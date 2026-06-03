@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GRARF | Sports OS</title>
+  <meta name="description" content="Never miss a moment. Get early access to GRARF.">
+  <meta name="color-scheme" content="light dark">
+  <link rel="icon" href="grarf-logo_black.svg" type="image/svg+xml" media="(prefers-color-scheme: light)">
+  <link rel="icon" href="grarf-logo-white.svg" type="image/svg+xml" media="(prefers-color-scheme: dark)">
+  <link rel="icon" href="grarf-logo_black.svg" type="image/svg+xml">
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+    }
+
+    body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      font-size: 16px;
+      line-height: 1.5;
+      color: #f5f5f7;
+      background: #000;
+    }
+
+    .layout {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      width: 100%;
+      height: 100%;
+      height: 100dvh;
+      max-height: 100dvh;
+      padding: 0 clamp(0.5rem, 1.25vw, 1rem) 0 0;
+      overflow: hidden;
+      background: #000;
+    }
+
+    .layout-stage {
+      position: relative;
+      width: calc(100% - clamp(1.75rem, 4.25vw, 3.25rem));
+      height: 100dvh;
+      min-height: 100dvh;
+      max-height: 100dvh;
+      margin-left: clamp(1.75rem, 4.25vw, 3.25rem);
+      margin-right: 0;
+      padding-left: 220px;
+      box-sizing: border-box;
+      overflow: hidden;
+    }
+
+    .layout-sidebar {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 220px;
+      height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      min-height: 0;
+      padding: clamp(0.75rem, 2vh, 1.5rem) 0.5rem;
+      overflow: hidden;
+      font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Monaco, Consolas, "Liberation Mono",
+        monospace;
+      color: #b7cccc;
+      background: #020404;
+      border-right: 1px solid #1b2b2b;
+      box-shadow: inset -16px 0 40px rgba(0, 0, 0, 0.42);
+      box-sizing: border-box;
+    }
+
+    .layout-sidebar .hero-logo {
+      display: block;
+      width: clamp(3.63rem, 8.3vw, 6.22rem);
+      height: auto;
+      flex-shrink: 0;
+      margin-left: 0.5rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid rgba(27, 43, 43, 0.9);
+    }
+
+    .sidebar-nav {
+      flex: 1 1 auto;
+      min-height: 0;
+      margin-top: 0.75rem;
+      padding: 0 0.25rem;
+      overflow: hidden;
+    }
+
+    .sidebar-nav-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+
+    .sidebar-nav-item {
+      display: block;
+      width: 100%;
+      padding: 5px 8px;
+      font-family: inherit;
+      font-size: 10px;
+      font-weight: 400;
+      line-height: 1.35;
+      letter-spacing: 0.12em;
+      text-align: left;
+      text-decoration: none;
+      color: #b7cccc;
+      background: transparent;
+      border: 1px solid transparent;
+      cursor: default;
+      transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .sidebar-nav-label {
+      display: block;
+    }
+
+    .sidebar-nav-meta {
+      display: block;
+      margin-top: 2px;
+      font-size: 8px;
+      font-weight: 400;
+      line-height: 1.25;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #6f8585;
+    }
+
+    .sidebar-nav-item:hover,
+    .sidebar-nav-item:focus-visible {
+      color: #56f7ff;
+      border-color: rgba(86, 247, 255, 0.25);
+      background: rgba(86, 247, 255, 0.06);
+      box-shadow: 0 0 12px rgba(86, 247, 255, 0.08);
+      outline: none;
+    }
+
+    .sidebar-nav-item:hover .sidebar-nav-meta,
+    .sidebar-nav-item:focus-visible .sidebar-nav-meta {
+      color: #8aa8a8;
+    }
+
+    .sidebar-nav-item.is-active {
+      color: #56f7ff;
+      border-color: rgba(86, 247, 255, 0.4);
+      background: rgba(86, 247, 255, 0.1);
+      box-shadow: inset 2px 0 0 rgba(86, 247, 255, 0.65);
+    }
+
+    .sidebar-nav-item.is-active .sidebar-nav-meta {
+      color: #7a9494;
+    }
+
+    .sidebar-cta {
+      flex-shrink: 0;
+      margin-top: auto;
+      width: 100%;
+      padding: 0.5rem 0.25rem 0;
+      border-top: 1px solid #1b2b2b;
+      background: rgba(3, 6, 6, 0.55);
+    }
+
+    .sidebar-cta .cta {
+      max-width: none;
+    }
+
+    .sidebar-cta #cta-heading {
+      margin: 0 0 0.25rem;
+      padding: 0 0.25rem;
+      font-family: inherit;
+      font-size: 10.35px;
+      font-weight: 400;
+      line-height: 1.4;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: #6f8585;
+    }
+
+    .sidebar-cta .cta-form {
+      flex-direction: column;
+      gap: 0.375rem;
+    }
+
+    .sidebar-cta .cta-input {
+      width: 100%;
+      padding: 7px 8px;
+      font-family: inherit;
+      font-size: 10px;
+      font-weight: 400;
+      line-height: 1.4;
+      letter-spacing: 0.08em;
+      color: #b7cccc;
+      background: #050a0a;
+      border: 1px solid rgba(27, 43, 43, 0.95);
+      border-radius: 0;
+      outline: none;
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+      box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.4);
+      transition: border-color 0.2s ease, background 0.2s ease;
+    }
+
+    .sidebar-cta .cta-input::placeholder {
+      color: #6f8585;
+    }
+
+    .sidebar-cta .cta-input:focus {
+      border-color: rgba(86, 247, 255, 0.45);
+      background: #050a0a;
+    }
+
+    .sidebar-cta .cta-button {
+      width: 100%;
+      padding: 6px 8px;
+      font-family: inherit;
+      font-size: 8px;
+      font-weight: 400;
+      line-height: 1.4;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: rgba(86, 247, 255, 0.9);
+      background: #050a0a;
+      border: 1px solid rgba(86, 247, 255, 0.45);
+      border-radius: 0;
+      cursor: pointer;
+      box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.35);
+      transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+    }
+
+    .sidebar-cta .cta-button:hover {
+      color: #56f7ff;
+      background: rgba(86, 247, 255, 0.06);
+      border-color: rgba(86, 247, 255, 0.6);
+    }
+
+    .sidebar-cta .cta-button:active {
+      transform: none;
+      background: rgba(86, 247, 255, 0.1);
+    }
+
+    .sidebar-cta .cta-button:focus-visible {
+      outline: 1px solid rgba(86, 247, 255, 0.5);
+      outline-offset: 1px;
+    }
+
+    .sidebar-cta .cta-message {
+      margin-top: 0.375rem;
+      padding: 0 0.5rem;
+      font-size: 9px;
+      letter-spacing: 0.06em;
+      color: #6f8585;
+      min-height: 1rem;
+    }
+
+    .sidebar-cta .cta-message.is-error {
+      color: #ffb4b4;
+    }
+
+    .sidebar-cta .cta-message.is-success {
+      color: #b8f0c8;
+    }
+
+    .layout-main {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100dvh;
+      min-width: 0;
+      overflow: hidden;
+      background: #000;
+    }
+
+    .hero-video-frame {
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      width: 100%;
+      min-width: 0;
+      min-height: 0;
+      padding: clamp(0.75rem, 2vh, 1.5rem);
+      box-sizing: border-box;
+    }
+
+    .hero-video-stage {
+      width: min(100%, calc((100dvh - 2 * clamp(0.75rem, 2vh, 1.5rem)) * 16 / 9));
+      max-height: calc(100dvh - 2 * clamp(0.75rem, 2vh, 1.5rem));
+      aspect-ratio: 16 / 9;
+      flex-shrink: 0;
+      background: #000;
+    }
+
+    .hero-video-stage .landing-video {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .hero-overlay {
+      position: absolute;
+      inset: 0;
+      background: #000;
+      opacity: 0.5;
+    }
+
+    .brand {
+      font-size: clamp(2.5rem, 8vw, 4.5rem);
+      font-weight: 700;
+      letter-spacing: 0.28em;
+      text-indent: 0.28em;
+      line-height: 1;
+      margin-bottom: 2.5rem;
+      color: #fff;
+      text-shadow: 0 2px 24px rgba(0, 0, 0, 0.45);
+    }
+
+    .headline {
+      font-size: clamp(1.35rem, 4.2vw, 2.125rem);
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      line-height: 1.2;
+      text-transform: uppercase;
+      color: #fff;
+      margin-bottom: 1rem;
+      text-shadow: 0 2px 20px rgba(0, 0, 0, 0.5);
+    }
+
+    .subheadline {
+      font-size: clamp(1.125rem, 3vw, 1.5rem);
+      font-weight: 400;
+      letter-spacing: 0.02em;
+      color: rgba(255, 255, 255, 0.88);
+      margin-bottom: 2.75rem;
+      text-shadow: 0 1px 12px rgba(0, 0, 0, 0.45);
+    }
+
+    .cta {
+      width: 100%;
+      max-width: 28rem;
+    }
+
+    .cta-form {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      width: 100%;
+    }
+
+    .cta-input {
+      flex: 1;
+      min-width: 0;
+      width: 100%;
+      padding: 0.9375rem 1.25rem;
+      font: inherit;
+      font-size: 1rem;
+      color: #fff;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      border-radius: 12px;
+      outline: none;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
+      transition: border-color 0.2s ease, background 0.2s ease;
+    }
+
+    .cta-input::placeholder {
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    .cta-input:focus {
+      border-color: rgba(255, 255, 255, 0.45);
+      background: rgba(255, 255, 255, 0.14);
+    }
+
+    .cta-button {
+      flex-shrink: 0;
+      width: 100%;
+      padding: 0.9375rem 1.5rem;
+      font: inherit;
+      font-size: 0.8125rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #0a0a0a;
+      background: #fff;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.35);
+      transition: background 0.2s ease, transform 0.15s ease;
+    }
+
+    .cta-button:hover {
+      background: #f0f0f2;
+    }
+
+    .cta-button:active {
+      transform: scale(0.98);
+    }
+
+    .cta-button:focus-visible {
+      outline: 2px solid #fff;
+      outline-offset: 3px;
+    }
+
+    .cta-message {
+      margin-top: 1rem;
+      font-size: 0.875rem;
+      color: rgba(255, 255, 255, 0.75);
+      min-height: 1.25rem;
+    }
+
+    .cta-message.is-error {
+      color: #ffb4b4;
+    }
+
+    .cta-message.is-success {
+      color: #b8f0c8;
+    }
+
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+  </style>
+</head>
+<body>
+  <main class="layout">
+    <div class="layout-stage">
+    <aside class="layout-sidebar">
+      <img
+        class="hero-logo"
+        src="grarf_logo-white.png"
+        width="512"
+        height="512"
+        alt="GRARF"
+      >
+
+      <nav class="sidebar-nav" aria-label="Primary navigation">
+        <ul class="sidebar-nav-list">
+          <li>
+            <span
+              class="sidebar-nav-item is-active"
+              data-nav-action="live-whip-around"
+              role="button"
+              tabindex="0"
+              aria-current="page"
+            ><span class="sidebar-nav-label">/live-whip-around_manual</span></span>
+          </li>
+          <li>
+            <span
+              class="sidebar-nav-item"
+              data-nav-action="watch-live"
+              role="button"
+              tabindex="0"
+            ><span class="sidebar-nav-label">/watch-guide_live-stream</span></span>
+          </li>
+          <li>
+            <span
+              class="sidebar-nav-item"
+              data-nav-action="every-league-covered"
+              role="button"
+              tabindex="0"
+            ><span class="sidebar-nav-label">/league-overview</span></span>
+          </li>
+          <li>
+            <span
+              class="sidebar-nav-item"
+              data-nav-action="every-game-covered"
+              role="button"
+              tabindex="0"
+            ><span class="sidebar-nav-label">/game-workspace</span></span>
+          </li>
+          <li>
+            <span
+              class="sidebar-nav-item"
+              data-nav-action="newsletters-shows"
+              role="button"
+              tabindex="0"
+            ><span class="sidebar-nav-label">/newsletters_shows</span></span>
+          </li>
+          <li>
+            <span
+              class="sidebar-nav-item"
+              data-nav-action="podcasts-betting"
+              role="button"
+              tabindex="0"
+            ><span class="sidebar-nav-label">/podcasts_betting</span></span>
+          </li>
+          <li>
+            <span
+              class="sidebar-nav-item"
+              data-nav-action="multi-view"
+              role="button"
+              tabindex="0"
+            ><span class="sidebar-nav-label">/multiview</span></span>
+          </li>
+          <li>
+            <span
+              class="sidebar-nav-item"
+              data-nav-action="prepare-lineup"
+              role="button"
+              tabindex="0"
+            ><span class="sidebar-nav-label">/fantasy</span></span>
+          </li>
+          <li>
+            <span
+              class="sidebar-nav-item"
+              data-nav-action="prepare-game"
+              role="button"
+              tabindex="0"
+            ><span class="sidebar-nav-label">/game-prep</span></span>
+          </li>
+          <li>
+            <span
+              class="sidebar-nav-item"
+              data-nav-action="catch-up-everything"
+              role="button"
+              tabindex="0"
+            ><span class="sidebar-nav-label">/catch-up</span></span>
+          </li>
+          <li>
+            <span
+              class="sidebar-nav-item"
+              data-nav-action="convo"
+              role="button"
+              tabindex="0"
+            ><span class="sidebar-nav-label">/convo</span></span>
+          </li>
+        </ul>
+      </nav>
+
+      <div class="sidebar-cta">
+        <section class="cta" aria-labelledby="cta-heading">
+          <h2 id="cta-heading">EARLY ACCESS</h2>
+          <form class="cta-form" id="early-access-form" novalidate>
+            <label class="visually-hidden" for="email">Email address</label>
+            <input
+              class="cta-input"
+              type="email"
+              id="email"
+              name="email"
+              placeholder="Enter your email"
+              autocomplete="email"
+              required
+            >
+            <button class="cta-button" type="submit">JOIN WAITLIST</button>
+          </form>
+          <p class="cta-message" id="cta-message" role="status" aria-live="polite"></p>
+        </section>
+      </div>
+    </aside>
+
+    <div class="layout-main">
+      <div class="hero-video-frame">
+        <div class="hero-video-stage">
+          <video
+            id="landing-video"
+            class="landing-video"
+            src="videos/GRARF Live Whip Around.mp4"
+            autoplay
+            muted
+            loop
+            playsinline
+            preload="auto"
+          ></video>
+        </div>
+      </div>
+    </div>
+    </div>
+  </main>
+
+  <script>
+    (function () {
+      var form = document.getElementById("early-access-form");
+      var input = document.getElementById("email");
+      var message = document.getElementById("cta-message");
+
+      function setMessage(text, type) {
+        message.textContent = text;
+        message.className = "cta-message" + (type ? " is-" + type : "");
+      }
+
+      var WAITLIST_API_URL = "https://grarf-waitlist.grarf.workers.dev/waitlist";
+      var submitButton = form.querySelector(".cta-button");
+
+      form.addEventListener("submit", function (e) {
+        e.preventDefault();
+        var value = (input.value || "").trim();
+        if (!value) {
+          setMessage("Please enter your email.", "error");
+          input.focus();
+          return;
+        }
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+          setMessage("Please enter a valid email address.", "error");
+          input.focus();
+          return;
+        }
+        if (submitButton) submitButton.disabled = true;
+        fetch(WAITLIST_API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: value }),
+        })
+          .then(function (response) {
+            if (response.ok) {
+              setMessage("Thanks — you're on the list.", "success");
+              form.reset();
+              return;
+            }
+            setMessage("Something went wrong. Please try again.", "error");
+          })
+          .catch(function () {
+            setMessage("Something went wrong. Please try again.", "error");
+          })
+          .finally(function () {
+            if (submitButton) submitButton.disabled = false;
+          });
+      });
+
+      var navItems = document.querySelectorAll("[data-nav-action]");
+      var landingVideo = document.getElementById("landing-video");
+      var currentNavAction = "live-whip-around";
+      var videoSrcByNavAction = {
+        "live-whip-around": "videos/GRARF Live Whip Around.mp4",
+        "watch-live": "videos/GRARF Channel Guide.mp4",
+        "every-league-covered": "videos/GRARF League Overview.mp4",
+        "every-game-covered": "videos/GRARF Deep Dive.mp4",
+        "newsletters-shows": "videos/GRARF Newsletters Shows.mp4",
+        "podcasts-betting": "videos/GRARF Podcasts Betting.mp4",
+        "multi-view": "videos/GRARF Baseball Multi View.mp4",
+        "prepare-lineup": "videos/GRARF Fantasy.mp4",
+        "prepare-game": "videos/GRARF Game Prep.mp4",
+        "catch-up-everything": "videos/GRARF Catch Up MLB.mp4",
+        "convo": "videos/GRARF Convo.mp4"
+      };
+      var prefetchedVideoSrc = Object.create(null);
+      prefetchedVideoSrc[videoSrcByNavAction["live-whip-around"]] = true;
+
+      function prefetchLandingVideo(navAction) {
+        var src = videoSrcByNavAction[navAction];
+        if (!src || navAction === currentNavAction || prefetchedVideoSrc[src]) return;
+        prefetchedVideoSrc[src] = true;
+        fetch(src, { credentials: "same-origin" }).catch(function () {});
+      }
+
+      function setActiveNavItem(activeNav) {
+        navItems.forEach(function (navEl) {
+          navEl.classList.remove("is-active");
+          navEl.removeAttribute("aria-current");
+        });
+        activeNav.classList.add("is-active");
+        activeNav.setAttribute("aria-current", "page");
+      }
+
+      function playLandingVideo() {
+        var playPromise = landingVideo.play();
+        if (playPromise && typeof playPromise.catch === "function") {
+          playPromise.catch(function () {});
+        }
+      }
+
+      function showLandingVideo(navAction, navEl) {
+        var nextSrc = videoSrcByNavAction[navAction];
+        if (!nextSrc || navAction === currentNavAction) return;
+        currentNavAction = navAction;
+        prefetchedVideoSrc[nextSrc] = true;
+        setActiveNavItem(navEl);
+        landingVideo.pause();
+        landingVideo.src = nextSrc;
+        landingVideo.load();
+        if (landingVideo.readyState >= 3) {
+          playLandingVideo();
+        } else {
+          landingVideo.addEventListener("canplay", playLandingVideo, { once: true });
+        }
+      }
+
+      navItems.forEach(function (navEl) {
+        var navAction = navEl.getAttribute("data-nav-action");
+        function onPrefetchIntent() {
+          prefetchLandingVideo(navAction);
+        }
+        function onSelect() {
+          showLandingVideo(navAction, navEl);
+        }
+        navEl.addEventListener("mouseenter", onPrefetchIntent);
+        navEl.addEventListener("focus", onPrefetchIntent);
+        navEl.addEventListener("touchstart", onPrefetchIntent, { passive: true });
+        navEl.addEventListener("click", onSelect);
+        navEl.addEventListener("keydown", function (e) {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            onSelect();
+          }
+        });
+      });
+    })();
+  </script>
+</body>
+</html>
