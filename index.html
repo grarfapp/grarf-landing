@@ -448,115 +448,369 @@
       white-space: nowrap;
       border: 0;
     }
+
+    .mobile-accordion-panel {
+      display: none;
+      padding: 0;
+      background: #000;
+    }
+
+    .mobile-accordion-item.is-expanded .mobile-accordion-panel {
+      display: block;
+    }
+
+    @media (max-width: 767px) {
+      html,
+      body {
+        height: auto;
+        min-height: 100dvh;
+        overflow-x: hidden;
+        overflow-y: auto;
+      }
+
+      .layout {
+        height: auto;
+        min-height: 100dvh;
+        max-height: none;
+        padding: 0;
+        overflow: visible;
+      }
+
+      .layout-stage {
+        width: 100%;
+        height: auto;
+        min-height: 100dvh;
+        max-height: none;
+        margin: 0;
+        padding-left: 0;
+        overflow: visible;
+      }
+
+      .layout-sidebar {
+        position: static;
+        width: 100%;
+        height: auto;
+        min-height: 0;
+        overflow: visible;
+        border-right: none;
+        box-shadow: none;
+        padding-left: 0;
+        padding-right: 0;
+      }
+
+      .mobile-site-header {
+        position: sticky;
+        top: 0;
+        z-index: 30;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        padding: 0.5rem 0.5rem;
+        background: #020404;
+        border-bottom: 1px solid rgba(27, 43, 43, 0.9);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.42);
+      }
+
+      .mobile-site-header .hero-logo {
+        display: block;
+        width: clamp(4.5rem, 20vw, 5.5rem);
+        height: auto;
+        margin: 0;
+        padding-bottom: 0;
+        border-bottom: none;
+      }
+
+      .mobile-accordion-item {
+        scroll-margin-top: calc(var(--mobile-header-offset, 4rem) + 0.5rem);
+      }
+
+      .sidebar-nav {
+        flex: none;
+        overflow: visible;
+        padding: 0 0.5rem;
+      }
+
+      .sidebar-nav-item {
+        cursor: pointer;
+      }
+
+      .sidebar-nav-list > .mobile-accordion-item:last-child {
+        margin-bottom: 0.75rem;
+      }
+
+      .sidebar-cta.mobile-footer-cta {
+        flex-shrink: 0;
+        margin-top: 2.5rem;
+        width: 100%;
+        margin-left: 0;
+        margin-right: 0;
+        padding: 4.5rem 1.25rem 0;
+        padding-bottom: calc(4rem + env(safe-area-inset-bottom, 0px));
+        border-top: 2px solid rgba(27, 43, 43, 0.98);
+        background: linear-gradient(
+          180deg,
+          rgba(2, 4, 4, 0) 0%,
+          rgba(3, 10, 10, 0.94) 18%,
+          #030606 42%,
+          #020404 100%
+        );
+        box-shadow:
+          inset 0 1px 0 rgba(86, 247, 255, 0.18),
+          inset 0 3px 28px rgba(86, 247, 255, 0.05),
+          0 -28px 56px rgba(0, 0, 0, 0.45);
+      }
+
+      .mobile-footer-cta #cta-heading {
+        margin: 0 0 1.25rem;
+        padding: 0;
+        font-size: 0.6875rem;
+        letter-spacing: 0.28em;
+        text-align: center;
+        color: #56f7ff;
+      }
+
+      .mobile-footer-cta .cta {
+        max-width: 22rem;
+        margin: 0 auto;
+      }
+
+      .mobile-footer-cta .cta-form {
+        gap: 0.875rem;
+        padding-bottom: 0.25rem;
+      }
+
+      .mobile-footer-cta .cta-input {
+        padding: 12px 14px;
+        font-size: 14px;
+        letter-spacing: 0.04em;
+      }
+
+      .mobile-footer-cta .cta-button {
+        padding: 12px 14px;
+        font-size: 11px;
+        letter-spacing: 0.14em;
+        color: #020404;
+        background: #56f7ff;
+        border-color: rgba(86, 247, 255, 0.85);
+        box-shadow: 0 0 20px rgba(86, 247, 255, 0.18);
+      }
+
+      .mobile-footer-cta .cta-button:hover {
+        color: #020404;
+        background: #7df9ff;
+        border-color: #7df9ff;
+      }
+
+      .mobile-footer-cta .cta-button:active {
+        background: #3de8f2;
+      }
+
+      .mobile-footer-cta .cta-message {
+        margin-top: 1rem;
+        padding: 0 0 0.5rem;
+        font-size: 11px;
+        text-align: center;
+        min-height: 1.25rem;
+      }
+
+      .layout-main {
+        display: none;
+      }
+
+      .mobile-accordion-item.is-expanded .mobile-accordion-panel {
+        width: 100vw;
+        max-width: 100vw;
+        margin-left: calc(50% - 50vw);
+        margin-right: calc(50% - 50vw);
+        margin-bottom: 0.5rem;
+      }
+
+      .mobile-accordion-video-slot {
+        width: 100%;
+      }
+
+      .mobile-accordion-video-slot .hero-video-stage {
+        width: 100%;
+        max-width: 100%;
+        max-height: none;
+        height: auto;
+        aspect-ratio: 16 / 9;
+      }
+
+      .mobile-accordion-video-slot .landing-video {
+        display: block;
+        width: 100%;
+        height: 100%;
+        max-width: 100%;
+        object-fit: contain;
+      }
+
+      .mobile-accordion-panel[hidden] {
+        display: none !important;
+      }
+    }
+
+    @media (min-width: 768px) {
+      .mobile-accordion-panel {
+        display: none !important;
+      }
+    }
   </style>
 </head>
 <body>
   <main class="layout">
     <div class="layout-stage">
     <aside class="layout-sidebar">
-      <img
-        class="hero-logo"
-        src="grarf_logo-white.png"
-        width="512"
-        height="512"
-        alt="GRARF"
-      >
+      <header class="mobile-site-header">
+        <img
+          class="hero-logo"
+          src="grarf_logo-white.png"
+          width="512"
+          height="512"
+          alt="GRARF"
+        >
+      </header>
 
       <nav class="sidebar-nav" aria-label="Primary navigation">
         <ul class="sidebar-nav-list">
-          <li>
+          <li class="mobile-accordion-item is-expanded">
             <span
               class="sidebar-nav-item is-active"
               data-nav-action="live-whip-around"
               role="button"
               tabindex="0"
               aria-current="page"
+              aria-expanded="true"
             ><span class="sidebar-nav-label">/live-whip-around_manual</span></span>
+            <div class="mobile-accordion-panel" data-nav-panel="live-whip-around">
+              <div class="mobile-accordion-video-slot"></div>
+            </div>
           </li>
-          <li>
+          <li class="mobile-accordion-item">
             <span
               class="sidebar-nav-item"
               data-nav-action="watch-live"
               role="button"
               tabindex="0"
+              aria-expanded="false"
             ><span class="sidebar-nav-label">/watch-guide_live-stream</span></span>
+            <div class="mobile-accordion-panel" data-nav-panel="watch-live" hidden>
+              <div class="mobile-accordion-video-slot"></div>
+            </div>
           </li>
-          <li>
+          <li class="mobile-accordion-item">
             <span
               class="sidebar-nav-item"
               data-nav-action="every-league-covered"
               role="button"
               tabindex="0"
+              aria-expanded="false"
             ><span class="sidebar-nav-label">/league-overview</span></span>
+            <div class="mobile-accordion-panel" data-nav-panel="every-league-covered" hidden>
+              <div class="mobile-accordion-video-slot"></div>
+            </div>
           </li>
-          <li>
+          <li class="mobile-accordion-item">
             <span
               class="sidebar-nav-item"
               data-nav-action="every-game-covered"
               role="button"
               tabindex="0"
+              aria-expanded="false"
             ><span class="sidebar-nav-label">/game-workspace</span></span>
+            <div class="mobile-accordion-panel" data-nav-panel="every-game-covered" hidden>
+              <div class="mobile-accordion-video-slot"></div>
+            </div>
           </li>
-          <li>
+          <li class="mobile-accordion-item">
             <span
               class="sidebar-nav-item"
               data-nav-action="newsletters-shows"
               role="button"
               tabindex="0"
+              aria-expanded="false"
             ><span class="sidebar-nav-label">/newsletters_shows</span></span>
+            <div class="mobile-accordion-panel" data-nav-panel="newsletters-shows" hidden>
+              <div class="mobile-accordion-video-slot"></div>
+            </div>
           </li>
-          <li>
+          <li class="mobile-accordion-item">
             <span
               class="sidebar-nav-item"
               data-nav-action="podcasts-betting"
               role="button"
               tabindex="0"
+              aria-expanded="false"
             ><span class="sidebar-nav-label">/podcasts_betting</span></span>
+            <div class="mobile-accordion-panel" data-nav-panel="podcasts-betting" hidden>
+              <div class="mobile-accordion-video-slot"></div>
+            </div>
           </li>
-          <li>
+          <li class="mobile-accordion-item">
             <span
               class="sidebar-nav-item"
               data-nav-action="multi-view"
               role="button"
               tabindex="0"
+              aria-expanded="false"
             ><span class="sidebar-nav-label">/multiview</span></span>
+            <div class="mobile-accordion-panel" data-nav-panel="multi-view" hidden>
+              <div class="mobile-accordion-video-slot"></div>
+            </div>
           </li>
-          <li>
+          <li class="mobile-accordion-item">
             <span
               class="sidebar-nav-item"
               data-nav-action="prepare-lineup"
               role="button"
               tabindex="0"
+              aria-expanded="false"
             ><span class="sidebar-nav-label">/fantasy</span></span>
+            <div class="mobile-accordion-panel" data-nav-panel="prepare-lineup" hidden>
+              <div class="mobile-accordion-video-slot"></div>
+            </div>
           </li>
-          <li>
+          <li class="mobile-accordion-item">
             <span
               class="sidebar-nav-item"
               data-nav-action="prepare-game"
               role="button"
               tabindex="0"
+              aria-expanded="false"
             ><span class="sidebar-nav-label">/game-prep</span></span>
+            <div class="mobile-accordion-panel" data-nav-panel="prepare-game" hidden>
+              <div class="mobile-accordion-video-slot"></div>
+            </div>
           </li>
-          <li>
+          <li class="mobile-accordion-item">
             <span
               class="sidebar-nav-item"
               data-nav-action="catch-up-everything"
               role="button"
               tabindex="0"
+              aria-expanded="false"
             ><span class="sidebar-nav-label">/catch-up</span></span>
+            <div class="mobile-accordion-panel" data-nav-panel="catch-up-everything" hidden>
+              <div class="mobile-accordion-video-slot"></div>
+            </div>
           </li>
-          <li>
+          <li class="mobile-accordion-item">
             <span
               class="sidebar-nav-item"
               data-nav-action="convo"
               role="button"
               tabindex="0"
+              aria-expanded="false"
             ><span class="sidebar-nav-label">/convo</span></span>
+            <div class="mobile-accordion-panel" data-nav-panel="convo" hidden>
+              <div class="mobile-accordion-video-slot"></div>
+            </div>
           </li>
         </ul>
       </nav>
 
-      <div class="sidebar-cta">
+      <footer class="sidebar-cta mobile-footer-cta">
         <section class="cta" aria-labelledby="cta-heading">
           <h2 id="cta-heading">EARLY ACCESS</h2>
           <form class="cta-form" id="early-access-form" novalidate>
@@ -574,7 +828,7 @@
           </form>
           <p class="cta-message" id="cta-message" role="status" aria-live="polite"></p>
         </section>
-      </div>
+      </footer>
     </aside>
 
     <div class="layout-main">
@@ -647,6 +901,10 @@
 
       var navItems = document.querySelectorAll("[data-nav-action]");
       var landingVideo = document.getElementById("landing-video");
+      var videoStage = document.querySelector(".hero-video-stage");
+      var layoutMainFrame = document.querySelector(".layout-main .hero-video-frame");
+      var mobileAccordionItems = document.querySelectorAll(".mobile-accordion-item");
+      var mobileMq = window.matchMedia("(max-width: 767px)");
       var currentNavAction = "live-whip-around";
       var videoSrcByNavAction = {
         "live-whip-around": "videos/GRARF Live Whip Around.mp4",
@@ -687,9 +945,87 @@
         }
       }
 
+      function isMobileLayout() {
+        return mobileMq.matches;
+      }
+
+      function updateMobileHeaderOffset() {
+        if (!isMobileLayout()) return;
+        var header = document.querySelector(".mobile-site-header");
+        if (!header) return;
+        document.documentElement.style.setProperty(
+          "--mobile-header-offset",
+          header.offsetHeight + "px"
+        );
+      }
+
+      function scrollMobileAccordionIntoView(navEl) {
+        if (!isMobileLayout()) return;
+        var item = navEl.closest(".mobile-accordion-item");
+        if (!item) return;
+        updateMobileHeaderOffset();
+        requestAnimationFrame(function () {
+          requestAnimationFrame(function () {
+            item.scrollIntoView({ behavior: "smooth", block: "start" });
+          });
+        });
+      }
+
+      function setMobileAccordionExpanded(navEl) {
+        mobileAccordionItems.forEach(function (item) {
+          var panel = item.querySelector(".mobile-accordion-panel");
+          var slot = item.querySelector(".mobile-accordion-video-slot");
+          var trigger = item.querySelector("[data-nav-action]");
+          var expanded = trigger === navEl;
+          item.classList.toggle("is-expanded", expanded);
+          if (panel) panel.hidden = !expanded;
+          if (trigger) trigger.setAttribute("aria-expanded", expanded ? "true" : "false");
+          if (expanded && slot && videoStage) slot.appendChild(videoStage);
+        });
+      }
+
+      function restoreDesktopVideoPlacement() {
+        if (layoutMainFrame && videoStage) layoutMainFrame.appendChild(videoStage);
+        mobileAccordionItems.forEach(function (item) {
+          var panel = item.querySelector(".mobile-accordion-panel");
+          var trigger = item.querySelector("[data-nav-action]");
+          item.classList.remove("is-expanded");
+          if (panel) panel.hidden = true;
+          if (trigger) trigger.setAttribute("aria-expanded", "false");
+        });
+        var activeNav = document.querySelector("[data-nav-action].is-active");
+        if (activeNav) {
+          var activeItem = activeNav.closest(".mobile-accordion-item");
+          if (activeItem) {
+            var activePanel = activeItem.querySelector(".mobile-accordion-panel");
+            activeItem.classList.add("is-expanded");
+            if (activePanel) activePanel.hidden = false;
+            activeNav.setAttribute("aria-expanded", "true");
+          }
+        }
+      }
+
+      function syncMobileAccordionLayout() {
+        if (isMobileLayout()) {
+          updateMobileHeaderOffset();
+          var activeNav = document.querySelector("[data-nav-action].is-active") || navItems[0];
+          setMobileAccordionExpanded(activeNav);
+        } else {
+          restoreDesktopVideoPlacement();
+        }
+      }
+
       function showLandingVideo(navAction, navEl) {
         var nextSrc = videoSrcByNavAction[navAction];
-        if (!nextSrc || navAction === currentNavAction) return;
+        if (!nextSrc) return;
+        if (isMobileLayout()) setMobileAccordionExpanded(navEl);
+        if (navAction === currentNavAction) {
+          if (isMobileLayout()) {
+            setActiveNavItem(navEl);
+            scrollMobileAccordionIntoView(navEl);
+          }
+          return;
+        }
         currentNavAction = navAction;
         prefetchedVideoSrc[nextSrc] = true;
         setActiveNavItem(navEl);
@@ -701,6 +1037,14 @@
         } else {
           landingVideo.addEventListener("canplay", playLandingVideo, { once: true });
         }
+        if (isMobileLayout()) scrollMobileAccordionIntoView(navEl);
+      }
+
+      syncMobileAccordionLayout();
+      if (typeof mobileMq.addEventListener === "function") {
+        mobileMq.addEventListener("change", syncMobileAccordionLayout);
+      } else if (typeof mobileMq.addListener === "function") {
+        mobileMq.addListener(syncMobileAccordionLayout);
       }
 
       navItems.forEach(function (navEl) {
