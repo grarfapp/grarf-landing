@@ -687,11 +687,17 @@
               <div class="mobile-accordion-video-slot"></div>
             </div>
           </li>
-          <li>
-            <a
+          <li class="mobile-accordion-item">
+            <span
               class="sidebar-nav-item"
-              href="/sportscape"
-            ><span class="sidebar-nav-label">Sportscape</span></a>
+              data-nav-action="sportscape"
+              role="button"
+              tabindex="0"
+              aria-expanded="false"
+            ><span class="sidebar-nav-label">/sportscape</span></span>
+            <div class="mobile-accordion-panel" data-nav-panel="sportscape" hidden>
+              <div class="mobile-accordion-video-slot"></div>
+            </div>
           </li>
           <li class="mobile-accordion-item">
             <span
@@ -914,6 +920,7 @@
       var currentNavAction = "live-whip-around";
       var videoSrcByNavAction = {
         "live-whip-around": "videos/GRARF Live Whip Around.mp4",
+        "sportscape": "videos/GRARF Sportscape.mp4",
         "watch-live": "videos/GRARF Channel Guide.mp4",
         "every-league-covered": "videos/GRARF League Overview.mp4",
         "every-game-covered": "videos/GRARF Deep Dive.mp4",
