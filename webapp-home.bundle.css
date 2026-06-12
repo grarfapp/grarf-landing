@@ -1,0 +1,17 @@
+@import "https://fonts.googleapis.com/css2?family=Inconsolata+Go:wght@400;600&display=swap";
+
+/* ../grarf/desktop/src/lib/sportscape/sportscapeHeadlineTypography.css */
+.sportscape-headline {
+  font-family:
+    "Inconsolata Go",
+    ui-monospace,
+    monospace;
+}
+
+/* ../grarf/desktop/src/lib/sportscape/sportscapeRecapTypography.css */
+.sportscape-recap-body {
+  font-family:
+    "Inconsolata Go",
+    ui-monospace,
+    monospace;
+}

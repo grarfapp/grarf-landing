@@ -1,0 +1,3 @@
+/* Scoped utilities only — avoid clobbering webapp.css shell reset */
+@tailwind components;
+@tailwind utilities;
