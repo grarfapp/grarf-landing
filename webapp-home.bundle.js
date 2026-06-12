@@ -23117,6 +23117,169 @@ var GAMES_COLUMN_LEAGUE_LABEL = {
   F1: "Formula 1"
 };
 
+// ../grarf/desktop/src/lib/gamesSpine/resolveWorldCupWorkspaceEmbedUrl.ts
+init_define_import_meta_env();
+
+// ../grarf/desktop/src/lib/aiscore/buildAiscoreMatchUrl.ts
+init_define_import_meta_env();
+
+// ../grarf/desktop/src/lib/aiscore/teamSlugUtils.ts
+init_define_import_meta_env();
+
+// ../grarf/desktop/src/lib/tennisChannelPlus/nameUtils.ts
+init_define_import_meta_env();
+function normalizeTennisText(value) {
+  return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9\s]/g, " ").replace(/\s+/g, " ").trim();
+}
+function tokenizeTennisLabel(raw) {
+  const trimmed = raw.trim();
+  if (!trimmed) return [];
+  if (trimmed.includes("/")) {
+    return trimmed.split("/").flatMap((part) => tokenizeTennisLabel(part)).filter(Boolean);
+  }
+  let label = trimmed;
+  if (label.includes(",")) {
+    const [last, first] = label.split(",").map((part) => part.trim());
+    label = `${first} ${last}`.trim();
+  }
+  return normalizeTennisText(label).split(" ").filter((token) => token.length >= 2);
+}
+function tokenSetFromLabel(raw) {
+  return new Set(tokenizeTennisLabel(raw));
+}
+function tokenOverlapScore(a2, b2) {
+  if (a2.size === 0 || b2.size === 0) return 0;
+  let matched = 0;
+  for (const token of a2) {
+    if (b2.has(token)) {
+      matched += 1;
+      continue;
+    }
+    for (const other of b2) {
+      if (token.length >= 4 && other.length >= 4 && (token.includes(other) || other.includes(token))) {
+        matched += 0.9;
+        break;
+      }
+    }
+  }
+  return matched / Math.max(a2.size, b2.size);
+}
+var TOURNAMENT_STOP_WORDS = /* @__PURE__ */ new Set([
+  "atp",
+  "wta",
+  "itf",
+  "men",
+  "women",
+  "singles",
+  "doubles",
+  "mixed",
+  "round",
+  "final",
+  "quarterfinals",
+  "semifinals",
+  "challenger",
+  "great",
+  "britain",
+  "germany",
+  "netherlands",
+  "united",
+  "states"
+]);
+function tokenizeTournamentText(raw) {
+  const tokens = normalizeTennisText(raw).split(" ").filter((token) => token.length >= 3 && !TOURNAMENT_STOP_WORDS.has(token));
+  return new Set(tokens);
+}
+
+// ../grarf/desktop/src/lib/aiscore/teamSlugUtils.ts
+var AISCORE_TEAM_SLUG_OVERRIDES = {
+  usa: "usa",
+  "united states": "usa",
+  "bosnia and herzegovina": "bosnia-and-herzegovina",
+  "bosnia herzegovina": "bosnia-and-herzegovina",
+  "bosnia-herzegovina": "bosnia-and-herzegovina",
+  "cote d ivoire": "cote-d'ivoire",
+  "ivory coast": "cote-d'ivoire",
+  "ir iran": "ir-iran",
+  "south korea": "south-korea",
+  "south africa": "south-africa",
+  "saudi arabia": "saudi-arabia",
+  "new zealand": "new-zealand",
+  "cabo verde": "cabo-verde",
+  "cape verde": "cabo-verde",
+  "democratic republic of the congo": "democratic-republic-of-the-congo",
+  "dr congo": "democratic-republic-of-the-congo",
+  curacao: "curacao",
+  turkiye: "turkiye",
+  turkey: "turkiye",
+  czechia: "czechia",
+  "czech republic": "czechia"
+};
+function teamNameToAiscoreSlug(name) {
+  const normalized = normalizeTennisText(name);
+  if (!normalized) return "";
+  const override = AISCORE_TEAM_SLUG_OVERRIDES[normalized];
+  if (override) return override;
+  return normalized.replace(/\s+/g, "-");
+}
+function buildAiscoreMatchSlugPath(homeTeamName, awayTeamName) {
+  const homeSlug = teamNameToAiscoreSlug(homeTeamName);
+  const awaySlug = teamNameToAiscoreSlug(awayTeamName);
+  if (!homeSlug || !awaySlug) return null;
+  return `match-${homeSlug}-${awaySlug}`;
+}
+
+// ../grarf/desktop/src/lib/aiscore/buildAiscoreMatchUrl.ts
+function buildAiscoreMatchUrl(matchId, homeTeamName, awayTeamName) {
+  const slugPath = buildAiscoreMatchSlugPath(homeTeamName, awayTeamName);
+  const id = matchId.trim();
+  if (!slugPath || !id) return null;
+  return `https://www.aiscore.com/${slugPath}/${encodeURIComponent(id)}`;
+}
+
+// ../grarf/desktop/src/lib/fotmob/buildFotmobMatchUrl.ts
+init_define_import_meta_env();
+function buildFotmobMatchUrl(matchId) {
+  const id = String(matchId).trim();
+  return `https://www.fotmob.com/match/${encodeURIComponent(id)}`;
+}
+
+// ../grarf/desktop/src/lib/platform/isGrarfWebRenderer.ts
+init_define_import_meta_env();
+function isGrarfWebRenderer() {
+  return typeof window !== "undefined" && window.GRARF_WEB_CONFIG != null;
+}
+
+// ../grarf/desktop/src/lib/gamesSpine/resolveWorldCupWorkspaceEmbedUrl.ts
+function isWorldCupGameRow(game) {
+  if (game.league === "WORLDCUP") return true;
+  return parseEspnGameIdFromRowId(game.id)?.league === "WORLDCUP";
+}
+function resolveWorldCupFotmobWorkspaceUrl(game) {
+  const fromMetadata = game.metadata?.fotmobMatchUrl?.trim();
+  if (fromMetadata) return fromMetadata;
+  const fotmobId = game.externalIds?.fotmob?.trim();
+  if (fotmobId) return buildFotmobMatchUrl(fotmobId);
+  return null;
+}
+function resolveWorldCupAiscoreWorkspaceUrl(game) {
+  const fromMetadata = game.metadata?.aiscoreMatchUrl?.trim();
+  if (fromMetadata) return fromMetadata;
+  const aiscoreId = game.externalIds?.aiscore?.trim();
+  if (!aiscoreId) return null;
+  const homeName = game.metadata?.officialHomeName?.trim() || game.homeTeam.trim();
+  const awayName = game.metadata?.officialAwayName?.trim() || game.awayTeam.trim();
+  return buildAiscoreMatchUrl(aiscoreId, homeName, awayName);
+}
+function resolveWorldCupWorkspaceEmbedUrl(game) {
+  if (isGrarfWebRenderer()) {
+    if (game.status === "scheduled") {
+      return resolveWorldCupAiscoreWorkspaceUrl(game);
+    }
+    return resolveWorldCupFotmobWorkspaceUrl(game);
+  }
+  return resolveWorldCupFotmobWorkspaceUrl(game);
+}
+
 // ../grarf/desktop/src/lib/espn/espnGameUrls.ts
 var ESPN_GAME_ID_RE = /^espn-([A-Z0-9]+)-(\d+)$/i;
 var SOCCER_LEAGUE_KEYS = /* @__PURE__ */ new Set([
@@ -23191,6 +23354,11 @@ function leagueKeyFromEspnGameId(gameId) {
 }
 function resolveGameWorkspaceEmbedUrl(game, gameId) {
   if (!gameId) return null;
+  if (game && isWorldCupGameRow(game)) {
+    const worldCupUrl = resolveWorldCupWorkspaceEmbedUrl(game);
+    if (worldCupUrl) return worldCupUrl;
+    if (isGrarfWebRenderer()) return null;
+  }
   if (game?.streamUrl?.trim()) {
     if (game.streamProvider === "ESPN+") {
       console.log("[ESPN] Resolved streamUrl for workspace", {
@@ -23494,14 +23662,6 @@ init_define_import_meta_env();
 
 // ../grarf/desktop/src/config/operationalIngestConfig.ts
 init_define_import_meta_env();
-
-// ../grarf/desktop/src/lib/platform/isGrarfWebRenderer.ts
-init_define_import_meta_env();
-function isGrarfWebRenderer() {
-  return typeof window !== "undefined" && window.GRARF_WEB_CONFIG != null;
-}
-
-// ../grarf/desktop/src/config/operationalIngestConfig.ts
 function resolveWebOperationalIngestUrl() {
   if (typeof window === "undefined") return null;
   return window.GRARF_WEB_CONFIG?.operationalIngestUrl?.trim() || null;
@@ -32847,13 +33007,6 @@ init_define_import_meta_env();
 // ../grarf/desktop/src/lib/fotmob/enrichWorldCupGamesWithFotmobUrls.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/fotmob/buildFotmobMatchUrl.ts
-init_define_import_meta_env();
-function buildFotmobMatchUrl(matchId) {
-  const id = String(matchId).trim();
-  return `https://www.fotmob.com/match/${encodeURIComponent(id)}`;
-}
-
 // ../grarf/desktop/src/lib/fotmob/fetchFotmobWorldCupCatalog.ts
 init_define_import_meta_env();
 
@@ -32946,70 +33099,6 @@ async function fetchFotmobWorldCupCatalog(games) {
 
 // ../grarf/desktop/src/lib/fotmob/matchFotmobWorldCupMatch.ts
 init_define_import_meta_env();
-
-// ../grarf/desktop/src/lib/tennisChannelPlus/nameUtils.ts
-init_define_import_meta_env();
-function normalizeTennisText(value) {
-  return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9\s]/g, " ").replace(/\s+/g, " ").trim();
-}
-function tokenizeTennisLabel(raw) {
-  const trimmed = raw.trim();
-  if (!trimmed) return [];
-  if (trimmed.includes("/")) {
-    return trimmed.split("/").flatMap((part) => tokenizeTennisLabel(part)).filter(Boolean);
-  }
-  let label = trimmed;
-  if (label.includes(",")) {
-    const [last, first] = label.split(",").map((part) => part.trim());
-    label = `${first} ${last}`.trim();
-  }
-  return normalizeTennisText(label).split(" ").filter((token) => token.length >= 2);
-}
-function tokenSetFromLabel(raw) {
-  return new Set(tokenizeTennisLabel(raw));
-}
-function tokenOverlapScore(a2, b2) {
-  if (a2.size === 0 || b2.size === 0) return 0;
-  let matched = 0;
-  for (const token of a2) {
-    if (b2.has(token)) {
-      matched += 1;
-      continue;
-    }
-    for (const other of b2) {
-      if (token.length >= 4 && other.length >= 4 && (token.includes(other) || other.includes(token))) {
-        matched += 0.9;
-        break;
-      }
-    }
-  }
-  return matched / Math.max(a2.size, b2.size);
-}
-var TOURNAMENT_STOP_WORDS = /* @__PURE__ */ new Set([
-  "atp",
-  "wta",
-  "itf",
-  "men",
-  "women",
-  "singles",
-  "doubles",
-  "mixed",
-  "round",
-  "final",
-  "quarterfinals",
-  "semifinals",
-  "challenger",
-  "great",
-  "britain",
-  "germany",
-  "netherlands",
-  "united",
-  "states"
-]);
-function tokenizeTournamentText(raw) {
-  const tokens = normalizeTennisText(raw).split(" ").filter((token) => token.length >= 3 && !TOURNAMENT_STOP_WORDS.has(token));
-  return new Set(tokens);
-}
 
 // ../grarf/desktop/src/lib/foxWorldCup/teamSlugUtils.ts
 init_define_import_meta_env();
@@ -33225,6 +33314,518 @@ async function enrichOperationalSnapshotFotmob(transport) {
   };
 }
 
+// ../grarf/desktop/src/lib/aiscore/enrichOperationalSnapshotAiscore.ts
+init_define_import_meta_env();
+
+// ../grarf/desktop/src/lib/aiscore/enrichWorldCupGamesWithAiscoreUrls.ts
+init_define_import_meta_env();
+
+// ../grarf/desktop/src/lib/aiscore/fetchAiscoreWorldCupCatalog.ts
+init_define_import_meta_env();
+
+// ../grarf/desktop/src/lib/aiscore/aiscoreDateKeys.ts
+init_define_import_meta_env();
+function aiscoreFixturesDateKeyFromMs(ms2) {
+  if (!Number.isFinite(ms2)) return null;
+  const d2 = new Date(ms2);
+  const y2 = d2.getUTCFullYear();
+  const m2 = String(d2.getUTCMonth() + 1).padStart(2, "0");
+  const day = String(d2.getUTCDate()).padStart(2, "0");
+  return `${y2}-${m2}-${day}`;
+}
+function aiscoreFixturesDateKeyFromScheduledDateKey(key2) {
+  const trimmed = key2?.trim() ?? "";
+  return /^\d{4}-\d{2}-\d{2}$/.test(trimmed) ? trimmed : null;
+}
+function aiscoreFixturesDateKeysForGame(game) {
+  const keys = /* @__PURE__ */ new Set();
+  const fromMs = game.startTimeMs != null ? aiscoreFixturesDateKeyFromMs(game.startTimeMs) : null;
+  const fromScheduled = aiscoreFixturesDateKeyFromScheduledDateKey(game.scheduledDateKey);
+  if (fromMs) keys.add(fromMs);
+  if (fromScheduled) keys.add(fromScheduled);
+  if (fromMs && game.startTimeMs != null) {
+    const ms2 = game.startTimeMs;
+    keys.add(aiscoreFixturesDateKeyFromMs(ms2 - 24 * 60 * 60 * 1e3));
+    keys.add(aiscoreFixturesDateKeyFromMs(ms2 + 24 * 60 * 60 * 1e3));
+  }
+  return [...keys].filter(Boolean);
+}
+
+// ../grarf/desktop/src/lib/aiscore/fetchAiscoreFixturesByDate.ts
+init_define_import_meta_env();
+
+// ../grarf/desktop/src/lib/aiscore/parseAiscoreNuxtMatches.ts
+init_define_import_meta_env();
+var MATCH_TUPLE_RE = /\{id:"([a-z0-9]{10,20})",homeTeam:\{id:([a-zA-Z0-9_$]+)\},awayTeam:\{id:([a-zA-Z0-9_$]+)\}/g;
+var TEAM_LITERAL_RE = /\{id:([a-zA-Z0-9_$]+),name:"([^"]+)",slug:"([^"]+)"\}/g;
+var TEAM_VAR_RE = /\{id:([a-zA-Z0-9_$]+),name:([a-zA-Z0-9_$]+),slug:([a-zA-Z0-9_$"][^}]*)\}/g;
+function extractNuxtPayload(html) {
+  const start = html.indexOf("window.__NUXT__=");
+  if (start < 0) return null;
+  let depth = 0;
+  let end = start + "window.__NUXT__=".length;
+  for (; end < html.length; end += 1) {
+    const char = html[end];
+    if (char === "(") depth += 1;
+    else if (char === ")") {
+      depth -= 1;
+      if (depth === 0) {
+        end += 1;
+        break;
+      }
+    }
+  }
+  return html.slice(start + "window.__NUXT__=".length, end);
+}
+function buildStringTable(raw) {
+  const strings = /* @__PURE__ */ new Map();
+  for (const match of raw.matchAll(/([a-zA-Z_$][a-zA-Z0-9_$]*):("(?:\\.|[^"\\])*")/g)) {
+    try {
+      strings.set(match[1], JSON.parse(match[2]));
+    } catch {
+    }
+  }
+  for (const match of raw.matchAll(/("(?:\\.|[^"\\])*"):([a-zA-Z_$][a-zA-Z0-9_$]*)/g)) {
+    try {
+      strings.set(match[2], JSON.parse(match[1]));
+    } catch {
+    }
+  }
+  return strings;
+}
+function resolveString(value, strings) {
+  return strings.get(value) ?? value;
+}
+function parseSlug(rawSlug, strings) {
+  const trimmed = rawSlug.trim();
+  if (trimmed.startsWith('"')) {
+    try {
+      return JSON.parse(trimmed.split(",")[0]);
+    } catch {
+      return trimmed.replace(/^"|"$/g, "");
+    }
+  }
+  return resolveString(trimmed.split(",")[0], strings);
+}
+function buildTeamRefMap(raw, strings) {
+  const teams = /* @__PURE__ */ new Map();
+  for (const match of raw.matchAll(TEAM_LITERAL_RE)) {
+    teams.set(match[1], { name: match[2], slug: match[3] });
+  }
+  for (const match of raw.matchAll(TEAM_VAR_RE)) {
+    const name = resolveString(match[2], strings);
+    const slug = parseSlug(match[3], strings);
+    if (typeof name === "string" && typeof slug === "string" && slug.length > 0) {
+      teams.set(match[1], { name, slug });
+    }
+  }
+  return teams;
+}
+function parseMatchTimeMs(raw, matchId) {
+  const idx = raw.indexOf(`{id:"${matchId}"`);
+  if (idx < 0) return null;
+  const window2 = raw.slice(idx, idx + 400);
+  const match = window2.match(/(?:matchTime|startTime):(\d{10,13})/);
+  if (!match?.[1]) return null;
+  const n2 = Number(match[1]);
+  if (!Number.isFinite(n2)) return null;
+  return n2 > 1e12 ? n2 : n2 * 1e3;
+}
+function parseAiscoreNuxtMatches(html) {
+  const raw = extractNuxtPayload(html);
+  if (!raw) return [];
+  const strings = buildStringTable(raw);
+  const teams = buildTeamRefMap(raw, strings);
+  const matches = [];
+  for (const match of raw.matchAll(MATCH_TUPLE_RE)) {
+    const home = teams.get(match[2]);
+    const away = teams.get(match[3]);
+    if (!home?.slug || !away?.slug) continue;
+    const id = match[1];
+    matches.push({
+      id,
+      home,
+      away,
+      matchTimeMs: parseMatchTimeMs(raw, id)
+    });
+  }
+  return matches;
+}
+function parseAiscoreMatchUrlFromHtml(html) {
+  const canonical = html.match(/rel="canonical" href="(https:\/\/www\.aiscore\.com\/match-[^"]+)"/)?.[1];
+  if (canonical && /\/match-[a-z0-9-]+\/[a-z0-9]{10,20}$/i.test(canonical)) {
+    return canonical;
+  }
+  const alternate = html.match(
+    /href="(https:\/\/www\.aiscore\.com\/match-[a-z0-9-]+\/[a-z0-9]{10,20})"/i
+  )?.[1];
+  return alternate ?? null;
+}
+
+// ../grarf/desktop/src/lib/aiscore/fetchAiscoreFixturesByDate.ts
+var AISCORE_FIXTURES_BASE = "https://www.aiscore.com/football/fixtures";
+var AISCORE_WORLD_CUP_SCHEDULE = "https://www.aiscore.com/tournament-football/world-cup-2026/rygbn1i4e1wrcwql/schedule";
+var LOG12 = "[AiScore]";
+var HTML_HEADERS = {
+  Accept: "text/html,application/xhtml+xml",
+  "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
+};
+async function fetchAiscoreFixturesByDate(dateKey) {
+  const normalized = dateKey.trim();
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(normalized)) return [];
+  try {
+    const res = await fetch(`${AISCORE_FIXTURES_BASE}/${normalized}`, {
+      headers: HTML_HEADERS,
+      cache: "no-store"
+    });
+    if (!res.ok) return [];
+    const html = await res.text();
+    return parseAiscoreNuxtMatches(html);
+  } catch (error) {
+    if (define_import_meta_env_default.DEV) {
+      console.warn(`${LOG12} fixtures fetch failed for ${normalized}`, error);
+    }
+    return [];
+  }
+}
+async function fetchAiscoreWorldCupScheduleMatches() {
+  try {
+    const res = await fetch(AISCORE_WORLD_CUP_SCHEDULE, {
+      headers: HTML_HEADERS,
+      cache: "no-store"
+    });
+    if (!res.ok) return [];
+    const html = await res.text();
+    return parseAiscoreNuxtMatches(html);
+  } catch (error) {
+    if (define_import_meta_env_default.DEV) {
+      console.warn(`${LOG12} World Cup schedule fetch failed`, error);
+    }
+    return [];
+  }
+}
+
+// ../grarf/desktop/src/lib/aiscore/fetchAiscoreWorldCupCatalog.ts
+async function fetchAiscoreWorldCupCatalog(games) {
+  const dateKeys = /* @__PURE__ */ new Set();
+  for (const game of games) {
+    if (game.league !== "WORLDCUP") continue;
+    for (const key2 of aiscoreFixturesDateKeysForGame(game)) {
+      dateKeys.add(key2);
+    }
+  }
+  const byId = /* @__PURE__ */ new Map();
+  const scheduleMatches = await fetchAiscoreWorldCupScheduleMatches();
+  for (const match of scheduleMatches) {
+    byId.set(match.id, match);
+  }
+  if (dateKeys.size > 0) {
+    await Promise.all(
+      [...dateKeys].map(async (dateKey) => {
+        const matches = await fetchAiscoreFixturesByDate(dateKey);
+        for (const match of matches) {
+          byId.set(match.id, match);
+        }
+      })
+    );
+  }
+  return [...byId.values()];
+}
+
+// ../grarf/desktop/src/lib/aiscore/matchAiscoreWorldCupMatch.ts
+init_define_import_meta_env();
+var MIN_TEAM_SCORE2 = 0.55;
+var MIN_TOTAL_SCORE2 = 0.62;
+var MAX_KICKOFF_DELTA_MS2 = 18 * 60 * 60 * 1e3;
+function isWorldCupGame2(game) {
+  return game.league === "WORLDCUP";
+}
+function kickoffScore2(game, match) {
+  const gameMs = game.startTimeMs;
+  const matchMs = match.matchTimeMs;
+  if (!Number.isFinite(gameMs) || !Number.isFinite(matchMs)) return 1;
+  const delta = Math.abs(gameMs - matchMs);
+  if (delta > MAX_KICKOFF_DELTA_MS2) return 0;
+  return 1 - Math.min(delta / (6 * 60 * 60 * 1e3), 1) * 0.25;
+}
+function teamScore2(game, match) {
+  const [gameAway, gameHome] = gameTeamTokenSets(game);
+  const matchAway = tokenSetFromLabel(match.away.name);
+  const matchHome = tokenSetFromLabel(match.home.name);
+  const direct = tokenOverlapScore(gameAway, matchAway) + tokenOverlapScore(gameHome, matchHome);
+  const swapped = tokenOverlapScore(gameAway, matchHome) + tokenOverlapScore(gameHome, matchAway);
+  return Math.max(direct, swapped) / 2;
+}
+function scoreAiscoreMatch(game, match) {
+  const teams = teamScore2(game, match);
+  if (teams < MIN_TEAM_SCORE2) return 0;
+  const kickoff = kickoffScore2(game, match);
+  if (kickoff <= 0) return 0;
+  return teams * kickoff;
+}
+function matchAiscoreWorldCupMatch(game, catalog) {
+  if (!isWorldCupGame2(game)) return null;
+  if (catalog.length === 0) return null;
+  let best = null;
+  let bestScore = 0;
+  for (const candidate of catalog) {
+    const score2 = scoreAiscoreMatch(game, candidate);
+    if (score2 > bestScore) {
+      bestScore = score2;
+      best = candidate;
+    }
+  }
+  if (!best || bestScore < MIN_TOTAL_SCORE2) return null;
+  return best;
+}
+
+// ../grarf/desktop/src/lib/aiscore/resolveAiscoreMatchUrlForGame.ts
+init_define_import_meta_env();
+
+// ../grarf/desktop/src/lib/aiscore/discoverAiscoreMatchUrlViaSearch.ts
+init_define_import_meta_env();
+var LOG13 = "[AiScore]";
+var SEARCH_HEADERS = {
+  Accept: "text/html",
+  "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
+};
+function extractMatchUrlsFromHtml(html, slugPath) {
+  const urls = /* @__PURE__ */ new Set();
+  if (slugPath) {
+    const pattern = new RegExp(`aiscore\\.com\\/${slugPath}\\/([a-z0-9]{10,20})`, "gi");
+    for (const match of html.matchAll(pattern)) {
+      urls.add(`https://www.${match[0]}`);
+    }
+  }
+  for (const match of html.matchAll(/aiscore\.com\/match-[a-z0-9-]+\/[a-z0-9]{10,20}/gi)) {
+    urls.add(`https://www.${match[0]}`);
+  }
+  const fromHtml = parseAiscoreMatchUrlFromHtml(html);
+  if (fromHtml) urls.add(fromHtml);
+  return [...urls];
+}
+async function fetchSearchHtml(url) {
+  try {
+    const res = await fetch(url, { headers: SEARCH_HEADERS, cache: "no-store" });
+    if (!res.ok) return null;
+    return res.text();
+  } catch {
+    return null;
+  }
+}
+function titleMatchesGame(title, game) {
+  const home = game.metadata?.officialHomeName?.trim() || game.homeTeam.trim();
+  const away = game.metadata?.officialAwayName?.trim() || game.awayTeam.trim();
+  const normalizedTitle = title.toLowerCase();
+  const homeTokens = home.toLowerCase().split(/\s+/).filter((token) => token.length >= 3);
+  const awayTokens = away.toLowerCase().split(/\s+/).filter((token) => token.length >= 3);
+  const homeHit = normalizedTitle.includes(home.toLowerCase()) || homeTokens.some((token) => normalizedTitle.includes(token));
+  const awayHit = normalizedTitle.includes(away.toLowerCase()) || awayTokens.some((token) => normalizedTitle.includes(token));
+  return homeHit && awayHit;
+}
+async function validateAiscoreMatchUrl(url, game) {
+  try {
+    const res = await fetch(url, { headers: SEARCH_HEADERS, cache: "no-store" });
+    if (!res.ok) return false;
+    const html = await res.text();
+    const title = html.match(/<title>([^<]+)/)?.[1] ?? "";
+    return titleMatchesGame(title, game);
+  } catch {
+    return false;
+  }
+}
+async function searchHtmlForMatchUrls(searchUrl, slugPath) {
+  const html = await fetchSearchHtml(searchUrl);
+  if (!html) return [];
+  return extractMatchUrlsFromHtml(html, slugPath);
+}
+async function discoverAiscoreMatchUrlViaSearch(game) {
+  const homeName = game.metadata?.officialHomeName?.trim() || game.homeTeam.trim();
+  const awayName = game.metadata?.officialAwayName?.trim() || game.awayTeam.trim();
+  const slugPath = buildAiscoreMatchSlugPath(homeName, awayName);
+  if (!slugPath) return null;
+  const queries = [
+    `https://search.brave.com/search?q=${encodeURIComponent(`site:aiscore.com ${slugPath}`)}`,
+    `https://search.brave.com/search?q=${encodeURIComponent(`site:aiscore.com ${homeName} ${awayName}`)}`,
+    `https://html.duckduckgo.com/html/?q=${encodeURIComponent(`site:aiscore.com ${slugPath}`)}`,
+    `https://html.duckduckgo.com/html/?q=${encodeURIComponent(`site:aiscore.com ${homeName} ${awayName}`)}`
+  ];
+  const candidates = /* @__PURE__ */ new Set();
+  for (const searchUrl of queries) {
+    for (const url of await searchHtmlForMatchUrls(searchUrl, slugPath)) {
+      candidates.add(url);
+    }
+    if (candidates.size > 0) break;
+  }
+  for (const url of candidates) {
+    if (await validateAiscoreMatchUrl(url, game)) {
+      return url;
+    }
+  }
+  const first = candidates.values().next().value;
+  if (first) {
+    if (define_import_meta_env_default.DEV) {
+      console.warn(`${LOG13} using unvalidated search match URL`, first);
+    }
+    return first;
+  }
+  if (define_import_meta_env_default.DEV) {
+    console.warn(`${LOG13} search discovery found no match URL`, { homeName, awayName });
+  }
+  return null;
+}
+
+// ../grarf/desktop/src/lib/aiscore/fetchAiscoreSitemapMatches.ts
+init_define_import_meta_env();
+var AISCORE_MATCHES_SITEMAP = "https://www.aiscore.com/sitemap/matches.xml";
+var LOG14 = "[AiScore]";
+var cachedSitemapUrls = null;
+var sitemapLoadPromise = null;
+async function loadAiscoreSitemapMatchUrls() {
+  if (cachedSitemapUrls) return cachedSitemapUrls;
+  if (sitemapLoadPromise) return sitemapLoadPromise;
+  sitemapLoadPromise = (async () => {
+    try {
+      const res = await fetch(AISCORE_MATCHES_SITEMAP, {
+        headers: {
+          Accept: "application/xml,text/xml",
+          "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
+        },
+        cache: "force-cache"
+      });
+      if (!res.ok) return [];
+      const xml = await res.text();
+      const urls = [...xml.matchAll(/<loc>(https:\/\/www\.aiscore\.com\/match-[^<]+)<\/loc>/g)].map(
+        (match) => match[1].replace(/\/h2h$/, "")
+      );
+      cachedSitemapUrls = [...new Set(urls)];
+      return cachedSitemapUrls;
+    } catch (error) {
+      if (define_import_meta_env_default.DEV) {
+        console.warn(`${LOG14} sitemap fetch failed`, error);
+      }
+      return [];
+    } finally {
+      sitemapLoadPromise = null;
+    }
+  })();
+  return sitemapLoadPromise;
+}
+async function lookupAiscoreMatchUrlFromSitemap(homeTeamName, awayTeamName) {
+  const direct = buildAiscoreMatchSlugPath(homeTeamName, awayTeamName);
+  const swapped = buildAiscoreMatchSlugPath(awayTeamName, homeTeamName);
+  if (!direct && !swapped) return null;
+  const urls = await loadAiscoreSitemapMatchUrls();
+  for (const url of urls) {
+    const path = url.replace("https://www.aiscore.com/", "");
+    if (direct && path.startsWith(`${direct}/`)) return url;
+    if (swapped && path.startsWith(`${swapped}/`)) return url;
+  }
+  return null;
+}
+
+// ../grarf/desktop/src/lib/aiscore/resolveAiscoreMatchUrlForGame.ts
+function officialHomeName(game) {
+  return game.metadata?.officialHomeName?.trim() || game.homeTeam.trim();
+}
+function officialAwayName(game) {
+  return game.metadata?.officialAwayName?.trim() || game.awayTeam.trim();
+}
+async function resolveAiscoreMatchUrlForGame(game) {
+  const cached = game.metadata?.aiscoreMatchUrl?.trim();
+  if (cached) return cached;
+  const fromSitemap = await lookupAiscoreMatchUrlFromSitemap(
+    officialHomeName(game),
+    officialAwayName(game)
+  );
+  if (fromSitemap) return fromSitemap;
+  return discoverAiscoreMatchUrlViaSearch(game);
+}
+
+// ../grarf/desktop/src/lib/aiscore/enrichWorldCupGamesWithAiscoreUrls.ts
+var LOG15 = "[AiScore]";
+function isWorldCupRow2(game) {
+  return game.league === "WORLDCUP";
+}
+function officialHomeName2(game) {
+  return game.metadata?.officialHomeName?.trim() || game.homeTeam.trim();
+}
+function officialAwayName2(game) {
+  return game.metadata?.officialAwayName?.trim() || game.awayTeam.trim();
+}
+async function resolveAiscoreMatchUrlForUnmatchedGame(game) {
+  return resolveAiscoreMatchUrlForGame(game);
+}
+async function enrichWorldCupGamesWithAiscoreUrls(games) {
+  const worldCupRows = games.filter(isWorldCupRow2);
+  if (worldCupRows.length === 0) return games;
+  let catalog;
+  try {
+    catalog = await fetchAiscoreWorldCupCatalog(worldCupRows);
+  } catch (error) {
+    if (define_import_meta_env_default.DEV) {
+      console.warn(`${LOG15} catalog fetch failed`, error);
+    }
+    catalog = [];
+  }
+  let matched = 0;
+  const out = [];
+  for (const game of games) {
+    if (!isWorldCupRow2(game)) {
+      out.push(game);
+      continue;
+    }
+    let matchUrl = null;
+    let matchId = null;
+    const aiscoreMatch = catalog.length > 0 ? matchAiscoreWorldCupMatch(game, catalog) : null;
+    if (aiscoreMatch) {
+      matchId = aiscoreMatch.id;
+      matchUrl = buildAiscoreMatchUrl(aiscoreMatch.id, aiscoreMatch.home.name, aiscoreMatch.away.name) ?? buildAiscoreMatchUrl(aiscoreMatch.id, officialHomeName2(game), officialAwayName2(game));
+    }
+    if (!matchUrl) {
+      matchUrl = await resolveAiscoreMatchUrlForUnmatchedGame(game);
+      if (matchUrl) {
+        matchId = matchUrl.split("/").pop()?.trim() ?? null;
+      }
+    }
+    if (!matchUrl || !matchId) {
+      out.push(game);
+      continue;
+    }
+    matched += 1;
+    out.push({
+      ...game,
+      externalIds: {
+        ...game.externalIds,
+        aiscore: matchId
+      },
+      metadata: {
+        ...game.metadata,
+        aiscoreMatchUrl: matchUrl
+      }
+    });
+  }
+  if (define_import_meta_env_default.DEV && matched > 0) {
+    console.log(`${LOG15} matched ${matched} World Cup row(s)`, { catalogSize: catalog.length });
+  }
+  return out;
+}
+
+// ../grarf/desktop/src/lib/aiscore/enrichOperationalSnapshotAiscore.ts
+async function enrichOperationalSnapshotAiscore(transport) {
+  const rows = transport.leagues.WORLDCUP;
+  if (!Array.isArray(rows) || rows.length === 0) return transport;
+  const enriched = await enrichWorldCupGamesWithAiscoreUrls(rows);
+  if (!enriched.some((row, index) => row !== rows[index])) return transport;
+  return {
+    ...transport,
+    leagues: {
+      ...transport.leagues,
+      WORLDCUP: enriched
+    }
+  };
+}
+
 // ../grarf/desktop/src/lib/foxWorldCup/enrichOperationalSnapshotFoxWorldCup.ts
 init_define_import_meta_env();
 
@@ -33272,7 +33873,7 @@ function parseFoxWorldCupEventPath(pathOrUrl) {
 var FOX_EVENT_BASE2 = "https://www.fox.com";
 var FETCH_TIMEOUT_MS = 1e4;
 var MAX_UUID_PROBES = 24;
-var HTML_HEADERS = {
+var HTML_HEADERS2 = {
   Accept: "text/html,application/xhtml+xml",
   "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
 };
@@ -33299,7 +33900,7 @@ function extractEventDetailUuids(html) {
 }
 async function fetchFoxHtml(url) {
   const res = await fetch(url, {
-    headers: HTML_HEADERS,
+    headers: HTML_HEADERS2,
     signal: AbortSignal.timeout(FETCH_TIMEOUT_MS)
   });
   if (!res.ok) throw new Error(`FOX page fetch failed: ${res.status} ${url}`);
@@ -33424,7 +34025,7 @@ var FOX_WORLD_CUP_HUB_URL = "https://www.fox.com/soccer/fifa-world-cup";
 var FOX_SPORTS_PAGE_URL = "https://www.fox.com/sports";
 var FETCH_TIMEOUT_MS3 = 15e3;
 var CACHE_TTL_MS = 6e4;
-var HTML_HEADERS2 = {
+var HTML_HEADERS3 = {
   Accept: "text/html,application/xhtml+xml",
   "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
 };
@@ -33454,7 +34055,7 @@ function mergeCatalogRows(rows) {
 }
 async function fetchFoxHtml2(url) {
   const res = await fetch(url, {
-    headers: HTML_HEADERS2,
+    headers: HTML_HEADERS3,
     signal: AbortSignal.timeout(FETCH_TIMEOUT_MS3)
   });
   if (!res.ok) throw new Error(`FOX page fetch failed: ${res.status} ${url}`);
@@ -33494,9 +34095,9 @@ async function fetchFoxWorldCupEventCatalog(now = Date.now(), forceRefresh = fal
 
 // ../grarf/desktop/src/lib/foxWorldCup/matchFoxWorldCupStream.ts
 init_define_import_meta_env();
-var MIN_TEAM_SCORE2 = 0.55;
-var MIN_TOTAL_SCORE2 = 0.62;
-function isWorldCupGame2(game) {
+var MIN_TEAM_SCORE3 = 0.55;
+var MIN_TOTAL_SCORE3 = 0.62;
+function isWorldCupGame3(game) {
   return game.league === "WORLDCUP";
 }
 function scoreEventMatch(game, event) {
@@ -33507,11 +34108,11 @@ function scoreEventMatch(game, event) {
     event.awayTeamSlug,
     event.homeTeamSlug
   );
-  if (teams < MIN_TEAM_SCORE2) return 0;
+  if (teams < MIN_TEAM_SCORE3) return 0;
   return teams;
 }
 function matchFoxWorldCupStream(game, catalog) {
-  if (!isWorldCupGame2(game)) return null;
+  if (!isWorldCupGame3(game)) return null;
   if (game.status !== "live" && game.status !== "scheduled") return null;
   if (catalog.length === 0) return null;
   let best = null;
@@ -33523,18 +34124,18 @@ function matchFoxWorldCupStream(game, catalog) {
       best = event;
     }
   }
-  if (!best || bestScore < MIN_TOTAL_SCORE2) return null;
+  if (!best || bestScore < MIN_TOTAL_SCORE3) return null;
   return best;
 }
 
 // ../grarf/desktop/src/lib/foxWorldCup/enrichWorldCupGamesWithFoxStreams.ts
-var LOG12 = "[FoxWorldCup]";
-function isWorldCupRow2(game) {
+var LOG16 = "[FoxWorldCup]";
+function isWorldCupRow3(game) {
   return game.league === "WORLDCUP";
 }
 async function enrichWorldCupGamesWithFoxStreams(games) {
   const needsFox = games.some(
-    (game) => isWorldCupRow2(game) && (game.status === "live" || game.status === "scheduled")
+    (game) => isWorldCupRow3(game) && (game.status === "live" || game.status === "scheduled")
   );
   if (!needsFox) return games;
   let catalog;
@@ -33542,14 +34143,14 @@ async function enrichWorldCupGamesWithFoxStreams(games) {
     catalog = await fetchFoxWorldCupEventCatalog();
   } catch (error) {
     if (define_import_meta_env_default.DEV) {
-      console.warn(`${LOG12} catalog fetch failed`, error);
+      console.warn(`${LOG16} catalog fetch failed`, error);
     }
     return games;
   }
   if (catalog.length === 0) return games;
   let matched = 0;
   const out = games.map((game) => {
-    if (!isWorldCupRow2(game)) return game;
+    if (!isWorldCupRow3(game)) return game;
     if (game.status !== "live" && game.status !== "scheduled") return game;
     const stream = matchFoxWorldCupStream(game, catalog);
     if (!stream) return game;
@@ -33561,7 +34162,7 @@ async function enrichWorldCupGamesWithFoxStreams(games) {
     };
   });
   if (define_import_meta_env_default.DEV && matched > 0) {
-    console.log(`${LOG12} matched ${matched} World Cup row(s)`, { catalogSize: catalog.length });
+    console.log(`${LOG16} matched ${matched} World Cup row(s)`, { catalogSize: catalog.length });
   }
   return out;
 }
@@ -33664,7 +34265,7 @@ async function fetchTennisChannelPlusLiveCatalog(now = Date.now(), forceRefresh 
 // ../grarf/desktop/src/lib/tennisChannelPlus/matchTennisChannelStream.ts
 init_define_import_meta_env();
 var MIN_PLAYER_SCORE = 0.55;
-var MIN_TOTAL_SCORE3 = 0.62;
+var MIN_TOTAL_SCORE4 = 0.62;
 function isTennisLeague(game) {
   return game.league === "ATP" || game.league === "WTA";
 }
@@ -33727,12 +34328,12 @@ function matchTennisChannelPlusStream(game, catalog) {
       best = stream;
     }
   }
-  if (!best || bestScore < MIN_TOTAL_SCORE3) return null;
+  if (!best || bestScore < MIN_TOTAL_SCORE4) return null;
   return best;
 }
 
 // ../grarf/desktop/src/lib/tennisChannelPlus/enrichTennisGamesWithTennisChannelPlus.ts
-var LOG13 = "[TennisChannelPlus]";
+var LOG17 = "[TennisChannelPlus]";
 function isTennisLeague2(game) {
   return game.league === "ATP" || game.league === "WTA";
 }
@@ -33744,7 +34345,7 @@ async function enrichTennisGamesWithTennisChannelPlus(games) {
     catalog = await fetchTennisChannelPlusLiveCatalog();
   } catch (error) {
     if (define_import_meta_env_default.DEV) {
-      console.warn(`${LOG13} catalog fetch failed`, error);
+      console.warn(`${LOG17} catalog fetch failed`, error);
     }
     return games;
   }
@@ -33763,7 +34364,7 @@ async function enrichTennisGamesWithTennisChannelPlus(games) {
     };
   });
   if (define_import_meta_env_default.DEV && matched > 0) {
-    console.log(`${LOG13} matched ${matched} live tennis row(s)`, { catalogSize: catalog.length });
+    console.log(`${LOG17} matched ${matched} live tennis row(s)`, { catalogSize: catalog.length });
   }
   return out;
 }
@@ -33913,7 +34514,7 @@ async function supplementOperationalSnapshotFromLocalIpc(transport) {
 }
 
 // ../grarf/desktop/src/services/operationalIngest/enrichOperationalTransport.ts
-var LOG14 = "[OperationalIngest]";
+var LOG18 = "[OperationalIngest]";
 function cloudRowMissingMlbPk2(row) {
   if (typeof row.gamePk === "number" && row.gamePk > 0) return false;
   const mlb2 = row.externalIds?.mlb?.trim();
@@ -33940,33 +34541,38 @@ async function enrichOperationalTransport(rawTransport) {
   try {
     transport = await supplementOperationalSnapshotFromLocalIpc(transport);
   } catch (e2) {
-    console.warn(`${LOG14} local IPC supplement failed`, e2);
+    console.warn(`${LOG18} local IPC supplement failed`, e2);
   }
   try {
     transport = await joinMissingMlbProviderIds(transport);
   } catch (e2) {
-    console.warn(`${LOG14} MLB provider join failed`, e2);
+    console.warn(`${LOG18} MLB provider join failed`, e2);
   }
   try {
     transport = await enrichOperationalSnapshotTennisChannel(transport);
   } catch (e2) {
-    console.warn(`${LOG14} Tennis Channel Plus enrich failed`, e2);
+    console.warn(`${LOG18} Tennis Channel Plus enrich failed`, e2);
   }
   try {
     transport = await enrichOperationalSnapshotFoxWorldCup(transport);
   } catch (e2) {
-    console.warn(`${LOG14} FOX World Cup enrich failed`, e2);
+    console.warn(`${LOG18} FOX World Cup enrich failed`, e2);
   }
   try {
     transport = await enrichOperationalSnapshotFotmob(transport);
   } catch (e2) {
-    console.warn(`${LOG14} FotMob World Cup enrich failed`, e2);
+    console.warn(`${LOG18} FotMob World Cup enrich failed`, e2);
+  }
+  try {
+    transport = await enrichOperationalSnapshotAiscore(transport);
+  } catch (e2) {
+    console.warn(`${LOG18} AiScore World Cup enrich failed`, e2);
   }
   return transport;
 }
 
 // ../grarf/desktop/src/services/operationalIngest/startOperationalSnapshotPolling.ts
-var LOG15 = "[OperationalIngest]";
+var LOG19 = "[OperationalIngest]";
 var DEFAULT_POLL_INTERVAL_MS = 6e4;
 var RETRY_MS = 15e3;
 function startOperationalSnapshotPolling(hydrate) {
@@ -33981,7 +34587,7 @@ function startOperationalSnapshotPolling(hydrate) {
   let retryTimer = null;
   let intervalId = null;
   if (define_import_meta_env_default.DEV) {
-    console.log(`${LOG15} provider=grarf_cloud polling centralized snapshot`);
+    console.log(`${LOG19} provider=grarf_cloud polling centralized snapshot`);
   }
   const clearRetry = () => {
     if (retryTimer != null) {
@@ -34006,7 +34612,7 @@ function startOperationalSnapshotPolling(hydrate) {
         clearRetry();
       } catch (e2) {
         const msg = e2 instanceof Error ? e2.message : String(e2);
-        console.warn(`${LOG15} poll failed`, msg);
+        console.warn(`${LOG19} poll failed`, msg);
         if (!stopped && retryTimer == null) {
           retryTimer = setTimeout(() => {
             retryTimer = null;
@@ -34038,7 +34644,7 @@ async function loadCanonicalOperationalSnapshot() {
 }
 
 // ../grarf/desktop/src/components/LiveGamesBridge.tsx
-var LOG16 = "[OperationalIngest]";
+var LOG20 = "[OperationalIngest]";
 function parseUpdatedAtMs(updatedAt) {
   if (!updatedAt?.trim()) return 0;
   const ms2 = Date.parse(updatedAt);
@@ -34063,14 +34669,14 @@ function LiveGamesBridge() {
           const enriched = await enrichOperationalTransport(transport);
           applySnapshot(enriched, normalizeOperationalSnapshot(enriched));
         } catch (e2) {
-          console.warn(`${LOG16} transport enrich failed`, e2);
+          console.warn(`${LOG20} transport enrich failed`, e2);
           applySnapshot(transport, normalizeOperationalSnapshot(transport));
         }
       })();
     };
     if (config.provider === "grarf_cloud") {
       if (define_import_meta_env_default.DEV) {
-        console.log(`${LOG16} grarf_cloud with local IPC supplement (fresher wins)`);
+        console.log(`${LOG20} grarf_cloud with local IPC supplement (fresher wins)`);
       }
       if (isGrarfWebRenderer()) {
         void (async () => {
@@ -34080,7 +34686,7 @@ function LiveGamesBridge() {
             const canonical = normalizeOperationalSnapshot(enriched);
             hydrate(canonical);
           } catch (e2) {
-            console.warn(`${LOG16} web immediate ESPN hydrate failed`, e2);
+            console.warn(`${LOG20} web immediate ESPN hydrate failed`, e2);
           }
         })();
       }
@@ -34124,7 +34730,7 @@ function LiveGamesBridge() {
             }
             applySnapshot(enriched, canonical);
           } catch (e2) {
-            console.warn(`${LOG16} local IPC enrich failed`, e2);
+            console.warn(`${LOG20} local IPC enrich failed`, e2);
             let canonical = normalizeOperationalSnapshot(transport);
             if (transport.source === "espn_local_adapter") {
               const prevLeagues = useLiveGamesStore.getState().leagues;
@@ -34678,7 +35284,7 @@ init_define_import_meta_env();
 
 // ../grarf/desktop/src/lib/commandBriefing/briefingPersistence.ts
 init_define_import_meta_env();
-var LOG17 = "[CommandBriefing]";
+var LOG21 = "[CommandBriefing]";
 function snapshotFromGame(game) {
   const league = game.league ?? "MLB";
   return {
@@ -34746,15 +35352,15 @@ function findLiveGameByEditorialKey(editorialKey, games) {
 }
 function logUsingLiveGame(game) {
   if (!define_import_meta_env_default.DEV) return;
-  console.log(`${LOG17} Using live operational game`, { gameId: game.id });
+  console.log(`${LOG21} Using live operational game`, { gameId: game.id });
 }
 function logUsingPersistedFallback(snap) {
   if (!define_import_meta_env_default.DEV) return;
-  console.log(`${LOG17} Using persisted fallback snapshot`, { gameId: snap.gameId });
+  console.log(`${LOG21} Using persisted fallback snapshot`, { gameId: snap.gameId });
 }
 function logPersistedFallbackSnapshot(gameId) {
   if (!define_import_meta_env_default.DEV) return;
-  console.log(`${LOG17} Persisted fallback snapshot`, { gameId });
+  console.log(`${LOG21} Persisted fallback snapshot`, { gameId });
 }
 function persistBriefingSnapshot(game) {
   const api = window.grarf?.commandBriefingSavePersistenceEntry;
@@ -35047,7 +35653,7 @@ function FinalizedGameRetentionBridge() {
 // ../grarf/desktop/src/components/operational/YesterdayCatchUpSeedBridge.tsx
 init_define_import_meta_env();
 var import_react17 = __toESM(require_react(), 1);
-var LOG18 = "[CatchUpYesterday]";
+var LOG22 = "[CatchUpYesterday]";
 function YesterdayCatchUpSeedBridge() {
   (0, import_react17.useEffect)(() => {
     const api = window.grarf?.gamesGetYesterdayFinals;
@@ -35060,17 +35666,17 @@ function YesterdayCatchUpSeedBridge() {
         const finals = result?.finals ?? [];
         if (finals.length === 0) {
           if (define_import_meta_env_default.DEV) {
-            console.warn(`${LOG18} no yesterday finals returned`);
+            console.warn(`${LOG22} no yesterday finals returned`);
           }
           return;
         }
         useRecentFinalizedGamesStore.getState().mergeFinalizedGames(finals);
         if (define_import_meta_env_default.DEV) {
-          console.log(`${LOG18} seeded ${finals.length} yesterday finals for Catch Up`);
+          console.log(`${LOG22} seeded ${finals.length} yesterday finals for Catch Up`);
         }
       } catch (e2) {
         if (!cancelled && define_import_meta_env_default.DEV) {
-          console.warn(`${LOG18} seed failed`, e2);
+          console.warn(`${LOG22} seed failed`, e2);
         }
       }
     })();
@@ -35279,7 +35885,7 @@ function computeAttentionScore(input) {
 
 // ../grarf/desktop/src/lib/attentionRuntime/devLogging.ts
 init_define_import_meta_env();
-var LOG19 = "[AttentionRuntime]";
+var LOG23 = "[AttentionRuntime]";
 var lastRankingSignature = "";
 var lastRecomputeLogAt = 0;
 function rankingSignature(rankings) {
@@ -35295,7 +35901,7 @@ function logAttentionRecompute(input) {
   if (!rankingChanged && now - lastRecomputeLogAt < 6e4) return;
   lastRankingSignature = signature;
   lastRecomputeLogAt = now;
-  console.log(`${LOG19} recompute`, {
+  console.log(`${LOG23} recompute`, {
     trigger: input.trigger,
     gameCount: input.gameCount,
     top: input.rankings.slice(0, 5).map((r3) => ({
@@ -35307,13 +35913,13 @@ function logAttentionRecompute(input) {
 }
 function logResidualGravityStarted(input) {
   if (!define_import_meta_env_default.DEV) return;
-  console.log(`${LOG19} residual gravity started`, input);
+  console.log(`${LOG23} residual gravity started`, input);
 }
 function logResidualGravityDecay(states) {
   if (!define_import_meta_env_default.DEV || states.length === 0) return;
   const active2 = states.filter((s2) => s2.currentGravity > 0.5);
   if (active2.length === 0) return;
-  console.log(`${LOG19} residual gravity decay`, {
+  console.log(`${LOG23} residual gravity decay`, {
     active: active2.map((s2) => ({
       eventId: s2.eventId,
       gravity: s2.currentGravity,
@@ -35758,7 +36364,7 @@ init_define_import_meta_env();
 
 // ../grarf/desktop/src/lib/recommendationRuntime/devLogging.ts
 init_define_import_meta_env();
-var LOG20 = "[RecommendationRuntime]";
+var LOG24 = "[RecommendationRuntime]";
 var lastPrimaryId = null;
 var lastRankingSignature2 = "";
 var lastLogAt = 0;
@@ -35778,14 +36384,14 @@ function logRecommendationUpdate(diag) {
   lastRankingSignature2 = signature;
   lastLogAt = now;
   if (primaryChanged) {
-    console.log(`${LOG20} primary transition`, {
+    console.log(`${LOG24} primary transition`, {
       from: previousPrimary,
       to: diag.primaryRecommendation,
       reasoning: diag.primaryReasoning,
       mode: diag.operationalMode
     });
   }
-  console.log(`${LOG20} recommendations`, {
+  console.log(`${LOG24} recommendations`, {
     trigger: diag.lastRecomputeReason,
     primary: diag.primaryRecommendation,
     top: diag.rankedRecommendations.slice(0, 4).map((r3) => ({
@@ -36446,12 +37052,12 @@ function espnWatchEventIdFromGame(game) {
 }
 
 // ../grarf/desktop/src/lib/watch/providers/espnResolver.ts
-var LOG21 = "[Resolver]";
+var LOG25 = "[Resolver]";
 function resolverDebug(message, extra) {
   if (extra && Object.keys(extra).length > 0) {
-    console.log(`${LOG21} ${message}`, extra);
+    console.log(`${LOG25} ${message}`, extra);
   } else {
-    console.log(`${LOG21} ${message}`);
+    console.log(`${LOG25} ${message}`);
   }
 }
 function parseEspnEventId(game) {
@@ -36611,13 +37217,13 @@ function gameHasParamountBroadcast(game) {
 }
 
 // ../grarf/desktop/src/lib/watch/providers/paramountResolver.ts
-var LOG22 = "[Paramount]";
+var LOG26 = "[Paramount]";
 function resolveParamountWatchOption(game) {
   const cached = getCachedStreamUrl("Paramount+", game.id);
   const streamUrl = game.streamUrl?.trim() || cached;
   if (!streamUrl) return null;
   if (game.streamProvider !== "Paramount+" && !gameHasParamountBroadcast(game)) return null;
-  console.log(`${LOG22} Resolved stream URL for match`, {
+  console.log(`${LOG26} Resolved stream URL for match`, {
     gameId: game.id,
     league: game.league,
     streamUrl
@@ -36647,7 +37253,7 @@ function gameHasPeacockBroadcast(game) {
 }
 
 // ../grarf/desktop/src/lib/watch/providers/peacockResolver.ts
-var LOG23 = "[Peacock]";
+var LOG27 = "[Peacock]";
 function resolvePeacockWatchOption(game) {
   if (game.league === "WORLDCUP") return null;
   const cached = getCachedStreamUrl("Peacock", game.id);
@@ -36668,8 +37274,8 @@ function resolvePeacockWatchOption(game) {
     };
   }
   if (game.streamProvider !== "Peacock" && !gameHasPeacockBroadcast(game)) return null;
-  console.log(`${LOG23} Resolved playback URL`, streamUrl);
-  console.log(`${LOG23} Resolved stream URL for match`, {
+  console.log(`${LOG27} Resolved playback URL`, streamUrl);
+  console.log(`${LOG27} Resolved stream URL for match`, {
     gameId: game.id,
     league: game.league,
     streamUrl
@@ -36706,7 +37312,7 @@ function gameHasAppleTvResolvableStream(game) {
 }
 
 // ../grarf/desktop/src/lib/watch/providers/appleTvResolver.ts
-var LOG24 = "[AppleTV]";
+var LOG28 = "[AppleTV]";
 function resolveAppleTvWatchOption(game) {
   if (!gameHasAppleTvResolvableStream(game)) return null;
   const cached = getCachedStreamUrl("Apple TV", game.id);
@@ -36715,7 +37321,7 @@ function resolveAppleTvWatchOption(game) {
   if (game.streamProvider !== "Apple TV" && !gameHasAppleTvBroadcast(game) && game.league !== "F1") {
     return null;
   }
-  console.log(`${LOG24} Resolved stream URL for match`, {
+  console.log(`${LOG28} Resolved stream URL for match`, {
     gameId: game.id,
     league: game.league,
     streamUrl
@@ -37452,12 +38058,12 @@ function buildMlbGameWorkspaceTab(game, options) {
 
 // ../grarf/desktop/src/lib/watch/watchDebug.ts
 init_define_import_meta_env();
-var LOG25 = "[Watch]";
+var LOG29 = "[Watch]";
 function watchDebug(message, extra) {
   if (extra && Object.keys(extra).length > 0) {
-    console.log(`${LOG25} ${message}`, extra);
+    console.log(`${LOG29} ${message}`, extra);
   } else {
-    console.log(`${LOG25} ${message}`);
+    console.log(`${LOG29} ${message}`);
   }
 }
 
@@ -37473,12 +38079,12 @@ function launchLegacyMlbWatch(game, dispatch) {
 
 // ../grarf/desktop/src/lib/watch/peacockExternalLaunch.ts
 init_define_import_meta_env();
-var LOG26 = "[Peacock]";
+var LOG30 = "[Peacock]";
 var WATCH_LOG = "[Watch]";
 function openPeacockPlaybackExternally(url) {
   const href = url.trim();
   if (!href) return;
-  console.log(`${LOG26} Resolved playback URL`, href);
+  console.log(`${LOG30} Resolved playback URL`, href);
   console.log(`${WATCH_LOG} Provider launchMode: external`);
   console.log(`${WATCH_LOG} Opening Peacock stream in system browser`);
   void window.grarf?.openExternalUrl?.(href)?.then((res) => {
@@ -37678,21 +38284,21 @@ function tryLaunchDirectStreamWatch(game, dispatch) {
 
 // ../grarf/desktop/src/lib/watch/usaNetworkWatch.ts
 init_define_import_meta_env();
-var LOG27 = "[Watch]";
+var LOG31 = "[Watch]";
 var USA_NETWORK_LIVE_URL = "https://www.usanetwork.com/live";
 function tryLaunchUsaNetworkWatch(game) {
   if (game.streamProvider !== "USA") return false;
   const url = game.streamUrl?.trim() || USA_NETWORK_LIVE_URL;
-  console.log(`${LOG27} Launching USA stream externally`);
-  console.log(`${LOG27} streamProvider=USA streamUrl=${url} launchMode=external`);
-  console.log(`${LOG27} Executing external launch: ${url}`);
+  console.log(`${LOG31} Launching USA stream externally`);
+  console.log(`${LOG31} streamProvider=USA streamUrl=${url} launchMode=external`);
+  console.log(`${LOG31} Executing external launch: ${url}`);
   openWatchStreamExternally(url, "USA Network");
   return true;
 }
 
 // ../grarf/desktop/src/lib/watch/wnbaWatchLive.ts
 init_define_import_meta_env();
-var LOG28 = "[WNBA]";
+var LOG32 = "[WNBA]";
 function buildWnbaPeacockWatchOption(game, streamUrl) {
   return {
     id: `peacock-direct-${game.id}`,
@@ -37718,13 +38324,13 @@ function wnbaGameHasResolvableStream(game) {
   return !!getCachedStreamUrl("Peacock", game.id);
 }
 function logWnbaWatchLiveRendered(game) {
-  console.log(`${LOG28} WATCH LIVE rendered`, {
+  console.log(`${LOG32} WATCH LIVE rendered`, {
     gameId: game.id,
     streamProvider: game.streamProvider ?? null
   });
 }
 function logWnbaWatchLiveClicked(game) {
-  console.log(`${LOG28} WATCH LIVE clicked`, {
+  console.log(`${LOG32} WATCH LIVE clicked`, {
     gameId: game.id,
     streamProvider: game.streamProvider ?? null,
     streamUrl: game.streamUrl?.trim() || getCachedStreamUrl("Peacock", game.id)
@@ -37790,7 +38396,7 @@ function handleWatchLiveClick(game, dispatch) {
 
 // ../grarf/desktop/src/lib/watch/operationalWatchLive.ts
 init_define_import_meta_env();
-var LOG29 = "[WatchLive]";
+var LOG33 = "[WatchLive]";
 function gameHasOperationalWatchLive(game) {
   return game.status === "live" && Boolean(game.streamUrl?.trim());
 }
@@ -37801,9 +38407,9 @@ function logWatchLiveOperationalAlert(_game) {
 function logWatchLiveLaunch(game) {
   if (!define_import_meta_env_default.DEV) return;
   if (game.streamProvider) {
-    console.log(`${LOG29} Launching provider: ${game.streamProvider}`);
+    console.log(`${LOG33} Launching provider: ${game.streamProvider}`);
     if (game.streamProvider === "Peacock" || game.streamProvider === "USA" || game.streamProvider === "Tennis Channel+" || game.streamProvider === "FOX Sports") {
-      console.log(`${LOG29} Opening external browser`);
+      console.log(`${LOG33} Opening external browser`);
     }
   }
 }
@@ -38183,7 +38789,7 @@ var import_react25 = __toESM(require_react(), 1);
 
 // ../grarf/desktop/src/lib/workspace/paneContainment.ts
 init_define_import_meta_env();
-var LOG30 = "[PaneLayout]";
+var LOG34 = "[PaneLayout]";
 var PANE_LAYOUT_RESIZE_EVENT = "grarf:pane-resize";
 function dispatchPaneLayoutResize() {
   if (typeof window === "undefined") return;
@@ -38194,19 +38800,19 @@ var PANE_EMBED_HOST = "relative h-full w-full min-h-0 min-w-0 max-h-full max-w-f
 var PANE_EMBED_ABSOLUTE_FILL = "absolute inset-0 min-h-0 min-w-0 max-h-full max-w-full overflow-hidden";
 function logPaneContainmentApplied(surface) {
   if (!define_import_meta_env_default.DEV) return;
-  console.log(`${LOG30} Applied overflow containment`, { surface });
+  console.log(`${LOG34} Applied overflow containment`, { surface });
 }
 function logPaneEmbedResized(slot, width, height) {
   if (!define_import_meta_env_default.DEV) return;
-  console.log(`${LOG30} Resized embedded content pane`, { slot, width: Math.round(width), height: Math.round(height) });
+  console.log(`${LOG34} Resized embedded content pane`, { slot, width: Math.round(width), height: Math.round(height) });
 }
 function logPaneBrowserViewConstrained(slot) {
   if (!define_import_meta_env_default.DEV) return;
-  console.log(`${LOG30} BrowserView constrained to parent bounds`, { slot });
+  console.log(`${LOG34} BrowserView constrained to parent bounds`, { slot });
 }
 function logPaneOverflowPrevented(slot) {
   if (!define_import_meta_env_default.DEV) return;
-  console.log(`${LOG30} Prevented pane overflow`, { slot });
+  console.log(`${LOG34} Prevented pane overflow`, { slot });
 }
 
 // ../grarf/desktop/src/components/operationalAlerts/OperationalAlertCard.tsx
@@ -44776,6 +45382,277 @@ function leagueRoutePath(league) {
   return GRARF_LEAGUE_ROUTE_PATHS[league] ?? "/";
 }
 
+// ../grarf/desktop/src/lib/gamesSpine/openWorldCupGameRowInWorkspace.ts
+init_define_import_meta_env();
+
+// ../grarf/desktop/src/lib/gamesSpine/openGameWorkspaceTab.ts
+init_define_import_meta_env();
+
+// ../grarf/desktop/src/gameWorkspace/resolveMlbGameRow.ts
+init_define_import_meta_env();
+function hasMlbGamePk2(game) {
+  if (typeof game.gamePk === "number" && Number.isFinite(game.gamePk) && game.gamePk > 0) {
+    return true;
+  }
+  const mlb2 = game.externalIds?.mlb?.trim();
+  return !!mlb2 && /^\d+$/.test(mlb2);
+}
+function resolveMlbGameRow(gameId, leagueRows) {
+  const candidates = [];
+  const fromLeague = leagueRows.find((g2) => g2.id === gameId);
+  if (fromLeague) candidates.push(fromLeague);
+  const retained = useRecentFinalizedGamesStore.getState().getAllRetained().find((g2) => g2.id === gameId);
+  if (retained) candidates.push(retained);
+  if (candidates.length === 0) return void 0;
+  return candidates.find(hasMlbGamePk2) ?? candidates[0];
+}
+
+// ../grarf/desktop/src/data/leagueWebWorkspace.ts
+init_define_import_meta_env();
+var LEAGUE_BOARD_CATEGORIES = [
+  { id: "news", label: "NEWS" },
+  { id: "standings", label: "STANDINGS" },
+  { id: "stats", label: "STATS" },
+  { id: "fantasy", label: "FANTASY" },
+  { id: "betting", label: "BETTING" }
+];
+function website(id, title, url) {
+  return { id, type: "website", title, url, closable: false };
+}
+function placeholder(id, title, body) {
+  return {
+    id,
+    type: "placeholder",
+    title,
+    url: "",
+    closable: false,
+    placeholderBody: body
+  };
+}
+var SOCCER_ESPN_LEAGUE = {
+  mls: "usa.1",
+  epl: "eng.1",
+  laliga: "esp.1",
+  nwsl: "usa.nwsl",
+  ligamx: "mex.1",
+  seriea: "ita.1",
+  ligue1: "fra.1"
+};
+function soccerHub(slug) {
+  const name = SOCCER_ESPN_LEAGUE[slug];
+  return `https://www.espn.com/soccer/league/_/name/${name}`;
+}
+function leagueBoardNewsSources(slug) {
+  if (slug === "atp" || slug === "wta") {
+    return [
+      { id: "espn", label: "ESPN", url: `https://www.espn.com/tennis/${slug}/scoreboard` },
+      { id: "scores", label: "Scores", url: `https://www.espn.com/tennis/${slug}/scoreboard` },
+      { id: "cbs", label: "CBS", url: "https://www.cbssports.com/tennis/" }
+    ];
+  }
+  if (slug === "mls") {
+    const hub = soccerHub("mls");
+    return [
+      { id: "espn", label: "ESPN", url: hub },
+      { id: "scores", label: "Scores", url: "https://www.espn.com/soccer/schedule/_/league/usa.1" },
+      { id: "cbs", label: "CBS", url: "https://www.cbssports.com/soccer/mls/" }
+    ];
+  }
+  const soccerName = SOCCER_ESPN_LEAGUE[slug];
+  if (soccerName) {
+    const hub = soccerHub(slug);
+    return [
+      { id: "espn", label: "ESPN", url: hub },
+      { id: "scores", label: "Scores", url: `https://www.espn.com/soccer/schedule/_/league/${soccerName}` },
+      { id: "cbs", label: "CBS", url: "https://www.cbssports.com/soccer/" }
+    ];
+  }
+  const root = `https://www.espn.com/${slug}/`;
+  return [
+    { id: "espn", label: "ESPN", url: root },
+    { id: "scores", label: "Scores", url: `${root}scoreboard` },
+    { id: "cbs", label: "CBS", url: `https://www.cbssports.com/${slug}/` }
+  ];
+}
+var NEWS_INDEX = {
+  nba: leagueBoardNewsSources("nba"),
+  wnba: leagueBoardNewsSources("wnba"),
+  nhl: leagueBoardNewsSources("nhl"),
+  mls: leagueBoardNewsSources("mls"),
+  epl: leagueBoardNewsSources("epl"),
+  laliga: leagueBoardNewsSources("laliga"),
+  nwsl: leagueBoardNewsSources("nwsl"),
+  ligamx: leagueBoardNewsSources("ligamx"),
+  seriea: leagueBoardNewsSources("seriea"),
+  ligue1: leagueBoardNewsSources("ligue1"),
+  atp: leagueBoardNewsSources("atp"),
+  wta: leagueBoardNewsSources("wta")
+};
+function newsById(slug) {
+  return Object.fromEntries(NEWS_INDEX[slug].map((s2) => [s2.id, s2]));
+}
+function leagueScoreboardFallbackUrl(slug) {
+  if (slug === "atp" || slug === "wta") {
+    return `https://www.espn.com/tennis/${slug}/scoreboard`;
+  }
+  const soccerName = SOCCER_ESPN_LEAGUE[slug];
+  if (soccerName) return `https://www.espn.com/soccer/schedule/_/league/${soccerName}`;
+  return `https://www.espn.com/${slug}/scoreboard`;
+}
+function leagueBuiltinWorkspaceFromNav(slug, nav) {
+  const { categoryId, newsSourceId } = nav;
+  const newsMap = newsById(slug);
+  if (categoryId === "news") {
+    const src = newsMap[newsSourceId] ?? NEWS_INDEX[slug][0];
+    return website(`${slug}-builtin-news-${src.id}`, src.label, src.url);
+  }
+  if (categoryId === "standings") {
+    const soccerName = SOCCER_ESPN_LEAGUE[slug];
+    if (soccerName) {
+      return website(
+        `${slug}-builtin-standings`,
+        "Standings",
+        `https://www.espn.com/soccer/standings/_/league/${soccerName}`
+      );
+    }
+    return website(`${slug}-builtin-standings`, "Standings", `https://www.espn.com/${slug}/standings`);
+  }
+  if (categoryId === "stats") {
+    const soccerName = SOCCER_ESPN_LEAGUE[slug];
+    if (soccerName) {
+      return website(
+        `${slug}-builtin-stats`,
+        "Stats",
+        `https://www.espn.com/soccer/stats/_/league/${soccerName}`
+      );
+    }
+    return website(`${slug}-builtin-stats`, "Stats", `https://www.espn.com/${slug}/stats`);
+  }
+  if (categoryId === "fantasy") {
+    return placeholder(`${slug}-builtin-fantasy`, "Fantasy", "League tools and waivers will route here.");
+  }
+  return placeholder(`${slug}-builtin-betting`, "Betting", "Odds, props, and trends will route here.");
+}
+function defaultLeagueWebNavState(slug) {
+  return { categoryId: "news", newsSourceId: NEWS_INDEX[slug][0].id };
+}
+function leagueWebSubnavForCategory(slug, categoryId) {
+  if (categoryId !== "news") return null;
+  return [...NEWS_INDEX[slug]];
+}
+function isLeagueWebCategoryId(id) {
+  return LEAGUE_BOARD_CATEGORIES.some((c2) => c2.id === id);
+}
+function resolveLeagueWebActiveWorkspace(slug, nav, overlay) {
+  if (overlay.activeId) {
+    return overlay.tabs.find((t2) => t2.id === overlay.activeId) ?? null;
+  }
+  return leagueBuiltinWorkspaceFromNav(slug, nav);
+}
+var CATEGORY_LABEL = {
+  news: "NEWS",
+  standings: "STANDINGS",
+  stats: "STATS",
+  fantasy: "FANTASY",
+  betting: "BETTING"
+};
+function leagueWebWorkspaceStatusLabel(slug, nav, overlay) {
+  if (overlay.activeId) {
+    const t2 = overlay.tabs.find((x2) => x2.id === overlay.activeId);
+    if (t2) return t2.title;
+  }
+  if (nav.categoryId === "news") {
+    const src = newsById(slug)[nav.newsSourceId] ?? NEWS_INDEX[slug][0];
+    return `${src.label.toUpperCase()} \xB7 ${CATEGORY_LABEL.news}`;
+  }
+  return CATEGORY_LABEL[nav.categoryId];
+}
+
+// ../grarf/desktop/src/lib/gamesSpine/openGameWorkspaceTab.ts
+var BOARD_SLUG = {
+  NBA: "nba",
+  WNBA: "wnba",
+  NHL: "nhl",
+  MLS: "mls",
+  EPL: "epl",
+  LALIGA: "laliga",
+  NWSL: "nwsl",
+  LIGAMX: "ligamx",
+  SERIEA: "seriea",
+  LIGUE1: "ligue1",
+  ATP: "atp",
+  WTA: "wta"
+};
+function resolveSpineRowWorkspaceEmbedUrl(game) {
+  if (isWorldCupGameRow(game)) {
+    const worldCupUrl = resolveWorldCupWorkspaceEmbedUrl(game);
+    if (worldCupUrl) return worldCupUrl;
+    if (isGrarfWebRenderer()) return null;
+  }
+  const parsed = parseEspnGameIdFromRowId(game.id);
+  if (parsed) {
+    return buildEspnGamecastUrl(parsed.league, parsed.eventId, {
+      ufcCardEventId: game.metadata?.ufcCardEventId
+    });
+  }
+  const slug = game.league ? BOARD_SLUG[game.league] : void 0;
+  if (slug) return leagueScoreboardFallbackUrl(slug);
+  return null;
+}
+function buildGameWorkspaceTabForRow(game, options) {
+  const isMlbRow = game.league === "MLB" || game.id.startsWith("espn-MLB-");
+  if (isMlbRow) {
+    const mlbRows = useCanonicalLiveGameStore.getState().leagues.MLB ?? [];
+    const resolved = resolveMlbGameRow(game.id, mlbRows) ?? game;
+    return buildMlbGameWorkspaceTab({ ...resolved, league: "MLB" }, options);
+  }
+  const slug = game.league ? BOARD_SLUG[game.league] : void 0;
+  const title = `${game.awayTeam} @ ${game.homeTeam}`;
+  const url = resolveSpineRowWorkspaceEmbedUrl(game);
+  if (url) {
+    return {
+      id: slug ? `${slug}-game-${game.id}` : `game-web-${game.id}`,
+      type: "website",
+      title,
+      url,
+      closable: true
+    };
+  }
+  if (slug) {
+    return {
+      id: `${slug}-fallback-${game.id}`,
+      type: "website",
+      title,
+      url: leagueScoreboardFallbackUrl(slug),
+      closable: true
+    };
+  }
+  return null;
+}
+
+// ../grarf/desktop/src/lib/gamesSpine/openWorldCupGameRowInWorkspace.ts
+async function openWorldCupGameRowInWorkspace(game) {
+  let resolvedGame = game;
+  if (isGrarfWebRenderer() && isWorldCupGameRow(game) && game.status === "scheduled" && !game.metadata?.aiscoreMatchUrl?.trim()) {
+    const aiscoreUrl = await resolveAiscoreMatchUrlForGame(game);
+    if (aiscoreUrl) {
+      const aiscoreId = aiscoreUrl.split("/").pop()?.trim() ?? null;
+      resolvedGame = {
+        ...game,
+        externalIds: {
+          ...game.externalIds,
+          ...aiscoreId ? { aiscore: aiscoreId } : {}
+        },
+        metadata: {
+          ...game.metadata,
+          aiscoreMatchUrl: aiscoreUrl
+        }
+      };
+    }
+  }
+  return buildGameWorkspaceTabForRow(resolvedGame);
+}
+
 // ../grarf/desktop/src/store/findLiveGame.ts
 init_define_import_meta_env();
 function findLiveGameById(gameId, consumerId = "find_live_game") {
@@ -44799,19 +45676,44 @@ function GameWorkspacePage() {
   const { id: rawParam } = useParams();
   const id = rawParam ? decodeURIComponent(rawParam) : "";
   const game = (0, import_react45.useMemo)(() => id ? findLiveGameById(id) : void 0, [id]);
-  const workspace = (0, import_react45.useMemo)(() => {
-    if (!id) return null;
-    const url = resolveGameWorkspaceEmbedUrl(game, id);
-    if (!url) return null;
-    const title = gameWorkspaceTitle(game, id);
-    console.log("[Workspace] Opened ESPN+ workspace successfully", { gameId: id, title });
-    return {
-      id: `game-workspace-${id}`,
-      type: "website",
-      title,
-      url,
-      closable: false,
-      ...game?.streamProvider === "Peacock" ? { embedPartition: STREAMING_PROVIDERS.peacock.partition } : {}
+  const [workspace, setWorkspace] = (0, import_react45.useState)(null);
+  (0, import_react45.useEffect)(() => {
+    if (!id) {
+      setWorkspace(null);
+      return;
+    }
+    let cancelled = false;
+    void (async () => {
+      if (game) {
+        const worldCupTab = await openWorldCupGameRowInWorkspace(game);
+        if (cancelled) return;
+        if (worldCupTab) {
+          setWorkspace({
+            ...worldCupTab,
+            id: `game-workspace-${id}`,
+            closable: false,
+            ...game.streamProvider === "Peacock" ? { embedPartition: STREAMING_PROVIDERS.peacock.partition } : {}
+          });
+          return;
+        }
+      }
+      const url = resolveGameWorkspaceEmbedUrl(game, id);
+      if (cancelled) return;
+      if (!url) {
+        setWorkspace(null);
+        return;
+      }
+      setWorkspace({
+        id: `game-workspace-${id}`,
+        type: "website",
+        title: gameWorkspaceTitle(game, id),
+        url,
+        closable: false,
+        ...game?.streamProvider === "Peacock" ? { embedPartition: STREAMING_PROVIDERS.peacock.partition } : {}
+      });
+    })();
+    return () => {
+      cancelled = true;
     };
   }, [game, id]);
   (0, import_react45.useEffect)(() => {
@@ -45044,7 +45946,7 @@ var import_react51 = __toESM(require_react(), 1);
 
 // ../grarf/desktop/src/lib/commandBriefing/selectBriefingGames.ts
 init_define_import_meta_env();
-var LOG31 = "[CommandBriefing]";
+var LOG35 = "[CommandBriefing]";
 function featuredEntryForKey(bundle, baseKey, dateKey) {
   const scopedKey = dateKey !== formatBriefingDateKey() ? `${baseKey}::${dateKey}` : baseKey;
   return bundle?.featuredGames?.[scopedKey] ?? bundle?.featuredGames?.[baseKey];
@@ -45096,7 +45998,7 @@ function selectBriefingGames(games, bundle, dateKey, fallbacks = {}, leagueScope
     if (!inLeagueScope(resolved)) return;
     seen.add(editorialKey);
     if (define_import_meta_env_default.DEV) {
-      console.log(`${LOG31} Included game: ${resolved.awayTeam} vs ${resolved.homeTeam}`);
+      console.log(`${LOG35} Included game: ${resolved.awayTeam} vs ${resolved.homeTeam}`);
     }
     out.push({ game: resolved, priority, narrative });
   };
@@ -45114,7 +46016,7 @@ function selectBriefingGames(games, bundle, dateKey, fallbacks = {}, leagueScope
   }
   out.sort((a2, b2) => a2.priority - b2.priority);
   if (define_import_meta_env_default.DEV && out.length > 0) {
-    console.log(`${LOG31} Generated from ranked games: ${out.length} items`);
+    console.log(`${LOG35} Generated from ranked games: ${out.length} items`);
   }
   return out;
 }
@@ -45563,7 +46465,7 @@ var import_react50 = __toESM(require_react(), 1);
 
 // ../grarf/desktop/src/lib/commandBriefing/commandBriefingLeagueLabel.ts
 init_define_import_meta_env();
-var LOG32 = "[CommandBriefing]";
+var LOG36 = "[CommandBriefing]";
 var BRIEFING_LEAGUE_LABELS = {
   MLB: "MLB",
   NCAABB: "NCAA BASEBALL",
@@ -45608,30 +46510,30 @@ function resolveCommandBriefingLeagueLabel(game) {
 }
 function logCommandBriefingLeagueLabel(label) {
   if (!define_import_meta_env_default.DEV) return;
-  console.log(`${LOG32} Rendering league label:`, label);
+  console.log(`${LOG36} Rendering league label:`, label);
 }
 function logCommandBriefingMetadataStyling() {
   if (!define_import_meta_env_default.DEV) return;
-  console.log(`${LOG32} Applied operational metadata styling`);
+  console.log(`${LOG36} Applied operational metadata styling`);
 }
 
 // ../grarf/desktop/src/lib/commandBriefing/commandBriefingLayout.ts
 init_define_import_meta_env();
-var LOG33 = "[CommandBriefingLayout]";
+var LOG37 = "[CommandBriefingLayout]";
 var COMMAND_BRIEFING_PACKET = "flex min-w-0 flex-col gap-px";
 var COMMAND_BRIEFING_OPERATIONAL_ROW = "min-w-0 break-words pl-3 text-left text-[9px] leading-snug tracking-wide";
 var COMMAND_BRIEFING_PROVIDER_ROW = "min-w-0 break-words pl-3 text-left text-[9px] leading-snug tracking-wide text-textdim/90";
 function logCommandBriefingLayoutAligned() {
   if (!define_import_meta_env_default.DEV) return;
-  console.log(`${LOG33} Aligned operational rows beneath briefing`);
+  console.log(`${LOG37} Aligned operational rows beneath briefing`);
 }
 function logCommandBriefingLayoutDetachedScoreRemoved() {
   if (!define_import_meta_env_default.DEV) return;
-  console.log(`${LOG33} Removed detached score alignment`);
+  console.log(`${LOG37} Removed detached score alignment`);
 }
 function logCommandBriefingLayoutHierarchyAdjusted() {
   if (!define_import_meta_env_default.DEV) return;
-  console.log(`${LOG33} Adjusted responsive operational hierarchy`);
+  console.log(`${LOG37} Adjusted responsive operational hierarchy`);
 }
 
 // ../grarf/desktop/src/lib/commandBriefing/resolveBriefingDisplay.ts
@@ -45639,7 +46541,7 @@ init_define_import_meta_env();
 
 // ../grarf/desktop/src/lib/commandBriefing/deriveFinalPostgameSlate.ts
 init_define_import_meta_env();
-var LOG34 = "[CommandBriefing]";
+var LOG38 = "[CommandBriefing]";
 var SOCCER_LEAGUES2 = /* @__PURE__ */ new Set([
   "EPL",
   "LALIGA",
@@ -45705,16 +46607,16 @@ function deriveFinalPostgameSlate(game) {
 }
 function logDeterministicFinalSlate(slate, game) {
   if (!define_import_meta_env_default.DEV) return;
-  console.log(`${LOG34} Rendering FINAL state`);
-  console.log(`${LOG34} Using deterministic FINAL-state template`);
-  console.log(`${LOG34} Suppressed generated narrative wording`);
-  console.log(`${LOG34} Final-state template: "${slate}"`);
-  console.log(`${LOG34} Using separate score row`);
-  console.log(`${LOG34} Suppressed score embedding in blurb`, {
+  console.log(`${LOG38} Rendering FINAL state`);
+  console.log(`${LOG38} Using deterministic FINAL-state template`);
+  console.log(`${LOG38} Suppressed generated narrative wording`);
+  console.log(`${LOG38} Final-state template: "${slate}"`);
+  console.log(`${LOG38} Using separate score row`);
+  console.log(`${LOG38} Suppressed score embedding in blurb`, {
     gameId: game.id,
     league: game.league
   });
-  console.log(`${LOG34} Suppressed pregame narrative in FINAL state`);
+  console.log(`${LOG38} Suppressed pregame narrative in FINAL state`);
 }
 
 // ../grarf/desktop/src/lib/commandBriefing/resolveBriefingDisplay.ts
@@ -46733,7 +47635,7 @@ function InlineEditableText({
 
 // ../grarf/desktop/src/components/gamesSpine/GameNarrativeCapsule.tsx
 var import_jsx_runtime40 = __toESM(require_jsx_runtime(), 1);
-var LOG35 = "[GamesSpine]";
+var LOG39 = "[GamesSpine]";
 function GameNarrativeCapsule({
   game,
   defaultCollapsed = false,
@@ -46756,9 +47658,9 @@ function GameNarrativeCapsule({
   (0, import_react57.useEffect)(() => {
     if (!text2.trim() && !editMode) return;
     if (define_import_meta_env_default.DEV) {
-      console.log(`${LOG35} Narrative capsule attached to game:`, gameKey);
+      console.log(`${LOG39} Narrative capsule attached to game:`, gameKey);
       if (text2.trim()) {
-        console.log(`${LOG35} Rendering narrative capsule: "${text2.trim()}"`);
+        console.log(`${LOG39} Rendering narrative capsule: "${text2.trim()}"`);
       }
     }
   }, [gameKey, text2, editMode]);
@@ -46832,7 +47734,7 @@ function GameNarrativeCapsule({
 // ../grarf/desktop/src/components/editorial/BriefingPriorityField.tsx
 init_define_import_meta_env();
 var import_jsx_runtime41 = __toESM(require_jsx_runtime(), 1);
-var LOG36 = "[Editorial]";
+var LOG40 = "[Editorial]";
 function BriefingPriorityField({ priority, editMode, onChange }) {
   if (!editMode) return null;
   return /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)(
@@ -46866,7 +47768,7 @@ function BriefingPriorityField({ priority, editMode, onChange }) {
                 return;
               }
               const clamped = Math.min(10, Math.max(1, Math.round(n2)));
-              console.log(`${LOG36} Priority updated: ${clamped}`);
+              console.log(`${LOG40} Priority updated: ${clamped}`);
               onChange(clamped);
             },
             onKeyDown: (e2) => e2.stopPropagation(),
@@ -48308,7 +49210,7 @@ function HomeEditorialModeBar({ className }) {
 init_define_import_meta_env();
 var import_react63 = __toESM(require_react(), 1);
 var STORAGE_KEY4 = "grarf-games-spine-collapse-v1";
-var LOG37 = "[GamesSpine]";
+var LOG41 = "[GamesSpine]";
 function readCollapseMap() {
   if (typeof sessionStorage === "undefined") return {};
   try {
@@ -48338,7 +49240,7 @@ function useGamesSpineCollapse() {
   const toggleCollapsed = (0, import_react63.useCallback)((league) => {
     setCollapsed((prev) => {
       const next = !prev[league];
-      console.log(`${LOG37} League ${next ? "collapsed" : "expanded"}:`, league);
+      console.log(`${LOG41} League ${next ? "collapsed" : "expanded"}:`, league);
       return { ...prev, [league]: next };
     });
   }, []);
@@ -49103,7 +50005,7 @@ function clearPodcastCache() {
 
 // ../grarf/desktop/src/components/media/PodcastRailPanel.tsx
 var import_jsx_runtime52 = __toESM(require_jsx_runtime(), 1);
-var LOG38 = "[Podcasts]";
+var LOG42 = "[Podcasts]";
 function formatDur(sec) {
   if (sec == null || !Number.isFinite(sec)) return "\u2014";
   const m2 = Math.floor(sec / 60);
@@ -49134,7 +50036,7 @@ function PodcastRailPanel({ className }) {
       setLoading(true);
       setErr(null);
       setFeedErrors(0);
-      console.log(`${LOG38} Loaded ${orderedFeeds.length} feeds`);
+      console.log(`${LOG42} Loaded ${orderedFeeds.length} feeds`);
       const all = [];
       let fromCache = 0;
       let fetched = 0;
@@ -49172,7 +50074,7 @@ function PodcastRailPanel({ className }) {
       all.sort((a2, b2) => new Date(b2.publishedAt).getTime() - new Date(a2.publishedAt).getTime());
       setEpisodes(all.slice(0, 48));
       setFeedErrors(failed);
-      console.log(`${LOG38} Fetched ${all.length} episodes`);
+      console.log(`${LOG42} Fetched ${all.length} episodes`);
       if (all.length === 0) {
         setErr(
           failed >= orderedFeeds.length ? "No episodes available \u2014 RSS unreachable or feeds changed. Try REFRESH or check network." : "No playable episodes in feeds yet. Try REFRESH."
@@ -51697,7 +52599,7 @@ async function runCbsHeadlinesVideoProbe(executeJavaScript, options) {
 // ../grarf/desktop/src/components/homeMvp/HomeHeadlinesCbsPanel.tsx
 var import_jsx_runtime61 = __toESM(require_jsx_runtime(), 1);
 var CBS_SPORTS_HQ_LIVE_URL = "https://www.cbssports.com/watch/live";
-var LOG39 = "[HomeHeadlinesCbs]";
+var LOG43 = "[HomeHeadlinesCbs]";
 var BROWSER_SURFACE_TYPE = "Electron webview (guest WebContents)";
 var HEADLINES_CONTENT_HEIGHT = "h-[19.5rem]";
 var CBS_WEB_PREFS = "contextIsolation=yes,nodeIntegration=no,sandbox=no,javascript=yes,autoplayPolicy=no-user-gesture-required";
@@ -51719,21 +52621,21 @@ function HomeHeadlinesCbsPanel({ embedsEnabled = true, videoUrl }) {
   const showSurface = embedsEnabled && hasWebviewTag();
   (0, import_react73.useLayoutEffect)(() => {
     if (!showSurface) {
-      console.warn(`${LOG39} webview unavailable \u2014 embedsEnabled=${embedsEnabled}`);
+      console.warn(`${LOG43} webview unavailable \u2014 embedsEnabled=${embedsEnabled}`);
       return;
     }
     const wv = wvRef.current;
     if (!wv) return;
-    console.log(`${LOG39} browser surface type:`, BROWSER_SURFACE_TYPE);
-    console.log(`${LOG39} navigation URL:`, navigationUrl);
+    console.log(`${LOG43} browser surface type:`, BROWSER_SURFACE_TYPE);
+    console.log(`${LOG43} navigation URL:`, navigationUrl);
     const onStartLoading = () => {
-      console.log(`${LOG39} did-start-loading`, { url: navigationUrl });
+      console.log(`${LOG43} did-start-loading`, { url: navigationUrl });
     };
     const onNavigate = (event) => {
       const e2 = event;
       if (e2.isMainFrame === false) return;
       finalUrlRef.current = e2.url ?? finalUrlRef.current;
-      console.log(`${LOG39} did-navigate (redirect)`, {
+      console.log(`${LOG43} did-navigate (redirect)`, {
         url: e2.url,
         finalUrl: finalUrlRef.current
       });
@@ -51743,7 +52645,7 @@ function HomeHeadlinesCbsPanel({ embedsEnabled = true, videoUrl }) {
       if (e2.isMainFrame === false) return;
       if (e2.errorCode === -3) return;
       const message = formatLoadError(e2);
-      console.error(`${LOG39} did-fail-load`, {
+      console.error(`${LOG43} did-fail-load`, {
         errorCode: e2.errorCode,
         errorDescription: e2.errorDescription,
         validatedURL: e2.validatedURL
@@ -51754,12 +52656,12 @@ function HomeHeadlinesCbsPanel({ embedsEnabled = true, videoUrl }) {
       const e2 = event;
       if (e2.isMainFrame === false) return;
       const status = e2.httpResponseCode ?? e2.statusCode;
-      console.log(`${LOG39} did-get-response-details`, {
+      console.log(`${LOG43} did-get-response-details`, {
         status,
         url: e2.url
       });
       if (status != null && status >= 400) {
-        console.error(`${LOG39} HTTP error`, { status, url: e2.url });
+        console.error(`${LOG43} HTTP error`, { status, url: e2.url });
       }
       if (status != null && status >= 500) {
         setLoadError(`HTTP ${status} \u2014 ${e2.url ?? navigationUrl}`);
@@ -51772,7 +52674,7 @@ function HomeHeadlinesCbsPanel({ embedsEnabled = true, videoUrl }) {
       } catch {
       }
       finalUrlRef.current = resolvedUrl;
-      console.log(`${LOG39} did-finish-load`, {
+      console.log(`${LOG43} did-finish-load`, {
         result: "ok",
         finalUrl: resolvedUrl
       });
@@ -51783,10 +52685,10 @@ function HomeHeadlinesCbsPanel({ embedsEnabled = true, videoUrl }) {
       void wv.executeJavaScript("window.location.href").then((href) => {
         if (typeof href === "string" && href) {
           finalUrlRef.current = href;
-          console.log(`${LOG39} final navigation URL after redirects:`, href);
+          console.log(`${LOG43} final navigation URL after redirects:`, href);
         }
       }).catch((err) => {
-        console.warn(`${LOG39} final URL probe failed`, err);
+        console.warn(`${LOG43} final URL probe failed`, err);
       });
     };
     const onConsoleMessage = (event) => {
@@ -51797,28 +52699,28 @@ function HomeHeadlinesCbsPanel({ embedsEnabled = true, videoUrl }) {
       const isCert = lower.includes("certificate") || lower.includes("ssl") || lower.includes("net::err_cert");
       const isAutoplay = lower.includes("autoplay") || lower.includes("play() request") || lower.includes("notallowederror");
       if (isCsp) {
-        console.error(`${LOG39} CSP console error`, {
+        console.error(`${LOG43} CSP console error`, {
           level: e2.level,
           message,
           sourceId: e2.sourceId,
           line: e2.line
         });
       } else if (isCert) {
-        console.error(`${LOG39} certificate console error`, {
+        console.error(`${LOG43} certificate console error`, {
           level: e2.level,
           message,
           sourceId: e2.sourceId,
           line: e2.line
         });
       } else if (isAutoplay) {
-        console.warn(`${LOG39} media autoplay console message`, {
+        console.warn(`${LOG43} media autoplay console message`, {
           level: e2.level,
           message,
           sourceId: e2.sourceId,
           line: e2.line
         });
       } else if (e2.level === 3) {
-        console.error(`${LOG39} console error`, {
+        console.error(`${LOG43} console error`, {
           message,
           sourceId: e2.sourceId,
           line: e2.line
@@ -58918,257 +59820,6 @@ function overlayActiveGameId(state3) {
   return fallback?.[1] ?? null;
 }
 
-// ../grarf/desktop/src/lib/gamesSpine/openGameWorkspaceTab.ts
-init_define_import_meta_env();
-
-// ../grarf/desktop/src/gameWorkspace/resolveMlbGameRow.ts
-init_define_import_meta_env();
-function hasMlbGamePk2(game) {
-  if (typeof game.gamePk === "number" && Number.isFinite(game.gamePk) && game.gamePk > 0) {
-    return true;
-  }
-  const mlb2 = game.externalIds?.mlb?.trim();
-  return !!mlb2 && /^\d+$/.test(mlb2);
-}
-function resolveMlbGameRow(gameId, leagueRows) {
-  const candidates = [];
-  const fromLeague = leagueRows.find((g2) => g2.id === gameId);
-  if (fromLeague) candidates.push(fromLeague);
-  const retained = useRecentFinalizedGamesStore.getState().getAllRetained().find((g2) => g2.id === gameId);
-  if (retained) candidates.push(retained);
-  if (candidates.length === 0) return void 0;
-  return candidates.find(hasMlbGamePk2) ?? candidates[0];
-}
-
-// ../grarf/desktop/src/data/leagueWebWorkspace.ts
-init_define_import_meta_env();
-var LEAGUE_BOARD_CATEGORIES = [
-  { id: "news", label: "NEWS" },
-  { id: "standings", label: "STANDINGS" },
-  { id: "stats", label: "STATS" },
-  { id: "fantasy", label: "FANTASY" },
-  { id: "betting", label: "BETTING" }
-];
-function website(id, title, url) {
-  return { id, type: "website", title, url, closable: false };
-}
-function placeholder(id, title, body) {
-  return {
-    id,
-    type: "placeholder",
-    title,
-    url: "",
-    closable: false,
-    placeholderBody: body
-  };
-}
-var SOCCER_ESPN_LEAGUE = {
-  mls: "usa.1",
-  epl: "eng.1",
-  laliga: "esp.1",
-  nwsl: "usa.nwsl",
-  ligamx: "mex.1",
-  seriea: "ita.1",
-  ligue1: "fra.1"
-};
-function soccerHub(slug) {
-  const name = SOCCER_ESPN_LEAGUE[slug];
-  return `https://www.espn.com/soccer/league/_/name/${name}`;
-}
-function leagueBoardNewsSources(slug) {
-  if (slug === "atp" || slug === "wta") {
-    return [
-      { id: "espn", label: "ESPN", url: `https://www.espn.com/tennis/${slug}/scoreboard` },
-      { id: "scores", label: "Scores", url: `https://www.espn.com/tennis/${slug}/scoreboard` },
-      { id: "cbs", label: "CBS", url: "https://www.cbssports.com/tennis/" }
-    ];
-  }
-  if (slug === "mls") {
-    const hub = soccerHub("mls");
-    return [
-      { id: "espn", label: "ESPN", url: hub },
-      { id: "scores", label: "Scores", url: "https://www.espn.com/soccer/schedule/_/league/usa.1" },
-      { id: "cbs", label: "CBS", url: "https://www.cbssports.com/soccer/mls/" }
-    ];
-  }
-  const soccerName = SOCCER_ESPN_LEAGUE[slug];
-  if (soccerName) {
-    const hub = soccerHub(slug);
-    return [
-      { id: "espn", label: "ESPN", url: hub },
-      { id: "scores", label: "Scores", url: `https://www.espn.com/soccer/schedule/_/league/${soccerName}` },
-      { id: "cbs", label: "CBS", url: "https://www.cbssports.com/soccer/" }
-    ];
-  }
-  const root = `https://www.espn.com/${slug}/`;
-  return [
-    { id: "espn", label: "ESPN", url: root },
-    { id: "scores", label: "Scores", url: `${root}scoreboard` },
-    { id: "cbs", label: "CBS", url: `https://www.cbssports.com/${slug}/` }
-  ];
-}
-var NEWS_INDEX = {
-  nba: leagueBoardNewsSources("nba"),
-  wnba: leagueBoardNewsSources("wnba"),
-  nhl: leagueBoardNewsSources("nhl"),
-  mls: leagueBoardNewsSources("mls"),
-  epl: leagueBoardNewsSources("epl"),
-  laliga: leagueBoardNewsSources("laliga"),
-  nwsl: leagueBoardNewsSources("nwsl"),
-  ligamx: leagueBoardNewsSources("ligamx"),
-  seriea: leagueBoardNewsSources("seriea"),
-  ligue1: leagueBoardNewsSources("ligue1"),
-  atp: leagueBoardNewsSources("atp"),
-  wta: leagueBoardNewsSources("wta")
-};
-function newsById(slug) {
-  return Object.fromEntries(NEWS_INDEX[slug].map((s2) => [s2.id, s2]));
-}
-function leagueScoreboardFallbackUrl(slug) {
-  if (slug === "atp" || slug === "wta") {
-    return `https://www.espn.com/tennis/${slug}/scoreboard`;
-  }
-  const soccerName = SOCCER_ESPN_LEAGUE[slug];
-  if (soccerName) return `https://www.espn.com/soccer/schedule/_/league/${soccerName}`;
-  return `https://www.espn.com/${slug}/scoreboard`;
-}
-function leagueBuiltinWorkspaceFromNav(slug, nav) {
-  const { categoryId, newsSourceId } = nav;
-  const newsMap = newsById(slug);
-  if (categoryId === "news") {
-    const src = newsMap[newsSourceId] ?? NEWS_INDEX[slug][0];
-    return website(`${slug}-builtin-news-${src.id}`, src.label, src.url);
-  }
-  if (categoryId === "standings") {
-    const soccerName = SOCCER_ESPN_LEAGUE[slug];
-    if (soccerName) {
-      return website(
-        `${slug}-builtin-standings`,
-        "Standings",
-        `https://www.espn.com/soccer/standings/_/league/${soccerName}`
-      );
-    }
-    return website(`${slug}-builtin-standings`, "Standings", `https://www.espn.com/${slug}/standings`);
-  }
-  if (categoryId === "stats") {
-    const soccerName = SOCCER_ESPN_LEAGUE[slug];
-    if (soccerName) {
-      return website(
-        `${slug}-builtin-stats`,
-        "Stats",
-        `https://www.espn.com/soccer/stats/_/league/${soccerName}`
-      );
-    }
-    return website(`${slug}-builtin-stats`, "Stats", `https://www.espn.com/${slug}/stats`);
-  }
-  if (categoryId === "fantasy") {
-    return placeholder(`${slug}-builtin-fantasy`, "Fantasy", "League tools and waivers will route here.");
-  }
-  return placeholder(`${slug}-builtin-betting`, "Betting", "Odds, props, and trends will route here.");
-}
-function defaultLeagueWebNavState(slug) {
-  return { categoryId: "news", newsSourceId: NEWS_INDEX[slug][0].id };
-}
-function leagueWebSubnavForCategory(slug, categoryId) {
-  if (categoryId !== "news") return null;
-  return [...NEWS_INDEX[slug]];
-}
-function isLeagueWebCategoryId(id) {
-  return LEAGUE_BOARD_CATEGORIES.some((c2) => c2.id === id);
-}
-function resolveLeagueWebActiveWorkspace(slug, nav, overlay) {
-  if (overlay.activeId) {
-    return overlay.tabs.find((t2) => t2.id === overlay.activeId) ?? null;
-  }
-  return leagueBuiltinWorkspaceFromNav(slug, nav);
-}
-var CATEGORY_LABEL = {
-  news: "NEWS",
-  standings: "STANDINGS",
-  stats: "STATS",
-  fantasy: "FANTASY",
-  betting: "BETTING"
-};
-function leagueWebWorkspaceStatusLabel(slug, nav, overlay) {
-  if (overlay.activeId) {
-    const t2 = overlay.tabs.find((x2) => x2.id === overlay.activeId);
-    if (t2) return t2.title;
-  }
-  if (nav.categoryId === "news") {
-    const src = newsById(slug)[nav.newsSourceId] ?? NEWS_INDEX[slug][0];
-    return `${src.label.toUpperCase()} \xB7 ${CATEGORY_LABEL.news}`;
-  }
-  return CATEGORY_LABEL[nav.categoryId];
-}
-
-// ../grarf/desktop/src/lib/gamesSpine/openGameWorkspaceTab.ts
-var BOARD_SLUG = {
-  NBA: "nba",
-  WNBA: "wnba",
-  NHL: "nhl",
-  MLS: "mls",
-  EPL: "epl",
-  LALIGA: "laliga",
-  NWSL: "nwsl",
-  LIGAMX: "ligamx",
-  SERIEA: "seriea",
-  LIGUE1: "ligue1",
-  ATP: "atp",
-  WTA: "wta"
-};
-function resolveWorldCupFotmobWorkspaceUrl(game) {
-  const fromMetadata = game.metadata?.fotmobMatchUrl?.trim();
-  if (fromMetadata) return fromMetadata;
-  const fotmobId = game.externalIds?.fotmob?.trim();
-  if (fotmobId) return buildFotmobMatchUrl(fotmobId);
-  return null;
-}
-function resolveSpineRowWorkspaceEmbedUrl(game) {
-  if (game.league === "WORLDCUP") {
-    const fotmobUrl = resolveWorldCupFotmobWorkspaceUrl(game);
-    if (fotmobUrl) return fotmobUrl;
-  }
-  const parsed = parseEspnGameIdFromRowId(game.id);
-  if (parsed) {
-    return buildEspnGamecastUrl(parsed.league, parsed.eventId, {
-      ufcCardEventId: game.metadata?.ufcCardEventId
-    });
-  }
-  const slug = game.league ? BOARD_SLUG[game.league] : void 0;
-  if (slug) return leagueScoreboardFallbackUrl(slug);
-  return null;
-}
-function buildGameWorkspaceTabForRow(game, options) {
-  const isMlbRow = game.league === "MLB" || game.id.startsWith("espn-MLB-");
-  if (isMlbRow) {
-    const mlbRows = useCanonicalLiveGameStore.getState().leagues.MLB ?? [];
-    const resolved = resolveMlbGameRow(game.id, mlbRows) ?? game;
-    return buildMlbGameWorkspaceTab({ ...resolved, league: "MLB" }, options);
-  }
-  const slug = game.league ? BOARD_SLUG[game.league] : void 0;
-  const title = `${game.awayTeam} @ ${game.homeTeam}`;
-  const url = resolveSpineRowWorkspaceEmbedUrl(game);
-  if (url) {
-    return {
-      id: slug ? `${slug}-game-${game.id}` : `game-web-${game.id}`,
-      type: "website",
-      title,
-      url,
-      closable: true
-    };
-  }
-  if (slug) {
-    return {
-      id: `${slug}-fallback-${game.id}`,
-      type: "website",
-      title,
-      url: leagueScoreboardFallbackUrl(slug),
-      closable: true
-    };
-  }
-  return null;
-}
-
 // ../grarf/desktop/src/lib/gamesSpine/openMcwsGameRowInBrowser.ts
 init_define_import_meta_env();
 function tryOpenMcwsGameRowInBrowser(game) {
@@ -59385,6 +60036,19 @@ function HomePage() {
   const watchDispatch = (0, import_react104.useCallback)((action) => {
     dispatchOverlay(action);
   }, []);
+  const openSpineGameWorkspace = (0, import_react104.useCallback)(
+    (game) => {
+      if (tryOpenMcwsGameRowInBrowser(game)) return;
+      void (async () => {
+        const tab = await openWorldCupGameRowInWorkspace(game);
+        if (tab) {
+          if (isHomeOps) dispatchOverlay({ type: "open", tab });
+          else dispatch({ type: "open", tab });
+        }
+      })();
+    },
+    [isHomeOps]
+  );
   const onSelectGame = (0, import_react104.useCallback)(
     (gameId) => {
       setLastClickedGameId(gameId);
@@ -59393,18 +60057,14 @@ function HomePage() {
         dispatchOverlay({ type: "dismissWatchSessions" });
         const game2 = findLiveGameById(gameId);
         if (!game2) return;
-        if (tryOpenMcwsGameRowInBrowser(game2)) return;
-        const tab2 = buildGameWorkspaceTabForRow(game2);
-        if (tab2) dispatchOverlay({ type: "open", tab: tab2 });
+        openSpineGameWorkspace(game2);
         return;
       }
       const game = findLiveGameById(gameId);
       if (!game) return;
-      if (tryOpenMcwsGameRowInBrowser(game)) return;
-      const tab = buildGameWorkspaceTabForRow(game);
-      if (tab) dispatch({ type: "open", tab });
+      openSpineGameWorkspace(game);
     },
-    [isHomeOps]
+    [isHomeOps, openSpineGameWorkspace]
   );
   const operationalAlertActions = (0, import_react104.useMemo)(
     () => ({
@@ -59416,9 +60076,7 @@ function HomePage() {
         setLastClickedGameId(gameId);
         const game = findLiveGameById(gameId);
         if (!game) return;
-        if (tryOpenMcwsGameRowInBrowser(game)) return;
-        const tab = buildGameWorkspaceTabForRow(game);
-        if (tab) dispatch({ type: "open", tab });
+        openSpineGameWorkspace(game);
       },
       watchDispatch: ((action) => {
         if (action.type !== "open") return;
@@ -59426,7 +60084,7 @@ function HomePage() {
         else dispatch({ type: "open", tab: action.tab });
       })
     }),
-    [isHomeOps, onSelectGame, dispatch]
+    [isHomeOps, onSelectGame, openSpineGameWorkspace, dispatch]
   );
   useOperationalAlertActionsRegistration(operationalAlertActions);
   const orchestrationExecutionDriver = (0, import_react104.useMemo)(
@@ -60428,8 +61086,10 @@ function LeagueBoardPage({ league }) {
       if (!game) return;
       clearCenterEmbedForSpineGameSelect();
       dispatchOverlay({ type: "dismissWatchSessions" });
-      const tab = buildGameWorkspaceTabForRow(game);
-      if (tab) dispatchOverlay({ type: "open", tab });
+      void (async () => {
+        const tab = await openWorldCupGameRowInWorkspace(game);
+        if (tab) dispatchOverlay({ type: "open", tab });
+      })();
     },
     [games, league, slug]
   );
@@ -60701,7 +61361,7 @@ function LeagueHomeWebPane({
 init_define_import_meta_env();
 var import_react111 = __toESM(require_react(), 1);
 var import_jsx_runtime109 = __toESM(require_jsx_runtime(), 1);
-var LOG40 = "[MlbCatchUpStandings]";
+var LOG44 = "[MlbCatchUpStandings]";
 var MLB_CATCH_UP_PRIMARY_STANDINGS_URL = "https://mlb.theohtani.com/standings/2026";
 var MLB_CATCH_UP_FALLBACK_STANDINGS_URL = "https://www.fangraphs.com/standings/playoff-odds";
 var LOAD_TIMEOUT_MS = 3e4;
@@ -60743,13 +61403,13 @@ function MlbCatchUpStandingsPane({ paneId, className }) {
       if (!isPrimarySrc(activeSrcRef.current)) return;
       fallbackUsedRef.current = true;
       clearLoadTimeout();
-      console.log(`${LOG40} Primary standings load failed (${reason})`);
-      console.log(`${LOG40} FanGraphs fallback activated`);
+      console.log(`${LOG44} Primary standings load failed (${reason})`);
+      console.log(`${LOG44} FanGraphs fallback activated`);
       setActiveSrc(MLB_CATCH_UP_FALLBACK_STANDINGS_URL);
     };
     const onStartLoading = () => {
       if (isPrimarySrc(activeSrcRef.current) && !fallbackUsedRef.current) {
-        console.log(`${LOG40} Primary standings load started`);
+        console.log(`${LOG44} Primary standings load started`);
         clearLoadTimeout();
         loadTimeout = setTimeout(() => activateFallback("timeout"), LOAD_TIMEOUT_MS);
       }
@@ -60778,7 +61438,7 @@ function MlbCatchUpStandingsPane({ paneId, className }) {
     const onFinishLoad = () => {
       clearLoadTimeout();
       if (isFallbackSrc(activeSrcRef.current)) {
-        console.log(`${LOG40} FanGraphs fallback loaded successfully`);
+        console.log(`${LOG44} FanGraphs fallback loaded successfully`);
         return;
       }
       if (!isPrimarySrc(activeSrcRef.current) || fallbackUsedRef.current) return;
@@ -60847,7 +61507,7 @@ var import_react112 = __toESM(require_react(), 1);
 
 // ../grarf/desktop/src/lib/rss/rssFetchDiagnostics.ts
 init_define_import_meta_env();
-var LOG41 = "[RSS DEBUG]";
+var LOG45 = "[RSS DEBUG]";
 function classifyRssBody(body) {
   const text2 = typeof body === "string" ? body : "";
   const trimmed = text2.trimStart();
@@ -60879,7 +61539,7 @@ function headersToRecord(headers) {
 }
 async function diagnoseRendererRssFetch(url) {
   const label = "renderer-fetch";
-  console.group(`${LOG41}[${label}] ${url}`);
+  console.group(`${LOG45}[${label}] ${url}`);
   try {
     const started = performance.now();
     const res = await fetch(url, {
@@ -60891,7 +61551,7 @@ async function diagnoseRendererRssFetch(url) {
     });
     const body = await res.text();
     const classification = classifyRssBody(body);
-    console.log(`${LOG41}[${label}] metadata`, {
+    console.log(`${LOG45}[${label}] metadata`, {
       finalUrl: res.url,
       status: res.status,
       statusText: res.statusText,
@@ -60904,19 +61564,19 @@ async function diagnoseRendererRssFetch(url) {
       elapsedMs: Math.round(performance.now() - started),
       ...classification
     });
-    console.log(`${LOG41}[${label}] preview`, previewRssBody(body));
+    console.log(`${LOG45}[${label}] preview`, previewRssBody(body));
   } catch (e2) {
-    console.error(`${LOG41}[${label}] threw`, e2);
+    console.error(`${LOG45}[${label}] threw`, e2);
   } finally {
     console.groupEnd();
   }
 }
 async function diagnoseElectronRssFetch(url) {
   const label = "electron-helper";
-  console.group(`${LOG41}[${label}] ${url}`);
+  console.group(`${LOG45}[${label}] ${url}`);
   const bridge = typeof window !== "undefined" ? window.grarf?.tickerRssFetch : void 0;
   if (!bridge) {
-    console.warn(`${LOG41}[${label}] window.grarf.tickerRssFetch unavailable (not in Electron?)`);
+    console.warn(`${LOG45}[${label}] window.grarf.tickerRssFetch unavailable (not in Electron?)`);
     console.groupEnd();
     return;
   }
@@ -60926,7 +61586,7 @@ async function diagnoseElectronRssFetch(url) {
   const xml = result && "ok" in result && result.ok === true && "xml" in result ? result.xml : "";
   const classification = classifyRssBody(xml);
   const debugAttempts = result && typeof result === "object" && "_rssDebug" in result ? result._rssDebug : void 0;
-  console.log(`${LOG41}[${label}] bridge summary`, {
+  console.log(`${LOG45}[${label}] bridge summary`, {
     ok: result && "ok" in result ? result.ok : void 0,
     status: result && "status" in result ? result.status : void 0,
     statusText: result && "statusText" in result ? result.statusText : void 0,
@@ -60935,23 +61595,23 @@ async function diagnoseElectronRssFetch(url) {
     ...classification
   });
   if (debugAttempts) {
-    console.log(`${LOG41}[${label}] per-attempt (main process)`, debugAttempts);
+    console.log(`${LOG45}[${label}] per-attempt (main process)`, debugAttempts);
   }
-  console.log(`${LOG41}[${label}] preview`, previewRssBody(xml));
+  console.log(`${LOG45}[${label}] preview`, previewRssBody(xml));
   console.groupEnd();
 }
 function logRssPreParseInput(label, xml) {
   const classification = classifyRssBody(xml);
-  console.log(`${LOG41}[${label}] pre-parse`, {
+  console.log(`${LOG45}[${label}] pre-parse`, {
     ...classification,
     preview: previewRssBody(xml)
   });
 }
 async function runEspnMlbRssFetchDiagnostics(url = "https://www.espn.com/espn/rss/mlb/news") {
-  console.log(`${LOG41} === ESPN MLB RSS fetch diagnosis start ===`, url);
+  console.log(`${LOG45} === ESPN MLB RSS fetch diagnosis start ===`, url);
   await diagnoseElectronRssFetch(url);
   await diagnoseRendererRssFetch(url);
-  console.log(`${LOG41} === ESPN MLB RSS fetch diagnosis end ===`);
+  console.log(`${LOG45} === ESPN MLB RSS fetch diagnosis end ===`);
 }
 
 // ../grarf/desktop/src/components/mlb/MlbHeadlinesFeedPane.tsx
