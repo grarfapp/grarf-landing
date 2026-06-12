@@ -28247,6 +28247,22 @@ function leagueDirectoryCollapsedLabel(item) {
 
 // ../grarf/desktop/src/components/shell/LeagueNavActivityTallyMarks.tsx
 init_define_import_meta_env();
+var import_jsx_runtime3 = __toESM(require_jsx_runtime(), 1);
+var TALLY_STATUS_CLASS = {
+  scheduled: "bg-[#9eb0b0]/70",
+  live: "bg-redsys",
+  final: "bg-[#3a4545]"
+};
+function LeagueNavActivityTallyMarks({ statuses }) {
+  if (statuses.length === 0) return null;
+  return /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "ml-1 flex shrink-0 items-center gap-px", "aria-hidden": true, children: statuses.map((status, index) => /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
+    "span",
+    {
+      className: cn2("h-2.5 w-px shrink-0", TALLY_STATUS_CLASS[status])
+    },
+    index
+  )) });
+}
 
 // ../grarf/desktop/src/lib/navigation/resolveLeagueNavActivityStatuses.ts
 init_define_import_meta_env();
@@ -28435,50 +28451,20 @@ function filterGamesSpineSlateForToday(games, now = /* @__PURE__ */ new Date()) 
 }
 
 // ../grarf/desktop/src/lib/navigation/resolveLeagueNavActivityStatuses.ts
-var LEAGUE_NAV_ACTIVITY_METER_SLOTS = 24;
-var STATUS_ORDER = ["final", "live", "scheduled"];
-function countStatuses(statuses) {
-  const counts = { final: 0, live: 0, scheduled: 0 };
-  for (const status of statuses) counts[status]++;
-  return counts;
-}
-function allocateStatusSlots(counts, totalSlots) {
-  const total = STATUS_ORDER.reduce((sum, status) => sum + counts[status], 0);
-  if (total === 0 || totalSlots === 0) return [];
-  const buckets = STATUS_ORDER.map((status) => ({
-    status,
-    quota: counts[status] / total * totalSlots,
-    slots: 0
-  }));
-  for (const bucket of buckets) {
-    bucket.slots = Math.floor(bucket.quota);
+function buildActivityTallyStatusesByBucket(statuses) {
+  let finalCount = 0;
+  let liveCount = 0;
+  let scheduledCount = 0;
+  for (const status of statuses) {
+    if (status === "final") finalCount++;
+    else if (status === "live") liveCount++;
+    else scheduledCount++;
   }
-  let remainder = totalSlots - buckets.reduce((sum, bucket) => sum + bucket.slots, 0);
-  const byFraction = [...buckets].sort((a2, b2) => b2.quota % 1 - a2.quota % 1);
-  for (let i2 = 0; i2 < remainder; i2++) {
-    byFraction[i2 % byFraction.length].slots++;
-  }
-  const out = [];
-  for (const bucket of buckets) {
-    for (let i2 = 0; i2 < bucket.slots; i2++) out.push(bucket.status);
-  }
-  return out;
-}
-function buildLeagueNavActivityMeter(statuses, maxGamesToday) {
-  const gameCount = statuses.length;
-  if (gameCount === 0 || maxGamesToday <= 0) {
-    return Array(LEAGUE_NAV_ACTIVITY_METER_SLOTS).fill("empty");
-  }
-  const filledSlots = Math.max(
-    1,
-    Math.min(
-      LEAGUE_NAV_ACTIVITY_METER_SLOTS,
-      Math.round(gameCount / maxGamesToday * LEAGUE_NAV_ACTIVITY_METER_SLOTS)
-    )
-  );
-  const filled = allocateStatusSlots(countStatuses(statuses), filledSlots);
-  const emptySlots = LEAGUE_NAV_ACTIVITY_METER_SLOTS - filled.length;
-  return [...filled, ...Array(emptySlots).fill("empty")];
+  return [
+    ...Array(finalCount).fill("final"),
+    ...Array(liveCount).fill("live"),
+    ...Array(scheduledCount).fill("scheduled")
+  ];
 }
 function resolveLeagueNavActivityStatusesByLeague(leagues) {
   const out = /* @__PURE__ */ new Map();
@@ -28487,50 +28473,10 @@ function resolveLeagueNavActivityStatusesByLeague(leagues) {
     if (slate.length === 0) continue;
     out.set(
       leagueKey,
-      slate.map((game) => game.status)
+      buildActivityTallyStatusesByBucket(slate.map((game) => game.status))
     );
   }
   return out;
-}
-function resolveLeagueNavActivityMetersByLeague(leagues) {
-  const statusesByLeague = resolveLeagueNavActivityStatusesByLeague(leagues);
-  let maxGamesToday = 0;
-  for (const statuses of statusesByLeague.values()) {
-    maxGamesToday = Math.max(maxGamesToday, statuses.length);
-  }
-  const out = /* @__PURE__ */ new Map();
-  for (const [leagueKey, statuses] of statusesByLeague) {
-    out.set(leagueKey, buildLeagueNavActivityMeter(statuses, maxGamesToday));
-  }
-  return out;
-}
-
-// ../grarf/desktop/src/components/shell/LeagueNavActivityTallyMarks.tsx
-var import_jsx_runtime3 = __toESM(require_jsx_runtime(), 1);
-var SEGMENT_STATUS_CLASS = {
-  scheduled: "bg-[#9eb0b0]/70",
-  live: "bg-redsys",
-  final: "bg-[#3a4545]"
-};
-function LeagueNavActivityTallyMarks({ segments }) {
-  if (segments.length === 0) return null;
-  return /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
-    "span",
-    {
-      className: "ml-1 flex h-2.5 w-[38px] shrink-0 items-stretch gap-px",
-      "aria-hidden": true,
-      children: segments.map((segment, index) => /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
-        "span",
-        {
-          className: cn2(
-            "min-w-0 flex-1",
-            segment === "empty" ? "bg-white/[0.06]" : SEGMENT_STATUS_CLASS[segment]
-          )
-        },
-        index
-      ))
-    }
-  );
 }
 
 // ../grarf/desktop/src/lib/navigation/resolveOnTodayNavItems.ts
@@ -29609,15 +29555,15 @@ function DirectoryNavRow({
   item,
   active: active2,
   sidebarCollapsed,
-  activityMeterSegments
+  activityStatuses
 }) {
-  const showActivityIndicator = isGrarfWebRenderer() && !sidebarCollapsed && activityMeterSegments != null && activityMeterSegments.some((segment) => segment !== "empty");
+  const showActivityIndicator = isGrarfWebRenderer() && !sidebarCollapsed && activityStatuses != null && activityStatuses.length > 0;
   const expandedLabel = showActivityIndicator ? /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("span", { className: "flex w-full min-w-0 items-center justify-between gap-1", children: [
     /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("span", { className: "inline-flex min-w-0 items-center gap-1.5", children: [
       /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(DirectoryNavLogo, { item }),
       /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { className: "truncate", children: item.label })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(LeagueNavActivityTallyMarks, { segments: activityMeterSegments })
+    /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(LeagueNavActivityTallyMarks, { statuses: activityStatuses })
   ] }) : /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("span", { className: "inline-flex min-w-0 items-center gap-1.5", children: [
     /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(DirectoryNavLogo, { item }),
     /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { className: "truncate", children: item.label })
@@ -29657,7 +29603,7 @@ function AppLeftNav() {
   const measureRef = (0, import_react8.useRef)(null);
   const liveLeagues = useLiveGamesStore((s2) => s2.leagues);
   const onTodayActivityByLeague = (0, import_react8.useMemo)(
-    () => isGrarfWebRenderer() ? resolveLeagueNavActivityMetersByLeague(liveLeagues) : null,
+    () => isGrarfWebRenderer() ? resolveLeagueNavActivityStatusesByLeague(liveLeagues) : null,
     [liveLeagues]
   );
   const leagueDirectorySections = (0, import_react8.useMemo)(() => {
@@ -29741,7 +29687,7 @@ function AppLeftNav() {
                 item,
                 active: isDirectoryItemActive(item, pathname, homeShellMode),
                 sidebarCollapsed,
-                activityMeterSegments: section.id === "on-today" && item.grarfLeagueKey ? onTodayActivityByLeague?.get(item.grarfLeagueKey) : void 0
+                activityStatuses: section.id === "on-today" && item.grarfLeagueKey ? onTodayActivityByLeague?.get(item.grarfLeagueKey) : void 0
               },
               item.id
             )) })
