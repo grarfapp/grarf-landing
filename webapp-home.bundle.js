@@ -44724,10 +44724,10 @@ function YoutubeIframeApiPlayer({
       playerRef.current?.destroy();
       playerRef.current = null;
     };
-    void loadYoutubeIframeApi().then((YT2) => {
+    void loadYoutubeIframeApi().then((YT) => {
       if (cancelled || !containerRef.current) return;
       destroyPlayer();
-      playerRef.current = new YT2.Player(containerRef.current, {
+      playerRef.current = new YT.Player(containerRef.current, {
         host: YOUTUBE_IFRAME_API_NOCOOKIE_HOST,
         videoId,
         playerVars: buildYoutubeIframeApiPlayerVars({ autoplay, mute, startSec }),
@@ -52214,6 +52214,18 @@ function buildHomeWebHeadlinesYoutubeWatchUrl(videoId) {
 var import_jsx_runtime64 = __toESM(require_jsx_runtime(), 1);
 var HEADLINES_CONTENT_HEIGHT2 = "aspect-video w-full max-h-[11rem]";
 var PLAYBACK_WATCHDOG_MS = 8e3;
+var BUFFERING_CONFIRM_MS = 5e3;
+var YT_PLAYER_STATE = {
+  UNSTARTED: -1,
+  ENDED: 0,
+  PLAYING: 1,
+  PAUSED: 2,
+  BUFFERING: 3,
+  CUED: 5
+};
+function isPlaybackConfirmed(state3) {
+  return state3 === YT_PLAYER_STATE.PLAYING;
+}
 function HomeHeadlinesWebPlaylistPanel({ embedsEnabled = true }) {
   const watchdogRef = (0, import_react74.useRef)(null);
   const hasPlayedRef = (0, import_react74.useRef)(false);
@@ -52227,28 +52239,30 @@ function HomeHeadlinesWebPlaylistPanel({ embedsEnabled = true }) {
   }, []);
   const advanceSource = (0, import_react74.useCallback)(() => {
     clearWatchdog();
+    hasPlayedRef.current = false;
     setSourceIndex((index) => {
       const next = index + 1;
       if (next >= HOME_WEB_HEADLINES_YOUTUBE_SOURCES.length) {
         setExhausted(true);
         return index;
       }
+      setExhausted(false);
       return next;
     });
   }, [clearWatchdog]);
   const activeVideoId = HOME_WEB_HEADLINES_YOUTUBE_SOURCES[sourceIndex] ?? null;
   const scheduleWatchdog = (0, import_react74.useCallback)(
-    (getState) => {
+    (getState, delayMs = PLAYBACK_WATCHDOG_MS) => {
       clearWatchdog();
       watchdogRef.current = setTimeout(() => {
-        const state3 = getState();
-        if (state3 !== YT.PlayerState.PLAYING && state3 !== YT.PlayerState.BUFFERING) {
+        if (!isPlaybackConfirmed(getState())) {
           advanceSource();
         }
-      }, PLAYBACK_WATCHDOG_MS);
+      }, delayMs);
     },
     [advanceSource, clearWatchdog]
   );
+  (0, import_react74.useEffect)(() => () => clearWatchdog(), [clearWatchdog]);
   return /* @__PURE__ */ (0, import_jsx_runtime64.jsx)(
     "section",
     {
@@ -52274,14 +52288,17 @@ function HomeHeadlinesWebPlaylistPanel({ embedsEnabled = true }) {
                 scheduleWatchdog(() => player.getPlayerState());
               },
               onStateChange: (state3, player) => {
-                if (state3 === YT.PlayerState.PLAYING || state3 === YT.PlayerState.BUFFERING) {
+                if (isPlaybackConfirmed(state3)) {
                   hasPlayedRef.current = true;
                   clearWatchdog();
                   return;
                 }
-                if (!hasPlayedRef.current && (state3 === YT.PlayerState.ENDED || state3 === YT.PlayerState.UNSTARTED)) {
-                  scheduleWatchdog(() => player.getPlayerState());
+                if (hasPlayedRef.current) return;
+                if (state3 === YT_PLAYER_STATE.BUFFERING) {
+                  scheduleWatchdog(() => player.getPlayerState(), BUFFERING_CONFIRM_MS);
+                  return;
                 }
+                scheduleWatchdog(() => player.getPlayerState());
               }
             },
             activeVideoId
