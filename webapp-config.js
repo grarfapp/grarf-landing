@@ -2,4 +2,5 @@
 window.GRARF_WEB_CONFIG = {
   operationalIngestUrl: "https://grarf-operational-service.grarf.workers.dev",
   operationalPollIntervalMs: 60_000,
+  sportscapeEditorialApiUrl: "https://grarf-sportscape-editorial.grarf.workers.dev",
 };

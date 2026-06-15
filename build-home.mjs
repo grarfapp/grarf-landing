@@ -4,6 +4,7 @@
  */
 import * as esbuild from "esbuild";
 import { execSync } from "node:child_process";
+import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -16,6 +17,10 @@ const ingestUrl =
   process.env.VITE_GRARF_OPERATIONAL_INGEST_URL ??
   "https://grarf-operational-service.grarf.workers.dev";
 
+const sportscapeEditorialApiUrl =
+  process.env.VITE_SPORTSCAPE_EDITORIAL_API_URL ??
+  "https://grarf-sportscape-editorial.grarf.workers.dev";
+
 /** Full env object — required for dynamic `import.meta.env[name]` access in desktop code. */
 const importMetaEnv = {
   DEV: false,
@@ -23,6 +28,7 @@ const importMetaEnv = {
   MODE: "production",
   VITE_OPERATIONAL_INGEST_PROVIDER: "grarf_cloud",
   VITE_GRARF_OPERATIONAL_INGEST_URL: ingestUrl,
+  VITE_SPORTSCAPE_EDITORIAL_API_URL: sportscapeEditorialApiUrl,
   VITE_TRACE_FINAL_LIVE_FIELDS: "",
   VITE_ENABLE_ESPN_RESOLVER: "false",
   VITE_POSTHOG_KEY: "",
@@ -70,5 +76,14 @@ execSync(
   `npx tailwindcss -i "${tailwindInput}" -o "${outCss}" -c "${tailwindConfig}" --minify`,
   { stdio: "inherit", cwd: __dirname }
 );
+
+const webappHtmlPath = path.join(__dirname, "webapp.html");
+const spa404Path = path.join(__dirname, "404.html");
+const webappHtml = fs.readFileSync(webappHtmlPath, "utf8");
+const spa404Html = webappHtml.includes("<base ")
+  ? webappHtml
+  : webappHtml.replace("<head>", '<head>\n  <base href="/">');
+fs.writeFileSync(spa404Path, spa404Html);
+console.log("[build-home] wrote GitHub Pages SPA fallback:", spa404Path);
 
 console.log("[build-home] done:", outJs, outCss);
