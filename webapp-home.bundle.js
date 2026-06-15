@@ -57994,11 +57994,6 @@ async function removeAiBriefSelectionViaWorker(id) {
   if (!res.ok) throw new Error(`ai_brief_remove_failed_${res.status}`);
 }
 async function fetchSportscapeEditorialDocument() {
-  if (shouldUseLocalSportscapeEditorialFallback() && window.grarf?.sportscapeEditorialGetDocument) {
-    const result = await window.grarf.sportscapeEditorialGetDocument();
-    if (!result.ok || !result.document) throw new Error(result.error ?? "load_failed");
-    return result.document;
-  }
   return fetchSportscapeEditorialDocumentViaWorker();
 }
 async function saveSportscapeEditorialEntry(input) {
@@ -58046,16 +58041,26 @@ function useSportscapeEditorialDocument() {
   const [document2, setDocument] = (0, import_react90.useState)(EMPTY_DOCUMENT);
   (0, import_react90.useEffect)(() => {
     let cancelled = false;
-    void fetchSportscapeEditorialDocument().then((next) => {
-      if (!cancelled) setDocument(next);
-    }).catch((error) => {
-      if (cancelled) return;
-      const message = error instanceof Error ? error.message : String(error);
-      console.warn(`[SPORTSCAPE EDITORIAL] load failed (${message})`);
-      setDocument(EMPTY_DOCUMENT);
-    });
+    const load = () => {
+      void fetchSportscapeEditorialDocument().then((next) => {
+        if (!cancelled) setDocument(next);
+      }).catch((error) => {
+        if (cancelled) return;
+        const message = error instanceof Error ? error.message : String(error);
+        console.warn(`[SPORTSCAPE EDITORIAL] load failed (${message})`);
+        setDocument(EMPTY_DOCUMENT);
+      });
+    };
+    load();
+    const onVisibilityChange = () => {
+      if (window.document.visibilityState === "visible") {
+        load();
+      }
+    };
+    window.addEventListener("visibilitychange", onVisibilityChange);
     return () => {
       cancelled = true;
+      window.removeEventListener("visibilitychange", onVisibilityChange);
     };
   }, []);
   return document2;
