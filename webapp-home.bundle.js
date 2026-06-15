@@ -67343,6 +67343,16 @@ function SportscapeEditorialAdminContent() {
   ] });
 }
 function SportscapeEditorialAdminPage() {
+  (0, import_react130.useEffect)(() => {
+    const root = document.getElementById("grarf-web-root");
+    if (!root) return;
+    const previousClassName = root.className;
+    root.classList.remove("overflow-hidden", "h-screen");
+    root.classList.add("min-h-screen");
+    return () => {
+      root.className = previousClassName;
+    };
+  }, []);
   return /* @__PURE__ */ (0, import_jsx_runtime138.jsx)(SportscapeEditorialPasswordGate, { children: /* @__PURE__ */ (0, import_jsx_runtime138.jsx)(SportscapeEditorialAdminContent, {}) });
 }
 
