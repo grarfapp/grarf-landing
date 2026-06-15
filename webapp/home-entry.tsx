@@ -24,21 +24,19 @@ function IntelligenceSyncBridge() {
   return null;
 }
 
-function AppShellRoutes() {
-  return (
-    <>
-      <Route index element={<HomePage />} />
-      {leagueDirectoryUniqueRoutes().map((item) => (
-        <Route
-          key={item.route}
-          path={item.route.replace(/^\//, "")}
-          element={<LeagueDirectoryRoutePage />}
-        />
-      ))}
-      <Route path="game/:id" element={<GameWorkspacePage />} />
-    </>
-  );
-}
+const appShellRouteElements = (
+  <>
+    <Route index element={<HomePage />} />
+    {leagueDirectoryUniqueRoutes().map((item) => (
+      <Route
+        key={item.route}
+        path={item.route.replace(/^\//, "")}
+        element={<LeagueDirectoryRoutePage />}
+      />
+    ))}
+    <Route path="game/:id" element={<GameWorkspacePage />} />
+  </>
+);
 
 function WebHomeApp() {
   return (
@@ -46,10 +44,10 @@ function WebHomeApp() {
       <IntelligenceSyncBridge />
       <Routes>
         <Route path="/" element={<AppShellLayout />}>
-          <AppShellRoutes />
+          {appShellRouteElements}
         </Route>
         <Route path="webapp.html" element={<AppShellLayout />}>
-          <AppShellRoutes />
+          {appShellRouteElements}
         </Route>
         <Route path="admin/sportscape" element={<SportscapeEditorialAdminPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />

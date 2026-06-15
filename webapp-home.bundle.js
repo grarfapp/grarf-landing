@@ -67348,26 +67348,24 @@ function IntelligenceSyncBridge() {
   (0, import_react131.useEffect)(() => bindIntelligenceStoreUpdates(), []);
   return null;
 }
-function AppShellRoutes() {
-  return /* @__PURE__ */ (0, import_jsx_runtime139.jsxs)(import_jsx_runtime139.Fragment, { children: [
-    /* @__PURE__ */ (0, import_jsx_runtime139.jsx)(Route, { index: true, element: /* @__PURE__ */ (0, import_jsx_runtime139.jsx)(HomePage, {}) }),
-    leagueDirectoryUniqueRoutes().map((item) => /* @__PURE__ */ (0, import_jsx_runtime139.jsx)(
-      Route,
-      {
-        path: item.route.replace(/^\//, ""),
-        element: /* @__PURE__ */ (0, import_jsx_runtime139.jsx)(LeagueDirectoryRoutePage, {})
-      },
-      item.route
-    )),
-    /* @__PURE__ */ (0, import_jsx_runtime139.jsx)(Route, { path: "game/:id", element: /* @__PURE__ */ (0, import_jsx_runtime139.jsx)(GameWorkspacePage, {}) })
-  ] });
-}
+var appShellRouteElements = /* @__PURE__ */ (0, import_jsx_runtime139.jsxs)(import_jsx_runtime139.Fragment, { children: [
+  /* @__PURE__ */ (0, import_jsx_runtime139.jsx)(Route, { index: true, element: /* @__PURE__ */ (0, import_jsx_runtime139.jsx)(HomePage, {}) }),
+  leagueDirectoryUniqueRoutes().map((item) => /* @__PURE__ */ (0, import_jsx_runtime139.jsx)(
+    Route,
+    {
+      path: item.route.replace(/^\//, ""),
+      element: /* @__PURE__ */ (0, import_jsx_runtime139.jsx)(LeagueDirectoryRoutePage, {})
+    },
+    item.route
+  )),
+  /* @__PURE__ */ (0, import_jsx_runtime139.jsx)(Route, { path: "game/:id", element: /* @__PURE__ */ (0, import_jsx_runtime139.jsx)(GameWorkspacePage, {}) })
+] });
 function WebHomeApp() {
   return /* @__PURE__ */ (0, import_jsx_runtime139.jsxs)(AnalyticsProvider, { children: [
     /* @__PURE__ */ (0, import_jsx_runtime139.jsx)(IntelligenceSyncBridge, {}),
     /* @__PURE__ */ (0, import_jsx_runtime139.jsxs)(Routes, { children: [
-      /* @__PURE__ */ (0, import_jsx_runtime139.jsx)(Route, { path: "/", element: /* @__PURE__ */ (0, import_jsx_runtime139.jsx)(AppShellLayout, {}), children: /* @__PURE__ */ (0, import_jsx_runtime139.jsx)(AppShellRoutes, {}) }),
-      /* @__PURE__ */ (0, import_jsx_runtime139.jsx)(Route, { path: "webapp.html", element: /* @__PURE__ */ (0, import_jsx_runtime139.jsx)(AppShellLayout, {}), children: /* @__PURE__ */ (0, import_jsx_runtime139.jsx)(AppShellRoutes, {}) }),
+      /* @__PURE__ */ (0, import_jsx_runtime139.jsx)(Route, { path: "/", element: /* @__PURE__ */ (0, import_jsx_runtime139.jsx)(AppShellLayout, {}), children: appShellRouteElements }),
+      /* @__PURE__ */ (0, import_jsx_runtime139.jsx)(Route, { path: "webapp.html", element: /* @__PURE__ */ (0, import_jsx_runtime139.jsx)(AppShellLayout, {}), children: appShellRouteElements }),
       /* @__PURE__ */ (0, import_jsx_runtime139.jsx)(Route, { path: "admin/sportscape", element: /* @__PURE__ */ (0, import_jsx_runtime139.jsx)(SportscapeEditorialAdminPage, {}) }),
       /* @__PURE__ */ (0, import_jsx_runtime139.jsx)(Route, { path: "*", element: /* @__PURE__ */ (0, import_jsx_runtime139.jsx)(Navigate, { to: "/", replace: true }) })
     ] })
