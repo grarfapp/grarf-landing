@@ -1,25 +1,55 @@
 {
-  "date": "2026-06-11",
+  "date": "2026-06-14",
   "stories": [
     {
-      "headline": "Mexico get World Cup party started with 2-0 win over nine-man South Africa",
-      "url": "https://www.reuters.com/sports/soccer/mexico-get-world-cup-party-started-with-2-0-win-over-nine-man-south-africa-2026-06-11/"
+      "league": "FIFA World Cup",
+      "headline": "Brazil struggle with World Cup 'nerves' in Morocco draw",
+      "url": "https://www.espn.com/soccer/story/_/id/49054529/brazil-vs-morocco-2026-world-cup-vinicius-junior"
     },
     {
-      "headline": "Hurricanes hold off Golden Knights in Game 5, move within 1 win of Stanley Cup",
-      "url": "https://www.nhl.com/news/topic/playoffs/vegas-golden-knights-carolina-hurricanes-stanley-cup-final-game-5-recap-june-11-2026"
+      "league": "FIFA World Cup",
+      "headline": "Scotland hang on for first World Cup win since 1990 with 1-0 victory over Haiti",
+      "url": "https://www.reuters.com/sports/soccer/scotland-squeeze-past-haiti-1-0-bag-first-world-cup-win-36-years-2026-06-14/"
     },
     {
-      "headline": "Brooks Koepka surges into share of RBC Canadian Open lead with opening round 64",
-      "url": "https://www.pgatour.com/article/news/latest/2026/06/11/brooks-koepka-round-1-rbc-canadian-open-tpc-toronto-at-osprey-valley-leaderboard-scores-results"
+      "league": "FIFA World Cup",
+      "headline": "Qatar stuns Switzerland with last-gasp World Cup equalizer to steal a point",
+      "url": "https://www.usatoday.com/story/sports/soccer/worldcup/2026/06/13/qatar-switzerland-world-cup-prediction-analysis-odds/90532354007/"
     },
     {
-      "headline": "Shohei Ohtani exits vs. Pirates with left knee inflammation",
-      "url": "https://www.mlb.com/news/shohei-ohtani-left-knee-inflammation"
+      "league": "FIFA World Cup",
+      "headline": "Australia's new star Irankunda spoils Turkiye's World Cup return",
+      "url": "https://www.thescore.com/worldcup/news/3553613/australias-new-star-irankunda-spoils-turkiyes-world-cup-return"
     },
     {
-      "headline": "Taylor Fritz defeats Martin Landaluce in Stuttgart",
-      "url": "https://www.atptour.com/en/news/fritz-landaluce-stuttgart-2026-thursday"
+      "league": "Men's College World Series",
+      "headline": "No. 3 Georgia Beats No. 6 Texas 7-1 In CWS Opener",
+      "url": "https://georgiadogs.com/news/2026/6/14/baseball-no-3-georgia-beats-no-6-texas-7-1-in-cws-opener"
+    },
+    {
+      "league": "Men's College World Series",
+      "headline": "Oklahoma shuts out 7-seed Alabama in MCWS first round",
+      "url": "https://www.secsports.com/news/2026/06/oklahoma-shuts-out-7-seed-alabama-in-mcws-first-round"
+    },
+    {
+      "league": "MLB",
+      "headline": "Yamamoto comes THIS close to perfection -- then a no-no -- vs. White Sox",
+      "url": "https://www.mlb.com/news/yoshinobu-yamamoto-loses-perfect-game-in-eighth-no-hitter-in-ninth?game_pk=824587"
+    },
+    {
+      "league": "PGA Tour",
+      "headline": "2026 RBC Canadian Open leaderboard: Tommy Fleetwood among pack chasing Jackson Suber after Moving Day",
+      "url": "https://www.cbssports.com/golf/news/rbc-canadian-open-leaderboard-2026-live-updates-round-3-scores-coveage/live/"
+    },
+    {
+      "league": "ATP",
+      "headline": "Shelton holds nerve to dethrone Fritz in Stuttgart",
+      "url": "https://www.atptour.com/en/news/shelton-fritz-stuttgart-2026-final"
+    },
+    {
+      "league": "WTA",
+      "headline": "Vekic sweeps by Raducanu at Queen's Club to secure first career WTA 500 title",
+      "url": "https://www.wtatennis.com/news/4519072/vekic-sweeps-past-raducanu-at-queens-for-first-wta-500-crown-first-title-since-2024"
     }
   ]
 }

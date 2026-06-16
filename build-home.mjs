@@ -77,9 +77,39 @@ execSync(
   { stdio: "inherit", cwd: __dirname }
 );
 
+const desktopPublicLogosDir = path.resolve(__dirname, "../grarf/desktop/public/league-logos");
+const landingLogosDir = path.join(__dirname, "league-logos");
+
+function copyRecursive(src, dest) {
+  const stat = fs.statSync(src);
+  if (stat.isDirectory()) {
+    fs.mkdirSync(dest, { recursive: true });
+    for (const name of fs.readdirSync(src)) {
+      copyRecursive(path.join(src, name), path.join(dest, name));
+    }
+    return;
+  }
+  fs.copyFileSync(src, dest);
+}
+
+if (fs.existsSync(desktopPublicLogosDir)) {
+  fs.mkdirSync(landingLogosDir, { recursive: true });
+  for (const name of fs.readdirSync(desktopPublicLogosDir)) {
+    copyRecursive(path.join(desktopPublicLogosDir, name), path.join(landingLogosDir, name));
+  }
+  console.log("[build-home] synced league-logos from desktop/public");
+} else {
+  console.warn("[build-home] skip league-logos sync — missing", desktopPublicLogosDir);
+}
+
 const webappHtmlPath = path.join(__dirname, "webapp.html");
 const spa404Path = path.join(__dirname, "404.html");
-const webappHtml = fs.readFileSync(webappHtmlPath, "utf8");
+const buildStamp = String(Date.now());
+const webappHtmlTemplate = fs.readFileSync(webappHtmlPath, "utf8");
+const webappHtml = webappHtmlTemplate
+  .replace(/href="webapp-home\.css(?:\?[^"]*)?"/, `href="webapp-home.css?v=${buildStamp}"`)
+  .replace(/src="webapp-home\.bundle\.js(?:\?[^"]*)?"/, `src="webapp-home.bundle.js?v=${buildStamp}"`);
+fs.writeFileSync(webappHtmlPath, webappHtml);
 const spa404Html = webappHtml.includes("<base ")
   ? webappHtml
   : webappHtml.replace("<head>", '<head>\n  <base href="/">');

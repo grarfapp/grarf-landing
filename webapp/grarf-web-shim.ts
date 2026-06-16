@@ -13,7 +13,71 @@ declare global {
 }
 
 const LS_EDITORIAL = "grarf-web-editorial-bundle";
+
+type WebEditorialBundle = {
+  narratives: Record<string, { manualNarrative?: string }>;
+  featuredGames: Record<string, { briefingPriority?: number; featuredRank?: number }>;
+  leagueContexts: Record<string, { leagueContext?: string }>;
+  generatedSummaries?: Record<string, unknown>;
+};
+
+function emptyWebEditorialBundle(): WebEditorialBundle {
+  return { narratives: {}, featuredGames: {}, leagueContexts: {}, generatedSummaries: {} };
+}
+
+function readWebEditorialBundle(): WebEditorialBundle {
+  const raw = readJson<Record<string, unknown> | null>(LS_EDITORIAL, null);
+  if (!raw || typeof raw !== "object") return emptyWebEditorialBundle();
+
+  if (raw.narratives || raw.featuredGames || raw.leagueContexts) {
+    return {
+      narratives: (raw.narratives as WebEditorialBundle["narratives"]) ?? {},
+      featuredGames: (raw.featuredGames as WebEditorialBundle["featuredGames"]) ?? {},
+      leagueContexts: (raw.leagueContexts as WebEditorialBundle["leagueContexts"]) ?? {},
+      generatedSummaries: (raw.generatedSummaries as WebEditorialBundle["generatedSummaries"]) ?? {},
+    };
+  }
+
+  const bundle = emptyWebEditorialBundle();
+  const legacyGames = raw.games;
+  if (legacyGames && typeof legacyGames === "object") {
+    for (const [gameKey, row] of Object.entries(legacyGames as Record<string, Record<string, unknown>>)) {
+      if (typeof row?.manualNarrative === "string" && row.manualNarrative.trim()) {
+        bundle.narratives[gameKey] = { manualNarrative: row.manualNarrative.trim() };
+      }
+      const rank = row?.briefingPriority ?? row?.featuredRank;
+      if (typeof rank === "number" && Number.isFinite(rank)) {
+        bundle.featuredGames[gameKey] = { briefingPriority: Math.round(rank) };
+      }
+    }
+  }
+
+  const legacyLeagues = raw.leagues;
+  if (legacyLeagues && typeof legacyLeagues === "object") {
+    for (const [leagueKey, row] of Object.entries(legacyLeagues as Record<string, Record<string, unknown>>)) {
+      if (typeof row?.leagueContext === "string" && row.leagueContext.trim()) {
+        bundle.leagueContexts[leagueKey.toUpperCase()] = { leagueContext: row.leagueContext.trim() };
+      }
+    }
+  }
+
+  return bundle;
+}
+
+function writeWebEditorialBundle(bundle: WebEditorialBundle): void {
+  writeJson(LS_EDITORIAL, bundle);
+}
 const LS_BRIEFING_PERSISTENCE = "grarf-web-briefing-persistence";
+function readBriefingPersistenceSnapshots(): Record<string, unknown> {
+  const raw = readJson<Record<string, unknown> | null>(LS_BRIEFING_PERSISTENCE, null);
+  if (!raw || typeof raw !== "object") return {};
+  const nested = raw.snapshots;
+  if (nested && typeof nested === "object" && !Array.isArray(nested)) {
+    return nested as Record<string, unknown>;
+  }
+  // Legacy flat map keyed by gameId.
+  return raw;
+}
 const LS_COMMAND_BRIEFING = "grarf-web-command-briefing-store";
 
 function readJson<T>(key: string, fallback: T): T {
@@ -261,41 +325,121 @@ function installGrarfBridge(): void {
     tickerRssFetch,
 
     editorialGetBundle: async () => {
-      const bundle = readJson(LS_EDITORIAL, null);
-      return bundle ? { ok: true as const, bundle } : { ok: false as const, error: "No editorial bundle" };
+      const bundle = readWebEditorialBundle();
+      return { ok: true as const, bundle };
     },
     editorialSaveNarrative: async (payload) => {
-      const bundle = readJson<Record<string, unknown>>(LS_EDITORIAL, { games: {}, leagues: {} });
-      const games = (bundle.games ?? {}) as Record<string, Record<string, unknown>>;
-      const row = games[payload.gameKey] ?? {};
-      if (payload.manualNarrative == null) delete row.manualNarrative;
-      else row.manualNarrative = payload.manualNarrative;
-      games[payload.gameKey] = row;
-      bundle.games = games;
-      writeJson(LS_EDITORIAL, bundle);
-      return { ok: true as const, bundle };
+      const bundle = readWebEditorialBundle();
+      const narratives = { ...bundle.narratives };
+      if (payload.manualNarrative == null || !String(payload.manualNarrative).trim()) {
+        delete narratives[payload.gameKey];
+      } else {
+        narratives[payload.gameKey] = { manualNarrative: String(payload.manualNarrative).trim() };
+      }
+      const next = { ...bundle, narratives };
+      writeWebEditorialBundle(next);
+      return { ok: true as const, bundle: next };
     },
     editorialSaveFeaturedRank: async (payload) => {
-      const bundle = readJson<Record<string, unknown>>(LS_EDITORIAL, { games: {}, leagues: {} });
-      const games = (bundle.games ?? {}) as Record<string, Record<string, unknown>>;
-      const row = games[payload.gameKey] ?? {};
-      if (payload.featuredRank != null) row.featuredRank = payload.featuredRank;
-      if (payload.briefingPriority != null) row.briefingPriority = payload.briefingPriority;
-      games[payload.gameKey] = row;
-      bundle.games = games;
-      writeJson(LS_EDITORIAL, bundle);
-      return { ok: true as const, bundle };
+      const bundle = readWebEditorialBundle();
+      const featuredGames = { ...bundle.featuredGames };
+      const rank = payload.briefingPriority ?? payload.featuredRank;
+      if (rank == null || !Number.isFinite(rank)) delete featuredGames[payload.gameKey];
+      else featuredGames[payload.gameKey] = { briefingPriority: Math.round(rank) };
+      const next = { ...bundle, featuredGames };
+      writeWebEditorialBundle(next);
+      return { ok: true as const, bundle: next };
     },
     editorialSaveLeagueContext: async (payload) => {
-      const bundle = readJson<Record<string, unknown>>(LS_EDITORIAL, { games: {}, leagues: {} });
-      const leagues = (bundle.leagues ?? {}) as Record<string, Record<string, unknown>>;
-      const row = leagues[payload.leagueKey] ?? {};
-      if (payload.leagueContext == null) delete row.leagueContext;
-      else row.leagueContext = payload.leagueContext;
-      leagues[payload.leagueKey] = row;
-      bundle.leagues = leagues;
-      writeJson(LS_EDITORIAL, bundle);
-      return { ok: true as const, bundle };
+      const bundle = readWebEditorialBundle();
+      const leagueContexts = { ...bundle.leagueContexts };
+      const leagueKey = String(payload.leagueKey).toUpperCase();
+      if (payload.leagueContext == null || !String(payload.leagueContext).trim()) {
+        delete leagueContexts[leagueKey];
+      } else {
+        leagueContexts[leagueKey] = { leagueContext: String(payload.leagueContext).trim() };
+      }
+      const next = { ...bundle, leagueContexts };
+      writeWebEditorialBundle(next);
+      return { ok: true as const, bundle: next };
+    },
+    sportscapeEditorialGetDocument: async () => {
+      try {
+        const res = await fetch("/api/sportscape-editorial");
+        if (!res.ok) return { ok: false as const, error: `HTTP ${res.status}` };
+        const body = (await res.json()) as { document?: import("../../grarf/desktop/src/types/sportscapeEditorial").SportscapeEditorialDocument };
+        return { ok: true as const, document: body.document ?? { entries: [], aiBriefSelections: [] } };
+      } catch (err) {
+        return { ok: false as const, error: err instanceof Error ? err.message : String(err) };
+      }
+    },
+    sportscapeEditorialUpsertEntry: async (payload) => {
+      try {
+        const res = await fetch("/api/sportscape-editorial/entries", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        if (!res.ok) return { ok: false as const, error: `HTTP ${res.status}` };
+        const body = (await res.json()) as {
+          entry?: import("../../grarf/desktop/src/types/sportscapeEditorial").SportscapeEditorialEntry;
+          document?: import("../../grarf/desktop/src/types/sportscapeEditorial").SportscapeEditorialDocument;
+        };
+        if (!body.entry) return { ok: false as const, error: "missing_entry" };
+        return { ok: true as const, entry: body.entry, document: body.document };
+      } catch (err) {
+        return { ok: false as const, error: err instanceof Error ? err.message : String(err) };
+      }
+    },
+    sportscapeEditorialUpsertAiBriefSelection: async (payload) => {
+      try {
+        const res = await fetch("/api/sportscape-editorial/ai-brief-selections", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        if (!res.ok) return { ok: false as const, error: `HTTP ${res.status}` };
+        const body = (await res.json()) as {
+          selection?: import("../../grarf/desktop/src/types/sportscapeEditorial").SportscapeAiBriefSelection;
+          document?: import("../../grarf/desktop/src/types/sportscapeEditorial").SportscapeEditorialDocument;
+        };
+        if (!body.selection) return { ok: false as const, error: "missing_selection" };
+        return { ok: true as const, selection: body.selection, document: body.document };
+      } catch (err) {
+        return { ok: false as const, error: err instanceof Error ? err.message : String(err) };
+      }
+    },
+    sportscapeEditorialRemoveAiBriefSelection: async (payload) => {
+      try {
+        const res = await fetch("/api/sportscape-editorial/ai-brief-selections/remove", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        if (!res.ok) return { ok: false as const, error: `HTTP ${res.status}` };
+        const body = (await res.json()) as {
+          removed?: boolean;
+          document?: import("../../grarf/desktop/src/types/sportscapeEditorial").SportscapeEditorialDocument;
+        };
+        return { ok: true as const, removed: body.removed, document: body.document };
+      } catch (err) {
+        return { ok: false as const, error: err instanceof Error ? err.message : String(err) };
+      }
+    },
+    sportscapeEditorialVerifyPassword: async (password) => {
+      try {
+        const res = await fetch("/api/sportscape-editorial/verify-password", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ password }),
+        });
+        if (res.status === 401) return { ok: false as const };
+        if (!res.ok) return { ok: false as const, error: `HTTP ${res.status}` };
+        const body = (await res.json()) as { ok?: boolean };
+        return { ok: Boolean(body.ok) };
+      } catch (err) {
+        return { ok: false as const, error: err instanceof Error ? err.message : String(err) };
+      }
     },
     editorialGenerationGetSummaries: async () => ({ ok: true as const, summaries: {} }),
     editorialGenerationGetState: async () => ({ ok: true as const, generationState: { games: {} } }),
@@ -316,16 +460,13 @@ function installGrarfBridge(): void {
       return { ok: true as const, store };
     },
     commandBriefingGetPersistence: async () => {
-      const snapshots = readJson(LS_BRIEFING_PERSISTENCE, { snapshots: {} });
-      return { ok: true as const, snapshots };
+      return { ok: true as const, snapshots: readBriefingPersistenceSnapshots() };
     },
     commandBriefingSavePersistenceEntry: async (payload) => {
-      const file = readJson<{ snapshots: Record<string, unknown> }>(LS_BRIEFING_PERSISTENCE, {
-        snapshots: {},
-      });
-      file.snapshots[payload.gameId] = payload.snapshot;
-      writeJson(LS_BRIEFING_PERSISTENCE, file);
-      return { ok: true as const, snapshots: file };
+      const snapshots = readBriefingPersistenceSnapshots();
+      snapshots[payload.gameId] = payload.snapshot;
+      writeJson(LS_BRIEFING_PERSISTENCE, { snapshots });
+      return { ok: true as const, snapshots };
     },
 
     intelligenceGetCachedFeed: async () => ({ ok: true as const, items: [] }),
@@ -388,5 +529,9 @@ function installGrarfBridge(): void {
 }
 
 installGrarfBridge();
+
+for (const slot of [...embedLayers.keys()]) {
+  clearEmbedLayer(slot);
+}
 
 export {};
