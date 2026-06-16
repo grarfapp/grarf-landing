@@ -55321,41 +55321,175 @@ var MONTH_NAMES = [
   "November",
   "December"
 ];
-function formatLocalDateYmd(now = /* @__PURE__ */ new Date()) {
-  const year = now.getFullYear();
-  const month = String(now.getMonth() + 1).padStart(2, "0");
-  const day = String(now.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
+var MONTH_NAME_TO_NUMBER = Object.fromEntries(MONTH_NAMES.map((name, i2) => [name.toLowerCase(), i2 + 1]));
+var MLB_ALL_GAMES_HIGHLIGHT_TITLE_NEEDLE = "highlights from all games";
+function getMlbAllGamesOperationalTodayKey(now = /* @__PURE__ */ new Date()) {
+  return getOperationalTodayDateKey(now, GRARF_OPERATIONAL_SLATE_TIMEZONE);
 }
-function getMlbAllGamesHighlightTargetDates(now = /* @__PURE__ */ new Date()) {
-  const yesterday = new Date(now);
-  yesterday.setDate(yesterday.getDate() - 1);
-  return [formatLocalDateYmd(yesterday), formatLocalDateYmd(now)];
+function getMlbAllGamesHighlightTargetSlateDate(now = /* @__PURE__ */ new Date()) {
+  return getOperationalYesterdayDateKey(now, GRARF_OPERATIONAL_SLATE_TIMEZONE);
+}
+function dateYmdToEpochDay(dateYmd) {
+  const [y2, m2, d2] = String(dateYmd).split("-").map(Number);
+  return Math.floor(Date.UTC(y2, (m2 ?? 1) - 1, d2 ?? 1) / 864e5);
+}
+function inferYearForMonthDay(month, day, referenceDateYmd) {
+  if (!Number.isFinite(month) || !Number.isFinite(day) || month < 1 || month > 12 || day < 1 || day > 31) {
+    return null;
+  }
+  const refYear = Number(String(referenceDateYmd).slice(0, 4));
+  if (!Number.isFinite(refYear)) return null;
+  const refDay = dateYmdToEpochDay(referenceDateYmd);
+  let best = null;
+  let bestDistance = Infinity;
+  for (const year of [refYear - 1, refYear, refYear + 1]) {
+    const candidate = `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+    const distance = Math.abs(dateYmdToEpochDay(candidate) - refDay);
+    if (distance < bestDistance) {
+      bestDistance = distance;
+      best = candidate;
+    }
+  }
+  return best;
+}
+function formatParsedDateYmd(month, day, year) {
+  if (!Number.isFinite(month) || !Number.isFinite(day) || !Number.isFinite(year)) return null;
+  if (month < 1 || month > 12 || day < 1 || day > 31) return null;
+  return `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+}
+function parseMlbAllGamesHighlightTitleDate(title, referenceDateYmd) {
+  const raw = String(title ?? "").trim();
+  if (!raw) return null;
+  const lower = raw.toLowerCase();
+  if (!lower.includes(MLB_ALL_GAMES_HIGHLIGHT_TITLE_NEEDLE)) return null;
+  const monthDayYearSlash = lower.match(
+    /highlights from all games on\s+(\d{1,2})\/(\d{1,2})(?:\/(\d{2,4}))?(?:\s|[(,]|$)/i
+  );
+  if (monthDayYearSlash) {
+    const month = Number(monthDayYearSlash[1]);
+    const day = Number(monthDayYearSlash[2]);
+    const yearToken = monthDayYearSlash[3];
+    if (yearToken) {
+      let year = Number(yearToken);
+      if (yearToken.length === 2) year = 2e3 + year;
+      return formatParsedDateYmd(month, day, year);
+    }
+    return inferYearForMonthDay(month, day, referenceDateYmd);
+  }
+  const monthNameDayYear = lower.match(
+    /highlights from all games on\s+([a-z]+)\s+(\d{1,2})(?:,?\s+(\d{4}))?(?:\s|[(,]|$)/i
+  );
+  if (monthNameDayYear) {
+    const month = MONTH_NAME_TO_NUMBER[monthNameDayYear[1]];
+    const day = Number(monthNameDayYear[2]);
+    const yearToken = monthNameDayYear[3];
+    if (!month) return null;
+    if (yearToken) {
+      return formatParsedDateYmd(month, day, Number(yearToken));
+    }
+    return inferYearForMonthDay(month, day, referenceDateYmd);
+  }
+  return null;
+}
+function mlbAllGamesHighlightTitleMatchesTargetSlateDate(title, targetSlateDateYmd) {
+  const parsed = parseMlbAllGamesHighlightTitleDate(title, targetSlateDateYmd);
+  return parsed != null && parsed === targetSlateDateYmd;
 }
 function titleMatchesCatchupDate(title, dateYmd) {
-  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(dateYmd ?? "").trim());
-  if (!match) return false;
-  const year = Number(match[1]);
-  const month = Number(match[2]);
-  const day = Number(match[3]);
-  const monthName = MONTH_NAMES[month - 1];
-  if (!monthName) return false;
-  const lower = String(title ?? "").toLowerCase();
-  const tokens = [
-    `${monthName} ${day}, ${year}`,
-    `${monthName} ${day}`,
-    `${month}/${day}/${year}`,
-    `${month}/${day}/${String(year).slice(-2)}`,
-    `${String(month).padStart(2, "0")}/${String(day).padStart(2, "0")}/${year}`,
-    `${String(month).padStart(2, "0")}/${String(day).padStart(2, "0")}/${String(year).slice(-2)}`
-  ];
-  return tokens.some((token) => lower.includes(token.toLowerCase()));
+  return mlbAllGamesHighlightTitleMatchesTargetSlateDate(title, dateYmd);
+}
+function describeMlbAllGamesHighlightTitleRejection(title, targetSlateDateYmd) {
+  const parsed = parseMlbAllGamesHighlightTitleDate(title, targetSlateDateYmd);
+  if (parsed == null) {
+    return "could not parse title date";
+  }
+  if (parsed !== targetSlateDateYmd) {
+    return `title date ${parsed} != target slate date ${targetSlateDateYmd}`;
+  }
+  return "accepted";
+}
+
+// ../grarf/desktop/shared/mlbAllGamesHighlightSelection.js
+init_define_import_meta_env();
+var MLB_CATCHUP_DAILY_HIGHLIGHT_TITLE_PATTERNS = [MLB_ALL_GAMES_HIGHLIGHT_TITLE_NEEDLE];
+function entryTitle(entry) {
+  return entry?.title ?? entry?.snippet?.title ?? "";
+}
+function entryVideoId(entry) {
+  return entry?.videoId ?? entry?.id?.videoId ?? null;
+}
+function entryPublishedAt(entry) {
+  return entry?.publishedAt ?? entry?.published ?? entry?.snippet?.publishedAt ?? "";
+}
+function isMlbAllGamesHighlightCandidate(title) {
+  const lower = String(title ?? "").trim().toLowerCase();
+  if (!lower) return false;
+  return MLB_CATCHUP_DAILY_HIGHLIGHT_TITLE_PATTERNS.some((pattern) => lower.includes(pattern));
+}
+function selectMlbAllGamesHighlightForSlateDate(entries, targetSlateDateYmd, now = /* @__PURE__ */ new Date()) {
+  const operationalToday = getMlbAllGamesOperationalTodayKey(now);
+  const targetSlateDate = targetSlateDateYmd ?? getMlbAllGamesHighlightTargetSlateDate(now);
+  const candidates = [];
+  const rejected = [];
+  for (const entry of entries) {
+    const title = entryTitle(entry);
+    if (!isMlbAllGamesHighlightCandidate(title)) continue;
+    const parsedTitleDate = parseMlbAllGamesHighlightTitleDate(title, targetSlateDate);
+    const candidate = {
+      videoId: entryVideoId(entry),
+      title,
+      parsedTitleDate,
+      publishedAt: entryPublishedAt(entry)
+    };
+    candidates.push(candidate);
+    const reason = describeMlbAllGamesHighlightTitleRejection(title, targetSlateDate);
+    if (reason === "accepted") continue;
+    rejected.push({
+      ...candidate,
+      reason
+    });
+  }
+  const accepted = candidates.filter(
+    (candidate) => mlbAllGamesHighlightTitleMatchesTargetSlateDate(candidate.title, targetSlateDate)
+  );
+  accepted.sort((a2, b2) => {
+    const ta2 = new Date(a2.publishedAt || 0).getTime();
+    const tb = new Date(b2.publishedAt || 0).getTime();
+    return tb - ta2;
+  });
+  const selected = accepted[0] ?? null;
+  return {
+    selected,
+    verification: {
+      operationalToday,
+      targetSlateDate,
+      candidateCount: candidates.length,
+      candidates,
+      acceptedVideo: selected ? {
+        videoId: selected.videoId,
+        title: selected.title,
+        parsedTitleDate: selected.parsedTitleDate,
+        publishedAt: selected.publishedAt
+      } : null,
+      rejected,
+      failClosed: selected == null,
+      failReason: selected == null ? candidates.length === 0 ? "no MLB All Games Highlights candidates in feed" : `no candidate title date equals target slate date ${targetSlateDate}` : null
+    }
+  };
+}
+function logMlbAllGamesHighlightSelection(verification, rssUrl) {
+  const payload = {
+    ...verification,
+    rssUrl: rssUrl ?? null
+  };
+  console.log(`[MLB ALL GAMES HIGHLIGHT SELECTION]
+${JSON.stringify(payload, null, 2)}`);
 }
 
 // ../grarf/desktop/shared/youtubeAllGamesHighlightFetch.js
 var DEFAULT_MLB_CHANNEL_ID = "UCoLrcjPV5PbUrUyXq5mjc_A";
 var CHROME_UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36";
-var MLB_CATCHUP_DAILY_HIGHLIGHT_TITLE_PATTERNS = [
+var MLB_CATCHUP_DAILY_HIGHLIGHT_TITLE_PATTERNS2 = [
   "highlights from all games",
   "mlb daily recap",
   "mlb game recaps",
@@ -55368,7 +55502,7 @@ function titleMatchesNeedle(title, needle) {
 function titleMatchesMlbCatchupDailyPatterns(title) {
   const lower = String(title ?? "").trim().toLowerCase();
   if (!lower) return false;
-  return MLB_CATCHUP_DAILY_HIGHLIGHT_TITLE_PATTERNS.some((pattern) => lower.includes(pattern));
+  return MLB_CATCHUP_DAILY_HIGHLIGHT_TITLE_PATTERNS2.some((pattern) => lower.includes(pattern));
 }
 function entryMatchesDailyHighlight(entry, needle) {
   const title = entry?.title ?? entry?.snippet?.title ?? "";
@@ -55376,7 +55510,27 @@ function entryMatchesDailyHighlight(entry, needle) {
   if (needle) return titleMatchesNeedle(title, needle);
   return false;
 }
-function pickDailyHighlightForDate(entries, needle, targetDateYmd) {
+function pickDailyHighlightForDate(entries, needle, targetDateYmd, options = {}) {
+  const isMlbAllGamesNeedle = typeof needle === "string" && needle.toLowerCase().includes("highlights from all games");
+  if (targetDateYmd && isMlbAllGamesNeedle) {
+    const { selected, verification } = selectMlbAllGamesHighlightForSlateDate(
+      entries,
+      targetDateYmd,
+      options.now
+    );
+    logMlbAllGamesHighlightSelection(verification, options.rssUrl);
+    if (!selected) return null;
+    return entries.find((entry) => {
+      const title = entry?.title ?? entry?.snippet?.title ?? "";
+      const videoId = entry?.videoId ?? entry?.id?.videoId ?? null;
+      return title === selected.title && videoId === selected.videoId;
+    }) ?? {
+      title: selected.title,
+      published: selected.publishedAt,
+      publishedAt: selected.publishedAt,
+      videoId: selected.videoId
+    };
+  }
   const matches = entries.filter((entry) => entryMatchesDailyHighlight(entry, needle));
   if (matches.length === 0) return null;
   if (targetDateYmd) {
@@ -55392,6 +55546,7 @@ function pickDailyHighlightForDate(entries, needle, targetDateYmd) {
       });
       return dated[0];
     }
+    return null;
   }
   matches.sort((a2, b2) => {
     const ta2 = new Date(a2?.publishedAt ?? a2?.published ?? a2?.snippet?.publishedAt ?? 0).getTime();
@@ -55523,7 +55678,7 @@ async function fetchViaChannelRss(channelId, needle, allowNewestFallback, target
   const xml = await res.text();
   const entries = parseAtomEntries2(xml);
   if (targetDateYmd) {
-    const best2 = pickDailyHighlightForDate(entries, needle, targetDateYmd);
+    const best2 = pickDailyHighlightForDate(entries, needle, targetDateYmd, { rssUrl: url });
     if (best2) return normalizeRssPick(best2);
     return { ok: false, error: "No matching daily highlight for target date" };
   }
@@ -58576,7 +58731,6 @@ init_define_import_meta_env();
 
 // ../grarf/desktop/src/lib/youtubeAllGamesHighlightShared.ts
 init_define_import_meta_env();
-var ALL_GAMES_HIGHLIGHT_API_PATH = "/api/youtube/all-games-highlight";
 async function resolveAllGamesHighlight2(params, options) {
   return resolveAllGamesHighlight(
     params,
@@ -58585,41 +58739,26 @@ async function resolveAllGamesHighlight2(params, options) {
 }
 
 // ../grarf/desktop/src/lib/youtubeAllGamesHighlightWeb.ts
+init_resolveYoutubeChannelRssUrl();
 function hasElectronAllGamesBridge() {
   return typeof window.grarf?.youtubeFetchAllGamesHighlight === "function";
 }
-function allGamesHighlightWebApiUrl() {
-  if (typeof window === "undefined" || hasElectronAllGamesBridge()) return null;
-  const fromConfig = window.GRARF_WEB_CONFIG?.allGamesHighlightApiUrl?.trim();
-  if (fromConfig) return fromConfig;
-  return ALL_GAMES_HIGHLIGHT_API_PATH;
-}
-async function fetchAllGamesHighlightViaWebApi(params) {
-  const apiUrl = allGamesHighlightWebApiUrl();
-  if (!apiUrl) return null;
-  try {
-    const res = await fetch(apiUrl, {
-      method: "POST",
-      headers: { Accept: "application/json", "Content-Type": "application/json" },
-      body: JSON.stringify(params),
-      cache: "no-store"
-    });
-    if (!res.ok) return null;
-    return await res.json();
-  } catch {
-    return null;
-  }
-}
 async function fetchAllGamesHighlightViaWebRss(params) {
   if (typeof window === "undefined" || hasElectronAllGamesBridge()) return null;
-  return resolveAllGamesHighlight2(params, {
-    resolveRssUrl: (channelId) => `/clips/youtube-rss/${encodeURIComponent(channelId)}`
-  });
+  const channelId = typeof params.channelId === "string" && params.channelId.trim().length > 0 ? params.channelId.trim() : DEFAULT_MLB_CHANNEL_ID;
+  const rssUrls = resolveYoutubeChannelRssFetchUrls(channelId);
+  let lastResult = { ok: false, error: "Recap lookup unavailable" };
+  for (const rssUrl of rssUrls) {
+    const result = await resolveAllGamesHighlight2(params, {
+      resolveRssUrl: () => rssUrl
+    });
+    if (result.ok) return result;
+    lastResult = result;
+  }
+  return lastResult;
 }
 async function fetchAllGamesHighlightOnWeb(params) {
   if (hasElectronAllGamesBridge()) return null;
-  const api = await fetchAllGamesHighlightViaWebApi(params);
-  if (api) return api;
   return fetchAllGamesHighlightViaWebRss(params);
 }
 
@@ -58629,45 +58768,27 @@ async function fetchAllGamesHighlight(params) {
   if (fn2) return fn2(params);
   return fetchAllGamesHighlightOnWeb(params);
 }
-var MLB_ALL_GAMES_HIGHLIGHT_WAITING_MESSAGE = "Waiting for official highlight upload...";
-function userFacingAllGamesHighlightError(technical) {
-  if (/no matching highlight/i.test(technical)) {
-    return MLB_ALL_GAMES_HIGHLIGHT_WAITING_MESSAGE;
-  }
-  return technical;
-}
-var MLB_LINE_LABS_PREVIEW_WAITING_MESSAGE = "Waiting for today's MLB preview...";
-function userFacingLineLabsPreviewError(technical) {
-  if (/no matching highlight/i.test(technical)) {
-    return MLB_LINE_LABS_PREVIEW_WAITING_MESSAGE;
-  }
-  return technical;
-}
 async function fetchMlbAllGamesDailyHighlight() {
-  const targetDates = getMlbAllGamesHighlightTargetDates();
-  for (const targetDateYmd of targetDates) {
-    const r3 = await fetchAllGamesHighlight({
-      channelId: MLB_OFFICIAL_UPLOADS_CHANNEL_ID,
-      titleSubstring: ALL_GAMES_HIGHLIGHT_TITLE_SUBSTRING,
-      overrideTargetId: "mlb-all-games-highlights",
-      targetDateYmd
-    });
-    if (r3?.ok) {
-      return { ok: true, video: r3.video };
-    }
-  }
-  const last = await fetchAllGamesHighlight({
+  const targetSlateDateYmd = getMlbAllGamesHighlightTargetSlateDate();
+  const r3 = await fetchAllGamesHighlight({
     channelId: MLB_OFFICIAL_UPLOADS_CHANNEL_ID,
     titleSubstring: ALL_GAMES_HIGHLIGHT_TITLE_SUBSTRING,
-    overrideTargetId: "mlb-all-games-highlights"
+    overrideTargetId: "mlb-all-games-highlights",
+    targetDateYmd: targetSlateDateYmd
   });
-  if (!last) {
+  if (!r3) {
+    console.warn(
+      `[MLB ALL GAMES HIGHLIGHT] fetch unavailable for target slate date ${targetSlateDateYmd}`
+    );
     return { ok: false, error: "Recap lookup unavailable" };
   }
-  if (!last.ok) {
-    return { ok: false, error: userFacingAllGamesHighlightError(last.error) };
+  if (!r3.ok) {
+    console.warn(
+      `[MLB ALL GAMES HIGHLIGHT] no match for target slate date ${targetSlateDateYmd}: ${r3.error}`
+    );
+    return { ok: false, error: r3.error };
   }
-  return { ok: true, video: last.video };
+  return { ok: true, video: r3.video };
 }
 async function fetchMlbLineLabsPreview() {
   const r3 = await fetchAllGamesHighlight({
@@ -58679,7 +58800,7 @@ async function fetchMlbLineLabsPreview() {
     return { ok: false, error: "Preview lookup unavailable" };
   }
   if (!r3.ok) {
-    return { ok: false, error: userFacingLineLabsPreviewError(r3.error) };
+    return { ok: false, error: r3.error };
   }
   return { ok: true, video: r3.video };
 }
@@ -58694,21 +58815,14 @@ function allGamesHighlightToCardItem(v2) {
 
 // ../grarf/desktop/src/store/mlbAllGamesHighlightStore.ts
 var REFRESH_MS = 6 * 60 * 60 * 1e3;
-var STORAGE_KEY7 = "grarf.mlbAllGamesHighlight.v2";
-var EMERGENCY_FALLBACK_VIDEO_ID = "iHDxA4vLBNY";
-function isValidAllGamesHighlight(item) {
+var STORAGE_KEY7 = "grarf.mlbAllGamesHighlight.v4";
+function isValidAllGamesHighlight(item, targetSlateDateYmd = getMlbAllGamesHighlightTargetSlateDate()) {
   const t2 = item.title.trim().toLowerCase();
-  return t2.includes(ALL_GAMES_HIGHLIGHT_TITLE_SUBSTRING.toLowerCase());
-}
-function emergencyFallbackItem() {
-  return {
-    videoId: EMERGENCY_FALLBACK_VIDEO_ID,
-    title: "Highlights from ALL GAMES",
-    channel: "MLB"
-  };
+  return t2.includes(ALL_GAMES_HIGHLIGHT_TITLE_SUBSTRING.toLowerCase()) && mlbAllGamesHighlightTitleMatchesTargetSlateDate(item.title, targetSlateDateYmd);
 }
 function readCachedHighlight() {
   if (typeof window === "undefined") return null;
+  const targetSlateDateYmd = getMlbAllGamesHighlightTargetSlateDate();
   const stores = [
     typeof localStorage !== "undefined" ? localStorage : null,
     typeof sessionStorage !== "undefined" ? sessionStorage : null
@@ -58719,16 +58833,27 @@ function readCachedHighlight() {
       const raw = s2.getItem(STORAGE_KEY7);
       if (!raw) continue;
       const parsed = JSON.parse(raw);
-      if (typeof parsed.videoId === "string" && typeof parsed.title === "string") {
-        const item = {
-          videoId: parsed.videoId,
-          title: parsed.title,
-          channel: typeof parsed.channel === "string" ? parsed.channel : "MLB",
-          thumbnailUrl: typeof parsed.thumbnailUrl === "string" ? parsed.thumbnailUrl : void 0
-        };
-        if (!isValidAllGamesHighlight(item)) continue;
-        return item;
+      if (typeof parsed.videoId !== "string" || typeof parsed.title !== "string") continue;
+      if (parsed.targetSlateDateYmd !== targetSlateDateYmd) {
+        console.warn(
+          `[MLB ALL GAMES HIGHLIGHT] discarding cache for stale slate ${parsed.targetSlateDateYmd}; current target=${targetSlateDateYmd}`
+        );
+        continue;
       }
+      const item = {
+        videoId: parsed.videoId,
+        title: parsed.title,
+        channel: typeof parsed.channel === "string" ? parsed.channel : "MLB",
+        thumbnailUrl: typeof parsed.thumbnailUrl === "string" ? parsed.thumbnailUrl : void 0,
+        targetSlateDateYmd
+      };
+      if (!isValidAllGamesHighlight(item, targetSlateDateYmd)) {
+        console.warn(
+          `[MLB ALL GAMES HIGHLIGHT] discarding cache with invalid title date: ${item.title}`
+        );
+        continue;
+      }
+      return item;
     }
   } catch {
   }
@@ -58736,12 +58861,14 @@ function readCachedHighlight() {
 }
 function writeCachedHighlight(item) {
   if (typeof window === "undefined") return;
+  const targetSlateDateYmd = getMlbAllGamesHighlightTargetSlateDate();
   try {
     const raw = JSON.stringify({
       videoId: item.videoId,
       title: item.title,
       channel: item.channel,
-      thumbnailUrl: item.thumbnailUrl
+      thumbnailUrl: item.thumbnailUrl,
+      targetSlateDateYmd
     });
     if (typeof localStorage !== "undefined") localStorage.setItem(STORAGE_KEY7, raw);
     if (typeof sessionStorage !== "undefined") sessionStorage.setItem(STORAGE_KEY7, raw);
@@ -58750,7 +58877,7 @@ function writeCachedHighlight(item) {
 }
 function stickyDisplayHighlight(authoritative) {
   if (authoritative && isValidAllGamesHighlight(authoritative)) return authoritative;
-  return emergencyFallbackItem();
+  return null;
 }
 var loadInFlight = null;
 var useMlbAllGamesHighlightStore = (0, import_zustand22.create)((set, get) => {
@@ -58758,8 +58885,9 @@ var useMlbAllGamesHighlightStore = (0, import_zustand22.create)((set, get) => {
   const initialDisplay = stickyDisplayHighlight(cached);
   if (cached) {
     console.log(
-      `[MLB ALL GAMES HIGHLIGHT] videoId=${cached.videoId}
-title=${cached.title}`
+      `[MLB ALL GAMES HIGHLIGHT] cache hit videoId=${cached.videoId}
+title=${cached.title}
+targetSlateDate=${cached.targetSlateDateYmd}`
     );
   }
   const loadHighlight = async () => {
@@ -58776,20 +58904,31 @@ title=${cached.title}`
               displayHighlight: next
             });
             console.log(
-              `[MLB ALL GAMES HIGHLIGHT] videoId=${next.videoId}
+              `[MLB ALL GAMES HIGHLIGHT] accepted videoId=${next.videoId}
 title=${next.title}`
             );
             return;
           }
+          console.warn(
+            `[MLB ALL GAMES HIGHLIGHT] rejected fetched video after title-date validation: ${next.title}`
+          );
         }
         const current = get().authoritativeHighlight;
+        const nextDisplay = stickyDisplayHighlight(current);
+        if (!nextDisplay) {
+          console.warn(
+            `[MLB ALL GAMES HIGHLIGHT] fail closed \u2014 no highlight for target slate date ${getMlbAllGamesHighlightTargetSlateDate()}`
+          );
+        }
         set({
-          displayHighlight: stickyDisplayHighlight(current)
+          authoritativeHighlight: nextDisplay,
+          displayHighlight: nextDisplay
         });
-      } catch {
-        const current = get().authoritativeHighlight;
+      } catch (error) {
+        console.warn("[MLB ALL GAMES HIGHLIGHT] fetch error", error);
         set({
-          displayHighlight: stickyDisplayHighlight(current)
+          authoritativeHighlight: null,
+          displayHighlight: null
         });
       }
     })().finally(() => {
@@ -59274,14 +59413,14 @@ function SportscapeMlbCompactHeaderActions({
         onExpandWorkspace
       }
     ) : /* @__PURE__ */ (0, import_jsx_runtime83.jsx)(SportscapePodcastDailyRecapRow, {}) : null,
-    /* @__PURE__ */ (0, import_jsx_runtime83.jsx)(
+    allGamesHighlight ? /* @__PURE__ */ (0, import_jsx_runtime83.jsx)(
       SportscapeCompactVideoRow,
       {
         label: "Highlights From All Games",
         item: allGamesHighlight,
         onExpandWorkspace
       }
-    )
+    ) : null
   ] });
 }
 
@@ -65637,6 +65776,7 @@ function MlbAllGamesHighlightsBlock({
   presentation = "default",
   className
 }) {
+  if (!displayHighlight) return null;
   return /* @__PURE__ */ (0, import_jsx_runtime124.jsx)(
     InlineRecapModule,
     {
