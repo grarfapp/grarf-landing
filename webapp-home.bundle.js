@@ -66869,6 +66869,34 @@ function getSportscapeEditorialHighlightSource(league) {
 // ../grarf/desktop/src/components/sportscapeEditorial/SportscapeEditorialEventRow.tsx
 init_define_import_meta_env();
 var import_react127 = __toESM(require_react(), 1);
+
+// ../grarf/desktop/src/lib/sportscape/editorial/sportscapeEditorialAiBriefSelectionUtils.ts
+init_define_import_meta_env();
+var AI_BRIEF_PRIORITY_MIN = 1;
+var AI_BRIEF_PRIORITY_MAX = 100;
+var AI_BRIEF_PRIORITY_DEFAULT = 100;
+function clampAiBriefPriorityRank(rank) {
+  if (!Number.isFinite(rank)) return AI_BRIEF_PRIORITY_DEFAULT;
+  return Math.min(
+    AI_BRIEF_PRIORITY_MAX,
+    Math.max(AI_BRIEF_PRIORITY_MIN, Math.round(rank))
+  );
+}
+function suggestNextAiBriefRank(_selections) {
+  return AI_BRIEF_PRIORITY_DEFAULT;
+}
+function sortAiBriefSelectionsByRank(selections) {
+  return [...selections].sort((a2, b2) => a2.rank - b2.rank);
+}
+function buildAiBriefSummaryLines(params) {
+  return sortAiBriefSelectionsByRank(params.selections).map((selection) => ({
+    rank: selection.rank,
+    eventId: selection.eventId,
+    headline: params.headlineByEventId.get(selection.eventId)?.trim() || selection.eventId
+  }));
+}
+
+// ../grarf/desktop/src/components/sportscapeEditorial/SportscapeEditorialEventRow.tsx
 var import_jsx_runtime135 = __toESM(require_jsx_runtime(), 1);
 function SportscapeEditorialEventRow({
   event,
@@ -66923,14 +66951,16 @@ function SportscapeEditorialEventRow({
     }
   };
   const persistAiBriefSelection = async (nextRank) => {
+    const rank2 = clampAiBriefPriorityRank(nextRank);
     setAiBriefBusy(true);
     setAiBriefError(null);
     try {
       const selection = await saveAiBriefSelection({
         id: aiBriefSelection?.id,
         eventId: event.eventId,
-        rank: nextRank
+        rank: rank2
       });
+      setRank(String(selection.rank));
       onAiBriefSelectionChange(event.eventId, selection);
     } catch (err) {
       setAiBriefError(err instanceof Error ? err.message : "AI Brief save failed");
@@ -66944,7 +66974,9 @@ function SportscapeEditorialEventRow({
     setAiBriefError(null);
     if (checked) {
       const nextRank = Number.parseInt(rank, 10);
-      const resolvedRank = Number.isFinite(nextRank) && nextRank > 0 ? nextRank : suggestedRank;
+      const resolvedRank = clampAiBriefPriorityRank(
+        Number.isFinite(nextRank) ? nextRank : suggestedRank
+      );
       setRank(String(resolvedRank));
       try {
         await persistAiBriefSelection(resolvedRank);
@@ -66971,13 +67003,15 @@ function SportscapeEditorialEventRow({
   const onRankBlur = async () => {
     if (!includeInAiBrief) return;
     const parsed = Number.parseInt(rank, 10);
-    if (!Number.isFinite(parsed) || parsed < 1) {
+    if (!Number.isFinite(parsed)) {
       setRank(String(aiBriefSelection?.rank ?? suggestedRank));
       return;
     }
-    if (aiBriefSelection?.rank === parsed) return;
+    const clamped = clampAiBriefPriorityRank(parsed);
+    setRank(String(clamped));
+    if (aiBriefSelection?.rank === clamped) return;
     try {
-      await persistAiBriefSelection(parsed);
+      await persistAiBriefSelection(clamped);
     } catch {
       setRank(String(aiBriefSelection?.rank ?? suggestedRank));
     }
@@ -67040,12 +67074,13 @@ function SportscapeEditorialEventRow({
         /* @__PURE__ */ (0, import_jsx_runtime135.jsx)("span", { className: "text-[10px] tracking-[0.16em] text-textdim", children: "INCLUDE IN AI BRIEF" })
       ] }),
       /* @__PURE__ */ (0, import_jsx_runtime135.jsxs)("label", { className: "flex items-center gap-2", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime135.jsx)("span", { className: "text-[10px] tracking-[0.16em] text-textdim", children: "RANK" }),
+        /* @__PURE__ */ (0, import_jsx_runtime135.jsx)("span", { className: "text-[10px] tracking-[0.16em] text-textdim", children: "AI BRIEF PRIORITY (1 = highest, 100 = lowest)" }),
         /* @__PURE__ */ (0, import_jsx_runtime135.jsx)(
           "input",
           {
             type: "number",
             min: 1,
+            max: 100,
             step: 1,
             value: rank,
             disabled: !includeInAiBrief || aiBriefBusy,
@@ -67214,28 +67249,6 @@ function SportscapeEditorialPasswordGate({ children }) {
       ]
     }
   ) });
-}
-
-// ../grarf/desktop/src/lib/sportscape/editorial/sportscapeEditorialAiBriefSelectionUtils.ts
-init_define_import_meta_env();
-function suggestNextAiBriefRank(selections) {
-  let maxRank = 0;
-  for (const selection of selections) {
-    if (Number.isFinite(selection.rank)) {
-      maxRank = Math.max(maxRank, Math.round(selection.rank));
-    }
-  }
-  return maxRank + 1;
-}
-function sortAiBriefSelectionsByRank(selections) {
-  return [...selections].sort((a2, b2) => a2.rank - b2.rank);
-}
-function buildAiBriefSummaryLines(params) {
-  return sortAiBriefSelectionsByRank(params.selections).map((selection) => ({
-    rank: selection.rank,
-    eventId: selection.eventId,
-    headline: params.headlineByEventId.get(selection.eventId)?.trim() || selection.eventId
-  }));
 }
 
 // ../grarf/desktop/src/pages/SportscapeEditorialAdminPage.tsx
