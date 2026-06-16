@@ -31937,6 +31937,7 @@ init_define_import_meta_env();
 // src/config/sportscapeEditorialConfig.ts
 init_define_import_meta_env();
 var DEFAULT_SPORTSCAPE_EDITORIAL_API_URL = "https://grarf-sportscape-editorial.grarf.workers.dev";
+var DEV_SPORTSCAPE_EDITORIAL_API_URL = "/api/sportscape-editorial";
 function resolveWebSportscapeEditorialApiUrl() {
   if (typeof window === "undefined") return null;
   return window.GRARF_WEB_CONFIG?.sportscapeEditorialApiUrl?.trim() || null;
@@ -31946,6 +31947,9 @@ function getSportscapeEditorialApiBaseUrl() {
   if (fromEnv) return fromEnv.replace(/\/+$/, "");
   const fromWeb = resolveWebSportscapeEditorialApiUrl();
   if (fromWeb) return fromWeb.replace(/\/+$/, "");
+  if (define_import_meta_env_default.DEV) {
+    return DEV_SPORTSCAPE_EDITORIAL_API_URL;
+  }
   return DEFAULT_SPORTSCAPE_EDITORIAL_API_URL;
 }
 function shouldUseLocalSportscapeEditorialFallback() {
