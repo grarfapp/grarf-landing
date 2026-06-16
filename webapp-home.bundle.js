@@ -28699,21 +28699,47 @@ init_define_import_meta_env();
 init_define_import_meta_env();
 var GRARF_OPERATIONAL_SLATE_TIMEZONE = "America/Chicago";
 var OPERATIONAL_SLATE_NEXT_DAY_CUTOFF_HOUR = 6;
+var calendarFormatterCache = /* @__PURE__ */ new Map();
+function getCalendarFormatter(timeZone) {
+  let formatter = calendarFormatterCache.get(timeZone);
+  if (!formatter) {
+    formatter = new Intl.DateTimeFormat("en-US", {
+      timeZone,
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "numeric",
+      hourCycle: "h23"
+    });
+    calendarFormatterCache.set(timeZone, formatter);
+  }
+  return formatter;
+}
 function calendarPartsInTimeZone(ms2, timeZone) {
-  const parts = new Intl.DateTimeFormat("en-US", {
-    timeZone,
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    hour: "numeric",
-    hourCycle: "h23"
-  }).formatToParts(new Date(ms2));
+  const parts = getCalendarFormatter(timeZone).formatToParts(new Date(ms2));
   return {
     year: Number(parts.find((p2) => p2.type === "year")?.value),
     month: Number(parts.find((p2) => p2.type === "month")?.value),
     day: Number(parts.find((p2) => p2.type === "day")?.value),
     hour: Number(parts.find((p2) => p2.type === "hour")?.value)
   };
+}
+var operationalTodayKeyCache = {
+  timeZone: "",
+  bucketMs: 0,
+  key: "1970-01-01"
+};
+function readOperationalTodayKeyCache(now, timeZone) {
+  const bucketMs = Math.floor(now.getTime() / 6e4);
+  if (operationalTodayKeyCache.timeZone === timeZone && operationalTodayKeyCache.bucketMs === bucketMs) {
+    return operationalTodayKeyCache.key;
+  }
+  return null;
+}
+function writeOperationalTodayKeyCache(now, timeZone, key2) {
+  operationalTodayKeyCache.timeZone = timeZone;
+  operationalTodayKeyCache.bucketMs = Math.floor(now.getTime() / 6e4);
+  operationalTodayKeyCache.key = key2;
 }
 function formatOperationalDateKeyFromMs(ms2, timeZone = GRARF_OPERATIONAL_SLATE_TIMEZONE) {
   if (ms2 == null || !Number.isFinite(ms2) || ms2 <= 0) return void 0;
@@ -28722,7 +28748,11 @@ function formatOperationalDateKeyFromMs(ms2, timeZone = GRARF_OPERATIONAL_SLATE_
   return `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
 }
 function getOperationalTodayDateKey(now = /* @__PURE__ */ new Date(), timeZone = GRARF_OPERATIONAL_SLATE_TIMEZONE) {
-  return formatOperationalDateKeyFromMs(now.getTime(), timeZone) ?? "1970-01-01";
+  const cached = readOperationalTodayKeyCache(now, timeZone);
+  if (cached) return cached;
+  const key2 = formatOperationalDateKeyFromMs(now.getTime(), timeZone) ?? "1970-01-01";
+  writeOperationalTodayKeyCache(now, timeZone, key2);
+  return key2;
 }
 function offsetOperationalDateKey(dateKey, dayOffset, timeZone = GRARF_OPERATIONAL_SLATE_TIMEZONE) {
   const [y2, m2, d2] = dateKey.split("-").map(Number);
@@ -28747,7 +28777,11 @@ function resolveScheduledDateKey(isoStart, slateDateKey, timeZone = GRARF_OPERAT
   const slate = typeof slateDateKey === "string" ? slateDateKey.trim() : "";
   return slate || void 0;
 }
+var nextDayCutoffMsCache = /* @__PURE__ */ new Map();
 function getNextDayCutoffMs(operationalDateKey, cutoffHour, timeZone) {
+  const cacheKey3 = `${operationalDateKey}|${cutoffHour}|${timeZone}`;
+  const cached = nextDayCutoffMsCache.get(cacheKey3);
+  if (cached != null) return cached;
   const tomorrowKey = offsetOperationalDateKey(operationalDateKey, 1, timeZone);
   const [y2, m2, d2] = tomorrowKey.split("-").map(Number);
   let probe = Date.UTC(y2, (m2 ?? 1) - 1, d2 ?? 1, 12, 0, 0);
@@ -28755,9 +28789,14 @@ function getNextDayCutoffMs(operationalDateKey, cutoffHour, timeZone) {
     const candidate = probe + i2 * 36e5;
     const key2 = formatOperationalDateKeyFromMs(candidate, timeZone);
     const hour = calendarPartsInTimeZone(candidate, timeZone).hour;
-    if (key2 === tomorrowKey && hour === cutoffHour) return candidate;
+    if (key2 === tomorrowKey && hour === cutoffHour) {
+      nextDayCutoffMsCache.set(cacheKey3, candidate);
+      return candidate;
+    }
   }
-  return probe + 24 * 36e5;
+  const fallback = probe + 24 * 36e5;
+  nextDayCutoffMsCache.set(cacheKey3, fallback);
+  return fallback;
 }
 function isScheduledOnOperationalEveningSlate(game, operationalDateKey, now = /* @__PURE__ */ new Date(), timeZone = GRARF_OPERATIONAL_SLATE_TIMEZONE) {
   const startKey = formatOperationalDateKeyFromMs(game.startTimeMs, timeZone);
@@ -28840,6 +28879,31 @@ function isScheduledOnOperationalEveningSlate2(game, operationalDateKey, now = /
     GRARF_OPERATIONAL_SLATE_TIMEZONE
   );
 }
+function buildGamesSpineOperationalDateContext(operationalDateKey, now) {
+  return {
+    operationalDateKey,
+    todayKey: getGamesSpineOperationalTodayKey(now),
+    yesterdayKey: getGamesSpineOperationalYesterdayKey(now)
+  };
+}
+function isGameOnGamesSpineOperationalDateWithContext(game, ctx, now = /* @__PURE__ */ new Date()) {
+  if (game.status === "scheduled") {
+    if (isGolfLeagueKey(game.league) && game.scheduledDateKey?.trim() === ctx.operationalDateKey) {
+      return true;
+    }
+    return isScheduledOnOperationalEveningSlate2(game, ctx.operationalDateKey, now);
+  }
+  if (game.status === "live" && ctx.operationalDateKey === ctx.todayKey) {
+    return true;
+  }
+  const gameDateKey = resolveGameOperationalDateKey(game);
+  if (!gameDateKey) return false;
+  if (gameDateKey === ctx.operationalDateKey) return true;
+  if (game.status === "live" && gameDateKey === ctx.yesterdayKey) {
+    return true;
+  }
+  return false;
+}
 function resolveGameOperationalDateKey(game) {
   if (game.status === "scheduled" || game.status === "live") {
     const fromStart = formatOperationalDateKeyFromMs(game.startTimeMs, GRARF_OPERATIONAL_SLATE_TIMEZONE);
@@ -28874,191 +28938,19 @@ function explainOperationalDateRemoval(game, operationalDateKey = getGamesSpineO
   return "operational_date_mismatch";
 }
 function isGameOnGamesSpineOperationalDate(game, operationalDateKey = getGamesSpineOperationalTodayKey(), now = /* @__PURE__ */ new Date()) {
-  if (game.status === "scheduled") {
-    if (isGolfLeagueKey(game.league) && game.scheduledDateKey?.trim() === operationalDateKey) {
-      return true;
-    }
-    return isScheduledOnOperationalEveningSlate2(game, operationalDateKey, now);
-  }
-  if (game.status === "live" && operationalDateKey === getGamesSpineOperationalTodayKey(now)) {
-    return true;
-  }
-  const gameDateKey = resolveGameOperationalDateKey(game);
-  if (!gameDateKey) return false;
-  if (gameDateKey === operationalDateKey) return true;
-  if (game.status === "live" && gameDateKey === getGamesSpineOperationalYesterdayKey(now)) {
-    return true;
-  }
-  return false;
+  return isGameOnGamesSpineOperationalDateWithContext(
+    game,
+    buildGamesSpineOperationalDateContext(operationalDateKey, now),
+    now
+  );
 }
 function filterGamesSpineSlateForOperationalDate(games, operationalDateKey = getGamesSpineOperationalTodayKey(), now = /* @__PURE__ */ new Date()) {
-  return games.filter((g2) => isGameOnGamesSpineOperationalDate(g2, operationalDateKey, now));
+  if (games.length === 0) return games;
+  const ctx = buildGamesSpineOperationalDateContext(operationalDateKey, now);
+  return games.filter((g2) => isGameOnGamesSpineOperationalDateWithContext(g2, ctx, now));
 }
 function filterGamesSpineSlateForToday(games, now = /* @__PURE__ */ new Date()) {
   return filterGamesSpineSlateForOperationalDate(games, getGamesSpineOperationalTodayKey(now), now);
-}
-
-// ../grarf/desktop/src/lib/gamesSpine/operationalManualLeagueGames.ts
-init_define_import_meta_env();
-
-// ../grarf/desktop/src/lib/gamesSpine/manualLeMans2026SpineEntry.ts
-init_define_import_meta_env();
-
-// ../grarf/desktop/src/lib/watch/externalWatchLaunch.ts
-init_define_import_meta_env();
-init_isGrarfWebRenderer();
-var WATCH_LOG = "[Watch]";
-async function openWatchStreamExternally(url, providerLabel2 = "stream") {
-  const href = url.trim();
-  if (!href) {
-    console.warn(`${WATCH_LOG} External launch failed: empty url`);
-    return;
-  }
-  console.log(`${WATCH_LOG} Provider launchMode: external`);
-  console.log(`${WATCH_LOG} Opening ${providerLabel2} in system browser`, href);
-  if (isGrarfWebRenderer()) {
-    window.open(href, "_blank", "noopener,noreferrer");
-    return;
-  }
-  const openExternal = window.grarf?.openExternalUrl;
-  if (!openExternal) {
-    console.warn(`${WATCH_LOG} openExternalUrl unavailable \u2014 falling back to window.open`);
-    try {
-      window.open(href, "_blank", "noopener,noreferrer");
-      console.log(`${WATCH_LOG} window.open fallback invoked`);
-    } catch (e2) {
-      console.warn(`${WATCH_LOG} External launch failed:`, e2);
-    }
-    return;
-  }
-  try {
-    const res = await openExternal(href);
-    if (res?.ok) {
-      console.log(`${WATCH_LOG} shell.openExternal success`);
-    } else {
-      console.warn(`${WATCH_LOG} External launch failed:`, res?.error ?? "unknown error");
-    }
-  } catch (e2) {
-    console.warn(`${WATCH_LOG} External launch failed:`, e2);
-  }
-}
-
-// ../grarf/desktop/src/lib/gamesSpine/manualLeMans2026SpineEntry.ts
-var import_react9 = __toESM(require_react(), 1);
-var MANUAL_LE_MANS_2026_GAME_ID = "manual-wec-le-mans-2026";
-var LE_MANS_2026_LIVESTREAM_URL = "https://plus.fiawec.com/en/livestream/s-24-hours-of-le-mans-race-en-4ggw9";
-var LE_MANS_2026_START_MS = Date.parse("2026-06-13T14:00:00.000Z");
-var LE_MANS_2026_END_MS = Date.parse("2026-06-14T14:00:00.000Z");
-var LE_MANS_2026_OPERATIONAL_DATE_KEYS = /* @__PURE__ */ new Set(["2026-06-13", "2026-06-14"]);
-function isManualLeMans2026GameId(gameId) {
-  return gameId === MANUAL_LE_MANS_2026_GAME_ID;
-}
-function isManualLeMans2026VisibleOnOperationalDate(operationalDateKey = getGamesSpineOperationalTodayKey()) {
-  return LE_MANS_2026_OPERATIONAL_DATE_KEYS.has(operationalDateKey);
-}
-function resolveManualLeMans2026Status(now = /* @__PURE__ */ new Date()) {
-  const ms2 = now.getTime();
-  if (ms2 < LE_MANS_2026_START_MS) return "scheduled";
-  if (ms2 < LE_MANS_2026_END_MS) return "live";
-  return "final";
-}
-function formatManualLeMans2026TimeRemaining(now = /* @__PURE__ */ new Date()) {
-  const remainingMs = Math.max(0, LE_MANS_2026_END_MS - now.getTime());
-  const totalMinutes = Math.floor(remainingMs / 6e4);
-  const hours = Math.floor(totalMinutes / 60);
-  const minutes = totalMinutes % 60;
-  return `Time Remaining: ${hours}h ${minutes}m`;
-}
-function resolveManualLeMans2026SpineGame(now = /* @__PURE__ */ new Date()) {
-  const status = resolveManualLeMans2026Status(now);
-  const statusLine = status === "live" ? formatManualLeMans2026TimeRemaining(now) : status === "final" ? "Completed" : void 0;
-  return {
-    id: MANUAL_LE_MANS_2026_GAME_ID,
-    grarfGameId: MANUAL_LE_MANS_2026_GAME_ID,
-    time: new Date(LE_MANS_2026_START_MS).toLocaleString("en-US", {
-      weekday: "short",
-      hour: "numeric",
-      minute: "2-digit",
-      timeZone: "America/Chicago",
-      timeZoneName: "short"
-    }),
-    awayTeam: "24 Hours of Le Mans",
-    awayRecord: "\u2014",
-    homeTeam: "",
-    homeRecord: "",
-    awayCity: "",
-    homeCity: "",
-    awayPitcher: "\u2014",
-    awayPitcherStats: "",
-    homePitcher: "\u2014",
-    homePitcherStats: "",
-    channels: [],
-    broadcasts: [],
-    status,
-    statusLine,
-    streamUrl: status === "live" ? LE_MANS_2026_LIVESTREAM_URL : void 0,
-    startTimeMs: LE_MANS_2026_START_MS,
-    scheduledDateKey: "2026-06-13",
-    league: "WEC",
-    lastUpdated: now.toISOString()
-  };
-}
-function resolveWecOperationalLeagueGames(now = /* @__PURE__ */ new Date()) {
-  if (!isManualLeMans2026VisibleOnOperationalDate(getGamesSpineOperationalTodayKey(now))) {
-    return [];
-  }
-  return [resolveManualLeMans2026SpineGame(now)];
-}
-function useManualLeMans2026LiveRefreshMs() {
-  const [nowMs, setNowMs] = (0, import_react9.useState)(() => Date.now());
-  (0, import_react9.useEffect)(() => {
-    if (!isManualLeMans2026VisibleOnOperationalDate(getGamesSpineOperationalTodayKey())) return;
-    if (resolveManualLeMans2026Status() !== "live") return;
-    const id = window.setInterval(() => setNowMs(Date.now()), 6e4);
-    return () => window.clearInterval(id);
-  }, []);
-  return nowMs;
-}
-function refreshManualLeMans2026SpineGameIfNeeded(game, now = /* @__PURE__ */ new Date()) {
-  if (!isManualLeMans2026GameId(game.id)) return game;
-  return resolveManualLeMans2026SpineGame(now);
-}
-function tryLaunchManualLeMans2026WatchLive(game) {
-  if (!isManualLeMans2026GameId(game.id) || game.status !== "live") return false;
-  void openWatchStreamExternally(LE_MANS_2026_LIVESTREAM_URL, "WEC");
-  return true;
-}
-
-// ../grarf/desktop/src/lib/gamesSpine/operationalManualLeagueGames.ts
-var MANUAL_OPERATIONAL_LEAGUE_RESOLVERS = {
-  WEC: resolveWecOperationalLeagueGames
-};
-function resolveManualOperationalLeagueGames(now = /* @__PURE__ */ new Date()) {
-  const out = {};
-  for (const [key2, resolve] of Object.entries(MANUAL_OPERATIONAL_LEAGUE_RESOLVERS)) {
-    if (!resolve) continue;
-    const rows = resolve(now);
-    if (rows.length > 0) out[key2] = rows;
-  }
-  return out;
-}
-function mergeOperationalLeagueGames(leagues, now = /* @__PURE__ */ new Date()) {
-  const manual = resolveManualOperationalLeagueGames(now);
-  if (Object.keys(manual).length === 0) return leagues;
-  const merged = { ...leagues };
-  for (const [key2, rows] of Object.entries(manual)) {
-    const leagueKey = key2;
-    const existing = merged[leagueKey] ?? [];
-    const seen = new Set(existing.map((g2) => g2.id));
-    const combined = [...existing];
-    for (const game of rows) {
-      if (seen.has(game.id)) continue;
-      seen.add(game.id);
-      combined.push(game);
-    }
-    merged[leagueKey] = combined;
-  }
-  return merged;
 }
 
 // ../grarf/desktop/src/lib/navigation/resolveLeagueNavActivityStatuses.ts
@@ -29077,11 +28969,10 @@ function buildActivityTallyStatusesByBucket(statuses) {
     ...Array(scheduledCount).fill("scheduled")
   ];
 }
-function resolveLeagueNavActivityStatusesByLeague(leagues) {
-  const merged = mergeOperationalLeagueGames(leagues);
+function resolveLeagueNavActivityStatusesByLeague(mergedLeagues) {
   const out = /* @__PURE__ */ new Map();
   for (const leagueKey of OPERATIONAL_SLATE_LEAGUE_ORDER) {
-    const slate = filterGamesSpineSlateForToday(merged[leagueKey] ?? []);
+    const slate = filterGamesSpineSlateForToday(mergedLeagues[leagueKey] ?? []);
     if (slate.length === 0) continue;
     out.set(
       leagueKey,
@@ -29262,11 +29153,10 @@ function leagueRoutePath(league) {
 function directoryItemForLeagueKey(key2) {
   return LEAGUE_DIRECTORY_ITEMS.find((item) => item.grarfLeagueKey === key2);
 }
-function resolveOnTodayNavItems(leagues) {
-  const merged = mergeOperationalLeagueGames(leagues);
+function resolveOnTodayNavItems(mergedLeagues) {
   const activeLeagueKeys = [];
   for (const leagueKey of OPERATIONAL_SLATE_LEAGUE_ORDER) {
-    const slate = filterGamesSpineSlateForToday(merged[leagueKey] ?? []);
+    const slate = filterGamesSpineSlateForToday(mergedLeagues[leagueKey] ?? []);
     if (slate.length === 0) continue;
     activeLeagueKeys.push(leagueKey);
   }
@@ -29294,6 +29184,195 @@ function resolveOnTodayNavItems(leagues) {
     });
   }
   return out;
+}
+
+// ../grarf/desktop/src/lib/gamesSpine/operationalManualLeagueGames.ts
+init_define_import_meta_env();
+
+// ../grarf/desktop/src/lib/gamesSpine/manualLeMans2026SpineEntry.ts
+init_define_import_meta_env();
+
+// ../grarf/desktop/src/lib/watch/externalWatchLaunch.ts
+init_define_import_meta_env();
+init_isGrarfWebRenderer();
+var WATCH_LOG = "[Watch]";
+async function openWatchStreamExternally(url, providerLabel2 = "stream") {
+  const href = url.trim();
+  if (!href) {
+    console.warn(`${WATCH_LOG} External launch failed: empty url`);
+    return;
+  }
+  console.log(`${WATCH_LOG} Provider launchMode: external`);
+  console.log(`${WATCH_LOG} Opening ${providerLabel2} in system browser`, href);
+  if (isGrarfWebRenderer()) {
+    window.open(href, "_blank", "noopener,noreferrer");
+    return;
+  }
+  const openExternal = window.grarf?.openExternalUrl;
+  if (!openExternal) {
+    console.warn(`${WATCH_LOG} openExternalUrl unavailable \u2014 falling back to window.open`);
+    try {
+      window.open(href, "_blank", "noopener,noreferrer");
+      console.log(`${WATCH_LOG} window.open fallback invoked`);
+    } catch (e2) {
+      console.warn(`${WATCH_LOG} External launch failed:`, e2);
+    }
+    return;
+  }
+  try {
+    const res = await openExternal(href);
+    if (res?.ok) {
+      console.log(`${WATCH_LOG} shell.openExternal success`);
+    } else {
+      console.warn(`${WATCH_LOG} External launch failed:`, res?.error ?? "unknown error");
+    }
+  } catch (e2) {
+    console.warn(`${WATCH_LOG} External launch failed:`, e2);
+  }
+}
+
+// ../grarf/desktop/src/lib/gamesSpine/manualLeMans2026SpineEntry.ts
+var import_react9 = __toESM(require_react(), 1);
+var MANUAL_LE_MANS_2026_GAME_ID = "manual-wec-le-mans-2026";
+var LE_MANS_2026_LIVESTREAM_URL = "https://plus.fiawec.com/en/livestream/s-24-hours-of-le-mans-race-en-4ggw9";
+var LE_MANS_2026_START_MS = Date.parse("2026-06-13T14:00:00.000Z");
+var LE_MANS_2026_END_MS = Date.parse("2026-06-14T14:00:00.000Z");
+var LE_MANS_2026_OPERATIONAL_DATE_KEYS = /* @__PURE__ */ new Set(["2026-06-13", "2026-06-14"]);
+function isManualLeMans2026GameId(gameId) {
+  return gameId === MANUAL_LE_MANS_2026_GAME_ID;
+}
+function isManualLeMans2026VisibleOnOperationalDate(operationalDateKey = getGamesSpineOperationalTodayKey()) {
+  return LE_MANS_2026_OPERATIONAL_DATE_KEYS.has(operationalDateKey);
+}
+function resolveManualLeMans2026Status(now = /* @__PURE__ */ new Date()) {
+  const ms2 = now.getTime();
+  if (ms2 < LE_MANS_2026_START_MS) return "scheduled";
+  if (ms2 < LE_MANS_2026_END_MS) return "live";
+  return "final";
+}
+function formatManualLeMans2026TimeRemaining(now = /* @__PURE__ */ new Date()) {
+  const remainingMs = Math.max(0, LE_MANS_2026_END_MS - now.getTime());
+  const totalMinutes = Math.floor(remainingMs / 6e4);
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+  return `Time Remaining: ${hours}h ${minutes}m`;
+}
+function resolveManualLeMans2026SpineGame(now = /* @__PURE__ */ new Date()) {
+  const status = resolveManualLeMans2026Status(now);
+  const statusLine = status === "live" ? formatManualLeMans2026TimeRemaining(now) : status === "final" ? "Completed" : void 0;
+  return {
+    id: MANUAL_LE_MANS_2026_GAME_ID,
+    grarfGameId: MANUAL_LE_MANS_2026_GAME_ID,
+    time: new Date(LE_MANS_2026_START_MS).toLocaleString("en-US", {
+      weekday: "short",
+      hour: "numeric",
+      minute: "2-digit",
+      timeZone: "America/Chicago",
+      timeZoneName: "short"
+    }),
+    awayTeam: "24 Hours of Le Mans",
+    awayRecord: "\u2014",
+    homeTeam: "",
+    homeRecord: "",
+    awayCity: "",
+    homeCity: "",
+    awayPitcher: "\u2014",
+    awayPitcherStats: "",
+    homePitcher: "\u2014",
+    homePitcherStats: "",
+    channels: [],
+    broadcasts: [],
+    status,
+    statusLine,
+    streamUrl: status === "live" ? LE_MANS_2026_LIVESTREAM_URL : void 0,
+    startTimeMs: LE_MANS_2026_START_MS,
+    scheduledDateKey: "2026-06-13",
+    league: "WEC",
+    lastUpdated: now.toISOString()
+  };
+}
+function resolveWecOperationalLeagueGames(now = /* @__PURE__ */ new Date()) {
+  const operationalDateKey = getGamesSpineOperationalTodayKey(now);
+  if (!isManualLeMans2026VisibleOnOperationalDate(operationalDateKey)) {
+    return [];
+  }
+  return [resolveManualLeMans2026SpineGame(now)];
+}
+function useManualLeMans2026LiveRefreshMs() {
+  const [nowMs, setNowMs] = (0, import_react9.useState)(() => Date.now());
+  (0, import_react9.useEffect)(() => {
+    if (!isManualLeMans2026VisibleOnOperationalDate(getGamesSpineOperationalTodayKey())) return;
+    if (resolveManualLeMans2026Status() !== "live") return;
+    const id = window.setInterval(() => setNowMs(Date.now()), 6e4);
+    return () => window.clearInterval(id);
+  }, []);
+  return nowMs;
+}
+function refreshManualLeMans2026SpineGameIfNeeded(game, now = /* @__PURE__ */ new Date()) {
+  if (!isManualLeMans2026GameId(game.id)) return game;
+  return resolveManualLeMans2026SpineGame(now);
+}
+function tryLaunchManualLeMans2026WatchLive(game) {
+  if (!isManualLeMans2026GameId(game.id) || game.status !== "live") return false;
+  void openWatchStreamExternally(LE_MANS_2026_LIVESTREAM_URL, "WEC");
+  return true;
+}
+
+// ../grarf/desktop/src/lib/gamesSpine/operationalManualLeagueGames.ts
+var MANUAL_OPERATIONAL_LEAGUE_RESOLVERS = {
+  WEC: resolveWecOperationalLeagueGames
+};
+var manualOperationalCache = {
+  nowBucket: -1,
+  result: {}
+};
+var mergeOperationalCache = {
+  leagues: null,
+  nowBucket: -1,
+  result: {}
+};
+function operationalNowBucket(now) {
+  return Math.floor(now.getTime() / 6e4);
+}
+function resolveManualOperationalLeagueGames(now = /* @__PURE__ */ new Date()) {
+  const nowBucket = operationalNowBucket(now);
+  if (manualOperationalCache.nowBucket === nowBucket) {
+    return manualOperationalCache.result;
+  }
+  const out = {};
+  for (const [key2, resolve] of Object.entries(MANUAL_OPERATIONAL_LEAGUE_RESOLVERS)) {
+    if (!resolve) continue;
+    const rows = resolve(now);
+    if (rows.length > 0) out[key2] = rows;
+  }
+  manualOperationalCache = { nowBucket, result: out };
+  return out;
+}
+function mergeOperationalLeagueGames(leagues, now = /* @__PURE__ */ new Date()) {
+  const nowBucket = operationalNowBucket(now);
+  if (mergeOperationalCache.leagues === leagues && mergeOperationalCache.nowBucket === nowBucket) {
+    return mergeOperationalCache.result;
+  }
+  const manual = resolveManualOperationalLeagueGames(now);
+  if (Object.keys(manual).length === 0) {
+    mergeOperationalCache = { leagues, nowBucket, result: leagues };
+    return leagues;
+  }
+  const merged = { ...leagues };
+  for (const [key2, rows] of Object.entries(manual)) {
+    const leagueKey = key2;
+    const existing = merged[leagueKey] ?? [];
+    const seen = new Set(existing.map((g2) => g2.id));
+    const combined = [...existing];
+    for (const game of rows) {
+      if (seen.has(game.id)) continue;
+      seen.add(game.id);
+      combined.push(game);
+    }
+    merged[leagueKey] = combined;
+  }
+  mergeOperationalCache = { leagues, nowBucket, result: merged };
+  return merged;
 }
 
 // ../grarf/desktop/src/components/shell/AppLeftNav.tsx
@@ -30315,13 +30394,17 @@ function AppLeftNav() {
   };
   const measureRef = (0, import_react10.useRef)(null);
   const liveLeagues = useLiveGamesStore((s2) => s2.leagues);
-  const onTodayActivityByLeague = (0, import_react10.useMemo)(
-    () => isGrarfWebRenderer() ? resolveLeagueNavActivityStatusesByLeague(liveLeagues) : null,
+  const mergedOperationalLeagues = (0, import_react10.useMemo)(
+    () => mergeOperationalLeagueGames(liveLeagues),
     [liveLeagues]
+  );
+  const onTodayActivityByLeague = (0, import_react10.useMemo)(
+    () => isGrarfWebRenderer() ? resolveLeagueNavActivityStatusesByLeague(mergedOperationalLeagues) : null,
+    [mergedOperationalLeagues]
   );
   const leagueDirectorySections = (0, import_react10.useMemo)(() => {
     const sections = getLeagueDirectoryV1ForNav();
-    const onTodayItems = resolveOnTodayNavItems(liveLeagues);
+    const onTodayItems = resolveOnTodayNavItems(mergedOperationalLeagues);
     const onTodayLeagueKeys = new Set(
       onTodayItems.flatMap((item) => item.grarfLeagueKey ? [item.grarfLeagueKey] : [])
     );
@@ -30337,7 +30420,7 @@ function AppLeftNav() {
         )
       };
     });
-  }, [liveLeagues]);
+  }, [mergedOperationalLeagues]);
   const menuLabels = (0, import_react10.useMemo)(
     () => [
       LEAGUE_DIRECTORY_HOME.label,
@@ -49944,17 +50027,16 @@ function compareGamesByImportanceV1(a2, b2, startTimeAsc) {
   if (aStart !== bStart) return startTimeAsc ? aStart - bStart : bStart - aStart;
   return a2.id.localeCompare(b2.id);
 }
-function collectOperationalSpineGames(leagues) {
-  const merged = mergeOperationalLeagueGames(leagues);
+function collectOperationalSpineGames(mergedLeagues) {
   const out = [];
   for (const leagueKey of OPERATIONAL_SLATE_LEAGUE_ORDER) {
-    const slate = filterGamesSpineSlateForToday(merged[leagueKey] ?? []);
+    const slate = filterGamesSpineSlateForToday(mergedLeagues[leagueKey] ?? []);
     out.push(...slate);
   }
   return out;
 }
-function resolveBestGameRightNowV1(leagues) {
-  const games = collectOperationalSpineGames(leagues);
+function resolveBestGameRightNowV1(mergedLeagues) {
+  const games = collectOperationalSpineGames(mergedLeagues);
   if (games.length === 0) return null;
   const liveGames = games.filter((g2) => g2.status === "live");
   if (liveGames.length > 0) {
@@ -50035,13 +50117,14 @@ function BestGameRightNowSection({
 init_isGrarfWebRenderer();
 var import_jsx_runtime53 = __toESM(require_jsx_runtime(), 1);
 function useAnyGamesLoaded() {
-  return useLiveGamesStore((s2) => {
-    const merged = mergeOperationalLeagueGames(s2.leagues);
+  const leagues = useLiveGamesStore((s2) => s2.leagues);
+  return (0, import_react66.useMemo)(() => {
+    const merged = mergeOperationalLeagueGames(leagues);
     if (GAMES_COLUMN_LEAGUE_ORDER.some((k2) => (merged[k2]?.length ?? 0) > 0)) return true;
     return OPERATIONAL_ADJUNCT_LEAGUE_KEYS.some(
       (k2) => filterGamesSpineSlateForToday(merged[k2] ?? []).length > 0
     );
-  });
+  }, [leagues]);
 }
 function HomeGamesToday({
   parentScrolls = false,
@@ -50073,7 +50156,8 @@ function HomeGamesToday({
   );
   const bestGameRightNow = (0, import_react66.useMemo)(() => {
     if (!isGrarfWebRenderer()) return null;
-    const result = resolveBestGameRightNowV1(leagues);
+    const mergedLeagues = mergeOperationalLeagueGames(leagues);
+    const result = resolveBestGameRightNowV1(mergedLeagues);
     if (!result) return null;
     const now = new Date(manualLeMansRefreshMs);
     const game = refreshManualLeMans2026SpineGameIfNeeded(result.game, now);
