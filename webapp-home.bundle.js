@@ -59671,6 +59671,7 @@ function HomeSportscapeCard({
 
 // ../grarf/desktop/src/components/homeMvp/HomeSportscapeHeadlinesRow.tsx
 init_define_import_meta_env();
+var import_react97 = __toESM(require_react(), 1);
 
 // ../grarf/desktop/src/data/homeSportscapeHeadlinesFeeds.ts
 init_define_import_meta_env();
@@ -59717,79 +59718,9 @@ var HOME_SPORTSCAPE_HEADLINES_SOURCE_FEEDS = [
   }
 ];
 
-// ../grarf/desktop/src/hooks/useDailyBrief.ts
-init_define_import_meta_env();
-var import_react96 = __toESM(require_react(), 1);
-
-// ../grarf/desktop/src/lib/home/loadDailyBrief.ts
-init_define_import_meta_env();
-var DAILY_BRIEF_JSON_URL = "/data/dailyBrief.json";
-var DEFAULT_TITLE = "Top Sports Moments of the Day";
-function normalizeStory(raw) {
-  if (!raw || typeof raw !== "object") return null;
-  const row = raw;
-  const headline = typeof row.headline === "string" ? row.headline.trim() : "";
-  const url = typeof row.url === "string" ? row.url.trim() : "";
-  if (!headline || !/^https?:\/\//i.test(url)) return null;
-  const rank = typeof row.rank === "number" && Number.isFinite(row.rank) ? row.rank : typeof row.rank === "string" && /^\d+$/.test(row.rank) ? Number(row.rank) : 0;
-  return {
-    rank,
-    headline,
-    url,
-    league: typeof row.league === "string" ? row.league.trim() : "",
-    event_date: typeof row.event_date === "string" ? row.event_date.trim() : ""
-  };
-}
-function normalizeDailyBrief(raw) {
-  if (!raw || typeof raw !== "object") {
-    return { date: "", title: DEFAULT_TITLE, stories: [] };
-  }
-  const row = raw;
-  const stories = Array.isArray(row.stories) ? row.stories.map(normalizeStory).filter((story) => story != null).sort((a2, b2) => a2.rank - b2.rank) : [];
-  return {
-    date: typeof row.date === "string" ? row.date.trim() : "",
-    title: typeof row.title === "string" && row.title.trim() ? row.title.trim() : DEFAULT_TITLE,
-    stories
-  };
-}
-async function loadDailyBrief() {
-  try {
-    const res = await fetch(DAILY_BRIEF_JSON_URL, {
-      cache: "no-store",
-      headers: { Accept: "application/json" }
-    });
-    if (!res.ok) {
-      return { date: "", title: DEFAULT_TITLE, stories: [] };
-    }
-    return normalizeDailyBrief(await res.json());
-  } catch {
-    return { date: "", title: DEFAULT_TITLE, stories: [] };
-  }
-}
-
-// ../grarf/desktop/src/hooks/useDailyBrief.ts
-var EMPTY_BRIEF = {
-  date: "",
-  title: "Top Sports Moments of the Day",
-  stories: []
-};
-function useDailyBrief() {
-  const [brief, setBrief] = (0, import_react96.useState)(EMPTY_BRIEF);
-  const [loaded, setLoaded] = (0, import_react96.useState)(false);
-  const refresh = (0, import_react96.useCallback)(async () => {
-    const next = await loadDailyBrief();
-    setBrief(next);
-    setLoaded(true);
-  }, []);
-  (0, import_react96.useEffect)(() => {
-    void refresh();
-  }, [refresh]);
-  return { brief, loaded, refresh };
-}
-
 // ../grarf/desktop/src/hooks/useHomeSportscapeHeadlinesRss.ts
 init_define_import_meta_env();
-var import_react97 = __toESM(require_react(), 1);
+var import_react96 = __toESM(require_react(), 1);
 
 // ../grarf/desktop/src/lib/home/fetchHomeSportscapeHeadlineFeed.ts
 init_define_import_meta_env();
@@ -59805,9 +59736,9 @@ async function fetchHomeSportscapeHeadlineFeed(feedUrl) {
 // ../grarf/desktop/src/hooks/useHomeSportscapeHeadlinesRss.ts
 var POLL_MS8 = 3 * 60 * 1e3;
 function useHomeSportscapeHeadlinesRss() {
-  const [headlinesBySourceId, setHeadlinesBySourceId] = (0, import_react97.useState)({});
-  const [loading, setLoading] = (0, import_react97.useState)(true);
-  const refresh = (0, import_react97.useCallback)(async () => {
+  const [headlinesBySourceId, setHeadlinesBySourceId] = (0, import_react96.useState)({});
+  const [loading, setLoading] = (0, import_react96.useState)(true);
+  const refresh = (0, import_react96.useCallback)(async () => {
     const results = await Promise.all(
       HOME_SPORTSCAPE_HEADLINES_SOURCE_FEEDS.map(async (feed) => {
         try {
@@ -59821,12 +59752,64 @@ function useHomeSportscapeHeadlinesRss() {
     setHeadlinesBySourceId(Object.fromEntries(results));
     setLoading(false);
   }, []);
-  (0, import_react97.useEffect)(() => {
+  (0, import_react96.useEffect)(() => {
     void refresh();
     const timer = window.setInterval(() => void refresh(), POLL_MS8);
     return () => window.clearInterval(timer);
   }, [refresh]);
   return { headlinesBySourceId, loading, refresh };
+}
+
+// ../grarf/desktop/src/lib/sportscape/editorial/sportscapeEditorialAiBriefSelectionUtils.ts
+init_define_import_meta_env();
+var AI_BRIEF_PRIORITY_MIN = 1;
+var AI_BRIEF_PRIORITY_MAX = 100;
+var AI_BRIEF_PRIORITY_DEFAULT = 100;
+function clampAiBriefPriorityRank(rank) {
+  if (!Number.isFinite(rank)) return AI_BRIEF_PRIORITY_DEFAULT;
+  return Math.min(
+    AI_BRIEF_PRIORITY_MAX,
+    Math.max(AI_BRIEF_PRIORITY_MIN, Math.round(rank))
+  );
+}
+function suggestNextAiBriefRank(_selections) {
+  return AI_BRIEF_PRIORITY_DEFAULT;
+}
+function sortAiBriefSelectionsByRank(selections) {
+  return [...selections].sort((a2, b2) => a2.rank - b2.rank);
+}
+function editorialEntryByEventId(entries) {
+  const next = /* @__PURE__ */ new Map();
+  for (const entry of entries) {
+    next.set(entry.eventId, entry);
+  }
+  return next;
+}
+function buildSportscapeEditorialAiBriefStories(document2) {
+  const entriesByEventId = editorialEntryByEventId(document2.entries);
+  const stories = [];
+  for (const selection of sortAiBriefSelectionsByRank(document2.aiBriefSelections)) {
+    const entry = entriesByEventId.get(selection.eventId);
+    if (!entry) continue;
+    const headline = entry.headline.trim();
+    const url = entry.articleUrl.trim();
+    if (!headline || !/^https?:\/\//i.test(url)) continue;
+    stories.push({
+      rank: selection.rank,
+      eventId: selection.eventId,
+      headline,
+      url,
+      league: SPORTSCAPE_EDITORIAL_LEAGUE_LABEL[entry.league] ?? entry.league
+    });
+  }
+  return stories;
+}
+function buildAiBriefSummaryLines(params) {
+  return sortAiBriefSelectionsByRank(params.selections).map((selection) => ({
+    rank: selection.rank,
+    eventId: selection.eventId,
+    headline: params.headlineByEventId.get(selection.eventId)?.trim() || selection.eventId
+  }));
 }
 
 // ../grarf/desktop/src/components/homeMvp/HomeSportscapeHeadlinesRow.tsx
@@ -59835,7 +59818,7 @@ var SOURCE_BLOCK_WIDTH_CLASS = "w-[19.5rem] shrink-0";
 var AI_BRIEF_BLOCK_WIDTH_CLASS = "w-[25rem] shrink-0";
 var HEADLINES_BLOCK_HEIGHT_CLASS = "h-[15.5rem]";
 var SOURCE_HEADLINE_TEXT_CLASS = "text-[12px] font-medium leading-snug tracking-[0.05em] text-[#b8cccc]";
-var AI_BRIEF_CARD_HEADER = "JUNE 10, 2026 BRIEFING";
+var AI_BRIEF_CARD_HEADER = "AI BRIEF";
 var AI_BRIEF_EMPTY_CLASS = "px-2 py-1.5 text-[10px] font-medium leading-snug tracking-[0.04em] text-ambersys/90";
 var AI_BRIEF_HEADLINE_TEXT_CLASS = "text-[12px] font-medium leading-snug tracking-[0.05em] text-ambersys/90";
 var AI_BRIEF_STORY_ROW_CLASS = "flex min-w-0 items-start gap-2 border-b border-ambersys/25 pb-2 last:border-b-0 last:pb-0";
@@ -59846,8 +59829,11 @@ function openHeadlineArticle(url) {
   void openExternalUrl2(url);
 }
 function HomeSportscapeAiBriefBlock() {
-  const { brief } = useDailyBrief();
-  const hasStories = brief.stories.length > 0;
+  const editorialDocument = useSportscapeEditorialDocument();
+  const stories = (0, import_react97.useMemo)(
+    () => buildSportscapeEditorialAiBriefStories(editorialDocument),
+    [editorialDocument]
+  );
   return /* @__PURE__ */ (0, import_jsx_runtime85.jsxs)(
     "article",
     {
@@ -59864,12 +59850,12 @@ function HomeSportscapeAiBriefBlock() {
           /* @__PURE__ */ (0, import_jsx_runtime85.jsx)("span", { className: "h-1 w-1 shrink-0 rounded-full bg-ambersys/70", "aria-hidden": true }),
           /* @__PURE__ */ (0, import_jsx_runtime85.jsx)("span", { className: "truncate text-[8px] font-medium tracking-[0.14em] text-ambersys/90", children: AI_BRIEF_CARD_HEADER })
         ] }),
-        !hasStories ? /* @__PURE__ */ (0, import_jsx_runtime85.jsx)("p", { className: AI_BRIEF_EMPTY_CLASS, children: "No daily briefing loaded." }) : /* @__PURE__ */ (0, import_jsx_runtime85.jsx)("ul", { className: HEADLINE_LIST_CLASS, role: "list", children: brief.stories.map((story, index) => /* @__PURE__ */ (0, import_jsx_runtime85.jsx)(
+        stories.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime85.jsx)("p", { className: AI_BRIEF_EMPTY_CLASS, children: "No AI Brief stories selected." }) : /* @__PURE__ */ (0, import_jsx_runtime85.jsx)("ul", { className: HEADLINE_LIST_CLASS, role: "list", children: stories.map((story) => /* @__PURE__ */ (0, import_jsx_runtime85.jsx)(
           HomeSportscapeAiBriefStoryRow,
           {
             story
           },
-          `${story.rank}-${story.url}-${index}`
+          `${story.eventId}-${story.rank}`
         )) })
       ]
     }
@@ -66869,34 +66855,6 @@ function getSportscapeEditorialHighlightSource(league) {
 // ../grarf/desktop/src/components/sportscapeEditorial/SportscapeEditorialEventRow.tsx
 init_define_import_meta_env();
 var import_react127 = __toESM(require_react(), 1);
-
-// ../grarf/desktop/src/lib/sportscape/editorial/sportscapeEditorialAiBriefSelectionUtils.ts
-init_define_import_meta_env();
-var AI_BRIEF_PRIORITY_MIN = 1;
-var AI_BRIEF_PRIORITY_MAX = 100;
-var AI_BRIEF_PRIORITY_DEFAULT = 100;
-function clampAiBriefPriorityRank(rank) {
-  if (!Number.isFinite(rank)) return AI_BRIEF_PRIORITY_DEFAULT;
-  return Math.min(
-    AI_BRIEF_PRIORITY_MAX,
-    Math.max(AI_BRIEF_PRIORITY_MIN, Math.round(rank))
-  );
-}
-function suggestNextAiBriefRank(_selections) {
-  return AI_BRIEF_PRIORITY_DEFAULT;
-}
-function sortAiBriefSelectionsByRank(selections) {
-  return [...selections].sort((a2, b2) => a2.rank - b2.rank);
-}
-function buildAiBriefSummaryLines(params) {
-  return sortAiBriefSelectionsByRank(params.selections).map((selection) => ({
-    rank: selection.rank,
-    eventId: selection.eventId,
-    headline: params.headlineByEventId.get(selection.eventId)?.trim() || selection.eventId
-  }));
-}
-
-// ../grarf/desktop/src/components/sportscapeEditorial/SportscapeEditorialEventRow.tsx
 var import_jsx_runtime135 = __toESM(require_jsx_runtime(), 1);
 function SportscapeEditorialEventRow({
   event,
