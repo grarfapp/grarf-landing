@@ -59086,6 +59086,28 @@ var SPORTSCAPE_EDITORIAL_LEAGUE_LABEL = {
   LIV: "LIV",
   CHAMPIONS: "CHAMPIONS"
 };
+var SPORTSCAPE_EDITORIAL_MANUAL_LEAGUE_QUICK_PICKS = [
+  ...SPORTSCAPE_EDITORIAL_LEAGUE_DISPLAY_ORDER.map((key2) => SPORTSCAPE_EDITORIAL_LEAGUE_LABEL[key2]),
+  "ATP Halle",
+  "ATP Queen's Club",
+  "WTA Berlin",
+  "PGA Tour",
+  "LIV Golf",
+  "NASCAR Cup",
+  "IndyCar",
+  "Formula 1",
+  "NCAA Baseball",
+  "College Football Playoff",
+  "Breaking News"
+];
+function isSportscapeEditorialLeagueKey(value) {
+  return Object.prototype.hasOwnProperty.call(SPORTSCAPE_EDITORIAL_LEAGUE_LABEL, value);
+}
+function resolveSportscapeEditorialLeagueDisplayLabel(league) {
+  const trimmed = league.trim();
+  if (!trimmed) return "";
+  return isSportscapeEditorialLeagueKey(trimmed) ? SPORTSCAPE_EDITORIAL_LEAGUE_LABEL[trimmed] : trimmed;
+}
 var SPORTSCAPE_EDITORIAL_LEAGUES_COLLAPSED_BY_DEFAULT = /* @__PURE__ */ new Set([
   "ATP",
   "WTA"
@@ -59123,9 +59145,23 @@ function groupSportscapeEditorialEventsByLeague(events) {
     grouped.set(league, []);
   }
   for (const event of events) {
-    grouped.get(event.league)?.push(event);
+    const key2 = event.league.trim();
+    if (!key2) continue;
+    if (!grouped.has(key2)) grouped.set(key2, []);
+    grouped.get(key2).push(event);
   }
   return grouped;
+}
+function listSportscapeEditorialAdminLeagueSections(grouped) {
+  const sections = [];
+  for (const league of SPORTSCAPE_EDITORIAL_LEAGUE_DISPLAY_ORDER) {
+    sections.push(league);
+  }
+  const freeform = [...grouped.keys()].filter((key2) => !isSportscapeEditorialLeagueKey(key2)).sort((a2, b2) => a2.localeCompare(b2));
+  for (const league of freeform) {
+    if (!sections.includes(league)) sections.push(league);
+  }
+  return sections;
 }
 
 // ../grarf/desktop/src/lib/sportscape/resolveSportscapeScoreSideLabel.ts
@@ -62072,7 +62108,7 @@ function buildSportscapeEditorialAiBriefStories(document2) {
       eventId: selection.eventId,
       headline,
       url,
-      league: SPORTSCAPE_EDITORIAL_LEAGUE_LABEL[entry.league] ?? entry.league
+      league: resolveSportscapeEditorialLeagueDisplayLabel(entry.league)
     });
   }
   return stories;
@@ -69241,7 +69277,9 @@ function formatLocalCalendarDateKey(now = /* @__PURE__ */ new Date()) {
   return `${year}-${month}-${day}`;
 }
 function leagueSlugForManualEventId(league) {
-  return league.toLowerCase().replace(/_/g, "-");
+  const slug = league.trim().toLowerCase().replace(/_/g, "-").replace(/[^a-z0-9]+/g, "-").replace(/-+/g, "-").replace(/^-|-$/g, "");
+  if (slug) return slug.slice(0, 64);
+  return "manual";
 }
 function generateManualEditorialEventId(league, existingEventIds, now = /* @__PURE__ */ new Date()) {
   const dateKey = formatLocalCalendarDateKey(now);
@@ -69260,14 +69298,15 @@ function generateManualEditorialEventId(league, existingEventIds, now = /* @__PU
 var import_jsx_runtime149 = __toESM(require_jsx_runtime(), 1);
 var INPUT_CLASS = "mt-1 w-full border border-line/60 bg-[#030808] px-3 py-2 text-sm text-[#d8e8e8] outline-none focus:border-cyansys/40";
 var LABEL_CLASS = "text-[10px] tracking-[0.16em] text-textdim";
-var DEFAULT_LEAGUE = "ATP";
+var LEAGUE_NAME_DATALIST_ID = "sportscape-manual-ai-brief-league-suggestions";
 function SportscapeEditorialManualAiBriefEntry({
   existingEventIds,
   suggestedRank,
   onEntrySaved,
   onAiBriefSelectionChange
 }) {
-  const [league, setLeague] = (0, import_react134.useState)(DEFAULT_LEAGUE);
+  const [leagueName, setLeagueName] = (0, import_react134.useState)("");
+  const [quickPick, setQuickPick] = (0, import_react134.useState)("");
   const [headline, setHeadline] = (0, import_react134.useState)("");
   const [articleUrl, setArticleUrl] = (0, import_react134.useState)("");
   const [highlightUrl, setHighlightUrl] = (0, import_react134.useState)("");
@@ -69275,7 +69314,18 @@ function SportscapeEditorialManualAiBriefEntry({
   const [busy, setBusy] = (0, import_react134.useState)(false);
   const [error, setError] = (0, import_react134.useState)(null);
   const [lastEventId, setLastEventId] = (0, import_react134.useState)(null);
-  const leagueOptions = (0, import_react134.useMemo)(
+  const leagueSuggestions = (0, import_react134.useMemo)(() => {
+    const seen = /* @__PURE__ */ new Set();
+    const next = [];
+    for (const label of SPORTSCAPE_EDITORIAL_MANUAL_LEAGUE_QUICK_PICKS) {
+      const trimmed = label.trim();
+      if (!trimmed || seen.has(trimmed)) continue;
+      seen.add(trimmed);
+      next.push(trimmed);
+    }
+    return next;
+  }, []);
+  const quickPickOptions = (0, import_react134.useMemo)(
     () => SPORTSCAPE_EDITORIAL_LEAGUE_DISPLAY_ORDER.map((key2) => ({
       key: key2,
       label: SPORTSCAPE_EDITORIAL_LEAGUE_LABEL[key2]
@@ -69283,19 +69333,31 @@ function SportscapeEditorialManualAiBriefEntry({
     []
   );
   const clearForm = () => {
-    setLeague(DEFAULT_LEAGUE);
+    setLeagueName("");
+    setQuickPick("");
     setHeadline("");
     setArticleUrl("");
     setHighlightUrl("");
     setRank(String(suggestedRank));
     setError(null);
   };
+  const onQuickPickChange = (value) => {
+    setQuickPick(value);
+    if (!value) return;
+    const option = quickPickOptions.find((row) => row.key === value);
+    if (option) setLeagueName(option.label);
+  };
   const onSubmit = async (event) => {
     event.preventDefault();
     setError(null);
+    const trimmedLeagueName = leagueName.trim();
     const trimmedHeadline = headline.trim();
     const trimmedArticleUrl = articleUrl.trim();
     const trimmedHighlightUrl = highlightUrl.trim();
+    if (!trimmedLeagueName) {
+      setError("League name is required.");
+      return;
+    }
     if (!trimmedHeadline) {
       setError("Headline is required.");
       return;
@@ -69310,9 +69372,9 @@ function SportscapeEditorialManualAiBriefEntry({
     );
     setBusy(true);
     try {
-      const eventId = generateManualEditorialEventId(league, existingEventIds);
+      const eventId = generateManualEditorialEventId(trimmedLeagueName, existingEventIds);
       const entry = await saveSportscapeEditorialEntry({
-        league,
+        league: trimmedLeagueName,
         eventId,
         headline: trimmedHeadline,
         articleUrl: trimmedArticleUrl,
@@ -69334,17 +69396,38 @@ function SportscapeEditorialManualAiBriefEntry({
   };
   return /* @__PURE__ */ (0, import_jsx_runtime149.jsxs)("section", { className: "border border-ambersys/35 bg-[#040808]/70 p-4", children: [
     /* @__PURE__ */ (0, import_jsx_runtime149.jsx)("h2", { className: "font-sans text-sm text-[#d8e8e8]", children: "Manual AI Brief Entry" }),
-    /* @__PURE__ */ (0, import_jsx_runtime149.jsx)("p", { className: "mt-1 text-[11px] leading-relaxed text-textdim", children: "Add editorial stories without a Games Spine event \u2014 tennis, golf, motorsport, breaking news, and other manual picks." }),
+    /* @__PURE__ */ (0, import_jsx_runtime149.jsx)("p", { className: "mt-1 text-[11px] leading-relaxed text-textdim", children: "Type any league, tour, or event name \u2014 tennis, golf, motorsport, college sports, breaking news, and other manual picks." }),
     /* @__PURE__ */ (0, import_jsx_runtime149.jsxs)("form", { onSubmit: (event) => void onSubmit(event), className: "mt-4 grid gap-3", children: [
       /* @__PURE__ */ (0, import_jsx_runtime149.jsxs)("label", { className: "block", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime149.jsx)("span", { className: LABEL_CLASS, children: "LEAGUE" }),
+        /* @__PURE__ */ (0, import_jsx_runtime149.jsx)("span", { className: LABEL_CLASS, children: "LEAGUE NAME" }),
         /* @__PURE__ */ (0, import_jsx_runtime149.jsx)(
+          "input",
+          {
+            value: leagueName,
+            onChange: (event) => {
+              setLeagueName(event.target.value);
+              setQuickPick("");
+            },
+            list: LEAGUE_NAME_DATALIST_ID,
+            placeholder: "ATP Halle",
+            className: INPUT_CLASS,
+            required: true
+          }
+        ),
+        /* @__PURE__ */ (0, import_jsx_runtime149.jsx)("datalist", { id: LEAGUE_NAME_DATALIST_ID, children: leagueSuggestions.map((suggestion) => /* @__PURE__ */ (0, import_jsx_runtime149.jsx)("option", { value: suggestion }, suggestion)) })
+      ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime149.jsxs)("label", { className: "block", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime149.jsx)("span", { className: LABEL_CLASS, children: "QUICK PICK (optional)" }),
+        /* @__PURE__ */ (0, import_jsx_runtime149.jsxs)(
           "select",
           {
-            value: league,
-            onChange: (event) => setLeague(event.target.value),
+            value: quickPick,
+            onChange: (event) => onQuickPickChange(event.target.value),
             className: INPUT_CLASS,
-            children: leagueOptions.map((option) => /* @__PURE__ */ (0, import_jsx_runtime149.jsx)("option", { value: option.key, children: option.label }, option.key))
+            children: [
+              /* @__PURE__ */ (0, import_jsx_runtime149.jsx)("option", { value: "", children: "Choose a starter league\u2026" }),
+              quickPickOptions.map((option) => /* @__PURE__ */ (0, import_jsx_runtime149.jsx)("option", { value: option.key, children: option.label }, option.key))
+            ]
           }
         )
       ] }),
@@ -69546,7 +69629,7 @@ function resolveGameForArticle(article, gamesByEventId) {
   return void 0;
 }
 function buildGameFromArticle(article, league, eventId) {
-  const grarfLeague = mapEditorialLeagueToGrarfLeague(league);
+  const grarfLeague = isSportscapeEditorialLeagueKey(league) ? mapEditorialLeagueToGrarfLeague(league) : "ATP";
   const espnEventId = article.eventId?.trim() || void 0;
   return {
     id: espnEventId ? `espn-${grarfLeague}-${espnEventId}` : `sportscape-${grarfLeague}-${eventId}`,
@@ -69958,12 +70041,14 @@ function SportscapeEditorialLeagueSection({
   onEntrySaved,
   onAiBriefSelectionChange
 }) {
-  const [expanded, setExpanded] = (0, import_react137.useState)(
-    () => !SPORTSCAPE_EDITORIAL_LEAGUES_COLLAPSED_BY_DEFAULT.has(league)
-  );
-  const highlightSource = getSportscapeEditorialHighlightSource(league);
-  const label = SPORTSCAPE_EDITORIAL_LEAGUE_LABEL[league];
+  const [expanded, setExpanded] = (0, import_react137.useState)(() => {
+    if (!isSportscapeEditorialLeagueKey(league)) return true;
+    return !SPORTSCAPE_EDITORIAL_LEAGUES_COLLAPSED_BY_DEFAULT.has(league);
+  });
+  const highlightSource = isSportscapeEditorialLeagueKey(league) ? getSportscapeEditorialHighlightSource(league) : null;
+  const label = resolveSportscapeEditorialLeagueDisplayLabel(league);
   const highlightLabel = (0, import_react137.useMemo)(() => {
+    if (!highlightSource) return null;
     try {
       const host = new URL(highlightSource.highlightsUrl).hostname.replace(/^www\./, "");
       if (host.includes("youtube")) return `${label} YouTube`;
@@ -69971,7 +70056,7 @@ function SportscapeEditorialLeagueSection({
     } catch {
       return `${label} highlights`;
     }
-  }, [highlightSource.highlightsUrl, label]);
+  }, [highlightSource, label]);
   return /* @__PURE__ */ (0, import_jsx_runtime152.jsxs)("section", { className: "border border-line/50 bg-panel2/80", children: [
     /* @__PURE__ */ (0, import_jsx_runtime152.jsxs)("header", { className: "flex flex-wrap items-center justify-between gap-3 border-b border-line/40 px-4 py-3", children: [
       /* @__PURE__ */ (0, import_jsx_runtime152.jsxs)(
@@ -69994,12 +70079,13 @@ function SportscapeEditorialLeagueSection({
       /* @__PURE__ */ (0, import_jsx_runtime152.jsx)(
         "a",
         {
-          href: highlightSource.highlightsUrl,
+          href: highlightSource?.highlightsUrl,
           target: "_blank",
           rel: "noopener noreferrer",
           className: cn2(
             "shrink-0 border border-line/60 px-2 py-1 text-[10px] tracking-[0.16em] text-[#9ab0b0]",
-            "transition hover:border-cyansys/40 hover:text-cyansys"
+            "transition hover:border-cyansys/40 hover:text-cyansys",
+            !highlightSource && "pointer-events-none invisible"
           ),
           children: "OPEN HIGHLIGHTS SOURCE"
         }
@@ -70018,7 +70104,7 @@ function SportscapeEditorialLeagueSection({
         },
         `${league}:${event.eventId}`
       )),
-      expanded && events.length > 0 ? /* @__PURE__ */ (0, import_jsx_runtime152.jsx)("p", { className: "text-[10px] text-textdim", children: highlightLabel }) : null
+      expanded && events.length > 0 && highlightLabel ? /* @__PURE__ */ (0, import_jsx_runtime152.jsx)("p", { className: "text-[10px] text-textdim", children: highlightLabel }) : null
     ] }) : null
   ] });
 }
@@ -70221,6 +70307,10 @@ function SportscapeEditorialAdminContent() {
     });
   }, []);
   const grouped = (0, import_react140.useMemo)(() => groupSportscapeEditorialEventsByLeague(events), [events]);
+  const leagueSections = (0, import_react140.useMemo)(
+    () => listSportscapeEditorialAdminLeagueSections(grouped),
+    [grouped]
+  );
   const suggestedRank = (0, import_react140.useMemo)(
     () => suggestNextAiBriefRank(aiBriefSelectionsByEventId.values()),
     [aiBriefSelectionsByEventId]
@@ -70338,7 +70428,7 @@ function SportscapeEditorialAdminContent() {
           error: aiBriefActionError
         }
       ),
-      SPORTSCAPE_EDITORIAL_LEAGUE_DISPLAY_ORDER.map((league) => /* @__PURE__ */ (0, import_jsx_runtime154.jsx)(
+      leagueSections.map((league) => /* @__PURE__ */ (0, import_jsx_runtime154.jsx)(
         SportscapeEditorialLeagueSection,
         {
           league,
