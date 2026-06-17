@@ -40770,7 +40770,9 @@ var CHANNEL_LOGO_BY_LABEL = {
   "FOX SPORTS": "/league-logos/channel-fox.png",
   "CBS SPORTS NETWORK": "/league-logos/channel-cbs-sports.png",
   "APPLE TV MLB": "/league-logos/channel-apple-tv.png",
-  "APPLE TV": "/league-logos/channel-apple-tv.png"
+  "APPLE TV": "/league-logos/channel-apple-tv.png",
+  "TENNIS CHANNEL": "/league-logos/channel-tennis-channel.png",
+  "TENNIS CHANNEL+": "/league-logos/channel-tennis-channel.png"
 };
 function normalizeChannelLogoKey(label) {
   return label.trim().replace(/\s+/g, " ").toUpperCase();
@@ -40902,12 +40904,72 @@ init_define_import_meta_env();
 
 // ../grarf/desktop/src/lib/broadcast/gameBroadcastDisplay.ts
 init_define_import_meta_env();
+
+// ../grarf/desktop/src/lib/broadcast/resolveGameChannelPresentation.ts
+init_define_import_meta_env();
+
+// ../grarf/desktop/src/lib/broadcast/streamUrlChannelFallback.ts
+init_define_import_meta_env();
+var STREAM_URL_CHANNEL_MAPPINGS = [
+  { domains: ["tennischannel.com"], label: "Tennis Channel" },
+  { domains: ["watch.mlb.com", "mlb.com"], label: "MLB.TV" },
+  { domains: ["peacocktv.com", "peacock.com"], label: "Peacock" },
+  { domains: ["paramountplus.com"], label: "Paramount+" },
+  { domains: ["foxsports.com"], label: "FOX Sports" },
+  { domains: ["plus.espn.com"], label: "ESPN+" },
+  { domains: ["espn.com"], label: "ESPN" },
+  { domains: ["tv.apple.com"], label: "Apple TV" },
+  { domains: ["usanetwork.com"], label: "USA Network" }
+];
+function normalizeStreamHostname(streamUrl) {
+  try {
+    const host = new URL(streamUrl.trim()).hostname.toLowerCase();
+    return host.replace(/^www\./, "");
+  } catch {
+    return null;
+  }
+}
+function hostnameMatchesDomain(hostname, domain) {
+  return hostname === domain || hostname.endsWith(`.${domain}`);
+}
+function deriveChannelLabelFromStreamUrl(streamUrl) {
+  const hostname = normalizeStreamHostname(streamUrl);
+  if (!hostname) return null;
+  for (const { domains, label } of STREAM_URL_CHANNEL_MAPPINGS) {
+    if (domains.some((domain) => hostnameMatchesDomain(hostname, domain))) {
+      return label;
+    }
+  }
+  return null;
+}
+
+// ../grarf/desktop/src/lib/broadcast/resolveGameChannelPresentation.ts
+function primaryBroadcastLabel(game) {
+  return broadcastLabelsForGameCard(game, 1)[0] ?? "TV TBD";
+}
+function resolvePrimaryChannelLabel(game) {
+  const label = primaryBroadcastLabel(game);
+  if (label !== "TV TBD") return label;
+  const streamUrl = game.streamUrl?.trim();
+  if (!streamUrl) return label;
+  return deriveChannelLabelFromStreamUrl(streamUrl) ?? label;
+}
+function resolveGameChannelPresentation(game) {
+  const label = resolvePrimaryChannelLabel(game);
+  return {
+    label,
+    logoUrl: resolveChannelLogoUrl(label)
+  };
+}
+
+// ../grarf/desktop/src/lib/broadcast/gameBroadcastDisplay.ts
 function broadcastLabelsForGameCard(game, max = 6) {
   return rankBroadcastLabelsForGame(game, max);
 }
 function formatBroadcastsSubtitle(game, max = 6, sep = " \u2022 ") {
   const labels = broadcastLabelsForGameCard(game, max);
-  return labels.length > 0 ? labels.join(sep) : "TV TBD";
+  if (labels.length > 0) return labels.join(sep);
+  return resolvePrimaryChannelLabel(game);
 }
 
 // ../grarf/desktop/src/lib/gamesSpine/formatGameDisplayTime.ts
@@ -48077,11 +48139,7 @@ function resolveCommandBriefingScheduleLabel(game) {
   return formatGameDisplayTimeLocal(game);
 }
 function resolveCommandBriefingChannel(game) {
-  const label = broadcastLabelsForGameCard(game, 1)[0] ?? "TV TBD";
-  return {
-    label,
-    logoUrl: resolveChannelLogoUrl(label)
-  };
+  return resolveGameChannelPresentation(game);
 }
 function buildCommandBriefingGameCardContent(game, leagueLabel) {
   const channel = resolveCommandBriefingChannel(game);
@@ -48503,11 +48561,7 @@ function logGamesSpineRecordColumnWidth(_widthPx) {
 // ../grarf/desktop/src/lib/gamesSpine/gamesSpineChannelPresentation.ts
 init_define_import_meta_env();
 function resolveGamesSpineChannelPresentation(game) {
-  const label = broadcastLabelsForGameCard(game, 1)[0] ?? "TV TBD";
-  return {
-    label,
-    logoUrl: resolveChannelLogoUrl(label)
-  };
+  return resolveGameChannelPresentation(game);
 }
 
 // ../grarf/desktop/src/lib/gamesSpine/isStandaloneSpineEvent.ts
