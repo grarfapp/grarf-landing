@@ -60583,6 +60583,12 @@ function filterCompleteSportscapeEditorialEntries(entries) {
   return entries.filter(isCompleteSportscapeEditorialEntry);
 }
 
+// ../grarf/desktop/src/lib/sportscape/editorial/sportscapeEditorialVisibility.ts
+init_define_import_meta_env();
+function editorialEntryShowsInLeagueSection(entry) {
+  return entry.showInLeagueSection !== false;
+}
+
 // ../grarf/desktop/src/lib/sportscape/editorial/parseEditorialHighlightUrl.ts
 init_define_import_meta_env();
 function parseEditorialHighlightUrl(highlightUrl) {
@@ -60714,7 +60720,7 @@ function findMatchingEditorialEntry(article, editorialByEventId, gamesByEventId)
 function mergeSportscapeArticlesWithEditorial(params) {
   const { automatic, editorialEntries, league, gamesByEventId, gameScoresByEventId } = params;
   const completeForLeague = filterCompleteSportscapeEditorialEntries(editorialEntries).filter(
-    (entry) => entry.league === league
+    (entry) => entry.league === league && editorialEntryShowsInLeagueSection(entry)
   );
   const editorialByEventId = new Map(
     completeForLeague.map((entry) => [entry.eventId, entry])
@@ -69314,6 +69320,7 @@ function SportscapeEditorialManualAiBriefEntry({
   const [busy, setBusy] = (0, import_react134.useState)(false);
   const [error, setError] = (0, import_react134.useState)(null);
   const [lastEventId, setLastEventId] = (0, import_react134.useState)(null);
+  const [lastPublishMode, setLastPublishMode] = (0, import_react134.useState)(null);
   const leagueSuggestions = (0, import_react134.useMemo)(() => {
     const seen = /* @__PURE__ */ new Set();
     const next = [];
@@ -69347,57 +69354,74 @@ function SportscapeEditorialManualAiBriefEntry({
     const option = quickPickOptions.find((row) => row.key === value);
     if (option) setLeagueName(option.label);
   };
-  const onSubmit = async (event) => {
-    event.preventDefault();
-    setError(null);
+  const validateForm = () => {
     const trimmedLeagueName = leagueName.trim();
     const trimmedHeadline = headline.trim();
     const trimmedArticleUrl = articleUrl.trim();
     const trimmedHighlightUrl = highlightUrl.trim();
     if (!trimmedLeagueName) {
       setError("League name is required.");
-      return;
+      return null;
     }
     if (!trimmedHeadline) {
       setError("Headline is required.");
-      return;
+      return null;
     }
     if (!/^https?:\/\//i.test(trimmedArticleUrl)) {
       setError("Article URL must start with http:// or https://");
-      return;
+      return null;
     }
     const parsedRank = Number.parseInt(rank, 10);
     const resolvedRank = clampAiBriefPriorityRank(
       Number.isFinite(parsedRank) ? parsedRank : suggestedRank
     );
+    return {
+      league: trimmedLeagueName,
+      headline: trimmedHeadline,
+      articleUrl: trimmedArticleUrl,
+      highlightUrl: trimmedHighlightUrl,
+      rank: resolvedRank
+    };
+  };
+  const publish = async (mode) => {
+    setError(null);
+    const values = validateForm();
+    if (!values) return;
+    const showInLeagueSection = mode !== "aiBrief";
+    const addToAiBrief = mode !== "leagueSection";
     setBusy(true);
     try {
-      const eventId = generateManualEditorialEventId(trimmedLeagueName, existingEventIds);
+      const eventId = generateManualEditorialEventId(values.league, existingEventIds);
       const entry = await saveSportscapeEditorialEntry({
-        league: trimmedLeagueName,
+        league: values.league,
         eventId,
-        headline: trimmedHeadline,
-        articleUrl: trimmedArticleUrl,
-        highlightUrl: trimmedHighlightUrl
-      });
-      const selection = await saveAiBriefSelection({
-        eventId,
-        rank: resolvedRank
+        headline: values.headline,
+        articleUrl: values.articleUrl,
+        highlightUrl: values.highlightUrl,
+        showInLeagueSection
       });
       onEntrySaved(entry);
-      onAiBriefSelectionChange(eventId, selection);
+      if (addToAiBrief) {
+        const selection = await saveAiBriefSelection({
+          eventId,
+          rank: values.rank
+        });
+        onAiBriefSelectionChange(eventId, selection);
+      }
       setLastEventId(eventId);
+      setLastPublishMode(mode);
       clearForm();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Unable to add manual AI Brief entry.");
+      setError(err instanceof Error ? err.message : "Unable to publish manual editorial entry.");
     } finally {
       setBusy(false);
     }
   };
+  const publishModeLabel = lastPublishMode === "aiBrief" ? "AI Brief only" : lastPublishMode === "leagueSection" ? "League section only" : lastPublishMode === "both" ? "AI Brief + league section" : null;
   return /* @__PURE__ */ (0, import_jsx_runtime149.jsxs)("section", { className: "border border-ambersys/35 bg-[#040808]/70 p-4", children: [
     /* @__PURE__ */ (0, import_jsx_runtime149.jsx)("h2", { className: "font-sans text-sm text-[#d8e8e8]", children: "Manual AI Brief Entry" }),
-    /* @__PURE__ */ (0, import_jsx_runtime149.jsx)("p", { className: "mt-1 text-[11px] leading-relaxed text-textdim", children: "Type any league, tour, or event name \u2014 tennis, golf, motorsport, college sports, breaking news, and other manual picks." }),
-    /* @__PURE__ */ (0, import_jsx_runtime149.jsxs)("form", { onSubmit: (event) => void onSubmit(event), className: "mt-4 grid gap-3", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime149.jsx)("p", { className: "mt-1 text-[11px] leading-relaxed text-textdim", children: "Publish to AI Brief, a league section, or both. League name is freeform \u2014 tours, events, breaking news, and cross-sport stories." }),
+    /* @__PURE__ */ (0, import_jsx_runtime149.jsxs)("div", { className: "mt-4 grid gap-3", children: [
       /* @__PURE__ */ (0, import_jsx_runtime149.jsxs)("label", { className: "block", children: [
         /* @__PURE__ */ (0, import_jsx_runtime149.jsx)("span", { className: LABEL_CLASS, children: "LEAGUE NAME" }),
         /* @__PURE__ */ (0, import_jsx_runtime149.jsx)(
@@ -69467,8 +69491,7 @@ function SportscapeEditorialManualAiBriefEntry({
             step: 1,
             value: rank,
             onChange: (event) => setRank(event.target.value),
-            className: cn2(INPUT_CLASS, "max-w-[8rem]"),
-            required: true
+            className: cn2(INPUT_CLASS, "max-w-[8rem]")
           }
         )
       ] }),
@@ -69487,19 +69510,47 @@ function SportscapeEditorialManualAiBriefEntry({
       error ? /* @__PURE__ */ (0, import_jsx_runtime149.jsx)("p", { className: "text-[11px] text-redsys", children: error }) : null,
       lastEventId ? /* @__PURE__ */ (0, import_jsx_runtime149.jsxs)("p", { className: "text-[10px] tracking-[0.12em] text-greensys/85", children: [
         "Added as ",
-        lastEventId
+        lastEventId,
+        publishModeLabel ? ` \xB7 ${publishModeLabel}` : ""
       ] }) : null,
       /* @__PURE__ */ (0, import_jsx_runtime149.jsxs)("div", { className: "flex flex-wrap gap-2 pt-1", children: [
         /* @__PURE__ */ (0, import_jsx_runtime149.jsx)(
           "button",
           {
-            type: "submit",
+            type: "button",
             disabled: busy,
+            onClick: () => void publish("aiBrief"),
             className: cn2(
               "border border-cyansys/50 px-3 py-2 text-[10px] tracking-[0.18em] text-cyansys transition",
               "hover:bg-cyansys/10 disabled:opacity-40"
             ),
-            children: busy ? "ADDING\u2026" : "ADD TO AI BRIEF"
+            children: busy ? "PUBLISHING\u2026" : "ADD TO AI BRIEF"
+          }
+        ),
+        /* @__PURE__ */ (0, import_jsx_runtime149.jsx)(
+          "button",
+          {
+            type: "button",
+            disabled: busy,
+            onClick: () => void publish("leagueSection"),
+            className: cn2(
+              "border border-ambersys/50 px-3 py-2 text-[10px] tracking-[0.18em] text-ambersys transition",
+              "hover:bg-ambersys/10 disabled:opacity-40"
+            ),
+            children: busy ? "PUBLISHING\u2026" : "ADD TO LEAGUE SECTION"
+          }
+        ),
+        /* @__PURE__ */ (0, import_jsx_runtime149.jsx)(
+          "button",
+          {
+            type: "button",
+            disabled: busy,
+            onClick: () => void publish("both"),
+            className: cn2(
+              "border border-greensys/50 px-3 py-2 text-[10px] tracking-[0.18em] text-greensys transition",
+              "hover:bg-greensys/10 disabled:opacity-40"
+            ),
+            children: busy ? "PUBLISHING\u2026" : "ADD TO BOTH"
           }
         ),
         /* @__PURE__ */ (0, import_jsx_runtime149.jsx)(
@@ -69711,6 +69762,7 @@ function collectSportscapeAdminEventsFromWebSportscape(params) {
     }
   }
   for (const entry of params.editorialEntries) {
+    if (!editorialEntryShowsInLeagueSection(entry)) continue;
     if (seenEventIds.has(entry.eventId)) continue;
     markSeen(entry.eventId);
     events.push(adminEventFromEditorialEntry(entry, params.gamesByEventId));
@@ -70182,9 +70234,10 @@ function countAutomatedArticles(mergedByLeague) {
   }
   return total;
 }
-function useSportscapeAdminEvents() {
+function useSportscapeAdminEvents(options) {
   const liveLeagues = useLiveGamesStore((state3) => state3.leagues);
   const editorialDocument = useSportscapeEditorialDocument();
+  const editorialEntries = options?.editorialEntries !== void 0 ? options.editorialEntries : editorialDocument.entries;
   const mlbSportscapeArticles = useMlbSportscapeArticles();
   const nhlSportscapeArticles = useNhlSportscapeArticles();
   const wnbaSportscapeArticles = useWnbaSportscapeArticles();
@@ -70202,32 +70255,32 @@ function useSportscapeAdminEvents() {
     return {
       MLB: mergeSportscapeArticlesWithEditorial({
         automatic: mlbSportscapeArticles,
-        editorialEntries: editorialDocument.entries,
+        editorialEntries,
         league: "MLB",
         gamesByEventId
       }),
       NHL: mergeSportscapeArticlesWithEditorial({
         automatic: nhlSportscapeArticles,
-        editorialEntries: editorialDocument.entries,
+        editorialEntries,
         league: "NHL",
         gamesByEventId
       }),
       WNBA: mergeSportscapeArticlesWithEditorial({
         automatic: wnbaSportscapeArticles,
-        editorialEntries: editorialDocument.entries,
+        editorialEntries,
         league: "WNBA",
         gamesByEventId
       }),
       WORLD_CUP: mergeSportscapeArticlesWithEditorial({
         automatic: worldCupSportscapeArticles,
-        editorialEntries: editorialDocument.entries,
+        editorialEntries,
         league: "WORLD_CUP",
         gamesByEventId,
         gameScoresByEventId: worldCupGameScoresByEventId
       }),
       MCWS: mergeSportscapeArticlesWithEditorial({
         automatic: mcwsSportscapeArticles,
-        editorialEntries: editorialDocument.entries,
+        editorialEntries,
         league: "MCWS",
         gamesByEventId,
         gameScoresByEventId: mcwsGameScoresByEventId
@@ -70239,7 +70292,7 @@ function useSportscapeAdminEvents() {
     wnbaSportscapeArticles,
     worldCupSportscapeArticles,
     mcwsSportscapeArticles,
-    editorialDocument.entries,
+    editorialEntries,
     gamesByEventId,
     worldCupGameScoresByEventId,
     mcwsGameScoresByEventId
@@ -70247,10 +70300,10 @@ function useSportscapeAdminEvents() {
   const events = (0, import_react139.useMemo)(
     () => collectSportscapeAdminEventsFromWebSportscape({
       mergedArticlesByLeague,
-      editorialEntries: editorialDocument.entries,
+      editorialEntries,
       gamesByEventId
     }),
-    [mergedArticlesByLeague, editorialDocument.entries, gamesByEventId]
+    [mergedArticlesByLeague, editorialEntries, gamesByEventId]
   );
   const automatedArticleCount = (0, import_react139.useMemo)(
     () => countAutomatedArticles(mergedArticlesByLeague),
@@ -70279,13 +70332,6 @@ function buildAiBriefSelectionsByEventId(selections) {
 }
 function SportscapeEditorialAdminContent() {
   const updatedAt = useLiveGamesStore((state3) => state3.updatedAt);
-  const {
-    events,
-    loading: sportscapeEventsLoading,
-    operationalDateLabel,
-    operationalDateKey,
-    automatedArticleCount
-  } = useSportscapeAdminEvents();
   const [entriesByEventId, setEntriesByEventId] = (0, import_react140.useState)(
     /* @__PURE__ */ new Map()
   );
@@ -70294,6 +70340,17 @@ function SportscapeEditorialAdminContent() {
   const [aiBriefActionError, setAiBriefActionError] = (0, import_react140.useState)(null);
   const [removingLineId, setRemovingLineId] = (0, import_react140.useState)(null);
   const [clearBusy, setClearBusy] = (0, import_react140.useState)(false);
+  const editorialEntries = (0, import_react140.useMemo)(
+    () => [...entriesByEventId.values()],
+    [entriesByEventId]
+  );
+  const {
+    events,
+    loading: sportscapeEventsLoading,
+    operationalDateLabel,
+    operationalDateKey,
+    automatedArticleCount
+  } = useSportscapeAdminEvents({ editorialEntries });
   (0, import_react140.useEffect)(() => {
     void fetchSportscapeEditorialDocument().then((document2) => {
       const nextEntries = /* @__PURE__ */ new Map();
