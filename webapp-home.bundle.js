@@ -14959,7 +14959,7 @@ function ensureLiveTrackTimelineInitialized() {
 ensureLiveTrackTimelineInitialized();
 
 // webapp/home-entry.tsx
-var import_react139 = __toESM(require_react());
+var import_react140 = __toESM(require_react());
 var import_client = __toESM(require_client());
 
 // node_modules/react-router/dist/development/index.mjs
@@ -60455,6 +60455,11 @@ async function deleteAiBriefSelection(id) {
   }
   await removeAiBriefSelectionViaWorker(id);
 }
+async function clearAllAiBriefSelections(selections) {
+  for (const selection of selections) {
+    await deleteAiBriefSelection(selection.id);
+  }
+}
 
 // ../grarf/desktop/src/hooks/useSportscapeEditorialDocument.ts
 var EMPTY_DOCUMENT = {
@@ -62116,6 +62121,7 @@ function buildSportscapeEditorialAiBriefStories(document2) {
 }
 function buildAiBriefSummaryLines(params) {
   return sortAiBriefSelectionsByRank(params.selections).map((selection) => ({
+    id: selection.id,
     rank: selection.rank,
     eventId: selection.eventId,
     headline: params.headlineByEventId.get(selection.eventId)?.trim() || selection.eventId
@@ -69261,7 +69267,7 @@ function LeagueDirectoryRoutePage() {
 
 // ../grarf/desktop/src/pages/SportscapeEditorialAdminPage.tsx
 init_define_import_meta_env();
-var import_react138 = __toESM(require_react(), 1);
+var import_react139 = __toESM(require_react(), 1);
 
 // ../grarf/desktop/src/components/sportscapeEditorial/SportscapeEditorialManualAiBriefEntry.tsx
 init_define_import_meta_env();
@@ -69475,23 +69481,81 @@ function SportscapeEditorialManualAiBriefEntry({
 
 // ../grarf/desktop/src/components/sportscapeEditorial/SportscapeEditorialAiBriefSummary.tsx
 init_define_import_meta_env();
+var import_react135 = __toESM(require_react(), 1);
 var import_jsx_runtime150 = __toESM(require_jsx_runtime(), 1);
-function SportscapeEditorialAiBriefSummary({ lines }) {
+function SportscapeEditorialAiBriefSummary({
+  lines,
+  onRemoveLine,
+  onClearAll,
+  removingLineId,
+  clearBusy,
+  error
+}) {
+  const [confirmClear, setConfirmClear] = (0, import_react135.useState)(false);
+  const controlsDisabled = clearBusy || removingLineId !== null;
+  const handleClearClick = () => {
+    if (lines.length === 0) return;
+    if (!confirmClear) {
+      setConfirmClear(true);
+      return;
+    }
+    void Promise.resolve(onClearAll()).finally(() => setConfirmClear(false));
+  };
   return /* @__PURE__ */ (0, import_jsx_runtime150.jsxs)("section", { className: "border border-line/50 bg-panel2/80 p-4", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime150.jsx)("h2", { className: "text-[10px] tracking-[0.24em] text-cyansys", children: "AI BRIEF SELECTIONS" }),
-    lines.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime150.jsx)("p", { className: "mt-3 text-[11px] text-textdim", children: "No events selected for AI Brief." }) : /* @__PURE__ */ (0, import_jsx_runtime150.jsx)("ol", { className: "mt-3 space-y-2", children: lines.map((line) => /* @__PURE__ */ (0, import_jsx_runtime150.jsxs)("li", { className: "flex gap-3 text-sm text-[#d8e8e8]", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime150.jsxs)("span", { className: "w-6 shrink-0 font-mono text-[11px] text-textdim", children: [
-        line.rank,
-        "."
-      ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime150.jsx)("span", { className: "min-w-0 leading-snug", children: line.headline })
-    ] }, line.eventId)) })
+    /* @__PURE__ */ (0, import_jsx_runtime150.jsxs)("div", { className: "flex flex-wrap items-start justify-between gap-3", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime150.jsx)("h2", { className: "text-[10px] tracking-[0.24em] text-cyansys", children: "AI BRIEF SELECTIONS" }),
+      lines.length > 0 ? /* @__PURE__ */ (0, import_jsx_runtime150.jsx)(
+        "button",
+        {
+          type: "button",
+          disabled: controlsDisabled,
+          onClick: handleClearClick,
+          className: cn2(
+            "border px-3 py-1.5 text-[10px] tracking-[0.16em] transition disabled:opacity-40",
+            confirmClear ? "border-redsys/70 bg-redsys/10 text-redsys hover:bg-redsys/15" : "border-redsys/45 text-redsys hover:border-redsys/70 hover:bg-redsys/10"
+          ),
+          children: clearBusy ? "CLEARING\u2026" : confirmClear ? "CONFIRM CLEAR AI BRIEF" : "CLEAR AI BRIEF"
+        }
+      ) : null
+    ] }),
+    confirmClear && !clearBusy ? /* @__PURE__ */ (0, import_jsx_runtime150.jsx)("p", { className: "mt-2 text-[11px] text-redsys/90", children: "Remove all AI Brief selections for this date?" }) : null,
+    lines.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime150.jsx)("p", { className: "mt-3 text-[11px] text-textdim", children: "No AI Brief selections" }) : /* @__PURE__ */ (0, import_jsx_runtime150.jsx)("ol", { className: "mt-3 space-y-2", children: lines.map((line) => /* @__PURE__ */ (0, import_jsx_runtime150.jsxs)(
+      "li",
+      {
+        className: "flex items-start gap-2 text-sm text-[#d8e8e8]",
+        children: [
+          /* @__PURE__ */ (0, import_jsx_runtime150.jsxs)("span", { className: "w-6 shrink-0 pt-0.5 font-mono text-[11px] text-textdim", children: [
+            line.rank,
+            "."
+          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime150.jsx)("span", { className: "min-w-0 flex-1 leading-snug", children: line.headline }),
+          /* @__PURE__ */ (0, import_jsx_runtime150.jsx)(
+            "button",
+            {
+              type: "button",
+              title: "Remove from AI Brief",
+              "aria-label": "Remove from AI Brief",
+              disabled: controlsDisabled,
+              onClick: () => void onRemoveLine(line),
+              className: cn2(
+                "shrink-0 rounded border border-line/50 p-1 text-textdim transition",
+                "hover:border-redsys/50 hover:bg-redsys/10 hover:text-redsys",
+                "disabled:opacity-40"
+              ),
+              children: /* @__PURE__ */ (0, import_jsx_runtime150.jsx)(X2, { className: "h-3.5 w-3.5", "aria-hidden": true })
+            }
+          )
+        ]
+      },
+      line.id
+    )) }),
+    error ? /* @__PURE__ */ (0, import_jsx_runtime150.jsx)("p", { className: "mt-3 text-[11px] text-redsys", children: error }) : null
   ] });
 }
 
 // ../grarf/desktop/src/components/sportscapeEditorial/SportscapeEditorialLeagueSection.tsx
 init_define_import_meta_env();
-var import_react136 = __toESM(require_react(), 1);
+var import_react137 = __toESM(require_react(), 1);
 
 // ../grarf/desktop/src/lib/sportscape/editorial/sportscapeEditorialHighlightRegistry.ts
 init_define_import_meta_env();
@@ -69559,7 +69623,7 @@ function getSportscapeEditorialHighlightSource(league) {
 
 // ../grarf/desktop/src/components/sportscapeEditorial/SportscapeEditorialEventRow.tsx
 init_define_import_meta_env();
-var import_react135 = __toESM(require_react(), 1);
+var import_react136 = __toESM(require_react(), 1);
 var import_jsx_runtime151 = __toESM(require_jsx_runtime(), 1);
 function SportscapeEditorialEventRow({
   event,
@@ -69569,27 +69633,27 @@ function SportscapeEditorialEventRow({
   onSaved,
   onAiBriefSelectionChange
 }) {
-  const [headline, setHeadline] = (0, import_react135.useState)(existing?.headline ?? "");
-  const [articleUrl, setArticleUrl] = (0, import_react135.useState)(existing?.articleUrl ?? "");
-  const [highlightUrl, setHighlightUrl] = (0, import_react135.useState)(existing?.highlightUrl ?? "");
-  const [includeInAiBrief, setIncludeInAiBrief] = (0, import_react135.useState)(Boolean(aiBriefSelection));
-  const [rank, setRank] = (0, import_react135.useState)(String(aiBriefSelection?.rank ?? suggestedRank));
-  const [busy, setBusy] = (0, import_react135.useState)(false);
-  const [aiBriefBusy, setAiBriefBusy] = (0, import_react135.useState)(false);
-  const [error, setError] = (0, import_react135.useState)(null);
-  const [aiBriefError, setAiBriefError] = (0, import_react135.useState)(null);
-  const [savedAt, setSavedAt] = (0, import_react135.useState)(existing?.updatedAt ?? null);
-  (0, import_react135.useEffect)(() => {
+  const [headline, setHeadline] = (0, import_react136.useState)(existing?.headline ?? "");
+  const [articleUrl, setArticleUrl] = (0, import_react136.useState)(existing?.articleUrl ?? "");
+  const [highlightUrl, setHighlightUrl] = (0, import_react136.useState)(existing?.highlightUrl ?? "");
+  const [includeInAiBrief, setIncludeInAiBrief] = (0, import_react136.useState)(Boolean(aiBriefSelection));
+  const [rank, setRank] = (0, import_react136.useState)(String(aiBriefSelection?.rank ?? suggestedRank));
+  const [busy, setBusy] = (0, import_react136.useState)(false);
+  const [aiBriefBusy, setAiBriefBusy] = (0, import_react136.useState)(false);
+  const [error, setError] = (0, import_react136.useState)(null);
+  const [aiBriefError, setAiBriefError] = (0, import_react136.useState)(null);
+  const [savedAt, setSavedAt] = (0, import_react136.useState)(existing?.updatedAt ?? null);
+  (0, import_react136.useEffect)(() => {
     setHeadline(existing?.headline ?? "");
     setArticleUrl(existing?.articleUrl ?? "");
     setHighlightUrl(existing?.highlightUrl ?? "");
     setSavedAt(existing?.updatedAt ?? null);
   }, [existing?.id, existing?.updatedAt, existing?.headline, existing?.articleUrl, existing?.highlightUrl]);
-  (0, import_react135.useEffect)(() => {
+  (0, import_react136.useEffect)(() => {
     setIncludeInAiBrief(Boolean(aiBriefSelection));
     setRank(String(aiBriefSelection?.rank ?? suggestedRank));
   }, [aiBriefSelection?.id, aiBriefSelection?.rank, suggestedRank]);
-  const dirty = (0, import_react135.useMemo)(
+  const dirty = (0, import_react136.useMemo)(
     () => headline !== (existing?.headline ?? "") || articleUrl !== (existing?.articleUrl ?? "") || highlightUrl !== (existing?.highlightUrl ?? ""),
     [headline, articleUrl, highlightUrl, existing]
   );
@@ -69786,12 +69850,12 @@ function SportscapeEditorialLeagueSection({
   onEntrySaved,
   onAiBriefSelectionChange
 }) {
-  const [expanded, setExpanded] = (0, import_react136.useState)(
+  const [expanded, setExpanded] = (0, import_react137.useState)(
     () => !SPORTSCAPE_EDITORIAL_LEAGUES_COLLAPSED_BY_DEFAULT.has(league)
   );
   const highlightSource = getSportscapeEditorialHighlightSource(league);
   const label = SPORTSCAPE_EDITORIAL_LEAGUE_LABEL[league];
-  const highlightLabel = (0, import_react136.useMemo)(() => {
+  const highlightLabel = (0, import_react137.useMemo)(() => {
     try {
       const host = new URL(highlightSource.highlightsUrl).hostname.replace(/^www\./, "");
       if (host.includes("youtube")) return `${label} YouTube`;
@@ -69853,13 +69917,13 @@ function SportscapeEditorialLeagueSection({
 
 // ../grarf/desktop/src/components/sportscapeEditorial/SportscapeEditorialPasswordGate.tsx
 init_define_import_meta_env();
-var import_react137 = __toESM(require_react(), 1);
+var import_react138 = __toESM(require_react(), 1);
 var import_jsx_runtime153 = __toESM(require_jsx_runtime(), 1);
 function SportscapeEditorialPasswordGate({ children }) {
-  const [authed, setAuthed] = (0, import_react137.useState)(() => isSportscapeAdminAuthed());
-  const [password, setPassword] = (0, import_react137.useState)("");
-  const [error, setError] = (0, import_react137.useState)(null);
-  const [busy, setBusy] = (0, import_react137.useState)(false);
+  const [authed, setAuthed] = (0, import_react138.useState)(() => isSportscapeAdminAuthed());
+  const [password, setPassword] = (0, import_react138.useState)("");
+  const [error, setError] = (0, import_react138.useState)(null);
+  const [busy, setBusy] = (0, import_react138.useState)(false);
   const onSubmit = async (event) => {
     event.preventDefault();
     setError(null);
@@ -69927,12 +69991,15 @@ function SportscapeEditorialAdminContent() {
   const leagues = useLiveGamesStore((state3) => state3.leagues);
   const updatedAt = useLiveGamesStore((state3) => state3.updatedAt);
   const retainedById = useRecentFinalizedGamesStore((state3) => state3.byId);
-  const [entriesByEventId, setEntriesByEventId] = (0, import_react138.useState)(
+  const [entriesByEventId, setEntriesByEventId] = (0, import_react139.useState)(
     /* @__PURE__ */ new Map()
   );
-  const [aiBriefSelectionsByEventId, setAiBriefSelectionsByEventId] = (0, import_react138.useState)(/* @__PURE__ */ new Map());
-  const [loadError, setLoadError] = (0, import_react138.useState)(null);
-  (0, import_react138.useEffect)(() => {
+  const [aiBriefSelectionsByEventId, setAiBriefSelectionsByEventId] = (0, import_react139.useState)(/* @__PURE__ */ new Map());
+  const [loadError, setLoadError] = (0, import_react139.useState)(null);
+  const [aiBriefActionError, setAiBriefActionError] = (0, import_react139.useState)(null);
+  const [removingLineId, setRemovingLineId] = (0, import_react139.useState)(null);
+  const [clearBusy, setClearBusy] = (0, import_react139.useState)(false);
+  (0, import_react139.useEffect)(() => {
     void fetchSportscapeEditorialDocument().then((document2) => {
       const nextEntries = /* @__PURE__ */ new Map();
       for (const entry of document2.entries) {
@@ -69944,19 +70011,19 @@ function SportscapeEditorialAdminContent() {
       setLoadError(err instanceof Error ? err.message : "Unable to load editorial data");
     });
   }, []);
-  const events = (0, import_react138.useMemo)(
+  const events = (0, import_react139.useMemo)(
     () => collectFinalizedSportscapeEditorialEventsFromGamesSpine({
       liveLeagues: leagues,
       getSupplementalFinalsForLeague: (league) => useRecentFinalizedGamesStore.getState().getRetainedForLeague(league)
     }),
     [leagues, retainedById]
   );
-  const grouped = (0, import_react138.useMemo)(() => groupSportscapeEditorialEventsByLeague(events), [events]);
-  const suggestedRank = (0, import_react138.useMemo)(
+  const grouped = (0, import_react139.useMemo)(() => groupSportscapeEditorialEventsByLeague(events), [events]);
+  const suggestedRank = (0, import_react139.useMemo)(
     () => suggestNextAiBriefRank(aiBriefSelectionsByEventId.values()),
     [aiBriefSelectionsByEventId]
   );
-  const headlineByEventId = (0, import_react138.useMemo)(() => {
+  const headlineByEventId = (0, import_react139.useMemo)(() => {
     const next = /* @__PURE__ */ new Map();
     for (const event of events) {
       next.set(
@@ -69970,11 +70037,11 @@ function SportscapeEditorialAdminContent() {
     }
     return next;
   }, [events, entriesByEventId]);
-  const existingEditorialEventIds = (0, import_react138.useMemo)(
+  const existingEditorialEventIds = (0, import_react139.useMemo)(
     () => [...entriesByEventId.keys()],
     [entriesByEventId]
   );
-  const aiBriefSummaryLines = (0, import_react138.useMemo)(
+  const aiBriefSummaryLines = (0, import_react139.useMemo)(
     () => buildAiBriefSummaryLines({
       selections: [...aiBriefSelectionsByEventId.values()],
       headlineByEventId
@@ -69998,6 +70065,41 @@ function SportscapeEditorialAdminContent() {
       next.set(selection.eventId, selection);
       return next;
     });
+  };
+  const onRemoveAiBriefLine = async (line) => {
+    const previous = aiBriefSelectionsByEventId.get(line.eventId);
+    if (!previous) return;
+    setAiBriefActionError(null);
+    setRemovingLineId(line.id);
+    onAiBriefSelectionChange(line.eventId, null);
+    try {
+      await deleteAiBriefSelection(line.id);
+    } catch (err) {
+      onAiBriefSelectionChange(line.eventId, previous);
+      setAiBriefActionError(
+        err instanceof Error ? err.message : "Unable to remove AI Brief selection"
+      );
+    } finally {
+      setRemovingLineId(null);
+    }
+  };
+  const onClearAllAiBriefSelections = async () => {
+    const snapshot = new Map(aiBriefSelectionsByEventId);
+    const selections = [...snapshot.values()];
+    if (selections.length === 0) return;
+    setAiBriefActionError(null);
+    setClearBusy(true);
+    setAiBriefSelectionsByEventId(/* @__PURE__ */ new Map());
+    try {
+      await clearAllAiBriefSelections(selections);
+    } catch (err) {
+      setAiBriefSelectionsByEventId(snapshot);
+      setAiBriefActionError(
+        err instanceof Error ? err.message : "Unable to clear AI Brief selections"
+      );
+    } finally {
+      setClearBusy(false);
+    }
   };
   return /* @__PURE__ */ (0, import_jsx_runtime154.jsxs)("div", { className: "min-h-screen bg-[#020404] text-[#d8e8e8]", children: [
     /* @__PURE__ */ (0, import_jsx_runtime154.jsx)(LiveGamesBridge, {}),
@@ -70023,7 +70125,17 @@ function SportscapeEditorialAdminContent() {
           onAiBriefSelectionChange: (eventId, selection) => onAiBriefSelectionChange(eventId, selection)
         }
       ),
-      /* @__PURE__ */ (0, import_jsx_runtime154.jsx)(SportscapeEditorialAiBriefSummary, { lines: aiBriefSummaryLines }),
+      /* @__PURE__ */ (0, import_jsx_runtime154.jsx)(
+        SportscapeEditorialAiBriefSummary,
+        {
+          lines: aiBriefSummaryLines,
+          onRemoveLine: onRemoveAiBriefLine,
+          onClearAll: onClearAllAiBriefSelections,
+          removingLineId,
+          clearBusy,
+          error: aiBriefActionError
+        }
+      ),
       SPORTSCAPE_EDITORIAL_LEAGUE_DISPLAY_ORDER.map((league) => /* @__PURE__ */ (0, import_jsx_runtime154.jsx)(
         SportscapeEditorialLeagueSection,
         {
@@ -70041,7 +70153,7 @@ function SportscapeEditorialAdminContent() {
   ] });
 }
 function SportscapeEditorialAdminPage() {
-  (0, import_react138.useEffect)(() => {
+  (0, import_react139.useEffect)(() => {
     const root = document.getElementById("grarf-web-root");
     if (!root) return;
     const previousClassName = root.className;
@@ -70058,7 +70170,7 @@ function SportscapeEditorialAdminPage() {
 var import_jsx_runtime155 = __toESM(require_jsx_runtime());
 var reactRoot = null;
 function IntelligenceSyncBridge() {
-  (0, import_react139.useEffect)(() => bindIntelligenceStoreUpdates(), []);
+  (0, import_react140.useEffect)(() => bindIntelligenceStoreUpdates(), []);
   return null;
 }
 var appShellRouteElements = /* @__PURE__ */ (0, import_jsx_runtime155.jsxs)(import_jsx_runtime155.Fragment, { children: [
@@ -70092,7 +70204,7 @@ function mountWebHome(container) {
     reactRoot = (0, import_client.createRoot)(container);
   }
   reactRoot.render(
-    /* @__PURE__ */ (0, import_jsx_runtime155.jsx)(import_react139.StrictMode, { children: /* @__PURE__ */ (0, import_jsx_runtime155.jsx)(BrowserRouter, { children: /* @__PURE__ */ (0, import_jsx_runtime155.jsx)(WebHomeApp, {}) }) })
+    /* @__PURE__ */ (0, import_jsx_runtime155.jsx)(import_react140.StrictMode, { children: /* @__PURE__ */ (0, import_jsx_runtime155.jsx)(BrowserRouter, { children: /* @__PURE__ */ (0, import_jsx_runtime155.jsx)(WebHomeApp, {}) }) })
   );
 }
 var autoRoot = document.getElementById("grarf-web-root");
