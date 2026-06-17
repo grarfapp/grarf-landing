@@ -14959,7 +14959,7 @@ function ensureLiveTrackTimelineInitialized() {
 ensureLiveTrackTimelineInitialized();
 
 // webapp/home-entry.tsx
-var import_react140 = __toESM(require_react());
+var import_react141 = __toESM(require_react());
 var import_client = __toESM(require_client());
 
 // node_modules/react-router/dist/development/index.mjs
@@ -59036,44 +59036,6 @@ init_define_import_meta_env();
 
 // ../grarf/desktop/src/lib/sportscape/editorial/collectFinalizedSportscapeEditorialEventsFromGamesSpine.ts
 init_define_import_meta_env();
-function collectFinalizedSportscapeEditorialEventsFromGamesSpine(input) {
-  const now = input.now ?? /* @__PURE__ */ new Date();
-  const mergedLiveLeagues = mergeOperationalLeagueGames(input.liveLeagues);
-  const seenEventIds = /* @__PURE__ */ new Set();
-  const events = [];
-  for (const league of GAMES_COLUMN_LEAGUE_ORDER) {
-    const supplementalFinals = mergeCatchUpSupplementalFinals(
-      input.getSupplementalFinalsForLeague(league)
-    );
-    const games = mergedLiveLeagues[league] ?? [];
-    const spineSlate = buildGamesSpineOperationalSlate(
-      games,
-      supplementalFinals,
-      "CATCH_UP",
-      now
-    );
-    const spineFinals = spineSlate.filter((game) => isSpineFinalizedGame(game));
-    for (const game of spineFinals) {
-      const editorialLeague = mapGrarfLeagueToEditorialLeague(game.league);
-      if (!editorialLeague) continue;
-      const eventId = resolveSportscapeEditorialEventId(game);
-      if (seenEventIds.has(eventId)) continue;
-      seenEventIds.add(eventId);
-      events.push({
-        eventId,
-        title: resolveSportscapeEditorialEventTitle(game),
-        league: editorialLeague,
-        game
-      });
-    }
-  }
-  events.sort((a2, b2) => {
-    const leagueDelta = SPORTSCAPE_EDITORIAL_LEAGUE_DISPLAY_ORDER.indexOf(a2.league) - SPORTSCAPE_EDITORIAL_LEAGUE_DISPLAY_ORDER.indexOf(b2.league);
-    if (leagueDelta !== 0) return leagueDelta;
-    return a2.title.localeCompare(b2.title);
-  });
-  return events;
-}
 
 // ../grarf/desktop/src/lib/sportscape/editorial/sportscapeEditorialLeagueMapping.ts
 var SPORTSCAPE_EDITORIAL_SOURCE_LEAGUES = {
@@ -59134,10 +59096,6 @@ for (const [editorialLeague, source] of Object.entries(SPORTSCAPE_EDITORIAL_SOUR
   for (const grarfLeague of keys) {
     GRARF_TO_EDITORIAL.set(grarfLeague, editorialLeague);
   }
-}
-function mapGrarfLeagueToEditorialLeague(league) {
-  if (!league) return null;
-  return GRARF_TO_EDITORIAL.get(league) ?? null;
 }
 function resolveSportscapeEditorialEventId(game) {
   const canonical = game.metadata?.canonicalEvent?.eventId?.trim();
@@ -69267,7 +69225,7 @@ function LeagueDirectoryRoutePage() {
 
 // ../grarf/desktop/src/pages/SportscapeEditorialAdminPage.tsx
 init_define_import_meta_env();
-var import_react139 = __toESM(require_react(), 1);
+var import_react140 = __toESM(require_react(), 1);
 
 // ../grarf/desktop/src/components/sportscapeEditorial/SportscapeEditorialManualAiBriefEntry.tsx
 init_define_import_meta_env();
@@ -69557,6 +69515,140 @@ function SportscapeEditorialAiBriefSummary({
 init_define_import_meta_env();
 var import_react137 = __toESM(require_react(), 1);
 
+// ../grarf/desktop/src/lib/sportscape/editorial/collectSportscapeAdminEventsFromWebSportscape.ts
+init_define_import_meta_env();
+function collectArticleEventIds(article, gamesByEventId) {
+  const ids = /* @__PURE__ */ new Set();
+  if (article.eventId?.trim()) ids.add(article.eventId.trim());
+  if (article.gamePk != null) {
+    for (const game of gamesByEventId.values()) {
+      if (game.gamePk !== article.gamePk) continue;
+      for (const raw of [
+        game.metadata?.canonicalEvent?.eventId,
+        game.espnEventId,
+        game.externalIds?.espn,
+        game.id,
+        game.grarfGameId
+      ]) {
+        const key2 = String(raw ?? "").trim();
+        if (key2) ids.add(key2);
+      }
+    }
+    ids.add(String(article.gamePk));
+  }
+  return [...ids];
+}
+function resolveGameForArticle(article, gamesByEventId) {
+  for (const eventId of collectArticleEventIds(article, gamesByEventId)) {
+    const game = gamesByEventId.get(eventId);
+    if (game) return game;
+  }
+  return void 0;
+}
+function buildGameFromArticle(article, league, eventId) {
+  const grarfLeague = mapEditorialLeagueToGrarfLeague(league);
+  const espnEventId = article.eventId?.trim() || void 0;
+  return {
+    id: espnEventId ? `espn-${grarfLeague}-${espnEventId}` : `sportscape-${grarfLeague}-${eventId}`,
+    grarfGameId: espnEventId ? `espn-${grarfLeague}-${espnEventId}` : `sportscape-${grarfLeague}-${eventId}`,
+    league: grarfLeague,
+    awayTeam: article.awayTeamDisplay ?? article.awayTeam ?? "Away",
+    homeTeam: article.homeTeamDisplay ?? article.homeTeam ?? "Home",
+    awayScore: article.awayScore,
+    homeScore: article.homeScore,
+    status: "final",
+    gamePk: article.gamePk,
+    espnEventId,
+    externalIds: espnEventId ? { espn: espnEventId, mlb: null } : void 0,
+    time: ""
+  };
+}
+function resolveArticleTitle(article, game) {
+  const away = article.awayTeamDisplay ?? article.awayTeam ?? game.awayTeam;
+  const home = article.homeTeamDisplay ?? article.homeTeam ?? game.homeTeam;
+  if (away?.trim() && home?.trim()) return `${away} vs ${home}`;
+  if (article.headline.trim()) return article.headline.trim();
+  return resolveSportscapeEditorialEventTitle(game);
+}
+function adminEventFromArticle(article, league, gamesByEventId) {
+  const alternateEventIds = collectArticleEventIds(article, gamesByEventId);
+  const game = resolveGameForArticle(article, gamesByEventId);
+  const eventId = game ? resolveSportscapeEditorialEventId(game) : alternateEventIds[0] ?? `${league.toLowerCase()}-${article.headline.trim().slice(0, 48)}`;
+  const resolvedGame = game ?? buildGameFromArticle(article, league, eventId);
+  return {
+    eventId,
+    alternateEventIds: alternateEventIds.filter((id) => id !== eventId),
+    title: resolveArticleTitle(article, resolvedGame),
+    league,
+    game: resolvedGame,
+    sportscapeDefaults: {
+      headline: article.headline.trim(),
+      articleUrl: article.url?.trim() || void 0,
+      highlightUrl: article.highlightVideoUrl?.trim() || void 0
+    }
+  };
+}
+function adminEventFromEditorialEntry(entry, gamesByEventId) {
+  const game = gamesByEventId.get(entry.eventId) ?? buildGameFromArticle(
+    {
+      headline: entry.headline,
+      url: entry.articleUrl,
+      homeTeam: "Home",
+      awayTeam: "Away"
+    },
+    entry.league,
+    entry.eventId
+  );
+  return {
+    eventId: entry.eventId,
+    title: entry.headline.trim() || resolveSportscapeEditorialEventTitle(game),
+    league: entry.league,
+    game: { ...game, id: entry.eventId, grarfGameId: entry.eventId },
+    sportscapeDefaults: {
+      headline: entry.headline.trim(),
+      articleUrl: entry.articleUrl.trim() || void 0,
+      highlightUrl: entry.highlightUrl.trim() || void 0
+    }
+  };
+}
+function collectSportscapeAdminEventsFromWebSportscape(params) {
+  const seenEventIds = /* @__PURE__ */ new Set();
+  const events = [];
+  const markSeen = (eventId) => {
+    seenEventIds.add(eventId);
+  };
+  for (const league of AUTOMATED_SPORTSCAPE_EDITORIAL_LEAGUES) {
+    const articles = params.mergedArticlesByLeague[league] ?? [];
+    for (const article of articles) {
+      const event = adminEventFromArticle(article, league, params.gamesByEventId);
+      if (seenEventIds.has(event.eventId)) continue;
+      markSeen(event.eventId);
+      for (const alt of event.alternateEventIds ?? []) markSeen(alt);
+      events.push(event);
+    }
+  }
+  for (const entry of params.editorialEntries) {
+    if (seenEventIds.has(entry.eventId)) continue;
+    markSeen(entry.eventId);
+    events.push(adminEventFromEditorialEntry(entry, params.gamesByEventId));
+  }
+  events.sort((a2, b2) => {
+    const leagueDelta = SPORTSCAPE_EDITORIAL_LEAGUE_DISPLAY_ORDER.indexOf(a2.league) - SPORTSCAPE_EDITORIAL_LEAGUE_DISPLAY_ORDER.indexOf(b2.league);
+    if (leagueDelta !== 0) return leagueDelta;
+    return a2.title.localeCompare(b2.title);
+  });
+  return events;
+}
+function resolveEditorialEntryForAdminEvent(event, entriesByEventId) {
+  const direct = entriesByEventId.get(event.eventId);
+  if (direct) return direct;
+  for (const alt of event.alternateEventIds ?? []) {
+    const match = entriesByEventId.get(alt);
+    if (match) return match;
+  }
+  return void 0;
+}
+
 // ../grarf/desktop/src/lib/sportscape/editorial/sportscapeEditorialHighlightRegistry.ts
 init_define_import_meta_env();
 var SPORTSCAPE_EDITORIAL_HIGHLIGHT_REGISTRY = {
@@ -69633,9 +69725,16 @@ function SportscapeEditorialEventRow({
   onSaved,
   onAiBriefSelectionChange
 }) {
-  const [headline, setHeadline] = (0, import_react136.useState)(existing?.headline ?? "");
-  const [articleUrl, setArticleUrl] = (0, import_react136.useState)(existing?.articleUrl ?? "");
-  const [highlightUrl, setHighlightUrl] = (0, import_react136.useState)(existing?.highlightUrl ?? "");
+  const defaults = event.sportscapeDefaults;
+  const [headline, setHeadline] = (0, import_react136.useState)(
+    existing?.headline ?? defaults?.headline ?? ""
+  );
+  const [articleUrl, setArticleUrl] = (0, import_react136.useState)(
+    existing?.articleUrl ?? defaults?.articleUrl ?? ""
+  );
+  const [highlightUrl, setHighlightUrl] = (0, import_react136.useState)(
+    existing?.highlightUrl ?? defaults?.highlightUrl ?? ""
+  );
   const [includeInAiBrief, setIncludeInAiBrief] = (0, import_react136.useState)(Boolean(aiBriefSelection));
   const [rank, setRank] = (0, import_react136.useState)(String(aiBriefSelection?.rank ?? suggestedRank));
   const [busy, setBusy] = (0, import_react136.useState)(false);
@@ -69644,18 +69743,27 @@ function SportscapeEditorialEventRow({
   const [aiBriefError, setAiBriefError] = (0, import_react136.useState)(null);
   const [savedAt, setSavedAt] = (0, import_react136.useState)(existing?.updatedAt ?? null);
   (0, import_react136.useEffect)(() => {
-    setHeadline(existing?.headline ?? "");
-    setArticleUrl(existing?.articleUrl ?? "");
-    setHighlightUrl(existing?.highlightUrl ?? "");
+    setHeadline(existing?.headline ?? defaults?.headline ?? "");
+    setArticleUrl(existing?.articleUrl ?? defaults?.articleUrl ?? "");
+    setHighlightUrl(existing?.highlightUrl ?? defaults?.highlightUrl ?? "");
     setSavedAt(existing?.updatedAt ?? null);
-  }, [existing?.id, existing?.updatedAt, existing?.headline, existing?.articleUrl, existing?.highlightUrl]);
+  }, [
+    existing?.id,
+    existing?.updatedAt,
+    existing?.headline,
+    existing?.articleUrl,
+    existing?.highlightUrl,
+    defaults?.headline,
+    defaults?.articleUrl,
+    defaults?.highlightUrl
+  ]);
   (0, import_react136.useEffect)(() => {
     setIncludeInAiBrief(Boolean(aiBriefSelection));
     setRank(String(aiBriefSelection?.rank ?? suggestedRank));
   }, [aiBriefSelection?.id, aiBriefSelection?.rank, suggestedRank]);
   const dirty = (0, import_react136.useMemo)(
-    () => headline !== (existing?.headline ?? "") || articleUrl !== (existing?.articleUrl ?? "") || highlightUrl !== (existing?.highlightUrl ?? ""),
-    [headline, articleUrl, highlightUrl, existing]
+    () => headline !== (existing?.headline ?? defaults?.headline ?? "") || articleUrl !== (existing?.articleUrl ?? defaults?.articleUrl ?? "") || highlightUrl !== (existing?.highlightUrl ?? defaults?.highlightUrl ?? ""),
+    [headline, articleUrl, highlightUrl, existing, defaults]
   );
   const onSave = async () => {
     setBusy(true);
@@ -69898,11 +70006,11 @@ function SportscapeEditorialLeagueSection({
       )
     ] }),
     expanded ? /* @__PURE__ */ (0, import_jsx_runtime152.jsxs)("div", { className: "space-y-3 p-4", children: [
-      events.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime152.jsx)("p", { className: "text-[11px] text-textdim", children: "No finalized events." }) : events.map((event) => /* @__PURE__ */ (0, import_jsx_runtime152.jsx)(
+      events.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime152.jsx)("p", { className: "text-[11px] text-textdim", children: "No Sportscape games for this date." }) : events.map((event) => /* @__PURE__ */ (0, import_jsx_runtime152.jsx)(
         SportscapeEditorialEventRow,
         {
           event,
-          existing: entriesByEventId.get(event.eventId),
+          existing: resolveEditorialEntryForAdminEvent(event, entriesByEventId),
           aiBriefSelection: aiBriefSelectionsByEventId.get(event.eventId),
           suggestedRank,
           onSaved: onEntrySaved,
@@ -69978,6 +70086,102 @@ function SportscapeEditorialPasswordGate({ children }) {
   ) });
 }
 
+// ../grarf/desktop/src/hooks/useSportscapeAdminEvents.ts
+init_define_import_meta_env();
+var import_react139 = __toESM(require_react(), 1);
+function countAutomatedArticles(mergedByLeague) {
+  let total = 0;
+  for (const league of AUTOMATED_SPORTSCAPE_EDITORIAL_LEAGUES) {
+    total += mergedByLeague[league]?.length ?? 0;
+  }
+  return total;
+}
+function useSportscapeAdminEvents() {
+  const liveLeagues = useLiveGamesStore((state3) => state3.leagues);
+  const editorialDocument = useSportscapeEditorialDocument();
+  const mlbSportscapeArticles = useMlbSportscapeArticles();
+  const nhlSportscapeArticles = useNhlSportscapeArticles();
+  const wnbaSportscapeArticles = useWnbaSportscapeArticles();
+  const worldCupSportscapeArticles = useWorldCupSportscapeArticles();
+  const worldCupGameScoresByEventId = useWorldCupSportscapeGameScores(liveLeagues);
+  const mcwsSportscapeArticles = useMcwsSportscapeArticles();
+  const mcwsGameScoresByEventId = useMcwsSportscapeGameScores();
+  const [feedsSettled, setFeedsSettled] = (0, import_react139.useState)(false);
+  (0, import_react139.useEffect)(() => {
+    const timer = window.setTimeout(() => setFeedsSettled(true), 5e3);
+    return () => window.clearTimeout(timer);
+  }, []);
+  const gamesByEventId = (0, import_react139.useMemo)(() => buildEventIdGameIndex(liveLeagues), [liveLeagues]);
+  const mergedArticlesByLeague = (0, import_react139.useMemo)(() => {
+    return {
+      MLB: mergeSportscapeArticlesWithEditorial({
+        automatic: mlbSportscapeArticles,
+        editorialEntries: editorialDocument.entries,
+        league: "MLB",
+        gamesByEventId
+      }),
+      NHL: mergeSportscapeArticlesWithEditorial({
+        automatic: nhlSportscapeArticles,
+        editorialEntries: editorialDocument.entries,
+        league: "NHL",
+        gamesByEventId
+      }),
+      WNBA: mergeSportscapeArticlesWithEditorial({
+        automatic: wnbaSportscapeArticles,
+        editorialEntries: editorialDocument.entries,
+        league: "WNBA",
+        gamesByEventId
+      }),
+      WORLD_CUP: mergeSportscapeArticlesWithEditorial({
+        automatic: worldCupSportscapeArticles,
+        editorialEntries: editorialDocument.entries,
+        league: "WORLD_CUP",
+        gamesByEventId,
+        gameScoresByEventId: worldCupGameScoresByEventId
+      }),
+      MCWS: mergeSportscapeArticlesWithEditorial({
+        automatic: mcwsSportscapeArticles,
+        editorialEntries: editorialDocument.entries,
+        league: "MCWS",
+        gamesByEventId,
+        gameScoresByEventId: mcwsGameScoresByEventId
+      })
+    };
+  }, [
+    mlbSportscapeArticles,
+    nhlSportscapeArticles,
+    wnbaSportscapeArticles,
+    worldCupSportscapeArticles,
+    mcwsSportscapeArticles,
+    editorialDocument.entries,
+    gamesByEventId,
+    worldCupGameScoresByEventId,
+    mcwsGameScoresByEventId
+  ]);
+  const events = (0, import_react139.useMemo)(
+    () => collectSportscapeAdminEventsFromWebSportscape({
+      mergedArticlesByLeague,
+      editorialEntries: editorialDocument.entries,
+      gamesByEventId
+    }),
+    [mergedArticlesByLeague, editorialDocument.entries, gamesByEventId]
+  );
+  const automatedArticleCount = (0, import_react139.useMemo)(
+    () => countAutomatedArticles(mergedArticlesByLeague),
+    [mergedArticlesByLeague]
+  );
+  const loading = !feedsSettled && events.length === 0 && automatedArticleCount === 0;
+  const operationalDateKey = getYesterdayDateString();
+  const operationalDateLabel = formatSportscapeCatchupBriefingTitle();
+  return {
+    events,
+    loading,
+    operationalDateKey,
+    operationalDateLabel,
+    automatedArticleCount
+  };
+}
+
 // ../grarf/desktop/src/pages/SportscapeEditorialAdminPage.tsx
 var import_jsx_runtime154 = __toESM(require_jsx_runtime(), 1);
 function buildAiBriefSelectionsByEventId(selections) {
@@ -69988,18 +70192,23 @@ function buildAiBriefSelectionsByEventId(selections) {
   return next;
 }
 function SportscapeEditorialAdminContent() {
-  const leagues = useLiveGamesStore((state3) => state3.leagues);
   const updatedAt = useLiveGamesStore((state3) => state3.updatedAt);
-  const retainedById = useRecentFinalizedGamesStore((state3) => state3.byId);
-  const [entriesByEventId, setEntriesByEventId] = (0, import_react139.useState)(
+  const {
+    events,
+    loading: sportscapeEventsLoading,
+    operationalDateLabel,
+    operationalDateKey,
+    automatedArticleCount
+  } = useSportscapeAdminEvents();
+  const [entriesByEventId, setEntriesByEventId] = (0, import_react140.useState)(
     /* @__PURE__ */ new Map()
   );
-  const [aiBriefSelectionsByEventId, setAiBriefSelectionsByEventId] = (0, import_react139.useState)(/* @__PURE__ */ new Map());
-  const [loadError, setLoadError] = (0, import_react139.useState)(null);
-  const [aiBriefActionError, setAiBriefActionError] = (0, import_react139.useState)(null);
-  const [removingLineId, setRemovingLineId] = (0, import_react139.useState)(null);
-  const [clearBusy, setClearBusy] = (0, import_react139.useState)(false);
-  (0, import_react139.useEffect)(() => {
+  const [aiBriefSelectionsByEventId, setAiBriefSelectionsByEventId] = (0, import_react140.useState)(/* @__PURE__ */ new Map());
+  const [loadError, setLoadError] = (0, import_react140.useState)(null);
+  const [aiBriefActionError, setAiBriefActionError] = (0, import_react140.useState)(null);
+  const [removingLineId, setRemovingLineId] = (0, import_react140.useState)(null);
+  const [clearBusy, setClearBusy] = (0, import_react140.useState)(false);
+  (0, import_react140.useEffect)(() => {
     void fetchSportscapeEditorialDocument().then((document2) => {
       const nextEntries = /* @__PURE__ */ new Map();
       for (const entry of document2.entries) {
@@ -70011,24 +70220,18 @@ function SportscapeEditorialAdminContent() {
       setLoadError(err instanceof Error ? err.message : "Unable to load editorial data");
     });
   }, []);
-  const events = (0, import_react139.useMemo)(
-    () => collectFinalizedSportscapeEditorialEventsFromGamesSpine({
-      liveLeagues: leagues,
-      getSupplementalFinalsForLeague: (league) => useRecentFinalizedGamesStore.getState().getRetainedForLeague(league)
-    }),
-    [leagues, retainedById]
-  );
-  const grouped = (0, import_react139.useMemo)(() => groupSportscapeEditorialEventsByLeague(events), [events]);
-  const suggestedRank = (0, import_react139.useMemo)(
+  const grouped = (0, import_react140.useMemo)(() => groupSportscapeEditorialEventsByLeague(events), [events]);
+  const suggestedRank = (0, import_react140.useMemo)(
     () => suggestNextAiBriefRank(aiBriefSelectionsByEventId.values()),
     [aiBriefSelectionsByEventId]
   );
-  const headlineByEventId = (0, import_react139.useMemo)(() => {
+  const headlineByEventId = (0, import_react140.useMemo)(() => {
     const next = /* @__PURE__ */ new Map();
     for (const event of events) {
+      const existing = resolveEditorialEntryForAdminEvent(event, entriesByEventId);
       next.set(
         event.eventId,
-        entriesByEventId.get(event.eventId)?.headline?.trim() || event.title
+        existing?.headline?.trim() || event.sportscapeDefaults?.headline?.trim() || event.title
       );
     }
     for (const [eventId, entry] of entriesByEventId) {
@@ -70037,11 +70240,11 @@ function SportscapeEditorialAdminContent() {
     }
     return next;
   }, [events, entriesByEventId]);
-  const existingEditorialEventIds = (0, import_react139.useMemo)(
+  const existingEditorialEventIds = (0, import_react140.useMemo)(
     () => [...entriesByEventId.keys()],
     [entriesByEventId]
   );
-  const aiBriefSummaryLines = (0, import_react139.useMemo)(
+  const aiBriefSummaryLines = (0, import_react140.useMemo)(
     () => buildAiBriefSummaryLines({
       selections: [...aiBriefSelectionsByEventId.values()],
       headlineByEventId
@@ -70106,13 +70309,12 @@ function SportscapeEditorialAdminContent() {
     /* @__PURE__ */ (0, import_jsx_runtime154.jsxs)("header", { className: "border-b border-line/50 bg-panel/90 px-4 py-4", children: [
       /* @__PURE__ */ (0, import_jsx_runtime154.jsx)("p", { className: "text-[10px] tracking-[0.28em] text-textdim", children: "GRARF \xB7 ADMIN" }),
       /* @__PURE__ */ (0, import_jsx_runtime154.jsx)("h1", { className: "mt-1 font-sans text-xl", children: "Sportscape Editorial" }),
-      /* @__PURE__ */ (0, import_jsx_runtime154.jsx)("p", { className: "mt-2 max-w-3xl text-[11px] leading-relaxed text-textdim", children: "Manage headline, article, and highlight URLs for finalized events. Select and rank events for AI Brief inclusion. Data saves to the Sportscape Editorial cloud API." }),
-      /* @__PURE__ */ (0, import_jsx_runtime154.jsxs)("p", { className: "mt-2 text-[10px] tracking-[0.14em] text-textdim", children: [
-        events.length,
-        " finalized events \xB7 Games Spine + operational retention \xB7 ingest",
-        " ",
-        updatedAt ?? "pending"
+      /* @__PURE__ */ (0, import_jsx_runtime154.jsxs)("p", { className: "mt-2 max-w-3xl text-[11px] leading-relaxed text-textdim", children: [
+        "Same games as Catch Up Sportscape on webapp.html for ",
+        operationalDateLabel,
+        ". Edit headlines, article URLs, and highlights; rank selections for AI Brief. Saves to the Sportscape Editorial cloud API."
       ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime154.jsx)("p", { className: "mt-2 text-[10px] tracking-[0.14em] text-textdim", children: sportscapeEventsLoading ? "Loading Sportscape games\u2026" : `${events.length} Sportscape games \xB7 ${automatedArticleCount} automated recaps \xB7 ${operationalDateKey} \xB7 ingest ${updatedAt ?? "pending"}` }),
       loadError ? /* @__PURE__ */ (0, import_jsx_runtime154.jsx)("p", { className: "mt-2 text-[11px] text-redsys", children: loadError }) : null
     ] }),
     /* @__PURE__ */ (0, import_jsx_runtime154.jsxs)("main", { className: "mx-auto flex w-full max-w-5xl flex-col gap-4 px-4 py-6", children: [
@@ -70153,7 +70355,7 @@ function SportscapeEditorialAdminContent() {
   ] });
 }
 function SportscapeEditorialAdminPage() {
-  (0, import_react139.useEffect)(() => {
+  (0, import_react140.useEffect)(() => {
     const root = document.getElementById("grarf-web-root");
     if (!root) return;
     const previousClassName = root.className;
@@ -70170,7 +70372,7 @@ function SportscapeEditorialAdminPage() {
 var import_jsx_runtime155 = __toESM(require_jsx_runtime());
 var reactRoot = null;
 function IntelligenceSyncBridge() {
-  (0, import_react140.useEffect)(() => bindIntelligenceStoreUpdates(), []);
+  (0, import_react141.useEffect)(() => bindIntelligenceStoreUpdates(), []);
   return null;
 }
 var appShellRouteElements = /* @__PURE__ */ (0, import_jsx_runtime155.jsxs)(import_jsx_runtime155.Fragment, { children: [
@@ -70204,7 +70406,7 @@ function mountWebHome(container) {
     reactRoot = (0, import_client.createRoot)(container);
   }
   reactRoot.render(
-    /* @__PURE__ */ (0, import_jsx_runtime155.jsx)(import_react140.StrictMode, { children: /* @__PURE__ */ (0, import_jsx_runtime155.jsx)(BrowserRouter, { children: /* @__PURE__ */ (0, import_jsx_runtime155.jsx)(WebHomeApp, {}) }) })
+    /* @__PURE__ */ (0, import_jsx_runtime155.jsx)(import_react141.StrictMode, { children: /* @__PURE__ */ (0, import_jsx_runtime155.jsx)(BrowserRouter, { children: /* @__PURE__ */ (0, import_jsx_runtime155.jsx)(WebHomeApp, {}) }) })
   );
 }
 var autoRoot = document.getElementById("grarf-web-root");
