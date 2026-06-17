@@ -69494,7 +69494,7 @@ function SportscapeEditorialManualAiBriefEntry({
         headline: values.headline,
         articleUrl: values.articleUrl,
         highlightUrl: values.highlightUrl,
-        highlightsVideoThumbnailUrl: values.highlightsVideoThumbnailUrl || void 0,
+        highlightsVideoThumbnailUrl: values.highlightsVideoThumbnailUrl,
         showInLeagueSection
       });
       onEntrySaved(entry);
