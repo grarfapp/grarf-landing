@@ -29316,6 +29316,38 @@ init_define_import_meta_env();
 
 // ../grarf/desktop/shared/operationalSlateDate.js
 init_define_import_meta_env();
+
+// ../grarf/desktop/shared/golfTournamentDate.js
+init_define_import_meta_env();
+var GOLF_TOURNAMENT_DAY_TIMEZONE = "America/New_York";
+var GOLF_LEAGUE_KEYS2 = /* @__PURE__ */ new Set(["PGA", "LPGA", "LIV", "CHAMPIONS"]);
+function isGolfTournamentLeagueKey(league) {
+  return typeof league === "string" && GOLF_LEAGUE_KEYS2.has(league);
+}
+function readGolfTournamentStartDateKey(iso, formatDayKey) {
+  if (typeof iso !== "string" || !iso.trim()) return null;
+  const ms2 = Date.parse(iso);
+  if (!Number.isFinite(ms2) || ms2 <= 0) {
+    const match = iso.match(/^(\d{4}-\d{2}-\d{2})/);
+    return match?.[1] ?? null;
+  }
+  return formatDayKey(ms2, GOLF_TOURNAMENT_DAY_TIMEZONE) ?? null;
+}
+function formatGolfScheduledDayLabel(dateKey) {
+  const trimmed = dateKey.trim();
+  if (!trimmed) return "\u2014";
+  const [y2, m2, d2] = trimmed.split("-").map(Number);
+  if (!y2 || !m2 || !d2) return "\u2014";
+  const anchor = new Date(Date.UTC(y2, m2 - 1, d2, 17, 0, 0));
+  return anchor.toLocaleDateString("en-US", {
+    weekday: "short",
+    month: "numeric",
+    day: "numeric",
+    timeZone: GOLF_TOURNAMENT_DAY_TIMEZONE
+  });
+}
+
+// ../grarf/desktop/shared/operationalSlateDate.js
 var GRARF_OPERATIONAL_SLATE_TIMEZONE = "America/Chicago";
 var OPERATIONAL_SLATE_NEXT_DAY_CUTOFF_HOUR = 6;
 var calendarFormatterCache = /* @__PURE__ */ new Map();
@@ -29436,6 +29468,10 @@ function filterGamesForOperationalDateKey(games, operationalDateKey, now = /* @_
   return games.filter((g2) => {
     if (g2?.status === "live") return true;
     if (g2?.status === "scheduled") {
+      if (isGolfTournamentLeagueKey(g2?.league)) {
+        const key3 = typeof g2?.scheduledDateKey === "string" ? g2.scheduledDateKey.trim() : "";
+        return key3 ? key3 === operationalDateKey : false;
+      }
       return isScheduledOnOperationalEveningSlate(g2, operationalDateKey, now, timeZone);
     }
     const key2 = formatOperationalDateKeyFromMs(g2?.startTimeMs, timeZone) || (typeof g2?.scheduledDateKey === "string" ? g2.scheduledDateKey.trim() : void 0);
@@ -29507,8 +29543,9 @@ function buildGamesSpineOperationalDateContext(operationalDateKey, now) {
 }
 function isGameOnGamesSpineOperationalDateWithContext(game, ctx, now = /* @__PURE__ */ new Date()) {
   if (game.status === "scheduled") {
-    if (isGolfLeagueKey(game.league) && game.scheduledDateKey?.trim() === ctx.operationalDateKey) {
-      return true;
+    if (isGolfLeagueKey(game.league)) {
+      const key2 = game.scheduledDateKey?.trim();
+      return key2 ? key2 === ctx.operationalDateKey : false;
     }
     return isScheduledOnOperationalEveningSlate2(game, ctx.operationalDateKey, now);
   }
@@ -34130,6 +34167,10 @@ function normalizeGolfEvent(event, leagueKey, slateDateKey) {
   const operationalTodayKey = getOperationalTodayDateKey();
   const tournamentEndKey = readTournamentEndDateKey(event);
   const pastTournamentEnd = tournamentEndKey != null && operationalTodayKey > tournamentEndKey;
+  const tournamentStartKey = readGolfTournamentStartDateKey(
+    isoStart,
+    formatOperationalDateKeyFromMs
+  );
   const inferredLive = !pastTournamentEnd && !completed && state3 === "pre" && scoreboardDayKey === operationalTodayKey && startTimeMs > 0 && startTimeMs <= Date.now();
   const live = !completed && !pastTournamentEnd && (state3 === "in" || inferredLive);
   const final = completed || state3 === "post" || pastTournamentEnd;
@@ -34139,7 +34180,12 @@ function normalizeGolfEvent(event, leagueKey, slateDateKey) {
   else if (final) cardStatus = "final";
   const broadcasts = collectBroadcastLabels2(comp);
   const channels = broadcasts;
-  const scheduledDateKey = scoreboardDayKey || resolveScheduledDateKey(isoStart, slateDateKey) || formatOperationalDateKeyFromMs(startTimeMs);
+  let scheduledDateKey = scoreboardDayKey || resolveScheduledDateKey(isoStart, slateDateKey) || formatOperationalDateKeyFromMs(startTimeMs);
+  if (scheduled && tournamentStartKey) {
+    if (!scheduledDateKey || scheduledDateKey < tournamentStartKey) {
+      scheduledDateKey = tournamentStartKey;
+    }
+  }
   const finalizedStatusLine = safe5(statusType?.shortDetail) || safe5(statusType?.description) || safe5(statusType?.detail) || "Final";
   let statusLine = "";
   if (live || final) {
@@ -34155,7 +34201,7 @@ function normalizeGolfEvent(event, leagueKey, slateDateKey) {
     league: leagueKey,
     espnEventId: eventId,
     externalIds: { espn: eventId, mlb: null },
-    time: formatTimeEt5(isoStart),
+    time: scheduled ? formatGolfScheduledDayLabel(scheduledDateKey) : formatTimeEt5(isoStart),
     awayTeam: title,
     awayRecord: "\u2014",
     homeTeam: "",
@@ -34193,6 +34239,19 @@ function normalizeGolfScoreboard(scoreboardJson, leagueKey) {
     if (g2) out.push(g2);
   }
   return out;
+}
+
+// ../grarf/desktop/electron/espn/mergeOperationalScoreboards.js
+init_define_import_meta_env();
+function mergeNormalizedGamesById(primary, secondary) {
+  const byId = /* @__PURE__ */ new Map();
+  for (const game of primary ?? []) {
+    if (game?.id) byId.set(game.id, game);
+  }
+  for (const game of secondary ?? []) {
+    if (game?.id && !byId.has(game.id)) byId.set(game.id, game);
+  }
+  return [...byId.values()];
 }
 
 // ../grarf/desktop/electron/espn/normalize.js
@@ -34557,6 +34616,11 @@ function sortGames(games) {
     return String(a2.time).localeCompare(String(b2.time));
   });
 }
+function normalizeDatedOperationalScoreboardPair(todayJson, tomorrowJson, leagueKey) {
+  const todayGames = normalizeScoreboard(todayJson ?? { events: [] }, leagueKey);
+  const tomorrowGames = normalizeScoreboard(tomorrowJson ?? { events: [] }, leagueKey);
+  return sortGames(mergeNormalizedGamesById(todayGames, tomorrowGames));
+}
 
 // ../grarf/desktop/src/services/operationalIngest/web/fetchWebEspnOperationalSnapshot.ts
 var LOG7 = "[OperationalIngest]";
@@ -34604,58 +34668,59 @@ function scoreboardEventId(ev) {
   const id = ev.id;
   return id != null ? String(id) : null;
 }
-function mergeScoreboardJson(primary, secondary) {
-  if (!primary || typeof primary !== "object") return secondary ?? primary;
-  if (!secondary || typeof secondary !== "object") return primary;
-  const primaryEvents = Array.isArray(primary.events) ? primary.events : [];
-  const secondaryEvents = Array.isArray(secondary.events) ? secondary.events : [];
-  const seen = /* @__PURE__ */ new Set();
-  const merged = [];
-  for (const ev of primaryEvents) {
-    const id = scoreboardEventId(ev);
-    if (id) seen.add(id);
-    merged.push(ev);
+function countLiveAcrossScoreboards(...jsons) {
+  let live = 0;
+  for (const json of jsons) {
+    live += countLiveScoreboardEvents(json);
   }
-  for (const ev of secondaryEvents) {
-    const id = scoreboardEventId(ev);
-    if (id && seen.has(id)) continue;
-    if (id) seen.add(id);
-    merged.push(ev);
-  }
-  return { ...primary, events: merged };
+  return live;
 }
-async function fetchDatedScoreboardWithTomorrow(endpoint) {
+function countUniqueScoreboardEvents(...jsons) {
+  const ids = /* @__PURE__ */ new Set();
+  let count = 0;
+  for (const json of jsons) {
+    const events = Array.isArray(json?.events) ? json.events : [];
+    for (const ev of events) {
+      const id = scoreboardEventId(ev);
+      if (id && ids.has(id)) continue;
+      if (id) ids.add(id);
+      count += 1;
+    }
+  }
+  return count;
+}
+async function fetchDatedScoreboardPair(endpoint) {
   const datedUrl = `${endpoint}${endpoint.includes("?") ? "&" : "?"}dates=${formatEspnScoreboardDatesParam()}`;
   const tomorrowUrl = `${endpoint}${endpoint.includes("?") ? "&" : "?"}dates=${formatEspnScoreboardDatesParamForTomorrow()}`;
   const [todayJson, tomorrowJson] = await Promise.all([
     fetchEspnScoreboardJson(datedUrl),
     fetchEspnScoreboardJson(tomorrowUrl).catch(() => ({ events: [] }))
   ]);
-  return mergeScoreboardJson(todayJson, tomorrowJson);
+  return { todayJson, tomorrowJson };
 }
 async function fetchOperationalScoreboardJsonWeb(endpoint) {
-  const datedJson = await fetchDatedScoreboardWithTomorrow(endpoint);
-  const datedEvents = Array.isArray(datedJson?.events) ? datedJson.events : [];
-  const datedLive = countLiveScoreboardEvents(datedJson);
-  if (datedEvents.length > 0 && datedLive > 0) {
-    return { json: datedJson, usedFallback: false };
+  const { todayJson, tomorrowJson } = await fetchDatedScoreboardPair(endpoint);
+  const datedEventCount = countUniqueScoreboardEvents(todayJson, tomorrowJson);
+  const datedLive = countLiveAcrossScoreboards(todayJson, tomorrowJson);
+  if (datedEventCount > 0 && datedLive > 0) {
+    return { todayJson, tomorrowJson, usedFallback: false };
   }
   const defaultJson = await fetchEspnScoreboardJson(endpoint);
   const defaultLive = countLiveScoreboardEvents(defaultJson);
-  if (datedEvents.length > 0 && datedLive === 0 && defaultLive > 0) {
-    return { json: defaultJson, usedFallback: false };
+  if (datedEventCount > 0 && datedLive === 0 && defaultLive > 0) {
+    return { todayJson: defaultJson, tomorrowJson: null, usedFallback: false };
   }
-  if (datedEvents.length > 0) {
-    return { json: datedJson, usedFallback: false };
+  if (datedEventCount > 0) {
+    return { todayJson, tomorrowJson, usedFallback: false };
   }
-  return { json: defaultJson, usedFallback: true };
+  return { todayJson: defaultJson, tomorrowJson: null, usedFallback: true };
 }
 async function fetchLeagueGames(key2) {
   const endpoint = ESPN_OPERATIONAL_LEAGUE_ENDPOINTS[key2];
   if (!endpoint) return [];
   try {
-    const { json, usedFallback } = await fetchOperationalScoreboardJsonWeb(endpoint);
-    let games = normalizeScoreboard(json, key2);
+    const { todayJson, tomorrowJson, usedFallback } = await fetchOperationalScoreboardJsonWeb(endpoint);
+    let games = tomorrowJson ? normalizeDatedOperationalScoreboardPair(todayJson, tomorrowJson, key2) : normalizeScoreboard(todayJson, key2);
     if (usedFallback) {
       games = filterGamesForOperationalFallbackIngest(games);
     }
@@ -40834,6 +40899,9 @@ function formatBroadcastsSubtitle(game, max = 6, sep = " \u2022 ") {
 // ../grarf/desktop/src/lib/gamesSpine/formatGameDisplayTime.ts
 init_define_import_meta_env();
 function formatGameDisplayTimeLocal(game) {
+  if (isGolfTournamentLeagueKey(game.league) && game.status === "scheduled" && game.scheduledDateKey?.trim()) {
+    return formatGolfScheduledDayLabel(game.scheduledDateKey);
+  }
   const ms2 = game.startTimeMs;
   if (ms2 != null && Number.isFinite(ms2) && ms2 > 0) {
     const instant = new Date(ms2);
@@ -60589,6 +60657,9 @@ function editorialEntryShowsInLeagueSection(entry) {
   return entry.showInLeagueSection !== false;
 }
 
+// ../grarf/desktop/src/lib/sportscape/editorial/resolveEditorialHighlightPresentation.ts
+init_define_import_meta_env();
+
 // ../grarf/desktop/src/lib/sportscape/editorial/parseEditorialHighlightUrl.ts
 init_define_import_meta_env();
 function parseEditorialHighlightUrl(highlightUrl) {
@@ -60601,6 +60672,27 @@ function parseEditorialHighlightUrl(highlightUrl) {
   return {
     youtubeVideoId,
     thumbnailUrl: youtubeThumbnailUrl(youtubeVideoId, "hqdefault")
+  };
+}
+
+// ../grarf/desktop/src/lib/sportscape/editorial/resolveEditorialHighlightPresentation.ts
+function resolveEditorialHighlightPresentation(entry) {
+  const highlightVideoUrl = entry.highlightUrl.trim();
+  const destination = parseEditorialHighlightUrl(highlightVideoUrl);
+  const thumbnailSourceUrl = entry.highlightsVideoThumbnailUrl?.trim() ?? "";
+  if (!thumbnailSourceUrl) {
+    return {
+      highlightVideoUrl,
+      highlightThumbnailUrl: destination.thumbnailUrl,
+      highlightYoutubeVideoId: destination.youtubeVideoId
+    };
+  }
+  const thumbnailSource = parseEditorialHighlightUrl(thumbnailSourceUrl);
+  return {
+    highlightVideoUrl,
+    highlightThumbnailUrl: thumbnailSource.thumbnailUrl ?? destination.thumbnailUrl,
+    // Omit video id so Sportscape click opens highlightUrl (channel/page), not the thumbnail video.
+    highlightYoutubeVideoId: void 0
   };
 }
 
@@ -60642,7 +60734,7 @@ function resolveEditorialScoreSources(eventId, gamesByEventId, gameScoresByEvent
   };
 }
 function editorialEntryToSportscapeArticle(entry, options) {
-  const highlight = parseEditorialHighlightUrl(entry.highlightUrl);
+  const highlight = resolveEditorialHighlightPresentation(entry);
   const game = options?.game;
   const gameScore = options?.gameScore;
   const preserveFrom = options?.preserveFrom;
@@ -60651,9 +60743,9 @@ function editorialEntryToSportscapeArticle(entry, options) {
     headline: entry.headline.trim(),
     url: entry.articleUrl.trim(),
     eventId: entry.eventId,
-    highlightVideoUrl: entry.highlightUrl.trim(),
-    highlightThumbnailUrl: highlight.thumbnailUrl,
-    highlightYoutubeVideoId: highlight.youtubeVideoId,
+    highlightVideoUrl: highlight.highlightVideoUrl,
+    highlightThumbnailUrl: highlight.highlightThumbnailUrl,
+    highlightYoutubeVideoId: highlight.highlightYoutubeVideoId,
     highlightTitle: entry.headline.trim(),
     gamePk: game?.gamePk ?? preserveFrom?.gamePk,
     homeTeam: game?.homeTeam ?? gameScore?.homeTeam ?? preserveFrom?.homeTeam,
@@ -69316,6 +69408,7 @@ function SportscapeEditorialManualAiBriefEntry({
   const [headline, setHeadline] = (0, import_react134.useState)("");
   const [articleUrl, setArticleUrl] = (0, import_react134.useState)("");
   const [highlightUrl, setHighlightUrl] = (0, import_react134.useState)("");
+  const [highlightsVideoThumbnailUrl, setHighlightsVideoThumbnailUrl] = (0, import_react134.useState)("");
   const [rank, setRank] = (0, import_react134.useState)(String(suggestedRank));
   const [busy, setBusy] = (0, import_react134.useState)(false);
   const [error, setError] = (0, import_react134.useState)(null);
@@ -69345,6 +69438,7 @@ function SportscapeEditorialManualAiBriefEntry({
     setHeadline("");
     setArticleUrl("");
     setHighlightUrl("");
+    setHighlightsVideoThumbnailUrl("");
     setRank(String(suggestedRank));
     setError(null);
   };
@@ -69359,6 +69453,7 @@ function SportscapeEditorialManualAiBriefEntry({
     const trimmedHeadline = headline.trim();
     const trimmedArticleUrl = articleUrl.trim();
     const trimmedHighlightUrl = highlightUrl.trim();
+    const trimmedHighlightsVideoThumbnailUrl = highlightsVideoThumbnailUrl.trim();
     if (!trimmedLeagueName) {
       setError("League name is required.");
       return null;
@@ -69380,6 +69475,7 @@ function SportscapeEditorialManualAiBriefEntry({
       headline: trimmedHeadline,
       articleUrl: trimmedArticleUrl,
       highlightUrl: trimmedHighlightUrl,
+      highlightsVideoThumbnailUrl: trimmedHighlightsVideoThumbnailUrl,
       rank: resolvedRank
     };
   };
@@ -69398,6 +69494,7 @@ function SportscapeEditorialManualAiBriefEntry({
         headline: values.headline,
         articleUrl: values.articleUrl,
         highlightUrl: values.highlightUrl,
+        highlightsVideoThumbnailUrl: values.highlightsVideoThumbnailUrl || void 0,
         showInLeagueSection
       });
       onEntrySaved(entry);
@@ -69503,6 +69600,19 @@ function SportscapeEditorialManualAiBriefEntry({
             type: "url",
             value: highlightUrl,
             onChange: (event) => setHighlightUrl(event.target.value),
+            className: INPUT_CLASS
+          }
+        )
+      ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime149.jsxs)("label", { className: "block", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime149.jsx)("span", { className: LABEL_CLASS, children: "HIGHLIGHTS VIDEO THUMBNAIL" }),
+        /* @__PURE__ */ (0, import_jsx_runtime149.jsx)(
+          "input",
+          {
+            type: "url",
+            value: highlightsVideoThumbnailUrl,
+            onChange: (event) => setHighlightsVideoThumbnailUrl(event.target.value),
+            placeholder: "https://www.youtube.com/watch?v=kyLHrm6ANv0",
             className: INPUT_CLASS
           }
         )
