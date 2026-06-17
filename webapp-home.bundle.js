@@ -34243,13 +34243,27 @@ function normalizeGolfScoreboard(scoreboardJson, leagueKey) {
 
 // ../grarf/desktop/electron/espn/mergeOperationalScoreboards.js
 init_define_import_meta_env();
+function operationalGameMatchupKey(game) {
+  const league = game?.league;
+  const away = typeof game?.awayTeam === "string" ? game.awayTeam.trim().toLowerCase() : "";
+  const home = typeof game?.homeTeam === "string" ? game.homeTeam.trim().toLowerCase() : "";
+  if (!league || !away || !home) return null;
+  const teams = [away, home].sort();
+  return `${league}|${teams[0]}|${teams[1]}`;
+}
 function mergeNormalizedGamesById(primary, secondary) {
   const byId = /* @__PURE__ */ new Map();
+  const primaryMatchups = /* @__PURE__ */ new Set();
   for (const game of primary ?? []) {
     if (game?.id) byId.set(game.id, game);
+    const matchupKey = operationalGameMatchupKey(game);
+    if (matchupKey) primaryMatchups.add(matchupKey);
   }
   for (const game of secondary ?? []) {
-    if (game?.id && !byId.has(game.id)) byId.set(game.id, game);
+    if (!game?.id || byId.has(game.id)) continue;
+    const matchupKey = operationalGameMatchupKey(game);
+    if (matchupKey && primaryMatchups.has(matchupKey)) continue;
+    byId.set(game.id, game);
   }
   return [...byId.values()];
 }
