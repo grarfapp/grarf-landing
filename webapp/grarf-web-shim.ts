@@ -8,8 +8,13 @@ type WorkspaceEmbedSlot = "center" | "centerChild" | "right";
 
 declare global {
   interface Window {
+    GRARF_ELECTRON?: true;
     GRARF_WEB_CONFIG?: { operationalIngestUrl?: string; operationalPollIntervalMs?: number };
   }
+}
+
+function isElectronRenderer(): boolean {
+  return typeof window !== "undefined" && window.GRARF_ELECTRON === true;
 }
 
 const LS_EDITORIAL = "grarf-web-editorial-bundle";
@@ -188,7 +193,9 @@ function installWebviewShim(): void {
   }
 }
 
-installWebviewShim();
+if (!isElectronRenderer()) {
+  installWebviewShim();
+}
 
 type EmbedEntry = { iframe: HTMLIFrameElement; url: string };
 const embedLayers = new Map<WorkspaceEmbedSlot, EmbedEntry>();
@@ -528,10 +535,11 @@ function installGrarfBridge(): void {
   };
 }
 
-installGrarfBridge();
-
-for (const slot of [...embedLayers.keys()]) {
-  clearEmbedLayer(slot);
+if (!isElectronRenderer()) {
+  installGrarfBridge();
+  for (const slot of [...embedLayers.keys()]) {
+    clearEmbedLayer(slot);
+  }
 }
 
 export {};
