@@ -29712,6 +29712,27 @@ init_define_import_meta_env();
 
 // ../grarf/desktop/src/lib/bestGameRightNow/leagueImportanceV1.ts
 init_define_import_meta_env();
+
+// ../grarf/desktop/shared/golfWatchUrls.js
+init_define_import_meta_env();
+var PGA_TOUR_LEADERBOARD_URL = "https://www.pgatour.com/leaderboard";
+var US_OPEN_WATCH_URL = "https://www.usopen.com/watch.html";
+var PGA_TOUR_LEAGUE_KEY = "PGA";
+function isUsOpenTournamentTitle(title) {
+  return typeof title === "string" && /\bu\.?\s*s\.?\s*open\b/i.test(title.trim());
+}
+function isPgaTourUsOpenEvent(leagueKey, tournamentTitle) {
+  return leagueKey === PGA_TOUR_LEAGUE_KEY && isUsOpenTournamentTitle(tournamentTitle);
+}
+function resolveGolfLeaderboardUrl() {
+  return PGA_TOUR_LEADERBOARD_URL;
+}
+function resolveGolfWatchStreamUrl(leagueKey, tournamentTitle) {
+  if (!isPgaTourUsOpenEvent(leagueKey, tournamentTitle)) return null;
+  return US_OPEN_WATCH_URL;
+}
+
+// ../grarf/desktop/src/lib/bestGameRightNow/leagueImportanceV1.ts
 var LEAGUE_IMPORTANCE_V1 = {
   NBA: 100,
   WORLDCUP: 99,
@@ -29730,7 +29751,9 @@ var LEAGUE_IMPORTANCE_V1 = {
   WNBA: 70,
   GOLF: 69,
   PGA: 69,
-  CHAMPIONS: 68,
+  LPGA: 67,
+  CHAMPIONS: 66,
+  LIV: 65,
   ATP: 65,
   WTA: 65,
   NASCAR_XFINITY: 60,
@@ -29739,6 +29762,14 @@ var LEAGUE_IMPORTANCE_V1 = {
   RUGBY: 40,
   CYCLING: 35,
   NHRA: 34
+};
+var GOLF_GAME_IMPORTANCE_V1 = {
+  US_OPEN: 98.5,
+  PGA_MAJOR: 71,
+  PGA: 69,
+  LPGA: 67,
+  CHAMPIONS: 66,
+  LIV: 65
 };
 var LEAGUE_IMPORTANCE_ALIASES = {
   MCWS: "NCAABB",
@@ -29752,9 +29783,7 @@ var LEAGUE_IMPORTANCE_ALIASES = {
   "NASCAR CUP SERIES": "NASCAR",
   "NASCAR OREILLY AUTO PARTS SERIES": "NASCAR_XFINITY",
   "24 HOURS OF LE MANS": "LEMANS",
-  "LE MANS": "LEMANS",
-  LPGA: "GOLF",
-  LIV: "GOLF"
+  "LE MANS": "LEMANS"
 };
 function normalizeLeagueLabel(value) {
   return value.trim().toUpperCase().replace(/['']/g, "'");
@@ -29767,12 +29796,36 @@ function resolveImportanceKey(raw) {
   if (alias && LEAGUE_IMPORTANCE_V1[alias] != null) return alias;
   return null;
 }
+function golfTournamentTitle(game) {
+  return game.awayTeam?.trim() ?? "";
+}
+function isPgaTourMajorExcludingUsOpen(title) {
+  if (!title || isUsOpenTournamentTitle(title)) return false;
+  return /\bmasters\b/i.test(title) || /\bpga championship\b/i.test(title) || /\b(the )?open championship\b/i.test(title) || /\bbritish open\b/i.test(title);
+}
+function resolveGolfGameImportanceV1(game) {
+  const league = game.league;
+  const title = golfTournamentTitle(game);
+  if (isPgaTourUsOpenEvent(league, title)) {
+    return GOLF_GAME_IMPORTANCE_V1.US_OPEN;
+  }
+  if (league === "PGA") {
+    if (isPgaTourMajorExcludingUsOpen(title)) return GOLF_GAME_IMPORTANCE_V1.PGA_MAJOR;
+    return GOLF_GAME_IMPORTANCE_V1.PGA;
+  }
+  if (league === "LPGA") return GOLF_GAME_IMPORTANCE_V1.LPGA;
+  if (league === "CHAMPIONS") return GOLF_GAME_IMPORTANCE_V1.CHAMPIONS;
+  if (league === "LIV") return GOLF_GAME_IMPORTANCE_V1.LIV;
+  return null;
+}
 function resolveLeagueImportanceV1ForLeagueKey(leagueKey) {
   const fromKey = resolveImportanceKey(leagueKey);
   if (fromKey) return LEAGUE_IMPORTANCE_V1[fromKey] ?? 0;
   return 0;
 }
 function resolveLeagueImportanceV1(game) {
+  const golfImportance = resolveGolfGameImportanceV1(game);
+  if (golfImportance != null) return golfImportance;
   const fromKey = resolveImportanceKey(game.league);
   if (fromKey) return LEAGUE_IMPORTANCE_V1[fromKey] ?? 0;
   const metadataLeague = game.metadata?.leagueLabel;
@@ -34403,27 +34456,6 @@ function normalizeTennisScoreboard2(scoreboardJson, leagueKey) {
 
 // ../grarf/desktop/electron/espn/normalizeGolf.js
 init_define_import_meta_env();
-
-// ../grarf/desktop/shared/golfWatchUrls.js
-init_define_import_meta_env();
-var PGA_TOUR_LEADERBOARD_URL = "https://www.pgatour.com/leaderboard";
-var US_OPEN_WATCH_URL = "https://www.usopen.com/watch.html";
-var PGA_TOUR_LEAGUE_KEY = "PGA";
-function isUsOpenTournamentTitle(title) {
-  return typeof title === "string" && /\bu\.?\s*s\.?\s*open\b/i.test(title.trim());
-}
-function isPgaTourUsOpenEvent(leagueKey, tournamentTitle) {
-  return leagueKey === PGA_TOUR_LEAGUE_KEY && isUsOpenTournamentTitle(tournamentTitle);
-}
-function resolveGolfLeaderboardUrl() {
-  return PGA_TOUR_LEADERBOARD_URL;
-}
-function resolveGolfWatchStreamUrl(leagueKey, tournamentTitle) {
-  if (!isPgaTourUsOpenEvent(leagueKey, tournamentTitle)) return null;
-  return US_OPEN_WATCH_URL;
-}
-
-// ../grarf/desktop/electron/espn/normalizeGolf.js
 function isActiveRoundPostStatus(statusName) {
   return statusName === "STATUS_SUSPENDED" || statusName === "STATUS_DELAYED";
 }
