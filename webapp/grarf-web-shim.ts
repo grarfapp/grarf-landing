@@ -141,9 +141,53 @@ function createWebviewElement(): ElectronWebviewLike {
     set: (value: string) => syncSrc(value),
   });
 
+  let sourceLockUrl = "";
+  let cachedGuestUrl = "";
+
+  const readIframeUrl = (): string => {
+    if (cachedGuestUrl && cachedGuestUrl !== "about:blank") return cachedGuestUrl;
+    let loaded = iframe.src;
+    try {
+      loaded = iframe.contentWindow?.location.href ?? loaded;
+    } catch {
+      /* cross-origin */
+    }
+    return loaded;
+  };
+
+  const dispatchFrameEvent = (type: string, url?: string) => {
+    const ev = new Event(type) as Event & { url?: string; isMainFrame?: boolean };
+    ev.isMainFrame = true;
+    if (url) ev.url = url;
+    host.dispatchEvent(ev);
+  };
+
+  const probeGuestUrl = async (): Promise<string> => {
+    try {
+      const href = await iframe.contentWindow?.eval("window.location.href");
+      if (typeof href === "string" && href && href !== "about:blank") {
+        cachedGuestUrl = href;
+        return href;
+      }
+    } catch {
+      /* cross-origin */
+    }
+    return readIframeUrl();
+  };
+
   iframe.addEventListener("load", () => {
-    host.dispatchEvent(new Event("dom-ready"));
-    host.dispatchEvent(new Event("did-finish-load"));
+    void (async () => {
+      dispatchFrameEvent("did-finish-load");
+
+      const loaded = await probeGuestUrl();
+      if (!loaded || loaded === "about:blank") return;
+
+      if (sourceLockUrl && loaded !== sourceLockUrl) {
+        dispatchFrameEvent("did-navigate", loaded);
+      }
+
+      sourceLockUrl = loaded;
+    })();
   });
   iframe.addEventListener("error", () => {
     const ev = new Event("did-fail-load") as Event & {
@@ -160,8 +204,14 @@ function createWebviewElement(): ElectronWebviewLike {
   });
 
   const webview = host as ElectronWebviewLike;
-  webview.getURL = () => iframe.src;
-  webview.executeJavaScript = () => Promise.resolve(null);
+  webview.getURL = () => cachedGuestUrl || iframe.src;
+  webview.executeJavaScript = async (code: string) => {
+    try {
+      return iframe.contentWindow?.eval(code) ?? null;
+    } catch {
+      return null;
+    }
+  };
   return webview;
 }
 
