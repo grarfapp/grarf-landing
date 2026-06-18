@@ -13412,9 +13412,6 @@ var require_middleware = __commonJS({
 function resolveYoutubeChannelRssPath(channelId) {
   return `/clips/youtube-rss/${encodeURIComponent(channelId)}`;
 }
-function resolveYoutubeChannelRssUrl(channelId) {
-  return resolveYoutubeChannelRssPath(channelId);
-}
 function resolveYoutubeChannelRssFetchUrls(channelId) {
   const sameOrigin = resolveYoutubeChannelRssPath(channelId);
   if (!isGrarfWebRenderer()) {
@@ -13569,17 +13566,20 @@ function mergeSortDedupeUploads(rows) {
   });
 }
 async function fetchChannelRssXml(channelId) {
-  const url = resolveYoutubeChannelRssUrl(channelId);
-  try {
-    const res = await fetch(url, {
-      headers: { Accept: "application/atom+xml, text/xml, */*" }
-    });
-    if (!res.ok) return null;
-    const xml = await res.text();
-    return xml.trim().length > 0 ? xml : null;
-  } catch {
-    return null;
+  const urls = resolveYoutubeChannelRssFetchUrls(channelId);
+  for (const url of urls) {
+    try {
+      const res = await fetch(url, {
+        headers: { Accept: "application/atom+xml, text/xml, */*" }
+      });
+      if (!res.ok) continue;
+      const xml = await res.text();
+      if (xml.trim().length > 0) return xml;
+    } catch {
+      continue;
+    }
   }
+  return null;
 }
 async function fetchRssViaSharedIngest(sources, onTrace) {
   const sourceTraces = [];
