@@ -23631,7 +23631,12 @@ function resolveGameWorkspaceEmbedUrl(game, gameId) {
     if (fotmobUrl) return fotmobUrl;
   }
   if (game?.streamUrl?.trim()) {
-    if (game.streamProvider === "ESPN+") {
+    if (isGolfLeagueKey(game.league) && game.launchMode === "external") {
+      console.log("[Golf] Skipping streamUrl for workspace \u2014 row opens leaderboard; WATCH LIVE opens externally", {
+        league: game.league,
+        gameId: game.id
+      });
+    } else if (game.streamProvider === "ESPN+") {
       console.log("[ESPN] Resolved streamUrl for workspace", {
         league: game.league,
         gameId: game.id
@@ -29495,6 +29500,13 @@ function isScheduledOnOperationalEveningSlate(game, operationalDateKey, now = /*
   if (!startKey && payloadKey === operationalDateKey) return true;
   return false;
 }
+function resolveGameOperationalSlateDateKey(game, timeZone = GRARF_OPERATIONAL_SLATE_TIMEZONE) {
+  const scheduledKey = typeof game?.scheduledDateKey === "string" ? game.scheduledDateKey.trim() : "";
+  if (isGolfTournamentLeagueKey(game?.league) && scheduledKey) {
+    return scheduledKey;
+  }
+  return formatOperationalDateKeyFromMs(game?.startTimeMs, timeZone) || scheduledKey || void 0;
+}
 function filterGamesForOperationalDateKey(games, operationalDateKey, now = /* @__PURE__ */ new Date(), timeZone = GRARF_OPERATIONAL_SLATE_TIMEZONE) {
   return games.filter((g2) => {
     if (g2?.status === "live") return true;
@@ -29505,7 +29517,7 @@ function filterGamesForOperationalDateKey(games, operationalDateKey, now = /* @_
       }
       return isScheduledOnOperationalEveningSlate(g2, operationalDateKey, now, timeZone);
     }
-    const key2 = formatOperationalDateKeyFromMs(g2?.startTimeMs, timeZone) || (typeof g2?.scheduledDateKey === "string" ? g2.scheduledDateKey.trim() : void 0);
+    const key2 = resolveGameOperationalSlateDateKey(g2, timeZone);
     return key2 === operationalDateKey;
   });
 }
@@ -34161,6 +34173,30 @@ function normalizeTennisScoreboard2(scoreboardJson, leagueKey) {
 
 // ../grarf/desktop/electron/espn/normalizeGolf.js
 init_define_import_meta_env();
+
+// ../grarf/desktop/shared/golfWatchUrls.js
+init_define_import_meta_env();
+var PGA_TOUR_LEADERBOARD_URL = "https://www.pgatour.com/leaderboard";
+var US_OPEN_WATCH_URL = "https://www.usopen.com/watch.html";
+var PGA_TOUR_LEAGUE_KEY = "PGA";
+function isUsOpenTournamentTitle(title) {
+  return typeof title === "string" && /\bu\.?\s*s\.?\s*open\b/i.test(title.trim());
+}
+function isPgaTourUsOpenEvent(leagueKey, tournamentTitle) {
+  return leagueKey === PGA_TOUR_LEAGUE_KEY && isUsOpenTournamentTitle(tournamentTitle);
+}
+function resolveGolfLeaderboardUrl() {
+  return PGA_TOUR_LEADERBOARD_URL;
+}
+function resolveGolfWatchStreamUrl(leagueKey, tournamentTitle) {
+  if (!isPgaTourUsOpenEvent(leagueKey, tournamentTitle)) return null;
+  return US_OPEN_WATCH_URL;
+}
+
+// ../grarf/desktop/electron/espn/normalizeGolf.js
+function isActiveRoundPostStatus(statusName) {
+  return statusName === "STATUS_SUSPENDED" || statusName === "STATUS_DELAYED";
+}
 function safe5(v2) {
   return typeof v2 === "string" && v2.trim() ? v2.trim() : "";
 }
@@ -34203,8 +34239,10 @@ function normalizeGolfEvent(event, leagueKey, slateDateKey) {
     formatOperationalDateKeyFromMs
   );
   const inferredLive = !pastTournamentEnd && !completed && state3 === "pre" && scoreboardDayKey === operationalTodayKey && startTimeMs > 0 && startTimeMs <= Date.now();
-  const live = !completed && !pastTournamentEnd && (state3 === "in" || inferredLive);
-  const final = completed || state3 === "post" || pastTournamentEnd;
+  const statusName = safe5(statusType?.name).toUpperCase();
+  const activeRoundPost = isActiveRoundPostStatus(statusName);
+  const live = !completed && !pastTournamentEnd && (state3 === "in" || inferredLive || activeRoundPost);
+  const final = !live && (completed || pastTournamentEnd || state3 === "post" && !activeRoundPost);
   const scheduled = !completed && !pastTournamentEnd && state3 === "pre" && !inferredLive;
   let cardStatus = "scheduled";
   if (live) cardStatus = "live";
@@ -34226,6 +34264,13 @@ function normalizeGolfEvent(event, leagueKey, slateDateKey) {
   }
   const eventId = String(event.id);
   const id = `espn-${leagueKey}-${eventId}`;
+  const periodNum = status.period != null ? Number(status.period) : NaN;
+  const round = Number.isFinite(periodNum) && periodNum > 0 ? periodNum : void 0;
+  const watchStreamUrl = resolveGolfWatchStreamUrl(leagueKey, title);
+  const watchLinks = [{ provider: "PGA Tour", url: PGA_TOUR_LEADERBOARD_URL }];
+  if (watchStreamUrl) {
+    watchLinks.push({ provider: "US Open", url: watchStreamUrl });
+  }
   const game = {
     id,
     grarfGameId: id,
@@ -34250,13 +34295,21 @@ function normalizeGolfEvent(event, leagueKey, slateDateKey) {
     startTimeMs,
     scheduledDateKey,
     lastUpdated: (/* @__PURE__ */ new Date()).toISOString(),
-    metadata: {},
+    metadata: {
+      ...round != null ? { round } : {},
+      leaderboardUrl: PGA_TOUR_LEADERBOARD_URL
+    },
+    ...watchStreamUrl ? {
+      streamUrl: watchStreamUrl,
+      streamProvider: "US Open",
+      launchMode: "external"
+    } : {},
     content: {
       stories: [],
       clips: [],
       highlights: [],
       social: [],
-      watchLinks: []
+      watchLinks
     }
   };
   return attachCanonicalEventMetadata(game, { sport: "golf", title });
@@ -38949,6 +39002,22 @@ function installDemoNcaaBaseballAlertTrigger() {
 // ../grarf/desktop/src/lib/watch/handleWatchLiveClick.ts
 init_define_import_meta_env();
 
+// ../grarf/desktop/src/lib/watch/golfWatchLive.ts
+init_define_import_meta_env();
+function tryLaunchGolfWatch(game) {
+  if (!isPgaTourUsOpenEvent(game.league, game.awayTeam)) return false;
+  if (game.launchMode !== "external") return false;
+  const streamUrl = game.streamUrl?.trim();
+  if (!streamUrl) return false;
+  void openWatchStreamExternally(streamUrl, game.streamProvider ?? "US Open");
+  return true;
+}
+function golfGameHasResolvableWatchStream(game) {
+  if (!isPgaTourUsOpenEvent(game.league, game.awayTeam)) return false;
+  if (game.launchMode !== "external") return false;
+  return Boolean(game.streamUrl?.trim());
+}
+
 // ../grarf/desktop/src/lib/watch/providerRegistry.ts
 init_define_import_meta_env();
 
@@ -40300,6 +40369,9 @@ function handleWatchLiveClick(game, dispatch) {
     return { action: "launched" };
   }
   if (tryLaunchUsaNetworkWatch(game)) {
+    return { action: "launched" };
+  }
+  if (tryLaunchGolfWatch(game)) {
     return { action: "launched" };
   }
   if (!watchConfig.espnResolverEnabled) {
@@ -45874,6 +45946,7 @@ function isMlbScoreboardGame(game) {
 function gameHasHomeSpineWatchLive(game) {
   if (isDemoNhlVegasCarolinaGame(game)) return true;
   if (game.status !== "live") return false;
+  if (golfGameHasResolvableWatchStream(game)) return true;
   if (game.streamUrl?.trim()) return true;
   if (isMlbScoreboardGame(game)) return true;
   if (gameHasEspnWatchBroadcast2(game)) return true;
@@ -65944,6 +66017,9 @@ var BOARD_SLUG = {
   WTA: "wta"
 };
 function resolveSpineRowWorkspaceEmbedUrl(game) {
+  if (isGolfLeagueKey(game.league)) {
+    return resolveGolfLeaderboardUrl();
+  }
   if (isWorldCupGameRow(game)) {
     const fotmobUrl = resolveWorldCupCenterPaneEmbedUrl(game);
     if (fotmobUrl) return fotmobUrl;
@@ -65999,6 +66075,16 @@ function tryOpenMcwsGameRowInBrowser(game) {
   if (!eventId) return false;
   const url = buildEspnGamecastUrl("NCAABB", eventId);
   window.open(url, "_blank", "noopener,noreferrer");
+  return true;
+}
+
+// ../grarf/desktop/src/lib/gamesSpine/openGolfGameRowInBrowser.ts
+init_define_import_meta_env();
+init_isGrarfWebRenderer();
+function tryOpenGolfGameRowInBrowser(game) {
+  if (!isGrarfWebRenderer()) return false;
+  if (!isGolfLeagueKey(game.league)) return false;
+  window.open(resolveGolfLeaderboardUrl(), "_blank", "noopener,noreferrer");
   return true;
 }
 
@@ -66223,6 +66309,7 @@ function HomePage() {
         const game2 = findLiveGameById(gameId);
         if (!game2) return;
         if (tryOpenMcwsGameRowInBrowser(game2)) return;
+        if (tryOpenGolfGameRowInBrowser(game2)) return;
         if (tryOpenWorldCupFotmobInBrowser(game2)) return;
         const tab2 = buildGameWorkspaceTabForRow(game2);
         if (tab2) dispatchOverlay({ type: "open", tab: tab2 });
@@ -66231,6 +66318,7 @@ function HomePage() {
       const game = findLiveGameById(gameId);
       if (!game) return;
       if (tryOpenMcwsGameRowInBrowser(game)) return;
+      if (tryOpenGolfGameRowInBrowser(game)) return;
       const tab = buildGameWorkspaceTabForRow(game);
       if (tab) dispatch({ type: "open", tab });
     },
@@ -66247,6 +66335,7 @@ function HomePage() {
         const game = findLiveGameById(gameId);
         if (!game) return;
         if (tryOpenMcwsGameRowInBrowser(game)) return;
+        if (tryOpenGolfGameRowInBrowser(game)) return;
         if (tryOpenWorldCupFotmobInBrowser(game)) return;
         const tab = buildGameWorkspaceTabForRow(game);
         if (tab) dispatch({ type: "open", tab });
