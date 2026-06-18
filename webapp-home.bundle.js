@@ -14226,39 +14226,39 @@ function emptyWebEditorialBundle() {
 function readWebEditorialBundle() {
   const raw = readJson(LS_EDITORIAL, null);
   if (!raw || typeof raw !== "object") return emptyWebEditorialBundle();
-  if (raw.narratives || raw.featuredGames || raw.leagueContexts) {
-    return {
-      narratives: raw.narratives ?? {},
-      featuredGames: raw.featuredGames ?? {},
-      leagueContexts: raw.leagueContexts ?? {},
-      generatedSummaries: raw.generatedSummaries ?? {}
-    };
-  }
-  const bundle = emptyWebEditorialBundle();
-  const legacyGames = raw.games;
-  if (legacyGames && typeof legacyGames === "object") {
-    for (const [gameKey, row] of Object.entries(legacyGames)) {
-      if (typeof row?.manualNarrative === "string" && row.manualNarrative.trim()) {
-        bundle.narratives[gameKey] = { manualNarrative: row.manualNarrative.trim() };
+  let narratives = {};
+  let leagueContexts = {};
+  let generatedSummaries;
+  if (raw.narratives || raw.leagueContexts) {
+    narratives = raw.narratives ?? {};
+    leagueContexts = raw.leagueContexts ?? {};
+    generatedSummaries = raw.generatedSummaries;
+  } else {
+    const legacyGames = raw.games;
+    if (legacyGames && typeof legacyGames === "object") {
+      for (const [gameKey, row] of Object.entries(legacyGames)) {
+        if (typeof row?.manualNarrative === "string" && row.manualNarrative.trim()) {
+          narratives[gameKey] = { manualNarrative: row.manualNarrative.trim() };
+        }
       }
-      const rank = row?.briefingPriority ?? row?.featuredRank;
-      if (typeof rank === "number" && Number.isFinite(rank)) {
-        bundle.featuredGames[gameKey] = { briefingPriority: Math.round(rank) };
+    }
+    const legacyLeagues = raw.leagues;
+    if (legacyLeagues && typeof legacyLeagues === "object") {
+      for (const [leagueKey, row] of Object.entries(legacyLeagues)) {
+        if (typeof row?.leagueContext === "string" && row.leagueContext.trim()) {
+          leagueContexts[leagueKey.toUpperCase()] = { leagueContext: row.leagueContext.trim() };
+        }
       }
     }
   }
-  const legacyLeagues = raw.leagues;
-  if (legacyLeagues && typeof legacyLeagues === "object") {
-    for (const [leagueKey, row] of Object.entries(legacyLeagues)) {
-      if (typeof row?.leagueContext === "string" && row.leagueContext.trim()) {
-        bundle.leagueContexts[leagueKey.toUpperCase()] = { leagueContext: row.leagueContext.trim() };
-      }
-    }
-  }
-  return bundle;
+  return { narratives, featuredGames: {}, leagueContexts, generatedSummaries };
 }
 function writeWebEditorialBundle(bundle) {
-  writeJson(LS_EDITORIAL, bundle);
+  writeJson(LS_EDITORIAL, {
+    narratives: bundle.narratives,
+    leagueContexts: bundle.leagueContexts,
+    generatedSummaries: bundle.generatedSummaries
+  });
 }
 var LS_BRIEFING_PERSISTENCE = "grarf-web-briefing-persistence";
 function readBriefingPersistenceSnapshots() {
@@ -14525,9 +14525,7 @@ function installGrarfBridge() {
       const rank = payload.briefingPriority ?? payload.featuredRank;
       if (rank == null || !Number.isFinite(rank)) delete featuredGames[payload.gameKey];
       else featuredGames[payload.gameKey] = { briefingPriority: Math.round(rank) };
-      const next = { ...bundle, featuredGames };
-      writeWebEditorialBundle(next);
-      return { ok: true, bundle: next };
+      return { ok: true, bundle: { ...bundle, featuredGames } };
     },
     editorialSaveLeagueContext: async (payload) => {
       const bundle = readWebEditorialBundle();
@@ -14592,6 +14590,21 @@ function installGrarfBridge() {
         if (!res.ok) return { ok: false, error: `HTTP ${res.status}` };
         const body = await res.json();
         return { ok: true, removed: body.removed, document: body.document };
+      } catch (err) {
+        return { ok: false, error: err instanceof Error ? err.message : String(err) };
+      }
+    },
+    sportscapeEditorialUpsertFeaturedGame: async (payload) => {
+      try {
+        const res = await fetch("/api/sportscape-editorial/featured-games", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        if (!res.ok) return { ok: false, error: `HTTP ${res.status}` };
+        const body = await res.json();
+        if (!body.document) return { ok: false, error: "missing_document" };
+        return { ok: true, document: body.document };
       } catch (err) {
         return { ok: false, error: err instanceof Error ? err.message : String(err) };
       }
@@ -32022,6 +32035,205 @@ function markGrarfAdmin() {
   }
 }
 
+// ../grarf/desktop/src/lib/sportscape/editorial/sportscapeEditorialApi.ts
+init_define_import_meta_env();
+
+// ../grarf/desktop/src/config/sportscapeEditorialConfig.ts
+init_define_import_meta_env();
+var DEFAULT_SPORTSCAPE_EDITORIAL_API_URL = "https://grarf-sportscape-editorial.grarf.workers.dev";
+function resolveWebSportscapeEditorialApiUrl() {
+  if (typeof window === "undefined") return null;
+  return window.GRARF_WEB_CONFIG?.sportscapeEditorialApiUrl?.trim() || null;
+}
+function getSportscapeEditorialApiBaseUrl() {
+  const fromEnv = define_import_meta_env_default.VITE_SPORTSCAPE_EDITORIAL_API_URL?.trim();
+  if (fromEnv) return fromEnv.replace(/\/+$/, "");
+  const fromWeb = resolveWebSportscapeEditorialApiUrl();
+  if (fromWeb) return fromWeb.replace(/\/+$/, "");
+  return DEFAULT_SPORTSCAPE_EDITORIAL_API_URL;
+}
+function shouldUseLocalSportscapeEditorialFallback() {
+  if (!define_import_meta_env_default.DEV) return false;
+  if (define_import_meta_env_default.VITE_SPORTSCAPE_EDITORIAL_USE_LOCAL !== "1") return false;
+  return Boolean(
+    typeof window !== "undefined" && window.grarf?.sportscapeEditorialGetDocument
+  );
+}
+function sportscapeEditorialApiUrl(path) {
+  const base = getSportscapeEditorialApiBaseUrl();
+  if (path === "/" || path === "") return `${base}/`;
+  const suffix = path.startsWith("/") ? path : `/${path}`;
+  return `${base}${suffix}`;
+}
+
+// ../grarf/desktop/src/lib/sportscape/editorial/sportscapeEditorialAdminAuth.ts
+init_define_import_meta_env();
+var SESSION_KEY = "grarf-sportscape-admin-token";
+function getSportscapeAdminToken() {
+  try {
+    const token = sessionStorage.getItem(SESSION_KEY)?.trim();
+    return token || null;
+  } catch {
+    return null;
+  }
+}
+function isSportscapeAdminAuthed() {
+  return Boolean(getSportscapeAdminToken());
+}
+function markSportscapeAdminAuthed(token) {
+  try {
+    sessionStorage.setItem(SESSION_KEY, token);
+  } catch {
+  }
+  markGrarfAdmin();
+}
+
+// ../grarf/desktop/src/lib/sportscape/editorial/sportscapeEditorialApi.ts
+function workerWriteHeaders() {
+  const headers = {
+    "Content-Type": "application/json"
+  };
+  const token = getSportscapeAdminToken();
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+  return headers;
+}
+async function fetchSportscapeEditorialDocumentViaWorker() {
+  const res = await fetch(sportscapeEditorialApiUrl("/"), { method: "GET" });
+  if (!res.ok) throw new Error(`load_failed_${res.status}`);
+  const body = await res.json();
+  return body.document ?? { entries: [], aiBriefSelections: [], featuredGames: {} };
+}
+function featuredGamesFromEditorialDocument(doc) {
+  const out = {};
+  const raw = doc?.featuredGames;
+  if (!raw) return out;
+  for (const [key2, row] of Object.entries(raw)) {
+    const rank = row.briefingPriority ?? row.featuredRank;
+    if (typeof rank !== "number" || !Number.isFinite(rank) || rank < 1 || rank > 10) continue;
+    out[key2] = { briefingPriority: Math.round(rank) };
+  }
+  return out;
+}
+async function upsertFeaturedGameViaWorker(input) {
+  const res = await fetch(sportscapeEditorialApiUrl("/featured-games"), {
+    method: "POST",
+    headers: workerWriteHeaders(),
+    body: JSON.stringify(input)
+  });
+  if (!res.ok) throw new Error(`featured_game_save_failed_${res.status}`);
+  const body = await res.json();
+  if (!body.document) throw new Error("featured_game_save_missing_document");
+  return body.document;
+}
+async function upsertSportscapeEditorialEntryViaWorker(input) {
+  const res = await fetch(sportscapeEditorialApiUrl("/entries"), {
+    method: "POST",
+    headers: workerWriteHeaders(),
+    body: JSON.stringify(input)
+  });
+  if (!res.ok) throw new Error(`save_failed_${res.status}`);
+  const body = await res.json();
+  if (!body.entry) throw new Error("save_missing_entry");
+  return body.entry;
+}
+async function verifySportscapeAdminPasswordViaWorker(password) {
+  const res = await fetch(sportscapeEditorialApiUrl("/verify-password"), {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ password })
+  });
+  if (res.status === 401) return false;
+  if (!res.ok) throw new Error(`verify_failed_${res.status}`);
+  const body = await res.json();
+  if (!body.ok || !body.token) return false;
+  markSportscapeAdminAuthed(body.token);
+  return true;
+}
+async function upsertAiBriefSelectionViaWorker(input) {
+  const res = await fetch(sportscapeEditorialApiUrl("/ai-brief-selections"), {
+    method: "POST",
+    headers: workerWriteHeaders(),
+    body: JSON.stringify(input)
+  });
+  if (!res.ok) throw new Error(`ai_brief_upsert_failed_${res.status}`);
+  const body = await res.json();
+  if (!body.selection) throw new Error("ai_brief_upsert_missing_selection");
+  return body.selection;
+}
+async function removeAiBriefSelectionViaWorker(id) {
+  const res = await fetch(sportscapeEditorialApiUrl("/ai-brief-selections/remove"), {
+    method: "POST",
+    headers: workerWriteHeaders(),
+    body: JSON.stringify({ id })
+  });
+  if (!res.ok) throw new Error(`ai_brief_remove_failed_${res.status}`);
+}
+async function fetchSportscapeEditorialDocument() {
+  return fetchSportscapeEditorialDocumentViaWorker();
+}
+async function fetchFeaturedGamesFromEditorialWorker() {
+  const doc = await fetchSportscapeEditorialDocument();
+  return featuredGamesFromEditorialDocument(doc);
+}
+async function saveFeaturedGamePriorityViaWorker(gameKey, rank) {
+  const input = {
+    gameKey,
+    briefingPriority: rank,
+    featuredRank: rank
+  };
+  if (shouldUseLocalSportscapeEditorialFallback() && window.grarf?.sportscapeEditorialUpsertFeaturedGame) {
+    const result = await window.grarf.sportscapeEditorialUpsertFeaturedGame(input);
+    if (!result.ok || !result.document) {
+      throw new Error(result.error ?? "featured_game_save_failed");
+    }
+    return featuredGamesFromEditorialDocument(result.document);
+  }
+  const doc = await upsertFeaturedGameViaWorker(input);
+  return featuredGamesFromEditorialDocument(doc);
+}
+async function saveSportscapeEditorialEntry(input) {
+  if (shouldUseLocalSportscapeEditorialFallback() && window.grarf?.sportscapeEditorialUpsertEntry) {
+    const result = await window.grarf.sportscapeEditorialUpsertEntry(input);
+    if (!result.ok || !result.entry) throw new Error(result.error ?? "save_failed");
+    return result.entry;
+  }
+  return upsertSportscapeEditorialEntryViaWorker(input);
+}
+async function verifySportscapeAdminPassword(password) {
+  if (shouldUseLocalSportscapeEditorialFallback() && window.grarf?.sportscapeEditorialVerifyPassword) {
+    const result = await window.grarf.sportscapeEditorialVerifyPassword(password);
+    if (result.error) throw new Error(result.error);
+    if (result.ok) markSportscapeAdminAuthed("local-dev");
+    return Boolean(result.ok);
+  }
+  return verifySportscapeAdminPasswordViaWorker(password);
+}
+async function saveAiBriefSelection(input) {
+  if (shouldUseLocalSportscapeEditorialFallback() && window.grarf?.sportscapeEditorialUpsertAiBriefSelection) {
+    const result = await window.grarf.sportscapeEditorialUpsertAiBriefSelection(input);
+    if (!result.ok || !result.selection) {
+      throw new Error(result.error ?? "ai_brief_upsert_failed");
+    }
+    return result.selection;
+  }
+  return upsertAiBriefSelectionViaWorker(input);
+}
+async function deleteAiBriefSelection(id) {
+  if (shouldUseLocalSportscapeEditorialFallback() && window.grarf?.sportscapeEditorialRemoveAiBriefSelection) {
+    const result = await window.grarf.sportscapeEditorialRemoveAiBriefSelection({ id });
+    if (!result.ok) throw new Error(result.error ?? "ai_brief_remove_failed");
+    return;
+  }
+  await removeAiBriefSelectionViaWorker(id);
+}
+async function clearAllAiBriefSelections(selections) {
+  for (const selection of selections) {
+    await deleteAiBriefSelection(selection.id);
+  }
+}
+
 // ../grarf/desktop/src/store/editorialStore.ts
 var LOG2 = "[Editorial]";
 var EDIT_MODE_KEY = "grarf-editorial-edit-mode-v1";
@@ -32179,12 +32391,10 @@ var useEditorialStore = (0, import_zustand8.create)((set, get) => ({
   saveFeaturedRank: (gameKey, rank) => {
     get().setFeaturedRankLocal(gameKey, rank);
     debounced(`featured:${gameKey}`, () => {
-      const api = window.grarf?.editorialSaveFeaturedRank;
-      if (!api) return;
-      void api({ gameKey, briefingPriority: rank, featuredRank: rank }).then((res) => {
-        if (res?.ok && res.bundle) {
-          set({ bundle: normalizeEditorialBundle(res.bundle) });
-        }
+      void saveFeaturedGamePriorityViaWorker(gameKey, rank).then((featuredGames) => {
+        set((s2) => ({ bundle: { ...s2.bundle, featuredGames } }));
+      }).catch((err) => {
+        console.warn(`${LOG2} featuredGames save failed`, gameKey, err);
       });
     });
   },
@@ -32201,12 +32411,19 @@ var useEditorialStore = (0, import_zustand8.create)((set, get) => ({
 }));
 async function loadEditorialBundleFromMain() {
   const api = window.grarf?.editorialGetBundle;
-  if (!api) {
-    useEditorialStore.getState().hydrate(emptyBundle());
-    return;
+  let bundle = emptyBundle();
+  if (api) {
+    const res = await api();
+    if (res?.ok && res.bundle) {
+      bundle = normalizeEditorialBundle(res.bundle);
+    }
   }
-  const res = await api();
-  let bundle = res?.ok && res.bundle ? normalizeEditorialBundle(res.bundle) : emptyBundle();
+  try {
+    const featuredGames = await fetchFeaturedGamesFromEditorialWorker();
+    bundle = { ...bundle, featuredGames };
+  } catch (err) {
+    console.warn(`${LOG2} featuredGames load failed`, err);
+  }
   const summariesApi = window.grarf?.editorialGenerationGetSummaries;
   if (summariesApi) {
     const sumRes = await summariesApi();
@@ -61510,165 +61727,6 @@ function useMlbSportscapeArticles() {
 // ../grarf/desktop/src/hooks/useSportscapeEditorialDocument.ts
 init_define_import_meta_env();
 var import_react103 = __toESM(require_react(), 1);
-
-// ../grarf/desktop/src/lib/sportscape/editorial/sportscapeEditorialApi.ts
-init_define_import_meta_env();
-
-// ../grarf/desktop/src/config/sportscapeEditorialConfig.ts
-init_define_import_meta_env();
-var DEFAULT_SPORTSCAPE_EDITORIAL_API_URL = "https://grarf-sportscape-editorial.grarf.workers.dev";
-function resolveWebSportscapeEditorialApiUrl() {
-  if (typeof window === "undefined") return null;
-  return window.GRARF_WEB_CONFIG?.sportscapeEditorialApiUrl?.trim() || null;
-}
-function getSportscapeEditorialApiBaseUrl() {
-  const fromEnv = define_import_meta_env_default.VITE_SPORTSCAPE_EDITORIAL_API_URL?.trim();
-  if (fromEnv) return fromEnv.replace(/\/+$/, "");
-  const fromWeb = resolveWebSportscapeEditorialApiUrl();
-  if (fromWeb) return fromWeb.replace(/\/+$/, "");
-  return DEFAULT_SPORTSCAPE_EDITORIAL_API_URL;
-}
-function shouldUseLocalSportscapeEditorialFallback() {
-  if (!define_import_meta_env_default.DEV) return false;
-  if (define_import_meta_env_default.VITE_SPORTSCAPE_EDITORIAL_USE_LOCAL !== "1") return false;
-  return Boolean(
-    typeof window !== "undefined" && window.grarf?.sportscapeEditorialGetDocument
-  );
-}
-function sportscapeEditorialApiUrl(path) {
-  const base = getSportscapeEditorialApiBaseUrl();
-  if (path === "/" || path === "") return `${base}/`;
-  const suffix = path.startsWith("/") ? path : `/${path}`;
-  return `${base}${suffix}`;
-}
-
-// ../grarf/desktop/src/lib/sportscape/editorial/sportscapeEditorialAdminAuth.ts
-init_define_import_meta_env();
-var SESSION_KEY = "grarf-sportscape-admin-token";
-function getSportscapeAdminToken() {
-  try {
-    const token = sessionStorage.getItem(SESSION_KEY)?.trim();
-    return token || null;
-  } catch {
-    return null;
-  }
-}
-function isSportscapeAdminAuthed() {
-  return Boolean(getSportscapeAdminToken());
-}
-function markSportscapeAdminAuthed(token) {
-  try {
-    sessionStorage.setItem(SESSION_KEY, token);
-  } catch {
-  }
-  markGrarfAdmin();
-}
-
-// ../grarf/desktop/src/lib/sportscape/editorial/sportscapeEditorialApi.ts
-function workerWriteHeaders() {
-  const headers = {
-    "Content-Type": "application/json"
-  };
-  const token = getSportscapeAdminToken();
-  if (token) {
-    headers.Authorization = `Bearer ${token}`;
-  }
-  return headers;
-}
-async function fetchSportscapeEditorialDocumentViaWorker() {
-  const res = await fetch(sportscapeEditorialApiUrl("/"), { method: "GET" });
-  if (!res.ok) throw new Error(`load_failed_${res.status}`);
-  const body = await res.json();
-  return body.document ?? { entries: [], aiBriefSelections: [] };
-}
-async function upsertSportscapeEditorialEntryViaWorker(input) {
-  const res = await fetch(sportscapeEditorialApiUrl("/entries"), {
-    method: "POST",
-    headers: workerWriteHeaders(),
-    body: JSON.stringify(input)
-  });
-  if (!res.ok) throw new Error(`save_failed_${res.status}`);
-  const body = await res.json();
-  if (!body.entry) throw new Error("save_missing_entry");
-  return body.entry;
-}
-async function verifySportscapeAdminPasswordViaWorker(password) {
-  const res = await fetch(sportscapeEditorialApiUrl("/verify-password"), {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ password })
-  });
-  if (res.status === 401) return false;
-  if (!res.ok) throw new Error(`verify_failed_${res.status}`);
-  const body = await res.json();
-  if (!body.ok || !body.token) return false;
-  markSportscapeAdminAuthed(body.token);
-  return true;
-}
-async function upsertAiBriefSelectionViaWorker(input) {
-  const res = await fetch(sportscapeEditorialApiUrl("/ai-brief-selections"), {
-    method: "POST",
-    headers: workerWriteHeaders(),
-    body: JSON.stringify(input)
-  });
-  if (!res.ok) throw new Error(`ai_brief_upsert_failed_${res.status}`);
-  const body = await res.json();
-  if (!body.selection) throw new Error("ai_brief_upsert_missing_selection");
-  return body.selection;
-}
-async function removeAiBriefSelectionViaWorker(id) {
-  const res = await fetch(sportscapeEditorialApiUrl("/ai-brief-selections/remove"), {
-    method: "POST",
-    headers: workerWriteHeaders(),
-    body: JSON.stringify({ id })
-  });
-  if (!res.ok) throw new Error(`ai_brief_remove_failed_${res.status}`);
-}
-async function fetchSportscapeEditorialDocument() {
-  return fetchSportscapeEditorialDocumentViaWorker();
-}
-async function saveSportscapeEditorialEntry(input) {
-  if (shouldUseLocalSportscapeEditorialFallback() && window.grarf?.sportscapeEditorialUpsertEntry) {
-    const result = await window.grarf.sportscapeEditorialUpsertEntry(input);
-    if (!result.ok || !result.entry) throw new Error(result.error ?? "save_failed");
-    return result.entry;
-  }
-  return upsertSportscapeEditorialEntryViaWorker(input);
-}
-async function verifySportscapeAdminPassword(password) {
-  if (shouldUseLocalSportscapeEditorialFallback() && window.grarf?.sportscapeEditorialVerifyPassword) {
-    const result = await window.grarf.sportscapeEditorialVerifyPassword(password);
-    if (result.error) throw new Error(result.error);
-    if (result.ok) markSportscapeAdminAuthed("local-dev");
-    return Boolean(result.ok);
-  }
-  return verifySportscapeAdminPasswordViaWorker(password);
-}
-async function saveAiBriefSelection(input) {
-  if (shouldUseLocalSportscapeEditorialFallback() && window.grarf?.sportscapeEditorialUpsertAiBriefSelection) {
-    const result = await window.grarf.sportscapeEditorialUpsertAiBriefSelection(input);
-    if (!result.ok || !result.selection) {
-      throw new Error(result.error ?? "ai_brief_upsert_failed");
-    }
-    return result.selection;
-  }
-  return upsertAiBriefSelectionViaWorker(input);
-}
-async function deleteAiBriefSelection(id) {
-  if (shouldUseLocalSportscapeEditorialFallback() && window.grarf?.sportscapeEditorialRemoveAiBriefSelection) {
-    const result = await window.grarf.sportscapeEditorialRemoveAiBriefSelection({ id });
-    if (!result.ok) throw new Error(result.error ?? "ai_brief_remove_failed");
-    return;
-  }
-  await removeAiBriefSelectionViaWorker(id);
-}
-async function clearAllAiBriefSelections(selections) {
-  for (const selection of selections) {
-    await deleteAiBriefSelection(selection.id);
-  }
-}
-
-// ../grarf/desktop/src/hooks/useSportscapeEditorialDocument.ts
 var EMPTY_DOCUMENT = {
   entries: [],
   aiBriefSelections: []

@@ -34,43 +34,44 @@ function readWebEditorialBundle(): WebEditorialBundle {
   const raw = readJson<Record<string, unknown> | null>(LS_EDITORIAL, null);
   if (!raw || typeof raw !== "object") return emptyWebEditorialBundle();
 
-  if (raw.narratives || raw.featuredGames || raw.leagueContexts) {
-    return {
-      narratives: (raw.narratives as WebEditorialBundle["narratives"]) ?? {},
-      featuredGames: (raw.featuredGames as WebEditorialBundle["featuredGames"]) ?? {},
-      leagueContexts: (raw.leagueContexts as WebEditorialBundle["leagueContexts"]) ?? {},
-      generatedSummaries: (raw.generatedSummaries as WebEditorialBundle["generatedSummaries"]) ?? {},
-    };
-  }
+  let narratives: WebEditorialBundle["narratives"] = {};
+  let leagueContexts: WebEditorialBundle["leagueContexts"] = {};
+  let generatedSummaries: WebEditorialBundle["generatedSummaries"];
 
-  const bundle = emptyWebEditorialBundle();
-  const legacyGames = raw.games;
-  if (legacyGames && typeof legacyGames === "object") {
-    for (const [gameKey, row] of Object.entries(legacyGames as Record<string, Record<string, unknown>>)) {
-      if (typeof row?.manualNarrative === "string" && row.manualNarrative.trim()) {
-        bundle.narratives[gameKey] = { manualNarrative: row.manualNarrative.trim() };
+  if (raw.narratives || raw.leagueContexts) {
+    narratives = (raw.narratives as WebEditorialBundle["narratives"]) ?? {};
+    leagueContexts = (raw.leagueContexts as WebEditorialBundle["leagueContexts"]) ?? {};
+    generatedSummaries = raw.generatedSummaries as WebEditorialBundle["generatedSummaries"];
+  } else {
+    const legacyGames = raw.games;
+    if (legacyGames && typeof legacyGames === "object") {
+      for (const [gameKey, row] of Object.entries(legacyGames as Record<string, Record<string, unknown>>)) {
+        if (typeof row?.manualNarrative === "string" && row.manualNarrative.trim()) {
+          narratives[gameKey] = { manualNarrative: row.manualNarrative.trim() };
+        }
       }
-      const rank = row?.briefingPriority ?? row?.featuredRank;
-      if (typeof rank === "number" && Number.isFinite(rank)) {
-        bundle.featuredGames[gameKey] = { briefingPriority: Math.round(rank) };
+    }
+
+    const legacyLeagues = raw.leagues;
+    if (legacyLeagues && typeof legacyLeagues === "object") {
+      for (const [leagueKey, row] of Object.entries(legacyLeagues as Record<string, Record<string, unknown>>)) {
+        if (typeof row?.leagueContext === "string" && row.leagueContext.trim()) {
+          leagueContexts[leagueKey.toUpperCase()] = { leagueContext: row.leagueContext.trim() };
+        }
       }
     }
   }
 
-  const legacyLeagues = raw.leagues;
-  if (legacyLeagues && typeof legacyLeagues === "object") {
-    for (const [leagueKey, row] of Object.entries(legacyLeagues as Record<string, Record<string, unknown>>)) {
-      if (typeof row?.leagueContext === "string" && row.leagueContext.trim()) {
-        bundle.leagueContexts[leagueKey.toUpperCase()] = { leagueContext: row.leagueContext.trim() };
-      }
-    }
-  }
-
-  return bundle;
+  // featuredGames are global — loaded from Sportscape Editorial Worker, not localStorage.
+  return { narratives, featuredGames: {}, leagueContexts, generatedSummaries };
 }
 
 function writeWebEditorialBundle(bundle: WebEditorialBundle): void {
-  writeJson(LS_EDITORIAL, bundle);
+  writeJson(LS_EDITORIAL, {
+    narratives: bundle.narratives,
+    leagueContexts: bundle.leagueContexts,
+    generatedSummaries: bundle.generatedSummaries,
+  });
 }
 const LS_BRIEFING_PERSISTENCE = "grarf-web-briefing-persistence";
 function readBriefingPersistenceSnapshots(): Record<string, unknown> {
@@ -398,14 +399,13 @@ function installGrarfBridge(): void {
       return { ok: true as const, bundle: next };
     },
     editorialSaveFeaturedRank: async (payload) => {
+      // Deprecated: featuredGames persist via Sportscape Editorial Worker (editorialStore).
       const bundle = readWebEditorialBundle();
       const featuredGames = { ...bundle.featuredGames };
       const rank = payload.briefingPriority ?? payload.featuredRank;
       if (rank == null || !Number.isFinite(rank)) delete featuredGames[payload.gameKey];
       else featuredGames[payload.gameKey] = { briefingPriority: Math.round(rank) };
-      const next = { ...bundle, featuredGames };
-      writeWebEditorialBundle(next);
-      return { ok: true as const, bundle: next };
+      return { ok: true as const, bundle: { ...bundle, featuredGames } };
     },
     editorialSaveLeagueContext: async (payload) => {
       const bundle = readWebEditorialBundle();
@@ -479,6 +479,23 @@ function installGrarfBridge(): void {
           document?: import("../../grarf/desktop/src/types/sportscapeEditorial").SportscapeEditorialDocument;
         };
         return { ok: true as const, removed: body.removed, document: body.document };
+      } catch (err) {
+        return { ok: false as const, error: err instanceof Error ? err.message : String(err) };
+      }
+    },
+    sportscapeEditorialUpsertFeaturedGame: async (payload) => {
+      try {
+        const res = await fetch("/api/sportscape-editorial/featured-games", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        if (!res.ok) return { ok: false as const, error: `HTTP ${res.status}` };
+        const body = (await res.json()) as {
+          document?: import("../../grarf/desktop/src/types/sportscapeEditorial").SportscapeEditorialDocument;
+        };
+        if (!body.document) return { ok: false as const, error: "missing_document" };
+        return { ok: true as const, document: body.document };
       } catch (err) {
         return { ok: false as const, error: err instanceof Error ? err.message : String(err) };
       }
