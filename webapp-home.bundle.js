@@ -41121,9 +41121,19 @@ function channelLogoImageClass(align = "left") {
 // ../grarf/desktop/src/lib/broadcast/resolveChannelLogoUrl.ts
 init_define_import_meta_env();
 var CHANNEL_LOGO_BY_LABEL = {
+  ABC: "/league-logos/channel-abc.png",
+  CBS: "/league-logos/channel-cbs.png",
   ESPN: "/league-logos/channel-espn.png",
   ESPN2: "/league-logos/channel-espn2.png",
   ESPNU: "/league-logos/channel-espnu.png",
+  USA: "/league-logos/channel-usa.png",
+  "USA NETWORK": "/league-logos/channel-usa.png",
+  "USA NET": "/league-logos/channel-usa.png",
+  ION: "/league-logos/channel-ion.png",
+  "NBA TV": "/league-logos/channel-nba-tv.png",
+  NBATV: "/league-logos/channel-nba-tv.png",
+  CNBC: "/league-logos/channel-cnbc.png",
+  "PARAMOUNT+": "/league-logos/channel-paramount-plus.png",
   TNT: "/league-logos/channel-tnt.png",
   "MLB.TV": "/league-logos/channel-mlbtv.png",
   "MLB TV": "/league-logos/channel-mlbtv.png",
@@ -41138,7 +41148,9 @@ var CHANNEL_LOGO_BY_LABEL = {
   "APPLE TV": "/league-logos/channel-apple-tv.png",
   "TENNIS CHANNEL": "/league-logos/channel-tennis-channel.png",
   "TENNIS CHANNEL+": "/league-logos/channel-tennis-channel.png",
-  "PRIME VIDEO": "/league-logos/channel-prime-video.png"
+  "PRIME VIDEO": "/league-logos/channel-prime-video.png",
+  PRIME: "/league-logos/channel-prime-video.png",
+  "WNBA LEAGUE PASS": "/league-logos/channel-wnba-league-pass.png"
 };
 function normalizeChannelLogoKey(label) {
   return label.trim().replace(/\s+/g, " ").toUpperCase();
@@ -41152,6 +41164,12 @@ function resolveChannelLogoUrl(channelLabel) {
   if (/\bFS2\b/.test(key2)) return CHANNEL_LOGO_BY_LABEL.FS1 ?? null;
   if (/\bFOX\b/.test(key2)) return CHANNEL_LOGO_BY_LABEL.FOX ?? null;
   if (/\bPRIME\s*VIDEO\b/.test(key2)) return CHANNEL_LOGO_BY_LABEL["PRIME VIDEO"] ?? null;
+  if (key2 === "PRIME") return CHANNEL_LOGO_BY_LABEL.PRIME ?? null;
+  if (/^USA(\s+NET(WORK)?)?$/.test(key2)) return CHANNEL_LOGO_BY_LABEL.USA ?? null;
+  if (/^NBA\s*TV$/.test(key2)) return CHANNEL_LOGO_BY_LABEL["NBA TV"] ?? null;
+  if (/\bWNBA\s+LEAGUE\s+PASS\b/.test(key2) || key2 === "LEAGUE PASS") {
+    return CHANNEL_LOGO_BY_LABEL["WNBA LEAGUE PASS"] ?? null;
+  }
   return null;
 }
 
@@ -41285,6 +41303,103 @@ init_define_import_meta_env();
 // ../grarf/desktop/src/lib/broadcast/resolveGameChannelPresentation.ts
 init_define_import_meta_env();
 
+// ../grarf/desktop/src/lib/broadcast/selectWnbaDisplayBroadcastLabel.ts
+init_define_import_meta_env();
+function normalizeBroadcastLabel(value) {
+  return value.trim().replace(/\s+/g, " ").toUpperCase();
+}
+var WNBA_DISPLAY_BROADCAST_TIERS = [
+  {
+    canonicalLabel: "ABC",
+    matches: (u2) => u2 === "ABC" || /^ABC\s/.test(u2)
+  },
+  {
+    canonicalLabel: "CBS",
+    matches: (u2) => u2 === "CBS" || u2.startsWith("CBS ") && !u2.includes("SPORTS")
+  },
+  {
+    canonicalLabel: "ESPN",
+    matches: (u2) => {
+      if (isEspnPlusBroadcastLabel(u2)) return false;
+      if (isEspnLinearBroadcastLabel(u2)) return true;
+      return /\bESPN\b/.test(u2) && !/\+/.test(u2) && !/UNLIMITED|UNLMTD/.test(u2);
+    }
+  },
+  {
+    canonicalLabel: "USA",
+    matches: (u2) => u2 === "USA" || u2 === "USA NETWORK" || u2 === "USA NET" || /^USA\s+NET(WORK)?$/.test(u2)
+  },
+  {
+    canonicalLabel: "ION",
+    matches: (u2) => u2 === "ION" || u2.startsWith("ION ")
+  },
+  {
+    canonicalLabel: "NBA TV",
+    matches: (u2) => u2 === "NBA TV" || u2 === "NBATV" || /^NBA\s*TV\b/.test(u2)
+  },
+  {
+    canonicalLabel: "CNBC",
+    matches: (u2) => u2 === "CNBC" || u2.startsWith("CNBC ")
+  },
+  {
+    canonicalLabel: "Paramount+",
+    matches: (u2) => u2 === "PARAMOUNT+" || u2 === "PARAMOUNT PLUS" || /^PARAMOUNT\+?/.test(u2)
+  },
+  {
+    canonicalLabel: "Prime Video",
+    matches: (u2) => u2 === "PRIME VIDEO" || /^PRIME\s+VIDEO\b/.test(u2)
+  },
+  {
+    canonicalLabel: "Prime",
+    matches: (u2) => u2 === "PRIME"
+  },
+  {
+    canonicalLabel: "WNBA League Pass",
+    matches: (u2) => u2 === "WNBA LEAGUE PASS" || u2 === "LEAGUE PASS" || /\bWNBA\s+LEAGUE\s+PASS\b/.test(u2)
+  }
+];
+function uniqueBroadcastLabels(labels) {
+  const seen = /* @__PURE__ */ new Set();
+  const out = [];
+  for (const raw of labels) {
+    const trimmed = raw.trim();
+    if (!trimmed || trimmed === "TV TBD") continue;
+    const key2 = trimmed.toLowerCase();
+    if (seen.has(key2)) continue;
+    seen.add(key2);
+    out.push(trimmed);
+  }
+  return out;
+}
+function matchWnbaDisplayBroadcastTier(label) {
+  const normalized = normalizeBroadcastLabel(label);
+  for (let index = 0; index < WNBA_DISPLAY_BROADCAST_TIERS.length; index += 1) {
+    const tier = WNBA_DISPLAY_BROADCAST_TIERS[index];
+    if (tier.matches(normalized)) {
+      return { tierIndex: index, canonicalLabel: tier.canonicalLabel };
+    }
+  }
+  return null;
+}
+function selectWnbaDisplayBroadcastLabel(labels) {
+  const unique = uniqueBroadcastLabels(labels);
+  if (unique.length === 0) return null;
+  let best = null;
+  for (const label of unique) {
+    const match = matchWnbaDisplayBroadcastTier(label);
+    if (!match) continue;
+    if (!best || match.tierIndex < best.tierIndex) {
+      best = match;
+    }
+  }
+  if (best) return best.canonicalLabel;
+  return rankBroadcastLabels(unique, "WNBA", 1)[0] ?? null;
+}
+function selectWnbaDisplayBroadcastLabelForGame(game) {
+  const pool = [...game.broadcasts ?? [], ...game.channels ?? []];
+  return selectWnbaDisplayBroadcastLabel(pool);
+}
+
 // ../grarf/desktop/src/lib/broadcast/streamUrlChannelFallback.ts
 init_define_import_meta_env();
 var STREAM_URL_CHANNEL_MAPPINGS = [
@@ -41322,6 +41437,9 @@ function deriveChannelLabelFromStreamUrl(streamUrl) {
 
 // ../grarf/desktop/src/lib/broadcast/resolveGameChannelPresentation.ts
 function primaryBroadcastLabel(game) {
+  if (game.league === "WNBA") {
+    return selectWnbaDisplayBroadcastLabelForGame(game) ?? "TV TBD";
+  }
   return broadcastLabelsForGameCard(game, 1)[0] ?? "TV TBD";
 }
 function resolvePrimaryChannelLabel(game) {
