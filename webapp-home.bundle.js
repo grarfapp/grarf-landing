@@ -51251,10 +51251,22 @@ function GameRow({
 
 // ../grarf/desktop/src/lib/bestGameRightNow/resolveBestGameRightNowV1.ts
 init_define_import_meta_env();
+function resolveManualLeagueBaseImportance(manual) {
+  if (manual.leaguePriority != null && Number.isFinite(manual.leaguePriority)) {
+    return manual.leaguePriority;
+  }
+  if (manual.insertAfterLeague?.trim()) {
+    return resolveLeagueImportanceV1ForLeagueKey(manual.insertAfterLeague);
+  }
+  if (manual.insertBeforeLeague?.trim()) {
+    return resolveLeagueImportanceV1ForLeagueKey(manual.insertBeforeLeague);
+  }
+  return 0;
+}
 function resolveGameImportanceForBestGame(game) {
   const manual = game.metadata?.manualGamesSpine;
   if (manual) {
-    let score2 = manual.leaguePriority;
+    let score2 = resolveManualLeagueBaseImportance(manual);
     if (manual.bestGamePriority != null && Number.isFinite(manual.bestGamePriority)) {
       score2 += (11 - manual.bestGamePriority) * 50;
     }
@@ -53100,7 +53112,9 @@ function convertEventToMlbGame(league, event, now) {
       leagueLabel: league.league,
       manualGamesSpine: {
         leagueLabel: league.league,
-        leaguePriority: league.leaguePriority,
+        leaguePriority: league.leaguePriority ?? void 0,
+        insertAfterLeague: league.insertAfterLeague ?? null,
+        insertBeforeLeague: league.insertBeforeLeague ?? null,
         bestGamePriority: event.bestGamePriority != null && Number.isFinite(event.bestGamePriority) ? event.bestGamePriority : void 0,
         eventName: event.eventName,
         date: event.date,
@@ -53126,11 +53140,13 @@ function convertManualGamesSpineDocument(document2, now = /* @__PURE__ */ new Da
     sections.push({
       slug: manualGamesSpineLeagueSlug(league.league),
       leagueLabel: league.league,
-      leaguePriority: league.leaguePriority,
+      leaguePriority: league.leaguePriority ?? null,
+      insertAfterLeague: league.insertAfterLeague ?? null,
+      insertBeforeLeague: league.insertBeforeLeague ?? null,
       games: sortGamesSpineChronologically(games)
     });
   }
-  return sections.sort((a2, b2) => b2.leaguePriority - a2.leaguePriority);
+  return sections;
 }
 function flattenManualGamesSpineGames(sections) {
   const out = [];
@@ -53185,28 +53201,98 @@ init_isGrarfWebRenderer();
 
 // ../grarf/desktop/src/lib/gamesSpine/mergeGamesSpineSectionsByPriority.ts
 init_define_import_meta_env();
+function normalizePlacementLabel(value) {
+  return value.trim().toLowerCase();
+}
+function operationalKeyMatchesAnchor(leagueKey, anchor) {
+  const normalized = normalizePlacementLabel(anchor);
+  if (normalizePlacementLabel(leagueKey) === normalized) return true;
+  return normalizePlacementLabel(resolveGamesSpineLeagueDisplayLabel(leagueKey)) === normalized;
+}
+function manualSectionMatchesAnchor(section, anchor) {
+  return normalizePlacementLabel(section.leagueLabel) === normalizePlacementLabel(anchor);
+}
+function findVisibleAnchorIndex(sections, anchor) {
+  for (let index = 0; index < sections.length; index += 1) {
+    const section = sections[index];
+    if (section.kind === "operational" && operationalKeyMatchesAnchor(section.leagueKey, anchor)) {
+      return index;
+    }
+    if (section.kind === "manual" && manualSectionMatchesAnchor(section.section, anchor)) {
+      return index;
+    }
+  }
+  return -1;
+}
+function findOperationalOrderAnchorIndex(operationalLeagueOrder, anchor) {
+  return operationalLeagueOrder.findIndex((key2) => operationalKeyMatchesAnchor(key2, anchor));
+}
+function resolveAnchorIndex(sections, operationalLeagueOrder, anchor, mode) {
+  const visibleIndex = findVisibleAnchorIndex(sections, anchor);
+  if (visibleIndex >= 0) {
+    return mode === "before" ? visibleIndex : visibleIndex + 1;
+  }
+  const orderIndex = findOperationalOrderAnchorIndex(operationalLeagueOrder, anchor);
+  if (orderIndex < 0) return sections.length;
+  if (mode === "before") {
+    for (let index = orderIndex; index < operationalLeagueOrder.length; index += 1) {
+      const key2 = operationalLeagueOrder[index];
+      const visible = sections.findIndex(
+        (section) => section.kind === "operational" && section.leagueKey === key2
+      );
+      if (visible >= 0) return visible;
+    }
+    return sections.length;
+  }
+  for (let index = orderIndex; index >= 0; index -= 1) {
+    const key2 = operationalLeagueOrder[index];
+    const visible = sections.findIndex(
+      (section) => section.kind === "operational" && section.leagueKey === key2
+    );
+    if (visible >= 0) return visible + 1;
+  }
+  return 0;
+}
+function resolveLegacyPriorityInsertionIndex(sections, leaguePriority) {
+  for (let index = 0; index < sections.length; index += 1) {
+    const section = sections[index];
+    if (section.kind !== "operational") continue;
+    const importance = resolveLeagueImportanceV1ForLeagueKey(section.leagueKey);
+    if (leaguePriority > importance) return index;
+  }
+  return sections.length;
+}
+function resolveManualInsertionIndex(sections, manual, operationalLeagueOrder) {
+  const insertBefore = manual.insertBeforeLeague?.trim();
+  if (insertBefore) {
+    return resolveAnchorIndex(sections, operationalLeagueOrder, insertBefore, "before");
+  }
+  const insertAfter = manual.insertAfterLeague?.trim();
+  if (insertAfter) {
+    return resolveAnchorIndex(sections, operationalLeagueOrder, insertAfter, "after");
+  }
+  if (manual.leaguePriority != null && Number.isFinite(manual.leaguePriority)) {
+    return resolveLegacyPriorityInsertionIndex(sections, manual.leaguePriority);
+  }
+  return sections.length;
+}
 function mergeGamesSpineSectionsByPriority(operationalLeagueOrder, mergedLeagues, manualSections) {
   const operationalWithGames = operationalLeagueOrder.filter(
     (key2) => filterGamesSpineSlateForToday(mergedLeagues[key2] ?? []).length > 0
   );
-  const manuals = [...manualSections].sort((a2, b2) => b2.leaguePriority - a2.leaguePriority);
-  const out = [];
-  let manualIndex = 0;
-  for (const leagueKey of operationalWithGames) {
-    const operationalImportance = resolveLeagueImportanceV1ForLeagueKey(leagueKey);
-    while (manualIndex < manuals.length && manuals[manualIndex].leaguePriority > operationalImportance) {
-      const section = manuals[manualIndex];
-      out.push({ kind: "manual", slug: section.slug, section });
-      manualIndex += 1;
-    }
-    out.push({ kind: "operational", leagueKey });
+  let sections = operationalWithGames.map((leagueKey) => ({
+    kind: "operational",
+    leagueKey
+  }));
+  for (const manual of manualSections) {
+    const insertAt = resolveManualInsertionIndex(sections, manual, operationalLeagueOrder);
+    sections = [
+      ...sections.slice(0, insertAt),
+      { kind: "manual", slug: manual.slug, section: manual },
+      ...sections.slice(insertAt)
+    ];
   }
-  while (manualIndex < manuals.length) {
-    const section = manuals[manualIndex];
-    out.push({ kind: "manual", slug: section.slug, section });
-    manualIndex += 1;
-  }
-  return out;
+  return sections;
 }
 function gamesSpineManualCollapseKey(slug) {
   return `manual:${slug}`;
@@ -71672,13 +71758,122 @@ init_define_import_meta_env();
 
 // ../grarf/desktop/src/lib/gamesSpine/manual/gamesSpineManualLeagueDocument.ts
 init_define_import_meta_env();
+function manualGamesSpineEventUniquenessKey(event) {
+  return `${event.date.trim()}::${event.eventName.trim().toLowerCase()}`;
+}
+function mergeManualGamesSpineLeagueMetadata(existing, incoming) {
+  const insertAfterLeague = incoming.insertAfterLeague ?? existing.insertAfterLeague ?? null;
+  const insertBeforeLeague = incoming.insertBeforeLeague ?? existing.insertBeforeLeague ?? null;
+  const usesNameBasedPlacement = Boolean(insertAfterLeague?.trim() || insertBeforeLeague?.trim());
+  const leaguePriority = usesNameBasedPlacement ? null : incoming.leaguePriority ?? existing.leaguePriority ?? null;
+  return {
+    leaguePriority,
+    insertAfterLeague,
+    insertBeforeLeague,
+    channel: incoming.channel ?? existing.channel ?? null,
+    channelUrl: incoming.channelUrl ?? existing.channelUrl ?? null
+  };
+}
+function mergeManualGamesSpineLeagueMetadataForAppend(existing, incoming) {
+  const merged = mergeManualGamesSpineLeagueMetadata(existing, incoming);
+  return {
+    ...merged,
+    channel: existing.channel ?? incoming.channel ?? null,
+    channelUrl: existing.channelUrl ?? incoming.channelUrl ?? null
+  };
+}
+function cloneManualGamesSpineEvent(event) {
+  return { ...event };
+}
+function materializeManualGamesSpineEventStreamDefaults(event, leagueDefaults) {
+  const materialized = cloneManualGamesSpineEvent(event);
+  if (!materialized.channel?.trim() && leagueDefaults.channel?.trim()) {
+    materialized.channel = leagueDefaults.channel.trim();
+  }
+  if (!materialized.channelUrl?.trim() && leagueDefaults.channelUrl?.trim()) {
+    materialized.channelUrl = leagueDefaults.channelUrl.trim();
+  }
+  return materialized;
+}
+function resolveManualGamesSpineEventStream(event, league) {
+  return {
+    channel: event.channel?.trim() || league.channel?.trim() || null,
+    channelUrl: event.channelUrl?.trim() || league.channelUrl?.trim() || null
+  };
+}
+function sanitizeManualGamesSpineLeagueForStorage(league) {
+  const insertAfterLeague = league.insertAfterLeague?.trim() ? league.insertAfterLeague.trim() : null;
+  const insertBeforeLeague = league.insertBeforeLeague?.trim() ? league.insertBeforeLeague.trim() : null;
+  const usesNameBasedPlacement = Boolean(insertAfterLeague || insertBeforeLeague);
+  const sanitized = {
+    league: league.league.trim(),
+    insertAfterLeague,
+    insertBeforeLeague,
+    channel: league.channel?.trim() ? league.channel.trim() : null,
+    channelUrl: league.channelUrl?.trim() ? league.channelUrl.trim() : null,
+    games: league.games
+  };
+  if (!usesNameBasedPlacement && league.leaguePriority != null && Number.isFinite(league.leaguePriority)) {
+    sanitized.leaguePriority = league.leaguePriority;
+  }
+  return sanitized;
+}
+function appendManualGamesSpineLeagueEvents(existing, incoming) {
+  const seen = new Set(existing.games.map(manualGamesSpineEventUniquenessKey));
+  const mergedGames = existing.games.map(
+    (event) => materializeManualGamesSpineEventStreamDefaults(event, existing)
+  );
+  let addedCount = 0;
+  let skippedDuplicateCount = 0;
+  for (const event of incoming.games) {
+    const key2 = manualGamesSpineEventUniquenessKey(event);
+    if (seen.has(key2)) {
+      skippedDuplicateCount += 1;
+      continue;
+    }
+    seen.add(key2);
+    mergedGames.push(materializeManualGamesSpineEventStreamDefaults(event, incoming));
+    addedCount += 1;
+  }
+  return {
+    league: {
+      ...mergeManualGamesSpineLeagueMetadataForAppend(existing, incoming),
+      league: existing.league,
+      games: sortManualGamesSpineEventsChronologically(mergedGames)
+    },
+    addedCount,
+    skippedDuplicateCount
+  };
+}
+function replaceManualGamesSpineLeague(existing, incoming) {
+  return {
+    ...mergeManualGamesSpineLeagueMetadata(existing, incoming),
+    league: existing.league,
+    games: sortManualGamesSpineEventsChronologically(incoming.games)
+  };
+}
+function groupManualGamesSpineEventsByDateWithIndex(events) {
+  const byDate = /* @__PURE__ */ new Map();
+  events.forEach((event, index) => {
+    const dateKey = event.date.trim() || "Undated";
+    const bucket = byDate.get(dateKey) ?? [];
+    bucket.push({ event, index });
+    byDate.set(dateKey, bucket);
+  });
+  return [...byDate.entries()].sort(([left], [right]) => parseManualGamesSpineDateKeyMs(left) - parseManualGamesSpineDateKeyMs(right)).map(([date, rows]) => ({
+    date,
+    rows: rows.sort(
+      (a2, b2) => Date.parse(a2.event.startTime) - Date.parse(b2.event.startTime)
+    )
+  }));
+}
 function leagueDocumentKey(leagueName) {
   return leagueName.trim().toLowerCase();
 }
 function upsertManualGamesSpineLeague(document2, league) {
   const key2 = leagueDocumentKey(league.league);
   const leagues = document2.leagues.filter((row) => leagueDocumentKey(row.league) !== key2);
-  leagues.push(league);
+  leagues.push(sanitizeManualGamesSpineLeagueForStorage(league));
   return { leagues };
 }
 function deleteManualGamesSpineLeague(document2, leagueName) {
@@ -71720,11 +71915,17 @@ function formatManualGamesSpineAdminLeagueDateRange(events) {
   if (dateKeys.length === 1) return formatManualGamesSpineAdminDateLabel(dateKeys[0]);
   const firstMs = parseManualGamesSpineDateKeyMs(dateKeys[0]);
   const lastMs = parseManualGamesSpineDateKeyMs(dateKeys[dateKeys.length - 1]);
-  const firstLabel = new Date(firstMs).toLocaleDateString("en-US", {
+  const firstDate = new Date(firstMs);
+  const lastDate = new Date(lastMs);
+  if (firstDate.getFullYear() === lastDate.getFullYear() && firstDate.getMonth() === lastDate.getMonth()) {
+    const month = firstDate.toLocaleDateString("en-US", { month: "short" });
+    return `${month} ${firstDate.getDate()}\u2013${lastDate.getDate()}, ${lastDate.getFullYear()}`;
+  }
+  const firstLabel = firstDate.toLocaleDateString("en-US", {
     month: "short",
     day: "numeric"
   });
-  const lastLabel = new Date(lastMs).toLocaleDateString("en-US", {
+  const lastLabel = lastDate.toLocaleDateString("en-US", {
     month: "short",
     day: "numeric",
     year: "numeric"
@@ -71760,13 +71961,16 @@ function formatManualGamesSpinePlacementLabel(league) {
   if (league.insertBeforeLeague?.trim()) {
     return `Before ${league.insertBeforeLeague.trim()}`;
   }
-  return "By league priority";
+  if (league.leaguePriority != null && Number.isFinite(league.leaguePriority)) {
+    return "After operational leagues (legacy placement)";
+  }
+  return "After operational leagues";
 }
 function resolveManualGamesSpineAdminEventChannel(event, league) {
-  const eventChannel = event.channel?.trim();
-  if (eventChannel) return eventChannel;
-  const leagueChannel = league.channel?.trim();
-  return leagueChannel || null;
+  return resolveManualGamesSpineEventStream(event, league).channel;
+}
+function resolveManualGamesSpineAdminEventChannelUrl(event, league) {
+  return resolveManualGamesSpineEventStream(event, league).channelUrl;
 }
 function cloneManualGamesSpineLeague(league) {
   return {
@@ -71818,7 +72022,7 @@ function validateInsertFields(row) {
 function validateNoDuplicateEvents(games) {
   const seen = /* @__PURE__ */ new Set();
   for (const game of games) {
-    const key2 = `${game.date}::${game.eventName.trim().toLowerCase()}`;
+    const key2 = manualGamesSpineEventUniquenessKey(game);
     if (seen.has(key2)) {
       return `Duplicate event on ${game.date}: ${game.eventName}`;
     }
@@ -71871,7 +72075,9 @@ function validateLeague(raw) {
   const row = raw;
   if (!isNonEmptyString(row.league)) return "league is required";
   const leaguePriority = parsePriority(row.leaguePriority);
-  if (leaguePriority == null) return "leaguePriority must be a number";
+  if (row.leaguePriority != null && row.leaguePriority !== "" && leaguePriority == null) {
+    return "leaguePriority must be a number when provided";
+  }
   if ("channel" in row && row.channel != null && typeof row.channel !== "string") {
     return "channel must be a string or null";
   }
@@ -71891,15 +72097,18 @@ function validateLeague(raw) {
   }
   const duplicateError = validateNoDuplicateEvents(games);
   if (duplicateError) return duplicateError;
-  return {
+  const insertAfterLeague = row.insertAfterLeague == null || String(row.insertAfterLeague).trim() === "" ? null : String(row.insertAfterLeague).trim();
+  const insertBeforeLeague = row.insertBeforeLeague == null || String(row.insertBeforeLeague).trim() === "" ? null : String(row.insertBeforeLeague).trim();
+  const usesNameBasedPlacement = Boolean(insertAfterLeague || insertBeforeLeague);
+  return sanitizeManualGamesSpineLeagueForStorage({
     league: row.league.trim(),
-    leaguePriority,
-    insertAfterLeague: row.insertAfterLeague == null ? null : String(row.insertAfterLeague),
-    insertBeforeLeague: row.insertBeforeLeague == null ? null : String(row.insertBeforeLeague),
+    ...usesNameBasedPlacement || leaguePriority == null ? {} : { leaguePriority },
+    insertAfterLeague,
+    insertBeforeLeague,
     channel: parseOptionalString(row.channel),
     channelUrl: parseOptionalString(row.channelUrl),
     games
-  };
+  });
 }
 function extractSingleLeague(raw) {
   if (raw == null) return "JSON is empty";
@@ -71960,6 +72169,30 @@ async function upsertPersistedManualGamesSpineLeague(input) {
 async function deletePersistedManualGamesSpineLeague(leagueName) {
   const document2 = deleteManualGamesSpineLeague(await loadManualGamesSpineDocument(), leagueName);
   return persistManualGamesSpineDocument(document2);
+}
+async function importPersistedManualGamesSpineLeague(input) {
+  const document2 = await loadManualGamesSpineDocument();
+  const existing = findManualGamesSpineLeague(document2, input.league.league);
+  if (input.mode === "append") {
+    if (!existing) {
+      const created = upsertManualGamesSpineLeague(document2, input.league);
+      return {
+        document: await persistManualGamesSpineDocument(created),
+        addedCount: input.league.games.length,
+        skippedDuplicateCount: 0
+      };
+    }
+    const appended = appendManualGamesSpineLeagueEvents(existing, input.league);
+    const merged2 = upsertManualGamesSpineLeague(document2, appended.league);
+    return {
+      document: await persistManualGamesSpineDocument(merged2),
+      addedCount: appended.addedCount,
+      skippedDuplicateCount: appended.skippedDuplicateCount
+    };
+  }
+  const league = existing && input.mode === "replace" ? replaceManualGamesSpineLeague(existing, input.league) : input.league;
+  const merged = upsertManualGamesSpineLeague(document2, league);
+  return { document: await persistManualGamesSpineDocument(merged) };
 }
 
 // ../grarf/desktop/src/components/gamesSpineAdmin/SavedLeaguesBrowser.tsx
@@ -72024,6 +72257,23 @@ function GamesSpineLeagueVisualEditor({
     if (!confirmed) return;
     onChange({ ...draft, games: draft.games.filter((_2, gameIndex) => gameIndex !== index) });
   };
+  const updatePlacementAfter = (value) => {
+    const insertAfterLeague = nullIfEmpty(value);
+    onChange({
+      ...draft,
+      insertAfterLeague,
+      insertBeforeLeague: insertAfterLeague ? null : draft.insertBeforeLeague
+    });
+  };
+  const updatePlacementBefore = (value) => {
+    const insertBeforeLeague = nullIfEmpty(value);
+    onChange({
+      ...draft,
+      insertBeforeLeague,
+      insertAfterLeague: insertBeforeLeague ? null : draft.insertAfterLeague
+    });
+  };
+  const eventsByDate = groupManualGamesSpineEventsByDateWithIndex(draft.games);
   return /* @__PURE__ */ (0, import_jsx_runtime156.jsxs)("div", { className: "space-y-4 rounded border border-greensys/25 bg-[#071012] p-3", children: [
     /* @__PURE__ */ (0, import_jsx_runtime156.jsx)("div", { className: "flex flex-wrap items-center justify-between gap-2", children: /* @__PURE__ */ (0, import_jsx_runtime156.jsxs)("div", { children: [
       /* @__PURE__ */ (0, import_jsx_runtime156.jsx)("div", { className: "text-[10px] tracking-[0.16em] text-greensys", children: "VISUAL EDITOR" }),
@@ -72042,38 +72292,28 @@ function GamesSpineLeagueVisualEditor({
         )
       ] }),
       /* @__PURE__ */ (0, import_jsx_runtime156.jsxs)("label", { className: "flex flex-col gap-1", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime156.jsx)(FieldLabel, { children: "LEAGUE PRIORITY" }),
-        /* @__PURE__ */ (0, import_jsx_runtime156.jsx)(
-          TextInput,
-          {
-            value: String(draft.leaguePriority),
-            onChange: (value) => updateLeagueField("leaguePriority", value.trim() === "" ? 0 : Number(value)),
-            placeholder: "65"
-          }
-        )
-      ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime156.jsxs)("label", { className: "flex flex-col gap-1", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime156.jsx)(FieldLabel, { children: "INSERT AFTER LEAGUE" }),
+        /* @__PURE__ */ (0, import_jsx_runtime156.jsx)(FieldLabel, { children: "AFTER LEAGUE" }),
         /* @__PURE__ */ (0, import_jsx_runtime156.jsx)(
           TextInput,
           {
             value: draft.insertAfterLeague ?? "",
-            onChange: (value) => updateLeagueField("insertAfterLeague", nullIfEmpty(value)),
-            placeholder: "MLB"
+            onChange: updatePlacementAfter,
+            placeholder: "WNBA"
           }
         )
       ] }),
       /* @__PURE__ */ (0, import_jsx_runtime156.jsxs)("label", { className: "flex flex-col gap-1", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime156.jsx)(FieldLabel, { children: "INSERT BEFORE LEAGUE" }),
+        /* @__PURE__ */ (0, import_jsx_runtime156.jsx)(FieldLabel, { children: "BEFORE LEAGUE" }),
         /* @__PURE__ */ (0, import_jsx_runtime156.jsx)(
           TextInput,
           {
             value: draft.insertBeforeLeague ?? "",
-            onChange: (value) => updateLeagueField("insertBeforeLeague", nullIfEmpty(value)),
-            placeholder: "NHL"
+            onChange: updatePlacementBefore,
+            placeholder: "MLB"
           }
         )
       ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime156.jsx)("p", { className: "md:col-span-2 text-[10px] leading-relaxed text-textdim", children: "Set one placement field using an operational or manual league name. Leave both empty to append after operational leagues." }),
       /* @__PURE__ */ (0, import_jsx_runtime156.jsxs)("label", { className: "flex flex-col gap-1", children: [
         /* @__PURE__ */ (0, import_jsx_runtime156.jsx)(FieldLabel, { children: "LEAGUE STREAM CHANNEL" }),
         /* @__PURE__ */ (0, import_jsx_runtime156.jsx)(
@@ -72114,111 +72354,118 @@ function GamesSpineLeagueVisualEditor({
           }
         )
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime156.jsx)("div", { className: "space-y-3", children: draft.games.map((event, index) => /* @__PURE__ */ (0, import_jsx_runtime156.jsxs)(
-        "div",
-        {
-          className: "rounded border border-line/40 bg-[#0b1216] p-3",
-          children: [
-            /* @__PURE__ */ (0, import_jsx_runtime156.jsxs)("div", { className: "mb-2 flex items-center justify-between gap-2", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime156.jsxs)("span", { className: "text-[10px] tracking-[0.12em] text-cyansys/80", children: [
-                "Event ",
-                index + 1
-              ] }),
-              /* @__PURE__ */ (0, import_jsx_runtime156.jsx)(
-                "button",
-                {
-                  type: "button",
-                  onClick: () => onDeleteEvent(index),
-                  className: "rounded border border-redsys/40 px-2 py-1 text-[10px] tracking-[0.12em] text-redsys hover:border-redsys/70",
-                  children: "Delete"
-                }
-              )
-            ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime156.jsxs)("div", { className: "grid gap-2 md:grid-cols-2", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime156.jsxs)("label", { className: "flex flex-col gap-1", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime156.jsx)(FieldLabel, { children: "DATE" }),
+      /* @__PURE__ */ (0, import_jsx_runtime156.jsx)("div", { className: "space-y-4", children: eventsByDate.map(({ date, rows }) => /* @__PURE__ */ (0, import_jsx_runtime156.jsxs)("div", { className: "space-y-2", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime156.jsxs)("div", { className: "border-y border-line/40 bg-[#071012] px-2 py-1.5 text-center font-mono text-[10px] tracking-[0.14em] text-cyansys/80", children: [
+          "=== ",
+          formatManualGamesSpineAdminDateLabel(date),
+          " ==="
+        ] }),
+        rows.map(({ event, index }) => /* @__PURE__ */ (0, import_jsx_runtime156.jsxs)(
+          "div",
+          {
+            className: "rounded border border-line/40 bg-[#0b1216] p-3",
+            children: [
+              /* @__PURE__ */ (0, import_jsx_runtime156.jsxs)("div", { className: "mb-2 flex items-center justify-between gap-2", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime156.jsxs)("span", { className: "text-[10px] tracking-[0.12em] text-cyansys/80", children: [
+                  "Event ",
+                  index + 1
+                ] }),
                 /* @__PURE__ */ (0, import_jsx_runtime156.jsx)(
-                  TextInput,
+                  "button",
                   {
-                    value: event.date,
-                    onChange: (value) => updateEvent(index, { date: value }),
-                    placeholder: "2026-06-20"
+                    type: "button",
+                    onClick: () => onDeleteEvent(index),
+                    className: "rounded border border-redsys/40 px-2 py-1 text-[10px] tracking-[0.12em] text-redsys hover:border-redsys/70",
+                    children: "Delete"
                   }
                 )
               ] }),
-              /* @__PURE__ */ (0, import_jsx_runtime156.jsxs)("label", { className: "flex flex-col gap-1 md:col-span-2", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime156.jsx)(FieldLabel, { children: "EVENT NAME" }),
-                /* @__PURE__ */ (0, import_jsx_runtime156.jsx)(
-                  TextInput,
-                  {
-                    value: event.eventName,
-                    onChange: (value) => updateEvent(index, { eventName: value }),
-                    placeholder: "The Commonwealth Cup"
-                  }
-                )
-              ] }),
-              /* @__PURE__ */ (0, import_jsx_runtime156.jsxs)("label", { className: "flex flex-col gap-1", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime156.jsx)(FieldLabel, { children: "START TIME" }),
-                /* @__PURE__ */ (0, import_jsx_runtime156.jsx)(
-                  TextInput,
-                  {
-                    value: event.startTime,
-                    onChange: (value) => updateEvent(index, { startTime: value }),
-                    placeholder: "2026-06-20T10:05:00-04:00"
-                  }
-                )
-              ] }),
-              /* @__PURE__ */ (0, import_jsx_runtime156.jsxs)("label", { className: "flex flex-col gap-1", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime156.jsx)(FieldLabel, { children: "END TIME" }),
-                /* @__PURE__ */ (0, import_jsx_runtime156.jsx)(
-                  TextInput,
-                  {
-                    value: event.endTime,
-                    onChange: (value) => updateEvent(index, { endTime: value }),
-                    placeholder: "2026-06-20T10:45:00-04:00"
-                  }
-                )
-              ] }),
-              /* @__PURE__ */ (0, import_jsx_runtime156.jsxs)("label", { className: "flex flex-col gap-1", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime156.jsx)(FieldLabel, { children: "CHANNEL" }),
-                /* @__PURE__ */ (0, import_jsx_runtime156.jsx)(
-                  TextInput,
-                  {
-                    value: event.channel ?? "",
-                    onChange: (value) => updateEvent(index, { channel: nullIfEmpty(value) }),
-                    placeholder: "inherit league default"
-                  }
-                )
-              ] }),
-              /* @__PURE__ */ (0, import_jsx_runtime156.jsxs)("label", { className: "flex flex-col gap-1", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime156.jsx)(FieldLabel, { children: "CHANNEL URL" }),
-                /* @__PURE__ */ (0, import_jsx_runtime156.jsx)(
-                  TextInput,
-                  {
-                    value: event.channelUrl ?? "",
-                    onChange: (value) => updateEvent(index, { channelUrl: nullIfEmpty(value) }),
-                    placeholder: "inherit league default"
-                  }
-                )
-              ] }),
-              /* @__PURE__ */ (0, import_jsx_runtime156.jsxs)("label", { className: "flex flex-col gap-1", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime156.jsx)(FieldLabel, { children: "BEST GAME PRIORITY" }),
-                /* @__PURE__ */ (0, import_jsx_runtime156.jsx)(
-                  TextInput,
-                  {
-                    value: event.bestGamePriority == null ? "" : String(event.bestGamePriority),
-                    onChange: (value) => updateEvent(index, {
-                      bestGamePriority: value.trim() === "" ? null : Number(value)
-                    }),
-                    placeholder: "1"
-                  }
-                )
+              /* @__PURE__ */ (0, import_jsx_runtime156.jsxs)("div", { className: "grid gap-2 md:grid-cols-2", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime156.jsxs)("label", { className: "flex flex-col gap-1", children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime156.jsx)(FieldLabel, { children: "DATE" }),
+                  /* @__PURE__ */ (0, import_jsx_runtime156.jsx)(
+                    TextInput,
+                    {
+                      value: event.date,
+                      onChange: (value) => updateEvent(index, { date: value }),
+                      placeholder: "2026-06-20"
+                    }
+                  )
+                ] }),
+                /* @__PURE__ */ (0, import_jsx_runtime156.jsxs)("label", { className: "flex flex-col gap-1 md:col-span-2", children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime156.jsx)(FieldLabel, { children: "EVENT NAME" }),
+                  /* @__PURE__ */ (0, import_jsx_runtime156.jsx)(
+                    TextInput,
+                    {
+                      value: event.eventName,
+                      onChange: (value) => updateEvent(index, { eventName: value }),
+                      placeholder: "The Commonwealth Cup"
+                    }
+                  )
+                ] }),
+                /* @__PURE__ */ (0, import_jsx_runtime156.jsxs)("label", { className: "flex flex-col gap-1", children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime156.jsx)(FieldLabel, { children: "START TIME" }),
+                  /* @__PURE__ */ (0, import_jsx_runtime156.jsx)(
+                    TextInput,
+                    {
+                      value: event.startTime,
+                      onChange: (value) => updateEvent(index, { startTime: value }),
+                      placeholder: "2026-06-20T10:05:00-04:00"
+                    }
+                  )
+                ] }),
+                /* @__PURE__ */ (0, import_jsx_runtime156.jsxs)("label", { className: "flex flex-col gap-1", children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime156.jsx)(FieldLabel, { children: "END TIME" }),
+                  /* @__PURE__ */ (0, import_jsx_runtime156.jsx)(
+                    TextInput,
+                    {
+                      value: event.endTime,
+                      onChange: (value) => updateEvent(index, { endTime: value }),
+                      placeholder: "2026-06-20T10:45:00-04:00"
+                    }
+                  )
+                ] }),
+                /* @__PURE__ */ (0, import_jsx_runtime156.jsxs)("label", { className: "flex flex-col gap-1", children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime156.jsx)(FieldLabel, { children: "CHANNEL" }),
+                  /* @__PURE__ */ (0, import_jsx_runtime156.jsx)(
+                    TextInput,
+                    {
+                      value: event.channel ?? "",
+                      onChange: (value) => updateEvent(index, { channel: nullIfEmpty(value) }),
+                      placeholder: "event stream channel (overrides league default)"
+                    }
+                  )
+                ] }),
+                /* @__PURE__ */ (0, import_jsx_runtime156.jsxs)("label", { className: "flex flex-col gap-1 md:col-span-2", children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime156.jsx)(FieldLabel, { children: "CHANNEL URL" }),
+                  /* @__PURE__ */ (0, import_jsx_runtime156.jsx)(
+                    TextInput,
+                    {
+                      value: event.channelUrl ?? "",
+                      onChange: (value) => updateEvent(index, { channelUrl: nullIfEmpty(value) }),
+                      placeholder: "event stream URL (overrides league default)"
+                    }
+                  )
+                ] }),
+                /* @__PURE__ */ (0, import_jsx_runtime156.jsxs)("label", { className: "flex flex-col gap-1", children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime156.jsx)(FieldLabel, { children: "BEST GAME PRIORITY" }),
+                  /* @__PURE__ */ (0, import_jsx_runtime156.jsx)(
+                    TextInput,
+                    {
+                      value: event.bestGamePriority == null ? "" : String(event.bestGamePriority),
+                      onChange: (value) => updateEvent(index, {
+                        bestGamePriority: value.trim() === "" ? null : Number(value)
+                      }),
+                      placeholder: "1"
+                    }
+                  )
+                ] })
               ] })
-            ] })
-          ]
-        },
-        `event-${index}`
-      )) })
+            ]
+          },
+          `event-${index}`
+        ))
+      ] }, date)) })
     ] }),
     /* @__PURE__ */ (0, import_jsx_runtime156.jsxs)("div", { className: "flex flex-wrap gap-2 border-t border-line/40 pt-3", children: [
       /* @__PURE__ */ (0, import_jsx_runtime156.jsx)(
@@ -72369,7 +72616,17 @@ function SavedLeaguesBrowser({
                     /* @__PURE__ */ (0, import_jsx_runtime157.jsx)("div", { className: "text-[11px] font-medium tracking-[0.08em] text-[#d8e8e8]", children: league.league }),
                     /* @__PURE__ */ (0, import_jsx_runtime157.jsxs)("div", { children: [
                       /* @__PURE__ */ (0, import_jsx_runtime157.jsx)("span", { className: "tracking-[0.12em] text-[#5f7a7a]", children: "PLACEMENT" }),
-                      /* @__PURE__ */ (0, import_jsx_runtime157.jsx)("div", { className: "mt-1 text-[#d8e8e8]", children: formatManualGamesSpinePlacementLabel(league) })
+                      /* @__PURE__ */ (0, import_jsx_runtime157.jsxs)("div", { className: "mt-2 grid gap-1", children: [
+                        /* @__PURE__ */ (0, import_jsx_runtime157.jsxs)("div", { className: "text-[#d8e8e8]", children: [
+                          "After League: ",
+                          league.insertAfterLeague?.trim() || "\u2014"
+                        ] }),
+                        /* @__PURE__ */ (0, import_jsx_runtime157.jsxs)("div", { className: "text-[#d8e8e8]", children: [
+                          "Before League: ",
+                          league.insertBeforeLeague?.trim() || "\u2014"
+                        ] }),
+                        !league.insertAfterLeague?.trim() && !league.insertBeforeLeague?.trim() ? /* @__PURE__ */ (0, import_jsx_runtime157.jsx)("div", { className: "text-textdim", children: formatManualGamesSpinePlacementLabel(league) }) : null
+                      ] })
                     ] }),
                     /* @__PURE__ */ (0, import_jsx_runtime157.jsxs)("div", { children: [
                       /* @__PURE__ */ (0, import_jsx_runtime157.jsx)("span", { className: "tracking-[0.12em] text-[#5f7a7a]", children: "LEAGUE STREAM" }),
@@ -72400,6 +72657,10 @@ function SavedLeaguesBrowser({
                             event,
                             league
                           );
+                          const channelUrl = resolveManualGamesSpineAdminEventChannelUrl(
+                            event,
+                            league
+                          );
                           return /* @__PURE__ */ (0, import_jsx_runtime157.jsxs)(
                             "div",
                             {
@@ -72409,7 +72670,10 @@ function SavedLeaguesBrowser({
                                   /* @__PURE__ */ (0, import_jsx_runtime157.jsx)("span", { className: "shrink-0 font-mono text-[10px] tabular-nums tracking-wide text-cyansys/85", children: formatManualGamesSpineAdminEventTime(event.startTime) }),
                                   /* @__PURE__ */ (0, import_jsx_runtime157.jsx)("span", { className: "min-w-0 truncate text-[11px] tracking-[0.04em] text-[#eef6f6]", children: event.eventName })
                                 ] }),
-                                channel ? /* @__PURE__ */ (0, import_jsx_runtime157.jsx)("div", { className: "mt-1 pl-[3.25rem] text-[9px] tracking-wide text-textdim", children: channel }) : null
+                                channel || channelUrl ? /* @__PURE__ */ (0, import_jsx_runtime157.jsxs)("div", { className: "mt-1 space-y-0.5 pl-[3.25rem] text-[9px] tracking-wide text-textdim", children: [
+                                  channel ? /* @__PURE__ */ (0, import_jsx_runtime157.jsx)("div", { children: channel }) : null,
+                                  channelUrl ? /* @__PURE__ */ (0, import_jsx_runtime157.jsx)("div", { className: "break-all font-mono", children: channelUrl }) : null
+                                ] }) : null
                               ]
                             },
                             `${event.date}:${event.eventName}:${event.startTime}`
@@ -72469,6 +72733,7 @@ function GamesSpineAdminPanel() {
   const [actionError, setActionError] = (0, import_react149.useState)(null);
   const [busy, setBusy] = (0, import_react149.useState)(null);
   const [savedAt, setSavedAt] = (0, import_react149.useState)(null);
+  const [pendingImport, setPendingImport] = (0, import_react149.useState)(null);
   const parsedImportPreview = (0, import_react149.useMemo)(
     () => parseGamesSpineManualLeagueEditorJson(importJsonText),
     [importJsonText]
@@ -72498,39 +72763,78 @@ function GamesSpineAdminPanel() {
   const onValidateImport = (0, import_react149.useCallback)(() => {
     setBusy("validate");
     setActionError(null);
+    setPendingImport(null);
     const result = parseGamesSpineManualLeagueEditorJson(importJsonText);
     if (!result.ok) {
       setValidationMessage(result.error);
     } else {
+      const dateRange = formatManualGamesSpineAdminLeagueDateRange(result.league.games);
       setValidationMessage(
-        `Import valid \xB7 ${result.league.league} \xB7 ${result.league.games.length} event(s)`
+        `Import valid \xB7 ${result.league.league} \xB7 ${result.league.games.length} event(s) \xB7 ${dateRange}`
       );
     }
     setBusy(null);
   }, [importJsonText]);
+  const executeImport = (0, import_react149.useCallback)(
+    async (league, mode) => {
+      setBusy("save");
+      setActionError(null);
+      try {
+        const outcome = await importPersistedManualGamesSpineLeague({ league, mode });
+        syncPersistedDocument(outcome.document);
+        setImportJsonText("");
+        setPendingImport(null);
+        setSavedAt((/* @__PURE__ */ new Date()).toISOString());
+        if (mode === "append") {
+          const skipped = outcome.skippedDuplicateCount && outcome.skippedDuplicateCount > 0 ? ` \xB7 skipped ${outcome.skippedDuplicateCount} duplicate(s)` : "";
+          setValidationMessage(
+            `Appended \xB7 ${league.league} \xB7 added ${outcome.addedCount ?? 0} event(s)${skipped}`
+          );
+        } else if (mode === "replace") {
+          setValidationMessage(
+            `Replaced \xB7 ${league.league} \xB7 ${league.games.length} event(s) in import`
+          );
+        } else {
+          setValidationMessage(
+            `Imported \xB7 ${league.league} \xB7 edit visually in Saved Leagues below`
+          );
+        }
+      } catch (err) {
+        setActionError(
+          err instanceof Error ? err.message : "Unable to import manual Games Spine league"
+        );
+      } finally {
+        setBusy(null);
+      }
+    },
+    [syncPersistedDocument]
+  );
   const onImportLeague = (0, import_react149.useCallback)(async () => {
     setBusy("save");
     setActionError(null);
+    setPendingImport(null);
     const result = parseGamesSpineManualLeagueEditorJson(importJsonText);
     if (!result.ok) {
       setValidationMessage(result.error);
       setBusy(null);
       return;
     }
-    try {
-      const saved = await upsertPersistedManualGamesSpineLeague({ league: result.league });
-      syncPersistedDocument(saved);
-      setImportJsonText("");
-      setSavedAt((/* @__PURE__ */ new Date()).toISOString());
+    const existing = findManualGamesSpineLeague(savedDocument, result.league.league);
+    if (existing) {
+      setPendingImport({
+        league: result.league,
+        existingEventCount: existing.games.length,
+        existingDateRange: formatManualGamesSpineAdminLeagueDateRange(existing.games),
+        incomingDateRange: formatManualGamesSpineAdminLeagueDateRange(result.league.games)
+      });
       setValidationMessage(
-        `Imported \xB7 ${result.league.league} \xB7 edit visually in Saved Leagues below`
+        `"${result.league.league}" already exists \u2014 choose Append Events or Replace League`
       );
-    } catch (err) {
-      setActionError(err instanceof Error ? err.message : "Unable to import manual Games Spine league");
-    } finally {
       setBusy(null);
+      return;
     }
-  }, [importJsonText, syncPersistedDocument]);
+    await executeImport(result.league, "create");
+  }, [importJsonText, savedDocument, executeImport]);
   const onLoadCurrent = (0, import_react149.useCallback)(async () => {
     if (editingLeagueKey) {
       setActionError("Cancel the current visual edit before reloading from storage");
@@ -72552,6 +72856,7 @@ function GamesSpineAdminPanel() {
   }, [refreshPersistedDocument, editingLeagueKey]);
   const onClearImport = (0, import_react149.useCallback)(() => {
     setImportJsonText("");
+    setPendingImport(null);
     setValidationMessage("Import form cleared");
     setActionError(null);
     setSavedAt(null);
@@ -72633,7 +72938,7 @@ function GamesSpineAdminPanel() {
     /* @__PURE__ */ (0, import_jsx_runtime158.jsxs)("section", { className: "flex flex-col gap-3 rounded border border-dashed border-line/60 bg-[#071012] p-4", children: [
       /* @__PURE__ */ (0, import_jsx_runtime158.jsxs)("div", { children: [
         /* @__PURE__ */ (0, import_jsx_runtime158.jsx)("div", { className: "text-[10px] tracking-[0.18em] text-textdim", children: "IMPORT / CREATE ONLY" }),
-        /* @__PURE__ */ (0, import_jsx_runtime158.jsx)("p", { className: "mt-1 text-[11px] leading-relaxed text-textdim", children: "JSON is for importing a new league or bulk-pasting a create payload. Do not use this area to maintain existing leagues." })
+        /* @__PURE__ */ (0, import_jsx_runtime158.jsx)("p", { className: "mt-1 text-[11px] leading-relaxed text-textdim", children: "JSON is for importing a new league or bulk-pasting events. One league can span many dates \u2014 paste June 19 and June 20 events under the same league name. Importing into an existing league offers Append Events or Replace League." })
       ] }),
       /* @__PURE__ */ (0, import_jsx_runtime158.jsxs)("label", { ref: importRef, className: "flex flex-col gap-2", children: [
         /* @__PURE__ */ (0, import_jsx_runtime158.jsx)("span", { className: "text-[10px] tracking-[0.14em] text-[#5f7a7a]", children: "League import JSON" }),
@@ -72644,7 +72949,7 @@ function GamesSpineAdminPanel() {
             onChange: (event) => setImportJsonText(event.target.value),
             spellCheck: false,
             disabled: editingLeagueKey !== null,
-            placeholder: 'Paste one league object to import/create, e.g. { "league": "Royal Ascot", "leaguePriority": 65, "games": [...] }',
+            placeholder: 'Paste one league object to import/create, e.g. { "league": "Royal Ascot", "insertAfterLeague": "WNBA", "games": [...] }',
             className: "min-h-[180px] w-full rounded border border-line/60 bg-[#020404] px-3 py-3 font-mono text-[11px] leading-relaxed text-[#d8e8e8] outline-none focus:border-greensys/50 disabled:opacity-50"
           }
         )
@@ -72691,7 +72996,58 @@ function GamesSpineAdminPanel() {
           }
         )
       ] }),
-      editingLeagueKey ? /* @__PURE__ */ (0, import_jsx_runtime158.jsx)("p", { className: "text-[10px] text-textdim", children: "Finish or cancel the visual edit before importing another league." }) : null
+      editingLeagueKey ? /* @__PURE__ */ (0, import_jsx_runtime158.jsx)("p", { className: "text-[10px] text-textdim", children: "Finish or cancel the visual edit before importing another league." }) : null,
+      pendingImport ? /* @__PURE__ */ (0, import_jsx_runtime158.jsxs)("div", { className: "rounded border border-amber-500/40 bg-amber-500/5 p-3", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime158.jsx)("div", { className: "text-[10px] tracking-[0.14em] text-amber-200/90", children: "LEAGUE ALREADY EXISTS" }),
+        /* @__PURE__ */ (0, import_jsx_runtime158.jsxs)("p", { className: "mt-2 text-[11px] leading-relaxed text-[#d8e8e8]", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime158.jsx)("span", { className: "font-medium", children: pendingImport.league.league }),
+          " is already saved with ",
+          pendingImport.existingEventCount,
+          " event(s) (",
+          pendingImport.existingDateRange,
+          "). This import has ",
+          pendingImport.league.games.length,
+          " event(s) (",
+          pendingImport.incomingDateRange,
+          ")."
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime158.jsxs)("div", { className: "mt-3 flex flex-wrap gap-2", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime158.jsx)(
+            "button",
+            {
+              type: "button",
+              onClick: () => void executeImport(pendingImport.league, "append"),
+              disabled: busy !== null,
+              className: "rounded border border-greensys/50 bg-greensys/10 px-3 py-2 text-[10px] tracking-[0.16em] text-greensys hover:bg-greensys/20 disabled:opacity-50",
+              children: "Append Events"
+            }
+          ),
+          /* @__PURE__ */ (0, import_jsx_runtime158.jsx)(
+            "button",
+            {
+              type: "button",
+              onClick: () => void executeImport(pendingImport.league, "replace"),
+              disabled: busy !== null,
+              className: "rounded border border-redsys/40 px-3 py-2 text-[10px] tracking-[0.16em] text-redsys hover:border-redsys/70 disabled:opacity-50",
+              children: "Replace League"
+            }
+          ),
+          /* @__PURE__ */ (0, import_jsx_runtime158.jsx)(
+            "button",
+            {
+              type: "button",
+              onClick: () => {
+                setPendingImport(null);
+                setValidationMessage("Import cancelled \u2014 existing league unchanged");
+              },
+              disabled: busy !== null,
+              className: "rounded border border-line/70 px-3 py-2 text-[10px] tracking-[0.16em] text-[#d8e8e8] hover:border-greensys/50 disabled:opacity-50",
+              children: "Cancel"
+            }
+          )
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime158.jsx)("p", { className: "mt-2 text-[10px] leading-relaxed text-textdim", children: "Append merges new events and skips duplicates (same date + event name). Replace removes all existing events and stores only the import payload." })
+      ] }) : null
     ] }),
     validationMessage ? /* @__PURE__ */ (0, import_jsx_runtime158.jsx)("p", { className: "text-[11px] text-greensys", children: validationMessage }) : null,
     actionError ? /* @__PURE__ */ (0, import_jsx_runtime158.jsx)("p", { className: "text-[11px] text-redsys", children: actionError }) : null,
