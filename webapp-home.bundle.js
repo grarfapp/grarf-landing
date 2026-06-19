@@ -33,7 +33,7 @@ var __publicField = (obj, key2, value) => __defNormalProp(obj, typeof key2 !== "
 var define_import_meta_env_default;
 var init_define_import_meta_env = __esm({
   "<define:import.meta.env>"() {
-    define_import_meta_env_default = { DEV: false, PROD: true, MODE: "production", VITE_OPERATIONAL_INGEST_PROVIDER: "grarf_cloud", VITE_GRARF_OPERATIONAL_INGEST_URL: "https://grarf-operational-service.grarf.workers.dev", VITE_SPORTSCAPE_EDITORIAL_API_URL: "https://grarf-sportscape-editorial.grarf.workers.dev", VITE_TRACE_FINAL_LIVE_FIELDS: "", VITE_ENABLE_ESPN_RESOLVER: "false", VITE_POSTHOG_KEY: "", VITE_POSTHOG_HOST: "" };
+    define_import_meta_env_default = { DEV: false, PROD: true, MODE: "production", VITE_OPERATIONAL_INGEST_PROVIDER: "grarf_cloud", VITE_GRARF_OPERATIONAL_INGEST_URL: "https://grarf-operational-service.grarf.workers.dev", VITE_SPORTSCAPE_EDITORIAL_API_URL: "https://grarf-operational-service.grarf.workers.dev/sportscape-editorial", VITE_TRACE_FINAL_LIVE_FIELDS: "", VITE_ENABLE_ESPN_RESOLVER: "false", VITE_POSTHOG_KEY: "", VITE_POSTHOG_HOST: "" };
   }
 });
 
@@ -14219,7 +14219,7 @@ init_define_import_meta_env();
 function resolveSportscapeEditorialApiBase() {
   const fromConfig = window.GRARF_WEB_CONFIG?.sportscapeEditorialApiUrl?.trim();
   if (fromConfig) return fromConfig.replace(/\/+$/, "");
-  return "https://grarf-sportscape-editorial.grarf.workers.dev";
+  return "https://grarf-operational-service.grarf.workers.dev/sportscape-editorial";
 }
 function sportscapeEditorialBridgeUrl(path) {
   const base = resolveSportscapeEditorialApiBase();
@@ -32338,16 +32338,21 @@ init_define_import_meta_env();
 
 // ../grarf/desktop/src/config/sportscapeEditorialConfig.ts
 init_define_import_meta_env();
+init_isGrarfWebRenderer();
 var DEFAULT_SPORTSCAPE_EDITORIAL_API_URL = "https://grarf-sportscape-editorial.grarf.workers.dev";
+var WEB_SPORTSCAPE_EDITORIAL_API_URL = "https://grarf-operational-service.grarf.workers.dev/sportscape-editorial";
 function resolveWebSportscapeEditorialApiUrl() {
   if (typeof window === "undefined") return null;
   return window.GRARF_WEB_CONFIG?.sportscapeEditorialApiUrl?.trim() || null;
 }
 function getSportscapeEditorialApiBaseUrl() {
-  const fromEnv = define_import_meta_env_default.VITE_SPORTSCAPE_EDITORIAL_API_URL?.trim();
-  if (fromEnv) return fromEnv.replace(/\/+$/, "");
   const fromWeb = resolveWebSportscapeEditorialApiUrl();
   if (fromWeb) return fromWeb.replace(/\/+$/, "");
+  if (isGrarfWebRenderer()) {
+    return WEB_SPORTSCAPE_EDITORIAL_API_URL;
+  }
+  const fromEnv = define_import_meta_env_default.VITE_SPORTSCAPE_EDITORIAL_API_URL?.trim();
+  if (fromEnv) return fromEnv.replace(/\/+$/, "");
   return DEFAULT_SPORTSCAPE_EDITORIAL_API_URL;
 }
 function shouldUseLocalSportscapeEditorialFallback() {

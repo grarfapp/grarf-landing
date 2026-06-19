@@ -19,7 +19,7 @@ const ingestUrl =
 
 const sportscapeEditorialApiUrl =
   process.env.VITE_SPORTSCAPE_EDITORIAL_API_URL ??
-  "https://grarf-sportscape-editorial.grarf.workers.dev";
+  "https://grarf-operational-service.grarf.workers.dev/sportscape-editorial";
 
 /** Full env object — required for dynamic `import.meta.env[name]` access in desktop code. */
 const importMetaEnv = {

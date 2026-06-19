@@ -20,7 +20,7 @@ declare global {
 function resolveSportscapeEditorialApiBase(): string {
   const fromConfig = window.GRARF_WEB_CONFIG?.sportscapeEditorialApiUrl?.trim();
   if (fromConfig) return fromConfig.replace(/\/+$/, "");
-  return "https://grarf-sportscape-editorial.grarf.workers.dev";
+  return "https://grarf-operational-service.grarf.workers.dev/sportscape-editorial";
 }
 
 function sportscapeEditorialBridgeUrl(path: string): string {
