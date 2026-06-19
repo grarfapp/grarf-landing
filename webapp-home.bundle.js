@@ -23952,6 +23952,65 @@ init_operationalIngestConfig();
 
 // ../grarf/desktop/src/lib/homeGamesColumnFilter.ts
 init_define_import_meta_env();
+
+// ../grarf/desktop/src/lib/gamesSpine/isGameActivelyLive.ts
+init_define_import_meta_env();
+
+// ../grarf/desktop/shared/espnPausedCompetitionStatus.js
+init_define_import_meta_env();
+var ESPN_PAUSED_STATUS_NAMES = /* @__PURE__ */ new Set([
+  "STATUS_SUSPENDED",
+  "STATUS_DELAYED",
+  "STATUS_HALTED",
+  "STATUS_INTERRUPTED",
+  "STATUS_WEATHER_DELAY"
+]);
+function safeEspnText(value) {
+  return typeof value === "string" && value.trim() ? value.trim() : "";
+}
+function isEspnPausedCompetitionStatus(statusType) {
+  if (!statusType || typeof statusType !== "object") return false;
+  const statusName = safeEspnText(statusType.name).toUpperCase();
+  if (statusName === "STATUS_POSTPONED") return false;
+  if (ESPN_PAUSED_STATUS_NAMES.has(statusName)) return true;
+  const detail = `${safeEspnText(statusType.shortDetail)} ${safeEspnText(statusType.detail)} ${safeEspnText(statusType.description)}`.toLowerCase();
+  if (!detail) return false;
+  if (/\b(suspended|weather delay|delayed|halted|interrupted)\b/.test(detail)) {
+    return statusName !== "STATUS_IN_PROGRESS";
+  }
+  return false;
+}
+function resolveEspnCardStatus(statusType) {
+  const statusName = safeEspnText(statusType?.name).toUpperCase();
+  const completed = !!statusType?.completed;
+  const state3 = safeEspnText(statusType?.state).toLowerCase();
+  if (statusName === "STATUS_POSTPONED") return "postponed";
+  if (isEspnPausedCompetitionStatus(statusType)) return "scheduled";
+  if (statusName === "STATUS_IN_PROGRESS" || !completed && state3 === "in") return "live";
+  if (statusName === "STATUS_FINAL" || completed || state3 === "post") return "final";
+  return "scheduled";
+}
+
+// ../grarf/desktop/src/lib/gamesSpine/isGameActivelyLive.ts
+function pausedFromStatusLine(statusLine) {
+  const line = statusLine?.trim();
+  if (!line) return false;
+  return isEspnPausedCompetitionStatus({
+    shortDetail: line,
+    detail: line,
+    description: line
+  });
+}
+function isGameCompetitionPaused(game) {
+  if (game.status === "postponed") return true;
+  return pausedFromStatusLine(game.statusLine);
+}
+function isGameActivelyLive(game) {
+  if (game.status !== "live") return false;
+  return !isGameCompetitionPaused(game);
+}
+
+// ../grarf/desktop/src/lib/homeGamesColumnFilter.ts
 var HOME_GAMES_FILTER_STORAGE_KEY = "grarf-home-games-status-filter";
 var FILTERS = ["all", "live", "upcoming", "final"];
 function parseHomeGamesFilter(raw) {
@@ -23972,7 +24031,7 @@ function writeHomeGamesFilterToSession(filter) {
 }
 function matchHomeGamesStatusFilter(game, filter) {
   if (filter === "all") return true;
-  if (filter === "live") return game.status === "live";
+  if (filter === "live") return isGameActivelyLive(game);
   if (filter === "upcoming") return game.status === "scheduled";
   if (filter === "final") return game.status === "final";
   return true;
@@ -29677,6 +29736,11 @@ function filterGamesSpineSlateForToday(games, now = /* @__PURE__ */ new Date()) 
 }
 
 // ../grarf/desktop/src/lib/navigation/resolveLeagueNavActivityStatuses.ts
+function resolveActivityBucketStatus(game) {
+  if (game.status === "final") return "final";
+  if (isGameActivelyLive(game)) return "live";
+  return "scheduled";
+}
 function buildActivityTallyStatusesByBucket(statuses) {
   let finalCount = 0;
   let liveCount = 0;
@@ -29699,7 +29763,7 @@ function resolveLeagueNavActivityStatusesByLeague(mergedLeagues) {
     if (slate.length === 0) continue;
     out.set(
       leagueKey,
-      buildActivityTallyStatusesByBucket(slate.map((game) => game.status))
+      buildActivityTallyStatusesByBucket(slate.map((game) => resolveActivityBucketStatus(game)))
     );
   }
   return out;
@@ -30952,6 +31016,8 @@ function preserveLiveStatusOnIngest(incoming, previousGames) {
         return { ...prev };
       }
       if (prev.status !== "live") return game;
+      if (isGameCompetitionPaused(game)) return game;
+      if (isGameCompetitionPaused(prev)) return game;
       if (game.status === "live" || game.status === "final") return game;
       leagueChanged = true;
       return {
@@ -32074,7 +32140,7 @@ function launchDemoNhlVegasCarolinaWatch(dispatch) {
 // ../grarf/desktop/src/lib/operationalMode/matchOperationalModeSpineFilter.ts
 function matchOperationalModeSpineFilter(game, mode) {
   if (isDemoNhlVegasCarolinaGame(game)) return true;
-  if (mode === "LIVE") return game.status === "live";
+  if (mode === "LIVE") return isGameActivelyLive(game);
   if (mode === "CATCH_UP") return game.status === "final";
   return game.status === "scheduled";
 }
@@ -33843,13 +33909,7 @@ function formatTimeEt2(iso) {
   }
 }
 function readCardStatus(comp, statusType) {
-  const completed = !!statusType?.completed;
-  const state3 = safe2(statusType?.state).toLowerCase();
-  const live = !completed && state3 === "in";
-  const final = completed || state3 === "post";
-  if (live) return "live";
-  if (final) return "final";
-  return "scheduled";
+  return resolveEspnCardStatus(statusType);
 }
 function readStatusLine(comp, statusType, cardStatus) {
   const detail = safe2(statusType?.shortDetail) || safe2(statusType?.description) || safe2(statusType?.detail) || "";
@@ -34071,9 +34131,10 @@ function normalizeMmaCompetition(competition, card, matchNumber, totalFights, le
   const statusType = status.type || {};
   const completed = !!statusType.completed;
   const state3 = safe3(statusType.state).toLowerCase();
-  const live = !completed && state3 === "in";
+  const paused = isEspnPausedCompetitionStatus(statusType);
+  const live = !completed && !paused && state3 === "in";
   const final = completed || state3 === "post";
-  const scheduled = !completed && state3 === "pre";
+  const scheduled = !completed && (state3 === "pre" || paused);
   let cardStatus = "scheduled";
   if (live) cardStatus = "live";
   else if (final) cardStatus = "final";
@@ -34108,7 +34169,7 @@ function normalizeMmaCompetition(competition, card, matchNumber, totalFights, le
   } else if (final) {
     statusLine = [contextLine, detail || "Final"].filter(Boolean).join(" \xB7 ");
   } else if (scheduled) {
-    statusLine = [contextLine, venueName].filter(Boolean).join(" \xB7 ");
+    statusLine = paused ? [contextLine, detail].filter(Boolean).join(" \xB7 ") : [contextLine, venueName].filter(Boolean).join(" \xB7 ");
   }
   const competitionId = String(competition.id ?? "");
   if (!competitionId) return null;
@@ -34354,9 +34415,10 @@ function normalizeTennisCompetition2(competition, tournament, groupingLabel, gro
   const statusType = status.type || {};
   const completed = !!statusType.completed;
   const state3 = safe4(statusType.state).toLowerCase();
-  const live = !completed && state3 === "in";
+  const paused = isEspnPausedCompetitionStatus(statusType);
+  const live = !completed && !paused && state3 === "in";
   const final = completed || state3 === "post";
-  const scheduled = !completed && state3 === "pre";
+  const scheduled = !completed && (state3 === "pre" || paused);
   let cardStatus = "scheduled";
   if (live) cardStatus = "live";
   else if (final) cardStatus = "final";
@@ -34384,8 +34446,12 @@ function normalizeTennisCompetition2(competition, tournament, groupingLabel, gro
   const contextLine = contextParts.join(" \xB7 ");
   let statusLine = contextLine;
   if (scheduled) {
-    const venueBits = [venueName, courtName].filter(Boolean).join(" \xB7 ");
-    statusLine = [contextLine, venueBits].filter(Boolean).join(" \xB7 ");
+    if (paused) {
+      statusLine = safe4(statusType.shortDetail) || safe4(statusType.detail) || safe4(statusType.description) || contextLine;
+    } else {
+      const venueBits = [venueName, courtName].filter(Boolean).join(" \xB7 ");
+      statusLine = [contextLine, venueBits].filter(Boolean).join(" \xB7 ");
+    }
   } else if (cardStatus === "final") {
     statusLine = [contextLine, noteText || safe4(statusType.shortDetail) || "Final"].filter(Boolean).join(" \xB7 ") || "Final";
   }
@@ -34470,9 +34536,6 @@ function normalizeTennisScoreboard2(scoreboardJson, leagueKey) {
 
 // ../grarf/desktop/electron/espn/normalizeGolf.js
 init_define_import_meta_env();
-function isActiveRoundPostStatus(statusName) {
-  return statusName === "STATUS_SUSPENDED" || statusName === "STATUS_DELAYED";
-}
 function safe5(v2) {
   return typeof v2 === "string" && v2.trim() ? v2.trim() : "";
 }
@@ -34514,12 +34577,11 @@ function normalizeGolfEvent(event, leagueKey, slateDateKey) {
     isoStart,
     formatOperationalDateKeyFromMs
   );
-  const inferredLive = !pastTournamentEnd && !completed && state3 === "pre" && scoreboardDayKey === operationalTodayKey && startTimeMs > 0 && startTimeMs <= Date.now();
-  const statusName = safe5(statusType?.name).toUpperCase();
-  const activeRoundPost = isActiveRoundPostStatus(statusName);
-  const live = !completed && !pastTournamentEnd && (state3 === "in" || inferredLive || activeRoundPost);
-  const final = !live && (completed || pastTournamentEnd || state3 === "post" && !activeRoundPost);
-  const scheduled = !completed && !pastTournamentEnd && state3 === "pre" && !inferredLive;
+  const paused = isEspnPausedCompetitionStatus(statusType);
+  const inferredLive = !pastTournamentEnd && !completed && !paused && state3 === "pre" && scoreboardDayKey === operationalTodayKey && startTimeMs > 0 && startTimeMs <= Date.now();
+  const live = !completed && !pastTournamentEnd && !paused && (state3 === "in" || inferredLive);
+  const final = !live && (completed || pastTournamentEnd || state3 === "post" && !paused);
+  const scheduled = !completed && !pastTournamentEnd && (state3 === "pre" || paused) && !inferredLive;
   let cardStatus = "scheduled";
   if (live) cardStatus = "live";
   else if (final) cardStatus = "final";
@@ -34823,13 +34885,7 @@ function pickOddsSummary(competition) {
   return void 0;
 }
 function resolveEspnTeamSportCardStatus(statusType) {
-  const statusName = safe6(statusType?.name).toUpperCase();
-  const completed = !!statusType?.completed;
-  const state3 = safe6(statusType?.state).toLowerCase();
-  if (statusName === "STATUS_POSTPONED") return "postponed";
-  if (statusName === "STATUS_IN_PROGRESS" || !completed && state3 === "in") return "live";
-  if (statusName === "STATUS_FINAL" || completed || state3 === "post") return "final";
-  return "scheduled";
+  return resolveEspnCardStatus(statusType);
 }
 function normalizeEspnEvent(event, leagueKey, slateDateKey) {
   const comp = event?.competitions?.[0];
@@ -34896,6 +34952,8 @@ function normalizeEspnEvent(event, leagueKey, slateDateKey) {
   let statusLine = "";
   if (postponed) {
     statusLine = safe6(statusType?.shortDetail) || safe6(statusType?.detail) || safe6(statusType?.description) || "Postponed";
+  } else if (scheduled && cardStatus === "scheduled") {
+    statusLine = safe6(statusType?.shortDetail) || safe6(statusType?.detail) || safe6(statusType?.description) || (venueName ? venueName : "");
   } else if (live || final) {
     statusLine = buildStatusLine(comp, statusType);
   } else if (scheduled && venueName) {
@@ -37511,7 +37569,7 @@ function resolveAutomaticOperationalMode(leagues, now = /* @__PURE__ */ new Date
   const slate = allGames(leagues).filter(
     (g2) => isGameOnGamesSpineOperationalDate(g2, todayKey, now)
   );
-  if (slate.some((g2) => g2.status === "live")) return "LIVE";
+  if (slate.some((g2) => isGameActivelyLive(g2))) return "LIVE";
   return "CATCH_UP";
 }
 
@@ -37966,7 +38024,7 @@ function resolveLeagueContextStrip(league, games) {
   if (ingestLabel) {
     return { label: ingestLabel.toUpperCase(), source: "ingest" };
   }
-  const live = games.filter((g2) => g2.status === "live").length;
+  const live = games.filter((g2) => isGameActivelyLive(g2)).length;
   const scheduled = games.filter((g2) => g2.status === "scheduled").length;
   const final = games.filter((g2) => g2.status === "final").length;
   if (league === "F1") {
@@ -37993,7 +38051,7 @@ function resolveGameNarrative(game) {
   if (ingest) {
     return { text: ingest, source: game.narrativeSource ?? "ingest" };
   }
-  if (game.status === "live") {
+  if (isGameActivelyLive(game)) {
     if (game.statusLine?.trim()) {
       return { text: game.statusLine.trim(), source: "rules" };
     }
@@ -39808,7 +39866,7 @@ init_define_import_meta_env();
 init_define_import_meta_env();
 function buildCanonicalLiveStateLabel(game) {
   const parts = [];
-  if (game.status === "live") parts.push("LIVE");
+  if (isGameActivelyLive(game)) parts.push("LIVE");
   else if (game.status === "final") parts.push("FINAL");
   const line = game.statusLine?.trim();
   if (line) parts.push(line);
@@ -46436,7 +46494,7 @@ function isMlbScoreboardGame(game) {
 }
 function gameHasHomeSpineWatchLive(game) {
   if (isDemoNhlVegasCarolinaGame(game)) return true;
-  if (game.status !== "live") return false;
+  if (!isGameActivelyLive(game)) return false;
   if (golfGameHasResolvableWatchStream(game)) return true;
   if (game.streamUrl?.trim()) return true;
   if (isMlbScoreboardGame(game)) return true;
@@ -49755,6 +49813,9 @@ function resolveGamesSpineCardTimingLabel(game, scheduleLabel) {
     return game.statusLine?.trim() || "Postponed";
   }
   if (game.status === "scheduled") {
+    if (isGameCompetitionPaused(game) && game.statusLine?.trim()) {
+      return game.statusLine.trim();
+    }
     const stripped = stripLivePrefix(scheduleLabel);
     if (stripped) return stripped;
     return formatGameDisplayTimeLocal(game);
@@ -50223,10 +50284,11 @@ function GamesSpineCardStatusRow({
   className
 }) {
   const timingLabel = hideTime ? null : resolveGamesSpineCardTimingLabel(game, scheduleLabel);
-  const isLive = game.status === "live";
+  const isLive = isGameActivelyLive(game);
+  const isPaused = isGameCompetitionPaused(game);
   const isFinal = game.status === "final";
   const isPostponed = game.status === "postponed";
-  const isScheduled = game.status === "scheduled";
+  const isScheduled = game.status === "scheduled" || isPaused;
   return /* @__PURE__ */ (0, import_jsx_runtime49.jsxs)("div", { className: cn2(GAMES_SPINE_CARD_STATUS_GRID_CLASS, "pr-0.5", className), children: [
     /* @__PURE__ */ (0, import_jsx_runtime49.jsx)("div", { className: "flex min-w-0 items-center justify-start", children: isLive ? /* @__PURE__ */ (0, import_jsx_runtime49.jsx)(GamesSpineLiveBadge, { operationalPulse }) : isPostponed ? /* @__PURE__ */ (0, import_jsx_runtime49.jsx)("span", { className: "border border-line bg-panel2 px-1 py-px text-[8px] tracking-[0.14em] text-textdim", children: "POSTPONED" }) : isFinal ? /* @__PURE__ */ (0, import_jsx_runtime49.jsx)("span", { className: "border border-line bg-panel2 px-1 py-px text-[8px] tracking-[0.14em] text-textdim", children: "FINAL" }) : isScheduled && timingLabel ? /* @__PURE__ */ (0, import_jsx_runtime49.jsx)("time", { className: GAMES_SPINE_CARD_START_TIME_CLASS, children: timingLabel }) : isScheduled ? /* @__PURE__ */ (0, import_jsx_runtime49.jsx)("span", { "aria-hidden": true }) : scheduleLabel ? /* @__PURE__ */ (0, import_jsx_runtime49.jsx)(
       "span",
@@ -51042,7 +51104,7 @@ function GameRow({
       lastUpdated: game.lastUpdated ?? null
     });
   }, [game]);
-  const isLive = game.status === "live";
+  const isLive = isGameActivelyLive(game);
   const isRail = variant === "rail";
   const tennis = isTennisGame(game);
   const ufc = isUfcGame(game);
@@ -51070,7 +51132,7 @@ function GameRow({
   const expandedSummary = resolveGeneratedSummaryText(game, bundle);
   const wnbaWatchLiveLogged = (0, import_react65.useRef)(null);
   const recordColLogged = (0, import_react65.useRef)(null);
-  const scoreMode = game.status === "live" || game.status === "final";
+  const scoreMode = isGameActivelyLive(game) || game.status === "final";
   const scoreAnchorRef = useGamesSpineScoreAnchor(isRail && scoreMode, homeSpineParity);
   const isPrepare = isRail && game.status === "scheduled";
   const tennisPresentation = tennis ? resolveTennisMatchPresentation(game) : null;
@@ -51512,7 +51574,7 @@ function resolveBestGameRightNowV1(mergedLeagues, manualGames = []) {
     ...collectManualSpineGames(manualGames)
   ].filter((g2) => g2.status !== "postponed");
   if (games.length === 0) return null;
-  const liveGames = games.filter((g2) => g2.status === "live");
+  const liveGames = games.filter((g2) => isGameActivelyLive(g2));
   if (liveGames.length > 0) {
     liveGames.sort((a2, b2) => compareGamesByImportanceV1(a2, b2, false));
     return { kind: "best_live", game: liveGames[0] };
@@ -53378,7 +53440,7 @@ var import_react79 = __toESM(require_react(), 1);
 var import_jsx_runtime73 = __toESM(require_jsx_runtime(), 1);
 function filterManualVisibleGames(games, statusFilter) {
   if (statusFilter === "live") {
-    return sortGamesSpineChronologically(games.filter((game) => game.status === "live"));
+    return sortGamesSpineChronologically(games.filter((game) => isGameActivelyLive(game)));
   }
   if (statusFilter === "all") {
     return sortGamesSpineChronologically(games);
@@ -53574,7 +53636,7 @@ function HomeGamesToday({
     const out = [];
     for (const key2 of GAMES_COLUMN_LEAGUE_ORDER) {
       for (const g2 of leagues[key2] ?? []) {
-        if (g2.status === "live") out.push(g2);
+        if (isGameActivelyLive(g2)) out.push(g2);
       }
     }
     return out;
