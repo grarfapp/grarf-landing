@@ -40568,6 +40568,43 @@ function executeWatchOption(game, option, dispatch) {
 
 // ../grarf/desktop/src/lib/watch/launchDirectStreamWatch.ts
 init_define_import_meta_env();
+
+// ../grarf/desktop/src/lib/broadcast/streamUrlChannelFallback.ts
+init_define_import_meta_env();
+var STREAM_URL_CHANNEL_MAPPINGS = [
+  { domains: ["tennischannel.com"], label: "Tennis Channel" },
+  { domains: ["watch.mlb.com", "mlb.com"], label: "MLB.TV" },
+  { domains: ["peacocktv.com", "peacock.com"], label: "Peacock" },
+  { domains: ["paramountplus.com"], label: "Paramount+" },
+  { domains: ["foxsports.com"], label: "FOX Sports" },
+  { domains: ["plus.espn.com"], label: "ESPN+" },
+  { domains: ["espn.com"], label: "ESPN" },
+  { domains: ["tv.apple.com"], label: "Apple TV" },
+  { domains: ["usanetwork.com"], label: "USA Network" }
+];
+function normalizeStreamHostname(streamUrl) {
+  try {
+    const host = new URL(streamUrl.trim()).hostname.toLowerCase();
+    return host.replace(/^www\./, "");
+  } catch {
+    return null;
+  }
+}
+function hostnameMatchesDomain(hostname, domain) {
+  return hostname === domain || hostname.endsWith(`.${domain}`);
+}
+function deriveChannelLabelFromStreamUrl(streamUrl) {
+  const hostname = normalizeStreamHostname(streamUrl);
+  if (!hostname) return null;
+  for (const { domains, label } of STREAM_URL_CHANNEL_MAPPINGS) {
+    if (domains.some((domain) => hostnameMatchesDomain(hostname, domain))) {
+      return label;
+    }
+  }
+  return null;
+}
+
+// ../grarf/desktop/src/lib/watch/launchDirectStreamWatch.ts
 function espnPlusDirectOption(game, deepLink) {
   return {
     id: `espn-plus-direct-${game.id}`,
@@ -40645,7 +40682,17 @@ function tryLaunchDirectStreamWatch(game, dispatch) {
     );
     return true;
   }
-  if (!gameHasEspnWatchBroadcast2(game)) return false;
+  if (!gameHasEspnWatchBroadcast2(game)) {
+    if (streamUrl) {
+      watchDebug("Launching resolved streamUrl externally", { gameId: game.id, streamUrl });
+      void openWatchStreamExternally(
+        streamUrl,
+        game.streamProvider ?? deriveChannelLabelFromStreamUrl(streamUrl) ?? "stream"
+      );
+      return true;
+    }
+    return false;
+  }
   const watchEventId = espnWatchEventIdFromGame(game) ?? parseEspnEventIdFromGame(game) ?? null;
   if (!watchEventId) return false;
   const deepLink = buildEspnPlusWatchUrl(watchEventId);
@@ -41496,41 +41543,6 @@ function selectWnbaDisplayBroadcastLabel(labels) {
 function selectWnbaDisplayBroadcastLabelForGame(game) {
   const pool = [...game.broadcasts ?? [], ...game.channels ?? []];
   return selectWnbaDisplayBroadcastLabel(pool);
-}
-
-// ../grarf/desktop/src/lib/broadcast/streamUrlChannelFallback.ts
-init_define_import_meta_env();
-var STREAM_URL_CHANNEL_MAPPINGS = [
-  { domains: ["tennischannel.com"], label: "Tennis Channel" },
-  { domains: ["watch.mlb.com", "mlb.com"], label: "MLB.TV" },
-  { domains: ["peacocktv.com", "peacock.com"], label: "Peacock" },
-  { domains: ["paramountplus.com"], label: "Paramount+" },
-  { domains: ["foxsports.com"], label: "FOX Sports" },
-  { domains: ["plus.espn.com"], label: "ESPN+" },
-  { domains: ["espn.com"], label: "ESPN" },
-  { domains: ["tv.apple.com"], label: "Apple TV" },
-  { domains: ["usanetwork.com"], label: "USA Network" }
-];
-function normalizeStreamHostname(streamUrl) {
-  try {
-    const host = new URL(streamUrl.trim()).hostname.toLowerCase();
-    return host.replace(/^www\./, "");
-  } catch {
-    return null;
-  }
-}
-function hostnameMatchesDomain(hostname, domain) {
-  return hostname === domain || hostname.endsWith(`.${domain}`);
-}
-function deriveChannelLabelFromStreamUrl(streamUrl) {
-  const hostname = normalizeStreamHostname(streamUrl);
-  if (!hostname) return null;
-  for (const { domains, label } of STREAM_URL_CHANNEL_MAPPINGS) {
-    if (domains.some((domain) => hostnameMatchesDomain(hostname, domain))) {
-      return label;
-    }
-  }
-  return null;
 }
 
 // ../grarf/desktop/src/lib/broadcast/resolveGameChannelPresentation.ts
@@ -48048,11 +48060,193 @@ loadedUrl=${src}`);
 
 // ../grarf/desktop/src/store/findLiveGame.ts
 init_define_import_meta_env();
+
+// ../grarf/desktop/src/lib/gamesSpine/manual/convertManualGamesSpineDocument.ts
+init_define_import_meta_env();
+
+// ../grarf/desktop/src/lib/gamesSpine/manual/manualGamesSpineUtils.ts
+init_define_import_meta_env();
+function resolveManualGamesSpineStatus(nowMs, startTimeMs, endTimeMs) {
+  if (nowMs < startTimeMs) return "scheduled";
+  if (nowMs < endTimeMs) return "live";
+  return "final";
+}
+function slugPart(value) {
+  return value.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+}
+function manualGamesSpineLeagueSlug(leagueLabel) {
+  return slugPart(leagueLabel) || "manual-league";
+}
+function resolveManualGamesSpineChannelValue(eventValue, leagueValue) {
+  const eventChannel = eventValue?.trim();
+  if (eventChannel) return eventChannel;
+  const leagueChannel = leagueValue?.trim();
+  if (leagueChannel) return leagueChannel;
+  return null;
+}
+var CHANNEL_LABEL_TO_STREAM_PROVIDER = {
+  Peacock: "Peacock",
+  "ESPN+": "ESPN+",
+  ESPN: "ESPN+",
+  "Paramount+": "Paramount+",
+  "FOX Sports": "FOX Sports",
+  "Apple TV": "Apple TV",
+  "USA Network": "USA",
+  "Tennis Channel": "Tennis Channel+"
+};
+function resolveStreamProviderFromChannelLabel(channelLabel) {
+  const trimmed = channelLabel?.trim();
+  if (!trimmed) return null;
+  if (CHANNEL_LABEL_TO_STREAM_PROVIDER[trimmed]) {
+    return CHANNEL_LABEL_TO_STREAM_PROVIDER[trimmed];
+  }
+  if (/\bpeacock\b/i.test(trimmed)) return "Peacock";
+  if (/\bespn\+?\b/i.test(trimmed)) return "ESPN+";
+  if (/\bparamount\+?\b/i.test(trimmed)) return "Paramount+";
+  if (/\bfox sports\b/i.test(trimmed)) return "FOX Sports";
+  if (/\bapple tv\b/i.test(trimmed)) return "Apple TV";
+  if (/\busa network\b/i.test(trimmed)) return "USA";
+  if (/\btennis channel\b/i.test(trimmed)) return "Tennis Channel+";
+  return null;
+}
+function resolveManualGamesSpineStreamProvider(channel, channelUrl) {
+  const urlLabel = channelUrl?.trim() ? deriveChannelLabelFromStreamUrl(channelUrl) : null;
+  return resolveStreamProviderFromChannelLabel(urlLabel) ?? resolveStreamProviderFromChannelLabel(channel);
+}
+function manualGamesSpineEventId(leagueLabel, eventName, date) {
+  return `manual-gs-${slugPart(leagueLabel)}-${slugPart(eventName)}-${date}`;
+}
+function formatManualGamesSpineStatusLine(status, startTimeMs, endTimeMs, nowMs) {
+  if (status === "live") {
+    const remainingMs = Math.max(0, endTimeMs - nowMs);
+    const totalMinutes = Math.floor(remainingMs / 6e4);
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+    return `Live \xB7 ${hours}h ${minutes}m remaining`;
+  }
+  if (status === "final") return "Completed";
+  return void 0;
+}
+function formatManualGamesSpineDisplayTime(startTimeMs) {
+  return new Date(startTimeMs).toLocaleString("en-US", {
+    weekday: "short",
+    hour: "numeric",
+    minute: "2-digit",
+    timeZoneName: "short"
+  });
+}
+function refreshManualGamesSpineGameIfNeeded(game, now) {
+  const manual = game.metadata?.manualGamesSpine;
+  if (!manual) return game;
+  const startTimeMs = Date.parse(manual.startTimeIso);
+  const endTimeMs = Date.parse(manual.endTimeIso);
+  if (!Number.isFinite(startTimeMs) || !Number.isFinite(endTimeMs)) return game;
+  const nowMs = now.getTime();
+  const status = resolveManualGamesSpineStatus(nowMs, startTimeMs, endTimeMs);
+  const statusLine = formatManualGamesSpineStatusLine(status, startTimeMs, endTimeMs, nowMs);
+  if (game.status === status && game.statusLine === statusLine) return game;
+  return {
+    ...game,
+    status,
+    statusLine
+  };
+}
+
+// ../grarf/desktop/src/lib/gamesSpine/manual/convertManualGamesSpineDocument.ts
+function convertEventToMlbGame(league, event, now) {
+  const startTimeMs = Date.parse(event.startTime);
+  const endTimeMs = Date.parse(event.endTime);
+  if (!Number.isFinite(startTimeMs) || !Number.isFinite(endTimeMs)) return null;
+  const nowMs = now.getTime();
+  const status = resolveManualGamesSpineStatus(nowMs, startTimeMs, endTimeMs);
+  const channel = resolveManualGamesSpineChannelValue(event.channel, league.channel) ?? "";
+  const channelUrl = resolveManualGamesSpineChannelValue(event.channelUrl, league.channelUrl);
+  const streamProvider = resolveManualGamesSpineStreamProvider(channel, channelUrl);
+  const broadcasts = channel ? [channel] : [];
+  return {
+    id: manualGamesSpineEventId(league.league, event.eventName, event.date),
+    grarfGameId: manualGamesSpineEventId(league.league, event.eventName, event.date),
+    time: formatManualGamesSpineDisplayTime(startTimeMs),
+    awayTeam: event.eventName,
+    awayRecord: "\u2014",
+    homeTeam: channel,
+    homeRecord: "\u2014",
+    awayCity: "",
+    homeCity: "",
+    awayPitcher: "\u2014",
+    awayPitcherStats: "",
+    homePitcher: "\u2014",
+    homePitcherStats: "",
+    channels: broadcasts,
+    broadcasts,
+    streamUrl: channelUrl,
+    streamProvider,
+    status,
+    statusLine: formatManualGamesSpineStatusLine(status, startTimeMs, endTimeMs, nowMs),
+    startTimeMs,
+    scheduledDateKey: event.date,
+    metadata: {
+      leagueLabel: league.league,
+      manualGamesSpine: {
+        leagueLabel: league.league,
+        leaguePriority: league.leaguePriority ?? void 0,
+        insertAfterLeague: league.insertAfterLeague ?? null,
+        insertBeforeLeague: league.insertBeforeLeague ?? null,
+        bestGamePriority: event.bestGamePriority != null && Number.isFinite(event.bestGamePriority) ? event.bestGamePriority : void 0,
+        eventName: event.eventName,
+        date: event.date,
+        startTimeIso: event.startTime,
+        endTimeIso: event.endTime,
+        channel,
+        channelUrl
+      }
+    }
+  };
+}
+function convertManualGamesSpineDocument(document2, now = /* @__PURE__ */ new Date(), operationalDateKey = getGamesSpineOperationalTodayKey(now)) {
+  if (!document2?.leagues?.length) return [];
+  const sections = [];
+  for (const league of document2.leagues) {
+    const games = [];
+    for (const event of league.games) {
+      if (event.date !== operationalDateKey) continue;
+      const row = convertEventToMlbGame(league, event, now);
+      if (row) games.push(row);
+    }
+    if (games.length === 0) continue;
+    sections.push({
+      slug: manualGamesSpineLeagueSlug(league.league),
+      leagueLabel: league.league,
+      leaguePriority: league.leaguePriority ?? null,
+      insertAfterLeague: league.insertAfterLeague ?? null,
+      insertBeforeLeague: league.insertBeforeLeague ?? null,
+      games: sortGamesSpineChronologically(games)
+    });
+  }
+  return sections;
+}
+function flattenManualGamesSpineGames(sections) {
+  const out = [];
+  for (const section of sections) out.push(...section.games);
+  return out;
+}
+
+// ../grarf/desktop/src/store/findLiveGame.ts
 function findLiveGameById(gameId, consumerId = "find_live_game") {
   const canonical = getCanonicalLiveGameRow(gameId, consumerId);
   if (canonical) return canonical;
   if (isManualLeMans2026GameId(gameId)) return resolveManualLeMans2026SpineGame();
   return void 0;
+}
+function findGamesSpineGameById(gameId, consumerId = "find_games_spine_game") {
+  const operational = findLiveGameById(gameId, consumerId);
+  if (operational) return operational;
+  const document2 = useGamesSpineManualStore.getState().document;
+  const now = /* @__PURE__ */ new Date();
+  const manualGames = flattenManualGamesSpineGames(
+    convertManualGamesSpineDocument(document2, now)
+  ).map((game) => refreshManualGamesSpineGameIfNeeded(game, now));
+  return manualGames.find((game) => game.id === gameId || game.grarfGameId === gameId);
 }
 
 // ../grarf/desktop/src/pages/GameWorkspacePage.tsx
@@ -51610,7 +51804,7 @@ function CommandBriefingModuleProduction({
   const briefingCount = ranked.length;
   const firstRankedGame = displayRanked[0]?.game;
   const onWatchLive = (0, import_react67.useCallback)((gameId) => {
-    const game = findLiveGameById(gameId);
+    const game = findGamesSpineGameById(gameId);
     if (!game || !gameHasHomeSpineWatchLive(game)) return;
     logWatchLiveLaunch(game);
     if (game.league === "WNBA") logWnbaWatchLiveClicked(game);
@@ -53015,145 +53209,6 @@ function useGamesSpineCollapse() {
 init_define_import_meta_env();
 var import_react78 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/lib/gamesSpine/manual/convertManualGamesSpineDocument.ts
-init_define_import_meta_env();
-
-// ../grarf/desktop/src/lib/gamesSpine/manual/manualGamesSpineUtils.ts
-init_define_import_meta_env();
-function resolveManualGamesSpineStatus(nowMs, startTimeMs, endTimeMs) {
-  if (nowMs < startTimeMs) return "scheduled";
-  if (nowMs < endTimeMs) return "live";
-  return "final";
-}
-function slugPart(value) {
-  return value.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
-}
-function manualGamesSpineLeagueSlug(leagueLabel) {
-  return slugPart(leagueLabel) || "manual-league";
-}
-function resolveManualGamesSpineChannelValue(eventValue, leagueValue) {
-  const eventChannel = eventValue?.trim();
-  if (eventChannel) return eventChannel;
-  const leagueChannel = leagueValue?.trim();
-  if (leagueChannel) return leagueChannel;
-  return null;
-}
-function manualGamesSpineEventId(leagueLabel, eventName, date) {
-  return `manual-gs-${slugPart(leagueLabel)}-${slugPart(eventName)}-${date}`;
-}
-function formatManualGamesSpineStatusLine(status, startTimeMs, endTimeMs, nowMs) {
-  if (status === "live") {
-    const remainingMs = Math.max(0, endTimeMs - nowMs);
-    const totalMinutes = Math.floor(remainingMs / 6e4);
-    const hours = Math.floor(totalMinutes / 60);
-    const minutes = totalMinutes % 60;
-    return `Live \xB7 ${hours}h ${minutes}m remaining`;
-  }
-  if (status === "final") return "Completed";
-  return void 0;
-}
-function formatManualGamesSpineDisplayTime(startTimeMs) {
-  return new Date(startTimeMs).toLocaleString("en-US", {
-    weekday: "short",
-    hour: "numeric",
-    minute: "2-digit",
-    timeZoneName: "short"
-  });
-}
-function refreshManualGamesSpineGameIfNeeded(game, now) {
-  const manual = game.metadata?.manualGamesSpine;
-  if (!manual) return game;
-  const startTimeMs = Date.parse(manual.startTimeIso);
-  const endTimeMs = Date.parse(manual.endTimeIso);
-  if (!Number.isFinite(startTimeMs) || !Number.isFinite(endTimeMs)) return game;
-  const nowMs = now.getTime();
-  const status = resolveManualGamesSpineStatus(nowMs, startTimeMs, endTimeMs);
-  const statusLine = formatManualGamesSpineStatusLine(status, startTimeMs, endTimeMs, nowMs);
-  if (game.status === status && game.statusLine === statusLine) return game;
-  return {
-    ...game,
-    status,
-    statusLine
-  };
-}
-
-// ../grarf/desktop/src/lib/gamesSpine/manual/convertManualGamesSpineDocument.ts
-function convertEventToMlbGame(league, event, now) {
-  const startTimeMs = Date.parse(event.startTime);
-  const endTimeMs = Date.parse(event.endTime);
-  if (!Number.isFinite(startTimeMs) || !Number.isFinite(endTimeMs)) return null;
-  const nowMs = now.getTime();
-  const status = resolveManualGamesSpineStatus(nowMs, startTimeMs, endTimeMs);
-  const channel = resolveManualGamesSpineChannelValue(event.channel, league.channel) ?? "";
-  const channelUrl = resolveManualGamesSpineChannelValue(event.channelUrl, league.channelUrl);
-  const broadcasts = channel ? [channel] : [];
-  return {
-    id: manualGamesSpineEventId(league.league, event.eventName, event.date),
-    grarfGameId: manualGamesSpineEventId(league.league, event.eventName, event.date),
-    time: formatManualGamesSpineDisplayTime(startTimeMs),
-    awayTeam: event.eventName,
-    awayRecord: "\u2014",
-    homeTeam: channel,
-    homeRecord: "\u2014",
-    awayCity: "",
-    homeCity: "",
-    awayPitcher: "\u2014",
-    awayPitcherStats: "",
-    homePitcher: "\u2014",
-    homePitcherStats: "",
-    channels: broadcasts,
-    broadcasts,
-    streamUrl: channelUrl,
-    status,
-    statusLine: formatManualGamesSpineStatusLine(status, startTimeMs, endTimeMs, nowMs),
-    startTimeMs,
-    scheduledDateKey: event.date,
-    metadata: {
-      leagueLabel: league.league,
-      manualGamesSpine: {
-        leagueLabel: league.league,
-        leaguePriority: league.leaguePriority ?? void 0,
-        insertAfterLeague: league.insertAfterLeague ?? null,
-        insertBeforeLeague: league.insertBeforeLeague ?? null,
-        bestGamePriority: event.bestGamePriority != null && Number.isFinite(event.bestGamePriority) ? event.bestGamePriority : void 0,
-        eventName: event.eventName,
-        date: event.date,
-        startTimeIso: event.startTime,
-        endTimeIso: event.endTime,
-        channel,
-        channelUrl
-      }
-    }
-  };
-}
-function convertManualGamesSpineDocument(document2, now = /* @__PURE__ */ new Date(), operationalDateKey = getGamesSpineOperationalTodayKey(now)) {
-  if (!document2?.leagues?.length) return [];
-  const sections = [];
-  for (const league of document2.leagues) {
-    const games = [];
-    for (const event of league.games) {
-      if (event.date !== operationalDateKey) continue;
-      const row = convertEventToMlbGame(league, event, now);
-      if (row) games.push(row);
-    }
-    if (games.length === 0) continue;
-    sections.push({
-      slug: manualGamesSpineLeagueSlug(league.league),
-      leagueLabel: league.league,
-      leaguePriority: league.leaguePriority ?? null,
-      insertAfterLeague: league.insertAfterLeague ?? null,
-      insertBeforeLeague: league.insertBeforeLeague ?? null,
-      games: sortGamesSpineChronologically(games)
-    });
-  }
-  return sections;
-}
-function flattenManualGamesSpineGames(sections) {
-  const out = [];
-  for (const section of sections) out.push(...section.games);
-  return out;
-}
-
 // ../grarf/desktop/src/hooks/useManualGamesSpineLiveRefreshMs.ts
 init_define_import_meta_env();
 var import_react77 = __toESM(require_react(), 1);
@@ -53320,7 +53375,9 @@ var HomeManualGamesSpineSection = (0, import_react79.memo)(function HomeManualGa
   onToggleCollapse,
   parentScrolls,
   selectedId = null,
-  onOpen
+  onOpen,
+  onWatchLive,
+  canShowWatchLive
 }) {
   const selectedDate = useCommandBriefingStore((state3) => state3.selectedDate);
   const manualRefreshMs = useManualGamesSpineLiveRefreshMs();
@@ -53392,7 +53449,9 @@ var HomeManualGamesSpineSection = (0, import_react79.memo)(function HomeManualGa
                     variant: "rail",
                     homeSpineParity: true,
                     isSelected: selectedId === game.id,
-                    onOpen
+                    onOpen,
+                    onWatchLive,
+                    canShowWatchLive
                   }
                 ) }, game.id))
               }
@@ -53516,7 +53575,7 @@ function HomeGamesToday({
       }));
       return;
     }
-    const game = findLiveGameById(gameId);
+    const game = findGamesSpineGameById(gameId);
     if (!game || !gameHasHomeSpineWatchLive(game)) return;
     if (game.league === "WNBA") logWnbaWatchLiveClicked(game);
     trackWatchLiveClicked({
@@ -53631,7 +53690,9 @@ function HomeGamesToday({
                 onToggleCollapse: () => toggleCollapsed(gamesSpineManualCollapseKey(section.slug)),
                 parentScrolls,
                 selectedId,
-                onOpen
+                onOpen,
+                onWatchLive,
+                canShowWatchLive: gameHasHomeSpineWatchLive
               },
               section.slug
             )
@@ -53695,7 +53756,7 @@ function useHomeSpineGameInteractions({
         }));
         return;
       }
-      const game = findLiveGameById(gameId);
+      const game = findGamesSpineGameById(gameId);
       if (!game || !gameHasHomeSpineWatchLive(game)) return;
       if (game.league === "WNBA") logWnbaWatchLiveClicked(game);
       trackWatchLiveClicked({
