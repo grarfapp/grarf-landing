@@ -72256,6 +72256,45 @@ function useSportscapeAdminEvents(options) {
 
 // ../grarf/desktop/src/pages/SportscapeEditorialAdminPage.tsx
 var import_jsx_runtime160 = __toESM(require_jsx_runtime(), 1);
+function SportscapeAdminTabBar({
+  activeTab,
+  onTabChange
+}) {
+  const tabs = [
+    { id: "sportscape", label: "Sportscape" },
+    { id: "games-spine", label: "Games Spine" }
+  ];
+  return /* @__PURE__ */ (0, import_jsx_runtime160.jsx)(
+    "nav",
+    {
+      className: "border-b border-line/50 bg-[#020404]",
+      "aria-label": "Admin sections",
+      children: /* @__PURE__ */ (0, import_jsx_runtime160.jsx)("div", { className: "mx-auto flex max-w-5xl gap-0 px-4", children: tabs.map((tab) => {
+        const active2 = activeTab === tab.id;
+        return /* @__PURE__ */ (0, import_jsx_runtime160.jsx)(
+          "button",
+          {
+            type: "button",
+            onClick: () => onTabChange(tab.id),
+            className: [
+              "border-b-2 px-4 py-3 text-[11px] tracking-[0.18em] transition-colors",
+              active2 ? "border-greensys text-greensys" : "border-transparent text-textdim hover:text-[#d8e8e8]"
+            ].join(" "),
+            "aria-current": active2 ? "page" : void 0,
+            children: tab.label
+          },
+          tab.id
+        );
+      }) })
+    }
+  );
+}
+function GamesSpineAdminPlaceholder() {
+  return /* @__PURE__ */ (0, import_jsx_runtime160.jsx)("div", { className: "min-h-[60vh] bg-[#020404] text-[#d8e8e8]", children: /* @__PURE__ */ (0, import_jsx_runtime160.jsxs)("main", { className: "mx-auto flex w-full max-w-5xl flex-col gap-3 px-4 py-16", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime160.jsx)("h1", { className: "font-sans text-xl", children: "Games Spine Admin" }),
+    /* @__PURE__ */ (0, import_jsx_runtime160.jsx)("p", { className: "text-[12px] text-textdim", children: "Manual Events coming soon." })
+  ] }) });
+}
 function buildAiBriefSelectionsByEventId(selections) {
   const next = /* @__PURE__ */ new Map();
   for (const selection of selections) {
@@ -72435,6 +72474,7 @@ function SportscapeEditorialAdminContent() {
   ] });
 }
 function SportscapeEditorialAdminPage() {
+  const [activeTab, setActiveTab] = (0, import_react151.useState)("sportscape");
   (0, import_react151.useEffect)(() => {
     const root = document.getElementById("grarf-web-root");
     if (!root) return;
@@ -72445,7 +72485,10 @@ function SportscapeEditorialAdminPage() {
       root.className = previousClassName;
     };
   }, []);
-  return /* @__PURE__ */ (0, import_jsx_runtime160.jsx)(SportscapeEditorialPasswordGate, { children: /* @__PURE__ */ (0, import_jsx_runtime160.jsx)(SportscapeEditorialAdminContent, {}) });
+  return /* @__PURE__ */ (0, import_jsx_runtime160.jsxs)(SportscapeEditorialPasswordGate, { children: [
+    /* @__PURE__ */ (0, import_jsx_runtime160.jsx)(SportscapeAdminTabBar, { activeTab, onTabChange: setActiveTab }),
+    activeTab === "sportscape" ? /* @__PURE__ */ (0, import_jsx_runtime160.jsx)(SportscapeEditorialAdminContent, {}) : /* @__PURE__ */ (0, import_jsx_runtime160.jsx)(GamesSpineAdminPlaceholder, {})
+  ] });
 }
 
 // webapp/home-entry.tsx
