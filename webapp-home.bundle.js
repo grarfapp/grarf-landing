@@ -15013,7 +15013,7 @@ function ensureLiveTrackTimelineInitialized() {
 ensureLiveTrackTimelineInitialized();
 
 // webapp/home-entry.tsx
-var import_react156 = __toESM(require_react());
+var import_react157 = __toESM(require_react());
 var import_client = __toESM(require_client());
 
 // node_modules/react-router/dist/development/index.mjs
@@ -71661,18 +71661,87 @@ function LeagueDirectoryRoutePage() {
 
 // ../grarf/desktop/src/pages/SportscapeEditorialAdminPage.tsx
 init_define_import_meta_env();
-var import_react155 = __toESM(require_react(), 1);
+var import_react156 = __toESM(require_react(), 1);
 
 // ../grarf/desktop/src/components/gamesSpineAdmin/GamesSpineAdminPanel.tsx
 init_define_import_meta_env();
-var import_react148 = __toESM(require_react(), 1);
+var import_react149 = __toESM(require_react(), 1);
+
+// ../grarf/desktop/src/lib/gamesSpine/manual/gamesSpineManualLeagueDocument.ts
+init_define_import_meta_env();
+function leagueDocumentKey(leagueName) {
+  return leagueName.trim().toLowerCase();
+}
+function upsertManualGamesSpineLeague(document2, league) {
+  const key2 = leagueDocumentKey(league.league);
+  const leagues = document2.leagues.filter((row) => leagueDocumentKey(row.league) !== key2);
+  leagues.push(league);
+  return { leagues };
+}
+function deleteManualGamesSpineLeague(document2, leagueName) {
+  const key2 = leagueDocumentKey(leagueName);
+  return {
+    leagues: document2.leagues.filter((row) => leagueDocumentKey(row.league) !== key2)
+  };
+}
+function findManualGamesSpineLeague(document2, leagueName) {
+  const key2 = leagueDocumentKey(leagueName);
+  return document2.leagues.find((row) => leagueDocumentKey(row.league) === key2) ?? null;
+}
+function listManualGamesSpineLeagues(document2) {
+  return [...document2.leagues].sort(
+    (a2, b2) => a2.league.localeCompare(b2.league, void 0, { sensitivity: "base" })
+  );
+}
+function sortManualGamesSpineEventsChronologically(events) {
+  return [...events].sort((a2, b2) => Date.parse(a2.startTime) - Date.parse(b2.startTime));
+}
+function formatManualGamesSpineAdminEventTime(startTimeIso) {
+  const ms2 = Date.parse(startTimeIso);
+  if (!Number.isFinite(ms2)) return startTimeIso;
+  return new Date(ms2).toLocaleTimeString("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true
+  });
+}
+function formatManualGamesSpineLeagueForEditor(league) {
+  return JSON.stringify(
+    {
+      league: league.league,
+      leaguePriority: league.leaguePriority,
+      insertAfterLeague: league.insertAfterLeague ?? null,
+      insertBeforeLeague: league.insertBeforeLeague ?? null,
+      channel: league.channel ?? null,
+      channelUrl: league.channelUrl ?? null,
+      games: league.games
+    },
+    null,
+    2
+  );
+}
+function formatManualGamesSpinePlacementLabel(league) {
+  if (league.insertAfterLeague?.trim()) {
+    return `After ${league.insertAfterLeague.trim()}`;
+  }
+  if (league.insertBeforeLeague?.trim()) {
+    return `Before ${league.insertBeforeLeague.trim()}`;
+  }
+  return "By league priority";
+}
+function resolveManualGamesSpineAdminEventChannel(event, league) {
+  const eventChannel = event.channel?.trim();
+  if (eventChannel) return eventChannel;
+  const leagueChannel = league.channel?.trim();
+  return leagueChannel || null;
+}
 
 // ../grarf/desktop/src/lib/gamesSpine/manual/validateGamesSpineManualDocument.ts
 init_define_import_meta_env();
 function isNonEmptyString(value) {
   return typeof value === "string" && value.trim().length > 0;
 }
-function parsePriority(value, label) {
+function parsePriority(value) {
   if (value == null || value === "") return null;
   const num = Number(value);
   if (!Number.isFinite(num)) return null;
@@ -71681,6 +71750,31 @@ function parsePriority(value, label) {
 function parseOptionalString(value) {
   if (value == null) return null;
   return String(value);
+}
+function validateInsertFields(row) {
+  if ("insertAfterLeague" in row && row.insertAfterLeague != null && typeof row.insertAfterLeague !== "string") {
+    return "insertAfterLeague must be a string or null";
+  }
+  if ("insertBeforeLeague" in row && row.insertBeforeLeague != null && typeof row.insertBeforeLeague !== "string") {
+    return "insertBeforeLeague must be a string or null";
+  }
+  const after = row.insertAfterLeague == null || row.insertAfterLeague === "" ? null : String(row.insertAfterLeague);
+  const before = row.insertBeforeLeague == null || row.insertBeforeLeague === "" ? null : String(row.insertBeforeLeague);
+  if (after && before) {
+    return "Use insertAfterLeague or insertBeforeLeague, not both";
+  }
+  return null;
+}
+function validateNoDuplicateEvents(games) {
+  const seen = /* @__PURE__ */ new Set();
+  for (const game of games) {
+    const key2 = `${game.date}::${game.eventName.trim().toLowerCase()}`;
+    if (seen.has(key2)) {
+      return `Duplicate event on ${game.date}: ${game.eventName}`;
+    }
+    seen.add(key2);
+  }
+  return null;
 }
 function validateEvent(raw, index) {
   if (!raw || typeof raw !== "object" || Array.isArray(raw)) {
@@ -71700,7 +71794,13 @@ function validateEvent(raw, index) {
   if (Date.parse(row.endTime) < Date.parse(row.startTime)) {
     return `games[${index}].endTime must be after startTime`;
   }
-  const bestGamePriority = parsePriority(row.bestGamePriority, "bestGamePriority");
+  if ("channel" in row && row.channel != null && typeof row.channel !== "string") {
+    return `games[${index}].channel must be a string or null`;
+  }
+  if ("channelUrl" in row && row.channelUrl != null && typeof row.channelUrl !== "string") {
+    return `games[${index}].channelUrl must be a string or null`;
+  }
+  const bestGamePriority = parsePriority(row.bestGamePriority);
   if (row.bestGamePriority != null && row.bestGamePriority !== "" && bestGamePriority == null) {
     return `games[${index}].bestGamePriority must be a number`;
   }
@@ -71720,8 +71820,16 @@ function validateLeague(raw) {
   }
   const row = raw;
   if (!isNonEmptyString(row.league)) return "league is required";
-  const leaguePriority = parsePriority(row.leaguePriority, "leaguePriority");
+  const leaguePriority = parsePriority(row.leaguePriority);
   if (leaguePriority == null) return "leaguePriority must be a number";
+  if ("channel" in row && row.channel != null && typeof row.channel !== "string") {
+    return "channel must be a string or null";
+  }
+  if ("channelUrl" in row && row.channelUrl != null && typeof row.channelUrl !== "string") {
+    return "channelUrl must be a string or null";
+  }
+  const insertError = validateInsertFields(row);
+  if (insertError) return insertError;
   if (!Array.isArray(row.games) || row.games.length === 0) {
     return "games must be a non-empty array";
   }
@@ -71731,215 +71839,445 @@ function validateLeague(raw) {
     if (typeof parsed === "string") return parsed;
     games.push(parsed);
   }
+  const duplicateError = validateNoDuplicateEvents(games);
+  if (duplicateError) return duplicateError;
   return {
     league: row.league.trim(),
     leaguePriority,
+    insertAfterLeague: row.insertAfterLeague == null ? null : String(row.insertAfterLeague),
+    insertBeforeLeague: row.insertBeforeLeague == null ? null : String(row.insertBeforeLeague),
     channel: parseOptionalString(row.channel),
     channelUrl: parseOptionalString(row.channelUrl),
     games
   };
 }
-function validateGamesSpineManualDocument(raw) {
-  if (raw == null) {
-    return { ok: false, error: "JSON is empty" };
-  }
+function extractSingleLeague(raw) {
+  if (raw == null) return "JSON is empty";
   if (Array.isArray(raw)) {
-    const leagues = [];
-    for (let i2 = 0; i2 < raw.length; i2 += 1) {
-      const parsed = validateLeague(raw[i2]);
-      if (typeof parsed === "string") return { ok: false, error: parsed };
-      leagues.push(parsed);
-    }
-    return { ok: true, document: { leagues } };
+    if (raw.length !== 1) return "Editor must contain exactly one league";
+    return validateLeague(raw[0]);
   }
   if (typeof raw === "object") {
     const obj = raw;
     if (Array.isArray(obj.leagues)) {
-      const leagues = [];
-      for (let i2 = 0; i2 < obj.leagues.length; i2 += 1) {
-        const parsed = validateLeague(obj.leagues[i2]);
-        if (typeof parsed === "string") return { ok: false, error: parsed };
-        leagues.push(parsed);
-      }
-      return { ok: true, document: { leagues } };
+      if (obj.leagues.length !== 1) return "Editor must contain exactly one league";
+      return validateLeague(obj.leagues[0]);
     }
-    const single = validateLeague(raw);
-    if (typeof single === "string") return { ok: false, error: single };
-    return { ok: true, document: { leagues: [single] } };
+    return validateLeague(raw);
   }
-  return { ok: false, error: "JSON must be an object or array" };
+  return "JSON must be a league object";
 }
-function parseGamesSpineManualJson(text2) {
+function validateGamesSpineManualLeagueEditor(raw) {
+  const parsed = extractSingleLeague(raw);
+  if (typeof parsed === "string") return { ok: false, error: parsed };
+  return { ok: true, league: parsed };
+}
+function parseGamesSpineManualLeagueEditorJson(text2) {
+  const trimmed = text2.trim();
+  if (!trimmed) return { ok: false, error: "JSON is empty" };
   try {
-    return validateGamesSpineManualDocument(JSON.parse(text2));
+    return validateGamesSpineManualLeagueEditor(JSON.parse(trimmed));
   } catch {
     return { ok: false, error: "Invalid JSON" };
   }
 }
 
-// ../grarf/desktop/src/components/gamesSpineAdmin/GamesSpineAdminPanel.tsx
+// ../grarf/desktop/src/components/gamesSpineAdmin/SavedLeaguesBrowser.tsx
+init_define_import_meta_env();
+var import_react148 = __toESM(require_react(), 1);
 var import_jsx_runtime156 = __toESM(require_jsx_runtime(), 1);
-var EXAMPLE_JSON = `{
-  "league": "Royal Ascot",
-  "leaguePriority": 65,
-  "games": [
-    {
-      "date": "2026-06-19",
-      "eventName": "The Commonwealth Cup",
-      "startTime": "2026-06-19T10:05:00-04:00",
-      "endTime": "2026-06-19T10:45:00-04:00",
-      "channel": "NBC",
-      "channelUrl": null,
-      "bestGamePriority": 1
-    }
-  ]
-}`;
-function formatDocumentForEditor(document2) {
-  if (document2.leagues.length === 1) {
-    const league = document2.leagues[0];
-    return JSON.stringify(
-      {
-        league: league.league,
-        leaguePriority: league.leaguePriority,
-        games: league.games
-      },
-      null,
-      2
-    );
-  }
-  return JSON.stringify(document2, null, 2);
+function leagueIsSelected(selectedLeague, leagueName) {
+  if (!selectedLeague) return false;
+  return leagueName.localeCompare(selectedLeague, void 0, { sensitivity: "base" }) === 0;
 }
+function SavedLeaguesBrowser({
+  document: document2,
+  selectedLeague,
+  deletingLeague,
+  onEdit,
+  onDelete
+}) {
+  const leagues = (0, import_react148.useMemo)(() => listManualGamesSpineLeagues(document2), [document2]);
+  const [expandedByLeague, setExpandedByLeague] = (0, import_react148.useState)({});
+  const toggleExpanded = (0, import_react148.useCallback)((leagueName) => {
+    setExpandedByLeague((prev) => ({
+      ...prev,
+      [leagueName]: !prev[leagueName]
+    }));
+  }, []);
+  return /* @__PURE__ */ (0, import_jsx_runtime156.jsxs)("section", { className: "flex flex-col gap-3", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime156.jsxs)("div", { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime156.jsxs)("h2", { className: "text-[10px] tracking-[0.18em] text-textdim", children: [
+        "Saved Leagues (",
+        leagues.length,
+        ")"
+      ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime156.jsx)("p", { className: "mt-1 text-[11px] leading-relaxed text-textdim", children: "Authoritative preview of manual leagues stored for the live web app." })
+    ] }),
+    leagues.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime156.jsx)("div", { className: "rounded border border-line/60 bg-[#071012] px-3 py-6 text-center text-[11px] text-textdim", children: "No saved leagues yet. Paste league JSON above and save." }) : /* @__PURE__ */ (0, import_jsx_runtime156.jsx)("div", { className: "flex flex-col gap-3", children: leagues.map((league) => {
+      const expanded = expandedByLeague[league.league] === true;
+      const eventCount = league.games.length;
+      const sortedEvents = sortManualGamesSpineEventsChronologically(league.games);
+      const selected = leagueIsSelected(selectedLeague, league.league);
+      const deleting = deletingLeague === league.league;
+      return /* @__PURE__ */ (0, import_jsx_runtime156.jsxs)(
+        "article",
+        {
+          className: cn2(
+            "min-w-0 rounded-sm border border-[#24363c]/75 bg-[#0b1216]",
+            "shadow-[inset_0_1px_0_rgba(255,255,255,0.05),0_1px_2px_rgba(0,0,0,0.4)]",
+            selected && "ring-1 ring-greensys/35"
+          ),
+          children: [
+            /* @__PURE__ */ (0, import_jsx_runtime156.jsx)("header", { className: "border-b border-[#24363c]/50", children: /* @__PURE__ */ (0, import_jsx_runtime156.jsx)(
+              "button",
+              {
+                type: "button",
+                onClick: () => toggleExpanded(league.league),
+                className: cn2(
+                  "flex w-full items-center justify-between gap-3 border-l-2 border-l-cyansys/35 py-2 pl-2.5 pr-2 text-left",
+                  "transition duration-150 hover:border-l-cyansys/55 hover:bg-[#0e181d]/90",
+                  "focus-visible:outline focus-visible:outline-1 focus-visible:outline-cyansys/35"
+                ),
+                "aria-expanded": expanded,
+                children: /* @__PURE__ */ (0, import_jsx_runtime156.jsxs)("span", { className: "flex min-w-0 items-center gap-2", children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime156.jsx)(
+                    "span",
+                    {
+                      className: "w-3 shrink-0 text-center text-[9px] text-cyansys/55",
+                      "aria-hidden": true,
+                      children: expanded ? "\u25BC" : "\u25B6"
+                    }
+                  ),
+                  /* @__PURE__ */ (0, import_jsx_runtime156.jsx)("span", { className: "truncate font-mono text-[15px] font-bold leading-none tracking-[0.12em] text-[#eef6f6]", children: league.league }),
+                  /* @__PURE__ */ (0, import_jsx_runtime156.jsxs)("span", { className: "shrink-0 text-[10px] tracking-[0.08em] text-[#5f7a7a]", children: [
+                    "(",
+                    eventCount,
+                    " event",
+                    eventCount === 1 ? "" : "s",
+                    ")"
+                  ] })
+                ] })
+              }
+            ) }),
+            /* @__PURE__ */ (0, import_jsx_runtime156.jsx)(
+              "div",
+              {
+                className: cn2(
+                  "grid transition-[grid-template-rows] duration-200 ease-out",
+                  expanded ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+                ),
+                children: /* @__PURE__ */ (0, import_jsx_runtime156.jsx)("div", { className: cn2("min-h-0 overflow-hidden", expanded && "overflow-visible"), children: /* @__PURE__ */ (0, import_jsx_runtime156.jsxs)("div", { className: "space-y-3 px-3 py-3", children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime156.jsxs)("div", { className: "grid gap-2 rounded border border-line/40 bg-[#071012] px-3 py-3 text-[10px] leading-relaxed text-textdim", children: [
+                    /* @__PURE__ */ (0, import_jsx_runtime156.jsx)("div", { className: "text-[11px] font-medium tracking-[0.08em] text-[#d8e8e8]", children: league.league }),
+                    /* @__PURE__ */ (0, import_jsx_runtime156.jsxs)("div", { children: [
+                      /* @__PURE__ */ (0, import_jsx_runtime156.jsx)("span", { className: "tracking-[0.12em] text-[#5f7a7a]", children: "PLACEMENT" }),
+                      /* @__PURE__ */ (0, import_jsx_runtime156.jsx)("div", { className: "mt-1 text-[#d8e8e8]", children: formatManualGamesSpinePlacementLabel(league) }),
+                      /* @__PURE__ */ (0, import_jsx_runtime156.jsxs)("div", { className: "mt-1 font-mono text-[9px] text-textdim", children: [
+                        "insertAfterLeague: ",
+                        league.insertAfterLeague ?? "null"
+                      ] }),
+                      /* @__PURE__ */ (0, import_jsx_runtime156.jsxs)("div", { className: "font-mono text-[9px] text-textdim", children: [
+                        "insertBeforeLeague: ",
+                        league.insertBeforeLeague ?? "null"
+                      ] })
+                    ] }),
+                    /* @__PURE__ */ (0, import_jsx_runtime156.jsxs)("div", { children: [
+                      /* @__PURE__ */ (0, import_jsx_runtime156.jsx)("span", { className: "tracking-[0.12em] text-[#5f7a7a]", children: "LEAGUE STREAM" }),
+                      /* @__PURE__ */ (0, import_jsx_runtime156.jsx)("div", { className: "mt-1 text-[#d8e8e8]", children: league.channel?.trim() || "\u2014" }),
+                      /* @__PURE__ */ (0, import_jsx_runtime156.jsx)("div", { className: "mt-1 break-all font-mono text-[9px] text-textdim", children: league.channelUrl?.trim() || "\u2014" })
+                    ] }),
+                    /* @__PURE__ */ (0, import_jsx_runtime156.jsxs)("div", { children: [
+                      /* @__PURE__ */ (0, import_jsx_runtime156.jsx)("span", { className: "tracking-[0.12em] text-[#5f7a7a]", children: "EVENT COUNT" }),
+                      /* @__PURE__ */ (0, import_jsx_runtime156.jsx)("div", { className: "mt-1 text-[#d8e8e8]", children: eventCount })
+                    ] })
+                  ] }),
+                  /* @__PURE__ */ (0, import_jsx_runtime156.jsx)(
+                    "div",
+                    {
+                      className: cn2(
+                        LEAGUE_GAMES_SPINE_LIST_SHELL,
+                        GAMES_SPINE_CARD_LIST_CLASS,
+                        "mx-0 px-1 py-1"
+                      ),
+                      children: sortedEvents.map((event) => {
+                        const channel = resolveManualGamesSpineAdminEventChannel(event, league);
+                        return /* @__PURE__ */ (0, import_jsx_runtime156.jsxs)(
+                          "div",
+                          {
+                            className: "border-b border-line/30 px-2 py-2 last:border-b-0",
+                            children: [
+                              /* @__PURE__ */ (0, import_jsx_runtime156.jsxs)("div", { className: "flex min-w-0 items-baseline gap-3", children: [
+                                /* @__PURE__ */ (0, import_jsx_runtime156.jsx)("span", { className: "shrink-0 font-mono text-[10px] tabular-nums tracking-wide text-cyansys/85", children: formatManualGamesSpineAdminEventTime(event.startTime) }),
+                                /* @__PURE__ */ (0, import_jsx_runtime156.jsx)("span", { className: "min-w-0 truncate text-[11px] tracking-[0.04em] text-[#eef6f6]", children: event.eventName })
+                              ] }),
+                              channel ? /* @__PURE__ */ (0, import_jsx_runtime156.jsx)("div", { className: "mt-1 pl-[3.25rem] text-[9px] tracking-wide text-textdim", children: channel }) : null
+                            ]
+                          },
+                          `${event.date}:${event.eventName}:${event.startTime}`
+                        );
+                      })
+                    }
+                  ),
+                  /* @__PURE__ */ (0, import_jsx_runtime156.jsxs)("div", { className: "flex flex-wrap gap-2", children: [
+                    /* @__PURE__ */ (0, import_jsx_runtime156.jsx)(
+                      "button",
+                      {
+                        type: "button",
+                        onClick: () => onEdit(league.league),
+                        className: "rounded border border-line/70 px-3 py-1.5 text-[10px] tracking-[0.14em] text-[#d8e8e8] hover:border-greensys/50",
+                        children: "Edit"
+                      }
+                    ),
+                    /* @__PURE__ */ (0, import_jsx_runtime156.jsx)(
+                      "button",
+                      {
+                        type: "button",
+                        disabled: deleting,
+                        onClick: () => onDelete(league.league),
+                        className: "rounded border border-redsys/40 px-3 py-1.5 text-[10px] tracking-[0.14em] text-redsys hover:border-redsys/70 disabled:opacity-50",
+                        children: deleting ? "Deleting\u2026" : "Delete"
+                      }
+                    )
+                  ] })
+                ] }) })
+              }
+            )
+          ]
+        },
+        league.league
+      );
+    }) })
+  ] });
+}
+
+// ../grarf/desktop/src/components/gamesSpineAdmin/GamesSpineAdminPanel.tsx
+var import_jsx_runtime157 = __toESM(require_jsx_runtime(), 1);
 function GamesSpineAdminPanel() {
+  const storedDocument = useGamesSpineManualStore((state3) => state3.document);
   const setDocument = useGamesSpineManualStore((state3) => state3.setDocument);
-  const [jsonText, setJsonText] = (0, import_react148.useState)(EXAMPLE_JSON);
-  const [validationMessage, setValidationMessage] = (0, import_react148.useState)(null);
-  const [actionError, setActionError] = (0, import_react148.useState)(null);
-  const [busy, setBusy] = (0, import_react148.useState)(null);
-  const [savedAt, setSavedAt] = (0, import_react148.useState)(null);
-  const parsedPreview = (0, import_react148.useMemo)(() => parseGamesSpineManualJson(jsonText), [jsonText]);
-  const onValidate = (0, import_react148.useCallback)(() => {
+  const editorRef = (0, import_react149.useRef)(null);
+  const [savedDocument, setSavedDocument] = (0, import_react149.useState)(
+    storedDocument ?? { leagues: [] }
+  );
+  const [jsonText, setJsonText] = (0, import_react149.useState)("");
+  const [selectedLeague, setSelectedLeague] = (0, import_react149.useState)(null);
+  const [deletingLeague, setDeletingLeague] = (0, import_react149.useState)(null);
+  const [validationMessage, setValidationMessage] = (0, import_react149.useState)(null);
+  const [actionError, setActionError] = (0, import_react149.useState)(null);
+  const [busy, setBusy] = (0, import_react149.useState)(null);
+  const [savedAt, setSavedAt] = (0, import_react149.useState)(null);
+  const parsedPreview = (0, import_react149.useMemo)(
+    () => parseGamesSpineManualLeagueEditorJson(jsonText),
+    [jsonText]
+  );
+  const syncSavedDocument = (0, import_react149.useCallback)((document2) => {
+    setSavedDocument(document2);
+    setDocument(document2);
+  }, [setDocument]);
+  const refreshSavedDocument = (0, import_react149.useCallback)(async () => {
+    const document2 = await fetchGamesSpineManualDocument();
+    syncSavedDocument(document2);
+    return document2;
+  }, [syncSavedDocument]);
+  (0, import_react149.useEffect)(() => {
+    void refreshSavedDocument().catch(() => {
+    });
+  }, [refreshSavedDocument]);
+  const scrollToEditor = (0, import_react149.useCallback)(() => {
+    editorRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, []);
+  const onValidate = (0, import_react149.useCallback)(() => {
     setBusy("validate");
     setActionError(null);
-    const result = parseGamesSpineManualJson(jsonText);
+    const result = parseGamesSpineManualLeagueEditorJson(jsonText);
     if (!result.ok) {
       setValidationMessage(result.error);
     } else {
-      const leagueCount = result.document.leagues.length;
-      const gameCount = result.document.leagues.reduce(
-        (sum, league) => sum + league.games.length,
-        0
+      setValidationMessage(
+        `Valid \xB7 ${result.league.league} \xB7 ${result.league.games.length} event(s)`
       );
-      setValidationMessage(`Valid \xB7 ${leagueCount} league(s) \xB7 ${gameCount} event(s)`);
     }
     setBusy(null);
   }, [jsonText]);
-  const onSave = (0, import_react148.useCallback)(async () => {
+  const onSave = (0, import_react149.useCallback)(async () => {
     setBusy("save");
     setActionError(null);
-    const result = parseGamesSpineManualJson(jsonText);
+    const result = parseGamesSpineManualLeagueEditorJson(jsonText);
     if (!result.ok) {
       setValidationMessage(result.error);
       setBusy(null);
       return;
     }
     try {
-      const saved = await saveGamesSpineManualDocument(result.document);
-      setDocument(saved);
-      setJsonText(formatDocumentForEditor(saved));
+      const existing = await fetchGamesSpineManualDocument();
+      const merged = upsertManualGamesSpineLeague(existing, result.league);
+      const saved = await saveGamesSpineManualDocument(merged);
+      syncSavedDocument(saved);
+      setSelectedLeague(result.league.league);
+      setJsonText(formatManualGamesSpineLeagueForEditor(result.league));
       setSavedAt((/* @__PURE__ */ new Date()).toISOString());
-      const leagueCount = saved.leagues.length;
-      const gameCount = saved.leagues.reduce((sum, league) => sum + league.games.length, 0);
-      setValidationMessage(`Saved \xB7 ${leagueCount} league(s) \xB7 ${gameCount} event(s)`);
+      setValidationMessage(
+        `Saved \xB7 ${result.league.league} \xB7 ${saved.leagues.length} league(s) stored`
+      );
     } catch (err) {
       setActionError(err instanceof Error ? err.message : "Unable to save manual Games Spine data");
     } finally {
       setBusy(null);
     }
-  }, [jsonText, setDocument]);
-  const onLoadCurrent = (0, import_react148.useCallback)(async () => {
+  }, [jsonText, syncSavedDocument]);
+  const onLoadCurrent = (0, import_react149.useCallback)(async () => {
     setBusy("load");
     setActionError(null);
     try {
-      const document2 = await fetchGamesSpineManualDocument();
-      setDocument(document2);
-      setJsonText(formatDocumentForEditor(document2));
+      const document2 = await refreshSavedDocument();
       setSavedAt(null);
-      if (document2.leagues.length === 0) {
-        setValidationMessage("Loaded empty document");
-      } else {
-        const gameCount = document2.leagues.reduce((sum, league) => sum + league.games.length, 0);
-        setValidationMessage(
-          `Loaded \xB7 ${document2.leagues.length} league(s) \xB7 ${gameCount} event(s)`
-        );
-      }
+      setValidationMessage(
+        document2.leagues.length === 0 ? "Loaded empty document" : `Loaded \xB7 ${document2.leagues.length} saved league(s)`
+      );
     } catch (err) {
       setActionError(err instanceof Error ? err.message : "Unable to load manual Games Spine data");
     } finally {
       setBusy(null);
     }
-  }, [setDocument]);
-  return /* @__PURE__ */ (0, import_jsx_runtime156.jsx)("div", { className: "min-h-[60vh] bg-[#020404] text-[#d8e8e8]", children: /* @__PURE__ */ (0, import_jsx_runtime156.jsxs)("main", { className: "mx-auto flex w-full max-w-5xl flex-col gap-4 px-4 py-8", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime156.jsxs)("div", { children: [
-      /* @__PURE__ */ (0, import_jsx_runtime156.jsx)("h1", { className: "font-sans text-xl", children: "Games Spine Admin" }),
-      /* @__PURE__ */ (0, import_jsx_runtime156.jsx)("p", { className: "mt-2 max-w-3xl text-[11px] leading-relaxed text-textdim", children: "Paste manual league JSON, validate, and save to the Games Spine cloud store. Saved events appear in the live web app Games Spine alongside operational data." })
+  }, [refreshSavedDocument]);
+  const onClearForm = (0, import_react149.useCallback)(() => {
+    setJsonText("");
+    setSelectedLeague(null);
+    setValidationMessage("Form cleared");
+    setActionError(null);
+    setSavedAt(null);
+  }, []);
+  const onEditLeague = (0, import_react149.useCallback)(
+    (leagueName) => {
+      const league = findManualGamesSpineLeague(savedDocument, leagueName);
+      if (!league) return;
+      setSelectedLeague(league.league);
+      setJsonText(formatManualGamesSpineLeagueForEditor(league));
+      setValidationMessage(`Loaded ${league.league} into editor`);
+      setActionError(null);
+      scrollToEditor();
+    },
+    [savedDocument, scrollToEditor]
+  );
+  const onDeleteLeague = (0, import_react149.useCallback)(
+    async (leagueName) => {
+      const existing = findManualGamesSpineLeague(savedDocument, leagueName);
+      if (!existing) {
+        setActionError(`No saved league named "${leagueName}"`);
+        return;
+      }
+      const confirmed = window.confirm(`Delete ${leagueName}?`);
+      if (!confirmed) return;
+      setDeletingLeague(leagueName);
+      setActionError(null);
+      try {
+        const current = await fetchGamesSpineManualDocument();
+        const merged = deleteManualGamesSpineLeague(current, leagueName);
+        const saved = await saveGamesSpineManualDocument(merged);
+        syncSavedDocument(saved);
+        if (selectedLeague && leagueName.localeCompare(selectedLeague, void 0, { sensitivity: "base" }) === 0) {
+          setJsonText("");
+          setSelectedLeague(null);
+        }
+        setSavedAt((/* @__PURE__ */ new Date()).toISOString());
+        setValidationMessage(`Deleted \xB7 ${leagueName} \xB7 ${saved.leagues.length} league(s) remain`);
+      } catch (err) {
+        setActionError(
+          err instanceof Error ? err.message : "Unable to delete manual Games Spine league"
+        );
+      } finally {
+        setDeletingLeague(null);
+      }
+    },
+    [savedDocument, selectedLeague, syncSavedDocument]
+  );
+  return /* @__PURE__ */ (0, import_jsx_runtime157.jsx)("div", { className: "min-h-[60vh] bg-[#020404] text-[#d8e8e8]", children: /* @__PURE__ */ (0, import_jsx_runtime157.jsxs)("main", { className: "mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-8", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime157.jsxs)("div", { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime157.jsx)("h1", { className: "font-sans text-xl", children: "Games Spine Admin" }),
+      /* @__PURE__ */ (0, import_jsx_runtime157.jsx)("p", { className: "mt-2 max-w-3xl text-[11px] leading-relaxed text-textdim", children: "Paste or edit one league JSON at a time. The Saved Leagues browser below is the source of truth for what ships to the live web app." })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime156.jsxs)("label", { className: "flex flex-col gap-2", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime156.jsx)("span", { className: "text-[10px] tracking-[0.18em] text-textdim", children: "MANUAL JSON" }),
-      /* @__PURE__ */ (0, import_jsx_runtime156.jsx)(
+    /* @__PURE__ */ (0, import_jsx_runtime157.jsxs)("label", { ref: editorRef, className: "flex flex-col gap-2", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime157.jsx)("span", { className: "text-[10px] tracking-[0.18em] text-textdim", children: "LEAGUE JSON EDITOR" }),
+      /* @__PURE__ */ (0, import_jsx_runtime157.jsx)(
         "textarea",
         {
           value: jsonText,
-          onChange: (event) => setJsonText(event.target.value),
+          onChange: (event) => {
+            setJsonText(event.target.value);
+            setSelectedLeague(null);
+          },
           spellCheck: false,
-          className: "min-h-[420px] w-full rounded border border-line/60 bg-[#071012] px-3 py-3 font-mono text-[11px] leading-relaxed text-[#d8e8e8] outline-none focus:border-greensys/50"
+          placeholder: 'Paste one league object, e.g. { "league": "Royal Ascot", "leaguePriority": 65, "channel": "NBC", "games": [...] }',
+          className: "min-h-[320px] w-full rounded border border-line/60 bg-[#071012] px-3 py-3 font-mono text-[11px] leading-relaxed text-[#d8e8e8] outline-none focus:border-greensys/50"
         }
       )
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime156.jsxs)("div", { className: "flex flex-wrap items-center gap-2", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime156.jsx)(
+    /* @__PURE__ */ (0, import_jsx_runtime157.jsxs)("div", { className: "flex flex-wrap items-center gap-2", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime157.jsx)(
         "button",
         {
           type: "button",
           onClick: onValidate,
-          disabled: busy !== null,
+          disabled: busy !== null || deletingLeague !== null,
           className: "rounded border border-line/70 px-3 py-2 text-[10px] tracking-[0.16em] text-[#d8e8e8] hover:border-greensys/50 disabled:opacity-50",
           children: busy === "validate" ? "Validating\u2026" : "Validate"
         }
       ),
-      /* @__PURE__ */ (0, import_jsx_runtime156.jsx)(
+      /* @__PURE__ */ (0, import_jsx_runtime157.jsx)(
         "button",
         {
           type: "button",
           onClick: () => void onSave(),
-          disabled: busy !== null,
+          disabled: busy !== null || deletingLeague !== null,
           className: "rounded border border-greensys/50 bg-greensys/10 px-3 py-2 text-[10px] tracking-[0.16em] text-greensys hover:bg-greensys/20 disabled:opacity-50",
           children: busy === "save" ? "Saving\u2026" : "Save"
         }
       ),
-      /* @__PURE__ */ (0, import_jsx_runtime156.jsx)(
+      /* @__PURE__ */ (0, import_jsx_runtime157.jsx)(
         "button",
         {
           type: "button",
           onClick: () => void onLoadCurrent(),
-          disabled: busy !== null,
+          disabled: busy !== null || deletingLeague !== null,
           className: "rounded border border-line/70 px-3 py-2 text-[10px] tracking-[0.16em] text-[#d8e8e8] hover:border-greensys/50 disabled:opacity-50",
           children: busy === "load" ? "Loading\u2026" : "Load Current"
         }
+      ),
+      /* @__PURE__ */ (0, import_jsx_runtime157.jsx)(
+        "button",
+        {
+          type: "button",
+          onClick: onClearForm,
+          disabled: busy !== null || deletingLeague !== null,
+          className: "rounded border border-line/70 px-3 py-2 text-[10px] tracking-[0.16em] text-[#d8e8e8] hover:border-greensys/50 disabled:opacity-50",
+          children: "Clear Form"
+        }
       )
     ] }),
-    validationMessage ? /* @__PURE__ */ (0, import_jsx_runtime156.jsx)("p", { className: "text-[11px] text-greensys", children: validationMessage }) : null,
-    actionError ? /* @__PURE__ */ (0, import_jsx_runtime156.jsx)("p", { className: "text-[11px] text-redsys", children: actionError }) : null,
-    savedAt ? /* @__PURE__ */ (0, import_jsx_runtime156.jsxs)("p", { className: "text-[10px] tracking-[0.12em] text-textdim", children: [
+    validationMessage ? /* @__PURE__ */ (0, import_jsx_runtime157.jsx)("p", { className: "text-[11px] text-greensys", children: validationMessage }) : null,
+    actionError ? /* @__PURE__ */ (0, import_jsx_runtime157.jsx)("p", { className: "text-[11px] text-redsys", children: actionError }) : null,
+    savedAt ? /* @__PURE__ */ (0, import_jsx_runtime157.jsxs)("p", { className: "text-[10px] tracking-[0.12em] text-textdim", children: [
       "Saved at ",
       savedAt
     ] }) : null,
-    !parsedPreview.ok ? /* @__PURE__ */ (0, import_jsx_runtime156.jsx)("p", { className: "text-[10px] text-textdim", children: "Current textarea is not valid yet." }) : null
+    jsonText.trim() && !parsedPreview.ok ? /* @__PURE__ */ (0, import_jsx_runtime157.jsx)("p", { className: "text-[10px] text-textdim", children: "Current textarea is not valid yet." }) : null,
+    /* @__PURE__ */ (0, import_jsx_runtime157.jsx)(
+      SavedLeaguesBrowser,
+      {
+        document: savedDocument,
+        selectedLeague,
+        deletingLeague,
+        onEdit: onEditLeague,
+        onDelete: (leagueName) => void onDeleteLeague(leagueName)
+      }
+    )
   ] }) });
 }
 
 // ../grarf/desktop/src/components/sportscapeEditorial/SportscapeEditorialManualAiBriefEntry.tsx
 init_define_import_meta_env();
-var import_react149 = __toESM(require_react(), 1);
+var import_react150 = __toESM(require_react(), 1);
 
 // ../grarf/desktop/src/lib/sportscape/editorial/generateManualEditorialEventId.ts
 init_define_import_meta_env();
@@ -71969,7 +72307,7 @@ function generateManualEditorialEventId(league, existingEventIds, now = /* @__PU
 }
 
 // ../grarf/desktop/src/components/sportscapeEditorial/SportscapeEditorialManualAiBriefEntry.tsx
-var import_jsx_runtime157 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime158 = __toESM(require_jsx_runtime(), 1);
 var INPUT_CLASS = "mt-1 w-full border border-line/60 bg-[#030808] px-3 py-2 text-sm text-[#d8e8e8] outline-none focus:border-cyansys/40";
 var LABEL_CLASS = "text-[10px] tracking-[0.16em] text-textdim";
 var LEAGUE_NAME_DATALIST_ID = "sportscape-manual-ai-brief-league-suggestions";
@@ -71979,18 +72317,18 @@ function SportscapeEditorialManualAiBriefEntry({
   onEntrySaved,
   onAiBriefSelectionChange
 }) {
-  const [leagueName, setLeagueName] = (0, import_react149.useState)("");
-  const [quickPick, setQuickPick] = (0, import_react149.useState)("");
-  const [headline, setHeadline] = (0, import_react149.useState)("");
-  const [articleUrl, setArticleUrl] = (0, import_react149.useState)("");
-  const [highlightUrl, setHighlightUrl] = (0, import_react149.useState)("");
-  const [highlightsVideoThumbnailUrl, setHighlightsVideoThumbnailUrl] = (0, import_react149.useState)("");
-  const [rank, setRank] = (0, import_react149.useState)(String(suggestedRank));
-  const [busy, setBusy] = (0, import_react149.useState)(false);
-  const [error, setError] = (0, import_react149.useState)(null);
-  const [lastEventId, setLastEventId] = (0, import_react149.useState)(null);
-  const [lastPublishMode, setLastPublishMode] = (0, import_react149.useState)(null);
-  const leagueSuggestions = (0, import_react149.useMemo)(() => {
+  const [leagueName, setLeagueName] = (0, import_react150.useState)("");
+  const [quickPick, setQuickPick] = (0, import_react150.useState)("");
+  const [headline, setHeadline] = (0, import_react150.useState)("");
+  const [articleUrl, setArticleUrl] = (0, import_react150.useState)("");
+  const [highlightUrl, setHighlightUrl] = (0, import_react150.useState)("");
+  const [highlightsVideoThumbnailUrl, setHighlightsVideoThumbnailUrl] = (0, import_react150.useState)("");
+  const [rank, setRank] = (0, import_react150.useState)(String(suggestedRank));
+  const [busy, setBusy] = (0, import_react150.useState)(false);
+  const [error, setError] = (0, import_react150.useState)(null);
+  const [lastEventId, setLastEventId] = (0, import_react150.useState)(null);
+  const [lastPublishMode, setLastPublishMode] = (0, import_react150.useState)(null);
+  const leagueSuggestions = (0, import_react150.useMemo)(() => {
     const seen = /* @__PURE__ */ new Set();
     const next = [];
     for (const label of SPORTSCAPE_EDITORIAL_MANUAL_LEAGUE_QUICK_PICKS) {
@@ -72001,7 +72339,7 @@ function SportscapeEditorialManualAiBriefEntry({
     }
     return next;
   }, []);
-  const quickPickOptions = (0, import_react149.useMemo)(
+  const quickPickOptions = (0, import_react150.useMemo)(
     () => SPORTSCAPE_EDITORIAL_LEAGUE_DISPLAY_ORDER.map((key2) => ({
       key: key2,
       label: SPORTSCAPE_EDITORIAL_LEAGUE_LABEL[key2]
@@ -72091,13 +72429,13 @@ function SportscapeEditorialManualAiBriefEntry({
     }
   };
   const publishModeLabel = lastPublishMode === "aiBrief" ? "AI Brief only" : lastPublishMode === "leagueSection" ? "League section only" : lastPublishMode === "both" ? "AI Brief + league section" : null;
-  return /* @__PURE__ */ (0, import_jsx_runtime157.jsxs)("section", { className: "border border-ambersys/35 bg-[#040808]/70 p-4", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime157.jsx)("h2", { className: "font-sans text-sm text-[#d8e8e8]", children: "Manual AI Brief Entry" }),
-    /* @__PURE__ */ (0, import_jsx_runtime157.jsx)("p", { className: "mt-1 text-[11px] leading-relaxed text-textdim", children: "Publish to AI Brief, a league section, or both. League name is freeform \u2014 tours, events, breaking news, and cross-sport stories." }),
-    /* @__PURE__ */ (0, import_jsx_runtime157.jsxs)("div", { className: "mt-4 grid gap-3", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime157.jsxs)("label", { className: "block", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime157.jsx)("span", { className: LABEL_CLASS, children: "LEAGUE NAME" }),
-        /* @__PURE__ */ (0, import_jsx_runtime157.jsx)(
+  return /* @__PURE__ */ (0, import_jsx_runtime158.jsxs)("section", { className: "border border-ambersys/35 bg-[#040808]/70 p-4", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime158.jsx)("h2", { className: "font-sans text-sm text-[#d8e8e8]", children: "Manual AI Brief Entry" }),
+    /* @__PURE__ */ (0, import_jsx_runtime158.jsx)("p", { className: "mt-1 text-[11px] leading-relaxed text-textdim", children: "Publish to AI Brief, a league section, or both. League name is freeform \u2014 tours, events, breaking news, and cross-sport stories." }),
+    /* @__PURE__ */ (0, import_jsx_runtime158.jsxs)("div", { className: "mt-4 grid gap-3", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime158.jsxs)("label", { className: "block", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime158.jsx)("span", { className: LABEL_CLASS, children: "LEAGUE NAME" }),
+        /* @__PURE__ */ (0, import_jsx_runtime158.jsx)(
           "input",
           {
             value: leagueName,
@@ -72111,26 +72449,26 @@ function SportscapeEditorialManualAiBriefEntry({
             required: true
           }
         ),
-        /* @__PURE__ */ (0, import_jsx_runtime157.jsx)("datalist", { id: LEAGUE_NAME_DATALIST_ID, children: leagueSuggestions.map((suggestion) => /* @__PURE__ */ (0, import_jsx_runtime157.jsx)("option", { value: suggestion }, suggestion)) })
+        /* @__PURE__ */ (0, import_jsx_runtime158.jsx)("datalist", { id: LEAGUE_NAME_DATALIST_ID, children: leagueSuggestions.map((suggestion) => /* @__PURE__ */ (0, import_jsx_runtime158.jsx)("option", { value: suggestion }, suggestion)) })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime157.jsxs)("label", { className: "block", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime157.jsx)("span", { className: LABEL_CLASS, children: "QUICK PICK (optional)" }),
-        /* @__PURE__ */ (0, import_jsx_runtime157.jsxs)(
+      /* @__PURE__ */ (0, import_jsx_runtime158.jsxs)("label", { className: "block", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime158.jsx)("span", { className: LABEL_CLASS, children: "QUICK PICK (optional)" }),
+        /* @__PURE__ */ (0, import_jsx_runtime158.jsxs)(
           "select",
           {
             value: quickPick,
             onChange: (event) => onQuickPickChange(event.target.value),
             className: INPUT_CLASS,
             children: [
-              /* @__PURE__ */ (0, import_jsx_runtime157.jsx)("option", { value: "", children: "Choose a starter league\u2026" }),
-              quickPickOptions.map((option) => /* @__PURE__ */ (0, import_jsx_runtime157.jsx)("option", { value: option.key, children: option.label }, option.key))
+              /* @__PURE__ */ (0, import_jsx_runtime158.jsx)("option", { value: "", children: "Choose a starter league\u2026" }),
+              quickPickOptions.map((option) => /* @__PURE__ */ (0, import_jsx_runtime158.jsx)("option", { value: option.key, children: option.label }, option.key))
             ]
           }
         )
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime157.jsxs)("label", { className: "block", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime157.jsx)("span", { className: LABEL_CLASS, children: "HEADLINE" }),
-        /* @__PURE__ */ (0, import_jsx_runtime157.jsx)(
+      /* @__PURE__ */ (0, import_jsx_runtime158.jsxs)("label", { className: "block", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime158.jsx)("span", { className: LABEL_CLASS, children: "HEADLINE" }),
+        /* @__PURE__ */ (0, import_jsx_runtime158.jsx)(
           "input",
           {
             value: headline,
@@ -72140,9 +72478,9 @@ function SportscapeEditorialManualAiBriefEntry({
           }
         )
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime157.jsxs)("label", { className: "block", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime157.jsx)("span", { className: LABEL_CLASS, children: "ARTICLE URL" }),
-        /* @__PURE__ */ (0, import_jsx_runtime157.jsx)(
+      /* @__PURE__ */ (0, import_jsx_runtime158.jsxs)("label", { className: "block", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime158.jsx)("span", { className: LABEL_CLASS, children: "ARTICLE URL" }),
+        /* @__PURE__ */ (0, import_jsx_runtime158.jsx)(
           "input",
           {
             type: "url",
@@ -72153,9 +72491,9 @@ function SportscapeEditorialManualAiBriefEntry({
           }
         )
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime157.jsxs)("label", { className: "block", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime157.jsx)("span", { className: LABEL_CLASS, children: "AI BRIEF RANK (1 = highest, 100 = lowest)" }),
-        /* @__PURE__ */ (0, import_jsx_runtime157.jsx)(
+      /* @__PURE__ */ (0, import_jsx_runtime158.jsxs)("label", { className: "block", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime158.jsx)("span", { className: LABEL_CLASS, children: "AI BRIEF RANK (1 = highest, 100 = lowest)" }),
+        /* @__PURE__ */ (0, import_jsx_runtime158.jsx)(
           "input",
           {
             type: "number",
@@ -72168,9 +72506,9 @@ function SportscapeEditorialManualAiBriefEntry({
           }
         )
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime157.jsxs)("label", { className: "block", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime157.jsx)("span", { className: LABEL_CLASS, children: "HIGHLIGHT URL (optional)" }),
-        /* @__PURE__ */ (0, import_jsx_runtime157.jsx)(
+      /* @__PURE__ */ (0, import_jsx_runtime158.jsxs)("label", { className: "block", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime158.jsx)("span", { className: LABEL_CLASS, children: "HIGHLIGHT URL (optional)" }),
+        /* @__PURE__ */ (0, import_jsx_runtime158.jsx)(
           "input",
           {
             type: "url",
@@ -72180,9 +72518,9 @@ function SportscapeEditorialManualAiBriefEntry({
           }
         )
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime157.jsxs)("label", { className: "block", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime157.jsx)("span", { className: LABEL_CLASS, children: "HIGHLIGHTS VIDEO THUMBNAIL" }),
-        /* @__PURE__ */ (0, import_jsx_runtime157.jsx)(
+      /* @__PURE__ */ (0, import_jsx_runtime158.jsxs)("label", { className: "block", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime158.jsx)("span", { className: LABEL_CLASS, children: "HIGHLIGHTS VIDEO THUMBNAIL" }),
+        /* @__PURE__ */ (0, import_jsx_runtime158.jsx)(
           "input",
           {
             type: "url",
@@ -72193,14 +72531,14 @@ function SportscapeEditorialManualAiBriefEntry({
           }
         )
       ] }),
-      error ? /* @__PURE__ */ (0, import_jsx_runtime157.jsx)("p", { className: "text-[11px] text-redsys", children: error }) : null,
-      lastEventId ? /* @__PURE__ */ (0, import_jsx_runtime157.jsxs)("p", { className: "text-[10px] tracking-[0.12em] text-greensys/85", children: [
+      error ? /* @__PURE__ */ (0, import_jsx_runtime158.jsx)("p", { className: "text-[11px] text-redsys", children: error }) : null,
+      lastEventId ? /* @__PURE__ */ (0, import_jsx_runtime158.jsxs)("p", { className: "text-[10px] tracking-[0.12em] text-greensys/85", children: [
         "Added as ",
         lastEventId,
         publishModeLabel ? ` \xB7 ${publishModeLabel}` : ""
       ] }) : null,
-      /* @__PURE__ */ (0, import_jsx_runtime157.jsxs)("div", { className: "flex flex-wrap gap-2 pt-1", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime157.jsx)(
+      /* @__PURE__ */ (0, import_jsx_runtime158.jsxs)("div", { className: "flex flex-wrap gap-2 pt-1", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime158.jsx)(
           "button",
           {
             type: "button",
@@ -72213,7 +72551,7 @@ function SportscapeEditorialManualAiBriefEntry({
             children: busy ? "PUBLISHING\u2026" : "ADD TO AI BRIEF"
           }
         ),
-        /* @__PURE__ */ (0, import_jsx_runtime157.jsx)(
+        /* @__PURE__ */ (0, import_jsx_runtime158.jsx)(
           "button",
           {
             type: "button",
@@ -72226,7 +72564,7 @@ function SportscapeEditorialManualAiBriefEntry({
             children: busy ? "PUBLISHING\u2026" : "ADD TO LEAGUE SECTION"
           }
         ),
-        /* @__PURE__ */ (0, import_jsx_runtime157.jsx)(
+        /* @__PURE__ */ (0, import_jsx_runtime158.jsx)(
           "button",
           {
             type: "button",
@@ -72239,7 +72577,7 @@ function SportscapeEditorialManualAiBriefEntry({
             children: busy ? "PUBLISHING\u2026" : "ADD TO BOTH"
           }
         ),
-        /* @__PURE__ */ (0, import_jsx_runtime157.jsx)(
+        /* @__PURE__ */ (0, import_jsx_runtime158.jsx)(
           "button",
           {
             type: "button",
@@ -72259,8 +72597,8 @@ function SportscapeEditorialManualAiBriefEntry({
 
 // ../grarf/desktop/src/components/sportscapeEditorial/SportscapeEditorialAiBriefSummary.tsx
 init_define_import_meta_env();
-var import_react150 = __toESM(require_react(), 1);
-var import_jsx_runtime158 = __toESM(require_jsx_runtime(), 1);
+var import_react151 = __toESM(require_react(), 1);
+var import_jsx_runtime159 = __toESM(require_jsx_runtime(), 1);
 function SportscapeEditorialAiBriefSummary({
   lines,
   onRemoveLine,
@@ -72269,7 +72607,7 @@ function SportscapeEditorialAiBriefSummary({
   clearBusy,
   error
 }) {
-  const [confirmClear, setConfirmClear] = (0, import_react150.useState)(false);
+  const [confirmClear, setConfirmClear] = (0, import_react151.useState)(false);
   const controlsDisabled = clearBusy || removingLineId !== null;
   const handleClearClick = () => {
     if (lines.length === 0) return;
@@ -72279,10 +72617,10 @@ function SportscapeEditorialAiBriefSummary({
     }
     void Promise.resolve(onClearAll()).finally(() => setConfirmClear(false));
   };
-  return /* @__PURE__ */ (0, import_jsx_runtime158.jsxs)("section", { className: "border border-line/50 bg-panel2/80 p-4", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime158.jsxs)("div", { className: "flex flex-wrap items-start justify-between gap-3", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime158.jsx)("h2", { className: "text-[10px] tracking-[0.24em] text-cyansys", children: "AI BRIEF SELECTIONS" }),
-      lines.length > 0 ? /* @__PURE__ */ (0, import_jsx_runtime158.jsx)(
+  return /* @__PURE__ */ (0, import_jsx_runtime159.jsxs)("section", { className: "border border-line/50 bg-panel2/80 p-4", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime159.jsxs)("div", { className: "flex flex-wrap items-start justify-between gap-3", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime159.jsx)("h2", { className: "text-[10px] tracking-[0.24em] text-cyansys", children: "AI BRIEF SELECTIONS" }),
+      lines.length > 0 ? /* @__PURE__ */ (0, import_jsx_runtime159.jsx)(
         "button",
         {
           type: "button",
@@ -72296,18 +72634,18 @@ function SportscapeEditorialAiBriefSummary({
         }
       ) : null
     ] }),
-    confirmClear && !clearBusy ? /* @__PURE__ */ (0, import_jsx_runtime158.jsx)("p", { className: "mt-2 text-[11px] text-redsys/90", children: "Remove all AI Brief selections for this date?" }) : null,
-    lines.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime158.jsx)("p", { className: "mt-3 text-[11px] text-textdim", children: "No AI Brief selections" }) : /* @__PURE__ */ (0, import_jsx_runtime158.jsx)("ol", { className: "mt-3 space-y-2", children: lines.map((line) => /* @__PURE__ */ (0, import_jsx_runtime158.jsxs)(
+    confirmClear && !clearBusy ? /* @__PURE__ */ (0, import_jsx_runtime159.jsx)("p", { className: "mt-2 text-[11px] text-redsys/90", children: "Remove all AI Brief selections for this date?" }) : null,
+    lines.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime159.jsx)("p", { className: "mt-3 text-[11px] text-textdim", children: "No AI Brief selections" }) : /* @__PURE__ */ (0, import_jsx_runtime159.jsx)("ol", { className: "mt-3 space-y-2", children: lines.map((line) => /* @__PURE__ */ (0, import_jsx_runtime159.jsxs)(
       "li",
       {
         className: "flex items-start gap-2 text-sm text-[#d8e8e8]",
         children: [
-          /* @__PURE__ */ (0, import_jsx_runtime158.jsxs)("span", { className: "w-6 shrink-0 pt-0.5 font-mono text-[11px] text-textdim", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime159.jsxs)("span", { className: "w-6 shrink-0 pt-0.5 font-mono text-[11px] text-textdim", children: [
             line.rank,
             "."
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime158.jsx)("span", { className: "min-w-0 flex-1 leading-snug", children: line.headline }),
-          /* @__PURE__ */ (0, import_jsx_runtime158.jsx)(
+          /* @__PURE__ */ (0, import_jsx_runtime159.jsx)("span", { className: "min-w-0 flex-1 leading-snug", children: line.headline }),
+          /* @__PURE__ */ (0, import_jsx_runtime159.jsx)(
             "button",
             {
               type: "button",
@@ -72320,20 +72658,20 @@ function SportscapeEditorialAiBriefSummary({
                 "hover:border-redsys/50 hover:bg-redsys/10 hover:text-redsys",
                 "disabled:opacity-40"
               ),
-              children: /* @__PURE__ */ (0, import_jsx_runtime158.jsx)(X2, { className: "h-3.5 w-3.5", "aria-hidden": true })
+              children: /* @__PURE__ */ (0, import_jsx_runtime159.jsx)(X2, { className: "h-3.5 w-3.5", "aria-hidden": true })
             }
           )
         ]
       },
       line.id
     )) }),
-    error ? /* @__PURE__ */ (0, import_jsx_runtime158.jsx)("p", { className: "mt-3 text-[11px] text-redsys", children: error }) : null
+    error ? /* @__PURE__ */ (0, import_jsx_runtime159.jsx)("p", { className: "mt-3 text-[11px] text-redsys", children: error }) : null
   ] });
 }
 
 // ../grarf/desktop/src/components/sportscapeEditorial/SportscapeEditorialLeagueSection.tsx
 init_define_import_meta_env();
-var import_react152 = __toESM(require_react(), 1);
+var import_react153 = __toESM(require_react(), 1);
 
 // ../grarf/desktop/src/lib/sportscape/editorial/collectSportscapeAdminEventsFromWebSportscape.ts
 init_define_import_meta_env();
@@ -72536,8 +72874,8 @@ function getSportscapeEditorialHighlightSource(league) {
 
 // ../grarf/desktop/src/components/sportscapeEditorial/SportscapeEditorialEventRow.tsx
 init_define_import_meta_env();
-var import_react151 = __toESM(require_react(), 1);
-var import_jsx_runtime159 = __toESM(require_jsx_runtime(), 1);
+var import_react152 = __toESM(require_react(), 1);
+var import_jsx_runtime160 = __toESM(require_jsx_runtime(), 1);
 function SportscapeEditorialEventRow({
   event,
   existing,
@@ -72547,23 +72885,23 @@ function SportscapeEditorialEventRow({
   onAiBriefSelectionChange
 }) {
   const defaults = event.sportscapeDefaults;
-  const [headline, setHeadline] = (0, import_react151.useState)(
+  const [headline, setHeadline] = (0, import_react152.useState)(
     existing?.headline ?? defaults?.headline ?? ""
   );
-  const [articleUrl, setArticleUrl] = (0, import_react151.useState)(
+  const [articleUrl, setArticleUrl] = (0, import_react152.useState)(
     existing?.articleUrl ?? defaults?.articleUrl ?? ""
   );
-  const [highlightUrl, setHighlightUrl] = (0, import_react151.useState)(
+  const [highlightUrl, setHighlightUrl] = (0, import_react152.useState)(
     existing?.highlightUrl ?? defaults?.highlightUrl ?? ""
   );
-  const [includeInAiBrief, setIncludeInAiBrief] = (0, import_react151.useState)(Boolean(aiBriefSelection));
-  const [rank, setRank] = (0, import_react151.useState)(String(aiBriefSelection?.rank ?? suggestedRank));
-  const [busy, setBusy] = (0, import_react151.useState)(false);
-  const [aiBriefBusy, setAiBriefBusy] = (0, import_react151.useState)(false);
-  const [error, setError] = (0, import_react151.useState)(null);
-  const [aiBriefError, setAiBriefError] = (0, import_react151.useState)(null);
-  const [savedAt, setSavedAt] = (0, import_react151.useState)(existing?.updatedAt ?? null);
-  (0, import_react151.useEffect)(() => {
+  const [includeInAiBrief, setIncludeInAiBrief] = (0, import_react152.useState)(Boolean(aiBriefSelection));
+  const [rank, setRank] = (0, import_react152.useState)(String(aiBriefSelection?.rank ?? suggestedRank));
+  const [busy, setBusy] = (0, import_react152.useState)(false);
+  const [aiBriefBusy, setAiBriefBusy] = (0, import_react152.useState)(false);
+  const [error, setError] = (0, import_react152.useState)(null);
+  const [aiBriefError, setAiBriefError] = (0, import_react152.useState)(null);
+  const [savedAt, setSavedAt] = (0, import_react152.useState)(existing?.updatedAt ?? null);
+  (0, import_react152.useEffect)(() => {
     setHeadline(existing?.headline ?? defaults?.headline ?? "");
     setArticleUrl(existing?.articleUrl ?? defaults?.articleUrl ?? "");
     setHighlightUrl(existing?.highlightUrl ?? defaults?.highlightUrl ?? "");
@@ -72578,11 +72916,11 @@ function SportscapeEditorialEventRow({
     defaults?.articleUrl,
     defaults?.highlightUrl
   ]);
-  (0, import_react151.useEffect)(() => {
+  (0, import_react152.useEffect)(() => {
     setIncludeInAiBrief(Boolean(aiBriefSelection));
     setRank(String(aiBriefSelection?.rank ?? suggestedRank));
   }, [aiBriefSelection?.id, aiBriefSelection?.rank, suggestedRank]);
-  const dirty = (0, import_react151.useMemo)(
+  const dirty = (0, import_react152.useMemo)(
     () => headline !== (existing?.headline ?? defaults?.headline ?? "") || articleUrl !== (existing?.articleUrl ?? defaults?.articleUrl ?? "") || highlightUrl !== (existing?.highlightUrl ?? defaults?.highlightUrl ?? ""),
     [headline, articleUrl, highlightUrl, existing, defaults]
   );
@@ -72672,18 +73010,18 @@ function SportscapeEditorialEventRow({
       setRank(String(aiBriefSelection?.rank ?? suggestedRank));
     }
   };
-  return /* @__PURE__ */ (0, import_jsx_runtime159.jsxs)("article", { className: "border border-line/40 bg-[#040808]/70 p-4", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime159.jsxs)("div", { className: "flex flex-wrap items-start justify-between gap-3", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime159.jsxs)("div", { className: "min-w-0 flex-1", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime159.jsx)("p", { className: "text-[10px] tracking-[0.16em] text-textdim", children: event.eventId }),
-        /* @__PURE__ */ (0, import_jsx_runtime159.jsx)("h3", { className: "mt-1 font-sans text-sm text-[#d8e8e8]", children: event.title })
+  return /* @__PURE__ */ (0, import_jsx_runtime160.jsxs)("article", { className: "border border-line/40 bg-[#040808]/70 p-4", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime160.jsxs)("div", { className: "flex flex-wrap items-start justify-between gap-3", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime160.jsxs)("div", { className: "min-w-0 flex-1", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime160.jsx)("p", { className: "text-[10px] tracking-[0.16em] text-textdim", children: event.eventId }),
+        /* @__PURE__ */ (0, import_jsx_runtime160.jsx)("h3", { className: "mt-1 font-sans text-sm text-[#d8e8e8]", children: event.title })
       ] }),
-      savedAt && !dirty ? /* @__PURE__ */ (0, import_jsx_runtime159.jsx)("span", { className: "shrink-0 text-[10px] tracking-[0.14em] text-greensys/80", children: "SAVED" }) : null
+      savedAt && !dirty ? /* @__PURE__ */ (0, import_jsx_runtime160.jsx)("span", { className: "shrink-0 text-[10px] tracking-[0.14em] text-greensys/80", children: "SAVED" }) : null
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime159.jsxs)("div", { className: "mt-4 grid gap-3", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime159.jsxs)("label", { className: "block", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime159.jsx)("span", { className: "text-[10px] tracking-[0.16em] text-textdim", children: "HEADLINE" }),
-        /* @__PURE__ */ (0, import_jsx_runtime159.jsx)(
+    /* @__PURE__ */ (0, import_jsx_runtime160.jsxs)("div", { className: "mt-4 grid gap-3", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime160.jsxs)("label", { className: "block", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime160.jsx)("span", { className: "text-[10px] tracking-[0.16em] text-textdim", children: "HEADLINE" }),
+        /* @__PURE__ */ (0, import_jsx_runtime160.jsx)(
           "input",
           {
             value: headline,
@@ -72692,9 +73030,9 @@ function SportscapeEditorialEventRow({
           }
         )
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime159.jsxs)("label", { className: "block", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime159.jsx)("span", { className: "text-[10px] tracking-[0.16em] text-textdim", children: "ARTICLE URL" }),
-        /* @__PURE__ */ (0, import_jsx_runtime159.jsx)(
+      /* @__PURE__ */ (0, import_jsx_runtime160.jsxs)("label", { className: "block", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime160.jsx)("span", { className: "text-[10px] tracking-[0.16em] text-textdim", children: "ARTICLE URL" }),
+        /* @__PURE__ */ (0, import_jsx_runtime160.jsx)(
           "input",
           {
             value: articleUrl,
@@ -72703,9 +73041,9 @@ function SportscapeEditorialEventRow({
           }
         )
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime159.jsxs)("label", { className: "block", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime159.jsx)("span", { className: "text-[10px] tracking-[0.16em] text-textdim", children: "HIGHLIGHT URL" }),
-        /* @__PURE__ */ (0, import_jsx_runtime159.jsx)(
+      /* @__PURE__ */ (0, import_jsx_runtime160.jsxs)("label", { className: "block", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime160.jsx)("span", { className: "text-[10px] tracking-[0.16em] text-textdim", children: "HIGHLIGHT URL" }),
+        /* @__PURE__ */ (0, import_jsx_runtime160.jsx)(
           "input",
           {
             value: highlightUrl,
@@ -72715,9 +73053,9 @@ function SportscapeEditorialEventRow({
         )
       ] })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime159.jsxs)("div", { className: "mt-4 flex flex-wrap items-center gap-4 border-t border-line/30 pt-4", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime159.jsxs)("label", { className: "flex items-center gap-2 text-[11px] text-[#d8e8e8]", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime159.jsx)(
+    /* @__PURE__ */ (0, import_jsx_runtime160.jsxs)("div", { className: "mt-4 flex flex-wrap items-center gap-4 border-t border-line/30 pt-4", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime160.jsxs)("label", { className: "flex items-center gap-2 text-[11px] text-[#d8e8e8]", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime160.jsx)(
           "input",
           {
             type: "checkbox",
@@ -72727,11 +73065,11 @@ function SportscapeEditorialEventRow({
             className: "h-4 w-4 border border-line/60 bg-[#030808] accent-cyansys"
           }
         ),
-        /* @__PURE__ */ (0, import_jsx_runtime159.jsx)("span", { className: "text-[10px] tracking-[0.16em] text-textdim", children: "INCLUDE IN AI BRIEF" })
+        /* @__PURE__ */ (0, import_jsx_runtime160.jsx)("span", { className: "text-[10px] tracking-[0.16em] text-textdim", children: "INCLUDE IN AI BRIEF" })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime159.jsxs)("label", { className: "flex items-center gap-2", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime159.jsx)("span", { className: "text-[10px] tracking-[0.16em] text-textdim", children: "AI BRIEF PRIORITY (1 = highest, 100 = lowest)" }),
-        /* @__PURE__ */ (0, import_jsx_runtime159.jsx)(
+      /* @__PURE__ */ (0, import_jsx_runtime160.jsxs)("label", { className: "flex items-center gap-2", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime160.jsx)("span", { className: "text-[10px] tracking-[0.16em] text-textdim", children: "AI BRIEF PRIORITY (1 = highest, 100 = lowest)" }),
+        /* @__PURE__ */ (0, import_jsx_runtime160.jsx)(
           "input",
           {
             type: "number",
@@ -72750,9 +73088,9 @@ function SportscapeEditorialEventRow({
         )
       ] })
     ] }),
-    error ? /* @__PURE__ */ (0, import_jsx_runtime159.jsx)("p", { className: "mt-3 text-[11px] text-redsys", children: error }) : null,
-    aiBriefError ? /* @__PURE__ */ (0, import_jsx_runtime159.jsx)("p", { className: "mt-3 text-[11px] text-redsys", children: aiBriefError }) : null,
-    /* @__PURE__ */ (0, import_jsx_runtime159.jsx)(
+    error ? /* @__PURE__ */ (0, import_jsx_runtime160.jsx)("p", { className: "mt-3 text-[11px] text-redsys", children: error }) : null,
+    aiBriefError ? /* @__PURE__ */ (0, import_jsx_runtime160.jsx)("p", { className: "mt-3 text-[11px] text-redsys", children: aiBriefError }) : null,
+    /* @__PURE__ */ (0, import_jsx_runtime160.jsx)(
       "button",
       {
         type: "button",
@@ -72769,7 +73107,7 @@ function SportscapeEditorialEventRow({
 }
 
 // ../grarf/desktop/src/components/sportscapeEditorial/SportscapeEditorialLeagueSection.tsx
-var import_jsx_runtime160 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime161 = __toESM(require_jsx_runtime(), 1);
 function SportscapeEditorialLeagueSection({
   league,
   events,
@@ -72779,13 +73117,13 @@ function SportscapeEditorialLeagueSection({
   onEntrySaved,
   onAiBriefSelectionChange
 }) {
-  const [expanded, setExpanded] = (0, import_react152.useState)(() => {
+  const [expanded, setExpanded] = (0, import_react153.useState)(() => {
     if (!isSportscapeEditorialLeagueKey(league)) return true;
     return !SPORTSCAPE_EDITORIAL_LEAGUES_COLLAPSED_BY_DEFAULT.has(league);
   });
   const highlightSource = isSportscapeEditorialLeagueKey(league) ? getSportscapeEditorialHighlightSource(league) : null;
   const label = resolveSportscapeEditorialLeagueDisplayLabel(league);
-  const highlightLabel = (0, import_react152.useMemo)(() => {
+  const highlightLabel = (0, import_react153.useMemo)(() => {
     if (!highlightSource) return null;
     try {
       const host = new URL(highlightSource.highlightsUrl).hostname.replace(/^www\./, "");
@@ -72795,17 +73133,17 @@ function SportscapeEditorialLeagueSection({
       return `${label} highlights`;
     }
   }, [highlightSource, label]);
-  return /* @__PURE__ */ (0, import_jsx_runtime160.jsxs)("section", { className: "border border-line/50 bg-panel2/80", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime160.jsxs)("header", { className: "flex flex-wrap items-center justify-between gap-3 border-b border-line/40 px-4 py-3", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime160.jsxs)(
+  return /* @__PURE__ */ (0, import_jsx_runtime161.jsxs)("section", { className: "border border-line/50 bg-panel2/80", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime161.jsxs)("header", { className: "flex flex-wrap items-center justify-between gap-3 border-b border-line/40 px-4 py-3", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime161.jsxs)(
         "button",
         {
           type: "button",
           onClick: () => setExpanded((value) => !value),
           className: "flex min-w-0 items-center gap-2 text-left",
           children: [
-            /* @__PURE__ */ (0, import_jsx_runtime160.jsx)("span", { className: "text-[10px] text-textdim", children: expanded ? "\u25BE" : "\u25B8" }),
-            /* @__PURE__ */ (0, import_jsx_runtime160.jsxs)("span", { className: "font-sans text-sm tracking-[0.08em] text-[#d8e8e8]", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime161.jsx)("span", { className: "text-[10px] text-textdim", children: expanded ? "\u25BE" : "\u25B8" }),
+            /* @__PURE__ */ (0, import_jsx_runtime161.jsxs)("span", { className: "font-sans text-sm tracking-[0.08em] text-[#d8e8e8]", children: [
               label,
               " (",
               events.length,
@@ -72814,7 +73152,7 @@ function SportscapeEditorialLeagueSection({
           ]
         }
       ),
-      /* @__PURE__ */ (0, import_jsx_runtime160.jsx)(
+      /* @__PURE__ */ (0, import_jsx_runtime161.jsx)(
         "a",
         {
           href: highlightSource?.highlightsUrl,
@@ -72829,8 +73167,8 @@ function SportscapeEditorialLeagueSection({
         }
       )
     ] }),
-    expanded ? /* @__PURE__ */ (0, import_jsx_runtime160.jsxs)("div", { className: "space-y-3 p-4", children: [
-      events.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime160.jsx)("p", { className: "text-[11px] text-textdim", children: "No Sportscape games for this date." }) : events.map((event) => /* @__PURE__ */ (0, import_jsx_runtime160.jsx)(
+    expanded ? /* @__PURE__ */ (0, import_jsx_runtime161.jsxs)("div", { className: "space-y-3 p-4", children: [
+      events.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime161.jsx)("p", { className: "text-[11px] text-textdim", children: "No Sportscape games for this date." }) : events.map((event) => /* @__PURE__ */ (0, import_jsx_runtime161.jsx)(
         SportscapeEditorialEventRow,
         {
           event,
@@ -72842,24 +73180,24 @@ function SportscapeEditorialLeagueSection({
         },
         `${league}:${event.eventId}`
       )),
-      expanded && events.length > 0 && highlightLabel ? /* @__PURE__ */ (0, import_jsx_runtime160.jsx)("p", { className: "text-[10px] text-textdim", children: highlightLabel }) : null
+      expanded && events.length > 0 && highlightLabel ? /* @__PURE__ */ (0, import_jsx_runtime161.jsx)("p", { className: "text-[10px] text-textdim", children: highlightLabel }) : null
     ] }) : null
   ] });
 }
 
 // ../grarf/desktop/src/components/sportscapeEditorial/SportscapeEditorialPasswordGate.tsx
 init_define_import_meta_env();
-var import_react153 = __toESM(require_react(), 1);
-var import_jsx_runtime161 = __toESM(require_jsx_runtime(), 1);
+var import_react154 = __toESM(require_react(), 1);
+var import_jsx_runtime162 = __toESM(require_jsx_runtime(), 1);
 function SportscapeEditorialPasswordGate({ children }) {
-  const [authed, setAuthed] = (0, import_react153.useState)(() => isSportscapeAdminAuthed());
-  if (authed) return /* @__PURE__ */ (0, import_jsx_runtime161.jsx)(import_jsx_runtime161.Fragment, { children });
-  return /* @__PURE__ */ (0, import_jsx_runtime161.jsx)("div", { className: "flex min-h-screen items-center justify-center bg-[#020404] px-4", children: /* @__PURE__ */ (0, import_jsx_runtime161.jsx)("div", { className: "w-full max-w-sm border border-line/60 bg-panel2 p-6 shadow-lg", children: /* @__PURE__ */ (0, import_jsx_runtime161.jsx)(SportscapeEditorialPasswordForm, { onSuccess: () => setAuthed(true) }) }) });
+  const [authed, setAuthed] = (0, import_react154.useState)(() => isSportscapeAdminAuthed());
+  if (authed) return /* @__PURE__ */ (0, import_jsx_runtime162.jsx)(import_jsx_runtime162.Fragment, { children });
+  return /* @__PURE__ */ (0, import_jsx_runtime162.jsx)("div", { className: "flex min-h-screen items-center justify-center bg-[#020404] px-4", children: /* @__PURE__ */ (0, import_jsx_runtime162.jsx)("div", { className: "w-full max-w-sm border border-line/60 bg-panel2 p-6 shadow-lg", children: /* @__PURE__ */ (0, import_jsx_runtime162.jsx)(SportscapeEditorialPasswordForm, { onSuccess: () => setAuthed(true) }) }) });
 }
 
 // ../grarf/desktop/src/hooks/useSportscapeAdminEvents.ts
 init_define_import_meta_env();
-var import_react154 = __toESM(require_react(), 1);
+var import_react155 = __toESM(require_react(), 1);
 function countAutomatedArticles(mergedByLeague) {
   let total = 0;
   for (const league of AUTOMATED_SPORTSCAPE_EDITORIAL_LEAGUES) {
@@ -72878,13 +73216,13 @@ function useSportscapeAdminEvents(options) {
   const worldCupGameScoresByEventId = useWorldCupSportscapeGameScores(liveLeagues);
   const mcwsSportscapeArticles = useMcwsSportscapeArticles();
   const mcwsGameScoresByEventId = useMcwsSportscapeGameScores();
-  const [feedsSettled, setFeedsSettled] = (0, import_react154.useState)(false);
-  (0, import_react154.useEffect)(() => {
+  const [feedsSettled, setFeedsSettled] = (0, import_react155.useState)(false);
+  (0, import_react155.useEffect)(() => {
     const timer = window.setTimeout(() => setFeedsSettled(true), 5e3);
     return () => window.clearTimeout(timer);
   }, []);
-  const gamesByEventId = (0, import_react154.useMemo)(() => buildEventIdGameIndex(liveLeagues), [liveLeagues]);
-  const mergedArticlesByLeague = (0, import_react154.useMemo)(() => {
+  const gamesByEventId = (0, import_react155.useMemo)(() => buildEventIdGameIndex(liveLeagues), [liveLeagues]);
+  const mergedArticlesByLeague = (0, import_react155.useMemo)(() => {
     return {
       MLB: mergeSportscapeArticlesWithEditorial({
         automatic: mlbSportscapeArticles,
@@ -72930,7 +73268,7 @@ function useSportscapeAdminEvents(options) {
     worldCupGameScoresByEventId,
     mcwsGameScoresByEventId
   ]);
-  const events = (0, import_react154.useMemo)(
+  const events = (0, import_react155.useMemo)(
     () => collectSportscapeAdminEventsFromWebSportscape({
       mergedArticlesByLeague,
       editorialEntries,
@@ -72938,7 +73276,7 @@ function useSportscapeAdminEvents(options) {
     }),
     [mergedArticlesByLeague, editorialEntries, gamesByEventId]
   );
-  const automatedArticleCount = (0, import_react154.useMemo)(
+  const automatedArticleCount = (0, import_react155.useMemo)(
     () => countAutomatedArticles(mergedArticlesByLeague),
     [mergedArticlesByLeague]
   );
@@ -72955,7 +73293,7 @@ function useSportscapeAdminEvents(options) {
 }
 
 // ../grarf/desktop/src/pages/SportscapeEditorialAdminPage.tsx
-var import_jsx_runtime162 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime163 = __toESM(require_jsx_runtime(), 1);
 function SportscapeAdminTabBar({
   activeTab,
   onTabChange
@@ -72964,14 +73302,14 @@ function SportscapeAdminTabBar({
     { id: "sportscape", label: "Sportscape" },
     { id: "games-spine", label: "Games Spine" }
   ];
-  return /* @__PURE__ */ (0, import_jsx_runtime162.jsx)(
+  return /* @__PURE__ */ (0, import_jsx_runtime163.jsx)(
     "nav",
     {
       className: "border-b border-line/50 bg-[#020404]",
       "aria-label": "Admin sections",
-      children: /* @__PURE__ */ (0, import_jsx_runtime162.jsx)("div", { className: "mx-auto flex max-w-5xl gap-0 px-4", children: tabs.map((tab) => {
+      children: /* @__PURE__ */ (0, import_jsx_runtime163.jsx)("div", { className: "mx-auto flex max-w-5xl gap-0 px-4", children: tabs.map((tab) => {
         const active2 = activeTab === tab.id;
-        return /* @__PURE__ */ (0, import_jsx_runtime162.jsx)(
+        return /* @__PURE__ */ (0, import_jsx_runtime163.jsx)(
           "button",
           {
             type: "button",
@@ -72990,7 +73328,7 @@ function SportscapeAdminTabBar({
   );
 }
 function GamesSpineAdminPlaceholder() {
-  return /* @__PURE__ */ (0, import_jsx_runtime162.jsx)(GamesSpineAdminPanel, {});
+  return /* @__PURE__ */ (0, import_jsx_runtime163.jsx)(GamesSpineAdminPanel, {});
 }
 function buildAiBriefSelectionsByEventId(selections) {
   const next = /* @__PURE__ */ new Map();
@@ -73001,15 +73339,15 @@ function buildAiBriefSelectionsByEventId(selections) {
 }
 function SportscapeEditorialAdminContent() {
   const updatedAt = useLiveGamesStore((state3) => state3.updatedAt);
-  const [entriesByEventId, setEntriesByEventId] = (0, import_react155.useState)(
+  const [entriesByEventId, setEntriesByEventId] = (0, import_react156.useState)(
     /* @__PURE__ */ new Map()
   );
-  const [aiBriefSelectionsByEventId, setAiBriefSelectionsByEventId] = (0, import_react155.useState)(/* @__PURE__ */ new Map());
-  const [loadError, setLoadError] = (0, import_react155.useState)(null);
-  const [aiBriefActionError, setAiBriefActionError] = (0, import_react155.useState)(null);
-  const [removingLineId, setRemovingLineId] = (0, import_react155.useState)(null);
-  const [clearBusy, setClearBusy] = (0, import_react155.useState)(false);
-  const editorialEntries = (0, import_react155.useMemo)(
+  const [aiBriefSelectionsByEventId, setAiBriefSelectionsByEventId] = (0, import_react156.useState)(/* @__PURE__ */ new Map());
+  const [loadError, setLoadError] = (0, import_react156.useState)(null);
+  const [aiBriefActionError, setAiBriefActionError] = (0, import_react156.useState)(null);
+  const [removingLineId, setRemovingLineId] = (0, import_react156.useState)(null);
+  const [clearBusy, setClearBusy] = (0, import_react156.useState)(false);
+  const editorialEntries = (0, import_react156.useMemo)(
     () => [...entriesByEventId.values()],
     [entriesByEventId]
   );
@@ -73020,7 +73358,7 @@ function SportscapeEditorialAdminContent() {
     operationalDateKey,
     automatedArticleCount
   } = useSportscapeAdminEvents({ editorialEntries });
-  (0, import_react155.useEffect)(() => {
+  (0, import_react156.useEffect)(() => {
     void fetchSportscapeEditorialDocument().then((document2) => {
       const nextEntries = /* @__PURE__ */ new Map();
       for (const entry of document2.entries) {
@@ -73032,16 +73370,16 @@ function SportscapeEditorialAdminContent() {
       setLoadError(err instanceof Error ? err.message : "Unable to load editorial data");
     });
   }, []);
-  const grouped = (0, import_react155.useMemo)(() => groupSportscapeEditorialEventsByLeague(events), [events]);
-  const leagueSections = (0, import_react155.useMemo)(
+  const grouped = (0, import_react156.useMemo)(() => groupSportscapeEditorialEventsByLeague(events), [events]);
+  const leagueSections = (0, import_react156.useMemo)(
     () => listSportscapeEditorialAdminLeagueSections(grouped),
     [grouped]
   );
-  const suggestedRank = (0, import_react155.useMemo)(
+  const suggestedRank = (0, import_react156.useMemo)(
     () => suggestNextAiBriefRank(aiBriefSelectionsByEventId.values()),
     [aiBriefSelectionsByEventId]
   );
-  const headlineByEventId = (0, import_react155.useMemo)(() => {
+  const headlineByEventId = (0, import_react156.useMemo)(() => {
     const next = /* @__PURE__ */ new Map();
     for (const event of events) {
       const existing = resolveEditorialEntryForAdminEvent(event, entriesByEventId);
@@ -73056,11 +73394,11 @@ function SportscapeEditorialAdminContent() {
     }
     return next;
   }, [events, entriesByEventId]);
-  const existingEditorialEventIds = (0, import_react155.useMemo)(
+  const existingEditorialEventIds = (0, import_react156.useMemo)(
     () => [...entriesByEventId.keys()],
     [entriesByEventId]
   );
-  const aiBriefSummaryLines = (0, import_react155.useMemo)(
+  const aiBriefSummaryLines = (0, import_react156.useMemo)(
     () => buildAiBriefSummaryLines({
       selections: [...aiBriefSelectionsByEventId.values()],
       headlineByEventId
@@ -73120,21 +73458,21 @@ function SportscapeEditorialAdminContent() {
       setClearBusy(false);
     }
   };
-  return /* @__PURE__ */ (0, import_jsx_runtime162.jsxs)("div", { className: "min-h-screen bg-[#020404] text-[#d8e8e8]", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime162.jsx)(LiveGamesBridge, {}),
-    /* @__PURE__ */ (0, import_jsx_runtime162.jsxs)("header", { className: "border-b border-line/50 bg-panel/90 px-4 py-4", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime162.jsx)("p", { className: "text-[10px] tracking-[0.28em] text-textdim", children: "GRARF \xB7 ADMIN" }),
-      /* @__PURE__ */ (0, import_jsx_runtime162.jsx)("h1", { className: "mt-1 font-sans text-xl", children: "Sportscape Editorial" }),
-      /* @__PURE__ */ (0, import_jsx_runtime162.jsxs)("p", { className: "mt-2 max-w-3xl text-[11px] leading-relaxed text-textdim", children: [
+  return /* @__PURE__ */ (0, import_jsx_runtime163.jsxs)("div", { className: "min-h-screen bg-[#020404] text-[#d8e8e8]", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime163.jsx)(LiveGamesBridge, {}),
+    /* @__PURE__ */ (0, import_jsx_runtime163.jsxs)("header", { className: "border-b border-line/50 bg-panel/90 px-4 py-4", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime163.jsx)("p", { className: "text-[10px] tracking-[0.28em] text-textdim", children: "GRARF \xB7 ADMIN" }),
+      /* @__PURE__ */ (0, import_jsx_runtime163.jsx)("h1", { className: "mt-1 font-sans text-xl", children: "Sportscape Editorial" }),
+      /* @__PURE__ */ (0, import_jsx_runtime163.jsxs)("p", { className: "mt-2 max-w-3xl text-[11px] leading-relaxed text-textdim", children: [
         "Same games as Catch Up Sportscape on webapp.html for ",
         operationalDateLabel,
         ". Edit headlines, article URLs, and highlights; rank selections for AI Brief. Saves to the Sportscape Editorial cloud API."
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime162.jsx)("p", { className: "mt-2 text-[10px] tracking-[0.14em] text-textdim", children: sportscapeEventsLoading ? "Loading Sportscape games\u2026" : `${events.length} Sportscape games \xB7 ${automatedArticleCount} automated recaps \xB7 ${operationalDateKey} \xB7 ingest ${updatedAt ?? "pending"}` }),
-      loadError ? /* @__PURE__ */ (0, import_jsx_runtime162.jsx)("p", { className: "mt-2 text-[11px] text-redsys", children: loadError }) : null
+      /* @__PURE__ */ (0, import_jsx_runtime163.jsx)("p", { className: "mt-2 text-[10px] tracking-[0.14em] text-textdim", children: sportscapeEventsLoading ? "Loading Sportscape games\u2026" : `${events.length} Sportscape games \xB7 ${automatedArticleCount} automated recaps \xB7 ${operationalDateKey} \xB7 ingest ${updatedAt ?? "pending"}` }),
+      loadError ? /* @__PURE__ */ (0, import_jsx_runtime163.jsx)("p", { className: "mt-2 text-[11px] text-redsys", children: loadError }) : null
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime162.jsxs)("main", { className: "mx-auto flex w-full max-w-5xl flex-col gap-4 px-4 py-6", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime162.jsx)(
+    /* @__PURE__ */ (0, import_jsx_runtime163.jsxs)("main", { className: "mx-auto flex w-full max-w-5xl flex-col gap-4 px-4 py-6", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime163.jsx)(
         SportscapeEditorialManualAiBriefEntry,
         {
           existingEventIds: existingEditorialEventIds,
@@ -73143,7 +73481,7 @@ function SportscapeEditorialAdminContent() {
           onAiBriefSelectionChange: (eventId, selection) => onAiBriefSelectionChange(eventId, selection)
         }
       ),
-      /* @__PURE__ */ (0, import_jsx_runtime162.jsx)(
+      /* @__PURE__ */ (0, import_jsx_runtime163.jsx)(
         SportscapeEditorialAiBriefSummary,
         {
           lines: aiBriefSummaryLines,
@@ -73154,7 +73492,7 @@ function SportscapeEditorialAdminContent() {
           error: aiBriefActionError
         }
       ),
-      leagueSections.map((league) => /* @__PURE__ */ (0, import_jsx_runtime162.jsx)(
+      leagueSections.map((league) => /* @__PURE__ */ (0, import_jsx_runtime163.jsx)(
         SportscapeEditorialLeagueSection,
         {
           league,
@@ -73171,8 +73509,8 @@ function SportscapeEditorialAdminContent() {
   ] });
 }
 function SportscapeEditorialAdminPage() {
-  const [activeTab, setActiveTab] = (0, import_react155.useState)("sportscape");
-  (0, import_react155.useEffect)(() => {
+  const [activeTab, setActiveTab] = (0, import_react156.useState)("sportscape");
+  (0, import_react156.useEffect)(() => {
     const root = document.getElementById("grarf-web-root");
     if (!root) return;
     const previousClassName = root.className;
@@ -73182,39 +73520,39 @@ function SportscapeEditorialAdminPage() {
       root.className = previousClassName;
     };
   }, []);
-  return /* @__PURE__ */ (0, import_jsx_runtime162.jsxs)(SportscapeEditorialPasswordGate, { children: [
-    /* @__PURE__ */ (0, import_jsx_runtime162.jsx)(SportscapeAdminTabBar, { activeTab, onTabChange: setActiveTab }),
-    activeTab === "sportscape" ? /* @__PURE__ */ (0, import_jsx_runtime162.jsx)(SportscapeEditorialAdminContent, {}) : /* @__PURE__ */ (0, import_jsx_runtime162.jsx)(GamesSpineAdminPlaceholder, {})
+  return /* @__PURE__ */ (0, import_jsx_runtime163.jsxs)(SportscapeEditorialPasswordGate, { children: [
+    /* @__PURE__ */ (0, import_jsx_runtime163.jsx)(SportscapeAdminTabBar, { activeTab, onTabChange: setActiveTab }),
+    activeTab === "sportscape" ? /* @__PURE__ */ (0, import_jsx_runtime163.jsx)(SportscapeEditorialAdminContent, {}) : /* @__PURE__ */ (0, import_jsx_runtime163.jsx)(GamesSpineAdminPlaceholder, {})
   ] });
 }
 
 // webapp/home-entry.tsx
-var import_jsx_runtime163 = __toESM(require_jsx_runtime());
+var import_jsx_runtime164 = __toESM(require_jsx_runtime());
 var reactRoot = null;
 function IntelligenceSyncBridge() {
-  (0, import_react156.useEffect)(() => bindIntelligenceStoreUpdates(), []);
+  (0, import_react157.useEffect)(() => bindIntelligenceStoreUpdates(), []);
   return null;
 }
-var appShellRouteElements = /* @__PURE__ */ (0, import_jsx_runtime163.jsxs)(import_jsx_runtime163.Fragment, { children: [
-  /* @__PURE__ */ (0, import_jsx_runtime163.jsx)(Route, { index: true, element: /* @__PURE__ */ (0, import_jsx_runtime163.jsx)(HomePage, {}) }),
-  leagueDirectoryUniqueRoutes().map((item) => /* @__PURE__ */ (0, import_jsx_runtime163.jsx)(
+var appShellRouteElements = /* @__PURE__ */ (0, import_jsx_runtime164.jsxs)(import_jsx_runtime164.Fragment, { children: [
+  /* @__PURE__ */ (0, import_jsx_runtime164.jsx)(Route, { index: true, element: /* @__PURE__ */ (0, import_jsx_runtime164.jsx)(HomePage, {}) }),
+  leagueDirectoryUniqueRoutes().map((item) => /* @__PURE__ */ (0, import_jsx_runtime164.jsx)(
     Route,
     {
       path: item.route.replace(/^\//, ""),
-      element: /* @__PURE__ */ (0, import_jsx_runtime163.jsx)(LeagueDirectoryRoutePage, {})
+      element: /* @__PURE__ */ (0, import_jsx_runtime164.jsx)(LeagueDirectoryRoutePage, {})
     },
     item.route
   )),
-  /* @__PURE__ */ (0, import_jsx_runtime163.jsx)(Route, { path: "game/:id", element: /* @__PURE__ */ (0, import_jsx_runtime163.jsx)(GameWorkspacePage, {}) })
+  /* @__PURE__ */ (0, import_jsx_runtime164.jsx)(Route, { path: "game/:id", element: /* @__PURE__ */ (0, import_jsx_runtime164.jsx)(GameWorkspacePage, {}) })
 ] });
 function WebHomeApp() {
-  return /* @__PURE__ */ (0, import_jsx_runtime163.jsxs)(AnalyticsProvider, { children: [
-    /* @__PURE__ */ (0, import_jsx_runtime163.jsx)(IntelligenceSyncBridge, {}),
-    /* @__PURE__ */ (0, import_jsx_runtime163.jsxs)(Routes, { children: [
-      /* @__PURE__ */ (0, import_jsx_runtime163.jsx)(Route, { path: "/", element: /* @__PURE__ */ (0, import_jsx_runtime163.jsx)(AppShellLayout, {}), children: appShellRouteElements }),
-      /* @__PURE__ */ (0, import_jsx_runtime163.jsx)(Route, { path: "webapp.html", element: /* @__PURE__ */ (0, import_jsx_runtime163.jsx)(AppShellLayout, {}), children: appShellRouteElements }),
-      /* @__PURE__ */ (0, import_jsx_runtime163.jsx)(Route, { path: "admin/sportscape", element: /* @__PURE__ */ (0, import_jsx_runtime163.jsx)(SportscapeEditorialAdminPage, {}) }),
-      /* @__PURE__ */ (0, import_jsx_runtime163.jsx)(Route, { path: "*", element: /* @__PURE__ */ (0, import_jsx_runtime163.jsx)(Navigate, { to: "/", replace: true }) })
+  return /* @__PURE__ */ (0, import_jsx_runtime164.jsxs)(AnalyticsProvider, { children: [
+    /* @__PURE__ */ (0, import_jsx_runtime164.jsx)(IntelligenceSyncBridge, {}),
+    /* @__PURE__ */ (0, import_jsx_runtime164.jsxs)(Routes, { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime164.jsx)(Route, { path: "/", element: /* @__PURE__ */ (0, import_jsx_runtime164.jsx)(AppShellLayout, {}), children: appShellRouteElements }),
+      /* @__PURE__ */ (0, import_jsx_runtime164.jsx)(Route, { path: "webapp.html", element: /* @__PURE__ */ (0, import_jsx_runtime164.jsx)(AppShellLayout, {}), children: appShellRouteElements }),
+      /* @__PURE__ */ (0, import_jsx_runtime164.jsx)(Route, { path: "admin/sportscape", element: /* @__PURE__ */ (0, import_jsx_runtime164.jsx)(SportscapeEditorialAdminPage, {}) }),
+      /* @__PURE__ */ (0, import_jsx_runtime164.jsx)(Route, { path: "*", element: /* @__PURE__ */ (0, import_jsx_runtime164.jsx)(Navigate, { to: "/", replace: true }) })
     ] })
   ] });
 }
@@ -73226,7 +73564,7 @@ function mountWebHome(container) {
     reactRoot = (0, import_client.createRoot)(container);
   }
   reactRoot.render(
-    /* @__PURE__ */ (0, import_jsx_runtime163.jsx)(import_react156.StrictMode, { children: /* @__PURE__ */ (0, import_jsx_runtime163.jsx)(BrowserRouter, { children: /* @__PURE__ */ (0, import_jsx_runtime163.jsx)(WebHomeApp, {}) }) })
+    /* @__PURE__ */ (0, import_jsx_runtime164.jsx)(import_react157.StrictMode, { children: /* @__PURE__ */ (0, import_jsx_runtime164.jsx)(BrowserRouter, { children: /* @__PURE__ */ (0, import_jsx_runtime164.jsx)(WebHomeApp, {}) }) })
   );
 }
 var autoRoot = document.getElementById("grarf-web-root");
