@@ -9,8 +9,25 @@ type WorkspaceEmbedSlot = "center" | "centerChild" | "right";
 declare global {
   interface Window {
     GRARF_ELECTRON?: true;
-    GRARF_WEB_CONFIG?: { operationalIngestUrl?: string; operationalPollIntervalMs?: number };
+    GRARF_WEB_CONFIG?: {
+      operationalIngestUrl?: string;
+      operationalPollIntervalMs?: number;
+      sportscapeEditorialApiUrl?: string;
+    };
   }
+}
+
+function resolveSportscapeEditorialApiBase(): string {
+  const fromConfig = window.GRARF_WEB_CONFIG?.sportscapeEditorialApiUrl?.trim();
+  if (fromConfig) return fromConfig.replace(/\/+$/, "");
+  return "https://grarf-sportscape-editorial.grarf.workers.dev";
+}
+
+function sportscapeEditorialBridgeUrl(path: string): string {
+  const base = resolveSportscapeEditorialApiBase();
+  if (path === "/" || path === "") return `${base}/`;
+  const suffix = path.startsWith("/") ? path : `/${path}`;
+  return `${base}${suffix}`;
 }
 
 function isElectronRenderer(): boolean {
@@ -422,7 +439,7 @@ function installGrarfBridge(): void {
     },
     sportscapeEditorialGetDocument: async () => {
       try {
-        const res = await fetch("/api/sportscape-editorial");
+        const res = await fetch(sportscapeEditorialBridgeUrl("/"));
         if (!res.ok) return { ok: false as const, error: `HTTP ${res.status}` };
         const body = (await res.json()) as { document?: import("../../grarf/desktop/src/types/sportscapeEditorial").SportscapeEditorialDocument };
         return { ok: true as const, document: body.document ?? { entries: [], aiBriefSelections: [] } };
@@ -432,7 +449,7 @@ function installGrarfBridge(): void {
     },
     sportscapeEditorialUpsertEntry: async (payload) => {
       try {
-        const res = await fetch("/api/sportscape-editorial/entries", {
+        const res = await fetch(sportscapeEditorialBridgeUrl("/entries"), {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
@@ -450,7 +467,7 @@ function installGrarfBridge(): void {
     },
     sportscapeEditorialUpsertAiBriefSelection: async (payload) => {
       try {
-        const res = await fetch("/api/sportscape-editorial/ai-brief-selections", {
+        const res = await fetch(sportscapeEditorialBridgeUrl("/ai-brief-selections"), {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
@@ -468,7 +485,7 @@ function installGrarfBridge(): void {
     },
     sportscapeEditorialRemoveAiBriefSelection: async (payload) => {
       try {
-        const res = await fetch("/api/sportscape-editorial/ai-brief-selections/remove", {
+        const res = await fetch(sportscapeEditorialBridgeUrl("/ai-brief-selections/remove"), {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
@@ -485,7 +502,7 @@ function installGrarfBridge(): void {
     },
     sportscapeEditorialUpsertFeaturedGame: async (payload) => {
       try {
-        const res = await fetch("/api/sportscape-editorial/featured-games", {
+        const res = await fetch(sportscapeEditorialBridgeUrl("/featured-games"), {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
@@ -502,15 +519,16 @@ function installGrarfBridge(): void {
     },
     sportscapeEditorialVerifyPassword: async (password) => {
       try {
-        const res = await fetch("/api/sportscape-editorial/verify-password", {
+        const res = await fetch(sportscapeEditorialBridgeUrl("/verify-password"), {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ password }),
         });
         if (res.status === 401) return { ok: false as const };
         if (!res.ok) return { ok: false as const, error: `HTTP ${res.status}` };
-        const body = (await res.json()) as { ok?: boolean };
-        return { ok: Boolean(body.ok) };
+        const body = (await res.json()) as { ok?: boolean; token?: string };
+        if (!body.ok || !body.token) return { ok: false as const };
+        return { ok: true as const, token: body.token };
       } catch (err) {
         return { ok: false as const, error: err instanceof Error ? err.message : String(err) };
       }
