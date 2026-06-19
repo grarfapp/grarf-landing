@@ -48064,6 +48064,23 @@ init_define_import_meta_env();
 // ../grarf/desktop/src/lib/gamesSpine/manual/convertManualGamesSpineDocument.ts
 init_define_import_meta_env();
 
+// ../grarf/desktop/src/lib/gamesSpine/manualGamesSpineLeagueLogoUrls.ts
+init_define_import_meta_env();
+
+// ../grarf/desktop/src/lib/gamesSpine/royalAscotLeagueLogoUrl.ts
+init_define_import_meta_env();
+var ROYAL_ASCOT_LEAGUE_LOGO_URL = "/league-logos/royal-ascot.png";
+
+// ../grarf/desktop/src/lib/gamesSpine/manualGamesSpineLeagueLogoUrls.ts
+var MANUAL_GAMES_SPINE_LEAGUE_LOGO_BY_KEY = {
+  "royal ascot": ROYAL_ASCOT_LEAGUE_LOGO_URL
+};
+function resolveManualGamesSpineLeagueLogoUrl(leagueLabel) {
+  const key2 = leagueLabel?.trim().toLowerCase();
+  if (!key2) return void 0;
+  return MANUAL_GAMES_SPINE_LEAGUE_LOGO_BY_KEY[key2];
+}
+
 // ../grarf/desktop/src/lib/gamesSpine/manual/manualGamesSpineUtils.ts
 init_define_import_meta_env();
 function resolveManualGamesSpineStatus(nowMs, startTimeMs, endTimeMs) {
@@ -48162,6 +48179,7 @@ function convertEventToMlbGame(league, event, now) {
   const channel = resolveManualGamesSpineChannelValue(event.channel, league.channel) ?? "";
   const channelUrl = resolveManualGamesSpineChannelValue(event.channelUrl, league.channelUrl);
   const streamProvider = resolveManualGamesSpineStreamProvider(channel, channelUrl);
+  const leagueLogoUrl = resolveManualGamesSpineLeagueLogoUrl(league.league);
   const broadcasts = channel ? [channel] : [];
   return {
     id: manualGamesSpineEventId(league.league, event.eventName, event.date),
@@ -48169,6 +48187,7 @@ function convertEventToMlbGame(league, event, now) {
     time: formatManualGamesSpineDisplayTime(startTimeMs),
     awayTeam: event.eventName,
     awayRecord: "\u2014",
+    awayLogoUrl: leagueLogoUrl,
     homeTeam: channel,
     homeRecord: "\u2014",
     awayCity: "",
@@ -53382,6 +53401,8 @@ var HomeManualGamesSpineSection = (0, import_react79.memo)(function HomeManualGa
   const selectedDate = useCommandBriefingStore((state3) => state3.selectedDate);
   const manualRefreshMs = useManualGamesSpineLiveRefreshMs();
   const todayKey = getGamesSpineOperationalTodayKey();
+  const leagueLogoUrl = resolveManualGamesSpineLeagueLogoUrl(section.leagueLabel);
+  const [logoFailed, setLogoFailed] = (0, import_react79.useState)(false);
   const visibleGames = (0, import_react79.useMemo)(() => {
     if (selectedDate !== todayKey) return [];
     const now = new Date(manualRefreshMs);
@@ -53421,6 +53442,19 @@ var HomeManualGamesSpineSection = (0, import_react79.memo)(function HomeManualGa
                 "aria-expanded": !collapsed,
                 children: /* @__PURE__ */ (0, import_jsx_runtime73.jsxs)("span", { className: "flex min-w-0 items-center gap-2", children: [
                   /* @__PURE__ */ (0, import_jsx_runtime73.jsx)("span", { className: "w-3 shrink-0 text-center text-[9px] text-cyansys/55", "aria-hidden": true, children: collapsed ? "\u25B6" : "\u25BC" }),
+                  leagueLogoUrl && !logoFailed ? /* @__PURE__ */ (0, import_jsx_runtime73.jsx)(
+                    "img",
+                    {
+                      src: leagueLogoUrl,
+                      alt: "",
+                      width: 16,
+                      height: 16,
+                      loading: "lazy",
+                      decoding: "async",
+                      onError: () => setLogoFailed(true),
+                      className: "h-4 w-4 shrink-0 object-contain brightness-110 contrast-110"
+                    }
+                  ) : null,
                   /* @__PURE__ */ (0, import_jsx_runtime73.jsx)("span", { className: "truncate text-[17px] font-bold leading-none tracking-[0.14em] text-[#eef6f6]", children: section.leagueLabel })
                 ] })
               }
