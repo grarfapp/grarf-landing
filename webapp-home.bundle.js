@@ -57245,7 +57245,7 @@ function HomeHeadlinesCbsPanel({ embedsEnabled = true, videoUrl }) {
   return /* @__PURE__ */ (0, import_jsx_runtime86.jsxs)(
     "section",
     {
-      className: "shrink-0 border-b border-line/70 bg-[#020506]/95 font-mono",
+      className: "shrink-0 border-t border-line/70 bg-[#020506]/95 font-mono",
       "aria-label": "CBS Sports HQ headlines",
       children: [
         /* @__PURE__ */ (0, import_jsx_runtime86.jsx)("header", { className: "border-b border-line/50 px-2 py-1", children: /* @__PURE__ */ (0, import_jsx_runtime86.jsx)("div", { className: "text-[9px] tracking-[0.22em] text-cyansys/85", children: "HEADLINES" }) }),
@@ -57284,7 +57284,7 @@ function HomeHeadlinesWebPlaylistPanel({ embedsEnabled = true }) {
   return /* @__PURE__ */ (0, import_jsx_runtime87.jsx)(
     "section",
     {
-      className: "shrink-0 border-b border-line/70 bg-[#020506]/95 font-mono",
+      className: "shrink-0 border-t border-line/70 bg-[#020506]/95 font-mono",
       "aria-label": "Ambient video channel",
       children: /* @__PURE__ */ (0, import_jsx_runtime87.jsx)(
         "div",
@@ -57522,13 +57522,6 @@ function HomeRightRail({
     [isMlbGameWorkspace, activeGameWorkspace, onReturnToLeagueFromSocialRail]
   );
   return /* @__PURE__ */ (0, import_jsx_runtime91.jsxs)("div", { className: "flex h-full min-h-0 w-full min-w-0 flex-col overflow-hidden", children: [
-    isGrarfWebRenderer() ? /* @__PURE__ */ (0, import_jsx_runtime91.jsx)(HomeHeadlinesWebPlaylistPanel, { embedsEnabled: appVisible && embedsReady }) : /* @__PURE__ */ (0, import_jsx_runtime91.jsx)(
-      HomeHeadlinesCbsPanel,
-      {
-        embedsEnabled: appVisible && embedsReady,
-        videoUrl: headlinesVideoUrl
-      }
-    ),
     /* @__PURE__ */ (0, import_jsx_runtime91.jsx)("div", { className: "flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden", children: isMlbGameWorkspace && activeGamePayload && activeGameWorkspace ? /* @__PURE__ */ (0, import_jsx_runtime91.jsx)(
       GameUtilityRail,
       {
@@ -57570,7 +57563,14 @@ function HomeRightRail({
         onOpenLiveShow
       },
       railContext.contextKey
-    ) })
+    ) }),
+    isGrarfWebRenderer() ? /* @__PURE__ */ (0, import_jsx_runtime91.jsx)(HomeHeadlinesWebPlaylistPanel, { embedsEnabled: appVisible && embedsReady }) : /* @__PURE__ */ (0, import_jsx_runtime91.jsx)(
+      HomeHeadlinesCbsPanel,
+      {
+        embedsEnabled: appVisible && embedsReady,
+        videoUrl: headlinesVideoUrl
+      }
+    )
   ] });
 }
 
