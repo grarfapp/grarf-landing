@@ -14,7 +14,9 @@ import { HomePage } from "../../grarf/desktop/src/pages/HomePage";
 import { LeagueDirectoryRoutePage } from "../../grarf/desktop/src/pages/LeagueDirectoryRoutePage";
 import { SportscapeEditorialAdminPage } from "../../grarf/desktop/src/pages/SportscapeEditorialAdminPage";
 import { bindIntelligenceStoreUpdates } from "../../grarf/desktop/src/store/intelligenceStore";
+import type { CenterPaneApplicationMode } from "../../grarf/desktop/src/types/centerPaneApplicationMode";
 import type { GlobalOperationalMode } from "../../grarf/desktop/src/types/globalOperationalMode";
+import { useCenterPaneApplicationModeStore } from "../../grarf/desktop/src/store/centerPaneApplicationModeStore";
 import { useOperationalModeStore } from "../../grarf/desktop/src/store/operationalModeStore";
 
 let reactRoot: Root | null = null;
@@ -27,6 +29,10 @@ function IntelligenceSyncBridge() {
 const appShellRouteElements = (
   <>
     <Route index element={<HomePage />} />
+    <Route path="sportscape" element={<HomePage />} />
+    <Route path="browser" element={<HomePage />} />
+    <Route path="whiparound" element={<HomePage />} />
+    <Route path="livetracker" element={<HomePage />} />
     {leagueDirectoryUniqueRoutes().map((item) => (
       <Route
         key={item.route}
@@ -58,6 +64,10 @@ function WebHomeApp() {
 
 export function syncOperationalMode(mode: GlobalOperationalMode): void {
   useOperationalModeStore.getState().setModeByUser(mode);
+}
+
+export function syncCenterPaneApplicationMode(mode: CenterPaneApplicationMode): void {
+  useCenterPaneApplicationModeStore.getState().setModeExplicit(mode);
 }
 
 export function mountWebHome(container: HTMLElement): void {
