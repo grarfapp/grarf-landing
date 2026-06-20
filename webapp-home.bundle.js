@@ -463,8 +463,8 @@ var require_react_production = __commonJS({
     exports.useDeferredValue = function(value, initialValue) {
       return ReactSharedInternals.H.useDeferredValue(value, initialValue);
     };
-    exports.useEffect = function(create35, deps) {
-      return ReactSharedInternals.H.useEffect(create35, deps);
+    exports.useEffect = function(create36, deps) {
+      return ReactSharedInternals.H.useEffect(create36, deps);
     };
     exports.useEffectEvent = function(callback) {
       return ReactSharedInternals.H.useEffectEvent(callback);
@@ -472,17 +472,17 @@ var require_react_production = __commonJS({
     exports.useId = function() {
       return ReactSharedInternals.H.useId();
     };
-    exports.useImperativeHandle = function(ref, create35, deps) {
-      return ReactSharedInternals.H.useImperativeHandle(ref, create35, deps);
+    exports.useImperativeHandle = function(ref, create36, deps) {
+      return ReactSharedInternals.H.useImperativeHandle(ref, create36, deps);
     };
-    exports.useInsertionEffect = function(create35, deps) {
-      return ReactSharedInternals.H.useInsertionEffect(create35, deps);
+    exports.useInsertionEffect = function(create36, deps) {
+      return ReactSharedInternals.H.useInsertionEffect(create36, deps);
     };
-    exports.useLayoutEffect = function(create35, deps) {
-      return ReactSharedInternals.H.useLayoutEffect(create35, deps);
+    exports.useLayoutEffect = function(create36, deps) {
+      return ReactSharedInternals.H.useLayoutEffect(create36, deps);
     };
-    exports.useMemo = function(create35, deps) {
-      return ReactSharedInternals.H.useMemo(create35, deps);
+    exports.useMemo = function(create36, deps) {
+      return ReactSharedInternals.H.useMemo(create36, deps);
     };
     exports.useOptimistic = function(passthrough, reducer) {
       return ReactSharedInternals.H.useOptimistic(passthrough, reducer);
@@ -546,8 +546,8 @@ var require_react2 = __commonJS({
       Object.assign(useBoundStore, api);
       return useBoundStore;
     };
-    var create35 = ((createState) => createState ? createImpl(createState) : createImpl);
-    exports.create = create35;
+    var create36 = ((createState) => createState ? createImpl(createState) : createImpl);
+    exports.create = create36;
     exports.useStore = useStore;
   }
 });
@@ -4821,43 +4821,43 @@ var require_react_dom_client_production = __commonJS({
       currentStateHook.memoizedState = action;
       return [stateHook, dispatch, false];
     }
-    function pushSimpleEffect(tag, inst, create35, deps) {
-      tag = { tag, create: create35, deps, inst, next: null };
+    function pushSimpleEffect(tag, inst, create36, deps) {
+      tag = { tag, create: create36, deps, inst, next: null };
       inst = currentlyRenderingFiber.updateQueue;
       null === inst && (inst = createFunctionComponentUpdateQueue(), currentlyRenderingFiber.updateQueue = inst);
-      create35 = inst.lastEffect;
-      null === create35 ? inst.lastEffect = tag.next = tag : (deps = create35.next, create35.next = tag, tag.next = deps, inst.lastEffect = tag);
+      create36 = inst.lastEffect;
+      null === create36 ? inst.lastEffect = tag.next = tag : (deps = create36.next, create36.next = tag, tag.next = deps, inst.lastEffect = tag);
       return tag;
     }
     function updateRef() {
       return updateWorkInProgressHook().memoizedState;
     }
-    function mountEffectImpl(fiberFlags, hookFlags, create35, deps) {
+    function mountEffectImpl(fiberFlags, hookFlags, create36, deps) {
       var hook = mountWorkInProgressHook();
       currentlyRenderingFiber.flags |= fiberFlags;
       hook.memoizedState = pushSimpleEffect(
         1 | hookFlags,
         { destroy: void 0 },
-        create35,
+        create36,
         void 0 === deps ? null : deps
       );
     }
-    function updateEffectImpl(fiberFlags, hookFlags, create35, deps) {
+    function updateEffectImpl(fiberFlags, hookFlags, create36, deps) {
       var hook = updateWorkInProgressHook();
       deps = void 0 === deps ? null : deps;
       var inst = hook.memoizedState.inst;
-      null !== currentHook && null !== deps && areHookInputsEqual(deps, currentHook.memoizedState.deps) ? hook.memoizedState = pushSimpleEffect(hookFlags, inst, create35, deps) : (currentlyRenderingFiber.flags |= fiberFlags, hook.memoizedState = pushSimpleEffect(
+      null !== currentHook && null !== deps && areHookInputsEqual(deps, currentHook.memoizedState.deps) ? hook.memoizedState = pushSimpleEffect(hookFlags, inst, create36, deps) : (currentlyRenderingFiber.flags |= fiberFlags, hook.memoizedState = pushSimpleEffect(
         1 | hookFlags,
         inst,
-        create35,
+        create36,
         deps
       ));
     }
-    function mountEffect(create35, deps) {
-      mountEffectImpl(8390656, 8, create35, deps);
+    function mountEffect(create36, deps) {
+      mountEffectImpl(8390656, 8, create36, deps);
     }
-    function updateEffect(create35, deps) {
-      updateEffectImpl(2048, 8, create35, deps);
+    function updateEffect(create36, deps) {
+      updateEffectImpl(2048, 8, create36, deps);
     }
     function useEffectEventImpl(payload) {
       currentlyRenderingFiber.flags |= 4;
@@ -4877,28 +4877,28 @@ var require_react_dom_client_production = __commonJS({
         return ref.impl.apply(void 0, arguments);
       };
     }
-    function updateInsertionEffect(create35, deps) {
-      return updateEffectImpl(4, 2, create35, deps);
+    function updateInsertionEffect(create36, deps) {
+      return updateEffectImpl(4, 2, create36, deps);
     }
-    function updateLayoutEffect(create35, deps) {
-      return updateEffectImpl(4, 4, create35, deps);
+    function updateLayoutEffect(create36, deps) {
+      return updateEffectImpl(4, 4, create36, deps);
     }
-    function imperativeHandleEffect(create35, ref) {
+    function imperativeHandleEffect(create36, ref) {
       if ("function" === typeof ref) {
-        create35 = create35();
-        var refCleanup = ref(create35);
+        create36 = create36();
+        var refCleanup = ref(create36);
         return function() {
           "function" === typeof refCleanup ? refCleanup() : ref(null);
         };
       }
       if (null !== ref && void 0 !== ref)
-        return create35 = create35(), ref.current = create35, function() {
+        return create36 = create36(), ref.current = create36, function() {
           ref.current = null;
         };
     }
-    function updateImperativeHandle(ref, create35, deps) {
+    function updateImperativeHandle(ref, create36, deps) {
       deps = null !== deps && void 0 !== deps ? deps.concat([ref]) : null;
-      updateEffectImpl(4, 4, imperativeHandleEffect.bind(null, create35, ref), deps);
+      updateEffectImpl(4, 4, imperativeHandleEffect.bind(null, create36, ref), deps);
     }
     function mountDebugValue() {
     }
@@ -5197,20 +5197,20 @@ var require_react_dom_client_production = __commonJS({
       },
       useContext: readContext,
       useEffect: mountEffect,
-      useImperativeHandle: function(ref, create35, deps) {
+      useImperativeHandle: function(ref, create36, deps) {
         deps = null !== deps && void 0 !== deps ? deps.concat([ref]) : null;
         mountEffectImpl(
           4194308,
           4,
-          imperativeHandleEffect.bind(null, create35, ref),
+          imperativeHandleEffect.bind(null, create36, ref),
           deps
         );
       },
-      useLayoutEffect: function(create35, deps) {
-        return mountEffectImpl(4194308, 4, create35, deps);
+      useLayoutEffect: function(create36, deps) {
+        return mountEffectImpl(4194308, 4, create36, deps);
       },
-      useInsertionEffect: function(create35, deps) {
-        mountEffectImpl(4, 2, create35, deps);
+      useInsertionEffect: function(create36, deps) {
+        mountEffectImpl(4, 2, create36, deps);
       },
       useMemo: function(nextCreate, deps) {
         var hook = mountWorkInProgressHook();
@@ -7238,8 +7238,8 @@ var require_react_dom_client_production = __commonJS({
           do {
             if ((updateQueue.tag & flags) === flags) {
               lastEffect = void 0;
-              var create35 = updateQueue.create, inst = updateQueue.inst;
-              lastEffect = create35();
+              var create36 = updateQueue.create, inst = updateQueue.inst;
+              lastEffect = create36();
               inst.destroy = lastEffect;
             }
             updateQueue = updateQueue.next;
@@ -13186,8 +13186,8 @@ var require_middleware = __commonJS({
       return initialState2;
     };
     var subscribeWithSelector = subscribeWithSelectorImpl;
-    function combine(initialState2, create35) {
-      return (...args) => Object.assign({}, initialState2, create35(...args));
+    function combine(initialState2, create36) {
+      return (...args) => Object.assign({}, initialState2, create36(...args));
     }
     function createJSONStorage(getStorage, options) {
       let storage;
@@ -14297,6 +14297,15 @@ function writeJson(key2, value) {
   } catch {
   }
 }
+function resolveHomeSourceEmbedUrlForShim(url) {
+  const trimmed = url.trim();
+  if (!trimmed) return trimmed;
+  if (window.GRARF_WEB_CONFIG?.homeSourceEmbedProxy === true) {
+    return `/api/home-source-embed?url=${encodeURIComponent(trimmed)}`;
+  }
+  const base = window.GRARF_WEB_CONFIG?.operationalIngestUrl?.trim().replace(/\/+$/, "") ?? "https://grarf-operational-service.grarf.workers.dev";
+  return `${base}/home-source-embed?url=${encodeURIComponent(trimmed)}`;
+}
 function createWebviewElement() {
   const host = document.createElement("div");
   host.setAttribute("data-grarf-webview", "");
@@ -14335,12 +14344,27 @@ function createWebviewElement() {
     }
     return loaded;
   };
-  const dispatchFrameEvent = (type, url) => {
-    const ev = new Event(type);
+  const dispatchFrameEvent = (type, url, cancelable = false) => {
+    const ev = new Event(type, { cancelable });
     ev.isMainFrame = true;
     if (url) ev.url = url;
     host.dispatchEvent(ev);
+    return ev;
   };
+  const onEmbedNavigateMessage = (event) => {
+    if (event.source !== iframe.contentWindow) return;
+    const data2 = event.data;
+    if (!data2 || data2.type !== "grarf-home-embed-navigate") return;
+    const nextUrl = data2.url?.trim() ?? "";
+    if (!nextUrl) return;
+    const willNavigate = dispatchFrameEvent("will-navigate", nextUrl, true);
+    if (willNavigate.defaultPrevented) return;
+    const embedSrc = resolveHomeSourceEmbedUrlForShim(nextUrl);
+    if (embedSrc && iframe.src !== embedSrc) {
+      iframe.src = embedSrc;
+    }
+  };
+  window.addEventListener("message", onEmbedNavigateMessage);
   const probeGuestUrl = async () => {
     try {
       const href = await iframe.contentWindow?.eval("window.location.href");
@@ -14373,6 +14397,19 @@ function createWebviewElement() {
   });
   const webview = host;
   webview.getURL = () => cachedGuestUrl || iframe.src;
+  webview.canGoBack = () => {
+    try {
+      return (iframe.contentWindow?.history.length ?? 0) > 1;
+    } catch {
+      return false;
+    }
+  };
+  webview.goBack = () => {
+    try {
+      iframe.contentWindow?.history.back();
+    } catch {
+    }
+  };
   webview.executeJavaScript = async (code) => {
     try {
       return iframe.contentWindow?.eval(code) ?? null;
@@ -32050,9 +32087,18 @@ function useGlobalHeaderNewsTickerItems() {
 
 // ../grarf/desktop/src/components/shell/GlobalHeaderNewsTicker.tsx
 var import_jsx_runtime11 = __toESM(require_jsx_runtime(), 1);
-var TICKER_PX_PER_SEC = 35;
-var TICKER_DURATION_MIN_SEC = 21;
 var TICKER_FEED_LABEL_WIDTH_PX = 52;
+var FIT_HOLD_MS = 8e3;
+var OVERFLOW_INITIAL_HOLD_MS = 4e3;
+var OVERFLOW_END_HOLD_MS = 3e3;
+var EXIT_MS = 300;
+var ENTER_MS = 340;
+var SCROLL_PX_PER_SEC = 32;
+var OVERFLOW_EPSILON_PX = 1;
+function computeScrollDurationMs(distancePx) {
+  const ms2 = distancePx / SCROLL_PX_PER_SEC * 1e3;
+  return Math.round(Math.min(12e3, Math.max(2e3, ms2)));
+}
 function GlobalHeaderTickerFeedLabel() {
   return /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(
     "div",
@@ -32069,55 +32115,100 @@ function GlobalHeaderTickerFeedLabel() {
     }
   );
 }
-function GlobalHeaderTickerSegment({
-  items,
-  className,
-  "aria-hidden": ariaHidden
-}) {
-  const unavailable = isGlobalHeaderTickerUnavailable(items);
-  return /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(
-    "div",
-    {
-      className: cn2(
-        "flex shrink-0 items-center whitespace-nowrap px-3 font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-[#c8e8e8]",
-        className
-      ),
-      "aria-hidden": ariaHidden,
-      children: items.map((item, index) => /* @__PURE__ */ (0, import_jsx_runtime11.jsxs)("span", { className: "flex shrink-0 items-center", children: [
-        index > 0 ? /* @__PURE__ */ (0, import_jsx_runtime11.jsx)("span", { className: "mx-3 shrink-0 text-[#4a6a6a]", "aria-hidden": true, children: "\u2022" }) : null,
-        !unavailable && item.url ? /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(
-          "a",
-          {
-            href: item.url,
-            target: "_blank",
-            rel: "noopener noreferrer",
-            className: "shrink-0 transition hover:text-white",
-            children: item.title
-          }
-        ) : /* @__PURE__ */ (0, import_jsx_runtime11.jsx)("span", { children: item.title })
-      ] }, `${item.url || item.title}-${index}`))
-    }
+function GlobalHeaderTickerHeadline({ item, unavailable, onComplete }) {
+  const viewportRef = (0, import_react15.useRef)(null);
+  const textRef = (0, import_react15.useRef)(null);
+  const [layout, setLayout] = (0, import_react15.useState)(null);
+  const [phase, setPhase] = (0, import_react15.useState)("entering");
+  const [scrollOffset, setScrollOffset] = (0, import_react15.useState)(0);
+  const scrollDurationMs = (0, import_react15.useMemo)(
+    () => layout?.overflows ? computeScrollDurationMs(layout.scrollDistance) : 0,
+    [layout]
   );
+  (0, import_react15.useLayoutEffect)(() => {
+    const viewport = viewportRef.current;
+    const text2 = textRef.current;
+    if (!viewport || !text2) {
+      setLayout({ overflows: false, scrollDistance: 0 });
+      setScrollOffset(0);
+      setPhase("entering");
+      return;
+    }
+    const scrollDistance = Math.max(0, text2.scrollWidth - viewport.clientWidth);
+    const overflows = scrollDistance > OVERFLOW_EPSILON_PX;
+    setLayout({ overflows, scrollDistance: overflows ? scrollDistance : 0 });
+    setScrollOffset(0);
+    setPhase("entering");
+  }, [item.title, item.url]);
+  (0, import_react15.useEffect)(() => {
+    if (!layout) return;
+    const timers = [];
+    const schedule = (fn2, delayMs) => {
+      timers.push(window.setTimeout(fn2, delayMs));
+    };
+    let elapsed = ENTER_MS;
+    if (!layout.overflows) {
+      schedule(() => setPhase("holding"), elapsed);
+      elapsed += FIT_HOLD_MS;
+      schedule(() => setPhase("exiting"), elapsed);
+      elapsed += EXIT_MS;
+      schedule(onComplete, elapsed);
+    } else {
+      schedule(() => setPhase("holding"), elapsed);
+      elapsed += OVERFLOW_INITIAL_HOLD_MS;
+      schedule(() => {
+        setPhase("scrolling");
+        requestAnimationFrame(() => {
+          setScrollOffset(layout.scrollDistance);
+        });
+      }, elapsed);
+      elapsed += scrollDurationMs;
+      schedule(() => setPhase("holdingEnd"), elapsed);
+      elapsed += OVERFLOW_END_HOLD_MS;
+      schedule(() => setPhase("exiting"), elapsed);
+      elapsed += EXIT_MS;
+      schedule(onComplete, elapsed);
+    }
+    return () => {
+      timers.forEach((id) => window.clearTimeout(id));
+    };
+  }, [item.title, item.url, layout, scrollDurationMs, onComplete]);
+  const showEnter = phase === "entering";
+  const showExit = phase === "exiting";
+  const headlineClassName = cn2(
+    "inline-block whitespace-nowrap transition hover:text-white",
+    unavailable || !item.url ? "cursor-default" : void 0
+  );
+  const panStyle = layout?.overflows && scrollOffset > 0 ? {
+    transform: `translateX(-${scrollOffset}px)`,
+    transition: `transform ${scrollDurationMs}ms ease-in-out`
+  } : layout?.overflows ? { transform: "translateX(0)", transition: `transform ${scrollDurationMs}ms ease-in-out` } : void 0;
+  return /* @__PURE__ */ (0, import_jsx_runtime11.jsx)("div", { ref: viewportRef, className: "min-w-0 flex-1 overflow-hidden", children: /* @__PURE__ */ (0, import_jsx_runtime11.jsx)("div", { className: cn2(showEnter && "grarf-ticker-item-enter", showExit && "grarf-ticker-item-exit"), children: /* @__PURE__ */ (0, import_jsx_runtime11.jsx)("div", { className: "inline-block min-w-max", style: panStyle, children: !unavailable && item.url ? /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(
+    "a",
+    {
+      ref: textRef,
+      href: item.url,
+      target: "_blank",
+      rel: "noopener noreferrer",
+      className: headlineClassName,
+      children: item.title
+    }
+  ) : /* @__PURE__ */ (0, import_jsx_runtime11.jsx)("span", { ref: textRef, className: headlineClassName, children: item.title }) }) }) });
 }
 function GlobalHeaderNewsTicker({ className }) {
   const items = useGlobalHeaderNewsTickerItems();
-  const trackRef = (0, import_react15.useRef)(null);
-  const [durationSec, setDurationSec] = (0, import_react15.useState)(56);
-  const loopStartFractionRef = (0, import_react15.useRef)(Math.random());
-  (0, import_react15.useLayoutEffect)(() => {
-    const track = trackRef.current;
-    const segment = track?.firstElementChild;
-    if (!(segment instanceof HTMLElement)) return;
-    const measure = () => {
-      const width = segment.getBoundingClientRect().width;
-      if (width <= 0) return;
-      setDurationSec(Math.max(TICKER_DURATION_MIN_SEC, width / TICKER_PX_PER_SEC));
-    };
-    measure();
-    const observer = typeof ResizeObserver !== "undefined" ? new ResizeObserver(measure) : null;
-    observer?.observe(segment);
-    return () => observer?.disconnect();
-  }, [items]);
+  const n2 = items.length;
+  const [tick, setTick] = (0, import_react15.useState)(0);
+  const unavailable = (0, import_react15.useMemo)(() => isGlobalHeaderTickerUnavailable(items), [items]);
+  (0, import_react15.useEffect)(() => {
+    if (n2 === 0) return;
+    setTick((t2) => t2 % n2);
+  }, [n2]);
+  const advanceHeadline = (0, import_react15.useCallback)(() => {
+    if (n2 === 0) return;
+    setTick((t2) => (t2 + 1) % n2);
+  }, [n2]);
+  const current = n2 > 0 ? items[tick % n2] : null;
   return /* @__PURE__ */ (0, import_jsx_runtime11.jsxs)(
     "div",
     {
@@ -32140,22 +32231,15 @@ function GlobalHeaderNewsTicker({ className }) {
               "aria-hidden": true
             }
           ),
-          /* @__PURE__ */ (0, import_jsx_runtime11.jsxs)(
-            "div",
+          /* @__PURE__ */ (0, import_jsx_runtime11.jsx)("div", { className: "flex h-full min-w-0 items-center px-3 font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-[#c8e8e8]", children: !current ? /* @__PURE__ */ (0, import_jsx_runtime11.jsx)("span", { className: "truncate text-[#6e8585]", children: "FEED \xB7 waiting for headlines\u2026" }) : /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(
+            GlobalHeaderTickerHeadline,
             {
-              ref: trackRef,
-              className: "grarf-global-header-ticker-track flex w-max",
-              style: {
-                ["--global-header-ticker-duration"]: `${durationSec}s`,
-                ["--global-header-ticker-start-fraction"]: String(loopStartFractionRef.current),
-                ["--global-header-ticker-start-delay"]: `-${loopStartFractionRef.current * durationSec}s`
-              },
-              children: [
-                /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(GlobalHeaderTickerSegment, { items }),
-                /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(GlobalHeaderTickerSegment, { items, "aria-hidden": true })
-              ]
-            }
-          )
+              item: current,
+              unavailable,
+              onComplete: advanceHeadline
+            },
+            `${tick}-${current.url || current.title}`
+          ) })
         ] })
       ]
     }
@@ -32297,25 +32381,17 @@ function GlobalAppBar() {
       className: "z-40 grid h-11 shrink-0 grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 border-b border-line bg-[#020404]/98 px-3 font-mono sm:gap-3",
       "aria-label": "Global application bar",
       children: [
-        /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("div", { className: "flex shrink-0 items-center", children: /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(Link, { to: "/", "aria-label": "GRARF home", className: "flex items-center opacity-90 transition hover:opacity-100", children: /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
-          "img",
-          {
-            src: "/grarf_logo-white.png",
-            alt: "GRARF",
-            className: "h-7 w-auto object-contain",
-            draggable: false
-          }
-        ) }) }),
-        /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("div", { className: "relative flex min-w-0 flex-1 items-center px-0.5 sm:px-1", children: paneAlignedFeed ? /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
-          "div",
-          {
-            className: "fixed z-[41] flex h-11 items-center px-0.5 sm:px-1",
-            style: { left: paneAlignedFeed.left, width: paneAlignedFeed.width, top: 0 },
-            children: /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(GlobalHeaderNewsTicker, { className: "w-full max-w-none" })
-          }
-        ) : /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(GlobalHeaderNewsTicker, { className: "w-full max-w-none" }) }),
-        /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)("div", { className: "flex shrink-0 items-center justify-end gap-2 sm:gap-3", children: [
-          isWeb ? /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(GatedFeatureSearchBar, { placeholder: "Search signals, markets, games\u2026" }) : /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)("div", { className: "flex max-w-[220px] items-center border border-line/70 bg-black/40 px-2 py-1", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)("div", { className: "flex shrink-0 items-center gap-2 sm:gap-3", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(Link, { to: "/", "aria-label": "GRARF home", className: "flex items-center opacity-90 transition hover:opacity-100", children: /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
+            "img",
+            {
+              src: "/grarf_logo-white.png",
+              alt: "GRARF",
+              className: "h-7 w-auto object-contain",
+              draggable: false
+            }
+          ) }),
+          isWeb ? /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(GatedFeatureSearchBar, { placeholder: "Search signals, markets, games\u2026", className: "flex-none" }) : /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)("div", { className: "flex max-w-[220px] items-center border border-line/70 bg-black/40 px-2 py-1", children: [
             /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(Search, { size: 11, className: "mr-1.5 shrink-0 text-textdim/70", "aria-hidden": true }),
             /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
               "input",
@@ -32329,7 +32405,17 @@ function GlobalAppBar() {
                 "aria-label": "Search signals, markets, games"
               }
             )
-          ] }),
+          ] })
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("div", { className: "relative flex min-w-0 flex-1 items-center justify-center px-0.5 sm:px-1", children: paneAlignedFeed ? /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
+          "div",
+          {
+            className: "fixed z-[41] flex h-11 w-full items-center justify-center px-0.5 sm:px-1",
+            style: { left: paneAlignedFeed.left, width: paneAlignedFeed.width, top: 0 },
+            children: /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(GlobalHeaderNewsTicker, { className: "mx-auto w-[70.875%] max-w-none shrink-0 flex-none" })
+          }
+        ) : /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(GlobalHeaderNewsTicker, { className: "mx-auto w-[70.875%] max-w-none shrink-0 flex-none" }) }),
+        /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)("div", { className: "flex shrink-0 items-center justify-end gap-2 sm:gap-3", children: [
           /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
             "span",
             {
@@ -59712,9 +59798,33 @@ function homeSourceFocusArticlePartition(url) {
 
 // ../grarf/desktop/src/lib/home/homeSourceWebEmbedUrl.ts
 init_define_import_meta_env();
+init_isGrarfWebRenderer();
+var HOME_SOURCE_EMBED_PROXY_PATH = "/api/home-source-embed";
+var DEFAULT_OPERATIONAL_EMBED_PROXY_BASE = "https://grarf-operational-service.grarf.workers.dev";
+function resolveWebEmbedProxyBase() {
+  if (typeof window === "undefined") return DEFAULT_OPERATIONAL_EMBED_PROXY_BASE;
+  if (window.GRARF_WEB_CONFIG?.homeSourceEmbedProxy === true) {
+    return "";
+  }
+  const fromConfig = window.GRARF_WEB_CONFIG?.operationalIngestUrl?.trim().replace(/\/+$/, "");
+  return fromConfig || DEFAULT_OPERATIONAL_EMBED_PROXY_BASE;
+}
 function resolveHomeSourceEmbedUrl(url) {
   const trimmed = url.trim();
-  return trimmed || url;
+  if (!trimmed) return trimmed;
+  if (isGrarfWebRenderer()) {
+    const proxyBase = resolveWebEmbedProxyBase();
+    if (!proxyBase) {
+      return resolveHomeSourceEmbedProxyUrl(trimmed);
+    }
+    return `${proxyBase}/home-source-embed?url=${encodeURIComponent(trimmed)}`;
+  }
+  return trimmed;
+}
+function resolveHomeSourceEmbedProxyUrl(url) {
+  const trimmed = url.trim();
+  if (!trimmed) return trimmed;
+  return `${HOME_SOURCE_EMBED_PROXY_PATH}?url=${encodeURIComponent(trimmed)}`;
 }
 
 // ../grarf/desktop/src/lib/home/homeSourceFocusArticleNavigation.ts
@@ -59927,9 +60037,6 @@ function attachArticleSelectionListeners(listenerKey, wv, onArticleRoute) {
     window.removeEventListener("message", onEmbedNavigateMessage);
   });
 }
-function cardArticleListenerKey(sessionKey) {
-  return `${sessionKey}::card`;
-}
 function focusArticleRouteHandler(sessionKey) {
   return (articleUrl) => {
     useHomeSourceFocusStore.getState().setSelectedArticle(sessionKey, articleUrl);
@@ -59971,12 +60078,6 @@ function acquireHomeSourceCardWebview(sessionKey, host, embedSrc, partition) {
 function registerHomeSourceCardHost(sessionKey, host) {
   if (host) cardHosts.set(sessionKey, host);
   else cardHosts.delete(sessionKey);
-}
-function bindHomeSourceCardArticleNavigation(sessionKey, wv, onArticleNavigate) {
-  const listenerKey = cardArticleListenerKey(sessionKey);
-  detachArticleSelectionListeners(listenerKey);
-  if (!wv || !onArticleNavigate) return;
-  attachArticleSelectionListeners(listenerKey, wv, onArticleNavigate);
 }
 function resolveEntryUrl(sessionKey, fallbackUrl) {
   const card = cardWebviews.get(sessionKey);
@@ -60036,57 +60137,269 @@ function releaseHomeSourceFocusWebview(sessionKey) {
   returnBorrowedCardWebview(sessionKey);
 }
 
+// ../grarf/desktop/src/lib/home/homeSourcePaneSplitSession.ts
+init_define_import_meta_env();
+var splitWebviews = /* @__PURE__ */ new Map();
+var splitListenerCleanups = /* @__PURE__ */ new Map();
+var WEBVIEW_PREFS2 = "contextIsolation=yes,nodeIntegration=no,javascript=yes";
+var WEBVIEW_CLASS2 = "absolute inset-0 h-full w-full border-0";
+function readWebviewUrl2(wv) {
+  return readHomeSourceWebviewUrl(wv);
+}
+function probeWebviewUrl2(wv) {
+  return probeHomeSourceWebviewUrl(wv);
+}
+function webviewOwnsEmbedNavigateMessage2(wv, event) {
+  const iframe = wv.querySelector?.("iframe");
+  if (!iframe?.contentWindow) return true;
+  return event.source === iframe.contentWindow;
+}
+function isHomeSourcePaneSplitCandidate(sourceUrl, nextUrl) {
+  if (!isHomeSourceArticleCandidateUrl(nextUrl)) return false;
+  if (isSameDocumentHomeSourceNavigation(sourceUrl, nextUrl)) return false;
+  return true;
+}
+function restoreSourceSurface2(wv, sourceLockUrl) {
+  if (!sourceLockUrl) return;
+  queueMicrotask(() => {
+    const current = readWebviewUrl2(wv);
+    if (isSameDocumentHomeSourceNavigation(sourceLockUrl, current)) return;
+    try {
+      if (wv.canGoBack?.()) {
+        wv.goBack?.();
+        return;
+      }
+    } catch {
+    }
+    try {
+      if (readWebviewUrl2(wv) !== sourceLockUrl) {
+        wv.src = sourceLockUrl;
+      }
+    } catch {
+      wv.src = sourceLockUrl;
+    }
+  });
+}
+function openSplitFromSource(wv, sourceLockUrl, destinationUrl, restoreSource, onSplitOpen) {
+  if (!isHomeSourcePaneSplitCandidate(sourceLockUrl, destinationUrl)) return;
+  onSplitOpen(destinationUrl);
+  if (restoreSource) restoreSourceSurface2(wv, sourceLockUrl);
+}
+function attachPaneSplitNavigationListeners(listenerKey, wv, onSplitOpen) {
+  splitListenerCleanups.get(listenerKey)?.();
+  const sourceLock = { url: "" };
+  let allowMainFrameNavigation = true;
+  const initialUrl = readWebviewUrl2(wv);
+  if (initialUrl && initialUrl !== "about:blank") {
+    sourceLock.url = initialUrl;
+    allowMainFrameNavigation = false;
+  }
+  const onDidFinishLoad = (event) => {
+    const e2 = event;
+    if (e2.isMainFrame === false) return;
+    void (async () => {
+      const loaded = await probeWebviewUrl2(wv);
+      if (!loaded || loaded === "about:blank") return;
+      if (!allowMainFrameNavigation && sourceLock.url) {
+        if (isHomeSourcePaneSplitCandidate(sourceLock.url, loaded)) {
+          openSplitFromSource(wv, sourceLock.url, loaded, true, onSplitOpen);
+          return;
+        }
+      }
+      sourceLock.url = loaded;
+      allowMainFrameNavigation = false;
+    })();
+  };
+  const onEmbedNavigateMessage = (event) => {
+    const data2 = event.data;
+    if (!data2 || data2.type !== "grarf-home-embed-navigate") return;
+    if (!webviewOwnsEmbedNavigateMessage2(wv, event)) return;
+    const nextUrl = data2.url?.trim() ?? "";
+    if (!nextUrl || !sourceLock.url || allowMainFrameNavigation) return;
+    if (isSameDocumentHomeSourceNavigation(sourceLock.url, nextUrl)) return;
+    openSplitFromSource(wv, sourceLock.url, nextUrl, false, onSplitOpen);
+  };
+  const onWillNavigate = (event) => {
+    const e2 = event;
+    if (e2.isMainFrame === false) return;
+    const nextUrl = e2.url?.trim() ?? "";
+    if (!nextUrl) return;
+    if (allowMainFrameNavigation) return;
+    if (!sourceLock.url) return;
+    if (isSameDocumentHomeSourceNavigation(sourceLock.url, nextUrl)) return;
+    event.preventDefault();
+    openSplitFromSource(wv, sourceLock.url, nextUrl, false, onSplitOpen);
+  };
+  const onNewWindow = (event) => {
+    const e2 = event;
+    const nextUrl = e2.url?.trim() ?? "";
+    if (!nextUrl || !sourceLock.url) return;
+    event.preventDefault();
+    openSplitFromSource(wv, sourceLock.url, nextUrl, false, onSplitOpen);
+  };
+  const onDidNavigateInPage = (event) => {
+    const e2 = event;
+    if (e2.isMainFrame === false) return;
+    if (allowMainFrameNavigation || !sourceLock.url) return;
+    const nextUrl = e2.url?.trim() ?? readWebviewUrl2(wv);
+    if (!nextUrl) return;
+    if (isSameDocumentHomeSourceNavigation(sourceLock.url, nextUrl)) return;
+    openSplitFromSource(wv, sourceLock.url, nextUrl, true, onSplitOpen);
+  };
+  const onDidNavigate = (event) => {
+    const e2 = event;
+    if (e2.isMainFrame === false) return;
+    if (allowMainFrameNavigation || !sourceLock.url) return;
+    const nextUrl = e2.url?.trim() ?? readWebviewUrl2(wv);
+    if (!nextUrl) return;
+    if (isSameDocumentHomeSourceNavigation(sourceLock.url, nextUrl)) return;
+    openSplitFromSource(wv, sourceLock.url, nextUrl, true, onSplitOpen);
+  };
+  wv.addEventListener("did-finish-load", onDidFinishLoad);
+  wv.addEventListener("will-navigate", onWillNavigate);
+  wv.addEventListener("new-window", onNewWindow);
+  wv.addEventListener("did-navigate-in-page", onDidNavigateInPage);
+  wv.addEventListener("did-navigate", onDidNavigate);
+  window.addEventListener("message", onEmbedNavigateMessage);
+  splitListenerCleanups.set(listenerKey, () => {
+    wv.removeEventListener("did-finish-load", onDidFinishLoad);
+    wv.removeEventListener("will-navigate", onWillNavigate);
+    wv.removeEventListener("new-window", onNewWindow);
+    wv.removeEventListener("did-navigate-in-page", onDidNavigateInPage);
+    wv.removeEventListener("did-navigate", onDidNavigate);
+    window.removeEventListener("message", onEmbedNavigateMessage);
+  });
+}
+function paneSplitListenerKey(sessionKey) {
+  return `${sessionKey}::pane-split-left`;
+}
+function bindHomeSourcePaneSplitNavigation(sessionKey, wv, onSplitOpen) {
+  const listenerKey = paneSplitListenerKey(sessionKey);
+  splitListenerCleanups.get(listenerKey)?.();
+  if (!wv || !onSplitOpen) return;
+  attachPaneSplitNavigationListeners(listenerKey, wv, onSplitOpen);
+}
+function acquireHomeSourceSplitWebview(sessionKey, host, destinationUrl, partition) {
+  const embedSrc = resolveHomeSourceEmbedUrl(destinationUrl);
+  let wv = splitWebviews.get(sessionKey);
+  if (!wv) {
+    wv = document.createElement("webview");
+    wv.partition = partition;
+    wv.setAttribute("webpreferences", WEBVIEW_PREFS2);
+    wv.className = WEBVIEW_CLASS2;
+    splitWebviews.set(sessionKey, wv);
+  }
+  if (embedSrc && readWebviewUrl2(wv) !== embedSrc) {
+    wv.src = embedSrc;
+  }
+  if (wv.parentElement !== host) {
+    host.appendChild(wv);
+  }
+  return wv;
+}
+function detachHomeSourceSplitWebview(sessionKey) {
+  splitWebviews.get(sessionKey)?.remove();
+  splitWebviews.delete(sessionKey);
+}
+function releaseHomeSourceSplitWebview(sessionKey) {
+  detachHomeSourceSplitWebview(sessionKey);
+  const listenerKey = paneSplitListenerKey(sessionKey);
+  splitListenerCleanups.get(listenerKey)?.();
+  splitListenerCleanups.delete(listenerKey);
+}
+
 // ../grarf/desktop/src/components/homeMvp/HomeSourceWebPane.tsx
 init_isGrarfWebRenderer();
+
+// ../grarf/desktop/src/store/homeSourcePaneSplitStore.ts
+init_define_import_meta_env();
+var import_zustand31 = __toESM(require_zustand(), 1);
+var useHomeSourcePaneSplitStore = (0, import_zustand31.create)((set) => ({
+  splitUrlBySession: {},
+  setSplitUrl: (sessionKey, url) => set((state3) => ({
+    splitUrlBySession: {
+      ...state3.splitUrlBySession,
+      [sessionKey]: url
+    }
+  })),
+  clearSplitUrl: (sessionKey) => set((state3) => {
+    const splitUrlBySession = { ...state3.splitUrlBySession };
+    delete splitUrlBySession[sessionKey];
+    return { splitUrlBySession };
+  })
+}));
+
+// ../grarf/desktop/src/components/homeMvp/HomeSourceWebPane.tsx
 var import_jsx_runtime97 = __toESM(require_jsx_runtime(), 1);
 function HomeSourceWebPane({
   source,
   sessionKey,
   mountWebview = true,
   className,
-  onArticleNavigate,
   onFullscreen
 }) {
-  const embedHostRef = (0, import_react104.useRef)(null);
-  const onArticleNavigateRef = (0, import_react104.useRef)(onArticleNavigate);
-  onArticleNavigateRef.current = onArticleNavigate;
+  const leftHostRef = (0, import_react104.useRef)(null);
+  const rightHostRef = (0, import_react104.useRef)(null);
   const hasEmbedUrl = Boolean(source.url?.trim());
   const showEmbed = mountWebview && hasEmbedUrl;
   const isBorrowed = useHomeSourceFocusStore(
     (state3) => state3.borrowedCardWebviewKeys[sessionKey] ?? false
   );
-  const partition = (0, import_react104.useMemo)(() => {
+  const splitUrl = useHomeSourcePaneSplitStore(
+    (state3) => state3.splitUrlBySession[sessionKey] ?? null
+  );
+  const setSplitUrl = useHomeSourcePaneSplitStore((state3) => state3.setSplitUrl);
+  const clearSplitUrl = useHomeSourcePaneSplitStore((state3) => state3.clearSplitUrl);
+  const sourcePartition = (0, import_react104.useMemo)(() => {
     if (!hasEmbedUrl) return "persist:grarf-home-generic";
     return homeSourceWebPartition(source.url);
   }, [source.url, hasEmbedUrl]);
+  const splitPartition = (0, import_react104.useMemo)(() => {
+    if (!splitUrl) return sourcePartition;
+    return homeSourceWebPartition(splitUrl);
+  }, [splitUrl, sourcePartition]);
   const embedSrc = resolveHomeSourceEmbedUrl(source.url);
+  const splitActive = Boolean(splitUrl);
+  const onSplitOpen = (0, import_react104.useCallback)(
+    (destinationUrl) => {
+      setSplitUrl(sessionKey, destinationUrl);
+    },
+    [sessionKey, setSplitUrl]
+  );
   (0, import_react104.useEffect)(() => {
     if (!showEmbed) return;
     void window.grarf?.workspaceEmbedClear?.("center");
     void window.grarf?.workspaceEmbedClear?.("centerChild");
   }, [showEmbed]);
+  (0, import_react104.useEffect)(() => {
+    return () => {
+      clearSplitUrl(sessionKey);
+      releaseHomeSourceSplitWebview(sessionKey);
+    };
+  }, [sessionKey, clearSplitUrl]);
   (0, import_react104.useLayoutEffect)(() => {
-    const host = embedHostRef.current;
-    if (!showEmbed || !host) {
+    const host = leftHostRef.current;
+    if (!showEmbed || !host || isBorrowed) {
       registerHomeSourceCardHost(sessionKey, null);
-      bindHomeSourceCardArticleNavigation(sessionKey, null, void 0);
+      bindHomeSourcePaneSplitNavigation(sessionKey, null, void 0);
       return;
     }
     registerHomeSourceCardHost(sessionKey, host);
-    const routeArticle = (articleUrl) => {
-      onArticleNavigateRef.current?.(articleUrl);
-    };
-    if (!isBorrowed) {
-      const wv = acquireHomeSourceCardWebview(sessionKey, host, embedSrc, partition);
-      bindHomeSourceCardArticleNavigation(sessionKey, wv, routeArticle);
-    } else {
-      bindHomeSourceCardArticleNavigation(sessionKey, null, void 0);
-    }
+    const wv = acquireHomeSourceCardWebview(sessionKey, host, embedSrc, sourcePartition);
+    bindHomeSourcePaneSplitNavigation(sessionKey, wv, onSplitOpen);
     return () => {
       registerHomeSourceCardHost(sessionKey, null);
-      bindHomeSourceCardArticleNavigation(sessionKey, null, void 0);
+      bindHomeSourcePaneSplitNavigation(sessionKey, null, void 0);
     };
-  }, [sessionKey, showEmbed, embedSrc, partition, isBorrowed]);
+  }, [sessionKey, showEmbed, embedSrc, sourcePartition, isBorrowed, onSplitOpen]);
+  (0, import_react104.useLayoutEffect)(() => {
+    const host = rightHostRef.current;
+    if (!showEmbed || !splitUrl || !host) {
+      detachHomeSourceSplitWebview(sessionKey);
+      return;
+    }
+    acquireHomeSourceSplitWebview(sessionKey, host, splitUrl, splitPartition);
+  }, [sessionKey, showEmbed, splitUrl, splitPartition]);
   const isWebRenderer = isGrarfWebRenderer();
   return /* @__PURE__ */ (0, import_jsx_runtime97.jsxs)(
     "div",
@@ -60112,6 +60425,8 @@ function HomeSourceWebPane({
                 type: "button",
                 onClick: (event) => {
                   event.stopPropagation();
+                  clearSplitUrl(sessionKey);
+                  detachHomeSourceSplitWebview(sessionKey);
                   onFullscreen();
                 },
                 "aria-label": `Full screen ${source.label}`,
@@ -60121,13 +60436,31 @@ function HomeSourceWebPane({
             ) : void 0
           }
         ),
-        /* @__PURE__ */ (0, import_jsx_runtime97.jsx)("div", { className: cn2(PANE_CONTENT_CONTAIN, "relative min-h-0 flex-1 bg-black"), children: /* @__PURE__ */ (0, import_jsx_runtime97.jsx)(
+        /* @__PURE__ */ (0, import_jsx_runtime97.jsxs)(
           "div",
           {
-            ref: embedHostRef,
-            className: cn2(PANE_EMBED_HOST, "h-full w-full", isBorrowed && PANE_EMBED_ABSOLUTE_FILL)
+            className: cn2(
+              PANE_CONTENT_CONTAIN,
+              "relative min-h-0 flex-1 bg-black",
+              splitActive && "grid grid-cols-[35%_65%]"
+            ),
+            children: [
+              /* @__PURE__ */ (0, import_jsx_runtime97.jsx)(
+                "div",
+                {
+                  ref: leftHostRef,
+                  className: cn2(
+                    PANE_EMBED_HOST,
+                    "relative min-h-0 min-w-0",
+                    splitActive && "border-r border-line/80",
+                    isBorrowed && PANE_EMBED_ABSOLUTE_FILL
+                  )
+                }
+              ),
+              splitActive ? /* @__PURE__ */ (0, import_jsx_runtime97.jsx)("div", { ref: rightHostRef, className: cn2(PANE_EMBED_HOST, "relative min-h-0 min-w-0 bg-[#020506]") }) : null
+            ]
           }
-        ) })
+        )
       ]
     }
   );
@@ -60135,7 +60468,7 @@ function HomeSourceWebPane({
 
 // ../grarf/desktop/src/components/homeMvp/HomeLeagueStackSection.tsx
 var import_jsx_runtime98 = __toESM(require_jsx_runtime(), 1);
-var HomeLeagueStackSection = (0, import_react105.forwardRef)(function HomeLeagueStackSection2({ section, mountWebviews = true, onSourceArticleNavigate, onSourceFullscreen }, ref) {
+var HomeLeagueStackSection = (0, import_react105.forwardRef)(function HomeLeagueStackSection2({ section, mountWebviews = true, onSourceFullscreen }, ref) {
   const isWebRenderer = isGrarfWebRenderer();
   return /* @__PURE__ */ (0, import_jsx_runtime98.jsx)(
     "section",
@@ -60149,7 +60482,6 @@ var HomeLeagueStackSection = (0, import_react105.forwardRef)(function HomeLeague
           sessionKey: `${section.id}-${source.id}`,
           source,
           mountWebview: mountWebviews,
-          onArticleNavigate: onSourceArticleNavigate && source.url?.trim() ? (articleUrl) => onSourceArticleNavigate(section.id, source, articleUrl) : void 0,
           onFullscreen: onSourceFullscreen && source.url?.trim() ? () => onSourceFullscreen(section.id, source) : void 0
         },
         `${section.id}-${source.id}`
@@ -60160,7 +60492,7 @@ var HomeLeagueStackSection = (0, import_react105.forwardRef)(function HomeLeague
 
 // ../grarf/desktop/src/components/homeMvp/HomeSourceCardsSurface.tsx
 var import_jsx_runtime99 = __toESM(require_jsx_runtime(), 1);
-function HomeSourceCardsSurface({ className, onSourceArticleNavigate, onSourceFullscreen }) {
+function HomeSourceCardsSurface({ className, onSourceFullscreen }) {
   const { activeSection } = useHomeActiveLeagueContext();
   const liveSubmenuId = useHomeLiveSubmenuStore((s2) => s2.activeId);
   const liveLeagueSubmenuId = useHomeLiveLeagueSubmenuStore((s2) => s2.activeId);
@@ -60190,7 +60522,6 @@ function HomeSourceCardsSurface({ className, onSourceArticleNavigate, onSourceFu
         {
           section,
           mountWebviews: true,
-          onSourceArticleNavigate,
           onSourceFullscreen
         },
         `${section.id}-${liveSubmenuId}-${liveLeagueSubmenuId}-${liveMotorsportsSubmenuId ?? "parent"}`
@@ -62149,16 +62480,29 @@ var SOCCER_COUNTRY_ABBREV_BY_NAME = {
   "dr congo": "COD",
   "democratic republic of congo": "COD"
 };
+var SOCCER_COUNTRY_ABBREV_BY_CODE = Object.fromEntries(
+  [...new Set(Object.values(SOCCER_COUNTRY_ABBREV_BY_NAME))].map((abbrev) => [
+    abbrev.toLowerCase(),
+    abbrev
+  ])
+);
+var SOCCER_COUNTRY_LOOKUP = {
+  ...SOCCER_COUNTRY_ABBREV_BY_NAME,
+  ...SOCCER_COUNTRY_ABBREV_BY_CODE,
+  /** ESPN sometimes uses MOR; FIFA code is MAR. */
+  mor: "MAR"
+};
 function normalizeCountryLookupKey(name) {
   return name.trim().replace(/\s+/g, " ").toLowerCase();
 }
 function resolveSoccerCountryAbbrev(teamName) {
   const key2 = normalizeCountryLookupKey(teamName);
   if (!key2) return void 0;
-  const direct = SOCCER_COUNTRY_ABBREV_BY_NAME[key2];
+  const direct = SOCCER_COUNTRY_LOOKUP[key2];
   if (direct) return direct;
   for (const [country, abbrev] of Object.entries(SOCCER_COUNTRY_ABBREV_BY_NAME)) {
-    if (key2.includes(country) || country.includes(key2)) return abbrev;
+    if (key2.includes(country)) return abbrev;
+    if (key2.length >= 4 && country.includes(key2)) return abbrev;
   }
   return void 0;
 }
@@ -62229,8 +62573,9 @@ function resolveSportscapeTeamIdentity(input) {
   const teamName = input.teamName.trim();
   const sport = input.sport;
   let abbrev = input.abbrev?.trim().toUpperCase();
-  if (!abbrev && sport === "soccer") {
-    abbrev = resolveSoccerCountryAbbrev(teamName);
+  if (sport === "soccer") {
+    const fromName = resolveSoccerCountryAbbrev(teamName);
+    if (fromName) abbrev = fromName;
   }
   if (!abbrev) {
     const liveTrackSport = resolveLiveTrackSport(sport);
@@ -64521,7 +64866,7 @@ var import_react117 = __toESM(require_react(), 1);
 
 // ../grarf/desktop/src/store/mlbAllGamesHighlightStore.ts
 init_define_import_meta_env();
-var import_zustand31 = __toESM(require_zustand(), 1);
+var import_zustand32 = __toESM(require_zustand(), 1);
 
 // ../grarf/desktop/src/lib/youtubeAllGamesHighlight.ts
 init_define_import_meta_env();
@@ -64695,7 +65040,7 @@ function stickyDisplayHighlight(authoritative) {
   return null;
 }
 var loadInFlight = null;
-var useMlbAllGamesHighlightStore = (0, import_zustand31.create)((set, get) => {
+var useMlbAllGamesHighlightStore = (0, import_zustand32.create)((set, get) => {
   const cached = readCachedHighlight();
   const initialDisplay = stickyDisplayHighlight(cached);
   if (cached) {
@@ -65277,7 +65622,7 @@ var import_react120 = __toESM(require_react(), 1);
 
 // ../grarf/desktop/src/store/mlbMorningLineupHighlightStore.ts
 init_define_import_meta_env();
-var import_zustand32 = __toESM(require_zustand(), 1);
+var import_zustand33 = __toESM(require_zustand(), 1);
 
 // ../grarf/desktop/src/lib/youtubeMorningLineupHighlight.ts
 init_define_import_meta_env();
@@ -65440,7 +65785,7 @@ function writeCachedHighlight2(item) {
   }
 }
 var loadInFlight2 = null;
-var useMlbMorningLineupHighlightStore = (0, import_zustand32.create)((set, get) => {
+var useMlbMorningLineupHighlightStore = (0, import_zustand33.create)((set, get) => {
   const cached = readCachedHighlight2();
   const loadHighlight = async () => {
     if (loadInFlight2) return loadInFlight2;
@@ -65868,6 +66213,28 @@ function buildAiBriefSummaryLines(params) {
   }));
 }
 
+// ../grarf/desktop/src/lib/sportscape/resolveSportscapeHeadlinesSourceLogoUrl.ts
+init_define_import_meta_env();
+var LOCAL_SOURCE_LOGOS = {
+  espn: "/league-logos/channel-espn.png",
+  cbs: "/league-logos/channel-cbs-sports.png",
+  fox: "/league-logos/channel-fox.png",
+  athletic: "/league-logos/source-the-athletic.png"
+};
+var FAVICON_PUBLISHER_URL_BY_SOURCE = {
+  yahoo: "https://sports.yahoo.com/",
+  si: "https://www.si.com/",
+  nbc: "https://www.nbcsports.com/",
+  yardbarker: "https://www.yardbarker.com/"
+};
+function resolveSportscapeHeadlinesSourceLogoUrl(sourceId) {
+  const local = LOCAL_SOURCE_LOGOS[sourceId];
+  if (local) return local;
+  const publisherUrl = FAVICON_PUBLISHER_URL_BY_SOURCE[sourceId];
+  if (!publisherUrl) return void 0;
+  return resolveWebsiteFaviconUrl(publisherUrl) ?? void 0;
+}
+
 // ../grarf/desktop/src/components/homeMvp/HomeSportscapeHeadlinesRow.tsx
 var import_jsx_runtime106 = __toESM(require_jsx_runtime(), 1);
 var SOURCE_BLOCK_WIDTH_CLASS = "w-[19.5rem] shrink-0";
@@ -65975,6 +66342,28 @@ function HeadlinesSourceBlockBullets({
     }
   );
 }
+function SportscapeHeadlinesSourceLogo({ sourceId }) {
+  const logoUrl = (0, import_react123.useMemo)(() => resolveSportscapeHeadlinesSourceLogoUrl(sourceId), [sourceId]);
+  const [failed, setFailed] = (0, import_react123.useState)(false);
+  if (!logoUrl || failed) {
+    return /* @__PURE__ */ (0, import_jsx_runtime106.jsx)("span", { className: "h-1 w-1 shrink-0 rounded-full bg-textdim/55", "aria-hidden": true });
+  }
+  return /* @__PURE__ */ (0, import_jsx_runtime106.jsx)(
+    "img",
+    {
+      src: logoUrl,
+      alt: "",
+      width: 16,
+      height: 16,
+      loading: "lazy",
+      decoding: "async",
+      referrerPolicy: "no-referrer",
+      onError: () => setFailed(true),
+      className: "h-4 w-4 shrink-0 object-contain",
+      "aria-hidden": true
+    }
+  );
+}
 function HomeSportscapeHeadlinesSourceBlock({
   id,
   label,
@@ -65992,7 +66381,7 @@ function HomeSportscapeHeadlinesSourceBlock({
       "aria-label": label,
       children: [
         /* @__PURE__ */ (0, import_jsx_runtime106.jsxs)("header", { className: "flex h-6 shrink-0 items-center gap-1.5 border-b border-[#24363c]/55 bg-[#020707]/90 px-2", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime106.jsx)("span", { className: "h-1 w-1 shrink-0 rounded-full bg-textdim/55", "aria-hidden": true }),
+          /* @__PURE__ */ (0, import_jsx_runtime106.jsx)(SportscapeHeadlinesSourceLogo, { sourceId: id }),
           /* @__PURE__ */ (0, import_jsx_runtime106.jsx)("span", { className: "truncate text-[8px] font-medium tracking-[0.14em] text-cyansys/85", children: label })
         ] }),
         /* @__PURE__ */ (0, import_jsx_runtime106.jsx)(HeadlinesSourceBlockBullets, { blockId: id, headlines })
@@ -67082,12 +67471,12 @@ function usePaneDragResize({ side, min, max, getWidth, onLiveResize, onCommit })
 
 // ../grarf/desktop/src/store/workspaceLayoutStore.ts
 init_define_import_meta_env();
-var import_zustand33 = __toESM(require_zustand(), 1);
+var import_zustand34 = __toESM(require_zustand(), 1);
 var import_middleware2 = __toESM(require_middleware(), 1);
 function clamp2(n2, min, max) {
   return Math.min(max, Math.max(min, n2));
 }
-var useWorkspaceLayoutStore = (0, import_zustand33.create)()(
+var useWorkspaceLayoutStore = (0, import_zustand34.create)()(
   (0, import_middleware2.persist)(
     (set, get) => ({
       layouts: { ...DEFAULT_PANE_LAYOUTS },
@@ -67972,7 +68361,7 @@ var import_react134 = __toESM(require_react(), 1);
 
 // ../grarf/desktop/src/store/orchestrationExecutionStore.ts
 init_define_import_meta_env();
-var import_zustand34 = __toESM(require_zustand(), 1);
+var import_zustand35 = __toESM(require_zustand(), 1);
 
 // ../grarf/desktop/src/services/orchestrationExecution/orchestrationExecutionEngine.ts
 init_define_import_meta_env();
@@ -68176,7 +68565,7 @@ function getOrchestrationExecutionEngine() {
 }
 
 // ../grarf/desktop/src/store/orchestrationExecutionStore.ts
-var useOrchestrationExecutionStore = (0, import_zustand34.create)(() => {
+var useOrchestrationExecutionStore = (0, import_zustand35.create)(() => {
   const engine = getOrchestrationExecutionEngine();
   return {
     interruptState: engine.getState(),
@@ -70673,15 +71062,6 @@ function HomePage() {
     },
     [isHomeOps, onSelectGame, navigate]
   );
-  const onHomeSourceArticleNavigate = (0, import_react147.useCallback)(
-    (sectionId, source, articleUrl) => {
-      const sessionKey = `${sectionId}-${source.id}`;
-      useHomeSourceFocusStore.getState().setSelectedArticle(sessionKey, articleUrl);
-      clearCenterEmbedForSpineGameSelect();
-      dispatchOverlay({ type: "open", tab: buildHomeSourceFocusTab(sectionId, source) });
-    },
-    []
-  );
   const onHomeSourceFullscreen = (0, import_react147.useCallback)((sectionId, source) => {
     const sessionKey = `${sectionId}-${source.id}`;
     useHomeSourceFocusStore.getState().clearSelectedArticle(sessionKey);
@@ -70719,7 +71099,6 @@ function HomePage() {
               children: /* @__PURE__ */ (0, import_jsx_runtime141.jsx)(
                 HomeSourceCardsSurface,
                 {
-                  onSourceArticleNavigate: onHomeSourceArticleNavigate,
                   onSourceFullscreen: onHomeSourceFullscreen
                 }
               )
