@@ -463,8 +463,8 @@ var require_react_production = __commonJS({
     exports.useDeferredValue = function(value, initialValue) {
       return ReactSharedInternals.H.useDeferredValue(value, initialValue);
     };
-    exports.useEffect = function(create36, deps) {
-      return ReactSharedInternals.H.useEffect(create36, deps);
+    exports.useEffect = function(create35, deps) {
+      return ReactSharedInternals.H.useEffect(create35, deps);
     };
     exports.useEffectEvent = function(callback) {
       return ReactSharedInternals.H.useEffectEvent(callback);
@@ -472,17 +472,17 @@ var require_react_production = __commonJS({
     exports.useId = function() {
       return ReactSharedInternals.H.useId();
     };
-    exports.useImperativeHandle = function(ref, create36, deps) {
-      return ReactSharedInternals.H.useImperativeHandle(ref, create36, deps);
+    exports.useImperativeHandle = function(ref, create35, deps) {
+      return ReactSharedInternals.H.useImperativeHandle(ref, create35, deps);
     };
-    exports.useInsertionEffect = function(create36, deps) {
-      return ReactSharedInternals.H.useInsertionEffect(create36, deps);
+    exports.useInsertionEffect = function(create35, deps) {
+      return ReactSharedInternals.H.useInsertionEffect(create35, deps);
     };
-    exports.useLayoutEffect = function(create36, deps) {
-      return ReactSharedInternals.H.useLayoutEffect(create36, deps);
+    exports.useLayoutEffect = function(create35, deps) {
+      return ReactSharedInternals.H.useLayoutEffect(create35, deps);
     };
-    exports.useMemo = function(create36, deps) {
-      return ReactSharedInternals.H.useMemo(create36, deps);
+    exports.useMemo = function(create35, deps) {
+      return ReactSharedInternals.H.useMemo(create35, deps);
     };
     exports.useOptimistic = function(passthrough, reducer) {
       return ReactSharedInternals.H.useOptimistic(passthrough, reducer);
@@ -546,8 +546,8 @@ var require_react2 = __commonJS({
       Object.assign(useBoundStore, api);
       return useBoundStore;
     };
-    var create36 = ((createState) => createState ? createImpl(createState) : createImpl);
-    exports.create = create36;
+    var create35 = ((createState) => createState ? createImpl(createState) : createImpl);
+    exports.create = create35;
     exports.useStore = useStore;
   }
 });
@@ -4821,43 +4821,43 @@ var require_react_dom_client_production = __commonJS({
       currentStateHook.memoizedState = action;
       return [stateHook, dispatch, false];
     }
-    function pushSimpleEffect(tag, inst, create36, deps) {
-      tag = { tag, create: create36, deps, inst, next: null };
+    function pushSimpleEffect(tag, inst, create35, deps) {
+      tag = { tag, create: create35, deps, inst, next: null };
       inst = currentlyRenderingFiber.updateQueue;
       null === inst && (inst = createFunctionComponentUpdateQueue(), currentlyRenderingFiber.updateQueue = inst);
-      create36 = inst.lastEffect;
-      null === create36 ? inst.lastEffect = tag.next = tag : (deps = create36.next, create36.next = tag, tag.next = deps, inst.lastEffect = tag);
+      create35 = inst.lastEffect;
+      null === create35 ? inst.lastEffect = tag.next = tag : (deps = create35.next, create35.next = tag, tag.next = deps, inst.lastEffect = tag);
       return tag;
     }
     function updateRef() {
       return updateWorkInProgressHook().memoizedState;
     }
-    function mountEffectImpl(fiberFlags, hookFlags, create36, deps) {
+    function mountEffectImpl(fiberFlags, hookFlags, create35, deps) {
       var hook = mountWorkInProgressHook();
       currentlyRenderingFiber.flags |= fiberFlags;
       hook.memoizedState = pushSimpleEffect(
         1 | hookFlags,
         { destroy: void 0 },
-        create36,
+        create35,
         void 0 === deps ? null : deps
       );
     }
-    function updateEffectImpl(fiberFlags, hookFlags, create36, deps) {
+    function updateEffectImpl(fiberFlags, hookFlags, create35, deps) {
       var hook = updateWorkInProgressHook();
       deps = void 0 === deps ? null : deps;
       var inst = hook.memoizedState.inst;
-      null !== currentHook && null !== deps && areHookInputsEqual(deps, currentHook.memoizedState.deps) ? hook.memoizedState = pushSimpleEffect(hookFlags, inst, create36, deps) : (currentlyRenderingFiber.flags |= fiberFlags, hook.memoizedState = pushSimpleEffect(
+      null !== currentHook && null !== deps && areHookInputsEqual(deps, currentHook.memoizedState.deps) ? hook.memoizedState = pushSimpleEffect(hookFlags, inst, create35, deps) : (currentlyRenderingFiber.flags |= fiberFlags, hook.memoizedState = pushSimpleEffect(
         1 | hookFlags,
         inst,
-        create36,
+        create35,
         deps
       ));
     }
-    function mountEffect(create36, deps) {
-      mountEffectImpl(8390656, 8, create36, deps);
+    function mountEffect(create35, deps) {
+      mountEffectImpl(8390656, 8, create35, deps);
     }
-    function updateEffect(create36, deps) {
-      updateEffectImpl(2048, 8, create36, deps);
+    function updateEffect(create35, deps) {
+      updateEffectImpl(2048, 8, create35, deps);
     }
     function useEffectEventImpl(payload) {
       currentlyRenderingFiber.flags |= 4;
@@ -4877,28 +4877,28 @@ var require_react_dom_client_production = __commonJS({
         return ref.impl.apply(void 0, arguments);
       };
     }
-    function updateInsertionEffect(create36, deps) {
-      return updateEffectImpl(4, 2, create36, deps);
+    function updateInsertionEffect(create35, deps) {
+      return updateEffectImpl(4, 2, create35, deps);
     }
-    function updateLayoutEffect(create36, deps) {
-      return updateEffectImpl(4, 4, create36, deps);
+    function updateLayoutEffect(create35, deps) {
+      return updateEffectImpl(4, 4, create35, deps);
     }
-    function imperativeHandleEffect(create36, ref) {
+    function imperativeHandleEffect(create35, ref) {
       if ("function" === typeof ref) {
-        create36 = create36();
-        var refCleanup = ref(create36);
+        create35 = create35();
+        var refCleanup = ref(create35);
         return function() {
           "function" === typeof refCleanup ? refCleanup() : ref(null);
         };
       }
       if (null !== ref && void 0 !== ref)
-        return create36 = create36(), ref.current = create36, function() {
+        return create35 = create35(), ref.current = create35, function() {
           ref.current = null;
         };
     }
-    function updateImperativeHandle(ref, create36, deps) {
+    function updateImperativeHandle(ref, create35, deps) {
       deps = null !== deps && void 0 !== deps ? deps.concat([ref]) : null;
-      updateEffectImpl(4, 4, imperativeHandleEffect.bind(null, create36, ref), deps);
+      updateEffectImpl(4, 4, imperativeHandleEffect.bind(null, create35, ref), deps);
     }
     function mountDebugValue() {
     }
@@ -5197,20 +5197,20 @@ var require_react_dom_client_production = __commonJS({
       },
       useContext: readContext,
       useEffect: mountEffect,
-      useImperativeHandle: function(ref, create36, deps) {
+      useImperativeHandle: function(ref, create35, deps) {
         deps = null !== deps && void 0 !== deps ? deps.concat([ref]) : null;
         mountEffectImpl(
           4194308,
           4,
-          imperativeHandleEffect.bind(null, create36, ref),
+          imperativeHandleEffect.bind(null, create35, ref),
           deps
         );
       },
-      useLayoutEffect: function(create36, deps) {
-        return mountEffectImpl(4194308, 4, create36, deps);
+      useLayoutEffect: function(create35, deps) {
+        return mountEffectImpl(4194308, 4, create35, deps);
       },
-      useInsertionEffect: function(create36, deps) {
-        mountEffectImpl(4, 2, create36, deps);
+      useInsertionEffect: function(create35, deps) {
+        mountEffectImpl(4, 2, create35, deps);
       },
       useMemo: function(nextCreate, deps) {
         var hook = mountWorkInProgressHook();
@@ -7238,8 +7238,8 @@ var require_react_dom_client_production = __commonJS({
           do {
             if ((updateQueue.tag & flags) === flags) {
               lastEffect = void 0;
-              var create36 = updateQueue.create, inst = updateQueue.inst;
-              lastEffect = create36();
+              var create35 = updateQueue.create, inst = updateQueue.inst;
+              lastEffect = create35();
               inst.destroy = lastEffect;
             }
             updateQueue = updateQueue.next;
@@ -13186,8 +13186,8 @@ var require_middleware = __commonJS({
       return initialState2;
     };
     var subscribeWithSelector = subscribeWithSelectorImpl;
-    function combine(initialState2, create36) {
-      return (...args) => Object.assign({}, initialState2, create36(...args));
+    function combine(initialState2, create35) {
+      return (...args) => Object.assign({}, initialState2, create35(...args));
     }
     function createJSONStorage(getStorage, options) {
       let storage;
@@ -14297,15 +14297,6 @@ function writeJson(key2, value) {
   } catch {
   }
 }
-function resolveHomeSourceEmbedUrlForShim(url) {
-  const trimmed = url.trim();
-  if (!trimmed) return trimmed;
-  if (window.GRARF_WEB_CONFIG?.homeSourceEmbedProxy === true) {
-    return `/api/home-source-embed?url=${encodeURIComponent(trimmed)}`;
-  }
-  const base = window.GRARF_WEB_CONFIG?.operationalIngestUrl?.trim().replace(/\/+$/, "") ?? "https://grarf-operational-service.grarf.workers.dev";
-  return `${base}/home-source-embed?url=${encodeURIComponent(trimmed)}`;
-}
 function createWebviewElement() {
   const host = document.createElement("div");
   host.setAttribute("data-grarf-webview", "");
@@ -14344,27 +14335,12 @@ function createWebviewElement() {
     }
     return loaded;
   };
-  const dispatchFrameEvent = (type, url, cancelable = false) => {
-    const ev = new Event(type, { cancelable });
+  const dispatchFrameEvent = (type, url) => {
+    const ev = new Event(type);
     ev.isMainFrame = true;
     if (url) ev.url = url;
     host.dispatchEvent(ev);
-    return ev;
   };
-  const onEmbedNavigateMessage = (event) => {
-    if (event.source !== iframe.contentWindow) return;
-    const data2 = event.data;
-    if (!data2 || data2.type !== "grarf-home-embed-navigate") return;
-    const nextUrl = data2.url?.trim() ?? "";
-    if (!nextUrl) return;
-    const willNavigate = dispatchFrameEvent("will-navigate", nextUrl, true);
-    if (willNavigate.defaultPrevented) return;
-    const embedSrc = resolveHomeSourceEmbedUrlForShim(nextUrl);
-    if (embedSrc && iframe.src !== embedSrc) {
-      iframe.src = embedSrc;
-    }
-  };
-  window.addEventListener("message", onEmbedNavigateMessage);
   const probeGuestUrl = async () => {
     try {
       const href = await iframe.contentWindow?.eval("window.location.href");
@@ -14397,19 +14373,6 @@ function createWebviewElement() {
   });
   const webview = host;
   webview.getURL = () => cachedGuestUrl || iframe.src;
-  webview.canGoBack = () => {
-    try {
-      return (iframe.contentWindow?.history.length ?? 0) > 1;
-    } catch {
-      return false;
-    }
-  };
-  webview.goBack = () => {
-    try {
-      iframe.contentWindow?.history.back();
-    } catch {
-    }
-  };
   webview.executeJavaScript = async (code) => {
     try {
       return iframe.contentWindow?.eval(code) ?? null;
@@ -32090,7 +32053,7 @@ var import_jsx_runtime11 = __toESM(require_jsx_runtime(), 1);
 var TICKER_FEED_LABEL_WIDTH_PX = 52;
 var FIT_HOLD_MS = 8e3;
 var OVERFLOW_INITIAL_HOLD_MS = 4e3;
-var OVERFLOW_END_HOLD_MS = 3e3;
+var OVERFLOW_END_HOLD_MS = 1e3;
 var EXIT_MS = 300;
 var ENTER_MS = 340;
 var SCROLL_PX_PER_SEC = 32;
@@ -59798,33 +59761,9 @@ function homeSourceFocusArticlePartition(url) {
 
 // ../grarf/desktop/src/lib/home/homeSourceWebEmbedUrl.ts
 init_define_import_meta_env();
-init_isGrarfWebRenderer();
-var HOME_SOURCE_EMBED_PROXY_PATH = "/api/home-source-embed";
-var DEFAULT_OPERATIONAL_EMBED_PROXY_BASE = "https://grarf-operational-service.grarf.workers.dev";
-function resolveWebEmbedProxyBase() {
-  if (typeof window === "undefined") return DEFAULT_OPERATIONAL_EMBED_PROXY_BASE;
-  if (window.GRARF_WEB_CONFIG?.homeSourceEmbedProxy === true) {
-    return "";
-  }
-  const fromConfig = window.GRARF_WEB_CONFIG?.operationalIngestUrl?.trim().replace(/\/+$/, "");
-  return fromConfig || DEFAULT_OPERATIONAL_EMBED_PROXY_BASE;
-}
 function resolveHomeSourceEmbedUrl(url) {
   const trimmed = url.trim();
-  if (!trimmed) return trimmed;
-  if (isGrarfWebRenderer()) {
-    const proxyBase = resolveWebEmbedProxyBase();
-    if (!proxyBase) {
-      return resolveHomeSourceEmbedProxyUrl(trimmed);
-    }
-    return `${proxyBase}/home-source-embed?url=${encodeURIComponent(trimmed)}`;
-  }
-  return trimmed;
-}
-function resolveHomeSourceEmbedProxyUrl(url) {
-  const trimmed = url.trim();
-  if (!trimmed) return trimmed;
-  return `${HOME_SOURCE_EMBED_PROXY_PATH}?url=${encodeURIComponent(trimmed)}`;
+  return trimmed || url;
 }
 
 // ../grarf/desktop/src/lib/home/homeSourceFocusArticleNavigation.ts
@@ -60037,6 +59976,9 @@ function attachArticleSelectionListeners(listenerKey, wv, onArticleRoute) {
     window.removeEventListener("message", onEmbedNavigateMessage);
   });
 }
+function cardArticleListenerKey(sessionKey) {
+  return `${sessionKey}::card`;
+}
 function focusArticleRouteHandler(sessionKey) {
   return (articleUrl) => {
     useHomeSourceFocusStore.getState().setSelectedArticle(sessionKey, articleUrl);
@@ -60078,6 +60020,12 @@ function acquireHomeSourceCardWebview(sessionKey, host, embedSrc, partition) {
 function registerHomeSourceCardHost(sessionKey, host) {
   if (host) cardHosts.set(sessionKey, host);
   else cardHosts.delete(sessionKey);
+}
+function bindHomeSourceCardArticleNavigation(sessionKey, wv, onArticleNavigate) {
+  const listenerKey = cardArticleListenerKey(sessionKey);
+  detachArticleSelectionListeners(listenerKey);
+  if (!wv || !onArticleNavigate) return;
+  attachArticleSelectionListeners(listenerKey, wv, onArticleNavigate);
 }
 function resolveEntryUrl(sessionKey, fallbackUrl) {
   const card = cardWebviews.get(sessionKey);
@@ -60137,269 +60085,57 @@ function releaseHomeSourceFocusWebview(sessionKey) {
   returnBorrowedCardWebview(sessionKey);
 }
 
-// ../grarf/desktop/src/lib/home/homeSourcePaneSplitSession.ts
-init_define_import_meta_env();
-var splitWebviews = /* @__PURE__ */ new Map();
-var splitListenerCleanups = /* @__PURE__ */ new Map();
-var WEBVIEW_PREFS2 = "contextIsolation=yes,nodeIntegration=no,javascript=yes";
-var WEBVIEW_CLASS2 = "absolute inset-0 h-full w-full border-0";
-function readWebviewUrl2(wv) {
-  return readHomeSourceWebviewUrl(wv);
-}
-function probeWebviewUrl2(wv) {
-  return probeHomeSourceWebviewUrl(wv);
-}
-function webviewOwnsEmbedNavigateMessage2(wv, event) {
-  const iframe = wv.querySelector?.("iframe");
-  if (!iframe?.contentWindow) return true;
-  return event.source === iframe.contentWindow;
-}
-function isHomeSourcePaneSplitCandidate(sourceUrl, nextUrl) {
-  if (!isHomeSourceArticleCandidateUrl(nextUrl)) return false;
-  if (isSameDocumentHomeSourceNavigation(sourceUrl, nextUrl)) return false;
-  return true;
-}
-function restoreSourceSurface2(wv, sourceLockUrl) {
-  if (!sourceLockUrl) return;
-  queueMicrotask(() => {
-    const current = readWebviewUrl2(wv);
-    if (isSameDocumentHomeSourceNavigation(sourceLockUrl, current)) return;
-    try {
-      if (wv.canGoBack?.()) {
-        wv.goBack?.();
-        return;
-      }
-    } catch {
-    }
-    try {
-      if (readWebviewUrl2(wv) !== sourceLockUrl) {
-        wv.src = sourceLockUrl;
-      }
-    } catch {
-      wv.src = sourceLockUrl;
-    }
-  });
-}
-function openSplitFromSource(wv, sourceLockUrl, destinationUrl, restoreSource, onSplitOpen) {
-  if (!isHomeSourcePaneSplitCandidate(sourceLockUrl, destinationUrl)) return;
-  onSplitOpen(destinationUrl);
-  if (restoreSource) restoreSourceSurface2(wv, sourceLockUrl);
-}
-function attachPaneSplitNavigationListeners(listenerKey, wv, onSplitOpen) {
-  splitListenerCleanups.get(listenerKey)?.();
-  const sourceLock = { url: "" };
-  let allowMainFrameNavigation = true;
-  const initialUrl = readWebviewUrl2(wv);
-  if (initialUrl && initialUrl !== "about:blank") {
-    sourceLock.url = initialUrl;
-    allowMainFrameNavigation = false;
-  }
-  const onDidFinishLoad = (event) => {
-    const e2 = event;
-    if (e2.isMainFrame === false) return;
-    void (async () => {
-      const loaded = await probeWebviewUrl2(wv);
-      if (!loaded || loaded === "about:blank") return;
-      if (!allowMainFrameNavigation && sourceLock.url) {
-        if (isHomeSourcePaneSplitCandidate(sourceLock.url, loaded)) {
-          openSplitFromSource(wv, sourceLock.url, loaded, true, onSplitOpen);
-          return;
-        }
-      }
-      sourceLock.url = loaded;
-      allowMainFrameNavigation = false;
-    })();
-  };
-  const onEmbedNavigateMessage = (event) => {
-    const data2 = event.data;
-    if (!data2 || data2.type !== "grarf-home-embed-navigate") return;
-    if (!webviewOwnsEmbedNavigateMessage2(wv, event)) return;
-    const nextUrl = data2.url?.trim() ?? "";
-    if (!nextUrl || !sourceLock.url || allowMainFrameNavigation) return;
-    if (isSameDocumentHomeSourceNavigation(sourceLock.url, nextUrl)) return;
-    openSplitFromSource(wv, sourceLock.url, nextUrl, false, onSplitOpen);
-  };
-  const onWillNavigate = (event) => {
-    const e2 = event;
-    if (e2.isMainFrame === false) return;
-    const nextUrl = e2.url?.trim() ?? "";
-    if (!nextUrl) return;
-    if (allowMainFrameNavigation) return;
-    if (!sourceLock.url) return;
-    if (isSameDocumentHomeSourceNavigation(sourceLock.url, nextUrl)) return;
-    event.preventDefault();
-    openSplitFromSource(wv, sourceLock.url, nextUrl, false, onSplitOpen);
-  };
-  const onNewWindow = (event) => {
-    const e2 = event;
-    const nextUrl = e2.url?.trim() ?? "";
-    if (!nextUrl || !sourceLock.url) return;
-    event.preventDefault();
-    openSplitFromSource(wv, sourceLock.url, nextUrl, false, onSplitOpen);
-  };
-  const onDidNavigateInPage = (event) => {
-    const e2 = event;
-    if (e2.isMainFrame === false) return;
-    if (allowMainFrameNavigation || !sourceLock.url) return;
-    const nextUrl = e2.url?.trim() ?? readWebviewUrl2(wv);
-    if (!nextUrl) return;
-    if (isSameDocumentHomeSourceNavigation(sourceLock.url, nextUrl)) return;
-    openSplitFromSource(wv, sourceLock.url, nextUrl, true, onSplitOpen);
-  };
-  const onDidNavigate = (event) => {
-    const e2 = event;
-    if (e2.isMainFrame === false) return;
-    if (allowMainFrameNavigation || !sourceLock.url) return;
-    const nextUrl = e2.url?.trim() ?? readWebviewUrl2(wv);
-    if (!nextUrl) return;
-    if (isSameDocumentHomeSourceNavigation(sourceLock.url, nextUrl)) return;
-    openSplitFromSource(wv, sourceLock.url, nextUrl, true, onSplitOpen);
-  };
-  wv.addEventListener("did-finish-load", onDidFinishLoad);
-  wv.addEventListener("will-navigate", onWillNavigate);
-  wv.addEventListener("new-window", onNewWindow);
-  wv.addEventListener("did-navigate-in-page", onDidNavigateInPage);
-  wv.addEventListener("did-navigate", onDidNavigate);
-  window.addEventListener("message", onEmbedNavigateMessage);
-  splitListenerCleanups.set(listenerKey, () => {
-    wv.removeEventListener("did-finish-load", onDidFinishLoad);
-    wv.removeEventListener("will-navigate", onWillNavigate);
-    wv.removeEventListener("new-window", onNewWindow);
-    wv.removeEventListener("did-navigate-in-page", onDidNavigateInPage);
-    wv.removeEventListener("did-navigate", onDidNavigate);
-    window.removeEventListener("message", onEmbedNavigateMessage);
-  });
-}
-function paneSplitListenerKey(sessionKey) {
-  return `${sessionKey}::pane-split-left`;
-}
-function bindHomeSourcePaneSplitNavigation(sessionKey, wv, onSplitOpen) {
-  const listenerKey = paneSplitListenerKey(sessionKey);
-  splitListenerCleanups.get(listenerKey)?.();
-  if (!wv || !onSplitOpen) return;
-  attachPaneSplitNavigationListeners(listenerKey, wv, onSplitOpen);
-}
-function acquireHomeSourceSplitWebview(sessionKey, host, destinationUrl, partition) {
-  const embedSrc = resolveHomeSourceEmbedUrl(destinationUrl);
-  let wv = splitWebviews.get(sessionKey);
-  if (!wv) {
-    wv = document.createElement("webview");
-    wv.partition = partition;
-    wv.setAttribute("webpreferences", WEBVIEW_PREFS2);
-    wv.className = WEBVIEW_CLASS2;
-    splitWebviews.set(sessionKey, wv);
-  }
-  if (embedSrc && readWebviewUrl2(wv) !== embedSrc) {
-    wv.src = embedSrc;
-  }
-  if (wv.parentElement !== host) {
-    host.appendChild(wv);
-  }
-  return wv;
-}
-function detachHomeSourceSplitWebview(sessionKey) {
-  splitWebviews.get(sessionKey)?.remove();
-  splitWebviews.delete(sessionKey);
-}
-function releaseHomeSourceSplitWebview(sessionKey) {
-  detachHomeSourceSplitWebview(sessionKey);
-  const listenerKey = paneSplitListenerKey(sessionKey);
-  splitListenerCleanups.get(listenerKey)?.();
-  splitListenerCleanups.delete(listenerKey);
-}
-
 // ../grarf/desktop/src/components/homeMvp/HomeSourceWebPane.tsx
 init_isGrarfWebRenderer();
-
-// ../grarf/desktop/src/store/homeSourcePaneSplitStore.ts
-init_define_import_meta_env();
-var import_zustand31 = __toESM(require_zustand(), 1);
-var useHomeSourcePaneSplitStore = (0, import_zustand31.create)((set) => ({
-  splitUrlBySession: {},
-  setSplitUrl: (sessionKey, url) => set((state3) => ({
-    splitUrlBySession: {
-      ...state3.splitUrlBySession,
-      [sessionKey]: url
-    }
-  })),
-  clearSplitUrl: (sessionKey) => set((state3) => {
-    const splitUrlBySession = { ...state3.splitUrlBySession };
-    delete splitUrlBySession[sessionKey];
-    return { splitUrlBySession };
-  })
-}));
-
-// ../grarf/desktop/src/components/homeMvp/HomeSourceWebPane.tsx
 var import_jsx_runtime97 = __toESM(require_jsx_runtime(), 1);
 function HomeSourceWebPane({
   source,
   sessionKey,
   mountWebview = true,
   className,
+  onArticleNavigate,
   onFullscreen
 }) {
-  const leftHostRef = (0, import_react104.useRef)(null);
-  const rightHostRef = (0, import_react104.useRef)(null);
+  const embedHostRef = (0, import_react104.useRef)(null);
+  const onArticleNavigateRef = (0, import_react104.useRef)(onArticleNavigate);
+  onArticleNavigateRef.current = onArticleNavigate;
   const hasEmbedUrl = Boolean(source.url?.trim());
   const showEmbed = mountWebview && hasEmbedUrl;
   const isBorrowed = useHomeSourceFocusStore(
     (state3) => state3.borrowedCardWebviewKeys[sessionKey] ?? false
   );
-  const splitUrl = useHomeSourcePaneSplitStore(
-    (state3) => state3.splitUrlBySession[sessionKey] ?? null
-  );
-  const setSplitUrl = useHomeSourcePaneSplitStore((state3) => state3.setSplitUrl);
-  const clearSplitUrl = useHomeSourcePaneSplitStore((state3) => state3.clearSplitUrl);
-  const sourcePartition = (0, import_react104.useMemo)(() => {
+  const partition = (0, import_react104.useMemo)(() => {
     if (!hasEmbedUrl) return "persist:grarf-home-generic";
     return homeSourceWebPartition(source.url);
   }, [source.url, hasEmbedUrl]);
-  const splitPartition = (0, import_react104.useMemo)(() => {
-    if (!splitUrl) return sourcePartition;
-    return homeSourceWebPartition(splitUrl);
-  }, [splitUrl, sourcePartition]);
   const embedSrc = resolveHomeSourceEmbedUrl(source.url);
-  const splitActive = Boolean(splitUrl);
-  const onSplitOpen = (0, import_react104.useCallback)(
-    (destinationUrl) => {
-      setSplitUrl(sessionKey, destinationUrl);
-    },
-    [sessionKey, setSplitUrl]
-  );
   (0, import_react104.useEffect)(() => {
     if (!showEmbed) return;
     void window.grarf?.workspaceEmbedClear?.("center");
     void window.grarf?.workspaceEmbedClear?.("centerChild");
   }, [showEmbed]);
-  (0, import_react104.useEffect)(() => {
-    return () => {
-      clearSplitUrl(sessionKey);
-      releaseHomeSourceSplitWebview(sessionKey);
-    };
-  }, [sessionKey, clearSplitUrl]);
   (0, import_react104.useLayoutEffect)(() => {
-    const host = leftHostRef.current;
-    if (!showEmbed || !host || isBorrowed) {
+    const host = embedHostRef.current;
+    if (!showEmbed || !host) {
       registerHomeSourceCardHost(sessionKey, null);
-      bindHomeSourcePaneSplitNavigation(sessionKey, null, void 0);
+      bindHomeSourceCardArticleNavigation(sessionKey, null, void 0);
       return;
     }
     registerHomeSourceCardHost(sessionKey, host);
-    const wv = acquireHomeSourceCardWebview(sessionKey, host, embedSrc, sourcePartition);
-    bindHomeSourcePaneSplitNavigation(sessionKey, wv, onSplitOpen);
+    const routeArticle = (articleUrl) => {
+      onArticleNavigateRef.current?.(articleUrl);
+    };
+    if (!isBorrowed) {
+      const wv = acquireHomeSourceCardWebview(sessionKey, host, embedSrc, partition);
+      bindHomeSourceCardArticleNavigation(sessionKey, wv, routeArticle);
+    } else {
+      bindHomeSourceCardArticleNavigation(sessionKey, null, void 0);
+    }
     return () => {
       registerHomeSourceCardHost(sessionKey, null);
-      bindHomeSourcePaneSplitNavigation(sessionKey, null, void 0);
+      bindHomeSourceCardArticleNavigation(sessionKey, null, void 0);
     };
-  }, [sessionKey, showEmbed, embedSrc, sourcePartition, isBorrowed, onSplitOpen]);
-  (0, import_react104.useLayoutEffect)(() => {
-    const host = rightHostRef.current;
-    if (!showEmbed || !splitUrl || !host) {
-      detachHomeSourceSplitWebview(sessionKey);
-      return;
-    }
-    acquireHomeSourceSplitWebview(sessionKey, host, splitUrl, splitPartition);
-  }, [sessionKey, showEmbed, splitUrl, splitPartition]);
+  }, [sessionKey, showEmbed, embedSrc, partition, isBorrowed]);
   const isWebRenderer = isGrarfWebRenderer();
   return /* @__PURE__ */ (0, import_jsx_runtime97.jsxs)(
     "div",
@@ -60425,8 +60161,6 @@ function HomeSourceWebPane({
                 type: "button",
                 onClick: (event) => {
                   event.stopPropagation();
-                  clearSplitUrl(sessionKey);
-                  detachHomeSourceSplitWebview(sessionKey);
                   onFullscreen();
                 },
                 "aria-label": `Full screen ${source.label}`,
@@ -60436,31 +60170,13 @@ function HomeSourceWebPane({
             ) : void 0
           }
         ),
-        /* @__PURE__ */ (0, import_jsx_runtime97.jsxs)(
+        /* @__PURE__ */ (0, import_jsx_runtime97.jsx)("div", { className: cn2(PANE_CONTENT_CONTAIN, "relative min-h-0 flex-1 bg-black"), children: /* @__PURE__ */ (0, import_jsx_runtime97.jsx)(
           "div",
           {
-            className: cn2(
-              PANE_CONTENT_CONTAIN,
-              "relative min-h-0 flex-1 bg-black",
-              splitActive && "grid grid-cols-[35%_65%]"
-            ),
-            children: [
-              /* @__PURE__ */ (0, import_jsx_runtime97.jsx)(
-                "div",
-                {
-                  ref: leftHostRef,
-                  className: cn2(
-                    PANE_EMBED_HOST,
-                    "relative min-h-0 min-w-0",
-                    splitActive && "border-r border-line/80",
-                    isBorrowed && PANE_EMBED_ABSOLUTE_FILL
-                  )
-                }
-              ),
-              splitActive ? /* @__PURE__ */ (0, import_jsx_runtime97.jsx)("div", { ref: rightHostRef, className: cn2(PANE_EMBED_HOST, "relative min-h-0 min-w-0 bg-[#020506]") }) : null
-            ]
+            ref: embedHostRef,
+            className: cn2(PANE_EMBED_HOST, "h-full w-full", isBorrowed && PANE_EMBED_ABSOLUTE_FILL)
           }
-        )
+        ) })
       ]
     }
   );
@@ -60468,7 +60184,7 @@ function HomeSourceWebPane({
 
 // ../grarf/desktop/src/components/homeMvp/HomeLeagueStackSection.tsx
 var import_jsx_runtime98 = __toESM(require_jsx_runtime(), 1);
-var HomeLeagueStackSection = (0, import_react105.forwardRef)(function HomeLeagueStackSection2({ section, mountWebviews = true, onSourceFullscreen }, ref) {
+var HomeLeagueStackSection = (0, import_react105.forwardRef)(function HomeLeagueStackSection2({ section, mountWebviews = true, onSourceArticleNavigate, onSourceFullscreen }, ref) {
   const isWebRenderer = isGrarfWebRenderer();
   return /* @__PURE__ */ (0, import_jsx_runtime98.jsx)(
     "section",
@@ -60482,6 +60198,7 @@ var HomeLeagueStackSection = (0, import_react105.forwardRef)(function HomeLeague
           sessionKey: `${section.id}-${source.id}`,
           source,
           mountWebview: mountWebviews,
+          onArticleNavigate: onSourceArticleNavigate && source.url?.trim() ? (articleUrl) => onSourceArticleNavigate(section.id, source, articleUrl) : void 0,
           onFullscreen: onSourceFullscreen && source.url?.trim() ? () => onSourceFullscreen(section.id, source) : void 0
         },
         `${section.id}-${source.id}`
@@ -60492,7 +60209,7 @@ var HomeLeagueStackSection = (0, import_react105.forwardRef)(function HomeLeague
 
 // ../grarf/desktop/src/components/homeMvp/HomeSourceCardsSurface.tsx
 var import_jsx_runtime99 = __toESM(require_jsx_runtime(), 1);
-function HomeSourceCardsSurface({ className, onSourceFullscreen }) {
+function HomeSourceCardsSurface({ className, onSourceArticleNavigate, onSourceFullscreen }) {
   const { activeSection } = useHomeActiveLeagueContext();
   const liveSubmenuId = useHomeLiveSubmenuStore((s2) => s2.activeId);
   const liveLeagueSubmenuId = useHomeLiveLeagueSubmenuStore((s2) => s2.activeId);
@@ -60522,6 +60239,7 @@ function HomeSourceCardsSurface({ className, onSourceFullscreen }) {
         {
           section,
           mountWebviews: true,
+          onSourceArticleNavigate,
           onSourceFullscreen
         },
         `${section.id}-${liveSubmenuId}-${liveLeagueSubmenuId}-${liveMotorsportsSubmenuId ?? "parent"}`
@@ -64866,7 +64584,7 @@ var import_react117 = __toESM(require_react(), 1);
 
 // ../grarf/desktop/src/store/mlbAllGamesHighlightStore.ts
 init_define_import_meta_env();
-var import_zustand32 = __toESM(require_zustand(), 1);
+var import_zustand31 = __toESM(require_zustand(), 1);
 
 // ../grarf/desktop/src/lib/youtubeAllGamesHighlight.ts
 init_define_import_meta_env();
@@ -65040,7 +64758,7 @@ function stickyDisplayHighlight(authoritative) {
   return null;
 }
 var loadInFlight = null;
-var useMlbAllGamesHighlightStore = (0, import_zustand32.create)((set, get) => {
+var useMlbAllGamesHighlightStore = (0, import_zustand31.create)((set, get) => {
   const cached = readCachedHighlight();
   const initialDisplay = stickyDisplayHighlight(cached);
   if (cached) {
@@ -65622,7 +65340,7 @@ var import_react120 = __toESM(require_react(), 1);
 
 // ../grarf/desktop/src/store/mlbMorningLineupHighlightStore.ts
 init_define_import_meta_env();
-var import_zustand33 = __toESM(require_zustand(), 1);
+var import_zustand32 = __toESM(require_zustand(), 1);
 
 // ../grarf/desktop/src/lib/youtubeMorningLineupHighlight.ts
 init_define_import_meta_env();
@@ -65785,7 +65503,7 @@ function writeCachedHighlight2(item) {
   }
 }
 var loadInFlight2 = null;
-var useMlbMorningLineupHighlightStore = (0, import_zustand33.create)((set, get) => {
+var useMlbMorningLineupHighlightStore = (0, import_zustand32.create)((set, get) => {
   const cached = readCachedHighlight2();
   const loadHighlight = async () => {
     if (loadInFlight2) return loadInFlight2;
@@ -67471,12 +67189,12 @@ function usePaneDragResize({ side, min, max, getWidth, onLiveResize, onCommit })
 
 // ../grarf/desktop/src/store/workspaceLayoutStore.ts
 init_define_import_meta_env();
-var import_zustand34 = __toESM(require_zustand(), 1);
+var import_zustand33 = __toESM(require_zustand(), 1);
 var import_middleware2 = __toESM(require_middleware(), 1);
 function clamp2(n2, min, max) {
   return Math.min(max, Math.max(min, n2));
 }
-var useWorkspaceLayoutStore = (0, import_zustand34.create)()(
+var useWorkspaceLayoutStore = (0, import_zustand33.create)()(
   (0, import_middleware2.persist)(
     (set, get) => ({
       layouts: { ...DEFAULT_PANE_LAYOUTS },
@@ -68361,7 +68079,7 @@ var import_react134 = __toESM(require_react(), 1);
 
 // ../grarf/desktop/src/store/orchestrationExecutionStore.ts
 init_define_import_meta_env();
-var import_zustand35 = __toESM(require_zustand(), 1);
+var import_zustand34 = __toESM(require_zustand(), 1);
 
 // ../grarf/desktop/src/services/orchestrationExecution/orchestrationExecutionEngine.ts
 init_define_import_meta_env();
@@ -68565,7 +68283,7 @@ function getOrchestrationExecutionEngine() {
 }
 
 // ../grarf/desktop/src/store/orchestrationExecutionStore.ts
-var useOrchestrationExecutionStore = (0, import_zustand35.create)(() => {
+var useOrchestrationExecutionStore = (0, import_zustand34.create)(() => {
   const engine = getOrchestrationExecutionEngine();
   return {
     interruptState: engine.getState(),
@@ -71062,6 +70780,15 @@ function HomePage() {
     },
     [isHomeOps, onSelectGame, navigate]
   );
+  const onHomeSourceArticleNavigate = (0, import_react147.useCallback)(
+    (sectionId, source, articleUrl) => {
+      const sessionKey = `${sectionId}-${source.id}`;
+      useHomeSourceFocusStore.getState().setSelectedArticle(sessionKey, articleUrl);
+      clearCenterEmbedForSpineGameSelect();
+      dispatchOverlay({ type: "open", tab: buildHomeSourceFocusTab(sectionId, source) });
+    },
+    []
+  );
   const onHomeSourceFullscreen = (0, import_react147.useCallback)((sectionId, source) => {
     const sessionKey = `${sectionId}-${source.id}`;
     useHomeSourceFocusStore.getState().clearSelectedArticle(sessionKey);
@@ -71099,6 +70826,7 @@ function HomePage() {
               children: /* @__PURE__ */ (0, import_jsx_runtime141.jsx)(
                 HomeSourceCardsSurface,
                 {
+                  onSourceArticleNavigate: onHomeSourceArticleNavigate,
                   onSourceFullscreen: onHomeSourceFullscreen
                 }
               )

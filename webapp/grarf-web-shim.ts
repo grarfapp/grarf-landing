@@ -124,21 +124,7 @@ function writeJson(key: string, value: unknown): void {
 type ElectronWebviewLike = HTMLElement & {
   getURL(): string;
   executeJavaScript(code: string, userGesture?: boolean): Promise<unknown>;
-  canGoBack?: () => boolean;
-  goBack?: () => void;
 };
-
-function resolveHomeSourceEmbedUrlForShim(url: string): string {
-  const trimmed = url.trim();
-  if (!trimmed) return trimmed;
-  if (window.GRARF_WEB_CONFIG?.homeSourceEmbedProxy === true) {
-    return `/api/home-source-embed?url=${encodeURIComponent(trimmed)}`;
-  }
-  const base =
-    window.GRARF_WEB_CONFIG?.operationalIngestUrl?.trim().replace(/\/+$/, "") ??
-    "https://grarf-operational-service.grarf.workers.dev";
-  return `${base}/home-source-embed?url=${encodeURIComponent(trimmed)}`;
-}
 
 /** Electron `<webview>` → div host + iframe (browsers cannot register `webview` as a custom element). */
 function createWebviewElement(): ElectronWebviewLike {
@@ -187,35 +173,12 @@ function createWebviewElement(): ElectronWebviewLike {
     return loaded;
   };
 
-  const dispatchFrameEvent = (type: string, url?: string, cancelable = false): Event & {
-    url?: string;
-    isMainFrame?: boolean;
-  } => {
-    const ev = new Event(type, { cancelable }) as Event & { url?: string; isMainFrame?: boolean };
+  const dispatchFrameEvent = (type: string, url?: string) => {
+    const ev = new Event(type) as Event & { url?: string; isMainFrame?: boolean };
     ev.isMainFrame = true;
     if (url) ev.url = url;
     host.dispatchEvent(ev);
-    return ev;
   };
-
-  const onEmbedNavigateMessage = (event: MessageEvent) => {
-    if (event.source !== iframe.contentWindow) return;
-    const data = event.data as { type?: string; url?: string } | null;
-    if (!data || data.type !== "grarf-home-embed-navigate") return;
-
-    const nextUrl = data.url?.trim() ?? "";
-    if (!nextUrl) return;
-
-    const willNavigate = dispatchFrameEvent("will-navigate", nextUrl, true);
-    if (willNavigate.defaultPrevented) return;
-
-    const embedSrc = resolveHomeSourceEmbedUrlForShim(nextUrl);
-    if (embedSrc && iframe.src !== embedSrc) {
-      iframe.src = embedSrc;
-    }
-  };
-
-  window.addEventListener("message", onEmbedNavigateMessage);
 
   const probeGuestUrl = async (): Promise<string> => {
     try {
@@ -260,20 +223,6 @@ function createWebviewElement(): ElectronWebviewLike {
 
   const webview = host as ElectronWebviewLike;
   webview.getURL = () => cachedGuestUrl || iframe.src;
-  webview.canGoBack = () => {
-    try {
-      return (iframe.contentWindow?.history.length ?? 0) > 1;
-    } catch {
-      return false;
-    }
-  };
-  webview.goBack = () => {
-    try {
-      iframe.contentWindow?.history.back();
-    } catch {
-      /* ignore */
-    }
-  };
   webview.executeJavaScript = async (code: string) => {
     try {
       return iframe.contentWindow?.eval(code) ?? null;
