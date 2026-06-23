@@ -123,7 +123,13 @@ function writeJson(key: string, value: unknown): void {
 
 type ElectronWebviewLike = HTMLElement & {
   getURL(): string;
+  loadURL(url: string): void;
   executeJavaScript(code: string, userGesture?: boolean): Promise<unknown>;
+  canGoBack?: () => boolean;
+  canGoForward?: () => boolean;
+  goBack?: () => void;
+  goForward?: () => void;
+  reload?: () => void;
 };
 
 /** Electron `<webview>` → div host + iframe (browsers cannot register `webview` as a custom element). */
@@ -161,6 +167,68 @@ function createWebviewElement(): ElectronWebviewLike {
 
   let sourceLockUrl = "";
   let cachedGuestUrl = "";
+  let initialLoadDone = false;
+  let reloading = false;
+  let stackNavEpoch = 0;
+  let pendingStackNav: number | null = null;
+  const urlStack: string[] = [];
+  let stackIndex = -1;
+
+  const assignGuestSrc = (url: string, forceReload = false) => {
+    if (!url || url === "about:blank") return;
+    cachedGuestUrl = url;
+    if (!forceReload && iframe.src !== url) {
+      iframe.src = url;
+      return;
+    }
+    if (forceReload || iframe.src === url) {
+      iframe.src = "about:blank";
+      queueMicrotask(() => {
+        iframe.src = url;
+      });
+      return;
+    }
+    iframe.src = url;
+  };
+
+  const pushStackEntry = (url: string) => {
+    if (!url || url === "about:blank") return;
+    urlStack.splice(stackIndex + 1);
+    urlStack.push(url);
+    stackIndex = urlStack.length - 1;
+  };
+
+  const syncStackFromLoad = (loaded: string) => {
+    if (!initialLoadDone) {
+      pushStackEntry(loaded);
+      initialLoadDone = true;
+      return;
+    }
+
+    if (reloading) {
+      reloading = false;
+      cachedGuestUrl = loaded;
+      return;
+    }
+
+    // Back/forward via assignGuestSrc — stack index already updated.
+    if (pendingStackNav !== null && pendingStackNav === stackNavEpoch) {
+      pendingStackNav = null;
+      cachedGuestUrl = loaded;
+      return;
+    }
+
+    if (loaded !== urlStack[stackIndex]) {
+      pushStackEntry(loaded);
+      cachedGuestUrl = loaded;
+      return;
+    }
+
+    // Cross-origin in-place navigation — parent cannot read the destination URL.
+    urlStack.splice(stackIndex + 1);
+    urlStack.push("__opaque__");
+    stackIndex = urlStack.length - 1;
+  };
 
   const readIframeUrl = (): string => {
     if (cachedGuestUrl && cachedGuestUrl !== "about:blank") return cachedGuestUrl;
@@ -194,14 +262,20 @@ function createWebviewElement(): ElectronWebviewLike {
   };
 
   iframe.addEventListener("load", () => {
-    void (async () => {
-      dispatchFrameEvent("did-finish-load");
+    if (!iframe.src || iframe.src === "about:blank") return;
 
+    void (async () => {
       const loaded = await probeGuestUrl();
       if (!loaded || loaded === "about:blank") return;
 
+      syncStackFromLoad(loaded);
+
+      dispatchFrameEvent("did-finish-load");
+
       if (sourceLockUrl && loaded !== sourceLockUrl) {
         dispatchFrameEvent("did-navigate", loaded);
+      } else if (urlStack[stackIndex] === "__opaque__") {
+        dispatchFrameEvent("did-navigate-in-page", loaded);
       }
 
       sourceLockUrl = loaded;
@@ -223,6 +297,45 @@ function createWebviewElement(): ElectronWebviewLike {
 
   const webview = host as ElectronWebviewLike;
   webview.getURL = () => cachedGuestUrl || iframe.src;
+  webview.loadURL = (url: string) => {
+    assignGuestSrc(url, true);
+  };
+  webview.canGoBack = () => stackIndex > 0;
+  webview.canGoForward = () => {
+    if (stackIndex < 0 || stackIndex >= urlStack.length - 1) return false;
+    return urlStack[stackIndex + 1] !== "__opaque__";
+  };
+  webview.goBack = () => {
+    if (stackIndex <= 0) return;
+    const nextIndex = stackIndex - 1;
+    const target = urlStack[nextIndex];
+    if (!target || target === "__opaque__") return;
+    stackNavEpoch += 1;
+    pendingStackNav = stackNavEpoch;
+    stackIndex = nextIndex;
+    assignGuestSrc(target, true);
+  };
+  webview.goForward = () => {
+    if (stackIndex < 0 || stackIndex >= urlStack.length - 1) return;
+    const nextIndex = stackIndex + 1;
+    const target = urlStack[nextIndex];
+    if (!target || target === "__opaque__") return;
+    stackNavEpoch += 1;
+    pendingStackNav = stackNavEpoch;
+    stackIndex = nextIndex;
+    assignGuestSrc(target, true);
+  };
+  webview.reload = () => {
+    reloading = true;
+    try {
+      iframe.contentWindow?.location.reload();
+      return;
+    } catch {
+      /* cross-origin fallback */
+    }
+    const current = cachedGuestUrl || iframe.src;
+    if (current) assignGuestSrc(current);
+  };
   webview.executeJavaScript = async (code: string) => {
     try {
       return iframe.contentWindow?.eval(code) ?? null;
