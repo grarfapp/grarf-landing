@@ -64163,6 +64163,13 @@ function mlbOfficialGameStoryUrl(gamePk) {
 function mlbNewsUrlFromSlug(slug) {
   return `https://www.mlb.com/news/${slug}`;
 }
+function resolveMlbRecapPublicArticleUrl(recapArticle, gamePk) {
+  const slug = typeof recapArticle?.slug === "string" ? recapArticle.slug.trim() : "";
+  if (slug) return mlbNewsUrlFromSlug(slug);
+  const rawUrl = typeof recapArticle?.url === "string" ? recapArticle.url.trim() : "";
+  if (rawUrl && /^https?:\/\/www\.mlb\.com\//i.test(rawUrl)) return rawUrl;
+  return mlbOfficialGameStoryUrl(gamePk);
+}
 async function fetchMlbScheduleGames(dateYmd) {
   const url = `${MLB_STATS_API_BASE2}/schedule?sportId=1&date=${encodeURIComponent(dateYmd)}`;
   const res = await fetch(url, { headers: FETCH_HEADERS8 });
@@ -64224,13 +64231,10 @@ function normalizeMlbRecapArticle(recapArticle, gamePk) {
   const seoTitle = typeof recapArticle.seoTitle === "string" ? recapArticle.seoTitle.trim() : "";
   const blurb = typeof recapArticle.blurb === "string" ? recapArticle.blurb.trim() : "";
   const bodyHtml = typeof recapArticle.body === "string" ? recapArticle.body.trim() : "";
-  const slug = typeof recapArticle.slug === "string" ? recapArticle.slug.trim() : "";
   const publishedDate = typeof recapArticle.date === "string" ? recapArticle.date : "";
   const body = bodyHtml || blurb;
   const subhead = seoTitle || blurb.split("\n")[0]?.trim() || "";
-  let articleUrl = typeof recapArticle.url === "string" ? recapArticle.url.trim() : "";
-  if (!articleUrl && slug) articleUrl = mlbNewsUrlFromSlug(slug);
-  if (!articleUrl) articleUrl = mlbOfficialGameStoryUrl(gamePk);
+  const articleUrl = resolveMlbRecapPublicArticleUrl(recapArticle, gamePk);
   const state3 = typeof recapArticle.state === "string" ? recapArticle.state : "";
   const recapAvailable = Boolean(body) && (state3 === "A" || state3 === "" || Boolean(headline));
   return {
@@ -64608,8 +64612,10 @@ async function generateMlbCatchupFeed(date) {
 
 // ../grarf/desktop/src/hooks/useMlbCatchupHeadlines.ts
 function mapCatchupFeedArticle(article) {
+  const articleUrl = article.articleUrl?.trim();
   const mapped = {
     headline: article.headline,
+    url: articleUrl || void 0,
     gamePk: article.gamePk,
     homeTeam: article.homeTeam,
     awayTeam: article.awayTeam,
@@ -66214,8 +66220,10 @@ function HomeSportscapeCard({
         "text-[12px] leading-snug tracking-[0.05em]",
         index === 0 ? "text-[#b8cccc]" : "text-[#9aaeae]"
       );
-      const clickableByUrl = Boolean(article.url && !isMlbLeagueCard);
-      const clickableByCatchup = article.gamePk != null && onCatchupHeadlineClick != null;
+      const clickableByUrl = Boolean(
+        article.url && (!isMlbLeagueCard || isWebRenderer)
+      );
+      const clickableByCatchup = !isWebRenderer && article.gamePk != null && onCatchupHeadlineClick != null;
       const clickable = clickableByUrl || clickableByCatchup;
       const isActive = activeCatchupGamePk != null && article.gamePk != null && article.gamePk === activeCatchupGamePk;
       const articleKey = article.gamePk != null ? `mlb-catchup-${article.gamePk}` : article.eventId != null ? `${isWorldCupLeagueCard ? "world-cup" : isMcwsLeagueCard ? "mcws" : isWnbaLeagueCard ? "wnba" : "nhl"}-catchup-${article.eventId}` : article.headline;
@@ -66238,6 +66246,10 @@ function HomeSportscapeCard({
               article,
               headlineClassName,
               clickable ? () => {
+                if (article.url && (isWebRenderer || !isMlbLeagueCard)) {
+                  openSportscapeArticleInBrowser(article.url);
+                  return;
+                }
                 if (article.gamePk != null && onCatchupHeadlineClick) {
                   const rowEl = articleRowRefs.current.get(article.gamePk);
                   if (rowEl) onCatchupHeadlineClick(article, rowEl);
