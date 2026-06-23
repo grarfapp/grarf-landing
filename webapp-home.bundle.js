@@ -24122,6 +24122,349 @@ function isGameActivelyLive(game) {
   return !isGameCompetitionPaused(game);
 }
 
+// ../grarf/desktop/src/lib/gamesSpine/gamesSpineOperationalDate.ts
+init_define_import_meta_env();
+
+// ../grarf/desktop/shared/operationalSlateDate.js
+init_define_import_meta_env();
+
+// ../grarf/desktop/shared/golfTournamentDate.js
+init_define_import_meta_env();
+var GOLF_TOURNAMENT_DAY_TIMEZONE = "America/New_York";
+var GOLF_LEAGUE_KEYS2 = /* @__PURE__ */ new Set(["PGA", "LPGA", "LIV", "CHAMPIONS"]);
+function isGolfTournamentLeagueKey(league) {
+  return typeof league === "string" && GOLF_LEAGUE_KEYS2.has(league);
+}
+function readGolfTournamentStartDateKey(iso, formatDayKey) {
+  if (typeof iso !== "string" || !iso.trim()) return null;
+  const ms2 = Date.parse(iso);
+  if (!Number.isFinite(ms2) || ms2 <= 0) {
+    const match = iso.match(/^(\d{4}-\d{2}-\d{2})/);
+    return match?.[1] ?? null;
+  }
+  return formatDayKey(ms2, GOLF_TOURNAMENT_DAY_TIMEZONE) ?? null;
+}
+function readGolfTournamentEndDateKey(iso, formatDayKey) {
+  return readGolfTournamentStartDateKey(iso, formatDayKey);
+}
+function formatGolfScheduledDayLabel(dateKey) {
+  const trimmed = dateKey.trim();
+  if (!trimmed) return "\u2014";
+  const [y2, m2, d2] = trimmed.split("-").map(Number);
+  if (!y2 || !m2 || !d2) return "\u2014";
+  const anchor = new Date(Date.UTC(y2, m2 - 1, d2, 17, 0, 0));
+  return anchor.toLocaleDateString("en-US", {
+    weekday: "short",
+    month: "numeric",
+    day: "numeric",
+    timeZone: GOLF_TOURNAMENT_DAY_TIMEZONE
+  });
+}
+
+// ../grarf/desktop/shared/operationalSlateDate.js
+var GRARF_OPERATIONAL_SLATE_TIMEZONE = "America/Chicago";
+var OPERATIONAL_SLATE_NEXT_DAY_CUTOFF_HOUR = 6;
+var calendarFormatterCache = /* @__PURE__ */ new Map();
+function getCalendarFormatter(timeZone) {
+  let formatter = calendarFormatterCache.get(timeZone);
+  if (!formatter) {
+    formatter = new Intl.DateTimeFormat("en-US", {
+      timeZone,
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "numeric",
+      hourCycle: "h23"
+    });
+    calendarFormatterCache.set(timeZone, formatter);
+  }
+  return formatter;
+}
+function calendarPartsInTimeZone(ms2, timeZone) {
+  const parts = getCalendarFormatter(timeZone).formatToParts(new Date(ms2));
+  return {
+    year: Number(parts.find((p2) => p2.type === "year")?.value),
+    month: Number(parts.find((p2) => p2.type === "month")?.value),
+    day: Number(parts.find((p2) => p2.type === "day")?.value),
+    hour: Number(parts.find((p2) => p2.type === "hour")?.value)
+  };
+}
+var operationalTodayKeyCache = {
+  timeZone: "",
+  bucketMs: 0,
+  key: "1970-01-01"
+};
+function readOperationalTodayKeyCache(now, timeZone) {
+  const bucketMs = Math.floor(now.getTime() / 6e4);
+  if (operationalTodayKeyCache.timeZone === timeZone && operationalTodayKeyCache.bucketMs === bucketMs) {
+    return operationalTodayKeyCache.key;
+  }
+  return null;
+}
+function writeOperationalTodayKeyCache(now, timeZone, key2) {
+  operationalTodayKeyCache.timeZone = timeZone;
+  operationalTodayKeyCache.bucketMs = Math.floor(now.getTime() / 6e4);
+  operationalTodayKeyCache.key = key2;
+}
+function formatOperationalDateKeyFromMs(ms2, timeZone = GRARF_OPERATIONAL_SLATE_TIMEZONE) {
+  if (ms2 == null || !Number.isFinite(ms2) || ms2 <= 0) return void 0;
+  const { year, month, day } = calendarPartsInTimeZone(ms2, timeZone);
+  if (!year || !month || !day) return void 0;
+  return `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+}
+function getOperationalTodayDateKey(now = /* @__PURE__ */ new Date(), timeZone = GRARF_OPERATIONAL_SLATE_TIMEZONE) {
+  const cached = readOperationalTodayKeyCache(now, timeZone);
+  if (cached) return cached;
+  const key2 = formatOperationalDateKeyFromMs(now.getTime(), timeZone) ?? "1970-01-01";
+  writeOperationalTodayKeyCache(now, timeZone, key2);
+  return key2;
+}
+function offsetOperationalDateKey(dateKey, dayOffset, timeZone = GRARF_OPERATIONAL_SLATE_TIMEZONE) {
+  const [y2, m2, d2] = dateKey.split("-").map(Number);
+  const anchor = Date.UTC(y2, (m2 ?? 1) - 1, (d2 ?? 1) + dayOffset, 12, 0, 0);
+  return formatOperationalDateKeyFromMs(anchor, timeZone) ?? dateKey;
+}
+function getOperationalYesterdayDateKey(now = /* @__PURE__ */ new Date(), timeZone = GRARF_OPERATIONAL_SLATE_TIMEZONE) {
+  return offsetOperationalDateKey(getOperationalTodayDateKey(now, timeZone), -1, timeZone);
+}
+function getOperationalTomorrowDateKey(now = /* @__PURE__ */ new Date(), timeZone = GRARF_OPERATIONAL_SLATE_TIMEZONE) {
+  return offsetOperationalDateKey(getOperationalTodayDateKey(now, timeZone), 1, timeZone);
+}
+function formatEspnScoreboardDatesParam(now = /* @__PURE__ */ new Date(), timeZone = GRARF_OPERATIONAL_SLATE_TIMEZONE) {
+  return getOperationalTodayDateKey(now, timeZone).replace(/-/g, "");
+}
+function formatEspnScoreboardDatesParamForTomorrow(now = /* @__PURE__ */ new Date(), timeZone = GRARF_OPERATIONAL_SLATE_TIMEZONE) {
+  return getOperationalTomorrowDateKey(now, timeZone).replace(/-/g, "");
+}
+function resolveScheduledDateKey(isoStart, slateDateKey, timeZone = GRARF_OPERATIONAL_SLATE_TIMEZONE) {
+  const fromStart = formatOperationalDateKeyFromMs(Date.parse(isoStart || ""), timeZone);
+  if (fromStart) return fromStart;
+  const slate = typeof slateDateKey === "string" ? slateDateKey.trim() : "";
+  return slate || void 0;
+}
+var nextDayCutoffMsCache = /* @__PURE__ */ new Map();
+function getNextDayCutoffMs(operationalDateKey, cutoffHour, timeZone) {
+  const cacheKey3 = `${operationalDateKey}|${cutoffHour}|${timeZone}`;
+  const cached = nextDayCutoffMsCache.get(cacheKey3);
+  if (cached != null) return cached;
+  const tomorrowKey = offsetOperationalDateKey(operationalDateKey, 1, timeZone);
+  const [y2, m2, d2] = tomorrowKey.split("-").map(Number);
+  let probe = Date.UTC(y2, (m2 ?? 1) - 1, d2 ?? 1, 12, 0, 0);
+  for (let i2 = -30; i2 < 30; i2++) {
+    const candidate = probe + i2 * 36e5;
+    const key2 = formatOperationalDateKeyFromMs(candidate, timeZone);
+    const hour = calendarPartsInTimeZone(candidate, timeZone).hour;
+    if (key2 === tomorrowKey && hour === cutoffHour) {
+      nextDayCutoffMsCache.set(cacheKey3, candidate);
+      return candidate;
+    }
+  }
+  const fallback = probe + 24 * 36e5;
+  nextDayCutoffMsCache.set(cacheKey3, fallback);
+  return fallback;
+}
+function isScheduledOnOperationalEveningSlate(game, operationalDateKey, now = /* @__PURE__ */ new Date(), timeZone = GRARF_OPERATIONAL_SLATE_TIMEZONE) {
+  const startKey = formatOperationalDateKeyFromMs(game.startTimeMs, timeZone);
+  if (startKey === operationalDateKey) return true;
+  const tomorrowKey = getOperationalTomorrowDateKey(now, timeZone);
+  const payloadKey = typeof game.scheduledDateKey === "string" ? game.scheduledDateKey.trim() : null;
+  if (startKey === tomorrowKey) {
+    const ms2 = game.startTimeMs;
+    if (ms2 != null && Number.isFinite(ms2) && ms2 > 0) {
+      const cutoff = getNextDayCutoffMs(operationalDateKey, OPERATIONAL_SLATE_NEXT_DAY_CUTOFF_HOUR, timeZone);
+      if (ms2 < cutoff) return true;
+    }
+  }
+  if (!startKey && payloadKey === operationalDateKey) return true;
+  return false;
+}
+function resolveGameOperationalSlateDateKey(game, timeZone = GRARF_OPERATIONAL_SLATE_TIMEZONE) {
+  const scheduledKey = typeof game?.scheduledDateKey === "string" ? game.scheduledDateKey.trim() : "";
+  if (isGolfTournamentLeagueKey(game?.league)) {
+    if (game?.status === "final") {
+      const endKey = typeof game?.metadata?.tournamentEndDateKey === "string" ? game.metadata.tournamentEndDateKey.trim() : "";
+      if (endKey) return endKey;
+    }
+    if (scheduledKey) return scheduledKey;
+  }
+  return formatOperationalDateKeyFromMs(game?.startTimeMs, timeZone) || scheduledKey || void 0;
+}
+function filterGamesForOperationalDateKey(games, operationalDateKey, now = /* @__PURE__ */ new Date(), timeZone = GRARF_OPERATIONAL_SLATE_TIMEZONE) {
+  return games.filter((g2) => {
+    if (g2?.status === "live") return true;
+    if (g2?.status === "scheduled") {
+      if (isGolfTournamentLeagueKey(g2?.league)) {
+        const key3 = typeof g2?.scheduledDateKey === "string" ? g2.scheduledDateKey.trim() : "";
+        return key3 ? key3 === operationalDateKey : false;
+      }
+      return isScheduledOnOperationalEveningSlate(g2, operationalDateKey, now, timeZone);
+    }
+    const key2 = resolveGameOperationalSlateDateKey(g2, timeZone);
+    return key2 === operationalDateKey;
+  });
+}
+function shouldKeepGameOnOperationalFallbackIngest(game, now = /* @__PURE__ */ new Date(), timeZone = GRARF_OPERATIONAL_SLATE_TIMEZONE) {
+  if (game?.status === "live") return true;
+  const todayKey = getOperationalTodayDateKey(now, timeZone);
+  if (filterGamesForOperationalDateKey([game], todayKey, now, timeZone).length > 0) {
+    return true;
+  }
+  if (game?.status === "final") {
+    const yesterdayKey2 = getOperationalYesterdayDateKey(now, timeZone);
+    if (filterGamesForOperationalDateKey([game], yesterdayKey2, now, timeZone).length > 0) {
+      return true;
+    }
+  }
+  return false;
+}
+function filterGamesForOperationalFallbackIngest(games, now = /* @__PURE__ */ new Date(), timeZone = GRARF_OPERATIONAL_SLATE_TIMEZONE) {
+  return games.filter((g2) => shouldKeepGameOnOperationalFallbackIngest(g2, now, timeZone));
+}
+
+// ../grarf/desktop/src/lib/gamesSpine/gamesSpineOperationalDate.ts
+function formatUtcDateKeyFromMs(ms2) {
+  if (ms2 == null || !Number.isFinite(ms2) || ms2 <= 0) return null;
+  const d2 = new Date(ms2);
+  const y2 = d2.getUTCFullYear();
+  const m2 = String(d2.getUTCMonth() + 1).padStart(2, "0");
+  const day = String(d2.getUTCDate()).padStart(2, "0");
+  return `${y2}-${m2}-${day}`;
+}
+function buildOperationalSlateDateDiagnostics(game) {
+  const startTimeMs = game.startTimeMs != null && Number.isFinite(game.startTimeMs) && game.startTimeMs > 0 ? game.startTimeMs : null;
+  return {
+    scheduledDateKeyFromPayload: game.scheduledDateKey?.trim() ?? null,
+    localOperationalDateKey: formatOperationalDateKeyFromMs(startTimeMs) ?? null,
+    utcDateKeyFromStart: formatUtcDateKeyFromMs(startTimeMs),
+    startTimeMs,
+    startTimeLocalFormatted: startTimeMs != null ? new Date(startTimeMs).toLocaleString("en-US", {
+      timeZone: GRARF_OPERATIONAL_SLATE_TIMEZONE
+    }) : null
+  };
+}
+function getGamesSpineOperationalTodayKey(now = /* @__PURE__ */ new Date()) {
+  return getOperationalTodayDateKey(now, GRARF_OPERATIONAL_SLATE_TIMEZONE);
+}
+function getGamesSpineOperationalYesterdayKey(now = /* @__PURE__ */ new Date()) {
+  return getOperationalYesterdayDateKey(now, GRARF_OPERATIONAL_SLATE_TIMEZONE);
+}
+function formatLocalDateKeyFromMs(ms2) {
+  return formatOperationalDateKeyFromMs(ms2 ?? void 0, GRARF_OPERATIONAL_SLATE_TIMEZONE) ?? null;
+}
+function isScheduledOnOperationalEveningSlate2(game, operationalDateKey, now = /* @__PURE__ */ new Date()) {
+  return isScheduledOnOperationalEveningSlate(
+    game,
+    operationalDateKey,
+    now,
+    GRARF_OPERATIONAL_SLATE_TIMEZONE
+  );
+}
+function buildGamesSpineOperationalDateContext(operationalDateKey, now) {
+  return {
+    operationalDateKey,
+    todayKey: getGamesSpineOperationalTodayKey(now),
+    yesterdayKey: getGamesSpineOperationalYesterdayKey(now)
+  };
+}
+function isGameOnGamesSpineOperationalDateWithContext(game, ctx, now = /* @__PURE__ */ new Date()) {
+  if (game.status === "scheduled") {
+    if (isGolfLeagueKey(game.league)) {
+      const key2 = game.scheduledDateKey?.trim();
+      return key2 ? key2 === ctx.operationalDateKey : false;
+    }
+    return isScheduledOnOperationalEveningSlate2(game, ctx.operationalDateKey, now);
+  }
+  if (game.status === "live" && ctx.operationalDateKey === ctx.todayKey) {
+    return true;
+  }
+  const gameDateKey = resolveGameOperationalDateKey(game);
+  if (!gameDateKey) return false;
+  if (gameDateKey === ctx.operationalDateKey) return true;
+  if (game.status === "live" && gameDateKey === ctx.yesterdayKey) {
+    return true;
+  }
+  return false;
+}
+function readGolfFinalOperationalDateKey(game) {
+  const endKey = game.metadata?.tournamentEndDateKey?.trim();
+  if (endKey) return endKey;
+  const scheduledKey = game.scheduledDateKey?.trim();
+  return scheduledKey || null;
+}
+function resolveGameOperationalDateKey(game) {
+  if (game.status === "scheduled" || game.status === "live") {
+    if (isGolfLeagueKey(game.league)) {
+      const key2 = game.scheduledDateKey?.trim();
+      if (key2) return key2;
+      return formatOperationalDateKeyFromMs(game.startTimeMs, GRARF_OPERATIONAL_SLATE_TIMEZONE) ?? null;
+    }
+    const fromStart = formatOperationalDateKeyFromMs(game.startTimeMs, GRARF_OPERATIONAL_SLATE_TIMEZONE);
+    if (fromStart) return fromStart;
+    if (game.scheduledDateKey?.trim()) return game.scheduledDateKey.trim();
+    return null;
+  }
+  if (game.status === "final" && isGolfLeagueKey(game.league)) {
+    const golfFinalKey = readGolfFinalOperationalDateKey(game);
+    if (golfFinalKey) return golfFinalKey;
+  }
+  if (game.scheduledDateKey?.trim()) {
+    return game.scheduledDateKey.trim();
+  }
+  return formatOperationalDateKeyFromMs(game.startTimeMs, GRARF_OPERATIONAL_SLATE_TIMEZONE) ?? null;
+}
+function isGamesSpineYesterdayFinalGame(game, now = /* @__PURE__ */ new Date()) {
+  if (game.status !== "final") return false;
+  const gameDateKey = resolveGameOperationalDateKey(game);
+  if (!gameDateKey) return false;
+  return gameDateKey === getGamesSpineOperationalYesterdayKey(now);
+}
+function isCatchUpSpineFinalGame(game, now = /* @__PURE__ */ new Date()) {
+  if (game.status !== "final") return false;
+  const todayKey = getGamesSpineOperationalTodayKey(now);
+  const yesterdayKey2 = getGamesSpineOperationalYesterdayKey(now);
+  const gameDateKey = resolveGameOperationalDateKey(game);
+  if (!gameDateKey) return false;
+  if (gameDateKey === todayKey) return false;
+  if (gameDateKey === yesterdayKey2) return true;
+  return gameDateKey < todayKey;
+}
+function explainOperationalDateRemoval(game, operationalDateKey = getGamesSpineOperationalTodayKey(), now = /* @__PURE__ */ new Date()) {
+  if (isGameOnGamesSpineOperationalDate(game, operationalDateKey, now)) {
+    return "kept";
+  }
+  const diag = buildOperationalSlateDateDiagnostics(game);
+  const payloadKey = diag.scheduledDateKeyFromPayload;
+  const localKey = diag.localOperationalDateKey;
+  if (game.status === "scheduled") {
+    if (payloadKey != null && payloadKey !== operationalDateKey && localKey === operationalDateKey) {
+      return "scheduled_payload_utc_mismatch_local_start_on_operational_day";
+    }
+    if (payloadKey != null && payloadKey !== operationalDateKey) {
+      return "scheduled_date_mismatch";
+    }
+    return "operational_date_mismatch";
+  }
+  if (payloadKey != null && payloadKey !== operationalDateKey) {
+    return "scheduled_date_mismatch";
+  }
+  return "operational_date_mismatch";
+}
+function isGameOnGamesSpineOperationalDate(game, operationalDateKey = getGamesSpineOperationalTodayKey(), now = /* @__PURE__ */ new Date()) {
+  return isGameOnGamesSpineOperationalDateWithContext(
+    game,
+    buildGamesSpineOperationalDateContext(operationalDateKey, now),
+    now
+  );
+}
+function filterGamesSpineSlateForOperationalDate(games, operationalDateKey = getGamesSpineOperationalTodayKey(), now = /* @__PURE__ */ new Date()) {
+  if (games.length === 0) return games;
+  const ctx = buildGamesSpineOperationalDateContext(operationalDateKey, now);
+  return games.filter((g2) => isGameOnGamesSpineOperationalDateWithContext(g2, ctx, now));
+}
+function filterGamesSpineSlateForToday(games, now = /* @__PURE__ */ new Date()) {
+  return filterGamesSpineSlateForOperationalDate(games, getGamesSpineOperationalTodayKey(now), now);
+}
+
 // ../grarf/desktop/src/lib/homeGamesColumnFilter.ts
 var HOME_GAMES_FILTER_STORAGE_KEY = "grarf-home-games-status-filter";
 var FILTERS = ["all", "live", "upcoming", "final"];
@@ -24147,6 +24490,10 @@ function matchHomeGamesStatusFilter(game, filter) {
   if (filter === "upcoming") return game.status === "scheduled";
   if (filter === "final") return game.status === "final";
   return true;
+}
+function matchHomeGamesSpineStatusFilter(game, filter, now = /* @__PURE__ */ new Date()) {
+  if (filter === "final") return isGamesSpineYesterdayFinalGame(game, now);
+  return matchHomeGamesStatusFilter(game, filter);
 }
 function homeGamesFilterEmptyLabel(filter) {
   switch (filter) {
@@ -29531,323 +29878,6 @@ function OnTodayNavRowWithTallies({
 
 // ../grarf/desktop/src/lib/navigation/resolveLeagueNavActivityStatuses.ts
 init_define_import_meta_env();
-
-// ../grarf/desktop/src/lib/gamesSpine/gamesSpineOperationalDate.ts
-init_define_import_meta_env();
-
-// ../grarf/desktop/shared/operationalSlateDate.js
-init_define_import_meta_env();
-
-// ../grarf/desktop/shared/golfTournamentDate.js
-init_define_import_meta_env();
-var GOLF_TOURNAMENT_DAY_TIMEZONE = "America/New_York";
-var GOLF_LEAGUE_KEYS2 = /* @__PURE__ */ new Set(["PGA", "LPGA", "LIV", "CHAMPIONS"]);
-function isGolfTournamentLeagueKey(league) {
-  return typeof league === "string" && GOLF_LEAGUE_KEYS2.has(league);
-}
-function readGolfTournamentStartDateKey(iso, formatDayKey) {
-  if (typeof iso !== "string" || !iso.trim()) return null;
-  const ms2 = Date.parse(iso);
-  if (!Number.isFinite(ms2) || ms2 <= 0) {
-    const match = iso.match(/^(\d{4}-\d{2}-\d{2})/);
-    return match?.[1] ?? null;
-  }
-  return formatDayKey(ms2, GOLF_TOURNAMENT_DAY_TIMEZONE) ?? null;
-}
-function formatGolfScheduledDayLabel(dateKey) {
-  const trimmed = dateKey.trim();
-  if (!trimmed) return "\u2014";
-  const [y2, m2, d2] = trimmed.split("-").map(Number);
-  if (!y2 || !m2 || !d2) return "\u2014";
-  const anchor = new Date(Date.UTC(y2, m2 - 1, d2, 17, 0, 0));
-  return anchor.toLocaleDateString("en-US", {
-    weekday: "short",
-    month: "numeric",
-    day: "numeric",
-    timeZone: GOLF_TOURNAMENT_DAY_TIMEZONE
-  });
-}
-
-// ../grarf/desktop/shared/operationalSlateDate.js
-var GRARF_OPERATIONAL_SLATE_TIMEZONE = "America/Chicago";
-var OPERATIONAL_SLATE_NEXT_DAY_CUTOFF_HOUR = 6;
-var calendarFormatterCache = /* @__PURE__ */ new Map();
-function getCalendarFormatter(timeZone) {
-  let formatter = calendarFormatterCache.get(timeZone);
-  if (!formatter) {
-    formatter = new Intl.DateTimeFormat("en-US", {
-      timeZone,
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-      hour: "numeric",
-      hourCycle: "h23"
-    });
-    calendarFormatterCache.set(timeZone, formatter);
-  }
-  return formatter;
-}
-function calendarPartsInTimeZone(ms2, timeZone) {
-  const parts = getCalendarFormatter(timeZone).formatToParts(new Date(ms2));
-  return {
-    year: Number(parts.find((p2) => p2.type === "year")?.value),
-    month: Number(parts.find((p2) => p2.type === "month")?.value),
-    day: Number(parts.find((p2) => p2.type === "day")?.value),
-    hour: Number(parts.find((p2) => p2.type === "hour")?.value)
-  };
-}
-var operationalTodayKeyCache = {
-  timeZone: "",
-  bucketMs: 0,
-  key: "1970-01-01"
-};
-function readOperationalTodayKeyCache(now, timeZone) {
-  const bucketMs = Math.floor(now.getTime() / 6e4);
-  if (operationalTodayKeyCache.timeZone === timeZone && operationalTodayKeyCache.bucketMs === bucketMs) {
-    return operationalTodayKeyCache.key;
-  }
-  return null;
-}
-function writeOperationalTodayKeyCache(now, timeZone, key2) {
-  operationalTodayKeyCache.timeZone = timeZone;
-  operationalTodayKeyCache.bucketMs = Math.floor(now.getTime() / 6e4);
-  operationalTodayKeyCache.key = key2;
-}
-function formatOperationalDateKeyFromMs(ms2, timeZone = GRARF_OPERATIONAL_SLATE_TIMEZONE) {
-  if (ms2 == null || !Number.isFinite(ms2) || ms2 <= 0) return void 0;
-  const { year, month, day } = calendarPartsInTimeZone(ms2, timeZone);
-  if (!year || !month || !day) return void 0;
-  return `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
-}
-function getOperationalTodayDateKey(now = /* @__PURE__ */ new Date(), timeZone = GRARF_OPERATIONAL_SLATE_TIMEZONE) {
-  const cached = readOperationalTodayKeyCache(now, timeZone);
-  if (cached) return cached;
-  const key2 = formatOperationalDateKeyFromMs(now.getTime(), timeZone) ?? "1970-01-01";
-  writeOperationalTodayKeyCache(now, timeZone, key2);
-  return key2;
-}
-function offsetOperationalDateKey(dateKey, dayOffset, timeZone = GRARF_OPERATIONAL_SLATE_TIMEZONE) {
-  const [y2, m2, d2] = dateKey.split("-").map(Number);
-  const anchor = Date.UTC(y2, (m2 ?? 1) - 1, (d2 ?? 1) + dayOffset, 12, 0, 0);
-  return formatOperationalDateKeyFromMs(anchor, timeZone) ?? dateKey;
-}
-function getOperationalYesterdayDateKey(now = /* @__PURE__ */ new Date(), timeZone = GRARF_OPERATIONAL_SLATE_TIMEZONE) {
-  return offsetOperationalDateKey(getOperationalTodayDateKey(now, timeZone), -1, timeZone);
-}
-function getOperationalTomorrowDateKey(now = /* @__PURE__ */ new Date(), timeZone = GRARF_OPERATIONAL_SLATE_TIMEZONE) {
-  return offsetOperationalDateKey(getOperationalTodayDateKey(now, timeZone), 1, timeZone);
-}
-function formatEspnScoreboardDatesParam(now = /* @__PURE__ */ new Date(), timeZone = GRARF_OPERATIONAL_SLATE_TIMEZONE) {
-  return getOperationalTodayDateKey(now, timeZone).replace(/-/g, "");
-}
-function formatEspnScoreboardDatesParamForTomorrow(now = /* @__PURE__ */ new Date(), timeZone = GRARF_OPERATIONAL_SLATE_TIMEZONE) {
-  return getOperationalTomorrowDateKey(now, timeZone).replace(/-/g, "");
-}
-function resolveScheduledDateKey(isoStart, slateDateKey, timeZone = GRARF_OPERATIONAL_SLATE_TIMEZONE) {
-  const fromStart = formatOperationalDateKeyFromMs(Date.parse(isoStart || ""), timeZone);
-  if (fromStart) return fromStart;
-  const slate = typeof slateDateKey === "string" ? slateDateKey.trim() : "";
-  return slate || void 0;
-}
-var nextDayCutoffMsCache = /* @__PURE__ */ new Map();
-function getNextDayCutoffMs(operationalDateKey, cutoffHour, timeZone) {
-  const cacheKey3 = `${operationalDateKey}|${cutoffHour}|${timeZone}`;
-  const cached = nextDayCutoffMsCache.get(cacheKey3);
-  if (cached != null) return cached;
-  const tomorrowKey = offsetOperationalDateKey(operationalDateKey, 1, timeZone);
-  const [y2, m2, d2] = tomorrowKey.split("-").map(Number);
-  let probe = Date.UTC(y2, (m2 ?? 1) - 1, d2 ?? 1, 12, 0, 0);
-  for (let i2 = -30; i2 < 30; i2++) {
-    const candidate = probe + i2 * 36e5;
-    const key2 = formatOperationalDateKeyFromMs(candidate, timeZone);
-    const hour = calendarPartsInTimeZone(candidate, timeZone).hour;
-    if (key2 === tomorrowKey && hour === cutoffHour) {
-      nextDayCutoffMsCache.set(cacheKey3, candidate);
-      return candidate;
-    }
-  }
-  const fallback = probe + 24 * 36e5;
-  nextDayCutoffMsCache.set(cacheKey3, fallback);
-  return fallback;
-}
-function isScheduledOnOperationalEveningSlate(game, operationalDateKey, now = /* @__PURE__ */ new Date(), timeZone = GRARF_OPERATIONAL_SLATE_TIMEZONE) {
-  const startKey = formatOperationalDateKeyFromMs(game.startTimeMs, timeZone);
-  if (startKey === operationalDateKey) return true;
-  const tomorrowKey = getOperationalTomorrowDateKey(now, timeZone);
-  const payloadKey = typeof game.scheduledDateKey === "string" ? game.scheduledDateKey.trim() : null;
-  if (startKey === tomorrowKey) {
-    const ms2 = game.startTimeMs;
-    if (ms2 != null && Number.isFinite(ms2) && ms2 > 0) {
-      const cutoff = getNextDayCutoffMs(operationalDateKey, OPERATIONAL_SLATE_NEXT_DAY_CUTOFF_HOUR, timeZone);
-      if (ms2 < cutoff) return true;
-    }
-  }
-  if (!startKey && payloadKey === operationalDateKey) return true;
-  return false;
-}
-function resolveGameOperationalSlateDateKey(game, timeZone = GRARF_OPERATIONAL_SLATE_TIMEZONE) {
-  const scheduledKey = typeof game?.scheduledDateKey === "string" ? game.scheduledDateKey.trim() : "";
-  if (isGolfTournamentLeagueKey(game?.league) && scheduledKey) {
-    return scheduledKey;
-  }
-  return formatOperationalDateKeyFromMs(game?.startTimeMs, timeZone) || scheduledKey || void 0;
-}
-function filterGamesForOperationalDateKey(games, operationalDateKey, now = /* @__PURE__ */ new Date(), timeZone = GRARF_OPERATIONAL_SLATE_TIMEZONE) {
-  return games.filter((g2) => {
-    if (g2?.status === "live") return true;
-    if (g2?.status === "scheduled") {
-      if (isGolfTournamentLeagueKey(g2?.league)) {
-        const key3 = typeof g2?.scheduledDateKey === "string" ? g2.scheduledDateKey.trim() : "";
-        return key3 ? key3 === operationalDateKey : false;
-      }
-      return isScheduledOnOperationalEveningSlate(g2, operationalDateKey, now, timeZone);
-    }
-    const key2 = resolveGameOperationalSlateDateKey(g2, timeZone);
-    return key2 === operationalDateKey;
-  });
-}
-function shouldKeepGameOnOperationalFallbackIngest(game, now = /* @__PURE__ */ new Date(), timeZone = GRARF_OPERATIONAL_SLATE_TIMEZONE) {
-  if (game?.status === "live") return true;
-  const todayKey = getOperationalTodayDateKey(now, timeZone);
-  if (filterGamesForOperationalDateKey([game], todayKey, now, timeZone).length > 0) {
-    return true;
-  }
-  if (game?.status === "final") {
-    const yesterdayKey2 = getOperationalYesterdayDateKey(now, timeZone);
-    if (filterGamesForOperationalDateKey([game], yesterdayKey2, now, timeZone).length > 0) {
-      return true;
-    }
-  }
-  return false;
-}
-function filterGamesForOperationalFallbackIngest(games, now = /* @__PURE__ */ new Date(), timeZone = GRARF_OPERATIONAL_SLATE_TIMEZONE) {
-  return games.filter((g2) => shouldKeepGameOnOperationalFallbackIngest(g2, now, timeZone));
-}
-
-// ../grarf/desktop/src/lib/gamesSpine/gamesSpineOperationalDate.ts
-function formatUtcDateKeyFromMs(ms2) {
-  if (ms2 == null || !Number.isFinite(ms2) || ms2 <= 0) return null;
-  const d2 = new Date(ms2);
-  const y2 = d2.getUTCFullYear();
-  const m2 = String(d2.getUTCMonth() + 1).padStart(2, "0");
-  const day = String(d2.getUTCDate()).padStart(2, "0");
-  return `${y2}-${m2}-${day}`;
-}
-function buildOperationalSlateDateDiagnostics(game) {
-  const startTimeMs = game.startTimeMs != null && Number.isFinite(game.startTimeMs) && game.startTimeMs > 0 ? game.startTimeMs : null;
-  return {
-    scheduledDateKeyFromPayload: game.scheduledDateKey?.trim() ?? null,
-    localOperationalDateKey: formatOperationalDateKeyFromMs(startTimeMs) ?? null,
-    utcDateKeyFromStart: formatUtcDateKeyFromMs(startTimeMs),
-    startTimeMs,
-    startTimeLocalFormatted: startTimeMs != null ? new Date(startTimeMs).toLocaleString("en-US", {
-      timeZone: GRARF_OPERATIONAL_SLATE_TIMEZONE
-    }) : null
-  };
-}
-function getGamesSpineOperationalTodayKey(now = /* @__PURE__ */ new Date()) {
-  return getOperationalTodayDateKey(now, GRARF_OPERATIONAL_SLATE_TIMEZONE);
-}
-function getGamesSpineOperationalYesterdayKey(now = /* @__PURE__ */ new Date()) {
-  return getOperationalYesterdayDateKey(now, GRARF_OPERATIONAL_SLATE_TIMEZONE);
-}
-function formatLocalDateKeyFromMs(ms2) {
-  return formatOperationalDateKeyFromMs(ms2 ?? void 0, GRARF_OPERATIONAL_SLATE_TIMEZONE) ?? null;
-}
-function isScheduledOnOperationalEveningSlate2(game, operationalDateKey, now = /* @__PURE__ */ new Date()) {
-  return isScheduledOnOperationalEveningSlate(
-    game,
-    operationalDateKey,
-    now,
-    GRARF_OPERATIONAL_SLATE_TIMEZONE
-  );
-}
-function buildGamesSpineOperationalDateContext(operationalDateKey, now) {
-  return {
-    operationalDateKey,
-    todayKey: getGamesSpineOperationalTodayKey(now),
-    yesterdayKey: getGamesSpineOperationalYesterdayKey(now)
-  };
-}
-function isGameOnGamesSpineOperationalDateWithContext(game, ctx, now = /* @__PURE__ */ new Date()) {
-  if (game.status === "scheduled") {
-    if (isGolfLeagueKey(game.league)) {
-      const key2 = game.scheduledDateKey?.trim();
-      return key2 ? key2 === ctx.operationalDateKey : false;
-    }
-    return isScheduledOnOperationalEveningSlate2(game, ctx.operationalDateKey, now);
-  }
-  if (game.status === "live" && ctx.operationalDateKey === ctx.todayKey) {
-    return true;
-  }
-  const gameDateKey = resolveGameOperationalDateKey(game);
-  if (!gameDateKey) return false;
-  if (gameDateKey === ctx.operationalDateKey) return true;
-  if (game.status === "live" && gameDateKey === ctx.yesterdayKey) {
-    return true;
-  }
-  return false;
-}
-function resolveGameOperationalDateKey(game) {
-  if (game.status === "scheduled" || game.status === "live") {
-    const fromStart = formatOperationalDateKeyFromMs(game.startTimeMs, GRARF_OPERATIONAL_SLATE_TIMEZONE);
-    if (fromStart) return fromStart;
-    if (game.scheduledDateKey?.trim()) return game.scheduledDateKey.trim();
-    return null;
-  }
-  if (game.scheduledDateKey?.trim()) {
-    return game.scheduledDateKey.trim();
-  }
-  return formatOperationalDateKeyFromMs(game.startTimeMs, GRARF_OPERATIONAL_SLATE_TIMEZONE) ?? null;
-}
-function isCatchUpSpineFinalGame(game, now = /* @__PURE__ */ new Date()) {
-  if (game.status !== "final") return false;
-  const todayKey = getGamesSpineOperationalTodayKey(now);
-  const yesterdayKey2 = getGamesSpineOperationalYesterdayKey(now);
-  const gameDateKey = resolveGameOperationalDateKey(game);
-  if (!gameDateKey) return false;
-  if (gameDateKey === todayKey) return false;
-  if (gameDateKey === yesterdayKey2) return true;
-  return gameDateKey < todayKey;
-}
-function explainOperationalDateRemoval(game, operationalDateKey = getGamesSpineOperationalTodayKey(), now = /* @__PURE__ */ new Date()) {
-  if (isGameOnGamesSpineOperationalDate(game, operationalDateKey, now)) {
-    return "kept";
-  }
-  const diag = buildOperationalSlateDateDiagnostics(game);
-  const payloadKey = diag.scheduledDateKeyFromPayload;
-  const localKey = diag.localOperationalDateKey;
-  if (game.status === "scheduled") {
-    if (payloadKey != null && payloadKey !== operationalDateKey && localKey === operationalDateKey) {
-      return "scheduled_payload_utc_mismatch_local_start_on_operational_day";
-    }
-    if (payloadKey != null && payloadKey !== operationalDateKey) {
-      return "scheduled_date_mismatch";
-    }
-    return "operational_date_mismatch";
-  }
-  if (payloadKey != null && payloadKey !== operationalDateKey) {
-    return "scheduled_date_mismatch";
-  }
-  return "operational_date_mismatch";
-}
-function isGameOnGamesSpineOperationalDate(game, operationalDateKey = getGamesSpineOperationalTodayKey(), now = /* @__PURE__ */ new Date()) {
-  return isGameOnGamesSpineOperationalDateWithContext(
-    game,
-    buildGamesSpineOperationalDateContext(operationalDateKey, now),
-    now
-  );
-}
-function filterGamesSpineSlateForOperationalDate(games, operationalDateKey = getGamesSpineOperationalTodayKey(), now = /* @__PURE__ */ new Date()) {
-  if (games.length === 0) return games;
-  const ctx = buildGamesSpineOperationalDateContext(operationalDateKey, now);
-  return games.filter((g2) => isGameOnGamesSpineOperationalDateWithContext(g2, ctx, now));
-}
-function filterGamesSpineSlateForToday(games, now = /* @__PURE__ */ new Date()) {
-  return filterGamesSpineSlateForOperationalDate(games, getGamesSpineOperationalTodayKey(now), now);
-}
-
-// ../grarf/desktop/src/lib/navigation/resolveLeagueNavActivityStatuses.ts
 function resolveActivityBucketStatus(game) {
   if (game.status === "final") return "final";
   if (isGameActivelyLive(game)) return "live";
@@ -35118,12 +35148,6 @@ function formatTimeEt5(iso) {
     return "\u2014";
   }
 }
-function readTournamentEndDateKey(event) {
-  const raw = safe5(event?.endDate);
-  if (!raw) return null;
-  const match = raw.match(/^(\d{4}-\d{2}-\d{2})/);
-  return match?.[1] ?? null;
-}
 function normalizeGolfEvent(event, leagueKey, slateDateKey) {
   const comp = event?.competitions?.[0];
   if (!comp) return null;
@@ -35137,7 +35161,10 @@ function normalizeGolfEvent(event, leagueKey, slateDateKey) {
   const startTimeMs = Date.parse(isoStart || "") || 0;
   const scoreboardDayKey = typeof slateDateKey === "string" && slateDateKey.trim() ? slateDateKey.trim() : null;
   const operationalTodayKey = getOperationalTodayDateKey();
-  const tournamentEndKey = readTournamentEndDateKey(event);
+  const tournamentEndKey = readGolfTournamentEndDateKey(
+    safe5(event?.endDate),
+    formatOperationalDateKeyFromMs
+  );
   const pastTournamentEnd = tournamentEndKey != null && operationalTodayKey > tournamentEndKey;
   const tournamentStartKey = readGolfTournamentStartDateKey(
     isoStart,
@@ -35158,6 +35185,9 @@ function normalizeGolfEvent(event, leagueKey, slateDateKey) {
     if (!scheduledDateKey || scheduledDateKey < tournamentStartKey) {
       scheduledDateKey = tournamentStartKey;
     }
+  }
+  if (final && tournamentEndKey) {
+    scheduledDateKey = tournamentEndKey;
   }
   const finalizedStatusLine = safe5(statusType?.shortDetail) || safe5(statusType?.description) || safe5(statusType?.detail) || "Final";
   let statusLine = "";
@@ -35201,6 +35231,7 @@ function normalizeGolfEvent(event, leagueKey, slateDateKey) {
     lastUpdated: (/* @__PURE__ */ new Date()).toISOString(),
     metadata: {
       ...round != null ? { round } : {},
+      ...tournamentEndKey ? { tournamentEndDateKey: tournamentEndKey } : {},
       leaderboardUrl: PGA_TOUR_LEADERBOARD_URL
     },
     ...watchStreamUrl ? {
@@ -50153,7 +50184,7 @@ var MODES = [
   { mode: "sportscape", label: "SPORTSCAPE" },
   { mode: "browser", label: "BROWSER" },
   { mode: "whiparound", label: "WHIP AROUND" },
-  { mode: "newswire", label: "NEWSWIRE" },
+  // { mode: "newswire", label: "NEWSWIRE" }, // embedded in LiveTracker — not a top-level destination
   { mode: "livetracker", label: "LIVETRACKER" }
 ];
 function prominentActiveClass(mode) {
@@ -51576,7 +51607,7 @@ function buildVisibleSpineGames(input) {
     );
   }
   const modeSlate = input.useOperationalModePipeline && !input.skipOperationalModeFilter ? dateSlate.filter((g2) => matchOperationalModeSpineFilter(g2, viewMode)) : dateSlate;
-  const filtered = input.statusFilter === "all" ? modeSlate : modeSlate.filter((g2) => matchHomeGamesStatusFilter(g2, input.statusFilter));
+  const filtered = input.statusFilter === "all" ? modeSlate : modeSlate.filter((g2) => matchHomeGamesSpineStatusFilter(g2, input.statusFilter));
   return sortGamesSpineChronologically(filtered);
 }
 
@@ -51613,7 +51644,7 @@ function buildAllVisibleSpineGames(input) {
 
 // ../grarf/desktop/src/lib/commandBriefing/buildCommandBriefingGamePool.ts
 function buildCommandBriefingGamePool(input) {
-  return buildAllVisibleSpineGames({
+  const slate = buildAllVisibleSpineGames({
     liveLeagues: input.liveLeagues,
     scheduleByDate: input.scheduleByDate,
     getSupplementalFinalsForLeague: () => [],
@@ -51624,6 +51655,9 @@ function buildCommandBriefingGamePool(input) {
     league: input.league,
     skipOperationalModeFilter: true
   });
+  return slate.filter(
+    (game) => game.status !== "final" || isGamesSpineYesterdayFinalGame(game)
+  );
 }
 
 // ../grarf/desktop/src/lib/gamesSpine/gamesSpineCardLayout.ts
@@ -55656,7 +55690,7 @@ function filterManualVisibleGames(games, statusFilter) {
     return sortGamesSpineChronologically(games);
   }
   return sortGamesSpineChronologically(
-    games.filter((game) => matchHomeGamesStatusFilter(game, statusFilter))
+    games.filter((game) => matchHomeGamesSpineStatusFilter(game, statusFilter))
   );
 }
 var HomeManualGamesSpineSection = (0, import_react87.memo)(function HomeManualGamesSpineSection2({
@@ -55842,7 +55876,7 @@ function HomeGamesToday({
     for (const section of manualSections) {
       for (const game of section.games) {
         const refreshed = refreshManualGamesSpineGameIfNeeded(game, now);
-        if (matchHomeGamesStatusFilter(refreshed, filter)) count += 1;
+        if (matchHomeGamesSpineStatusFilter(refreshed, filter)) count += 1;
       }
     }
     return count;
@@ -70410,10 +70444,7 @@ function HomeCenterPaneApplicationSurface({
   if (mode === "whiparound") {
     return /* @__PURE__ */ (0, import_jsx_runtime137.jsx)(CenterPanePlaceholderSurface, { message: CENTER_PANE_PLACEHOLDER_COPY.whiparound });
   }
-  if (mode === "newswire") {
-    return /* @__PURE__ */ (0, import_jsx_runtime137.jsx)(HomeNewswirePane, {});
-  }
-  if (mode === "livetracker") {
+  if (mode === "livetracker" || mode === "newswire") {
     return /* @__PURE__ */ (0, import_jsx_runtime137.jsx)(HomeLiveTrackerSplitPane, {});
   }
   if (mode === "sportscape") return /* @__PURE__ */ (0, import_jsx_runtime137.jsx)(import_jsx_runtime137.Fragment, { children: sportscapeContent });
