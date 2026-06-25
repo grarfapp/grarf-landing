@@ -70723,11 +70723,15 @@ function emptySnapshot2() {
     updatedAt: null
   };
 }
-var useLiveTrackerActiveFeedsStore = (0, import_zustand38.create)((set) => ({
+var useLiveTrackerActiveFeedsStore = (0, import_zustand38.create)((set, get) => ({
   ...emptySnapshot2(),
   syncFromLiveLeagues: () => {
     const { leagueKeys, updatedAt } = useLiveTrackerLiveLeaguesStore.getState();
-    set(buildLiveTrackerActiveFeedsSnapshot(leagueKeys, updatedAt));
+    const next = buildLiveTrackerActiveFeedsSnapshot(leagueKeys, updatedAt);
+    const current = get();
+    const sameFeeds = current.feedUrls.length === next.feedUrls.length && current.feedUrls.every((url, index) => url === next.feedUrls[index]) && current.updatedAt === next.updatedAt;
+    if (sameFeeds) return;
+    set(next);
   }
 }));
 function getActiveLiveTrackerFeeds() {
@@ -70873,9 +70877,6 @@ function mergeRetainedLiveTrackerPosts(incoming, previous, displayActiveLeagueKe
 var useLiveTrackerPostsStore = (0, import_zustand39.create)((set, get) => ({
   ...emptySnapshot3(),
   refresh: async () => {
-    const nowMs = Date.now();
-    syncLiveTrackerLeagueRetention(nowMs);
-    useLiveTrackerLiveLeaguesStore.getState().syncFromGamesSpine(nowMs);
     const displayActiveLeagueKeys = new Set(
       useLiveTrackerLiveLeaguesStore.getState().leagueKeys
     );
@@ -71178,6 +71179,9 @@ function HomeLiveTrackerSurface({ posts, statusMessage }) {
 // ../grarf/desktop/src/components/homeMvp/HomeLiveTrackerFoundationPane.tsx
 var import_jsx_runtime133 = __toESM(require_jsx_runtime(), 1);
 var LIVE_TRACKER_FEED_POLL_MS = 3e4;
+function sameLeagueKeys(a2, b2) {
+  return a2.length === b2.length && a2.every((key2, index) => key2 === b2[index]);
+}
 function HomeLiveTrackerFoundationPane() {
   const posts = useHomeLiveTrackerPosts();
   const activeFeeds = useLiveTrackerActiveFeedsStore((state3) => state3.feeds);
@@ -71197,7 +71201,10 @@ function HomeLiveTrackerFoundationPane() {
     };
   }, []);
   (0, import_react141.useEffect)(() => {
-    return useLiveTrackerActiveFeedsStore.subscribe(() => {
+    let previousLeagueKeys = useLiveTrackerLiveLeaguesStore.getState().leagueKeys;
+    return useLiveTrackerLiveLeaguesStore.subscribe((state3) => {
+      if (sameLeagueKeys(state3.leagueKeys, previousLeagueKeys)) return;
+      previousLeagueKeys = state3.leagueKeys;
       void refreshLiveTrackerPosts();
     });
   }, []);
