@@ -70152,11 +70152,23 @@ function truncateTitle(title, max = 80) {
   if (trimmed.length <= max) return trimmed;
   return `${trimmed.slice(0, max - 1)}\u2026`;
 }
-function openNewswireStoryInBrowser(story) {
-  const url = story.url.trim();
-  if (!url || !/^https?:\/\//i.test(url)) return false;
+function normalizeStoryUrl(raw) {
+  const trimmed = raw.trim();
+  if (!trimmed) return null;
+  if (/^https?:\/\//i.test(trimmed)) return trimmed;
+  if (trimmed.startsWith("//")) return `https:${trimmed}`;
+  return `https://${trimmed}`;
+}
+function prepareBrowserCenterPane() {
   useCenterPaneApplicationModeStore.getState().setModeExplicit("browser");
-  if (newswireBrowserTabOpener?.(story)) {
+  useHomeLiveSubmenuStore.getState().setActiveId("livetrack");
+}
+function openNewswireStoryInBrowser(story) {
+  const url = normalizeStoryUrl(story.url);
+  if (!url) return false;
+  const resolvedStory = url === story.url.trim() ? story : { ...story, url };
+  prepareBrowserCenterPane();
+  if (newswireBrowserTabOpener?.(resolvedStory)) {
     return true;
   }
   if (isGrarfWebRenderer()) {
@@ -71936,11 +71948,11 @@ function HomePage() {
     return registerNewswireBrowserTabOpener((story) => {
       clearCenterEmbedForSpineGameSelect();
       const tab = buildNewswireBrowserWorkspaceTab(story);
-      if (isHomeOps) dispatchOverlay({ type: "open", tab });
-      else dispatch({ type: "open", tab });
+      trackStoryOpened({ source: "home_newswire", url: tab.url });
+      openUrlWorkspaceTab(tab);
       return true;
     });
-  }, [isHomeOps]);
+  }, [openUrlWorkspaceTab]);
   const onOpenLiveShow = (0, import_react146.useCallback)(
     (req) => {
       if (isDemoDanLeBatardShowWatchRequest(req.channelId)) {
