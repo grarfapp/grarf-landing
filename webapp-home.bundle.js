@@ -27714,6 +27714,27 @@ function AppShellProvider({ children }) {
     opener(tab);
     return true;
   }, []);
+  const openWebsiteWorkspaceTab = (0, import_react2.useCallback)(
+    (url, options) => {
+      const launch = parseUrlLaunchInput(url);
+      if (!launch) return false;
+      const opener = workspaceUrlLauncherRef.current;
+      if (!opener) {
+        console.warn("[Workspace] No URL launcher registered on this page");
+        return false;
+      }
+      const base = buildUrlWorkspaceTab(launch);
+      const title = options?.title?.trim();
+      const tab = {
+        ...base,
+        id: options?.tabId ?? `website-${Date.now()}`,
+        title: title && title.length > 0 ? title.length > 80 ? `${title.slice(0, 77)}\u2026` : title : base.title
+      };
+      opener(tab);
+      return true;
+    },
+    []
+  );
   const value = (0, import_react2.useMemo)(
     () => ({
       homeShellMode,
@@ -27721,9 +27742,17 @@ function AppShellProvider({ children }) {
       sidebarCollapsed,
       toggleSidebar,
       registerWorkspaceUrlLauncher,
-      launchSearchInput
+      launchSearchInput,
+      openWebsiteWorkspaceTab
     }),
-    [homeShellMode, sidebarCollapsed, toggleSidebar, registerWorkspaceUrlLauncher, launchSearchInput]
+    [
+      homeShellMode,
+      sidebarCollapsed,
+      toggleSidebar,
+      registerWorkspaceUrlLauncher,
+      launchSearchInput,
+      openWebsiteWorkspaceTab
+    ]
   );
   return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AppShellContext.Provider, { value, children });
 }
@@ -71333,6 +71362,17 @@ function formatNewswireWireLine(story, options) {
   return `${source}${headline}`;
 }
 
+// ../grarf/desktop/src/lib/newswire/openNewswireStoryInBrowser.ts
+init_define_import_meta_env();
+function openNewswireStoryInBrowser(story, openWebsiteWorkspaceTab) {
+  const url = story.url.trim();
+  if (!url) return false;
+  return openWebsiteWorkspaceTab(url, {
+    title: story.headline,
+    tabId: `home-newswire-${story.id}-${Date.now()}`
+  });
+}
+
 // ../grarf/desktop/src/components/homeMvp/HomeLiveTrackTerminalCursor.tsx
 init_define_import_meta_env();
 var import_jsx_runtime134 = __toESM(require_jsx_runtime(), 1);
@@ -71384,8 +71424,12 @@ function HomeNewswireWireLine({
   onTypingProgress,
   revealAnchorRef
 }) {
+  const { openWebsiteWorkspaceTab } = useAppShell();
   const wireLine = (0, import_react144.useMemo)(() => formatNewswireWireLine(story), [story]);
   const typingEvent = (0, import_react144.useMemo)(() => newswireStoryToTypingEvent(story), [story]);
+  const handleOpenStory = () => {
+    openNewswireStoryInBrowser(story, openWebsiteWorkspaceTab);
+  };
   const { typedLineIndex, typedCharCount, showCursor } = useHomeLiveTrackBlockTyping({
     lines: [wireLine],
     event: typingEvent,
@@ -71403,17 +71447,25 @@ function HomeNewswireWireLine({
   const isCurrentLine = typedLineIndex === 0;
   const visibleText = isTyping && isCurrentLine ? wireLine.slice(0, typedCharCount) : wireLine;
   const isRevealAnchor = Boolean(revealAnchorRef && showCursor && isCurrentLine);
-  return /* @__PURE__ */ (0, import_jsx_runtime135.jsx)("div", { className: "px-2 py-px font-mono text-[12px] leading-snug tracking-[0.01em] text-[#d4e0e0]", children: /* @__PURE__ */ (0, import_jsx_runtime135.jsxs)(
-    "span",
+  return /* @__PURE__ */ (0, import_jsx_runtime135.jsx)(
+    "button",
     {
-      ref: isRevealAnchor ? revealAnchorRef : void 0,
-      className: "block whitespace-pre-wrap",
-      children: [
-        visibleText,
-        showCursor && isCurrentLine ? /* @__PURE__ */ (0, import_jsx_runtime135.jsx)(HomeLiveTrackTerminalCursor, {}) : null
-      ]
+      type: "button",
+      onClick: handleOpenStory,
+      className: "block w-full cursor-pointer px-2 py-px text-left font-mono text-[12px] leading-snug tracking-[0.01em] text-[#d4e0e0]",
+      children: /* @__PURE__ */ (0, import_jsx_runtime135.jsxs)(
+        "span",
+        {
+          ref: isRevealAnchor ? revealAnchorRef : void 0,
+          className: "block whitespace-pre-wrap",
+          children: [
+            visibleText,
+            showCursor && isCurrentLine ? /* @__PURE__ */ (0, import_jsx_runtime135.jsx)(HomeLiveTrackTerminalCursor, {}) : null
+          ]
+        }
+      )
     }
-  ) });
+  );
 }
 
 // ../grarf/desktop/src/components/homeMvp/HomeNewswireSurface.tsx
