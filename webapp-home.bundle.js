@@ -58425,6 +58425,14 @@ init_define_import_meta_env();
 init_define_import_meta_env();
 var LIVE_TRACKER_LEAGUE_RETENTION_MS = 30 * 60 * 1e3;
 function resolveLiveTrackerGameCompletionMs(game, retainedAtById) {
+  const observationMs = resolveLiveTrackerFinalObservationMs(game, retainedAtById);
+  if (observationMs != null) return observationMs;
+  if (game.startTimeMs != null && Number.isFinite(game.startTimeMs) && game.startTimeMs > 0) {
+    return game.startTimeMs;
+  }
+  return 0;
+}
+function resolveLiveTrackerFinalObservationMs(game, retainedAtById) {
   const lastUpdated = game.lastUpdated?.trim();
   if (lastUpdated) {
     const parsed = Date.parse(lastUpdated);
@@ -58434,10 +58442,10 @@ function resolveLiveTrackerGameCompletionMs(game, retainedAtById) {
   if (retainedAt != null && Number.isFinite(retainedAt) && retainedAt > 0) {
     return retainedAt;
   }
-  if (game.startTimeMs != null && Number.isFinite(game.startTimeMs) && game.startTimeMs > 0) {
-    return game.startTimeMs;
-  }
-  return 0;
+  return null;
+}
+function wasLiveTrackerLiveGame(game) {
+  return game.status === "live" || isGameActivelyLive(game);
 }
 function collectLeagueGamesWithRetainedFinals(league, leagues, retainedFinals) {
   const byId = /* @__PURE__ */ new Map();
@@ -58468,24 +58476,28 @@ function updateLeagueRetentionCompletedAtMs(input) {
   for (const game of games) {
     if (game.status !== "final") continue;
     const previous = previousGamesById2.get(game.id);
-    if (!previous || previous.status !== "live") continue;
-    const transitionMs = resolveLiveTrackerGameCompletionMs(game, retainedAtById) || nowMs;
-    completedAtMs = completedAtMs == null ? transitionMs : Math.max(completedAtMs, transitionMs);
+    if (!previous || !wasLiveTrackerLiveGame(previous)) continue;
+    completedAtMs = completedAtMs == null ? nowMs : Math.max(completedAtMs, nowMs);
   }
   for (const previous of previousGamesById2.values()) {
-    if ((previous.league ?? "MLB") !== league || previous.status !== "live") continue;
+    if ((previous.league ?? "MLB") !== league || !wasLiveTrackerLiveGame(previous)) continue;
     const current = games.find((game) => game.id === previous.id);
-    if (current?.status === "live") continue;
-    const transitionMs = current?.status === "final" ? resolveLiveTrackerGameCompletionMs(current, retainedAtById) || nowMs : nowMs;
-    completedAtMs = completedAtMs == null ? transitionMs : Math.max(completedAtMs, transitionMs);
+    if (current && wasLiveTrackerLiveGame(current)) continue;
+    if (current?.status === "final") {
+      completedAtMs = completedAtMs == null ? nowMs : Math.max(completedAtMs, nowMs);
+      continue;
+    }
+    completedAtMs = completedAtMs == null ? nowMs : Math.max(completedAtMs, nowMs);
   }
   if (completedAtMs == null) {
     const finals = games.filter((game) => game.status === "final");
     if (finals.length > 0) {
       let latestFinalMs = 0;
       for (const game of finals) {
-        const completionMs = resolveLiveTrackerGameCompletionMs(game, retainedAtById);
-        if (completionMs > latestFinalMs) latestFinalMs = completionMs;
+        const observationMs = resolveLiveTrackerFinalObservationMs(game, retainedAtById);
+        if (observationMs != null && observationMs > latestFinalMs) {
+          latestFinalMs = observationMs;
+        }
       }
       if (latestFinalMs > 0 && nowMs - latestFinalMs < LIVE_TRACKER_LEAGUE_RETENTION_MS) {
         completedAtMs = latestFinalMs;
@@ -58609,6 +58621,31 @@ function getLiveTrackLeagueFeedRegistry() {
 
 // ../grarf/desktop/src/store/liveTrackerLeagueRetentionStore.ts
 var previousGamesById = /* @__PURE__ */ new Map();
+var RETENTION_STORAGE_KEY = "grarf-live-tracker-league-retention-v1";
+function readPersistedCompletedAtMsByLeague(nowMs) {
+  if (typeof sessionStorage === "undefined") return {};
+  try {
+    const raw = sessionStorage.getItem(RETENTION_STORAGE_KEY);
+    if (!raw) return {};
+    const parsed = JSON.parse(raw);
+    const pruned = {};
+    for (const [league, completedAtMs] of Object.entries(parsed)) {
+      if (typeof completedAtMs !== "number" || !Number.isFinite(completedAtMs)) continue;
+      if (nowMs - completedAtMs >= LIVE_TRACKER_LEAGUE_RETENTION_MS) continue;
+      pruned[league] = completedAtMs;
+    }
+    return pruned;
+  } catch {
+    return {};
+  }
+}
+function persistCompletedAtMsByLeague(completedAtMsByLeague) {
+  if (typeof sessionStorage === "undefined") return;
+  try {
+    sessionStorage.setItem(RETENTION_STORAGE_KEY, JSON.stringify(completedAtMsByLeague));
+  } catch {
+  }
+}
 function trackedLeagueKeys() {
   const keys = new Set(GAMES_COLUMN_LEAGUE_ORDER);
   for (const feed of getLiveTrackerFeedRegistry()) {
@@ -58630,24 +58667,28 @@ function buildRetainedAtById() {
   );
 }
 var useLiveTrackerLeagueRetentionStore = (0, import_zustand30.create)((set, get) => ({
-  completedAtMsByLeague: {},
+  completedAtMsByLeague: readPersistedCompletedAtMsByLeague(Date.now()),
   syncFromCanonical: (nowMs = Date.now()) => {
     const leagues = useCanonicalLiveGameStore.getState().leagues;
     const retainedFinals = useRecentFinalizedGamesStore.getState().getAllRetained();
     const retainedAtById = buildRetainedAtById();
-    const nextCompletedAtMsByLeague = {};
+    const nextCompletedAtMsByLeague = {
+      ...readPersistedCompletedAtMsByLeague(nowMs)
+    };
     for (const league of trackedLeagueKeys()) {
       const games = collectLeagueGamesWithRetainedFinals(league, leagues, retainedFinals);
       const completedAtMs = updateLeagueRetentionCompletedAtMs({
         league,
         games,
         previousGamesById,
-        existingCompletedAtMs: get().completedAtMsByLeague[league],
+        existingCompletedAtMs: get().completedAtMsByLeague[league] ?? nextCompletedAtMsByLeague[league],
         retainedAtById,
         nowMs
       });
       if (completedAtMs != null) {
         nextCompletedAtMsByLeague[league] = completedAtMs;
+      } else {
+        delete nextCompletedAtMsByLeague[league];
       }
     }
     const nextGamesById = /* @__PURE__ */ new Map();
@@ -58661,6 +58702,7 @@ var useLiveTrackerLeagueRetentionStore = (0, import_zustand30.create)((set, get)
       }
     }
     previousGamesById = nextGamesById;
+    persistCompletedAtMsByLeague(nextCompletedAtMsByLeague);
     set({ completedAtMsByLeague: nextCompletedAtMsByLeague });
   },
   getCompletedAtMs: (league) => get().completedAtMsByLeague[league],
@@ -70093,6 +70135,52 @@ function clearCenterEmbedForSpineGameSelect() {
   void window.grarf?.workspaceEmbedClear?.("centerChild");
 }
 
+// ../grarf/desktop/src/lib/newswire/openNewswireStoryInBrowser.ts
+init_define_import_meta_env();
+init_isGrarfWebRenderer();
+var newswireBrowserTabOpener = null;
+function registerNewswireBrowserTabOpener(opener) {
+  newswireBrowserTabOpener = opener;
+  return () => {
+    if (newswireBrowserTabOpener === opener) {
+      newswireBrowserTabOpener = null;
+    }
+  };
+}
+function truncateTitle(title, max = 80) {
+  const trimmed = title.trim();
+  if (trimmed.length <= max) return trimmed;
+  return `${trimmed.slice(0, max - 1)}\u2026`;
+}
+function openNewswireStoryInBrowser(story) {
+  const url = story.url.trim();
+  if (!url || !/^https?:\/\//i.test(url)) return false;
+  useCenterPaneApplicationModeStore.getState().setModeExplicit("browser");
+  if (newswireBrowserTabOpener?.(story)) {
+    return true;
+  }
+  if (isGrarfWebRenderer()) {
+    window.open(url, "_blank", "noopener,noreferrer");
+    return true;
+  }
+  return false;
+}
+function buildNewswireBrowserWorkspaceTab(story) {
+  const url = story.url.trim();
+  let hostname = "Article";
+  try {
+    hostname = new URL(url).hostname.replace(/^www\./, "");
+  } catch {
+  }
+  return {
+    id: `home-newswire-${story.id}-${Date.now()}`,
+    type: "website",
+    title: truncateTitle(story.headline) || hostname,
+    url,
+    closable: true
+  };
+}
+
 // ../grarf/desktop/src/lib/workspace/buildYoutubeWorkspaceTab.ts
 init_define_import_meta_env();
 function resolveYoutubeWorkspaceVideoId(raw) {
@@ -71362,17 +71450,6 @@ function formatNewswireWireLine(story, options) {
   return `${source}${headline}`;
 }
 
-// ../grarf/desktop/src/lib/newswire/openNewswireStoryInBrowser.ts
-init_define_import_meta_env();
-function openNewswireStoryInBrowser(story, openWebsiteWorkspaceTab) {
-  const url = story.url.trim();
-  if (!url) return false;
-  return openWebsiteWorkspaceTab(url, {
-    title: story.headline,
-    tabId: `home-newswire-${story.id}-${Date.now()}`
-  });
-}
-
 // ../grarf/desktop/src/components/homeMvp/HomeLiveTrackTerminalCursor.tsx
 init_define_import_meta_env();
 var import_jsx_runtime134 = __toESM(require_jsx_runtime(), 1);
@@ -71424,11 +71501,10 @@ function HomeNewswireWireLine({
   onTypingProgress,
   revealAnchorRef
 }) {
-  const { openWebsiteWorkspaceTab } = useAppShell();
   const wireLine = (0, import_react144.useMemo)(() => formatNewswireWireLine(story), [story]);
   const typingEvent = (0, import_react144.useMemo)(() => newswireStoryToTypingEvent(story), [story]);
   const handleOpenStory = () => {
-    openNewswireStoryInBrowser(story, openWebsiteWorkspaceTab);
+    openNewswireStoryInBrowser(story);
   };
   const { typedLineIndex, typedCharCount, showCursor } = useHomeLiveTrackBlockTyping({
     lines: [wireLine],
@@ -71849,6 +71925,15 @@ function HomePage() {
     [isHomeOps]
   );
   useWorkspaceUrlLauncher(openUrlWorkspaceTab);
+  (0, import_react146.useEffect)(() => {
+    return registerNewswireBrowserTabOpener((story) => {
+      clearCenterEmbedForSpineGameSelect();
+      const tab = buildNewswireBrowserWorkspaceTab(story);
+      if (isHomeOps) dispatchOverlay({ type: "open", tab });
+      else dispatch({ type: "open", tab });
+      return true;
+    });
+  }, [isHomeOps]);
   const onOpenLiveShow = (0, import_react146.useCallback)(
     (req) => {
       if (isDemoDanLeBatardShowWatchRequest(req.channelId)) {
