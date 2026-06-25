@@ -515,8 +515,8 @@ var require_react_production = __commonJS({
     exports.useDeferredValue = function(value, initialValue) {
       return ReactSharedInternals.H.useDeferredValue(value, initialValue);
     };
-    exports.useEffect = function(create39, deps) {
-      return ReactSharedInternals.H.useEffect(create39, deps);
+    exports.useEffect = function(create40, deps) {
+      return ReactSharedInternals.H.useEffect(create40, deps);
     };
     exports.useEffectEvent = function(callback) {
       return ReactSharedInternals.H.useEffectEvent(callback);
@@ -524,17 +524,17 @@ var require_react_production = __commonJS({
     exports.useId = function() {
       return ReactSharedInternals.H.useId();
     };
-    exports.useImperativeHandle = function(ref, create39, deps) {
-      return ReactSharedInternals.H.useImperativeHandle(ref, create39, deps);
+    exports.useImperativeHandle = function(ref, create40, deps) {
+      return ReactSharedInternals.H.useImperativeHandle(ref, create40, deps);
     };
-    exports.useInsertionEffect = function(create39, deps) {
-      return ReactSharedInternals.H.useInsertionEffect(create39, deps);
+    exports.useInsertionEffect = function(create40, deps) {
+      return ReactSharedInternals.H.useInsertionEffect(create40, deps);
     };
-    exports.useLayoutEffect = function(create39, deps) {
-      return ReactSharedInternals.H.useLayoutEffect(create39, deps);
+    exports.useLayoutEffect = function(create40, deps) {
+      return ReactSharedInternals.H.useLayoutEffect(create40, deps);
     };
-    exports.useMemo = function(create39, deps) {
-      return ReactSharedInternals.H.useMemo(create39, deps);
+    exports.useMemo = function(create40, deps) {
+      return ReactSharedInternals.H.useMemo(create40, deps);
     };
     exports.useOptimistic = function(passthrough, reducer) {
       return ReactSharedInternals.H.useOptimistic(passthrough, reducer);
@@ -598,8 +598,8 @@ var require_react2 = __commonJS({
       Object.assign(useBoundStore, api);
       return useBoundStore;
     };
-    var create39 = ((createState) => createState ? createImpl(createState) : createImpl);
-    exports.create = create39;
+    var create40 = ((createState) => createState ? createImpl(createState) : createImpl);
+    exports.create = create40;
     exports.useStore = useStore;
   }
 });
@@ -4873,43 +4873,43 @@ var require_react_dom_client_production = __commonJS({
       currentStateHook.memoizedState = action;
       return [stateHook, dispatch, false];
     }
-    function pushSimpleEffect(tag, inst, create39, deps) {
-      tag = { tag, create: create39, deps, inst, next: null };
+    function pushSimpleEffect(tag, inst, create40, deps) {
+      tag = { tag, create: create40, deps, inst, next: null };
       inst = currentlyRenderingFiber.updateQueue;
       null === inst && (inst = createFunctionComponentUpdateQueue(), currentlyRenderingFiber.updateQueue = inst);
-      create39 = inst.lastEffect;
-      null === create39 ? inst.lastEffect = tag.next = tag : (deps = create39.next, create39.next = tag, tag.next = deps, inst.lastEffect = tag);
+      create40 = inst.lastEffect;
+      null === create40 ? inst.lastEffect = tag.next = tag : (deps = create40.next, create40.next = tag, tag.next = deps, inst.lastEffect = tag);
       return tag;
     }
     function updateRef() {
       return updateWorkInProgressHook().memoizedState;
     }
-    function mountEffectImpl(fiberFlags, hookFlags, create39, deps) {
+    function mountEffectImpl(fiberFlags, hookFlags, create40, deps) {
       var hook = mountWorkInProgressHook();
       currentlyRenderingFiber.flags |= fiberFlags;
       hook.memoizedState = pushSimpleEffect(
         1 | hookFlags,
         { destroy: void 0 },
-        create39,
+        create40,
         void 0 === deps ? null : deps
       );
     }
-    function updateEffectImpl(fiberFlags, hookFlags, create39, deps) {
+    function updateEffectImpl(fiberFlags, hookFlags, create40, deps) {
       var hook = updateWorkInProgressHook();
       deps = void 0 === deps ? null : deps;
       var inst = hook.memoizedState.inst;
-      null !== currentHook && null !== deps && areHookInputsEqual(deps, currentHook.memoizedState.deps) ? hook.memoizedState = pushSimpleEffect(hookFlags, inst, create39, deps) : (currentlyRenderingFiber.flags |= fiberFlags, hook.memoizedState = pushSimpleEffect(
+      null !== currentHook && null !== deps && areHookInputsEqual(deps, currentHook.memoizedState.deps) ? hook.memoizedState = pushSimpleEffect(hookFlags, inst, create40, deps) : (currentlyRenderingFiber.flags |= fiberFlags, hook.memoizedState = pushSimpleEffect(
         1 | hookFlags,
         inst,
-        create39,
+        create40,
         deps
       ));
     }
-    function mountEffect(create39, deps) {
-      mountEffectImpl(8390656, 8, create39, deps);
+    function mountEffect(create40, deps) {
+      mountEffectImpl(8390656, 8, create40, deps);
     }
-    function updateEffect(create39, deps) {
-      updateEffectImpl(2048, 8, create39, deps);
+    function updateEffect(create40, deps) {
+      updateEffectImpl(2048, 8, create40, deps);
     }
     function useEffectEventImpl(payload) {
       currentlyRenderingFiber.flags |= 4;
@@ -4929,28 +4929,28 @@ var require_react_dom_client_production = __commonJS({
         return ref.impl.apply(void 0, arguments);
       };
     }
-    function updateInsertionEffect(create39, deps) {
-      return updateEffectImpl(4, 2, create39, deps);
+    function updateInsertionEffect(create40, deps) {
+      return updateEffectImpl(4, 2, create40, deps);
     }
-    function updateLayoutEffect(create39, deps) {
-      return updateEffectImpl(4, 4, create39, deps);
+    function updateLayoutEffect(create40, deps) {
+      return updateEffectImpl(4, 4, create40, deps);
     }
-    function imperativeHandleEffect(create39, ref) {
+    function imperativeHandleEffect(create40, ref) {
       if ("function" === typeof ref) {
-        create39 = create39();
-        var refCleanup = ref(create39);
+        create40 = create40();
+        var refCleanup = ref(create40);
         return function() {
           "function" === typeof refCleanup ? refCleanup() : ref(null);
         };
       }
       if (null !== ref && void 0 !== ref)
-        return create39 = create39(), ref.current = create39, function() {
+        return create40 = create40(), ref.current = create40, function() {
           ref.current = null;
         };
     }
-    function updateImperativeHandle(ref, create39, deps) {
+    function updateImperativeHandle(ref, create40, deps) {
       deps = null !== deps && void 0 !== deps ? deps.concat([ref]) : null;
-      updateEffectImpl(4, 4, imperativeHandleEffect.bind(null, create39, ref), deps);
+      updateEffectImpl(4, 4, imperativeHandleEffect.bind(null, create40, ref), deps);
     }
     function mountDebugValue() {
     }
@@ -5249,20 +5249,20 @@ var require_react_dom_client_production = __commonJS({
       },
       useContext: readContext,
       useEffect: mountEffect,
-      useImperativeHandle: function(ref, create39, deps) {
+      useImperativeHandle: function(ref, create40, deps) {
         deps = null !== deps && void 0 !== deps ? deps.concat([ref]) : null;
         mountEffectImpl(
           4194308,
           4,
-          imperativeHandleEffect.bind(null, create39, ref),
+          imperativeHandleEffect.bind(null, create40, ref),
           deps
         );
       },
-      useLayoutEffect: function(create39, deps) {
-        return mountEffectImpl(4194308, 4, create39, deps);
+      useLayoutEffect: function(create40, deps) {
+        return mountEffectImpl(4194308, 4, create40, deps);
       },
-      useInsertionEffect: function(create39, deps) {
-        mountEffectImpl(4, 2, create39, deps);
+      useInsertionEffect: function(create40, deps) {
+        mountEffectImpl(4, 2, create40, deps);
       },
       useMemo: function(nextCreate, deps) {
         var hook = mountWorkInProgressHook();
@@ -7290,8 +7290,8 @@ var require_react_dom_client_production = __commonJS({
           do {
             if ((updateQueue.tag & flags) === flags) {
               lastEffect = void 0;
-              var create39 = updateQueue.create, inst = updateQueue.inst;
-              lastEffect = create39();
+              var create40 = updateQueue.create, inst = updateQueue.inst;
+              lastEffect = create40();
               inst.destroy = lastEffect;
             }
             updateQueue = updateQueue.next;
@@ -13186,8 +13186,8 @@ var require_middleware = __commonJS({
       return initialState2;
     };
     var subscribeWithSelector = subscribeWithSelectorImpl;
-    function combine(initialState2, create39) {
-      return (...args) => Object.assign({}, initialState2, create39(...args));
+    function combine(initialState2, create40) {
+      return (...args) => Object.assign({}, initialState2, create40(...args));
     }
     function createJSONStorage(getStorage, options) {
       let storage;
@@ -58392,6 +58392,149 @@ init_define_import_meta_env();
 // ../grarf/desktop/src/lib/livetrack/feed/resolveLiveTrackLeagueActivation.ts
 init_define_import_meta_env();
 
+// ../grarf/desktop/src/lib/liveTracker/liveTrackerLeagueRetention.ts
+init_define_import_meta_env();
+var LIVE_TRACKER_LEAGUE_RETENTION_MS = 30 * 60 * 1e3;
+function resolveLiveTrackerGameCompletionMs(game, retainedAtById) {
+  const lastUpdated = game.lastUpdated?.trim();
+  if (lastUpdated) {
+    const parsed = Date.parse(lastUpdated);
+    if (Number.isFinite(parsed) && parsed > 0) return parsed;
+  }
+  const retainedAt = retainedAtById[game.id];
+  if (retainedAt != null && Number.isFinite(retainedAt) && retainedAt > 0) {
+    return retainedAt;
+  }
+  if (game.startTimeMs != null && Number.isFinite(game.startTimeMs) && game.startTimeMs > 0) {
+    return game.startTimeMs;
+  }
+  return 0;
+}
+function collectLeagueGamesWithRetainedFinals(league, leagues, retainedFinals) {
+  const byId = /* @__PURE__ */ new Map();
+  for (const game of leagues[league] ?? []) {
+    byId.set(game.id, game);
+  }
+  for (const game of retainedFinals) {
+    if ((game.league ?? "MLB") !== league) continue;
+    if (!byId.has(game.id)) byId.set(game.id, game);
+  }
+  return [...byId.values()];
+}
+function collectSpineLeaguesGamesWithRetainedFinals(spineLeagues, leagues, retainedFinals) {
+  const byId = /* @__PURE__ */ new Map();
+  for (const league of spineLeagues) {
+    for (const game of collectLeagueGamesWithRetainedFinals(league, leagues, retainedFinals)) {
+      byId.set(game.id, game);
+    }
+  }
+  return [...byId.values()];
+}
+function updateLeagueRetentionCompletedAtMs(input) {
+  const { league, games, previousGamesById: previousGamesById2, retainedAtById, nowMs } = input;
+  if (games.some(isGameActivelyLive)) {
+    return void 0;
+  }
+  let completedAtMs = input.existingCompletedAtMs;
+  for (const game of games) {
+    if (game.status !== "final") continue;
+    const previous = previousGamesById2.get(game.id);
+    if (!previous || previous.status !== "live") continue;
+    const transitionMs = resolveLiveTrackerGameCompletionMs(game, retainedAtById) || nowMs;
+    completedAtMs = completedAtMs == null ? transitionMs : Math.max(completedAtMs, transitionMs);
+  }
+  for (const previous of previousGamesById2.values()) {
+    if ((previous.league ?? "MLB") !== league || previous.status !== "live") continue;
+    const current = games.find((game) => game.id === previous.id);
+    if (current?.status === "live") continue;
+    const transitionMs = current?.status === "final" ? resolveLiveTrackerGameCompletionMs(current, retainedAtById) || nowMs : nowMs;
+    completedAtMs = completedAtMs == null ? transitionMs : Math.max(completedAtMs, transitionMs);
+  }
+  if (completedAtMs == null) {
+    const finals = games.filter((game) => game.status === "final");
+    if (finals.length > 0) {
+      let latestFinalMs = 0;
+      for (const game of finals) {
+        const completionMs = resolveLiveTrackerGameCompletionMs(game, retainedAtById);
+        if (completionMs > latestFinalMs) latestFinalMs = completionMs;
+      }
+      if (latestFinalMs > 0 && nowMs - latestFinalMs < LIVE_TRACKER_LEAGUE_RETENTION_MS) {
+        completedAtMs = latestFinalMs;
+      }
+    }
+  }
+  if (completedAtMs == null) return void 0;
+  if (nowMs - completedAtMs >= LIVE_TRACKER_LEAGUE_RETENTION_MS) return void 0;
+  return completedAtMs;
+}
+function isLeagueWithinRetentionWindow(completedAtMs, nowMs = Date.now()) {
+  if (completedAtMs == null || !Number.isFinite(completedAtMs) || completedAtMs <= 0) {
+    return false;
+  }
+  return nowMs - completedAtMs < LIVE_TRACKER_LEAGUE_RETENTION_MS;
+}
+function isLeagueActiveForLiveTracker(games, completedAtMs, nowMs = Date.now()) {
+  if (games.some(isGameActivelyLive)) return true;
+  return isLeagueWithinRetentionWindow(completedAtMs, nowMs);
+}
+
+// ../grarf/desktop/src/store/liveTrackerLeagueRetentionStore.ts
+init_define_import_meta_env();
+var import_zustand30 = __toESM(require_zustand(), 1);
+
+// ../grarf/desktop/src/lib/liveTracker/liveTrackerFeedRegistry.ts
+init_define_import_meta_env();
+var LIVE_TRACKER_FEED_REGISTRY = [
+  {
+    league: "MLB",
+    feedUrl: "https://rss.app/feeds/5I56VczaapQkNeCM.xml",
+    feedId: "live-tracker-mlb",
+    label: "MLB"
+  },
+  {
+    league: "WORLDCUP",
+    feedUrl: "https://rss.app/feeds/i0RTt434yrat6hLW.xml",
+    feedId: "live-tracker-worldcup",
+    label: "FIFA World Cup"
+  },
+  {
+    league: "AFL",
+    feedUrl: "https://rss.app/feeds/jOSGNaMf3d3RSyr4.xml",
+    feedId: "live-tracker-afl",
+    label: "AFL"
+  },
+  {
+    league: "PGA",
+    feedUrl: "https://rss.app/feeds/_QiTingwHRGS3iO5W.xml",
+    feedId: "live-tracker-us-open",
+    label: "U.S. Open"
+  },
+  {
+    league: "ATP",
+    feedUrl: "https://rss.app/feeds/lRfObGAeHAFZiD1h.xml",
+    feedId: "live-tracker-atp",
+    label: "ATP"
+  },
+  {
+    league: "WTA",
+    feedUrl: "https://rss.app/feeds/jYQQ0s1LFdqQ5o1f.xml",
+    feedId: "live-tracker-wta",
+    label: "WTA"
+  }
+];
+var FEED_BY_LEAGUE = new Map(
+  LIVE_TRACKER_FEED_REGISTRY.map((entry) => [entry.league, entry])
+);
+function getLiveTrackerFeedRegistry() {
+  return LIVE_TRACKER_FEED_REGISTRY;
+}
+function resolveLiveTrackerFeedForLeague(league) {
+  return FEED_BY_LEAGUE.get(league) ?? null;
+}
+function hasLiveTrackerFeedForLeague(league) {
+  return FEED_BY_LEAGUE.has(league);
+}
+
 // ../grarf/desktop/src/lib/livetrack/feed/leagueFeedRegistry.ts
 init_define_import_meta_env();
 var LIVE_TRACK_LEAGUE_FEED_REGISTRY = [
@@ -58435,32 +58578,19 @@ function getLiveTrackLeagueFeedRegistry() {
   return LIVE_TRACK_LEAGUE_FEED_REGISTRY;
 }
 
-// ../grarf/desktop/src/lib/livetrack/feed/resolveLiveTrackLeagueActivation.ts
-var LIVE_TRACK_POST_FINAL_WINDOW_MS = 30 * 60 * 1e3;
-function resolveGameCompletionMs(game, retainedAtById) {
-  const lastUpdated = game.lastUpdated?.trim();
-  if (lastUpdated) {
-    const parsed = Date.parse(lastUpdated);
-    if (Number.isFinite(parsed) && parsed > 0) return parsed;
+// ../grarf/desktop/src/store/liveTrackerLeagueRetentionStore.ts
+var previousGamesById = /* @__PURE__ */ new Map();
+function trackedLeagueKeys() {
+  const keys = new Set(GAMES_COLUMN_LEAGUE_ORDER);
+  for (const feed of getLiveTrackerFeedRegistry()) {
+    keys.add(feed.league);
   }
-  const retainedAt = retainedAtById[game.id];
-  if (retainedAt != null && Number.isFinite(retainedAt) && retainedAt > 0) {
-    return retainedAt;
+  for (const feed of getLiveTrackLeagueFeedRegistry()) {
+    for (const league of feed.spineLeagues) {
+      keys.add(league);
+    }
   }
-  if (game.startTimeMs != null && Number.isFinite(game.startTimeMs) && game.startTimeMs > 0) {
-    return game.startTimeMs;
-  }
-  return 0;
-}
-function collectOperationalSpineGames2(definition) {
-  const liveLeagues = useCanonicalLiveGameStore.getState().leagues;
-  const operationalMode = useOperationalModeStore.getState().mode;
-  const leagueGames = [];
-  for (const spineLeague of definition.spineLeagues) {
-    leagueGames.push(...liveLeagues[spineLeague] ?? []);
-  }
-  const supplementalFinals = useRecentFinalizedGamesStore.getState().getAllRetained().filter((game) => definition.spineLeagues.includes(game.league ?? "MLB"));
-  return buildGamesSpineOperationalSlate(leagueGames, supplementalFinals, operationalMode);
+  return [...keys];
 }
 function buildRetainedAtById() {
   return Object.fromEntries(
@@ -58470,38 +58600,124 @@ function buildRetainedAtById() {
     ])
   );
 }
-function isLiveTrackLeagueFeedActive(games, nowMs = Date.now(), retainedAtById = buildRetainedAtById()) {
-  const hasLive = games.some((game) => game.status === "live");
-  if (hasLive) return true;
-  const finals = games.filter((game) => game.status === "final");
-  if (finals.length === 0) return false;
-  let latestFinalMs = 0;
-  for (const game of finals) {
-    const completionMs = resolveGameCompletionMs(game, retainedAtById);
-    if (completionMs > latestFinalMs) latestFinalMs = completionMs;
+var useLiveTrackerLeagueRetentionStore = (0, import_zustand30.create)((set, get) => ({
+  completedAtMsByLeague: {},
+  syncFromCanonical: (nowMs = Date.now()) => {
+    const leagues = useCanonicalLiveGameStore.getState().leagues;
+    const retainedFinals = useRecentFinalizedGamesStore.getState().getAllRetained();
+    const retainedAtById = buildRetainedAtById();
+    const nextCompletedAtMsByLeague = {};
+    for (const league of trackedLeagueKeys()) {
+      const games = collectLeagueGamesWithRetainedFinals(league, leagues, retainedFinals);
+      const completedAtMs = updateLeagueRetentionCompletedAtMs({
+        league,
+        games,
+        previousGamesById,
+        existingCompletedAtMs: get().completedAtMsByLeague[league],
+        retainedAtById,
+        nowMs
+      });
+      if (completedAtMs != null) {
+        nextCompletedAtMsByLeague[league] = completedAtMs;
+      }
+    }
+    const nextGamesById = /* @__PURE__ */ new Map();
+    for (const league of trackedLeagueKeys()) {
+      for (const game of collectLeagueGamesWithRetainedFinals(
+        league,
+        leagues,
+        retainedFinals
+      )) {
+        nextGamesById.set(game.id, game);
+      }
+    }
+    previousGamesById = nextGamesById;
+    set({ completedAtMsByLeague: nextCompletedAtMsByLeague });
+  },
+  getCompletedAtMs: (league) => get().completedAtMsByLeague[league],
+  isLeagueDisplayActive: (league, nowMs = Date.now()) => {
+    const leagues = useCanonicalLiveGameStore.getState().leagues;
+    const retainedFinals = useRecentFinalizedGamesStore.getState().getAllRetained();
+    const games = collectLeagueGamesWithRetainedFinals(league, leagues, retainedFinals);
+    return isLeagueActiveForLiveTracker(games, get().completedAtMsByLeague[league], nowMs);
+  },
+  getDisplayActiveLeagueKeys: (nowMs = Date.now()) => {
+    get().syncFromCanonical(nowMs);
+    return trackedLeagueKeys().filter((league) => get().isLeagueDisplayActive(league, nowMs));
   }
-  if (latestFinalMs <= 0) return false;
-  return nowMs - latestFinalMs < LIVE_TRACK_POST_FINAL_WINDOW_MS;
+}));
+function syncLiveTrackerLeagueRetention(nowMs = Date.now()) {
+  useLiveTrackerLeagueRetentionStore.getState().syncFromCanonical(nowMs);
+}
+useCanonicalLiveGameStore.subscribe(() => {
+  syncLiveTrackerLeagueRetention();
+});
+useRecentFinalizedGamesStore.subscribe(() => {
+  syncLiveTrackerLeagueRetention();
+});
+syncLiveTrackerLeagueRetention();
+
+// ../grarf/desktop/src/lib/livetrack/feed/resolveLiveTrackLeagueActivation.ts
+function buildRetainedAtById2() {
+  return Object.fromEntries(
+    Object.entries(useRecentFinalizedGamesStore.getState().byId).map(([id, entry]) => [
+      id,
+      entry.retainedAt
+    ])
+  );
+}
+function collectLiveTrackSpineGames(definition) {
+  const leagues = useCanonicalLiveGameStore.getState().leagues;
+  const retainedFinals = useRecentFinalizedGamesStore.getState().getAllRetained();
+  return collectSpineLeaguesGamesWithRetainedFinals(
+    definition.spineLeagues,
+    leagues,
+    retainedFinals
+  );
+}
+function resolveFeedRetentionCompletedAtMs(definition, nowMs) {
+  let latest;
+  for (const spineLeague of definition.spineLeagues) {
+    const completedAtMs = useLiveTrackerLeagueRetentionStore.getState().getCompletedAtMs(spineLeague);
+    if (!isLeagueWithinRetentionWindow(completedAtMs, nowMs)) continue;
+    latest = latest == null ? completedAtMs : Math.max(latest, completedAtMs);
+  }
+  return latest;
+}
+function isLiveTrackLeagueFeedActive(definition, games, nowMs = Date.now()) {
+  if (games.some(isGameActivelyLive)) return true;
+  for (const spineLeague of definition.spineLeagues) {
+    if (useLiveTrackerLeagueRetentionStore.getState().isLeagueDisplayActive(spineLeague, nowMs)) {
+      return true;
+    }
+  }
+  return isLeagueActiveForLiveTracker(
+    games,
+    resolveFeedRetentionCompletedAtMs(definition, nowMs),
+    nowMs
+  );
 }
 function resolveLiveTrackLeagueActivationStates(nowMs = Date.now()) {
-  const retainedAtById = buildRetainedAtById();
+  const retainedAtById = buildRetainedAtById2();
   return getLiveTrackLeagueFeedRegistry().map((definition) => {
-    const games = collectOperationalSpineGames2(definition);
-    const liveGameCount = games.filter((game) => game.status === "live").length;
+    const games = collectLiveTrackSpineGames(definition);
+    const liveGameCount = games.filter(isGameActivelyLive).length;
     const finals = games.filter((game) => game.status === "final");
     let lastFinalEndedAt = null;
     let latestFinalMs = 0;
     for (const game of finals) {
-      const completionMs = resolveGameCompletionMs(game, retainedAtById);
+      const completionMs = resolveLiveTrackerGameCompletionMs(game, retainedAtById);
       if (completionMs > latestFinalMs) {
         latestFinalMs = completionMs;
         lastFinalEndedAt = new Date(completionMs).toISOString();
       }
     }
-    const minutesSinceLastFinal = latestFinalMs > 0 ? Math.floor((nowMs - latestFinalMs) / 6e4) : null;
+    const retentionCompletedAtMs = resolveFeedRetentionCompletedAtMs(definition, nowMs);
+    const referenceFinalMs = retentionCompletedAtMs ?? latestFinalMs;
+    const minutesSinceLastFinal = referenceFinalMs > 0 ? Math.floor((nowMs - referenceFinalMs) / 6e4) : null;
     return {
       league: definition.league,
-      active: isLiveTrackLeagueFeedActive(games, nowMs, retainedAtById),
+      active: isLiveTrackLeagueFeedActive(definition, games, nowMs),
       liveGameCount,
       lastFinalEndedAt,
       minutesSinceLastFinal
@@ -58509,10 +58725,9 @@ function resolveLiveTrackLeagueActivationStates(nowMs = Date.now()) {
   });
 }
 function resolveActiveLiveTrackLeagueFeeds(nowMs = Date.now()) {
-  const retainedAtById = buildRetainedAtById();
   return getLiveTrackLeagueFeedRegistry().filter((definition) => {
-    const games = collectOperationalSpineGames2(definition);
-    return isLiveTrackLeagueFeedActive(games, nowMs, retainedAtById);
+    const games = collectLiveTrackSpineGames(definition);
+    return isLiveTrackLeagueFeedActive(definition, games, nowMs);
   });
 }
 
@@ -59996,9 +60211,9 @@ function pickSavedPaneWidthsForRail(saved, paneIds) {
 
 // ../grarf/desktop/src/store/leagueHomePaneLayoutStore.ts
 init_define_import_meta_env();
-var import_zustand30 = __toESM(require_zustand(), 1);
+var import_zustand31 = __toESM(require_zustand(), 1);
 var import_middleware = __toESM(require_middleware(), 1);
-var useLeagueHomePaneLayoutStore = (0, import_zustand30.create)()(
+var useLeagueHomePaneLayoutStore = (0, import_zustand31.create)()(
   (0, import_middleware.persist)(
     (set) => ({
       byLeague: {},
@@ -60639,8 +60854,8 @@ init_isGrarfWebRenderer();
 
 // ../grarf/desktop/src/store/homeSourceFocusStore.ts
 init_define_import_meta_env();
-var import_zustand31 = __toESM(require_zustand(), 1);
-var useHomeSourceFocusStore = (0, import_zustand31.create)((set) => ({
+var import_zustand32 = __toESM(require_zustand(), 1);
+var useHomeSourceFocusStore = (0, import_zustand32.create)((set) => ({
   selectedArticleUrlBySession: {},
   borrowedCardWebviewKeys: {},
   webFullscreenSessionKey: null,
@@ -66014,7 +66229,7 @@ var import_react121 = __toESM(require_react(), 1);
 
 // ../grarf/desktop/src/store/mlbAllGamesHighlightStore.ts
 init_define_import_meta_env();
-var import_zustand32 = __toESM(require_zustand(), 1);
+var import_zustand33 = __toESM(require_zustand(), 1);
 
 // ../grarf/desktop/src/lib/youtubeAllGamesHighlight.ts
 init_define_import_meta_env();
@@ -66188,7 +66403,7 @@ function stickyDisplayHighlight(authoritative) {
   return null;
 }
 var loadInFlight = null;
-var useMlbAllGamesHighlightStore = (0, import_zustand32.create)((set, get) => {
+var useMlbAllGamesHighlightStore = (0, import_zustand33.create)((set, get) => {
   const cached = readCachedHighlight();
   const initialDisplay = stickyDisplayHighlight(cached);
   if (cached) {
@@ -66770,7 +66985,7 @@ var import_react124 = __toESM(require_react(), 1);
 
 // ../grarf/desktop/src/store/mlbMorningLineupHighlightStore.ts
 init_define_import_meta_env();
-var import_zustand33 = __toESM(require_zustand(), 1);
+var import_zustand34 = __toESM(require_zustand(), 1);
 
 // ../grarf/desktop/src/lib/youtubeMorningLineupHighlight.ts
 init_define_import_meta_env();
@@ -66894,7 +67109,7 @@ function writeCachedHighlight2(item) {
   }
 }
 var loadInFlight2 = null;
-var useMlbMorningLineupHighlightStore = (0, import_zustand33.create)((set, get) => {
+var useMlbMorningLineupHighlightStore = (0, import_zustand34.create)((set, get) => {
   const cached = readCachedHighlight2();
   const loadHighlight = async () => {
     if (loadInFlight2) return loadInFlight2;
@@ -68602,12 +68817,12 @@ function usePaneDragResize({ side, min, max, getWidth, onLiveResize, onCommit })
 
 // ../grarf/desktop/src/store/workspaceLayoutStore.ts
 init_define_import_meta_env();
-var import_zustand34 = __toESM(require_zustand(), 1);
+var import_zustand35 = __toESM(require_zustand(), 1);
 var import_middleware2 = __toESM(require_middleware(), 1);
 function clamp2(n2, min, max) {
   return Math.min(max, Math.max(min, n2));
 }
-var useWorkspaceLayoutStore = (0, import_zustand34.create)()(
+var useWorkspaceLayoutStore = (0, import_zustand35.create)()(
   (0, import_middleware2.persist)(
     (set, get) => ({
       layouts: { ...DEFAULT_PANE_LAYOUTS },
@@ -69492,7 +69707,7 @@ var import_react138 = __toESM(require_react(), 1);
 
 // ../grarf/desktop/src/store/orchestrationExecutionStore.ts
 init_define_import_meta_env();
-var import_zustand35 = __toESM(require_zustand(), 1);
+var import_zustand36 = __toESM(require_zustand(), 1);
 
 // ../grarf/desktop/src/services/orchestrationExecution/orchestrationExecutionEngine.ts
 init_define_import_meta_env();
@@ -69696,7 +69911,7 @@ function getOrchestrationExecutionEngine() {
 }
 
 // ../grarf/desktop/src/store/orchestrationExecutionStore.ts
-var useOrchestrationExecutionStore = (0, import_zustand35.create)(() => {
+var useOrchestrationExecutionStore = (0, import_zustand36.create)(() => {
   const engine = getOrchestrationExecutionEngine();
   return {
     interruptState: engine.getState(),
@@ -70290,66 +70505,17 @@ var import_react140 = __toESM(require_react(), 1);
 
 // ../grarf/desktop/src/store/liveTrackerPostsStore.ts
 init_define_import_meta_env();
-var import_zustand38 = __toESM(require_zustand(), 1);
+var import_zustand39 = __toESM(require_zustand(), 1);
 
 // ../grarf/desktop/src/lib/liveTracker/fetchActiveLiveTrackerPosts.ts
 init_define_import_meta_env();
 
 // ../grarf/desktop/src/store/liveTrackerActiveFeedsStore.ts
 init_define_import_meta_env();
-var import_zustand37 = __toESM(require_zustand(), 1);
+var import_zustand38 = __toESM(require_zustand(), 1);
 
 // ../grarf/desktop/src/lib/liveTracker/resolveActiveLiveTrackerFeeds.ts
 init_define_import_meta_env();
-
-// ../grarf/desktop/src/lib/liveTracker/liveTrackerFeedRegistry.ts
-init_define_import_meta_env();
-var LIVE_TRACKER_FEED_REGISTRY = [
-  {
-    league: "MLB",
-    feedUrl: "https://rss.app/feeds/5I56VczaapQkNeCM.xml",
-    feedId: "live-tracker-mlb",
-    label: "MLB"
-  },
-  {
-    league: "WORLDCUP",
-    feedUrl: "https://rss.app/feeds/i0RTt434yrat6hLW.xml",
-    feedId: "live-tracker-worldcup",
-    label: "FIFA World Cup"
-  },
-  {
-    league: "AFL",
-    feedUrl: "https://rss.app/feeds/jOSGNaMf3d3RSyr4.xml",
-    feedId: "live-tracker-afl",
-    label: "AFL"
-  },
-  {
-    league: "PGA",
-    feedUrl: "https://rss.app/feeds/_QiTingwHRGS3iO5W.xml",
-    feedId: "live-tracker-us-open",
-    label: "U.S. Open"
-  },
-  {
-    league: "ATP",
-    feedUrl: "https://rss.app/feeds/lRfObGAeHAFZiD1h.xml",
-    feedId: "live-tracker-atp",
-    label: "ATP"
-  },
-  {
-    league: "WTA",
-    feedUrl: "https://rss.app/feeds/jYQQ0s1LFdqQ5o1f.xml",
-    feedId: "live-tracker-wta",
-    label: "WTA"
-  }
-];
-var FEED_BY_LEAGUE = new Map(
-  LIVE_TRACKER_FEED_REGISTRY.map((entry) => [entry.league, entry])
-);
-function resolveLiveTrackerFeedForLeague(league) {
-  return FEED_BY_LEAGUE.get(league) ?? null;
-}
-
-// ../grarf/desktop/src/lib/liveTracker/resolveActiveLiveTrackerFeeds.ts
 function resolveActiveLiveTrackerFeeds(liveLeagueKeys) {
   const feeds = [];
   for (const league of liveLeagueKeys) {
@@ -70369,7 +70535,7 @@ function buildLiveTrackerActiveFeedsSnapshot(liveLeagueKeys, updatedAt = null) {
 
 // ../grarf/desktop/src/store/liveTrackerLiveLeaguesStore.ts
 init_define_import_meta_env();
-var import_zustand36 = __toESM(require_zustand(), 1);
+var import_zustand37 = __toESM(require_zustand(), 1);
 
 // ../grarf/desktop/src/lib/liveTracker/resolveCurrentlyLiveGamesSpineLeagues.ts
 init_define_import_meta_env();
@@ -70384,11 +70550,24 @@ function resolveCurrentlyLiveGamesSpineLeagues(leagues) {
   }
   return liveLeagues;
 }
-function buildLiveTrackerLiveLeaguesSnapshot(leagues, updatedAt = null) {
-  const liveLeagues = resolveCurrentlyLiveGamesSpineLeagues(leagues);
+function buildLiveTrackerDisplayLeaguesSnapshot(leagues, completedAtMsByLeague, updatedAt = null, nowMs = Date.now()) {
+  const displayLeagues = [];
+  const seen = /* @__PURE__ */ new Set();
+  for (const entry of resolveCurrentlyLiveGamesSpineLeagues(leagues)) {
+    displayLeagues.push(entry);
+    seen.add(entry.league);
+  }
+  for (const [league, completedAtMs] of Object.entries(completedAtMsByLeague)) {
+    const leagueKey = league;
+    if (seen.has(leagueKey)) continue;
+    if (!isLeagueWithinRetentionWindow(completedAtMs, nowMs)) continue;
+    if (!hasLiveTrackerFeedForLeague(leagueKey)) continue;
+    displayLeagues.push({ league: leagueKey, liveGameCount: 0 });
+    seen.add(leagueKey);
+  }
   return {
-    leagues: liveLeagues,
-    leagueKeys: liveLeagues.map((entry) => entry.league),
+    leagues: displayLeagues,
+    leagueKeys: displayLeagues.map((entry) => entry.league),
     updatedAt
   };
 }
@@ -70401,14 +70580,20 @@ function emptySnapshot() {
     updatedAt: null
   };
 }
-var useLiveTrackerLiveLeaguesStore = (0, import_zustand36.create)((set) => ({
+var useLiveTrackerLiveLeaguesStore = (0, import_zustand37.create)((set) => ({
   ...emptySnapshot(),
-  syncFromGamesSpine: () => {
+  syncFromGamesSpine: (nowMs = Date.now()) => {
     const { leagues, updatedAt } = useCanonicalLiveGameStore.getState();
-    set(buildLiveTrackerLiveLeaguesSnapshot(leagues, updatedAt));
+    const { completedAtMsByLeague } = useLiveTrackerLeagueRetentionStore.getState();
+    set(
+      buildLiveTrackerDisplayLeaguesSnapshot(leagues, completedAtMsByLeague, updatedAt, nowMs)
+    );
   }
 }));
 useCanonicalLiveGameStore.subscribe(() => {
+  useLiveTrackerLiveLeaguesStore.getState().syncFromGamesSpine();
+});
+useLiveTrackerLeagueRetentionStore.subscribe(() => {
   useLiveTrackerLiveLeaguesStore.getState().syncFromGamesSpine();
 });
 useLiveTrackerLiveLeaguesStore.getState().syncFromGamesSpine();
@@ -70421,7 +70606,7 @@ function emptySnapshot2() {
     updatedAt: null
   };
 }
-var useLiveTrackerActiveFeedsStore = (0, import_zustand37.create)((set) => ({
+var useLiveTrackerActiveFeedsStore = (0, import_zustand38.create)((set) => ({
   ...emptySnapshot2(),
   syncFromLiveLeagues: () => {
     const { leagueKeys, updatedAt } = useLiveTrackerLiveLeaguesStore.getState();
@@ -70551,12 +70736,44 @@ function emptySnapshot3() {
     fetchedAt: null
   };
 }
-var useLiveTrackerPostsStore = (0, import_zustand38.create)((set) => ({
+function sortLiveTrackerPostsNewestFirst(posts) {
+  return [...posts].sort(
+    (a2, b2) => new Date(b2.publishedAt).getTime() - new Date(a2.publishedAt).getTime()
+  );
+}
+function mergeRetainedLiveTrackerPosts(incoming, previous, displayActiveLeagueKeys) {
+  const merged = /* @__PURE__ */ new Map();
+  for (const post of incoming) {
+    if (!displayActiveLeagueKeys.has(post.league)) continue;
+    merged.set(post.url, post);
+  }
+  for (const post of previous) {
+    if (!displayActiveLeagueKeys.has(post.league)) continue;
+    if (!merged.has(post.url)) merged.set(post.url, post);
+  }
+  return sortLiveTrackerPostsNewestFirst([...merged.values()]);
+}
+var useLiveTrackerPostsStore = (0, import_zustand39.create)((set, get) => ({
   ...emptySnapshot3(),
   refresh: async () => {
+    const nowMs = Date.now();
+    syncLiveTrackerLeagueRetention(nowMs);
+    useLiveTrackerLiveLeaguesStore.getState().syncFromGamesSpine(nowMs);
+    const displayActiveLeagueKeys = new Set(
+      useLiveTrackerLiveLeaguesStore.getState().leagueKeys
+    );
     const snapshot = await fetchActiveLiveTrackerPosts();
-    set((state3) => ({ ...state3, ...snapshot }));
-    return snapshot;
+    const posts = mergeRetainedLiveTrackerPosts(
+      snapshot.posts,
+      get().posts,
+      displayActiveLeagueKeys
+    );
+    const nextSnapshot = {
+      ...snapshot,
+      posts
+    };
+    set((state3) => ({ ...state3, ...nextSnapshot }));
+    return nextSnapshot;
   }
 }));
 function refreshLiveTrackerPosts() {
@@ -70564,7 +70781,7 @@ function refreshLiveTrackerPosts() {
 }
 
 // ../grarf/desktop/src/hooks/useHomeLiveTrackerPosts.ts
-function sortLiveTrackerPostsNewestFirst(posts) {
+function sortLiveTrackerPostsNewestFirst2(posts) {
   return [...posts].sort(
     (a2, b2) => new Date(b2.publishedAt).getTime() - new Date(a2.publishedAt).getTime()
   );
@@ -70572,7 +70789,7 @@ function sortLiveTrackerPostsNewestFirst(posts) {
 function useHomeLiveTrackerPosts() {
   const posts = useLiveTrackerPostsStore((state3) => state3.posts);
   return (0, import_react140.useMemo)(
-    () => sortLiveTrackerPostsNewestFirst(posts ?? []),
+    () => sortLiveTrackerPostsNewestFirst2(posts ?? []),
     [posts]
   );
 }
