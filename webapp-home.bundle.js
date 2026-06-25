@@ -23862,6 +23862,2612 @@ function AnalyticsProvider({ children }) {
 
 // ../grarf/desktop/src/layouts/AppShellLayout.tsx
 init_define_import_meta_env();
+
+// ../grarf/desktop/src/lib/gamesSpine/webGamesSpineBootstrap.ts
+init_define_import_meta_env();
+init_isGrarfWebRenderer();
+
+// ../grarf/desktop/src/lib/gamesSpine/manual/gamesSpineManualApi.ts
+init_define_import_meta_env();
+
+// ../grarf/desktop/src/config/sportscapeEditorialConfig.ts
+init_define_import_meta_env();
+init_isGrarfWebRenderer();
+var SPORTSCAPE_EDITORIAL_PRIMARY_API_URL = "https://grarf-operational-service.grarf.workers.dev/sportscape-editorial";
+var SPORTSCAPE_EDITORIAL_FALLBACK_API_URL = "https://grarf-sportscape-editorial.grarf.workers.dev";
+var SPORTSCAPE_EDITORIAL_FAILOVER_BASE_URLS = [
+  SPORTSCAPE_EDITORIAL_PRIMARY_API_URL,
+  SPORTSCAPE_EDITORIAL_FALLBACK_API_URL
+];
+var DEFAULT_SPORTSCAPE_EDITORIAL_API_URL = SPORTSCAPE_EDITORIAL_FALLBACK_API_URL;
+var WEB_SPORTSCAPE_EDITORIAL_API_URL = SPORTSCAPE_EDITORIAL_PRIMARY_API_URL;
+function resolveWebSportscapeEditorialApiUrl() {
+  if (typeof window === "undefined") return null;
+  return window.GRARF_WEB_CONFIG?.sportscapeEditorialApiUrl?.trim() || null;
+}
+function getSportscapeEditorialApiBaseUrl() {
+  const fromWeb = resolveWebSportscapeEditorialApiUrl();
+  if (fromWeb) return fromWeb.replace(/\/+$/, "");
+  if (isGrarfWebRenderer()) {
+    return WEB_SPORTSCAPE_EDITORIAL_API_URL;
+  }
+  const fromEnv = define_import_meta_env_default.VITE_SPORTSCAPE_EDITORIAL_API_URL?.trim();
+  if (fromEnv) return fromEnv.replace(/\/+$/, "");
+  return DEFAULT_SPORTSCAPE_EDITORIAL_API_URL;
+}
+function shouldUseLocalSportscapeEditorialFallback() {
+  if (!define_import_meta_env_default.DEV) return false;
+  if (define_import_meta_env_default.VITE_SPORTSCAPE_EDITORIAL_USE_LOCAL !== "1") return false;
+  return Boolean(
+    typeof window !== "undefined" && window.grarf?.sportscapeEditorialGetDocument
+  );
+}
+function sportscapeEditorialUrlForBase(base, path) {
+  const normalized = base.replace(/\/+$/, "");
+  if (path === "/" || path === "") return `${normalized}/`;
+  const suffix = path.startsWith("/") ? path : `/${path}`;
+  return `${normalized}${suffix}`;
+}
+function sportscapeEditorialApiUrl(path) {
+  return sportscapeEditorialUrlForBase(getSportscapeEditorialApiBaseUrl(), path);
+}
+
+// ../grarf/desktop/src/lib/sportscape/editorial/sportscapeEditorialAdminAuth.ts
+init_define_import_meta_env();
+
+// ../grarf/desktop/src/lib/admin/grarfAdminFlag.ts
+init_define_import_meta_env();
+var GRARF_ADMIN_STORAGE_KEY = "grarf-admin";
+function isGrarfAdmin() {
+  if (typeof localStorage === "undefined") return false;
+  try {
+    return localStorage.getItem(GRARF_ADMIN_STORAGE_KEY) === "true";
+  } catch {
+    return false;
+  }
+}
+function markGrarfAdmin() {
+  if (typeof localStorage === "undefined") return;
+  try {
+    localStorage.setItem(GRARF_ADMIN_STORAGE_KEY, "true");
+  } catch {
+  }
+}
+
+// ../grarf/desktop/src/lib/sportscape/editorial/sportscapeEditorialAdminAuth.ts
+var SESSION_KEY = "grarf-sportscape-admin-token";
+function getSportscapeAdminToken() {
+  try {
+    const token = sessionStorage.getItem(SESSION_KEY)?.trim();
+    return token || null;
+  } catch {
+    return null;
+  }
+}
+function isSportscapeAdminAuthed() {
+  return Boolean(getSportscapeAdminToken());
+}
+function markSportscapeAdminAuthed(token) {
+  try {
+    sessionStorage.setItem(SESSION_KEY, token);
+  } catch {
+  }
+  markGrarfAdmin();
+}
+
+// ../grarf/desktop/src/lib/gamesSpine/manual/gamesSpineManualApi.ts
+function workerWriteHeaders() {
+  const headers = {
+    "Content-Type": "application/json"
+  };
+  const token = getSportscapeAdminToken();
+  if (token) headers.Authorization = `Bearer ${token}`;
+  return headers;
+}
+var manualDocumentPrefetch = null;
+function prefetchGamesSpineManualDocument() {
+  if (manualDocumentPrefetch) return;
+  manualDocumentPrefetch = fetchGamesSpineManualDocument();
+}
+async function resolveGamesSpineManualDocument() {
+  prefetchGamesSpineManualDocument();
+  return manualDocumentPrefetch;
+}
+async function fetchGamesSpineManualDocument() {
+  const res = await fetch(sportscapeEditorialApiUrl("/games-spine-manual"), { method: "GET" });
+  if (!res.ok) throw new Error(`games_spine_manual_load_failed_${res.status}`);
+  const body = await res.json();
+  return body.document ?? { leagues: [] };
+}
+async function loadGamesSpineManualDocument() {
+  return resolveGamesSpineManualDocument();
+}
+async function saveGamesSpineManualDocument(document2) {
+  const res = await fetch(sportscapeEditorialApiUrl("/games-spine-manual"), {
+    method: "POST",
+    headers: workerWriteHeaders(),
+    body: JSON.stringify({ document: document2 })
+  });
+  if (!res.ok) throw new Error(`games_spine_manual_save_failed_${res.status}`);
+  const body = await res.json();
+  if (!body.document) throw new Error("games_spine_manual_save_missing_document");
+  return body.document;
+}
+
+// ../grarf/desktop/src/services/operationalIngest/fetchOperationalSnapshot.ts
+init_define_import_meta_env();
+init_operationalIngestConfig();
+init_isGrarfWebRenderer();
+
+// ../grarf/desktop/src/services/operationalIngest/supplementOperationalSnapshotWithTennis.ts
+init_define_import_meta_env();
+
+// ../grarf/desktop/src/services/operationalIngest/tennis/fetchTennisOperationalLeagues.ts
+init_define_import_meta_env();
+
+// ../grarf/desktop/src/services/operationalIngest/tennis/fetchEspnTennisScoreboard.ts
+init_define_import_meta_env();
+
+// ../grarf/desktop/src/services/operationalIngest/tennis/operationalDate.ts
+init_define_import_meta_env();
+
+// ../grarf/desktop/shared/operationalSlateDate.js
+init_define_import_meta_env();
+
+// ../grarf/desktop/shared/golfTournamentDate.js
+init_define_import_meta_env();
+var GOLF_TOURNAMENT_DAY_TIMEZONE = "America/New_York";
+var GOLF_LEAGUE_KEYS2 = /* @__PURE__ */ new Set(["PGA", "LPGA", "LIV", "CHAMPIONS"]);
+function isGolfTournamentLeagueKey(league) {
+  return typeof league === "string" && GOLF_LEAGUE_KEYS2.has(league);
+}
+function readGolfTournamentStartDateKey(iso, formatDayKey) {
+  if (typeof iso !== "string" || !iso.trim()) return null;
+  const ms2 = Date.parse(iso);
+  if (!Number.isFinite(ms2) || ms2 <= 0) {
+    const match = iso.match(/^(\d{4}-\d{2}-\d{2})/);
+    return match?.[1] ?? null;
+  }
+  return formatDayKey(ms2, GOLF_TOURNAMENT_DAY_TIMEZONE) ?? null;
+}
+function readGolfTournamentEndDateKey(iso, formatDayKey) {
+  return readGolfTournamentStartDateKey(iso, formatDayKey);
+}
+function formatGolfScheduledDayLabel(dateKey) {
+  const trimmed = dateKey.trim();
+  if (!trimmed) return "\u2014";
+  const [y2, m2, d2] = trimmed.split("-").map(Number);
+  if (!y2 || !m2 || !d2) return "\u2014";
+  const anchor = new Date(Date.UTC(y2, m2 - 1, d2, 17, 0, 0));
+  return anchor.toLocaleDateString("en-US", {
+    weekday: "short",
+    month: "numeric",
+    day: "numeric",
+    timeZone: GOLF_TOURNAMENT_DAY_TIMEZONE
+  });
+}
+
+// ../grarf/desktop/shared/operationalSlateDate.js
+var GRARF_OPERATIONAL_SLATE_TIMEZONE = "America/Chicago";
+var OPERATIONAL_SLATE_NEXT_DAY_CUTOFF_HOUR = 6;
+var calendarFormatterCache = /* @__PURE__ */ new Map();
+function getCalendarFormatter(timeZone) {
+  let formatter = calendarFormatterCache.get(timeZone);
+  if (!formatter) {
+    formatter = new Intl.DateTimeFormat("en-US", {
+      timeZone,
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "numeric",
+      hourCycle: "h23"
+    });
+    calendarFormatterCache.set(timeZone, formatter);
+  }
+  return formatter;
+}
+function calendarPartsInTimeZone(ms2, timeZone) {
+  const parts = getCalendarFormatter(timeZone).formatToParts(new Date(ms2));
+  return {
+    year: Number(parts.find((p2) => p2.type === "year")?.value),
+    month: Number(parts.find((p2) => p2.type === "month")?.value),
+    day: Number(parts.find((p2) => p2.type === "day")?.value),
+    hour: Number(parts.find((p2) => p2.type === "hour")?.value)
+  };
+}
+var operationalTodayKeyCache = {
+  timeZone: "",
+  bucketMs: 0,
+  key: "1970-01-01"
+};
+function readOperationalTodayKeyCache(now, timeZone) {
+  const bucketMs = Math.floor(now.getTime() / 6e4);
+  if (operationalTodayKeyCache.timeZone === timeZone && operationalTodayKeyCache.bucketMs === bucketMs) {
+    return operationalTodayKeyCache.key;
+  }
+  return null;
+}
+function writeOperationalTodayKeyCache(now, timeZone, key2) {
+  operationalTodayKeyCache.timeZone = timeZone;
+  operationalTodayKeyCache.bucketMs = Math.floor(now.getTime() / 6e4);
+  operationalTodayKeyCache.key = key2;
+}
+function formatOperationalDateKeyFromMs(ms2, timeZone = GRARF_OPERATIONAL_SLATE_TIMEZONE) {
+  if (ms2 == null || !Number.isFinite(ms2) || ms2 <= 0) return void 0;
+  const { year, month, day } = calendarPartsInTimeZone(ms2, timeZone);
+  if (!year || !month || !day) return void 0;
+  return `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+}
+function getOperationalTodayDateKey(now = /* @__PURE__ */ new Date(), timeZone = GRARF_OPERATIONAL_SLATE_TIMEZONE) {
+  const cached = readOperationalTodayKeyCache(now, timeZone);
+  if (cached) return cached;
+  const key2 = formatOperationalDateKeyFromMs(now.getTime(), timeZone) ?? "1970-01-01";
+  writeOperationalTodayKeyCache(now, timeZone, key2);
+  return key2;
+}
+function offsetOperationalDateKey(dateKey, dayOffset, timeZone = GRARF_OPERATIONAL_SLATE_TIMEZONE) {
+  const [y2, m2, d2] = dateKey.split("-").map(Number);
+  const anchor = Date.UTC(y2, (m2 ?? 1) - 1, (d2 ?? 1) + dayOffset, 12, 0, 0);
+  return formatOperationalDateKeyFromMs(anchor, timeZone) ?? dateKey;
+}
+function getOperationalYesterdayDateKey(now = /* @__PURE__ */ new Date(), timeZone = GRARF_OPERATIONAL_SLATE_TIMEZONE) {
+  return offsetOperationalDateKey(getOperationalTodayDateKey(now, timeZone), -1, timeZone);
+}
+function getOperationalTomorrowDateKey(now = /* @__PURE__ */ new Date(), timeZone = GRARF_OPERATIONAL_SLATE_TIMEZONE) {
+  return offsetOperationalDateKey(getOperationalTodayDateKey(now, timeZone), 1, timeZone);
+}
+function formatEspnScoreboardDatesParam(now = /* @__PURE__ */ new Date(), timeZone = GRARF_OPERATIONAL_SLATE_TIMEZONE) {
+  return getOperationalTodayDateKey(now, timeZone).replace(/-/g, "");
+}
+function formatEspnScoreboardDatesParamForTomorrow(now = /* @__PURE__ */ new Date(), timeZone = GRARF_OPERATIONAL_SLATE_TIMEZONE) {
+  return getOperationalTomorrowDateKey(now, timeZone).replace(/-/g, "");
+}
+function resolveScheduledDateKey(isoStart, slateDateKey, timeZone = GRARF_OPERATIONAL_SLATE_TIMEZONE) {
+  const fromStart = formatOperationalDateKeyFromMs(Date.parse(isoStart || ""), timeZone);
+  if (fromStart) return fromStart;
+  const slate = typeof slateDateKey === "string" ? slateDateKey.trim() : "";
+  return slate || void 0;
+}
+var nextDayCutoffMsCache = /* @__PURE__ */ new Map();
+function getNextDayCutoffMs(operationalDateKey, cutoffHour, timeZone) {
+  const cacheKey3 = `${operationalDateKey}|${cutoffHour}|${timeZone}`;
+  const cached = nextDayCutoffMsCache.get(cacheKey3);
+  if (cached != null) return cached;
+  const tomorrowKey = offsetOperationalDateKey(operationalDateKey, 1, timeZone);
+  const [y2, m2, d2] = tomorrowKey.split("-").map(Number);
+  let probe = Date.UTC(y2, (m2 ?? 1) - 1, d2 ?? 1, 12, 0, 0);
+  for (let i2 = -30; i2 < 30; i2++) {
+    const candidate = probe + i2 * 36e5;
+    const key2 = formatOperationalDateKeyFromMs(candidate, timeZone);
+    const hour = calendarPartsInTimeZone(candidate, timeZone).hour;
+    if (key2 === tomorrowKey && hour === cutoffHour) {
+      nextDayCutoffMsCache.set(cacheKey3, candidate);
+      return candidate;
+    }
+  }
+  const fallback = probe + 24 * 36e5;
+  nextDayCutoffMsCache.set(cacheKey3, fallback);
+  return fallback;
+}
+function isScheduledOnOperationalEveningSlate(game, operationalDateKey, now = /* @__PURE__ */ new Date(), timeZone = GRARF_OPERATIONAL_SLATE_TIMEZONE) {
+  const startKey = formatOperationalDateKeyFromMs(game.startTimeMs, timeZone);
+  if (startKey === operationalDateKey) return true;
+  const tomorrowKey = getOperationalTomorrowDateKey(now, timeZone);
+  const payloadKey = typeof game.scheduledDateKey === "string" ? game.scheduledDateKey.trim() : null;
+  if (startKey === tomorrowKey) {
+    const ms2 = game.startTimeMs;
+    if (ms2 != null && Number.isFinite(ms2) && ms2 > 0) {
+      const cutoff = getNextDayCutoffMs(operationalDateKey, OPERATIONAL_SLATE_NEXT_DAY_CUTOFF_HOUR, timeZone);
+      if (ms2 < cutoff) return true;
+    }
+  }
+  if (!startKey && payloadKey === operationalDateKey) return true;
+  return false;
+}
+function resolveGameOperationalSlateDateKey(game, timeZone = GRARF_OPERATIONAL_SLATE_TIMEZONE) {
+  const scheduledKey = typeof game?.scheduledDateKey === "string" ? game.scheduledDateKey.trim() : "";
+  if (isGolfTournamentLeagueKey(game?.league)) {
+    if (game?.status === "final") {
+      const endKey = typeof game?.metadata?.tournamentEndDateKey === "string" ? game.metadata.tournamentEndDateKey.trim() : "";
+      if (endKey) return endKey;
+    }
+    if (scheduledKey) return scheduledKey;
+  }
+  return formatOperationalDateKeyFromMs(game?.startTimeMs, timeZone) || scheduledKey || void 0;
+}
+function filterGamesForOperationalDateKey(games, operationalDateKey, now = /* @__PURE__ */ new Date(), timeZone = GRARF_OPERATIONAL_SLATE_TIMEZONE) {
+  return games.filter((g2) => {
+    if (g2?.status === "live") return true;
+    if (g2?.status === "scheduled") {
+      if (isGolfTournamentLeagueKey(g2?.league)) {
+        const key3 = typeof g2?.scheduledDateKey === "string" ? g2.scheduledDateKey.trim() : "";
+        return key3 ? key3 === operationalDateKey : false;
+      }
+      return isScheduledOnOperationalEveningSlate(g2, operationalDateKey, now, timeZone);
+    }
+    const key2 = resolveGameOperationalSlateDateKey(g2, timeZone);
+    return key2 === operationalDateKey;
+  });
+}
+function shouldKeepGameOnOperationalFallbackIngest(game, now = /* @__PURE__ */ new Date(), timeZone = GRARF_OPERATIONAL_SLATE_TIMEZONE) {
+  if (game?.status === "live") return true;
+  const todayKey = getOperationalTodayDateKey(now, timeZone);
+  if (filterGamesForOperationalDateKey([game], todayKey, now, timeZone).length > 0) {
+    return true;
+  }
+  if (game?.status === "final") {
+    const yesterdayKey2 = getOperationalYesterdayDateKey(now, timeZone);
+    if (filterGamesForOperationalDateKey([game], yesterdayKey2, now, timeZone).length > 0) {
+      return true;
+    }
+  }
+  return false;
+}
+function filterGamesForOperationalFallbackIngest(games, now = /* @__PURE__ */ new Date(), timeZone = GRARF_OPERATIONAL_SLATE_TIMEZONE) {
+  return games.filter((g2) => shouldKeepGameOnOperationalFallbackIngest(g2, now, timeZone));
+}
+
+// ../grarf/desktop/src/services/operationalIngest/tennis/fetchEspnTennisScoreboard.ts
+var ESPN_FETCH_TIMEOUT_MS = 12e3;
+async function fetchScoreboardJson(url) {
+  const res = await fetch(url, {
+    headers: { Accept: "application/json" },
+    signal: AbortSignal.timeout(ESPN_FETCH_TIMEOUT_MS)
+  });
+  if (!res.ok) {
+    const t2 = await res.text().catch(() => "");
+    throw new Error(`ESPN ${res.status}: ${t2.slice(0, 120)}`);
+  }
+  return res.json();
+}
+function isCompetitionLive(comp) {
+  const statusType = comp.status?.type;
+  if (!statusType) return false;
+  if (statusType.completed) return false;
+  return String(statusType.state ?? "").toLowerCase() === "in";
+}
+function countLiveTennisCompetitions(json) {
+  const events = Array.isArray(json?.events) ? json.events : [];
+  let n2 = 0;
+  for (const ev of events) {
+    if (!ev || typeof ev !== "object") continue;
+    const groupings = Array.isArray(ev.groupings) ? ev.groupings : [];
+    for (const grouping of groupings) {
+      if (!grouping || typeof grouping !== "object") continue;
+      const competitions = Array.isArray(grouping.competitions) ? grouping.competitions : [];
+      for (const competition of competitions) {
+        if (!competition || typeof competition !== "object") continue;
+        if (isCompetitionLive(competition)) n2 += 1;
+      }
+    }
+  }
+  return n2;
+}
+async function fetchOperationalTennisScoreboardJson(endpoint, now = /* @__PURE__ */ new Date()) {
+  const datesParam = formatEspnScoreboardDatesParam(now);
+  const datedUrl = `${endpoint}${endpoint.includes("?") ? "&" : "?"}dates=${datesParam}`;
+  const datedJson = await fetchScoreboardJson(datedUrl);
+  const datedEvents = Array.isArray(datedJson?.events) ? datedJson.events : [];
+  const datedLive = countLiveTennisCompetitions(datedJson);
+  if (datedEvents.length > 0 && datedLive > 0) {
+    return { json: datedJson, usedFallback: false };
+  }
+  const defaultJson = await fetchScoreboardJson(endpoint);
+  const defaultLive = countLiveTennisCompetitions(defaultJson);
+  if (datedEvents.length > 0 && datedLive === 0 && defaultLive > 0) {
+    return { json: defaultJson, usedFallback: false };
+  }
+  if (datedEvents.length > 0) {
+    return { json: datedJson, usedFallback: false };
+  }
+  return { json: defaultJson, usedFallback: true };
+}
+
+// ../grarf/desktop/src/services/operationalIngest/tennis/normalizeTennisOperational.ts
+init_define_import_meta_env();
+var MENS_DRAW_TYPE_SLUGS = /* @__PURE__ */ new Set(["mens-singles", "mens-doubles"]);
+var WOMENS_DRAW_TYPE_SLUGS = /* @__PURE__ */ new Set(["womens-singles", "womens-doubles"]);
+function resolveTennisTourLeague(competition, groupingLabel, groupingSlug, pollLeagueKey) {
+  const type = competition.type;
+  const typeSlug = safe(type?.slug).toLowerCase();
+  if (MENS_DRAW_TYPE_SLUGS.has(typeSlug)) return "ATP";
+  if (WOMENS_DRAW_TYPE_SLUGS.has(typeSlug)) return "WTA";
+  const groupingTypeSlug = safe(groupingSlug).toLowerCase();
+  if (MENS_DRAW_TYPE_SLUGS.has(groupingTypeSlug)) return "ATP";
+  if (WOMENS_DRAW_TYPE_SLUGS.has(groupingTypeSlug)) return "WTA";
+  const label = safe(groupingLabel).toLowerCase();
+  if (label.startsWith("men")) return "ATP";
+  if (label.startsWith("women")) return "WTA";
+  if (typeSlug === "mixed-doubles" || groupingTypeSlug === "mixed-doubles") {
+    return pollLeagueKey;
+  }
+  return null;
+}
+function safe(v2) {
+  return typeof v2 === "string" && v2.trim() ? v2.trim() : "";
+}
+function formatTimeEt(iso) {
+  try {
+    const d2 = new Date(iso);
+    if (Number.isNaN(d2.getTime())) return "\u2014";
+    return d2.toLocaleTimeString("en-US", {
+      hour: "numeric",
+      minute: "2-digit",
+      timeZoneName: "short"
+    });
+  } catch {
+    return "\u2014";
+  }
+}
+function pickPlayerName(athlete) {
+  if (!athlete) return "TBD";
+  return safe(athlete.shortName) || safe(athlete.displayName) || safe(athlete.fullName) || "TBD";
+}
+function pickPlayerLogoUrl(athlete) {
+  const flag = athlete?.flag;
+  const href = flag?.href;
+  return typeof href === "string" && href.startsWith("http") ? href.trim() : void 0;
+}
+function countSetsWon(competitor) {
+  const lines = competitor.linescores;
+  if (!Array.isArray(lines)) return null;
+  let won = 0;
+  for (const row of lines) {
+    if (row && typeof row === "object" && row.winner === true) {
+      won += 1;
+    }
+  }
+  return won;
+}
+function mapTennisSetLines(competitor) {
+  const lines = Array.isArray(competitor.linescores) ? competitor.linescores : [];
+  const out = [];
+  for (const row of lines) {
+    if (!row || typeof row !== "object") continue;
+    const value = Number(row.value);
+    if (!Number.isFinite(value)) continue;
+    const tiebreakRaw = row.tiebreak;
+    out.push({
+      value,
+      tiebreak: tiebreakRaw != null && Number.isFinite(Number(tiebreakRaw)) ? Number(tiebreakRaw) : void 0,
+      winner: row.winner === true
+    });
+  }
+  return out;
+}
+function pickAthleteSeed(athlete) {
+  const seed = athlete?.seed;
+  const n2 = typeof seed === "number" ? seed : Number(seed);
+  return Number.isFinite(n2) && n2 > 0 ? n2 : null;
+}
+function resolveServerSide(away, home) {
+  if (away.possession === true) return "away";
+  if (home.possession === true) return "home";
+  return null;
+}
+function collectBroadcastLabels(competition) {
+  const seen = /* @__PURE__ */ new Set();
+  const out = [];
+  const geo = competition.geoBroadcasts;
+  if (Array.isArray(geo)) {
+    for (const row of geo) {
+      const label = safe(row?.media?.shortName);
+      if (!label || label === "TV TBD") continue;
+      const key2 = label.toLowerCase();
+      if (seen.has(key2)) continue;
+      seen.add(key2);
+      out.push(label);
+    }
+  }
+  const arr = competition.broadcasts;
+  if (Array.isArray(arr)) {
+    for (const b2 of arr) {
+      const names = b2?.names;
+      if (!Array.isArray(names)) continue;
+      for (const n2 of names) {
+        const label = typeof n2 === "string" ? n2.trim() : "";
+        if (!label || label === "TV TBD") continue;
+        const key2 = label.toLowerCase();
+        if (seen.has(key2)) continue;
+        seen.add(key2);
+        out.push(label);
+      }
+    }
+  }
+  if (typeof competition.broadcast === "string") {
+    const label = competition.broadcast.trim();
+    if (label && label !== "TV TBD") out.push(label);
+  }
+  return out.length ? out : ["TV TBD"];
+}
+function flattenTennisCompetitions(events) {
+  const rows = [];
+  if (!Array.isArray(events)) return rows;
+  for (const tournament of events) {
+    if (!tournament || typeof tournament !== "object") continue;
+    const t2 = tournament;
+    const groupings = Array.isArray(t2.groupings) ? t2.groupings : [];
+    for (const grouping of groupings) {
+      if (!grouping || typeof grouping !== "object") continue;
+      const g2 = grouping;
+      const groupingMeta = g2.grouping;
+      const groupingLabel = safe(groupingMeta?.displayName) || void 0;
+      const groupingSlug = safe(groupingMeta?.slug) || void 0;
+      const competitions = Array.isArray(g2.competitions) ? g2.competitions : [];
+      for (const competition of competitions) {
+        if (!competition || typeof competition !== "object") continue;
+        rows.push({
+          competition,
+          tournament: t2,
+          groupingLabel,
+          groupingSlug
+        });
+      }
+    }
+  }
+  return rows;
+}
+function sortTennisGames(games) {
+  const rank = (g2) => {
+    if (g2.status === "live") return 0;
+    if (g2.status === "scheduled") return 1;
+    return 2;
+  };
+  return [...games].sort((a2, b2) => {
+    const dr2 = rank(a2) - rank(b2);
+    if (dr2 !== 0) return dr2;
+    const ta2 = typeof a2.startTimeMs === "number" ? a2.startTimeMs : 0;
+    const tb = typeof b2.startTimeMs === "number" ? b2.startTimeMs : 0;
+    if (ta2 !== tb) return ta2 - tb;
+    return String(a2.time).localeCompare(String(b2.time));
+  });
+}
+function normalizeTennisCompetition(competition, tournament, groupingLabel, groupingSlug, pollLeagueKey, slateDateKey) {
+  const tourLeagueKey = resolveTennisTourLeague(
+    competition,
+    groupingLabel,
+    groupingSlug,
+    pollLeagueKey
+  );
+  if (!tourLeagueKey) return null;
+  const competitors = Array.isArray(competition.competitors) ? competition.competitors : [];
+  const away = competitors.find(
+    (c2) => c2 && typeof c2 === "object" && c2.homeAway === "away"
+  );
+  const home = competitors.find(
+    (c2) => c2 && typeof c2 === "object" && c2.homeAway === "home"
+  );
+  if (!away || !home) return null;
+  const awayAthlete = away.athlete;
+  const homeAthlete = home.athlete;
+  if (!awayAthlete || !homeAthlete) return null;
+  const status = competition.status || {};
+  const statusType = status.type || {};
+  const completed = !!statusType.completed;
+  const state3 = safe(statusType.state).toLowerCase();
+  const live = !completed && state3 === "in";
+  const final = completed || state3 === "post";
+  let cardStatus = "scheduled";
+  if (live) cardStatus = "live";
+  else if (final) cardStatus = "final";
+  const awayTeam = pickPlayerName(awayAthlete);
+  const homeTeam = pickPlayerName(homeAthlete);
+  const awayScore = countSetsWon(away);
+  const homeScore = countSetsWon(home);
+  const tournamentName = safe(tournament.shortName) || safe(tournament.name) || "";
+  const round = competition.round;
+  const roundName = safe(round?.displayName);
+  const venue = competition.venue;
+  const awaySets = mapTennisSetLines(away);
+  const homeSets = mapTennisSetLines(home);
+  const notes = Array.isArray(competition.notes) ? competition.notes : [];
+  const noteText = safe(
+    notes.find((n2) => n2 && typeof n2 === "object" && n2.type === "event")?.text
+  );
+  const broadcasts = collectBroadcastLabels(competition);
+  const isoStart = safe(competition.startDate) || safe(competition.date) || safe(tournament.date);
+  const startTimeMs = Date.parse(isoStart || "") || 0;
+  const scheduledDateKey = resolveScheduledDateKey(isoStart, slateDateKey);
+  const periodNum = status.period != null ? Number(status.period) : NaN;
+  const period = Number.isFinite(periodNum) ? periodNum : void 0;
+  const displayClock = safe(status.displayClock) || void 0;
+  const contextParts = [tournamentName, roundName || groupingLabel].filter(Boolean);
+  const contextLine = contextParts.join(" \xB7 ");
+  let statusLine = contextLine;
+  if (cardStatus === "scheduled") {
+    const venueBits = [safe(venue?.fullName), safe(venue?.court)].filter(Boolean).join(" \xB7 ");
+    statusLine = [contextLine, venueBits].filter(Boolean).join(" \xB7 ");
+  } else if (cardStatus === "final") {
+    statusLine = [contextLine, noteText || safe(statusType.shortDetail) || "Final"].filter(Boolean).join(" \xB7 ") || "Final";
+  }
+  const competitionId = String(competition.id ?? "");
+  if (!competitionId) return null;
+  const id = `espn-${tourLeagueKey}-${competitionId}`;
+  return {
+    id,
+    grarfGameId: id,
+    league: tourLeagueKey,
+    espnEventId: competitionId,
+    externalIds: { espn: competitionId, mlb: null },
+    time: formatTimeEt(isoStart),
+    awayTeam,
+    awayLogoUrl: pickPlayerLogoUrl(awayAthlete),
+    awayRecord: "",
+    homeTeam,
+    homeLogoUrl: pickPlayerLogoUrl(homeAthlete),
+    homeRecord: "",
+    awayScore,
+    homeScore,
+    awayCity: "",
+    homeCity: "",
+    awayPitcher: "",
+    awayPitcherStats: "",
+    homePitcher: "",
+    homePitcherStats: "",
+    channels: broadcasts,
+    broadcasts,
+    status: cardStatus,
+    statusLine: statusLine || void 0,
+    startTimeMs,
+    scheduledDateKey,
+    lastUpdated: (/* @__PURE__ */ new Date()).toISOString(),
+    metadata: {
+      officialAwayName: safe(awayAthlete.displayName) || safe(awayAthlete.fullName) || awayTeam,
+      officialHomeName: safe(homeAthlete.displayName) || safe(homeAthlete.fullName) || homeTeam,
+      tennis: {
+        contextLine,
+        awaySets,
+        homeSets,
+        awaySeed: pickAthleteSeed(awayAthlete),
+        homeSeed: pickAthleteSeed(homeAthlete),
+        serverSide: resolveServerSide(away, home)
+      }
+    },
+    period: cardStatus === "final" ? null : period,
+    displayClock: cardStatus === "final" ? void 0 : displayClock,
+    content: {
+      stories: [],
+      clips: [],
+      highlights: [],
+      social: [],
+      watchLinks: []
+    }
+  };
+}
+function normalizeTennisScoreboard(scoreboardJson, pollLeagueKey, usedFallback) {
+  const day = scoreboardJson.day;
+  const slateDateKey = typeof day?.date === "string" ? day.date.trim() : void 0;
+  const events = Array.isArray(scoreboardJson.events) ? scoreboardJson.events : [];
+  const out = [];
+  for (const row of flattenTennisCompetitions(events)) {
+    const game = normalizeTennisCompetition(
+      row.competition,
+      row.tournament,
+      row.groupingLabel,
+      row.groupingSlug,
+      pollLeagueKey,
+      slateDateKey
+    );
+    if (game) out.push(game);
+  }
+  let sorted = sortTennisGames(out);
+  if (usedFallback) {
+    sorted = filterGamesForOperationalFallbackIngest(sorted);
+  }
+  return sorted;
+}
+function mergeTennisGamesById(existing, incoming) {
+  if (incoming.length === 0) return existing;
+  const byId = new Map(existing.map((g2) => [g2.id, g2]));
+  for (const game of incoming) {
+    byId.set(game.id, game);
+  }
+  return [...byId.values()];
+}
+function applyTennisPollToLeagueGames(leagueGames, pollLeagueKey, games) {
+  const atpGames = games.filter((g2) => g2.league === "ATP");
+  const wtaGames = games.filter((g2) => g2.league === "WTA");
+  if (pollLeagueKey === "ATP") {
+    leagueGames.ATP = atpGames;
+    if (wtaGames.length > 0) {
+      leagueGames.WTA = mergeTennisGamesById(leagueGames.WTA ?? [], wtaGames);
+    }
+  } else {
+    leagueGames.WTA = wtaGames;
+    if (atpGames.length > 0) {
+      leagueGames.ATP = mergeTennisGamesById(leagueGames.ATP ?? [], atpGames);
+    }
+  }
+}
+
+// ../grarf/desktop/src/services/operationalIngest/tennis/fetchTennisOperationalLeagues.ts
+var TENNIS_BASE = "https://site.api.espn.com/apis/site/v2/sports/tennis";
+var TENNIS_ENDPOINTS = [
+  { key: "ATP", endpoint: `${TENNIS_BASE}/atp/scoreboard` },
+  { key: "WTA", endpoint: `${TENNIS_BASE}/wta/scoreboard` }
+];
+var LOG = "[OperationalIngest][tennis]";
+async function fetchTennisLeagueGames(key2, endpoint) {
+  const { json, usedFallback } = await fetchOperationalTennisScoreboardJson(endpoint);
+  return normalizeTennisScoreboard(json, key2, usedFallback);
+}
+async function fetchTennisOperationalLeagues() {
+  const leagueGames = {};
+  const results = await Promise.all(
+    TENNIS_ENDPOINTS.map(async ({ key: key2, endpoint }) => {
+      try {
+        const games = await fetchTennisLeagueGames(key2, endpoint);
+        return { key: key2, games, error: null };
+      } catch (e2) {
+        const msg = e2 instanceof Error ? e2.message : String(e2);
+        if (define_import_meta_env_default.DEV) {
+          console.warn(`${LOG} ${key2} fetch failed`, msg);
+        }
+        return { key: key2, games: [], error: msg };
+      }
+    })
+  );
+  for (const row of results) {
+    applyTennisPollToLeagueGames(leagueGames, row.key, row.games);
+  }
+  if (define_import_meta_env_default.DEV) {
+    console.log(`${LOG} slate`, {
+      atp: leagueGames.ATP?.length ?? 0,
+      wta: leagueGames.WTA?.length ?? 0
+    });
+  }
+  return leagueGames;
+}
+
+// ../grarf/desktop/src/services/operationalIngest/supplementOperationalSnapshotWithTennis.ts
+var LOG2 = "[OperationalIngest]";
+async function supplementOperationalSnapshotWithTennis(snap) {
+  const tennis = await fetchTennisOperationalLeagues();
+  const atpIncoming = tennis.ATP ?? [];
+  const wtaIncoming = tennis.WTA ?? [];
+  if (atpIncoming.length === 0 && wtaIncoming.length === 0) {
+    return snap;
+  }
+  const leagues = { ...snap.leagues };
+  if (atpIncoming.length > 0) {
+    leagues.ATP = mergeTennisGamesById(leagues.ATP ?? [], atpIncoming);
+  }
+  if (wtaIncoming.length > 0) {
+    leagues.WTA = mergeTennisGamesById(leagues.WTA ?? [], wtaIncoming);
+  }
+  if (define_import_meta_env_default.DEV) {
+    console.log(`${LOG2} tennis supplement`, {
+      atp: leagues.ATP?.length ?? 0,
+      wta: leagues.WTA?.length ?? 0
+    });
+  }
+  return { ...snap, leagues };
+}
+
+// ../grarf/desktop/src/services/operationalIngest/web/fetchWebEspnOperationalSnapshot.ts
+init_define_import_meta_env();
+
+// ../grarf/desktop/src/data/espnOperationalLeagueEndpoints.ts
+init_define_import_meta_env();
+var SOCCER_BASE = "https://site.api.espn.com/apis/site/v2/sports/soccer";
+var TENNIS_BASE2 = "https://site.api.espn.com/apis/site/v2/sports/tennis";
+var MMA_BASE = "https://site.api.espn.com/apis/site/v2/sports/mma";
+var GOLF_BASE = "https://site.api.espn.com/apis/site/v2/sports/golf";
+var RACING_BASE = "https://site.api.espn.com/apis/site/v2/sports/racing";
+var ESPN_OPERATIONAL_LEAGUE_ENDPOINTS = {
+  MLB: "https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/scoreboard",
+  NCAABB: "https://site.api.espn.com/apis/site/v2/sports/baseball/college-baseball/scoreboard",
+  NBA: "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard",
+  WNBA: "https://site.api.espn.com/apis/site/v2/sports/basketball/wnba/scoreboard",
+  NHL: "https://site.api.espn.com/apis/site/v2/sports/hockey/nhl/scoreboard",
+  AFL: "https://site.api.espn.com/apis/site/v2/sports/australian-football/afl/scoreboard",
+  MLS: `${SOCCER_BASE}/usa.1/scoreboard`,
+  EPL: `${SOCCER_BASE}/eng.1/scoreboard`,
+  LALIGA: `${SOCCER_BASE}/esp.1/scoreboard`,
+  NWSL: `${SOCCER_BASE}/usa.nwsl/scoreboard`,
+  LIGAMX: `${SOCCER_BASE}/mex.1/scoreboard`,
+  SERIEA: `${SOCCER_BASE}/ita.1/scoreboard`,
+  LIGUE1: `${SOCCER_BASE}/fra.1/scoreboard`,
+  EREDIVISIE: `${SOCCER_BASE}/ned.1/scoreboard`,
+  BUNDESLIGA: `${SOCCER_BASE}/ger.1/scoreboard`,
+  UCL: `${SOCCER_BASE}/uefa.champions/scoreboard`,
+  UEL: `${SOCCER_BASE}/uefa.europa/scoreboard`,
+  WWC: `${SOCCER_BASE}/fifa.wwc/scoreboard`,
+  EURO: `${SOCCER_BASE}/uefa.euro/scoreboard`,
+  COPA: `${SOCCER_BASE}/conmebol.america/scoreboard`,
+  GOLDCUP: `${SOCCER_BASE}/concacaf.gold/scoreboard`,
+  NATIONS: `${SOCCER_BASE}/uefa.nations/scoreboard`,
+  CLUBWC: `${SOCCER_BASE}/fifa.cwc/scoreboard`,
+  SPFL: `${SOCCER_BASE}/sco.1/scoreboard`,
+  SAUDI: `${SOCCER_BASE}/ksa.1/scoreboard`,
+  SUPERLIG: `${SOCCER_BASE}/tur.1/scoreboard`,
+  USLCUP: `${SOCCER_BASE}/usa.usl.l1.cup/scoreboard`,
+  WORLDCUP: `${SOCCER_BASE}/fifa.world/scoreboard`,
+  ATP: `${TENNIS_BASE2}/atp/scoreboard`,
+  WTA: `${TENNIS_BASE2}/wta/scoreboard`,
+  UFC: `${MMA_BASE}/ufc/scoreboard`,
+  PGA: `${GOLF_BASE}/pga/scoreboard`,
+  LPGA: `${GOLF_BASE}/lpga/scoreboard`,
+  LIV: `${GOLF_BASE}/liv/scoreboard`,
+  CHAMPIONS: `${GOLF_BASE}/champions-tour/scoreboard`,
+  F1: `${RACING_BASE}/f1/scoreboard`,
+  NASCAR: `${RACING_BASE}/nascar-premier/scoreboard`,
+  INDYCAR: `${RACING_BASE}/irl/scoreboard`
+};
+
+// ../grarf/desktop/electron/espn/normalize.js
+init_define_import_meta_env();
+
+// ../grarf/desktop/electron/espn/espnPlusStream.js
+init_define_import_meta_env();
+
+// ../grarf/desktop/shared/espnWatchBroadcast.js
+init_define_import_meta_env();
+var ESPN_PLUS_LABEL = /espn\s*\+|espn\s*plus|espn\s*unlimited|espn\s*unlmtd/i;
+function isEspnPlusBroadcastLabel(label) {
+  if (typeof label !== "string" || !label.trim()) return false;
+  return ESPN_PLUS_LABEL.test(label);
+}
+function isEspnLinearBroadcastLabel(label) {
+  if (typeof label !== "string" || !label.trim()) return false;
+  const t2 = label.trim();
+  if (ESPN_PLUS_LABEL.test(t2)) return false;
+  return /^(espn2?|abc|espn\s*network|espn\s*national)$/i.test(t2);
+}
+function gameHasEspnPlusBroadcast(broadcastLabels) {
+  return broadcastLabels.some(isEspnPlusBroadcastLabel);
+}
+var LINEAR_ESPN_WATCH_LEAGUES = /* @__PURE__ */ new Set(["NHL", "ATP", "WTA", "NCAABB"]);
+function gameHasEspnWatchBroadcast(broadcastLabels, leagueKey) {
+  if (gameHasEspnPlusBroadcast(broadcastLabels)) return true;
+  if (leagueKey && LINEAR_ESPN_WATCH_LEAGUES.has(leagueKey)) {
+    return broadcastLabels.some(isEspnLinearBroadcastLabel);
+  }
+  return false;
+}
+
+// ../grarf/desktop/electron/espn/espnPlusStream.js
+var LOG3 = "[ESPN]";
+var PLAY_LOCATION = "where-to-watch%3Aguide";
+function buildEspnPlusWatchUrlByEventCalendarId(eventCalendarId) {
+  const id = String(eventCalendarId).trim();
+  if (!/^\d+$/.test(id)) return null;
+  return `https://www.espn.com/watch/player/_/eventCalendarId/${id}?playLocation=${PLAY_LOCATION}`;
+}
+function resolveEspnPlusStreamFromEvent(event, broadcastLabels, leagueKey) {
+  if (!gameHasEspnWatchBroadcast(broadcastLabels, leagueKey)) return null;
+  if (leagueKey && !LEGACY_EVENT_CALENDAR_LEAGUES.has(leagueKey)) {
+    return null;
+  }
+  const eventCalendarId = String(event?.id ?? "").trim();
+  if (!/^\d+$/.test(eventCalendarId)) {
+    console.warn(`${LOG3} ESPN watch broadcast present but missing event id`, { leagueKey });
+    return null;
+  }
+  const streamUrl = buildEspnPlusWatchUrlByEventCalendarId(eventCalendarId);
+  if (!streamUrl) return null;
+  const linearNhl = leagueKey === "NHL" && !gameHasEspnPlusBroadcast(broadcastLabels) && gameHasEspnWatchBroadcast(broadcastLabels, leagueKey);
+  console.log(`${LOG3} Found watch eventCalendarId: ${eventCalendarId}`);
+  console.log(`${LOG3} Current generated URL: ${streamUrl}`);
+  console.log(
+    `${LOG3} Resolved direct ESPN watch URL (legacy calendar id${linearNhl ? ", NHL linear ESPN" : ""})`
+  );
+  return { streamUrl, streamProvider: "ESPN+", eventCalendarId };
+}
+var LEGACY_EVENT_CALENDAR_LEAGUES = /* @__PURE__ */ new Set(["MLB", "NBA", "WNBA", "NHL", "NCAABB"]);
+function resolveEspnWatchStreamFromCompetition(competition, broadcastLabels, leagueKey) {
+  if (!gameHasEspnWatchBroadcast(broadcastLabels, leagueKey)) return null;
+  const eventCalendarId = String(competition?.id ?? "").trim();
+  if (!/^\d+$/.test(eventCalendarId)) {
+    console.warn(`${LOG3} ESPN watch broadcast present but missing competition id`, { leagueKey });
+    return null;
+  }
+  const streamUrl = buildEspnPlusWatchUrlByEventCalendarId(eventCalendarId);
+  if (!streamUrl) return null;
+  const linearOnly = !gameHasEspnPlusBroadcast(broadcastLabels) && gameHasEspnWatchBroadcast(broadcastLabels, leagueKey);
+  console.log(`${LOG3} Found watch eventCalendarId: ${eventCalendarId}`);
+  console.log(`${LOG3} Current generated URL: ${streamUrl}`);
+  console.log(
+    `${LOG3} Resolved direct ESPN watch URL (${linearOnly ? "linear ESPN" : "ESPN+"}, ${leagueKey})`
+  );
+  return { streamUrl, streamProvider: "ESPN+", eventCalendarId };
+}
+function attachEspnPlusStreamToGame(game, stream) {
+  game.streamUrl = stream.streamUrl;
+  game.streamProvider = stream.streamProvider;
+  if (stream.playerId) {
+    game.espnPlusPlayerId = stream.playerId;
+  }
+  if (stream.eventCalendarId) {
+    game.espnWatchEventId = stream.eventCalendarId;
+  }
+  if (!Array.isArray(game.content?.watchLinks)) {
+    game.content = { ...game.content ?? {}, watchLinks: [] };
+  }
+  game.content.watchLinks = [
+    {
+      provider: stream.streamProvider,
+      url: stream.streamUrl,
+      eventCalendarId: stream.eventCalendarId,
+      ...stream.playerId ? { playerId: stream.playerId } : {}
+    }
+  ];
+  console.log(`${LOG3} Attached streamUrl to game object`, {
+    id: game.id,
+    eventCalendarId: stream.eventCalendarId,
+    playerId: stream.playerId ?? null
+  });
+}
+
+// ../grarf/desktop/shared/espnPausedCompetitionStatus.js
+init_define_import_meta_env();
+var ESPN_PAUSED_STATUS_NAMES = /* @__PURE__ */ new Set([
+  "STATUS_SUSPENDED",
+  "STATUS_DELAYED",
+  "STATUS_HALTED",
+  "STATUS_INTERRUPTED",
+  "STATUS_WEATHER_DELAY"
+]);
+function safeEspnText(value) {
+  return typeof value === "string" && value.trim() ? value.trim() : "";
+}
+function isEspnPausedCompetitionStatus(statusType) {
+  if (!statusType || typeof statusType !== "object") return false;
+  const statusName = safeEspnText(statusType.name).toUpperCase();
+  if (statusName === "STATUS_POSTPONED") return false;
+  if (ESPN_PAUSED_STATUS_NAMES.has(statusName)) return true;
+  const detail = `${safeEspnText(statusType.shortDetail)} ${safeEspnText(statusType.detail)} ${safeEspnText(statusType.description)}`.toLowerCase();
+  if (!detail) return false;
+  if (/\b(suspended|weather delay|delayed|halted|interrupted)\b/.test(detail)) {
+    return statusName !== "STATUS_IN_PROGRESS";
+  }
+  return false;
+}
+function resolveEspnCardStatus(statusType) {
+  const statusName = safeEspnText(statusType?.name).toUpperCase();
+  const completed = !!statusType?.completed;
+  const state3 = safeEspnText(statusType?.state).toLowerCase();
+  if (statusName === "STATUS_POSTPONED") return "postponed";
+  if (isEspnPausedCompetitionStatus(statusType)) return "scheduled";
+  if (statusName === "STATUS_IN_PROGRESS" || !completed && state3 === "in") return "live";
+  if (statusName === "STATUS_FINAL" || completed || state3 === "post") return "final";
+  return "scheduled";
+}
+
+// ../grarf/desktop/electron/espn/normalizeRacing.js
+init_define_import_meta_env();
+
+// ../grarf/desktop/electron/espn/canonicalEventMetadata.js
+init_define_import_meta_env();
+function attachCanonicalEventMetadata(game, input) {
+  const eventId = String(game?.espnEventId ?? game?.id ?? "").trim();
+  if (!eventId) return game;
+  game.metadata = {
+    ...game.metadata ?? {},
+    canonicalEvent: {
+      eventId,
+      sport: input.sport,
+      league: game.league,
+      title: input.title,
+      startTime: typeof game.startTimeMs === "number" && game.startTimeMs > 0 ? new Date(game.startTimeMs).toISOString() : void 0,
+      status: game.status,
+      ...input.sessionLabel ? { sessionLabel: input.sessionLabel } : {}
+    }
+  };
+  return game;
+}
+
+// ../grarf/desktop/electron/espn/operationalDate.js
+init_define_import_meta_env();
+
+// ../grarf/desktop/electron/espn/normalizeRacing.js
+var RACING_SESSION_LEAGUES = /* @__PURE__ */ new Set(["F1"]);
+var RACING_STANDALONE_LEAGUES = /* @__PURE__ */ new Set(["NASCAR", "INDYCAR"]);
+function isRacingLeagueKey(leagueKey) {
+  return RACING_SESSION_LEAGUES.has(leagueKey) || RACING_STANDALONE_LEAGUES.has(leagueKey);
+}
+function safe2(v2) {
+  return typeof v2 === "string" && v2.trim() ? v2.trim() : "";
+}
+function formatTimeEt2(iso) {
+  try {
+    const d2 = new Date(iso);
+    if (Number.isNaN(d2.getTime())) return "\u2014";
+    return d2.toLocaleTimeString("en-US", {
+      hour: "numeric",
+      minute: "2-digit",
+      timeZoneName: "short"
+    });
+  } catch {
+    return "\u2014";
+  }
+}
+function readCardStatus(comp, statusType) {
+  return resolveEspnCardStatus(statusType);
+}
+function readStatusLine(comp, statusType, cardStatus) {
+  const detail = safe2(statusType?.shortDetail) || safe2(statusType?.description) || safe2(statusType?.detail) || "";
+  if (cardStatus === "final") return detail || "Final";
+  return detail || void 0;
+}
+function normalizeRacingCompetition(event, comp, leagueKey, slateDateKey) {
+  if (!comp) return null;
+  const status = comp.status || {};
+  const statusType = status.type || {};
+  const cardStatus = readCardStatus(comp, statusType);
+  const grandPrixName = safe2(event?.shortName) || safe2(event?.name);
+  if (!grandPrixName) return null;
+  const sessionLabel = safe2(comp?.type?.abbreviation) || safe2(comp?.type?.text) || safe2(comp?.type?.shortName) || "Session";
+  const title = leagueKey === "F1" && sessionLabel !== "Session" ? `${grandPrixName} \xB7 ${sessionLabel}` : grandPrixName;
+  const broadcasts = collectBroadcastLabels2(comp);
+  const isoStart = comp.date || event?.date;
+  const startTimeMs = Date.parse(isoStart || "") || 0;
+  const scheduledDateKey = resolveScheduledDateKey(isoStart, slateDateKey);
+  const eventId = String(event?.id ?? "").trim();
+  const compId = String(comp?.id ?? "").trim();
+  if (!eventId || !compId) return null;
+  const id = `espn-${leagueKey}-${compId}`;
+  const game = {
+    id,
+    grarfGameId: id,
+    league: leagueKey,
+    espnEventId: compId,
+    externalIds: { espn: compId, mlb: null },
+    time: formatTimeEt2(isoStart),
+    awayTeam: title,
+    awayRecord: "\u2014",
+    homeTeam: "",
+    homeRecord: "\u2014",
+    awayCity: "",
+    homeCity: "",
+    awayPitcher: "\u2014",
+    awayPitcherStats: "",
+    homePitcher: "\u2014",
+    homePitcherStats: "",
+    channels: broadcasts,
+    broadcasts,
+    status: cardStatus,
+    statusLine: readStatusLine(comp, statusType, cardStatus),
+    startTimeMs,
+    scheduledDateKey,
+    lastUpdated: (/* @__PURE__ */ new Date()).toISOString(),
+    metadata: {
+      racingEventId: eventId,
+      racingSessionLabel: leagueKey === "F1" ? sessionLabel : void 0
+    },
+    content: {
+      stories: [],
+      clips: [],
+      highlights: [],
+      social: [],
+      watchLinks: []
+    }
+  };
+  return attachCanonicalEventMetadata(game, {
+    sport: "motorsports",
+    title,
+    sessionLabel: leagueKey === "F1" ? sessionLabel : void 0
+  });
+}
+function normalizeRacingStandaloneEvent(event, leagueKey, slateDateKey) {
+  const comp = event?.competitions?.[0];
+  if (!comp) return null;
+  const title = safe2(event?.shortName) || safe2(event?.name);
+  if (!title) return null;
+  const game = normalizeRacingCompetition(event, comp, leagueKey, slateDateKey);
+  if (!game) return null;
+  game.awayTeam = title;
+  game.espnEventId = String(event.id);
+  game.id = `espn-${leagueKey}-${event.id}`;
+  game.grarfGameId = game.id;
+  return attachCanonicalEventMetadata(game, {
+    sport: "motorsports",
+    title
+  });
+}
+function normalizeRacingScoreboard(scoreboardJson, leagueKey) {
+  const slateDateKey = typeof scoreboardJson?.day?.date === "string" ? scoreboardJson.day.date.trim() : void 0;
+  const events = Array.isArray(scoreboardJson?.events) ? scoreboardJson.events : [];
+  const out = [];
+  for (const event of events) {
+    if (RACING_STANDALONE_LEAGUES.has(leagueKey)) {
+      const row = normalizeRacingStandaloneEvent(event, leagueKey, slateDateKey);
+      if (row) out.push(row);
+      continue;
+    }
+    const competitions = Array.isArray(event?.competitions) ? event.competitions : [];
+    for (const comp of competitions) {
+      const row = normalizeRacingCompetition(event, comp, leagueKey, slateDateKey);
+      if (row) out.push(row);
+    }
+  }
+  return out;
+}
+
+// ../grarf/desktop/electron/espn/normalizeMma.js
+init_define_import_meta_env();
+var MMA_LEAGUE_KEYS = /* @__PURE__ */ new Set(["UFC"]);
+function isMmaLeagueKey(leagueKey) {
+  return MMA_LEAGUE_KEYS.has(leagueKey);
+}
+function safe3(v2) {
+  return typeof v2 === "string" && v2.trim() ? v2.trim() : "";
+}
+function formatTimeEt3(iso) {
+  try {
+    const d2 = new Date(iso);
+    if (Number.isNaN(d2.getTime())) return "\u2014";
+    return d2.toLocaleTimeString("en-US", {
+      hour: "numeric",
+      minute: "2-digit",
+      timeZoneName: "short"
+    });
+  } catch {
+    return "\u2014";
+  }
+}
+function pickFighterName(athlete) {
+  if (!athlete) return "TBD";
+  return safe3(athlete.shortName) || safe3(athlete.displayName) || safe3(athlete.fullName) || "TBD";
+}
+function pickFighterLogoUrl(athlete) {
+  const href = athlete?.flag?.href;
+  return typeof href === "string" && href.startsWith("http") ? href.trim() : void 0;
+}
+function pickFighterRecord(competitor) {
+  const records = competitor?.records;
+  if (!Array.isArray(records)) return "\u2014";
+  const overall = records.find((row) => row?.name === "overall" || row?.type === "total") ?? records[0];
+  const summary = safe3(overall?.summary);
+  return summary || "\u2014";
+}
+function resolveMatchNumber(index, totalFights) {
+  return Math.max(1, totalFights - index);
+}
+function resolveCardSegment(matchNumber) {
+  if (matchNumber <= 5) return "main";
+  if (matchNumber <= 9) return "prelims1";
+  return "prelims2";
+}
+function resolveCorners(competitors) {
+  const red = competitors.find((row) => row?.order === 1) ?? competitors[0];
+  const blue = competitors.find((row) => row?.order === 2) ?? competitors[1];
+  return { away: red, home: blue };
+}
+function collectBroadcastLabels3(competition) {
+  const seen = /* @__PURE__ */ new Set();
+  const out = [];
+  const geo = competition?.geoBroadcasts;
+  if (Array.isArray(geo)) {
+    for (const row of geo) {
+      const label = safe3(row?.media?.shortName);
+      if (!label || label === "TV TBD") continue;
+      const key2 = label.toLowerCase();
+      if (seen.has(key2)) continue;
+      seen.add(key2);
+      out.push(label);
+    }
+  }
+  const arr = competition?.broadcasts;
+  if (Array.isArray(arr)) {
+    for (const b2 of arr) {
+      const names = b2?.names;
+      if (!Array.isArray(names)) continue;
+      for (const n2 of names) {
+        const label = typeof n2 === "string" ? n2.trim() : "";
+        if (!label || label === "TV TBD") continue;
+        const key2 = label.toLowerCase();
+        if (seen.has(key2)) continue;
+        seen.add(key2);
+        out.push(label);
+      }
+    }
+  }
+  if (typeof competition?.broadcast === "string") {
+    const label = competition.broadcast.trim();
+    if (label && label !== "TV TBD") out.push(label);
+  }
+  return out.length ? out : ["TV TBD"];
+}
+function flattenMmaCompetitions(events) {
+  const rows = [];
+  if (!Array.isArray(events)) return rows;
+  for (const card of events) {
+    const competitions = Array.isArray(card?.competitions) ? card.competitions : [];
+    const totalFights = competitions.length;
+    competitions.forEach((competition, index) => {
+      if (!competition) return;
+      rows.push({
+        competition,
+        card,
+        matchNumber: resolveMatchNumber(index, totalFights),
+        totalFights
+      });
+    });
+  }
+  return rows;
+}
+function formatRoundPhase(status, cardStatus) {
+  if (cardStatus !== "live") return "";
+  const periodNum = status?.period != null ? Number(status.period) : NaN;
+  const clock = safe3(status?.displayClock);
+  if (Number.isFinite(periodNum) && clock) return `R${periodNum} ${clock}`;
+  return safe3(status?.type?.shortDetail) || safe3(status?.type?.detail) || "Live";
+}
+function normalizeMmaCompetition(competition, card, matchNumber, totalFights, leagueKey, slateDateKey) {
+  const competitors = Array.isArray(competition?.competitors) ? competition.competitors : [];
+  const { away, home } = resolveCorners(competitors);
+  if (!away || !home) return null;
+  const awayAthlete = away.athlete;
+  const homeAthlete = home.athlete;
+  if (!awayAthlete || !homeAthlete) return null;
+  const status = competition.status || {};
+  const statusType = status.type || {};
+  const completed = !!statusType.completed;
+  const state3 = safe3(statusType.state).toLowerCase();
+  const paused = isEspnPausedCompetitionStatus(statusType);
+  const live = !completed && !paused && state3 === "in";
+  const final = completed || state3 === "post";
+  const scheduled = !completed && (state3 === "pre" || paused);
+  let cardStatus = "scheduled";
+  if (live) cardStatus = "live";
+  else if (final) cardStatus = "final";
+  const awayTeam = pickFighterName(awayAthlete);
+  const homeTeam = pickFighterName(homeAthlete);
+  const awayLogoUrl = pickFighterLogoUrl(awayAthlete);
+  const homeLogoUrl = pickFighterLogoUrl(homeAthlete);
+  const awayRecord = pickFighterRecord(away);
+  const homeRecord = pickFighterRecord(home);
+  const cardEventId = String(card?.id ?? "");
+  const cardName = safe3(card?.shortName) || safe3(card?.name) || "UFC";
+  const weightClass = safe3(competition?.type?.abbreviation) || safe3(competition?.type?.text) || "";
+  const venueName = safe3(competition?.venue?.fullName);
+  const totalRounds = Number(competition?.format?.regulation?.periods);
+  const ufcTotalRounds = Number.isFinite(totalRounds) && totalRounds > 0 ? totalRounds : void 0;
+  const ufcIsMainEvent = matchNumber === 1;
+  const ufcCardSegment = resolveCardSegment(matchNumber);
+  const broadcasts = collectBroadcastLabels3(competition);
+  const isoStart = competition.startDate || competition.date || card?.date;
+  const startTimeMs = Date.parse(isoStart || "") || 0;
+  const scheduledDateKey = resolveScheduledDateKey(isoStart, slateDateKey);
+  const periodNum = status.period != null ? Number(status.period) : NaN;
+  const period = Number.isFinite(periodNum) ? periodNum : void 0;
+  const displayClock = safe3(status.displayClock) || void 0;
+  const contextParts = [cardName, weightClass].filter(Boolean);
+  const contextLine = contextParts.join(" \xB7 ");
+  const roundPhase = formatRoundPhase(status, cardStatus);
+  const detail = safe3(statusType.shortDetail) || safe3(statusType.detail) || safe3(statusType.description);
+  let statusLine = "";
+  if (live) {
+    statusLine = [contextLine, roundPhase || detail].filter(Boolean).join(" \xB7 ");
+  } else if (final) {
+    statusLine = [contextLine, detail || "Final"].filter(Boolean).join(" \xB7 ");
+  } else if (scheduled) {
+    statusLine = paused ? [contextLine, detail].filter(Boolean).join(" \xB7 ") : [contextLine, venueName].filter(Boolean).join(" \xB7 ");
+  }
+  const competitionId = String(competition.id ?? "");
+  if (!competitionId) return null;
+  const id = `espn-${leagueKey}-${competitionId}`;
+  const game = {
+    id,
+    grarfGameId: id,
+    league: leagueKey,
+    espnEventId: competitionId,
+    externalIds: { espn: competitionId, mlb: null },
+    time: formatTimeEt3(isoStart),
+    awayTeam,
+    awayLogoUrl,
+    awayRecord,
+    homeTeam,
+    homeLogoUrl,
+    homeRecord,
+    awayScore: null,
+    homeScore: null,
+    awayCity: "",
+    homeCity: "",
+    awayPitcher: "",
+    awayPitcherStats: "",
+    homePitcher: "",
+    homePitcherStats: "",
+    channels: broadcasts,
+    broadcasts,
+    status: cardStatus,
+    statusLine: statusLine || void 0,
+    startTimeMs,
+    scheduledDateKey,
+    lastUpdated: (/* @__PURE__ */ new Date()).toISOString(),
+    metadata: {
+      officialAwayName: safe3(awayAthlete.displayName) || safe3(awayAthlete.fullName) || awayTeam,
+      officialHomeName: safe3(homeAthlete.displayName) || safe3(homeAthlete.fullName) || homeTeam,
+      ufcCardEventId: cardEventId || void 0,
+      ufcCardName: cardName || void 0,
+      ufcCardSegment,
+      ufcMatchNumber: matchNumber,
+      ufcWeightClass: weightClass || void 0,
+      ufcIsMainEvent,
+      ufcTotalRounds
+    },
+    period: cardStatus === "final" ? null : period,
+    displayClock: cardStatus === "final" ? void 0 : displayClock,
+    content: {
+      stories: [],
+      clips: [],
+      highlights: [],
+      social: [],
+      watchLinks: []
+    }
+  };
+  return attachCanonicalEventMetadata(game, {
+    sport: "mma",
+    title: `${awayTeam} vs ${homeTeam}`
+  });
+}
+function sortMmaGames(games) {
+  const rank = (g2) => {
+    if (g2.status === "live") return 0;
+    if (g2.status === "scheduled") return 1;
+    return 2;
+  };
+  return [...games].sort((a2, b2) => {
+    const dr2 = rank(a2) - rank(b2);
+    if (dr2 !== 0) return dr2;
+    const ma2 = a2.metadata?.ufcMatchNumber ?? 999;
+    const mb = b2.metadata?.ufcMatchNumber ?? 999;
+    if (ma2 !== mb) return ma2 - mb;
+    const ta2 = typeof a2.startTimeMs === "number" ? a2.startTimeMs : 0;
+    const tb = typeof b2.startTimeMs === "number" ? b2.startTimeMs : 0;
+    if (ta2 !== tb) return ta2 - tb;
+    return String(a2.time).localeCompare(String(b2.time));
+  });
+}
+function normalizeMmaScoreboard(scoreboardJson, leagueKey) {
+  const slateDateKey = typeof scoreboardJson?.day?.date === "string" ? scoreboardJson.day.date.trim() : void 0;
+  const events = Array.isArray(scoreboardJson?.events) ? scoreboardJson.events : [];
+  const out = [];
+  for (const row of flattenMmaCompetitions(events)) {
+    const game = normalizeMmaCompetition(
+      row.competition,
+      row.card,
+      row.matchNumber,
+      row.totalFights,
+      leagueKey,
+      slateDateKey
+    );
+    if (game) out.push(game);
+  }
+  return sortMmaGames(out);
+}
+
+// ../grarf/desktop/electron/espn/normalizeTennis.js
+init_define_import_meta_env();
+var TENNIS_LEAGUE_KEYS2 = /* @__PURE__ */ new Set(["ATP", "WTA"]);
+var MENS_DRAW_TYPE_SLUGS2 = /* @__PURE__ */ new Set(["mens-singles", "mens-doubles"]);
+var WOMENS_DRAW_TYPE_SLUGS2 = /* @__PURE__ */ new Set(["womens-singles", "womens-doubles"]);
+function isTennisLeagueKey(leagueKey) {
+  return TENNIS_LEAGUE_KEYS2.has(leagueKey);
+}
+function resolveTennisTourLeague2(competition, groupingLabel, groupingSlug, pollLeagueKey) {
+  const typeSlug = safe4(competition?.type?.slug).toLowerCase();
+  if (MENS_DRAW_TYPE_SLUGS2.has(typeSlug)) return "ATP";
+  if (WOMENS_DRAW_TYPE_SLUGS2.has(typeSlug)) return "WTA";
+  const groupingTypeSlug = safe4(groupingSlug).toLowerCase();
+  if (MENS_DRAW_TYPE_SLUGS2.has(groupingTypeSlug)) return "ATP";
+  if (WOMENS_DRAW_TYPE_SLUGS2.has(groupingTypeSlug)) return "WTA";
+  const label = safe4(groupingLabel).toLowerCase();
+  if (label.startsWith("men")) return "ATP";
+  if (label.startsWith("women")) return "WTA";
+  if (typeSlug === "mixed-doubles" || groupingTypeSlug === "mixed-doubles") {
+    return pollLeagueKey;
+  }
+  return null;
+}
+function safe4(v2) {
+  return typeof v2 === "string" && v2.trim() ? v2.trim() : "";
+}
+function formatTimeEt4(iso) {
+  try {
+    const d2 = new Date(iso);
+    if (Number.isNaN(d2.getTime())) return "\u2014";
+    return d2.toLocaleTimeString("en-US", {
+      hour: "numeric",
+      minute: "2-digit",
+      timeZoneName: "short"
+    });
+  } catch {
+    return "\u2014";
+  }
+}
+function pickPlayerName2(athlete) {
+  if (!athlete) return "TBD";
+  return safe4(athlete.shortName) || safe4(athlete.displayName) || safe4(athlete.fullName) || "TBD";
+}
+function pickPlayerLogoUrl2(athlete) {
+  const href = athlete?.flag?.href;
+  return typeof href === "string" && href.startsWith("http") ? href.trim() : void 0;
+}
+function countSetsWon2(competitor) {
+  const lines = competitor?.linescores;
+  if (!Array.isArray(lines)) return null;
+  let won = 0;
+  for (const row of lines) {
+    if (row?.winner === true) won += 1;
+  }
+  return won;
+}
+function mapTennisSetLines2(competitor) {
+  const lines = Array.isArray(competitor?.linescores) ? competitor.linescores : [];
+  const out = [];
+  for (const row of lines) {
+    const value = Number(row?.value);
+    if (!Number.isFinite(value)) continue;
+    const tiebreakRaw = row?.tiebreak;
+    out.push({
+      value,
+      tiebreak: tiebreakRaw != null && Number.isFinite(Number(tiebreakRaw)) ? Number(tiebreakRaw) : void 0,
+      winner: row?.winner === true
+    });
+  }
+  return out;
+}
+function pickAthleteSeed2(athlete) {
+  const n2 = Number(athlete?.seed);
+  return Number.isFinite(n2) && n2 > 0 ? n2 : null;
+}
+function resolveServerSide2(away, home) {
+  if (away?.possession === true) return "away";
+  if (home?.possession === true) return "home";
+  return null;
+}
+function collectBroadcastLabels4(competition) {
+  const seen = /* @__PURE__ */ new Set();
+  const out = [];
+  const geo = competition?.geoBroadcasts;
+  if (Array.isArray(geo)) {
+    for (const row of geo) {
+      const label = safe4(row?.media?.shortName);
+      if (!label || label === "TV TBD") continue;
+      const key2 = label.toLowerCase();
+      if (seen.has(key2)) continue;
+      seen.add(key2);
+      out.push(label);
+    }
+  }
+  const arr = competition?.broadcasts;
+  if (Array.isArray(arr)) {
+    for (const b2 of arr) {
+      const names = b2?.names;
+      if (!Array.isArray(names)) continue;
+      for (const n2 of names) {
+        const label = typeof n2 === "string" ? n2.trim() : "";
+        if (!label || label === "TV TBD") continue;
+        const key2 = label.toLowerCase();
+        if (seen.has(key2)) continue;
+        seen.add(key2);
+        out.push(label);
+      }
+    }
+  }
+  if (typeof competition?.broadcast === "string") {
+    const label = competition.broadcast.trim();
+    if (label && label !== "TV TBD") out.push(label);
+  }
+  return out.length ? out : ["TV TBD"];
+}
+function flattenTennisCompetitions2(events) {
+  const rows = [];
+  if (!Array.isArray(events)) return rows;
+  for (const tournament of events) {
+    const groupings = Array.isArray(tournament?.groupings) ? tournament.groupings : [];
+    for (const grouping of groupings) {
+      const groupingLabel = safe4(grouping?.grouping?.displayName) || void 0;
+      const groupingSlug = safe4(grouping?.grouping?.slug) || void 0;
+      const competitions = Array.isArray(grouping?.competitions) ? grouping.competitions : [];
+      for (const competition of competitions) {
+        if (!competition) continue;
+        rows.push({ competition, tournament, groupingLabel, groupingSlug });
+      }
+    }
+  }
+  return rows;
+}
+function normalizeTennisCompetition2(competition, tournament, groupingLabel, groupingSlug, pollLeagueKey, slateDateKey) {
+  const tourLeagueKey = resolveTennisTourLeague2(
+    competition,
+    groupingLabel,
+    groupingSlug,
+    pollLeagueKey
+  );
+  if (!tourLeagueKey) return null;
+  const competitors = Array.isArray(competition?.competitors) ? competition.competitors : [];
+  const away = competitors.find((c2) => c2?.homeAway === "away");
+  const home = competitors.find((c2) => c2?.homeAway === "home");
+  if (!away || !home) return null;
+  const awayAthlete = away.athlete;
+  const homeAthlete = home.athlete;
+  if (!awayAthlete || !homeAthlete) return null;
+  const status = competition.status || {};
+  const statusType = status.type || {};
+  const completed = !!statusType.completed;
+  const state3 = safe4(statusType.state).toLowerCase();
+  const paused = isEspnPausedCompetitionStatus(statusType);
+  const live = !completed && !paused && state3 === "in";
+  const final = completed || state3 === "post";
+  const scheduled = !completed && (state3 === "pre" || paused);
+  let cardStatus = "scheduled";
+  if (live) cardStatus = "live";
+  else if (final) cardStatus = "final";
+  const awayTeam = pickPlayerName2(awayAthlete);
+  const homeTeam = pickPlayerName2(homeAthlete);
+  const awayLogoUrl = pickPlayerLogoUrl2(awayAthlete);
+  const homeLogoUrl = pickPlayerLogoUrl2(homeAthlete);
+  const awayScore = countSetsWon2(away);
+  const homeScore = countSetsWon2(home);
+  const tournamentName = safe4(tournament?.shortName) || safe4(tournament?.name) || "";
+  const roundName = safe4(competition?.round?.displayName);
+  const venueName = safe4(competition?.venue?.fullName);
+  const courtName = safe4(competition?.venue?.court);
+  const awaySets = mapTennisSetLines2(away);
+  const homeSets = mapTennisSetLines2(home);
+  const noteText = Array.isArray(competition?.notes) ? safe4(competition.notes.find((n2) => n2?.type === "event")?.text) : "";
+  const broadcasts = collectBroadcastLabels4(competition);
+  const isoStart = competition.startDate || competition.date || tournament?.date;
+  const startTimeMs = Date.parse(isoStart || "") || 0;
+  const scheduledDateKey = resolveScheduledDateKey(isoStart, slateDateKey);
+  const periodNum = status.period != null ? Number(status.period) : NaN;
+  const period = Number.isFinite(periodNum) ? periodNum : void 0;
+  const displayClock = safe4(status.displayClock) || void 0;
+  const contextParts = [tournamentName, roundName || groupingLabel].filter(Boolean);
+  const contextLine = contextParts.join(" \xB7 ");
+  let statusLine = contextLine;
+  if (scheduled) {
+    if (paused) {
+      statusLine = safe4(statusType.shortDetail) || safe4(statusType.detail) || safe4(statusType.description) || contextLine;
+    } else {
+      const venueBits = [venueName, courtName].filter(Boolean).join(" \xB7 ");
+      statusLine = [contextLine, venueBits].filter(Boolean).join(" \xB7 ");
+    }
+  } else if (cardStatus === "final") {
+    statusLine = [contextLine, noteText || safe4(statusType.shortDetail) || "Final"].filter(Boolean).join(" \xB7 ") || "Final";
+  }
+  const competitionId = String(competition.id);
+  const id = `espn-${tourLeagueKey}-${competitionId}`;
+  const game = {
+    id,
+    grarfGameId: id,
+    league: tourLeagueKey,
+    espnEventId: competitionId,
+    externalIds: { espn: competitionId, mlb: null },
+    time: formatTimeEt4(isoStart),
+    awayTeam,
+    awayLogoUrl,
+    awayRecord: "",
+    homeTeam,
+    homeLogoUrl,
+    homeRecord: "",
+    awayScore,
+    homeScore,
+    awayCity: "",
+    homeCity: "",
+    awayPitcher: "",
+    awayPitcherStats: "",
+    homePitcher: "",
+    homePitcherStats: "",
+    channels: broadcasts,
+    broadcasts,
+    status: cardStatus,
+    statusLine: statusLine || void 0,
+    startTimeMs,
+    scheduledDateKey,
+    lastUpdated: (/* @__PURE__ */ new Date()).toISOString(),
+    metadata: {
+      officialAwayName: safe4(awayAthlete.displayName) || safe4(awayAthlete.fullName) || awayTeam,
+      officialHomeName: safe4(homeAthlete.displayName) || safe4(homeAthlete.fullName) || homeTeam,
+      tennis: {
+        contextLine,
+        awaySets,
+        homeSets,
+        awaySeed: pickAthleteSeed2(awayAthlete),
+        homeSeed: pickAthleteSeed2(homeAthlete),
+        serverSide: resolveServerSide2(away, home)
+      }
+    },
+    period: cardStatus === "final" ? null : period,
+    displayClock: cardStatus === "final" ? void 0 : displayClock,
+    content: {
+      stories: [],
+      clips: [],
+      highlights: [],
+      social: [],
+      watchLinks: []
+    }
+  };
+  const espnStream = resolveEspnWatchStreamFromCompetition(competition, broadcasts, tourLeagueKey);
+  if (espnStream) {
+    attachEspnPlusStreamToGame(game, espnStream);
+  }
+  return attachCanonicalEventMetadata(game, {
+    sport: "tennis",
+    title: `${awayTeam} vs ${homeTeam}`
+  });
+}
+function normalizeTennisScoreboard2(scoreboardJson, leagueKey) {
+  const slateDateKey = typeof scoreboardJson?.day?.date === "string" ? scoreboardJson.day.date.trim() : void 0;
+  const events = Array.isArray(scoreboardJson?.events) ? scoreboardJson.events : [];
+  const out = [];
+  for (const row of flattenTennisCompetitions2(events)) {
+    const game = normalizeTennisCompetition2(
+      row.competition,
+      row.tournament,
+      row.groupingLabel,
+      row.groupingSlug,
+      leagueKey,
+      slateDateKey
+    );
+    if (game) out.push(game);
+  }
+  return out;
+}
+
+// ../grarf/desktop/electron/espn/normalizeGolf.js
+init_define_import_meta_env();
+
+// ../grarf/desktop/shared/golfWatchUrls.js
+init_define_import_meta_env();
+var PGA_TOUR_LEADERBOARD_URL = "https://www.pgatour.com/leaderboard";
+var US_OPEN_WATCH_URL = "https://www.usopen.com/watch.html";
+var PGA_TOUR_LEAGUE_KEY = "PGA";
+function isUsOpenTournamentTitle(title) {
+  return typeof title === "string" && /\bu\.?\s*s\.?\s*open\b/i.test(title.trim());
+}
+function isPgaTourUsOpenEvent(leagueKey, tournamentTitle) {
+  return leagueKey === PGA_TOUR_LEAGUE_KEY && isUsOpenTournamentTitle(tournamentTitle);
+}
+function resolveGolfLeaderboardUrl() {
+  return PGA_TOUR_LEADERBOARD_URL;
+}
+function resolveGolfWatchStreamUrl(leagueKey, tournamentTitle) {
+  if (!isPgaTourUsOpenEvent(leagueKey, tournamentTitle)) return null;
+  return US_OPEN_WATCH_URL;
+}
+
+// ../grarf/desktop/electron/espn/normalizeGolf.js
+function safe5(v2) {
+  return typeof v2 === "string" && v2.trim() ? v2.trim() : "";
+}
+function formatTimeEt5(iso) {
+  try {
+    const d2 = new Date(iso);
+    if (Number.isNaN(d2.getTime())) return "\u2014";
+    return d2.toLocaleTimeString("en-US", {
+      hour: "numeric",
+      minute: "2-digit",
+      timeZoneName: "short"
+    });
+  } catch {
+    return "\u2014";
+  }
+}
+function normalizeGolfEvent(event, leagueKey, slateDateKey) {
+  const comp = event?.competitions?.[0];
+  if (!comp) return null;
+  const title = safe5(event?.name) || safe5(event?.shortName);
+  if (!title) return null;
+  const status = comp.status || {};
+  const statusType = status.type || {};
+  const completed = !!statusType.completed;
+  const state3 = safe5(statusType.state).toLowerCase();
+  const isoStart = comp.date || event.date;
+  const startTimeMs = Date.parse(isoStart || "") || 0;
+  const scoreboardDayKey = typeof slateDateKey === "string" && slateDateKey.trim() ? slateDateKey.trim() : null;
+  const operationalTodayKey = getOperationalTodayDateKey();
+  const tournamentEndKey = readGolfTournamentEndDateKey(
+    safe5(event?.endDate),
+    formatOperationalDateKeyFromMs
+  );
+  const pastTournamentEnd = tournamentEndKey != null && operationalTodayKey > tournamentEndKey;
+  const tournamentStartKey = readGolfTournamentStartDateKey(
+    isoStart,
+    formatOperationalDateKeyFromMs
+  );
+  const paused = isEspnPausedCompetitionStatus(statusType);
+  const inferredLive = !pastTournamentEnd && !completed && !paused && state3 === "pre" && scoreboardDayKey === operationalTodayKey && startTimeMs > 0 && startTimeMs <= Date.now();
+  const live = !completed && !pastTournamentEnd && !paused && (state3 === "in" || inferredLive);
+  const final = !live && (completed || pastTournamentEnd || state3 === "post" && !paused);
+  const scheduled = !completed && !pastTournamentEnd && (state3 === "pre" || paused) && !inferredLive;
+  let cardStatus = "scheduled";
+  if (live) cardStatus = "live";
+  else if (final) cardStatus = "final";
+  const broadcasts = collectBroadcastLabels2(comp);
+  const channels = broadcasts;
+  let scheduledDateKey = scoreboardDayKey || resolveScheduledDateKey(isoStart, slateDateKey) || formatOperationalDateKeyFromMs(startTimeMs);
+  if (scheduled && tournamentStartKey) {
+    if (!scheduledDateKey || scheduledDateKey < tournamentStartKey) {
+      scheduledDateKey = tournamentStartKey;
+    }
+  }
+  if (final && tournamentEndKey) {
+    scheduledDateKey = tournamentEndKey;
+  }
+  const finalizedStatusLine = safe5(statusType?.shortDetail) || safe5(statusType?.description) || safe5(statusType?.detail) || "Final";
+  let statusLine = "";
+  if (live || final) {
+    statusLine = inferredLive ? "In Progress" : finalizedStatusLine;
+  } else if (scheduled) {
+    statusLine = safe5(statusType?.shortDetail) || safe5(statusType?.detail) || "";
+  }
+  const eventId = String(event.id);
+  const id = `espn-${leagueKey}-${eventId}`;
+  const periodNum = status.period != null ? Number(status.period) : NaN;
+  const round = Number.isFinite(periodNum) && periodNum > 0 ? periodNum : void 0;
+  const watchStreamUrl = resolveGolfWatchStreamUrl(leagueKey, title);
+  const watchLinks = [{ provider: "PGA Tour", url: PGA_TOUR_LEADERBOARD_URL }];
+  if (watchStreamUrl) {
+    watchLinks.push({ provider: "US Open", url: watchStreamUrl });
+  }
+  const game = {
+    id,
+    grarfGameId: id,
+    league: leagueKey,
+    espnEventId: eventId,
+    externalIds: { espn: eventId, mlb: null },
+    time: scheduled ? formatGolfScheduledDayLabel(scheduledDateKey) : formatTimeEt5(isoStart),
+    awayTeam: title,
+    awayRecord: "\u2014",
+    homeTeam: "",
+    homeRecord: "\u2014",
+    awayCity: "",
+    homeCity: "",
+    awayPitcher: "\u2014",
+    awayPitcherStats: "",
+    homePitcher: "\u2014",
+    homePitcherStats: "",
+    channels,
+    broadcasts,
+    status: cardStatus,
+    statusLine: statusLine || void 0,
+    startTimeMs,
+    scheduledDateKey,
+    lastUpdated: (/* @__PURE__ */ new Date()).toISOString(),
+    metadata: {
+      ...round != null ? { round } : {},
+      ...tournamentEndKey ? { tournamentEndDateKey: tournamentEndKey } : {},
+      leaderboardUrl: PGA_TOUR_LEADERBOARD_URL
+    },
+    ...watchStreamUrl ? {
+      streamUrl: watchStreamUrl,
+      streamProvider: "US Open",
+      launchMode: "external"
+    } : {},
+    content: {
+      stories: [],
+      clips: [],
+      highlights: [],
+      social: [],
+      watchLinks
+    }
+  };
+  return attachCanonicalEventMetadata(game, { sport: "golf", title });
+}
+function normalizeGolfScoreboard(scoreboardJson, leagueKey) {
+  const slateDateKey = typeof scoreboardJson?.day?.date === "string" ? scoreboardJson.day.date.trim() : void 0;
+  const events = Array.isArray(scoreboardJson?.events) ? scoreboardJson.events : [];
+  const out = [];
+  for (const ev of events) {
+    const g2 = normalizeGolfEvent(ev, leagueKey, slateDateKey);
+    if (g2) out.push(g2);
+  }
+  return out;
+}
+
+// ../grarf/desktop/electron/espn/mergeOperationalScoreboards.js
+init_define_import_meta_env();
+function operationalGameMatchupKey(game) {
+  const league = game?.league;
+  const away = typeof game?.awayTeam === "string" ? game.awayTeam.trim().toLowerCase() : "";
+  const home = typeof game?.homeTeam === "string" ? game.homeTeam.trim().toLowerCase() : "";
+  if (!league || !away || !home) return null;
+  const teams = [away, home].sort();
+  return `${league}|${teams[0]}|${teams[1]}`;
+}
+function mergeNormalizedGamesById(primary, secondary) {
+  const byId = /* @__PURE__ */ new Map();
+  const primaryMatchups = /* @__PURE__ */ new Set();
+  for (const game of primary ?? []) {
+    if (game?.id) byId.set(game.id, game);
+    const matchupKey = operationalGameMatchupKey(game);
+    if (matchupKey) primaryMatchups.add(matchupKey);
+  }
+  for (const game of secondary ?? []) {
+    if (!game?.id || byId.has(game.id)) continue;
+    const matchupKey = operationalGameMatchupKey(game);
+    if (matchupKey && primaryMatchups.has(matchupKey)) continue;
+    byId.set(game.id, game);
+  }
+  return [...byId.values()];
+}
+
+// ../grarf/desktop/electron/espn/normalize.js
+function safe6(v2) {
+  return typeof v2 === "string" && v2.trim() ? v2.trim() : "";
+}
+function pickRecord(records) {
+  if (!Array.isArray(records)) return "\u2014";
+  const total = records.find((r3) => r3 && (r3.type === "total" || r3.name === "overall" || r3.name === "Total"));
+  if (total?.summary) return String(total.summary);
+  const any = records.find((r3) => r3?.summary);
+  return any?.summary ? String(any.summary) : "\u2014";
+}
+function pickProbable(probables, teamId) {
+  if (!Array.isArray(probables)) return { name: "\u2014", stats: "" };
+  const row = probables.find((p2) => String(p2?.team?.id ?? "") === String(teamId));
+  const athlete = row?.athlete;
+  const name = athlete?.displayName || athlete?.fullName || "\u2014";
+  const stats = "";
+  return { name: String(name), stats };
+}
+function pushBroadcastLabel(seen, out, raw) {
+  const label = typeof raw === "string" ? raw.trim() : typeof raw?.name === "string" ? raw.name.trim() : "";
+  if (!label || label === "TV TBD") return;
+  const key2 = label.toLowerCase();
+  if (seen.has(key2)) return;
+  seen.add(key2);
+  out.push(label);
+}
+function broadcastDebug(message, extra) {
+  if (extra && Object.keys(extra).length > 0) {
+    console.log(`[Broadcasts] ${message}`, extra);
+  } else {
+    console.log(`[Broadcasts] ${message}`);
+  }
+}
+function dropRedundantAggregateBroadcastLabels(labels) {
+  if (labels.length < 2) return labels;
+  const individualKeys = new Set(labels.map((l2) => l2.toLowerCase()));
+  return labels.filter((label) => {
+    if (!label.includes("/")) return true;
+    const parts = label.split("/").map((p2) => p2.trim()).filter(Boolean);
+    if (parts.length < 2) return true;
+    const allPartsPresent = parts.every((part) => individualKeys.has(part.toLowerCase()));
+    return !allPartsPresent;
+  });
+}
+function collectBroadcastLabels2(competition) {
+  const seen = /* @__PURE__ */ new Set();
+  const out = [];
+  const geo = competition?.geoBroadcasts;
+  if (Array.isArray(geo)) {
+    const ordered = [...geo].sort((a2, b2) => {
+      const ta2 = String(a2?.market?.type ?? "").toLowerCase();
+      const tb = String(b2?.market?.type ?? "").toLowerCase();
+      if (ta2 === "national" && tb !== "national") return -1;
+      if (tb === "national" && ta2 !== "national") return 1;
+      return 0;
+    });
+    for (const row of ordered) {
+      pushBroadcastLabel(seen, out, row?.media?.shortName);
+    }
+  }
+  const arr = competition?.broadcasts;
+  if (Array.isArray(arr)) {
+    for (const b2 of arr) {
+      const names = b2?.names;
+      if (!Array.isArray(names)) continue;
+      for (const n2 of names) {
+        pushBroadcastLabel(seen, out, n2);
+      }
+    }
+  }
+  if (typeof competition?.broadcast === "string") {
+    pushBroadcastLabel(seen, out, competition.broadcast);
+  }
+  const cleaned = dropRedundantAggregateBroadcastLabels(out);
+  return cleaned.length ? cleaned : ["TV TBD"];
+}
+function buildStatusLine(competition, statusType) {
+  const sit = competition?.situation;
+  const detail = safe6(statusType?.detail) || safe6(statusType?.shortDetail);
+  if (sit && (sit.balls != null || sit.strikes != null || sit.outs != null)) {
+    const parts = [];
+    if (detail) parts.push(detail);
+    const count = [];
+    if (sit.balls != null) count.push(`${sit.balls}-${sit.strikes ?? 0}`);
+    if (sit.outs != null) count.push(`${sit.outs} OUT`);
+    if (count.length) parts.push(count.join(" \xB7 "));
+    return parts.join(" \xB7 ") || detail || "";
+  }
+  return detail || safe6(statusType?.description) || "";
+}
+var SOCCER_LEAGUE_KEYS2 = /* @__PURE__ */ new Set([
+  "MLS",
+  "EPL",
+  "LALIGA",
+  "NWSL",
+  "LIGAMX",
+  "SERIEA",
+  "LIGUE1",
+  "EREDIVISIE",
+  "BUNDESLIGA",
+  "UCL",
+  "UEL",
+  "WWC",
+  "EURO",
+  "COPA",
+  "GOLDCUP",
+  "NATIONS",
+  "CLUBWC",
+  "SPFL",
+  "SAUDI",
+  "SUPERLIG",
+  "USLCUP",
+  "WORLDCUP"
+]);
+var NATIONAL_TEAM_SOCCER_LEAGUE_KEYS = /* @__PURE__ */ new Set([
+  "WORLDCUP",
+  "WWC",
+  "EURO",
+  "COPA",
+  "GOLDCUP",
+  "NATIONS"
+]);
+function pickTeamLogoHref(team, leagueKey) {
+  if (!team) return void 0;
+  const logos = team.logos;
+  if (Array.isArray(logos)) {
+    for (const row of logos) {
+      const href = typeof row?.href === "string" ? row.href.trim() : "";
+      if (href.startsWith("http")) return href;
+    }
+  }
+  const direct = safe6(team.logo);
+  if (direct.startsWith("http")) return direct;
+  const id = team.id != null ? String(team.id) : "";
+  const abbr = (safe6(team.abbreviation) || safe6(team.abbrev)).toLowerCase();
+  if (NATIONAL_TEAM_SOCCER_LEAGUE_KEYS.has(leagueKey) && abbr) {
+    return `https://a.espncdn.com/i/teamlogos/countries/500/${abbr}.png`;
+  }
+  if (leagueKey === "NCAABB" && id) {
+    return `https://a.espncdn.com/i/teamlogos/ncaa/500/${id}.png`;
+  }
+  if (SOCCER_LEAGUE_KEYS2.has(leagueKey) && id) {
+    return `https://a.espncdn.com/i/teamlogos/soccer/500/${id}.png`;
+  }
+  if (leagueKey === "MLB" && abbr) {
+    return `https://a.espncdn.com/i/teamlogos/mlb/500/scoreboard/${abbr}.png`;
+  }
+  if (leagueKey === "NBA" && abbr) {
+    return `https://a.espncdn.com/i/teamlogos/nba/500/scoreboard/${abbr}.png`;
+  }
+  if (leagueKey === "WNBA" && abbr) {
+    return `https://a.espncdn.com/i/teamlogos/wnba/500/${abbr}.png`;
+  }
+  if (leagueKey === "NHL" && abbr) {
+    return `https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/${abbr}.png`;
+  }
+  if (leagueKey === "AFL" && abbr) {
+    return `https://a.espncdn.com/i/teamlogos/afl/500/${abbr}.png`;
+  }
+  if (leagueKey === "MLS" && id) {
+    return `https://a.espncdn.com/i/teamlogos/soccer/500/${id}.png`;
+  }
+  return void 0;
+}
+function formatTimeEt6(iso) {
+  try {
+    const d2 = new Date(iso);
+    if (Number.isNaN(d2.getTime())) return "\u2014";
+    return d2.toLocaleTimeString("en-US", {
+      hour: "numeric",
+      minute: "2-digit",
+      timeZoneName: "short"
+    });
+  } catch {
+    return "\u2014";
+  }
+}
+function parseScore(raw) {
+  if (raw == null || raw === "") return null;
+  const n2 = Number(raw);
+  return Number.isFinite(n2) ? n2 : null;
+}
+function pickOddsSummary(competition) {
+  const odds = competition?.odds?.[0];
+  if (!odds) return void 0;
+  const details = odds.details;
+  if (typeof details === "string" && details.trim()) return details.trim();
+  const spread = odds.spread;
+  if (typeof spread === "string" && spread.trim()) return spread.trim();
+  const home = odds.homeTeamOdds;
+  const away = odds.awayTeamOdds;
+  if (home?.moneyLine != null && away?.moneyLine != null) {
+    return `${away.moneyLine} / ${home.moneyLine}`;
+  }
+  return void 0;
+}
+function resolveEspnTeamSportCardStatus(statusType) {
+  return resolveEspnCardStatus(statusType);
+}
+function normalizeEspnEvent(event, leagueKey, slateDateKey) {
+  const comp = event?.competitions?.[0];
+  if (!comp) return null;
+  const status = comp.status || {};
+  const statusType = status.type || {};
+  const cardStatus = resolveEspnTeamSportCardStatus(statusType);
+  const live = cardStatus === "live";
+  const final = cardStatus === "final";
+  const scheduled = cardStatus === "scheduled";
+  const postponed = cardStatus === "postponed";
+  const competitors = Array.isArray(comp.competitors) ? comp.competitors : [];
+  const away = competitors.find((c2) => c2?.homeAway === "away");
+  const home = competitors.find((c2) => c2?.homeAway === "home");
+  if (!away?.team || !home?.team) return null;
+  const awayTeam = away.team.shortDisplayName || away.team.displayName || away.team.name || "Away";
+  const homeTeam = home.team.shortDisplayName || home.team.displayName || home.team.name || "Home";
+  const awayTeamAbbrev = safe6(away.team.abbreviation) || safe6(away.team.abbrev) || void 0;
+  const homeTeamAbbrev = safe6(home.team.abbreviation) || safe6(home.team.abbrev) || void 0;
+  const awayLogoUrl = pickTeamLogoHref(away.team, leagueKey);
+  const homeLogoUrl = pickTeamLogoHref(home.team, leagueKey);
+  const awayCity = away.team.location || awayTeam;
+  const homeCity = home.team.location || homeTeam;
+  const awayRecord = pickRecord(away.records);
+  const homeRecord = pickRecord(home.records);
+  const awayScore = parseScore(away.score);
+  const homeScore = parseScore(home.score);
+  const awayStandingsLine = safe6(away.standingsSummary) || void 0;
+  const homeStandingsLine = safe6(home.standingsSummary) || void 0;
+  const probables = comp.probables || [];
+  const awayProb = pickProbable(probables, String(away.team.id));
+  const homeProb = pickProbable(probables, String(home.team.id));
+  const broadcasts = collectBroadcastLabels2(comp);
+  const channels = broadcasts;
+  if (broadcasts.length > 0 && broadcasts[0] !== "TV TBD") {
+    broadcastDebug(`Parsed ${broadcasts.join(" \xB7 ")} from ESPN payload`, {
+      away: awayTeam,
+      home: homeTeam
+    });
+  }
+  const venueName = comp.venue?.fullName || comp.venue?.address?.city || "";
+  const oddsSummary = pickOddsSummary(comp);
+  const isoStart = comp.date || event.date;
+  const startTimeMs = Date.parse(isoStart || "") || 0;
+  const scheduledDateKey = resolveScheduledDateKey(isoStart, slateDateKey);
+  const st2 = status;
+  const periodNum = st2.period != null ? Number(st2.period) : NaN;
+  const period = Number.isFinite(periodNum) ? periodNum : void 0;
+  const displayClock = safe6(st2.displayClock) || void 0;
+  let situation;
+  const sit = comp.situation;
+  if (sit && typeof sit === "object") {
+    const onFirst = !!sit.onFirst;
+    const onSecond = !!sit.onSecond;
+    const onThird = !!sit.onThird;
+    const basesLoaded = onFirst && onSecond && onThird;
+    if (basesLoaded || sit.outs != null) {
+      situation = {
+        basesLoaded,
+        ...sit.outs != null ? { outs: Number(sit.outs) } : {}
+      };
+    }
+  }
+  let statusLine = "";
+  if (postponed) {
+    statusLine = safe6(statusType?.shortDetail) || safe6(statusType?.detail) || safe6(statusType?.description) || "Postponed";
+  } else if (scheduled && cardStatus === "scheduled") {
+    statusLine = safe6(statusType?.shortDetail) || safe6(statusType?.detail) || safe6(statusType?.description) || (venueName ? venueName : "");
+  } else if (live || final) {
+    statusLine = buildStatusLine(comp, statusType);
+  } else if (scheduled && venueName) {
+    statusLine = venueName;
+  }
+  const finalizedStatusLine = safe6(statusType?.shortDetail) || safe6(statusType?.description) || safe6(statusType?.detail) || "Final";
+  const eventId = String(event.id);
+  const id = `espn-${leagueKey}-${eventId}`;
+  const metadata = leagueKey === "MLB" ? {
+    officialAwayName: String(away.team.displayName || away.team.name || awayTeam),
+    officialHomeName: String(home.team.displayName || home.team.name || homeTeam)
+  } : leagueKey === "NCAABB" ? {
+    espnSeasonSlug: safe6(event?.season?.slug) || void 0
+  } : {};
+  const game = {
+    id,
+    grarfGameId: id,
+    league: leagueKey,
+    espnEventId: eventId,
+    externalIds: { espn: eventId, mlb: null },
+    time: formatTimeEt6(isoStart),
+    awayTeam,
+    awayTeamAbbrev,
+    awayLogoUrl,
+    awayRecord,
+    awayStandingsLine,
+    homeTeam,
+    homeTeamAbbrev,
+    homeLogoUrl,
+    homeRecord,
+    homeStandingsLine,
+    awayScore,
+    homeScore,
+    awayCity,
+    homeCity,
+    awayPitcher: awayProb.name,
+    awayPitcherStats: awayProb.stats || "\u2014",
+    homePitcher: homeProb.name,
+    homePitcherStats: homeProb.stats || "\u2014",
+    channels,
+    broadcasts,
+    status: cardStatus,
+    statusLine: (cardStatus === "final" ? finalizedStatusLine : statusLine) || void 0,
+    startTimeMs,
+    scheduledDateKey,
+    oddsSummary,
+    lastUpdated: (/* @__PURE__ */ new Date()).toISOString(),
+    metadata,
+    period: cardStatus === "final" || cardStatus === "postponed" ? null : period,
+    displayClock: cardStatus === "final" || cardStatus === "postponed" ? void 0 : displayClock,
+    situation: cardStatus === "final" || cardStatus === "postponed" ? void 0 : situation,
+    content: {
+      stories: [],
+      clips: [],
+      highlights: [],
+      social: [],
+      watchLinks: []
+    }
+  };
+  const espnPlusStream = resolveEspnPlusStreamFromEvent(event, broadcasts, leagueKey);
+  if (espnPlusStream) {
+    attachEspnPlusStreamToGame(game, espnPlusStream);
+  }
+  return game;
+}
+function normalizeScoreboard(scoreboardJson, leagueKey) {
+  if (isMmaLeagueKey(leagueKey)) {
+    return normalizeMmaScoreboard(scoreboardJson, leagueKey);
+  }
+  if (isTennisLeagueKey(leagueKey)) {
+    return sortGames(normalizeTennisScoreboard2(scoreboardJson, leagueKey));
+  }
+  if (isGolfLeagueKey(leagueKey)) {
+    return sortGames(normalizeGolfScoreboard(scoreboardJson, leagueKey));
+  }
+  if (isRacingLeagueKey(leagueKey)) {
+    return sortGames(normalizeRacingScoreboard(scoreboardJson, leagueKey));
+  }
+  const slateDateKey = typeof scoreboardJson?.day?.date === "string" ? scoreboardJson.day.date.trim() : void 0;
+  const events = Array.isArray(scoreboardJson?.events) ? scoreboardJson.events : [];
+  const out = [];
+  for (const ev of events) {
+    const g2 = normalizeEspnEvent(ev, leagueKey, slateDateKey);
+    if (g2) out.push(g2);
+  }
+  return sortGames(out);
+}
+function sortGames(games) {
+  const rank = (g2) => {
+    if (g2.status === "live") return 0;
+    if (g2.status === "scheduled") return 1;
+    if (g2.status === "postponed") return 2;
+    return 3;
+  };
+  return [...games].sort((a2, b2) => {
+    const dr2 = rank(a2) - rank(b2);
+    if (dr2 !== 0) return dr2;
+    const ta2 = typeof a2.startTimeMs === "number" ? a2.startTimeMs : 0;
+    const tb = typeof b2.startTimeMs === "number" ? b2.startTimeMs : 0;
+    if (ta2 !== tb) return ta2 - tb;
+    return String(a2.time).localeCompare(String(b2.time));
+  });
+}
+function normalizeDatedOperationalScoreboardPair(todayJson, tomorrowJson, leagueKey) {
+  const todayGames = normalizeScoreboard(todayJson ?? { events: [] }, leagueKey);
+  const tomorrowGames = normalizeScoreboard(tomorrowJson ?? { events: [] }, leagueKey);
+  return sortGames(mergeNormalizedGamesById(todayGames, tomorrowGames));
+}
+
+// ../grarf/desktop/src/services/operationalIngest/web/fetchWebEspnOperationalSnapshot.ts
+var LOG4 = "[OperationalIngest]";
+var ESPN_FETCH_TIMEOUT_MS2 = 12e3;
+var LEAGUE_FETCH_CONCURRENCY = 8;
+var webEspnSnapshotPrefetch = null;
+function prefetchWebEspnOperationalSnapshot() {
+  if (!webEspnSnapshotPrefetch) {
+    webEspnSnapshotPrefetch = fetchWebEspnOperationalSnapshot();
+  }
+  return webEspnSnapshotPrefetch;
+}
+async function fetchEspnScoreboardJson(url) {
+  const res = await fetch(url, {
+    headers: { Accept: "application/json" },
+    signal: AbortSignal.timeout(ESPN_FETCH_TIMEOUT_MS2)
+  });
+  if (!res.ok) {
+    throw new Error(`ESPN ${res.status}`);
+  }
+  return res.json();
+}
+function countLiveScoreboardEvents(json) {
+  const events = Array.isArray(json?.events) ? json.events : [];
+  let live = 0;
+  for (const ev of events) {
+    const comp = ev?.competitions?.[0];
+    const statusType = comp?.status?.type;
+    if (!statusType) continue;
+    if (statusType.completed) continue;
+    if (String(statusType.state ?? "").toLowerCase() === "in") live += 1;
+  }
+  return live;
+}
+function scoreboardEventId(ev) {
+  if (!ev || typeof ev !== "object") return null;
+  const id = ev.id;
+  return id != null ? String(id) : null;
+}
+function countLiveAcrossScoreboards(...jsons) {
+  let live = 0;
+  for (const json of jsons) {
+    live += countLiveScoreboardEvents(json);
+  }
+  return live;
+}
+function countUniqueScoreboardEvents(...jsons) {
+  const ids = /* @__PURE__ */ new Set();
+  let count = 0;
+  for (const json of jsons) {
+    const events = Array.isArray(json?.events) ? json.events : [];
+    for (const ev of events) {
+      const id = scoreboardEventId(ev);
+      if (id && ids.has(id)) continue;
+      if (id) ids.add(id);
+      count += 1;
+    }
+  }
+  return count;
+}
+async function fetchDatedScoreboardPair(endpoint) {
+  const datedUrl = `${endpoint}${endpoint.includes("?") ? "&" : "?"}dates=${formatEspnScoreboardDatesParam()}`;
+  const tomorrowUrl = `${endpoint}${endpoint.includes("?") ? "&" : "?"}dates=${formatEspnScoreboardDatesParamForTomorrow()}`;
+  const [todayJson, tomorrowJson] = await Promise.all([
+    fetchEspnScoreboardJson(datedUrl),
+    fetchEspnScoreboardJson(tomorrowUrl).catch(() => ({ events: [] }))
+  ]);
+  return { todayJson, tomorrowJson };
+}
+async function fetchOperationalScoreboardJsonWeb(endpoint) {
+  const { todayJson, tomorrowJson } = await fetchDatedScoreboardPair(endpoint);
+  const datedEventCount = countUniqueScoreboardEvents(todayJson, tomorrowJson);
+  const datedLive = countLiveAcrossScoreboards(todayJson, tomorrowJson);
+  if (datedEventCount > 0 && datedLive > 0) {
+    return { todayJson, tomorrowJson, usedFallback: false };
+  }
+  const defaultJson = await fetchEspnScoreboardJson(endpoint);
+  const defaultLive = countLiveScoreboardEvents(defaultJson);
+  if (datedEventCount > 0 && datedLive === 0 && defaultLive > 0) {
+    return { todayJson: defaultJson, tomorrowJson: null, usedFallback: false };
+  }
+  if (datedEventCount > 0) {
+    return { todayJson, tomorrowJson, usedFallback: false };
+  }
+  return { todayJson: defaultJson, tomorrowJson: null, usedFallback: true };
+}
+async function fetchLeagueGames(key2) {
+  const endpoint = ESPN_OPERATIONAL_LEAGUE_ENDPOINTS[key2];
+  if (!endpoint) return [];
+  try {
+    const { todayJson, tomorrowJson, usedFallback } = await fetchOperationalScoreboardJsonWeb(endpoint);
+    let games = tomorrowJson ? normalizeDatedOperationalScoreboardPair(todayJson, tomorrowJson, key2) : normalizeScoreboard(todayJson, key2);
+    if (usedFallback) {
+      games = filterGamesForOperationalFallbackIngest(games);
+    }
+    return games;
+  } catch (e2) {
+    if (define_import_meta_env_default.DEV) {
+      console.warn(`${LOG4} web ESPN fetch failed`, key2, e2);
+    }
+    return [];
+  }
+}
+async function mapWithConcurrency(items, concurrency, fn2) {
+  const out = new Array(items.length);
+  let index = 0;
+  const workers = Array.from({ length: Math.min(concurrency, items.length) }, async () => {
+    while (index < items.length) {
+      const i2 = index;
+      index += 1;
+      out[i2] = await fn2(items[i2]);
+    }
+  });
+  await Promise.all(workers);
+  return out;
+}
+async function fetchWebEspnOperationalSnapshot(leagueKeys = [...GAMES_COLUMN_LEAGUE_ORDER]) {
+  const results = await mapWithConcurrency(leagueKeys, LEAGUE_FETCH_CONCURRENCY, async (key2) => ({
+    key: key2,
+    games: await fetchLeagueGames(key2)
+  }));
+  const leagues = {};
+  let total = 0;
+  for (const { key: key2, games } of results) {
+    if (games.length > 0) {
+      leagues[key2] = games;
+      total += games.length;
+    }
+  }
+  if (define_import_meta_env_default.DEV) {
+    console.log(`${LOG4} web ESPN fallback snapshot`, { total, leagues: Object.keys(leagues).length });
+  }
+  const transport = {
+    generatedAt: (/* @__PURE__ */ new Date()).toISOString(),
+    source: "espn_local_adapter",
+    leagues
+  };
+  return supplementOperationalSnapshotWithTennis(transport);
+}
+
+// ../grarf/desktop/src/services/operationalIngest/fetchOperationalSnapshot.ts
+var LOG5 = "[OperationalIngest]";
+var CLOUD_STALE_THRESHOLD_MS = 9e4;
+var CLOUD_FETCH_TIMEOUT_MS = 2e4;
+var WEB_CLOUD_BOOTSTRAP_TIMEOUT_MS = 2500;
+var CLOUD_FETCH_MAX_ATTEMPTS = 3;
+var CLOUD_FETCH_RETRY_MS = 1500;
+var webCloudSnapshotPrefetch = null;
+function prefetchWebOperationalCloudSnapshot() {
+  if (!isGrarfWebRenderer()) return Promise.resolve(null);
+  if (!webCloudSnapshotPrefetch) {
+    webCloudSnapshotPrefetch = fetchViaGrarfCloudService({ webBootstrap: true }).then((snap) => countOperationalGames(snap) > 0 ? snap : null).catch((e2) => {
+      if (define_import_meta_env_default.DEV) {
+        console.warn(`${LOG5} web cloud prefetch failed`, e2);
+      }
+      return null;
+    });
+  }
+  return webCloudSnapshotPrefetch;
+}
+async function resolveWebOperationalCloudSnapshot() {
+  const prefetched = await prefetchWebOperationalCloudSnapshot();
+  if (prefetched) return prefetched;
+  try {
+    const snap = await fetchViaGrarfCloudService({ webBootstrap: true });
+    return countOperationalGames(snap) > 0 ? snap : null;
+  } catch {
+    return null;
+  }
+}
+function countOperationalGames(snap) {
+  return Object.values(snap.leagues ?? {}).reduce(
+    (total, rows) => total + (Array.isArray(rows) ? rows.length : 0),
+    0
+  );
+}
+function mergeEspnWatchFieldsFromSupplement(cloud, espn) {
+  let next = cloud;
+  if (!cloud.streamUrl?.trim() && espn.streamUrl?.trim()) {
+    next = {
+      ...next,
+      streamUrl: espn.streamUrl,
+      streamProvider: espn.streamProvider ?? next.streamProvider,
+      espnWatchEventId: espn.espnWatchEventId ?? next.espnWatchEventId
+    };
+  }
+  const cloudBroadcast = cloud.broadcasts?.find((label) => label?.trim() && label !== "TV TBD");
+  const espnBroadcast = espn.broadcasts?.find((label) => label?.trim() && label !== "TV TBD");
+  if (!cloudBroadcast && espnBroadcast) {
+    next = {
+      ...next,
+      broadcasts: espn.broadcasts,
+      channels: espn.channels ?? espn.broadcasts
+    };
+  }
+  return next;
+}
+function supplementCloudSnapshotFromEspn(cloud, espn) {
+  const leagues = { ...cloud.leagues ?? {} };
+  let changed = false;
+  for (const [key2, rows] of Object.entries(espn.leagues ?? {})) {
+    if (!Array.isArray(rows) || rows.length === 0) continue;
+    const leagueKey = key2;
+    const cloudRows = leagues[leagueKey];
+    if (!Array.isArray(cloudRows) || cloudRows.length === 0) {
+      leagues[leagueKey] = rows;
+      changed = true;
+      continue;
+    }
+    const espnById = new Map(rows.map((row) => [row.id, row]));
+    let leagueChanged = false;
+    const mergedRows = cloudRows.map((cloudRow) => {
+      const espnRow = espnById.get(cloudRow.id);
+      if (!espnRow) return cloudRow;
+      const merged = mergeEspnWatchFieldsFromSupplement(cloudRow, espnRow);
+      if (merged !== cloudRow) leagueChanged = true;
+      return merged;
+    });
+    if (leagueChanged) {
+      leagues[leagueKey] = mergedRows;
+      changed = true;
+    }
+  }
+  return changed ? { ...cloud, leagues } : cloud;
+}
+function hasElectronGamesIpc() {
+  return Boolean(typeof window !== "undefined" && window.grarf?.gamesGetSnapshot);
+}
+function emptyOperationalSnapshot() {
+  const leagues = {};
+  for (const key2 of GAMES_COLUMN_LEAGUE_ORDER) {
+    leagues[key2] = [];
+  }
+  leagues.F1 = [];
+  return {
+    generatedAt: (/* @__PURE__ */ new Date()).toISOString(),
+    source: "espn_local_adapter",
+    leagues
+  };
+}
+function snapshotAgeMs(generatedAt) {
+  if (!generatedAt?.trim()) return Number.POSITIVE_INFINITY;
+  const ms2 = Date.parse(generatedAt);
+  if (!Number.isFinite(ms2)) return Number.POSITIVE_INFINITY;
+  return Math.max(0, Date.now() - ms2);
+}
+function ipcSnapshotToOperationalResponse(snap, source = "espn_local_adapter") {
+  const leagues = {};
+  for (const key2 of [...GAMES_COLUMN_LEAGUE_ORDER, "F1"]) {
+    const rows = snap.leagues?.[key2];
+    if (Array.isArray(rows)) leagues[key2] = rows;
+  }
+  return {
+    generatedAt: snap.updatedAt ?? (/* @__PURE__ */ new Date()).toISOString(),
+    source,
+    leagues
+  };
+}
+async function fetchViaEspnLocalIpcAdapter() {
+  const api = window.grarf?.gamesGetSnapshot;
+  if (!api) {
+    if (define_import_meta_env_default.DEV) {
+      console.warn(`${LOG5} source=espn_local_adapter unavailable (no Electron IPC)`);
+    }
+    return emptyOperationalSnapshot();
+  }
+  const snap = await api();
+  return ipcSnapshotToOperationalResponse(snap);
+}
+async function fetchViaGrarfCloudService(options) {
+  const { cloudBaseUrl } = getOperationalIngestConfig();
+  if (!cloudBaseUrl) {
+    throw new Error("[OperationalIngest] grarf_cloud provider requires VITE_GRARF_OPERATIONAL_INGEST_URL");
+  }
+  const url = `${cloudBaseUrl.replace(/\/$/, "")}/operational/snapshot`;
+  const maxAttempts = options?.webBootstrap ? 1 : CLOUD_FETCH_MAX_ATTEMPTS;
+  let lastError;
+  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+    try {
+      const res = await fetch(url, {
+        headers: { Accept: "application/json" },
+        signal: AbortSignal.timeout(
+          options?.webBootstrap ? WEB_CLOUD_BOOTSTRAP_TIMEOUT_MS : CLOUD_FETCH_TIMEOUT_MS
+        )
+      });
+      if (res.status === 503) {
+        lastError = "grarf_cloud snapshot warming (503)";
+        if (attempt < maxAttempts) {
+          await new Promise((resolve) => window.setTimeout(resolve, CLOUD_FETCH_RETRY_MS * attempt));
+          continue;
+        }
+        throw new Error(lastError);
+      }
+      if (!res.ok) {
+        throw new Error(`[OperationalIngest] grarf_cloud fetch failed: ${res.status}`);
+      }
+      const json = await res.json();
+      const transport = {
+        generatedAt: json.generatedAt ?? (/* @__PURE__ */ new Date()).toISOString(),
+        source: json.source ?? "grarf_operational_service",
+        leagues: json.leagues ?? {}
+      };
+      return supplementOperationalSnapshotWithTennis(transport);
+    } catch (e2) {
+      lastError = e2 instanceof Error ? e2.message : String(e2);
+      if (attempt < maxAttempts) {
+        await new Promise((resolve) => window.setTimeout(resolve, CLOUD_FETCH_RETRY_MS * attempt));
+        continue;
+      }
+      throw e2;
+    }
+  }
+  throw new Error(lastError ?? "[OperationalIngest] grarf_cloud fetch failed");
+}
+async function fetchViaWebOperationalIngest() {
+  const espnTask = prefetchWebEspnOperationalSnapshot();
+  const cloud = await resolveWebOperationalCloudSnapshot();
+  const espn = await espnTask;
+  const cloudGames = cloud ? countOperationalGames(cloud) : 0;
+  const espnGames = countOperationalGames(espn);
+  if (cloud && cloudGames > 0) {
+    return supplementCloudSnapshotFromEspn(cloud, espn);
+  }
+  if (espnGames > 0) {
+    if (define_import_meta_env_default.DEV) {
+      console.warn(`${LOG5} web using ESPN ingest (cloud unavailable or empty)`);
+    }
+    return espn;
+  }
+  return cloud ?? espn;
+}
+async function fetchViaGrarfCloudWithLocalFallback() {
+  let cloud = null;
+  let cloudError = null;
+  try {
+    cloud = await fetchViaGrarfCloudService();
+  } catch (e2) {
+    cloudError = e2 instanceof Error ? e2.message : String(e2);
+  }
+  const cloudAgeMs = cloud ? snapshotAgeMs(cloud.generatedAt) : Number.POSITIVE_INFINITY;
+  const cloudFresh = cloud != null && cloudAgeMs <= CLOUD_STALE_THRESHOLD_MS;
+  const electronIpc = hasElectronGamesIpc();
+  if (cloudFresh && cloud) {
+    return cloud;
+  }
+  if (!electronIpc) {
+    if (cloud) {
+      if (define_import_meta_env_default.DEV && !cloudFresh) {
+        console.warn(`${LOG5} browser/web using cloud snapshot (stale but authoritative)`, {
+          cloudAgeMs,
+          cloudError
+        });
+      }
+      return cloud;
+    }
+    if (isGrarfWebRenderer()) {
+      if (define_import_meta_env_default.DEV && cloudError) {
+        console.warn(`${LOG5} web ESPN fallback (cloud unavailable)`, { cloudError });
+      }
+      return fetchWebEspnOperationalSnapshot();
+    }
+    throw new Error(cloudError ?? "[OperationalIngest] grarf_cloud unavailable in browser");
+  }
+  const local = await fetchViaEspnLocalIpcAdapter();
+  const localAgeMs = snapshotAgeMs(local.generatedAt);
+  if (cloud && cloudAgeMs <= localAgeMs) {
+    return cloud;
+  }
+  if (define_import_meta_env_default.DEV && (cloudError || cloud && !cloudFresh)) {
+    console.warn(`${LOG5} using local IPC fallback (cloud stale or failed)`, {
+      cloudError,
+      cloudAgeMs: cloud ? cloudAgeMs : null,
+      localAgeMs,
+      localGeneratedAt: local.generatedAt
+    });
+  }
+  return {
+    ...local,
+    source: "espn_local_adapter"
+  };
+}
+async function fetchOperationalSnapshot() {
+  const config = getOperationalIngestConfig();
+  if (isGrarfWebRenderer()) {
+    return fetchViaWebOperationalIngest();
+  }
+  if (config.provider === "grarf_cloud") {
+    return fetchViaGrarfCloudWithLocalFallback();
+  }
+  return fetchViaEspnLocalIpcAdapter();
+}
+function operationalResponseFromIpcPush(snap) {
+  return ipcSnapshotToOperationalResponse(snap);
+}
+
+// ../grarf/desktop/src/lib/gamesSpine/webGamesSpineBootstrap.ts
+function bootstrapWebGamesSpineIngest() {
+  if (!isGrarfWebRenderer()) return;
+  prefetchWebOperationalCloudSnapshot();
+  prefetchWebEspnOperationalSnapshot();
+  prefetchGamesSpineManualDocument();
+}
+if (typeof window !== "undefined") {
+  bootstrapWebGamesSpineIngest();
+}
+
+// ../grarf/desktop/src/layouts/AppShellLayout.tsx
 var import_react43 = __toESM(require_react(), 1);
 
 // ../grarf/desktop/src/lib/perf/perfDiagnostics.ts
@@ -24067,43 +26673,6 @@ init_define_import_meta_env();
 
 // ../grarf/desktop/src/lib/gamesSpine/isGameActivelyLive.ts
 init_define_import_meta_env();
-
-// ../grarf/desktop/shared/espnPausedCompetitionStatus.js
-init_define_import_meta_env();
-var ESPN_PAUSED_STATUS_NAMES = /* @__PURE__ */ new Set([
-  "STATUS_SUSPENDED",
-  "STATUS_DELAYED",
-  "STATUS_HALTED",
-  "STATUS_INTERRUPTED",
-  "STATUS_WEATHER_DELAY"
-]);
-function safeEspnText(value) {
-  return typeof value === "string" && value.trim() ? value.trim() : "";
-}
-function isEspnPausedCompetitionStatus(statusType) {
-  if (!statusType || typeof statusType !== "object") return false;
-  const statusName = safeEspnText(statusType.name).toUpperCase();
-  if (statusName === "STATUS_POSTPONED") return false;
-  if (ESPN_PAUSED_STATUS_NAMES.has(statusName)) return true;
-  const detail = `${safeEspnText(statusType.shortDetail)} ${safeEspnText(statusType.detail)} ${safeEspnText(statusType.description)}`.toLowerCase();
-  if (!detail) return false;
-  if (/\b(suspended|weather delay|delayed|halted|interrupted)\b/.test(detail)) {
-    return statusName !== "STATUS_IN_PROGRESS";
-  }
-  return false;
-}
-function resolveEspnCardStatus(statusType) {
-  const statusName = safeEspnText(statusType?.name).toUpperCase();
-  const completed = !!statusType?.completed;
-  const state3 = safeEspnText(statusType?.state).toLowerCase();
-  if (statusName === "STATUS_POSTPONED") return "postponed";
-  if (isEspnPausedCompetitionStatus(statusType)) return "scheduled";
-  if (statusName === "STATUS_IN_PROGRESS" || !completed && state3 === "in") return "live";
-  if (statusName === "STATUS_FINAL" || completed || state3 === "post") return "final";
-  return "scheduled";
-}
-
-// ../grarf/desktop/src/lib/gamesSpine/isGameActivelyLive.ts
 function pausedFromStatusLine(statusLine) {
   const line = statusLine?.trim();
   if (!line) return false;
@@ -24124,204 +26693,6 @@ function isGameActivelyLive(game) {
 
 // ../grarf/desktop/src/lib/gamesSpine/gamesSpineOperationalDate.ts
 init_define_import_meta_env();
-
-// ../grarf/desktop/shared/operationalSlateDate.js
-init_define_import_meta_env();
-
-// ../grarf/desktop/shared/golfTournamentDate.js
-init_define_import_meta_env();
-var GOLF_TOURNAMENT_DAY_TIMEZONE = "America/New_York";
-var GOLF_LEAGUE_KEYS2 = /* @__PURE__ */ new Set(["PGA", "LPGA", "LIV", "CHAMPIONS"]);
-function isGolfTournamentLeagueKey(league) {
-  return typeof league === "string" && GOLF_LEAGUE_KEYS2.has(league);
-}
-function readGolfTournamentStartDateKey(iso, formatDayKey) {
-  if (typeof iso !== "string" || !iso.trim()) return null;
-  const ms2 = Date.parse(iso);
-  if (!Number.isFinite(ms2) || ms2 <= 0) {
-    const match = iso.match(/^(\d{4}-\d{2}-\d{2})/);
-    return match?.[1] ?? null;
-  }
-  return formatDayKey(ms2, GOLF_TOURNAMENT_DAY_TIMEZONE) ?? null;
-}
-function readGolfTournamentEndDateKey(iso, formatDayKey) {
-  return readGolfTournamentStartDateKey(iso, formatDayKey);
-}
-function formatGolfScheduledDayLabel(dateKey) {
-  const trimmed = dateKey.trim();
-  if (!trimmed) return "\u2014";
-  const [y2, m2, d2] = trimmed.split("-").map(Number);
-  if (!y2 || !m2 || !d2) return "\u2014";
-  const anchor = new Date(Date.UTC(y2, m2 - 1, d2, 17, 0, 0));
-  return anchor.toLocaleDateString("en-US", {
-    weekday: "short",
-    month: "numeric",
-    day: "numeric",
-    timeZone: GOLF_TOURNAMENT_DAY_TIMEZONE
-  });
-}
-
-// ../grarf/desktop/shared/operationalSlateDate.js
-var GRARF_OPERATIONAL_SLATE_TIMEZONE = "America/Chicago";
-var OPERATIONAL_SLATE_NEXT_DAY_CUTOFF_HOUR = 6;
-var calendarFormatterCache = /* @__PURE__ */ new Map();
-function getCalendarFormatter(timeZone) {
-  let formatter = calendarFormatterCache.get(timeZone);
-  if (!formatter) {
-    formatter = new Intl.DateTimeFormat("en-US", {
-      timeZone,
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-      hour: "numeric",
-      hourCycle: "h23"
-    });
-    calendarFormatterCache.set(timeZone, formatter);
-  }
-  return formatter;
-}
-function calendarPartsInTimeZone(ms2, timeZone) {
-  const parts = getCalendarFormatter(timeZone).formatToParts(new Date(ms2));
-  return {
-    year: Number(parts.find((p2) => p2.type === "year")?.value),
-    month: Number(parts.find((p2) => p2.type === "month")?.value),
-    day: Number(parts.find((p2) => p2.type === "day")?.value),
-    hour: Number(parts.find((p2) => p2.type === "hour")?.value)
-  };
-}
-var operationalTodayKeyCache = {
-  timeZone: "",
-  bucketMs: 0,
-  key: "1970-01-01"
-};
-function readOperationalTodayKeyCache(now, timeZone) {
-  const bucketMs = Math.floor(now.getTime() / 6e4);
-  if (operationalTodayKeyCache.timeZone === timeZone && operationalTodayKeyCache.bucketMs === bucketMs) {
-    return operationalTodayKeyCache.key;
-  }
-  return null;
-}
-function writeOperationalTodayKeyCache(now, timeZone, key2) {
-  operationalTodayKeyCache.timeZone = timeZone;
-  operationalTodayKeyCache.bucketMs = Math.floor(now.getTime() / 6e4);
-  operationalTodayKeyCache.key = key2;
-}
-function formatOperationalDateKeyFromMs(ms2, timeZone = GRARF_OPERATIONAL_SLATE_TIMEZONE) {
-  if (ms2 == null || !Number.isFinite(ms2) || ms2 <= 0) return void 0;
-  const { year, month, day } = calendarPartsInTimeZone(ms2, timeZone);
-  if (!year || !month || !day) return void 0;
-  return `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
-}
-function getOperationalTodayDateKey(now = /* @__PURE__ */ new Date(), timeZone = GRARF_OPERATIONAL_SLATE_TIMEZONE) {
-  const cached = readOperationalTodayKeyCache(now, timeZone);
-  if (cached) return cached;
-  const key2 = formatOperationalDateKeyFromMs(now.getTime(), timeZone) ?? "1970-01-01";
-  writeOperationalTodayKeyCache(now, timeZone, key2);
-  return key2;
-}
-function offsetOperationalDateKey(dateKey, dayOffset, timeZone = GRARF_OPERATIONAL_SLATE_TIMEZONE) {
-  const [y2, m2, d2] = dateKey.split("-").map(Number);
-  const anchor = Date.UTC(y2, (m2 ?? 1) - 1, (d2 ?? 1) + dayOffset, 12, 0, 0);
-  return formatOperationalDateKeyFromMs(anchor, timeZone) ?? dateKey;
-}
-function getOperationalYesterdayDateKey(now = /* @__PURE__ */ new Date(), timeZone = GRARF_OPERATIONAL_SLATE_TIMEZONE) {
-  return offsetOperationalDateKey(getOperationalTodayDateKey(now, timeZone), -1, timeZone);
-}
-function getOperationalTomorrowDateKey(now = /* @__PURE__ */ new Date(), timeZone = GRARF_OPERATIONAL_SLATE_TIMEZONE) {
-  return offsetOperationalDateKey(getOperationalTodayDateKey(now, timeZone), 1, timeZone);
-}
-function formatEspnScoreboardDatesParam(now = /* @__PURE__ */ new Date(), timeZone = GRARF_OPERATIONAL_SLATE_TIMEZONE) {
-  return getOperationalTodayDateKey(now, timeZone).replace(/-/g, "");
-}
-function formatEspnScoreboardDatesParamForTomorrow(now = /* @__PURE__ */ new Date(), timeZone = GRARF_OPERATIONAL_SLATE_TIMEZONE) {
-  return getOperationalTomorrowDateKey(now, timeZone).replace(/-/g, "");
-}
-function resolveScheduledDateKey(isoStart, slateDateKey, timeZone = GRARF_OPERATIONAL_SLATE_TIMEZONE) {
-  const fromStart = formatOperationalDateKeyFromMs(Date.parse(isoStart || ""), timeZone);
-  if (fromStart) return fromStart;
-  const slate = typeof slateDateKey === "string" ? slateDateKey.trim() : "";
-  return slate || void 0;
-}
-var nextDayCutoffMsCache = /* @__PURE__ */ new Map();
-function getNextDayCutoffMs(operationalDateKey, cutoffHour, timeZone) {
-  const cacheKey3 = `${operationalDateKey}|${cutoffHour}|${timeZone}`;
-  const cached = nextDayCutoffMsCache.get(cacheKey3);
-  if (cached != null) return cached;
-  const tomorrowKey = offsetOperationalDateKey(operationalDateKey, 1, timeZone);
-  const [y2, m2, d2] = tomorrowKey.split("-").map(Number);
-  let probe = Date.UTC(y2, (m2 ?? 1) - 1, d2 ?? 1, 12, 0, 0);
-  for (let i2 = -30; i2 < 30; i2++) {
-    const candidate = probe + i2 * 36e5;
-    const key2 = formatOperationalDateKeyFromMs(candidate, timeZone);
-    const hour = calendarPartsInTimeZone(candidate, timeZone).hour;
-    if (key2 === tomorrowKey && hour === cutoffHour) {
-      nextDayCutoffMsCache.set(cacheKey3, candidate);
-      return candidate;
-    }
-  }
-  const fallback = probe + 24 * 36e5;
-  nextDayCutoffMsCache.set(cacheKey3, fallback);
-  return fallback;
-}
-function isScheduledOnOperationalEveningSlate(game, operationalDateKey, now = /* @__PURE__ */ new Date(), timeZone = GRARF_OPERATIONAL_SLATE_TIMEZONE) {
-  const startKey = formatOperationalDateKeyFromMs(game.startTimeMs, timeZone);
-  if (startKey === operationalDateKey) return true;
-  const tomorrowKey = getOperationalTomorrowDateKey(now, timeZone);
-  const payloadKey = typeof game.scheduledDateKey === "string" ? game.scheduledDateKey.trim() : null;
-  if (startKey === tomorrowKey) {
-    const ms2 = game.startTimeMs;
-    if (ms2 != null && Number.isFinite(ms2) && ms2 > 0) {
-      const cutoff = getNextDayCutoffMs(operationalDateKey, OPERATIONAL_SLATE_NEXT_DAY_CUTOFF_HOUR, timeZone);
-      if (ms2 < cutoff) return true;
-    }
-  }
-  if (!startKey && payloadKey === operationalDateKey) return true;
-  return false;
-}
-function resolveGameOperationalSlateDateKey(game, timeZone = GRARF_OPERATIONAL_SLATE_TIMEZONE) {
-  const scheduledKey = typeof game?.scheduledDateKey === "string" ? game.scheduledDateKey.trim() : "";
-  if (isGolfTournamentLeagueKey(game?.league)) {
-    if (game?.status === "final") {
-      const endKey = typeof game?.metadata?.tournamentEndDateKey === "string" ? game.metadata.tournamentEndDateKey.trim() : "";
-      if (endKey) return endKey;
-    }
-    if (scheduledKey) return scheduledKey;
-  }
-  return formatOperationalDateKeyFromMs(game?.startTimeMs, timeZone) || scheduledKey || void 0;
-}
-function filterGamesForOperationalDateKey(games, operationalDateKey, now = /* @__PURE__ */ new Date(), timeZone = GRARF_OPERATIONAL_SLATE_TIMEZONE) {
-  return games.filter((g2) => {
-    if (g2?.status === "live") return true;
-    if (g2?.status === "scheduled") {
-      if (isGolfTournamentLeagueKey(g2?.league)) {
-        const key3 = typeof g2?.scheduledDateKey === "string" ? g2.scheduledDateKey.trim() : "";
-        return key3 ? key3 === operationalDateKey : false;
-      }
-      return isScheduledOnOperationalEveningSlate(g2, operationalDateKey, now, timeZone);
-    }
-    const key2 = resolveGameOperationalSlateDateKey(g2, timeZone);
-    return key2 === operationalDateKey;
-  });
-}
-function shouldKeepGameOnOperationalFallbackIngest(game, now = /* @__PURE__ */ new Date(), timeZone = GRARF_OPERATIONAL_SLATE_TIMEZONE) {
-  if (game?.status === "live") return true;
-  const todayKey = getOperationalTodayDateKey(now, timeZone);
-  if (filterGamesForOperationalDateKey([game], todayKey, now, timeZone).length > 0) {
-    return true;
-  }
-  if (game?.status === "final") {
-    const yesterdayKey2 = getOperationalYesterdayDateKey(now, timeZone);
-    if (filterGamesForOperationalDateKey([game], yesterdayKey2, now, timeZone).length > 0) {
-      return true;
-    }
-  }
-  return false;
-}
-function filterGamesForOperationalFallbackIngest(games, now = /* @__PURE__ */ new Date(), timeZone = GRARF_OPERATIONAL_SLATE_TIMEZONE) {
-  return games.filter((g2) => shouldKeepGameOnOperationalFallbackIngest(g2, now, timeZone));
-}
-
-// ../grarf/desktop/src/lib/gamesSpine/gamesSpineOperationalDate.ts
 function formatUtcDateKeyFromMs(ms2) {
   if (ms2 == null || !Number.isFinite(ms2) || ms2 <= 0) return null;
   const d2 = new Date(ms2);
@@ -24348,7 +26719,7 @@ function getGamesSpineOperationalTodayKey(now = /* @__PURE__ */ new Date()) {
 function getGamesSpineOperationalYesterdayKey(now = /* @__PURE__ */ new Date()) {
   return getOperationalYesterdayDateKey(now, GRARF_OPERATIONAL_SLATE_TIMEZONE);
 }
-function formatLocalDateKeyFromMs(ms2) {
+function formatLocalDateKeyFromMs2(ms2) {
   return formatOperationalDateKeyFromMs(ms2 ?? void 0, GRARF_OPERATIONAL_SLATE_TIMEZONE) ?? null;
 }
 function isScheduledOnOperationalEveningSlate2(game, operationalDateKey, now = /* @__PURE__ */ new Date()) {
@@ -25114,6 +27485,7 @@ var import_react3 = __toESM(require_react(), 1);
 // ../grarf/desktop/src/context/AppShellContext.tsx
 init_define_import_meta_env();
 var import_react2 = __toESM(require_react(), 1);
+init_isGrarfWebRenderer();
 
 // ../grarf/desktop/src/lib/search/urlLauncher.ts
 init_define_import_meta_env();
@@ -25263,18 +27635,27 @@ function tryBuildUrlWorkspaceTab(raw) {
 
 // ../grarf/desktop/src/context/AppShellContext.tsx
 var import_jsx_runtime = __toESM(require_jsx_runtime(), 1);
-var STORAGE_KEY = "grarf-sidebar-collapsed";
+var DESKTOP_STORAGE_KEY = "grarf-sidebar-collapsed";
+var WEB_STORAGE_KEY = "grarf-web-sidebar-collapsed";
 var AppShellContext = (0, import_react2.createContext)(null);
+function readInitialSidebarCollapsed() {
+  if (typeof localStorage === "undefined") {
+    return typeof window !== "undefined" && isGrarfWebRenderer();
+  }
+  if (isGrarfWebRenderer()) {
+    const stored = localStorage.getItem(WEB_STORAGE_KEY);
+    return stored === null ? true : stored === "1";
+  }
+  return localStorage.getItem(DESKTOP_STORAGE_KEY) === "1";
+}
 function AppShellProvider({ children }) {
   const workspaceUrlLauncherRef = (0, import_react2.useRef)(null);
   const [homeShellMode, setHomeShellMode] = (0, import_react2.useState)("home");
-  const [sidebarCollapsed, setSidebarCollapsed] = (0, import_react2.useState)(() => {
-    if (typeof localStorage === "undefined") return false;
-    return localStorage.getItem(STORAGE_KEY) === "1";
-  });
+  const [sidebarCollapsed, setSidebarCollapsed] = (0, import_react2.useState)(() => readInitialSidebarCollapsed());
   (0, import_react2.useEffect)(() => {
     try {
-      localStorage.setItem(STORAGE_KEY, sidebarCollapsed ? "1" : "0");
+      const key2 = isGrarfWebRenderer() ? WEB_STORAGE_KEY : DESKTOP_STORAGE_KEY;
+      localStorage.setItem(key2, sidebarCollapsed ? "1" : "0");
     } catch {
     }
   }, [sidebarCollapsed]);
@@ -29959,27 +32340,6 @@ init_define_import_meta_env();
 
 // ../grarf/desktop/src/lib/bestGameRightNow/leagueImportanceV1.ts
 init_define_import_meta_env();
-
-// ../grarf/desktop/shared/golfWatchUrls.js
-init_define_import_meta_env();
-var PGA_TOUR_LEADERBOARD_URL = "https://www.pgatour.com/leaderboard";
-var US_OPEN_WATCH_URL = "https://www.usopen.com/watch.html";
-var PGA_TOUR_LEAGUE_KEY = "PGA";
-function isUsOpenTournamentTitle(title) {
-  return typeof title === "string" && /\bu\.?\s*s\.?\s*open\b/i.test(title.trim());
-}
-function isPgaTourUsOpenEvent(leagueKey, tournamentTitle) {
-  return leagueKey === PGA_TOUR_LEAGUE_KEY && isUsOpenTournamentTitle(tournamentTitle);
-}
-function resolveGolfLeaderboardUrl() {
-  return PGA_TOUR_LEADERBOARD_URL;
-}
-function resolveGolfWatchStreamUrl(leagueKey, tournamentTitle) {
-  if (!isPgaTourUsOpenEvent(leagueKey, tournamentTitle)) return null;
-  return US_OPEN_WATCH_URL;
-}
-
-// ../grarf/desktop/src/lib/bestGameRightNow/leagueImportanceV1.ts
 var LEAGUE_IMPORTANCE_V1 = {
   NBA: 100,
   WORLDCUP: 99,
@@ -30545,13 +32905,13 @@ var import_zustand8 = __toESM(require_zustand(), 1);
 
 // ../grarf/desktop/src/lib/broadcast/broadcastDebug.ts
 init_define_import_meta_env();
-var LOG = "[Broadcasts]";
-function broadcastDebug(message, extra) {
+var LOG6 = "[Broadcasts]";
+function broadcastDebug2(message, extra) {
   if (!define_import_meta_env_default.DEV) return;
   if (extra && Object.keys(extra).length > 0) {
-    console.log(`${LOG} ${message}`, extra);
+    console.log(`${LOG6} ${message}`, extra);
   } else {
-    console.log(`${LOG} ${message}`);
+    console.log(`${LOG6} ${message}`);
   }
 }
 
@@ -30786,7 +33146,7 @@ function pruneLiveRecency(byId, ingestCycle, now = Date.now()) {
 // ../grarf/desktop/src/store/recentFinalizedGamesStore.ts
 init_define_import_meta_env();
 var import_zustand5 = __toESM(require_zustand(), 1);
-var STORAGE_KEY2 = "grarf-recent-finalized-games-v2";
+var STORAGE_KEY = "grarf-recent-finalized-games-v2";
 function upsertFinals(byId, games, now) {
   const next = { ...byId };
   for (const raw of games) {
@@ -30809,7 +33169,7 @@ function upsertFinals(byId, games, now) {
 function readPersistedById() {
   if (typeof sessionStorage === "undefined") return {};
   try {
-    const raw = sessionStorage.getItem(STORAGE_KEY2);
+    const raw = sessionStorage.getItem(STORAGE_KEY);
     if (!raw) return {};
     const parsed = JSON.parse(raw);
     return pruneRetainedFinals(parsed);
@@ -30820,7 +33180,7 @@ function readPersistedById() {
 function persistById(byId) {
   if (typeof sessionStorage === "undefined") return;
   try {
-    sessionStorage.setItem(STORAGE_KEY2, JSON.stringify(byId));
+    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(byId));
   } catch {
   }
 }
@@ -31379,33 +33739,6 @@ init_define_import_meta_env();
 
 // ../grarf/desktop/src/lib/broadcast/broadcastLabelRank.ts
 init_define_import_meta_env();
-
-// ../grarf/desktop/shared/espnWatchBroadcast.js
-init_define_import_meta_env();
-var ESPN_PLUS_LABEL = /espn\s*\+|espn\s*plus|espn\s*unlimited|espn\s*unlmtd/i;
-function isEspnPlusBroadcastLabel(label) {
-  if (typeof label !== "string" || !label.trim()) return false;
-  return ESPN_PLUS_LABEL.test(label);
-}
-function isEspnLinearBroadcastLabel(label) {
-  if (typeof label !== "string" || !label.trim()) return false;
-  const t2 = label.trim();
-  if (ESPN_PLUS_LABEL.test(t2)) return false;
-  return /^(espn2?|abc|espn\s*network|espn\s*national)$/i.test(t2);
-}
-function gameHasEspnPlusBroadcast(broadcastLabels) {
-  return broadcastLabels.some(isEspnPlusBroadcastLabel);
-}
-var LINEAR_ESPN_WATCH_LEAGUES = /* @__PURE__ */ new Set(["NHL", "ATP", "WTA", "NCAABB"]);
-function gameHasEspnWatchBroadcast(broadcastLabels, leagueKey) {
-  if (gameHasEspnPlusBroadcast(broadcastLabels)) return true;
-  if (leagueKey && LINEAR_ESPN_WATCH_LEAGUES.has(leagueKey)) {
-    return broadcastLabels.some(isEspnLinearBroadcastLabel);
-  }
-  return false;
-}
-
-// ../grarf/desktop/src/lib/broadcast/broadcastLabelRank.ts
 function isMlbTvBroadcastLabel(label) {
   return /MLB\.?\s*TV|MLBTV/i.test(label.trim());
 }
@@ -31623,7 +33956,7 @@ var useLiveGamesStore = (0, import_zustand8.create)((set) => ({
   updatedAt: useCanonicalLiveGameStore.getState().updatedAt,
   hydrate: (snap, completeness) => {
     if (define_import_meta_env_default.DEV) {
-      broadcastDebug(`[CanonicalLive] Ingest ${snap.updatedAt ?? "?"}`);
+      broadcastDebug2(`[CanonicalLive] Ingest ${snap.updatedAt ?? "?"}`);
     }
     if (define_import_meta_env_default.DEV && define_import_meta_env_default.VITE_TRACE_FINAL_LIVE_FIELDS === "1") {
       try {
@@ -32718,96 +35051,13 @@ function matchOperationalModeSpineFilter(game, mode) {
 init_define_import_meta_env();
 var import_zustand10 = __toESM(require_zustand(), 1);
 
-// ../grarf/desktop/src/lib/admin/grarfAdminFlag.ts
-init_define_import_meta_env();
-var GRARF_ADMIN_STORAGE_KEY = "grarf-admin";
-function isGrarfAdmin() {
-  if (typeof localStorage === "undefined") return false;
-  try {
-    return localStorage.getItem(GRARF_ADMIN_STORAGE_KEY) === "true";
-  } catch {
-    return false;
-  }
-}
-function markGrarfAdmin() {
-  if (typeof localStorage === "undefined") return;
-  try {
-    localStorage.setItem(GRARF_ADMIN_STORAGE_KEY, "true");
-  } catch {
-  }
-}
-
 // ../grarf/desktop/src/lib/sportscape/editorial/sportscapeEditorialApi.ts
 init_define_import_meta_env();
-
-// ../grarf/desktop/src/config/sportscapeEditorialConfig.ts
-init_define_import_meta_env();
-init_isGrarfWebRenderer();
-var SPORTSCAPE_EDITORIAL_PRIMARY_API_URL = "https://grarf-operational-service.grarf.workers.dev/sportscape-editorial";
-var SPORTSCAPE_EDITORIAL_FALLBACK_API_URL = "https://grarf-sportscape-editorial.grarf.workers.dev";
-var SPORTSCAPE_EDITORIAL_FAILOVER_BASE_URLS = [
-  SPORTSCAPE_EDITORIAL_PRIMARY_API_URL,
-  SPORTSCAPE_EDITORIAL_FALLBACK_API_URL
-];
-var DEFAULT_SPORTSCAPE_EDITORIAL_API_URL = SPORTSCAPE_EDITORIAL_FALLBACK_API_URL;
-var WEB_SPORTSCAPE_EDITORIAL_API_URL = SPORTSCAPE_EDITORIAL_PRIMARY_API_URL;
-function resolveWebSportscapeEditorialApiUrl() {
-  if (typeof window === "undefined") return null;
-  return window.GRARF_WEB_CONFIG?.sportscapeEditorialApiUrl?.trim() || null;
-}
-function getSportscapeEditorialApiBaseUrl() {
-  const fromWeb = resolveWebSportscapeEditorialApiUrl();
-  if (fromWeb) return fromWeb.replace(/\/+$/, "");
-  if (isGrarfWebRenderer()) {
-    return WEB_SPORTSCAPE_EDITORIAL_API_URL;
-  }
-  const fromEnv = define_import_meta_env_default.VITE_SPORTSCAPE_EDITORIAL_API_URL?.trim();
-  if (fromEnv) return fromEnv.replace(/\/+$/, "");
-  return DEFAULT_SPORTSCAPE_EDITORIAL_API_URL;
-}
-function shouldUseLocalSportscapeEditorialFallback() {
-  if (!define_import_meta_env_default.DEV) return false;
-  if (define_import_meta_env_default.VITE_SPORTSCAPE_EDITORIAL_USE_LOCAL !== "1") return false;
-  return Boolean(
-    typeof window !== "undefined" && window.grarf?.sportscapeEditorialGetDocument
-  );
-}
-function sportscapeEditorialUrlForBase(base, path) {
-  const normalized = base.replace(/\/+$/, "");
-  if (path === "/" || path === "") return `${normalized}/`;
-  const suffix = path.startsWith("/") ? path : `/${path}`;
-  return `${normalized}${suffix}`;
-}
-function sportscapeEditorialApiUrl(path) {
-  return sportscapeEditorialUrlForBase(getSportscapeEditorialApiBaseUrl(), path);
-}
-
-// ../grarf/desktop/src/lib/sportscape/editorial/sportscapeEditorialAdminAuth.ts
-init_define_import_meta_env();
-var SESSION_KEY = "grarf-sportscape-admin-token";
-function getSportscapeAdminToken() {
-  try {
-    const token = sessionStorage.getItem(SESSION_KEY)?.trim();
-    return token || null;
-  } catch {
-    return null;
-  }
-}
-function isSportscapeAdminAuthed() {
-  return Boolean(getSportscapeAdminToken());
-}
-function markSportscapeAdminAuthed(token) {
-  try {
-    sessionStorage.setItem(SESSION_KEY, token);
-  } catch {
-  }
-  markGrarfAdmin();
-}
 
 // ../grarf/desktop/src/lib/sportscape/editorial/fetchSportscapeEditorialWithFailover.ts
 init_define_import_meta_env();
 var FETCH_TIMEOUT_MS = 15e3;
-var LOG2 = "[Sportscape Editorial]";
+var LOG7 = "[Sportscape Editorial]";
 function isTransportFailure(err) {
   if (!(err instanceof Error)) return true;
   const msg = err.message.toLowerCase();
@@ -32835,7 +35085,7 @@ async function fetchSportscapeEditorialWithFailover(path, init, options) {
         errors.push(`${baseUrl}: HTTP ${response.status}`);
         continue;
       }
-      console.log(`${LOG2} Connected via ${baseUrl}`);
+      console.log(`${LOG7} Connected via ${baseUrl}`);
       return { response, baseUrl };
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
@@ -32851,7 +35101,7 @@ async function fetchSportscapeEditorialWithFailover(path, init, options) {
 }
 
 // ../grarf/desktop/src/lib/sportscape/editorial/sportscapeEditorialApi.ts
-function workerWriteHeaders() {
+function workerWriteHeaders2() {
   const headers = {
     "Content-Type": "application/json"
   };
@@ -32881,7 +35131,7 @@ function featuredGamesFromEditorialDocument(doc) {
 async function upsertFeaturedGameViaWorker(input) {
   const { response: res } = await fetchSportscapeEditorialWithFailover("/featured-games", {
     method: "POST",
-    headers: workerWriteHeaders(),
+    headers: workerWriteHeaders2(),
     body: JSON.stringify(input)
   });
   if (!res.ok) throw new Error(`featured_game_save_failed_${res.status}`);
@@ -32892,7 +35142,7 @@ async function upsertFeaturedGameViaWorker(input) {
 async function upsertSportscapeEditorialEntryViaWorker(input) {
   const { response: res } = await fetchSportscapeEditorialWithFailover("/entries", {
     method: "POST",
-    headers: workerWriteHeaders(),
+    headers: workerWriteHeaders2(),
     body: JSON.stringify(input)
   });
   if (!res.ok) throw new Error(`save_failed_${res.status}`);
@@ -32922,7 +35172,7 @@ async function verifySportscapeAdminPasswordViaWorker(password) {
 async function upsertAiBriefSelectionViaWorker(input) {
   const { response: res } = await fetchSportscapeEditorialWithFailover("/ai-brief-selections", {
     method: "POST",
-    headers: workerWriteHeaders(),
+    headers: workerWriteHeaders2(),
     body: JSON.stringify(input)
   });
   if (!res.ok) throw new Error(`ai_brief_upsert_failed_${res.status}`);
@@ -32933,7 +35183,7 @@ async function upsertAiBriefSelectionViaWorker(input) {
 async function removeAiBriefSelectionViaWorker(id) {
   const { response: res } = await fetchSportscapeEditorialWithFailover("/ai-brief-selections/remove", {
     method: "POST",
-    headers: workerWriteHeaders(),
+    headers: workerWriteHeaders2(),
     body: JSON.stringify({ id })
   });
   if (!res.ok) throw new Error(`ai_brief_remove_failed_${res.status}`);
@@ -33003,7 +35253,7 @@ async function clearAllAiBriefSelections(selections) {
 }
 
 // ../grarf/desktop/src/store/editorialStore.ts
-var LOG3 = "[Editorial]";
+var LOG8 = "[Editorial]";
 var EDIT_MODE_KEY = "grarf-editorial-edit-mode-v1";
 var AUTOSAVE_MS = 1e3;
 var emptyBundle = () => ({
@@ -33111,7 +35361,7 @@ var useEditorialStore = (0, import_zustand10.create)((set, get) => ({
     if (!isGrarfAdmin()) return;
     writeEditMode(on2);
     set({ editMode: on2 });
-    console.log(`${LOG3} Edit mode ${on2 ? "enabled" : "disabled"}`);
+    console.log(`${LOG8} Edit mode ${on2 ? "enabled" : "disabled"}`);
   },
   setManualNarrativeLocal: (gameKey, text2) => {
     set((s2) => {
@@ -33154,7 +35404,7 @@ var useEditorialStore = (0, import_zustand10.create)((set, get) => ({
   saveManualNarrative: (gameKey, text2) => {
     const trimmed = text2.trim();
     if (trimmed) {
-      console.log(`${LOG3} Narrative updated: "${trimmed}"`);
+      console.log(`${LOG8} Narrative updated: "${trimmed}"`);
     }
     get().setManualNarrativeLocal(gameKey, text2);
     debounced(`narrative:${gameKey}`, () => {
@@ -33174,7 +35424,7 @@ var useEditorialStore = (0, import_zustand10.create)((set, get) => ({
       void saveFeaturedGamePriorityViaWorker(gameKey, rank).then((featuredGames) => {
         set((s2) => ({ bundle: { ...s2.bundle, featuredGames }, featuredGamesSaveError: null }));
       }).catch((err) => {
-        console.warn(`${LOG3} featuredGames save failed`, gameKey, err);
+        console.warn(`${LOG8} featuredGames save failed`, gameKey, err);
         set({ featuredGamesSaveError: featuredGamesSaveErrorMessage(err) });
       });
     });
@@ -33203,7 +35453,7 @@ async function loadEditorialBundleFromMain() {
     const featuredGames = await fetchFeaturedGamesFromEditorialWorker();
     bundle = { ...bundle, featuredGames };
   } catch (err) {
-    console.warn(`${LOG3} featuredGames load failed`, err);
+    console.warn(`${LOG8} featuredGames load failed`, err);
   }
   const summariesApi = window.grarf?.editorialGenerationGetSummaries;
   if (summariesApi) {
@@ -33241,7 +35491,7 @@ var import_zustand11 = __toESM(require_zustand(), 1);
 
 // ../grarf/desktop/src/lib/commandBriefing/commandBriefingDates.ts
 init_define_import_meta_env();
-var LOG4 = "[CommandBriefing]";
+var LOG9 = "[CommandBriefing]";
 var DAY_MS = 24 * 60 * 60 * 1e3;
 function getBriefingOperationalTodayKey(now = /* @__PURE__ */ new Date()) {
   return getOperationalTodayDateKey(now, GRARF_OPERATIONAL_SLATE_TIMEZONE);
@@ -33271,7 +35521,7 @@ function getBriefingDateOptions(now = /* @__PURE__ */ new Date()) {
     options.push({ key: key2, label });
   }
   if (define_import_meta_env_default.DEV) {
-    console.log(`${LOG4} Loaded briefing date options`, { today: todayKey, count: options.length });
+    console.log(`${LOG9} Loaded briefing date options`, { today: todayKey, count: options.length });
   }
   return options;
 }
@@ -33286,7 +35536,7 @@ function resolveActiveBriefingDateKey(selectedKey, now = /* @__PURE__ */ new Dat
   if (selectedKey === todayKey) return todayKey;
   if (selectedKey === legacyBrowserLocalTodayKey(now) && selectedKey !== todayKey) {
     if (define_import_meta_env_default.DEV) {
-      console.log(`${LOG4} Migrated legacy local today to operational today`, {
+      console.log(`${LOG9} Migrated legacy local today to operational today`, {
         was: selectedKey,
         now: todayKey
       });
@@ -33302,7 +35552,7 @@ function resolveActiveBriefingDateKey(selectedKey, now = /* @__PURE__ */ new Dat
   );
   if (selectedStart.getTime() < todayStart.getTime()) {
     if (define_import_meta_env_default.DEV) {
-      console.log(`${LOG4} Date rollover \u2014 using today`, { was: selectedKey, now: todayKey });
+      console.log(`${LOG9} Date rollover \u2014 using today`, { was: selectedKey, now: todayKey });
     }
     return todayKey;
   }
@@ -33350,7 +35600,7 @@ function resolveRemoval(input) {
   }
   if (!input.seenAfterTodaySlateFilter) {
     const detail = explainOperationalDateRemoval(input.game, input.todayKey);
-    const localFromStart = formatLocalDateKeyFromMs(input.game.startTimeMs);
+    const localFromStart = formatLocalDateKeyFromMs2(input.game.startTimeMs);
     const removalReason = scheduledKey != null && scheduledKey !== input.todayKey && localFromStart === input.todayKey ? "scheduled_date_mismatch" : detail.includes("scheduled_date_mismatch") ? "scheduled_date_mismatch" : "operational_date_mismatch";
     return { removedAt: "operational_date_filter", removalReason };
   }
@@ -33909,2173 +36159,9 @@ if (typeof window !== "undefined") {
 
 // ../grarf/desktop/src/components/LiveGamesBridge.tsx
 init_operationalIngestConfig();
-init_isGrarfWebRenderer();
 
 // ../grarf/desktop/src/services/operationalIngest/index.ts
 init_define_import_meta_env();
-
-// ../grarf/desktop/src/services/operationalIngest/fetchOperationalSnapshot.ts
-init_define_import_meta_env();
-init_operationalIngestConfig();
-init_isGrarfWebRenderer();
-
-// ../grarf/desktop/src/services/operationalIngest/supplementOperationalSnapshotWithTennis.ts
-init_define_import_meta_env();
-
-// ../grarf/desktop/src/services/operationalIngest/tennis/fetchTennisOperationalLeagues.ts
-init_define_import_meta_env();
-
-// ../grarf/desktop/src/services/operationalIngest/tennis/fetchEspnTennisScoreboard.ts
-init_define_import_meta_env();
-
-// ../grarf/desktop/src/services/operationalIngest/tennis/operationalDate.ts
-init_define_import_meta_env();
-
-// ../grarf/desktop/src/services/operationalIngest/tennis/fetchEspnTennisScoreboard.ts
-var ESPN_FETCH_TIMEOUT_MS = 12e3;
-async function fetchScoreboardJson(url) {
-  const res = await fetch(url, {
-    headers: { Accept: "application/json" },
-    signal: AbortSignal.timeout(ESPN_FETCH_TIMEOUT_MS)
-  });
-  if (!res.ok) {
-    const t2 = await res.text().catch(() => "");
-    throw new Error(`ESPN ${res.status}: ${t2.slice(0, 120)}`);
-  }
-  return res.json();
-}
-function isCompetitionLive(comp) {
-  const statusType = comp.status?.type;
-  if (!statusType) return false;
-  if (statusType.completed) return false;
-  return String(statusType.state ?? "").toLowerCase() === "in";
-}
-function countLiveTennisCompetitions(json) {
-  const events = Array.isArray(json?.events) ? json.events : [];
-  let n2 = 0;
-  for (const ev of events) {
-    if (!ev || typeof ev !== "object") continue;
-    const groupings = Array.isArray(ev.groupings) ? ev.groupings : [];
-    for (const grouping of groupings) {
-      if (!grouping || typeof grouping !== "object") continue;
-      const competitions = Array.isArray(grouping.competitions) ? grouping.competitions : [];
-      for (const competition of competitions) {
-        if (!competition || typeof competition !== "object") continue;
-        if (isCompetitionLive(competition)) n2 += 1;
-      }
-    }
-  }
-  return n2;
-}
-async function fetchOperationalTennisScoreboardJson(endpoint, now = /* @__PURE__ */ new Date()) {
-  const datesParam = formatEspnScoreboardDatesParam(now);
-  const datedUrl = `${endpoint}${endpoint.includes("?") ? "&" : "?"}dates=${datesParam}`;
-  const datedJson = await fetchScoreboardJson(datedUrl);
-  const datedEvents = Array.isArray(datedJson?.events) ? datedJson.events : [];
-  const datedLive = countLiveTennisCompetitions(datedJson);
-  if (datedEvents.length > 0 && datedLive > 0) {
-    return { json: datedJson, usedFallback: false };
-  }
-  const defaultJson = await fetchScoreboardJson(endpoint);
-  const defaultLive = countLiveTennisCompetitions(defaultJson);
-  if (datedEvents.length > 0 && datedLive === 0 && defaultLive > 0) {
-    return { json: defaultJson, usedFallback: false };
-  }
-  if (datedEvents.length > 0) {
-    return { json: datedJson, usedFallback: false };
-  }
-  return { json: defaultJson, usedFallback: true };
-}
-
-// ../grarf/desktop/src/services/operationalIngest/tennis/normalizeTennisOperational.ts
-init_define_import_meta_env();
-var MENS_DRAW_TYPE_SLUGS = /* @__PURE__ */ new Set(["mens-singles", "mens-doubles"]);
-var WOMENS_DRAW_TYPE_SLUGS = /* @__PURE__ */ new Set(["womens-singles", "womens-doubles"]);
-function resolveTennisTourLeague(competition, groupingLabel, groupingSlug, pollLeagueKey) {
-  const type = competition.type;
-  const typeSlug = safe(type?.slug).toLowerCase();
-  if (MENS_DRAW_TYPE_SLUGS.has(typeSlug)) return "ATP";
-  if (WOMENS_DRAW_TYPE_SLUGS.has(typeSlug)) return "WTA";
-  const groupingTypeSlug = safe(groupingSlug).toLowerCase();
-  if (MENS_DRAW_TYPE_SLUGS.has(groupingTypeSlug)) return "ATP";
-  if (WOMENS_DRAW_TYPE_SLUGS.has(groupingTypeSlug)) return "WTA";
-  const label = safe(groupingLabel).toLowerCase();
-  if (label.startsWith("men")) return "ATP";
-  if (label.startsWith("women")) return "WTA";
-  if (typeSlug === "mixed-doubles" || groupingTypeSlug === "mixed-doubles") {
-    return pollLeagueKey;
-  }
-  return null;
-}
-function safe(v2) {
-  return typeof v2 === "string" && v2.trim() ? v2.trim() : "";
-}
-function formatTimeEt(iso) {
-  try {
-    const d2 = new Date(iso);
-    if (Number.isNaN(d2.getTime())) return "\u2014";
-    return d2.toLocaleTimeString("en-US", {
-      hour: "numeric",
-      minute: "2-digit",
-      timeZoneName: "short"
-    });
-  } catch {
-    return "\u2014";
-  }
-}
-function pickPlayerName(athlete) {
-  if (!athlete) return "TBD";
-  return safe(athlete.shortName) || safe(athlete.displayName) || safe(athlete.fullName) || "TBD";
-}
-function pickPlayerLogoUrl(athlete) {
-  const flag = athlete?.flag;
-  const href = flag?.href;
-  return typeof href === "string" && href.startsWith("http") ? href.trim() : void 0;
-}
-function countSetsWon(competitor) {
-  const lines = competitor.linescores;
-  if (!Array.isArray(lines)) return null;
-  let won = 0;
-  for (const row of lines) {
-    if (row && typeof row === "object" && row.winner === true) {
-      won += 1;
-    }
-  }
-  return won;
-}
-function mapTennisSetLines(competitor) {
-  const lines = Array.isArray(competitor.linescores) ? competitor.linescores : [];
-  const out = [];
-  for (const row of lines) {
-    if (!row || typeof row !== "object") continue;
-    const value = Number(row.value);
-    if (!Number.isFinite(value)) continue;
-    const tiebreakRaw = row.tiebreak;
-    out.push({
-      value,
-      tiebreak: tiebreakRaw != null && Number.isFinite(Number(tiebreakRaw)) ? Number(tiebreakRaw) : void 0,
-      winner: row.winner === true
-    });
-  }
-  return out;
-}
-function pickAthleteSeed(athlete) {
-  const seed = athlete?.seed;
-  const n2 = typeof seed === "number" ? seed : Number(seed);
-  return Number.isFinite(n2) && n2 > 0 ? n2 : null;
-}
-function resolveServerSide(away, home) {
-  if (away.possession === true) return "away";
-  if (home.possession === true) return "home";
-  return null;
-}
-function collectBroadcastLabels(competition) {
-  const seen = /* @__PURE__ */ new Set();
-  const out = [];
-  const geo = competition.geoBroadcasts;
-  if (Array.isArray(geo)) {
-    for (const row of geo) {
-      const label = safe(row?.media?.shortName);
-      if (!label || label === "TV TBD") continue;
-      const key2 = label.toLowerCase();
-      if (seen.has(key2)) continue;
-      seen.add(key2);
-      out.push(label);
-    }
-  }
-  const arr = competition.broadcasts;
-  if (Array.isArray(arr)) {
-    for (const b2 of arr) {
-      const names = b2?.names;
-      if (!Array.isArray(names)) continue;
-      for (const n2 of names) {
-        const label = typeof n2 === "string" ? n2.trim() : "";
-        if (!label || label === "TV TBD") continue;
-        const key2 = label.toLowerCase();
-        if (seen.has(key2)) continue;
-        seen.add(key2);
-        out.push(label);
-      }
-    }
-  }
-  if (typeof competition.broadcast === "string") {
-    const label = competition.broadcast.trim();
-    if (label && label !== "TV TBD") out.push(label);
-  }
-  return out.length ? out : ["TV TBD"];
-}
-function flattenTennisCompetitions(events) {
-  const rows = [];
-  if (!Array.isArray(events)) return rows;
-  for (const tournament of events) {
-    if (!tournament || typeof tournament !== "object") continue;
-    const t2 = tournament;
-    const groupings = Array.isArray(t2.groupings) ? t2.groupings : [];
-    for (const grouping of groupings) {
-      if (!grouping || typeof grouping !== "object") continue;
-      const g2 = grouping;
-      const groupingMeta = g2.grouping;
-      const groupingLabel = safe(groupingMeta?.displayName) || void 0;
-      const groupingSlug = safe(groupingMeta?.slug) || void 0;
-      const competitions = Array.isArray(g2.competitions) ? g2.competitions : [];
-      for (const competition of competitions) {
-        if (!competition || typeof competition !== "object") continue;
-        rows.push({
-          competition,
-          tournament: t2,
-          groupingLabel,
-          groupingSlug
-        });
-      }
-    }
-  }
-  return rows;
-}
-function sortTennisGames(games) {
-  const rank = (g2) => {
-    if (g2.status === "live") return 0;
-    if (g2.status === "scheduled") return 1;
-    return 2;
-  };
-  return [...games].sort((a2, b2) => {
-    const dr2 = rank(a2) - rank(b2);
-    if (dr2 !== 0) return dr2;
-    const ta2 = typeof a2.startTimeMs === "number" ? a2.startTimeMs : 0;
-    const tb = typeof b2.startTimeMs === "number" ? b2.startTimeMs : 0;
-    if (ta2 !== tb) return ta2 - tb;
-    return String(a2.time).localeCompare(String(b2.time));
-  });
-}
-function normalizeTennisCompetition(competition, tournament, groupingLabel, groupingSlug, pollLeagueKey, slateDateKey) {
-  const tourLeagueKey = resolveTennisTourLeague(
-    competition,
-    groupingLabel,
-    groupingSlug,
-    pollLeagueKey
-  );
-  if (!tourLeagueKey) return null;
-  const competitors = Array.isArray(competition.competitors) ? competition.competitors : [];
-  const away = competitors.find(
-    (c2) => c2 && typeof c2 === "object" && c2.homeAway === "away"
-  );
-  const home = competitors.find(
-    (c2) => c2 && typeof c2 === "object" && c2.homeAway === "home"
-  );
-  if (!away || !home) return null;
-  const awayAthlete = away.athlete;
-  const homeAthlete = home.athlete;
-  if (!awayAthlete || !homeAthlete) return null;
-  const status = competition.status || {};
-  const statusType = status.type || {};
-  const completed = !!statusType.completed;
-  const state3 = safe(statusType.state).toLowerCase();
-  const live = !completed && state3 === "in";
-  const final = completed || state3 === "post";
-  let cardStatus = "scheduled";
-  if (live) cardStatus = "live";
-  else if (final) cardStatus = "final";
-  const awayTeam = pickPlayerName(awayAthlete);
-  const homeTeam = pickPlayerName(homeAthlete);
-  const awayScore = countSetsWon(away);
-  const homeScore = countSetsWon(home);
-  const tournamentName = safe(tournament.shortName) || safe(tournament.name) || "";
-  const round = competition.round;
-  const roundName = safe(round?.displayName);
-  const venue = competition.venue;
-  const awaySets = mapTennisSetLines(away);
-  const homeSets = mapTennisSetLines(home);
-  const notes = Array.isArray(competition.notes) ? competition.notes : [];
-  const noteText = safe(
-    notes.find((n2) => n2 && typeof n2 === "object" && n2.type === "event")?.text
-  );
-  const broadcasts = collectBroadcastLabels(competition);
-  const isoStart = safe(competition.startDate) || safe(competition.date) || safe(tournament.date);
-  const startTimeMs = Date.parse(isoStart || "") || 0;
-  const scheduledDateKey = resolveScheduledDateKey(isoStart, slateDateKey);
-  const periodNum = status.period != null ? Number(status.period) : NaN;
-  const period = Number.isFinite(periodNum) ? periodNum : void 0;
-  const displayClock = safe(status.displayClock) || void 0;
-  const contextParts = [tournamentName, roundName || groupingLabel].filter(Boolean);
-  const contextLine = contextParts.join(" \xB7 ");
-  let statusLine = contextLine;
-  if (cardStatus === "scheduled") {
-    const venueBits = [safe(venue?.fullName), safe(venue?.court)].filter(Boolean).join(" \xB7 ");
-    statusLine = [contextLine, venueBits].filter(Boolean).join(" \xB7 ");
-  } else if (cardStatus === "final") {
-    statusLine = [contextLine, noteText || safe(statusType.shortDetail) || "Final"].filter(Boolean).join(" \xB7 ") || "Final";
-  }
-  const competitionId = String(competition.id ?? "");
-  if (!competitionId) return null;
-  const id = `espn-${tourLeagueKey}-${competitionId}`;
-  return {
-    id,
-    grarfGameId: id,
-    league: tourLeagueKey,
-    espnEventId: competitionId,
-    externalIds: { espn: competitionId, mlb: null },
-    time: formatTimeEt(isoStart),
-    awayTeam,
-    awayLogoUrl: pickPlayerLogoUrl(awayAthlete),
-    awayRecord: "",
-    homeTeam,
-    homeLogoUrl: pickPlayerLogoUrl(homeAthlete),
-    homeRecord: "",
-    awayScore,
-    homeScore,
-    awayCity: "",
-    homeCity: "",
-    awayPitcher: "",
-    awayPitcherStats: "",
-    homePitcher: "",
-    homePitcherStats: "",
-    channels: broadcasts,
-    broadcasts,
-    status: cardStatus,
-    statusLine: statusLine || void 0,
-    startTimeMs,
-    scheduledDateKey,
-    lastUpdated: (/* @__PURE__ */ new Date()).toISOString(),
-    metadata: {
-      officialAwayName: safe(awayAthlete.displayName) || safe(awayAthlete.fullName) || awayTeam,
-      officialHomeName: safe(homeAthlete.displayName) || safe(homeAthlete.fullName) || homeTeam,
-      tennis: {
-        contextLine,
-        awaySets,
-        homeSets,
-        awaySeed: pickAthleteSeed(awayAthlete),
-        homeSeed: pickAthleteSeed(homeAthlete),
-        serverSide: resolveServerSide(away, home)
-      }
-    },
-    period: cardStatus === "final" ? null : period,
-    displayClock: cardStatus === "final" ? void 0 : displayClock,
-    content: {
-      stories: [],
-      clips: [],
-      highlights: [],
-      social: [],
-      watchLinks: []
-    }
-  };
-}
-function normalizeTennisScoreboard(scoreboardJson, pollLeagueKey, usedFallback) {
-  const day = scoreboardJson.day;
-  const slateDateKey = typeof day?.date === "string" ? day.date.trim() : void 0;
-  const events = Array.isArray(scoreboardJson.events) ? scoreboardJson.events : [];
-  const out = [];
-  for (const row of flattenTennisCompetitions(events)) {
-    const game = normalizeTennisCompetition(
-      row.competition,
-      row.tournament,
-      row.groupingLabel,
-      row.groupingSlug,
-      pollLeagueKey,
-      slateDateKey
-    );
-    if (game) out.push(game);
-  }
-  let sorted = sortTennisGames(out);
-  if (usedFallback) {
-    sorted = filterGamesForOperationalFallbackIngest(sorted);
-  }
-  return sorted;
-}
-function mergeTennisGamesById(existing, incoming) {
-  if (incoming.length === 0) return existing;
-  const byId = new Map(existing.map((g2) => [g2.id, g2]));
-  for (const game of incoming) {
-    byId.set(game.id, game);
-  }
-  return [...byId.values()];
-}
-function applyTennisPollToLeagueGames(leagueGames, pollLeagueKey, games) {
-  const atpGames = games.filter((g2) => g2.league === "ATP");
-  const wtaGames = games.filter((g2) => g2.league === "WTA");
-  if (pollLeagueKey === "ATP") {
-    leagueGames.ATP = atpGames;
-    if (wtaGames.length > 0) {
-      leagueGames.WTA = mergeTennisGamesById(leagueGames.WTA ?? [], wtaGames);
-    }
-  } else {
-    leagueGames.WTA = wtaGames;
-    if (atpGames.length > 0) {
-      leagueGames.ATP = mergeTennisGamesById(leagueGames.ATP ?? [], atpGames);
-    }
-  }
-}
-
-// ../grarf/desktop/src/services/operationalIngest/tennis/fetchTennisOperationalLeagues.ts
-var TENNIS_BASE = "https://site.api.espn.com/apis/site/v2/sports/tennis";
-var TENNIS_ENDPOINTS = [
-  { key: "ATP", endpoint: `${TENNIS_BASE}/atp/scoreboard` },
-  { key: "WTA", endpoint: `${TENNIS_BASE}/wta/scoreboard` }
-];
-var LOG5 = "[OperationalIngest][tennis]";
-async function fetchTennisLeagueGames(key2, endpoint) {
-  const { json, usedFallback } = await fetchOperationalTennisScoreboardJson(endpoint);
-  return normalizeTennisScoreboard(json, key2, usedFallback);
-}
-async function fetchTennisOperationalLeagues() {
-  const leagueGames = {};
-  const results = await Promise.all(
-    TENNIS_ENDPOINTS.map(async ({ key: key2, endpoint }) => {
-      try {
-        const games = await fetchTennisLeagueGames(key2, endpoint);
-        return { key: key2, games, error: null };
-      } catch (e2) {
-        const msg = e2 instanceof Error ? e2.message : String(e2);
-        if (define_import_meta_env_default.DEV) {
-          console.warn(`${LOG5} ${key2} fetch failed`, msg);
-        }
-        return { key: key2, games: [], error: msg };
-      }
-    })
-  );
-  for (const row of results) {
-    applyTennisPollToLeagueGames(leagueGames, row.key, row.games);
-  }
-  if (define_import_meta_env_default.DEV) {
-    console.log(`${LOG5} slate`, {
-      atp: leagueGames.ATP?.length ?? 0,
-      wta: leagueGames.WTA?.length ?? 0
-    });
-  }
-  return leagueGames;
-}
-
-// ../grarf/desktop/src/services/operationalIngest/supplementOperationalSnapshotWithTennis.ts
-var LOG6 = "[OperationalIngest]";
-async function supplementOperationalSnapshotWithTennis(snap) {
-  const tennis = await fetchTennisOperationalLeagues();
-  const atpIncoming = tennis.ATP ?? [];
-  const wtaIncoming = tennis.WTA ?? [];
-  if (atpIncoming.length === 0 && wtaIncoming.length === 0) {
-    return snap;
-  }
-  const leagues = { ...snap.leagues };
-  if (atpIncoming.length > 0) {
-    leagues.ATP = mergeTennisGamesById(leagues.ATP ?? [], atpIncoming);
-  }
-  if (wtaIncoming.length > 0) {
-    leagues.WTA = mergeTennisGamesById(leagues.WTA ?? [], wtaIncoming);
-  }
-  if (define_import_meta_env_default.DEV) {
-    console.log(`${LOG6} tennis supplement`, {
-      atp: leagues.ATP?.length ?? 0,
-      wta: leagues.WTA?.length ?? 0
-    });
-  }
-  return { ...snap, leagues };
-}
-
-// ../grarf/desktop/src/services/operationalIngest/web/fetchWebEspnOperationalSnapshot.ts
-init_define_import_meta_env();
-
-// ../grarf/desktop/src/data/espnOperationalLeagueEndpoints.ts
-init_define_import_meta_env();
-var SOCCER_BASE = "https://site.api.espn.com/apis/site/v2/sports/soccer";
-var TENNIS_BASE2 = "https://site.api.espn.com/apis/site/v2/sports/tennis";
-var MMA_BASE = "https://site.api.espn.com/apis/site/v2/sports/mma";
-var GOLF_BASE = "https://site.api.espn.com/apis/site/v2/sports/golf";
-var RACING_BASE = "https://site.api.espn.com/apis/site/v2/sports/racing";
-var ESPN_OPERATIONAL_LEAGUE_ENDPOINTS = {
-  MLB: "https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/scoreboard",
-  NCAABB: "https://site.api.espn.com/apis/site/v2/sports/baseball/college-baseball/scoreboard",
-  NBA: "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard",
-  WNBA: "https://site.api.espn.com/apis/site/v2/sports/basketball/wnba/scoreboard",
-  NHL: "https://site.api.espn.com/apis/site/v2/sports/hockey/nhl/scoreboard",
-  AFL: "https://site.api.espn.com/apis/site/v2/sports/australian-football/afl/scoreboard",
-  MLS: `${SOCCER_BASE}/usa.1/scoreboard`,
-  EPL: `${SOCCER_BASE}/eng.1/scoreboard`,
-  LALIGA: `${SOCCER_BASE}/esp.1/scoreboard`,
-  NWSL: `${SOCCER_BASE}/usa.nwsl/scoreboard`,
-  LIGAMX: `${SOCCER_BASE}/mex.1/scoreboard`,
-  SERIEA: `${SOCCER_BASE}/ita.1/scoreboard`,
-  LIGUE1: `${SOCCER_BASE}/fra.1/scoreboard`,
-  EREDIVISIE: `${SOCCER_BASE}/ned.1/scoreboard`,
-  BUNDESLIGA: `${SOCCER_BASE}/ger.1/scoreboard`,
-  UCL: `${SOCCER_BASE}/uefa.champions/scoreboard`,
-  UEL: `${SOCCER_BASE}/uefa.europa/scoreboard`,
-  WWC: `${SOCCER_BASE}/fifa.wwc/scoreboard`,
-  EURO: `${SOCCER_BASE}/uefa.euro/scoreboard`,
-  COPA: `${SOCCER_BASE}/conmebol.america/scoreboard`,
-  GOLDCUP: `${SOCCER_BASE}/concacaf.gold/scoreboard`,
-  NATIONS: `${SOCCER_BASE}/uefa.nations/scoreboard`,
-  CLUBWC: `${SOCCER_BASE}/fifa.cwc/scoreboard`,
-  SPFL: `${SOCCER_BASE}/sco.1/scoreboard`,
-  SAUDI: `${SOCCER_BASE}/ksa.1/scoreboard`,
-  SUPERLIG: `${SOCCER_BASE}/tur.1/scoreboard`,
-  USLCUP: `${SOCCER_BASE}/usa.usl.l1.cup/scoreboard`,
-  WORLDCUP: `${SOCCER_BASE}/fifa.world/scoreboard`,
-  ATP: `${TENNIS_BASE2}/atp/scoreboard`,
-  WTA: `${TENNIS_BASE2}/wta/scoreboard`,
-  UFC: `${MMA_BASE}/ufc/scoreboard`,
-  PGA: `${GOLF_BASE}/pga/scoreboard`,
-  LPGA: `${GOLF_BASE}/lpga/scoreboard`,
-  LIV: `${GOLF_BASE}/liv/scoreboard`,
-  CHAMPIONS: `${GOLF_BASE}/champions-tour/scoreboard`,
-  F1: `${RACING_BASE}/f1/scoreboard`,
-  NASCAR: `${RACING_BASE}/nascar-premier/scoreboard`,
-  INDYCAR: `${RACING_BASE}/irl/scoreboard`
-};
-
-// ../grarf/desktop/electron/espn/normalize.js
-init_define_import_meta_env();
-
-// ../grarf/desktop/electron/espn/espnPlusStream.js
-init_define_import_meta_env();
-var LOG7 = "[ESPN]";
-var PLAY_LOCATION = "where-to-watch%3Aguide";
-function buildEspnPlusWatchUrlByEventCalendarId(eventCalendarId) {
-  const id = String(eventCalendarId).trim();
-  if (!/^\d+$/.test(id)) return null;
-  return `https://www.espn.com/watch/player/_/eventCalendarId/${id}?playLocation=${PLAY_LOCATION}`;
-}
-function resolveEspnPlusStreamFromEvent(event, broadcastLabels, leagueKey) {
-  if (!gameHasEspnWatchBroadcast(broadcastLabels, leagueKey)) return null;
-  if (leagueKey && !LEGACY_EVENT_CALENDAR_LEAGUES.has(leagueKey)) {
-    return null;
-  }
-  const eventCalendarId = String(event?.id ?? "").trim();
-  if (!/^\d+$/.test(eventCalendarId)) {
-    console.warn(`${LOG7} ESPN watch broadcast present but missing event id`, { leagueKey });
-    return null;
-  }
-  const streamUrl = buildEspnPlusWatchUrlByEventCalendarId(eventCalendarId);
-  if (!streamUrl) return null;
-  const linearNhl = leagueKey === "NHL" && !gameHasEspnPlusBroadcast(broadcastLabels) && gameHasEspnWatchBroadcast(broadcastLabels, leagueKey);
-  console.log(`${LOG7} Found watch eventCalendarId: ${eventCalendarId}`);
-  console.log(`${LOG7} Current generated URL: ${streamUrl}`);
-  console.log(
-    `${LOG7} Resolved direct ESPN watch URL (legacy calendar id${linearNhl ? ", NHL linear ESPN" : ""})`
-  );
-  return { streamUrl, streamProvider: "ESPN+", eventCalendarId };
-}
-var LEGACY_EVENT_CALENDAR_LEAGUES = /* @__PURE__ */ new Set(["MLB", "NBA", "WNBA", "NHL", "NCAABB"]);
-function resolveEspnWatchStreamFromCompetition(competition, broadcastLabels, leagueKey) {
-  if (!gameHasEspnWatchBroadcast(broadcastLabels, leagueKey)) return null;
-  const eventCalendarId = String(competition?.id ?? "").trim();
-  if (!/^\d+$/.test(eventCalendarId)) {
-    console.warn(`${LOG7} ESPN watch broadcast present but missing competition id`, { leagueKey });
-    return null;
-  }
-  const streamUrl = buildEspnPlusWatchUrlByEventCalendarId(eventCalendarId);
-  if (!streamUrl) return null;
-  const linearOnly = !gameHasEspnPlusBroadcast(broadcastLabels) && gameHasEspnWatchBroadcast(broadcastLabels, leagueKey);
-  console.log(`${LOG7} Found watch eventCalendarId: ${eventCalendarId}`);
-  console.log(`${LOG7} Current generated URL: ${streamUrl}`);
-  console.log(
-    `${LOG7} Resolved direct ESPN watch URL (${linearOnly ? "linear ESPN" : "ESPN+"}, ${leagueKey})`
-  );
-  return { streamUrl, streamProvider: "ESPN+", eventCalendarId };
-}
-function attachEspnPlusStreamToGame(game, stream) {
-  game.streamUrl = stream.streamUrl;
-  game.streamProvider = stream.streamProvider;
-  if (stream.playerId) {
-    game.espnPlusPlayerId = stream.playerId;
-  }
-  if (stream.eventCalendarId) {
-    game.espnWatchEventId = stream.eventCalendarId;
-  }
-  if (!Array.isArray(game.content?.watchLinks)) {
-    game.content = { ...game.content ?? {}, watchLinks: [] };
-  }
-  game.content.watchLinks = [
-    {
-      provider: stream.streamProvider,
-      url: stream.streamUrl,
-      eventCalendarId: stream.eventCalendarId,
-      ...stream.playerId ? { playerId: stream.playerId } : {}
-    }
-  ];
-  console.log(`${LOG7} Attached streamUrl to game object`, {
-    id: game.id,
-    eventCalendarId: stream.eventCalendarId,
-    playerId: stream.playerId ?? null
-  });
-}
-
-// ../grarf/desktop/electron/espn/normalizeRacing.js
-init_define_import_meta_env();
-
-// ../grarf/desktop/electron/espn/canonicalEventMetadata.js
-init_define_import_meta_env();
-function attachCanonicalEventMetadata(game, input) {
-  const eventId = String(game?.espnEventId ?? game?.id ?? "").trim();
-  if (!eventId) return game;
-  game.metadata = {
-    ...game.metadata ?? {},
-    canonicalEvent: {
-      eventId,
-      sport: input.sport,
-      league: game.league,
-      title: input.title,
-      startTime: typeof game.startTimeMs === "number" && game.startTimeMs > 0 ? new Date(game.startTimeMs).toISOString() : void 0,
-      status: game.status,
-      ...input.sessionLabel ? { sessionLabel: input.sessionLabel } : {}
-    }
-  };
-  return game;
-}
-
-// ../grarf/desktop/electron/espn/operationalDate.js
-init_define_import_meta_env();
-
-// ../grarf/desktop/electron/espn/normalizeRacing.js
-var RACING_SESSION_LEAGUES = /* @__PURE__ */ new Set(["F1"]);
-var RACING_STANDALONE_LEAGUES = /* @__PURE__ */ new Set(["NASCAR", "INDYCAR"]);
-function isRacingLeagueKey(leagueKey) {
-  return RACING_SESSION_LEAGUES.has(leagueKey) || RACING_STANDALONE_LEAGUES.has(leagueKey);
-}
-function safe2(v2) {
-  return typeof v2 === "string" && v2.trim() ? v2.trim() : "";
-}
-function formatTimeEt2(iso) {
-  try {
-    const d2 = new Date(iso);
-    if (Number.isNaN(d2.getTime())) return "\u2014";
-    return d2.toLocaleTimeString("en-US", {
-      hour: "numeric",
-      minute: "2-digit",
-      timeZoneName: "short"
-    });
-  } catch {
-    return "\u2014";
-  }
-}
-function readCardStatus(comp, statusType) {
-  return resolveEspnCardStatus(statusType);
-}
-function readStatusLine(comp, statusType, cardStatus) {
-  const detail = safe2(statusType?.shortDetail) || safe2(statusType?.description) || safe2(statusType?.detail) || "";
-  if (cardStatus === "final") return detail || "Final";
-  return detail || void 0;
-}
-function normalizeRacingCompetition(event, comp, leagueKey, slateDateKey) {
-  if (!comp) return null;
-  const status = comp.status || {};
-  const statusType = status.type || {};
-  const cardStatus = readCardStatus(comp, statusType);
-  const grandPrixName = safe2(event?.shortName) || safe2(event?.name);
-  if (!grandPrixName) return null;
-  const sessionLabel = safe2(comp?.type?.abbreviation) || safe2(comp?.type?.text) || safe2(comp?.type?.shortName) || "Session";
-  const title = leagueKey === "F1" && sessionLabel !== "Session" ? `${grandPrixName} \xB7 ${sessionLabel}` : grandPrixName;
-  const broadcasts = collectBroadcastLabels2(comp);
-  const isoStart = comp.date || event?.date;
-  const startTimeMs = Date.parse(isoStart || "") || 0;
-  const scheduledDateKey = resolveScheduledDateKey(isoStart, slateDateKey);
-  const eventId = String(event?.id ?? "").trim();
-  const compId = String(comp?.id ?? "").trim();
-  if (!eventId || !compId) return null;
-  const id = `espn-${leagueKey}-${compId}`;
-  const game = {
-    id,
-    grarfGameId: id,
-    league: leagueKey,
-    espnEventId: compId,
-    externalIds: { espn: compId, mlb: null },
-    time: formatTimeEt2(isoStart),
-    awayTeam: title,
-    awayRecord: "\u2014",
-    homeTeam: "",
-    homeRecord: "\u2014",
-    awayCity: "",
-    homeCity: "",
-    awayPitcher: "\u2014",
-    awayPitcherStats: "",
-    homePitcher: "\u2014",
-    homePitcherStats: "",
-    channels: broadcasts,
-    broadcasts,
-    status: cardStatus,
-    statusLine: readStatusLine(comp, statusType, cardStatus),
-    startTimeMs,
-    scheduledDateKey,
-    lastUpdated: (/* @__PURE__ */ new Date()).toISOString(),
-    metadata: {
-      racingEventId: eventId,
-      racingSessionLabel: leagueKey === "F1" ? sessionLabel : void 0
-    },
-    content: {
-      stories: [],
-      clips: [],
-      highlights: [],
-      social: [],
-      watchLinks: []
-    }
-  };
-  return attachCanonicalEventMetadata(game, {
-    sport: "motorsports",
-    title,
-    sessionLabel: leagueKey === "F1" ? sessionLabel : void 0
-  });
-}
-function normalizeRacingStandaloneEvent(event, leagueKey, slateDateKey) {
-  const comp = event?.competitions?.[0];
-  if (!comp) return null;
-  const title = safe2(event?.shortName) || safe2(event?.name);
-  if (!title) return null;
-  const game = normalizeRacingCompetition(event, comp, leagueKey, slateDateKey);
-  if (!game) return null;
-  game.awayTeam = title;
-  game.espnEventId = String(event.id);
-  game.id = `espn-${leagueKey}-${event.id}`;
-  game.grarfGameId = game.id;
-  return attachCanonicalEventMetadata(game, {
-    sport: "motorsports",
-    title
-  });
-}
-function normalizeRacingScoreboard(scoreboardJson, leagueKey) {
-  const slateDateKey = typeof scoreboardJson?.day?.date === "string" ? scoreboardJson.day.date.trim() : void 0;
-  const events = Array.isArray(scoreboardJson?.events) ? scoreboardJson.events : [];
-  const out = [];
-  for (const event of events) {
-    if (RACING_STANDALONE_LEAGUES.has(leagueKey)) {
-      const row = normalizeRacingStandaloneEvent(event, leagueKey, slateDateKey);
-      if (row) out.push(row);
-      continue;
-    }
-    const competitions = Array.isArray(event?.competitions) ? event.competitions : [];
-    for (const comp of competitions) {
-      const row = normalizeRacingCompetition(event, comp, leagueKey, slateDateKey);
-      if (row) out.push(row);
-    }
-  }
-  return out;
-}
-
-// ../grarf/desktop/electron/espn/normalizeMma.js
-init_define_import_meta_env();
-var MMA_LEAGUE_KEYS = /* @__PURE__ */ new Set(["UFC"]);
-function isMmaLeagueKey(leagueKey) {
-  return MMA_LEAGUE_KEYS.has(leagueKey);
-}
-function safe3(v2) {
-  return typeof v2 === "string" && v2.trim() ? v2.trim() : "";
-}
-function formatTimeEt3(iso) {
-  try {
-    const d2 = new Date(iso);
-    if (Number.isNaN(d2.getTime())) return "\u2014";
-    return d2.toLocaleTimeString("en-US", {
-      hour: "numeric",
-      minute: "2-digit",
-      timeZoneName: "short"
-    });
-  } catch {
-    return "\u2014";
-  }
-}
-function pickFighterName(athlete) {
-  if (!athlete) return "TBD";
-  return safe3(athlete.shortName) || safe3(athlete.displayName) || safe3(athlete.fullName) || "TBD";
-}
-function pickFighterLogoUrl(athlete) {
-  const href = athlete?.flag?.href;
-  return typeof href === "string" && href.startsWith("http") ? href.trim() : void 0;
-}
-function pickFighterRecord(competitor) {
-  const records = competitor?.records;
-  if (!Array.isArray(records)) return "\u2014";
-  const overall = records.find((row) => row?.name === "overall" || row?.type === "total") ?? records[0];
-  const summary = safe3(overall?.summary);
-  return summary || "\u2014";
-}
-function resolveMatchNumber(index, totalFights) {
-  return Math.max(1, totalFights - index);
-}
-function resolveCardSegment(matchNumber) {
-  if (matchNumber <= 5) return "main";
-  if (matchNumber <= 9) return "prelims1";
-  return "prelims2";
-}
-function resolveCorners(competitors) {
-  const red = competitors.find((row) => row?.order === 1) ?? competitors[0];
-  const blue = competitors.find((row) => row?.order === 2) ?? competitors[1];
-  return { away: red, home: blue };
-}
-function collectBroadcastLabels3(competition) {
-  const seen = /* @__PURE__ */ new Set();
-  const out = [];
-  const geo = competition?.geoBroadcasts;
-  if (Array.isArray(geo)) {
-    for (const row of geo) {
-      const label = safe3(row?.media?.shortName);
-      if (!label || label === "TV TBD") continue;
-      const key2 = label.toLowerCase();
-      if (seen.has(key2)) continue;
-      seen.add(key2);
-      out.push(label);
-    }
-  }
-  const arr = competition?.broadcasts;
-  if (Array.isArray(arr)) {
-    for (const b2 of arr) {
-      const names = b2?.names;
-      if (!Array.isArray(names)) continue;
-      for (const n2 of names) {
-        const label = typeof n2 === "string" ? n2.trim() : "";
-        if (!label || label === "TV TBD") continue;
-        const key2 = label.toLowerCase();
-        if (seen.has(key2)) continue;
-        seen.add(key2);
-        out.push(label);
-      }
-    }
-  }
-  if (typeof competition?.broadcast === "string") {
-    const label = competition.broadcast.trim();
-    if (label && label !== "TV TBD") out.push(label);
-  }
-  return out.length ? out : ["TV TBD"];
-}
-function flattenMmaCompetitions(events) {
-  const rows = [];
-  if (!Array.isArray(events)) return rows;
-  for (const card of events) {
-    const competitions = Array.isArray(card?.competitions) ? card.competitions : [];
-    const totalFights = competitions.length;
-    competitions.forEach((competition, index) => {
-      if (!competition) return;
-      rows.push({
-        competition,
-        card,
-        matchNumber: resolveMatchNumber(index, totalFights),
-        totalFights
-      });
-    });
-  }
-  return rows;
-}
-function formatRoundPhase(status, cardStatus) {
-  if (cardStatus !== "live") return "";
-  const periodNum = status?.period != null ? Number(status.period) : NaN;
-  const clock = safe3(status?.displayClock);
-  if (Number.isFinite(periodNum) && clock) return `R${periodNum} ${clock}`;
-  return safe3(status?.type?.shortDetail) || safe3(status?.type?.detail) || "Live";
-}
-function normalizeMmaCompetition(competition, card, matchNumber, totalFights, leagueKey, slateDateKey) {
-  const competitors = Array.isArray(competition?.competitors) ? competition.competitors : [];
-  const { away, home } = resolveCorners(competitors);
-  if (!away || !home) return null;
-  const awayAthlete = away.athlete;
-  const homeAthlete = home.athlete;
-  if (!awayAthlete || !homeAthlete) return null;
-  const status = competition.status || {};
-  const statusType = status.type || {};
-  const completed = !!statusType.completed;
-  const state3 = safe3(statusType.state).toLowerCase();
-  const paused = isEspnPausedCompetitionStatus(statusType);
-  const live = !completed && !paused && state3 === "in";
-  const final = completed || state3 === "post";
-  const scheduled = !completed && (state3 === "pre" || paused);
-  let cardStatus = "scheduled";
-  if (live) cardStatus = "live";
-  else if (final) cardStatus = "final";
-  const awayTeam = pickFighterName(awayAthlete);
-  const homeTeam = pickFighterName(homeAthlete);
-  const awayLogoUrl = pickFighterLogoUrl(awayAthlete);
-  const homeLogoUrl = pickFighterLogoUrl(homeAthlete);
-  const awayRecord = pickFighterRecord(away);
-  const homeRecord = pickFighterRecord(home);
-  const cardEventId = String(card?.id ?? "");
-  const cardName = safe3(card?.shortName) || safe3(card?.name) || "UFC";
-  const weightClass = safe3(competition?.type?.abbreviation) || safe3(competition?.type?.text) || "";
-  const venueName = safe3(competition?.venue?.fullName);
-  const totalRounds = Number(competition?.format?.regulation?.periods);
-  const ufcTotalRounds = Number.isFinite(totalRounds) && totalRounds > 0 ? totalRounds : void 0;
-  const ufcIsMainEvent = matchNumber === 1;
-  const ufcCardSegment = resolveCardSegment(matchNumber);
-  const broadcasts = collectBroadcastLabels3(competition);
-  const isoStart = competition.startDate || competition.date || card?.date;
-  const startTimeMs = Date.parse(isoStart || "") || 0;
-  const scheduledDateKey = resolveScheduledDateKey(isoStart, slateDateKey);
-  const periodNum = status.period != null ? Number(status.period) : NaN;
-  const period = Number.isFinite(periodNum) ? periodNum : void 0;
-  const displayClock = safe3(status.displayClock) || void 0;
-  const contextParts = [cardName, weightClass].filter(Boolean);
-  const contextLine = contextParts.join(" \xB7 ");
-  const roundPhase = formatRoundPhase(status, cardStatus);
-  const detail = safe3(statusType.shortDetail) || safe3(statusType.detail) || safe3(statusType.description);
-  let statusLine = "";
-  if (live) {
-    statusLine = [contextLine, roundPhase || detail].filter(Boolean).join(" \xB7 ");
-  } else if (final) {
-    statusLine = [contextLine, detail || "Final"].filter(Boolean).join(" \xB7 ");
-  } else if (scheduled) {
-    statusLine = paused ? [contextLine, detail].filter(Boolean).join(" \xB7 ") : [contextLine, venueName].filter(Boolean).join(" \xB7 ");
-  }
-  const competitionId = String(competition.id ?? "");
-  if (!competitionId) return null;
-  const id = `espn-${leagueKey}-${competitionId}`;
-  const game = {
-    id,
-    grarfGameId: id,
-    league: leagueKey,
-    espnEventId: competitionId,
-    externalIds: { espn: competitionId, mlb: null },
-    time: formatTimeEt3(isoStart),
-    awayTeam,
-    awayLogoUrl,
-    awayRecord,
-    homeTeam,
-    homeLogoUrl,
-    homeRecord,
-    awayScore: null,
-    homeScore: null,
-    awayCity: "",
-    homeCity: "",
-    awayPitcher: "",
-    awayPitcherStats: "",
-    homePitcher: "",
-    homePitcherStats: "",
-    channels: broadcasts,
-    broadcasts,
-    status: cardStatus,
-    statusLine: statusLine || void 0,
-    startTimeMs,
-    scheduledDateKey,
-    lastUpdated: (/* @__PURE__ */ new Date()).toISOString(),
-    metadata: {
-      officialAwayName: safe3(awayAthlete.displayName) || safe3(awayAthlete.fullName) || awayTeam,
-      officialHomeName: safe3(homeAthlete.displayName) || safe3(homeAthlete.fullName) || homeTeam,
-      ufcCardEventId: cardEventId || void 0,
-      ufcCardName: cardName || void 0,
-      ufcCardSegment,
-      ufcMatchNumber: matchNumber,
-      ufcWeightClass: weightClass || void 0,
-      ufcIsMainEvent,
-      ufcTotalRounds
-    },
-    period: cardStatus === "final" ? null : period,
-    displayClock: cardStatus === "final" ? void 0 : displayClock,
-    content: {
-      stories: [],
-      clips: [],
-      highlights: [],
-      social: [],
-      watchLinks: []
-    }
-  };
-  return attachCanonicalEventMetadata(game, {
-    sport: "mma",
-    title: `${awayTeam} vs ${homeTeam}`
-  });
-}
-function sortMmaGames(games) {
-  const rank = (g2) => {
-    if (g2.status === "live") return 0;
-    if (g2.status === "scheduled") return 1;
-    return 2;
-  };
-  return [...games].sort((a2, b2) => {
-    const dr2 = rank(a2) - rank(b2);
-    if (dr2 !== 0) return dr2;
-    const ma2 = a2.metadata?.ufcMatchNumber ?? 999;
-    const mb = b2.metadata?.ufcMatchNumber ?? 999;
-    if (ma2 !== mb) return ma2 - mb;
-    const ta2 = typeof a2.startTimeMs === "number" ? a2.startTimeMs : 0;
-    const tb = typeof b2.startTimeMs === "number" ? b2.startTimeMs : 0;
-    if (ta2 !== tb) return ta2 - tb;
-    return String(a2.time).localeCompare(String(b2.time));
-  });
-}
-function normalizeMmaScoreboard(scoreboardJson, leagueKey) {
-  const slateDateKey = typeof scoreboardJson?.day?.date === "string" ? scoreboardJson.day.date.trim() : void 0;
-  const events = Array.isArray(scoreboardJson?.events) ? scoreboardJson.events : [];
-  const out = [];
-  for (const row of flattenMmaCompetitions(events)) {
-    const game = normalizeMmaCompetition(
-      row.competition,
-      row.card,
-      row.matchNumber,
-      row.totalFights,
-      leagueKey,
-      slateDateKey
-    );
-    if (game) out.push(game);
-  }
-  return sortMmaGames(out);
-}
-
-// ../grarf/desktop/electron/espn/normalizeTennis.js
-init_define_import_meta_env();
-var TENNIS_LEAGUE_KEYS2 = /* @__PURE__ */ new Set(["ATP", "WTA"]);
-var MENS_DRAW_TYPE_SLUGS2 = /* @__PURE__ */ new Set(["mens-singles", "mens-doubles"]);
-var WOMENS_DRAW_TYPE_SLUGS2 = /* @__PURE__ */ new Set(["womens-singles", "womens-doubles"]);
-function isTennisLeagueKey(leagueKey) {
-  return TENNIS_LEAGUE_KEYS2.has(leagueKey);
-}
-function resolveTennisTourLeague2(competition, groupingLabel, groupingSlug, pollLeagueKey) {
-  const typeSlug = safe4(competition?.type?.slug).toLowerCase();
-  if (MENS_DRAW_TYPE_SLUGS2.has(typeSlug)) return "ATP";
-  if (WOMENS_DRAW_TYPE_SLUGS2.has(typeSlug)) return "WTA";
-  const groupingTypeSlug = safe4(groupingSlug).toLowerCase();
-  if (MENS_DRAW_TYPE_SLUGS2.has(groupingTypeSlug)) return "ATP";
-  if (WOMENS_DRAW_TYPE_SLUGS2.has(groupingTypeSlug)) return "WTA";
-  const label = safe4(groupingLabel).toLowerCase();
-  if (label.startsWith("men")) return "ATP";
-  if (label.startsWith("women")) return "WTA";
-  if (typeSlug === "mixed-doubles" || groupingTypeSlug === "mixed-doubles") {
-    return pollLeagueKey;
-  }
-  return null;
-}
-function safe4(v2) {
-  return typeof v2 === "string" && v2.trim() ? v2.trim() : "";
-}
-function formatTimeEt4(iso) {
-  try {
-    const d2 = new Date(iso);
-    if (Number.isNaN(d2.getTime())) return "\u2014";
-    return d2.toLocaleTimeString("en-US", {
-      hour: "numeric",
-      minute: "2-digit",
-      timeZoneName: "short"
-    });
-  } catch {
-    return "\u2014";
-  }
-}
-function pickPlayerName2(athlete) {
-  if (!athlete) return "TBD";
-  return safe4(athlete.shortName) || safe4(athlete.displayName) || safe4(athlete.fullName) || "TBD";
-}
-function pickPlayerLogoUrl2(athlete) {
-  const href = athlete?.flag?.href;
-  return typeof href === "string" && href.startsWith("http") ? href.trim() : void 0;
-}
-function countSetsWon2(competitor) {
-  const lines = competitor?.linescores;
-  if (!Array.isArray(lines)) return null;
-  let won = 0;
-  for (const row of lines) {
-    if (row?.winner === true) won += 1;
-  }
-  return won;
-}
-function mapTennisSetLines2(competitor) {
-  const lines = Array.isArray(competitor?.linescores) ? competitor.linescores : [];
-  const out = [];
-  for (const row of lines) {
-    const value = Number(row?.value);
-    if (!Number.isFinite(value)) continue;
-    const tiebreakRaw = row?.tiebreak;
-    out.push({
-      value,
-      tiebreak: tiebreakRaw != null && Number.isFinite(Number(tiebreakRaw)) ? Number(tiebreakRaw) : void 0,
-      winner: row?.winner === true
-    });
-  }
-  return out;
-}
-function pickAthleteSeed2(athlete) {
-  const n2 = Number(athlete?.seed);
-  return Number.isFinite(n2) && n2 > 0 ? n2 : null;
-}
-function resolveServerSide2(away, home) {
-  if (away?.possession === true) return "away";
-  if (home?.possession === true) return "home";
-  return null;
-}
-function collectBroadcastLabels4(competition) {
-  const seen = /* @__PURE__ */ new Set();
-  const out = [];
-  const geo = competition?.geoBroadcasts;
-  if (Array.isArray(geo)) {
-    for (const row of geo) {
-      const label = safe4(row?.media?.shortName);
-      if (!label || label === "TV TBD") continue;
-      const key2 = label.toLowerCase();
-      if (seen.has(key2)) continue;
-      seen.add(key2);
-      out.push(label);
-    }
-  }
-  const arr = competition?.broadcasts;
-  if (Array.isArray(arr)) {
-    for (const b2 of arr) {
-      const names = b2?.names;
-      if (!Array.isArray(names)) continue;
-      for (const n2 of names) {
-        const label = typeof n2 === "string" ? n2.trim() : "";
-        if (!label || label === "TV TBD") continue;
-        const key2 = label.toLowerCase();
-        if (seen.has(key2)) continue;
-        seen.add(key2);
-        out.push(label);
-      }
-    }
-  }
-  if (typeof competition?.broadcast === "string") {
-    const label = competition.broadcast.trim();
-    if (label && label !== "TV TBD") out.push(label);
-  }
-  return out.length ? out : ["TV TBD"];
-}
-function flattenTennisCompetitions2(events) {
-  const rows = [];
-  if (!Array.isArray(events)) return rows;
-  for (const tournament of events) {
-    const groupings = Array.isArray(tournament?.groupings) ? tournament.groupings : [];
-    for (const grouping of groupings) {
-      const groupingLabel = safe4(grouping?.grouping?.displayName) || void 0;
-      const groupingSlug = safe4(grouping?.grouping?.slug) || void 0;
-      const competitions = Array.isArray(grouping?.competitions) ? grouping.competitions : [];
-      for (const competition of competitions) {
-        if (!competition) continue;
-        rows.push({ competition, tournament, groupingLabel, groupingSlug });
-      }
-    }
-  }
-  return rows;
-}
-function normalizeTennisCompetition2(competition, tournament, groupingLabel, groupingSlug, pollLeagueKey, slateDateKey) {
-  const tourLeagueKey = resolveTennisTourLeague2(
-    competition,
-    groupingLabel,
-    groupingSlug,
-    pollLeagueKey
-  );
-  if (!tourLeagueKey) return null;
-  const competitors = Array.isArray(competition?.competitors) ? competition.competitors : [];
-  const away = competitors.find((c2) => c2?.homeAway === "away");
-  const home = competitors.find((c2) => c2?.homeAway === "home");
-  if (!away || !home) return null;
-  const awayAthlete = away.athlete;
-  const homeAthlete = home.athlete;
-  if (!awayAthlete || !homeAthlete) return null;
-  const status = competition.status || {};
-  const statusType = status.type || {};
-  const completed = !!statusType.completed;
-  const state3 = safe4(statusType.state).toLowerCase();
-  const paused = isEspnPausedCompetitionStatus(statusType);
-  const live = !completed && !paused && state3 === "in";
-  const final = completed || state3 === "post";
-  const scheduled = !completed && (state3 === "pre" || paused);
-  let cardStatus = "scheduled";
-  if (live) cardStatus = "live";
-  else if (final) cardStatus = "final";
-  const awayTeam = pickPlayerName2(awayAthlete);
-  const homeTeam = pickPlayerName2(homeAthlete);
-  const awayLogoUrl = pickPlayerLogoUrl2(awayAthlete);
-  const homeLogoUrl = pickPlayerLogoUrl2(homeAthlete);
-  const awayScore = countSetsWon2(away);
-  const homeScore = countSetsWon2(home);
-  const tournamentName = safe4(tournament?.shortName) || safe4(tournament?.name) || "";
-  const roundName = safe4(competition?.round?.displayName);
-  const venueName = safe4(competition?.venue?.fullName);
-  const courtName = safe4(competition?.venue?.court);
-  const awaySets = mapTennisSetLines2(away);
-  const homeSets = mapTennisSetLines2(home);
-  const noteText = Array.isArray(competition?.notes) ? safe4(competition.notes.find((n2) => n2?.type === "event")?.text) : "";
-  const broadcasts = collectBroadcastLabels4(competition);
-  const isoStart = competition.startDate || competition.date || tournament?.date;
-  const startTimeMs = Date.parse(isoStart || "") || 0;
-  const scheduledDateKey = resolveScheduledDateKey(isoStart, slateDateKey);
-  const periodNum = status.period != null ? Number(status.period) : NaN;
-  const period = Number.isFinite(periodNum) ? periodNum : void 0;
-  const displayClock = safe4(status.displayClock) || void 0;
-  const contextParts = [tournamentName, roundName || groupingLabel].filter(Boolean);
-  const contextLine = contextParts.join(" \xB7 ");
-  let statusLine = contextLine;
-  if (scheduled) {
-    if (paused) {
-      statusLine = safe4(statusType.shortDetail) || safe4(statusType.detail) || safe4(statusType.description) || contextLine;
-    } else {
-      const venueBits = [venueName, courtName].filter(Boolean).join(" \xB7 ");
-      statusLine = [contextLine, venueBits].filter(Boolean).join(" \xB7 ");
-    }
-  } else if (cardStatus === "final") {
-    statusLine = [contextLine, noteText || safe4(statusType.shortDetail) || "Final"].filter(Boolean).join(" \xB7 ") || "Final";
-  }
-  const competitionId = String(competition.id);
-  const id = `espn-${tourLeagueKey}-${competitionId}`;
-  const game = {
-    id,
-    grarfGameId: id,
-    league: tourLeagueKey,
-    espnEventId: competitionId,
-    externalIds: { espn: competitionId, mlb: null },
-    time: formatTimeEt4(isoStart),
-    awayTeam,
-    awayLogoUrl,
-    awayRecord: "",
-    homeTeam,
-    homeLogoUrl,
-    homeRecord: "",
-    awayScore,
-    homeScore,
-    awayCity: "",
-    homeCity: "",
-    awayPitcher: "",
-    awayPitcherStats: "",
-    homePitcher: "",
-    homePitcherStats: "",
-    channels: broadcasts,
-    broadcasts,
-    status: cardStatus,
-    statusLine: statusLine || void 0,
-    startTimeMs,
-    scheduledDateKey,
-    lastUpdated: (/* @__PURE__ */ new Date()).toISOString(),
-    metadata: {
-      officialAwayName: safe4(awayAthlete.displayName) || safe4(awayAthlete.fullName) || awayTeam,
-      officialHomeName: safe4(homeAthlete.displayName) || safe4(homeAthlete.fullName) || homeTeam,
-      tennis: {
-        contextLine,
-        awaySets,
-        homeSets,
-        awaySeed: pickAthleteSeed2(awayAthlete),
-        homeSeed: pickAthleteSeed2(homeAthlete),
-        serverSide: resolveServerSide2(away, home)
-      }
-    },
-    period: cardStatus === "final" ? null : period,
-    displayClock: cardStatus === "final" ? void 0 : displayClock,
-    content: {
-      stories: [],
-      clips: [],
-      highlights: [],
-      social: [],
-      watchLinks: []
-    }
-  };
-  const espnStream = resolveEspnWatchStreamFromCompetition(competition, broadcasts, tourLeagueKey);
-  if (espnStream) {
-    attachEspnPlusStreamToGame(game, espnStream);
-  }
-  return attachCanonicalEventMetadata(game, {
-    sport: "tennis",
-    title: `${awayTeam} vs ${homeTeam}`
-  });
-}
-function normalizeTennisScoreboard2(scoreboardJson, leagueKey) {
-  const slateDateKey = typeof scoreboardJson?.day?.date === "string" ? scoreboardJson.day.date.trim() : void 0;
-  const events = Array.isArray(scoreboardJson?.events) ? scoreboardJson.events : [];
-  const out = [];
-  for (const row of flattenTennisCompetitions2(events)) {
-    const game = normalizeTennisCompetition2(
-      row.competition,
-      row.tournament,
-      row.groupingLabel,
-      row.groupingSlug,
-      leagueKey,
-      slateDateKey
-    );
-    if (game) out.push(game);
-  }
-  return out;
-}
-
-// ../grarf/desktop/electron/espn/normalizeGolf.js
-init_define_import_meta_env();
-function safe5(v2) {
-  return typeof v2 === "string" && v2.trim() ? v2.trim() : "";
-}
-function formatTimeEt5(iso) {
-  try {
-    const d2 = new Date(iso);
-    if (Number.isNaN(d2.getTime())) return "\u2014";
-    return d2.toLocaleTimeString("en-US", {
-      hour: "numeric",
-      minute: "2-digit",
-      timeZoneName: "short"
-    });
-  } catch {
-    return "\u2014";
-  }
-}
-function normalizeGolfEvent(event, leagueKey, slateDateKey) {
-  const comp = event?.competitions?.[0];
-  if (!comp) return null;
-  const title = safe5(event?.name) || safe5(event?.shortName);
-  if (!title) return null;
-  const status = comp.status || {};
-  const statusType = status.type || {};
-  const completed = !!statusType.completed;
-  const state3 = safe5(statusType.state).toLowerCase();
-  const isoStart = comp.date || event.date;
-  const startTimeMs = Date.parse(isoStart || "") || 0;
-  const scoreboardDayKey = typeof slateDateKey === "string" && slateDateKey.trim() ? slateDateKey.trim() : null;
-  const operationalTodayKey = getOperationalTodayDateKey();
-  const tournamentEndKey = readGolfTournamentEndDateKey(
-    safe5(event?.endDate),
-    formatOperationalDateKeyFromMs
-  );
-  const pastTournamentEnd = tournamentEndKey != null && operationalTodayKey > tournamentEndKey;
-  const tournamentStartKey = readGolfTournamentStartDateKey(
-    isoStart,
-    formatOperationalDateKeyFromMs
-  );
-  const paused = isEspnPausedCompetitionStatus(statusType);
-  const inferredLive = !pastTournamentEnd && !completed && !paused && state3 === "pre" && scoreboardDayKey === operationalTodayKey && startTimeMs > 0 && startTimeMs <= Date.now();
-  const live = !completed && !pastTournamentEnd && !paused && (state3 === "in" || inferredLive);
-  const final = !live && (completed || pastTournamentEnd || state3 === "post" && !paused);
-  const scheduled = !completed && !pastTournamentEnd && (state3 === "pre" || paused) && !inferredLive;
-  let cardStatus = "scheduled";
-  if (live) cardStatus = "live";
-  else if (final) cardStatus = "final";
-  const broadcasts = collectBroadcastLabels2(comp);
-  const channels = broadcasts;
-  let scheduledDateKey = scoreboardDayKey || resolveScheduledDateKey(isoStart, slateDateKey) || formatOperationalDateKeyFromMs(startTimeMs);
-  if (scheduled && tournamentStartKey) {
-    if (!scheduledDateKey || scheduledDateKey < tournamentStartKey) {
-      scheduledDateKey = tournamentStartKey;
-    }
-  }
-  if (final && tournamentEndKey) {
-    scheduledDateKey = tournamentEndKey;
-  }
-  const finalizedStatusLine = safe5(statusType?.shortDetail) || safe5(statusType?.description) || safe5(statusType?.detail) || "Final";
-  let statusLine = "";
-  if (live || final) {
-    statusLine = inferredLive ? "In Progress" : finalizedStatusLine;
-  } else if (scheduled) {
-    statusLine = safe5(statusType?.shortDetail) || safe5(statusType?.detail) || "";
-  }
-  const eventId = String(event.id);
-  const id = `espn-${leagueKey}-${eventId}`;
-  const periodNum = status.period != null ? Number(status.period) : NaN;
-  const round = Number.isFinite(periodNum) && periodNum > 0 ? periodNum : void 0;
-  const watchStreamUrl = resolveGolfWatchStreamUrl(leagueKey, title);
-  const watchLinks = [{ provider: "PGA Tour", url: PGA_TOUR_LEADERBOARD_URL }];
-  if (watchStreamUrl) {
-    watchLinks.push({ provider: "US Open", url: watchStreamUrl });
-  }
-  const game = {
-    id,
-    grarfGameId: id,
-    league: leagueKey,
-    espnEventId: eventId,
-    externalIds: { espn: eventId, mlb: null },
-    time: scheduled ? formatGolfScheduledDayLabel(scheduledDateKey) : formatTimeEt5(isoStart),
-    awayTeam: title,
-    awayRecord: "\u2014",
-    homeTeam: "",
-    homeRecord: "\u2014",
-    awayCity: "",
-    homeCity: "",
-    awayPitcher: "\u2014",
-    awayPitcherStats: "",
-    homePitcher: "\u2014",
-    homePitcherStats: "",
-    channels,
-    broadcasts,
-    status: cardStatus,
-    statusLine: statusLine || void 0,
-    startTimeMs,
-    scheduledDateKey,
-    lastUpdated: (/* @__PURE__ */ new Date()).toISOString(),
-    metadata: {
-      ...round != null ? { round } : {},
-      ...tournamentEndKey ? { tournamentEndDateKey: tournamentEndKey } : {},
-      leaderboardUrl: PGA_TOUR_LEADERBOARD_URL
-    },
-    ...watchStreamUrl ? {
-      streamUrl: watchStreamUrl,
-      streamProvider: "US Open",
-      launchMode: "external"
-    } : {},
-    content: {
-      stories: [],
-      clips: [],
-      highlights: [],
-      social: [],
-      watchLinks
-    }
-  };
-  return attachCanonicalEventMetadata(game, { sport: "golf", title });
-}
-function normalizeGolfScoreboard(scoreboardJson, leagueKey) {
-  const slateDateKey = typeof scoreboardJson?.day?.date === "string" ? scoreboardJson.day.date.trim() : void 0;
-  const events = Array.isArray(scoreboardJson?.events) ? scoreboardJson.events : [];
-  const out = [];
-  for (const ev of events) {
-    const g2 = normalizeGolfEvent(ev, leagueKey, slateDateKey);
-    if (g2) out.push(g2);
-  }
-  return out;
-}
-
-// ../grarf/desktop/electron/espn/mergeOperationalScoreboards.js
-init_define_import_meta_env();
-function operationalGameMatchupKey(game) {
-  const league = game?.league;
-  const away = typeof game?.awayTeam === "string" ? game.awayTeam.trim().toLowerCase() : "";
-  const home = typeof game?.homeTeam === "string" ? game.homeTeam.trim().toLowerCase() : "";
-  if (!league || !away || !home) return null;
-  const teams = [away, home].sort();
-  return `${league}|${teams[0]}|${teams[1]}`;
-}
-function mergeNormalizedGamesById(primary, secondary) {
-  const byId = /* @__PURE__ */ new Map();
-  const primaryMatchups = /* @__PURE__ */ new Set();
-  for (const game of primary ?? []) {
-    if (game?.id) byId.set(game.id, game);
-    const matchupKey = operationalGameMatchupKey(game);
-    if (matchupKey) primaryMatchups.add(matchupKey);
-  }
-  for (const game of secondary ?? []) {
-    if (!game?.id || byId.has(game.id)) continue;
-    const matchupKey = operationalGameMatchupKey(game);
-    if (matchupKey && primaryMatchups.has(matchupKey)) continue;
-    byId.set(game.id, game);
-  }
-  return [...byId.values()];
-}
-
-// ../grarf/desktop/electron/espn/normalize.js
-function safe6(v2) {
-  return typeof v2 === "string" && v2.trim() ? v2.trim() : "";
-}
-function pickRecord(records) {
-  if (!Array.isArray(records)) return "\u2014";
-  const total = records.find((r3) => r3 && (r3.type === "total" || r3.name === "overall" || r3.name === "Total"));
-  if (total?.summary) return String(total.summary);
-  const any = records.find((r3) => r3?.summary);
-  return any?.summary ? String(any.summary) : "\u2014";
-}
-function pickProbable(probables, teamId) {
-  if (!Array.isArray(probables)) return { name: "\u2014", stats: "" };
-  const row = probables.find((p2) => String(p2?.team?.id ?? "") === String(teamId));
-  const athlete = row?.athlete;
-  const name = athlete?.displayName || athlete?.fullName || "\u2014";
-  const stats = "";
-  return { name: String(name), stats };
-}
-function pushBroadcastLabel(seen, out, raw) {
-  const label = typeof raw === "string" ? raw.trim() : typeof raw?.name === "string" ? raw.name.trim() : "";
-  if (!label || label === "TV TBD") return;
-  const key2 = label.toLowerCase();
-  if (seen.has(key2)) return;
-  seen.add(key2);
-  out.push(label);
-}
-function broadcastDebug2(message, extra) {
-  if (extra && Object.keys(extra).length > 0) {
-    console.log(`[Broadcasts] ${message}`, extra);
-  } else {
-    console.log(`[Broadcasts] ${message}`);
-  }
-}
-function dropRedundantAggregateBroadcastLabels(labels) {
-  if (labels.length < 2) return labels;
-  const individualKeys = new Set(labels.map((l2) => l2.toLowerCase()));
-  return labels.filter((label) => {
-    if (!label.includes("/")) return true;
-    const parts = label.split("/").map((p2) => p2.trim()).filter(Boolean);
-    if (parts.length < 2) return true;
-    const allPartsPresent = parts.every((part) => individualKeys.has(part.toLowerCase()));
-    return !allPartsPresent;
-  });
-}
-function collectBroadcastLabels2(competition) {
-  const seen = /* @__PURE__ */ new Set();
-  const out = [];
-  const geo = competition?.geoBroadcasts;
-  if (Array.isArray(geo)) {
-    const ordered = [...geo].sort((a2, b2) => {
-      const ta2 = String(a2?.market?.type ?? "").toLowerCase();
-      const tb = String(b2?.market?.type ?? "").toLowerCase();
-      if (ta2 === "national" && tb !== "national") return -1;
-      if (tb === "national" && ta2 !== "national") return 1;
-      return 0;
-    });
-    for (const row of ordered) {
-      pushBroadcastLabel(seen, out, row?.media?.shortName);
-    }
-  }
-  const arr = competition?.broadcasts;
-  if (Array.isArray(arr)) {
-    for (const b2 of arr) {
-      const names = b2?.names;
-      if (!Array.isArray(names)) continue;
-      for (const n2 of names) {
-        pushBroadcastLabel(seen, out, n2);
-      }
-    }
-  }
-  if (typeof competition?.broadcast === "string") {
-    pushBroadcastLabel(seen, out, competition.broadcast);
-  }
-  const cleaned = dropRedundantAggregateBroadcastLabels(out);
-  return cleaned.length ? cleaned : ["TV TBD"];
-}
-function buildStatusLine(competition, statusType) {
-  const sit = competition?.situation;
-  const detail = safe6(statusType?.detail) || safe6(statusType?.shortDetail);
-  if (sit && (sit.balls != null || sit.strikes != null || sit.outs != null)) {
-    const parts = [];
-    if (detail) parts.push(detail);
-    const count = [];
-    if (sit.balls != null) count.push(`${sit.balls}-${sit.strikes ?? 0}`);
-    if (sit.outs != null) count.push(`${sit.outs} OUT`);
-    if (count.length) parts.push(count.join(" \xB7 "));
-    return parts.join(" \xB7 ") || detail || "";
-  }
-  return detail || safe6(statusType?.description) || "";
-}
-var SOCCER_LEAGUE_KEYS2 = /* @__PURE__ */ new Set([
-  "MLS",
-  "EPL",
-  "LALIGA",
-  "NWSL",
-  "LIGAMX",
-  "SERIEA",
-  "LIGUE1",
-  "EREDIVISIE",
-  "BUNDESLIGA",
-  "UCL",
-  "UEL",
-  "WWC",
-  "EURO",
-  "COPA",
-  "GOLDCUP",
-  "NATIONS",
-  "CLUBWC",
-  "SPFL",
-  "SAUDI",
-  "SUPERLIG",
-  "USLCUP",
-  "WORLDCUP"
-]);
-var NATIONAL_TEAM_SOCCER_LEAGUE_KEYS = /* @__PURE__ */ new Set([
-  "WORLDCUP",
-  "WWC",
-  "EURO",
-  "COPA",
-  "GOLDCUP",
-  "NATIONS"
-]);
-function pickTeamLogoHref(team, leagueKey) {
-  if (!team) return void 0;
-  const logos = team.logos;
-  if (Array.isArray(logos)) {
-    for (const row of logos) {
-      const href = typeof row?.href === "string" ? row.href.trim() : "";
-      if (href.startsWith("http")) return href;
-    }
-  }
-  const direct = safe6(team.logo);
-  if (direct.startsWith("http")) return direct;
-  const id = team.id != null ? String(team.id) : "";
-  const abbr = (safe6(team.abbreviation) || safe6(team.abbrev)).toLowerCase();
-  if (NATIONAL_TEAM_SOCCER_LEAGUE_KEYS.has(leagueKey) && abbr) {
-    return `https://a.espncdn.com/i/teamlogos/countries/500/${abbr}.png`;
-  }
-  if (leagueKey === "NCAABB" && id) {
-    return `https://a.espncdn.com/i/teamlogos/ncaa/500/${id}.png`;
-  }
-  if (SOCCER_LEAGUE_KEYS2.has(leagueKey) && id) {
-    return `https://a.espncdn.com/i/teamlogos/soccer/500/${id}.png`;
-  }
-  if (leagueKey === "MLB" && abbr) {
-    return `https://a.espncdn.com/i/teamlogos/mlb/500/scoreboard/${abbr}.png`;
-  }
-  if (leagueKey === "NBA" && abbr) {
-    return `https://a.espncdn.com/i/teamlogos/nba/500/scoreboard/${abbr}.png`;
-  }
-  if (leagueKey === "WNBA" && abbr) {
-    return `https://a.espncdn.com/i/teamlogos/wnba/500/${abbr}.png`;
-  }
-  if (leagueKey === "NHL" && abbr) {
-    return `https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/${abbr}.png`;
-  }
-  if (leagueKey === "AFL" && abbr) {
-    return `https://a.espncdn.com/i/teamlogos/afl/500/${abbr}.png`;
-  }
-  if (leagueKey === "MLS" && id) {
-    return `https://a.espncdn.com/i/teamlogos/soccer/500/${id}.png`;
-  }
-  return void 0;
-}
-function formatTimeEt6(iso) {
-  try {
-    const d2 = new Date(iso);
-    if (Number.isNaN(d2.getTime())) return "\u2014";
-    return d2.toLocaleTimeString("en-US", {
-      hour: "numeric",
-      minute: "2-digit",
-      timeZoneName: "short"
-    });
-  } catch {
-    return "\u2014";
-  }
-}
-function parseScore(raw) {
-  if (raw == null || raw === "") return null;
-  const n2 = Number(raw);
-  return Number.isFinite(n2) ? n2 : null;
-}
-function pickOddsSummary(competition) {
-  const odds = competition?.odds?.[0];
-  if (!odds) return void 0;
-  const details = odds.details;
-  if (typeof details === "string" && details.trim()) return details.trim();
-  const spread = odds.spread;
-  if (typeof spread === "string" && spread.trim()) return spread.trim();
-  const home = odds.homeTeamOdds;
-  const away = odds.awayTeamOdds;
-  if (home?.moneyLine != null && away?.moneyLine != null) {
-    return `${away.moneyLine} / ${home.moneyLine}`;
-  }
-  return void 0;
-}
-function resolveEspnTeamSportCardStatus(statusType) {
-  return resolveEspnCardStatus(statusType);
-}
-function normalizeEspnEvent(event, leagueKey, slateDateKey) {
-  const comp = event?.competitions?.[0];
-  if (!comp) return null;
-  const status = comp.status || {};
-  const statusType = status.type || {};
-  const cardStatus = resolveEspnTeamSportCardStatus(statusType);
-  const live = cardStatus === "live";
-  const final = cardStatus === "final";
-  const scheduled = cardStatus === "scheduled";
-  const postponed = cardStatus === "postponed";
-  const competitors = Array.isArray(comp.competitors) ? comp.competitors : [];
-  const away = competitors.find((c2) => c2?.homeAway === "away");
-  const home = competitors.find((c2) => c2?.homeAway === "home");
-  if (!away?.team || !home?.team) return null;
-  const awayTeam = away.team.shortDisplayName || away.team.displayName || away.team.name || "Away";
-  const homeTeam = home.team.shortDisplayName || home.team.displayName || home.team.name || "Home";
-  const awayTeamAbbrev = safe6(away.team.abbreviation) || safe6(away.team.abbrev) || void 0;
-  const homeTeamAbbrev = safe6(home.team.abbreviation) || safe6(home.team.abbrev) || void 0;
-  const awayLogoUrl = pickTeamLogoHref(away.team, leagueKey);
-  const homeLogoUrl = pickTeamLogoHref(home.team, leagueKey);
-  const awayCity = away.team.location || awayTeam;
-  const homeCity = home.team.location || homeTeam;
-  const awayRecord = pickRecord(away.records);
-  const homeRecord = pickRecord(home.records);
-  const awayScore = parseScore(away.score);
-  const homeScore = parseScore(home.score);
-  const awayStandingsLine = safe6(away.standingsSummary) || void 0;
-  const homeStandingsLine = safe6(home.standingsSummary) || void 0;
-  const probables = comp.probables || [];
-  const awayProb = pickProbable(probables, String(away.team.id));
-  const homeProb = pickProbable(probables, String(home.team.id));
-  const broadcasts = collectBroadcastLabels2(comp);
-  const channels = broadcasts;
-  if (broadcasts.length > 0 && broadcasts[0] !== "TV TBD") {
-    broadcastDebug2(`Parsed ${broadcasts.join(" \xB7 ")} from ESPN payload`, {
-      away: awayTeam,
-      home: homeTeam
-    });
-  }
-  const venueName = comp.venue?.fullName || comp.venue?.address?.city || "";
-  const oddsSummary = pickOddsSummary(comp);
-  const isoStart = comp.date || event.date;
-  const startTimeMs = Date.parse(isoStart || "") || 0;
-  const scheduledDateKey = resolveScheduledDateKey(isoStart, slateDateKey);
-  const st2 = status;
-  const periodNum = st2.period != null ? Number(st2.period) : NaN;
-  const period = Number.isFinite(periodNum) ? periodNum : void 0;
-  const displayClock = safe6(st2.displayClock) || void 0;
-  let situation;
-  const sit = comp.situation;
-  if (sit && typeof sit === "object") {
-    const onFirst = !!sit.onFirst;
-    const onSecond = !!sit.onSecond;
-    const onThird = !!sit.onThird;
-    const basesLoaded = onFirst && onSecond && onThird;
-    if (basesLoaded || sit.outs != null) {
-      situation = {
-        basesLoaded,
-        ...sit.outs != null ? { outs: Number(sit.outs) } : {}
-      };
-    }
-  }
-  let statusLine = "";
-  if (postponed) {
-    statusLine = safe6(statusType?.shortDetail) || safe6(statusType?.detail) || safe6(statusType?.description) || "Postponed";
-  } else if (scheduled && cardStatus === "scheduled") {
-    statusLine = safe6(statusType?.shortDetail) || safe6(statusType?.detail) || safe6(statusType?.description) || (venueName ? venueName : "");
-  } else if (live || final) {
-    statusLine = buildStatusLine(comp, statusType);
-  } else if (scheduled && venueName) {
-    statusLine = venueName;
-  }
-  const finalizedStatusLine = safe6(statusType?.shortDetail) || safe6(statusType?.description) || safe6(statusType?.detail) || "Final";
-  const eventId = String(event.id);
-  const id = `espn-${leagueKey}-${eventId}`;
-  const metadata = leagueKey === "MLB" ? {
-    officialAwayName: String(away.team.displayName || away.team.name || awayTeam),
-    officialHomeName: String(home.team.displayName || home.team.name || homeTeam)
-  } : leagueKey === "NCAABB" ? {
-    espnSeasonSlug: safe6(event?.season?.slug) || void 0
-  } : {};
-  const game = {
-    id,
-    grarfGameId: id,
-    league: leagueKey,
-    espnEventId: eventId,
-    externalIds: { espn: eventId, mlb: null },
-    time: formatTimeEt6(isoStart),
-    awayTeam,
-    awayTeamAbbrev,
-    awayLogoUrl,
-    awayRecord,
-    awayStandingsLine,
-    homeTeam,
-    homeTeamAbbrev,
-    homeLogoUrl,
-    homeRecord,
-    homeStandingsLine,
-    awayScore,
-    homeScore,
-    awayCity,
-    homeCity,
-    awayPitcher: awayProb.name,
-    awayPitcherStats: awayProb.stats || "\u2014",
-    homePitcher: homeProb.name,
-    homePitcherStats: homeProb.stats || "\u2014",
-    channels,
-    broadcasts,
-    status: cardStatus,
-    statusLine: (cardStatus === "final" ? finalizedStatusLine : statusLine) || void 0,
-    startTimeMs,
-    scheduledDateKey,
-    oddsSummary,
-    lastUpdated: (/* @__PURE__ */ new Date()).toISOString(),
-    metadata,
-    period: cardStatus === "final" || cardStatus === "postponed" ? null : period,
-    displayClock: cardStatus === "final" || cardStatus === "postponed" ? void 0 : displayClock,
-    situation: cardStatus === "final" || cardStatus === "postponed" ? void 0 : situation,
-    content: {
-      stories: [],
-      clips: [],
-      highlights: [],
-      social: [],
-      watchLinks: []
-    }
-  };
-  const espnPlusStream = resolveEspnPlusStreamFromEvent(event, broadcasts, leagueKey);
-  if (espnPlusStream) {
-    attachEspnPlusStreamToGame(game, espnPlusStream);
-  }
-  return game;
-}
-function normalizeScoreboard(scoreboardJson, leagueKey) {
-  if (isMmaLeagueKey(leagueKey)) {
-    return normalizeMmaScoreboard(scoreboardJson, leagueKey);
-  }
-  if (isTennisLeagueKey(leagueKey)) {
-    return sortGames(normalizeTennisScoreboard2(scoreboardJson, leagueKey));
-  }
-  if (isGolfLeagueKey(leagueKey)) {
-    return sortGames(normalizeGolfScoreboard(scoreboardJson, leagueKey));
-  }
-  if (isRacingLeagueKey(leagueKey)) {
-    return sortGames(normalizeRacingScoreboard(scoreboardJson, leagueKey));
-  }
-  const slateDateKey = typeof scoreboardJson?.day?.date === "string" ? scoreboardJson.day.date.trim() : void 0;
-  const events = Array.isArray(scoreboardJson?.events) ? scoreboardJson.events : [];
-  const out = [];
-  for (const ev of events) {
-    const g2 = normalizeEspnEvent(ev, leagueKey, slateDateKey);
-    if (g2) out.push(g2);
-  }
-  return sortGames(out);
-}
-function sortGames(games) {
-  const rank = (g2) => {
-    if (g2.status === "live") return 0;
-    if (g2.status === "scheduled") return 1;
-    if (g2.status === "postponed") return 2;
-    return 3;
-  };
-  return [...games].sort((a2, b2) => {
-    const dr2 = rank(a2) - rank(b2);
-    if (dr2 !== 0) return dr2;
-    const ta2 = typeof a2.startTimeMs === "number" ? a2.startTimeMs : 0;
-    const tb = typeof b2.startTimeMs === "number" ? b2.startTimeMs : 0;
-    if (ta2 !== tb) return ta2 - tb;
-    return String(a2.time).localeCompare(String(b2.time));
-  });
-}
-function normalizeDatedOperationalScoreboardPair(todayJson, tomorrowJson, leagueKey) {
-  const todayGames = normalizeScoreboard(todayJson ?? { events: [] }, leagueKey);
-  const tomorrowGames = normalizeScoreboard(tomorrowJson ?? { events: [] }, leagueKey);
-  return sortGames(mergeNormalizedGamesById(todayGames, tomorrowGames));
-}
-
-// ../grarf/desktop/src/services/operationalIngest/web/fetchWebEspnOperationalSnapshot.ts
-var LOG8 = "[OperationalIngest]";
-var ESPN_FETCH_TIMEOUT_MS2 = 12e3;
-var LEAGUE_FETCH_CONCURRENCY = 8;
-async function fetchEspnScoreboardJson(url) {
-  const res = await fetch(url, {
-    headers: { Accept: "application/json" },
-    signal: AbortSignal.timeout(ESPN_FETCH_TIMEOUT_MS2)
-  });
-  if (!res.ok) {
-    throw new Error(`ESPN ${res.status}`);
-  }
-  return res.json();
-}
-function countLiveScoreboardEvents(json) {
-  const events = Array.isArray(json?.events) ? json.events : [];
-  let live = 0;
-  for (const ev of events) {
-    const comp = ev?.competitions?.[0];
-    const statusType = comp?.status?.type;
-    if (!statusType) continue;
-    if (statusType.completed) continue;
-    if (String(statusType.state ?? "").toLowerCase() === "in") live += 1;
-  }
-  return live;
-}
-function scoreboardEventId(ev) {
-  if (!ev || typeof ev !== "object") return null;
-  const id = ev.id;
-  return id != null ? String(id) : null;
-}
-function countLiveAcrossScoreboards(...jsons) {
-  let live = 0;
-  for (const json of jsons) {
-    live += countLiveScoreboardEvents(json);
-  }
-  return live;
-}
-function countUniqueScoreboardEvents(...jsons) {
-  const ids = /* @__PURE__ */ new Set();
-  let count = 0;
-  for (const json of jsons) {
-    const events = Array.isArray(json?.events) ? json.events : [];
-    for (const ev of events) {
-      const id = scoreboardEventId(ev);
-      if (id && ids.has(id)) continue;
-      if (id) ids.add(id);
-      count += 1;
-    }
-  }
-  return count;
-}
-async function fetchDatedScoreboardPair(endpoint) {
-  const datedUrl = `${endpoint}${endpoint.includes("?") ? "&" : "?"}dates=${formatEspnScoreboardDatesParam()}`;
-  const tomorrowUrl = `${endpoint}${endpoint.includes("?") ? "&" : "?"}dates=${formatEspnScoreboardDatesParamForTomorrow()}`;
-  const [todayJson, tomorrowJson] = await Promise.all([
-    fetchEspnScoreboardJson(datedUrl),
-    fetchEspnScoreboardJson(tomorrowUrl).catch(() => ({ events: [] }))
-  ]);
-  return { todayJson, tomorrowJson };
-}
-async function fetchOperationalScoreboardJsonWeb(endpoint) {
-  const { todayJson, tomorrowJson } = await fetchDatedScoreboardPair(endpoint);
-  const datedEventCount = countUniqueScoreboardEvents(todayJson, tomorrowJson);
-  const datedLive = countLiveAcrossScoreboards(todayJson, tomorrowJson);
-  if (datedEventCount > 0 && datedLive > 0) {
-    return { todayJson, tomorrowJson, usedFallback: false };
-  }
-  const defaultJson = await fetchEspnScoreboardJson(endpoint);
-  const defaultLive = countLiveScoreboardEvents(defaultJson);
-  if (datedEventCount > 0 && datedLive === 0 && defaultLive > 0) {
-    return { todayJson: defaultJson, tomorrowJson: null, usedFallback: false };
-  }
-  if (datedEventCount > 0) {
-    return { todayJson, tomorrowJson, usedFallback: false };
-  }
-  return { todayJson: defaultJson, tomorrowJson: null, usedFallback: true };
-}
-async function fetchLeagueGames(key2) {
-  const endpoint = ESPN_OPERATIONAL_LEAGUE_ENDPOINTS[key2];
-  if (!endpoint) return [];
-  try {
-    const { todayJson, tomorrowJson, usedFallback } = await fetchOperationalScoreboardJsonWeb(endpoint);
-    let games = tomorrowJson ? normalizeDatedOperationalScoreboardPair(todayJson, tomorrowJson, key2) : normalizeScoreboard(todayJson, key2);
-    if (usedFallback) {
-      games = filterGamesForOperationalFallbackIngest(games);
-    }
-    return games;
-  } catch (e2) {
-    if (define_import_meta_env_default.DEV) {
-      console.warn(`${LOG8} web ESPN fetch failed`, key2, e2);
-    }
-    return [];
-  }
-}
-async function mapWithConcurrency(items, concurrency, fn2) {
-  const out = new Array(items.length);
-  let index = 0;
-  const workers = Array.from({ length: Math.min(concurrency, items.length) }, async () => {
-    while (index < items.length) {
-      const i2 = index;
-      index += 1;
-      out[i2] = await fn2(items[i2]);
-    }
-  });
-  await Promise.all(workers);
-  return out;
-}
-async function fetchWebEspnOperationalSnapshot(leagueKeys = [...GAMES_COLUMN_LEAGUE_ORDER]) {
-  const results = await mapWithConcurrency(leagueKeys, LEAGUE_FETCH_CONCURRENCY, async (key2) => ({
-    key: key2,
-    games: await fetchLeagueGames(key2)
-  }));
-  const leagues = {};
-  let total = 0;
-  for (const { key: key2, games } of results) {
-    if (games.length > 0) {
-      leagues[key2] = games;
-      total += games.length;
-    }
-  }
-  if (define_import_meta_env_default.DEV) {
-    console.log(`${LOG8} web ESPN fallback snapshot`, { total, leagues: Object.keys(leagues).length });
-  }
-  const transport = {
-    generatedAt: (/* @__PURE__ */ new Date()).toISOString(),
-    source: "espn_local_adapter",
-    leagues
-  };
-  return supplementOperationalSnapshotWithTennis(transport);
-}
-
-// ../grarf/desktop/src/services/operationalIngest/fetchOperationalSnapshot.ts
-var LOG9 = "[OperationalIngest]";
-var CLOUD_STALE_THRESHOLD_MS = 9e4;
-var CLOUD_FETCH_TIMEOUT_MS = 2e4;
-var CLOUD_FETCH_MAX_ATTEMPTS = 3;
-var CLOUD_FETCH_RETRY_MS = 1500;
-var WEB_CLOUD_RACE_TIMEOUT_MS = 4e3;
-function countOperationalGames(snap) {
-  return Object.values(snap.leagues ?? {}).reduce(
-    (total, rows) => total + (Array.isArray(rows) ? rows.length : 0),
-    0
-  );
-}
-function mergeEspnWatchFieldsFromSupplement(cloud, espn) {
-  let next = cloud;
-  if (!cloud.streamUrl?.trim() && espn.streamUrl?.trim()) {
-    next = {
-      ...next,
-      streamUrl: espn.streamUrl,
-      streamProvider: espn.streamProvider ?? next.streamProvider,
-      espnWatchEventId: espn.espnWatchEventId ?? next.espnWatchEventId
-    };
-  }
-  const cloudBroadcast = cloud.broadcasts?.find((label) => label?.trim() && label !== "TV TBD");
-  const espnBroadcast = espn.broadcasts?.find((label) => label?.trim() && label !== "TV TBD");
-  if (!cloudBroadcast && espnBroadcast) {
-    next = {
-      ...next,
-      broadcasts: espn.broadcasts,
-      channels: espn.channels ?? espn.broadcasts
-    };
-  }
-  return next;
-}
-function supplementCloudSnapshotFromEspn(cloud, espn) {
-  const leagues = { ...cloud.leagues ?? {} };
-  let changed = false;
-  for (const [key2, rows] of Object.entries(espn.leagues ?? {})) {
-    if (!Array.isArray(rows) || rows.length === 0) continue;
-    const leagueKey = key2;
-    const cloudRows = leagues[leagueKey];
-    if (!Array.isArray(cloudRows) || cloudRows.length === 0) {
-      leagues[leagueKey] = rows;
-      changed = true;
-      continue;
-    }
-    const espnById = new Map(rows.map((row) => [row.id, row]));
-    let leagueChanged = false;
-    const mergedRows = cloudRows.map((cloudRow) => {
-      const espnRow = espnById.get(cloudRow.id);
-      if (!espnRow) return cloudRow;
-      const merged = mergeEspnWatchFieldsFromSupplement(cloudRow, espnRow);
-      if (merged !== cloudRow) leagueChanged = true;
-      return merged;
-    });
-    if (leagueChanged) {
-      leagues[leagueKey] = mergedRows;
-      changed = true;
-    }
-  }
-  return changed ? { ...cloud, leagues } : cloud;
-}
-function hasElectronGamesIpc() {
-  return Boolean(typeof window !== "undefined" && window.grarf?.gamesGetSnapshot);
-}
-function emptyOperationalSnapshot() {
-  const leagues = {};
-  for (const key2 of GAMES_COLUMN_LEAGUE_ORDER) {
-    leagues[key2] = [];
-  }
-  leagues.F1 = [];
-  return {
-    generatedAt: (/* @__PURE__ */ new Date()).toISOString(),
-    source: "espn_local_adapter",
-    leagues
-  };
-}
-function snapshotAgeMs(generatedAt) {
-  if (!generatedAt?.trim()) return Number.POSITIVE_INFINITY;
-  const ms2 = Date.parse(generatedAt);
-  if (!Number.isFinite(ms2)) return Number.POSITIVE_INFINITY;
-  return Math.max(0, Date.now() - ms2);
-}
-function ipcSnapshotToOperationalResponse(snap, source = "espn_local_adapter") {
-  const leagues = {};
-  for (const key2 of [...GAMES_COLUMN_LEAGUE_ORDER, "F1"]) {
-    const rows = snap.leagues?.[key2];
-    if (Array.isArray(rows)) leagues[key2] = rows;
-  }
-  return {
-    generatedAt: snap.updatedAt ?? (/* @__PURE__ */ new Date()).toISOString(),
-    source,
-    leagues
-  };
-}
-async function fetchViaEspnLocalIpcAdapter() {
-  const api = window.grarf?.gamesGetSnapshot;
-  if (!api) {
-    if (define_import_meta_env_default.DEV) {
-      console.warn(`${LOG9} source=espn_local_adapter unavailable (no Electron IPC)`);
-    }
-    return emptyOperationalSnapshot();
-  }
-  const snap = await api();
-  return ipcSnapshotToOperationalResponse(snap);
-}
-async function fetchViaGrarfCloudService() {
-  const { cloudBaseUrl } = getOperationalIngestConfig();
-  if (!cloudBaseUrl) {
-    throw new Error("[OperationalIngest] grarf_cloud provider requires VITE_GRARF_OPERATIONAL_INGEST_URL");
-  }
-  const url = `${cloudBaseUrl.replace(/\/$/, "")}/operational/snapshot`;
-  let lastError;
-  for (let attempt = 1; attempt <= CLOUD_FETCH_MAX_ATTEMPTS; attempt += 1) {
-    try {
-      const res = await fetch(url, {
-        headers: { Accept: "application/json" },
-        signal: AbortSignal.timeout(CLOUD_FETCH_TIMEOUT_MS)
-      });
-      if (res.status === 503 && attempt < CLOUD_FETCH_MAX_ATTEMPTS) {
-        lastError = "grarf_cloud snapshot warming (503)";
-        await new Promise((resolve) => window.setTimeout(resolve, CLOUD_FETCH_RETRY_MS * attempt));
-        continue;
-      }
-      if (!res.ok) {
-        throw new Error(`[OperationalIngest] grarf_cloud fetch failed: ${res.status}`);
-      }
-      const json = await res.json();
-      const transport = {
-        generatedAt: json.generatedAt ?? (/* @__PURE__ */ new Date()).toISOString(),
-        source: json.source ?? "grarf_operational_service",
-        leagues: json.leagues ?? {}
-      };
-      return supplementOperationalSnapshotWithTennis(transport);
-    } catch (e2) {
-      lastError = e2 instanceof Error ? e2.message : String(e2);
-      if (attempt < CLOUD_FETCH_MAX_ATTEMPTS) {
-        await new Promise((resolve) => window.setTimeout(resolve, CLOUD_FETCH_RETRY_MS * attempt));
-        continue;
-      }
-      throw e2;
-    }
-  }
-  throw new Error(lastError ?? "[OperationalIngest] grarf_cloud fetch failed");
-}
-async function fetchViaWebOperationalIngest() {
-  const espnTask = fetchWebEspnOperationalSnapshot();
-  let cloud = null;
-  let cloudError = null;
-  try {
-    cloud = await Promise.race([
-      fetchViaGrarfCloudService(),
-      new Promise((_2, reject) => {
-        window.setTimeout(
-          () => reject(new Error("grarf_cloud web race timeout")),
-          WEB_CLOUD_RACE_TIMEOUT_MS
-        );
-      })
-    ]);
-  } catch (e2) {
-    cloudError = e2 instanceof Error ? e2.message : String(e2);
-  }
-  const espn = await espnTask;
-  const cloudGames = cloud ? countOperationalGames(cloud) : 0;
-  const espnGames = countOperationalGames(espn);
-  if (cloud && cloudGames > 0) {
-    const cloudFresh = snapshotAgeMs(cloud.generatedAt) <= CLOUD_STALE_THRESHOLD_MS;
-    if (cloudFresh) return supplementCloudSnapshotFromEspn(cloud, espn);
-    if (espnGames === 0) return cloud;
-  }
-  if (espnGames > 0) {
-    if (define_import_meta_env_default.DEV && cloudError) {
-      console.warn(`${LOG9} web using ESPN ingest (cloud unavailable or empty)`, { cloudError });
-    }
-    return espn;
-  }
-  return cloud ?? espn;
-}
-async function fetchViaGrarfCloudWithLocalFallback() {
-  let cloud = null;
-  let cloudError = null;
-  try {
-    cloud = await fetchViaGrarfCloudService();
-  } catch (e2) {
-    cloudError = e2 instanceof Error ? e2.message : String(e2);
-  }
-  const cloudAgeMs = cloud ? snapshotAgeMs(cloud.generatedAt) : Number.POSITIVE_INFINITY;
-  const cloudFresh = cloud != null && cloudAgeMs <= CLOUD_STALE_THRESHOLD_MS;
-  const electronIpc = hasElectronGamesIpc();
-  if (cloudFresh && cloud) {
-    return cloud;
-  }
-  if (!electronIpc) {
-    if (cloud) {
-      if (define_import_meta_env_default.DEV && !cloudFresh) {
-        console.warn(`${LOG9} browser/web using cloud snapshot (stale but authoritative)`, {
-          cloudAgeMs,
-          cloudError
-        });
-      }
-      return cloud;
-    }
-    if (isGrarfWebRenderer()) {
-      if (define_import_meta_env_default.DEV && cloudError) {
-        console.warn(`${LOG9} web ESPN fallback (cloud unavailable)`, { cloudError });
-      }
-      return fetchWebEspnOperationalSnapshot();
-    }
-    throw new Error(cloudError ?? "[OperationalIngest] grarf_cloud unavailable in browser");
-  }
-  const local = await fetchViaEspnLocalIpcAdapter();
-  const localAgeMs = snapshotAgeMs(local.generatedAt);
-  if (cloud && cloudAgeMs <= localAgeMs) {
-    return cloud;
-  }
-  if (define_import_meta_env_default.DEV && (cloudError || cloud && !cloudFresh)) {
-    console.warn(`${LOG9} using local IPC fallback (cloud stale or failed)`, {
-      cloudError,
-      cloudAgeMs: cloud ? cloudAgeMs : null,
-      localAgeMs,
-      localGeneratedAt: local.generatedAt
-    });
-  }
-  return {
-    ...local,
-    source: "espn_local_adapter"
-  };
-}
-async function fetchOperationalSnapshot() {
-  const config = getOperationalIngestConfig();
-  if (isGrarfWebRenderer()) {
-    return fetchViaWebOperationalIngest();
-  }
-  if (config.provider === "grarf_cloud") {
-    return fetchViaGrarfCloudWithLocalFallback();
-  }
-  return fetchViaEspnLocalIpcAdapter();
-}
-function operationalResponseFromIpcPush(snap) {
-  return ipcSnapshotToOperationalResponse(snap);
-}
 
 // ../grarf/desktop/src/services/operationalIngest/normalizeOperationalSnapshot.ts
 init_define_import_meta_env();
@@ -36100,6 +36186,7 @@ function normalizeOperationalSnapshot(response) {
 // ../grarf/desktop/src/services/operationalIngest/startOperationalSnapshotPolling.ts
 init_define_import_meta_env();
 init_operationalIngestConfig();
+init_isGrarfWebRenderer();
 
 // ../grarf/desktop/src/services/operationalIngest/enrichOperationalTransport.ts
 init_define_import_meta_env();
@@ -37452,10 +37539,28 @@ function startOperationalSnapshotPolling(hydrate) {
       try {
         const rawTransport = await fetchOperationalSnapshot();
         if (stopped) return;
+        const applyHydrate = async (transport2) => {
+          recordCentralizedTransportIngest(transport2);
+          const canonical = normalizeOperationalSnapshot(transport2);
+          hydrate(canonical);
+        };
+        if (isGrarfWebRenderer()) {
+          await applyHydrate(rawTransport);
+          clearRetry();
+          void (async () => {
+            try {
+              const enriched = await enrichOperationalTransport(rawTransport);
+              if (stopped) return;
+              await applyHydrate(enriched);
+            } catch (e2) {
+              const msg = e2 instanceof Error ? e2.message : String(e2);
+              console.warn(`${LOG16} web enrich refresh failed`, msg);
+            }
+          })();
+          return;
+        }
         const transport = await enrichOperationalTransport(rawTransport);
-        recordCentralizedTransportIngest(transport);
-        const canonical = normalizeOperationalSnapshot(transport);
-        hydrate(canonical);
+        await applyHydrate(transport);
         clearRetry();
       } catch (e2) {
         const msg = e2 instanceof Error ? e2.message : String(e2);
@@ -37539,20 +37644,6 @@ function LiveGamesBridge() {
     if (config.provider === "grarf_cloud") {
       if (define_import_meta_env_default.DEV) {
         console.log(`${LOG17} grarf_cloud with local IPC supplement (fresher wins)`);
-      }
-      if (isGrarfWebRenderer()) {
-        void (async () => {
-          try {
-            const transport = await fetchWebEspnOperationalSnapshot();
-            lastCloudLeaguesRef.current = transport.leagues ?? {};
-            if (useGamesSpineRenderStore.getState().operationalReady) return;
-            const enriched = await enrichOperationalTransport(transport);
-            const canonical = normalizeOperationalSnapshot(enriched);
-            hydrate(canonical, { source: "espn_local_adapter" });
-          } catch (e2) {
-            console.warn(`${LOG17} web ESPN fallback hydrate failed`, e2);
-          }
-        })();
       }
       const stopCloudPoll = startOperationalSnapshotPolling((snap) => {
         lastCloudLeaguesRef.current = snap.leagues ?? {};
@@ -37650,36 +37741,6 @@ init_isGrarfWebRenderer();
 // ../grarf/desktop/src/store/gamesSpineManualStore.ts
 init_define_import_meta_env();
 var import_zustand12 = __toESM(require_zustand(), 1);
-
-// ../grarf/desktop/src/lib/gamesSpine/manual/gamesSpineManualApi.ts
-init_define_import_meta_env();
-function workerWriteHeaders2() {
-  const headers = {
-    "Content-Type": "application/json"
-  };
-  const token = getSportscapeAdminToken();
-  if (token) headers.Authorization = `Bearer ${token}`;
-  return headers;
-}
-async function fetchGamesSpineManualDocument() {
-  const res = await fetch(sportscapeEditorialApiUrl("/games-spine-manual"), { method: "GET" });
-  if (!res.ok) throw new Error(`games_spine_manual_load_failed_${res.status}`);
-  const body = await res.json();
-  return body.document ?? { leagues: [] };
-}
-async function saveGamesSpineManualDocument(document2) {
-  const res = await fetch(sportscapeEditorialApiUrl("/games-spine-manual"), {
-    method: "POST",
-    headers: workerWriteHeaders2(),
-    body: JSON.stringify({ document: document2 })
-  });
-  if (!res.ok) throw new Error(`games_spine_manual_save_failed_${res.status}`);
-  const body = await res.json();
-  if (!body.document) throw new Error("games_spine_manual_save_missing_document");
-  return body.document;
-}
-
-// ../grarf/desktop/src/store/gamesSpineManualStore.ts
 var useGamesSpineManualStore = (0, import_zustand12.create)((set) => ({
   document: null,
   loadError: null,
@@ -37687,7 +37748,7 @@ var useGamesSpineManualStore = (0, import_zustand12.create)((set) => ({
   setDocument: (document2) => set({ document: document2, loadError: null, loadedAt: (/* @__PURE__ */ new Date()).toISOString() }),
   refreshDocument: async () => {
     try {
-      const document2 = await fetchGamesSpineManualDocument();
+      const document2 = await loadGamesSpineManualDocument();
       set({ document: document2, loadError: null, loadedAt: (/* @__PURE__ */ new Date()).toISOString() });
     } catch (err) {
       set({
@@ -40317,7 +40378,7 @@ var OPERATIONAL_ALERT_TITLES = {
   final_minutes: "FINAL MINUTES ALERT"
 };
 var OPERATIONAL_ALERT_MAX_VISIBLE = 3;
-var OPERATIONAL_ALERT_AUTO_DISMISS_MS = 12e3;
+var OPERATIONAL_ALERT_AUTO_DISMISS_MS = 3e4;
 
 // ../grarf/desktop/src/lib/operationalAlerts/operationalAlertLog.ts
 init_define_import_meta_env();
@@ -40465,11 +40526,11 @@ var watchConfig = {
 
 // ../grarf/desktop/src/lib/watch/espnResolutionCache.ts
 init_define_import_meta_env();
-var STORAGE_KEY3 = "grarf-espn-watch-v1";
+var STORAGE_KEY2 = "grarf-espn-watch-v1";
 var TTL_MS = 30 * 60 * 1e3;
 function read() {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY3);
+    const raw = localStorage.getItem(STORAGE_KEY2);
     if (!raw) return {};
     const p2 = JSON.parse(raw);
     return p2?.entries && typeof p2.entries === "object" ? p2.entries : {};
@@ -40479,7 +40540,7 @@ function read() {
 }
 function write(entries) {
   try {
-    localStorage.setItem(STORAGE_KEY3, JSON.stringify({ version: 1, entries }));
+    localStorage.setItem(STORAGE_KEY2, JSON.stringify({ version: 1, entries }));
   } catch {
   }
 }
@@ -40645,14 +40706,14 @@ init_define_import_meta_env();
 
 // ../grarf/desktop/src/lib/stream/streamLinkCache.ts
 init_define_import_meta_env();
-var STORAGE_KEY4 = "grarf-stream-links-v1";
+var STORAGE_KEY3 = "grarf-stream-links-v1";
 var DEFAULT_TTL_MS = 30 * 60 * 1e3;
 function cacheKey(provider, gameId) {
   return `${provider}:${gameId}`;
 }
 function read2() {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY4);
+    const raw = localStorage.getItem(STORAGE_KEY3);
     if (!raw) return {};
     const p2 = JSON.parse(raw);
     return p2?.entries && typeof p2.entries === "object" ? p2.entries : {};
@@ -41957,7 +42018,13 @@ function executeOperationalAlertWatchLive(params) {
 }
 
 // ../grarf/desktop/src/store/operationalAlertStore.ts
+var OPERATIONAL_ALERT_APPEARANCE_DELAY_MIN_MS = 3e3;
+var OPERATIONAL_ALERT_APPEARANCE_DELAY_MAX_MS = 1e4;
 var sessionOnceEmitted2 = /* @__PURE__ */ new Set();
+function randomOperationalAlertAppearanceDelayMs() {
+  const span = OPERATIONAL_ALERT_APPEARANCE_DELAY_MAX_MS - OPERATIONAL_ALERT_APPEARANCE_DELAY_MIN_MS + 1;
+  return OPERATIONAL_ALERT_APPEARANCE_DELAY_MIN_MS + Math.floor(Math.random() * span);
+}
 function allowSessionOnce2(key2) {
   if (sessionOnceEmitted2.has(key2)) return false;
   sessionOnceEmitted2.add(key2);
@@ -41990,6 +42057,25 @@ function fillVisible(visible, queue) {
     visible.push(next);
   }
 }
+function appendOperationalAlert(get, set, alert) {
+  const { visible, queue } = get();
+  const prevVisibleCount = visible.length;
+  const nextVisible = [...visible];
+  const nextQueue = [...queue];
+  if (nextVisible.length < OPERATIONAL_ALERT_MAX_VISIBLE) {
+    nextVisible.push(alert);
+  } else {
+    nextQueue.push(alert);
+    logOperationalAlertQueued(alert.body);
+  }
+  fillVisible(nextVisible, nextQueue);
+  set({ visible: nextVisible, queue: nextQueue });
+  logOperationalAlertStackSize(nextVisible.length);
+  const addedToStack = nextVisible.length - prevVisibleCount;
+  if (addedToStack > 0 && prevVisibleCount > 0) {
+    logOperationalAlertInsertedBelowStack(addedToStack, nextVisible.length);
+  }
+}
 var useOperationalAlertStore = (0, import_zustand16.create)((set, get) => ({
   visible: [],
   queue: [],
@@ -42001,24 +42087,14 @@ var useOperationalAlertStore = (0, import_zustand16.create)((set, get) => ({
       batch.push(toVisible(item, now));
     }
     if (batch.length === 0) return;
-    const { visible, queue } = get();
-    const prevVisibleCount = visible.length;
-    const nextVisible = [...visible];
-    const nextQueue = [...queue];
-    for (const alert of batch) {
-      if (nextVisible.length < OPERATIONAL_ALERT_MAX_VISIBLE) {
-        nextVisible.push(alert);
-      } else {
-        nextQueue.push(alert);
-        logOperationalAlertQueued(alert.body);
-      }
-    }
-    fillVisible(nextVisible, nextQueue);
-    set({ visible: nextVisible, queue: nextQueue });
-    logOperationalAlertStackSize(nextVisible.length);
-    const addedToStack = nextVisible.length - prevVisibleCount;
-    if (addedToStack > 0 && prevVisibleCount > 0) {
-      logOperationalAlertInsertedBelowStack(addedToStack, nextVisible.length);
+    appendOperationalAlert(get, set, batch[0]);
+    let delayMs = 0;
+    for (let index = 1; index < batch.length; index++) {
+      delayMs += randomOperationalAlertAppearanceDelayMs();
+      const alert = batch[index];
+      window.setTimeout(() => {
+        appendOperationalAlert(get, set, alert);
+      }, delayMs);
     }
   },
   dismiss: (id) => {
@@ -42131,7 +42207,11 @@ function inferMlb2(prev, next) {
     const suf = inn != null ? ` \u2014 ${inn}${nth2(inn)}` : "";
     push(out, "close_game", `${scoreLine(next)}${suf}`, next, `ops-mlb-close-${next.gameId}-${inn}`);
   }
-  return out;
+  return suppressRedundantMlbAlertsForSameGameState(out);
+}
+function suppressRedundantMlbAlertsForSameGameState(alerts) {
+  if (!alerts.some((alert) => alert.kind === "walk_off_threat")) return alerts;
+  return alerts.filter((alert) => alert.kind !== "close_game");
 }
 function inferBasketball(next) {
   const out = [];
@@ -55947,12 +56027,30 @@ function HomeEditorialModeBar({ className }) {
 // ../grarf/desktop/src/hooks/useGamesSpineCollapse.ts
 init_define_import_meta_env();
 var import_react84 = __toESM(require_react(), 1);
-var STORAGE_KEY5 = "grarf-games-spine-collapse-v1";
+var STORAGE_KEY4 = "grarf-games-spine-collapse-v2";
 var LOG36 = "[GamesSpine]";
+function collapseStorageKey(statusFilter, leagueKey) {
+  return `${statusFilter}:${leagueKey}`;
+}
+function filterDefaultsCollapsed(statusFilter) {
+  switch (statusFilter) {
+    case "all":
+    case "upcoming":
+      return true;
+    case "live":
+    case "final":
+      return false;
+  }
+}
+function leagueCollapsedForFilter(map, leagueKey, statusFilter) {
+  const stored = map[collapseStorageKey(statusFilter, leagueKey)];
+  if (stored === void 0) return filterDefaultsCollapsed(statusFilter);
+  return stored;
+}
 function readCollapseMap() {
   if (typeof sessionStorage === "undefined") return {};
   try {
-    const raw = sessionStorage.getItem(STORAGE_KEY5);
+    const raw = sessionStorage.getItem(STORAGE_KEY4);
     if (!raw) return {};
     const parsed = JSON.parse(raw);
     return parsed && typeof parsed === "object" ? parsed : {};
@@ -55962,26 +56060,30 @@ function readCollapseMap() {
 }
 function writeCollapseMap(map) {
   try {
-    sessionStorage.setItem(STORAGE_KEY5, JSON.stringify(map));
+    sessionStorage.setItem(STORAGE_KEY4, JSON.stringify(map));
   } catch {
   }
 }
-function useGamesSpineCollapse() {
+function useGamesSpineCollapse(statusFilter) {
   const [collapsed, setCollapsed] = (0, import_react84.useState)(() => readCollapseMap());
   (0, import_react84.useEffect)(() => {
     writeCollapseMap(collapsed);
   }, [collapsed]);
   const isCollapsed = (0, import_react84.useCallback)(
-    (key2) => collapsed[key2] === true,
-    [collapsed]
+    (key2) => leagueCollapsedForFilter(collapsed, key2, statusFilter),
+    [collapsed, statusFilter]
   );
-  const toggleCollapsed = (0, import_react84.useCallback)((key2) => {
-    setCollapsed((prev) => {
-      const next = !prev[key2];
-      console.log(`${LOG36} League ${next ? "collapsed" : "expanded"}:`, key2);
-      return { ...prev, [key2]: next };
-    });
-  }, []);
+  const toggleCollapsed = (0, import_react84.useCallback)(
+    (leagueKey) => {
+      const storageKey = collapseStorageKey(statusFilter, leagueKey);
+      setCollapsed((prev) => {
+        const next = !leagueCollapsedForFilter(prev, leagueKey, statusFilter);
+        console.log(`${LOG36} League ${next ? "collapsed" : "expanded"}:`, leagueKey);
+        return { ...prev, [storageKey]: next };
+      });
+    },
+    [statusFilter]
+  );
   return { isCollapsed, toggleCollapsed };
 }
 
@@ -56298,7 +56400,7 @@ function HomeGamesToday({
     (s2) => s2.operationalReady && s2.manualReady
   );
   const showEditorialControls = isGrarfAdmin();
-  const { isCollapsed, toggleCollapsed } = useGamesSpineCollapse();
+  const { isCollapsed, toggleCollapsed } = useGamesSpineCollapse(filter);
   const leagues = useLiveGamesStore((s2) => s2.leagues);
   const manualDocument = useGamesSpineManualStore((s2) => s2.document);
   const manualRefreshMs = useManualGamesSpineLiveRefreshMs();
@@ -57149,11 +57251,11 @@ function scoreFeed(f2, route, liveTags) {
 
 // ../grarf/desktop/src/lib/media/podcastCache.ts
 init_define_import_meta_env();
-var STORAGE_KEY6 = "grarf-podcast-cache-v1";
+var STORAGE_KEY5 = "grarf-podcast-cache-v1";
 var DEFAULT_TTL_MS2 = 45 * 60 * 1e3;
 function readRoot() {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY6);
+    const raw = localStorage.getItem(STORAGE_KEY5);
     if (!raw) return { version: 1, feeds: {} };
     const p2 = JSON.parse(raw);
     if (p2?.version !== 1 || typeof p2.feeds !== "object") return { version: 1, feeds: {} };
@@ -57164,7 +57266,7 @@ function readRoot() {
 }
 function writeRoot(root) {
   try {
-    localStorage.setItem(STORAGE_KEY6, JSON.stringify(root));
+    localStorage.setItem(STORAGE_KEY5, JSON.stringify(root));
   } catch {
   }
 }
@@ -57606,11 +57708,11 @@ function score(ch, route, liveTags, liveNba) {
 
 // ../grarf/desktop/src/lib/media/liveChannelCache.ts
 init_define_import_meta_env();
-var STORAGE_KEY7 = "grarf-live-channel-cache-v1";
+var STORAGE_KEY6 = "grarf-live-channel-cache-v1";
 var DEFAULT_TTL_MS3 = 50 * 60 * 1e3;
 function readRoot2() {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY7);
+    const raw = localStorage.getItem(STORAGE_KEY6);
     if (!raw) return { version: 1, channels: {} };
     const p2 = JSON.parse(raw);
     if (p2?.version !== 1 || typeof p2.channels !== "object") return { version: 1, channels: {} };
@@ -57621,7 +57723,7 @@ function readRoot2() {
 }
 function writeRoot2(root) {
   try {
-    localStorage.setItem(STORAGE_KEY7, JSON.stringify(root));
+    localStorage.setItem(STORAGE_KEY6, JSON.stringify(root));
   } catch {
   }
 }
@@ -65985,7 +66087,7 @@ function allGamesHighlightToCardItem(v2) {
 
 // ../grarf/desktop/src/store/mlbAllGamesHighlightStore.ts
 var REFRESH_MS = 6 * 60 * 60 * 1e3;
-var STORAGE_KEY8 = "grarf.mlbAllGamesHighlight.v4";
+var STORAGE_KEY7 = "grarf.mlbAllGamesHighlight.v4";
 function isValidAllGamesHighlight(item, targetSlateDateYmd = getMlbAllGamesHighlightTargetSlateDate()) {
   const t2 = item.title.trim().toLowerCase();
   return t2.includes(ALL_GAMES_HIGHLIGHT_TITLE_SUBSTRING.toLowerCase()) && mlbAllGamesHighlightTitleMatchesTargetSlateDate(item.title, targetSlateDateYmd);
@@ -66000,7 +66102,7 @@ function readCachedHighlight() {
   try {
     for (const s2 of stores) {
       if (!s2) continue;
-      const raw = s2.getItem(STORAGE_KEY8);
+      const raw = s2.getItem(STORAGE_KEY7);
       if (!raw) continue;
       const parsed = JSON.parse(raw);
       if (typeof parsed.videoId !== "string" || typeof parsed.title !== "string") continue;
@@ -66040,8 +66142,8 @@ function writeCachedHighlight(item) {
       thumbnailUrl: item.thumbnailUrl,
       targetSlateDateYmd
     });
-    if (typeof localStorage !== "undefined") localStorage.setItem(STORAGE_KEY8, raw);
-    if (typeof sessionStorage !== "undefined") sessionStorage.setItem(STORAGE_KEY8, raw);
+    if (typeof localStorage !== "undefined") localStorage.setItem(STORAGE_KEY7, raw);
+    if (typeof sessionStorage !== "undefined") sessionStorage.setItem(STORAGE_KEY7, raw);
   } catch {
   }
 }
@@ -66710,7 +66812,7 @@ function morningLineupHighlightToCardItem(v2) {
 
 // ../grarf/desktop/src/store/mlbMorningLineupHighlightStore.ts
 var REFRESH_MS3 = 6 * 60 * 60 * 1e3;
-var STORAGE_KEY9 = "grarf.mlbMorningLineupHighlight.v1";
+var STORAGE_KEY8 = "grarf.mlbMorningLineupHighlight.v1";
 function isValidMorningLineupHighlight(item) {
   return item.videoId.trim().length > 0 && item.title.trim().length > 0;
 }
@@ -66723,7 +66825,7 @@ function readCachedHighlight2() {
   try {
     for (const s2 of stores) {
       if (!s2) continue;
-      const raw = s2.getItem(STORAGE_KEY9);
+      const raw = s2.getItem(STORAGE_KEY8);
       if (!raw) continue;
       const parsed = JSON.parse(raw);
       if (typeof parsed.videoId === "string" && typeof parsed.title === "string") {
@@ -66750,8 +66852,8 @@ function writeCachedHighlight2(item) {
       channel: item.channel,
       thumbnailUrl: item.thumbnailUrl
     });
-    if (typeof localStorage !== "undefined") localStorage.setItem(STORAGE_KEY9, raw);
-    if (typeof sessionStorage !== "undefined") sessionStorage.setItem(STORAGE_KEY9, raw);
+    if (typeof localStorage !== "undefined") localStorage.setItem(STORAGE_KEY8, raw);
+    if (typeof sessionStorage !== "undefined") sessionStorage.setItem(STORAGE_KEY8, raw);
   } catch {
   }
 }
@@ -74434,7 +74536,7 @@ function MlbAllGamesHighlightsBlock({
 init_define_import_meta_env();
 var import_react161 = __toESM(require_react(), 1);
 var REFRESH_MS5 = 6 * 60 * 60 * 1e3;
-var STORAGE_KEY10 = "grarf.mlbLineLabsPreview.v1";
+var STORAGE_KEY9 = "grarf.mlbLineLabsPreview.v1";
 function isValidLineLabsPreview(item) {
   const t2 = item.title.trim().toLowerCase();
   return t2.includes(LINE_LABS_MLB_PICKS_TITLE_SUBSTRING.toLowerCase());
@@ -74448,7 +74550,7 @@ function readCachedPreview() {
   try {
     for (const s2 of stores) {
       if (!s2) continue;
-      const raw = s2.getItem(STORAGE_KEY10);
+      const raw = s2.getItem(STORAGE_KEY9);
       if (!raw) continue;
       const parsed = JSON.parse(raw);
       if (typeof parsed.videoId === "string" && typeof parsed.title === "string") {
@@ -74473,8 +74575,8 @@ function writeCachedPreview(item) {
       channel: item.channel,
       thumbnailUrl: item.thumbnailUrl
     });
-    if (typeof localStorage !== "undefined") localStorage.setItem(STORAGE_KEY10, raw);
-    if (typeof sessionStorage !== "undefined") sessionStorage.setItem(STORAGE_KEY10, raw);
+    if (typeof localStorage !== "undefined") localStorage.setItem(STORAGE_KEY9, raw);
+    if (typeof sessionStorage !== "undefined") sessionStorage.setItem(STORAGE_KEY9, raw);
   } catch {
   }
 }
