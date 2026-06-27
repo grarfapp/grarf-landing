@@ -16938,6 +16938,12 @@ function resolveWebSportscapeEditorialApiUrl() {
   if (typeof window === "undefined") return null;
   return window.GRARF_WEB_CONFIG?.sportscapeEditorialApiUrl?.trim() || null;
 }
+function resolveSameOriginSportscapeEditorialApiUrl() {
+  if (typeof window === "undefined") return null;
+  const { hostname } = window.location;
+  if (hostname !== "localhost" && hostname !== "127.0.0.1") return null;
+  return `${window.location.origin}/api/sportscape-editorial`;
+}
 function getSportscapeEditorialApiBaseUrl() {
   return resolveSportscapeEditorialApiBaseUrls()[0] ?? DEFAULT_SPORTSCAPE_EDITORIAL_API_URL;
 }
@@ -16951,7 +16957,7 @@ function resolveSportscapeEditorialApiBaseUrls() {
     out.push(normalized);
   };
   if (isGrarfWebRenderer() && typeof window !== "undefined") {
-    push2(`${window.location.origin}/api/sportscape-editorial`);
+    push2(resolveSameOriginSportscapeEditorialApiUrl());
   }
   push2(resolveWebSportscapeEditorialApiUrl());
   for (const base of SPORTSCAPE_EDITORIAL_FAILOVER_BASE_URLS) {
@@ -37388,7 +37394,7 @@ function isTransportFailure(err) {
   return msg === "failed to fetch" || msg.includes("network") || msg.includes("cors") || msg.includes("aborted") || err.name === "AbortError" || err.name === "TypeError";
 }
 function shouldFailoverOnStatus(status) {
-  return status === 404 || status === 500 || status === 502 || status === 503 || status === 504;
+  return status === 404 || status === 405 || status === 500 || status === 502 || status === 503 || status === 504;
 }
 async function fetchOne(baseUrl, path, init) {
   const url = sportscapeEditorialUrlForBase(baseUrl, path);
