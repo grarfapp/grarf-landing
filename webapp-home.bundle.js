@@ -19887,8 +19887,26 @@ function isElectronRenderer() {
   return typeof window !== "undefined" && window.GRARF_ELECTRON === true;
 }
 var LS_EDITORIAL = "grarf-web-editorial-bundle";
+var LS_FEATURED_GAMES = "grarf-featured-games-v1";
 function emptyWebEditorialBundle() {
   return { narratives: {}, featuredGames: {}, leagueContexts: {}, generatedSummaries: {} };
+}
+function readFeaturedGamesFromBrowserStorage() {
+  const raw = readJson(
+    LS_FEATURED_GAMES,
+    null
+  );
+  if (!raw || typeof raw !== "object") return {};
+  const out = {};
+  for (const [key2, row] of Object.entries(raw)) {
+    const rank = row?.briefingPriority ?? row?.featuredRank;
+    if (typeof rank !== "number" || !Number.isFinite(rank) || rank < 1 || rank > 10) continue;
+    out[key2] = { briefingPriority: Math.round(rank) };
+  }
+  return out;
+}
+function writeFeaturedGamesToBrowserStorage(featuredGames) {
+  writeJson(LS_FEATURED_GAMES, featuredGames);
 }
 function readWebEditorialBundle() {
   const raw = readJson(LS_EDITORIAL, null);
@@ -19918,7 +19936,12 @@ function readWebEditorialBundle() {
       }
     }
   }
-  return { narratives, featuredGames: {}, leagueContexts, generatedSummaries };
+  return {
+    narratives,
+    featuredGames: readFeaturedGamesFromBrowserStorage(),
+    leagueContexts,
+    generatedSummaries
+  };
 }
 function writeWebEditorialBundle(bundle) {
   writeJson(LS_EDITORIAL, {
@@ -20282,12 +20305,15 @@ function installGrarfBridge() {
       return { ok: true, bundle: next };
     },
     editorialSaveFeaturedRank: async (payload) => {
-      const bundle = readWebEditorialBundle();
-      const featuredGames = { ...bundle.featuredGames };
+      const featuredGames = { ...readFeaturedGamesFromBrowserStorage() };
       const rank = payload.briefingPriority ?? payload.featuredRank;
       if (rank == null || !Number.isFinite(rank)) delete featuredGames[payload.gameKey];
       else featuredGames[payload.gameKey] = { briefingPriority: Math.round(rank) };
-      return { ok: true, bundle: { ...bundle, featuredGames } };
+      writeFeaturedGamesToBrowserStorage(featuredGames);
+      return {
+        ok: true,
+        bundle: { ...readWebEditorialBundle(), featuredGames }
+      };
     },
     editorialSaveLeagueContext: async (payload) => {
       const bundle = readWebEditorialBundle();
@@ -37586,7 +37612,7 @@ async function clearAllAiBriefSelections(selections) {
 // ../grarf/desktop/src/lib/sportscape/editorial/featuredGamesBrowserStorage.ts
 init_define_import_meta_env();
 var STORAGE_KEY2 = "grarf-featured-games-v1";
-function readFeaturedGamesFromBrowserStorage() {
+function readFeaturedGamesFromBrowserStorage2() {
   if (typeof localStorage === "undefined") return {};
   try {
     const raw = localStorage.getItem(STORAGE_KEY2);
@@ -37604,7 +37630,7 @@ function readFeaturedGamesFromBrowserStorage() {
     return {};
   }
 }
-function writeFeaturedGamesToBrowserStorage(featuredGames) {
+function writeFeaturedGamesToBrowserStorage2(featuredGames) {
   if (typeof localStorage === "undefined") return;
   try {
     localStorage.setItem(STORAGE_KEY2, JSON.stringify(featuredGames));
@@ -37783,26 +37809,13 @@ var useEditorialStore = (0, import_zustand10.create)((set, get) => ({
   saveFeaturedRank: (gameKey, rank) => {
     get().setFeaturedRankLocal(gameKey, rank);
     set({ featuredGamesSaveError: null });
-    writeFeaturedGamesToBrowserStorage(useEditorialStore.getState().bundle.featuredGames);
-    const localSave = window.grarf?.editorialSaveFeaturedRank;
-    if (localSave) {
-      void localSave({ gameKey, briefingPriority: rank, featuredRank: rank }).then((res) => {
-        if (res?.ok && res.bundle) {
-          set({ bundle: normalizeEditorialBundle(res.bundle) });
-        }
-      });
-    }
+    writeFeaturedGamesToBrowserStorage2(useEditorialStore.getState().bundle.featuredGames);
     void saveFeaturedGamePriorityViaWorker(gameKey, rank).then((featuredGames) => {
-      const merged = {
-        ...featuredGames,
-        ...useEditorialStore.getState().bundle.featuredGames
-      };
-      writeFeaturedGamesToBrowserStorage(merged);
+      const browserFeatured = readFeaturedGamesFromBrowserStorage2();
+      const merged = { ...featuredGames, ...browserFeatured };
+      writeFeaturedGamesToBrowserStorage2(merged);
       set((s2) => ({
-        bundle: {
-          ...s2.bundle,
-          featuredGames: { ...s2.bundle.featuredGames, ...featuredGames }
-        },
+        bundle: { ...s2.bundle, featuredGames: merged },
         featuredGamesSaveError: null
       }));
     }).catch((err) => {
@@ -37830,7 +37843,7 @@ async function loadEditorialBundleFromMain() {
       bundle = normalizeEditorialBundle(res.bundle);
     }
   }
-  const browserFeaturedGames = readFeaturedGamesFromBrowserStorage();
+  const browserFeaturedGames = readFeaturedGamesFromBrowserStorage2();
   try {
     const featuredGames = await fetchFeaturedGamesFromEditorialWorker();
     bundle = {
