@@ -37583,6 +37583,35 @@ async function clearAllAiBriefSelections(selections) {
   }
 }
 
+// ../grarf/desktop/src/lib/sportscape/editorial/featuredGamesBrowserStorage.ts
+init_define_import_meta_env();
+var STORAGE_KEY2 = "grarf-featured-games-v1";
+function readFeaturedGamesFromBrowserStorage() {
+  if (typeof localStorage === "undefined") return {};
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY2);
+    if (!raw) return {};
+    const parsed = JSON.parse(raw);
+    if (!parsed || typeof parsed !== "object") return {};
+    const out = {};
+    for (const [key2, row] of Object.entries(parsed)) {
+      const rank = row?.briefingPriority ?? row?.featuredRank;
+      if (typeof rank !== "number" || !Number.isFinite(rank) || rank < 1 || rank > 10) continue;
+      out[key2] = { briefingPriority: Math.round(rank) };
+    }
+    return out;
+  } catch {
+    return {};
+  }
+}
+function writeFeaturedGamesToBrowserStorage(featuredGames) {
+  if (typeof localStorage === "undefined") return;
+  try {
+    localStorage.setItem(STORAGE_KEY2, JSON.stringify(featuredGames));
+  } catch {
+  }
+}
+
 // ../grarf/desktop/src/store/editorialStore.ts
 var LOG8 = "[Editorial]";
 var EDIT_MODE_KEY = "grarf-editorial-edit-mode-v1";
@@ -37671,7 +37700,10 @@ function featuredGamesSaveErrorMessage(err) {
   if (message.includes("featured_game_save_failed_401")) {
     return "Command Briefing priority save failed: editorial sign-in required. Turn Edit Mode off and on to sign in.";
   }
-  return "Command Briefing priority save failed. Try again or re-authenticate.";
+  if (message.includes("Unable to reach Sportscape Editorial API") || message.includes("load_failed_")) {
+    return "Cloud editorial sync unavailable \u2014 priorities saved locally in this browser.";
+  }
+  return "Command Briefing priority cloud sync failed. Priorities are saved locally in this browser.";
 }
 var useEditorialStore = (0, import_zustand10.create)((set, get) => ({
   bundle: emptyBundle(),
@@ -37751,6 +37783,7 @@ var useEditorialStore = (0, import_zustand10.create)((set, get) => ({
   saveFeaturedRank: (gameKey, rank) => {
     get().setFeaturedRankLocal(gameKey, rank);
     set({ featuredGamesSaveError: null });
+    writeFeaturedGamesToBrowserStorage(useEditorialStore.getState().bundle.featuredGames);
     const localSave = window.grarf?.editorialSaveFeaturedRank;
     if (localSave) {
       void localSave({ gameKey, briefingPriority: rank, featuredRank: rank }).then((res) => {
@@ -37760,6 +37793,11 @@ var useEditorialStore = (0, import_zustand10.create)((set, get) => ({
       });
     }
     void saveFeaturedGamePriorityViaWorker(gameKey, rank).then((featuredGames) => {
+      const merged = {
+        ...featuredGames,
+        ...useEditorialStore.getState().bundle.featuredGames
+      };
+      writeFeaturedGamesToBrowserStorage(merged);
       set((s2) => ({
         bundle: {
           ...s2.bundle,
@@ -37792,14 +37830,19 @@ async function loadEditorialBundleFromMain() {
       bundle = normalizeEditorialBundle(res.bundle);
     }
   }
+  const browserFeaturedGames = readFeaturedGamesFromBrowserStorage();
   try {
     const featuredGames = await fetchFeaturedGamesFromEditorialWorker();
     bundle = {
       ...bundle,
-      featuredGames: { ...bundle.featuredGames, ...featuredGames }
+      featuredGames: { ...featuredGames, ...browserFeaturedGames }
     };
   } catch (err) {
     console.warn(`${LOG8} featuredGames load failed`, err);
+    bundle = {
+      ...bundle,
+      featuredGames: { ...bundle.featuredGames, ...browserFeaturedGames }
+    };
   }
   const summariesApi = window.grarf?.editorialGenerationGetSummaries;
   if (summariesApi) {
@@ -39458,14 +39501,14 @@ init_define_import_meta_env();
 
 // ../grarf/desktop/src/lib/stream/streamLinkCache.ts
 init_define_import_meta_env();
-var STORAGE_KEY2 = "grarf-stream-links-v1";
+var STORAGE_KEY3 = "grarf-stream-links-v1";
 var DEFAULT_TTL_MS = 30 * 60 * 1e3;
 function cacheKey(provider, gameId) {
   return `${provider}:${gameId}`;
 }
 function read() {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY2);
+    const raw = localStorage.getItem(STORAGE_KEY3);
     if (!raw) return {};
     const p2 = JSON.parse(raw);
     return p2?.entries && typeof p2.entries === "object" ? p2.entries : {};
@@ -39475,7 +39518,7 @@ function read() {
 }
 function write(entries) {
   try {
-    localStorage.setItem(STORAGE_KEY2, JSON.stringify({ version: 1, entries }));
+    localStorage.setItem(STORAGE_KEY3, JSON.stringify({ version: 1, entries }));
   } catch {
   }
 }
@@ -43472,11 +43515,11 @@ var watchConfig = {
 
 // ../grarf/desktop/src/lib/watch/espnResolutionCache.ts
 init_define_import_meta_env();
-var STORAGE_KEY3 = "grarf-espn-watch-v1";
+var STORAGE_KEY4 = "grarf-espn-watch-v1";
 var TTL_MS = 30 * 60 * 1e3;
 function read2() {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY3);
+    const raw = localStorage.getItem(STORAGE_KEY4);
     if (!raw) return {};
     const p2 = JSON.parse(raw);
     return p2?.entries && typeof p2.entries === "object" ? p2.entries : {};
@@ -43486,7 +43529,7 @@ function read2() {
 }
 function write2(entries) {
   try {
-    localStorage.setItem(STORAGE_KEY3, JSON.stringify({ version: 1, entries }));
+    localStorage.setItem(STORAGE_KEY4, JSON.stringify({ version: 1, entries }));
   } catch {
   }
 }
@@ -58324,7 +58367,7 @@ function HomeEditorialModeBar({ className }) {
 // ../grarf/desktop/src/hooks/useGamesSpineCollapse.ts
 init_define_import_meta_env();
 var import_react82 = __toESM(require_react(), 1);
-var STORAGE_KEY4 = "grarf-games-spine-collapse-v2";
+var STORAGE_KEY5 = "grarf-games-spine-collapse-v2";
 var LOG35 = "[GamesSpine]";
 function collapseStorageKey(statusFilter, leagueKey) {
   return `${statusFilter}:${leagueKey}`;
@@ -58347,7 +58390,7 @@ function leagueCollapsedForFilter(map, leagueKey, statusFilter) {
 function readCollapseMap() {
   if (typeof sessionStorage === "undefined") return {};
   try {
-    const raw = sessionStorage.getItem(STORAGE_KEY4);
+    const raw = sessionStorage.getItem(STORAGE_KEY5);
     if (!raw) return {};
     const parsed = JSON.parse(raw);
     return parsed && typeof parsed === "object" ? parsed : {};
@@ -58357,7 +58400,7 @@ function readCollapseMap() {
 }
 function writeCollapseMap(map) {
   try {
-    sessionStorage.setItem(STORAGE_KEY4, JSON.stringify(map));
+    sessionStorage.setItem(STORAGE_KEY5, JSON.stringify(map));
   } catch {
   }
 }
@@ -59770,11 +59813,11 @@ function scoreFeed(f2, route, liveTags) {
 
 // ../grarf/desktop/src/lib/media/podcastCache.ts
 init_define_import_meta_env();
-var STORAGE_KEY5 = "grarf-podcast-cache-v1";
+var STORAGE_KEY6 = "grarf-podcast-cache-v1";
 var DEFAULT_TTL_MS2 = 45 * 60 * 1e3;
 function readRoot() {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY5);
+    const raw = localStorage.getItem(STORAGE_KEY6);
     if (!raw) return { version: 1, feeds: {} };
     const p2 = JSON.parse(raw);
     if (p2?.version !== 1 || typeof p2.feeds !== "object") return { version: 1, feeds: {} };
@@ -59785,7 +59828,7 @@ function readRoot() {
 }
 function writeRoot(root) {
   try {
-    localStorage.setItem(STORAGE_KEY5, JSON.stringify(root));
+    localStorage.setItem(STORAGE_KEY6, JSON.stringify(root));
   } catch {
   }
 }
@@ -60227,11 +60270,11 @@ function score(ch, route, liveTags, liveNba) {
 
 // ../grarf/desktop/src/lib/media/liveChannelCache.ts
 init_define_import_meta_env();
-var STORAGE_KEY6 = "grarf-live-channel-cache-v1";
+var STORAGE_KEY7 = "grarf-live-channel-cache-v1";
 var DEFAULT_TTL_MS3 = 50 * 60 * 1e3;
 function readRoot2() {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY6);
+    const raw = localStorage.getItem(STORAGE_KEY7);
     if (!raw) return { version: 1, channels: {} };
     const p2 = JSON.parse(raw);
     if (p2?.version !== 1 || typeof p2.channels !== "object") return { version: 1, channels: {} };
@@ -60242,7 +60285,7 @@ function readRoot2() {
 }
 function writeRoot2(root) {
   try {
-    localStorage.setItem(STORAGE_KEY6, JSON.stringify(root));
+    localStorage.setItem(STORAGE_KEY7, JSON.stringify(root));
   } catch {
   }
 }
@@ -68645,7 +68688,7 @@ function allGamesHighlightToCardItem(v2) {
 
 // ../grarf/desktop/src/store/mlbAllGamesHighlightStore.ts
 var REFRESH_MS = 6 * 60 * 60 * 1e3;
-var STORAGE_KEY7 = "grarf.mlbAllGamesHighlight.v4";
+var STORAGE_KEY8 = "grarf.mlbAllGamesHighlight.v4";
 function isValidAllGamesHighlight(item, targetSlateDateYmd = getMlbAllGamesHighlightTargetSlateDate()) {
   const t2 = item.title.trim().toLowerCase();
   return t2.includes(ALL_GAMES_HIGHLIGHT_TITLE_SUBSTRING.toLowerCase()) && mlbAllGamesHighlightTitleMatchesTargetSlateDate(item.title, targetSlateDateYmd);
@@ -68660,7 +68703,7 @@ function readCachedHighlight() {
   try {
     for (const s2 of stores) {
       if (!s2) continue;
-      const raw = s2.getItem(STORAGE_KEY7);
+      const raw = s2.getItem(STORAGE_KEY8);
       if (!raw) continue;
       const parsed = JSON.parse(raw);
       if (typeof parsed.videoId !== "string" || typeof parsed.title !== "string") continue;
@@ -68700,8 +68743,8 @@ function writeCachedHighlight(item) {
       thumbnailUrl: item.thumbnailUrl,
       targetSlateDateYmd
     });
-    if (typeof localStorage !== "undefined") localStorage.setItem(STORAGE_KEY7, raw);
-    if (typeof sessionStorage !== "undefined") sessionStorage.setItem(STORAGE_KEY7, raw);
+    if (typeof localStorage !== "undefined") localStorage.setItem(STORAGE_KEY8, raw);
+    if (typeof sessionStorage !== "undefined") sessionStorage.setItem(STORAGE_KEY8, raw);
   } catch {
   }
 }
@@ -69370,7 +69413,7 @@ function morningLineupHighlightToCardItem(v2) {
 
 // ../grarf/desktop/src/store/mlbMorningLineupHighlightStore.ts
 var REFRESH_MS3 = 6 * 60 * 60 * 1e3;
-var STORAGE_KEY8 = "grarf.mlbMorningLineupHighlight.v1";
+var STORAGE_KEY9 = "grarf.mlbMorningLineupHighlight.v1";
 function isValidMorningLineupHighlight(item) {
   return item.videoId.trim().length > 0 && item.title.trim().length > 0;
 }
@@ -69383,7 +69426,7 @@ function readCachedHighlight2() {
   try {
     for (const s2 of stores) {
       if (!s2) continue;
-      const raw = s2.getItem(STORAGE_KEY8);
+      const raw = s2.getItem(STORAGE_KEY9);
       if (!raw) continue;
       const parsed = JSON.parse(raw);
       if (typeof parsed.videoId === "string" && typeof parsed.title === "string") {
@@ -69410,8 +69453,8 @@ function writeCachedHighlight2(item) {
       channel: item.channel,
       thumbnailUrl: item.thumbnailUrl
     });
-    if (typeof localStorage !== "undefined") localStorage.setItem(STORAGE_KEY8, raw);
-    if (typeof sessionStorage !== "undefined") sessionStorage.setItem(STORAGE_KEY8, raw);
+    if (typeof localStorage !== "undefined") localStorage.setItem(STORAGE_KEY9, raw);
+    if (typeof sessionStorage !== "undefined") sessionStorage.setItem(STORAGE_KEY9, raw);
   } catch {
   }
 }
@@ -78641,7 +78684,7 @@ function MlbAllGamesHighlightsBlock({
 init_define_import_meta_env();
 var import_react167 = __toESM(require_react(), 1);
 var REFRESH_MS5 = 6 * 60 * 60 * 1e3;
-var STORAGE_KEY9 = "grarf.mlbLineLabsPreview.v1";
+var STORAGE_KEY10 = "grarf.mlbLineLabsPreview.v1";
 function isValidLineLabsPreview(item) {
   const t2 = item.title.trim().toLowerCase();
   return t2.includes(LINE_LABS_MLB_PICKS_TITLE_SUBSTRING.toLowerCase());
@@ -78655,7 +78698,7 @@ function readCachedPreview() {
   try {
     for (const s2 of stores) {
       if (!s2) continue;
-      const raw = s2.getItem(STORAGE_KEY9);
+      const raw = s2.getItem(STORAGE_KEY10);
       if (!raw) continue;
       const parsed = JSON.parse(raw);
       if (typeof parsed.videoId === "string" && typeof parsed.title === "string") {
@@ -78680,8 +78723,8 @@ function writeCachedPreview(item) {
       channel: item.channel,
       thumbnailUrl: item.thumbnailUrl
     });
-    if (typeof localStorage !== "undefined") localStorage.setItem(STORAGE_KEY9, raw);
-    if (typeof sessionStorage !== "undefined") sessionStorage.setItem(STORAGE_KEY9, raw);
+    if (typeof localStorage !== "undefined") localStorage.setItem(STORAGE_KEY10, raw);
+    if (typeof sessionStorage !== "undefined") sessionStorage.setItem(STORAGE_KEY10, raw);
   } catch {
   }
 }
