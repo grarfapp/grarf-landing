@@ -13569,6 +13569,12 @@ var require_client = __commonJS({
 function normalizeLeagueLabel(value) {
   return value.trim().toUpperCase().replace(/['']/g, "'");
 }
+function resolveManualEditorialLeagueImportanceScore(raw) {
+  const anchor = MANUAL_LEAGUE_IMPORTANCE_AFTER[normalizeLeagueLabel(raw)];
+  if (!anchor) return null;
+  const anchorScore = SCORE_BY_LEAGUE_KEY.get(anchor) ?? 0;
+  return anchorScore > 0 ? anchorScore - 0.5 : null;
+}
 function resolveCanonicalLeagueImportanceKey(raw) {
   if (!raw) return null;
   const normalized = normalizeLeagueLabel(raw);
@@ -13579,6 +13585,9 @@ function resolveCanonicalLeagueImportanceKey(raw) {
   return alias ?? null;
 }
 function resolveLeagueImportanceScore(raw) {
+  if (!raw) return 0;
+  const manualScore = resolveManualEditorialLeagueImportanceScore(raw);
+  if (manualScore != null) return manualScore;
   const key2 = resolveCanonicalLeagueImportanceKey(raw);
   if (!key2) return 0;
   return SCORE_BY_LEAGUE_KEY.get(key2) ?? 0;
@@ -13590,7 +13599,7 @@ function sortGrarfLeagueKeysByImportance(keys) {
     return a2.localeCompare(b2);
   });
 }
-var CANONICAL_LEAGUE_IMPORTANCE_ORDER, IMPORTANCE_ALIASES, SCORE_BY_LEAGUE_KEY;
+var CANONICAL_LEAGUE_IMPORTANCE_ORDER, IMPORTANCE_ALIASES, MANUAL_LEAGUE_IMPORTANCE_AFTER, SCORE_BY_LEAGUE_KEY;
 var init_leagueImportanceOrder = __esm({
   "../grarf/desktop/src/data/leagueImportanceOrder.ts"() {
     init_define_import_meta_env();
@@ -13644,6 +13653,10 @@ var init_leagueImportanceOrder = __esm({
       "FORMULA ONE": "F1",
       "NASCAR CUP SERIES": "NASCAR",
       "NASCAR OREILLY AUTO PARTS SERIES": "NASCAR"
+    };
+    MANUAL_LEAGUE_IMPORTANCE_AFTER = {
+      "GT WORLD": "WEC",
+      "GT-WORLD-CHALLENGE": "WEC"
     };
     SCORE_BY_LEAGUE_KEY = new Map(
       CANONICAL_LEAGUE_IMPORTANCE_ORDER.map((key2, index) => [
@@ -16995,6 +17008,52 @@ function markSportscapeAdminAuthed(token) {
   markGrarfAdmin();
 }
 
+// ../grarf/desktop/src/lib/gamesSpine/manual/mergeBundledGamesSpineManualDocument.ts
+init_define_import_meta_env();
+
+// ../grarf/desktop/src/data/gamesSpineManualBundledLeagues.ts
+init_define_import_meta_env();
+var GAMES_SPINE_MANUAL_BUNDLED_LEAGUES = [
+  {
+    league: "gt-world-challenge",
+    displayName: "GT World",
+    insertAfterLeague: "WEC",
+    sourceTimeZone: "America/Chicago",
+    channel: "YouTube",
+    channelUrl: "https://www.youtube.com/live/1bbj47g_FOs?si=dZLDLjR3q8TIS6Ly",
+    games: [
+      {
+        date: "2026-06-27",
+        eventName: "24 Hours of Spa",
+        startTime: "2026-06-27T09:00:00",
+        endTime: "2026-06-28T10:00:00",
+        bestGamePriority: 0
+      },
+      {
+        date: "2026-06-28",
+        eventName: "24 Hours of Spa",
+        startTime: "2026-06-27T09:00:00",
+        endTime: "2026-06-28T10:00:00",
+        bestGamePriority: 0
+      }
+    ]
+  }
+];
+
+// ../grarf/desktop/src/lib/gamesSpine/manual/mergeBundledGamesSpineManualDocument.ts
+function leagueStorageKey(league) {
+  return league.trim().toLowerCase();
+}
+function mergeBundledGamesSpineManualDocument(document2) {
+  const byKey = new Map(
+    document2.leagues.map((league) => [leagueStorageKey(league.league), league])
+  );
+  for (const bundled of GAMES_SPINE_MANUAL_BUNDLED_LEAGUES) {
+    byKey.set(leagueStorageKey(bundled.league), bundled);
+  }
+  return { leagues: [...byKey.values()] };
+}
+
 // ../grarf/desktop/src/lib/gamesSpine/manual/gamesSpineManualApi.ts
 function workerWriteHeaders() {
   const headers = {
@@ -17014,10 +17073,14 @@ async function resolveGamesSpineManualDocument() {
   return manualDocumentPrefetch;
 }
 async function fetchGamesSpineManualDocument() {
-  const res = await fetch(sportscapeEditorialApiUrl("/games-spine-manual"), { method: "GET" });
-  if (!res.ok) throw new Error(`games_spine_manual_load_failed_${res.status}`);
-  const body = await res.json();
-  return body.document ?? { leagues: [] };
+  try {
+    const res = await fetch(sportscapeEditorialApiUrl("/games-spine-manual"), { method: "GET" });
+    if (!res.ok) throw new Error(`games_spine_manual_load_failed_${res.status}`);
+    const body = await res.json();
+    return mergeBundledGamesSpineManualDocument(body.document ?? { leagues: [] });
+  } catch {
+    return mergeBundledGamesSpineManualDocument({ leagues: [] });
+  }
 }
 async function loadGamesSpineManualDocument() {
   return resolveGamesSpineManualDocument();
@@ -43165,6 +43228,146 @@ function installDemoNcaaBaseballAlertTrigger() {
 // ../grarf/desktop/src/lib/watch/handleWatchLiveClick.ts
 init_define_import_meta_env();
 
+// ../grarf/desktop/src/lib/gamesSpine/manual/manualGamesSpineWatchLive.ts
+init_define_import_meta_env();
+init_isGameActivelyLive();
+
+// ../grarf/desktop/src/lib/workspace/buildYoutubeWorkspaceTab.ts
+init_define_import_meta_env();
+
+// ../grarf/desktop/src/lib/youtubeUrl.ts
+init_define_import_meta_env();
+function youtubeVideoIdFromUrl(raw) {
+  try {
+    const u2 = new URL(raw);
+    const host = u2.hostname.replace(/^www\./, "");
+    if (host === "youtu.be") {
+      const id = u2.pathname.replace(/^\//, "").split("/")[0];
+      return id && /^[\w-]{6,32}$/.test(id) ? id : null;
+    }
+    if (host.includes("youtube.com")) {
+      const v2 = u2.searchParams.get("v");
+      if (v2 && /^[\w-]{6,32}$/.test(v2)) return v2;
+      const m2 = u2.pathname.match(/\/shorts\/([\w-]+)/);
+      if (m2?.[1]) return m2[1];
+    }
+  } catch {
+  }
+  return null;
+}
+function youtubeThumbnailUrl(videoId, quality = "mqdefault") {
+  return `https://i.ytimg.com/vi/${encodeURIComponent(videoId)}/${quality}.jpg`;
+}
+function youtubeWatchUrl(videoId) {
+  return `https://youtu.be/${encodeURIComponent(videoId)}`;
+}
+function logMlbDailyHighlightsSelection(location2, item, source) {
+  if (!item?.videoId) return;
+  console.log(
+    `[MLB DAILY HIGHLIGHTS]
+${location2} selected videoId=${item.videoId}
+${location2} source=${source}`
+  );
+}
+function buildYoutubeIframeEmbedSrc(videoId, opts) {
+  const params = new URLSearchParams({ rel: "0", modestbranding: "1" });
+  if (opts?.autoplay) {
+    params.set("autoplay", "1");
+    params.set("playsinline", "1");
+  }
+  const start = opts?.start;
+  if (start != null && start > 0) params.set("start", String(start));
+  return `https://www.youtube.com/embed/${encodeURIComponent(videoId)}?${params.toString()}`;
+}
+function resolveWorkspaceEmbedUrl(raw) {
+  return raw.trim();
+}
+
+// ../grarf/desktop/src/lib/workspace/buildYoutubeWorkspaceTab.ts
+function resolveYoutubeWorkspaceVideoId(raw) {
+  const trimmed = raw.trim();
+  if (/^[\w-]{6,32}$/.test(trimmed)) return trimmed;
+  return youtubeVideoIdFromUrl(trimmed);
+}
+async function clearWorkspaceEmbedsForYoutubeLaunch() {
+  await window.grarf?.workspaceEmbedClear?.("center");
+  await window.grarf?.workspaceEmbedClear?.("centerChild");
+}
+function buildYoutubeWorkspaceTab(title, videoIdOrUrl, options) {
+  const videoId = resolveYoutubeWorkspaceVideoId(videoIdOrUrl);
+  if (!videoId) {
+    console.warn("[YOUTUBE WORKSPACE] could not resolve videoId", { raw: videoIdOrUrl });
+    return null;
+  }
+  const youtubeUrl = youtubeWatchUrl(videoId);
+  const useIframeApi = options?.useIframeApi === true;
+  const embedUrl = buildYoutubeIframeEmbedSrc(videoId, {
+    autoplay: options?.autoplay,
+    start: options?.startSec
+  });
+  console.log(
+    useIframeApi ? `[YOUTUBE WORKSPACE]
+videoId=${videoId}
+youtubeUrl=${youtubeUrl}
+player=iframe-api
+host=https://www.youtube-nocookie.com` : `[YOUTUBE WORKSPACE]
+videoId=${videoId}
+youtubeUrl=${youtubeUrl}
+embedUrl=${embedUrl}
+loadedUrl=${embedUrl}`
+  );
+  const prefix = options?.idPrefix ?? "yt";
+  return {
+    id: `${prefix}-${videoId}-${Date.now()}`,
+    type: "youtube",
+    title,
+    url: embedUrl,
+    youtubeVideoId: videoId,
+    youtubeAutoplay: options?.autoplay,
+    youtubeStartSec: options?.startSec,
+    youtubeUseIframeApi: useIframeApi,
+    closable: true
+  };
+}
+
+// ../grarf/desktop/src/lib/gamesSpine/manual/manualGamesSpineWatchLive.ts
+function resolveManualGamesSpineYoutubeVideoId(url) {
+  const trimmed = url?.trim();
+  if (!trimmed) return null;
+  const fromWatchUrl = youtubeVideoIdFromUrl(trimmed);
+  if (fromWatchUrl) return fromWatchUrl;
+  try {
+    const match = new URL(trimmed).pathname.match(/\/live\/([\w-]+)/);
+    if (match?.[1] && /^[\w-]{6,32}$/.test(match[1])) return match[1];
+  } catch {
+  }
+  return null;
+}
+function resolveManualGamesSpineWatchStreamUrl(game) {
+  const manual = game.metadata?.manualGamesSpine;
+  if (!manual) return null;
+  return manual.channelUrl?.trim() || game.streamUrl?.trim() || null;
+}
+function manualGamesSpineGameHasWatchLive(game) {
+  if (!game.metadata?.manualGamesSpine) return false;
+  if (!isGameActivelyLive(game)) return false;
+  return resolveManualGamesSpineYoutubeVideoId(resolveManualGamesSpineWatchStreamUrl(game)) != null;
+}
+function tryLaunchManualGamesSpineWatchLive(game, dispatch) {
+  if (!manualGamesSpineGameHasWatchLive(game)) return false;
+  const streamUrl = resolveManualGamesSpineWatchStreamUrl(game);
+  const videoId = resolveManualGamesSpineYoutubeVideoId(streamUrl);
+  if (!videoId) return false;
+  const title = game.metadata?.manualGamesSpine?.eventName?.trim() || game.awayTeam || "Watch";
+  const tab = buildYoutubeWorkspaceTab(title, videoId, {
+    idPrefix: "manual-gs-yt",
+    autoplay: true
+  });
+  if (!tab) return false;
+  dispatch({ type: "open", tab });
+  return true;
+}
+
 // ../grarf/desktop/src/lib/watch/aflWatchLive.ts
 init_define_import_meta_env();
 init_isGameActivelyLive();
@@ -44599,6 +44802,9 @@ function isMlbGame2(game) {
   return game.league === "MLB" || /^espn-MLB-/i.test(game.id);
 }
 function handleWatchLiveClick(game, dispatch) {
+  if (tryLaunchManualGamesSpineWatchLive(game, dispatch)) {
+    return { action: "launched" };
+  }
   if (tryLaunchManualLeMans2026WatchLive(game)) {
     return { action: "launched" };
   }
@@ -50543,54 +50749,6 @@ var import_react46 = __toESM(require_react(), 1);
 init_define_import_meta_env();
 var import_react45 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/lib/youtubeUrl.ts
-init_define_import_meta_env();
-function youtubeVideoIdFromUrl(raw) {
-  try {
-    const u2 = new URL(raw);
-    const host = u2.hostname.replace(/^www\./, "");
-    if (host === "youtu.be") {
-      const id = u2.pathname.replace(/^\//, "").split("/")[0];
-      return id && /^[\w-]{6,32}$/.test(id) ? id : null;
-    }
-    if (host.includes("youtube.com")) {
-      const v2 = u2.searchParams.get("v");
-      if (v2 && /^[\w-]{6,32}$/.test(v2)) return v2;
-      const m2 = u2.pathname.match(/\/shorts\/([\w-]+)/);
-      if (m2?.[1]) return m2[1];
-    }
-  } catch {
-  }
-  return null;
-}
-function youtubeThumbnailUrl(videoId, quality = "mqdefault") {
-  return `https://i.ytimg.com/vi/${encodeURIComponent(videoId)}/${quality}.jpg`;
-}
-function youtubeWatchUrl(videoId) {
-  return `https://youtu.be/${encodeURIComponent(videoId)}`;
-}
-function logMlbDailyHighlightsSelection(location2, item, source) {
-  if (!item?.videoId) return;
-  console.log(
-    `[MLB DAILY HIGHLIGHTS]
-${location2} selected videoId=${item.videoId}
-${location2} source=${source}`
-  );
-}
-function buildYoutubeIframeEmbedSrc(videoId, opts) {
-  const params = new URLSearchParams({ rel: "0", modestbranding: "1" });
-  if (opts?.autoplay) {
-    params.set("autoplay", "1");
-    params.set("playsinline", "1");
-  }
-  const start = opts?.start;
-  if (start != null && start > 0) params.set("start", String(start));
-  return `https://www.youtube.com/embed/${encodeURIComponent(videoId)}?${params.toString()}`;
-}
-function resolveWorkspaceEmbedUrl(raw) {
-  return raw.trim();
-}
-
 // ../grarf/desktop/src/lib/workspace/measureEmbedHostBounds.ts
 init_define_import_meta_env();
 
@@ -51116,6 +51274,7 @@ function isMlbScoreboardGame(game) {
 }
 function gameHasHomeSpineWatchLive(game) {
   if (isDemoNhlVegasCarolinaGame(game)) return true;
+  if (manualGamesSpineGameHasWatchLive(game)) return true;
   if (!isGameActivelyLive(game)) return false;
   if (isMlbScoreboardGame(game)) return true;
   if (resolveLiveGameWatchTarget(game) != null) return true;
@@ -53003,9 +53162,10 @@ function convertEventToMlbGame(league, event, now) {
   };
 }
 function convertManualGamesSpineDocument(document2, now = /* @__PURE__ */ new Date(), operationalDateKey = getGamesSpineOperationalTodayKey(now)) {
-  if (!document2?.leagues?.length) return [];
+  const merged = mergeBundledGamesSpineManualDocument(document2 ?? { leagues: [] });
+  if (!merged.leagues.length) return [];
   const sections = [];
-  for (const league of document2.leagues) {
+  for (const league of merged.leagues) {
     const games = [];
     for (const event of league.games) {
       if (event.date !== operationalDateKey) continue;
@@ -58136,6 +58296,7 @@ init_define_import_meta_env();
 // ../grarf/desktop/src/lib/bestGameRightNow/resolveBestGameRightNowV1.ts
 init_define_import_meta_env();
 init_isGameActivelyLive();
+init_leagueImportanceOrder();
 
 // ../grarf/desktop/src/lib/bestGameRightNow/worldCupBestGameRanking.ts
 init_define_import_meta_env();
@@ -58159,11 +58320,17 @@ function resolveManualLeagueBaseImportance(manual) {
   if (manual.leaguePriority != null && Number.isFinite(manual.leaguePriority)) {
     return manual.leaguePriority;
   }
+  const manualLabelScore = resolveLeagueImportanceScore(manual.displayName) || resolveLeagueImportanceScore(manual.leagueKey) || resolveLeagueImportanceScore(manual.leagueLabel);
+  if (manualLabelScore > 0) return manualLabelScore;
   if (manual.insertAfterLeague?.trim()) {
-    return resolveLeagueImportanceV1ForLeagueKey(manual.insertAfterLeague);
+    const anchorScore = resolveLeagueImportanceV1ForLeagueKey(manual.insertAfterLeague);
+    if (anchorScore > 0) return anchorScore - 0.5;
+    return 0;
   }
   if (manual.insertBeforeLeague?.trim()) {
-    return resolveLeagueImportanceV1ForLeagueKey(manual.insertBeforeLeague);
+    const anchorScore = resolveLeagueImportanceV1ForLeagueKey(manual.insertBeforeLeague);
+    if (anchorScore > 0) return anchorScore + 0.5;
+    return 0;
   }
   return 0;
 }
@@ -58171,7 +58338,7 @@ function resolveGameImportanceForBestGame(game) {
   const manual = game.metadata?.manualGamesSpine;
   if (manual) {
     let score2 = resolveManualLeagueBaseImportance(manual);
-    if (manual.bestGamePriority != null && Number.isFinite(manual.bestGamePriority)) {
+    if (manual.bestGamePriority != null && Number.isFinite(manual.bestGamePriority) && manual.bestGamePriority > 0) {
       score2 += (11 - manual.bestGamePriority) * 50;
     }
     return score2;
@@ -72153,54 +72320,6 @@ function buildNewswireBrowserWorkspaceTab(story) {
     type: "website",
     title: truncateTitle(story.headline) || hostname,
     url,
-    closable: true
-  };
-}
-
-// ../grarf/desktop/src/lib/workspace/buildYoutubeWorkspaceTab.ts
-init_define_import_meta_env();
-function resolveYoutubeWorkspaceVideoId(raw) {
-  const trimmed = raw.trim();
-  if (/^[\w-]{6,32}$/.test(trimmed)) return trimmed;
-  return youtubeVideoIdFromUrl(trimmed);
-}
-async function clearWorkspaceEmbedsForYoutubeLaunch() {
-  await window.grarf?.workspaceEmbedClear?.("center");
-  await window.grarf?.workspaceEmbedClear?.("centerChild");
-}
-function buildYoutubeWorkspaceTab(title, videoIdOrUrl, options) {
-  const videoId = resolveYoutubeWorkspaceVideoId(videoIdOrUrl);
-  if (!videoId) {
-    console.warn("[YOUTUBE WORKSPACE] could not resolve videoId", { raw: videoIdOrUrl });
-    return null;
-  }
-  const youtubeUrl = youtubeWatchUrl(videoId);
-  const useIframeApi = options?.useIframeApi === true;
-  const embedUrl = buildYoutubeIframeEmbedSrc(videoId, {
-    autoplay: options?.autoplay,
-    start: options?.startSec
-  });
-  console.log(
-    useIframeApi ? `[YOUTUBE WORKSPACE]
-videoId=${videoId}
-youtubeUrl=${youtubeUrl}
-player=iframe-api
-host=https://www.youtube-nocookie.com` : `[YOUTUBE WORKSPACE]
-videoId=${videoId}
-youtubeUrl=${youtubeUrl}
-embedUrl=${embedUrl}
-loadedUrl=${embedUrl}`
-  );
-  const prefix = options?.idPrefix ?? "yt";
-  return {
-    id: `${prefix}-${videoId}-${Date.now()}`,
-    type: "youtube",
-    title,
-    url: embedUrl,
-    youtubeVideoId: videoId,
-    youtubeAutoplay: options?.autoplay,
-    youtubeStartSec: options?.startSec,
-    youtubeUseIframeApi: useIframeApi,
     closable: true
   };
 }
