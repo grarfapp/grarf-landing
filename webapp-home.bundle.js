@@ -52754,12 +52754,18 @@ var ROYAL_ASCOT_LEAGUE_LOGO_URL = "/league-logos/royal-ascot.png";
 
 // ../grarf/desktop/src/lib/gamesSpine/manualGamesSpineLeagueLogoUrls.ts
 var MANUAL_GAMES_SPINE_LEAGUE_LOGO_BY_KEY = {
-  "royal ascot": ROYAL_ASCOT_LEAGUE_LOGO_URL
+  "royal ascot": ROYAL_ASCOT_LEAGUE_LOGO_URL,
+  "royal-ascot": ROYAL_ASCOT_LEAGUE_LOGO_URL
 };
-function resolveManualGamesSpineLeagueLogoUrl(leagueLabel) {
-  const key2 = leagueLabel?.trim().toLowerCase();
-  if (!key2) return void 0;
-  return MANUAL_GAMES_SPINE_LEAGUE_LOGO_BY_KEY[key2];
+function resolveManualGamesSpineLeagueLogoUrl(league) {
+  const candidates = typeof league === "string" || league == null ? [league] : [league.displayName, league.league];
+  for (const candidate of candidates) {
+    const key2 = candidate?.trim().toLowerCase();
+    if (!key2) continue;
+    const logo = MANUAL_GAMES_SPINE_LEAGUE_LOGO_BY_KEY[key2];
+    if (logo) return logo;
+  }
+  return void 0;
 }
 
 // ../grarf/desktop/src/lib/gamesSpine/manual/resolveManualGamesSpineLeagueDisplayName.ts
@@ -52949,7 +52955,7 @@ function convertEventToMlbGame(league, event, now) {
   const channel = resolveManualGamesSpineChannelValue(event.channel, league.channel) ?? "";
   const channelUrl = resolveManualGamesSpineChannelValue(event.channelUrl, league.channelUrl);
   const streamProvider = resolveManualGamesSpineStreamProvider(channel, channelUrl);
-  const leagueLogoUrl = resolveManualGamesSpineLeagueLogoUrl(league.league);
+  const leagueLogoUrl = resolveManualGamesSpineLeagueLogoUrl(league);
   const leagueDisplayName = resolveManualGamesSpineLeagueDisplayName(league);
   const broadcasts = channel ? [channel] : [];
   return {
@@ -58500,7 +58506,10 @@ var HomeManualGamesSpineSection = (0, import_react85.memo)(function HomeManualGa
   const selectedDate = useCommandBriefingStore((state3) => state3.selectedDate);
   const manualRefreshMs = useManualGamesSpineLiveRefreshMs();
   const todayKey = getGamesSpineOperationalTodayKey();
-  const leagueLogoUrl = resolveManualGamesSpineLeagueLogoUrl(section.leagueKey);
+  const leagueLogoUrl = resolveManualGamesSpineLeagueLogoUrl({
+    league: section.leagueKey,
+    displayName: section.leagueLabel
+  });
   const [logoFailed, setLogoFailed] = (0, import_react85.useState)(false);
   const visibleGames = (0, import_react85.useMemo)(() => {
     if (selectedDate !== todayKey) return [];
@@ -79583,6 +79592,75 @@ function createBlankManualGamesSpineEvent() {
 
 // ../grarf/desktop/src/lib/gamesSpine/manual/validateGamesSpineManualDocument.ts
 init_define_import_meta_env();
+
+// ../grarf/desktop/src/lib/gamesSpine/manual/normalizeCanonicalManualImport.ts
+init_define_import_meta_env();
+function normalizeOptionalString(value) {
+  if (value == null) return null;
+  const trimmed = String(value).trim();
+  return trimmed || null;
+}
+function deriveDateFromIsoPrefix(value) {
+  if (!value) return null;
+  return value.match(/^(\d{4}-\d{2}-\d{2})/)?.[1] ?? null;
+}
+function normalizeCanonicalGame(raw) {
+  if (!raw || typeof raw !== "object" || Array.isArray(raw)) return null;
+  const row = raw;
+  const startTime = normalizeOptionalString(row.startTime);
+  const endTime = normalizeOptionalString(row.endTime);
+  const date = normalizeOptionalString(row.date) ?? deriveDateFromIsoPrefix(startTime);
+  const normalized = {
+    date: date ?? "",
+    eventName: normalizeOptionalString(row.eventName) ?? "",
+    startTime: startTime ?? "",
+    endTime: endTime ?? "",
+    channel: normalizeOptionalString(row.channel),
+    channelUrl: normalizeOptionalString(row.channelUrl)
+  };
+  if ("bestGamePriority" in row) {
+    normalized.bestGamePriority = row.bestGamePriority;
+  }
+  return normalized;
+}
+function normalizeCanonicalManualImportLeague(raw) {
+  if (!raw || typeof raw !== "object" || Array.isArray(raw)) return raw;
+  const row = raw;
+  const games = Array.isArray(row.games) ? row.games.map((game) => normalizeCanonicalGame(game)).filter((game) => game != null) : [];
+  const normalized = {
+    league: normalizeOptionalString(row.league) ?? "",
+    displayName: normalizeOptionalString(row.displayName),
+    insertAfterLeague: normalizeOptionalString(row.insertAfterLeague),
+    sourceTimeZone: normalizeOptionalString(row.sourceTimeZone),
+    channel: normalizeOptionalString(row.channel),
+    channelUrl: normalizeOptionalString(row.channelUrl),
+    games
+  };
+  const insertBeforeLeague = normalizeOptionalString(row.insertBeforeLeague);
+  if (insertBeforeLeague) {
+    normalized.insertBeforeLeague = insertBeforeLeague;
+  }
+  if ("leaguePriority" in row) {
+    normalized.leaguePriority = row.leaguePriority;
+  }
+  return normalized;
+}
+function normalizeCanonicalManualImportEditorPayload(raw) {
+  if (raw == null) return raw;
+  if (Array.isArray(raw)) {
+    return raw.map((entry) => normalizeCanonicalManualImportLeague(entry));
+  }
+  if (typeof raw === "object") {
+    const obj = raw;
+    if (Array.isArray(obj.leagues)) {
+      return { leagues: obj.leagues.map((entry) => normalizeCanonicalManualImportLeague(entry)) };
+    }
+    return normalizeCanonicalManualImportLeague(raw);
+  }
+  return raw;
+}
+
+// ../grarf/desktop/src/lib/gamesSpine/manual/validateGamesSpineManualDocument.ts
 function isNonEmptyString(value) {
   return typeof value === "string" && value.trim().length > 0;
 }
@@ -79594,7 +79672,8 @@ function parsePriority(value) {
 }
 function parseOptionalString(value) {
   if (value == null) return null;
-  return String(value);
+  const trimmed = String(value).trim();
+  return trimmed || null;
 }
 function validateInsertFields(row) {
   if ("insertAfterLeague" in row && row.insertAfterLeague != null && typeof row.insertAfterLeague !== "string") {
@@ -79651,13 +79730,15 @@ function validateEvent(raw, index, sourceTimeZone) {
   if (row.bestGamePriority != null && row.bestGamePriority !== "" && bestGamePriority == null) {
     return `games[${index}].bestGamePriority must be a number`;
   }
+  const channel = parseOptionalString(row.channel);
+  const channelUrl = parseOptionalString(row.channelUrl);
   return {
     date: row.date.trim(),
     eventName: row.eventName.trim(),
     startTime: row.startTime.trim(),
     endTime: row.endTime.trim(),
-    channel: row.channel == null ? null : String(row.channel),
-    channelUrl: row.channelUrl == null ? null : String(row.channelUrl),
+    channel,
+    channelUrl,
     bestGamePriority
   };
 }
@@ -79733,7 +79814,8 @@ function extractSingleLeague(raw) {
   return "JSON must be a league object";
 }
 function validateGamesSpineManualLeagueEditor(raw) {
-  const parsed = extractSingleLeague(raw);
+  const normalized = normalizeCanonicalManualImportEditorPayload(raw);
+  const parsed = extractSingleLeague(normalized);
   if (typeof parsed === "string") return { ok: false, error: parsed };
   return { ok: true, league: parsed };
 }
@@ -80556,12 +80638,12 @@ function GamesSpineAdminPanel() {
   return /* @__PURE__ */ (0, import_jsx_runtime178.jsx)("div", { className: "min-h-[60vh] bg-[#020404] text-[#d8e8e8]", children: /* @__PURE__ */ (0, import_jsx_runtime178.jsxs)("main", { className: "mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-8", children: [
     /* @__PURE__ */ (0, import_jsx_runtime178.jsxs)("div", { children: [
       /* @__PURE__ */ (0, import_jsx_runtime178.jsx)("h1", { className: "font-sans text-xl", children: "Games Spine Admin" }),
-      /* @__PURE__ */ (0, import_jsx_runtime178.jsx)("p", { className: "mt-2 max-w-3xl text-[11px] leading-relaxed text-textdim", children: "Import or create leagues once from JSON. Existing leagues are edited visually in the Saved Leagues browser \u2014 that editor is the source of truth." })
+      /* @__PURE__ */ (0, import_jsx_runtime178.jsx)("p", { className: "mt-2 max-w-3xl text-[11px] leading-relaxed text-textdim", children: "Paste ChatGPT-generated JSON in the canonical manual-import format. The editor normalizes and imports it \u2014 no code changes required. Existing leagues are edited visually in Saved Leagues below." })
     ] }),
     /* @__PURE__ */ (0, import_jsx_runtime178.jsxs)("section", { className: "flex flex-col gap-3 rounded border border-dashed border-line/60 bg-[#071012] p-4", children: [
       /* @__PURE__ */ (0, import_jsx_runtime178.jsxs)("div", { children: [
         /* @__PURE__ */ (0, import_jsx_runtime178.jsx)("div", { className: "text-[10px] tracking-[0.18em] text-textdim", children: "IMPORT / CREATE ONLY" }),
-        /* @__PURE__ */ (0, import_jsx_runtime178.jsx)("p", { className: "mt-1 text-[11px] leading-relaxed text-textdim", children: "JSON is for importing a new league or bulk-pasting events. One league can span many dates \u2014 paste June 19 and June 20 events under the same league name. Importing into an existing league offers Append Events or Replace League." })
+        /* @__PURE__ */ (0, import_jsx_runtime178.jsx)("p", { className: "mt-1 text-[11px] leading-relaxed text-textdim", children: "One league object per paste. Fields: league, displayName, insertAfterLeague, sourceTimeZone, channel, channelUrl, games[]. Events can span multiple dates under the same league key. Importing into an existing league offers Append Events or Replace League." })
       ] }),
       /* @__PURE__ */ (0, import_jsx_runtime178.jsxs)("label", { ref: importRef, className: "flex flex-col gap-2", children: [
         /* @__PURE__ */ (0, import_jsx_runtime178.jsx)("span", { className: "text-[10px] tracking-[0.14em] text-[#5f7a7a]", children: "League import JSON" }),
@@ -80572,7 +80654,7 @@ function GamesSpineAdminPanel() {
             onChange: (event) => setImportJsonText(event.target.value),
             spellCheck: false,
             disabled: editingLeagueKey !== null,
-            placeholder: 'Paste one league object, e.g. { "league": "royal-ascot", "displayName": "Royal Ascot", "insertAfterLeague": "WNBA", "games": [...] }',
+            placeholder: 'Paste canonical league JSON \u2014 { "league": "wec-spa-24h", "displayName": "24 Hours of Spa", "insertAfterLeague": "F1", "sourceTimeZone": "Europe/Brussels", "channel": "", "channelUrl": "", "games": [{ "date": "2026-06-20", "eventName": "Race", "startTime": "2026-06-20T16:00:00", "endTime": "2026-06-20T18:00:00", "bestGamePriority": 0 }] }',
             className: "min-h-[180px] w-full rounded border border-line/60 bg-[#020404] px-3 py-3 font-mono text-[11px] leading-relaxed text-[#d8e8e8] outline-none focus:border-greensys/50 disabled:opacity-50"
           }
         )
