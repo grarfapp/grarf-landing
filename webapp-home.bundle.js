@@ -51572,6 +51572,84 @@ function resolveManualGamesSpineLeagueLogoUrl(leagueLabel) {
 
 // ../grarf/desktop/src/lib/gamesSpine/manual/manualGamesSpineUtils.ts
 init_define_import_meta_env();
+var WALL_CLOCK_RE = /^(\d{4})-(\d{2})-(\d{2})[T ](\d{2}):(\d{2})(?::(\d{2}))?(?:\.\d{1,3})?(?:Z|[+-]\d{2}:?\d{2})?$/;
+function isValidIanaTimeZone(timeZone) {
+  const trimmed = timeZone.trim();
+  if (!trimmed) return false;
+  try {
+    Intl.DateTimeFormat(void 0, { timeZone: trimmed });
+    return true;
+  } catch {
+    return false;
+  }
+}
+function calendarPartsInTimeZone3(ms2, timeZone) {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hourCycle: "h23"
+  }).formatToParts(new Date(ms2));
+  return {
+    year: Number(parts.find((part) => part.type === "year")?.value),
+    month: Number(parts.find((part) => part.type === "month")?.value),
+    day: Number(parts.find((part) => part.type === "day")?.value),
+    hour: Number(parts.find((part) => part.type === "hour")?.value),
+    minute: Number(parts.find((part) => part.type === "minute")?.value),
+    second: Number(parts.find((part) => part.type === "second")?.value)
+  };
+}
+function parseWallClockInTimeZone(dateTime, timeZone) {
+  const match = dateTime.trim().match(WALL_CLOCK_RE);
+  if (!match) return null;
+  const target = {
+    year: Number(match[1]),
+    month: Number(match[2]),
+    day: Number(match[3]),
+    hour: Number(match[4]),
+    minute: Number(match[5]),
+    second: Number(match[6] ?? 0)
+  };
+  let ms2 = Date.UTC(target.year, target.month - 1, target.day, target.hour, target.minute, target.second);
+  for (let attempt = 0; attempt < 6; attempt += 1) {
+    const parts = calendarPartsInTimeZone3(ms2, timeZone);
+    if (parts.year === target.year && parts.month === target.month && parts.day === target.day && parts.hour === target.hour && parts.minute === target.minute && parts.second === target.second) {
+      return ms2;
+    }
+    const targetMs = Date.UTC(
+      target.year,
+      target.month - 1,
+      target.day,
+      target.hour,
+      target.minute,
+      target.second
+    );
+    const actualMs = Date.UTC(
+      parts.year,
+      parts.month - 1,
+      parts.day,
+      parts.hour,
+      parts.minute,
+      parts.second
+    );
+    ms2 += targetMs - actualMs;
+  }
+  return null;
+}
+function parseManualGamesSpineEventTimeMs(value, sourceTimeZone) {
+  const trimmed = value.trim();
+  if (!trimmed) return null;
+  const zone = sourceTimeZone?.trim();
+  if (zone) {
+    return parseWallClockInTimeZone(trimmed, zone);
+  }
+  const ms2 = Date.parse(trimmed);
+  return Number.isFinite(ms2) ? ms2 : null;
+}
 function resolveManualGamesSpineStatus(nowMs, startTimeMs, endTimeMs) {
   if (nowMs < startTimeMs) return "scheduled";
   if (nowMs < endTimeMs) return "live";
@@ -51644,8 +51722,11 @@ function formatManualGamesSpineDisplayTime(startTimeMs) {
 function refreshManualGamesSpineGameIfNeeded(game, now) {
   const manual = game.metadata?.manualGamesSpine;
   if (!manual) return game;
-  const startTimeMs = Date.parse(manual.startTimeIso);
-  const endTimeMs = Date.parse(manual.endTimeIso);
+  const startTimeMs = parseManualGamesSpineEventTimeMs(
+    manual.startTimeIso,
+    manual.sourceTimeZone
+  );
+  const endTimeMs = parseManualGamesSpineEventTimeMs(manual.endTimeIso, manual.sourceTimeZone);
   if (!Number.isFinite(startTimeMs) || !Number.isFinite(endTimeMs)) return game;
   const nowMs = now.getTime();
   const status = resolveManualGamesSpineStatus(nowMs, startTimeMs, endTimeMs);
@@ -51660,8 +51741,8 @@ function refreshManualGamesSpineGameIfNeeded(game, now) {
 
 // ../grarf/desktop/src/lib/gamesSpine/manual/convertManualGamesSpineDocument.ts
 function convertEventToMlbGame(league, event, now) {
-  const startTimeMs = Date.parse(event.startTime);
-  const endTimeMs = Date.parse(event.endTime);
+  const startTimeMs = parseManualGamesSpineEventTimeMs(event.startTime, league.sourceTimeZone);
+  const endTimeMs = parseManualGamesSpineEventTimeMs(event.endTime, league.sourceTimeZone);
   if (!Number.isFinite(startTimeMs) || !Number.isFinite(endTimeMs)) return null;
   const nowMs = now.getTime();
   const status = resolveManualGamesSpineStatus(nowMs, startTimeMs, endTimeMs);
@@ -51705,6 +51786,7 @@ function convertEventToMlbGame(league, event, now) {
         date: event.date,
         startTimeIso: event.startTime,
         endTimeIso: event.endTime,
+        sourceTimeZone: league.sourceTimeZone?.trim() ? league.sourceTimeZone.trim() : null,
         channel,
         channelUrl
       }
@@ -78131,7 +78213,7 @@ init_define_import_meta_env();
 // ../grarf/desktop/src/lib/gamesSpine/manual/gamesSpineManualLeagueDocument.ts
 init_define_import_meta_env();
 function manualGamesSpineEventUniquenessKey(event) {
-  return `${event.date.trim()}::${event.eventName.trim().toLowerCase()}`;
+  return `${event.date.trim()}::${event.eventName.trim().toLowerCase()}::${event.startTime.trim()}`;
 }
 function mergeManualGamesSpineLeagueMetadata(existing, incoming) {
   const insertAfterLeague = incoming.insertAfterLeague ?? existing.insertAfterLeague ?? null;
@@ -78143,7 +78225,8 @@ function mergeManualGamesSpineLeagueMetadata(existing, incoming) {
     insertAfterLeague,
     insertBeforeLeague,
     channel: incoming.channel ?? existing.channel ?? null,
-    channelUrl: incoming.channelUrl ?? existing.channelUrl ?? null
+    channelUrl: incoming.channelUrl ?? existing.channelUrl ?? null,
+    sourceTimeZone: incoming.sourceTimeZone?.trim() ? incoming.sourceTimeZone.trim() : existing.sourceTimeZone?.trim() ? existing.sourceTimeZone.trim() : null
   };
 }
 function mergeManualGamesSpineLeagueMetadataForAppend(existing, incoming) {
@@ -78187,6 +78270,9 @@ function sanitizeManualGamesSpineLeagueForStorage(league) {
   };
   if (!usesNameBasedPlacement && league.leaguePriority != null && Number.isFinite(league.leaguePriority)) {
     sanitized.leaguePriority = league.leaguePriority;
+  }
+  if (league.sourceTimeZone?.trim()) {
+    sanitized.sourceTimeZone = league.sourceTimeZone.trim();
   }
   return sanitized;
 }
@@ -78402,7 +78488,7 @@ function validateNoDuplicateEvents(games) {
   }
   return null;
 }
-function validateEvent(raw, index) {
+function validateEvent(raw, index, sourceTimeZone) {
   if (!raw || typeof raw !== "object" || Array.isArray(raw)) {
     return `games[${index}] must be an object`;
   }
@@ -78411,13 +78497,15 @@ function validateEvent(raw, index) {
   if (!isNonEmptyString(row.eventName)) return `games[${index}].eventName is required`;
   if (!isNonEmptyString(row.startTime)) return `games[${index}].startTime is required`;
   if (!isNonEmptyString(row.endTime)) return `games[${index}].endTime is required`;
-  if (Number.isNaN(Date.parse(row.startTime))) {
-    return `games[${index}].startTime must be a valid ISO datetime`;
+  const startTimeMs = parseManualGamesSpineEventTimeMs(String(row.startTime), sourceTimeZone);
+  if (startTimeMs == null) {
+    return sourceTimeZone ? `games[${index}].startTime must be a valid datetime in ${sourceTimeZone}` : `games[${index}].startTime must be a valid ISO datetime`;
   }
-  if (Number.isNaN(Date.parse(row.endTime))) {
-    return `games[${index}].endTime must be a valid ISO datetime`;
+  const endTimeMs = parseManualGamesSpineEventTimeMs(String(row.endTime), sourceTimeZone);
+  if (endTimeMs == null) {
+    return sourceTimeZone ? `games[${index}].endTime must be a valid datetime in ${sourceTimeZone}` : `games[${index}].endTime must be a valid ISO datetime`;
   }
-  if (Date.parse(row.endTime) < Date.parse(row.startTime)) {
+  if (endTimeMs < startTimeMs) {
     return `games[${index}].endTime must be after startTime`;
   }
   if ("channel" in row && row.channel != null && typeof row.channel !== "string") {
@@ -78456,6 +78544,13 @@ function validateLeague(raw) {
   if ("channelUrl" in row && row.channelUrl != null && typeof row.channelUrl !== "string") {
     return "channelUrl must be a string or null";
   }
+  if ("sourceTimeZone" in row && row.sourceTimeZone != null && typeof row.sourceTimeZone !== "string") {
+    return "sourceTimeZone must be a string or null";
+  }
+  const sourceTimeZone = row.sourceTimeZone == null || String(row.sourceTimeZone).trim() === "" ? null : String(row.sourceTimeZone).trim();
+  if (sourceTimeZone && !isValidIanaTimeZone(sourceTimeZone)) {
+    return "sourceTimeZone must be a valid IANA timezone identifier";
+  }
   const insertError = validateInsertFields(row);
   if (insertError) return insertError;
   if (!Array.isArray(row.games) || row.games.length === 0) {
@@ -78463,7 +78558,7 @@ function validateLeague(raw) {
   }
   const games = [];
   for (let i2 = 0; i2 < row.games.length; i2 += 1) {
-    const parsed = validateEvent(row.games[i2], i2);
+    const parsed = validateEvent(row.games[i2], i2, sourceTimeZone);
     if (typeof parsed === "string") return parsed;
     games.push(parsed);
   }
@@ -78474,6 +78569,7 @@ function validateLeague(raw) {
   const usesNameBasedPlacement = Boolean(insertAfterLeague || insertBeforeLeague);
   return sanitizeManualGamesSpineLeagueForStorage({
     league: row.league.trim(),
+    ...sourceTimeZone ? { sourceTimeZone } : {},
     ...usesNameBasedPlacement || leaguePriority == null ? {} : { leaguePriority },
     insertAfterLeague,
     insertBeforeLeague,
