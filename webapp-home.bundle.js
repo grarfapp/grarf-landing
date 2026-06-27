@@ -80682,6 +80682,13 @@ function SportscapeEditorialAdminContent() {
 function SportscapeEditorialAdminPage() {
   const [activeTab, setActiveTab] = (0, import_react176.useState)("sportscape");
   (0, import_react176.useEffect)(() => {
+    const previousTitle = document.title;
+    document.title = "Admin GRARF";
+    return () => {
+      document.title = previousTitle;
+    };
+  }, []);
+  (0, import_react176.useEffect)(() => {
     const root = document.getElementById("grarf-web-root");
     if (!root) return;
     const previousClassName = root.className;
