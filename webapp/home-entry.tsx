@@ -35,6 +35,7 @@ const appShellRouteElements = (
     <Route path="whiparound" element={<HomePage />} />
     <Route path="newswire" element={<HomePage />} />
     <Route path="livetracker" element={<HomePage />} />
+    <Route path="highlightstv" element={<HomePage />} />
     {leagueDirectoryUniqueRoutes().map((item) => (
       <Route
         key={item.route}

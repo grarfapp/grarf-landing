@@ -35,6 +35,7 @@ function isElectronRenderer(): boolean {
 }
 
 const LS_EDITORIAL = "grarf-web-editorial-bundle";
+const LS_FEATURED_GAMES = "grarf-featured-games-v1";
 
 type WebEditorialBundle = {
   narratives: Record<string, { manualNarrative?: string }>;
@@ -45,6 +46,27 @@ type WebEditorialBundle = {
 
 function emptyWebEditorialBundle(): WebEditorialBundle {
   return { narratives: {}, featuredGames: {}, leagueContexts: {}, generatedSummaries: {} };
+}
+
+function readFeaturedGamesFromBrowserStorage(): WebEditorialBundle["featuredGames"] {
+  const raw = readJson<Record<string, { briefingPriority?: number; featuredRank?: number }> | null>(
+    LS_FEATURED_GAMES,
+    null
+  );
+  if (!raw || typeof raw !== "object") return {};
+  const out: WebEditorialBundle["featuredGames"] = {};
+  for (const [key, row] of Object.entries(raw)) {
+    const rank = row?.briefingPriority ?? row?.featuredRank;
+    if (typeof rank !== "number" || !Number.isFinite(rank) || rank < 1 || rank > 10) continue;
+    out[key] = { briefingPriority: Math.round(rank) };
+  }
+  return out;
+}
+
+function writeFeaturedGamesToBrowserStorage(
+  featuredGames: WebEditorialBundle["featuredGames"]
+): void {
+  writeJson(LS_FEATURED_GAMES, featuredGames);
 }
 
 function readWebEditorialBundle(): WebEditorialBundle {
@@ -79,8 +101,12 @@ function readWebEditorialBundle(): WebEditorialBundle {
     }
   }
 
-  // featuredGames are global — loaded from Sportscape Editorial Worker, not localStorage.
-  return { narratives, featuredGames: {}, leagueContexts, generatedSummaries };
+  return {
+    narratives,
+    featuredGames: readFeaturedGamesFromBrowserStorage(),
+    leagueContexts,
+    generatedSummaries,
+  };
 }
 
 function writeWebEditorialBundle(bundle: WebEditorialBundle): void {
@@ -529,13 +555,15 @@ function installGrarfBridge(): void {
       return { ok: true as const, bundle: next };
     },
     editorialSaveFeaturedRank: async (payload) => {
-      // Deprecated: featuredGames persist via Sportscape Editorial Worker (editorialStore).
-      const bundle = readWebEditorialBundle();
-      const featuredGames = { ...bundle.featuredGames };
+      const featuredGames = { ...readFeaturedGamesFromBrowserStorage() };
       const rank = payload.briefingPriority ?? payload.featuredRank;
       if (rank == null || !Number.isFinite(rank)) delete featuredGames[payload.gameKey];
       else featuredGames[payload.gameKey] = { briefingPriority: Math.round(rank) };
-      return { ok: true as const, bundle: { ...bundle, featuredGames } };
+      writeFeaturedGamesToBrowserStorage(featuredGames);
+      return {
+        ok: true as const,
+        bundle: { ...readWebEditorialBundle(), featuredGames },
+      };
     },
     editorialSaveLeagueContext: async (payload) => {
       const bundle = readWebEditorialBundle();
