@@ -33,11 +33,11 @@ var __publicField = (obj, key2, value) => __defNormalProp(obj, typeof key2 !== "
 var define_import_meta_env_default;
 var init_define_import_meta_env = __esm({
   "<define:import.meta.env>"() {
-    define_import_meta_env_default = { DEV: false, PROD: true, MODE: "production", VITE_OPERATIONAL_INGEST_PROVIDER: "grarf_cloud", VITE_GRARF_OPERATIONAL_INGEST_URL: "https://grarf-operational-service.grarf.workers.dev", VITE_SPORTSCAPE_EDITORIAL_API_URL: "https://grarf-operational-service.grarf.workers.dev/sportscape-editorial", VITE_TRACE_FINAL_LIVE_FIELDS: "", VITE_ENABLE_ESPN_RESOLVER: "false", VITE_POSTHOG_KEY: "", VITE_POSTHOG_HOST: "" };
+    define_import_meta_env_default = { DEV: false, PROD: true, MODE: "production", VITE_OPERATIONAL_INGEST_PROVIDER: "grarf_cloud", VITE_GRARF_OPERATIONAL_INGEST_URL: "https://grarf-operational-service.grarf.workers.dev", VITE_SPORTSCAPE_EDITORIAL_API_URL: "https://grarf-operational-service.grarf.workers.dev/sportscape-editorial", VITE_TRACE_FINAL_LIVE_FIELDS: "", VITE_ENABLE_ESPN_RESOLVER: "false", VITE_POSTHOG_KEY: "phc_AGQGsddTcRefiXfaR634tAiCEvfkyWk5mtKR4qzQbcxP", VITE_POSTHOG_HOST: "https://us.i.posthog.com" };
   }
 });
 
-// ../grarf/desktop/src/lib/platform/isGrarfWebRenderer.ts
+// src/lib/platform/isGrarfWebRenderer.ts
 function isGrarfElectronRenderer() {
   return typeof window !== "undefined" && window.GRARF_ELECTRON === true;
 }
@@ -46,12 +46,12 @@ function isGrarfWebRenderer() {
   return typeof window !== "undefined" && window.GRARF_WEB_CONFIG != null;
 }
 var init_isGrarfWebRenderer = __esm({
-  "../grarf/desktop/src/lib/platform/isGrarfWebRenderer.ts"() {
+  "src/lib/platform/isGrarfWebRenderer.ts"() {
     init_define_import_meta_env();
   }
 });
 
-// ../grarf/desktop/src/config/operationalIngestConfig.ts
+// src/config/operationalIngestConfig.ts
 function resolveWebOperationalIngestUrl() {
   if (typeof window === "undefined") return null;
   return window.GRARF_WEB_CONFIG?.operationalIngestUrl?.trim() || null;
@@ -83,15 +83,15 @@ function usesLocalRetainedFinalsFallback() {
   return getOperationalIngestConfig().provider === "espn_local_ipc";
 }
 var init_operationalIngestConfig = __esm({
-  "../grarf/desktop/src/config/operationalIngestConfig.ts"() {
+  "src/config/operationalIngestConfig.ts"() {
     init_define_import_meta_env();
     init_isGrarfWebRenderer();
   }
 });
 
-// node_modules/zustand/vanilla.js
+// ../../grarf-landing/node_modules/zustand/vanilla.js
 var require_vanilla = __commonJS({
-  "node_modules/zustand/vanilla.js"(exports) {
+  "../../grarf-landing/node_modules/zustand/vanilla.js"(exports) {
     "use strict";
     init_define_import_meta_env();
     var createStoreImpl = (createState) => {
@@ -120,9 +120,9 @@ var require_vanilla = __commonJS({
   }
 });
 
-// node_modules/react/cjs/react.production.js
+// ../../grarf-landing/node_modules/react/cjs/react.production.js
 var require_react_production = __commonJS({
-  "node_modules/react/cjs/react.production.js"(exports) {
+  "../../grarf-landing/node_modules/react/cjs/react.production.js"(exports) {
     "use strict";
     init_define_import_meta_env();
     var REACT_ELEMENT_TYPE = Symbol.for("react.transitional.element");
@@ -562,9 +562,9 @@ var require_react_production = __commonJS({
   }
 });
 
-// node_modules/react/index.js
+// ../../grarf-landing/node_modules/react/index.js
 var require_react = __commonJS({
-  "node_modules/react/index.js"(exports, module) {
+  "../../grarf-landing/node_modules/react/index.js"(exports, module) {
     "use strict";
     init_define_import_meta_env();
     if (true) {
@@ -575,9 +575,9 @@ var require_react = __commonJS({
   }
 });
 
-// node_modules/zustand/react.js
+// ../../grarf-landing/node_modules/zustand/react.js
 var require_react2 = __commonJS({
-  "node_modules/zustand/react.js"(exports) {
+  "../../grarf-landing/node_modules/zustand/react.js"(exports) {
     "use strict";
     init_define_import_meta_env();
     var React12 = require_react();
@@ -604,9 +604,9 @@ var require_react2 = __commonJS({
   }
 });
 
-// node_modules/zustand/index.js
+// ../../grarf-landing/node_modules/zustand/index.js
 var require_zustand = __commonJS({
-  "node_modules/zustand/index.js"(exports) {
+  "../../grarf-landing/node_modules/zustand/index.js"(exports) {
     "use strict";
     init_define_import_meta_env();
     var vanilla = require_vanilla();
@@ -630,9 +630,9 @@ var require_zustand = __commonJS({
   }
 });
 
-// node_modules/scheduler/cjs/scheduler.production.js
+// ../../grarf-landing/node_modules/scheduler/cjs/scheduler.production.js
 var require_scheduler_production = __commonJS({
-  "node_modules/scheduler/cjs/scheduler.production.js"(exports) {
+  "../../grarf-landing/node_modules/scheduler/cjs/scheduler.production.js"(exports) {
     "use strict";
     init_define_import_meta_env();
     function push2(heap, node) {
@@ -904,9 +904,9 @@ var require_scheduler_production = __commonJS({
   }
 });
 
-// node_modules/scheduler/index.js
+// ../../grarf-landing/node_modules/scheduler/index.js
 var require_scheduler = __commonJS({
-  "node_modules/scheduler/index.js"(exports, module) {
+  "../../grarf-landing/node_modules/scheduler/index.js"(exports, module) {
     "use strict";
     init_define_import_meta_env();
     if (true) {
@@ -917,9 +917,9 @@ var require_scheduler = __commonJS({
   }
 });
 
-// node_modules/react-dom/cjs/react-dom.production.js
+// ../../grarf-landing/node_modules/react-dom/cjs/react-dom.production.js
 var require_react_dom_production = __commonJS({
-  "node_modules/react-dom/cjs/react-dom.production.js"(exports) {
+  "../../grarf-landing/node_modules/react-dom/cjs/react-dom.production.js"(exports) {
     "use strict";
     init_define_import_meta_env();
     var React12 = require_react();
@@ -1067,9 +1067,9 @@ var require_react_dom_production = __commonJS({
   }
 });
 
-// node_modules/react-dom/index.js
+// ../../grarf-landing/node_modules/react-dom/index.js
 var require_react_dom = __commonJS({
-  "node_modules/react-dom/index.js"(exports, module) {
+  "../../grarf-landing/node_modules/react-dom/index.js"(exports, module) {
     "use strict";
     init_define_import_meta_env();
     function checkDCE() {
@@ -1094,9 +1094,9 @@ var require_react_dom = __commonJS({
   }
 });
 
-// node_modules/react-dom/cjs/react-dom-client.production.js
+// ../../grarf-landing/node_modules/react-dom/cjs/react-dom-client.production.js
 var require_react_dom_client_production = __commonJS({
-  "node_modules/react-dom/cjs/react-dom-client.production.js"(exports) {
+  "../../grarf-landing/node_modules/react-dom/cjs/react-dom-client.production.js"(exports) {
     "use strict";
     init_define_import_meta_env();
     var Scheduler = require_scheduler();
@@ -12840,9 +12840,9 @@ var require_react_dom_client_production = __commonJS({
   }
 });
 
-// node_modules/react-dom/client.js
+// ../../grarf-landing/node_modules/react-dom/client.js
 var require_client = __commonJS({
-  "node_modules/react-dom/client.js"(exports, module) {
+  "../../grarf-landing/node_modules/react-dom/client.js"(exports, module) {
     "use strict";
     init_define_import_meta_env();
     function checkDCE() {
@@ -12867,9 +12867,9 @@ var require_client = __commonJS({
   }
 });
 
-// node_modules/react/cjs/react-jsx-runtime.production.js
+// ../../grarf-landing/node_modules/react/cjs/react-jsx-runtime.production.js
 var require_react_jsx_runtime_production = __commonJS({
-  "node_modules/react/cjs/react-jsx-runtime.production.js"(exports) {
+  "../../grarf-landing/node_modules/react/cjs/react-jsx-runtime.production.js"(exports) {
     "use strict";
     init_define_import_meta_env();
     var REACT_ELEMENT_TYPE = Symbol.for("react.transitional.element");
@@ -12898,9 +12898,9 @@ var require_react_jsx_runtime_production = __commonJS({
   }
 });
 
-// node_modules/react/jsx-runtime.js
+// ../../grarf-landing/node_modules/react/jsx-runtime.js
 var require_jsx_runtime = __commonJS({
-  "node_modules/react/jsx-runtime.js"(exports, module) {
+  "../../grarf-landing/node_modules/react/jsx-runtime.js"(exports, module) {
     "use strict";
     init_define_import_meta_env();
     if (true) {
@@ -12911,7 +12911,7 @@ var require_jsx_runtime = __commonJS({
   }
 });
 
-// ../grarf/desktop/src/lib/youtube/resolveYoutubeChannelRssUrl.ts
+// src/lib/youtube/resolveYoutubeChannelRssUrl.ts
 function resolveYoutubeChannelRssPath(channelId) {
   return `/clips/youtube-rss/${encodeURIComponent(channelId)}`;
 }
@@ -12927,23 +12927,23 @@ function resolveYoutubeChannelRssFetchUrls(channelId) {
   return [sameOrigin];
 }
 var init_resolveYoutubeChannelRssUrl = __esm({
-  "../grarf/desktop/src/lib/youtube/resolveYoutubeChannelRssUrl.ts"() {
+  "src/lib/youtube/resolveYoutubeChannelRssUrl.ts"() {
     init_define_import_meta_env();
     init_operationalIngestConfig();
     init_isGrarfWebRenderer();
   }
 });
 
-// ../grarf/desktop/src/lib/social/socialSignalBodyTypography.css
+// src/lib/social/socialSignalBodyTypography.css
 var require_socialSignalBodyTypography = __commonJS({
-  "../grarf/desktop/src/lib/social/socialSignalBodyTypography.css"(exports, module) {
+  "src/lib/social/socialSignalBodyTypography.css"(exports, module) {
     module.exports = {};
   }
 });
 
-// node_modules/zustand/middleware.js
+// ../../grarf-landing/node_modules/zustand/middleware.js
 var require_middleware = __commonJS({
-  "node_modules/zustand/middleware.js"(exports) {
+  "../../grarf-landing/node_modules/zustand/middleware.js"(exports) {
     "use strict";
     init_define_import_meta_env();
     var reduxImpl = (reducer, initial) => (set, _get, api) => {
@@ -13438,10 +13438,10 @@ var require_middleware = __commonJS({
   }
 });
 
-// ../grarf/desktop/src/data/youtubeClipSources.ts
+// src/data/youtubeClipSources.ts
 var YOUTUBE_CLIP_SOURCES, MLB_PAGE_CLIP_SOURCES;
 var init_youtubeClipSources = __esm({
-  "../grarf/desktop/src/data/youtubeClipSources.ts"() {
+  "src/data/youtubeClipSources.ts"() {
     init_define_import_meta_env();
     YOUTUBE_CLIP_SOURCES = [
       { league: "MLB", channelId: "UCoLrcjPV5PbUrUyXq5mjc_A" },
@@ -13459,7 +13459,7 @@ var init_youtubeClipSources = __esm({
   }
 });
 
-// ../grarf/desktop/src/lib/youtubeClipsApi.ts
+// src/lib/youtubeClipsApi.ts
 function decodeXmlEntities2(s2) {
   return s2.replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&apos;/g, "'").replace(/&amp;/g, "&");
 }
@@ -13641,14 +13641,14 @@ async function fetchYoutubeRssUploads(sources = YOUTUBE_CLIP_SOURCES, onTrace) {
   return fetchRssViaSharedIngest(sources, onTrace);
 }
 var init_youtubeClipsApi = __esm({
-  "../grarf/desktop/src/lib/youtubeClipsApi.ts"() {
+  "src/lib/youtubeClipsApi.ts"() {
     init_define_import_meta_env();
     init_youtubeClipSources();
     init_resolveYoutubeChannelRssUrl();
   }
 });
 
-// ../grarf/desktop/src/services/operationalShortMedia/tierRules.ts
+// src/services/operationalShortMedia/tierRules.ts
 function haystack(c2) {
   return `${c2.title} ${c2.descriptionSnippet ?? ""}`;
 }
@@ -13711,7 +13711,7 @@ function operationalScoreForClip(c2, tier) {
 }
 var OPERATIONAL_SHORT_FORM_MAX_SEC, OPERATIONAL_HIGHLIGHT_MAX_SEC, HIGHLIGHT_RE, OPERATIONAL_RE, SHORT_FORM_TITLE_RE;
 var init_tierRules = __esm({
-  "../grarf/desktop/src/services/operationalShortMedia/tierRules.ts"() {
+  "src/services/operationalShortMedia/tierRules.ts"() {
     init_define_import_meta_env();
     init_youtubeClipsApi();
     OPERATIONAL_SHORT_FORM_MAX_SEC = 300;
@@ -13722,7 +13722,7 @@ var init_tierRules = __esm({
   }
 });
 
-// ../grarf/desktop/src/services/operationalShortMedia/OperationalShortMediaAggregator.ts
+// src/services/operationalShortMedia/OperationalShortMediaAggregator.ts
 function sortByScoreThenRecency(a2, b2) {
   if (b2.operationalScore !== a2.operationalScore) {
     return b2.operationalScore - a2.operationalScore;
@@ -13731,7 +13731,7 @@ function sortByScoreThenRecency(a2, b2) {
 }
 var DEFAULT_MAX_INVENTORY, TIER_ORDER, OperationalShortMediaAggregator;
 var init_OperationalShortMediaAggregator = __esm({
-  "../grarf/desktop/src/services/operationalShortMedia/OperationalShortMediaAggregator.ts"() {
+  "src/services/operationalShortMedia/OperationalShortMediaAggregator.ts"() {
     init_define_import_meta_env();
     init_tierRules();
     DEFAULT_MAX_INVENTORY = 32;
@@ -13800,7 +13800,7 @@ var init_OperationalShortMediaAggregator = __esm({
   }
 });
 
-// ../grarf/desktop/src/services/operationalShortMedia/diagnostics/classifyRejections.ts
+// src/services/operationalShortMedia/diagnostics/classifyRejections.ts
 function haystack2(c2) {
   return `${c2.title} ${c2.descriptionSnippet ?? ""}`.toLowerCase();
 }
@@ -13881,7 +13881,7 @@ function countRejectionReasons(records) {
 }
 var EXCLUDED_KEYWORD_RE;
 var init_classifyRejections = __esm({
-  "../grarf/desktop/src/services/operationalShortMedia/diagnostics/classifyRejections.ts"() {
+  "src/services/operationalShortMedia/diagnostics/classifyRejections.ts"() {
     init_define_import_meta_env();
     init_youtubeClipsApi();
     init_tierRules();
@@ -13889,7 +13889,7 @@ var init_classifyRejections = __esm({
   }
 });
 
-// ../grarf/desktop/src/services/operationalShortMedia/diagnostics/collectPipelineDiagnostics.ts
+// src/services/operationalShortMedia/diagnostics/collectPipelineDiagnostics.ts
 function collectOperationalShortMediaPipelineDiagnostics(input) {
   const polledAt = input.polledAt ?? (/* @__PURE__ */ new Date()).toISOString();
   const rawRows = input.rawFetchedUploads ?? input.pollUploads;
@@ -13931,14 +13931,14 @@ function collectOperationalShortMediaPipelineDiagnostics(input) {
 }
 var MAX_REJECTION_SAMPLES;
 var init_collectPipelineDiagnostics = __esm({
-  "../grarf/desktop/src/services/operationalShortMedia/diagnostics/collectPipelineDiagnostics.ts"() {
+  "src/services/operationalShortMedia/diagnostics/collectPipelineDiagnostics.ts"() {
     init_define_import_meta_env();
     init_classifyRejections();
     MAX_REJECTION_SAMPLES = 24;
   }
 });
 
-// ../grarf/desktop/src/services/operationalShortMedia/diagnostics/diagnosticsStore.ts
+// src/services/operationalShortMedia/diagnostics/diagnosticsStore.ts
 function publishOperationalShortMediaDiagnostics(snapshot) {
   if (snapshot.pollUploads > 0 || snapshot.renderInventoryCount > 0) {
     lastSuccessfulPollAt = snapshot.polledAt;
@@ -13956,7 +13956,7 @@ function getLastOperationalShortMediaSuccessfulPollAt() {
 }
 var lastDiagnostics, lastSuccessfulPollAt;
 var init_diagnosticsStore = __esm({
-  "../grarf/desktop/src/services/operationalShortMedia/diagnostics/diagnosticsStore.ts"() {
+  "src/services/operationalShortMedia/diagnostics/diagnosticsStore.ts"() {
     init_define_import_meta_env();
     lastDiagnostics = null;
     lastSuccessfulPollAt = null;
@@ -13966,9 +13966,9 @@ var init_diagnosticsStore = __esm({
   }
 });
 
-// ../grarf/desktop/src/services/operationalShortMedia/diagnostics/index.ts
+// src/services/operationalShortMedia/diagnostics/index.ts
 var init_diagnostics = __esm({
-  "../grarf/desktop/src/services/operationalShortMedia/diagnostics/index.ts"() {
+  "src/services/operationalShortMedia/diagnostics/index.ts"() {
     init_define_import_meta_env();
     init_classifyRejections();
     init_collectPipelineDiagnostics();
@@ -13976,7 +13976,7 @@ var init_diagnostics = __esm({
   }
 });
 
-// ../grarf/desktop/src/services/operationalShortMedia/diagnostics/youtubeRssIngestTrace.ts
+// src/services/operationalShortMedia/diagnostics/youtubeRssIngestTrace.ts
 function emptyYoutubeRssIngestTrace(sources) {
   return {
     viaBridge: false,
@@ -13994,15 +13994,15 @@ function emptyYoutubeRssIngestTrace(sources) {
   };
 }
 var init_youtubeRssIngestTrace = __esm({
-  "../grarf/desktop/src/services/operationalShortMedia/diagnostics/youtubeRssIngestTrace.ts"() {
+  "src/services/operationalShortMedia/diagnostics/youtubeRssIngestTrace.ts"() {
     init_define_import_meta_env();
   }
 });
 
-// ../grarf/desktop/src/services/operationalShortMedia/inventory/config.ts
+// src/services/operationalShortMedia/inventory/config.ts
 var DEFAULT_INVENTORY_LAST_SEEN_TTL_MS, DEFAULT_INVENTORY_PUBLISHED_MAX_AGE_MS, DEFAULT_ROLLING_INVENTORY_CONFIG;
 var init_config = __esm({
-  "../grarf/desktop/src/services/operationalShortMedia/inventory/config.ts"() {
+  "src/services/operationalShortMedia/inventory/config.ts"() {
     init_define_import_meta_env();
     DEFAULT_INVENTORY_LAST_SEEN_TTL_MS = 12 * 60 * 60 * 1e3;
     DEFAULT_INVENTORY_PUBLISHED_MAX_AGE_MS = 24 * 60 * 60 * 1e3;
@@ -14013,7 +14013,7 @@ var init_config = __esm({
   }
 });
 
-// ../grarf/desktop/src/services/operationalShortMedia/inventory/sessionClipCache.ts
+// src/services/operationalShortMedia/inventory/sessionClipCache.ts
 function readPersistedClipInventory() {
   if (typeof sessionStorage === "undefined") return [];
   try {
@@ -14037,14 +14037,14 @@ function writePersistedClipInventory(clips) {
 }
 var SESSION_KEY2, MAX_PERSISTED;
 var init_sessionClipCache = __esm({
-  "../grarf/desktop/src/services/operationalShortMedia/inventory/sessionClipCache.ts"() {
+  "src/services/operationalShortMedia/inventory/sessionClipCache.ts"() {
     init_define_import_meta_env();
     SESSION_KEY2 = "grarf.operational.clips.rolling.v1";
     MAX_PERSISTED = 48;
   }
 });
 
-// ../grarf/desktop/src/services/operationalShortMedia/inventory/rollingInventoryStore.ts
+// src/services/operationalShortMedia/inventory/rollingInventoryStore.ts
 function sourcesCacheKey(sources) {
   return sources.map((s2) => s2.channelId).sort().join("|");
 }
@@ -14070,7 +14070,7 @@ function getRollingOperationalShortMediaInventory(sources, config) {
 }
 var RollingOperationalShortMediaInventory, storeBySourcesKey;
 var init_rollingInventoryStore = __esm({
-  "../grarf/desktop/src/services/operationalShortMedia/inventory/rollingInventoryStore.ts"() {
+  "src/services/operationalShortMedia/inventory/rollingInventoryStore.ts"() {
     init_define_import_meta_env();
     init_config();
     init_sessionClipCache();
@@ -14136,9 +14136,9 @@ var init_rollingInventoryStore = __esm({
   }
 });
 
-// ../grarf/desktop/src/services/operationalShortMedia/inventory/index.ts
+// src/services/operationalShortMedia/inventory/index.ts
 var init_inventory = __esm({
-  "../grarf/desktop/src/services/operationalShortMedia/inventory/index.ts"() {
+  "src/services/operationalShortMedia/inventory/index.ts"() {
     init_define_import_meta_env();
     init_config();
     init_rollingInventoryStore();
@@ -14146,7 +14146,7 @@ var init_inventory = __esm({
   }
 });
 
-// ../grarf/desktop/src/services/operationalShortMedia/resolveStripRenderInventory.ts
+// src/services/operationalShortMedia/resolveStripRenderInventory.ts
 function resolveStripRenderInventory(aggregated, uploads) {
   if (aggregated.items.length > 0) {
     return aggregated.items.map((item) => item.media);
@@ -14157,12 +14157,12 @@ function hasStripRenderInventory(clips) {
   return clips.length > 0;
 }
 var init_resolveStripRenderInventory = __esm({
-  "../grarf/desktop/src/services/operationalShortMedia/resolveStripRenderInventory.ts"() {
+  "src/services/operationalShortMedia/resolveStripRenderInventory.ts"() {
     init_define_import_meta_env();
   }
 });
 
-// ../grarf/desktop/src/services/operationalShortMedia/fetchOperationalShortSportsClips.ts
+// src/services/operationalShortMedia/fetchOperationalShortSportsClips.ts
 async function fetchStripRenderInventory(sources = YOUTUBE_CLIP_SOURCES) {
   let rssTrace = emptyYoutubeRssIngestTrace(sources);
   const pollUploads = await fetchYoutubeRssUploads(sources, (trace) => {
@@ -14204,7 +14204,7 @@ async function fetchStripRenderInventory(sources = YOUTUBE_CLIP_SOURCES) {
   return { clips, aggregated, uploads: activeUploads };
 }
 var init_fetchOperationalShortSportsClips = __esm({
-  "../grarf/desktop/src/services/operationalShortMedia/fetchOperationalShortSportsClips.ts"() {
+  "src/services/operationalShortMedia/fetchOperationalShortSportsClips.ts"() {
     init_define_import_meta_env();
     init_youtubeClipSources();
     init_youtubeClipsApi();
@@ -14218,17 +14218,17 @@ var init_fetchOperationalShortSportsClips = __esm({
   }
 });
 
-// webapp/home-entry.tsx
+// ../../grarf-landing/webapp/home-entry.tsx
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/gamesSpine/webGamesSpineBootstrap.ts
+// src/lib/gamesSpine/webGamesSpineBootstrap.ts
 init_define_import_meta_env();
 init_isGrarfWebRenderer();
 
-// ../grarf/desktop/src/lib/gamesSpine/manual/gamesSpineManualApi.ts
+// src/lib/gamesSpine/manual/gamesSpineManualApi.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/config/sportscapeEditorialConfig.ts
+// src/config/sportscapeEditorialConfig.ts
 init_define_import_meta_env();
 init_isGrarfWebRenderer();
 var SPORTSCAPE_EDITORIAL_PRIMARY_API_URL = "https://grarf-operational-service.grarf.workers.dev/sportscape-editorial";
@@ -14293,10 +14293,10 @@ function sportscapeEditorialApiUrl(path) {
   return sportscapeEditorialUrlForBase(getSportscapeEditorialApiBaseUrl(), path);
 }
 
-// ../grarf/desktop/src/lib/sportscape/editorial/sportscapeEditorialAdminAuth.ts
+// src/lib/sportscape/editorial/sportscapeEditorialAdminAuth.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/admin/grarfAdminFlag.ts
+// src/lib/admin/grarfAdminFlag.ts
 init_define_import_meta_env();
 var GRARF_ADMIN_STORAGE_KEY = "grarf-admin";
 function isGrarfAdmin() {
@@ -14315,7 +14315,7 @@ function markGrarfAdmin() {
   }
 }
 
-// ../grarf/desktop/src/lib/sportscape/editorial/sportscapeEditorialAdminAuth.ts
+// src/lib/sportscape/editorial/sportscapeEditorialAdminAuth.ts
 var SESSION_KEY = "grarf-sportscape-admin-token";
 function getSportscapeAdminToken() {
   try {
@@ -14336,10 +14336,10 @@ function markSportscapeAdminAuthed(token) {
   markGrarfAdmin();
 }
 
-// ../grarf/desktop/src/lib/gamesSpine/manual/mergeBundledGamesSpineManualDocument.ts
+// src/lib/gamesSpine/manual/mergeBundledGamesSpineManualDocument.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/data/gamesSpineManualBundledLeagues.ts
+// src/data/gamesSpineManualBundledLeagues.ts
 init_define_import_meta_env();
 var GAMES_SPINE_MANUAL_BUNDLED_LEAGUES = [
   {
@@ -14368,7 +14368,7 @@ var GAMES_SPINE_MANUAL_BUNDLED_LEAGUES = [
   }
 ];
 
-// ../grarf/desktop/src/lib/gamesSpine/manual/mergeBundledGamesSpineManualDocument.ts
+// src/lib/gamesSpine/manual/mergeBundledGamesSpineManualDocument.ts
 function leagueStorageKey(league) {
   return league.trim().toLowerCase();
 }
@@ -14382,7 +14382,7 @@ function mergeBundledGamesSpineManualDocument(document2) {
   return { leagues: [...byKey.values()] };
 }
 
-// ../grarf/desktop/src/lib/gamesSpine/manual/gamesSpineManualApi.ts
+// src/lib/gamesSpine/manual/gamesSpineManualApi.ts
 function workerWriteHeaders() {
   const headers = {
     "Content-Type": "application/json"
@@ -14425,27 +14425,27 @@ async function saveGamesSpineManualDocument(document2) {
   return body.document;
 }
 
-// ../grarf/desktop/src/services/operationalIngest/fetchOperationalSnapshot.ts
+// src/services/operationalIngest/fetchOperationalSnapshot.ts
 init_define_import_meta_env();
 init_operationalIngestConfig();
 init_isGrarfWebRenderer();
 
-// ../grarf/desktop/src/services/operationalIngest/supplementOperationalSnapshotWithTennis.ts
+// src/services/operationalIngest/supplementOperationalSnapshotWithTennis.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/services/operationalIngest/tennis/fetchTennisOperationalLeagues.ts
+// src/services/operationalIngest/tennis/fetchTennisOperationalLeagues.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/services/operationalIngest/tennis/fetchEspnTennisScoreboard.ts
+// src/services/operationalIngest/tennis/fetchEspnTennisScoreboard.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/services/operationalIngest/tennis/operationalDate.ts
+// src/services/operationalIngest/tennis/operationalDate.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/shared/operationalSlateDate.js
+// shared/operationalSlateDate.js
 init_define_import_meta_env();
 
-// ../grarf/desktop/shared/golfTournamentDate.js
+// shared/golfTournamentDate.js
 init_define_import_meta_env();
 var GOLF_TOURNAMENT_DAY_TIMEZONE = "America/New_York";
 var GOLF_LEAGUE_KEYS = /* @__PURE__ */ new Set(["PGA", "LPGA", "LIV", "CHAMPIONS"]);
@@ -14478,7 +14478,7 @@ function formatGolfScheduledDayLabel(dateKey) {
   });
 }
 
-// ../grarf/desktop/shared/operationalSlateDate.js
+// shared/operationalSlateDate.js
 var GRARF_OPERATIONAL_SLATE_TIMEZONE = "America/Chicago";
 var OPERATIONAL_SLATE_NEXT_DAY_CUTOFF_HOUR = 6;
 var OPERATIONAL_SPORTS_DAY_ROLLOVER_HOUR = 4;
@@ -14681,7 +14681,7 @@ function filterGamesForOperationalFallbackIngest(games, now = /* @__PURE__ */ ne
   return games.filter((g2) => shouldKeepGameOnOperationalFallbackIngest(g2, now, timeZone));
 }
 
-// ../grarf/desktop/src/services/operationalIngest/tennis/fetchEspnTennisScoreboard.ts
+// src/services/operationalIngest/tennis/fetchEspnTennisScoreboard.ts
 var ESPN_FETCH_TIMEOUT_MS = 12e3;
 async function fetchScoreboardJson(url) {
   const res = await fetch(url, {
@@ -14737,13 +14737,13 @@ async function fetchOperationalTennisScoreboardJson(endpoint, now = /* @__PURE__
   return { json: defaultJson, usedFallback: true };
 }
 
-// ../grarf/desktop/src/services/operationalIngest/tennis/normalizeTennisOperational.ts
+// src/services/operationalIngest/tennis/normalizeTennisOperational.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/watch/espnPlusStream.ts
+// src/lib/watch/espnPlusStream.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/shared/espnWatchBroadcast.js
+// shared/espnWatchBroadcast.js
 init_define_import_meta_env();
 var ESPN_PLUS_LABEL = /espn\s*\+|espn\s*plus|espn\s*unlimited|espn\s*unlmtd/i;
 function isEspnPlusBroadcastLabel(label) {
@@ -14768,7 +14768,7 @@ function gameHasEspnWatchBroadcast(broadcastLabels, leagueKey) {
   return false;
 }
 
-// ../grarf/desktop/src/lib/watch/espnPlusStream.ts
+// src/lib/watch/espnPlusStream.ts
 function gameHasEspnPlusBroadcast2(game) {
   const hints = [...game.broadcasts ?? [], ...game.channels ?? []];
   return gameHasEspnPlusBroadcast(hints);
@@ -14849,7 +14849,7 @@ function resolveEspnWatchStreamFromCompetition(competition, broadcastLabels, lea
   return { streamUrl, streamProvider: "ESPN+", eventCalendarId };
 }
 
-// ../grarf/desktop/src/services/operationalIngest/tennis/normalizeTennisOperational.ts
+// src/services/operationalIngest/tennis/normalizeTennisOperational.ts
 var MENS_DRAW_TYPE_SLUGS = /* @__PURE__ */ new Set(["mens-singles", "mens-doubles"]);
 var WOMENS_DRAW_TYPE_SLUGS = /* @__PURE__ */ new Set(["womens-singles", "womens-doubles"]);
 function resolveTennisTourLeague(competition, groupingLabel, groupingSlug, pollLeagueKey) {
@@ -15178,7 +15178,7 @@ function applyTennisPollToLeagueGames(leagueGames, pollLeagueKey, games) {
   }
 }
 
-// ../grarf/desktop/src/services/operationalIngest/tennis/fetchTennisOperationalLeagues.ts
+// src/services/operationalIngest/tennis/fetchTennisOperationalLeagues.ts
 var TENNIS_BASE = "https://site.api.espn.com/apis/site/v2/sports/tennis";
 var TENNIS_ENDPOINTS = [
   { key: "ATP", endpoint: `${TENNIS_BASE}/atp/scoreboard` },
@@ -15217,7 +15217,7 @@ async function fetchTennisOperationalLeagues() {
   return leagueGames;
 }
 
-// ../grarf/desktop/src/services/operationalIngest/supplementOperationalSnapshotWithTennis.ts
+// src/services/operationalIngest/supplementOperationalSnapshotWithTennis.ts
 var LOG2 = "[OperationalIngest]";
 async function supplementOperationalSnapshotWithTennis(snap) {
   const tennis = await fetchTennisOperationalLeagues();
@@ -15242,13 +15242,13 @@ async function supplementOperationalSnapshotWithTennis(snap) {
   return { ...snap, leagues };
 }
 
-// ../grarf/desktop/src/services/operationalIngest/web/fetchWebEspnOperationalSnapshot.ts
+// src/services/operationalIngest/web/fetchWebEspnOperationalSnapshot.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/data/espnOperationalLeagueEndpoints.ts
+// src/data/espnOperationalLeagueEndpoints.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/data/espnOperationalLeagueRegistry.generated.ts
+// src/data/espnOperationalLeagueRegistry.generated.ts
 init_define_import_meta_env();
 var ESPN_OPERATIONAL_INGEST_LEAGUES = [
   {
@@ -15780,7 +15780,7 @@ var ESPN_SOCCER_OPERATIONAL_LEAGUE_KEYS = new Set(
   ESPN_OPERATIONAL_INGEST_LEAGUES.filter((l2) => l2.sport === "soccer").map((l2) => l2.key)
 );
 
-// ../grarf/desktop/shared/espnOperationalIngestDisabledLeagues.js
+// shared/espnOperationalIngestDisabledLeagues.js
 init_define_import_meta_env();
 var ESPN_OPERATIONAL_INGEST_DISABLED_LEAGUE_KEYS = /* @__PURE__ */ new Set(["LIV"]);
 function isEspnOperationalIngestLeagueDisabled(key2) {
@@ -15790,15 +15790,15 @@ function filterEspnOperationalIngestLeagueKeys(keys) {
   return keys.filter((key2) => !isEspnOperationalIngestLeagueDisabled(key2));
 }
 
-// ../grarf/desktop/electron/espn/normalize.js
+// electron/espn/normalize.js
 init_define_import_meta_env();
 
-// ../grarf/desktop/electron/espn/espnOperationalLeagueConstants.generated.js
+// electron/espn/espnOperationalLeagueConstants.generated.js
 init_define_import_meta_env();
 var SOCCER_LEAGUE_KEYS = /* @__PURE__ */ new Set(["ARG1", "BEL1", "BRA1", "BUNDESLIGA", "CLUBWC", "CONCACAF_CL", "CONCACAF_NG", "CONCACAF_WC", "COPA", "EPL", "EREDIVISIE", "EURO", "GOLDCUP", "INTFRIENDLY", "LALIGA", "LIBERTADORES", "LIGAMX", "LIGUE1", "MLS", "NATIONS", "NWSL", "POR1", "SAUDI", "SERIEA", "SPFL", "SUDAMERICANA", "SUPERLIG", "UCL", "UECL", "UEL", "USL1", "USLC", "USLCUP", "UWCQ", "WORLDCUP", "WWC"]);
 var NATIONAL_TEAM_SOCCER_LEAGUE_KEYS = /* @__PURE__ */ new Set(["CONCACAF_NG", "CONCACAF_WC", "COPA", "EURO", "GOLDCUP", "INTFRIENDLY", "NATIONS", "UWCQ", "WORLDCUP", "WWC"]);
 
-// ../grarf/desktop/electron/espn/espnPlusStream.js
+// electron/espn/espnPlusStream.js
 init_define_import_meta_env();
 var LOG3 = "[ESPN]";
 var PLAY_LOCATION2 = "where-to-watch%3Aguide";
@@ -15872,7 +15872,7 @@ function attachEspnPlusStreamToGame2(game, stream) {
   });
 }
 
-// ../grarf/desktop/shared/espnPausedCompetitionStatus.js
+// shared/espnPausedCompetitionStatus.js
 init_define_import_meta_env();
 var ESPN_PAUSED_STATUS_NAMES = /* @__PURE__ */ new Set([
   "STATUS_SUSPENDED",
@@ -15907,10 +15907,10 @@ function resolveEspnCardStatus(statusType) {
   return "scheduled";
 }
 
-// ../grarf/desktop/electron/espn/normalizeRacing.js
+// electron/espn/normalizeRacing.js
 init_define_import_meta_env();
 
-// ../grarf/desktop/electron/espn/canonicalEventMetadata.js
+// electron/espn/canonicalEventMetadata.js
 init_define_import_meta_env();
 function attachCanonicalEventMetadata(game, input) {
   const eventId = String(game?.espnEventId ?? game?.id ?? "").trim();
@@ -15930,10 +15930,10 @@ function attachCanonicalEventMetadata(game, input) {
   return game;
 }
 
-// ../grarf/desktop/electron/espn/operationalDate.js
+// electron/espn/operationalDate.js
 init_define_import_meta_env();
 
-// ../grarf/desktop/shared/motorsportRaceState.js
+// shared/motorsportRaceState.js
 init_define_import_meta_env();
 function safe2(v2) {
   return typeof v2 === "string" && v2.trim() ? v2.trim() : "";
@@ -16089,7 +16089,7 @@ function extractMotorsportRaceStateFromEspnCompetition(comp, options = {}) {
   };
 }
 
-// ../grarf/desktop/shared/motorsportLeagues.js
+// shared/motorsportLeagues.js
 init_define_import_meta_env();
 var MOTORSPORT_SESSION_LEAGUES = /* @__PURE__ */ new Set(["F1", "F2", "F3", "FORMULA_E"]);
 var MOTORSPORT_STANDALONE_LEAGUES = /* @__PURE__ */ new Set([
@@ -16115,7 +16115,7 @@ function isMotorsportStandaloneLeagueKey(leagueKey) {
   return typeof leagueKey === "string" && MOTORSPORT_STANDALONE_LEAGUES.has(leagueKey);
 }
 
-// ../grarf/desktop/electron/espn/normalizeRacing.js
+// electron/espn/normalizeRacing.js
 function isRacingLeagueKey(leagueKey) {
   return isMotorsportSessionLeagueKey(leagueKey) || isMotorsportStandaloneLeagueKey(leagueKey);
 }
@@ -16241,7 +16241,7 @@ function normalizeRacingScoreboard(scoreboardJson, leagueKey) {
   return out;
 }
 
-// ../grarf/desktop/electron/espn/normalizeMma.js
+// electron/espn/normalizeMma.js
 init_define_import_meta_env();
 var MMA_LEAGUE_KEYS = /* @__PURE__ */ new Set(["UFC"]);
 function isMmaLeagueKey(leagueKey) {
@@ -16495,7 +16495,7 @@ function normalizeMmaScoreboard(scoreboardJson, leagueKey) {
   return sortMmaGames(out);
 }
 
-// ../grarf/desktop/electron/espn/normalizeTennis.js
+// electron/espn/normalizeTennis.js
 init_define_import_meta_env();
 var TENNIS_LEAGUE_KEYS = /* @__PURE__ */ new Set(["ATP", "WTA"]);
 var MENS_DRAW_TYPE_SLUGS2 = /* @__PURE__ */ new Set(["mens-singles", "mens-doubles"]);
@@ -16771,10 +16771,10 @@ function normalizeTennisScoreboard2(scoreboardJson, leagueKey) {
   return out;
 }
 
-// ../grarf/desktop/electron/espn/normalizeGolf.js
+// electron/espn/normalizeGolf.js
 init_define_import_meta_env();
 
-// ../grarf/desktop/shared/grarfSportHierarchy.js
+// shared/grarfSportHierarchy.js
 init_define_import_meta_env();
 var GRARF_SPORT_HIERARCHY = {
   soccer: {
@@ -16855,7 +16855,7 @@ function sportLeagueKeys(sportKey) {
   return GRARF_SPORT_HIERARCHY[sportKey]?.leagueKeys ?? [];
 }
 
-// ../grarf/desktop/shared/golfWatchUrls.js
+// shared/golfWatchUrls.js
 init_define_import_meta_env();
 var PGA_TOUR_LEADERBOARD_URL = "https://www.pgatour.com/leaderboard";
 var LPGA_TOUR_LEADERBOARD_URL = "https://www.lpga.com/leaderboard";
@@ -16878,7 +16878,7 @@ function resolveGolfWatchStreamUrl(leagueKey, tournamentTitle) {
   return US_OPEN_WATCH_URL;
 }
 
-// ../grarf/desktop/electron/espn/normalizeGolf.js
+// electron/espn/normalizeGolf.js
 function safe6(v2) {
   return typeof v2 === "string" && v2.trim() ? v2.trim() : "";
 }
@@ -17006,7 +17006,7 @@ function normalizeGolfScoreboard(scoreboardJson, leagueKey) {
   return out;
 }
 
-// ../grarf/desktop/electron/espn/mergeOperationalScoreboards.js
+// electron/espn/mergeOperationalScoreboards.js
 init_define_import_meta_env();
 function operationalGameMatchupKey(game) {
   const league = game?.league;
@@ -17033,7 +17033,7 @@ function mergeNormalizedGamesById(primary, secondary) {
   return [...byId.values()];
 }
 
-// ../grarf/desktop/shared/fifaMenWorldRankingsJune2026.js
+// shared/fifaMenWorldRankingsJune2026.js
 init_define_import_meta_env();
 var FIFA_MEN_WORLD_RANKINGS_JUNE_2026 = Object.freeze({
   france: 1,
@@ -17187,7 +17187,7 @@ function attachWorldCupFifaRankingMetadata(game) {
   };
 }
 
-// ../grarf/desktop/electron/espn/normalize.js
+// electron/espn/normalize.js
 function safe7(v2) {
   return typeof v2 === "string" && v2.trim() ? v2.trim() : "";
 }
@@ -17536,7 +17536,7 @@ function normalizeDatedOperationalScoreboardPair(todayJson, tomorrowJson, league
   return sortGames(mergeNormalizedGamesById(todayGames, tomorrowGames));
 }
 
-// ../grarf/desktop/src/services/operationalIngest/web/fetchWebEspnOperationalSnapshot.ts
+// src/services/operationalIngest/web/fetchWebEspnOperationalSnapshot.ts
 var LOG4 = "[OperationalIngest]";
 var ESPN_FETCH_TIMEOUT_MS2 = 12e3;
 var LEAGUE_FETCH_CONCURRENCY = 8;
@@ -17701,7 +17701,7 @@ async function fetchWebEspnOperationalSnapshot(leagueKeys = filterEspnOperationa
   return supplementOperationalSnapshotWithTennis(transport);
 }
 
-// ../grarf/desktop/src/services/operationalIngest/fetchOperationalSnapshot.ts
+// src/services/operationalIngest/fetchOperationalSnapshot.ts
 var LOG5 = "[OperationalIngest]";
 var CLOUD_STALE_THRESHOLD_MS = 9e4;
 var CLOUD_FETCH_TIMEOUT_MS = 2e4;
@@ -17988,7 +17988,7 @@ function operationalResponseFromIpcPush(snap) {
   return ipcSnapshotToOperationalResponse(snap);
 }
 
-// ../grarf/desktop/src/lib/gamesSpine/webGamesSpineBootstrap.ts
+// src/lib/gamesSpine/webGamesSpineBootstrap.ts
 function bootstrapWebGamesSpineIngest() {
   if (!isGrarfWebRenderer()) return;
   prefetchWebOperationalCloudSnapshot();
@@ -18000,7 +18000,7 @@ if (typeof window !== "undefined") {
   bootstrapWebGamesSpineIngest();
 }
 
-// webapp/grarf-web-shim.ts
+// ../../grarf-landing/webapp/grarf-web-shim.ts
 init_define_import_meta_env();
 function resolveSportscapeEditorialApiBase() {
   const fromConfig = window.GRARF_WEB_CONFIG?.sportscapeEditorialApiUrl?.trim();
@@ -18629,17 +18629,17 @@ if (!isElectronRenderer()) {
   }
 }
 
-// ../grarf/desktop/src/lib/livetrack/bootLiveTrack.ts
+// src/lib/livetrack/bootLiveTrack.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/livetrack/initializeLiveTrackTimeline.ts
+// src/lib/livetrack/initializeLiveTrackTimeline.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/store/liveTrackAnimationStore.ts
+// src/store/liveTrackAnimationStore.ts
 init_define_import_meta_env();
 var import_zustand = __toESM(require_zustand(), 1);
 
-// ../grarf/desktop/src/lib/livetrack/liveTrackAnimationStorage.ts
+// src/lib/livetrack/liveTrackAnimationStorage.ts
 init_define_import_meta_env();
 var LIVE_TRACK_ANIMATION_STORAGE_KEY = "grarf-livetrack-animation";
 var LIVE_TRACK_ANIMATION_STORAGE_VERSION = 1;
@@ -18672,7 +18672,7 @@ function writeLiveTrackAnimationSync(completedIds) {
   }
 }
 
-// ../grarf/desktop/src/store/liveTrackAnimationStore.ts
+// src/store/liveTrackAnimationStore.ts
 function mergeCompletedIds(base, ids) {
   if (ids.length === 0) return base;
   const next = { ...base };
@@ -18759,14 +18759,14 @@ function initializeLiveTrackAnimationFromTimeline(eventIds) {
   getLiveTrackAnimationStore().getState().markHydratedTimeline(eventIds);
 }
 
-// ../grarf/desktop/src/store/liveTrackTimelineStore.ts
+// src/store/liveTrackTimelineStore.ts
 init_define_import_meta_env();
 var import_zustand2 = __toESM(require_zustand(), 1);
 
-// ../grarf/desktop/src/lib/livetrack/liveTrackTimelineStorage.ts
+// src/lib/livetrack/liveTrackTimelineStorage.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/livetrack/liveTrackTimelineRetention.ts
+// src/lib/livetrack/liveTrackTimelineRetention.ts
 init_define_import_meta_env();
 var LIVE_TRACK_TIMELINE_RETENTION_MS = 18 * 60 * 60 * 1e3;
 function resolveLiveTrackEventTimeMs(event) {
@@ -18782,7 +18782,7 @@ function pruneLiveTrackTimeline(events, now = Date.now()) {
   return events.filter((event) => isLiveTrackEventWithinRetention(event, now));
 }
 
-// ../grarf/desktop/src/lib/livetrack/liveTrackTimelineStorage.ts
+// src/lib/livetrack/liveTrackTimelineStorage.ts
 var LIVE_TRACK_TIMELINE_STORAGE_KEY = "grarf-livetrack-timeline";
 var LIVE_TRACK_TIMELINE_STORAGE_VERSION = 1;
 function isValidLiveTrackEvent(value) {
@@ -18827,7 +18827,7 @@ function writeLiveTrackTimelineSync(events) {
   }
 }
 
-// ../grarf/desktop/src/lib/livetrack/sortLiveTrackEvents.ts
+// src/lib/livetrack/sortLiveTrackEvents.ts
 init_define_import_meta_env();
 function sortLiveTrackEventsChronologically(events) {
   return [...events].sort(
@@ -18840,7 +18840,7 @@ function sortLiveTrackEventsNewestFirst(events) {
   );
 }
 
-// ../grarf/desktop/src/store/liveTrackTimelineStore.ts
+// src/store/liveTrackTimelineStore.ts
 function eventsByIdFromList(events) {
   const byId = {};
   for (const event of events) {
@@ -18931,7 +18931,7 @@ function getLiveTrackTimelineStore() {
   return useLiveTrackTimelineStore;
 }
 
-// ../grarf/desktop/src/lib/livetrack/initializeLiveTrackTimeline.ts
+// src/lib/livetrack/initializeLiveTrackTimeline.ts
 var initialized = false;
 function ensureLiveTrackTimelineInitialized() {
   if (initialized) return;
@@ -18940,17 +18940,17 @@ function ensureLiveTrackTimelineInitialized() {
   initializeLiveTrackAnimationFromTimeline(eventIds);
 }
 
-// ../grarf/desktop/src/lib/livetrack/bootLiveTrack.ts
+// src/lib/livetrack/bootLiveTrack.ts
 ensureLiveTrackTimelineInitialized();
 
-// webapp/home-entry.tsx
+// ../../grarf-landing/webapp/home-entry.tsx
 var import_react195 = __toESM(require_react());
 var import_client = __toESM(require_client());
 
-// node_modules/react-router/dist/development/index.mjs
+// ../../grarf-landing/node_modules/react-router/dist/development/index.mjs
 init_define_import_meta_env();
 
-// node_modules/react-router/dist/development/chunk-6CSD65Y2.mjs
+// ../../grarf-landing/node_modules/react-router/dist/development/chunk-6CSD65Y2.mjs
 init_define_import_meta_env();
 var React = __toESM(require_react(), 1);
 var React2 = __toESM(require_react(), 1);
@@ -21676,20 +21676,20 @@ function useViewTransitionState(to2, { relative } = {}) {
   return matchPath(path.pathname, nextPath) != null || matchPath(path.pathname, currentPath) != null;
 }
 
-// ../grarf/desktop/src/components/analytics/AnalyticsProvider.tsx
+// src/components/analytics/AnalyticsProvider.tsx
 init_define_import_meta_env();
 var import_react = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/lib/analytics/index.ts
+// src/lib/analytics/index.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/analytics/analytics.ts
+// src/lib/analytics/analytics.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/analytics/posthogClient.ts
+// src/lib/analytics/posthogClient.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/node_modules/posthog-js/dist/module.js
+// node_modules/posthog-js/dist/module.js
 init_define_import_meta_env();
 var t = "undefined" != typeof window ? window : void 0;
 var e = "undefined" != typeof globalThis ? globalThis : t;
@@ -27003,8 +27003,9 @@ var La = (Ua = jn[Gn] = new Zn(), (function() {
   null != r && r.addEventListener ? "complete" === r.readyState ? e2() : sr(r, "DOMContentLoaded", e2, { capture: false }) : t && Le.error("Browser doesn't support `document.addEventListener` so PostHog couldn't be initialized");
 })(), Ua);
 
-// ../grarf/desktop/src/lib/analytics/startupVerification.ts
+// src/lib/analytics/startupVerification.ts
 init_define_import_meta_env();
+init_isGrarfWebRenderer();
 var startupTestSent = false;
 function maskPostHogKey(key2) {
   if (key2.length <= 8) return "****";
@@ -27036,7 +27037,7 @@ function sendStartupTestEvent(client) {
       "grarf_app_started",
       {
         source: "startup_verification",
-        runtime: "electron-renderer"
+        runtime: isGrarfWebRenderer() ? "web" : "electron-renderer"
       },
       { send_instantly: true }
     );
@@ -27052,7 +27053,7 @@ function sendStartupTestEvent(client) {
   }
 }
 
-// ../grarf/desktop/src/lib/analytics/posthogClient.ts
+// src/lib/analytics/posthogClient.ts
 var SESSION_REPLAY_SAMPLE_RATE = 0.15;
 var initialized2 = false;
 function isAnalyticsEnabled() {
@@ -27101,7 +27102,7 @@ function bootstrapPostHog() {
   initPostHog();
 }
 
-// ../grarf/desktop/src/lib/analytics/analytics.ts
+// src/lib/analytics/analytics.ts
 function debugLog(event, properties) {
   if (!define_import_meta_env_default.DEV) return;
   if (properties && Object.keys(properties).length > 0) {
@@ -27153,7 +27154,7 @@ function trackStreamWatchEnded(params) {
   analytics.track("stream_watch_ended", params);
 }
 
-// ../grarf/desktop/src/lib/analytics/engagement.ts
+// src/lib/analytics/engagement.ts
 init_define_import_meta_env();
 var ACTIVITY_IDLE_MS = 6e4;
 var HEARTBEAT_MS = 6e4;
@@ -27231,16 +27232,16 @@ function startEngagementTracking(track) {
   return stopEngagement;
 }
 
-// ../grarf/desktop/src/lib/analytics/leagueKey.ts
+// src/lib/analytics/leagueKey.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/espn/espnGameUrls.ts
+// src/lib/espn/espnGameUrls.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/data/gamesColumnLeagues.ts
+// src/data/gamesColumnLeagues.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/data/leagueImportanceOrder.ts
+// src/data/leagueImportanceOrder.ts
 init_define_import_meta_env();
 var CANONICAL_LEAGUE_IMPORTANCE_ORDER = [
   "WORLDCUP",
@@ -27338,11 +27339,11 @@ function sortGrarfLeagueKeysByImportance(keys) {
   });
 }
 
-// ../grarf/desktop/src/data/grarfSportHierarchy.ts
+// src/data/grarfSportHierarchy.ts
 init_define_import_meta_env();
 var GOLF_TOUR_LEAGUE_ORDER = sportLeagueKeys("golf");
 
-// ../grarf/desktop/src/data/gamesColumnLeagues.ts
+// src/data/gamesColumnLeagues.ts
 var GOLF_COLUMN_LEAGUE_KEYS = [
   .../* @__PURE__ */ new Set([...GOLF_TOUR_LEAGUE_ORDER, "PGA", "LPGA", "LIV", "CHAMPIONS"])
 ];
@@ -27434,20 +27435,20 @@ var GAMES_COLUMN_LEAGUE_LABEL = {
   CHAMPIONS: "PGA Champions"
 };
 
-// ../grarf/desktop/src/lib/gamesSpine/resolveWorldCupWorkspaceEmbedUrl.ts
+// src/lib/gamesSpine/resolveWorldCupWorkspaceEmbedUrl.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/fotmob/buildFotmobMatchUrl.ts
+// src/lib/fotmob/buildFotmobMatchUrl.ts
 init_define_import_meta_env();
 function buildFotmobMatchUrl(matchId) {
   const id = String(matchId).trim();
   return `https://www.fotmob.com/match/${encodeURIComponent(id)}`;
 }
 
-// ../grarf/desktop/src/lib/foxWorldCup/teamSlugUtils.ts
+// src/lib/foxWorldCup/teamSlugUtils.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/tennisChannelPlus/nameUtils.ts
+// src/lib/tennisChannelPlus/nameUtils.ts
 init_define_import_meta_env();
 function normalizeTennisText(value) {
   return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9\s]/g, " ").replace(/\s+/g, " ").trim();
@@ -27511,7 +27512,7 @@ function tokenizeTournamentText(raw) {
   return new Set(tokens);
 }
 
-// ../grarf/desktop/src/lib/foxWorldCup/teamSlugUtils.ts
+// src/lib/foxWorldCup/teamSlugUtils.ts
 var SLUG_STOP_WORDS = /* @__PURE__ */ new Set(["and"]);
 var FOX_TEAM_SLUG_OVERRIDES = {
   turkey: "turkiye",
@@ -27622,7 +27623,7 @@ function scoreFoxWorldCupTeams(gameAway, gameHome, eventAwaySlug, eventHomeSlug)
   return Math.max(direct, swapped) / 2;
 }
 
-// ../grarf/desktop/src/lib/gamesSpine/resolveWorldCupWorkspaceEmbedUrl.ts
+// src/lib/gamesSpine/resolveWorldCupWorkspaceEmbedUrl.ts
 init_isGrarfWebRenderer();
 var USA_VS_BOSNIA_FOTMOB_MATCH_URL = "https://www.fotmob.com/matches/usa-vs-bosnia-herzegovina/2c7uzr";
 function teamTokensIncludeUnitedStates(tokens) {
@@ -27677,7 +27678,7 @@ function openWorldCupGamesSpineRow(game, dispatch) {
   return true;
 }
 
-// ../grarf/desktop/src/lib/espn/espnGameUrls.ts
+// src/lib/espn/espnGameUrls.ts
 var ESPN_GAME_ID_RE = /^espn-([A-Z0-9]+)-(\d+)$/i;
 var SOCCER_LEAGUE_KEYS2 = /* @__PURE__ */ new Set([
   "MLS",
@@ -27819,7 +27820,7 @@ function resolveGameWorkspaceEmbedUrl(game, gameId) {
   return null;
 }
 
-// ../grarf/desktop/src/lib/analytics/leagueKey.ts
+// src/lib/analytics/leagueKey.ts
 var SPORT_TO_LEAGUE = {
   mlb: "MLB",
   nba: "NBA",
@@ -27850,7 +27851,7 @@ function leagueKeyFromRoute(pathname) {
   return leagueKeyFromGameId(pathname.startsWith("/game/") ? pathname.slice("/game/".length) : "");
 }
 
-// ../grarf/desktop/src/components/analytics/AnalyticsProvider.tsx
+// src/components/analytics/AnalyticsProvider.tsx
 var LEAGUE_PATHS = {
   "/mlb": "MLB",
   "/nba": "NBA",
@@ -27886,14 +27887,14 @@ function AnalyticsProvider({ children }) {
   return children;
 }
 
-// ../grarf/desktop/src/layouts/AppShellLayout.tsx
+// src/layouts/AppShellLayout.tsx
 init_define_import_meta_env();
 var import_react47 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/lib/perf/perfDiagnostics.ts
+// src/lib/perf/perfDiagnostics.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/perf/embedRegistry.ts
+// src/lib/perf/embedRegistry.ts
 init_define_import_meta_env();
 var active = /* @__PURE__ */ new Map();
 function key(slot, url) {
@@ -27913,11 +27914,11 @@ function getActiveEmbeds() {
   return [...active.values()];
 }
 
-// ../grarf/desktop/src/store/tickerEventQueueStore.ts
+// src/store/tickerEventQueueStore.ts
 init_define_import_meta_env();
 var import_zustand3 = __toESM(require_zustand(), 1);
 
-// ../grarf/desktop/src/types/liveSportsTicker.ts
+// src/types/liveSportsTicker.ts
 init_define_import_meta_env();
 function tickerTypeRank(t2) {
   switch (t2) {
@@ -27938,7 +27939,7 @@ function defaultDisplayMsForType(t2) {
   return 4500;
 }
 
-// ../grarf/desktop/src/store/tickerEventQueueStore.ts
+// src/store/tickerEventQueueStore.ts
 var sessionOnceEmitted = /* @__PURE__ */ new Set();
 function allowSessionOnce(key2) {
   if (!key2) return true;
@@ -27992,7 +27993,7 @@ var useTickerEventQueue = (0, import_zustand3.create)((set, get) => ({
   }
 }));
 
-// ../grarf/desktop/src/lib/perf/perfDiagnostics.ts
+// src/lib/perf/perfDiagnostics.ts
 var renderCount = 0;
 function initPerfDiagnostics() {
   if (!define_import_meta_env_default.DEV) return;
@@ -28012,10 +28013,10 @@ function initPerfDiagnostics() {
   log();
 }
 
-// ../grarf/desktop/src/lib/perf/initPerformanceInstrumentation.ts
+// src/lib/perf/initPerformanceInstrumentation.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/perf/timerInstrument.ts
+// src/lib/perf/timerInstrument.ts
 init_define_import_meta_env();
 var installed = false;
 var activeIntervalCount = 0;
@@ -28067,10 +28068,10 @@ function getTimerInstrumentationCounts() {
   };
 }
 
-// ../grarf/desktop/src/lib/perf/performanceSnapshot.ts
+// src/lib/perf/performanceSnapshot.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/perf/performanceContext.ts
+// src/lib/perf/performanceContext.ts
 init_define_import_meta_env();
 var context = {
   route: "/",
@@ -28084,14 +28085,14 @@ function getPerformanceContext() {
   return context;
 }
 
-// ../grarf/desktop/src/lib/operationalRuntime/operationalRuntimeObservability.ts
+// src/lib/operationalRuntime/operationalRuntimeObservability.ts
 init_define_import_meta_env();
 init_operationalIngestConfig();
 
-// ../grarf/desktop/src/lib/homeGamesColumnFilter.ts
+// src/lib/homeGamesColumnFilter.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/gamesSpine/isGameActivelyLive.ts
+// src/lib/gamesSpine/isGameActivelyLive.ts
 init_define_import_meta_env();
 function pausedFromStatusLine(statusLine) {
   const line = statusLine?.trim();
@@ -28111,7 +28112,7 @@ function isGameActivelyLive(game) {
   return !isGameCompetitionPaused(game);
 }
 
-// ../grarf/desktop/src/lib/gamesSpine/gamesSpineOperationalDate.ts
+// src/lib/gamesSpine/gamesSpineOperationalDate.ts
 init_define_import_meta_env();
 init_isGrarfWebRenderer();
 function gamesSpineOperationalTimeZone() {
@@ -28293,7 +28294,7 @@ function filterGamesSpineSlateForUpcoming(games, now = /* @__PURE__ */ new Date(
   );
 }
 
-// ../grarf/desktop/src/lib/homeGamesColumnFilter.ts
+// src/lib/homeGamesColumnFilter.ts
 var HOME_GAMES_FILTER_STORAGE_KEY = "grarf-home-games-status-filter";
 var FILTERS = ["all", "live", "upcoming", "final"];
 function parseHomeGamesFilter(raw) {
@@ -28336,7 +28337,7 @@ function homeGamesFilterEmptyLabel(filter) {
   }
 }
 
-// ../grarf/desktop/src/store/operationalModeStore.ts
+// src/store/operationalModeStore.ts
 init_define_import_meta_env();
 var import_zustand4 = __toESM(require_zustand(), 1);
 function initialState() {
@@ -28387,7 +28388,7 @@ if (define_import_meta_env_default.DEV && typeof window !== "undefined") {
   window.__grarfOperationalMode = getInspectableOperationalModeState;
 }
 
-// ../grarf/desktop/src/lib/operationalRuntime/operationalRuntimeObservability.ts
+// src/lib/operationalRuntime/operationalRuntimeObservability.ts
 var RUNTIME_LOG = "[GRARF Operational Runtime]";
 var RETENTION_LOG = "[GRARF Centralized Retention]";
 var lastTransportMeta = null;
@@ -28490,13 +28491,13 @@ if (typeof window !== "undefined") {
   w2.__grarfOperationalRuntime = inspectOperationalRuntime;
 }
 
-// ../grarf/desktop/src/lib/perf/performanceSnapshot.ts
+// src/lib/perf/performanceSnapshot.ts
 init_operationalIngestConfig();
 
-// ../grarf/desktop/src/lib/ticker/rssNews.ts
+// src/lib/ticker/rssNews.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/ticker/normalizeGameForTicker.ts
+// src/lib/ticker/normalizeGameForTicker.ts
 init_define_import_meta_env();
 function leagueKeyToSport(league) {
   switch (league) {
@@ -28565,7 +28566,7 @@ function normalizeGameForTicker(game) {
   };
 }
 
-// ../grarf/desktop/src/lib/ticker/rssNews.ts
+// src/lib/ticker/rssNews.ts
 var TICKER_RSS_POLL_INTERVAL_MS = 3 * 60 * 1e3;
 var RSS_CACHE_TTL_MS = TICKER_RSS_POLL_INTERVAL_MS;
 var rssCache = null;
@@ -28810,7 +28811,7 @@ async function refreshTickerRssNews() {
   return lines;
 }
 
-// ../grarf/desktop/src/lib/perf/performanceSnapshot.ts
+// src/lib/perf/performanceSnapshot.ts
 function readRendererHeapMb() {
   const mem = typeof performance !== "undefined" && "memory" in performance ? performance.memory : void 0;
   return mem ? Math.round(mem.usedJSHeapSize / 1024 / 1024) : null;
@@ -28925,7 +28926,7 @@ function initPerformanceSnapshotCommand() {
   window.__grarfCapturePerformanceSnapshot = captureAndStorePerformanceSnapshot;
 }
 
-// ../grarf/desktop/src/lib/perf/initPerformanceInstrumentation.ts
+// src/lib/perf/initPerformanceInstrumentation.ts
 function initPerformanceInstrumentation() {
   if (!define_import_meta_env_default.DEV) return;
   installTimerInstrumentation();
@@ -28935,19 +28936,19 @@ function initPerformanceInstrumentation() {
   );
 }
 
-// ../grarf/desktop/src/components/perf/PerformanceContextBridge.tsx
+// src/components/perf/PerformanceContextBridge.tsx
 init_define_import_meta_env();
 var import_react3 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/context/AppShellContext.tsx
+// src/context/AppShellContext.tsx
 init_define_import_meta_env();
 var import_react2 = __toESM(require_react(), 1);
 init_isGrarfWebRenderer();
 
-// ../grarf/desktop/src/lib/search/urlLauncher.ts
+// src/lib/search/urlLauncher.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/shared/streamingProviders.js
+// shared/streamingProviders.js
 init_define_import_meta_env();
 var DEFAULT_EMBED_CENTER_PARTITION = "persist:grarf-center";
 var INTELLIGENCE_EMBED_PARTITION = "persist:grarf-intelligence";
@@ -29003,7 +29004,7 @@ function getStreamingProvider(providerId) {
   return STREAMING_PROVIDERS[providerId] ?? null;
 }
 
-// ../grarf/desktop/src/lib/search/urlLauncher.ts
+// src/lib/search/urlLauncher.ts
 var LOG_SEARCH = "[Search]";
 var LOG_WORKSPACE = "[Workspace]";
 var DOMAIN_LIKE_RE = /^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,}(?::\d+)?(?:\/[^\s]*)?$/i;
@@ -29090,7 +29091,7 @@ function tryBuildUrlWorkspaceTab(raw) {
   return buildUrlWorkspaceTab(launch);
 }
 
-// ../grarf/desktop/src/context/AppShellContext.tsx
+// src/context/AppShellContext.tsx
 var import_jsx_runtime = __toESM(require_jsx_runtime(), 1);
 var DESKTOP_STORAGE_KEY = "grarf-sidebar-collapsed";
 var WEB_STORAGE_KEY = "grarf-web-sidebar-collapsed";
@@ -29186,7 +29187,7 @@ function useAppShell() {
   return ctx;
 }
 
-// ../grarf/desktop/src/components/perf/PerformanceContextBridge.tsx
+// src/components/perf/PerformanceContextBridge.tsx
 function PerformanceContextBridge() {
   const location2 = useLocation();
   const { homeShellMode } = useAppShell();
@@ -29199,7 +29200,7 @@ function PerformanceContextBridge() {
   return null;
 }
 
-// ../grarf/desktop/src/components/perf/PerformanceDiagnosticsPanel.tsx
+// src/components/perf/PerformanceDiagnosticsPanel.tsx
 init_define_import_meta_env();
 var import_react4 = __toESM(require_react(), 1);
 var import_jsx_runtime2 = __toESM(require_jsx_runtime(), 1);
@@ -29322,52 +29323,52 @@ function PerformanceDiagnosticsPanel() {
   ] });
 }
 
-// ../grarf/desktop/src/context/GatedLeagueCommandCentersContext.tsx
+// src/context/GatedLeagueCommandCentersContext.tsx
 init_define_import_meta_env();
 var import_react10 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/components/gatedFeature/GatedFeatureModal.tsx
+// src/components/gatedFeature/GatedFeatureModal.tsx
 init_define_import_meta_env();
 var import_react9 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/node_modules/lucide-react/dist/esm/lucide-react.mjs
+// node_modules/lucide-react/dist/esm/lucide-react.mjs
 init_define_import_meta_env();
 
-// ../grarf/desktop/node_modules/lucide-react/dist/esm/createLucideIcon.mjs
+// node_modules/lucide-react/dist/esm/createLucideIcon.mjs
 init_define_import_meta_env();
 var import_react7 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/node_modules/lucide-react/dist/esm/shared/src/utils/mergeClasses.mjs
+// node_modules/lucide-react/dist/esm/shared/src/utils/mergeClasses.mjs
 init_define_import_meta_env();
 var mergeClasses = (...classes) => classes.filter((className, index, array) => {
   return Boolean(className) && className.trim() !== "" && array.indexOf(className) === index;
 }).join(" ").trim();
 
-// ../grarf/desktop/node_modules/lucide-react/dist/esm/shared/src/utils/toKebabCase.mjs
+// node_modules/lucide-react/dist/esm/shared/src/utils/toKebabCase.mjs
 init_define_import_meta_env();
 var toKebabCase = (string) => string.replace(/([a-z0-9])([A-Z])/g, "$1-$2").toLowerCase();
 
-// ../grarf/desktop/node_modules/lucide-react/dist/esm/shared/src/utils/toPascalCase.mjs
+// node_modules/lucide-react/dist/esm/shared/src/utils/toPascalCase.mjs
 init_define_import_meta_env();
 
-// ../grarf/desktop/node_modules/lucide-react/dist/esm/shared/src/utils/toCamelCase.mjs
+// node_modules/lucide-react/dist/esm/shared/src/utils/toCamelCase.mjs
 init_define_import_meta_env();
 var toCamelCase = (string) => string.replace(
   /^([A-Z])|[\s-_]+(\w)/g,
   (match, p1, p2) => p2 ? p2.toUpperCase() : p1.toLowerCase()
 );
 
-// ../grarf/desktop/node_modules/lucide-react/dist/esm/shared/src/utils/toPascalCase.mjs
+// node_modules/lucide-react/dist/esm/shared/src/utils/toPascalCase.mjs
 var toPascalCase = (string) => {
   const camelCase = toCamelCase(string);
   return camelCase.charAt(0).toUpperCase() + camelCase.slice(1);
 };
 
-// ../grarf/desktop/node_modules/lucide-react/dist/esm/Icon.mjs
+// node_modules/lucide-react/dist/esm/Icon.mjs
 init_define_import_meta_env();
 var import_react6 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/node_modules/lucide-react/dist/esm/defaultAttributes.mjs
+// node_modules/lucide-react/dist/esm/defaultAttributes.mjs
 init_define_import_meta_env();
 var defaultAttributes = {
   xmlns: "http://www.w3.org/2000/svg",
@@ -29381,7 +29382,7 @@ var defaultAttributes = {
   strokeLinejoin: "round"
 };
 
-// ../grarf/desktop/node_modules/lucide-react/dist/esm/shared/src/utils/hasA11yProp.mjs
+// node_modules/lucide-react/dist/esm/shared/src/utils/hasA11yProp.mjs
 init_define_import_meta_env();
 var hasA11yProp = (props) => {
   for (const prop in props) {
@@ -29392,13 +29393,13 @@ var hasA11yProp = (props) => {
   return false;
 };
 
-// ../grarf/desktop/node_modules/lucide-react/dist/esm/context.mjs
+// node_modules/lucide-react/dist/esm/context.mjs
 init_define_import_meta_env();
 var import_react5 = __toESM(require_react(), 1);
 var LucideContext = (0, import_react5.createContext)({});
 var useLucideContext = () => (0, import_react5.useContext)(LucideContext);
 
-// ../grarf/desktop/node_modules/lucide-react/dist/esm/Icon.mjs
+// node_modules/lucide-react/dist/esm/Icon.mjs
 var Icon = (0, import_react6.forwardRef)(
   ({ color, size, strokeWidth, absoluteStrokeWidth, className = "", children, iconNode, ...rest }, ref) => {
     const {
@@ -29430,7 +29431,7 @@ var Icon = (0, import_react6.forwardRef)(
   }
 );
 
-// ../grarf/desktop/node_modules/lucide-react/dist/esm/createLucideIcon.mjs
+// node_modules/lucide-react/dist/esm/createLucideIcon.mjs
 var createLucideIcon = (iconName, iconNode) => {
   const Component4 = (0, import_react7.forwardRef)(
     ({ className, ...props }, ref) => (0, import_react7.createElement)(Icon, {
@@ -29448,7 +29449,7 @@ var createLucideIcon = (iconName, iconNode) => {
   return Component4;
 };
 
-// ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/calendar.mjs
+// node_modules/lucide-react/dist/esm/icons/calendar.mjs
 init_define_import_meta_env();
 var __iconNode = [
   ["path", { d: "M8 2v4", key: "1cmpym" }],
@@ -29458,17 +29459,17 @@ var __iconNode = [
 ];
 var Calendar = createLucideIcon("calendar", __iconNode);
 
-// ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/chevron-left.mjs
+// node_modules/lucide-react/dist/esm/icons/chevron-left.mjs
 init_define_import_meta_env();
 var __iconNode2 = [["path", { d: "m15 18-6-6 6-6", key: "1wnfg3" }]];
 var ChevronLeft = createLucideIcon("chevron-left", __iconNode2);
 
-// ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/chevron-right.mjs
+// node_modules/lucide-react/dist/esm/icons/chevron-right.mjs
 init_define_import_meta_env();
 var __iconNode3 = [["path", { d: "m9 18 6-6-6-6", key: "mthhwq" }]];
 var ChevronRight = createLucideIcon("chevron-right", __iconNode3);
 
-// ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/clipboard-list.mjs
+// node_modules/lucide-react/dist/esm/icons/clipboard-list.mjs
 init_define_import_meta_env();
 var __iconNode4 = [
   ["rect", { width: "8", height: "4", x: "8", y: "2", rx: "1", ry: "1", key: "tgr4d6" }],
@@ -29486,7 +29487,7 @@ var __iconNode4 = [
 ];
 var ClipboardList = createLucideIcon("clipboard-list", __iconNode4);
 
-// ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/compass.mjs
+// node_modules/lucide-react/dist/esm/icons/compass.mjs
 init_define_import_meta_env();
 var __iconNode5 = [
   ["circle", { cx: "12", cy: "12", r: "10", key: "1mglay" }],
@@ -29500,7 +29501,7 @@ var __iconNode5 = [
 ];
 var Compass = createLucideIcon("compass", __iconNode5);
 
-// ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/globe.mjs
+// node_modules/lucide-react/dist/esm/icons/globe.mjs
 init_define_import_meta_env();
 var __iconNode6 = [
   ["circle", { cx: "12", cy: "12", r: "10", key: "1mglay" }],
@@ -29509,7 +29510,7 @@ var __iconNode6 = [
 ];
 var Globe = createLucideIcon("globe", __iconNode6);
 
-// ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/headphones.mjs
+// node_modules/lucide-react/dist/esm/icons/headphones.mjs
 init_define_import_meta_env();
 var __iconNode7 = [
   [
@@ -29522,7 +29523,7 @@ var __iconNode7 = [
 ];
 var Headphones = createLucideIcon("headphones", __iconNode7);
 
-// ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/history.mjs
+// node_modules/lucide-react/dist/esm/icons/history.mjs
 init_define_import_meta_env();
 var __iconNode8 = [
   ["path", { d: "M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8", key: "1357e3" }],
@@ -29531,7 +29532,7 @@ var __iconNode8 = [
 ];
 var History = createLucideIcon("history", __iconNode8);
 
-// ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/layout-grid.mjs
+// node_modules/lucide-react/dist/esm/icons/layout-grid.mjs
 init_define_import_meta_env();
 var __iconNode9 = [
   ["rect", { width: "7", height: "7", x: "3", y: "3", rx: "1", key: "1g98yp" }],
@@ -29541,12 +29542,12 @@ var __iconNode9 = [
 ];
 var LayoutGrid = createLucideIcon("layout-grid", __iconNode9);
 
-// ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/loader-circle.mjs
+// node_modules/lucide-react/dist/esm/icons/loader-circle.mjs
 init_define_import_meta_env();
 var __iconNode10 = [["path", { d: "M21 12a9 9 0 1 1-6.219-8.56", key: "13zald" }]];
 var LoaderCircle = createLucideIcon("loader-circle", __iconNode10);
 
-// ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/newspaper.mjs
+// node_modules/lucide-react/dist/esm/icons/newspaper.mjs
 init_define_import_meta_env();
 var __iconNode11 = [
   ["path", { d: "M15 18h-5", key: "95g1m2" }],
@@ -29562,7 +29563,7 @@ var __iconNode11 = [
 ];
 var Newspaper = createLucideIcon("newspaper", __iconNode11);
 
-// ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/radio.mjs
+// node_modules/lucide-react/dist/esm/icons/radio.mjs
 init_define_import_meta_env();
 var __iconNode12 = [
   ["path", { d: "M16.247 7.761a6 6 0 0 1 0 8.478", key: "1fwjs5" }],
@@ -29573,7 +29574,7 @@ var __iconNode12 = [
 ];
 var Radio = createLucideIcon("radio", __iconNode12);
 
-// ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/search.mjs
+// node_modules/lucide-react/dist/esm/icons/search.mjs
 init_define_import_meta_env();
 var __iconNode13 = [
   ["path", { d: "m21 21-4.34-4.34", key: "14j7rj" }],
@@ -29581,7 +29582,7 @@ var __iconNode13 = [
 ];
 var Search = createLucideIcon("search", __iconNode13);
 
-// ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/settings.mjs
+// node_modules/lucide-react/dist/esm/icons/settings.mjs
 init_define_import_meta_env();
 var __iconNode14 = [
   [
@@ -29595,7 +29596,7 @@ var __iconNode14 = [
 ];
 var Settings = createLucideIcon("settings", __iconNode14);
 
-// ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/square-arrow-out-up-right.mjs
+// node_modules/lucide-react/dist/esm/icons/square-arrow-out-up-right.mjs
 init_define_import_meta_env();
 var __iconNode15 = [
   ["path", { d: "M21 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h6", key: "y09zxi" }],
@@ -29604,7 +29605,7 @@ var __iconNode15 = [
 ];
 var SquareArrowOutUpRight = createLucideIcon("square-arrow-out-up-right", __iconNode15);
 
-// ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/triangle-alert.mjs
+// node_modules/lucide-react/dist/esm/icons/triangle-alert.mjs
 init_define_import_meta_env();
 var __iconNode16 = [
   [
@@ -29619,7 +29620,7 @@ var __iconNode16 = [
 ];
 var TriangleAlert = createLucideIcon("triangle-alert", __iconNode16);
 
-// ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/users.mjs
+// node_modules/lucide-react/dist/esm/icons/users.mjs
 init_define_import_meta_env();
 var __iconNode17 = [
   ["path", { d: "M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2", key: "1yyitq" }],
@@ -29629,7 +29630,7 @@ var __iconNode17 = [
 ];
 var Users = createLucideIcon("users", __iconNode17);
 
-// ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/video.mjs
+// node_modules/lucide-react/dist/esm/icons/video.mjs
 init_define_import_meta_env();
 var __iconNode18 = [
   [
@@ -29643,7 +29644,7 @@ var __iconNode18 = [
 ];
 var Video = createLucideIcon("video", __iconNode18);
 
-// ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/wifi.mjs
+// node_modules/lucide-react/dist/esm/icons/wifi.mjs
 init_define_import_meta_env();
 var __iconNode19 = [
   ["path", { d: "M12 20h.01", key: "zekei9" }],
@@ -29653,7 +29654,7 @@ var __iconNode19 = [
 ];
 var Wifi = createLucideIcon("wifi", __iconNode19);
 
-// ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/x.mjs
+// node_modules/lucide-react/dist/esm/icons/x.mjs
 init_define_import_meta_env();
 var __iconNode20 = [
   ["path", { d: "M18 6 6 18", key: "1bl5f8" }],
@@ -29661,10 +29662,10 @@ var __iconNode20 = [
 ];
 var X2 = createLucideIcon("x", __iconNode20);
 
-// ../grarf/desktop/src/lib/cn.ts
+// src/lib/cn.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/node_modules/clsx/dist/clsx.mjs
+// node_modules/clsx/dist/clsx.mjs
 init_define_import_meta_env();
 function r2(e2) {
   var t2, f2, n2 = "";
@@ -29680,7 +29681,7 @@ function clsx() {
   return n2;
 }
 
-// ../grarf/desktop/node_modules/tailwind-merge/dist/bundle-mjs.mjs
+// node_modules/tailwind-merge/dist/bundle-mjs.mjs
 init_define_import_meta_env();
 var concatArrays = (array1, array2) => {
   const combinedArray = new Array(array1.length + array2.length);
@@ -32855,12 +32856,12 @@ var getDefaultConfig = () => {
 };
 var twMerge = /* @__PURE__ */ createTailwindMerge(getDefaultConfig);
 
-// ../grarf/desktop/src/lib/cn.ts
+// src/lib/cn.ts
 function cn2(...inputs) {
   return twMerge(clsx(inputs));
 }
 
-// ../grarf/desktop/src/hooks/useGatedFeatureModal.ts
+// src/hooks/useGatedFeatureModal.ts
 init_define_import_meta_env();
 var import_react8 = __toESM(require_react(), 1);
 function useGatedFeatureModal({ open, onClose }) {
@@ -32907,10 +32908,10 @@ function useGatedFeatureModal({ open, onClose }) {
   };
 }
 
-// ../grarf/desktop/src/lib/waitlist/submitWaitlistSignup.ts
+// src/lib/waitlist/submitWaitlistSignup.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/waitlist/waitlistConfig.ts
+// src/lib/waitlist/waitlistConfig.ts
 init_define_import_meta_env();
 init_isGrarfWebRenderer();
 var DEFAULT_WAITLIST_PATH = "/api/waitlist";
@@ -32921,7 +32922,7 @@ function resolveWaitlistApiUrl() {
   return DEFAULT_WAITLIST_PATH;
 }
 
-// ../grarf/desktop/src/lib/waitlist/submitWaitlistSignup.ts
+// src/lib/waitlist/submitWaitlistSignup.ts
 var EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 function normalizeEmail(email) {
   return email.trim().toLowerCase();
@@ -32959,7 +32960,7 @@ async function submitWaitlistSignup(request) {
   }
 }
 
-// ../grarf/desktop/src/components/gatedFeature/GatedFeatureModal.tsx
+// src/components/gatedFeature/GatedFeatureModal.tsx
 var import_jsx_runtime3 = __toESM(require_jsx_runtime(), 1);
 function GatedFeatureModal({
   open,
@@ -33146,7 +33147,7 @@ function GatedFeatureModal({
   );
 }
 
-// ../grarf/desktop/src/data/gatedFeatures/leagueCommandCenters.ts
+// src/data/gatedFeatures/leagueCommandCenters.ts
 init_define_import_meta_env();
 var LEAGUE_COMMAND_CENTERS_FEATURE_KEY = "league-command-centers";
 var LEAGUE_COMMAND_CENTERS_GATED_FEATURE = {
@@ -33170,7 +33171,7 @@ var LEAGUE_COMMAND_CENTERS_GATED_FEATURE = {
 };
 var LEAGUE_COMMAND_CENTERS_MODAL_ICON = LayoutGrid;
 
-// ../grarf/desktop/src/context/GatedLeagueCommandCentersContext.tsx
+// src/context/GatedLeagueCommandCentersContext.tsx
 var import_jsx_runtime4 = __toESM(require_jsx_runtime(), 1);
 var GatedLeagueCommandCentersContext = (0, import_react10.createContext)(null);
 function GatedLeagueCommandCentersProvider({ children }) {
@@ -33204,11 +33205,11 @@ function useGatedLeagueCommandCenters() {
   return ctx;
 }
 
-// ../grarf/desktop/src/components/shell/AppLeftNav.tsx
+// src/components/shell/AppLeftNav.tsx
 init_define_import_meta_env();
 var import_react13 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/data/homeMvp.ts
+// src/data/homeMvp.ts
 init_define_import_meta_env();
 var BETTING_TABS = [
   { id: "dk", label: "DraftKings", url: "https://sportsbook.draftkings.com" },
@@ -33262,39 +33263,39 @@ var UTILITY_NAV = [
 var SOCIAL_NITTER_LIST_URL = "https://nitter.net/i/lists/1930635686060695832";
 var REDDIT_SPORTS_URL = "https://www.reddit.com/r/sports/new/";
 
-// ../grarf/desktop/src/data/leagueDirectoryV1.ts
+// src/data/leagueDirectoryV1.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/gamesSpine/eplLeagueLogoUrl.ts
+// src/lib/gamesSpine/eplLeagueLogoUrl.ts
 init_define_import_meta_env();
 var EPL_LEAGUE_LOGO_URL = "/league-logos/epl.png";
 
-// ../grarf/desktop/src/lib/gamesSpine/lpgaLeagueLogoUrl.ts
+// src/lib/gamesSpine/lpgaLeagueLogoUrl.ts
 init_define_import_meta_env();
 var LPGA_LEAGUE_LOGO_URL = "/league-logos/lpga.png";
 
-// ../grarf/desktop/src/lib/gamesSpine/ncaafLeagueLogoUrl.ts
+// src/lib/gamesSpine/ncaafLeagueLogoUrl.ts
 init_define_import_meta_env();
 var NCAAF_LEAGUE_LOGO_URL = "/league-logos/ncaaf.png";
 
-// ../grarf/desktop/src/lib/gamesSpine/uclLeagueLogoUrl.ts
+// src/lib/gamesSpine/uclLeagueLogoUrl.ts
 init_define_import_meta_env();
 var UCL_LEAGUE_LOGO_URL = "/league-logos/ucl.png";
 
-// ../grarf/desktop/src/lib/gamesSpine/wecLeagueLogoUrl.ts
+// src/lib/gamesSpine/wecLeagueLogoUrl.ts
 init_define_import_meta_env();
 var WEC_LEAGUE_LOGO_URL = "/league-logos/wec.png";
 
-// ../grarf/desktop/src/data/leagueDirectoryNavMenu.ts
+// src/data/leagueDirectoryNavMenu.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/data/resolveLeagueDirectoryNavItemLogo.ts
+// src/data/resolveLeagueDirectoryNavItemLogo.ts
 init_define_import_meta_env();
 function resolveLeagueDirectoryNavItemLogo(itemId) {
   return `/league-logos/nav/${itemId}.png`;
 }
 
-// ../grarf/desktop/src/data/leagueDirectoryNavMenu.ts
+// src/data/leagueDirectoryNavMenu.ts
 function navItem(id, label, logos, overrides = {}) {
   const { logoUrl, ...rest } = overrides;
   return {
@@ -33594,7 +33595,7 @@ function flattenLeagueDirectorySectionItems(sections) {
   return sections.flatMap((section) => [...section.items, ...section.expansionItems ?? []]);
 }
 
-// ../grarf/desktop/src/data/leagueDirectoryV1.ts
+// src/data/leagueDirectoryV1.ts
 var LOGO = {
   nfl: "https://a.espncdn.com/i/teamlogos/leagues/500/nfl.png",
   nba: "https://a.espncdn.com/i/teamlogos/leagues/500/nba.png",
@@ -33668,7 +33669,7 @@ function leagueDirectorySectionTitleLabel(section) {
   return section.title;
 }
 
-// ../grarf/desktop/src/components/shell/DirectoryNavSportGroupHeader.tsx
+// src/components/shell/DirectoryNavSportGroupHeader.tsx
 init_define_import_meta_env();
 var import_jsx_runtime5 = __toESM(require_jsx_runtime(), 1);
 function DirectoryNavSportGroupHeader({ label, variant = "sport" }) {
@@ -33695,11 +33696,11 @@ function DirectoryNavSportGroupHeader({ label, variant = "sport" }) {
   );
 }
 
-// ../grarf/desktop/src/components/shell/OnTodayNavRowWithTallies.tsx
+// src/components/shell/OnTodayNavRowWithTallies.tsx
 init_define_import_meta_env();
 var import_react11 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/components/shell/LeagueNavActivityTallyMarks.tsx
+// src/components/shell/LeagueNavActivityTallyMarks.tsx
 init_define_import_meta_env();
 var import_jsx_runtime6 = __toESM(require_jsx_runtime(), 1);
 var TALLY_STATUS_CLASS = {
@@ -33729,7 +33730,7 @@ function LeagueNavActivityTallyMarks({ statuses, clipOverflow = false }) {
   );
 }
 
-// ../grarf/desktop/src/components/shell/OnTodayNavRowWithTallies.tsx
+// src/components/shell/OnTodayNavRowWithTallies.tsx
 var import_jsx_runtime7 = __toESM(require_jsx_runtime(), 1);
 var ON_TODAY_LABEL_TALLY_GAP_PX = 20;
 function OnTodayNavRowWithTallies({
@@ -33783,7 +33784,7 @@ function OnTodayNavRowWithTallies({
   ] });
 }
 
-// ../grarf/desktop/src/lib/navigation/resolveLeagueNavActivityStatuses.ts
+// src/lib/navigation/resolveLeagueNavActivityStatuses.ts
 init_define_import_meta_env();
 function resolveActivityBucketStatus(game) {
   if (game.status === "final") return "final";
@@ -33818,16 +33819,16 @@ function resolveLeagueNavActivityStatusesByLeague(mergedLeagues) {
   return out;
 }
 
-// ../grarf/desktop/src/lib/navigation/resolveLeagueDirectoryNavSections.ts
+// src/lib/navigation/resolveLeagueDirectoryNavSections.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/navigation/resolveOnTodayNavItems.ts
+// src/lib/navigation/resolveOnTodayNavItems.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/bestGameRightNow/leagueImportanceV1.ts
+// src/lib/bestGameRightNow/leagueImportanceV1.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/golf/lpgaMajorTournament.ts
+// src/lib/golf/lpgaMajorTournament.ts
 init_define_import_meta_env();
 var LPGA_MAJOR_TITLE_PATTERNS = [
   /\bevian championship\b/i,
@@ -33849,7 +33850,7 @@ function isLpgaMajorTournamentTitle(title) {
   return LPGA_MAJOR_TITLE_PATTERNS.some((pattern) => pattern.test(trimmed));
 }
 
-// ../grarf/desktop/src/lib/bestGameRightNow/leagueImportanceV1.ts
+// src/lib/bestGameRightNow/leagueImportanceV1.ts
 var GOLF_GAME_IMPORTANCE_V1 = {
   US_OPEN: 98.5,
   PGA_MAJOR: 71,
@@ -33901,7 +33902,7 @@ function resolveLeagueImportanceV1(game) {
   return 0;
 }
 
-// ../grarf/desktop/src/lib/gamesSpine/gamesSpineLeagueDisplayLabel.ts
+// src/lib/gamesSpine/gamesSpineLeagueDisplayLabel.ts
 init_define_import_meta_env();
 var GAMES_SPINE_LEAGUE_DISPLAY_LABEL = {
   EPL: "EPL",
@@ -33912,18 +33913,18 @@ function resolveGamesSpineLeagueDisplayLabel(league) {
   return GAMES_SPINE_LEAGUE_DISPLAY_LABEL[league] ?? GAMES_COLUMN_LEAGUE_LABEL[league] ?? resolveEspnOperationalLeagueLabel(league) ?? league;
 }
 
-// ../grarf/desktop/src/lib/gamesSpine/gamesSpineLeagueLogoUrls.ts
+// src/lib/gamesSpine/gamesSpineLeagueLogoUrls.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/gamesSpine/mcwsLeagueLogoUrl.ts
+// src/lib/gamesSpine/mcwsLeagueLogoUrl.ts
 init_define_import_meta_env();
 var MCWS_LEAGUE_LOGO_URL = "https://upload.wikimedia.org/wikipedia/en/c/c2/Cws_logo_new_ncaa2016.png";
 
-// ../grarf/desktop/src/lib/gamesSpine/worldCupLeagueLogoUrl.ts
+// src/lib/gamesSpine/worldCupLeagueLogoUrl.ts
 init_define_import_meta_env();
 var WORLD_CUP_LEAGUE_LOGO_URL = "/league-logos/fifa-world-cup-2026.png";
 
-// ../grarf/desktop/src/lib/gamesSpine/gamesSpineLeagueLogoUrls.ts
+// src/lib/gamesSpine/gamesSpineLeagueLogoUrls.ts
 var GAMES_SPINE_LEAGUE_LOGO_URL = {
   MLB: "https://a.espncdn.com/i/teamlogos/leagues/500/mlb.png",
   NCAABB: MCWS_LEAGUE_LOGO_URL,
@@ -33965,7 +33966,7 @@ function resolveGamesSpineLeagueLogoUrl(league) {
   return GAMES_SPINE_LEAGUE_LOGO_URL[league];
 }
 
-// ../grarf/desktop/src/lib/navigation/leagueRoutePaths.ts
+// src/lib/navigation/leagueRoutePaths.ts
 init_define_import_meta_env();
 var GRARF_LEAGUE_ROUTE_PATHS = {
   MLB: "/mlb",
@@ -34002,7 +34003,7 @@ function leagueRoutePath(league) {
   return GRARF_LEAGUE_ROUTE_PATHS[league] ?? "/";
 }
 
-// ../grarf/desktop/src/lib/navigation/resolveOnTodayNavItems.ts
+// src/lib/navigation/resolveOnTodayNavItems.ts
 var NAV_LOGO_ITEM_BY_GRARF_LEAGUE = {
   MLB: "mlb",
   NHL: "nhl",
@@ -34074,7 +34075,7 @@ function resolveOnTodayNavItems(mergedLeagues) {
   return out;
 }
 
-// ../grarf/desktop/src/lib/navigation/resolveLeagueDirectoryNavSections.ts
+// src/lib/navigation/resolveLeagueDirectoryNavSections.ts
 function resolveLeagueDirectoryNavSections(mergedOperationalLeagues, sections = getLeagueDirectoryV1ForNav()) {
   const onTodayItems = resolveOnTodayNavItems(mergedOperationalLeagues);
   return sections.map(
@@ -34082,13 +34083,13 @@ function resolveLeagueDirectoryNavSections(mergedOperationalLeagues, sections = 
   );
 }
 
-// ../grarf/desktop/src/lib/gamesSpine/operationalManualLeagueGames.ts
+// src/lib/gamesSpine/operationalManualLeagueGames.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/gamesSpine/manualLeMans2026SpineEntry.ts
+// src/lib/gamesSpine/manualLeMans2026SpineEntry.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/watch/externalWatchLaunch.ts
+// src/lib/watch/externalWatchLaunch.ts
 init_define_import_meta_env();
 init_isGrarfWebRenderer();
 var WATCH_LOG = "[Watch]";
@@ -34127,7 +34128,7 @@ async function openWatchStreamExternally(url, providerLabel2 = "stream") {
   }
 }
 
-// ../grarf/desktop/src/lib/gamesSpine/manualLeMans2026SpineEntry.ts
+// src/lib/gamesSpine/manualLeMans2026SpineEntry.ts
 var import_react12 = __toESM(require_react(), 1);
 var MANUAL_LE_MANS_2026_GAME_ID = "manual-wec-le-mans-2026";
 var LE_MANS_2026_LIVESTREAM_URL = "https://plus.fiawec.com/en/livestream/s-24-hours-of-le-mans-race-en-4ggw9";
@@ -34214,7 +34215,7 @@ function tryLaunchManualLeMans2026WatchLive(game) {
   return true;
 }
 
-// ../grarf/desktop/src/lib/gamesSpine/operationalManualLeagueGames.ts
+// src/lib/gamesSpine/operationalManualLeagueGames.ts
 var MANUAL_OPERATIONAL_LEAGUE_RESOLVERS = {
   WEC: resolveWecOperationalLeagueGames
 };
@@ -34271,13 +34272,13 @@ function mergeOperationalLeagueGames(leagues, now = /* @__PURE__ */ new Date()) 
   return merged;
 }
 
-// ../grarf/desktop/src/components/shell/AppLeftNav.tsx
+// src/components/shell/AppLeftNav.tsx
 init_isGrarfWebRenderer();
 
-// ../grarf/desktop/src/components/gatedFeature/GatedFeatureAccessIndicator.tsx
+// src/components/gatedFeature/GatedFeatureAccessIndicator.tsx
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/components/gatedFeature/GatedFeatureLockIcon.tsx
+// src/components/gatedFeature/GatedFeatureLockIcon.tsx
 init_define_import_meta_env();
 var import_jsx_runtime8 = __toESM(require_jsx_runtime(), 1);
 function GatedFeatureLockIcon({ className, size = 11 }) {
@@ -34318,7 +34319,7 @@ function GatedFeatureLockIcon({ className, size = 11 }) {
   );
 }
 
-// ../grarf/desktop/src/components/gatedFeature/GatedFeatureAccessIndicator.tsx
+// src/components/gatedFeature/GatedFeatureAccessIndicator.tsx
 var import_jsx_runtime9 = __toESM(require_jsx_runtime(), 1);
 function GatedFeatureAccessIndicator({
   className,
@@ -34353,17 +34354,17 @@ function GatedFeatureAccessIndicator({
   );
 }
 
-// ../grarf/desktop/src/lib/navigation/isLeagueDirectoryGatedNavItem.ts
+// src/lib/navigation/isLeagueDirectoryGatedNavItem.ts
 init_define_import_meta_env();
 function isLeagueDirectoryGatedNavItem(item) {
   return item.id !== "home" && item.route !== "/";
 }
 
-// ../grarf/desktop/src/store/liveGamesStore.ts
+// src/store/liveGamesStore.ts
 init_define_import_meta_env();
 var import_zustand8 = __toESM(require_zustand(), 1);
 
-// ../grarf/desktop/src/lib/broadcast/broadcastDebug.ts
+// src/lib/broadcast/broadcastDebug.ts
 init_define_import_meta_env();
 var LOG7 = "[Broadcasts]";
 function broadcastDebug2(message, extra) {
@@ -34375,7 +34376,7 @@ function broadcastDebug2(message, extra) {
   }
 }
 
-// ../grarf/desktop/src/lib/finalizedGameRetention/preserveMissingOperationalIngestGames.ts
+// src/lib/finalizedGameRetention/preserveMissingOperationalIngestGames.ts
 init_define_import_meta_env();
 function preserveMissingOperationalIngestGames(incoming, previousGames) {
   if (previousGames.length === 0) return incoming;
@@ -34434,7 +34435,7 @@ function mergeFinalRowsWithoutContradictingProtectedGames(primary, extraLeagues,
   return changed ? { ...primary, leagues } : primary;
 }
 
-// ../grarf/desktop/src/lib/finalizedGameRetention/mergeCatchUpIngestSnapshot.ts
+// src/lib/finalizedGameRetention/mergeCatchUpIngestSnapshot.ts
 init_define_import_meta_env();
 function mergeFinalRowsIntoSnapshot(primary, extraLeagues) {
   const leagues = { ...primary.leagues };
@@ -34469,25 +34470,25 @@ function mergeSupplementalRetainedFinals(snap, retained) {
   return mergeFinalRowsIntoSnapshot(snap, byLeague);
 }
 
-// ../grarf/desktop/src/lib/finalizedGameRetention/transitionCoverageDiagnostics.ts
+// src/lib/finalizedGameRetention/transitionCoverageDiagnostics.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/finalizedGameRetention/transitionCoverageTracker.ts
+// src/lib/finalizedGameRetention/transitionCoverageTracker.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/finalizedGameRetention/harvestFinalizedOnIngestTransition.ts
+// src/lib/finalizedGameRetention/harvestFinalizedOnIngestTransition.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/finalizedGameRetention/retentionUtils.ts
+// src/lib/finalizedGameRetention/retentionUtils.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/finalizedGameRetention/constants.ts
+// src/lib/finalizedGameRetention/constants.ts
 init_define_import_meta_env();
 var FINALIZED_RETENTION_TTL_MS = 24 * 60 * 60 * 1e3;
 var LIVE_RECENCY_MAX_INGEST_CYCLES = 32;
 var LIVE_RECENCY_MAX_MS = 8 * 60 * 60 * 1e3;
 
-// ../grarf/desktop/src/lib/finalizedGameRetention/retentionUtils.ts
+// src/lib/finalizedGameRetention/retentionUtils.ts
 function copyFinalizedGame(game) {
   return { ...game };
 }
@@ -34530,7 +34531,7 @@ function collectFinalGamesFromLeagues(leagues) {
   return out;
 }
 
-// ../grarf/desktop/src/lib/finalizedGameRetention/harvestFinalizedOnIngestTransition.ts
+// src/lib/finalizedGameRetention/harvestFinalizedOnIngestTransition.ts
 function collectAllGamesFromLeagues(leagues) {
   const out = [];
   const seen = /* @__PURE__ */ new Set();
@@ -34591,7 +34592,7 @@ function collectFinalizedHarvestFromIngestTransition(input) {
   return candidates.map((c2) => c2.game);
 }
 
-// ../grarf/desktop/src/lib/finalizedGameRetention/liveRecency.ts
+// src/lib/finalizedGameRetention/liveRecency.ts
 init_define_import_meta_env();
 function recordLiveObservations(byId, games, ingestCycle, now = Date.now()) {
   const next = { ...byId };
@@ -34615,7 +34616,7 @@ function pruneLiveRecency(byId, ingestCycle, now = Date.now()) {
   return next;
 }
 
-// ../grarf/desktop/src/store/recentFinalizedGamesStore.ts
+// src/store/recentFinalizedGamesStore.ts
 init_define_import_meta_env();
 var import_zustand5 = __toESM(require_zustand(), 1);
 var STORAGE_KEY = "grarf-recent-finalized-games-v2";
@@ -34725,7 +34726,7 @@ if (typeof window !== "undefined") {
   };
 }
 
-// ../grarf/desktop/src/lib/finalizedGameRetention/transitionCoverageTracker.ts
+// src/lib/finalizedGameRetention/transitionCoverageTracker.ts
 var MAX_TRACKED_GAMES = 800;
 var MAX_HISTORY_PER_GAME = 24;
 function collectAllGamesFromLeagues2(leagues) {
@@ -34992,7 +34993,7 @@ function resetTransitionCoverageDiagnostics() {
   lastIngestCycle = 0;
 }
 
-// ../grarf/desktop/src/lib/finalizedGameRetention/transitionCoverageDiagnostics.ts
+// src/lib/finalizedGameRetention/transitionCoverageDiagnostics.ts
 function inspectFinalizedTransitionCoverage() {
   return buildFinalizedTransitionCoverageSnapshot();
 }
@@ -35010,17 +35011,17 @@ if (typeof window !== "undefined") {
   w2.__grarfResetFinalizedTransitionCoverage = resetTransitionCoverageDiagnostics;
 }
 
-// ../grarf/desktop/src/lib/wimbledon/preserveWimbledonSlamTrackerOnOperationalIngest.ts
+// src/lib/wimbledon/preserveWimbledonSlamTrackerOnOperationalIngest.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/wimbledon/buildWimbledonSlamTrackerUrl.ts
+// src/lib/wimbledon/buildWimbledonSlamTrackerUrl.ts
 init_define_import_meta_env();
 function buildWimbledonSlamTrackerUrl(matchId) {
   const id = String(matchId).trim();
   return `https://www.wimbledon.com/en_GB/scores/slamtracker/${encodeURIComponent(id)}`;
 }
 
-// ../grarf/desktop/src/lib/wimbledon/preserveWimbledonSlamTrackerOnOperationalIngest.ts
+// src/lib/wimbledon/preserveWimbledonSlamTrackerOnOperationalIngest.ts
 function carryWimbledonSlamTrackerFields(game, previous) {
   if (game.metadata?.wimbledonSlamTrackerUrl?.trim()) return game;
   const prevUrl = previous?.metadata?.wimbledonSlamTrackerUrl?.trim();
@@ -35060,13 +35061,13 @@ function preserveWimbledonSlamTrackerOnOperationalIngest(incoming, previousGames
   return changed ? { ...incoming, leagues } : incoming;
 }
 
-// ../grarf/desktop/src/lib/gamesSpine/preserveLiveStatusOnIngest.ts
+// src/lib/gamesSpine/preserveLiveStatusOnIngest.ts
 init_define_import_meta_env();
 function preserveLiveStatusOnIngest(incoming) {
   return incoming;
 }
 
-// ../grarf/desktop/src/lib/gamesSpine/preserveMissingOperationalLeagueSections.ts
+// src/lib/gamesSpine/preserveMissingOperationalLeagueSections.ts
 init_define_import_meta_env();
 var LOG8 = "[GamesSpine]";
 function countLeaguesWithTodaySlate(leagues, now = /* @__PURE__ */ new Date()) {
@@ -35170,7 +35171,7 @@ function applyGamesSpineSnapshotStability(incoming, previousLeagues, now = /* @_
   return preserveMissingOperationalLeagueSections(incoming, previousLeagues, now);
 }
 
-// ../grarf/desktop/src/store/gamesSpineRenderStore.ts
+// src/store/gamesSpineRenderStore.ts
 init_define_import_meta_env();
 var import_zustand6 = __toESM(require_zustand(), 1);
 init_isGrarfWebRenderer();
@@ -35214,20 +35215,20 @@ var useGamesSpineRenderStore = (0, import_zustand6.create)((set, get) => ({
   }
 }));
 
-// ../grarf/desktop/src/store/canonicalLiveGameStore.ts
+// src/store/canonicalLiveGameStore.ts
 init_define_import_meta_env();
 var import_zustand7 = __toESM(require_zustand(), 1);
 
-// ../grarf/desktop/src/services/canonicalLiveGame/normalize.ts
+// src/services/canonicalLiveGame/normalize.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/broadcast/deriveBroadcasts.ts
+// src/lib/broadcast/deriveBroadcasts.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/broadcast/broadcastLabelRank.ts
+// src/lib/broadcast/broadcastLabelRank.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/broadcast/nbaTvBroadcast.ts
+// src/lib/broadcast/nbaTvBroadcast.ts
 init_define_import_meta_env();
 var NBA_TV_BROADCAST_LABEL = "NBA TV";
 function isNbaTvBroadcastLabel(label) {
@@ -35241,7 +35242,7 @@ function nbaTvBroadcastDedupeKey(label) {
   return isNbaTvBroadcastLabel(label) ? "nba tv" : label.trim().toLowerCase();
 }
 
-// ../grarf/desktop/src/lib/broadcast/broadcastLabelRank.ts
+// src/lib/broadcast/broadcastLabelRank.ts
 var WNBA_REAL_BROADCASTER = /prime|nba\s*tv|peacock|usa|ion|cnbc|paramount|cbs|abc|cw\b|league\s*pass|wwor|kfaa|vegas/i;
 function filterWnbaMisattributedEspn(labels, league) {
   if (league !== "WNBA") return [...labels];
@@ -35327,7 +35328,7 @@ function rankBroadcastLabelsForGame(game, max = 6) {
   return rankBroadcastLabels(pool, game.league, max);
 }
 
-// ../grarf/desktop/src/lib/broadcast/deriveBroadcasts.ts
+// src/lib/broadcast/deriveBroadcasts.ts
 function attachBroadcastFields(game) {
   const pool = game.broadcasts && game.broadcasts.length > 0 && game.broadcasts[0] !== "TV TBD" ? game.broadcasts : game.channels ?? [];
   const broadcasts = rankBroadcastLabels(pool, game.league);
@@ -35337,7 +35338,7 @@ function attachBroadcastFields(game) {
   };
 }
 
-// ../grarf/desktop/src/services/canonicalLiveGame/normalize.ts
+// src/services/canonicalLiveGame/normalize.ts
 function normalizeCanonicalLiveGame(game, input) {
   const league = game.league ?? "MLB";
   const enriched = attachBroadcastFields({ ...game, league });
@@ -35354,7 +35355,7 @@ function normalizeCanonicalLiveGame(game, input) {
   return { game: enriched, meta };
 }
 
-// ../grarf/desktop/src/store/canonicalLiveGameStore.ts
+// src/store/canonicalLiveGameStore.ts
 function emptyLeagues() {
   return {};
 }
@@ -35463,7 +35464,7 @@ function getCanonicalLiveGameRow(gameId, consumerId) {
   return useCanonicalLiveGameStore.getState().getCanonicalGameRow(gameId, consumerId);
 }
 
-// ../grarf/desktop/src/store/liveGamesStore.ts
+// src/store/liveGamesStore.ts
 var useLiveGamesStore = (0, import_zustand8.create)((set) => ({
   leagues: useCanonicalLiveGameStore.getState().leagues,
   updatedAt: useCanonicalLiveGameStore.getState().updatedAt,
@@ -35550,7 +35551,7 @@ useCanonicalLiveGameStore.subscribe((canonical) => {
   });
 });
 
-// ../grarf/desktop/src/components/shell/AppLeftNav.tsx
+// src/components/shell/AppLeftNav.tsx
 var import_jsx_runtime10 = __toESM(require_jsx_runtime(), 1);
 var EXPANDED_MIN_PX = 132;
 var EXPANDED_MAX_PX = 248;
@@ -35926,22 +35927,22 @@ function AppLeftNav() {
   );
 }
 
-// ../grarf/desktop/src/components/shell/GlobalAppBar.tsx
+// src/components/shell/GlobalAppBar.tsx
 init_define_import_meta_env();
 var import_react17 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/components/shell/GlobalHeaderNewsTicker.tsx
+// src/components/shell/GlobalHeaderNewsTicker.tsx
 init_define_import_meta_env();
 var import_react15 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/hooks/useGlobalHeaderNewsTickerHeadlines.ts
+// src/hooks/useGlobalHeaderNewsTickerHeadlines.ts
 init_define_import_meta_env();
 var import_react14 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/lib/ticker/fetchGlobalHeaderTickerRss.ts
+// src/lib/ticker/fetchGlobalHeaderTickerRss.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/types/globalHeaderTicker.ts
+// src/types/globalHeaderTicker.ts
 init_define_import_meta_env();
 var GLOBAL_HEADER_TICKER_RSS_FEED_URL = "https://rss.app/feeds/_YQJFO8TR3FiyO9s4.xml";
 var GLOBAL_HEADER_TICKER_RSS_POLL_INTERVAL_MS = 10 * 60 * 1e3;
@@ -35955,7 +35956,7 @@ function isGlobalHeaderTickerUnavailable(items) {
   return items.length === 1 && items[0]?.title === GLOBAL_HEADER_TICKER_UNAVAILABLE_LABEL && !items[0]?.url;
 }
 
-// ../grarf/desktop/src/lib/ticker/parseGlobalHeaderTickerRss.ts
+// src/lib/ticker/parseGlobalHeaderTickerRss.ts
 init_define_import_meta_env();
 function textContent2(el) {
   return el?.textContent?.replace(/\s+/g, " ").trim() ?? "";
@@ -36012,7 +36013,7 @@ function parseGlobalHeaderTickerRss(xml, maxItems = GLOBAL_HEADER_TICKER_RSS_MAX
   return out;
 }
 
-// ../grarf/desktop/src/lib/ticker/fetchGlobalHeaderTickerRss.ts
+// src/lib/ticker/fetchGlobalHeaderTickerRss.ts
 var cache = null;
 async function fetchRssXml() {
   const bridge = typeof window !== "undefined" ? window.grarf?.tickerRssFetch : void 0;
@@ -36049,7 +36050,7 @@ async function fetchGlobalHeaderTickerRssItems() {
   return cache?.items ?? [];
 }
 
-// ../grarf/desktop/src/hooks/useGlobalHeaderNewsTickerHeadlines.ts
+// src/hooks/useGlobalHeaderNewsTickerHeadlines.ts
 function useGlobalHeaderNewsTickerItems() {
   const [items, setItems] = (0, import_react14.useState)([GLOBAL_HEADER_TICKER_UNAVAILABLE]);
   (0, import_react14.useEffect)(() => {
@@ -36071,7 +36072,7 @@ function useGlobalHeaderNewsTickerItems() {
   return items;
 }
 
-// ../grarf/desktop/src/components/shell/GlobalHeaderNewsTicker.tsx
+// src/components/shell/GlobalHeaderNewsTicker.tsx
 var import_jsx_runtime11 = __toESM(require_jsx_runtime(), 1);
 var TICKER_FEED_LABEL_WIDTH_PX = 52;
 var FIT_HOLD_MS = 8e3;
@@ -36232,14 +36233,14 @@ function GlobalHeaderNewsTicker({ className }) {
   );
 }
 
-// ../grarf/desktop/src/components/shell/GlobalAppBar.tsx
+// src/components/shell/GlobalAppBar.tsx
 init_isGrarfWebRenderer();
 
-// ../grarf/desktop/src/components/shell/GatedFeatureSearchBar.tsx
+// src/components/shell/GatedFeatureSearchBar.tsx
 init_define_import_meta_env();
 var import_react16 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/data/gatedFeatures/universalSearch.ts
+// src/data/gatedFeatures/universalSearch.ts
 init_define_import_meta_env();
 var UNIVERSAL_SEARCH_FEATURE_KEY = "universal-search";
 var UNIVERSAL_SEARCH_GATED_FEATURE = {
@@ -36264,7 +36265,7 @@ var UNIVERSAL_SEARCH_GATED_FEATURE = {
 };
 var UNIVERSAL_SEARCH_MODAL_ICON = Search;
 
-// ../grarf/desktop/src/components/shell/GatedFeatureSearchBar.tsx
+// src/components/shell/GatedFeatureSearchBar.tsx
 var import_jsx_runtime12 = __toESM(require_jsx_runtime(), 1);
 function GatedFeatureSearchBar({
   className,
@@ -36311,7 +36312,7 @@ function GatedFeatureSearchBar({
   ] });
 }
 
-// ../grarf/desktop/src/store/centerPaneFeedAlignmentStore.ts
+// src/store/centerPaneFeedAlignmentStore.ts
 init_define_import_meta_env();
 var import_zustand9 = __toESM(require_zustand(), 1);
 var useCenterPaneFeedAlignmentStore = (0, import_zustand9.create)((set) => ({
@@ -36321,7 +36322,7 @@ var useCenterPaneFeedAlignmentStore = (0, import_zustand9.create)((set) => ({
   clearAlignment: () => set({ leftPx: null, widthPx: null })
 }));
 
-// ../grarf/desktop/src/components/shell/GlobalAppBar.tsx
+// src/components/shell/GlobalAppBar.tsx
 var import_jsx_runtime13 = __toESM(require_jsx_runtime(), 1);
 function useLiveDateTime() {
   const [now, setNow] = (0, import_react17.useState)(() => /* @__PURE__ */ new Date());
@@ -36425,18 +36426,18 @@ function GlobalAppBar() {
   );
 }
 
-// ../grarf/desktop/src/components/LiveGamesBridge.tsx
+// src/components/LiveGamesBridge.tsx
 init_define_import_meta_env();
 var import_react18 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/lib/catchUpDiagnostics/index.ts
+// src/lib/catchUpDiagnostics/index.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/catchUpDiagnostics/operationalSlateTrace.ts
+// src/lib/catchUpDiagnostics/operationalSlateTrace.ts
 init_define_import_meta_env();
 init_operationalIngestConfig();
 
-// ../grarf/desktop/src/lib/finalizedGameRetention/buildOperationalSpineSlate.ts
+// src/lib/finalizedGameRetention/buildOperationalSpineSlate.ts
 init_define_import_meta_env();
 function mergeRetainedFinalsIntoSpineSlate(slate, leagueGames, retainedFinals) {
   const seen = new Set(slate.map((g2) => g2.id));
@@ -36477,7 +36478,7 @@ function buildGamesSpineOperationalSlate(leagueGames, retainedFinals, operationa
   return buildCatchUpFinalSlate(leagueGames, retainedFinals, nowDate);
 }
 
-// ../grarf/desktop/src/lib/finalizedGameRetention/mergeCatchUpSupplementalFinals.ts
+// src/lib/finalizedGameRetention/mergeCatchUpSupplementalFinals.ts
 init_define_import_meta_env();
 function mergeCatchUpSupplementalFinals(...groups) {
   const byId = /* @__PURE__ */ new Map();
@@ -36490,13 +36491,13 @@ function mergeCatchUpSupplementalFinals(...groups) {
   return [...byId.values()];
 }
 
-// ../grarf/desktop/src/lib/gamesSpine/sortGamesSpineChronologically.ts
+// src/lib/gamesSpine/sortGamesSpineChronologically.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/bestGameRightNow/tennisMatchupImportanceV1.ts
+// src/lib/bestGameRightNow/tennisMatchupImportanceV1.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/gamesSpine/isTennisLeague.ts
+// src/lib/gamesSpine/isTennisLeague.ts
 init_define_import_meta_env();
 function isTennisLeague(league) {
   return league === "ATP" || league === "WTA";
@@ -36505,7 +36506,7 @@ function isTennisGame(game) {
   return isTennisLeague(game.league);
 }
 
-// ../grarf/desktop/src/lib/bestGameRightNow/tennisMatchupImportanceV1.ts
+// src/lib/bestGameRightNow/tennisMatchupImportanceV1.ts
 function readCanonicalPlayerRank(game, side) {
   const playerRank = side === "away" ? game.awayPlayerRank : game.homePlayerRank;
   const rank = playerRank?.rank;
@@ -36544,7 +36545,7 @@ function compareTennisGamesByMatchupImportanceV1(a2, b2) {
   return bScore - aScore;
 }
 
-// ../grarf/desktop/src/lib/gamesSpine/sortGamesSpineChronologically.ts
+// src/lib/gamesSpine/sortGamesSpineChronologically.ts
 function gamesSpineStatusBucketRank(status) {
   switch (status) {
     case "live":
@@ -36592,19 +36593,19 @@ function sortGamesSpineUpcomingByOperationalDay(games, now = /* @__PURE__ */ new
   });
 }
 
-// ../grarf/desktop/src/lib/operationalMode/matchOperationalModeSpineFilter.ts
+// src/lib/operationalMode/matchOperationalModeSpineFilter.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/demo/demoNhlVegasCarolinaGame.ts
+// src/lib/demo/demoNhlVegasCarolinaGame.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/demo/isDemoDataModeEnabled.ts
+// src/lib/demo/isDemoDataModeEnabled.ts
 init_define_import_meta_env();
 function isDemoDataModeEnabled() {
   return window.grarf?.demoDataModeEnabled === true;
 }
 
-// ../grarf/desktop/src/lib/demo/demoNhlVegasCarolinaGame.ts
+// src/lib/demo/demoNhlVegasCarolinaGame.ts
 var DEMO_NHL_VEGAS_CAROLINA_GAME_ID = "espn-NHL-401582001";
 var DEMO_NHL_VEGAS_CAROLINA_WATCH_URL = "https://www.nhl.com/video/topic/game-recaps/mtl-at-car-recap-6397017049112";
 function isDemoNhlVegasCarolinaGameId(gameId) {
@@ -36636,7 +36637,7 @@ function launchDemoNhlVegasCarolinaWatch(dispatch) {
   dispatch({ type: "open", tab: buildDemoNhlVegasCarolinaWatchTab() });
 }
 
-// ../grarf/desktop/src/lib/operationalMode/matchOperationalModeSpineFilter.ts
+// src/lib/operationalMode/matchOperationalModeSpineFilter.ts
 function matchOperationalModeSpineFilter(game, mode) {
   if (isDemoNhlVegasCarolinaGame(game)) return true;
   if (mode === "LIVE") return isGameActivelyLive(game);
@@ -36644,14 +36645,14 @@ function matchOperationalModeSpineFilter(game, mode) {
   return game.status === "scheduled";
 }
 
-// ../grarf/desktop/src/store/editorialStore.ts
+// src/store/editorialStore.ts
 init_define_import_meta_env();
 var import_zustand10 = __toESM(require_zustand(), 1);
 
-// ../grarf/desktop/src/lib/sportscape/editorial/sportscapeEditorialApi.ts
+// src/lib/sportscape/editorial/sportscapeEditorialApi.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/sportscape/editorial/fetchSportscapeEditorialWithFailover.ts
+// src/lib/sportscape/editorial/fetchSportscapeEditorialWithFailover.ts
 init_define_import_meta_env();
 var FETCH_TIMEOUT_MS = 15e3;
 var LOG9 = "[Sportscape Editorial]";
@@ -36698,7 +36699,7 @@ async function fetchSportscapeEditorialWithFailover(path, init, options) {
   );
 }
 
-// ../grarf/desktop/src/lib/sportscape/editorial/sportscapeEditorialApi.ts
+// src/lib/sportscape/editorial/sportscapeEditorialApi.ts
 function workerWriteHeaders2() {
   const headers = {
     "Content-Type": "application/json"
@@ -36850,7 +36851,7 @@ async function clearAllAiBriefSelections(selections) {
   }
 }
 
-// ../grarf/desktop/src/lib/sportscape/editorial/featuredGamesBrowserStorage.ts
+// src/lib/sportscape/editorial/featuredGamesBrowserStorage.ts
 init_define_import_meta_env();
 var STORAGE_KEY2 = "grarf-featured-games-v1";
 function readFeaturedGamesFromBrowserStorage2() {
@@ -36879,7 +36880,7 @@ function writeFeaturedGamesToBrowserStorage2(featuredGames) {
   }
 }
 
-// ../grarf/desktop/src/store/editorialStore.ts
+// src/store/editorialStore.ts
 var LOG10 = "[Editorial]";
 var EDIT_MODE_KEY = "grarf-editorial-edit-mode-v1";
 var AUTOSAVE_MS = 1e3;
@@ -37128,11 +37129,11 @@ function mergeGeneratedSummaries(summaries) {
   }));
 }
 
-// ../grarf/desktop/src/store/commandBriefingStore.ts
+// src/store/commandBriefingStore.ts
 init_define_import_meta_env();
 var import_zustand11 = __toESM(require_zustand(), 1);
 
-// ../grarf/desktop/src/lib/commandBriefing/commandBriefingDates.ts
+// src/lib/commandBriefing/commandBriefingDates.ts
 init_define_import_meta_env();
 var LOG11 = "[CommandBriefing]";
 var DAY_MS = 24 * 60 * 60 * 1e3;
@@ -37221,7 +37222,7 @@ function daysUntilBriefingDate(key2, now = /* @__PURE__ */ new Date()) {
   return Math.round((target - todayStart) / DAY_MS);
 }
 
-// ../grarf/desktop/src/store/commandBriefingStore.ts
+// src/store/commandBriefingStore.ts
 var DATE_KEY = "grarf-command-briefing-date-v1";
 function readSelectedDate() {
   if (typeof sessionStorage === "undefined") return formatBriefingDateKey();
@@ -37245,7 +37246,7 @@ var useCommandBriefingStore = (0, import_zustand11.create)((set) => ({
   }
 }));
 
-// ../grarf/desktop/src/lib/catchUpDiagnostics/operationalSlateTrace.ts
+// src/lib/catchUpDiagnostics/operationalSlateTrace.ts
 function isTraceableStatus(status) {
   return status === "scheduled" || status === "live";
 }
@@ -37402,7 +37403,7 @@ if (typeof window !== "undefined") {
   w2.__grarfOperationalSlateTrace = inspectOperationalSlateTrace;
 }
 
-// ../grarf/desktop/src/lib/catchUpDiagnostics/centralizedRetentionTrace.ts
+// src/lib/catchUpDiagnostics/centralizedRetentionTrace.ts
 init_define_import_meta_env();
 function resolveRemovalStage(input) {
   if (!input.seenInCanonical) return "canonical_ingest_missing";
@@ -37543,7 +37544,7 @@ function buildCentralizedRetentionTrace(statusFilter = "all", transportMeta = nu
   };
 }
 
-// ../grarf/desktop/src/lib/catchUpDiagnostics/buildCatchUpProvenance.ts
+// src/lib/catchUpDiagnostics/buildCatchUpProvenance.ts
 init_define_import_meta_env();
 init_operationalIngestConfig();
 function classifyTransportGameSource(game, todayKey = getOperationalSportsDayDateKey()) {
@@ -37711,7 +37712,7 @@ function buildCatchUpSourceSummary(input) {
   };
 }
 
-// ../grarf/desktop/src/lib/catchUpDiagnostics/diagnosticsStore.ts
+// src/lib/catchUpDiagnostics/diagnosticsStore.ts
 init_define_import_meta_env();
 init_operationalIngestConfig();
 var lastTransport = null;
@@ -37813,22 +37814,22 @@ if (typeof window !== "undefined") {
   w2.__grarfCentralizedRetentionTrace = inspectCentralizedRetentionTrace;
 }
 
-// ../grarf/desktop/src/components/LiveGamesBridge.tsx
+// src/components/LiveGamesBridge.tsx
 init_operationalIngestConfig();
 init_isGrarfWebRenderer();
 
-// ../grarf/desktop/src/lib/updateEngine/liveGamesPollRegistry.ts
+// src/lib/updateEngine/liveGamesPollRegistry.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/services/operationalIngest/startOperationalSnapshotPolling.ts
+// src/services/operationalIngest/startOperationalSnapshotPolling.ts
 init_define_import_meta_env();
 init_operationalIngestConfig();
 init_isGrarfWebRenderer();
 
-// ../grarf/desktop/src/services/operationalIngest/enrichOperationalTransport.ts
+// src/services/operationalIngest/enrichOperationalTransport.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/mlb/joinMlbProviderIdsClient.ts
+// src/lib/mlb/joinMlbProviderIdsClient.ts
 init_define_import_meta_env();
 var scheduleCache = /* @__PURE__ */ new Map();
 function hasMlbGamePk(game) {
@@ -37910,16 +37911,16 @@ async function joinMlbProviderIdsOnGames(games) {
   });
 }
 
-// ../grarf/desktop/src/lib/fotmob/enrichOperationalSnapshotFotmob.ts
+// src/lib/fotmob/enrichOperationalSnapshotFotmob.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/fotmob/enrichWorldCupGamesWithFotmobUrls.ts
+// src/lib/fotmob/enrichWorldCupGamesWithFotmobUrls.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/fotmob/fetchFotmobWorldCupCatalog.ts
+// src/lib/fotmob/fetchFotmobWorldCupCatalog.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/fotmob/fetchFotmobMatchesByDate.ts
+// src/lib/fotmob/fetchFotmobMatchesByDate.ts
 init_define_import_meta_env();
 var FOTMOB_MATCHES_API = "https://www.fotmob.com/api/data/matches";
 var LOG12 = "[FotMob]";
@@ -37969,7 +37970,7 @@ async function fetchFotmobWorldCupMatchesByDate(dateKey) {
   }
 }
 
-// ../grarf/desktop/src/lib/fotmob/fetchFotmobWorldCupCatalog.ts
+// src/lib/fotmob/fetchFotmobWorldCupCatalog.ts
 function dateKeysForGame(game) {
   const keys = /* @__PURE__ */ new Set();
   const fromMs = game.startTimeMs != null ? fotmobDateKeyFromMs(game.startTimeMs) : null;
@@ -38006,7 +38007,7 @@ async function fetchFotmobWorldCupCatalog(games) {
   return [...byId.values()];
 }
 
-// ../grarf/desktop/src/lib/fotmob/matchFotmobWorldCupMatch.ts
+// src/lib/fotmob/matchFotmobWorldCupMatch.ts
 init_define_import_meta_env();
 var MIN_TEAM_SCORE = 0.55;
 var MIN_TOTAL_SCORE = 0.62;
@@ -38053,7 +38054,7 @@ function matchFotmobWorldCupMatch(game, catalog) {
   return best;
 }
 
-// ../grarf/desktop/src/lib/fotmob/enrichWorldCupGamesWithFotmobUrls.ts
+// src/lib/fotmob/enrichWorldCupGamesWithFotmobUrls.ts
 var LOG13 = "[FotMob]";
 function isWorldCupRow(game) {
   return game.league === "WORLDCUP";
@@ -38096,7 +38097,7 @@ async function enrichWorldCupGamesWithFotmobUrls(games) {
   return out;
 }
 
-// ../grarf/desktop/src/lib/fotmob/enrichOperationalSnapshotFotmob.ts
+// src/lib/fotmob/enrichOperationalSnapshotFotmob.ts
 async function enrichOperationalSnapshotFotmob(transport) {
   const rows = transport.leagues.WORLDCUP;
   if (!Array.isArray(rows) || rows.length === 0) return transport;
@@ -38111,19 +38112,19 @@ async function enrichOperationalSnapshotFotmob(transport) {
   };
 }
 
-// ../grarf/desktop/src/lib/foxWorldCup/enrichOperationalSnapshotFoxWorldCup.ts
+// src/lib/foxWorldCup/enrichOperationalSnapshotFoxWorldCup.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/foxWorldCup/enrichWorldCupGamesWithFoxStreams.ts
+// src/lib/foxWorldCup/enrichWorldCupGamesWithFoxStreams.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/foxWorldCup/fetchFoxWorldCupEventCatalog.ts
+// src/lib/foxWorldCup/fetchFoxWorldCupEventCatalog.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/foxWorldCup/discoverFoxWorldCupDetailUrls.ts
+// src/lib/foxWorldCup/discoverFoxWorldCupDetailUrls.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/foxWorldCup/parseFoxWorldCupEvent.ts
+// src/lib/foxWorldCup/parseFoxWorldCupEvent.ts
 init_define_import_meta_env();
 var FOX_EVENT_BASE = "https://www.fox.com";
 var FOX_EVENT_PATH_RE = /detail\/event\/([a-f0-9-]{36})\/(fifa-world-cup-\d{4}-[a-z0-9-]+)/i;
@@ -38154,7 +38155,7 @@ function parseFoxWorldCupEventPath(pathOrUrl) {
   };
 }
 
-// ../grarf/desktop/src/lib/foxWorldCup/discoverFoxWorldCupDetailUrls.ts
+// src/lib/foxWorldCup/discoverFoxWorldCupDetailUrls.ts
 var FOX_EVENT_BASE2 = "https://www.fox.com";
 var FETCH_TIMEOUT_MS2 = 1e4;
 var MAX_UUID_PROBES = 24;
@@ -38241,7 +38242,7 @@ async function discoverFoxWorldCupDetailUrls(htmlSources) {
   return [...bySlug.values()];
 }
 
-// ../grarf/desktop/src/lib/foxWorldCup/fetchFoxWorldCupBifrostCatalog.ts
+// src/lib/foxWorldCup/fetchFoxWorldCupBifrostCatalog.ts
 init_define_import_meta_env();
 var BIFROST_API_KEY = "jE7yBJVRNAwdDesMgTzTXUUSx1It41Fq";
 var WORLD_CUP_GROUP_ID = "12";
@@ -38318,7 +38319,7 @@ async function fetchFoxWorldCupBifrostCatalog() {
   return [...bySlug.values()];
 }
 
-// ../grarf/desktop/src/lib/foxWorldCup/fetchFoxWorldCupEventCatalog.ts
+// src/lib/foxWorldCup/fetchFoxWorldCupEventCatalog.ts
 var FOX_WORLD_CUP_HUB_URL = "https://www.fox.com/soccer/fifa-world-cup";
 var FOX_SPORTS_PAGE_URL = "https://www.fox.com/sports";
 var FETCH_TIMEOUT_MS4 = 15e3;
@@ -38391,10 +38392,10 @@ async function fetchFoxWorldCupEventCatalog(now = Date.now(), forceRefresh = fal
   return cachedCatalog;
 }
 
-// ../grarf/desktop/src/lib/foxWorldCup/lookupFoxWorldCupStreamForGame.ts
+// src/lib/foxWorldCup/lookupFoxWorldCupStreamForGame.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/foxWorldCup/buildFoxWorldCupMatchHubUrlFromGame.ts
+// src/lib/foxWorldCup/buildFoxWorldCupMatchHubUrlFromGame.ts
 init_define_import_meta_env();
 var FOX_WORLD_CUP_HUB_PREFIX = "https://www.fox.com/soccer/fifa-world-cup/";
 function resolveWorldCupGroupNotes(game) {
@@ -38421,7 +38422,7 @@ function buildFoxWorldCupMatchHubUrlFromGame(game) {
   return `${FOX_WORLD_CUP_HUB_PREFIX}${homeSlug}-vs-${awaySlug}-${dateSlug}-${groupSlug}`;
 }
 
-// ../grarf/desktop/src/lib/foxWorldCup/gameHasFoxOrFs1Broadcast.ts
+// src/lib/foxWorldCup/gameHasFoxOrFs1Broadcast.ts
 init_define_import_meta_env();
 var FOX_BROADCAST = /\b(fox|fs1|fox\s*one)\b/i;
 function gameHasFoxOrFs1Broadcast(game) {
@@ -38429,7 +38430,7 @@ function gameHasFoxOrFs1Broadcast(game) {
   return hints.some((label) => FOX_BROADCAST.test(label.trim()));
 }
 
-// ../grarf/desktop/src/lib/foxWorldCup/matchFoxWorldCupStream.ts
+// src/lib/foxWorldCup/matchFoxWorldCupStream.ts
 init_define_import_meta_env();
 var MIN_TEAM_SCORE2 = 0.55;
 var MIN_TOTAL_SCORE2 = 0.62;
@@ -38464,7 +38465,7 @@ function matchFoxWorldCupStream(game, catalog) {
   return best;
 }
 
-// ../grarf/desktop/src/lib/foxWorldCup/lookupFoxWorldCupStreamForGame.ts
+// src/lib/foxWorldCup/lookupFoxWorldCupStreamForGame.ts
 function catalogKey(homeSlug, awaySlug) {
   return `${homeSlug}-vs-${awaySlug}`;
 }
@@ -38505,7 +38506,7 @@ function lookupFoxWorldCupStreamForGame(game, catalog) {
   };
 }
 
-// ../grarf/desktop/src/lib/foxWorldCup/enrichWorldCupGamesWithFoxStreams.ts
+// src/lib/foxWorldCup/enrichWorldCupGamesWithFoxStreams.ts
 var LOG14 = "[FoxWorldCup]";
 function isWorldCupRow2(game) {
   return game.league === "WORLDCUP";
@@ -38543,7 +38544,7 @@ async function enrichWorldCupGamesWithFoxStreams(games) {
   return out;
 }
 
-// ../grarf/desktop/src/lib/foxWorldCup/enrichOperationalSnapshotFoxWorldCup.ts
+// src/lib/foxWorldCup/enrichOperationalSnapshotFoxWorldCup.ts
 async function enrichOperationalSnapshotFoxWorldCup(transport) {
   const rows = transport.leagues.WORLDCUP;
   if (!Array.isArray(rows) || rows.length === 0) return transport;
@@ -38558,13 +38559,13 @@ async function enrichOperationalSnapshotFoxWorldCup(transport) {
   };
 }
 
-// ../grarf/desktop/src/lib/wnba/enrichOperationalSnapshotWnbaStreams.ts
+// src/lib/wnba/enrichOperationalSnapshotWnbaStreams.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/wnba/enrichWnbaGamesWithPrimeVideoStreams.ts
+// src/lib/wnba/enrichWnbaGamesWithPrimeVideoStreams.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/stream/streamLinkCache.ts
+// src/lib/stream/streamLinkCache.ts
 init_define_import_meta_env();
 var STORAGE_KEY3 = "grarf-stream-links-v1";
 var DEFAULT_TTL_MS = 30 * 60 * 1e3;
@@ -38609,7 +38610,7 @@ function setCachedStreamUrl(provider, gameId, streamUrl, ttlMs = DEFAULT_TTL_MS)
   write(entries);
 }
 
-// ../grarf/desktop/src/lib/wnba/fetchWnbaPrimeVideoLeaguePassCatalog.ts
+// src/lib/wnba/fetchWnbaPrimeVideoLeaguePassCatalog.ts
 init_define_import_meta_env();
 var PRIME_VIDEO_WNBA_CATALOG_PROXY_PATH = "/wnba/prime-video-league-pass-catalog";
 var CATALOG_CACHE_TTL_MS = 10 * 60 * 1e3;
@@ -38642,7 +38643,7 @@ async function fetchWnbaPrimeVideoLeaguePassCatalog() {
   }
 }
 
-// ../grarf/desktop/src/lib/wnba/matchWnbaPrimeVideoLeaguePassEvent.ts
+// src/lib/wnba/matchWnbaPrimeVideoLeaguePassEvent.ts
 init_define_import_meta_env();
 function nicknameMatchesTeam(nickname, teamName) {
   const nick = nickname.trim().toLowerCase();
@@ -38668,7 +38669,7 @@ function isAmazonPrimeVideoDetailUrl(url) {
   return /amazon\.com\/gp\/video\/detail\//i.test(url.trim());
 }
 
-// ../grarf/desktop/src/lib/wnba/enrichWnbaGamesWithPrimeVideoStreams.ts
+// src/lib/wnba/enrichWnbaGamesWithPrimeVideoStreams.ts
 var CACHE_PROVIDER = "Prime Video";
 var LOCKED_STREAM_PROVIDERS = /* @__PURE__ */ new Set(["Peacock", "ESPN+", "Paramount+", "Apple TV+"]);
 function enrichGameRow(game, catalog) {
@@ -38714,7 +38715,7 @@ async function enrichWnbaGamesWithPrimeVideoStreams(games) {
   return games.map((game) => enrichGameRow(game, catalog));
 }
 
-// ../grarf/desktop/src/lib/wnba/enrichOperationalSnapshotWnbaStreams.ts
+// src/lib/wnba/enrichOperationalSnapshotWnbaStreams.ts
 async function enrichOperationalSnapshotWnbaStreams(transport) {
   const rows = transport.leagues.WNBA;
   if (!Array.isArray(rows) || rows.length === 0) return transport;
@@ -38729,7 +38730,7 @@ async function enrichOperationalSnapshotWnbaStreams(transport) {
   };
 }
 
-// ../grarf/desktop/src/lib/watch/enrichOperationalSnapshotEspnWatchStreams.ts
+// src/lib/watch/enrichOperationalSnapshotEspnWatchStreams.ts
 init_define_import_meta_env();
 var ESPN_WATCH_CALENDAR_LEAGUES = /* @__PURE__ */ new Set([
   "MLB",
@@ -38905,13 +38906,13 @@ async function enrichOperationalSnapshotEspnWatchPickerStreams(transport) {
   return transport;
 }
 
-// ../grarf/desktop/src/lib/wimbledon/enrichOperationalSnapshotWimbledonSlamTracker.ts
+// src/lib/wimbledon/enrichOperationalSnapshotWimbledonSlamTracker.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/wimbledon/enrichWimbledonSlamTrackerMatches.ts
+// src/lib/wimbledon/enrichWimbledonSlamTrackerMatches.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/watch/enrichWimbledonEspnWatchStreams.ts
+// src/lib/watch/enrichWimbledonEspnWatchStreams.ts
 init_define_import_meta_env();
 var ESPN_FETCH_UA2 = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36";
 var WIMBLEDON_ESPN_WATCH_CATALOG_ID = "6929e7a4-2c40-3f82-a710-42baae9472c6";
@@ -39054,14 +39055,14 @@ async function enrichWimbledonEspnWatchStreams(games) {
   }
 }
 
-// ../grarf/desktop/src/lib/wimbledon/fetchWimbledonDrawCatalog.ts
+// src/lib/wimbledon/fetchWimbledonDrawCatalog.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/wimbledon/types.ts
+// src/lib/wimbledon/types.ts
 init_define_import_meta_env();
 var WIMBLEDON_DRAW_CODES = ["MS", "LS", "MD", "LD", "XD"];
 
-// ../grarf/desktop/src/lib/wimbledon/fetchWimbledonDrawCatalog.ts
+// src/lib/wimbledon/fetchWimbledonDrawCatalog.ts
 var WIMBLEDON_FETCH_UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36";
 var CATALOG_CACHE_TTL_MS3 = 3e4;
 var INVALID_DRAW_CACHE_TTL_MS = 5e3;
@@ -39241,7 +39242,7 @@ async function fetchWimbledonDrawCatalog(year) {
   return matches;
 }
 
-// ../grarf/desktop/src/lib/wimbledon/matchWimbledonSlamTrackerGame.ts
+// src/lib/wimbledon/matchWimbledonSlamTrackerGame.ts
 init_define_import_meta_env();
 var MIN_PLAYER_SCORE2 = 0.55;
 var MIN_TOTAL_SCORE4 = 0.65;
@@ -39413,7 +39414,7 @@ function matchWimbledonSlamTrackerGame(game, catalog) {
   return resolutionFromMatchId(best.matchId);
 }
 
-// ../grarf/desktop/src/lib/wimbledon/enrichWimbledonSlamTrackerMatches.ts
+// src/lib/wimbledon/enrichWimbledonSlamTrackerMatches.ts
 var LOG15 = "[WimbledonSlamTracker]";
 function attachSlamTrackerResolution(game, matchId, url) {
   game.externalIds = {
@@ -39470,7 +39471,7 @@ async function enrichWimbledonSlamTrackerMatches(games) {
   }
 }
 
-// ../grarf/desktop/src/lib/wimbledon/enrichOperationalSnapshotWimbledonSlamTracker.ts
+// src/lib/wimbledon/enrichOperationalSnapshotWimbledonSlamTracker.ts
 async function enrichOperationalSnapshotWimbledonSlamTracker(transport) {
   let changed = false;
   for (const key2 of ["ATP", "WTA"]) {
@@ -39484,10 +39485,10 @@ async function enrichOperationalSnapshotWimbledonSlamTracker(transport) {
   return changed ? { ...transport, leagues: { ...transport.leagues } } : transport;
 }
 
-// ../grarf/desktop/src/lib/watch/enrichOperationalSnapshotUsaNetworkStreams.ts
+// src/lib/watch/enrichOperationalSnapshotUsaNetworkStreams.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/watch/usaNetworkBroadcast.ts
+// src/lib/watch/usaNetworkBroadcast.ts
 init_define_import_meta_env();
 var USA_NETWORK_LIVE_URL = "https://www.usanetwork.com/live";
 var USA_NETWORK_WNBA_STREAM_URL = "https://www.usanetwork.com/sports";
@@ -39514,7 +39515,7 @@ function resolveUsaNetworkStreamUrl(game) {
   return USA_NETWORK_LIVE_URL;
 }
 
-// ../grarf/desktop/src/lib/watch/enrichOperationalSnapshotUsaNetworkStreams.ts
+// src/lib/watch/enrichOperationalSnapshotUsaNetworkStreams.ts
 var CACHE_PROVIDER2 = "USA";
 function enrichGameRow3(game) {
   if (game.streamUrl?.trim() && game.streamProvider && game.streamProvider !== CACHE_PROVIDER2) {
@@ -39571,10 +39572,10 @@ function enrichOperationalSnapshotUsaNetworkStreams(transport) {
   return changed ? { ...transport, leagues } : transport;
 }
 
-// ../grarf/desktop/src/lib/watch/sanitizeOperationalSnapshotWatchStreams.ts
+// src/lib/watch/sanitizeOperationalSnapshotWatchStreams.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/watch/watchStreamUrl.ts
+// src/lib/watch/watchStreamUrl.ts
 init_define_import_meta_env();
 var ESPN_GAMECAST_PATH = /espn\.com\/(?:[a-z]+\/)?game(?:cast)?\/|espn\.com\/soccer\/match\//i;
 var ESPN_WATCH_PLAYER_PATH = /espn\.com\/watch\/player(?:\/|\?)/i;
@@ -39604,7 +39605,7 @@ function sanitizeGameWatchStreamFields(game) {
   return { ...game, streamUrl: null, streamProvider: null };
 }
 
-// ../grarf/desktop/src/lib/watch/sanitizeOperationalSnapshotWatchStreams.ts
+// src/lib/watch/sanitizeOperationalSnapshotWatchStreams.ts
 function sanitizeLeagueRows(rows) {
   if (!Array.isArray(rows) || rows.length === 0) {
     return { rows: rows ?? [], changed: false };
@@ -39630,19 +39631,19 @@ function sanitizeOperationalSnapshotWatchStreams(transport) {
   return changed ? { ...transport, leagues } : transport;
 }
 
-// ../grarf/desktop/src/lib/tennisChannelPlus/enrichOperationalSnapshotTennisChannel.ts
+// src/lib/tennisChannelPlus/enrichOperationalSnapshotTennisChannel.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/tennisChannelPlus/enrichTennisGamesWithTennisChannelPlus.ts
+// src/lib/tennisChannelPlus/enrichTennisGamesWithTennisChannelPlus.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/tennisChannelPlus/fetchTennisChannelPlusLiveCatalog.ts
+// src/lib/tennisChannelPlus/fetchTennisChannelPlusLiveCatalog.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/tennisChannelPlus/parseTennisChannelEvent.ts
+// src/lib/tennisChannelPlus/parseTennisChannelEvent.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/tennisChannelPlus/buildTennisChannelStreamUrl.ts
+// src/lib/tennisChannelPlus/buildTennisChannelStreamUrl.ts
 init_define_import_meta_env();
 var TENNIS_CHANNEL_VIDEO_BASE = "https://www.tennischannel.com/en-us/video";
 function buildTennisChannelPlusStreamUrl(slug, contentId) {
@@ -39650,7 +39651,7 @@ function buildTennisChannelPlusStreamUrl(slug, contentId) {
   return `${TENNIS_CHANNEL_VIDEO_BASE}/${encodeURIComponent(safeSlug)}/${contentId}`;
 }
 
-// ../grarf/desktop/src/lib/tennisChannelPlus/parseTennisChannelEvent.ts
+// src/lib/tennisChannelPlus/parseTennisChannelEvent.ts
 function pickCourtName(metadata) {
   if (!Array.isArray(metadata)) return null;
   for (const row of metadata) {
@@ -39686,7 +39687,7 @@ function parseTennisChannelPlusEvent(event) {
   };
 }
 
-// ../grarf/desktop/src/lib/tennisChannelPlus/fetchTennisChannelPlusLiveCatalog.ts
+// src/lib/tennisChannelPlus/fetchTennisChannelPlusLiveCatalog.ts
 var TENNIS_CHANNEL_EVENTS_URL = "https://www.tennischannel.com/api/v2/events";
 var FETCH_TIMEOUT_MS5 = 12e3;
 var cachedCatalog3 = null;
@@ -39710,7 +39711,7 @@ async function fetchTennisChannelPlusLiveCatalog(now = Date.now(), forceRefresh 
   return parsed;
 }
 
-// ../grarf/desktop/src/lib/tennisChannelPlus/matchTennisChannelStream.ts
+// src/lib/tennisChannelPlus/matchTennisChannelStream.ts
 init_define_import_meta_env();
 var MIN_PLAYER_SCORE3 = 0.55;
 var MIN_TOTAL_SCORE5 = 0.62;
@@ -39780,7 +39781,7 @@ function matchTennisChannelPlusStream(game, catalog) {
   return best;
 }
 
-// ../grarf/desktop/src/lib/tennisChannelPlus/enrichTennisGamesWithTennisChannelPlus.ts
+// src/lib/tennisChannelPlus/enrichTennisGamesWithTennisChannelPlus.ts
 var LOG16 = "[TennisChannelPlus]";
 function isTennisLeague4(game) {
   return game.league === "ATP" || game.league === "WTA";
@@ -39817,7 +39818,7 @@ async function enrichTennisGamesWithTennisChannelPlus(games) {
   return out;
 }
 
-// ../grarf/desktop/src/lib/tennisChannelPlus/enrichOperationalSnapshotTennisChannel.ts
+// src/lib/tennisChannelPlus/enrichOperationalSnapshotTennisChannel.ts
 var TENNIS_LEAGUES = ["ATP", "WTA"];
 async function enrichOperationalSnapshotTennisChannel(transport) {
   const leagues = { ...transport.leagues };
@@ -39834,10 +39835,10 @@ async function enrichOperationalSnapshotTennisChannel(transport) {
   return changed ? { ...transport, leagues } : transport;
 }
 
-// ../grarf/desktop/src/lib/standings/enrichOperationalSnapshotTeamStandings.ts
+// src/lib/standings/enrichOperationalSnapshotTeamStandings.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/standings/espn/teamStandingsCache.ts
+// src/lib/standings/espn/teamStandingsCache.ts
 init_define_import_meta_env();
 var DEFAULT_TTL_MS2 = 30 * 60 * 1e3;
 var cache2 = /* @__PURE__ */ new Map();
@@ -39852,10 +39853,10 @@ function writeCachedStandingsValue(cacheKey3, value) {
 }
 var ESPN_STANDINGS_CACHE_TTL_MS = DEFAULT_TTL_MS2;
 
-// ../grarf/desktop/src/lib/standings/mlb/buildMlbEspnStandingsIndex.ts
+// src/lib/standings/mlb/buildMlbEspnStandingsIndex.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/standings/formatCanonicalStandingsDisplayLabel.ts
+// src/lib/standings/formatCanonicalStandingsDisplayLabel.ts
 init_define_import_meta_env();
 function formatOrdinal(rank) {
   const mod100 = rank % 100;
@@ -39877,7 +39878,7 @@ function formatCanonicalStandingsDisplayLabel(input) {
   return division ? `${place} \u2022 ${division}` : place;
 }
 
-// ../grarf/desktop/src/lib/standings/espn/fetchEspnStandingsJson.ts
+// src/lib/standings/espn/fetchEspnStandingsJson.ts
 init_define_import_meta_env();
 var ESPN_FETCH_TIMEOUT_MS3 = 12e3;
 async function fetchEspnStandingsJson(url, signal) {
@@ -39891,7 +39892,7 @@ async function fetchEspnStandingsJson(url, signal) {
   return res.json();
 }
 
-// ../grarf/desktop/src/lib/standings/mlb/buildMlbEspnStandingsIndex.ts
+// src/lib/standings/mlb/buildMlbEspnStandingsIndex.ts
 var LOG17 = "[StandingsEnrich:MLB]";
 var MLB_ESPN_STANDINGS_URL = "https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/standings";
 var MLB_ESPN_CORE_BASE = "https://sports.core.api.espn.com/v2/sports/baseball/leagues/mlb";
@@ -40133,7 +40134,7 @@ async function buildMlbEspnStandingsIndex(now = /* @__PURE__ */ new Date()) {
   return index;
 }
 
-// ../grarf/desktop/src/lib/standings/mlb/enrichMlbGamesWithStandings.ts
+// src/lib/standings/mlb/enrichMlbGamesWithStandings.ts
 init_define_import_meta_env();
 var LOG18 = "[StandingsEnrich:MLB]";
 function normalizeTeamLookupKey2(value) {
@@ -40179,7 +40180,7 @@ async function enrichMlbGamesWithStandings(games, index) {
   return enriched;
 }
 
-// ../grarf/desktop/src/lib/standings/wnba/buildWnbaEspnStandingsIndex.ts
+// src/lib/standings/wnba/buildWnbaEspnStandingsIndex.ts
 init_define_import_meta_env();
 var LOG19 = "[StandingsEnrich:WNBA]";
 var WNBA_ESPN_STANDINGS_URL = "https://site.api.espn.com/apis/site/v2/sports/basketball/wnba/standings";
@@ -40408,7 +40409,7 @@ async function buildWnbaEspnStandingsIndex(now = /* @__PURE__ */ new Date()) {
   return index;
 }
 
-// ../grarf/desktop/src/lib/standings/wnba/enrichWnbaGamesWithStandings.ts
+// src/lib/standings/wnba/enrichWnbaGamesWithStandings.ts
 init_define_import_meta_env();
 var LOG20 = "[StandingsEnrich:WNBA]";
 function normalizeTeamLookupKey4(value) {
@@ -40454,7 +40455,7 @@ async function enrichWnbaGamesWithStandings(games, index) {
   return enriched;
 }
 
-// ../grarf/desktop/src/lib/standings/enrichOperationalSnapshotTeamStandings.ts
+// src/lib/standings/enrichOperationalSnapshotTeamStandings.ts
 var LOG21 = "[StandingsEnrich]";
 var TEAM_STANDINGS_LEAGUE_ENRICHERS = {
   MLB: {
@@ -40501,13 +40502,13 @@ async function enrichOperationalSnapshotTeamStandings(transport) {
   return { ...transport, leagues: nextLeagues };
 }
 
-// ../grarf/desktop/src/lib/playerRank/enrichOperationalSnapshotPlayerRanks.ts
+// src/lib/playerRank/enrichOperationalSnapshotPlayerRanks.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/playerRank/enrichTennisGamesWithPlayerRanks.ts
+// src/lib/playerRank/enrichTennisGamesWithPlayerRanks.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/playerRank/buildCanonicalPlayerRank.ts
+// src/lib/playerRank/buildCanonicalPlayerRank.ts
 init_define_import_meta_env();
 function buildCanonicalPlayerRank(rank, kind, source, leagueKey) {
   return {
@@ -40519,7 +40520,7 @@ function buildCanonicalPlayerRank(rank, kind, source, leagueKey) {
   };
 }
 
-// ../grarf/desktop/src/lib/playerRank/resolveWimbledonFeedSeedsForGame.ts
+// src/lib/playerRank/resolveWimbledonFeedSeedsForGame.ts
 init_define_import_meta_env();
 function gamePlayerLabelVariants2(game, side) {
   const primary = side === "away" ? game.awayTeam : game.homeTeam;
@@ -40554,7 +40555,7 @@ function resolveWimbledonFeedSeedsForGame(game, match) {
   return { awaySeed: match.team2Seed, homeSeed: match.team1Seed };
 }
 
-// ../grarf/desktop/src/lib/playerRank/enrichTennisGamesWithPlayerRanks.ts
+// src/lib/playerRank/enrichTennisGamesWithPlayerRanks.ts
 var LOG22 = "[PlayerRankEnrich:Tennis]";
 function resolveTennisSideRank(game, side, wimbledonSeeds) {
   const leagueKey = game.league;
@@ -40611,7 +40612,7 @@ async function enrichTennisGamesWithPlayerRanks(games, catalogByYear) {
   return enriched;
 }
 
-// ../grarf/desktop/src/lib/playerRank/enrichOperationalSnapshotPlayerRanks.ts
+// src/lib/playerRank/enrichOperationalSnapshotPlayerRanks.ts
 var LOG23 = "[PlayerRankEnrich]";
 var TENNIS_PLAYER_RANK_LEAGUES = ["ATP", "WTA"];
 async function buildWimbledonCatalogByYear(transport) {
@@ -40658,10 +40659,10 @@ async function enrichOperationalSnapshotPlayerRanks(transport) {
   return { ...transport, leagues: nextLeagues };
 }
 
-// ../grarf/desktop/src/services/operationalIngest/enrichOperationalTransport.ts
+// src/services/operationalIngest/enrichOperationalTransport.ts
 init_isGrarfWebRenderer();
 
-// ../grarf/desktop/src/services/operationalIngest/supplementOperationalSnapshotFromLocalIpc.ts
+// src/services/operationalIngest/supplementOperationalSnapshotFromLocalIpc.ts
 init_define_import_meta_env();
 function cloudRowMissingMlbPk(row) {
   if (typeof row.gamePk === "number" && row.gamePk > 0) return false;
@@ -40788,7 +40789,7 @@ async function supplementOperationalSnapshotFromLocalIpc(transport) {
   return changed ? { ...transport, leagues: mergedLeagues } : transport;
 }
 
-// ../grarf/desktop/src/services/operationalIngest/enrichOperationalTransport.ts
+// src/services/operationalIngest/enrichOperationalTransport.ts
 var LOG24 = "[OperationalIngest]";
 function cloudRowMissingMlbPk2(row) {
   if (typeof row.gamePk === "number" && row.gamePk > 0) return false;
@@ -40894,7 +40895,7 @@ async function enrichOperationalTransport(rawTransport) {
   return transport;
 }
 
-// ../grarf/desktop/src/services/operationalIngest/normalizeOperationalSnapshot.ts
+// src/services/operationalIngest/normalizeOperationalSnapshot.ts
 init_define_import_meta_env();
 function normalizeOperationalSnapshot(response) {
   const leagues = {};
@@ -40913,7 +40914,7 @@ function normalizeOperationalSnapshot(response) {
   return canonical;
 }
 
-// ../grarf/desktop/src/services/operationalIngest/startOperationalSnapshotPolling.ts
+// src/services/operationalIngest/startOperationalSnapshotPolling.ts
 var LOG25 = "[OperationalIngest]";
 var DEFAULT_POLL_INTERVAL_MS = 6e4;
 var RETRY_MS = 15e3;
@@ -40997,14 +40998,14 @@ function startOperationalSnapshotPolling(hydrate, options) {
   };
 }
 
-// ../grarf/desktop/src/lib/updateEngine/updateEngineCadences.ts
+// src/lib/updateEngine/updateEngineCadences.ts
 init_define_import_meta_env();
 var WEB_UPDATE_ENGINE_LIVE_GAMES_POLL_MS = 15e3;
 var WEB_UPDATE_ENGINE_SIGNALS_POLL_MS = 3e4;
 var WEB_UPDATE_ENGINE_BROWSER_POLL_MS = 2 * 6e4;
 var WEB_UPDATE_ENGINE_HIGHLIGHTS_TV_POLL_MS = 5 * 6e4;
 
-// ../grarf/desktop/src/lib/updateEngine/liveGamesPollRegistry.ts
+// src/lib/updateEngine/liveGamesPollRegistry.ts
 var hydrateFn = null;
 var stopPoll = null;
 function isWebLiveGamesHydrateRegistered() {
@@ -41029,7 +41030,7 @@ function startWebLiveGamesPoller() {
   };
 }
 
-// ../grarf/desktop/src/services/operationalIngest/index.ts
+// src/services/operationalIngest/index.ts
 init_define_import_meta_env();
 init_operationalIngestConfig();
 async function loadCanonicalOperationalSnapshot() {
@@ -41038,7 +41039,7 @@ async function loadCanonicalOperationalSnapshot() {
   return { transport, canonical: normalizeOperationalSnapshot(transport) };
 }
 
-// ../grarf/desktop/src/components/LiveGamesBridge.tsx
+// src/components/LiveGamesBridge.tsx
 function supplementOperationalSnapshotLeagues(primary, supplement) {
   const merged = { ...primary };
   let changed = false;
@@ -41176,30 +41177,30 @@ function LiveGamesBridge() {
   return null;
 }
 
-// ../grarf/desktop/src/components/updateEngine/WebUpdateEngineBridge.tsx
+// src/components/updateEngine/WebUpdateEngineBridge.tsx
 init_define_import_meta_env();
 var import_react19 = __toESM(require_react(), 1);
 init_isGrarfWebRenderer();
 
-// ../grarf/desktop/src/lib/updateEngine/webUpdateEngine.ts
+// src/lib/updateEngine/webUpdateEngine.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/store/liveTrackerPostsStore.ts
+// src/store/liveTrackerPostsStore.ts
 init_define_import_meta_env();
 var import_zustand16 = __toESM(require_zustand(), 1);
 init_isGrarfWebRenderer();
 
-// ../grarf/desktop/src/lib/liveTracker/fetchActiveLiveTrackerPosts.ts
+// src/lib/liveTracker/fetchActiveLiveTrackerPosts.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/store/liveTrackerActiveFeedsStore.ts
+// src/store/liveTrackerActiveFeedsStore.ts
 init_define_import_meta_env();
 var import_zustand15 = __toESM(require_zustand(), 1);
 
-// ../grarf/desktop/src/lib/liveTracker/resolveActiveLiveTrackerFeeds.ts
+// src/lib/liveTracker/resolveActiveLiveTrackerFeeds.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/liveTracker/liveTrackerFeedRegistry.ts
+// src/lib/liveTracker/liveTrackerFeedRegistry.ts
 init_define_import_meta_env();
 var LIVE_TRACKER_FEED_REGISTRY = [
   {
@@ -41277,7 +41278,7 @@ function hasLiveTrackerFeedForLeague(league) {
   return FEED_BY_LEAGUE.has(league);
 }
 
-// ../grarf/desktop/src/lib/liveTracker/resolveActiveLiveTrackerFeeds.ts
+// src/lib/liveTracker/resolveActiveLiveTrackerFeeds.ts
 function resolveActiveLiveTrackerFeeds(liveLeagueKeys) {
   const feeds = [];
   for (const league of liveLeagueKeys) {
@@ -41295,27 +41296,27 @@ function buildLiveTrackerActiveFeedsSnapshot(liveLeagueKeys, updatedAt = null) {
   };
 }
 
-// ../grarf/desktop/src/store/liveTrackerLiveLeaguesStore.ts
+// src/store/liveTrackerLiveLeaguesStore.ts
 init_define_import_meta_env();
 var import_zustand14 = __toESM(require_zustand(), 1);
 
-// ../grarf/desktop/src/lib/liveTracker/resolveCurrentlyLiveGamesSpineLeagues.ts
+// src/lib/liveTracker/resolveCurrentlyLiveGamesSpineLeagues.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/liveTracker/resolveManualLiveTrackerLeagueGames.ts
+// src/lib/liveTracker/resolveManualLiveTrackerLeagueGames.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/gamesSpine/manual/convertManualGamesSpineDocument.ts
+// src/lib/gamesSpine/manual/convertManualGamesSpineDocument.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/gamesSpine/manualGamesSpineLeagueLogoUrls.ts
+// src/lib/gamesSpine/manualGamesSpineLeagueLogoUrls.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/gamesSpine/royalAscotLeagueLogoUrl.ts
+// src/lib/gamesSpine/royalAscotLeagueLogoUrl.ts
 init_define_import_meta_env();
 var ROYAL_ASCOT_LEAGUE_LOGO_URL = "/league-logos/royal-ascot.png";
 
-// ../grarf/desktop/src/lib/gamesSpine/manualGamesSpineLeagueLogoUrls.ts
+// src/lib/gamesSpine/manualGamesSpineLeagueLogoUrls.ts
 var MANUAL_GAMES_SPINE_LEAGUE_LOGO_BY_KEY = {
   "royal ascot": ROYAL_ASCOT_LEAGUE_LOGO_URL,
   "royal-ascot": ROYAL_ASCOT_LEAGUE_LOGO_URL
@@ -41331,7 +41332,7 @@ function resolveManualGamesSpineLeagueLogoUrl(league) {
   return void 0;
 }
 
-// ../grarf/desktop/src/lib/gamesSpine/manual/resolveManualGamesSpineLeagueDisplayName.ts
+// src/lib/gamesSpine/manual/resolveManualGamesSpineLeagueDisplayName.ts
 init_define_import_meta_env();
 function resolveManualGamesSpineLeagueDisplayName(league) {
   const displayName = league.displayName?.trim();
@@ -41339,10 +41340,10 @@ function resolveManualGamesSpineLeagueDisplayName(league) {
   return league.league.trim();
 }
 
-// ../grarf/desktop/src/lib/gamesSpine/manual/manualGamesSpineUtils.ts
+// src/lib/gamesSpine/manual/manualGamesSpineUtils.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/broadcast/streamUrlChannelFallback.ts
+// src/lib/broadcast/streamUrlChannelFallback.ts
 init_define_import_meta_env();
 var STREAM_URL_CHANNEL_MAPPINGS = [
   { domains: ["tennischannel.com"], label: "Tennis Channel" },
@@ -41384,7 +41385,7 @@ function deriveChannelLabelFromStreamUrl(streamUrl) {
   return null;
 }
 
-// ../grarf/desktop/src/lib/gamesSpine/manual/manualGamesSpineUtils.ts
+// src/lib/gamesSpine/manual/manualGamesSpineUtils.ts
 var WALL_CLOCK_RE = /^(\d{4})-(\d{2})-(\d{2})[T ](\d{2}):(\d{2})(?::(\d{2}))?(?:\.\d{1,3})?(?:Z|[+-]\d{2}:?\d{2})?$/;
 function isValidIanaTimeZone(timeZone) {
   const trimmed = timeZone.trim();
@@ -41552,7 +41553,7 @@ function refreshManualGamesSpineGameIfNeeded(game, now) {
   };
 }
 
-// ../grarf/desktop/src/lib/gamesSpine/manual/convertManualGamesSpineDocument.ts
+// src/lib/gamesSpine/manual/convertManualGamesSpineDocument.ts
 function convertEventToMlbGame(league, event, now) {
   const startTimeMs = parseManualGamesSpineEventTimeMs(event.startTime, league.sourceTimeZone);
   const endTimeMs = parseManualGamesSpineEventTimeMs(event.endTime, league.sourceTimeZone);
@@ -41639,7 +41640,7 @@ function flattenManualGamesSpineGames(sections) {
   return out;
 }
 
-// ../grarf/desktop/src/store/gamesSpineManualStore.ts
+// src/store/gamesSpineManualStore.ts
 init_define_import_meta_env();
 var import_zustand12 = __toESM(require_zustand(), 1);
 var useGamesSpineManualStore = (0, import_zustand12.create)((set) => ({
@@ -41659,7 +41660,7 @@ var useGamesSpineManualStore = (0, import_zustand12.create)((set) => ({
   }
 }));
 
-// ../grarf/desktop/src/lib/liveTracker/liveTrackerLeagueRetention.ts
+// src/lib/liveTracker/liveTrackerLeagueRetention.ts
 init_define_import_meta_env();
 var LIVE_TRACKER_LEAGUE_RETENTION_MS = 2 * 60 * 60 * 1e3;
 function resolveLiveTrackerGameCompletionMs(game, retainedAtById) {
@@ -41742,7 +41743,7 @@ function isLeagueActiveForLiveTracker(games, completedAtMs, nowMs = Date.now()) 
   return isLeagueWithinRetentionWindow(completedAtMs, nowMs);
 }
 
-// ../grarf/desktop/src/lib/liveTracker/resolveManualLiveTrackerLeagueGames.ts
+// src/lib/liveTracker/resolveManualLiveTrackerLeagueGames.ts
 var MANUAL_LIVE_TRACKER_LEAGUE_KEYS = {
   "gt-world-challenge": "GT_WORLD_CHALLENGE",
   "wec-spa-24h": "GT_WORLD_CHALLENGE"
@@ -41775,7 +41776,7 @@ function collectLiveTrackerLeagueGames(league, leagues, retainedFinals, nowMs = 
   return resolveManualLiveTrackerGamesByLeague(nowMs).get(league) ?? [];
 }
 
-// ../grarf/desktop/src/lib/liveTracker/resolveCurrentlyLiveGamesSpineLeagues.ts
+// src/lib/liveTracker/resolveCurrentlyLiveGamesSpineLeagues.ts
 function resolveCurrentlyLiveGamesSpineLeagues(leagues) {
   const liveLeagues = [];
   for (const league of GAMES_COLUMN_LEAGUE_ORDER) {
@@ -41822,12 +41823,12 @@ function buildLiveTrackerDisplayLeaguesSnapshot(leagues, completedAtMsByLeague, 
   };
 }
 
-// ../grarf/desktop/src/store/liveTrackerLeagueRetentionStore.ts
+// src/store/liveTrackerLeagueRetentionStore.ts
 init_define_import_meta_env();
 var import_zustand13 = __toESM(require_zustand(), 1);
 init_isGrarfWebRenderer();
 
-// ../grarf/desktop/src/lib/livetrack/feed/leagueFeedRegistry.ts
+// src/lib/livetrack/feed/leagueFeedRegistry.ts
 init_define_import_meta_env();
 var LIVE_TRACK_LEAGUE_FEED_REGISTRY = [
   {
@@ -41870,23 +41871,23 @@ function getLiveTrackLeagueFeedRegistry() {
   return LIVE_TRACK_LEAGUE_FEED_REGISTRY;
 }
 
-// ../grarf/desktop/src/lib/liveTracker/liveTrackerScorePostEvents.ts
+// src/lib/liveTracker/liveTrackerScorePostEvents.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/commandBriefing/deriveFinalPostgameSlate.ts
+// src/lib/commandBriefing/deriveFinalPostgameSlate.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/liveTracker/liveTrackerScorePostEvents.ts
+// src/lib/liveTracker/liveTrackerScorePostEvents.ts
 init_isGrarfWebRenderer();
 
-// ../grarf/desktop/src/lib/liveTracker/liveTrackerConfiguration.ts
+// src/lib/liveTracker/liveTrackerConfiguration.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/data/liveTrackerConfigurationConfig.ts
+// src/data/liveTrackerConfigurationConfig.ts
 init_define_import_meta_env();
 var LIVE_TRACKER_CONFIGURATION_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQgtSg_UuFj1FEFnfiMbrXM9nj1cOeZ06IZWllUlIcClVKmgLjhX_0pF3HnOpmpntGZO-yuEvIWt_VD/pub?gid=596382171&single=true&output=csv";
 
-// ../grarf/desktop/src/lib/liveTracker/parseLiveTrackerConfigurationCsv.ts
+// src/lib/liveTracker/parseLiveTrackerConfigurationCsv.ts
 init_define_import_meta_env();
 var LIVE_TRACKER_SCORE_POST_POLICIES = [
   "EVERY_SCORE",
@@ -41983,7 +41984,7 @@ function parseLiveTrackerConfigurationCsv(csv) {
   return rows;
 }
 
-// ../grarf/desktop/src/lib/liveTracker/liveTrackerConfiguration.ts
+// src/lib/liveTracker/liveTrackerConfiguration.ts
 var LIVE_TRACKER_CONFIG_TO_SPINE_LEAGUE_KEY = {
   GTWORLD: "GT_WORLD_CHALLENGE"
 };
@@ -42023,11 +42024,11 @@ function getCachedLiveTrackerConfigurationRows() {
   return cachedRows ?? [];
 }
 
-// ../grarf/desktop/src/lib/liveTracker/liveTrackerFinalScoreEvents.ts
+// src/lib/liveTracker/liveTrackerFinalScoreEvents.ts
 init_define_import_meta_env();
 init_isGrarfWebRenderer();
 
-// ../grarf/desktop/src/lib/liveTracker/liveTrackerWebPersistenceStorage.ts
+// src/lib/liveTracker/liveTrackerWebPersistenceStorage.ts
 init_define_import_meta_env();
 init_isGrarfWebRenderer();
 function persistenceStorage() {
@@ -42065,7 +42066,7 @@ function removeLiveTrackerPersistenceItem(key2) {
   }
 }
 
-// ../grarf/desktop/src/lib/liveTracker/liveTrackerFinalScoreEvents.ts
+// src/lib/liveTracker/liveTrackerFinalScoreEvents.ts
 var EMITTED_FINAL_SCORE_GAME_IDS_KEY = "grarf-live-tracker-emitted-final-scores-v2";
 function wasLiveTrackerLiveGame2(game) {
   return game.status === "live" || isGameActivelyLive(game);
@@ -42175,11 +42176,11 @@ function ingestLiveTrackerFinalScoreTransitions(previousGamesById3, nextGamesByI
   return posts;
 }
 
-// ../grarf/desktop/src/lib/liveTracker/liveTrackerPostsPersistence.ts
+// src/lib/liveTracker/liveTrackerPostsPersistence.ts
 init_define_import_meta_env();
 init_isGrarfWebRenderer();
 
-// ../grarf/desktop/src/lib/liveTracker/sortLiveTrackerPosts.ts
+// src/lib/liveTracker/sortLiveTrackerPosts.ts
 init_define_import_meta_env();
 function resolveLiveTrackerPostTimelineMs(post) {
   if (post.timelineAddedAtMs != null && Number.isFinite(post.timelineAddedAtMs)) {
@@ -42200,7 +42201,7 @@ function stampLiveTrackerPostTimeline(post, timelineAddedAtMs, existing) {
   return { ...post, timelineAddedAtMs };
 }
 
-// ../grarf/desktop/src/lib/liveTracker/liveTrackerPostsPersistence.ts
+// src/lib/liveTracker/liveTrackerPostsPersistence.ts
 var LIVE_TRACKER_POSTS_STORAGE_KEY = "grarf-live-tracker-posts-v1";
 function isGrarfGeneratedLiveTrackerScorePost(post) {
   const url = post.url?.trim() ?? "";
@@ -42265,7 +42266,7 @@ function writePersistedLiveTrackerPosts(posts) {
   );
 }
 
-// ../grarf/desktop/src/lib/liveTracker/liveTrackerTrackedGameScoreStorage.ts
+// src/lib/liveTracker/liveTrackerTrackedGameScoreStorage.ts
 init_define_import_meta_env();
 init_isGrarfWebRenderer();
 var LIVE_TRACKER_TRACKED_GAME_SCORES_STORAGE_KEY = "grarf-live-tracker-tracked-game-scores-v2";
@@ -42312,7 +42313,7 @@ function resolvePersistedTrackedGameStateLabel(game) {
   return game.status.toUpperCase();
 }
 
-// ../grarf/desktop/src/lib/liveTracker/liveTrackerScorePostEvents.ts
+// src/lib/liveTracker/liveTrackerScorePostEvents.ts
 var EMITTED_SCORE_POSTS_KEY = "grarf-live-tracker-emitted-score-posts-v2";
 var LEGACY_EMITTED_SCORE_POSTS_KEY = "grarf-live-tracker-emitted-score-posts-v1";
 var LEGACY_EMITTED_FINAL_SCORE_GAME_IDS_KEY = "grarf-live-tracker-emitted-final-scores-v2";
@@ -42357,7 +42358,7 @@ function ingestLiveTrackerScorePostTransitions(previousGamesById3, nextGamesById
   );
 }
 
-// ../grarf/desktop/src/store/liveTrackerLeagueRetentionStore.ts
+// src/store/liveTrackerLeagueRetentionStore.ts
 function hydratePreviousGamesByIdFromPersistence() {
   return /* @__PURE__ */ new Map();
 }
@@ -42527,7 +42528,7 @@ if (isGrarfWebRenderer()) {
   syncLiveTrackerLeagueRetention();
 }
 
-// ../grarf/desktop/src/store/liveTrackerLiveLeaguesStore.ts
+// src/store/liveTrackerLiveLeaguesStore.ts
 var MANUAL_LIVE_TRACKER_REFRESH_MS = 3e4;
 function emptySnapshot() {
   return {
@@ -42572,7 +42573,7 @@ if (typeof window !== "undefined") {
 }
 useLiveTrackerLiveLeaguesStore.getState().syncFromGamesSpine();
 
-// ../grarf/desktop/src/store/liveTrackerActiveFeedsStore.ts
+// src/store/liveTrackerActiveFeedsStore.ts
 function emptySnapshot2() {
   return {
     feeds: [],
@@ -42599,13 +42600,13 @@ useLiveTrackerLiveLeaguesStore.subscribe(() => {
 });
 useLiveTrackerActiveFeedsStore.getState().syncFromLiveLeagues();
 
-// ../grarf/desktop/src/lib/liveTracker/fetchLiveTrackerFeedPosts.ts
+// src/lib/liveTracker/fetchLiveTrackerFeedPosts.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/services/rssIngest/fetchRssXml.ts
+// src/services/rssIngest/fetchRssXml.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/rss/resolveProxiedRssFetchUrl.ts
+// src/lib/rss/resolveProxiedRssFetchUrl.ts
 init_define_import_meta_env();
 init_operationalIngestConfig();
 init_isGrarfWebRenderer();
@@ -42636,7 +42637,7 @@ function resolveProxiedRssFetchUrl(feedUrl) {
   return proxiedPath;
 }
 
-// ../grarf/desktop/src/services/rssIngest/fetchRssXml.ts
+// src/services/rssIngest/fetchRssXml.ts
 init_isGrarfWebRenderer();
 function extractLiveTrackRssAppPath(url) {
   try {
@@ -42703,10 +42704,10 @@ async function fetchRssXml2(url) {
   });
 }
 
-// ../grarf/desktop/src/services/rssIngest/parseRssXml.ts
+// src/services/rssIngest/parseRssXml.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/livetrack/preserveLiveTrackPostText.ts
+// src/lib/livetrack/preserveLiveTrackPostText.ts
 init_define_import_meta_env();
 var MAX_CONSECUTIVE_BLANK_LINES = 2;
 function preserveLiveTrackPostText(raw) {
@@ -42718,7 +42719,7 @@ function preserveLiveTrackPostText(raw) {
   return text2.trim();
 }
 
-// ../grarf/desktop/src/services/rssIngest/parseRssXml.ts
+// src/services/rssIngest/parseRssXml.ts
 var MRSS_NS = "http://search.yahoo.com/mrss/";
 var DEFAULT_RSS_SUMMARY_MAX_CHARS = 2e3;
 function resolveMaxSummaryChars(options = {}) {
@@ -42933,7 +42934,7 @@ function parseRssXml(xml, maxItems = 50, options = {}) {
   return parseAtomEntries(doc, maxItems, maxSummaryChars);
 }
 
-// ../grarf/desktop/src/lib/liveTracker/normalizeLiveTrackerPosts.ts
+// src/lib/liveTracker/normalizeLiveTrackerPosts.ts
 init_define_import_meta_env();
 function resolveLiveTrackerPostSource(feed, entry) {
   const author = entry.author?.trim();
@@ -42957,7 +42958,7 @@ function normalizeLiveTrackerPosts(feed, entries) {
   }));
 }
 
-// ../grarf/desktop/src/lib/liveTracker/fetchLiveTrackerFeedPosts.ts
+// src/lib/liveTracker/fetchLiveTrackerFeedPosts.ts
 var DEFAULT_MAX_ITEMS = 50;
 async function fetchLiveTrackerFeedPosts(feed, options = {}) {
   const maxItems = options.maxItems ?? DEFAULT_MAX_ITEMS;
@@ -43003,7 +43004,7 @@ async function fetchLiveTrackerFeedPosts(feed, options = {}) {
   }
 }
 
-// ../grarf/desktop/src/lib/liveTracker/fetchActiveLiveTrackerPosts.ts
+// src/lib/liveTracker/fetchActiveLiveTrackerPosts.ts
 function buildPostsSnapshot(feeds, results) {
   const byFeedId = {};
   const posts = [];
@@ -43036,7 +43037,7 @@ async function fetchActiveLiveTrackerPosts(options = {}) {
   return buildPostsSnapshot(feeds, results);
 }
 
-// ../grarf/desktop/src/lib/liveTracker/liveTrackerPostRetention.ts
+// src/lib/liveTracker/liveTrackerPostRetention.ts
 init_define_import_meta_env();
 init_isGrarfWebRenderer();
 var LIVE_TRACKER_POST_RETENTION_MS = LIVE_TRACKER_LEAGUE_RETENTION_MS;
@@ -43069,7 +43070,7 @@ function pruneLiveTrackerPostsByRetention(posts, context2, now = Date.now()) {
   return posts.filter((post) => isLiveTrackerPostWithinRetention(post, context2, now));
 }
 
-// ../grarf/desktop/src/store/liveTrackerPostsStore.ts
+// src/store/liveTrackerPostsStore.ts
 function emptySnapshot3() {
   return {
     posts: hydrateInitialLiveTrackerPosts(),
@@ -43202,11 +43203,11 @@ function pruneLiveTrackerPostsIfNeeded(retentionContext) {
   });
 }
 
-// ../grarf/desktop/src/store/homeSportscapeHeadlinesStore.ts
+// src/store/homeSportscapeHeadlinesStore.ts
 init_define_import_meta_env();
 var import_zustand17 = __toESM(require_zustand(), 1);
 
-// ../grarf/desktop/src/data/homeSportscapeHeadlinesFeeds.ts
+// src/data/homeSportscapeHeadlinesFeeds.ts
 init_define_import_meta_env();
 var HOME_SPORTSCAPE_HEADLINES_SOURCE_FEEDS = [
   {
@@ -43251,7 +43252,7 @@ var HOME_SPORTSCAPE_HEADLINES_SOURCE_FEEDS = [
   }
 ];
 
-// ../grarf/desktop/src/lib/home/fetchHomeSportscapeHeadlineFeed.ts
+// src/lib/home/fetchHomeSportscapeHeadlineFeed.ts
 init_define_import_meta_env();
 async function fetchHomeSportscapeHeadlineFeed(feedUrl) {
   const fetched = await fetchRssXml2(feedUrl);
@@ -43262,7 +43263,7 @@ async function fetchHomeSportscapeHeadlineFeed(feedUrl) {
   }));
 }
 
-// ../grarf/desktop/src/store/homeSportscapeHeadlinesStore.ts
+// src/store/homeSportscapeHeadlinesStore.ts
 function mergeHeadlineItems(previous, incoming) {
   if (incoming.length === 0) return [...previous];
   const knownUrls = new Set(previous.map((item) => item.url));
@@ -43309,17 +43310,17 @@ var useHomeSportscapeHeadlinesStore = (0, import_zustand17.create)((set, get) =>
   }
 }));
 
-// ../grarf/desktop/src/store/webSignalsFeedStore.ts
+// src/store/webSignalsFeedStore.ts
 init_define_import_meta_env();
 var import_zustand18 = __toESM(require_zustand(), 1);
 
-// ../grarf/desktop/src/lib/social/gameSocialRail/fetchGameSocialRailFeedEvents.ts
+// src/lib/social/gameSocialRail/fetchGameSocialRailFeedEvents.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/livetrack/feed/mapFeedItemToLiveTrackEvent.ts
+// src/lib/livetrack/feed/mapFeedItemToLiveTrackEvent.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/livetrack/resolveLiveTrackFeedPostBody.ts
+// src/lib/livetrack/resolveLiveTrackFeedPostBody.ts
 init_define_import_meta_env();
 function normalizePostBodyForComparison(text2) {
   return text2.replace(/\s+/g, " ").trim().toLowerCase();
@@ -43354,7 +43355,7 @@ function resolveLiveTrackFeedPostBody(titleBody, summaryBody) {
   return pickRicherBody(title, summary);
 }
 
-// ../grarf/desktop/src/lib/livetrack/feed/mapFeedItemToLiveTrackEvent.ts
+// src/lib/livetrack/feed/mapFeedItemToLiveTrackEvent.ts
 function parseSportFromTitle(title) {
   const match = title.match(/^([A-Za-z][A-Za-z0-9'.\s]{0,40}):\s+/);
   return match?.[1]?.trim() ?? null;
@@ -43418,10 +43419,10 @@ function mapFeedItemToLiveTrackEvent(item, options = {}) {
   };
 }
 
-// ../grarf/desktop/src/lib/livetrack/feed/sources/fetchLiveTrackItemsFromRssUrl.ts
+// src/lib/livetrack/feed/sources/fetchLiveTrackItemsFromRssUrl.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/services/rssIngest/normalizeFeedItems.ts
+// src/services/rssIngest/normalizeFeedItems.ts
 init_define_import_meta_env();
 function stableHash2(input) {
   let h2 = 2166136261;
@@ -43454,7 +43455,7 @@ function normalizeFeedItems(feed, entries) {
   }));
 }
 
-// ../grarf/desktop/src/lib/livetrack/feed/mapNormalizedRssItemToFeedItem.ts
+// src/lib/livetrack/feed/mapNormalizedRssItemToFeedItem.ts
 init_define_import_meta_env();
 function mapNormalizedRssItemToFeedItem(item) {
   return {
@@ -43473,7 +43474,7 @@ function mapNormalizedRssItemToFeedItem(item) {
   };
 }
 
-// ../grarf/desktop/src/lib/livetrack/feed/sources/fetchLiveTrackItemsFromRssUrl.ts
+// src/lib/livetrack/feed/sources/fetchLiveTrackItemsFromRssUrl.ts
 function toRssFeedDefinition(feed, feedUrl) {
   return {
     id: feed.id,
@@ -43529,7 +43530,7 @@ async function fetchLiveTrackItemsFromRssUrl(definition, feedUrl, options = {}) 
   }
 }
 
-// ../grarf/desktop/src/lib/social/gameSocialRail/dedupeGameSocialRailFeedEvents.ts
+// src/lib/social/gameSocialRail/dedupeGameSocialRailFeedEvents.ts
 init_define_import_meta_env();
 function dedupeGameSocialRailFeedEvents(events) {
   const sorted = sortLiveTrackEventsNewestFirst(events);
@@ -43548,7 +43549,7 @@ function dedupeGameSocialRailFeedEvents(events) {
   return sortLiveTrackEventsChronologically(deduped);
 }
 
-// ../grarf/desktop/src/lib/social/gameSocialRail/fetchGameSocialRailFeedEvents.ts
+// src/lib/social/gameSocialRail/fetchGameSocialRailFeedEvents.ts
 var MAX_ITEMS_PER_FEED = 50;
 function buildFeedSourceDefinition(resolution, feedIndex) {
   const feed = resolution.feeds[feedIndex];
@@ -43586,7 +43587,7 @@ async function fetchGameSocialRailFeedEvents(resolution) {
   return sortLiveTrackEventsChronologically(merged);
 }
 
-// ../grarf/desktop/src/store/webSignalsFeedStore.ts
+// src/store/webSignalsFeedStore.ts
 function mergeSignalsFeedEvents(previous, incoming) {
   if (incoming.length === 0) return previous;
   const knownIds = new Set(previous.map((event) => event.id));
@@ -43654,7 +43655,7 @@ var useWebSignalsFeedStore = (0, import_zustand18.create)((set, get) => ({
   }
 }));
 
-// ../grarf/desktop/src/lib/updateEngine/highlightsTvPollRegistry.ts
+// src/lib/updateEngine/highlightsTvPollRegistry.ts
 init_define_import_meta_env();
 var handlers = /* @__PURE__ */ new Set();
 function registerWebHighlightsTvRefresh(fn2) {
@@ -43667,7 +43668,7 @@ async function runWebHighlightsTvRefresh() {
   await Promise.all([...handlers].map((fn2) => Promise.resolve(fn2())));
 }
 
-// ../grarf/desktop/src/lib/updateEngine/webUpdateEngine.ts
+// src/lib/updateEngine/webUpdateEngine.ts
 function startInterval(fn2, intervalMs) {
   const timer = window.setInterval(() => {
     void fn2();
@@ -43702,7 +43703,7 @@ function startWebUpdateEngine() {
   };
 }
 
-// ../grarf/desktop/src/components/updateEngine/WebUpdateEngineBridge.tsx
+// src/components/updateEngine/WebUpdateEngineBridge.tsx
 function WebUpdateEngineBridge() {
   (0, import_react19.useEffect)(() => {
     if (!isGrarfWebRenderer()) return void 0;
@@ -43711,7 +43712,7 @@ function WebUpdateEngineBridge() {
   return null;
 }
 
-// ../grarf/desktop/src/components/GamesSpineManualBridge.tsx
+// src/components/GamesSpineManualBridge.tsx
 init_define_import_meta_env();
 var import_react20 = __toESM(require_react(), 1);
 init_isGrarfWebRenderer();
@@ -43731,7 +43732,7 @@ function GamesSpineManualBridge() {
   return null;
 }
 
-// ../grarf/desktop/src/components/editorial/EditorialBridge.tsx
+// src/components/editorial/EditorialBridge.tsx
 init_define_import_meta_env();
 var import_react21 = __toESM(require_react(), 1);
 function EditorialBridge() {
@@ -43745,11 +43746,11 @@ function EditorialBridge() {
   return null;
 }
 
-// ../grarf/desktop/src/components/commandBriefing/BriefingPersistenceFallbackBridge.tsx
+// src/components/commandBriefing/BriefingPersistenceFallbackBridge.tsx
 init_define_import_meta_env();
 var import_react22 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/store/briefingPersistenceFallbackStore.ts
+// src/store/briefingPersistenceFallbackStore.ts
 init_define_import_meta_env();
 var import_zustand19 = __toESM(require_zustand(), 1);
 var useBriefingPersistenceFallbackStore = (0, import_zustand19.create)((set) => ({
@@ -43778,7 +43779,7 @@ if (typeof window !== "undefined") {
   w2.__grarfBriefingPersistenceFallbacks = () => useBriefingPersistenceFallbackStore.getState().snapshots;
 }
 
-// ../grarf/desktop/src/components/commandBriefing/BriefingPersistenceFallbackBridge.tsx
+// src/components/commandBriefing/BriefingPersistenceFallbackBridge.tsx
 function BriefingPersistenceFallbackBridge() {
   const loadFromPersistence = useBriefingPersistenceFallbackStore((s2) => s2.loadFromPersistence);
   (0, import_react22.useEffect)(() => {
@@ -43787,17 +43788,17 @@ function BriefingPersistenceFallbackBridge() {
   return null;
 }
 
-// ../grarf/desktop/src/components/commandBriefing/CommandBriefingBridge.tsx
+// src/components/commandBriefing/CommandBriefingBridge.tsx
 init_define_import_meta_env();
 function CommandBriefingBridge() {
   return null;
 }
 
-// ../grarf/desktop/src/components/ticker/LiveSportsTickerEngine.tsx
+// src/components/ticker/LiveSportsTickerEngine.tsx
 init_define_import_meta_env();
 var import_react24 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/lib/perf/useAppVisible.ts
+// src/lib/perf/useAppVisible.ts
 init_define_import_meta_env();
 var import_react23 = __toESM(require_react(), 1);
 function useAppVisible() {
@@ -43812,7 +43813,7 @@ function useAppVisible() {
   return visible;
 }
 
-// ../grarf/desktop/src/lib/ticker/flattenLiveGames.ts
+// src/lib/ticker/flattenLiveGames.ts
 init_define_import_meta_env();
 function flattenLiveGames(leagues) {
   const out = [];
@@ -43823,7 +43824,7 @@ function flattenLiveGames(leagues) {
   return out;
 }
 
-// ../grarf/desktop/src/lib/ticker/inferTickerEvents.ts
+// src/lib/ticker/inferTickerEvents.ts
 init_define_import_meta_env();
 function emoji(sport) {
   switch (sport) {
@@ -44152,7 +44153,7 @@ function inferUpcomingGameEvents(_prev, next) {
   return out;
 }
 
-// ../grarf/desktop/src/components/ticker/LiveSportsTickerEngine.tsx
+// src/components/ticker/LiveSportsTickerEngine.tsx
 function LiveSportsTickerEngine() {
   const appVisible = useAppVisible();
   const enqueueInferred = useTickerEventQueue((s2) => s2.enqueueInferred);
@@ -44203,14 +44204,14 @@ function LiveSportsTickerEngine() {
   return null;
 }
 
-// ../grarf/desktop/src/components/operational/OperationalModeBridge.tsx
+// src/components/operational/OperationalModeBridge.tsx
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/hooks/useOperationalModeAutoDefaults.ts
+// src/hooks/useOperationalModeAutoDefaults.ts
 init_define_import_meta_env();
 var import_react25 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/lib/operationalMode/resolveAutomaticOperationalMode.ts
+// src/lib/operationalMode/resolveAutomaticOperationalMode.ts
 init_define_import_meta_env();
 function allGames(leagues) {
   return Object.values(leagues).flat();
@@ -44224,7 +44225,7 @@ function resolveAutomaticOperationalMode(leagues, now = /* @__PURE__ */ new Date
   return "CATCH_UP";
 }
 
-// ../grarf/desktop/src/hooks/useOperationalModeAutoDefaults.ts
+// src/hooks/useOperationalModeAutoDefaults.ts
 function useOperationalModeAutoDefaults(enabled = true) {
   const leagues = useLiveGamesStore((s2) => s2.leagues);
   const applyAutomaticMode = useOperationalModeStore((s2) => s2.applyAutomaticMode);
@@ -44236,23 +44237,23 @@ function useOperationalModeAutoDefaults(enabled = true) {
   }, [enabled, leagues, manuallyOverridden, applyAutomaticMode]);
 }
 
-// ../grarf/desktop/src/components/operational/OperationalModeBridge.tsx
+// src/components/operational/OperationalModeBridge.tsx
 function OperationalModeBridge() {
   useOperationalModeAutoDefaults(true);
   return null;
 }
 
-// ../grarf/desktop/src/components/homeMvp/CenterPaneApplicationModeSyncBridge.tsx
+// src/components/homeMvp/CenterPaneApplicationModeSyncBridge.tsx
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/hooks/useCenterPaneApplicationModeSync.ts
+// src/hooks/useCenterPaneApplicationModeSync.ts
 init_define_import_meta_env();
 var import_react26 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/lib/home/resolveCenterPaneApplicationModeFromPath.ts
+// src/lib/home/resolveCenterPaneApplicationModeFromPath.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/types/centerPaneApplicationMode.ts
+// src/types/centerPaneApplicationMode.ts
 init_define_import_meta_env();
 var CENTER_PANE_APPLICATION_MODES = [
   "sportscape",
@@ -44279,7 +44280,7 @@ var CENTER_PANE_PLACEHOLDER_COPY = {
   livetracker: "LiveTracker Coming Soon"
 };
 
-// ../grarf/desktop/src/lib/home/resolveCenterPaneApplicationModeFromPath.ts
+// src/lib/home/resolveCenterPaneApplicationModeFromPath.ts
 function resolveCenterPaneApplicationModeFromPath(pathname) {
   const segments = pathname.replace(/\/+$/, "").split("/").filter(Boolean);
   const last = segments[segments.length - 1];
@@ -44288,7 +44289,7 @@ function resolveCenterPaneApplicationModeFromPath(pathname) {
   return last;
 }
 
-// ../grarf/desktop/src/lib/home/deriveOperationalModeFromCenterPaneApplicationMode.ts
+// src/lib/home/deriveOperationalModeFromCenterPaneApplicationMode.ts
 init_define_import_meta_env();
 function deriveOperationalModeFromCenterPaneApplicationMode(mode) {
   if (mode === "sportscape") return "CATCH_UP";
@@ -44296,23 +44297,23 @@ function deriveOperationalModeFromCenterPaneApplicationMode(mode) {
   return null;
 }
 
-// ../grarf/desktop/src/hooks/useCenterPaneApplicationModeSync.ts
+// src/hooks/useCenterPaneApplicationModeSync.ts
 init_isGrarfWebRenderer();
 
-// ../grarf/desktop/src/store/centerPaneApplicationModeStore.ts
+// src/store/centerPaneApplicationModeStore.ts
 init_define_import_meta_env();
 var import_zustand20 = __toESM(require_zustand(), 1);
 
-// ../grarf/desktop/src/lib/home/deriveCenterPaneApplicationMode.ts
+// src/lib/home/deriveCenterPaneApplicationMode.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/home/importantLeagues.ts
+// src/lib/home/importantLeagues.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/mcws/isMcwsOperationalGame.ts
+// src/lib/mcws/isMcwsOperationalGame.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/shared/mcwsEspnCatchupSeasonFilter.js
+// shared/mcwsEspnCatchupSeasonFilter.js
 init_define_import_meta_env();
 var MCWS_ACCEPTED_SEASON_SLUGS = /* @__PURE__ */ new Set(["world-series", "championship-series"]);
 function readMcwsSeasonSlug(event) {
@@ -44355,7 +44356,7 @@ ${JSON.stringify(partition, null, 2)}`
   );
 }
 
-// ../grarf/desktop/src/lib/mcws/isMcwsOperationalGame.ts
+// src/lib/mcws/isMcwsOperationalGame.ts
 function isMcwsOperationalGame(game) {
   if (game.league !== "NCAABB") return false;
   const slug = game.metadata?.espnSeasonSlug?.trim();
@@ -44363,7 +44364,7 @@ function isMcwsOperationalGame(game) {
   return false;
 }
 
-// ../grarf/desktop/src/lib/home/importantLeagues.ts
+// src/lib/home/importantLeagues.ts
 var IMPORTANT_LEAGUES = [
   { label: "NFL", key: "NFL" },
   { label: "NCAAF", key: "NCAAF" },
@@ -44559,7 +44560,7 @@ function isAtLeastOneImportantLeagueUpcoming(leagues, now = /* @__PURE__ */ new 
   return false;
 }
 
-// ../grarf/desktop/src/lib/home/deriveCenterPaneApplicationMode.ts
+// src/lib/home/deriveCenterPaneApplicationMode.ts
 function deriveInitialCenterPaneApplicationModeFromGamesSpine(leagues, now = /* @__PURE__ */ new Date()) {
   for (const games of Object.values(leagues)) {
     if (!games?.length) continue;
@@ -44575,7 +44576,7 @@ function deriveCenterPaneApplicationModeFromImportantLeagues(leagues, now = /* @
   return "browser";
 }
 
-// ../grarf/desktop/src/store/centerPaneApplicationModeStore.ts
+// src/store/centerPaneApplicationModeStore.ts
 var useCenterPaneApplicationModeStore = (0, import_zustand20.create)((set) => ({
   mode: "sportscape",
   source: "operational",
@@ -44603,7 +44604,7 @@ var useCenterPaneApplicationModeStore = (0, import_zustand20.create)((set) => ({
   }
 }));
 
-// ../grarf/desktop/src/hooks/useCenterPaneApplicationModeSync.ts
+// src/hooks/useCenterPaneApplicationModeSync.ts
 var OPERATIONAL_AUTO_CENTER_PANE_MODES = /* @__PURE__ */ new Set([
   "sportscape",
   "browser",
@@ -44650,27 +44651,27 @@ function useCenterPaneApplicationModeSync() {
   ]);
 }
 
-// ../grarf/desktop/src/components/homeMvp/CenterPaneApplicationModeSyncBridge.tsx
+// src/components/homeMvp/CenterPaneApplicationModeSyncBridge.tsx
 function CenterPaneApplicationModeSyncBridge() {
   useCenterPaneApplicationModeSync();
   return null;
 }
 
-// ../grarf/desktop/src/components/operational/FinalizedGameRetentionBridge.tsx
+// src/components/operational/FinalizedGameRetentionBridge.tsx
 init_define_import_meta_env();
 var import_react27 = __toESM(require_react(), 1);
 init_operationalIngestConfig();
 
-// ../grarf/desktop/src/lib/finalizedGameRetention/index.ts
+// src/lib/finalizedGameRetention/index.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/finalizedGameRetention/collectPersistedFinalizedGames.ts
+// src/lib/finalizedGameRetention/collectPersistedFinalizedGames.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/commandBriefing/briefingPersistence.ts
+// src/lib/commandBriefing/briefingPersistence.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/editorial/editorialGameKey.ts
+// src/lib/editorial/editorialGameKey.ts
 init_define_import_meta_env();
 function editorialGameKey(game) {
   const espn = game.espnEventId ?? game.externalIds?.espn;
@@ -44697,7 +44698,7 @@ function editorialLookupKeysForGame(game) {
   return [...keys];
 }
 
-// ../grarf/desktop/src/lib/commandBriefing/briefingPersistence.ts
+// src/lib/commandBriefing/briefingPersistence.ts
 var LOG27 = "[CommandBriefing]";
 function snapshotFromGame(game) {
   const league = game.league ?? "MLB";
@@ -44743,7 +44744,7 @@ function persistBriefingSnapshot(game) {
   });
 }
 
-// ../grarf/desktop/src/lib/finalizedGameRetention/analyzeLifecycle.ts
+// src/lib/finalizedGameRetention/analyzeLifecycle.ts
 init_define_import_meta_env();
 function yesterdayKey(now) {
   return getOperationalSportsDayYesterdayDateKey(now);
@@ -44937,7 +44938,7 @@ function collectFinalizedGameRetentionSnapshot(input) {
   };
 }
 
-// ../grarf/desktop/src/lib/finalizedGameRetention/diagnosticsStore.ts
+// src/lib/finalizedGameRetention/diagnosticsStore.ts
 init_define_import_meta_env();
 init_operationalIngestConfig();
 var MAX_HISTORY = 32;
@@ -44980,7 +44981,7 @@ if (typeof window !== "undefined") {
   w2.__grarfRefreshFinalizedGameRetention = refreshFinalizedGameRetentionDiagnostics;
 }
 
-// ../grarf/desktop/src/components/operational/FinalizedGameRetentionBridge.tsx
+// src/components/operational/FinalizedGameRetentionBridge.tsx
 function FinalizedGameRetentionBridge() {
   (0, import_react27.useEffect)(() => {
     refreshFinalizedGameRetentionDiagnostics();
@@ -45019,7 +45020,7 @@ function FinalizedGameRetentionBridge() {
   return null;
 }
 
-// ../grarf/desktop/src/components/operational/YesterdayCatchUpSeedBridge.tsx
+// src/components/operational/YesterdayCatchUpSeedBridge.tsx
 init_define_import_meta_env();
 var import_react28 = __toESM(require_react(), 1);
 var LOG28 = "[CatchUpYesterday]";
@@ -45056,28 +45057,28 @@ function YesterdayCatchUpSeedBridge() {
   return null;
 }
 
-// ../grarf/desktop/src/components/operational/AttentionRuntimeBridge.tsx
+// src/components/operational/AttentionRuntimeBridge.tsx
 init_define_import_meta_env();
 var import_react29 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/lib/attentionRuntime/index.ts
+// src/lib/attentionRuntime/index.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/attentionRuntime/types.ts
+// src/lib/attentionRuntime/types.ts
 init_define_import_meta_env();
 var RESIDUAL_DECAY_DURATION_MS = 15 * 60 * 1e3;
 var RESIDUAL_DECAY_TICK_MS = 3e4;
 
-// ../grarf/desktop/src/lib/attentionRuntime/attentionRuntime.ts
+// src/lib/attentionRuntime/attentionRuntime.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/attentionRuntime/computeAttentionScore.ts
+// src/lib/attentionRuntime/computeAttentionScore.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/editorial/resolveEditorialNarrative.ts
+// src/lib/editorial/resolveEditorialNarrative.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/gamesSpine/gamesSpineContext.ts
+// src/lib/gamesSpine/gamesSpineContext.ts
 init_define_import_meta_env();
 function pitcherLast(name) {
   const t2 = name.trim();
@@ -45156,7 +45157,7 @@ function resolveGameNarrative(game) {
   return null;
 }
 
-// ../grarf/desktop/src/lib/editorial/editorialScopedKey.ts
+// src/lib/editorial/editorialScopedKey.ts
 init_define_import_meta_env();
 function editorialScopedKey(game, dateKey) {
   const base = editorialGameKey(game);
@@ -45165,7 +45166,7 @@ function editorialScopedKey(game, dateKey) {
   return `${base}::${dateKey}`;
 }
 
-// ../grarf/desktop/src/lib/editorial/resolveGeneratedSummary.ts
+// src/lib/editorial/resolveGeneratedSummary.ts
 init_define_import_meta_env();
 function entryForGame(bundle, game) {
   const summaries = bundle?.generatedSummaries;
@@ -45194,7 +45195,7 @@ function resolveGeneratedSummaryText(game, bundle) {
   return summary || null;
 }
 
-// ../grarf/desktop/src/lib/editorial/resolveEditorialNarrative.ts
+// src/lib/editorial/resolveEditorialNarrative.ts
 function narrativeEntry(bundle, scopedKey, baseKey) {
   return bundle?.narratives?.[scopedKey] ?? bundle?.narratives?.[baseKey];
 }
@@ -45248,7 +45249,7 @@ function resolveBriefingPriority(game, bundle, dateKey) {
   return parseBriefingPriorityRank(raw ?? void 0);
 }
 
-// ../grarf/desktop/src/lib/attentionRuntime/signals.ts
+// src/lib/attentionRuntime/signals.ts
 init_define_import_meta_env();
 var STAKES_PATTERN = /playoff|postseason|elimination|championship|finals|semi-?final|conference final|world series|stanley cup|super bowl|knockout|cup final/i;
 var DRAMATIC_FINISH_PATTERN = /walk[- ]?off|buzzer|overtime winner|ot winner|golden goal|penalty shootout|knockout|no[- ]?hitter/i;
@@ -45299,7 +45300,7 @@ function gameOperationalFingerprint(game) {
   ].join("|");
 }
 
-// ../grarf/desktop/src/lib/attentionRuntime/computeAttentionScore.ts
+// src/lib/attentionRuntime/computeAttentionScore.ts
 var COMPONENT_CAPS = {
   baseImportance: 40,
   urgency: 35,
@@ -45426,7 +45427,7 @@ function computeAttentionScore(input) {
   };
 }
 
-// ../grarf/desktop/src/lib/attentionRuntime/devLogging.ts
+// src/lib/attentionRuntime/devLogging.ts
 init_define_import_meta_env();
 var LOG29 = "[AttentionRuntime]";
 var lastRankingSignature = "";
@@ -45472,7 +45473,7 @@ function logResidualGravityDecay(states) {
   });
 }
 
-// ../grarf/desktop/src/lib/attentionRuntime/residualGravityState.ts
+// src/lib/attentionRuntime/residualGravityState.ts
 init_define_import_meta_env();
 function computeCurrentGravity(entry, now) {
   const elapsed = Math.max(0, now - entry.startedAt);
@@ -45532,7 +45533,7 @@ function maybeStartResidualGravity(input) {
   return { store, started: true, reason };
 }
 
-// ../grarf/desktop/src/lib/attentionRuntime/attentionRuntime.ts
+// src/lib/attentionRuntime/attentionRuntime.ts
 var scoreUpdateListeners = /* @__PURE__ */ new Set();
 function subscribeAttentionScoreUpdates(listener) {
   scoreUpdateListeners.add(listener);
@@ -45725,7 +45726,7 @@ if (typeof window !== "undefined") {
   w2.__grarfRecomputeAttentionScores = (trigger = "ingest_update") => recomputeAttentionScores(trigger);
 }
 
-// ../grarf/desktop/src/components/operational/AttentionRuntimeBridge.tsx
+// src/components/operational/AttentionRuntimeBridge.tsx
 function AttentionRuntimeBridge() {
   (0, import_react29.useEffect)(() => {
     recomputeAttentionScores("initial");
@@ -45752,14 +45753,14 @@ function AttentionRuntimeBridge() {
   return null;
 }
 
-// ../grarf/desktop/src/components/operational/RecommendationRuntimeBridge.tsx
+// src/components/operational/RecommendationRuntimeBridge.tsx
 init_define_import_meta_env();
 var import_react30 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/lib/recommendationRuntime/index.ts
+// src/lib/recommendationRuntime/index.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/recommendationRuntime/computeRecommendations.ts
+// src/lib/recommendationRuntime/computeRecommendations.ts
 init_define_import_meta_env();
 init_operationalIngestConfig();
 var PRIMARY_SWITCH_MARGIN = 8;
@@ -45903,10 +45904,10 @@ function buildRecommendationEntries(sorted, primaryId) {
   });
 }
 
-// ../grarf/desktop/src/lib/recommendationRuntime/recommendationRuntime.ts
+// src/lib/recommendationRuntime/recommendationRuntime.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/recommendationRuntime/devLogging.ts
+// src/lib/recommendationRuntime/devLogging.ts
 init_define_import_meta_env();
 var LOG30 = "[RecommendationRuntime]";
 var lastPrimaryId = null;
@@ -45952,7 +45953,7 @@ function resetRecommendationDevLogging() {
   lastLogAt = 0;
 }
 
-// ../grarf/desktop/src/lib/recommendationRuntime/recommendationRuntime.ts
+// src/lib/recommendationRuntime/recommendationRuntime.ts
 var recommendationUpdateListeners = /* @__PURE__ */ new Set();
 function subscribeRecommendationUpdates(listener) {
   recommendationUpdateListeners.add(listener);
@@ -46043,7 +46044,7 @@ if (typeof window !== "undefined") {
   w2.__grarfRecomputeRecommendations = (trigger = "manual") => recomputeRecommendations(trigger);
 }
 
-// ../grarf/desktop/src/components/operational/RecommendationRuntimeBridge.tsx
+// src/components/operational/RecommendationRuntimeBridge.tsx
 function RecommendationRuntimeBridge() {
   (0, import_react30.useEffect)(() => {
     const unsubAttention = subscribeAttentionScoreUpdates(() => {
@@ -46063,17 +46064,17 @@ function RecommendationRuntimeBridge() {
   return null;
 }
 
-// ../grarf/desktop/src/components/operational/RecommendationPresentationBridge.tsx
+// src/components/operational/RecommendationPresentationBridge.tsx
 init_define_import_meta_env();
 var import_react32 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/lib/recommendationPresentation/index.ts
+// src/lib/recommendationPresentation/index.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/recommendationPresentation/resolveOperationalContext.ts
+// src/lib/recommendationPresentation/resolveOperationalContext.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/gameWorkspace/mlbRailSignals.ts
+// src/gameWorkspace/mlbRailSignals.ts
 init_define_import_meta_env();
 function mlbLiveStatePrimary(game) {
   if (game.status !== "live" && game.status !== "final") return null;
@@ -46095,7 +46096,7 @@ function mlbBasesSketch(game) {
   return null;
 }
 
-// ../grarf/desktop/src/lib/gamesSpine/tennisMatchPresentation.ts
+// src/lib/gamesSpine/tennisMatchPresentation.ts
 init_define_import_meta_env();
 var SET_PAIR_RE = /^(\d+)\s*-\s*(\d+)$/;
 function mapLinescores(lines) {
@@ -46203,7 +46204,7 @@ function resolveTennisOperationalContextLine(game) {
   return presentation?.contextLine ?? null;
 }
 
-// ../grarf/desktop/src/lib/recommendationPresentation/resolveOperationalContext.ts
+// src/lib/recommendationPresentation/resolveOperationalContext.ts
 function resolveOperationalContextLine(game) {
   if (isTennisGame(game)) {
     const tennisContext = resolveTennisOperationalContextLine(game);
@@ -46241,7 +46242,7 @@ function resolveOperationalContextSupplement(game) {
   return bases;
 }
 
-// ../grarf/desktop/src/lib/recommendationPresentation/presentationSignals.ts
+// src/lib/recommendationPresentation/presentationSignals.ts
 init_define_import_meta_env();
 var INACTIVE = {
   isPrimaryElevated: false,
@@ -46270,7 +46271,7 @@ function resolveGamePresentationSignals(input) {
   };
 }
 
-// ../grarf/desktop/src/lib/recommendationPresentation/recommendationPresentationStore.ts
+// src/lib/recommendationPresentation/recommendationPresentationStore.ts
 init_define_import_meta_env();
 var import_zustand21 = __toESM(require_zustand(), 1);
 var useRecommendationPresentationStore = (0, import_zustand21.create)(() => ({
@@ -46305,7 +46306,7 @@ function syncRecommendationPresentation() {
   }));
 }
 
-// ../grarf/desktop/src/lib/recommendationPresentation/useGamePresentationSignals.ts
+// src/lib/recommendationPresentation/useGamePresentationSignals.ts
 init_define_import_meta_env();
 var import_react31 = __toESM(require_react(), 1);
 function useGamePresentationSignals(game, enabled, input) {
@@ -46341,7 +46342,7 @@ function useGamePresentationSignals(game, enabled, input) {
   );
 }
 
-// ../grarf/desktop/src/components/operational/RecommendationPresentationBridge.tsx
+// src/components/operational/RecommendationPresentationBridge.tsx
 function RecommendationPresentationBridge() {
   (0, import_react32.useEffect)(() => {
     syncRecommendationPresentation();
@@ -46353,21 +46354,21 @@ function RecommendationPresentationBridge() {
   return null;
 }
 
-// ../grarf/desktop/src/components/operationalAlerts/OperationalAlertsEngine.tsx
+// src/components/operationalAlerts/OperationalAlertsEngine.tsx
 init_define_import_meta_env();
 var import_react33 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/store/operationalAlertStore.ts
+// src/store/operationalAlertStore.ts
 init_define_import_meta_env();
 var import_zustand24 = __toESM(require_zustand(), 1);
 
-// ../grarf/desktop/src/lib/operationalAlerts/alertActions.ts
+// src/lib/operationalAlerts/alertActions.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/demo/demoNcaaBaseballAlert.ts
+// src/lib/demo/demoNcaaBaseballAlert.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/types/operationalAlerts.ts
+// src/types/operationalAlerts.ts
 init_define_import_meta_env();
 var OPERATIONAL_ALERT_TITLES = {
   close_game: "CLOSE GAME ALERT",
@@ -46378,7 +46379,7 @@ var OPERATIONAL_ALERT_TITLES = {
 var OPERATIONAL_ALERT_MAX_VISIBLE = 3;
 var OPERATIONAL_ALERT_AUTO_DISMISS_MS = 3e4;
 
-// ../grarf/desktop/src/lib/operationalAlerts/operationalAlertLog.ts
+// src/lib/operationalAlerts/operationalAlertLog.ts
 init_define_import_meta_env();
 function logOperationalAlertTriggered(_title, _body) {
 }
@@ -46393,7 +46394,7 @@ function logOperationalAlertQueued(_body) {
 function logOperationalAlertDismissed(_alertId) {
 }
 
-// ../grarf/desktop/src/lib/demo/demoNcaaBaseballAlert.ts
+// src/lib/demo/demoNcaaBaseballAlert.ts
 var DEMO_NCAA_BASEBALL_ALERT_GAME_ID = "demo-NCAA-baseball-kentucky-wvu-elimination";
 var DEMO_NCAA_BASEBALL_ALERT_YOUTUBE_URL = "https://youtu.be/_VMnVZiuyIU?si=zhhqWq1GW86ujO6L&t=1003";
 var DEMO_NCAA_BASEBALL_ALERT_YOUTUBE_VIDEO_ID = "_VMnVZiuyIU";
@@ -46476,16 +46477,16 @@ function installDemoNcaaBaseballAlertTrigger() {
   );
 }
 
-// ../grarf/desktop/src/lib/watch/handleWatchLiveClick.ts
+// src/lib/watch/handleWatchLiveClick.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/gamesSpine/manual/manualGamesSpineWatchLive.ts
+// src/lib/gamesSpine/manual/manualGamesSpineWatchLive.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/workspace/buildYoutubeWorkspaceTab.ts
+// src/lib/workspace/buildYoutubeWorkspaceTab.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/youtubeUrl.ts
+// src/lib/youtubeUrl.ts
 init_define_import_meta_env();
 function youtubeVideoIdFromUrl(raw) {
   try {
@@ -46533,7 +46534,7 @@ function resolveWorkspaceEmbedUrl(raw) {
   return raw.trim();
 }
 
-// ../grarf/desktop/src/lib/workspace/buildYoutubeWorkspaceTab.ts
+// src/lib/workspace/buildYoutubeWorkspaceTab.ts
 function resolveYoutubeWorkspaceVideoId(raw) {
   const trimmed = raw.trim();
   if (/^[\w-]{6,32}$/.test(trimmed)) return trimmed;
@@ -46580,7 +46581,7 @@ loadedUrl=${embedUrl}`
   };
 }
 
-// ../grarf/desktop/src/lib/gamesSpine/manual/manualGamesSpineWatchLive.ts
+// src/lib/gamesSpine/manual/manualGamesSpineWatchLive.ts
 function resolveManualGamesSpineYoutubeVideoId(url) {
   const trimmed = url?.trim();
   if (!trimmed) return null;
@@ -46618,7 +46619,7 @@ function tryLaunchManualGamesSpineWatchLive(game, dispatch) {
   return true;
 }
 
-// ../grarf/desktop/src/lib/watch/aflWatchLive.ts
+// src/lib/watch/aflWatchLive.ts
 init_define_import_meta_env();
 var AFL_FS2_LIVE_URL = "https://www.foxsports.com/live/fs2";
 function aflGameHasResolvableWatchStream(game) {
@@ -46632,7 +46633,7 @@ function tryLaunchAflFs2Watch(game) {
   return true;
 }
 
-// ../grarf/desktop/src/lib/watch/golfWatchLive.ts
+// src/lib/watch/golfWatchLive.ts
 init_define_import_meta_env();
 function tryLaunchGolfWatch(game) {
   if (!isPgaTourUsOpenEvent(game.league, game.awayTeam)) return false;
@@ -46643,10 +46644,10 @@ function tryLaunchGolfWatch(game) {
   return true;
 }
 
-// ../grarf/desktop/src/lib/watch/providerRegistry.ts
+// src/lib/watch/providerRegistry.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/watch/watchConfig.ts
+// src/lib/watch/watchConfig.ts
 init_define_import_meta_env();
 function envFlag(name) {
   const v2 = define_import_meta_env_default[name];
@@ -46656,7 +46657,7 @@ var watchConfig = {
   espnResolverEnabled: envFlag("VITE_ENABLE_ESPN_RESOLVER")
 };
 
-// ../grarf/desktop/src/lib/watch/espnResolutionCache.ts
+// src/lib/watch/espnResolutionCache.ts
 init_define_import_meta_env();
 var STORAGE_KEY4 = "grarf-espn-watch-v1";
 var TTL_MS = 30 * 60 * 1e3;
@@ -46691,7 +46692,7 @@ function setCachedEspnOption(gameId, option) {
   write2(entries);
 }
 
-// ../grarf/desktop/src/lib/watch/providers/mlbTvLegacyProvider.ts
+// src/lib/watch/providers/mlbTvLegacyProvider.ts
 init_define_import_meta_env();
 function mlbTvLegacyWatchOption(game) {
   if (game.league !== "MLB" && !/^espn-MLB-/i.test(game.id)) return null;
@@ -46703,7 +46704,7 @@ function mlbTvLegacyWatchOption(game) {
   };
 }
 
-// ../grarf/desktop/src/lib/watch/providers/espnResolver.ts
+// src/lib/watch/providers/espnResolver.ts
 init_define_import_meta_env();
 var LOG31 = "[Resolver]";
 function resolverDebug(message, extra) {
@@ -46836,10 +46837,10 @@ function resolveEspnWatchOption(game) {
   };
 }
 
-// ../grarf/desktop/src/lib/watch/providers/paramountResolver.ts
+// src/lib/watch/providers/paramountResolver.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/watch/paramountPlusStream.ts
+// src/lib/watch/paramountPlusStream.ts
 init_define_import_meta_env();
 var PARAMOUNT_LABEL = /paramount\s*\+?/i;
 function gameHasParamountBroadcast(game) {
@@ -46847,7 +46848,7 @@ function gameHasParamountBroadcast(game) {
   return hints.some((h2) => PARAMOUNT_LABEL.test(h2));
 }
 
-// ../grarf/desktop/src/lib/watch/providers/paramountResolver.ts
+// src/lib/watch/providers/paramountResolver.ts
 var LOG32 = "[Paramount]";
 function resolveParamountWatchOption(game) {
   const cached = getCachedStreamUrl("Paramount+", game.id);
@@ -46872,10 +46873,10 @@ function resolveParamountWatchOption(game) {
   };
 }
 
-// ../grarf/desktop/src/lib/watch/providers/peacockResolver.ts
+// src/lib/watch/providers/peacockResolver.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/watch/peacockPlusStream.ts
+// src/lib/watch/peacockPlusStream.ts
 init_define_import_meta_env();
 var PEACOCK_LABEL = /\bpeacock\b/i;
 function gameHasPeacockBroadcast(game) {
@@ -46883,7 +46884,7 @@ function gameHasPeacockBroadcast(game) {
   return hints.some((h2) => PEACOCK_LABEL.test(h2));
 }
 
-// ../grarf/desktop/src/lib/watch/providers/peacockResolver.ts
+// src/lib/watch/providers/peacockResolver.ts
 var LOG33 = "[Peacock]";
 function resolvePeacockWatchOption(game) {
   if (game.league === "WORLDCUP") return null;
@@ -46925,10 +46926,10 @@ function resolvePeacockWatchOption(game) {
   };
 }
 
-// ../grarf/desktop/src/lib/watch/providers/appleTvResolver.ts
+// src/lib/watch/providers/appleTvResolver.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/watch/appleTvStream.ts
+// src/lib/watch/appleTvStream.ts
 init_define_import_meta_env();
 function gameHasAppleTvBroadcast(game) {
   const broadcasts = game.broadcasts ?? game.channels ?? [];
@@ -46942,7 +46943,7 @@ function gameHasAppleTvResolvableStream(game) {
   return !!getCachedStreamUrl("Apple TV", game.id);
 }
 
-// ../grarf/desktop/src/lib/watch/providers/appleTvResolver.ts
+// src/lib/watch/providers/appleTvResolver.ts
 var LOG34 = "[AppleTV]";
 function resolveAppleTvWatchOption(game) {
   if (!gameHasAppleTvResolvableStream(game)) return null;
@@ -46970,7 +46971,7 @@ function resolveAppleTvWatchOption(game) {
   };
 }
 
-// ../grarf/desktop/src/lib/watch/sortWatchOptionsForGame.ts
+// src/lib/watch/sortWatchOptionsForGame.ts
 init_define_import_meta_env();
 function isMlbGame(game) {
   return game.league === "MLB" || /^espn-MLB-/i.test(game.id);
@@ -46994,7 +46995,7 @@ function sortWatchOptionsForGame(game, options) {
   });
 }
 
-// ../grarf/desktop/src/lib/watch/providerRegistry.ts
+// src/lib/watch/providerRegistry.ts
 var registry = {
   MLBTV: (game) => mlbTvLegacyWatchOption(game),
   ESPN: (game) => {
@@ -47027,11 +47028,11 @@ function collectWatchOptionsFromRegistry(game) {
   return sortWatchOptionsForGame(game, out);
 }
 
-// ../grarf/desktop/src/lib/watch/executeWatchOption.ts
+// src/lib/watch/executeWatchOption.ts
 init_define_import_meta_env();
 init_isGrarfWebRenderer();
 
-// ../grarf/desktop/src/streaming/mlbTvUrls.ts
+// src/streaming/mlbTvUrls.ts
 init_define_import_meta_env();
 function buildMlbTvLaunchUrl(game) {
   const pk = game.externalIds?.mlb?.trim();
@@ -47041,13 +47042,13 @@ function buildMlbTvLaunchUrl(game) {
   return "https://www.mlb.com/tv";
 }
 
-// ../grarf/desktop/src/lib/watch/legacyMlbWatch.ts
+// src/lib/watch/legacyMlbWatch.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/gameWorkspace/mlbGameWorkspace.ts
+// src/gameWorkspace/mlbGameWorkspace.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/services/canonicalLiveGame/liveStateLabel.ts
+// src/services/canonicalLiveGame/liveStateLabel.ts
 init_define_import_meta_env();
 function buildCanonicalLiveStateLabel(game) {
   const parts = [];
@@ -47059,7 +47060,7 @@ function buildCanonicalLiveStateLabel(game) {
   return parts.join(" \xB7 ");
 }
 
-// ../grarf/desktop/src/data/mlbWorkspaceEmbeds.ts
+// src/data/mlbWorkspaceEmbeds.ts
 init_define_import_meta_env();
 var MLB_WORKSPACE_EMBEDS = {
   "20260511-tb-bos": "https://www.mlb.com/tv/g822818/v3381df16-af1b-4e2c-9389-49d82ef3f446?affiliateId=SCORES#game_state=live"
@@ -47073,7 +47074,7 @@ function getGameWorkspaceEmbedUrl(gameId) {
   return MLB_WORKSPACE_EMBEDS[gameId] ?? null;
 }
 
-// ../grarf/desktop/src/gameWorkspace/mlbGamedayUrl.ts
+// src/gameWorkspace/mlbGamedayUrl.ts
 init_define_import_meta_env();
 function resolveStatsApiGamePk(game) {
   if (typeof game.gamePk === "number" && Number.isFinite(game.gamePk) && game.gamePk > 0) {
@@ -47100,10 +47101,10 @@ function buildMlbStoryUrl(game) {
   return `https://www.mlb.com/stories/game/${pk}?storylocal=web-scores-game-embed`;
 }
 
-// ../grarf/desktop/src/gameWorkspace/resolveTeamSignalFeeds.ts
+// src/gameWorkspace/resolveTeamSignalFeeds.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/config/teamSignalFeeds.ts
+// src/config/teamSignalFeeds.ts
 init_define_import_meta_env();
 var TEAM_SIGNAL_FEEDS = {
   MLB: {
@@ -47230,12 +47231,12 @@ var TEAM_SIGNAL_FEEDS = {
   }
 };
 
-// ../grarf/desktop/src/data/mlbActivityRail.ts
+// src/data/mlbActivityRail.ts
 init_define_import_meta_env();
 var MLB_ACTIVITY_SOCIAL_URL = "https://nitter.net/i/lists/1504889268006645761";
 var MLB_ACTIVITY_REDDIT_URL = "https://www.reddit.com/r/baseball/new/";
 
-// ../grarf/desktop/src/gameWorkspace/resolveTeamSignalFeeds.ts
+// src/gameWorkspace/resolveTeamSignalFeeds.ts
 function norm(s2) {
   return s2.trim().toLowerCase().replace(/\./g, "").replace(/\s+/g, " ");
 }
@@ -47285,10 +47286,10 @@ function resolveGameTeamSignalFeeds(sport, game) {
   return out;
 }
 
-// ../grarf/desktop/src/gameWorkspace/resolveTeamRedditFeeds.ts
+// src/gameWorkspace/resolveTeamRedditFeeds.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/config/teamSubreddits.ts
+// src/config/teamSubreddits.ts
 init_define_import_meta_env();
 var TEAM_SUBREDDITS = {
   MLB: {
@@ -47333,7 +47334,7 @@ function redditSubNewUrl(subreddit) {
   return `https://www.reddit.com/r/${encodeURIComponent(s2)}/new/`;
 }
 
-// ../grarf/desktop/src/gameWorkspace/resolveTeamRedditFeeds.ts
+// src/gameWorkspace/resolveTeamRedditFeeds.ts
 function resolveGameTeamRedditFeeds(sport, game) {
   if (sport !== "mlb") return [];
   const lg = LEAGUE_SUBREDDITS.MLB;
@@ -47362,10 +47363,10 @@ function resolveGameTeamRedditFeeds(sport, game) {
   ];
 }
 
-// ../grarf/desktop/src/lib/workspaceIdentityDiagnostics/index.ts
+// src/lib/workspaceIdentityDiagnostics/index.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/workspaceIdentityDiagnostics/parseGamecenterGameId.ts
+// src/lib/workspaceIdentityDiagnostics/parseGamecenterGameId.ts
 init_define_import_meta_env();
 function parseGamecenterGameIdFromUrl(url) {
   if (!url?.trim()) return null;
@@ -47373,10 +47374,10 @@ function parseGamecenterGameIdFromUrl(url) {
   return m2?.[1] ?? null;
 }
 
-// ../grarf/desktop/src/lib/workspaceIdentityDiagnostics/buildSnapshot.ts
+// src/lib/workspaceIdentityDiagnostics/buildSnapshot.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/workspaceIdentityDiagnostics/computeDivergence.ts
+// src/lib/workspaceIdentityDiagnostics/computeDivergence.ts
 init_define_import_meta_env();
 function computeWorkspaceIdentityDivergence(input) {
   const clicked = input.clickedGameId?.trim() || null;
@@ -47433,10 +47434,10 @@ function computeWorkspaceIdentityDivergence(input) {
   return { divergencePoint: null, divergenceDetail: null };
 }
 
-// ../grarf/desktop/src/lib/workspaceIdentityDiagnostics/mlbGamecenterUrlResolution.ts
+// src/lib/workspaceIdentityDiagnostics/mlbGamecenterUrlResolution.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/workspaceIdentityDiagnostics/diagnosticsStore.ts
+// src/lib/workspaceIdentityDiagnostics/diagnosticsStore.ts
 init_define_import_meta_env();
 var MAX_HISTORY2 = 48;
 var lastSnapshot3 = null;
@@ -47503,7 +47504,7 @@ if (typeof window !== "undefined") {
   w2.__grarfMlbGamecenterUrlTraceSummary = inspectMlbGamecenterUrlResolutionSummary;
 }
 
-// ../grarf/desktop/src/lib/workspaceIdentityDiagnostics/mlbGamecenterUrlResolution.ts
+// src/lib/workspaceIdentityDiagnostics/mlbGamecenterUrlResolution.ts
 var MLB_GENERIC_GAMEDAY_URL = "https://www.mlb.com/gameday";
 function resolveMlbGamePk(game) {
   if (!game) return null;
@@ -47609,7 +47610,7 @@ function summarizeMlbGamecenterUrlResolutionHistory(rows) {
   };
 }
 
-// ../grarf/desktop/src/lib/workspaceIdentityDiagnostics/buildSnapshot.ts
+// src/lib/workspaceIdentityDiagnostics/buildSnapshot.ts
 function buildWorkspaceIdentitySnapshot(input) {
   const gamecenterUrl = input.gamecenterUrl ?? null;
   const gamecenterResolvedGameId = parseGamecenterGameIdFromUrl(gamecenterUrl);
@@ -47657,7 +47658,7 @@ function buildWorkspaceIdentitySnapshot(input) {
   };
 }
 
-// ../grarf/desktop/src/gameWorkspace/mlbGameWorkspace.ts
+// src/gameWorkspace/mlbGameWorkspace.ts
 function buildMlbGameWorkspaceTab(game, options) {
   const gamedayUrl = buildMlbComGamedayLiveUrl(game);
   const espnGamecastUrl = getGameWorkspaceEmbedUrl(game.id);
@@ -47712,10 +47713,10 @@ function buildMlbGameWorkspaceTab(game, options) {
   return tab;
 }
 
-// ../grarf/desktop/src/lib/watch/legacyMlbWatch.ts
+// src/lib/watch/legacyMlbWatch.ts
 init_isGrarfWebRenderer();
 
-// ../grarf/desktop/src/lib/watch/watchDebug.ts
+// src/lib/watch/watchDebug.ts
 init_define_import_meta_env();
 var LOG35 = "[Watch]";
 function watchDebug(message, extra) {
@@ -47726,7 +47727,7 @@ function watchDebug(message, extra) {
   }
 }
 
-// ../grarf/desktop/src/lib/watch/legacyMlbWatch.ts
+// src/lib/watch/legacyMlbWatch.ts
 function launchLegacyMlbWatch(game, dispatch) {
   if (isGrarfWebRenderer()) {
     window.open(buildMlbTvLaunchUrl(game).trim(), "_blank", "noopener,noreferrer");
@@ -47736,7 +47737,7 @@ function launchLegacyMlbWatch(game, dispatch) {
   dispatch({ type: "open", tab: buildMlbGameWorkspaceTab(game, { startInWatchMode: true }) });
 }
 
-// ../grarf/desktop/src/lib/watch/peacockExternalLaunch.ts
+// src/lib/watch/peacockExternalLaunch.ts
 init_define_import_meta_env();
 var LOG36 = "[Peacock]";
 var WATCH_LOG2 = "[Watch]";
@@ -47753,7 +47754,7 @@ function openPeacockPlaybackExternally(url) {
   });
 }
 
-// ../grarf/desktop/src/lib/watch/executeWatchOption.ts
+// src/lib/watch/executeWatchOption.ts
 function openWebWatchLiveTab(url) {
   const href = url.trim();
   if (!href) return;
@@ -47809,7 +47810,7 @@ function executeWatchOption(game, option, dispatch) {
   }
 }
 
-// ../grarf/desktop/src/lib/watch/launchDirectStreamWatch.ts
+// src/lib/watch/launchDirectStreamWatch.ts
 init_define_import_meta_env();
 function espnPlusDirectOption(game, deepLink) {
   return {
@@ -47916,7 +47917,7 @@ function tryLaunchDirectStreamWatch(game, dispatch) {
   return true;
 }
 
-// ../grarf/desktop/src/lib/watch/usaNetworkWatch.ts
+// src/lib/watch/usaNetworkWatch.ts
 init_define_import_meta_env();
 var LOG37 = "[Watch]";
 function tryLaunchUsaNetworkWatch(game) {
@@ -47930,7 +47931,7 @@ function tryLaunchUsaNetworkWatch(game) {
   return true;
 }
 
-// ../grarf/desktop/src/lib/watch/wnbaWatchLive.ts
+// src/lib/watch/wnbaWatchLive.ts
 init_define_import_meta_env();
 var LOG38 = "[WNBA]";
 var PRIME_VIDEO_PROVIDER = "Prime Video";
@@ -48000,7 +48001,7 @@ function logWnbaWatchLiveClicked(game) {
   });
 }
 
-// ../grarf/desktop/src/lib/watch/handleWatchLiveClick.ts
+// src/lib/watch/handleWatchLiveClick.ts
 function isStrongSingleOption(options) {
   if (options.length !== 1) return null;
   const o2 = options[0];
@@ -48074,7 +48075,7 @@ function handleWatchLiveClick(game, dispatch) {
   return { action: "picker", game, options };
 }
 
-// ../grarf/desktop/src/lib/watch/operationalWatchLive.ts
+// src/lib/watch/operationalWatchLive.ts
 init_define_import_meta_env();
 var LOG39 = "[WatchLive]";
 function gameHasOperationalWatchLive(game) {
@@ -48096,7 +48097,7 @@ function logWatchLiveLaunch(game) {
   }
 }
 
-// ../grarf/desktop/src/lib/operationalAlerts/alertActions.ts
+// src/lib/operationalAlerts/alertActions.ts
 function defaultOperationalAlertWatchLiveAction(targetGameId) {
   return { targetGameId, action: "WATCH_LIVE" };
 }
@@ -48132,18 +48133,18 @@ function executeOperationalAlertWatchLive(params) {
   return handleWatchLiveClick(game, watchDispatch);
 }
 
-// ../grarf/desktop/src/store/operationalAlertStore.ts
+// src/store/operationalAlertStore.ts
 init_isGrarfWebRenderer();
 
-// ../grarf/desktop/src/store/gamesSpineCloseGameAlertStore.ts
+// src/store/gamesSpineCloseGameAlertStore.ts
 init_define_import_meta_env();
 var import_zustand23 = __toESM(require_zustand(), 1);
 
-// ../grarf/desktop/src/store/gamesSpineTransientAlertStore.ts
+// src/store/gamesSpineTransientAlertStore.ts
 init_define_import_meta_env();
 var import_zustand22 = __toESM(require_zustand(), 1);
 
-// ../grarf/desktop/src/lib/gamesSpine/gamesSpineTransientAlertScheduler.ts
+// src/lib/gamesSpine/gamesSpineTransientAlertScheduler.ts
 init_define_import_meta_env();
 var GAMES_SPINE_TRANSIENT_ALERT_VISIBLE_MS = {
   "close-game": 6e4,
@@ -48192,7 +48193,7 @@ function resolveGamesSpineTransientAlertAriaLabel(type) {
   }
 }
 
-// ../grarf/desktop/src/store/gamesSpineTransientAlertStore.ts
+// src/store/gamesSpineTransientAlertStore.ts
 var MAX_QUEUE = 24;
 function collectDedupeKeys(active2, queue) {
   const keys = /* @__PURE__ */ new Set();
@@ -48239,7 +48240,7 @@ var useGamesSpineTransientAlertStore = (0, import_zustand22.create)((set, get) =
   }
 }));
 
-// ../grarf/desktop/src/store/gamesSpineCloseGameAlertStore.ts
+// src/store/gamesSpineCloseGameAlertStore.ts
 function resolveOperationalAlertTransientType(kind) {
   switch (kind) {
     case "close_game":
@@ -48274,7 +48275,7 @@ var useGamesSpineCloseGameAlertStore = (0, import_zustand23.create)(() => ({
   }
 }));
 
-// ../grarf/desktop/src/store/operationalAlertStore.ts
+// src/store/operationalAlertStore.ts
 var OPERATIONAL_ALERT_APPEARANCE_DELAY_MIN_MS = 3e3;
 var OPERATIONAL_ALERT_APPEARANCE_DELAY_MAX_MS = 1e4;
 var sessionOnceEmitted2 = /* @__PURE__ */ new Set();
@@ -48372,10 +48373,10 @@ var useOperationalAlertStore = (0, import_zustand24.create)((set, get) => ({
   }
 }));
 
-// ../grarf/desktop/src/lib/operationalAlerts/inferOperationalAlerts.ts
+// src/lib/operationalAlerts/inferOperationalAlerts.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/operationalAlerts/tennisDecidingSetAlert.ts
+// src/lib/operationalAlerts/tennisDecidingSetAlert.ts
 init_define_import_meta_env();
 init_isGrarfWebRenderer();
 var ATP_MAJOR_TOURNAMENT = /\baustralian\s+open\b|\bfrench\s+open\b|\broland\s+garros\b|\bwimbledon\b|\bus\s+open\b/i;
@@ -48447,7 +48448,7 @@ function inferTennisOperationalAlerts(prev, next) {
   ];
 }
 
-// ../grarf/desktop/src/lib/operationalAlerts/inferOperationalAlerts.ts
+// src/lib/operationalAlerts/inferOperationalAlerts.ts
 var SOCCER_LEAGUES = /* @__PURE__ */ new Set([
   "MLS",
   "EPL",
@@ -48673,7 +48674,7 @@ function inferOperationalAlerts(prev, next) {
   return out;
 }
 
-// ../grarf/desktop/src/components/operationalAlerts/OperationalAlertsEngine.tsx
+// src/components/operationalAlerts/OperationalAlertsEngine.tsx
 function normalizeF1Game(game) {
   const base = normalizeGameForTicker({ ...game, league: "F1" });
   return { ...base, league: "F1", sport: "mlb" };
@@ -48711,12 +48712,12 @@ function OperationalAlertsEngine() {
   return null;
 }
 
-// ../grarf/desktop/src/components/operationalAlerts/OperationalAlertsStack.tsx
+// src/components/operationalAlerts/OperationalAlertsStack.tsx
 init_define_import_meta_env();
 var import_react36 = __toESM(require_react(), 1);
 init_isGrarfWebRenderer();
 
-// ../grarf/desktop/src/lib/workspace/paneContainment.ts
+// src/lib/workspace/paneContainment.ts
 init_define_import_meta_env();
 var LOG40 = "[PaneLayout]";
 var PANE_LAYOUT_RESIZE_EVENT = "grarf:pane-resize";
@@ -48744,15 +48745,15 @@ function logPaneOverflowPrevented(slot) {
   console.log(`${LOG40} Prevented pane overflow`, { slot });
 }
 
-// ../grarf/desktop/src/components/operationalAlerts/OperationalAlertCard.tsx
+// src/components/operationalAlerts/OperationalAlertCard.tsx
 init_define_import_meta_env();
 var import_react35 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/components/broadcast/BroadcastChannelLogo.tsx
+// src/components/broadcast/BroadcastChannelLogo.tsx
 init_define_import_meta_env();
 var import_react34 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/lib/broadcast/channelLogoSizing.ts
+// src/lib/broadcast/channelLogoSizing.ts
 init_define_import_meta_env();
 var CHANNEL_LOGO_HEIGHT_CLASS = "h-3.5";
 var CHANNEL_LOGO_MAX_WIDTH_CLASS = "max-w-11";
@@ -48767,10 +48768,10 @@ function channelLogoImageClass(align = "left") {
   );
 }
 
-// ../grarf/desktop/src/lib/broadcast/resolveChannelLogoSrc.ts
+// src/lib/broadcast/resolveChannelLogoSrc.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/media/publicAssetUrl.ts
+// src/lib/media/publicAssetUrl.ts
 init_define_import_meta_env();
 function publicAssetUrl(pathFromWebRoot) {
   const t2 = pathFromWebRoot.trim();
@@ -48782,7 +48783,7 @@ function publicAssetUrl(pathFromWebRoot) {
   return `/${clean}`;
 }
 
-// ../grarf/desktop/src/lib/broadcast/resolveChannelLogoSrc.ts
+// src/lib/broadcast/resolveChannelLogoSrc.ts
 function resolveChannelLogoSrc(logoUrl) {
   const t2 = logoUrl.trim();
   if (!t2) return t2;
@@ -48791,7 +48792,7 @@ function resolveChannelLogoSrc(logoUrl) {
   return publicAssetUrl(t2);
 }
 
-// ../grarf/desktop/src/lib/broadcast/resolveChannelLogoUrl.ts
+// src/lib/broadcast/resolveChannelLogoUrl.ts
 init_define_import_meta_env();
 var NBA_TV_CHANNEL_LOGO_URL = "/league-logos/channel-nba-tv.png";
 var CHANNEL_LOGO_BY_LABEL = {
@@ -48854,7 +48855,7 @@ function resolveChannelLogoUrl(channelLabel) {
   return null;
 }
 
-// ../grarf/desktop/src/components/broadcast/BroadcastChannelLogo.tsx
+// src/components/broadcast/BroadcastChannelLogo.tsx
 var import_jsx_runtime14 = __toESM(require_jsx_runtime(), 1);
 function BroadcastChannelLogo({
   logoUrl,
@@ -48927,16 +48928,16 @@ function BroadcastChannelLogoFromLabel({
   );
 }
 
-// ../grarf/desktop/src/lib/operationalAlerts/alertPresentation.ts
+// src/lib/operationalAlerts/alertPresentation.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/broadcast/gameBroadcastDisplay.ts
+// src/lib/broadcast/gameBroadcastDisplay.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/broadcast/resolveGameChannelPresentation.ts
+// src/lib/broadcast/resolveGameChannelPresentation.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/broadcast/selectWnbaDisplayBroadcastLabel.ts
+// src/lib/broadcast/selectWnbaDisplayBroadcastLabel.ts
 init_define_import_meta_env();
 function normalizeBroadcastLabel(value) {
   return value.trim().replace(/\s+/g, " ").toUpperCase();
@@ -49033,7 +49034,7 @@ function selectWnbaDisplayBroadcastLabelForGame(game) {
   return selectWnbaDisplayBroadcastLabel(pool);
 }
 
-// ../grarf/desktop/src/lib/broadcast/resolveGameChannelPresentation.ts
+// src/lib/broadcast/resolveGameChannelPresentation.ts
 function primaryBroadcastLabel(game) {
   if (game.league === "WNBA") {
     return selectWnbaDisplayBroadcastLabelForGame(game) ?? "TV TBD";
@@ -49059,7 +49060,7 @@ function resolveGameChannelPresentation(game) {
   };
 }
 
-// ../grarf/desktop/src/lib/broadcast/gameBroadcastDisplay.ts
+// src/lib/broadcast/gameBroadcastDisplay.ts
 var AFL_BROADCAST_LABEL = "FS2";
 function resolveAflBroadcastLabel(game) {
   return game.league === "AFL" ? AFL_BROADCAST_LABEL : null;
@@ -49075,7 +49076,7 @@ function formatBroadcastsSubtitle(game, max = 6, sep = " \u2022 ") {
   return resolvePrimaryChannelLabel(game);
 }
 
-// ../grarf/desktop/src/lib/operationalAlerts/alertPresentation.ts
+// src/lib/operationalAlerts/alertPresentation.ts
 function formatOperationalAlertTime(createdAtMs) {
   return new Date(createdAtMs).toLocaleTimeString(void 0, {
     hour: "numeric",
@@ -49113,17 +49114,17 @@ function resolveOperationalAlertChannel(game) {
   return null;
 }
 
-// ../grarf/desktop/src/hooks/useGameForOperationalAlert.ts
+// src/hooks/useGameForOperationalAlert.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/demo/resolveDemoOperationalAlertGame.ts
+// src/lib/demo/resolveDemoOperationalAlertGame.ts
 init_define_import_meta_env();
 function resolveDemoOperationalAlertGame(gameId) {
   if (isDemoNcaaBaseballAlertGameId(gameId)) return getDemoNcaaBaseballAlertGame();
   return void 0;
 }
 
-// ../grarf/desktop/src/hooks/useGameForOperationalAlert.ts
+// src/hooks/useGameForOperationalAlert.ts
 var ALERT_LEAGUE_ORDER = GAMES_COLUMN_LEAGUE_ORDER;
 function useGameForOperationalAlert(gameId) {
   const demoGame = resolveDemoOperationalAlertGame(gameId);
@@ -49137,7 +49138,7 @@ function useGameForOperationalAlert(gameId) {
   return demoGame ?? storeGame;
 }
 
-// ../grarf/desktop/src/store/operationalAlertActionsStore.ts
+// src/store/operationalAlertActionsStore.ts
 init_define_import_meta_env();
 var import_zustand25 = __toESM(require_zustand(), 1);
 var useOperationalAlertActionsStore = (0, import_zustand25.create)((set, get) => ({
@@ -49150,10 +49151,10 @@ var useOperationalAlertActionsStore = (0, import_zustand25.create)((set, get) =>
   }
 }));
 
-// ../grarf/desktop/src/components/watch/WatchOptionsModal.tsx
+// src/components/watch/WatchOptionsModal.tsx
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/gamesSpine/formatGameDisplayTime.ts
+// src/lib/gamesSpine/formatGameDisplayTime.ts
 init_define_import_meta_env();
 function formatGameDisplayTimeLocal(game) {
   if (isGolfTournamentLeagueKey(game.league) && game.status === "scheduled" && game.scheduledDateKey?.trim()) {
@@ -49170,7 +49171,7 @@ function formatGameDisplayTimeLocal(game) {
   return game.time?.trim() || "\u2014";
 }
 
-// ../grarf/desktop/src/components/watch/WatchOptionsModal.tsx
+// src/components/watch/WatchOptionsModal.tsx
 var import_jsx_runtime15 = __toESM(require_jsx_runtime(), 1);
 function WatchOptionsModal({ game, options, onClose, onSelect }) {
   const title = `${game.awayTeam} @ ${game.homeTeam}`;
@@ -49231,7 +49232,7 @@ function WatchOptionsModal({ game, options, onClose, onSelect }) {
   );
 }
 
-// ../grarf/desktop/src/components/operationalAlerts/OperationalAlertCard.tsx
+// src/components/operationalAlerts/OperationalAlertCard.tsx
 var import_jsx_runtime16 = __toESM(require_jsx_runtime(), 1);
 function OperationalAlertCard({ alert, isNew }) {
   const navigate = useNavigate();
@@ -49429,7 +49430,7 @@ function OperationalAlertCard({ alert, isNew }) {
   ] });
 }
 
-// ../grarf/desktop/src/components/operationalAlerts/OperationalAlertsStack.tsx
+// src/components/operationalAlerts/OperationalAlertsStack.tsx
 var import_jsx_runtime17 = __toESM(require_jsx_runtime(), 1);
 var STACK_ENTER_MS = 420;
 function OperationalAlertsStack() {
@@ -49484,15 +49485,15 @@ function OperationalAlertsStack() {
   );
 }
 
-// ../grarf/desktop/src/components/gamesSpine/GamesSpineStartsSoonAlertBridge.tsx
+// src/components/gamesSpine/GamesSpineStartsSoonAlertBridge.tsx
 init_define_import_meta_env();
 var import_react37 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/lib/gamesSpine/startGamesSpineStartsSoonObserver.ts
+// src/lib/gamesSpine/startGamesSpineStartsSoonObserver.ts
 init_define_import_meta_env();
 init_isGrarfWebRenderer();
 
-// ../grarf/desktop/src/lib/gamesSpine/detectGamesSpineStartsSoonAlerts.ts
+// src/lib/gamesSpine/detectGamesSpineStartsSoonAlerts.ts
 init_define_import_meta_env();
 var GAMES_SPINE_STARTS_SOON_MINUTES_BEFORE_START = 10;
 var sessionEmittedGameIds = /* @__PURE__ */ new Set();
@@ -49539,7 +49540,7 @@ function detectGamesSpineStartsSoonAlerts(games, nowMs = Date.now()) {
   return items;
 }
 
-// ../grarf/desktop/src/lib/gamesSpine/startGamesSpineStartsSoonObserver.ts
+// src/lib/gamesSpine/startGamesSpineStartsSoonObserver.ts
 function collectOperationalGames2(leagues) {
   const games = flattenLiveGames(leagues);
   const f1Games = leagues.F1 ?? [];
@@ -49567,24 +49568,24 @@ function startGamesSpineStartsSoonObserver() {
   };
 }
 
-// ../grarf/desktop/src/components/gamesSpine/GamesSpineStartsSoonAlertBridge.tsx
+// src/components/gamesSpine/GamesSpineStartsSoonAlertBridge.tsx
 function GamesSpineStartsSoonAlertBridge() {
   (0, import_react37.useEffect)(() => startGamesSpineStartsSoonObserver(), []);
   return null;
 }
 
-// ../grarf/desktop/src/components/gamesSpine/GamesSpineGameUpdateAlertBridge.tsx
+// src/components/gamesSpine/GamesSpineGameUpdateAlertBridge.tsx
 init_define_import_meta_env();
 var import_react38 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/lib/gamesSpine/startGamesSpineGameUpdateObserver.ts
+// src/lib/gamesSpine/startGamesSpineGameUpdateObserver.ts
 init_define_import_meta_env();
 init_isGrarfWebRenderer();
 
-// ../grarf/desktop/src/lib/gamesSpine/detectGamesSpineGameUpdateAlerts.ts
+// src/lib/gamesSpine/detectGamesSpineGameUpdateAlerts.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/gamesSpine/isStandaloneSpineEvent.ts
+// src/lib/gamesSpine/isStandaloneSpineEvent.ts
 init_define_import_meta_env();
 var STANDALONE_SPINE_LEAGUE_KEYS = /* @__PURE__ */ new Set([
   "WEC",
@@ -49614,7 +49615,7 @@ function isStandaloneSpineEvent(game) {
   return !game.homeTeam?.trim();
 }
 
-// ../grarf/desktop/src/lib/gamesSpine/detectGamesSpineGameUpdateAlerts.ts
+// src/lib/gamesSpine/detectGamesSpineGameUpdateAlerts.ts
 var emittedScoreStates = /* @__PURE__ */ new Set();
 function normalizeScore(value) {
   if (value == null || !Number.isFinite(value)) return null;
@@ -49689,7 +49690,7 @@ function detectGamesSpineGameUpdateAlerts(previousById, nextGames) {
   return items;
 }
 
-// ../grarf/desktop/src/lib/gamesSpine/startGamesSpineGameUpdateObserver.ts
+// src/lib/gamesSpine/startGamesSpineGameUpdateObserver.ts
 var previousGamesById2 = {};
 function collectOperationalGames3(leagues) {
   const out = [];
@@ -49732,13 +49733,13 @@ function startGamesSpineGameUpdateObserver() {
   };
 }
 
-// ../grarf/desktop/src/components/gamesSpine/GamesSpineGameUpdateAlertBridge.tsx
+// src/components/gamesSpine/GamesSpineGameUpdateAlertBridge.tsx
 function GamesSpineGameUpdateAlertBridge() {
   (0, import_react38.useEffect)(() => startGamesSpineGameUpdateObserver(), []);
   return null;
 }
 
-// ../grarf/desktop/src/components/demo/DemoModeAlertBridge.tsx
+// src/components/demo/DemoModeAlertBridge.tsx
 init_define_import_meta_env();
 var import_react39 = __toESM(require_react(), 1);
 function DemoModeAlertBridge() {
@@ -49749,11 +49750,11 @@ function DemoModeAlertBridge() {
   return null;
 }
 
-// ../grarf/desktop/src/components/media/PodcastAudioBridge.tsx
+// src/components/media/PodcastAudioBridge.tsx
 init_define_import_meta_env();
 var import_react40 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/store/podcastPlayerStore.ts
+// src/store/podcastPlayerStore.ts
 init_define_import_meta_env();
 var import_zustand26 = __toESM(require_zustand(), 1);
 var usePodcastPlayerStore = (0, import_zustand26.create)((set, get) => ({
@@ -49793,7 +49794,7 @@ var usePodcastPlayerStore = (0, import_zustand26.create)((set, get) => ({
   }
 }));
 
-// ../grarf/desktop/src/components/media/PodcastAudioBridge.tsx
+// src/components/media/PodcastAudioBridge.tsx
 var import_jsx_runtime18 = __toESM(require_jsx_runtime(), 1);
 function PodcastAudioBridge() {
   const ref = (0, import_react40.useRef)(null);
@@ -49856,23 +49857,23 @@ function PodcastAudioBridge() {
   );
 }
 
-// ../grarf/desktop/src/components/homeMvp/HomeLiveTrackIngestBridge.tsx
+// src/components/homeMvp/HomeLiveTrackIngestBridge.tsx
 init_define_import_meta_env();
 var import_react41 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/lib/livetrack/startLiveTrackProviders.ts
+// src/lib/livetrack/startLiveTrackProviders.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/livetrack/liveTrackProviderRegistry.ts
+// src/lib/livetrack/liveTrackProviderRegistry.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/livetrack/basketball/startBasketballLiveTrackPolling.ts
+// src/lib/livetrack/basketball/startBasketballLiveTrackPolling.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/livetrack/homeLiveTrackEventSource.ts
+// src/lib/livetrack/homeLiveTrackEventSource.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/livetrack/liveTrackEnablement.ts
+// src/lib/livetrack/liveTrackEnablement.ts
 init_define_import_meta_env();
 function isLiveTrackGloballyDisabled() {
   return define_import_meta_env_default.VITE_LIVETRACK_DISABLED === "1";
@@ -49887,7 +49888,7 @@ function isLiveTrackLeagueEnabled(explicitFlag) {
   return isLiveTrackProductionDefaultOn();
 }
 
-// ../grarf/desktop/src/lib/livetrack/homeLiveTrackEventSource.ts
+// src/lib/livetrack/homeLiveTrackEventSource.ts
 var MLB_MOMENTS_ENABLED = define_import_meta_env_default.VITE_LIVETRACK_MLB_MOMENTS === "1";
 var NCAA_BASEBALL_MOMENTS_ENABLED = define_import_meta_env_default.VITE_LIVETRACK_NCAA_BASEBALL_MOMENTS === "1";
 var NHL_MOMENTS_ENABLED = define_import_meta_env_default.VITE_LIVETRACK_NHL_MOMENTS === "1";
@@ -49923,7 +49924,7 @@ function updateHomeLiveTrackEvent(eventId, updater) {
   return getLiveTrackTimelineStore().getState().updateEvent(eventId, updater);
 }
 
-// ../grarf/desktop/src/lib/livetrack/espn/espnSummaryClient.ts
+// src/lib/livetrack/espn/espnSummaryClient.ts
 init_define_import_meta_env();
 function espnSummaryUrl(sport, espnLeague, eventId) {
   return `https://site.api.espn.com/apis/site/v2/sports/${sport}/${espnLeague}/summary?event=${encodeURIComponent(eventId)}`;
@@ -49961,7 +49962,7 @@ function readEspnSummaryKeyEvents(summary) {
   return Array.isArray(keyEvents) ? keyEvents : [];
 }
 
-// ../grarf/desktop/src/lib/livetrack/espn/espnLiveTrackLeagueConfig.ts
+// src/lib/livetrack/espn/espnLiveTrackLeagueConfig.ts
 init_define_import_meta_env();
 var SOCCER_BASE = "https://site.api.espn.com/apis/site/v2/sports/soccer";
 var BASKETBALL_BASE = "https://site.api.espn.com/apis/site/v2/sports/basketball";
@@ -50032,7 +50033,7 @@ var TENNIS_LIVETRACK_LEAGUES = [
   tennisConfig("WTA", "wta", "WTA")
 ];
 
-// ../grarf/desktop/src/lib/livetrack/espn/resolveLiveEspnEventIds.ts
+// src/lib/livetrack/espn/resolveLiveEspnEventIds.ts
 init_define_import_meta_env();
 function resolveEspnEventId(game) {
   const id = game.espnEventId?.trim() || game.externalIds?.espn?.trim() || "";
@@ -50059,7 +50060,7 @@ async function resolveLiveEspnEventIds(config) {
   return fetchLiveEventIdsFromScoreboard(config).catch(() => []);
 }
 
-// ../grarf/desktop/src/lib/livetrack/basketball/basketballMomentFormat.ts
+// src/lib/livetrack/basketball/basketballMomentFormat.ts
 init_define_import_meta_env();
 function createBasketballDetectionState() {
   return {
@@ -50150,7 +50151,7 @@ function detectBasketballMomentsFromPlays(plays, espnEventId, leagueKey, teams, 
   return out;
 }
 
-// ../grarf/desktop/src/lib/livetrack/basketball/mapBasketballMomentToLiveTrackEvent.ts
+// src/lib/livetrack/basketball/mapBasketballMomentToLiveTrackEvent.ts
 init_define_import_meta_env();
 function titleCaseHeadline(headline) {
   return headline.toLowerCase().replace(/\b\w/g, (char) => char.toUpperCase());
@@ -50184,7 +50185,7 @@ function mapBasketballMomentToLiveTrackEvent(moment, sportLabel, tweetUrl) {
   };
 }
 
-// ../grarf/desktop/src/lib/livetrack/basketball/startBasketballLiveTrackPolling.ts
+// src/lib/livetrack/basketball/startBasketballLiveTrackPolling.ts
 var POLL_MS = 1e4;
 var cursors = /* @__PURE__ */ new Map();
 async function pollLeagueOnce(config) {
@@ -50240,13 +50241,13 @@ function startBasketballLiveTrackPolling() {
   };
 }
 
-// ../grarf/desktop/src/lib/livetrack/mlb/startMlbLiveTrackPolling.ts
+// src/lib/livetrack/mlb/startMlbLiveTrackPolling.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/livetrack/baseball/baseballMomentGameState.ts
+// src/lib/livetrack/baseball/baseballMomentGameState.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/livetrack/baseball/baseballMomentKinds.ts
+// src/lib/livetrack/baseball/baseballMomentKinds.ts
 init_define_import_meta_env();
 var BASEBALL_HIT_EVENT_TYPES = /* @__PURE__ */ new Set([
   "single",
@@ -50325,7 +50326,7 @@ function formatBaseballHeadline(kind, subject) {
   }
 }
 
-// ../grarf/desktop/src/lib/livetrack/baseball/baseballMomentGameState.ts
+// src/lib/livetrack/baseball/baseballMomentGameState.ts
 function createBaseballMomentGameState() {
   return {
     lastProcessedAtBatIndex: -1,
@@ -50427,10 +50428,10 @@ function ncaaHbpFromPlayText(playText) {
   return /\bhit by pitch\b/i.test(playText);
 }
 
-// ../grarf/desktop/src/lib/livetrack/liveTrackReplayScheduler.ts
+// src/lib/livetrack/liveTrackReplayScheduler.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/livetrack/liveTrackReplayMode.ts
+// src/lib/livetrack/liveTrackReplayMode.ts
 init_define_import_meta_env();
 var LIVE_TRACK_REPLAY_DEFAULT_MLB_GAME_PK = 775296;
 var LIVE_TRACK_REPLAY_DEFAULT_NCAA_EVENT_ID = "401874370";
@@ -50475,7 +50476,7 @@ function isNhlLiveTrackReplayEmission() {
   return Boolean(envGameId && /^\d+$/.test(envGameId));
 }
 
-// ../grarf/desktop/src/lib/livetrack/liveTrackReplayScheduler.ts
+// src/lib/livetrack/liveTrackReplayScheduler.ts
 var sessionCount = 0;
 var pendingItems = [];
 var sortedItems = [];
@@ -50605,10 +50606,10 @@ function registerLiveTrackReplayMoments(items) {
   }, LIVE_TRACK_REPLAY_BATCH_DEBOUNCE_MS);
 }
 
-// ../grarf/desktop/src/lib/livetrack/mlb/collectMlbLiveTrackReplayItems.ts
+// src/lib/livetrack/mlb/collectMlbLiveTrackReplayItems.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/livetrack/mlb/mlbMomentFormat.ts
+// src/lib/livetrack/mlb/mlbMomentFormat.ts
 init_define_import_meta_env();
 function ordinal(n2) {
   const suffixes = ["th", "st", "nd", "rd"];
@@ -50941,10 +50942,10 @@ function advanceMlbPlayCursor(state3, play) {
   }
 }
 
-// ../grarf/desktop/src/lib/moment/mergeObservation.ts
+// src/lib/moment/mergeObservation.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/moment/momentStore.ts
+// src/lib/moment/momentStore.ts
 init_define_import_meta_env();
 var moments = [];
 var mergeKeyIndex = /* @__PURE__ */ new Map();
@@ -50980,7 +50981,7 @@ function getRecentMoments(limit) {
   return [...moments].sort((a2, b2) => b2.timestamp.localeCompare(a2.timestamp)).slice(0, n2);
 }
 
-// ../grarf/desktop/src/lib/moment/mergeObservation.ts
+// src/lib/moment/mergeObservation.ts
 function buildMlbHomeRunMergeKey(gamePk, atBatIndex, kind) {
   return `${gamePk}:${atBatIndex}:${kind}`;
 }
@@ -51021,7 +51022,7 @@ function mergeObservation(observation) {
   };
 }
 
-// ../grarf/desktop/src/lib/moment/mlb/isMlbHomeRunMomentKind.ts
+// src/lib/moment/mlb/isMlbHomeRunMomentKind.ts
 init_define_import_meta_env();
 var MLB_HOME_RUN_MOMENT_KINDS = /* @__PURE__ */ new Set([
   "home_run",
@@ -51032,10 +51033,10 @@ function isMlbHomeRunMomentKind(kind) {
   return MLB_HOME_RUN_MOMENT_KINDS.has(kind);
 }
 
-// ../grarf/desktop/src/lib/moment/mlb/publishMlbHomeRunMoment.ts
+// src/lib/moment/mlb/publishMlbHomeRunMoment.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/livetrack/liveTrackMomentTier.ts
+// src/lib/livetrack/liveTrackMomentTier.ts
 init_define_import_meta_env();
 var FEATURED_MOMENT_KINDS = /* @__PURE__ */ new Set([
   "home_run",
@@ -51062,7 +51063,7 @@ function resolveLiveTrackMomentTier(momentKind) {
   return "featured";
 }
 
-// ../grarf/desktop/src/lib/livetrack/mlb/mapMlbMomentToLiveTrackEvent.ts
+// src/lib/livetrack/mlb/mapMlbMomentToLiveTrackEvent.ts
 init_define_import_meta_env();
 function titleCaseHeadline2(headline) {
   return headline.toLowerCase().replace(/\b\w/g, (char) => char.toUpperCase());
@@ -51101,13 +51102,13 @@ function mapMlbMomentToLiveTrackEvent(moment) {
   };
 }
 
-// ../grarf/desktop/src/lib/moment/emitMoment.ts
+// src/lib/moment/emitMoment.ts
 init_define_import_meta_env();
 function emitMoment(moment) {
   return addMoment(moment);
 }
 
-// ../grarf/desktop/src/lib/moment/mapMomentToLiveTrackEvent.ts
+// src/lib/moment/mapMomentToLiveTrackEvent.ts
 init_define_import_meta_env();
 function titleCaseHeadline3(headline) {
   return headline.toLowerCase().replace(/\b\w/g, (char) => char.toUpperCase());
@@ -51153,10 +51154,10 @@ function mapMomentToLiveTrackEvent(moment, context2 = {}) {
   };
 }
 
-// ../grarf/desktop/src/lib/moment/mlb/mapDetectedMlbMomentToObservation.ts
+// src/lib/moment/mlb/mapDetectedMlbMomentToObservation.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/livetrack/mlb/resolveMlbGameIdByGamePk.ts
+// src/lib/livetrack/mlb/resolveMlbGameIdByGamePk.ts
 init_define_import_meta_env();
 function mlbRowMatchesGamePk(gamePk, game) {
   if (game.gamePk != null && game.gamePk === gamePk) return true;
@@ -51170,7 +51171,7 @@ function resolveMlbGameIdByGamePk(gamePk) {
   return match?.id ?? null;
 }
 
-// ../grarf/desktop/src/lib/moment/mlb/mapDetectedMlbMomentToObservation.ts
+// src/lib/moment/mlb/mapDetectedMlbMomentToObservation.ts
 function mapDetectedMlbMomentToObservation(detected) {
   const gameId = resolveMlbGameIdByGamePk(detected.gamePk) ?? `mlb-${detected.gamePk}`;
   return {
@@ -51200,7 +51201,7 @@ function mapDetectedMlbMomentToObservation(detected) {
   };
 }
 
-// ../grarf/desktop/src/lib/moment/mlb/publishMlbHomeRunMoment.ts
+// src/lib/moment/mlb/publishMlbHomeRunMoment.ts
 function ingestMlbHomeRunMoment(detected) {
   const observation = mapDetectedMlbMomentToObservation(detected);
   const { moment, created } = mergeObservation(observation);
@@ -51228,19 +51229,19 @@ function publishMlbHomeRunMoment(detected) {
   return appendHomeLiveTrackEvent(event);
 }
 
-// ../grarf/desktop/src/lib/livetrack/mlb/mlbLiveTrackMomentEnrichment.ts
+// src/lib/livetrack/mlb/mlbLiveTrackMomentEnrichment.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/moment/mlb/attachMlbHomeRunHighlight.ts
+// src/lib/moment/mlb/attachMlbHomeRunHighlight.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/attachment/index.ts
+// src/lib/attachment/index.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/attachment/attachmentStore.ts
+// src/lib/attachment/attachmentStore.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/attachment/momentAttachmentStore.ts
+// src/lib/attachment/momentAttachmentStore.ts
 init_define_import_meta_env();
 var relationships = [];
 function attachAttachmentToMoment(momentId, attachmentId, confidence) {
@@ -51277,7 +51278,7 @@ function getMomentAttachmentCount() {
   return relationships.length;
 }
 
-// ../grarf/desktop/src/lib/attachment/attachmentStore.ts
+// src/lib/attachment/attachmentStore.ts
 var attachments = [];
 function addAttachment(attachment) {
   if (attachments.some((row) => row.id === attachment.id)) return false;
@@ -51294,7 +51295,7 @@ function getAttachmentsForMoment2(momentId) {
   return getAttachmentsForMoment(momentId);
 }
 
-// ../grarf/desktop/src/lib/moment/mlb/attachMlbHomeRunHighlight.ts
+// src/lib/moment/mlb/attachMlbHomeRunHighlight.ts
 var MLB_HOME_RUN_HIGHLIGHT_CONFIDENCE = 1;
 function createMlbHighlightAttachment(media, detected) {
   return {
@@ -51319,7 +51320,7 @@ function attachMlbHomeRunHighlightToMoment(momentId, media, detected) {
   );
 }
 
-// ../grarf/desktop/src/lib/livetrack/mlb/enrichMlbLiveTrackMomentMedia.ts
+// src/lib/livetrack/mlb/enrichMlbLiveTrackMomentMedia.ts
 init_define_import_meta_env();
 function batterLastName2(fullName) {
   const name = fullName.trim();
@@ -51426,7 +51427,7 @@ async function resolveMlbMomentHighlightMedia(moment, isWalkOff) {
   return matchMlbContentHighlightMedia(items, moment, isWalkOff);
 }
 
-// ../grarf/desktop/src/lib/livetrack/mlb/mlbLiveTrackMomentEnrichment.ts
+// src/lib/livetrack/mlb/mlbLiveTrackMomentEnrichment.ts
 var MAX_ENRICHMENT_ATTEMPTS = 30;
 var ENRICHMENT_TIMEOUT_MS = 5 * 60 * 1e3;
 var pendingByEventId = /* @__PURE__ */ new Map();
@@ -51501,7 +51502,7 @@ function retryPendingMlbLiveTrackMomentEnrichments() {
   }
 }
 
-// ../grarf/desktop/src/lib/livetrack/mlb/collectMlbLiveTrackReplayItems.ts
+// src/lib/livetrack/mlb/collectMlbLiveTrackReplayItems.ts
 function readTeamField(value, field) {
   if (value && typeof value === "object" && field in value) {
     const raw = value[field];
@@ -51560,7 +51561,7 @@ function collectMlbLiveTrackReplayItems(gamePk, feed) {
   return items;
 }
 
-// ../grarf/desktop/src/lib/moment/momentVerification.ts
+// src/lib/moment/momentVerification.ts
 init_define_import_meta_env();
 function getCanonicalMomentCount() {
   return getMomentCount();
@@ -51607,13 +51608,13 @@ function exposeMomentStoreForVerification() {
   };
 }
 
-// ../grarf/desktop/src/lib/timeline/timelineVerification.ts
+// src/lib/timeline/timelineVerification.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/timeline/projectGameTimeline.ts
+// src/lib/timeline/projectGameTimeline.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/timeline/formatTimelineTimestamp.ts
+// src/lib/timeline/formatTimelineTimestamp.ts
 init_define_import_meta_env();
 function formatTimelineTimestamp(timestamp) {
   const parsed = Date.parse(timestamp);
@@ -51624,7 +51625,7 @@ function formatTimelineTimestamp(timestamp) {
   }).format(new Date(parsed));
 }
 
-// ../grarf/desktop/src/lib/timeline/projectGameTimeline.ts
+// src/lib/timeline/projectGameTimeline.ts
 function buildTimelineEntry(moment) {
   return {
     moment,
@@ -51646,7 +51647,7 @@ function projectGameTimeline(gameId) {
   };
 }
 
-// ../grarf/desktop/src/lib/timeline/timelineVerification.ts
+// src/lib/timeline/timelineVerification.ts
 function logGameTimelineSnapshot(gameId) {
   const timeline = projectGameTimeline(gameId);
   console.log("[GameTimeline] gameId:", timeline.gameId);
@@ -51661,7 +51662,7 @@ function exposeTimelineForVerification() {
   };
 }
 
-// ../grarf/desktop/src/lib/livetrack/mlb/startMlbLiveTrackPolling.ts
+// src/lib/livetrack/mlb/startMlbLiveTrackPolling.ts
 var POLL_MS2 = 1e4;
 var cursors2 = /* @__PURE__ */ new Map();
 function resolveMlbGamePks() {
@@ -51820,13 +51821,13 @@ function startMlbLiveTrackPolling() {
   };
 }
 
-// ../grarf/desktop/src/lib/livetrack/ncaaBaseball/startNcaaBaseballLiveTrackPolling.ts
+// src/lib/livetrack/ncaaBaseball/startNcaaBaseballLiveTrackPolling.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/livetrack/ncaaBaseball/collectNcaaBaseballLiveTrackReplayItems.ts
+// src/lib/livetrack/ncaaBaseball/collectNcaaBaseballLiveTrackReplayItems.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/livetrack/ncaaBaseball/ncaaBaseballMomentFormat.ts
+// src/lib/livetrack/ncaaBaseball/ncaaBaseballMomentFormat.ts
 init_define_import_meta_env();
 function ordinal2(n2) {
   const suffixes = ["th", "st", "nd", "rd"];
@@ -52135,7 +52136,7 @@ function detectNcaaBaseballMomentsFromSummary(plays, espnEventId, teams, state3,
   return moments2;
 }
 
-// ../grarf/desktop/src/lib/livetrack/ncaaBaseball/mapNcaaBaseballMomentToLiveTrackEvent.ts
+// src/lib/livetrack/ncaaBaseball/mapNcaaBaseballMomentToLiveTrackEvent.ts
 init_define_import_meta_env();
 function titleCaseHeadline4(headline) {
   return headline.toLowerCase().replace(/\b\w/g, (char) => char.toUpperCase());
@@ -52174,7 +52175,7 @@ function mapNcaaBaseballMomentToLiveTrackEvent(moment) {
   };
 }
 
-// ../grarf/desktop/src/lib/livetrack/ncaaBaseball/collectNcaaBaseballLiveTrackReplayItems.ts
+// src/lib/livetrack/ncaaBaseball/collectNcaaBaseballLiveTrackReplayItems.ts
 function readTeamNames(summary) {
   const header = summary.header;
   const competition = header?.competitions?.[0];
@@ -52208,14 +52209,14 @@ function collectNcaaBaseballLiveTrackReplayItems(espnEventId, summary) {
   }));
 }
 
-// ../grarf/desktop/src/lib/livetrack/ncaaBaseball/ncaaBaseballEspnUrls.ts
+// src/lib/livetrack/ncaaBaseball/ncaaBaseballEspnUrls.ts
 init_define_import_meta_env();
 var NCAA_BASEBALL_ESPN_SCOREBOARD_URL = "https://site.api.espn.com/apis/site/v2/sports/baseball/college-baseball/scoreboard";
 function ncaaBaseballEspnSummaryUrl(espnEventId) {
   return `https://site.api.espn.com/apis/site/v2/sports/baseball/college-baseball/summary?event=${encodeURIComponent(espnEventId)}`;
 }
 
-// ../grarf/desktop/src/lib/livetrack/ncaaBaseball/startNcaaBaseballLiveTrackPolling.ts
+// src/lib/livetrack/ncaaBaseball/startNcaaBaseballLiveTrackPolling.ts
 var POLL_MS3 = 1e4;
 var cursors3 = /* @__PURE__ */ new Map();
 function resolveNcaaBaseballEventIds() {
@@ -52359,13 +52360,13 @@ function startNcaaBaseballLiveTrackPolling() {
   };
 }
 
-// ../grarf/desktop/src/lib/livetrack/nhl/startNhlLiveTrackPolling.ts
+// src/lib/livetrack/nhl/startNhlLiveTrackPolling.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/livetrack/nhl/collectNhlLiveTrackReplayItems.ts
+// src/lib/livetrack/nhl/collectNhlLiveTrackReplayItems.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/livetrack/nhl/nhlMomentFormat.ts
+// src/lib/livetrack/nhl/nhlMomentFormat.ts
 init_define_import_meta_env();
 function createNhlDetectionState() {
   return {
@@ -52569,10 +52570,10 @@ function detectNhlMomentsFromPlayByPlay(payload, state3, options) {
   return moments2;
 }
 
-// ../grarf/desktop/src/lib/livetrack/nhl/mapNhlMomentToLiveTrackEvent.ts
+// src/lib/livetrack/nhl/mapNhlMomentToLiveTrackEvent.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/livetrack/nhl/nhlMomentTier.ts
+// src/lib/livetrack/nhl/nhlMomentTier.ts
 init_define_import_meta_env();
 var FEATURED_KINDS = /* @__PURE__ */ new Set([
   "goal",
@@ -52587,7 +52588,7 @@ function resolveNhlMomentTier(kind) {
   return "featured";
 }
 
-// ../grarf/desktop/src/lib/livetrack/nhl/mapNhlMomentToLiveTrackEvent.ts
+// src/lib/livetrack/nhl/mapNhlMomentToLiveTrackEvent.ts
 function titleCaseHeadline5(headline) {
   return headline.toLowerCase().replace(/\b\w/g, (char) => char.toUpperCase());
 }
@@ -52621,7 +52622,7 @@ function mapNhlMomentToLiveTrackEvent(moment) {
   };
 }
 
-// ../grarf/desktop/src/lib/livetrack/nhl/collectNhlLiveTrackReplayItems.ts
+// src/lib/livetrack/nhl/collectNhlLiveTrackReplayItems.ts
 function collectNhlLiveTrackReplayItems(payload) {
   const state3 = createNhlDetectionState();
   const moments2 = detectNhlMomentsFromPlayByPlay(payload, state3, { includeProcessed: true });
@@ -52630,7 +52631,7 @@ function collectNhlLiveTrackReplayItems(payload) {
   }));
 }
 
-// ../grarf/desktop/src/lib/livetrack/nhl/nhlApiUrls.ts
+// src/lib/livetrack/nhl/nhlApiUrls.ts
 init_define_import_meta_env();
 var NHL_API_BASE = "https://api-web.nhle.com/v1";
 function nhlScheduleNowUrl() {
@@ -52640,7 +52641,7 @@ function nhlGamePlayByPlayUrl(gameId) {
   return `${NHL_API_BASE}/gamecenter/${encodeURIComponent(gameId)}/play-by-play`;
 }
 
-// ../grarf/desktop/src/lib/livetrack/nhl/startNhlLiveTrackPolling.ts
+// src/lib/livetrack/nhl/startNhlLiveTrackPolling.ts
 var POLL_MS4 = 1e4;
 var cursors4 = /* @__PURE__ */ new Map();
 async function fetchPlayByPlay(gameId) {
@@ -52754,10 +52755,10 @@ function startNhlLiveTrackPolling() {
   };
 }
 
-// ../grarf/desktop/src/lib/livetrack/soccer/startSoccerLiveTrackPolling.ts
+// src/lib/livetrack/soccer/startSoccerLiveTrackPolling.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/livetrack/soccer/soccerMomentFormat.ts
+// src/lib/livetrack/soccer/soccerMomentFormat.ts
 init_define_import_meta_env();
 function createSoccerDetectionState() {
   return { emittedEventKeys: /* @__PURE__ */ new Set() };
@@ -52834,7 +52835,7 @@ function detectSoccerMomentsFromKeyEvents(keyEvents, espnEventId, leagueKey, tea
   return out;
 }
 
-// ../grarf/desktop/src/lib/livetrack/soccer/mapSoccerMomentToLiveTrackEvent.ts
+// src/lib/livetrack/soccer/mapSoccerMomentToLiveTrackEvent.ts
 init_define_import_meta_env();
 function titleCaseHeadline6(headline) {
   return headline.toLowerCase().replace(/\b\w/g, (char) => char.toUpperCase());
@@ -52869,7 +52870,7 @@ function mapSoccerMomentToLiveTrackEvent(moment, sportLabel, tweetUrl) {
   };
 }
 
-// ../grarf/desktop/src/lib/livetrack/soccer/startSoccerLiveTrackPolling.ts
+// src/lib/livetrack/soccer/startSoccerLiveTrackPolling.ts
 var POLL_MS5 = 1e4;
 var cursors5 = /* @__PURE__ */ new Map();
 async function pollLeagueOnce2(config) {
@@ -52927,10 +52928,10 @@ function startSoccerLiveTrackPolling() {
   };
 }
 
-// ../grarf/desktop/src/lib/livetrack/tennis/startTennisLiveTrackPolling.ts
+// src/lib/livetrack/tennis/startTennisLiveTrackPolling.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/livetrack/tennis/tennisMomentFormat.ts
+// src/lib/livetrack/tennis/tennisMomentFormat.ts
 init_define_import_meta_env();
 function createTennisDetectionState() {
   return { lastSnapshot: null, emittedMatchWin: false };
@@ -52990,7 +52991,7 @@ function buildSetMoment(input, snapshot, winner, loser) {
   };
 }
 
-// ../grarf/desktop/src/lib/livetrack/tennis/mapTennisMomentToLiveTrackEvent.ts
+// src/lib/livetrack/tennis/mapTennisMomentToLiveTrackEvent.ts
 init_define_import_meta_env();
 function titleCaseHeadline7(headline) {
   return headline.toLowerCase().replace(/\b\w/g, (char) => char.toUpperCase());
@@ -53024,7 +53025,7 @@ function mapTennisMomentToLiveTrackEvent(moment, sportLabel) {
   };
 }
 
-// ../grarf/desktop/src/lib/livetrack/tennis/startTennisLiveTrackPolling.ts
+// src/lib/livetrack/tennis/startTennisLiveTrackPolling.ts
 var POLL_MS6 = 15e3;
 var cursors6 = /* @__PURE__ */ new Map();
 function readMatchSnapshot(game) {
@@ -53085,10 +53086,10 @@ function startTennisLiveTrackPolling() {
   };
 }
 
-// ../grarf/desktop/src/lib/livetrack/ufc/startUfcLiveTrackPolling.ts
+// src/lib/livetrack/ufc/startUfcLiveTrackPolling.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/livetrack/ufc/ufcMomentFormat.ts
+// src/lib/livetrack/ufc/ufcMomentFormat.ts
 init_define_import_meta_env();
 function createUfcDetectionState() {
   return { lastProcessedSequence: -1, emittedSequences: /* @__PURE__ */ new Set() };
@@ -53150,7 +53151,7 @@ function ufcCorePlaysUrl(cardEventId, fightId) {
   return `https://sports.core.api.espn.com/v2/sports/mma/leagues/ufc/events/${encodeURIComponent(cardEventId)}/competitions/${encodeURIComponent(fightId)}/plays?limit=200`;
 }
 
-// ../grarf/desktop/src/lib/livetrack/ufc/mapUfcMomentToLiveTrackEvent.ts
+// src/lib/livetrack/ufc/mapUfcMomentToLiveTrackEvent.ts
 init_define_import_meta_env();
 function titleCaseHeadline8(headline) {
   return headline.toLowerCase().replace(/\b\w/g, (char) => char.toUpperCase());
@@ -53184,7 +53185,7 @@ function mapUfcMomentToLiveTrackEvent(moment) {
   };
 }
 
-// ../grarf/desktop/src/lib/livetrack/ufc/startUfcLiveTrackPolling.ts
+// src/lib/livetrack/ufc/startUfcLiveTrackPolling.ts
 var POLL_MS7 = 1e4;
 var cursors7 = /* @__PURE__ */ new Map();
 function resolveLiveUfcFights() {
@@ -53258,7 +53259,7 @@ function startUfcLiveTrackPolling() {
   };
 }
 
-// ../grarf/desktop/src/lib/livetrack/liveTrackProviderRegistry.ts
+// src/lib/livetrack/liveTrackProviderRegistry.ts
 var LIVE_TRACK_PROVIDERS = [
   { id: "mlb", start: startMlbLiveTrackPolling },
   { id: "ncaa-baseball", start: startNcaaBaseballLiveTrackPolling },
@@ -53269,7 +53270,7 @@ var LIVE_TRACK_PROVIDERS = [
   { id: "tennis", start: startTennisLiveTrackPolling }
 ];
 
-// ../grarf/desktop/src/lib/livetrack/startLiveTrackProviders.ts
+// src/lib/livetrack/startLiveTrackProviders.ts
 function startLiveTrackProviders() {
   const stops = LIVE_TRACK_PROVIDERS.map((provider) => provider.start());
   return () => {
@@ -53279,13 +53280,13 @@ function startLiveTrackProviders() {
   };
 }
 
-// ../grarf/desktop/src/components/homeMvp/HomeLiveTrackIngestBridge.tsx
+// src/components/homeMvp/HomeLiveTrackIngestBridge.tsx
 function HomeLiveTrackIngestBridge() {
   (0, import_react41.useEffect)(() => startLiveTrackProviders(), []);
   return null;
 }
 
-// ../grarf/desktop/src/components/homeMvp/HomeLiveTrackTimelineBridge.tsx
+// src/components/homeMvp/HomeLiveTrackTimelineBridge.tsx
 init_define_import_meta_env();
 var import_react42 = __toESM(require_react(), 1);
 var PRUNE_INTERVAL_MS = 6e4;
@@ -53302,20 +53303,20 @@ function HomeLiveTrackTimelineBridge() {
   return null;
 }
 
-// ../grarf/desktop/src/components/homeMvp/HomeLiveTrackWireFeedBridge.tsx
+// src/components/homeMvp/HomeLiveTrackWireFeedBridge.tsx
 init_define_import_meta_env();
 var import_react43 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/lib/livetrack/feed/startLiveTrackWireFeedPolling.ts
+// src/lib/livetrack/feed/startLiveTrackWireFeedPolling.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/livetrack/feed/ingestLiveTrackFeeds.ts
+// src/lib/livetrack/feed/ingestLiveTrackFeeds.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/livetrack/feed/createLiveTrackFeedSource.ts
+// src/lib/livetrack/feed/createLiveTrackFeedSource.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/livetrack/feed/sources/rssAppLiveTrackFeedSource.ts
+// src/lib/livetrack/feed/sources/rssAppLiveTrackFeedSource.ts
 init_define_import_meta_env();
 var RssAppLiveTrackFeedSource = class {
   constructor(definition) {
@@ -53327,10 +53328,10 @@ var RssAppLiveTrackFeedSource = class {
   }
 };
 
-// ../grarf/desktop/src/lib/livetrack/feed/sources/rssHubLiveTrackFeedSource.ts
+// src/lib/livetrack/feed/sources/rssHubLiveTrackFeedSource.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/livetrack/feed/resolveRssHubFeedUrl.ts
+// src/lib/livetrack/feed/resolveRssHubFeedUrl.ts
 init_define_import_meta_env();
 var LIVETRACK_RSSHUB_DEFAULT_BASE_URL = "https://rsshub.rssforever.com";
 var LIVETRACK_RSSHUB_DEFAULT_ROUTE = "/twitter/list/2064696162578264479";
@@ -53357,7 +53358,7 @@ function resolveRssHubFeedUrl(definition) {
   return `${normalizedBase}${route}`;
 }
 
-// ../grarf/desktop/src/lib/livetrack/feed/sources/rssHubLiveTrackFeedSource.ts
+// src/lib/livetrack/feed/sources/rssHubLiveTrackFeedSource.ts
 var RssHubLiveTrackFeedSource = class {
   constructor(definition) {
     __publicField(this, "definition");
@@ -53369,7 +53370,7 @@ var RssHubLiveTrackFeedSource = class {
   }
 };
 
-// ../grarf/desktop/src/lib/livetrack/feed/createLiveTrackFeedSource.ts
+// src/lib/livetrack/feed/createLiveTrackFeedSource.ts
 function createLiveTrackFeedSource(definition) {
   switch (definition.kind) {
     case "rss-app":
@@ -53381,7 +53382,7 @@ function createLiveTrackFeedSource(definition) {
   }
 }
 
-// ../grarf/desktop/src/lib/livetrack/feed/ingestLiveTrackFeeds.ts
+// src/lib/livetrack/feed/ingestLiveTrackFeeds.ts
 async function ingestLiveTrackFeeds(options) {
   const maxItems = options.maxItemsPerFeed ?? 50;
   const initialSync = options.initialSync === true;
@@ -53452,10 +53453,10 @@ async function ingestLiveTrackFeeds(options) {
   return results;
 }
 
-// ../grarf/desktop/src/lib/livetrack/feed/liveTrackFeedSourcePlan.ts
+// src/lib/livetrack/feed/liveTrackFeedSourcePlan.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/livetrack/feed/liveTrackFeedRegistry.ts
+// src/lib/livetrack/feed/liveTrackFeedRegistry.ts
 init_define_import_meta_env();
 var LIVETRACK_RSS_VALIDATION_FEED_ID = "livetrack-rss-validation";
 var LIVETRACK_RSSHUB_FEED_ID = "livetrack-rsshub";
@@ -53496,7 +53497,7 @@ function buildRssHubFeedSourceDefinition() {
   };
 }
 
-// ../grarf/desktop/src/lib/livetrack/feed/liveTrackFeedSourcePlan.ts
+// src/lib/livetrack/feed/liveTrackFeedSourcePlan.ts
 function resolveFallbackEnabled(primary) {
   if (primary !== "rsshub") return false;
   const raw = define_import_meta_env_default.VITE_LIVETRACK_FEED_FALLBACK?.trim().toLowerCase();
@@ -53520,7 +53521,7 @@ function getLiveTrackFeedSourcePlan() {
   };
 }
 
-// ../grarf/desktop/src/lib/livetrack/feed/startLiveTrackWireFeedPolling.ts
+// src/lib/livetrack/feed/startLiveTrackWireFeedPolling.ts
 var WIRE_FEED_POLL_MS = 3e4;
 function startLiveTrackWireFeedPolling() {
   const plan = getLiveTrackFeedSourcePlan();
@@ -53541,24 +53542,24 @@ function startLiveTrackWireFeedPolling() {
   };
 }
 
-// ../grarf/desktop/src/components/homeMvp/HomeLiveTrackWireFeedBridge.tsx
+// src/components/homeMvp/HomeLiveTrackWireFeedBridge.tsx
 function HomeLiveTrackWireFeedBridge() {
   (0, import_react43.useEffect)(() => startLiveTrackWireFeedPolling(), []);
   return null;
 }
 
-// ../grarf/desktop/src/components/homeMvp/HomeNewswireTimelineBridge.tsx
+// src/components/homeMvp/HomeNewswireTimelineBridge.tsx
 init_define_import_meta_env();
 var import_react44 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/lib/newswire/initializeNewswireTimeline.ts
+// src/lib/newswire/initializeNewswireTimeline.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/store/newswireTimelineStore.ts
+// src/store/newswireTimelineStore.ts
 init_define_import_meta_env();
 var import_zustand27 = __toESM(require_zustand(), 1);
 
-// ../grarf/desktop/src/lib/newswire/newswireTimelineStorage.ts
+// src/lib/newswire/newswireTimelineStorage.ts
 init_define_import_meta_env();
 var NEWSWIRE_TIMELINE_STORAGE_KEY = "grarf-newswire-timeline";
 var NEWSWIRE_TIMELINE_STORAGE_VERSION = 2;
@@ -53613,7 +53614,7 @@ function writeNewswireTimelineSync(stories) {
   }
 }
 
-// ../grarf/desktop/src/store/newswireTimelineStore.ts
+// src/store/newswireTimelineStore.ts
 function storiesByIdFromList(stories) {
   const byId = {};
   for (const story of stories) {
@@ -53692,7 +53693,7 @@ function getNewswireTimelineStore() {
   return useNewswireTimelineStore;
 }
 
-// ../grarf/desktop/src/lib/newswire/initializeNewswireTimeline.ts
+// src/lib/newswire/initializeNewswireTimeline.ts
 var initialized3 = false;
 function ensureNewswireTimelineInitialized() {
   if (initialized3) return;
@@ -53701,7 +53702,7 @@ function ensureNewswireTimelineInitialized() {
   initializeLiveTrackAnimationFromTimeline(eventIds);
 }
 
-// ../grarf/desktop/src/components/homeMvp/HomeNewswireTimelineBridge.tsx
+// src/components/homeMvp/HomeNewswireTimelineBridge.tsx
 var PRUNE_INTERVAL_MS2 = 6e4;
 function HomeNewswireTimelineBridge() {
   (0, import_react44.useEffect)(() => {
@@ -53716,20 +53717,20 @@ function HomeNewswireTimelineBridge() {
   return null;
 }
 
-// ../grarf/desktop/src/components/homeMvp/HomeNewswireWireFeedBridge.tsx
+// src/components/homeMvp/HomeNewswireWireFeedBridge.tsx
 init_define_import_meta_env();
 var import_react45 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/lib/newswire/feed/startNewswireWireFeedPolling.ts
+// src/lib/newswire/feed/startNewswireWireFeedPolling.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/newswire/feed/ingestNewswireFeed.ts
+// src/lib/newswire/feed/ingestNewswireFeed.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/newswire/dedupeNewswireStories.ts
+// src/lib/newswire/dedupeNewswireStories.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/newswire/sanitizeNewswireText.ts
+// src/lib/newswire/sanitizeNewswireText.ts
 init_define_import_meta_env();
 function sanitizeNewswireText(raw) {
   if (!raw) return "";
@@ -53738,7 +53739,7 @@ function sanitizeNewswireText(raw) {
   return text2.replace(/\s+/g, " ").trim();
 }
 
-// ../grarf/desktop/src/lib/newswire/dedupeNewswireStories.ts
+// src/lib/newswire/dedupeNewswireStories.ts
 function normalizeNewswireHeadlineKey(headline) {
   return sanitizeNewswireText(headline).toLowerCase().replace(/[^\w\s]/g, "").replace(/\s+/g, " ").trim();
 }
@@ -53762,10 +53763,10 @@ function dedupeNewswireStories(stories) {
   return deduped;
 }
 
-// ../grarf/desktop/src/lib/newswire/mapFeedItemToNewswireStory.ts
+// src/lib/newswire/mapFeedItemToNewswireStory.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/newswire/normalizeNewswireSource.ts
+// src/lib/newswire/normalizeNewswireSource.ts
 init_define_import_meta_env();
 var SOURCE_BY_HOST = {
   "espn.com": "ESPN",
@@ -53814,7 +53815,7 @@ function normalizeNewswireSource(url, author) {
   return "News";
 }
 
-// ../grarf/desktop/src/lib/newswire/mapFeedItemToNewswireStory.ts
+// src/lib/newswire/mapFeedItemToNewswireStory.ts
 function stableHash3(input) {
   let h2 = 2166136261;
   for (let i2 = 0; i2 < input.length; i2++) {
@@ -53837,7 +53838,7 @@ function mapFeedItemToNewswireStory(item) {
   };
 }
 
-// ../grarf/desktop/src/lib/newswire/feed/newswireFeedRegistry.ts
+// src/lib/newswire/feed/newswireFeedRegistry.ts
 init_define_import_meta_env();
 var NEWSWIRE_RSS_FEED_ID = "newswire-rss-app";
 var NEWSWIRE_RSS_FEED_URL = "https://rss.app/feeds/_YQJFO8TR3FiyO9s4.xml";
@@ -53855,7 +53856,7 @@ function buildNewswireRssAppFeedSourceDefinition() {
   };
 }
 
-// ../grarf/desktop/src/lib/newswire/feed/ingestNewswireFeed.ts
+// src/lib/newswire/feed/ingestNewswireFeed.ts
 var MAX_ITEMS = 50;
 async function ingestNewswireFeed(options = {}) {
   const definition = buildNewswireRssAppFeedSourceDefinition();
@@ -53911,7 +53912,7 @@ async function ingestNewswireFeed(options = {}) {
   return { ok: true, feedItemCount, appended, skipped };
 }
 
-// ../grarf/desktop/src/lib/newswire/feed/startNewswireWireFeedPolling.ts
+// src/lib/newswire/feed/startNewswireWireFeedPolling.ts
 var WIRE_FEED_POLL_MS2 = 3e4;
 function startNewswireWireFeedPolling() {
   let cancelled = false;
@@ -53927,21 +53928,21 @@ function startNewswireWireFeedPolling() {
   };
 }
 
-// ../grarf/desktop/src/components/homeMvp/HomeNewswireWireFeedBridge.tsx
+// src/components/homeMvp/HomeNewswireWireFeedBridge.tsx
 function HomeNewswireWireFeedBridge() {
   (0, import_react45.useEffect)(() => startNewswireWireFeedPolling(), []);
   return null;
 }
 
-// ../grarf/desktop/src/lib/livetrack/oldLiveTrackerColdStorage.ts
+// src/lib/livetrack/oldLiveTrackerColdStorage.ts
 init_define_import_meta_env();
 var OLD_LIVETRACKER_ENABLED = false;
 
-// ../grarf/desktop/src/components/operator/OperatorControlPanel.tsx
+// src/components/operator/OperatorControlPanel.tsx
 init_define_import_meta_env();
 var import_react46 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/lib/operator/operatorApi.ts
+// src/lib/operator/operatorApi.ts
 init_define_import_meta_env();
 async function fetchOperatorEnabled() {
   const fn2 = window.grarf?.operatorIsEnabled;
@@ -53975,7 +53976,7 @@ function formatOperatorCountdown(ms2) {
   return `${h2}h ${m2}m`;
 }
 
-// ../grarf/desktop/src/components/operator/OperatorControlPanel.tsx
+// src/components/operator/OperatorControlPanel.tsx
 var import_jsx_runtime19 = __toESM(require_jsx_runtime(), 1);
 function OperatorControlPanel({ open, onClose }) {
   const [targets, setTargets] = (0, import_react46.useState)([]);
@@ -54159,7 +54160,7 @@ function OperatorControlPanel({ open, onClose }) {
   ] });
 }
 
-// ../grarf/desktop/src/layouts/AppShellLayout.tsx
+// src/layouts/AppShellLayout.tsx
 var import_jsx_runtime20 = __toESM(require_jsx_runtime(), 1);
 function AppShellLayout() {
   const [operatorEnabled, setOperatorEnabled] = (0, import_react47.useState)(false);
@@ -54227,26 +54228,26 @@ function AppShellLayout() {
   ] }) });
 }
 
-// ../grarf/desktop/src/pages/GameWorkspacePage.tsx
+// src/pages/GameWorkspacePage.tsx
 init_define_import_meta_env();
 var import_react61 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/components/workspace/WorkspaceRenderer.tsx
+// src/components/workspace/WorkspaceRenderer.tsx
 init_define_import_meta_env();
 var import_react60 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/components/ContextualSplitEmbed.tsx
+// src/components/ContextualSplitEmbed.tsx
 init_define_import_meta_env();
 var import_react49 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/components/WorkspaceEmbedHost.tsx
+// src/components/WorkspaceEmbedHost.tsx
 init_define_import_meta_env();
 var import_react48 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/lib/workspace/measureEmbedHostBounds.ts
+// src/lib/workspace/measureEmbedHostBounds.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/workspace/paneLayoutDefaults.ts
+// src/lib/workspace/paneLayoutDefaults.ts
 init_define_import_meta_env();
 var PANE_COLLAPSED_WIDTH_PX = 32;
 var PANE_RESIZE_HANDLE_PX = 4;
@@ -54276,7 +54277,7 @@ var DEFAULT_PANE_LAYOUTS = {
   }
 };
 
-// ../grarf/desktop/src/lib/workspace/measureEmbedHostBounds.ts
+// src/lib/workspace/measureEmbedHostBounds.ts
 var WORKSPACE_SPINE_PANE_SELECTOR = "[data-grarf-workspace-spine]";
 var OPERATIONAL_ALERTS_STACK_SELECTOR = "[data-grarf-operational-alerts]";
 function readWorkspaceSpineBoundaryRightPx() {
@@ -54344,7 +54345,7 @@ function measureEmbedHostBounds(host) {
   };
 }
 
-// ../grarf/desktop/src/lib/workspace/centerEmbedSuppression.ts
+// src/lib/workspace/centerEmbedSuppression.ts
 init_define_import_meta_env();
 var suppressionDepth = 0;
 function isCenterEmbedSuppressed(slot = "center") {
@@ -54352,7 +54353,7 @@ function isCenterEmbedSuppressed(slot = "center") {
   return slot === "center" || slot === "centerChild";
 }
 
-// ../grarf/desktop/src/components/WorkspaceEmbedHost.tsx
+// src/components/WorkspaceEmbedHost.tsx
 var import_jsx_runtime21 = __toESM(require_jsx_runtime(), 1);
 function hasEmbedBridge() {
   return typeof window !== "undefined" && !!window.grarf?.workspaceEmbedSync;
@@ -54568,7 +54569,7 @@ function WorkspaceEmbedHost2({
   );
 }
 
-// ../grarf/desktop/src/components/ContextualSplitEmbed.tsx
+// src/components/ContextualSplitEmbed.tsx
 var import_jsx_runtime22 = __toESM(require_jsx_runtime(), 1);
 var SOURCE_PANE_PERCENT = 40;
 var CHILD_PANE_PERCENT = 60;
@@ -54669,7 +54670,7 @@ function ContextualSplitEmbed({ url, className, partition, active: active2 = tru
   );
 }
 
-// ../grarf/desktop/src/components/streaming/StreamWorkspaceWebview.tsx
+// src/components/streaming/StreamWorkspaceWebview.tsx
 init_define_import_meta_env();
 var import_react50 = __toESM(require_react(), 1);
 var import_jsx_runtime23 = __toESM(require_jsx_runtime(), 1);
@@ -54695,11 +54696,11 @@ function StreamWorkspaceWebview({ url, partition, title, className }) {
   ) });
 }
 
-// ../grarf/desktop/src/components/gameWorkspace/GameWorkspace.tsx
+// src/components/gameWorkspace/GameWorkspace.tsx
 init_define_import_meta_env();
 var import_react57 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/lib/mlbCatchUp/historicalMlbWorkspace.ts
+// src/lib/mlbCatchUp/historicalMlbWorkspace.ts
 init_define_import_meta_env();
 var HISTORICAL_MLB_GAME_ID = /^mlb-(\d+)$/;
 function parseHistoricalMlbCatchupGamePk(gameId) {
@@ -54723,7 +54724,7 @@ ${panel} loaded
 gamePk=${gamePk}`);
 }
 
-// ../grarf/desktop/src/hooks/useCanonicalLiveGame.ts
+// src/hooks/useCanonicalLiveGame.ts
 init_define_import_meta_env();
 var import_react51 = __toESM(require_react(), 1);
 function useCanonicalLiveGame(gameId, consumerId = "react_subscriber") {
@@ -54740,13 +54741,13 @@ function useCanonicalLiveGameRow(gameId, consumerId = "react_subscriber") {
   return useCanonicalLiveGame(gameId, consumerId)?.game;
 }
 
-// ../grarf/desktop/src/components/gameWorkspace/GameWorkspace.tsx
+// src/components/gameWorkspace/GameWorkspace.tsx
 init_isGrarfWebRenderer();
 
-// ../grarf/desktop/src/lib/watch/homeSpineWatchLive.ts
+// src/lib/watch/homeSpineWatchLive.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/watch/resolveLiveGameWatchTarget.ts
+// src/lib/watch/resolveLiveGameWatchTarget.ts
 init_define_import_meta_env();
 function resolveLiveGameWatchTarget(game) {
   const streamUrl = game.streamUrl?.trim();
@@ -54760,7 +54761,7 @@ function resolveLiveGameWatchTarget(game) {
   return { streamUrl, streamProvider: derived };
 }
 
-// ../grarf/desktop/src/lib/watch/homeSpineWatchLive.ts
+// src/lib/watch/homeSpineWatchLive.ts
 function isMlbScoreboardGame(game) {
   return game.league === "MLB" || /^espn-MLB-/i.test(game.id);
 }
@@ -54780,11 +54781,11 @@ function logWatchLiveRenderingOnHomepageCard(_game) {
 function logHomeSpineWatchLiveState(_game) {
 }
 
-// ../grarf/desktop/src/components/editorial/GameWorkspaceEditorialDetail.tsx
+// src/components/editorial/GameWorkspaceEditorialDetail.tsx
 init_define_import_meta_env();
 var import_react52 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/components/editorial/GameEditorialSummaryDetail.tsx
+// src/components/editorial/GameEditorialSummaryDetail.tsx
 init_define_import_meta_env();
 var import_jsx_runtime24 = __toESM(require_jsx_runtime(), 1);
 function GameEditorialSummaryDetail({ summary, className, variant = "compact" }) {
@@ -54804,7 +54805,7 @@ function GameEditorialSummaryDetail({ summary, className, variant = "compact" })
   );
 }
 
-// ../grarf/desktop/src/components/editorial/GameWorkspaceEditorialDetail.tsx
+// src/components/editorial/GameWorkspaceEditorialDetail.tsx
 var import_jsx_runtime25 = __toESM(require_jsx_runtime(), 1);
 function GameWorkspaceEditorialDetail({ gameId, catchupContextGame, className }) {
   const bundle = useEditorialStore((s2) => s2.bundle);
@@ -54837,11 +54838,11 @@ function GameWorkspaceEditorialDetail({ gameId, catchupContextGame, className })
   ] });
 }
 
-// ../grarf/desktop/src/components/gameWorkspace/GameWorkspaceHighlightsPlaceholder.tsx
+// src/components/gameWorkspace/GameWorkspaceHighlightsPlaceholder.tsx
 init_define_import_meta_env();
 var import_react55 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/lib/mlbCatchUp/resolveWorkspaceGamePk.ts
+// src/lib/mlbCatchUp/resolveWorkspaceGamePk.ts
 init_define_import_meta_env();
 function resolveWorkspaceGamePk(gameId, game) {
   if (typeof game?.gamePk === "number" && Number.isFinite(game.gamePk) && game.gamePk > 0) {
@@ -54855,11 +54856,11 @@ function resolveWorkspaceGamePk(gameId, game) {
   return parseHistoricalMlbCatchupGamePk(gameId);
 }
 
-// ../grarf/desktop/src/hooks/useMlbGameWorkspaceHighlights.ts
+// src/hooks/useMlbGameWorkspaceHighlights.ts
 init_define_import_meta_env();
 var import_react53 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/store/mlbCatchupHighlightsStore.ts
+// src/store/mlbCatchupHighlightsStore.ts
 init_define_import_meta_env();
 var import_zustand28 = __toESM(require_zustand(), 1);
 var EMPTY_MAP = {};
@@ -54870,7 +54871,7 @@ var useMlbCatchupHighlightsStore = (0, import_zustand28.create)((set, get) => ({
   getHighlightsForGamePk: (gamePk) => get().highlightsByGamePk[gamePk] ?? []
 }));
 
-// ../grarf/desktop/src/hooks/useMlbGameWorkspaceHighlights.ts
+// src/hooks/useMlbGameWorkspaceHighlights.ts
 function useMlbGameWorkspaceHighlights(gamePk) {
   const highlightsByGamePk = useMlbCatchupHighlightsStore((s2) => s2.highlightsByGamePk);
   const highlights = (0, import_react53.useMemo)(() => {
@@ -54886,20 +54887,20 @@ highlights=${highlights.length}`);
   return highlights;
 }
 
-// ../grarf/desktop/src/hooks/useGameWorkspaceHighlight.ts
+// src/hooks/useGameWorkspaceHighlight.ts
 init_define_import_meta_env();
 var import_react54 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/lib/leagueHighlights/fetchGameLeagueHighlight.ts
+// src/lib/leagueHighlights/fetchGameLeagueHighlight.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/config/leagueHighlightProviders.ts
+// src/config/leagueHighlightProviders.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/services/highlights/providers/registry.ts
+// src/services/highlights/providers/registry.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/services/highlights/providers/mlb.ts
+// src/services/highlights/providers/mlb.ts
 init_define_import_meta_env();
 var MLB_HIGHLIGHTS_PLAYLIST_ID = "PLL-lmlkrmJak3neKKEataBelAVfdkBbDX";
 var MLB_HIGHLIGHT_PROVIDER = {
@@ -54910,7 +54911,7 @@ var MLB_HIGHLIGHT_PROVIDER = {
   maxPlaylistItems: 75
 };
 
-// ../grarf/desktop/src/services/highlights/providers/registry.ts
+// src/services/highlights/providers/registry.ts
 var REGISTRY = {
   MLB: MLB_HIGHLIGHT_PROVIDER
 };
@@ -54919,7 +54920,7 @@ function getHighlightProvider(league) {
   return REGISTRY[key2] ?? null;
 }
 
-// ../grarf/desktop/src/config/leagueHighlightProviders.ts
+// src/config/leagueHighlightProviders.ts
 var LEAGUE_HIGHLIGHT_PROVIDERS = {
   MLB: {
     league: "MLB",
@@ -54930,16 +54931,16 @@ var LEAGUE_HIGHLIGHT_PROVIDERS = {
   }
 };
 
-// ../grarf/desktop/src/lib/leagueHighlights/fetchGameLeagueHighlightWeb.ts
+// src/lib/leagueHighlights/fetchGameLeagueHighlightWeb.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/highlightsTv/ingestHighlightsTvChannelClips.ts
+// src/lib/highlightsTv/ingestHighlightsTvChannelClips.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/data/highlightsTvChannelOrder.ts
+// src/data/highlightsTvChannelOrder.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/highlightsTv/parseHighlightsTvChannelIngestionCsv.ts
+// src/lib/highlightsTv/parseHighlightsTvChannelIngestionCsv.ts
 init_define_import_meta_env();
 function parseCsvRecord2(line) {
   const fields = [];
@@ -55009,7 +55010,7 @@ function isHighlightsTvChannelIngestionRowEnabled(enabled) {
   return value === "true" || value === "yes" || value === "1";
 }
 
-// ../grarf/desktop/src/data/highlightsTvChannelOrder.ts
+// src/data/highlightsTvChannelOrder.ts
 var HIGHLIGHTS_TV_CONFIG_LEAGUE_KEY_ALIASES = {
   WORLD_CUP: "WORLDCUP",
   FIFAWORLDCUP: "WORLDCUP"
@@ -55092,11 +55093,11 @@ function resolveHighlightsTvConfiguredChannels(rows) {
   return configured;
 }
 
-// ../grarf/desktop/src/data/highlightsTvChannelIngestionConfig.ts
+// src/data/highlightsTvChannelIngestionConfig.ts
 init_define_import_meta_env();
 var HIGHLIGHTS_TV_CHANNEL_INGESTION_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQgtSg_UuFj1FEFnfiMbrXM9nj1cOeZ06IZWllUlIcClVKmgLjhX_0pF3HnOpmpntGZO-yuEvIWt_VD/pub?gid=0&single=true&output=csv";
 
-// ../grarf/desktop/src/lib/highlightsTv/applyHighlightsTvIngestionKeywordFilters.ts
+// src/lib/highlightsTv/applyHighlightsTvIngestionKeywordFilters.ts
 init_define_import_meta_env();
 function splitKeywordCell(cell) {
   return cell.split("|").map((keyword) => keyword.trim()).filter(Boolean);
@@ -55116,18 +55117,18 @@ function applyHighlightsTvRequiredTitleKeywordFilter(videos, requiredTitleKeywor
   return videos.filter((video) => titleMatchesAnyKeyword(video.title, requiredKeywords));
 }
 
-// ../grarf/desktop/src/lib/highlightsTv/fetchHighlightsTvIngestionSourceVideos.ts
+// src/lib/highlightsTv/fetchHighlightsTvIngestionSourceVideos.ts
 init_define_import_meta_env();
 init_operationalIngestConfig();
 init_isGrarfWebRenderer();
 
-// ../grarf/desktop/src/lib/sportscape/highlights/sportscapeHighlightSourceUtils.ts
+// src/lib/sportscape/highlights/sportscapeHighlightSourceUtils.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/shared/youtubeAllGamesHighlightFetch.js
+// shared/youtubeAllGamesHighlightFetch.js
 init_define_import_meta_env();
 
-// ../grarf/desktop/shared/mlbAllGamesHighlightDate.js
+// shared/mlbAllGamesHighlightDate.js
 init_define_import_meta_env();
 var MONTH_NAMES = [
   "January",
@@ -55228,7 +55229,7 @@ function describeMlbAllGamesHighlightTitleRejection(title, targetSlateDateYmd) {
   return "accepted";
 }
 
-// ../grarf/desktop/shared/mlbAllGamesHighlightSelection.js
+// shared/mlbAllGamesHighlightSelection.js
 init_define_import_meta_env();
 var MLB_CATCHUP_DAILY_HIGHLIGHT_TITLE_PATTERNS = [MLB_ALL_GAMES_HIGHLIGHT_TITLE_NEEDLE];
 function entryTitle(entry) {
@@ -55305,7 +55306,7 @@ function logMlbAllGamesHighlightSelection(verification, rssUrl) {
 ${JSON.stringify(payload, null, 2)}`);
 }
 
-// ../grarf/desktop/shared/youtubeAllGamesHighlightFetch.js
+// shared/youtubeAllGamesHighlightFetch.js
 var DEFAULT_MLB_CHANNEL_ID = "UCoLrcjPV5PbUrUyXq5mjc_A";
 var CHROME_UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36";
 var MLB_CATCHUP_DAILY_HIGHLIGHT_TITLE_PATTERNS2 = [
@@ -55567,15 +55568,15 @@ async function resolveAllGamesHighlight(payload, options = {}) {
   }
 }
 
-// ../grarf/desktop/src/lib/sportscape/highlights/sportscapeHighlightSourceUtils.ts
+// src/lib/sportscape/highlights/sportscapeHighlightSourceUtils.ts
 init_resolveYoutubeChannelRssUrl();
 
-// ../grarf/desktop/src/lib/youtube/resolveYoutubePlaylistRssUrl.ts
+// src/lib/youtube/resolveYoutubePlaylistRssUrl.ts
 init_define_import_meta_env();
 init_operationalIngestConfig();
 init_isGrarfWebRenderer();
 
-// ../grarf/desktop/src/lib/youtubeMorningLineupHighlightShared.ts
+// src/lib/youtubeMorningLineupHighlightShared.ts
 init_define_import_meta_env();
 var MORNING_LINEUP_PLAYLIST_RSS_PATH = "/clips/youtube-playlist-rss";
 var MORNING_LINEUP_HIGHLIGHT_API_PATH = "/api/youtube/morning-lineup-highlight";
@@ -55612,7 +55613,7 @@ function resolveMorningLineupFromPlaylistRss(xml) {
   return normalizePlaylistEntry(newest);
 }
 
-// ../grarf/desktop/src/lib/youtube/resolveYoutubePlaylistRssUrl.ts
+// src/lib/youtube/resolveYoutubePlaylistRssUrl.ts
 function resolveYoutubePlaylistRssPath(playlistId) {
   return `${MORNING_LINEUP_PLAYLIST_RSS_PATH}/${encodeURIComponent(playlistId)}`;
 }
@@ -55628,7 +55629,7 @@ function resolveYoutubePlaylistRssFetchUrls(playlistId) {
   return [sameOrigin];
 }
 
-// ../grarf/desktop/src/lib/sportscape/highlights/sportscapeHighlightSourceUtils.ts
+// src/lib/sportscape/highlights/sportscapeHighlightSourceUtils.ts
 var PLAYLIST_ID_FROM_URL_RE = /[?&]list=(PL[\w-]+)/i;
 var YOUTUBE_CHANNEL_ID_RE = /\/channel\/(UC[\w-]{22})/i;
 var ESPN_SPORTSCAPE_YOUTUBE_CHANNEL_ID = "UCiWLfSweyRNmLpgEHekhoAg";
@@ -55701,7 +55702,7 @@ async function fetchSportscapeYoutubeChannel(sourceUrl) {
   }));
 }
 
-// ../grarf/desktop/src/lib/highlightsTv/fetchHighlightsTvIngestionSourceVideos.ts
+// src/lib/highlightsTv/fetchHighlightsTvIngestionSourceVideos.ts
 var HIGHLIGHTS_TV_WEB_PLAYLIST_DATA_PATH = "/clips/youtube-playlist-data";
 var YOUTUBE_CHANNEL_ID_RE2 = /\/channel\/(UC[\w-]{22})/i;
 var YOUTUBE_HANDLE_CHANNEL_IDS = {
@@ -55808,7 +55809,7 @@ async function fetchHighlightsTvIngestionSourceVideos(sourceType, sourceUrl) {
   throw new Error(`unsupported_highlights_tv_source_type:${sourceType}`);
 }
 
-// ../grarf/desktop/src/lib/highlightsTv/ingestHighlightsTvChannelClips.ts
+// src/lib/highlightsTv/ingestHighlightsTvChannelClips.ts
 async function loadHighlightsTvChannelIngestionRows() {
   const response = await fetch(HIGHLIGHTS_TV_CHANNEL_INGESTION_CSV_URL, { cache: "no-store" });
   if (!response.ok) {
@@ -55865,10 +55866,10 @@ async function ingestHighlightsTvChannelClips(leagueKey, leagueLabel) {
   return ingestHighlightsTvClipsFromIngestionRow(row, leagueKey, leagueLabel);
 }
 
-// ../grarf/desktop/src/lib/highlightsTv/filterHighlightsTvAmbientEligibleClips.ts
+// src/lib/highlightsTv/filterHighlightsTvAmbientEligibleClips.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/leagueHighlights/resolveLeagueHighlightGamePayload.ts
+// src/lib/leagueHighlights/resolveLeagueHighlightGamePayload.ts
 init_define_import_meta_env();
 function resolveLeagueHighlightGamePayload(game) {
   return {
@@ -55899,10 +55900,10 @@ function resolveLeagueHighlightFetchKey(payload) {
   ].join("");
 }
 
-// ../grarf/desktop/src/services/mediaResolution/scoreTitleMatch.ts
+// src/services/mediaResolution/scoreTitleMatch.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/services/mediaResolution/teamAliases.ts
+// src/services/mediaResolution/teamAliases.ts
 init_define_import_meta_env();
 function normalizeTeamToken(s2) {
   return String(s2 || "").toLowerCase().replace(/\./g, "").replace(/[^a-z0-9\s]/g, " ").replace(/\s+/g, " ").trim();
@@ -55927,7 +55928,7 @@ function buildTeamAliasTerms(game, side) {
   return [...terms];
 }
 
-// ../grarf/desktop/src/services/mediaResolution/scoreTitleMatch.ts
+// src/services/mediaResolution/scoreTitleMatch.ts
 function fragmentMatchesTerms(fragment, terms) {
   const f2 = normalizeTeamToken(fragment);
   if (!f2) return false;
@@ -56003,7 +56004,7 @@ function scoreDateProximity(game, publishedAt) {
 }
 var MIN_STRONG_MATCH_SCORE = 8;
 
-// ../grarf/desktop/src/lib/highlightsTv/filterHighlightsTvAmbientEligibleClips.ts
+// src/lib/highlightsTv/filterHighlightsTvAmbientEligibleClips.ts
 var HIGHLIGHT_TITLE_PATTERNS = ["highlight", "highlights"];
 function isHighlightsTvSoloCompetitionGame(game) {
   if (isGolfLeagueKey(game.league)) return true;
@@ -56127,7 +56128,7 @@ function filterHighlightsTvAmbientEligibleClips(clips, games, now = /* @__PURE__
   );
 }
 
-// ../grarf/desktop/src/lib/leagueHighlights/fetchGameLeagueHighlightWeb.ts
+// src/lib/leagueHighlights/fetchGameLeagueHighlightWeb.ts
 init_isGrarfWebRenderer();
 var MLB_CLIPS_CACHE_TTL_MS = 5 * 60 * 1e3;
 var mlbClipsCache = null;
@@ -56167,7 +56168,7 @@ async function fetchGameLeagueHighlightViaHighlightsTv(payload) {
   }
 }
 
-// ../grarf/desktop/src/lib/leagueHighlights/fetchGameLeagueHighlight.ts
+// src/lib/leagueHighlights/fetchGameLeagueHighlight.ts
 init_isGrarfWebRenderer();
 var resolveCache = /* @__PURE__ */ new Map();
 var CACHE_TTL_MS3 = 5 * 60 * 1e3;
@@ -56204,7 +56205,7 @@ async function fetchGameLeagueHighlight(payload) {
   return promise;
 }
 
-// ../grarf/desktop/src/hooks/useGameWorkspaceHighlight.ts
+// src/hooks/useGameWorkspaceHighlight.ts
 function useGameWorkspaceHighlight(gameId, catchupContextGame) {
   const canonicalGame = useCanonicalLiveGameRow(gameId, "game_workspace_highlights");
   const game = canonicalGame ?? (gameId ? resolveWorkspaceGameRow(gameId, catchupContextGame) : void 0);
@@ -56279,7 +56280,7 @@ function useGameWorkspaceHighlight(gameId, catchupContextGame) {
   return { loading, video, error, supported };
 }
 
-// ../grarf/desktop/src/components/gameWorkspace/GameWorkspaceHighlightsPlaceholder.tsx
+// src/components/gameWorkspace/GameWorkspaceHighlightsPlaceholder.tsx
 init_isGrarfWebRenderer();
 var import_jsx_runtime26 = __toESM(require_jsx_runtime(), 1);
 var WEB_GAME_WORKSPACE_HIGHLIGHT_FRAME_CLASS = "aspect-video w-full max-w-full max-h-full";
@@ -56463,11 +56464,11 @@ function GameWorkspaceHighlightsPlaceholder({
   );
 }
 
-// ../grarf/desktop/src/components/gameWorkspace/GameWorkspaceStandingsSnapshot.tsx
+// src/components/gameWorkspace/GameWorkspaceStandingsSnapshot.tsx
 init_define_import_meta_env();
 var import_react56 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/lib/gameWorkspace/resolveGameWorkspaceContextSnapshot.ts
+// src/lib/gameWorkspace/resolveGameWorkspaceContextSnapshot.ts
 init_define_import_meta_env();
 function resolveGameWorkspaceContextSnapshot(game) {
   const lines = [];
@@ -56510,7 +56511,7 @@ function resolveGameWorkspaceContextSnapshot(game) {
   return lines;
 }
 
-// ../grarf/desktop/src/components/gameWorkspace/GameWorkspaceStandingsSnapshot.tsx
+// src/components/gameWorkspace/GameWorkspaceStandingsSnapshot.tsx
 var import_jsx_runtime27 = __toESM(require_jsx_runtime(), 1);
 function GameWorkspaceStandingsSnapshot({ gameId, catchupContextGame, className }) {
   const canonicalGame = useCanonicalLiveGameRow(gameId, "game_workspace_standings");
@@ -56556,7 +56557,7 @@ function GameWorkspaceStandingsSnapshot({ gameId, catchupContextGame, className 
   );
 }
 
-// ../grarf/desktop/src/components/gameWorkspace/GameWorkspace.tsx
+// src/components/gameWorkspace/GameWorkspace.tsx
 var import_jsx_runtime28 = __toESM(require_jsx_runtime(), 1);
 var STORY_COLUMN_CLASS = "flex min-h-0 min-w-0 max-w-[38%] flex-[0_1_38%] flex-col border-l border-line/40 bg-[#010303]";
 var MLB_WORKSPACE_STORY_FRAME_CLASS = "aspect-[9/16] h-full max-h-full w-auto max-w-full";
@@ -56968,11 +56969,11 @@ function GameWorkspace({ workspace, className, watchCoordination, suppressWorksp
   ] });
 }
 
-// ../grarf/desktop/src/components/intelligence/IntelligenceWorkspace.tsx
+// src/components/intelligence/IntelligenceWorkspace.tsx
 init_define_import_meta_env();
 var import_react58 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/lib/intelligence/intelligenceApi.ts
+// src/lib/intelligence/intelligenceApi.ts
 init_define_import_meta_env();
 async function getCachedIntelligenceFeed() {
   const fn2 = window.grarf?.intelligenceGetCachedFeed;
@@ -57023,13 +57024,13 @@ function subscribeIntelligenceUpdates(listener) {
   return fn2((payload) => listener({ items: payload.items }));
 }
 
-// ../grarf/desktop/src/lib/intelligence/mergeContext.ts
+// src/lib/intelligence/mergeContext.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/intelligence/linkContext.ts
+// src/lib/intelligence/linkContext.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/data/signalScopeContent.ts
+// src/data/signalScopeContent.ts
 init_define_import_meta_env();
 function mockSignalPulseLines(scope, opts) {
   const { leagueLabel, gameContextLabel } = opts;
@@ -57058,7 +57059,7 @@ function mockSignalPulseLines(scope, opts) {
   ];
 }
 
-// ../grarf/desktop/src/lib/intelligence/linkContext.ts
+// src/lib/intelligence/linkContext.ts
 var LEAGUE_KEYS = ["MLB", "NBA", "WNBA", "NHL", "MLS"];
 function gameMatchesTeam(game, teamLabel) {
   const t2 = teamLabel.toLowerCase();
@@ -57098,7 +57099,7 @@ function buildIntelligenceContext(entities, liveGames) {
   return { relatedGames, signalLines, trendingTags, relatedHeadlines };
 }
 
-// ../grarf/desktop/src/lib/intelligence/mergeContext.ts
+// src/lib/intelligence/mergeContext.ts
 function mergeIntelligenceContext(briefing, liveGames) {
   const live = buildIntelligenceContext(briefing.entities, liveGames);
   const cached = briefing.contextBundle;
@@ -57111,7 +57112,7 @@ function mergeIntelligenceContext(briefing, liveGames) {
   };
 }
 
-// ../grarf/desktop/src/lib/intelligence/openExternal.ts
+// src/lib/intelligence/openExternal.ts
 init_define_import_meta_env();
 async function openExternalUrl2(url) {
   const fn2 = window.grarf?.openExternalUrl;
@@ -57123,10 +57124,10 @@ async function openExternalUrl2(url) {
   return !!r3?.ok;
 }
 
-// ../grarf/desktop/src/lib/intelligence/resolveArticleUrl.ts
+// src/lib/intelligence/resolveArticleUrl.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/shared/intelligence/articleUrl.js
+// shared/intelligence/articleUrl.js
 init_define_import_meta_env();
 function pickCanonicalUrl(url) {
   if (!url || typeof url !== "string") return null;
@@ -57162,12 +57163,12 @@ function pickBestArticleUrl(canonicalUrl, outboundLinks = []) {
   return null;
 }
 
-// ../grarf/desktop/src/lib/intelligence/resolveArticleUrl.ts
+// src/lib/intelligence/resolveArticleUrl.ts
 function resolveArticleUrl(briefing) {
   return pickBestArticleUrl(briefing.canonicalUrl, briefing.outboundLinks);
 }
 
-// ../grarf/desktop/src/components/intelligence/IntelligenceContextModules.tsx
+// src/components/intelligence/IntelligenceContextModules.tsx
 init_define_import_meta_env();
 var import_jsx_runtime29 = __toESM(require_jsx_runtime(), 1);
 function Module({
@@ -57230,7 +57231,7 @@ function IntelligenceContextModules({ context: context2, onSelectGame, className
   );
 }
 
-// ../grarf/desktop/src/components/intelligence/IntelligenceEmbedFallback.tsx
+// src/components/intelligence/IntelligenceEmbedFallback.tsx
 init_define_import_meta_env();
 var import_jsx_runtime30 = __toESM(require_jsx_runtime(), 1);
 function IntelligenceEmbedFallback({
@@ -57276,7 +57277,7 @@ function IntelligenceEmbedFallback({
   );
 }
 
-// ../grarf/desktop/src/components/intelligence/IntelligenceWorkspace.tsx
+// src/components/intelligence/IntelligenceWorkspace.tsx
 var import_jsx_runtime31 = __toESM(require_jsx_runtime(), 1);
 function formatDate(iso) {
   const t2 = Date.parse(iso);
@@ -57423,11 +57424,11 @@ function IntelligenceWorkspace({ workspace, className, onSelectGame }) {
   );
 }
 
-// ../grarf/desktop/src/components/youtube/YoutubeIframeApiPlayer.tsx
+// src/components/youtube/YoutubeIframeApiPlayer.tsx
 init_define_import_meta_env();
 var import_react59 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/lib/youtube/loadYoutubeIframeApi.ts
+// src/lib/youtube/loadYoutubeIframeApi.ts
 init_define_import_meta_env();
 function loadYoutubeIframeApi() {
   if (typeof window === "undefined") {
@@ -57467,7 +57468,7 @@ function loadYoutubeIframeApi() {
   });
 }
 
-// ../grarf/desktop/src/components/youtube/YoutubeIframeApiPlayer.tsx
+// src/components/youtube/YoutubeIframeApiPlayer.tsx
 var import_jsx_runtime32 = __toESM(require_jsx_runtime(), 1);
 var YOUTUBE_IFRAME_API_NOCOOKIE_HOST = "https://www.youtube-nocookie.com";
 function buildYoutubeIframeApiPlayerVars(options) {
@@ -57546,7 +57547,7 @@ function YoutubeIframeApiPlayer({
   );
 }
 
-// ../grarf/desktop/src/components/workspace/WorkspaceRenderer.tsx
+// src/components/workspace/WorkspaceRenderer.tsx
 var import_jsx_runtime33 = __toESM(require_jsx_runtime(), 1);
 var WEB_KINDS = /* @__PURE__ */ new Set(["website", "gameday", "betting", "fantasy"]);
 function WebsiteWorkspaceEmbed({
@@ -57746,7 +57747,7 @@ loadedUrl=${src}`);
   return null;
 }
 
-// ../grarf/desktop/src/store/findLiveGame.ts
+// src/store/findLiveGame.ts
 init_define_import_meta_env();
 function findLiveGameById(gameId, consumerId = "find_live_game") {
   const canonical = getCanonicalLiveGameRow(gameId, consumerId);
@@ -57765,7 +57766,7 @@ function findGamesSpineGameById(gameId, consumerId = "find_games_spine_game") {
   return manualGames.find((game) => game.id === gameId || game.grarfGameId === gameId);
 }
 
-// ../grarf/desktop/src/pages/GameWorkspacePage.tsx
+// src/pages/GameWorkspacePage.tsx
 var import_jsx_runtime34 = __toESM(require_jsx_runtime(), 1);
 function backHrefForGameId(rawId) {
   const league = leagueKeyFromGameId(rawId);
@@ -57835,18 +57836,18 @@ function GameWorkspacePage() {
   ] });
 }
 
-// ../grarf/desktop/src/pages/HomePage.tsx
+// src/pages/HomePage.tsx
 init_define_import_meta_env();
 var import_react164 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/components/homeMvp/HomeCenterPanePrimaryNav.tsx
+// src/components/homeMvp/HomeCenterPanePrimaryNav.tsx
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/components/homeMvp/CenterPaneApplicationModeSelector.tsx
+// src/components/homeMvp/CenterPaneApplicationModeSelector.tsx
 init_define_import_meta_env();
 var import_react62 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/lib/home/buildCenterPaneApplicationModePath.ts
+// src/lib/home/buildCenterPaneApplicationModePath.ts
 init_define_import_meta_env();
 function buildCenterPaneApplicationModePath(pathname, mode) {
   const segment = CENTER_PANE_APPLICATION_MODE_ROUTES[mode];
@@ -57860,7 +57861,7 @@ function buildCenterPaneApplicationModePath(pathname, mode) {
   return `/${segments.join("/")}/${segment}`;
 }
 
-// ../grarf/desktop/src/components/homeMvp/CenterPaneApplicationModeSelector.tsx
+// src/components/homeMvp/CenterPaneApplicationModeSelector.tsx
 init_isGrarfWebRenderer();
 var import_jsx_runtime35 = __toESM(require_jsx_runtime(), 1);
 var MODES = [
@@ -58011,7 +58012,7 @@ function CenterPaneApplicationModeSelector({
   );
 }
 
-// ../grarf/desktop/src/lib/home/homeSubnavChrome.ts
+// src/lib/home/homeSubnavChrome.ts
 init_define_import_meta_env();
 var HOME_SUBNAV_ROW_HEIGHT_CLASS = "h-[24.5px]";
 var HOME_SUBNAV_BUTTON_CLASS = "shrink-0 rounded-sm border px-2 py-0.5 text-[9px] font-medium tracking-[0.14em] transition duration-150";
@@ -58020,7 +58021,7 @@ var HOME_SUBNAV_ROW_CLASS = "flex shrink-0 flex-wrap items-center gap-px border-
 var HOME_LEAGUE_SUBNAV_ROW_SCROLL_CLASS = "flex shrink-0 flex-nowrap items-center gap-px overflow-x-auto overflow-y-hidden overscroll-x-contain border-b border-line/70 bg-[#040808] px-1 py-0.5";
 var HOME_SUBNAV_CHILD_GROUP_CLASS = "mx-0.5 flex shrink-0 items-center gap-px rounded-sm border border-[rgba(0,255,255,0.18)] bg-[rgba(0,255,255,0.03)] px-1 py-0.5 shadow-[inset_0_0_0_1px_rgba(0,255,255,0.04)]";
 
-// ../grarf/desktop/src/components/homeMvp/HomeCenterPanePrimaryNav.tsx
+// src/components/homeMvp/HomeCenterPanePrimaryNav.tsx
 var import_jsx_runtime36 = __toESM(require_jsx_runtime(), 1);
 function HomeCenterPanePrimaryNav({
   className,
@@ -58036,11 +58037,11 @@ function HomeCenterPanePrimaryNav({
   );
 }
 
-// ../grarf/desktop/src/components/homeMvp/HomeLiveSubmenu.tsx
+// src/components/homeMvp/HomeLiveSubmenu.tsx
 init_define_import_meta_env();
 var import_react64 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/components/workspace/WorkspaceSubnav.tsx
+// src/components/workspace/WorkspaceSubnav.tsx
 init_define_import_meta_env();
 var import_jsx_runtime37 = __toESM(require_jsx_runtime(), 1);
 function WorkspaceSubnav({ items, activeId, onSelect, className, "aria-label": aria }) {
@@ -58077,15 +58078,15 @@ function WorkspaceSubnav({ items, activeId, onSelect, className, "aria-label": a
   );
 }
 
-// ../grarf/desktop/src/hooks/useHomeLiveSubmenuEntryDefaults.ts
+// src/hooks/useHomeLiveSubmenuEntryDefaults.ts
 init_define_import_meta_env();
 var import_react63 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/store/homeLiveSubmenuStore.ts
+// src/store/homeLiveSubmenuStore.ts
 init_define_import_meta_env();
 var import_zustand29 = __toESM(require_zustand(), 1);
 
-// ../grarf/desktop/src/types/homeLiveSubmenu.ts
+// src/types/homeLiveSubmenu.ts
 init_define_import_meta_env();
 var HOME_LIVE_SUBMENU_DEFAULT = "livetrack";
 var HOME_LIVE_SUBMENU_ITEMS = [
@@ -58100,14 +58101,14 @@ function isHomeLiveSubmenuId(id) {
   return HOME_LIVE_SUBMENU_IDS.has(id);
 }
 
-// ../grarf/desktop/src/store/homeLiveSubmenuStore.ts
+// src/store/homeLiveSubmenuStore.ts
 var useHomeLiveSubmenuStore = (0, import_zustand29.create)((set) => ({
   activeId: HOME_LIVE_SUBMENU_DEFAULT,
   setActiveId: (id) => set({ activeId: id }),
   resetToDefault: () => set({ activeId: HOME_LIVE_SUBMENU_DEFAULT })
 }));
 
-// ../grarf/desktop/src/hooks/useHomeLiveSubmenuEntryDefaults.ts
+// src/hooks/useHomeLiveSubmenuEntryDefaults.ts
 function useHomeLiveSubmenuEntryDefaults() {
   const centerPaneMode = useCenterPaneApplicationModeStore((s2) => s2.mode);
   const resetToDefault = useHomeLiveSubmenuStore((s2) => s2.resetToDefault);
@@ -58123,7 +58124,7 @@ function useHomeLiveSubmenuEntryDefaults() {
   }, [centerPaneMode, resetToDefault]);
 }
 
-// ../grarf/desktop/src/components/homeMvp/HomeLiveSubmenu.tsx
+// src/components/homeMvp/HomeLiveSubmenu.tsx
 init_isGrarfWebRenderer();
 var import_jsx_runtime38 = __toESM(require_jsx_runtime(), 1);
 function HomeLiveSubmenu() {
@@ -58151,19 +58152,19 @@ function HomeLiveSubmenu() {
   );
 }
 
-// ../grarf/desktop/src/components/homeMvp/HomeLiveLeagueSubmenu.tsx
+// src/components/homeMvp/HomeLiveLeagueSubmenu.tsx
 init_define_import_meta_env();
 init_isGrarfWebRenderer();
 
-// ../grarf/desktop/src/hooks/useHomeLiveLeagueSubmenuEntryDefaults.ts
+// src/hooks/useHomeLiveLeagueSubmenuEntryDefaults.ts
 init_define_import_meta_env();
 var import_react65 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/store/homeLiveLeagueSubmenuStore.ts
+// src/store/homeLiveLeagueSubmenuStore.ts
 init_define_import_meta_env();
 var import_zustand30 = __toESM(require_zustand(), 1);
 
-// ../grarf/desktop/src/types/homeLiveLeagueSubmenu.ts
+// src/types/homeLiveLeagueSubmenu.ts
 init_define_import_meta_env();
 var HOME_LIVE_LEAGUE_SUBMENU_DEFAULT = "all";
 var HOME_LIVE_LEAGUE_SUBMENU_ITEMS = [
@@ -58190,14 +58191,14 @@ function isHomeLiveLeagueSubmenuId(id) {
   return HOME_LIVE_LEAGUE_SUBMENU_IDS.has(id);
 }
 
-// ../grarf/desktop/src/store/homeLiveLeagueSubmenuStore.ts
+// src/store/homeLiveLeagueSubmenuStore.ts
 var useHomeLiveLeagueSubmenuStore = (0, import_zustand30.create)((set) => ({
   activeId: HOME_LIVE_LEAGUE_SUBMENU_DEFAULT,
   setActiveId: (id) => set({ activeId: id }),
   resetToDefault: () => set({ activeId: HOME_LIVE_LEAGUE_SUBMENU_DEFAULT })
 }));
 
-// ../grarf/desktop/src/hooks/useHomeLiveLeagueSubmenuEntryDefaults.ts
+// src/hooks/useHomeLiveLeagueSubmenuEntryDefaults.ts
 function useHomeLiveLeagueSubmenuEntryDefaults() {
   const centerPaneMode = useCenterPaneApplicationModeStore((s2) => s2.mode);
   const resetToDefault = useHomeLiveLeagueSubmenuStore((s2) => s2.resetToDefault);
@@ -58213,11 +58214,11 @@ function useHomeLiveLeagueSubmenuEntryDefaults() {
   }, [centerPaneMode, resetToDefault]);
 }
 
-// ../grarf/desktop/src/hooks/useHomeLiveMotorsportsSubmenuEntryDefaults.ts
+// src/hooks/useHomeLiveMotorsportsSubmenuEntryDefaults.ts
 init_define_import_meta_env();
 var import_react66 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/store/homeLiveMotorsportsSubmenuStore.ts
+// src/store/homeLiveMotorsportsSubmenuStore.ts
 init_define_import_meta_env();
 var import_zustand31 = __toESM(require_zustand(), 1);
 var useHomeLiveMotorsportsSubmenuStore = (0, import_zustand31.create)((set) => ({
@@ -58227,7 +58228,7 @@ var useHomeLiveMotorsportsSubmenuStore = (0, import_zustand31.create)((set) => (
   resetToDefault: () => set({ activeId: null })
 }));
 
-// ../grarf/desktop/src/hooks/useHomeLiveMotorsportsSubmenuEntryDefaults.ts
+// src/hooks/useHomeLiveMotorsportsSubmenuEntryDefaults.ts
 function useHomeLiveMotorsportsSubmenuEntryDefaults() {
   const mode = useOperationalModeStore((s2) => s2.mode);
   const resetToDefault = useHomeLiveMotorsportsSubmenuStore((s2) => s2.resetToDefault);
@@ -58243,11 +58244,11 @@ function useHomeLiveMotorsportsSubmenuEntryDefaults() {
   }, [mode, resetToDefault]);
 }
 
-// ../grarf/desktop/src/hooks/useHomeLiveSoccerSubmenuEntryDefaults.ts
+// src/hooks/useHomeLiveSoccerSubmenuEntryDefaults.ts
 init_define_import_meta_env();
 var import_react67 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/store/homeLiveSoccerSubmenuStore.ts
+// src/store/homeLiveSoccerSubmenuStore.ts
 init_define_import_meta_env();
 var import_zustand32 = __toESM(require_zustand(), 1);
 var useHomeLiveSoccerSubmenuStore = (0, import_zustand32.create)((set) => ({
@@ -58257,7 +58258,7 @@ var useHomeLiveSoccerSubmenuStore = (0, import_zustand32.create)((set) => ({
   resetToDefault: () => set({ activeId: null })
 }));
 
-// ../grarf/desktop/src/hooks/useHomeLiveSoccerSubmenuEntryDefaults.ts
+// src/hooks/useHomeLiveSoccerSubmenuEntryDefaults.ts
 function useHomeLiveSoccerSubmenuEntryDefaults() {
   const mode = useOperationalModeStore((s2) => s2.mode);
   const resetToDefault = useHomeLiveSoccerSubmenuStore((s2) => s2.resetToDefault);
@@ -58273,7 +58274,7 @@ function useHomeLiveSoccerSubmenuEntryDefaults() {
   }, [mode, resetToDefault]);
 }
 
-// ../grarf/desktop/src/types/homeLiveMotorsportsSubmenu.ts
+// src/types/homeLiveMotorsportsSubmenu.ts
 init_define_import_meta_env();
 var HOME_LIVE_MOTORSPORTS_SUBMENU_ITEMS = [
   { id: "f1", label: "F1" },
@@ -58289,7 +58290,7 @@ function isHomeLiveMotorsportsSubmenuId(id) {
   return HOME_LIVE_MOTORSPORTS_SUBMENU_IDS.has(id);
 }
 
-// ../grarf/desktop/src/types/homeLiveSoccerSubmenu.ts
+// src/types/homeLiveSoccerSubmenu.ts
 init_define_import_meta_env();
 var HOME_LIVE_SOCCER_SUBMENU_ITEMS = [
   { id: "epl", label: "EPL" },
@@ -58312,7 +58313,7 @@ function isHomeLiveSoccerSubmenuId(id) {
   return HOME_LIVE_SOCCER_SUBMENU_IDS.has(id);
 }
 
-// ../grarf/desktop/src/components/homeMvp/HomeLiveLeagueSubmenu.tsx
+// src/components/homeMvp/HomeLiveLeagueSubmenu.tsx
 var import_jsx_runtime39 = __toESM(require_jsx_runtime(), 1);
 var SOCCER_LEAGUE_SUBMENU_ID = "soccer";
 var MOTORSPORTS_LEAGUE_SUBMENU_ID = "f1";
@@ -58424,21 +58425,21 @@ function HomeLiveLeagueSubmenu() {
   }) });
 }
 
-// ../grarf/desktop/src/components/homeMvp/HomeHeadlinesWebsiteSubmenu.tsx
+// src/components/homeMvp/HomeHeadlinesWebsiteSubmenu.tsx
 init_define_import_meta_env();
 var import_react69 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/hooks/useHomeHeadlinesWebsiteSubmenuEntryDefaults.ts
+// src/hooks/useHomeHeadlinesWebsiteSubmenuEntryDefaults.ts
 init_define_import_meta_env();
 var import_react68 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/lib/home/resolveHeadlinesAllWebsitePaneSources.ts
+// src/lib/home/resolveHeadlinesAllWebsitePaneSources.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/data/homeLeagueSections.ts
+// src/data/homeLeagueSections.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/data/homeGeneralSportsSources.ts
+// src/data/homeGeneralSportsSources.ts
 init_define_import_meta_env();
 var GENERAL_SPORTS_SOURCES = [
   { id: "espn", label: "ESPN", url: "https://www.espn.com/" },
@@ -58453,10 +58454,10 @@ var GENERAL_SPORTS_SOURCES = [
   { id: "yardbarker", label: "Yardbarker", url: "https://www.yardbarker.com/" }
 ];
 
-// ../grarf/desktop/src/lib/home/resolveGeneralSportsSources.ts
+// src/lib/home/resolveGeneralSportsSources.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/data/homeWebGeneralSportsSources.ts
+// src/data/homeWebGeneralSportsSources.ts
 init_define_import_meta_env();
 var WEB_GENERAL_SPORTS_SOURCES = [
   { id: "si", label: "SI.com", url: "https://www.si.com/" },
@@ -58465,13 +58466,13 @@ var WEB_GENERAL_SPORTS_SOURCES = [
   { id: "general_sports_placeholder", label: "Browser Workspace", url: "" }
 ];
 
-// ../grarf/desktop/src/lib/home/resolveGeneralSportsSources.ts
+// src/lib/home/resolveGeneralSportsSources.ts
 init_isGrarfWebRenderer();
 function resolveGeneralSportsSources() {
   return isGrarfWebRenderer() ? WEB_GENERAL_SPORTS_SOURCES : GENERAL_SPORTS_SOURCES;
 }
 
-// ../grarf/desktop/src/data/homeMlbSources.ts
+// src/data/homeMlbSources.ts
 init_define_import_meta_env();
 var MLB_SOURCES = [
   { id: "mlb", label: "MLB.com", url: "https://www.mlb.com/" },
@@ -58488,7 +58489,7 @@ var MLB_SOURCES = [
   { id: "yardbarker_mlb", label: "Yardbarker MLB", url: "https://www.yardbarker.com/mlb" }
 ];
 
-// ../grarf/desktop/src/data/homeLeagueSources.ts
+// src/data/homeLeagueSources.ts
 init_define_import_meta_env();
 var NBA_SOURCES = [
   { id: "nba", label: "NBA.com", url: "https://www.nba.com/" },
@@ -58622,7 +58623,7 @@ var COLLEGE_BASKETBALL_SOURCES = [
   }
 ];
 
-// ../grarf/desktop/src/data/homeLeagueSections.ts
+// src/data/homeLeagueSections.ts
 var HOME_LEAGUE_SECTIONS = [
   { id: "general-sports", label: "GENERAL SPORTS", sources: GENERAL_SPORTS_SOURCES },
   { id: "mlb", label: "MLB", sources: MLB_SOURCES },
@@ -58662,10 +58663,10 @@ function previousHomeLeagueSection(activeId) {
   return HOME_LEAGUE_SECTIONS[activeIndex - 1] ?? null;
 }
 
-// ../grarf/desktop/src/lib/home/resolveWebBettingPaneSources.ts
+// src/lib/home/resolveWebBettingPaneSources.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/data/homeWebBettingSources.ts
+// src/data/homeWebBettingSources.ts
 init_define_import_meta_env();
 var WEB_BETTING_ALL_SOURCES = [
   {
@@ -58676,7 +58677,7 @@ var WEB_BETTING_ALL_SOURCES = [
   { id: "betting_all_placeholder", label: "Browser Workspace", url: "" }
 ];
 
-// ../grarf/desktop/src/lib/home/resolveWebBettingPaneSources.ts
+// src/lib/home/resolveWebBettingPaneSources.ts
 init_isGrarfWebRenderer();
 function resolveWebBettingPaneSources(liveSubmenuId, bettingSubmenuId) {
   if (!isGrarfWebRenderer()) return null;
@@ -58689,10 +58690,10 @@ function resolveWebBettingPaneSources(liveSubmenuId, bettingSubmenuId) {
   }
 }
 
-// ../grarf/desktop/src/lib/home/resolveWebFantasyPaneSources.ts
+// src/lib/home/resolveWebFantasyPaneSources.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/data/homeWebFantasySources.ts
+// src/data/homeWebFantasySources.ts
 init_define_import_meta_env();
 var WEB_FANTASY_ALL_SOURCES = [
   { id: "fantasy_all_rotowire", label: "RotoWire.com", url: "https://www.rotowire.com/" },
@@ -58786,7 +58787,7 @@ var WEB_FANTASY_COLLEGE_BASKETBALL_SOURCES = [
   { id: "fantasy_college_basketball_placeholder", label: "Browser Workspace", url: "" }
 ];
 
-// ../grarf/desktop/src/lib/home/resolveWebFantasyPaneSources.ts
+// src/lib/home/resolveWebFantasyPaneSources.ts
 init_isGrarfWebRenderer();
 function resolveWebFantasyPaneSources(liveSubmenuId, fantasySubmenuId) {
   if (!isGrarfWebRenderer()) return null;
@@ -58825,10 +58826,10 @@ function resolveWebFantasyPaneSources(liveSubmenuId, fantasySubmenuId) {
   }
 }
 
-// ../grarf/desktop/src/lib/home/resolveWebHeadlinesPaneSources.ts
+// src/lib/home/resolveWebHeadlinesPaneSources.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/data/homeWebHeadlinesMotorsportsSources.ts
+// src/data/homeWebHeadlinesMotorsportsSources.ts
 init_define_import_meta_env();
 var WEB_HEADLINES_MOTORSPORTS_SOURCES = [
   { id: "motorsport_com", label: "Motorsport.com", url: "https://www.motorsport.com/" },
@@ -58882,7 +58883,7 @@ var WEB_HEADLINES_MOTORSPORTS_SPORTS_CARS_SOURCES = [
   { id: "headlines_motorsports_sports_cars_placeholder", label: "Browser Workspace", url: "" }
 ];
 
-// ../grarf/desktop/src/data/homeWebHeadlinesBoxingSources.ts
+// src/data/homeWebHeadlinesBoxingSources.ts
 init_define_import_meta_env();
 var WEB_HEADLINES_BOXING_SOURCES = [
   {
@@ -58901,7 +58902,7 @@ var WEB_HEADLINES_BOXING_SOURCES = [
   { id: "headlines_boxing_placeholder", label: "Browser Workspace", url: "" }
 ];
 
-// ../grarf/desktop/src/data/homeWebHeadlinesCricketSources.ts
+// src/data/homeWebHeadlinesCricketSources.ts
 init_define_import_meta_env();
 var WEB_HEADLINES_CRICKET_SOURCES = [
   {
@@ -58912,7 +58913,7 @@ var WEB_HEADLINES_CRICKET_SOURCES = [
   { id: "headlines_cricket_placeholder", label: "Browser Workspace", url: "" }
 ];
 
-// ../grarf/desktop/src/data/homeWebHeadlinesGolfSources.ts
+// src/data/homeWebHeadlinesGolfSources.ts
 init_define_import_meta_env();
 var WEB_HEADLINES_GOLF_SOURCES = [
   { id: "pga_tour_com", label: "PGATour.com", url: "https://www.pgatour.com/" },
@@ -58924,7 +58925,7 @@ var WEB_HEADLINES_GOLF_SOURCES = [
   { id: "headlines_golf_placeholder", label: "Browser Workspace", url: "" }
 ];
 
-// ../grarf/desktop/src/data/homeWebHeadlinesHorseRacingSources.ts
+// src/data/homeWebHeadlinesHorseRacingSources.ts
 init_define_import_meta_env();
 var WEB_HEADLINES_HORSE_RACING_SOURCES = [
   { id: "tvg", label: "TVG.com", url: "https://www.tvg.com/" },
@@ -58936,7 +58937,7 @@ var WEB_HEADLINES_HORSE_RACING_SOURCES = [
   { id: "headlines_horse_racing_placeholder", label: "Browser Workspace", url: "" }
 ];
 
-// ../grarf/desktop/src/data/homeWebHeadlinesMmaSources.ts
+// src/data/homeWebHeadlinesMmaSources.ts
 init_define_import_meta_env();
 var WEB_HEADLINES_MMA_SOURCES = [
   { id: "sherdog", label: "Sherdog.com", url: "https://www.sherdog.com/" },
@@ -58944,14 +58945,14 @@ var WEB_HEADLINES_MMA_SOURCES = [
   { id: "headlines_mma_placeholder", label: "Browser Workspace", url: "" }
 ];
 
-// ../grarf/desktop/src/data/homeWebHeadlinesRugbySources.ts
+// src/data/homeWebHeadlinesRugbySources.ts
 init_define_import_meta_env();
 var WEB_HEADLINES_RUGBY_SOURCES = [
   { id: "planet_rugby", label: "PlanetRugby.com", url: "https://www.planetrugby.com/" },
   { id: "headlines_rugby_placeholder", label: "Browser Workspace", url: "" }
 ];
 
-// ../grarf/desktop/src/data/homeWebHeadlinesTennisSources.ts
+// src/data/homeWebHeadlinesTennisSources.ts
 init_define_import_meta_env();
 var WEB_HEADLINES_TENNIS_SOURCES = [
   { id: "tennis_365", label: "Tennis365.com", url: "https://www.tennis365.com/" },
@@ -58963,14 +58964,14 @@ var WEB_HEADLINES_TENNIS_SOURCES = [
   { id: "headlines_tennis_placeholder", label: "Browser Workspace", url: "" }
 ];
 
-// ../grarf/desktop/src/data/homeWebHeadlinesWnbaSources.ts
+// src/data/homeWebHeadlinesWnbaSources.ts
 init_define_import_meta_env();
 var WEB_HEADLINES_WNBA_SOURCES = [
   { id: "wnba_com", label: "WNBA.com", url: "https://www.wnba.com/" },
   { id: "headlines_wnba_placeholder", label: "Browser Workspace", url: "" }
 ];
 
-// ../grarf/desktop/src/data/homeWebHeadlinesAllSources.ts
+// src/data/homeWebHeadlinesAllSources.ts
 init_define_import_meta_env();
 var WEB_HEADLINES_ALL_SOURCES = [
   { id: "the_score", label: "TheScore.com", url: "https://www.thescore.com/" },
@@ -58979,7 +58980,7 @@ var WEB_HEADLINES_ALL_SOURCES = [
   { id: "headlines_all_placeholder", label: "Browser Workspace", url: "" }
 ];
 
-// ../grarf/desktop/src/data/homeWebHeadlinesMlbSources.ts
+// src/data/homeWebHeadlinesMlbSources.ts
 init_define_import_meta_env();
 var WEB_HEADLINES_MLB_SOURCES = [
   { id: "baseball_savant", label: "BaseballSavant.com", url: "https://baseballsavant.mlb.com/" },
@@ -58998,7 +58999,7 @@ var WEB_HEADLINES_MLB_SOURCES = [
   { id: "headlines_mlb_placeholder", label: "Browser Workspace", url: "" }
 ];
 
-// ../grarf/desktop/src/data/homeWebHeadlinesNbaSources.ts
+// src/data/homeWebHeadlinesNbaSources.ts
 init_define_import_meta_env();
 var WEB_HEADLINES_NBA_SOURCES = [
   { id: "the_score_nba", label: "TheScore.com/NBA", url: "https://www.thescore.com/nba" },
@@ -59010,7 +59011,7 @@ var WEB_HEADLINES_NBA_SOURCES = [
   { id: "headlines_nba_placeholder_1", label: "Browser Workspace", url: "" }
 ];
 
-// ../grarf/desktop/src/data/homeWebHeadlinesNflSources.ts
+// src/data/homeWebHeadlinesNflSources.ts
 init_define_import_meta_env();
 var WEB_HEADLINES_NFL_SOURCES = [
   { id: "nfl_com", label: "NFL.com", url: "https://www.nfl.com/" },
@@ -59023,7 +59024,7 @@ var WEB_HEADLINES_NFL_SOURCES = [
   { id: "headlines_nfl_placeholder", label: "Browser Workspace", url: "" }
 ];
 
-// ../grarf/desktop/src/data/homeWebHeadlinesNhlSources.ts
+// src/data/homeWebHeadlinesNhlSources.ts
 init_define_import_meta_env();
 var WEB_HEADLINES_NHL_SOURCES = [
   { id: "nhl_com", label: "NHL.com", url: "https://www.nhl.com/" },
@@ -59042,7 +59043,7 @@ var WEB_HEADLINES_NHL_SOURCES = [
   { id: "headlines_nhl_placeholder", label: "Browser Workspace", url: "" }
 ];
 
-// ../grarf/desktop/src/data/homeWebHeadlinesSoccerSources.ts
+// src/data/homeWebHeadlinesSoccerSources.ts
 init_define_import_meta_env();
 var WEB_HEADLINES_SOCCER_SOURCES = [
   { id: "soccerway_news", label: "Soccerway.com", url: "https://www.soccerway.com/news/" },
@@ -59055,7 +59056,7 @@ var WEB_HEADLINES_SOCCER_SOURCES = [
   { id: "headlines_soccer_placeholder", label: "Browser Workspace", url: "" }
 ];
 
-// ../grarf/desktop/src/lib/home/resolveWebHeadlinesPaneSources.ts
+// src/lib/home/resolveWebHeadlinesPaneSources.ts
 init_isGrarfWebRenderer();
 var MOTORSPORTS_LEAGUE_SUBMENU_ID2 = "f1";
 var SOCCER_LEAGUE_SUBMENU_ID2 = "soccer";
@@ -59130,7 +59131,7 @@ function resolveWebHeadlinesPaneSources(liveSubmenuId, liveLeagueSubmenuId, live
   return WEB_GENERAL_SPORTS_SOURCES;
 }
 
-// ../grarf/desktop/src/lib/home/resolveHeadlinesAllWebsitePaneSources.ts
+// src/lib/home/resolveHeadlinesAllWebsitePaneSources.ts
 var HEADLINES_ALL_WEBSITE_PANE_SECTION_ID = DEFAULT_HOME_ACTIVE_LEAGUE_ID;
 function filterEmbeddableHomeSources(sources) {
   return sources.filter((source) => source.url.trim().length > 0);
@@ -59171,7 +59172,7 @@ function buildHeadlinesWebsitePaneSessionKey(sourceId) {
   return buildHeadlinesAllWebsitePaneSessionKey(sourceId);
 }
 
-// ../grarf/desktop/src/store/homeHeadlinesWebsiteSubmenuStore.ts
+// src/store/homeHeadlinesWebsiteSubmenuStore.ts
 init_define_import_meta_env();
 var import_zustand33 = __toESM(require_zustand(), 1);
 var useHomeHeadlinesWebsiteSubmenuStore = (0, import_zustand33.create)((set) => ({
@@ -59192,11 +59193,11 @@ var useHomeHeadlinesWebsiteSubmenuStore = (0, import_zustand33.create)((set) => 
   })
 }));
 
-// ../grarf/desktop/src/store/homeLiveBettingSubmenuStore.ts
+// src/store/homeLiveBettingSubmenuStore.ts
 init_define_import_meta_env();
 var import_zustand34 = __toESM(require_zustand(), 1);
 
-// ../grarf/desktop/src/types/homeLiveBettingSubmenu.ts
+// src/types/homeLiveBettingSubmenu.ts
 init_define_import_meta_env();
 var HOME_LIVE_BETTING_SUBMENU_DEFAULT = "all";
 var HOME_LIVE_BETTING_SUBMENU_ITEMS = [
@@ -59212,18 +59213,18 @@ function isHomeLiveBettingSubmenuId(id) {
   return HOME_LIVE_BETTING_SUBMENU_IDS.has(id);
 }
 
-// ../grarf/desktop/src/store/homeLiveBettingSubmenuStore.ts
+// src/store/homeLiveBettingSubmenuStore.ts
 var useHomeLiveBettingSubmenuStore = (0, import_zustand34.create)((set) => ({
   activeId: HOME_LIVE_BETTING_SUBMENU_DEFAULT,
   setActiveId: (id) => set({ activeId: id }),
   resetToDefault: () => set({ activeId: HOME_LIVE_BETTING_SUBMENU_DEFAULT })
 }));
 
-// ../grarf/desktop/src/store/homeLiveFantasySubmenuStore.ts
+// src/store/homeLiveFantasySubmenuStore.ts
 init_define_import_meta_env();
 var import_zustand35 = __toESM(require_zustand(), 1);
 
-// ../grarf/desktop/src/types/homeLiveFantasySubmenu.ts
+// src/types/homeLiveFantasySubmenu.ts
 init_define_import_meta_env();
 var HOME_LIVE_FANTASY_SUBMENU_DEFAULT = "all";
 var HOME_LIVE_FANTASY_SUBMENU_ITEMS = [
@@ -59249,14 +59250,14 @@ function isHomeLiveFantasySubmenuId(id) {
   return HOME_LIVE_FANTASY_SUBMENU_IDS.has(id);
 }
 
-// ../grarf/desktop/src/store/homeLiveFantasySubmenuStore.ts
+// src/store/homeLiveFantasySubmenuStore.ts
 var useHomeLiveFantasySubmenuStore = (0, import_zustand35.create)((set) => ({
   activeId: HOME_LIVE_FANTASY_SUBMENU_DEFAULT,
   setActiveId: (id) => set({ activeId: id }),
   resetToDefault: () => set({ activeId: HOME_LIVE_FANTASY_SUBMENU_DEFAULT })
 }));
 
-// ../grarf/desktop/src/hooks/useHomeHeadlinesWebsiteSubmenuEntryDefaults.ts
+// src/hooks/useHomeHeadlinesWebsiteSubmenuEntryDefaults.ts
 function useHomeHeadlinesWebsiteSubmenuEntryDefaults() {
   const liveSubmenuId = useHomeLiveSubmenuStore((s2) => s2.activeId);
   const liveLeagueSubmenuId = useHomeLiveLeagueSubmenuStore((s2) => s2.activeId);
@@ -59290,10 +59291,10 @@ function useHomeHeadlinesWebsiteSubmenuEntryDefaults() {
   ]);
 }
 
-// ../grarf/desktop/src/lib/home/buildHeadlinesWebsiteSubmenuItems.ts
+// src/lib/home/buildHeadlinesWebsiteSubmenuItems.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/home/websitePaneBranding.ts
+// src/lib/home/websitePaneBranding.ts
 init_define_import_meta_env();
 function resolveWebsiteFaviconUrl(url) {
   const trimmed = url.trim();
@@ -59327,7 +59328,7 @@ function formatWebsitePaneHeaderLabel(label, url) {
   return humanizeDomainToken(domainPart);
 }
 
-// ../grarf/desktop/src/lib/home/buildHeadlinesWebsiteSubmenuItems.ts
+// src/lib/home/buildHeadlinesWebsiteSubmenuItems.ts
 var BROWSER_WORKSPACE_MORE_MENU_LABEL = "MORE";
 function buildHeadlinesWebsiteSubmenuItems(sources, browserWorkspacePlaceholder) {
   const items = sources.map((source) => ({
@@ -59344,7 +59345,7 @@ function buildHeadlinesWebsiteSubmenuItems(sources, browserWorkspacePlaceholder)
   return items;
 }
 
-// ../grarf/desktop/src/components/homeMvp/HomeHeadlinesWebsiteSubmenu.tsx
+// src/components/homeMvp/HomeHeadlinesWebsiteSubmenu.tsx
 init_isGrarfWebRenderer();
 var import_jsx_runtime40 = __toESM(require_jsx_runtime(), 1);
 function HomeHeadlinesWebsiteSubmenu() {
@@ -59432,10 +59433,10 @@ function HomeHeadlinesWebsiteSubmenu() {
   );
 }
 
-// ../grarf/desktop/src/components/homeMvp/HomeLiveFantasySubmenu.tsx
+// src/components/homeMvp/HomeLiveFantasySubmenu.tsx
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/hooks/useHomeLiveFantasySubmenuEntryDefaults.ts
+// src/hooks/useHomeLiveFantasySubmenuEntryDefaults.ts
 init_define_import_meta_env();
 var import_react70 = __toESM(require_react(), 1);
 function useHomeLiveFantasySubmenuEntryDefaults() {
@@ -59453,7 +59454,7 @@ function useHomeLiveFantasySubmenuEntryDefaults() {
   }, [centerPaneMode, resetToDefault]);
 }
 
-// ../grarf/desktop/src/components/homeMvp/HomeLiveFantasySubmenu.tsx
+// src/components/homeMvp/HomeLiveFantasySubmenu.tsx
 var import_jsx_runtime41 = __toESM(require_jsx_runtime(), 1);
 function HomeLiveFantasySubmenu() {
   useHomeLiveFantasySubmenuEntryDefaults();
@@ -59475,10 +59476,10 @@ function HomeLiveFantasySubmenu() {
   );
 }
 
-// ../grarf/desktop/src/components/homeMvp/HomeLiveBettingSubmenu.tsx
+// src/components/homeMvp/HomeLiveBettingSubmenu.tsx
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/hooks/useHomeLiveBettingSubmenuEntryDefaults.ts
+// src/hooks/useHomeLiveBettingSubmenuEntryDefaults.ts
 init_define_import_meta_env();
 var import_react71 = __toESM(require_react(), 1);
 function useHomeLiveBettingSubmenuEntryDefaults() {
@@ -59496,7 +59497,7 @@ function useHomeLiveBettingSubmenuEntryDefaults() {
   }, [centerPaneMode, resetToDefault]);
 }
 
-// ../grarf/desktop/src/components/homeMvp/HomeLiveBettingSubmenu.tsx
+// src/components/homeMvp/HomeLiveBettingSubmenu.tsx
 var import_jsx_runtime42 = __toESM(require_jsx_runtime(), 1);
 function HomeLiveBettingSubmenu() {
   useHomeLiveBettingSubmenuEntryDefaults();
@@ -59518,22 +59519,22 @@ function HomeLiveBettingSubmenu() {
   );
 }
 
-// ../grarf/desktop/src/components/homeMvp/HomeContextColumn.tsx
+// src/components/homeMvp/HomeContextColumn.tsx
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/components/homeMvp/HomeGamesToday.tsx
+// src/components/homeMvp/HomeGamesToday.tsx
 init_define_import_meta_env();
 var import_react93 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/context/HomeActiveLeagueContext.tsx
+// src/context/HomeActiveLeagueContext.tsx
 init_define_import_meta_env();
 var import_react73 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/hooks/useHomeActiveLeague.ts
+// src/hooks/useHomeActiveLeague.ts
 init_define_import_meta_env();
 var import_react72 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/lib/home/homeActiveLeagueNavigation.ts
+// src/lib/home/homeActiveLeagueNavigation.ts
 init_define_import_meta_env();
 var HOME_LEAGUE_CHAPTER_COUNT = 2;
 function getHomeActiveLeagueView(activeLeagueId) {
@@ -59548,7 +59549,7 @@ function promoteHomeLeagueChapter(selectedId) {
   return selectedId;
 }
 
-// ../grarf/desktop/src/hooks/useHomeActiveLeague.ts
+// src/hooks/useHomeActiveLeague.ts
 function useHomeActiveLeague(initialLeagueId = DEFAULT_HOME_ACTIVE_LEAGUE_ID) {
   const [activeLeagueId, setActiveLeagueId] = (0, import_react72.useState)(initialLeagueId);
   const { activeSection, previousSection, nextSections } = (0, import_react72.useMemo)(
@@ -59567,7 +59568,7 @@ function useHomeActiveLeague(initialLeagueId = DEFAULT_HOME_ACTIVE_LEAGUE_ID) {
   };
 }
 
-// ../grarf/desktop/src/context/HomeActiveLeagueContext.tsx
+// src/context/HomeActiveLeagueContext.tsx
 var import_jsx_runtime43 = __toESM(require_jsx_runtime(), 1);
 var HomeActiveLeagueContext = (0, import_react73.createContext)(null);
 function HomeActiveLeagueProvider({ children }) {
@@ -59595,7 +59596,7 @@ function useHomeActiveLeagueContextOptional() {
   };
 }
 
-// ../grarf/desktop/src/lib/home/resolveHomeActiveLeagueSync.ts
+// src/lib/home/resolveHomeActiveLeagueSync.ts
 init_define_import_meta_env();
 var HOME_LEAGUE_SPINE_KEYS = {
   mlb: ["MLB"],
@@ -59665,7 +59666,7 @@ function resolveHomeActiveLeagueRailContext(activeLeagueId) {
   };
 }
 
-// ../grarf/desktop/src/lib/gamesSpine/resolveGamesSpineOperationalLeagueOrder.ts
+// src/lib/gamesSpine/resolveGamesSpineOperationalLeagueOrder.ts
 init_define_import_meta_env();
 init_isGrarfWebRenderer();
 function leagueHasSpineGames(mergedLeagues, leagueKey) {
@@ -59691,11 +59692,11 @@ function anyOperationalSpineLeagueHasGames(mergedLeagues, leagueOrder = resolveG
   return leagueOrder.some((key2) => leagueHasSpineGames(mergedLeagues, key2));
 }
 
-// ../grarf/desktop/src/hooks/useHomeGamesColumnFilter.ts
+// src/hooks/useHomeGamesColumnFilter.ts
 init_define_import_meta_env();
 var import_react74 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/lib/gamesSpine/gamesSpineTemporarilyHiddenLeagues.ts
+// src/lib/gamesSpine/gamesSpineTemporarilyHiddenLeagues.ts
 init_define_import_meta_env();
 var GAMES_SPINE_TEMPORARILY_HIDDEN_LEAGUES = [
   "LIV"
@@ -59719,11 +59720,11 @@ function omitHiddenGamesSpineLeagueGames(mergedLeagues) {
   return visible;
 }
 
-// ../grarf/desktop/src/lib/gamesSpine/buildVisibleSpineGames.ts
+// src/lib/gamesSpine/buildVisibleSpineGames.ts
 init_define_import_meta_env();
 init_isGrarfWebRenderer();
 
-// ../grarf/desktop/src/lib/gamesSpine/resolveViewLeagueGames.ts
+// src/lib/gamesSpine/resolveViewLeagueGames.ts
 init_define_import_meta_env();
 init_isGrarfWebRenderer();
 function mergeGamesSpineLeagueGamesById(...groups) {
@@ -59773,7 +59774,7 @@ function resolveViewLeagueGames(league, selectedDate, liveLeagues, scheduleByDat
   return scheduleByDate[dateKey]?.[league] ?? [];
 }
 
-// ../grarf/desktop/src/lib/gamesSpine/buildVisibleSpineGames.ts
+// src/lib/gamesSpine/buildVisibleSpineGames.ts
 function buildVisibleSpineGames(input) {
   const games = input.games ?? [];
   const isToday = isSelectedDateOperationalSportsDay(input.selectedDate);
@@ -59803,7 +59804,7 @@ function buildVisibleSpineGames(input) {
   return sortGamesSpineChronologically2(filtered);
 }
 
-// ../grarf/desktop/src/store/scheduleCacheStore.ts
+// src/store/scheduleCacheStore.ts
 init_define_import_meta_env();
 var import_zustand36 = __toESM(require_zustand(), 1);
 var useScheduleCacheStore = (0, import_zustand36.create)((set) => ({
@@ -59828,7 +59829,7 @@ var useScheduleCacheStore = (0, import_zustand36.create)((set) => ({
   }
 }));
 
-// ../grarf/desktop/src/hooks/useHomeGamesColumnFilter.ts
+// src/hooks/useHomeGamesColumnFilter.ts
 function useHomeGamesColumnFilter() {
   const [filter, setFilterState] = (0, import_react74.useState)(
     () => readHomeGamesFilterFromSession()
@@ -59866,7 +59867,7 @@ function useHomeGamesColumnFilter() {
   return { filter, setFilter, filteredCount };
 }
 
-// ../grarf/desktop/src/components/homeMvp/HomeGamesColumnFilterBar.tsx
+// src/components/homeMvp/HomeGamesColumnFilterBar.tsx
 init_define_import_meta_env();
 var import_jsx_runtime44 = __toESM(require_jsx_runtime(), 1);
 var FILTER_OPTIONS = [
@@ -59920,15 +59921,15 @@ function HomeGamesColumnFilterBar({ filter, onFilterChange, className }) {
   );
 }
 
-// ../grarf/desktop/src/components/homeMvp/HomeLeagueSpineSection.tsx
+// src/components/homeMvp/HomeLeagueSpineSection.tsx
 init_define_import_meta_env();
 var import_react82 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/components/GameRow.tsx
+// src/components/GameRow.tsx
 init_define_import_meta_env();
 var import_react79 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/lib/gamesSpine/isSpineFinalizedGame.ts
+// src/lib/gamesSpine/isSpineFinalizedGame.ts
 init_define_import_meta_env();
 function isSpineFinalizedGame(game) {
   if (game.status === "final") return true;
@@ -59936,15 +59937,15 @@ function isSpineFinalizedGame(game) {
   return line != null && /^final$/i.test(line);
 }
 
-// ../grarf/desktop/src/components/gamesSpine/GameNarrativeCapsule.tsx
+// src/components/gamesSpine/GameNarrativeCapsule.tsx
 init_define_import_meta_env();
 var import_react77 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/components/editorial/GameGenerationControls.tsx
+// src/components/editorial/GameGenerationControls.tsx
 init_define_import_meta_env();
 var import_react75 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/lib/editorial/resolveGenerationState.ts
+// src/lib/editorial/resolveGenerationState.ts
 init_define_import_meta_env();
 function resolveGenerationStateLabel(state3) {
   if (!state3) return null;
@@ -59971,7 +59972,7 @@ function resolveGameGenerationStates(game, generationState) {
   return { preview, recap, active: active2 };
 }
 
-// ../grarf/desktop/src/components/editorial/GameGenerationControls.tsx
+// src/components/editorial/GameGenerationControls.tsx
 var import_jsx_runtime45 = __toESM(require_jsx_runtime(), 1);
 function GameGenerationControls({ game, className }) {
   const editMode = useEditorialStore((s2) => s2.editMode);
@@ -60038,7 +60039,7 @@ function GameGenerationControls({ game, className }) {
   );
 }
 
-// ../grarf/desktop/src/components/editorial/InlineEditableText.tsx
+// src/components/editorial/InlineEditableText.tsx
 init_define_import_meta_env();
 var import_react76 = __toESM(require_react(), 1);
 var import_jsx_runtime46 = __toESM(require_jsx_runtime(), 1);
@@ -60087,7 +60088,7 @@ function InlineEditableText({
   );
 }
 
-// ../grarf/desktop/src/components/gamesSpine/GameNarrativeCapsule.tsx
+// src/components/gamesSpine/GameNarrativeCapsule.tsx
 var import_jsx_runtime47 = __toESM(require_jsx_runtime(), 1);
 var LOG41 = "[GamesSpine]";
 function GameNarrativeCapsule({
@@ -60185,7 +60186,7 @@ function GameNarrativeCapsule({
   );
 }
 
-// ../grarf/desktop/src/components/editorial/BriefingPriorityField.tsx
+// src/components/editorial/BriefingPriorityField.tsx
 init_define_import_meta_env();
 var import_jsx_runtime48 = __toESM(require_jsx_runtime(), 1);
 var LOG42 = "[Editorial]";
@@ -60234,13 +60235,13 @@ function BriefingPriorityField({ priority, editMode, onChange }) {
   );
 }
 
-// ../grarf/desktop/src/lib/gamesSpine/gamesSpineRecordLayout.ts
+// src/lib/gamesSpine/gamesSpineRecordLayout.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/gamesSpine/gamesSpineScoreLayout.ts
+// src/lib/gamesSpine/gamesSpineScoreLayout.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/gamesSpine/gamesSpineMatchupLayout.ts
+// src/lib/gamesSpine/gamesSpineMatchupLayout.ts
 init_define_import_meta_env();
 var GAMES_SPINE_MATCHUP_GRID_2COL = "grid w-full min-w-0 max-w-full grid-cols-[minmax(0,1fr)_max-content] items-center gap-x-1";
 var GAMES_SPINE_MATCHUP_GRID = "grid w-full min-w-0 max-w-full grid-cols-[minmax(0,5fr)_max-content_max-content] items-center gap-x-1.5";
@@ -60249,7 +60250,7 @@ var GAMES_SPINE_META_CELL = "flex w-max max-w-full shrink-0 justify-end justify-
 var GAMES_SPINE_META_SCORE_CLASS = "text-[10px] text-textdim";
 var GAMES_SPINE_META_TIME_CLASS = "text-[10px] tracking-wide text-cyansys/90";
 
-// ../grarf/desktop/src/lib/gamesSpine/gamesSpineScoreLayout.ts
+// src/lib/gamesSpine/gamesSpineScoreLayout.ts
 var GAMES_SPINE_ROW_WIDTH_BOUND = "box-border w-full max-w-full min-w-0";
 var GAMES_SPINE_MATCHUP_TEAM = "flex min-w-0 max-w-full items-center gap-1";
 var GAMES_SPINE_MATCHUP_TEAM_LABEL = "min-w-0 truncate";
@@ -60263,7 +60264,7 @@ function logResponsiveScoreClippingPreventedAtNarrowWidth() {
 function logResponsiveScoreContainerInFlexLayout() {
 }
 
-// ../grarf/desktop/src/lib/gamesSpine/gamesSpineRecordLayout.ts
+// src/lib/gamesSpine/gamesSpineRecordLayout.ts
 var GAMES_SPINE_MATCHUP_ROW = GAMES_SPINE_MATCHUP_GRID;
 var GAMES_SPINE_MATCHUP_ROW_2COL = GAMES_SPINE_MATCHUP_GRID_2COL;
 var GAMES_SPINE_TEAM_NAME = GAMES_SPINE_MATCHUP_TEAM_LABEL;
@@ -60271,7 +60272,7 @@ var GAMES_SPINE_TEAM_RECORD = GAMES_SPINE_RECORD_CELL;
 function logGamesSpineRecordColumnWidth(_widthPx) {
 }
 
-// ../grarf/desktop/src/lib/gamesSpine/responsiveGameCard.ts
+// src/lib/gamesSpine/responsiveGameCard.ts
 init_define_import_meta_env();
 function logResponsiveGameCardLeaguePageBehavior() {
 }
@@ -60282,7 +60283,7 @@ function logResponsiveGameCardWatchLiveAttached() {
 function logResponsiveGameCardPreventedScoreClipping() {
 }
 
-// ../grarf/desktop/src/hooks/useGamesSpineScoreAnchor.ts
+// src/hooks/useGamesSpineScoreAnchor.ts
 init_define_import_meta_env();
 var import_react78 = __toESM(require_react(), 1);
 function useGamesSpineScoreAnchor(enabled, homeSpineParity = false) {
@@ -60320,7 +60321,7 @@ function useGamesSpineScoreAnchor(enabled, homeSpineParity = false) {
   return scoreRef;
 }
 
-// ../grarf/desktop/src/lib/gamesSpine/gamesSpineCardLayout.ts
+// src/lib/gamesSpine/gamesSpineCardLayout.ts
 init_define_import_meta_env();
 var GAMES_SPINE_CARD_SECTION_DIVIDER_CLASS = "h-px w-full shrink-0 bg-[#2B3239]/35";
 var GAMES_SPINE_CARD_SHELL_CLASS = "flex min-w-0 flex-col gap-2";
@@ -60355,16 +60356,16 @@ function gamesSpineCardPanelSurfaceClass({
   );
 }
 
-// ../grarf/desktop/src/components/gamesSpine/GamesSpineHomeParityGameRow.tsx
+// src/components/gamesSpine/GamesSpineHomeParityGameRow.tsx
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/commandBriefing/commandBriefingGameCardContent.ts
+// src/lib/commandBriefing/commandBriefingGameCardContent.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/gamesSpine/gamesSpineSideStat.ts
+// src/lib/gamesSpine/gamesSpineSideStat.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/gamesSpine/isUfcLeague.ts
+// src/lib/gamesSpine/isUfcLeague.ts
 init_define_import_meta_env();
 function isUfcLeague(league) {
   return league === "UFC";
@@ -60373,7 +60374,7 @@ function isUfcGame(game) {
   return isUfcLeague(game.league);
 }
 
-// ../grarf/desktop/src/lib/gamesSpine/gamesSpineSideStat.ts
+// src/lib/gamesSpine/gamesSpineSideStat.ts
 function resolveGamesSpineSideStat(game, side) {
   const scoreMode = game.status === "live" || game.status === "final";
   const athleteMatch = isTennisGame(game) || isUfcGame(game);
@@ -60387,7 +60388,7 @@ function resolveGamesSpineSideStat(game, side) {
   return game.homeRecord;
 }
 
-// ../grarf/desktop/src/lib/commandBriefing/commandBriefingGameCardContent.ts
+// src/lib/commandBriefing/commandBriefingGameCardContent.ts
 function resolveCommandBriefingScheduleLabel(game) {
   if (game.status === "live") {
     const state3 = game.statusLine?.trim();
@@ -60425,14 +60426,14 @@ function formatCommandBriefingCompactLine(game, leagueLabel) {
   return `${league} \xB7 ${away} \xB7 ${home} \xB7 ${schedule}`;
 }
 
-// ../grarf/desktop/src/lib/commandBriefing/commandBriefingLeagueLabel.ts
+// src/lib/commandBriefing/commandBriefingLeagueLabel.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/mcws/mcwsDisplayLabel.ts
+// src/lib/mcws/mcwsDisplayLabel.ts
 init_define_import_meta_env();
 var MCWS_DISPLAY_LABEL = "MCWS";
 
-// ../grarf/desktop/src/lib/commandBriefing/commandBriefingLeagueLabel.ts
+// src/lib/commandBriefing/commandBriefingLeagueLabel.ts
 var LOG43 = "[CommandBriefing]";
 var BRIEFING_LEAGUE_LABELS = {
   MLB: "MLB",
@@ -60502,7 +60503,7 @@ function logCommandBriefingMetadataStyling() {
   console.log(`${LOG43} Applied operational metadata styling`);
 }
 
-// ../grarf/desktop/src/lib/gamesSpine/motorsportSpinePresentation.ts
+// src/lib/gamesSpine/motorsportSpinePresentation.ts
 init_define_import_meta_env();
 function isMotorsportGame(game) {
   return isMotorsportLeagueKey(game.league);
@@ -60551,10 +60552,10 @@ function resolveMotorsportSpineFooterLine(game) {
   return null;
 }
 
-// ../grarf/desktop/src/components/gamesSpine/GamesSpineUnifiedGameCard.tsx
+// src/components/gamesSpine/GamesSpineUnifiedGameCard.tsx
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/gamesSpine/resolveGamesSpineBroadcastOutlets.ts
+// src/lib/gamesSpine/resolveGamesSpineBroadcastOutlets.ts
 init_define_import_meta_env();
 function normalizeOutletKey(label) {
   return label.trim().toLowerCase().replace(/\s+/g, " ");
@@ -60604,10 +60605,10 @@ function gameShouldShowSpineBroadcastOutlets(game) {
   return game.status === "live" || game.status === "scheduled";
 }
 
-// ../grarf/desktop/src/lib/gamesSpine/resolveGamesSpineMatchupSideOrder.ts
+// src/lib/gamesSpine/resolveGamesSpineMatchupSideOrder.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/gamesSpine/isSoccerLeague.ts
+// src/lib/gamesSpine/isSoccerLeague.ts
 init_define_import_meta_env();
 var PRIMARY_SOCCER_LEAGUE_KEYS = /* @__PURE__ */ new Set(["EPL"]);
 function isSoccerLeague(league) {
@@ -60617,14 +60618,14 @@ function isSoccerLeague(league) {
   return resolveSportKeyForLeague(league) === "soccer";
 }
 
-// ../grarf/desktop/src/lib/gamesSpine/resolveGamesSpineMatchupSideOrder.ts
+// src/lib/gamesSpine/resolveGamesSpineMatchupSideOrder.ts
 function resolveGamesSpineMatchupSideOrder(game) {
   if (isSoccerLeague(game.league)) return ["home", "away"];
   if (game.league === "AFL") return ["home", "away"];
   return ["away", "home"];
 }
 
-// ../grarf/desktop/src/components/gamesSpine/GamesSpineBroadcastOutletBadgeRow.tsx
+// src/components/gamesSpine/GamesSpineBroadcastOutletBadgeRow.tsx
 init_define_import_meta_env();
 var import_jsx_runtime49 = __toESM(require_jsx_runtime(), 1);
 var GAMES_SPINE_CHANNEL_BADGE_NEUTRAL_CLASS = "inline-flex h-6 max-w-[5.5rem] items-center justify-center rounded border border-line/80 bg-[#050a0a] px-1.5";
@@ -60663,17 +60664,17 @@ function GamesSpineBroadcastOutletBadgeRow({ outlets }) {
   )) });
 }
 
-// ../grarf/desktop/src/components/gamesSpine/GamesSpineCardSectionDivider.tsx
+// src/components/gamesSpine/GamesSpineCardSectionDivider.tsx
 init_define_import_meta_env();
 var import_jsx_runtime50 = __toESM(require_jsx_runtime(), 1);
 function GamesSpineCardSectionDivider({ className }) {
   return /* @__PURE__ */ (0, import_jsx_runtime50.jsx)("div", { className: cn2(GAMES_SPINE_CARD_SECTION_DIVIDER_CLASS, className), "aria-hidden": true });
 }
 
-// ../grarf/desktop/src/components/gamesSpine/GamesSpineCardStatusRow.tsx
+// src/components/gamesSpine/GamesSpineCardStatusRow.tsx
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/commandBriefing/commandBriefingLayout.ts
+// src/lib/commandBriefing/commandBriefingLayout.ts
 init_define_import_meta_env();
 var COMMAND_BRIEFING_SCHEDULE_LABEL_CLASS = "shrink-0 text-right text-[9px] leading-snug tracking-wide";
 var COMMAND_BRIEFING_CHANNEL_LOGO_CLASS = channelLogoImageClass("right");
@@ -60691,7 +60692,7 @@ function logCommandBriefingLayoutHierarchyAdjusted() {
   console.log("[CommandBriefingLayout] Applied wireframe card hierarchy");
 }
 
-// ../grarf/desktop/src/lib/gamesSpine/resolveGamesSpineCardTimingLabel.ts
+// src/lib/gamesSpine/resolveGamesSpineCardTimingLabel.ts
 init_define_import_meta_env();
 var SOCCER_LEAGUES2 = /* @__PURE__ */ new Set([
   "EPL",
@@ -60782,22 +60783,22 @@ function resolveGamesSpineCardTimingLabel(game, scheduleLabel) {
   return stripLivePrefix(scheduleLabel);
 }
 
-// ../grarf/desktop/src/components/gamesSpine/GamesSpineRailLivePresentation.tsx
+// src/components/gamesSpine/GamesSpineRailLivePresentation.tsx
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/components/gamesSpine/GamesSpineMatchupStack.tsx
+// src/components/gamesSpine/GamesSpineMatchupStack.tsx
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/gamesSpine/gamesSpineChannelPresentation.ts
+// src/lib/gamesSpine/gamesSpineChannelPresentation.ts
 init_define_import_meta_env();
 function resolveGamesSpineChannelPresentation(game) {
   return resolveGameChannelPresentation(game);
 }
 
-// ../grarf/desktop/src/lib/gamesSpine/resolveTeamLogoUrl.ts
+// src/lib/gamesSpine/resolveTeamLogoUrl.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/gamesSpine/darkThemeLogoOverrides.ts
+// src/lib/gamesSpine/darkThemeLogoOverrides.ts
 init_define_import_meta_env();
 function darkCdn(sport, abbrev) {
   return `https://a.espncdn.com/i/teamlogos/${sport}/500-dark/${abbrev}.png`;
@@ -60845,7 +60846,7 @@ function getDarkThemeLogoUrl(league, abbrev) {
   return OVERRIDES[league]?.[abbrev.toLowerCase()];
 }
 
-// ../grarf/desktop/src/lib/gamesSpine/mlbEspnLogoSlug.ts
+// src/lib/gamesSpine/mlbEspnLogoSlug.ts
 init_define_import_meta_env();
 var MLB_ESPN_SCOREBOARD_SLUG = {
   az: "ari",
@@ -60863,7 +60864,7 @@ function buildMlbEspnScoreboardLogoUrl(abbrev) {
   return `https://a.espncdn.com/i/teamlogos/mlb/500/scoreboard/${slug}.png`;
 }
 
-// ../grarf/desktop/src/lib/gamesSpine/wnbaEspnLogoUrl.ts
+// src/lib/gamesSpine/wnbaEspnLogoUrl.ts
 init_define_import_meta_env();
 function buildWnbaEspnLogoUrl(abbrev) {
   const trimmed = abbrev?.trim();
@@ -60871,7 +60872,7 @@ function buildWnbaEspnLogoUrl(abbrev) {
   return `https://a.espncdn.com/i/teamlogos/wnba/500/${trimmed.toLowerCase()}.png`;
 }
 
-// ../grarf/desktop/src/lib/gamesSpine/resolveTeamLogoUrl.ts
+// src/lib/gamesSpine/resolveTeamLogoUrl.ts
 var NATIONAL_TEAM_SOCCER_LEAGUES = /* @__PURE__ */ new Set([
   "WORLDCUP",
   "WWC",
@@ -60957,7 +60958,7 @@ function parseLeagueFromEspnId(id) {
   return key2;
 }
 
-// ../grarf/desktop/src/components/gamesSpine/GamesSpineTeamMark.tsx
+// src/components/gamesSpine/GamesSpineTeamMark.tsx
 init_define_import_meta_env();
 var import_jsx_runtime51 = __toESM(require_jsx_runtime(), 1);
 function GamesSpineTeamMark({
@@ -60991,7 +60992,7 @@ function GamesSpineTeamMark({
   ] });
 }
 
-// ../grarf/desktop/src/components/gamesSpine/TennisSpineMatchup.tsx
+// src/components/gamesSpine/TennisSpineMatchup.tsx
 init_define_import_meta_env();
 init_isGrarfWebRenderer();
 var import_jsx_runtime52 = __toESM(require_jsx_runtime(), 1);
@@ -61076,7 +61077,7 @@ function TennisSpineMatchup({ game, className }) {
   ] });
 }
 
-// ../grarf/desktop/src/components/gamesSpine/GamesSpineMatchupStack.tsx
+// src/components/gamesSpine/GamesSpineMatchupStack.tsx
 var import_jsx_runtime53 = __toESM(require_jsx_runtime(), 1);
 function RecordCell({
   record,
@@ -61174,7 +61175,7 @@ function GamesSpineMatchupStack({
   ] });
 }
 
-// ../grarf/desktop/src/components/gamesSpine/GamesSpineRailLivePresentation.tsx
+// src/components/gamesSpine/GamesSpineRailLivePresentation.tsx
 var import_jsx_runtime54 = __toESM(require_jsx_runtime(), 1);
 function GamesSpineLiveBadge({
   className,
@@ -61199,7 +61200,7 @@ function GamesSpineLiveBadge({
   );
 }
 
-// ../grarf/desktop/src/components/gamesSpine/GamesSpineCardStatusRow.tsx
+// src/components/gamesSpine/GamesSpineCardStatusRow.tsx
 var import_jsx_runtime55 = __toESM(require_jsx_runtime(), 1);
 function scheduleAccentClass(scheduleLabel) {
   return scheduleLabel.startsWith("LIVE") ? "text-redsys/85" : "text-textdim/90";
@@ -61267,7 +61268,7 @@ function GamesSpineCardDemoStatusRow({
   ] });
 }
 
-// ../grarf/desktop/src/components/gamesSpine/GamesSpineUnifiedGameCard.tsx
+// src/components/gamesSpine/GamesSpineUnifiedGameCard.tsx
 var import_jsx_runtime56 = __toESM(require_jsx_runtime(), 1);
 function DemoMatchup({
   awayTeamLabel,
@@ -61370,7 +61371,7 @@ function GamesSpineUnifiedGameCard({
   ] });
 }
 
-// ../grarf/desktop/src/components/gamesSpine/GamesSpineHomeParityGameRow.tsx
+// src/components/gamesSpine/GamesSpineHomeParityGameRow.tsx
 var import_jsx_runtime57 = __toESM(require_jsx_runtime(), 1);
 function pitcherShort(name) {
   const t2 = name.trim();
@@ -61459,7 +61460,7 @@ function GamesSpineHomeParityGameRow({
   );
 }
 
-// ../grarf/desktop/src/lib/demo/demoWnbaWhipAroundGame.ts
+// src/lib/demo/demoWnbaWhipAroundGame.ts
 init_define_import_meta_env();
 var DEMO_WNBA_WHIP_AROUND_GAME_ID = "demo-WNBA-whip-around-aces-wings";
 var DEMO_WNBA_WHIP_AROUND_YOUTUBE_VIDEO_ID = "-eknbQkiwd8";
@@ -61530,7 +61531,7 @@ function launchDemoWnbaWhipAroundWatch(dispatch) {
   dispatch({ type: "open", tab: buildDemoWnbaWhipAroundWatchTab() });
 }
 
-// ../grarf/desktop/src/components/GameRow.tsx
+// src/components/GameRow.tsx
 var import_jsx_runtime58 = __toESM(require_jsx_runtime(), 1);
 function pitcherShort2(name) {
   const t2 = name.trim();
@@ -61987,7 +61988,7 @@ function GameRow({
   );
 }
 
-// ../grarf/desktop/src/components/gamesSpine/GamesSpineLeagueHeaderMark.tsx
+// src/components/gamesSpine/GamesSpineLeagueHeaderMark.tsx
 init_define_import_meta_env();
 var import_react80 = __toESM(require_react(), 1);
 var import_jsx_runtime59 = __toESM(require_jsx_runtime(), 1);
@@ -62011,7 +62012,7 @@ function GamesSpineLeagueHeaderMark({ league }) {
   );
 }
 
-// ../grarf/desktop/src/components/editorial/EditableLeagueContextStrip.tsx
+// src/components/editorial/EditableLeagueContextStrip.tsx
 init_define_import_meta_env();
 var import_jsx_runtime60 = __toESM(require_jsx_runtime(), 1);
 function EditableLeagueContextStrip({
@@ -62055,7 +62056,7 @@ function EditableLeagueContextStrip({
   );
 }
 
-// ../grarf/desktop/src/lib/gamesSpine/gamesSpineSummary.ts
+// src/lib/gamesSpine/gamesSpineSummary.ts
 init_define_import_meta_env();
 var SOCCER_LEAGUES4 = /* @__PURE__ */ new Set([
   "MLS",
@@ -62113,7 +62114,7 @@ function buildLeagueSummaryLine(league, games, statusFilter = "all") {
   return { total, live, upcoming, final, unit, summaryLine };
 }
 
-// ../grarf/desktop/src/lib/editorial/resolveEditorialLeagueContext.ts
+// src/lib/editorial/resolveEditorialLeagueContext.ts
 init_define_import_meta_env();
 function resolveEditorialLeagueContext(league, games, bundle) {
   const manual = bundle?.leagueContexts?.[league]?.leagueContext?.trim();
@@ -62123,14 +62124,14 @@ function resolveEditorialLeagueContext(league, games, bundle) {
   return resolveLeagueContextStrip(league, games);
 }
 
-// ../grarf/desktop/src/components/homeMvp/BestGameRightNowSection.tsx
+// src/components/homeMvp/BestGameRightNowSection.tsx
 init_define_import_meta_env();
 var import_react81 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/lib/bestGameRightNow/resolveBestGameRightNowV1.ts
+// src/lib/bestGameRightNow/resolveBestGameRightNowV1.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/bestGameRightNow/worldCupBestGameRanking.ts
+// src/lib/bestGameRightNow/worldCupBestGameRanking.ts
 init_define_import_meta_env();
 function resolveWorldCupBestGameImportanceV1(game) {
   if (game.league !== "WORLDCUP") return null;
@@ -62147,7 +62148,7 @@ function compareWorldCupGamesByFifaRankingV1(a2, b2) {
   return bScore - aScore;
 }
 
-// ../grarf/desktop/src/lib/bestGameRightNow/resolveBestGameRightNowV1.ts
+// src/lib/bestGameRightNow/resolveBestGameRightNowV1.ts
 function resolveManualLeagueBaseImportance(manual) {
   if (manual.leaguePriority != null && Number.isFinite(manual.leaguePriority)) {
     return manual.leaguePriority;
@@ -62248,13 +62249,13 @@ function bestGameRightNowV1SectionLabel(result) {
   return result.kind === "best_live" ? "BEST GAME RIGHT NOW" : "NEXT BIG EVENT";
 }
 
-// ../grarf/desktop/src/lib/gamesSpine/homeGamesSpineScoreParity.ts
+// src/lib/gamesSpine/homeGamesSpineScoreParity.ts
 init_define_import_meta_env();
 var LEAGUE_GAMES_SPINE_LIST_SHELL = "box-border min-w-0 w-full max-w-full";
 var HOME_GAMES_SPINE_GAME_STACK = "box-border flex min-w-0 w-full max-w-full flex-col";
 var HOME_GAMES_SPINE_LEAGUE_PANEL = `${LEAGUE_GAMES_SPINE_LIST_SHELL} bg-[#060b0d]/80`;
 
-// ../grarf/desktop/src/lib/gamesSpine/gamesSpineTransientAlertPresentation.ts
+// src/lib/gamesSpine/gamesSpineTransientAlertPresentation.ts
 init_define_import_meta_env();
 var GAMES_SPINE_TRANSIENT_ALERT_TRANSITION_MS = 320;
 var CLOSE_GAME_SHELL_CLASS = cn2(
@@ -62328,13 +62329,13 @@ function resolveGamesSpineTransientAlertHeaderLabelClass(variant) {
   return HEADER_LABEL_BY_VARIANT[variant];
 }
 
-// ../grarf/desktop/src/components/homeMvp/BestGameRightNowSection.tsx
+// src/components/homeMvp/BestGameRightNowSection.tsx
 init_isGrarfWebRenderer();
 
-// ../grarf/desktop/src/components/homeMvp/BestGameRightNowFeaturedShell.tsx
+// src/components/homeMvp/BestGameRightNowFeaturedShell.tsx
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/bestGameRightNow/bestGameRightNowPresentation.ts
+// src/lib/bestGameRightNow/bestGameRightNowPresentation.ts
 init_define_import_meta_env();
 var BEST_GAME_RIGHT_NOW_SHELL_CLASS = cn2(
   "mx-1 mb-px rounded-sm border border-ambersys/25 bg-[#100a06]",
@@ -62393,7 +62394,7 @@ function resolveGamesSpineBestGameRightNowPlacement(bestGameResult, firstLeagueS
   return { standaloneResult: bestGameResult ?? null, inlineResult: null };
 }
 
-// ../grarf/desktop/src/components/homeMvp/BestGameRightNowFeaturedShell.tsx
+// src/components/homeMvp/BestGameRightNowFeaturedShell.tsx
 var import_jsx_runtime61 = __toESM(require_jsx_runtime(), 1);
 function BestGameRightNowFeaturedShell({
   label,
@@ -62410,7 +62411,7 @@ function BestGameRightNowFeaturedShell({
   ] });
 }
 
-// ../grarf/desktop/src/components/homeMvp/BestGameRightNowSection.tsx
+// src/components/homeMvp/BestGameRightNowSection.tsx
 var import_jsx_runtime62 = __toESM(require_jsx_runtime(), 1);
 function BestGameRightNowTransientOverlayShell({
   variant,
@@ -62500,13 +62501,13 @@ function BestGameRightNowSection({
   );
 }
 
-// ../grarf/desktop/src/lib/gamesSpine/gamesSpineStickyLayout.ts
+// src/lib/gamesSpine/gamesSpineStickyLayout.ts
 init_define_import_meta_env();
 var HOME_GAMES_SPINE_LEAGUE_STICKY_TOP = "top-[3.75rem]";
 var HOME_GAMES_SPINE_FIRST_LEAGUE_STICKY_TOP = "top-[2.25rem]";
 var HOME_GAMES_SPINE_LEAGUE_STICKY_Z = "z-[11]";
 
-// ../grarf/desktop/src/components/homeMvp/HomeLeagueSpineSection.tsx
+// src/components/homeMvp/HomeLeagueSpineSection.tsx
 init_isGrarfWebRenderer();
 var import_jsx_runtime63 = __toESM(require_jsx_runtime(), 1);
 var HomeLeagueSpineSection = (0, import_react82.memo)(function HomeLeagueSpineSection2({
@@ -62807,11 +62808,11 @@ var HomeLeagueSpineSection = (0, import_react82.memo)(function HomeLeagueSpineSe
   );
 });
 
-// ../grarf/desktop/src/components/homeMvp/HomeFeaturedSpineSection.tsx
+// src/components/homeMvp/HomeFeaturedSpineSection.tsx
 init_define_import_meta_env();
 var import_react83 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/lib/editorial/selectFeaturedGames.ts
+// src/lib/editorial/selectFeaturedGames.ts
 init_define_import_meta_env();
 function matchFeaturedGamesSpineStatusFilter(game, statusFilter, selectedDate, now = /* @__PURE__ */ new Date()) {
   if (statusFilter === "final") {
@@ -62852,7 +62853,7 @@ function buildFeaturedSpineGamePool(selectedDate, statusFilter, liveLeagues, sch
   return [...byId.values()];
 }
 
-// ../grarf/desktop/src/components/homeMvp/HomeFeaturedSpineSection.tsx
+// src/components/homeMvp/HomeFeaturedSpineSection.tsx
 var import_jsx_runtime64 = __toESM(require_jsx_runtime(), 1);
 var HomeFeaturedSpineSection = (0, import_react83.memo)(function HomeFeaturedSpineSection2({
   statusFilter,
@@ -62988,7 +62989,7 @@ var HomeFeaturedSpineSection = (0, import_react83.memo)(function HomeFeaturedSpi
   );
 });
 
-// ../grarf/desktop/src/components/homeMvp/GamesSpinePermanentLeagueHeader.tsx
+// src/components/homeMvp/GamesSpinePermanentLeagueHeader.tsx
 init_define_import_meta_env();
 var import_jsx_runtime65 = __toESM(require_jsx_runtime(), 1);
 function GamesSpinePermanentLeagueHeader({
@@ -63028,16 +63029,16 @@ function GamesSpinePermanentLeagueHeader({
   ) });
 }
 
-// ../grarf/desktop/src/components/homeMvp/MoreLeaguesWaitlistCard.tsx
+// src/components/homeMvp/MoreLeaguesWaitlistCard.tsx
 init_define_import_meta_env();
 var import_react84 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/data/gatedFeatures/moreLeagues.ts
+// src/data/gatedFeatures/moreLeagues.ts
 init_define_import_meta_env();
 var MORE_LEAGUES_FEATURE_KEY = "more-leagues";
 var MORE_LEAGUES_SUCCESS_MESSAGE = "You're on the list. We'll let you know when expanded league coverage launches on web.";
 
-// ../grarf/desktop/src/components/homeMvp/MoreLeaguesWaitlistCard.tsx
+// src/components/homeMvp/MoreLeaguesWaitlistCard.tsx
 var import_jsx_runtime66 = __toESM(require_jsx_runtime(), 1);
 function MoreLeaguesWaitlistCard({
   collapsed,
@@ -63183,14 +63184,14 @@ function MoreLeaguesWaitlistCard({
   ] });
 }
 
-// ../grarf/desktop/src/components/editorial/HomeEditorialModeBar.tsx
+// src/components/editorial/HomeEditorialModeBar.tsx
 init_define_import_meta_env();
 var import_react86 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/components/sportscapeEditorial/SportscapeEditorialPasswordModal.tsx
+// src/components/sportscapeEditorial/SportscapeEditorialPasswordModal.tsx
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/components/sportscapeEditorial/SportscapeEditorialPasswordForm.tsx
+// src/components/sportscapeEditorial/SportscapeEditorialPasswordForm.tsx
 init_define_import_meta_env();
 var import_react85 = __toESM(require_react(), 1);
 var import_jsx_runtime67 = __toESM(require_jsx_runtime(), 1);
@@ -63260,7 +63261,7 @@ function SportscapeEditorialPasswordForm({
   ] });
 }
 
-// ../grarf/desktop/src/components/sportscapeEditorial/SportscapeEditorialPasswordModal.tsx
+// src/components/sportscapeEditorial/SportscapeEditorialPasswordModal.tsx
 var import_jsx_runtime68 = __toESM(require_jsx_runtime(), 1);
 function SportscapeEditorialPasswordModal({
   open,
@@ -63309,7 +63310,7 @@ function SportscapeEditorialPasswordModal({
   );
 }
 
-// ../grarf/desktop/src/components/editorial/HomeEditorialModeBar.tsx
+// src/components/editorial/HomeEditorialModeBar.tsx
 var import_jsx_runtime69 = __toESM(require_jsx_runtime(), 1);
 function HomeEditorialModeBar({ className }) {
   const editMode = useEditorialStore((s2) => s2.editMode);
@@ -63430,11 +63431,11 @@ function HomeEditorialModeBar({ className }) {
   ] });
 }
 
-// ../grarf/desktop/src/hooks/useGamesSpineCollapse.ts
+// src/hooks/useGamesSpineCollapse.ts
 init_define_import_meta_env();
 var import_react87 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/lib/gamesSpine/mergeGamesSpineSectionsByPriority.ts
+// src/lib/gamesSpine/mergeGamesSpineSectionsByPriority.ts
 init_define_import_meta_env();
 init_isGrarfWebRenderer();
 function normalizePlacementLabel(value) {
@@ -63540,7 +63541,7 @@ function gamesSpineManualCollapseKey(slug) {
 var GAMES_SPINE_FEATURED_COLLAPSE_KEY = "FEATURED";
 var GAMES_SPINE_MORE_LEAGUES_COLLAPSE_KEY = "MORE_LEAGUES";
 
-// ../grarf/desktop/src/hooks/useGamesSpineCollapse.ts
+// src/hooks/useGamesSpineCollapse.ts
 var STORAGE_KEY5 = "grarf-games-spine-collapse-v2";
 var LOG44 = "[GamesSpine]";
 function collapseStorageKey(statusFilter, leagueKey) {
@@ -63604,11 +63605,11 @@ function useGamesSpineCollapse(statusFilter) {
   return { isCollapsed, toggleCollapsed };
 }
 
-// ../grarf/desktop/src/hooks/useHomeBestGameRightNowResult.ts
+// src/hooks/useHomeBestGameRightNowResult.ts
 init_define_import_meta_env();
 var import_react89 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/hooks/useManualGamesSpineLiveRefreshMs.ts
+// src/hooks/useManualGamesSpineLiveRefreshMs.ts
 init_define_import_meta_env();
 var import_react88 = __toESM(require_react(), 1);
 function useManualGamesSpineLiveRefreshMs() {
@@ -63624,7 +63625,7 @@ function useManualGamesSpineLiveRefreshMs() {
   return nowMs;
 }
 
-// ../grarf/desktop/src/hooks/useHomeBestGameRightNowResult.ts
+// src/hooks/useHomeBestGameRightNowResult.ts
 init_isGrarfWebRenderer();
 function useHomeBestGameRightNowResult() {
   const leagues = useLiveGamesStore((s2) => s2.leagues);
@@ -63651,7 +63652,7 @@ function useHomeBestGameRightNowResult() {
   }, [leagues, manualDocument, manualLeMansRefreshMs, manualGamesSpineRefreshMs]);
 }
 
-// ../grarf/desktop/src/lib/gamesSpine/resolveFirstDisplayedGamesSpineLeagueGame.ts
+// src/lib/gamesSpine/resolveFirstDisplayedGamesSpineLeagueGame.ts
 init_define_import_meta_env();
 function buildManualSectionVisibleGames(games, statusFilter) {
   if (statusFilter === "live") {
@@ -63730,14 +63731,14 @@ function matchesFirstDisplayedGamesSpineLeagueGame(target, section) {
   return false;
 }
 
-// ../grarf/desktop/src/components/homeMvp/HomeGamesToday.tsx
+// src/components/homeMvp/HomeGamesToday.tsx
 init_isGrarfWebRenderer();
 
-// ../grarf/desktop/src/components/gamesSpine/GamesSpineTransientAlertQueue.tsx
+// src/components/gamesSpine/GamesSpineTransientAlertQueue.tsx
 init_define_import_meta_env();
 var import_react91 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/lib/gamesSpine/gamesSpineTransientAlertPlaceholderGames.ts
+// src/lib/gamesSpine/gamesSpineTransientAlertPlaceholderGames.ts
 init_define_import_meta_env();
 function spineTransientAlertPlaceholderBase(id, league, awayTeam, homeTeam) {
   return {
@@ -63804,7 +63805,7 @@ function resolveTransientAlertPlaceholderGame(gameId) {
   return TRANSIENT_ALERT_PLACEHOLDER_GAMES_BY_ID.get(gameId);
 }
 
-// ../grarf/desktop/src/components/gamesSpine/GamesSpineTransientAlertGameCard.tsx
+// src/components/gamesSpine/GamesSpineTransientAlertGameCard.tsx
 init_define_import_meta_env();
 var import_jsx_runtime70 = __toESM(require_jsx_runtime(), 1);
 function GamesSpineTransientAlertGameCard({
@@ -63829,7 +63830,7 @@ function GamesSpineTransientAlertGameCard({
   ) });
 }
 
-// ../grarf/desktop/src/components/gamesSpine/GamesSpineTransientAlertShell.tsx
+// src/components/gamesSpine/GamesSpineTransientAlertShell.tsx
 init_define_import_meta_env();
 var import_react90 = __toESM(require_react(), 1);
 var import_jsx_runtime71 = __toESM(require_jsx_runtime(), 1);
@@ -63929,7 +63930,7 @@ function GamesSpineTransientAlertShell({
   );
 }
 
-// ../grarf/desktop/src/components/gamesSpine/GamesSpineTransientAlertQueue.tsx
+// src/components/gamesSpine/GamesSpineTransientAlertQueue.tsx
 var import_jsx_runtime72 = __toESM(require_jsx_runtime(), 1);
 function GamesSpineTransientAlertQueue({
   className,
@@ -63975,7 +63976,7 @@ function GamesSpineTransientAlertQueue({
   );
 }
 
-// ../grarf/desktop/src/components/homeMvp/HomeManualGamesSpineSection.tsx
+// src/components/homeMvp/HomeManualGamesSpineSection.tsx
 init_define_import_meta_env();
 var import_react92 = __toESM(require_react(), 1);
 init_isGrarfWebRenderer();
@@ -64134,14 +64135,14 @@ var HomeManualGamesSpineSection = (0, import_react92.memo)(function HomeManualGa
   );
 });
 
-// ../grarf/desktop/src/lib/gamesSpine/clearCenterEmbedForSpineGameSelect.ts
+// src/lib/gamesSpine/clearCenterEmbedForSpineGameSelect.ts
 init_define_import_meta_env();
 function clearCenterEmbedForSpineGameSelect() {
   void window.grarf?.workspaceEmbedClear?.("center");
   void window.grarf?.workspaceEmbedClear?.("centerChild");
 }
 
-// ../grarf/desktop/src/data/gamesSpinePermanentBrowserSocialRailFeeds.ts
+// src/data/gamesSpinePermanentBrowserSocialRailFeeds.ts
 init_define_import_meta_env();
 var GAMES_SPINE_PERMANENT_BROWSER_SOCIAL_RAIL_FEEDS = [
   {
@@ -64173,7 +64174,7 @@ var GAMES_SPINE_PERMANENT_BROWSER_SOCIAL_RAIL_FEEDS = [
   }
 ];
 
-// ../grarf/desktop/src/components/homeMvp/HomeGamesToday.tsx
+// src/components/homeMvp/HomeGamesToday.tsx
 var import_jsx_runtime74 = __toESM(require_jsx_runtime(), 1);
 function useAnyGamesLoaded() {
   const leagues = useLiveGamesStore((s2) => s2.leagues);
@@ -64552,7 +64553,7 @@ function HomeGamesToday({
   );
 }
 
-// ../grarf/desktop/src/hooks/useHomeSpineGameInteractions.ts
+// src/hooks/useHomeSpineGameInteractions.ts
 init_define_import_meta_env();
 var import_react94 = __toESM(require_react(), 1);
 function useHomeSpineGameInteractions({
@@ -64631,7 +64632,7 @@ function useHomeSpineGameInteractions({
   };
 }
 
-// ../grarf/desktop/src/components/homeMvp/HomeContextColumn.tsx
+// src/components/homeMvp/HomeContextColumn.tsx
 var import_jsx_runtime75 = __toESM(require_jsx_runtime(), 1);
 function HomeContextColumn({
   hostedInPaneLayout = false,
@@ -64681,20 +64682,20 @@ function HomeContextColumn({
   );
 }
 
-// ../grarf/desktop/src/components/homeMvp/HomeRightRail.tsx
+// src/components/homeMvp/HomeRightRail.tsx
 init_define_import_meta_env();
 var import_react112 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/components/activity/ActivityRail.tsx
+// src/components/activity/ActivityRail.tsx
 init_define_import_meta_env();
 var import_react106 = __toESM(require_react(), 1);
 init_isGrarfWebRenderer();
 
-// ../grarf/desktop/src/components/intelligence/IntelligenceRailPanel.tsx
+// src/components/intelligence/IntelligenceRailPanel.tsx
 init_define_import_meta_env();
 var import_react95 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/store/intelligenceStore.ts
+// src/store/intelligenceStore.ts
 init_define_import_meta_env();
 var import_zustand37 = __toESM(require_zustand(), 1);
 var useIntelligenceStore = (0, import_zustand37.create)((set, get) => ({
@@ -64776,7 +64777,7 @@ function bindIntelligenceStoreUpdates() {
   });
 }
 
-// ../grarf/desktop/src/components/intelligence/IntelligenceRailPanel.tsx
+// src/components/intelligence/IntelligenceRailPanel.tsx
 var import_jsx_runtime76 = __toESM(require_jsx_runtime(), 1);
 function formatPublished(iso) {
   const t2 = Date.parse(iso);
@@ -64874,11 +64875,11 @@ function IntelligenceRailPanel({ onOpenBriefing, className }) {
   );
 }
 
-// ../grarf/desktop/src/components/media/PodcastRailPanel.tsx
+// src/components/media/PodcastRailPanel.tsx
 init_define_import_meta_env();
 var import_react96 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/data/podcastFeeds.ts
+// src/data/podcastFeeds.ts
 init_define_import_meta_env();
 var PODCAST_FEEDS = [
   {
@@ -65651,7 +65652,7 @@ var PODCAST_FEEDS = [
   }
 ];
 
-// ../grarf/desktop/src/lib/media/parsePodcastRss.ts
+// src/lib/media/parsePodcastRss.ts
 init_define_import_meta_env();
 var ITUNES_NS = "http://www.itunes.com/dtds/podcast-1.0.dtd";
 var MRSS_NS2 = "http://search.yahoo.com/mrss/";
@@ -65787,10 +65788,10 @@ async function fetchPodcastFeedXml(feedUrl) {
   return { ok: true, xml: r3.xml };
 }
 
-// ../grarf/desktop/src/lib/media/podcastRouting.ts
+// src/lib/media/podcastRouting.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/media/podcastEpisodeEditorialBoost.ts
+// src/lib/media/podcastEpisodeEditorialBoost.ts
 init_define_import_meta_env();
 var FEATURED_EVENT_KEYWORDS = [
   { term: "world cup", score: 40 },
@@ -65824,7 +65825,7 @@ function resolvePodcastEpisodeEditorialBoost(episode) {
   return scorePodcastEpisodeEditorialBoostFromMetadata(episode);
 }
 
-// ../grarf/desktop/src/lib/media/podcastRouting.ts
+// src/lib/media/podcastRouting.ts
 var PRIORITY_WEIGHT = {
   high: 3,
   medium: 2,
@@ -65952,7 +65953,7 @@ function sortPodcastEpisodesForContext(episodes, feeds, opts) {
   return [...episodes].sort((a2, b2) => compareEpisodesForContext(a2, b2, feedById, contextBucket));
 }
 
-// ../grarf/desktop/src/lib/media/podcastCache.ts
+// src/lib/media/podcastCache.ts
 init_define_import_meta_env();
 var STORAGE_KEY6 = "grarf-podcast-cache-v1";
 var DEFAULT_TTL_MS3 = 45 * 60 * 1e3;
@@ -65999,7 +66000,7 @@ function clearPodcastCache() {
   writeRoot({ version: 1, feeds: {} });
 }
 
-// ../grarf/desktop/src/components/media/PodcastRailPanel.tsx
+// src/components/media/PodcastRailPanel.tsx
 init_isGrarfWebRenderer();
 var import_jsx_runtime77 = __toESM(require_jsx_runtime(), 1);
 var LOG45 = "[Podcasts]";
@@ -66193,11 +66194,11 @@ function PodcastRailPanel({
   );
 }
 
-// ../grarf/desktop/src/components/activity/PodcastsWaitlistPanel.tsx
+// src/components/activity/PodcastsWaitlistPanel.tsx
 init_define_import_meta_env();
 var import_react97 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/data/gatedFeatures/podcasts.ts
+// src/data/gatedFeatures/podcasts.ts
 init_define_import_meta_env();
 var PODCASTS_FEATURE_KEY = "podcasts";
 var PODCASTS_GATED_FEATURE = {
@@ -66212,7 +66213,7 @@ var PODCASTS_GATED_FEATURE = {
   ctaLabel: "Join the Waitlist"
 };
 
-// ../grarf/desktop/src/components/activity/PodcastsWaitlistPanel.tsx
+// src/components/activity/PodcastsWaitlistPanel.tsx
 var import_jsx_runtime78 = __toESM(require_jsx_runtime(), 1);
 var FEATURED_PODCASTS = [
   "Pardon My Take",
@@ -66323,14 +66324,14 @@ function PodcastsWaitlistPanel({ className }) {
   );
 }
 
-// ../grarf/desktop/src/components/media/ShowsRailPanel.tsx
+// src/components/media/ShowsRailPanel.tsx
 init_define_import_meta_env();
 var import_react98 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/lib/demo/demoLiveChannels.ts
+// src/lib/demo/demoLiveChannels.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/data/liveChannels.ts
+// src/data/liveChannels.ts
 init_define_import_meta_env();
 var LIVE_CHANNELS = [
   {
@@ -66461,7 +66462,7 @@ var LIVE_CHANNELS = [
   }
 ];
 
-// ../grarf/desktop/src/lib/demo/demoLiveChannels.ts
+// src/lib/demo/demoLiveChannels.ts
 var DEMO_PAT_MCAFEE_SHOW_THUMBNAIL = "/media/shows/demo/the-pat-mcafee-show.png";
 var DEMO_DAN_LE_BATARD_SHOW_THUMBNAIL = "/media/shows/demo/dan-le-batard-show-with-stugotz.png";
 var DEMO_DAN_LE_BATARD_SHOW_CHANNEL_ID = "nbc-sports-now";
@@ -66508,7 +66509,7 @@ function resolveLiveChannelsForDisplay() {
   });
 }
 
-// ../grarf/desktop/src/lib/media/mediaContext.ts
+// src/lib/media/mediaContext.ts
 init_define_import_meta_env();
 var LEAGUES = ["MLB", "NBA", "WNBA", "NHL", "MLS"];
 function computeMediaContext(hint) {
@@ -66534,7 +66535,7 @@ function selectMediaContext(state3) {
   return mediaContextFromLeagues(state3.leagues);
 }
 
-// ../grarf/desktop/src/lib/media/liveChannelRouting.ts
+// src/lib/media/liveChannelRouting.ts
 init_define_import_meta_env();
 var PRIORITY_WEIGHT2 = {
   high: 40,
@@ -66584,7 +66585,7 @@ function score(ch, route, liveTags, liveNba) {
   return PRIORITY_WEIGHT2[ch.priority] + leagueMatchesRoute(ch.league, route) + liveTagBoost(ch.league, liveTags) + authPenalty(ch) + nbaEspnBoost(ch, route, liveNba) + patMcAfeeSundayBoost(ch);
 }
 
-// ../grarf/desktop/src/lib/media/liveChannelCache.ts
+// src/lib/media/liveChannelCache.ts
 init_define_import_meta_env();
 var STORAGE_KEY7 = "grarf-live-channel-cache-v1";
 var DEFAULT_TTL_MS4 = 50 * 60 * 1e3;
@@ -66680,7 +66681,7 @@ async function ensureLiveChannelEnrichment(ch) {
   return meta;
 }
 
-// ../grarf/desktop/src/components/media/ShowsRailPanel.tsx
+// src/components/media/ShowsRailPanel.tsx
 var import_jsx_runtime79 = __toESM(require_jsx_runtime(), 1);
 function channelInitials(name) {
   const parts = name.replace(/['']/g, "'").split(/\s+/).filter((w2) => w2.length > 0 && !/^the$/i.test(w2));
@@ -66896,7 +66897,7 @@ function ShowsRailPanel({
   );
 }
 
-// ../grarf/desktop/src/lib/homeOperational/resolveHomeRightRailContext.ts
+// src/lib/homeOperational/resolveHomeRightRailContext.ts
 init_define_import_meta_env();
 function defaultHomeTeamFeedIndex(slots) {
   const homeIdx = slots.findIndex((s2) => s2.key.startsWith("home"));
@@ -66992,11 +66993,11 @@ function resolveHomeRightRailContext(game) {
   };
 }
 
-// ../grarf/desktop/src/components/social/GameSocialRailFeedPanel.tsx
+// src/components/social/GameSocialRailFeedPanel.tsx
 init_define_import_meta_env();
 var import_react101 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/hooks/useGameSocialRailFeedEvents.ts
+// src/hooks/useGameSocialRailFeedEvents.ts
 init_define_import_meta_env();
 var import_react99 = __toESM(require_react(), 1);
 init_isGrarfWebRenderer();
@@ -67044,10 +67045,10 @@ function useGameSocialRailFeedEvents(resolution) {
   return { events, loading, error, refresh };
 }
 
-// ../grarf/desktop/src/lib/social/gameSocialRail/resolveFeedsForSelectedGame.ts
+// src/lib/social/gameSocialRail/resolveFeedsForSelectedGame.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/data/gameSocialRailTeamFeedRegistry.ts
+// src/data/gameSocialRailTeamFeedRegistry.ts
 init_define_import_meta_env();
 var GAME_SOCIAL_RAIL_TEAM_FEED_REGISTRY = [
   {
@@ -67262,10 +67263,10 @@ var GAME_SOCIAL_RAIL_TEAM_FEED_REGISTRY = [
   }
 ];
 
-// ../grarf/desktop/src/lib/social/gameSocialRail/resolveGameSocialRailLeagueSignals.ts
+// src/lib/social/gameSocialRail/resolveGameSocialRailLeagueSignals.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/data/gameSocialRailLeagueSignalsRegistry.ts
+// src/data/gameSocialRailLeagueSignalsRegistry.ts
 init_define_import_meta_env();
 var GAME_SOCIAL_RAIL_ATP_WTA_FEED = {
   feedId: "game-social-rail-atp-wta",
@@ -67319,7 +67320,7 @@ var GAME_SOCIAL_RAIL_LEAGUE_SIGNALS_REGISTRY = [
   }
 ];
 
-// ../grarf/desktop/src/lib/social/gameSocialRail/resolveGameSocialRailLeagueSignals.ts
+// src/lib/social/gameSocialRail/resolveGameSocialRailLeagueSignals.ts
 function resolveGameLeagueKey(game) {
   return game.league ?? "MLB";
 }
@@ -67329,7 +67330,7 @@ function resolveGameSocialRailLeagueSignalsConfig(game) {
   return GAME_SOCIAL_RAIL_LEAGUE_SIGNALS_REGISTRY.find((entry) => entry.leagueKey === leagueKey) ?? null;
 }
 
-// ../grarf/desktop/src/lib/social/gameSocialRail/resolveFeedsForSelectedGame.ts
+// src/lib/social/gameSocialRail/resolveFeedsForSelectedGame.ts
 function normalizeTeamLabel(label) {
   return label.trim().toLowerCase().replace(/\s+/g, " ");
 }
@@ -67386,14 +67387,14 @@ function resolveFeedsForSelectedGame(game, tab) {
   };
 }
 
-// ../grarf/desktop/src/components/social/GameSocialRailFeedPanel.tsx
+// src/components/social/GameSocialRailFeedPanel.tsx
 init_isGrarfWebRenderer();
 
-// ../grarf/desktop/src/components/social/SocialRssFeedPostRow.tsx
+// src/components/social/SocialRssFeedPostRow.tsx
 init_define_import_meta_env();
 init_isGrarfWebRenderer();
 
-// ../grarf/desktop/src/lib/social/socialSignalBodyTypography.ts
+// src/lib/social/socialSignalBodyTypography.ts
 init_define_import_meta_env();
 init_isGrarfWebRenderer();
 var SOCIAL_SIGNAL_BODY_CLASS = "grarf-signal-body";
@@ -67401,10 +67402,10 @@ if (isGrarfWebRenderer()) {
   void Promise.resolve().then(() => __toESM(require_socialSignalBodyTypography(), 1));
 }
 
-// ../grarf/desktop/src/lib/social/formatSocialWirePostMeta.ts
+// src/lib/social/formatSocialWirePostMeta.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/livetrack/liveTrackLeagueIdentity.ts
+// src/lib/livetrack/liveTrackLeagueIdentity.ts
 init_define_import_meta_env();
 function directoryLogo(id) {
   return LEAGUE_DIRECTORY_ITEMS.find((item) => item.id === id)?.logoUrl;
@@ -67467,7 +67468,7 @@ function formatLiveTrackLeagueDisplayName(sport) {
   return resolveLiveTrackLeagueIdentity(sport).displayName;
 }
 
-// ../grarf/desktop/src/lib/social/formatSocialWirePostMeta.ts
+// src/lib/social/formatSocialWirePostMeta.ts
 function formatSocialWireClock(iso) {
   const date = new Date(iso);
   if (Number.isNaN(date.getTime())) return "";
@@ -67492,21 +67493,21 @@ function formatSocialWireMeta(event) {
   return clock ? `${league} \u2022 ${clock}` : league;
 }
 
-// ../grarf/desktop/src/components/homeMvp/HomeLiveTrackPostRow.tsx
+// src/components/homeMvp/HomeLiveTrackPostRow.tsx
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/livetrack/openLiveTrackPostUrl.ts
+// src/lib/livetrack/openLiveTrackPostUrl.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/livetrack/resolveLiveTrackMomentMedia.ts
+// src/lib/livetrack/resolveLiveTrackMomentMedia.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/livetrack/homeLiveTrackMockMedia.ts
+// src/lib/livetrack/homeLiveTrackMockMedia.ts
 init_define_import_meta_env();
 var LIVE_TRACK_GRAND_SLAM_MOCK_VIDEO_URL = "/livetrack/grand-slam.mp4";
 var LIVE_TRACK_USC_ESPN_GRAND_SLAM_EVENT_ID = "livetrack-usc-espn-grand-slam-lead";
 
-// ../grarf/desktop/src/lib/livetrack/resolveLiveTrackMomentMedia.ts
+// src/lib/livetrack/resolveLiveTrackMomentMedia.ts
 var SLOVAKIA_LIVETRACK_EVENT_ID = "livetrack-slovakia-montenegro-lead";
 var SLOVAKIA_LIVETRACK_MOCK_VIDEO_URL = "https://video.twimg.com/ext_tw_video/2062943430452367361/pu/vid/avc1/1280x720/lLMqXKecAhHv_PGH.mp4?tag=12";
 function hasPlayableLiveTrackVideo(event) {
@@ -67541,7 +67542,7 @@ function resolveLiveTrackPostUrl(event) {
   return event.embed.tweetUrl?.trim() ?? "";
 }
 
-// ../grarf/desktop/src/lib/livetrack/openLiveTrackPostUrl.ts
+// src/lib/livetrack/openLiveTrackPostUrl.ts
 function openLiveTrackPostUrl(event) {
   const url = resolveLiveTrackPostUrl(event);
   if (!url || !/^https?:\/\//i.test(url)) return false;
@@ -67549,7 +67550,7 @@ function openLiveTrackPostUrl(event) {
   return true;
 }
 
-// ../grarf/desktop/src/lib/livetrack/resolveLiveTrackPostInteraction.ts
+// src/lib/livetrack/resolveLiveTrackPostInteraction.ts
 init_define_import_meta_env();
 function resolveLiveTrackPostInteraction(event) {
   if (hasPlayableLiveTrackVideo(event)) return "play-video";
@@ -67558,7 +67559,7 @@ function resolveLiveTrackPostInteraction(event) {
   return "none";
 }
 
-// ../grarf/desktop/src/components/homeMvp/HomeLiveTrackPostRow.tsx
+// src/components/homeMvp/HomeLiveTrackPostRow.tsx
 var import_jsx_runtime80 = __toESM(require_jsx_runtime(), 1);
 function HomeLiveTrackPostRow({
   event,
@@ -67605,10 +67606,10 @@ function HomeLiveTrackPostRow({
   );
 }
 
-// ../grarf/desktop/src/components/social/SocialRssAppMediaPreview.tsx
+// src/components/social/SocialRssAppMediaPreview.tsx
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/social/socialRssAppMediaLayout.ts
+// src/lib/social/socialRssAppMediaLayout.ts
 init_define_import_meta_env();
 var RSSAPP_TWITTER_EMBED_WIDTH_PX = 550;
 var RSSAPP_FEED_MEDIA_CONTAINER_CLASS = cn2(
@@ -67633,18 +67634,18 @@ var RSSAPP_FEED_VIDEO_POSTER_CLASS = cn2(
 );
 var RSSAPP_FEED_VIDEO_IMAGE_CLASS = "block h-full w-full object-cover";
 
-// ../grarf/desktop/src/lib/social/resolveTwitterStatusIdFromPostUrl.ts
+// src/lib/social/resolveTwitterStatusIdFromPostUrl.ts
 init_define_import_meta_env();
 function resolveTwitterStatusIdFromPostUrl(url) {
   const match = url.trim().match(/\/status\/(\d+)/i);
   return match?.[1] ?? null;
 }
 
-// ../grarf/desktop/src/components/homeMvp/HomeLiveTrackTwitterEmbedMedia.tsx
+// src/components/homeMvp/HomeLiveTrackTwitterEmbedMedia.tsx
 init_define_import_meta_env();
 var import_react100 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/types/livetrack.ts
+// src/types/livetrack.ts
 init_define_import_meta_env();
 function buildLiveTrackTwitterEmbedSrc(tweetId, options) {
   const params = new URLSearchParams({
@@ -67656,7 +67657,7 @@ function buildLiveTrackTwitterEmbedSrc(tweetId, options) {
   return `https://platform.twitter.com/embed/Tweet.html?${params.toString()}`;
 }
 
-// ../grarf/desktop/src/components/homeMvp/HomeLiveTrackTwitterEmbedMedia.tsx
+// src/components/homeMvp/HomeLiveTrackTwitterEmbedMedia.tsx
 var import_jsx_runtime81 = __toESM(require_jsx_runtime(), 1);
 var DEFAULT_EMBED_WIDTH_PX = 320;
 var EMBED_MIN_HEIGHT_PX = 352;
@@ -67697,7 +67698,7 @@ function HomeLiveTrackTwitterEmbedMedia({
   );
 }
 
-// ../grarf/desktop/src/components/social/SocialRssAppMediaPreview.tsx
+// src/components/social/SocialRssAppMediaPreview.tsx
 var import_jsx_runtime82 = __toESM(require_jsx_runtime(), 1);
 function stopRowActivation(event) {
   event.stopPropagation();
@@ -67782,7 +67783,7 @@ function hasSocialRssAppMedia(event) {
   return Boolean(videoSrc || previewImageUrl);
 }
 
-// ../grarf/desktop/src/components/social/SocialRssFeedPostRow.tsx
+// src/components/social/SocialRssFeedPostRow.tsx
 var import_jsx_runtime83 = __toESM(require_jsx_runtime(), 1);
 function SocialRssFeedPostRow({
   event,
@@ -67828,7 +67829,7 @@ function SocialRssFeedPostRow({
   ) });
 }
 
-// ../grarf/desktop/src/components/social/GameSocialRailFeedPanel.tsx
+// src/components/social/GameSocialRailFeedPanel.tsx
 var import_jsx_runtime84 = __toESM(require_jsx_runtime(), 1);
 function GameSocialRailFeedPanel({
   game,
@@ -67933,11 +67934,11 @@ function GameSocialRailFeedPanelBody({
   );
 }
 
-// ../grarf/desktop/src/components/activity/SignalsIntelWaitlistPanel.tsx
+// src/components/activity/SignalsIntelWaitlistPanel.tsx
 init_define_import_meta_env();
 var import_react102 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/data/gatedFeatures/signalsIntel.ts
+// src/data/gatedFeatures/signalsIntel.ts
 init_define_import_meta_env();
 var SIGNALS_INTEL_FEATURE_KEY = "signals-intel";
 var SIGNALS_INTEL_GATED_FEATURE = {
@@ -67952,7 +67953,7 @@ var SIGNALS_INTEL_GATED_FEATURE = {
   ctaLabel: "Join the Waitlist"
 };
 
-// ../grarf/desktop/src/components/activity/SignalsIntelWaitlistPanel.tsx
+// src/components/activity/SignalsIntelWaitlistPanel.tsx
 var import_jsx_runtime85 = __toESM(require_jsx_runtime(), 1);
 var LOGO_BOX_CLASS = "flex h-5 w-5 shrink-0 items-center justify-center";
 var INTEL_NEWSLETTER_EXAMPLES = [
@@ -68094,11 +68095,11 @@ function SignalsIntelWaitlistPanel({ className }) {
   );
 }
 
-// ../grarf/desktop/src/components/activity/SignalsShowWaitlistPanel.tsx
+// src/components/activity/SignalsShowWaitlistPanel.tsx
 init_define_import_meta_env();
 var import_react103 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/data/gatedFeatures/signalsShow.ts
+// src/data/gatedFeatures/signalsShow.ts
 init_define_import_meta_env();
 var SIGNALS_SHOW_FEATURE_KEY = "signals-show";
 var SIGNALS_SHOW_GATED_FEATURE = {
@@ -68113,7 +68114,7 @@ var SIGNALS_SHOW_GATED_FEATURE = {
   ctaLabel: "Join the Waitlist"
 };
 
-// ../grarf/desktop/src/components/activity/SignalsShowWaitlistPanel.tsx
+// src/components/activity/SignalsShowWaitlistPanel.tsx
 var import_jsx_runtime86 = __toESM(require_jsx_runtime(), 1);
 var LOGO_BOX_CLASS2 = "flex h-5 w-5 shrink-0 items-center justify-center";
 var SHOW_EXAMPLES = [
@@ -68259,11 +68260,11 @@ function SignalsShowWaitlistPanel({ className }) {
   );
 }
 
-// ../grarf/desktop/src/components/activity/SignalsConvoWaitlistPanel.tsx
+// src/components/activity/SignalsConvoWaitlistPanel.tsx
 init_define_import_meta_env();
 var import_react104 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/data/gatedFeatures/signalsConvo.ts
+// src/data/gatedFeatures/signalsConvo.ts
 init_define_import_meta_env();
 var SIGNALS_CONVO_FEATURE_KEY = "signals-convo";
 var SIGNALS_CONVO_GATED_FEATURE = {
@@ -68278,7 +68279,7 @@ var SIGNALS_CONVO_GATED_FEATURE = {
   ctaLabel: "Join the Waitlist"
 };
 
-// ../grarf/desktop/src/components/activity/SignalsConvoWaitlistPanel.tsx
+// src/components/activity/SignalsConvoWaitlistPanel.tsx
 var import_jsx_runtime87 = __toESM(require_jsx_runtime(), 1);
 var LOGO_BOX_CLASS3 = "flex h-5 w-5 shrink-0 items-center justify-center";
 var CONVO_COMMUNITY_EXAMPLES = [
@@ -68424,11 +68425,11 @@ function SignalsConvoWaitlistPanel({ className }) {
   );
 }
 
-// ../grarf/desktop/src/components/activity/SignalsChatWaitlistPanel.tsx
+// src/components/activity/SignalsChatWaitlistPanel.tsx
 init_define_import_meta_env();
 var import_react105 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/data/gatedFeatures/signalsChat.ts
+// src/data/gatedFeatures/signalsChat.ts
 init_define_import_meta_env();
 var SIGNALS_CHAT_FEATURE_KEY = "signals-chat";
 var SIGNALS_CHAT_GATED_FEATURE = {
@@ -68443,7 +68444,7 @@ var SIGNALS_CHAT_GATED_FEATURE = {
   ctaLabel: "Join the Waitlist"
 };
 
-// ../grarf/desktop/src/components/activity/SignalsChatWaitlistPanel.tsx
+// src/components/activity/SignalsChatWaitlistPanel.tsx
 var import_jsx_runtime88 = __toESM(require_jsx_runtime(), 1);
 var LOGO_BOX_CLASS4 = "flex h-5 w-5 shrink-0 items-center justify-center";
 var CHAT_ROOM_EXAMPLES = [
@@ -68556,7 +68557,7 @@ function SignalsChatWaitlistPanel({ className }) {
   );
 }
 
-// ../grarf/desktop/src/components/activity/ActivityRail.tsx
+// src/components/activity/ActivityRail.tsx
 var import_jsx_runtime89 = __toESM(require_jsx_runtime(), 1);
 var tabCls = "min-w-0 flex-1 border border-transparent py-1 text-center text-[8px] tracking-[0.08em] transition duration-150";
 var WEB_PREMIUM_SIGNAL_TAB_LOCK_IDS = /* @__PURE__ */ new Set([
@@ -68825,22 +68826,22 @@ function ActivityRail({
   );
 }
 
-// ../grarf/desktop/src/components/gameWorkspace/GameUtilityRail.tsx
+// src/components/gameWorkspace/GameUtilityRail.tsx
 init_define_import_meta_env();
 var import_react109 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/components/social/SocialRssAppFeedPanel.tsx
+// src/components/social/SocialRssAppFeedPanel.tsx
 init_define_import_meta_env();
 var import_react108 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/hooks/useSocialRssFeedEvents.ts
+// src/hooks/useSocialRssFeedEvents.ts
 init_define_import_meta_env();
 var import_react107 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/lib/livetrack/feed/fetchLiveTrackFeedEvents.ts
+// src/lib/livetrack/feed/fetchLiveTrackFeedEvents.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/livetrack/feed/resolveLiveTrackLeagueActivation.ts
+// src/lib/livetrack/feed/resolveLiveTrackLeagueActivation.ts
 init_define_import_meta_env();
 function buildRetainedAtById2() {
   return Object.fromEntries(
@@ -68915,7 +68916,7 @@ function resolveActiveLiveTrackLeagueFeeds(nowMs = Date.now()) {
   });
 }
 
-// ../grarf/desktop/src/lib/livetrack/feed/fetchLiveTrackFeedEvents.ts
+// src/lib/livetrack/feed/fetchLiveTrackFeedEvents.ts
 var MAX_ITEMS_PER_LEAGUE = 50;
 function toFeedSourceDefinition(definition) {
   return {
@@ -68978,7 +68979,7 @@ async function fetchLiveTrackFeedEvents() {
   return sortLiveTrackEventsChronologically(merged);
 }
 
-// ../grarf/desktop/src/hooks/useSocialRssFeedEvents.ts
+// src/hooks/useSocialRssFeedEvents.ts
 var SOCIAL_FEED_POLL_MS = 3e4;
 function useSocialRssFeedEvents() {
   const [events, setEvents] = (0, import_react107.useState)([]);
@@ -69003,7 +69004,7 @@ function useSocialRssFeedEvents() {
   return { events, loading, error, refresh };
 }
 
-// ../grarf/desktop/src/components/social/SocialRssAppFeedPanel.tsx
+// src/components/social/SocialRssAppFeedPanel.tsx
 var import_jsx_runtime90 = __toESM(require_jsx_runtime(), 1);
 function SocialRssAppFeedPanel({ className }) {
   const { events, loading, error, refresh } = useSocialRssFeedEvents();
@@ -69052,15 +69053,15 @@ function SocialRssAppFeedPanel({ className }) {
   );
 }
 
-// ../grarf/desktop/src/lib/social/gameSocialRail/resolveSocialRailFeedContext.ts
+// src/lib/social/gameSocialRail/resolveSocialRailFeedContext.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/data/homeWebSocialRssAppEmbed.ts
+// src/data/homeWebSocialRssAppEmbed.ts
 init_define_import_meta_env();
 var HOME_WEB_SOCIAL_RSS_APP_FEED_ID = "A5cZ5XPYdaf14rPD";
 var HOME_WEB_SOCIAL_RSS_FEED_URL = `https://rss.app/feeds/${HOME_WEB_SOCIAL_RSS_APP_FEED_ID}.xml`;
 
-// ../grarf/desktop/src/lib/social/gameSocialRail/resolveSocialRailFeedContext.ts
+// src/lib/social/gameSocialRail/resolveSocialRailFeedContext.ts
 var ALL_SPORTS_SOCIAL_RAIL_FEED = {
   feedId: "social-rail-all-sports",
   feedUrl: HOME_WEB_SOCIAL_RSS_FEED_URL,
@@ -69120,7 +69121,7 @@ function resolveHomeSocialRailFeedResolution(activeLeagueId) {
   return resolveAllSportsSocialRailFeedResolution();
 }
 
-// ../grarf/desktop/src/components/gameWorkspace/GameUtilityRail.tsx
+// src/components/gameWorkspace/GameUtilityRail.tsx
 init_isGrarfWebRenderer();
 var import_jsx_runtime91 = __toESM(require_jsx_runtime(), 1);
 var tabCls2 = "shrink-0 min-w-[3.75rem] border border-transparent px-0.5 py-1 text-center text-[7px] tracking-[0.05em] transition duration-150";
@@ -69397,11 +69398,11 @@ function GameUtilityRail({
   );
 }
 
-// ../grarf/desktop/src/components/homeMvp/HomeHeadlinesCbsPanel.tsx
+// src/components/homeMvp/HomeHeadlinesCbsPanel.tsx
 init_define_import_meta_env();
 var import_react110 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/lib/home/cbsHeadlinesVideoProbe.ts
+// src/lib/home/cbsHeadlinesVideoProbe.ts
 init_define_import_meta_env();
 var CBS_HEADLINES_VIDEO_PROBE_JS = `(function(){
   function pickVideo(){
@@ -69472,7 +69473,7 @@ async function runCbsHeadlinesVideoProbe(executeJavaScript, options) {
   return null;
 }
 
-// ../grarf/desktop/src/components/homeMvp/HomeHeadlinesCbsPanel.tsx
+// src/components/homeMvp/HomeHeadlinesCbsPanel.tsx
 var import_jsx_runtime92 = __toESM(require_jsx_runtime(), 1);
 var CBS_SPORTS_HQ_LIVE_URL = "https://www.cbssports.com/watch/live";
 var LOG46 = "[HomeHeadlinesCbs]";
@@ -69654,7 +69655,7 @@ function HomeHeadlinesCbsPanel({ embedsEnabled = true, videoUrl }) {
   );
 }
 
-// ../grarf/desktop/src/components/homeMvp/HomeHeadlinesWebPlaylistPanel.tsx
+// src/components/homeMvp/HomeHeadlinesWebPlaylistPanel.tsx
 init_define_import_meta_env();
 var import_jsx_runtime93 = __toESM(require_jsx_runtime(), 1);
 var HEADLINES_CONTENT_HEIGHT2 = "aspect-video w-full max-h-[11rem]";
@@ -69692,10 +69693,10 @@ function HomeHeadlinesWebPlaylistPanel({ embedsEnabled = true }) {
   );
 }
 
-// ../grarf/desktop/src/components/homeMvp/HomeRightRail.tsx
+// src/components/homeMvp/HomeRightRail.tsx
 init_isGrarfWebRenderer();
 
-// ../grarf/desktop/src/components/social/SocialRailHierarchyHeader.tsx
+// src/components/social/SocialRailHierarchyHeader.tsx
 init_define_import_meta_env();
 var import_jsx_runtime94 = __toESM(require_jsx_runtime(), 1);
 function SocialRailHierarchyHeader({
@@ -69738,7 +69739,7 @@ function SocialRailHierarchyHeader({
   );
 }
 
-// ../grarf/desktop/src/components/social/SocialRailPanel.tsx
+// src/components/social/SocialRailPanel.tsx
 init_define_import_meta_env();
 init_isGrarfWebRenderer();
 var import_jsx_runtime95 = __toESM(require_jsx_runtime(), 1);
@@ -69755,7 +69756,7 @@ function SocialRailPanel({ className, embedsEnabled, resolution }) {
   return /* @__PURE__ */ (0, import_jsx_runtime95.jsx)(SocialRssAppFeedPanel, { className });
 }
 
-// ../grarf/desktop/src/components/media/PersistentPodcastPlayer.tsx
+// src/components/media/PersistentPodcastPlayer.tsx
 init_define_import_meta_env();
 var import_jsx_runtime96 = __toESM(require_jsx_runtime(), 1);
 function fmt(sec) {
@@ -69828,7 +69829,7 @@ function PersistentPodcastPlayer() {
   );
 }
 
-// ../grarf/desktop/src/lib/perf/useDeferredMount.ts
+// src/lib/perf/useDeferredMount.ts
 init_define_import_meta_env();
 var import_react111 = __toESM(require_react(), 1);
 function useDeferredMount(delayMs = 900, enabled = true) {
@@ -69860,7 +69861,7 @@ function useDeferredMount(delayMs = 900, enabled = true) {
   return ready;
 }
 
-// ../grarf/desktop/src/components/homeMvp/HomeRightRail.tsx
+// src/components/homeMvp/HomeRightRail.tsx
 var import_jsx_runtime97 = __toESM(require_jsx_runtime(), 1);
 function HomeRightRail({
   activeGameId,
@@ -70019,19 +70020,19 @@ function HomeRightRail({
   ] });
 }
 
-// ../grarf/desktop/src/components/homeMvp/HomeSourceCardsSurface.tsx
+// src/components/homeMvp/HomeSourceCardsSurface.tsx
 init_define_import_meta_env();
 var import_react120 = __toESM(require_react(), 1);
 init_isGrarfWebRenderer();
 
-// ../grarf/desktop/src/components/league/LeagueHomePageLayout.tsx
+// src/components/league/LeagueHomePageLayout.tsx
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/components/league/LeagueHomePaneRail.tsx
+// src/components/league/LeagueHomePaneRail.tsx
 init_define_import_meta_env();
 var import_react114 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/lib/leagueHome/leagueHomePaneLayoutStorage.ts
+// src/lib/leagueHome/leagueHomePaneLayoutStorage.ts
 init_define_import_meta_env();
 var LEAGUE_HOME_PANE_MIN_WIDTH_PX = 300;
 var LEAGUE_HOME_PANE_LAYOUT_STORAGE_KEY = "grarf-league-home-pane-layouts";
@@ -70086,7 +70087,7 @@ function pickSavedPaneWidthsForRail(saved, paneIds) {
   return picked;
 }
 
-// ../grarf/desktop/src/store/leagueHomePaneLayoutStore.ts
+// src/store/leagueHomePaneLayoutStore.ts
 init_define_import_meta_env();
 var import_zustand38 = __toESM(require_zustand(), 1);
 var import_middleware = __toESM(require_middleware(), 1);
@@ -70116,7 +70117,7 @@ var useLeagueHomePaneLayoutStore = (0, import_zustand38.create)()(
   )
 );
 
-// ../grarf/desktop/src/components/league/leagueHomePaneFocus.tsx
+// src/components/league/leagueHomePaneFocus.tsx
 init_define_import_meta_env();
 var import_react113 = __toESM(require_react(), 1);
 var import_jsx_runtime98 = __toESM(require_jsx_runtime(), 1);
@@ -70156,7 +70157,7 @@ function LeagueHomePaneFocusHeaderActions() {
   return /* @__PURE__ */ (0, import_jsx_runtime98.jsx)("button", { type: "button", onClick: enterFullFocus, className: focusControlClass, children: "FULL" });
 }
 
-// ../grarf/desktop/src/components/league/LeagueHomePaneRail.tsx
+// src/components/league/LeagueHomePaneRail.tsx
 var import_jsx_runtime99 = __toESM(require_jsx_runtime(), 1);
 var PANE_RESIZE_HANDLE_WIDTH_PX = 8;
 var RAIL_PANE_WIDTH_RATIO = 0.45;
@@ -70512,10 +70513,10 @@ function LeagueHomePaneRail({
   ] });
 }
 
-// ../grarf/desktop/src/components/league/LeagueHomePanel.tsx
+// src/components/league/LeagueHomePanel.tsx
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/components/league/WebsitePaneSiteIcon.tsx
+// src/components/league/WebsitePaneSiteIcon.tsx
 init_define_import_meta_env();
 var import_react115 = __toESM(require_react(), 1);
 var import_jsx_runtime100 = __toESM(require_jsx_runtime(), 1);
@@ -70542,7 +70543,7 @@ function WebsitePaneSiteIcon({ url, className }) {
   );
 }
 
-// ../grarf/desktop/src/components/league/LeagueHomePanel.tsx
+// src/components/league/LeagueHomePanel.tsx
 var import_jsx_runtime101 = __toESM(require_jsx_runtime(), 1);
 var leagueHomePanelShellClass = "flex h-full min-h-0 min-w-0 flex-col overflow-hidden rounded-[2px] border border-[#24363c]/55 bg-[#010303] shadow-[inset_0_0_0_1px_rgba(10,20,24,0.92),inset_0_1px_0_rgba(86,247,255,0.02)]";
 var leagueHomePanelBodyWellClass = "shadow-[inset_0_2px_12px_rgba(0,0,0,0.42),inset_0_0_0_1px_rgba(36,54,60,0.22)]";
@@ -70641,7 +70642,7 @@ function LeagueHomePanelBadge({ children, className }) {
   );
 }
 
-// ../grarf/desktop/src/components/league/LeagueHomePageLayout.tsx
+// src/components/league/LeagueHomePageLayout.tsx
 var import_jsx_runtime102 = __toESM(require_jsx_runtime(), 1);
 var leagueHomeWorkspaceSurfaceClass = "bg-[#061214]";
 function PlaceholderRailPane({ label, hint }) {
@@ -70724,12 +70725,12 @@ function LeagueHomePageLayout({
   );
 }
 
-// ../grarf/desktop/src/components/homeMvp/HomeLeagueStackSection.tsx
+// src/components/homeMvp/HomeLeagueStackSection.tsx
 init_define_import_meta_env();
 var import_react119 = __toESM(require_react(), 1);
 init_isGrarfWebRenderer();
 
-// ../grarf/desktop/src/store/homeSourceFocusStore.ts
+// src/store/homeSourceFocusStore.ts
 init_define_import_meta_env();
 var import_zustand39 = __toESM(require_zustand(), 1);
 var useHomeSourceFocusStore = (0, import_zustand39.create)((set) => ({
@@ -70757,19 +70758,19 @@ var useHomeSourceFocusStore = (0, import_zustand39.create)((set) => ({
   clearWebFullscreenSessionKey: () => set({ webFullscreenSessionKey: null })
 }));
 
-// ../grarf/desktop/src/components/homeMvp/HomeSourceWebPane.tsx
+// src/components/homeMvp/HomeSourceWebPane.tsx
 init_define_import_meta_env();
 var import_react118 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/lib/home/homeWebPaneFrame.ts
+// src/lib/home/homeWebPaneFrame.ts
 init_define_import_meta_env();
 var HOME_WEB_PANE_FRAME_MARGIN_CLASS = "m-[25px]";
 var HOME_WEB_PANE_FRAME_HEIGHT_CLASS = "h-[calc(100%-50px)]";
 
-// ../grarf/desktop/src/lib/home/homeSourceFocusSourceSession.ts
+// src/lib/home/homeSourceFocusSourceSession.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/home/homeSourceWebPartition.ts
+// src/lib/home/homeSourceWebPartition.ts
 init_define_import_meta_env();
 function homeSourceWebPartition(url) {
   try {
@@ -70786,14 +70787,14 @@ function homeSourceFocusArticlePartition(url) {
   }
 }
 
-// ../grarf/desktop/src/lib/home/homeSourceWebEmbedUrl.ts
+// src/lib/home/homeSourceWebEmbedUrl.ts
 init_define_import_meta_env();
 function resolveHomeSourceEmbedUrl(url) {
   const trimmed = url.trim();
   return trimmed || url;
 }
 
-// ../grarf/desktop/src/lib/home/homeSourceFocusArticleNavigation.ts
+// src/lib/home/homeSourceFocusArticleNavigation.ts
 init_define_import_meta_env();
 function isSameDocumentHomeSourceNavigation(currentUrl, nextUrl) {
   if (!currentUrl || !nextUrl) return false;
@@ -70816,7 +70817,7 @@ function isHomeSourceArticleCandidateUrl(url) {
   }
 }
 
-// ../grarf/desktop/src/lib/home/homeSourceWebviewUrl.ts
+// src/lib/home/homeSourceWebviewUrl.ts
 init_define_import_meta_env();
 function readHomeSourceWebviewUrl(wv) {
   try {
@@ -70843,7 +70844,7 @@ async function probeHomeSourceWebviewUrl(wv) {
   return readHomeSourceWebviewUrl(wv);
 }
 
-// ../grarf/desktop/src/lib/home/homeSourceFocusSourceSession.ts
+// src/lib/home/homeSourceFocusSourceSession.ts
 init_isGrarfWebRenderer();
 var cardWebviews = /* @__PURE__ */ new Map();
 var cardHosts = /* @__PURE__ */ new Map();
@@ -71096,7 +71097,7 @@ function releaseHomeSourceFocusWebview(sessionKey) {
   returnBorrowedCardWebview(sessionKey);
 }
 
-// ../grarf/desktop/src/lib/home/homeSourceWebviewNavigation.ts
+// src/lib/home/homeSourceWebviewNavigation.ts
 init_define_import_meta_env();
 function isWebShimWebview(wv) {
   return wv.getAttribute?.("data-grarf-webview") != null;
@@ -71124,14 +71125,14 @@ function homeSourceWebviewGoHome(wv, homeUrl) {
   }
 }
 
-// ../grarf/desktop/src/components/homeMvp/HomeSourceWebPane.tsx
+// src/components/homeMvp/HomeSourceWebPane.tsx
 init_isGrarfWebRenderer();
 
-// ../grarf/desktop/src/components/homeMvp/HomeBrowserWebsitePanePlaceholder.tsx
+// src/components/homeMvp/HomeBrowserWebsitePanePlaceholder.tsx
 init_define_import_meta_env();
 var import_react116 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/data/gatedFeatures/browserWorkspace.ts
+// src/data/gatedFeatures/browserWorkspace.ts
 init_define_import_meta_env();
 var BROWSER_WORKSPACE_FEATURE_KEY = "browser-workspace";
 var BROWSER_WORKSPACE_GATED_FEATURE = {
@@ -71146,7 +71147,7 @@ var BROWSER_WORKSPACE_GATED_FEATURE = {
   ctaLabel: "Join Waitlist"
 };
 
-// ../grarf/desktop/src/components/homeMvp/HomeBrowserWebsitePanePlaceholder.tsx
+// src/components/homeMvp/HomeBrowserWebsitePanePlaceholder.tsx
 var import_jsx_runtime103 = __toESM(require_jsx_runtime(), 1);
 var LOGO_BOX_CLASS5 = "flex h-5 w-5 shrink-0 items-center justify-center";
 var BROWSER_DESTINATIONS = [
@@ -71273,7 +71274,7 @@ function HomeBrowserWebsitePanePlaceholder() {
   ] }) }) });
 }
 
-// ../grarf/desktop/src/components/homeMvp/WebsitePaneBrowserControls.tsx
+// src/components/homeMvp/WebsitePaneBrowserControls.tsx
 init_define_import_meta_env();
 var import_jsx_runtime104 = __toESM(require_jsx_runtime(), 1);
 var navButtonClass = "border border-line/80 px-1 py-0.5 font-mono text-[11px] leading-none text-textdim transition hover:border-cyansys/40 hover:text-cyansys";
@@ -71293,11 +71294,11 @@ function WebsitePaneBrowserControls({ onHome, className }) {
   ) });
 }
 
-// ../grarf/desktop/src/components/homeMvp/WebsitePaneBrowsingLayoutIndicator.tsx
+// src/components/homeMvp/WebsitePaneBrowsingLayoutIndicator.tsx
 init_define_import_meta_env();
 var import_react117 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/data/gatedFeatures/desktopBrowsing.ts
+// src/data/gatedFeatures/desktopBrowsing.ts
 init_define_import_meta_env();
 var DESKTOP_BROWSER_FEATURE_KEY = "desktop-browsing";
 var DESKTOP_BROWSER_HERO_VIDEO_SRC = "/videos/GRARF%20Fantasy.mp4";
@@ -71314,7 +71315,7 @@ var DESKTOP_BROWSER_GATED_FEATURE = {
   ctaLabel: "Join Waitlist"
 };
 
-// ../grarf/desktop/src/components/homeMvp/WebsitePaneBrowsingLayoutIndicator.tsx
+// src/components/homeMvp/WebsitePaneBrowsingLayoutIndicator.tsx
 init_isGrarfWebRenderer();
 var import_jsx_runtime105 = __toESM(require_jsx_runtime(), 1);
 var indicatorClassName = "inline-flex items-center gap-1 rounded-[2px] border border-line/25 bg-[#030909]/75 px-1.5 py-px shadow-[inset_0_1px_0_rgba(255,255,255,0.02)]";
@@ -71378,7 +71379,7 @@ function WebsitePaneBrowsingLayoutIndicator({ className }) {
   ] });
 }
 
-// ../grarf/desktop/src/components/homeMvp/HomeSourceWebPane.tsx
+// src/components/homeMvp/HomeSourceWebPane.tsx
 var import_jsx_runtime106 = __toESM(require_jsx_runtime(), 1);
 function HomeSourceWebPane({
   source,
@@ -71494,7 +71495,7 @@ function HomeSourceWebPane({
   );
 }
 
-// ../grarf/desktop/src/components/homeMvp/HomeLeagueStackSection.tsx
+// src/components/homeMvp/HomeLeagueStackSection.tsx
 var import_jsx_runtime107 = __toESM(require_jsx_runtime(), 1);
 function resolveFocusedWebsitePaneSourceId(root) {
   const rootRect = root.getBoundingClientRect();
@@ -71641,7 +71642,7 @@ var HomeLeagueStackSection = (0, import_react119.forwardRef)(function HomeLeague
   );
 });
 
-// ../grarf/desktop/src/components/homeMvp/HomeSourceCardsSurface.tsx
+// src/components/homeMvp/HomeSourceCardsSurface.tsx
 var import_jsx_runtime108 = __toESM(require_jsx_runtime(), 1);
 function HomeSourceCardsSurface({ className, onSourceArticleNavigate, onSourceFullscreen }) {
   const { activeSection } = useHomeActiveLeagueContext();
@@ -71694,11 +71695,11 @@ function HomeSourceCardsSurface({ className, onSourceArticleNavigate, onSourceFu
   );
 }
 
-// ../grarf/desktop/src/components/homeMvp/HomeSportscapeSurface.tsx
+// src/components/homeMvp/HomeSportscapeSurface.tsx
 init_define_import_meta_env();
 var import_react139 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/lib/home/homeActiveLeagueScrollTransition.ts
+// src/lib/home/homeActiveLeagueScrollTransition.ts
 init_define_import_meta_env();
 var HOME_LEAGUE_STACK_TRANSITION_MS = 280;
 function resolveSectionScrollTop(viewportEl, sectionEl) {
@@ -71725,7 +71726,7 @@ function animateScrollTop(viewportEl, targetTop, durationMs = HOME_LEAGUE_STACK_
   });
 }
 
-// ../grarf/desktop/src/data/homeSportscapeShells.ts
+// src/data/homeSportscapeShells.ts
 init_define_import_meta_env();
 var HOME_SPORTSCAPE_MLB_SHELL_ID = "sportscape-mlb-shell";
 var HOME_SPORTSCAPE_NHL_SHELL_ID = "sportscape-nhl-shell";
@@ -71776,11 +71777,11 @@ var MCWS_SPORTSCAPE_SHELL = createSportscapeShell({
   logoUrl: GAMES_SPINE_LEAGUE_LOGO_URL.NCAABB
 });
 
-// ../grarf/desktop/src/hooks/useMlbCatchupGameHighlightsMap.ts
+// src/hooks/useMlbCatchupGameHighlightsMap.ts
 init_define_import_meta_env();
 var import_react121 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/lib/mlbCatchUp/getYesterdayDateString.ts
+// src/lib/mlbCatchUp/getYesterdayDateString.ts
 init_define_import_meta_env();
 function getYesterdayDateString(now = /* @__PURE__ */ new Date()) {
   const yesterday = new Date(now);
@@ -71799,10 +71800,10 @@ function formatSportscapeCatchupBriefingTitle(now = /* @__PURE__ */ new Date()) 
   return `${monthDay} Briefing`;
 }
 
-// ../grarf/desktop/src/services/mlbRecaps/mlbCatchupHighlightsFeedGenerator.js
+// src/services/mlbRecaps/mlbCatchupHighlightsFeedGenerator.js
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/services/mlbRecaps/mlbCatchupHighlightsFetcher.js
+// src/services/mlbRecaps/mlbCatchupHighlightsFetcher.js
 init_define_import_meta_env();
 var MLB_STATS_API_BASE = "https://statsapi.mlb.com/api/v1";
 var FETCH_HEADERS = {
@@ -71901,7 +71902,7 @@ async function fetchMlbCatchupHighlightsForGame(gamePk, meta = {}) {
   return videos.map((video) => normalizeMlbCatchupHighlightVideo(video, gamePk, meta)).filter(Boolean);
 }
 
-// ../grarf/desktop/src/services/mlbRecaps/mlbCatchupHighlightsFeedGenerator.js
+// src/services/mlbRecaps/mlbCatchupHighlightsFeedGenerator.js
 function buildCatchupGameLabel(awayTeam, homeTeam) {
   const away = awayTeam.trim();
   const home = homeTeam.trim();
@@ -71944,7 +71945,7 @@ gameMaps=${gameCount}`);
   };
 }
 
-// ../grarf/desktop/src/hooks/useMlbCatchupGameHighlightsMap.ts
+// src/hooks/useMlbCatchupGameHighlightsMap.ts
 function useMlbCatchupGameHighlightsMap() {
   (0, import_react121.useEffect)(() => {
     let cancelled = false;
@@ -71969,17 +71970,17 @@ function useMlbCatchupGameHighlightsMap() {
   }, []);
 }
 
-// ../grarf/desktop/src/hooks/useNhlSportscapeArticles.ts
+// src/hooks/useNhlSportscapeArticles.ts
 init_define_import_meta_env();
 var import_react122 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/lib/sportscape/nhl/nhlEspnCatchupFeedGenerator.ts
+// src/lib/sportscape/nhl/nhlEspnCatchupFeedGenerator.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/sportscape/highlights/fetchSportscapeHighlightPlaylist.ts
+// src/lib/sportscape/highlights/fetchSportscapeHighlightPlaylist.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/sportscape/highlights/sportscapeHighlightSourceRegistry.ts
+// src/lib/sportscape/highlights/sportscapeHighlightSourceRegistry.ts
 init_define_import_meta_env();
 var SPORTSCAPE_HIGHLIGHT_SOURCE_REGISTRY = {
   NHL: {
@@ -72011,7 +72012,7 @@ function getSportscapeHighlightSource(league) {
   return SPORTSCAPE_HIGHLIGHT_SOURCE_REGISTRY[league];
 }
 
-// ../grarf/desktop/src/lib/sportscape/highlights/fetchSportscapeHighlightPlaylist.ts
+// src/lib/sportscape/highlights/fetchSportscapeHighlightPlaylist.ts
 async function fetchSportscapeHighlightPlaylist(league) {
   const source = getSportscapeHighlightSource(league);
   if (source.sourceType === "youtube_playlist") {
@@ -72023,19 +72024,19 @@ async function fetchSportscapeHighlightPlaylist(league) {
   throw new Error(`sportscape_highlight_source_unsupported:${league}:${source.sourceType}`);
 }
 
-// ../grarf/desktop/src/lib/sportscape/nhl/resolveNhlSportscapeHighlight.ts
+// src/lib/sportscape/nhl/resolveNhlSportscapeHighlight.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/sportscape/highlights/matchSportscapeHighlightByStrategy.ts
+// src/lib/sportscape/highlights/matchSportscapeHighlightByStrategy.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/sportscape/highlights/matchTeamsAndDateHighlight.ts
+// src/lib/sportscape/highlights/matchTeamsAndDateHighlight.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/livetrack/liveTrackTeamMetadata.ts
+// src/lib/livetrack/liveTrackTeamMetadata.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/livetrack/liveTrackNcaaBaseballTeams.ts
+// src/lib/livetrack/liveTrackNcaaBaseballTeams.ts
 init_define_import_meta_env();
 var LIVE_TRACK_NCAA_BASEBALL_TEAMS = [
   { names: ["Abilene Christian Wildcats", "Abilene Chrstn"], abbrev: "ACU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2000.png", tokenClass: "border-rose-400/35 bg-rose-400/[0.08] text-rose-200" },
@@ -72442,7 +72443,7 @@ var LIVE_TRACK_NCAA_BASEBALL_TEAMS = [
   { names: ["Youngstown State Penguins", "Youngstown St"], abbrev: "YSU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2754.png", tokenClass: "border-orange-400/40 bg-orange-400/[0.1] text-orange-200" }
 ];
 
-// ../grarf/desktop/src/lib/livetrack/wnbaTeamMetadata.ts
+// src/lib/livetrack/wnbaTeamMetadata.ts
 init_define_import_meta_env();
 function wnbaTeam(abbrev, displayName, nicknames = []) {
   const logoUrl = buildWnbaEspnLogoUrl(abbrev) ?? "";
@@ -72471,7 +72472,7 @@ var WNBA_TEAMS = [
   wnbaTeam("WSH", "Washington Mystics", ["Mystics"])
 ];
 
-// ../grarf/desktop/src/lib/livetrack/liveTrackTeamMetadata.ts
+// src/lib/livetrack/liveTrackTeamMetadata.ts
 var DEFAULT_TEAM_TOKEN_CLASS = "border-cyansys/35 bg-cyansys/[0.08] text-cyansys";
 var LIVE_TRACK_BRAND_TOKEN_BY_BUCKET = {
   mlb: {
@@ -72742,7 +72743,7 @@ var LIVE_TRACK_MLB_TEAM_COUNT = MLB_TEAMS.length;
 var LIVE_TRACK_NHL_TEAM_COUNT = NHL_TEAMS.length;
 var LIVE_TRACK_NCAA_BASEBALL_TEAM_COUNT = LIVE_TRACK_NCAA_BASEBALL_TEAMS.length;
 
-// ../grarf/desktop/src/lib/sportscape/highlights/matchTeamsAndDateHighlight.ts
+// src/lib/sportscape/highlights/matchTeamsAndDateHighlight.ts
 function buildTeamSearchTerms(teamName, sport) {
   const terms = /* @__PURE__ */ new Set();
   const trimmed = teamName.trim();
@@ -72853,7 +72854,7 @@ function matchTeamsAndDateHighlight(entries, params) {
   };
 }
 
-// ../grarf/desktop/src/lib/sportscape/highlights/matchSportscapeHighlightByStrategy.ts
+// src/lib/sportscape/highlights/matchSportscapeHighlightByStrategy.ts
 function matchSportscapeHighlightByStrategy(strategy, entries, params) {
   switch (strategy) {
     case "teams_and_date":
@@ -72863,7 +72864,7 @@ function matchSportscapeHighlightByStrategy(strategy, entries, params) {
   }
 }
 
-// ../grarf/desktop/src/lib/sportscape/nhl/pickEspnRecapHighlightVideo.ts
+// src/lib/sportscape/nhl/pickEspnRecapHighlightVideo.ts
 init_define_import_meta_env();
 function readEspnVideoWebHref(video) {
   const links = video.links;
@@ -72897,7 +72898,7 @@ function pickEspnRecapHighlightVideo(videos) {
   };
 }
 
-// ../grarf/desktop/src/lib/sportscape/nhl/resolveNhlSportscapeHighlight.ts
+// src/lib/sportscape/nhl/resolveNhlSportscapeHighlight.ts
 function resolveNhlSportscapeHighlight(params) {
   const { matchingStrategy } = getSportscapeHighlightSource("NHL");
   const youtube = matchSportscapeHighlightByStrategy(matchingStrategy, params.playlistEntries, {
@@ -72924,7 +72925,7 @@ function resolveNhlSportscapeHighlight(params) {
   };
 }
 
-// ../grarf/desktop/src/lib/sportscape/nhl/nhlEspnCatchupFeedGenerator.ts
+// src/lib/sportscape/nhl/nhlEspnCatchupFeedGenerator.ts
 var NHL_SCOREBOARD_URL = "https://site.api.espn.com/apis/site/v2/sports/hockey/nhl/scoreboard";
 var FETCH_HEADERS2 = {
   Accept: "application/json",
@@ -73032,13 +73033,13 @@ async function generateNhlEspnCatchupFeed(dateYmd = getYesterdayDateString()) {
   };
 }
 
-// ../grarf/desktop/src/lib/sportscape/nhl/nhlRecapToSportscapeScoreLines.ts
+// src/lib/sportscape/nhl/nhlRecapToSportscapeScoreLines.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/sportscape/resolveSportscapeTeamIdentity.ts
+// src/lib/sportscape/resolveSportscapeTeamIdentity.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/gamesSpine/worldCupCountryLogoUrl.ts
+// src/lib/gamesSpine/worldCupCountryLogoUrl.ts
 init_define_import_meta_env();
 function buildWorldCupCountryLogoUrl(abbrev) {
   const trimmed = abbrev?.trim();
@@ -73046,7 +73047,7 @@ function buildWorldCupCountryLogoUrl(abbrev) {
   return `https://a.espncdn.com/i/teamlogos/countries/500/${trimmed.toLowerCase()}.png`;
 }
 
-// ../grarf/desktop/src/lib/sportscape/soccerCountryAbbrev.ts
+// src/lib/sportscape/soccerCountryAbbrev.ts
 init_define_import_meta_env();
 var SOCCER_COUNTRY_ABBREV_BY_NAME = {
   algeria: "ALG",
@@ -73149,7 +73150,7 @@ function resolveSoccerCountryAbbrev(teamName) {
   return void 0;
 }
 
-// ../grarf/desktop/src/lib/sportscape/resolveSportscapeTeamIdentity.ts
+// src/lib/sportscape/resolveSportscapeTeamIdentity.ts
 function abbrevFromSportscapeLogoUrl(logoUrl) {
   if (!logoUrl) return void 0;
   const countryMatch = logoUrl.match(/\/countries\/\d+\/([^.]+)\.png/i);
@@ -73281,7 +73282,7 @@ function buildSportscapeMatchupScoreLines(input) {
   return [away, { ...home, homeLogoUrl: home.logoUrl }];
 }
 
-// ../grarf/desktop/src/lib/sportscape/nhl/nhlRecapToSportscapeScoreLines.ts
+// src/lib/sportscape/nhl/nhlRecapToSportscapeScoreLines.ts
 function nhlRecapToSportscapeScoreLines(recap) {
   return buildSportscapeMatchupScoreLines({
     sport: "nhl",
@@ -73292,7 +73293,7 @@ function nhlRecapToSportscapeScoreLines(recap) {
   });
 }
 
-// ../grarf/desktop/src/hooks/useNhlSportscapeArticles.ts
+// src/hooks/useNhlSportscapeArticles.ts
 function mapNhlRecapToArticle(recap) {
   return {
     eventId: recap.eventId,
@@ -73342,17 +73343,17 @@ espnHighlightsLoaded=${feed.espnHighlightsLoaded}`
   return articles;
 }
 
-// ../grarf/desktop/src/hooks/useWnbaSportscapeArticles.ts
+// src/hooks/useWnbaSportscapeArticles.ts
 init_define_import_meta_env();
 var import_react123 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/lib/sportscape/wnba/wnbaEspnCatchupFeedGenerator.ts
+// src/lib/sportscape/wnba/wnbaEspnCatchupFeedGenerator.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/sportscape/wnba/resolveWnbaSportscapeHighlight.ts
+// src/lib/sportscape/wnba/resolveWnbaSportscapeHighlight.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/sportscape/wnba/matchWnbaYoutubePlaylistHighlight.ts
+// src/lib/sportscape/wnba/matchWnbaYoutubePlaylistHighlight.ts
 init_define_import_meta_env();
 function normalizeText(value) {
   return value.trim().toLowerCase();
@@ -73429,7 +73430,7 @@ function matchWnbaYoutubePlaylistHighlight(entries, params) {
   };
 }
 
-// ../grarf/desktop/src/lib/sportscape/wnba/resolveWnbaSportscapeHighlight.ts
+// src/lib/sportscape/wnba/resolveWnbaSportscapeHighlight.ts
 function resolveWnbaSportscapeHighlight(params) {
   const matchParams = {
     awayTeam: params.awayTeam,
@@ -73459,7 +73460,7 @@ function resolveWnbaSportscapeHighlight(params) {
   };
 }
 
-// ../grarf/desktop/src/lib/sportscape/wnba/wnbaEspnCatchupFeedGenerator.ts
+// src/lib/sportscape/wnba/wnbaEspnCatchupFeedGenerator.ts
 var WNBA_SCOREBOARD_URL = "https://site.api.espn.com/apis/site/v2/sports/basketball/wnba/scoreboard";
 var FETCH_HEADERS3 = {
   Accept: "application/json",
@@ -73604,7 +73605,7 @@ async function generateWnbaEspnCatchupFeed(dateYmd = getYesterdayDateString()) {
   };
 }
 
-// ../grarf/desktop/src/lib/sportscape/wnba/wnbaRecapToSportscapeScoreLines.ts
+// src/lib/sportscape/wnba/wnbaRecapToSportscapeScoreLines.ts
 init_define_import_meta_env();
 function wnbaRecapToSportscapeScoreLines(recap) {
   return buildSportscapeMatchupScoreLines({
@@ -73621,7 +73622,7 @@ function wnbaRecapToSportscapeScoreLines(recap) {
   });
 }
 
-// ../grarf/desktop/src/hooks/useWnbaSportscapeArticles.ts
+// src/hooks/useWnbaSportscapeArticles.ts
 function mapWnbaRecapToArticle(recap) {
   return {
     eventId: recap.eventId,
@@ -73671,14 +73672,14 @@ espnHighlightsLoaded=${feed.espnHighlightsLoaded}`
   return articles;
 }
 
-// ../grarf/desktop/src/hooks/useWorldCupSportscapeArticles.ts
+// src/hooks/useWorldCupSportscapeArticles.ts
 init_define_import_meta_env();
 var import_react124 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/lib/sportscape/worldCup/worldCupEspnCatchupFeedGenerator.ts
+// src/lib/sportscape/worldCup/worldCupEspnCatchupFeedGenerator.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/sportscape/worldCup/resolveWorldCupSportscapeHighlight.ts
+// src/lib/sportscape/worldCup/resolveWorldCupSportscapeHighlight.ts
 init_define_import_meta_env();
 function resolveWorldCupSportscapeHighlight(params) {
   const { matchingStrategy } = getSportscapeHighlightSource("WORLD_CUP");
@@ -73706,7 +73707,7 @@ function resolveWorldCupSportscapeHighlight(params) {
   };
 }
 
-// ../grarf/desktop/src/lib/sportscape/worldCup/worldCupEspnCatchupFeedGenerator.ts
+// src/lib/sportscape/worldCup/worldCupEspnCatchupFeedGenerator.ts
 var WORLD_CUP_SCOREBOARD_URL = "https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard";
 var FETCH_HEADERS4 = {
   Accept: "application/json",
@@ -73843,7 +73844,7 @@ async function generateWorldCupEspnCatchupFeed(dateYmd = getYesterdayDateString(
   };
 }
 
-// ../grarf/desktop/src/lib/sportscape/worldCup/worldCupRecapToSportscapeScoreLines.ts
+// src/lib/sportscape/worldCup/worldCupRecapToSportscapeScoreLines.ts
 init_define_import_meta_env();
 function worldCupRecapToSportscapeScoreLines(recap) {
   return buildSportscapeMatchupScoreLines({
@@ -73859,7 +73860,7 @@ function worldCupRecapToSportscapeScoreLines(recap) {
   });
 }
 
-// ../grarf/desktop/src/hooks/useWorldCupSportscapeArticles.ts
+// src/hooks/useWorldCupSportscapeArticles.ts
 function mapWorldCupRecapToArticle(recap) {
   return {
     eventId: recap.eventId,
@@ -73909,14 +73910,14 @@ espnHighlightsLoaded=${feed.espnHighlightsLoaded}`
   return articles;
 }
 
-// ../grarf/desktop/src/hooks/useWorldCupSportscapeGameScores.ts
+// src/hooks/useWorldCupSportscapeGameScores.ts
 init_define_import_meta_env();
 var import_react125 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/lib/sportscape/worldCup/fetchWorldCupScoreboardGameScoresByEventId.ts
+// src/lib/sportscape/worldCup/fetchWorldCupScoreboardGameScoresByEventId.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/sportscape/worldCup/readWorldCupScoreboardEventGame.ts
+// src/lib/sportscape/worldCup/readWorldCupScoreboardEventGame.ts
 init_define_import_meta_env();
 function readCompetitorScore4(competitor) {
   const parsed = Number.parseInt(String(competitor?.score ?? "").trim(), 10);
@@ -73949,7 +73950,7 @@ function readWorldCupScoreboardEventGame(event) {
   };
 }
 
-// ../grarf/desktop/src/lib/sportscape/worldCup/fetchWorldCupScoreboardGameScoresByEventId.ts
+// src/lib/sportscape/worldCup/fetchWorldCupScoreboardGameScoresByEventId.ts
 var WORLD_CUP_SCOREBOARD_URL2 = "https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard";
 var FETCH_HEADERS5 = {
   Accept: "application/json",
@@ -73996,16 +73997,16 @@ async function fetchWorldCupScoreboardGameScoresByEventId(dateYmds = buildWorldC
   return out;
 }
 
-// ../grarf/desktop/src/lib/sportscape/resolveSportscapeGameScoreLines.ts
+// src/lib/sportscape/resolveSportscapeGameScoreLines.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/sportscape/editorial/sportscapeEditorialLeagueMapping.ts
+// src/lib/sportscape/editorial/sportscapeEditorialLeagueMapping.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/sportscape/editorial/collectFinalizedSportscapeEditorialEventsFromGamesSpine.ts
+// src/lib/sportscape/editorial/collectFinalizedSportscapeEditorialEventsFromGamesSpine.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/sportscape/editorial/sportscapeEditorialLeagueMapping.ts
+// src/lib/sportscape/editorial/sportscapeEditorialLeagueMapping.ts
 var SPORTSCAPE_EDITORIAL_SOURCE_LEAGUES = {
   MLB: "MLB",
   NHL: "NHL",
@@ -74125,7 +74126,7 @@ function listSportscapeEditorialAdminLeagueSections(grouped) {
   return sections;
 }
 
-// ../grarf/desktop/src/lib/sportscape/resolveSportscapeScoreSideLabel.ts
+// src/lib/sportscape/resolveSportscapeScoreSideLabel.ts
 init_define_import_meta_env();
 function inferSportscapeScoreSportFromEditorialLeague(league) {
   switch (league) {
@@ -74178,7 +74179,7 @@ function normalizeSportscapeScoreLines(lines, sport) {
   });
 }
 
-// ../grarf/desktop/src/lib/sportscape/resolveSportscapeGameScoreLines.ts
+// src/lib/sportscape/resolveSportscapeGameScoreLines.ts
 function snapshotToSportscapeScoreLines(snapshot, sport = "ncaa") {
   return buildSportscapeMatchupScoreLines({
     sport,
@@ -74275,7 +74276,7 @@ function resolveSportscapeArticleScoreLines(article, sport, sources) {
   return void 0;
 }
 
-// ../grarf/desktop/src/hooks/useWorldCupSportscapeGameScores.ts
+// src/hooks/useWorldCupSportscapeGameScores.ts
 function mergeWorldCupScoreSnapshots(scoreboard, liveLeagues) {
   const merged = new Map(scoreboard);
   const spineGames = liveLeagues.WORLDCUP ?? [];
@@ -74325,14 +74326,14 @@ eventIds=${[...next.keys()].join(", ") || "(none)"}`
   );
 }
 
-// ../grarf/desktop/src/hooks/useMcwsSportscapeArticles.ts
+// src/hooks/useMcwsSportscapeArticles.ts
 init_define_import_meta_env();
 var import_react126 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/lib/sportscape/mcws/mcwsEspnCatchupFeedGenerator.ts
+// src/lib/sportscape/mcws/mcwsEspnCatchupFeedGenerator.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/sportscape/mcws/resolveMcwsSportscapeHighlight.ts
+// src/lib/sportscape/mcws/resolveMcwsSportscapeHighlight.ts
 init_define_import_meta_env();
 function resolveMcwsSportscapeHighlight(params) {
   const { matchingStrategy } = getSportscapeHighlightSource("MCWS");
@@ -74360,7 +74361,7 @@ function resolveMcwsSportscapeHighlight(params) {
   };
 }
 
-// ../grarf/desktop/src/lib/sportscape/mcws/readMcwsScoreboardEventGame.ts
+// src/lib/sportscape/mcws/readMcwsScoreboardEventGame.ts
 init_define_import_meta_env();
 function readCompetitorScore5(competitor) {
   const parsed = Number.parseInt(String(competitor?.score ?? "").trim(), 10);
@@ -74391,7 +74392,7 @@ function readMcwsScoreboardEventGame(event) {
   };
 }
 
-// ../grarf/desktop/src/lib/sportscape/mcws/mcwsEspnCatchupFeedGenerator.ts
+// src/lib/sportscape/mcws/mcwsEspnCatchupFeedGenerator.ts
 var FETCH_HEADERS6 = {
   Accept: "application/json",
   "User-Agent": "Mozilla/5.0 (compatible; GrarfMcwsSportscape/1.0)"
@@ -74492,7 +74493,7 @@ async function generateMcwsEspnCatchupFeed(dateYmd = getYesterdayDateString()) {
   };
 }
 
-// ../grarf/desktop/src/lib/sportscape/mcws/mcwsRecapToSportscapeScoreLines.ts
+// src/lib/sportscape/mcws/mcwsRecapToSportscapeScoreLines.ts
 init_define_import_meta_env();
 function mcwsRecapToSportscapeScoreLines(recap) {
   return buildSportscapeMatchupScoreLines({
@@ -74508,7 +74509,7 @@ function mcwsRecapToSportscapeScoreLines(recap) {
   });
 }
 
-// ../grarf/desktop/src/hooks/useMcwsSportscapeArticles.ts
+// src/hooks/useMcwsSportscapeArticles.ts
 function mapMcwsRecapToArticle(recap) {
   return {
     eventId: recap.eventId,
@@ -74558,11 +74559,11 @@ espnHighlightsLoaded=${feed.espnHighlightsLoaded}`
   return articles;
 }
 
-// ../grarf/desktop/src/hooks/useMcwsSportscapeGameScores.ts
+// src/hooks/useMcwsSportscapeGameScores.ts
 init_define_import_meta_env();
 var import_react127 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/lib/sportscape/mcws/fetchMcwsScoreboardGameScoresByEventId.ts
+// src/lib/sportscape/mcws/fetchMcwsScoreboardGameScoresByEventId.ts
 init_define_import_meta_env();
 var FETCH_HEADERS7 = {
   Accept: "application/json",
@@ -74594,7 +74595,7 @@ async function fetchMcwsScoreboardGameScoresByEventId(dateYmd = getYesterdayDate
   return out;
 }
 
-// ../grarf/desktop/src/hooks/useMcwsSportscapeGameScores.ts
+// src/hooks/useMcwsSportscapeGameScores.ts
 function useMcwsSportscapeGameScores() {
   const [scoresByEventId, setScoresByEventId] = (0, import_react127.useState)(() => /* @__PURE__ */ new Map());
   (0, import_react127.useEffect)(() => {
@@ -74621,15 +74622,15 @@ eventIds=${[...next.keys()].join(", ") || "(none)"}`
   return scoresByEventId;
 }
 
-// ../grarf/desktop/src/hooks/useMlbSportscapeArticles.ts
+// src/hooks/useMlbSportscapeArticles.ts
 init_define_import_meta_env();
 var import_react129 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/hooks/useMlbCatchupHeadlines.ts
+// src/hooks/useMlbCatchupHeadlines.ts
 init_define_import_meta_env();
 var import_react128 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/lib/sportscape/mlb/buildMlbArticleScoreLines.ts
+// src/lib/sportscape/mlb/buildMlbArticleScoreLines.ts
 init_define_import_meta_env();
 function buildMlbArticleScoreLines(article) {
   if (article.gamePk == null) return void 0;
@@ -74651,10 +74652,10 @@ function buildMlbArticleScoreLines(article) {
   });
 }
 
-// ../grarf/desktop/src/services/mlbRecaps/mlbCatchupFeedGenerator.js
+// src/services/mlbRecaps/mlbCatchupFeedGenerator.js
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/services/mlbRecaps/mlbRecapFetcher.js
+// src/services/mlbRecaps/mlbRecapFetcher.js
 init_define_import_meta_env();
 var MLB_STATS_API_BASE2 = "https://statsapi.mlb.com/api/v1";
 var FETCH_HEADERS8 = {
@@ -74819,7 +74820,7 @@ async function fetchMlbRecapsForDate(date) {
   return results;
 }
 
-// ../grarf/desktop/src/services/mlbRecaps/mlbGameRecapFilter.js
+// src/services/mlbRecaps/mlbGameRecapFilter.js
 init_define_import_meta_env();
 var POSITIVE_SIGNALS = [
   /\bbeat\b/i,
@@ -74979,7 +74980,7 @@ excluded=${excluded.length}`);
   return { included, excluded };
 }
 
-// ../grarf/desktop/src/services/mlbRecaps/mlbCatchupFeedGenerator.js
+// src/services/mlbRecaps/mlbCatchupFeedGenerator.js
 var MLB_STATS_API_BASE3 = "https://statsapi.mlb.com/api/v1";
 var FETCH_HEADERS9 = {
   Accept: "application/json",
@@ -75114,7 +75115,7 @@ async function generateMlbCatchupFeed(date) {
   };
 }
 
-// ../grarf/desktop/src/hooks/useMlbCatchupHeadlines.ts
+// src/hooks/useMlbCatchupHeadlines.ts
 function mapCatchupFeedArticle(article) {
   const articleUrl = article.articleUrl?.trim();
   const mapped = {
@@ -75167,7 +75168,7 @@ headlinesLoaded=${feed.headlinesLoaded}`
   return articles;
 }
 
-// ../grarf/desktop/src/lib/sportscape/mlb/collectMlbSpineGames.ts
+// src/lib/sportscape/mlb/collectMlbSpineGames.ts
 init_define_import_meta_env();
 function mlbSpineGamePkFromRow(game) {
   if (typeof game.gamePk === "number" && Number.isFinite(game.gamePk) && game.gamePk > 0) {
@@ -75214,7 +75215,7 @@ function findMlbSpineGameByGamePk(games, gamePk) {
   return games.find((game) => mlbSpineGamesMatchGamePk(game, gamePk));
 }
 
-// ../grarf/desktop/src/lib/sportscape/mlb/mlbGameToSportscapeScoreLines.ts
+// src/lib/sportscape/mlb/mlbGameToSportscapeScoreLines.ts
 init_define_import_meta_env();
 function mlbGameToSportscapeScoreLines(game) {
   const awayScore = typeof game.awayScore === "number" && Number.isFinite(game.awayScore) ? String(game.awayScore) : "";
@@ -75233,7 +75234,7 @@ function mlbGameToSportscapeScoreLines(game) {
   });
 }
 
-// ../grarf/desktop/src/hooks/useMlbSportscapeArticles.ts
+// src/hooks/useMlbSportscapeArticles.ts
 var EMPTY_MLB_GAMES = [];
 function attachSpineScoreIfNeeded(article, spineGames) {
   if (article.scoreLines?.length || article.gamePk == null) return article;
@@ -75270,7 +75271,7 @@ function useMlbSportscapeArticles() {
   }, [catchupArticles, liveMlb, retainedById, scheduleByDate]);
 }
 
-// ../grarf/desktop/src/hooks/useSportscapeEditorialDocument.ts
+// src/hooks/useSportscapeEditorialDocument.ts
 init_define_import_meta_env();
 var import_react130 = __toESM(require_react(), 1);
 var EMPTY_DOCUMENT = {
@@ -75306,7 +75307,7 @@ function useSportscapeEditorialDocument() {
   return document2;
 }
 
-// ../grarf/desktop/src/lib/mlbCatchUp/openMlbCatchupGameExperience.ts
+// src/lib/mlbCatchUp/openMlbCatchupGameExperience.ts
 init_define_import_meta_env();
 function buildHistoricalMlbCatchupGame({
   gamePk,
@@ -75386,10 +75387,10 @@ gamePk=${gamePk}`);
   return tab;
 }
 
-// ../grarf/desktop/src/lib/sportscape/editorial/mergeSportscapeArticlesWithEditorial.ts
+// src/lib/sportscape/editorial/mergeSportscapeArticlesWithEditorial.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/sportscape/editorial/isCompleteSportscapeEditorialEntry.ts
+// src/lib/sportscape/editorial/isCompleteSportscapeEditorialEntry.ts
 init_define_import_meta_env();
 function isCompleteSportscapeEditorialEntry(entry) {
   return Boolean(
@@ -75400,16 +75401,16 @@ function filterCompleteSportscapeEditorialEntries(entries) {
   return entries.filter(isCompleteSportscapeEditorialEntry);
 }
 
-// ../grarf/desktop/src/lib/sportscape/editorial/sportscapeEditorialVisibility.ts
+// src/lib/sportscape/editorial/sportscapeEditorialVisibility.ts
 init_define_import_meta_env();
 function editorialEntryShowsInLeagueSection(entry) {
   return entry.showInLeagueSection !== false;
 }
 
-// ../grarf/desktop/src/lib/sportscape/editorial/resolveEditorialHighlightPresentation.ts
+// src/lib/sportscape/editorial/resolveEditorialHighlightPresentation.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/sportscape/editorial/parseEditorialHighlightUrl.ts
+// src/lib/sportscape/editorial/parseEditorialHighlightUrl.ts
 init_define_import_meta_env();
 function parseEditorialHighlightUrl(highlightUrl) {
   const trimmed = highlightUrl.trim();
@@ -75424,7 +75425,7 @@ function parseEditorialHighlightUrl(highlightUrl) {
   };
 }
 
-// ../grarf/desktop/src/lib/sportscape/editorial/resolveEditorialHighlightPresentation.ts
+// src/lib/sportscape/editorial/resolveEditorialHighlightPresentation.ts
 function resolveEditorialHighlightPresentation(entry) {
   const highlightVideoUrl = entry.highlightUrl.trim();
   const destination = parseEditorialHighlightUrl(highlightVideoUrl);
@@ -75445,7 +75446,7 @@ function resolveEditorialHighlightPresentation(entry) {
   };
 }
 
-// ../grarf/desktop/src/lib/sportscape/editorial/mergeSportscapeArticlesWithEditorial.ts
+// src/lib/sportscape/editorial/mergeSportscapeArticlesWithEditorial.ts
 var AUTOMATED_SPORTSCAPE_EDITORIAL_LEAGUES = [
   "MLB",
   "NHL",
@@ -75608,44 +75609,44 @@ function mergeSportscapeArticlesWithEditorial(params) {
   return merged;
 }
 
-// ../grarf/desktop/src/components/homeMvp/HomeSportscapeCard.tsx
+// src/components/homeMvp/HomeSportscapeCard.tsx
 init_define_import_meta_env();
 var import_react135 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/lib/sportscape/sportscapeExpansionPanel.ts
+// src/lib/sportscape/sportscapeExpansionPanel.ts
 init_define_import_meta_env();
 var sportscapeExpansionPanelShellClass = "rounded-[2px] border border-[#24363c]/55 bg-[#010303] shadow-[inset_0_0_0_1px_rgba(10,20,24,0.92),inset_0_1px_0_rgba(86,247,255,0.02)]";
 
-// ../grarf/desktop/src/hooks/useMlbAllGamesHighlight.ts
+// src/hooks/useMlbAllGamesHighlight.ts
 init_define_import_meta_env();
 var import_react131 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/store/mlbAllGamesHighlightStore.ts
+// src/store/mlbAllGamesHighlightStore.ts
 init_define_import_meta_env();
 var import_zustand40 = __toESM(require_zustand(), 1);
 
-// ../grarf/desktop/src/lib/youtubeAllGamesHighlight.ts
+// src/lib/youtubeAllGamesHighlight.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/data/youtubeAllGamesConfig.ts
+// src/data/youtubeAllGamesConfig.ts
 init_define_import_meta_env();
 init_youtubeClipSources();
 var mlb = YOUTUBE_CLIP_SOURCES.find((s2) => s2.league === "MLB");
 var MLB_OFFICIAL_UPLOADS_CHANNEL_ID = mlb?.channelId ?? "UCoLrcjPV5PbUrUyXq5mjc_A";
 var ALL_GAMES_HIGHLIGHT_TITLE_SUBSTRING = "Highlights from ALL GAMES";
 
-// ../grarf/desktop/src/lib/mlbCatchUp/mlbAllGamesHighlightDate.ts
+// src/lib/mlbCatchUp/mlbAllGamesHighlightDate.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/data/youtubeLineLabsConfig.ts
+// src/data/youtubeLineLabsConfig.ts
 init_define_import_meta_env();
 var LINE_LABS_CHANNEL_ID = "UCEpBWs16r--279Oi-kKfuHg";
 var LINE_LABS_MLB_PICKS_TITLE_SUBSTRING = "MLB PICKS";
 
-// ../grarf/desktop/src/lib/youtubeAllGamesHighlightWeb.ts
+// src/lib/youtubeAllGamesHighlightWeb.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/youtubeAllGamesHighlightShared.ts
+// src/lib/youtubeAllGamesHighlightShared.ts
 init_define_import_meta_env();
 async function resolveAllGamesHighlight2(params, options) {
   return resolveAllGamesHighlight(
@@ -75654,7 +75655,7 @@ async function resolveAllGamesHighlight2(params, options) {
   );
 }
 
-// ../grarf/desktop/src/lib/youtubeAllGamesHighlightWeb.ts
+// src/lib/youtubeAllGamesHighlightWeb.ts
 init_resolveYoutubeChannelRssUrl();
 function hasElectronAllGamesBridge() {
   return typeof window.grarf?.youtubeFetchAllGamesHighlight === "function";
@@ -75678,7 +75679,7 @@ async function fetchAllGamesHighlightOnWeb(params) {
   return fetchAllGamesHighlightViaWebRss(params);
 }
 
-// ../grarf/desktop/src/lib/youtubeAllGamesHighlight.ts
+// src/lib/youtubeAllGamesHighlight.ts
 async function fetchAllGamesHighlight(params) {
   const fn2 = window.grarf?.youtubeFetchAllGamesHighlight;
   if (fn2) return fn2(params);
@@ -75729,7 +75730,7 @@ function allGamesHighlightToCardItem(v2) {
   };
 }
 
-// ../grarf/desktop/src/store/mlbAllGamesHighlightStore.ts
+// src/store/mlbAllGamesHighlightStore.ts
 var REFRESH_MS = 6 * 60 * 60 * 1e3;
 var STORAGE_KEY8 = "grarf.mlbAllGamesHighlight.v4";
 function isValidAllGamesHighlight(item, targetSlateDateYmd = getMlbAllGamesHighlightTargetSlateDate()) {
@@ -75891,7 +75892,7 @@ title=${next.title}`
   };
 });
 
-// ../grarf/desktop/src/hooks/useMlbAllGamesHighlight.ts
+// src/hooks/useMlbAllGamesHighlight.ts
 function useMlbAllGamesDisplayHighlight(enabled = true, logLocation) {
   const displayHighlight = useMlbAllGamesHighlightStore((s2) => s2.displayHighlight);
   const authoritativeHighlight = useMlbAllGamesHighlightStore((s2) => s2.authoritativeHighlight);
@@ -75916,7 +75917,7 @@ function useMlbAllGamesDisplayHighlight(enabled = true, logLocation) {
   };
 }
 
-// ../grarf/desktop/src/lib/sportscape/openSportscapeHighlightInBrowser.ts
+// src/lib/sportscape/openSportscapeHighlightInBrowser.ts
 init_define_import_meta_env();
 init_isGrarfWebRenderer();
 function openSportscapeArticleInBrowser(url) {
@@ -75932,7 +75933,7 @@ function openSportscapeHighlightInBrowser(videoId, sourceUrl) {
   return true;
 }
 
-// ../grarf/desktop/src/lib/sportscape/sportscapeArticleRowLayout.ts
+// src/lib/sportscape/sportscapeArticleRowLayout.ts
 init_define_import_meta_env();
 var SPORTSCAPE_ARTICLE_ROW_GUTTER_PX = 35;
 var SPORTSCAPE_ARTICLE_SCORE_COLUMN_WIDTH = "5.75rem";
@@ -75944,7 +75945,7 @@ var SPORTSCAPE_ARTICLE_SCORE_PANEL_CLASS = "box-border rounded-[2px] bg-[#060c0c
 var SPORTSCAPE_ARTICLE_THUMBNAIL_COLUMN_CLASS = "box-border flex w-[4rem] min-w-[4rem] max-w-[4rem] shrink-0 grow-0 items-center self-stretch";
 var SPORTSCAPE_ARTICLE_HEADLINE_COLUMN_CLASS = "min-w-0 flex-[1_1_auto]";
 
-// ../grarf/desktop/src/components/homeMvp/MlbSportscapeArticleScoreBlock.tsx
+// src/components/homeMvp/MlbSportscapeArticleScoreBlock.tsx
 init_define_import_meta_env();
 var import_react132 = __toESM(require_react(), 1);
 var import_jsx_runtime109 = __toESM(require_jsx_runtime(), 1);
@@ -76038,11 +76039,11 @@ function SportscapeArticleScoreBlock({
   );
 }
 
-// ../grarf/desktop/src/components/homeMvp/SportscapeArticleGameHighlight.tsx
+// src/components/homeMvp/SportscapeArticleGameHighlight.tsx
 init_define_import_meta_env();
 init_isGrarfWebRenderer();
 
-// ../grarf/desktop/src/components/homeMvp/SportscapeArticleHighlightPlaceholder.tsx
+// src/components/homeMvp/SportscapeArticleHighlightPlaceholder.tsx
 init_define_import_meta_env();
 var import_jsx_runtime110 = __toESM(require_jsx_runtime(), 1);
 var SPORTSCAPE_ARTICLE_HIGHLIGHT_PLACEHOLDER_CLASS = "box-border h-[2.25rem] w-[4rem] shrink-0 rounded-[2px] border border-[#24363c]/55 bg-[#060c0c]";
@@ -76057,7 +76058,7 @@ function SportscapeArticleHighlightPlaceholder({ className }) {
   );
 }
 
-// ../grarf/desktop/src/components/homeMvp/SportscapeArticleGameHighlight.tsx
+// src/components/homeMvp/SportscapeArticleGameHighlight.tsx
 var import_jsx_runtime111 = __toESM(require_jsx_runtime(), 1);
 function SportscapeArticleGameHighlight({
   gamePk,
@@ -76108,7 +76109,7 @@ function SportscapeArticleGameHighlight({
   return /* @__PURE__ */ (0, import_jsx_runtime111.jsx)("div", { className: frameClass, "data-slot": "sportscape-article-highlight-thumbnail", "aria-hidden": true, children: image });
 }
 
-// ../grarf/desktop/src/components/homeMvp/SportscapeArticleEspnVideoHighlight.tsx
+// src/components/homeMvp/SportscapeArticleEspnVideoHighlight.tsx
 init_define_import_meta_env();
 init_isGrarfWebRenderer();
 var import_jsx_runtime112 = __toESM(require_jsx_runtime(), 1);
@@ -76167,18 +76168,18 @@ function SportscapeArticleEspnVideoHighlight({
   return /* @__PURE__ */ (0, import_jsx_runtime112.jsx)("div", { className: frameClass, "data-slot": "sportscape-article-highlight-thumbnail", "aria-hidden": true, children: image });
 }
 
-// ../grarf/desktop/src/components/homeMvp/SportscapeMlbCompactHeaderActions.tsx
+// src/components/homeMvp/SportscapeMlbCompactHeaderActions.tsx
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/data/leagueSpotifyPodcasts.ts
+// src/data/leagueSpotifyPodcasts.ts
 init_define_import_meta_env();
 var MLB_MORNING_LINEUP_SPOTIFY_SHOW_ID = "3NxxfRcrOJ2YC5kTD83U9B";
 
-// ../grarf/desktop/src/hooks/useSpotifyLatestEpisode.ts
+// src/hooks/useSpotifyLatestEpisode.ts
 init_define_import_meta_env();
 var import_react133 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/lib/spotifyLatestEpisode.ts
+// src/lib/spotifyLatestEpisode.ts
 init_define_import_meta_env();
 async function invokeSpotifyLatestEpisode(showId) {
   const fn2 = window.grarf?.spotifyFetchLatestEpisode;
@@ -76188,7 +76189,7 @@ async function invokeSpotifyLatestEpisode(showId) {
   return res;
 }
 
-// ../grarf/desktop/src/hooks/useSpotifyLatestEpisode.ts
+// src/hooks/useSpotifyLatestEpisode.ts
 var REFRESH_MS2 = 45 * 60 * 1e3;
 function useSpotifyLatestEpisode(showId) {
   const [state3, setState] = (0, import_react133.useState)({ status: "loading" });
@@ -76253,16 +76254,16 @@ function useSpotifyLatestEpisode(showId) {
   return state3;
 }
 
-// ../grarf/desktop/src/components/homeMvp/SportscapeMlbCompactHeaderActions.tsx
+// src/components/homeMvp/SportscapeMlbCompactHeaderActions.tsx
 init_isGrarfWebRenderer();
 
-// ../grarf/desktop/src/lib/spotify/spotifyEpisodeOpenUrl.ts
+// src/lib/spotify/spotifyEpisodeOpenUrl.ts
 init_define_import_meta_env();
 function spotifyEpisodeOpenUrl(episodeId) {
   return `https://open.spotify.com/episode/${encodeURIComponent(episodeId.trim())}`;
 }
 
-// ../grarf/desktop/src/components/homeMvp/SportscapeMlbCompactHeaderActions.tsx
+// src/components/homeMvp/SportscapeMlbCompactHeaderActions.tsx
 var import_jsx_runtime113 = __toESM(require_jsx_runtime(), 1);
 var COMPACT_ROW_CLASS = "flex h-[2rem] w-full shrink-0 items-center gap-2 overflow-hidden rounded-[2px] border border-[#24363c]/55 bg-[#060c0c] px-1 py-0.5 text-left transition duration-150 hover:border-cyansys/35 hover:shadow-[0_0_10px_rgba(86,247,255,0.06)] focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-cyansys/50";
 var THUMB_CLASS = "h-[1.5rem] w-[1.5rem] shrink-0 overflow-hidden rounded-[1px] bg-[#0a1212] object-cover object-center";
@@ -76362,32 +76363,32 @@ function SportscapeMlbCompactHeaderActions({
   ] });
 }
 
-// ../grarf/desktop/src/lib/mlbCatchUpWeekendLayout.ts
+// src/lib/mlbCatchUpWeekendLayout.ts
 init_define_import_meta_env();
 function isMlbCatchUpWeekend(now = /* @__PURE__ */ new Date()) {
   const day = now.getDay();
   return day === 0 || day === 6;
 }
 
-// ../grarf/desktop/src/components/homeMvp/HomeSportscapeCard.tsx
+// src/components/homeMvp/HomeSportscapeCard.tsx
 init_isGrarfWebRenderer();
 
-// ../grarf/desktop/src/hooks/useMlbMorningLineupDisplayHighlight.ts
+// src/hooks/useMlbMorningLineupDisplayHighlight.ts
 init_define_import_meta_env();
 var import_react134 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/store/mlbMorningLineupHighlightStore.ts
+// src/store/mlbMorningLineupHighlightStore.ts
 init_define_import_meta_env();
 var import_zustand41 = __toESM(require_zustand(), 1);
 
-// ../grarf/desktop/src/lib/youtubeMorningLineupHighlight.ts
+// src/lib/youtubeMorningLineupHighlight.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/data/youtubeMorningLineupConfig.ts
+// src/data/youtubeMorningLineupConfig.ts
 init_define_import_meta_env();
 var MLB_MORNING_LINEUP_PLAYLIST_ID = "PLL-lmlkrmJaknDB3qVRluy5om33VIUzQl";
 
-// ../grarf/desktop/src/lib/youtubeMorningLineupHighlightWeb.ts
+// src/lib/youtubeMorningLineupHighlightWeb.ts
 init_define_import_meta_env();
 function hasElectronMorningLineupBridge() {
   return typeof window.grarf?.youtubeFetchMorningLineupHighlight === "function";
@@ -76436,7 +76437,7 @@ async function fetchMorningLineupHighlightOnWeb() {
   return fetchMorningLineupHighlightViaWebRss();
 }
 
-// ../grarf/desktop/src/lib/youtubeMorningLineupHighlight.ts
+// src/lib/youtubeMorningLineupHighlight.ts
 async function fetchMlbMorningLineupDailyHighlight() {
   const fn2 = window.grarf?.youtubeFetchMorningLineupHighlight;
   if (fn2) {
@@ -76454,7 +76455,7 @@ function morningLineupHighlightToCardItem(v2) {
   return allGamesHighlightToCardItem(v2);
 }
 
-// ../grarf/desktop/src/store/mlbMorningLineupHighlightStore.ts
+// src/store/mlbMorningLineupHighlightStore.ts
 var REFRESH_MS3 = 6 * 60 * 60 * 1e3;
 var STORAGE_KEY9 = "grarf.mlbMorningLineupHighlight.v1";
 function isValidMorningLineupHighlight(item) {
@@ -76565,7 +76566,7 @@ var useMlbMorningLineupHighlightStore = (0, import_zustand41.create)((set, get) 
   };
 });
 
-// ../grarf/desktop/src/hooks/useMlbMorningLineupDisplayHighlight.ts
+// src/hooks/useMlbMorningLineupDisplayHighlight.ts
 function useMlbMorningLineupDisplayHighlight(enabled = true) {
   const displayHighlight = useMlbMorningLineupHighlightStore((s2) => s2.displayHighlight);
   const authoritativeHighlight = useMlbMorningLineupHighlightStore((s2) => s2.authoritativeHighlight);
@@ -76580,10 +76581,10 @@ function useMlbMorningLineupDisplayHighlight(enabled = true) {
   };
 }
 
-// ../grarf/desktop/src/lib/sportscape/sportscapeMediaLayout.ts
+// src/lib/sportscape/sportscapeMediaLayout.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/components/homeMvp/HomeSportscapeCard.tsx
+// src/components/homeMvp/HomeSportscapeCard.tsx
 var import_jsx_runtime114 = __toESM(require_jsx_runtime(), 1);
 var SPORTSCAPE_MLB_LEAGUE_CARD_ID = "sportscape-mlb-shell";
 var SPORTSCAPE_NHL_LEAGUE_CARD_ID = "sportscape-nhl-shell";
@@ -76792,11 +76793,11 @@ function HomeSportscapeCard({
   ] }) });
 }
 
-// ../grarf/desktop/src/components/homeMvp/HomeSportscapeHeadlinesRow.tsx
+// src/components/homeMvp/HomeSportscapeHeadlinesRow.tsx
 init_define_import_meta_env();
 var import_react137 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/hooks/useHomeSportscapeHeadlinesRss.ts
+// src/hooks/useHomeSportscapeHeadlinesRss.ts
 init_define_import_meta_env();
 var import_react136 = __toESM(require_react(), 1);
 init_isGrarfWebRenderer();
@@ -76835,7 +76836,7 @@ function useHomeSportscapeHeadlinesRss() {
   return { headlinesBySourceId, loading, refresh };
 }
 
-// ../grarf/desktop/src/lib/sportscape/editorial/sportscapeEditorialAiBriefSelectionUtils.ts
+// src/lib/sportscape/editorial/sportscapeEditorialAiBriefSelectionUtils.ts
 init_define_import_meta_env();
 var AI_BRIEF_PRIORITY_MIN = 1;
 var AI_BRIEF_PRIORITY_MAX = 100;
@@ -76888,7 +76889,7 @@ function buildAiBriefSummaryLines(params) {
   }));
 }
 
-// ../grarf/desktop/src/lib/sportscape/resolveSportscapeHeadlinesSourceLogoUrl.ts
+// src/lib/sportscape/resolveSportscapeHeadlinesSourceLogoUrl.ts
 init_define_import_meta_env();
 var LOCAL_SOURCE_LOGOS = {
   espn: "/league-logos/channel-espn.png",
@@ -76910,7 +76911,7 @@ function resolveSportscapeHeadlinesSourceLogoUrl(sourceId) {
   return resolveWebsiteFaviconUrl(publisherUrl) ?? void 0;
 }
 
-// ../grarf/desktop/src/components/homeMvp/HomeSportscapeHeadlinesRow.tsx
+// src/components/homeMvp/HomeSportscapeHeadlinesRow.tsx
 var import_jsx_runtime115 = __toESM(require_jsx_runtime(), 1);
 var SOURCE_BLOCK_WIDTH_CLASS = "w-[19.5rem] shrink-0";
 var AI_BRIEF_BLOCK_WIDTH_CLASS = "w-[25rem] shrink-0";
@@ -77088,7 +77089,7 @@ function HomeSportscapeHeadlinesRow() {
   ) });
 }
 
-// ../grarf/desktop/src/components/homeMvp/SportscapeMoreLeaguesDesktopWaitlistRow.tsx
+// src/components/homeMvp/SportscapeMoreLeaguesDesktopWaitlistRow.tsx
 init_define_import_meta_env();
 var import_react138 = __toESM(require_react(), 1);
 var import_jsx_runtime116 = __toESM(require_jsx_runtime(), 1);
@@ -77184,7 +77185,7 @@ function SportscapeMoreLeaguesDesktopWaitlistRow() {
   );
 }
 
-// ../grarf/desktop/src/components/homeMvp/HomeSportscapeSurface.tsx
+// src/components/homeMvp/HomeSportscapeSurface.tsx
 init_isGrarfWebRenderer();
 var import_jsx_runtime117 = __toESM(require_jsx_runtime(), 1);
 function sportscapeCardSpineOrderIndex(league) {
@@ -77476,11 +77477,11 @@ function HomeSportscapeSurface({
   );
 }
 
-// ../grarf/desktop/src/data/homeSportscapeCbsVideo.ts
+// src/data/homeSportscapeCbsVideo.ts
 init_define_import_meta_env();
 var SPORTSCAPE_CBS_SPORTS_HQ_VIDEO_URL = "https://www.youtube.com/watch?v=tyJtpx5Lbc4";
 
-// ../grarf/desktop/src/components/homeMvp/HomeSourceFocusBackHeader.tsx
+// src/components/homeMvp/HomeSourceFocusBackHeader.tsx
 init_define_import_meta_env();
 var import_jsx_runtime118 = __toESM(require_jsx_runtime(), 1);
 var HOME_SOURCE_FOCUS_BACK_HEADER_HEIGHT_CLASS = "h-[22px]";
@@ -77505,10 +77506,10 @@ function HomeSourceFocusBackHeader({ title, onBack }) {
   );
 }
 
-// ../grarf/desktop/src/components/homeMvp/HomeSourceFocusWorkspace.tsx
+// src/components/homeMvp/HomeSourceFocusWorkspace.tsx
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/home/buildHomeSourceFocusTab.ts
+// src/lib/home/buildHomeSourceFocusTab.ts
 init_define_import_meta_env();
 var HOME_SOURCE_FOCUS_TAB_PREFIX = "home-focus-";
 function resolveHomeSourceFocusSessionKey(workspace) {
@@ -77529,10 +77530,10 @@ function isHomeSourceFocusTab(workspace) {
   return workspace?.id.startsWith(HOME_SOURCE_FOCUS_TAB_PREFIX) ?? false;
 }
 
-// ../grarf/desktop/src/components/homeMvp/HomeSourceFocusWorkspace.tsx
+// src/components/homeMvp/HomeSourceFocusWorkspace.tsx
 init_isGrarfWebRenderer();
 
-// ../grarf/desktop/src/components/homeMvp/HomeSourceFocusArticlePane.tsx
+// src/components/homeMvp/HomeSourceFocusArticlePane.tsx
 init_define_import_meta_env();
 var import_react140 = __toESM(require_react(), 1);
 var import_jsx_runtime119 = __toESM(require_jsx_runtime(), 1);
@@ -77562,7 +77563,7 @@ function HomeSourceFocusArticlePane({ url }) {
   );
 }
 
-// ../grarf/desktop/src/components/homeMvp/HomeSourceFocusSourcePane.tsx
+// src/components/homeMvp/HomeSourceFocusSourcePane.tsx
 init_define_import_meta_env();
 var import_react141 = __toESM(require_react(), 1);
 init_isGrarfWebRenderer();
@@ -77595,7 +77596,7 @@ function HomeSourceFocusSourcePane({ sessionKey, fallbackUrl }) {
   );
 }
 
-// ../grarf/desktop/src/components/homeMvp/HomeSourceFocusWorkspace.tsx
+// src/components/homeMvp/HomeSourceFocusWorkspace.tsx
 var import_jsx_runtime121 = __toESM(require_jsx_runtime(), 1);
 function HomeSourceFocusWorkspace({ workspace }) {
   const sessionKey = resolveHomeSourceFocusSessionKey(workspace);
@@ -77643,10 +77644,10 @@ function HomeSourceFocusWorkspace({ workspace }) {
   );
 }
 
-// ../grarf/desktop/src/components/workspace/CommandWorkspaceColumn.tsx
+// src/components/workspace/CommandWorkspaceColumn.tsx
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/components/workspace/WorkspaceCategoryNav.tsx
+// src/components/workspace/WorkspaceCategoryNav.tsx
 init_define_import_meta_env();
 var import_jsx_runtime122 = __toESM(require_jsx_runtime(), 1);
 var btn = "shrink-0 rounded-sm border px-2.5 py-1 text-[9px] font-medium tracking-[0.18em] transition duration-150";
@@ -77683,19 +77684,19 @@ function WorkspaceCategoryNav({ items, activeId, onSelect, className, "aria-labe
   );
 }
 
-// ../grarf/desktop/src/components/workspace/EphemeralWorkspaceTabs.tsx
+// src/components/workspace/EphemeralWorkspaceTabs.tsx
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/components/workspace/GameWorkspaceTabScorebug.tsx
+// src/components/workspace/GameWorkspaceTabScorebug.tsx
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/livetrack/homeLiveTrackTerminalFormat.ts
+// src/lib/livetrack/homeLiveTrackTerminalFormat.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/livetrack/liveTrackArticlePost.ts
+// src/lib/livetrack/liveTrackArticlePost.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/livetrack/homeLiveTrackTerminalFormat.ts
+// src/lib/livetrack/homeLiveTrackTerminalFormat.ts
 var TERMINAL_SOURCE_BY_HANDLE = {
   BaseballAmerica: "Baseball America",
   CollegeBSBNews: "College Baseball News",
@@ -77784,7 +77785,7 @@ function formatLiveTrackBroadcastChannel(tweetUrl, sourceLabel) {
   return formatLiveTrackTerminalSource(tweetUrl);
 }
 
-// ../grarf/desktop/src/components/workspace/GameWorkspaceTabScorebug.tsx
+// src/components/workspace/GameWorkspaceTabScorebug.tsx
 init_isGrarfWebRenderer();
 var import_jsx_runtime123 = __toESM(require_jsx_runtime(), 1);
 var TAB_STRIP_HEIGHT = "h-[14px]";
@@ -78134,7 +78135,7 @@ function shouldRenderGameWorkspaceTabScorebug(tab) {
   return resolveGameWorkspaceTabScorebugGameId(tab) != null;
 }
 
-// ../grarf/desktop/src/components/workspace/EphemeralWorkspaceTabs.tsx
+// src/components/workspace/EphemeralWorkspaceTabs.tsx
 var import_jsx_runtime124 = __toESM(require_jsx_runtime(), 1);
 var tabBtn = "group flex max-w-[200px] shrink-0 items-center gap-1 border px-2 py-0.5 text-left text-[9px] tracking-[0.1em] transition duration-150";
 var gameTabContainerActiveClass = "border-2 border-ambersys/30 bg-[#020404] opacity-100 shadow-[inset_0_-1px_0_rgba(251,191,36,0.45)]";
@@ -78211,7 +78212,7 @@ function EphemeralWorkspaceTabs({ tabs, activeId, onSelect, onClose, className }
   );
 }
 
-// ../grarf/desktop/src/components/workspace/CommandWorkspaceColumn.tsx
+// src/components/workspace/CommandWorkspaceColumn.tsx
 var import_jsx_runtime125 = __toESM(require_jsx_runtime(), 1);
 function CommandWorkspaceColumn({
   categories,
@@ -78283,14 +78284,14 @@ function CommandWorkspaceColumn({
   );
 }
 
-// ../grarf/desktop/src/components/media/LiveAmbientMediaStrip.tsx
+// src/components/media/LiveAmbientMediaStrip.tsx
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/components/homeMvp/LiveSportsClipsFeed.tsx
+// src/components/homeMvp/LiveSportsClipsFeed.tsx
 init_define_import_meta_env();
 var import_react142 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/services/operationalShortMedia/index.ts
+// src/services/operationalShortMedia/index.ts
 init_define_import_meta_env();
 init_tierRules();
 init_OperationalShortMediaAggregator();
@@ -78299,7 +78300,7 @@ init_resolveStripRenderInventory();
 init_inventory();
 init_diagnostics();
 
-// ../grarf/desktop/src/components/homeMvp/LiveSportsClipsFeed.tsx
+// src/components/homeMvp/LiveSportsClipsFeed.tsx
 var import_jsx_runtime126 = __toESM(require_jsx_runtime(), 1);
 var POLL_MS9 = 10 * 60 * 1e3;
 var RETRY_MS2 = 8e3;
@@ -78563,7 +78564,7 @@ function LiveSportsClipsFeed({
   );
 }
 
-// ../grarf/desktop/src/components/media/LiveAmbientMediaStrip.tsx
+// src/components/media/LiveAmbientMediaStrip.tsx
 var import_jsx_runtime127 = __toESM(require_jsx_runtime(), 1);
 function LiveAmbientMediaStrip({ onClipYoutube, clipSources, railExpanded, embedded }) {
   const onClipOpen = (clip) => {
@@ -78594,7 +78595,7 @@ function LiveAmbientMediaStrip({ onClipYoutube, clipSources, railExpanded, embed
   );
 }
 
-// ../grarf/desktop/src/components/layout/CollapsibleMediaRail.tsx
+// src/components/layout/CollapsibleMediaRail.tsx
 init_define_import_meta_env();
 var import_jsx_runtime128 = __toESM(require_jsx_runtime(), 1);
 var MODE_CONTROL_BTN = "flex h-5 w-5 shrink-0 items-center justify-center rounded-sm border text-[11px] leading-none transition duration-150";
@@ -78684,11 +78685,11 @@ function CollapsibleMediaRail({
   );
 }
 
-// ../grarf/desktop/src/components/layout/WorkspacePaneLayout.tsx
+// src/components/layout/WorkspacePaneLayout.tsx
 init_define_import_meta_env();
 var import_react145 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/hooks/usePaneDragResize.ts
+// src/hooks/usePaneDragResize.ts
 init_define_import_meta_env();
 var import_react143 = __toESM(require_react(), 1);
 function usePaneDragResize({ side, min, max, getWidth, onLiveResize, onCommit }) {
@@ -78727,7 +78728,7 @@ function usePaneDragResize({ side, min, max, getWidth, onLiveResize, onCommit })
   return { onPointerDown, isDragging: () => draggingRef.current };
 }
 
-// ../grarf/desktop/src/store/workspaceLayoutStore.ts
+// src/store/workspaceLayoutStore.ts
 init_define_import_meta_env();
 var import_zustand42 = __toESM(require_zustand(), 1);
 var import_middleware2 = __toESM(require_middleware(), 1);
@@ -78798,7 +78799,7 @@ function selectPaneLayout(id) {
   return (s2) => s2.layouts[id] ?? DEFAULT_PANE_LAYOUTS[id];
 }
 
-// ../grarf/desktop/src/components/layout/CenterPaneFeedAlignmentBridge.tsx
+// src/components/layout/CenterPaneFeedAlignmentBridge.tsx
 init_define_import_meta_env();
 var import_react144 = __toESM(require_react(), 1);
 function CenterPaneFeedAlignmentBridge({ centerRef }) {
@@ -78827,7 +78828,7 @@ function CenterPaneFeedAlignmentBridge({ centerRef }) {
   return null;
 }
 
-// ../grarf/desktop/src/components/layout/PaneCollapseButton.tsx
+// src/components/layout/PaneCollapseButton.tsx
 init_define_import_meta_env();
 var import_jsx_runtime129 = __toESM(require_jsx_runtime(), 1);
 function PaneCollapseButton({ collapsed, side, onToggle, label }) {
@@ -78850,7 +78851,7 @@ function PaneCollapseButton({ collapsed, side, onToggle, label }) {
   );
 }
 
-// ../grarf/desktop/src/components/layout/PaneResizeHandle.tsx
+// src/components/layout/PaneResizeHandle.tsx
 init_define_import_meta_env();
 var import_jsx_runtime130 = __toESM(require_jsx_runtime(), 1);
 function PaneResizeHandle({ onPointerDown, ariaLabel }) {
@@ -78877,7 +78878,7 @@ function PaneResizeHandle({ onPointerDown, ariaLabel }) {
   );
 }
 
-// ../grarf/desktop/src/components/layout/WorkspacePaneLayout.tsx
+// src/components/layout/WorkspacePaneLayout.tsx
 var import_jsx_runtime131 = __toESM(require_jsx_runtime(), 1);
 function hasEmbedBridge2() {
   return typeof window !== "undefined" && !!window.grarf?.workspaceEmbedClear;
@@ -79112,14 +79113,14 @@ function WorkspacePaneLayoutInner({
 }
 var WorkspacePaneLayout = (0, import_react145.memo)(WorkspacePaneLayoutInner);
 
-// ../grarf/desktop/src/components/gamesSpine/GamesSpineCommandBriefingHeader.tsx
+// src/components/gamesSpine/GamesSpineCommandBriefingHeader.tsx
 init_define_import_meta_env();
 var import_jsx_runtime132 = __toESM(require_jsx_runtime(), 1);
 function GamesSpineCommandBriefingHeader() {
   return /* @__PURE__ */ (0, import_jsx_runtime132.jsx)("span", { className: "shrink-0 px-0.5 text-[9px] tracking-[0.2em] text-textdim", children: "GAMES" });
 }
 
-// ../grarf/desktop/src/components/ticker/LiveSportsTicker.tsx
+// src/components/ticker/LiveSportsTicker.tsx
 init_define_import_meta_env();
 var import_react146 = __toESM(require_react(), 1);
 var import_jsx_runtime133 = __toESM(require_jsx_runtime(), 1);
@@ -79309,7 +79310,7 @@ function LiveSportsTickerInner({ className, leagueFilter, onNavigate }) {
 }
 var LiveSportsTicker = (0, import_react146.memo)(LiveSportsTickerInner);
 
-// ../grarf/desktop/src/lib/workspaceTabReducer.ts
+// src/lib/workspaceTabReducer.ts
 init_define_import_meta_env();
 function workspaceTabReducer(state3, action) {
   switch (action.type) {
@@ -79340,7 +79341,7 @@ function workspaceTabReducer(state3, action) {
   }
 }
 
-// ../grarf/desktop/src/data/homeWorkspaceTabs.ts
+// src/data/homeWorkspaceTabs.ts
 init_define_import_meta_env();
 function createInitialHomeWorkspaceTabs() {
   const row = (id, title, url) => ({
@@ -79411,20 +79412,20 @@ function workspaceStateForShellMode(mode) {
   return leagueShellWorkspaceState(mode);
 }
 
-// ../grarf/desktop/src/lib/leagueAmbientMediaStrip.ts
+// src/lib/leagueAmbientMediaStrip.ts
 init_define_import_meta_env();
 function shouldShowLeagueAmbientMediaStrip(workspace) {
   return workspace?.type !== "game";
 }
 
-// ../grarf/desktop/src/pages/HomePage.tsx
+// src/pages/HomePage.tsx
 init_isGrarfWebRenderer();
 
-// ../grarf/desktop/src/hooks/useHomeOperationalPrioritization.ts
+// src/hooks/useHomeOperationalPrioritization.ts
 init_define_import_meta_env();
 var import_react147 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/lib/homeOperational/homeOperationalPrioritization.ts
+// src/lib/homeOperational/homeOperationalPrioritization.ts
 init_define_import_meta_env();
 var STATUS_BASE = {
   LIVE: { live: 3e3, final: 350, scheduled: 180, postponed: 40 },
@@ -79584,7 +79585,7 @@ if (define_import_meta_env_default.DEV && typeof window !== "undefined") {
   window.__grarfHomePrioritization = getInspectableHomeOperationalPrioritization;
 }
 
-// ../grarf/desktop/src/hooks/useHomeOperationalPrioritization.ts
+// src/hooks/useHomeOperationalPrioritization.ts
 function useHomeOperationalPrioritization() {
   const mode = useOperationalModeStore((s2) => s2.mode);
   const leagues = useLiveGamesStore((s2) => s2.leagues);
@@ -79603,7 +79604,7 @@ function useHomeOperationalPrioritization() {
   }, [allGames2, bundle, selectedDate, mode]);
 }
 
-// ../grarf/desktop/src/hooks/useOperationalAlertActionsRegistration.ts
+// src/hooks/useOperationalAlertActionsRegistration.ts
 init_define_import_meta_env();
 var import_react148 = __toESM(require_react(), 1);
 function useOperationalAlertActionsRegistration(actions) {
@@ -79613,21 +79614,21 @@ function useOperationalAlertActionsRegistration(actions) {
   }, [actions, register]);
 }
 
-// ../grarf/desktop/src/hooks/useOrchestrationExecutionRegistration.ts
+// src/hooks/useOrchestrationExecutionRegistration.ts
 init_define_import_meta_env();
 var import_react149 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/store/orchestrationExecutionStore.ts
+// src/store/orchestrationExecutionStore.ts
 init_define_import_meta_env();
 var import_zustand43 = __toESM(require_zustand(), 1);
 
-// ../grarf/desktop/src/services/orchestrationExecution/orchestrationExecutionEngine.ts
+// src/services/orchestrationExecution/orchestrationExecutionEngine.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/services/orchestrationExecution/executeInterruptPrimary.ts
+// src/services/orchestrationExecution/executeInterruptPrimary.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/services/orchestrationExecution/guards.ts
+// src/services/orchestrationExecution/guards.ts
 init_define_import_meta_env();
 var SINGLE_VIEW_AUTO_MODES = ["AUTO_SINGLE_VIEW"];
 var MANUAL_MODES = ["MANUAL_SINGLE_VIEW", "MANUAL_MULTIVIEW"];
@@ -79670,7 +79671,7 @@ function evaluateInterruptPrimaryGuards(recommendation, context2) {
   return [...new Set(blocked)];
 }
 
-// ../grarf/desktop/src/services/orchestrationExecution/executeInterruptPrimary.ts
+// src/services/orchestrationExecution/executeInterruptPrimary.ts
 function blockedEvent(recommendation, blockedReasons, nowMs, previousPrimaryGameId) {
   return {
     executed: false,
@@ -79731,7 +79732,7 @@ function buildSuccessfulInterruptEvent(plan, nowMs = Date.now()) {
   };
 }
 
-// ../grarf/desktop/src/services/orchestrationExecution/orchestrationExecutionEngine.ts
+// src/services/orchestrationExecution/orchestrationExecutionEngine.ts
 var OrchestrationExecutionEngine = class {
   constructor() {
     __publicField(this, "driver", null);
@@ -79822,7 +79823,7 @@ function getOrchestrationExecutionEngine() {
   return singleton;
 }
 
-// ../grarf/desktop/src/store/orchestrationExecutionStore.ts
+// src/store/orchestrationExecutionStore.ts
 var useOrchestrationExecutionStore = (0, import_zustand43.create)(() => {
   const engine = getOrchestrationExecutionEngine();
   return {
@@ -79851,7 +79852,7 @@ var useOrchestrationExecutionStore = (0, import_zustand43.create)(() => {
   };
 });
 
-// ../grarf/desktop/src/hooks/useOrchestrationExecutionRegistration.ts
+// src/hooks/useOrchestrationExecutionRegistration.ts
 function useOrchestrationExecutionRegistration(driver) {
   const register = useOrchestrationExecutionStore((s2) => s2.registerDriver);
   (0, import_react149.useEffect)(() => {
@@ -79860,7 +79861,7 @@ function useOrchestrationExecutionRegistration(driver) {
   }, [driver, register]);
 }
 
-// ../grarf/desktop/src/hooks/useWorkspaceUrlLauncher.ts
+// src/hooks/useWorkspaceUrlLauncher.ts
 init_define_import_meta_env();
 var import_react150 = __toESM(require_react(), 1);
 function useWorkspaceUrlLauncher(openTab) {
@@ -79870,7 +79871,7 @@ function useWorkspaceUrlLauncher(openTab) {
   }, [openTab, registerWorkspaceUrlLauncher]);
 }
 
-// ../grarf/desktop/src/lib/intelligence/buildIntelligenceWorkspaceTab.ts
+// src/lib/intelligence/buildIntelligenceWorkspaceTab.ts
 init_define_import_meta_env();
 function buildIntelligenceWorkspaceTab(briefingId, title, articleUrl) {
   const short = title.length > 72 ? `${title.slice(0, 69)}\u2026` : title;
@@ -79884,7 +79885,7 @@ function buildIntelligenceWorkspaceTab(briefingId, title, articleUrl) {
   };
 }
 
-// ../grarf/desktop/src/lib/overlayWorkspaceReducer.ts
+// src/lib/overlayWorkspaceReducer.ts
 init_define_import_meta_env();
 var CENTER_PANE_APPLICATION_TAB_PREFIX = "center-pane-";
 function isCenterPaneWorkspaceTab(tab) {
@@ -79980,7 +79981,7 @@ function initialOverlayWorkspaceState() {
   return { tabs: [], activeId: null };
 }
 
-// ../grarf/desktop/src/lib/newswire/openNewswireStoryInBrowser.ts
+// src/lib/newswire/openNewswireStoryInBrowser.ts
 init_define_import_meta_env();
 init_isGrarfWebRenderer();
 var newswireBrowserTabOpener = null;
@@ -80032,7 +80033,7 @@ function buildNewswireBrowserWorkspaceTab(story) {
   };
 }
 
-// ../grarf/desktop/src/lib/gamesSpine/overlayActiveGameId.ts
+// src/lib/gamesSpine/overlayActiveGameId.ts
 init_define_import_meta_env();
 function overlayActiveGameId(state3) {
   const tab = state3.tabs.find((t2) => t2.id === state3.activeId) ?? state3.tabs[0];
@@ -80044,10 +80045,10 @@ function overlayActiveGameId(state3) {
   return fallback?.[1] ?? null;
 }
 
-// ../grarf/desktop/src/lib/gamesSpine/openGameWorkspaceTab.ts
+// src/lib/gamesSpine/openGameWorkspaceTab.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/gameWorkspace/resolveMlbGameRow.ts
+// src/gameWorkspace/resolveMlbGameRow.ts
 init_define_import_meta_env();
 function hasMlbGamePk2(game) {
   if (typeof game.gamePk === "number" && Number.isFinite(game.gamePk) && game.gamePk > 0) {
@@ -80066,7 +80067,7 @@ function resolveMlbGameRow(gameId, leagueRows) {
   return candidates.find(hasMlbGamePk2) ?? candidates[0];
 }
 
-// ../grarf/desktop/src/data/leagueWebWorkspace.ts
+// src/data/leagueWebWorkspace.ts
 init_define_import_meta_env();
 var LEAGUE_BOARD_CATEGORIES = [
   { id: "news", label: "NEWS" },
@@ -80227,7 +80228,7 @@ function leagueWebWorkspaceStatusLabel(slug, nav, overlay) {
   return CATEGORY_LABEL[nav.categoryId];
 }
 
-// ../grarf/desktop/src/lib/gamesSpine/resolveWimbledonWorkspaceEmbedUrl.ts
+// src/lib/gamesSpine/resolveWimbledonWorkspaceEmbedUrl.ts
 init_define_import_meta_env();
 init_isGrarfWebRenderer();
 var WIMBLEDON_SCORES_UPCOMING_URL = "https://www.wimbledon.com/en_GB/scores/upcoming";
@@ -80262,7 +80263,7 @@ function openWimbledonGamesSpineRow(game, dispatch) {
   return true;
 }
 
-// ../grarf/desktop/src/lib/gamesSpine/resolveWnbaGameCenterUrl.ts
+// src/lib/gamesSpine/resolveWnbaGameCenterUrl.ts
 init_define_import_meta_env();
 var WNBA_GAME_CENTER_PREFIX = "https://www.wnba.com/game/";
 function isWnbaSpineGame(game) {
@@ -80299,7 +80300,7 @@ function resolveWnbaGameCenterUrl(game) {
   return null;
 }
 
-// ../grarf/desktop/src/lib/gamesSpine/openAflGameRowInBrowser.ts
+// src/lib/gamesSpine/openAflGameRowInBrowser.ts
 init_define_import_meta_env();
 init_isGrarfWebRenderer();
 function tryOpenAflGameRowInBrowser(game) {
@@ -80312,7 +80313,7 @@ function tryOpenAflGameRowInBrowser(game) {
   return true;
 }
 
-// ../grarf/desktop/src/lib/gamesSpine/tryOpenF1GameRowInBrowser.ts
+// src/lib/gamesSpine/tryOpenF1GameRowInBrowser.ts
 init_define_import_meta_env();
 var F1_LIVE_TIMING_URL = "https://www.formula1.com/en/timing/f1-live-lite";
 function tryOpenF1GameRowInBrowser(game) {
@@ -80321,7 +80322,7 @@ function tryOpenF1GameRowInBrowser(game) {
   return true;
 }
 
-// ../grarf/desktop/src/lib/gamesSpine/openGolfGameRowInBrowser.ts
+// src/lib/gamesSpine/openGolfGameRowInBrowser.ts
 init_define_import_meta_env();
 init_isGrarfWebRenderer();
 function tryOpenGolfGameRowInBrowser(game) {
@@ -80331,7 +80332,7 @@ function tryOpenGolfGameRowInBrowser(game) {
   return true;
 }
 
-// ../grarf/desktop/src/lib/gamesSpine/openMcwsGameRowInBrowser.ts
+// src/lib/gamesSpine/openMcwsGameRowInBrowser.ts
 init_define_import_meta_env();
 init_isGrarfWebRenderer();
 function tryOpenMcwsGameRowInBrowser(game) {
@@ -80344,7 +80345,7 @@ function tryOpenMcwsGameRowInBrowser(game) {
   return true;
 }
 
-// ../grarf/desktop/src/lib/gamesSpine/openGameWorkspaceTab.ts
+// src/lib/gamesSpine/openGameWorkspaceTab.ts
 init_isGrarfWebRenderer();
 var BOARD_SLUG = {
   NBA: "nba",
@@ -80433,7 +80434,7 @@ function openGamesSpineRowInWorkspace(game, dispatch) {
   dispatch({ type: "open", tab });
 }
 
-// ../grarf/desktop/src/components/workspace/LeagueWorkspaceColumn.tsx
+// src/components/workspace/LeagueWorkspaceColumn.tsx
 init_define_import_meta_env();
 var import_jsx_runtime134 = __toESM(require_jsx_runtime(), 1);
 var tabBtn2 = "group flex max-w-[200px] shrink-0 items-center gap-1 border px-2 py-1 text-left text-[9px] tracking-[0.12em] transition duration-150";
@@ -80499,11 +80500,11 @@ function LeagueWorkspaceColumn({ tabs, activeId, onSelect, onClose }) {
   );
 }
 
-// ../grarf/desktop/src/components/homeMvp/HomeCenterPaneApplicationSurface.tsx
+// src/components/homeMvp/HomeCenterPaneApplicationSurface.tsx
 init_define_import_meta_env();
 init_isGrarfWebRenderer();
 
-// ../grarf/desktop/src/components/homeMvp/CenterPanePlaceholderSurface.tsx
+// src/components/homeMvp/CenterPanePlaceholderSurface.tsx
 init_define_import_meta_env();
 var import_jsx_runtime135 = __toESM(require_jsx_runtime(), 1);
 function CenterPanePlaceholderSurface({ message, className }) {
@@ -80519,36 +80520,36 @@ function CenterPanePlaceholderSurface({ message, className }) {
   );
 }
 
-// ../grarf/desktop/src/components/homeMvp/HomeLiveTrackerSplitPane.tsx
+// src/components/homeMvp/HomeLiveTrackerSplitPane.tsx
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/components/homeMvp/HomeLiveTrackerFoundationPane.tsx
+// src/components/homeMvp/HomeLiveTrackerFoundationPane.tsx
 init_define_import_meta_env();
 var import_react152 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/hooks/useHomeLiveTrackerPosts.ts
+// src/hooks/useHomeLiveTrackerPosts.ts
 init_define_import_meta_env();
 function useHomeLiveTrackerPosts() {
   const posts = useLiveTrackerPostsStore((state3) => state3.posts);
   return sortLiveTrackerPostsNewestFirst(posts ?? []);
 }
 
-// ../grarf/desktop/src/components/homeMvp/HomeLiveTrackerFoundationPane.tsx
+// src/components/homeMvp/HomeLiveTrackerFoundationPane.tsx
 init_isGrarfWebRenderer();
 
-// ../grarf/desktop/src/components/homeMvp/HomeLiveTrackerSurface.tsx
+// src/components/homeMvp/HomeLiveTrackerSurface.tsx
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/liveTracker/homeLiveTrackerSpacing.ts
+// src/lib/liveTracker/homeLiveTrackerSpacing.ts
 init_define_import_meta_env();
 var LIVE_TRACKER_TIMELINE_LIST = "flex w-full flex-col";
 var LIVE_TRACKER_TIMELINE_EVENT = "py-2.5";
 var LIVE_TRACKER_TIMELINE_EVENT_DIVIDER = "border-b border-[#010303]";
 
-// ../grarf/desktop/src/components/homeMvp/HomeLiveTrackerPostLine.tsx
+// src/components/homeMvp/HomeLiveTrackerPostLine.tsx
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/league/leagueColors.ts
+// src/lib/league/leagueColors.ts
 init_define_import_meta_env();
 var LEAGUE_COLOR_FALLBACK = "#4a6666";
 var LEAGUE_COLORS = {
@@ -80685,7 +80686,7 @@ function resolveGrarfLeagueColor(league) {
   return resolveLeagueColor(league);
 }
 
-// ../grarf/desktop/src/components/homeMvp/HomeLiveTrackerFinalScoreStrip.tsx
+// src/components/homeMvp/HomeLiveTrackerFinalScoreStrip.tsx
 init_define_import_meta_env();
 var import_jsx_runtime136 = __toESM(require_jsx_runtime(), 1);
 var STRIP_HEIGHT = "h-[22px]";
@@ -80840,7 +80841,7 @@ function HomeLiveTrackerFinalScoreStrip({ post }) {
   );
 }
 
-// ../grarf/desktop/src/components/homeMvp/HomeLiveTrackerPostLine.tsx
+// src/components/homeMvp/HomeLiveTrackerPostLine.tsx
 var import_jsx_runtime137 = __toESM(require_jsx_runtime(), 1);
 var WIRE_THUMB_FRAME_CLASS = "relative block h-[90px] w-[160px] shrink-0 overflow-hidden rounded-[2px] border border-[#24363c]/55 bg-black/40 shadow-[inset_0_0_0_1px_rgba(10,20,24,0.92)]";
 var WIRE_THUMB_EMPTY_CLASS = "relative block h-[90px] w-[160px] shrink-0 overflow-hidden rounded-[2px] border border-[#010303] bg-[#010303] shadow-none";
@@ -80955,7 +80956,7 @@ function HomeLiveTrackerPostLine({ post }) {
   );
 }
 
-// ../grarf/desktop/src/components/homeMvp/HomeLiveTrackerLiveScorePlaceholder.tsx
+// src/components/homeMvp/HomeLiveTrackerLiveScorePlaceholder.tsx
 init_define_import_meta_env();
 var import_react151 = __toESM(require_react(), 1);
 init_isGrarfWebRenderer();
@@ -81145,7 +81146,7 @@ function HomeLiveTrackerLiveScoreDevPlaceholder() {
   return /* @__PURE__ */ (0, import_jsx_runtime138.jsx)(HomeLiveTrackerLiveScorePlaceholder, { game: DEV_PLACEHOLDER_GAME });
 }
 
-// ../grarf/desktop/src/components/homeMvp/HomeLiveTrackTerminalCursor.tsx
+// src/components/homeMvp/HomeLiveTrackTerminalCursor.tsx
 init_define_import_meta_env();
 var import_jsx_runtime139 = __toESM(require_jsx_runtime(), 1);
 function HomeLiveTrackTerminalCursor({ idle = false }) {
@@ -81162,7 +81163,7 @@ function HomeLiveTrackTerminalCursor({ idle = false }) {
   );
 }
 
-// ../grarf/desktop/src/components/homeMvp/HomeLiveTrackerSurface.tsx
+// src/components/homeMvp/HomeLiveTrackerSurface.tsx
 init_isGrarfWebRenderer();
 var import_jsx_runtime140 = __toESM(require_jsx_runtime(), 1);
 function liveTrackerPostKey(post, index) {
@@ -81215,7 +81216,7 @@ function HomeLiveTrackerSurface({ posts, statusMessage }) {
   ] });
 }
 
-// ../grarf/desktop/src/components/homeMvp/HomeLiveTrackerFoundationPane.tsx
+// src/components/homeMvp/HomeLiveTrackerFoundationPane.tsx
 var import_jsx_runtime141 = __toESM(require_jsx_runtime(), 1);
 var LIVE_TRACKER_FEED_POLL_MS = 3e4;
 var LIVE_TRACKER_IDLE_BANNER_COPY = "No leagues are currently live. Catch up on the latest action from today's games.";
@@ -81278,11 +81279,11 @@ function HomeLiveTrackerFoundationPane() {
   return /* @__PURE__ */ (0, import_jsx_runtime141.jsx)(HomeLiveTrackerSurface, { posts, statusMessage });
 }
 
-// ../grarf/desktop/src/components/homeMvp/HomeNewswirePane.tsx
+// src/components/homeMvp/HomeNewswirePane.tsx
 init_define_import_meta_env();
 var import_react158 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/hooks/useHomeNewswireWireEvents.ts
+// src/hooks/useHomeNewswireWireEvents.ts
 init_define_import_meta_env();
 var import_react153 = __toESM(require_react(), 1);
 function sortNewswireStoriesNewestFirst(stories) {
@@ -81299,11 +81300,11 @@ function useHomeNewswireWireEvents() {
   }, [version, storiesById]);
 }
 
-// ../grarf/desktop/src/hooks/useNewswireStagedInsertion.ts
+// src/hooks/useNewswireStagedInsertion.ts
 init_define_import_meta_env();
 var import_react154 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/lib/newswire/buildNewswireStagedInsertionSchedule.ts
+// src/lib/newswire/buildNewswireStagedInsertionSchedule.ts
 init_define_import_meta_env();
 var WINDOW_MS = 45e3;
 var MIN_GAP_MS = 3e3;
@@ -81326,11 +81327,11 @@ function buildNewswireStagedInsertionSchedule(count) {
   return delays;
 }
 
-// ../grarf/desktop/src/lib/newswire/newswireTypewriterEnabled.ts
+// src/lib/newswire/newswireTypewriterEnabled.ts
 init_define_import_meta_env();
 var NEWSWIRE_TYPEWRITER_ENABLED = true;
 
-// ../grarf/desktop/src/store/newswireStagedQueueStore.ts
+// src/store/newswireStagedQueueStore.ts
 init_define_import_meta_env();
 var import_zustand44 = __toESM(require_zustand(), 1);
 function pickRandomHoldBackCount(total) {
@@ -81364,7 +81365,7 @@ function getNewswireStagedQueueStore() {
   return useNewswireStagedQueueStore;
 }
 
-// ../grarf/desktop/src/hooks/useNewswireStagedInsertion.ts
+// src/hooks/useNewswireStagedInsertion.ts
 function waitForLiveTrackAnimationIdle() {
   const store = getLiveTrackAnimationStore();
   if (store.getState().animatingId === null) {
@@ -81422,11 +81423,11 @@ function useNewswireStagedInsertion() {
   }, [initialized4]);
 }
 
-// ../grarf/desktop/src/components/homeMvp/HomeNewswireSurface.tsx
+// src/components/homeMvp/HomeNewswireSurface.tsx
 init_define_import_meta_env();
 var import_react157 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/lib/livetrack/homeLiveTrackCombinedScroll.ts
+// src/lib/livetrack/homeLiveTrackCombinedScroll.ts
 init_define_import_meta_env();
 var REVEAL_SCROLL_PADDING_PX = 12;
 function scrollLiveTrackRevealAnchorIntoView(scrollEl, anchorEl) {
@@ -81444,15 +81445,15 @@ function scrollLiveTrackFeedToTop(scrollEl) {
   scrollEl.scrollTop = 0;
 }
 
-// ../grarf/desktop/src/components/homeMvp/HomeNewswireWireLine.tsx
+// src/components/homeMvp/HomeNewswireWireLine.tsx
 init_define_import_meta_env();
 var import_react156 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/hooks/useHomeLiveTrackBlockTyping.ts
+// src/hooks/useHomeLiveTrackBlockTyping.ts
 init_define_import_meta_env();
 var import_react155 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/lib/livetrack/homeLiveTrackTerminalReveal.ts
+// src/lib/livetrack/homeLiveTrackTerminalReveal.ts
 init_define_import_meta_env();
 function pushChars(units, kind, text2) {
   for (const char of text2) {
@@ -81519,7 +81520,7 @@ function getLiveTrackTerminalLineRevealLength(line, event, options) {
   return line.length;
 }
 
-// ../grarf/desktop/src/hooks/useHomeLiveTrackBlockTyping.ts
+// src/hooks/useHomeLiveTrackBlockTyping.ts
 var TYPE_INTERVAL_MS = 50;
 var LINE_PAUSE_MS = 500;
 function useHomeLiveTrackBlockTyping({
@@ -81615,7 +81616,7 @@ function useHomeLiveTrackBlockTyping({
   };
 }
 
-// ../grarf/desktop/src/lib/newswire/formatNewswireWireLine.ts
+// src/lib/newswire/formatNewswireWireLine.ts
 init_define_import_meta_env();
 function formatNewswireWireTimestamp(iso) {
   const date = new Date(iso);
@@ -81625,7 +81626,7 @@ function formatNewswireWireTimestamp(iso) {
   return `${hours}:${minutes}`;
 }
 
-// ../grarf/desktop/src/lib/newswire/resolveNewswireSourceColor.ts
+// src/lib/newswire/resolveNewswireSourceColor.ts
 init_define_import_meta_env();
 var NEWSWIRE_SOURCE_COLOR_DEFAULT = "text-textdim/75";
 var NEWSWIRE_SOURCE_COLOR_BY_KEY = {
@@ -81657,7 +81658,7 @@ function resolveNewswireSourceColorClass(source) {
   return NEWSWIRE_SOURCE_COLOR_BY_KEY[key2] ?? NEWSWIRE_SOURCE_COLOR_DEFAULT;
 }
 
-// ../grarf/desktop/src/components/homeMvp/HomeNewswireWireLine.tsx
+// src/components/homeMvp/HomeNewswireWireLine.tsx
 init_isGrarfWebRenderer();
 var import_jsx_runtime142 = __toESM(require_jsx_runtime(), 1);
 var NEWSWIRE_ROW_GRID_CLASS = "box-border grid w-full min-w-0 max-w-full grid-cols-[minmax(0,1fr)_8ch_minmax(5ch,5ch)] items-center gap-x-1 pr-0.5 text-[8px] leading-[1.32]";
@@ -81771,7 +81772,7 @@ function HomeNewswireWireLine({
   ] });
 }
 
-// ../grarf/desktop/src/components/homeMvp/HomeNewswireSurface.tsx
+// src/components/homeMvp/HomeNewswireSurface.tsx
 var import_jsx_runtime143 = __toESM(require_jsx_runtime(), 1);
 function HomeNewswireWireRow({
   story,
@@ -81868,7 +81869,7 @@ function HomeNewswireSurface({ stories }) {
   ] });
 }
 
-// ../grarf/desktop/src/components/homeMvp/HomeNewswirePane.tsx
+// src/components/homeMvp/HomeNewswirePane.tsx
 var import_jsx_runtime144 = __toESM(require_jsx_runtime(), 1);
 function HomeNewswirePane() {
   const stories = useHomeNewswireWireEvents();
@@ -81885,7 +81886,7 @@ function HomeNewswirePane() {
   return /* @__PURE__ */ (0, import_jsx_runtime144.jsx)(HomeNewswireSurface, { stories: displayedStories });
 }
 
-// ../grarf/desktop/src/components/homeMvp/HomeLiveTrackerSplitPane.tsx
+// src/components/homeMvp/HomeLiveTrackerSplitPane.tsx
 var import_jsx_runtime145 = __toESM(require_jsx_runtime(), 1);
 function HomeLiveTrackerSplitPane() {
   return /* @__PURE__ */ (0, import_jsx_runtime145.jsxs)("div", { className: "grid h-full min-h-0 min-w-0 grid-cols-[40%_60%] overflow-hidden", children: [
@@ -81894,7 +81895,7 @@ function HomeLiveTrackerSplitPane() {
   ] });
 }
 
-// ../grarf/desktop/src/components/homeMvp/HomeWhipAroundWebPane.tsx
+// src/components/homeMvp/HomeWhipAroundWebPane.tsx
 init_define_import_meta_env();
 var import_react159 = __toESM(require_react(), 1);
 var import_jsx_runtime146 = __toESM(require_jsx_runtime(), 1);
@@ -81989,11 +81990,11 @@ function HomeWhipAroundWebPane() {
   ] }) }) });
 }
 
-// ../grarf/desktop/src/components/homeMvp/HomeHighlightsTvPane.tsx
+// src/components/homeMvp/HomeHighlightsTvPane.tsx
 init_define_import_meta_env();
 var import_react163 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/components/homeMvp/HomeHighlightsTvChannelBar.tsx
+// src/components/homeMvp/HomeHighlightsTvChannelBar.tsx
 init_define_import_meta_env();
 init_isGrarfWebRenderer();
 var import_jsx_runtime147 = __toESM(require_jsx_runtime(), 1);
@@ -82045,7 +82046,7 @@ function HomeHighlightsTvChannelBar({
   );
 }
 
-// ../grarf/desktop/src/components/homeMvp/HomeHighlightsTvPlayer.tsx
+// src/components/homeMvp/HomeHighlightsTvPlayer.tsx
 init_define_import_meta_env();
 var import_jsx_runtime148 = __toESM(require_jsx_runtime(), 1);
 function HomeHighlightsTvPlayer({ clip, className, mute = true, startSec, onEnded }) {
@@ -82076,7 +82077,7 @@ function HomeHighlightsTvPlayer({ clip, className, mute = true, startSec, onEnde
   );
 }
 
-// ../grarf/desktop/src/components/homeMvp/HomeHighlightsTvProgrammingGuide.tsx
+// src/components/homeMvp/HomeHighlightsTvProgrammingGuide.tsx
 init_define_import_meta_env();
 var import_react160 = __toESM(require_react(), 1);
 init_isGrarfWebRenderer();
@@ -82354,11 +82355,11 @@ function HomeHighlightsTvProgrammingGuide({
   );
 }
 
-// ../grarf/desktop/src/hooks/useHighlightsTvAmbientPlayback.ts
+// src/hooks/useHighlightsTvAmbientPlayback.ts
 init_define_import_meta_env();
 var import_react161 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/lib/highlightsTv/collectHighlightsTvAmbientSpineGames.ts
+// src/lib/highlightsTv/collectHighlightsTvAmbientSpineGames.ts
 init_define_import_meta_env();
 function resolveHighlightsTvAmbientSpineLeagueKeys(channelLeagueKey) {
   if (channelLeagueKey === "WIMBLEDON") return ["ATP", "WTA"];
@@ -82393,7 +82394,7 @@ function collectHighlightsTvAmbientSpineGames(channelLeagueKey) {
   return out;
 }
 
-// ../grarf/desktop/src/lib/highlightsTv/highlightsTvAmbientBroadcast.ts
+// src/lib/highlightsTv/highlightsTvAmbientBroadcast.ts
 init_define_import_meta_env();
 var HIGHLIGHTS_TV_AMBIENT_BROADCAST_EPOCH_MS = Date.parse("2026-06-01T12:00:00.000Z");
 var HIGHLIGHTS_TV_AMBIENT_CLIP_DURATION_ESTIMATE_MS = 3 * 60 * 1e3;
@@ -82415,7 +82416,7 @@ function resolveHighlightsTvAmbientBroadcastPosition(clips, nowMs = Date.now(), 
   return { index, startSec: Math.floor(offsetMs / 1e3) };
 }
 
-// ../grarf/desktop/src/lib/highlightsTv/highlightsTvChannelRefreshInterval.ts
+// src/lib/highlightsTv/highlightsTvChannelRefreshInterval.ts
 init_define_import_meta_env();
 var HIGHLIGHTS_TV_CHANNEL_REFRESH_MS = 15 * 60 * 1e3;
 var HIGHLIGHTS_TV_AMBIENT_INGESTION_REFRESH_MS_ACTIVE = 45 * 60 * 1e3;
@@ -82436,7 +82437,7 @@ function resolveHighlightsTvAmbientIngestionRefreshMs(now = /* @__PURE__ */ new 
   return HIGHLIGHTS_TV_AMBIENT_INGESTION_REFRESH_MS_ACTIVE;
 }
 
-// ../grarf/desktop/src/hooks/useHighlightsTvAmbientPlayback.ts
+// src/hooks/useHighlightsTvAmbientPlayback.ts
 init_isGrarfWebRenderer();
 function resolveChannelLabel(leagueKey) {
   return HIGHLIGHTS_TV_CHANNEL_ORDER.find((channel) => channel.leagueKey === leagueKey)?.label ?? leagueKey;
@@ -82920,11 +82921,11 @@ function useHighlightsTvAmbientPlayback() {
   );
 }
 
-// ../grarf/desktop/src/hooks/useHighlightsTvChannelPlayback.ts
+// src/hooks/useHighlightsTvChannelPlayback.ts
 init_define_import_meta_env();
 var import_react162 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/lib/highlightsTv/fetchHighlightsTvPlaylistClips.ts
+// src/lib/highlightsTv/fetchHighlightsTvPlaylistClips.ts
 init_define_import_meta_env();
 async function fetchHighlightsTvPlaylistClips(playlistUrl, leagueKey, leagueLabel) {
   const entries = await fetchSportscapeYoutubePlaylist(playlistUrl);
@@ -82941,7 +82942,7 @@ async function fetchHighlightsTvPlaylistClips(playlistUrl, leagueKey, leagueLabe
   );
 }
 
-// ../grarf/desktop/src/data/highlightsTvMvpSeed.ts
+// src/data/highlightsTvMvpSeed.ts
 init_define_import_meta_env();
 var HIGHLIGHTS_TV_MVP_SEED = {
   leagues: [
@@ -82974,7 +82975,7 @@ for (const league of HIGHLIGHTS_TV_MVP_SEED.leagues) {
   }
 }
 
-// ../grarf/desktop/src/hooks/useHighlightsTvChannelPlayback.ts
+// src/hooks/useHighlightsTvChannelPlayback.ts
 function resolveSeedLeagueSection(leagueKey) {
   const seedKey = resolveHighlightsTvSeedLeagueKey(leagueKey);
   return HIGHLIGHTS_TV_MVP_SEED.leagues.find((league) => league.leagueKey === seedKey);
@@ -83129,7 +83130,7 @@ function useHighlightsTvChannelPlayback() {
   };
 }
 
-// ../grarf/desktop/src/lib/highlightsTv/resolveHighlightsTvProgrammingGuideNewerVideos.ts
+// src/lib/highlightsTv/resolveHighlightsTvProgrammingGuideNewerVideos.ts
 init_define_import_meta_env();
 function readPublishedAtMs(clip) {
   const publishedAt = clip.publishedAt?.trim() ?? "";
@@ -83181,7 +83182,7 @@ function resolveHighlightsTvProgrammingGuideNewerVideos(displayedLeagueKey, leag
   };
 }
 
-// ../grarf/desktop/src/components/homeMvp/HomeHighlightsTvPane.tsx
+// src/components/homeMvp/HomeHighlightsTvPane.tsx
 init_isGrarfWebRenderer();
 var import_jsx_runtime150 = __toESM(require_jsx_runtime(), 1);
 function HomeHighlightsTvPaneAmbient() {
@@ -83293,7 +83294,7 @@ function HomeHighlightsTvPane() {
   return /* @__PURE__ */ (0, import_jsx_runtime150.jsx)(HomeHighlightsTvPaneChannel, {});
 }
 
-// ../grarf/desktop/src/components/homeMvp/HomeCenterPaneApplicationSurface.tsx
+// src/components/homeMvp/HomeCenterPaneApplicationSurface.tsx
 var import_jsx_runtime151 = __toESM(require_jsx_runtime(), 1);
 function HomeCenterPaneApplicationSurface({
   mode,
@@ -83316,14 +83317,14 @@ function HomeCenterPaneApplicationSurface({
   return /* @__PURE__ */ (0, import_jsx_runtime151.jsx)(import_jsx_runtime151.Fragment, { children: browserContent });
 }
 
-// ../grarf/desktop/src/lib/home/buildCenterPaneApplicationModeTab.ts
+// src/lib/home/buildCenterPaneApplicationModeTab.ts
 init_define_import_meta_env();
 var CENTER_PANE_APPLICATION_TAB_PREFIX2 = "center-pane-";
 function isCenterPaneApplicationModeTab(workspace) {
   return workspace?.id.startsWith(CENTER_PANE_APPLICATION_TAB_PREFIX2) ?? false;
 }
 
-// ../grarf/desktop/src/pages/HomePage.tsx
+// src/pages/HomePage.tsx
 var import_jsx_runtime152 = __toESM(require_jsx_runtime(), 1);
 var EMPTY_NAV = [];
 var HOME_CENTER_LIVE_SPORTS_TICKER_ENABLED = false;
@@ -83866,10 +83867,10 @@ function HomePage() {
   ) }) });
 }
 
-// ../grarf/desktop/src/pages/LeagueDirectoryRoutePage.tsx
+// src/pages/LeagueDirectoryRoutePage.tsx
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/components/navigation/GatedLeagueWebRouteGate.tsx
+// src/components/navigation/GatedLeagueWebRouteGate.tsx
 init_define_import_meta_env();
 var import_react165 = __toESM(require_react(), 1);
 var import_jsx_runtime153 = __toESM(require_jsx_runtime(), 1);
@@ -83881,14 +83882,14 @@ function GatedLeagueWebRouteGate() {
   return /* @__PURE__ */ (0, import_jsx_runtime153.jsx)(Navigate, { to: "/", replace: true });
 }
 
-// ../grarf/desktop/src/pages/LeagueDirectoryRoutePage.tsx
+// src/pages/LeagueDirectoryRoutePage.tsx
 init_isGrarfWebRenderer();
 
-// ../grarf/desktop/src/pages/DirectoryLeaguePage.tsx
+// src/pages/DirectoryLeaguePage.tsx
 init_define_import_meta_env();
 var import_react167 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/components/league/LeaguePageHeader.tsx
+// src/components/league/LeaguePageHeader.tsx
 init_define_import_meta_env();
 var import_react166 = __toESM(require_react(), 1);
 var import_jsx_runtime154 = __toESM(require_jsx_runtime(), 1);
@@ -84061,7 +84062,7 @@ function LeaguePageHeader({
   );
 }
 
-// ../grarf/desktop/src/data/directoryLeagueWorkspace.ts
+// src/data/directoryLeagueWorkspace.ts
 init_define_import_meta_env();
 var DIRECTORY_ESPN_WEB = {
   nfl: { espnRoot: "nfl" },
@@ -84163,7 +84164,7 @@ function isDirectoryLeagueCategoryId(id) {
   return LEAGUE_BOARD_CATEGORIES.some((c2) => c2.id === id);
 }
 
-// ../grarf/desktop/src/pages/DirectoryLeaguePage.tsx
+// src/pages/DirectoryLeaguePage.tsx
 var import_jsx_runtime155 = __toESM(require_jsx_runtime(), 1);
 function DirectoryLeaguePage({ item }) {
   const navigate = useNavigate();
@@ -84340,21 +84341,21 @@ function DirectoryLeaguePage({ item }) {
   ] });
 }
 
-// ../grarf/desktop/src/pages/LeagueBoardPage.tsx
+// src/pages/LeagueBoardPage.tsx
 init_define_import_meta_env();
 var import_react174 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/components/league/LeagueGamesContextColumn.tsx
+// src/components/league/LeagueGamesContextColumn.tsx
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/components/commandBriefing/CommandBriefingModule.tsx
+// src/components/commandBriefing/CommandBriefingModule.tsx
 init_define_import_meta_env();
 var import_react171 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/lib/commandBriefing/buildCommandBriefingGamePool.ts
+// src/lib/commandBriefing/buildCommandBriefingGamePool.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/gamesSpine/buildAllVisibleSpineGames.ts
+// src/lib/gamesSpine/buildAllVisibleSpineGames.ts
 init_define_import_meta_env();
 function buildAllVisibleSpineGames(input) {
   const shared = {
@@ -84386,7 +84387,7 @@ function buildAllVisibleSpineGames(input) {
   return out;
 }
 
-// ../grarf/desktop/src/lib/commandBriefing/buildCommandBriefingGamePool.ts
+// src/lib/commandBriefing/buildCommandBriefingGamePool.ts
 function buildCommandBriefingGamePool(input) {
   const slate = buildAllVisibleSpineGames({
     liveLeagues: input.liveLeagues,
@@ -84404,7 +84405,7 @@ function buildCommandBriefingGamePool(input) {
   );
 }
 
-// ../grarf/desktop/src/lib/commandBriefing/selectBriefingGames.ts
+// src/lib/commandBriefing/selectBriefingGames.ts
 init_define_import_meta_env();
 var LOG47 = "[CommandBriefing]";
 function defaultBriefingNarrative(game) {
@@ -84460,7 +84461,7 @@ function selectBriefingGames(games, bundle, dateKey, _fallbacks = {}, leagueScop
   return ranked;
 }
 
-// ../grarf/desktop/src/hooks/useScheduleCacheForSelectedDate.ts
+// src/hooks/useScheduleCacheForSelectedDate.ts
 init_define_import_meta_env();
 var import_react168 = __toESM(require_react(), 1);
 function useScheduleCacheForSelectedDate(selectedDate) {
@@ -84511,7 +84512,7 @@ function useScheduleCacheForSelectedDate(selectedDate) {
   ]);
 }
 
-// ../grarf/desktop/src/components/commandBriefing/CommandBriefingCompactItemRow.tsx
+// src/components/commandBriefing/CommandBriefingCompactItemRow.tsx
 init_define_import_meta_env();
 var import_jsx_runtime156 = __toESM(require_jsx_runtime(), 1);
 function CommandBriefingCompactItemRow({ game, onSelectGame }) {
@@ -84545,11 +84546,11 @@ function CommandBriefingCompactItemRow({ game, onSelectGame }) {
   );
 }
 
-// ../grarf/desktop/src/components/commandBriefing/DemoHomeCommandBriefingPanel.tsx
+// src/components/commandBriefing/DemoHomeCommandBriefingPanel.tsx
 init_define_import_meta_env();
 var import_react169 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/data/demoHomeCommandBriefing.ts
+// src/data/demoHomeCommandBriefing.ts
 init_define_import_meta_env();
 var NHL_LOGO = (abbrev) => `https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/${abbrev}.png`;
 var MLB_LOGO = (abbrev) => `https://a.espncdn.com/i/teamlogos/mlb/500/scoreboard/${abbrev}.png`;
@@ -84610,10 +84611,10 @@ var DEMO_HOME_COMMAND_BRIEFING_CARDS = [
   }
 ];
 
-// ../grarf/desktop/src/components/commandBriefing/DemoHomeCommandBriefingRow.tsx
+// src/components/commandBriefing/DemoHomeCommandBriefingRow.tsx
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/components/commandBriefing/CommandBriefingGameCard.tsx
+// src/components/commandBriefing/CommandBriefingGameCard.tsx
 init_define_import_meta_env();
 var import_jsx_runtime157 = __toESM(require_jsx_runtime(), 1);
 function CommandBriefingGameCard({
@@ -84646,7 +84647,7 @@ function CommandBriefingGameCard({
   );
 }
 
-// ../grarf/desktop/src/components/commandBriefing/DemoHomeCommandBriefingRow.tsx
+// src/components/commandBriefing/DemoHomeCommandBriefingRow.tsx
 var import_jsx_runtime158 = __toESM(require_jsx_runtime(), 1);
 function demoMarkLabel(mark) {
   return mark.name.trim().toUpperCase();
@@ -84693,7 +84694,7 @@ function formatDemoHomeCommandBriefingCompactLine(card) {
   }).join(" | ");
 }
 
-// ../grarf/desktop/src/components/commandBriefing/DemoHomeCommandBriefingPanel.tsx
+// src/components/commandBriefing/DemoHomeCommandBriefingPanel.tsx
 var import_jsx_runtime159 = __toESM(require_jsx_runtime(), 1);
 function DemoHomeCommandBriefingPanel({ briefingDisplayMode = "expanded" }) {
   const items = DEMO_HOME_COMMAND_BRIEFING_CARDS;
@@ -84748,7 +84749,7 @@ function DemoHomeCommandBriefingPanel({ briefingDisplayMode = "expanded" }) {
   );
 }
 
-// ../grarf/desktop/src/components/commandBriefing/CommandBriefingItemRow.tsx
+// src/components/commandBriefing/CommandBriefingItemRow.tsx
 init_define_import_meta_env();
 var import_react170 = __toESM(require_react(), 1);
 var import_jsx_runtime160 = __toESM(require_jsx_runtime(), 1);
@@ -84826,7 +84827,7 @@ function CommandBriefingItemRow({
   );
 }
 
-// ../grarf/desktop/src/components/commandBriefing/CommandBriefingModule.tsx
+// src/components/commandBriefing/CommandBriefingModule.tsx
 var import_jsx_runtime161 = __toESM(require_jsx_runtime(), 1);
 function CommandBriefingExpandedList({
   ranked,
@@ -85109,7 +85110,7 @@ function CommandBriefingModuleProduction({
   );
 }
 
-// ../grarf/desktop/src/components/league/LeagueGamesSpineFeed.tsx
+// src/components/league/LeagueGamesSpineFeed.tsx
 init_define_import_meta_env();
 var import_jsx_runtime162 = __toESM(require_jsx_runtime(), 1);
 function LeagueGamesSpineFeed({
@@ -85156,7 +85157,7 @@ function LeagueGamesSpineFeed({
   ] });
 }
 
-// ../grarf/desktop/src/components/league/LeagueGamesContextColumn.tsx
+// src/components/league/LeagueGamesContextColumn.tsx
 var import_jsx_runtime163 = __toESM(require_jsx_runtime(), 1);
 function LeagueGamesContextColumn({
   league,
@@ -85210,7 +85211,7 @@ function LeagueGamesContextColumn({
   );
 }
 
-// ../grarf/desktop/src/hooks/useGamesCatchUpAutoSelect.ts
+// src/hooks/useGamesCatchUpAutoSelect.ts
 init_define_import_meta_env();
 var import_react172 = __toESM(require_react(), 1);
 var GAMES_CATCH_UP_ENTRY_KEY = "games:CATCH_UP";
@@ -85228,7 +85229,7 @@ function useGamesCatchUpAutoSelect(isGamesCatchUp, leadingGameId, onSelectGame) 
   }, [isGamesCatchUp, leadingGameId, onSelectGame]);
 }
 
-// ../grarf/desktop/src/hooks/useLeadingOperationalSpineGameId.ts
+// src/hooks/useLeadingOperationalSpineGameId.ts
 init_define_import_meta_env();
 var import_react173 = __toESM(require_react(), 1);
 function useLeadingOperationalSpineGameId(league) {
@@ -85246,7 +85247,7 @@ function useLeadingOperationalSpineGameId(league) {
   }, [games, operationalMode, retainedById, league]);
 }
 
-// ../grarf/desktop/src/pages/LeagueBoardPage.tsx
+// src/pages/LeagueBoardPage.tsx
 var import_jsx_runtime164 = __toESM(require_jsx_runtime(), 1);
 var SLUG_BY_LEAGUE = {
   NBA: "nba",
@@ -85514,15 +85515,15 @@ function LeagueBoardPage({ league }) {
   ] });
 }
 
-// ../grarf/desktop/src/pages/MLBPage.tsx
+// src/pages/MLBPage.tsx
 init_define_import_meta_env();
 var import_react184 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/components/mlb/MlbCatchUpHomeSurface.tsx
+// src/components/mlb/MlbCatchUpHomeSurface.tsx
 init_define_import_meta_env();
 var import_react181 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/components/league/LeagueHomeWebPane.tsx
+// src/components/league/LeagueHomeWebPane.tsx
 init_define_import_meta_env();
 var import_react175 = __toESM(require_react(), 1);
 var import_jsx_runtime165 = __toESM(require_jsx_runtime(), 1);
@@ -85637,7 +85638,7 @@ function LeagueHomeWebPane({
   );
 }
 
-// ../grarf/desktop/src/components/mlb/MlbCatchUpStandingsPane.tsx
+// src/components/mlb/MlbCatchUpStandingsPane.tsx
 init_define_import_meta_env();
 var import_react176 = __toESM(require_react(), 1);
 var import_jsx_runtime166 = __toESM(require_jsx_runtime(), 1);
@@ -85781,11 +85782,11 @@ function MlbCatchUpStandingsPane({ paneId, className }) {
   );
 }
 
-// ../grarf/desktop/src/components/mlb/MlbHeadlinesFeedPane.tsx
+// src/components/mlb/MlbHeadlinesFeedPane.tsx
 init_define_import_meta_env();
 var import_react177 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/lib/gamesSpine/sortOperationalSpineGames.ts
+// src/lib/gamesSpine/sortOperationalSpineGames.ts
 init_define_import_meta_env();
 function statusBase(game) {
   if (game.status === "live") return 1e3;
@@ -85810,7 +85811,7 @@ function sortBriefingPriorityGames(games, bundle, dateKey) {
   );
 }
 
-// ../grarf/desktop/src/lib/rss/rssFetchDiagnostics.ts
+// src/lib/rss/rssFetchDiagnostics.ts
 init_define_import_meta_env();
 var LOG49 = "[RSS DEBUG]";
 function classifyRssBody(body) {
@@ -85919,7 +85920,7 @@ async function runEspnMlbRssFetchDiagnostics(url = "https://www.espn.com/espn/rs
   console.log(`${LOG49} === ESPN MLB RSS fetch diagnosis end ===`);
 }
 
-// ../grarf/desktop/src/components/mlb/MlbHeadlinesFeedPane.tsx
+// src/components/mlb/MlbHeadlinesFeedPane.tsx
 var import_jsx_runtime167 = __toESM(require_jsx_runtime(), 1);
 var ESPN_MLB_RSS_URL = "https://www.espn.com/espn/rss/mlb/news";
 function resolveSummaryHeadlineUrl(game) {
@@ -86148,13 +86149,13 @@ function MlbHeadlinesFeedPane({
   );
 }
 
-// ../grarf/desktop/src/components/leagueOverview/LeagueOverviewCard.tsx
+// src/components/leagueOverview/LeagueOverviewCard.tsx
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/components/leagueOverview/LeagueOverviewCardSections.tsx
+// src/components/leagueOverview/LeagueOverviewCardSections.tsx
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/components/leagueOverview/leagueOverviewCardLayout.ts
+// src/components/leagueOverview/leagueOverviewCardLayout.ts
 init_define_import_meta_env();
 var leagueOverviewCardShellClass = "flex min-h-0 min-w-0 flex-col overflow-hidden rounded-[2px] border border-[#24363c]/55 bg-[#010303] font-mono shadow-[inset_0_0_0_1px_rgba(10,20,24,0.92),inset_0_1px_0_rgba(86,247,255,0.02)]";
 var leagueOverviewCardHeaderClass = "flex shrink-0 items-start justify-between gap-2 border-b border-[#24363c]/40 bg-[#020707]/90 px-2 py-1.5";
@@ -86165,7 +86166,7 @@ var leagueOverviewRowClass = "flex items-baseline justify-between gap-2 px-2 py-
 var leagueOverviewRowPrimaryClass = "min-w-0 truncate text-[#c8d4d4]";
 var leagueOverviewRowMetricClass = "shrink-0 tabular-nums text-[#8aa0a0]";
 
-// ../grarf/desktop/src/components/leagueOverview/LeagueOverviewCardSections.tsx
+// src/components/leagueOverview/LeagueOverviewCardSections.tsx
 var import_jsx_runtime168 = __toESM(require_jsx_runtime(), 1);
 function LeagueOverviewSectionFrame({ title, children, className }) {
   return /* @__PURE__ */ (0, import_jsx_runtime168.jsxs)("section", { className: cn2(leagueOverviewSectionShellClass, className), "aria-label": title, children: [
@@ -86233,11 +86234,11 @@ function LeagueOverviewStatLeadersSection({
   return /* @__PURE__ */ (0, import_jsx_runtime168.jsx)(LeagueOverviewSectionFrame, { title: section.title, children: section.entries.length > 0 ? /* @__PURE__ */ (0, import_jsx_runtime168.jsx)("ul", { className: "list-none pb-1", children: section.entries.map((entry) => /* @__PURE__ */ (0, import_jsx_runtime168.jsx)(StatLeaderRow, { entry }, entry.id)) }) : /* @__PURE__ */ (0, import_jsx_runtime168.jsx)(LeagueOverviewSectionEmpty, {}) });
 }
 
-// ../grarf/desktop/src/components/leagueOverview/LeagueOverviewSnapshotContent.tsx
+// src/components/leagueOverview/LeagueOverviewSnapshotContent.tsx
 init_define_import_meta_env();
 var import_react179 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/lib/leagueOverview/lookupMlbTeamPulseMark.ts
+// src/lib/leagueOverview/lookupMlbTeamPulseMark.ts
 init_define_import_meta_env();
 function normalizeTeamToken2(value) {
   return value.trim().toLowerCase().replace(/[^a-z0-9]+/g, "");
@@ -86268,7 +86269,7 @@ function lookupMlbTeamPulseMark(games, teamName) {
   return { label: target.toUpperCase() };
 }
 
-// ../grarf/desktop/src/components/leagueOverview/LeaguePulseTeamMark.tsx
+// src/components/leagueOverview/LeaguePulseTeamMark.tsx
 init_define_import_meta_env();
 var import_react178 = __toESM(require_react(), 1);
 var import_jsx_runtime169 = __toESM(require_jsx_runtime(), 1);
@@ -86288,7 +86289,7 @@ function LeaguePulseTeamMark({ teamName }) {
   );
 }
 
-// ../grarf/desktop/src/components/leagueOverview/LeagueOverviewSnapshotContent.tsx
+// src/components/leagueOverview/LeagueOverviewSnapshotContent.tsx
 var import_jsx_runtime170 = __toESM(require_jsx_runtime(), 1);
 var PULSE_ROTATION_MS = 7e3;
 var PULSE_FADE_MS = 450;
@@ -86429,7 +86430,7 @@ function LeagueOverviewSnapshotContent({ snapshot }) {
   ) });
 }
 
-// ../grarf/desktop/src/components/leagueOverview/LeagueOverviewCard.tsx
+// src/components/leagueOverview/LeagueOverviewCard.tsx
 var import_jsx_runtime171 = __toESM(require_jsx_runtime(), 1);
 function LeagueOverviewCardEmptyShell({ className }) {
   return /* @__PURE__ */ (0, import_jsx_runtime171.jsxs)(
@@ -86478,19 +86479,19 @@ function LeagueOverviewCard({ model, className }) {
   );
 }
 
-// ../grarf/desktop/src/hooks/useMlbLeagueOverviewCard.ts
+// src/hooks/useMlbLeagueOverviewCard.ts
 init_define_import_meta_env();
 var import_react180 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/services/mlbOverview/fetchMlbStatsApiStandings.ts
+// src/services/mlbOverview/fetchMlbStatsApiStandings.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/services/mlbOverview/mlbStandingsDivisionOrder.ts
+// src/services/mlbOverview/mlbStandingsDivisionOrder.ts
 init_define_import_meta_env();
 var MLB_STATS_API_LEAGUE_IDS = "103,104";
 var MLB_STATS_API_STANDINGS_URL = `https://statsapi.mlb.com/api/v1/standings?leagueId=${MLB_STATS_API_LEAGUE_IDS}&standingsTypes=regularSeason&hydrate=division,league`;
 
-// ../grarf/desktop/src/services/mlbOverview/fetchMlbStatsApiStandings.ts
+// src/services/mlbOverview/fetchMlbStatsApiStandings.ts
 async function fetchMlbStatsApiStandings(signal) {
   const res = await fetch(MLB_STATS_API_STANDINGS_URL, { signal });
   if (!res.ok) {
@@ -86499,7 +86500,7 @@ async function fetchMlbStatsApiStandings(signal) {
   return await res.json();
 }
 
-// ../grarf/desktop/src/services/mlbOverview/fetchMlbStatsApiLeaders.ts
+// src/services/mlbOverview/fetchMlbStatsApiLeaders.ts
 init_define_import_meta_env();
 var MLB_STATS_API_LEADERS_URL = "https://statsapi.mlb.com/api/v1/stats/leaders?leaderCategories=homeRuns,earnedRunAverage&sportId=1&leaderGameTypes=R&limit=1&statGroup=pitching,hitting";
 async function fetchMlbStatsApiLeaders(signal) {
@@ -86514,16 +86515,16 @@ function pickMlbLeader(response, category) {
   return group?.leaders?.[0] ?? null;
 }
 
-// ../grarf/desktop/src/services/mlbOverview/mapMlbStandingsToLeagueOverviewCard.ts
+// src/services/mlbOverview/mapMlbStandingsToLeagueOverviewCard.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/leagueOverview/resolveMlbPlayerHeadshotUrl.ts
+// src/lib/leagueOverview/resolveMlbPlayerHeadshotUrl.ts
 init_define_import_meta_env();
 function resolveMlbPlayerHeadshotUrl(playerId) {
   return `https://img.mlbstatic.com/mlb-photos/image/upload/w_120,q_auto:best/v1/people/${playerId}/headshot/67/current`;
 }
 
-// ../grarf/desktop/src/services/mlbOverview/mapMlbStandingsToLeagueOverviewCard.ts
+// src/services/mlbOverview/mapMlbStandingsToLeagueOverviewCard.ts
 var WILD_CARD_TEAMS_PER_LEAGUE = 3;
 function mapSeasonPhaseLabel(seasonState) {
   switch (seasonState) {
@@ -86641,7 +86642,7 @@ function mapMlbStandingsToLeagueOverviewCard(standings, leaders) {
   };
 }
 
-// ../grarf/desktop/src/hooks/useMlbLeagueOverviewCard.ts
+// src/hooks/useMlbLeagueOverviewCard.ts
 var REFRESH_MS4 = 10 * 60 * 1e3;
 function useMlbLeagueOverviewCard(enabled = true) {
   const [model, setModel] = (0, import_react180.useState)(null);
@@ -86681,7 +86682,7 @@ function useMlbLeagueOverviewCard(enabled = true) {
   return { model, loading };
 }
 
-// ../grarf/desktop/src/components/mlb/MlbCatchUpHomeSurface.tsx
+// src/components/mlb/MlbCatchUpHomeSurface.tsx
 var import_jsx_runtime172 = __toESM(require_jsx_runtime(), 1);
 var EMPTY_WORKSPACE_NAV = [];
 var MLB_GAME_WORKSPACE_PANE_ID = "mlb-game-workspace";
@@ -86830,7 +86831,7 @@ function MlbCatchUpHomeSurface({
   );
 }
 
-// ../grarf/desktop/src/components/mlb/MlbPreviewHomeSurface.tsx
+// src/components/mlb/MlbPreviewHomeSurface.tsx
 init_define_import_meta_env();
 var import_react182 = __toESM(require_react(), 1);
 var import_jsx_runtime173 = __toESM(require_jsx_runtime(), 1);
@@ -86985,13 +86986,13 @@ function MlbPreviewHomeSurface({
   );
 }
 
-// ../grarf/desktop/src/components/mlb/MLBContextColumn.tsx
+// src/components/mlb/MLBContextColumn.tsx
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/components/media/SpotifyPodcastPanel.tsx
+// src/components/media/SpotifyPodcastPanel.tsx
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/components/briefing/ExpandToWorkspaceButton.tsx
+// src/components/briefing/ExpandToWorkspaceButton.tsx
 init_define_import_meta_env();
 var import_jsx_runtime174 = __toESM(require_jsx_runtime(), 1);
 function ExpandToWorkspaceButton({ onClick, label = "Open in workspace", className }) {
@@ -87012,7 +87013,7 @@ function ExpandToWorkspaceButton({ onClick, label = "Open in workspace", classNa
   );
 }
 
-// ../grarf/desktop/src/components/briefing/BriefingDockedEmbedShell.tsx
+// src/components/briefing/BriefingDockedEmbedShell.tsx
 init_define_import_meta_env();
 var import_jsx_runtime175 = __toESM(require_jsx_runtime(), 1);
 function briefingDockedIframeHeight(variant) {
@@ -87138,7 +87139,7 @@ function BriefingDockedEmbedError({
   );
 }
 
-// ../grarf/desktop/src/components/media/SpotifyPodcastPanel.tsx
+// src/components/media/SpotifyPodcastPanel.tsx
 var import_jsx_runtime176 = __toESM(require_jsx_runtime(), 1);
 function SpotifyPodcastPanel({
   showId,
@@ -87207,7 +87208,7 @@ function SpotifyPodcastPanel({
   );
 }
 
-// ../grarf/desktop/src/components/briefing/BriefingYoutubeDockedPanel.tsx
+// src/components/briefing/BriefingYoutubeDockedPanel.tsx
 init_define_import_meta_env();
 var import_jsx_runtime177 = __toESM(require_jsx_runtime(), 1);
 function BriefingYoutubeDockedPanel({
@@ -87253,13 +87254,13 @@ function BriefingYoutubeDockedPanel({
   );
 }
 
-// ../grarf/desktop/src/components/briefing/MlbAllGamesHighlightsBlock.tsx
+// src/components/briefing/MlbAllGamesHighlightsBlock.tsx
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/components/briefing/InlineRecapModule.tsx
+// src/components/briefing/InlineRecapModule.tsx
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/components/briefing/GameHighlightMediaCard.tsx
+// src/components/briefing/GameHighlightMediaCard.tsx
 init_define_import_meta_env();
 var import_jsx_runtime178 = __toESM(require_jsx_runtime(), 1);
 function GameHighlightMediaCard({
@@ -87326,7 +87327,7 @@ function GameHighlightMediaCard({
   );
 }
 
-// ../grarf/desktop/src/components/briefing/InlineRecapModule.tsx
+// src/components/briefing/InlineRecapModule.tsx
 var import_jsx_runtime179 = __toESM(require_jsx_runtime(), 1);
 function InlineRecapModule({
   videoId,
@@ -87365,7 +87366,7 @@ function InlineRecapModule({
   );
 }
 
-// ../grarf/desktop/src/components/briefing/MlbAllGamesHighlightsBlock.tsx
+// src/components/briefing/MlbAllGamesHighlightsBlock.tsx
 var import_jsx_runtime180 = __toESM(require_jsx_runtime(), 1);
 function MlbAllGamesHighlightsBlock({
   displayHighlight,
@@ -87385,7 +87386,7 @@ function MlbAllGamesHighlightsBlock({
   );
 }
 
-// ../grarf/desktop/src/hooks/useMlbLineLabsPreview.ts
+// src/hooks/useMlbLineLabsPreview.ts
 init_define_import_meta_env();
 var import_react183 = __toESM(require_react(), 1);
 var REFRESH_MS5 = 6 * 60 * 60 * 1e3;
@@ -87507,7 +87508,7 @@ function useMlbLineLabsPreview(enabled = true) {
   return { preview, authoritativePreview, initialLoading };
 }
 
-// ../grarf/desktop/src/components/mlb/MLBContextColumn.tsx
+// src/components/mlb/MLBContextColumn.tsx
 var import_jsx_runtime181 = __toESM(require_jsx_runtime(), 1);
 function MLBContextColumn({
   games: _games,
@@ -87610,7 +87611,7 @@ function MLBContextColumn({
   );
 }
 
-// ../grarf/desktop/src/components/MLBActivityRail.tsx
+// src/components/MLBActivityRail.tsx
 init_define_import_meta_env();
 init_isGrarfWebRenderer();
 var import_jsx_runtime182 = __toESM(require_jsx_runtime(), 1);
@@ -87644,10 +87645,10 @@ function MLBActivityRail({
   );
 }
 
-// ../grarf/desktop/src/pages/MLBPage.tsx
+// src/pages/MLBPage.tsx
 init_youtubeClipSources();
 
-// ../grarf/desktop/src/data/mlbCommandWorkspace.ts
+// src/data/mlbCommandWorkspace.ts
 init_define_import_meta_env();
 var MLB_WORKSPACE_CATEGORIES = [
   { id: "news", label: "NEWS" },
@@ -87728,7 +87729,7 @@ function mlbWorkspaceStatusLabel(nav, overlay) {
   return CATEGORY_LABEL2[nav.categoryId];
 }
 
-// ../grarf/desktop/src/lib/livetrack/mlb/liveTrackMlbCatchUpIntent.ts
+// src/lib/livetrack/mlb/liveTrackMlbCatchUpIntent.ts
 init_define_import_meta_env();
 var LIVE_TRACK_MLB_CATCH_UP_GAME_INTENT_KEY = "grarf:livetrack-mlb-catchup-game";
 function consumeLiveTrackMlbCatchUpGameIntent() {
@@ -87738,7 +87739,7 @@ function consumeLiveTrackMlbCatchUpGameIntent() {
   return gameId;
 }
 
-// ../grarf/desktop/src/pages/MLBPage.tsx
+// src/pages/MLBPage.tsx
 init_isGrarfWebRenderer();
 var import_jsx_runtime183 = __toESM(require_jsx_runtime(), 1);
 var EMPTY_WORKSPACE_NAV3 = [];
@@ -88411,35 +88412,35 @@ function MLBPage() {
   ] });
 }
 
-// ../grarf/desktop/src/pages/NBAPage.tsx
+// src/pages/NBAPage.tsx
 init_define_import_meta_env();
 var import_jsx_runtime184 = __toESM(require_jsx_runtime(), 1);
 function NBAPage() {
   return /* @__PURE__ */ (0, import_jsx_runtime184.jsx)(LeagueBoardPage, { league: "NBA" });
 }
 
-// ../grarf/desktop/src/pages/NHLPage.tsx
+// src/pages/NHLPage.tsx
 init_define_import_meta_env();
 var import_jsx_runtime185 = __toESM(require_jsx_runtime(), 1);
 function NHLPage() {
   return /* @__PURE__ */ (0, import_jsx_runtime185.jsx)(LeagueBoardPage, { league: "NHL" });
 }
 
-// ../grarf/desktop/src/pages/MLSPage.tsx
+// src/pages/MLSPage.tsx
 init_define_import_meta_env();
 var import_jsx_runtime186 = __toESM(require_jsx_runtime(), 1);
 function MLSPage() {
   return /* @__PURE__ */ (0, import_jsx_runtime186.jsx)(LeagueBoardPage, { league: "MLS" });
 }
 
-// ../grarf/desktop/src/pages/WNBAPage.tsx
+// src/pages/WNBAPage.tsx
 init_define_import_meta_env();
 var import_jsx_runtime187 = __toESM(require_jsx_runtime(), 1);
 function WNBAPage() {
   return /* @__PURE__ */ (0, import_jsx_runtime187.jsx)(LeagueBoardPage, { league: "WNBA" });
 }
 
-// ../grarf/desktop/src/pages/F1Page.tsx
+// src/pages/F1Page.tsx
 init_define_import_meta_env();
 var import_react185 = __toESM(require_react(), 1);
 var import_jsx_runtime188 = __toESM(require_jsx_runtime(), 1);
@@ -88561,7 +88562,7 @@ function F1Page() {
   ] });
 }
 
-// ../grarf/desktop/src/pages/LeagueDirectoryRoutePage.tsx
+// src/pages/LeagueDirectoryRoutePage.tsx
 var import_jsx_runtime189 = __toESM(require_jsx_runtime(), 1);
 var BOARD_LEAGUES = /* @__PURE__ */ new Set([
   "NBA",
@@ -88604,18 +88605,18 @@ function LeagueDirectoryRoutePage() {
   return /* @__PURE__ */ (0, import_jsx_runtime189.jsx)(DirectoryLeaguePage, { item });
 }
 
-// ../grarf/desktop/src/pages/SportscapeEditorialAdminPage.tsx
+// src/pages/SportscapeEditorialAdminPage.tsx
 init_define_import_meta_env();
 var import_react194 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/components/gamesSpineAdmin/GamesSpineAdminPanel.tsx
+// src/components/gamesSpineAdmin/GamesSpineAdminPanel.tsx
 init_define_import_meta_env();
 var import_react187 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/lib/gamesSpine/manual/gamesSpineManualAdminPersistence.ts
+// src/lib/gamesSpine/manual/gamesSpineManualAdminPersistence.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/gamesSpine/manual/gamesSpineManualLeagueDocument.ts
+// src/lib/gamesSpine/manual/gamesSpineManualLeagueDocument.ts
 init_define_import_meta_env();
 function manualGamesSpineEventUniquenessKey(event) {
   return `${event.date.trim()}::${event.eventName.trim().toLowerCase()}::${event.startTime.trim()}`;
@@ -88857,10 +88858,10 @@ function createBlankManualGamesSpineEvent() {
   };
 }
 
-// ../grarf/desktop/src/lib/gamesSpine/manual/validateGamesSpineManualDocument.ts
+// src/lib/gamesSpine/manual/validateGamesSpineManualDocument.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/gamesSpine/manual/normalizeCanonicalManualImport.ts
+// src/lib/gamesSpine/manual/normalizeCanonicalManualImport.ts
 init_define_import_meta_env();
 function normalizeOptionalString(value) {
   if (value == null) return null;
@@ -88927,7 +88928,7 @@ function normalizeCanonicalManualImportEditorPayload(raw) {
   return raw;
 }
 
-// ../grarf/desktop/src/lib/gamesSpine/manual/validateGamesSpineManualDocument.ts
+// src/lib/gamesSpine/manual/validateGamesSpineManualDocument.ts
 function isNonEmptyString(value) {
   return typeof value === "string" && value.trim().length > 0;
 }
@@ -89101,7 +89102,7 @@ function validateGamesSpineManualLeagueDraft(league) {
   return { ok: true, league: parsed };
 }
 
-// ../grarf/desktop/src/lib/gamesSpine/manual/gamesSpineManualAdminPersistence.ts
+// src/lib/gamesSpine/manual/gamesSpineManualAdminPersistence.ts
 function serializeVisualLeagueDraftForStorage(draft) {
   return validateGamesSpineManualLeagueDraft(draft);
 }
@@ -89150,11 +89151,11 @@ async function importPersistedManualGamesSpineLeague(input) {
   return { document: await persistManualGamesSpineDocument(merged) };
 }
 
-// ../grarf/desktop/src/components/gamesSpineAdmin/SavedLeaguesBrowser.tsx
+// src/components/gamesSpineAdmin/SavedLeaguesBrowser.tsx
 init_define_import_meta_env();
 var import_react186 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/components/gamesSpineAdmin/GamesSpineLeagueVisualEditor.tsx
+// src/components/gamesSpineAdmin/GamesSpineLeagueVisualEditor.tsx
 init_define_import_meta_env();
 var import_jsx_runtime190 = __toESM(require_jsx_runtime(), 1);
 function FieldLabel({ children }) {
@@ -89468,7 +89469,7 @@ function GamesSpineLeagueVisualEditor({
   ] });
 }
 
-// ../grarf/desktop/src/components/gamesSpineAdmin/SavedLeaguesBrowser.tsx
+// src/components/gamesSpineAdmin/SavedLeaguesBrowser.tsx
 var import_jsx_runtime191 = __toESM(require_jsx_runtime(), 1);
 function SavedLeaguesBrowser({
   document: document2,
@@ -89687,7 +89688,7 @@ function SavedLeaguesBrowser({
   ] });
 }
 
-// ../grarf/desktop/src/components/gamesSpineAdmin/GamesSpineAdminPanel.tsx
+// src/components/gamesSpineAdmin/GamesSpineAdminPanel.tsx
 var import_jsx_runtime192 = __toESM(require_jsx_runtime(), 1);
 function GamesSpineAdminPanel() {
   const storedDocument = useGamesSpineManualStore((state3) => state3.document);
@@ -90046,11 +90047,11 @@ function GamesSpineAdminPanel() {
   ] }) });
 }
 
-// ../grarf/desktop/src/components/sportscapeEditorial/SportscapeEditorialManualAiBriefEntry.tsx
+// src/components/sportscapeEditorial/SportscapeEditorialManualAiBriefEntry.tsx
 init_define_import_meta_env();
 var import_react188 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/lib/sportscape/editorial/generateManualEditorialEventId.ts
+// src/lib/sportscape/editorial/generateManualEditorialEventId.ts
 init_define_import_meta_env();
 var MANUAL_EDITORIAL_EVENT_ID_PREFIX = "editorial-";
 function formatLocalCalendarDateKey(now = /* @__PURE__ */ new Date()) {
@@ -90077,7 +90078,7 @@ function generateManualEditorialEventId(league, existingEventIds, now = /* @__PU
   return `${prefix}${sequence}`;
 }
 
-// ../grarf/desktop/src/components/sportscapeEditorial/SportscapeEditorialManualAiBriefEntry.tsx
+// src/components/sportscapeEditorial/SportscapeEditorialManualAiBriefEntry.tsx
 var import_jsx_runtime193 = __toESM(require_jsx_runtime(), 1);
 var INPUT_CLASS = "mt-1 w-full border border-line/60 bg-[#030808] px-3 py-2 text-sm text-[#d8e8e8] outline-none focus:border-cyansys/40";
 var LABEL_CLASS = "text-[10px] tracking-[0.16em] text-textdim";
@@ -90366,7 +90367,7 @@ function SportscapeEditorialManualAiBriefEntry({
   ] });
 }
 
-// ../grarf/desktop/src/components/sportscapeEditorial/SportscapeEditorialAiBriefSummary.tsx
+// src/components/sportscapeEditorial/SportscapeEditorialAiBriefSummary.tsx
 init_define_import_meta_env();
 var import_react189 = __toESM(require_react(), 1);
 var import_jsx_runtime194 = __toESM(require_jsx_runtime(), 1);
@@ -90440,11 +90441,11 @@ function SportscapeEditorialAiBriefSummary({
   ] });
 }
 
-// ../grarf/desktop/src/components/sportscapeEditorial/SportscapeEditorialLeagueSection.tsx
+// src/components/sportscapeEditorial/SportscapeEditorialLeagueSection.tsx
 init_define_import_meta_env();
 var import_react191 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/lib/sportscape/editorial/collectSportscapeAdminEventsFromWebSportscape.ts
+// src/lib/sportscape/editorial/collectSportscapeAdminEventsFromWebSportscape.ts
 init_define_import_meta_env();
 function collectArticleEventIds(article, gamesByEventId) {
   const ids = /* @__PURE__ */ new Set();
@@ -90579,7 +90580,7 @@ function resolveEditorialEntryForAdminEvent(event, entriesByEventId) {
   return void 0;
 }
 
-// ../grarf/desktop/src/lib/sportscape/editorial/sportscapeEditorialHighlightRegistry.ts
+// src/lib/sportscape/editorial/sportscapeEditorialHighlightRegistry.ts
 init_define_import_meta_env();
 var SPORTSCAPE_EDITORIAL_HIGHLIGHT_REGISTRY = {
   MLB: {
@@ -90643,7 +90644,7 @@ function getSportscapeEditorialHighlightSource(league) {
   return SPORTSCAPE_EDITORIAL_HIGHLIGHT_REGISTRY[league];
 }
 
-// ../grarf/desktop/src/components/sportscapeEditorial/SportscapeEditorialEventRow.tsx
+// src/components/sportscapeEditorial/SportscapeEditorialEventRow.tsx
 init_define_import_meta_env();
 var import_react190 = __toESM(require_react(), 1);
 var import_jsx_runtime195 = __toESM(require_jsx_runtime(), 1);
@@ -90877,7 +90878,7 @@ function SportscapeEditorialEventRow({
   ] });
 }
 
-// ../grarf/desktop/src/components/sportscapeEditorial/SportscapeEditorialLeagueSection.tsx
+// src/components/sportscapeEditorial/SportscapeEditorialLeagueSection.tsx
 var import_jsx_runtime196 = __toESM(require_jsx_runtime(), 1);
 function SportscapeEditorialLeagueSection({
   league,
@@ -90956,7 +90957,7 @@ function SportscapeEditorialLeagueSection({
   ] });
 }
 
-// ../grarf/desktop/src/components/sportscapeEditorial/SportscapeEditorialPasswordGate.tsx
+// src/components/sportscapeEditorial/SportscapeEditorialPasswordGate.tsx
 init_define_import_meta_env();
 var import_react192 = __toESM(require_react(), 1);
 var import_jsx_runtime197 = __toESM(require_jsx_runtime(), 1);
@@ -90966,7 +90967,7 @@ function SportscapeEditorialPasswordGate({ children }) {
   return /* @__PURE__ */ (0, import_jsx_runtime197.jsx)("div", { className: "flex min-h-screen items-center justify-center bg-[#020404] px-4", children: /* @__PURE__ */ (0, import_jsx_runtime197.jsx)("div", { className: "w-full max-w-sm border border-line/60 bg-panel2 p-6 shadow-lg", children: /* @__PURE__ */ (0, import_jsx_runtime197.jsx)(SportscapeEditorialPasswordForm, { onSuccess: () => setAuthed(true) }) }) });
 }
 
-// ../grarf/desktop/src/hooks/useSportscapeAdminEvents.ts
+// src/hooks/useSportscapeAdminEvents.ts
 init_define_import_meta_env();
 var import_react193 = __toESM(require_react(), 1);
 function countAutomatedArticles(mergedByLeague) {
@@ -91063,7 +91064,7 @@ function useSportscapeAdminEvents(options) {
   };
 }
 
-// ../grarf/desktop/src/pages/SportscapeEditorialAdminPage.tsx
+// src/pages/SportscapeEditorialAdminPage.tsx
 var import_jsx_runtime198 = __toESM(require_jsx_runtime(), 1);
 function SportscapeAdminTabBar({
   activeTab,
@@ -91304,7 +91305,7 @@ function SportscapeEditorialAdminPage() {
   ] });
 }
 
-// webapp/home-entry.tsx
+// ../../grarf-landing/webapp/home-entry.tsx
 var import_jsx_runtime199 = __toESM(require_jsx_runtime());
 var reactRoot = null;
 function IntelligenceSyncBridge() {
