@@ -21,6 +21,9 @@ const sportscapeEditorialApiUrl =
   process.env.VITE_SPORTSCAPE_EDITORIAL_API_URL ??
   "https://grarf-operational-service.grarf.workers.dev/sportscape-editorial";
 
+const posthogKey = process.env.VITE_POSTHOG_KEY ?? "";
+const posthogHost = process.env.VITE_POSTHOG_HOST ?? "";
+
 /** Full env object — required for dynamic `import.meta.env[name]` access in desktop code. */
 const importMetaEnv = {
   DEV: false,
@@ -31,8 +34,8 @@ const importMetaEnv = {
   VITE_SPORTSCAPE_EDITORIAL_API_URL: sportscapeEditorialApiUrl,
   VITE_TRACE_FINAL_LIVE_FIELDS: "",
   VITE_ENABLE_ESPN_RESOLVER: "false",
-  VITE_POSTHOG_KEY: "",
-  VITE_POSTHOG_HOST: "",
+  VITE_POSTHOG_KEY: posthogKey,
+  VITE_POSTHOG_HOST: posthogHost,
 };
 
 console.log("[build-home] bundling Desktop Home from desktop/src …");
