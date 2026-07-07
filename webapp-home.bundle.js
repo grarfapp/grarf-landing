@@ -14263,17 +14263,20 @@ function resolveSportscapeEditorialApiBaseUrls() {
   };
   if (isGrarfWebRenderer() && typeof window !== "undefined") {
     push2(resolveSameOriginSportscapeEditorialApiUrl());
+    for (const base of SPORTSCAPE_EDITORIAL_FAILOVER_BASE_URLS) {
+      push2(base);
+    }
+    push2(resolveWebSportscapeEditorialApiUrl());
+    if (out.length === 0) {
+      push2(WEB_SPORTSCAPE_EDITORIAL_API_URL);
+    }
+    return out;
   }
-  push2(resolveWebSportscapeEditorialApiUrl());
   for (const base of SPORTSCAPE_EDITORIAL_FAILOVER_BASE_URLS) {
     push2(base);
   }
-  if (!isGrarfWebRenderer()) {
-    push2(define_import_meta_env_default.VITE_SPORTSCAPE_EDITORIAL_API_URL?.trim());
-    push2(DEFAULT_SPORTSCAPE_EDITORIAL_API_URL);
-  } else if (out.length === 0) {
-    push2(WEB_SPORTSCAPE_EDITORIAL_API_URL);
-  }
+  push2(define_import_meta_env_default.VITE_SPORTSCAPE_EDITORIAL_API_URL?.trim());
+  push2(DEFAULT_SPORTSCAPE_EDITORIAL_API_URL);
   return out;
 }
 function shouldUseLocalSportscapeEditorialFallback() {
@@ -34715,12 +34718,20 @@ function resolveTourDeFranceStages() {
 
 // ../grarf/desktop/src/lib/gamesSpine/manualTourDeFranceSpineEntry.ts
 var TOUR_DE_FRANCE_GAME_ID_PREFIX = "manual-tdf-stage-";
+var TOUR_DE_FRANCE_LIVE_GRACE_MS = 30 * 60 * 1e3;
+function resolveTourDeFranceStageStatus(nowMs, startTimeMs, endTimeMs) {
+  return resolveManualGamesSpineStatus(
+    nowMs,
+    startTimeMs,
+    endTimeMs + TOUR_DE_FRANCE_LIVE_GRACE_MS
+  );
+}
 function isTourDeFranceSpineGameId(gameId) {
   return gameId.startsWith(TOUR_DE_FRANCE_GAME_ID_PREFIX);
 }
 function resolveTourDeFranceSpineGame(stage2, now) {
   const nowMs = now.getTime();
-  const status = resolveManualGamesSpineStatus(nowMs, stage2.startTimeMs, stage2.endTimeMs);
+  const status = resolveTourDeFranceStageStatus(nowMs, stage2.startTimeMs, stage2.endTimeMs);
   const broadcasts = [...stage2.broadcast];
   const eventName = `Stage ${stage2.stage}`;
   return {
@@ -34750,7 +34761,7 @@ function resolveTourDeFranceSpineGame(stage2, now) {
 function anyTourDeFranceStageLive(now = /* @__PURE__ */ new Date()) {
   const nowMs = now.getTime();
   return resolveTourDeFranceStages().some(
-    (stage2) => resolveManualGamesSpineStatus(nowMs, stage2.startTimeMs, stage2.endTimeMs) === "live"
+    (stage2) => resolveTourDeFranceStageStatus(nowMs, stage2.startTimeMs, stage2.endTimeMs) === "live"
   );
 }
 function resolveTdfOperationalLeagueGames(now = /* @__PURE__ */ new Date()) {
@@ -35190,6 +35201,63 @@ function getHomeLeagueWorkspaceNewsSources(hubId) {
   return HOME_LEAGUE_WORKSPACE_NEWS_SOURCES_BY_HUB[hubId];
 }
 
+// ../grarf/desktop/src/lib/home/websitePaneBranding.ts
+init_define_import_meta_env();
+function resolveWebsiteFaviconUrl(url) {
+  const trimmed = url.trim();
+  if (!trimmed) return null;
+  try {
+    const hostname = new URL(trimmed).hostname;
+    if (!hostname) return null;
+    return `https://www.google.com/s2/favicons?domain=${encodeURIComponent(hostname)}&sz=32`;
+  } catch {
+    return null;
+  }
+}
+var DOMAIN_TLD_PATTERN = /\.(com|net|org|io|co|us|uk)(\.[a-z]{2})?$/i;
+var KNOWN_LEAGUE_DOMAIN_SUFFIXES = /* @__PURE__ */ new Set(["mlb", "nba", "nfl", "nhl", "wnba", "mls", "espn"]);
+var KNOWN_LEAGUE_BRAND_SUFFIXES = /* @__PURE__ */ new Set(["WNBA", "NBA", "NFL", "NHL", "MLB", "MLS"]);
+function humanizeDomainToken(token) {
+  const spaced = token.replace(/-/g, " ").replace(/_/g, " ").replace(/([A-Z]+)([A-Z][a-z])/g, "$1 $2").replace(/([a-z])([A-Z])/g, "$1 $2").replace(/([a-z])(\d)/g, "$1 $2");
+  return spaced.split(/\s+/).filter(Boolean).map((word) => {
+    if (word === word.toUpperCase() && /^[A-Z0-9]{2,5}$/.test(word)) return word;
+    const lower = word.toLowerCase();
+    if (["nhl", "nba", "mlb", "nfl", "nbc", "f1", "mls", "ucl", "epl", "wnba", "pga", "cbs", "usa"].includes(lower)) {
+      return lower.toUpperCase();
+    }
+    return lower.charAt(0).toUpperCase() + lower.slice(1);
+  }).join(" ");
+}
+function extractBrandNameToken(label, url) {
+  const labelHead = (label.split("/")[0] ?? label).trim();
+  let fromLabel = labelHead.replace(DOMAIN_TLD_PATTERN, "");
+  const dotParts = fromLabel.split(".");
+  if (dotParts.length === 2) {
+    const suffix = dotParts[1]?.toUpperCase();
+    if (suffix && KNOWN_LEAGUE_BRAND_SUFFIXES.has(suffix)) {
+      return dotParts[1];
+    }
+  }
+  try {
+    const hostname = new URL(url.trim()).hostname.replace(/^www\./i, "");
+    const hostParts = hostname.split(".").filter(Boolean);
+    if (hostParts.length >= 3 && KNOWN_LEAGUE_DOMAIN_SUFFIXES.has(hostParts[hostParts.length - 2]?.toLowerCase() ?? "")) {
+      return hostParts[0] ?? fromLabel;
+    }
+  } catch {
+  }
+  return fromLabel;
+}
+function formatWebsitePaneHeaderLabel(label, url) {
+  const trimmedLabel = label.trim();
+  if (!url.trim()) return trimmedLabel;
+  if (trimmedLabel.length <= 5 && trimmedLabel.includes("/")) return trimmedLabel;
+  if (!DOMAIN_TLD_PATTERN.test(trimmedLabel) && !trimmedLabel.includes("/")) {
+    return trimmedLabel;
+  }
+  return humanizeDomainToken(extractBrandNameToken(trimmedLabel, url));
+}
+
 // ../grarf/desktop/src/data/homeLeagueWorkspaceFifaWorldCupNavigation.ts
 var FIFA_WORLD_CUP_MAIN_MENU_SOURCES = getHomeLeagueWorkspaceNewsSources("fifa-world-cup").filter(
   (source) => source.url.trim().length > 0
@@ -35198,7 +35266,7 @@ var HOME_LEAGUE_WORKSPACE_FIFA_WORLD_CUP_NAVIGATION = {
   defaultCategoryId: FIFA_WORLD_CUP_MAIN_MENU_SOURCES[0]?.id ?? "soccerway_news",
   categories: FIFA_WORLD_CUP_MAIN_MENU_SOURCES.map((source) => ({
     id: source.id,
-    label: source.label,
+    label: formatWebsitePaneHeaderLabel(source.label, source.url),
     sources: [source]
   }))
 };
@@ -36174,40 +36242,6 @@ function buildHeadlinesWebsitePaneSessionKey(sourceId) {
   return buildHeadlinesAllWebsitePaneSessionKey(sourceId);
 }
 
-// ../grarf/desktop/src/lib/home/websitePaneBranding.ts
-init_define_import_meta_env();
-function resolveWebsiteFaviconUrl(url) {
-  const trimmed = url.trim();
-  if (!trimmed) return null;
-  try {
-    const hostname = new URL(trimmed).hostname;
-    if (!hostname) return null;
-    return `https://www.google.com/s2/favicons?domain=${encodeURIComponent(hostname)}&sz=32`;
-  } catch {
-    return null;
-  }
-}
-function humanizeDomainToken(token) {
-  const spaced = token.replace(/-/g, " ").replace(/_/g, " ").replace(/([A-Z]+)([A-Z][a-z])/g, "$1 $2").replace(/([a-z])([A-Z])/g, "$1 $2").replace(/([a-z])(\d)/g, "$1 $2");
-  return spaced.split(/\s+/).filter(Boolean).map((word) => {
-    if (word === word.toUpperCase() && /^[A-Z0-9]{2,5}$/.test(word)) return word;
-    const lower = word.toLowerCase();
-    if (["nhl", "nba", "mlb", "nfl", "nbc", "f1", "mls", "ucl", "epl"].includes(lower)) {
-      return lower.toUpperCase();
-    }
-    return lower.charAt(0).toUpperCase() + lower.slice(1);
-  }).join(" ");
-}
-function formatWebsitePaneHeaderLabel(label, url) {
-  if (!url.trim()) return label;
-  if (label.length <= 5 && label.includes("/")) return label;
-  const domainPart = (label.split("/")[0] ?? label).replace(
-    /\.(com|net|org|io|co|us|uk)(\.[a-z]{2})?$/i,
-    ""
-  );
-  return humanizeDomainToken(domainPart);
-}
-
 // ../grarf/desktop/src/data/homeLeagueWorkspaceHorseRacingNavigation.ts
 var HORSE_RACING_SOURCES = getHomeLeagueWorkspaceNewsSources("horse-racing");
 var HORSE_RACING_MAIN_MENU_SOURCES = HORSE_RACING_SOURCES.filter(
@@ -36357,10 +36391,6 @@ var HOME_LEAGUE_WORKSPACE_LPGA_NAVIGATION = {
 
 // ../grarf/desktop/src/data/homeLeagueWorkspaceNbaNavigation.ts
 init_define_import_meta_env();
-var NBA_MAIN_MENU_SOURCE_LABELS = {
-  the_score_nba: "The Score",
-  bleacher_report_nba: "Bleacher Report"
-};
 var NBA_MAIN_MENU_SOURCES = getHomeLeagueWorkspaceNewsSources("nba").filter(
   (source) => source.url.trim().length > 0 && source.id !== "nba_com"
 );
@@ -36368,7 +36398,7 @@ var HOME_LEAGUE_WORKSPACE_NBA_NAVIGATION = {
   defaultCategoryId: NBA_MAIN_MENU_SOURCES[0]?.id ?? "the_score_nba",
   categories: NBA_MAIN_MENU_SOURCES.map((source) => ({
     id: source.id,
-    label: NBA_MAIN_MENU_SOURCE_LABELS[source.id] ?? source.label,
+    label: formatWebsitePaneHeaderLabel(source.label, source.url),
     sources: [source]
   }))
 };
@@ -36389,10 +36419,6 @@ var HOME_LEAGUE_WORKSPACE_NHL_NAVIGATION = {
 
 // ../grarf/desktop/src/data/homeLeagueWorkspaceNflNavigation.ts
 init_define_import_meta_env();
-var NFL_MAIN_MENU_SOURCE_LABELS = {
-  the_score_nfl: "The Score",
-  bleacher_report_nfl: "Bleacher Report"
-};
 var NFL_MAIN_MENU_SOURCES = getHomeLeagueWorkspaceNewsSources("nfl").filter(
   (source) => source.url.trim().length > 0 && source.id !== "nfl_com"
 );
@@ -36400,7 +36426,7 @@ var HOME_LEAGUE_WORKSPACE_NFL_NAVIGATION = {
   defaultCategoryId: NFL_MAIN_MENU_SOURCES[0]?.id ?? "the_score_nfl",
   categories: NFL_MAIN_MENU_SOURCES.map((source) => ({
     id: source.id,
-    label: NFL_MAIN_MENU_SOURCE_LABELS[source.id] ?? source.label,
+    label: formatWebsitePaneHeaderLabel(source.label, source.url),
     sources: [source]
   }))
 };
@@ -36462,7 +36488,7 @@ var HOME_LEAGUE_WORKSPACE_PGA_TOUR_NAVIGATION = {
   defaultCategoryId: PGA_MAIN_MENU_SOURCES[0]?.id ?? "pga_tour_com",
   categories: PGA_MAIN_MENU_SOURCES.map((source) => ({
     id: source.id,
-    label: source.label,
+    label: formatWebsitePaneHeaderLabel(source.label, source.url),
     sources: [source]
   }))
 };
@@ -36476,7 +36502,7 @@ var HOME_LEAGUE_WORKSPACE_BOXING_NAVIGATION = {
   defaultCategoryId: BOXING_MAIN_MENU_SOURCES[0]?.id ?? "boxing_news_online",
   categories: BOXING_MAIN_MENU_SOURCES.map((source) => ({
     id: source.id,
-    label: source.label,
+    label: formatWebsitePaneHeaderLabel(source.label, source.url),
     sources: [source]
   }))
 };
@@ -36490,7 +36516,7 @@ var HOME_LEAGUE_WORKSPACE_UFC_NAVIGATION = {
   defaultCategoryId: UFC_MAIN_MENU_SOURCES[0]?.id ?? "sherdog",
   categories: UFC_MAIN_MENU_SOURCES.map((source) => ({
     id: source.id,
-    label: source.label,
+    label: formatWebsitePaneHeaderLabel(source.label, source.url),
     sources: [source]
   }))
 };
@@ -36603,7 +36629,7 @@ var HOME_LEAGUE_WORKSPACE_WTA_NAVIGATION = {
   defaultCategoryId: WTA_MAIN_MENU_SOURCES[0]?.id ?? "tennis_365",
   categories: WTA_MAIN_MENU_SOURCES.map((source) => ({
     id: source.id,
-    label: source.label,
+    label: formatWebsitePaneHeaderLabel(source.label, source.url),
     sources: [source]
   }))
 };
@@ -39506,17 +39532,11 @@ async function upsertSportscapeEditorialEntryViaWorker(input) {
   return body.entry;
 }
 async function verifySportscapeAdminPasswordViaWorker(password) {
-  const { response: res } = await fetchSportscapeEditorialWithFailover(
-    "/verify-password",
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ password })
-    },
-    {
-      failoverOnStatus: (status) => status === 502 || status === 503 || status === 504
-    }
-  );
+  const { response: res } = await fetchSportscapeEditorialWithFailover("/verify-password", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ password })
+  });
   if (res.status === 401) return false;
   if (!res.ok) throw new Error(`verify_failed_${res.status}`);
   const body = await res.json();
@@ -59501,10 +59521,17 @@ async function fetchMlbWorkspaceStandings(signal) {
   return await res.json();
 }
 
+// ../grarf/desktop/src/lib/gameWorkspace/normalizeMlbWorkspaceTeamAbbrev.ts
+init_define_import_meta_env();
+function normalizeMlbWorkspaceTeamAbbrev(value) {
+  const normalized = value?.trim().toUpperCase() ?? "";
+  return normalized === "ARI" ? "AZ" : normalized;
+}
+
 // ../grarf/desktop/src/lib/gameWorkspace/resolveMlbWorkspaceDivisionStandings.ts
 init_define_import_meta_env();
 function normalizeTeamAbbrev(value) {
-  return value?.trim().toUpperCase() ?? "";
+  return normalizeMlbWorkspaceTeamAbbrev(value);
 }
 function resolveTeamRecordAbbrev(teamRecord) {
   const team = teamRecord.team;
@@ -59581,8 +59608,8 @@ function useMlbWorkspaceStandingsContext(game) {
     records: []
   });
   const gameId = game?.id;
-  const awayAbbrev = game?.awayTeamAbbrev?.trim().toUpperCase() ?? "";
-  const homeAbbrev = game?.homeTeamAbbrev?.trim().toUpperCase() ?? "";
+  const awayAbbrev = normalizeMlbWorkspaceTeamAbbrev(game?.awayTeamAbbrev);
+  const homeAbbrev = normalizeMlbWorkspaceTeamAbbrev(game?.homeTeamAbbrev);
   const awayTeamName = game?.awayTeam;
   const homeTeamName = game?.homeTeam;
   (0, import_react59.useEffect)(() => {
@@ -61366,7 +61393,7 @@ function resolveHomeLeagueHubPaneSources(hubId, categoryId, liveLeagues) {
 init_define_import_meta_env();
 var HOME_WEB_PANE_FRAME_MARGIN_CLASS = "m-[25px]";
 var HOME_WEB_PANE_FRAME_HEIGHT_CLASS = "h-[calc(100%-50px)]";
-var HOME_WEB_CENTER_PANE_SURFACE_CLASS = "bg-[#0d252a]";
+var HOME_WEB_CENTER_PANE_SURFACE_CLASS = "bg-[#141414]";
 
 // ../grarf/desktop/src/components/homeMvp/HomeSourceCardsSurface.tsx
 init_isGrarfWebRenderer();
@@ -65533,6 +65560,12 @@ function resolveGamesSpineBroadcastOutlets(game) {
     isWatchLiveDestination: streamDestination != null && broadcastOutletLabelsMatch(label, streamDestination)
   }));
 }
+function resolveAdditionalGamesSpineBroadcastOutlets(game) {
+  const primaryLabel = resolvePrimaryChannelLabel(game);
+  return resolveGamesSpineBroadcastOutlets(game).filter(
+    (outlet) => !broadcastOutletLabelsMatch(outlet.label, primaryLabel)
+  );
+}
 function gameShouldShowSpineBroadcastOutlets(game) {
   return game.status === "live" || game.status === "scheduled";
 }
@@ -65560,40 +65593,17 @@ function resolveGamesSpineMatchupSideOrder(game) {
 // ../grarf/desktop/src/components/gamesSpine/GamesSpineBroadcastOutletBadgeRow.tsx
 init_define_import_meta_env();
 var import_jsx_runtime67 = __toESM(require_jsx_runtime(), 1);
-var GAMES_SPINE_CHANNEL_BADGE_NEUTRAL_CLASS = "inline-flex h-6 max-w-[5.5rem] items-center justify-center rounded border border-line/80 bg-[#050a0a] px-1.5";
-var GAMES_SPINE_CHANNEL_BADGE_STREAM_CLASS = "inline-flex h-6 max-w-[5.5rem] items-center justify-center rounded border border-cyansys/45 bg-cyansys/[0.08] px-1.5";
-var GAMES_SPINE_CHANNEL_BADGE_LOGO_CLASS = "h-3.5 w-auto max-w-[3.75rem] object-contain";
 function GamesSpineBroadcastOutletBadgeRow({ outlets }) {
   if (outlets.length === 0) return null;
-  return /* @__PURE__ */ (0, import_jsx_runtime67.jsx)("div", { className: "flex w-full min-w-0 flex-wrap items-center justify-center gap-1", children: outlets.map((outlet, index) => /* @__PURE__ */ (0, import_jsx_runtime67.jsx)(
-    "span",
+  const line = outlets.map((outlet) => outlet.label).join(" \u2022 ");
+  return /* @__PURE__ */ (0, import_jsx_runtime67.jsx)("div", { className: "w-full min-w-0 px-1", children: /* @__PURE__ */ (0, import_jsx_runtime67.jsx)(
+    "p",
     {
-      className: cn2(
-        outlet.isWatchLiveDestination ? GAMES_SPINE_CHANNEL_BADGE_STREAM_CLASS : GAMES_SPINE_CHANNEL_BADGE_NEUTRAL_CLASS
-      ),
-      title: outlet.label,
-      children: outlet.logoUrl ? /* @__PURE__ */ (0, import_jsx_runtime67.jsx)(
-        "img",
-        {
-          src: resolveChannelLogoSrc(outlet.logoUrl),
-          alt: "",
-          loading: "lazy",
-          decoding: "async",
-          className: GAMES_SPINE_CHANNEL_BADGE_LOGO_CLASS
-        }
-      ) : /* @__PURE__ */ (0, import_jsx_runtime67.jsx)(
-        "span",
-        {
-          className: cn2(
-            "max-w-[4.75rem] truncate font-mono text-[8px] font-bold uppercase leading-none tracking-[0.06em]",
-            outlet.isWatchLiveDestination ? "text-cyansys/95" : "text-white"
-          ),
-          children: outlet.label
-        }
-      )
-    },
-    `${outlet.label}-${index}`
-  )) });
+      className: "truncate text-center font-mono text-[10px] leading-snug tracking-[0.02em] text-white",
+      title: line,
+      children: line
+    }
+  ) });
 }
 
 // ../grarf/desktop/src/components/gamesSpine/GamesSpineCardSectionDivider.tsx
@@ -66299,7 +66309,7 @@ function GamesSpineUnifiedGameCard({
   className
 }) {
   const resolvedWatchLabel = watchLiveLabel ?? (game && isSpineFinalizedGame(game) ? "[ WATCH REPLAY ]" : "[ WATCH LIVE ]");
-  const broadcastOutlets = showBroadcastOutletBadges && game ? resolveGamesSpineBroadcastOutlets(game) : [];
+  const broadcastOutlets = showBroadcastOutletBadges && game ? resolveAdditionalGamesSpineBroadcastOutlets(game) : [];
   const showBroadcastRow = broadcastOutlets.length > 0;
   return /* @__PURE__ */ (0, import_jsx_runtime74.jsxs)("div", { className: cn2(GAMES_SPINE_CARD_SHELL_CLASS, className), children: [
     /* @__PURE__ */ (0, import_jsx_runtime74.jsx)("div", { className: GAMES_SPINE_CARD_LEAGUE_LABEL_CLASS, children: leagueLabel }),
@@ -74901,7 +74911,7 @@ var HOME_LEAGUE_WORKSPACE_SOCIAL_RAIL_FEEDS = [
   {
     workspaceId: "nfl",
     feedId: "league-workspace-nfl",
-    feedUrl: "https://rss.app/feeds/Gk1l9OhvynmeInlL.xml",
+    feedUrl: "https://rss.app/feeds/UAzJHgahaJHhRxGk.xml",
     sourceLabel: "NFL",
     teamKey: "nfl"
   },
@@ -84743,6 +84753,20 @@ function tryOpenF1GameRowInBrowser(game) {
   return true;
 }
 
+// ../grarf/desktop/src/lib/gamesSpine/tryOpenTourDeFranceGameRowInLeagueWorkspace.ts
+init_define_import_meta_env();
+init_isGrarfWebRenderer();
+var TOUR_DE_FRANCE_HUB_ID = "tour-de-france";
+function tryOpenTourDeFranceGameRowInLeagueWorkspace(game) {
+  if (!isGrarfWebRenderer()) return false;
+  if (game.league !== "TDF" && !isTourDeFranceSpineGameId(game.id)) return false;
+  const refreshed = refreshManualTourDeFranceSpineGameIfNeeded(game);
+  const categoryId = isGameActivelyLive(refreshed) ? "live" : "news";
+  useHomeLeagueWorkspaceMainMenuStore.getState().setActiveCategory(TOUR_DE_FRANCE_HUB_ID, categoryId);
+  openHomeLeagueWorkspace(TOUR_DE_FRANCE_HUB_ID);
+  return true;
+}
+
 // ../grarf/desktop/src/lib/gamesSpine/openGolfGameRowInBrowser.ts
 init_define_import_meta_env();
 init_isGrarfWebRenderer();
@@ -84855,6 +84879,7 @@ function prepareDesktopWnbaGameCenterBrowserPane(game) {
   useHomeLiveSubmenuStore.getState().setActiveId("livetrack");
 }
 function openGamesSpineRowInWorkspace(game, dispatch) {
+  if (tryOpenTourDeFranceGameRowInLeagueWorkspace(game)) return;
   if (tryOpenF1GameRowInBrowser(game)) return;
   if (tryOpenMcwsGameRowInBrowser(game)) return;
   if (tryOpenAflGameRowInBrowser(game)) return;
@@ -85643,7 +85668,7 @@ function HomeLiveTrackerSurface({ posts, statusMessage }) {
   return /* @__PURE__ */ (0, import_jsx_runtime152.jsxs)("div", { className: "flex h-full min-h-0 min-w-0 flex-col bg-[#010303]", children: [
     /* @__PURE__ */ (0, import_jsx_runtime152.jsxs)("div", { className: "shrink-0 border-b border-[#24363c]/45 bg-[#020707]/90 px-2 py-1.5", children: [
       /* @__PURE__ */ (0, import_jsx_runtime152.jsx)("p", { className: "font-mono text-[8px] tracking-[0.14em] text-cyansys/80", children: "LIVETRACKER" }),
-      /* @__PURE__ */ (0, import_jsx_runtime152.jsx)("p", { className: "mt-0.5 font-mono text-[7px] tracking-[0.08em] text-textdim/70", children: "Live RSS \u2014 newest first" })
+      /* @__PURE__ */ (0, import_jsx_runtime152.jsx)("p", { className: "mt-0.5 font-mono text-[7px] tracking-[0.08em] text-textdim/70", children: "LIVE FEED - All leagues in progress" })
     ] }),
     /* @__PURE__ */ (0, import_jsx_runtime152.jsxs)(
       "div",
@@ -86310,7 +86335,7 @@ function HomeNewswireSurface({ stories }) {
   return /* @__PURE__ */ (0, import_jsx_runtime155.jsxs)("div", { className: "flex h-full min-h-0 min-w-0 flex-col bg-[#010303]", children: [
     /* @__PURE__ */ (0, import_jsx_runtime155.jsxs)("div", { className: "shrink-0 border-b border-[#24363c]/45 bg-[#020707]/90 px-2 py-1.5", children: [
       /* @__PURE__ */ (0, import_jsx_runtime155.jsx)("p", { className: "font-mono text-[8px] tracking-[0.14em] text-cyansys/80", children: "NEWSWIRE" }),
-      /* @__PURE__ */ (0, import_jsx_runtime155.jsx)("p", { className: "mt-0.5 font-mono text-[7px] tracking-[0.08em] text-textdim/70", children: "Sports wire \u2014 newest first" })
+      /* @__PURE__ */ (0, import_jsx_runtime155.jsx)("p", { className: "mt-0.5 font-mono text-[7px] tracking-[0.08em] text-textdim/70", children: "LATEST NEWS - All leagues" })
     ] }),
     /* @__PURE__ */ (0, import_jsx_runtime155.jsx)(
       "div",
