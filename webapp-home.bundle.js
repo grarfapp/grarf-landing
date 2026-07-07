@@ -29630,9 +29630,17 @@ var __iconNode15 = [
 ];
 var SquareArrowOutUpRight = createLucideIcon("square-arrow-out-up-right", __iconNode15);
 
-// ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/triangle-alert.mjs
+// ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/trending-up.mjs
 init_define_import_meta_env();
 var __iconNode16 = [
+  ["path", { d: "M16 7h6v6", key: "box55l" }],
+  ["path", { d: "m22 7-8.5 8.5-5-5L2 17", key: "1t1m79" }]
+];
+var TrendingUp = createLucideIcon("trending-up", __iconNode16);
+
+// ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/triangle-alert.mjs
+init_define_import_meta_env();
+var __iconNode17 = [
   [
     "path",
     {
@@ -29643,21 +29651,21 @@ var __iconNode16 = [
   ["path", { d: "M12 9v4", key: "juzpu7" }],
   ["path", { d: "M12 17h.01", key: "p32p05" }]
 ];
-var TriangleAlert = createLucideIcon("triangle-alert", __iconNode16);
+var TriangleAlert = createLucideIcon("triangle-alert", __iconNode17);
 
 // ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/users.mjs
 init_define_import_meta_env();
-var __iconNode17 = [
+var __iconNode18 = [
   ["path", { d: "M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2", key: "1yyitq" }],
   ["path", { d: "M16 3.128a4 4 0 0 1 0 7.744", key: "16gr8j" }],
   ["path", { d: "M22 21v-2a4 4 0 0 0-3-3.87", key: "kshegd" }],
   ["circle", { cx: "9", cy: "7", r: "4", key: "nufk8" }]
 ];
-var Users = createLucideIcon("users", __iconNode17);
+var Users = createLucideIcon("users", __iconNode18);
 
 // ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/video.mjs
 init_define_import_meta_env();
-var __iconNode18 = [
+var __iconNode19 = [
   [
     "path",
     {
@@ -29667,25 +29675,25 @@ var __iconNode18 = [
   ],
   ["rect", { x: "2", y: "6", width: "14", height: "12", rx: "2", key: "158x01" }]
 ];
-var Video = createLucideIcon("video", __iconNode18);
+var Video = createLucideIcon("video", __iconNode19);
 
 // ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/wifi.mjs
 init_define_import_meta_env();
-var __iconNode19 = [
+var __iconNode20 = [
   ["path", { d: "M12 20h.01", key: "zekei9" }],
   ["path", { d: "M2 8.82a15 15 0 0 1 20 0", key: "dnpr2z" }],
   ["path", { d: "M5 12.859a10 10 0 0 1 14 0", key: "1x1e6c" }],
   ["path", { d: "M8.5 16.429a5 5 0 0 1 7 0", key: "1bycff" }]
 ];
-var Wifi = createLucideIcon("wifi", __iconNode19);
+var Wifi = createLucideIcon("wifi", __iconNode20);
 
 // ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/x.mjs
 init_define_import_meta_env();
-var __iconNode20 = [
+var __iconNode21 = [
   ["path", { d: "M18 6 6 18", key: "1bl5f8" }],
   ["path", { d: "m6 6 12 12", key: "d8bk6v" }]
 ];
-var X2 = createLucideIcon("x", __iconNode20);
+var X2 = createLucideIcon("x", __iconNode21);
 
 // ../grarf/desktop/src/lib/cn.ts
 init_define_import_meta_env();
@@ -63410,6 +63418,7 @@ function WorkspaceSubnav({
   onSelect,
   className,
   leagueWorkspaceChrome = false,
+  fadeGatedLockItems = false,
   "aria-label": aria
 }) {
   if (!items || items.length === 0) return null;
@@ -63431,7 +63440,7 @@ function WorkspaceSubnav({
               HOME_SUBNAV_BUTTON_CLASS,
               on2 && (leagueWorkspaceChrome ? HOME_LEAGUE_WORKSPACE_NAV_BUTTON_ACTIVE_CLASS : "border-greensys/35 bg-greensys/[0.08] text-greensys"),
               !on2 && !dis && (leagueWorkspaceChrome ? HOME_LEAGUE_WORKSPACE_NAV_BUTTON_INACTIVE_CLASS : "border-transparent text-[#8a9e9e] hover:border-line/80 hover:bg-white/[0.03] hover:text-white"),
-              !on2 && !dis && item.showGatedLock && leagueWorkspaceChrome && "opacity-[0.30] hover:opacity-100",
+              !on2 && !dis && item.showGatedLock && (leagueWorkspaceChrome || fadeGatedLockItems) && "opacity-[0.30] hover:opacity-100",
               dis && "cursor-not-allowed border-transparent text-textdim/50 opacity-60"
             ),
             children: /* @__PURE__ */ (0, import_jsx_runtime48.jsxs)("span", { className: "inline-flex items-center gap-1", children: [
@@ -64114,6 +64123,22 @@ function HomeCenterPanePrimaryNav({
 init_define_import_meta_env();
 var import_react84 = __toESM(require_react(), 1);
 
+// ../grarf/desktop/src/data/gatedFeatures/browserBetting.ts
+init_define_import_meta_env();
+var BROWSER_BETTING_FEATURE_KEY = "browser-betting";
+var BROWSER_BETTING_GATED_FEATURE = {
+  featureKey: BROWSER_BETTING_FEATURE_KEY,
+  title: "Betting is coming to GRARF.",
+  headerEyebrow: "GET EARLY ACCESS",
+  subtitle: "Track odds movement, betting trends, sharp action, line movement, betting news, and game insights\u2014all organized by league and integrated directly into your sports workflow.",
+  bullets: [],
+  waitlistHeading: "Join the Waitlist",
+  waitlistBody: "Join the waitlist to be among the first to get access.",
+  successMessage: "You're on the list. We'll let you know when betting launches on GRARF web.",
+  ctaLabel: "Join Waitlist"
+};
+var BROWSER_BETTING_MODAL_ICON = TrendingUp;
+
 // ../grarf/desktop/src/hooks/useHomeLiveSubmenuEntryDefaults.ts
 init_define_import_meta_env();
 var import_react83 = __toESM(require_react(), 1);
@@ -64140,24 +64165,50 @@ function HomeLiveSubmenu() {
   const centerPaneMode = useCenterPaneApplicationModeStore((s2) => s2.mode);
   const activeId = useHomeLiveSubmenuStore((s2) => s2.activeId);
   const setActiveId = useHomeLiveSubmenuStore((s2) => s2.setActiveId);
-  const items = (0, import_react84.useMemo)(() => {
-    if (!isGrarfWebRenderer()) return HOME_LIVE_SUBMENU_ITEMS;
-    return HOME_LIVE_SUBMENU_ITEMS.map(
-      (item) => item.id === "betting" ? { id: item.id, label: item.label } : item
-    );
+  const resetToDefault = useHomeLiveSubmenuStore((s2) => s2.resetToDefault);
+  const isWeb = isGrarfWebRenderer();
+  const [bettingWaitlistOpen, setBettingWaitlistOpen] = (0, import_react84.useState)(false);
+  const items = (0, import_react84.useMemo)(() => HOME_LIVE_SUBMENU_ITEMS, []);
+  (0, import_react84.useEffect)(() => {
+    if (!isWeb || activeId !== "betting") return;
+    resetToDefault();
+  }, [isWeb, activeId, resetToDefault]);
+  const openBettingWaitlist = (0, import_react84.useCallback)(() => {
+    setBettingWaitlistOpen(true);
+  }, []);
+  const closeBettingWaitlist = (0, import_react84.useCallback)(() => {
+    setBettingWaitlistOpen(false);
   }, []);
   if (centerPaneMode !== "browser") return null;
-  return /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(
-    WorkspaceSubnav,
-    {
-      items,
-      activeId,
-      onSelect: (id) => {
-        if (isHomeLiveSubmenuId(id)) setActiveId(id);
-      },
-      "aria-label": "Live sections"
-    }
-  );
+  const effectiveActiveId = isWeb && activeId === "betting" ? "livetrack" : activeId;
+  return /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)(import_jsx_runtime57.Fragment, { children: [
+    /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(
+      WorkspaceSubnav,
+      {
+        items,
+        activeId: effectiveActiveId,
+        fadeGatedLockItems: isWeb,
+        onSelect: (id) => {
+          if (!isHomeLiveSubmenuId(id)) return;
+          if (isWeb && id === "betting") {
+            openBettingWaitlist();
+            return;
+          }
+          setActiveId(id);
+        },
+        "aria-label": "Live sections"
+      }
+    ),
+    isWeb ? /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(
+      GatedFeatureModal,
+      {
+        open: bettingWaitlistOpen,
+        onClose: closeBettingWaitlist,
+        config: BROWSER_BETTING_GATED_FEATURE,
+        headerIcon: BROWSER_BETTING_MODAL_ICON
+      }
+    ) : null
+  ] });
 }
 
 // ../grarf/desktop/src/components/homeMvp/HomeLiveLeagueSubmenu.tsx
@@ -85608,7 +85659,7 @@ function HomeLiveTrackerSurface({ posts, statusMessage }) {
   return /* @__PURE__ */ (0, import_jsx_runtime152.jsxs)("div", { className: "flex h-full min-h-0 min-w-0 flex-col bg-[#010303]", children: [
     /* @__PURE__ */ (0, import_jsx_runtime152.jsxs)("div", { className: "shrink-0 border-b border-[#24363c]/45 bg-[#020707]/90 px-2 py-1.5", children: [
       /* @__PURE__ */ (0, import_jsx_runtime152.jsx)("p", { className: "font-mono text-[8px] tracking-[0.14em] text-cyansys/80", children: "LIVETRACKER" }),
-      /* @__PURE__ */ (0, import_jsx_runtime152.jsx)("p", { className: "mt-0.5 font-mono text-[7px] tracking-[0.08em] text-textdim/70", children: "Live RSS \u2014 newest first" })
+      /* @__PURE__ */ (0, import_jsx_runtime152.jsx)("p", { className: "mt-0.5 font-mono text-[7px] tracking-[0.08em] text-textdim/70", children: isGrarfWebRenderer() ? "LIVE FEED - All leagues in progress" : "Live RSS \u2014 newest first" })
     ] }),
     /* @__PURE__ */ (0, import_jsx_runtime152.jsxs)(
       "div",
@@ -85873,6 +85924,9 @@ function scrollLiveTrackRevealAnchorIntoView(scrollEl, anchorEl) {
 function scrollLiveTrackFeedToTop(scrollEl) {
   scrollEl.scrollTop = 0;
 }
+
+// ../grarf/desktop/src/components/homeMvp/HomeNewswireSurface.tsx
+init_isGrarfWebRenderer();
 
 // ../grarf/desktop/src/components/homeMvp/HomeNewswireWireLine.tsx
 init_define_import_meta_env();
@@ -86275,7 +86329,7 @@ function HomeNewswireSurface({ stories }) {
   return /* @__PURE__ */ (0, import_jsx_runtime155.jsxs)("div", { className: "flex h-full min-h-0 min-w-0 flex-col bg-[#010303]", children: [
     /* @__PURE__ */ (0, import_jsx_runtime155.jsxs)("div", { className: "shrink-0 border-b border-[#24363c]/45 bg-[#020707]/90 px-2 py-1.5", children: [
       /* @__PURE__ */ (0, import_jsx_runtime155.jsx)("p", { className: "font-mono text-[8px] tracking-[0.14em] text-cyansys/80", children: "NEWSWIRE" }),
-      /* @__PURE__ */ (0, import_jsx_runtime155.jsx)("p", { className: "mt-0.5 font-mono text-[7px] tracking-[0.08em] text-textdim/70", children: "Sports wire \u2014 newest first" })
+      /* @__PURE__ */ (0, import_jsx_runtime155.jsx)("p", { className: "mt-0.5 font-mono text-[7px] tracking-[0.08em] text-textdim/70", children: isGrarfWebRenderer() ? "LATEST NEWS - All leagues" : "Sports wire \u2014 newest first" })
     ] }),
     /* @__PURE__ */ (0, import_jsx_runtime155.jsx)(
       "div",
@@ -95927,6 +95981,7 @@ lucide-react/dist/esm/icons/radio.mjs:
 lucide-react/dist/esm/icons/search.mjs:
 lucide-react/dist/esm/icons/settings.mjs:
 lucide-react/dist/esm/icons/square-arrow-out-up-right.mjs:
+lucide-react/dist/esm/icons/trending-up.mjs:
 lucide-react/dist/esm/icons/triangle-alert.mjs:
 lucide-react/dist/esm/icons/users.mjs:
 lucide-react/dist/esm/icons/video.mjs:
