@@ -36195,25 +36195,75 @@ function resolveWebsiteFaviconUrl(url) {
     return null;
   }
 }
+var WEBSITE_BRAND_BY_HOST = {
+  "pgatour.com": "PGA TOUR",
+  "tennis365.com": "Tennis365",
+  "baseballsavant.mlb.com": "Baseball Savant",
+  "formula1.com": "Formula 1",
+  "espn.com": "ESPN",
+  "mlb.com": "MLB",
+  "nfl.com": "NFL",
+  "nhl.com": "NHL",
+  "wnba.com": "WNBA",
+  "nbcsports.com": "NBC Sports",
+  "cbssports.com": "CBS Sports",
+  "theathletic.com": "The Athletic",
+  "tennisworldusa.org": "Tennis World USA"
+};
+var BRAND_ACRONYMS = /* @__PURE__ */ new Set([
+  "nhl",
+  "nba",
+  "mlb",
+  "nfl",
+  "nbc",
+  "cbs",
+  "f1",
+  "mls",
+  "ucl",
+  "epl",
+  "wnba",
+  "usa",
+  "pga",
+  "si",
+  "icc",
+  "tvg"
+]);
+function normalizeWebsiteHost(hostname) {
+  return hostname.replace(/^www\./i, "").toLowerCase();
+}
+function looksLikeDomainStyleLabel(label) {
+  const head = (label.split("/")[0] ?? label).trim();
+  return /\.(com|net|org|io|co|us|uk|live)(\/|$)/i.test(head);
+}
 function humanizeDomainToken(token) {
-  const spaced = token.replace(/-/g, " ").replace(/_/g, " ").replace(/([A-Z]+)([A-Z][a-z])/g, "$1 $2").replace(/([a-z])([A-Z])/g, "$1 $2").replace(/([a-z])(\d)/g, "$1 $2");
+  const spaced = token.replace(/-/g, " ").replace(/_/g, " ").replace(/([A-Z]+)([A-Z][a-z])/g, "$1 $2").replace(/([a-z])([A-Z])/g, "$1 $2");
   return spaced.split(/\s+/).filter(Boolean).map((word) => {
     if (word === word.toUpperCase() && /^[A-Z0-9]{2,5}$/.test(word)) return word;
     const lower = word.toLowerCase();
-    if (["nhl", "nba", "mlb", "nfl", "nbc", "f1", "mls", "ucl", "epl"].includes(lower)) {
-      return lower.toUpperCase();
-    }
+    if (BRAND_ACRONYMS.has(lower)) return lower.toUpperCase();
     return lower.charAt(0).toUpperCase() + lower.slice(1);
   }).join(" ");
 }
 function formatWebsitePaneHeaderLabel(label, url) {
-  if (!url.trim()) return label;
+  const trimmedUrl = url.trim();
+  if (!trimmedUrl) return label;
   if (label.length <= 5 && label.includes("/")) return label;
+  if (!looksLikeDomainStyleLabel(label)) return label;
+  try {
+    const host = normalizeWebsiteHost(new URL(trimmedUrl).hostname);
+    const brandByHost = WEBSITE_BRAND_BY_HOST[host];
+    if (brandByHost) return brandByHost;
+  } catch {
+  }
   const domainPart = (label.split("/")[0] ?? label).replace(
-    /\.(com|net|org|io|co|us|uk)(\.[a-z]{2})?$/i,
+    /\.(com|net|org|io|co|us|uk|live)(\.[a-z]{2})?$/i,
     ""
   );
   return humanizeDomainToken(domainPart);
+}
+function isLeagueWorkspaceWebsiteCategoryTab(categoryLabel, sources) {
+  const embeddable = sources.filter((source) => source.url.trim().length > 0);
+  return embeddable.length === 1 && categoryLabel === embeddable[0].label;
 }
 
 // ../grarf/desktop/src/data/homeLeagueWorkspaceHorseRacingNavigation.ts
@@ -61374,7 +61424,7 @@ function resolveHomeLeagueHubPaneSources(hubId, categoryId, liveLeagues) {
 init_define_import_meta_env();
 var HOME_WEB_PANE_FRAME_MARGIN_CLASS = "m-[25px]";
 var HOME_WEB_PANE_FRAME_HEIGHT_CLASS = "h-[calc(100%-50px)]";
-var HOME_WEB_CENTER_PANE_SURFACE_CLASS = "bg-[#0d252a]";
+var HOME_WEB_CENTER_PANE_SURFACE_CLASS = "bg-[#141414]";
 
 // ../grarf/desktop/src/components/homeMvp/HomeSourceCardsSurface.tsx
 init_isGrarfWebRenderer();
@@ -63463,13 +63513,18 @@ function HomeLeagueWorkspaceMainMenu({ hubId, config }) {
     (s2) => s2.activeCategoryByHub[hubId] ?? config?.defaultCategoryId ?? null
   );
   const setActiveCategory = useHomeLeagueWorkspaceMainMenuStore((s2) => s2.setActiveCategory);
+  const isWebRenderer = isGrarfWebRenderer();
   const items = (0, import_react77.useMemo)(
-    () => config?.categories.map((category) => ({
-      id: category.id,
-      label: category.label,
-      showGatedLock: category.showGatedLock
-    })) ?? [],
-    [config?.categories]
+    () => config?.categories.map((category) => {
+      const websiteSource = category.sources.find((source) => source.url.trim().length > 0);
+      const label = isWebRenderer && websiteSource && isLeagueWorkspaceWebsiteCategoryTab(category.label, category.sources) ? formatWebsitePaneHeaderLabel(websiteSource.label, websiteSource.url) : category.label;
+      return {
+        id: category.id,
+        label,
+        showGatedLock: category.showGatedLock
+      };
+    }) ?? [],
+    [config?.categories, isWebRenderer]
   );
   if (!items.length) return null;
   const handleSelect = (categoryId) => {
