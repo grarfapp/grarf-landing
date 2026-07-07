@@ -51354,6 +51354,7 @@ var CHANNEL_LOGO_BY_LABEL = {
   CNBC: "/league-logos/channel-cnbc.png",
   "PARAMOUNT+": "/league-logos/channel-paramount-plus.png",
   TNT: "/league-logos/channel-tnt.png",
+  TBS: "/league-logos/channel-tbs.png",
   "MLB.TV": "/league-logos/channel-mlbtv.png",
   "MLB TV": "/league-logos/channel-mlbtv.png",
   MLBTV: "/league-logos/channel-mlbtv.png",
@@ -64632,10 +64633,156 @@ init_define_import_meta_env();
 
 // ../grarf/desktop/src/store/gamesSpineDisplayStore.ts
 init_define_import_meta_env();
+var import_zustand42 = __toESM(require_zustand(), 1);
+
+// ../grarf/desktop/src/lib/gamesSpine/gamesSpineCompactLeftWidth.ts
+init_define_import_meta_env();
+init_isGrarfWebRenderer();
+
+// ../grarf/desktop/src/store/workspaceLayoutStore.ts
+init_define_import_meta_env();
 var import_zustand41 = __toESM(require_zustand(), 1);
-var useGamesSpineDisplayStore = (0, import_zustand41.create)((set) => ({
+var import_middleware2 = __toESM(require_middleware(), 1);
+function clamp2(n2, min, max) {
+  return Math.min(max, Math.max(min, n2));
+}
+function resolvePaneLayoutSlice(layouts, id) {
+  return { ...DEFAULT_PANE_LAYOUTS[id], ...layouts[id] };
+}
+function mergePersistedPaneLayouts(persisted) {
+  const merged = {};
+  for (const id of Object.keys(DEFAULT_PANE_LAYOUTS)) {
+    merged[id] = { ...DEFAULT_PANE_LAYOUTS[id], ...persisted?.[id] };
+  }
+  return merged;
+}
+var useWorkspaceLayoutStore = (0, import_zustand41.create)()(
+  (0, import_middleware2.persist)(
+    (set) => ({
+      layouts: mergePersistedPaneLayouts(),
+      setLeftWidth: (id, width) => set((s2) => {
+        const cur = resolvePaneLayoutSlice(s2.layouts, id);
+        return {
+          layouts: {
+            ...s2.layouts,
+            [id]: {
+              ...cur,
+              leftWidth: clamp2(width, PANE_LAYOUT_LIMITS.left.min, PANE_LAYOUT_LIMITS.left.max)
+            }
+          }
+        };
+      }),
+      setRightWidth: (id, width) => set((s2) => {
+        const cur = resolvePaneLayoutSlice(s2.layouts, id);
+        return {
+          layouts: {
+            ...s2.layouts,
+            [id]: {
+              ...cur,
+              rightWidth: clamp2(width, PANE_LAYOUT_LIMITS.right.min, PANE_LAYOUT_LIMITS.right.max)
+            }
+          }
+        };
+      }),
+      toggleLeftCollapsed: (id) => set((s2) => {
+        const cur = resolvePaneLayoutSlice(s2.layouts, id);
+        return {
+          layouts: {
+            ...s2.layouts,
+            [id]: { ...cur, leftCollapsed: !cur.leftCollapsed }
+          }
+        };
+      }),
+      toggleRightCollapsed: (id) => set((s2) => {
+        const cur = resolvePaneLayoutSlice(s2.layouts, id);
+        return {
+          layouts: {
+            ...s2.layouts,
+            [id]: { ...cur, rightCollapsed: !cur.rightCollapsed }
+          }
+        };
+      }),
+      setLeftCollapsed: (id, collapsed) => set((s2) => {
+        const cur = resolvePaneLayoutSlice(s2.layouts, id);
+        return {
+          layouts: {
+            ...s2.layouts,
+            [id]: { ...cur, leftCollapsed: collapsed }
+          }
+        };
+      }),
+      setRightCollapsed: (id, collapsed) => set((s2) => {
+        const cur = resolvePaneLayoutSlice(s2.layouts, id);
+        return {
+          layouts: {
+            ...s2.layouts,
+            [id]: { ...cur, rightCollapsed: collapsed }
+          }
+        };
+      })
+    }),
+    {
+      name: "grarf-workspace-panes",
+      version: 1,
+      partialize: (s2) => ({ layouts: s2.layouts }),
+      merge: (persistedState, currentState) => {
+        const persisted = persistedState;
+        return {
+          ...currentState,
+          ...persisted,
+          layouts: mergePersistedPaneLayouts(persisted?.layouts)
+        };
+      }
+    }
+  )
+);
+function selectPaneLayout(id) {
+  return (s2) => s2.layouts[id] ?? DEFAULT_PANE_LAYOUTS[id];
+}
+function usePaneLayout(id) {
+  return useWorkspaceLayoutStore(selectPaneLayout(id));
+}
+
+// ../grarf/desktop/src/lib/gamesSpine/gamesSpineCompactLeftWidth.ts
+var GAMES_SPINE_COMPACT_LEFT_WIDTH_PX = 400;
+var HOME_LAYOUT_ID = "home";
+function applyGamesSpineCompactLeftWidth(nextMode, restorePx) {
+  if (!isGrarfWebRenderer()) {
+    return nextMode === "compact" ? restorePx : null;
+  }
+  const workspace = useWorkspaceLayoutStore.getState();
+  const homeLayout = {
+    ...DEFAULT_PANE_LAYOUTS.home,
+    ...workspace.layouts.home
+  };
+  if (homeLayout.leftCollapsed) {
+    return nextMode === "compact" ? restorePx : null;
+  }
+  if (nextMode === "compact") {
+    const currentWidth = homeLayout.leftWidth;
+    if (currentWidth !== GAMES_SPINE_COMPACT_LEFT_WIDTH_PX) {
+      workspace.setLeftWidth(HOME_LAYOUT_ID, GAMES_SPINE_COMPACT_LEFT_WIDTH_PX);
+    }
+    return currentWidth;
+  }
+  if (restorePx != null) {
+    workspace.setLeftWidth(HOME_LAYOUT_ID, restorePx);
+  }
+  return null;
+}
+
+// ../grarf/desktop/src/store/gamesSpineDisplayStore.ts
+var useGamesSpineDisplayStore = (0, import_zustand42.create)((set, get) => ({
   gamesMode: "full",
-  setGamesMode: (gamesMode) => set({ gamesMode })
+  compactLeftWidthRestorePx: null,
+  setGamesMode: (gamesMode) => {
+    if (get().gamesMode === gamesMode) return;
+    const compactLeftWidthRestorePx = applyGamesSpineCompactLeftWidth(
+      gamesMode,
+      get().compactLeftWidthRestorePx
+    );
+    set({ gamesMode, compactLeftWidthRestorePx });
+  }
 }));
 
 // ../grarf/desktop/src/components/homeMvp/HomeGamesSpineDisplayToolbar.tsx
@@ -70427,8 +70574,8 @@ var import_react114 = __toESM(require_react(), 1);
 
 // ../grarf/desktop/src/store/intelligenceStore.ts
 init_define_import_meta_env();
-var import_zustand42 = __toESM(require_zustand(), 1);
-var useIntelligenceStore = (0, import_zustand42.create)((set, get) => ({
+var import_zustand43 = __toESM(require_zustand(), 1);
+var useIntelligenceStore = (0, import_zustand43.create)((set, get) => ({
   items: [],
   loading: false,
   syncing: false,
@@ -79941,7 +80088,7 @@ var import_react142 = __toESM(require_react(), 1);
 
 // ../grarf/desktop/src/store/mlbAllGamesHighlightStore.ts
 init_define_import_meta_env();
-var import_zustand43 = __toESM(require_zustand(), 1);
+var import_zustand44 = __toESM(require_zustand(), 1);
 
 // ../grarf/desktop/src/lib/youtubeAllGamesHighlight.ts
 init_define_import_meta_env();
@@ -80115,7 +80262,7 @@ function stickyDisplayHighlight(authoritative) {
   return null;
 }
 var loadInFlight = null;
-var useMlbAllGamesHighlightStore = (0, import_zustand43.create)((set, get) => {
+var useMlbAllGamesHighlightStore = (0, import_zustand44.create)((set, get) => {
   const cached = readCachedHighlight();
   const initialDisplay = stickyDisplayHighlight(cached);
   if (cached) {
@@ -80697,7 +80844,7 @@ var import_react145 = __toESM(require_react(), 1);
 
 // ../grarf/desktop/src/store/mlbMorningLineupHighlightStore.ts
 init_define_import_meta_env();
-var import_zustand44 = __toESM(require_zustand(), 1);
+var import_zustand45 = __toESM(require_zustand(), 1);
 
 // ../grarf/desktop/src/lib/youtubeMorningLineupHighlight.ts
 init_define_import_meta_env();
@@ -80821,7 +80968,7 @@ function writeCachedHighlight2(item) {
   }
 }
 var loadInFlight2 = null;
-var useMlbMorningLineupHighlightStore = (0, import_zustand44.create)((set, get) => {
+var useMlbMorningLineupHighlightStore = (0, import_zustand45.create)((set, get) => {
   const cached = readCachedHighlight2();
   const loadHighlight = async () => {
     if (loadInFlight2) return loadInFlight2;
@@ -83083,110 +83230,6 @@ function usePaneDragResize({ side, min, max, getWidth, onLiveResize, onCommit })
     [side, min, max, getWidth, onLiveResize, onCommit]
   );
   return { onPointerDown, isDragging: () => draggingRef.current };
-}
-
-// ../grarf/desktop/src/store/workspaceLayoutStore.ts
-init_define_import_meta_env();
-var import_zustand45 = __toESM(require_zustand(), 1);
-var import_middleware2 = __toESM(require_middleware(), 1);
-function clamp2(n2, min, max) {
-  return Math.min(max, Math.max(min, n2));
-}
-function resolvePaneLayoutSlice(layouts, id) {
-  return { ...DEFAULT_PANE_LAYOUTS[id], ...layouts[id] };
-}
-function mergePersistedPaneLayouts(persisted) {
-  const merged = {};
-  for (const id of Object.keys(DEFAULT_PANE_LAYOUTS)) {
-    merged[id] = { ...DEFAULT_PANE_LAYOUTS[id], ...persisted?.[id] };
-  }
-  return merged;
-}
-var useWorkspaceLayoutStore = (0, import_zustand45.create)()(
-  (0, import_middleware2.persist)(
-    (set) => ({
-      layouts: mergePersistedPaneLayouts(),
-      setLeftWidth: (id, width) => set((s2) => {
-        const cur = resolvePaneLayoutSlice(s2.layouts, id);
-        return {
-          layouts: {
-            ...s2.layouts,
-            [id]: {
-              ...cur,
-              leftWidth: clamp2(width, PANE_LAYOUT_LIMITS.left.min, PANE_LAYOUT_LIMITS.left.max)
-            }
-          }
-        };
-      }),
-      setRightWidth: (id, width) => set((s2) => {
-        const cur = resolvePaneLayoutSlice(s2.layouts, id);
-        return {
-          layouts: {
-            ...s2.layouts,
-            [id]: {
-              ...cur,
-              rightWidth: clamp2(width, PANE_LAYOUT_LIMITS.right.min, PANE_LAYOUT_LIMITS.right.max)
-            }
-          }
-        };
-      }),
-      toggleLeftCollapsed: (id) => set((s2) => {
-        const cur = resolvePaneLayoutSlice(s2.layouts, id);
-        return {
-          layouts: {
-            ...s2.layouts,
-            [id]: { ...cur, leftCollapsed: !cur.leftCollapsed }
-          }
-        };
-      }),
-      toggleRightCollapsed: (id) => set((s2) => {
-        const cur = resolvePaneLayoutSlice(s2.layouts, id);
-        return {
-          layouts: {
-            ...s2.layouts,
-            [id]: { ...cur, rightCollapsed: !cur.rightCollapsed }
-          }
-        };
-      }),
-      setLeftCollapsed: (id, collapsed) => set((s2) => {
-        const cur = resolvePaneLayoutSlice(s2.layouts, id);
-        return {
-          layouts: {
-            ...s2.layouts,
-            [id]: { ...cur, leftCollapsed: collapsed }
-          }
-        };
-      }),
-      setRightCollapsed: (id, collapsed) => set((s2) => {
-        const cur = resolvePaneLayoutSlice(s2.layouts, id);
-        return {
-          layouts: {
-            ...s2.layouts,
-            [id]: { ...cur, rightCollapsed: collapsed }
-          }
-        };
-      })
-    }),
-    {
-      name: "grarf-workspace-panes",
-      version: 1,
-      partialize: (s2) => ({ layouts: s2.layouts }),
-      merge: (persistedState, currentState) => {
-        const persisted = persistedState;
-        return {
-          ...currentState,
-          ...persisted,
-          layouts: mergePersistedPaneLayouts(persisted?.layouts)
-        };
-      }
-    }
-  )
-);
-function selectPaneLayout(id) {
-  return (s2) => s2.layouts[id] ?? DEFAULT_PANE_LAYOUTS[id];
-}
-function usePaneLayout(id) {
-  return useWorkspaceLayoutStore(selectPaneLayout(id));
 }
 
 // ../grarf/desktop/src/components/layout/CenterPaneFeedAlignmentBridge.tsx
