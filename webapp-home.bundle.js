@@ -39431,233 +39431,39 @@ function matchOperationalModeSpineFilter(game, mode) {
 init_define_import_meta_env();
 var import_zustand12 = __toESM(require_zustand(), 1);
 
-// ../grarf/desktop/src/lib/sportscape/editorial/sportscapeEditorialApi.ts
+// ../grarf/desktop/src/lib/editorial/buildFeaturedGamesFromConfig.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/sportscape/editorial/fetchSportscapeEditorialWithFailover.ts
+// ../grarf/desktop/src/data/featuredGamesConfig.ts
 init_define_import_meta_env();
-var FETCH_TIMEOUT_MS = 15e3;
-var LOG9 = "[Sportscape Editorial]";
-function isTransportFailure(err) {
-  if (!(err instanceof Error)) return true;
-  const msg = err.message.toLowerCase();
-  return msg === "failed to fetch" || msg.includes("network") || msg.includes("cors") || msg.includes("aborted") || err.name === "AbortError" || err.name === "TypeError";
-}
-function shouldFailoverOnStatus(status) {
-  return status === 404 || status === 405 || status === 500 || status === 502 || status === 503 || status === 504;
-}
-async function fetchOne(baseUrl, path, init) {
-  const url = sportscapeEditorialUrlForBase(baseUrl, path);
-  return fetch(url, {
-    ...init,
-    signal: AbortSignal.timeout(FETCH_TIMEOUT_MS)
-  });
-}
-async function fetchSportscapeEditorialWithFailover(path, init, options) {
-  const shouldFailover = options?.failoverOnStatus ?? shouldFailoverOnStatus;
-  const errors = [];
-  const baseUrls = resolveSportscapeEditorialApiBaseUrls();
-  for (let i2 = 0; i2 < baseUrls.length; i2++) {
-    const baseUrl = baseUrls[i2];
-    const isLast = i2 === baseUrls.length - 1;
-    try {
-      const response = await fetchOne(baseUrl, path, init);
-      if (!response.ok && shouldFailover(response.status) && !isLast) {
-        errors.push(`${baseUrl}: HTTP ${response.status}`);
-        continue;
-      }
-      console.log(`${LOG9} Connected via ${baseUrl}`);
-      return { response, baseUrl };
-    } catch (err) {
-      const message = err instanceof Error ? err.message : String(err);
-      errors.push(`${baseUrl}: ${message}`);
-      if (!isLast && isTransportFailure(err)) continue;
-      if (isLast) break;
-      if (!isTransportFailure(err)) throw err instanceof Error ? err : new Error(message);
-    }
-  }
-  throw new Error(
-    "Unable to reach Sportscape Editorial API"
-  );
-}
+var FEATURED_GAMES_OPERATIONAL_DATE = "2026-07-07";
+var FEATURED_GAMES_SELECTIONS = [
+  { rank: 1, league: "World Cup", matchup: "Argentina vs Egypt", gameKey: "760509" },
+  { rank: 2, league: "World Cup", matchup: "Switzerland vs Colombia", gameKey: "760508" },
+  { rank: 3, league: "WTA", matchup: "Gauff vs Pegula", gameKey: "177714" },
+  { rank: 4, league: "ATP", matchup: "Djokovic vs Auger-Aliassime", gameKey: "177493" },
+  { rank: 5, league: "Tour de France", matchup: "Stage 4", gameKey: "manual-tdf-stage-4-2026-07-07" },
+  { rank: 6, league: "MLB", matchup: "Yankees vs Rays", gameKey: "401816058" }
+];
 
-// ../grarf/desktop/src/lib/sportscape/editorial/sportscapeEditorialApi.ts
-function workerWriteHeaders2() {
-  const headers = {
-    "Content-Type": "application/json"
-  };
-  const token = getSportscapeAdminToken();
-  if (token) {
-    headers.Authorization = `Bearer ${token}`;
+// ../grarf/desktop/src/lib/editorial/buildFeaturedGamesFromConfig.ts
+function buildFeaturedGamesFromConfig(operationalDateKey = getOperationalSportsDayDateKey()) {
+  if (operationalDateKey !== FEATURED_GAMES_OPERATIONAL_DATE) {
+    return {};
   }
-  return headers;
-}
-async function fetchSportscapeEditorialDocumentViaWorker() {
-  const { response: res } = await fetchSportscapeEditorialWithFailover("/", { method: "GET" });
-  if (!res.ok) throw new Error(`load_failed_${res.status}`);
-  const body = await res.json();
-  return body.document ?? { entries: [], aiBriefSelections: [], featuredGames: {} };
-}
-function featuredGamesFromEditorialDocument(doc) {
   const out = {};
-  const raw = doc?.featuredGames;
-  if (!raw) return out;
-  for (const [key2, row] of Object.entries(raw)) {
-    const rank = row.briefingPriority ?? row.featuredRank;
-    if (typeof rank !== "number" || !Number.isFinite(rank) || rank < 1 || rank > 10) continue;
-    out[key2] = { briefingPriority: Math.round(rank) };
+  for (const row of FEATURED_GAMES_SELECTIONS) {
+    const gameKey = row.gameKey.trim();
+    if (!gameKey) continue;
+    const rank = Math.round(row.rank);
+    if (!Number.isFinite(rank) || rank < 1 || rank > 10) continue;
+    out[gameKey] = { briefingPriority: rank };
   }
   return out;
 }
-async function upsertFeaturedGameViaWorker(input) {
-  const { response: res } = await fetchSportscapeEditorialWithFailover("/featured-games", {
-    method: "POST",
-    headers: workerWriteHeaders2(),
-    body: JSON.stringify(input)
-  });
-  if (!res.ok) throw new Error(`featured_game_save_failed_${res.status}`);
-  const body = await res.json();
-  if (!body.document) throw new Error("featured_game_save_missing_document");
-  return body.document;
-}
-async function upsertSportscapeEditorialEntryViaWorker(input) {
-  const { response: res } = await fetchSportscapeEditorialWithFailover("/entries", {
-    method: "POST",
-    headers: workerWriteHeaders2(),
-    body: JSON.stringify(input)
-  });
-  if (!res.ok) throw new Error(`save_failed_${res.status}`);
-  const body = await res.json();
-  if (!body.entry) throw new Error("save_missing_entry");
-  return body.entry;
-}
-async function verifySportscapeAdminPasswordViaWorker(password) {
-  const { response: res } = await fetchSportscapeEditorialWithFailover("/verify-password", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ password })
-  });
-  if (res.status === 401) return false;
-  if (!res.ok) throw new Error(`verify_failed_${res.status}`);
-  const body = await res.json();
-  if (!body.ok || !body.token) return false;
-  markSportscapeAdminAuthed(body.token);
-  return true;
-}
-async function upsertAiBriefSelectionViaWorker(input) {
-  const { response: res } = await fetchSportscapeEditorialWithFailover("/ai-brief-selections", {
-    method: "POST",
-    headers: workerWriteHeaders2(),
-    body: JSON.stringify(input)
-  });
-  if (!res.ok) throw new Error(`ai_brief_upsert_failed_${res.status}`);
-  const body = await res.json();
-  if (!body.selection) throw new Error("ai_brief_upsert_missing_selection");
-  return body.selection;
-}
-async function removeAiBriefSelectionViaWorker(id) {
-  const { response: res } = await fetchSportscapeEditorialWithFailover("/ai-brief-selections/remove", {
-    method: "POST",
-    headers: workerWriteHeaders2(),
-    body: JSON.stringify({ id })
-  });
-  if (!res.ok) throw new Error(`ai_brief_remove_failed_${res.status}`);
-}
-async function fetchSportscapeEditorialDocument() {
-  return fetchSportscapeEditorialDocumentViaWorker();
-}
-async function fetchFeaturedGamesFromEditorialWorker() {
-  const doc = await fetchSportscapeEditorialDocument();
-  return featuredGamesFromEditorialDocument(doc);
-}
-async function saveFeaturedGamePriorityViaWorker(gameKey, rank) {
-  const input = {
-    gameKey,
-    briefingPriority: rank,
-    featuredRank: rank
-  };
-  if (shouldUseLocalSportscapeEditorialFallback() && window.grarf?.sportscapeEditorialUpsertFeaturedGame) {
-    const result = await window.grarf.sportscapeEditorialUpsertFeaturedGame(input);
-    if (!result.ok || !result.document) {
-      throw new Error(result.error ?? "featured_game_save_failed");
-    }
-    return featuredGamesFromEditorialDocument(result.document);
-  }
-  const doc = await upsertFeaturedGameViaWorker(input);
-  return featuredGamesFromEditorialDocument(doc);
-}
-async function saveSportscapeEditorialEntry(input) {
-  if (shouldUseLocalSportscapeEditorialFallback() && window.grarf?.sportscapeEditorialUpsertEntry) {
-    const result = await window.grarf.sportscapeEditorialUpsertEntry(input);
-    if (!result.ok || !result.entry) throw new Error(result.error ?? "save_failed");
-    return result.entry;
-  }
-  return upsertSportscapeEditorialEntryViaWorker(input);
-}
-async function verifySportscapeAdminPassword(password) {
-  if (shouldUseLocalSportscapeEditorialFallback() && window.grarf?.sportscapeEditorialVerifyPassword) {
-    const result = await window.grarf.sportscapeEditorialVerifyPassword(password);
-    if (result.error) throw new Error(result.error);
-    if (result.ok) markSportscapeAdminAuthed("local-dev");
-    return Boolean(result.ok);
-  }
-  return verifySportscapeAdminPasswordViaWorker(password);
-}
-async function saveAiBriefSelection(input) {
-  if (shouldUseLocalSportscapeEditorialFallback() && window.grarf?.sportscapeEditorialUpsertAiBriefSelection) {
-    const result = await window.grarf.sportscapeEditorialUpsertAiBriefSelection(input);
-    if (!result.ok || !result.selection) {
-      throw new Error(result.error ?? "ai_brief_upsert_failed");
-    }
-    return result.selection;
-  }
-  return upsertAiBriefSelectionViaWorker(input);
-}
-async function deleteAiBriefSelection(id) {
-  if (shouldUseLocalSportscapeEditorialFallback() && window.grarf?.sportscapeEditorialRemoveAiBriefSelection) {
-    const result = await window.grarf.sportscapeEditorialRemoveAiBriefSelection({ id });
-    if (!result.ok) throw new Error(result.error ?? "ai_brief_remove_failed");
-    return;
-  }
-  await removeAiBriefSelectionViaWorker(id);
-}
-async function clearAllAiBriefSelections(selections) {
-  for (const selection of selections) {
-    await deleteAiBriefSelection(selection.id);
-  }
-}
-
-// ../grarf/desktop/src/lib/sportscape/editorial/featuredGamesBrowserStorage.ts
-init_define_import_meta_env();
-var STORAGE_KEY2 = "grarf-featured-games-v1";
-function readFeaturedGamesFromBrowserStorage2() {
-  if (typeof localStorage === "undefined") return {};
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY2);
-    if (!raw) return {};
-    const parsed = JSON.parse(raw);
-    if (!parsed || typeof parsed !== "object") return {};
-    const out = {};
-    for (const [key2, row] of Object.entries(parsed)) {
-      const rank = row?.briefingPriority ?? row?.featuredRank;
-      if (typeof rank !== "number" || !Number.isFinite(rank) || rank < 1 || rank > 10) continue;
-      out[key2] = { briefingPriority: Math.round(rank) };
-    }
-    return out;
-  } catch {
-    return {};
-  }
-}
-function writeFeaturedGamesToBrowserStorage2(featuredGames) {
-  if (typeof localStorage === "undefined") return;
-  try {
-    localStorage.setItem(STORAGE_KEY2, JSON.stringify(featuredGames));
-  } catch {
-  }
-}
 
 // ../grarf/desktop/src/store/editorialStore.ts
-var LOG10 = "[Editorial]";
+var LOG9 = "[Editorial]";
 var EDIT_MODE_KEY = "grarf-editorial-edit-mode-v1";
 var AUTOSAVE_MS = 1e3;
 var emptyBundle = () => ({
@@ -39712,6 +39518,12 @@ function normalizeEditorialBundle(raw) {
   }
   return { narratives, featuredGames, leagueContexts, generatedSummaries: empty.generatedSummaries };
 }
+function withCodeFeaturedGames(bundle) {
+  return {
+    ...bundle,
+    featuredGames: buildFeaturedGamesFromConfig()
+  };
+}
 function readEditMode() {
   if (!isGrarfAdmin()) return false;
   if (typeof sessionStorage === "undefined") return false;
@@ -39739,27 +39551,16 @@ function debounced(key2, fn2) {
     }, AUTOSAVE_MS)
   );
 }
-function featuredGamesSaveErrorMessage(err) {
-  const message = err instanceof Error ? err.message : String(err);
-  if (message.includes("featured_game_save_failed_401")) {
-    return "Command Briefing priority save failed: editorial sign-in required. Turn Edit Mode off and on to sign in.";
-  }
-  if (message.includes("Unable to reach Sportscape Editorial API") || message.includes("load_failed_")) {
-    return "Cloud editorial sync unavailable \u2014 priorities saved locally in this browser.";
-  }
-  return "Command Briefing priority cloud sync failed. Priorities are saved locally in this browser.";
-}
 var useEditorialStore = (0, import_zustand12.create)((set, get) => ({
   bundle: emptyBundle(),
   generationState: {},
   loaded: false,
   editMode: readEditMode(),
-  featuredGamesSaveError: null,
-  clearFeaturedGamesSaveError: () => {
-    set({ featuredGamesSaveError: null });
-  },
   hydrate: (bundle) => {
-    set({ bundle: normalizeEditorialBundle(bundle), loaded: true });
+    set({
+      bundle: withCodeFeaturedGames(normalizeEditorialBundle(bundle)),
+      loaded: true
+    });
   },
   setGenerationState: (generationState) => {
     set({ generationState });
@@ -39768,7 +39569,7 @@ var useEditorialStore = (0, import_zustand12.create)((set, get) => ({
     if (!isGrarfAdmin()) return;
     writeEditMode(on2);
     set({ editMode: on2 });
-    console.log(`${LOG10} Edit mode ${on2 ? "enabled" : "disabled"}`);
+    console.log(`${LOG9} Edit mode ${on2 ? "enabled" : "disabled"}`);
   },
   setManualNarrativeLocal: (gameKey, text2) => {
     set((s2) => {
@@ -39811,7 +39612,7 @@ var useEditorialStore = (0, import_zustand12.create)((set, get) => ({
   saveManualNarrative: (gameKey, text2) => {
     const trimmed = text2.trim();
     if (trimmed) {
-      console.log(`${LOG10} Narrative updated: "${trimmed}"`);
+      console.log(`${LOG9} Narrative updated: "${trimmed}"`);
     }
     get().setManualNarrativeLocal(gameKey, text2);
     debounced(`narrative:${gameKey}`, () => {
@@ -39819,27 +39620,14 @@ var useEditorialStore = (0, import_zustand12.create)((set, get) => ({
       if (!api) return;
       void api({ gameKey, manualNarrative: trimmed || null }).then((res) => {
         if (res?.ok && res.bundle) {
-          set({ bundle: normalizeEditorialBundle(res.bundle) });
+          set({ bundle: withCodeFeaturedGames(normalizeEditorialBundle(res.bundle)) });
         }
       });
     });
   },
+  /** Session-only preview in edit mode — Featured Games persist via `featuredGamesConfig.ts`. */
   saveFeaturedRank: (gameKey, rank) => {
     get().setFeaturedRankLocal(gameKey, rank);
-    set({ featuredGamesSaveError: null });
-    writeFeaturedGamesToBrowserStorage2(useEditorialStore.getState().bundle.featuredGames);
-    void saveFeaturedGamePriorityViaWorker(gameKey, rank).then((featuredGames) => {
-      const browserFeatured = readFeaturedGamesFromBrowserStorage2();
-      const merged = { ...featuredGames, ...browserFeatured };
-      writeFeaturedGamesToBrowserStorage2(merged);
-      set((s2) => ({
-        bundle: { ...s2.bundle, featuredGames: merged },
-        featuredGamesSaveError: null
-      }));
-    }).catch((err) => {
-      console.warn(`${LOG10} featuredGames save failed`, gameKey, err);
-      set({ featuredGamesSaveError: featuredGamesSaveErrorMessage(err) });
-    });
   },
   saveLeagueContext: (leagueKey, text2) => {
     get().setLeagueContextLocal(leagueKey, text2);
@@ -39847,7 +39635,9 @@ var useEditorialStore = (0, import_zustand12.create)((set, get) => ({
       const api = window.grarf?.editorialSaveLeagueContext;
       if (!api) return;
       void api({ leagueKey, leagueContext: text2.trim() || null }).then((res) => {
-        if (res?.ok && res.bundle) set({ bundle: normalizeEditorialBundle(res.bundle) });
+        if (res?.ok && res.bundle) {
+          set({ bundle: withCodeFeaturedGames(normalizeEditorialBundle(res.bundle)) });
+        }
       });
     });
   }
@@ -39861,20 +39651,7 @@ async function loadEditorialBundleFromMain() {
       bundle = normalizeEditorialBundle(res.bundle);
     }
   }
-  const browserFeaturedGames = readFeaturedGamesFromBrowserStorage2();
-  try {
-    const featuredGames = await fetchFeaturedGamesFromEditorialWorker();
-    bundle = {
-      ...bundle,
-      featuredGames: { ...featuredGames, ...browserFeaturedGames }
-    };
-  } catch (err) {
-    console.warn(`${LOG10} featuredGames load failed`, err);
-    bundle = {
-      ...bundle,
-      featuredGames: { ...bundle.featuredGames, ...browserFeaturedGames }
-    };
-  }
+  bundle = withCodeFeaturedGames(bundle);
   const summariesApi = window.grarf?.editorialGenerationGetSummaries;
   if (summariesApi) {
     const sumRes = await summariesApi();
@@ -39911,7 +39688,7 @@ var import_zustand13 = __toESM(require_zustand(), 1);
 
 // ../grarf/desktop/src/lib/commandBriefing/commandBriefingDates.ts
 init_define_import_meta_env();
-var LOG11 = "[CommandBriefing]";
+var LOG10 = "[CommandBriefing]";
 var DAY_MS = 24 * 60 * 60 * 1e3;
 function getBriefingOperationalTodayKey(now = /* @__PURE__ */ new Date()) {
   return getOperationalSportsDayDateKey(now, GRARF_OPERATIONAL_SLATE_TIMEZONE);
@@ -39941,7 +39718,7 @@ function getBriefingDateOptions(now = /* @__PURE__ */ new Date()) {
     options.push({ key: key2, label });
   }
   if (define_import_meta_env_default.DEV) {
-    console.log(`${LOG11} Loaded briefing date options`, { today: todayKey, count: options.length });
+    console.log(`${LOG10} Loaded briefing date options`, { today: todayKey, count: options.length });
   }
   return options;
 }
@@ -39957,7 +39734,7 @@ function resolveActiveBriefingDateKey(selectedKey, now = /* @__PURE__ */ new Dat
   const calendarTodayCentral = getOperationalCalendarDateKey(now, GRARF_OPERATIONAL_SLATE_TIMEZONE);
   if (selectedKey === calendarTodayCentral && calendarTodayCentral !== sportsDayKey) {
     if (define_import_meta_env_default.DEV) {
-      console.log(`${LOG11} Mapped calendar today to operational sports day`, {
+      console.log(`${LOG10} Mapped calendar today to operational sports day`, {
         was: selectedKey,
         now: sportsDayKey
       });
@@ -39966,7 +39743,7 @@ function resolveActiveBriefingDateKey(selectedKey, now = /* @__PURE__ */ new Dat
   }
   if (selectedKey === legacyBrowserLocalTodayKey(now) && selectedKey !== sportsDayKey) {
     if (define_import_meta_env_default.DEV) {
-      console.log(`${LOG11} Migrated legacy local today to operational sports day`, {
+      console.log(`${LOG10} Migrated legacy local today to operational sports day`, {
         was: selectedKey,
         now: sportsDayKey
       });
@@ -39982,7 +39759,7 @@ function resolveActiveBriefingDateKey(selectedKey, now = /* @__PURE__ */ new Dat
   );
   if (selectedStart.getTime() < sportsDayStart.getTime()) {
     if (define_import_meta_env_default.DEV) {
-      console.log(`${LOG11} Date rollover \u2014 using operational sports day`, {
+      console.log(`${LOG10} Date rollover \u2014 using operational sports day`, {
         was: selectedKey,
         now: sportsDayKey
       });
@@ -40699,7 +40476,7 @@ init_define_import_meta_env();
 // ../grarf/desktop/src/lib/fotmob/fetchFotmobMatchesByDate.ts
 init_define_import_meta_env();
 var FOTMOB_MATCHES_API = "https://www.fotmob.com/api/data/matches";
-var LOG12 = "[FotMob]";
+var LOG11 = "[FotMob]";
 function isWorldCupBucket(bucket) {
   if (bucket.parentLeagueName === "World Cup") return true;
   return /^world cup/i.test(bucket.name ?? "");
@@ -40740,7 +40517,7 @@ async function fetchFotmobWorldCupMatchesByDate(dateKey) {
     return matches;
   } catch (error) {
     if (define_import_meta_env_default.DEV) {
-      console.warn(`${LOG12} matches fetch failed for ${normalized}`, error);
+      console.warn(`${LOG11} matches fetch failed for ${normalized}`, error);
     }
     return [];
   }
@@ -40831,7 +40608,7 @@ function matchFotmobWorldCupMatch(game, catalog) {
 }
 
 // ../grarf/desktop/src/lib/fotmob/enrichWorldCupGamesWithFotmobUrls.ts
-var LOG13 = "[FotMob]";
+var LOG12 = "[FotMob]";
 function isWorldCupRow(game) {
   return game.league === "WORLDCUP";
 }
@@ -40843,7 +40620,7 @@ async function enrichWorldCupGamesWithFotmobUrls(games) {
     catalog = await fetchFotmobWorldCupCatalog(worldCupRows);
   } catch (error) {
     if (define_import_meta_env_default.DEV) {
-      console.warn(`${LOG13} catalog fetch failed`, error);
+      console.warn(`${LOG12} catalog fetch failed`, error);
     }
     return games;
   }
@@ -40868,7 +40645,7 @@ async function enrichWorldCupGamesWithFotmobUrls(games) {
     };
   });
   if (define_import_meta_env_default.DEV && matched > 0) {
-    console.log(`${LOG13} matched ${matched} World Cup row(s)`, { catalogSize: catalog.length });
+    console.log(`${LOG12} matched ${matched} World Cup row(s)`, { catalogSize: catalog.length });
   }
   return out;
 }
@@ -40933,7 +40710,7 @@ function parseFoxWorldCupEventPath(pathOrUrl) {
 
 // ../grarf/desktop/src/lib/foxWorldCup/discoverFoxWorldCupDetailUrls.ts
 var FOX_EVENT_BASE2 = "https://www.fox.com";
-var FETCH_TIMEOUT_MS2 = 1e4;
+var FETCH_TIMEOUT_MS = 1e4;
 var MAX_UUID_PROBES = 24;
 var HTML_HEADERS = {
   Accept: "text/html,application/xhtml+xml",
@@ -40963,7 +40740,7 @@ function extractEventDetailUuids(html) {
 async function fetchFoxHtml(url) {
   const res = await fetch(url, {
     headers: HTML_HEADERS,
-    signal: AbortSignal.timeout(FETCH_TIMEOUT_MS2)
+    signal: AbortSignal.timeout(FETCH_TIMEOUT_MS)
   });
   if (!res.ok) throw new Error(`FOX page fetch failed: ${res.status} ${url}`);
   return res.text();
@@ -41022,7 +40799,7 @@ async function discoverFoxWorldCupDetailUrls(htmlSources) {
 init_define_import_meta_env();
 var BIFROST_API_KEY = "jE7yBJVRNAwdDesMgTzTXUUSx1It41Fq";
 var WORLD_CUP_GROUP_ID = "12";
-var FETCH_TIMEOUT_MS3 = 15e3;
+var FETCH_TIMEOUT_MS2 = 15e3;
 function parseFoxHubStreamUrlFromSponsorship(sponsorship) {
   const raw = sponsorship?.url?.trim();
   if (!raw) return null;
@@ -41070,7 +40847,7 @@ function parseBifrostEvent(event) {
 async function fetchBifrostJson(url) {
   const res = await fetch(url, {
     headers: { Accept: "application/json" },
-    signal: AbortSignal.timeout(FETCH_TIMEOUT_MS3)
+    signal: AbortSignal.timeout(FETCH_TIMEOUT_MS2)
   });
   if (!res.ok) throw new Error(`Fox Sports bifrost fetch failed: ${res.status}`);
   return await res.json();
@@ -41098,7 +40875,7 @@ async function fetchFoxWorldCupBifrostCatalog() {
 // ../grarf/desktop/src/lib/foxWorldCup/fetchFoxWorldCupEventCatalog.ts
 var FOX_WORLD_CUP_HUB_URL = "https://www.fox.com/soccer/fifa-world-cup";
 var FOX_SPORTS_PAGE_URL = "https://www.fox.com/sports";
-var FETCH_TIMEOUT_MS4 = 15e3;
+var FETCH_TIMEOUT_MS3 = 15e3;
 var CACHE_TTL_MS = 6e4;
 var HTML_HEADERS2 = {
   Accept: "text/html,application/xhtml+xml",
@@ -41131,7 +40908,7 @@ function mergeCatalogRows(rows) {
 async function fetchFoxHtml2(url) {
   const res = await fetch(url, {
     headers: HTML_HEADERS2,
-    signal: AbortSignal.timeout(FETCH_TIMEOUT_MS4)
+    signal: AbortSignal.timeout(FETCH_TIMEOUT_MS3)
   });
   if (!res.ok) throw new Error(`FOX page fetch failed: ${res.status} ${url}`);
   return res.text();
@@ -41283,7 +41060,7 @@ function lookupFoxWorldCupStreamForGame(game, catalog) {
 }
 
 // ../grarf/desktop/src/lib/foxWorldCup/enrichWorldCupGamesWithFoxStreams.ts
-var LOG14 = "[FoxWorldCup]";
+var LOG13 = "[FoxWorldCup]";
 function isWorldCupRow2(game) {
   return game.league === "WORLDCUP";
 }
@@ -41297,7 +41074,7 @@ async function enrichWorldCupGamesWithFoxStreams(games) {
     catalog = await fetchFoxWorldCupEventCatalog();
   } catch (error) {
     if (define_import_meta_env_default.DEV) {
-      console.warn(`${LOG14} catalog fetch failed \u2014 using deterministic FOX hub URLs`, error);
+      console.warn(`${LOG13} catalog fetch failed \u2014 using deterministic FOX hub URLs`, error);
     }
   }
   let matched = 0;
@@ -41315,7 +41092,7 @@ async function enrichWorldCupGamesWithFoxStreams(games) {
     };
   });
   if (define_import_meta_env_default.DEV && matched > 0) {
-    console.log(`${LOG14} matched ${matched} World Cup row(s)`, { catalogSize: catalog.length });
+    console.log(`${LOG13} matched ${matched} World Cup row(s)`, { catalogSize: catalog.length });
   }
   return out;
 }
@@ -41484,14 +41261,14 @@ init_define_import_meta_env();
 
 // ../grarf/desktop/src/lib/stream/streamLinkCache.ts
 init_define_import_meta_env();
-var STORAGE_KEY3 = "grarf-stream-links-v1";
+var STORAGE_KEY2 = "grarf-stream-links-v1";
 var DEFAULT_TTL_MS = 30 * 60 * 1e3;
 function cacheKey(provider, gameId) {
   return `${provider}:${gameId}`;
 }
 function read() {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY3);
+    const raw = localStorage.getItem(STORAGE_KEY2);
     if (!raw) return {};
     const p2 = JSON.parse(raw);
     return p2?.entries && typeof p2.entries === "object" ? p2.entries : {};
@@ -41501,7 +41278,7 @@ function read() {
 }
 function write(entries) {
   try {
-    localStorage.setItem(STORAGE_KEY3, JSON.stringify({ version: 1, entries }));
+    localStorage.setItem(STORAGE_KEY2, JSON.stringify({ version: 1, entries }));
   } catch {
   }
 }
@@ -42334,7 +42111,7 @@ function matchWimbledonSlamTrackerGame(game, catalog) {
 }
 
 // ../grarf/desktop/src/lib/wimbledon/enrichWimbledonSlamTrackerMatches.ts
-var LOG15 = "[WimbledonSlamTracker]";
+var LOG14 = "[WimbledonSlamTracker]";
 function attachSlamTrackerResolution(game, matchId, url) {
   game.externalIds = {
     ...game.externalIds,
@@ -42386,7 +42163,7 @@ async function enrichWimbledonSlamTrackerMatches(games) {
     attachSlamTrackerResolution(game, resolution.matchId, resolution.url);
   }
   if (define_import_meta_env_default?.DEV && matched > 0) {
-    console.log(`${LOG15} matched ${matched} Wimbledon row(s)`, { targets: targets.length });
+    console.log(`${LOG14} matched ${matched} Wimbledon row(s)`, { targets: targets.length });
   }
 }
 
@@ -42608,7 +42385,7 @@ function parseTennisChannelPlusEvent(event) {
 
 // ../grarf/desktop/src/lib/tennisChannelPlus/fetchTennisChannelPlusLiveCatalog.ts
 var TENNIS_CHANNEL_EVENTS_URL = "https://www.tennischannel.com/api/v2/events";
-var FETCH_TIMEOUT_MS5 = 12e3;
+var FETCH_TIMEOUT_MS4 = 12e3;
 var cachedCatalog3 = null;
 var cachedAtMs3 = 0;
 var CACHE_TTL_MS2 = 6e4;
@@ -42618,7 +42395,7 @@ async function fetchTennisChannelPlusLiveCatalog(now = Date.now(), forceRefresh 
   }
   const res = await fetch(TENNIS_CHANNEL_EVENTS_URL, {
     headers: { Accept: "application/json" },
-    signal: AbortSignal.timeout(FETCH_TIMEOUT_MS5)
+    signal: AbortSignal.timeout(FETCH_TIMEOUT_MS4)
   });
   if (!res.ok) {
     throw new Error(`Tennis Channel Plus events fetch failed: ${res.status}`);
@@ -42701,7 +42478,7 @@ function matchTennisChannelPlusStream(game, catalog) {
 }
 
 // ../grarf/desktop/src/lib/tennisChannelPlus/enrichTennisGamesWithTennisChannelPlus.ts
-var LOG16 = "[TennisChannelPlus]";
+var LOG15 = "[TennisChannelPlus]";
 function isTennisLeague3(game) {
   return game.league === "ATP" || game.league === "WTA";
 }
@@ -42713,7 +42490,7 @@ async function enrichTennisGamesWithTennisChannelPlus(games) {
     catalog = await fetchTennisChannelPlusLiveCatalog();
   } catch (error) {
     if (define_import_meta_env_default.DEV) {
-      console.warn(`${LOG16} catalog fetch failed`, error);
+      console.warn(`${LOG15} catalog fetch failed`, error);
     }
     return games;
   }
@@ -42732,7 +42509,7 @@ async function enrichTennisGamesWithTennisChannelPlus(games) {
     };
   });
   if (define_import_meta_env_default.DEV && matched > 0) {
-    console.log(`${LOG16} matched ${matched} live tennis row(s)`, { catalogSize: catalog.length });
+    console.log(`${LOG15} matched ${matched} live tennis row(s)`, { catalogSize: catalog.length });
   }
   return out;
 }
@@ -42812,7 +42589,7 @@ async function fetchEspnStandingsJson(url, signal) {
 }
 
 // ../grarf/desktop/src/lib/standings/mlb/buildMlbEspnStandingsIndex.ts
-var LOG17 = "[StandingsEnrich:MLB]";
+var LOG16 = "[StandingsEnrich:MLB]";
 var MLB_ESPN_STANDINGS_URL = "https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/standings";
 var MLB_ESPN_CORE_BASE = "https://sports.core.api.espn.com/v2/sports/baseball/leagues/mlb";
 var MLB_DIVISION_GROUP_IDS = [1, 2, 3, 4, 5, 6];
@@ -43000,7 +42777,7 @@ async function hydrateMlbStandingsAbbrevs(entries, season) {
         });
       } catch (error) {
         if (define_import_meta_env_default.DEV) {
-          console.warn(`${LOG17} Team abbrev fetch failed`, entry.espnTeamId, error);
+          console.warn(`${LOG16} Team abbrev fetch failed`, entry.espnTeamId, error);
         }
       }
     })
@@ -43034,7 +42811,7 @@ async function buildMlbEspnStandingsIndex(now = /* @__PURE__ */ new Date()) {
     entries = parseEspnSiteStandingsPayload(sitePayload);
   } catch (error) {
     if (define_import_meta_env_default.DEV) {
-      console.warn(`${LOG17} Site standings fetch failed`, error);
+      console.warn(`${LOG16} Site standings fetch failed`, error);
     }
   }
   if (entries.length === 0) {
@@ -43045,7 +42822,7 @@ async function buildMlbEspnStandingsIndex(now = /* @__PURE__ */ new Date()) {
     registerStandingsEntry(index, entry);
   }
   if (define_import_meta_env_default.DEV) {
-    console.log(`${LOG17} Built MLB standings index`, {
+    console.log(`${LOG16} Built MLB standings index`, {
       teams: index.byEspnTeamId.size,
       season
     });
@@ -43055,7 +42832,7 @@ async function buildMlbEspnStandingsIndex(now = /* @__PURE__ */ new Date()) {
 
 // ../grarf/desktop/src/lib/standings/mlb/enrichMlbGamesWithStandings.ts
 init_define_import_meta_env();
-var LOG18 = "[StandingsEnrich:MLB]";
+var LOG17 = "[StandingsEnrich:MLB]";
 function normalizeTeamLookupKey2(value) {
   return String(value ?? "").trim().toLowerCase().replace(/\s+/g, " ");
 }
@@ -43094,14 +42871,14 @@ async function enrichMlbGamesWithStandings(games, index) {
     return next;
   });
   if (define_import_meta_env_default.DEV && attached > 0) {
-    console.log(`${LOG18} Attached standings to games`, { games: games.length, attached });
+    console.log(`${LOG17} Attached standings to games`, { games: games.length, attached });
   }
   return enriched;
 }
 
 // ../grarf/desktop/src/lib/standings/wnba/buildWnbaEspnStandingsIndex.ts
 init_define_import_meta_env();
-var LOG19 = "[StandingsEnrich:WNBA]";
+var LOG18 = "[StandingsEnrich:WNBA]";
 var WNBA_ESPN_STANDINGS_URL = "https://site.api.espn.com/apis/site/v2/sports/basketball/wnba/standings";
 var WNBA_ESPN_CORE_BASE = "https://sports.core.api.espn.com/v2/sports/basketball/leagues/wnba";
 var WNBA_CONFERENCE_GROUP_IDS = [1, 2];
@@ -43275,7 +43052,7 @@ async function hydrateWnbaStandingsAbbrevs(entries, season) {
         });
       } catch (error) {
         if (define_import_meta_env_default.DEV) {
-          console.warn(`${LOG19} Team abbrev fetch failed`, entry.espnTeamId, error);
+          console.warn(`${LOG18} Team abbrev fetch failed`, entry.espnTeamId, error);
         }
       }
     })
@@ -43309,7 +43086,7 @@ async function buildWnbaEspnStandingsIndex(now = /* @__PURE__ */ new Date()) {
     entries = parseEspnSiteStandingsPayload2(sitePayload);
   } catch (error) {
     if (define_import_meta_env_default.DEV) {
-      console.warn(`${LOG19} Site standings fetch failed`, error);
+      console.warn(`${LOG18} Site standings fetch failed`, error);
     }
   }
   if (entries.length === 0) {
@@ -43320,7 +43097,7 @@ async function buildWnbaEspnStandingsIndex(now = /* @__PURE__ */ new Date()) {
     registerStandingsEntry2(index, entry);
   }
   if (define_import_meta_env_default.DEV) {
-    console.log(`${LOG19} Built WNBA standings index`, {
+    console.log(`${LOG18} Built WNBA standings index`, {
       teams: index.byEspnTeamId.size,
       season
     });
@@ -43330,7 +43107,7 @@ async function buildWnbaEspnStandingsIndex(now = /* @__PURE__ */ new Date()) {
 
 // ../grarf/desktop/src/lib/standings/wnba/enrichWnbaGamesWithStandings.ts
 init_define_import_meta_env();
-var LOG20 = "[StandingsEnrich:WNBA]";
+var LOG19 = "[StandingsEnrich:WNBA]";
 function normalizeTeamLookupKey4(value) {
   return String(value ?? "").trim().toLowerCase().replace(/\s+/g, " ");
 }
@@ -43369,13 +43146,13 @@ async function enrichWnbaGamesWithStandings(games, index) {
     return next;
   });
   if (define_import_meta_env_default.DEV && attached > 0) {
-    console.log(`${LOG20} Attached standings to games`, { games: games.length, attached });
+    console.log(`${LOG19} Attached standings to games`, { games: games.length, attached });
   }
   return enriched;
 }
 
 // ../grarf/desktop/src/lib/standings/enrichOperationalSnapshotTeamStandings.ts
-var LOG21 = "[StandingsEnrich]";
+var LOG20 = "[StandingsEnrich]";
 var TEAM_STANDINGS_LEAGUE_ENRICHERS = {
   MLB: {
     buildIndex: buildMlbEspnStandingsIndex,
@@ -43414,7 +43191,7 @@ async function enrichOperationalSnapshotTeamStandings(transport) {
         changed = true;
       }
     } catch (error) {
-      console.warn(`${LOG21} ${leagueKey} standings enrich failed`, error);
+      console.warn(`${LOG20} ${leagueKey} standings enrich failed`, error);
     }
   }
   if (!changed) return transport;
@@ -43475,7 +43252,7 @@ function resolveWimbledonFeedSeedsForGame(game, match) {
 }
 
 // ../grarf/desktop/src/lib/playerRank/enrichTennisGamesWithPlayerRanks.ts
-var LOG22 = "[PlayerRankEnrich:Tennis]";
+var LOG21 = "[PlayerRankEnrich:Tennis]";
 function resolveTennisSideRank(game, side, wimbledonSeeds) {
   const leagueKey = game.league;
   if (leagueKey !== "ATP" && leagueKey !== "WTA") return void 0;
@@ -43526,13 +43303,13 @@ async function enrichTennisGamesWithPlayerRanks(games, catalogByYear) {
     return next;
   });
   if (define_import_meta_env_default.DEV && attached > 0) {
-    console.log(`${LOG22} Attached player ranks`, { games: games.length, attached });
+    console.log(`${LOG21} Attached player ranks`, { games: games.length, attached });
   }
   return enriched;
 }
 
 // ../grarf/desktop/src/lib/playerRank/enrichOperationalSnapshotPlayerRanks.ts
-var LOG23 = "[PlayerRankEnrich]";
+var LOG22 = "[PlayerRankEnrich]";
 var TENNIS_PLAYER_RANK_LEAGUES = ["ATP", "WTA"];
 async function buildWimbledonCatalogByYear(transport) {
   const years = /* @__PURE__ */ new Set();
@@ -43571,7 +43348,7 @@ async function enrichOperationalSnapshotPlayerRanks(transport) {
         changed = true;
       }
     } catch (error) {
-      console.warn(`${LOG23} ${leagueKey} player rank enrich failed`, error);
+      console.warn(`${LOG22} ${leagueKey} player rank enrich failed`, error);
     }
   }
   if (!changed) return transport;
@@ -43716,7 +43493,7 @@ async function supplementOperationalSnapshotFromLocalIpc(transport) {
 }
 
 // ../grarf/desktop/src/services/operationalIngest/enrichOperationalTransport.ts
-var LOG24 = "[OperationalIngest]";
+var LOG23 = "[OperationalIngest]";
 function cloudRowMissingMlbPk2(row) {
   if (typeof row.gamePk === "number" && row.gamePk > 0) return false;
   const mlb2 = row.externalIds?.mlb?.trim();
@@ -43743,17 +43520,17 @@ async function enrichOperationalTransport(rawTransport) {
   try {
     transport = sanitizeOperationalSnapshotWatchStreams(transport);
   } catch (e2) {
-    console.warn(`${LOG24} watch stream sanitize failed`, e2);
+    console.warn(`${LOG23} watch stream sanitize failed`, e2);
   }
   try {
     transport = await supplementOperationalSnapshotFromLocalIpc(transport);
   } catch (e2) {
-    console.warn(`${LOG24} local IPC supplement failed`, e2);
+    console.warn(`${LOG23} local IPC supplement failed`, e2);
   }
   try {
     transport = enrichOperationalSnapshotEspnWatchStreams(transport);
   } catch (e2) {
-    console.warn(`${LOG24} ESPN Watch stream enrich failed`, e2);
+    console.warn(`${LOG23} ESPN Watch stream enrich failed`, e2);
   }
   if (isGrarfWebRenderer()) {
     try {
@@ -43763,59 +43540,59 @@ async function enrichOperationalTransport(rawTransport) {
         await enrichWimbledonEspnWatchStreams(rows);
       }
     } catch (e2) {
-      console.warn(`${LOG24} Wimbledon ESPN Watch enrich failed`, e2);
+      console.warn(`${LOG23} Wimbledon ESPN Watch enrich failed`, e2);
     }
     try {
       transport = await enrichOperationalSnapshotWimbledonSlamTracker(transport);
     } catch (e2) {
-      console.warn(`${LOG24} Wimbledon SlamTracker enrich failed`, e2);
+      console.warn(`${LOG23} Wimbledon SlamTracker enrich failed`, e2);
     }
     try {
       transport = await enrichOperationalSnapshotEspnWatchPickerStreams(transport);
     } catch (e2) {
-      console.warn(`${LOG24} ESPN Watch picker enrich failed`, e2);
+      console.warn(`${LOG23} ESPN Watch picker enrich failed`, e2);
     }
   }
   try {
     transport = enrichOperationalSnapshotUsaNetworkStreams(transport);
   } catch (e2) {
-    console.warn(`${LOG24} USA Network stream enrich failed`, e2);
+    console.warn(`${LOG23} USA Network stream enrich failed`, e2);
   }
   try {
     transport = await joinMissingMlbProviderIds(transport);
   } catch (e2) {
-    console.warn(`${LOG24} MLB provider join failed`, e2);
+    console.warn(`${LOG23} MLB provider join failed`, e2);
   }
   try {
     transport = await enrichOperationalSnapshotTennisChannel(transport);
   } catch (e2) {
-    console.warn(`${LOG24} Tennis Channel Plus enrich failed`, e2);
+    console.warn(`${LOG23} Tennis Channel Plus enrich failed`, e2);
   }
   try {
     transport = await enrichOperationalSnapshotFoxWorldCup(transport);
   } catch (e2) {
-    console.warn(`${LOG24} FOX World Cup enrich failed`, e2);
+    console.warn(`${LOG23} FOX World Cup enrich failed`, e2);
   }
   try {
     transport = await enrichOperationalSnapshotWnbaStreams(transport);
   } catch (e2) {
-    console.warn(`${LOG24} WNBA Prime Video enrich failed`, e2);
+    console.warn(`${LOG23} WNBA Prime Video enrich failed`, e2);
   }
   try {
     transport = await enrichOperationalSnapshotFotmob(transport);
   } catch (e2) {
-    console.warn(`${LOG24} FotMob World Cup enrich failed`, e2);
+    console.warn(`${LOG23} FotMob World Cup enrich failed`, e2);
   }
   if (isGrarfWebRenderer()) {
     try {
       transport = await enrichOperationalSnapshotTeamStandings(transport);
     } catch (e2) {
-      console.warn(`${LOG24} team standings enrich failed`, e2);
+      console.warn(`${LOG23} team standings enrich failed`, e2);
     }
     try {
       transport = await enrichOperationalSnapshotPlayerRanks(transport);
     } catch (e2) {
-      console.warn(`${LOG24} player rank enrich failed`, e2);
+      console.warn(`${LOG23} player rank enrich failed`, e2);
     }
   }
   return transport;
@@ -43841,7 +43618,7 @@ function normalizeOperationalSnapshot(response) {
 }
 
 // ../grarf/desktop/src/services/operationalIngest/startOperationalSnapshotPolling.ts
-var LOG25 = "[OperationalIngest]";
+var LOG24 = "[OperationalIngest]";
 var DEFAULT_POLL_INTERVAL_MS = 6e4;
 var RETRY_MS = 15e3;
 function startOperationalSnapshotPolling(hydrate, options) {
@@ -43856,7 +43633,7 @@ function startOperationalSnapshotPolling(hydrate, options) {
   let retryTimer = null;
   let intervalId = null;
   if (define_import_meta_env_default.DEV) {
-    console.log(`${LOG25} provider=grarf_cloud polling centralized snapshot`);
+    console.log(`${LOG24} provider=grarf_cloud polling centralized snapshot`);
   }
   const clearRetry = () => {
     if (retryTimer != null) {
@@ -43889,7 +43666,7 @@ function startOperationalSnapshotPolling(hydrate, options) {
             await applyHydrate(enriched, { source: "grarf_cloud" });
           } catch (e2) {
             const msg = e2 instanceof Error ? e2.message : String(e2);
-            console.warn(`${LOG25} web enrich hydrate failed`, msg);
+            console.warn(`${LOG24} web enrich hydrate failed`, msg);
             if (stopped) return;
             await applyHydrate(rawTransport, { source: "grarf_cloud" });
           }
@@ -43900,7 +43677,7 @@ function startOperationalSnapshotPolling(hydrate, options) {
         clearRetry();
       } catch (e2) {
         const msg = e2 instanceof Error ? e2.message : String(e2);
-        console.warn(`${LOG25} poll failed`, msg);
+        console.warn(`${LOG24} poll failed`, msg);
         if (!stopped && retryTimer == null) {
           retryTimer = setTimeout(() => {
             retryTimer = null;
@@ -43980,7 +43757,7 @@ function supplementOperationalSnapshotLeagues(primary, supplement) {
   }
   return changed ? merged : primary;
 }
-var LOG26 = "[OperationalIngest]";
+var LOG25 = "[OperationalIngest]";
 function parseUpdatedAtMs(updatedAt) {
   if (!updatedAt?.trim()) return 0;
   const ms2 = Date.parse(updatedAt);
@@ -44005,14 +43782,14 @@ function LiveGamesBridge() {
           const enriched = await enrichOperationalTransport(transport);
           applySnapshot(enriched, normalizeOperationalSnapshot(enriched), completeness);
         } catch (e2) {
-          console.warn(`${LOG26} transport enrich failed`, e2);
+          console.warn(`${LOG25} transport enrich failed`, e2);
           applySnapshot(transport, normalizeOperationalSnapshot(transport), completeness);
         }
       })();
     };
     if (config.provider === "grarf_cloud") {
       if (define_import_meta_env_default.DEV) {
-        console.log(`${LOG26} grarf_cloud with local IPC supplement (fresher wins)`);
+        console.log(`${LOG25} grarf_cloud with local IPC supplement (fresher wins)`);
       }
       const cloudHydrate = (snap) => {
         lastCloudLeaguesRef.current = snap.leagues ?? {};
@@ -44072,7 +43849,7 @@ function LiveGamesBridge() {
             }
             applySnapshot(enriched, canonical, { source: "espn_local_adapter" });
           } catch (e2) {
-            console.warn(`${LOG26} local IPC enrich failed`, e2);
+            console.warn(`${LOG25} local IPC enrich failed`, e2);
             let canonical = normalizeOperationalSnapshot(transport);
             if (transport.source === "espn_local_adapter") {
               const prevLeagues = useLiveGamesStore.getState().leagues;
@@ -47405,7 +47182,7 @@ function editorialLookupKeysForGame(game) {
 }
 
 // ../grarf/desktop/src/lib/commandBriefing/briefingPersistence.ts
-var LOG27 = "[CommandBriefing]";
+var LOG26 = "[CommandBriefing]";
 function snapshotFromGame(game) {
   const league = game.league ?? "MLB";
   return {
@@ -47432,11 +47209,11 @@ function snapshotFromGame(game) {
 }
 function logUsingLiveGame(game) {
   if (!define_import_meta_env_default.DEV) return;
-  console.log(`${LOG27} Using live operational game`, { gameId: game.id });
+  console.log(`${LOG26} Using live operational game`, { gameId: game.id });
 }
 function logPersistedFallbackSnapshot(gameId) {
   if (!define_import_meta_env_default.DEV) return;
-  console.log(`${LOG27} Persisted fallback snapshot`, { gameId });
+  console.log(`${LOG26} Persisted fallback snapshot`, { gameId });
 }
 function persistBriefingSnapshot(game) {
   const api = window.grarf?.commandBriefingSavePersistenceEntry;
@@ -47729,7 +47506,7 @@ function FinalizedGameRetentionBridge() {
 // ../grarf/desktop/src/components/operational/YesterdayCatchUpSeedBridge.tsx
 init_define_import_meta_env();
 var import_react30 = __toESM(require_react(), 1);
-var LOG28 = "[CatchUpYesterday]";
+var LOG27 = "[CatchUpYesterday]";
 function YesterdayCatchUpSeedBridge() {
   (0, import_react30.useEffect)(() => {
     const api = window.grarf?.gamesGetYesterdayFinals;
@@ -47742,17 +47519,17 @@ function YesterdayCatchUpSeedBridge() {
         const finals = result?.finals ?? [];
         if (finals.length === 0) {
           if (define_import_meta_env_default.DEV) {
-            console.warn(`${LOG28} no yesterday finals returned`);
+            console.warn(`${LOG27} no yesterday finals returned`);
           }
           return;
         }
         useRecentFinalizedGamesStore.getState().mergeFinalizedGames(finals);
         if (define_import_meta_env_default.DEV) {
-          console.log(`${LOG28} seeded ${finals.length} yesterday finals for Catch Up`);
+          console.log(`${LOG27} seeded ${finals.length} yesterday finals for Catch Up`);
         }
       } catch (e2) {
         if (!cancelled && define_import_meta_env_default.DEV) {
-          console.warn(`${LOG28} seed failed`, e2);
+          console.warn(`${LOG27} seed failed`, e2);
         }
       }
     })();
@@ -48135,7 +47912,7 @@ function computeAttentionScore(input) {
 
 // ../grarf/desktop/src/lib/attentionRuntime/devLogging.ts
 init_define_import_meta_env();
-var LOG29 = "[AttentionRuntime]";
+var LOG28 = "[AttentionRuntime]";
 var lastRankingSignature = "";
 var lastRecomputeLogAt = 0;
 function rankingSignature(rankings) {
@@ -48151,7 +47928,7 @@ function logAttentionRecompute(input) {
   if (!rankingChanged && now - lastRecomputeLogAt < 6e4) return;
   lastRankingSignature = signature;
   lastRecomputeLogAt = now;
-  console.log(`${LOG29} recompute`, {
+  console.log(`${LOG28} recompute`, {
     trigger: input.trigger,
     gameCount: input.gameCount,
     top: input.rankings.slice(0, 5).map((r3) => ({
@@ -48163,13 +47940,13 @@ function logAttentionRecompute(input) {
 }
 function logResidualGravityStarted(input) {
   if (!define_import_meta_env_default.DEV) return;
-  console.log(`${LOG29} residual gravity started`, input);
+  console.log(`${LOG28} residual gravity started`, input);
 }
 function logResidualGravityDecay(states) {
   if (!define_import_meta_env_default.DEV || states.length === 0) return;
   const active2 = states.filter((s2) => s2.currentGravity > 0.5);
   if (active2.length === 0) return;
-  console.log(`${LOG29} residual gravity decay`, {
+  console.log(`${LOG28} residual gravity decay`, {
     active: active2.map((s2) => ({
       eventId: s2.eventId,
       gravity: s2.currentGravity,
@@ -48615,7 +48392,7 @@ init_define_import_meta_env();
 
 // ../grarf/desktop/src/lib/recommendationRuntime/devLogging.ts
 init_define_import_meta_env();
-var LOG30 = "[RecommendationRuntime]";
+var LOG29 = "[RecommendationRuntime]";
 var lastPrimaryId = null;
 var lastRankingSignature2 = "";
 var lastLogAt = 0;
@@ -48635,14 +48412,14 @@ function logRecommendationUpdate(diag) {
   lastRankingSignature2 = signature;
   lastLogAt = now;
   if (primaryChanged) {
-    console.log(`${LOG30} primary transition`, {
+    console.log(`${LOG29} primary transition`, {
       from: previousPrimary,
       to: diag.primaryRecommendation,
       reasoning: diag.primaryReasoning,
       mode: diag.operationalMode
     });
   }
-  console.log(`${LOG30} recommendations`, {
+  console.log(`${LOG29} recommendations`, {
     trigger: diag.lastRecomputeReason,
     primary: diag.primaryRecommendation,
     top: diag.rankedRecommendations.slice(0, 4).map((r3) => ({
@@ -49400,11 +49177,11 @@ var watchConfig = {
 
 // ../grarf/desktop/src/lib/watch/espnResolutionCache.ts
 init_define_import_meta_env();
-var STORAGE_KEY4 = "grarf-espn-watch-v1";
+var STORAGE_KEY3 = "grarf-espn-watch-v1";
 var TTL_MS = 30 * 60 * 1e3;
 function read2() {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY4);
+    const raw = localStorage.getItem(STORAGE_KEY3);
     if (!raw) return {};
     const p2 = JSON.parse(raw);
     return p2?.entries && typeof p2.entries === "object" ? p2.entries : {};
@@ -49414,7 +49191,7 @@ function read2() {
 }
 function write2(entries) {
   try {
-    localStorage.setItem(STORAGE_KEY4, JSON.stringify({ version: 1, entries }));
+    localStorage.setItem(STORAGE_KEY3, JSON.stringify({ version: 1, entries }));
   } catch {
   }
 }
@@ -49447,12 +49224,12 @@ function mlbTvLegacyWatchOption(game) {
 
 // ../grarf/desktop/src/lib/watch/providers/espnResolver.ts
 init_define_import_meta_env();
-var LOG31 = "[Resolver]";
+var LOG30 = "[Resolver]";
 function resolverDebug(message, extra) {
   if (extra && Object.keys(extra).length > 0) {
-    console.log(`${LOG31} ${message}`, extra);
+    console.log(`${LOG30} ${message}`, extra);
   } else {
-    console.log(`${LOG31} ${message}`);
+    console.log(`${LOG30} ${message}`);
   }
 }
 function parseEspnEventId(game) {
@@ -49590,13 +49367,13 @@ function gameHasParamountBroadcast(game) {
 }
 
 // ../grarf/desktop/src/lib/watch/providers/paramountResolver.ts
-var LOG32 = "[Paramount]";
+var LOG31 = "[Paramount]";
 function resolveParamountWatchOption(game) {
   const cached = getCachedStreamUrl("Paramount+", game.id);
   const streamUrl = game.streamUrl?.trim() || cached;
   if (!streamUrl) return null;
   if (game.streamProvider !== "Paramount+" && !gameHasParamountBroadcast(game)) return null;
-  console.log(`${LOG32} Resolved stream URL for match`, {
+  console.log(`${LOG31} Resolved stream URL for match`, {
     gameId: game.id,
     league: game.league,
     streamUrl
@@ -49626,7 +49403,7 @@ function gameHasPeacockBroadcast(game) {
 }
 
 // ../grarf/desktop/src/lib/watch/providers/peacockResolver.ts
-var LOG33 = "[Peacock]";
+var LOG32 = "[Peacock]";
 function resolvePeacockWatchOption(game) {
   if (game.league === "WORLDCUP") return null;
   const cached = getCachedStreamUrl("Peacock", game.id);
@@ -49647,8 +49424,8 @@ function resolvePeacockWatchOption(game) {
     };
   }
   if (game.streamProvider !== "Peacock" && !gameHasPeacockBroadcast(game)) return null;
-  console.log(`${LOG33} Resolved playback URL`, streamUrl);
-  console.log(`${LOG33} Resolved stream URL for match`, {
+  console.log(`${LOG32} Resolved playback URL`, streamUrl);
+  console.log(`${LOG32} Resolved stream URL for match`, {
     gameId: game.id,
     league: game.league,
     streamUrl
@@ -49685,7 +49462,7 @@ function gameHasAppleTvResolvableStream(game) {
 }
 
 // ../grarf/desktop/src/lib/watch/providers/appleTvResolver.ts
-var LOG34 = "[AppleTV]";
+var LOG33 = "[AppleTV]";
 function resolveAppleTvWatchOption(game) {
   if (!gameHasAppleTvResolvableStream(game)) return null;
   const cached = getCachedStreamUrl("Apple TV", game.id);
@@ -49694,7 +49471,7 @@ function resolveAppleTvWatchOption(game) {
   if (game.streamProvider !== "Apple TV" && !gameHasAppleTvBroadcast(game) && game.league !== "F1") {
     return null;
   }
-  console.log(`${LOG34} Resolved stream URL for match`, {
+  console.log(`${LOG33} Resolved stream URL for match`, {
     gameId: game.id,
     league: game.league,
     streamUrl
@@ -50478,12 +50255,12 @@ init_isGrarfWebRenderer();
 
 // ../grarf/desktop/src/lib/watch/watchDebug.ts
 init_define_import_meta_env();
-var LOG35 = "[Watch]";
+var LOG34 = "[Watch]";
 function watchDebug(message, extra) {
   if (extra && Object.keys(extra).length > 0) {
-    console.log(`${LOG35} ${message}`, extra);
+    console.log(`${LOG34} ${message}`, extra);
   } else {
-    console.log(`${LOG35} ${message}`);
+    console.log(`${LOG34} ${message}`);
   }
 }
 
@@ -50499,12 +50276,12 @@ function launchLegacyMlbWatch(game, dispatch) {
 
 // ../grarf/desktop/src/lib/watch/peacockExternalLaunch.ts
 init_define_import_meta_env();
-var LOG36 = "[Peacock]";
+var LOG35 = "[Peacock]";
 var WATCH_LOG2 = "[Watch]";
 function openPeacockPlaybackExternally(url) {
   const href = url.trim();
   if (!href) return;
-  console.log(`${LOG36} Resolved playback URL`, href);
+  console.log(`${LOG35} Resolved playback URL`, href);
   console.log(`${WATCH_LOG2} Provider launchMode: external`);
   console.log(`${WATCH_LOG2} Opening Peacock stream in system browser`);
   void window.grarf?.openExternalUrl?.(href)?.then((res) => {
@@ -50679,21 +50456,21 @@ function tryLaunchDirectStreamWatch(game, dispatch) {
 
 // ../grarf/desktop/src/lib/watch/usaNetworkWatch.ts
 init_define_import_meta_env();
-var LOG37 = "[Watch]";
+var LOG36 = "[Watch]";
 function tryLaunchUsaNetworkWatch(game) {
   const hasUsa = game.streamProvider === "USA" || gameRowHasUsaNetworkBroadcast(game);
   if (!hasUsa) return false;
   const url = game.streamUrl?.trim() || resolveUsaNetworkStreamUrl(game) || USA_NETWORK_LIVE_URL;
-  console.log(`${LOG37} Launching USA stream externally`);
-  console.log(`${LOG37} streamProvider=USA streamUrl=${url} launchMode=external`);
-  console.log(`${LOG37} Executing external launch: ${url}`);
+  console.log(`${LOG36} Launching USA stream externally`);
+  console.log(`${LOG36} streamProvider=USA streamUrl=${url} launchMode=external`);
+  console.log(`${LOG36} Executing external launch: ${url}`);
   openWatchStreamExternally(url, "USA Network");
   return true;
 }
 
 // ../grarf/desktop/src/lib/watch/wnbaWatchLive.ts
 init_define_import_meta_env();
-var LOG38 = "[WNBA]";
+var LOG37 = "[WNBA]";
 var PRIME_VIDEO_PROVIDER = "Prime Video";
 function resolveWnbaWatchStreamUrl(game) {
   const direct = game.streamUrl?.trim();
@@ -50748,13 +50525,13 @@ function gameHasResolvableWnbaWatchLive(game) {
   return resolveWnbaWatchStreamUrl(game) != null;
 }
 function logWnbaWatchLiveRendered(game) {
-  console.log(`${LOG38} WATCH LIVE rendered`, {
+  console.log(`${LOG37} WATCH LIVE rendered`, {
     gameId: game.id,
     streamProvider: game.streamProvider ?? null
   });
 }
 function logWnbaWatchLiveClicked(game) {
-  console.log(`${LOG38} WATCH LIVE clicked`, {
+  console.log(`${LOG37} WATCH LIVE clicked`, {
     gameId: game.id,
     streamProvider: game.streamProvider ?? null,
     streamUrl: resolveWnbaWatchStreamUrl(game)
@@ -50837,7 +50614,7 @@ function handleWatchLiveClick(game, dispatch) {
 
 // ../grarf/desktop/src/lib/watch/operationalWatchLive.ts
 init_define_import_meta_env();
-var LOG39 = "[WatchLive]";
+var LOG38 = "[WatchLive]";
 function gameHasOperationalWatchLive(game) {
   if (aflGameHasResolvableWatchStream(game)) return true;
   const url = game.streamUrl?.trim();
@@ -50850,9 +50627,9 @@ function logWatchLiveOperationalAlert(_game) {
 function logWatchLiveLaunch(game) {
   if (!define_import_meta_env_default.DEV) return;
   if (game.streamProvider) {
-    console.log(`${LOG39} Launching provider: ${game.streamProvider}`);
+    console.log(`${LOG38} Launching provider: ${game.streamProvider}`);
     if (game.streamProvider === "Peacock" || game.streamProvider === "USA" || game.streamProvider === "Tennis Channel+" || game.streamProvider === "FOX Sports") {
-      console.log(`${LOG39} Opening external browser`);
+      console.log(`${LOG38} Opening external browser`);
     }
   }
 }
@@ -51479,7 +51256,7 @@ init_isGrarfWebRenderer();
 
 // ../grarf/desktop/src/lib/workspace/paneContainment.ts
 init_define_import_meta_env();
-var LOG40 = "[PaneLayout]";
+var LOG39 = "[PaneLayout]";
 var PANE_LAYOUT_RESIZE_EVENT = "grarf:pane-resize";
 function dispatchPaneLayoutResize() {
   if (typeof window === "undefined") return;
@@ -51491,19 +51268,19 @@ var PANE_EMBED_HOST = "relative h-full w-full min-h-0 min-w-0 max-h-full max-w-f
 var PANE_EMBED_ABSOLUTE_FILL = "absolute inset-0 min-h-0 min-w-0 max-h-full max-w-full overflow-hidden";
 function logPaneContainmentApplied(surface) {
   if (!define_import_meta_env_default.DEV) return;
-  console.log(`${LOG40} Applied overflow containment`, { surface });
+  console.log(`${LOG39} Applied overflow containment`, { surface });
 }
 function logPaneEmbedResized(slot, width, height) {
   if (!define_import_meta_env_default.DEV) return;
-  console.log(`${LOG40} Resized embedded content pane`, { slot, width: Math.round(width), height: Math.round(height) });
+  console.log(`${LOG39} Resized embedded content pane`, { slot, width: Math.round(width), height: Math.round(height) });
 }
 function logPaneBrowserViewConstrained(slot) {
   if (!define_import_meta_env_default.DEV) return;
-  console.log(`${LOG40} BrowserView constrained to parent bounds`, { slot });
+  console.log(`${LOG39} BrowserView constrained to parent bounds`, { slot });
 }
 function logPaneOverflowPrevented(slot) {
   if (!define_import_meta_env_default.DEV) return;
-  console.log(`${LOG40} Prevented pane overflow`, { slot });
+  console.log(`${LOG39} Prevented pane overflow`, { slot });
 }
 
 // ../grarf/desktop/src/components/operationalAlerts/OperationalAlertCard.tsx
@@ -63437,6 +63214,7 @@ function WorkspaceSubnav({
   onSelect,
   className,
   leagueWorkspaceChrome = false,
+  webGatedItemOpacity = false,
   "aria-label": aria
 }) {
   if (!items || items.length === 0) return null;
@@ -63458,7 +63236,7 @@ function WorkspaceSubnav({
               HOME_SUBNAV_BUTTON_CLASS,
               on2 && (leagueWorkspaceChrome ? HOME_LEAGUE_WORKSPACE_NAV_BUTTON_ACTIVE_CLASS : "border-greensys/35 bg-greensys/[0.08] text-greensys"),
               !on2 && !dis && (leagueWorkspaceChrome ? HOME_LEAGUE_WORKSPACE_NAV_BUTTON_INACTIVE_CLASS : "border-transparent text-[#8a9e9e] hover:border-line/80 hover:bg-white/[0.03] hover:text-white"),
-              !on2 && !dis && item.showGatedLock && leagueWorkspaceChrome && "opacity-[0.30] hover:opacity-100",
+              !on2 && !dis && item.showGatedLock && (leagueWorkspaceChrome || webGatedItemOpacity) && "opacity-[0.30] hover:opacity-100",
               dis && "cursor-not-allowed border-transparent text-textdim/50 opacity-60"
             ),
             children: /* @__PURE__ */ (0, import_jsx_runtime48.jsxs)("span", { className: "inline-flex items-center gap-1", children: [
@@ -64141,6 +63919,20 @@ function HomeCenterPanePrimaryNav({
 init_define_import_meta_env();
 var import_react84 = __toESM(require_react(), 1);
 
+// ../grarf/desktop/src/data/gatedFeatures/browserBetting.ts
+init_define_import_meta_env();
+var BROWSER_BETTING_FEATURE_KEY = "browser-betting";
+var BROWSER_BETTING_GATED_FEATURE = {
+  featureKey: BROWSER_BETTING_FEATURE_KEY,
+  title: "Betting is coming to GRARF.",
+  subtitle: "Track odds movement, betting trends, sharp action, line movement, betting news, and game insights\u2014all organized by league and integrated directly into your sports workflow.",
+  bullets: [],
+  waitlistHeading: "Join the Waitlist",
+  waitlistBody: "Join the waitlist to be among the first to get access.",
+  successMessage: "You're on the list. We'll let you know when Betting launches on GRARF.",
+  ctaLabel: "Join Waitlist"
+};
+
 // ../grarf/desktop/src/hooks/useHomeLiveSubmenuEntryDefaults.ts
 init_define_import_meta_env();
 var import_react83 = __toESM(require_react(), 1);
@@ -64167,24 +63959,45 @@ function HomeLiveSubmenu() {
   const centerPaneMode = useCenterPaneApplicationModeStore((s2) => s2.mode);
   const activeId = useHomeLiveSubmenuStore((s2) => s2.activeId);
   const setActiveId = useHomeLiveSubmenuStore((s2) => s2.setActiveId);
-  const items = (0, import_react84.useMemo)(() => {
-    if (!isGrarfWebRenderer()) return HOME_LIVE_SUBMENU_ITEMS;
-    return HOME_LIVE_SUBMENU_ITEMS.map(
-      (item) => item.id === "betting" ? { id: item.id, label: item.label } : item
-    );
+  const [bettingWaitlistOpen, setBettingWaitlistOpen] = (0, import_react84.useState)(false);
+  const isWeb = isGrarfWebRenderer();
+  const openBettingWaitlist = (0, import_react84.useCallback)(() => {
+    setBettingWaitlistOpen(true);
   }, []);
-  if (centerPaneMode !== "browser") return null;
-  return /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(
-    WorkspaceSubnav,
-    {
-      items,
-      activeId,
-      onSelect: (id) => {
-        if (isHomeLiveSubmenuId(id)) setActiveId(id);
-      },
-      "aria-label": "Live sections"
-    }
+  const closeBettingWaitlist = (0, import_react84.useCallback)(() => {
+    setBettingWaitlistOpen(false);
+  }, []);
+  const onSelect = (0, import_react84.useCallback)(
+    (id) => {
+      if (isWeb && id === "betting") {
+        openBettingWaitlist();
+        return;
+      }
+      if (isHomeLiveSubmenuId(id)) setActiveId(id);
+    },
+    [isWeb, openBettingWaitlist, setActiveId]
   );
+  if (centerPaneMode !== "browser") return null;
+  return /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)(import_jsx_runtime57.Fragment, { children: [
+    /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(
+      WorkspaceSubnav,
+      {
+        items: HOME_LIVE_SUBMENU_ITEMS,
+        activeId,
+        onSelect,
+        webGatedItemOpacity: isWeb,
+        "aria-label": "Live sections"
+      }
+    ),
+    isWeb ? /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(
+      GatedFeatureModal,
+      {
+        open: bettingWaitlistOpen,
+        onClose: closeBettingWaitlist,
+        config: BROWSER_BETTING_GATED_FEATURE
+      }
+    ) : null
+  ] });
 }
 
 // ../grarf/desktop/src/components/homeMvp/HomeLiveLeagueSubmenu.tsx
@@ -65112,7 +64925,7 @@ function InlineEditableText({
 
 // ../grarf/desktop/src/components/gamesSpine/GameNarrativeCapsule.tsx
 var import_jsx_runtime65 = __toESM(require_jsx_runtime(), 1);
-var LOG41 = "[GamesSpine]";
+var LOG40 = "[GamesSpine]";
 function GameNarrativeCapsule({
   game,
   defaultCollapsed = false,
@@ -65135,9 +64948,9 @@ function GameNarrativeCapsule({
   (0, import_react93.useEffect)(() => {
     if (!text2.trim() && !editMode) return;
     if (define_import_meta_env_default.DEV) {
-      console.log(`${LOG41} Narrative capsule attached to game:`, gameKey);
+      console.log(`${LOG40} Narrative capsule attached to game:`, gameKey);
       if (text2.trim()) {
-        console.log(`${LOG41} Rendering narrative capsule: "${text2.trim()}"`);
+        console.log(`${LOG40} Rendering narrative capsule: "${text2.trim()}"`);
       }
     }
   }, [gameKey, text2, editMode]);
@@ -65211,7 +65024,7 @@ function GameNarrativeCapsule({
 // ../grarf/desktop/src/components/editorial/BriefingPriorityField.tsx
 init_define_import_meta_env();
 var import_jsx_runtime66 = __toESM(require_jsx_runtime(), 1);
-var LOG42 = "[Editorial]";
+var LOG41 = "[Editorial]";
 function BriefingPriorityField({ priority, editMode, onChange }) {
   if (!editMode) return null;
   return /* @__PURE__ */ (0, import_jsx_runtime66.jsxs)(
@@ -65245,7 +65058,7 @@ function BriefingPriorityField({ priority, editMode, onChange }) {
                 return;
               }
               const clamped = Math.min(10, Math.max(1, Math.round(n2)));
-              console.log(`${LOG42} Priority updated: ${clamped}`);
+              console.log(`${LOG41} Priority updated: ${clamped}`);
               onChange(clamped);
             },
             onKeyDown: (e2) => e2.stopPropagation(),
@@ -65393,7 +65206,7 @@ init_define_import_meta_env();
 var MCWS_DISPLAY_LABEL = "MCWS";
 
 // ../grarf/desktop/src/lib/commandBriefing/commandBriefingLeagueLabel.ts
-var LOG43 = "[CommandBriefing]";
+var LOG42 = "[CommandBriefing]";
 var BRIEFING_LEAGUE_LABELS = {
   MLB: "MLB",
   NCAABB: "NCAA BASEBALL",
@@ -65455,11 +65268,11 @@ function resolveCommandBriefingLeagueLabel(game) {
 }
 function logCommandBriefingLeagueLabel(label) {
   if (!define_import_meta_env_default.DEV) return;
-  console.log(`${LOG43} Rendering league label:`, label);
+  console.log(`${LOG42} Rendering league label:`, label);
 }
 function logCommandBriefingMetadataStyling() {
   if (!define_import_meta_env_default.DEV) return;
-  console.log(`${LOG43} Applied operational metadata styling`);
+  console.log(`${LOG42} Applied operational metadata styling`);
 }
 
 // ../grarf/desktop/src/lib/gamesSpine/motorsportSpinePresentation.ts
@@ -68847,6 +68660,162 @@ init_define_import_meta_env();
 // ../grarf/desktop/src/components/sportscapeEditorial/SportscapeEditorialPasswordForm.tsx
 init_define_import_meta_env();
 var import_react104 = __toESM(require_react(), 1);
+
+// ../grarf/desktop/src/lib/sportscape/editorial/sportscapeEditorialApi.ts
+init_define_import_meta_env();
+
+// ../grarf/desktop/src/lib/sportscape/editorial/fetchSportscapeEditorialWithFailover.ts
+init_define_import_meta_env();
+var FETCH_TIMEOUT_MS5 = 15e3;
+var LOG43 = "[Sportscape Editorial]";
+function isTransportFailure(err) {
+  if (!(err instanceof Error)) return true;
+  const msg = err.message.toLowerCase();
+  return msg === "failed to fetch" || msg.includes("network") || msg.includes("cors") || msg.includes("aborted") || err.name === "AbortError" || err.name === "TypeError";
+}
+function shouldFailoverOnStatus(status) {
+  return status === 404 || status === 405 || status === 500 || status === 502 || status === 503 || status === 504;
+}
+async function fetchOne(baseUrl, path, init) {
+  const url = sportscapeEditorialUrlForBase(baseUrl, path);
+  return fetch(url, {
+    ...init,
+    signal: AbortSignal.timeout(FETCH_TIMEOUT_MS5)
+  });
+}
+async function fetchSportscapeEditorialWithFailover(path, init, options) {
+  const shouldFailover = options?.failoverOnStatus ?? shouldFailoverOnStatus;
+  const errors = [];
+  const baseUrls = resolveSportscapeEditorialApiBaseUrls();
+  for (let i2 = 0; i2 < baseUrls.length; i2++) {
+    const baseUrl = baseUrls[i2];
+    const isLast = i2 === baseUrls.length - 1;
+    try {
+      const response = await fetchOne(baseUrl, path, init);
+      if (!response.ok && shouldFailover(response.status) && !isLast) {
+        errors.push(`${baseUrl}: HTTP ${response.status}`);
+        continue;
+      }
+      console.log(`${LOG43} Connected via ${baseUrl}`);
+      return { response, baseUrl };
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      errors.push(`${baseUrl}: ${message}`);
+      if (!isLast && isTransportFailure(err)) continue;
+      if (isLast) break;
+      if (!isTransportFailure(err)) throw err instanceof Error ? err : new Error(message);
+    }
+  }
+  throw new Error(
+    "Unable to reach Sportscape Editorial API"
+  );
+}
+
+// ../grarf/desktop/src/lib/sportscape/editorial/sportscapeEditorialApi.ts
+function workerWriteHeaders2() {
+  const headers = {
+    "Content-Type": "application/json"
+  };
+  const token = getSportscapeAdminToken();
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+  return headers;
+}
+async function fetchSportscapeEditorialDocumentViaWorker() {
+  const { response: res } = await fetchSportscapeEditorialWithFailover("/", { method: "GET" });
+  if (!res.ok) throw new Error(`load_failed_${res.status}`);
+  const body = await res.json();
+  return body.document ?? { entries: [], aiBriefSelections: [], featuredGames: {} };
+}
+async function upsertSportscapeEditorialEntryViaWorker(input) {
+  const { response: res } = await fetchSportscapeEditorialWithFailover("/entries", {
+    method: "POST",
+    headers: workerWriteHeaders2(),
+    body: JSON.stringify(input)
+  });
+  if (!res.ok) throw new Error(`save_failed_${res.status}`);
+  const body = await res.json();
+  if (!body.entry) throw new Error("save_missing_entry");
+  return body.entry;
+}
+async function verifySportscapeAdminPasswordViaWorker(password) {
+  const { response: res } = await fetchSportscapeEditorialWithFailover("/verify-password", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ password })
+  });
+  if (res.status === 401) return false;
+  if (!res.ok) throw new Error(`verify_failed_${res.status}`);
+  const body = await res.json();
+  if (!body.ok || !body.token) return false;
+  markSportscapeAdminAuthed(body.token);
+  return true;
+}
+async function upsertAiBriefSelectionViaWorker(input) {
+  const { response: res } = await fetchSportscapeEditorialWithFailover("/ai-brief-selections", {
+    method: "POST",
+    headers: workerWriteHeaders2(),
+    body: JSON.stringify(input)
+  });
+  if (!res.ok) throw new Error(`ai_brief_upsert_failed_${res.status}`);
+  const body = await res.json();
+  if (!body.selection) throw new Error("ai_brief_upsert_missing_selection");
+  return body.selection;
+}
+async function removeAiBriefSelectionViaWorker(id) {
+  const { response: res } = await fetchSportscapeEditorialWithFailover("/ai-brief-selections/remove", {
+    method: "POST",
+    headers: workerWriteHeaders2(),
+    body: JSON.stringify({ id })
+  });
+  if (!res.ok) throw new Error(`ai_brief_remove_failed_${res.status}`);
+}
+async function fetchSportscapeEditorialDocument() {
+  return fetchSportscapeEditorialDocumentViaWorker();
+}
+async function saveSportscapeEditorialEntry(input) {
+  if (shouldUseLocalSportscapeEditorialFallback() && window.grarf?.sportscapeEditorialUpsertEntry) {
+    const result = await window.grarf.sportscapeEditorialUpsertEntry(input);
+    if (!result.ok || !result.entry) throw new Error(result.error ?? "save_failed");
+    return result.entry;
+  }
+  return upsertSportscapeEditorialEntryViaWorker(input);
+}
+async function verifySportscapeAdminPassword(password) {
+  if (shouldUseLocalSportscapeEditorialFallback() && window.grarf?.sportscapeEditorialVerifyPassword) {
+    const result = await window.grarf.sportscapeEditorialVerifyPassword(password);
+    if (result.error) throw new Error(result.error);
+    if (result.ok) markSportscapeAdminAuthed("local-dev");
+    return Boolean(result.ok);
+  }
+  return verifySportscapeAdminPasswordViaWorker(password);
+}
+async function saveAiBriefSelection(input) {
+  if (shouldUseLocalSportscapeEditorialFallback() && window.grarf?.sportscapeEditorialUpsertAiBriefSelection) {
+    const result = await window.grarf.sportscapeEditorialUpsertAiBriefSelection(input);
+    if (!result.ok || !result.selection) {
+      throw new Error(result.error ?? "ai_brief_upsert_failed");
+    }
+    return result.selection;
+  }
+  return upsertAiBriefSelectionViaWorker(input);
+}
+async function deleteAiBriefSelection(id) {
+  if (shouldUseLocalSportscapeEditorialFallback() && window.grarf?.sportscapeEditorialRemoveAiBriefSelection) {
+    const result = await window.grarf.sportscapeEditorialRemoveAiBriefSelection({ id });
+    if (!result.ok) throw new Error(result.error ?? "ai_brief_remove_failed");
+    return;
+  }
+  await removeAiBriefSelectionViaWorker(id);
+}
+async function clearAllAiBriefSelections(selections) {
+  for (const selection of selections) {
+    await deleteAiBriefSelection(selection.id);
+  }
+}
+
+// ../grarf/desktop/src/components/sportscapeEditorial/SportscapeEditorialPasswordForm.tsx
 var import_jsx_runtime89 = __toESM(require_jsx_runtime(), 1);
 function SportscapeEditorialPasswordForm({
   idPrefix = "sportscape-admin",
@@ -68968,8 +68937,6 @@ var import_jsx_runtime91 = __toESM(require_jsx_runtime(), 1);
 function HomeEditorialModeBar({ className }) {
   const editMode = useEditorialStore((s2) => s2.editMode);
   const setEditMode = useEditorialStore((s2) => s2.setEditMode);
-  const featuredGamesSaveError = useEditorialStore((s2) => s2.featuredGamesSaveError);
-  const clearFeaturedGamesSaveError = useEditorialStore((s2) => s2.clearFeaturedGamesSaveError);
   const [busy, setBusy] = (0, import_react105.useState)(null);
   const [status, setStatus] = (0, import_react105.useState)(null);
   const [passwordPromptOpen, setPasswordPromptOpen] = (0, import_react105.useState)(false);
@@ -68982,12 +68949,10 @@ function HomeEditorialModeBar({ className }) {
       setPasswordPromptOpen(true);
       return;
     }
-    clearFeaturedGamesSaveError();
     setEditMode(true);
   };
   const onEditModeAuthed = () => {
     setPasswordPromptOpen(false);
-    clearFeaturedGamesSaveError();
     setEditMode(true);
   };
   const runGeneration = async (mode) => {
@@ -69054,7 +69019,6 @@ function HomeEditorialModeBar({ className }) {
               }
             )
           ] }),
-          featuredGamesSaveError ? /* @__PURE__ */ (0, import_jsx_runtime91.jsx)("p", { className: "text-[8px] leading-relaxed text-redsys", children: featuredGamesSaveError }) : null,
           editMode ? /* @__PURE__ */ (0, import_jsx_runtime91.jsxs)("div", { className: "flex flex-wrap items-center gap-1.5", children: [
             /* @__PURE__ */ (0, import_jsx_runtime91.jsx)(
               "button",
@@ -69195,7 +69159,7 @@ var GAMES_SPINE_FEATURED_COLLAPSE_KEY = "FEATURED";
 var GAMES_SPINE_MORE_LEAGUES_COLLAPSE_KEY = "MORE_LEAGUES";
 
 // ../grarf/desktop/src/hooks/useGamesSpineCollapse.ts
-var STORAGE_KEY5 = "grarf-games-spine-collapse-v2";
+var STORAGE_KEY4 = "grarf-games-spine-collapse-v2";
 var LOG44 = "[GamesSpine]";
 function collapseStorageKey(statusFilter, leagueKey) {
   return `${statusFilter}:${leagueKey}`;
@@ -69221,7 +69185,7 @@ function leagueCollapsedForFilter(map, leagueKey, statusFilter) {
 function readCollapseMap() {
   if (typeof sessionStorage === "undefined") return {};
   try {
-    const raw = sessionStorage.getItem(STORAGE_KEY5);
+    const raw = sessionStorage.getItem(STORAGE_KEY4);
     if (!raw) return {};
     const parsed = JSON.parse(raw);
     return parsed && typeof parsed === "object" ? parsed : {};
@@ -69231,7 +69195,7 @@ function readCollapseMap() {
 }
 function writeCollapseMap(map) {
   try {
-    sessionStorage.setItem(STORAGE_KEY5, JSON.stringify(map));
+    sessionStorage.setItem(STORAGE_KEY4, JSON.stringify(map));
   } catch {
   }
 }
@@ -71721,11 +71685,11 @@ function sortPodcastEpisodesForContext(episodes, feeds, opts) {
 
 // ../grarf/desktop/src/lib/media/podcastCache.ts
 init_define_import_meta_env();
-var STORAGE_KEY6 = "grarf-podcast-cache-v1";
+var STORAGE_KEY5 = "grarf-podcast-cache-v1";
 var DEFAULT_TTL_MS3 = 45 * 60 * 1e3;
 function readRoot() {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY6);
+    const raw = localStorage.getItem(STORAGE_KEY5);
     if (!raw) return { version: 1, feeds: {} };
     const p2 = JSON.parse(raw);
     if (p2?.version !== 1 || typeof p2.feeds !== "object") return { version: 1, feeds: {} };
@@ -71736,7 +71700,7 @@ function readRoot() {
 }
 function writeRoot(root) {
   try {
-    localStorage.setItem(STORAGE_KEY6, JSON.stringify(root));
+    localStorage.setItem(STORAGE_KEY5, JSON.stringify(root));
   } catch {
   }
 }
@@ -72353,11 +72317,11 @@ function score(ch, route, liveTags, liveNba) {
 
 // ../grarf/desktop/src/lib/media/liveChannelCache.ts
 init_define_import_meta_env();
-var STORAGE_KEY7 = "grarf-live-channel-cache-v1";
+var STORAGE_KEY6 = "grarf-live-channel-cache-v1";
 var DEFAULT_TTL_MS4 = 50 * 60 * 1e3;
 function readRoot2() {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY7);
+    const raw = localStorage.getItem(STORAGE_KEY6);
     if (!raw) return { version: 1, channels: {} };
     const p2 = JSON.parse(raw);
     if (p2?.version !== 1 || typeof p2.channels !== "object") return { version: 1, channels: {} };
@@ -72368,7 +72332,7 @@ function readRoot2() {
 }
 function writeRoot2(root) {
   try {
-    localStorage.setItem(STORAGE_KEY7, JSON.stringify(root));
+    localStorage.setItem(STORAGE_KEY6, JSON.stringify(root));
   } catch {
   }
 }
@@ -80086,7 +80050,7 @@ function allGamesHighlightToCardItem(v2) {
 
 // ../grarf/desktop/src/store/mlbAllGamesHighlightStore.ts
 var REFRESH_MS = 6 * 60 * 60 * 1e3;
-var STORAGE_KEY8 = "grarf.mlbAllGamesHighlight.v4";
+var STORAGE_KEY7 = "grarf.mlbAllGamesHighlight.v4";
 function isValidAllGamesHighlight(item, targetSlateDateYmd = getMlbAllGamesHighlightTargetSlateDate()) {
   const t2 = item.title.trim().toLowerCase();
   return t2.includes(ALL_GAMES_HIGHLIGHT_TITLE_SUBSTRING.toLowerCase()) && mlbAllGamesHighlightTitleMatchesTargetSlateDate(item.title, targetSlateDateYmd);
@@ -80101,7 +80065,7 @@ function readCachedHighlight() {
   try {
     for (const s2 of stores) {
       if (!s2) continue;
-      const raw = s2.getItem(STORAGE_KEY8);
+      const raw = s2.getItem(STORAGE_KEY7);
       if (!raw) continue;
       const parsed = JSON.parse(raw);
       if (typeof parsed.videoId !== "string" || typeof parsed.title !== "string") continue;
@@ -80141,8 +80105,8 @@ function writeCachedHighlight(item) {
       thumbnailUrl: item.thumbnailUrl,
       targetSlateDateYmd
     });
-    if (typeof localStorage !== "undefined") localStorage.setItem(STORAGE_KEY8, raw);
-    if (typeof sessionStorage !== "undefined") sessionStorage.setItem(STORAGE_KEY8, raw);
+    if (typeof localStorage !== "undefined") localStorage.setItem(STORAGE_KEY7, raw);
+    if (typeof sessionStorage !== "undefined") sessionStorage.setItem(STORAGE_KEY7, raw);
   } catch {
   }
 }
@@ -80811,7 +80775,7 @@ function morningLineupHighlightToCardItem(v2) {
 
 // ../grarf/desktop/src/store/mlbMorningLineupHighlightStore.ts
 var REFRESH_MS3 = 6 * 60 * 60 * 1e3;
-var STORAGE_KEY9 = "grarf.mlbMorningLineupHighlight.v1";
+var STORAGE_KEY8 = "grarf.mlbMorningLineupHighlight.v1";
 function isValidMorningLineupHighlight(item) {
   return item.videoId.trim().length > 0 && item.title.trim().length > 0;
 }
@@ -80824,7 +80788,7 @@ function readCachedHighlight2() {
   try {
     for (const s2 of stores) {
       if (!s2) continue;
-      const raw = s2.getItem(STORAGE_KEY9);
+      const raw = s2.getItem(STORAGE_KEY8);
       if (!raw) continue;
       const parsed = JSON.parse(raw);
       if (typeof parsed.videoId === "string" && typeof parsed.title === "string") {
@@ -80851,8 +80815,8 @@ function writeCachedHighlight2(item) {
       channel: item.channel,
       thumbnailUrl: item.thumbnailUrl
     });
-    if (typeof localStorage !== "undefined") localStorage.setItem(STORAGE_KEY9, raw);
-    if (typeof sessionStorage !== "undefined") sessionStorage.setItem(STORAGE_KEY9, raw);
+    if (typeof localStorage !== "undefined") localStorage.setItem(STORAGE_KEY8, raw);
+    if (typeof sessionStorage !== "undefined") sessionStorage.setItem(STORAGE_KEY8, raw);
   } catch {
   }
 }
@@ -91915,7 +91879,7 @@ function MlbAllGamesHighlightsBlock({
 init_define_import_meta_env();
 var import_react195 = __toESM(require_react(), 1);
 var REFRESH_MS5 = 6 * 60 * 60 * 1e3;
-var STORAGE_KEY10 = "grarf.mlbLineLabsPreview.v1";
+var STORAGE_KEY9 = "grarf.mlbLineLabsPreview.v1";
 function isValidLineLabsPreview(item) {
   const t2 = item.title.trim().toLowerCase();
   return t2.includes(LINE_LABS_MLB_PICKS_TITLE_SUBSTRING.toLowerCase());
@@ -91929,7 +91893,7 @@ function readCachedPreview() {
   try {
     for (const s2 of stores) {
       if (!s2) continue;
-      const raw = s2.getItem(STORAGE_KEY10);
+      const raw = s2.getItem(STORAGE_KEY9);
       if (!raw) continue;
       const parsed = JSON.parse(raw);
       if (typeof parsed.videoId === "string" && typeof parsed.title === "string") {
@@ -91954,8 +91918,8 @@ function writeCachedPreview(item) {
       channel: item.channel,
       thumbnailUrl: item.thumbnailUrl
     });
-    if (typeof localStorage !== "undefined") localStorage.setItem(STORAGE_KEY10, raw);
-    if (typeof sessionStorage !== "undefined") sessionStorage.setItem(STORAGE_KEY10, raw);
+    if (typeof localStorage !== "undefined") localStorage.setItem(STORAGE_KEY9, raw);
+    if (typeof sessionStorage !== "undefined") sessionStorage.setItem(STORAGE_KEY9, raw);
   } catch {
   }
 }
