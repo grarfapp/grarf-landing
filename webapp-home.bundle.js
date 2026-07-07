@@ -16840,7 +16840,7 @@ var GOLF_LEAGUE_KEY_SET = new Set(GOLF_LEAGUE_KEYS2);
 function isGolfLeagueKey(leagueKey) {
   return typeof leagueKey === "string" && GOLF_LEAGUE_KEY_SET.has(leagueKey);
 }
-function resolveSportKeyForLeague2(leagueKey) {
+function resolveSportKeyForLeague(leagueKey) {
   if (typeof leagueKey !== "string" || !leagueKey.trim()) return void 0;
   const key2 = leagueKey.trim();
   for (const [sportKey, def] of Object.entries(GRARF_SPORT_HIERARCHY)) {
@@ -29630,17 +29630,9 @@ var __iconNode15 = [
 ];
 var SquareArrowOutUpRight = createLucideIcon("square-arrow-out-up-right", __iconNode15);
 
-// ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/trending-up.mjs
-init_define_import_meta_env();
-var __iconNode16 = [
-  ["path", { d: "M16 7h6v6", key: "box55l" }],
-  ["path", { d: "m22 7-8.5 8.5-5-5L2 17", key: "1t1m79" }]
-];
-var TrendingUp = createLucideIcon("trending-up", __iconNode16);
-
 // ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/triangle-alert.mjs
 init_define_import_meta_env();
-var __iconNode17 = [
+var __iconNode16 = [
   [
     "path",
     {
@@ -29651,21 +29643,21 @@ var __iconNode17 = [
   ["path", { d: "M12 9v4", key: "juzpu7" }],
   ["path", { d: "M12 17h.01", key: "p32p05" }]
 ];
-var TriangleAlert = createLucideIcon("triangle-alert", __iconNode17);
+var TriangleAlert = createLucideIcon("triangle-alert", __iconNode16);
 
 // ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/users.mjs
 init_define_import_meta_env();
-var __iconNode18 = [
+var __iconNode17 = [
   ["path", { d: "M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2", key: "1yyitq" }],
   ["path", { d: "M16 3.128a4 4 0 0 1 0 7.744", key: "16gr8j" }],
   ["path", { d: "M22 21v-2a4 4 0 0 0-3-3.87", key: "kshegd" }],
   ["circle", { cx: "9", cy: "7", r: "4", key: "nufk8" }]
 ];
-var Users = createLucideIcon("users", __iconNode18);
+var Users = createLucideIcon("users", __iconNode17);
 
 // ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/video.mjs
 init_define_import_meta_env();
-var __iconNode19 = [
+var __iconNode18 = [
   [
     "path",
     {
@@ -29675,25 +29667,25 @@ var __iconNode19 = [
   ],
   ["rect", { x: "2", y: "6", width: "14", height: "12", rx: "2", key: "158x01" }]
 ];
-var Video = createLucideIcon("video", __iconNode19);
+var Video = createLucideIcon("video", __iconNode18);
 
 // ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/wifi.mjs
 init_define_import_meta_env();
-var __iconNode20 = [
+var __iconNode19 = [
   ["path", { d: "M12 20h.01", key: "zekei9" }],
   ["path", { d: "M2 8.82a15 15 0 0 1 20 0", key: "dnpr2z" }],
   ["path", { d: "M5 12.859a10 10 0 0 1 14 0", key: "1x1e6c" }],
   ["path", { d: "M8.5 16.429a5 5 0 0 1 7 0", key: "1bycff" }]
 ];
-var Wifi = createLucideIcon("wifi", __iconNode20);
+var Wifi = createLucideIcon("wifi", __iconNode19);
 
 // ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/x.mjs
 init_define_import_meta_env();
-var __iconNode21 = [
+var __iconNode20 = [
   ["path", { d: "M18 6 6 18", key: "1bl5f8" }],
   ["path", { d: "m6 6 12 12", key: "d8bk6v" }]
 ];
-var X2 = createLucideIcon("x", __iconNode21);
+var X2 = createLucideIcon("x", __iconNode20);
 
 // ../grarf/desktop/src/lib/cn.ts
 init_define_import_meta_env();
@@ -34274,7 +34266,7 @@ function resolveOnTodayNavItems(mergedLeagues) {
     seenLeagueKeys.add(leagueKey);
     const existing = directoryItemForLeagueKey(leagueKey);
     const label = ON_TODAY_NAV_LABEL_OVERRIDES[leagueKey] ?? existing?.label ?? resolveGamesSpineLeagueDisplayLabel(leagueKey);
-    const grarfSportKey = existing?.grarfSportKey ?? resolveSportKeyForLeague2(leagueKey);
+    const grarfSportKey = existing?.grarfSportKey ?? resolveSportKeyForLeague(leagueKey);
     out.push({
       id: `on-today-${leagueKey.toLowerCase()}`,
       label,
@@ -36195,75 +36187,25 @@ function resolveWebsiteFaviconUrl(url) {
     return null;
   }
 }
-var WEBSITE_BRAND_BY_HOST = {
-  "pgatour.com": "PGA TOUR",
-  "tennis365.com": "Tennis365",
-  "baseballsavant.mlb.com": "Baseball Savant",
-  "formula1.com": "Formula 1",
-  "espn.com": "ESPN",
-  "mlb.com": "MLB",
-  "nfl.com": "NFL",
-  "nhl.com": "NHL",
-  "wnba.com": "WNBA",
-  "nbcsports.com": "NBC Sports",
-  "cbssports.com": "CBS Sports",
-  "theathletic.com": "The Athletic",
-  "tennisworldusa.org": "Tennis World USA"
-};
-var BRAND_ACRONYMS = /* @__PURE__ */ new Set([
-  "nhl",
-  "nba",
-  "mlb",
-  "nfl",
-  "nbc",
-  "cbs",
-  "f1",
-  "mls",
-  "ucl",
-  "epl",
-  "wnba",
-  "usa",
-  "pga",
-  "si",
-  "icc",
-  "tvg"
-]);
-function normalizeWebsiteHost(hostname) {
-  return hostname.replace(/^www\./i, "").toLowerCase();
-}
-function looksLikeDomainStyleLabel(label) {
-  const head = (label.split("/")[0] ?? label).trim();
-  return /\.(com|net|org|io|co|us|uk|live)(\/|$)/i.test(head);
-}
 function humanizeDomainToken(token) {
-  const spaced = token.replace(/-/g, " ").replace(/_/g, " ").replace(/([A-Z]+)([A-Z][a-z])/g, "$1 $2").replace(/([a-z])([A-Z])/g, "$1 $2");
+  const spaced = token.replace(/-/g, " ").replace(/_/g, " ").replace(/([A-Z]+)([A-Z][a-z])/g, "$1 $2").replace(/([a-z])([A-Z])/g, "$1 $2").replace(/([a-z])(\d)/g, "$1 $2");
   return spaced.split(/\s+/).filter(Boolean).map((word) => {
     if (word === word.toUpperCase() && /^[A-Z0-9]{2,5}$/.test(word)) return word;
     const lower = word.toLowerCase();
-    if (BRAND_ACRONYMS.has(lower)) return lower.toUpperCase();
+    if (["nhl", "nba", "mlb", "nfl", "nbc", "f1", "mls", "ucl", "epl"].includes(lower)) {
+      return lower.toUpperCase();
+    }
     return lower.charAt(0).toUpperCase() + lower.slice(1);
   }).join(" ");
 }
 function formatWebsitePaneHeaderLabel(label, url) {
-  const trimmedUrl = url.trim();
-  if (!trimmedUrl) return label;
+  if (!url.trim()) return label;
   if (label.length <= 5 && label.includes("/")) return label;
-  if (!looksLikeDomainStyleLabel(label)) return label;
-  try {
-    const host = normalizeWebsiteHost(new URL(trimmedUrl).hostname);
-    const brandByHost = WEBSITE_BRAND_BY_HOST[host];
-    if (brandByHost) return brandByHost;
-  } catch {
-  }
   const domainPart = (label.split("/")[0] ?? label).replace(
-    /\.(com|net|org|io|co|us|uk|live)(\.[a-z]{2})?$/i,
+    /\.(com|net|org|io|co|us|uk)(\.[a-z]{2})?$/i,
     ""
   );
   return humanizeDomainToken(domainPart);
-}
-function isLeagueWorkspaceWebsiteCategoryTab(categoryLabel, sources) {
-  const embeddable = sources.filter((source) => source.url.trim().length > 0);
-  return embeddable.length === 1 && categoryLabel === embeddable[0].label;
 }
 
 // ../grarf/desktop/src/data/homeLeagueWorkspaceHorseRacingNavigation.ts
@@ -61424,7 +61366,7 @@ function resolveHomeLeagueHubPaneSources(hubId, categoryId, liveLeagues) {
 init_define_import_meta_env();
 var HOME_WEB_PANE_FRAME_MARGIN_CLASS = "m-[25px]";
 var HOME_WEB_PANE_FRAME_HEIGHT_CLASS = "h-[calc(100%-50px)]";
-var HOME_WEB_CENTER_PANE_SURFACE_CLASS = "bg-[#141414]";
+var HOME_WEB_CENTER_PANE_SURFACE_CLASS = "bg-[#0d252a]";
 
 // ../grarf/desktop/src/components/homeMvp/HomeSourceCardsSurface.tsx
 init_isGrarfWebRenderer();
@@ -63468,7 +63410,6 @@ function WorkspaceSubnav({
   onSelect,
   className,
   leagueWorkspaceChrome = false,
-  fadeGatedLockItems = false,
   "aria-label": aria
 }) {
   if (!items || items.length === 0) return null;
@@ -63490,7 +63431,7 @@ function WorkspaceSubnav({
               HOME_SUBNAV_BUTTON_CLASS,
               on2 && (leagueWorkspaceChrome ? HOME_LEAGUE_WORKSPACE_NAV_BUTTON_ACTIVE_CLASS : "border-greensys/35 bg-greensys/[0.08] text-greensys"),
               !on2 && !dis && (leagueWorkspaceChrome ? HOME_LEAGUE_WORKSPACE_NAV_BUTTON_INACTIVE_CLASS : "border-transparent text-[#8a9e9e] hover:border-line/80 hover:bg-white/[0.03] hover:text-white"),
-              !on2 && !dis && item.showGatedLock && (leagueWorkspaceChrome || fadeGatedLockItems) && "opacity-[0.30] hover:opacity-100",
+              !on2 && !dis && item.showGatedLock && leagueWorkspaceChrome && "opacity-[0.30] hover:opacity-100",
               dis && "cursor-not-allowed border-transparent text-textdim/50 opacity-60"
             ),
             children: /* @__PURE__ */ (0, import_jsx_runtime48.jsxs)("span", { className: "inline-flex items-center gap-1", children: [
@@ -63513,18 +63454,13 @@ function HomeLeagueWorkspaceMainMenu({ hubId, config }) {
     (s2) => s2.activeCategoryByHub[hubId] ?? config?.defaultCategoryId ?? null
   );
   const setActiveCategory = useHomeLeagueWorkspaceMainMenuStore((s2) => s2.setActiveCategory);
-  const isWebRenderer = isGrarfWebRenderer();
   const items = (0, import_react77.useMemo)(
-    () => config?.categories.map((category) => {
-      const websiteSource = category.sources.find((source) => source.url.trim().length > 0);
-      const label = isWebRenderer && websiteSource && isLeagueWorkspaceWebsiteCategoryTab(category.label, category.sources) ? formatWebsitePaneHeaderLabel(websiteSource.label, websiteSource.url) : category.label;
-      return {
-        id: category.id,
-        label,
-        showGatedLock: category.showGatedLock
-      };
-    }) ?? [],
-    [config?.categories, isWebRenderer]
+    () => config?.categories.map((category) => ({
+      id: category.id,
+      label: category.label,
+      showGatedLock: category.showGatedLock
+    })) ?? [],
+    [config?.categories]
   );
   if (!items.length) return null;
   const handleSelect = (categoryId) => {
@@ -64178,22 +64114,6 @@ function HomeCenterPanePrimaryNav({
 init_define_import_meta_env();
 var import_react84 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/data/gatedFeatures/browserBetting.ts
-init_define_import_meta_env();
-var BROWSER_BETTING_FEATURE_KEY = "browser-betting";
-var BROWSER_BETTING_GATED_FEATURE = {
-  featureKey: BROWSER_BETTING_FEATURE_KEY,
-  title: "Betting is coming to GRARF.",
-  headerEyebrow: "GET EARLY ACCESS",
-  subtitle: "Track odds movement, betting trends, sharp action, line movement, betting news, and game insights\u2014all organized by league and integrated directly into your sports workflow.",
-  bullets: [],
-  waitlistHeading: "Join the Waitlist",
-  waitlistBody: "Join the waitlist to be among the first to get access.",
-  successMessage: "You're on the list. We'll let you know when betting launches on GRARF web.",
-  ctaLabel: "Join Waitlist"
-};
-var BROWSER_BETTING_MODAL_ICON = TrendingUp;
-
 // ../grarf/desktop/src/hooks/useHomeLiveSubmenuEntryDefaults.ts
 init_define_import_meta_env();
 var import_react83 = __toESM(require_react(), 1);
@@ -64220,50 +64140,24 @@ function HomeLiveSubmenu() {
   const centerPaneMode = useCenterPaneApplicationModeStore((s2) => s2.mode);
   const activeId = useHomeLiveSubmenuStore((s2) => s2.activeId);
   const setActiveId = useHomeLiveSubmenuStore((s2) => s2.setActiveId);
-  const resetToDefault = useHomeLiveSubmenuStore((s2) => s2.resetToDefault);
-  const isWeb = isGrarfWebRenderer();
-  const [bettingWaitlistOpen, setBettingWaitlistOpen] = (0, import_react84.useState)(false);
-  const items = (0, import_react84.useMemo)(() => HOME_LIVE_SUBMENU_ITEMS, []);
-  (0, import_react84.useEffect)(() => {
-    if (!isWeb || activeId !== "betting") return;
-    resetToDefault();
-  }, [isWeb, activeId, resetToDefault]);
-  const openBettingWaitlist = (0, import_react84.useCallback)(() => {
-    setBettingWaitlistOpen(true);
-  }, []);
-  const closeBettingWaitlist = (0, import_react84.useCallback)(() => {
-    setBettingWaitlistOpen(false);
+  const items = (0, import_react84.useMemo)(() => {
+    if (!isGrarfWebRenderer()) return HOME_LIVE_SUBMENU_ITEMS;
+    return HOME_LIVE_SUBMENU_ITEMS.map(
+      (item) => item.id === "betting" ? { id: item.id, label: item.label } : item
+    );
   }, []);
   if (centerPaneMode !== "browser") return null;
-  const effectiveActiveId = isWeb && activeId === "betting" ? "livetrack" : activeId;
-  return /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)(import_jsx_runtime57.Fragment, { children: [
-    /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(
-      WorkspaceSubnav,
-      {
-        items,
-        activeId: effectiveActiveId,
-        fadeGatedLockItems: isWeb,
-        onSelect: (id) => {
-          if (!isHomeLiveSubmenuId(id)) return;
-          if (isWeb && id === "betting") {
-            openBettingWaitlist();
-            return;
-          }
-          setActiveId(id);
-        },
-        "aria-label": "Live sections"
-      }
-    ),
-    isWeb ? /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(
-      GatedFeatureModal,
-      {
-        open: bettingWaitlistOpen,
-        onClose: closeBettingWaitlist,
-        config: BROWSER_BETTING_GATED_FEATURE,
-        headerIcon: BROWSER_BETTING_MODAL_ICON
-      }
-    ) : null
-  ] });
+  return /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(
+    WorkspaceSubnav,
+    {
+      items,
+      activeId,
+      onSelect: (id) => {
+        if (isHomeLiveSubmenuId(id)) setActiveId(id);
+      },
+      "aria-label": "Live sections"
+    }
+  );
 }
 
 // ../grarf/desktop/src/components/homeMvp/HomeLiveLeagueSubmenu.tsx
@@ -64895,7 +64789,6 @@ function HomeGamesColumnFilterBar({ filter, onFilterChange, className }) {
 
 // ../grarf/desktop/src/components/homeMvp/HomeGamesSpineDisplayToolbar.tsx
 init_define_import_meta_env();
-init_isGrarfWebRenderer();
 
 // ../grarf/desktop/src/store/gamesSpineDisplayStore.ts
 init_define_import_meta_env();
@@ -64905,80 +64798,8 @@ var useGamesSpineDisplayStore = (0, import_zustand41.create)((set) => ({
   setGamesMode: (gamesMode) => set({ gamesMode })
 }));
 
-// ../grarf/desktop/src/store/workspaceLayoutStore.ts
-init_define_import_meta_env();
-var import_zustand42 = __toESM(require_zustand(), 1);
-var import_middleware2 = __toESM(require_middleware(), 1);
-function clamp2(n2, min, max) {
-  return Math.min(max, Math.max(min, n2));
-}
-var useWorkspaceLayoutStore = (0, import_zustand42.create)()(
-  (0, import_middleware2.persist)(
-    (set, get) => ({
-      layouts: { ...DEFAULT_PANE_LAYOUTS },
-      setLeftWidth: (id, width) => set((s2) => ({
-        layouts: {
-          ...s2.layouts,
-          [id]: {
-            ...s2.layouts[id],
-            leftWidth: clamp2(width, PANE_LAYOUT_LIMITS.left.min, PANE_LAYOUT_LIMITS.left.max)
-          }
-        }
-      })),
-      setRightWidth: (id, width) => set((s2) => ({
-        layouts: {
-          ...s2.layouts,
-          [id]: {
-            ...s2.layouts[id],
-            rightWidth: clamp2(width, PANE_LAYOUT_LIMITS.right.min, PANE_LAYOUT_LIMITS.right.max)
-          }
-        }
-      })),
-      toggleLeftCollapsed: (id) => {
-        const cur = get().layouts[id];
-        set((s2) => ({
-          layouts: {
-            ...s2.layouts,
-            [id]: { ...cur, leftCollapsed: !cur.leftCollapsed }
-          }
-        }));
-      },
-      toggleRightCollapsed: (id) => {
-        const cur = get().layouts[id];
-        set((s2) => ({
-          layouts: {
-            ...s2.layouts,
-            [id]: { ...cur, rightCollapsed: !cur.rightCollapsed }
-          }
-        }));
-      },
-      setLeftCollapsed: (id, collapsed) => set((s2) => ({
-        layouts: {
-          ...s2.layouts,
-          [id]: { ...s2.layouts[id], leftCollapsed: collapsed }
-        }
-      })),
-      setRightCollapsed: (id, collapsed) => set((s2) => ({
-        layouts: {
-          ...s2.layouts,
-          [id]: { ...s2.layouts[id], rightCollapsed: collapsed }
-        }
-      }))
-    }),
-    {
-      name: "grarf-workspace-panes",
-      version: 1,
-      partialize: (s2) => ({ layouts: s2.layouts })
-    }
-  )
-);
-function selectPaneLayout(id) {
-  return (s2) => s2.layouts[id] ?? DEFAULT_PANE_LAYOUTS[id];
-}
-
 // ../grarf/desktop/src/components/homeMvp/HomeGamesSpineDisplayToolbar.tsx
 var import_jsx_runtime62 = __toESM(require_jsx_runtime(), 1);
-var COMPACT_GAMES_SPINE_MIN_SLATE_WIDTH_PX = 345;
 var TOOLBAR_ROW_TEXT_CLASS = "font-mono text-[8px] leading-none";
 var TOOLBAR_LABEL_CLASS = cn2(TOOLBAR_ROW_TEXT_CLASS, "tracking-[0.12em] text-textdim");
 var GLYPH_SIZE_CLASS = "h-[8px] w-[8px]";
@@ -65021,12 +64842,6 @@ function HomeGamesSpineDisplayToolbar({
   const selectGamesMode = (mode) => {
     if (gamesMode === mode) return;
     setGamesMode(mode);
-    if (mode === "compact" && isGrarfWebRenderer()) {
-      const { layouts, setLeftWidth } = useWorkspaceLayoutStore.getState();
-      if (layouts.home.leftWidth < COMPACT_GAMES_SPINE_MIN_SLATE_WIDTH_PX) {
-        setLeftWidth("home", COMPACT_GAMES_SPINE_MIN_SLATE_WIDTH_PX);
-      }
-    }
   };
   return /* @__PURE__ */ (0, import_jsx_runtime62.jsx)(
     "div",
@@ -65732,7 +65547,7 @@ function isSoccerLeague(league) {
   if (!league) return false;
   if (PRIMARY_SOCCER_LEAGUE_KEYS.has(league)) return true;
   if (ESPN_SOCCER_OPERATIONAL_LEAGUE_KEYS.has(league)) return true;
-  return resolveSportKeyForLeague2(league) === "soccer";
+  return resolveSportKeyForLeague(league) === "soccer";
 }
 
 // ../grarf/desktop/src/lib/gamesSpine/resolveGamesSpineMatchupSideOrder.ts
@@ -70638,8 +70453,8 @@ var import_react114 = __toESM(require_react(), 1);
 
 // ../grarf/desktop/src/store/intelligenceStore.ts
 init_define_import_meta_env();
-var import_zustand43 = __toESM(require_zustand(), 1);
-var useIntelligenceStore = (0, import_zustand43.create)((set, get) => ({
+var import_zustand42 = __toESM(require_zustand(), 1);
+var useIntelligenceStore = (0, import_zustand42.create)((set, get) => ({
   items: [],
   loading: false,
   syncing: false,
@@ -71825,13 +71640,13 @@ function grarfLeagueToPodcastBucket(league) {
     default:
       break;
   }
-  if (isEspnSoccerLeague(league) || resolveSportKeyForLeague2(league) === "soccer") return "Soccer";
-  if (resolveSportKeyForLeague2(league) === "golf" || league === "DP_WORLD") return "Golf";
-  if (resolveSportKeyForLeague2(league) === "tennis") return "ATP/WTA";
-  if (resolveSportKeyForLeague2(league) === "motorsports" || MOTORSPORT_LEAGUES.has(league)) {
+  if (isEspnSoccerLeague(league) || resolveSportKeyForLeague(league) === "soccer") return "Soccer";
+  if (resolveSportKeyForLeague(league) === "golf" || league === "DP_WORLD") return "Golf";
+  if (resolveSportKeyForLeague(league) === "tennis") return "ATP/WTA";
+  if (resolveSportKeyForLeague(league) === "motorsports" || MOTORSPORT_LEAGUES.has(league)) {
     return "Motorsports";
   }
-  if (resolveSportKeyForLeague2(league) === "combat") return "MMA";
+  if (resolveSportKeyForLeague(league) === "combat") return "MMA";
   return null;
 }
 function resolvePodcastWorkspaceContextLeague(opts) {
@@ -80152,7 +79967,7 @@ var import_react142 = __toESM(require_react(), 1);
 
 // ../grarf/desktop/src/store/mlbAllGamesHighlightStore.ts
 init_define_import_meta_env();
-var import_zustand44 = __toESM(require_zustand(), 1);
+var import_zustand43 = __toESM(require_zustand(), 1);
 
 // ../grarf/desktop/src/lib/youtubeAllGamesHighlight.ts
 init_define_import_meta_env();
@@ -80326,7 +80141,7 @@ function stickyDisplayHighlight(authoritative) {
   return null;
 }
 var loadInFlight = null;
-var useMlbAllGamesHighlightStore = (0, import_zustand44.create)((set, get) => {
+var useMlbAllGamesHighlightStore = (0, import_zustand43.create)((set, get) => {
   const cached = readCachedHighlight();
   const initialDisplay = stickyDisplayHighlight(cached);
   if (cached) {
@@ -80908,7 +80723,7 @@ var import_react145 = __toESM(require_react(), 1);
 
 // ../grarf/desktop/src/store/mlbMorningLineupHighlightStore.ts
 init_define_import_meta_env();
-var import_zustand45 = __toESM(require_zustand(), 1);
+var import_zustand44 = __toESM(require_zustand(), 1);
 
 // ../grarf/desktop/src/lib/youtubeMorningLineupHighlight.ts
 init_define_import_meta_env();
@@ -81032,7 +80847,7 @@ function writeCachedHighlight2(item) {
   }
 }
 var loadInFlight2 = null;
-var useMlbMorningLineupHighlightStore = (0, import_zustand45.create)((set, get) => {
+var useMlbMorningLineupHighlightStore = (0, import_zustand44.create)((set, get) => {
   const cached = readCachedHighlight2();
   const loadHighlight = async () => {
     if (loadInFlight2) return loadInFlight2;
@@ -83296,6 +83111,110 @@ function usePaneDragResize({ side, min, max, getWidth, onLiveResize, onCommit })
   return { onPointerDown, isDragging: () => draggingRef.current };
 }
 
+// ../grarf/desktop/src/store/workspaceLayoutStore.ts
+init_define_import_meta_env();
+var import_zustand45 = __toESM(require_zustand(), 1);
+var import_middleware2 = __toESM(require_middleware(), 1);
+function clamp2(n2, min, max) {
+  return Math.min(max, Math.max(min, n2));
+}
+function resolvePaneLayoutSlice(layouts, id) {
+  return { ...DEFAULT_PANE_LAYOUTS[id], ...layouts[id] };
+}
+function mergePersistedPaneLayouts(persisted) {
+  const merged = {};
+  for (const id of Object.keys(DEFAULT_PANE_LAYOUTS)) {
+    merged[id] = { ...DEFAULT_PANE_LAYOUTS[id], ...persisted?.[id] };
+  }
+  return merged;
+}
+var useWorkspaceLayoutStore = (0, import_zustand45.create)()(
+  (0, import_middleware2.persist)(
+    (set) => ({
+      layouts: mergePersistedPaneLayouts(),
+      setLeftWidth: (id, width) => set((s2) => {
+        const cur = resolvePaneLayoutSlice(s2.layouts, id);
+        return {
+          layouts: {
+            ...s2.layouts,
+            [id]: {
+              ...cur,
+              leftWidth: clamp2(width, PANE_LAYOUT_LIMITS.left.min, PANE_LAYOUT_LIMITS.left.max)
+            }
+          }
+        };
+      }),
+      setRightWidth: (id, width) => set((s2) => {
+        const cur = resolvePaneLayoutSlice(s2.layouts, id);
+        return {
+          layouts: {
+            ...s2.layouts,
+            [id]: {
+              ...cur,
+              rightWidth: clamp2(width, PANE_LAYOUT_LIMITS.right.min, PANE_LAYOUT_LIMITS.right.max)
+            }
+          }
+        };
+      }),
+      toggleLeftCollapsed: (id) => set((s2) => {
+        const cur = resolvePaneLayoutSlice(s2.layouts, id);
+        return {
+          layouts: {
+            ...s2.layouts,
+            [id]: { ...cur, leftCollapsed: !cur.leftCollapsed }
+          }
+        };
+      }),
+      toggleRightCollapsed: (id) => set((s2) => {
+        const cur = resolvePaneLayoutSlice(s2.layouts, id);
+        return {
+          layouts: {
+            ...s2.layouts,
+            [id]: { ...cur, rightCollapsed: !cur.rightCollapsed }
+          }
+        };
+      }),
+      setLeftCollapsed: (id, collapsed) => set((s2) => {
+        const cur = resolvePaneLayoutSlice(s2.layouts, id);
+        return {
+          layouts: {
+            ...s2.layouts,
+            [id]: { ...cur, leftCollapsed: collapsed }
+          }
+        };
+      }),
+      setRightCollapsed: (id, collapsed) => set((s2) => {
+        const cur = resolvePaneLayoutSlice(s2.layouts, id);
+        return {
+          layouts: {
+            ...s2.layouts,
+            [id]: { ...cur, rightCollapsed: collapsed }
+          }
+        };
+      })
+    }),
+    {
+      name: "grarf-workspace-panes",
+      version: 1,
+      partialize: (s2) => ({ layouts: s2.layouts }),
+      merge: (persistedState, currentState) => {
+        const persisted = persistedState;
+        return {
+          ...currentState,
+          ...persisted,
+          layouts: mergePersistedPaneLayouts(persisted?.layouts)
+        };
+      }
+    }
+  )
+);
+function selectPaneLayout(id) {
+  return (s2) => s2.layouts[id] ?? DEFAULT_PANE_LAYOUTS[id];
+}
+function usePaneLayout(id) {
+  return useWorkspaceLayoutStore(selectPaneLayout(id));
+}
+
 // ../grarf/desktop/src/components/layout/CenterPaneFeedAlignmentBridge.tsx
 init_define_import_meta_env();
 var import_react156 = __toESM(require_react(), 1);
@@ -83397,7 +83316,7 @@ function WorkspacePaneLayoutInner({
   className
 }) {
   const hasRight = !!right;
-  const layout = useWorkspaceLayoutStore(selectPaneLayout(layoutId));
+  const layout = usePaneLayout(layoutId);
   const setLeftWidth = useWorkspaceLayoutStore((s2) => s2.setLeftWidth);
   const setRightWidth = useWorkspaceLayoutStore((s2) => s2.setRightWidth);
   const toggleLeftCollapsed = useWorkspaceLayoutStore((s2) => s2.toggleLeftCollapsed);
@@ -83511,7 +83430,17 @@ function WorkspacePaneLayoutInner({
                     ]
                   }
                 ),
-                !layout.leftCollapsed ? /* @__PURE__ */ (0, import_jsx_runtime143.jsx)("div", { className: "flex min-h-0 min-w-0 max-w-full flex-1 flex-col overflow-hidden", children: left }) : null,
+                /* @__PURE__ */ (0, import_jsx_runtime143.jsx)(
+                  "div",
+                  {
+                    className: cn2(
+                      "flex min-h-0 min-w-0 max-w-full flex-1 flex-col overflow-hidden",
+                      layout.leftCollapsed && "hidden"
+                    ),
+                    "aria-hidden": layout.leftCollapsed,
+                    children: left
+                  }
+                ),
                 layout.leftCollapsed ? /* @__PURE__ */ (0, import_jsx_runtime143.jsx)(
                   "span",
                   {
@@ -85714,7 +85643,7 @@ function HomeLiveTrackerSurface({ posts, statusMessage }) {
   return /* @__PURE__ */ (0, import_jsx_runtime152.jsxs)("div", { className: "flex h-full min-h-0 min-w-0 flex-col bg-[#010303]", children: [
     /* @__PURE__ */ (0, import_jsx_runtime152.jsxs)("div", { className: "shrink-0 border-b border-[#24363c]/45 bg-[#020707]/90 px-2 py-1.5", children: [
       /* @__PURE__ */ (0, import_jsx_runtime152.jsx)("p", { className: "font-mono text-[8px] tracking-[0.14em] text-cyansys/80", children: "LIVETRACKER" }),
-      /* @__PURE__ */ (0, import_jsx_runtime152.jsx)("p", { className: "mt-0.5 font-mono text-[7px] tracking-[0.08em] text-textdim/70", children: isGrarfWebRenderer() ? "LIVE FEED - All leagues in progress" : "Live RSS \u2014 newest first" })
+      /* @__PURE__ */ (0, import_jsx_runtime152.jsx)("p", { className: "mt-0.5 font-mono text-[7px] tracking-[0.08em] text-textdim/70", children: "Live RSS \u2014 newest first" })
     ] }),
     /* @__PURE__ */ (0, import_jsx_runtime152.jsxs)(
       "div",
@@ -85979,9 +85908,6 @@ function scrollLiveTrackRevealAnchorIntoView(scrollEl, anchorEl) {
 function scrollLiveTrackFeedToTop(scrollEl) {
   scrollEl.scrollTop = 0;
 }
-
-// ../grarf/desktop/src/components/homeMvp/HomeNewswireSurface.tsx
-init_isGrarfWebRenderer();
 
 // ../grarf/desktop/src/components/homeMvp/HomeNewswireWireLine.tsx
 init_define_import_meta_env();
@@ -86384,7 +86310,7 @@ function HomeNewswireSurface({ stories }) {
   return /* @__PURE__ */ (0, import_jsx_runtime155.jsxs)("div", { className: "flex h-full min-h-0 min-w-0 flex-col bg-[#010303]", children: [
     /* @__PURE__ */ (0, import_jsx_runtime155.jsxs)("div", { className: "shrink-0 border-b border-[#24363c]/45 bg-[#020707]/90 px-2 py-1.5", children: [
       /* @__PURE__ */ (0, import_jsx_runtime155.jsx)("p", { className: "font-mono text-[8px] tracking-[0.14em] text-cyansys/80", children: "NEWSWIRE" }),
-      /* @__PURE__ */ (0, import_jsx_runtime155.jsx)("p", { className: "mt-0.5 font-mono text-[7px] tracking-[0.08em] text-textdim/70", children: isGrarfWebRenderer() ? "LATEST NEWS - All leagues" : "Sports wire \u2014 newest first" })
+      /* @__PURE__ */ (0, import_jsx_runtime155.jsx)("p", { className: "mt-0.5 font-mono text-[7px] tracking-[0.08em] text-textdim/70", children: "Sports wire \u2014 newest first" })
     ] }),
     /* @__PURE__ */ (0, import_jsx_runtime155.jsx)(
       "div",
@@ -96036,7 +95962,6 @@ lucide-react/dist/esm/icons/radio.mjs:
 lucide-react/dist/esm/icons/search.mjs:
 lucide-react/dist/esm/icons/settings.mjs:
 lucide-react/dist/esm/icons/square-arrow-out-up-right.mjs:
-lucide-react/dist/esm/icons/trending-up.mjs:
 lucide-react/dist/esm/icons/triangle-alert.mjs:
 lucide-react/dist/esm/icons/users.mjs:
 lucide-react/dist/esm/icons/video.mjs:
