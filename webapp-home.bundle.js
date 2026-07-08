@@ -34954,12 +34954,6 @@ function mergeOperationalLeagueGames(leagues, now = /* @__PURE__ */ new Date()) 
 // ../grarf/desktop/src/components/shell/AppLeftNav.tsx
 init_isGrarfWebRenderer();
 
-// ../grarf/desktop/src/lib/navigation/isLeagueDirectoryGatedNavItem.ts
-init_define_import_meta_env();
-function isLeagueDirectoryGatedNavItem(item) {
-  return item.id !== "home" && item.route !== "/";
-}
-
 // ../grarf/desktop/src/lib/navigation/leagueDirectoryGatedNavItemIds.ts
 init_define_import_meta_env();
 var GATED_LEAGUE_DIRECTORY_NAV_ITEM_IDS = /* @__PURE__ */ new Set([
@@ -38887,8 +38881,10 @@ function DirectoryNavRow({
   onActivate
 }) {
   const leagueHubId = resolveHomeLeagueWorkspaceHubIdFromItem(item);
-  const isLeagueWorkspace = Boolean(onLeagueWorkspaceActivate && leagueHubId) && isLeagueWorkspaceNavItem(item);
-  const isGatedLeague = Boolean(gateLeagueNav && isLeagueDirectoryGatedNavItem(item) && onGatedLeagueActivate) && !isLeagueWorkspace;
+  const isGatedLeague = Boolean(
+    gateLeagueNav && showGatedVisuals && onGatedLeagueActivate
+  );
+  const isLeagueWorkspace = Boolean(onLeagueWorkspaceActivate && leagueHubId) && isLeagueWorkspaceNavItem(item) && !isGatedLeague;
   const showActivityIndicator = isGrarfWebRenderer() && !sidebarCollapsed && activityStatuses != null && activityStatuses.length > 0;
   const expandedLabel = showActivityIndicator ? /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(
     OnTodayNavRowWithTallies,
@@ -38920,24 +38916,24 @@ function DirectoryNavRow({
       leagueWorkspaceActive: isLeagueWorkspace && active2
     }
   ) : expandedLabel;
-  if (isLeagueWorkspace && leagueHubId) {
-    return /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(
-      "button",
-      {
-        type: "button",
-        onClick: () => onLeagueWorkspaceActivate?.(leagueHubId),
-        title: item.label,
-        className: rowClassName,
-        children: content
-      }
-    );
-  }
   if (isGatedLeague) {
     return /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(
       "button",
       {
         type: "button",
         onClick: () => onGatedLeagueActivate?.(`Main Menu \u2192 ${item.label}`),
+        title: item.label,
+        className: rowClassName,
+        children: content
+      }
+    );
+  }
+  if (isLeagueWorkspace && leagueHubId) {
+    return /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(
+      "button",
+      {
+        type: "button",
+        onClick: () => onLeagueWorkspaceActivate?.(leagueHubId),
         title: item.label,
         className: rowClassName,
         children: content
