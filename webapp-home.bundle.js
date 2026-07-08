@@ -40065,14 +40065,14 @@ init_define_import_meta_env();
 
 // ../grarf/desktop/src/data/featuredGamesConfig.ts
 init_define_import_meta_env();
-var FEATURED_GAMES_OPERATIONAL_DATE = "2026-07-07";
+var FEATURED_GAMES_OPERATIONAL_DATE = "2026-07-08";
 var FEATURED_GAMES_SELECTIONS = [
-  { rank: 1, league: "World Cup", matchup: "Argentina vs Egypt", gameKey: "760509" },
-  { rank: 2, league: "World Cup", matchup: "Switzerland vs Colombia", gameKey: "760508" },
-  { rank: 3, league: "WTA", matchup: "Gauff vs Pegula", gameKey: "177714" },
-  { rank: 4, league: "ATP", matchup: "Djokovic vs Auger-Aliassime", gameKey: "177493" },
-  { rank: 5, league: "Tour de France", matchup: "Stage 4", gameKey: "manual-tdf-stage-4-2026-07-07" },
-  { rank: 6, league: "MLB", matchup: "Yankees vs Rays", gameKey: "401816058" }
+  { rank: 1, league: "ATP", matchup: "Zverev vs Fritz", gameKey: "177494" },
+  { rank: 2, league: "ATP", matchup: "Fery vs Cobolli", gameKey: "177492" },
+  { rank: 3, league: "WTA", matchup: "Paolini vs Kostyuk", gameKey: "177705" },
+  { rank: 4, league: "WTA", matchup: "Mertens vs Noskova", gameKey: "177712" },
+  { rank: 5, league: "Tour de France", matchup: "Stage 5", gameKey: "manual-tdf-stage-5-2026-07-08" },
+  { rank: 6, league: "MLB", matchup: "Yankees vs Rays", gameKey: "401816073" }
 ];
 
 // ../grarf/desktop/src/lib/editorial/buildFeaturedGamesFromConfig.ts
