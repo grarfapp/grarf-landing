@@ -32939,15 +32939,38 @@ function useGatedFeatureModal({ open, onClose }) {
 // ../grarf/desktop/src/lib/waitlist/submitWaitlistSignup.ts
 init_define_import_meta_env();
 
+// ../grarf/desktop/src/lib/waitlist/buildWaitlistSignupPayload.ts
+init_define_import_meta_env();
+function resolveWaitlistEnvironment() {
+  return define_import_meta_env_default.DEV ? "development" : "production";
+}
+function buildWaitlistSignupPayload(request) {
+  return {
+    ...request,
+    featureKey: request.featureKey.trim(),
+    featureName: request.featureName.trim(),
+    uiEntryPoint: request.uiEntryPoint.trim(),
+    timestampUtc: (/* @__PURE__ */ new Date()).toISOString(),
+    environment: resolveWaitlistEnvironment()
+  };
+}
+
 // ../grarf/desktop/src/lib/waitlist/waitlistConfig.ts
 init_define_import_meta_env();
 init_isGrarfWebRenderer();
 var DEFAULT_WAITLIST_PATH = "/api/waitlist";
+var DEPLOYED_WAITLIST_URL = "https://grarf-waitlist.grarf.workers.dev/waitlist";
+function isLocalWebHost() {
+  if (typeof window === "undefined") return false;
+  const host = window.location.hostname;
+  return host === "localhost" || host === "127.0.0.1";
+}
 function resolveWaitlistApiUrl() {
   if (!isGrarfWebRenderer()) return null;
   const fromConfig = window.GRARF_WEB_CONFIG?.waitlistApiUrl?.trim();
   if (fromConfig) return fromConfig;
-  return DEFAULT_WAITLIST_PATH;
+  if (isLocalWebHost()) return DEFAULT_WAITLIST_PATH;
+  return DEPLOYED_WAITLIST_URL;
 }
 
 // ../grarf/desktop/src/lib/waitlist/submitWaitlistSignup.ts
@@ -32958,21 +32981,43 @@ function normalizeEmail(email) {
 async function submitWaitlistSignup(request) {
   const email = normalizeEmail(request.email);
   const featureKey = request.featureKey.trim();
+  const featureName = request.featureName.trim();
+  const uiEntryPoint = request.uiEntryPoint.trim();
   if (!email || !EMAIL_PATTERN.test(email)) {
     return { ok: false, error: "Enter a valid email address." };
   }
   if (!featureKey) {
     return { ok: false, error: "Feature is not configured." };
   }
+  if (!featureName) {
+    return { ok: false, error: "Feature is not configured." };
+  }
+  if (!uiEntryPoint) {
+    return { ok: false, error: "Feature is not configured." };
+  }
   const apiUrl = resolveWaitlistApiUrl();
   if (!apiUrl) {
     return { ok: false, error: "Waitlist is not available in this environment." };
   }
+  const payload = buildWaitlistSignupPayload({
+    email,
+    featureKey,
+    featureName,
+    uiEntryPoint
+  });
   try {
     const response = await fetch(apiUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, feature: featureKey })
+      body: JSON.stringify({
+        email: payload.email,
+        feature: payload.featureKey,
+        featureKey: payload.featureKey,
+        featureName: payload.featureName,
+        uiEntryPoint: payload.uiEntryPoint,
+        timestampUtc: payload.timestampUtc,
+        environment: payload.environment
+      })
     });
     const body = await response.json().catch(() => null);
     if (!response.ok || !body?.ok) {
@@ -32994,6 +33039,7 @@ function GatedFeatureModal({
   open,
   onClose,
   config,
+  uiEntryPoint,
   signupHandler = submitWaitlistSignup,
   headerIcon: HeaderIcon
 }) {
@@ -33014,7 +33060,9 @@ function GatedFeatureModal({
       setErrorMessage(null);
       const result = await signupHandler({
         email,
-        featureKey: config.featureKey
+        featureKey: config.featureKey,
+        featureName: config.featureName,
+        uiEntryPoint
       });
       if (!result.ok) {
         setStatus("error");
@@ -33023,7 +33071,7 @@ function GatedFeatureModal({
       }
       setStatus("success");
     },
-    [config.featureKey, email, signupHandler, status, setErrorMessage, setStatus]
+    [config.featureKey, config.featureName, email, signupHandler, status, uiEntryPoint, setErrorMessage, setStatus]
   );
   if (!open) return null;
   return /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
@@ -33180,6 +33228,7 @@ init_define_import_meta_env();
 var LEAGUE_COMMAND_CENTERS_FEATURE_KEY = "league-command-centers";
 var LEAGUE_COMMAND_CENTERS_GATED_FEATURE = {
   featureKey: LEAGUE_COMMAND_CENTERS_FEATURE_KEY,
+  featureName: "League Command Center",
   title: "League Command Centers",
   headerEyebrow: "GET EARLY ACCESS",
   subtitle: "Follow every game, storyline, highlight, injury, ranking, transaction, and news item in one place.",
@@ -33204,7 +33253,9 @@ var import_jsx_runtime4 = __toESM(require_jsx_runtime(), 1);
 var GatedLeagueCommandCentersContext = (0, import_react10.createContext)(null);
 function GatedLeagueCommandCentersProvider({ children }) {
   const [open, setOpen] = (0, import_react10.useState)(false);
-  const openGatedLeagueModal = (0, import_react10.useCallback)(() => {
+  const [uiEntryPoint, setUiEntryPoint] = (0, import_react10.useState)("Main Menu \u2192 League Command Center");
+  const openGatedLeagueModal = (0, import_react10.useCallback)((entryPoint) => {
+    setUiEntryPoint(entryPoint);
     setOpen(true);
   }, []);
   const closeGatedLeagueModal = (0, import_react10.useCallback)(() => {
@@ -33218,6 +33269,7 @@ function GatedLeagueCommandCentersProvider({ children }) {
         open,
         onClose: closeGatedLeagueModal,
         config: LEAGUE_COMMAND_CENTERS_GATED_FEATURE,
+        uiEntryPoint,
         headerIcon: LEAGUE_COMMAND_CENTERS_MODAL_ICON
       }
     )
@@ -33241,6 +33293,7 @@ init_define_import_meta_env();
 var BROWSER_BETTING_FEATURE_KEY = "browser-betting";
 var BROWSER_BETTING_GATED_FEATURE = {
   featureKey: BROWSER_BETTING_FEATURE_KEY,
+  featureName: "Betting",
   title: "Betting is coming to GRARF.",
   subtitle: "Track odds movement, betting trends, sharp action, line movement, betting news, and game insights\u2014all organized by league and integrated directly into your sports workflow.",
   bullets: [],
@@ -33258,14 +33311,16 @@ init_define_import_meta_env();
 var import_zustand5 = __toESM(require_zustand(), 1);
 var useBrowserBettingWaitlistStore = (0, import_zustand5.create)((set) => ({
   open: false,
-  openBrowserBettingWaitlist: () => set({ open: true }),
-  closeBrowserBettingWaitlist: () => set({ open: false })
+  uiEntryPoint: null,
+  openBrowserBettingWaitlist: (uiEntryPoint) => set({ open: true, uiEntryPoint }),
+  closeBrowserBettingWaitlist: () => set({ open: false, uiEntryPoint: null })
 }));
 
 // ../grarf/desktop/src/components/gatedFeature/BrowserBettingWaitlistModal.tsx
 var import_jsx_runtime5 = __toESM(require_jsx_runtime(), 1);
 function BrowserBettingWaitlistModal() {
   const open = useBrowserBettingWaitlistStore((s2) => s2.open);
+  const uiEntryPoint = useBrowserBettingWaitlistStore((s2) => s2.uiEntryPoint);
   const onClose = useBrowserBettingWaitlistStore((s2) => s2.closeBrowserBettingWaitlist);
   if (!isGrarfWebRenderer()) return null;
   return /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
@@ -33273,7 +33328,8 @@ function BrowserBettingWaitlistModal() {
     {
       open,
       onClose,
-      config: BROWSER_BETTING_GATED_FEATURE
+      config: BROWSER_BETTING_GATED_FEATURE,
+      uiEntryPoint: uiEntryPoint ?? "Browser \u2192 Betting"
     }
   );
 }
@@ -33961,7 +34017,7 @@ function DirectoryNavSportGroupHeader({
       "button",
       {
         type: "button",
-        onClick: onGatedActivate,
+        onClick: () => onGatedActivate?.(`Main Menu \u2192 ${label}`),
         className: cn2(
           sportGroupHeaderShellClass,
           "w-full text-left transition focus-visible:outline focus-visible:outline-1 focus-visible:outline-cyansys/50"
@@ -38881,7 +38937,7 @@ function DirectoryNavRow({
       "button",
       {
         type: "button",
-        onClick: onGatedLeagueActivate,
+        onClick: () => onGatedLeagueActivate?.(`Main Menu \u2192 ${item.label}`),
         title: item.label,
         className: rowClassName,
         children: content
@@ -39215,7 +39271,7 @@ function AppLeftNav() {
                       return;
                     }
                     if (gateLeagueNav && item.id === "betting") {
-                      openBrowserBettingWaitlist();
+                      openBrowserBettingWaitlist("Main Menu \u2192 Betting");
                       return;
                     }
                     goHomeMode(item.id);
@@ -39565,6 +39621,7 @@ init_define_import_meta_env();
 var UNIVERSAL_SEARCH_FEATURE_KEY = "universal-search";
 var UNIVERSAL_SEARCH_GATED_FEATURE = {
   featureKey: UNIVERSAL_SEARCH_FEATURE_KEY,
+  featureName: "Universal Search",
   title: "Universal Sports Search",
   headerEyebrow: "GET EARLY ACCESS",
   subtitle: "Search every game, team, player, league, article, highlight, bet, and storyline across the sports internet.",
@@ -39662,6 +39719,7 @@ function GatedFeatureSearchBar({
         open,
         onClose: closeModal,
         config,
+        uiEntryPoint: "Browser \u2192 Search",
         headerIcon: UNIVERSAL_SEARCH_MODAL_ICON
       }
     )
@@ -62754,6 +62812,7 @@ init_define_import_meta_env();
 var BROWSER_WORKSPACE_FEATURE_KEY = "browser-workspace";
 var BROWSER_WORKSPACE_GATED_FEATURE = {
   featureKey: BROWSER_WORKSPACE_FEATURE_KEY,
+  featureName: "Browser Workspace",
   title: "Browse Sports Your Way",
   headerEyebrow: "GET EARLY ACCESS",
   subtitle: "Follow ESPN, The Athletic, CBS Sports, Yahoo Sports, NBA.com, and your own websites in one personalized sports workspace.",
@@ -62813,7 +62872,9 @@ function HomeBrowserWebsitePanePlaceholder() {
       setErrorMessage(null);
       const result = await submitWaitlistSignup({
         email,
-        featureKey: BROWSER_WORKSPACE_FEATURE_KEY
+        featureKey: BROWSER_WORKSPACE_FEATURE_KEY,
+        featureName: BROWSER_WORKSPACE_GATED_FEATURE.featureName,
+        uiEntryPoint: "Website Pane \u2192 Locked Feature"
       });
       if (!result.ok) {
         setStatus("error");
@@ -62921,6 +62982,7 @@ var DESKTOP_BROWSER_FEATURE_KEY = "desktop-browsing";
 var DESKTOP_BROWSER_HERO_VIDEO_SRC = "/videos/GRARF%20Fantasy.mp4";
 var DESKTOP_BROWSER_GATED_FEATURE = {
   featureKey: DESKTOP_BROWSER_FEATURE_KEY,
+  featureName: "Desktop Browsing",
   title: "Better Browsing on Desktop",
   headerEyebrow: "GET EARLY ACCESS",
   subtitle: "Multi-pane browsing layouts, advanced workspace controls, and power-user browsing tools are available in the GRARF desktop app.",
@@ -62990,7 +63052,8 @@ function WebsitePaneBrowsingLayoutIndicator({ className }) {
       {
         open,
         onClose: closeModal,
-        config: DESKTOP_BROWSER_GATED_FEATURE
+        config: DESKTOP_BROWSER_GATED_FEATURE,
+        uiEntryPoint: "Browser \u2192 Browsing Layout"
       }
     )
   ] });
@@ -64275,7 +64338,7 @@ function HomeLiveSubmenu() {
   const onSelect = (0, import_react84.useCallback)(
     (id) => {
       if (isWeb && id === "betting") {
-        openBettingWaitlist();
+        openBettingWaitlist("Browser \u2192 Betting");
         return;
       }
       if (isHomeLiveSubmenuId(id)) setActiveId(id);
@@ -69155,6 +69218,7 @@ var import_react103 = __toESM(require_react(), 1);
 // ../grarf/desktop/src/data/gatedFeatures/moreLeagues.ts
 init_define_import_meta_env();
 var MORE_LEAGUES_FEATURE_KEY = "more-leagues";
+var MORE_LEAGUES_FEATURE_NAME = "More Leagues";
 var MORE_LEAGUES_SUCCESS_MESSAGE = "You're on the list. We'll let you know when expanded league coverage launches on web.";
 
 // ../grarf/desktop/src/components/homeMvp/MoreLeaguesWaitlistCard.tsx
@@ -69175,7 +69239,9 @@ function MoreLeaguesWaitlistCard({
       setErrorMessage(null);
       const result = await submitWaitlistSignup({
         email,
-        featureKey: MORE_LEAGUES_FEATURE_KEY
+        featureKey: MORE_LEAGUES_FEATURE_KEY,
+        featureName: MORE_LEAGUES_FEATURE_NAME,
+        uiEntryPoint: "Games Spine \u2192 More Leagues"
       });
       if (!result.ok) {
         setStatus("error");
@@ -72633,6 +72699,7 @@ init_define_import_meta_env();
 var PODCASTS_FEATURE_KEY = "podcasts";
 var PODCASTS_GATED_FEATURE = {
   featureKey: PODCASTS_FEATURE_KEY,
+  featureName: "Podcasts",
   title: "Podcasts",
   headerEyebrow: "PODCASTS",
   subtitle: "Follow your favorite leagues, teams and athletes with contextual podcast recommendations built specifically for sports fans.",
@@ -72663,7 +72730,9 @@ function PodcastsWaitlistPanel({ className }) {
       setErrorMessage(null);
       const result = await submitWaitlistSignup({
         email,
-        featureKey: PODCASTS_FEATURE_KEY
+        featureKey: PODCASTS_FEATURE_KEY,
+        featureName: PODCASTS_GATED_FEATURE.featureName,
+        uiEntryPoint: "Activity \u2192 Podcasts"
       });
       if (!result.ok) {
         setStatus("error");
@@ -74374,6 +74443,7 @@ init_define_import_meta_env();
 var SIGNALS_INTEL_FEATURE_KEY = "signals-intel";
 var SIGNALS_INTEL_GATED_FEATURE = {
   featureKey: SIGNALS_INTEL_FEATURE_KEY,
+  featureName: "Signals Intel",
   title: "Read every sports newsletter in one place.",
   headerEyebrow: "INTEL",
   subtitle: "Never bounce between inboxes again. GRARF Desktop brings your favorite sports newsletters together into a single reading workspace.",
@@ -74434,7 +74504,9 @@ function SignalsIntelWaitlistPanel({ className }) {
       setErrorMessage(null);
       const result = await submitWaitlistSignup({
         email,
-        featureKey: SIGNALS_INTEL_FEATURE_KEY
+        featureKey: SIGNALS_INTEL_FEATURE_KEY,
+        featureName: SIGNALS_INTEL_GATED_FEATURE.featureName,
+        uiEntryPoint: "Activity \u2192 Signals \u2192 Intel"
       });
       if (!result.ok) {
         setStatus("error");
@@ -74535,6 +74607,7 @@ init_define_import_meta_env();
 var SIGNALS_SHOW_FEATURE_KEY = "signals-show";
 var SIGNALS_SHOW_GATED_FEATURE = {
   featureKey: SIGNALS_SHOW_FEATURE_KEY,
+  featureName: "Signals Show",
   title: "Watch every sports show in one place.",
   headerEyebrow: "SHOW",
   subtitle: "No more jumping between YouTube, network websites, and streaming apps. GRARF Desktop brings your favorite daily sports shows together into a single viewing workspace.",
@@ -74599,7 +74672,9 @@ function SignalsShowWaitlistPanel({ className }) {
       setErrorMessage(null);
       const result = await submitWaitlistSignup({
         email,
-        featureKey: SIGNALS_SHOW_FEATURE_KEY
+        featureKey: SIGNALS_SHOW_FEATURE_KEY,
+        featureName: SIGNALS_SHOW_GATED_FEATURE.featureName,
+        uiEntryPoint: "Activity \u2192 Signals \u2192 Show"
       });
       if (!result.ok) {
         setStatus("error");
@@ -74700,6 +74775,7 @@ init_define_import_meta_env();
 var SIGNALS_CONVO_FEATURE_KEY = "signals-convo";
 var SIGNALS_CONVO_GATED_FEATURE = {
   featureKey: SIGNALS_CONVO_FEATURE_KEY,
+  featureName: "Signals Convo",
   title: "Every fan conversation. One place.",
   headerEyebrow: "CONVO",
   subtitle: "See what fans are saying without hunting across dozens of communities. GRARF Desktop brings together the best sports discussions from Reddit into a single conversation workspace.",
@@ -74764,7 +74840,9 @@ function SignalsConvoWaitlistPanel({ className }) {
       setErrorMessage(null);
       const result = await submitWaitlistSignup({
         email,
-        featureKey: SIGNALS_CONVO_FEATURE_KEY
+        featureKey: SIGNALS_CONVO_FEATURE_KEY,
+        featureName: SIGNALS_CONVO_GATED_FEATURE.featureName,
+        uiEntryPoint: "Activity \u2192 Signals \u2192 Convo"
       });
       if (!result.ok) {
         setStatus("error");
@@ -74865,6 +74943,7 @@ init_define_import_meta_env();
 var SIGNALS_CHAT_FEATURE_KEY = "signals-chat";
 var SIGNALS_CHAT_GATED_FEATURE = {
   featureKey: SIGNALS_CHAT_FEATURE_KEY,
+  featureName: "Signals Chat",
   title: "Watch the game together.",
   headerEyebrow: "CHAT",
   subtitle: "Sports are better with other fans. GRARF Desktop gives you a live chat room for every game.",
@@ -74896,7 +74975,9 @@ function SignalsChatWaitlistPanel({ className }) {
       setErrorMessage(null);
       const result = await submitWaitlistSignup({
         email,
-        featureKey: SIGNALS_CHAT_FEATURE_KEY
+        featureKey: SIGNALS_CHAT_FEATURE_KEY,
+        featureName: SIGNALS_CHAT_GATED_FEATURE.featureName,
+        uiEntryPoint: "Activity \u2192 Signals \u2192 Chat"
       });
       if (!result.ok) {
         setStatus("error");
@@ -82139,7 +82220,9 @@ function SportscapeMoreLeaguesDesktopWaitlistRow() {
       setErrorMessage(null);
       const result = await submitWaitlistSignup({
         email,
-        featureKey: MORE_LEAGUES_FEATURE_KEY
+        featureKey: MORE_LEAGUES_FEATURE_KEY,
+        featureName: MORE_LEAGUES_FEATURE_NAME,
+        uiEntryPoint: "Sportscape \u2192 More Leagues"
       });
       if (!result.ok) {
         setStatus("error");
@@ -86974,10 +87057,20 @@ function HomeLiveTrackerSplitPane() {
 // ../grarf/desktop/src/components/homeMvp/HomeWhipAroundWebPane.tsx
 init_define_import_meta_env();
 var import_react171 = __toESM(require_react(), 1);
+
+// ../grarf/desktop/src/data/gatedFeatures/liveWhipAround.ts
+init_define_import_meta_env();
+var LIVE_WHIP_AROUND_FEATURE_KEY = "live-whip-around";
+var LIVE_WHIP_AROUND_FEATURE_NAME = "Live Whip Around";
+var LIVE_WHIP_AROUND_SUCCESS_MESSAGE = "You're on the list. We'll let you know when Live Whip Around launches on Desktop.";
+
+// ../grarf/desktop/src/components/homeMvp/HomeWhipAroundWebPane.tsx
 var import_jsx_runtime159 = __toESM(require_jsx_runtime(), 1);
 var WHIP_AROUND_PROMO_VIDEO_SRC = "/videos/GRARF%20Live%20Whip%20Around.mp4";
 function HomeWhipAroundWebPane() {
   const [email, setEmail] = (0, import_react171.useState)("");
+  const [status, setStatus] = (0, import_react171.useState)("idle");
+  const [errorMessage, setErrorMessage] = (0, import_react171.useState)(null);
   const videoRef = (0, import_react171.useRef)(null);
   const [showControls, setShowControls] = (0, import_react171.useState)(false);
   (0, import_react171.useEffect)(() => {
@@ -86990,6 +87083,27 @@ function HomeWhipAroundWebPane() {
       setShowControls(true);
     });
   }, []);
+  const onSubmit = (0, import_react171.useCallback)(
+    async (event) => {
+      event.preventDefault();
+      if (status === "loading" || status === "success") return;
+      setStatus("loading");
+      setErrorMessage(null);
+      const result = await submitWaitlistSignup({
+        email,
+        featureKey: LIVE_WHIP_AROUND_FEATURE_KEY,
+        featureName: LIVE_WHIP_AROUND_FEATURE_NAME,
+        uiEntryPoint: "Home \u2192 Live Whip Around"
+      });
+      if (!result.ok) {
+        setStatus("error");
+        setErrorMessage(result.error);
+        return;
+      }
+      setStatus("success");
+    },
+    [email, status]
+  );
   return /* @__PURE__ */ (0, import_jsx_runtime159.jsx)("div", { className: "flex h-full min-h-0 flex-col overflow-hidden bg-[#010303] font-mono", children: /* @__PURE__ */ (0, import_jsx_runtime159.jsx)("div", { className: "flex min-h-0 flex-1 items-center justify-center px-5 py-5 sm:px-6", children: /* @__PURE__ */ (0, import_jsx_runtime159.jsxs)("div", { className: "grid w-[90%] max-w-full grid-cols-[63%_37%] items-start gap-6", children: [
     /* @__PURE__ */ (0, import_jsx_runtime159.jsx)("div", { className: "min-h-0 min-w-0", children: /* @__PURE__ */ (0, import_jsx_runtime159.jsx)("div", { className: "overflow-hidden border border-line/40 bg-black", children: /* @__PURE__ */ (0, import_jsx_runtime159.jsx)(
       "video",
@@ -87024,43 +87138,49 @@ function HomeWhipAroundWebPane() {
       ] }),
       /* @__PURE__ */ (0, import_jsx_runtime159.jsxs)("div", { className: "mt-4", children: [
         /* @__PURE__ */ (0, import_jsx_runtime159.jsx)("h3", { className: "text-[10px] leading-snug tracking-[0.05em] text-[#c8d8d8]", children: "Get notified when Live Whip Around launches on Desktop" }),
-        /* @__PURE__ */ (0, import_jsx_runtime159.jsxs)(
-          "form",
+        status === "success" ? /* @__PURE__ */ (0, import_jsx_runtime159.jsx)(
+          "p",
           {
-            className: "mt-3 space-y-2",
-            onSubmit: (event) => {
-              event.preventDefault();
-            },
-            children: [
-              /* @__PURE__ */ (0, import_jsx_runtime159.jsxs)("label", { className: "block", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime159.jsx)("span", { className: "sr-only", children: "Email address" }),
-                /* @__PURE__ */ (0, import_jsx_runtime159.jsx)(
-                  "input",
-                  {
-                    type: "email",
-                    name: "email",
-                    value: email,
-                    onChange: (event) => setEmail(event.target.value),
-                    autoComplete: "email",
-                    placeholder: "you@email.com",
-                    className: "w-full border border-line/60 bg-black/65 px-2.5 py-2 text-[11px] text-[#d7eeee] outline-none placeholder:text-textdim/70 focus:border-cyansys/45"
-                  }
-                )
-              ] }),
-              /* @__PURE__ */ (0, import_jsx_runtime159.jsx)(
-                "button",
-                {
-                  type: "submit",
-                  className: cn2(
-                    "flex w-full items-center justify-center border px-3 py-2 text-[10px] tracking-[0.14em] transition",
-                    "border-cyansys/45 bg-cyansys/[0.08] text-cyansys hover:border-cyansys/60 hover:bg-cyansys/[0.12]"
-                  ),
-                  children: "Join Waitlist"
-                }
-              )
-            ]
+            className: "mt-3 border border-greensys/30 bg-greensys/[0.08] px-3 py-2 text-[10px] leading-snug text-greensys/95",
+            role: "status",
+            children: LIVE_WHIP_AROUND_SUCCESS_MESSAGE
           }
-        )
+        ) : /* @__PURE__ */ (0, import_jsx_runtime159.jsxs)("form", { className: "mt-3 space-y-2", onSubmit, children: [
+          /* @__PURE__ */ (0, import_jsx_runtime159.jsxs)("label", { className: "block", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime159.jsx)("span", { className: "sr-only", children: "Email address" }),
+            /* @__PURE__ */ (0, import_jsx_runtime159.jsx)(
+              "input",
+              {
+                type: "email",
+                name: "email",
+                value: email,
+                onChange: (event) => setEmail(event.target.value),
+                required: true,
+                autoComplete: "email",
+                placeholder: "you@email.com",
+                disabled: status === "loading",
+                className: "w-full border border-line/60 bg-black/65 px-2.5 py-2 text-[11px] text-[#d7eeee] outline-none placeholder:text-textdim/70 focus:border-cyansys/45"
+              }
+            )
+          ] }),
+          status === "error" && errorMessage ? /* @__PURE__ */ (0, import_jsx_runtime159.jsx)("p", { className: "text-[10px] text-redsys/90", role: "alert", children: errorMessage }) : null,
+          /* @__PURE__ */ (0, import_jsx_runtime159.jsx)(
+            "button",
+            {
+              type: "submit",
+              disabled: status === "loading",
+              className: cn2(
+                "flex w-full items-center justify-center gap-2 border px-3 py-2 text-[10px] tracking-[0.14em] transition",
+                "border-cyansys/45 bg-cyansys/[0.08] text-cyansys hover:border-cyansys/60 hover:bg-cyansys/[0.12]",
+                "disabled:cursor-not-allowed disabled:opacity-60"
+              ),
+              children: status === "loading" ? /* @__PURE__ */ (0, import_jsx_runtime159.jsxs)(import_jsx_runtime159.Fragment, { children: [
+                /* @__PURE__ */ (0, import_jsx_runtime159.jsx)(LoaderCircle, { size: 12, className: "animate-spin", "aria-hidden": true }),
+                "JOINING\u2026"
+              ] }) : "Join Waitlist"
+            }
+          )
+        ] })
       ] })
     ] })
   ] }) }) });
