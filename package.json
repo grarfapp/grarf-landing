@@ -7,6 +7,8 @@
     "build:spine": "node build-spine.mjs",
     "build:home": "node build-home.mjs",
     "build:webapp": "node build-home.mjs",
+    "build:admin": "node build-admin.mjs",
+    "dev:admin": "node build-admin.mjs --serve",
     "build:dailybrief": "node scripts/build-daily-brief.mjs",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

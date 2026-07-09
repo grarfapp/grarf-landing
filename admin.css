@@ -1,0 +1,538 @@
+:root {
+  color-scheme: dark;
+  --admin-bg: #0c0e12;
+  --admin-surface: #141820;
+  --admin-surface-raised: #1a1f2a;
+  --admin-border: #2a3140;
+  --admin-text: #e8ecf4;
+  --admin-text-muted: #8b95a8;
+  --admin-accent: #5b8def;
+  --admin-accent-muted: #3d5f99;
+  --admin-sidebar-width: 240px;
+  --admin-console-width: 440px;
+  font-family: Inter, system-ui, -apple-system, sans-serif;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  min-height: 100%;
+  height: 100%;
+  background: var(--admin-bg);
+  color: var(--admin-text);
+}
+
+.grarf-admin {
+  display: flex;
+  min-height: 100%;
+  height: 100%;
+}
+
+.grarf-admin__sidebar {
+  width: var(--admin-sidebar-width);
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--admin-border);
+  background: var(--admin-surface);
+}
+
+.grarf-admin__brand {
+  padding: 20px 18px 16px;
+  border-bottom: 1px solid var(--admin-border);
+}
+
+.grarf-admin__brand-title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.grarf-admin__brand-subtitle {
+  margin: 4px 0 0;
+  font-size: 12px;
+  color: var(--admin-text-muted);
+}
+
+.grarf-admin__nav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 12px 10px;
+  flex: 1;
+}
+
+.grarf-admin__nav-item {
+  display: block;
+  width: 100%;
+  padding: 10px 12px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--admin-text);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+}
+
+.grarf-admin__nav-item:hover:not(:disabled) {
+  background: var(--admin-surface-raised);
+}
+
+.grarf-admin__nav-item--active {
+  background: var(--admin-accent-muted);
+  color: #fff;
+}
+
+.grarf-admin__nav-item:disabled {
+  color: var(--admin-text-muted);
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.grarf-admin__main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.grarf-admin__module-header {
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid var(--admin-border);
+}
+
+.grarf-admin__module-title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.grarf-admin__module-description {
+  margin: 6px 0 0;
+  font-size: 13px;
+  color: var(--admin-text-muted);
+  max-width: 72ch;
+}
+
+.grarf-admin__toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.grarf-admin__label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--admin-text-muted);
+}
+
+.grarf-admin__select {
+  min-width: 160px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--admin-border);
+  background: var(--admin-surface-raised);
+  color: var(--admin-text);
+  font: inherit;
+  font-size: 13px;
+}
+
+.grarf-admin__status {
+  font-size: 12px;
+  color: var(--admin-text-muted);
+}
+
+.grarf-admin__status--error {
+  color: #f87171;
+}
+
+.grarf-admin__operations-body {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(220px, 280px) minmax(260px, 1fr) var(--admin-console-width);
+}
+
+.grarf-admin__panel {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--admin-border);
+}
+
+.grarf-admin__panel:last-child {
+  border-right: none;
+}
+
+.grarf-admin__panel-header {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--admin-border);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--admin-text-muted);
+}
+
+.grarf-admin__panel-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+}
+
+.grarf-admin__list {
+  list-style: none;
+  margin: 0;
+  padding: 6px;
+}
+
+.grarf-admin__list-item {
+  margin: 0;
+}
+
+.grarf-admin__list-button {
+  display: block;
+  width: 100%;
+  padding: 10px 12px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--admin-text);
+  font: inherit;
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.grarf-admin__list-button:hover {
+  background: var(--admin-surface-raised);
+}
+
+.grarf-admin__list-button--active {
+  background: rgba(91, 141, 239, 0.18);
+  outline: 1px solid var(--admin-accent-muted);
+}
+
+.grarf-admin__list-button-subtitle {
+  display: block;
+  margin-top: 3px;
+  font-size: 11px;
+  color: var(--admin-text-muted);
+}
+
+.grarf-admin__list-button-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.grarf-admin__list-button-label {
+  min-width: 0;
+  flex: 1;
+}
+
+.grarf-admin__game-indicators {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 2px;
+}
+
+.grarf-admin__game-indicator {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  font-size: 11px;
+  line-height: 1;
+}
+
+.grarf-admin__game-indicator-emoji {
+  display: block;
+  transform: scale(0.92);
+}
+
+.grarf-admin__game-indicator--needs-attention {
+  background: rgba(251, 191, 36, 0.14);
+}
+
+.grarf-admin__game-indicator--missing-stream {
+  background: rgba(248, 113, 113, 0.12);
+}
+
+.grarf-admin__game-indicator--manual-override {
+  background: rgba(192, 132, 252, 0.12);
+}
+
+.grarf-admin__game-indicator--navigation-override {
+  background: rgba(74, 222, 128, 0.12);
+}
+
+.grarf-admin__game-indicator--featured {
+  background: rgba(250, 204, 21, 0.12);
+}
+
+.grarf-admin__empty {
+  padding: 24px 16px;
+  font-size: 13px;
+  color: var(--admin-text-muted);
+}
+
+.grarf-admin__console {
+  padding: 14px 16px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.grarf-admin__console-section {
+  border: 1px solid var(--admin-border);
+  border-radius: 10px;
+  background: var(--admin-surface);
+  overflow: hidden;
+}
+
+.grarf-admin__console-section--prominent {
+  border-color: #3a4f73;
+  background: linear-gradient(180deg, #171d28 0%, var(--admin-surface) 100%);
+}
+
+.grarf-admin__console-section--system {
+  border-style: dashed;
+  background: transparent;
+}
+
+.grarf-admin__console-section-header {
+  padding: 12px 14px 0;
+}
+
+.grarf-admin__console-section-title {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--admin-text);
+}
+
+.grarf-admin__console-section-description {
+  margin: 6px 0 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--admin-text-muted);
+}
+
+.grarf-admin__console-section-body {
+  padding: 12px 14px 14px;
+}
+
+.grarf-admin__console-game-summary {
+  margin-bottom: 12px;
+  padding: 12px 14px;
+  border-radius: 8px;
+  background: rgba(91, 141, 239, 0.08);
+  border: 1px solid rgba(91, 141, 239, 0.18);
+}
+
+.grarf-admin__console-game-title {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.grarf-admin__console-game-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.grarf-admin__console-status-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: rgba(91, 141, 239, 0.16);
+  color: #dbe7ff;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.grarf-admin__console-status-line {
+  font-size: 12px;
+  color: var(--admin-text-muted);
+}
+
+.grarf-admin__console-field-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+
+.grarf-admin__console-field-grid--compact {
+  gap: 8px;
+}
+
+.grarf-admin__console-field {
+  display: grid;
+  gap: 4px;
+}
+
+.grarf-admin__console-field-label {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--admin-text-muted);
+}
+
+.grarf-admin__console-field-value {
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--admin-text);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.grarf-admin__console-field-value--mono {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 11px;
+}
+
+.grarf-admin__console-field-empty {
+  font-size: 12px;
+  font-style: italic;
+  color: #6f7a8f;
+}
+
+.grarf-admin__console-override-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.grarf-admin__console-override-field {
+  display: grid;
+  gap: 6px;
+}
+
+.grarf-admin__console-override-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--admin-text);
+}
+
+.grarf-admin__console-override-value {
+  padding: 10px 12px;
+  border: 1px solid var(--admin-border);
+  border-radius: 8px;
+  background: var(--admin-surface-raised);
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--admin-text);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.grarf-admin__console-override-value--mono {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 11px;
+}
+
+.grarf-admin__console-override-empty {
+  padding: 10px 12px;
+  border: 1px dashed #3a4254;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.02);
+  font-size: 12px;
+  color: #7d879b;
+}
+
+.grarf-admin__console-input,
+.grarf-admin__console-textarea,
+.grarf-admin__console-select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--admin-border);
+  border-radius: 8px;
+  background: var(--admin-bg);
+  color: var(--admin-text);
+  font: inherit;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.grarf-admin__console-input:focus,
+.grarf-admin__console-textarea:focus,
+.grarf-admin__console-select:focus {
+  outline: none;
+  border-color: var(--admin-accent-muted);
+  box-shadow: 0 0 0 2px rgba(91, 141, 239, 0.15);
+}
+
+.grarf-admin__console-input::placeholder,
+.grarf-admin__console-textarea::placeholder {
+  color: #5f6b80;
+}
+
+.grarf-admin__console-input--mono,
+.grarf-admin__console-textarea--mono {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 11px;
+}
+
+.grarf-admin__console-textarea {
+  resize: vertical;
+  min-height: 72px;
+}
+
+.grarf-admin__console-select {
+  cursor: pointer;
+}
+
+.grarf-admin__console-system-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 12px 14px;
+  border: none;
+  background: transparent;
+  color: var(--admin-text-muted);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.grarf-admin__console-system-toggle:hover {
+  color: var(--admin-text);
+  background: var(--admin-surface-raised);
+}
+
+.grarf-admin__console-system-toggle-icon {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.grarf-admin__console-system-body {
+  border-top: 1px solid var(--admin-border);
+  padding-top: 12px;
+}

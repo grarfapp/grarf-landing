@@ -67212,6 +67212,7 @@ function resolveGamesSpineCompactScoreCellClass() {
 }
 var GAMES_SPINE_COMPACT_COMPETITOR_CELL_CLASS = "grid min-w-0 grid-cols-[12px_minmax(0,1fr)] items-center gap-x-[0.5ch]";
 var GAMES_SPINE_COMPACT_COMPETITOR_LABEL_CLASS = "min-w-0 truncate pl-[0.5ch] text-left font-mono text-[11px] leading-none tracking-[0.06em]";
+var GAMES_SPINE_COMPACT_STANDINGS_LABEL_CLASS = "truncate text-[8px] leading-tight text-textdim/55";
 var GAMES_SPINE_COMPACT_CHANNEL_LOGO_HEIGHT_CLASS = "h-[0.7rem]";
 var GAMES_SPINE_COMPACT_CHANNEL_LOGO_MAX_WIDTH_CLASS = "max-w-[2.2rem]";
 var GAMES_SPINE_COMPACT_BROADCAST_COLUMN_WEB_WIDTH_CLASS = "w-[2.2rem]";
@@ -67305,11 +67306,17 @@ function resolveGamesSpineCompactMatchupModel(game) {
     return { kind: "event", event: eventColumns };
   }
   const [leftSide, rightSide] = resolveGamesSpineMatchupSideOrder(game);
+  const resolveStandingsLabel = (side) => {
+    const label = side === "away" ? game.awayTeamStandings?.displayLabel : game.homeTeamStandings?.displayLabel;
+    const trimmed = label?.trim();
+    return trimmed ? trimmed : void 0;
+  };
   const buildPill = (side, score2) => ({
     side,
     abbrev: resolveGamesSpineCompactTeamLabel(game, side),
     teamName: ((side === "away" ? game.awayTeam : game.homeTeam) ?? "").trim(),
-    score: score2
+    score: score2,
+    standingsLabel: resolveStandingsLabel(side)
   });
   const isScoreboard = game.status === "live" || game.status === "final" || isSpineFinalizedGame(game);
   if (!isScoreboard) {
@@ -67398,36 +67405,58 @@ function resolveResultEmphasis(side, winnerSide) {
   if (!winnerSide) return "neutral";
   return side === winnerSide ? "winner" : "loser";
 }
-function CompetitorLogo({ logoUrl }) {
-  return /* @__PURE__ */ (0, import_jsx_runtime77.jsx)("span", { className: "inline-flex h-[12px] w-[12px] shrink-0 items-center justify-center", children: logoUrl ? /* @__PURE__ */ (0, import_jsx_runtime77.jsx)(
-    "img",
+function CompetitorLogo({ logoUrl, alignTop }) {
+  return /* @__PURE__ */ (0, import_jsx_runtime77.jsx)(
+    "span",
     {
-      src: logoUrl,
-      alt: "",
-      className: "h-2.5 w-2.5 shrink-0 object-contain",
-      loading: "lazy",
-      decoding: "async"
+      className: cn2(
+        "inline-flex h-[12px] w-[12px] shrink-0 items-center justify-center",
+        alignTop && "mt-0.5"
+      ),
+      children: logoUrl ? /* @__PURE__ */ (0, import_jsx_runtime77.jsx)(
+        "img",
+        {
+          src: logoUrl,
+          alt: "",
+          className: "h-2.5 w-2.5 shrink-0 object-contain",
+          loading: "lazy",
+          decoding: "async"
+        }
+      ) : null
     }
-  ) : null });
+  );
 }
 function GamesSpineCompactCompetitorColumn({ game, pill, resultEmphasis }) {
   const logoUrl = resolveDarkThemeLogoUrl(game, pill.side);
   const weightClass = resultEmphasis === "winner" ? "font-bold" : "font-normal";
   const labelColorClass = resultEmphasis === "loser" ? "text-white/60" : "text-white/90";
-  return /* @__PURE__ */ (0, import_jsx_runtime77.jsxs)("div", { className: GAMES_SPINE_COMPACT_COMPETITOR_CELL_CLASS, children: [
-    /* @__PURE__ */ (0, import_jsx_runtime77.jsx)(CompetitorLogo, { logoUrl }),
-    /* @__PURE__ */ (0, import_jsx_runtime77.jsx)(
-      "span",
-      {
-        className: cn2(
-          GAMES_SPINE_COMPACT_COMPETITOR_LABEL_CLASS,
-          labelColorClass,
-          weightClass
-        ),
-        children: pill.abbrev
-      }
-    )
-  ] });
+  const showStandings = isGrarfWebRenderer() && Boolean(pill.standingsLabel);
+  return /* @__PURE__ */ (0, import_jsx_runtime77.jsxs)(
+    "div",
+    {
+      className: cn2(
+        GAMES_SPINE_COMPACT_COMPETITOR_CELL_CLASS,
+        showStandings ? "items-start" : "items-center"
+      ),
+      children: [
+        /* @__PURE__ */ (0, import_jsx_runtime77.jsx)(CompetitorLogo, { logoUrl, alignTop: showStandings }),
+        /* @__PURE__ */ (0, import_jsx_runtime77.jsxs)("span", { className: "flex min-w-0 flex-col gap-px", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime77.jsx)(
+            "span",
+            {
+              className: cn2(
+                GAMES_SPINE_COMPACT_COMPETITOR_LABEL_CLASS,
+                labelColorClass,
+                weightClass
+              ),
+              children: pill.abbrev
+            }
+          ),
+          showStandings ? /* @__PURE__ */ (0, import_jsx_runtime77.jsx)("span", { className: GAMES_SPINE_COMPACT_STANDINGS_LABEL_CLASS, children: pill.standingsLabel }) : null
+        ] })
+      ]
+    }
+  );
 }
 function GamesSpineCompactEventNameColumn({ game, label }) {
   const logoUrl = resolveDarkThemeLogoUrl(game, "away") ?? resolveGamesSpineLeagueLogoUrl(game.league);
@@ -67439,11 +67468,23 @@ function GamesSpineCompactEventNameColumn({ game, label }) {
 function GamesSpineCompactScoreColumn({
   score: score2,
   showScore,
-  resultEmphasis
+  resultEmphasis,
+  alignCenter = false
 }) {
   const weightClass = resultEmphasis === "winner" ? "font-bold" : "font-normal";
   const scoreColorClass = resultEmphasis === "loser" ? "text-white/50" : "text-white/75";
-  return /* @__PURE__ */ (0, import_jsx_runtime77.jsx)("span", { className: cn2(resolveGamesSpineCompactScoreCellClass(), scoreColorClass, weightClass), children: showScore ? score2 ?? "\u2014" : null });
+  return /* @__PURE__ */ (0, import_jsx_runtime77.jsx)(
+    "span",
+    {
+      className: cn2(
+        resolveGamesSpineCompactScoreCellClass(),
+        scoreColorClass,
+        weightClass,
+        alignCenter && "self-center"
+      ),
+      children: showScore ? score2 ?? "\u2014" : null
+    }
+  );
 }
 function GamesSpineCompactMatchupColumns({ game }) {
   const model = resolveGamesSpineCompactMatchupModel(game);
@@ -67462,6 +67503,7 @@ function GamesSpineCompactMatchupColumns({ game }) {
     ] });
   }
   const winnerSide = resolveCompactWinnerSide(game, model.left, model.right);
+  const hasStandings = isGrarfWebRenderer() && Boolean(model.left.standingsLabel?.trim() || model.right.standingsLabel?.trim());
   return /* @__PURE__ */ (0, import_jsx_runtime77.jsxs)(import_jsx_runtime77.Fragment, { children: [
     /* @__PURE__ */ (0, import_jsx_runtime77.jsx)(
       GamesSpineCompactCompetitorColumn,
@@ -67476,7 +67518,8 @@ function GamesSpineCompactMatchupColumns({ game }) {
       {
         score: model.left.score,
         showScore: model.showScores,
-        resultEmphasis: resolveResultEmphasis(model.left.side, winnerSide)
+        resultEmphasis: resolveResultEmphasis(model.left.side, winnerSide),
+        alignCenter: hasStandings
       }
     ),
     /* @__PURE__ */ (0, import_jsx_runtime77.jsx)(
@@ -67492,7 +67535,8 @@ function GamesSpineCompactMatchupColumns({ game }) {
       {
         score: model.right.score,
         showScore: model.showScores,
-        resultEmphasis: resolveResultEmphasis(model.right.side, winnerSide)
+        resultEmphasis: resolveResultEmphasis(model.right.side, winnerSide),
+        alignCenter: hasStandings
       }
     )
   ] });
@@ -67512,45 +67556,59 @@ function GamesSpineCompactGameRow({ game, hideTime = false, className }) {
   const channel = resolveGameChannelPresentation(game);
   const showChannelLogo = shouldShowCompactChannelLogo(game);
   const isLive = isGameActivelyLive(game);
-  return /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: cn2(resolveGamesSpineCompactRowGridClass(game), className), children: [
-    /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(
-      "span",
-      {
-        className: cn2(
-          GAMES_SPINE_COMPACT_STATUS_CELL_CLASS,
-          isLive ? "text-ambersys/95" : "text-textdim/90"
-        ),
-        children: statusLabel || /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("span", { "aria-hidden": true, children: "\xA0" })
-      }
-    ),
-    /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(GamesSpineCompactMatchupColumns, { game }),
-    /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(
-      "div",
-      {
-        className: cn2(
-          "flex shrink-0 items-center",
-          isGrarfWebRenderer() ? cn2(GAMES_SPINE_COMPACT_BROADCAST_COLUMN_WEB_WIDTH_CLASS, "justify-center") : "justify-start"
-        ),
-        children: showChannelLogo ? /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(
-          BroadcastChannelLogo,
-          {
-            logoUrl: channel.logoUrl,
-            label: channel.label,
-            align: "left",
-            slotClassName: isGrarfWebRenderer() ? GAMES_SPINE_COMPACT_CHANNEL_LOGO_SLOT_CLASS : void 0,
-            imageClassName: isGrarfWebRenderer() ? gamesSpineCompactChannelLogoImageClass("left") : void 0,
-            fallbackClassName: cn2(GAMES_SPINE_CARD_CHANNEL_FALLBACK_CLASS, "max-w-none text-[9px]")
-          }
-        ) : /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(
+  const matchupModel = resolveGamesSpineCompactMatchupModel(game);
+  const hasStandings = isGrarfWebRenderer() && matchupModel.kind === "matchup" && Boolean(matchupModel.left.standingsLabel?.trim() || matchupModel.right.standingsLabel?.trim());
+  return /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)(
+    "div",
+    {
+      className: cn2(
+        resolveGamesSpineCompactRowGridClass(game),
+        hasStandings && "items-start",
+        className
+      ),
+      children: [
+        /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(
           "span",
           {
-            "aria-hidden": true,
-            className: isGrarfWebRenderer() ? "block w-full" : "block min-w-[2.25rem]"
+            className: cn2(
+              GAMES_SPINE_COMPACT_STATUS_CELL_CLASS,
+              isLive ? "text-ambersys/95" : "text-textdim/90",
+              hasStandings && "mt-0.5"
+            ),
+            children: statusLabel || /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("span", { "aria-hidden": true, children: "\xA0" })
+          }
+        ),
+        /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(GamesSpineCompactMatchupColumns, { game }),
+        /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(
+          "div",
+          {
+            className: cn2(
+              "flex shrink-0 items-center",
+              isGrarfWebRenderer() ? cn2(GAMES_SPINE_COMPACT_BROADCAST_COLUMN_WEB_WIDTH_CLASS, "justify-center") : "justify-start",
+              hasStandings && "self-center"
+            ),
+            children: showChannelLogo ? /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(
+              BroadcastChannelLogo,
+              {
+                logoUrl: channel.logoUrl,
+                label: channel.label,
+                align: "left",
+                slotClassName: isGrarfWebRenderer() ? GAMES_SPINE_COMPACT_CHANNEL_LOGO_SLOT_CLASS : void 0,
+                imageClassName: isGrarfWebRenderer() ? gamesSpineCompactChannelLogoImageClass("left") : void 0,
+                fallbackClassName: cn2(GAMES_SPINE_CARD_CHANNEL_FALLBACK_CLASS, "max-w-none text-[9px]")
+              }
+            ) : /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(
+              "span",
+              {
+                "aria-hidden": true,
+                className: isGrarfWebRenderer() ? "block w-full" : "block min-w-[2.25rem]"
+              }
+            )
           }
         )
-      }
-    )
-  ] });
+      ]
+    }
+  );
 }
 
 // ../grarf/desktop/src/components/gamesSpine/GamesSpineGameDisplayTransition.tsx
