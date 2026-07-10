@@ -38187,6 +38187,7 @@ var import_zustand9 = __toESM(require_zustand(), 1);
 
 // ../grarf/desktop/src/lib/home/deriveCenterPaneApplicationMode.ts
 init_define_import_meta_env();
+init_isGrarfWebRenderer();
 
 // ../grarf/desktop/src/lib/home/importantLeagues.ts
 init_define_import_meta_env();
@@ -38443,6 +38444,7 @@ function isAtLeastOneImportantLeagueUpcoming(leagues, now = /* @__PURE__ */ new 
 
 // ../grarf/desktop/src/lib/home/deriveCenterPaneApplicationMode.ts
 function deriveInitialCenterPaneApplicationModeFromGamesSpine(leagues, now = /* @__PURE__ */ new Date()) {
+  if (isGrarfWebRenderer()) return "livetracker";
   for (const games of Object.values(leagues)) {
     if (!games?.length) continue;
     for (const game of filterGamesSpineSlateForOperationalSportsDay(games, now)) {
@@ -38458,10 +38460,11 @@ function deriveCenterPaneApplicationModeFromImportantLeagues(leagues, now = /* @
 }
 
 // ../grarf/desktop/src/store/centerPaneApplicationModeStore.ts
+init_isGrarfWebRenderer();
 var useCenterPaneApplicationModeStore = (0, import_zustand9.create)((set) => ({
-  mode: "sportscape",
+  mode: isGrarfWebRenderer() ? "livetracker" : "sportscape",
   source: "operational",
-  initialDefaultApplied: false,
+  initialDefaultApplied: isGrarfWebRenderer(),
   setModeExplicit: (mode) => set({ mode, source: "explicit", initialDefaultApplied: true }),
   setModeFromRoute: (mode) => set({ mode, source: "route" }),
   syncFromImportantLeagueActivity: (leagues) => {
@@ -39140,17 +39143,18 @@ function isCompleteOperationalSnapshot(leagues, meta) {
   return countLeaguesWithTodaySlate(leagues) > 0;
 }
 var useGamesSpineRenderStore = (0, import_zustand11.create)((set, get) => ({
-  operationalReady: !isGrarfWebRenderer(),
+  operationalReady: true,
+  operationalIngestComplete: !isGrarfWebRenderer(),
   /** Manual KV overrides load async — never block the operational spine on them. */
   manualReady: true,
   hasPromotedInitialSnapshot: !isGrarfWebRenderer(),
   markOperationalIngest: (leagues, meta) => {
     const complete = isCompleteOperationalSnapshot(leagues, meta);
-    if (!complete) return;
-    set({
+    set((state3) => ({
       operationalReady: true,
-      hasPromotedInitialSnapshot: true
-    });
+      operationalIngestComplete: state3.operationalIngestComplete || complete,
+      hasPromotedInitialSnapshot: state3.hasPromotedInitialSnapshot || complete
+    }));
   },
   markManualLoaded: () => {
     set({ manualReady: true });
@@ -39161,7 +39165,8 @@ var useGamesSpineRenderStore = (0, import_zustand11.create)((set, get) => ({
   },
   resetForTests: () => {
     set({
-      operationalReady: !isGrarfWebRenderer(),
+      operationalReady: true,
+      operationalIngestComplete: !isGrarfWebRenderer(),
       manualReady: true,
       hasPromotedInitialSnapshot: !isGrarfWebRenderer()
     });
@@ -45044,6 +45049,12 @@ function parseUpdatedAtMs(updatedAt) {
   const ms2 = Date.parse(updatedAt);
   return Number.isFinite(ms2) ? ms2 : 0;
 }
+function countOperationalGames2(leagues) {
+  return Object.values(leagues).reduce(
+    (total, rows) => total + (Array.isArray(rows) ? rows.length : 0),
+    0
+  );
+}
 function LiveGamesBridge() {
   const hydrate = useLiveGamesStore((s2) => s2.hydrate);
   const lastCloudLeaguesRef = (0, import_react19.useRef)({});
@@ -45101,6 +45112,32 @@ function LiveGamesBridge() {
         }
         hydrate(merged, { source: "grarf_cloud" });
       };
+      if (isGrarfWebRenderer()) {
+        void (async () => {
+          const hydrateIfEmpty = (snap, completeness) => {
+            if (useLiveGamesStore.getState().updatedAt != null) return;
+            hydrate(snap, completeness);
+          };
+          try {
+            const cloud = await prefetchWebOperationalCloudSnapshot();
+            if (cloud && countOperationalGames2(cloud.leagues ?? {}) > 0) {
+              hydrateIfEmpty(normalizeOperationalSnapshot(cloud), {
+                source: "grarf_cloud"
+              });
+              return;
+            }
+          } catch {
+          }
+          try {
+            const priority = await prefetchWebPriorityEspnOperationalSnapshot();
+            hydrateIfEmpty(normalizeOperationalSnapshot(priority), {
+              source: "espn_local_adapter",
+              requestedLeagueCount: WEB_PRIORITY_OPERATIONAL_LEAGUES.length
+            });
+          } catch {
+          }
+        })();
+      }
       const stopCloudPoll = isGrarfWebRenderer() ? registerWebLiveGamesHydrate(cloudHydrate) : startOperationalSnapshotPolling(cloudHydrate);
       const api2 = window.grarf;
       if (!api2?.gamesSubscribe) {
@@ -48134,7 +48171,6 @@ function useCenterPaneApplicationModeSync() {
     if (!OPERATIONAL_AUTO_CENTER_PANE_MODES.has(mode)) return;
     if (isGrarfWebRenderer()) {
       if (source === "explicit" || initialDefaultApplied) return;
-      if (updatedAt == null) return;
       applyInitialDefaultFromGamesSpine(leagues);
       return;
     }
@@ -65555,6 +65591,15 @@ function buildVisibleSpineGames(input) {
 // ../grarf/desktop/src/hooks/useHomeGamesColumnFilter.ts
 init_isGrarfWebRenderer();
 
+// ../grarf/desktop/src/lib/gamesSpine/resolveCanonicalWebHomeGamesSpineOperationalMode.ts
+init_define_import_meta_env();
+init_isGrarfWebRenderer();
+var CANONICAL_WEB_HOME_GAMES_SPINE_OPERATIONAL_MODE = "LIVE";
+function resolveCanonicalWebHomeGamesSpineOperationalMode(storeMode, briefingScrollContext) {
+  if (!isGrarfWebRenderer() || briefingScrollContext !== "home") return storeMode;
+  return CANONICAL_WEB_HOME_GAMES_SPINE_OPERATIONAL_MODE;
+}
+
 // ../grarf/desktop/src/store/scheduleCacheStore.ts
 init_define_import_meta_env();
 var import_zustand41 = __toESM(require_zustand(), 1);
@@ -65589,7 +65634,11 @@ function useHomeGamesColumnFilter() {
     setFilterState(next);
     writeHomeGamesFilterToSession(next);
   }, []);
-  const operationalMode = useOperationalModeStore((st2) => st2.mode);
+  const storeOperationalMode = useOperationalModeStore((st2) => st2.mode);
+  const operationalMode = resolveCanonicalWebHomeGamesSpineOperationalMode(
+    storeOperationalMode,
+    "home"
+  );
   const liveLeagues = useLiveGamesStore((s2) => s2.leagues);
   const scheduleByDate = useScheduleCacheStore((s2) => s2.byDate);
   const selectedDate = useCommandBriefingStore((s2) => s2.selectedDate);
@@ -69449,9 +69498,14 @@ var HomeLeagueSpineSection = (0, import_react101.memo)(function HomeLeagueSpineS
   const bundle = useEditorialStore((s2) => s2.bundle);
   const editMode = useEditorialStore((s2) => s2.editMode);
   const selectedDate = useCommandBriefingStore((s2) => s2.selectedDate);
-  const operationalMode = useOperationalModeStore((s2) => s2.mode);
+  const storeOperationalMode = useOperationalModeStore((s2) => s2.mode);
+  const operationalMode = resolveCanonicalWebHomeGamesSpineOperationalMode(
+    storeOperationalMode,
+    briefingScrollContext
+  );
   const manualLeMansRefreshMs = useManualLeMans2026LiveRefreshMs();
   const manualTourDeFranceRefreshMs = useManualTourDeFranceLiveRefreshMs();
+  const operationalIngestComplete = useGamesSpineRenderStore((s2) => s2.operationalIngestComplete);
   const gamesMode = useGamesSpineDisplayStore((state3) => state3.gamesMode);
   const cardListClass = isGrarfWebRenderer() ? resolveGamesSpineCardListLayoutClass(gamesMode) : GAMES_SPINE_CARD_LIST_CLASS;
   const useOperationalModePipeline = briefingScrollContext === "home" || briefingScrollContext === "league";
@@ -69598,7 +69652,8 @@ var HomeLeagueSpineSection = (0, import_react101.memo)(function HomeLeagueSpineS
     observer.observe(el);
     return () => observer.disconnect();
   }, [league, visibleGames.length, parentScrolls]);
-  if (visibleGames.length === 0) return null;
+  const isWebOperationalLoading = isGrarfWebRenderer() && briefingScrollContext === "home" && !operationalIngestComplete && visibleGames.length === 0;
+  if (visibleGames.length === 0 && !isWebOperationalLoading) return null;
   const hideSpineGeneratedSummaryHeadline = briefingScrollContext === "league" && operationalMode === "CATCH_UP";
   const isWebSpine = isGrarfWebRenderer();
   const stickyTop = parentScrolls ? briefingScrollContext === "league" ? "top-[3.25rem]" : isFirstLeagueInSpine && isWebSpine && compactFirstLeagueStickyTop ? HOME_GAMES_SPINE_FIRST_LEAGUE_STICKY_TOP : HOME_GAMES_SPINE_LEAGUE_STICKY_TOP : "top-0";
@@ -69693,7 +69748,7 @@ var HomeLeagueSpineSection = (0, import_react101.memo)(function HomeLeagueSpineS
                   "min-h-0 min-w-0 w-full max-w-full",
                   collapsed ? "overflow-hidden" : "overflow-visible"
                 ),
-                children: /* @__PURE__ */ (0, import_jsx_runtime86.jsx)(
+                children: /* @__PURE__ */ (0, import_jsx_runtime86.jsxs)(
                   "div",
                   {
                     className: cn2(
@@ -69701,45 +69756,48 @@ var HomeLeagueSpineSection = (0, import_react101.memo)(function HomeLeagueSpineS
                       cardListClass,
                       "min-h-min mx-1 px-2 py-2 transition-opacity duration-150"
                     ),
-                    children: visibleGames.map((g2) => {
-                      const narrative = resolveEditorialGameNarrative(g2, bundle, selectedDate);
-                      const spineNarrativeText = hideSpineGeneratedSummaryHeadline && narrative?.source === "generated" ? "" : narrative?.text?.trim() ?? "";
-                      const showNarrative = (editMode || Boolean(spineNarrativeText)) && !isDemoWnbaWhipAroundGameId(g2.id);
-                      const groupTimeLabel = prepareGroupStarters.get(g2.id);
-                      const isGroupStart = groupTimeLabel !== void 0;
-                      const hideGroupedPrepareTime = g2.status === "scheduled" && isPrepareGrouped && !isGroupStart;
-                      if (bestGameRightNowFeatured && bestGameRightNowFeatured.game.id === g2.id) {
-                        return /* @__PURE__ */ (0, import_jsx_runtime86.jsx)(
-                          BestGameRightNowSection,
-                          {
-                            result: bestGameRightNowFeatured,
-                            selectedId,
-                            onOpen,
-                            onWatchLive,
-                            canShowWatchLive
-                          },
-                          g2.id
-                        );
-                      }
-                      return /* @__PURE__ */ (0, import_jsx_runtime86.jsxs)("div", { className: HOME_GAMES_SPINE_GAME_STACK, children: [
-                        /* @__PURE__ */ (0, import_jsx_runtime86.jsx)(
-                          GameRow,
-                          {
-                            game: g2,
-                            variant: "rail",
-                            homeSpineParity: true,
-                            hideTime: hideGroupedPrepareTime,
-                            isSelected: selectedId === g2.id,
-                            onOpen,
-                            onWatchLive,
-                            canShowWatchLive,
-                            showSpineNarrative: showNarrative,
-                            hideSpineGeneratedSummaryHeadline
-                          }
-                        ),
-                        g2.oddsSummary && !spineNarrativeText && !editMode ? /* @__PURE__ */ (0, import_jsx_runtime86.jsx)("div", { className: "px-1 py-0.5 text-[8px] tracking-wide text-textdim/90", children: g2.oddsSummary }) : null
-                      ] }, g2.id);
-                    })
+                    children: [
+                      isWebOperationalLoading ? /* @__PURE__ */ (0, import_jsx_runtime86.jsx)("p", { className: "px-1 py-2 text-[9px] tracking-[0.12em] text-[#5f7a7a]", children: "(loading\u2026)" }) : null,
+                      visibleGames.map((g2) => {
+                        const narrative = resolveEditorialGameNarrative(g2, bundle, selectedDate);
+                        const spineNarrativeText = hideSpineGeneratedSummaryHeadline && narrative?.source === "generated" ? "" : narrative?.text?.trim() ?? "";
+                        const showNarrative = (editMode || Boolean(spineNarrativeText)) && !isDemoWnbaWhipAroundGameId(g2.id);
+                        const groupTimeLabel = prepareGroupStarters.get(g2.id);
+                        const isGroupStart = groupTimeLabel !== void 0;
+                        const hideGroupedPrepareTime = g2.status === "scheduled" && isPrepareGrouped && !isGroupStart;
+                        if (bestGameRightNowFeatured && bestGameRightNowFeatured.game.id === g2.id) {
+                          return /* @__PURE__ */ (0, import_jsx_runtime86.jsx)(
+                            BestGameRightNowSection,
+                            {
+                              result: bestGameRightNowFeatured,
+                              selectedId,
+                              onOpen,
+                              onWatchLive,
+                              canShowWatchLive
+                            },
+                            g2.id
+                          );
+                        }
+                        return /* @__PURE__ */ (0, import_jsx_runtime86.jsxs)("div", { className: HOME_GAMES_SPINE_GAME_STACK, children: [
+                          /* @__PURE__ */ (0, import_jsx_runtime86.jsx)(
+                            GameRow,
+                            {
+                              game: g2,
+                              variant: "rail",
+                              homeSpineParity: true,
+                              hideTime: hideGroupedPrepareTime,
+                              isSelected: selectedId === g2.id,
+                              onOpen,
+                              onWatchLive,
+                              canShowWatchLive,
+                              showSpineNarrative: showNarrative,
+                              hideSpineGeneratedSummaryHeadline
+                            }
+                          ),
+                          g2.oddsSummary && !spineNarrativeText && !editMode ? /* @__PURE__ */ (0, import_jsx_runtime86.jsx)("div", { className: "px-1 py-0.5 text-[8px] tracking-wide text-textdim/90", children: g2.oddsSummary }) : null
+                        ] }, g2.id);
+                      })
+                    ]
                   }
                 )
               }
@@ -70651,8 +70709,9 @@ function resolveManualInsertionIndex(sections, manual, operationalLeagueOrder) {
   }
   return sections.length;
 }
-function mergeGamesSpineSectionsByPriority(operationalLeagueOrder, mergedLeagues, manualSections) {
+function mergeGamesSpineSectionsByPriority(operationalLeagueOrder, mergedLeagues, manualSections, skeletonOperationalLeagues) {
   const operationalWithGames = operationalLeagueOrder.filter((key2) => {
+    if (skeletonOperationalLeagues?.has(key2)) return true;
     const games = mergedLeagues[key2] ?? [];
     if (filterGamesSpineSlateForOperationalSportsDay(games).length > 0) return true;
     return isGrarfWebRenderer() && filterGamesSpineSlateForUpcoming(games).length > 0;
@@ -71396,6 +71455,17 @@ var GAMES_SPINE_PERMANENT_BROWSER_SOCIAL_RAIL_FEEDS = [
   }
 ];
 
+// ../grarf/desktop/src/lib/gamesSpine/resolveWebGamesSpineBootstrapOperationalLeagueOrder.ts
+init_define_import_meta_env();
+var WEB_GAMES_SPINE_BOOTSTRAP_LEAGUES = [
+  ...WEB_PRIORITY_OPERATIONAL_LEAGUES,
+  WIMBLEDON_MEN_GAMES_SPINE_LEAGUE,
+  WIMBLEDON_WOMEN_GAMES_SPINE_LEAGUE
+];
+function resolveWebGamesSpineBootstrapOperationalLeagueOrder() {
+  return sortGrarfLeagueKeysByImportance([...new Set(WEB_GAMES_SPINE_BOOTSTRAP_LEAGUES)]);
+}
+
 // ../grarf/desktop/src/components/homeMvp/HomeGamesToday.tsx
 var import_jsx_runtime97 = __toESM(require_jsx_runtime(), 1);
 function useAnyGamesLoaded() {
@@ -71441,6 +71511,8 @@ function HomeGamesToday({
   const renderReady = useGamesSpineRenderStore(
     (s2) => s2.operationalReady && s2.manualReady
   );
+  const operationalIngestComplete = useGamesSpineRenderStore((s2) => s2.operationalIngestComplete);
+  const webSpineBootstrapActive = isGrarfWebRenderer() && !operationalIngestComplete;
   const showEditorialControls = isGrarfAdmin();
   const { isCollapsed, toggleCollapsed, setAllLeaguesCollapsed } = useGamesSpineCollapse(filter);
   const leagues = useLiveGamesStore((s2) => s2.leagues);
@@ -71452,7 +71524,11 @@ function HomeGamesToday({
   const manualRefreshMs = useManualGamesSpineLiveRefreshMs();
   const manualLeMansRefreshMs = useManualLeMans2026LiveRefreshMs();
   const manualTourDeFranceRefreshMs = useManualTourDeFranceLiveRefreshMs();
-  const operationalMode = useOperationalModeStore((s2) => s2.mode);
+  const storeOperationalMode = useOperationalModeStore((s2) => s2.mode);
+  const operationalMode = resolveCanonicalWebHomeGamesSpineOperationalMode(
+    storeOperationalMode,
+    "home"
+  );
   const computedBestGameRightNow = useHomeBestGameRightNowResult();
   const mergedLeagues = (0, import_react112.useMemo)(
     () => applyWimbledonGamesSpinePresentationPartition(mergeOperationalLeagueGames(leagues)),
@@ -71467,12 +71543,19 @@ function HomeGamesToday({
       (key2) => filterGamesSpineSlateForOperationalSportsDay(merged[key2] ?? []).length > 0
     );
     const seen = new Set(base);
-    const withAdjunct = [
+    let withAdjunct = [
       ...base,
       ...adjunctVisible.filter((key2) => !seen.has(key2))
     ];
+    if (webSpineBootstrapActive && parentScrolls) {
+      for (const key2 of resolveWebGamesSpineBootstrapOperationalLeagueOrder()) {
+        if (seen.has(key2)) continue;
+        seen.add(key2);
+        withAdjunct.push(key2);
+      }
+    }
     return withoutGamesSpineHiddenLeagues(withAdjunct);
-  }, [activeLeagueId, parentScrolls, mergedLeagues]);
+  }, [activeLeagueId, parentScrolls, mergedLeagues, webSpineBootstrapActive]);
   const spineContextLabel = (0, import_react112.useMemo)(
     () => parentScrolls ? "All Sports" : resolveHomeActiveLeagueSpineLabel(activeLeagueId),
     [activeLeagueId, parentScrolls]
@@ -71481,9 +71564,21 @@ function HomeGamesToday({
     () => convertManualGamesSpineDocument(manualDocument, new Date(manualRefreshMs)),
     [manualDocument, manualRefreshMs]
   );
+  const skeletonOperationalLeagues = (0, import_react112.useMemo)(() => {
+    if (!webSpineBootstrapActive || !parentScrolls) return void 0;
+    const withGames = new Set(resolveGamesSpineOperationalLeagueOrder(mergedLeagues));
+    return new Set(
+      resolveWebGamesSpineBootstrapOperationalLeagueOrder().filter((key2) => !withGames.has(key2))
+    );
+  }, [webSpineBootstrapActive, parentScrolls, mergedLeagues]);
   const spineSections = (0, import_react112.useMemo)(
-    () => mergeGamesSpineSectionsByPriority(spineLeagueOrder, mergedLeagues, manualSections),
-    [spineLeagueOrder, mergedLeagues, manualSections]
+    () => mergeGamesSpineSectionsByPriority(
+      spineLeagueOrder,
+      mergedLeagues,
+      manualSections,
+      skeletonOperationalLeagues
+    ),
+    [spineLeagueOrder, mergedLeagues, manualSections, skeletonOperationalLeagues]
   );
   const gamesSpineLeagueCollapseKeys = (0, import_react112.useMemo)(() => {
     if (!isGrarfWebRenderer()) return [];
@@ -71707,11 +71802,11 @@ function HomeGamesToday({
   ] }) : null;
   const bestGameFeaturedInFeaturedSection = gamesSpineBestGamePlacement.featuredInlineResult != null;
   const gamesSpineMain = /* @__PURE__ */ (0, import_jsx_runtime97.jsxs)(import_jsx_runtime97.Fragment, { children: [
-    !renderReady ? /* @__PURE__ */ (0, import_jsx_runtime97.jsx)("div", { className: "border-b border-line/60 px-2 py-6 text-center text-[9px] tracking-[0.14em] text-[#5f7a7a]", children: "Loading scoreboard\u2026" }) : !anyGames ? /* @__PURE__ */ (0, import_jsx_runtime97.jsx)("div", { className: "border-b border-line/60 px-2 py-3 text-[9px] leading-relaxed text-textdim", children: "No slate loaded. Open the desktop app to sync ESPN scoreboards from the main process." }) : spineSections.length === 0 && featuredFilteredCount === 0 ? /* @__PURE__ */ (0, import_jsx_runtime97.jsxs)("div", { className: "border-b border-line/60 px-2 py-6 text-center text-[9px] tracking-[0.14em] text-[#5f7a7a]", children: [
+    !renderReady ? /* @__PURE__ */ (0, import_jsx_runtime97.jsx)("div", { className: "border-b border-line/60 px-2 py-6 text-center text-[9px] tracking-[0.14em] text-[#5f7a7a]", children: "Loading scoreboard\u2026" }) : !anyGames && !webSpineBootstrapActive ? /* @__PURE__ */ (0, import_jsx_runtime97.jsx)("div", { className: "border-b border-line/60 px-2 py-3 text-[9px] leading-relaxed text-textdim", children: "No slate loaded. Open the desktop app to sync ESPN scoreboards from the main process." }) : spineSections.length === 0 && featuredFilteredCount === 0 && !webSpineBootstrapActive ? /* @__PURE__ */ (0, import_jsx_runtime97.jsxs)("div", { className: "border-b border-line/60 px-2 py-6 text-center text-[9px] tracking-[0.14em] text-[#5f7a7a]", children: [
       "No scoreboard for ",
       spineContextLabel,
       "."
-    ] }) : totalFilteredCount === 0 ? /* @__PURE__ */ (0, import_jsx_runtime97.jsx)("div", { className: "border-b border-line/60 px-2 py-6 text-center text-[9px] tracking-[0.14em] text-[#5f7a7a] transition-opacity duration-150", children: homeGamesFilterEmptyLabel(filter) }) : /* @__PURE__ */ (0, import_jsx_runtime97.jsxs)("div", { className: "overflow-visible transition-opacity duration-150 [&>section:first-of-type]:mt-2 [&>section:not(:first-of-type)]:mt-4", children: [
+    ] }) : totalFilteredCount === 0 && !webSpineBootstrapActive ? /* @__PURE__ */ (0, import_jsx_runtime97.jsx)("div", { className: "border-b border-line/60 px-2 py-6 text-center text-[9px] tracking-[0.14em] text-[#5f7a7a] transition-opacity duration-150", children: homeGamesFilterEmptyLabel(filter) }) : /* @__PURE__ */ (0, import_jsx_runtime97.jsxs)("div", { className: "overflow-visible transition-opacity duration-150 [&>section:first-of-type]:mt-2 [&>section:not(:first-of-type)]:mt-4", children: [
       gamesSpineBestGamePlacement.standaloneResult ? /* @__PURE__ */ (0, import_jsx_runtime97.jsx)(
         BestGameRightNowSection,
         {
