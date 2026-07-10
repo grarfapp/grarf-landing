@@ -1,20 +1,22 @@
 import { useMemo, useState } from "react";
-import { OPERATIONS } from "../../../../grarf/desktop/src/data/operations";
-import { getOperationalSportsDayDateKey } from "../../../../grarf/desktop/shared/operationalSlateDate.js";
 import type {
   OperationsSnapshotGame,
   OperationsSnapshotSection,
 } from "../../../../grarf/desktop/src/types/operationsSnapshot";
 import { OperationsConsole } from "../components/OperationsConsole";
 import { OperationsGameIndicatorBadges } from "../components/OperationsGameIndicatorBadges";
+import { OperationsPendingChangesBar } from "../components/OperationsPendingChangesBar";
+import { OperationsSnapshotSearchBar } from "../components/OperationsSnapshotSearchBar";
 import { useAdminOperationsDateSnapshot } from "../hooks/useAdminOperationsDateSnapshot";
-
-function resolveDefaultOperationalDateKey(): string {
-  const configuredDateKeys = Object.keys(OPERATIONS.dates).sort();
-  const sportsDayKey = getOperationalSportsDayDateKey();
-  if (configuredDateKeys.includes(sportsDayKey)) return sportsDayKey;
-  return configuredDateKeys[configuredDateKeys.length - 1] ?? sportsDayKey;
-}
+import { useOperationsPendingChanges } from "../hooks/useOperationsPendingChanges";
+import {
+  resolveDefaultOperationsConsoleDateKey,
+  resolveOperationsConsoleDateKeys,
+} from "../lib/resolveOperationsConsoleDateKeys";
+import {
+  normalizeOperationsSnapshotSearchQuery,
+  searchOperationsSnapshotGames,
+} from "../lib/searchOperationsSnapshotGames";
 
 function formatGameListLabel(game: OperationsSnapshotGame): string {
   const away = game.participants.away.trim();
@@ -24,15 +26,17 @@ function formatGameListLabel(game: OperationsSnapshotGame): string {
 }
 
 export function OperationsModule() {
-  const configuredDateKeys = useMemo(
-    () => Object.keys(OPERATIONS.dates).sort(),
-    []
+  const operationalDateKeys = useMemo(() => resolveOperationsConsoleDateKeys(), []);
+  const [operationalDateKey, setOperationalDateKey] = useState(
+    resolveDefaultOperationsConsoleDateKey
   );
-  const [operationalDateKey, setOperationalDateKey] = useState(resolveDefaultOperationalDateKey);
   const [selectedSectionKey, setSelectedSectionKey] = useState<string | null>(null);
   const [selectedGameKey, setSelectedGameKey] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const { snapshot, loading, error } = useAdminOperationsDateSnapshot(operationalDateKey);
+  const normalizedSearchQuery = normalizeOperationsSnapshotSearchQuery(searchQuery);
+  const isSearchActive = normalizedSearchQuery.length > 0;
 
   const activeSectionKey = useMemo(() => {
     if (!snapshot || snapshot.sections.length === 0) return null;
@@ -51,6 +55,27 @@ export function OperationsModule() {
     if (!snapshot || !selectedGameKey) return null;
     return snapshot.gamesByKey[selectedGameKey] ?? null;
   }, [selectedGameKey, snapshot]);
+
+  const searchResults = useMemo(() => {
+    if (!snapshot || !isSearchActive) return [];
+    return searchOperationsSnapshotGames(snapshot, searchQuery);
+  }, [isSearchActive, searchQuery, snapshot]);
+
+  const visibleGames = isSearchActive ? searchResults : (activeSection?.games ?? []);
+
+  const {
+    activeDraft,
+    currentGameChangeCount,
+    discardActiveGame,
+    discardAll,
+    isGamePending,
+    pendingEdits,
+    pendingGameCount,
+    saveAll,
+    saveAllState,
+    totalPendingFieldChanges,
+    updateField,
+  } = useOperationsPendingChanges(operationalDateKey, selectedGame);
 
   return (
     <>
@@ -72,9 +97,10 @@ export function OperationsModule() {
               setOperationalDateKey(event.target.value);
               setSelectedSectionKey(null);
               setSelectedGameKey(null);
+              setSearchQuery("");
             }}
           >
-            {configuredDateKeys.map((dateKey) => (
+            {operationalDateKeys.map((dateKey) => (
               <option key={dateKey} value={dateKey}>
                 {dateKey}
               </option>
@@ -89,6 +115,17 @@ export function OperationsModule() {
           {error ? <span className="grarf-admin__status grarf-admin__status--error">{error}</span> : null}
         </div>
       </header>
+
+      <OperationsPendingChangesBar
+        pendingEdits={pendingEdits}
+        pendingGameCount={pendingGameCount}
+        totalPendingFieldChanges={totalPendingFieldChanges}
+        saveAllState={saveAllState}
+        onSaveAll={saveAll}
+        onDiscardAll={discardAll}
+      />
+
+      <OperationsSnapshotSearchBar value={searchQuery} onChange={setSearchQuery} />
 
       <div className="grarf-admin__operations-body">
         <section className="grarf-admin__panel" aria-label="Operational sections">
@@ -131,41 +168,42 @@ export function OperationsModule() {
         </section>
 
         <section className="grarf-admin__panel" aria-label="Games in section">
-          <div className="grarf-admin__panel-header">Games</div>
+          <div className="grarf-admin__panel-header">
+            {isSearchActive ? "Search Results" : "Games"}
+          </div>
           <div className="grarf-admin__panel-scroll">
-            {!activeSection || activeSection.games.length === 0 ? (
-              <p className="grarf-admin__empty">
-                {loading ? "Loading games…" : "Select a section with games."}
-              </p>
+            {loading ? (
+              <p className="grarf-admin__empty">Loading games…</p>
+            ) : isSearchActive ? (
+              visibleGames.length === 0 ? (
+                <p className="grarf-admin__empty">No games match your search.</p>
+              ) : (
+                <ul className="grarf-admin__list">
+                  {visibleGames.map((game) => (
+                    <GameListItem
+                      key={game.gameKey}
+                      game={game}
+                      isActive={game.gameKey === selectedGameKey}
+                      isGamePending={isGamePending}
+                      showLeague
+                      onSelect={setSelectedGameKey}
+                    />
+                  ))}
+                </ul>
+              )
+            ) : !activeSection || visibleGames.length === 0 ? (
+              <p className="grarf-admin__empty">Select a section with games.</p>
             ) : (
               <ul className="grarf-admin__list">
-                {activeSection.games.map((game) => {
-                  const isActive = game.gameKey === selectedGameKey;
-                  return (
-                    <li key={game.gameKey} className="grarf-admin__list-item">
-                      <button
-                        type="button"
-                        className={
-                          isActive
-                            ? "grarf-admin__list-button grarf-admin__list-button--active"
-                            : "grarf-admin__list-button"
-                        }
-                        onClick={() => setSelectedGameKey(game.gameKey)}
-                      >
-                        <span className="grarf-admin__list-button-row">
-                          <span className="grarf-admin__list-button-label">
-                            {formatGameListLabel(game)}
-                          </span>
-                          <OperationsGameIndicatorBadges game={game} />
-                        </span>
-                        <span className="grarf-admin__list-button-subtitle">
-                          {game.status}
-                          {game.statusLine ? ` · ${game.statusLine}` : ""}
-                        </span>
-                      </button>
-                    </li>
-                  );
-                })}
+                {visibleGames.map((game) => (
+                  <GameListItem
+                    key={game.gameKey}
+                    game={game}
+                    isActive={game.gameKey === selectedGameKey}
+                    isGamePending={isGamePending}
+                    onSelect={setSelectedGameKey}
+                  />
+                ))}
               </ul>
             )}
           </div>
@@ -174,11 +212,15 @@ export function OperationsModule() {
         <section className="grarf-admin__panel" aria-label="Operations Console">
           <div className="grarf-admin__panel-header">Operations Console</div>
           <div className="grarf-admin__panel-scroll">
-            {selectedGame ? (
+            {selectedGame && activeDraft ? (
               <OperationsConsole
                 game={selectedGame}
                 operationalDateKey={operationalDateKey}
                 assembledAt={snapshot?.assembledAt}
+                draft={activeDraft}
+                currentGameChangeCount={currentGameChangeCount}
+                onFieldChange={updateField}
+                onDiscardCurrent={discardActiveGame}
               />
             ) : (
               <p className="grarf-admin__empty">
@@ -189,5 +231,57 @@ export function OperationsModule() {
         </section>
       </div>
     </>
+  );
+}
+
+function GameListItem({
+  game,
+  isActive,
+  isGamePending,
+  showLeague = false,
+  onSelect,
+}: {
+  game: OperationsSnapshotGame;
+  isActive: boolean;
+  isGamePending: (gameKey: string) => boolean;
+  showLeague?: boolean;
+  onSelect: (gameKey: string) => void;
+}) {
+  const hasPendingEdits = isGamePending(game.gameKey);
+
+  return (
+    <li className="grarf-admin__list-item">
+      <button
+        type="button"
+        className={
+          isActive
+            ? "grarf-admin__list-button grarf-admin__list-button--active"
+            : hasPendingEdits
+              ? "grarf-admin__list-button grarf-admin__list-button--pending"
+              : "grarf-admin__list-button"
+        }
+        onClick={() => onSelect(game.gameKey)}
+      >
+        <span className="grarf-admin__list-button-row">
+          <span className="grarf-admin__list-button-label">{formatGameListLabel(game)}</span>
+          {hasPendingEdits ? (
+            <span className="grarf-admin__list-pending-badge" title="Pending edits">
+              Pending
+            </span>
+          ) : null}
+          <OperationsGameIndicatorBadges game={game} />
+        </span>
+        <span className="grarf-admin__list-button-subtitle">
+          {showLeague ? (
+            <>
+              {game.leagueLabel}
+              {" · "}
+            </>
+          ) : null}
+          {game.status}
+          {game.statusLine ? ` · ${game.statusLine}` : ""}
+        </span>
+      </button>
+    </li>
   );
 }

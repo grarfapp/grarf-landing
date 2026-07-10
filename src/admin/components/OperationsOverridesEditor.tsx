@@ -1,15 +1,11 @@
-import { useEffect, useState } from "react";
 import type { OperationsSnapshotGame } from "../../../../grarf/desktop/src/types/operationsSnapshot";
-import {
-  buildOperationalOverrideDraft,
-  type OperationalOverrideDraft,
-} from "../lib/buildOperationalOverrideDraft";
+import type { OperationalOverrideDraft } from "../lib/buildOperationalOverrideDraft";
 
 type OperationsOverridesEditorProps = {
   game: OperationsSnapshotGame;
+  draft: OperationalOverrideDraft;
+  onFieldChange: (field: keyof OperationalOverrideDraft, value: string) => void;
 };
-
-type DraftField = keyof OperationalOverrideDraft;
 
 function ConsoleOverrideTextInput({
   id,
@@ -115,19 +111,11 @@ function ConsoleOverrideSelect({
   );
 }
 
-export function OperationsOverridesEditor({ game }: OperationsOverridesEditorProps) {
-  const [draft, setDraft] = useState<OperationalOverrideDraft>(() =>
-    buildOperationalOverrideDraft(game)
-  );
-
-  useEffect(() => {
-    setDraft(buildOperationalOverrideDraft(game));
-  }, [game.gameKey]);
-
-  const updateField = (field: DraftField, value: string) => {
-    setDraft((current) => ({ ...current, [field]: value }));
-  };
-
+export function OperationsOverridesEditor({
+  game,
+  draft,
+  onFieldChange,
+}: OperationsOverridesEditorProps) {
   const fieldId = (suffix: string) => `ops-override-${game.gameKey}-${suffix}`;
 
   return (
@@ -138,7 +126,7 @@ export function OperationsOverridesEditor({ game }: OperationsOverridesEditorPro
         value={draft.primaryStream}
         placeholder="Stream URL or channel URL"
         monospace
-        onChange={(value) => updateField("primaryStream", value)}
+        onChange={(value) => onFieldChange("primaryStream", value)}
       />
       <ConsoleOverrideTextarea
         id={fieldId("alternative-streams")}
@@ -147,14 +135,14 @@ export function OperationsOverridesEditor({ game }: OperationsOverridesEditorPro
         placeholder="One stream per line (Display Name — URL)"
         rows={4}
         monospace
-        onChange={(value) => updateField("alternativeStreams", value)}
+        onChange={(value) => onFieldChange("alternativeStreams", value)}
       />
       <ConsoleOverrideTextInput
         id={fieldId("broadcast-override")}
         label="Broadcast Override"
         value={draft.broadcastOverride}
         placeholder="Comma-separated broadcast labels"
-        onChange={(value) => updateField("broadcastOverride", value)}
+        onChange={(value) => onFieldChange("broadcastOverride", value)}
       />
       <ConsoleOverrideTextInput
         id={fieldId("center-pane-url")}
@@ -162,19 +150,19 @@ export function OperationsOverridesEditor({ game }: OperationsOverridesEditorPro
         value={draft.centerPaneUrlWhenGameCardClicked}
         placeholder="https://"
         monospace
-        onChange={(value) => updateField("centerPaneUrlWhenGameCardClicked", value)}
+        onChange={(value) => onFieldChange("centerPaneUrlWhenGameCardClicked", value)}
       />
       <ConsoleOverrideSelect
         id={fieldId("center-pane")}
         label="Center Pane"
         value={draft.centerPane}
-        onChange={(value) => updateField("centerPane", value)}
+        onChange={(value) => onFieldChange("centerPane", value)}
       />
       <ConsoleOverrideSelect
         id={fieldId("browser-tab")}
         label="Browser Tab"
         value={draft.browserTab}
-        onChange={(value) => updateField("browserTab", value)}
+        onChange={(value) => onFieldChange("browserTab", value)}
       />
       <ConsoleOverrideTextarea
         id={fieldId("manual-highlights")}
@@ -182,7 +170,7 @@ export function OperationsOverridesEditor({ game }: OperationsOverridesEditorPro
         value={draft.manualHighlights}
         placeholder="Highlights configuration or notes"
         rows={3}
-        onChange={(value) => updateField("manualHighlights", value)}
+        onChange={(value) => onFieldChange("manualHighlights", value)}
       />
       <ConsoleOverrideTextarea
         id={fieldId("manual-social-posts")}
@@ -190,7 +178,7 @@ export function OperationsOverridesEditor({ game }: OperationsOverridesEditorPro
         value={draft.manualSocialPosts}
         placeholder="Social post references or copy"
         rows={3}
-        onChange={(value) => updateField("manualSocialPosts", value)}
+        onChange={(value) => onFieldChange("manualSocialPosts", value)}
       />
       <ConsoleOverrideTextarea
         id={fieldId("operational-notes")}
@@ -198,7 +186,7 @@ export function OperationsOverridesEditor({ game }: OperationsOverridesEditorPro
         value={draft.operationalNotes}
         placeholder="Internal operator notes"
         rows={4}
-        onChange={(value) => updateField("operationalNotes", value)}
+        onChange={(value) => onFieldChange("operationalNotes", value)}
       />
     </div>
   );

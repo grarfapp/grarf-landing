@@ -950,11 +950,11 @@ var require_react_development = __commonJS({
       exports.useDeferredValue = function(value, initialValue) {
         return resolveDispatcher().useDeferredValue(value, initialValue);
       };
-      exports.useEffect = function(create, deps) {
-        null == create && console.warn(
+      exports.useEffect = function(create2, deps) {
+        null == create2 && console.warn(
           "React Hook useEffect requires an effect callback. Did you forget to pass a callback to the hook?"
         );
-        return resolveDispatcher().useEffect(create, deps);
+        return resolveDispatcher().useEffect(create2, deps);
       };
       exports.useEffectEvent = function(callback) {
         return resolveDispatcher().useEffectEvent(callback);
@@ -962,23 +962,23 @@ var require_react_development = __commonJS({
       exports.useId = function() {
         return resolveDispatcher().useId();
       };
-      exports.useImperativeHandle = function(ref, create, deps) {
-        return resolveDispatcher().useImperativeHandle(ref, create, deps);
+      exports.useImperativeHandle = function(ref, create2, deps) {
+        return resolveDispatcher().useImperativeHandle(ref, create2, deps);
       };
-      exports.useInsertionEffect = function(create, deps) {
-        null == create && console.warn(
+      exports.useInsertionEffect = function(create2, deps) {
+        null == create2 && console.warn(
           "React Hook useInsertionEffect requires an effect callback. Did you forget to pass a callback to the hook?"
         );
-        return resolveDispatcher().useInsertionEffect(create, deps);
+        return resolveDispatcher().useInsertionEffect(create2, deps);
       };
-      exports.useLayoutEffect = function(create, deps) {
-        null == create && console.warn(
+      exports.useLayoutEffect = function(create2, deps) {
+        null == create2 && console.warn(
           "React Hook useLayoutEffect requires an effect callback. Did you forget to pass a callback to the hook?"
         );
-        return resolveDispatcher().useLayoutEffect(create, deps);
+        return resolveDispatcher().useLayoutEffect(create2, deps);
       };
-      exports.useMemo = function(create, deps) {
-        return resolveDispatcher().useMemo(create, deps);
+      exports.useMemo = function(create2, deps) {
+        return resolveDispatcher().useMemo(create2, deps);
       };
       exports.useOptimistic = function(passthrough, reducer) {
         return resolveDispatcher().useOptimistic(passthrough, reducer);
@@ -1344,7 +1344,7 @@ var require_react_dom_development = __commonJS({
         return dispatcher;
       }
       "undefined" !== typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ && "function" === typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart && __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart(Error());
-      var React = require_react(), Internals = {
+      var React2 = require_react(), Internals = {
         d: {
           f: noop,
           r: function() {
@@ -1362,7 +1362,7 @@ var require_react_dom_development = __commonJS({
         },
         p: 0,
         findDOMNode: null
-      }, REACT_PORTAL_TYPE = Symbol.for("react.portal"), ReactSharedInternals = React.__CLIENT_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE;
+      }, REACT_PORTAL_TYPE = Symbol.for("react.portal"), ReactSharedInternals = React2.__CLIENT_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE;
       "function" === typeof Map && null != Map.prototype && "function" === typeof Map.prototype.forEach && "function" === typeof Set && null != Set.prototype && "function" === typeof Set.prototype.clear && "function" === typeof Set.prototype.forEach || console.error(
         "React depends on Map and Set built-in types. Make sure that you load a polyfill in older browsers. https://reactjs.org/link/react-polyfills"
       );
@@ -2899,7 +2899,7 @@ var require_react_dom_client_development = __commonJS({
         "number" === type && getActiveElement(node.ownerDocument) === node || node.defaultValue === "" + value || (node.defaultValue = "" + value);
       }
       function validateOptionProps(element, props) {
-        null == props.value && ("object" === typeof props.children && null !== props.children ? React.Children.forEach(props.children, function(child) {
+        null == props.value && ("object" === typeof props.children && null !== props.children ? React2.Children.forEach(props.children, function(child) {
           null == child || "string" === typeof child || "number" === typeof child || "bigint" === typeof child || didWarnInvalidChild || (didWarnInvalidChild = true, console.error(
             "Cannot infer the option value of complex children. Pass a `value` prop or use a plain string as children to <option>."
           ));
@@ -7325,8 +7325,8 @@ var require_react_dom_client_development = __commonJS({
         ))
           hook.memoizedState = getServerSnapshot, didReceiveUpdate = true;
         hook = hook.queue;
-        var create = subscribeToStore.bind(null, fiber, hook, subscribe);
-        updateEffectImpl(2048, Passive, create, [subscribe]);
+        var create2 = subscribeToStore.bind(null, fiber, hook, subscribe);
+        updateEffectImpl(2048, Passive, create2, [subscribe]);
         if (hook.getSnapshot !== getSnapshot || cachedSnapshot || null !== workInProgressHook && workInProgressHook.memoizedState.tag & HasEffect) {
           fiber.flags |= 2048;
           pushSimpleEffect(
@@ -7662,12 +7662,12 @@ var require_react_dom_client_development = __commonJS({
         currentStateHook.memoizedState = action;
         return [stateHook, dispatch, false];
       }
-      function pushSimpleEffect(tag, inst, create, deps) {
-        tag = { tag, create, deps, inst, next: null };
+      function pushSimpleEffect(tag, inst, create2, deps) {
+        tag = { tag, create: create2, deps, inst, next: null };
         inst = currentlyRenderingFiber.updateQueue;
         null === inst && (inst = createFunctionComponentUpdateQueue(), currentlyRenderingFiber.updateQueue = inst);
-        create = inst.lastEffect;
-        null === create ? inst.lastEffect = tag.next = tag : (deps = create.next, create.next = tag, tag.next = deps, inst.lastEffect = tag);
+        create2 = inst.lastEffect;
+        null === create2 ? inst.lastEffect = tag.next = tag : (deps = create2.next, create2.next = tag, tag.next = deps, inst.lastEffect = tag);
         return tag;
       }
       function mountRef(initialValue) {
@@ -7675,29 +7675,29 @@ var require_react_dom_client_development = __commonJS({
         initialValue = { current: initialValue };
         return hook.memoizedState = initialValue;
       }
-      function mountEffectImpl(fiberFlags, hookFlags, create, deps) {
+      function mountEffectImpl(fiberFlags, hookFlags, create2, deps) {
         var hook = mountWorkInProgressHook();
         currentlyRenderingFiber.flags |= fiberFlags;
         hook.memoizedState = pushSimpleEffect(
           HasEffect | hookFlags,
           { destroy: void 0 },
-          create,
+          create2,
           void 0 === deps ? null : deps
         );
       }
-      function updateEffectImpl(fiberFlags, hookFlags, create, deps) {
+      function updateEffectImpl(fiberFlags, hookFlags, create2, deps) {
         var hook = updateWorkInProgressHook();
         deps = void 0 === deps ? null : deps;
         var inst = hook.memoizedState.inst;
-        null !== currentHook && null !== deps && areHookInputsEqual(deps, currentHook.memoizedState.deps) ? hook.memoizedState = pushSimpleEffect(hookFlags, inst, create, deps) : (currentlyRenderingFiber.flags |= fiberFlags, hook.memoizedState = pushSimpleEffect(
+        null !== currentHook && null !== deps && areHookInputsEqual(deps, currentHook.memoizedState.deps) ? hook.memoizedState = pushSimpleEffect(hookFlags, inst, create2, deps) : (currentlyRenderingFiber.flags |= fiberFlags, hook.memoizedState = pushSimpleEffect(
           HasEffect | hookFlags,
           inst,
-          create,
+          create2,
           deps
         ));
       }
-      function mountEffect(create, deps) {
-        (currentlyRenderingFiber.mode & StrictEffectsMode) !== NoMode ? mountEffectImpl(276826112, Passive, create, deps) : mountEffectImpl(8390656, Passive, create, deps);
+      function mountEffect(create2, deps) {
+        (currentlyRenderingFiber.mode & StrictEffectsMode) !== NoMode ? mountEffectImpl(276826112, Passive, create2, deps) : mountEffectImpl(8390656, Passive, create2, deps);
       }
       function useEffectEventImpl(payload) {
         currentlyRenderingFiber.flags |= 4;
@@ -7731,15 +7731,15 @@ var require_react_dom_client_development = __commonJS({
           return ref.impl.apply(void 0, arguments);
         };
       }
-      function mountLayoutEffect(create, deps) {
+      function mountLayoutEffect(create2, deps) {
         var fiberFlags = 4194308;
         (currentlyRenderingFiber.mode & StrictEffectsMode) !== NoMode && (fiberFlags |= 134217728);
-        return mountEffectImpl(fiberFlags, Layout, create, deps);
+        return mountEffectImpl(fiberFlags, Layout, create2, deps);
       }
-      function imperativeHandleEffect(create, ref) {
+      function imperativeHandleEffect(create2, ref) {
         if ("function" === typeof ref) {
-          create = create();
-          var refCleanup = ref(create);
+          create2 = create2();
+          var refCleanup = ref(create2);
           return function() {
             "function" === typeof refCleanup ? refCleanup() : ref(null);
           };
@@ -7748,14 +7748,14 @@ var require_react_dom_client_development = __commonJS({
           return ref.hasOwnProperty("current") || console.error(
             "Expected useImperativeHandle() first argument to either be a ref callback or React.createRef() object. Instead received: %s.",
             "an object with keys {" + Object.keys(ref).join(", ") + "}"
-          ), create = create(), ref.current = create, function() {
+          ), create2 = create2(), ref.current = create2, function() {
             ref.current = null;
           };
       }
-      function mountImperativeHandle(ref, create, deps) {
-        "function" !== typeof create && console.error(
+      function mountImperativeHandle(ref, create2, deps) {
+        "function" !== typeof create2 && console.error(
           "Expected useImperativeHandle() second argument to be a function that creates a handle. Instead received: %s.",
-          null !== create ? typeof create : "null"
+          null !== create2 ? typeof create2 : "null"
         );
         deps = null !== deps && void 0 !== deps ? deps.concat([ref]) : null;
         var fiberFlags = 4194308;
@@ -7763,20 +7763,20 @@ var require_react_dom_client_development = __commonJS({
         mountEffectImpl(
           fiberFlags,
           Layout,
-          imperativeHandleEffect.bind(null, create, ref),
+          imperativeHandleEffect.bind(null, create2, ref),
           deps
         );
       }
-      function updateImperativeHandle(ref, create, deps) {
-        "function" !== typeof create && console.error(
+      function updateImperativeHandle(ref, create2, deps) {
+        "function" !== typeof create2 && console.error(
           "Expected useImperativeHandle() second argument to be a function that creates a handle. Instead received: %s.",
-          null !== create ? typeof create : "null"
+          null !== create2 ? typeof create2 : "null"
         );
         deps = null !== deps && void 0 !== deps ? deps.concat([ref]) : null;
         updateEffectImpl(
           4,
           Layout,
-          imperativeHandleEffect.bind(null, create, ref),
+          imperativeHandleEffect.bind(null, create2, ref),
           deps
         );
       }
@@ -18531,14 +18531,14 @@ var require_react_dom_client_development = __commonJS({
         ));
       }
       "undefined" !== typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ && "function" === typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart && __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart(Error());
-      var Scheduler = require_scheduler(), React = require_react(), ReactDOM = require_react_dom(), assign = Object.assign, REACT_LEGACY_ELEMENT_TYPE = Symbol.for("react.element"), REACT_ELEMENT_TYPE = Symbol.for("react.transitional.element"), REACT_PORTAL_TYPE = Symbol.for("react.portal"), REACT_FRAGMENT_TYPE = Symbol.for("react.fragment"), REACT_STRICT_MODE_TYPE = Symbol.for("react.strict_mode"), REACT_PROFILER_TYPE = Symbol.for("react.profiler"), REACT_CONSUMER_TYPE = Symbol.for("react.consumer"), REACT_CONTEXT_TYPE = Symbol.for("react.context"), REACT_FORWARD_REF_TYPE = Symbol.for("react.forward_ref"), REACT_SUSPENSE_TYPE = Symbol.for("react.suspense"), REACT_SUSPENSE_LIST_TYPE = Symbol.for("react.suspense_list"), REACT_MEMO_TYPE = Symbol.for("react.memo"), REACT_LAZY_TYPE = Symbol.for("react.lazy");
+      var Scheduler = require_scheduler(), React2 = require_react(), ReactDOM = require_react_dom(), assign = Object.assign, REACT_LEGACY_ELEMENT_TYPE = Symbol.for("react.element"), REACT_ELEMENT_TYPE = Symbol.for("react.transitional.element"), REACT_PORTAL_TYPE = Symbol.for("react.portal"), REACT_FRAGMENT_TYPE = Symbol.for("react.fragment"), REACT_STRICT_MODE_TYPE = Symbol.for("react.strict_mode"), REACT_PROFILER_TYPE = Symbol.for("react.profiler"), REACT_CONSUMER_TYPE = Symbol.for("react.consumer"), REACT_CONTEXT_TYPE = Symbol.for("react.context"), REACT_FORWARD_REF_TYPE = Symbol.for("react.forward_ref"), REACT_SUSPENSE_TYPE = Symbol.for("react.suspense"), REACT_SUSPENSE_LIST_TYPE = Symbol.for("react.suspense_list"), REACT_MEMO_TYPE = Symbol.for("react.memo"), REACT_LAZY_TYPE = Symbol.for("react.lazy");
       Symbol.for("react.scope");
       var REACT_ACTIVITY_TYPE = Symbol.for("react.activity");
       Symbol.for("react.legacy_hidden");
       Symbol.for("react.tracing_marker");
       var REACT_MEMO_CACHE_SENTINEL = Symbol.for("react.memo_cache_sentinel");
       Symbol.for("react.view_transition");
-      var MAYBE_ITERATOR_SYMBOL = Symbol.iterator, REACT_CLIENT_REFERENCE = Symbol.for("react.client.reference"), isArrayImpl = Array.isArray, ReactSharedInternals = React.__CLIENT_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE, ReactDOMSharedInternals = ReactDOM.__DOM_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE, NotPending = Object.freeze({
+      var MAYBE_ITERATOR_SYMBOL = Symbol.iterator, REACT_CLIENT_REFERENCE = Symbol.for("react.client.reference"), isArrayImpl = Array.isArray, ReactSharedInternals = React2.__CLIENT_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE, ReactDOMSharedInternals = ReactDOM.__DOM_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE, NotPending = Object.freeze({
         pending: false,
         data: null,
         method: null,
@@ -19837,10 +19837,10 @@ var require_react_dom_client_development = __commonJS({
         callComponentWillUnmount
       ), callCreate = {
         react_stack_bottom_frame: function(effect) {
-          var create = effect.create;
+          var create2 = effect.create;
           effect = effect.inst;
-          create = create();
-          return effect.destroy = create;
+          create2 = create2();
+          return effect.destroy = create2;
         }
       }, callCreateInDEV = callCreate.react_stack_bottom_frame.bind(callCreate), callDestroy = {
         react_stack_bottom_frame: function(current2, nearestMountedAncestor, destroy) {
@@ -19950,38 +19950,38 @@ var require_react_dom_client_development = __commonJS({
           mountHookTypesDev();
           return readContext(context);
         },
-        useEffect: function(create, deps) {
+        useEffect: function(create2, deps) {
           currentHookNameInDev = "useEffect";
           mountHookTypesDev();
           checkDepsAreArrayDev(deps);
-          return mountEffect(create, deps);
+          return mountEffect(create2, deps);
         },
-        useImperativeHandle: function(ref, create, deps) {
+        useImperativeHandle: function(ref, create2, deps) {
           currentHookNameInDev = "useImperativeHandle";
           mountHookTypesDev();
           checkDepsAreArrayDev(deps);
-          return mountImperativeHandle(ref, create, deps);
+          return mountImperativeHandle(ref, create2, deps);
         },
-        useInsertionEffect: function(create, deps) {
+        useInsertionEffect: function(create2, deps) {
           currentHookNameInDev = "useInsertionEffect";
           mountHookTypesDev();
           checkDepsAreArrayDev(deps);
-          mountEffectImpl(4, Insertion, create, deps);
+          mountEffectImpl(4, Insertion, create2, deps);
         },
-        useLayoutEffect: function(create, deps) {
+        useLayoutEffect: function(create2, deps) {
           currentHookNameInDev = "useLayoutEffect";
           mountHookTypesDev();
           checkDepsAreArrayDev(deps);
-          return mountLayoutEffect(create, deps);
+          return mountLayoutEffect(create2, deps);
         },
-        useMemo: function(create, deps) {
+        useMemo: function(create2, deps) {
           currentHookNameInDev = "useMemo";
           mountHookTypesDev();
           checkDepsAreArrayDev(deps);
           var prevDispatcher = ReactSharedInternals.H;
           ReactSharedInternals.H = InvalidNestedHooksDispatcherOnMountInDEV;
           try {
-            return mountMemo(create, deps);
+            return mountMemo(create2, deps);
           } finally {
             ReactSharedInternals.H = prevDispatcher;
           }
@@ -20085,33 +20085,33 @@ var require_react_dom_client_development = __commonJS({
           updateHookTypesDev();
           return readContext(context);
         },
-        useEffect: function(create, deps) {
+        useEffect: function(create2, deps) {
           currentHookNameInDev = "useEffect";
           updateHookTypesDev();
-          return mountEffect(create, deps);
+          return mountEffect(create2, deps);
         },
-        useImperativeHandle: function(ref, create, deps) {
+        useImperativeHandle: function(ref, create2, deps) {
           currentHookNameInDev = "useImperativeHandle";
           updateHookTypesDev();
-          return mountImperativeHandle(ref, create, deps);
+          return mountImperativeHandle(ref, create2, deps);
         },
-        useInsertionEffect: function(create, deps) {
+        useInsertionEffect: function(create2, deps) {
           currentHookNameInDev = "useInsertionEffect";
           updateHookTypesDev();
-          mountEffectImpl(4, Insertion, create, deps);
+          mountEffectImpl(4, Insertion, create2, deps);
         },
-        useLayoutEffect: function(create, deps) {
+        useLayoutEffect: function(create2, deps) {
           currentHookNameInDev = "useLayoutEffect";
           updateHookTypesDev();
-          return mountLayoutEffect(create, deps);
+          return mountLayoutEffect(create2, deps);
         },
-        useMemo: function(create, deps) {
+        useMemo: function(create2, deps) {
           currentHookNameInDev = "useMemo";
           updateHookTypesDev();
           var prevDispatcher = ReactSharedInternals.H;
           ReactSharedInternals.H = InvalidNestedHooksDispatcherOnMountInDEV;
           try {
-            return mountMemo(create, deps);
+            return mountMemo(create2, deps);
           } finally {
             ReactSharedInternals.H = prevDispatcher;
           }
@@ -20215,33 +20215,33 @@ var require_react_dom_client_development = __commonJS({
           updateHookTypesDev();
           return readContext(context);
         },
-        useEffect: function(create, deps) {
+        useEffect: function(create2, deps) {
           currentHookNameInDev = "useEffect";
           updateHookTypesDev();
-          updateEffectImpl(2048, Passive, create, deps);
+          updateEffectImpl(2048, Passive, create2, deps);
         },
-        useImperativeHandle: function(ref, create, deps) {
+        useImperativeHandle: function(ref, create2, deps) {
           currentHookNameInDev = "useImperativeHandle";
           updateHookTypesDev();
-          return updateImperativeHandle(ref, create, deps);
+          return updateImperativeHandle(ref, create2, deps);
         },
-        useInsertionEffect: function(create, deps) {
+        useInsertionEffect: function(create2, deps) {
           currentHookNameInDev = "useInsertionEffect";
           updateHookTypesDev();
-          return updateEffectImpl(4, Insertion, create, deps);
+          return updateEffectImpl(4, Insertion, create2, deps);
         },
-        useLayoutEffect: function(create, deps) {
+        useLayoutEffect: function(create2, deps) {
           currentHookNameInDev = "useLayoutEffect";
           updateHookTypesDev();
-          return updateEffectImpl(4, Layout, create, deps);
+          return updateEffectImpl(4, Layout, create2, deps);
         },
-        useMemo: function(create, deps) {
+        useMemo: function(create2, deps) {
           currentHookNameInDev = "useMemo";
           updateHookTypesDev();
           var prevDispatcher = ReactSharedInternals.H;
           ReactSharedInternals.H = InvalidNestedHooksDispatcherOnUpdateInDEV;
           try {
-            return updateMemo(create, deps);
+            return updateMemo(create2, deps);
           } finally {
             ReactSharedInternals.H = prevDispatcher;
           }
@@ -20345,33 +20345,33 @@ var require_react_dom_client_development = __commonJS({
           updateHookTypesDev();
           return readContext(context);
         },
-        useEffect: function(create, deps) {
+        useEffect: function(create2, deps) {
           currentHookNameInDev = "useEffect";
           updateHookTypesDev();
-          updateEffectImpl(2048, Passive, create, deps);
+          updateEffectImpl(2048, Passive, create2, deps);
         },
-        useImperativeHandle: function(ref, create, deps) {
+        useImperativeHandle: function(ref, create2, deps) {
           currentHookNameInDev = "useImperativeHandle";
           updateHookTypesDev();
-          return updateImperativeHandle(ref, create, deps);
+          return updateImperativeHandle(ref, create2, deps);
         },
-        useInsertionEffect: function(create, deps) {
+        useInsertionEffect: function(create2, deps) {
           currentHookNameInDev = "useInsertionEffect";
           updateHookTypesDev();
-          return updateEffectImpl(4, Insertion, create, deps);
+          return updateEffectImpl(4, Insertion, create2, deps);
         },
-        useLayoutEffect: function(create, deps) {
+        useLayoutEffect: function(create2, deps) {
           currentHookNameInDev = "useLayoutEffect";
           updateHookTypesDev();
-          return updateEffectImpl(4, Layout, create, deps);
+          return updateEffectImpl(4, Layout, create2, deps);
         },
-        useMemo: function(create, deps) {
+        useMemo: function(create2, deps) {
           currentHookNameInDev = "useMemo";
           updateHookTypesDev();
           var prevDispatcher = ReactSharedInternals.H;
           ReactSharedInternals.H = InvalidNestedHooksDispatcherOnRerenderInDEV;
           try {
-            return updateMemo(create, deps);
+            return updateMemo(create2, deps);
           } finally {
             ReactSharedInternals.H = prevDispatcher;
           }
@@ -20481,38 +20481,38 @@ var require_react_dom_client_development = __commonJS({
           mountHookTypesDev();
           return readContext(context);
         },
-        useEffect: function(create, deps) {
+        useEffect: function(create2, deps) {
           currentHookNameInDev = "useEffect";
           warnInvalidHookAccess();
           mountHookTypesDev();
-          return mountEffect(create, deps);
+          return mountEffect(create2, deps);
         },
-        useImperativeHandle: function(ref, create, deps) {
+        useImperativeHandle: function(ref, create2, deps) {
           currentHookNameInDev = "useImperativeHandle";
           warnInvalidHookAccess();
           mountHookTypesDev();
-          return mountImperativeHandle(ref, create, deps);
+          return mountImperativeHandle(ref, create2, deps);
         },
-        useInsertionEffect: function(create, deps) {
+        useInsertionEffect: function(create2, deps) {
           currentHookNameInDev = "useInsertionEffect";
           warnInvalidHookAccess();
           mountHookTypesDev();
-          mountEffectImpl(4, Insertion, create, deps);
+          mountEffectImpl(4, Insertion, create2, deps);
         },
-        useLayoutEffect: function(create, deps) {
+        useLayoutEffect: function(create2, deps) {
           currentHookNameInDev = "useLayoutEffect";
           warnInvalidHookAccess();
           mountHookTypesDev();
-          return mountLayoutEffect(create, deps);
+          return mountLayoutEffect(create2, deps);
         },
-        useMemo: function(create, deps) {
+        useMemo: function(create2, deps) {
           currentHookNameInDev = "useMemo";
           warnInvalidHookAccess();
           mountHookTypesDev();
           var prevDispatcher = ReactSharedInternals.H;
           ReactSharedInternals.H = InvalidNestedHooksDispatcherOnMountInDEV;
           try {
-            return mountMemo(create, deps);
+            return mountMemo(create2, deps);
           } finally {
             ReactSharedInternals.H = prevDispatcher;
           }
@@ -20636,38 +20636,38 @@ var require_react_dom_client_development = __commonJS({
           updateHookTypesDev();
           return readContext(context);
         },
-        useEffect: function(create, deps) {
+        useEffect: function(create2, deps) {
           currentHookNameInDev = "useEffect";
           warnInvalidHookAccess();
           updateHookTypesDev();
-          updateEffectImpl(2048, Passive, create, deps);
+          updateEffectImpl(2048, Passive, create2, deps);
         },
-        useImperativeHandle: function(ref, create, deps) {
+        useImperativeHandle: function(ref, create2, deps) {
           currentHookNameInDev = "useImperativeHandle";
           warnInvalidHookAccess();
           updateHookTypesDev();
-          return updateImperativeHandle(ref, create, deps);
+          return updateImperativeHandle(ref, create2, deps);
         },
-        useInsertionEffect: function(create, deps) {
+        useInsertionEffect: function(create2, deps) {
           currentHookNameInDev = "useInsertionEffect";
           warnInvalidHookAccess();
           updateHookTypesDev();
-          return updateEffectImpl(4, Insertion, create, deps);
+          return updateEffectImpl(4, Insertion, create2, deps);
         },
-        useLayoutEffect: function(create, deps) {
+        useLayoutEffect: function(create2, deps) {
           currentHookNameInDev = "useLayoutEffect";
           warnInvalidHookAccess();
           updateHookTypesDev();
-          return updateEffectImpl(4, Layout, create, deps);
+          return updateEffectImpl(4, Layout, create2, deps);
         },
-        useMemo: function(create, deps) {
+        useMemo: function(create2, deps) {
           currentHookNameInDev = "useMemo";
           warnInvalidHookAccess();
           updateHookTypesDev();
           var prevDispatcher = ReactSharedInternals.H;
           ReactSharedInternals.H = InvalidNestedHooksDispatcherOnUpdateInDEV;
           try {
-            return updateMemo(create, deps);
+            return updateMemo(create2, deps);
           } finally {
             ReactSharedInternals.H = prevDispatcher;
           }
@@ -20791,38 +20791,38 @@ var require_react_dom_client_development = __commonJS({
           updateHookTypesDev();
           return readContext(context);
         },
-        useEffect: function(create, deps) {
+        useEffect: function(create2, deps) {
           currentHookNameInDev = "useEffect";
           warnInvalidHookAccess();
           updateHookTypesDev();
-          updateEffectImpl(2048, Passive, create, deps);
+          updateEffectImpl(2048, Passive, create2, deps);
         },
-        useImperativeHandle: function(ref, create, deps) {
+        useImperativeHandle: function(ref, create2, deps) {
           currentHookNameInDev = "useImperativeHandle";
           warnInvalidHookAccess();
           updateHookTypesDev();
-          return updateImperativeHandle(ref, create, deps);
+          return updateImperativeHandle(ref, create2, deps);
         },
-        useInsertionEffect: function(create, deps) {
+        useInsertionEffect: function(create2, deps) {
           currentHookNameInDev = "useInsertionEffect";
           warnInvalidHookAccess();
           updateHookTypesDev();
-          return updateEffectImpl(4, Insertion, create, deps);
+          return updateEffectImpl(4, Insertion, create2, deps);
         },
-        useLayoutEffect: function(create, deps) {
+        useLayoutEffect: function(create2, deps) {
           currentHookNameInDev = "useLayoutEffect";
           warnInvalidHookAccess();
           updateHookTypesDev();
-          return updateEffectImpl(4, Layout, create, deps);
+          return updateEffectImpl(4, Layout, create2, deps);
         },
-        useMemo: function(create, deps) {
+        useMemo: function(create2, deps) {
           currentHookNameInDev = "useMemo";
           warnInvalidHookAccess();
           updateHookTypesDev();
           var prevDispatcher = ReactSharedInternals.H;
           ReactSharedInternals.H = InvalidNestedHooksDispatcherOnUpdateInDEV;
           try {
-            return updateMemo(create, deps);
+            return updateMemo(create2, deps);
           } finally {
             ReactSharedInternals.H = prevDispatcher;
           }
@@ -21326,7 +21326,7 @@ var require_react_dom_client_development = __commonJS({
         }
       };
       (function() {
-        var isomorphicReactPackageVersion = React.version;
+        var isomorphicReactPackageVersion = React2.version;
         if ("19.2.7" !== isomorphicReactPackageVersion)
           throw Error(
             'Incompatible React versions: The "react" and "react-dom" packages must have the exact same version. Instead got:\n  - react:      ' + (isomorphicReactPackageVersion + "\n  - react-dom:  19.2.7\nLearn more: https://react.dev/warnings/version-mismatch")
@@ -21682,18 +21682,18 @@ var require_react_jsx_runtime_development = __commonJS({
       function isValidElement(object) {
         return "object" === typeof object && null !== object && object.$$typeof === REACT_ELEMENT_TYPE;
       }
-      var React = require_react(), REACT_ELEMENT_TYPE = Symbol.for("react.transitional.element"), REACT_PORTAL_TYPE = Symbol.for("react.portal"), REACT_FRAGMENT_TYPE = Symbol.for("react.fragment"), REACT_STRICT_MODE_TYPE = Symbol.for("react.strict_mode"), REACT_PROFILER_TYPE = Symbol.for("react.profiler"), REACT_CONSUMER_TYPE = Symbol.for("react.consumer"), REACT_CONTEXT_TYPE = Symbol.for("react.context"), REACT_FORWARD_REF_TYPE = Symbol.for("react.forward_ref"), REACT_SUSPENSE_TYPE = Symbol.for("react.suspense"), REACT_SUSPENSE_LIST_TYPE = Symbol.for("react.suspense_list"), REACT_MEMO_TYPE = Symbol.for("react.memo"), REACT_LAZY_TYPE = Symbol.for("react.lazy"), REACT_ACTIVITY_TYPE = Symbol.for("react.activity"), REACT_CLIENT_REFERENCE = Symbol.for("react.client.reference"), ReactSharedInternals = React.__CLIENT_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE, hasOwnProperty = Object.prototype.hasOwnProperty, isArrayImpl = Array.isArray, createTask = console.createTask ? console.createTask : function() {
+      var React2 = require_react(), REACT_ELEMENT_TYPE = Symbol.for("react.transitional.element"), REACT_PORTAL_TYPE = Symbol.for("react.portal"), REACT_FRAGMENT_TYPE = Symbol.for("react.fragment"), REACT_STRICT_MODE_TYPE = Symbol.for("react.strict_mode"), REACT_PROFILER_TYPE = Symbol.for("react.profiler"), REACT_CONSUMER_TYPE = Symbol.for("react.consumer"), REACT_CONTEXT_TYPE = Symbol.for("react.context"), REACT_FORWARD_REF_TYPE = Symbol.for("react.forward_ref"), REACT_SUSPENSE_TYPE = Symbol.for("react.suspense"), REACT_SUSPENSE_LIST_TYPE = Symbol.for("react.suspense_list"), REACT_MEMO_TYPE = Symbol.for("react.memo"), REACT_LAZY_TYPE = Symbol.for("react.lazy"), REACT_ACTIVITY_TYPE = Symbol.for("react.activity"), REACT_CLIENT_REFERENCE = Symbol.for("react.client.reference"), ReactSharedInternals = React2.__CLIENT_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE, hasOwnProperty = Object.prototype.hasOwnProperty, isArrayImpl = Array.isArray, createTask = console.createTask ? console.createTask : function() {
         return null;
       };
-      React = {
+      React2 = {
         react_stack_bottom_frame: function(callStackForError) {
           return callStackForError();
         }
       };
       var specialPropKeyWarningShown;
       var didWarnAboutElementRef = {};
-      var unknownOwnerDebugStack = React.react_stack_bottom_frame.bind(
-        React,
+      var unknownOwnerDebugStack = React2.react_stack_bottom_frame.bind(
+        React2,
         UnknownOwner
       )();
       var unknownOwnerDebugTask = createTask(getTaskName(UnknownOwner));
@@ -21740,12 +21740,12 @@ var require_jsx_runtime = __commonJS({
 
 // admin.tsx
 init_define_import_meta_env();
-var import_react8 = __toESM(require_react());
+var import_react9 = __toESM(require_react());
 var import_client = __toESM(require_client());
 
 // src/admin/GRARFAdminApp.tsx
 init_define_import_meta_env();
-var import_react7 = __toESM(require_react());
+var import_react8 = __toESM(require_react());
 
 // src/admin/AdminSidebar.tsx
 init_define_import_meta_env();
@@ -21794,610 +21794,14 @@ function AdminSidebar({ activeItemId, onSelect }) {
 
 // src/admin/modules/OperationsModule.tsx
 init_define_import_meta_env();
-var import_react6 = __toESM(require_react());
-
-// ../grarf/desktop/src/data/operations.ts
-init_define_import_meta_env();
-var OPERATIONS = {
-  dates: {
-    "2026-06-13": {
-      featuredGames: { selections: [] },
-      manualEventOverrides: {
-        WEC: {
-          timeZone: "America/Chicago",
-          operationalDateKeys: ["2026-06-13", "2026-06-14"],
-          gameId: "manual-wec-le-mans-2026",
-          eventName: "24 Hours of Le Mans",
-          scheduledDateKey: "2026-06-13",
-          startTime: "2026-06-13T09:00:00",
-          endTime: "2026-06-14T09:00:00"
-        }
-      },
-      manualGameOverrides: {
-        "manual-wec-le-mans-2026": {
-          streamUrl: "https://plus.fiawec.com/en/livestream/s-24-hours-of-le-mans-race-en-4ggw9"
-        }
-      }
-    },
-    "2026-06-14": {
-      featuredGames: { selections: [] },
-      manualEventOverrides: {
-        WEC: {
-          timeZone: "America/Chicago",
-          operationalDateKeys: ["2026-06-13", "2026-06-14"],
-          gameId: "manual-wec-le-mans-2026",
-          eventName: "24 Hours of Le Mans",
-          scheduledDateKey: "2026-06-13",
-          startTime: "2026-06-13T09:00:00",
-          endTime: "2026-06-14T09:00:00"
-        }
-      },
-      manualGameOverrides: {
-        "manual-wec-le-mans-2026": {
-          streamUrl: "https://plus.fiawec.com/en/livestream/s-24-hours-of-le-mans-race-en-4ggw9"
-        }
-      }
-    },
-    "2026-06-27": {
-      featuredGames: { selections: [] },
-      manualEventOverrides: {
-        GT_WORLD_CHALLENGE: {
-          league: "gt-world-challenge",
-          displayName: "GT World",
-          insertAfterLeague: "WEC",
-          sourceTimeZone: "America/Chicago",
-          games: [
-            {
-              date: "2026-06-27",
-              eventName: "24 Hours of Spa",
-              startTime: "2026-06-27T09:00:00",
-              endTime: "2026-06-28T10:00:00",
-              bestGamePriority: 0
-            }
-          ]
-        }
-      },
-      manualGameOverrides: {
-        "manual-gs-gt-world-challenge-24-hours-of-spa-2026-06-27": {
-          channel: "YouTube",
-          channelUrl: "https://www.youtube.com/live/1bbj47g_FOs?si=dZLDLjR3q8TIS6Ly"
-        }
-      }
-    },
-    "2026-06-28": {
-      featuredGames: { selections: [] },
-      manualEventOverrides: {
-        GT_WORLD_CHALLENGE: {
-          league: "gt-world-challenge",
-          displayName: "GT World",
-          insertAfterLeague: "WEC",
-          sourceTimeZone: "America/Chicago",
-          games: [
-            {
-              date: "2026-06-28",
-              eventName: "24 Hours of Spa",
-              startTime: "2026-06-27T09:00:00",
-              endTime: "2026-06-28T10:00:00",
-              bestGamePriority: 0
-            }
-          ]
-        }
-      },
-      manualGameOverrides: {
-        "manual-gs-gt-world-challenge-24-hours-of-spa-2026-06-28": {
-          channel: "YouTube",
-          channelUrl: "https://www.youtube.com/live/1bbj47g_FOs?si=dZLDLjR3q8TIS6Ly"
-        }
-      }
-    },
-    "2026-07-08": {
-      featuredGames: {
-        selections: [
-          { rank: 1, league: "ATP", matchup: "Zverev vs Fritz", gameKey: "177494" },
-          { rank: 2, league: "ATP", matchup: "Fery vs Cobolli", gameKey: "177492" },
-          { rank: 3, league: "WTA", matchup: "Paolini vs Kostyuk", gameKey: "177705" },
-          { rank: 4, league: "WTA", matchup: "Mertens vs Noskova", gameKey: "177712" },
-          {
-            rank: 5,
-            league: "Tour de France",
-            matchup: "Stage 5",
-            gameKey: "manual-tdf-stage-5-2026-07-08"
-          },
-          { rank: 6, league: "MLB", matchup: "Yankees vs Rays", gameKey: "401816073" }
-        ]
-      },
-      manualEventOverrides: {
-        TDF: {
-          timeZone: "America/New_York",
-          highlightsTv: {
-            sport: "CYCLING",
-            sourceType: "Playlist",
-            url: "https://youtube.com/playlist?list=PLWuO6-g6SGnU&si=IuqQ1pQ5ejSjUOwc",
-            requiredTitleKeywords: "highlights",
-            excludedKeywords: "",
-            enabled: true
-          },
-          stages: [
-            {
-              stage: 1,
-              date: "2026-07-04",
-              start: "10:00",
-              end: "12:00",
-              route: "Barcelona to Barcelona",
-              broadcast: ["NBC", "Peacock"]
-            },
-            {
-              stage: 2,
-              date: "2026-07-05",
-              start: "07:00",
-              end: "11:30",
-              route: "Tarragona to Barcelona",
-              broadcast: ["Peacock"]
-            },
-            {
-              stage: 3,
-              date: "2026-07-06",
-              start: "05:30",
-              end: "11:00",
-              route: "Granollers to Les Angles",
-              broadcast: ["Peacock"]
-            },
-            {
-              stage: 4,
-              date: "2026-07-07",
-              start: "06:30",
-              end: "11:30",
-              route: "Carcassonne to Foix",
-              broadcast: ["Peacock"]
-            },
-            {
-              stage: 5,
-              date: "2026-07-08",
-              start: "07:00",
-              end: "11:00",
-              route: "Lannemezan to Pau",
-              broadcast: ["Peacock"]
-            },
-            {
-              stage: 6,
-              date: "2026-07-09",
-              start: "06:00",
-              end: "11:30",
-              route: "Pau to Gavarnie-G\xE8dre",
-              broadcast: ["Peacock"]
-            },
-            {
-              stage: 7,
-              date: "2026-07-10",
-              start: "06:30",
-              end: "11:00",
-              route: "Hagetmau to Bordeaux",
-              broadcast: ["Peacock"]
-            },
-            {
-              stage: 8,
-              date: "2026-07-11",
-              start: "06:30",
-              end: "11:00",
-              route: "P\xE9rigueux to Bergerac",
-              broadcast: ["NBC", "Peacock"]
-            },
-            {
-              stage: 9,
-              date: "2026-07-12",
-              start: "06:30",
-              end: "11:30",
-              route: "Malemort to Ussel",
-              broadcast: ["Peacock"]
-            },
-            {
-              stage: 10,
-              date: "2026-07-14",
-              start: "06:30",
-              end: "11:00",
-              route: "Aurillac to Le Lioran",
-              broadcast: ["Peacock"]
-            },
-            {
-              stage: 11,
-              date: "2026-07-15",
-              start: "07:00",
-              end: "11:00",
-              route: "Vichy to Nevers",
-              broadcast: ["Peacock"]
-            },
-            {
-              stage: 12,
-              date: "2026-07-16",
-              start: "07:00",
-              end: "11:30",
-              route: "Circuit Nevers Magny-Cours to Chalon-sur-Sa\xF4ne",
-              broadcast: ["Peacock"]
-            },
-            {
-              stage: 13,
-              date: "2026-07-17",
-              start: "06:30",
-              end: "12:00",
-              route: "Dole to Belfort",
-              broadcast: ["Peacock"]
-            },
-            {
-              stage: 14,
-              date: "2026-07-18",
-              start: "06:30",
-              end: "11:00",
-              route: "Mulhouse to Le Markstein Fellering",
-              broadcast: ["Peacock"]
-            },
-            {
-              stage: 15,
-              date: "2026-07-19",
-              start: "06:30",
-              end: "12:00",
-              route: "Champagnole to Plateau de Solaison",
-              broadcast: ["Peacock"]
-            },
-            {
-              stage: 16,
-              date: "2026-07-21",
-              start: "06:30",
-              end: "10:00",
-              route: "\xC9vian-les-Bains to Thonon-les-Bains",
-              broadcast: ["Peacock"]
-            },
-            {
-              stage: 17,
-              date: "2026-07-22",
-              start: "06:30",
-              end: "11:00",
-              route: "Chambery to Voiron",
-              broadcast: ["Peacock"]
-            },
-            {
-              stage: 18,
-              date: "2026-07-23",
-              start: "06:00",
-              end: "11:30",
-              route: "Voiron to Orci\xE8res-Merlette",
-              broadcast: ["Peacock"]
-            },
-            {
-              stage: 19,
-              date: "2026-07-24",
-              start: "07:00",
-              end: "11:00",
-              route: "Gap to Alpe d'Huez",
-              broadcast: ["Peacock"]
-            },
-            {
-              stage: 20,
-              date: "2026-07-25",
-              start: "05:30",
-              end: "11:00",
-              route: "Le Bourg d'Oisans to Alpe d'Huez",
-              broadcast: ["NBC", "Peacock"]
-            },
-            {
-              stage: 21,
-              date: "2026-07-26",
-              start: "09:30",
-              end: "13:00",
-              route: "Thoiry to Paris Champs-\xC9lys\xE9es",
-              broadcast: ["Peacock"]
-            }
-          ]
-        }
-      },
-      manualGameOverrides: {}
-    }
-  }
-};
-
-// ../grarf/desktop/shared/operationalSlateDate.js
-init_define_import_meta_env();
-
-// ../grarf/desktop/shared/golfTournamentDate.js
-init_define_import_meta_env();
-var GOLF_TOURNAMENT_DAY_TIMEZONE = "America/New_York";
-var GOLF_LEAGUE_KEYS = /* @__PURE__ */ new Set(["PGA", "LPGA", "LIV", "CHAMPIONS"]);
-function isGolfTournamentLeagueKey(league) {
-  return typeof league === "string" && GOLF_LEAGUE_KEYS.has(league);
-}
-function readGolfTournamentStartDateKey(iso, formatDayKey) {
-  if (typeof iso !== "string" || !iso.trim()) return null;
-  const ms = Date.parse(iso);
-  if (!Number.isFinite(ms) || ms <= 0) {
-    const match = iso.match(/^(\d{4}-\d{2}-\d{2})/);
-    return match?.[1] ?? null;
-  }
-  return formatDayKey(ms, GOLF_TOURNAMENT_DAY_TIMEZONE) ?? null;
-}
-function readGolfTournamentEndDateKey(iso, formatDayKey) {
-  return readGolfTournamentStartDateKey(iso, formatDayKey);
-}
-function formatGolfScheduledDayLabel(dateKey) {
-  const trimmed = dateKey.trim();
-  if (!trimmed) return "\u2014";
-  const [y, m, d] = trimmed.split("-").map(Number);
-  if (!y || !m || !d) return "\u2014";
-  const anchor = new Date(Date.UTC(y, m - 1, d, 17, 0, 0));
-  return anchor.toLocaleDateString("en-US", {
-    weekday: "short",
-    month: "numeric",
-    day: "numeric",
-    timeZone: GOLF_TOURNAMENT_DAY_TIMEZONE
-  });
-}
-
-// ../grarf/desktop/shared/operationalSlateDate.js
-var GRARF_OPERATIONAL_SLATE_TIMEZONE = "America/Chicago";
-var OPERATIONAL_SLATE_NEXT_DAY_CUTOFF_HOUR = 6;
-var OPERATIONAL_SPORTS_DAY_ROLLOVER_HOUR = 4;
-var calendarFormatterCache = /* @__PURE__ */ new Map();
-function getCalendarFormatter(timeZone) {
-  let formatter = calendarFormatterCache.get(timeZone);
-  if (!formatter) {
-    formatter = new Intl.DateTimeFormat("en-US", {
-      timeZone,
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-      hour: "numeric",
-      hourCycle: "h23"
-    });
-    calendarFormatterCache.set(timeZone, formatter);
-  }
-  return formatter;
-}
-function calendarPartsInTimeZone(ms, timeZone) {
-  const parts = getCalendarFormatter(timeZone).formatToParts(new Date(ms));
-  return {
-    year: Number(parts.find((p) => p.type === "year")?.value),
-    month: Number(parts.find((p) => p.type === "month")?.value),
-    day: Number(parts.find((p) => p.type === "day")?.value),
-    hour: Number(parts.find((p) => p.type === "hour")?.value)
-  };
-}
-var operationalCalendarDateKeyCache = {
-  timeZone: "",
-  bucketMs: 0,
-  key: "1970-01-01"
-};
-var operationalSportsDayKeyCache = {
-  timeZone: "",
-  bucketMs: 0,
-  key: "1970-01-01"
-};
-function resolveOperationalSlateTimeZone() {
-  return GRARF_OPERATIONAL_SLATE_TIMEZONE;
-}
-function readOperationalCalendarDateKeyCache(now, timeZone) {
-  const bucketMs = Math.floor(now.getTime() / 6e4);
-  if (operationalCalendarDateKeyCache.timeZone === timeZone && operationalCalendarDateKeyCache.bucketMs === bucketMs) {
-    return operationalCalendarDateKeyCache.key;
-  }
-  return null;
-}
-function writeOperationalCalendarDateKeyCache(now, timeZone, key) {
-  operationalCalendarDateKeyCache.timeZone = timeZone;
-  operationalCalendarDateKeyCache.bucketMs = Math.floor(now.getTime() / 6e4);
-  operationalCalendarDateKeyCache.key = key;
-}
-function formatOperationalDateKeyFromMs(ms, timeZone = GRARF_OPERATIONAL_SLATE_TIMEZONE) {
-  if (ms == null || !Number.isFinite(ms) || ms <= 0) return void 0;
-  const { year, month, day } = calendarPartsInTimeZone(ms, timeZone);
-  if (!year || !month || !day) return void 0;
-  return `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
-}
-function writeOperationalSportsDayKeyCache(now, timeZone, key) {
-  operationalSportsDayKeyCache.timeZone = timeZone;
-  operationalSportsDayKeyCache.bucketMs = Math.floor(now.getTime() / 6e4);
-  operationalSportsDayKeyCache.key = key;
-}
-function readOperationalSportsDayKeyCache(now, timeZone) {
-  const bucketMs = Math.floor(now.getTime() / 6e4);
-  if (operationalSportsDayKeyCache.timeZone === timeZone && operationalSportsDayKeyCache.bucketMs === bucketMs) {
-    return operationalSportsDayKeyCache.key;
-  }
-  return null;
-}
-function getOperationalCalendarDateKey(now = /* @__PURE__ */ new Date(), timeZone = resolveOperationalSlateTimeZone()) {
-  const cached = readOperationalCalendarDateKeyCache(now, timeZone);
-  if (cached) return cached;
-  const key = formatOperationalDateKeyFromMs(now.getTime(), timeZone) ?? "1970-01-01";
-  writeOperationalCalendarDateKeyCache(now, timeZone, key);
-  return key;
-}
-function getOperationalSportsDayDateKey(now = /* @__PURE__ */ new Date(), timeZone = resolveOperationalSlateTimeZone()) {
-  const cached = readOperationalSportsDayKeyCache(now, timeZone);
-  if (cached) return cached;
-  let key = getOperationalCalendarDateKey(now, timeZone);
-  const { hour } = calendarPartsInTimeZone(now.getTime(), timeZone);
-  if (hour < OPERATIONAL_SPORTS_DAY_ROLLOVER_HOUR) {
-    key = offsetOperationalDateKey(key, -1, timeZone);
-  }
-  writeOperationalSportsDayKeyCache(now, timeZone, key);
-  return key;
-}
-function getOperationalSportsDayYesterdayDateKey(now = /* @__PURE__ */ new Date(), timeZone = resolveOperationalSlateTimeZone()) {
-  return offsetOperationalDateKey(getOperationalSportsDayDateKey(now, timeZone), -1, timeZone);
-}
-function getOperationalSportsDayTomorrowDateKey(now = /* @__PURE__ */ new Date(), timeZone = resolveOperationalSlateTimeZone()) {
-  return offsetOperationalDateKey(getOperationalSportsDayDateKey(now, timeZone), 1, timeZone);
-}
-function formatEspnScoreboardDatesParamForOperationalSportsDay(now = /* @__PURE__ */ new Date(), timeZone = resolveOperationalSlateTimeZone()) {
-  const key = getOperationalSportsDayDateKey(now, timeZone);
-  return key.replace(/-/g, "");
-}
-function formatEspnScoreboardDatesParamForOperationalSportsDayUpcoming(now = /* @__PURE__ */ new Date(), timeZone = resolveOperationalSlateTimeZone()) {
-  const key = getOperationalSportsDayTomorrowDateKey(now, timeZone);
-  return key.replace(/-/g, "");
-}
-function offsetOperationalDateKey(dateKey, dayOffset, timeZone = GRARF_OPERATIONAL_SLATE_TIMEZONE) {
-  const [y, m, d] = dateKey.split("-").map(Number);
-  const anchor = Date.UTC(y, (m ?? 1) - 1, (d ?? 1) + dayOffset, 12, 0, 0);
-  return formatOperationalDateKeyFromMs(anchor, timeZone) ?? dateKey;
-}
-function formatEspnScoreboardDatesParam(now = /* @__PURE__ */ new Date(), timeZone = GRARF_OPERATIONAL_SLATE_TIMEZONE) {
-  return getOperationalCalendarDateKey(now, timeZone).replace(/-/g, "");
-}
-function resolveScheduledDateKey(isoStart, slateDateKey, timeZone = GRARF_OPERATIONAL_SLATE_TIMEZONE) {
-  const fromStart = formatOperationalDateKeyFromMs(Date.parse(isoStart || ""), timeZone);
-  if (fromStart) return fromStart;
-  const slate = typeof slateDateKey === "string" ? slateDateKey.trim() : "";
-  return slate || void 0;
-}
-var nextDayCutoffMsCache = /* @__PURE__ */ new Map();
-function getNextDayCutoffMs(operationalDateKey, cutoffHour, timeZone) {
-  const cacheKey2 = `${operationalDateKey}|${cutoffHour}|${timeZone}`;
-  const cached = nextDayCutoffMsCache.get(cacheKey2);
-  if (cached != null) return cached;
-  const tomorrowKey = offsetOperationalDateKey(operationalDateKey, 1, timeZone);
-  const [y, m, d] = tomorrowKey.split("-").map(Number);
-  let probe = Date.UTC(y, (m ?? 1) - 1, d ?? 1, 12, 0, 0);
-  for (let i = -30; i < 30; i++) {
-    const candidate = probe + i * 36e5;
-    const key = formatOperationalDateKeyFromMs(candidate, timeZone);
-    const hour = calendarPartsInTimeZone(candidate, timeZone).hour;
-    if (key === tomorrowKey && hour === cutoffHour) {
-      nextDayCutoffMsCache.set(cacheKey2, candidate);
-      return candidate;
-    }
-  }
-  const fallback = probe + 24 * 36e5;
-  nextDayCutoffMsCache.set(cacheKey2, fallback);
-  return fallback;
-}
-function isScheduledOnOperationalEveningSlate(game, operationalDateKey, now = /* @__PURE__ */ new Date(), timeZone = GRARF_OPERATIONAL_SLATE_TIMEZONE) {
-  const startKey = formatOperationalDateKeyFromMs(game.startTimeMs, timeZone);
-  if (startKey === operationalDateKey) return true;
-  const tomorrowKey = offsetOperationalDateKey(operationalDateKey, 1, timeZone);
-  const payloadKey = typeof game.scheduledDateKey === "string" ? game.scheduledDateKey.trim() : null;
-  if (startKey === tomorrowKey) {
-    const ms = game.startTimeMs;
-    if (ms != null && Number.isFinite(ms) && ms > 0) {
-      const cutoff = getNextDayCutoffMs(operationalDateKey, OPERATIONAL_SLATE_NEXT_DAY_CUTOFF_HOUR, timeZone);
-      if (ms < cutoff) return true;
-    }
-  }
-  if (!startKey && payloadKey === operationalDateKey) return true;
-  return false;
-}
-function resolveGameOperationalSlateDateKey(game, timeZone = GRARF_OPERATIONAL_SLATE_TIMEZONE) {
-  const scheduledKey = typeof game?.scheduledDateKey === "string" ? game.scheduledDateKey.trim() : "";
-  if (isGolfTournamentLeagueKey(game?.league)) {
-    if (scheduledKey) return scheduledKey;
-    if (game?.status === "final") {
-      const endKey = typeof game?.metadata?.tournamentEndDateKey === "string" ? game.metadata.tournamentEndDateKey.trim() : "";
-      if (endKey) return endKey;
-    }
-  }
-  return formatOperationalDateKeyFromMs(game?.startTimeMs, timeZone) || scheduledKey || void 0;
-}
-function filterGamesForOperationalDateKey(games, operationalDateKey, now = /* @__PURE__ */ new Date(), timeZone = GRARF_OPERATIONAL_SLATE_TIMEZONE) {
-  return games.filter((g) => {
-    if (g?.status === "live") return true;
-    if (g?.status === "scheduled") {
-      if (isGolfTournamentLeagueKey(g?.league)) {
-        const key2 = typeof g?.scheduledDateKey === "string" ? g.scheduledDateKey.trim() : "";
-        return key2 ? key2 === operationalDateKey : false;
-      }
-      return isScheduledOnOperationalEveningSlate(g, operationalDateKey, now, timeZone);
-    }
-    if (isScheduledOnOperationalEveningSlate(g, operationalDateKey, now, timeZone)) {
-      return true;
-    }
-    const key = resolveGameOperationalSlateDateKey(g, timeZone);
-    return key === operationalDateKey;
-  });
-}
-function shouldKeepGameOnOperationalFallbackIngest(game, now = /* @__PURE__ */ new Date(), timeZone = GRARF_OPERATIONAL_SLATE_TIMEZONE) {
-  if (game?.status === "live") return true;
-  const activeSlateDayKey = getOperationalSportsDayDateKey(now, timeZone);
-  if (filterGamesForOperationalDateKey([game], activeSlateDayKey, now, timeZone).length > 0) {
-    return true;
-  }
-  if (game?.status === "final") {
-    const precedingDayKey = getOperationalSportsDayYesterdayDateKey(now, timeZone);
-    if (filterGamesForOperationalDateKey([game], precedingDayKey, now, timeZone).length > 0) {
-      return true;
-    }
-  }
-  return false;
-}
-function filterGamesForOperationalFallbackIngest(games, now = /* @__PURE__ */ new Date(), timeZone = GRARF_OPERATIONAL_SLATE_TIMEZONE) {
-  return games.filter((g) => shouldKeepGameOnOperationalFallbackIngest(g, now, timeZone));
-}
+var import_react7 = __toESM(require_react());
 
 // src/admin/components/OperationsConsole.tsx
 init_define_import_meta_env();
-var import_react2 = __toESM(require_react());
-
-// src/admin/components/OperationsOverridesEditor.tsx
-init_define_import_meta_env();
 var import_react = __toESM(require_react());
 
-// src/admin/lib/buildOperationalOverrideDraft.ts
-init_define_import_meta_env();
-function hasText(value) {
-  return typeof value === "string" && value.trim().length > 0;
-}
-function formatWatchOptions(options) {
-  if (!options || options.length === 0) return "";
-  return options.map((option) => {
-    const label = option.displayName?.trim() || option.provider;
-    const link = option.deepLink?.trim();
-    return link ? `${label} \u2014 ${link}` : label;
-  }).join("\n");
-}
-function readOverrideString(override, key) {
-  if (!override || typeof override !== "object") return "";
-  const value = override[key];
-  if (typeof value === "string" && value.trim()) return value.trim();
-  return "";
-}
-function resolveYesNoDraft(overrideValue, resolvedFlag) {
-  if (hasText(overrideValue)) return overrideValue.trim().toUpperCase();
-  if (resolvedFlag) return "Y";
-  return "";
-}
-function buildOperationalOverrideDraft(game) {
-  const override = game.manualGameOverride;
-  let primaryStream = "";
-  if (hasText(override?.streamUrl)) {
-    primaryStream = override.streamUrl.trim();
-  } else if (hasText(override?.channelUrl)) {
-    primaryStream = override.channelUrl.trim();
-  }
-  let broadcastOverride = "";
-  if (override?.broadcasts && override.broadcasts.length > 0) {
-    broadcastOverride = override.broadcasts.map((label) => label.trim()).filter(Boolean).join(", ");
-  } else if (override?.channels && override.channels.length > 0) {
-    broadcastOverride = override.channels.map((label) => label.trim()).filter(Boolean).join(", ");
-  } else if (hasText(override?.channel)) {
-    broadcastOverride = override.channel.trim();
-  }
-  let centerPaneUrlWhenGameCardClicked = "";
-  if (hasText(override?.centerPaneUrlWhenGameCardClicked)) {
-    centerPaneUrlWhenGameCardClicked = override.centerPaneUrlWhenGameCardClicked.trim();
-  } else if (hasText(game.navigationOverride?.url)) {
-    centerPaneUrlWhenGameCardClicked = game.navigationOverride.url.trim();
-  }
-  return {
-    primaryStream,
-    alternativeStreams: formatWatchOptions(override?.watchOptions),
-    broadcastOverride,
-    centerPaneUrlWhenGameCardClicked,
-    centerPane: resolveYesNoDraft(override?.centerPane, game.navigationOverride?.openInCenterPane),
-    browserTab: resolveYesNoDraft(override?.browserTab, game.navigationOverride?.openInBrowserTab),
-    manualHighlights: readOverrideString(override, "manualHighlights"),
-    manualSocialPosts: readOverrideString(override, "manualSocialPosts"),
-    operationalNotes: readOverrideString(override, "operationalNotes")
-  };
-}
-
 // src/admin/components/OperationsOverridesEditor.tsx
+init_define_import_meta_env();
 var import_jsx_runtime2 = __toESM(require_jsx_runtime());
 function ConsoleOverrideTextInput({
   id,
@@ -22470,16 +21874,11 @@ function ConsoleOverrideSelect({
     )
   ] });
 }
-function OperationsOverridesEditor({ game }) {
-  const [draft, setDraft] = (0, import_react.useState)(
-    () => buildOperationalOverrideDraft(game)
-  );
-  (0, import_react.useEffect)(() => {
-    setDraft(buildOperationalOverrideDraft(game));
-  }, [game.gameKey]);
-  const updateField = (field, value) => {
-    setDraft((current) => ({ ...current, [field]: value }));
-  };
+function OperationsOverridesEditor({
+  game,
+  draft,
+  onFieldChange
+}) {
   const fieldId = (suffix) => `ops-override-${game.gameKey}-${suffix}`;
   return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "grarf-admin__console-override-grid", children: [
     /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
@@ -22490,7 +21889,7 @@ function OperationsOverridesEditor({ game }) {
         value: draft.primaryStream,
         placeholder: "Stream URL or channel URL",
         monospace: true,
-        onChange: (value) => updateField("primaryStream", value)
+        onChange: (value) => onFieldChange("primaryStream", value)
       }
     ),
     /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
@@ -22502,7 +21901,7 @@ function OperationsOverridesEditor({ game }) {
         placeholder: "One stream per line (Display Name \u2014 URL)",
         rows: 4,
         monospace: true,
-        onChange: (value) => updateField("alternativeStreams", value)
+        onChange: (value) => onFieldChange("alternativeStreams", value)
       }
     ),
     /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
@@ -22512,7 +21911,7 @@ function OperationsOverridesEditor({ game }) {
         label: "Broadcast Override",
         value: draft.broadcastOverride,
         placeholder: "Comma-separated broadcast labels",
-        onChange: (value) => updateField("broadcastOverride", value)
+        onChange: (value) => onFieldChange("broadcastOverride", value)
       }
     ),
     /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
@@ -22523,7 +21922,7 @@ function OperationsOverridesEditor({ game }) {
         value: draft.centerPaneUrlWhenGameCardClicked,
         placeholder: "https://",
         monospace: true,
-        onChange: (value) => updateField("centerPaneUrlWhenGameCardClicked", value)
+        onChange: (value) => onFieldChange("centerPaneUrlWhenGameCardClicked", value)
       }
     ),
     /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
@@ -22532,7 +21931,7 @@ function OperationsOverridesEditor({ game }) {
         id: fieldId("center-pane"),
         label: "Center Pane",
         value: draft.centerPane,
-        onChange: (value) => updateField("centerPane", value)
+        onChange: (value) => onFieldChange("centerPane", value)
       }
     ),
     /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
@@ -22541,7 +21940,7 @@ function OperationsOverridesEditor({ game }) {
         id: fieldId("browser-tab"),
         label: "Browser Tab",
         value: draft.browserTab,
-        onChange: (value) => updateField("browserTab", value)
+        onChange: (value) => onFieldChange("browserTab", value)
       }
     ),
     /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
@@ -22552,7 +21951,7 @@ function OperationsOverridesEditor({ game }) {
         value: draft.manualHighlights,
         placeholder: "Highlights configuration or notes",
         rows: 3,
-        onChange: (value) => updateField("manualHighlights", value)
+        onChange: (value) => onFieldChange("manualHighlights", value)
       }
     ),
     /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
@@ -22563,7 +21962,7 @@ function OperationsOverridesEditor({ game }) {
         value: draft.manualSocialPosts,
         placeholder: "Social post references or copy",
         rows: 3,
-        onChange: (value) => updateField("manualSocialPosts", value)
+        onChange: (value) => onFieldChange("manualSocialPosts", value)
       }
     ),
     /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
@@ -22574,7 +21973,7 @@ function OperationsOverridesEditor({ game }) {
         value: draft.operationalNotes,
         placeholder: "Internal operator notes",
         rows: 4,
-        onChange: (value) => updateField("operationalNotes", value)
+        onChange: (value) => onFieldChange("operationalNotes", value)
       }
     )
   ] });
@@ -22602,7 +22001,7 @@ function formatBroadcasts(broadcasts) {
   if (labels.length === 0) return null;
   return labels.join(", ");
 }
-function hasText2(value) {
+function hasText(value) {
   return typeof value === "string" && value.trim().length > 0;
 }
 function ConsoleField({
@@ -22610,7 +22009,7 @@ function ConsoleField({
   value,
   monospace
 }) {
-  const populated = hasText2(value);
+  const populated = hasText(value);
   return /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "grarf-admin__console-field", children: [
     /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "grarf-admin__console-field-label", children: label }),
     populated ? /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
@@ -22645,9 +22044,14 @@ function ConsoleSection({
 function OperationsConsole({
   game,
   operationalDateKey,
-  assembledAt
+  assembledAt,
+  draft,
+  currentGameChangeCount,
+  onFieldChange,
+  onDiscardCurrent
 }) {
-  const [systemOpen, setSystemOpen] = (0, import_react2.useState)(false);
+  const [systemOpen, setSystemOpen] = (0, import_react.useState)(false);
+  const hasChanges = currentGameChangeCount > 0;
   const featuredLabel = game.featuredRank != null && Number.isFinite(game.featuredRank) ? `Yes \u2014 Rank #${game.featuredRank}` : "No";
   return /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "grarf-admin__console", children: [
     /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(
@@ -22678,12 +22082,32 @@ function OperationsConsole({
         ]
       }
     ),
-    /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
+    /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(
       ConsoleSection,
       {
         title: "Operational Overrides",
-        description: "Edit manual operational fields for this game. Changes are kept in local draft state only and are not saved.",
-        children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(OperationsOverridesEditor, { game })
+        description: "Edit manual operational fields for this game. Changes stay in Pending Changes until Save All.",
+        children: [
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(OperationsOverridesEditor, { game, draft, onFieldChange }),
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "grarf-admin__console-save-bar", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "grarf-admin__console-save-meta", children: hasChanges ? /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("span", { className: "grarf-admin__console-save-pending", children: [
+              currentGameChangeCount,
+              " unsaved change",
+              currentGameChangeCount === 1 ? "" : "s",
+              " for this game"
+            ] }) : /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "grarf-admin__console-save-pending grarf-admin__console-save-pending--idle", children: "No changes from snapshot" }) }),
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
+              "button",
+              {
+                type: "button",
+                className: "grarf-admin__pending-discard-button",
+                disabled: !hasChanges,
+                onClick: onDiscardCurrent,
+                children: "Discard"
+              }
+            )
+          ] })
+        ]
       }
     ),
     /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("section", { className: "grarf-admin__console-section grarf-admin__console-section--system", children: [
@@ -22730,19 +22154,19 @@ init_define_import_meta_env();
 // src/admin/lib/resolveOperationsGameIndicators.ts
 init_define_import_meta_env();
 var UPCOMING_OR_LIVE_STATUSES = /* @__PURE__ */ new Set(["scheduled", "live"]);
-function hasText3(value) {
+function hasText2(value) {
   return typeof value === "string" && value.trim().length > 0;
 }
-function readOverrideString2(override, key) {
+function readOverrideString(override, key) {
   if (!override || typeof override !== "object") return null;
   const value = override[key];
   if (typeof value === "string" && value.trim()) return value.trim();
   return null;
 }
 function hasPrimaryStream(game) {
-  if (hasText3(game.streamUrl)) return true;
+  if (hasText2(game.streamUrl)) return true;
   const channelUrl = game.game.metadata?.manualGamesSpine?.channelUrl;
-  return hasText3(channelUrl);
+  return hasText2(channelUrl);
 }
 function isUpcomingOrLive(game) {
   return UPCOMING_OR_LIVE_STATUSES.has(game.status);
@@ -22757,19 +22181,19 @@ function evaluateNavigationOverride(game) {
   if (game.navigationOverride) return true;
   const override = game.manualGameOverride;
   if (!override) return false;
-  return hasText3(override.centerPaneUrlWhenGameCardClicked) || hasText3(override.centerPane) || hasText3(override.browserTab);
+  return hasText2(override.centerPaneUrlWhenGameCardClicked) || hasText2(override.centerPane) || hasText2(override.browserTab);
 }
 function evaluateManualOverride(game) {
   if (evaluateNavigationOverride(game)) return true;
   const override = game.manualGameOverride;
   if (!override) return false;
-  if (hasText3(override.streamUrl) || hasText3(override.streamProvider) || hasText3(override.channel) || hasText3(override.channelUrl) || hasText3(override.launchMode)) {
+  if (hasText2(override.streamUrl) || hasText2(override.streamProvider) || hasText2(override.channel) || hasText2(override.channelUrl) || hasText2(override.launchMode)) {
     return true;
   }
-  if (override.broadcasts && override.broadcasts.some((label) => hasText3(label))) return true;
-  if (override.channels && override.channels.some((label) => hasText3(label))) return true;
+  if (override.broadcasts && override.broadcasts.some((label) => hasText2(label))) return true;
+  if (override.channels && override.channels.some((label) => hasText2(label))) return true;
   if (override.watchOptions && override.watchOptions.length > 0) return true;
-  if (readOverrideString2(override, "manualHighlights") || readOverrideString2(override, "manualSocialPosts") || readOverrideString2(override, "operationalNotes")) {
+  if (readOverrideString(override, "manualHighlights") || readOverrideString(override, "manualSocialPosts") || readOverrideString(override, "operationalNotes")) {
     return true;
   }
   return false;
@@ -22823,6 +22247,363 @@ function OperationsGameIndicatorBadges({ game }) {
   )) });
 }
 
+// src/admin/components/OperationsPendingChangesBar.tsx
+init_define_import_meta_env();
+
+// src/admin/lib/operationsChangeSet.ts
+init_define_import_meta_env();
+function normalizeDraftValue(value) {
+  return value.trim();
+}
+function parseCommaSeparatedLabels(value) {
+  return value.split(",").map((label) => label.trim()).filter(Boolean);
+}
+function parseAlternativeStreamsDraft(value) {
+  return value.split("\n").map((line) => line.trim()).filter(Boolean).map((line, index) => {
+    const separator = line.indexOf(" \u2014 ");
+    if (separator >= 0) {
+      return {
+        id: `manual-alt-${index}`,
+        displayName: line.slice(0, separator).trim(),
+        deepLink: line.slice(separator + 3).trim()
+      };
+    }
+    return {
+      id: `manual-alt-${index}`,
+      displayName: line
+    };
+  });
+}
+var DRAFT_FIELD_SPECS = [
+  {
+    draftKey: "primaryStream",
+    canonicalKey: "streamUrl",
+    label: "Primary Stream",
+    section: "manualGameOverrides",
+    toPatchFragment: (editedValue) => editedValue.trim() ? { streamUrl: editedValue.trim() } : { streamUrl: "" }
+  },
+  {
+    draftKey: "alternativeStreams",
+    canonicalKey: "watchOptions",
+    label: "Alternative Streams",
+    section: "manualGameOverrides",
+    toPatchFragment: (editedValue) => ({
+      watchOptions: parseAlternativeStreamsDraft(editedValue)
+    })
+  },
+  {
+    draftKey: "broadcastOverride",
+    canonicalKey: "broadcasts",
+    label: "Broadcast Override",
+    section: "manualGameOverrides",
+    toPatchFragment: (editedValue) => ({
+      broadcasts: parseCommaSeparatedLabels(editedValue)
+    })
+  },
+  {
+    draftKey: "centerPaneUrlWhenGameCardClicked",
+    canonicalKey: "centerPaneUrlWhenGameCardClicked",
+    label: "Center Pane URL When Game Card Clicked",
+    section: "manualGameOverrides",
+    toPatchFragment: (editedValue) => ({
+      centerPaneUrlWhenGameCardClicked: editedValue.trim()
+    })
+  },
+  {
+    draftKey: "centerPane",
+    canonicalKey: "centerPane",
+    label: "Center Pane",
+    section: "manualGameOverrides",
+    toPatchFragment: (editedValue) => ({
+      centerPane: editedValue.trim().toUpperCase()
+    })
+  },
+  {
+    draftKey: "browserTab",
+    canonicalKey: "browserTab",
+    label: "Browser Tab",
+    section: "manualGameOverrides",
+    toPatchFragment: (editedValue) => ({
+      browserTab: editedValue.trim().toUpperCase()
+    })
+  },
+  {
+    draftKey: "manualHighlights",
+    canonicalKey: "manualHighlights",
+    label: "Manual Highlights",
+    section: "manualGameOverrides",
+    toPatchFragment: (editedValue) => ({
+      manualHighlights: editedValue.trim()
+    })
+  },
+  {
+    draftKey: "manualSocialPosts",
+    canonicalKey: "manualSocialPosts",
+    label: "Manual Social Posts",
+    section: "manualGameOverrides",
+    toPatchFragment: (editedValue) => ({
+      manualSocialPosts: editedValue.trim()
+    })
+  },
+  {
+    draftKey: "operationalNotes",
+    canonicalKey: "operationalNotes",
+    label: "Operational Notes",
+    section: "manualGameOverrides",
+    toPatchFragment: (editedValue) => ({
+      operationalNotes: editedValue.trim()
+    })
+  }
+];
+function resolveOperationsChangeFields(originalDraft, editedDraft) {
+  const changes = [];
+  for (const spec of DRAFT_FIELD_SPECS) {
+    const originalValue = normalizeDraftValue(originalDraft[spec.draftKey]);
+    const editedValue = normalizeDraftValue(editedDraft[spec.draftKey]);
+    if (originalValue === editedValue) continue;
+    changes.push({
+      fieldKey: spec.canonicalKey,
+      label: spec.label,
+      section: spec.section,
+      originalValue,
+      editedValue
+    });
+  }
+  return changes;
+}
+function validateOperationalOverrideDraft(draft) {
+  const errors = [];
+  const navigationUrl = draft.centerPaneUrlWhenGameCardClicked.trim();
+  const centerPane = draft.centerPane.trim().toUpperCase();
+  const browserTab = draft.browserTab.trim().toUpperCase();
+  if (navigationUrl) {
+    if (centerPane !== "Y" && browserTab !== "Y") {
+      errors.push(
+        "Navigation override requires Center Pane or Browser Tab to be set to Yes when a URL is provided."
+      );
+    }
+    if (centerPane === "Y" && browserTab === "Y") {
+      errors.push("Center Pane and Browser Tab cannot both be Yes.");
+    }
+  }
+  if ((centerPane === "Y" || browserTab === "Y") && !navigationUrl) {
+    errors.push("Center Pane URL is required when Center Pane or Browser Tab is Yes.");
+  }
+  if (centerPane && centerPane !== "Y" && centerPane !== "N") {
+    errors.push('Center Pane must be "Yes", "No", or not set.');
+  }
+  if (browserTab && browserTab !== "Y" && browserTab !== "N") {
+    errors.push('Browser Tab must be "Yes", "No", or not set.');
+  }
+  return errors.length > 0 ? { ok: false, errors } : { ok: true };
+}
+function buildOperationsChangeSet(input) {
+  const changes = resolveOperationsChangeFields(input.originalDraft, input.editedDraft);
+  const patch = {};
+  for (const change of changes) {
+    const spec = DRAFT_FIELD_SPECS.find((row) => row.canonicalKey === change.fieldKey);
+    if (!spec) continue;
+    Object.assign(patch, spec.toPatchFragment(change.editedValue, input.editedDraft));
+  }
+  return {
+    operationalDateKey: input.operationalDateKey,
+    gameKey: input.game.gameKey,
+    grarfGameId: input.game.grarfGameId ?? input.game.game.grarfGameId,
+    leagueKey: String(input.game.league),
+    section: "manualGameOverrides",
+    assembledAt: (/* @__PURE__ */ new Date()).toISOString(),
+    changes,
+    patch
+  };
+}
+function countOperationsPendingFieldChanges(pendingEdits) {
+  return pendingEdits.reduce(
+    (total, entry) => total + resolveOperationsChangeFields(entry.originalDraft, entry.editedDraft).length,
+    0
+  );
+}
+function validateAndBuildOperationsPendingChangesCollection(operationalDateKey, pendingEdits) {
+  const issues = [];
+  for (const entry of pendingEdits) {
+    const validation = validateOperationalOverrideDraft(entry.editedDraft);
+    if (!validation.ok) {
+      issues.push({
+        gameKey: entry.gameKey,
+        eventName: entry.eventName,
+        errors: validation.errors
+      });
+    }
+  }
+  if (issues.length > 0) {
+    return { ok: false, issues };
+  }
+  const changeSets = pendingEdits.map(
+    (entry) => buildOperationsChangeSet({
+      game: entry.game,
+      operationalDateKey: entry.operationalDateKey,
+      originalDraft: entry.originalDraft,
+      editedDraft: entry.editedDraft
+    })
+  );
+  return {
+    ok: true,
+    collection: {
+      operationalDateKey,
+      assembledAt: (/* @__PURE__ */ new Date()).toISOString(),
+      gameCount: changeSets.filter((changeSet) => changeSet.changes.length > 0).length,
+      fieldChangeCount: countOperationsPendingFieldChanges(pendingEdits),
+      changeSets
+    }
+  };
+}
+
+// src/admin/components/OperationsChangeSetSummary.tsx
+init_define_import_meta_env();
+var import_jsx_runtime5 = __toESM(require_jsx_runtime());
+function OperationsChangeSetSummary({ changeSet }) {
+  if (changeSet.changes.length === 0) {
+    return /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("p", { className: "grarf-admin__console-save-message", children: "Validation passed. No operational fields differ from the loaded snapshot." });
+  }
+  return /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "grarf-admin__console-change-set", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("p", { className: "grarf-admin__console-save-message", children: [
+      "Operations Change Set ready \u2014 ",
+      changeSet.changes.length,
+      " field",
+      changeSet.changes.length === 1 ? "" : "s",
+      " changed in",
+      " ",
+      /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { className: "grarf-admin__mono", children: changeSet.section }),
+      "."
+    ] }),
+    /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("ul", { className: "grarf-admin__console-change-set-list", children: changeSet.changes.map((change) => /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("li", { className: "grarf-admin__console-change-set-item", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: "grarf-admin__console-change-set-field", children: change.label }),
+      /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "grarf-admin__console-change-set-values", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { className: "grarf-admin__console-change-set-original", children: change.originalValue || "\u2014" }),
+        /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { className: "grarf-admin__console-change-set-arrow", "aria-hidden": true, children: "\u2192" }),
+        /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { className: "grarf-admin__console-change-set-edited", children: change.editedValue || "\u2014" })
+      ] })
+    ] }, change.fieldKey)) })
+  ] });
+}
+
+// src/admin/components/OperationsPendingChangesBar.tsx
+var import_jsx_runtime6 = __toESM(require_jsx_runtime());
+function OperationsPendingChangesBar({
+  pendingEdits,
+  pendingGameCount,
+  totalPendingFieldChanges,
+  saveAllState,
+  onSaveAll,
+  onDiscardAll
+}) {
+  const hasPending = pendingGameCount > 0;
+  const eventNameByGameKey = new Map(
+    pendingEdits.map((entry) => [entry.gameKey, entry.eventName])
+  );
+  return /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("section", { className: "grarf-admin__pending-bar", "aria-label": "Pending operational changes", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { className: "grarf-admin__pending-bar-header", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { className: "grarf-admin__pending-bar-summary", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("span", { className: "grarf-admin__pending-bar-count", children: totalPendingFieldChanges }),
+        /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { className: "grarf-admin__pending-bar-copy", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("div", { className: "grarf-admin__pending-bar-title", children: "Pending Changes" }),
+          /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("div", { className: "grarf-admin__pending-bar-subtitle", children: hasPending ? `${pendingGameCount} game${pendingGameCount === 1 ? "" : "s"} with unsaved edits` : "No unsaved operational edits" })
+        ] })
+      ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { className: "grarf-admin__pending-bar-actions", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
+          "button",
+          {
+            type: "button",
+            className: "grarf-admin__pending-discard-button",
+            disabled: !hasPending,
+            onClick: onDiscardAll,
+            children: "Discard All"
+          }
+        ),
+        /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
+          "button",
+          {
+            type: "button",
+            className: "grarf-admin__console-save-button",
+            disabled: !hasPending,
+            onClick: onSaveAll,
+            children: "Save All"
+          }
+        )
+      ] })
+    ] }),
+    hasPending ? /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("ul", { className: "grarf-admin__pending-game-list", children: pendingEdits.map((entry) => /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(PendingGameListItem, { entry }, entry.gameKey)) }) : null,
+    saveAllState.status === "validation_error" ? /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { className: "grarf-admin__console-save-feedback grarf-admin__console-save-feedback--error", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("p", { className: "grarf-admin__console-save-feedback-title", children: "Save All validation failed" }),
+      /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("ul", { className: "grarf-admin__console-save-error-list", children: saveAllState.issues.map((issue) => /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("li", { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("strong", { children: issue.eventName }),
+        ": ",
+        issue.errors.join(" ")
+      ] }, issue.gameKey)) })
+    ] }) : null,
+    saveAllState.status === "success" ? /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { className: "grarf-admin__console-save-feedback grarf-admin__console-save-feedback--success", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("p", { className: "grarf-admin__console-save-feedback-title", children: "Pending changes collection ready" }),
+      /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("p", { className: "grarf-admin__console-save-message", children: [
+        saveAllState.collection.gameCount,
+        " game",
+        saveAllState.collection.gameCount === 1 ? "" : "s",
+        " \xB7",
+        " ",
+        saveAllState.collection.fieldChangeCount,
+        " field change",
+        saveAllState.collection.fieldChangeCount === 1 ? "" : "s",
+        " ready for the future Operations API."
+      ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("div", { className: "grarf-admin__pending-collection", children: saveAllState.collection.changeSets.filter((changeSet) => changeSet.changes.length > 0).map((changeSet) => /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { className: "grarf-admin__pending-collection-item", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("div", { className: "grarf-admin__pending-collection-game", children: eventNameByGameKey.get(changeSet.gameKey) ?? changeSet.gameKey }),
+        /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(OperationsChangeSetSummary, { changeSet })
+      ] }, changeSet.gameKey)) })
+    ] }) : null
+  ] });
+}
+function PendingGameListItem({ entry }) {
+  const changeCount = resolveOperationsChangeFields(entry.originalDraft, entry.editedDraft).length;
+  return /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("li", { className: "grarf-admin__pending-game-item", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("span", { className: "grarf-admin__pending-game-marker", "aria-hidden": true }),
+    /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { className: "grarf-admin__pending-game-copy", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("div", { className: "grarf-admin__pending-game-name", children: entry.eventName }),
+      /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { className: "grarf-admin__pending-game-meta", children: [
+        entry.leagueLabel,
+        " \xB7 ",
+        changeCount,
+        " field change",
+        changeCount === 1 ? "" : "s"
+      ] })
+    ] }),
+    /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("span", { className: "grarf-admin__pending-game-ready", children: "Ready" })
+  ] });
+}
+
+// src/admin/components/OperationsSnapshotSearchBar.tsx
+init_define_import_meta_env();
+var import_jsx_runtime7 = __toESM(require_jsx_runtime());
+function OperationsSnapshotSearchBar({
+  value,
+  onChange
+}) {
+  return /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { className: "grarf-admin__operations-search", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("label", { className: "grarf-admin__operations-search-label", htmlFor: "operations-snapshot-search", children: "Search snapshot" }),
+    /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(
+      "input",
+      {
+        id: "operations-snapshot-search",
+        type: "search",
+        className: "grarf-admin__operations-search-input",
+        value,
+        placeholder: "Search games, teams, players, leagues...",
+        onChange: (event) => onChange(event.target.value),
+        autoComplete: "off",
+        spellCheck: false
+      }
+    )
+  ] });
+}
+
 // src/admin/hooks/useAdminOperationsDateSnapshot.ts
 init_define_import_meta_env();
 var import_react5 = __toESM(require_react());
@@ -22835,14 +22616,46 @@ init_define_import_meta_env();
 
 // ../grarf/desktop/src/data/leagueImportanceOrder.ts
 init_define_import_meta_env();
-var CANONICAL_LEAGUE_IMPORTANCE_ORDER = [
+
+// ../grarf/desktop/src/lib/leaguePriority/index.ts
+init_define_import_meta_env();
+
+// ../grarf/desktop/src/lib/leaguePriority/leaguePriorityService.ts
+init_define_import_meta_env();
+
+// ../grarf/desktop/src/lib/leaguePriority/leaguePriorityAliases.ts
+init_define_import_meta_env();
+var LEAGUE_PRIORITY_ALIASES = {
+  MCWS: "NCAABB",
+  "NCAA BASEBALL": "NCAABB",
+  "WORLD CUP": "WORLDCUP",
+  "FIFA WORLD CUP": "WORLDCUP",
+  "TOUR DE FRANCE": "TDF",
+  "TOUR-DE-FRANCE": "TDF",
+  GTWORLD: "GT_WORLD_CHALLENGE",
+  "FORMULA 1": "F1",
+  "FORMULA ONE": "F1",
+  "NASCAR CUP SERIES": "NASCAR",
+  "NASCAR OREILLY AUTO PARTS SERIES": "NASCAR",
+  "NBA SUMMER LEAGUE": "NBASUMMER"
+};
+var LEAGUE_PRIORITY_MANUAL_AFTER = {
+  "GT WORLD": "WEC",
+  "GT-WORLD-CHALLENGE": "WEC"
+};
+
+// ../grarf/desktop/src/lib/leaguePriority/leaguePrioritySeed.ts
+init_define_import_meta_env();
+var LEAGUE_PRIORITY_SEED_ORDER = [
   "WORLDCUP",
+  "WIMBLEDON_MEN",
+  "WIMBLEDON_WOMEN",
   "MLB",
-  "ATP",
-  "WTA",
+  "NBASUMMER",
   "TDF",
   "WNBA",
-  "WIMBLEDON",
+  "ATP",
+  "WTA",
   "WWC",
   "EURO",
   "EPL",
@@ -22879,62 +22692,66 @@ var CANONICAL_LEAGUE_IMPORTANCE_ORDER = [
   "AFL",
   "CHAMPIONS"
 ];
-var IMPORTANCE_ALIASES = {
-  MCWS: "NCAABB",
-  "NCAA BASEBALL": "NCAABB",
-  "WORLD CUP": "WORLDCUP",
-  "FIFA WORLD CUP": "WORLDCUP",
-  "TOUR DE FRANCE": "TDF",
-  "TOUR-DE-FRANCE": "TDF",
-  GTWORLD: "GT_WORLD_CHALLENGE",
-  "FORMULA 1": "F1",
-  "FORMULA ONE": "F1",
-  "NASCAR CUP SERIES": "NASCAR",
-  "NASCAR OREILLY AUTO PARTS SERIES": "NASCAR"
-};
-var MANUAL_LEAGUE_IMPORTANCE_AFTER = {
-  "GT WORLD": "WEC",
-  "GT-WORLD-CHALLENGE": "WEC"
-};
-var SCORE_BY_LEAGUE_KEY = new Map(
-  CANONICAL_LEAGUE_IMPORTANCE_ORDER.map((key, index) => [
-    key,
-    CANONICAL_LEAGUE_IMPORTANCE_ORDER.length - index
-  ])
-);
+function getLeaguePrioritySeedOrder() {
+  return LEAGUE_PRIORITY_SEED_ORDER;
+}
+
+// ../grarf/desktop/src/lib/leaguePriority/leaguePriorityService.ts
 function normalizeLeagueLabel(value) {
   return value.trim().toUpperCase().replace(/['']/g, "'");
 }
-function resolveManualEditorialLeagueImportanceScore(raw) {
-  const anchor = MANUAL_LEAGUE_IMPORTANCE_AFTER[normalizeLeagueLabel(raw)];
-  if (!anchor) return null;
-  const anchorScore = SCORE_BY_LEAGUE_KEY.get(anchor) ?? 0;
-  return anchorScore > 0 ? anchorScore - 0.5 : null;
+function buildScoreByLeagueKey(order) {
+  return new Map(order.map((key, index) => [key, order.length - index]));
 }
-function resolveCanonicalLeagueImportanceKey(raw) {
-  if (!raw) return null;
-  const normalized = normalizeLeagueLabel(raw);
-  if (SCORE_BY_LEAGUE_KEY.has(normalized)) {
-    return normalized;
+function createLeagueImportanceResolver(order) {
+  const scoreByLeagueKey = buildScoreByLeagueKey(order);
+  function resolveManualEditorialLeagueImportanceScore(raw) {
+    const anchor = LEAGUE_PRIORITY_MANUAL_AFTER[normalizeLeagueLabel(raw)];
+    if (!anchor) return null;
+    const anchorScore = scoreByLeagueKey.get(anchor) ?? 0;
+    return anchorScore > 0 ? anchorScore - 0.5 : null;
   }
-  const alias = IMPORTANCE_ALIASES[normalized];
-  return alias ?? null;
+  function resolveCanonicalLeagueImportanceKey2(raw) {
+    if (!raw) return null;
+    const normalized = normalizeLeagueLabel(raw);
+    if (scoreByLeagueKey.has(normalized)) {
+      return normalized;
+    }
+    const alias = LEAGUE_PRIORITY_ALIASES[normalized];
+    return alias ?? null;
+  }
+  function resolveLeagueImportanceScore2(raw) {
+    if (!raw) return 0;
+    const manualScore = resolveManualEditorialLeagueImportanceScore(raw);
+    if (manualScore != null) return manualScore;
+    const key = resolveCanonicalLeagueImportanceKey2(raw);
+    if (!key) return 0;
+    return scoreByLeagueKey.get(key) ?? 0;
+  }
+  function sortGrarfLeagueKeysByImportance2(keys) {
+    return [...keys].sort((a, b) => {
+      const importanceDelta = resolveLeagueImportanceScore2(b) - resolveLeagueImportanceScore2(a);
+      if (importanceDelta !== 0) return importanceDelta;
+      return a.localeCompare(b);
+    });
+  }
+  return {
+    getLeaguePriorityOrder: () => order,
+    resolveCanonicalLeagueImportanceKey: resolveCanonicalLeagueImportanceKey2,
+    resolveLeagueImportanceScore: resolveLeagueImportanceScore2,
+    sortGrarfLeagueKeysByImportance: sortGrarfLeagueKeysByImportance2
+  };
 }
+var activeResolver = createLeagueImportanceResolver(getLeaguePrioritySeedOrder());
 function resolveLeagueImportanceScore(raw) {
-  if (!raw) return 0;
-  const manualScore = resolveManualEditorialLeagueImportanceScore(raw);
-  if (manualScore != null) return manualScore;
-  const key = resolveCanonicalLeagueImportanceKey(raw);
-  if (!key) return 0;
-  return SCORE_BY_LEAGUE_KEY.get(key) ?? 0;
+  return activeResolver.resolveLeagueImportanceScore(raw);
 }
 function sortGrarfLeagueKeysByImportance(keys) {
-  return [...keys].sort((a, b) => {
-    const importanceDelta = resolveLeagueImportanceScore(b) - resolveLeagueImportanceScore(a);
-    if (importanceDelta !== 0) return importanceDelta;
-    return a.localeCompare(b);
-  });
+  return activeResolver.sortGrarfLeagueKeysByImportance(keys);
 }
+
+// ../grarf/desktop/src/lib/leaguePriority/buildLeaguePrioritySavePayload.ts
+init_define_import_meta_env();
 
 // ../grarf/desktop/src/data/grarfSportHierarchy.ts
 init_define_import_meta_env();
@@ -23000,8 +22817,8 @@ var GRARF_SPORT_HIERARCHY = {
     leagueKeys: []
   }
 };
-var GOLF_LEAGUE_KEYS2 = GRARF_SPORT_HIERARCHY.golf.leagueKeys;
-var GOLF_LEAGUE_KEY_SET = new Set(GOLF_LEAGUE_KEYS2);
+var GOLF_LEAGUE_KEYS = GRARF_SPORT_HIERARCHY.golf.leagueKeys;
+var GOLF_LEAGUE_KEY_SET = new Set(GOLF_LEAGUE_KEYS);
 function isGolfLeagueKey(leagueKey) {
   return typeof leagueKey === "string" && GOLF_LEAGUE_KEY_SET.has(leagueKey);
 }
@@ -23021,6 +22838,7 @@ var ALL_GAMES_COLUMN_LEAGUES = [
   "WEC",
   "NCAABB",
   "NBA",
+  "NBASUMMER",
   "WNBA",
   "NHL",
   "AFL",
@@ -23067,6 +22885,7 @@ var GAMES_COLUMN_LEAGUE_LABEL = {
   MLB: "MLB",
   NCAABB: "NCAA Baseball",
   NBA: "NBA",
+  NBASUMMER: "NBA Summer League",
   WNBA: "WNBA",
   NHL: "NHL",
   AFL: "AFL",
@@ -23382,6 +23201,13 @@ var ESPN_OPERATIONAL_INGEST_LEAGUES = [
     "endpoint": "https://site.api.espn.com/apis/site/v2/sports/basketball/nba-development/scoreboard"
   },
   {
+    "key": "NBASUMMER",
+    "sport": "basketball",
+    "label": "NBA Summer League",
+    "slug": "nba-summer",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/basketball/nba-summer/scoreboard"
+  },
+  {
     "key": "NCAABB",
     "sport": "baseball",
     "label": "NCAA Baseball",
@@ -23649,7 +23475,9 @@ var GAMES_SPINE_LEAGUE_DISPLAY_LABEL = {
   EPL: "EPL",
   NCAABB: "MCWS",
   WORLDCUP: "World Cup",
-  PLL: "PLL"
+  PLL: "PLL",
+  WIMBLEDON_MEN: "Wimbledon (Men's)",
+  WIMBLEDON_WOMEN: "Wimbledon (Women's)"
 };
 function resolveGamesSpineLeagueDisplayLabel(league) {
   return GAMES_SPINE_LEAGUE_DISPLAY_LABEL[league] ?? GAMES_COLUMN_LEAGUE_LABEL[league] ?? resolveEspnOperationalLeagueLabel(league) ?? league;
@@ -23657,6 +23485,242 @@ function resolveGamesSpineLeagueDisplayLabel(league) {
 
 // ../grarf/desktop/src/lib/gamesSpine/manual/convertManualGamesSpineDocument.ts
 init_define_import_meta_env();
+
+// ../grarf/desktop/shared/operationalSlateDate.js
+init_define_import_meta_env();
+
+// ../grarf/desktop/shared/golfTournamentDate.js
+init_define_import_meta_env();
+var GOLF_TOURNAMENT_DAY_TIMEZONE = "America/New_York";
+var GOLF_LEAGUE_KEYS2 = /* @__PURE__ */ new Set(["PGA", "LPGA", "LIV", "CHAMPIONS"]);
+function isGolfTournamentLeagueKey(league) {
+  return typeof league === "string" && GOLF_LEAGUE_KEYS2.has(league);
+}
+function readGolfTournamentStartDateKey(iso, formatDayKey) {
+  if (typeof iso !== "string" || !iso.trim()) return null;
+  const ms = Date.parse(iso);
+  if (!Number.isFinite(ms) || ms <= 0) {
+    const match = iso.match(/^(\d{4}-\d{2}-\d{2})/);
+    return match?.[1] ?? null;
+  }
+  return formatDayKey(ms, GOLF_TOURNAMENT_DAY_TIMEZONE) ?? null;
+}
+function readGolfTournamentEndDateKey(iso, formatDayKey) {
+  return readGolfTournamentStartDateKey(iso, formatDayKey);
+}
+function formatGolfScheduledDayLabel(dateKey) {
+  const trimmed = dateKey.trim();
+  if (!trimmed) return "\u2014";
+  const [y, m, d] = trimmed.split("-").map(Number);
+  if (!y || !m || !d) return "\u2014";
+  const anchor = new Date(Date.UTC(y, m - 1, d, 17, 0, 0));
+  return anchor.toLocaleDateString("en-US", {
+    weekday: "short",
+    month: "numeric",
+    day: "numeric",
+    timeZone: GOLF_TOURNAMENT_DAY_TIMEZONE
+  });
+}
+
+// ../grarf/desktop/shared/operationalSlateDate.js
+var GRARF_OPERATIONAL_SLATE_TIMEZONE = "America/Chicago";
+var OPERATIONAL_SLATE_NEXT_DAY_CUTOFF_HOUR = 6;
+var OPERATIONAL_SPORTS_DAY_ROLLOVER_HOUR = 4;
+var calendarFormatterCache = /* @__PURE__ */ new Map();
+function getCalendarFormatter(timeZone) {
+  let formatter = calendarFormatterCache.get(timeZone);
+  if (!formatter) {
+    formatter = new Intl.DateTimeFormat("en-US", {
+      timeZone,
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "numeric",
+      hourCycle: "h23"
+    });
+    calendarFormatterCache.set(timeZone, formatter);
+  }
+  return formatter;
+}
+function calendarPartsInTimeZone(ms, timeZone) {
+  const parts = getCalendarFormatter(timeZone).formatToParts(new Date(ms));
+  return {
+    year: Number(parts.find((p) => p.type === "year")?.value),
+    month: Number(parts.find((p) => p.type === "month")?.value),
+    day: Number(parts.find((p) => p.type === "day")?.value),
+    hour: Number(parts.find((p) => p.type === "hour")?.value)
+  };
+}
+var operationalCalendarDateKeyCache = {
+  timeZone: "",
+  bucketMs: 0,
+  key: "1970-01-01"
+};
+var operationalSportsDayKeyCache = {
+  timeZone: "",
+  bucketMs: 0,
+  key: "1970-01-01"
+};
+function resolveOperationalSlateTimeZone() {
+  return GRARF_OPERATIONAL_SLATE_TIMEZONE;
+}
+function readOperationalCalendarDateKeyCache(now, timeZone) {
+  const bucketMs = Math.floor(now.getTime() / 6e4);
+  if (operationalCalendarDateKeyCache.timeZone === timeZone && operationalCalendarDateKeyCache.bucketMs === bucketMs) {
+    return operationalCalendarDateKeyCache.key;
+  }
+  return null;
+}
+function writeOperationalCalendarDateKeyCache(now, timeZone, key) {
+  operationalCalendarDateKeyCache.timeZone = timeZone;
+  operationalCalendarDateKeyCache.bucketMs = Math.floor(now.getTime() / 6e4);
+  operationalCalendarDateKeyCache.key = key;
+}
+function formatOperationalDateKeyFromMs(ms, timeZone = GRARF_OPERATIONAL_SLATE_TIMEZONE) {
+  if (ms == null || !Number.isFinite(ms) || ms <= 0) return void 0;
+  const { year, month, day } = calendarPartsInTimeZone(ms, timeZone);
+  if (!year || !month || !day) return void 0;
+  return `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+}
+function writeOperationalSportsDayKeyCache(now, timeZone, key) {
+  operationalSportsDayKeyCache.timeZone = timeZone;
+  operationalSportsDayKeyCache.bucketMs = Math.floor(now.getTime() / 6e4);
+  operationalSportsDayKeyCache.key = key;
+}
+function readOperationalSportsDayKeyCache(now, timeZone) {
+  const bucketMs = Math.floor(now.getTime() / 6e4);
+  if (operationalSportsDayKeyCache.timeZone === timeZone && operationalSportsDayKeyCache.bucketMs === bucketMs) {
+    return operationalSportsDayKeyCache.key;
+  }
+  return null;
+}
+function getOperationalCalendarDateKey(now = /* @__PURE__ */ new Date(), timeZone = resolveOperationalSlateTimeZone()) {
+  const cached = readOperationalCalendarDateKeyCache(now, timeZone);
+  if (cached) return cached;
+  const key = formatOperationalDateKeyFromMs(now.getTime(), timeZone) ?? "1970-01-01";
+  writeOperationalCalendarDateKeyCache(now, timeZone, key);
+  return key;
+}
+function getOperationalSportsDayDateKey(now = /* @__PURE__ */ new Date(), timeZone = resolveOperationalSlateTimeZone()) {
+  const cached = readOperationalSportsDayKeyCache(now, timeZone);
+  if (cached) return cached;
+  let key = getOperationalCalendarDateKey(now, timeZone);
+  const { hour } = calendarPartsInTimeZone(now.getTime(), timeZone);
+  if (hour < OPERATIONAL_SPORTS_DAY_ROLLOVER_HOUR) {
+    key = offsetOperationalDateKey(key, -1, timeZone);
+  }
+  writeOperationalSportsDayKeyCache(now, timeZone, key);
+  return key;
+}
+function getOperationalSportsDayYesterdayDateKey(now = /* @__PURE__ */ new Date(), timeZone = resolveOperationalSlateTimeZone()) {
+  return offsetOperationalDateKey(getOperationalSportsDayDateKey(now, timeZone), -1, timeZone);
+}
+function getOperationalSportsDayTomorrowDateKey(now = /* @__PURE__ */ new Date(), timeZone = resolveOperationalSlateTimeZone()) {
+  return offsetOperationalDateKey(getOperationalSportsDayDateKey(now, timeZone), 1, timeZone);
+}
+function formatEspnScoreboardDatesParamForOperationalSportsDay(now = /* @__PURE__ */ new Date(), timeZone = resolveOperationalSlateTimeZone()) {
+  const key = getOperationalSportsDayDateKey(now, timeZone);
+  return key.replace(/-/g, "");
+}
+function formatEspnScoreboardDatesParamForOperationalSportsDayUpcoming(now = /* @__PURE__ */ new Date(), timeZone = resolveOperationalSlateTimeZone()) {
+  const key = getOperationalSportsDayTomorrowDateKey(now, timeZone);
+  return key.replace(/-/g, "");
+}
+function offsetOperationalDateKey(dateKey, dayOffset, timeZone = GRARF_OPERATIONAL_SLATE_TIMEZONE) {
+  const [y, m, d] = dateKey.split("-").map(Number);
+  const anchor = Date.UTC(y, (m ?? 1) - 1, (d ?? 1) + dayOffset, 12, 0, 0);
+  return formatOperationalDateKeyFromMs(anchor, timeZone) ?? dateKey;
+}
+function formatEspnScoreboardDatesParam(now = /* @__PURE__ */ new Date(), timeZone = GRARF_OPERATIONAL_SLATE_TIMEZONE) {
+  return getOperationalCalendarDateKey(now, timeZone).replace(/-/g, "");
+}
+function resolveScheduledDateKey(isoStart, slateDateKey, timeZone = GRARF_OPERATIONAL_SLATE_TIMEZONE) {
+  const fromStart = formatOperationalDateKeyFromMs(Date.parse(isoStart || ""), timeZone);
+  if (fromStart) return fromStart;
+  const slate = typeof slateDateKey === "string" ? slateDateKey.trim() : "";
+  return slate || void 0;
+}
+var nextDayCutoffMsCache = /* @__PURE__ */ new Map();
+function getNextDayCutoffMs(operationalDateKey, cutoffHour, timeZone) {
+  const cacheKey2 = `${operationalDateKey}|${cutoffHour}|${timeZone}`;
+  const cached = nextDayCutoffMsCache.get(cacheKey2);
+  if (cached != null) return cached;
+  const tomorrowKey = offsetOperationalDateKey(operationalDateKey, 1, timeZone);
+  const [y, m, d] = tomorrowKey.split("-").map(Number);
+  let probe = Date.UTC(y, (m ?? 1) - 1, d ?? 1, 12, 0, 0);
+  for (let i = -30; i < 30; i++) {
+    const candidate = probe + i * 36e5;
+    const key = formatOperationalDateKeyFromMs(candidate, timeZone);
+    const hour = calendarPartsInTimeZone(candidate, timeZone).hour;
+    if (key === tomorrowKey && hour === cutoffHour) {
+      nextDayCutoffMsCache.set(cacheKey2, candidate);
+      return candidate;
+    }
+  }
+  const fallback = probe + 24 * 36e5;
+  nextDayCutoffMsCache.set(cacheKey2, fallback);
+  return fallback;
+}
+function isScheduledOnOperationalEveningSlate(game, operationalDateKey, now = /* @__PURE__ */ new Date(), timeZone = GRARF_OPERATIONAL_SLATE_TIMEZONE) {
+  const startKey = formatOperationalDateKeyFromMs(game.startTimeMs, timeZone);
+  if (startKey === operationalDateKey) return true;
+  const tomorrowKey = offsetOperationalDateKey(operationalDateKey, 1, timeZone);
+  const payloadKey = typeof game.scheduledDateKey === "string" ? game.scheduledDateKey.trim() : null;
+  if (startKey === tomorrowKey) {
+    const ms = game.startTimeMs;
+    if (ms != null && Number.isFinite(ms) && ms > 0) {
+      const cutoff = getNextDayCutoffMs(operationalDateKey, OPERATIONAL_SLATE_NEXT_DAY_CUTOFF_HOUR, timeZone);
+      if (ms < cutoff) return true;
+    }
+  }
+  if (!startKey && payloadKey === operationalDateKey) return true;
+  return false;
+}
+function resolveGameOperationalSlateDateKey(game, timeZone = GRARF_OPERATIONAL_SLATE_TIMEZONE) {
+  const scheduledKey = typeof game?.scheduledDateKey === "string" ? game.scheduledDateKey.trim() : "";
+  if (isGolfTournamentLeagueKey(game?.league)) {
+    if (scheduledKey) return scheduledKey;
+    if (game?.status === "final") {
+      const endKey = typeof game?.metadata?.tournamentEndDateKey === "string" ? game.metadata.tournamentEndDateKey.trim() : "";
+      if (endKey) return endKey;
+    }
+  }
+  return formatOperationalDateKeyFromMs(game?.startTimeMs, timeZone) || scheduledKey || void 0;
+}
+function filterGamesForOperationalDateKey(games, operationalDateKey, now = /* @__PURE__ */ new Date(), timeZone = GRARF_OPERATIONAL_SLATE_TIMEZONE) {
+  return games.filter((g) => {
+    if (g?.status === "live") return true;
+    if (g?.status === "scheduled") {
+      if (isGolfTournamentLeagueKey(g?.league)) {
+        const key2 = typeof g?.scheduledDateKey === "string" ? g.scheduledDateKey.trim() : "";
+        return key2 ? key2 === operationalDateKey : false;
+      }
+      return isScheduledOnOperationalEveningSlate(g, operationalDateKey, now, timeZone);
+    }
+    if (isScheduledOnOperationalEveningSlate(g, operationalDateKey, now, timeZone)) {
+      return true;
+    }
+    const key = resolveGameOperationalSlateDateKey(g, timeZone);
+    return key === operationalDateKey;
+  });
+}
+function shouldKeepGameOnOperationalFallbackIngest(game, now = /* @__PURE__ */ new Date(), timeZone = GRARF_OPERATIONAL_SLATE_TIMEZONE) {
+  if (game?.status === "live") return true;
+  const activeSlateDayKey = getOperationalSportsDayDateKey(now, timeZone);
+  if (filterGamesForOperationalDateKey([game], activeSlateDayKey, now, timeZone).length > 0) {
+    return true;
+  }
+  if (game?.status === "final") {
+    const precedingDayKey = getOperationalSportsDayYesterdayDateKey(now, timeZone);
+    if (filterGamesForOperationalDateKey([game], precedingDayKey, now, timeZone).length > 0) {
+      return true;
+    }
+  }
+  return false;
+}
+function filterGamesForOperationalFallbackIngest(games, now = /* @__PURE__ */ new Date(), timeZone = GRARF_OPERATIONAL_SLATE_TIMEZONE) {
+  return games.filter((g) => shouldKeepGameOnOperationalFallbackIngest(g, now, timeZone));
+}
 
 // ../grarf/desktop/src/lib/gamesSpine/manualGamesSpineLeagueLogoUrls.ts
 init_define_import_meta_env();
@@ -24086,6 +24150,306 @@ init_define_import_meta_env();
 
 // ../grarf/desktop/src/lib/operations/resolveOperationsDateEntry.ts
 init_define_import_meta_env();
+
+// ../grarf/desktop/src/data/operations.ts
+init_define_import_meta_env();
+var OPERATIONS = {
+  dates: {
+    "2026-06-13": {
+      featuredGames: { selections: [] },
+      manualEventOverrides: {
+        WEC: {
+          timeZone: "America/Chicago",
+          operationalDateKeys: ["2026-06-13", "2026-06-14"],
+          gameId: "manual-wec-le-mans-2026",
+          eventName: "24 Hours of Le Mans",
+          scheduledDateKey: "2026-06-13",
+          startTime: "2026-06-13T09:00:00",
+          endTime: "2026-06-14T09:00:00"
+        }
+      },
+      manualGameOverrides: {
+        "manual-wec-le-mans-2026": {
+          streamUrl: "https://plus.fiawec.com/en/livestream/s-24-hours-of-le-mans-race-en-4ggw9"
+        }
+      }
+    },
+    "2026-06-14": {
+      featuredGames: { selections: [] },
+      manualEventOverrides: {
+        WEC: {
+          timeZone: "America/Chicago",
+          operationalDateKeys: ["2026-06-13", "2026-06-14"],
+          gameId: "manual-wec-le-mans-2026",
+          eventName: "24 Hours of Le Mans",
+          scheduledDateKey: "2026-06-13",
+          startTime: "2026-06-13T09:00:00",
+          endTime: "2026-06-14T09:00:00"
+        }
+      },
+      manualGameOverrides: {
+        "manual-wec-le-mans-2026": {
+          streamUrl: "https://plus.fiawec.com/en/livestream/s-24-hours-of-le-mans-race-en-4ggw9"
+        }
+      }
+    },
+    "2026-06-27": {
+      featuredGames: { selections: [] },
+      manualEventOverrides: {
+        GT_WORLD_CHALLENGE: {
+          league: "gt-world-challenge",
+          displayName: "GT World",
+          insertAfterLeague: "WEC",
+          sourceTimeZone: "America/Chicago",
+          games: [
+            {
+              date: "2026-06-27",
+              eventName: "24 Hours of Spa",
+              startTime: "2026-06-27T09:00:00",
+              endTime: "2026-06-28T10:00:00",
+              bestGamePriority: 0
+            }
+          ]
+        }
+      },
+      manualGameOverrides: {
+        "manual-gs-gt-world-challenge-24-hours-of-spa-2026-06-27": {
+          channel: "YouTube",
+          channelUrl: "https://www.youtube.com/live/1bbj47g_FOs?si=dZLDLjR3q8TIS6Ly"
+        }
+      }
+    },
+    "2026-06-28": {
+      featuredGames: { selections: [] },
+      manualEventOverrides: {
+        GT_WORLD_CHALLENGE: {
+          league: "gt-world-challenge",
+          displayName: "GT World",
+          insertAfterLeague: "WEC",
+          sourceTimeZone: "America/Chicago",
+          games: [
+            {
+              date: "2026-06-28",
+              eventName: "24 Hours of Spa",
+              startTime: "2026-06-27T09:00:00",
+              endTime: "2026-06-28T10:00:00",
+              bestGamePriority: 0
+            }
+          ]
+        }
+      },
+      manualGameOverrides: {
+        "manual-gs-gt-world-challenge-24-hours-of-spa-2026-06-28": {
+          channel: "YouTube",
+          channelUrl: "https://www.youtube.com/live/1bbj47g_FOs?si=dZLDLjR3q8TIS6Ly"
+        }
+      }
+    },
+    "2026-07-08": {
+      featuredGames: {
+        selections: [
+          { rank: 1, league: "ATP", matchup: "Zverev vs Fritz", gameKey: "177494" },
+          { rank: 2, league: "ATP", matchup: "Fery vs Cobolli", gameKey: "177492" },
+          { rank: 3, league: "WTA", matchup: "Paolini vs Kostyuk", gameKey: "177705" },
+          { rank: 4, league: "WTA", matchup: "Mertens vs Noskova", gameKey: "177712" },
+          {
+            rank: 5,
+            league: "Tour de France",
+            matchup: "Stage 5",
+            gameKey: "manual-tdf-stage-5-2026-07-08"
+          },
+          { rank: 6, league: "MLB", matchup: "Yankees vs Rays", gameKey: "401816073" }
+        ]
+      },
+      manualEventOverrides: {
+        TDF: {
+          timeZone: "America/New_York",
+          highlightsTv: {
+            sport: "CYCLING",
+            sourceType: "Playlist",
+            url: "https://youtube.com/playlist?list=PLWuO6-g6SGnU&si=IuqQ1pQ5ejSjUOwc",
+            requiredTitleKeywords: "highlights",
+            excludedKeywords: "",
+            enabled: true
+          },
+          stages: [
+            {
+              stage: 1,
+              date: "2026-07-04",
+              start: "10:00",
+              end: "12:00",
+              route: "Barcelona to Barcelona",
+              broadcast: ["NBC", "Peacock"]
+            },
+            {
+              stage: 2,
+              date: "2026-07-05",
+              start: "07:00",
+              end: "11:30",
+              route: "Tarragona to Barcelona",
+              broadcast: ["Peacock"]
+            },
+            {
+              stage: 3,
+              date: "2026-07-06",
+              start: "05:30",
+              end: "11:00",
+              route: "Granollers to Les Angles",
+              broadcast: ["Peacock"]
+            },
+            {
+              stage: 4,
+              date: "2026-07-07",
+              start: "06:30",
+              end: "11:30",
+              route: "Carcassonne to Foix",
+              broadcast: ["Peacock"]
+            },
+            {
+              stage: 5,
+              date: "2026-07-08",
+              start: "07:00",
+              end: "11:00",
+              route: "Lannemezan to Pau",
+              broadcast: ["Peacock"]
+            },
+            {
+              stage: 6,
+              date: "2026-07-09",
+              start: "06:00",
+              end: "11:30",
+              route: "Pau to Gavarnie-G\xE8dre",
+              broadcast: ["Peacock"]
+            },
+            {
+              stage: 7,
+              date: "2026-07-10",
+              start: "06:30",
+              end: "11:00",
+              route: "Hagetmau to Bordeaux",
+              broadcast: ["Peacock"]
+            },
+            {
+              stage: 8,
+              date: "2026-07-11",
+              start: "06:30",
+              end: "11:00",
+              route: "P\xE9rigueux to Bergerac",
+              broadcast: ["NBC", "Peacock"]
+            },
+            {
+              stage: 9,
+              date: "2026-07-12",
+              start: "06:30",
+              end: "11:30",
+              route: "Malemort to Ussel",
+              broadcast: ["Peacock"]
+            },
+            {
+              stage: 10,
+              date: "2026-07-14",
+              start: "06:30",
+              end: "11:00",
+              route: "Aurillac to Le Lioran",
+              broadcast: ["Peacock"]
+            },
+            {
+              stage: 11,
+              date: "2026-07-15",
+              start: "07:00",
+              end: "11:00",
+              route: "Vichy to Nevers",
+              broadcast: ["Peacock"]
+            },
+            {
+              stage: 12,
+              date: "2026-07-16",
+              start: "07:00",
+              end: "11:30",
+              route: "Circuit Nevers Magny-Cours to Chalon-sur-Sa\xF4ne",
+              broadcast: ["Peacock"]
+            },
+            {
+              stage: 13,
+              date: "2026-07-17",
+              start: "06:30",
+              end: "12:00",
+              route: "Dole to Belfort",
+              broadcast: ["Peacock"]
+            },
+            {
+              stage: 14,
+              date: "2026-07-18",
+              start: "06:30",
+              end: "11:00",
+              route: "Mulhouse to Le Markstein Fellering",
+              broadcast: ["Peacock"]
+            },
+            {
+              stage: 15,
+              date: "2026-07-19",
+              start: "06:30",
+              end: "12:00",
+              route: "Champagnole to Plateau de Solaison",
+              broadcast: ["Peacock"]
+            },
+            {
+              stage: 16,
+              date: "2026-07-21",
+              start: "06:30",
+              end: "10:00",
+              route: "\xC9vian-les-Bains to Thonon-les-Bains",
+              broadcast: ["Peacock"]
+            },
+            {
+              stage: 17,
+              date: "2026-07-22",
+              start: "06:30",
+              end: "11:00",
+              route: "Chambery to Voiron",
+              broadcast: ["Peacock"]
+            },
+            {
+              stage: 18,
+              date: "2026-07-23",
+              start: "06:00",
+              end: "11:30",
+              route: "Voiron to Orci\xE8res-Merlette",
+              broadcast: ["Peacock"]
+            },
+            {
+              stage: 19,
+              date: "2026-07-24",
+              start: "07:00",
+              end: "11:00",
+              route: "Gap to Alpe d'Huez",
+              broadcast: ["Peacock"]
+            },
+            {
+              stage: 20,
+              date: "2026-07-25",
+              start: "05:30",
+              end: "11:00",
+              route: "Le Bourg d'Oisans to Alpe d'Huez",
+              broadcast: ["NBC", "Peacock"]
+            },
+            {
+              stage: 21,
+              date: "2026-07-26",
+              start: "09:30",
+              end: "13:00",
+              route: "Thoiry to Paris Champs-\xC9lys\xE9es",
+              broadcast: ["Peacock"]
+            }
+          ]
+        }
+      },
+      manualGameOverrides: {}
+    }
+  }
+};
+
+// ../grarf/desktop/src/lib/operations/resolveOperationsDateEntry.ts
 var EMPTY_OPERATIONS_DATE_ENTRY = {
   featuredGames: { selections: [] },
   manualEventOverrides: {},
@@ -24270,7 +24634,7 @@ function resolveEspnCardStatus(statusType) {
 init_define_import_meta_env();
 
 // ../grarf/desktop/src/lib/gamesSpine/manualLeMans2026SpineEntry.ts
-var import_react3 = __toESM(require_react(), 1);
+var import_react2 = __toESM(require_react(), 1);
 var MANUAL_LE_MANS_2026_GAME_ID = "manual-wec-le-mans-2026";
 function resolveLeMansEventOverride(operationalDateKey) {
   return resolveOperationsDateEntry(operationalDateKey).manualEventOverrides.WEC;
@@ -24383,6 +24747,619 @@ function resolveGolfWatchStreamUrl(leagueKey, tournamentTitle) {
 
 // ../grarf/desktop/src/lib/golf/lpgaMajorTournament.ts
 init_define_import_meta_env();
+
+// ../grarf/desktop/src/lib/gamesSpine/wimbledonGamesSpinePresentation.ts
+init_define_import_meta_env();
+
+// ../grarf/desktop/src/lib/watch/enrichWimbledonEspnWatchStreams.ts
+init_define_import_meta_env();
+
+// ../grarf/desktop/src/lib/tennisChannelPlus/nameUtils.ts
+init_define_import_meta_env();
+function normalizeTennisText(value) {
+  return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9\s]/g, " ").replace(/\s+/g, " ").trim();
+}
+function tokenizeTennisLabel(raw) {
+  const trimmed = raw.trim();
+  if (!trimmed) return [];
+  if (trimmed.includes("/")) {
+    return trimmed.split("/").flatMap((part) => tokenizeTennisLabel(part)).filter(Boolean);
+  }
+  let label = trimmed;
+  if (label.includes(",")) {
+    const [last, first] = label.split(",").map((part) => part.trim());
+    label = `${first} ${last}`.trim();
+  }
+  return normalizeTennisText(label).split(" ").filter((token) => token.length >= 2);
+}
+function tokenSetFromLabel(raw) {
+  return new Set(tokenizeTennisLabel(raw));
+}
+function tokenOverlapScore(a, b) {
+  if (a.size === 0 || b.size === 0) return 0;
+  let matched = 0;
+  for (const token of a) {
+    if (b.has(token)) {
+      matched += 1;
+      continue;
+    }
+    for (const other of b) {
+      if (token.length >= 4 && other.length >= 4 && (token.includes(other) || other.includes(token))) {
+        matched += 0.9;
+        break;
+      }
+    }
+  }
+  return matched / Math.max(a.size, b.size);
+}
+var TOURNAMENT_STOP_WORDS = /* @__PURE__ */ new Set([
+  "atp",
+  "wta",
+  "itf",
+  "men",
+  "women",
+  "singles",
+  "doubles",
+  "mixed",
+  "round",
+  "final",
+  "quarterfinals",
+  "semifinals",
+  "challenger",
+  "great",
+  "britain",
+  "germany",
+  "netherlands",
+  "united",
+  "states"
+]);
+function tokenizeTournamentText(raw) {
+  const tokens = normalizeTennisText(raw).split(" ").filter((token) => token.length >= 3 && !TOURNAMENT_STOP_WORDS.has(token));
+  return new Set(tokens);
+}
+
+// ../grarf/desktop/src/lib/watch/espnPlusStream.ts
+init_define_import_meta_env();
+
+// ../grarf/desktop/shared/espnWatchBroadcast.js
+init_define_import_meta_env();
+var ESPN_PLUS_LABEL = /espn\s*\+|espn\s*plus|espn\s*unlimited|espn\s*unlmtd/i;
+function isEspnPlusBroadcastLabel(label) {
+  if (typeof label !== "string" || !label.trim()) return false;
+  return ESPN_PLUS_LABEL.test(label);
+}
+function isEspnLinearBroadcastLabel(label) {
+  if (typeof label !== "string" || !label.trim()) return false;
+  const t = label.trim();
+  if (ESPN_PLUS_LABEL.test(t)) return false;
+  return /^(espn2?|abc|espn\s*network|espn\s*national)$/i.test(t);
+}
+function gameHasEspnPlusBroadcast(broadcastLabels) {
+  return broadcastLabels.some(isEspnPlusBroadcastLabel);
+}
+var LINEAR_ESPN_WATCH_LEAGUES = /* @__PURE__ */ new Set(["NHL", "ATP", "WTA", "NCAABB"]);
+function gameHasEspnWatchBroadcast(broadcastLabels, leagueKey) {
+  if (gameHasEspnPlusBroadcast(broadcastLabels)) return true;
+  if (leagueKey && LINEAR_ESPN_WATCH_LEAGUES.has(leagueKey)) {
+    return broadcastLabels.some(isEspnLinearBroadcastLabel);
+  }
+  return false;
+}
+
+// ../grarf/desktop/src/lib/watch/espnPlusStream.ts
+var PLAY_LOCATION = "where-to-watch%3Aguide";
+function resolveEspnWatchLeagueKey(game) {
+  if (game.league) return game.league;
+  if (game.id.startsWith("espn-NHL-")) return "NHL";
+  if (game.id.startsWith("espn-NCAABB-")) return "NCAABB";
+  if (game.id.startsWith("espn-ATP-")) return "ATP";
+  if (game.id.startsWith("espn-WTA-")) return "WTA";
+  return void 0;
+}
+function gameHasEspnWatchBroadcast2(game) {
+  const hints = [...game.broadcasts ?? [], ...game.channels ?? []];
+  return gameHasEspnWatchBroadcast(hints, resolveEspnWatchLeagueKey(game));
+}
+function buildEspnPlusPlayerUrlByUuid(playerId) {
+  const id = playerId.trim();
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)) return null;
+  return `https://www.espn.com/watch/player/_/id/${id}?playLocation=${PLAY_LOCATION}`;
+}
+function buildEspnPlusWatchUrl(eventCalendarId) {
+  const id = eventCalendarId.trim();
+  if (!/^\d+$/.test(id)) return null;
+  return `https://www.espn.com/watch/player/_/eventCalendarId/${id}?playLocation=${PLAY_LOCATION}`;
+}
+function attachEspnPlusStreamToGame(game, stream) {
+  game.streamUrl = stream.streamUrl;
+  game.streamProvider = stream.streamProvider;
+  if (stream.playerId) {
+    game.espnPlusPlayerId = stream.playerId;
+  }
+  if (stream.eventCalendarId) {
+    game.espnWatchEventId = stream.eventCalendarId;
+  }
+  const watchLinks = Array.isArray(game.content?.watchLinks) ? [...game.content.watchLinks] : [];
+  game.content = {
+    ...game.content ?? {},
+    watchLinks: [
+      ...watchLinks,
+      {
+        provider: stream.streamProvider,
+        url: stream.streamUrl,
+        eventCalendarId: stream.eventCalendarId,
+        ...stream.playerId ? { playerId: stream.playerId } : {}
+      }
+    ]
+  };
+}
+function resolveEspnWatchStreamFromCompetition(competition, broadcastLabels, leagueKey) {
+  if (!gameHasEspnWatchBroadcast(broadcastLabels, leagueKey)) return null;
+  const eventCalendarId = String(competition?.id ?? "").trim();
+  if (!/^\d+$/.test(eventCalendarId)) return null;
+  const streamUrl = buildEspnPlusWatchUrl(eventCalendarId);
+  if (!streamUrl) return null;
+  return { streamUrl, streamProvider: "ESPN+", eventCalendarId };
+}
+
+// ../grarf/desktop/src/lib/watch/enrichWimbledonEspnWatchStreams.ts
+var ESPN_FETCH_UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36";
+var WIMBLEDON_ESPN_WATCH_CATALOG_ID = "6929e7a4-2c40-3f82-a710-42baae9472c6";
+var WIMBLEDON_ESPN_WATCH_CATALOG_URL = `https://watch.product.api.espn.com/api/product/v3/watchespn/web/catalog/${WIMBLEDON_ESPN_WATCH_CATALOG_ID}?tz=America%2FChicago&lang=en&countryCode=US&deviceType=desktop`;
+var MIN_PLAYER_SCORE = 0.55;
+var MIN_TOTAL_SCORE = 0.62;
+var CATALOG_CACHE_TTL_MS = 3e4;
+var catalogCache = null;
+function isTennisLeague(game) {
+  return game.league === "ATP" || game.league === "WTA";
+}
+function wimbledonHaystack(game) {
+  return [
+    game.metadata?.tennis?.contextLine,
+    game.statusLine,
+    game.leagueContextLabel
+  ].filter(Boolean).join(" ");
+}
+function isWimbledonTennisGame(game) {
+  if (!isTennisLeague(game)) return false;
+  return /\bwimbledon\b/i.test(wimbledonHaystack(game));
+}
+function gamePlayerTokenSets(game) {
+  const away = tokenSetFromLabel(game.metadata?.officialAwayName || game.awayTeam || "");
+  const home = tokenSetFromLabel(game.metadata?.officialHomeName || game.homeTeam || "");
+  return [away, home];
+}
+function parseEspnWatchMatchupNames(title) {
+  let cleaned = title.trim();
+  cleaned = cleaned.replace(/^\(\d+\)\s*/, "");
+  cleaned = cleaned.replace(/\s*\([^)]+\)\s*$/i, "");
+  const match = cleaned.match(/^(.+?)\s+vs\.?\s+(.+)$/i);
+  if (!match) return null;
+  return [match[1].trim(), match[2].trim()];
+}
+function listingPlayerTokenSets(listing) {
+  const parsed = parseEspnWatchMatchupNames(listing.shortName) ?? parseEspnWatchMatchupNames(listing.name);
+  if (!parsed) return [/* @__PURE__ */ new Set(), /* @__PURE__ */ new Set()];
+  return [tokenSetFromLabel(parsed[0]), tokenSetFromLabel(parsed[1])];
+}
+function scorePlayers(game, listing) {
+  const [gameAway, gameHome] = gamePlayerTokenSets(game);
+  const [listingAway, listingHome] = listingPlayerTokenSets(listing);
+  const direct = tokenOverlapScore(gameAway, listingAway) + tokenOverlapScore(gameHome, listingHome);
+  const swapped = tokenOverlapScore(gameAway, listingHome) + tokenOverlapScore(gameHome, listingAway);
+  return Math.max(direct, swapped) / 2;
+}
+function scoreListingMatch(game, listing) {
+  const players = scorePlayers(game, listing);
+  if (players < MIN_PLAYER_SCORE) return 0;
+  const liveBoost = listing.status === "live" ? 0.04 : 0;
+  return players + liveBoost;
+}
+function extractWebUrl(content) {
+  const links = content.links;
+  if (typeof links?.web === "string" && links.web.trim()) return links.web.trim();
+  const streams = content.streams;
+  for (const stream of streams ?? []) {
+    const web = stream.links?.web?.trim();
+    if (web) return web;
+  }
+  return null;
+}
+function parseWimbledonCatalogListings(json) {
+  const buckets = json?.page?.buckets;
+  if (!Array.isArray(buckets)) return [];
+  const listings = [];
+  for (const bucket of buckets) {
+    if (!bucket || typeof bucket !== "object") continue;
+    const contents = bucket.contents;
+    if (!Array.isArray(contents)) continue;
+    for (const raw of contents) {
+      if (!raw || typeof raw !== "object") continue;
+      const content = raw;
+      const status = String(content.status ?? "").toLowerCase();
+      if (status !== "live" && status !== "upcoming") continue;
+      const streamUrl = extractWebUrl(content);
+      const id = String(content.id ?? "").trim();
+      const name = String(content.name ?? "").trim();
+      const shortName = String(content.shortName ?? name).trim();
+      if (!streamUrl || !id || !name) continue;
+      listings.push({ id, name, shortName, streamUrl, status });
+    }
+  }
+  return listings;
+}
+async function fetchWimbledonEspnWatchCatalog() {
+  const now = Date.now();
+  if (catalogCache && now - catalogCache.fetchedAt < CATALOG_CACHE_TTL_MS) {
+    return catalogCache.listings;
+  }
+  try {
+    const res = await fetch(WIMBLEDON_ESPN_WATCH_CATALOG_URL, {
+      headers: { "User-Agent": ESPN_FETCH_UA, Accept: "application/json" }
+    });
+    if (!res.ok) return catalogCache?.listings ?? [];
+    const json = await res.json();
+    const listings = parseWimbledonCatalogListings(json);
+    catalogCache = { fetchedAt: now, listings };
+    return listings;
+  } catch {
+    return catalogCache?.listings ?? [];
+  }
+}
+function matchWimbledonEspnWatchListing(game, catalog) {
+  let best = null;
+  let bestScore = 0;
+  let secondBest = 0;
+  for (const listing of catalog) {
+    const score = scoreListingMatch(game, listing);
+    if (score > bestScore) {
+      secondBest = bestScore;
+      bestScore = score;
+      best = listing;
+      continue;
+    }
+    if (score > secondBest) secondBest = score;
+  }
+  if (!best || bestScore < MIN_TOTAL_SCORE) return null;
+  if (secondBest >= bestScore - 0.03) return null;
+  return best;
+}
+async function enrichWimbledonEspnWatchStreams(games) {
+  const targets = games.filter(
+    (game) => isWimbledonTennisGame(game) && game.status === "live"
+  );
+  if (targets.length === 0) return;
+  const catalog = await fetchWimbledonEspnWatchCatalog();
+  if (catalog.length === 0) return;
+  for (const game of targets) {
+    const listing = matchWimbledonEspnWatchListing(game, catalog);
+    if (!listing) {
+      continue;
+    }
+    attachEspnPlusStreamToGame(game, {
+      streamUrl: listing.streamUrl,
+      streamProvider: "ESPN+",
+      playerId: listing.id
+    });
+  }
+}
+
+// ../grarf/desktop/src/store/recentFinalizedGamesStore.ts
+init_define_import_meta_env();
+
+// ../grarf/desktop/node_modules/zustand/esm/vanilla.mjs
+init_define_import_meta_env();
+var createStoreImpl = (createState) => {
+  let state;
+  const listeners = /* @__PURE__ */ new Set();
+  const setState = (partial, replace) => {
+    const nextState = typeof partial === "function" ? partial(state) : partial;
+    if (!Object.is(nextState, state)) {
+      const previousState = state;
+      state = (replace != null ? replace : typeof nextState !== "object" || nextState === null) ? nextState : Object.assign({}, state, nextState);
+      listeners.forEach((listener) => listener(state, previousState));
+    }
+  };
+  const getState = () => state;
+  const getInitialState = () => initialState;
+  const subscribe = (listener) => {
+    listeners.add(listener);
+    return () => listeners.delete(listener);
+  };
+  const api = { setState, getState, getInitialState, subscribe };
+  const initialState = state = createState(setState, getState, api);
+  return api;
+};
+var createStore = ((createState) => createState ? createStoreImpl(createState) : createStoreImpl);
+
+// ../grarf/desktop/node_modules/zustand/esm/react.mjs
+init_define_import_meta_env();
+var import_react3 = __toESM(require_react(), 1);
+var identity = (arg) => arg;
+function useStore(api, selector = identity) {
+  const slice = import_react3.default.useSyncExternalStore(
+    api.subscribe,
+    import_react3.default.useCallback(() => selector(api.getState()), [api, selector]),
+    import_react3.default.useCallback(() => selector(api.getInitialState()), [api, selector])
+  );
+  import_react3.default.useDebugValue(slice);
+  return slice;
+}
+var createImpl = (createState) => {
+  const api = createStore(createState);
+  const useBoundStore = (selector) => useStore(api, selector);
+  Object.assign(useBoundStore, api);
+  return useBoundStore;
+};
+var create = ((createState) => createState ? createImpl(createState) : createImpl);
+
+// ../grarf/desktop/src/lib/finalizedGameRetention/harvestFinalizedOnIngestTransition.ts
+init_define_import_meta_env();
+
+// ../grarf/desktop/src/lib/finalizedGameRetention/retentionUtils.ts
+init_define_import_meta_env();
+
+// ../grarf/desktop/src/lib/finalizedGameRetention/constants.ts
+init_define_import_meta_env();
+var FINALIZED_RETENTION_TTL_MS = 24 * 60 * 60 * 1e3;
+var LIVE_RECENCY_MAX_INGEST_CYCLES = 32;
+var LIVE_RECENCY_MAX_MS = 8 * 60 * 60 * 1e3;
+
+// ../grarf/desktop/src/lib/finalizedGameRetention/retentionUtils.ts
+function copyFinalizedGame(game) {
+  return { ...game };
+}
+function resolveFinalizedRetentionExpiry(game, retainedAt) {
+  const finalizedMs = game.lastUpdated?.trim() ? Date.parse(game.lastUpdated.trim()) : NaN;
+  const anchor = Number.isFinite(finalizedMs) && finalizedMs > 0 ? Math.min(finalizedMs, retainedAt) : retainedAt;
+  return anchor + FINALIZED_RETENTION_TTL_MS;
+}
+function pruneRetainedFinals(byId, now = Date.now()) {
+  const next = {};
+  for (const [id, entry] of Object.entries(byId)) {
+    if (!entry?.game || entry.game.status !== "final") continue;
+    if (typeof entry.expiresAt !== "number" || entry.expiresAt <= now) continue;
+    next[id] = entry;
+  }
+  return next;
+}
+function collectAllGamesFromLeaguesForHarvest(leagues) {
+  const out = [];
+  const seen = /* @__PURE__ */ new Set();
+  if (!leagues) return out;
+  for (const rows of Object.values(leagues)) {
+    if (!rows?.length) continue;
+    for (const game of rows) {
+      if (seen.has(game.id)) continue;
+      seen.add(game.id);
+      out.push(game);
+    }
+  }
+  return out;
+}
+function collectFinalGamesFromLeagues(leagues) {
+  const out = [];
+  for (const rows of Object.values(leagues)) {
+    if (!rows?.length) continue;
+    for (const game of rows) {
+      if (game.status === "final") out.push(game);
+    }
+  }
+  return out;
+}
+
+// ../grarf/desktop/src/lib/finalizedGameRetention/harvestFinalizedOnIngestTransition.ts
+function collectAllGamesFromLeagues(leagues) {
+  const out = [];
+  const seen = /* @__PURE__ */ new Set();
+  if (!leagues) return out;
+  for (const rows of Object.values(leagues)) {
+    if (!rows?.length) continue;
+    for (const game of rows) {
+      if (seen.has(game.id)) continue;
+      seen.add(game.id);
+      out.push(game);
+    }
+  }
+  return out;
+}
+function classifyTransition(prevStatus, incomingStatus) {
+  if (incomingStatus === "final") {
+    if (prevStatus && prevStatus !== "final") return "status_transition";
+    return "incoming_final";
+  }
+  if (prevStatus === "final") return "prev_final";
+  return null;
+}
+function collectFinalizedHarvestCandidates(previousGames, incomingGames, ctx = { ingestCycle: 0 }) {
+  const prevById = /* @__PURE__ */ new Map();
+  for (const game of previousGames) prevById.set(game.id, game);
+  const incomingById = /* @__PURE__ */ new Map();
+  for (const game of incomingGames) incomingById.set(game.id, game);
+  const out = /* @__PURE__ */ new Map();
+  const add = (game, reason) => {
+    if (game.status === "postponed") return;
+    out.set(game.id, { game: copyFinalizedGame(game), reason });
+  };
+  for (const [id, prev] of prevById) {
+    const incoming = incomingById.get(id);
+    if (incoming) {
+      const reason = classifyTransition(prev.status, incoming.status);
+      if (reason) add(incoming, reason);
+      continue;
+    }
+    if (prev.status === "final") {
+      add(prev, "prev_final");
+    }
+  }
+  for (const incoming of incomingById.values()) {
+    if (incoming.status !== "final") continue;
+    if (out.has(incoming.id)) continue;
+    add(incoming, "incoming_final");
+  }
+  return [...out.values()];
+}
+function collectFinalizedHarvestFromIngestTransition(input) {
+  const incomingGames = collectAllGamesFromLeagues(input.incomingLeagues);
+  const candidates = collectFinalizedHarvestCandidates(input.previousGames, incomingGames, {
+    ingestCycle: input.ingestCycle,
+    liveRecencyById: input.liveRecencyById,
+    alreadyRetainedIds: input.alreadyRetainedIds
+  });
+  return candidates.map((c) => c.game);
+}
+
+// ../grarf/desktop/src/lib/finalizedGameRetention/liveRecency.ts
+init_define_import_meta_env();
+function recordLiveObservations(byId, games, ingestCycle, now = Date.now()) {
+  const next = { ...byId };
+  for (const raw of games) {
+    if (raw.status !== "live") continue;
+    next[raw.id] = {
+      game: copyFinalizedGame(raw),
+      lastLiveIngestCycle: ingestCycle,
+      lastLiveAtMs: now
+    };
+  }
+  return next;
+}
+function pruneLiveRecency(byId, ingestCycle, now = Date.now()) {
+  const next = {};
+  for (const [id, entry] of Object.entries(byId)) {
+    if (ingestCycle - entry.lastLiveIngestCycle > LIVE_RECENCY_MAX_INGEST_CYCLES) continue;
+    if (now - entry.lastLiveAtMs > LIVE_RECENCY_MAX_MS) continue;
+    next[id] = entry;
+  }
+  return next;
+}
+
+// ../grarf/desktop/src/store/recentFinalizedGamesStore.ts
+var STORAGE_KEY = "grarf-recent-finalized-games-v2";
+function upsertFinals(byId, games, now) {
+  const next = { ...byId };
+  for (const raw of games) {
+    if (raw.status !== "final") continue;
+    const game = copyFinalizedGame(raw);
+    const existing = next[game.id];
+    if (existing) {
+      next[game.id] = { ...existing, game };
+      continue;
+    }
+    const retainedAt = now;
+    next[game.id] = {
+      game,
+      retainedAt,
+      expiresAt: resolveFinalizedRetentionExpiry(game, retainedAt)
+    };
+  }
+  return next;
+}
+function readPersistedById() {
+  if (typeof sessionStorage === "undefined") return {};
+  try {
+    const raw = sessionStorage.getItem(STORAGE_KEY);
+    if (!raw) return {};
+    const parsed = JSON.parse(raw);
+    return pruneRetainedFinals(parsed);
+  } catch {
+    return {};
+  }
+}
+function persistById(byId) {
+  if (typeof sessionStorage === "undefined") return;
+  try {
+    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(byId));
+  } catch {
+  }
+}
+function commitById(byId, now = Date.now()) {
+  const pruned = pruneRetainedFinals(byId, now);
+  persistById(pruned);
+  return pruned;
+}
+var useRecentFinalizedGamesStore = create((set, get) => ({
+  byId: readPersistedById(),
+  liveRecencyById: {},
+  mergeFinalizedGames: (games, now = Date.now()) => {
+    const merged = upsertFinals(get().byId, games, now);
+    const byId = commitById(merged, now);
+    set({ byId });
+  },
+  harvestOnIngestTransition: (input) => {
+    const state = get();
+    const incomingGames = collectAllGamesFromLeaguesForHarvest(input.incomingLeagues);
+    const liveRecencyById = pruneLiveRecency(
+      recordLiveObservations(
+        state.liveRecencyById,
+        [...input.previousGames, ...incomingGames],
+        input.ingestCycle
+      ),
+      input.ingestCycle
+    );
+    const games = collectFinalizedHarvestFromIngestTransition({
+      previousGames: input.previousGames,
+      incomingLeagues: input.incomingLeagues,
+      ingestCycle: input.ingestCycle,
+      liveRecencyById,
+      alreadyRetainedIds: new Set(Object.keys(state.byId))
+    });
+    if (games.length > 0) get().mergeFinalizedGames(games);
+    set({ liveRecencyById });
+  },
+  harvestFinalizedFromLeagues: (leagues) => {
+    get().mergeFinalizedGames(collectFinalGamesFromLeagues(leagues));
+  },
+  getRetainedForLeague: (league) => {
+    const now = Date.now();
+    const out = [];
+    for (const entry of Object.values(get().byId)) {
+      if (entry.expiresAt <= now || entry.game.status !== "final") continue;
+      if ((entry.game.league ?? "MLB") !== league) continue;
+      out.push(entry.game);
+    }
+    return out;
+  },
+  getAllRetained: () => {
+    const now = Date.now();
+    return Object.values(get().byId).filter((e) => e.expiresAt > now && e.game.status === "final").map((e) => e.game);
+  },
+  pruneExpired: (now = Date.now()) => {
+    const pruned = commitById(get().byId, now);
+    if (pruned !== get().byId) set({ byId: pruned });
+  }
+}));
+if (typeof window !== "undefined") {
+  const w = window;
+  w.__grarfRecentFinalizedGames = () => {
+    const byId = useRecentFinalizedGamesStore.getState().byId;
+    const entries = Object.values(byId);
+    const byLeague = {};
+    for (const key of GAMES_COLUMN_LEAGUE_ORDER) {
+      byLeague[key] = useRecentFinalizedGamesStore.getState().getRetainedForLeague(key).length;
+    }
+    return { count: entries.length, byLeague, entries };
+  };
+}
+
+// ../grarf/desktop/src/lib/gamesSpine/wimbledonGamesSpinePresentation.ts
+var WIMBLEDON_MEN_GAMES_SPINE_LEAGUE = "WIMBLEDON_MEN";
+var WIMBLEDON_WOMEN_GAMES_SPINE_LEAGUE = "WIMBLEDON_WOMEN";
+function resolveWimbledonGamesSpineSourceLeague(league) {
+  if (league === WIMBLEDON_MEN_GAMES_SPINE_LEAGUE) return "ATP";
+  if (league === WIMBLEDON_WOMEN_GAMES_SPINE_LEAGUE) return "WTA";
+  return null;
+}
+function filterGamesForWimbledonGamesSpineSection(league, games) {
+  if (!isGrarfWebRenderer()) return [...games];
+  const sourceLeague = resolveWimbledonGamesSpineSourceLeague(league);
+  if (sourceLeague) {
+    return games.filter((game) => game.league === sourceLeague && isWimbledonTennisGame(game));
+  }
+  if (league === "ATP" || league === "WTA") {
+    return games.filter((game) => !isWimbledonTennisGame(game));
+  }
+  return [...games];
+}
 
 // ../grarf/desktop/src/lib/bestGameRightNow/leagueImportanceV1.ts
 var GOLF_GAME_IMPORTANCE_V1 = {
@@ -24762,23 +25739,30 @@ function isSelectedDateOperationalSportsDay(selectedDate, now = /* @__PURE__ */ 
   return resolveGamesSpineSelectedDateKey(selectedDate, now) === getOperationalSportsDayDateKey(now);
 }
 function resolveViewLeagueGames(league, selectedDate, liveLeagues, scheduleByDate) {
+  const sourceLeague = resolveWimbledonGamesSpineSourceLeague(league) ?? league;
   const mergedLeagues = mergeOperationalLeagueGames(liveLeagues);
   const dateKey = resolveGamesSpineSelectedDateKey(selectedDate);
+  let games;
   if (isSelectedDateOperationalSportsDay(dateKey)) {
-    const liveGames = mergedLeagues[league] ?? [];
-    if (!isGrarfWebRenderer()) return liveGames;
-    const now = /* @__PURE__ */ new Date();
-    const operationalSportsDayKey = getOperationalSportsDayDateKey(now);
-    const operationalSportsDayUpcomingKey = getOperationalSportsDayTomorrowDateKey(now);
-    const fromOperationalSportsDaySchedule = scheduleByDate[operationalSportsDayKey]?.[league] ?? [];
-    const fromOperationalSportsDayUpcomingSchedule = scheduleByDate[operationalSportsDayUpcomingKey]?.[league] ?? [];
-    return mergeGamesSpineLeagueGamesById(
-      liveGames,
-      fromOperationalSportsDaySchedule,
-      fromOperationalSportsDayUpcomingSchedule
-    );
+    const liveGames = mergedLeagues[sourceLeague] ?? [];
+    if (!isGrarfWebRenderer()) {
+      games = liveGames;
+    } else {
+      const now = /* @__PURE__ */ new Date();
+      const operationalSportsDayKey = getOperationalSportsDayDateKey(now);
+      const operationalSportsDayUpcomingKey = getOperationalSportsDayTomorrowDateKey(now);
+      const fromOperationalSportsDaySchedule = scheduleByDate[operationalSportsDayKey]?.[sourceLeague] ?? [];
+      const fromOperationalSportsDayUpcomingSchedule = scheduleByDate[operationalSportsDayUpcomingKey]?.[sourceLeague] ?? [];
+      games = mergeGamesSpineLeagueGamesById(
+        liveGames,
+        fromOperationalSportsDaySchedule,
+        fromOperationalSportsDayUpcomingSchedule
+      );
+    }
+  } else {
+    games = scheduleByDate[dateKey]?.[sourceLeague] ?? [];
   }
-  return scheduleByDate[dateKey]?.[league] ?? [];
+  return filterGamesForWimbledonGamesSpineSection(league, games);
 }
 
 // ../grarf/desktop/src/lib/operations/buildOperationsDateSnapshot.ts
@@ -25268,70 +26252,6 @@ async function fetchFotmobWorldCupCatalog(games) {
 // ../grarf/desktop/src/lib/fotmob/matchFotmobWorldCupMatch.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/tennisChannelPlus/nameUtils.ts
-init_define_import_meta_env();
-function normalizeTennisText(value) {
-  return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9\s]/g, " ").replace(/\s+/g, " ").trim();
-}
-function tokenizeTennisLabel(raw) {
-  const trimmed = raw.trim();
-  if (!trimmed) return [];
-  if (trimmed.includes("/")) {
-    return trimmed.split("/").flatMap((part) => tokenizeTennisLabel(part)).filter(Boolean);
-  }
-  let label = trimmed;
-  if (label.includes(",")) {
-    const [last, first] = label.split(",").map((part) => part.trim());
-    label = `${first} ${last}`.trim();
-  }
-  return normalizeTennisText(label).split(" ").filter((token) => token.length >= 2);
-}
-function tokenSetFromLabel(raw) {
-  return new Set(tokenizeTennisLabel(raw));
-}
-function tokenOverlapScore(a, b) {
-  if (a.size === 0 || b.size === 0) return 0;
-  let matched = 0;
-  for (const token of a) {
-    if (b.has(token)) {
-      matched += 1;
-      continue;
-    }
-    for (const other of b) {
-      if (token.length >= 4 && other.length >= 4 && (token.includes(other) || other.includes(token))) {
-        matched += 0.9;
-        break;
-      }
-    }
-  }
-  return matched / Math.max(a.size, b.size);
-}
-var TOURNAMENT_STOP_WORDS = /* @__PURE__ */ new Set([
-  "atp",
-  "wta",
-  "itf",
-  "men",
-  "women",
-  "singles",
-  "doubles",
-  "mixed",
-  "round",
-  "final",
-  "quarterfinals",
-  "semifinals",
-  "challenger",
-  "great",
-  "britain",
-  "germany",
-  "netherlands",
-  "united",
-  "states"
-]);
-function tokenizeTournamentText(raw) {
-  const tokens = normalizeTennisText(raw).split(" ").filter((token) => token.length >= 3 && !TOURNAMENT_STOP_WORDS.has(token));
-  return new Set(tokens);
-}
-
 // ../grarf/desktop/src/lib/foxWorldCup/teamSlugUtils.ts
 init_define_import_meta_env();
 var SLUG_STOP_WORDS = /* @__PURE__ */ new Set(["and"]);
@@ -25446,7 +26366,7 @@ function scoreFoxWorldCupTeams(gameAway, gameHome, eventAwaySlug, eventHomeSlug)
 
 // ../grarf/desktop/src/lib/fotmob/matchFotmobWorldCupMatch.ts
 var MIN_TEAM_SCORE = 0.55;
-var MIN_TOTAL_SCORE = 0.62;
+var MIN_TOTAL_SCORE2 = 0.62;
 var MAX_KICKOFF_DELTA_MS = 18 * 60 * 60 * 1e3;
 function isWorldCupGame(game) {
   return game.league === "WORLDCUP";
@@ -25486,7 +26406,7 @@ function matchFotmobWorldCupMatch(game, catalog) {
       best = candidate;
     }
   }
-  if (!best || bestScore < MIN_TOTAL_SCORE) return null;
+  if (!best || bestScore < MIN_TOTAL_SCORE2) return null;
   return best;
 }
 
@@ -25869,7 +26789,7 @@ function gameHasFoxOrFs1Broadcast(game) {
 // ../grarf/desktop/src/lib/foxWorldCup/matchFoxWorldCupStream.ts
 init_define_import_meta_env();
 var MIN_TEAM_SCORE2 = 0.55;
-var MIN_TOTAL_SCORE2 = 0.62;
+var MIN_TOTAL_SCORE3 = 0.62;
 function isWorldCupGame2(game) {
   return game.league === "WORLDCUP";
 }
@@ -25897,7 +26817,7 @@ function matchFoxWorldCupStream(game, catalog) {
       best = event;
     }
   }
-  if (!best || bestScore < MIN_TOTAL_SCORE2) return null;
+  if (!best || bestScore < MIN_TOTAL_SCORE3) return null;
   return best;
 }
 
@@ -26144,14 +27064,14 @@ init_define_import_meta_env();
 
 // ../grarf/desktop/src/lib/stream/streamLinkCache.ts
 init_define_import_meta_env();
-var STORAGE_KEY = "grarf-stream-links-v1";
+var STORAGE_KEY2 = "grarf-stream-links-v1";
 var DEFAULT_TTL_MS = 30 * 60 * 1e3;
 function cacheKey(provider, gameId) {
   return `${provider}:${gameId}`;
 }
 function read() {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = localStorage.getItem(STORAGE_KEY2);
     if (!raw) return {};
     const p = JSON.parse(raw);
     return p?.entries && typeof p.entries === "object" ? p.entries : {};
@@ -26161,7 +27081,7 @@ function read() {
 }
 function write(entries) {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({ version: 1, entries }));
+    localStorage.setItem(STORAGE_KEY2, JSON.stringify({ version: 1, entries }));
   } catch {
   }
 }
@@ -26190,13 +27110,13 @@ function setCachedStreamUrl(provider, gameId, streamUrl, ttlMs = DEFAULT_TTL_MS)
 // ../grarf/desktop/src/lib/wnba/fetchWnbaPrimeVideoLeaguePassCatalog.ts
 init_define_import_meta_env();
 var PRIME_VIDEO_WNBA_CATALOG_PROXY_PATH = "/wnba/prime-video-league-pass-catalog";
-var CATALOG_CACHE_TTL_MS = 10 * 60 * 1e3;
+var CATALOG_CACHE_TTL_MS2 = 10 * 60 * 1e3;
 var cachedCatalog2 = null;
 var cachedAtMs2 = 0;
 var inFlight = null;
 async function fetchWnbaPrimeVideoLeaguePassCatalog() {
   const now = Date.now();
-  if (cachedCatalog2 && now - cachedAtMs2 < CATALOG_CACHE_TTL_MS) {
+  if (cachedCatalog2 && now - cachedAtMs2 < CATALOG_CACHE_TTL_MS2) {
     return cachedCatalog2;
   }
   if (inFlight) return inFlight;
@@ -26335,90 +27255,6 @@ function parseEspnEventIdFromGame(game) {
   return parseEspnGameIdFromRowId(game.id)?.eventId ?? null;
 }
 
-// ../grarf/desktop/src/lib/watch/espnPlusStream.ts
-init_define_import_meta_env();
-
-// ../grarf/desktop/shared/espnWatchBroadcast.js
-init_define_import_meta_env();
-var ESPN_PLUS_LABEL = /espn\s*\+|espn\s*plus|espn\s*unlimited|espn\s*unlmtd/i;
-function isEspnPlusBroadcastLabel(label) {
-  if (typeof label !== "string" || !label.trim()) return false;
-  return ESPN_PLUS_LABEL.test(label);
-}
-function isEspnLinearBroadcastLabel(label) {
-  if (typeof label !== "string" || !label.trim()) return false;
-  const t = label.trim();
-  if (ESPN_PLUS_LABEL.test(t)) return false;
-  return /^(espn2?|abc|espn\s*network|espn\s*national)$/i.test(t);
-}
-function gameHasEspnPlusBroadcast(broadcastLabels) {
-  return broadcastLabels.some(isEspnPlusBroadcastLabel);
-}
-var LINEAR_ESPN_WATCH_LEAGUES = /* @__PURE__ */ new Set(["NHL", "ATP", "WTA", "NCAABB"]);
-function gameHasEspnWatchBroadcast(broadcastLabels, leagueKey) {
-  if (gameHasEspnPlusBroadcast(broadcastLabels)) return true;
-  if (leagueKey && LINEAR_ESPN_WATCH_LEAGUES.has(leagueKey)) {
-    return broadcastLabels.some(isEspnLinearBroadcastLabel);
-  }
-  return false;
-}
-
-// ../grarf/desktop/src/lib/watch/espnPlusStream.ts
-var PLAY_LOCATION = "where-to-watch%3Aguide";
-function resolveEspnWatchLeagueKey(game) {
-  if (game.league) return game.league;
-  if (game.id.startsWith("espn-NHL-")) return "NHL";
-  if (game.id.startsWith("espn-NCAABB-")) return "NCAABB";
-  if (game.id.startsWith("espn-ATP-")) return "ATP";
-  if (game.id.startsWith("espn-WTA-")) return "WTA";
-  return void 0;
-}
-function gameHasEspnWatchBroadcast2(game) {
-  const hints = [...game.broadcasts ?? [], ...game.channels ?? []];
-  return gameHasEspnWatchBroadcast(hints, resolveEspnWatchLeagueKey(game));
-}
-function buildEspnPlusPlayerUrlByUuid(playerId) {
-  const id = playerId.trim();
-  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)) return null;
-  return `https://www.espn.com/watch/player/_/id/${id}?playLocation=${PLAY_LOCATION}`;
-}
-function buildEspnPlusWatchUrl(eventCalendarId) {
-  const id = eventCalendarId.trim();
-  if (!/^\d+$/.test(id)) return null;
-  return `https://www.espn.com/watch/player/_/eventCalendarId/${id}?playLocation=${PLAY_LOCATION}`;
-}
-function attachEspnPlusStreamToGame(game, stream) {
-  game.streamUrl = stream.streamUrl;
-  game.streamProvider = stream.streamProvider;
-  if (stream.playerId) {
-    game.espnPlusPlayerId = stream.playerId;
-  }
-  if (stream.eventCalendarId) {
-    game.espnWatchEventId = stream.eventCalendarId;
-  }
-  const watchLinks = Array.isArray(game.content?.watchLinks) ? [...game.content.watchLinks] : [];
-  game.content = {
-    ...game.content ?? {},
-    watchLinks: [
-      ...watchLinks,
-      {
-        provider: stream.streamProvider,
-        url: stream.streamUrl,
-        eventCalendarId: stream.eventCalendarId,
-        ...stream.playerId ? { playerId: stream.playerId } : {}
-      }
-    ]
-  };
-}
-function resolveEspnWatchStreamFromCompetition(competition, broadcastLabels, leagueKey) {
-  if (!gameHasEspnWatchBroadcast(broadcastLabels, leagueKey)) return null;
-  const eventCalendarId = String(competition?.id ?? "").trim();
-  if (!/^\d+$/.test(eventCalendarId)) return null;
-  const streamUrl = buildEspnPlusWatchUrl(eventCalendarId);
-  if (!streamUrl) return null;
-  return { streamUrl, streamProvider: "ESPN+", eventCalendarId };
-}
-
 // ../grarf/desktop/src/lib/watch/enrichOperationalSnapshotEspnWatchStreams.ts
 var ESPN_WATCH_CALENDAR_LEAGUES = /* @__PURE__ */ new Set([
   "MLB",
@@ -26427,7 +27263,7 @@ var ESPN_WATCH_CALENDAR_LEAGUES = /* @__PURE__ */ new Set([
   "NCAABB"
 ]);
 var ESPN_WATCH_PICKER_LEAGUES = /* @__PURE__ */ new Set(["ATP", "WTA"]);
-var ESPN_FETCH_UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36";
+var ESPN_FETCH_UA2 = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36";
 var pickerPlayerCache = /* @__PURE__ */ new Map();
 function enrichGameRow2(game) {
   if (game.streamUrl?.trim()) return game;
@@ -26507,7 +27343,7 @@ async function fetchPccEventIdMap(cfg) {
   url.searchParams.set("platform", "web");
   try {
     const res = await fetch(url.toString(), {
-      headers: { "User-Agent": ESPN_FETCH_UA, Accept: "application/json" }
+      headers: { "User-Agent": ESPN_FETCH_UA2, Accept: "application/json" }
     });
     if (!res.ok) return map;
     const data = await res.json();
@@ -26544,7 +27380,7 @@ async function fetchEspnPlusPlayerIdFromPicker(watchEventId) {
   url.searchParams.set("entitlements", "no");
   try {
     const res = await fetch(url.toString(), {
-      headers: { "User-Agent": ESPN_FETCH_UA, Accept: "application/json" }
+      headers: { "User-Agent": ESPN_FETCH_UA2, Accept: "application/json" }
     });
     if (!res.ok) {
       pickerPlayerCache.set(key, null);
@@ -26599,149 +27435,6 @@ init_define_import_meta_env();
 
 // ../grarf/desktop/src/lib/wimbledon/enrichWimbledonSlamTrackerMatches.ts
 init_define_import_meta_env();
-
-// ../grarf/desktop/src/lib/watch/enrichWimbledonEspnWatchStreams.ts
-init_define_import_meta_env();
-var ESPN_FETCH_UA2 = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36";
-var WIMBLEDON_ESPN_WATCH_CATALOG_ID = "6929e7a4-2c40-3f82-a710-42baae9472c6";
-var WIMBLEDON_ESPN_WATCH_CATALOG_URL = `https://watch.product.api.espn.com/api/product/v3/watchespn/web/catalog/${WIMBLEDON_ESPN_WATCH_CATALOG_ID}?tz=America%2FChicago&lang=en&countryCode=US&deviceType=desktop`;
-var MIN_PLAYER_SCORE = 0.55;
-var MIN_TOTAL_SCORE3 = 0.62;
-var CATALOG_CACHE_TTL_MS2 = 3e4;
-var catalogCache = null;
-function isTennisLeague(game) {
-  return game.league === "ATP" || game.league === "WTA";
-}
-function wimbledonHaystack(game) {
-  return [
-    game.metadata?.tennis?.contextLine,
-    game.statusLine,
-    game.leagueContextLabel
-  ].filter(Boolean).join(" ");
-}
-function isWimbledonTennisGame(game) {
-  if (!isTennisLeague(game)) return false;
-  return /\bwimbledon\b/i.test(wimbledonHaystack(game));
-}
-function gamePlayerTokenSets(game) {
-  const away = tokenSetFromLabel(game.metadata?.officialAwayName || game.awayTeam || "");
-  const home = tokenSetFromLabel(game.metadata?.officialHomeName || game.homeTeam || "");
-  return [away, home];
-}
-function parseEspnWatchMatchupNames(title) {
-  let cleaned = title.trim();
-  cleaned = cleaned.replace(/^\(\d+\)\s*/, "");
-  cleaned = cleaned.replace(/\s*\([^)]+\)\s*$/i, "");
-  const match = cleaned.match(/^(.+?)\s+vs\.?\s+(.+)$/i);
-  if (!match) return null;
-  return [match[1].trim(), match[2].trim()];
-}
-function listingPlayerTokenSets(listing) {
-  const parsed = parseEspnWatchMatchupNames(listing.shortName) ?? parseEspnWatchMatchupNames(listing.name);
-  if (!parsed) return [/* @__PURE__ */ new Set(), /* @__PURE__ */ new Set()];
-  return [tokenSetFromLabel(parsed[0]), tokenSetFromLabel(parsed[1])];
-}
-function scorePlayers(game, listing) {
-  const [gameAway, gameHome] = gamePlayerTokenSets(game);
-  const [listingAway, listingHome] = listingPlayerTokenSets(listing);
-  const direct = tokenOverlapScore(gameAway, listingAway) + tokenOverlapScore(gameHome, listingHome);
-  const swapped = tokenOverlapScore(gameAway, listingHome) + tokenOverlapScore(gameHome, listingAway);
-  return Math.max(direct, swapped) / 2;
-}
-function scoreListingMatch(game, listing) {
-  const players = scorePlayers(game, listing);
-  if (players < MIN_PLAYER_SCORE) return 0;
-  const liveBoost = listing.status === "live" ? 0.04 : 0;
-  return players + liveBoost;
-}
-function extractWebUrl(content) {
-  const links = content.links;
-  if (typeof links?.web === "string" && links.web.trim()) return links.web.trim();
-  const streams = content.streams;
-  for (const stream of streams ?? []) {
-    const web = stream.links?.web?.trim();
-    if (web) return web;
-  }
-  return null;
-}
-function parseWimbledonCatalogListings(json) {
-  const buckets = json?.page?.buckets;
-  if (!Array.isArray(buckets)) return [];
-  const listings = [];
-  for (const bucket of buckets) {
-    if (!bucket || typeof bucket !== "object") continue;
-    const contents = bucket.contents;
-    if (!Array.isArray(contents)) continue;
-    for (const raw of contents) {
-      if (!raw || typeof raw !== "object") continue;
-      const content = raw;
-      const status = String(content.status ?? "").toLowerCase();
-      if (status !== "live" && status !== "upcoming") continue;
-      const streamUrl = extractWebUrl(content);
-      const id = String(content.id ?? "").trim();
-      const name = String(content.name ?? "").trim();
-      const shortName = String(content.shortName ?? name).trim();
-      if (!streamUrl || !id || !name) continue;
-      listings.push({ id, name, shortName, streamUrl, status });
-    }
-  }
-  return listings;
-}
-async function fetchWimbledonEspnWatchCatalog() {
-  const now = Date.now();
-  if (catalogCache && now - catalogCache.fetchedAt < CATALOG_CACHE_TTL_MS2) {
-    return catalogCache.listings;
-  }
-  try {
-    const res = await fetch(WIMBLEDON_ESPN_WATCH_CATALOG_URL, {
-      headers: { "User-Agent": ESPN_FETCH_UA2, Accept: "application/json" }
-    });
-    if (!res.ok) return catalogCache?.listings ?? [];
-    const json = await res.json();
-    const listings = parseWimbledonCatalogListings(json);
-    catalogCache = { fetchedAt: now, listings };
-    return listings;
-  } catch {
-    return catalogCache?.listings ?? [];
-  }
-}
-function matchWimbledonEspnWatchListing(game, catalog) {
-  let best = null;
-  let bestScore = 0;
-  let secondBest = 0;
-  for (const listing of catalog) {
-    const score = scoreListingMatch(game, listing);
-    if (score > bestScore) {
-      secondBest = bestScore;
-      bestScore = score;
-      best = listing;
-      continue;
-    }
-    if (score > secondBest) secondBest = score;
-  }
-  if (!best || bestScore < MIN_TOTAL_SCORE3) return null;
-  if (secondBest >= bestScore - 0.03) return null;
-  return best;
-}
-async function enrichWimbledonEspnWatchStreams(games) {
-  const targets = games.filter(
-    (game) => isWimbledonTennisGame(game) && game.status === "live"
-  );
-  if (targets.length === 0) return;
-  const catalog = await fetchWimbledonEspnWatchCatalog();
-  if (catalog.length === 0) return;
-  for (const game of targets) {
-    const listing = matchWimbledonEspnWatchListing(game, catalog);
-    if (!listing) {
-      continue;
-    }
-    attachEspnPlusStreamToGame(game, {
-      streamUrl: listing.streamUrl,
-      streamProvider: "ESPN+",
-      playerId: listing.id
-    });
-  }
-}
 
 // ../grarf/desktop/src/lib/wimbledon/fetchWimbledonDrawCatalog.ts
 init_define_import_meta_env();
@@ -30505,7 +31198,7 @@ function pickTeamLogoHref(team, leagueKey) {
   if (leagueKey === "MLB" && abbr) {
     return `https://a.espncdn.com/i/teamlogos/mlb/500/scoreboard/${abbr}.png`;
   }
-  if (leagueKey === "NBA" && abbr) {
+  if ((leagueKey === "NBA" || leagueKey === "NBASUMMER") && abbr) {
     return `https://a.espncdn.com/i/teamlogos/nba/500/scoreboard/${abbr}.png`;
   }
   if (leagueKey === "WNBA" && abbr) {
@@ -30753,6 +31446,7 @@ var WEB_PRIORITY_OPERATIONAL_LEAGUES = [
   "WORLDCUP",
   "MLB",
   "NBA",
+  "NBASUMMER",
   "NHL",
   "WNBA",
   "MLS",
@@ -31274,14 +31968,312 @@ function useAdminOperationsDateSnapshot(operationalDateKey) {
   return { snapshot, loading, error };
 }
 
-// src/admin/modules/OperationsModule.tsx
-var import_jsx_runtime5 = __toESM(require_jsx_runtime());
-function resolveDefaultOperationalDateKey() {
-  const configuredDateKeys = Object.keys(OPERATIONS.dates).sort();
-  const sportsDayKey = getOperationalSportsDayDateKey();
-  if (configuredDateKeys.includes(sportsDayKey)) return sportsDayKey;
-  return configuredDateKeys[configuredDateKeys.length - 1] ?? sportsDayKey;
+// src/admin/hooks/useOperationsPendingChanges.ts
+init_define_import_meta_env();
+var import_react6 = __toESM(require_react());
+
+// src/admin/lib/buildOperationalOverrideDraft.ts
+init_define_import_meta_env();
+function hasText3(value) {
+  return typeof value === "string" && value.trim().length > 0;
 }
+function formatWatchOptions(options) {
+  if (!options || options.length === 0) return "";
+  return options.map((option) => {
+    const label = option.displayName?.trim() || option.provider;
+    const link = option.deepLink?.trim();
+    return link ? `${label} \u2014 ${link}` : label;
+  }).join("\n");
+}
+function readOverrideString2(override, key) {
+  if (!override || typeof override !== "object") return "";
+  const value = override[key];
+  if (typeof value === "string" && value.trim()) return value.trim();
+  return "";
+}
+function resolveYesNoDraft(overrideValue, resolvedFlag) {
+  if (hasText3(overrideValue)) return overrideValue.trim().toUpperCase();
+  if (resolvedFlag) return "Y";
+  return "";
+}
+function buildOperationalOverrideDraft(game) {
+  const override = game.manualGameOverride;
+  let primaryStream = "";
+  if (hasText3(override?.streamUrl)) {
+    primaryStream = override.streamUrl.trim();
+  } else if (hasText3(override?.channelUrl)) {
+    primaryStream = override.channelUrl.trim();
+  }
+  let broadcastOverride = "";
+  if (override?.broadcasts && override.broadcasts.length > 0) {
+    broadcastOverride = override.broadcasts.map((label) => label.trim()).filter(Boolean).join(", ");
+  } else if (override?.channels && override.channels.length > 0) {
+    broadcastOverride = override.channels.map((label) => label.trim()).filter(Boolean).join(", ");
+  } else if (hasText3(override?.channel)) {
+    broadcastOverride = override.channel.trim();
+  }
+  let centerPaneUrlWhenGameCardClicked = "";
+  if (hasText3(override?.centerPaneUrlWhenGameCardClicked)) {
+    centerPaneUrlWhenGameCardClicked = override.centerPaneUrlWhenGameCardClicked.trim();
+  } else if (hasText3(game.navigationOverride?.url)) {
+    centerPaneUrlWhenGameCardClicked = game.navigationOverride.url.trim();
+  }
+  return {
+    primaryStream,
+    alternativeStreams: formatWatchOptions(override?.watchOptions),
+    broadcastOverride,
+    centerPaneUrlWhenGameCardClicked,
+    centerPane: resolveYesNoDraft(override?.centerPane, game.navigationOverride?.openInCenterPane),
+    browserTab: resolveYesNoDraft(override?.browserTab, game.navigationOverride?.openInBrowserTab),
+    manualHighlights: readOverrideString2(override, "manualHighlights"),
+    manualSocialPosts: readOverrideString2(override, "manualSocialPosts"),
+    operationalNotes: readOverrideString2(override, "operationalNotes")
+  };
+}
+
+// src/admin/hooks/useOperationsPendingChanges.ts
+function buildPendingGameEdit(input) {
+  return {
+    gameKey: input.game.gameKey,
+    eventName: input.game.eventName,
+    leagueLabel: input.game.leagueLabel,
+    operationalDateKey: input.operationalDateKey,
+    originalDraft: input.originalDraft,
+    editedDraft: input.editedDraft,
+    game: input.game
+  };
+}
+function useOperationsPendingChanges(operationalDateKey, selectedGame) {
+  const [pendingByGameKey, setPendingByGameKey] = (0, import_react6.useState)({});
+  const [activeOriginalDraft, setActiveOriginalDraft] = (0, import_react6.useState)(
+    null
+  );
+  const [activeDraft, setActiveDraft] = (0, import_react6.useState)(null);
+  const [saveAllState, setSaveAllState] = (0, import_react6.useState)({
+    status: "idle"
+  });
+  const pendingRef = (0, import_react6.useRef)(pendingByGameKey);
+  pendingRef.current = pendingByGameKey;
+  const pendingEdits = (0, import_react6.useMemo)(
+    () => Object.values(pendingByGameKey),
+    [pendingByGameKey]
+  );
+  const pendingGameKeys = (0, import_react6.useMemo)(
+    () => new Set(pendingEdits.map((entry) => entry.gameKey)),
+    [pendingEdits]
+  );
+  const totalPendingFieldChanges = (0, import_react6.useMemo)(
+    () => countOperationsPendingFieldChanges(pendingEdits),
+    [pendingEdits]
+  );
+  const currentGameChangeCount = (0, import_react6.useMemo)(() => {
+    if (!selectedGame || !activeDraft || !activeOriginalDraft) return 0;
+    return resolveOperationsChangeFields(activeOriginalDraft, activeDraft).length;
+  }, [activeDraft, activeOriginalDraft, selectedGame]);
+  const syncPendingEntry = (0, import_react6.useCallback)(
+    (game, originalDraft, editedDraft) => {
+      const changes = resolveOperationsChangeFields(originalDraft, editedDraft);
+      setPendingByGameKey((current) => {
+        if (changes.length === 0) {
+          if (!current[game.gameKey]) return current;
+          const next = { ...current };
+          delete next[game.gameKey];
+          return next;
+        }
+        return {
+          ...current,
+          [game.gameKey]: buildPendingGameEdit({
+            game,
+            operationalDateKey,
+            originalDraft,
+            editedDraft
+          })
+        };
+      });
+      setSaveAllState({ status: "idle" });
+    },
+    [operationalDateKey]
+  );
+  (0, import_react6.useEffect)(() => {
+    setPendingByGameKey({});
+    setSaveAllState({ status: "idle" });
+  }, [operationalDateKey]);
+  (0, import_react6.useEffect)(() => {
+    if (!selectedGame) {
+      setActiveOriginalDraft(null);
+      setActiveDraft(null);
+      return;
+    }
+    const snapshotOriginal = buildOperationalOverrideDraft(selectedGame);
+    const pending = pendingRef.current[selectedGame.gameKey];
+    setActiveOriginalDraft(pending?.originalDraft ?? snapshotOriginal);
+    setActiveDraft(pending?.editedDraft ?? snapshotOriginal);
+  }, [selectedGame?.gameKey, selectedGame]);
+  const updateField = (0, import_react6.useCallback)(
+    (field, value) => {
+      if (!selectedGame || !activeOriginalDraft) return;
+      setActiveDraft((current) => {
+        const baseDraft = current ?? activeOriginalDraft;
+        const nextDraft = { ...baseDraft, [field]: value };
+        syncPendingEntry(selectedGame, activeOriginalDraft, nextDraft);
+        return nextDraft;
+      });
+    },
+    [activeOriginalDraft, selectedGame, syncPendingEntry]
+  );
+  const discardGame = (0, import_react6.useCallback)(
+    (gameKey) => {
+      setPendingByGameKey((current) => {
+        if (!current[gameKey]) return current;
+        const next = { ...current };
+        delete next[gameKey];
+        return next;
+      });
+      setSaveAllState({ status: "idle" });
+      if (selectedGame?.gameKey === gameKey) {
+        const original = buildOperationalOverrideDraft(selectedGame);
+        setActiveOriginalDraft(original);
+        setActiveDraft(original);
+      }
+    },
+    [selectedGame]
+  );
+  const discardActiveGame = (0, import_react6.useCallback)(() => {
+    if (!selectedGame) return;
+    discardGame(selectedGame.gameKey);
+  }, [discardGame, selectedGame]);
+  const discardAll = (0, import_react6.useCallback)(() => {
+    setPendingByGameKey({});
+    setSaveAllState({ status: "idle" });
+    if (selectedGame) {
+      const original = buildOperationalOverrideDraft(selectedGame);
+      setActiveOriginalDraft(original);
+      setActiveDraft(original);
+    }
+  }, [selectedGame]);
+  const saveAll = (0, import_react6.useCallback)(() => {
+    const result = validateAndBuildOperationsPendingChangesCollection(
+      operationalDateKey,
+      pendingEdits
+    );
+    if (!result.ok) {
+      setSaveAllState({ status: "validation_error", issues: result.issues });
+      return null;
+    }
+    setSaveAllState({ status: "success", collection: result.collection });
+    return result.collection;
+  }, [operationalDateKey, pendingEdits]);
+  const isGamePending = (0, import_react6.useCallback)(
+    (gameKey) => pendingGameKeys.has(gameKey),
+    [pendingGameKeys]
+  );
+  return {
+    activeDraft,
+    currentGameChangeCount,
+    discardActiveGame,
+    discardAll,
+    discardGame,
+    isGamePending,
+    pendingEdits,
+    pendingGameCount: pendingEdits.length,
+    pendingGameKeys,
+    saveAll,
+    saveAllState,
+    totalPendingFieldChanges,
+    updateField
+  };
+}
+
+// src/admin/lib/resolveOperationsConsoleDateKeys.ts
+init_define_import_meta_env();
+var OPERATIONS_CONSOLE_FUTURE_DAY_COUNT = 13;
+function resolveOperationsConsoleDateKeys(now = /* @__PURE__ */ new Date()) {
+  const todayKey = getOperationalSportsDayDateKey(now, GRARF_OPERATIONAL_SLATE_TIMEZONE);
+  const dateKeys = [];
+  for (let dayOffset = 0; dayOffset <= OPERATIONS_CONSOLE_FUTURE_DAY_COUNT; dayOffset += 1) {
+    dateKeys.push(offsetOperationalDateKey(todayKey, dayOffset, GRARF_OPERATIONAL_SLATE_TIMEZONE));
+  }
+  return dateKeys;
+}
+function resolveDefaultOperationsConsoleDateKey(now = /* @__PURE__ */ new Date()) {
+  return getOperationalSportsDayDateKey(now, GRARF_OPERATIONAL_SLATE_TIMEZONE);
+}
+
+// src/admin/lib/searchOperationsSnapshotGames.ts
+init_define_import_meta_env();
+function normalizeSearchText(value) {
+  return value.trim().toLowerCase();
+}
+function normalizeOperationsSnapshotSearchQuery(query) {
+  return normalizeSearchText(query);
+}
+function pushSearchTerm(terms, value) {
+  const trimmed = value?.trim();
+  if (trimmed) terms.push(trimmed);
+}
+function collectOperationsSnapshotGameSearchTerms(game) {
+  const terms = [];
+  pushSearchTerm(terms, game.leagueLabel);
+  pushSearchTerm(terms, String(game.league));
+  pushSearchTerm(terms, game.eventName);
+  pushSearchTerm(terms, game.participants.away);
+  pushSearchTerm(terms, game.participants.home);
+  pushSearchTerm(terms, game.statusLine);
+  pushSearchTerm(terms, game.spineSectionLabel);
+  pushSearchTerm(terms, game.spineSectionKey);
+  const sourceGame = game.game;
+  pushSearchTerm(terms, sourceGame.awayTeam);
+  pushSearchTerm(terms, sourceGame.homeTeam);
+  pushSearchTerm(terms, sourceGame.awayTeamAbbrev);
+  pushSearchTerm(terms, sourceGame.homeTeamAbbrev);
+  pushSearchTerm(terms, sourceGame.awayCity);
+  pushSearchTerm(terms, sourceGame.homeCity);
+  pushSearchTerm(terms, sourceGame.awayPitcher);
+  pushSearchTerm(terms, sourceGame.homePitcher);
+  pushSearchTerm(terms, sourceGame.statusLine);
+  const metadata = sourceGame.metadata;
+  if (metadata) {
+    pushSearchTerm(terms, metadata.officialAwayName);
+    pushSearchTerm(terms, metadata.officialHomeName);
+    pushSearchTerm(terms, metadata.tennis?.contextLine);
+    pushSearchTerm(terms, metadata.canonicalEvent?.title);
+    pushSearchTerm(terms, metadata.canonicalEvent?.sessionLabel);
+    pushSearchTerm(terms, metadata.manualGamesSpine?.eventName);
+    pushSearchTerm(terms, metadata.manualGamesSpine?.leagueLabel);
+    pushSearchTerm(terms, metadata.manualGamesSpine?.displayName);
+    pushSearchTerm(terms, metadata.ufcCardName);
+    pushSearchTerm(terms, metadata.ufcCardSegment);
+    pushSearchTerm(terms, metadata.ufcWeightClass);
+    pushSearchTerm(terms, metadata.racingSessionLabel);
+    pushSearchTerm(terms, metadata.worldCupGroupNotes);
+  }
+  pushSearchTerm(terms, sourceGame.awayPlayerRank?.displayLabel);
+  pushSearchTerm(terms, sourceGame.homePlayerRank?.displayLabel);
+  return terms;
+}
+function operationsSnapshotGameMatchesSearchQuery(game, normalizedQuery) {
+  if (!normalizedQuery) return false;
+  const haystack = collectOperationsSnapshotGameSearchTerms(game).map(normalizeSearchText).join("\0");
+  return haystack.includes(normalizedQuery);
+}
+function searchOperationsSnapshotGames(snapshot, query) {
+  const normalizedQuery = normalizeOperationsSnapshotSearchQuery(query);
+  if (!normalizedQuery) return [];
+  const matches = [];
+  const seenGameKeys = /* @__PURE__ */ new Set();
+  for (const section of snapshot.sections) {
+    for (const game of section.games) {
+      if (seenGameKeys.has(game.gameKey)) continue;
+      if (!operationsSnapshotGameMatchesSearchQuery(game, normalizedQuery)) continue;
+      seenGameKeys.add(game.gameKey);
+      matches.push(game);
+    }
+  }
+  return matches;
+}
+
+// src/admin/modules/OperationsModule.tsx
+var import_jsx_runtime8 = __toESM(require_jsx_runtime());
 function formatGameListLabel(game) {
   const away = game.participants.away.trim();
   const home = game.participants.home.trim();
@@ -31289,36 +32281,56 @@ function formatGameListLabel(game) {
   return game.eventName.trim() || game.gameKey;
 }
 function OperationsModule() {
-  const configuredDateKeys = (0, import_react6.useMemo)(
-    () => Object.keys(OPERATIONS.dates).sort(),
-    []
+  const operationalDateKeys = (0, import_react7.useMemo)(() => resolveOperationsConsoleDateKeys(), []);
+  const [operationalDateKey, setOperationalDateKey] = (0, import_react7.useState)(
+    resolveDefaultOperationsConsoleDateKey
   );
-  const [operationalDateKey, setOperationalDateKey] = (0, import_react6.useState)(resolveDefaultOperationalDateKey);
-  const [selectedSectionKey, setSelectedSectionKey] = (0, import_react6.useState)(null);
-  const [selectedGameKey, setSelectedGameKey] = (0, import_react6.useState)(null);
+  const [selectedSectionKey, setSelectedSectionKey] = (0, import_react7.useState)(null);
+  const [selectedGameKey, setSelectedGameKey] = (0, import_react7.useState)(null);
+  const [searchQuery, setSearchQuery] = (0, import_react7.useState)("");
   const { snapshot, loading, error } = useAdminOperationsDateSnapshot(operationalDateKey);
-  const activeSectionKey = (0, import_react6.useMemo)(() => {
+  const normalizedSearchQuery = normalizeOperationsSnapshotSearchQuery(searchQuery);
+  const isSearchActive = normalizedSearchQuery.length > 0;
+  const activeSectionKey = (0, import_react7.useMemo)(() => {
     if (!snapshot || snapshot.sections.length === 0) return null;
     if (selectedSectionKey && snapshot.sections.some((section) => section.sectionKey === selectedSectionKey)) {
       return selectedSectionKey;
     }
     return snapshot.sections[0]?.sectionKey ?? null;
   }, [selectedSectionKey, snapshot]);
-  const activeSection = (0, import_react6.useMemo)(() => {
+  const activeSection = (0, import_react7.useMemo)(() => {
     if (!snapshot || !activeSectionKey) return null;
     return snapshot.sections.find((section) => section.sectionKey === activeSectionKey) ?? null;
   }, [activeSectionKey, snapshot]);
-  const selectedGame = (0, import_react6.useMemo)(() => {
+  const selectedGame = (0, import_react7.useMemo)(() => {
     if (!snapshot || !selectedGameKey) return null;
     return snapshot.gamesByKey[selectedGameKey] ?? null;
   }, [selectedGameKey, snapshot]);
-  return /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)(import_jsx_runtime5.Fragment, { children: [
-    /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("header", { className: "grarf-admin__module-header", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("h2", { className: "grarf-admin__module-title", children: "Operations" }),
-      /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("p", { className: "grarf-admin__module-description", children: "Read-only operational snapshot assembled from the same resolvers as the public Games Spine. Select a date, section, and game to inspect existing operational data." }),
-      /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "grarf-admin__toolbar", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("label", { className: "grarf-admin__label", htmlFor: "operations-date", children: "Operational date" }),
-        /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
+  const searchResults = (0, import_react7.useMemo)(() => {
+    if (!snapshot || !isSearchActive) return [];
+    return searchOperationsSnapshotGames(snapshot, searchQuery);
+  }, [isSearchActive, searchQuery, snapshot]);
+  const visibleGames = isSearchActive ? searchResults : activeSection?.games ?? [];
+  const {
+    activeDraft,
+    currentGameChangeCount,
+    discardActiveGame,
+    discardAll,
+    isGamePending,
+    pendingEdits,
+    pendingGameCount,
+    saveAll,
+    saveAllState,
+    totalPendingFieldChanges,
+    updateField
+  } = useOperationsPendingChanges(operationalDateKey, selectedGame);
+  return /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)(import_jsx_runtime8.Fragment, { children: [
+    /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("header", { className: "grarf-admin__module-header", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("h2", { className: "grarf-admin__module-title", children: "Operations" }),
+      /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("p", { className: "grarf-admin__module-description", children: "Read-only operational snapshot assembled from the same resolvers as the public Games Spine. Select a date, section, and game to inspect existing operational data." }),
+      /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "grarf-admin__toolbar", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("label", { className: "grarf-admin__label", htmlFor: "operations-date", children: "Operational date" }),
+        /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(
           "select",
           {
             id: "operations-date",
@@ -31328,24 +32340,37 @@ function OperationsModule() {
               setOperationalDateKey(event.target.value);
               setSelectedSectionKey(null);
               setSelectedGameKey(null);
+              setSearchQuery("");
             },
-            children: configuredDateKeys.map((dateKey) => /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("option", { value: dateKey, children: dateKey }, dateKey))
+            children: operationalDateKeys.map((dateKey) => /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("option", { value: dateKey, children: dateKey }, dateKey))
           }
         ),
-        loading ? /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { className: "grarf-admin__status", children: "Assembling snapshot\u2026" }) : null,
-        !loading && snapshot ? /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("span", { className: "grarf-admin__status", children: [
+        loading ? /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { className: "grarf-admin__status", children: "Assembling snapshot\u2026" }) : null,
+        !loading && snapshot ? /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("span", { className: "grarf-admin__status", children: [
           "Assembled ",
           new Date(snapshot.assembledAt).toLocaleString()
         ] }) : null,
-        error ? /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { className: "grarf-admin__status grarf-admin__status--error", children: error }) : null
+        error ? /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { className: "grarf-admin__status grarf-admin__status--error", children: error }) : null
       ] })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "grarf-admin__operations-body", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("section", { className: "grarf-admin__panel", "aria-label": "Operational sections", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: "grarf-admin__panel-header", children: "Sections" }),
-        /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: "grarf-admin__panel-scroll", children: !snapshot || snapshot.sections.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("p", { className: "grarf-admin__empty", children: loading ? "Loading sections\u2026" : "No operational sections for this date." }) : /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("ul", { className: "grarf-admin__list", children: snapshot.sections.map((section) => {
+    /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(
+      OperationsPendingChangesBar,
+      {
+        pendingEdits,
+        pendingGameCount,
+        totalPendingFieldChanges,
+        saveAllState,
+        onSaveAll: saveAll,
+        onDiscardAll: discardAll
+      }
+    ),
+    /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(OperationsSnapshotSearchBar, { value: searchQuery, onChange: setSearchQuery }),
+    /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "grarf-admin__operations-body", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("section", { className: "grarf-admin__panel", "aria-label": "Operational sections", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("div", { className: "grarf-admin__panel-header", children: "Sections" }),
+        /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("div", { className: "grarf-admin__panel-scroll", children: !snapshot || snapshot.sections.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("p", { className: "grarf-admin__empty", children: loading ? "Loading sections\u2026" : "No operational sections for this date." }) : /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("ul", { className: "grarf-admin__list", children: snapshot.sections.map((section) => {
           const isActive = section.sectionKey === activeSectionKey;
-          return /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("li", { className: "grarf-admin__list-item", children: /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)(
+          return /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("li", { className: "grarf-admin__list-item", children: /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)(
             "button",
             {
               type: "button",
@@ -31356,7 +32381,7 @@ function OperationsModule() {
               },
               children: [
                 section.sectionLabel,
-                /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("span", { className: "grarf-admin__list-button-subtitle", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("span", { className: "grarf-admin__list-button-subtitle", children: [
                   section.kind,
                   " \xB7 ",
                   section.games.length,
@@ -31368,63 +32393,98 @@ function OperationsModule() {
           ) }, section.sectionKey);
         }) }) })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("section", { className: "grarf-admin__panel", "aria-label": "Games in section", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: "grarf-admin__panel-header", children: "Games" }),
-        /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: "grarf-admin__panel-scroll", children: !activeSection || activeSection.games.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("p", { className: "grarf-admin__empty", children: loading ? "Loading games\u2026" : "Select a section with games." }) : /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("ul", { className: "grarf-admin__list", children: activeSection.games.map((game) => {
-          const isActive = game.gameKey === selectedGameKey;
-          return /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("li", { className: "grarf-admin__list-item", children: /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)(
-            "button",
-            {
-              type: "button",
-              className: isActive ? "grarf-admin__list-button grarf-admin__list-button--active" : "grarf-admin__list-button",
-              onClick: () => setSelectedGameKey(game.gameKey),
-              children: [
-                /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("span", { className: "grarf-admin__list-button-row", children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { className: "grarf-admin__list-button-label", children: formatGameListLabel(game) }),
-                  /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(OperationsGameIndicatorBadges, { game })
-                ] }),
-                /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("span", { className: "grarf-admin__list-button-subtitle", children: [
-                  game.status,
-                  game.statusLine ? ` \xB7 ${game.statusLine}` : ""
-                ] })
-              ]
-            }
-          ) }, game.gameKey);
-        }) }) })
+      /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("section", { className: "grarf-admin__panel", "aria-label": "Games in section", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("div", { className: "grarf-admin__panel-header", children: isSearchActive ? "Search Results" : "Games" }),
+        /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("div", { className: "grarf-admin__panel-scroll", children: loading ? /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("p", { className: "grarf-admin__empty", children: "Loading games\u2026" }) : isSearchActive ? visibleGames.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("p", { className: "grarf-admin__empty", children: "No games match your search." }) : /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("ul", { className: "grarf-admin__list", children: visibleGames.map((game) => /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(
+          GameListItem,
+          {
+            game,
+            isActive: game.gameKey === selectedGameKey,
+            isGamePending,
+            showLeague: true,
+            onSelect: setSelectedGameKey
+          },
+          game.gameKey
+        )) }) : !activeSection || visibleGames.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("p", { className: "grarf-admin__empty", children: "Select a section with games." }) : /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("ul", { className: "grarf-admin__list", children: visibleGames.map((game) => /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(
+          GameListItem,
+          {
+            game,
+            isActive: game.gameKey === selectedGameKey,
+            isGamePending,
+            onSelect: setSelectedGameKey
+          },
+          game.gameKey
+        )) }) })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("section", { className: "grarf-admin__panel", "aria-label": "Operations Console", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: "grarf-admin__panel-header", children: "Operations Console" }),
-        /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: "grarf-admin__panel-scroll", children: selectedGame ? /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
+      /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("section", { className: "grarf-admin__panel", "aria-label": "Operations Console", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("div", { className: "grarf-admin__panel-header", children: "Operations Console" }),
+        /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("div", { className: "grarf-admin__panel-scroll", children: selectedGame && activeDraft ? /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(
           OperationsConsole,
           {
             game: selectedGame,
             operationalDateKey,
-            assembledAt: snapshot?.assembledAt
+            assembledAt: snapshot?.assembledAt,
+            draft: activeDraft,
+            currentGameChangeCount,
+            onFieldChange: updateField,
+            onDiscardCurrent: discardActiveGame
           }
-        ) : /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("p", { className: "grarf-admin__empty", children: "Select a game to view its operational summary and manual overrides." }) })
+        ) : /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("p", { className: "grarf-admin__empty", children: "Select a game to view its operational summary and manual overrides." }) })
       ] })
     ] })
   ] });
 }
+function GameListItem({
+  game,
+  isActive,
+  isGamePending,
+  showLeague = false,
+  onSelect
+}) {
+  const hasPendingEdits = isGamePending(game.gameKey);
+  return /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("li", { className: "grarf-admin__list-item", children: /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)(
+    "button",
+    {
+      type: "button",
+      className: isActive ? "grarf-admin__list-button grarf-admin__list-button--active" : hasPendingEdits ? "grarf-admin__list-button grarf-admin__list-button--pending" : "grarf-admin__list-button",
+      onClick: () => onSelect(game.gameKey),
+      children: [
+        /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("span", { className: "grarf-admin__list-button-row", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { className: "grarf-admin__list-button-label", children: formatGameListLabel(game) }),
+          hasPendingEdits ? /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { className: "grarf-admin__list-pending-badge", title: "Pending edits", children: "Pending" }) : null,
+          /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(OperationsGameIndicatorBadges, { game })
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("span", { className: "grarf-admin__list-button-subtitle", children: [
+          showLeague ? /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)(import_jsx_runtime8.Fragment, { children: [
+            game.leagueLabel,
+            " \xB7 "
+          ] }) : null,
+          game.status,
+          game.statusLine ? ` \xB7 ${game.statusLine}` : ""
+        ] })
+      ]
+    }
+  ) });
+}
 
 // src/admin/GRARFAdminApp.tsx
-var import_jsx_runtime6 = __toESM(require_jsx_runtime());
+var import_jsx_runtime9 = __toESM(require_jsx_runtime());
 function GRARFAdminApp() {
-  const [activeNavItemId, setActiveNavItemId] = (0, import_react7.useState)("operations");
-  return /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { className: "grarf-admin", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(AdminSidebar, { activeItemId: activeNavItemId, onSelect: setActiveNavItemId }),
-    /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("main", { className: "grarf-admin__main", children: activeNavItemId === "operations" ? /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(OperationsModule, {}) : null })
+  const [activeNavItemId, setActiveNavItemId] = (0, import_react8.useState)("operations");
+  return /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("div", { className: "grarf-admin", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(AdminSidebar, { activeItemId: activeNavItemId, onSelect: setActiveNavItemId }),
+    /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("main", { className: "grarf-admin__main", children: activeNavItemId === "operations" ? /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(OperationsModule, {}) : null })
   ] });
 }
 
 // admin.tsx
-var import_jsx_runtime7 = __toESM(require_jsx_runtime());
+var import_jsx_runtime10 = __toESM(require_jsx_runtime());
 var rootElement = document.getElementById("root");
 if (!rootElement) {
   throw new Error("GRARF Admin root element not found");
 }
 (0, import_client.createRoot)(rootElement).render(
-  /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(import_react8.StrictMode, { children: /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(GRARFAdminApp, {}) })
+  /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(import_react9.StrictMode, { children: /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(GRARFAdminApp, {}) })
 );
 /*! Bundled license information:
 

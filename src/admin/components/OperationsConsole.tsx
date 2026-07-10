@@ -1,11 +1,16 @@
 import { useState, type ReactNode } from "react";
 import type { OperationsSnapshotGame } from "../../../../grarf/desktop/src/types/operationsSnapshot";
+import type { OperationalOverrideDraft } from "../lib/buildOperationalOverrideDraft";
 import { OperationsOverridesEditor } from "./OperationsOverridesEditor";
 
 type OperationsConsoleProps = {
   game: OperationsSnapshotGame;
   operationalDateKey: string;
   assembledAt?: string;
+  draft: OperationalOverrideDraft;
+  currentGameChangeCount: number;
+  onFieldChange: (field: keyof OperationalOverrideDraft, value: string) => void;
+  onDiscardCurrent: () => void;
 };
 
 function formatTimestamp(ms: number | undefined): string | null {
@@ -99,8 +104,13 @@ export function OperationsConsole({
   game,
   operationalDateKey,
   assembledAt,
+  draft,
+  currentGameChangeCount,
+  onFieldChange,
+  onDiscardCurrent,
 }: OperationsConsoleProps) {
   const [systemOpen, setSystemOpen] = useState(false);
+  const hasChanges = currentGameChangeCount > 0;
   const featuredLabel =
     game.featuredRank != null && Number.isFinite(game.featuredRank)
       ? `Yes — Rank #${game.featuredRank}`
@@ -137,9 +147,31 @@ export function OperationsConsole({
 
       <ConsoleSection
         title="Operational Overrides"
-        description="Edit manual operational fields for this game. Changes are kept in local draft state only and are not saved."
+        description="Edit manual operational fields for this game. Changes stay in Pending Changes until Save All."
       >
-        <OperationsOverridesEditor game={game} />
+        <OperationsOverridesEditor game={game} draft={draft} onFieldChange={onFieldChange} />
+        <div className="grarf-admin__console-save-bar">
+          <div className="grarf-admin__console-save-meta">
+            {hasChanges ? (
+              <span className="grarf-admin__console-save-pending">
+                {currentGameChangeCount} unsaved change
+                {currentGameChangeCount === 1 ? "" : "s"} for this game
+              </span>
+            ) : (
+              <span className="grarf-admin__console-save-pending grarf-admin__console-save-pending--idle">
+                No changes from snapshot
+              </span>
+            )}
+          </div>
+          <button
+            type="button"
+            className="grarf-admin__pending-discard-button"
+            disabled={!hasChanges}
+            onClick={onDiscardCurrent}
+          >
+            Discard
+          </button>
+        </div>
       </ConsoleSection>
 
       <section className="grarf-admin__console-section grarf-admin__console-section--system">
