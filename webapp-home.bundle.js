@@ -28479,7 +28479,7 @@ init_define_import_meta_env();
 
 // ../grarf/desktop/src/components/webMobileGate/webMobileGateDesktopScreenshot.ts
 init_define_import_meta_env();
-var WEB_MOBILE_GATE_DESKTOP_SCREENSHOT_SRC = null;
+var WEB_MOBILE_GATE_DESKTOP_SCREENSHOT_SRC = "/GRARF_mobile-gate.gif";
 var WEB_MOBILE_GATE_DESKTOP_SCREENSHOT_ASPECT_RATIO = "16 / 10";
 
 // ../grarf/desktop/src/components/webMobileGate/WebMobileWelcomeGate.tsx
@@ -28506,8 +28506,7 @@ function WebMobileWelcomeGate({ onContinue }) {
       {
         src: WEB_MOBILE_GATE_DESKTOP_SCREENSHOT_SRC,
         alt: "GRARF on desktop",
-        className: "w-full rounded-sm border border-line/60 object-cover shadow-[0_8px_32px_rgba(0,0,0,0.45)]",
-        style: { aspectRatio: WEB_MOBILE_GATE_DESKTOP_SCREENSHOT_ASPECT_RATIO },
+        className: "w-full rounded-sm border border-line/60 object-contain shadow-[0_8px_32px_rgba(0,0,0,0.45)]",
         draggable: false
       }
     ) : /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(
