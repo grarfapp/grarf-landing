@@ -28424,10 +28424,35 @@ init_isGrarfWebRenderer();
 
 // ../grarf/desktop/src/lib/platform/isWebMobilePhoneViewport.ts
 init_define_import_meta_env();
-var WEB_MOBILE_PHONE_MEDIA_QUERY = "(max-width: 767px)";
+function isPhoneUserAgent() {
+  const ua2 = navigator.userAgent;
+  if (/iPhone|iPod/i.test(ua2)) return true;
+  if (/Android/i.test(ua2) && /Mobile/i.test(ua2)) return true;
+  return false;
+}
+function isTabletUserAgent() {
+  const ua2 = navigator.userAgent;
+  if (/iPad/i.test(ua2)) return true;
+  if (/Android/i.test(ua2) && !/Mobile/i.test(ua2)) return true;
+  if (/Tablet|PlayBook|Silk/i.test(ua2)) return true;
+  if (/Macintosh/i.test(ua2) && navigator.maxTouchPoints > 1 && !/iPhone|iPod/i.test(ua2)) {
+    return true;
+  }
+  return false;
+}
+function isTouchPrimaryDevice() {
+  if (window.matchMedia("(pointer: coarse)").matches) return true;
+  if (navigator.maxTouchPoints > 0 && window.matchMedia("(hover: none)").matches) {
+    return true;
+  }
+  return false;
+}
 function isWebMobilePhoneViewport() {
-  if (typeof window === "undefined") return false;
-  return window.matchMedia(WEB_MOBILE_PHONE_MEDIA_QUERY).matches;
+  if (typeof window === "undefined" || typeof navigator === "undefined") return false;
+  if (!isPhoneUserAgent()) return false;
+  if (isTabletUserAgent()) return false;
+  if (!isTouchPrimaryDevice()) return false;
+  return true;
 }
 
 // ../grarf/desktop/src/lib/platform/webMobileGateSession.ts
