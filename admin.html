@@ -12,11 +12,16 @@
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="admin.css" />
+    <link rel="stylesheet" href="webapp-home.css" />
   </head>
   <body>
-    <div id="root"></div>
+    <div id="grarf-web-root" class="h-screen w-screen overflow-hidden"></div>
+    <!--
+      Signals the webapp bundle to activate Admin Mode before the first React render.
+      A future password gate can be inserted here before this flag is set.
+    -->
+    <script>window.__GRARF_ADMIN_ENTRY = true;</script>
     <script src="webapp-config.js"></script>
-    <script type="module" src="admin.bundle.js"></script>
+    <script type="module" src="webapp-home.bundle.js"></script>
   </body>
 </html>

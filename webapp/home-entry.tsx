@@ -20,6 +20,9 @@ import type { CenterPaneApplicationMode } from "../../grarf/desktop/src/types/ce
 import type { GlobalOperationalMode } from "../../grarf/desktop/src/types/globalOperationalMode";
 import { useCenterPaneApplicationModeStore } from "../../grarf/desktop/src/store/centerPaneApplicationModeStore";
 import { useOperationalModeStore } from "../../grarf/desktop/src/store/operationalModeStore";
+import { AdminModeOverlay } from "../../grarf/desktop/src/components/adminMode/AdminModeOverlay";
+import { markGrarfAdmin } from "../../grarf/desktop/src/lib/admin/grarfAdminFlag";
+import { useAdminModeStore } from "../../grarf/desktop/src/store/adminModeStore";
 
 let reactRoot: Root | null = null;
 
@@ -59,9 +62,14 @@ function WebHomeApp() {
         <Route path="webapp.html" element={<AppShellLayout />}>
           {appShellRouteElements}
         </Route>
+        {/* admin.html — same AppShellLayout as public, Admin Mode pre-activated before mount */}
+        <Route path="admin.html" element={<AppShellLayout />}>
+          {appShellRouteElements}
+        </Route>
         <Route path="admin/sportscape" element={<SportscapeEditorialAdminPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
+      <AdminModeOverlay />
     </AnalyticsProvider>
   );
 }
@@ -92,5 +100,13 @@ export function mountWebHome(container: HTMLElement): void {
 
 const autoRoot = document.getElementById("grarf-web-root");
 if (autoRoot) {
+  // Activate Admin Mode synchronously before the first React render so
+  // isAdminMode is already true when components mount. Set by admin.html
+  // before loading this bundle — allows a future password gate to be
+  // inserted in admin.html before the flag is set.
+  if ((window as { __GRARF_ADMIN_ENTRY?: boolean }).__GRARF_ADMIN_ENTRY) {
+    markGrarfAdmin();
+    useAdminModeStore.getState().enterAdminMode();
+  }
   mountWebHome(autoRoot);
 }

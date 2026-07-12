@@ -1,8 +1,12 @@
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type {
   OperationsSnapshotGame,
   OperationsSnapshotSection,
 } from "../../../../grarf/desktop/src/types/operationsSnapshot";
+import {
+  fetchPersistedFeaturedGames,
+  upsertFeaturedGamePriority,
+} from "../../../../grarf/desktop/src/lib/featuredGames/featuredGamesAdminApi";
 import { OperationsConsole } from "../components/OperationsConsole";
 import { OperationsGameIndicatorBadges } from "../components/OperationsGameIndicatorBadges";
 import { OperationsPendingChangesBar } from "../components/OperationsPendingChangesBar";
@@ -25,6 +29,20 @@ function formatGameListLabel(game: OperationsSnapshotGame): string {
   return game.eventName.trim() || game.gameKey;
 }
 
+function computeFeaturedPendingChanges(
+  baseline: Record<string, number>,
+  working: Record<string, number>
+): Array<{ gameKey: string; priority: number | null }> {
+  const changes: Array<{ gameKey: string; priority: number | null }> = [];
+  for (const key of Object.keys(baseline)) {
+    if (!(key in working)) changes.push({ gameKey: key, priority: null });
+  }
+  for (const [key, priority] of Object.entries(working)) {
+    if (baseline[key] !== priority) changes.push({ gameKey: key, priority });
+  }
+  return changes;
+}
+
 export function OperationsModule() {
   const operationalDateKeys = useMemo(() => resolveOperationsConsoleDateKeys(), []);
   const [operationalDateKey, setOperationalDateKey] = useState(
@@ -33,6 +51,13 @@ export function OperationsModule() {
   const [selectedSectionKey, setSelectedSectionKey] = useState<string | null>(null);
   const [selectedGameKey, setSelectedGameKey] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+
+  const [featuredBaseline, setFeaturedBaseline] = useState<Record<string, number>>({});
+  const [featuredWorking, setFeaturedWorking] = useState<Record<string, number>>({});
+  const [featuredSaveError, setFeaturedSaveError] = useState<string | null>(null);
+  const [featuredSaving, setFeaturedSaving] = useState(false);
+  const featuredBaselineRef = useRef(featuredBaseline);
+  featuredBaselineRef.current = featuredBaseline;
 
   const { snapshot, loading, error } = useAdminOperationsDateSnapshot(operationalDateKey);
   const normalizedSearchQuery = normalizeOperationsSnapshotSearchQuery(searchQuery);
@@ -77,6 +102,71 @@ export function OperationsModule() {
     updateField,
   } = useOperationsPendingChanges(operationalDateKey, selectedGame);
 
+  useEffect(() => {
+    let cancelled = false;
+    void fetchPersistedFeaturedGames()
+      .then((data) => {
+        if (cancelled) return;
+        setFeaturedBaseline(data);
+        setFeaturedWorking({ ...data });
+      })
+      .catch(() => {
+        /* featured priority editing still available without preloaded data */
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [operationalDateKey]);
+
+  const featuredPendingChanges = useMemo(
+    () => computeFeaturedPendingChanges(featuredBaseline, featuredWorking),
+    [featuredBaseline, featuredWorking]
+  );
+
+  const onFeaturedPriorityChange = useCallback((gameKey: string, raw: string) => {
+    const trimmed = raw.trim();
+    setFeaturedWorking((current) => {
+      const next = { ...current };
+      if (!trimmed) {
+        delete next[gameKey];
+      } else {
+        const n = Math.round(Number(trimmed));
+        if (Number.isFinite(n) && n >= 1 && n <= 10) {
+          next[gameKey] = n;
+        }
+      }
+      return next;
+    });
+    setFeaturedSaveError(null);
+  }, []);
+
+  const handleSaveAll = useCallback(async () => {
+    saveAll();
+    if (featuredPendingChanges.length === 0) return;
+    setFeaturedSaveError(null);
+    setFeaturedSaving(true);
+    try {
+      for (const change of featuredPendingChanges) {
+        await upsertFeaturedGamePriority(change.gameKey, change.priority);
+      }
+      const saved = await fetchPersistedFeaturedGames();
+      setFeaturedBaseline(saved);
+      setFeaturedWorking({ ...saved });
+    } catch (err) {
+      setFeaturedSaveError(
+        err instanceof Error ? err.message : "Unable to save featured priorities"
+      );
+    } finally {
+      setFeaturedSaving(false);
+    }
+  }, [saveAll, featuredPendingChanges]);
+
+  const handleDiscardAll = useCallback(() => {
+    discardAll();
+    setFeaturedWorking({ ...featuredBaselineRef.current });
+    setFeaturedSaveError(null);
+  }, [discardAll]);
+
   return (
     <>
       <header className="grarf-admin__module-header">
@@ -120,9 +210,12 @@ export function OperationsModule() {
         pendingEdits={pendingEdits}
         pendingGameCount={pendingGameCount}
         totalPendingFieldChanges={totalPendingFieldChanges}
+        featuredPriorityChangeCount={featuredPendingChanges.length}
+        featuredSaveError={featuredSaveError}
+        saving={featuredSaving}
         saveAllState={saveAllState}
-        onSaveAll={saveAll}
-        onDiscardAll={discardAll}
+        onSaveAll={handleSaveAll}
+        onDiscardAll={handleDiscardAll}
       />
 
       <OperationsSnapshotSearchBar value={searchQuery} onChange={setSearchQuery} />
@@ -186,7 +279,9 @@ export function OperationsModule() {
                       isActive={game.gameKey === selectedGameKey}
                       isGamePending={isGamePending}
                       showLeague
+                      featuredPriority={featuredWorking[game.gameKey] ?? null}
                       onSelect={setSelectedGameKey}
+                      onFeaturedPriorityChange={onFeaturedPriorityChange}
                     />
                   ))}
                 </ul>
@@ -201,7 +296,9 @@ export function OperationsModule() {
                     game={game}
                     isActive={game.gameKey === selectedGameKey}
                     isGamePending={isGamePending}
+                    featuredPriority={featuredWorking[game.gameKey] ?? null}
                     onSelect={setSelectedGameKey}
+                    onFeaturedPriorityChange={onFeaturedPriorityChange}
                   />
                 ))}
               </ul>
@@ -239,18 +336,22 @@ function GameListItem({
   isActive,
   isGamePending,
   showLeague = false,
+  featuredPriority,
   onSelect,
+  onFeaturedPriorityChange,
 }: {
   game: OperationsSnapshotGame;
   isActive: boolean;
   isGamePending: (gameKey: string) => boolean;
   showLeague?: boolean;
+  featuredPriority: number | null;
   onSelect: (gameKey: string) => void;
+  onFeaturedPriorityChange: (gameKey: string, raw: string) => void;
 }) {
   const hasPendingEdits = isGamePending(game.gameKey);
 
   return (
-    <li className="grarf-admin__list-item">
+    <li className="grarf-admin__list-item" style={{ display: "flex", alignItems: "stretch" }}>
       <button
         type="button"
         className={
@@ -260,6 +361,7 @@ function GameListItem({
               ? "grarf-admin__list-button grarf-admin__list-button--pending"
               : "grarf-admin__list-button"
         }
+        style={{ flex: 1, minWidth: 0 }}
         onClick={() => onSelect(game.gameKey)}
       >
         <span className="grarf-admin__list-button-row">
@@ -282,6 +384,29 @@ function GameListItem({
           {game.statusLine ? ` · ${game.statusLine}` : ""}
         </span>
       </button>
+      <input
+        type="number"
+        min={1}
+        max={10}
+        value={featuredPriority ?? ""}
+        placeholder="—"
+        title="Featured priority (1–10, blank = not featured)"
+        aria-label={`Featured priority for ${formatGameListLabel(game)}`}
+        onChange={(event) => onFeaturedPriorityChange(game.gameKey, event.target.value)}
+        style={{
+          width: "40px",
+          flexShrink: 0,
+          background: featuredPriority != null ? "rgba(100,200,150,0.08)" : "#071012",
+          border: "none",
+          borderLeft: "1px solid rgba(255,255,255,0.08)",
+          color: featuredPriority != null ? "#9de8c0" : "#5f7a7a",
+          fontSize: "11px",
+          fontFamily: "monospace",
+          textAlign: "center",
+          padding: "0 2px",
+          outline: "none",
+        }}
+      />
     </li>
   );
 }

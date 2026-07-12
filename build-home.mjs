@@ -105,6 +105,27 @@ if (fs.existsSync(desktopPublicLogosDir)) {
   console.warn("[build-home] skip league-logos sync — missing", desktopPublicLogosDir);
 }
 
+const mobileGateGifName = "GRARF_mobile-gate.gif";
+const desktopMobileGateGif = path.join(
+  path.resolve(__dirname, "../grarf/desktop/public"),
+  mobileGateGifName
+);
+const landingMobileGateGif = path.join(__dirname, mobileGateGifName);
+
+if (fs.existsSync(desktopMobileGateGif)) {
+  fs.copyFileSync(desktopMobileGateGif, landingMobileGateGif);
+  console.log("[build-home] synced", mobileGateGifName, "from desktop/public");
+} else if (fs.existsSync(landingMobileGateGif)) {
+  console.log("[build-home] using existing", mobileGateGifName, "at landing root");
+} else {
+  console.error(
+    "[build-home] missing required static asset:",
+    mobileGateGifName,
+    "(expected desktop/public or grarf-landing root)"
+  );
+  process.exit(1);
+}
+
 const webappHtmlPath = path.join(__dirname, "webapp.html");
 const spa404Path = path.join(__dirname, "404.html");
 const buildStamp = String(Date.now());

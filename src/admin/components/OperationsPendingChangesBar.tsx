@@ -10,11 +10,14 @@ type OperationsPendingChangesBarProps = {
   pendingEdits: OperationsPendingGameEdit[];
   pendingGameCount: number;
   totalPendingFieldChanges: number;
+  featuredPriorityChangeCount?: number;
+  featuredSaveError?: string | null;
+  saving?: boolean;
   saveAllState:
     | { status: "idle" }
     | { status: "validation_error"; issues: OperationsPendingChangesValidationIssue[] }
     | { status: "success"; collection: OperationsPendingChangesCollection };
-  onSaveAll: () => void;
+  onSaveAll: () => void | Promise<void>;
   onDiscardAll: () => void;
 };
 
@@ -22,34 +25,45 @@ export function OperationsPendingChangesBar({
   pendingEdits,
   pendingGameCount,
   totalPendingFieldChanges,
+  featuredPriorityChangeCount = 0,
+  featuredSaveError,
+  saving = false,
   saveAllState,
   onSaveAll,
   onDiscardAll,
 }: OperationsPendingChangesBarProps) {
-  const hasPending = pendingGameCount > 0;
+  const hasPending = pendingGameCount > 0 || featuredPriorityChangeCount > 0;
+  const totalCount = totalPendingFieldChanges + featuredPriorityChangeCount;
   const eventNameByGameKey = new Map(
     pendingEdits.map((entry) => [entry.gameKey, entry.eventName])
   );
+
+  function buildSubtitle() {
+    const parts: string[] = [];
+    if (pendingGameCount > 0) {
+      parts.push(`${pendingGameCount} game${pendingGameCount === 1 ? "" : "s"} with unsaved edits`);
+    }
+    if (featuredPriorityChangeCount > 0) {
+      parts.push(`${featuredPriorityChangeCount} featured priority change${featuredPriorityChangeCount === 1 ? "" : "s"}`);
+    }
+    return parts.length > 0 ? parts.join(" · ") : "No unsaved operational edits";
+  }
 
   return (
     <section className="grarf-admin__pending-bar" aria-label="Pending operational changes">
       <div className="grarf-admin__pending-bar-header">
         <div className="grarf-admin__pending-bar-summary">
-          <span className="grarf-admin__pending-bar-count">{totalPendingFieldChanges}</span>
+          <span className="grarf-admin__pending-bar-count">{totalCount}</span>
           <div className="grarf-admin__pending-bar-copy">
             <div className="grarf-admin__pending-bar-title">Pending Changes</div>
-            <div className="grarf-admin__pending-bar-subtitle">
-              {hasPending
-                ? `${pendingGameCount} game${pendingGameCount === 1 ? "" : "s"} with unsaved edits`
-                : "No unsaved operational edits"}
-            </div>
+            <div className="grarf-admin__pending-bar-subtitle">{buildSubtitle()}</div>
           </div>
         </div>
         <div className="grarf-admin__pending-bar-actions">
           <button
             type="button"
             className="grarf-admin__pending-discard-button"
-            disabled={!hasPending}
+            disabled={!hasPending || saving}
             onClick={onDiscardAll}
           >
             Discard All
@@ -57,10 +71,10 @@ export function OperationsPendingChangesBar({
           <button
             type="button"
             className="grarf-admin__console-save-button"
-            disabled={!hasPending}
-            onClick={onSaveAll}
+            disabled={!hasPending || saving}
+            onClick={() => void onSaveAll()}
           >
-            Save All
+            {saving ? "Saving…" : "Save All"}
           </button>
         </div>
       </div>
@@ -108,6 +122,13 @@ export function OperationsPendingChangesBar({
                 </div>
               ))}
           </div>
+        </div>
+      ) : null}
+
+      {featuredSaveError ? (
+        <div className="grarf-admin__console-save-feedback grarf-admin__console-save-feedback--error">
+          <p className="grarf-admin__console-save-feedback-title">Featured priority save failed</p>
+          <p className="grarf-admin__console-save-message">{featuredSaveError}</p>
         </div>
       ) : null}
     </section>
