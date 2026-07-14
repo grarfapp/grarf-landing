@@ -100411,8 +100411,37 @@ function AdminModeOverlay() {
 // webapp/home-entry.tsx
 var import_jsx_runtime222 = __toESM(require_jsx_runtime());
 var reactRoot = null;
+function isAdminHtmlEntry() {
+  return Boolean(window.__GRARF_ADMIN_ENTRY);
+}
+function activateAdminEntry() {
+  markGrarfAdmin();
+  useAdminModeStore.getState().enterAdminMode();
+  if (!resolveCenterPaneApplicationModeFromPath(window.location.pathname)) {
+    useCenterPaneApplicationModeStore.getState().setModeExplicit("operations");
+  }
+}
+function AdminEntryPasswordGate({ children }) {
+  const [authed, setAuthed] = (0, import_react217.useState)(() => !isAdminHtmlEntry() || isSportscapeAdminAuthed());
+  if (!authed) {
+    return /* @__PURE__ */ (0, import_jsx_runtime222.jsx)("div", { className: "flex min-h-screen items-center justify-center bg-[#020404] px-4", children: /* @__PURE__ */ (0, import_jsx_runtime222.jsx)("div", { className: "w-full max-w-sm border border-line/60 bg-panel2 p-6 shadow-lg", children: /* @__PURE__ */ (0, import_jsx_runtime222.jsx)(
+      SportscapeEditorialPasswordForm,
+      {
+        idPrefix: "grarf-admin-entry",
+        title: "GRARF Admin",
+        description: "Enter the editorial password to access the Operations Spine and save operational overrides.",
+        submitLabel: "ENTER",
+        onSuccess: () => {
+          activateAdminEntry();
+          setAuthed(true);
+        }
+      }
+    ) }) });
+  }
+  return /* @__PURE__ */ (0, import_jsx_runtime222.jsx)(import_jsx_runtime222.Fragment, { children });
+}
 function IntelligenceSyncBridge() {
-  (0, import_react217.useEffect)(() => bindIntelligenceStoreUpdates(), []);
+  useEffect(() => bindIntelligenceStoreUpdates(), []);
   return null;
 }
 var appShellRouteElements = /* @__PURE__ */ (0, import_jsx_runtime222.jsxs)(import_jsx_runtime222.Fragment, { children: [
@@ -100461,17 +100490,13 @@ function mountWebHome(container) {
     reactRoot = (0, import_client.createRoot)(container);
   }
   reactRoot.render(
-    /* @__PURE__ */ (0, import_jsx_runtime222.jsx)(import_react217.StrictMode, { children: /* @__PURE__ */ (0, import_jsx_runtime222.jsx)(BrowserRouter, { children: /* @__PURE__ */ (0, import_jsx_runtime222.jsx)(WebMobileGateRoot, { children: /* @__PURE__ */ (0, import_jsx_runtime222.jsx)(WebHomeApp, {}) }) }) })
+    /* @__PURE__ */ (0, import_jsx_runtime222.jsx)(import_react217.StrictMode, { children: /* @__PURE__ */ (0, import_jsx_runtime222.jsx)(BrowserRouter, { children: /* @__PURE__ */ (0, import_jsx_runtime222.jsx)(WebMobileGateRoot, { children: /* @__PURE__ */ (0, import_jsx_runtime222.jsx)(AdminEntryPasswordGate, { children: /* @__PURE__ */ (0, import_jsx_runtime222.jsx)(WebHomeApp, {}) }) }) }) })
   );
 }
 var autoRoot = document.getElementById("grarf-web-root");
 if (autoRoot) {
-  if (window.__GRARF_ADMIN_ENTRY) {
-    markGrarfAdmin();
-    useAdminModeStore.getState().enterAdminMode();
-    if (!resolveCenterPaneApplicationModeFromPath(window.location.pathname)) {
-      useCenterPaneApplicationModeStore.getState().setModeExplicit("operations");
-    }
+  if (isAdminHtmlEntry() && isSportscapeAdminAuthed()) {
+    activateAdminEntry();
   }
   mountWebHome(autoRoot);
 }
