@@ -58600,6 +58600,143 @@ gamePk=${gamePk}`);
 init_define_import_meta_env();
 var import_react54 = __toESM(require_react(), 1);
 
+// ../grarf/desktop/src/lib/gameCardNavigation/gameCardNavigation.ts
+init_define_import_meta_env();
+init_isGrarfWebRenderer();
+
+// ../grarf/desktop/src/store/adminOperationsCardStore.ts
+init_define_import_meta_env();
+var import_zustand32 = __toESM(require_zustand(), 1);
+var EMPTY_ADMIN_OPERATIONS_CARD_FIELDS = {
+  workspaceUrl: "",
+  navigationMode: "center-pane",
+  streamUrl: "",
+  highlightVideoUrl: "",
+  statusOverride: "",
+  viewerMessage: "",
+  operatorNote: ""
+};
+function cloneFieldsByGameId(source) {
+  const out = {};
+  for (const [gameId, fields] of Object.entries(source)) {
+    out[gameId] = { ...fields };
+  }
+  return out;
+}
+function serializeNavigationMode(mode) {
+  return mode === "new-browser-tab" ? "new-browser-tab" : null;
+}
+function buildPersistExport(gameKey, fields) {
+  return {
+    gameKey,
+    streamUrl: fields.streamUrl.trim() || null,
+    highlightVideoUrl: fields.highlightVideoUrl.trim() || null,
+    statusOverride: fields.statusOverride || null,
+    viewerMessage: fields.viewerMessage.trim() || null,
+    gameCardUrl: fields.workspaceUrl.trim() || null,
+    navigationMode: serializeNavigationMode(fields.navigationMode)
+  };
+}
+function persistExportsEqual(a2, b2) {
+  return a2.streamUrl === b2.streamUrl && a2.highlightVideoUrl === b2.highlightVideoUrl && a2.statusOverride === b2.statusOverride && a2.viewerMessage === b2.viewerMessage && a2.gameCardUrl === b2.gameCardUrl && a2.navigationMode === b2.navigationMode;
+}
+var useAdminOperationsCardStore = (0, import_zustand32.create)((set, get) => ({
+  fieldsByGameId: {},
+  persistedBaselineFieldsByGameId: {},
+  setField: (gameId, field, value) => {
+    const current = get().fieldsByGameId[gameId] ?? EMPTY_ADMIN_OPERATIONS_CARD_FIELDS;
+    set({
+      fieldsByGameId: {
+        ...get().fieldsByGameId,
+        [gameId]: { ...current, [field]: value }
+      }
+    });
+  },
+  setNavigationMode: (gameId, value) => {
+    const current = get().fieldsByGameId[gameId] ?? EMPTY_ADMIN_OPERATIONS_CARD_FIELDS;
+    set({
+      fieldsByGameId: {
+        ...get().fieldsByGameId,
+        [gameId]: { ...current, navigationMode: value }
+      }
+    });
+  },
+  setStatusOverride: (gameId, value) => {
+    const current = get().fieldsByGameId[gameId] ?? EMPTY_ADMIN_OPERATIONS_CARD_FIELDS;
+    set({
+      fieldsByGameId: {
+        ...get().fieldsByGameId,
+        [gameId]: { ...current, statusOverride: value }
+      }
+    });
+  },
+  hydrateFields: (fieldsByGameId) => {
+    const baseline = cloneFieldsByGameId(fieldsByGameId);
+    set({ fieldsByGameId: baseline, persistedBaselineFieldsByGameId: cloneFieldsByGameId(baseline) });
+  },
+  isDirty: () => get().exportForSave().length > 0,
+  markClean: () => set((state3) => ({
+    persistedBaselineFieldsByGameId: cloneFieldsByGameId(state3.fieldsByGameId)
+  })),
+  exportForSave: () => {
+    const { fieldsByGameId, persistedBaselineFieldsByGameId } = get();
+    const gameIds = /* @__PURE__ */ new Set([
+      ...Object.keys(fieldsByGameId),
+      ...Object.keys(persistedBaselineFieldsByGameId)
+    ]);
+    const records = [];
+    for (const gameKey of gameIds) {
+      const working = buildPersistExport(
+        gameKey,
+        fieldsByGameId[gameKey] ?? EMPTY_ADMIN_OPERATIONS_CARD_FIELDS
+      );
+      const baseline = buildPersistExport(
+        gameKey,
+        persistedBaselineFieldsByGameId[gameKey] ?? EMPTY_ADMIN_OPERATIONS_CARD_FIELDS
+      );
+      if (!persistExportsEqual(working, baseline)) {
+        records.push(working);
+      }
+    }
+    return records;
+  },
+  reset: () => set({ fieldsByGameId: {}, persistedBaselineFieldsByGameId: {} })
+}));
+
+// ../grarf/desktop/src/lib/gameCardNavigation/gameCardNavigation.ts
+function parseGameCardNavigationMode(raw) {
+  return raw === "new-browser-tab" ? "new-browser-tab" : "center-pane";
+}
+function applyGameCardNavigation(game, rawUrl, rawNavigationMode) {
+  if (!isGrarfWebRenderer()) return game;
+  const gameCardUrl = rawUrl?.trim() || game.gameCardUrl?.trim() || "";
+  if (!gameCardUrl) {
+    if (!game.gameCardUrl && !game.gameCardNavigationMode) return game;
+    return { ...game, gameCardUrl: null, gameCardNavigationMode: null };
+  }
+  const gameCardNavigationMode = parseGameCardNavigationMode(
+    rawNavigationMode ?? game.gameCardNavigationMode
+  );
+  if (game.gameCardUrl === gameCardUrl && game.gameCardNavigationMode === gameCardNavigationMode) {
+    return game;
+  }
+  return {
+    ...game,
+    gameCardUrl,
+    gameCardNavigationMode
+  };
+}
+function resolveManualGameCardNavigationTarget(game) {
+  if (!isGrarfWebRenderer()) return null;
+  const fields = useAdminOperationsCardStore.getState().fieldsByGameId[game.id] ?? EMPTY_ADMIN_OPERATIONS_CARD_FIELDS;
+  const url = fields.workspaceUrl.trim();
+  if (!url) return null;
+  return {
+    url,
+    navigationMode: parseGameCardNavigationMode(fields.navigationMode)
+  };
+}
+
 // ../grarf/desktop/src/lib/gameStatus/statusOverride.ts
 init_define_import_meta_env();
 init_isGrarfWebRenderer();
@@ -58636,48 +58773,27 @@ function applyGameStatusOverride(game, rawOverride) {
   };
 }
 
-// ../grarf/desktop/src/store/adminOperationsCardStore.ts
+// ../grarf/desktop/src/lib/gameViewerMessage/viewerMessage.ts
 init_define_import_meta_env();
-var import_zustand32 = __toESM(require_zustand(), 1);
-var EMPTY_ADMIN_OPERATIONS_CARD_FIELDS = {
-  workspaceUrl: "",
-  navigationMode: "center-pane",
-  streamUrl: "",
-  highlightVideoUrl: "",
-  statusOverride: "",
-  operatorNote: ""
-};
-var useAdminOperationsCardStore = (0, import_zustand32.create)((set, get) => ({
-  fieldsByGameId: {},
-  setField: (gameId, field, value) => {
-    const current = get().fieldsByGameId[gameId] ?? EMPTY_ADMIN_OPERATIONS_CARD_FIELDS;
-    set({
-      fieldsByGameId: {
-        ...get().fieldsByGameId,
-        [gameId]: { ...current, [field]: value }
-      }
-    });
-  },
-  setNavigationMode: (gameId, value) => {
-    const current = get().fieldsByGameId[gameId] ?? EMPTY_ADMIN_OPERATIONS_CARD_FIELDS;
-    set({
-      fieldsByGameId: {
-        ...get().fieldsByGameId,
-        [gameId]: { ...current, navigationMode: value }
-      }
-    });
-  },
-  setStatusOverride: (gameId, value) => {
-    const current = get().fieldsByGameId[gameId] ?? EMPTY_ADMIN_OPERATIONS_CARD_FIELDS;
-    set({
-      fieldsByGameId: {
-        ...get().fieldsByGameId,
-        [gameId]: { ...current, statusOverride: value }
-      }
-    });
-  },
-  reset: () => set({ fieldsByGameId: {} })
-}));
+init_isGrarfWebRenderer();
+function applyGameViewerMessage(game, rawViewerMessage) {
+  if (!isGrarfWebRenderer()) return game;
+  const viewerMessage = rawViewerMessage?.trim() || game.viewerMessage?.trim() || "";
+  const nextViewerMessage = viewerMessage || null;
+  if ((game.viewerMessage ?? null) === nextViewerMessage) return game;
+  return { ...game, viewerMessage: nextViewerMessage };
+}
+
+// ../grarf/desktop/src/lib/manualStreamUrl/manualStreamUrl.ts
+init_define_import_meta_env();
+init_isGrarfWebRenderer();
+function applyManualStreamUrl(game, rawStreamUrl) {
+  if (!isGrarfWebRenderer()) return game;
+  if (rawStreamUrl === void 0) return game;
+  const nextStreamUrl = rawStreamUrl.trim() || null;
+  if ((game.streamUrl ?? null) === nextStreamUrl) return game;
+  return { ...game, streamUrl: nextStreamUrl };
+}
 
 // ../grarf/desktop/src/hooks/useCanonicalLiveGame.ts
 function useCanonicalLiveGame(gameId, consumerId = "react_subscriber") {
@@ -58695,9 +58811,30 @@ function useCanonicalLiveGameRow(gameId, consumerId = "react_subscriber") {
   const statusOverride = useAdminOperationsCardStore(
     (s2) => gameId ? s2.fieldsByGameId[gameId]?.statusOverride : void 0
   );
+  const viewerMessage = useAdminOperationsCardStore(
+    (s2) => gameId ? s2.fieldsByGameId[gameId]?.viewerMessage : void 0
+  );
+  const gameCardUrl = useAdminOperationsCardStore(
+    (s2) => gameId ? s2.fieldsByGameId[gameId]?.workspaceUrl : void 0
+  );
+  const gameCardNavigationMode = useAdminOperationsCardStore(
+    (s2) => gameId ? s2.fieldsByGameId[gameId]?.navigationMode : void 0
+  );
+  const manualStreamUrl = useAdminOperationsCardStore((s2) => {
+    if (!gameId) return void 0;
+    const raw = s2.fieldsByGameId[gameId]?.streamUrl;
+    return raw?.trim() ? raw : void 0;
+  });
   return (0, import_react54.useMemo)(
-    () => game ? applyGameStatusOverride(game, statusOverride) : void 0,
-    [game, statusOverride]
+    () => game ? applyGameCardNavigation(
+      applyManualStreamUrl(
+        applyGameViewerMessage(applyGameStatusOverride(game, statusOverride), viewerMessage),
+        manualStreamUrl
+      ),
+      gameCardUrl,
+      gameCardNavigationMode
+    ) : void 0,
+    [game, statusOverride, viewerMessage, gameCardUrl, gameCardNavigationMode, manualStreamUrl]
   );
 }
 
@@ -67005,8 +67142,12 @@ function computeDuplicateIds(priorities) {
   }
   return result;
 }
+function clonePriorities(source) {
+  return { ...source };
+}
 var useAdminFeaturedPriorityStore = (0, import_zustand46.create)((set, get) => ({
   priorities: {},
+  persistedBaselinePriorities: {},
   duplicateIds: /* @__PURE__ */ new Set(),
   setPriority: (gameId, value) => {
     const next = { ...get().priorities };
@@ -67017,7 +67158,35 @@ var useAdminFeaturedPriorityStore = (0, import_zustand46.create)((set, get) => (
     }
     set({ priorities: next, duplicateIds: computeDuplicateIds(next) });
   },
-  reset: () => set({ priorities: {}, duplicateIds: /* @__PURE__ */ new Set() })
+  hydratePriorities: (priorities) => {
+    const baseline = clonePriorities(priorities);
+    set({
+      priorities: baseline,
+      persistedBaselinePriorities: clonePriorities(baseline),
+      duplicateIds: computeDuplicateIds(baseline)
+    });
+  },
+  isDirty: () => get().exportForSave().length > 0,
+  markClean: () => set((state3) => ({
+    persistedBaselinePriorities: clonePriorities(state3.priorities)
+  })),
+  exportForSave: () => {
+    const { priorities, persistedBaselinePriorities } = get();
+    const gameIds = /* @__PURE__ */ new Set([
+      ...Object.keys(priorities),
+      ...Object.keys(persistedBaselinePriorities)
+    ]);
+    const records = [];
+    for (const gameKey of gameIds) {
+      const workingPriority = priorities[gameKey] ?? null;
+      const baselinePriority = persistedBaselinePriorities[gameKey] ?? null;
+      if (workingPriority !== baselinePriority) {
+        records.push({ gameKey, featuredPriority: workingPriority });
+      }
+    }
+    return records;
+  },
+  reset: () => set({ priorities: {}, persistedBaselinePriorities: {}, duplicateIds: /* @__PURE__ */ new Set() })
 }));
 
 // ../grarf/desktop/src/components/adminMode/AdminFeaturedPriorityField.tsx
@@ -67998,6 +68167,7 @@ function GamesSpineUnifiedGameCard({
       }
     ) : null,
     statusSupplement ? /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "min-w-0 pr-1", children: statusSupplement }) : null,
+    game?.viewerMessage?.trim() ? /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "min-w-0 rounded-sm border border-ambersys/35 bg-ambersys/[0.08] px-2 py-1 text-[9px] font-semibold leading-snug tracking-[0.08em] text-ambersys", children: game.viewerMessage.trim() }) : null,
     /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(GamesSpineCardSectionDivider, {}),
     /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { ref: matchupRef, className: "min-w-0 py-0.5", children: game ? /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(
       GamesSpineMatchupStack,
@@ -68510,57 +68680,60 @@ function GamesSpineCompactGameRow({ game, hideTime = false, className }) {
   const isLive = isGameActivelyLive(game);
   const matchupModel = resolveGamesSpineCompactMatchupModel(game);
   const hasStandings = isGrarfWebRenderer() && matchupModel.kind === "matchup" && Boolean(matchupModel.left.standingsLabel?.trim() || matchupModel.right.standingsLabel?.trim());
-  return /* @__PURE__ */ (0, import_jsx_runtime81.jsxs)(
-    "div",
-    {
-      className: cn2(
-        resolveGamesSpineCompactRowGridClass(game),
-        hasStandings && "items-start",
-        className
-      ),
-      children: [
-        /* @__PURE__ */ (0, import_jsx_runtime81.jsx)(
-          "span",
-          {
-            className: cn2(
-              GAMES_SPINE_COMPACT_STATUS_CELL_CLASS,
-              isLive ? "text-ambersys/95" : "text-textdim/90",
-              hasStandings && "mt-0.5"
-            ),
-            children: statusLabel || /* @__PURE__ */ (0, import_jsx_runtime81.jsx)("span", { "aria-hidden": true, children: "\xA0" })
-          }
+  const viewerMessage = game.viewerMessage?.trim();
+  return /* @__PURE__ */ (0, import_jsx_runtime81.jsxs)("div", { className: cn2("min-w-0", className), children: [
+    /* @__PURE__ */ (0, import_jsx_runtime81.jsxs)(
+      "div",
+      {
+        className: cn2(
+          resolveGamesSpineCompactRowGridClass(game),
+          hasStandings && "items-start"
         ),
-        /* @__PURE__ */ (0, import_jsx_runtime81.jsx)(GamesSpineCompactMatchupColumns, { game }),
-        /* @__PURE__ */ (0, import_jsx_runtime81.jsx)(
-          "div",
-          {
-            className: cn2(
-              "flex shrink-0 items-center",
-              isGrarfWebRenderer() ? cn2(GAMES_SPINE_COMPACT_BROADCAST_COLUMN_WEB_WIDTH_CLASS, "justify-center") : "justify-start",
-              hasStandings && "self-center"
-            ),
-            children: showChannelLogo ? /* @__PURE__ */ (0, import_jsx_runtime81.jsx)(
-              BroadcastChannelLogo,
-              {
-                logoUrl: channel.logoUrl,
-                label: channel.label,
-                align: "left",
-                slotClassName: isGrarfWebRenderer() ? GAMES_SPINE_COMPACT_CHANNEL_LOGO_SLOT_CLASS : void 0,
-                imageClassName: isGrarfWebRenderer() ? gamesSpineCompactChannelLogoImageClass("left") : void 0,
-                fallbackClassName: cn2(GAMES_SPINE_CARD_CHANNEL_FALLBACK_CLASS, "max-w-none text-[9px]")
-              }
-            ) : /* @__PURE__ */ (0, import_jsx_runtime81.jsx)(
-              "span",
-              {
-                "aria-hidden": true,
-                className: isGrarfWebRenderer() ? "block w-full" : "block min-w-[2.25rem]"
-              }
-            )
-          }
-        )
-      ]
-    }
-  );
+        children: [
+          /* @__PURE__ */ (0, import_jsx_runtime81.jsx)(
+            "span",
+            {
+              className: cn2(
+                GAMES_SPINE_COMPACT_STATUS_CELL_CLASS,
+                isLive ? "text-ambersys/95" : "text-textdim/90",
+                hasStandings && "mt-0.5"
+              ),
+              children: statusLabel || /* @__PURE__ */ (0, import_jsx_runtime81.jsx)("span", { "aria-hidden": true, children: "\xA0" })
+            }
+          ),
+          /* @__PURE__ */ (0, import_jsx_runtime81.jsx)(GamesSpineCompactMatchupColumns, { game }),
+          /* @__PURE__ */ (0, import_jsx_runtime81.jsx)(
+            "div",
+            {
+              className: cn2(
+                "flex shrink-0 items-center",
+                isGrarfWebRenderer() ? cn2(GAMES_SPINE_COMPACT_BROADCAST_COLUMN_WEB_WIDTH_CLASS, "justify-center") : "justify-start",
+                hasStandings && "self-center"
+              ),
+              children: showChannelLogo ? /* @__PURE__ */ (0, import_jsx_runtime81.jsx)(
+                BroadcastChannelLogo,
+                {
+                  logoUrl: channel.logoUrl,
+                  label: channel.label,
+                  align: "left",
+                  slotClassName: isGrarfWebRenderer() ? GAMES_SPINE_COMPACT_CHANNEL_LOGO_SLOT_CLASS : void 0,
+                  imageClassName: isGrarfWebRenderer() ? gamesSpineCompactChannelLogoImageClass("left") : void 0,
+                  fallbackClassName: cn2(GAMES_SPINE_CARD_CHANNEL_FALLBACK_CLASS, "max-w-none text-[9px]")
+                }
+              ) : /* @__PURE__ */ (0, import_jsx_runtime81.jsx)(
+                "span",
+                {
+                  "aria-hidden": true,
+                  className: isGrarfWebRenderer() ? "block w-full" : "block min-w-[2.25rem]"
+                }
+              )
+            }
+          )
+        ]
+      }
+    ),
+    viewerMessage ? /* @__PURE__ */ (0, import_jsx_runtime81.jsx)("div", { className: "mt-1 min-w-0 rounded-sm border border-ambersys/35 bg-ambersys/[0.08] px-1.5 py-1 font-mono text-[8px] font-semibold leading-snug tracking-[0.08em] text-ambersys", children: viewerMessage }) : null
+  ] });
 }
 
 // ../grarf/desktop/src/components/gamesSpine/GamesSpineGameDisplayTransition.tsx
@@ -68809,11 +68982,11 @@ function GameRow({
     {
       role: "button",
       tabIndex: 0,
-      onClick: () => onOpen(game.id),
+      onClick: () => onOpen(game.id, game),
       onKeyDown: (e2) => {
         if (e2.key === "Enter" || e2.key === " ") {
           e2.preventDefault();
-          onOpen(game.id);
+          onOpen(game.id, game);
         }
       },
       className: cn2(
@@ -70150,15 +70323,28 @@ function useGamesWithCanonicalHighlights(games) {
   return (0, import_react103.useMemo)(() => {
     return games.map((game) => {
       const operationsFields = operationsFieldsByGameId[game.id];
-      const gameWithStatusOverride = applyGameStatusOverride(game, operationsFields?.statusOverride);
+      const manualStreamUrl = operationsFields?.streamUrl?.trim();
+      const gameWithOperationsOverrides = applyGameCardNavigation(
+        applyManualStreamUrl(
+          applyGameViewerMessage(
+            applyGameStatusOverride(game, operationsFields?.statusOverride),
+            operationsFields?.viewerMessage
+          ),
+          manualStreamUrl ? operationsFields.streamUrl : void 0
+        ),
+        operationsFields?.workspaceUrl,
+        operationsFields?.navigationMode
+      );
       const manualHighlight = manualHighlightUrlToGameHighlightVideo(
         operationsFields?.highlightVideoUrl ?? ""
       );
       const catchupHighlight = game.gamePk != null && Number.isFinite(game.gamePk) ? (mlbCatchupHighlightsByGamePk[game.gamePk] ?? EMPTY_MLB_CATCHUP_HIGHLIGHTS)[0] : null;
       const automaticHighlight = (catchupHighlight ? mlbCatchupHighlightToGameHighlightVideo(catchupHighlight) : null) ?? automaticHighlightsByGameId[game.id] ?? game.highlightVideo ?? null;
       const highlightVideo = manualHighlight ?? automaticHighlight;
-      if (gameWithStatusOverride.highlightVideo === highlightVideo) return gameWithStatusOverride;
-      return { ...gameWithStatusOverride, highlightVideo };
+      if (gameWithOperationsOverrides.highlightVideo === highlightVideo) {
+        return gameWithOperationsOverrides;
+      }
+      return { ...gameWithOperationsOverrides, highlightVideo };
     });
   }, [games, operationsFieldsByGameId, mlbCatchupHighlightsByGamePk, automaticHighlightsByGameId]);
 }
@@ -70169,9 +70355,21 @@ var import_react104 = __toESM(require_react(), 1);
 function useGamesWithCanonicalStatusOverrides(games) {
   const operationsFieldsByGameId = useAdminOperationsCardStore((s2) => s2.fieldsByGameId);
   return (0, import_react104.useMemo)(
-    () => games.map(
-      (game) => applyGameStatusOverride(game, operationsFieldsByGameId[game.id]?.statusOverride)
-    ),
+    () => games.map((game) => {
+      const operationsFields = operationsFieldsByGameId[game.id];
+      const manualStreamUrl = operationsFields?.streamUrl?.trim();
+      return applyGameCardNavigation(
+        applyManualStreamUrl(
+          applyGameViewerMessage(
+            applyGameStatusOverride(game, operationsFields?.statusOverride),
+            operationsFields?.viewerMessage
+          ),
+          manualStreamUrl ? operationsFields.streamUrl : void 0
+        ),
+        operationsFields?.workspaceUrl,
+        operationsFields?.navigationMode
+      );
+    }),
     [games, operationsFieldsByGameId]
   );
 }
@@ -72910,10 +73108,10 @@ function HomeGamesToday({
     },
     [watchPicker, watchDispatch]
   );
-  const onOpen = (id) => {
+  const onOpen = (id, game) => {
     if (isDemoWnbaWhipAroundGameId(id)) {
       if (onSelectGame) {
-        onSelectGame(id);
+        onSelectGame(id, game);
         return;
       }
       return;
@@ -72921,7 +73119,7 @@ function HomeGamesToday({
     const league = leagueKeyFromGameId(id);
     trackGameOpened({ gameId: id, league: league ?? "unknown", source: "home_scoreboard" });
     if (onSelectGame) {
-      onSelectGame(id);
+      onSelectGame(id, game);
       return;
     }
     navigate(`/game/${encodeURIComponent(id)}`);
@@ -86605,6 +86803,123 @@ init_isGrarfWebRenderer();
 init_define_import_meta_env();
 var import_react164 = __toESM(require_react(), 1);
 
+// ../grarf/desktop/src/lib/operationsSpine/operationsSpinePersistenceState.ts
+init_define_import_meta_env();
+function serializeNavigationMode2(mode) {
+  return mode === "new-browser-tab" ? "new-browser-tab" : null;
+}
+function buildCardPersistSlice(gameKey, fields) {
+  return {
+    streamUrl: fields.streamUrl.trim() || null,
+    highlightVideoUrl: fields.highlightVideoUrl.trim() || null,
+    statusOverride: fields.statusOverride || null,
+    viewerMessage: fields.viewerMessage.trim() || null,
+    gameCardUrl: fields.workspaceUrl.trim() || null,
+    navigationMode: serializeNavigationMode2(fields.navigationMode)
+  };
+}
+function cardPersistSlicesEqual(a2, b2) {
+  return a2.streamUrl === b2.streamUrl && a2.highlightVideoUrl === b2.highlightVideoUrl && a2.statusOverride === b2.statusOverride && a2.viewerMessage === b2.viewerMessage && a2.gameCardUrl === b2.gameCardUrl && a2.navigationMode === b2.navigationMode;
+}
+function buildWorkingRecord(gameKey) {
+  const cardState = useAdminOperationsCardStore.getState();
+  const featuredState = useAdminFeaturedPriorityStore.getState();
+  const fields = cardState.fieldsByGameId[gameKey] ?? EMPTY_ADMIN_OPERATIONS_CARD_FIELDS;
+  const featuredPriority = featuredState.priorities[gameKey] ?? null;
+  return {
+    gameKey,
+    featuredPriority,
+    ...buildCardPersistSlice(gameKey, fields)
+  };
+}
+function buildBaselineRecord(gameKey) {
+  const cardState = useAdminOperationsCardStore.getState();
+  const featuredState = useAdminFeaturedPriorityStore.getState();
+  const fields = cardState.persistedBaselineFieldsByGameId[gameKey] ?? EMPTY_ADMIN_OPERATIONS_CARD_FIELDS;
+  const featuredPriority = featuredState.persistedBaselinePriorities[gameKey] ?? null;
+  return {
+    gameKey,
+    featuredPriority,
+    ...buildCardPersistSlice(gameKey, fields)
+  };
+}
+function collectTrackedGameKeys() {
+  const cardState = useAdminOperationsCardStore.getState();
+  const featuredState = useAdminFeaturedPriorityStore.getState();
+  return [
+    .../* @__PURE__ */ new Set([
+      ...Object.keys(cardState.fieldsByGameId),
+      ...Object.keys(cardState.persistedBaselineFieldsByGameId),
+      ...Object.keys(featuredState.priorities),
+      ...Object.keys(featuredState.persistedBaselinePriorities)
+    ])
+  ];
+}
+function selectOperationsSpineIsDirty() {
+  for (const gameKey of collectTrackedGameKeys()) {
+    const working = buildWorkingRecord(gameKey);
+    const baseline = buildBaselineRecord(gameKey);
+    if (working.featuredPriority !== baseline.featuredPriority || !cardPersistSlicesEqual(working, baseline)) {
+      return true;
+    }
+  }
+  return false;
+}
+function exportOperationsSpineForSave() {
+  const records = [];
+  for (const gameKey of collectTrackedGameKeys()) {
+    const working = buildWorkingRecord(gameKey);
+    const baseline = buildBaselineRecord(gameKey);
+    if (working.featuredPriority !== baseline.featuredPriority || !cardPersistSlicesEqual(working, baseline)) {
+      records.push(working);
+    }
+  }
+  return records;
+}
+function markOperationsSpineClean() {
+  useAdminOperationsCardStore.getState().markClean();
+  useAdminFeaturedPriorityStore.getState().markClean();
+}
+
+// ../grarf/desktop/src/lib/operationsSpine/saveOperationsSpine.ts
+init_define_import_meta_env();
+
+// ../grarf/desktop/src/lib/operationsSpine/operationsSpinePersistenceApi.ts
+init_define_import_meta_env();
+function workerWriteHeaders3() {
+  const headers = {
+    "Content-Type": "application/json"
+  };
+  const token = getSportscapeAdminToken();
+  if (token) headers.Authorization = `Bearer ${token}`;
+  return headers;
+}
+async function saveGameOperationalOverrides(records) {
+  const { response: res } = await fetchSportscapeEditorialWithFailover(
+    "/game-operational-overrides",
+    {
+      method: "POST",
+      headers: workerWriteHeaders3(),
+      body: JSON.stringify({ records })
+    }
+  );
+  if (!res.ok) {
+    throw new Error(`game_operational_overrides_save_failed_${res.status}`);
+  }
+  const body = await res.json();
+  if (!body.ok) {
+    throw new Error(body.error ?? "game_operational_overrides_save_failed");
+  }
+  return Array.isArray(body.records) ? body.records : records;
+}
+
+// ../grarf/desktop/src/lib/operationsSpine/saveOperationsSpine.ts
+async function saveOperationsSpine() {
+  const records = exportOperationsSpineForSave();
+  await saveGameOperationalOverrides(records);
+  markOperationsSpineClean();
+}
+
 // ../grarf/desktop/src/components/adminMode/OperationsSpineSection.tsx
 init_define_import_meta_env();
 
@@ -86630,6 +86945,16 @@ function OperationsFieldRow({
 }) {
   return /* @__PURE__ */ (0, import_jsx_runtime151.jsxs)("div", { className: "flex items-center gap-2 py-1", children: [
     /* @__PURE__ */ (0, import_jsx_runtime151.jsx)(OperationsFieldCompletenessDot, { complete }),
+    /* @__PURE__ */ (0, import_jsx_runtime151.jsx)("span", { className: "w-[104px] shrink-0 font-mono text-[8px] tracking-[0.12em] text-[#7aada4]", children: label }),
+    /* @__PURE__ */ (0, import_jsx_runtime151.jsx)("div", { className: "min-w-0 flex-1", children })
+  ] });
+}
+function OperationsOptionalFieldRow({
+  label,
+  children
+}) {
+  return /* @__PURE__ */ (0, import_jsx_runtime151.jsxs)("div", { className: "flex items-center gap-2 py-1", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime151.jsx)("span", { className: "w-[6px] shrink-0", "aria-hidden": true }),
     /* @__PURE__ */ (0, import_jsx_runtime151.jsx)("span", { className: "w-[104px] shrink-0 font-mono text-[8px] tracking-[0.12em] text-[#7aada4]", children: label }),
     /* @__PURE__ */ (0, import_jsx_runtime151.jsx)("div", { className: "min-w-0 flex-1", children })
   ] });
@@ -86749,7 +87074,7 @@ function OperationsCard({ game }) {
       !canWatchLive ? /* @__PURE__ */ (0, import_jsx_runtime151.jsx)("span", { className: "shrink-0 font-mono text-[7px] tracking-[0.12em] text-[#5f7a7a]", children: "PRE-LIVE" }) : null
     ] }),
     /* @__PURE__ */ (0, import_jsx_runtime151.jsx)(OperationsFieldRow, { label: "FEATURED PRIORITY", complete: priority !== void 0, children: /* @__PURE__ */ (0, import_jsx_runtime151.jsx)(AdminFeaturedPriorityField, { game }) }),
-    /* @__PURE__ */ (0, import_jsx_runtime151.jsx)(OperationsFieldRow, { label: "WORKSPACE URL", complete: fields.workspaceUrl.trim().length > 0, children: /* @__PURE__ */ (0, import_jsx_runtime151.jsx)(
+    /* @__PURE__ */ (0, import_jsx_runtime151.jsx)(OperationsOptionalFieldRow, { label: "GAME CARD URL", children: /* @__PURE__ */ (0, import_jsx_runtime151.jsx)(
       OperationsTextField,
       {
         value: fields.workspaceUrl,
@@ -86757,7 +87082,7 @@ function OperationsCard({ game }) {
         onChange: updateField("workspaceUrl")
       }
     ) }),
-    /* @__PURE__ */ (0, import_jsx_runtime151.jsx)(OperationsFieldRow, { label: "NAVIGATION MODE", complete: true, children: /* @__PURE__ */ (0, import_jsx_runtime151.jsx)(
+    /* @__PURE__ */ (0, import_jsx_runtime151.jsx)(OperationsOptionalFieldRow, { label: "NAVIGATION", children: /* @__PURE__ */ (0, import_jsx_runtime151.jsx)(
       OperationsNavigationModeSelector,
       {
         value: fields.navigationMode,
@@ -86793,6 +87118,14 @@ function OperationsCard({ game }) {
         effectiveStatus: game.status,
         overrideValue: statusOverrideValue,
         onChange: (value) => setStatusOverride(game.id, value)
+      }
+    ) }),
+    /* @__PURE__ */ (0, import_jsx_runtime151.jsx)(OperationsOptionalFieldRow, { label: "VIEWER MESSAGE", children: /* @__PURE__ */ (0, import_jsx_runtime151.jsx)(
+      OperationsTextField,
+      {
+        value: fields.viewerMessage,
+        placeholder: "Short message for viewers\u2026",
+        onChange: updateField("viewerMessage")
       }
     ) }),
     /* @__PURE__ */ (0, import_jsx_runtime151.jsx)(OperationsFieldRow, { label: "OPERATOR NOTE", complete: fields.operatorNote.trim().length > 0, children: /* @__PURE__ */ (0, import_jsx_runtime151.jsx)(
@@ -86841,21 +87174,81 @@ var import_jsx_runtime153 = __toESM(require_jsx_runtime(), 1);
 function OperationsSpine() {
   const structureSections = useGamesSpineOperationsStructureStore((s2) => s2.sections);
   const gamesByKey = useGamesSpineOperationsGamesStore((s2) => s2.gamesByKey);
+  const fieldsByGameId = useAdminOperationsCardStore((s2) => s2.fieldsByGameId);
+  const persistedBaselineFieldsByGameId = useAdminOperationsCardStore(
+    (s2) => s2.persistedBaselineFieldsByGameId
+  );
+  const priorities = useAdminFeaturedPriorityStore((s2) => s2.priorities);
+  const persistedBaselinePriorities = useAdminFeaturedPriorityStore(
+    (s2) => s2.persistedBaselinePriorities
+  );
+  const duplicateIds = useAdminFeaturedPriorityStore((s2) => s2.duplicateIds);
+  const [saveStatus, setSaveStatus] = (0, import_react164.useState)("idle");
   const sections = (0, import_react164.useMemo)(() => {
     return structureSections.map((structure) => ({
       ...structure,
       games: gamesByKey[structure.key] ?? []
     })).filter((section) => section.games.length > 0).sort((a2, b2) => a2.order - b2.order);
   }, [structureSections, gamesByKey]);
+  const isDirty = (0, import_react164.useMemo)(
+    () => selectOperationsSpineIsDirty(),
+    [fieldsByGameId, persistedBaselineFieldsByGameId, priorities, persistedBaselinePriorities]
+  );
+  const hasDuplicateFeaturedPriorities = duplicateIds.size > 0;
+  const canSave = isDirty && !hasDuplicateFeaturedPriorities && saveStatus !== "saving";
+  (0, import_react164.useEffect)(() => {
+    if (saveStatus !== "saved") return;
+    const timer = window.setTimeout(() => setSaveStatus("idle"), 2500);
+    return () => window.clearTimeout(timer);
+  }, [saveStatus]);
+  const onSave = (0, import_react164.useCallback)(async () => {
+    if (!canSave) return;
+    setSaveStatus("saving");
+    try {
+      await saveOperationsSpine();
+      setSaveStatus("saved");
+    } catch {
+      setSaveStatus("failed");
+    }
+  }, [canSave]);
+  const statusLabel = (0, import_react164.useMemo)(() => {
+    if (saveStatus === "saving") return "Saving\u2026";
+    if (saveStatus === "saved") return "Saved";
+    if (saveStatus === "failed") return "Save Failed";
+    if (isDirty) return "Unsaved Changes";
+    return null;
+  }, [isDirty, saveStatus]);
   return /* @__PURE__ */ (0, import_jsx_runtime153.jsxs)(
     "div",
     {
       className: "flex h-full min-h-0 min-w-0 flex-col overflow-hidden bg-[#020404] font-mono",
       "aria-label": "Operations spine",
       children: [
-        /* @__PURE__ */ (0, import_jsx_runtime153.jsxs)("header", { className: "shrink-0 border-b border-line/60 bg-[#030606]/90 px-2 py-1.5", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime153.jsx)("span", { className: "font-mono text-[10px] tracking-[0.22em] text-cyansys/80", children: "OPERATIONS SPINE" }),
-          /* @__PURE__ */ (0, import_jsx_runtime153.jsx)("span", { className: "ml-2 font-mono text-[8px] tracking-[0.14em] text-textdim/60", children: "Operator checklist \u2014 mirrors Games Spine 1:1" })
+        /* @__PURE__ */ (0, import_jsx_runtime153.jsxs)("header", { className: "flex shrink-0 items-center justify-between gap-3 border-b border-line/60 bg-[#030606]/90 px-2 py-1.5", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime153.jsxs)("div", { className: "min-w-0", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime153.jsx)("span", { className: "font-mono text-[10px] tracking-[0.22em] text-cyansys/80", children: "OPERATIONS SPINE" }),
+            /* @__PURE__ */ (0, import_jsx_runtime153.jsx)("span", { className: "ml-2 font-mono text-[8px] tracking-[0.14em] text-textdim/60", children: "Operator checklist \u2014 mirrors Games Spine 1:1" })
+          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime153.jsxs)("div", { className: "flex shrink-0 items-center gap-2", children: [
+            hasDuplicateFeaturedPriorities ? /* @__PURE__ */ (0, import_jsx_runtime153.jsx)("span", { className: "font-mono text-[8px] tracking-[0.12em] text-redsys", children: "Duplicate featured priorities \u2014 resolve before saving" }) : null,
+            statusLabel ? /* @__PURE__ */ (0, import_jsx_runtime153.jsx)(
+              "span",
+              {
+                className: saveStatus === "failed" ? "font-mono text-[8px] tracking-[0.14em] text-redsys" : saveStatus === "saved" ? "font-mono text-[8px] tracking-[0.14em] text-greensys" : "font-mono text-[8px] tracking-[0.14em] text-cyansys/80",
+                children: statusLabel
+              }
+            ) : null,
+            /* @__PURE__ */ (0, import_jsx_runtime153.jsx)(
+              "button",
+              {
+                type: "button",
+                onClick: () => void onSave(),
+                disabled: !canSave,
+                className: "rounded border border-greensys/50 bg-greensys/10 px-2 py-1 font-mono text-[8px] tracking-[0.14em] text-greensys hover:bg-greensys/20 disabled:cursor-not-allowed disabled:opacity-40",
+                children: "Save"
+              }
+            )
+          ] })
         ] }),
         /* @__PURE__ */ (0, import_jsx_runtime153.jsx)("div", { className: "min-h-0 flex-1 overflow-y-auto overscroll-contain", children: sections.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime153.jsx)("div", { className: "px-3 py-6 text-center text-[9px] tracking-[0.14em] text-[#5f7a7a]", children: "No games to operate on." }) : /* @__PURE__ */ (0, import_jsx_runtime153.jsx)("div", { className: "flex flex-col gap-3 py-2", children: sections.map((section) => /* @__PURE__ */ (0, import_jsx_runtime153.jsx)(OperationsSpineSection, { section }, section.key)) }) })
       ]
@@ -87870,6 +88263,27 @@ function tryOpenNwslGameRowInBrowser(game) {
   return true;
 }
 
+// ../grarf/desktop/src/lib/gamesSpine/tryOpenWnbaGameRowInBrowser.ts
+init_define_import_meta_env();
+init_isGrarfWebRenderer();
+function resolveAutomaticWnbaGameRowBrowserUrl(game) {
+  const wnbaUrl = resolveWnbaGameCenterUrl(game);
+  if (wnbaUrl) return wnbaUrl;
+  const espnEventId = parseEspnEventIdFromGame(game);
+  if (espnEventId) {
+    return buildEspnGamecastUrl("WNBA", espnEventId);
+  }
+  return leagueScoreboardFallbackUrl("wnba");
+}
+function tryOpenWnbaGameRowInBrowser(game) {
+  if (!isGrarfWebRenderer()) return false;
+  if (!isWnbaSpineGame(game)) return false;
+  const url = resolveAutomaticWnbaGameRowBrowserUrl(game);
+  if (!url) return false;
+  window.open(url, "_blank", "noopener,noreferrer");
+  return true;
+}
+
 // ../grarf/desktop/src/lib/gamesSpine/openGameWorkspaceTab.ts
 init_isGrarfWebRenderer();
 var BOARD_SLUG = {
@@ -87888,7 +88302,13 @@ var BOARD_SLUG = {
 };
 function resolveSpineRowWorkspaceEmbedUrl(game) {
   if (isWnbaSpineGame(game)) {
-    return resolveWnbaGameCenterUrl(game);
+    const wnbaUrl = resolveWnbaGameCenterUrl(game);
+    if (wnbaUrl) return wnbaUrl;
+    const espnEventId = parseEspnEventIdFromGame(game);
+    if (espnEventId) {
+      return buildEspnGamecastUrl("WNBA", espnEventId);
+    }
+    return leagueScoreboardFallbackUrl("wnba");
   }
   if (isGolfLeagueKey(game.league)) {
     return resolveGolfLeaderboardUrl(game.league);
@@ -87929,7 +88349,6 @@ function buildGameWorkspaceTabForRow(game, options) {
       closable: true
     };
   }
-  if (isWnbaSpineGame(game)) return null;
   if (slug) {
     return {
       id: `${slug}-fallback-${game.id}`,
@@ -87947,13 +88366,10 @@ function prepareDesktopWnbaGameCenterBrowserPane(game) {
   useHomeLiveSubmenuStore.getState().setActiveId("livetrack");
 }
 function tryOpenOperationsWorkspaceNavigation(game, dispatch) {
-  if (!isGrarfWebRenderer()) return false;
-  const fields = useAdminOperationsCardStore.getState().fieldsByGameId[game.id];
-  const url = fields?.workspaceUrl?.trim();
-  if (!url) return false;
-  const navigationMode = fields?.navigationMode ?? "center-pane";
-  if (navigationMode === "new-browser-tab") {
-    window.open(url, "_blank", "noopener,noreferrer");
+  const target = resolveManualGameCardNavigationTarget(game);
+  if (!target) return false;
+  if (target.navigationMode === "new-browser-tab") {
+    window.open(target.url, "_blank", "noopener,noreferrer");
     return true;
   }
   dispatch({
@@ -87962,7 +88378,7 @@ function tryOpenOperationsWorkspaceNavigation(game, dispatch) {
       id: `operations-workspace-${game.id}`,
       type: "website",
       title: `${game.awayTeam} @ ${game.homeTeam}`,
-      url,
+      url: target.url,
       closable: true
     }
   });
@@ -87979,6 +88395,7 @@ function openGamesSpineRowInWorkspace(game, dispatch) {
   if (tryOpenGolfGameRowInBrowser(game)) return;
   if (openWorldCupGamesSpineRow(game, dispatch)) return;
   if (openWimbledonGamesSpineRow(game, dispatch)) return;
+  if (tryOpenWnbaGameRowInBrowser(game)) return;
   const tab = buildGameWorkspaceTabForRow(game);
   if (!tab) return;
   prepareDesktopWnbaGameCenterBrowserPane(game);
@@ -91183,9 +91600,9 @@ function HomePage() {
     dispatchOverlay(action);
   }, []);
   const onSelectGame = (0, import_react182.useCallback)(
-    (gameId) => {
+    (gameId, enrichedGame) => {
       setLastClickedGameId(gameId);
-      const game = findGamesSpineGameById(gameId);
+      const game = enrichedGame ?? findGamesSpineGameById(gameId);
       if (!game) return;
       if (isHomeOps) {
         clearCenterEmbedForSpineGameSelect();
@@ -96303,7 +96720,7 @@ var import_zustand55 = __toESM(require_zustand(), 1);
 
 // ../grarf/desktop/src/lib/leaguePriority/leaguePriorityAdminApi.ts
 init_define_import_meta_env();
-function workerWriteHeaders3() {
+function workerWriteHeaders4() {
   const headers = {
     "Content-Type": "application/json"
   };
@@ -96325,7 +96742,7 @@ async function fetchLeaguePriorityDocument() {
 async function saveLeaguePriorityDocument(document2) {
   const { response: res } = await fetchSportscapeEditorialWithFailover("/league-priority", {
     method: "POST",
-    headers: workerWriteHeaders3(),
+    headers: workerWriteHeaders4(),
     body: JSON.stringify({ document: document2 })
   });
   if (!res.ok) throw new Error(`league_priority_save_failed_${res.status}`);
