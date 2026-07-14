@@ -4,7 +4,7 @@
 import "../../grarf/desktop/src/lib/gamesSpine/webGamesSpineBootstrap";
 import "./grarf-web-shim";
 import "../../grarf/desktop/src/lib/livetrack/bootLiveTrack";
-import { StrictMode, useEffect } from "react";
+import { StrictMode, useEffect, useState } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { AnalyticsProvider } from "../../grarf/desktop/src/components/analytics/AnalyticsProvider";
@@ -21,11 +21,56 @@ import type { GlobalOperationalMode } from "../../grarf/desktop/src/types/global
 import { useCenterPaneApplicationModeStore } from "../../grarf/desktop/src/store/centerPaneApplicationModeStore";
 import { useOperationalModeStore } from "../../grarf/desktop/src/store/operationalModeStore";
 import { AdminModeOverlay } from "../../grarf/desktop/src/components/adminMode/AdminModeOverlay";
+import { SportscapeEditorialPasswordForm } from "../../grarf/desktop/src/components/sportscapeEditorial/SportscapeEditorialPasswordForm";
 import { markGrarfAdmin } from "../../grarf/desktop/src/lib/admin/grarfAdminFlag";
+import { isSportscapeAdminAuthed } from "../../grarf/desktop/src/lib/sportscape/editorial/sportscapeEditorialAdminAuth";
 import { useAdminModeStore } from "../../grarf/desktop/src/store/adminModeStore";
 import { resolveCenterPaneApplicationModeFromPath } from "../../grarf/desktop/src/lib/home/resolveCenterPaneApplicationModeFromPath";
+import { hydrateOperationalGameOverridesFromPersistence } from "../../grarf/desktop/src/lib/operationsSpine/hydrateOperationalGameOverrides";
 
 let reactRoot: Root | null = null;
+
+function isAdminHtmlEntry(): boolean {
+  return Boolean((window as { __GRARF_ADMIN_ENTRY?: boolean }).__GRARF_ADMIN_ENTRY);
+}
+
+/** Activate Admin Mode before HomePage mounts — must run synchronously on admin.html entry. */
+function activateAdminEntry(): void {
+  markGrarfAdmin();
+  useAdminModeStore.getState().enterAdminMode();
+  if (!resolveCenterPaneApplicationModeFromPath(window.location.pathname)) {
+    useCenterPaneApplicationModeStore.getState().setModeExplicit("operations");
+  }
+}
+
+/**
+ * admin.html page gate — reuses POST /verify-password and the existing bearer-token
+ * session so Operations Spine Save uses the same Authorization header as today.
+ */
+function AdminEntryPasswordGate({ children }: { children: React.ReactNode }) {
+  const [authed, setAuthed] = useState(() => !isAdminHtmlEntry() || isSportscapeAdminAuthed());
+
+  if (!authed) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-[#020404] px-4">
+        <div className="w-full max-w-sm border border-line/60 bg-panel2 p-6 shadow-lg">
+          <SportscapeEditorialPasswordForm
+            idPrefix="grarf-admin-entry"
+            title="GRARF Admin"
+            description="Enter the editorial password to access the Operations Spine and save operational overrides."
+            submitLabel="ENTER"
+            onSuccess={() => {
+              activateAdminEntry();
+              setAuthed(true);
+            }}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  return <>{children}</>;
+}
 
 function IntelligenceSyncBridge() {
   useEffect(() => bindIntelligenceStoreUpdates(), []);
@@ -99,7 +144,9 @@ export function mountWebHome(container: HTMLElement): void {
     <StrictMode>
       <BrowserRouter>
         <WebMobileGateRoot>
-          <WebHomeApp />
+          <AdminEntryPasswordGate>
+            <WebHomeApp />
+          </AdminEntryPasswordGate>
         </WebMobileGateRoot>
       </BrowserRouter>
     </StrictMode>
@@ -108,16 +155,13 @@ export function mountWebHome(container: HTMLElement): void {
 
 const autoRoot = document.getElementById("grarf-web-root");
 if (autoRoot) {
-  // Activate Admin Mode synchronously before the first React render so
-  // isAdminMode is already true when components mount. Set by admin.html
-  // before loading this bundle — allows a future password gate to be
-  // inserted in admin.html before the flag is set.
-  if ((window as { __GRARF_ADMIN_ENTRY?: boolean }).__GRARF_ADMIN_ENTRY) {
-    markGrarfAdmin();
-    useAdminModeStore.getState().enterAdminMode();
-    if (!resolveCenterPaneApplicationModeFromPath(window.location.pathname)) {
-      useCenterPaneApplicationModeStore.getState().setModeExplicit("operations");
+  void (async () => {
+    await hydrateOperationalGameOverridesFromPersistence();
+    // Returning admin.html visitors with a valid session token boot straight into
+    // Operations Spine; first-time visitors authenticate via AdminEntryPasswordGate.
+    if (isAdminHtmlEntry() && isSportscapeAdminAuthed()) {
+      activateAdminEntry();
     }
-  }
-  mountWebHome(autoRoot);
+    mountWebHome(autoRoot);
+  })();
 }

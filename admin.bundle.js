@@ -12959,12 +12959,12 @@ init_define_import_meta_env();
 
 // ../grarf/desktop/src/lib/admin/grarfAdminFlag.ts
 init_define_import_meta_env();
+var SPORTSCAPE_ADMIN_SESSION_KEY = "grarf-sportscape-admin-token";
 
 // ../grarf/desktop/src/lib/sportscape/editorial/sportscapeEditorialAdminAuth.ts
-var SESSION_KEY = "grarf-sportscape-admin-token";
 function getSportscapeAdminToken() {
   try {
-    const token = sessionStorage.getItem(SESSION_KEY)?.trim();
+    const token = sessionStorage.getItem(SPORTSCAPE_ADMIN_SESSION_KEY)?.trim();
     return token || null;
   } catch {
     return null;
