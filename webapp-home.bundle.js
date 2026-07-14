@@ -14017,7 +14017,7 @@ var init_config = __esm({
 function readPersistedClipInventory() {
   if (typeof sessionStorage === "undefined") return [];
   try {
-    const raw = sessionStorage.getItem(SESSION_KEY2);
+    const raw = sessionStorage.getItem(SESSION_KEY);
     if (!raw) return [];
     const parsed = JSON.parse(raw);
     if (!Array.isArray(parsed)) return [];
@@ -14031,15 +14031,15 @@ function readPersistedClipInventory() {
 function writePersistedClipInventory(clips) {
   if (typeof sessionStorage === "undefined") return;
   try {
-    sessionStorage.setItem(SESSION_KEY2, JSON.stringify(clips.slice(0, MAX_PERSISTED)));
+    sessionStorage.setItem(SESSION_KEY, JSON.stringify(clips.slice(0, MAX_PERSISTED)));
   } catch {
   }
 }
-var SESSION_KEY2, MAX_PERSISTED;
+var SESSION_KEY, MAX_PERSISTED;
 var init_sessionClipCache = __esm({
   "../grarf/desktop/src/services/operationalShortMedia/inventory/sessionClipCache.ts"() {
     init_define_import_meta_env();
-    SESSION_KEY2 = "grarf.operational.clips.rolling.v1";
+    SESSION_KEY = "grarf.operational.clips.rolling.v1";
     MAX_PERSISTED = 48;
   }
 });
@@ -14302,7 +14302,16 @@ init_define_import_meta_env();
 // ../grarf/desktop/src/lib/admin/grarfAdminFlag.ts
 init_define_import_meta_env();
 var GRARF_ADMIN_STORAGE_KEY = "grarf-admin";
+var SPORTSCAPE_ADMIN_SESSION_KEY = "grarf-sportscape-admin-token";
 function isGrarfAdmin() {
+  if (typeof sessionStorage === "undefined") return false;
+  try {
+    return Boolean(sessionStorage.getItem(SPORTSCAPE_ADMIN_SESSION_KEY)?.trim());
+  } catch {
+    return false;
+  }
+}
+function hasGrarfAdminMarker() {
   if (typeof localStorage === "undefined") return false;
   try {
     return localStorage.getItem(GRARF_ADMIN_STORAGE_KEY) === "true";
@@ -14317,12 +14326,18 @@ function markGrarfAdmin() {
   } catch {
   }
 }
+function clearGrarfAdminMarker() {
+  if (typeof localStorage === "undefined") return;
+  try {
+    localStorage.removeItem(GRARF_ADMIN_STORAGE_KEY);
+  } catch {
+  }
+}
 
 // ../grarf/desktop/src/lib/sportscape/editorial/sportscapeEditorialAdminAuth.ts
-var SESSION_KEY = "grarf-sportscape-admin-token";
 function getSportscapeAdminToken() {
   try {
-    const token = sessionStorage.getItem(SESSION_KEY)?.trim();
+    const token = sessionStorage.getItem(SPORTSCAPE_ADMIN_SESSION_KEY)?.trim();
     return token || null;
   } catch {
     return null;
@@ -14333,10 +14348,20 @@ function isSportscapeAdminAuthed() {
 }
 function markSportscapeAdminAuthed(token) {
   try {
-    sessionStorage.setItem(SESSION_KEY, token);
+    sessionStorage.setItem(SPORTSCAPE_ADMIN_SESSION_KEY, token);
   } catch {
   }
   markGrarfAdmin();
+}
+function clearSportscapeAdminAuth() {
+  try {
+    sessionStorage.removeItem(SPORTSCAPE_ADMIN_SESSION_KEY);
+  } catch {
+  }
+  clearGrarfAdminMarker();
+}
+function invalidateAdminSession() {
+  clearSportscapeAdminAuth();
 }
 
 // ../grarf/desktop/src/lib/gamesSpine/manual/mergeBundledGamesSpineManualDocument.ts
@@ -86994,6 +87019,10 @@ init_define_import_meta_env();
 // ../grarf/desktop/src/lib/operationsSpine/operationsSpinePersistenceApi.ts
 init_define_import_meta_env();
 var SAVE_PATH = "/game-operational-overrides";
+function handleUnauthorizedSave() {
+  invalidateAdminSession();
+  useAdminModeStore.getState().exitAdminMode();
+}
 function workerWriteHeaders3() {
   const headers = {
     "Content-Type": "application/json"
@@ -87021,6 +87050,9 @@ async function saveGameOperationalOverrides(records) {
     });
     const responseBody = await readSaveResponseBody(res);
     if (!res.ok) {
+      if (res.status === 401) {
+        handleUnauthorizedSave();
+      }
       throw await createOperationsSpineSaveError({
         baseUrl,
         path: SAVE_PATH,
@@ -87043,6 +87075,9 @@ async function saveGameOperationalOverrides(records) {
     }
     const body = responseBody;
     if (!body.ok) {
+      if (res.status === 401) {
+        handleUnauthorizedSave();
+      }
       throw await createOperationsSpineSaveError({
         baseUrl,
         path: SAVE_PATH,
@@ -100306,47 +100341,100 @@ function SportscapeEditorialAdminPage() {
 // ../grarf/desktop/src/components/adminMode/AdminModeOverlay.tsx
 init_define_import_meta_env();
 var import_react216 = __toESM(require_react(), 1);
+init_isGrarfWebRenderer();
 var import_jsx_runtime221 = __toESM(require_jsx_runtime(), 1);
 function AdminModeOverlay() {
-  const { isAdminMode, enterAdminMode, exitAdminMode, toggleAdminMode } = useAdminModeStore();
+  const { isAdminMode, enterAdminMode, exitAdminMode } = useAdminModeStore();
+  const [passwordPromptOpen, setPasswordPromptOpen] = (0, import_react216.useState)(false);
+  const [isAuthed, setIsAuthed] = (0, import_react216.useState)(isGrarfAdmin);
+  const refreshAuthState = (0, import_react216.useCallback)(() => {
+    setIsAuthed(isGrarfAdmin());
+  }, []);
+  const requestEnterAdminMode = (0, import_react216.useCallback)(() => {
+    if (isGrarfAdmin()) {
+      enterAdminMode();
+      return;
+    }
+    setPasswordPromptOpen(true);
+  }, [enterAdminMode]);
+  const onAdminAuthed = (0, import_react216.useCallback)(() => {
+    setPasswordPromptOpen(false);
+    refreshAuthState();
+    enterAdminMode();
+  }, [enterAdminMode, refreshAuthState]);
   (0, import_react216.useEffect)(() => {
     function onKeyDown(e2) {
       if ((e2.metaKey || e2.ctrlKey) && e2.shiftKey && e2.key === "A") {
         e2.preventDefault();
-        toggleAdminMode();
+        if (isAdminMode) {
+          exitAdminMode();
+          return;
+        }
+        requestEnterAdminMode();
       }
     }
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [toggleAdminMode]);
+  }, [exitAdminMode, isAdminMode, requestEnterAdminMode]);
+  (0, import_react216.useEffect)(() => {
+    refreshAuthState();
+  }, [isAdminMode, passwordPromptOpen, refreshAuthState]);
+  if (!isGrarfWebRenderer()) return null;
+  const canShowAdminEntry = isAuthed || hasGrarfAdminMarker();
   if (!isAdminMode) {
-    if (!isGrarfAdmin()) return null;
-    return /* @__PURE__ */ (0, import_jsx_runtime221.jsx)(
-      "button",
-      {
-        className: "grarf-admin-mode-trigger",
-        onClick: enterAdminMode,
-        title: "Enter Admin Mode (\u2318\u21E7A)",
-        "aria-label": "Enter Admin Mode"
-      }
-    );
+    if (!canShowAdminEntry) return null;
+    return /* @__PURE__ */ (0, import_jsx_runtime221.jsxs)(import_jsx_runtime221.Fragment, { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime221.jsx)(
+        SportscapeEditorialPasswordModal,
+        {
+          open: passwordPromptOpen,
+          title: "Admin access",
+          description: "Enter the editorial password to unlock Admin Mode and administrative write operations.",
+          submitLabel: "UNLOCK ADMIN",
+          onClose: () => setPasswordPromptOpen(false),
+          onSuccess: onAdminAuthed
+        }
+      ),
+      /* @__PURE__ */ (0, import_jsx_runtime221.jsx)(
+        "button",
+        {
+          className: "grarf-admin-mode-trigger",
+          onClick: requestEnterAdminMode,
+          title: "Enter Admin Mode (\u2318\u21E7A)",
+          "aria-label": "Enter Admin Mode"
+        }
+      )
+    ] });
   }
-  return /* @__PURE__ */ (0, import_jsx_runtime221.jsx)("div", { className: "grarf-admin-mode-overlay", role: "region", "aria-label": "GRARF Admin Mode", children: /* @__PURE__ */ (0, import_jsx_runtime221.jsxs)("div", { className: "grarf-admin-mode-bar", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime221.jsxs)("div", { className: "grarf-admin-mode-bar__start", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime221.jsx)("span", { className: "grarf-admin-mode-bar__badge", children: "ADMIN" }),
-      /* @__PURE__ */ (0, import_jsx_runtime221.jsx)("span", { className: "grarf-admin-mode-bar__label", children: "GRARF Admin Mode" })
-    ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime221.jsx)("div", { className: "grarf-admin-mode-bar__controls" }),
-    /* @__PURE__ */ (0, import_jsx_runtime221.jsx)("div", { className: "grarf-admin-mode-bar__end", children: /* @__PURE__ */ (0, import_jsx_runtime221.jsx)(
-      "button",
+  return /* @__PURE__ */ (0, import_jsx_runtime221.jsxs)(import_jsx_runtime221.Fragment, { children: [
+    /* @__PURE__ */ (0, import_jsx_runtime221.jsx)(
+      SportscapeEditorialPasswordModal,
       {
-        className: "grarf-admin-mode-bar__exit-btn",
-        type: "button",
-        onClick: exitAdminMode,
-        children: "Exit Admin Mode"
+        open: passwordPromptOpen,
+        title: "Admin access",
+        description: "Enter the editorial password to unlock Admin Mode and administrative write operations.",
+        submitLabel: "UNLOCK ADMIN",
+        onClose: () => setPasswordPromptOpen(false),
+        onSuccess: onAdminAuthed
       }
-    ) })
-  ] }) });
+    ),
+    /* @__PURE__ */ (0, import_jsx_runtime221.jsx)("div", { className: "grarf-admin-mode-overlay", role: "region", "aria-label": "GRARF Admin Mode", children: /* @__PURE__ */ (0, import_jsx_runtime221.jsxs)("div", { className: "grarf-admin-mode-bar", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime221.jsxs)("div", { className: "grarf-admin-mode-bar__start", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime221.jsx)("span", { className: "grarf-admin-mode-bar__badge", children: "ADMIN" }),
+        /* @__PURE__ */ (0, import_jsx_runtime221.jsx)("span", { className: "grarf-admin-mode-bar__label", children: "GRARF Admin Mode" })
+      ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime221.jsx)("div", { className: "grarf-admin-mode-bar__controls" }),
+      /* @__PURE__ */ (0, import_jsx_runtime221.jsx)("div", { className: "grarf-admin-mode-bar__end", children: /* @__PURE__ */ (0, import_jsx_runtime221.jsx)(
+        "button",
+        {
+          className: "grarf-admin-mode-bar__exit-btn",
+          type: "button",
+          onClick: exitAdminMode,
+          children: "Exit Admin Mode"
+        }
+      ) })
+    ] }) })
+  ] });
 }
 
 // webapp/home-entry.tsx
