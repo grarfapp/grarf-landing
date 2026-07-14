@@ -86871,13 +86871,40 @@ function selectOperationsSpineIsDirty() {
   }
   return false;
 }
+function buildExportRecord(gameKey) {
+  const working = buildWorkingRecord(gameKey);
+  const baseline = buildBaselineRecord(gameKey);
+  const featuredPriorityDirty = working.featuredPriority !== baseline.featuredPriority;
+  const cardDirty = !cardPersistSlicesEqual(working, baseline);
+  if (!featuredPriorityDirty && !cardDirty) {
+    return null;
+  }
+  const cardState = useAdminOperationsCardStore.getState();
+  const workingCard = buildCardPersistSlice(
+    gameKey,
+    cardState.fieldsByGameId[gameKey] ?? EMPTY_ADMIN_OPERATIONS_CARD_FIELDS
+  );
+  const baselineCard = buildCardPersistSlice(
+    gameKey,
+    cardState.persistedBaselineFieldsByGameId[gameKey] ?? EMPTY_ADMIN_OPERATIONS_CARD_FIELDS
+  );
+  return {
+    gameKey,
+    featuredPriority: featuredPriorityDirty ? working.featuredPriority : baseline.featuredPriority,
+    streamUrl: workingCard.streamUrl !== baselineCard.streamUrl ? workingCard.streamUrl : baselineCard.streamUrl,
+    highlightVideoUrl: workingCard.highlightVideoUrl !== baselineCard.highlightVideoUrl ? workingCard.highlightVideoUrl : baselineCard.highlightVideoUrl,
+    statusOverride: workingCard.statusOverride !== baselineCard.statusOverride ? workingCard.statusOverride : baselineCard.statusOverride,
+    viewerMessage: workingCard.viewerMessage !== baselineCard.viewerMessage ? workingCard.viewerMessage : baselineCard.viewerMessage,
+    gameCardUrl: workingCard.gameCardUrl !== baselineCard.gameCardUrl ? workingCard.gameCardUrl : baselineCard.gameCardUrl,
+    navigationMode: workingCard.navigationMode !== baselineCard.navigationMode ? workingCard.navigationMode : baselineCard.navigationMode
+  };
+}
 function exportOperationsSpineForSave() {
   const records = [];
   for (const gameKey of collectTrackedGameKeys()) {
-    const working = buildWorkingRecord(gameKey);
-    const baseline = buildBaselineRecord(gameKey);
-    if (working.featuredPriority !== baseline.featuredPriority || !cardPersistSlicesEqual(working, baseline)) {
-      records.push(working);
+    const record = buildExportRecord(gameKey);
+    if (record) {
+      records.push(record);
     }
   }
   return records;
@@ -87016,6 +87043,14 @@ async function readSaveResponseBody(response) {
   } catch {
     return text2;
   }
+}
+async function fetchGameOperationalOverrides() {
+  const { response: res } = await fetchSportscapeEditorialWithFailover(SAVE_PATH, {
+    method: "GET"
+  });
+  if (!res.ok) return [];
+  const body = await res.json();
+  return Array.isArray(body.records) ? body.records : [];
 }
 async function saveGameOperationalOverrides(records) {
   const recordsCount = records.length;
@@ -100408,6 +100443,50 @@ function AdminModeOverlay() {
   ] });
 }
 
+// ../grarf/desktop/src/lib/operationsSpine/hydrateOperationalGameOverrides.ts
+init_define_import_meta_env();
+function parseStatusOverride(raw) {
+  return parseGameStatusOverride(raw) ?? "";
+}
+function mapRecordToCardFields(record) {
+  return {
+    workspaceUrl: record.gameCardUrl?.trim() ?? "",
+    navigationMode: parseGameCardNavigationMode(record.navigationMode),
+    streamUrl: record.streamUrl?.trim() ?? "",
+    highlightVideoUrl: record.highlightVideoUrl?.trim() ?? "",
+    statusOverride: parseStatusOverride(record.statusOverride),
+    viewerMessage: record.viewerMessage?.trim() ?? "",
+    operatorNote: ""
+  };
+}
+function hasOperationalCardFields(fields) {
+  return fields.workspaceUrl !== EMPTY_ADMIN_OPERATIONS_CARD_FIELDS.workspaceUrl || fields.navigationMode !== EMPTY_ADMIN_OPERATIONS_CARD_FIELDS.navigationMode || fields.streamUrl !== EMPTY_ADMIN_OPERATIONS_CARD_FIELDS.streamUrl || fields.highlightVideoUrl !== EMPTY_ADMIN_OPERATIONS_CARD_FIELDS.highlightVideoUrl || fields.statusOverride !== EMPTY_ADMIN_OPERATIONS_CARD_FIELDS.statusOverride || fields.viewerMessage !== EMPTY_ADMIN_OPERATIONS_CARD_FIELDS.viewerMessage;
+}
+async function hydrateOperationalGameOverridesFromPersistence() {
+  try {
+    const records = await fetchGameOperationalOverrides();
+    if (records.length === 0) return;
+    const fieldsByGameId = {};
+    const priorities = {};
+    for (const record of records) {
+      const gameKey = record.gameKey.trim();
+      if (!gameKey) continue;
+      const fields = mapRecordToCardFields(record);
+      if (hasOperationalCardFields(fields)) {
+        fieldsByGameId[gameKey] = fields;
+      }
+      if (record.featuredPriority != null) {
+        priorities[gameKey] = record.featuredPriority;
+      }
+    }
+    if (Object.keys(fieldsByGameId).length > 0) {
+      useAdminOperationsCardStore.getState().hydrateFields(fieldsByGameId);
+    }
+    useAdminFeaturedPriorityStore.getState().hydratePriorities(priorities);
+  } catch {
+  }
+}
+
 // webapp/home-entry.tsx
 var import_jsx_runtime222 = __toESM(require_jsx_runtime());
 var reactRoot = null;
@@ -100495,10 +100574,13 @@ function mountWebHome(container) {
 }
 var autoRoot = document.getElementById("grarf-web-root");
 if (autoRoot) {
-  if (isAdminHtmlEntry() && isSportscapeAdminAuthed()) {
-    activateAdminEntry();
-  }
-  mountWebHome(autoRoot);
+  void (async () => {
+    await hydrateOperationalGameOverridesFromPersistence();
+    if (isAdminHtmlEntry() && isSportscapeAdminAuthed()) {
+      activateAdminEntry();
+    }
+    mountWebHome(autoRoot);
+  })();
 }
 export {
   mountWebHome,
