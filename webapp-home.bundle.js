@@ -71065,6 +71065,31 @@ function buildFeaturedSpineGamePool(selectedDate, statusFilter, liveLeagues, sch
   }
   return [...byId.values()];
 }
+function readFeaturedGameStartTimeMs(game) {
+  const ms2 = game.startTimeMs;
+  if (ms2 != null && Number.isFinite(ms2) && ms2 > 0) return ms2;
+  return Number.POSITIVE_INFINITY;
+}
+function compareUnifiedFeaturedGames(a2, b2) {
+  const bucketDelta = gamesSpineStatusBucketRank(a2.game.status) - gamesSpineStatusBucketRank(b2.game.status);
+  if (bucketDelta !== 0) return bucketDelta;
+  if (a2.game.status === "scheduled" || a2.game.status === "postponed") {
+    const startDelta2 = readFeaturedGameStartTimeMs(a2.game) - readFeaturedGameStartTimeMs(b2.game);
+    if (startDelta2 !== 0) return startDelta2;
+    const timeDelta2 = String(a2.game.time).localeCompare(String(b2.game.time));
+    if (timeDelta2 !== 0) return timeDelta2;
+    return String(a2.game.id).localeCompare(String(b2.game.id));
+  }
+  const aPriority = a2.effectivePriority ?? Number.POSITIVE_INFINITY;
+  const bPriority = b2.effectivePriority ?? Number.POSITIVE_INFINITY;
+  const priorityDelta = aPriority - bPriority;
+  if (priorityDelta !== 0) return priorityDelta;
+  const startDelta = readFeaturedGameStartTimeMs(a2.game) - readFeaturedGameStartTimeMs(b2.game);
+  if (startDelta !== 0) return startDelta;
+  const timeDelta = String(a2.game.time).localeCompare(String(b2.game.time));
+  if (timeDelta !== 0) return timeDelta;
+  return String(a2.game.id).localeCompare(String(b2.game.id));
+}
 function selectUnifiedFeaturedGames(games, bundle, adminPriorities, statusFilter, selectedDate = getOperationalSportsDayDateKey()) {
   const entries = [];
   for (const game of games) {
@@ -71079,7 +71104,7 @@ function selectUnifiedFeaturedGames(games, bundle, adminPriorities, statusFilter
       entries.push({ game, effectivePriority: editorialRank });
     }
   }
-  entries.sort((a2, b2) => a2.effectivePriority - b2.effectivePriority);
+  entries.sort(compareUnifiedFeaturedGames);
   return entries.map(({ game }) => game);
 }
 
