@@ -100441,7 +100441,7 @@ function AdminEntryPasswordGate({ children }) {
   return /* @__PURE__ */ (0, import_jsx_runtime222.jsx)(import_jsx_runtime222.Fragment, { children });
 }
 function IntelligenceSyncBridge() {
-  useEffect(() => bindIntelligenceStoreUpdates(), []);
+  (0, import_react217.useEffect)(() => bindIntelligenceStoreUpdates(), []);
   return null;
 }
 var appShellRouteElements = /* @__PURE__ */ (0, import_jsx_runtime222.jsxs)(import_jsx_runtime222.Fragment, { children: [
