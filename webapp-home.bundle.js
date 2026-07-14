@@ -65340,7 +65340,6 @@ var import_zustand42 = __toESM(require_zustand(), 1);
 var useAdminModeStore = (0, import_zustand42.create)((set, get) => ({
   isAdminMode: false,
   enterAdminMode: () => {
-    if (!isGrarfAdmin()) return;
     set({ isAdminMode: true });
   },
   exitAdminMode: () => {
@@ -65348,7 +65347,6 @@ var useAdminModeStore = (0, import_zustand42.create)((set, get) => ({
   },
   toggleAdminMode: () => {
     const { isAdminMode } = get();
-    if (!isAdminMode && !isGrarfAdmin()) return;
     set({ isAdminMode: !isAdminMode });
   }
 }));
