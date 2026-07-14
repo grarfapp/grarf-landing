@@ -86881,11 +86881,119 @@ function markOperationsSpineClean() {
   useAdminFeaturedPriorityStore.getState().markClean();
 }
 
+// ../grarf/desktop/src/lib/operationsSpine/operationsSpineSaveError.ts
+init_define_import_meta_env();
+var LOG_PREFIX = "[Operations Spine Save]";
+var OperationsSpineSaveError = class extends Error {
+  constructor(reason, diagnostic) {
+    super(reason);
+    __publicField(this, "reason");
+    __publicField(this, "diagnostic");
+    this.name = "OperationsSpineSaveError";
+    this.reason = reason;
+    this.diagnostic = diagnostic;
+  }
+};
+function isNetworkFailure(message) {
+  const lower = message.toLowerCase();
+  return lower === "failed to fetch" || lower.includes("unable to reach sportscape editorial api") || lower.includes("network") || lower.includes("cors") || lower.includes("aborted") || lower.includes("timeout");
+}
+function formatWorkerErrorCode(error) {
+  switch (error) {
+    case "unauthorized":
+      return "Unauthorized";
+    case "invalid_json":
+    case "records_required":
+      return "Validation Error";
+    case "internal_error":
+      return "Worker Error";
+    case "method_not_allowed":
+      return "HTTP 405";
+    case "not_found":
+      return "HTTP 404";
+    default:
+      return error.replace(/_/g, " ");
+  }
+}
+function resolveSaveFailureReason(httpStatus, responseBody, exceptionMessage) {
+  const body = responseBody;
+  if (body && typeof body === "object") {
+    if (typeof body.message === "string" && body.message.trim()) {
+      return body.message.trim();
+    }
+    if (typeof body.error === "string" && body.error.trim()) {
+      const formatted = formatWorkerErrorCode(body.error.trim());
+      if (formatted === "Worker Error" && typeof body.message === "string" && body.message.trim()) {
+        return body.message.trim();
+      }
+      return formatted;
+    }
+  }
+  if (httpStatus === 401) return "Unauthorized";
+  if (httpStatus === 400) return "Validation Error";
+  if (httpStatus === 405) return "HTTP 405";
+  if (httpStatus === 404) return "HTTP 404";
+  if (httpStatus != null && httpStatus >= 500) {
+    return httpStatus === 500 ? "Worker Error" : `HTTP ${httpStatus}`;
+  }
+  if (httpStatus != null && httpStatus >= 400) {
+    return `HTTP ${httpStatus}`;
+  }
+  if (exceptionMessage) {
+    if (isNetworkFailure(exceptionMessage)) return "Network Error";
+    return exceptionMessage;
+  }
+  return "Unknown Error";
+}
+async function readResponseBody(response) {
+  const text2 = await response.text();
+  if (!text2.trim()) return null;
+  try {
+    return JSON.parse(text2);
+  } catch {
+    return text2;
+  }
+}
+function logOperationsSpineSaveFailure(diagnostic) {
+  console.error(LOG_PREFIX, {
+    requestUrl: diagnostic.requestUrl,
+    method: diagnostic.method,
+    httpStatus: diagnostic.httpStatus,
+    responseBody: diagnostic.responseBody,
+    exceptionMessage: diagnostic.exceptionMessage,
+    stack: diagnostic.stack,
+    recordsCount: diagnostic.recordsCount
+  });
+}
+function buildOperationsSpineSaveRequestUrl(baseUrl, path) {
+  return sportscapeEditorialUrlForBase(baseUrl, path);
+}
+async function createOperationsSpineSaveError(params) {
+  const requestUrl = params.baseUrl ? buildOperationsSpineSaveRequestUrl(params.baseUrl, params.path) : null;
+  const httpStatus = params.httpStatus ?? (params.response ? params.response.status : null);
+  const responseBody = params.responseBody !== void 0 ? params.responseBody : params.response ? await readResponseBody(params.response) : null;
+  const exception = params.exception instanceof Error ? params.exception : params.exception != null ? new Error(String(params.exception)) : null;
+  const exceptionMessage = exception?.message ?? null;
+  const reason = resolveSaveFailureReason(httpStatus, responseBody, exceptionMessage);
+  const diagnostic = {
+    requestUrl,
+    method: params.method,
+    httpStatus,
+    responseBody,
+    exceptionMessage,
+    stack: exception?.stack ?? null,
+    recordsCount: params.recordsCount
+  };
+  logOperationsSpineSaveFailure(diagnostic);
+  return new OperationsSpineSaveError(reason, diagnostic);
+}
+
 // ../grarf/desktop/src/lib/operationsSpine/saveOperationsSpine.ts
 init_define_import_meta_env();
 
 // ../grarf/desktop/src/lib/operationsSpine/operationsSpinePersistenceApi.ts
 init_define_import_meta_env();
+var SAVE_PATH = "/game-operational-overrides";
 function workerWriteHeaders3() {
   const headers = {
     "Content-Type": "application/json"
@@ -86894,23 +87002,69 @@ function workerWriteHeaders3() {
   if (token) headers.Authorization = `Bearer ${token}`;
   return headers;
 }
+async function readSaveResponseBody(response) {
+  const text2 = await response.text();
+  if (!text2.trim()) return null;
+  try {
+    return JSON.parse(text2);
+  } catch {
+    return text2;
+  }
+}
 async function saveGameOperationalOverrides(records) {
-  const { response: res } = await fetchSportscapeEditorialWithFailover(
-    "/game-operational-overrides",
-    {
+  const recordsCount = records.length;
+  try {
+    const { response: res, baseUrl } = await fetchSportscapeEditorialWithFailover(SAVE_PATH, {
       method: "POST",
       headers: workerWriteHeaders3(),
       body: JSON.stringify({ records })
+    });
+    const responseBody = await readSaveResponseBody(res);
+    if (!res.ok) {
+      throw await createOperationsSpineSaveError({
+        baseUrl,
+        path: SAVE_PATH,
+        method: "POST",
+        recordsCount,
+        httpStatus: res.status,
+        responseBody
+      });
     }
-  );
-  if (!res.ok) {
-    throw new Error(`game_operational_overrides_save_failed_${res.status}`);
+    if (!responseBody || typeof responseBody !== "object") {
+      throw await createOperationsSpineSaveError({
+        baseUrl,
+        path: SAVE_PATH,
+        method: "POST",
+        recordsCount,
+        httpStatus: res.status,
+        responseBody,
+        exception: new Error("Malformed response")
+      });
+    }
+    const body = responseBody;
+    if (!body.ok) {
+      throw await createOperationsSpineSaveError({
+        baseUrl,
+        path: SAVE_PATH,
+        method: "POST",
+        recordsCount,
+        httpStatus: res.status,
+        responseBody
+      });
+    }
+    return Array.isArray(body.records) ? body.records : records;
+  } catch (error) {
+    if (error instanceof OperationsSpineSaveError) {
+      throw error;
+    }
+    throw await createOperationsSpineSaveError({
+      baseUrl: null,
+      path: SAVE_PATH,
+      method: "POST",
+      recordsCount,
+      exception: error
+    });
   }
-  const body = await res.json();
-  if (!body.ok) {
-    throw new Error(body.error ?? "game_operational_overrides_save_failed");
-  }
-  return Array.isArray(body.records) ? body.records : records;
 }
 
 // ../grarf/desktop/src/lib/operationsSpine/saveOperationsSpine.ts
@@ -87184,6 +87338,7 @@ function OperationsSpine() {
   );
   const duplicateIds = useAdminFeaturedPriorityStore((s2) => s2.duplicateIds);
   const [saveStatus, setSaveStatus] = (0, import_react164.useState)("idle");
+  const [saveFailureReason, setSaveFailureReason] = (0, import_react164.useState)(null);
   const sections = (0, import_react164.useMemo)(() => {
     return structureSections.map((structure) => ({
       ...structure,
@@ -87204,20 +87359,25 @@ function OperationsSpine() {
   const onSave = (0, import_react164.useCallback)(async () => {
     if (!canSave) return;
     setSaveStatus("saving");
+    setSaveFailureReason(null);
     try {
       await saveOperationsSpine();
       setSaveStatus("saved");
-    } catch {
+    } catch (error) {
+      const reason = error instanceof OperationsSpineSaveError ? error.reason : error instanceof Error ? error.message : "Unknown Error";
+      setSaveFailureReason(reason);
       setSaveStatus("failed");
     }
   }, [canSave]);
   const statusLabel = (0, import_react164.useMemo)(() => {
     if (saveStatus === "saving") return "Saving\u2026";
     if (saveStatus === "saved") return "Saved";
-    if (saveStatus === "failed") return "Save Failed";
+    if (saveStatus === "failed") {
+      return saveFailureReason ? `Save Failed: ${saveFailureReason}` : "Save Failed";
+    }
     if (isDirty) return "Unsaved Changes";
     return null;
-  }, [isDirty, saveStatus]);
+  }, [isDirty, saveStatus, saveFailureReason]);
   return /* @__PURE__ */ (0, import_jsx_runtime153.jsxs)(
     "div",
     {
