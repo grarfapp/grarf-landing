@@ -14326,13 +14326,6 @@ function markGrarfAdmin() {
   } catch {
   }
 }
-function clearGrarfAdminMarker() {
-  if (typeof localStorage === "undefined") return;
-  try {
-    localStorage.removeItem(GRARF_ADMIN_STORAGE_KEY);
-  } catch {
-  }
-}
 
 // ../grarf/desktop/src/lib/sportscape/editorial/sportscapeEditorialAdminAuth.ts
 function getSportscapeAdminToken() {
@@ -14352,16 +14345,6 @@ function markSportscapeAdminAuthed(token) {
   } catch {
   }
   markGrarfAdmin();
-}
-function clearSportscapeAdminAuth() {
-  try {
-    sessionStorage.removeItem(SPORTSCAPE_ADMIN_SESSION_KEY);
-  } catch {
-  }
-  clearGrarfAdminMarker();
-}
-function invalidateAdminSession() {
-  clearSportscapeAdminAuth();
 }
 
 // ../grarf/desktop/src/lib/gamesSpine/manual/mergeBundledGamesSpineManualDocument.ts
@@ -87017,10 +87000,6 @@ init_define_import_meta_env();
 // ../grarf/desktop/src/lib/operationsSpine/operationsSpinePersistenceApi.ts
 init_define_import_meta_env();
 var SAVE_PATH = "/game-operational-overrides";
-function handleUnauthorizedSave() {
-  invalidateAdminSession();
-  useAdminModeStore.getState().exitAdminMode();
-}
 function workerWriteHeaders3() {
   const headers = {
     "Content-Type": "application/json"
@@ -87048,9 +87027,6 @@ async function saveGameOperationalOverrides(records) {
     });
     const responseBody = await readSaveResponseBody(res);
     if (!res.ok) {
-      if (res.status === 401) {
-        handleUnauthorizedSave();
-      }
       throw await createOperationsSpineSaveError({
         baseUrl,
         path: SAVE_PATH,
@@ -87073,9 +87049,6 @@ async function saveGameOperationalOverrides(records) {
     }
     const body = responseBody;
     if (!body.ok) {
-      if (res.status === 401) {
-        handleUnauthorizedSave();
-      }
       throw await createOperationsSpineSaveError({
         baseUrl,
         path: SAVE_PATH,
