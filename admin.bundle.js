@@ -19410,6 +19410,9 @@ var MIN_TOTAL_SCORE5 = 0.62;
 function isTennisLeague2(game) {
   return game.league === "ATP" || game.league === "WTA";
 }
+function isMatchableTennisGame(game) {
+  return isTennisLeague2(game) && (game.status === "scheduled" || game.status === "live");
+}
 function gamePlayerTokenSets2(game) {
   const away = tokenSetFromLabel(game.metadata?.officialAwayName || game.awayTeam || "");
   const home = tokenSetFromLabel(game.metadata?.officialHomeName || game.homeTeam || "");
@@ -19458,7 +19461,7 @@ function scoreStreamMatch(game, stream) {
   return players * 0.65 + tournament * 0.25 + court * 0.1 + liveBoost;
 }
 function matchTennisChannelPlusStream(game, catalog) {
-  if (!isTennisLeague2(game) || game.status !== "live") return null;
+  if (!isMatchableTennisGame(game)) return null;
   if (catalog.length === 0) return null;
   let best = null;
   let bestScore = 0;
@@ -19478,9 +19481,19 @@ var LOG7 = "[TennisChannelPlus]";
 function isTennisLeague3(game) {
   return game.league === "ATP" || game.league === "WTA";
 }
+function isMatchableTennisGame2(game) {
+  if (!isTennisLeague3(game)) return false;
+  if (isGrarfWebRenderer()) return game.status === "scheduled" || game.status === "live";
+  return game.status === "live";
+}
+function canReplaceExistingStream(game) {
+  const streamUrl = game.streamUrl?.trim();
+  if (!streamUrl) return true;
+  return isGrarfWebRenderer() && game.streamProvider === "ESPN+";
+}
 async function enrichTennisGamesWithTennisChannelPlus(games) {
-  const hasLiveTennis = games.some((game) => isTennisLeague3(game) && game.status === "live");
-  if (!hasLiveTennis) return games;
+  const hasMatchableTennis = games.some(isMatchableTennisGame2);
+  if (!hasMatchableTennis) return games;
   let catalog;
   try {
     catalog = await fetchTennisChannelPlusLiveCatalog();
@@ -19493,8 +19506,8 @@ async function enrichTennisGamesWithTennisChannelPlus(games) {
   if (catalog.length === 0) return games;
   let matched = 0;
   const out = games.map((game) => {
-    if (!isTennisLeague3(game) || game.status !== "live") return game;
-    if (game.streamUrl?.trim()) return game;
+    if (!isMatchableTennisGame2(game)) return game;
+    if (!canReplaceExistingStream(game)) return game;
     const stream = matchTennisChannelPlusStream(game, catalog);
     if (!stream) return game;
     matched += 1;
@@ -19505,7 +19518,7 @@ async function enrichTennisGamesWithTennisChannelPlus(games) {
     };
   });
   if (define_import_meta_env_default.DEV && matched > 0) {
-    console.log(`${LOG7} matched ${matched} live tennis row(s)`, { catalogSize: catalog.length });
+    console.log(`${LOG7} matched ${matched} tennis row(s)`, { catalogSize: catalog.length });
   }
   return out;
 }

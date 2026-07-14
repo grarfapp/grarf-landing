@@ -23,6 +23,7 @@ import { useOperationalModeStore } from "../../grarf/desktop/src/store/operation
 import { AdminModeOverlay } from "../../grarf/desktop/src/components/adminMode/AdminModeOverlay";
 import { markGrarfAdmin } from "../../grarf/desktop/src/lib/admin/grarfAdminFlag";
 import { useAdminModeStore } from "../../grarf/desktop/src/store/adminModeStore";
+import { resolveCenterPaneApplicationModeFromPath } from "../../grarf/desktop/src/lib/home/resolveCenterPaneApplicationModeFromPath";
 
 let reactRoot: Root | null = null;
 
@@ -51,6 +52,13 @@ const appShellRouteElements = (
   </>
 );
 
+const adminAppShellRouteElements = (
+  <>
+    {appShellRouteElements}
+    <Route path="operations" element={<HomePage />} />
+  </>
+);
+
 function WebHomeApp() {
   return (
     <AnalyticsProvider>
@@ -64,7 +72,7 @@ function WebHomeApp() {
         </Route>
         {/* admin.html — same AppShellLayout as public, Admin Mode pre-activated before mount */}
         <Route path="admin.html" element={<AppShellLayout />}>
-          {appShellRouteElements}
+          {adminAppShellRouteElements}
         </Route>
         <Route path="admin/sportscape" element={<SportscapeEditorialAdminPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
@@ -107,6 +115,9 @@ if (autoRoot) {
   if ((window as { __GRARF_ADMIN_ENTRY?: boolean }).__GRARF_ADMIN_ENTRY) {
     markGrarfAdmin();
     useAdminModeStore.getState().enterAdminMode();
+    if (!resolveCenterPaneApplicationModeFromPath(window.location.pathname)) {
+      useCenterPaneApplicationModeStore.getState().setModeExplicit("operations");
+    }
   }
   mountWebHome(autoRoot);
 }
