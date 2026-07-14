@@ -65234,6 +65234,12 @@ function findGamesSpineGameById(gameId, consumerId = "find_games_spine_game") {
   ).map((game) => refreshManualGamesSpineGameIfNeeded(game, now));
   return manualGames.find((game) => game.id === gameId || game.grarfGameId === gameId);
 }
+function findGamesSpineGameForWatchLive(gameId, consumerId = "watch_live_click") {
+  const game = findGamesSpineGameById(gameId, consumerId);
+  if (!game) return void 0;
+  const manualStreamUrl = useAdminOperationsCardStore.getState().fieldsByGameId[gameId]?.streamUrl?.trim();
+  return applyManualStreamUrl(game, manualStreamUrl || void 0);
+}
 
 // ../grarf/desktop/src/pages/GameWorkspacePage.tsx
 var import_jsx_runtime57 = __toESM(require_jsx_runtime(), 1);
@@ -73091,7 +73097,7 @@ function HomeGamesToday({
       }));
       return;
     }
-    const game = findGamesSpineGameById(gameId);
+    const game = findGamesSpineGameForWatchLive(gameId);
     if (!game || !gameHasHomeSpineWatchLive(game)) return;
     if (game.league === "WNBA") logWnbaWatchLiveClicked(game);
     trackWatchLiveClicked({
@@ -73346,7 +73352,7 @@ function useHomeSpineGameInteractions({
         }));
         return;
       }
-      const game = findGamesSpineGameById(gameId);
+      const game = findGamesSpineGameForWatchLive(gameId);
       if (!game || !gameHasHomeSpineWatchLive(game)) return;
       if (game.league === "WNBA") logWnbaWatchLiveClicked(game);
       trackWatchLiveClicked({
@@ -89268,7 +89274,7 @@ function HomeLiveTrackerLiveScorePlaceholder({ game }) {
     (e2) => {
       e2.stopPropagation();
       if (!isGrarfWebRenderer()) return;
-      const spineGame = findGamesSpineGameById(game.gameId);
+      const spineGame = findGamesSpineGameForWatchLive(game.gameId);
       if (!spineGame || !liveTrackerScorePostCanWatchLive(spineGame)) return;
       const result = handleWatchLiveClick(spineGame, () => {
       });
@@ -93285,7 +93291,7 @@ function CommandBriefingModuleProduction({
   const briefingCount = ranked.length;
   const firstRankedGame = displayRanked[0]?.game;
   const onWatchLive = (0, import_react189.useCallback)((gameId) => {
-    const game = findGamesSpineGameById(gameId);
+    const game = findGamesSpineGameForWatchLive(gameId);
     if (!game || !gameHasHomeSpineWatchLive(game)) return;
     logWatchLiveLaunch(game);
     if (game.league === "WNBA") logWnbaWatchLiveClicked(game);
