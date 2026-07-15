@@ -19218,163 +19218,6 @@ async function enrichOperationalSnapshotTennisChannel(transport) {
   return changed ? { ...transport, leagues } : transport;
 }
 
-// ../grarf/desktop/src/lib/playerRank/enrichOperationalSnapshotPlayerRanks.ts
-init_define_import_meta_env();
-
-// ../grarf/desktop/src/lib/playerRank/enrichTennisGamesWithPlayerRanks.ts
-init_define_import_meta_env();
-
-// ../grarf/desktop/src/lib/playerRank/buildCanonicalPlayerRank.ts
-init_define_import_meta_env();
-function buildCanonicalPlayerRank(rank, kind, source, leagueKey) {
-  return {
-    source,
-    kind,
-    leagueKey,
-    rank,
-    displayLabel: String(rank)
-  };
-}
-
-// ../grarf/desktop/src/lib/playerRank/resolveWimbledonFeedSeedsForGame.ts
-init_define_import_meta_env();
-function gamePlayerLabelVariants2(game, side) {
-  const primary = side === "away" ? game.awayTeam : game.homeTeam;
-  const official = side === "away" ? game.metadata?.officialAwayName : game.metadata?.officialHomeName;
-  const labels = [primary, official].map((value) => value?.trim()).filter(Boolean);
-  return [...new Set(labels)];
-}
-function resolveWimbledonFeedSeedsForGame(game, match) {
-  const awayVariants = gamePlayerLabelVariants2(game, "away");
-  const homeVariants = gamePlayerLabelVariants2(game, "home");
-  const team1Tokens = tokenSetFromLabel(match.team1Label);
-  const team2Tokens = tokenSetFromLabel(match.team2Label);
-  let bestDirect = 0;
-  let bestSwapped = 0;
-  for (const away of awayVariants) {
-    for (const home of homeVariants) {
-      const awayTokens = tokenSetFromLabel(away);
-      const homeTokens = tokenSetFromLabel(home);
-      bestDirect = Math.max(
-        bestDirect,
-        tokenOverlapScore(awayTokens, team1Tokens) + tokenOverlapScore(homeTokens, team2Tokens)
-      );
-      bestSwapped = Math.max(
-        bestSwapped,
-        tokenOverlapScore(awayTokens, team2Tokens) + tokenOverlapScore(homeTokens, team1Tokens)
-      );
-    }
-  }
-  if (bestDirect >= bestSwapped) {
-    return { awaySeed: match.team1Seed, homeSeed: match.team2Seed };
-  }
-  return { awaySeed: match.team2Seed, homeSeed: match.team1Seed };
-}
-
-// ../grarf/desktop/src/lib/playerRank/enrichTennisGamesWithPlayerRanks.ts
-var LOG8 = "[PlayerRankEnrich:Tennis]";
-function resolveTennisSideRank(game, side, wimbledonSeeds) {
-  const leagueKey = game.league;
-  if (leagueKey !== "ATP" && leagueKey !== "WTA") return void 0;
-  const tennis = game.metadata?.tennis;
-  const tournamentSeed = side === "away" ? tennis?.awaySeed ?? null : tennis?.homeSeed ?? null;
-  if (tournamentSeed != null && tournamentSeed > 0) {
-    return buildCanonicalPlayerRank(tournamentSeed, "tournament_seed", "espn", leagueKey);
-  }
-  const wimbledonSeed = side === "away" ? wimbledonSeeds?.awaySeed ?? null : wimbledonSeeds?.homeSeed ?? null;
-  if (wimbledonSeed != null && wimbledonSeed > 0) {
-    return buildCanonicalPlayerRank(wimbledonSeed, "tournament_seed", "wimbledon", leagueKey);
-  }
-  const worldRank = side === "away" ? tennis?.awayWorldRank ?? null : tennis?.homeWorldRank ?? null;
-  if (worldRank != null && worldRank > 0) {
-    return buildCanonicalPlayerRank(worldRank, "world_ranking", "espn", leagueKey);
-  }
-  return void 0;
-}
-function resolveWimbledonSeeds(game, catalogByYear) {
-  if (!isWimbledonTennisGame(game)) return null;
-  const tournamentYear = resolveWimbledonTournamentYear(game);
-  const catalog = catalogByYear.get(tournamentYear) ?? [];
-  if (catalog.length === 0) return null;
-  const resolution = matchWimbledonSlamTrackerGame(game, catalog);
-  if (!resolution) return null;
-  const feedMatch = catalog.find((row) => row.matchId === resolution.matchId);
-  if (!feedMatch) return null;
-  return resolveWimbledonFeedSeedsForGame(game, feedMatch);
-}
-function attachPlayerRanksToGame(game, catalogByYear) {
-  if (game.league !== "ATP" && game.league !== "WTA") return game;
-  const wimbledonSeeds = resolveWimbledonSeeds(game, catalogByYear);
-  const awayPlayerRank = resolveTennisSideRank(game, "away", wimbledonSeeds);
-  const homePlayerRank = resolveTennisSideRank(game, "home", wimbledonSeeds);
-  if (!awayPlayerRank && !homePlayerRank) return game;
-  return {
-    ...game,
-    ...awayPlayerRank ? { awayPlayerRank } : {},
-    ...homePlayerRank ? { homePlayerRank } : {}
-  };
-}
-async function enrichTennisGamesWithPlayerRanks(games, catalogByYear) {
-  if (games.length === 0) return games;
-  let attached = 0;
-  const enriched = games.map((game) => {
-    const next = attachPlayerRanksToGame(game, catalogByYear);
-    if (next !== game) attached += 1;
-    return next;
-  });
-  if (define_import_meta_env_default.DEV && attached > 0) {
-    console.log(`${LOG8} Attached player ranks`, { games: games.length, attached });
-  }
-  return enriched;
-}
-
-// ../grarf/desktop/src/lib/playerRank/enrichOperationalSnapshotPlayerRanks.ts
-var LOG9 = "[PlayerRankEnrich]";
-var TENNIS_PLAYER_RANK_LEAGUES = ["ATP", "WTA"];
-async function buildWimbledonCatalogByYear(transport) {
-  const years = /* @__PURE__ */ new Set();
-  for (const leagueKey of TENNIS_PLAYER_RANK_LEAGUES) {
-    const rows = transport.leagues[leagueKey];
-    if (!Array.isArray(rows)) continue;
-    for (const game of rows) {
-      if (!isWimbledonTennisGame(game)) continue;
-      years.add(resolveWimbledonTournamentYear(game));
-    }
-  }
-  const catalogByYear = /* @__PURE__ */ new Map();
-  await Promise.all(
-    [...years].map(async (year) => {
-      const catalog = await fetchWimbledonDrawCatalogForTournament(year);
-      catalogByYear.set(
-        year,
-        catalog.filter((row) => wimbledonFeedMatchInTournamentYear(row, year))
-      );
-    })
-  );
-  return catalogByYear;
-}
-async function enrichOperationalSnapshotPlayerRanks(transport) {
-  const leagues = transport.leagues ?? {};
-  let changed = false;
-  const nextLeagues = { ...leagues };
-  const catalogByYear = await buildWimbledonCatalogByYear(transport);
-  for (const leagueKey of TENNIS_PLAYER_RANK_LEAGUES) {
-    const rows = leagues[leagueKey];
-    if (!Array.isArray(rows) || rows.length === 0) continue;
-    try {
-      const enriched = await enrichTennisGamesWithPlayerRanks(rows, catalogByYear);
-      if (enriched.some((row, index) => row !== rows[index])) {
-        nextLeagues[leagueKey] = enriched;
-        changed = true;
-      }
-    } catch (error) {
-      console.warn(`${LOG9} ${leagueKey} player rank enrich failed`, error);
-    }
-  }
-  if (!changed) return transport;
-  return { ...transport, leagues: nextLeagues };
-}
-
 // ../grarf/desktop/src/services/operationalIngest/supplementOperationalSnapshotFromLocalIpc.ts
 init_define_import_meta_env();
 function cloudRowMissingMlbPk(row) {
@@ -19510,7 +19353,7 @@ async function supplementOperationalSnapshotFromLocalIpc(transport) {
 }
 
 // ../grarf/desktop/src/services/operationalIngest/enrichOperationalTransport.ts
-var LOG10 = "[OperationalIngest]";
+var LOG8 = "[OperationalIngest]";
 function cloudRowMissingMlbPk2(row) {
   if (typeof row.gamePk === "number" && row.gamePk > 0) return false;
   const mlb = row.externalIds?.mlb?.trim();
@@ -19532,84 +19375,86 @@ async function joinMissingMlbProviderIds(transport) {
     }
   };
 }
+async function enrichOperationalSnapshotWatchStreamsLocal(transport) {
+  let next = transport;
+  try {
+    next = sanitizeOperationalSnapshotWatchStreams(next);
+  } catch (e) {
+    console.warn(`${LOG8} watch stream sanitize failed`, e);
+  }
+  try {
+    next = enrichOperationalSnapshotManualGameOverrides(next);
+  } catch (e) {
+    console.warn(`${LOG8} manual game override enrich failed`, e);
+  }
+  try {
+    next = enrichOperationalSnapshotEspnWatchStreams(next);
+  } catch (e) {
+    console.warn(`${LOG8} ESPN Watch stream enrich failed`, e);
+  }
+  try {
+    for (const key of ["ATP", "WTA"]) {
+      const rows = next.leagues[key];
+      if (!Array.isArray(rows) || rows.length === 0) continue;
+      await enrichWimbledonEspnWatchStreams(rows);
+    }
+  } catch (e) {
+    console.warn(`${LOG8} Wimbledon ESPN Watch enrich failed`, e);
+  }
+  try {
+    next = await enrichOperationalSnapshotWimbledonSlamTracker(next);
+  } catch (e) {
+    console.warn(`${LOG8} Wimbledon SlamTracker enrich failed`, e);
+  }
+  try {
+    next = await enrichOperationalSnapshotEspnWatchPickerStreams(next);
+  } catch (e) {
+    console.warn(`${LOG8} ESPN Watch picker enrich failed`, e);
+  }
+  try {
+    next = enrichOperationalSnapshotUsaNetworkStreams(next);
+  } catch (e) {
+    console.warn(`${LOG8} USA Network stream enrich failed`, e);
+  }
+  try {
+    next = await enrichOperationalSnapshotTennisChannel(next);
+  } catch (e) {
+    console.warn(`${LOG8} Tennis Channel Plus enrich failed`, e);
+  }
+  try {
+    next = await enrichOperationalSnapshotFoxWorldCup(next);
+  } catch (e) {
+    console.warn(`${LOG8} FOX World Cup enrich failed`, e);
+  }
+  try {
+    next = await enrichOperationalSnapshotWnbaStreams(next);
+  } catch (e) {
+    console.warn(`${LOG8} WNBA Prime Video enrich failed`, e);
+  }
+  try {
+    next = await enrichOperationalSnapshotFotmob(next);
+  } catch (e) {
+    console.warn(`${LOG8} FotMob World Cup enrich failed`, e);
+  }
+  return next;
+}
 async function enrichOperationalTransport(rawTransport) {
   let transport = rawTransport;
   try {
-    transport = sanitizeOperationalSnapshotWatchStreams(transport);
-  } catch (e) {
-    console.warn(`${LOG10} watch stream sanitize failed`, e);
-  }
-  try {
-    transport = enrichOperationalSnapshotManualGameOverrides(transport);
-  } catch (e) {
-    console.warn(`${LOG10} manual game override enrich failed`, e);
-  }
-  try {
     transport = await supplementOperationalSnapshotFromLocalIpc(transport);
   } catch (e) {
-    console.warn(`${LOG10} local IPC supplement failed`, e);
+    console.warn(`${LOG8} local IPC supplement failed`, e);
   }
-  try {
-    transport = enrichOperationalSnapshotEspnWatchStreams(transport);
-  } catch (e) {
-    console.warn(`${LOG10} ESPN Watch stream enrich failed`, e);
-  }
-  if (isGrarfWebRenderer()) {
+  if (!isGrarfWebRenderer()) {
     try {
-      for (const key of ["ATP", "WTA"]) {
-        const rows = transport.leagues[key];
-        if (!Array.isArray(rows) || rows.length === 0) continue;
-        await enrichWimbledonEspnWatchStreams(rows);
-      }
+      transport = await enrichOperationalSnapshotWatchStreamsLocal(transport);
     } catch (e) {
-      console.warn(`${LOG10} Wimbledon ESPN Watch enrich failed`, e);
+      console.warn(`${LOG8} watch/stream enrich failed`, e);
     }
     try {
-      transport = await enrichOperationalSnapshotWimbledonSlamTracker(transport);
+      transport = await joinMissingMlbProviderIds(transport);
     } catch (e) {
-      console.warn(`${LOG10} Wimbledon SlamTracker enrich failed`, e);
-    }
-    try {
-      transport = await enrichOperationalSnapshotEspnWatchPickerStreams(transport);
-    } catch (e) {
-      console.warn(`${LOG10} ESPN Watch picker enrich failed`, e);
-    }
-  }
-  try {
-    transport = enrichOperationalSnapshotUsaNetworkStreams(transport);
-  } catch (e) {
-    console.warn(`${LOG10} USA Network stream enrich failed`, e);
-  }
-  try {
-    transport = await joinMissingMlbProviderIds(transport);
-  } catch (e) {
-    console.warn(`${LOG10} MLB provider join failed`, e);
-  }
-  try {
-    transport = await enrichOperationalSnapshotTennisChannel(transport);
-  } catch (e) {
-    console.warn(`${LOG10} Tennis Channel Plus enrich failed`, e);
-  }
-  try {
-    transport = await enrichOperationalSnapshotFoxWorldCup(transport);
-  } catch (e) {
-    console.warn(`${LOG10} FOX World Cup enrich failed`, e);
-  }
-  try {
-    transport = await enrichOperationalSnapshotWnbaStreams(transport);
-  } catch (e) {
-    console.warn(`${LOG10} WNBA Prime Video enrich failed`, e);
-  }
-  try {
-    transport = await enrichOperationalSnapshotFotmob(transport);
-  } catch (e) {
-    console.warn(`${LOG10} FotMob World Cup enrich failed`, e);
-  }
-  if (isGrarfWebRenderer()) {
-    try {
-      transport = await enrichOperationalSnapshotPlayerRanks(transport);
-    } catch (e) {
-      console.warn(`${LOG10} player rank enrich failed`, e);
+      console.warn(`${LOG8} MLB provider join failed`, e);
     }
   }
   return transport;
@@ -19649,7 +19494,7 @@ function getOperationalIngestConfig() {
 }
 
 // ../grarf/desktop/src/services/operationalIngest/fetchOperationalSnapshot.ts
-var LOG11 = "[OperationalIngest]";
+var LOG9 = "[OperationalIngest]";
 var CLOUD_STALE_THRESHOLD_MS = 9e4;
 var CLOUD_FETCH_TIMEOUT_MS = 2e4;
 var WEB_CLOUD_BOOTSTRAP_TIMEOUT_MS = 2500;
@@ -19694,7 +19539,7 @@ async function fetchViaEspnLocalIpcAdapter() {
   const api = window.grarf?.gamesGetSnapshot;
   if (!api) {
     if (define_import_meta_env_default.DEV) {
-      console.warn(`${LOG11} source=espn_local_adapter unavailable (no Electron IPC)`);
+      console.warn(`${LOG9} source=espn_local_adapter unavailable (no Electron IPC)`);
     }
     return emptyOperationalSnapshot();
   }
@@ -19770,7 +19615,7 @@ async function fetchViaGrarfCloudWithLocalFallback() {
   if (!electronIpc) {
     if (cloud) {
       if (define_import_meta_env_default.DEV && !cloudFresh) {
-        console.warn(`${LOG11} browser/web using cloud snapshot (stale but authoritative)`, {
+        console.warn(`${LOG9} browser/web using cloud snapshot (stale but authoritative)`, {
           cloudAgeMs,
           cloudError
         });
@@ -19788,7 +19633,7 @@ async function fetchViaGrarfCloudWithLocalFallback() {
     return cloud;
   }
   if (define_import_meta_env_default.DEV && (cloudError || cloud && !cloudFresh)) {
-    console.warn(`${LOG11} using local IPC fallback (cloud stale or failed)`, {
+    console.warn(`${LOG9} using local IPC fallback (cloud stale or failed)`, {
       cloudError,
       cloudAgeMs: cloud ? cloudAgeMs : null,
       localAgeMs,

@@ -41366,163 +41366,6 @@ async function enrichOperationalSnapshotTennisChannel(transport) {
   return changed ? { ...transport, leagues } : transport;
 }
 
-// ../grarf/desktop/src/lib/playerRank/enrichOperationalSnapshotPlayerRanks.ts
-init_define_import_meta_env();
-
-// ../grarf/desktop/src/lib/playerRank/enrichTennisGamesWithPlayerRanks.ts
-init_define_import_meta_env();
-
-// ../grarf/desktop/src/lib/playerRank/buildCanonicalPlayerRank.ts
-init_define_import_meta_env();
-function buildCanonicalPlayerRank(rank, kind, source, leagueKey) {
-  return {
-    source,
-    kind,
-    leagueKey,
-    rank,
-    displayLabel: String(rank)
-  };
-}
-
-// ../grarf/desktop/src/lib/playerRank/resolveWimbledonFeedSeedsForGame.ts
-init_define_import_meta_env();
-function gamePlayerLabelVariants2(game, side) {
-  const primary = side === "away" ? game.awayTeam : game.homeTeam;
-  const official = side === "away" ? game.metadata?.officialAwayName : game.metadata?.officialHomeName;
-  const labels = [primary, official].map((value) => value?.trim()).filter(Boolean);
-  return [...new Set(labels)];
-}
-function resolveWimbledonFeedSeedsForGame(game, match) {
-  const awayVariants = gamePlayerLabelVariants2(game, "away");
-  const homeVariants = gamePlayerLabelVariants2(game, "home");
-  const team1Tokens = tokenSetFromLabel(match.team1Label);
-  const team2Tokens = tokenSetFromLabel(match.team2Label);
-  let bestDirect = 0;
-  let bestSwapped = 0;
-  for (const away of awayVariants) {
-    for (const home of homeVariants) {
-      const awayTokens = tokenSetFromLabel(away);
-      const homeTokens = tokenSetFromLabel(home);
-      bestDirect = Math.max(
-        bestDirect,
-        tokenOverlapScore(awayTokens, team1Tokens) + tokenOverlapScore(homeTokens, team2Tokens)
-      );
-      bestSwapped = Math.max(
-        bestSwapped,
-        tokenOverlapScore(awayTokens, team2Tokens) + tokenOverlapScore(homeTokens, team1Tokens)
-      );
-    }
-  }
-  if (bestDirect >= bestSwapped) {
-    return { awaySeed: match.team1Seed, homeSeed: match.team2Seed };
-  }
-  return { awaySeed: match.team2Seed, homeSeed: match.team1Seed };
-}
-
-// ../grarf/desktop/src/lib/playerRank/enrichTennisGamesWithPlayerRanks.ts
-var LOG12 = "[PlayerRankEnrich:Tennis]";
-function resolveTennisSideRank(game, side, wimbledonSeeds) {
-  const leagueKey = game.league;
-  if (leagueKey !== "ATP" && leagueKey !== "WTA") return void 0;
-  const tennis = game.metadata?.tennis;
-  const tournamentSeed = side === "away" ? tennis?.awaySeed ?? null : tennis?.homeSeed ?? null;
-  if (tournamentSeed != null && tournamentSeed > 0) {
-    return buildCanonicalPlayerRank(tournamentSeed, "tournament_seed", "espn", leagueKey);
-  }
-  const wimbledonSeed = side === "away" ? wimbledonSeeds?.awaySeed ?? null : wimbledonSeeds?.homeSeed ?? null;
-  if (wimbledonSeed != null && wimbledonSeed > 0) {
-    return buildCanonicalPlayerRank(wimbledonSeed, "tournament_seed", "wimbledon", leagueKey);
-  }
-  const worldRank = side === "away" ? tennis?.awayWorldRank ?? null : tennis?.homeWorldRank ?? null;
-  if (worldRank != null && worldRank > 0) {
-    return buildCanonicalPlayerRank(worldRank, "world_ranking", "espn", leagueKey);
-  }
-  return void 0;
-}
-function resolveWimbledonSeeds(game, catalogByYear) {
-  if (!isWimbledonTennisGame(game)) return null;
-  const tournamentYear = resolveWimbledonTournamentYear(game);
-  const catalog = catalogByYear.get(tournamentYear) ?? [];
-  if (catalog.length === 0) return null;
-  const resolution = matchWimbledonSlamTrackerGame(game, catalog);
-  if (!resolution) return null;
-  const feedMatch = catalog.find((row) => row.matchId === resolution.matchId);
-  if (!feedMatch) return null;
-  return resolveWimbledonFeedSeedsForGame(game, feedMatch);
-}
-function attachPlayerRanksToGame(game, catalogByYear) {
-  if (game.league !== "ATP" && game.league !== "WTA") return game;
-  const wimbledonSeeds = resolveWimbledonSeeds(game, catalogByYear);
-  const awayPlayerRank = resolveTennisSideRank(game, "away", wimbledonSeeds);
-  const homePlayerRank = resolveTennisSideRank(game, "home", wimbledonSeeds);
-  if (!awayPlayerRank && !homePlayerRank) return game;
-  return {
-    ...game,
-    ...awayPlayerRank ? { awayPlayerRank } : {},
-    ...homePlayerRank ? { homePlayerRank } : {}
-  };
-}
-async function enrichTennisGamesWithPlayerRanks(games, catalogByYear) {
-  if (games.length === 0) return games;
-  let attached = 0;
-  const enriched = games.map((game) => {
-    const next = attachPlayerRanksToGame(game, catalogByYear);
-    if (next !== game) attached += 1;
-    return next;
-  });
-  if (define_import_meta_env_default.DEV && attached > 0) {
-    console.log(`${LOG12} Attached player ranks`, { games: games.length, attached });
-  }
-  return enriched;
-}
-
-// ../grarf/desktop/src/lib/playerRank/enrichOperationalSnapshotPlayerRanks.ts
-var LOG13 = "[PlayerRankEnrich]";
-var TENNIS_PLAYER_RANK_LEAGUES = ["ATP", "WTA"];
-async function buildWimbledonCatalogByYear(transport) {
-  const years = /* @__PURE__ */ new Set();
-  for (const leagueKey of TENNIS_PLAYER_RANK_LEAGUES) {
-    const rows = transport.leagues[leagueKey];
-    if (!Array.isArray(rows)) continue;
-    for (const game of rows) {
-      if (!isWimbledonTennisGame(game)) continue;
-      years.add(resolveWimbledonTournamentYear(game));
-    }
-  }
-  const catalogByYear = /* @__PURE__ */ new Map();
-  await Promise.all(
-    [...years].map(async (year) => {
-      const catalog = await fetchWimbledonDrawCatalogForTournament(year);
-      catalogByYear.set(
-        year,
-        catalog.filter((row) => wimbledonFeedMatchInTournamentYear(row, year))
-      );
-    })
-  );
-  return catalogByYear;
-}
-async function enrichOperationalSnapshotPlayerRanks(transport) {
-  const leagues = transport.leagues ?? {};
-  let changed = false;
-  const nextLeagues = { ...leagues };
-  const catalogByYear = await buildWimbledonCatalogByYear(transport);
-  for (const leagueKey of TENNIS_PLAYER_RANK_LEAGUES) {
-    const rows = leagues[leagueKey];
-    if (!Array.isArray(rows) || rows.length === 0) continue;
-    try {
-      const enriched = await enrichTennisGamesWithPlayerRanks(rows, catalogByYear);
-      if (enriched.some((row, index) => row !== rows[index])) {
-        nextLeagues[leagueKey] = enriched;
-        changed = true;
-      }
-    } catch (error) {
-      console.warn(`${LOG13} ${leagueKey} player rank enrich failed`, error);
-    }
-  }
-  if (!changed) return transport;
-  return { ...transport, leagues: nextLeagues };
-}
-
 // ../grarf/desktop/src/services/operationalIngest/enrichOperationalTransport.ts
 init_isGrarfWebRenderer();
 
@@ -41661,7 +41504,7 @@ async function supplementOperationalSnapshotFromLocalIpc(transport) {
 }
 
 // ../grarf/desktop/src/services/operationalIngest/enrichOperationalTransport.ts
-var LOG14 = "[OperationalIngest]";
+var LOG12 = "[OperationalIngest]";
 function cloudRowMissingMlbPk2(row) {
   if (typeof row.gamePk === "number" && row.gamePk > 0) return false;
   const mlb2 = row.externalIds?.mlb?.trim();
@@ -41683,84 +41526,86 @@ async function joinMissingMlbProviderIds(transport) {
     }
   };
 }
+async function enrichOperationalSnapshotWatchStreamsLocal(transport) {
+  let next = transport;
+  try {
+    next = sanitizeOperationalSnapshotWatchStreams(next);
+  } catch (e2) {
+    console.warn(`${LOG12} watch stream sanitize failed`, e2);
+  }
+  try {
+    next = enrichOperationalSnapshotManualGameOverrides(next);
+  } catch (e2) {
+    console.warn(`${LOG12} manual game override enrich failed`, e2);
+  }
+  try {
+    next = enrichOperationalSnapshotEspnWatchStreams(next);
+  } catch (e2) {
+    console.warn(`${LOG12} ESPN Watch stream enrich failed`, e2);
+  }
+  try {
+    for (const key2 of ["ATP", "WTA"]) {
+      const rows = next.leagues[key2];
+      if (!Array.isArray(rows) || rows.length === 0) continue;
+      await enrichWimbledonEspnWatchStreams(rows);
+    }
+  } catch (e2) {
+    console.warn(`${LOG12} Wimbledon ESPN Watch enrich failed`, e2);
+  }
+  try {
+    next = await enrichOperationalSnapshotWimbledonSlamTracker(next);
+  } catch (e2) {
+    console.warn(`${LOG12} Wimbledon SlamTracker enrich failed`, e2);
+  }
+  try {
+    next = await enrichOperationalSnapshotEspnWatchPickerStreams(next);
+  } catch (e2) {
+    console.warn(`${LOG12} ESPN Watch picker enrich failed`, e2);
+  }
+  try {
+    next = enrichOperationalSnapshotUsaNetworkStreams(next);
+  } catch (e2) {
+    console.warn(`${LOG12} USA Network stream enrich failed`, e2);
+  }
+  try {
+    next = await enrichOperationalSnapshotTennisChannel(next);
+  } catch (e2) {
+    console.warn(`${LOG12} Tennis Channel Plus enrich failed`, e2);
+  }
+  try {
+    next = await enrichOperationalSnapshotFoxWorldCup(next);
+  } catch (e2) {
+    console.warn(`${LOG12} FOX World Cup enrich failed`, e2);
+  }
+  try {
+    next = await enrichOperationalSnapshotWnbaStreams(next);
+  } catch (e2) {
+    console.warn(`${LOG12} WNBA Prime Video enrich failed`, e2);
+  }
+  try {
+    next = await enrichOperationalSnapshotFotmob(next);
+  } catch (e2) {
+    console.warn(`${LOG12} FotMob World Cup enrich failed`, e2);
+  }
+  return next;
+}
 async function enrichOperationalTransport(rawTransport) {
   let transport = rawTransport;
   try {
-    transport = sanitizeOperationalSnapshotWatchStreams(transport);
-  } catch (e2) {
-    console.warn(`${LOG14} watch stream sanitize failed`, e2);
-  }
-  try {
-    transport = enrichOperationalSnapshotManualGameOverrides(transport);
-  } catch (e2) {
-    console.warn(`${LOG14} manual game override enrich failed`, e2);
-  }
-  try {
     transport = await supplementOperationalSnapshotFromLocalIpc(transport);
   } catch (e2) {
-    console.warn(`${LOG14} local IPC supplement failed`, e2);
+    console.warn(`${LOG12} local IPC supplement failed`, e2);
   }
-  try {
-    transport = enrichOperationalSnapshotEspnWatchStreams(transport);
-  } catch (e2) {
-    console.warn(`${LOG14} ESPN Watch stream enrich failed`, e2);
-  }
-  if (isGrarfWebRenderer()) {
+  if (!isGrarfWebRenderer()) {
     try {
-      for (const key2 of ["ATP", "WTA"]) {
-        const rows = transport.leagues[key2];
-        if (!Array.isArray(rows) || rows.length === 0) continue;
-        await enrichWimbledonEspnWatchStreams(rows);
-      }
+      transport = await enrichOperationalSnapshotWatchStreamsLocal(transport);
     } catch (e2) {
-      console.warn(`${LOG14} Wimbledon ESPN Watch enrich failed`, e2);
+      console.warn(`${LOG12} watch/stream enrich failed`, e2);
     }
     try {
-      transport = await enrichOperationalSnapshotWimbledonSlamTracker(transport);
+      transport = await joinMissingMlbProviderIds(transport);
     } catch (e2) {
-      console.warn(`${LOG14} Wimbledon SlamTracker enrich failed`, e2);
-    }
-    try {
-      transport = await enrichOperationalSnapshotEspnWatchPickerStreams(transport);
-    } catch (e2) {
-      console.warn(`${LOG14} ESPN Watch picker enrich failed`, e2);
-    }
-  }
-  try {
-    transport = enrichOperationalSnapshotUsaNetworkStreams(transport);
-  } catch (e2) {
-    console.warn(`${LOG14} USA Network stream enrich failed`, e2);
-  }
-  try {
-    transport = await joinMissingMlbProviderIds(transport);
-  } catch (e2) {
-    console.warn(`${LOG14} MLB provider join failed`, e2);
-  }
-  try {
-    transport = await enrichOperationalSnapshotTennisChannel(transport);
-  } catch (e2) {
-    console.warn(`${LOG14} Tennis Channel Plus enrich failed`, e2);
-  }
-  try {
-    transport = await enrichOperationalSnapshotFoxWorldCup(transport);
-  } catch (e2) {
-    console.warn(`${LOG14} FOX World Cup enrich failed`, e2);
-  }
-  try {
-    transport = await enrichOperationalSnapshotWnbaStreams(transport);
-  } catch (e2) {
-    console.warn(`${LOG14} WNBA Prime Video enrich failed`, e2);
-  }
-  try {
-    transport = await enrichOperationalSnapshotFotmob(transport);
-  } catch (e2) {
-    console.warn(`${LOG14} FotMob World Cup enrich failed`, e2);
-  }
-  if (isGrarfWebRenderer()) {
-    try {
-      transport = await enrichOperationalSnapshotPlayerRanks(transport);
-    } catch (e2) {
-      console.warn(`${LOG14} player rank enrich failed`, e2);
+      console.warn(`${LOG12} MLB provider join failed`, e2);
     }
   }
   return transport;
@@ -41786,7 +41631,7 @@ function normalizeOperationalSnapshot(response) {
 }
 
 // ../grarf/desktop/src/services/operationalIngest/startOperationalSnapshotPolling.ts
-var LOG15 = "[OperationalIngest]";
+var LOG13 = "[OperationalIngest]";
 var DEFAULT_POLL_INTERVAL_MS = 6e4;
 var RETRY_MS = 15e3;
 function startOperationalSnapshotPolling(hydrate, options) {
@@ -41801,7 +41646,7 @@ function startOperationalSnapshotPolling(hydrate, options) {
   let retryTimer = null;
   let intervalId = null;
   if (define_import_meta_env_default.DEV) {
-    console.log(`${LOG15} provider=grarf_cloud polling centralized snapshot`);
+    console.log(`${LOG13} provider=grarf_cloud polling centralized snapshot`);
   }
   const clearRetry = () => {
     if (retryTimer != null) {
@@ -41834,7 +41679,7 @@ function startOperationalSnapshotPolling(hydrate, options) {
           );
         } catch (e2) {
           const msg = e2 instanceof Error ? e2.message : String(e2);
-          console.warn(`${LOG15} enrich hydrate failed`, msg);
+          console.warn(`${LOG13} enrich hydrate failed`, msg);
           if (stopped) return;
           await applyHydrate(
             rawTransport,
@@ -41843,7 +41688,7 @@ function startOperationalSnapshotPolling(hydrate, options) {
         }
       } catch (e2) {
         const msg = e2 instanceof Error ? e2.message : String(e2);
-        console.warn(`${LOG15} poll failed`, msg);
+        console.warn(`${LOG13} poll failed`, msg);
         if (!stopped && retryTimer == null) {
           retryTimer = setTimeout(() => {
             retryTimer = null;
@@ -41923,7 +41768,7 @@ function supplementOperationalSnapshotLeagues(primary, supplement) {
   }
   return changed ? merged : primary;
 }
-var LOG16 = "[OperationalIngest]";
+var LOG14 = "[OperationalIngest]";
 function parseUpdatedAtMs(updatedAt) {
   if (!updatedAt?.trim()) return 0;
   const ms2 = Date.parse(updatedAt);
@@ -41954,14 +41799,14 @@ function LiveGamesBridge() {
           const enriched = await enrichOperationalTransport(transport);
           applySnapshot(enriched, normalizeOperationalSnapshot(enriched), completeness);
         } catch (e2) {
-          console.warn(`${LOG16} transport enrich failed`, e2);
+          console.warn(`${LOG14} transport enrich failed`, e2);
           applySnapshot(transport, normalizeOperationalSnapshot(transport), completeness);
         }
       })();
     };
     if (config.provider === "grarf_cloud") {
       if (define_import_meta_env_default.DEV) {
-        console.log(`${LOG16} grarf_cloud with local IPC supplement (fresher wins)`);
+        console.log(`${LOG14} grarf_cloud with local IPC supplement (fresher wins)`);
       }
       const cloudHydrate = (snap) => {
         lastCloudLeaguesRef.current = snap.leagues ?? {};
@@ -42036,7 +41881,7 @@ function LiveGamesBridge() {
             }
             applySnapshot(enriched, canonical, { source: "espn_local_adapter" });
           } catch (e2) {
-            console.warn(`${LOG16} local IPC enrich failed`, e2);
+            console.warn(`${LOG14} local IPC enrich failed`, e2);
             let canonical = normalizeOperationalSnapshot(transport);
             if (transport.source === "espn_local_adapter") {
               const prevLeagues = useLiveGamesStore.getState().leagues;
@@ -45118,7 +44963,7 @@ function editorialLookupKeysForGame(game) {
 }
 
 // ../grarf/desktop/src/lib/commandBriefing/briefingPersistence.ts
-var LOG17 = "[CommandBriefing]";
+var LOG15 = "[CommandBriefing]";
 function snapshotFromGame(game) {
   const league = game.league ?? "MLB";
   return {
@@ -45145,11 +44990,11 @@ function snapshotFromGame(game) {
 }
 function logUsingLiveGame(game) {
   if (!define_import_meta_env_default.DEV) return;
-  console.log(`${LOG17} Using live operational game`, { gameId: game.id });
+  console.log(`${LOG15} Using live operational game`, { gameId: game.id });
 }
 function logPersistedFallbackSnapshot(gameId) {
   if (!define_import_meta_env_default.DEV) return;
-  console.log(`${LOG17} Persisted fallback snapshot`, { gameId });
+  console.log(`${LOG15} Persisted fallback snapshot`, { gameId });
 }
 function persistBriefingSnapshot(game) {
   const api = window.grarf?.commandBriefingSavePersistenceEntry;
@@ -45442,7 +45287,7 @@ function FinalizedGameRetentionBridge() {
 // ../grarf/desktop/src/components/operational/YesterdayCatchUpSeedBridge.tsx
 init_define_import_meta_env();
 var import_react31 = __toESM(require_react(), 1);
-var LOG18 = "[CatchUpYesterday]";
+var LOG16 = "[CatchUpYesterday]";
 function YesterdayCatchUpSeedBridge() {
   (0, import_react31.useEffect)(() => {
     const api = window.grarf?.gamesGetYesterdayFinals;
@@ -45455,17 +45300,17 @@ function YesterdayCatchUpSeedBridge() {
         const finals = result?.finals ?? [];
         if (finals.length === 0) {
           if (define_import_meta_env_default.DEV) {
-            console.warn(`${LOG18} no yesterday finals returned`);
+            console.warn(`${LOG16} no yesterday finals returned`);
           }
           return;
         }
         useRecentFinalizedGamesStore.getState().mergeFinalizedGames(finals);
         if (define_import_meta_env_default.DEV) {
-          console.log(`${LOG18} seeded ${finals.length} yesterday finals for Catch Up`);
+          console.log(`${LOG16} seeded ${finals.length} yesterday finals for Catch Up`);
         }
       } catch (e2) {
         if (!cancelled && define_import_meta_env_default.DEV) {
-          console.warn(`${LOG18} seed failed`, e2);
+          console.warn(`${LOG16} seed failed`, e2);
         }
       }
     })();
@@ -45864,7 +45709,7 @@ function computeAttentionScore(input) {
 
 // ../grarf/desktop/src/lib/attentionRuntime/devLogging.ts
 init_define_import_meta_env();
-var LOG19 = "[AttentionRuntime]";
+var LOG17 = "[AttentionRuntime]";
 var lastRankingSignature = "";
 var lastRecomputeLogAt = 0;
 function rankingSignature(rankings) {
@@ -45880,7 +45725,7 @@ function logAttentionRecompute(input) {
   if (!rankingChanged && now - lastRecomputeLogAt < 6e4) return;
   lastRankingSignature = signature;
   lastRecomputeLogAt = now;
-  console.log(`${LOG19} recompute`, {
+  console.log(`${LOG17} recompute`, {
     trigger: input.trigger,
     gameCount: input.gameCount,
     top: input.rankings.slice(0, 5).map((r3) => ({
@@ -45892,13 +45737,13 @@ function logAttentionRecompute(input) {
 }
 function logResidualGravityStarted(input) {
   if (!define_import_meta_env_default.DEV) return;
-  console.log(`${LOG19} residual gravity started`, input);
+  console.log(`${LOG17} residual gravity started`, input);
 }
 function logResidualGravityDecay(states) {
   if (!define_import_meta_env_default.DEV || states.length === 0) return;
   const active2 = states.filter((s2) => s2.currentGravity > 0.5);
   if (active2.length === 0) return;
-  console.log(`${LOG19} residual gravity decay`, {
+  console.log(`${LOG17} residual gravity decay`, {
     active: active2.map((s2) => ({
       eventId: s2.eventId,
       gravity: s2.currentGravity,
@@ -46344,7 +46189,7 @@ init_define_import_meta_env();
 
 // ../grarf/desktop/src/lib/recommendationRuntime/devLogging.ts
 init_define_import_meta_env();
-var LOG20 = "[RecommendationRuntime]";
+var LOG18 = "[RecommendationRuntime]";
 var lastPrimaryId = null;
 var lastRankingSignature2 = "";
 var lastLogAt = 0;
@@ -46364,14 +46209,14 @@ function logRecommendationUpdate(diag) {
   lastRankingSignature2 = signature;
   lastLogAt = now;
   if (primaryChanged) {
-    console.log(`${LOG20} primary transition`, {
+    console.log(`${LOG18} primary transition`, {
       from: previousPrimary,
       to: diag.primaryRecommendation,
       reasoning: diag.primaryReasoning,
       mode: diag.operationalMode
     });
   }
-  console.log(`${LOG20} recommendations`, {
+  console.log(`${LOG18} recommendations`, {
     trigger: diag.lastRecomputeReason,
     primary: diag.primaryRecommendation,
     top: diag.rankedRecommendations.slice(0, 4).map((r3) => ({
@@ -47176,12 +47021,12 @@ function mlbTvLegacyWatchOption(game) {
 
 // ../grarf/desktop/src/lib/watch/providers/espnResolver.ts
 init_define_import_meta_env();
-var LOG21 = "[Resolver]";
+var LOG19 = "[Resolver]";
 function resolverDebug(message, extra) {
   if (extra && Object.keys(extra).length > 0) {
-    console.log(`${LOG21} ${message}`, extra);
+    console.log(`${LOG19} ${message}`, extra);
   } else {
-    console.log(`${LOG21} ${message}`);
+    console.log(`${LOG19} ${message}`);
   }
 }
 function parseEspnEventId(game) {
@@ -47319,13 +47164,13 @@ function gameHasParamountBroadcast(game) {
 }
 
 // ../grarf/desktop/src/lib/watch/providers/paramountResolver.ts
-var LOG22 = "[Paramount]";
+var LOG20 = "[Paramount]";
 function resolveParamountWatchOption(game) {
   const cached = getCachedStreamUrl("Paramount+", game.id);
   const streamUrl = game.streamUrl?.trim() || cached;
   if (!streamUrl) return null;
   if (game.streamProvider !== "Paramount+" && !gameHasParamountBroadcast(game)) return null;
-  console.log(`${LOG22} Resolved stream URL for match`, {
+  console.log(`${LOG20} Resolved stream URL for match`, {
     gameId: game.id,
     league: game.league,
     streamUrl
@@ -47355,7 +47200,7 @@ function gameHasPeacockBroadcast(game) {
 }
 
 // ../grarf/desktop/src/lib/watch/providers/peacockResolver.ts
-var LOG23 = "[Peacock]";
+var LOG21 = "[Peacock]";
 function resolvePeacockWatchOption(game) {
   if (game.league === "WORLDCUP") return null;
   const cached = getCachedStreamUrl("Peacock", game.id);
@@ -47376,8 +47221,8 @@ function resolvePeacockWatchOption(game) {
     };
   }
   if (game.streamProvider !== "Peacock" && !gameHasPeacockBroadcast(game)) return null;
-  console.log(`${LOG23} Resolved playback URL`, streamUrl);
-  console.log(`${LOG23} Resolved stream URL for match`, {
+  console.log(`${LOG21} Resolved playback URL`, streamUrl);
+  console.log(`${LOG21} Resolved stream URL for match`, {
     gameId: game.id,
     league: game.league,
     streamUrl
@@ -47414,7 +47259,7 @@ function gameHasAppleTvResolvableStream(game) {
 }
 
 // ../grarf/desktop/src/lib/watch/providers/appleTvResolver.ts
-var LOG24 = "[AppleTV]";
+var LOG22 = "[AppleTV]";
 function resolveAppleTvWatchOption(game) {
   if (!gameHasAppleTvResolvableStream(game)) return null;
   const cached = getCachedStreamUrl("Apple TV", game.id);
@@ -47423,7 +47268,7 @@ function resolveAppleTvWatchOption(game) {
   if (game.streamProvider !== "Apple TV" && !gameHasAppleTvBroadcast(game) && game.league !== "F1") {
     return null;
   }
-  console.log(`${LOG24} Resolved stream URL for match`, {
+  console.log(`${LOG22} Resolved stream URL for match`, {
     gameId: game.id,
     league: game.league,
     streamUrl
@@ -48207,12 +48052,12 @@ init_isGrarfWebRenderer();
 
 // ../grarf/desktop/src/lib/watch/watchDebug.ts
 init_define_import_meta_env();
-var LOG25 = "[Watch]";
+var LOG23 = "[Watch]";
 function watchDebug(message, extra) {
   if (extra && Object.keys(extra).length > 0) {
-    console.log(`${LOG25} ${message}`, extra);
+    console.log(`${LOG23} ${message}`, extra);
   } else {
-    console.log(`${LOG25} ${message}`);
+    console.log(`${LOG23} ${message}`);
   }
 }
 
@@ -48228,12 +48073,12 @@ function launchLegacyMlbWatch(game, dispatch) {
 
 // ../grarf/desktop/src/lib/watch/peacockExternalLaunch.ts
 init_define_import_meta_env();
-var LOG26 = "[Peacock]";
+var LOG24 = "[Peacock]";
 var WATCH_LOG2 = "[Watch]";
 function openPeacockPlaybackExternally(url) {
   const href = url.trim();
   if (!href) return;
-  console.log(`${LOG26} Resolved playback URL`, href);
+  console.log(`${LOG24} Resolved playback URL`, href);
   console.log(`${WATCH_LOG2} Provider launchMode: external`);
   console.log(`${WATCH_LOG2} Opening Peacock stream in system browser`);
   void window.grarf?.openExternalUrl?.(href)?.then((res) => {
@@ -48408,21 +48253,21 @@ function tryLaunchDirectStreamWatch(game, dispatch) {
 
 // ../grarf/desktop/src/lib/watch/usaNetworkWatch.ts
 init_define_import_meta_env();
-var LOG27 = "[Watch]";
+var LOG25 = "[Watch]";
 function tryLaunchUsaNetworkWatch(game) {
   const hasUsa = game.streamProvider === "USA" || gameRowHasUsaNetworkBroadcast(game);
   if (!hasUsa) return false;
   const url = game.streamUrl?.trim() || resolveUsaNetworkStreamUrl(game) || USA_NETWORK_LIVE_URL;
-  console.log(`${LOG27} Launching USA stream externally`);
-  console.log(`${LOG27} streamProvider=USA streamUrl=${url} launchMode=external`);
-  console.log(`${LOG27} Executing external launch: ${url}`);
+  console.log(`${LOG25} Launching USA stream externally`);
+  console.log(`${LOG25} streamProvider=USA streamUrl=${url} launchMode=external`);
+  console.log(`${LOG25} Executing external launch: ${url}`);
   openWatchStreamExternally(url, "USA Network");
   return true;
 }
 
 // ../grarf/desktop/src/lib/watch/wnbaWatchLive.ts
 init_define_import_meta_env();
-var LOG28 = "[WNBA]";
+var LOG26 = "[WNBA]";
 var PRIME_VIDEO_PROVIDER = "Prime Video";
 function resolveWnbaWatchStreamUrl(game) {
   const direct = game.streamUrl?.trim();
@@ -48477,13 +48322,13 @@ function gameHasResolvableWnbaWatchLive(game) {
   return resolveWnbaWatchStreamUrl(game) != null;
 }
 function logWnbaWatchLiveRendered(game) {
-  console.log(`${LOG28} WATCH LIVE rendered`, {
+  console.log(`${LOG26} WATCH LIVE rendered`, {
     gameId: game.id,
     streamProvider: game.streamProvider ?? null
   });
 }
 function logWnbaWatchLiveClicked(game) {
-  console.log(`${LOG28} WATCH LIVE clicked`, {
+  console.log(`${LOG26} WATCH LIVE clicked`, {
     gameId: game.id,
     streamProvider: game.streamProvider ?? null,
     streamUrl: resolveWnbaWatchStreamUrl(game)
@@ -48570,7 +48415,7 @@ function handleWatchLiveClick(game, dispatch) {
 
 // ../grarf/desktop/src/lib/watch/operationalWatchLive.ts
 init_define_import_meta_env();
-var LOG29 = "[WatchLive]";
+var LOG27 = "[WatchLive]";
 function gameHasOperationalWatchLive(game) {
   if (aflGameHasResolvableWatchStream(game)) return true;
   const url = game.streamUrl?.trim();
@@ -48583,9 +48428,9 @@ function logWatchLiveOperationalAlert(_game) {
 function logWatchLiveLaunch(game) {
   if (!define_import_meta_env_default.DEV) return;
   if (game.streamProvider) {
-    console.log(`${LOG29} Launching provider: ${game.streamProvider}`);
+    console.log(`${LOG27} Launching provider: ${game.streamProvider}`);
     if (game.streamProvider === "Peacock" || game.streamProvider === "USA" || game.streamProvider === "Tennis Channel+" || game.streamProvider === "FOX Sports") {
-      console.log(`${LOG29} Opening external browser`);
+      console.log(`${LOG27} Opening external browser`);
     }
   }
 }
@@ -49212,7 +49057,7 @@ init_isGrarfWebRenderer();
 
 // ../grarf/desktop/src/lib/workspace/paneContainment.ts
 init_define_import_meta_env();
-var LOG30 = "[PaneLayout]";
+var LOG28 = "[PaneLayout]";
 var PANE_LAYOUT_RESIZE_EVENT = "grarf:pane-resize";
 function dispatchPaneLayoutResize() {
   if (typeof window === "undefined") return;
@@ -49224,19 +49069,19 @@ var PANE_EMBED_HOST = "relative h-full w-full min-h-0 min-w-0 max-h-full max-w-f
 var PANE_EMBED_ABSOLUTE_FILL = "absolute inset-0 min-h-0 min-w-0 max-h-full max-w-full overflow-hidden";
 function logPaneContainmentApplied(surface) {
   if (!define_import_meta_env_default.DEV) return;
-  console.log(`${LOG30} Applied overflow containment`, { surface });
+  console.log(`${LOG28} Applied overflow containment`, { surface });
 }
 function logPaneEmbedResized(slot, width, height) {
   if (!define_import_meta_env_default.DEV) return;
-  console.log(`${LOG30} Resized embedded content pane`, { slot, width: Math.round(width), height: Math.round(height) });
+  console.log(`${LOG28} Resized embedded content pane`, { slot, width: Math.round(width), height: Math.round(height) });
 }
 function logPaneBrowserViewConstrained(slot) {
   if (!define_import_meta_env_default.DEV) return;
-  console.log(`${LOG30} BrowserView constrained to parent bounds`, { slot });
+  console.log(`${LOG28} BrowserView constrained to parent bounds`, { slot });
 }
 function logPaneOverflowPrevented(slot) {
   if (!define_import_meta_env_default.DEV) return;
-  console.log(`${LOG30} Prevented pane overflow`, { slot });
+  console.log(`${LOG28} Prevented pane overflow`, { slot });
 }
 
 // ../grarf/desktop/src/components/operationalAlerts/OperationalAlertCard.tsx
@@ -63581,7 +63426,7 @@ function InlineEditableText({
 
 // ../grarf/desktop/src/components/gamesSpine/GameNarrativeCapsule.tsx
 var import_jsx_runtime68 = __toESM(require_jsx_runtime(), 1);
-var LOG31 = "[GamesSpine]";
+var LOG29 = "[GamesSpine]";
 function GameNarrativeCapsule({
   game,
   defaultCollapsed = false,
@@ -63604,9 +63449,9 @@ function GameNarrativeCapsule({
   (0, import_react95.useEffect)(() => {
     if (!text2.trim() && !editMode) return;
     if (define_import_meta_env_default.DEV) {
-      console.log(`${LOG31} Narrative capsule attached to game:`, gameKey);
+      console.log(`${LOG29} Narrative capsule attached to game:`, gameKey);
       if (text2.trim()) {
-        console.log(`${LOG31} Rendering narrative capsule: "${text2.trim()}"`);
+        console.log(`${LOG29} Rendering narrative capsule: "${text2.trim()}"`);
       }
     }
   }, [gameKey, text2, editMode]);
@@ -63680,7 +63525,7 @@ function GameNarrativeCapsule({
 // ../grarf/desktop/src/components/editorial/BriefingPriorityField.tsx
 init_define_import_meta_env();
 var import_jsx_runtime69 = __toESM(require_jsx_runtime(), 1);
-var LOG32 = "[Editorial]";
+var LOG30 = "[Editorial]";
 function BriefingPriorityField({ priority, editMode, onChange }) {
   if (!editMode) return null;
   return /* @__PURE__ */ (0, import_jsx_runtime69.jsxs)(
@@ -63714,7 +63559,7 @@ function BriefingPriorityField({ priority, editMode, onChange }) {
                 return;
               }
               const clamped = Math.min(10, Math.max(1, Math.round(n2)));
-              console.log(`${LOG32} Priority updated: ${clamped}`);
+              console.log(`${LOG30} Priority updated: ${clamped}`);
               onChange(clamped);
             },
             onKeyDown: (e2) => e2.stopPropagation(),
@@ -63862,7 +63707,7 @@ init_define_import_meta_env();
 var MCWS_DISPLAY_LABEL = "MCWS";
 
 // ../grarf/desktop/src/lib/commandBriefing/commandBriefingLeagueLabel.ts
-var LOG33 = "[CommandBriefing]";
+var LOG31 = "[CommandBriefing]";
 var BRIEFING_LEAGUE_LABELS = {
   MLB: "MLB",
   NCAABB: "NCAA BASEBALL",
@@ -63926,11 +63771,11 @@ function resolveCommandBriefingLeagueLabel(game) {
 }
 function logCommandBriefingLeagueLabel(label) {
   if (!define_import_meta_env_default.DEV) return;
-  console.log(`${LOG33} Rendering league label:`, label);
+  console.log(`${LOG31} Rendering league label:`, label);
 }
 function logCommandBriefingMetadataStyling() {
   if (!define_import_meta_env_default.DEV) return;
-  console.log(`${LOG33} Applied operational metadata styling`);
+  console.log(`${LOG31} Applied operational metadata styling`);
 }
 
 // ../grarf/desktop/src/lib/gamesSpine/motorsportSpinePresentation.ts
@@ -68381,7 +68226,7 @@ init_define_import_meta_env();
 // ../grarf/desktop/src/lib/sportscape/editorial/fetchSportscapeEditorialWithFailover.ts
 init_define_import_meta_env();
 var FETCH_TIMEOUT_MS5 = 15e3;
-var LOG34 = "[Sportscape Editorial]";
+var LOG32 = "[Sportscape Editorial]";
 function isTransportFailure(err) {
   if (!(err instanceof Error)) return true;
   const msg = err.message.toLowerCase();
@@ -68410,7 +68255,7 @@ async function fetchSportscapeEditorialWithFailover(path, init, options) {
         errors.push(`${baseUrl}: HTTP ${response.status}`);
         continue;
       }
-      console.log(`${LOG34} Connected via ${baseUrl}`);
+      console.log(`${LOG32} Connected via ${baseUrl}`);
       return { response, baseUrl };
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
@@ -68876,7 +68721,7 @@ var GAMES_SPINE_MORE_LEAGUES_COLLAPSE_KEY = "MORE_LEAGUES";
 // ../grarf/desktop/src/hooks/useGamesSpineCollapse.ts
 init_isGrarfWebRenderer();
 var STORAGE_KEY4 = "grarf-games-spine-collapse-v2";
-var LOG35 = "[GamesSpine]";
+var LOG33 = "[GamesSpine]";
 function collapseStorageKey(statusFilter, leagueKey) {
   return `${statusFilter}:${leagueKey}`;
 }
@@ -68930,7 +68775,7 @@ function useGamesSpineCollapse(statusFilter) {
       const storageKey = collapseStorageKey(statusFilter, leagueKey);
       setCollapsed((prev) => {
         const next = !leagueCollapsedForFilter(prev, leagueKey, statusFilter);
-        console.log(`${LOG35} League ${next ? "collapsed" : "expanded"}:`, leagueKey);
+        console.log(`${LOG33} League ${next ? "collapsed" : "expanded"}:`, leagueKey);
         return { ...prev, [storageKey]: next };
       });
     },
@@ -72027,7 +71872,7 @@ function clearPodcastCache() {
 // ../grarf/desktop/src/components/media/PodcastRailPanel.tsx
 init_isGrarfWebRenderer();
 var import_jsx_runtime104 = __toESM(require_jsx_runtime(), 1);
-var LOG36 = "[Podcasts]";
+var LOG34 = "[Podcasts]";
 function formatDur(sec) {
   if (sec == null || !Number.isFinite(sec)) return "\u2014";
   const m2 = Math.floor(sec / 60);
@@ -72075,7 +71920,7 @@ function PodcastRailPanel({
       setLoading(true);
       setErr(null);
       setFeedErrors(0);
-      console.log(`${LOG36} Loaded ${orderedFeeds.length} feeds`);
+      console.log(`${LOG34} Loaded ${orderedFeeds.length} feeds`);
       const all = [];
       let fromCache = 0;
       let fetched = 0;
@@ -72113,7 +71958,7 @@ function PodcastRailPanel({
       const ranked = sortPodcastEpisodesForContext(all, PODCAST_FEEDS, podcastRoutingOpts);
       setEpisodes(ranked.slice(0, 48));
       setFeedErrors(failed);
-      console.log(`${LOG36} Fetched ${all.length} episodes`);
+      console.log(`${LOG34} Fetched ${all.length} episodes`);
       if (all.length === 0) {
         setErr(
           failed >= orderedFeeds.length ? "No episodes available \u2014 RSS unreachable or feeds changed. Try REFRESH or check network." : "No playable episodes in feeds yet. Try REFRESH."
@@ -75690,7 +75535,7 @@ async function runCbsHeadlinesVideoProbe(executeJavaScript, options) {
 // ../grarf/desktop/src/components/homeMvp/HomeHeadlinesCbsPanel.tsx
 var import_jsx_runtime119 = __toESM(require_jsx_runtime(), 1);
 var CBS_SPORTS_HQ_LIVE_URL = "https://www.cbssports.com/watch/live";
-var LOG37 = "[HomeHeadlinesCbs]";
+var LOG35 = "[HomeHeadlinesCbs]";
 var BROWSER_SURFACE_TYPE = "Electron webview (guest WebContents)";
 var HEADLINES_CONTENT_HEIGHT = "h-[19.5rem]";
 var CBS_WEB_PREFS = "contextIsolation=yes,nodeIntegration=no,sandbox=no,javascript=yes,autoplayPolicy=no-user-gesture-required";
@@ -75712,21 +75557,21 @@ function HomeHeadlinesCbsPanel({ embedsEnabled = true, videoUrl }) {
   const showSurface = embedsEnabled && hasWebviewTag();
   (0, import_react136.useLayoutEffect)(() => {
     if (!showSurface) {
-      console.warn(`${LOG37} webview unavailable \u2014 embedsEnabled=${embedsEnabled}`);
+      console.warn(`${LOG35} webview unavailable \u2014 embedsEnabled=${embedsEnabled}`);
       return;
     }
     const wv = wvRef.current;
     if (!wv) return;
-    console.log(`${LOG37} browser surface type:`, BROWSER_SURFACE_TYPE);
-    console.log(`${LOG37} navigation URL:`, navigationUrl);
+    console.log(`${LOG35} browser surface type:`, BROWSER_SURFACE_TYPE);
+    console.log(`${LOG35} navigation URL:`, navigationUrl);
     const onStartLoading = () => {
-      console.log(`${LOG37} did-start-loading`, { url: navigationUrl });
+      console.log(`${LOG35} did-start-loading`, { url: navigationUrl });
     };
     const onNavigate = (event) => {
       const e2 = event;
       if (e2.isMainFrame === false) return;
       finalUrlRef.current = e2.url ?? finalUrlRef.current;
-      console.log(`${LOG37} did-navigate (redirect)`, {
+      console.log(`${LOG35} did-navigate (redirect)`, {
         url: e2.url,
         finalUrl: finalUrlRef.current
       });
@@ -75736,7 +75581,7 @@ function HomeHeadlinesCbsPanel({ embedsEnabled = true, videoUrl }) {
       if (e2.isMainFrame === false) return;
       if (e2.errorCode === -3) return;
       const message = formatLoadError(e2);
-      console.error(`${LOG37} did-fail-load`, {
+      console.error(`${LOG35} did-fail-load`, {
         errorCode: e2.errorCode,
         errorDescription: e2.errorDescription,
         validatedURL: e2.validatedURL
@@ -75747,12 +75592,12 @@ function HomeHeadlinesCbsPanel({ embedsEnabled = true, videoUrl }) {
       const e2 = event;
       if (e2.isMainFrame === false) return;
       const status = e2.httpResponseCode ?? e2.statusCode;
-      console.log(`${LOG37} did-get-response-details`, {
+      console.log(`${LOG35} did-get-response-details`, {
         status,
         url: e2.url
       });
       if (status != null && status >= 400) {
-        console.error(`${LOG37} HTTP error`, { status, url: e2.url });
+        console.error(`${LOG35} HTTP error`, { status, url: e2.url });
       }
       if (status != null && status >= 500) {
         setLoadError(`HTTP ${status} \u2014 ${e2.url ?? navigationUrl}`);
@@ -75765,7 +75610,7 @@ function HomeHeadlinesCbsPanel({ embedsEnabled = true, videoUrl }) {
       } catch {
       }
       finalUrlRef.current = resolvedUrl;
-      console.log(`${LOG37} did-finish-load`, {
+      console.log(`${LOG35} did-finish-load`, {
         result: "ok",
         finalUrl: resolvedUrl
       });
@@ -75776,10 +75621,10 @@ function HomeHeadlinesCbsPanel({ embedsEnabled = true, videoUrl }) {
       void wv.executeJavaScript("window.location.href").then((href) => {
         if (typeof href === "string" && href) {
           finalUrlRef.current = href;
-          console.log(`${LOG37} final navigation URL after redirects:`, href);
+          console.log(`${LOG35} final navigation URL after redirects:`, href);
         }
       }).catch((err) => {
-        console.warn(`${LOG37} final URL probe failed`, err);
+        console.warn(`${LOG35} final URL probe failed`, err);
       });
     };
     const onConsoleMessage = (event) => {
@@ -75790,28 +75635,28 @@ function HomeHeadlinesCbsPanel({ embedsEnabled = true, videoUrl }) {
       const isCert = lower.includes("certificate") || lower.includes("ssl") || lower.includes("net::err_cert");
       const isAutoplay = lower.includes("autoplay") || lower.includes("play() request") || lower.includes("notallowederror");
       if (isCsp) {
-        console.error(`${LOG37} CSP console error`, {
+        console.error(`${LOG35} CSP console error`, {
           level: e2.level,
           message,
           sourceId: e2.sourceId,
           line: e2.line
         });
       } else if (isCert) {
-        console.error(`${LOG37} certificate console error`, {
+        console.error(`${LOG35} certificate console error`, {
           level: e2.level,
           message,
           sourceId: e2.sourceId,
           line: e2.line
         });
       } else if (isAutoplay) {
-        console.warn(`${LOG37} media autoplay console message`, {
+        console.warn(`${LOG35} media autoplay console message`, {
           level: e2.level,
           message,
           sourceId: e2.sourceId,
           line: e2.line
         });
       } else if (e2.level === 3) {
-        console.error(`${LOG37} console error`, {
+        console.error(`${LOG35} console error`, {
           message,
           sourceId: e2.sourceId,
           line: e2.line
@@ -89796,7 +89641,7 @@ function buildCommandBriefingGamePool(input) {
 
 // ../grarf/desktop/src/lib/commandBriefing/selectBriefingGames.ts
 init_define_import_meta_env();
-var LOG38 = "[CommandBriefing]";
+var LOG36 = "[CommandBriefing]";
 function defaultBriefingNarrative(game) {
   const away = game.awayTeam?.trim();
   const home = game.homeTeam?.trim();
@@ -89839,13 +89684,13 @@ function selectBriefingGames(games, bundle, dateKey, _fallbacks = {}, leagueScop
     const narrative = resolveEditorialGameNarrative(game, bundle, dateKey)?.text?.trim() ?? defaultBriefingNarrative(game);
     seen.add(editorialKey);
     if (define_import_meta_env_default.DEV) {
-      console.log(`${LOG38} Included game: ${game.awayTeam} vs ${game.homeTeam}`);
+      console.log(`${LOG36} Included game: ${game.awayTeam} vs ${game.homeTeam}`);
     }
     out.push({ game, priority, narrative });
   }
   const ranked = sortBriefingRankedForDisplay(out);
   if (define_import_meta_env_default.DEV && ranked.length > 0) {
-    console.log(`${LOG38} Generated from ranked games: ${ranked.length} items`);
+    console.log(`${LOG36} Generated from ranked games: ${ranked.length} items`);
   }
   return ranked;
 }
@@ -91033,7 +90878,7 @@ function LeagueHomeWebPane({
 init_define_import_meta_env();
 var import_react195 = __toESM(require_react(), 1);
 var import_jsx_runtime186 = __toESM(require_jsx_runtime(), 1);
-var LOG39 = "[MlbCatchUpStandings]";
+var LOG37 = "[MlbCatchUpStandings]";
 var MLB_CATCH_UP_PRIMARY_STANDINGS_URL = "https://mlb.theohtani.com/standings/2026";
 var MLB_CATCH_UP_FALLBACK_STANDINGS_URL = "https://www.fangraphs.com/standings/playoff-odds";
 var LOAD_TIMEOUT_MS = 3e4;
@@ -91075,13 +90920,13 @@ function MlbCatchUpStandingsPane({ paneId, className }) {
       if (!isPrimarySrc(activeSrcRef.current)) return;
       fallbackUsedRef.current = true;
       clearLoadTimeout();
-      console.log(`${LOG39} Primary standings load failed (${reason})`);
-      console.log(`${LOG39} FanGraphs fallback activated`);
+      console.log(`${LOG37} Primary standings load failed (${reason})`);
+      console.log(`${LOG37} FanGraphs fallback activated`);
       setActiveSrc(MLB_CATCH_UP_FALLBACK_STANDINGS_URL);
     };
     const onStartLoading = () => {
       if (isPrimarySrc(activeSrcRef.current) && !fallbackUsedRef.current) {
-        console.log(`${LOG39} Primary standings load started`);
+        console.log(`${LOG37} Primary standings load started`);
         clearLoadTimeout();
         loadTimeout = setTimeout(() => activateFallback("timeout"), LOAD_TIMEOUT_MS);
       }
@@ -91110,7 +90955,7 @@ function MlbCatchUpStandingsPane({ paneId, className }) {
     const onFinishLoad = () => {
       clearLoadTimeout();
       if (isFallbackSrc(activeSrcRef.current)) {
-        console.log(`${LOG39} FanGraphs fallback loaded successfully`);
+        console.log(`${LOG37} FanGraphs fallback loaded successfully`);
         return;
       }
       if (!isPrimarySrc(activeSrcRef.current) || fallbackUsedRef.current) return;
@@ -91204,7 +91049,7 @@ function sortBriefingPriorityGames(games, bundle, dateKey) {
 
 // ../grarf/desktop/src/lib/rss/rssFetchDiagnostics.ts
 init_define_import_meta_env();
-var LOG40 = "[RSS DEBUG]";
+var LOG38 = "[RSS DEBUG]";
 function classifyRssBody(body) {
   const text2 = typeof body === "string" ? body : "";
   const trimmed = text2.trimStart();
@@ -91236,7 +91081,7 @@ function headersToRecord(headers) {
 }
 async function diagnoseRendererRssFetch(url) {
   const label = "renderer-fetch";
-  console.group(`${LOG40}[${label}] ${url}`);
+  console.group(`${LOG38}[${label}] ${url}`);
   try {
     const started = performance.now();
     const res = await fetch(url, {
@@ -91248,7 +91093,7 @@ async function diagnoseRendererRssFetch(url) {
     });
     const body = await res.text();
     const classification = classifyRssBody(body);
-    console.log(`${LOG40}[${label}] metadata`, {
+    console.log(`${LOG38}[${label}] metadata`, {
       finalUrl: res.url,
       status: res.status,
       statusText: res.statusText,
@@ -91261,19 +91106,19 @@ async function diagnoseRendererRssFetch(url) {
       elapsedMs: Math.round(performance.now() - started),
       ...classification
     });
-    console.log(`${LOG40}[${label}] preview`, previewRssBody(body));
+    console.log(`${LOG38}[${label}] preview`, previewRssBody(body));
   } catch (e2) {
-    console.error(`${LOG40}[${label}] threw`, e2);
+    console.error(`${LOG38}[${label}] threw`, e2);
   } finally {
     console.groupEnd();
   }
 }
 async function diagnoseElectronRssFetch(url) {
   const label = "electron-helper";
-  console.group(`${LOG40}[${label}] ${url}`);
+  console.group(`${LOG38}[${label}] ${url}`);
   const bridge3 = typeof window !== "undefined" ? window.grarf?.tickerRssFetch : void 0;
   if (!bridge3) {
-    console.warn(`${LOG40}[${label}] window.grarf.tickerRssFetch unavailable (not in Electron?)`);
+    console.warn(`${LOG38}[${label}] window.grarf.tickerRssFetch unavailable (not in Electron?)`);
     console.groupEnd();
     return;
   }
@@ -91283,7 +91128,7 @@ async function diagnoseElectronRssFetch(url) {
   const xml = result && "ok" in result && result.ok === true && "xml" in result ? result.xml : "";
   const classification = classifyRssBody(xml);
   const debugAttempts = result && typeof result === "object" && "_rssDebug" in result ? result._rssDebug : void 0;
-  console.log(`${LOG40}[${label}] bridge summary`, {
+  console.log(`${LOG38}[${label}] bridge summary`, {
     ok: result && "ok" in result ? result.ok : void 0,
     status: result && "status" in result ? result.status : void 0,
     statusText: result && "statusText" in result ? result.statusText : void 0,
@@ -91292,23 +91137,23 @@ async function diagnoseElectronRssFetch(url) {
     ...classification
   });
   if (debugAttempts) {
-    console.log(`${LOG40}[${label}] per-attempt (main process)`, debugAttempts);
+    console.log(`${LOG38}[${label}] per-attempt (main process)`, debugAttempts);
   }
-  console.log(`${LOG40}[${label}] preview`, previewRssBody(xml));
+  console.log(`${LOG38}[${label}] preview`, previewRssBody(xml));
   console.groupEnd();
 }
 function logRssPreParseInput(label, xml) {
   const classification = classifyRssBody(xml);
-  console.log(`${LOG40}[${label}] pre-parse`, {
+  console.log(`${LOG38}[${label}] pre-parse`, {
     ...classification,
     preview: previewRssBody(xml)
   });
 }
 async function runEspnMlbRssFetchDiagnostics(url = "https://www.espn.com/espn/rss/mlb/news") {
-  console.log(`${LOG40} === ESPN MLB RSS fetch diagnosis start ===`, url);
+  console.log(`${LOG38} === ESPN MLB RSS fetch diagnosis start ===`, url);
   await diagnoseElectronRssFetch(url);
   await diagnoseRendererRssFetch(url);
-  console.log(`${LOG40} === ESPN MLB RSS fetch diagnosis end ===`);
+  console.log(`${LOG38} === ESPN MLB RSS fetch diagnosis end ===`);
 }
 
 // ../grarf/desktop/src/components/mlb/MlbHeadlinesFeedPane.tsx
