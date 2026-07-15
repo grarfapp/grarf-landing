@@ -53265,7 +53265,8 @@ var HIGHLIGHTS_TV_CHANNEL_ORDER = [
   { channelNumber: 39, leagueKey: "AFL", label: "AFL", sportGroup: "AUSSIE" },
   { channelNumber: 40, leagueKey: "CHAMPIONS", label: "CHAMPIONS", sportGroup: "SOCCER" },
   { channelNumber: 41, leagueKey: "WIMBLEDON", label: "WIMBLEDON", sportGroup: "TENNIS" },
-  { channelNumber: 42, leagueKey: "TDF", label: "TOUR DE FRANCE", sportGroup: "CYCLING" }
+  { channelNumber: 42, leagueKey: "NBASUMMER", label: "NBA SUMMER LEAGUE", sportGroup: "BASKETBALL" },
+  { channelNumber: 43, leagueKey: "TDF", label: "TOUR DE FRANCE", sportGroup: "CYCLING" }
 ];
 function resolveHighlightsTvConfiguredChannels(rows) {
   const enabledByKey = /* @__PURE__ */ new Map();
@@ -53746,7 +53747,7 @@ init_define_import_meta_env();
 // ../grarf/desktop/src/data/highlightsTvChannelIngestionConfig.ts
 init_define_import_meta_env();
 var HIGHLIGHTS_TV_CHANNEL_INGESTION_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQgtSg_UuFj1FEFnfiMbrXM9nj1cOeZ06IZWllUlIcClVKmgLjhX_0pF3HnOpmpntGZO-yuEvIWt_VD/pub?gid=0&single=true&output=csv";
-var HIGHLIGHTS_TV_PLAYLIST_ONLY_LEAGUE_KEYS = /* @__PURE__ */ new Set(["TDF"]);
+var HIGHLIGHTS_TV_PLAYLIST_ONLY_LEAGUE_KEYS = /* @__PURE__ */ new Set();
 function isHighlightsTvPlaylistOnlyLeagueKey(leagueKey) {
   return HIGHLIGHTS_TV_PLAYLIST_ONLY_LEAGUE_KEYS.has(leagueKey.trim().toUpperCase());
 }
@@ -54465,39 +54466,13 @@ async function fetchHighlightsTvIngestionSourceVideos(sourceType, sourceUrl, opt
 }
 
 // ../grarf/desktop/src/lib/highlightsTv/ingestHighlightsTvChannelClips.ts
-function resolveOperationsHighlightsTvStaticRows() {
-  const tdf = resolveAggregatedTdfManualEventOverride();
-  if (!tdf?.highlightsTv) return [];
-  const highlightsTv = tdf.highlightsTv;
-  return [
-    {
-      SPORT: highlightsTv.sport,
-      LEAGUE_KEY: "TDF",
-      SOURCE_TYPE: highlightsTv.sourceType,
-      URL: highlightsTv.url,
-      REQUIRED_TITLE_KEYWORDS: highlightsTv.requiredTitleKeywords,
-      EXCLUDED_KEYWORDS: highlightsTv.excludedKeywords,
-      ENABLED: highlightsTv.enabled ? "true" : "false"
-    }
-  ];
-}
-function mergeHighlightsTvChannelIngestionRows(csvRows) {
-  const byKey = /* @__PURE__ */ new Map();
-  for (const row of csvRows) {
-    byKey.set(resolveHighlightsTvCanonicalLeagueKey(row.LEAGUE_KEY), row);
-  }
-  for (const row of resolveOperationsHighlightsTvStaticRows()) {
-    byKey.set(resolveHighlightsTvCanonicalLeagueKey(row.LEAGUE_KEY), row);
-  }
-  return [...byKey.values()];
-}
 async function loadHighlightsTvChannelIngestionRows() {
   const response = await fetch(HIGHLIGHTS_TV_CHANNEL_INGESTION_CSV_URL, { cache: "no-store" });
   if (!response.ok) {
     throw new Error(`highlights_tv_channel_ingestion_csv_${response.status || "fetch_failed"}`);
   }
   const csv = await response.text();
-  return mergeHighlightsTvChannelIngestionRows(parseHighlightsTvChannelIngestionCsv(csv));
+  return parseHighlightsTvChannelIngestionCsv(csv);
 }
 function findHighlightsTvIngestionRow(rows, leagueKey) {
   const normalizedKey = resolveHighlightsTvCanonicalLeagueKey(leagueKey);
@@ -91292,6 +91267,20 @@ var HIGHLIGHTS_TV_MVP_SEED = {
       leagueLabel: "WNBA",
       defaultExpanded: false,
       youtubePlaylistUrl: "https://youtube.com/playlist?list=PLSPy3Xok-53RkJ8DpqGA6FQSOIY5HepSB&si=aqzalM590mhvXvnP",
+      clips: []
+    },
+    {
+      leagueKey: "NBASUMMER",
+      leagueLabel: "NBA SUMMER LEAGUE",
+      defaultExpanded: false,
+      youtubePlaylistUrl: "https://youtube.com/playlist?list=PLKvpcq43coWo&si=QDk5uobVN6T9_Qba",
+      clips: []
+    },
+    {
+      leagueKey: "TDF",
+      leagueLabel: "TOUR DE FRANCE",
+      defaultExpanded: false,
+      youtubePlaylistUrl: "https://youtube.com/playlist?list=PLWuO6-g6SGnU&si=H3f5Wj_J7AGCyCdB",
       clips: []
     }
   ]
