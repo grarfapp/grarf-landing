@@ -70407,7 +70407,7 @@ function resolvePrototypeVideoThumbnailUrl(video) {
   return video.youtubeVideoId ? `https://img.youtube.com/vi/${video.youtubeVideoId}/hqdefault.jpg` : "";
 }
 function resolvePrototypeEmbedSrc(videoId) {
-  return `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1`;
+  return `https://www.youtube-nocookie.com/embed/${videoId}?rel=0&modestbranding=1`;
 }
 function mapMlbCatchupHighlightToPrototypeVideo(highlight) {
   return mlbCatchupHighlightToGameHighlightVideo(highlight);
@@ -70565,7 +70565,7 @@ function TdfStage8HighlightSection({
   showSpineNarrative,
   hideSpineGeneratedSummaryHeadline
 }) {
-  const [expanded, setExpanded] = (0, import_react106.useState)(true);
+  const [expanded, setExpanded] = (0, import_react106.useState)(false);
   const narrativeSlot = expanded ? /* @__PURE__ */ (0, import_jsx_runtime89.jsx)(TdfStage8InlinePlayer, { video, onCollapse: () => setExpanded(false) }) : /* @__PURE__ */ (0, import_jsx_runtime89.jsx)(TdfStage8CollapsedThumbnail, { video, onExpand: () => setExpanded(true) });
   return /* @__PURE__ */ (0, import_jsx_runtime89.jsx)(
     GameRow,
