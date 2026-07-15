@@ -52820,43 +52820,6 @@ function resolveDemoOperationalAlertGame(gameId) {
 init_define_import_meta_env();
 var import_react38 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/config/leagueHighlightProviders.ts
-init_define_import_meta_env();
-
-// ../grarf/desktop/src/services/highlights/providers/registry.ts
-init_define_import_meta_env();
-
-// ../grarf/desktop/src/services/highlights/providers/mlb.ts
-init_define_import_meta_env();
-var MLB_HIGHLIGHTS_PLAYLIST_ID = "PLL-lmlkrmJak3neKKEataBelAVfdkBbDX";
-var MLB_HIGHLIGHT_PROVIDER = {
-  league: "MLB",
-  source: "youtube_playlist",
-  playlistId: MLB_HIGHLIGHTS_PLAYLIST_ID,
-  cacheTtlMs: 45 * 60 * 1e3,
-  maxPlaylistItems: 75
-};
-
-// ../grarf/desktop/src/services/highlights/providers/registry.ts
-var REGISTRY = {
-  MLB: MLB_HIGHLIGHT_PROVIDER
-};
-function getHighlightProvider(league) {
-  const key2 = league.trim().toUpperCase();
-  return REGISTRY[key2] ?? null;
-}
-
-// ../grarf/desktop/src/config/leagueHighlightProviders.ts
-var LEAGUE_HIGHLIGHT_PROVIDERS = {
-  MLB: {
-    league: "MLB",
-    playlistId: "PLL-lmlkrmJak3neKKEataBelAVfdkBbDX",
-    titlePatterns: ["highlight", "highlights"],
-    cacheTtlMs: 45 * 60 * 1e3,
-    maxPlaylistItems: 75
-  }
-};
-
 // ../grarf/desktop/src/lib/gamesSpine/applyCanonicalGamesSpineEnrichment.ts
 init_define_import_meta_env();
 
@@ -53128,10 +53091,44 @@ function applyCanonicalGamesSpineEnrichment(game, operationsFields, highlightCon
 // ../grarf/desktop/src/lib/leagueHighlights/fetchGameLeagueHighlight.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/leagueHighlights/fetchGameLeagueHighlightWeb.ts
+// ../grarf/desktop/src/config/leagueHighlightProviders.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/highlightsTv/ingestHighlightsTvChannelClips.ts
+// ../grarf/desktop/src/services/highlights/providers/registry.ts
+init_define_import_meta_env();
+
+// ../grarf/desktop/src/services/highlights/providers/mlb.ts
+init_define_import_meta_env();
+var MLB_HIGHLIGHTS_PLAYLIST_ID = "PLL-lmlkrmJak3neKKEataBelAVfdkBbDX";
+var MLB_HIGHLIGHT_PROVIDER = {
+  league: "MLB",
+  source: "youtube_playlist",
+  playlistId: MLB_HIGHLIGHTS_PLAYLIST_ID,
+  cacheTtlMs: 45 * 60 * 1e3,
+  maxPlaylistItems: 75
+};
+
+// ../grarf/desktop/src/services/highlights/providers/registry.ts
+var REGISTRY = {
+  MLB: MLB_HIGHLIGHT_PROVIDER
+};
+function getHighlightProvider(league) {
+  const key2 = league.trim().toUpperCase();
+  return REGISTRY[key2] ?? null;
+}
+
+// ../grarf/desktop/src/config/leagueHighlightProviders.ts
+var LEAGUE_HIGHLIGHT_PROVIDERS = {
+  MLB: {
+    league: "MLB",
+    playlistId: "PLL-lmlkrmJak3neKKEataBelAVfdkBbDX",
+    titlePatterns: ["highlight", "highlights"],
+    cacheTtlMs: 45 * 60 * 1e3,
+    maxPlaylistItems: 75
+  }
+};
+
+// ../grarf/desktop/src/lib/leagueHighlights/fetchGameLeagueHighlightWeb.ts
 init_define_import_meta_env();
 
 // ../grarf/desktop/src/data/highlightsTvChannelOrder.ts
@@ -53221,6 +53218,11 @@ function resolveHighlightsTvSeedLeagueKey(channelLeagueKey) {
   if (canonical === "GTWORLD") return "GT_WORLD_CHALLENGE";
   return canonical;
 }
+function resolveHighlightsTvIngestionLeagueKeyForGameLeague(gameLeague) {
+  const canonical = resolveHighlightsTvCanonicalLeagueKey(gameLeague);
+  if (canonical === "GT_WORLD_CHALLENGE") return "GTWORLD";
+  return canonical;
+}
 var HIGHLIGHTS_TV_CHANNEL_ORDER = [
   { channelNumber: 1, leagueKey: "WORLDCUP", label: "WORLD CUP", sportGroup: "SOCCER" },
   { channelNumber: 2, leagueKey: "WWC", label: "WWC", sportGroup: "SOCCER" },
@@ -53290,6 +53292,456 @@ function resolveHighlightsTvConfiguredChannels(rows) {
   }
   return configured;
 }
+
+// ../grarf/desktop/src/lib/highlightsTv/filterHighlightsTvAmbientEligibleClips.ts
+init_define_import_meta_env();
+
+// ../grarf/desktop/src/lib/leagueHighlights/resolveLeagueHighlightGamePayload.ts
+init_define_import_meta_env();
+function resolveLeagueHighlightGamePayload(game) {
+  return {
+    gameId: game.id,
+    league: game.league ?? "MLB",
+    awayTeam: game.awayTeam,
+    homeTeam: game.homeTeam,
+    awayCity: game.awayCity,
+    homeCity: game.homeCity,
+    officialAwayName: game.metadata?.officialAwayName,
+    officialHomeName: game.metadata?.officialHomeName,
+    startTimeMs: game.startTimeMs,
+    scheduledDateKey: game.startTimeMs && Number.isFinite(game.startTimeMs) ? formatBriefingDateKey(new Date(game.startTimeMs)) : formatBriefingDateKey()
+  };
+}
+function resolveLeagueHighlightFetchKey(payload) {
+  return [
+    payload.gameId,
+    payload.league,
+    payload.awayTeam,
+    payload.homeTeam,
+    payload.awayCity ?? "",
+    payload.homeCity ?? "",
+    payload.officialAwayName ?? "",
+    payload.officialHomeName ?? "",
+    String(payload.startTimeMs ?? ""),
+    payload.scheduledDateKey ?? ""
+  ].join("");
+}
+
+// ../grarf/desktop/src/services/mediaResolution/scoreTitleMatch.ts
+init_define_import_meta_env();
+
+// ../grarf/desktop/src/services/mediaResolution/teamAliases.ts
+init_define_import_meta_env();
+function normalizeTeamToken(s2) {
+  return String(s2 || "").toLowerCase().replace(/\./g, "").replace(/[^a-z0-9\s]/g, " ").replace(/\s+/g, " ").trim();
+}
+function buildTeamAliasTerms(game, side) {
+  const terms = /* @__PURE__ */ new Set();
+  const team = side === "away" ? game.awayTeam : game.homeTeam;
+  const city = side === "away" ? game.awayCity : game.homeCity;
+  const official = side === "away" ? game.officialAwayName : game.officialHomeName;
+  for (const raw of [team, city, official]) {
+    if (raw == null || !String(raw).trim()) continue;
+    const n2 = normalizeTeamToken(String(raw));
+    if (n2.length < 3) continue;
+    terms.add(n2);
+    const parts = n2.split(" ").filter(Boolean);
+    if (parts.length > 1) {
+      terms.add(parts[parts.length - 1]);
+      terms.add(parts.slice(-2).join(" "));
+    }
+  }
+  if (terms.has("athletics")) terms.add("a s");
+  return [...terms];
+}
+
+// ../grarf/desktop/src/services/mediaResolution/scoreTitleMatch.ts
+function fragmentMatchesTerms(fragment, terms) {
+  const f2 = normalizeTeamToken(fragment);
+  if (!f2) return false;
+  return terms.some((t2) => t2.length >= 3 && (f2.includes(t2) || t2.includes(f2)));
+}
+function scoreTitleAgainstGame(title, game, titlePatterns = ["highlight", "highlights"]) {
+  const reasons = [];
+  const awayTerms = buildTeamAliasTerms(game, "away");
+  const homeTerms = buildTeamAliasTerms(game, "home");
+  const lower = title.toLowerCase();
+  let teamMatch = false;
+  const vs2 = title.match(/(.+?)\s+vs\.?\s+(.+?)(?:\s|—|-|:|\||$)/i);
+  if (vs2) {
+    const left = vs2[1] ?? "";
+    const right = vs2[2] ?? "";
+    const aLeft = fragmentMatchesTerms(left, awayTerms);
+    const hLeft = fragmentMatchesTerms(left, homeTerms);
+    const aRight = fragmentMatchesTerms(right, awayTerms);
+    const hRight = fragmentMatchesTerms(right, homeTerms);
+    teamMatch = aLeft && hRight || hLeft && aRight;
+    if (teamMatch) reasons.push("both_teams_in_title");
+  } else {
+    const awayHit = awayTerms.some((term) => normalizeTeamToken(title).includes(term));
+    const homeHit = homeTerms.some((term) => normalizeTeamToken(title).includes(term));
+    teamMatch = awayHit && homeHit;
+    if (teamMatch) reasons.push("both_teams_in_title");
+  }
+  const highlightKeyword = titlePatterns.some((p2) => lower.includes(p2.toLowerCase()));
+  if (highlightKeyword) reasons.push("highlight_keyword");
+  return { teamMatch, highlightKeyword, reasons };
+}
+function resolveGameDayKey(game) {
+  if (game.scheduledDateKey?.trim()) return game.scheduledDateKey.trim();
+  const ms2 = game.startTimeMs;
+  if (ms2 && Number.isFinite(ms2)) {
+    const d2 = new Date(ms2);
+    const y2 = d2.getFullYear();
+    const m2 = String(d2.getMonth() + 1).padStart(2, "0");
+    const day = String(d2.getDate()).padStart(2, "0");
+    return `${y2}-${m2}-${day}`;
+  }
+  return null;
+}
+var MLB_HIGHLIGHT_MONTH_NAME_TO_NUMBER = {
+  january: 1,
+  february: 2,
+  march: 3,
+  april: 4,
+  may: 5,
+  june: 6,
+  july: 7,
+  august: 8,
+  september: 9,
+  october: 10,
+  november: 11,
+  december: 12
+};
+function formatParsedDateYmd(month, day, year) {
+  if (!Number.isFinite(month) || !Number.isFinite(day) || !Number.isFinite(year)) return null;
+  if (month < 1 || month > 12 || day < 1 || day > 31) return null;
+  return `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+}
+function parseMlbGameHighlightTitleDate(title, referenceDateYmd) {
+  const raw = String(title ?? "").trim();
+  if (!raw) return null;
+  const referenceYear = Number(referenceDateYmd.split("-")[0]);
+  const referenceYearValid = Number.isFinite(referenceYear) && referenceYear > 0;
+  const parenSlash = raw.match(/\((\d{1,2})\/(\d{1,2})\/(\d{2,4})\)/);
+  if (parenSlash) {
+    const month = Number(parenSlash[1]);
+    const day = Number(parenSlash[2]);
+    let year = Number(parenSlash[3]);
+    if (String(parenSlash[3]).length === 2) year = 2e3 + year;
+    return formatParsedDateYmd(month, day, year);
+  }
+  const slashYmd = raw.match(/\b(\d{1,2})\/(\d{1,2})\/(\d{4})\b/);
+  if (slashYmd) {
+    return formatParsedDateYmd(Number(slashYmd[1]), Number(slashYmd[2]), Number(slashYmd[3]));
+  }
+  const monthName = raw.match(
+    /\b(january|february|march|april|may|june|july|august|september|october|november|december)\s+(\d{1,2}),?\s+(\d{4})\b/i
+  );
+  if (monthName) {
+    const month = MLB_HIGHLIGHT_MONTH_NAME_TO_NUMBER[monthName[1].toLowerCase()];
+    if (!month) return null;
+    return formatParsedDateYmd(month, Number(monthName[2]), Number(monthName[3]));
+  }
+  const parenMonthDay = raw.match(
+    /\((january|february|march|april|may|june|july|august|september|october|november|december)\s+(\d{1,2})\)/i
+  );
+  if (parenMonthDay && referenceYearValid) {
+    const month = MLB_HIGHLIGHT_MONTH_NAME_TO_NUMBER[parenMonthDay[1].toLowerCase()];
+    if (!month) return null;
+    return formatParsedDateYmd(month, Number(parenMonthDay[2]), referenceYear);
+  }
+  const parenSlashNoYear = raw.match(/\((\d{1,2})\/(\d{1,2})\)/);
+  if (parenSlashNoYear && referenceYearValid) {
+    return formatParsedDateYmd(
+      Number(parenSlashNoYear[1]),
+      Number(parenSlashNoYear[2]),
+      referenceYear
+    );
+  }
+  return null;
+}
+function mlbGameHighlightTitleMatchesGameDay(title, game) {
+  const gameDayKey = resolveGameDayKey(game);
+  if (!gameDayKey) return false;
+  const parsed = parseMlbGameHighlightTitleDate(title, gameDayKey);
+  return parsed != null && parsed === gameDayKey;
+}
+function dayKeyFromMs(ms2) {
+  if (!Number.isFinite(ms2)) return null;
+  const d2 = new Date(ms2);
+  const y2 = d2.getFullYear();
+  const m2 = String(d2.getMonth() + 1).padStart(2, "0");
+  const day = String(d2.getDate()).padStart(2, "0");
+  return `${y2}-${m2}-${day}`;
+}
+function scoreDateProximity(game, publishedAt) {
+  const publishedMs = Date.parse(publishedAt || "");
+  if (!Number.isFinite(publishedMs) || publishedMs <= 0) {
+    return { score: 0 };
+  }
+  const gameDayKey = resolveGameDayKey(game);
+  const pubDay = dayKeyFromMs(publishedMs);
+  if (gameDayKey && pubDay) {
+    if (pubDay === gameDayKey) return { score: 10, reason: "date_same_day" };
+    const gameMs = game.startTimeMs && Number.isFinite(game.startTimeMs) ? game.startTimeMs : Date.parse(`${gameDayKey}T12:00:00`);
+    const diffDays = (publishedMs - gameMs) / (24 * 60 * 60 * 1e3);
+    if (diffDays >= -1 && diffDays <= 3) return { score: 6, reason: "date_within_3d" };
+    if (diffDays >= -2 && diffDays <= 5) return { score: 3, reason: "date_within_5d" };
+    return { score: 0 };
+  }
+  if (game.startTimeMs && Number.isFinite(game.startTimeMs)) {
+    const diffDays = (publishedMs - game.startTimeMs) / (24 * 60 * 60 * 1e3);
+    if (diffDays >= -1 && diffDays <= 3) return { score: 6, reason: "date_within_3d" };
+    if (diffDays >= -2 && diffDays <= 5) return { score: 3, reason: "date_within_5d" };
+  }
+  return { score: 0 };
+}
+var MIN_STRONG_MATCH_SCORE = 8;
+
+// ../grarf/desktop/src/lib/highlightsTv/soloCompetitionHighlightMatching.ts
+init_define_import_meta_env();
+
+// ../grarf/desktop/src/lib/gamesSpine/isStandaloneSpineEvent.ts
+init_define_import_meta_env();
+var STANDALONE_SPINE_LEAGUE_KEYS = /* @__PURE__ */ new Set([
+  "WEC",
+  ...GOLF_TOUR_LEAGUE_ORDER,
+  ...Array.from(
+    /* @__PURE__ */ new Set([
+      "F1",
+      "F2",
+      "F3",
+      "FORMULA_E",
+      "NASCAR",
+      "NASCAR_XFINITY",
+      "NASCAR_TRUCK",
+      "INDYCAR",
+      "MOTOGP",
+      "MOTO2",
+      "MOTO3"
+    ])
+  )
+]);
+function isStandaloneSpineLeague(league) {
+  if (league == null) return false;
+  return STANDALONE_SPINE_LEAGUE_KEYS.has(league) || isMotorsportLeagueKey(league);
+}
+function isStandaloneSpineEvent(game) {
+  if (!isStandaloneSpineLeague(game.league)) return false;
+  return !game.homeTeam?.trim();
+}
+
+// ../grarf/desktop/src/lib/highlightsTv/soloCompetitionHighlightMatching.ts
+var SOLO_EVENT_IDENTIFIER_PATTERNS = [
+  /^stage\s+(\d+)\s*$/i,
+  /^round\s+(\d+)\s*$/i,
+  /^race\s+(\d+)\s*$/i,
+  /^session\s+(\d+)\s*$/i
+];
+function readSoloCompetitionLeague(game) {
+  return String(game.league || "").trim().toUpperCase();
+}
+var SOLO_COMPETITION_HIGHLIGHT_LEAGUE_KEYS = /* @__PURE__ */ new Set(["TDF"]);
+function isSoloCompetitionHighlightResolverGame(game) {
+  const league = readSoloCompetitionLeague(game);
+  if (!league) return false;
+  if (isGolfLeagueKey(league)) return true;
+  if (isMotorsportLeagueKey(league)) return true;
+  if (SOLO_COMPETITION_HIGHLIGHT_LEAGUE_KEYS.has(league)) return true;
+  if (isStandaloneSpineLeague(league)) return true;
+  const homeTeam = game.homeTeam?.trim() ?? "";
+  const awayTeam = game.awayTeam?.trim() ?? "";
+  return awayTeam.length > 0 && homeTeam.length === 0;
+}
+function isSoloCompetitionHighlightGame(game) {
+  return isSoloCompetitionHighlightResolverGame(game);
+}
+function resolveRequiredSoloEventIdentifierTerm(awayTeam) {
+  const trimmed = awayTeam.trim();
+  if (!trimmed) return null;
+  for (const pattern of SOLO_EVENT_IDENTIFIER_PATTERNS) {
+    const match = trimmed.match(pattern);
+    if (!match) continue;
+    const prefix = trimmed.match(/^([a-z]+)/i)?.[1]?.toLowerCase();
+    const number = match[1];
+    if (prefix && number) return `${prefix} ${number}`;
+  }
+  return null;
+}
+function normalizedTitleIncludesWholeTerm(normalizedTitle, term) {
+  const normalizedTerm = normalizeTeamToken(term);
+  if (!normalizedTerm || normalizedTerm.length < 3) return false;
+  let start = 0;
+  while (start <= normalizedTitle.length) {
+    const idx = normalizedTitle.indexOf(normalizedTerm, start);
+    if (idx < 0) return false;
+    const before = idx === 0 ? " " : normalizedTitle[idx - 1];
+    const afterIdx = idx + normalizedTerm.length;
+    const after = afterIdx >= normalizedTitle.length ? " " : normalizedTitle[afterIdx];
+    const boundaryBefore = before === " ";
+    const boundaryAfter = after === " ";
+    if (boundaryBefore && boundaryAfter) return true;
+    start = idx + 1;
+  }
+  return false;
+}
+function appendSoloEventSearchTerms(terms, raw) {
+  if (!raw?.trim()) return;
+  for (const segment of raw.split(/[·–—|-]/)) {
+    const normalizedSegment = normalizeTeamToken(segment);
+    if (normalizedSegment.length >= 3) terms.add(normalizedSegment);
+    const parts = normalizedSegment.split(" ").filter(Boolean);
+    if (parts.length > 1) {
+      const last = parts[parts.length - 1];
+      if (last.length >= 3) terms.add(last);
+      terms.add(parts.slice(-2).join(" "));
+    }
+  }
+}
+function buildSoloCompetitionHighlightSearchTerms(game) {
+  const terms = /* @__PURE__ */ new Set();
+  for (const term of buildTeamAliasTerms(game, "away")) {
+    if (term.length >= 3) terms.add(term);
+  }
+  appendSoloEventSearchTerms(terms, game.awayTeam);
+  appendSoloEventSearchTerms(terms, game.officialAwayName);
+  const league = readSoloCompetitionLeague(game);
+  if (league) {
+    const tournamentLabel = resolveGamesSpineLeagueDisplayLabel(league);
+    appendSoloEventSearchTerms(terms, tournamentLabel);
+    appendSoloEventSearchTerms(terms, league);
+  }
+  const requiredIdentifier = resolveRequiredSoloEventIdentifierTerm(game.awayTeam ?? "");
+  if (requiredIdentifier) {
+    terms.add(normalizeTeamToken(requiredIdentifier));
+  }
+  return terms;
+}
+function soloCompetitionHighlightTitleMatchesGame(title, game) {
+  const normalizedTitle = normalizeTeamToken(title);
+  if (!normalizedTitle) return false;
+  const requiredIdentifier = resolveRequiredSoloEventIdentifierTerm(game.awayTeam ?? "");
+  if (requiredIdentifier) {
+    return normalizedTitleIncludesWholeTerm(normalizedTitle, requiredIdentifier);
+  }
+  const terms = buildSoloCompetitionHighlightSearchTerms(game);
+  let matchedTerms = 0;
+  for (const term of terms) {
+    if (term.length < 3) continue;
+    if (!normalizedTitleIncludesWholeTerm(normalizedTitle, term)) continue;
+    matchedTerms += 1;
+    if (term.length >= 4) return true;
+    if (matchedTerms >= 2) return true;
+  }
+  return false;
+}
+
+// ../grarf/desktop/src/lib/highlightsTv/filterHighlightsTvAmbientEligibleClips.ts
+var HIGHLIGHT_TITLE_PATTERNS = ["highlight", "highlights"];
+function resolveHighlightsTvMediaResolverGame(game) {
+  const payload = resolveLeagueHighlightGamePayload(game);
+  const operationalDateKey = resolveGameOperationalDateKey(game);
+  return operationalDateKey ? { ...payload, scheduledDateKey: operationalDateKey } : payload;
+}
+function scoreHighlightsTvClipAgainstSoloEventGame(clip, game) {
+  if (!soloCompetitionHighlightTitleMatchesGame(clip.title, game)) return null;
+  const publishedAt = clip.publishedAt?.trim() ?? "";
+  if (!publishedAt) return null;
+  const date = scoreDateProximity(game, publishedAt);
+  if (date.score <= 0) return null;
+  const titleScore = scoreTitleAgainstGame(clip.title, game, HIGHLIGHT_TITLE_PATTERNS);
+  const rawScore = date.score + (titleScore.highlightKeyword ? 2 : 0);
+  const minScore = titleScore.highlightKeyword && date.score >= 3 ? 5 : MIN_STRONG_MATCH_SCORE;
+  if (rawScore < minScore) return null;
+  return rawScore;
+}
+function resolveHighlightsTvAmbientEligibleSportsDayKeys(now = /* @__PURE__ */ new Date()) {
+  return {
+    sportsDayKey: getOperationalSportsDayDateKey(now),
+    precedingSportsDayKey: getOperationalSportsDayYesterdayDateKey(now)
+  };
+}
+function resolveHighlightsTvClipPublicationSportsDayKey(clip) {
+  const publishedAt = clip.publishedAt?.trim() ?? "";
+  if (!publishedAt) return null;
+  const publishedMs = Date.parse(publishedAt);
+  if (!Number.isFinite(publishedMs) || publishedMs <= 0) return null;
+  return getOperationalSportsDayDateKey(new Date(publishedMs));
+}
+function isHighlightsTvAmbientPublicationEligible(clip, now = /* @__PURE__ */ new Date()) {
+  const publicationSportsDayKey = resolveHighlightsTvClipPublicationSportsDayKey(clip);
+  if (!publicationSportsDayKey) return false;
+  const { sportsDayKey, precedingSportsDayKey } = resolveHighlightsTvAmbientEligibleSportsDayKeys(now);
+  return publicationSportsDayKey === sportsDayKey || publicationSportsDayKey === precedingSportsDayKey;
+}
+function isHighlightsTvAmbientEligibleGame(game, now = /* @__PURE__ */ new Date()) {
+  const { sportsDayKey, precedingSportsDayKey } = resolveHighlightsTvAmbientEligibleSportsDayKeys(now);
+  return isGameOnGamesSpineOperationalDate(game, sportsDayKey, now) || isGameOnGamesSpineOperationalDate(game, precedingSportsDayKey, now);
+}
+function scoreHighlightsTvClipAgainstGame(clip, game) {
+  const titleScore = scoreTitleAgainstGame(clip.title, game, HIGHLIGHT_TITLE_PATTERNS);
+  if (!titleScore.teamMatch) return null;
+  const publishedAt = clip.publishedAt?.trim() ?? "";
+  if (!publishedAt) return null;
+  const publishedMs = Date.parse(publishedAt);
+  if (!Number.isFinite(publishedMs) || publishedMs <= 0) return null;
+  const league = String(game.league || "").trim().toUpperCase();
+  if (league === "MLB") {
+    if (!titleScore.highlightKeyword) return null;
+    if (!mlbGameHighlightTitleMatchesGameDay(clip.title, game)) return null;
+    return MIN_STRONG_MATCH_SCORE + 2;
+  }
+  const date = scoreDateProximity(game, publishedAt);
+  if (date.score <= 0) return null;
+  const rawScore = date.score + (titleScore.highlightKeyword ? 2 : 0);
+  if (rawScore < MIN_STRONG_MATCH_SCORE) return null;
+  return rawScore;
+}
+function scoreHighlightsTvClipAgainstResolverGame(clip, game) {
+  if (isSoloCompetitionHighlightResolverGame(game)) {
+    return scoreHighlightsTvClipAgainstSoloEventGame(clip, game);
+  }
+  return scoreHighlightsTvClipAgainstGame(clip, game);
+}
+function resolveHighlightsTvGameHighlightClip(clips, game, now = /* @__PURE__ */ new Date()) {
+  let best = null;
+  for (const clip of clips) {
+    if (!isHighlightsTvAmbientPublicationEligible(clip, now)) continue;
+    const score2 = scoreHighlightsTvClipAgainstResolverGame(clip, game);
+    if (score2 == null) continue;
+    if (!best || score2 > best.score) {
+      best = { clip, score: score2 };
+      continue;
+    }
+    if (score2 !== best.score) continue;
+    const clipMs = Date.parse(clip.publishedAt ?? "");
+    const bestMs = Date.parse(best.clip.publishedAt ?? "");
+    if (Number.isFinite(clipMs) && Number.isFinite(bestMs) && clipMs > bestMs) {
+      best = { clip, score: score2 };
+    }
+  }
+  return best?.clip ?? null;
+}
+function clipMatchesGame(clip, game) {
+  const resolverGame = resolveHighlightsTvMediaResolverGame(game);
+  if (isSoloCompetitionHighlightGame(game)) {
+    return scoreHighlightsTvClipAgainstSoloEventGame(clip, resolverGame) != null;
+  }
+  return scoreHighlightsTvClipAgainstGame(clip, resolverGame) != null;
+}
+function filterHighlightsTvAmbientPublicationEligibleClips(clips, now = /* @__PURE__ */ new Date()) {
+  return clips.filter((clip) => isHighlightsTvAmbientPublicationEligible(clip, now));
+}
+function filterHighlightsTvAmbientEligibleClips(clips, games, now = /* @__PURE__ */ new Date()) {
+  if (clips.length === 0 || games.length === 0) return [];
+  return clips.filter(
+    (clip) => isHighlightsTvAmbientPublicationEligible(clip, now) && games.some((game) => clipMatchesGame(clip, game))
+  );
+}
+
+// ../grarf/desktop/src/lib/highlightsTv/ingestHighlightsTvChannelClips.ts
+init_define_import_meta_env();
 
 // ../grarf/desktop/src/data/highlightsTvChannelIngestionConfig.ts
 init_define_import_meta_env();
@@ -53374,7 +53826,7 @@ function inferYearForMonthDay(month, day, referenceDateYmd) {
   }
   return best;
 }
-function formatParsedDateYmd(month, day, year) {
+function formatParsedDateYmd2(month, day, year) {
   if (!Number.isFinite(month) || !Number.isFinite(day) || !Number.isFinite(year)) return null;
   if (month < 1 || month > 12 || day < 1 || day > 31) return null;
   return `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
@@ -53394,7 +53846,7 @@ function parseMlbAllGamesHighlightTitleDate(title, referenceDateYmd) {
     if (yearToken) {
       let year = Number(yearToken);
       if (yearToken.length === 2) year = 2e3 + year;
-      return formatParsedDateYmd(month, day, year);
+      return formatParsedDateYmd2(month, day, year);
     }
     return inferYearForMonthDay(month, day, referenceDateYmd);
   }
@@ -53407,7 +53859,7 @@ function parseMlbAllGamesHighlightTitleDate(title, referenceDateYmd) {
     const yearToken = monthNameDayYear[3];
     if (!month) return null;
     if (yearToken) {
-      return formatParsedDateYmd(month, day, Number(yearToken));
+      return formatParsedDateYmd2(month, day, Number(yearToken));
     }
     return inferYearForMonthDay(month, day, referenceDateYmd);
   }
@@ -54096,363 +54548,68 @@ async function ingestHighlightsTvChannelClips(leagueKey, leagueLabel) {
   return ingestHighlightsTvClipsFromIngestionRow(row, leagueKey, leagueLabel);
 }
 
-// ../grarf/desktop/src/lib/highlightsTv/filterHighlightsTvAmbientEligibleClips.ts
-init_define_import_meta_env();
-
-// ../grarf/desktop/src/lib/leagueHighlights/resolveLeagueHighlightGamePayload.ts
-init_define_import_meta_env();
-function resolveLeagueHighlightGamePayload(game) {
-  return {
-    gameId: game.id,
-    league: game.league ?? "MLB",
-    awayTeam: game.awayTeam,
-    homeTeam: game.homeTeam,
-    awayCity: game.awayCity,
-    homeCity: game.homeCity,
-    officialAwayName: game.metadata?.officialAwayName,
-    officialHomeName: game.metadata?.officialHomeName,
-    startTimeMs: game.startTimeMs,
-    scheduledDateKey: game.startTimeMs && Number.isFinite(game.startTimeMs) ? formatBriefingDateKey(new Date(game.startTimeMs)) : formatBriefingDateKey()
-  };
-}
-function resolveLeagueHighlightFetchKey(payload) {
-  return [
-    payload.gameId,
-    payload.league,
-    payload.awayTeam,
-    payload.homeTeam,
-    payload.awayCity ?? "",
-    payload.homeCity ?? "",
-    payload.officialAwayName ?? "",
-    payload.officialHomeName ?? "",
-    String(payload.startTimeMs ?? ""),
-    payload.scheduledDateKey ?? ""
-  ].join("");
-}
-
-// ../grarf/desktop/src/services/mediaResolution/scoreTitleMatch.ts
-init_define_import_meta_env();
-
-// ../grarf/desktop/src/services/mediaResolution/teamAliases.ts
-init_define_import_meta_env();
-function normalizeTeamToken(s2) {
-  return String(s2 || "").toLowerCase().replace(/\./g, "").replace(/[^a-z0-9\s]/g, " ").replace(/\s+/g, " ").trim();
-}
-function buildTeamAliasTerms(game, side) {
-  const terms = /* @__PURE__ */ new Set();
-  const team = side === "away" ? game.awayTeam : game.homeTeam;
-  const city = side === "away" ? game.awayCity : game.homeCity;
-  const official = side === "away" ? game.officialAwayName : game.officialHomeName;
-  for (const raw of [team, city, official]) {
-    if (raw == null || !String(raw).trim()) continue;
-    const n2 = normalizeTeamToken(String(raw));
-    if (n2.length < 3) continue;
-    terms.add(n2);
-    const parts = n2.split(" ").filter(Boolean);
-    if (parts.length > 1) {
-      terms.add(parts[parts.length - 1]);
-      terms.add(parts.slice(-2).join(" "));
-    }
-  }
-  if (terms.has("athletics")) terms.add("a s");
-  return [...terms];
-}
-
-// ../grarf/desktop/src/services/mediaResolution/scoreTitleMatch.ts
-function fragmentMatchesTerms(fragment, terms) {
-  const f2 = normalizeTeamToken(fragment);
-  if (!f2) return false;
-  return terms.some((t2) => t2.length >= 3 && (f2.includes(t2) || t2.includes(f2)));
-}
-function scoreTitleAgainstGame(title, game, titlePatterns = ["highlight", "highlights"]) {
-  const reasons = [];
-  const awayTerms = buildTeamAliasTerms(game, "away");
-  const homeTerms = buildTeamAliasTerms(game, "home");
-  const lower = title.toLowerCase();
-  let teamMatch = false;
-  const vs2 = title.match(/(.+?)\s+vs\.?\s+(.+?)(?:\s|—|-|:|\||$)/i);
-  if (vs2) {
-    const left = vs2[1] ?? "";
-    const right = vs2[2] ?? "";
-    const aLeft = fragmentMatchesTerms(left, awayTerms);
-    const hLeft = fragmentMatchesTerms(left, homeTerms);
-    const aRight = fragmentMatchesTerms(right, awayTerms);
-    const hRight = fragmentMatchesTerms(right, homeTerms);
-    teamMatch = aLeft && hRight || hLeft && aRight;
-    if (teamMatch) reasons.push("both_teams_in_title");
-  } else {
-    const awayHit = awayTerms.some((term) => normalizeTeamToken(title).includes(term));
-    const homeHit = homeTerms.some((term) => normalizeTeamToken(title).includes(term));
-    teamMatch = awayHit && homeHit;
-    if (teamMatch) reasons.push("both_teams_in_title");
-  }
-  const highlightKeyword = titlePatterns.some((p2) => lower.includes(p2.toLowerCase()));
-  if (highlightKeyword) reasons.push("highlight_keyword");
-  return { teamMatch, highlightKeyword, reasons };
-}
-function resolveGameDayKey(game) {
-  if (game.scheduledDateKey?.trim()) return game.scheduledDateKey.trim();
-  const ms2 = game.startTimeMs;
-  if (ms2 && Number.isFinite(ms2)) {
-    const d2 = new Date(ms2);
-    const y2 = d2.getFullYear();
-    const m2 = String(d2.getMonth() + 1).padStart(2, "0");
-    const day = String(d2.getDate()).padStart(2, "0");
-    return `${y2}-${m2}-${day}`;
-  }
-  return null;
-}
-var MLB_HIGHLIGHT_MONTH_NAME_TO_NUMBER = {
-  january: 1,
-  february: 2,
-  march: 3,
-  april: 4,
-  may: 5,
-  june: 6,
-  july: 7,
-  august: 8,
-  september: 9,
-  october: 10,
-  november: 11,
-  december: 12
-};
-function formatParsedDateYmd2(month, day, year) {
-  if (!Number.isFinite(month) || !Number.isFinite(day) || !Number.isFinite(year)) return null;
-  if (month < 1 || month > 12 || day < 1 || day > 31) return null;
-  return `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
-}
-function parseMlbGameHighlightTitleDate(title, referenceDateYmd) {
-  const raw = String(title ?? "").trim();
-  if (!raw) return null;
-  const referenceYear = Number(referenceDateYmd.split("-")[0]);
-  const referenceYearValid = Number.isFinite(referenceYear) && referenceYear > 0;
-  const parenSlash = raw.match(/\((\d{1,2})\/(\d{1,2})\/(\d{2,4})\)/);
-  if (parenSlash) {
-    const month = Number(parenSlash[1]);
-    const day = Number(parenSlash[2]);
-    let year = Number(parenSlash[3]);
-    if (String(parenSlash[3]).length === 2) year = 2e3 + year;
-    return formatParsedDateYmd2(month, day, year);
-  }
-  const slashYmd = raw.match(/\b(\d{1,2})\/(\d{1,2})\/(\d{4})\b/);
-  if (slashYmd) {
-    return formatParsedDateYmd2(Number(slashYmd[1]), Number(slashYmd[2]), Number(slashYmd[3]));
-  }
-  const monthName = raw.match(
-    /\b(january|february|march|april|may|june|july|august|september|october|november|december)\s+(\d{1,2}),?\s+(\d{4})\b/i
-  );
-  if (monthName) {
-    const month = MLB_HIGHLIGHT_MONTH_NAME_TO_NUMBER[monthName[1].toLowerCase()];
-    if (!month) return null;
-    return formatParsedDateYmd2(month, Number(monthName[2]), Number(monthName[3]));
-  }
-  const parenMonthDay = raw.match(
-    /\((january|february|march|april|may|june|july|august|september|october|november|december)\s+(\d{1,2})\)/i
-  );
-  if (parenMonthDay && referenceYearValid) {
-    const month = MLB_HIGHLIGHT_MONTH_NAME_TO_NUMBER[parenMonthDay[1].toLowerCase()];
-    if (!month) return null;
-    return formatParsedDateYmd2(month, Number(parenMonthDay[2]), referenceYear);
-  }
-  const parenSlashNoYear = raw.match(/\((\d{1,2})\/(\d{1,2})\)/);
-  if (parenSlashNoYear && referenceYearValid) {
-    return formatParsedDateYmd2(
-      Number(parenSlashNoYear[1]),
-      Number(parenSlashNoYear[2]),
-      referenceYear
-    );
-  }
-  return null;
-}
-function mlbGameHighlightTitleMatchesGameDay(title, game) {
-  const gameDayKey = resolveGameDayKey(game);
-  if (!gameDayKey) return false;
-  const parsed = parseMlbGameHighlightTitleDate(title, gameDayKey);
-  return parsed != null && parsed === gameDayKey;
-}
-function dayKeyFromMs(ms2) {
-  if (!Number.isFinite(ms2)) return null;
-  const d2 = new Date(ms2);
-  const y2 = d2.getFullYear();
-  const m2 = String(d2.getMonth() + 1).padStart(2, "0");
-  const day = String(d2.getDate()).padStart(2, "0");
-  return `${y2}-${m2}-${day}`;
-}
-function scoreDateProximity(game, publishedAt) {
-  const publishedMs = Date.parse(publishedAt || "");
-  if (!Number.isFinite(publishedMs) || publishedMs <= 0) {
-    return { score: 0 };
-  }
-  const gameDayKey = resolveGameDayKey(game);
-  const pubDay = dayKeyFromMs(publishedMs);
-  if (gameDayKey && pubDay) {
-    if (pubDay === gameDayKey) return { score: 10, reason: "date_same_day" };
-    const gameMs = game.startTimeMs && Number.isFinite(game.startTimeMs) ? game.startTimeMs : Date.parse(`${gameDayKey}T12:00:00`);
-    const diffDays = (publishedMs - gameMs) / (24 * 60 * 60 * 1e3);
-    if (diffDays >= -1 && diffDays <= 3) return { score: 6, reason: "date_within_3d" };
-    if (diffDays >= -2 && diffDays <= 5) return { score: 3, reason: "date_within_5d" };
-    return { score: 0 };
-  }
-  if (game.startTimeMs && Number.isFinite(game.startTimeMs)) {
-    const diffDays = (publishedMs - game.startTimeMs) / (24 * 60 * 60 * 1e3);
-    if (diffDays >= -1 && diffDays <= 3) return { score: 6, reason: "date_within_3d" };
-    if (diffDays >= -2 && diffDays <= 5) return { score: 3, reason: "date_within_5d" };
-  }
-  return { score: 0 };
-}
-var MIN_STRONG_MATCH_SCORE = 8;
-
-// ../grarf/desktop/src/lib/highlightsTv/filterHighlightsTvAmbientEligibleClips.ts
-var HIGHLIGHT_TITLE_PATTERNS = ["highlight", "highlights"];
-function isHighlightsTvSoloCompetitionGame(game) {
-  if (isGolfLeagueKey(game.league)) return true;
-  if (isMotorsportLeagueKey(game.league)) return true;
-  const homeTeam = game.homeTeam?.trim() ?? "";
-  const awayTeam = game.awayTeam?.trim() ?? "";
-  return awayTeam.length > 0 && homeTeam.length === 0;
-}
-function resolveHighlightsTvMediaResolverGame(game) {
-  const payload = resolveLeagueHighlightGamePayload(game);
-  const operationalDateKey = resolveGameOperationalDateKey(game);
-  return operationalDateKey ? { ...payload, scheduledDateKey: operationalDateKey } : payload;
-}
-function soloEventTitleMatchesGame(title, game) {
-  const normalizedTitle = normalizeTeamToken(title);
-  if (!normalizedTitle) return false;
-  const terms = /* @__PURE__ */ new Set();
-  for (const term of buildTeamAliasTerms(game, "away")) {
-    if (term.length >= 3) terms.add(term);
-  }
-  for (const raw of [game.awayTeam, game.officialAwayName]) {
-    if (!raw?.trim()) continue;
-    for (const segment of raw.split(/[·–—|-]/)) {
-      const normalizedSegment = normalizeTeamToken(segment);
-      if (normalizedSegment.length >= 3) terms.add(normalizedSegment);
-      const parts = normalizedSegment.split(" ").filter(Boolean);
-      if (parts.length > 1) {
-        terms.add(parts[parts.length - 1]);
-        terms.add(parts.slice(-2).join(" "));
-      }
-    }
-  }
-  let matchedTerms = 0;
-  for (const term of terms) {
-    if (term.length < 3) continue;
-    if (!normalizedTitle.includes(term)) continue;
-    matchedTerms += 1;
-    if (term.length >= 4) return true;
-    if (matchedTerms >= 2) return true;
-  }
-  return false;
-}
-function scoreHighlightsTvClipAgainstSoloEventGame(clip, game) {
-  if (!soloEventTitleMatchesGame(clip.title, game)) return null;
-  const publishedAt = clip.publishedAt?.trim() ?? "";
-  if (!publishedAt) return null;
-  const date = scoreDateProximity(game, publishedAt);
-  if (date.score <= 0) return null;
-  const titleScore = scoreTitleAgainstGame(clip.title, game, HIGHLIGHT_TITLE_PATTERNS);
-  const rawScore = date.score + (titleScore.highlightKeyword ? 2 : 0);
-  const minScore = titleScore.highlightKeyword && date.score >= 3 ? 5 : MIN_STRONG_MATCH_SCORE;
-  if (rawScore < minScore) return null;
-  return rawScore;
-}
-function resolveHighlightsTvAmbientEligibleSportsDayKeys(now = /* @__PURE__ */ new Date()) {
-  return {
-    sportsDayKey: getOperationalSportsDayDateKey(now),
-    precedingSportsDayKey: getOperationalSportsDayYesterdayDateKey(now)
-  };
-}
-function resolveHighlightsTvClipPublicationSportsDayKey(clip) {
-  const publishedAt = clip.publishedAt?.trim() ?? "";
-  if (!publishedAt) return null;
-  const publishedMs = Date.parse(publishedAt);
-  if (!Number.isFinite(publishedMs) || publishedMs <= 0) return null;
-  return getOperationalSportsDayDateKey(new Date(publishedMs));
-}
-function isHighlightsTvAmbientPublicationEligible(clip, now = /* @__PURE__ */ new Date()) {
-  const publicationSportsDayKey = resolveHighlightsTvClipPublicationSportsDayKey(clip);
-  if (!publicationSportsDayKey) return false;
-  const { sportsDayKey, precedingSportsDayKey } = resolveHighlightsTvAmbientEligibleSportsDayKeys(now);
-  return publicationSportsDayKey === sportsDayKey || publicationSportsDayKey === precedingSportsDayKey;
-}
-function isHighlightsTvAmbientEligibleGame(game, now = /* @__PURE__ */ new Date()) {
-  const { sportsDayKey, precedingSportsDayKey } = resolveHighlightsTvAmbientEligibleSportsDayKeys(now);
-  return isGameOnGamesSpineOperationalDate(game, sportsDayKey, now) || isGameOnGamesSpineOperationalDate(game, precedingSportsDayKey, now);
-}
-function scoreHighlightsTvClipAgainstGame(clip, game) {
-  const titleScore = scoreTitleAgainstGame(clip.title, game, HIGHLIGHT_TITLE_PATTERNS);
-  if (!titleScore.teamMatch) return null;
-  const publishedAt = clip.publishedAt?.trim() ?? "";
-  if (!publishedAt) return null;
-  const publishedMs = Date.parse(publishedAt);
-  if (!Number.isFinite(publishedMs) || publishedMs <= 0) return null;
-  const league = String(game.league || "").trim().toUpperCase();
-  if (league === "MLB") {
-    if (!titleScore.highlightKeyword) return null;
-    if (!mlbGameHighlightTitleMatchesGameDay(clip.title, game)) return null;
-    return MIN_STRONG_MATCH_SCORE + 2;
-  }
-  const date = scoreDateProximity(game, publishedAt);
-  if (date.score <= 0) return null;
-  const rawScore = date.score + (titleScore.highlightKeyword ? 2 : 0);
-  if (rawScore < MIN_STRONG_MATCH_SCORE) return null;
-  return rawScore;
-}
-function resolveHighlightsTvGameHighlightClip(clips, game, now = /* @__PURE__ */ new Date()) {
-  let best = null;
-  for (const clip of clips) {
-    if (!isHighlightsTvAmbientPublicationEligible(clip, now)) continue;
-    const score2 = scoreHighlightsTvClipAgainstGame(clip, game);
-    if (score2 == null) continue;
-    if (!best || score2 > best.score) {
-      best = { clip, score: score2 };
-      continue;
-    }
-    if (score2 !== best.score) continue;
-    const clipMs = Date.parse(clip.publishedAt ?? "");
-    const bestMs = Date.parse(best.clip.publishedAt ?? "");
-    if (Number.isFinite(clipMs) && Number.isFinite(bestMs) && clipMs > bestMs) {
-      best = { clip, score: score2 };
-    }
-  }
-  return best?.clip ?? null;
-}
-function clipMatchesGame(clip, game) {
-  const resolverGame = resolveHighlightsTvMediaResolverGame(game);
-  if (isHighlightsTvSoloCompetitionGame(game)) {
-    return scoreHighlightsTvClipAgainstSoloEventGame(clip, resolverGame) != null;
-  }
-  return scoreHighlightsTvClipAgainstGame(clip, resolverGame) != null;
-}
-function filterHighlightsTvAmbientPublicationEligibleClips(clips, now = /* @__PURE__ */ new Date()) {
-  return clips.filter((clip) => isHighlightsTvAmbientPublicationEligible(clip, now));
-}
-function filterHighlightsTvAmbientEligibleClips(clips, games, now = /* @__PURE__ */ new Date()) {
-  if (clips.length === 0 || games.length === 0) return [];
-  return clips.filter(
-    (clip) => isHighlightsTvAmbientPublicationEligible(clip, now) && games.some((game) => clipMatchesGame(clip, game))
-  );
-}
-
 // ../grarf/desktop/src/lib/leagueHighlights/fetchGameLeagueHighlightWeb.ts
 init_isGrarfWebRenderer();
-var MLB_CLIPS_CACHE_TTL_MS = 5 * 60 * 1e3;
-var mlbClipsCache = null;
-async function loadMlbHighlightsTvClips() {
-  if (mlbClipsCache && Date.now() - mlbClipsCache.at < MLB_CLIPS_CACHE_TTL_MS) {
-    return mlbClipsCache.clips;
+var CLIPS_CACHE_TTL_MS = 5 * 60 * 1e3;
+var clipsCacheByIngestionLeagueKey = /* @__PURE__ */ new Map();
+var enabledGameLeaguesCache = null;
+function resolveHighlightsTvChannelLabel(htvLeagueKey) {
+  return HIGHLIGHTS_TV_CHANNEL_ORDER.find((channel) => channel.leagueKey === htvLeagueKey)?.label ?? htvLeagueKey;
+}
+async function loadHighlightsTvClipsForGameLeague(gameLeague) {
+  const htvLeagueKey = resolveHighlightsTvIngestionLeagueKeyForGameLeague(gameLeague);
+  const cached = clipsCacheByIngestionLeagueKey.get(htvLeagueKey);
+  if (cached && Date.now() - cached.at < CLIPS_CACHE_TTL_MS) {
+    return cached.clips;
   }
-  const clips = await ingestHighlightsTvChannelClips("MLB", "MLB") ?? [];
-  mlbClipsCache = { clips, at: Date.now() };
+  const clips = await ingestHighlightsTvChannelClips(
+    htvLeagueKey,
+    resolveHighlightsTvChannelLabel(htvLeagueKey)
+  ) ?? [];
+  clipsCacheByIngestionLeagueKey.set(htvLeagueKey, { clips, at: Date.now() });
   return clips;
 }
+async function loadHighlightsTvWebAutomaticHighlightGameLeagues() {
+  if (enabledGameLeaguesCache && Date.now() - enabledGameLeaguesCache.at < CLIPS_CACHE_TTL_MS) {
+    return enabledGameLeaguesCache.leagues;
+  }
+  const rows = await loadHighlightsTvChannelIngestionRows();
+  const leagues = /* @__PURE__ */ new Set();
+  for (const row of rows) {
+    if (!isHighlightsTvChannelIngestionRowEnabled(row.ENABLED) || !row.URL.trim()) continue;
+    const htvKey = resolveHighlightsTvCanonicalLeagueKey(row.LEAGUE_KEY);
+    if (htvKey === "WIMBLEDON") {
+      leagues.add("ATP");
+      leagues.add("WTA");
+      continue;
+    }
+    leagues.add(resolveHighlightsTvSeedLeagueKey(htvKey));
+  }
+  enabledGameLeaguesCache = { leagues, at: Date.now() };
+  return leagues;
+}
+async function isHighlightsTvWebAutomaticHighlightLeague(gameLeague) {
+  const htvLeagueKey = resolveHighlightsTvIngestionLeagueKeyForGameLeague(gameLeague);
+  const rows = await loadHighlightsTvChannelIngestionRows();
+  const row = findHighlightsTvIngestionRow(rows, htvLeagueKey);
+  return Boolean(row && isHighlightsTvChannelIngestionRowEnabled(row.ENABLED) && row.URL.trim());
+}
 async function fetchGameLeagueHighlightViaHighlightsTv(payload) {
-  if (!isGrarfWebRenderer() || payload.league.trim().toUpperCase() !== "MLB") {
+  if (!isGrarfWebRenderer()) {
+    return { ok: false, error: "unsupported" };
+  }
+  const gameLeague = payload.league.trim();
+  if (!gameLeague) {
+    return { ok: false, error: "unsupported" };
+  }
+  if (!await isHighlightsTvWebAutomaticHighlightLeague(gameLeague)) {
     return { ok: false, error: "unsupported" };
   }
   try {
-    const clips = await loadMlbHighlightsTvClips();
+    const clips = await loadHighlightsTvClipsForGameLeague(gameLeague);
+    if (clips.length === 0) {
+      return { ok: false, error: "No matching highlight for this game" };
+    }
     const clip = resolveHighlightsTvGameHighlightClip(clips, payload);
     if (!clip) {
       return { ok: false, error: "No matching highlight for this game" };
@@ -54485,9 +54642,9 @@ function cacheKey2(payload) {
 }
 async function fetchGameLeagueHighlight(payload) {
   const league = payload.league;
-  if (!getHighlightProvider(league)) return null;
   const electronResolve = window.grarf?.leagueHighlightsResolveGame;
-  const resolve = electronResolve ?? (isGrarfWebRenderer() && league === "MLB" ? fetchGameLeagueHighlightViaHighlightsTv : null);
+  const resolve = electronResolve ?? (isGrarfWebRenderer() ? fetchGameLeagueHighlightViaHighlightsTv : null);
+  if (electronResolve && !getHighlightProvider(league)) return null;
   if (!resolve) return null;
   const key2 = cacheKey2(payload);
   const hit = resolveCache.get(key2);
@@ -54545,8 +54702,8 @@ var useMlbCatchupHighlightsStore = (0, import_zustand31.create)((set, get) => ({
 
 // ../grarf/desktop/src/hooks/useCanonicalGamesSpineGame.ts
 var EMPTY_MLB_CATCHUP_HIGHLIGHTS = [];
-function shouldResolveAutomaticHighlight(game) {
-  return isGrarfWebRenderer() && Boolean(game.league && getHighlightProvider(game.league));
+function shouldResolveAutomaticHighlight(game, highlightsTvGameLeagues) {
+  return isGrarfWebRenderer() && Boolean(game.league && highlightsTvGameLeagues?.has(game.league));
 }
 function buildHighlightPayload(game) {
   return {
@@ -54570,9 +54727,22 @@ function useCanonicalGamesSpineGame(baseGame) {
   const automaticHighlightsByGameId = useGameHighlightStore((s2) => s2.highlightsByGameId);
   const setResolvedHighlight = useGameHighlightStore((s2) => s2.setResolvedHighlight);
   const mlbCatchupHighlightsByGamePk = useMlbCatchupHighlightsStore((s2) => s2.highlightsByGamePk);
+  const [highlightsTvGameLeagues, setHighlightsTvGameLeagues] = (0, import_react38.useState)(
+    null
+  );
   (0, import_react38.useEffect)(() => {
-    if (!baseGame || !isGrarfWebRenderer()) return;
-    if (!shouldResolveAutomaticHighlight(baseGame)) return;
+    if (!isGrarfWebRenderer()) return;
+    let cancelled = false;
+    void loadHighlightsTvWebAutomaticHighlightGameLeagues().then((leagues) => {
+      if (!cancelled) setHighlightsTvGameLeagues(leagues);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+  (0, import_react38.useEffect)(() => {
+    if (!baseGame || !isGrarfWebRenderer() || !highlightsTvGameLeagues) return;
+    if (!shouldResolveAutomaticHighlight(baseGame, highlightsTvGameLeagues)) return;
     if (baseGame.id in automaticHighlightsByGameId) return;
     const hasMlbCatchupHighlight = baseGame.gamePk != null && Number.isFinite(baseGame.gamePk) && Boolean(mlbCatchupHighlightsByGamePk[baseGame.gamePk]?.[0]);
     if (hasMlbCatchupHighlight) return;
@@ -54584,6 +54754,7 @@ function useCanonicalGamesSpineGame(baseGame) {
     });
   }, [
     baseGame,
+    highlightsTvGameLeagues,
     automaticHighlightsByGameId,
     mlbCatchupHighlightsByGamePk,
     setResolvedHighlight
@@ -55062,38 +55233,6 @@ init_isGrarfWebRenderer();
 
 // ../grarf/desktop/src/lib/gamesSpine/detectGamesSpineGameUpdateAlerts.ts
 init_define_import_meta_env();
-
-// ../grarf/desktop/src/lib/gamesSpine/isStandaloneSpineEvent.ts
-init_define_import_meta_env();
-var STANDALONE_SPINE_LEAGUE_KEYS = /* @__PURE__ */ new Set([
-  "WEC",
-  ...GOLF_TOUR_LEAGUE_ORDER,
-  ...Array.from(
-    /* @__PURE__ */ new Set([
-      "F1",
-      "F2",
-      "F3",
-      "FORMULA_E",
-      "NASCAR",
-      "NASCAR_XFINITY",
-      "NASCAR_TRUCK",
-      "INDYCAR",
-      "MOTOGP",
-      "MOTO2",
-      "MOTO3"
-    ])
-  )
-]);
-function isStandaloneSpineLeague(league) {
-  if (league == null) return false;
-  return STANDALONE_SPINE_LEAGUE_KEYS.has(league) || isMotorsportLeagueKey(league);
-}
-function isStandaloneSpineEvent(game) {
-  if (!isStandaloneSpineLeague(game.league)) return false;
-  return !game.homeTeam?.trim();
-}
-
-// ../grarf/desktop/src/lib/gamesSpine/detectGamesSpineGameUpdateAlerts.ts
 var emittedScoreStates = /* @__PURE__ */ new Set();
 function normalizeScore(value) {
   if (value == null || !Number.isFinite(value)) return null;
@@ -70192,8 +70331,8 @@ init_define_import_meta_env();
 var import_react104 = __toESM(require_react(), 1);
 init_isGrarfWebRenderer();
 var EMPTY_MLB_CATCHUP_HIGHLIGHTS2 = [];
-function shouldResolveAutomaticHighlight2(game) {
-  return isGrarfWebRenderer() && Boolean(game.league && getHighlightProvider(game.league));
+function shouldResolveAutomaticHighlight2(game, highlightsTvGameLeagues) {
+  return isGrarfWebRenderer() && Boolean(game.league && highlightsTvGameLeagues?.has(game.league));
 }
 function buildHighlightPayload2(game) {
   return {
@@ -70214,10 +70353,23 @@ function useGamesWithCanonicalHighlights(games) {
   const setResolvedHighlight = useGameHighlightStore((s2) => s2.setResolvedHighlight);
   const operationsFieldsByGameId = useAdminOperationsCardStore((s2) => s2.fieldsByGameId);
   const mlbCatchupHighlightsByGamePk = useMlbCatchupHighlightsStore((s2) => s2.highlightsByGamePk);
+  const [highlightsTvGameLeagues, setHighlightsTvGameLeagues] = (0, import_react104.useState)(
+    null
+  );
   (0, import_react104.useEffect)(() => {
     if (!isGrarfWebRenderer()) return;
+    let cancelled = false;
+    void loadHighlightsTvWebAutomaticHighlightGameLeagues().then((leagues) => {
+      if (!cancelled) setHighlightsTvGameLeagues(leagues);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+  (0, import_react104.useEffect)(() => {
+    if (!isGrarfWebRenderer() || !highlightsTvGameLeagues) return;
     games.forEach((game) => {
-      if (!shouldResolveAutomaticHighlight2(game)) return;
+      if (!shouldResolveAutomaticHighlight2(game, highlightsTvGameLeagues)) return;
       if (game.id in automaticHighlightsByGameId) return;
       const hasMlbCatchupHighlight = game.gamePk != null && Number.isFinite(game.gamePk) && Boolean(mlbCatchupHighlightsByGamePk[game.gamePk]?.[0]);
       if (hasMlbCatchupHighlight) return;
@@ -70228,7 +70380,13 @@ function useGamesWithCanonicalHighlights(games) {
         );
       });
     });
-  }, [games, automaticHighlightsByGameId, mlbCatchupHighlightsByGamePk, setResolvedHighlight]);
+  }, [
+    games,
+    highlightsTvGameLeagues,
+    automaticHighlightsByGameId,
+    mlbCatchupHighlightsByGamePk,
+    setResolvedHighlight
+  ]);
   return (0, import_react104.useMemo)(() => {
     return games.map((game) => {
       const operationsFields = operationsFieldsByGameId[game.id];
