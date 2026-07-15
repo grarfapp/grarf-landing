@@ -3290,10 +3290,10 @@ var require_react_dom_client_production = __commonJS({
         refCount: 0
       };
     }
-    function releaseCache(cache2) {
-      cache2.refCount--;
-      0 === cache2.refCount && scheduleCallback$2(NormalPriority, function() {
-        cache2.controller.abort();
+    function releaseCache(cache) {
+      cache.refCount--;
+      0 === cache.refCount && scheduleCallback$2(NormalPriority, function() {
+        cache.controller.abort();
       });
     }
     var currentEntangledListeners = null;
@@ -8653,21 +8653,21 @@ var require_react_dom_client_production = __commonJS({
           case 23:
           case 22:
             if (null !== fiber.memoizedState && null !== fiber.memoizedState.cachePool) {
-              var cache2 = fiber.memoizedState.cachePool.pool;
-              null != cache2 && cache2.refCount++;
+              var cache = fiber.memoizedState.cachePool.pool;
+              null != cache && cache.refCount++;
             }
             break;
           case 24:
             releaseCache(fiber.memoizedState.cache);
         }
-        cache2 = fiber.child;
-        if (null !== cache2) cache2.return = fiber, nextEffect = cache2;
+        cache = fiber.child;
+        if (null !== cache) cache.return = fiber, nextEffect = cache;
         else
           a: for (fiber = deletedSubtreeRoot; null !== nextEffect; ) {
-            cache2 = nextEffect;
-            var sibling = cache2.sibling, returnFiber = cache2.return;
-            detachFiberAfterEffects(cache2);
-            if (cache2 === fiber) {
+            cache = nextEffect;
+            var sibling = cache.sibling, returnFiber = cache.return;
+            detachFiberAfterEffects(cache);
+            if (cache === fiber) {
               nextEffect = null;
               break a;
             }
@@ -8682,8 +8682,8 @@ var require_react_dom_client_production = __commonJS({
     }
     var DefaultAsyncDispatcher = {
       getCacheForType: function(resourceType) {
-        var cache2 = readContext(CacheContext), cacheForType = cache2.data.get(resourceType);
-        void 0 === cacheForType && (cacheForType = resourceType(), cache2.data.set(resourceType, cacheForType));
+        var cache = readContext(CacheContext), cacheForType = cache.data.get(resourceType);
+        void 0 === cacheForType && (cacheForType = resourceType(), cache.data.set(resourceType, cacheForType));
         return cacheForType;
       },
       cacheSignal: function() {
@@ -11822,24 +11822,24 @@ var require_react_dom_client_production = __commonJS({
     var tagCaches = null;
     function getHydratableHoistableCache(type, keyAttribute, ownerDocument) {
       if (null === tagCaches) {
-        var cache2 = /* @__PURE__ */ new Map();
+        var cache = /* @__PURE__ */ new Map();
         var caches = tagCaches = /* @__PURE__ */ new Map();
-        caches.set(ownerDocument, cache2);
+        caches.set(ownerDocument, cache);
       } else
-        caches = tagCaches, cache2 = caches.get(ownerDocument), cache2 || (cache2 = /* @__PURE__ */ new Map(), caches.set(ownerDocument, cache2));
-      if (cache2.has(type)) return cache2;
-      cache2.set(type, null);
+        caches = tagCaches, cache = caches.get(ownerDocument), cache || (cache = /* @__PURE__ */ new Map(), caches.set(ownerDocument, cache));
+      if (cache.has(type)) return cache;
+      cache.set(type, null);
       ownerDocument = ownerDocument.getElementsByTagName(type);
       for (caches = 0; caches < ownerDocument.length; caches++) {
         var node = ownerDocument[caches];
         if (!(node[internalHoistableMarker] || node[internalInstanceKey] || "link" === type && "stylesheet" === node.getAttribute("rel")) && "http://www.w3.org/2000/svg" !== node.namespaceURI) {
           var nodeKey = node.getAttribute(keyAttribute) || "";
           nodeKey = type + nodeKey;
-          var existing = cache2.get(nodeKey);
-          existing ? existing.push(node) : cache2.set(nodeKey, [node]);
+          var existing = cache.get(nodeKey);
+          existing ? existing.push(node) : cache.set(nodeKey, [node]);
         }
       }
-      return cache2;
+      return cache;
     }
     function mountHoistable(hoistableRoot, type, instance) {
       hoistableRoot = hoistableRoot.ownerDocument || hoistableRoot;
@@ -19218,673 +19218,6 @@ async function enrichOperationalSnapshotTennisChannel(transport) {
   return changed ? { ...transport, leagues } : transport;
 }
 
-// ../grarf/desktop/src/lib/standings/enrichOperationalSnapshotTeamStandings.ts
-init_define_import_meta_env();
-
-// ../grarf/desktop/src/lib/standings/espn/teamStandingsCache.ts
-init_define_import_meta_env();
-var DEFAULT_TTL_MS2 = 30 * 60 * 1e3;
-var cache = /* @__PURE__ */ new Map();
-function readCachedStandingsValue(cacheKey2, ttlMs = DEFAULT_TTL_MS2) {
-  const row = cache.get(cacheKey2);
-  if (!row) return null;
-  if (Date.now() - row.fetchedAt > ttlMs) return null;
-  return row.value;
-}
-function writeCachedStandingsValue(cacheKey2, value) {
-  cache.set(cacheKey2, { fetchedAt: Date.now(), value });
-}
-var ESPN_STANDINGS_CACHE_TTL_MS = DEFAULT_TTL_MS2;
-
-// ../grarf/desktop/src/lib/standings/mlb/buildMlbEspnStandingsIndex.ts
-init_define_import_meta_env();
-
-// ../grarf/desktop/src/lib/standings/formatCanonicalStandingsDisplayLabel.ts
-init_define_import_meta_env();
-function formatOrdinal(rank) {
-  const mod100 = rank % 100;
-  if (mod100 >= 11 && mod100 <= 13) return `${rank}th`;
-  switch (rank % 10) {
-    case 1:
-      return `${rank}st`;
-    case 2:
-      return `${rank}nd`;
-    case 3:
-      return `${rank}rd`;
-    default:
-      return `${rank}th`;
-  }
-}
-function formatCanonicalStandingsDisplayLabel(input) {
-  const place = formatOrdinal(input.divisionRank);
-  const division = input.divisionShortName?.trim() || input.divisionName?.trim();
-  return division ? `${place} \u2022 ${division}` : place;
-}
-
-// ../grarf/desktop/src/lib/standings/espn/fetchEspnStandingsJson.ts
-init_define_import_meta_env();
-var ESPN_FETCH_TIMEOUT_MS = 12e3;
-async function fetchEspnStandingsJson(url, signal) {
-  const res = await fetch(url, {
-    headers: { Accept: "application/json" },
-    signal: signal ?? AbortSignal.timeout(ESPN_FETCH_TIMEOUT_MS)
-  });
-  if (!res.ok) {
-    throw new Error(`ESPN standings request failed (${res.status})`);
-  }
-  return res.json();
-}
-
-// ../grarf/desktop/src/lib/standings/mlb/buildMlbEspnStandingsIndex.ts
-var LOG8 = "[StandingsEnrich:MLB]";
-var MLB_ESPN_STANDINGS_URL = "https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/standings";
-var MLB_ESPN_CORE_BASE = "https://sports.core.api.espn.com/v2/sports/baseball/leagues/mlb";
-var MLB_DIVISION_GROUP_IDS = [1, 2, 3, 4, 5, 6];
-function normalizeTeamLookupKey(value) {
-  return String(value ?? "").trim().toLowerCase().replace(/\s+/g, " ");
-}
-function parseRecordSummary(summary) {
-  const match = String(summary ?? "").match(/^(\d+)\s*-\s*(\d+)$/);
-  if (!match) return { wins: null, losses: null };
-  return { wins: Number(match[1]), losses: Number(match[2]) };
-}
-function statDisplayValue(stats, names) {
-  if (!Array.isArray(stats)) return void 0;
-  for (const name of names) {
-    const row = stats.find((s) => s?.name === name || s?.type === name);
-    if (row?.displayValue != null && String(row.displayValue).trim() !== "") {
-      return String(row.displayValue);
-    }
-  }
-  return void 0;
-}
-function statNumberValue(stats, names) {
-  if (!Array.isArray(stats)) return null;
-  for (const name of names) {
-    const row = stats.find((s) => s?.name === name || s?.type === name);
-    if (row?.value != null && Number.isFinite(Number(row.value))) return Number(row.value);
-    if (row?.displayValue != null) {
-      const parsed = Number.parseFloat(String(row.displayValue).replace(/[^\d.-]/g, ""));
-      if (Number.isFinite(parsed)) return parsed;
-    }
-  }
-  return null;
-}
-function registerStandingsEntry(index, entry) {
-  index.byEspnTeamId.set(entry.espnTeamId, entry);
-  if (entry.teamAbbreviation) {
-    index.byAbbrev.set(entry.teamAbbreviation.toUpperCase(), entry);
-  }
-  if (entry.teamDisplayName) {
-    index.byDisplayName.set(normalizeTeamLookupKey(entry.teamDisplayName), entry);
-  }
-}
-function buildCanonicalEntry(input) {
-  return {
-    source: "espn",
-    leagueKey: "MLB",
-    espnTeamId: input.espnTeamId,
-    teamAbbreviation: input.teamAbbreviation,
-    teamDisplayName: input.teamDisplayName,
-    divisionName: input.divisionName,
-    divisionAbbreviation: input.divisionAbbreviation,
-    divisionRank: input.divisionRank,
-    conferenceName: input.conferenceName,
-    conferenceAbbreviation: input.conferenceAbbreviation,
-    espnDivisionGroupId: input.espnDivisionGroupId,
-    playoffSeed: input.playoffSeed ?? null,
-    wins: input.wins ?? null,
-    losses: input.losses ?? null,
-    recordSummary: input.recordSummary ?? null,
-    gamesBack: input.gamesBack ?? null,
-    displayLabel: formatCanonicalStandingsDisplayLabel({
-      divisionRank: input.divisionRank,
-      divisionShortName: input.divisionShortName ?? input.divisionAbbreviation,
-      divisionName: input.divisionName
-    })
-  };
-}
-function parseEspnSiteStandingsPayload(payload) {
-  const children = Array.isArray(payload?.children) ? payload.children ?? [] : [];
-  const entries = [];
-  for (const child of children) {
-    const divisionName = String(child.name ?? "").trim();
-    if (!divisionName) continue;
-    const divisionRows = child.standings?.entries ?? [];
-    divisionRows.forEach((row, index) => {
-      const team = row.team;
-      const espnTeamId = team?.id != null ? String(team.id) : "";
-      if (!espnTeamId) return;
-      const recordSummary = statDisplayValue(row.stats, ["overall", "total", "record"]);
-      const parsedRecord = parseRecordSummary(recordSummary);
-      const rankFromStats = statNumberValue(row.stats, ["rank", "divisionRank", "playoffSeed"]);
-      const divisionRank = rankFromStats ?? index + 1;
-      entries.push(
-        buildCanonicalEntry({
-          espnTeamId,
-          teamAbbreviation: team?.abbreviation,
-          teamDisplayName: team?.displayName ?? team?.shortDisplayName,
-          divisionName,
-          divisionAbbreviation: child.abbreviation,
-          divisionShortName: child.shortName,
-          divisionRank,
-          conferenceName: child.parent?.name,
-          conferenceAbbreviation: child.parent?.abbreviation,
-          espnDivisionGroupId: child.id != null ? String(child.id) : void 0,
-          playoffSeed: statNumberValue(row.stats, ["playoffSeed"]),
-          wins: parsedRecord.wins ?? statNumberValue(row.stats, ["wins"]),
-          losses: parsedRecord.losses ?? statNumberValue(row.stats, ["losses"]),
-          recordSummary,
-          gamesBack: statDisplayValue(row.stats, ["gamesBehind", "divisionGamesBehind"])
-        })
-      );
-    });
-  }
-  return entries;
-}
-function extractEspnTeamIdFromRef(ref) {
-  const match = String(ref ?? "").match(/\/teams\/(\d+)/);
-  return match?.[1] ?? null;
-}
-async function fetchEspnCoreJson(url) {
-  return fetchEspnStandingsJson(url);
-}
-async function fetchMlbCoreDivisionStandings(season) {
-  const entries = [];
-  const parentConferenceCache = /* @__PURE__ */ new Map();
-  for (const groupId of MLB_DIVISION_GROUP_IDS) {
-    const groupUrl = `${MLB_ESPN_CORE_BASE}/seasons/${season}/types/2/groups/${groupId}?lang=en&region=us`;
-    const standingsUrl = `${MLB_ESPN_CORE_BASE}/seasons/${season}/types/2/groups/${groupId}/standings/0?lang=en&region=us`;
-    const [groupPayload, standingsPayload] = await Promise.all([
-      fetchEspnCoreJson(groupUrl),
-      fetchEspnCoreJson(standingsUrl)
-    ]);
-    const group = groupPayload;
-    const divisionName = String(group.name ?? "").trim();
-    if (!divisionName) continue;
-    let conferenceName;
-    let conferenceAbbreviation;
-    const parentRef = group.parent?.$ref;
-    if (parentRef) {
-      let parent = parentConferenceCache.get(parentRef);
-      if (!parent) {
-        const parentPayload = await fetchEspnCoreJson(parentRef);
-        parent = {
-          name: parentPayload.shortName ?? parentPayload.name,
-          abbreviation: parentPayload.abbreviation
-        };
-        parentConferenceCache.set(parentRef, parent);
-      }
-      conferenceName = parent.name;
-      conferenceAbbreviation = parent.abbreviation;
-    }
-    const standingsRows = Array.isArray(standingsPayload?.standings) ? standingsPayload.standings ?? [] : [];
-    standingsRows.forEach((row, index) => {
-      const espnTeamId = extractEspnTeamIdFromRef(row.team?.$ref);
-      if (!espnTeamId) return;
-      const record = row.records?.[0];
-      const stats = record?.stats;
-      const recordSummary = record?.summary ?? statDisplayValue(stats, ["record", "overall"]);
-      const parsedRecord = parseRecordSummary(recordSummary);
-      entries.push(
-        buildCanonicalEntry({
-          espnTeamId,
-          divisionName,
-          divisionAbbreviation: group.abbreviation,
-          divisionShortName: group.shortName,
-          divisionRank: index + 1,
-          conferenceName,
-          conferenceAbbreviation,
-          espnDivisionGroupId: group.id != null ? String(group.id) : String(groupId),
-          playoffSeed: statNumberValue(stats, ["playoffSeed"]),
-          wins: parsedRecord.wins ?? statNumberValue(stats, ["wins"]),
-          losses: parsedRecord.losses ?? statNumberValue(stats, ["losses"]),
-          recordSummary: recordSummary ?? null,
-          gamesBack: statDisplayValue(stats, ["divisionGamesBehind", "gamesBehind"])
-        })
-      );
-    });
-  }
-  return entries;
-}
-async function hydrateMlbStandingsAbbrevs(entries, season) {
-  const missing = entries.filter((entry) => !entry.teamAbbreviation);
-  if (missing.length === 0) return entries;
-  const abbrevByTeamId = /* @__PURE__ */ new Map();
-  await Promise.all(
-    missing.map(async (entry) => {
-      if (abbrevByTeamId.has(entry.espnTeamId)) return;
-      try {
-        const payload = await fetchEspnCoreJson(
-          `${MLB_ESPN_CORE_BASE}/seasons/${season}/teams/${entry.espnTeamId}?lang=en&region=us`
-        );
-        abbrevByTeamId.set(entry.espnTeamId, {
-          abbreviation: payload.abbreviation,
-          displayName: payload.shortDisplayName ?? payload.displayName
-        });
-      } catch (error) {
-        if (define_import_meta_env_default.DEV) {
-          console.warn(`${LOG8} Team abbrev fetch failed`, entry.espnTeamId, error);
-        }
-      }
-    })
-  );
-  return entries.map((entry) => {
-    const team = abbrevByTeamId.get(entry.espnTeamId);
-    if (!team) return entry;
-    return {
-      ...entry,
-      teamAbbreviation: entry.teamAbbreviation ?? team.abbreviation,
-      teamDisplayName: entry.teamDisplayName ?? team.displayName,
-      displayLabel: entry.displayLabel
-    };
-  });
-}
-function resolveMlbSeasonYear(now = /* @__PURE__ */ new Date()) {
-  return now.getFullYear();
-}
-async function buildMlbEspnStandingsIndex(now = /* @__PURE__ */ new Date()) {
-  const season = resolveMlbSeasonYear(now);
-  const index = {
-    byEspnTeamId: /* @__PURE__ */ new Map(),
-    byAbbrev: /* @__PURE__ */ new Map(),
-    byDisplayName: /* @__PURE__ */ new Map()
-  };
-  let entries = [];
-  try {
-    const sitePayload = await fetchEspnStandingsJson(
-      `${MLB_ESPN_STANDINGS_URL}?season=${season}&region=us&lang=en`
-    );
-    entries = parseEspnSiteStandingsPayload(sitePayload);
-  } catch (error) {
-    if (define_import_meta_env_default.DEV) {
-      console.warn(`${LOG8} Site standings fetch failed`, error);
-    }
-  }
-  if (entries.length === 0) {
-    entries = await fetchMlbCoreDivisionStandings(season);
-  }
-  entries = await hydrateMlbStandingsAbbrevs(entries, season);
-  for (const entry of entries) {
-    registerStandingsEntry(index, entry);
-  }
-  if (define_import_meta_env_default.DEV) {
-    console.log(`${LOG8} Built MLB standings index`, {
-      teams: index.byEspnTeamId.size,
-      season
-    });
-  }
-  return index;
-}
-
-// ../grarf/desktop/src/lib/standings/mlb/enrichMlbGamesWithStandings.ts
-init_define_import_meta_env();
-var LOG9 = "[StandingsEnrich:MLB]";
-function normalizeTeamLookupKey2(value) {
-  return String(value ?? "").trim().toLowerCase().replace(/\s+/g, " ");
-}
-function resolveTeamStandings(game, side, index) {
-  const abbrev = (side === "away" ? game.awayTeamAbbrev : game.homeTeamAbbrev)?.trim();
-  if (abbrev) {
-    const byAbbrev = index.byAbbrev.get(abbrev.toUpperCase());
-    if (byAbbrev) return byAbbrev;
-  }
-  const officialName = side === "away" ? game.metadata?.officialAwayName : game.metadata?.officialHomeName;
-  const displayName = side === "away" ? game.awayTeam : game.homeTeam;
-  for (const candidate of [officialName, displayName]) {
-    const key = normalizeTeamLookupKey2(candidate);
-    if (!key) continue;
-    const hit = index.byDisplayName.get(key);
-    if (hit) return hit;
-  }
-  return void 0;
-}
-function attachStandingsToGame(game, index) {
-  const awayTeamStandings = resolveTeamStandings(game, "away", index);
-  const homeTeamStandings = resolveTeamStandings(game, "home", index);
-  if (!awayTeamStandings && !homeTeamStandings) return game;
-  return {
-    ...game,
-    ...awayTeamStandings ? { awayTeamStandings } : {},
-    ...homeTeamStandings ? { homeTeamStandings } : {}
-  };
-}
-async function enrichMlbGamesWithStandings(games, index) {
-  if (games.length === 0 || index.byEspnTeamId.size === 0) return games;
-  let attached = 0;
-  const enriched = games.map((game) => {
-    const next = attachStandingsToGame(game, index);
-    if (next !== game) attached += 1;
-    return next;
-  });
-  if (define_import_meta_env_default.DEV && attached > 0) {
-    console.log(`${LOG9} Attached standings to games`, { games: games.length, attached });
-  }
-  return enriched;
-}
-
-// ../grarf/desktop/src/lib/standings/wnba/buildWnbaEspnStandingsIndex.ts
-init_define_import_meta_env();
-var LOG10 = "[StandingsEnrich:WNBA]";
-var WNBA_ESPN_STANDINGS_URL = "https://site.api.espn.com/apis/site/v2/sports/basketball/wnba/standings";
-var WNBA_ESPN_CORE_BASE = "https://sports.core.api.espn.com/v2/sports/basketball/leagues/wnba";
-var WNBA_CONFERENCE_GROUP_IDS = [1, 2];
-function normalizeTeamLookupKey3(value) {
-  return String(value ?? "").trim().toLowerCase().replace(/\s+/g, " ");
-}
-function parseRecordSummary2(summary) {
-  const match = String(summary ?? "").match(/^(\d+)\s*-\s*(\d+)$/);
-  if (!match) return { wins: null, losses: null };
-  return { wins: Number(match[1]), losses: Number(match[2]) };
-}
-function statDisplayValue2(stats, names) {
-  if (!Array.isArray(stats)) return void 0;
-  for (const name of names) {
-    const row = stats.find((s) => s?.name === name || s?.type === name);
-    if (row?.displayValue != null && String(row.displayValue).trim() !== "") {
-      return String(row.displayValue);
-    }
-  }
-  return void 0;
-}
-function statNumberValue2(stats, names) {
-  if (!Array.isArray(stats)) return null;
-  for (const name of names) {
-    const row = stats.find((s) => s?.name === name || s?.type === name);
-    if (row?.value != null && Number.isFinite(Number(row.value))) return Number(row.value);
-    if (row?.displayValue != null) {
-      const parsed = Number.parseFloat(String(row.displayValue).replace(/[^\d.-]/g, ""));
-      if (Number.isFinite(parsed)) return parsed;
-    }
-  }
-  return null;
-}
-function resolveConferenceShortName(name, slug) {
-  const trimmed = name.trim();
-  if (trimmed.endsWith(" Conference")) return trimmed.replace(/ Conference$/i, "");
-  if (slug) return slug.charAt(0).toUpperCase() + slug.slice(1);
-  return trimmed;
-}
-function registerStandingsEntry2(index, entry) {
-  index.byEspnTeamId.set(entry.espnTeamId, entry);
-  if (entry.teamAbbreviation) {
-    index.byAbbrev.set(entry.teamAbbreviation.toUpperCase(), entry);
-  }
-  if (entry.teamDisplayName) {
-    index.byDisplayName.set(normalizeTeamLookupKey3(entry.teamDisplayName), entry);
-  }
-}
-function buildCanonicalEntry2(input) {
-  const conferenceShortName = input.conferenceShortName ?? resolveConferenceShortName(input.conferenceName);
-  return {
-    source: "espn",
-    leagueKey: "WNBA",
-    espnTeamId: input.espnTeamId,
-    teamAbbreviation: input.teamAbbreviation,
-    teamDisplayName: input.teamDisplayName,
-    divisionName: input.conferenceName,
-    divisionAbbreviation: input.conferenceAbbreviation,
-    divisionRank: input.conferenceRank,
-    conferenceName: input.conferenceName,
-    conferenceAbbreviation: input.conferenceAbbreviation,
-    espnDivisionGroupId: input.espnConferenceGroupId,
-    playoffSeed: input.playoffSeed ?? null,
-    wins: input.wins ?? null,
-    losses: input.losses ?? null,
-    recordSummary: input.recordSummary ?? null,
-    gamesBack: input.gamesBack ?? null,
-    displayLabel: formatCanonicalStandingsDisplayLabel({
-      divisionRank: input.conferenceRank,
-      divisionShortName: conferenceShortName,
-      divisionName: input.conferenceName
-    })
-  };
-}
-function parseEspnSiteStandingsPayload2(payload) {
-  const children = Array.isArray(payload?.children) ? payload.children ?? [] : [];
-  const entries = [];
-  for (const child of children) {
-    const conferenceName = String(child.name ?? "").trim();
-    if (!conferenceName) continue;
-    const conferenceRows = child.standings?.entries ?? [];
-    conferenceRows.forEach((row, index) => {
-      const team = row.team;
-      const espnTeamId = team?.id != null ? String(team.id) : "";
-      if (!espnTeamId) return;
-      const recordSummary = statDisplayValue2(row.stats, ["overall", "total", "record"]);
-      const parsedRecord = parseRecordSummary2(recordSummary);
-      const rankFromStats = statNumberValue2(row.stats, ["rank", "divisionRank", "playoffSeed"]);
-      const conferenceRank = rankFromStats ?? index + 1;
-      entries.push(
-        buildCanonicalEntry2({
-          espnTeamId,
-          teamAbbreviation: team?.abbreviation,
-          teamDisplayName: team?.displayName ?? team?.shortDisplayName,
-          conferenceName,
-          conferenceAbbreviation: child.abbreviation,
-          conferenceShortName: child.shortName ?? resolveConferenceShortName(conferenceName),
-          conferenceRank,
-          espnConferenceGroupId: child.id != null ? String(child.id) : void 0,
-          playoffSeed: statNumberValue2(row.stats, ["playoffSeed"]),
-          wins: parsedRecord.wins ?? statNumberValue2(row.stats, ["wins"]),
-          losses: parsedRecord.losses ?? statNumberValue2(row.stats, ["losses"]),
-          recordSummary,
-          gamesBack: statDisplayValue2(row.stats, ["gamesBehind", "divisionGamesBehind"])
-        })
-      );
-    });
-  }
-  return entries;
-}
-function extractEspnTeamIdFromRef2(ref) {
-  const match = String(ref ?? "").match(/\/teams\/(\d+)/);
-  return match?.[1] ?? null;
-}
-async function fetchEspnCoreJson2(url) {
-  return fetchEspnStandingsJson(url);
-}
-async function fetchWnbaCoreConferenceStandings(season) {
-  const entries = [];
-  for (const groupId of WNBA_CONFERENCE_GROUP_IDS) {
-    const groupUrl = `${WNBA_ESPN_CORE_BASE}/seasons/${season}/types/2/groups/${groupId}?lang=en&region=us`;
-    const standingsUrl = `${WNBA_ESPN_CORE_BASE}/seasons/${season}/types/2/groups/${groupId}/standings/0?lang=en&region=us`;
-    const [groupPayload, standingsPayload] = await Promise.all([
-      fetchEspnCoreJson2(groupUrl),
-      fetchEspnCoreJson2(standingsUrl)
-    ]);
-    const group = groupPayload;
-    const conferenceName = String(group.name ?? "").trim();
-    if (!conferenceName) continue;
-    const standingsRows = Array.isArray(standingsPayload?.standings) ? standingsPayload.standings ?? [] : [];
-    standingsRows.forEach((row, index) => {
-      const espnTeamId = extractEspnTeamIdFromRef2(row.team?.$ref);
-      if (!espnTeamId) return;
-      const record = row.records?.[0];
-      const stats = record?.stats;
-      const recordSummary = record?.summary ?? statDisplayValue2(stats, ["record", "overall"]);
-      const parsedRecord = parseRecordSummary2(recordSummary);
-      entries.push(
-        buildCanonicalEntry2({
-          espnTeamId,
-          conferenceName,
-          conferenceAbbreviation: group.abbreviation,
-          conferenceShortName: resolveConferenceShortName(conferenceName, group.slug),
-          conferenceRank: index + 1,
-          espnConferenceGroupId: group.id != null ? String(group.id) : String(groupId),
-          playoffSeed: statNumberValue2(stats, ["playoffSeed"]),
-          wins: parsedRecord.wins ?? statNumberValue2(stats, ["wins"]),
-          losses: parsedRecord.losses ?? statNumberValue2(stats, ["losses"]),
-          recordSummary: recordSummary ?? null,
-          gamesBack: statDisplayValue2(stats, ["gamesBehind", "divisionGamesBehind"])
-        })
-      );
-    });
-  }
-  return entries;
-}
-async function hydrateWnbaStandingsAbbrevs(entries, season) {
-  const missing = entries.filter((entry) => !entry.teamAbbreviation);
-  if (missing.length === 0) return entries;
-  const abbrevByTeamId = /* @__PURE__ */ new Map();
-  await Promise.all(
-    missing.map(async (entry) => {
-      if (abbrevByTeamId.has(entry.espnTeamId)) return;
-      try {
-        const payload = await fetchEspnCoreJson2(
-          `${WNBA_ESPN_CORE_BASE}/seasons/${season}/teams/${entry.espnTeamId}?lang=en&region=us`
-        );
-        abbrevByTeamId.set(entry.espnTeamId, {
-          abbreviation: payload.abbreviation,
-          displayName: payload.shortDisplayName ?? payload.displayName
-        });
-      } catch (error) {
-        if (define_import_meta_env_default.DEV) {
-          console.warn(`${LOG10} Team abbrev fetch failed`, entry.espnTeamId, error);
-        }
-      }
-    })
-  );
-  return entries.map((entry) => {
-    const team = abbrevByTeamId.get(entry.espnTeamId);
-    if (!team) return entry;
-    return {
-      ...entry,
-      teamAbbreviation: entry.teamAbbreviation ?? team.abbreviation,
-      teamDisplayName: entry.teamDisplayName ?? team.displayName,
-      displayLabel: entry.displayLabel
-    };
-  });
-}
-function resolveWnbaSeasonYear(now = /* @__PURE__ */ new Date()) {
-  return now.getFullYear();
-}
-async function buildWnbaEspnStandingsIndex(now = /* @__PURE__ */ new Date()) {
-  const season = resolveWnbaSeasonYear(now);
-  const index = {
-    byEspnTeamId: /* @__PURE__ */ new Map(),
-    byAbbrev: /* @__PURE__ */ new Map(),
-    byDisplayName: /* @__PURE__ */ new Map()
-  };
-  let entries = [];
-  try {
-    const sitePayload = await fetchEspnStandingsJson(
-      `${WNBA_ESPN_STANDINGS_URL}?season=${season}&region=us&lang=en`
-    );
-    entries = parseEspnSiteStandingsPayload2(sitePayload);
-  } catch (error) {
-    if (define_import_meta_env_default.DEV) {
-      console.warn(`${LOG10} Site standings fetch failed`, error);
-    }
-  }
-  if (entries.length === 0) {
-    entries = await fetchWnbaCoreConferenceStandings(season);
-  }
-  entries = await hydrateWnbaStandingsAbbrevs(entries, season);
-  for (const entry of entries) {
-    registerStandingsEntry2(index, entry);
-  }
-  if (define_import_meta_env_default.DEV) {
-    console.log(`${LOG10} Built WNBA standings index`, {
-      teams: index.byEspnTeamId.size,
-      season
-    });
-  }
-  return index;
-}
-
-// ../grarf/desktop/src/lib/standings/wnba/enrichWnbaGamesWithStandings.ts
-init_define_import_meta_env();
-var LOG11 = "[StandingsEnrich:WNBA]";
-function normalizeTeamLookupKey4(value) {
-  return String(value ?? "").trim().toLowerCase().replace(/\s+/g, " ");
-}
-function resolveTeamStandings2(game, side, index) {
-  const abbrev = (side === "away" ? game.awayTeamAbbrev : game.homeTeamAbbrev)?.trim();
-  if (abbrev) {
-    const byAbbrev = index.byAbbrev.get(abbrev.toUpperCase());
-    if (byAbbrev) return byAbbrev;
-  }
-  const officialName = side === "away" ? game.metadata?.officialAwayName : game.metadata?.officialHomeName;
-  const displayName = side === "away" ? game.awayTeam : game.homeTeam;
-  for (const candidate of [officialName, displayName]) {
-    const key = normalizeTeamLookupKey4(candidate);
-    if (!key) continue;
-    const hit = index.byDisplayName.get(key);
-    if (hit) return hit;
-  }
-  return void 0;
-}
-function attachStandingsToGame2(game, index) {
-  const awayTeamStandings = resolveTeamStandings2(game, "away", index);
-  const homeTeamStandings = resolveTeamStandings2(game, "home", index);
-  if (!awayTeamStandings && !homeTeamStandings) return game;
-  return {
-    ...game,
-    ...awayTeamStandings ? { awayTeamStandings } : {},
-    ...homeTeamStandings ? { homeTeamStandings } : {}
-  };
-}
-async function enrichWnbaGamesWithStandings(games, index) {
-  if (games.length === 0 || index.byEspnTeamId.size === 0) return games;
-  let attached = 0;
-  const enriched = games.map((game) => {
-    const next = attachStandingsToGame2(game, index);
-    if (next !== game) attached += 1;
-    return next;
-  });
-  if (define_import_meta_env_default.DEV && attached > 0) {
-    console.log(`${LOG11} Attached standings to games`, { games: games.length, attached });
-  }
-  return enriched;
-}
-
-// ../grarf/desktop/src/lib/standings/enrichOperationalSnapshotTeamStandings.ts
-var LOG12 = "[StandingsEnrich]";
-var TEAM_STANDINGS_LEAGUE_ENRICHERS = {
-  MLB: {
-    buildIndex: buildMlbEspnStandingsIndex,
-    enrichGames: enrichMlbGamesWithStandings
-  },
-  WNBA: {
-    buildIndex: buildWnbaEspnStandingsIndex,
-    enrichGames: enrichWnbaGamesWithStandings
-  }
-};
-async function enrichLeagueGamesWithStandings(games, cacheKey2, buildIndex, enrichGames) {
-  let index = readCachedStandingsValue(cacheKey2, ESPN_STANDINGS_CACHE_TTL_MS);
-  if (!index) {
-    index = await buildIndex();
-    writeCachedStandingsValue(cacheKey2, index);
-  }
-  return enrichGames(games, index);
-}
-async function enrichOperationalSnapshotTeamStandings(transport) {
-  const leagues = transport.leagues ?? {};
-  let changed = false;
-  const nextLeagues = { ...leagues };
-  for (const [leagueKey, config] of Object.entries(TEAM_STANDINGS_LEAGUE_ENRICHERS)) {
-    const rows = leagues[leagueKey];
-    if (!Array.isArray(rows) || rows.length === 0 || !config) continue;
-    try {
-      const cacheKey2 = `espn-standings:${leagueKey}`;
-      const enriched = await enrichLeagueGamesWithStandings(
-        rows,
-        cacheKey2,
-        config.buildIndex,
-        config.enrichGames
-      );
-      if (enriched.some((row, index) => row !== rows[index])) {
-        nextLeagues[leagueKey] = enriched;
-        changed = true;
-      }
-    } catch (error) {
-      console.warn(`${LOG12} ${leagueKey} standings enrich failed`, error);
-    }
-  }
-  if (!changed) return transport;
-  return { ...transport, leagues: nextLeagues };
-}
-
 // ../grarf/desktop/src/lib/playerRank/enrichOperationalSnapshotPlayerRanks.ts
 init_define_import_meta_env();
 
@@ -19939,7 +19272,7 @@ function resolveWimbledonFeedSeedsForGame(game, match) {
 }
 
 // ../grarf/desktop/src/lib/playerRank/enrichTennisGamesWithPlayerRanks.ts
-var LOG13 = "[PlayerRankEnrich:Tennis]";
+var LOG8 = "[PlayerRankEnrich:Tennis]";
 function resolveTennisSideRank(game, side, wimbledonSeeds) {
   const leagueKey = game.league;
   if (leagueKey !== "ATP" && leagueKey !== "WTA") return void 0;
@@ -19990,13 +19323,13 @@ async function enrichTennisGamesWithPlayerRanks(games, catalogByYear) {
     return next;
   });
   if (define_import_meta_env_default.DEV && attached > 0) {
-    console.log(`${LOG13} Attached player ranks`, { games: games.length, attached });
+    console.log(`${LOG8} Attached player ranks`, { games: games.length, attached });
   }
   return enriched;
 }
 
 // ../grarf/desktop/src/lib/playerRank/enrichOperationalSnapshotPlayerRanks.ts
-var LOG14 = "[PlayerRankEnrich]";
+var LOG9 = "[PlayerRankEnrich]";
 var TENNIS_PLAYER_RANK_LEAGUES = ["ATP", "WTA"];
 async function buildWimbledonCatalogByYear(transport) {
   const years = /* @__PURE__ */ new Set();
@@ -20035,7 +19368,7 @@ async function enrichOperationalSnapshotPlayerRanks(transport) {
         changed = true;
       }
     } catch (error) {
-      console.warn(`${LOG14} ${leagueKey} player rank enrich failed`, error);
+      console.warn(`${LOG9} ${leagueKey} player rank enrich failed`, error);
     }
   }
   if (!changed) return transport;
@@ -20177,7 +19510,7 @@ async function supplementOperationalSnapshotFromLocalIpc(transport) {
 }
 
 // ../grarf/desktop/src/services/operationalIngest/enrichOperationalTransport.ts
-var LOG15 = "[OperationalIngest]";
+var LOG10 = "[OperationalIngest]";
 function cloudRowMissingMlbPk2(row) {
   if (typeof row.gamePk === "number" && row.gamePk > 0) return false;
   const mlb = row.externalIds?.mlb?.trim();
@@ -20204,22 +19537,22 @@ async function enrichOperationalTransport(rawTransport) {
   try {
     transport = sanitizeOperationalSnapshotWatchStreams(transport);
   } catch (e) {
-    console.warn(`${LOG15} watch stream sanitize failed`, e);
+    console.warn(`${LOG10} watch stream sanitize failed`, e);
   }
   try {
     transport = enrichOperationalSnapshotManualGameOverrides(transport);
   } catch (e) {
-    console.warn(`${LOG15} manual game override enrich failed`, e);
+    console.warn(`${LOG10} manual game override enrich failed`, e);
   }
   try {
     transport = await supplementOperationalSnapshotFromLocalIpc(transport);
   } catch (e) {
-    console.warn(`${LOG15} local IPC supplement failed`, e);
+    console.warn(`${LOG10} local IPC supplement failed`, e);
   }
   try {
     transport = enrichOperationalSnapshotEspnWatchStreams(transport);
   } catch (e) {
-    console.warn(`${LOG15} ESPN Watch stream enrich failed`, e);
+    console.warn(`${LOG10} ESPN Watch stream enrich failed`, e);
   }
   if (isGrarfWebRenderer()) {
     try {
@@ -20229,59 +19562,54 @@ async function enrichOperationalTransport(rawTransport) {
         await enrichWimbledonEspnWatchStreams(rows);
       }
     } catch (e) {
-      console.warn(`${LOG15} Wimbledon ESPN Watch enrich failed`, e);
+      console.warn(`${LOG10} Wimbledon ESPN Watch enrich failed`, e);
     }
     try {
       transport = await enrichOperationalSnapshotWimbledonSlamTracker(transport);
     } catch (e) {
-      console.warn(`${LOG15} Wimbledon SlamTracker enrich failed`, e);
+      console.warn(`${LOG10} Wimbledon SlamTracker enrich failed`, e);
     }
     try {
       transport = await enrichOperationalSnapshotEspnWatchPickerStreams(transport);
     } catch (e) {
-      console.warn(`${LOG15} ESPN Watch picker enrich failed`, e);
+      console.warn(`${LOG10} ESPN Watch picker enrich failed`, e);
     }
   }
   try {
     transport = enrichOperationalSnapshotUsaNetworkStreams(transport);
   } catch (e) {
-    console.warn(`${LOG15} USA Network stream enrich failed`, e);
+    console.warn(`${LOG10} USA Network stream enrich failed`, e);
   }
   try {
     transport = await joinMissingMlbProviderIds(transport);
   } catch (e) {
-    console.warn(`${LOG15} MLB provider join failed`, e);
+    console.warn(`${LOG10} MLB provider join failed`, e);
   }
   try {
     transport = await enrichOperationalSnapshotTennisChannel(transport);
   } catch (e) {
-    console.warn(`${LOG15} Tennis Channel Plus enrich failed`, e);
+    console.warn(`${LOG10} Tennis Channel Plus enrich failed`, e);
   }
   try {
     transport = await enrichOperationalSnapshotFoxWorldCup(transport);
   } catch (e) {
-    console.warn(`${LOG15} FOX World Cup enrich failed`, e);
+    console.warn(`${LOG10} FOX World Cup enrich failed`, e);
   }
   try {
     transport = await enrichOperationalSnapshotWnbaStreams(transport);
   } catch (e) {
-    console.warn(`${LOG15} WNBA Prime Video enrich failed`, e);
+    console.warn(`${LOG10} WNBA Prime Video enrich failed`, e);
   }
   try {
     transport = await enrichOperationalSnapshotFotmob(transport);
   } catch (e) {
-    console.warn(`${LOG15} FotMob World Cup enrich failed`, e);
+    console.warn(`${LOG10} FotMob World Cup enrich failed`, e);
   }
   if (isGrarfWebRenderer()) {
     try {
-      transport = await enrichOperationalSnapshotTeamStandings(transport);
-    } catch (e) {
-      console.warn(`${LOG15} team standings enrich failed`, e);
-    }
-    try {
       transport = await enrichOperationalSnapshotPlayerRanks(transport);
     } catch (e) {
-      console.warn(`${LOG15} player rank enrich failed`, e);
+      console.warn(`${LOG10} player rank enrich failed`, e);
     }
   }
   return transport;
@@ -20321,7 +19649,7 @@ function getOperationalIngestConfig() {
 }
 
 // ../grarf/desktop/src/services/operationalIngest/fetchOperationalSnapshot.ts
-var LOG16 = "[OperationalIngest]";
+var LOG11 = "[OperationalIngest]";
 var CLOUD_STALE_THRESHOLD_MS = 9e4;
 var CLOUD_FETCH_TIMEOUT_MS = 2e4;
 var WEB_CLOUD_BOOTSTRAP_TIMEOUT_MS = 2500;
@@ -20366,7 +19694,7 @@ async function fetchViaEspnLocalIpcAdapter() {
   const api = window.grarf?.gamesGetSnapshot;
   if (!api) {
     if (define_import_meta_env_default.DEV) {
-      console.warn(`${LOG16} source=espn_local_adapter unavailable (no Electron IPC)`);
+      console.warn(`${LOG11} source=espn_local_adapter unavailable (no Electron IPC)`);
     }
     return emptyOperationalSnapshot();
   }
@@ -20442,7 +19770,7 @@ async function fetchViaGrarfCloudWithLocalFallback() {
   if (!electronIpc) {
     if (cloud) {
       if (define_import_meta_env_default.DEV && !cloudFresh) {
-        console.warn(`${LOG16} browser/web using cloud snapshot (stale but authoritative)`, {
+        console.warn(`${LOG11} browser/web using cloud snapshot (stale but authoritative)`, {
           cloudAgeMs,
           cloudError
         });
@@ -20460,7 +19788,7 @@ async function fetchViaGrarfCloudWithLocalFallback() {
     return cloud;
   }
   if (define_import_meta_env_default.DEV && (cloudError || cloud && !cloudFresh)) {
-    console.warn(`${LOG16} using local IPC fallback (cloud stale or failed)`, {
+    console.warn(`${LOG11} using local IPC fallback (cloud stale or failed)`, {
       cloudError,
       cloudAgeMs: cloud ? cloudAgeMs : null,
       localAgeMs,
