@@ -4,7 +4,6 @@ export type AdminNavItemId =
   | "featured-games"
   | "streams"
   | "navigation"
-  | "league-configuration"
   | "waitlist"
   | "analytics"
   | "settings";
@@ -21,7 +20,6 @@ export const ADMIN_NAV_ITEMS: AdminNavItem[] = [
   { id: "featured-games", label: "Featured Games", enabled: false },
   { id: "streams", label: "Streams", enabled: false },
   { id: "navigation", label: "Navigation", enabled: false },
-  { id: "league-configuration", label: "League Configuration", enabled: true },
   { id: "waitlist", label: "Waitlist", enabled: false },
   { id: "analytics", label: "Analytics", enabled: false },
   { id: "settings", label: "Settings", enabled: false },
