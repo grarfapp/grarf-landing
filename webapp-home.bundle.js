@@ -36833,9 +36833,10 @@ function attachBroadcastFields(game) {
 }
 
 // ../grarf/desktop/src/services/canonicalLiveGame/normalize.ts
+init_isGrarfWebRenderer();
 function normalizeCanonicalLiveGame(game, input) {
   const league = game.league ?? "MLB";
-  const enriched = attachBroadcastFields({ ...game, league });
+  const enriched = isGrarfWebRenderer() ? { ...game, league } : attachBroadcastFields({ ...game, league });
   const meta = {
     gameId: enriched.id,
     league,
