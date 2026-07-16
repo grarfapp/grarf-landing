@@ -30838,6 +30838,7 @@ var GRARF_LEAGUE_KEY_NAV_ITEM_ID = {
   SERIEA: "serie-a",
   LIGUE1: "ligue-1",
   BUNDESLIGA: "bundesliga",
+  BRA1: "brasileirao",
   UCL: "ucl",
   UEL: "uel",
   WORLDCUP: "fifa-world-cup",
@@ -31523,6 +31524,10 @@ function OnTodayNavRowWithTallies({
 // ../grarf/desktop/src/lib/gamesSpine/gamesSpineLeagueLogoUrls.ts
 init_define_import_meta_env();
 
+// ../grarf/desktop/src/lib/gamesSpine/bra1LeagueLogoUrl.ts
+init_define_import_meta_env();
+var BRA1_LEAGUE_LOGO_URL = "/league-logos/brasileirao.png";
+
 // ../grarf/desktop/src/lib/gamesSpine/mcwsLeagueLogoUrl.ts
 init_define_import_meta_env();
 var MCWS_LEAGUE_LOGO_URL = "https://upload.wikimedia.org/wikipedia/en/c/c2/Cws_logo_new_ncaa2016.png";
@@ -31554,6 +31559,7 @@ var GAMES_SPINE_LEAGUE_LOGO_URL = {
   USL1: "/league-logos/usl-league-one.png",
   USLC: "/league-logos/usl-championship.png",
   BUNDESLIGA: "https://a.espncdn.com/i/leaguelogos/soccer/500/10.png",
+  BRA1: BRA1_LEAGUE_LOGO_URL,
   UCL: UCL_LEAGUE_LOGO_URL,
   UEL: "https://a.espncdn.com/i/leaguelogos/soccer/500/2310.png",
   WWC: "https://a.espncdn.com/i/leaguelogos/soccer/500/60.png",
