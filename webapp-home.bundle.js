@@ -65097,8 +65097,25 @@ function GamesSpineUnifiedGameCard({
   const showActionButtons = showFollowLive || showWatchLiveButton;
   const bothActionButtons = showFollowLive && showWatchLiveButton;
   const actionButtonLayoutClass = bothActionButtons ? "!w-auto min-w-max flex-1 basis-[calc(50%-0.125rem)] whitespace-nowrap" : "w-full whitespace-nowrap";
+  const league = game?.league;
+  const leagueLogoUrl = league ? resolveGamesSpineLeagueLogoUrl(league, { game }) : void 0;
   return /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: cn2(GAMES_SPINE_CARD_SHELL_CLASS, className), children: [
-    /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "flex min-w-0 items-center justify-between", children: /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: GAMES_SPINE_CARD_LEAGUE_LABEL_CLASS, children: leagueLabel }) }),
+    /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "flex min-w-0 items-center justify-between", children: /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "inline-flex min-w-0 items-center gap-1", children: [
+      league && leagueLogoUrl ? /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(
+        "img",
+        {
+          src: leagueLogoUrl,
+          alt: "",
+          className: cn2(
+            "h-2.5 w-2.5 shrink-0 object-contain",
+            resolveGamesSpineLeagueLogoImgClassName(league, leagueLogoUrl)
+          ),
+          loading: "lazy",
+          decoding: "async"
+        }
+      ) : null,
+      /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("span", { className: GAMES_SPINE_CARD_LEAGUE_LABEL_CLASS, children: leagueLabel })
+    ] }) }),
     game ? /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(
       GamesSpineCardStatusRow,
       {
