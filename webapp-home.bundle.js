@@ -31536,6 +31536,37 @@ var MCWS_LEAGUE_LOGO_URL = "https://upload.wikimedia.org/wikipedia/en/c/c2/Cws_l
 init_define_import_meta_env();
 var WORLD_CUP_LEAGUE_LOGO_URL = "/league-logos/fifa-world-cup-2026.png";
 
+// ../grarf/desktop/src/lib/gamesSpine/theOpenLeagueLogoUrl.ts
+init_define_import_meta_env();
+var THE_OPEN_LEAGUE_LOGO_URL = "/league-logos/the-open.png";
+
+// ../grarf/desktop/shared/golfWatchUrls.js
+init_define_import_meta_env();
+var PGA_TOUR_LEADERBOARD_URL = "https://www.pgatour.com/leaderboard";
+var LPGA_TOUR_LEADERBOARD_URL = "https://www.lpga.com/leaderboard";
+var PGA_TOUR_CHAMPIONS_LEADERBOARD_URL = "https://www.pgatour.com/pgatour-champions/leaderboard";
+var PGA_TOUR_LEAGUE_KEY = "PGA";
+function isUsOpenTournamentTitle(title) {
+  return typeof title === "string" && /\bu\.?\s*s\.?\s*open\b/i.test(title.trim());
+}
+function isPgaTourUsOpenEvent(leagueKey, tournamentTitle) {
+  return leagueKey === PGA_TOUR_LEAGUE_KEY && isUsOpenTournamentTitle(tournamentTitle);
+}
+function isPgaTourOpenChampionshipTitle(title) {
+  if (typeof title !== "string") return false;
+  const trimmed = title.trim();
+  if (!trimmed || isUsOpenTournamentTitle(trimmed)) return false;
+  return /^the open$/i.test(trimmed) || /\b(the )?open championship\b/i.test(trimmed) || /\bbritish open\b/i.test(trimmed);
+}
+function isPgaTourOpenChampionshipEvent(leagueKey, tournamentTitle) {
+  return leagueKey === PGA_TOUR_LEAGUE_KEY && isPgaTourOpenChampionshipTitle(tournamentTitle);
+}
+function resolveGolfLeaderboardUrl(leagueKey) {
+  if (leagueKey === "LPGA") return LPGA_TOUR_LEADERBOARD_URL;
+  if (leagueKey === "CHAMPIONS") return PGA_TOUR_CHAMPIONS_LEADERBOARD_URL;
+  return PGA_TOUR_LEADERBOARD_URL;
+}
+
 // ../grarf/desktop/src/lib/gamesSpine/gamesSpineLeagueLogoUrls.ts
 var GAMES_SPINE_LEAGUE_LOGO_URL = {
   MLB: "https://a.espncdn.com/i/teamlogos/leagues/500/mlb.png",
@@ -31586,7 +31617,11 @@ var GAMES_SPINE_LEAGUE_LOGO_URL = {
   PLL: "/league-logos/pll.png",
   USLCUP: "/league-logos/usl-cup.png"
 };
-function resolveGamesSpineLeagueLogoUrl(league) {
+function resolveGamesSpineLeagueLogoUrl(league, options) {
+  const tournamentTitle = options?.tournamentTitle ?? options?.game?.awayTeam;
+  if (isPgaTourOpenChampionshipEvent(league, tournamentTitle)) {
+    return THE_OPEN_LEAGUE_LOGO_URL;
+  }
   return GAMES_SPINE_LEAGUE_LOGO_URL[league];
 }
 function resolveGamesSpineLeagueLogoImgClassName(league, logoUrl) {
@@ -31639,24 +31674,6 @@ init_define_import_meta_env();
 
 // ../grarf/desktop/src/lib/bestGameRightNow/leagueImportanceV1.ts
 init_define_import_meta_env();
-
-// ../grarf/desktop/shared/golfWatchUrls.js
-init_define_import_meta_env();
-var PGA_TOUR_LEADERBOARD_URL = "https://www.pgatour.com/leaderboard";
-var LPGA_TOUR_LEADERBOARD_URL = "https://www.lpga.com/leaderboard";
-var PGA_TOUR_CHAMPIONS_LEADERBOARD_URL = "https://www.pgatour.com/pgatour-champions/leaderboard";
-var PGA_TOUR_LEAGUE_KEY = "PGA";
-function isUsOpenTournamentTitle(title) {
-  return typeof title === "string" && /\bu\.?\s*s\.?\s*open\b/i.test(title.trim());
-}
-function isPgaTourUsOpenEvent(leagueKey, tournamentTitle) {
-  return leagueKey === PGA_TOUR_LEAGUE_KEY && isUsOpenTournamentTitle(tournamentTitle);
-}
-function resolveGolfLeaderboardUrl(leagueKey) {
-  if (leagueKey === "LPGA") return LPGA_TOUR_LEADERBOARD_URL;
-  if (leagueKey === "CHAMPIONS") return PGA_TOUR_CHAMPIONS_LEADERBOARD_URL;
-  return PGA_TOUR_LEADERBOARD_URL;
-}
 
 // ../grarf/desktop/src/lib/golf/lpgaMajorTournament.ts
 init_define_import_meta_env();
@@ -41956,6 +41973,8 @@ init_define_import_meta_env();
 
 // ../grarf/desktop/src/lib/liveTracker/liveTrackerFeedRegistry.ts
 init_define_import_meta_env();
+var PGA_OPEN_LIVE_TRACKER_FEED_URL = "https://rss.app/feeds/c5Qh50PZLWqipg06.xml";
+var LIVE_TRACKER_PGA_OPEN_FEED_ID = "live-tracker-pga-open";
 var LIVE_TRACKER_FEED_REGISTRY = [
   {
     league: "MLB",
@@ -42037,37 +42056,23 @@ var FEED_BY_LEAGUE = new Map(
 function getLiveTrackerFeedRegistry() {
   return LIVE_TRACKER_FEED_REGISTRY;
 }
-function resolveLiveTrackerFeedForLeague(league) {
-  return FEED_BY_LEAGUE.get(league) ?? null;
+function resolveLiveTrackerFeedForLeague(league, options) {
+  const base = FEED_BY_LEAGUE.get(league) ?? null;
+  if (!base) return null;
+  if (league !== "PGA" || !options?.leagueGames?.length) return base;
+  if (!options.leagueGames.some((game) => isPgaTourOpenChampionshipEvent(game.league, game.awayTeam))) {
+    return base;
+  }
+  return {
+    ...base,
+    feedUrl: PGA_OPEN_LIVE_TRACKER_FEED_URL,
+    feedId: LIVE_TRACKER_PGA_OPEN_FEED_ID,
+    label: "The Open"
+  };
 }
 function hasLiveTrackerFeedForLeague(league) {
   return FEED_BY_LEAGUE.has(league);
 }
-
-// ../grarf/desktop/src/lib/liveTracker/resolveActiveLiveTrackerFeeds.ts
-function resolveActiveLiveTrackerFeeds(liveLeagueKeys) {
-  const feeds = [];
-  for (const league of liveLeagueKeys) {
-    const feed = resolveLiveTrackerFeedForLeague(league);
-    if (feed) feeds.push(feed);
-  }
-  return feeds;
-}
-function buildLiveTrackerActiveFeedsSnapshot(liveLeagueKeys, updatedAt = null) {
-  const feeds = resolveActiveLiveTrackerFeeds(liveLeagueKeys);
-  return {
-    feeds,
-    feedUrls: feeds.map((feed) => feed.feedUrl),
-    updatedAt
-  };
-}
-
-// ../grarf/desktop/src/store/liveTrackerLiveLeaguesStore.ts
-init_define_import_meta_env();
-var import_zustand19 = __toESM(require_zustand(), 1);
-
-// ../grarf/desktop/src/lib/liveTracker/resolveCurrentlyLiveGamesSpineLeagues.ts
-init_define_import_meta_env();
 
 // ../grarf/desktop/src/lib/liveTracker/resolveManualLiveTrackerLeagueGames.ts
 init_define_import_meta_env();
@@ -42353,7 +42358,37 @@ function collectLiveTrackerLeagueGames(league, leagues, retainedFinals, nowMs = 
   return resolveManualLiveTrackerGamesByLeague(nowMs).get(league) ?? [];
 }
 
+// ../grarf/desktop/src/lib/liveTracker/resolveActiveLiveTrackerFeeds.ts
+function resolveActiveLiveTrackerFeeds(liveLeagueKeys, context2) {
+  const feeds = [];
+  const nowMs = context2?.nowMs ?? Date.now();
+  for (const league of liveLeagueKeys) {
+    const leagueGames = context2 ? collectLiveTrackerLeagueGames(
+      league,
+      context2.leagues ?? {},
+      context2.retainedFinals ?? [],
+      nowMs
+    ) : void 0;
+    const feed = resolveLiveTrackerFeedForLeague(league, { leagueGames });
+    if (feed) feeds.push(feed);
+  }
+  return feeds;
+}
+function buildLiveTrackerActiveFeedsSnapshot(liveLeagueKeys, updatedAt = null, context2) {
+  const feeds = resolveActiveLiveTrackerFeeds(liveLeagueKeys, context2);
+  return {
+    feeds,
+    feedUrls: feeds.map((feed) => feed.feedUrl),
+    updatedAt
+  };
+}
+
+// ../grarf/desktop/src/store/liveTrackerLiveLeaguesStore.ts
+init_define_import_meta_env();
+var import_zustand19 = __toESM(require_zustand(), 1);
+
 // ../grarf/desktop/src/lib/liveTracker/resolveCurrentlyLiveGamesSpineLeagues.ts
+init_define_import_meta_env();
 function resolveCurrentlyLiveGamesSpineLeagues(leagues) {
   const liveLeagues = [];
   for (const league of getGamesColumnLeagueOrder()) {
@@ -42634,6 +42669,21 @@ function getCachedLiveTrackerConfigurationRows() {
 init_define_import_meta_env();
 init_isGrarfWebRenderer();
 
+// ../grarf/desktop/src/lib/liveTracker/resolveLiveTrackerLeagueDisplayLabel.ts
+init_define_import_meta_env();
+var LIVE_TRACKER_THE_OPEN_LABEL = "The Open";
+function isPgaOpenLiveTrackerFeedActive(activeFeeds) {
+  return activeFeeds?.some((feed) => feed.feedId === LIVE_TRACKER_PGA_OPEN_FEED_ID) ?? false;
+}
+function resolveLiveTrackerLeagueDisplayLabel(league, options) {
+  if (isPgaTourOpenChampionshipEvent(league, options?.tournamentTitle) || league === "PGA" && isPgaOpenLiveTrackerFeedActive(options?.activeFeeds)) {
+    return LIVE_TRACKER_THE_OPEN_LABEL;
+  }
+  const explicit = options?.leagueLabel?.trim();
+  if (explicit) return explicit;
+  return resolveGamesSpineLeagueDisplayLabel(league);
+}
+
 // ../grarf/desktop/src/lib/liveTracker/liveTrackerWebPersistenceStorage.ts
 init_define_import_meta_env();
 init_isGrarfWebRenderer();
@@ -42682,8 +42732,10 @@ function liveTrackerFinalScorePostUrl(gameId) {
 }
 function resolveFinalScoreLeagueLabel(game, league) {
   const manualLabel = game.metadata?.manualGamesSpine?.displayName?.trim() || game.metadata?.manualGamesSpine?.leagueLabel?.trim() || game.metadata?.leagueLabel?.trim();
-  if (manualLabel) return manualLabel;
-  return resolveGamesSpineLeagueDisplayLabel(league);
+  return resolveLiveTrackerLeagueDisplayLabel(league, {
+    leagueLabel: manualLabel,
+    tournamentTitle: game.awayTeam
+  });
 }
 function buildLiveTrackerFinalScorePost(game, publishedAtMs) {
   const league = game.league ?? "MLB";
@@ -43191,7 +43243,12 @@ var useLiveTrackerActiveFeedsStore = (0, import_zustand20.create)((set, get) => 
   ...emptySnapshot2(),
   syncFromLiveLeagues: () => {
     const { leagueKeys, updatedAt } = useLiveTrackerLiveLeaguesStore.getState();
-    const next = buildLiveTrackerActiveFeedsSnapshot(leagueKeys, updatedAt);
+    const { leagues } = useCanonicalLiveGameStore.getState();
+    const retainedFinals = useRecentFinalizedGamesStore.getState().getAllRetained();
+    const next = buildLiveTrackerActiveFeedsSnapshot(leagueKeys, updatedAt, {
+      leagues,
+      retainedFinals
+    });
     const current = get();
     const sameFeeds = current.feedUrls.length === next.feedUrls.length && current.feedUrls.every((url, index) => url === next.feedUrls[index]) && current.updatedAt === next.updatedAt;
     if (sameFeeds) return;
@@ -43748,7 +43805,11 @@ var useLiveTrackerPostsStore = (0, import_zustand21.create)((set, get) => ({
   ...emptySnapshot3(),
   refresh: async () => {
     const retentionContext = buildPostRetentionContext();
-    const feeds = resolveActiveLiveTrackerFeeds(retentionContext.liveIngestLeagueKeys);
+    const leagues = mergeOperationalLeagueGames(useCanonicalLiveGameStore.getState().leagues);
+    const feeds = resolveActiveLiveTrackerFeeds(retentionContext.liveIngestLeagueKeys, {
+      leagues,
+      retainedFinals: useRecentFinalizedGamesStore.getState().getAllRetained()
+    });
     useLiveTrackerActiveFeedsStore.setState({
       feeds,
       feedUrls: feeds.map((feed) => feed.feedUrl),
@@ -64464,7 +64525,7 @@ var SOCCER_LEAGUES3 = /* @__PURE__ */ new Set([
   "USLCUP",
   "WORLDCUP"
 ]);
-function espnCdnLogo(league, abbrev, teamId) {
+function espnCdnLogo(league, abbrev, teamId, game) {
   const abbr = abbrev?.trim().toLowerCase();
   const id = teamId?.trim();
   if (league && NATIONAL_TEAM_SOCCER_LEAGUES.has(league) && abbr) {
@@ -64492,7 +64553,7 @@ function espnCdnLogo(league, abbrev, teamId) {
     return `https://a.espncdn.com/i/teamlogos/soccer/500/${id}.png`;
   }
   if (league && isStandaloneSpineLeague(league)) {
-    return resolveGamesSpineLeagueLogoUrl(league);
+    return resolveGamesSpineLeagueLogoUrl(league, { game });
   }
   return void 0;
 }
@@ -64508,7 +64569,7 @@ function resolveTeamLogoUrl(game, side) {
   if (direct?.trim()) return direct.trim();
   const abbrev = side === "away" ? game.awayTeamAbbrev : game.homeTeamAbbrev;
   const league = game.league ?? (game.id.startsWith("espn-") ? parseLeagueFromEspnId(game.id) : void 0);
-  return espnCdnLogo(league, abbrev);
+  return espnCdnLogo(league, abbrev, void 0, game);
 }
 function parseLeagueFromEspnId(id) {
   const m2 = /^espn-([A-Z]+)-/i.exec(id);
@@ -65398,7 +65459,7 @@ function GamesSpineCompactCompetitorColumn({ game, pill, resultEmphasis }) {
   );
 }
 function GamesSpineCompactEventNameColumn({ game, label }) {
-  const logoUrl = resolveDarkThemeLogoUrl(game, "away") ?? resolveGamesSpineLeagueLogoUrl(game.league);
+  const logoUrl = resolveDarkThemeLogoUrl(game, "away") ?? resolveGamesSpineLeagueLogoUrl(game.league, { game });
   return /* @__PURE__ */ (0, import_jsx_runtime80.jsxs)("div", { className: GAMES_SPINE_COMPACT_COMPETITOR_CELL_CLASS, children: [
     /* @__PURE__ */ (0, import_jsx_runtime80.jsx)(CompetitorLogo, { logoUrl, league: game.league }),
     /* @__PURE__ */ (0, import_jsx_runtime80.jsx)("span", { className: cn2(GAMES_SPINE_COMPACT_COMPETITOR_LABEL_CLASS, "text-white/90"), children: label })
@@ -66202,8 +66263,8 @@ function GameRow({
 init_define_import_meta_env();
 var import_react100 = __toESM(require_react(), 1);
 var import_jsx_runtime84 = __toESM(require_jsx_runtime(), 1);
-function GamesSpineLeagueHeaderMark({ league }) {
-  const logoUrl = resolveGamesSpineLeagueLogoUrl(league);
+function GamesSpineLeagueHeaderMark({ league, game }) {
+  const logoUrl = resolveGamesSpineLeagueLogoUrl(league, { game });
   const [failed, setFailed] = (0, import_react100.useState)(false);
   if (!logoUrl || failed) return null;
   return /* @__PURE__ */ (0, import_jsx_runtime84.jsx)(
@@ -66781,8 +66842,11 @@ init_define_import_meta_env();
 var import_react101 = __toESM(require_react(), 1);
 init_isGrarfWebRenderer();
 var import_jsx_runtime86 = __toESM(require_jsx_runtime(), 1);
-function BestGameRightNowHeaderLeagueLogo({ league }) {
-  const logoUrl = resolveGamesSpineLeagueLogoUrl(league);
+function BestGameRightNowHeaderLeagueLogo({
+  league,
+  game
+}) {
+  const logoUrl = resolveGamesSpineLeagueLogoUrl(league, { game });
   const [logoFailed, setLogoFailed] = (0, import_react101.useState)(false);
   if (!logoUrl || logoFailed) return null;
   return /* @__PURE__ */ (0, import_jsx_runtime86.jsx)(
@@ -66806,6 +66870,7 @@ function BestGameRightNowHeaderLeagueLogo({ league }) {
 function BestGameRightNowFeaturedShell({
   label,
   league,
+  game,
   children,
   className,
   bodyClassName
@@ -66823,7 +66888,7 @@ function BestGameRightNowFeaturedShell({
           ),
           children: [
             /* @__PURE__ */ (0, import_jsx_runtime86.jsx)("span", { className: BEST_GAME_RIGHT_NOW_HEADER_LABEL_CLASS, children: label }),
-            showLeagueLogo ? /* @__PURE__ */ (0, import_jsx_runtime86.jsx)(BestGameRightNowHeaderLeagueLogo, { league }) : null
+            showLeagueLogo ? /* @__PURE__ */ (0, import_jsx_runtime86.jsx)(BestGameRightNowHeaderLeagueLogo, { league, game }) : null
           ]
         }
       )
@@ -66869,8 +66934,8 @@ function WhipAroundPlaceholderIcon({ className }) {
     }
   );
 }
-function WhipAroundAlertHeader({ alertTypeLabel, league, variant }) {
-  const leagueLogoUrl = resolveGamesSpineLeagueLogoUrl(league);
+function WhipAroundAlertHeader({ alertTypeLabel, league, game, variant }) {
+  const leagueLogoUrl = resolveGamesSpineLeagueLogoUrl(league, { game });
   const [logoFailed, setLogoFailed] = (0, import_react102.useState)(false);
   return /* @__PURE__ */ (0, import_jsx_runtime87.jsx)("header", { className: resolveGamesSpineTransientAlertHeaderShellClass(variant), children: /* @__PURE__ */ (0, import_jsx_runtime87.jsxs)("div", { className: "flex items-center justify-between gap-3 px-2.5 py-2", children: [
     /* @__PURE__ */ (0, import_jsx_runtime87.jsxs)("div", { className: "flex min-w-0 items-center gap-1", children: [
@@ -66919,6 +66984,7 @@ function BestGameRightNowTransientOverlayShell({
   visibleMs,
   instanceId,
   league,
+  game,
   onComplete,
   className,
   bodyClassName,
@@ -66939,6 +67005,7 @@ function BestGameRightNowTransientOverlayShell({
           {
             alertTypeLabel: headerLabel,
             league,
+            game,
             variant
           }
         ) : /* @__PURE__ */ (0, import_jsx_runtime88.jsxs)("header", { className: resolveGamesSpineTransientAlertHeaderShellClass(variant), children: [
@@ -66994,6 +67061,7 @@ function BestGameRightNowSection({
         visibleMs: resolveGamesSpineTransientAlertVisibleMs(transientOverlay.type),
         instanceId: transientOverlay.instanceId,
         league: game.league,
+        game,
         onComplete: onTransientOverlayComplete,
         className,
         bodyClassName: cn2(HOME_GAMES_SPINE_GAME_STACK),
@@ -67006,6 +67074,7 @@ function BestGameRightNowSection({
     {
       label,
       league: game.league,
+      game,
       className,
       bodyClassName: cn2(HOME_GAMES_SPINE_GAME_STACK),
       children: cardBody
@@ -67631,7 +67700,7 @@ var HomeLeagueSpineSection = (0, import_react107.memo)(function HomeLeagueSpineS
                   children: [
                     /* @__PURE__ */ (0, import_jsx_runtime90.jsxs)("span", { className: "flex min-w-0 items-center gap-2", children: [
                       /* @__PURE__ */ (0, import_jsx_runtime90.jsx)("span", { className: "w-3 shrink-0 text-center text-[9px] text-cyansys/55", "aria-hidden": true, children: collapsed ? "\u25B6" : "\u25BC" }),
-                      /* @__PURE__ */ (0, import_jsx_runtime90.jsx)(GamesSpineLeagueHeaderMark, { league }),
+                      /* @__PURE__ */ (0, import_jsx_runtime90.jsx)(GamesSpineLeagueHeaderMark, { league, game: highlightedVisibleGames[0] }),
                       /* @__PURE__ */ (0, import_jsx_runtime90.jsx)("span", { className: "truncate text-[17px] font-bold leading-none tracking-[0.14em] text-[#eef6f6]", children: displayName })
                     ] }),
                     /* @__PURE__ */ (0, import_jsx_runtime90.jsxs)("span", { className: "flex shrink-0 items-center gap-2", children: [
@@ -69144,6 +69213,7 @@ function GamesSpineTransientAlertShell({
   ariaLabel,
   visibleMs,
   league,
+  game,
   children,
   className,
   initialDelayMs = 0,
@@ -69218,6 +69288,7 @@ function GamesSpineTransientAlertShell({
               {
                 alertTypeLabel: headerLabel,
                 league,
+                game,
                 variant
               }
             ) : /* @__PURE__ */ (0, import_jsx_runtime98.jsxs)("header", { className: resolveGamesSpineTransientAlertHeaderShellClass(variant), children: [
@@ -69269,6 +69340,7 @@ function GamesSpineTransientAlertQueue({
       ariaLabel: resolveGamesSpineTransientAlertAriaLabel(active2.type),
       visibleMs: resolveGamesSpineTransientAlertVisibleMs(active2.type),
       league: game.league,
+      game,
       className,
       onExited,
       children: /* @__PURE__ */ (0, import_jsx_runtime99.jsx)(
@@ -82285,9 +82357,10 @@ function resolveTabSport(game) {
   return inferSportscapeScoreSportFromLeague(game.league);
 }
 var TAB_SCOREBUG_ROW_CLASS = "inline-flex w-max max-w-full shrink-0 flex-nowrap items-center gap-1 whitespace-nowrap leading-none";
-function TabLeagueIdentity({ league }) {
+function TabLeagueIdentity({ game }) {
+  const league = game.league;
   if (!league) return null;
-  const leagueLogoUrl = resolveGamesSpineLeagueLogoUrl(league);
+  const leagueLogoUrl = resolveGamesSpineLeagueLogoUrl(league, { game });
   const leagueLabel = resolveGamesSpineLeagueDisplayLabel(league);
   return /* @__PURE__ */ (0, import_jsx_runtime139.jsxs)("span", { className: "inline-flex shrink-0 items-center gap-0.5 whitespace-nowrap font-mono text-[8px] font-semibold leading-none tracking-[0.06em] text-[#eef6f6]/90", children: [
     leagueLogoUrl ? /* @__PURE__ */ (0, import_jsx_runtime139.jsx)(
@@ -82459,7 +82532,7 @@ function GameWorkspaceTabScorebug({
   const tennis = isTennisGame(game);
   if (game.status === "final") {
     return /* @__PURE__ */ (0, import_jsx_runtime139.jsxs)("span", { className: TAB_SCOREBUG_ROW_CLASS, children: [
-      /* @__PURE__ */ (0, import_jsx_runtime139.jsx)(TabLeagueIdentity, { league: game.league }),
+      /* @__PURE__ */ (0, import_jsx_runtime139.jsx)(TabLeagueIdentity, { game }),
       /* @__PURE__ */ (0, import_jsx_runtime139.jsx)("span", { className: TAB_FINAL_BADGE_CLASS, children: "FINAL" }),
       renderTabScoreStrip(awayVisuals),
       renderTabScoreStrip(homeVisuals)
@@ -82468,7 +82541,7 @@ function GameWorkspaceTabScorebug({
   if (game.status === "live") {
     const gameState = tennis ? resolveTabTennisGameState(game) : resolveGamesSpineCardTimingLabel(game) ?? game.statusLine?.trim() ?? "";
     return /* @__PURE__ */ (0, import_jsx_runtime139.jsxs)("span", { className: TAB_SCOREBUG_ROW_CLASS, children: [
-      /* @__PURE__ */ (0, import_jsx_runtime139.jsx)(TabLeagueIdentity, { league: game.league }),
+      /* @__PURE__ */ (0, import_jsx_runtime139.jsx)(TabLeagueIdentity, { game }),
       /* @__PURE__ */ (0, import_jsx_runtime139.jsx)(
         GamesSpineLiveBadge,
         {
@@ -85711,11 +85784,28 @@ function isLiveTrackerWimbledonPost(post) {
   }
   return false;
 }
+function isLiveTrackerTheOpenPost(post) {
+  if (post.leagueLabel.trim() === LIVE_TRACKER_THE_OPEN_LABEL) return true;
+  if (post.kind === "final_score" && post.gameId) {
+    const spineGame = getCanonicalLiveGameRow(post.gameId);
+    if (spineGame && isPgaTourOpenChampionshipEvent(spineGame.league, spineGame.awayTeam)) {
+      return true;
+    }
+  }
+  if (post.league === "PGA" && isPgaOpenLiveTrackerFeedActive(getActiveLiveTrackerFeeds())) {
+    return true;
+  }
+  return false;
+}
 function resolveLiveTrackerPostLeagueLogoUrl(post) {
   if (isLiveTrackerWimbledonPost(post)) {
     return LIVE_TRACKER_WIMBLEDON_LOGO_URL;
   }
-  return resolveGamesSpineLeagueLogoUrl(post.league);
+  if (isLiveTrackerTheOpenPost(post)) {
+    return THE_OPEN_LEAGUE_LOGO_URL;
+  }
+  const spineGame = post.gameId != null ? getCanonicalLiveGameRow(post.gameId) : void 0;
+  return resolveGamesSpineLeagueLogoUrl(post.league, { game: spineGame });
 }
 
 // ../grarf/desktop/src/lib/league/leagueColors.ts
@@ -85943,7 +86033,12 @@ function TeamScoreStrip({
 function HomeLiveTrackerFinalScoreStrip({ post }) {
   const score2 = post.finalScore;
   if (!score2) return null;
-  const leagueLabel = post.leagueLabel.trim() || resolveGamesSpineLeagueDisplayLabel(post.league);
+  const spineGame = post.gameId ? findLiveGameById(post.gameId) : void 0;
+  const leagueLabel = resolveLiveTrackerLeagueDisplayLabel(post.league, {
+    leagueLabel: post.leagueLabel,
+    tournamentTitle: spineGame?.awayTeam,
+    activeFeeds: getActiveLiveTrackerFeeds()
+  });
   const leagueLogoUrl = resolveLiveTrackerPostLeagueLogoUrl(post);
   const sport = resolveLiveTrackSportForFinalScore(post.league);
   const clock = formatLiveTrackTerminalClock(
@@ -86056,7 +86151,12 @@ function HomeLiveTrackerPostLine({ post }) {
   const body = sanitizeLiveTrackerWireBody(
     resolveLiveTrackFeedPostBody(post.title, post.description)
   );
-  const leagueLabel = post.leagueLabel.trim() || formatLiveTrackLeagueDisplayName(post.league);
+  const spineGame = post.gameId ? findLiveGameById(post.gameId) : void 0;
+  const leagueLabel = resolveLiveTrackerLeagueDisplayLabel(post.league, {
+    leagueLabel: post.leagueLabel,
+    tournamentTitle: spineGame?.awayTeam,
+    activeFeeds: getActiveLiveTrackerFeeds()
+  });
   const leagueLogoUrl = resolveLiveTrackerPostLeagueLogoUrl(post);
   const account = formatLiveTrackerWireAccount(post.source);
   const clock = formatLiveTrackerWireClock(post.publishedAt);
@@ -86239,8 +86339,17 @@ function liveTrackerScorePostCanWatchLive(spineGame) {
 }
 function HomeLiveTrackerLiveScorePlaceholder({ game }) {
   const [watchPicker, setWatchPicker] = (0, import_react170.useState)(null);
+  const spineGame = findGamesSpineGameForWatchLive(game.gameId);
+  const leagueDisplayLabel = resolveLiveTrackerLeagueDisplayLabel(game.league, {
+    tournamentTitle: spineGame?.awayTeam,
+    activeFeeds: getActiveLiveTrackerFeeds()
+  });
   const sport = LIVE_TRACK_SPORT_BY_LEAGUE[game.league];
-  const leagueLogoUrl = resolveGamesSpineLeagueLogoUrl(game.league);
+  const leagueLogoUrl = resolveLiveTrackerPostLeagueLogoUrl({
+    league: game.league,
+    leagueLabel: leagueDisplayLabel,
+    gameId: game.gameId
+  });
   const gameState = resolvePersistedTrackedGameStateLabel(game);
   const channel = game.channel?.trim() ?? "";
   const timelineEnteredAt = new Date(game.lastUpdatedMs).toISOString();
@@ -86249,9 +86358,9 @@ function HomeLiveTrackerLiveScorePlaceholder({ game }) {
     (e2) => {
       e2.stopPropagation();
       if (!isGrarfWebRenderer()) return;
-      const spineGame = findGamesSpineGameForWatchLive(game.gameId);
-      if (!spineGame || !liveTrackerScorePostCanWatchLive(spineGame)) return;
-      const result = handleWatchLiveClick(spineGame, () => {
+      const spineGame2 = findGamesSpineGameForWatchLive(game.gameId);
+      if (!spineGame2 || !liveTrackerScorePostCanWatchLive(spineGame2)) return;
+      const result = handleWatchLiveClick(spineGame2, () => {
       });
       if (result.action === "picker") {
         setWatchPicker({ game: result.game, options: result.options });
@@ -86283,7 +86392,7 @@ function HomeLiveTrackerLiveScorePlaceholder({ game }) {
                     decoding: "async"
                   }
                 ) : null,
-                /* @__PURE__ */ (0, import_jsx_runtime158.jsx)("span", { children: game.league })
+                /* @__PURE__ */ (0, import_jsx_runtime158.jsx)("span", { children: leagueDisplayLabel })
               ] })
             ] }),
             /* @__PURE__ */ (0, import_jsx_runtime158.jsx)("span", { className: GAME_STATE_PILL_CLASS, children: gameState }),
