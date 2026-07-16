@@ -24975,6 +24975,9 @@ function resolveGameWorkspaceEmbedUrl(game, gameId) {
   if (game) {
     const fotmobUrl = isWorldCupGameRow(game) ? resolveWorldCupWorkspaceEmbedUrl(game) : resolveFotmobMatchUrl(game);
     if (fotmobUrl) return fotmobUrl;
+    if (game.league === "NBASUMMER") {
+      return game.gameCardUrl?.trim() || null;
+    }
   }
   if (game?.streamUrl?.trim()) {
     if (isGolfLeagueKey(game.league) && game.launchMode === "external") {
@@ -85518,6 +85521,18 @@ function tryOpenMcwsGameRowInBrowser(game) {
   return true;
 }
 
+// ../grarf/desktop/src/lib/gamesSpine/tryOpenNbaSummerLeagueGameRowInBrowser.ts
+init_define_import_meta_env();
+init_isGrarfWebRenderer();
+function tryOpenNbaSummerLeagueGameRowInBrowser(game) {
+  if (!isGrarfWebRenderer()) return false;
+  if (game.league !== "NBASUMMER") return false;
+  const url = game.gameCardUrl?.trim();
+  if (!url) return false;
+  window.open(url, "_blank", "noopener,noreferrer");
+  return true;
+}
+
 // ../grarf/desktop/src/lib/gamesSpine/tryOpenNwslGameRowInBrowser.ts
 init_define_import_meta_env();
 init_isGrarfWebRenderer();
@@ -85568,6 +85583,9 @@ var BOARD_SLUG = {
   WTA: "wta"
 };
 function resolveSpineRowWorkspaceEmbedUrl(game) {
+  if (game.league === "NBASUMMER") {
+    return game.gameCardUrl?.trim() || null;
+  }
   if (isWnbaSpineGame(game)) {
     const wnbaUrl = resolveWnbaGameCenterUrl(game);
     if (wnbaUrl) return wnbaUrl;
@@ -85656,6 +85674,7 @@ function openGamesSpineRowInWorkspace(game, dispatch) {
   if (tryOpenTourDeFranceGameRowInLeagueWorkspace(game)) return;
   if (tryOpenF1GameRowInBrowser(game)) return;
   if (tryOpenMcwsGameRowInBrowser(game)) return;
+  if (tryOpenNbaSummerLeagueGameRowInBrowser(game)) return;
   if (tryOpenAflGameRowInBrowser(game)) return;
   if (openFotmobGamesSpineRow(game, dispatch)) return;
   if (tryOpenNwslGameRowInBrowser(game)) return;
