@@ -58126,6 +58126,7 @@ var GAMES_SPINE_CARD_LEAGUE_LABEL_CLASS = "text-[9px] uppercase leading-none tra
 var GAMES_SPINE_CARD_STATUS_GRID_CLASS = "grid w-full min-w-0 grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-x-2";
 var GAMES_SPINE_CARD_TIMING_CLASS = "truncate text-center text-[11px] leading-none tracking-wide text-ambersys/95";
 var GAMES_SPINE_CARD_START_TIME_CLASS = "inline-flex items-center border border-cyansys/45 bg-cyansys/[0.08] px-1.5 py-0.5 text-[10px] tracking-wide text-cyansys/95";
+var GAMES_SPINE_CARD_START_TIME_REPEAT_CLASS = "inline-flex items-center border border-[#2a3d42]/90 bg-[#0a1116]/95 px-1.5 py-0.5 text-[10px] tracking-wide text-[#8aa8a8]";
 var GAMES_SPINE_CARD_CHANNEL_FALLBACK_CLASS = "max-w-[4.5rem] truncate text-[10px] font-bold uppercase leading-none tracking-[0.06em] text-white";
 var GAMES_SPINE_CARD_MATCHUP_TEXT_CLASS = "text-[12px] leading-snug text-white";
 var GAMES_SPINE_CARD_SCORE_CLASS = "text-[12px] leading-none text-textdim/85";
@@ -64975,6 +64976,7 @@ function GamesSpineCardStatusRow({
   scheduleLabel,
   operationalPulse = false,
   hideTime = false,
+  prepareStartTimeRepeat = false,
   className
 }) {
   const channel = resolveGameChannelPresentation(game);
@@ -64989,7 +64991,13 @@ function GamesSpineCardStatusRow({
   const isSuspended = game.status === "suspended";
   const isScheduled = game.status === "scheduled" || isPaused;
   return /* @__PURE__ */ (0, import_jsx_runtime77.jsxs)("div", { className: cn2(GAMES_SPINE_CARD_STATUS_GRID_CLASS, "pr-0.5", className), children: [
-    /* @__PURE__ */ (0, import_jsx_runtime77.jsx)("div", { className: "flex min-w-0 items-center justify-start", children: isLive ? /* @__PURE__ */ (0, import_jsx_runtime77.jsx)(GamesSpineLiveBadge, { operationalPulse }) : isDelayed ? /* @__PURE__ */ (0, import_jsx_runtime77.jsx)("span", { className: "border border-line bg-panel2 px-1 py-px text-[8px] tracking-[0.14em] text-textdim", children: "DELAYED" }) : isPostponed ? /* @__PURE__ */ (0, import_jsx_runtime77.jsx)("span", { className: "border border-line bg-panel2 px-1 py-px text-[8px] tracking-[0.14em] text-textdim", children: "POSTPONED" }) : isSuspended ? /* @__PURE__ */ (0, import_jsx_runtime77.jsx)("span", { className: "border border-line bg-panel2 px-1 py-px text-[8px] tracking-[0.14em] text-textdim", children: "SUSPENDED" }) : isFinal ? /* @__PURE__ */ (0, import_jsx_runtime77.jsx)("span", { className: "border border-line bg-panel2 px-1 py-px text-[8px] tracking-[0.14em] text-textdim", children: "FINAL" }) : isScheduled && timingLabel ? /* @__PURE__ */ (0, import_jsx_runtime77.jsx)("time", { className: GAMES_SPINE_CARD_START_TIME_CLASS, children: timingLabel }) : isScheduled ? /* @__PURE__ */ (0, import_jsx_runtime77.jsx)("span", { "aria-hidden": true }) : scheduleLabel ? /* @__PURE__ */ (0, import_jsx_runtime77.jsx)(
+    /* @__PURE__ */ (0, import_jsx_runtime77.jsx)("div", { className: "flex min-w-0 items-center justify-start", children: isLive ? /* @__PURE__ */ (0, import_jsx_runtime77.jsx)(GamesSpineLiveBadge, { operationalPulse }) : isDelayed ? /* @__PURE__ */ (0, import_jsx_runtime77.jsx)("span", { className: "border border-line bg-panel2 px-1 py-px text-[8px] tracking-[0.14em] text-textdim", children: "DELAYED" }) : isPostponed ? /* @__PURE__ */ (0, import_jsx_runtime77.jsx)("span", { className: "border border-line bg-panel2 px-1 py-px text-[8px] tracking-[0.14em] text-textdim", children: "POSTPONED" }) : isSuspended ? /* @__PURE__ */ (0, import_jsx_runtime77.jsx)("span", { className: "border border-line bg-panel2 px-1 py-px text-[8px] tracking-[0.14em] text-textdim", children: "SUSPENDED" }) : isFinal ? /* @__PURE__ */ (0, import_jsx_runtime77.jsx)("span", { className: "border border-line bg-panel2 px-1 py-px text-[8px] tracking-[0.14em] text-textdim", children: "FINAL" }) : isScheduled && timingLabel ? /* @__PURE__ */ (0, import_jsx_runtime77.jsx)(
+      "time",
+      {
+        className: prepareStartTimeRepeat ? GAMES_SPINE_CARD_START_TIME_REPEAT_CLASS : GAMES_SPINE_CARD_START_TIME_CLASS,
+        children: timingLabel
+      }
+    ) : isScheduled ? /* @__PURE__ */ (0, import_jsx_runtime77.jsx)("span", { "aria-hidden": true }) : scheduleLabel ? /* @__PURE__ */ (0, import_jsx_runtime77.jsx)(
       "span",
       {
         className: cn2(
@@ -65065,6 +65073,7 @@ function GamesSpineUnifiedGameCard({
   scheduleLabel,
   operationalPulse = false,
   hideTime = false,
+  prepareStartTimeRepeat = false,
   showWatchLive = false,
   watchLiveLabel,
   onWatchLive,
@@ -65098,7 +65107,8 @@ function GamesSpineUnifiedGameCard({
         channelLabel,
         scheduleLabel,
         operationalPulse,
-        hideTime
+        hideTime,
+        prepareStartTimeRepeat
       }
     ) : scheduleLabel ? /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(
       GamesSpineCardDemoStatusRow,
@@ -65177,6 +65187,7 @@ function GamesSpineHomeParityGameRow({
   showWatchLive,
   showDemoNhlWatchLive,
   hideTime = false,
+  prepareStartTimeRepeat = false,
   hideSpineCityRow = false,
   hideSpinePitcherRow = false,
   showSpineNarrative = false,
@@ -65242,6 +65253,7 @@ function GamesSpineHomeParityGameRow({
       channelLabel: channel.label,
       operationalPulse: presentation.operationalPulse,
       hideTime,
+      prepareStartTimeRepeat,
       showWatchLive: showWatch,
       showBroadcastOutletBadges: gameShouldShowSpineBroadcastOutlets(game),
       enhancedWatchLive: presentation.enhancedWatchLive,
@@ -65864,6 +65876,7 @@ function GameRow({
   exemptFromCompactGamesMode = false,
   operationalDeprioritized = false,
   hideTime = false,
+  prepareStartTimeRepeat = false,
   applyFinalResultNameEmphasis = false,
   narrativeSlot
 }) {
@@ -66001,6 +66014,7 @@ function GameRow({
               showWatchLive,
               showDemoNhlWatchLive,
               hideTime: hideTime || hideSpineStartTime,
+              prepareStartTimeRepeat,
               hideSpineCityRow,
               hideSpinePitcherRow,
               showSpineNarrative,
@@ -66031,6 +66045,7 @@ function GameRow({
           showWatchLive,
           showDemoNhlWatchLive,
           hideTime: hideTime || hideSpineStartTime,
+          prepareStartTimeRepeat,
           hideSpineCityRow,
           hideSpinePitcherRow,
           showSpineNarrative,
@@ -67469,6 +67484,7 @@ function TdfStage8HighlightSection({
   onWatchLive,
   canShowWatchLive,
   hideTime = false,
+  prepareStartTimeRepeat = false,
   showSpineNarrative,
   hideSpineGeneratedSummaryHeadline
 }) {
@@ -67481,6 +67497,7 @@ function TdfStage8HighlightSection({
       variant: "rail",
       homeSpineParity: true,
       hideTime,
+      prepareStartTimeRepeat,
       isSelected,
       onOpen,
       onWatchLive,
@@ -67515,6 +67532,7 @@ function MlbInlineHighlightPrototypeSection(props) {
         variant: "rail",
         homeSpineParity: true,
         hideTime: props.hideTime,
+        prepareStartTimeRepeat: props.prepareStartTimeRepeat,
         isSelected: props.isSelected,
         onOpen: props.onOpen,
         onWatchLive: props.onWatchLive,
@@ -67848,7 +67866,9 @@ var HomeLeagueSpineSection = (0, import_react107.memo)(function HomeLeagueSpineS
                         const showNarrative = (editMode || Boolean(spineNarrativeText)) && !isDemoWnbaWhipAroundGameId(g2.id);
                         const groupTimeLabel = prepareGroupStarters.get(g2.id);
                         const isGroupStart = groupTimeLabel !== void 0;
-                        const hideGroupedPrepareTime = g2.status === "scheduled" && isPrepareGrouped && !isGroupStart;
+                        const isRepeatedPrepareStartTime = g2.status === "scheduled" && isPrepareGrouped && !isGroupStart;
+                        const hideGroupedPrepareTime = gamesMode === "compact" && isRepeatedPrepareStartTime;
+                        const prepareStartTimeRepeat = gamesMode === "full" && isRepeatedPrepareStartTime;
                         if (!isWebSpine && bestGameRightNowFeatured && bestGameRightNowFeatured.game.id === g2.id) {
                           return /* @__PURE__ */ (0, import_jsx_runtime90.jsx)(
                             BestGameRightNowSection,
@@ -67874,6 +67894,7 @@ var HomeLeagueSpineSection = (0, import_react107.memo)(function HomeLeagueSpineS
                               onWatchLive,
                               canShowWatchLive,
                               hideTime: hideGroupedPrepareTime,
+                              prepareStartTimeRepeat,
                               showSpineNarrative: true,
                               hideSpineGeneratedSummaryHeadline
                             },
@@ -67891,6 +67912,7 @@ var HomeLeagueSpineSection = (0, import_react107.memo)(function HomeLeagueSpineS
                                 onWatchLive,
                                 canShowWatchLive,
                                 hideTime: hideGroupedPrepareTime,
+                                prepareStartTimeRepeat,
                                 showSpineNarrative: showNarrative,
                                 hideSpineGeneratedSummaryHeadline
                               }
@@ -67906,6 +67928,7 @@ var HomeLeagueSpineSection = (0, import_react107.memo)(function HomeLeagueSpineS
                               variant: "rail",
                               homeSpineParity: true,
                               hideTime: hideGroupedPrepareTime,
+                              prepareStartTimeRepeat,
                               isSelected: selectedId === g2.id,
                               onOpen,
                               onWatchLive,
