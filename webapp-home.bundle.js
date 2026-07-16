@@ -31567,6 +31567,13 @@ function resolveGolfLeaderboardUrl(leagueKey) {
   return PGA_TOUR_LEADERBOARD_URL;
 }
 
+// ../grarf/desktop/src/lib/logo/grarfLogoImgClassName.ts
+init_define_import_meta_env();
+var GRARF_LOGO_IMG_BORDER_RADIUS_CLASS = "rounded-[3px]";
+function grarfLogoImgClassName(...classNames) {
+  return cn2(GRARF_LOGO_IMG_BORDER_RADIUS_CLASS, ...classNames);
+}
+
 // ../grarf/desktop/src/lib/gamesSpine/gamesSpineLeagueLogoUrls.ts
 var GAMES_SPINE_LEAGUE_LOGO_URL = {
   MLB: "https://a.espncdn.com/i/teamlogos/leagues/500/mlb.png",
@@ -31624,11 +31631,8 @@ function resolveGamesSpineLeagueLogoUrl(league, options) {
   }
   return GAMES_SPINE_LEAGUE_LOGO_URL[league];
 }
-function resolveGamesSpineLeagueLogoImgClassName(league, logoUrl) {
-  if (league === "USLCUP" || logoUrl?.includes("/usl-cup")) {
-    return "rounded-[10px]";
-  }
-  return void 0;
+function resolveGamesSpineLeagueLogoImgClassName(_league, _logoUrl) {
+  return grarfLogoImgClassName();
 }
 
 // ../grarf/desktop/src/lib/navigation/resolveLeagueNavActivityStatuses.ts
@@ -49179,7 +49183,7 @@ var CHANNEL_LOGO_MAX_WIDTH_CLASS = "max-w-11";
 var CHANNEL_LOGO_SLOT_CLASS = `flex ${CHANNEL_LOGO_HEIGHT_CLASS} items-center justify-start`;
 var CHANNEL_LOGO_SLOT_RIGHT_CLASS = `flex ${CHANNEL_LOGO_HEIGHT_CLASS} w-11 items-center justify-end`;
 function channelLogoImageClass(align = "left") {
-  return cn2(
+  return grarfLogoImgClassName(
     CHANNEL_LOGO_HEIGHT_CLASS,
     "w-auto shrink-0 object-contain",
     CHANNEL_LOGO_MAX_WIDTH_CLASS,
@@ -49306,27 +49310,17 @@ function BroadcastChannelLogo({
     );
   }
   const resolvedLogoUrl = resolveChannelLogoSrc(logoUrl);
-  const needsLightBackdrop = logoUrl.includes("channel-prime-video") || resolvedLogoUrl.includes("channel-prime-video");
   return /* @__PURE__ */ (0, import_jsx_runtime18.jsx)("span", { className: cn2(slot, className), children: /* @__PURE__ */ (0, import_jsx_runtime18.jsx)(
-    "span",
+    "img",
     {
-      className: cn2(
-        "inline-flex items-center",
-        needsLightBackdrop && "rounded bg-white/95 px-1 py-px"
-      ),
-      children: /* @__PURE__ */ (0, import_jsx_runtime18.jsx)(
-        "img",
-        {
-          src: resolvedLogoUrl,
-          alt: label,
-          loading: "lazy",
-          decoding: "async",
-          className: imageClassName ?? channelLogoImageClass(align),
-          onError: () => setImageFailed(true)
-        },
-        resolvedLogoUrl
-      )
-    }
+      src: resolvedLogoUrl,
+      alt: label,
+      loading: "lazy",
+      decoding: "async",
+      className: imageClassName ?? channelLogoImageClass(align),
+      onError: () => setImageFailed(true)
+    },
+    resolvedLogoUrl
   ) });
 }
 function BroadcastChannelLogoFromLabel({
@@ -57849,7 +57843,7 @@ function MlbStandingsContextTeamMark({
         height: 20,
         loading: "lazy",
         decoding: "async",
-        className: "h-5 w-5 shrink-0 object-contain opacity-90"
+        className: grarfLogoImgClassName("h-5 w-5 shrink-0 object-contain opacity-90")
       }
     ) : null,
     /* @__PURE__ */ (0, import_jsx_runtime31.jsx)(
@@ -64599,7 +64593,7 @@ function GamesSpineTeamMark({
         height: 16,
         loading: "lazy",
         decoding: "async",
-        className: cn2(
+        className: grarfLogoImgClassName(
           "h-4 w-4 shrink-0 object-contain opacity-90",
           standingsLabel && "mt-0.5",
           logoClassName
@@ -64671,7 +64665,7 @@ function TennisPlayerRow({
           height: 16,
           loading: "lazy",
           decoding: "async",
-          className: "h-4 w-4 shrink-0 object-contain opacity-90"
+          className: grarfLogoImgClassName("h-4 w-4 shrink-0 object-contain opacity-90")
         }
       ) : null,
       /* @__PURE__ */ (0, import_jsx_runtime74.jsxs)(
@@ -65211,7 +65205,7 @@ var GAMES_SPINE_COMPACT_CHANNEL_LOGO_MAX_WIDTH_CLASS = "max-w-[2.2rem]";
 var GAMES_SPINE_COMPACT_BROADCAST_COLUMN_WEB_WIDTH_CLASS = "w-[2.2rem]";
 var GAMES_SPINE_COMPACT_CHANNEL_LOGO_SLOT_CLASS = `flex w-full ${GAMES_SPINE_COMPACT_CHANNEL_LOGO_HEIGHT_CLASS} items-center justify-center`;
 function gamesSpineCompactChannelLogoImageClass(align = "left") {
-  return cn2(
+  return grarfLogoImgClassName(
     GAMES_SPINE_COMPACT_CHANNEL_LOGO_HEIGHT_CLASS,
     "w-auto shrink-0 object-contain",
     GAMES_SPINE_COMPACT_CHANNEL_LOGO_MAX_WIDTH_CLASS,
@@ -66263,8 +66257,8 @@ function GameRow({
 init_define_import_meta_env();
 var import_react100 = __toESM(require_react(), 1);
 var import_jsx_runtime84 = __toESM(require_jsx_runtime(), 1);
-function GamesSpineLeagueHeaderMark({ league, game }) {
-  const logoUrl = resolveGamesSpineLeagueLogoUrl(league, { game });
+function GamesSpineLeagueHeaderMark({ league }) {
+  const logoUrl = resolveGamesSpineLeagueLogoUrl(league);
   const [failed, setFailed] = (0, import_react100.useState)(false);
   if (!logoUrl || failed) return null;
   return /* @__PURE__ */ (0, import_jsx_runtime84.jsx)(
@@ -67700,7 +67694,7 @@ var HomeLeagueSpineSection = (0, import_react107.memo)(function HomeLeagueSpineS
                   children: [
                     /* @__PURE__ */ (0, import_jsx_runtime90.jsxs)("span", { className: "flex min-w-0 items-center gap-2", children: [
                       /* @__PURE__ */ (0, import_jsx_runtime90.jsx)("span", { className: "w-3 shrink-0 text-center text-[9px] text-cyansys/55", "aria-hidden": true, children: collapsed ? "\u25B6" : "\u25BC" }),
-                      /* @__PURE__ */ (0, import_jsx_runtime90.jsx)(GamesSpineLeagueHeaderMark, { league, game: highlightedVisibleGames[0] }),
+                      /* @__PURE__ */ (0, import_jsx_runtime90.jsx)(GamesSpineLeagueHeaderMark, { league }),
                       /* @__PURE__ */ (0, import_jsx_runtime90.jsx)("span", { className: "truncate text-[17px] font-bold leading-none tracking-[0.14em] text-[#eef6f6]", children: displayName })
                     ] }),
                     /* @__PURE__ */ (0, import_jsx_runtime90.jsxs)("span", { className: "flex shrink-0 items-center gap-2", children: [
@@ -69506,7 +69500,10 @@ var HomeManualGamesSpineSection = (0, import_react117.memo)(function HomeManualG
                           loading: "lazy",
                           decoding: "async",
                           onError: () => setLogoFailed(true),
-                          className: "h-4 w-4 shrink-0 object-contain brightness-110 contrast-110"
+                          className: cn2(
+                            "h-4 w-4 shrink-0 object-contain brightness-110 contrast-110",
+                            resolveGamesSpineLeagueLogoImgClassName()
+                          )
                         }
                       ) : null,
                       /* @__PURE__ */ (0, import_jsx_runtime100.jsx)("span", { className: "truncate text-[17px] font-bold leading-none tracking-[0.14em] text-[#eef6f6]", children: section.leagueLabel })
@@ -80415,7 +80412,7 @@ function computeWinnerLineIndices(lines) {
 function SportscapeTeamMark({
   abbrev,
   logoUrl,
-  markKind
+  markKind: _markKind
 }) {
   if (logoUrl) {
     return /* @__PURE__ */ (0, import_jsx_runtime125.jsx)(
@@ -80428,9 +80425,8 @@ function SportscapeTeamMark({
         loading: "lazy",
         decoding: "async",
         referrerPolicy: "no-referrer",
-        className: cn2(
-          "h-3 w-3 object-contain brightness-110 contrast-110",
-          markKind === "country-flag" && "rounded-[1px]"
+        className: grarfLogoImgClassName(
+          "h-3 w-3 object-contain brightness-110 contrast-110"
         )
       }
     );
@@ -81160,7 +81156,9 @@ function HomeSportscapeCard({
           loading: "lazy",
           decoding: "async",
           referrerPolicy: "no-referrer",
-          className: "h-4 w-4 shrink-0 object-contain brightness-110 contrast-110"
+          className: grarfLogoImgClassName(
+            "h-4 w-4 shrink-0 object-contain brightness-110 contrast-110"
+          )
         }
       ),
       /* @__PURE__ */ (0, import_jsx_runtime130.jsx)("span", { className: "text-[12px] font-bold tracking-[0.12em] text-cyansys", children: entry.leagueEventName })
@@ -81489,7 +81487,7 @@ function SportscapeHeadlinesSourceLogo({ sourceId }) {
       decoding: "async",
       referrerPolicy: "no-referrer",
       onError: () => setFailed(true),
-      className: "h-4 w-4 shrink-0 object-contain",
+      className: grarfLogoImgClassName("h-4 w-4 shrink-0 object-contain"),
       "aria-hidden": true
     }
   );
@@ -82415,7 +82413,7 @@ function TabTeamScoreStrip({
               {
                 src: logoUrl,
                 alt: "",
-                className: "h-2.5 w-2.5 shrink-0 object-contain",
+                className: grarfLogoImgClassName("h-2.5 w-2.5 shrink-0 object-contain"),
                 loading: "lazy",
                 decoding: "async"
               }
@@ -82483,7 +82481,7 @@ function TabTeamAbbrevStrip({
                 {
                   src: logoUrl,
                   alt: "",
-                  className: "h-2.5 w-2.5 shrink-0 object-contain",
+                  className: grarfLogoImgClassName("h-2.5 w-2.5 shrink-0 object-contain"),
                   loading: "lazy",
                   decoding: "async"
                 }
@@ -82606,7 +82604,9 @@ function LeagueHubWorkspaceTabLabel({ hubId, title }) {
         decoding: "async",
         referrerPolicy: "no-referrer",
         onError: () => setFailed(true),
-        className: "h-3.5 w-3.5 shrink-0 object-contain brightness-110 contrast-110"
+        className: grarfLogoImgClassName(
+          "h-3.5 w-3.5 shrink-0 object-contain brightness-110 contrast-110"
+        )
       }
     ) : null,
     /* @__PURE__ */ (0, import_jsx_runtime140.jsx)("span", { className: "truncate", children: title })
@@ -86007,7 +86007,7 @@ function TeamScoreStrip({
               {
                 src: logoUrl,
                 alt: "",
-                className: "h-3.5 w-3.5 shrink-0 object-contain",
+                className: grarfLogoImgClassName("h-3.5 w-3.5 shrink-0 object-contain"),
                 loading: "lazy",
                 decoding: "async"
               }
@@ -86309,7 +86309,7 @@ function TeamScoreStrip2({
               {
                 src: logoUrl,
                 alt: "",
-                className: "h-3.5 w-3.5 shrink-0 object-contain",
+                className: grarfLogoImgClassName("h-3.5 w-3.5 shrink-0 object-contain"),
                 loading: "lazy",
                 decoding: "async"
               }
