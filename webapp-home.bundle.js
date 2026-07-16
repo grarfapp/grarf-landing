@@ -57106,8 +57106,13 @@ function resolveLiveGameWatchTarget(game) {
     return { streamUrl, streamProvider: provider };
   }
   const derived = deriveChannelLabelFromStreamUrl(streamUrl);
-  if (!derived || derived === "ESPN") return null;
-  return { streamUrl, streamProvider: derived };
+  if (derived && derived !== "ESPN") {
+    return { streamUrl, streamProvider: derived };
+  }
+  if (provider === "ESPN+") {
+    return { streamUrl, streamProvider: "ESPN+" };
+  }
+  return { streamUrl };
 }
 
 // ../grarf/desktop/src/lib/watch/homeSpineWatchLive.ts
