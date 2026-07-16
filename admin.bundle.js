@@ -13867,6 +13867,7 @@ var LEAGUE_PRIORITY_MANUAL_AFTER = {
 init_define_import_meta_env();
 var LEAGUE_PRIORITY_SEED_ORDER = [
   "WORLDCUP",
+  "PGA",
   "WIMBLEDON_MEN",
   "WIMBLEDON_WOMEN",
   "MLB",
@@ -13891,7 +13892,6 @@ var LEAGUE_PRIORITY_SEED_ORDER = [
   "LIGUE1",
   "UEL",
   "LPGA",
-  "PGA",
   "INDYCAR",
   "NASCAR",
   "NATIONS",

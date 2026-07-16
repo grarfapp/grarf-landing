@@ -24394,6 +24394,7 @@ var LEAGUE_PRIORITY_MANUAL_AFTER = {
 init_define_import_meta_env();
 var LEAGUE_PRIORITY_SEED_ORDER = [
   "WORLDCUP",
+  "PGA",
   "WIMBLEDON_MEN",
   "WIMBLEDON_WOMEN",
   "MLB",
@@ -24418,7 +24419,6 @@ var LEAGUE_PRIORITY_SEED_ORDER = [
   "LIGUE1",
   "UEL",
   "LPGA",
-  "PGA",
   "INDYCAR",
   "NASCAR",
   "NATIONS",
@@ -63883,18 +63883,24 @@ function useAdminEditable(surface, element, interaction, payload) {
 // ../grarf/desktop/src/store/adminFeaturedPriorityStore.ts
 init_define_import_meta_env();
 var import_zustand47 = __toESM(require_zustand(), 1);
-function computeDuplicateIds(priorities) {
-  const valueToIds = /* @__PURE__ */ new Map();
+function duplicateScopeKey(gameId, gameDateKeys) {
+  const dateKey = gameDateKeys[gameId]?.trim();
+  if (dateKey) return dateKey;
+  return `__game:${gameId}`;
+}
+function computeDuplicateIds(priorities, gameDateKeys) {
+  const scopePriorityToIds = /* @__PURE__ */ new Map();
   for (const [id, value] of Object.entries(priorities)) {
-    const bucket = valueToIds.get(value);
+    const scopeKey = `${duplicateScopeKey(id, gameDateKeys)}:${value}`;
+    const bucket = scopePriorityToIds.get(scopeKey);
     if (bucket) {
       bucket.push(id);
     } else {
-      valueToIds.set(value, [id]);
+      scopePriorityToIds.set(scopeKey, [id]);
     }
   }
   const result = /* @__PURE__ */ new Set();
-  for (const ids of valueToIds.values()) {
+  for (const ids of scopePriorityToIds.values()) {
     if (ids.length > 1) ids.forEach((id) => result.add(id));
   }
   return result;
@@ -63905,22 +63911,52 @@ function clonePriorities(source) {
 var useAdminFeaturedPriorityStore = (0, import_zustand47.create)((set, get) => ({
   priorities: {},
   persistedBaselinePriorities: {},
+  gameDateKeys: {},
   duplicateIds: /* @__PURE__ */ new Set(),
-  setPriority: (gameId, value) => {
+  setPriority: (gameId, value, operationalDateKey) => {
     const next = { ...get().priorities };
+    const nextDateKeys = { ...get().gameDateKeys };
+    if (operationalDateKey?.trim()) {
+      nextDateKeys[gameId] = operationalDateKey.trim();
+    }
     if (value === void 0) {
       delete next[gameId];
+      delete nextDateKeys[gameId];
     } else {
       next[gameId] = value;
     }
-    set({ priorities: next, duplicateIds: computeDuplicateIds(next) });
+    set({
+      priorities: next,
+      gameDateKeys: nextDateKeys,
+      duplicateIds: computeDuplicateIds(next, nextDateKeys)
+    });
+  },
+  syncGameDateKeysFromGames: (games) => {
+    const nextDateKeys = { ...get().gameDateKeys };
+    let changed = false;
+    for (const game of games) {
+      const dateKey = resolveGameOperationalDateKey(game);
+      if (!dateKey) continue;
+      if (nextDateKeys[game.id] !== dateKey) {
+        nextDateKeys[game.id] = dateKey;
+        changed = true;
+      }
+    }
+    if (!changed) return;
+    const priorities = get().priorities;
+    set({
+      gameDateKeys: nextDateKeys,
+      duplicateIds: computeDuplicateIds(priorities, nextDateKeys)
+    });
   },
   hydratePriorities: (priorities) => {
     const baseline = clonePriorities(priorities);
+    const gameDateKeys = { ...get().gameDateKeys };
     set({
       priorities: baseline,
       persistedBaselinePriorities: clonePriorities(baseline),
-      duplicateIds: computeDuplicateIds(baseline)
+      gameDateKeys,
+      duplicateIds: computeDuplicateIds(baseline, gameDateKeys)
     });
   },
   isDirty: () => get().exportForSave().length > 0,
@@ -63943,7 +63979,12 @@ var useAdminFeaturedPriorityStore = (0, import_zustand47.create)((set, get) => (
     }
     return records;
   },
-  reset: () => set({ priorities: {}, persistedBaselinePriorities: {}, duplicateIds: /* @__PURE__ */ new Set() })
+  reset: () => set({
+    priorities: {},
+    persistedBaselinePriorities: {},
+    gameDateKeys: {},
+    duplicateIds: /* @__PURE__ */ new Set()
+  })
 }));
 
 // ../grarf/desktop/src/components/adminMode/AdminFeaturedPriorityField.tsx
@@ -63960,16 +64001,17 @@ function AdminFeaturedPriorityField({ game }) {
   const isDuplicate = useAdminFeaturedPriorityStore((s2) => s2.duplicateIds.has(game.id));
   const setPriority = useAdminFeaturedPriorityStore((s2) => s2.setPriority);
   if (!isAdminMode) return null;
+  const operationalDateKey = resolveGameOperationalDateKey(game) ?? void 0;
   function handleChange(e2) {
     const raw = e2.target.value.trim();
     if (!raw) {
-      setPriority(game.id, void 0);
+      setPriority(game.id, void 0, operationalDateKey);
       triggerEdit();
       return;
     }
     const n2 = Math.round(Number(raw));
     if (Number.isFinite(n2) && n2 >= 1 && n2 <= 10) {
-      setPriority(game.id, n2);
+      setPriority(game.id, n2, operationalDateKey);
       triggerEdit();
     }
   }
@@ -66970,6 +67012,7 @@ var useGamesSpineOperationsGamesStore = (0, import_zustand48.create)(
     gamesByKey: {},
     publishSectionGames: (key2, games) => {
       if (get().gamesByKey[key2] === games) return;
+      useAdminFeaturedPriorityStore.getState().syncGameDateKeysFromGames(games);
       set({ gamesByKey: { ...get().gamesByKey, [key2]: games } });
     },
     removeSectionGames: (key2) => {
