@@ -24398,6 +24398,7 @@ var LEAGUE_PRIORITY_SEED_ORDER = [
   "WIMBLEDON_MEN",
   "WIMBLEDON_WOMEN",
   "MLB",
+  "F1",
   "TDF",
   "NBASUMMER",
   "WNBA",
@@ -24408,7 +24409,6 @@ var LEAGUE_PRIORITY_SEED_ORDER = [
   "EPL",
   "NBA",
   "NHL",
-  "F1",
   "COPA",
   "UFC",
   "UCL",
@@ -24644,6 +24644,13 @@ function buildFotmobMatchUrl(matchId) {
   const id = String(matchId).trim();
   return `https://www.fotmob.com/match/${encodeURIComponent(id)}`;
 }
+function resolveFotmobMatchUrl(game) {
+  const fromMetadata = game.metadata?.fotmobMatchUrl?.trim();
+  if (fromMetadata) return fromMetadata;
+  const fotmobId = game.externalIds?.fotmob?.trim();
+  if (fotmobId) return buildFotmobMatchUrl(fotmobId);
+  return null;
+}
 
 // ../grarf/desktop/src/lib/foxWorldCup/teamSlugUtils.ts
 init_define_import_meta_env();
@@ -24845,23 +24852,27 @@ function isWorldCupGameRow(game) {
 function resolveWorldCupWorkspaceEmbedUrl(game) {
   const fixtureOverride = resolveWorldCupFotmobFixtureOverrideUrl(game);
   if (fixtureOverride) return fixtureOverride;
-  const fromMetadata = game.metadata?.fotmobMatchUrl?.trim();
-  if (fromMetadata) return fromMetadata;
-  const fotmobId = game.externalIds?.fotmob?.trim();
-  if (fotmobId) return buildFotmobMatchUrl(fotmobId);
-  return null;
+  return resolveFotmobMatchUrl(game);
 }
-function resolveWorldCupCenterPaneEmbedUrl(game) {
-  const fotmobUrl = resolveWorldCupWorkspaceEmbedUrl(game);
+function resolveFotmobCenterPaneEmbedUrl(game) {
+  const isWorldCup = isWorldCupGameRow(game);
+  const fotmobUrl = isWorldCup ? resolveWorldCupWorkspaceEmbedUrl(game) : resolveFotmobMatchUrl(game);
   if (!fotmobUrl) return null;
-  if (isGrarfWebRenderer() && game.status === "scheduled") return null;
+  if (game.status === "scheduled") {
+    if (isWorldCup) {
+      if (isGrarfWebRenderer()) return null;
+      return fotmobUrl;
+    }
+    return null;
+  }
   return fotmobUrl;
 }
-function openWorldCupGamesSpineRow(game, dispatch) {
-  if (!isWorldCupGameRow(game)) return false;
-  const fotmobUrl = resolveWorldCupWorkspaceEmbedUrl(game);
-  if (!fotmobUrl) return true;
-  if (isGrarfWebRenderer() && game.status === "scheduled") {
+function openFotmobGamesSpineRow(game, dispatch) {
+  const isWorldCup = isWorldCupGameRow(game);
+  const fotmobUrl = isWorldCup ? resolveWorldCupWorkspaceEmbedUrl(game) : resolveFotmobMatchUrl(game);
+  if (!fotmobUrl) return isWorldCup;
+  const openScheduledInNewTab = isWorldCup ? isGrarfWebRenderer() && game.status === "scheduled" : game.status === "scheduled";
+  if (openScheduledInNewTab) {
     window.open(fotmobUrl, "_blank", "noopener,noreferrer");
     return true;
   }
@@ -24961,8 +24972,9 @@ function leagueKeyFromEspnGameId(gameId) {
 }
 function resolveGameWorkspaceEmbedUrl(game, gameId) {
   if (!gameId) return null;
-  if (game && isWorldCupGameRow(game)) {
-    return resolveWorldCupWorkspaceEmbedUrl(game);
+  if (game) {
+    const fotmobUrl = isWorldCupGameRow(game) ? resolveWorldCupWorkspaceEmbedUrl(game) : resolveFotmobMatchUrl(game);
+    if (fotmobUrl) return fotmobUrl;
   }
   if (game?.streamUrl?.trim()) {
     if (isGolfLeagueKey(game.league) && game.launchMode === "external") {
@@ -85478,9 +85490,8 @@ function resolveSpineRowWorkspaceEmbedUrl(game) {
   if (isGolfLeagueKey(game.league)) {
     return resolveGolfLeaderboardUrl(game.league);
   }
-  if (isWorldCupGameRow(game)) {
-    return resolveWorldCupCenterPaneEmbedUrl(game);
-  }
+  const fotmobUrl = resolveFotmobCenterPaneEmbedUrl(game);
+  if (fotmobUrl) return fotmobUrl;
   if (isGrarfWebRenderer()) {
     const wimbledonUrl = resolveWimbledonCenterPaneEmbedUrl(game);
     if (wimbledonUrl) return wimbledonUrl;
@@ -85556,9 +85567,9 @@ function openGamesSpineRowInWorkspace(game, dispatch) {
   if (tryOpenF1GameRowInBrowser(game)) return;
   if (tryOpenMcwsGameRowInBrowser(game)) return;
   if (tryOpenAflGameRowInBrowser(game)) return;
+  if (openFotmobGamesSpineRow(game, dispatch)) return;
   if (tryOpenNwslGameRowInBrowser(game)) return;
   if (tryOpenGolfGameRowInBrowser(game)) return;
-  if (openWorldCupGamesSpineRow(game, dispatch)) return;
   if (openWimbledonGamesSpineRow(game, dispatch)) return;
   if (tryOpenWnbaGameRowInBrowser(game)) return;
   const tab = buildGameWorkspaceTabForRow(game);
