@@ -58079,6 +58079,7 @@ var GAMES_SPINE_CARD_CHANNEL_FALLBACK_CLASS = "max-w-[4.5rem] truncate text-[10p
 var GAMES_SPINE_CARD_MATCHUP_TEXT_CLASS = "text-[12px] leading-snug text-white";
 var GAMES_SPINE_CARD_SCORE_CLASS = "text-[12px] leading-none text-textdim/85";
 var GAMES_SPINE_WATCH_LIVE_BUTTON_CLASS = "w-full border border-cyansys/45 bg-[#050a0a] px-2 py-1 text-center font-mono text-[9px] tracking-[0.1em] text-cyansys/95 transition hover:border-cyansys/55 hover:shadow-[0_0_10px_rgba(34,211,238,0.12)]";
+var GAMES_SPINE_FOLLOW_LIVE_BUTTON_CLASS = "w-full border border-line bg-[#050a0a] px-2 py-1 text-center font-mono text-[9px] tracking-[0.1em] text-textdim/90 transition hover:border-line/80 hover:text-[#c4d8d8]";
 function gamesSpineCardPanelSurfaceClass({
   selected = false,
   primaryElevated = false,
@@ -65004,6 +65005,7 @@ function GamesSpineUnifiedGameCard({
   showWatchLive = false,
   watchLiveLabel,
   onWatchLive,
+  onFollowLive,
   enhancedWatchLive = false,
   showBroadcastOutletBadges = false,
   statusSupplement,
@@ -65018,6 +65020,11 @@ function GamesSpineUnifiedGameCard({
   const resolvedWatchLabel = watchLiveLabel ?? (game && isSpineFinalizedGame(game) ? "[ WATCH REPLAY ]" : "[ WATCH LIVE ]");
   const broadcastOutlets = showBroadcastOutletBadges && game ? resolveAdditionalGamesSpineBroadcastOutlets(game) : [];
   const showBroadcastRow = broadcastOutlets.length > 0;
+  const showFollowLive = Boolean(game && isGameActivelyLive(game) && onFollowLive);
+  const showWatchLiveButton = Boolean(showWatchLive && onWatchLive);
+  const showActionButtons = showFollowLive || showWatchLiveButton;
+  const bothActionButtons = showFollowLive && showWatchLiveButton;
+  const actionButtonLayoutClass = bothActionButtons ? "!w-auto min-w-max flex-1 basis-[calc(50%-0.125rem)] whitespace-nowrap" : "w-full whitespace-nowrap";
   return /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: cn2(GAMES_SPINE_CARD_SHELL_CLASS, className), children: [
     /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "flex min-w-0 items-center justify-between", children: /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: GAMES_SPINE_CARD_LEAGUE_LABEL_CLASS, children: leagueLabel }) }),
     game ? /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(
@@ -65063,20 +65070,32 @@ function GamesSpineUnifiedGameCard({
       /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(GamesSpineCardSectionDivider, {}),
       /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(GamesSpineBroadcastOutletBadgeRow, { outlets: broadcastOutlets })
     ] }) : null,
-    showWatchLive && onWatchLive ? /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)(import_jsx_runtime78.Fragment, { children: [
+    showActionButtons ? /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)(import_jsx_runtime78.Fragment, { children: [
       !showBroadcastRow ? /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(GamesSpineCardSectionDivider, {}) : null,
-      /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "flex w-full min-w-0 justify-center", children: /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(
-        "button",
-        {
-          type: "button",
-          className: cn2(
-            GAMES_SPINE_WATCH_LIVE_BUTTON_CLASS,
-            enhancedWatchLive && "border-cyansys/55 bg-cyansys/[0.08] text-cyansys shadow-[0_0_14px_rgba(86,247,255,0.14)] hover:border-cyansys/65 hover:shadow-[0_0_18px_rgba(86,247,255,0.2)]"
-          ),
-          onClick: onWatchLive,
-          children: resolvedWatchLabel
-        }
-      ) })
+      /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "flex w-full min-w-0 flex-wrap gap-1", children: [
+        showWatchLiveButton ? /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(
+          "button",
+          {
+            type: "button",
+            className: cn2(
+              GAMES_SPINE_WATCH_LIVE_BUTTON_CLASS,
+              actionButtonLayoutClass,
+              enhancedWatchLive && "border-cyansys/55 bg-cyansys/[0.08] text-cyansys shadow-[0_0_14px_rgba(86,247,255,0.14)] hover:border-cyansys/65 hover:shadow-[0_0_18px_rgba(86,247,255,0.2)]"
+            ),
+            onClick: onWatchLive,
+            children: resolvedWatchLabel
+          }
+        ) : null,
+        showFollowLive ? /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(
+          "button",
+          {
+            type: "button",
+            className: cn2(GAMES_SPINE_FOLLOW_LIVE_BUTTON_CLASS, actionButtonLayoutClass),
+            onClick: onFollowLive,
+            children: "[ FOLLOW LIVE ]"
+          }
+        ) : null
+      ] })
     ] }) : null,
     afterCard
   ] });
@@ -65103,6 +65122,7 @@ function GamesSpineHomeParityGameRow({
   briefingPriority,
   onBriefingPriorityChange,
   onWatchLive,
+  onOpen,
   narrativeSlot,
   matchupRef,
   applyFinalResultNameEmphasis = false
@@ -65165,6 +65185,10 @@ function GamesSpineHomeParityGameRow({
       onWatchLive: (e2) => {
         e2.stopPropagation();
         onWatchLive(game.id);
+      },
+      onFollowLive: (e2) => {
+        e2.stopPropagation();
+        onOpen(game.id, game);
       },
       statusSupplement,
       matchupFooter,
@@ -65908,6 +65932,7 @@ function GameRow({
               briefingPriority,
               onBriefingPriorityChange: (p2) => saveBriefingPriority(scopedKey, p2),
               onWatchLive: (gameId) => onWatchLive(gameId),
+              onOpen,
               narrativeSlot,
               matchupRef: scoreAnchorRef,
               applyFinalResultNameEmphasis
@@ -65937,6 +65962,7 @@ function GameRow({
           briefingPriority,
           onBriefingPriorityChange: (p2) => saveBriefingPriority(scopedKey, p2),
           onWatchLive: (gameId) => onWatchLive(gameId),
+          onOpen,
           narrativeSlot,
           matchupRef: scoreAnchorRef,
           applyFinalResultNameEmphasis
@@ -82554,7 +82580,7 @@ function GameWorkspaceTabScorebug({
   }
   const startTime = formatGameDisplayTimeLocal(game);
   return /* @__PURE__ */ (0, import_jsx_runtime139.jsxs)("span", { className: TAB_SCOREBUG_ROW_CLASS, children: [
-    /* @__PURE__ */ (0, import_jsx_runtime139.jsx)(TabLeagueIdentity, { league: game.league }),
+    /* @__PURE__ */ (0, import_jsx_runtime139.jsx)(TabLeagueIdentity, { game }),
     /* @__PURE__ */ (0, import_jsx_runtime139.jsx)(
       "time",
       {
