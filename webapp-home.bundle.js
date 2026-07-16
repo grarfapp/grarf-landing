@@ -45429,17 +45429,6 @@ init_define_import_meta_env();
 // ../grarf/desktop/src/lib/gamesSpine/gamesSpineContext.ts
 init_define_import_meta_env();
 init_isGrarfWebRenderer();
-var FOLLOW_LIVE_SPINE_ACTION_PILL_LEAGUES = /* @__PURE__ */ new Set([
-  "TDF",
-  "PGA",
-  "LPGA",
-  "CHAMPIONS"
-]);
-function resolveFollowLiveSpineActionPillLabel(league) {
-  if (!isGrarfWebRenderer()) return null;
-  if (!league || !FOLLOW_LIVE_SPINE_ACTION_PILL_LEAGUES.has(league)) return null;
-  return "Follow LIVE";
-}
 function pitcherLast(name) {
   const t2 = name.trim();
   if (!t2 || t2 === "\u2014") return "";
@@ -45478,10 +45467,6 @@ function resolveGameNarrative(game) {
     return { text: ingest, source: game.narrativeSource ?? "ingest" };
   }
   if (isGameActivelyLive(game)) {
-    const followLiveLabel = resolveFollowLiveSpineActionPillLabel(game.league);
-    if (followLiveLabel) {
-      return { text: followLiveLabel, source: "rules" };
-    }
     if (game.statusLine?.trim()) {
       return { text: game.statusLine.trim(), source: "rules" };
     }
