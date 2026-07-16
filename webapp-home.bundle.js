@@ -65369,6 +65369,16 @@ function resolveGamesSpineCompactEventColumns(game) {
   }
   return null;
 }
+function resolveEventWorkspaceTabModel(game) {
+  if (game.league === "TDF") return null;
+  const manual = game.metadata?.manualGamesSpine;
+  if (!manual && !isStandaloneSpineLeague(game.league)) return null;
+  const leagueLabel = manual?.displayName?.trim() || manual?.leagueLabel?.trim() || resolveGamesSpineLeagueDisplayLabel(game.league);
+  const eventName = manual?.eventName?.trim() || game.metadata?.canonicalEvent?.title?.trim() || game.awayTeam?.trim() || "";
+  if (!eventName || !leagueLabel) return null;
+  if (eventName === leagueLabel) return null;
+  return { leagueLabel, eventName };
+}
 function resolveGamesSpineCompactMatchupModel(game) {
   const eventColumns = resolveGamesSpineCompactEventColumns(game);
   if (eventColumns) {
@@ -82450,11 +82460,14 @@ function resolveTabSport(game) {
   return inferSportscapeScoreSportFromLeague(game.league);
 }
 var TAB_SCOREBUG_ROW_CLASS = "inline-flex w-max max-w-full shrink-0 flex-nowrap items-center gap-1 whitespace-nowrap leading-none";
-function TabLeagueIdentity({ game }) {
+function TabLeagueIdentity({
+  game,
+  leagueLabelOverride
+}) {
   const league = game.league;
   if (!league) return null;
   const leagueLogoUrl = resolveGamesSpineLeagueLogoUrl(league, { game });
-  const leagueLabel = resolveGamesSpineLeagueDisplayLabel(league);
+  const leagueLabel = leagueLabelOverride?.trim() || resolveGamesSpineLeagueDisplayLabel(league);
   return /* @__PURE__ */ (0, import_jsx_runtime139.jsxs)("span", { className: "inline-flex shrink-0 items-center gap-0.5 whitespace-nowrap font-mono text-[8px] font-semibold leading-none tracking-[0.06em] text-[#eef6f6]/90", children: [
     leagueLogoUrl ? /* @__PURE__ */ (0, import_jsx_runtime139.jsx)(
       "img",
@@ -82470,6 +82483,16 @@ function TabLeagueIdentity({ game }) {
       }
     ) : null,
     /* @__PURE__ */ (0, import_jsx_runtime139.jsx)("span", { className: "whitespace-nowrap", children: leagueLabel })
+  ] });
+}
+function EventWorkspaceTabLabel({
+  game,
+  model
+}) {
+  return /* @__PURE__ */ (0, import_jsx_runtime139.jsxs)("span", { className: TAB_SCOREBUG_ROW_CLASS, children: [
+    /* @__PURE__ */ (0, import_jsx_runtime139.jsx)(TabLeagueIdentity, { game, leagueLabelOverride: model.leagueLabel }),
+    /* @__PURE__ */ (0, import_jsx_runtime139.jsx)("span", { className: "shrink-0 font-mono text-[7px] leading-none tracking-[0.06em] text-textdim/70", children: "|" }),
+    /* @__PURE__ */ (0, import_jsx_runtime139.jsx)("span", { className: "min-w-0 truncate font-mono text-[8px] font-semibold leading-none tracking-[0.06em] text-[#eef6f6]/90", children: model.eventName })
   ] });
 }
 function TabTeamScoreStrip({
@@ -82619,6 +82642,10 @@ function GameWorkspaceTabScorebug({
   const game = canonicalGame ?? catchupContextGame ?? null;
   if (!game) {
     return /* @__PURE__ */ (0, import_jsx_runtime139.jsx)("span", { className: "truncate", children: fallbackTitle });
+  }
+  const eventTabModel = resolveEventWorkspaceTabModel(game);
+  if (eventTabModel) {
+    return /* @__PURE__ */ (0, import_jsx_runtime139.jsx)(EventWorkspaceTabLabel, { game, model: eventTabModel });
   }
   const awayVisuals = resolveTabSideVisuals(game, "away");
   const homeVisuals = resolveTabSideVisuals(game, "home");
