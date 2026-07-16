@@ -31438,6 +31438,20 @@ function MainMenuLeagueSearchBar({ className, value, onChange }) {
 init_define_import_meta_env();
 var import_react12 = __toESM(require_react(), 1);
 
+// ../grarf/desktop/src/lib/navigation/resolveMainMenuLeagueDirectoryLabel.ts
+init_define_import_meta_env();
+var MAIN_MENU_LEAGUE_LABEL_OVERRIDES = {
+  TDF: "TdF",
+  NBASUMMER: "NBA"
+};
+function resolveMainMenuLeagueDirectoryLabel(item) {
+  const leagueKey = item.grarfLeagueKey;
+  if (leagueKey && MAIN_MENU_LEAGUE_LABEL_OVERRIDES[leagueKey]) {
+    return MAIN_MENU_LEAGUE_LABEL_OVERRIDES[leagueKey];
+  }
+  return item.label;
+}
+
 // ../grarf/desktop/src/components/shell/LeagueNavActivityTallyMarks.tsx
 init_define_import_meta_env();
 var import_jsx_runtime11 = __toESM(require_jsx_runtime(), 1);
@@ -31479,6 +31493,7 @@ function OnTodayNavRowWithTallies({
   activityStatuses,
   renderLogo
 }) {
+  const mainMenuLabel = resolveMainMenuLeagueDirectoryLabel(item);
   const labelMaskRef = (0, import_react12.useRef)(null);
   const [labelEndPx, setLabelEndPx] = (0, import_react12.useState)(0);
   const remeasureLabelEnd = (0, import_react12.useCallback)(() => {
@@ -31489,7 +31504,7 @@ function OnTodayNavRowWithTallies({
   (0, import_react12.useLayoutEffect)(() => {
     remeasureLabelEnd();
     void document.fonts?.ready?.then(remeasureLabelEnd);
-  }, [item.label, item.logoUrl, remeasureLabelEnd]);
+  }, [mainMenuLabel, item.logoUrl, remeasureLabelEnd]);
   (0, import_react12.useLayoutEffect)(() => {
     if (typeof ResizeObserver === "undefined") return;
     const el = labelMaskRef.current;
@@ -31506,7 +31521,7 @@ function OnTodayNavRowWithTallies({
   return /* @__PURE__ */ (0, import_jsx_runtime12.jsxs)("span", { className: "relative isolate block w-full min-w-0", children: [
     /* @__PURE__ */ (0, import_jsx_runtime12.jsxs)("span", { className: "pointer-events-none inline-flex items-center gap-1.5 opacity-0", "aria-hidden": true, children: [
       renderLogo({ item }),
-      /* @__PURE__ */ (0, import_jsx_runtime12.jsx)("span", { children: item.label })
+      /* @__PURE__ */ (0, import_jsx_runtime12.jsx)("span", { children: mainMenuLabel })
     ] }),
     labelEndPx > 0 ? /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(
       "span",
@@ -31519,7 +31534,7 @@ function OnTodayNavRowWithTallies({
     ) : null,
     /* @__PURE__ */ (0, import_jsx_runtime12.jsxs)("span", { ref: labelMaskRef, className: labelMaskClass, style: labelMaskStyle, children: [
       renderLogo({ item }),
-      /* @__PURE__ */ (0, import_jsx_runtime12.jsx)("span", { className: "min-w-0 truncate", children: item.label })
+      /* @__PURE__ */ (0, import_jsx_runtime12.jsx)("span", { className: "min-w-0 truncate", children: mainMenuLabel })
     ] })
   ] });
 }
@@ -37309,7 +37324,7 @@ function DirectoryNavRow({
   ) : /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)("span", { className: "inline-flex min-w-0 flex-1 items-center justify-between gap-1.5", children: [
     /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)("span", { className: "inline-flex min-w-0 items-center gap-1.5", children: [
       /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(DirectoryNavLogo, { item }),
-      /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("span", { className: "truncate", children: item.label })
+      /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("span", { className: "truncate", children: resolveMainMenuLeagueDirectoryLabel(item) })
     ] }),
     showGatedLockIcon ? /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(GatedFeatureLockIcon, { size: 11, className: "shrink-0 text-cyansys/80" }) : null
   ] });
@@ -37527,7 +37542,9 @@ function AppLeftNav() {
   const menuLabels = (0, import_react15.useMemo)(
     () => [
       ...leagueSearchActive ? [] : [LEAGUE_DIRECTORY_HOME.label],
-      ...visibleLeagueDirectorySections.flatMap((section) => section.items.map((item) => item.label)),
+      ...visibleLeagueDirectorySections.flatMap(
+        (section) => section.items.map((item) => resolveMainMenuLeagueDirectoryLabel(item))
+      ),
       "FANTASY",
       "BETTING"
     ],
@@ -68208,7 +68225,8 @@ var import_jsx_runtime92 = __toESM(require_jsx_runtime(), 1);
 function GamesSpinePermanentLeagueHeader({
   label,
   parentScrolls = false,
-  onClick
+  onClick,
+  showLiveIndicator = false
 }) {
   const stickyTop = parentScrolls ? HOME_GAMES_SPINE_LEAGUE_STICKY_TOP : "top-0";
   return /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("section", { className: "min-w-0 w-full max-w-full", "aria-label": label, children: /* @__PURE__ */ (0, import_jsx_runtime92.jsx)(
@@ -68221,7 +68239,7 @@ function GamesSpinePermanentLeagueHeader({
         "backdrop-blur-sm supports-[backdrop-filter]:bg-[#0b1216]/95",
         stickyTop
       ),
-      children: /* @__PURE__ */ (0, import_jsx_runtime92.jsx)(
+      children: /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)(
         "button",
         {
           type: "button",
@@ -68232,10 +68250,13 @@ function GamesSpinePermanentLeagueHeader({
             "hover:border-l-cyansys/55 hover:bg-[#0e181d]/90",
             "focus-visible:outline focus-visible:outline-1 focus-visible:outline-cyansys/35"
           ),
-          children: /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("span", { className: "flex min-w-0 items-center gap-2", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("span", { className: "flex w-3 shrink-0 items-center justify-center text-cyansys/55", "aria-hidden": true, children: /* @__PURE__ */ (0, import_jsx_runtime92.jsx)(SquareArrowOutUpRight, { size: 9, strokeWidth: 2 }) }),
-            /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("span", { className: "truncate text-[17px] font-bold leading-none tracking-[0.14em] text-[#eef6f6]", children: label })
-          ] })
+          children: [
+            /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("span", { className: "flex min-w-0 items-center gap-2", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("span", { className: "flex w-3 shrink-0 items-center justify-center text-cyansys/55", "aria-hidden": true, children: /* @__PURE__ */ (0, import_jsx_runtime92.jsx)(SquareArrowOutUpRight, { size: 9, strokeWidth: 2 }) }),
+              /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("span", { className: "truncate text-[17px] font-bold leading-none tracking-[0.14em] text-[#eef6f6]", children: label })
+            ] }),
+            showLiveIndicator ? /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("span", { className: "flex shrink-0 items-center", children: /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("span", { className: "h-[5px] w-[5px] shrink-0 rounded-full bg-red-500", "aria-hidden": true }) }) : null
+          ]
         }
       )
     }
@@ -70255,6 +70276,7 @@ function HomeGamesToday({
       {
         label: entry.label,
         parentScrolls,
+        showLiveIndicator: entry.teamKey === "horse-racing",
         onClick: () => onPermanentLeagueWorkspaceOpen(entry.url, entry.label, entry.tabId)
       },
       entry.tabId
