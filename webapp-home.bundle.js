@@ -31572,9 +31572,108 @@ function resolveGolfLeaderboardUrl(leagueKey) {
 
 // ../grarf/desktop/src/lib/logo/grarfLogoImgClassName.ts
 init_define_import_meta_env();
+
+// ../grarf/desktop/src/lib/broadcast/resolveChannelLogoUrl.ts
+init_define_import_meta_env();
+
+// ../grarf/desktop/src/lib/broadcast/nbaTvBroadcast.ts
+init_define_import_meta_env();
+var NBA_TV_BROADCAST_LABEL = "NBA TV";
+function isNbaTvBroadcastLabel(label) {
+  const compact = label.trim().toUpperCase().replace(/[^A-Z0-9]/g, "");
+  return compact === "NBATV";
+}
+function canonicalizeNbaTvBroadcastLabel(label) {
+  return isNbaTvBroadcastLabel(label) ? NBA_TV_BROADCAST_LABEL : label;
+}
+function nbaTvBroadcastDedupeKey(label) {
+  return isNbaTvBroadcastLabel(label) ? "nba tv" : label.trim().toLowerCase();
+}
+
+// ../grarf/desktop/src/lib/broadcast/resolveChannelLogoUrl.ts
+var NBA_TV_CHANNEL_LOGO_URL = "/league-logos/channel-nba-tv.png";
+var CHANNEL_LOGO_BY_LABEL = {
+  ABC: "/league-logos/channel-abc.png",
+  CBS: "/league-logos/channel-cbs.png",
+  ESPN: "/league-logos/channel-espn.png",
+  ESPN2: "/league-logos/channel-espn2.png",
+  "ESPN+": "/league-logos/channel-espn-plus.png",
+  "ESPN PLUS": "/league-logos/channel-espn-plus.png",
+  "ESPN UNLIMITED": "/league-logos/channel-espn-plus.png",
+  "ESPN UNLMTD": "/league-logos/channel-espn-plus.png",
+  ESPNU: "/league-logos/channel-espnu.png",
+  USA: "/league-logos/channel-usa.png",
+  "USA NETWORK": "/league-logos/channel-usa.png",
+  "USA NET": "/league-logos/channel-usa.png",
+  ION: "/league-logos/channel-ion.png",
+  "NBA TV": NBA_TV_CHANNEL_LOGO_URL,
+  NBATV: NBA_TV_CHANNEL_LOGO_URL,
+  "NBA.TV": NBA_TV_CHANNEL_LOGO_URL,
+  "NBA-TV": NBA_TV_CHANNEL_LOGO_URL,
+  CNBC: "/league-logos/channel-cnbc.png",
+  "PARAMOUNT+": "/league-logos/channel-paramount-plus.png",
+  TNT: "/league-logos/channel-tnt.png",
+  TBS: "/league-logos/channel-tbs.png",
+  "MLB.TV": "/league-logos/channel-mlbtv.png",
+  "MLB TV": "/league-logos/channel-mlbtv.png",
+  MLBTV: "/league-logos/channel-mlbtv.png",
+  DAZN: "/league-logos/channel-dazn.png",
+  PEACOCK: "/league-logos/channel-peacock.png",
+  FOX: "/league-logos/channel-fox.png",
+  FS1: "/league-logos/channel-fs1.png",
+  FS2: "/league-logos/channel-fs2.png",
+  "FOX SPORTS": "/league-logos/channel-fox.png",
+  "CBS SPORTS NETWORK": "/league-logos/channel-cbs-sports.png",
+  "APPLE TV MLB": "/league-logos/channel-apple-tv.png",
+  "APPLE TV": "/league-logos/channel-apple-tv.png",
+  "TENNIS CHANNEL": "/league-logos/channel-tennis-channel.png",
+  "TENNIS CHANNEL+": "/league-logos/channel-tennis-channel.png",
+  "PRIME VIDEO": "/league-logos/channel-prime-video.png",
+  PRIME: "/league-logos/channel-prime-video.png",
+  "WNBA LEAGUE PASS": "/league-logos/channel-wnba-league-pass.png"
+};
+function normalizeChannelLogoKey(label) {
+  return label.trim().replace(/\s+/g, " ").toUpperCase();
+}
+function resolveChannelLogoUrl(channelLabel) {
+  const key2 = normalizeChannelLogoKey(channelLabel);
+  if (!key2) return null;
+  const direct = CHANNEL_LOGO_BY_LABEL[key2];
+  if (direct) return direct;
+  if (/\bFS1\b/.test(key2)) return CHANNEL_LOGO_BY_LABEL.FS1 ?? null;
+  if (/\bFS2\b/.test(key2)) return CHANNEL_LOGO_BY_LABEL.FS2 ?? null;
+  if (/\bFOX\b/.test(key2)) return CHANNEL_LOGO_BY_LABEL.FOX ?? null;
+  if (/\bPRIME\s*VIDEO\b/.test(key2)) return CHANNEL_LOGO_BY_LABEL["PRIME VIDEO"] ?? null;
+  if (key2 === "PRIME") return CHANNEL_LOGO_BY_LABEL.PRIME ?? null;
+  if (/^USA(\s+NET(WORK)?)?$/.test(key2)) return CHANNEL_LOGO_BY_LABEL.USA ?? null;
+  if (isNbaTvBroadcastLabel(key2)) return NBA_TV_CHANNEL_LOGO_URL;
+  if (/\bWNBA\s+LEAGUE\s+PASS\b/.test(key2) || key2 === "LEAGUE PASS") {
+    return CHANNEL_LOGO_BY_LABEL["WNBA LEAGUE PASS"] ?? null;
+  }
+  return null;
+}
+
+// ../grarf/desktop/src/lib/logo/grarfLogoImgClassName.ts
 var GRARF_LOGO_IMG_BORDER_RADIUS_CLASS = "rounded-[3px]";
+var FOX_CHANNEL_LOGO_PATH = "/league-logos/channel-fox.png";
+function logoUrlIsFoxAsset(logoUrl) {
+  return logoUrl.trim().toLowerCase().includes("channel-fox");
+}
+function isFoxLogo(options) {
+  const logoUrl = options?.logoUrl?.trim();
+  if (logoUrl && logoUrlIsFoxAsset(logoUrl)) return true;
+  const label = options?.label?.trim();
+  if (label && resolveChannelLogoUrl(label) === FOX_CHANNEL_LOGO_PATH) return true;
+  return false;
+}
+function grarfLogoImgBorderRadiusClass(options) {
+  return isFoxLogo(options) ? "rounded-none" : GRARF_LOGO_IMG_BORDER_RADIUS_CLASS;
+}
 function grarfLogoImgClassName(...classNames) {
   return cn2(GRARF_LOGO_IMG_BORDER_RADIUS_CLASS, ...classNames);
+}
+function grarfLogoImgClassNameFor(logo, ...classNames) {
+  return cn2(grarfLogoImgBorderRadiusClass(logo), ...classNames);
 }
 
 // ../grarf/desktop/src/lib/gamesSpine/gamesSpineLeagueLogoUrls.ts
@@ -36763,22 +36862,6 @@ init_define_import_meta_env();
 
 // ../grarf/desktop/src/lib/broadcast/broadcastLabelRank.ts
 init_define_import_meta_env();
-
-// ../grarf/desktop/src/lib/broadcast/nbaTvBroadcast.ts
-init_define_import_meta_env();
-var NBA_TV_BROADCAST_LABEL = "NBA TV";
-function isNbaTvBroadcastLabel(label) {
-  const compact = label.trim().toUpperCase().replace(/[^A-Z0-9]/g, "");
-  return compact === "NBATV";
-}
-function canonicalizeNbaTvBroadcastLabel(label) {
-  return isNbaTvBroadcastLabel(label) ? NBA_TV_BROADCAST_LABEL : label;
-}
-function nbaTvBroadcastDedupeKey(label) {
-  return isNbaTvBroadcastLabel(label) ? "nba tv" : label.trim().toLowerCase();
-}
-
-// ../grarf/desktop/src/lib/broadcast/broadcastLabelRank.ts
 var WNBA_REAL_BROADCASTER = /prime|nba\s*tv|peacock|usa|ion|cnbc|paramount|cbs|abc|cw\b|league\s*pass|wwor|kfaa|vegas/i;
 function filterWnbaMisattributedEspn(labels, league) {
   if (league !== "WNBA") return [...labels];
@@ -49214,8 +49297,9 @@ var CHANNEL_LOGO_HEIGHT_CLASS = "h-3.5";
 var CHANNEL_LOGO_MAX_WIDTH_CLASS = "max-w-11";
 var CHANNEL_LOGO_SLOT_CLASS = `flex ${CHANNEL_LOGO_HEIGHT_CLASS} items-center justify-start`;
 var CHANNEL_LOGO_SLOT_RIGHT_CLASS = `flex ${CHANNEL_LOGO_HEIGHT_CLASS} w-11 items-center justify-end`;
-function channelLogoImageClass(align = "left") {
-  return grarfLogoImgClassName(
+function channelLogoImageClass(align = "left", logo) {
+  return grarfLogoImgClassNameFor(
+    logo ?? {},
     CHANNEL_LOGO_HEIGHT_CLASS,
     "w-auto shrink-0 object-contain",
     CHANNEL_LOGO_MAX_WIDTH_CLASS,
@@ -49245,70 +49329,6 @@ function resolveChannelLogoSrc(logoUrl) {
   if (/^(https?:|data:)/i.test(t2)) return t2;
   if (t2.startsWith("/assets/") || t2.startsWith("/src/")) return t2;
   return publicAssetUrl(t2);
-}
-
-// ../grarf/desktop/src/lib/broadcast/resolveChannelLogoUrl.ts
-init_define_import_meta_env();
-var NBA_TV_CHANNEL_LOGO_URL = "/league-logos/channel-nba-tv.png";
-var CHANNEL_LOGO_BY_LABEL = {
-  ABC: "/league-logos/channel-abc.png",
-  CBS: "/league-logos/channel-cbs.png",
-  ESPN: "/league-logos/channel-espn.png",
-  ESPN2: "/league-logos/channel-espn2.png",
-  "ESPN+": "/league-logos/channel-espn-plus.png",
-  "ESPN PLUS": "/league-logos/channel-espn-plus.png",
-  "ESPN UNLIMITED": "/league-logos/channel-espn-plus.png",
-  "ESPN UNLMTD": "/league-logos/channel-espn-plus.png",
-  ESPNU: "/league-logos/channel-espnu.png",
-  USA: "/league-logos/channel-usa.png",
-  "USA NETWORK": "/league-logos/channel-usa.png",
-  "USA NET": "/league-logos/channel-usa.png",
-  ION: "/league-logos/channel-ion.png",
-  "NBA TV": NBA_TV_CHANNEL_LOGO_URL,
-  NBATV: NBA_TV_CHANNEL_LOGO_URL,
-  "NBA.TV": NBA_TV_CHANNEL_LOGO_URL,
-  "NBA-TV": NBA_TV_CHANNEL_LOGO_URL,
-  CNBC: "/league-logos/channel-cnbc.png",
-  "PARAMOUNT+": "/league-logos/channel-paramount-plus.png",
-  TNT: "/league-logos/channel-tnt.png",
-  TBS: "/league-logos/channel-tbs.png",
-  "MLB.TV": "/league-logos/channel-mlbtv.png",
-  "MLB TV": "/league-logos/channel-mlbtv.png",
-  MLBTV: "/league-logos/channel-mlbtv.png",
-  DAZN: "/league-logos/channel-dazn.png",
-  PEACOCK: "/league-logos/channel-peacock.png",
-  FOX: "/league-logos/channel-fox.png",
-  FS1: "/league-logos/channel-fs1.png",
-  FS2: "/league-logos/channel-fs2.png",
-  "FOX SPORTS": "/league-logos/channel-fox.png",
-  "CBS SPORTS NETWORK": "/league-logos/channel-cbs-sports.png",
-  "APPLE TV MLB": "/league-logos/channel-apple-tv.png",
-  "APPLE TV": "/league-logos/channel-apple-tv.png",
-  "TENNIS CHANNEL": "/league-logos/channel-tennis-channel.png",
-  "TENNIS CHANNEL+": "/league-logos/channel-tennis-channel.png",
-  "PRIME VIDEO": "/league-logos/channel-prime-video.png",
-  PRIME: "/league-logos/channel-prime-video.png",
-  "WNBA LEAGUE PASS": "/league-logos/channel-wnba-league-pass.png"
-};
-function normalizeChannelLogoKey(label) {
-  return label.trim().replace(/\s+/g, " ").toUpperCase();
-}
-function resolveChannelLogoUrl(channelLabel) {
-  const key2 = normalizeChannelLogoKey(channelLabel);
-  if (!key2) return null;
-  const direct = CHANNEL_LOGO_BY_LABEL[key2];
-  if (direct) return direct;
-  if (/\bFS1\b/.test(key2)) return CHANNEL_LOGO_BY_LABEL.FS1 ?? null;
-  if (/\bFS2\b/.test(key2)) return CHANNEL_LOGO_BY_LABEL.FS2 ?? null;
-  if (/\bFOX\b/.test(key2)) return CHANNEL_LOGO_BY_LABEL.FOX ?? null;
-  if (/\bPRIME\s*VIDEO\b/.test(key2)) return CHANNEL_LOGO_BY_LABEL["PRIME VIDEO"] ?? null;
-  if (key2 === "PRIME") return CHANNEL_LOGO_BY_LABEL.PRIME ?? null;
-  if (/^USA(\s+NET(WORK)?)?$/.test(key2)) return CHANNEL_LOGO_BY_LABEL.USA ?? null;
-  if (isNbaTvBroadcastLabel(key2)) return NBA_TV_CHANNEL_LOGO_URL;
-  if (/\bWNBA\s+LEAGUE\s+PASS\b/.test(key2) || key2 === "LEAGUE PASS") {
-    return CHANNEL_LOGO_BY_LABEL["WNBA LEAGUE PASS"] ?? null;
-  }
-  return null;
 }
 
 // ../grarf/desktop/src/components/broadcast/BroadcastChannelLogo.tsx
@@ -49349,7 +49369,7 @@ function BroadcastChannelLogo({
       alt: label,
       loading: "lazy",
       decoding: "async",
-      className: imageClassName ?? channelLogoImageClass(align),
+      className: imageClassName ?? channelLogoImageClass(align, { logoUrl: resolvedLogoUrl, label }),
       onError: () => setImageFailed(true)
     },
     resolvedLogoUrl
@@ -65239,8 +65259,9 @@ var GAMES_SPINE_COMPACT_CHANNEL_LOGO_HEIGHT_CLASS = "h-[0.7rem]";
 var GAMES_SPINE_COMPACT_CHANNEL_LOGO_MAX_WIDTH_CLASS = "max-w-[2.2rem]";
 var GAMES_SPINE_COMPACT_BROADCAST_COLUMN_WEB_WIDTH_CLASS = "w-[2.2rem]";
 var GAMES_SPINE_COMPACT_CHANNEL_LOGO_SLOT_CLASS = `flex w-full ${GAMES_SPINE_COMPACT_CHANNEL_LOGO_HEIGHT_CLASS} items-center justify-center`;
-function gamesSpineCompactChannelLogoImageClass(align = "left") {
-  return grarfLogoImgClassName(
+function gamesSpineCompactChannelLogoImageClass(align = "left", logo) {
+  return grarfLogoImgClassNameFor(
+    logo ?? {},
     GAMES_SPINE_COMPACT_CHANNEL_LOGO_HEIGHT_CLASS,
     "w-auto shrink-0 object-contain",
     GAMES_SPINE_COMPACT_CHANNEL_LOGO_MAX_WIDTH_CLASS,
@@ -65624,7 +65645,10 @@ function GamesSpineCompactGameRow({ game, hideTime = false, className }) {
                   label: channel.label,
                   align: "left",
                   slotClassName: isGrarfWebRenderer() ? GAMES_SPINE_COMPACT_CHANNEL_LOGO_SLOT_CLASS : void 0,
-                  imageClassName: isGrarfWebRenderer() ? gamesSpineCompactChannelLogoImageClass("left") : void 0,
+                  imageClassName: isGrarfWebRenderer() ? gamesSpineCompactChannelLogoImageClass("left", {
+                    logoUrl: channel.logoUrl,
+                    label: channel.label
+                  }) : void 0,
                   fallbackClassName: cn2(GAMES_SPINE_CARD_CHANNEL_FALLBACK_CLASS, "max-w-none text-[9px]")
                 }
               ) : /* @__PURE__ */ (0, import_jsx_runtime81.jsx)(
@@ -81524,7 +81548,10 @@ function SportscapeHeadlinesSourceLogo({ sourceId }) {
       decoding: "async",
       referrerPolicy: "no-referrer",
       onError: () => setFailed(true),
-      className: grarfLogoImgClassName("h-4 w-4 shrink-0 object-contain"),
+      className: grarfLogoImgClassNameFor(
+        { logoUrl, label: sourceId === "fox" ? "FOX" : sourceId },
+        "h-4 w-4 shrink-0 object-contain"
+      ),
       "aria-hidden": true
     }
   );
