@@ -66806,7 +66806,7 @@ function resolveBestGameRightNowV1(mergedLeagues, manualGames = []) {
   return { kind: "next_event", game: pickBestGameFromCandidates(upcomingGames, true) };
 }
 function bestGameRightNowV1SectionLabel(result) {
-  return result.kind === "best_live" ? "BEST GAME RIGHT NOW" : "NEXT BIG EVENT";
+  return result.kind === "best_live" ? "BEST EVENT RIGHT NOW" : "NEXT BIG EVENT";
 }
 
 // ../grarf/desktop/src/lib/gamesSpine/homeGamesSpineScoreParity.ts
