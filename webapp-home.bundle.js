@@ -87039,11 +87039,12 @@ function resolveNewswireSourceColorClass(source) {
 // ../grarf/desktop/src/components/homeMvp/HomeNewswireWireLine.tsx
 init_isGrarfWebRenderer();
 var import_jsx_runtime162 = __toESM(require_jsx_runtime(), 1);
-var NEWSWIRE_ROW_GRID_CLASS = "box-border grid w-full min-w-0 max-w-full grid-cols-[minmax(0,1fr)_8ch_minmax(5ch,5ch)] items-start gap-x-1 pr-0.5 text-[8px] leading-[1.32]";
-var NEWSWIRE_HEADLINE_CELL_CLASS = "col-start-1 row-start-1 min-w-0 overflow-hidden break-words pl-2 text-left text-[12px] leading-[1.32] text-[#d4e0e0] line-clamp-2";
-var NEWSWIRE_SOURCE_CELL_CLASS = "col-start-2 row-start-1 w-full min-w-0 overflow-hidden truncate text-left";
-var NEWSWIRE_TIMESTAMP_CELL_CLASS = "col-start-3 row-start-1 shrink-0 whitespace-nowrap text-left font-normal tracking-normal tabular-nums text-textdim/50";
 var NEWSWIRE_ROW_INTERACTIVE_CLASS = "m-0 box-border block w-full min-w-0 max-w-full self-stretch cursor-pointer border-0 bg-transparent px-0 py-1 text-left font-mono tracking-[0.01em] hover:bg-[#0a1416]";
+var NEWSWIRE_LINE_CLASS = "block min-w-0 overflow-hidden break-words pl-2 text-left leading-[1.32] line-clamp-2";
+var NEWSWIRE_HEADLINE_TEXT_CLASS = "text-[12px] text-[#d4e0e0]";
+var NEWSWIRE_SEPARATOR_CLASS = "text-[8px] text-textdim/50";
+var NEWSWIRE_SOURCE_TEXT_CLASS = "text-[8px] leading-[1.32]";
+var NEWSWIRE_TIMESTAMP_TEXT_CLASS = "text-[8px] leading-[1.32] font-normal tracking-normal tabular-nums text-textdim/50 whitespace-nowrap";
 function newswireStoryToTypingEvent(story) {
   return {
     id: story.id,
@@ -87113,41 +87114,39 @@ function HomeNewswireWireLine({
   const visibleHeadline = effectiveIsTyping && isCurrentLine ? headline.slice(0, typedCharCount) : headline;
   const isRevealAnchor = Boolean(revealAnchorRef && showCursor && isCurrentLine);
   const showMetadata = !effectiveIsTyping;
-  const rowClassName = [NEWSWIRE_ROW_GRID_CLASS, NEWSWIRE_ROW_INTERACTIVE_CLASS].join(" ");
-  const headlineCell = /* @__PURE__ */ (0, import_jsx_runtime162.jsxs)(
-    "span",
-    {
-      ref: isRevealAnchor ? revealAnchorRef : void 0,
-      className: NEWSWIRE_HEADLINE_CELL_CLASS,
-      children: [
-        visibleHeadline,
-        showCursor && isCurrentLine ? /* @__PURE__ */ (0, import_jsx_runtime162.jsx)(HomeLiveTrackTerminalCursor, {}) : null
-      ]
-    }
-  );
-  const sourceCell = showMetadata ? /* @__PURE__ */ (0, import_jsx_runtime162.jsx)("span", { className: `${NEWSWIRE_SOURCE_CELL_CLASS} ${sourceColorClass}`, children: source }) : null;
-  const timestampCell = showMetadata ? /* @__PURE__ */ (0, import_jsx_runtime162.jsx)("span", { className: NEWSWIRE_TIMESTAMP_CELL_CLASS, children: timestamp ?? "" }) : null;
+  const rowClassName = NEWSWIRE_ROW_INTERACTIVE_CLASS;
+  const lineContent = /* @__PURE__ */ (0, import_jsx_runtime162.jsxs)("span", { className: NEWSWIRE_LINE_CLASS, children: [
+    /* @__PURE__ */ (0, import_jsx_runtime162.jsxs)(
+      "span",
+      {
+        ref: isRevealAnchor ? revealAnchorRef : void 0,
+        className: NEWSWIRE_HEADLINE_TEXT_CLASS,
+        children: [
+          visibleHeadline,
+          showCursor && isCurrentLine ? /* @__PURE__ */ (0, import_jsx_runtime162.jsx)(HomeLiveTrackTerminalCursor, {}) : null
+        ]
+      }
+    ),
+    showMetadata ? /* @__PURE__ */ (0, import_jsx_runtime162.jsxs)(import_jsx_runtime162.Fragment, { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime162.jsx)("span", { className: NEWSWIRE_SEPARATOR_CLASS, "aria-hidden": true, children: " \xB7 " }),
+      /* @__PURE__ */ (0, import_jsx_runtime162.jsx)("span", { className: `${NEWSWIRE_SOURCE_TEXT_CLASS} ${sourceColorClass}`, children: source }),
+      /* @__PURE__ */ (0, import_jsx_runtime162.jsx)("span", { className: NEWSWIRE_SEPARATOR_CLASS, "aria-hidden": true, children: " \xB7 " }),
+      /* @__PURE__ */ (0, import_jsx_runtime162.jsx)("span", { className: NEWSWIRE_TIMESTAMP_TEXT_CLASS, children: timestamp ?? "" })
+    ] }) : null
+  ] });
   if (openInSystemBrowser) {
-    return /* @__PURE__ */ (0, import_jsx_runtime162.jsxs)(
+    return /* @__PURE__ */ (0, import_jsx_runtime162.jsx)(
       "a",
       {
         href: articleUrl,
         target: "_blank",
         rel: "noopener noreferrer",
         className: rowClassName,
-        children: [
-          headlineCell,
-          sourceCell,
-          timestampCell
-        ]
+        children: lineContent
       }
     );
   }
-  return /* @__PURE__ */ (0, import_jsx_runtime162.jsxs)("button", { type: "button", onClick: handleOpenStory, className: rowClassName, children: [
-    headlineCell,
-    sourceCell,
-    timestampCell
-  ] });
+  return /* @__PURE__ */ (0, import_jsx_runtime162.jsx)("button", { type: "button", onClick: handleOpenStory, className: rowClassName, children: lineContent });
 }
 
 // ../grarf/desktop/src/components/homeMvp/HomeNewswireSurface.tsx
