@@ -47093,6 +47093,27 @@ function mlbTvLegacyWatchOption(game) {
 
 // ../grarf/desktop/src/lib/watch/providers/espnResolver.ts
 init_define_import_meta_env();
+
+// ../grarf/desktop/src/lib/watch/resolveLiveGameWatchTarget.ts
+init_define_import_meta_env();
+function resolveLiveGameWatchTarget(game) {
+  const streamUrl = game.streamUrl?.trim();
+  if (!streamUrl || !isWatchStreamUrl(streamUrl)) return null;
+  const provider = game.streamProvider?.trim();
+  if (provider && provider !== "ESPN") {
+    return { streamUrl, streamProvider: provider };
+  }
+  const derived = deriveChannelLabelFromStreamUrl(streamUrl);
+  if (derived && derived !== "ESPN") {
+    return { streamUrl, streamProvider: derived };
+  }
+  if (provider === "ESPN+") {
+    return { streamUrl, streamProvider: "ESPN+" };
+  }
+  return { streamUrl };
+}
+
+// ../grarf/desktop/src/lib/watch/providers/espnResolver.ts
 var LOG19 = "[Resolver]";
 function resolverDebug(message, extra) {
   if (extra && Object.keys(extra).length > 0) {
@@ -47113,6 +47134,23 @@ function hintsMentionEspn(game) {
 }
 function resolveEspnWatchOption(game) {
   const now = (/* @__PURE__ */ new Date()).toISOString();
+  const league = resolveLeague(game);
+  if (league === "NBASUMMER") {
+    const published = resolveLiveGameWatchTarget(game);
+    if (!published) return null;
+    resolverDebug("Resolved NBA Summer League worker-published ESPN Watch URL", { confidence: 0.97 });
+    return {
+      id: `espn-plus-stream-${game.espnEventId ?? game.id}`,
+      provider: "ESPN",
+      displayName: "ESPN+ \u2014 Watch",
+      launchStrategy: "deep-link",
+      deepLink: published.streamUrl,
+      confidence: 0.97,
+      requiresAuth: true,
+      tier: "event",
+      lastVerified: now
+    };
+  }
   if (game.streamUrl && game.streamProvider === "ESPN+" && gameHasEspnWatchBroadcast2(game)) {
     resolverDebug("Resolved ESPN+ direct stream URL from game", { confidence: 0.97 });
     console.log("[ESPN] Resolved streamUrl for match", {
@@ -47135,7 +47173,6 @@ function resolveEspnWatchOption(game) {
     return null;
   }
   if (!hintsMentionEspn(game) && !gameHasEspnPlusBroadcast2(game)) return null;
-  const league = resolveLeague(game);
   const eventId = parseEspnEventId(game);
   if (eventId) {
     const deepLink = buildEspnGamecastUrl(league, eventId, {
@@ -48230,6 +48267,13 @@ function espnPlusDirectOption(game, deepLink) {
   };
 }
 function tryLaunchDirectStreamWatch(game, dispatch) {
+  if (game.league === "NBASUMMER") {
+    const streamUrl2 = game.streamUrl?.trim();
+    if (!streamUrl2 || !isWatchStreamUrl(streamUrl2)) return false;
+    watchDebug("Launching NBA Summer League worker-published ESPN Watch URL", { gameId: game.id });
+    executeWatchOption(game, espnPlusDirectOption(game, streamUrl2), dispatch);
+    return true;
+  }
   const streamUrl = game.streamUrl?.trim();
   if (!streamUrl || !isWatchStreamUrl(streamUrl)) return false;
   const streamProvider = game.streamProvider ?? deriveChannelLabelFromStreamUrl(streamUrl);
@@ -57156,27 +57200,6 @@ init_isGrarfWebRenderer();
 
 // ../grarf/desktop/src/lib/watch/homeSpineWatchLive.ts
 init_define_import_meta_env();
-
-// ../grarf/desktop/src/lib/watch/resolveLiveGameWatchTarget.ts
-init_define_import_meta_env();
-function resolveLiveGameWatchTarget(game) {
-  const streamUrl = game.streamUrl?.trim();
-  if (!streamUrl || !isWatchStreamUrl(streamUrl)) return null;
-  const provider = game.streamProvider?.trim();
-  if (provider && provider !== "ESPN") {
-    return { streamUrl, streamProvider: provider };
-  }
-  const derived = deriveChannelLabelFromStreamUrl(streamUrl);
-  if (derived && derived !== "ESPN") {
-    return { streamUrl, streamProvider: derived };
-  }
-  if (provider === "ESPN+") {
-    return { streamUrl, streamProvider: "ESPN+" };
-  }
-  return { streamUrl };
-}
-
-// ../grarf/desktop/src/lib/watch/homeSpineWatchLive.ts
 function isMlbScoreboardGame(game) {
   return game.league === "MLB" || /^espn-MLB-/i.test(game.id);
 }
