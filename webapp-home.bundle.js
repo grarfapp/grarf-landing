@@ -62272,7 +62272,8 @@ function compactActiveClass(mode) {
 function CenterPaneApplicationModeSelector({
   className,
   prominent = false,
-  onSelectWorkspace
+  onSelectWorkspace,
+  suppressActiveHighlight = false
 }) {
   const navigate = useNavigate();
   const { pathname } = useLocation();
@@ -62304,7 +62305,7 @@ function CenterPaneApplicationModeSelector({
         "aria-label": "Center pane application mode",
         children: [
           modes.map(({ mode: m2, label }) => {
-            const active2 = mode === m2;
+            const active2 = !suppressActiveHighlight && mode === m2;
             return /* @__PURE__ */ (0, import_jsx_runtime58.jsx)(
               "button",
               {
@@ -62340,7 +62341,7 @@ function CenterPaneApplicationModeSelector({
       children: [
         /* @__PURE__ */ (0, import_jsx_runtime58.jsx)("span", { className: "mr-0.5 hidden text-[8px] tracking-[0.18em] text-textdim lg:inline", children: "MODE" }),
         modes.map(({ mode: m2, label }) => {
-          const active2 = mode === m2;
+          const active2 = !suppressActiveHighlight && mode === m2;
           return /* @__PURE__ */ (0, import_jsx_runtime58.jsx)(
             "button",
             {
@@ -62372,14 +62373,22 @@ function CenterPaneApplicationModeSelector({
 var import_jsx_runtime59 = __toESM(require_jsx_runtime(), 1);
 function HomeCenterPanePrimaryNav({
   className,
-  onSelectWorkspace
+  onSelectWorkspace,
+  suppressActiveHighlight
 }) {
   return /* @__PURE__ */ (0, import_jsx_runtime59.jsx)(
     "div",
     {
       className: cn2(HOME_SUBNAV_ROW_CLASS, "justify-center", className),
       "data-center-pane-primary-nav": true,
-      children: /* @__PURE__ */ (0, import_jsx_runtime59.jsx)(CenterPaneApplicationModeSelector, { prominent: true, onSelectWorkspace })
+      children: /* @__PURE__ */ (0, import_jsx_runtime59.jsx)(
+        CenterPaneApplicationModeSelector,
+        {
+          prominent: true,
+          onSelectWorkspace,
+          suppressActiveHighlight
+        }
+      )
     }
   );
 }
@@ -89221,7 +89230,13 @@ function HomePage() {
     }
   );
   const centerWorkspace = isHomeOps ? /* @__PURE__ */ (0, import_jsx_runtime172.jsxs)("div", { className: "relative flex h-full min-h-0 min-w-0 flex-1 flex-col overflow-hidden", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime172.jsx)(HomeCenterPanePrimaryNav, { onSelectWorkspace: onSelectCenterPaneWorkspace }),
+    /* @__PURE__ */ (0, import_jsx_runtime172.jsx)(
+      HomeCenterPanePrimaryNav,
+      {
+        onSelectWorkspace: onSelectCenterPaneWorkspace,
+        suppressActiveHighlight: activeContentOverlayId != null
+      }
+    ),
     contentOverlayTabs.length > 0 ? /* @__PURE__ */ (0, import_jsx_runtime172.jsx)(
       EphemeralWorkspaceTabs,
       {
