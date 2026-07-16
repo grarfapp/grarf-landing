@@ -13867,7 +13867,6 @@ var LEAGUE_PRIORITY_MANUAL_AFTER = {
 init_define_import_meta_env();
 var LEAGUE_PRIORITY_SEED_ORDER = [
   "WORLDCUP",
-  "PGA",
   "WIMBLEDON_MEN",
   "WIMBLEDON_WOMEN",
   "MLB",
@@ -13891,6 +13890,7 @@ var LEAGUE_PRIORITY_SEED_ORDER = [
   "SERIEA",
   "LIGUE1",
   "UEL",
+  "PGA",
   "LPGA",
   "INDYCAR",
   "NASCAR",
@@ -15768,6 +15768,9 @@ function refreshManualLeMans2026SpineGameIfNeeded(game, now = /* @__PURE__ */ ne
 init_define_import_meta_env();
 
 // ../grarf/desktop/src/lib/bestGameRightNow/leagueImportanceV1.ts
+init_define_import_meta_env();
+
+// ../grarf/desktop/src/lib/eventPriority/resolvePublishedEventImportanceScore.ts
 init_define_import_meta_env();
 
 // ../grarf/desktop/shared/golfWatchUrls.js

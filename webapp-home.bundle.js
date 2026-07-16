@@ -24394,7 +24394,6 @@ var LEAGUE_PRIORITY_MANUAL_AFTER = {
 init_define_import_meta_env();
 var LEAGUE_PRIORITY_SEED_ORDER = [
   "WORLDCUP",
-  "PGA",
   "WIMBLEDON_MEN",
   "WIMBLEDON_WOMEN",
   "MLB",
@@ -24418,6 +24417,7 @@ var LEAGUE_PRIORITY_SEED_ORDER = [
   "SERIEA",
   "LIGUE1",
   "UEL",
+  "PGA",
   "LPGA",
   "INDYCAR",
   "NASCAR",
@@ -31799,6 +31799,14 @@ init_define_import_meta_env();
 // ../grarf/desktop/src/lib/bestGameRightNow/leagueImportanceV1.ts
 init_define_import_meta_env();
 
+// ../grarf/desktop/src/lib/eventPriority/resolvePublishedEventImportanceScore.ts
+init_define_import_meta_env();
+function resolvePublishedEventImportanceScore(game) {
+  const score2 = game.metadata?.eventPriority?.score;
+  if (score2 == null || !Number.isFinite(score2)) return null;
+  return score2;
+}
+
 // ../grarf/desktop/src/lib/golf/lpgaMajorTournament.ts
 init_define_import_meta_env();
 var LPGA_MAJOR_TITLE_PATTERNS = [
@@ -32439,6 +32447,8 @@ function resolveLeagueImportanceV1ForLeagueKey(leagueKey, _context) {
   return resolveLeagueImportanceScore(leagueKey);
 }
 function resolveLeagueImportanceV1(game) {
+  const publishedEventScore = resolvePublishedEventImportanceScore(game);
+  if (publishedEventScore != null) return publishedEventScore;
   const golfImportance = resolveGolfGameImportanceV1(game);
   if (golfImportance != null) return golfImportance;
   const wimbledonKey = resolveWimbledonGameLeagueImportanceKey(game);
@@ -46850,7 +46860,7 @@ var import_react36 = __toESM(require_react(), 1);
 
 // ../grarf/desktop/src/store/operationalAlertStore.ts
 init_define_import_meta_env();
-var import_zustand28 = __toESM(require_zustand(), 1);
+var import_zustand29 = __toESM(require_zustand(), 1);
 
 // ../grarf/desktop/src/lib/operationalAlerts/alertActions.ts
 init_define_import_meta_env();
@@ -46969,6 +46979,17 @@ function installDemoNcaaBaseballAlertTrigger() {
 
 // ../grarf/desktop/src/lib/watch/handleWatchLiveClick.ts
 init_define_import_meta_env();
+
+// ../grarf/desktop/src/lib/manualStreamUrl/manualStreamUrl.ts
+init_define_import_meta_env();
+init_isGrarfWebRenderer();
+function applyManualStreamUrl(game, rawStreamUrl) {
+  if (!isGrarfWebRenderer()) return game;
+  if (rawStreamUrl === void 0) return game;
+  const nextStreamUrl = rawStreamUrl.trim() || null;
+  if ((game.streamUrl ?? null) === nextStreamUrl) return game;
+  return { ...game, streamUrl: nextStreamUrl };
+}
 
 // ../grarf/desktop/src/lib/gamesSpine/manual/manualGamesSpineWatchLive.ts
 init_define_import_meta_env();
@@ -48556,6 +48577,107 @@ function logWnbaWatchLiveClicked(game) {
 
 // ../grarf/desktop/src/lib/watch/handleWatchLiveClick.ts
 init_isGrarfWebRenderer();
+
+// ../grarf/desktop/src/store/adminOperationsCardStore.ts
+init_define_import_meta_env();
+var import_zustand26 = __toESM(require_zustand(), 1);
+var EMPTY_ADMIN_OPERATIONS_CARD_FIELDS = {
+  workspaceUrl: "",
+  navigationMode: "center-pane",
+  streamUrl: "",
+  highlightVideoUrl: "",
+  statusOverride: "",
+  viewerMessage: "",
+  operatorNote: ""
+};
+function cloneFieldsByGameId(source) {
+  const out = {};
+  for (const [gameId, fields] of Object.entries(source)) {
+    out[gameId] = { ...fields };
+  }
+  return out;
+}
+function serializeNavigationMode(mode) {
+  return mode === "new-browser-tab" ? "new-browser-tab" : null;
+}
+function buildPersistExport(gameKey, fields) {
+  return {
+    gameKey,
+    streamUrl: fields.streamUrl.trim() || null,
+    highlightVideoUrl: fields.highlightVideoUrl.trim() || null,
+    statusOverride: fields.statusOverride || null,
+    viewerMessage: fields.viewerMessage.trim() || null,
+    gameCardUrl: fields.workspaceUrl.trim() || null,
+    navigationMode: serializeNavigationMode(fields.navigationMode)
+  };
+}
+function persistExportsEqual(a2, b2) {
+  return a2.streamUrl === b2.streamUrl && a2.highlightVideoUrl === b2.highlightVideoUrl && a2.statusOverride === b2.statusOverride && a2.viewerMessage === b2.viewerMessage && a2.gameCardUrl === b2.gameCardUrl && a2.navigationMode === b2.navigationMode;
+}
+var useAdminOperationsCardStore = (0, import_zustand26.create)((set, get) => ({
+  fieldsByGameId: {},
+  persistedBaselineFieldsByGameId: {},
+  setField: (gameId, field, value) => {
+    const current = get().fieldsByGameId[gameId] ?? EMPTY_ADMIN_OPERATIONS_CARD_FIELDS;
+    set({
+      fieldsByGameId: {
+        ...get().fieldsByGameId,
+        [gameId]: { ...current, [field]: value }
+      }
+    });
+  },
+  setNavigationMode: (gameId, value) => {
+    const current = get().fieldsByGameId[gameId] ?? EMPTY_ADMIN_OPERATIONS_CARD_FIELDS;
+    set({
+      fieldsByGameId: {
+        ...get().fieldsByGameId,
+        [gameId]: { ...current, navigationMode: value }
+      }
+    });
+  },
+  setStatusOverride: (gameId, value) => {
+    const current = get().fieldsByGameId[gameId] ?? EMPTY_ADMIN_OPERATIONS_CARD_FIELDS;
+    set({
+      fieldsByGameId: {
+        ...get().fieldsByGameId,
+        [gameId]: { ...current, statusOverride: value }
+      }
+    });
+  },
+  hydrateFields: (fieldsByGameId) => {
+    const baseline = cloneFieldsByGameId(fieldsByGameId);
+    set({ fieldsByGameId: baseline, persistedBaselineFieldsByGameId: cloneFieldsByGameId(baseline) });
+  },
+  isDirty: () => get().exportForSave().length > 0,
+  markClean: () => set((state3) => ({
+    persistedBaselineFieldsByGameId: cloneFieldsByGameId(state3.fieldsByGameId)
+  })),
+  exportForSave: () => {
+    const { fieldsByGameId, persistedBaselineFieldsByGameId } = get();
+    const gameIds = /* @__PURE__ */ new Set([
+      ...Object.keys(fieldsByGameId),
+      ...Object.keys(persistedBaselineFieldsByGameId)
+    ]);
+    const records = [];
+    for (const gameKey of gameIds) {
+      const working = buildPersistExport(
+        gameKey,
+        fieldsByGameId[gameKey] ?? EMPTY_ADMIN_OPERATIONS_CARD_FIELDS
+      );
+      const baseline = buildPersistExport(
+        gameKey,
+        persistedBaselineFieldsByGameId[gameKey] ?? EMPTY_ADMIN_OPERATIONS_CARD_FIELDS
+      );
+      if (!persistExportsEqual(working, baseline)) {
+        records.push(working);
+      }
+    }
+    return records;
+  },
+  reset: () => set({ fieldsByGameId: {}, persistedBaselineFieldsByGameId: {} })
+}));
+
+// ../grarf/desktop/src/lib/watch/handleWatchLiveClick.ts
 function isStrongSingleOption(options) {
   if (options.length !== 1) return null;
   const o2 = options[0];
@@ -48565,6 +48687,11 @@ function isStrongSingleOption(options) {
 }
 function isMlbGame2(game) {
   return game.league === "MLB" || /^espn-MLB-/i.test(game.id);
+}
+function tryLaunchMlbOperationsCardStreamOverride(game, dispatch) {
+  const manualStreamUrl = (useAdminOperationsCardStore.getState().fieldsByGameId[game.id] ?? EMPTY_ADMIN_OPERATIONS_CARD_FIELDS).streamUrl.trim();
+  if (!manualStreamUrl) return false;
+  return tryLaunchDirectStreamWatch(applyManualStreamUrl(game, manualStreamUrl), dispatch);
 }
 function handleWatchLiveClick(game, dispatch) {
   if (tryLaunchManualGamesSpineWatchLive(game, dispatch)) {
@@ -48583,6 +48710,9 @@ function handleWatchLiveClick(game, dispatch) {
     return { action: "launched" };
   }
   if (tryLaunchWnbaWatchLive(game, dispatch)) {
+    return { action: "launched" };
+  }
+  if (isMlbGame2(game) && tryLaunchMlbOperationsCardStreamOverride(game, dispatch)) {
     return { action: "launched" };
   }
   if (isGrarfWebRenderer() && game.streamProvider === "Tennis Channel+" && tryLaunchDirectStreamWatch(game, dispatch)) {
@@ -48695,11 +48825,11 @@ init_isGrarfWebRenderer();
 
 // ../grarf/desktop/src/store/gamesSpineCloseGameAlertStore.ts
 init_define_import_meta_env();
-var import_zustand27 = __toESM(require_zustand(), 1);
+var import_zustand28 = __toESM(require_zustand(), 1);
 
 // ../grarf/desktop/src/store/gamesSpineTransientAlertStore.ts
 init_define_import_meta_env();
-var import_zustand26 = __toESM(require_zustand(), 1);
+var import_zustand27 = __toESM(require_zustand(), 1);
 
 // ../grarf/desktop/src/lib/gamesSpine/gamesSpineTransientAlertScheduler.ts
 init_define_import_meta_env();
@@ -48766,7 +48896,7 @@ function activateNextFromQueue(set, get) {
   const [next, ...rest] = queue;
   set({ active: next, queue: rest });
 }
-var useGamesSpineTransientAlertStore = (0, import_zustand26.create)((set, get) => ({
+var useGamesSpineTransientAlertStore = (0, import_zustand27.create)((set, get) => ({
   active: null,
   queue: [],
   enqueue: (items) => {
@@ -48817,7 +48947,7 @@ function toTransientQueueItems(items) {
     gameId: item.gameId
   }));
 }
-var useGamesSpineCloseGameAlertStore = (0, import_zustand27.create)(() => ({
+var useGamesSpineCloseGameAlertStore = (0, import_zustand28.create)(() => ({
   queue: [],
   active: null,
   enqueue: (items) => {
@@ -48891,7 +49021,7 @@ function appendOperationalAlert(get, set, alert) {
     logOperationalAlertInsertedBelowStack(addedToStack, nextVisible.length);
   }
 }
-var useOperationalAlertStore = (0, import_zustand28.create)((set, get) => ({
+var useOperationalAlertStore = (0, import_zustand29.create)((set, get) => ({
   visible: [],
   queue: [],
   enqueueInferred: (items) => {
@@ -49621,107 +49751,6 @@ init_define_import_meta_env();
 // ../grarf/desktop/src/lib/gameCardNavigation/gameCardNavigation.ts
 init_define_import_meta_env();
 init_isGrarfWebRenderer();
-
-// ../grarf/desktop/src/store/adminOperationsCardStore.ts
-init_define_import_meta_env();
-var import_zustand29 = __toESM(require_zustand(), 1);
-var EMPTY_ADMIN_OPERATIONS_CARD_FIELDS = {
-  workspaceUrl: "",
-  navigationMode: "center-pane",
-  streamUrl: "",
-  highlightVideoUrl: "",
-  statusOverride: "",
-  viewerMessage: "",
-  operatorNote: ""
-};
-function cloneFieldsByGameId(source) {
-  const out = {};
-  for (const [gameId, fields] of Object.entries(source)) {
-    out[gameId] = { ...fields };
-  }
-  return out;
-}
-function serializeNavigationMode(mode) {
-  return mode === "new-browser-tab" ? "new-browser-tab" : null;
-}
-function buildPersistExport(gameKey, fields) {
-  return {
-    gameKey,
-    streamUrl: fields.streamUrl.trim() || null,
-    highlightVideoUrl: fields.highlightVideoUrl.trim() || null,
-    statusOverride: fields.statusOverride || null,
-    viewerMessage: fields.viewerMessage.trim() || null,
-    gameCardUrl: fields.workspaceUrl.trim() || null,
-    navigationMode: serializeNavigationMode(fields.navigationMode)
-  };
-}
-function persistExportsEqual(a2, b2) {
-  return a2.streamUrl === b2.streamUrl && a2.highlightVideoUrl === b2.highlightVideoUrl && a2.statusOverride === b2.statusOverride && a2.viewerMessage === b2.viewerMessage && a2.gameCardUrl === b2.gameCardUrl && a2.navigationMode === b2.navigationMode;
-}
-var useAdminOperationsCardStore = (0, import_zustand29.create)((set, get) => ({
-  fieldsByGameId: {},
-  persistedBaselineFieldsByGameId: {},
-  setField: (gameId, field, value) => {
-    const current = get().fieldsByGameId[gameId] ?? EMPTY_ADMIN_OPERATIONS_CARD_FIELDS;
-    set({
-      fieldsByGameId: {
-        ...get().fieldsByGameId,
-        [gameId]: { ...current, [field]: value }
-      }
-    });
-  },
-  setNavigationMode: (gameId, value) => {
-    const current = get().fieldsByGameId[gameId] ?? EMPTY_ADMIN_OPERATIONS_CARD_FIELDS;
-    set({
-      fieldsByGameId: {
-        ...get().fieldsByGameId,
-        [gameId]: { ...current, navigationMode: value }
-      }
-    });
-  },
-  setStatusOverride: (gameId, value) => {
-    const current = get().fieldsByGameId[gameId] ?? EMPTY_ADMIN_OPERATIONS_CARD_FIELDS;
-    set({
-      fieldsByGameId: {
-        ...get().fieldsByGameId,
-        [gameId]: { ...current, statusOverride: value }
-      }
-    });
-  },
-  hydrateFields: (fieldsByGameId) => {
-    const baseline = cloneFieldsByGameId(fieldsByGameId);
-    set({ fieldsByGameId: baseline, persistedBaselineFieldsByGameId: cloneFieldsByGameId(baseline) });
-  },
-  isDirty: () => get().exportForSave().length > 0,
-  markClean: () => set((state3) => ({
-    persistedBaselineFieldsByGameId: cloneFieldsByGameId(state3.fieldsByGameId)
-  })),
-  exportForSave: () => {
-    const { fieldsByGameId, persistedBaselineFieldsByGameId } = get();
-    const gameIds = /* @__PURE__ */ new Set([
-      ...Object.keys(fieldsByGameId),
-      ...Object.keys(persistedBaselineFieldsByGameId)
-    ]);
-    const records = [];
-    for (const gameKey of gameIds) {
-      const working = buildPersistExport(
-        gameKey,
-        fieldsByGameId[gameKey] ?? EMPTY_ADMIN_OPERATIONS_CARD_FIELDS
-      );
-      const baseline = buildPersistExport(
-        gameKey,
-        persistedBaselineFieldsByGameId[gameKey] ?? EMPTY_ADMIN_OPERATIONS_CARD_FIELDS
-      );
-      if (!persistExportsEqual(working, baseline)) {
-        records.push(working);
-      }
-    }
-    return records;
-  },
-  reset: () => set({ fieldsByGameId: {}, persistedBaselineFieldsByGameId: {} })
-}));
-
-// ../grarf/desktop/src/lib/gameCardNavigation/gameCardNavigation.ts
 function parseGameCardNavigationMode(raw) {
   return raw === "new-browser-tab" ? "new-browser-tab" : "center-pane";
 }
@@ -49835,17 +49864,6 @@ function applyGameViewerMessage(game, rawViewerMessage) {
   const nextViewerMessage = viewerMessage || null;
   if ((game.viewerMessage ?? null) === nextViewerMessage) return game;
   return { ...game, viewerMessage: nextViewerMessage };
-}
-
-// ../grarf/desktop/src/lib/manualStreamUrl/manualStreamUrl.ts
-init_define_import_meta_env();
-init_isGrarfWebRenderer();
-function applyManualStreamUrl(game, rawStreamUrl) {
-  if (!isGrarfWebRenderer()) return game;
-  if (rawStreamUrl === void 0) return game;
-  const nextStreamUrl = rawStreamUrl.trim() || null;
-  if ((game.streamUrl ?? null) === nextStreamUrl) return game;
-  return { ...game, streamUrl: nextStreamUrl };
 }
 
 // ../grarf/desktop/src/lib/gamesSpine/applyCanonicalGamesSpineEnrichment.ts
@@ -57454,6 +57472,49 @@ function GameWorkspaceHighlightMediaViewport({
   }
   return /* @__PURE__ */ (0, import_jsx_runtime30.jsx)("div", { className: "flex min-h-0 flex-1 items-center justify-center bg-black", children: /* @__PURE__ */ (0, import_jsx_runtime30.jsx)("div", { className: WEB_GAME_WORKSPACE_HIGHLIGHT_FRAME_CLASS, children }) });
 }
+function GameWorkspaceManualHighlightPlayer({
+  video,
+  videoOnly,
+  className
+}) {
+  return /* @__PURE__ */ (0, import_jsx_runtime30.jsxs)(
+    "div",
+    {
+      className: cn2(
+        "flex min-w-0 flex-col overflow-hidden border-l border-line/40 bg-black font-mono",
+        videoOnly ? "shrink-0" : "min-h-0 flex-1",
+        className
+      ),
+      children: [
+        !videoOnly ? /* @__PURE__ */ (0, import_jsx_runtime30.jsxs)("div", { className: "shrink-0 border-b border-line/40 bg-[#040808]/95 px-1 py-0.5", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime30.jsx)("span", { className: "text-[7px] tracking-[0.16em] text-textdim", children: "HIGHLIGHTS" }),
+          /* @__PURE__ */ (0, import_jsx_runtime30.jsx)("p", { className: "line-clamp-2 text-[7px] leading-snug text-ambersys/75", children: video.title })
+        ] }) : null,
+        /* @__PURE__ */ (0, import_jsx_runtime30.jsx)(GameWorkspaceHighlightMediaViewport, { videoOnly, children: video.youtubeVideoId ? /* @__PURE__ */ (0, import_jsx_runtime30.jsx)(GameWorkspaceLeagueHighlightIframe, { videoId: video.youtubeVideoId, title: video.title }) : video.playbackUrl ? /* @__PURE__ */ (0, import_jsx_runtime30.jsx)(
+          "video",
+          {
+            src: video.playbackUrl,
+            poster: video.thumbnailUrl || void 0,
+            controls: true,
+            playsInline: true,
+            preload: "metadata",
+            className: "h-full w-full bg-black object-contain"
+          },
+          video.playbackUrl
+        ) : /* @__PURE__ */ (0, import_jsx_runtime30.jsx)(
+          "iframe",
+          {
+            src: video.videoUrl,
+            className: "h-full w-full border-0 bg-black",
+            allow: "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share",
+            allowFullScreen: true,
+            title: video.title
+          }
+        ) })
+      ]
+    }
+  );
+}
 var GameWorkspaceLeagueHighlightIframe = (0, import_react60.memo)(function GameWorkspaceLeagueHighlightIframe2({
   videoId,
   title
@@ -57477,6 +57538,13 @@ function GameWorkspaceHighlightsPlaceholder({
   className,
   videoOnly = false
 }) {
+  const operationsHighlightUrl = useAdminOperationsCardStore(
+    (s2) => s2.fieldsByGameId[gameId]?.highlightVideoUrl ?? EMPTY_ADMIN_OPERATIONS_CARD_FIELDS.highlightVideoUrl
+  );
+  const manualHighlight = (0, import_react60.useMemo)(
+    () => manualHighlightUrlToGameHighlightVideo(operationsHighlightUrl),
+    [operationsHighlightUrl]
+  );
   const canonicalGame = useCanonicalLiveGameRow(gameId, "game_workspace_highlights");
   const workspaceGame = canonicalGame ?? resolveWorkspaceGameRow(gameId, catchupContextGame);
   const gamePk = resolveWorkspaceGamePk(gameId, workspaceGame);
@@ -57489,6 +57557,16 @@ function GameWorkspaceHighlightsPlaceholder({
     setHighlightIndex(0);
   }, [gamePk, mlbHighlights.length]);
   const { loading, video, error, supported } = useGameWorkspaceHighlight(gameId, catchupContextGame);
+  if (manualHighlight) {
+    return /* @__PURE__ */ (0, import_jsx_runtime30.jsx)(
+      GameWorkspaceManualHighlightPlayer,
+      {
+        video: manualHighlight,
+        videoOnly,
+        className
+      }
+    );
+  }
   if (hasMlbHighlights && currentMlbHighlight) {
     return /* @__PURE__ */ (0, import_jsx_runtime30.jsxs)(
       "div",
@@ -58122,7 +58200,7 @@ function resolveGamesSpineCardListLayoutClass(gamesMode) {
     gamesMode === "compact" ? "gap-1" : "gap-3"
   );
 }
-var GAMES_SPINE_CARD_LEAGUE_LABEL_CLASS = "text-[9px] uppercase leading-none tracking-[0.2em] text-[#5f7a7a]";
+var GAMES_SPINE_CARD_LEAGUE_LABEL_CLASS = "text-[9px] uppercase leading-none tracking-[0.2em] text-white/90";
 var GAMES_SPINE_CARD_STATUS_GRID_CLASS = "grid w-full min-w-0 grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-x-2";
 var GAMES_SPINE_CARD_TIMING_CLASS = "truncate text-center text-[11px] leading-none tracking-wide text-ambersys/95";
 var GAMES_SPINE_CARD_START_TIME_CLASS = "inline-flex items-center border border-cyansys/45 bg-cyansys/[0.08] px-1.5 py-0.5 text-[10px] tracking-wide text-cyansys/95";
