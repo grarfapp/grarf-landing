@@ -31607,6 +31607,7 @@ function nbaTvBroadcastDedupeKey(label) {
 
 // ../grarf/desktop/src/lib/broadcast/resolveChannelLogoUrl.ts
 var NBA_TV_CHANNEL_LOGO_URL = "/league-logos/channel-nba-tv.png";
+var GOLF_CHANNEL_LOGO_URL = "/league-logos/channel-golf-channel.png";
 var CHANNEL_LOGO_BY_LABEL = {
   ABC: "/league-logos/channel-abc.png",
   CBS: "/league-logos/channel-cbs.png",
@@ -31645,7 +31646,9 @@ var CHANNEL_LOGO_BY_LABEL = {
   "TENNIS CHANNEL+": "/league-logos/channel-tennis-channel.png",
   "PRIME VIDEO": "/league-logos/channel-prime-video.png",
   PRIME: "/league-logos/channel-prime-video.png",
-  "WNBA LEAGUE PASS": "/league-logos/channel-wnba-league-pass.png"
+  "WNBA LEAGUE PASS": "/league-logos/channel-wnba-league-pass.png",
+  "GOLF CHANNEL": GOLF_CHANNEL_LOGO_URL,
+  "GOLF CHNL": GOLF_CHANNEL_LOGO_URL
 };
 function normalizeChannelLogoKey(label) {
   return label.trim().replace(/\s+/g, " ").toUpperCase();
@@ -64365,13 +64368,16 @@ function resolveGolfSpineLiveTimingLabel(game, scheduleLabel) {
   if (stripped) return stripGolfLiveInProgressSuffix(stripped);
   return null;
 }
-function formatWnbaBasketballPeriodLabel(periodNum) {
+function isNbaFamilyBasketballLeague(league) {
+  return league === "NBA" || league === "NBASUMMER" || league === "WNBA";
+}
+function formatNbaFamilyBasketballPeriodLabel(periodNum) {
   if (periodNum >= 1 && periodNum <= 4) return `Q${periodNum}`;
   if (periodNum === 5) return "OT";
   if (periodNum > 5) return `${periodNum - 4}OT`;
   return null;
 }
-function parseWnbaBasketballPeriodText(text2) {
+function parseNbaFamilyBasketballPeriodText(text2) {
   const trimmed = text2.trim();
   const quarter = trimmed.match(/\b(\d+)(?:st|nd|rd|th)\s+Quarter\b/i);
   if (quarter) return `Q${quarter[1]}`;
@@ -64382,27 +64388,27 @@ function parseWnbaBasketballPeriodText(text2) {
   if (/\bOT\b/i.test(trimmed) || /\bovertime\b/i.test(trimmed)) return "OT";
   return null;
 }
-function formatWnbaLiveGameCardTimingLabel(game) {
+function formatNbaFamilyLiveGameCardTimingLabel(game) {
   const clock = game.displayClock?.trim();
   const periodNum = game.period != null && Number.isFinite(game.period) && game.period > 0 ? game.period : null;
   if (periodNum != null && clock) {
-    const periodLabel = formatWnbaBasketballPeriodLabel(periodNum);
+    const periodLabel = formatNbaFamilyBasketballPeriodLabel(periodNum);
     if (periodLabel) return `${periodLabel} - ${clock}`;
   }
   const statusLine = game.statusLine?.trim();
   if (!statusLine) return clock ?? null;
   const clockFirst = statusLine.match(/^(\d{1,2}:\d{2})\s*-\s*(.+)$/);
   if (clockFirst) {
-    const periodLabel = parseWnbaBasketballPeriodText(clockFirst[2]);
+    const periodLabel = parseNbaFamilyBasketballPeriodText(clockFirst[2]);
     if (periodLabel) return `${periodLabel} - ${clockFirst[1]}`;
   }
   const clockLast = statusLine.match(/^(.+?)\s*-\s*(\d{1,2}:\d{2})$/);
   if (clockLast) {
-    const periodLabel = parseWnbaBasketballPeriodText(clockLast[1]);
+    const periodLabel = parseNbaFamilyBasketballPeriodText(clockLast[1]);
     if (periodLabel) return `${periodLabel} - ${clockLast[2]}`;
   }
   if (periodNum != null) {
-    const periodLabel = formatWnbaBasketballPeriodLabel(periodNum);
+    const periodLabel = formatNbaFamilyBasketballPeriodLabel(periodNum);
     if (periodLabel && clock) return `${periodLabel} - ${clock}`;
   }
   return statusLine;
@@ -64446,8 +64452,8 @@ function resolveGamesSpineCardTimingLabel(game, scheduleLabel) {
       if (statusLine2) return statusLine2;
       return stripLivePrefix(scheduleLabel);
     }
-    if (game.league === "WNBA" && isGrarfWebRenderer()) {
-      return formatWnbaLiveGameCardTimingLabel(game) ?? game.statusLine?.trim() ?? game.displayClock?.trim() ?? stripLivePrefix(scheduleLabel);
+    if (isNbaFamilyBasketballLeague(game.league) && isGrarfWebRenderer()) {
+      return formatNbaFamilyLiveGameCardTimingLabel(game) ?? game.statusLine?.trim() ?? game.displayClock?.trim() ?? stripLivePrefix(scheduleLabel);
     }
     if (isGrarfWebRenderer() && game.league && GOLF_SPINE_LIVE_ROUND_LABEL_LEAGUES.has(game.league)) {
       const golfLabel = resolveGolfSpineLiveTimingLabel(game, scheduleLabel);
