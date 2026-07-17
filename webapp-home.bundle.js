@@ -50141,31 +50141,149 @@ init_define_import_meta_env();
 
 // ../grarf/desktop/shared/eventPriority/eventPrioritySeed.js
 init_define_import_meta_env();
-var EVENT_PRIORITY_ORDER = [];
+var EVENT_PRIORITY_ORDER = [
+  { league: "PGA", title: "The Open" }
+];
 function getEventPriorityOrder() {
   return EVENT_PRIORITY_ORDER;
 }
 
 // ../grarf/desktop/shared/eventPriority/eventPriorityService.js
 init_define_import_meta_env();
+var EVENT_REPOSITORY_LEAGUE_ALIASES = {
+  "PGA TOUR": "PGA",
+  "LPGA TOUR": "LPGA",
+  "PGA CHAMPIONS": "CHAMPIONS",
+  "CHAMPIONS TOUR": "CHAMPIONS",
+  "FORMULA 1": "F1",
+  "FORMULA ONE": "F1",
+  "TOUR DE FRANCE": "TDF"
+};
 function normalizeLeagueKey(value) {
   return String(value ?? "").trim().toUpperCase();
 }
 function normalizeEventTitle(value) {
   return String(value ?? "").trim().replace(/\s+/g, " ");
 }
+function resolveCanonicalEventRepositoryLeagueKey(value) {
+  const normalized = normalizeLeagueKey(value);
+  if (!normalized) return "";
+  return EVENT_REPOSITORY_LEAGUE_ALIASES[normalized] ?? normalized;
+}
+function buildIndexByEventKey(order) {
+  return new Map(
+    order.map((entry, index) => {
+      const league = resolveCanonicalEventRepositoryLeagueKey(entry.league);
+      const title = normalizeEventTitle(entry.title).toLowerCase();
+      return [`${league}::${title}`, index];
+    })
+  );
+}
 function buildScoreByEventKey(order) {
   return new Map(
     order.map((entry, index) => {
-      const league = normalizeLeagueKey(entry.league);
+      const league = resolveCanonicalEventRepositoryLeagueKey(entry.league);
       const title = normalizeEventTitle(entry.title).toLowerCase();
       return [`${league}::${title}`, order.length - index];
     })
   );
 }
-var scoreByEventKey = buildScoreByEventKey(getEventPriorityOrder());
+var eventOrder = getEventPriorityOrder();
+var indexByEventKey = buildIndexByEventKey(eventOrder);
+var scoreByEventKey = buildScoreByEventKey(eventOrder);
+function resolveEventMatchKey(game) {
+  const league = resolveCanonicalEventRepositoryLeagueKey(game.league);
+  const title = normalizeEventTitle(resolveCanonicalEventDisplayTitle(game)).toLowerCase();
+  if (!league || !title) return null;
+  return `${league}::${title}`;
+}
 function resolveCanonicalEventDisplayTitle(game) {
   return game.metadata?.canonicalEvent?.title?.trim() || game.metadata?.manualGamesSpine?.eventName?.trim() || game.awayTeam?.trim() || "";
+}
+function resolveEventPriorityOrderIndex(game) {
+  const key2 = resolveEventMatchKey(game);
+  if (!key2) return null;
+  const fromSeed = indexByEventKey.get(key2);
+  if (fromSeed != null) return fromSeed;
+  const score2 = game.metadata?.eventPriority?.score;
+  if (score2 != null && Number.isFinite(score2) && eventOrder.length > 0) {
+    const index = eventOrder.length - score2;
+    if (index >= 0 && index < eventOrder.length) return index;
+  }
+  return null;
+}
+
+// ../grarf/desktop/src/lib/eventPriority/resolveGrarfOperationalPrioritization.ts
+init_define_import_meta_env();
+function isLiveEventRepositoryGame(game) {
+  return isGameActivelyLive(game) && resolveEventPriorityOrderIndex(game) != null;
+}
+function partitionLiveEventRepositoryCandidates(games) {
+  const liveEventRepository = [];
+  const remainder = [];
+  for (const game of games) {
+    if (isLiveEventRepositoryGame(game)) {
+      liveEventRepository.push(game);
+    } else {
+      remainder.push(game);
+    }
+  }
+  return { liveEventRepository, remainder };
+}
+function pickBestLiveEventRepositoryCandidate(candidates, compareWithinBucket) {
+  if (candidates.length === 0) return null;
+  const groups = /* @__PURE__ */ new Map();
+  for (const game of candidates) {
+    const eventIndex = resolveEventPriorityOrderIndex(game);
+    if (eventIndex == null) continue;
+    const bucket = groups.get(eventIndex) ?? [];
+    bucket.push(game);
+    groups.set(eventIndex, bucket);
+  }
+  const eventIndices = [...groups.keys()].sort((a2, b2) => a2 - b2);
+  for (const eventIndex of eventIndices) {
+    const group = groups.get(eventIndex);
+    group.sort(compareWithinBucket);
+    return group[0];
+  }
+  return null;
+}
+function pickBestLeagueRepositoryCandidate(candidates, compareWithinBucket, resolveLeagueDiscriminator) {
+  if (candidates.length === 0) return null;
+  const groups = /* @__PURE__ */ new Map();
+  for (const game of candidates) {
+    const leagueScore = resolveLeagueDiscriminator(game);
+    const bucket = groups.get(leagueScore) ?? [];
+    bucket.push(game);
+    groups.set(leagueScore, bucket);
+  }
+  const leagueScores = [...groups.keys()].sort((a2, b2) => b2 - a2);
+  for (const leagueScore of leagueScores) {
+    const group = groups.get(leagueScore);
+    group.sort(compareWithinBucket);
+    return group[0];
+  }
+  return candidates[0] ?? null;
+}
+function sortGamesSpineLeaguesByGrarfOperationalPrioritization(leaguesWithGames, mergedLeagues) {
+  const liveEventLeagueIndex = /* @__PURE__ */ new Map();
+  for (const leagueKey of leaguesWithGames) {
+    const games = filterGamesSpineSlateForOperationalSportsDay(mergedLeagues[leagueKey] ?? []);
+    for (const game of games) {
+      if (!isLiveEventRepositoryGame(game)) continue;
+      const eventIndex = resolveEventPriorityOrderIndex(game);
+      if (eventIndex == null) continue;
+      const current = liveEventLeagueIndex.get(leagueKey);
+      if (current == null || eventIndex < current) {
+        liveEventLeagueIndex.set(leagueKey, eventIndex);
+      }
+    }
+  }
+  const eventRepositoryLeagues = [...liveEventLeagueIndex.entries()].sort((a2, b2) => a2[1] - b2[1]).map(([leagueKey]) => leagueKey);
+  const eventRepositorySet = new Set(eventRepositoryLeagues);
+  const remainder = leaguesWithGames.filter((leagueKey) => !eventRepositorySet.has(leagueKey));
+  const leagueRepositoryLeagues = sortGrarfLeagueKeysByImportance(remainder);
+  return [...eventRepositoryLeagues, ...leagueRepositoryLeagues];
 }
 
 // ../grarf/desktop/src/lib/leagueHighlights/resolveLeagueHighlightGamePayload.ts
@@ -63114,7 +63232,7 @@ function resolveGamesSpineOperationalLeagueOrder(mergedLeagues) {
       withGames.push(leagueKey);
     }
   }
-  return sortGrarfLeagueKeysByImportance(withGames);
+  return sortGamesSpineLeaguesByGrarfOperationalPrioritization(withGames, mergedLeagues);
 }
 function anyOperationalSpineLeagueHasGames(mergedLeagues, leagueOrder = resolveGamesSpineOperationalLeagueOrder(mergedLeagues)) {
   return leagueOrder.some((key2) => leagueHasSpineGames(mergedLeagues, key2));
@@ -67063,19 +67181,19 @@ function compareGamesByImportanceV1(a2, b2, startTimeAsc) {
   return a2.id.localeCompare(b2.id);
 }
 function pickBestGameFromCandidates(candidates, startTimeAsc) {
-  const groups = /* @__PURE__ */ new Map();
-  for (const game of candidates) {
-    const leagueScore = resolveBestGameLeagueOrderDiscriminator(game);
-    const bucket = groups.get(leagueScore) ?? [];
-    bucket.push(game);
-    groups.set(leagueScore, bucket);
-  }
-  const leagueScores = [...groups.keys()].sort((a2, b2) => b2 - a2);
-  for (const leagueScore of leagueScores) {
-    const group = groups.get(leagueScore);
-    group.sort((a2, b2) => compareGamesByImportanceV1(a2, b2, startTimeAsc));
-    return group[0];
-  }
+  const compareWithinBucket = (a2, b2) => compareGamesByImportanceV1(a2, b2, startTimeAsc);
+  const { liveEventRepository, remainder } = partitionLiveEventRepositoryCandidates(candidates);
+  const liveEventPick = pickBestLiveEventRepositoryCandidate(
+    liveEventRepository,
+    compareWithinBucket
+  );
+  if (liveEventPick) return liveEventPick;
+  const leaguePick = pickBestLeagueRepositoryCandidate(
+    remainder,
+    compareWithinBucket,
+    resolveBestGameLeagueOrderDiscriminator
+  );
+  if (leaguePick) return leaguePick;
   return candidates[0];
 }
 function collectOperationalSpineGames(mergedLeagues) {

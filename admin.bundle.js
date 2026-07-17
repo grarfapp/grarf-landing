@@ -15672,6 +15672,48 @@ init_define_import_meta_env();
 
 // ../grarf/desktop/shared/espnPausedCompetitionStatus.js
 init_define_import_meta_env();
+var ESPN_PAUSED_STATUS_NAMES = /* @__PURE__ */ new Set([
+  "STATUS_SUSPENDED",
+  "STATUS_DELAYED",
+  "STATUS_HALTED",
+  "STATUS_INTERRUPTED",
+  "STATUS_WEATHER_DELAY"
+]);
+function safeEspnText(value) {
+  return typeof value === "string" && value.trim() ? value.trim() : "";
+}
+function isEspnPausedCompetitionStatus(statusType) {
+  if (!statusType || typeof statusType !== "object") return false;
+  const statusName = safeEspnText(statusType.name).toUpperCase();
+  if (statusName === "STATUS_POSTPONED") return false;
+  if (ESPN_PAUSED_STATUS_NAMES.has(statusName)) return true;
+  const detail = `${safeEspnText(statusType.shortDetail)} ${safeEspnText(statusType.detail)} ${safeEspnText(statusType.description)}`.toLowerCase();
+  if (!detail) return false;
+  if (/\b(suspended|weather delay|delayed|halted|interrupted)\b/.test(detail)) {
+    return statusName !== "STATUS_IN_PROGRESS";
+  }
+  return false;
+}
+
+// ../grarf/desktop/src/lib/gamesSpine/isGameActivelyLive.ts
+function pausedFromStatusLine(statusLine) {
+  const line = statusLine?.trim();
+  if (!line) return false;
+  return isEspnPausedCompetitionStatus({
+    shortDetail: line,
+    detail: line,
+    description: line
+  });
+}
+function isGameCompetitionPaused(game) {
+  if (game.status === "delayed" || game.status === "suspended") return true;
+  if (game.status === "postponed") return true;
+  return pausedFromStatusLine(game.statusLine);
+}
+function isGameActivelyLive(game) {
+  if (game.status !== "live") return false;
+  return !isGameCompetitionPaused(game);
+}
 
 // ../grarf/desktop/src/lib/watch/externalWatchLaunch.ts
 init_define_import_meta_env();
@@ -16724,6 +16766,112 @@ function resolveManualGameCardNavigationOverride(game, operationalDateKey = getO
 
 // ../grarf/desktop/src/lib/gamesSpine/resolveGamesSpineOperationalLeagueOrder.ts
 init_define_import_meta_env();
+
+// ../grarf/desktop/src/lib/eventPriority/resolveGrarfOperationalPrioritization.ts
+init_define_import_meta_env();
+
+// ../grarf/desktop/shared/eventPriority/eventPriorityService.js
+init_define_import_meta_env();
+
+// ../grarf/desktop/shared/eventPriority/eventPrioritySeed.js
+init_define_import_meta_env();
+var EVENT_PRIORITY_ORDER = [
+  { league: "PGA", title: "The Open" }
+];
+function getEventPriorityOrder() {
+  return EVENT_PRIORITY_ORDER;
+}
+
+// ../grarf/desktop/shared/eventPriority/eventPriorityService.js
+var EVENT_REPOSITORY_LEAGUE_ALIASES = {
+  "PGA TOUR": "PGA",
+  "LPGA TOUR": "LPGA",
+  "PGA CHAMPIONS": "CHAMPIONS",
+  "CHAMPIONS TOUR": "CHAMPIONS",
+  "FORMULA 1": "F1",
+  "FORMULA ONE": "F1",
+  "TOUR DE FRANCE": "TDF"
+};
+function normalizeLeagueKey(value) {
+  return String(value ?? "").trim().toUpperCase();
+}
+function normalizeEventTitle(value) {
+  return String(value ?? "").trim().replace(/\s+/g, " ");
+}
+function resolveCanonicalEventRepositoryLeagueKey(value) {
+  const normalized = normalizeLeagueKey(value);
+  if (!normalized) return "";
+  return EVENT_REPOSITORY_LEAGUE_ALIASES[normalized] ?? normalized;
+}
+function buildIndexByEventKey(order) {
+  return new Map(
+    order.map((entry, index) => {
+      const league = resolveCanonicalEventRepositoryLeagueKey(entry.league);
+      const title = normalizeEventTitle(entry.title).toLowerCase();
+      return [`${league}::${title}`, index];
+    })
+  );
+}
+function buildScoreByEventKey(order) {
+  return new Map(
+    order.map((entry, index) => {
+      const league = resolveCanonicalEventRepositoryLeagueKey(entry.league);
+      const title = normalizeEventTitle(entry.title).toLowerCase();
+      return [`${league}::${title}`, order.length - index];
+    })
+  );
+}
+var eventOrder = getEventPriorityOrder();
+var indexByEventKey = buildIndexByEventKey(eventOrder);
+var scoreByEventKey = buildScoreByEventKey(eventOrder);
+function resolveEventMatchKey(game) {
+  const league = resolveCanonicalEventRepositoryLeagueKey(game.league);
+  const title = normalizeEventTitle(resolveCanonicalEventDisplayTitle(game)).toLowerCase();
+  if (!league || !title) return null;
+  return `${league}::${title}`;
+}
+function resolveCanonicalEventDisplayTitle(game) {
+  return game.metadata?.canonicalEvent?.title?.trim() || game.metadata?.manualGamesSpine?.eventName?.trim() || game.awayTeam?.trim() || "";
+}
+function resolveEventPriorityOrderIndex(game) {
+  const key = resolveEventMatchKey(game);
+  if (!key) return null;
+  const fromSeed = indexByEventKey.get(key);
+  if (fromSeed != null) return fromSeed;
+  const score = game.metadata?.eventPriority?.score;
+  if (score != null && Number.isFinite(score) && eventOrder.length > 0) {
+    const index = eventOrder.length - score;
+    if (index >= 0 && index < eventOrder.length) return index;
+  }
+  return null;
+}
+
+// ../grarf/desktop/src/lib/eventPriority/resolveGrarfOperationalPrioritization.ts
+function isLiveEventRepositoryGame(game) {
+  return isGameActivelyLive(game) && resolveEventPriorityOrderIndex(game) != null;
+}
+function sortGamesSpineLeaguesByGrarfOperationalPrioritization(leaguesWithGames, mergedLeagues) {
+  const liveEventLeagueIndex = /* @__PURE__ */ new Map();
+  for (const leagueKey of leaguesWithGames) {
+    const games = filterGamesSpineSlateForOperationalSportsDay(mergedLeagues[leagueKey] ?? []);
+    for (const game of games) {
+      if (!isLiveEventRepositoryGame(game)) continue;
+      const eventIndex = resolveEventPriorityOrderIndex(game);
+      if (eventIndex == null) continue;
+      const current = liveEventLeagueIndex.get(leagueKey);
+      if (current == null || eventIndex < current) {
+        liveEventLeagueIndex.set(leagueKey, eventIndex);
+      }
+    }
+  }
+  const eventRepositoryLeagues = [...liveEventLeagueIndex.entries()].sort((a, b) => a[1] - b[1]).map(([leagueKey]) => leagueKey);
+  const eventRepositorySet = new Set(eventRepositoryLeagues);
+  const remainder = leaguesWithGames.filter((leagueKey) => !eventRepositorySet.has(leagueKey));
+  const leagueRepositoryLeagues = sortGrarfLeagueKeysByImportance(remainder);
+  return [...eventRepositoryLeagues, ...leagueRepositoryLeagues];
+}
+
+// ../grarf/desktop/src/lib/gamesSpine/resolveGamesSpineOperationalLeagueOrder.ts
 function resolveGamesSpineOperationalLeagueOrder(mergedLeagues) {
   const withGames = [];
   for (const [key, games] of Object.entries(mergedLeagues)) {
@@ -16736,7 +16884,7 @@ function resolveGamesSpineOperationalLeagueOrder(mergedLeagues) {
       withGames.push(leagueKey);
     }
   }
-  return sortGrarfLeagueKeysByImportance(withGames);
+  return sortGamesSpineLeaguesByGrarfOperationalPrioritization(withGames, mergedLeagues);
 }
 
 // ../grarf/desktop/src/lib/gamesSpine/resolveViewLeagueGames.ts
