@@ -84841,6 +84841,73 @@ async function saveOperationsSpine() {
 // ../grarf/desktop/src/components/adminMode/OperationsSpineSection.tsx
 init_define_import_meta_env();
 
+// ../grarf/desktop/src/data/operationsLeagueResourceLinks.ts
+init_define_import_meta_env();
+var OPERATIONS_LEAGUE_RESOURCE_LINKS_BY_LEAGUE_KEY = {
+  ATP: [
+    { label: "Tennis Channel", url: "https://www.tennischannel.com/en-us/page/home" },
+    { label: "TennisTV", url: "https://www.tennistv.com/live-schedule" },
+    { label: "Flashscore", url: "https://www.flashscoreusa.com/tennis" }
+  ],
+  WTA: [
+    { label: "Tennis Channel", url: "https://www.tennischannel.com/en-us/page/home" },
+    { label: "Flashscore", url: "https://www.flashscoreusa.com/tennis/wta-singles/" },
+    { label: "WTA Live", url: "https://www.wtatennis.com/scores" },
+    { label: "WTA Upcoming", url: "https://www.wtatennis.com/scores?status=Upcoming" },
+    { label: "WTA Final", url: "https://www.wtatennis.com/scores?status=Finished" }
+  ],
+  NBASUMMER: [
+    {
+      label: "Prime",
+      url: "https://www.primevideo.com/tournament/amzn1.dv.icid.cf75b42a-68cd-4a1c-993a-a0b3f0575c5f"
+    }
+  ],
+  F1: [{ label: "Apple", url: "https://tv.apple.com/us/channel/formula-1/tvs.sbd.241000" }],
+  WNBA: [
+    { label: "WNBA", url: "https://wnba.com/watch" },
+    { label: "YT TV", url: "https://tv.youtube.com/browse/UCTaW97y7MEeBlSetXmM7u8A" }
+  ],
+  TDF: [{ label: "Peacock", url: "https://www.peacocktv.com/sports/cycling" }],
+  MLS: [{ label: "Apple", url: "https://tv.apple.com/us/channel/mls/tvs.sbd.7000" }],
+  NWSL: [{ label: "NWSL", url: "https://www.nwslsoccer.com/schedule" }],
+  BRA1: [{ label: "Fanatiz", url: "https://watch.fanatiz.com/brasileirao" }],
+  PLL: [
+    {
+      label: "ESPN",
+      url: "https://www.espn.com/watch/schedule/_/type/upcoming/categoryId/e9b1f7fc-0fe9-304f-8b23-f7ff267f1b72"
+    }
+  ],
+  USL1: [
+    { label: "USL", url: "https://www.uslleagueone.com/watch" },
+    {
+      label: "ESPN",
+      url: "https://www.espn.com/watch/schedule/_/type/upcoming/categoryId/119cfa41-71d4-39bf-a790-6273a52b0259"
+    }
+  ],
+  LIGAMX: [
+    { label: "LSTV", url: "https://www.livesoccertv.com/competitions/mexico/primera-division/" },
+    { label: "ViX", url: "https://vix.com/es-es/deportes" },
+    { label: "YT TV", url: "https://tv.youtube.com/browse/UCXyaZYAYAU1MQx1N37IbqAA?btab=1" }
+  ],
+  AFL: [{ label: "FS2", url: "https://www.foxsports.com/live/fs2" }],
+  PGA: [{ label: "GOLF", url: "https://www.golfchannel.com/watch/live" }]
+};
+var OPERATIONS_LEAGUE_RESOURCE_LINKS_BY_SECTION_LABEL = {
+  "Soccer ESPN": [
+    {
+      label: "ESPN",
+      url: "https://www.espn.com/watch/schedule/_/type/upcoming/categoryId/119cfa41-71d4-39bf-a790-6273a52b0259"
+    }
+  ]
+};
+function resolveOperationsLeagueResourceLinks(sectionKey, sectionLabel) {
+  if (sectionKey.startsWith("league:")) {
+    const leagueKey = sectionKey.slice("league:".length);
+    return OPERATIONS_LEAGUE_RESOURCE_LINKS_BY_LEAGUE_KEY[leagueKey] ?? [];
+  }
+  return OPERATIONS_LEAGUE_RESOURCE_LINKS_BY_SECTION_LABEL[sectionLabel] ?? [];
+}
+
 // ../grarf/desktop/src/components/adminMode/OperationsCard.tsx
 init_define_import_meta_env();
 var import_jsx_runtime151 = __toESM(require_jsx_runtime(), 1);
@@ -85062,27 +85129,41 @@ function OperationsCard({ game }) {
 // ../grarf/desktop/src/components/adminMode/OperationsSpineSection.tsx
 var import_jsx_runtime152 = __toESM(require_jsx_runtime(), 1);
 function OperationsSpineSection({ section }) {
+  const resourceLinks = resolveOperationsLeagueResourceLinks(section.key, section.label);
   return /* @__PURE__ */ (0, import_jsx_runtime152.jsxs)("section", { className: "min-w-0", "aria-label": `${section.label} operations`, children: [
-    /* @__PURE__ */ (0, import_jsx_runtime152.jsx)("header", { className: "sticky top-0 z-[1] mx-1 border border-[#24363c]/75 bg-[#0b1216]", children: /* @__PURE__ */ (0, import_jsx_runtime152.jsxs)(
-      "button",
-      {
-        type: "button",
-        onClick: section.onToggleCollapse,
-        className: "flex w-full items-center justify-between gap-2 border-l-2 border-l-cyansys/35 py-2 pl-2.5 pr-2 text-left transition duration-150 hover:border-l-cyansys/55 hover:bg-[#0e181d]/90",
-        "aria-expanded": !section.collapsed,
-        children: [
-          /* @__PURE__ */ (0, import_jsx_runtime152.jsxs)("span", { className: "flex min-w-0 items-center gap-2", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime152.jsx)("header", { className: "sticky top-0 z-[1] mx-1 border border-[#24363c]/75 bg-[#0b1216]", children: /* @__PURE__ */ (0, import_jsx_runtime152.jsxs)("div", { className: "flex w-full items-center justify-between gap-2 border-l-2 border-l-cyansys/35 py-2 pl-2.5 pr-2 transition duration-150 hover:border-l-cyansys/55 hover:bg-[#0e181d]/90", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime152.jsxs)(
+        "button",
+        {
+          type: "button",
+          onClick: section.onToggleCollapse,
+          className: "flex min-w-0 flex-1 items-center gap-2 text-left",
+          "aria-expanded": !section.collapsed,
+          children: [
             /* @__PURE__ */ (0, import_jsx_runtime152.jsx)("span", { className: "w-3 shrink-0 text-center text-[9px] text-cyansys/55", "aria-hidden": true, children: section.collapsed ? "\u25B6" : "\u25BC" }),
             /* @__PURE__ */ (0, import_jsx_runtime152.jsx)("span", { className: "truncate text-[13px] font-bold leading-none tracking-[0.14em] text-[#eef6f6]", children: section.label })
-          ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime152.jsxs)("span", { className: "shrink-0 font-mono text-[8px] tracking-[0.1em] text-[#5f7a7a]", children: [
-            section.games.length,
-            " game",
-            section.games.length === 1 ? "" : "s"
-          ] })
-        ]
-      }
-    ) }),
+          ]
+        }
+      ),
+      /* @__PURE__ */ (0, import_jsx_runtime152.jsxs)("div", { className: "flex shrink-0 items-center gap-1.5", children: [
+        resourceLinks.length > 0 ? /* @__PURE__ */ (0, import_jsx_runtime152.jsx)("div", { className: "flex max-w-[min(58vw,26rem)] items-center justify-end gap-1 overflow-x-auto", children: resourceLinks.map((link) => /* @__PURE__ */ (0, import_jsx_runtime152.jsx)(
+          "a",
+          {
+            href: link.url,
+            target: "_blank",
+            rel: "noopener noreferrer",
+            className: "shrink-0 rounded border border-[#243b37]/90 bg-[#0e181d]/60 px-1.5 py-0.5 font-mono text-[8px] tracking-[0.08em] text-[#8ab4b4] transition hover:border-cyansys/35 hover:text-cyansys/90",
+            children: link.label
+          },
+          `${link.label}:${link.url}`
+        )) }) : null,
+        /* @__PURE__ */ (0, import_jsx_runtime152.jsxs)("span", { className: "shrink-0 font-mono text-[8px] tracking-[0.1em] text-[#5f7a7a]", children: [
+          section.games.length,
+          " game",
+          section.games.length === 1 ? "" : "s"
+        ] })
+      ] })
+    ] }) }),
     !section.collapsed ? /* @__PURE__ */ (0, import_jsx_runtime152.jsx)("div", { className: "mx-1 flex flex-col gap-2 px-2 py-2", children: section.games.map((game) => /* @__PURE__ */ (0, import_jsx_runtime152.jsx)(OperationsCard, { game }, game.id)) }) : null
   ] });
 }
