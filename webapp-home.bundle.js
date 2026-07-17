@@ -24434,6 +24434,7 @@ var LEAGUE_PRIORITY_SEED_ORDER = [
   "USLCUP",
   "LIV",
   "WEC",
+  "MOTOGP",
   "GT_WORLD_CHALLENGE",
   "AFL",
   "CHAMPIONS"
@@ -50079,7 +50080,8 @@ var HIGHLIGHTS_TV_CHANNEL_ORDER = [
   { channelNumber: 40, leagueKey: "CHAMPIONS", label: "CHAMPIONS", sportGroup: "SOCCER" },
   { channelNumber: 41, leagueKey: "WIMBLEDON", label: "WIMBLEDON", sportGroup: "TENNIS" },
   { channelNumber: 42, leagueKey: "NBASUMMER", label: "NBA SUMMER LEAGUE", sportGroup: "BASKETBALL" },
-  { channelNumber: 43, leagueKey: "TDF", label: "TOUR DE FRANCE", sportGroup: "CYCLING" }
+  { channelNumber: 43, leagueKey: "TDF", label: "TOUR DE FRANCE", sportGroup: "CYCLING" },
+  { channelNumber: 44, leagueKey: "THEOPEN", label: "The Open", sportGroup: "GOLF" }
 ];
 function resolveHighlightsTvConfiguredChannels(rows) {
   const enabledByKey = /* @__PURE__ */ new Map();
@@ -51394,6 +51396,10 @@ async function loadHighlightsTvWebAutomaticHighlightGameLeagues() {
     if (htvKey === "WIMBLEDON") {
       leagues.add("ATP");
       leagues.add("WTA");
+      continue;
+    }
+    if (htvKey === "THEOPEN") {
+      leagues.add("PGA");
       continue;
     }
     leagues.add(resolveHighlightsTvSeedLeagueKey(htvKey));
@@ -84560,7 +84566,7 @@ function OperationsCard({ game }) {
   const setStatusOverride = useAdminOperationsCardStore((s2) => s2.setStatusOverride);
   const updateField = (field) => (value) => setField(game.id, field, value);
   const streamUrlValue = fields.streamUrl.trim() || game.streamUrl?.trim() || "";
-  const highlightVideoValue = fields.highlightVideoUrl.trim() || game.highlightVideo?.videoUrl?.trim() || "";
+  const highlightVideoValue = fields.highlightVideoUrl;
   const statusOverrideValue = parseGameStatusOverride(fields.statusOverride) ?? "";
   const gameLabel2 = `${game.awayTeam} @ ${game.homeTeam}`;
   const canWatchLive = gameHasHomeSpineWatchLive(game);
@@ -84597,7 +84603,7 @@ function OperationsCard({ game }) {
       OperationsFieldRow,
       {
         label: "HIGHLIGHT VIDEO",
-        complete: highlightVideoValue.length > 0,
+        complete: fields.highlightVideoUrl.trim().length > 0,
         children: /* @__PURE__ */ (0, import_jsx_runtime151.jsx)(
           OperationsTextField,
           {
@@ -87970,6 +87976,7 @@ var import_react180 = __toESM(require_react(), 1);
 init_define_import_meta_env();
 function resolveHighlightsTvAmbientSpineLeagueKeys(channelLeagueKey) {
   if (channelLeagueKey === "WIMBLEDON") return ["ATP", "WTA"];
+  if (channelLeagueKey === "THEOPEN") return ["PGA"];
   return [resolveHighlightsTvSeedLeagueKey(channelLeagueKey)];
 }
 function collectHighlightsTvAmbientSpineGames(channelLeagueKey) {
