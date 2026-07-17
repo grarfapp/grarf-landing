@@ -50169,6 +50169,11 @@ function resolveCanonicalEventDisplayTitle(game) {
 }
 
 // ../grarf/desktop/src/lib/leagueHighlights/resolveLeagueHighlightGamePayload.ts
+function resolveCompetitionRoundFromGameMetadata(game) {
+  const round = game.metadata?.round;
+  if (round == null || !Number.isFinite(round) || round <= 0) return void 0;
+  return Math.trunc(round);
+}
 function resolveLeagueHighlightGamePayload(game) {
   return {
     gameId: game.id,
@@ -50180,6 +50185,7 @@ function resolveLeagueHighlightGamePayload(game) {
     officialAwayName: game.metadata?.officialAwayName,
     officialHomeName: game.metadata?.officialHomeName,
     canonicalEventTitle: resolveCanonicalEventDisplayTitle(game) || void 0,
+    competitionRound: resolveCompetitionRoundFromGameMetadata(game),
     startTimeMs: game.startTimeMs,
     scheduledDateKey: game.startTimeMs && Number.isFinite(game.startTimeMs) ? formatBriefingDateKey(new Date(game.startTimeMs)) : formatBriefingDateKey()
   };
@@ -50195,6 +50201,7 @@ function resolveLeagueHighlightFetchKey(payload) {
     payload.officialAwayName ?? "",
     payload.officialHomeName ?? "",
     payload.canonicalEventTitle ?? "",
+    String(payload.competitionRound ?? ""),
     String(payload.startTimeMs ?? ""),
     payload.scheduledDateKey ?? ""
   ].join("");
@@ -50475,6 +50482,44 @@ var SOLO_EVENT_IDENTIFIER_PATTERNS = [
   /^race\s+(\d+)\s*$/i,
   /^session\s+(\d+)\s*$/i
 ];
+var HIGHLIGHT_ROUND_WORD_TO_NUMBER = {
+  one: 1,
+  two: 2,
+  three: 3,
+  four: 4,
+  first: 1,
+  second: 2,
+  third: 3,
+  fourth: 4
+};
+function readCompetitionRound(game) {
+  const round = game.competitionRound;
+  if (round == null || !Number.isFinite(round) || round <= 0) return null;
+  return Math.trunc(round);
+}
+function resolveCompetitionRoundFromHighlightTitle(title) {
+  const normalized = title.trim().toLowerCase();
+  if (!normalized) return null;
+  const digitMatch = normalized.match(/\bround\s+(\d+)\b/);
+  if (digitMatch?.[1]) {
+    const round = Number(digitMatch[1]);
+    return Number.isFinite(round) && round > 0 ? Math.trunc(round) : null;
+  }
+  const wordMatch = normalized.match(
+    /\bround\s+(one|two|three|four|first|second|third|fourth)\b/
+  );
+  if (wordMatch?.[1]) {
+    return HIGHLIGHT_ROUND_WORD_TO_NUMBER[wordMatch[1]] ?? null;
+  }
+  return null;
+}
+function soloCompetitionHighlightRoundMatchesGame(title, game) {
+  const requiredRound = readCompetitionRound(game);
+  if (requiredRound == null) return true;
+  const titleRound = resolveCompetitionRoundFromHighlightTitle(title);
+  if (titleRound == null) return false;
+  return titleRound === requiredRound;
+}
 function readSoloCompetitionLeague(game) {
   return String(game.league || "").trim().toUpperCase();
 }
@@ -50555,6 +50600,7 @@ function buildSoloCompetitionHighlightSearchTerms(game) {
   return terms;
 }
 function soloCompetitionHighlightTitleMatchesGame(title, game) {
+  if (!soloCompetitionHighlightRoundMatchesGame(title, game)) return false;
   const normalizedTitle = normalizeTeamToken(title);
   if (!normalizedTitle) return false;
   const requiredIdentifier = resolveRequiredSoloEventIdentifierTerm(game.awayTeam ?? "");
@@ -50587,6 +50633,7 @@ function scoreHighlightsTvClipAgainstCanonicalEventGame(clip, game) {
   if (normalizeHighlightsTvCanonicalEventTitle(clipEventLabel) !== normalizeHighlightsTvCanonicalEventTitle(eventTitle)) {
     return null;
   }
+  if (!soloCompetitionHighlightRoundMatchesGame(clip.title, game)) return null;
   const publishedAt = clip.publishedAt?.trim() ?? "";
   if (!publishedAt) return null;
   const date = scoreDateProximity(game, publishedAt);
@@ -51599,7 +51646,7 @@ var resolveCache = /* @__PURE__ */ new Map();
 var CACHE_TTL_MS3 = 5 * 60 * 1e3;
 var inFlight2 = /* @__PURE__ */ new Map();
 function cacheKey2(payload) {
-  return `${payload.league}:${payload.gameId}`;
+  return resolveLeagueHighlightFetchKey(payload);
 }
 async function fetchGameLeagueHighlight(payload) {
   const league = payload.league;
@@ -51690,12 +51737,15 @@ function useCanonicalGamesSpineGame(baseGame) {
   (0, import_react38.useEffect)(() => {
     if (!baseGame || !isGrarfWebRenderer() || !highlightsTvGameLeagues) return;
     if (!shouldResolveAutomaticHighlight(baseGame, highlightsTvGameLeagues)) return;
-    if (baseGame.id in automaticHighlightsByGameId) return;
+    const highlightStoreKey = resolveLeagueHighlightFetchKey(
+      resolveLeagueHighlightGamePayload(baseGame)
+    );
+    if (highlightStoreKey in automaticHighlightsByGameId) return;
     const hasMlbCatchupHighlight = baseGame.gamePk != null && Number.isFinite(baseGame.gamePk) && Boolean(mlbCatchupHighlightsByGamePk[baseGame.gamePk]?.[0]);
     if (hasMlbCatchupHighlight) return;
     void fetchGameLeagueHighlight(resolveLeagueHighlightGamePayload(baseGame)).then((result) => {
       setResolvedHighlight(
-        baseGame.id,
+        highlightStoreKey,
         result?.ok ? leagueHighlightVideoToGameHighlightVideo(result.video) : null
       );
     });
@@ -51710,7 +51760,7 @@ function useCanonicalGamesSpineGame(baseGame) {
     if (!baseGame) return void 0;
     const catchupHighlight = baseGame.gamePk != null && Number.isFinite(baseGame.gamePk) ? (mlbCatchupHighlightsByGamePk[baseGame.gamePk] ?? EMPTY_MLB_CATCHUP_HIGHLIGHTS)[0] : null;
     return applyCanonicalGamesSpineEnrichment(baseGame, operationsFields, {
-      automaticHighlight: automaticHighlightsByGameId[baseGame.id] ?? null,
+      automaticHighlight: automaticHighlightsByGameId[resolveLeagueHighlightFetchKey(resolveLeagueHighlightGamePayload(baseGame))] ?? null,
       catchupHighlight
     });
   }, [
@@ -57528,6 +57578,7 @@ function useGameWorkspaceHighlight(gameId, catchupContextGame) {
     game?.homeCity,
     game?.metadata?.officialAwayName,
     game?.metadata?.officialHomeName,
+    game?.metadata?.round,
     game?.startTimeMs
   ]);
   const [loading, setLoading] = (0, import_react59.useState)(false);
@@ -67482,12 +67533,13 @@ function useGamesWithCanonicalHighlights(games) {
     if (!isGrarfWebRenderer() || !highlightsTvGameLeagues) return;
     games.forEach((game) => {
       if (!shouldResolveAutomaticHighlight2(game, highlightsTvGameLeagues)) return;
-      if (game.id in automaticHighlightsByGameId) return;
+      const highlightStoreKey = resolveLeagueHighlightFetchKey(resolveLeagueHighlightGamePayload(game));
+      if (highlightStoreKey in automaticHighlightsByGameId) return;
       const hasMlbCatchupHighlight = game.gamePk != null && Number.isFinite(game.gamePk) && Boolean(mlbCatchupHighlightsByGamePk[game.gamePk]?.[0]);
       if (hasMlbCatchupHighlight) return;
       void fetchGameLeagueHighlight(resolveLeagueHighlightGamePayload(game)).then((result) => {
         setResolvedHighlight(
-          game.id,
+          highlightStoreKey,
           result?.ok ? leagueHighlightVideoToGameHighlightVideo(result.video) : null
         );
       });
@@ -67504,7 +67556,7 @@ function useGamesWithCanonicalHighlights(games) {
       const operationsFields = operationsFieldsByGameId[game.id];
       const catchupHighlight = game.gamePk != null && Number.isFinite(game.gamePk) ? (mlbCatchupHighlightsByGamePk[game.gamePk] ?? EMPTY_MLB_CATCHUP_HIGHLIGHTS2)[0] : null;
       return applyCanonicalGamesSpineEnrichment(game, operationsFields, {
-        automaticHighlight: automaticHighlightsByGameId[game.id] ?? null,
+        automaticHighlight: automaticHighlightsByGameId[resolveLeagueHighlightFetchKey(resolveLeagueHighlightGamePayload(game))] ?? null,
         catchupHighlight
       });
     });
