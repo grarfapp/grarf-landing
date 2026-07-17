@@ -42169,6 +42169,24 @@ var LIVE_TRACKER_FEED_REGISTRY = [
     feedUrl: "https://rss.app/feeds/_hM2icu7rxpN7XUsq.xml",
     feedId: "live-tracker-gt-world-challenge",
     label: "GT World"
+  },
+  {
+    league: "LIGAMX",
+    feedUrl: "https://rss.app/feeds/XT9ITsZ6kSXIcLYF.xml",
+    feedId: "live-tracker-ligamx",
+    label: "Liga MX"
+  },
+  {
+    league: "BRA1",
+    feedUrl: "https://rss.app/feeds/K3xmXidHsqWfoVj3.xml",
+    feedId: "live-tracker-bra1",
+    label: "Brasileirao"
+  },
+  {
+    league: "MLS",
+    feedUrl: "https://rss.app/feeds/3F355cjf7OMwp2dF.xml",
+    feedId: "live-tracker-mls",
+    label: "MLS"
   }
 ];
 var FEED_BY_LEAGUE = new Map(
@@ -73630,8 +73648,25 @@ var GAME_SOCIAL_RAIL_LEAGUE_SIGNALS_REGISTRY = [
     sourceLabel: "WNBA"
   },
   {
-    tabMode: "team-tabs",
-    leagueKey: "MLS"
+    tabMode: "league-feed",
+    leagueKey: "MLS",
+    feedId: "game-social-rail-mls",
+    feedUrl: "https://x.com/i/lists/788239444553773056?s=20",
+    sourceLabel: "MLS"
+  },
+  {
+    tabMode: "league-feed",
+    leagueKey: "LIGAMX",
+    feedId: "game-social-rail-ligamx",
+    feedUrl: "https://rss.app/feeds/xDYRvY2i3a6NsZVR.xml",
+    sourceLabel: "Liga MX"
+  },
+  {
+    tabMode: "league-feed",
+    leagueKey: "BRA1",
+    feedId: "game-social-rail-bra1",
+    feedUrl: "https://rss.app/feeds/b2P0wzTeLqFG5CoY.xml",
+    sourceLabel: "Brasileirao"
   },
   {
     tabMode: "league-feed",
@@ -75553,6 +75588,20 @@ var HOME_LEAGUE_WORKSPACE_SOCIAL_RAIL_FEEDS = [
     teamKey: "wnba"
   },
   {
+    workspaceId: "liga-mx",
+    feedId: "league-workspace-liga-mx",
+    feedUrl: "https://rss.app/feeds/xDYRvY2i3a6NsZVR.xml",
+    sourceLabel: "Liga MX",
+    teamKey: "liga-mx"
+  },
+  {
+    workspaceId: "mls",
+    feedId: "league-workspace-mls",
+    feedUrl: "https://x.com/i/lists/788239444553773056?s=20",
+    sourceLabel: "MLS",
+    teamKey: "mls"
+  },
+  {
     workspaceId: "wta",
     feedId: "league-workspace-wta",
     feedUrl: "https://rss.app/feeds/yMkZujQRn7NswZhD.xml",
@@ -75568,6 +75617,11 @@ var ALL_SPORTS_SOCIAL_RAIL_FEED = {
   teamKey: "all-sports",
   sourceLabel: "All Sports"
 };
+function resolveSocialRailActiveGame(game) {
+  if (!game) return null;
+  if (game.status === "scheduled" && resolveFotmobMatchUrl(game)) return null;
+  return game;
+}
 function resolveAllSportsSocialRailFeedResolution() {
   return {
     tab: "game",
@@ -89102,7 +89156,10 @@ function HomePage() {
   }, [contentOverlayTabs, activeContentOverlayId]);
   const socialRailActiveGameId = (0, import_react183.useMemo)(() => {
     if (!isHomeOps || !activeContentOverlayId) return null;
-    return overlayActiveGameId(overlay);
+    const gameId = overlayActiveGameId(overlay);
+    if (!gameId) return null;
+    const game = findLiveGameById(gameId);
+    return resolveSocialRailActiveGame(game) ? gameId : null;
   }, [isHomeOps, activeContentOverlayId, overlay]);
   const socialRailActiveGameWorkspace = (0, import_react183.useMemo)(() => {
     if (!isHomeOps || !activeContentOverlayId) return null;
