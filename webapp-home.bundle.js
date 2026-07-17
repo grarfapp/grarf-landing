@@ -24437,7 +24437,8 @@ var LEAGUE_PRIORITY_SEED_ORDER = [
   "MOTOGP",
   "GT_WORLD_CHALLENGE",
   "AFL",
-  "CHAMPIONS"
+  "CHAMPIONS",
+  "BRASILEIRAO"
 ];
 function getLeaguePrioritySeedOrder() {
   return LEAGUE_PRIORITY_SEED_ORDER;
@@ -50099,7 +50100,9 @@ var HIGHLIGHTS_TV_CHANNEL_ORDER = [
   { channelNumber: 41, leagueKey: "WIMBLEDON", label: "WIMBLEDON", sportGroup: "TENNIS" },
   { channelNumber: 42, leagueKey: "NBASUMMER", label: "NBA SUMMER LEAGUE", sportGroup: "BASKETBALL" },
   { channelNumber: 43, leagueKey: "TDF", label: "TOUR DE FRANCE", sportGroup: "CYCLING" },
-  { channelNumber: 44, leagueKey: "THEOPEN", label: "The Open", sportGroup: "GOLF" }
+  { channelNumber: 44, leagueKey: "THEOPEN", label: "The Open", sportGroup: "GOLF" },
+  { channelNumber: 45, leagueKey: "BRASILEIRAO", label: "BRASILEIRAO", sportGroup: "SOCCER" },
+  { channelNumber: 46, leagueKey: "MOTOGP", label: "MOTOGP", sportGroup: "AUTO" }
 ];
 function resolveHighlightsTvConfiguredChannels(rows) {
   const enabledByKey = /* @__PURE__ */ new Map();
@@ -51323,7 +51326,8 @@ var YOUTUBE_HANDLE_CHANNEL_IDS = {
   indycar: "UCy1F61QvUUQXAXi2Voa_fUw",
   nascar: "UCuN9hYw2RpoAW8rZ3VK3isA",
   gtworld: "UC-yHapH6mW1ceZ_5PDUf1_g",
-  afl: "UCxAeHdLDAatFV_vt95MSO-g"
+  afl: "UCxAeHdLDAatFV_vt95MSO-g",
+  motogp: "UC8pYaQzbBBXg9GIOHRvTmDQ"
 };
 function readYoutubeHandle(sourceUrl) {
   return sourceUrl.match(/youtube\.com\/@([^/?#]+)/i)?.[1]?.trim().toLowerCase() ?? null;

@@ -13910,7 +13910,8 @@ var LEAGUE_PRIORITY_SEED_ORDER = [
   "MOTOGP",
   "GT_WORLD_CHALLENGE",
   "AFL",
-  "CHAMPIONS"
+  "CHAMPIONS",
+  "BRASILEIRAO"
 ];
 function getLeaguePrioritySeedOrder() {
   return LEAGUE_PRIORITY_SEED_ORDER;
