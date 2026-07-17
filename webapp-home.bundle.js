@@ -24125,6 +24125,9 @@ var La = (Ua = jn[Gn] = new Zn(), (function() {
   null != r && r.addEventListener ? "complete" === r.readyState ? e2() : sr(r, "DOMContentLoaded", e2, { capture: false }) : t && Le.error("Browser doesn't support `document.addEventListener` so PostHog couldn't be initialized");
 })(), Ua);
 
+// ../grarf/desktop/src/lib/analytics/posthogClient.ts
+init_isGrarfWebRenderer();
+
 // ../grarf/desktop/src/lib/analytics/startupVerification.ts
 init_define_import_meta_env();
 init_isGrarfWebRenderer();
@@ -24185,10 +24188,11 @@ function initPostHog() {
   if (initialized2) return La;
   const { key: apiKey, host: apiHost } = readPostHogEnv();
   if (!apiKey) return null;
+  const isWeb = isGrarfWebRenderer();
   La.init(apiKey, {
     api_host: apiHost,
+    ...isWeb ? { defaults: "2025-05-24" } : { capture_pageview: false },
     person_profiles: "identified_only",
-    capture_pageview: false,
     capture_pageleave: false,
     autocapture: false,
     disable_session_recording: false,
