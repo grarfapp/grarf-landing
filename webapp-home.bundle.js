@@ -64308,6 +64308,58 @@ function isMotorsportGame(game) {
 function readMotorsportRaceState(game) {
   return game.metadata?.motorsport ?? null;
 }
+var F1_PRACTICE_SESSION_LABELS = /* @__PURE__ */ new Set(["FP1", "FP2", "FP3"]);
+var F1_PRACTICE_SESSION_DURATION_MS = 60 * 60 * 1e3;
+function readF1PracticeSessionLabel(game) {
+  const label = game.metadata?.racingSessionLabel?.trim() || readMotorsportRaceState(game)?.sessionLabel?.trim() || "";
+  return F1_PRACTICE_SESSION_LABELS.has(label) ? label : null;
+}
+function isF1PracticeSession(game) {
+  return game.league === "F1" && readF1PracticeSessionLabel(game) != null;
+}
+function parseClockMmSs(clock) {
+  const match = clock.trim().match(/^(\d{1,2}):(\d{2})$/);
+  if (!match) return null;
+  const minutes = Number(match[1]);
+  const seconds = Number(match[2]);
+  if (!Number.isFinite(minutes) || !Number.isFinite(seconds) || seconds >= 60) return null;
+  return { minutes, seconds };
+}
+function formatRemainingClockLabel(totalSeconds) {
+  const clamped = Math.max(0, Math.floor(totalSeconds));
+  const minutes = Math.floor(clamped / 60);
+  const seconds = clamped % 60;
+  return `${minutes}:${String(seconds).padStart(2, "0")} Left`;
+}
+function readF1PracticeRemainingSecondsFromFeed(game) {
+  const clock = game.displayClock?.trim();
+  if (clock && clock !== "0:00") {
+    const parsed = parseClockMmSs(clock);
+    if (parsed) return parsed.minutes * 60 + parsed.seconds;
+  }
+  const haystack3 = [game.statusLine, readMotorsportRaceState(game)?.statusDetail].filter((value) => Boolean(value?.trim())).join(" ");
+  const remainingMatch = haystack3.match(/\b(\d{1,2}):(\d{2})\s*(?:left|remaining)\b/i);
+  if (remainingMatch) {
+    const minutes = Number(remainingMatch[1]);
+    const seconds = Number(remainingMatch[2]);
+    if (Number.isFinite(minutes) && Number.isFinite(seconds) && seconds < 60) {
+      return minutes * 60 + seconds;
+    }
+  }
+  return null;
+}
+function deriveF1PracticeRemainingSeconds(game) {
+  const startTimeMs = game.startTimeMs;
+  if (startTimeMs == null || !Number.isFinite(startTimeMs) || startTimeMs <= 0) return null;
+  const sessionEndMs = startTimeMs + F1_PRACTICE_SESSION_DURATION_MS;
+  return Math.max(0, Math.floor((sessionEndMs - Date.now()) / 1e3));
+}
+function formatF1PracticeLiveSpineTimingLabel(game) {
+  if (game.status !== "live" || !isF1PracticeSession(game)) return null;
+  const remainingSeconds = readF1PracticeRemainingSecondsFromFeed(game) ?? deriveF1PracticeRemainingSeconds(game);
+  if (remainingSeconds == null) return null;
+  return formatRemainingClockLabel(remainingSeconds);
+}
 function formatLapLine(state3) {
   const { currentLap, totalLaps } = state3;
   if (currentLap != null && totalLaps != null) return `Lap ${currentLap} / ${totalLaps}`;
@@ -64855,6 +64907,10 @@ function resolveGamesSpineCardTimingLabel(game, scheduleLabel) {
       return game.statusLine?.trim() ?? stripLivePrefix(scheduleLabel);
     }
     if (isMotorsportGame(game)) {
+      if (isGrarfWebRenderer()) {
+        const f1PracticeLabel = formatF1PracticeLiveSpineTimingLabel(game);
+        if (f1PracticeLabel) return f1PracticeLabel;
+      }
       return resolveMotorsportSpineTimingLabel(game) ?? game.statusLine?.trim() ?? stripLivePrefix(scheduleLabel);
     }
     if (isMlbFamilyGame(game)) {
