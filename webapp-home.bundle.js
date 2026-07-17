@@ -24895,6 +24895,14 @@ function openFotmobGamesSpineRow(game, dispatch) {
   return true;
 }
 
+// ../grarf/desktop/src/lib/flashscore/resolveFlashscoreMatchUrl.ts
+init_define_import_meta_env();
+function resolveFlashscoreMatchUrl(game) {
+  const fromMetadata = game.metadata?.flashscoreMatchUrl?.trim();
+  if (fromMetadata) return fromMetadata;
+  return null;
+}
+
 // ../grarf/desktop/src/lib/espn/espnGameUrls.ts
 var ESPN_GAME_ID_RE = /^espn-([A-Z0-9]+)-(\d+)$/i;
 var SOCCER_LEAGUE_KEYS = /* @__PURE__ */ new Set([
@@ -24981,6 +24989,8 @@ function resolveGameWorkspaceEmbedUrl(game, gameId) {
   if (game) {
     const fotmobUrl = isWorldCupGameRow(game) ? resolveWorldCupWorkspaceEmbedUrl(game) : resolveFotmobMatchUrl(game);
     if (fotmobUrl) return fotmobUrl;
+    const flashscoreUrl = resolveFlashscoreMatchUrl(game);
+    if (flashscoreUrl) return flashscoreUrl;
     if (game.league === "NBASUMMER") {
       return game.gameCardUrl?.trim() || null;
     }
@@ -86383,6 +86393,8 @@ function resolveSpineRowWorkspaceEmbedUrl(game) {
   }
   const fotmobUrl = resolveFotmobCenterPaneEmbedUrl(game);
   if (fotmobUrl) return fotmobUrl;
+  const flashscoreUrl = resolveFlashscoreMatchUrl(game);
+  if (flashscoreUrl) return flashscoreUrl;
   if (isGrarfWebRenderer()) {
     const wimbledonUrl = resolveWimbledonCenterPaneEmbedUrl(game);
     if (wimbledonUrl) return wimbledonUrl;
