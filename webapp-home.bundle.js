@@ -64795,6 +64795,39 @@ function formatNbaFamilyLiveGameCardTimingLabel(game) {
   }
   return statusLine;
 }
+function formatAflQuarterPeriodLabel(periodNum) {
+  if (periodNum >= 1 && periodNum <= 4) return `${periodNum}Q`;
+  return null;
+}
+function parseAflQuarterPeriodText(text2) {
+  const trimmed = text2.trim();
+  const quarter = trimmed.match(/\b(\d+)(?:st|nd|rd|th)\s+Quarter\b/i);
+  if (quarter) return `${quarter[1]}Q`;
+  const numberedQ = trimmed.match(/\b(\d)\s*Q\b/i);
+  if (numberedQ) return `${numberedQ[1]}Q`;
+  return null;
+}
+function formatAflLiveGameCardTimingLabel(game) {
+  const clock = game.displayClock?.trim();
+  const periodNum = game.period != null && Number.isFinite(game.period) && game.period > 0 ? game.period : null;
+  if (periodNum != null && clock) {
+    const periodLabel = formatAflQuarterPeriodLabel(periodNum);
+    if (periodLabel) return `${periodLabel} - ${clock}`;
+  }
+  const statusLine = game.statusLine?.trim();
+  if (!statusLine) return clock ?? null;
+  const clockFirst = statusLine.match(/^(\d{1,2}:\d{2})\s*-\s*(.+)$/);
+  if (clockFirst) {
+    const periodLabel = parseAflQuarterPeriodText(clockFirst[2]);
+    if (periodLabel) return `${periodLabel} - ${clockFirst[1]}`;
+  }
+  const clockLast = statusLine.match(/^(.+?)\s*-\s*(\d{1,2}:\d{2})$/);
+  if (clockLast) {
+    const periodLabel = parseAflQuarterPeriodText(clockLast[1]);
+    if (periodLabel) return `${periodLabel} - ${clockLast[2]}`;
+  }
+  return statusLine;
+}
 function resolveGamesSpineCardTimingLabel(game, scheduleLabel) {
   if (game.status === "postponed") {
     return game.statusLine?.trim() || "Postponed";
@@ -64836,6 +64869,9 @@ function resolveGamesSpineCardTimingLabel(game, scheduleLabel) {
     }
     if (isNbaFamilyBasketballLeague(game.league) && isGrarfWebRenderer()) {
       return formatNbaFamilyLiveGameCardTimingLabel(game) ?? game.statusLine?.trim() ?? game.displayClock?.trim() ?? stripLivePrefix(scheduleLabel);
+    }
+    if (game.league === "AFL" && isGrarfWebRenderer()) {
+      return formatAflLiveGameCardTimingLabel(game) ?? game.statusLine?.trim() ?? game.displayClock?.trim() ?? stripLivePrefix(scheduleLabel);
     }
     if (isGrarfWebRenderer() && game.league && GOLF_SPINE_LIVE_ROUND_LABEL_LEAGUES.has(game.league)) {
       const golfLabel = resolveGolfSpineLiveTimingLabel(game, scheduleLabel);
