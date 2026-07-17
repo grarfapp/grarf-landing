@@ -47606,7 +47606,46 @@ init_isGrarfWebRenderer();
 
 // ../grarf/desktop/src/streaming/mlbTvUrls.ts
 init_define_import_meta_env();
+
+// ../grarf/desktop/src/gameWorkspace/mlbRaysRedSoxJul172026WorkspaceOverride.ts
+init_define_import_meta_env();
+var MLB_RAYS_RED_SOX_JUL_17_2026_WORKSPACE_OVERRIDE = {
+  gamePk: 824766,
+  gamedayUrl: "https://www.mlb.com/gameday/rays-vs-red-sox/2026/07/17/824766/live",
+  streamUrl: "https://www.mlb.com/tv/g824766/v9eb4aa92-d640-40eb-8489-07698e36a8df?affiliateId=SCORES#game=824766,tfs=20260509_201000,game_state=live"
+};
+var OVERRIDE_SCHEDULED_DATE_KEY = "2026-07-17";
+function normalizeTeamName(name) {
+  return name?.trim().toLowerCase() ?? "";
+}
+function resolveScheduledDateKey(game) {
+  const fromPayload = game.scheduledDateKey?.trim();
+  if (fromPayload) return fromPayload;
+  if (typeof game.startTimeMs !== "number" || !Number.isFinite(game.startTimeMs)) {
+    return null;
+  }
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "America/New_York",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit"
+  }).format(new Date(game.startTimeMs));
+}
+function isMlbGameRow(game) {
+  return game.league === "MLB" || /^espn-MLB-/i.test(game.id ?? "");
+}
+function isRaysRedSoxJul172026WorkspaceOverrideGame(game) {
+  if (!isMlbGameRow(game)) return false;
+  if (normalizeTeamName(game.awayTeam) !== "rays") return false;
+  if (normalizeTeamName(game.homeTeam) !== "red sox") return false;
+  return resolveScheduledDateKey(game) === OVERRIDE_SCHEDULED_DATE_KEY;
+}
+
+// ../grarf/desktop/src/streaming/mlbTvUrls.ts
 function buildMlbTvLaunchUrl(game) {
+  if (isRaysRedSoxJul172026WorkspaceOverrideGame(game)) {
+    return MLB_RAYS_RED_SOX_JUL_17_2026_WORKSPACE_OVERRIDE.streamUrl;
+  }
   const pk = game.externalIds?.mlb?.trim();
   if (pk && /^\d+$/.test(pk)) {
     return `https://www.mlb.com/tv/g${pk}`;
@@ -47649,6 +47688,9 @@ function getGameWorkspaceEmbedUrl(gameId) {
 // ../grarf/desktop/src/gameWorkspace/mlbGamedayUrl.ts
 init_define_import_meta_env();
 function resolveMlbStatsApiGamePk(game) {
+  if (isRaysRedSoxJul172026WorkspaceOverrideGame(game)) {
+    return MLB_RAYS_RED_SOX_JUL_17_2026_WORKSPACE_OVERRIDE.gamePk;
+  }
   if (typeof game.gamePk === "number" && Number.isFinite(game.gamePk) && game.gamePk > 0) {
     return game.gamePk;
   }
@@ -47685,6 +47727,9 @@ function resolveMlbWorkspaceStoryPanel(game, options) {
   return panelFromUrl(previewUrl ?? gameUrl ?? fallbackUrl);
 }
 function buildMlbComGamedayLiveUrl(game) {
+  if (isRaysRedSoxJul172026WorkspaceOverrideGame(game)) {
+    return MLB_RAYS_RED_SOX_JUL_17_2026_WORKSPACE_OVERRIDE.gamedayUrl;
+  }
   const pk = resolveMlbStatsApiGamePk(game);
   if (pk == null) return "https://www.mlb.com/gameday";
   return `https://www.mlb.com/gameday/${pk}`;
@@ -57647,6 +57692,9 @@ var import_react60 = __toESM(require_react(), 1);
 // ../grarf/desktop/src/lib/mlbCatchUp/resolveWorkspaceGamePk.ts
 init_define_import_meta_env();
 function resolveWorkspaceGamePk(gameId, game) {
+  if (game && isRaysRedSoxJul172026WorkspaceOverrideGame(game)) {
+    return MLB_RAYS_RED_SOX_JUL_17_2026_WORKSPACE_OVERRIDE.gamePk;
+  }
   if (typeof game?.gamePk === "number" && Number.isFinite(game.gamePk) && game.gamePk > 0) {
     return game.gamePk;
   }
