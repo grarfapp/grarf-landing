@@ -50114,6 +50114,40 @@ init_define_import_meta_env();
 
 // ../grarf/desktop/src/lib/leagueHighlights/resolveLeagueHighlightGamePayload.ts
 init_define_import_meta_env();
+
+// ../grarf/desktop/src/lib/eventPriority/index.ts
+init_define_import_meta_env();
+
+// ../grarf/desktop/shared/eventPriority/eventPrioritySeed.js
+init_define_import_meta_env();
+var EVENT_PRIORITY_ORDER = [];
+function getEventPriorityOrder() {
+  return EVENT_PRIORITY_ORDER;
+}
+
+// ../grarf/desktop/shared/eventPriority/eventPriorityService.js
+init_define_import_meta_env();
+function normalizeLeagueKey(value) {
+  return String(value ?? "").trim().toUpperCase();
+}
+function normalizeEventTitle(value) {
+  return String(value ?? "").trim().replace(/\s+/g, " ");
+}
+function buildScoreByEventKey(order) {
+  return new Map(
+    order.map((entry, index) => {
+      const league = normalizeLeagueKey(entry.league);
+      const title = normalizeEventTitle(entry.title).toLowerCase();
+      return [`${league}::${title}`, order.length - index];
+    })
+  );
+}
+var scoreByEventKey = buildScoreByEventKey(getEventPriorityOrder());
+function resolveCanonicalEventDisplayTitle(game) {
+  return game.metadata?.canonicalEvent?.title?.trim() || game.metadata?.manualGamesSpine?.eventName?.trim() || game.awayTeam?.trim() || "";
+}
+
+// ../grarf/desktop/src/lib/leagueHighlights/resolveLeagueHighlightGamePayload.ts
 function resolveLeagueHighlightGamePayload(game) {
   return {
     gameId: game.id,
@@ -50124,6 +50158,7 @@ function resolveLeagueHighlightGamePayload(game) {
     homeCity: game.homeCity,
     officialAwayName: game.metadata?.officialAwayName,
     officialHomeName: game.metadata?.officialHomeName,
+    canonicalEventTitle: resolveCanonicalEventDisplayTitle(game) || void 0,
     startTimeMs: game.startTimeMs,
     scheduledDateKey: game.startTimeMs && Number.isFinite(game.startTimeMs) ? formatBriefingDateKey(new Date(game.startTimeMs)) : formatBriefingDateKey()
   };
@@ -50138,6 +50173,7 @@ function resolveLeagueHighlightFetchKey(payload) {
     payload.homeCity ?? "",
     payload.officialAwayName ?? "",
     payload.officialHomeName ?? "",
+    payload.canonicalEventTitle ?? "",
     String(payload.startTimeMs ?? ""),
     payload.scheduledDateKey ?? ""
   ].join("");
@@ -50315,6 +50351,44 @@ function scoreDateProximity(game, publishedAt) {
 }
 var MIN_STRONG_MATCH_SCORE = 8;
 
+// ../grarf/desktop/src/lib/highlightsTv/resolveHighlightsTvCanonicalEventChannels.ts
+init_define_import_meta_env();
+function resolveHighlightsTvAmbientSpineLeagueKeys(channelLeagueKey) {
+  if (channelLeagueKey === "WIMBLEDON") return ["ATP", "WTA"];
+  if (channelLeagueKey === "THEOPEN") return ["PGA"];
+  return [resolveHighlightsTvSeedLeagueKey(channelLeagueKey)];
+}
+function normalizeHighlightsTvCanonicalEventTitle(value) {
+  return value.trim().replace(/\s+/g, " ").toLowerCase();
+}
+function isHighlightsTvEventLevelChannel(channel) {
+  const spineLeagues = resolveHighlightsTvAmbientSpineLeagueKeys(channel.leagueKey);
+  const seedLeague = resolveHighlightsTvSeedLeagueKey(channel.leagueKey);
+  return spineLeagues.length > 0 && (spineLeagues.length > 1 || spineLeagues[0] !== seedLeague);
+}
+function resolveHighlightsTvEnabledEventChannels(rows) {
+  return resolveHighlightsTvConfiguredChannels(rows).filter(isHighlightsTvEventLevelChannel);
+}
+function resolveHighlightsTvEventChannelKeysForCanonicalTitle(canonicalEventTitle, rows) {
+  const normalizedTitle = normalizeHighlightsTvCanonicalEventTitle(canonicalEventTitle);
+  if (!normalizedTitle) return [];
+  return resolveHighlightsTvEnabledEventChannels(rows).filter(
+    (channel) => normalizeHighlightsTvCanonicalEventTitle(channel.label) === normalizedTitle
+  ).map((channel) => channel.leagueKey);
+}
+function resolveHighlightsTvEventLevelSpineLeagueKeys(rows) {
+  const leagues = /* @__PURE__ */ new Set();
+  for (const channel of resolveHighlightsTvEnabledEventChannels(rows)) {
+    for (const spineLeague of resolveHighlightsTvAmbientSpineLeagueKeys(channel.leagueKey)) {
+      leagues.add(spineLeague);
+    }
+  }
+  return [...leagues];
+}
+function isHighlightsTvChannelIngestionRowEnabledForEventChannels(row) {
+  return isHighlightsTvChannelIngestionRowEnabled(row.ENABLED) && Boolean(row.URL.trim());
+}
+
 // ../grarf/desktop/src/lib/highlightsTv/soloCompetitionHighlightMatching.ts
 init_define_import_meta_env();
 
@@ -50485,6 +50559,23 @@ function resolveHighlightsTvMediaResolverGame(game) {
   const operationalDateKey = resolveGameOperationalDateKey(game);
   return operationalDateKey ? { ...payload, scheduledDateKey: operationalDateKey } : payload;
 }
+function scoreHighlightsTvClipAgainstCanonicalEventGame(clip, game) {
+  const eventTitle = game.canonicalEventTitle?.trim();
+  const clipEventLabel = clip.leagueLabel?.trim();
+  if (!eventTitle || !clipEventLabel) return null;
+  if (normalizeHighlightsTvCanonicalEventTitle(clipEventLabel) !== normalizeHighlightsTvCanonicalEventTitle(eventTitle)) {
+    return null;
+  }
+  const publishedAt = clip.publishedAt?.trim() ?? "";
+  if (!publishedAt) return null;
+  const date = scoreDateProximity(game, publishedAt);
+  if (date.score <= 0) return null;
+  const titleScore = scoreTitleAgainstGame(clip.title, game, HIGHLIGHT_TITLE_PATTERNS);
+  const rawScore = date.score + (titleScore.highlightKeyword ? 2 : 0);
+  const minScore = titleScore.highlightKeyword && date.score >= 3 ? 5 : MIN_STRONG_MATCH_SCORE;
+  if (rawScore < minScore) return null;
+  return rawScore;
+}
 function scoreHighlightsTvClipAgainstSoloEventGame(clip, game) {
   if (!soloCompetitionHighlightTitleMatchesGame(clip.title, game)) return null;
   const publishedAt = clip.publishedAt?.trim() ?? "";
@@ -50540,6 +50631,10 @@ function scoreHighlightsTvClipAgainstGame(clip, game) {
   return rawScore;
 }
 function scoreHighlightsTvClipAgainstResolverGame(clip, game) {
+  if (game.canonicalEventTitle?.trim()) {
+    const eventScore = scoreHighlightsTvClipAgainstCanonicalEventGame(clip, game);
+    if (eventScore != null) return eventScore;
+  }
   if (isSoloCompetitionHighlightResolverGame(game)) {
     return scoreHighlightsTvClipAgainstSoloEventGame(clip, game);
   }
@@ -51371,8 +51466,7 @@ var enabledGameLeaguesCache = null;
 function resolveHighlightsTvChannelLabel(htvLeagueKey) {
   return HIGHLIGHTS_TV_CHANNEL_ORDER.find((channel) => channel.leagueKey === htvLeagueKey)?.label ?? htvLeagueKey;
 }
-async function loadHighlightsTvClipsForGameLeague(gameLeague) {
-  const htvLeagueKey = resolveHighlightsTvIngestionLeagueKeyForGameLeague(gameLeague);
+async function loadHighlightsTvClipsForIngestionLeagueKey(htvLeagueKey) {
   const cached = clipsCacheByIngestionLeagueKey.get(htvLeagueKey);
   if (cached && Date.now() - cached.at < CLIPS_CACHE_TTL_MS) {
     return cached.clips;
@@ -51384,6 +51478,29 @@ async function loadHighlightsTvClipsForGameLeague(gameLeague) {
   clipsCacheByIngestionLeagueKey.set(htvLeagueKey, { clips, at: Date.now() });
   return clips;
 }
+async function loadHighlightsTvClipsForGame(payload, rows) {
+  const channelKeys = /* @__PURE__ */ new Set();
+  const gameLeague = payload.league.trim();
+  if (gameLeague) {
+    channelKeys.add(resolveHighlightsTvIngestionLeagueKeyForGameLeague(gameLeague));
+  }
+  const canonicalTitle = payload.canonicalEventTitle?.trim() ?? "";
+  for (const key2 of resolveHighlightsTvEventChannelKeysForCanonicalTitle(canonicalTitle, rows)) {
+    channelKeys.add(key2);
+  }
+  const clipsByVideoId = /* @__PURE__ */ new Map();
+  for (const key2 of channelKeys) {
+    const clips = await loadHighlightsTvClipsForIngestionLeagueKey(key2);
+    for (const clip of clips) {
+      if (clipsByVideoId.has(clip.youtubeVideoId)) continue;
+      clipsByVideoId.set(clip.youtubeVideoId, {
+        ...clip,
+        leagueKey: key2
+      });
+    }
+  }
+  return [...clipsByVideoId.values()];
+}
 async function loadHighlightsTvWebAutomaticHighlightGameLeagues() {
   if (enabledGameLeaguesCache && Date.now() - enabledGameLeaguesCache.at < CLIPS_CACHE_TTL_MS) {
     return enabledGameLeaguesCache.leagues;
@@ -51391,18 +51508,12 @@ async function loadHighlightsTvWebAutomaticHighlightGameLeagues() {
   const rows = await loadHighlightsTvChannelIngestionRows();
   const leagues = /* @__PURE__ */ new Set();
   for (const row of rows) {
-    if (!isHighlightsTvChannelIngestionRowEnabled(row.ENABLED) || !row.URL.trim()) continue;
+    if (!isHighlightsTvChannelIngestionRowEnabledForEventChannels(row)) continue;
     const htvKey = resolveHighlightsTvCanonicalLeagueKey(row.LEAGUE_KEY);
-    if (htvKey === "WIMBLEDON") {
-      leagues.add("ATP");
-      leagues.add("WTA");
-      continue;
-    }
-    if (htvKey === "THEOPEN") {
-      leagues.add("PGA");
-      continue;
-    }
     leagues.add(resolveHighlightsTvSeedLeagueKey(htvKey));
+  }
+  for (const spineLeague of resolveHighlightsTvEventLevelSpineLeagueKeys(rows)) {
+    leagues.add(spineLeague);
   }
   enabledGameLeaguesCache = { leagues, at: Date.now() };
   return leagues;
@@ -51413,6 +51524,14 @@ async function isHighlightsTvWebAutomaticHighlightLeague(gameLeague) {
   const row = findHighlightsTvIngestionRow(rows, htvLeagueKey);
   return Boolean(row && isHighlightsTvChannelIngestionRowEnabled(row.ENABLED) && row.URL.trim());
 }
+async function resolveHighlightsTvWebAutomaticHighlightSources(payload, rows) {
+  const gameLeague = payload.league.trim();
+  if (gameLeague && await isHighlightsTvWebAutomaticHighlightLeague(gameLeague)) {
+    return true;
+  }
+  const canonicalTitle = payload.canonicalEventTitle?.trim() ?? "";
+  return resolveHighlightsTvEventChannelKeysForCanonicalTitle(canonicalTitle, rows).length > 0;
+}
 async function fetchGameLeagueHighlightViaHighlightsTv(payload) {
   if (!isGrarfWebRenderer()) {
     return { ok: false, error: "unsupported" };
@@ -51421,11 +51540,12 @@ async function fetchGameLeagueHighlightViaHighlightsTv(payload) {
   if (!gameLeague) {
     return { ok: false, error: "unsupported" };
   }
-  if (!await isHighlightsTvWebAutomaticHighlightLeague(gameLeague)) {
-    return { ok: false, error: "unsupported" };
-  }
   try {
-    const clips = await loadHighlightsTvClipsForGameLeague(gameLeague);
+    const rows = await loadHighlightsTvChannelIngestionRows();
+    if (!await resolveHighlightsTvWebAutomaticHighlightSources(payload, rows)) {
+      return { ok: false, error: "unsupported" };
+    }
+    const clips = await loadHighlightsTvClipsForGame(payload, rows);
     if (clips.length === 0) {
       return { ok: false, error: "No matching highlight for this game" };
     }
@@ -51524,20 +51644,6 @@ var EMPTY_MLB_CATCHUP_HIGHLIGHTS = [];
 function shouldResolveAutomaticHighlight(game, highlightsTvGameLeagues) {
   return isGrarfWebRenderer() && Boolean(game.league && highlightsTvGameLeagues?.has(game.league));
 }
-function buildHighlightPayload(game) {
-  return {
-    gameId: game.id,
-    league: game.league ?? "",
-    awayTeam: game.awayTeam,
-    homeTeam: game.homeTeam,
-    awayCity: game.awayCity,
-    homeCity: game.homeCity,
-    officialAwayName: game.metadata?.officialAwayName,
-    officialHomeName: game.metadata?.officialHomeName,
-    startTimeMs: game.startTimeMs,
-    scheduledDateKey: game.scheduledDateKey
-  };
-}
 function useCanonicalGamesSpineGame(baseGame) {
   const gameId = baseGame?.id;
   const operationsFields = useAdminOperationsCardStore(
@@ -51565,7 +51671,7 @@ function useCanonicalGamesSpineGame(baseGame) {
     if (baseGame.id in automaticHighlightsByGameId) return;
     const hasMlbCatchupHighlight = baseGame.gamePk != null && Number.isFinite(baseGame.gamePk) && Boolean(mlbCatchupHighlightsByGamePk[baseGame.gamePk]?.[0]);
     if (hasMlbCatchupHighlight) return;
-    void fetchGameLeagueHighlight(buildHighlightPayload(baseGame)).then((result) => {
+    void fetchGameLeagueHighlight(resolveLeagueHighlightGamePayload(baseGame)).then((result) => {
       setResolvedHighlight(
         baseGame.id,
         result?.ok ? leagueHighlightVideoToGameHighlightVideo(result.video) : null
@@ -67332,20 +67438,6 @@ var EMPTY_MLB_CATCHUP_HIGHLIGHTS2 = [];
 function shouldResolveAutomaticHighlight2(game, highlightsTvGameLeagues) {
   return isGrarfWebRenderer() && Boolean(game.league && highlightsTvGameLeagues?.has(game.league));
 }
-function buildHighlightPayload2(game) {
-  return {
-    gameId: game.id,
-    league: game.league ?? "",
-    awayTeam: game.awayTeam,
-    homeTeam: game.homeTeam,
-    awayCity: game.awayCity,
-    homeCity: game.homeCity,
-    officialAwayName: game.metadata?.officialAwayName,
-    officialHomeName: game.metadata?.officialHomeName,
-    startTimeMs: game.startTimeMs,
-    scheduledDateKey: game.scheduledDateKey
-  };
-}
 function useGamesWithCanonicalHighlights(games) {
   const automaticHighlightsByGameId = useGameHighlightStore((s2) => s2.highlightsByGameId);
   const setResolvedHighlight = useGameHighlightStore((s2) => s2.setResolvedHighlight);
@@ -67371,7 +67463,7 @@ function useGamesWithCanonicalHighlights(games) {
       if (game.id in automaticHighlightsByGameId) return;
       const hasMlbCatchupHighlight = game.gamePk != null && Number.isFinite(game.gamePk) && Boolean(mlbCatchupHighlightsByGamePk[game.gamePk]?.[0]);
       if (hasMlbCatchupHighlight) return;
-      void fetchGameLeagueHighlight(buildHighlightPayload2(game)).then((result) => {
+      void fetchGameLeagueHighlight(resolveLeagueHighlightGamePayload(game)).then((result) => {
         setResolvedHighlight(
           game.id,
           result?.ok ? leagueHighlightVideoToGameHighlightVideo(result.video) : null
@@ -87974,11 +88066,6 @@ var import_react180 = __toESM(require_react(), 1);
 
 // ../grarf/desktop/src/lib/highlightsTv/collectHighlightsTvAmbientSpineGames.ts
 init_define_import_meta_env();
-function resolveHighlightsTvAmbientSpineLeagueKeys(channelLeagueKey) {
-  if (channelLeagueKey === "WIMBLEDON") return ["ATP", "WTA"];
-  if (channelLeagueKey === "THEOPEN") return ["PGA"];
-  return [resolveHighlightsTvSeedLeagueKey(channelLeagueKey)];
-}
 function collectHighlightsTvAmbientSpineGames(channelLeagueKey) {
   const spineLeagues = resolveHighlightsTvAmbientSpineLeagueKeys(channelLeagueKey);
   const now = /* @__PURE__ */ new Date();
