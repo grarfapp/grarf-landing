@@ -73651,7 +73651,7 @@ var GAME_SOCIAL_RAIL_LEAGUE_SIGNALS_REGISTRY = [
     tabMode: "league-feed",
     leagueKey: "MLS",
     feedId: "game-social-rail-mls",
-    feedUrl: "https://x.com/i/lists/788239444553773056?s=20",
+    feedUrl: "https://rss.app/feeds/W6TnfjiLa8qj4pTh.xml",
     sourceLabel: "MLS"
   },
   {
@@ -75597,7 +75597,7 @@ var HOME_LEAGUE_WORKSPACE_SOCIAL_RAIL_FEEDS = [
   {
     workspaceId: "mls",
     feedId: "league-workspace-mls",
-    feedUrl: "https://x.com/i/lists/788239444553773056?s=20",
+    feedUrl: "https://rss.app/feeds/W6TnfjiLa8qj4pTh.xml",
     sourceLabel: "MLS",
     teamKey: "mls"
   },
