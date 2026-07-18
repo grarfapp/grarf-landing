@@ -58031,9 +58031,11 @@ var F1HighlightYoutubeLink = (0, import_react60.memo)(function F1HighlightYoutub
   videoId,
   title,
   thumbnailUrl,
-  className
+  className,
+  playOverlay = "compact"
 }) {
-  const thumb = thumbnailUrl?.trim() || youtubeThumbnailUrl(videoId);
+  const thumb = thumbnailUrl?.trim() || "";
+  const youtubeStyleOverlay = playOverlay === "youtube";
   return /* @__PURE__ */ (0, import_jsx_runtime30.jsxs)(
     "button",
     {
@@ -58050,7 +58052,7 @@ var F1HighlightYoutubeLink = (0, import_react60.memo)(function F1HighlightYoutub
       ),
       "aria-label": `Watch on YouTube: ${title}`,
       children: [
-        /* @__PURE__ */ (0, import_jsx_runtime30.jsx)(
+        thumb ? /* @__PURE__ */ (0, import_jsx_runtime30.jsx)(
           "img",
           {
             src: thumb,
@@ -58060,16 +58062,38 @@ var F1HighlightYoutubeLink = (0, import_react60.memo)(function F1HighlightYoutub
             decoding: "async",
             referrerPolicy: "no-referrer"
           }
-        ),
-        /* @__PURE__ */ (0, import_jsx_runtime30.jsx)("span", { className: "absolute inset-0 bg-black/20 transition hover:bg-black/10", "aria-hidden": true }),
+        ) : null,
         /* @__PURE__ */ (0, import_jsx_runtime30.jsx)(
           "span",
           {
-            className: "absolute inset-0 flex items-center justify-center",
-            "aria-hidden": true,
-            children: /* @__PURE__ */ (0, import_jsx_runtime30.jsx)("span", { className: "flex h-10 w-10 items-center justify-center rounded-full bg-black/55 ring-1 ring-white/25 shadow-[0_2px_8px_rgba(0,0,0,0.45)]", children: /* @__PURE__ */ (0, import_jsx_runtime30.jsx)("svg", { viewBox: "0 0 24 24", fill: "currentColor", className: "h-4 w-4 translate-x-px text-white", children: /* @__PURE__ */ (0, import_jsx_runtime30.jsx)("path", { d: "M8 5v14l11-7z" }) }) })
+            className: cn2(
+              "absolute inset-0 transition",
+              youtubeStyleOverlay ? "bg-black/15 hover:bg-black/5" : "bg-black/20 hover:bg-black/10"
+            ),
+            "aria-hidden": true
           }
-        )
+        ),
+        /* @__PURE__ */ (0, import_jsx_runtime30.jsx)("span", { className: "absolute inset-0 flex items-center justify-center", "aria-hidden": true, children: /* @__PURE__ */ (0, import_jsx_runtime30.jsx)(
+          "span",
+          {
+            className: cn2(
+              "flex items-center justify-center rounded-full shadow-[0_4px_24px_rgba(0,0,0,0.45)]",
+              youtubeStyleOverlay ? "h-[4.5rem] w-[4.5rem] bg-[#212121]/80 ring-1 ring-white/10" : "h-10 w-10 bg-black/55 ring-1 ring-white/25 shadow-[0_2px_8px_rgba(0,0,0,0.45)]"
+            ),
+            children: /* @__PURE__ */ (0, import_jsx_runtime30.jsx)(
+              "svg",
+              {
+                viewBox: "0 0 24 24",
+                fill: "currentColor",
+                className: cn2(
+                  "translate-x-px text-white",
+                  youtubeStyleOverlay ? "h-9 w-9" : "h-4 w-4"
+                ),
+                children: /* @__PURE__ */ (0, import_jsx_runtime30.jsx)("path", { d: "M8 5v14l11-7z" })
+              }
+            )
+          }
+        ) })
       ]
     }
   );
@@ -58080,7 +58104,8 @@ var LeagueHighlightYoutubePlayer = (0, import_react60.memo)(function LeagueHighl
   title,
   thumbnailUrl,
   className,
-  embedHost = "youtube"
+  embedHost = "youtube",
+  playOverlay = "compact"
 }) {
   if (isF1HighlightLeague(league)) {
     return /* @__PURE__ */ (0, import_jsx_runtime30.jsx)(
@@ -58089,7 +58114,8 @@ var LeagueHighlightYoutubePlayer = (0, import_react60.memo)(function LeagueHighl
         videoId,
         title,
         thumbnailUrl,
-        className
+        className,
+        playOverlay
       }
     );
   }
@@ -88584,8 +88610,16 @@ function HomeHighlightsTvChannelBar({
 // ../grarf/desktop/src/components/homeMvp/HomeHighlightsTvPlayer.tsx
 init_define_import_meta_env();
 var import_jsx_runtime169 = __toESM(require_jsx_runtime(), 1);
-function HomeHighlightsTvPlayer({ clip, className, mute = true, startSec, onEnded }) {
-  const f1ExternalPlayback = isF1HighlightLeague(clip.leagueKey);
+function HomeHighlightsTvPlayer({
+  clip,
+  channelLeagueKey,
+  className,
+  mute = true,
+  startSec,
+  onEnded
+}) {
+  const leagueKey = clip.leagueKey ?? channelLeagueKey;
+  const f1ExternalPlayback = isF1HighlightLeague(leagueKey);
   return /* @__PURE__ */ (0, import_jsx_runtime169.jsx)(
     "div",
     {
@@ -88597,10 +88631,11 @@ function HomeHighlightsTvPlayer({ clip, className, mute = true, startSec, onEnde
       children: f1ExternalPlayback ? /* @__PURE__ */ (0, import_jsx_runtime169.jsx)(
         LeagueHighlightYoutubePlayer,
         {
-          league: clip.leagueKey,
+          league: leagueKey,
           videoId: clip.youtubeVideoId,
           title: clip.title,
           thumbnailUrl: clip.thumbnailUrl,
+          playOverlay: "youtube",
           className: "absolute inset-0 h-full w-full"
         }
       ) : /* @__PURE__ */ (0, import_jsx_runtime169.jsx)(
@@ -89776,6 +89811,7 @@ function HomeHighlightsTvPaneAmbient() {
       HomeHighlightsTvPlayer,
       {
         clip: currentClip,
+        channelLeagueKey: activeLeagueKey,
         className: "w-full max-w-full",
         mute: true,
         startSec: playbackStartSec,
@@ -89825,6 +89861,7 @@ function HomeHighlightsTvPaneChannel() {
       HomeHighlightsTvPlayer,
       {
         clip: currentClip,
+        channelLeagueKey: activeLeagueKey,
         className: "w-full max-w-full",
         mute: true,
         onEnded: advancePlaylist
