@@ -51702,6 +51702,18 @@ init_define_import_meta_env();
 var HIGHLIGHTS_TV_RSS_APP_INGESTION_BY_LEAGUE_KEY = {
   F1: {
     feedUrl: "https://rss.app/feeds/IY4wU95jBm05zJ4E.xml"
+  },
+  MLB: {
+    feedUrl: "https://rss.app/feeds/gitVwDcIVwNxmo2T.xml"
+  },
+  MLS: {
+    feedUrl: "https://rss.app/feeds/77odiqN1OeJG9Ltf.xml"
+  },
+  THEOPEN: {
+    feedUrl: "https://rss.app/feeds/iU0OBvQfPlJuZjXH.xml"
+  },
+  NBASUMMER: {
+    feedUrl: "https://rss.app/feeds/oKB252cI0hAEjDOV.xml"
   }
 };
 function resolveHighlightsTvRssAppIngestionSource(leagueKey) {
@@ -67435,19 +67447,9 @@ function isFeaturedGameForBestGame(game, featuredGames) {
   if (!featuredGames || Object.keys(featuredGames).length === 0) return false;
   return resolveBriefingPriority(game, { featuredGames }) != null;
 }
-function partitionFeaturedEligibleCandidates(liveGames, upcomingGames, featuredGames) {
-  if (!featuredGames || Object.keys(featuredGames).length === 0) {
-    return { hasEligibleFeatured: false, featuredLive: [], featuredUpcoming: [] };
-  }
-  const featuredLive = liveGames.filter((game) => isFeaturedGameForBestGame(game, featuredGames));
-  const featuredUpcoming = upcomingGames.filter(
-    (game) => isFeaturedGameForBestGame(game, featuredGames)
-  );
-  return {
-    hasEligibleFeatured: featuredLive.length > 0 || featuredUpcoming.length > 0,
-    featuredLive,
-    featuredUpcoming
-  };
+function collectFeaturedLiveGames(liveGames, featuredGames) {
+  if (!featuredGames || Object.keys(featuredGames).length === 0) return [];
+  return liveGames.filter((game) => isFeaturedGameForBestGame(game, featuredGames));
 }
 function resolveBestGameRightNowV1(mergedLeagues, manualGames = []) {
   const games = [
@@ -67465,14 +67467,9 @@ function resolveBestGameRightNowV1(mergedLeagues, manualGames = []) {
     }
     return true;
   });
-  const { hasEligibleFeatured, featuredLive, featuredUpcoming } = partitionFeaturedEligibleCandidates(liveGames, upcomingGames, featuredGames);
-  if (hasEligibleFeatured) {
-    if (featuredLive.length > 0) {
-      return { kind: "best_live", game: pickBestGameFromCandidates(featuredLive, false) };
-    }
-    if (featuredUpcoming.length > 0) {
-      return { kind: "next_event", game: pickBestGameFromCandidates(featuredUpcoming, true) };
-    }
+  const featuredLive = collectFeaturedLiveGames(liveGames, featuredGames);
+  if (featuredLive.length > 0) {
+    return { kind: "best_live", game: pickBestGameFromCandidates(featuredLive, false) };
   }
   if (liveGames.length > 0) {
     return { kind: "best_live", game: pickBestGameFromCandidates(liveGames, false) };
