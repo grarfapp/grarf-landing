@@ -50597,6 +50597,117 @@ function isHighlightsTvChannelIngestionRowEnabledForEventChannels(row) {
 // ../grarf/desktop/src/lib/highlightsTv/soloCompetitionHighlightMatching.ts
 init_define_import_meta_env();
 
+// ../grarf/desktop/src/lib/highlightsTv/f1HighlightTitleMatching.ts
+init_define_import_meta_env();
+var F1_MULTI_WORD_GP_LOCATIONS = [
+  "united arab emirates",
+  "united states",
+  "great britain",
+  "mexico city",
+  "sao paulo",
+  "las vegas",
+  "abu dhabi",
+  "hong kong",
+  "saudi arabia"
+];
+function foldAccents(value) {
+  return value.normalize("NFD").replace(/\p{M}/gu, "");
+}
+function normalizeF1TextToken(value) {
+  return normalizeTeamToken(foldAccents(value));
+}
+var F1_SESSION_PATTERNS = [
+  { key: "sprint_qualifying", pattern: /\bsprint\s+qualifying\b/i },
+  { key: "sprint_shootout", pattern: /\bsprint\s+shootout\b/i },
+  { key: "fp1", pattern: /\bfp\s*1\b/i },
+  { key: "fp2", pattern: /\bfp\s*2\b/i },
+  { key: "fp3", pattern: /\bfp\s*3\b/i },
+  { key: "fp1", pattern: /\bpractice\s+(?:1|one|first)\b/i },
+  { key: "fp2", pattern: /\bpractice\s+(?:2|two|second)\b/i },
+  { key: "fp3", pattern: /\bpractice\s+(?:3|three|third)\b/i },
+  { key: "qualifying", pattern: /\bqualifying\b/i },
+  { key: "sprint", pattern: /\bsprint\b/i },
+  { key: "race", pattern: /\brace\b/i }
+];
+function readF1League(game) {
+  return String(game.league || "").trim().toUpperCase();
+}
+function isF1HighlightResolverGame(game) {
+  return readF1League(game) === "F1";
+}
+function extractGpLocationPhrase(text2) {
+  const trimmed = text2.trim();
+  if (!trimmed) return null;
+  const grandPrixMatch = trimmed.match(
+    /([A-Za-zÀ-ÿ0-9][A-Za-zÀ-ÿ0-9\s'&.,-]*?)\s+Grand\s+Prix\b/i
+  );
+  if (grandPrixMatch?.[1]) return grandPrixMatch[1].trim();
+  const gpMatch = trimmed.match(/([A-Za-zÀ-ÿ0-9][A-Za-zÀ-ÿ0-9\s'&.,-]*?)\s+GP\b/i);
+  if (gpMatch?.[1]) return gpMatch[1].trim();
+  return null;
+}
+function resolveMultiWordGpLocation(words) {
+  const normalized = words.join(" ");
+  for (const location2 of F1_MULTI_WORD_GP_LOCATIONS) {
+    if (normalized === location2 || normalized.endsWith(` ${location2}`)) {
+      return location2;
+    }
+  }
+  return null;
+}
+function normalizeF1GrandPrixLocationKey(raw) {
+  const phrase = extractGpLocationPhrase(raw);
+  if (!phrase) return null;
+  const normalized = normalizeF1TextToken(phrase);
+  if (!normalized) return null;
+  const multiWord = resolveMultiWordGpLocation(normalized.split(/\s+/).filter(Boolean));
+  if (multiWord) return multiWord;
+  const words = normalized.split(/\s+/).filter(Boolean);
+  if (words.length === 0) return null;
+  const ampersandIndex = words.indexOf("&");
+  if (ampersandIndex >= 0) {
+    const afterAmpersand = words.slice(ampersandIndex + 1);
+    const fromAmpersand = resolveMultiWordGpLocation(afterAmpersand);
+    if (fromAmpersand) return fromAmpersand;
+    return afterAmpersand[afterAmpersand.length - 1] ?? null;
+  }
+  if (words.length === 1) return words[0];
+  const trailingPair = words.slice(-2).join(" ");
+  const pairLocation = resolveMultiWordGpLocation(trailingPair.split(/\s+/));
+  if (pairLocation) return pairLocation;
+  return words[words.length - 1];
+}
+function resolveF1SessionKey(text2) {
+  const normalized = ` ${normalizeF1TextToken(text2)} `;
+  if (!normalized.trim()) return null;
+  for (const { key: key2, pattern } of F1_SESSION_PATTERNS) {
+    if (pattern.test(normalized)) return key2;
+  }
+  return null;
+}
+function readF1SessionLabelFromGame(game) {
+  const awayTeam = game.awayTeam?.trim() ?? "";
+  const sessionFromTitle = awayTeam.includes("\xB7") ? awayTeam.split("\xB7").pop()?.trim() ?? "" : "";
+  return game.metadata?.racingSessionLabel?.trim() || sessionFromTitle || awayTeam;
+}
+function resolveF1GrandPrixLabelFromGame(game) {
+  const awayTeam = game.awayTeam?.trim() ?? "";
+  if (awayTeam.includes("\xB7")) {
+    return awayTeam.split("\xB7")[0]?.trim() ?? awayTeam;
+  }
+  return awayTeam;
+}
+function f1HighlightTitleMatchesGame(title, game) {
+  if (!isF1HighlightResolverGame(game)) return false;
+  const clipSession = resolveF1SessionKey(title);
+  const gameSession = resolveF1SessionKey(readF1SessionLabelFromGame(game));
+  if (!clipSession || !gameSession || clipSession !== gameSession) return false;
+  const clipGp = normalizeF1GrandPrixLocationKey(title);
+  const gameGp = normalizeF1GrandPrixLocationKey(resolveF1GrandPrixLabelFromGame(game));
+  if (!clipGp || !gameGp) return false;
+  return clipGp === gameGp;
+}
+
 // ../grarf/desktop/src/lib/gamesSpine/isStandaloneSpineEvent.ts
 init_define_import_meta_env();
 
@@ -50777,6 +50888,9 @@ function buildSoloCompetitionHighlightSearchTerms(game) {
   return terms;
 }
 function soloCompetitionHighlightTitleMatchesGame(title, game) {
+  if (isF1HighlightResolverGame(game)) {
+    return f1HighlightTitleMatchesGame(title, game);
+  }
   if (!soloCompetitionHighlightRoundMatchesGame(title, game)) return false;
   const normalizedTitle = normalizeTeamToken(title);
   if (!normalizedTitle) return false;
