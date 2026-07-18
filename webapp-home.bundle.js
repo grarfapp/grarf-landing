@@ -51646,6 +51646,69 @@ async function fetchHighlightsTvIngestionSourceVideos(sourceType, sourceUrl, opt
   throw new Error(`unsupported_highlights_tv_source_type:${sourceType}`);
 }
 
+// ../grarf/desktop/src/lib/highlightsTv/fetchHighlightsTvRssAppSourceVideos.ts
+init_define_import_meta_env();
+var LOG29 = "[HighlightsTv][RssApp]";
+function resolveYoutubeVideoIdFromRssItem(link, descriptionMarkup) {
+  const fromLink = youtubeVideoIdFromUrl(link);
+  if (fromLink) return fromLink;
+  if (descriptionMarkup) {
+    const embedMatch = descriptionMarkup.match(/youtube\.com\/embed\/([\w-]{6,32})/i);
+    if (embedMatch?.[1]) return embedMatch[1];
+  }
+  return null;
+}
+async function fetchHighlightsTvRssAppSourceVideos(feedUrl, options) {
+  const trimmedUrl = feedUrl.trim();
+  if (!trimmedUrl) return [];
+  const fetched = await fetchRssXml2(trimmedUrl);
+  if (!fetched.ok || !fetched.xml) {
+    console.warn(LOG29, "fetch_failed", {
+      feedUrl: trimmedUrl,
+      error: fetched.error ?? `http_${fetched.status ?? "unknown"}`
+    });
+    return [];
+  }
+  try {
+    const rawItems = parseRssXml(fetched.xml);
+    const entries = [];
+    for (const item of rawItems) {
+      const videoId = resolveYoutubeVideoIdFromRssItem(
+        item.url,
+        item.summary ?? item.videoUrl
+      );
+      if (!videoId) continue;
+      entries.push({
+        videoId,
+        title: item.title,
+        published: new Date(item.publishedAtMs).toISOString()
+      });
+    }
+    if (entries.length === 0) {
+      console.warn(LOG29, "no_youtube_videos_in_feed", { feedUrl: trimmedUrl });
+    }
+    return options?.preservePlaylistOrder === true ? entries : [...entries].reverse();
+  } catch (error) {
+    console.warn(LOG29, "parse_failed", {
+      feedUrl: trimmedUrl,
+      error: error instanceof Error ? error.message : String(error)
+    });
+    return [];
+  }
+}
+
+// ../grarf/desktop/src/lib/highlightsTv/highlightsTvRssAppIngestionRegistry.ts
+init_define_import_meta_env();
+var HIGHLIGHTS_TV_RSS_APP_INGESTION_BY_LEAGUE_KEY = {
+  F1: {
+    feedUrl: "https://rss.app/feeds/IY4wU95jBm05zJ4E.xml"
+  }
+};
+function resolveHighlightsTvRssAppIngestionSource(leagueKey) {
+  const canonicalKey = resolveHighlightsTvCanonicalLeagueKey(leagueKey);
+  return HIGHLIGHTS_TV_RSS_APP_INGESTION_BY_LEAGUE_KEY[canonicalKey] ?? null;
+}
+
 // ../grarf/desktop/src/lib/highlightsTv/ingestHighlightsTvChannelClips.ts
 async function loadHighlightsTvChannelIngestionRows() {
   const response = await fetch(HIGHLIGHTS_TV_CHANNEL_INGESTION_CSV_URL, { cache: "no-store" });
@@ -51676,7 +51739,10 @@ async function ingestHighlightsTvClipsFromIngestionRow(row, leagueKey, leagueLab
     return [];
   }
   const playlistOnly = isHighlightsTvPlaylistOnlyLeagueKey(leagueKey);
-  const videos = await fetchHighlightsTvIngestionSourceVideos(row.SOURCE_TYPE, row.URL, {
+  const rssAppSource = resolveHighlightsTvRssAppIngestionSource(leagueKey);
+  const videos = rssAppSource ? await fetchHighlightsTvRssAppSourceVideos(rssAppSource.feedUrl, {
+    preservePlaylistOrder: playlistOnly
+  }) : await fetchHighlightsTvIngestionSourceVideos(row.SOURCE_TYPE, row.URL, {
     preservePlaylistOrder: playlistOnly
   });
   let filtered = applyHighlightsTvRequiredTitleKeywordFilter(
@@ -64010,7 +64076,7 @@ function InlineEditableText({
 
 // ../grarf/desktop/src/components/gamesSpine/GameNarrativeCapsule.tsx
 var import_jsx_runtime68 = __toESM(require_jsx_runtime(), 1);
-var LOG29 = "[GamesSpine]";
+var LOG30 = "[GamesSpine]";
 function GameNarrativeCapsule({
   game,
   defaultCollapsed = false,
@@ -64033,9 +64099,9 @@ function GameNarrativeCapsule({
   (0, import_react95.useEffect)(() => {
     if (!text2.trim() && !editMode) return;
     if (define_import_meta_env_default.DEV) {
-      console.log(`${LOG29} Narrative capsule attached to game:`, gameKey);
+      console.log(`${LOG30} Narrative capsule attached to game:`, gameKey);
       if (text2.trim()) {
-        console.log(`${LOG29} Rendering narrative capsule: "${text2.trim()}"`);
+        console.log(`${LOG30} Rendering narrative capsule: "${text2.trim()}"`);
       }
     }
   }, [gameKey, text2, editMode]);
@@ -64109,7 +64175,7 @@ function GameNarrativeCapsule({
 // ../grarf/desktop/src/components/editorial/BriefingPriorityField.tsx
 init_define_import_meta_env();
 var import_jsx_runtime69 = __toESM(require_jsx_runtime(), 1);
-var LOG30 = "[Editorial]";
+var LOG31 = "[Editorial]";
 function BriefingPriorityField({ priority, editMode, onChange }) {
   if (!editMode) return null;
   return /* @__PURE__ */ (0, import_jsx_runtime69.jsxs)(
@@ -64143,7 +64209,7 @@ function BriefingPriorityField({ priority, editMode, onChange }) {
                 return;
               }
               const clamped = Math.min(10, Math.max(1, Math.round(n2)));
-              console.log(`${LOG30} Priority updated: ${clamped}`);
+              console.log(`${LOG31} Priority updated: ${clamped}`);
               onChange(clamped);
             },
             onKeyDown: (e2) => e2.stopPropagation(),
@@ -64291,7 +64357,7 @@ init_define_import_meta_env();
 var MCWS_DISPLAY_LABEL = "MCWS";
 
 // ../grarf/desktop/src/lib/commandBriefing/commandBriefingLeagueLabel.ts
-var LOG31 = "[CommandBriefing]";
+var LOG32 = "[CommandBriefing]";
 var BRIEFING_LEAGUE_LABELS = {
   MLB: "MLB",
   NCAABB: "NCAA BASEBALL",
@@ -64355,11 +64421,11 @@ function resolveCommandBriefingLeagueLabel(game) {
 }
 function logCommandBriefingLeagueLabel(label) {
   if (!define_import_meta_env_default.DEV) return;
-  console.log(`${LOG31} Rendering league label:`, label);
+  console.log(`${LOG32} Rendering league label:`, label);
 }
 function logCommandBriefingMetadataStyling() {
   if (!define_import_meta_env_default.DEV) return;
-  console.log(`${LOG31} Applied operational metadata styling`);
+  console.log(`${LOG32} Applied operational metadata styling`);
 }
 
 // ../grarf/desktop/src/lib/gamesSpine/motorsportSpinePresentation.ts
@@ -69025,7 +69091,7 @@ init_define_import_meta_env();
 // ../grarf/desktop/src/lib/sportscape/editorial/fetchSportscapeEditorialWithFailover.ts
 init_define_import_meta_env();
 var FETCH_TIMEOUT_MS5 = 15e3;
-var LOG32 = "[Sportscape Editorial]";
+var LOG33 = "[Sportscape Editorial]";
 function isTransportFailure(err) {
   if (!(err instanceof Error)) return true;
   const msg = err.message.toLowerCase();
@@ -69054,7 +69120,7 @@ async function fetchSportscapeEditorialWithFailover(path, init, options) {
         errors.push(`${baseUrl}: HTTP ${response.status}`);
         continue;
       }
-      console.log(`${LOG32} Connected via ${baseUrl}`);
+      console.log(`${LOG33} Connected via ${baseUrl}`);
       return { response, baseUrl };
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
@@ -69520,7 +69586,7 @@ var GAMES_SPINE_MORE_LEAGUES_COLLAPSE_KEY = "MORE_LEAGUES";
 // ../grarf/desktop/src/hooks/useGamesSpineCollapse.ts
 init_isGrarfWebRenderer();
 var STORAGE_KEY4 = "grarf-games-spine-collapse-v2";
-var LOG33 = "[GamesSpine]";
+var LOG34 = "[GamesSpine]";
 function collapseStorageKey(statusFilter, leagueKey) {
   return `${statusFilter}:${leagueKey}`;
 }
@@ -69574,7 +69640,7 @@ function useGamesSpineCollapse(statusFilter) {
       const storageKey = collapseStorageKey(statusFilter, leagueKey);
       setCollapsed((prev) => {
         const next = !leagueCollapsedForFilter(prev, leagueKey, statusFilter);
-        console.log(`${LOG33} League ${next ? "collapsed" : "expanded"}:`, leagueKey);
+        console.log(`${LOG34} League ${next ? "collapsed" : "expanded"}:`, leagueKey);
         return { ...prev, [storageKey]: next };
       });
     },
@@ -72678,7 +72744,7 @@ function clearPodcastCache() {
 // ../grarf/desktop/src/components/media/PodcastRailPanel.tsx
 init_isGrarfWebRenderer();
 var import_jsx_runtime104 = __toESM(require_jsx_runtime(), 1);
-var LOG34 = "[Podcasts]";
+var LOG35 = "[Podcasts]";
 function formatDur(sec) {
   if (sec == null || !Number.isFinite(sec)) return "\u2014";
   const m2 = Math.floor(sec / 60);
@@ -72726,7 +72792,7 @@ function PodcastRailPanel({
       setLoading(true);
       setErr(null);
       setFeedErrors(0);
-      console.log(`${LOG34} Loaded ${orderedFeeds.length} feeds`);
+      console.log(`${LOG35} Loaded ${orderedFeeds.length} feeds`);
       const all = [];
       let fromCache = 0;
       let fetched = 0;
@@ -72764,7 +72830,7 @@ function PodcastRailPanel({
       const ranked = sortPodcastEpisodesForContext(all, PODCAST_FEEDS, podcastRoutingOpts);
       setEpisodes(ranked.slice(0, 48));
       setFeedErrors(failed);
-      console.log(`${LOG34} Fetched ${all.length} episodes`);
+      console.log(`${LOG35} Fetched ${all.length} episodes`);
       if (all.length === 0) {
         setErr(
           failed >= orderedFeeds.length ? "No episodes available \u2014 RSS unreachable or feeds changed. Try REFRESH or check network." : "No playable episodes in feeds yet. Try REFRESH."
@@ -76377,7 +76443,7 @@ async function runCbsHeadlinesVideoProbe(executeJavaScript, options) {
 // ../grarf/desktop/src/components/homeMvp/HomeHeadlinesCbsPanel.tsx
 var import_jsx_runtime119 = __toESM(require_jsx_runtime(), 1);
 var CBS_SPORTS_HQ_LIVE_URL = "https://www.cbssports.com/watch/live";
-var LOG35 = "[HomeHeadlinesCbs]";
+var LOG36 = "[HomeHeadlinesCbs]";
 var BROWSER_SURFACE_TYPE = "Electron webview (guest WebContents)";
 var HEADLINES_CONTENT_HEIGHT = "h-[19.5rem]";
 var CBS_WEB_PREFS = "contextIsolation=yes,nodeIntegration=no,sandbox=no,javascript=yes,autoplayPolicy=no-user-gesture-required";
@@ -76399,21 +76465,21 @@ function HomeHeadlinesCbsPanel({ embedsEnabled = true, videoUrl }) {
   const showSurface = embedsEnabled && hasWebviewTag();
   (0, import_react136.useLayoutEffect)(() => {
     if (!showSurface) {
-      console.warn(`${LOG35} webview unavailable \u2014 embedsEnabled=${embedsEnabled}`);
+      console.warn(`${LOG36} webview unavailable \u2014 embedsEnabled=${embedsEnabled}`);
       return;
     }
     const wv = wvRef.current;
     if (!wv) return;
-    console.log(`${LOG35} browser surface type:`, BROWSER_SURFACE_TYPE);
-    console.log(`${LOG35} navigation URL:`, navigationUrl);
+    console.log(`${LOG36} browser surface type:`, BROWSER_SURFACE_TYPE);
+    console.log(`${LOG36} navigation URL:`, navigationUrl);
     const onStartLoading = () => {
-      console.log(`${LOG35} did-start-loading`, { url: navigationUrl });
+      console.log(`${LOG36} did-start-loading`, { url: navigationUrl });
     };
     const onNavigate = (event) => {
       const e2 = event;
       if (e2.isMainFrame === false) return;
       finalUrlRef.current = e2.url ?? finalUrlRef.current;
-      console.log(`${LOG35} did-navigate (redirect)`, {
+      console.log(`${LOG36} did-navigate (redirect)`, {
         url: e2.url,
         finalUrl: finalUrlRef.current
       });
@@ -76423,7 +76489,7 @@ function HomeHeadlinesCbsPanel({ embedsEnabled = true, videoUrl }) {
       if (e2.isMainFrame === false) return;
       if (e2.errorCode === -3) return;
       const message = formatLoadError(e2);
-      console.error(`${LOG35} did-fail-load`, {
+      console.error(`${LOG36} did-fail-load`, {
         errorCode: e2.errorCode,
         errorDescription: e2.errorDescription,
         validatedURL: e2.validatedURL
@@ -76434,12 +76500,12 @@ function HomeHeadlinesCbsPanel({ embedsEnabled = true, videoUrl }) {
       const e2 = event;
       if (e2.isMainFrame === false) return;
       const status = e2.httpResponseCode ?? e2.statusCode;
-      console.log(`${LOG35} did-get-response-details`, {
+      console.log(`${LOG36} did-get-response-details`, {
         status,
         url: e2.url
       });
       if (status != null && status >= 400) {
-        console.error(`${LOG35} HTTP error`, { status, url: e2.url });
+        console.error(`${LOG36} HTTP error`, { status, url: e2.url });
       }
       if (status != null && status >= 500) {
         setLoadError(`HTTP ${status} \u2014 ${e2.url ?? navigationUrl}`);
@@ -76452,7 +76518,7 @@ function HomeHeadlinesCbsPanel({ embedsEnabled = true, videoUrl }) {
       } catch {
       }
       finalUrlRef.current = resolvedUrl;
-      console.log(`${LOG35} did-finish-load`, {
+      console.log(`${LOG36} did-finish-load`, {
         result: "ok",
         finalUrl: resolvedUrl
       });
@@ -76463,10 +76529,10 @@ function HomeHeadlinesCbsPanel({ embedsEnabled = true, videoUrl }) {
       void wv.executeJavaScript("window.location.href").then((href) => {
         if (typeof href === "string" && href) {
           finalUrlRef.current = href;
-          console.log(`${LOG35} final navigation URL after redirects:`, href);
+          console.log(`${LOG36} final navigation URL after redirects:`, href);
         }
       }).catch((err) => {
-        console.warn(`${LOG35} final URL probe failed`, err);
+        console.warn(`${LOG36} final URL probe failed`, err);
       });
     };
     const onConsoleMessage = (event) => {
@@ -76477,28 +76543,28 @@ function HomeHeadlinesCbsPanel({ embedsEnabled = true, videoUrl }) {
       const isCert = lower.includes("certificate") || lower.includes("ssl") || lower.includes("net::err_cert");
       const isAutoplay = lower.includes("autoplay") || lower.includes("play() request") || lower.includes("notallowederror");
       if (isCsp) {
-        console.error(`${LOG35} CSP console error`, {
+        console.error(`${LOG36} CSP console error`, {
           level: e2.level,
           message,
           sourceId: e2.sourceId,
           line: e2.line
         });
       } else if (isCert) {
-        console.error(`${LOG35} certificate console error`, {
+        console.error(`${LOG36} certificate console error`, {
           level: e2.level,
           message,
           sourceId: e2.sourceId,
           line: e2.line
         });
       } else if (isAutoplay) {
-        console.warn(`${LOG35} media autoplay console message`, {
+        console.warn(`${LOG36} media autoplay console message`, {
           level: e2.level,
           message,
           sourceId: e2.sourceId,
           line: e2.line
         });
       } else if (e2.level === 3) {
-        console.error(`${LOG35} console error`, {
+        console.error(`${LOG36} console error`, {
           message,
           sourceId: e2.sourceId,
           line: e2.line
@@ -90645,7 +90711,7 @@ function buildCommandBriefingGamePool(input) {
 
 // ../grarf/desktop/src/lib/commandBriefing/selectBriefingGames.ts
 init_define_import_meta_env();
-var LOG36 = "[CommandBriefing]";
+var LOG37 = "[CommandBriefing]";
 function defaultBriefingNarrative(game) {
   const away = game.awayTeam?.trim();
   const home = game.homeTeam?.trim();
@@ -90688,13 +90754,13 @@ function selectBriefingGames(games, bundle, dateKey, _fallbacks = {}, leagueScop
     const narrative = resolveEditorialGameNarrative(game, bundle, dateKey)?.text?.trim() ?? defaultBriefingNarrative(game);
     seen.add(editorialKey);
     if (define_import_meta_env_default.DEV) {
-      console.log(`${LOG36} Included game: ${game.awayTeam} vs ${game.homeTeam}`);
+      console.log(`${LOG37} Included game: ${game.awayTeam} vs ${game.homeTeam}`);
     }
     out.push({ game, priority, narrative });
   }
   const ranked = sortBriefingRankedForDisplay(out);
   if (define_import_meta_env_default.DEV && ranked.length > 0) {
-    console.log(`${LOG36} Generated from ranked games: ${ranked.length} items`);
+    console.log(`${LOG37} Generated from ranked games: ${ranked.length} items`);
   }
   return ranked;
 }
@@ -91882,7 +91948,7 @@ function LeagueHomeWebPane({
 init_define_import_meta_env();
 var import_react195 = __toESM(require_react(), 1);
 var import_jsx_runtime186 = __toESM(require_jsx_runtime(), 1);
-var LOG37 = "[MlbCatchUpStandings]";
+var LOG38 = "[MlbCatchUpStandings]";
 var MLB_CATCH_UP_PRIMARY_STANDINGS_URL = "https://mlb.theohtani.com/standings/2026";
 var MLB_CATCH_UP_FALLBACK_STANDINGS_URL = "https://www.fangraphs.com/standings/playoff-odds";
 var LOAD_TIMEOUT_MS = 3e4;
@@ -91924,13 +91990,13 @@ function MlbCatchUpStandingsPane({ paneId, className }) {
       if (!isPrimarySrc(activeSrcRef.current)) return;
       fallbackUsedRef.current = true;
       clearLoadTimeout();
-      console.log(`${LOG37} Primary standings load failed (${reason})`);
-      console.log(`${LOG37} FanGraphs fallback activated`);
+      console.log(`${LOG38} Primary standings load failed (${reason})`);
+      console.log(`${LOG38} FanGraphs fallback activated`);
       setActiveSrc(MLB_CATCH_UP_FALLBACK_STANDINGS_URL);
     };
     const onStartLoading = () => {
       if (isPrimarySrc(activeSrcRef.current) && !fallbackUsedRef.current) {
-        console.log(`${LOG37} Primary standings load started`);
+        console.log(`${LOG38} Primary standings load started`);
         clearLoadTimeout();
         loadTimeout = setTimeout(() => activateFallback("timeout"), LOAD_TIMEOUT_MS);
       }
@@ -91959,7 +92025,7 @@ function MlbCatchUpStandingsPane({ paneId, className }) {
     const onFinishLoad = () => {
       clearLoadTimeout();
       if (isFallbackSrc(activeSrcRef.current)) {
-        console.log(`${LOG37} FanGraphs fallback loaded successfully`);
+        console.log(`${LOG38} FanGraphs fallback loaded successfully`);
         return;
       }
       if (!isPrimarySrc(activeSrcRef.current) || fallbackUsedRef.current) return;
@@ -92053,7 +92119,7 @@ function sortBriefingPriorityGames(games, bundle, dateKey) {
 
 // ../grarf/desktop/src/lib/rss/rssFetchDiagnostics.ts
 init_define_import_meta_env();
-var LOG38 = "[RSS DEBUG]";
+var LOG39 = "[RSS DEBUG]";
 function classifyRssBody(body) {
   const text2 = typeof body === "string" ? body : "";
   const trimmed = text2.trimStart();
@@ -92085,7 +92151,7 @@ function headersToRecord(headers) {
 }
 async function diagnoseRendererRssFetch(url) {
   const label = "renderer-fetch";
-  console.group(`${LOG38}[${label}] ${url}`);
+  console.group(`${LOG39}[${label}] ${url}`);
   try {
     const started = performance.now();
     const res = await fetch(url, {
@@ -92097,7 +92163,7 @@ async function diagnoseRendererRssFetch(url) {
     });
     const body = await res.text();
     const classification = classifyRssBody(body);
-    console.log(`${LOG38}[${label}] metadata`, {
+    console.log(`${LOG39}[${label}] metadata`, {
       finalUrl: res.url,
       status: res.status,
       statusText: res.statusText,
@@ -92110,19 +92176,19 @@ async function diagnoseRendererRssFetch(url) {
       elapsedMs: Math.round(performance.now() - started),
       ...classification
     });
-    console.log(`${LOG38}[${label}] preview`, previewRssBody(body));
+    console.log(`${LOG39}[${label}] preview`, previewRssBody(body));
   } catch (e2) {
-    console.error(`${LOG38}[${label}] threw`, e2);
+    console.error(`${LOG39}[${label}] threw`, e2);
   } finally {
     console.groupEnd();
   }
 }
 async function diagnoseElectronRssFetch(url) {
   const label = "electron-helper";
-  console.group(`${LOG38}[${label}] ${url}`);
+  console.group(`${LOG39}[${label}] ${url}`);
   const bridge3 = typeof window !== "undefined" ? window.grarf?.tickerRssFetch : void 0;
   if (!bridge3) {
-    console.warn(`${LOG38}[${label}] window.grarf.tickerRssFetch unavailable (not in Electron?)`);
+    console.warn(`${LOG39}[${label}] window.grarf.tickerRssFetch unavailable (not in Electron?)`);
     console.groupEnd();
     return;
   }
@@ -92132,7 +92198,7 @@ async function diagnoseElectronRssFetch(url) {
   const xml = result && "ok" in result && result.ok === true && "xml" in result ? result.xml : "";
   const classification = classifyRssBody(xml);
   const debugAttempts = result && typeof result === "object" && "_rssDebug" in result ? result._rssDebug : void 0;
-  console.log(`${LOG38}[${label}] bridge summary`, {
+  console.log(`${LOG39}[${label}] bridge summary`, {
     ok: result && "ok" in result ? result.ok : void 0,
     status: result && "status" in result ? result.status : void 0,
     statusText: result && "statusText" in result ? result.statusText : void 0,
@@ -92141,23 +92207,23 @@ async function diagnoseElectronRssFetch(url) {
     ...classification
   });
   if (debugAttempts) {
-    console.log(`${LOG38}[${label}] per-attempt (main process)`, debugAttempts);
+    console.log(`${LOG39}[${label}] per-attempt (main process)`, debugAttempts);
   }
-  console.log(`${LOG38}[${label}] preview`, previewRssBody(xml));
+  console.log(`${LOG39}[${label}] preview`, previewRssBody(xml));
   console.groupEnd();
 }
 function logRssPreParseInput(label, xml) {
   const classification = classifyRssBody(xml);
-  console.log(`${LOG38}[${label}] pre-parse`, {
+  console.log(`${LOG39}[${label}] pre-parse`, {
     ...classification,
     preview: previewRssBody(xml)
   });
 }
 async function runEspnMlbRssFetchDiagnostics(url = "https://www.espn.com/espn/rss/mlb/news") {
-  console.log(`${LOG38} === ESPN MLB RSS fetch diagnosis start ===`, url);
+  console.log(`${LOG39} === ESPN MLB RSS fetch diagnosis start ===`, url);
   await diagnoseElectronRssFetch(url);
   await diagnoseRendererRssFetch(url);
-  console.log(`${LOG38} === ESPN MLB RSS fetch diagnosis end ===`);
+  console.log(`${LOG39} === ESPN MLB RSS fetch diagnosis end ===`);
 }
 
 // ../grarf/desktop/src/components/mlb/MlbHeadlinesFeedPane.tsx
