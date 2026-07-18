@@ -31624,6 +31624,7 @@ function nbaTvBroadcastDedupeKey(label) {
 // ../grarf/desktop/src/lib/broadcast/resolveChannelLogoUrl.ts
 var NBA_TV_CHANNEL_LOGO_URL = "/league-logos/channel-nba-tv.png";
 var GOLF_CHANNEL_LOGO_URL = "/league-logos/channel-golf-channel.png";
+var PARAMOUNT_CHANNEL_LOGO_URL = "/league-logos/channel-paramount-plus.png";
 var CHANNEL_LOGO_BY_LABEL = {
   ABC: "/league-logos/channel-abc.png",
   CBS: "/league-logos/channel-cbs.png",
@@ -31643,7 +31644,7 @@ var CHANNEL_LOGO_BY_LABEL = {
   "NBA.TV": NBA_TV_CHANNEL_LOGO_URL,
   "NBA-TV": NBA_TV_CHANNEL_LOGO_URL,
   CNBC: "/league-logos/channel-cnbc.png",
-  "PARAMOUNT+": "/league-logos/channel-paramount-plus.png",
+  "PARAMOUNT+": PARAMOUNT_CHANNEL_LOGO_URL,
   TNT: "/league-logos/channel-tnt.png",
   TBS: "/league-logos/channel-tbs.png",
   "MLB.TV": "/league-logos/channel-mlbtv.png",
@@ -31693,6 +31694,9 @@ var FOX_CHANNEL_LOGO_PATH = "/league-logos/channel-fox.png";
 function logoUrlIsFoxAsset(logoUrl) {
   return logoUrl.trim().toLowerCase().includes("channel-fox");
 }
+function logoUrlIsParamountAsset(logoUrl) {
+  return logoUrl.trim().toLowerCase().includes("channel-paramount-plus");
+}
 function isFoxLogo(options) {
   const logoUrl = options?.logoUrl?.trim();
   if (logoUrl && logoUrlIsFoxAsset(logoUrl)) return true;
@@ -31700,8 +31704,16 @@ function isFoxLogo(options) {
   if (label && resolveChannelLogoUrl(label) === FOX_CHANNEL_LOGO_PATH) return true;
   return false;
 }
+function isParamountLogo(options) {
+  const logoUrl = options?.logoUrl?.trim();
+  if (logoUrl && logoUrlIsParamountAsset(logoUrl)) return true;
+  const label = options?.label?.trim();
+  if (label && resolveChannelLogoUrl(label) === PARAMOUNT_CHANNEL_LOGO_URL) return true;
+  return false;
+}
 function grarfLogoImgBorderRadiusClass(options) {
-  return isFoxLogo(options) ? "rounded-none" : GRARF_LOGO_IMG_BORDER_RADIUS_CLASS;
+  if (isFoxLogo(options) || isParamountLogo(options)) return "rounded-none";
+  return GRARF_LOGO_IMG_BORDER_RADIUS_CLASS;
 }
 function grarfLogoImgClassName(...classNames) {
   return cn2(GRARF_LOGO_IMG_BORDER_RADIUS_CLASS, ...classNames);
