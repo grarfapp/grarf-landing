@@ -51049,6 +51049,115 @@ function isHighlightsTvPlaylistOnlyLeagueKey(leagueKey) {
   return HIGHLIGHTS_TV_PLAYLIST_ONLY_LEAGUE_KEYS.has(leagueKey.trim().toUpperCase());
 }
 
+// ../grarf/desktop/src/lib/youtube/resolveYoutubeCanonicalThumbnailUrls.ts
+init_define_import_meta_env();
+init_operationalIngestConfig();
+
+// ../grarf/desktop/shared/youtubeCanonicalThumbnail.ts
+init_define_import_meta_env();
+var YOUTUBE_CANONICAL_THUMBNAIL_VARIANTS = [
+  "maxresdefault",
+  "sddefault",
+  "hqdefault",
+  "mqdefault"
+];
+function buildYoutubeCanonicalThumbnailUrl(videoId, variant = "mqdefault") {
+  const trimmed = String(videoId ?? "").trim();
+  return `https://i.ytimg.com/vi/${encodeURIComponent(trimmed)}/${variant}.jpg`;
+}
+function isYoutubeThumbnailResponseAvailable(response) {
+  if (!response || !response.ok) return false;
+  const contentLength = response.headers.get("content-length");
+  if (contentLength) {
+    const bytes = Number.parseInt(contentLength, 10);
+    if (Number.isFinite(bytes) && bytes > 0 && bytes < 3e3) {
+      return false;
+    }
+  }
+  return true;
+}
+async function resolveYoutubeCanonicalThumbnailUrl(videoId, fetchImpl = fetch) {
+  const trimmed = String(videoId ?? "").trim();
+  if (!trimmed) {
+    return buildYoutubeCanonicalThumbnailUrl("", "mqdefault");
+  }
+  for (const variant of YOUTUBE_CANONICAL_THUMBNAIL_VARIANTS) {
+    const url = buildYoutubeCanonicalThumbnailUrl(trimmed, variant);
+    try {
+      const response = await fetchImpl(url, {
+        method: "HEAD",
+        redirect: "follow"
+      });
+      if (isYoutubeThumbnailResponseAvailable(response)) {
+        return url;
+      }
+    } catch {
+    }
+  }
+  return buildYoutubeCanonicalThumbnailUrl(trimmed, "mqdefault");
+}
+async function resolveYoutubeCanonicalThumbnailUrls(videoIds, fetchImpl = fetch) {
+  const unique = [...new Set(videoIds.map((id) => String(id ?? "").trim()).filter(Boolean))];
+  const thumbnails = {};
+  const concurrency = 8;
+  for (let index = 0; index < unique.length; index += concurrency) {
+    const batch = unique.slice(index, index + concurrency);
+    await Promise.all(
+      batch.map(async (videoId) => {
+        thumbnails[videoId] = await resolveYoutubeCanonicalThumbnailUrl(videoId, fetchImpl);
+      })
+    );
+  }
+  return thumbnails;
+}
+
+// ../grarf/desktop/src/lib/youtube/resolveYoutubeCanonicalThumbnailUrls.ts
+var THUMBNAIL_BATCH_PATH = "/clips/youtube-canonical-thumbnails";
+function resolveOperationalThumbnailBatchUrls() {
+  const path = THUMBNAIL_BATCH_PATH;
+  const cloudBase = getOperationalIngestConfig().cloudBaseUrl?.replace(/\/$/, "");
+  if (cloudBase) {
+    return [`${cloudBase}${path}`];
+  }
+  return [path];
+}
+async function resolveYoutubeCanonicalThumbnailUrls2(videoIds) {
+  const unique = [...new Set(videoIds.map((id) => id.trim()).filter(Boolean))];
+  const resolved = /* @__PURE__ */ new Map();
+  if (unique.length === 0) return resolved;
+  for (const url of resolveOperationalThumbnailBatchUrls()) {
+    try {
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ videoIds: unique }),
+        cache: "no-store"
+      });
+      if (!response.ok) continue;
+      const data2 = await response.json();
+      for (const videoId of unique) {
+        const thumbnailUrl = data2.thumbnails?.[videoId]?.trim();
+        if (thumbnailUrl) resolved.set(videoId, thumbnailUrl);
+      }
+      if (resolved.size === unique.length) return resolved;
+    } catch {
+    }
+  }
+  const fallback = await resolveYoutubeCanonicalThumbnailUrls(unique, fetch);
+  for (const videoId of unique) {
+    if (resolved.has(videoId)) continue;
+    const thumbnailUrl = fallback[videoId]?.trim();
+    resolved.set(
+      videoId,
+      thumbnailUrl || buildYoutubeCanonicalThumbnailUrl(videoId, "hqdefault")
+    );
+  }
+  return resolved;
+}
+
 // ../grarf/desktop/src/lib/highlightsTv/applyHighlightsTvIngestionKeywordFilters.ts
 init_define_import_meta_env();
 function splitKeywordCell(cell) {
@@ -51879,13 +51988,16 @@ async function ingestHighlightsTvClipsFromIngestionRow(row, leagueKey, leagueLab
     row.REQUIRED_TITLE_KEYWORDS
   );
   filtered = applyHighlightsTvExcludedKeywordFilter(filtered, row.EXCLUDED_KEYWORDS);
+  const thumbnailUrls = await resolveYoutubeCanonicalThumbnailUrls2(
+    filtered.map((entry) => entry.videoId)
+  );
   const clips = filtered.map((entry, index) => ({
     id: `${leagueKey}-ingest-${index}-${entry.videoId}`,
     title: entry.title,
     leagueLabel,
     durationLabel: "\u2014",
     youtubeVideoId: entry.videoId,
-    thumbnailUrl: youtubeThumbnailUrl(entry.videoId, "mqdefault"),
+    thumbnailUrl: thumbnailUrls.get(entry.videoId),
     publishedAt: entry.published
   }));
   return playlistOnly ? clips : sortHighlightsTvClipsNewestFirst(clips);
@@ -52000,7 +52112,7 @@ async function fetchGameLeagueHighlightViaHighlightsTv(payload) {
         videoId: clip.youtubeVideoId,
         title: clip.title,
         videoUrl: `https://www.youtube.com/watch?v=${encodeURIComponent(clip.youtubeVideoId)}`,
-        thumbnailUrl: clip.thumbnailUrl ?? youtubeThumbnailUrl(clip.youtubeVideoId, "mqdefault"),
+        thumbnailUrl: clip.thumbnailUrl,
         publishedAt: clip.publishedAt ?? ""
       }
     };
@@ -89510,6 +89622,9 @@ var import_react182 = __toESM(require_react(), 1);
 init_define_import_meta_env();
 async function fetchHighlightsTvPlaylistClips(playlistUrl, leagueKey, leagueLabel) {
   const entries = await fetchSportscapeYoutubePlaylist(playlistUrl);
+  const thumbnailUrls = await resolveYoutubeCanonicalThumbnailUrls2(
+    entries.map((entry) => entry.videoId)
+  );
   return sortHighlightsTvClipsNewestFirst(
     entries.map((entry, index) => ({
       id: `${leagueKey}-pl-${index}-${entry.videoId}`,
@@ -89517,7 +89632,7 @@ async function fetchHighlightsTvPlaylistClips(playlistUrl, leagueKey, leagueLabe
       leagueLabel,
       durationLabel: "\u2014",
       youtubeVideoId: entry.videoId,
-      thumbnailUrl: youtubeThumbnailUrl(entry.videoId, "mqdefault"),
+      thumbnailUrl: thumbnailUrls.get(entry.videoId),
       publishedAt: entry.published
     }))
   );
