@@ -31761,6 +31761,8 @@ var GAMES_SPINE_LEAGUE_LOGO_URL = {
   WIMBLEDON_WOMEN: "/league-logos/wimbledon.png",
   UFC: "https://a.espncdn.com/i/teamlogos/leagues/500/ufc.png",
   F1: "https://a.espncdn.com/i/teamlogos/leagues/500/f1.png",
+  NASCAR: "/league-logos/nav/nascar-cup-series.png",
+  INDYCAR: "/league-logos/nav/indycar.png",
   TDF: "/league-logos/nav/tour-de-france.png",
   WEC: WEC_LEAGUE_LOGO_URL,
   PGA: "https://a.espncdn.com/combiner/i?img=/i/teamlogos/leagues/500/pgatour.png",
@@ -31777,7 +31779,7 @@ function resolveGamesSpineLeagueLogoUrl(league, options) {
   if (isPgaTourOpenChampionshipEvent(league, tournamentTitle)) {
     return THE_OPEN_LEAGUE_LOGO_URL;
   }
-  return GAMES_SPINE_LEAGUE_LOGO_URL[league];
+  return GAMES_SPINE_LEAGUE_LOGO_URL[league] ?? resolveCanonicalLeagueLogoUrl({ grarfLeagueKey: league });
 }
 function resolveGamesSpineLeagueLogoImgClassName(_league, _logoUrl) {
   return grarfLogoImgClassName();
@@ -67400,7 +67402,7 @@ init_define_import_meta_env();
 var import_react101 = __toESM(require_react(), 1);
 var import_jsx_runtime85 = __toESM(require_jsx_runtime(), 1);
 function GamesSpineLeagueHeaderMark({ league }) {
-  const logoUrl = resolveGamesSpineLeagueLogoUrl(league);
+  const logoUrl = resolveGamesSpineLeagueLogoUrl(league) ?? resolveCanonicalLeagueLogoUrl({ grarfLeagueKey: league });
   const [failed, setFailed] = (0, import_react101.useState)(false);
   if (!logoUrl || failed) return null;
   return /* @__PURE__ */ (0, import_jsx_runtime85.jsx)(
@@ -67412,7 +67414,6 @@ function GamesSpineLeagueHeaderMark({ league }) {
       height: 16,
       loading: "lazy",
       decoding: "async",
-      referrerPolicy: "no-referrer",
       onError: () => setFailed(true),
       className: cn2(
         "h-4 w-4 shrink-0 object-contain brightness-110 contrast-110",
