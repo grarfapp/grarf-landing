@@ -88291,6 +88291,46 @@ function resolveNewswireSourceColorClass(source) {
   return NEWSWIRE_SOURCE_COLOR_BY_KEY[key2] ?? NEWSWIRE_SOURCE_COLOR_DEFAULT;
 }
 
+// ../grarf/desktop/src/lib/newswire/resolveNewswireSourceLogoUrl.ts
+init_define_import_meta_env();
+var LOCAL_NEWSWIRE_SOURCE_LOGOS = {
+  ESPN: "/league-logos/channel-espn.png",
+  CBS: "/league-logos/channel-cbs-sports.png",
+  FOX: "/league-logos/channel-fox.png",
+  ATHLETIC: "/league-logos/source-the-athletic.png"
+};
+var NEWSWIRE_SOURCE_LOGO_ALIASES = {
+  "THE ATHLETIC": "ATHLETIC",
+  "FOX SPORTS": "FOX",
+  "CBS SPORTS": "CBS",
+  "YAHOO SPORTS": "YAHOO",
+  "SPORTS ILLUSTRATED": "SI"
+};
+var FAVICON_PUBLISHER_URL_BY_SOURCE2 = {
+  YAHOO: "https://sports.yahoo.com/",
+  NBC: "https://www.nbcsports.com/",
+  YARDBARKER: "https://www.yardbarker.com/",
+  SI: "https://www.si.com/"
+};
+function normalizeNewswireSourceLogoKey(source) {
+  const trimmed = source.trim().toUpperCase();
+  if (!trimmed) return "";
+  return NEWSWIRE_SOURCE_LOGO_ALIASES[trimmed] ?? trimmed;
+}
+function resolveNewswireSourceLogoUrl(source) {
+  const key2 = normalizeNewswireSourceLogoKey(source);
+  if (!key2) return null;
+  const local = LOCAL_NEWSWIRE_SOURCE_LOGOS[key2];
+  if (local) return local;
+  const fromChannel = resolveChannelLogoUrl(source);
+  if (fromChannel) return fromChannel;
+  const publisherUrl = FAVICON_PUBLISHER_URL_BY_SOURCE2[key2];
+  if (publisherUrl) {
+    return resolveWebsiteFaviconUrl(publisherUrl);
+  }
+  return null;
+}
+
 // ../grarf/desktop/src/components/homeMvp/HomeNewswireWireLine.tsx
 init_isGrarfWebRenderer();
 var import_jsx_runtime163 = __toESM(require_jsx_runtime(), 1);
@@ -88299,7 +88339,31 @@ var NEWSWIRE_LINE_CLASS = "block min-w-0 overflow-hidden break-words pl-2 text-l
 var NEWSWIRE_HEADLINE_TEXT_CLASS = "text-[12px] text-[#d4e0e0]";
 var NEWSWIRE_SEPARATOR_CLASS = "text-[8px] text-textdim/50";
 var NEWSWIRE_SOURCE_TEXT_CLASS = "text-[8px] leading-[1.32]";
+var NEWSWIRE_SOURCE_LOGO_SLOT_CLASS = "inline-flex h-3.5 max-w-11 shrink-0 items-center align-middle";
 var NEWSWIRE_TIMESTAMP_TEXT_CLASS = "text-[8px] leading-[1.32] font-normal tracking-normal tabular-nums text-textdim/50 whitespace-nowrap";
+function NewswireSourceMark({ source }) {
+  const logoUrl = (0, import_react176.useMemo)(() => resolveNewswireSourceLogoUrl(source), [source]);
+  const sourceColorClass = (0, import_react176.useMemo)(() => resolveNewswireSourceColorClass(source), [source]);
+  const [imageFailed, setImageFailed] = (0, import_react176.useState)(false);
+  (0, import_react176.useLayoutEffect)(() => {
+    setImageFailed(false);
+  }, [logoUrl]);
+  if (!logoUrl || imageFailed) {
+    return /* @__PURE__ */ (0, import_jsx_runtime163.jsx)("span", { className: `${NEWSWIRE_SOURCE_TEXT_CLASS} ${sourceColorClass}`, children: source });
+  }
+  const resolvedLogoUrl = resolveChannelLogoSrc(logoUrl);
+  return /* @__PURE__ */ (0, import_jsx_runtime163.jsx)("span", { className: NEWSWIRE_SOURCE_LOGO_SLOT_CLASS, children: /* @__PURE__ */ (0, import_jsx_runtime163.jsx)(
+    "img",
+    {
+      src: resolvedLogoUrl,
+      alt: source,
+      loading: "lazy",
+      decoding: "async",
+      className: channelLogoImageClass("left", { logoUrl: resolvedLogoUrl, label: source }),
+      onError: () => setImageFailed(true)
+    }
+  ) });
+}
 function newswireStoryToTypingEvent(story) {
   return {
     id: story.id,
@@ -88334,7 +88398,6 @@ function HomeNewswireWireLine({
 }) {
   const headline = (0, import_react176.useMemo)(() => story.headline.trim(), [story.headline]);
   const source = (0, import_react176.useMemo)(() => story.source.trim(), [story.source]);
-  const sourceColorClass = (0, import_react176.useMemo)(() => resolveNewswireSourceColorClass(source), [source]);
   const timestamp = (0, import_react176.useMemo)(() => formatNewswireWireTimestamp(story.timestamp), [story.timestamp]);
   const typingLines = (0, import_react176.useMemo)(() => [headline], [headline]);
   const typingEvent = (0, import_react176.useMemo)(
@@ -88384,7 +88447,7 @@ function HomeNewswireWireLine({
     ),
     showMetadata ? /* @__PURE__ */ (0, import_jsx_runtime163.jsxs)(import_jsx_runtime163.Fragment, { children: [
       /* @__PURE__ */ (0, import_jsx_runtime163.jsx)("span", { className: NEWSWIRE_SEPARATOR_CLASS, "aria-hidden": true, children: " \xB7 " }),
-      /* @__PURE__ */ (0, import_jsx_runtime163.jsx)("span", { className: `${NEWSWIRE_SOURCE_TEXT_CLASS} ${sourceColorClass}`, children: source }),
+      /* @__PURE__ */ (0, import_jsx_runtime163.jsx)(NewswireSourceMark, { source }),
       /* @__PURE__ */ (0, import_jsx_runtime163.jsx)("span", { className: NEWSWIRE_SEPARATOR_CLASS, "aria-hidden": true, children: " \xB7 " }),
       /* @__PURE__ */ (0, import_jsx_runtime163.jsx)("span", { className: NEWSWIRE_TIMESTAMP_TEXT_CLASS, children: timestamp ?? "" })
     ] }) : null
