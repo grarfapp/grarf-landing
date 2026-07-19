@@ -33038,6 +33038,7 @@ var ESPN_SOCCER_OPERATIONAL_LEAGUE_KEYS = new Set(
 var GAMES_SPINE_LEAGUE_DISPLAY_LABEL = {
   EPL: "EPL",
   NCAABB: "MCWS",
+  NASCAR: "NASCAR Cup Series",
   WORLDCUP: "World Cup",
   PLL: "PLL",
   WIMBLEDON_MEN: "Wimbledon (Men's)",
@@ -42214,6 +42215,12 @@ var LIVE_TRACKER_FEED_REGISTRY = [
     feedUrl: "https://rss.app/feeds/3F355cjf7OMwp2dF.xml",
     feedId: "live-tracker-mls",
     label: "MLS"
+  },
+  {
+    league: "UFC",
+    feedUrl: "https://rss.app/feeds/DQ8yGfZd9upXVYCj.xml",
+    feedId: "live-tracker-ufc",
+    label: "UFC"
   }
 ];
 var FEED_BY_LEAGUE = new Map(
