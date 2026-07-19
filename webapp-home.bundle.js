@@ -86841,18 +86841,6 @@ function tryOpenNbaSummerLeagueGameRowInBrowser(game) {
   return true;
 }
 
-// ../grarf/desktop/src/lib/gamesSpine/tryOpenNwslGameRowInBrowser.ts
-init_define_import_meta_env();
-init_isGrarfWebRenderer();
-function tryOpenNwslGameRowInBrowser(game) {
-  if (!isGrarfWebRenderer()) return false;
-  if (game.league !== "NWSL") return false;
-  const url = resolveGameWorkspaceEmbedUrl(game, game.id);
-  if (!url) return false;
-  window.open(url, "_blank", "noopener,noreferrer");
-  return true;
-}
-
 // ../grarf/desktop/src/lib/gamesSpine/tryOpenWnbaGameRowInBrowser.ts
 init_define_import_meta_env();
 init_isGrarfWebRenderer();
@@ -86987,7 +86975,6 @@ function openGamesSpineRowInWorkspace(game, dispatch) {
   if (tryOpenNbaSummerLeagueGameRowInBrowser(game)) return;
   if (tryOpenAflGameRowInBrowser(game)) return;
   if (openFotmobGamesSpineRow(game, dispatch)) return;
-  if (tryOpenNwslGameRowInBrowser(game)) return;
   if (tryOpenGolfGameRowInBrowser(game)) return;
   if (openWimbledonGamesSpineRow(game, dispatch)) return;
   if (tryOpenWnbaGameRowInBrowser(game)) return;
