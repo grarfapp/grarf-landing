@@ -24903,6 +24903,27 @@ function resolveFlashscoreMatchUrl(game) {
   return null;
 }
 
+// ../grarf/desktop/src/lib/tennis/resolveTennisGameCardEmbedUrl.ts
+init_define_import_meta_env();
+function isEspnGameCardUrl(url) {
+  try {
+    return new URL(url).hostname.includes("espn.com");
+  } catch {
+    return url.includes("espn.com");
+  }
+}
+function isTennisLeagueGame(game) {
+  return game.league === "ATP" || game.league === "WTA";
+}
+function resolveTennisGameCardEmbedUrl(game) {
+  if (!isTennisLeagueGame(game)) return null;
+  const flashscoreUrl = resolveFlashscoreMatchUrl(game);
+  if (flashscoreUrl) return flashscoreUrl;
+  const gameCardUrl = game.gameCardUrl?.trim();
+  if (gameCardUrl && !isEspnGameCardUrl(gameCardUrl)) return gameCardUrl;
+  return null;
+}
+
 // ../grarf/desktop/src/lib/espn/espnGameUrls.ts
 var ESPN_GAME_ID_RE = /^espn-([A-Z0-9]+)-(\d+)$/i;
 var SOCCER_LEAGUE_KEYS = /* @__PURE__ */ new Set([
@@ -24987,6 +25008,9 @@ function leagueKeyFromEspnGameId(gameId) {
 function resolveGameWorkspaceEmbedUrl(game, gameId) {
   if (!gameId) return null;
   if (game) {
+    if (isTennisLeagueGame(game)) {
+      return resolveTennisGameCardEmbedUrl(game);
+    }
     const fotmobUrl = isWorldCupGameRow(game) ? resolveWorldCupWorkspaceEmbedUrl(game) : resolveFotmobMatchUrl(game);
     if (fotmobUrl) return fotmobUrl;
     const flashscoreUrl = resolveFlashscoreMatchUrl(game);
@@ -25043,6 +25067,7 @@ function resolveGameWorkspaceEmbedUrl(game, gameId) {
   }
   const parsed = parseEspnGameIdFromRowId(gameId);
   if (parsed) {
+    if (parsed.league === "ATP" || parsed.league === "WTA") return null;
     console.log("[Resolver] Using generic ESPN event handler", parsed);
     return buildEspnGamecastUrl(parsed.league, parsed.eventId, {
       ufcCardEventId: game?.metadata?.ufcCardEventId
@@ -85858,23 +85883,11 @@ function resolveWimbledonWorkspaceEmbedUrl(game) {
 function resolveWimbledonCenterPaneEmbedUrl(game) {
   return resolveWimbledonWorkspaceEmbedUrl(game);
 }
-function openWimbledonGamesSpineRow(game, dispatch) {
+function openWimbledonGamesSpineRow(game, _dispatch) {
   if (!isGrarfWebRenderer()) return false;
   if (!isWimbledonTennisGame(game)) return false;
-  const url = resolveWimbledonWorkspaceEmbedUrl(game);
-  if (!url) return false;
-  const slug = game.league === "ATP" ? "atp" : game.league === "WTA" ? "wta" : void 0;
-  dispatch({
-    type: "open",
-    tab: {
-      id: slug ? `${slug}-game-${game.id}` : `game-web-${game.id}`,
-      type: "website",
-      title: `${game.awayTeam} @ ${game.homeTeam}`,
-      url,
-      closable: true
-    }
-  });
-  return true;
+  if (resolveTennisGameCardEmbedUrl(game)) return false;
+  return false;
 }
 
 // ../grarf/desktop/src/lib/gamesSpine/resolveWnbaGameCenterUrl.ts
@@ -86092,6 +86105,9 @@ function resolveSpineRowWorkspaceEmbedUrl(game) {
   if (isGolfLeagueKey(game.league)) {
     return resolveGolfLeaderboardUrl(game.league);
   }
+  if (isTennisLeagueGame(game)) {
+    return resolveTennisGameCardEmbedUrl(game);
+  }
   const fotmobUrl = resolveFotmobCenterPaneEmbedUrl(game);
   if (fotmobUrl) return fotmobUrl;
   const flashscoreUrl = resolveFlashscoreMatchUrl(game);
@@ -86129,7 +86145,7 @@ function buildGameWorkspaceTabForRow(game, options) {
       closable: true
     };
   }
-  if (slug) {
+  if (slug && !isTennisLeagueGame(game)) {
     return {
       id: `${slug}-fallback-${game.id}`,
       type: "website",
@@ -86183,6 +86199,46 @@ function openGamesSpineRowInWorkspace(game, dispatch) {
 }
 
 // ../grarf/desktop/src/components/adminMode/resolveOperationsCardAutomaticValues.ts
+function isTennisComMatchUrl(url) {
+  try {
+    const host = new URL(url).hostname.toLowerCase();
+    return host === "www.tennis.com" || host === "tennis.com";
+  } catch {
+    return /tennis\.com\/tournaments\//i.test(url);
+  }
+}
+function automaticEntry(url, sourceLabel) {
+  const trimmed = url.trim();
+  if (!trimmed) return [];
+  return [{ url: trimmed, sourceLabel }];
+}
+function resolveAutomaticFlashscoreGameCardUrl(game) {
+  return resolveFlashscoreMatchUrl(game);
+}
+function resolveAutomaticTennisComMatchUrl(game) {
+  const gameCardUrl = game.gameCardUrl?.trim();
+  if (gameCardUrl && isTennisComMatchUrl(gameCardUrl)) return gameCardUrl;
+  return null;
+}
+function resolveAutomaticCanonicalGameCardUrl(game) {
+  return game.gameCardUrl?.trim() || null;
+}
+function resolveProviderEffectiveUrl(input) {
+  if (input.manualOverride) return null;
+  if (!input.providerUrl || !input.runtimeEffective) return null;
+  return input.providerUrl === input.runtimeEffective ? input.providerUrl : null;
+}
+function buildTennisProviderDiagnosticSlice(input) {
+  return {
+    automatic: automaticEntry(input.automaticUrl ?? "", input.sourceLabel),
+    manualOverride: null,
+    effective: resolveProviderEffectiveUrl({
+      providerUrl: input.automaticUrl,
+      runtimeEffective: input.runtimeEffective,
+      manualOverride: input.manualOverride
+    })
+  };
+}
 function uniqueAutomaticEntries(entries) {
   const seen = /* @__PURE__ */ new Set();
   const out = [];
@@ -86245,6 +86301,35 @@ function resolveOperationsGameCardUrlDiagnostic(input) {
     manualOverride,
     effective: resolveEffectiveGameCardUrl(input.upstreamGame, input.fields)
   };
+}
+function resolveOperationsTennisGameCardUrlDiagnostic(input) {
+  const manualOverride = input.fields.workspaceUrl.trim() || null;
+  const runtimeEffective = resolveEffectiveGameCardUrl(input.upstreamGame, input.fields);
+  const flashscoreAutomatic = resolveAutomaticFlashscoreGameCardUrl(input.upstreamGame);
+  const tennisComAutomatic = resolveAutomaticTennisComMatchUrl(input.upstreamGame);
+  const canonicalAutomatic = resolveAutomaticCanonicalGameCardUrl(input.upstreamGame);
+  return {
+    flashscore: buildTennisProviderDiagnosticSlice({
+      automaticUrl: flashscoreAutomatic,
+      sourceLabel: "FlashscoreUSA",
+      runtimeEffective,
+      manualOverride
+    }),
+    tennisCom: buildTennisProviderDiagnosticSlice({
+      automaticUrl: tennisComAutomatic,
+      sourceLabel: "Tennis.com",
+      runtimeEffective,
+      manualOverride
+    }),
+    canonical: {
+      automatic: automaticEntry(canonicalAutomatic ?? "", "Generate Once"),
+      manualOverride,
+      effective: runtimeEffective
+    }
+  };
+}
+function isOperationsTennisGameCardDiagnosticsGame(game) {
+  return isTennisLeagueGame(game);
 }
 function resolveOperationsLiveStreamUrlDiagnostic(input) {
   const manualOverride = input.fields.streamUrl.trim() || null;
@@ -86336,6 +86421,40 @@ function OperationsDiagnosticEffectiveValue({ value }) {
   }
   return /* @__PURE__ */ (0, import_jsx_runtime152.jsx)(OperationsDiagnosticReadOnlyUrl, { url: value });
 }
+function OperationsUrlDiagnosticProviderGroup({
+  title,
+  diagnostic
+}) {
+  return /* @__PURE__ */ (0, import_jsx_runtime152.jsxs)("div", { className: "space-y-2 border border-[#1a2b28]/50 bg-[#030606]/25 px-2 py-2", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime152.jsx)("span", { className: "font-mono text-[7px] tracking-[0.14em] text-[#9eb8b3]", children: title }),
+    /* @__PURE__ */ (0, import_jsx_runtime152.jsx)(
+      OperationsDiagnosticSubsection,
+      {
+        title: "Automatic",
+        present: diagnostic.automatic.length > 0,
+        children: /* @__PURE__ */ (0, import_jsx_runtime152.jsx)(OperationsAutomaticDiagnosticEntries, { entries: diagnostic.automatic })
+      }
+    ),
+    /* @__PURE__ */ (0, import_jsx_runtime152.jsx)(OperationsDiagnosticSubsection, { title: "Manual Override", present: Boolean(diagnostic.manualOverride), children: /* @__PURE__ */ (0, import_jsx_runtime152.jsx)(OperationsDiagnosticOverrideValue, { value: diagnostic.manualOverride }) }),
+    /* @__PURE__ */ (0, import_jsx_runtime152.jsx)(OperationsDiagnosticSubsection, { title: "Effective", present: Boolean(diagnostic.effective), children: /* @__PURE__ */ (0, import_jsx_runtime152.jsx)(OperationsDiagnosticEffectiveValue, { value: diagnostic.effective }) })
+  ] });
+}
+function OperationsTennisGameCardUrlDiagnostics({
+  diagnostic
+}) {
+  return /* @__PURE__ */ (0, import_jsx_runtime152.jsxs)("div", { className: "space-y-2 border border-[#1a2b28]/70 bg-[#030606]/35 px-2 py-2", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime152.jsx)("span", { className: "font-mono text-[8px] tracking-[0.16em] text-[#d7eeee]", children: "GAME CARD" }),
+    /* @__PURE__ */ (0, import_jsx_runtime152.jsx)(OperationsUrlDiagnosticProviderGroup, { title: "FlashscoreUSA", diagnostic: diagnostic.flashscore }),
+    /* @__PURE__ */ (0, import_jsx_runtime152.jsx)(OperationsUrlDiagnosticProviderGroup, { title: "Tennis.com", diagnostic: diagnostic.tennisCom }),
+    /* @__PURE__ */ (0, import_jsx_runtime152.jsx)(
+      OperationsUrlDiagnosticProviderGroup,
+      {
+        title: "Canonical Game Card URL",
+        diagnostic: diagnostic.canonical
+      }
+    )
+  ] });
+}
 function OperationsUrlDiagnosticGroup({
   title,
   diagnostic
@@ -86359,9 +86478,14 @@ function OperationsUrlDiagnosticsSection({
   fields
 }) {
   const upstreamGame = useCanonicalLiveGameStore((s2) => s2.gamesById[game.id]?.game) ?? game;
+  const isTennisGameCardDiagnostics = isOperationsTennisGameCardDiagnosticsGame(upstreamGame);
   const gameCardDiagnostic = (0, import_react166.useMemo)(
-    () => resolveOperationsGameCardUrlDiagnostic({ upstreamGame, fields }),
-    [upstreamGame, fields]
+    () => isTennisGameCardDiagnostics ? null : resolveOperationsGameCardUrlDiagnostic({ upstreamGame, fields }),
+    [isTennisGameCardDiagnostics, upstreamGame, fields]
+  );
+  const tennisGameCardDiagnostic = (0, import_react166.useMemo)(
+    () => isTennisGameCardDiagnostics ? resolveOperationsTennisGameCardUrlDiagnostic({ upstreamGame, fields }) : null,
+    [isTennisGameCardDiagnostics, upstreamGame, fields]
   );
   const liveStreamDiagnostic = (0, import_react166.useMemo)(
     () => resolveOperationsLiveStreamUrlDiagnostic({ upstreamGame, fields }),
@@ -86369,7 +86493,7 @@ function OperationsUrlDiagnosticsSection({
   );
   return /* @__PURE__ */ (0, import_jsx_runtime152.jsxs)("div", { className: "mb-2 space-y-2 border-b border-[#1a2b28]/70 pb-2", children: [
     /* @__PURE__ */ (0, import_jsx_runtime152.jsx)("span", { className: "font-mono text-[7px] tracking-[0.2em] text-[#5f7a7a]", children: "URL DIAGNOSTICS (READ-ONLY)" }),
-    /* @__PURE__ */ (0, import_jsx_runtime152.jsx)(OperationsUrlDiagnosticGroup, { title: "GAME CARD", diagnostic: gameCardDiagnostic }),
+    tennisGameCardDiagnostic ? /* @__PURE__ */ (0, import_jsx_runtime152.jsx)(OperationsTennisGameCardUrlDiagnostics, { diagnostic: tennisGameCardDiagnostic }) : gameCardDiagnostic ? /* @__PURE__ */ (0, import_jsx_runtime152.jsx)(OperationsUrlDiagnosticGroup, { title: "GAME CARD", diagnostic: gameCardDiagnostic }) : null,
     /* @__PURE__ */ (0, import_jsx_runtime152.jsx)(OperationsUrlDiagnosticGroup, { title: "LIVE STREAM", diagnostic: liveStreamDiagnostic })
   ] });
 }

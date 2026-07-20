@@ -18348,6 +18348,9 @@ init_define_import_meta_env();
 // ../grarf/desktop/src/lib/flashscore/resolveFlashscoreMatchUrl.ts
 init_define_import_meta_env();
 
+// ../grarf/desktop/src/lib/tennis/resolveTennisGameCardEmbedUrl.ts
+init_define_import_meta_env();
+
 // ../grarf/desktop/src/lib/espn/espnGameUrls.ts
 var ESPN_GAME_ID_RE = /^espn-([A-Z0-9]+)-(\d+)$/i;
 var VALID_LEAGUE_KEYS = new Set(getGamesColumnLeagueOrder());
