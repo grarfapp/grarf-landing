@@ -33917,6 +33917,59 @@ var WEB_HEADLINES_RUGBY_SOURCES = [
 
 // ../grarf/desktop/src/data/homeWebHeadlinesSoccerSources.ts
 init_define_import_meta_env();
+
+// ../grarf/desktop/src/data/gamesSpinePermanentBrowserScheduleUrls.ts
+init_define_import_meta_env();
+
+// ../grarf/desktop/src/data/gamesSpinePermanentBrowserSocialRailFeeds.ts
+init_define_import_meta_env();
+var GAMES_SPINE_PERMANENT_BROWSER_SOCIAL_RAIL_FEEDS = [
+  {
+    tabId: "games-spine-permanent-more-soccer",
+    label: "More Soccer",
+    url: "https://aiscore.com",
+    feedId: "game-social-rail-more-soccer",
+    feedUrl: "https://rss.app/feeds/4jAmhAZIxSuNHGTH.xml",
+    sourceLabel: "More Soccer",
+    teamKey: "more-soccer"
+  },
+  {
+    tabId: "games-spine-permanent-horse-racing",
+    label: "Horse Racing",
+    url: "https://www.tvg.com/races",
+    feedId: "game-social-rail-horse-racing",
+    feedUrl: "https://rss.app/feeds/dKzpTG5VMquGcttI.xml",
+    sourceLabel: "Horse Racing",
+    teamKey: "horse-racing"
+  },
+  {
+    tabId: "games-spine-permanent-cricket",
+    label: "Cricket",
+    url: "https://crex.com/schedule",
+    feedId: "game-social-rail-cricket",
+    feedUrl: "https://rss.app/feeds/xdZyhDxbobBtv1J1.xml",
+    sourceLabel: "Cricket",
+    teamKey: "cricket"
+  }
+];
+
+// ../grarf/desktop/src/data/gamesSpinePermanentBrowserScheduleUrls.ts
+function resolveGamesSpinePermanentBrowserScheduleUrl(teamKey) {
+  const entry = GAMES_SPINE_PERMANENT_BROWSER_SOCIAL_RAIL_FEEDS.find(
+    (feed) => feed.teamKey === teamKey
+  );
+  if (!entry) {
+    throw new Error(`Unknown Games Spine permanent browser team key: ${teamKey}`);
+  }
+  return entry.url;
+}
+
+// ../grarf/desktop/src/data/homeWebHeadlinesSoccerSources.ts
+var MORE_SOCCER_SCHEDULE_SOURCE = {
+  id: "more_soccer__schedule",
+  label: "SCHEDULE",
+  url: resolveGamesSpinePermanentBrowserScheduleUrl("more-soccer")
+};
 var WEB_HEADLINES_SOCCER_SOURCES = [
   { id: "soccerway_news", label: "Soccerway.com", url: "https://www.soccerway.com/news/" },
   { id: "football365", label: "Football365.com", url: "https://www.football365.com/" },
@@ -34425,8 +34478,15 @@ function resolveWebHeadlinesMotorsportsPaneSources(liveMotorsportsSubmenuId) {
 }
 function resolveWebHeadlinesSoccerPaneSources(liveSoccerSubmenuId) {
   switch (liveSoccerSubmenuId) {
-    default:
-      return WEB_HEADLINES_SOCCER_SOURCES;
+    default: {
+      const placeholder4 = WEB_HEADLINES_SOCCER_SOURCES.find((source) => !source.url.trim());
+      const embeddable = WEB_HEADLINES_SOCCER_SOURCES.filter((source) => source.url.trim());
+      return [
+        ...embeddable,
+        MORE_SOCCER_SCHEDULE_SOURCE,
+        ...placeholder4 ? [placeholder4] : []
+      ];
+    }
   }
 }
 function resolveWebHeadlinesPaneSources(liveSubmenuId, liveLeagueSubmenuId, liveMotorsportsSubmenuId = null, liveSoccerSubmenuId = null) {
@@ -35087,6 +35147,11 @@ var HOME_LEAGUE_WORKSPACE_TOUR_DE_FRANCE_NON_LIVE_NAVIGATION = {
 
 // ../grarf/desktop/src/data/homeLeagueWorkspaceHorseRacingNavigation.ts
 init_define_import_meta_env();
+var HORSE_RACING_SCHEDULE_SOURCE = {
+  id: "horse_racing__schedule",
+  label: "TVG.com/Races",
+  url: resolveGamesSpinePermanentBrowserScheduleUrl("horse-racing")
+};
 var HORSE_RACING_SOURCES = getHomeLeagueWorkspaceNewsSources("horse-racing");
 var HORSE_RACING_MAIN_MENU_SOURCES = HORSE_RACING_SOURCES.filter(
   (source) => source.url.trim().length > 0
@@ -35100,6 +35165,11 @@ var HOME_LEAGUE_WORKSPACE_HORSE_RACING_NAVIGATION = {
       label: formatWebsitePaneHeaderLabel(source.label, source.url),
       sources: [source]
     })),
+    {
+      id: "schedule",
+      label: "SCHEDULE",
+      sources: [HORSE_RACING_SCHEDULE_SOURCE]
+    },
     ...HORSE_RACING_BROWSER_WORKSPACE_PLACEHOLDER ? [
       {
         id: HORSE_RACING_BROWSER_WORKSPACE_PLACEHOLDER.id,
@@ -35190,6 +35260,11 @@ var HOME_LEAGUE_WORKSPACE_INDYCAR_NON_LIVE_NAVIGATION = {
 
 // ../grarf/desktop/src/data/homeLeagueWorkspaceIccNavigation.ts
 init_define_import_meta_env();
+var ICC_SCHEDULE_SOURCE = {
+  id: "icc__schedule",
+  label: "Crex.com/Schedule",
+  url: resolveGamesSpinePermanentBrowserScheduleUrl("cricket")
+};
 var ICC_WEBSITE_SOURCE = getHomeLeagueWorkspaceNewsSources("t20-womens-world-cup").find(
   (source) => source.url.trim().length > 0
 );
@@ -35200,6 +35275,11 @@ var HOME_LEAGUE_WORKSPACE_ICC_NAVIGATION = {
       id: "icc",
       label: "ICC",
       sources: ICC_WEBSITE_SOURCE ? [ICC_WEBSITE_SOURCE] : []
+    },
+    {
+      id: "schedule",
+      label: "SCHEDULE",
+      sources: [ICC_SCHEDULE_SOURCE]
     }
   ]
 };
@@ -70781,38 +70861,6 @@ function clearCenterEmbedForSpineGameSelect() {
   void window.grarf?.workspaceEmbedClear?.("center");
   void window.grarf?.workspaceEmbedClear?.("centerChild");
 }
-
-// ../grarf/desktop/src/data/gamesSpinePermanentBrowserSocialRailFeeds.ts
-init_define_import_meta_env();
-var GAMES_SPINE_PERMANENT_BROWSER_SOCIAL_RAIL_FEEDS = [
-  {
-    tabId: "games-spine-permanent-more-soccer",
-    label: "More Soccer",
-    url: "https://aiscore.com",
-    feedId: "game-social-rail-more-soccer",
-    feedUrl: "https://rss.app/feeds/4jAmhAZIxSuNHGTH.xml",
-    sourceLabel: "More Soccer",
-    teamKey: "more-soccer"
-  },
-  {
-    tabId: "games-spine-permanent-horse-racing",
-    label: "Horse Racing",
-    url: "https://www.tvg.com/races",
-    feedId: "game-social-rail-horse-racing",
-    feedUrl: "https://rss.app/feeds/dKzpTG5VMquGcttI.xml",
-    sourceLabel: "Horse Racing",
-    teamKey: "horse-racing"
-  },
-  {
-    tabId: "games-spine-permanent-cricket",
-    label: "Cricket",
-    url: "https://crex.com/schedule",
-    feedId: "game-social-rail-cricket",
-    feedUrl: "https://rss.app/feeds/xdZyhDxbobBtv1J1.xml",
-    sourceLabel: "Cricket",
-    teamKey: "cricket"
-  }
-];
 
 // ../grarf/desktop/src/lib/gamesSpine/resolveWebGamesSpineBootstrapOperationalLeagueOrder.ts
 init_define_import_meta_env();
