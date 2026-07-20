@@ -86183,25 +86183,76 @@ function openGamesSpineRowInWorkspace(game, dispatch) {
 }
 
 // ../grarf/desktop/src/components/adminMode/resolveOperationsCardAutomaticValues.ts
-function uniqueTrimmedUrls(urls) {
+function uniqueAutomaticEntries(entries) {
   const seen = /* @__PURE__ */ new Set();
   const out = [];
-  for (const raw of urls) {
-    const url = raw?.trim();
+  for (const entry of entries) {
+    const url = entry.url.trim();
     if (!url || seen.has(url)) continue;
     seen.add(url);
-    out.push(url);
+    out.push({ url, sourceLabel: entry.sourceLabel.trim() || "Automatic" });
   }
   return out;
 }
-function resolveAutomaticLiveStreamUrls(game) {
-  return uniqueTrimmedUrls([
-    game.streamUrl,
-    ...(game.watchOptions ?? []).map((option) => option.deepLink)
-  ]);
+function resolveAutomaticGameCardSourceLabel(game, url) {
+  const flashscoreUrl = resolveFlashscoreMatchUrl(game);
+  if (flashscoreUrl && flashscoreUrl === url) return "Flashscore";
+  const fotmobUrl = resolveFotmobMatchUrl(game);
+  if (fotmobUrl && fotmobUrl === url) return "FotMob";
+  const generateOnceGameCardUrl = game.gameCardUrl?.trim();
+  if (generateOnceGameCardUrl && generateOnceGameCardUrl === url && game.league) {
+    return game.league;
+  }
+  return "Automatic";
 }
-function resolveAutomaticGameCardUrls(game) {
-  return uniqueTrimmedUrls([buildGameWorkspaceTabForRow(game)?.url]);
+function resolveAutomaticGameCardEntries(game) {
+  const url = buildGameWorkspaceTabForRow(game)?.url?.trim();
+  if (!url) return [];
+  return [{ url, sourceLabel: resolveAutomaticGameCardSourceLabel(game, url) }];
+}
+function resolveAutomaticLiveStreamEntries(game) {
+  const entries = [];
+  const streamUrl = game.streamUrl?.trim();
+  if (streamUrl) {
+    entries.push({
+      url: streamUrl,
+      sourceLabel: game.streamProvider?.trim() || "Automatic"
+    });
+  }
+  for (const option of game.watchOptions ?? []) {
+    const deepLink = option.deepLink?.trim();
+    if (!deepLink) continue;
+    entries.push({
+      url: deepLink,
+      sourceLabel: option.displayName?.trim() || option.provider || "Automatic"
+    });
+  }
+  return uniqueAutomaticEntries(entries);
+}
+function resolveEffectiveGameCardUrl(upstreamGame, fields) {
+  const manualOverride = fields.workspaceUrl.trim();
+  if (manualOverride) return manualOverride;
+  return buildGameWorkspaceTabForRow(upstreamGame)?.url?.trim() || null;
+}
+function resolveEffectiveLiveStreamUrl(upstreamGame, fields) {
+  const enriched = applyCanonicalGamesSpineOperationsEnrichment(upstreamGame, fields);
+  return enriched.streamUrl?.trim() || null;
+}
+function resolveOperationsGameCardUrlDiagnostic(input) {
+  const manualOverride = input.fields.workspaceUrl.trim() || null;
+  return {
+    automatic: resolveAutomaticGameCardEntries(input.upstreamGame),
+    manualOverride,
+    effective: resolveEffectiveGameCardUrl(input.upstreamGame, input.fields)
+  };
+}
+function resolveOperationsLiveStreamUrlDiagnostic(input) {
+  const manualOverride = input.fields.streamUrl.trim() || null;
+  return {
+    automatic: resolveAutomaticLiveStreamEntries(input.upstreamGame),
+    manualOverride,
+    effective: resolveEffectiveLiveStreamUrl(input.upstreamGame, input.fields)
+  };
 }
 
 // ../grarf/desktop/src/components/adminMode/OperationsCard.tsx
@@ -86229,7 +86280,7 @@ function OperationsFieldRow({
     /* @__PURE__ */ (0, import_jsx_runtime152.jsx)("div", { className: "min-w-0 flex-1", children })
   ] });
 }
-function OperationsAutomaticReadOnlyUrl({ url }) {
+function OperationsDiagnosticReadOnlyUrl({ url }) {
   return /* @__PURE__ */ (0, import_jsx_runtime152.jsx)(
     "div",
     {
@@ -86239,45 +86290,87 @@ function OperationsAutomaticReadOnlyUrl({ url }) {
     }
   );
 }
-function OperationsAutomaticValueRow({
-  label,
-  urls
+function OperationsDiagnosticSubsection({
+  title,
+  present,
+  children
 }) {
-  const present = urls.length > 0;
-  return /* @__PURE__ */ (0, import_jsx_runtime152.jsxs)("div", { className: "flex items-start gap-2 py-1", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime152.jsx)(OperationsFieldCompletenessDot, { complete: present }),
-    /* @__PURE__ */ (0, import_jsx_runtime152.jsx)("span", { className: "w-[104px] shrink-0 pt-0.5 font-mono text-[8px] tracking-[0.12em] text-[#7aada4]", children: label }),
-    /* @__PURE__ */ (0, import_jsx_runtime152.jsxs)("div", { className: "min-w-0 flex-1 space-y-1", children: [
+  return /* @__PURE__ */ (0, import_jsx_runtime152.jsxs)("div", { className: "space-y-1", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime152.jsxs)("div", { className: "flex items-center gap-1.5", children: [
       /* @__PURE__ */ (0, import_jsx_runtime152.jsx)(
         "span",
         {
           className: cn2(
-            "font-mono text-[7px] tracking-[0.14em]",
-            present ? "text-greensys" : "text-redsys"
+            "font-mono text-[7px] tracking-[0.12em]",
+            present ? "text-greensys" : "text-[#5f7a7a]"
           ),
-          children: present ? "PRESENT" : "MISSING"
+          "aria-hidden": true,
+          children: present ? "\u2713" : "\u2014"
         }
       ),
-      urls.map((url) => /* @__PURE__ */ (0, import_jsx_runtime152.jsx)(OperationsAutomaticReadOnlyUrl, { url }, url))
-    ] })
+      /* @__PURE__ */ (0, import_jsx_runtime152.jsx)("span", { className: "font-mono text-[7px] tracking-[0.14em] text-[#7aada4]", children: title })
+    ] }),
+    /* @__PURE__ */ (0, import_jsx_runtime152.jsx)("div", { className: "pl-3.5", children })
   ] });
 }
-function OperationsAutomaticValuesSection({ game }) {
+function OperationsAutomaticDiagnosticEntries({
+  entries
+}) {
+  if (entries.length === 0) {
+    return /* @__PURE__ */ (0, import_jsx_runtime152.jsx)("span", { className: "font-mono text-[8px] tracking-[0.1em] text-redsys", children: "Missing" });
+  }
+  return /* @__PURE__ */ (0, import_jsx_runtime152.jsx)("div", { className: "space-y-1", children: entries.map((entry) => /* @__PURE__ */ (0, import_jsx_runtime152.jsxs)("div", { className: "space-y-0.5", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime152.jsx)("span", { className: "font-mono text-[8px] tracking-[0.1em] text-greensys", children: entry.sourceLabel }),
+    /* @__PURE__ */ (0, import_jsx_runtime152.jsx)(OperationsDiagnosticReadOnlyUrl, { url: entry.url })
+  ] }, entry.url)) });
+}
+function OperationsDiagnosticOverrideValue({ value }) {
+  if (!value) {
+    return /* @__PURE__ */ (0, import_jsx_runtime152.jsx)("span", { className: "font-mono text-[8px] tracking-[0.1em] text-[#5f7a7a]", children: "\u2014" });
+  }
+  return /* @__PURE__ */ (0, import_jsx_runtime152.jsx)(OperationsDiagnosticReadOnlyUrl, { url: value });
+}
+function OperationsDiagnosticEffectiveValue({ value }) {
+  if (!value) {
+    return /* @__PURE__ */ (0, import_jsx_runtime152.jsx)("span", { className: "font-mono text-[8px] tracking-[0.1em] text-redsys", children: "Missing" });
+  }
+  return /* @__PURE__ */ (0, import_jsx_runtime152.jsx)(OperationsDiagnosticReadOnlyUrl, { url: value });
+}
+function OperationsUrlDiagnosticGroup({
+  title,
+  diagnostic
+}) {
+  return /* @__PURE__ */ (0, import_jsx_runtime152.jsxs)("div", { className: "space-y-2 border border-[#1a2b28]/70 bg-[#030606]/35 px-2 py-2", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime152.jsx)("span", { className: "font-mono text-[8px] tracking-[0.16em] text-[#d7eeee]", children: title }),
+    /* @__PURE__ */ (0, import_jsx_runtime152.jsx)(
+      OperationsDiagnosticSubsection,
+      {
+        title: "Automatic",
+        present: diagnostic.automatic.length > 0,
+        children: /* @__PURE__ */ (0, import_jsx_runtime152.jsx)(OperationsAutomaticDiagnosticEntries, { entries: diagnostic.automatic })
+      }
+    ),
+    /* @__PURE__ */ (0, import_jsx_runtime152.jsx)(OperationsDiagnosticSubsection, { title: "Manual Override", present: Boolean(diagnostic.manualOverride), children: /* @__PURE__ */ (0, import_jsx_runtime152.jsx)(OperationsDiagnosticOverrideValue, { value: diagnostic.manualOverride }) }),
+    /* @__PURE__ */ (0, import_jsx_runtime152.jsx)(OperationsDiagnosticSubsection, { title: "Effective", present: Boolean(diagnostic.effective), children: /* @__PURE__ */ (0, import_jsx_runtime152.jsx)(OperationsDiagnosticEffectiveValue, { value: diagnostic.effective }) })
+  ] });
+}
+function OperationsUrlDiagnosticsSection({
+  game,
+  fields
+}) {
   const upstreamGame = useCanonicalLiveGameStore((s2) => s2.gamesById[game.id]?.game) ?? game;
-  const automaticGameCardUrls = (0, import_react166.useMemo)(
-    () => resolveAutomaticGameCardUrls(upstreamGame),
-    [upstreamGame]
+  const gameCardDiagnostic = (0, import_react166.useMemo)(
+    () => resolveOperationsGameCardUrlDiagnostic({ upstreamGame, fields }),
+    [upstreamGame, fields]
   );
-  const automaticLiveStreamUrls = (0, import_react166.useMemo)(
-    () => resolveAutomaticLiveStreamUrls(upstreamGame),
-    [upstreamGame]
+  const liveStreamDiagnostic = (0, import_react166.useMemo)(
+    () => resolveOperationsLiveStreamUrlDiagnostic({ upstreamGame, fields }),
+    [upstreamGame, fields]
   );
-  return /* @__PURE__ */ (0, import_jsx_runtime152.jsxs)("div", { className: "mb-2 border-b border-[#1a2b28]/70 pb-2", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime152.jsx)("span", { className: "font-mono text-[7px] tracking-[0.2em] text-[#5f7a7a]", children: "AUTOMATIC (READ-ONLY)" }),
-    /* @__PURE__ */ (0, import_jsx_runtime152.jsxs)("div", { className: "mt-1 flex flex-col", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime152.jsx)(OperationsAutomaticValueRow, { label: "GAME CARD", urls: automaticGameCardUrls }),
-      /* @__PURE__ */ (0, import_jsx_runtime152.jsx)(OperationsAutomaticValueRow, { label: "LIVE STREAM", urls: automaticLiveStreamUrls })
-    ] })
+  return /* @__PURE__ */ (0, import_jsx_runtime152.jsxs)("div", { className: "mb-2 space-y-2 border-b border-[#1a2b28]/70 pb-2", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime152.jsx)("span", { className: "font-mono text-[7px] tracking-[0.2em] text-[#5f7a7a]", children: "URL DIAGNOSTICS (READ-ONLY)" }),
+    /* @__PURE__ */ (0, import_jsx_runtime152.jsx)(OperationsUrlDiagnosticGroup, { title: "GAME CARD", diagnostic: gameCardDiagnostic }),
+    /* @__PURE__ */ (0, import_jsx_runtime152.jsx)(OperationsUrlDiagnosticGroup, { title: "LIVE STREAM", diagnostic: liveStreamDiagnostic })
   ] });
 }
 function OperationsOptionalFieldRow({
@@ -86404,7 +86497,7 @@ function OperationsCard({ game }) {
       /* @__PURE__ */ (0, import_jsx_runtime152.jsx)("span", { className: "truncate font-mono text-[10px] tracking-[0.04em] text-[#e0e8e6]", children: gameLabel2 }),
       !canWatchLive ? /* @__PURE__ */ (0, import_jsx_runtime152.jsx)("span", { className: "shrink-0 font-mono text-[7px] tracking-[0.12em] text-[#5f7a7a]", children: "PRE-LIVE" }) : null
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime152.jsx)(OperationsAutomaticValuesSection, { game }),
+    /* @__PURE__ */ (0, import_jsx_runtime152.jsx)(OperationsUrlDiagnosticsSection, { game, fields }),
     /* @__PURE__ */ (0, import_jsx_runtime152.jsx)(OperationsFieldRow, { label: "FEATURED PRIORITY", complete: priority !== void 0, children: /* @__PURE__ */ (0, import_jsx_runtime152.jsx)(AdminFeaturedPriorityField, { game }) }),
     /* @__PURE__ */ (0, import_jsx_runtime152.jsx)(OperationsOptionalFieldRow, { label: "GAME CARD URL", children: /* @__PURE__ */ (0, import_jsx_runtime152.jsx)(
       OperationsTextField,
