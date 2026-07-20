@@ -24905,23 +24905,194 @@ function resolveFlashscoreMatchUrl(game) {
 
 // ../grarf/desktop/src/lib/tennis/resolveTennisGameCardEmbedUrl.ts
 init_define_import_meta_env();
-function isEspnGameCardUrl(url) {
-  try {
-    return new URL(url).hostname.includes("espn.com");
-  } catch {
-    return url.includes("espn.com");
+
+// ../grarf/desktop/src/lib/gameCardNavigation/gameCardNavigation.ts
+init_define_import_meta_env();
+init_isGrarfWebRenderer();
+
+// ../grarf/desktop/src/store/adminOperationsCardStore.ts
+init_define_import_meta_env();
+var import_zustand3 = __toESM(require_zustand(), 1);
+var EMPTY_ADMIN_OPERATIONS_CARD_FIELDS = {
+  workspaceUrl: "",
+  navigationMode: "center-pane",
+  streamUrl: "",
+  highlightVideoUrl: "",
+  statusOverride: "",
+  viewerMessage: "",
+  operatorNote: ""
+};
+function cloneFieldsByGameId(source) {
+  const out = {};
+  for (const [gameId, fields] of Object.entries(source)) {
+    out[gameId] = { ...fields };
   }
+  return out;
 }
+function serializeNavigationMode(mode) {
+  return mode === "new-browser-tab" ? "new-browser-tab" : null;
+}
+function buildPersistExport(gameKey, fields) {
+  return {
+    gameKey,
+    streamUrl: fields.streamUrl.trim() || null,
+    highlightVideoUrl: fields.highlightVideoUrl.trim() || null,
+    statusOverride: fields.statusOverride || null,
+    viewerMessage: fields.viewerMessage.trim() || null,
+    gameCardUrl: fields.workspaceUrl.trim() || null,
+    navigationMode: serializeNavigationMode(fields.navigationMode)
+  };
+}
+function persistExportsEqual(a2, b2) {
+  return a2.streamUrl === b2.streamUrl && a2.highlightVideoUrl === b2.highlightVideoUrl && a2.statusOverride === b2.statusOverride && a2.viewerMessage === b2.viewerMessage && a2.gameCardUrl === b2.gameCardUrl && a2.navigationMode === b2.navigationMode;
+}
+var useAdminOperationsCardStore = (0, import_zustand3.create)((set, get) => ({
+  fieldsByGameId: {},
+  persistedBaselineFieldsByGameId: {},
+  setField: (gameId, field, value) => {
+    const current = get().fieldsByGameId[gameId] ?? EMPTY_ADMIN_OPERATIONS_CARD_FIELDS;
+    set({
+      fieldsByGameId: {
+        ...get().fieldsByGameId,
+        [gameId]: { ...current, [field]: value }
+      }
+    });
+  },
+  setNavigationMode: (gameId, value) => {
+    const current = get().fieldsByGameId[gameId] ?? EMPTY_ADMIN_OPERATIONS_CARD_FIELDS;
+    set({
+      fieldsByGameId: {
+        ...get().fieldsByGameId,
+        [gameId]: { ...current, navigationMode: value }
+      }
+    });
+  },
+  setStatusOverride: (gameId, value) => {
+    const current = get().fieldsByGameId[gameId] ?? EMPTY_ADMIN_OPERATIONS_CARD_FIELDS;
+    set({
+      fieldsByGameId: {
+        ...get().fieldsByGameId,
+        [gameId]: { ...current, statusOverride: value }
+      }
+    });
+  },
+  hydrateFields: (fieldsByGameId) => {
+    const baseline = cloneFieldsByGameId(fieldsByGameId);
+    set({ fieldsByGameId: baseline, persistedBaselineFieldsByGameId: cloneFieldsByGameId(baseline) });
+  },
+  isDirty: () => get().exportForSave().length > 0,
+  markClean: () => set((state3) => ({
+    persistedBaselineFieldsByGameId: cloneFieldsByGameId(state3.fieldsByGameId)
+  })),
+  exportForSave: () => {
+    const { fieldsByGameId, persistedBaselineFieldsByGameId } = get();
+    const gameIds = /* @__PURE__ */ new Set([
+      ...Object.keys(fieldsByGameId),
+      ...Object.keys(persistedBaselineFieldsByGameId)
+    ]);
+    const records = [];
+    for (const gameKey of gameIds) {
+      const working = buildPersistExport(
+        gameKey,
+        fieldsByGameId[gameKey] ?? EMPTY_ADMIN_OPERATIONS_CARD_FIELDS
+      );
+      const baseline = buildPersistExport(
+        gameKey,
+        persistedBaselineFieldsByGameId[gameKey] ?? EMPTY_ADMIN_OPERATIONS_CARD_FIELDS
+      );
+      if (!persistExportsEqual(working, baseline)) {
+        records.push(working);
+      }
+    }
+    return records;
+  },
+  reset: () => set({ fieldsByGameId: {}, persistedBaselineFieldsByGameId: {} })
+}));
+
+// ../grarf/desktop/src/lib/gameCardNavigation/gameCardNavigation.ts
+function parseGameCardNavigationMode(raw) {
+  return raw === "new-browser-tab" ? "new-browser-tab" : "center-pane";
+}
+function applyGameCardNavigation(game, rawUrl, rawNavigationMode) {
+  if (!isGrarfWebRenderer()) return game;
+  const gameCardUrl = rawUrl?.trim() || game.gameCardUrl?.trim() || "";
+  if (!gameCardUrl) {
+    if (!game.gameCardUrl && !game.gameCardNavigationMode) return game;
+    return { ...game, gameCardUrl: null, gameCardNavigationMode: null };
+  }
+  const gameCardNavigationMode = parseGameCardNavigationMode(
+    rawNavigationMode ?? game.gameCardNavigationMode
+  );
+  if (game.gameCardUrl === gameCardUrl && game.gameCardNavigationMode === gameCardNavigationMode) {
+    return game;
+  }
+  return {
+    ...game,
+    gameCardUrl,
+    gameCardNavigationMode
+  };
+}
+function resolveManualGameCardNavigationTarget(game) {
+  if (!isGrarfWebRenderer()) return null;
+  const fields = useAdminOperationsCardStore.getState().fieldsByGameId[game.id] ?? EMPTY_ADMIN_OPERATIONS_CARD_FIELDS;
+  const url = fields.workspaceUrl.trim();
+  if (!url) return null;
+  return {
+    url,
+    navigationMode: parseGameCardNavigationMode(fields.navigationMode)
+  };
+}
+
+// ../grarf/desktop/src/lib/gamesSpine/resolveManualGameCardNavigationOverride.ts
+init_define_import_meta_env();
+function parseManualGameCardNavigationOverrideFields(source) {
+  const url = source?.centerPaneUrlWhenGameCardClicked?.trim();
+  if (!url) return null;
+  const openInCenterPane = source.centerPane?.trim().toUpperCase() === "Y";
+  const openInBrowserTab = source.browserTab?.trim().toUpperCase() === "Y";
+  if (openInCenterPane === openInBrowserTab) return null;
+  return { url, openInCenterPane, openInBrowserTab };
+}
+function resolveManualGameNavigationOverrideFields(gameKey, operationalDateKey) {
+  const overrides = resolveOperationsDateEntry(operationalDateKey).manualGameOverrides;
+  return overrides[gameKey];
+}
+function resolveEventWideNavigationOverrideFields(game, manualEventOverrides) {
+  const leagueKey = game.league;
+  if (!leagueKey || !(leagueKey in manualEventOverrides)) return void 0;
+  return manualEventOverrides[leagueKey];
+}
+function resolveManualGameCardNavigationOverride(game, operationalDateKey = getOperationalSportsDayDateKey()) {
+  const perGame = parseManualGameCardNavigationOverrideFields(
+    resolveManualGameNavigationOverrideFields(game.id, operationalDateKey)
+  ) ?? (game.grarfGameId ? parseManualGameCardNavigationOverrideFields(
+    resolveManualGameNavigationOverrideFields(game.grarfGameId, operationalDateKey)
+  ) : null);
+  if (perGame) return perGame;
+  const entry = resolveOperationsDateEntry(operationalDateKey);
+  return parseManualGameCardNavigationOverrideFields(
+    resolveEventWideNavigationOverrideFields(game, entry.manualEventOverrides)
+  );
+}
+
+// ../grarf/desktop/src/lib/tennis/resolveTennisGameCardEmbedUrl.ts
 function isTennisLeagueGame(game) {
   return game.league === "ATP" || game.league === "WTA";
 }
 function resolveTennisGameCardEmbedUrl(game) {
   if (!isTennisLeagueGame(game)) return null;
-  const flashscoreUrl = resolveFlashscoreMatchUrl(game);
-  if (flashscoreUrl) return flashscoreUrl;
-  const gameCardUrl = game.gameCardUrl?.trim();
-  if (gameCardUrl && !isEspnGameCardUrl(gameCardUrl)) return gameCardUrl;
-  return null;
+  return resolveFlashscoreMatchUrl(game);
+}
+function resolveEffectiveTennisGameCardUrl(game) {
+  if (!isTennisLeagueGame(game)) return null;
+  const adminOverride = resolveManualGameCardNavigationTarget(game);
+  if (adminOverride?.url.trim()) return adminOverride.url.trim();
+  const manualOverride = resolveManualGameCardNavigationOverride(game);
+  if (manualOverride?.url.trim()) return manualOverride.url.trim();
+  return resolveFlashscoreMatchUrl(game);
+}
+function tennisGameHasEffectiveGameCardUrl(game) {
+  return Boolean(resolveEffectiveTennisGameCardUrl(game));
 }
 
 // ../grarf/desktop/src/lib/espn/espnGameUrls.ts
@@ -25308,7 +25479,7 @@ function getActiveEmbeds() {
 
 // ../grarf/desktop/src/store/tickerEventQueueStore.ts
 init_define_import_meta_env();
-var import_zustand3 = __toESM(require_zustand(), 1);
+var import_zustand4 = __toESM(require_zustand(), 1);
 
 // ../grarf/desktop/src/types/liveSportsTicker.ts
 init_define_import_meta_env();
@@ -25371,7 +25542,7 @@ function toQueued(line, now) {
     displayDurationMs
   };
 }
-var useTickerEventQueue = (0, import_zustand3.create)((set, get) => ({
+var useTickerEventQueue = (0, import_zustand4.create)((set, get) => ({
   events: [],
   enqueueInferred: (lines) => {
     const now = Date.now();
@@ -25769,7 +25940,7 @@ function homeGamesFilterEmptyLabel(filter) {
 
 // ../grarf/desktop/src/store/operationalModeStore.ts
 init_define_import_meta_env();
-var import_zustand4 = __toESM(require_zustand(), 1);
+var import_zustand5 = __toESM(require_zustand(), 1);
 function initialState() {
   const now = Date.now();
   return {
@@ -25788,7 +25959,7 @@ function getInspectableOperationalModeState() {
     manuallyOverridden
   };
 }
-var useOperationalModeStore = (0, import_zustand4.create)((set, get) => ({
+var useOperationalModeStore = (0, import_zustand5.create)((set, get) => ({
   ...initialState(),
   setModeByUser: (mode) => {
     const prev = get();
@@ -30710,8 +30881,8 @@ init_isGrarfWebRenderer();
 
 // ../grarf/desktop/src/store/browserBettingWaitlistStore.ts
 init_define_import_meta_env();
-var import_zustand5 = __toESM(require_zustand(), 1);
-var useBrowserBettingWaitlistStore = (0, import_zustand5.create)((set) => ({
+var import_zustand6 = __toESM(require_zustand(), 1);
+var useBrowserBettingWaitlistStore = (0, import_zustand6.create)((set) => ({
   open: false,
   uiEntryPoint: null,
   openBrowserBettingWaitlist: (uiEntryPoint) => set({ open: true, uiEntryPoint }),
@@ -32139,7 +32310,7 @@ init_isGrarfWebRenderer();
 
 // ../grarf/desktop/src/store/recentFinalizedGamesStore.ts
 init_define_import_meta_env();
-var import_zustand6 = __toESM(require_zustand(), 1);
+var import_zustand7 = __toESM(require_zustand(), 1);
 
 // ../grarf/desktop/src/lib/finalizedGameRetention/harvestFinalizedOnIngestTransition.ts
 init_define_import_meta_env();
@@ -32325,7 +32496,7 @@ function commitById(byId, now = Date.now()) {
   persistById(pruned);
   return pruned;
 }
-var useRecentFinalizedGamesStore = (0, import_zustand6.create)((set, get) => ({
+var useRecentFinalizedGamesStore = (0, import_zustand7.create)((set, get) => ({
   byId: readPersistedById(),
   liveRecencyById: {},
   mergeFinalizedGames: (games, now = Date.now()) => {
@@ -35235,6 +35406,7 @@ var INDYCAR_SCHEDULE_SOURCE = {
   label: "Motorsport.com/Schedule",
   url: "https://www.motorsport.com/indycar/schedule/2026/"
 };
+var INDYCAR_LIVE_YOUTUBE_STREAM_URL = "https://www.youtube.com/live/1nz9hIlXVxQ?si=s5hEeT0YDKvVHOnt";
 var HOME_LEAGUE_WORKSPACE_INDYCAR_LIVE_NAVIGATION = {
   defaultCategoryId: "live",
   categories: [
@@ -35243,9 +35415,9 @@ var HOME_LEAGUE_WORKSPACE_INDYCAR_LIVE_NAVIGATION = {
       label: "LIVE",
       sources: [
         {
-          id: "indycar__live_placeholder",
-          label: "Live",
-          url: ""
+          id: "indycar__live_youtube",
+          label: "IndyCar Live",
+          url: INDYCAR_LIVE_YOUTUBE_STREAM_URL
         }
       ]
     },
@@ -35928,16 +36100,16 @@ init_define_import_meta_env();
 
 // ../grarf/desktop/src/store/homeLeagueWorkspaceStore.ts
 init_define_import_meta_env();
-var import_zustand7 = __toESM(require_zustand(), 1);
-var useHomeLeagueWorkspaceStore = (0, import_zustand7.create)((set) => ({
+var import_zustand8 = __toESM(require_zustand(), 1);
+var useHomeLeagueWorkspaceStore = (0, import_zustand8.create)((set) => ({
   activeId: null,
   setActiveId: (id) => set({ activeId: id })
 }));
 
 // ../grarf/desktop/src/store/homeLeagueWorkspaceMainMenuStore.ts
 init_define_import_meta_env();
-var import_zustand8 = __toESM(require_zustand(), 1);
-var useHomeLeagueWorkspaceMainMenuStore = (0, import_zustand8.create)((set) => ({
+var import_zustand9 = __toESM(require_zustand(), 1);
+var useHomeLeagueWorkspaceMainMenuStore = (0, import_zustand9.create)((set) => ({
   activeCategoryByHub: {},
   setActiveCategory: (hubId, categoryId) => set((state3) => ({
     activeCategoryByHub: { ...state3.activeCategoryByHub, [hubId]: categoryId }
@@ -36014,7 +36186,7 @@ function hasHomeLeagueWorkspaceLiveSession(hubId, leagues) {
 
 // ../grarf/desktop/src/store/liveGamesStore.ts
 init_define_import_meta_env();
-var import_zustand11 = __toESM(require_zustand(), 1);
+var import_zustand12 = __toESM(require_zustand(), 1);
 
 // ../grarf/desktop/src/lib/broadcast/broadcastDebug.ts
 init_define_import_meta_env();
@@ -36582,7 +36754,7 @@ function applyGamesSpineSnapshotStability(incoming, previousLeagues, now = /* @_
 
 // ../grarf/desktop/src/store/gamesSpineRenderStore.ts
 init_define_import_meta_env();
-var import_zustand9 = __toESM(require_zustand(), 1);
+var import_zustand10 = __toESM(require_zustand(), 1);
 init_isGrarfWebRenderer();
 function isCompleteOperationalSnapshot(leagues, meta) {
   if (meta.source === "grarf_cloud") return true;
@@ -36595,7 +36767,7 @@ function isCompleteOperationalSnapshot(leagues, meta) {
   }
   return countLeaguesWithTodaySlate(leagues) > 0;
 }
-var useGamesSpineRenderStore = (0, import_zustand9.create)((set, get) => ({
+var useGamesSpineRenderStore = (0, import_zustand10.create)((set, get) => ({
   operationalReady: true,
   operationalIngestComplete: !isGrarfWebRenderer(),
   /** Manual KV overrides load async — never block the operational spine on them. */
@@ -36628,7 +36800,7 @@ var useGamesSpineRenderStore = (0, import_zustand9.create)((set, get) => ({
 
 // ../grarf/desktop/src/store/canonicalLiveGameStore.ts
 init_define_import_meta_env();
-var import_zustand10 = __toESM(require_zustand(), 1);
+var import_zustand11 = __toESM(require_zustand(), 1);
 
 // ../grarf/desktop/src/services/canonicalLiveGame/normalize.ts
 init_define_import_meta_env();
@@ -36776,7 +36948,7 @@ function touchConsumer(record, consumerId) {
     }
   };
 }
-var useCanonicalLiveGameStore = (0, import_zustand10.create)((set, get) => ({
+var useCanonicalLiveGameStore = (0, import_zustand11.create)((set, get) => ({
   gamesById: {},
   leagues: emptyLeagues(),
   updatedAt: null,
@@ -36861,7 +37033,7 @@ function getCanonicalLiveGameRow(gameId, consumerId) {
 }
 
 // ../grarf/desktop/src/store/liveGamesStore.ts
-var useLiveGamesStore = (0, import_zustand11.create)((set) => ({
+var useLiveGamesStore = (0, import_zustand12.create)((set) => ({
   leagues: useCanonicalLiveGameStore.getState().leagues,
   updatedAt: useCanonicalLiveGameStore.getState().updatedAt,
   hydrate: (snap, completeness) => {
@@ -37074,7 +37246,7 @@ init_define_import_meta_env();
 
 // ../grarf/desktop/src/store/centerPaneApplicationModeStore.ts
 init_define_import_meta_env();
-var import_zustand12 = __toESM(require_zustand(), 1);
+var import_zustand13 = __toESM(require_zustand(), 1);
 
 // ../grarf/desktop/src/lib/home/deriveCenterPaneApplicationMode.ts
 init_define_import_meta_env();
@@ -37352,7 +37524,7 @@ function deriveCenterPaneApplicationModeFromImportantLeagues(leagues, now = /* @
 
 // ../grarf/desktop/src/store/centerPaneApplicationModeStore.ts
 init_isGrarfWebRenderer();
-var useCenterPaneApplicationModeStore = (0, import_zustand12.create)((set) => ({
+var useCenterPaneApplicationModeStore = (0, import_zustand13.create)((set) => ({
   mode: isGrarfWebRenderer() ? "livetracker" : "sportscape",
   source: "operational",
   initialDefaultApplied: isGrarfWebRenderer(),
@@ -37381,7 +37553,7 @@ var useCenterPaneApplicationModeStore = (0, import_zustand12.create)((set) => ({
 
 // ../grarf/desktop/src/store/homeLiveSubmenuStore.ts
 init_define_import_meta_env();
-var import_zustand13 = __toESM(require_zustand(), 1);
+var import_zustand14 = __toESM(require_zustand(), 1);
 
 // ../grarf/desktop/src/types/homeLiveSubmenu.ts
 init_define_import_meta_env();
@@ -37408,7 +37580,7 @@ function consumePendingBrowserLiveSubmenuEntry() {
   pendingBrowserEntrySubmenuId = null;
   return id;
 }
-var useHomeLiveSubmenuStore = (0, import_zustand13.create)((set) => ({
+var useHomeLiveSubmenuStore = (0, import_zustand14.create)((set) => ({
   activeId: HOME_LIVE_SUBMENU_DEFAULT,
   setActiveId: (id) => set({ activeId: id }),
   resetToDefault: () => set({ activeId: HOME_LIVE_SUBMENU_DEFAULT })
@@ -38426,8 +38598,8 @@ function GatedFeatureSearchBar({
 
 // ../grarf/desktop/src/store/centerPaneFeedAlignmentStore.ts
 init_define_import_meta_env();
-var import_zustand14 = __toESM(require_zustand(), 1);
-var useCenterPaneFeedAlignmentStore = (0, import_zustand14.create)((set) => ({
+var import_zustand15 = __toESM(require_zustand(), 1);
+var useCenterPaneFeedAlignmentStore = (0, import_zustand15.create)((set) => ({
   leftPx: null,
   widthPx: null,
   setAlignment: (leftPx, widthPx) => set({ leftPx, widthPx }),
@@ -38760,7 +38932,7 @@ function matchOperationalModeSpineFilter(game, mode) {
 
 // ../grarf/desktop/src/store/editorialStore.ts
 init_define_import_meta_env();
-var import_zustand15 = __toESM(require_zustand(), 1);
+var import_zustand16 = __toESM(require_zustand(), 1);
 
 // ../grarf/desktop/src/lib/editorial/buildFeaturedGamesFromConfig.ts
 init_define_import_meta_env();
@@ -38866,7 +39038,7 @@ function debounced(key2, fn2) {
     }, AUTOSAVE_MS)
   );
 }
-var useEditorialStore = (0, import_zustand15.create)((set, get) => ({
+var useEditorialStore = (0, import_zustand16.create)((set, get) => ({
   bundle: emptyBundle(),
   generationState: {},
   loaded: false,
@@ -38999,7 +39171,7 @@ function mergeGeneratedSummaries(summaries) {
 
 // ../grarf/desktop/src/store/commandBriefingStore.ts
 init_define_import_meta_env();
-var import_zustand16 = __toESM(require_zustand(), 1);
+var import_zustand17 = __toESM(require_zustand(), 1);
 
 // ../grarf/desktop/src/lib/commandBriefing/commandBriefingDates.ts
 init_define_import_meta_env();
@@ -39106,7 +39278,7 @@ function writeSelectedDate(key2) {
   } catch {
   }
 }
-var useCommandBriefingStore = (0, import_zustand16.create)((set) => ({
+var useCommandBriefingStore = (0, import_zustand17.create)((set) => ({
   selectedDate: resolveActiveBriefingDateKey(readSelectedDate()),
   setSelectedDate: (dateKey) => {
     writeSelectedDate(dateKey);
@@ -42338,7 +42510,7 @@ init_define_import_meta_env();
 
 // ../grarf/desktop/src/store/liveTrackerPostsStore.ts
 init_define_import_meta_env();
-var import_zustand21 = __toESM(require_zustand(), 1);
+var import_zustand22 = __toESM(require_zustand(), 1);
 init_isGrarfWebRenderer();
 
 // ../grarf/desktop/src/lib/liveTracker/fetchActiveLiveTrackerPosts.ts
@@ -42346,7 +42518,7 @@ init_define_import_meta_env();
 
 // ../grarf/desktop/src/store/liveTrackerActiveFeedsStore.ts
 init_define_import_meta_env();
-var import_zustand20 = __toESM(require_zustand(), 1);
+var import_zustand21 = __toESM(require_zustand(), 1);
 
 // ../grarf/desktop/src/lib/liveTracker/resolveActiveLiveTrackerFeeds.ts
 init_define_import_meta_env();
@@ -42416,6 +42588,12 @@ var LIVE_TRACKER_FEED_REGISTRY = [
     feedUrl: "https://rss.app/feeds/AWcSHm2UvsyooZd3.xml",
     feedId: "live-tracker-f1",
     label: "Formula 1"
+  },
+  {
+    league: "INDYCAR",
+    feedUrl: "https://rss.app/feeds/P1rkzScNrWflwYgk.xml",
+    feedId: "live-tracker-indycar",
+    label: "IndyCar"
   },
   {
     league: "TDF",
@@ -42606,8 +42784,8 @@ function flattenManualGamesSpineGames(sections) {
 
 // ../grarf/desktop/src/store/gamesSpineManualStore.ts
 init_define_import_meta_env();
-var import_zustand17 = __toESM(require_zustand(), 1);
-var useGamesSpineManualStore = (0, import_zustand17.create)((set) => ({
+var import_zustand18 = __toESM(require_zustand(), 1);
+var useGamesSpineManualStore = (0, import_zustand18.create)((set) => ({
   document: null,
   loadError: null,
   loadedAt: null,
@@ -42789,7 +42967,7 @@ function buildLiveTrackerActiveFeedsSnapshot(liveLeagueKeys, updatedAt = null, c
 
 // ../grarf/desktop/src/store/liveTrackerLiveLeaguesStore.ts
 init_define_import_meta_env();
-var import_zustand19 = __toESM(require_zustand(), 1);
+var import_zustand20 = __toESM(require_zustand(), 1);
 
 // ../grarf/desktop/src/lib/liveTracker/resolveCurrentlyLiveGamesSpineLeagues.ts
 init_define_import_meta_env();
@@ -42870,7 +43048,7 @@ function resolveLiveTrackerRssIngestLeagueKeys(leagues, completedAtMsByLeague, n
 
 // ../grarf/desktop/src/store/liveTrackerLeagueRetentionStore.ts
 init_define_import_meta_env();
-var import_zustand18 = __toESM(require_zustand(), 1);
+var import_zustand19 = __toESM(require_zustand(), 1);
 init_isGrarfWebRenderer();
 
 // ../grarf/desktop/src/lib/livetrack/feed/leagueFeedRegistry.ts
@@ -43542,7 +43720,7 @@ function buildRetainedAtById() {
     ])
   );
 }
-var useLiveTrackerLeagueRetentionStore = (0, import_zustand18.create)((set, get) => ({
+var useLiveTrackerLeagueRetentionStore = (0, import_zustand19.create)((set, get) => ({
   completedAtMsByLeague: readPersistedCompletedAtMsByLeague(Date.now()),
   persistedTrackedGamesById: isGrarfWebRenderer() ? {} : readLiveTrackerTrackedGameScores(),
   syncFromCanonical: (nowMs = Date.now()) => {
@@ -43599,7 +43777,7 @@ function emptySnapshot() {
     updatedAt: null
   };
 }
-var useLiveTrackerLiveLeaguesStore = (0, import_zustand19.create)((set) => ({
+var useLiveTrackerLiveLeaguesStore = (0, import_zustand20.create)((set) => ({
   ...emptySnapshot(),
   syncFromGamesSpine: (nowMs = Date.now()) => {
     const { leagues, updatedAt } = useCanonicalLiveGameStore.getState();
@@ -43643,7 +43821,7 @@ function emptySnapshot2() {
     updatedAt: null
   };
 }
-var useLiveTrackerActiveFeedsStore = (0, import_zustand20.create)((set, get) => ({
+var useLiveTrackerActiveFeedsStore = (0, import_zustand21.create)((set, get) => ({
   ...emptySnapshot2(),
   syncFromLiveLeagues: () => {
     const { leagueKeys, updatedAt } = useLiveTrackerLiveLeaguesStore.getState();
@@ -44205,7 +44383,7 @@ function buildPostRetentionContext() {
 function leagueKeysChanged(a2, b2) {
   return a2.length !== b2.length || a2.some((key2, index) => key2 !== b2[index]);
 }
-var useLiveTrackerPostsStore = (0, import_zustand21.create)((set, get) => ({
+var useLiveTrackerPostsStore = (0, import_zustand22.create)((set, get) => ({
   ...emptySnapshot3(),
   refresh: async () => {
     const retentionContext = buildPostRetentionContext();
@@ -44294,7 +44472,7 @@ function pruneLiveTrackerPostsIfNeeded(retentionContext) {
 
 // ../grarf/desktop/src/store/homeSportscapeHeadlinesStore.ts
 init_define_import_meta_env();
-var import_zustand22 = __toESM(require_zustand(), 1);
+var import_zustand23 = __toESM(require_zustand(), 1);
 
 // ../grarf/desktop/src/data/homeSportscapeHeadlinesFeeds.ts
 init_define_import_meta_env();
@@ -44373,7 +44551,7 @@ async function fetchAllHeadlines() {
   );
   return Object.fromEntries(results);
 }
-var useHomeSportscapeHeadlinesStore = (0, import_zustand22.create)((set, get) => ({
+var useHomeSportscapeHeadlinesStore = (0, import_zustand23.create)((set, get) => ({
   headlinesBySourceId: {},
   loading: true,
   refresh: async () => {
@@ -44401,7 +44579,7 @@ var useHomeSportscapeHeadlinesStore = (0, import_zustand22.create)((set, get) =>
 
 // ../grarf/desktop/src/store/webSignalsFeedStore.ts
 init_define_import_meta_env();
-var import_zustand23 = __toESM(require_zustand(), 1);
+var import_zustand24 = __toESM(require_zustand(), 1);
 
 // ../grarf/desktop/src/lib/social/gameSocialRail/fetchGameSocialRailFeedEvents.ts
 init_define_import_meta_env();
@@ -44688,7 +44866,7 @@ function mergeSignalsFeedEvents(previous, incoming) {
   }
   return merged;
 }
-var useWebSignalsFeedStore = (0, import_zustand23.create)((set, get) => ({
+var useWebSignalsFeedStore = (0, import_zustand24.create)((set, get) => ({
   activeResolution: null,
   events: [],
   loading: false,
@@ -44841,8 +45019,8 @@ var import_react24 = __toESM(require_react(), 1);
 
 // ../grarf/desktop/src/store/briefingPersistenceFallbackStore.ts
 init_define_import_meta_env();
-var import_zustand24 = __toESM(require_zustand(), 1);
-var useBriefingPersistenceFallbackStore = (0, import_zustand24.create)((set) => ({
+var import_zustand25 = __toESM(require_zustand(), 1);
+var useBriefingPersistenceFallbackStore = (0, import_zustand25.create)((set) => ({
   snapshots: {},
   loaded: false,
   setSnapshots: (snapshots) => set({ snapshots, loaded: true }),
@@ -47057,8 +47235,8 @@ function resolveGamePresentationSignals(input) {
 
 // ../grarf/desktop/src/lib/recommendationPresentation/recommendationPresentationStore.ts
 init_define_import_meta_env();
-var import_zustand25 = __toESM(require_zustand(), 1);
-var useRecommendationPresentationStore = (0, import_zustand25.create)(() => ({
+var import_zustand26 = __toESM(require_zustand(), 1);
+var useRecommendationPresentationStore = (0, import_zustand26.create)(() => ({
   syncVersion: 0,
   primaryRecommendationId: null,
   elevatedIds: {},
@@ -47283,6 +47461,32 @@ init_define_import_meta_env();
 
 // ../grarf/desktop/src/lib/youtubeUrl.ts
 init_define_import_meta_env();
+function parseYoutubeTimeParam(t2) {
+  const s2 = t2.trim();
+  if (/^\d+$/.test(s2)) return parseInt(s2, 10);
+  let total = 0;
+  const h2 = s2.match(/(\d+)h/i);
+  const m2 = s2.match(/(\d+)m/i);
+  const sec = s2.match(/(\d+)s/i);
+  if (h2) total += parseInt(h2[1], 10) * 3600;
+  if (m2) total += parseInt(m2[1], 10) * 60;
+  if (sec) total += parseInt(sec[1], 10);
+  return total > 0 ? total : 0;
+}
+function youtubeStartSecondsFromUrl(raw) {
+  try {
+    const u2 = new URL(raw);
+    const t2 = u2.searchParams.get("t") ?? u2.searchParams.get("start");
+    if (t2) return parseYoutubeTimeParam(t2);
+    const hashT = u2.hash.match(/[?&]t=([^&]+)/i)?.[1];
+    if (hashT) return parseYoutubeTimeParam(decodeURIComponent(hashT));
+  } catch {
+  }
+  return 0;
+}
+function isYoutubeEmbedPath(pathname) {
+  return /\/embed\/[\w-]+/.test(pathname);
+}
 function youtubeVideoIdFromUrl(raw) {
   try {
     const u2 = new URL(raw);
@@ -47294,8 +47498,12 @@ function youtubeVideoIdFromUrl(raw) {
     if (host.includes("youtube.com")) {
       const v2 = u2.searchParams.get("v");
       if (v2 && /^[\w-]{6,32}$/.test(v2)) return v2;
-      const m2 = u2.pathname.match(/\/shorts\/([\w-]+)/);
-      if (m2?.[1]) return m2[1];
+      const shorts = u2.pathname.match(/\/shorts\/([\w-]+)/);
+      if (shorts?.[1]) return shorts[1];
+      const live = u2.pathname.match(/\/live\/([\w-]+)/);
+      if (live?.[1] && /^[\w-]{6,32}$/.test(live[1])) return live[1];
+      const embed = u2.pathname.match(/\/embed\/([\w-]+)/);
+      if (embed?.[1] && /^[\w-]{6,32}$/.test(embed[1])) return embed[1];
     }
   } catch {
   }
@@ -47326,6 +47534,29 @@ function buildYoutubeIframeEmbedSrc(videoId, opts) {
   }
   const start = opts?.start;
   if (start != null && start > 0) params.set("start", String(start));
+  return `https://www.youtube.com/embed/${encodeURIComponent(videoId)}?${params.toString()}`;
+}
+function toYoutubeStreamEmbedUrl(raw) {
+  try {
+    const u2 = new URL(raw);
+    if (u2.hostname.replace(/^www\./, "").includes("youtube.com") && isYoutubeEmbedPath(u2.pathname)) {
+      return null;
+    }
+  } catch {
+  }
+  const videoId = youtubeVideoIdFromUrl(raw);
+  if (!videoId) return null;
+  const params = new URLSearchParams({
+    autoplay: "1",
+    rel: "0",
+    modestbranding: "1",
+    playsinline: "1",
+    controls: "1",
+    fs: "1",
+    iv_load_policy: "3"
+  });
+  const start = youtubeStartSecondsFromUrl(raw);
+  if (start > 0) params.set("start", String(start));
   return `https://www.youtube.com/embed/${encodeURIComponent(videoId)}?${params.toString()}`;
 }
 function resolveWorkspaceEmbedUrl(raw) {
@@ -48909,107 +49140,6 @@ function logWnbaWatchLiveClicked(game) {
 
 // ../grarf/desktop/src/lib/watch/handleWatchLiveClick.ts
 init_isGrarfWebRenderer();
-
-// ../grarf/desktop/src/store/adminOperationsCardStore.ts
-init_define_import_meta_env();
-var import_zustand26 = __toESM(require_zustand(), 1);
-var EMPTY_ADMIN_OPERATIONS_CARD_FIELDS = {
-  workspaceUrl: "",
-  navigationMode: "center-pane",
-  streamUrl: "",
-  highlightVideoUrl: "",
-  statusOverride: "",
-  viewerMessage: "",
-  operatorNote: ""
-};
-function cloneFieldsByGameId(source) {
-  const out = {};
-  for (const [gameId, fields] of Object.entries(source)) {
-    out[gameId] = { ...fields };
-  }
-  return out;
-}
-function serializeNavigationMode(mode) {
-  return mode === "new-browser-tab" ? "new-browser-tab" : null;
-}
-function buildPersistExport(gameKey, fields) {
-  return {
-    gameKey,
-    streamUrl: fields.streamUrl.trim() || null,
-    highlightVideoUrl: fields.highlightVideoUrl.trim() || null,
-    statusOverride: fields.statusOverride || null,
-    viewerMessage: fields.viewerMessage.trim() || null,
-    gameCardUrl: fields.workspaceUrl.trim() || null,
-    navigationMode: serializeNavigationMode(fields.navigationMode)
-  };
-}
-function persistExportsEqual(a2, b2) {
-  return a2.streamUrl === b2.streamUrl && a2.highlightVideoUrl === b2.highlightVideoUrl && a2.statusOverride === b2.statusOverride && a2.viewerMessage === b2.viewerMessage && a2.gameCardUrl === b2.gameCardUrl && a2.navigationMode === b2.navigationMode;
-}
-var useAdminOperationsCardStore = (0, import_zustand26.create)((set, get) => ({
-  fieldsByGameId: {},
-  persistedBaselineFieldsByGameId: {},
-  setField: (gameId, field, value) => {
-    const current = get().fieldsByGameId[gameId] ?? EMPTY_ADMIN_OPERATIONS_CARD_FIELDS;
-    set({
-      fieldsByGameId: {
-        ...get().fieldsByGameId,
-        [gameId]: { ...current, [field]: value }
-      }
-    });
-  },
-  setNavigationMode: (gameId, value) => {
-    const current = get().fieldsByGameId[gameId] ?? EMPTY_ADMIN_OPERATIONS_CARD_FIELDS;
-    set({
-      fieldsByGameId: {
-        ...get().fieldsByGameId,
-        [gameId]: { ...current, navigationMode: value }
-      }
-    });
-  },
-  setStatusOverride: (gameId, value) => {
-    const current = get().fieldsByGameId[gameId] ?? EMPTY_ADMIN_OPERATIONS_CARD_FIELDS;
-    set({
-      fieldsByGameId: {
-        ...get().fieldsByGameId,
-        [gameId]: { ...current, statusOverride: value }
-      }
-    });
-  },
-  hydrateFields: (fieldsByGameId) => {
-    const baseline = cloneFieldsByGameId(fieldsByGameId);
-    set({ fieldsByGameId: baseline, persistedBaselineFieldsByGameId: cloneFieldsByGameId(baseline) });
-  },
-  isDirty: () => get().exportForSave().length > 0,
-  markClean: () => set((state3) => ({
-    persistedBaselineFieldsByGameId: cloneFieldsByGameId(state3.fieldsByGameId)
-  })),
-  exportForSave: () => {
-    const { fieldsByGameId, persistedBaselineFieldsByGameId } = get();
-    const gameIds = /* @__PURE__ */ new Set([
-      ...Object.keys(fieldsByGameId),
-      ...Object.keys(persistedBaselineFieldsByGameId)
-    ]);
-    const records = [];
-    for (const gameKey of gameIds) {
-      const working = buildPersistExport(
-        gameKey,
-        fieldsByGameId[gameKey] ?? EMPTY_ADMIN_OPERATIONS_CARD_FIELDS
-      );
-      const baseline = buildPersistExport(
-        gameKey,
-        persistedBaselineFieldsByGameId[gameKey] ?? EMPTY_ADMIN_OPERATIONS_CARD_FIELDS
-      );
-      if (!persistExportsEqual(working, baseline)) {
-        records.push(working);
-      }
-    }
-    return records;
-  },
-  reset: () => set({ fieldsByGameId: {}, persistedBaselineFieldsByGameId: {} })
-}));
-
-// ../grarf/desktop/src/lib/watch/handleWatchLiveClick.ts
 function isStrongSingleOption(options) {
   if (options.length !== 1) return null;
   const o2 = options[0];
@@ -50079,42 +50209,6 @@ var import_react38 = __toESM(require_react(), 1);
 
 // ../grarf/desktop/src/lib/gamesSpine/applyCanonicalGamesSpineEnrichment.ts
 init_define_import_meta_env();
-
-// ../grarf/desktop/src/lib/gameCardNavigation/gameCardNavigation.ts
-init_define_import_meta_env();
-init_isGrarfWebRenderer();
-function parseGameCardNavigationMode(raw) {
-  return raw === "new-browser-tab" ? "new-browser-tab" : "center-pane";
-}
-function applyGameCardNavigation(game, rawUrl, rawNavigationMode) {
-  if (!isGrarfWebRenderer()) return game;
-  const gameCardUrl = rawUrl?.trim() || game.gameCardUrl?.trim() || "";
-  if (!gameCardUrl) {
-    if (!game.gameCardUrl && !game.gameCardNavigationMode) return game;
-    return { ...game, gameCardUrl: null, gameCardNavigationMode: null };
-  }
-  const gameCardNavigationMode = parseGameCardNavigationMode(
-    rawNavigationMode ?? game.gameCardNavigationMode
-  );
-  if (game.gameCardUrl === gameCardUrl && game.gameCardNavigationMode === gameCardNavigationMode) {
-    return game;
-  }
-  return {
-    ...game,
-    gameCardUrl,
-    gameCardNavigationMode
-  };
-}
-function resolveManualGameCardNavigationTarget(game) {
-  if (!isGrarfWebRenderer()) return null;
-  const fields = useAdminOperationsCardStore.getState().fieldsByGameId[game.id] ?? EMPTY_ADMIN_OPERATIONS_CARD_FIELDS;
-  const url = fields.workspaceUrl.trim();
-  if (!url) return null;
-  return {
-    url,
-    navigationMode: parseGameCardNavigationMode(fields.navigationMode)
-  };
-}
 
 // ../grarf/desktop/src/lib/gameHighlights/canonicalGameHighlight.ts
 init_define_import_meta_env();
@@ -61661,6 +61755,13 @@ function resolveHomeSourceEmbedUrl(url) {
   const trimmed = url.trim();
   return trimmed || url;
 }
+function resolveHomeSourceYoutubeIframeEmbedSrc(url) {
+  const embedSrc = toYoutubeStreamEmbedUrl(url);
+  if (!embedSrc) return null;
+  const parsed = new URL(embedSrc);
+  parsed.searchParams.set("mute", "1");
+  return parsed.toString();
+}
 
 // ../grarf/desktop/src/lib/home/homeSourceFocusArticleNavigation.ts
 init_define_import_meta_env();
@@ -62265,7 +62366,13 @@ function HomeSourceWebPane({
 }) {
   const embedHostRef = (0, import_react74.useRef)(null);
   const hasEmbedUrl = Boolean(source.url?.trim());
+  const youtubeIframeEmbedSrc = (0, import_react74.useMemo)(
+    () => resolveHomeSourceYoutubeIframeEmbedSrc(source.url ?? ""),
+    [source.url]
+  );
+  const isYoutubeIframeEmbed = youtubeIframeEmbedSrc != null;
   const showEmbed = mountWebview && hasEmbedUrl;
+  const showWebviewEmbed = showEmbed && !isYoutubeIframeEmbed;
   const isBorrowed = useHomeSourceFocusStore(
     (state3) => state3.borrowedCardWebviewKeys[sessionKey] ?? false
   );
@@ -62284,7 +62391,7 @@ function HomeSourceWebPane({
   }, [showEmbed]);
   (0, import_react74.useLayoutEffect)(() => {
     const host = embedHostRef.current;
-    if (!showEmbed || !host) {
+    if (!showWebviewEmbed || !host) {
       registerHomeSourceCardHost(sessionKey, null);
       return;
     }
@@ -62295,7 +62402,7 @@ function HomeSourceWebPane({
     return () => {
       registerHomeSourceCardHost(sessionKey, null);
     };
-  }, [sessionKey, showEmbed, embedSrc, partition, isBorrowed]);
+  }, [sessionKey, showWebviewEmbed, embedSrc, partition, isBorrowed]);
   const onNavHome = (0, import_react74.useCallback)(() => {
     const wv = getHomeSourceCardWebview(sessionKey);
     if (!wv || !embedSrc) return;
@@ -62333,8 +62440,8 @@ function HomeSourceWebPane({
             label: source.label,
             siteUrl: source.url,
             className: !hasEmbedUrl ? "border-b border-[#24363c]/55" : void 0,
-            leading: showEmbed ? /* @__PURE__ */ (0, import_jsx_runtime49.jsx)(WebsitePaneBrowserControls, { onHome: onNavHome }) : void 0,
-            center: showEmbed ? /* @__PURE__ */ (0, import_jsx_runtime49.jsx)(WebsitePaneBrowsingLayoutIndicator, {}) : void 0,
+            leading: showWebviewEmbed ? /* @__PURE__ */ (0, import_jsx_runtime49.jsx)(WebsitePaneBrowserControls, { onHome: onNavHome }) : void 0,
+            center: showWebviewEmbed ? /* @__PURE__ */ (0, import_jsx_runtime49.jsx)(WebsitePaneBrowsingLayoutIndicator, {}) : void 0,
             right: isWebFullscreen ? /* @__PURE__ */ (0, import_jsx_runtime49.jsx)(
               "button",
               {
@@ -62362,7 +62469,18 @@ function HomeSourceWebPane({
             ) : void 0
           }
         ),
-        /* @__PURE__ */ (0, import_jsx_runtime49.jsx)("div", { className: cn2(PANE_CONTENT_CONTAIN, "relative min-h-0 flex-1 bg-black"), children: hasEmbedUrl ? /* @__PURE__ */ (0, import_jsx_runtime49.jsx)(
+        /* @__PURE__ */ (0, import_jsx_runtime49.jsx)("div", { className: cn2(PANE_CONTENT_CONTAIN, "relative min-h-0 flex-1 bg-black"), children: hasEmbedUrl ? isYoutubeIframeEmbed ? /* @__PURE__ */ (0, import_jsx_runtime49.jsx)(
+          "iframe",
+          {
+            title: source.label,
+            src: youtubeIframeEmbedSrc,
+            className: cn2(PANE_EMBED_HOST, "h-full w-full border-0"),
+            allow: "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share",
+            allowFullScreen: true,
+            loading: "lazy",
+            referrerPolicy: "strict-origin-when-cross-origin"
+          }
+        ) : /* @__PURE__ */ (0, import_jsx_runtime49.jsx)(
           "div",
           {
             ref: embedHostRef,
@@ -66461,6 +66579,7 @@ function GamesSpineHomeParityGameRow({
   const scheduleLabel = resolveCommandBriefingScheduleLabel(game);
   const athleteMatch = isTennisGame(game) || isUfcGame(game);
   const showWatch = showWatchLive || showDemoNhlWatchLive;
+  const hasEffectiveGameCardUrl = !isTennisGame(game) || tennisGameHasEffectiveGameCardUrl(game);
   const statusSupplement = presentation.operationalSupplement ? /* @__PURE__ */ (0, import_jsx_runtime80.jsx)("div", { className: "text-[8px] tracking-[0.35em] text-textdim/70", children: presentation.operationalSupplement }) : game.status === "scheduled" && presentation.operationalContext ? /* @__PURE__ */ (0, import_jsx_runtime80.jsx)("div", { className: "truncate text-[9px] tracking-wide text-ambersys/90", children: presentation.operationalContext }) : null;
   const awayPitcher = pitcherShort(game.awayPitcher);
   const homePitcher = pitcherShort(game.homePitcher);
@@ -66516,10 +66635,10 @@ function GamesSpineHomeParityGameRow({
         e2.stopPropagation();
         onWatchLive(game.id);
       },
-      onFollowLive: (e2) => {
+      onFollowLive: hasEffectiveGameCardUrl ? (e2) => {
         e2.stopPropagation();
         onOpen(game.id, game);
-      },
+      } : void 0,
       statusSupplement,
       matchupFooter,
       afterCard,
@@ -67188,6 +67307,7 @@ function GameRow({
   const gamesDisplayMode = useGamesSpineDisplayStore((state3) => state3.gamesMode);
   const isWebHomeSpineParity = isRail && homeSpineParity && isGrarfWebRenderer();
   const isCompactSpineRow = isWebHomeSpineParity && gamesDisplayMode === "compact" && !exemptFromCompactGamesMode;
+  const gameCardClickable = !isTennisGame(game) || tennisGameHasEffectiveGameCardUrl(game);
   const renderRailMatchup = (className) => /* @__PURE__ */ (0, import_jsx_runtime84.jsx)(GamesSpineMatchupStack, { game, className });
   const [boardTopSide, boardBottomSide] = game.league === "AFL" ? resolveGamesSpineMatchupSideOrder(game) : ["away", "home"];
   const boardSideTeamName = {
@@ -67221,17 +67341,18 @@ function GameRow({
   return /* @__PURE__ */ (0, import_jsx_runtime84.jsx)(
     "article",
     {
-      role: "button",
-      tabIndex: 0,
-      onClick: () => onOpen(game.id, game),
-      onKeyDown: (e2) => {
+      role: gameCardClickable ? "button" : void 0,
+      tabIndex: gameCardClickable ? 0 : void 0,
+      onClick: gameCardClickable ? () => onOpen(game.id, game) : void 0,
+      onKeyDown: gameCardClickable ? (e2) => {
         if (e2.key === "Enter" || e2.key === " ") {
           e2.preventDefault();
           onOpen(game.id, game);
         }
-      },
+      } : void 0,
       className: cn2(
-        "group cursor-pointer font-mono transition duration-200",
+        "group font-mono transition duration-200",
+        gameCardClickable && "cursor-pointer",
         isRail ? cn2(
           GAMES_SPINE_ROW_WIDTH_BOUND,
           homeSpineParity ? cn2(
@@ -85944,40 +86065,6 @@ function tryOpenF1GameRowInBrowser(game) {
 // ../grarf/desktop/src/lib/gamesSpine/tryOpenManualGameCardNavigationOverride.ts
 init_define_import_meta_env();
 init_isGrarfWebRenderer();
-
-// ../grarf/desktop/src/lib/gamesSpine/resolveManualGameCardNavigationOverride.ts
-init_define_import_meta_env();
-function parseManualGameCardNavigationOverrideFields(source) {
-  const url = source?.centerPaneUrlWhenGameCardClicked?.trim();
-  if (!url) return null;
-  const openInCenterPane = source.centerPane?.trim().toUpperCase() === "Y";
-  const openInBrowserTab = source.browserTab?.trim().toUpperCase() === "Y";
-  if (openInCenterPane === openInBrowserTab) return null;
-  return { url, openInCenterPane, openInBrowserTab };
-}
-function resolveManualGameNavigationOverrideFields(gameKey, operationalDateKey) {
-  const overrides = resolveOperationsDateEntry(operationalDateKey).manualGameOverrides;
-  return overrides[gameKey];
-}
-function resolveEventWideNavigationOverrideFields(game, manualEventOverrides) {
-  const leagueKey = game.league;
-  if (!leagueKey || !(leagueKey in manualEventOverrides)) return void 0;
-  return manualEventOverrides[leagueKey];
-}
-function resolveManualGameCardNavigationOverride(game, operationalDateKey = getOperationalSportsDayDateKey()) {
-  const perGame = parseManualGameCardNavigationOverrideFields(
-    resolveManualGameNavigationOverrideFields(game.id, operationalDateKey)
-  ) ?? (game.grarfGameId ? parseManualGameCardNavigationOverrideFields(
-    resolveManualGameNavigationOverrideFields(game.grarfGameId, operationalDateKey)
-  ) : null);
-  if (perGame) return perGame;
-  const entry = resolveOperationsDateEntry(operationalDateKey);
-  return parseManualGameCardNavigationOverrideFields(
-    resolveEventWideNavigationOverrideFields(game, entry.manualEventOverrides)
-  );
-}
-
-// ../grarf/desktop/src/lib/gamesSpine/tryOpenManualGameCardNavigationOverride.ts
 function tryOpenManualGameCardNavigationOverride(game, dispatch) {
   if (!isGrarfWebRenderer()) return false;
   const override = resolveManualGameCardNavigationOverride(game);
@@ -86013,6 +86100,23 @@ function tryOpenTourDeFranceGameRowInLeagueWorkspace(game) {
   const categoryId = isGameActivelyLive(refreshed) ? "live" : "news";
   useHomeLeagueWorkspaceMainMenuStore.getState().setActiveCategory(TOUR_DE_FRANCE_HUB_ID, categoryId);
   openHomeLeagueWorkspace(TOUR_DE_FRANCE_HUB_ID);
+  return true;
+}
+
+// ../grarf/desktop/src/lib/gamesSpine/tryOpenIndyCarLiveGameRowInLeagueWorkspace.ts
+init_define_import_meta_env();
+init_isGrarfWebRenderer();
+var INDYCAR_HUB_ID = "indycar";
+var INDYCAR_LIVE_CATEGORY_ID = "live";
+function isIndyCarLiveLeagueWorkspaceNavigationTarget(game) {
+  return game.league === "INDYCAR" && isGameActivelyLive(game);
+}
+function tryOpenIndyCarLiveGameRowInLeagueWorkspace(game) {
+  if (!isGrarfWebRenderer()) return false;
+  if (!isIndyCarLiveLeagueWorkspaceNavigationTarget(game)) return false;
+  clearCenterEmbedForSpineGameSelect();
+  useHomeLeagueWorkspaceMainMenuStore.getState().setActiveCategory(INDYCAR_HUB_ID, INDYCAR_LIVE_CATEGORY_ID);
+  openHomeLeagueWorkspace(INDYCAR_HUB_ID);
   return true;
 }
 
@@ -86184,6 +86288,7 @@ function openGamesSpineRowInWorkspace(game, dispatch) {
   if (tryOpenOperationsWorkspaceNavigation(game, dispatch)) return;
   if (tryOpenManualGameCardNavigationOverride(game, dispatch)) return;
   if (tryOpenTourDeFranceGameRowInLeagueWorkspace(game)) return;
+  if (tryOpenIndyCarLiveGameRowInLeagueWorkspace(game)) return;
   if (tryOpenF1GameRowInBrowser(game)) return;
   if (tryOpenMcwsGameRowInBrowser(game)) return;
   if (tryOpenNbaSummerLeagueGameRowInBrowser(game)) return;
@@ -86192,6 +86297,7 @@ function openGamesSpineRowInWorkspace(game, dispatch) {
   if (tryOpenGolfGameRowInBrowser(game)) return;
   if (openWimbledonGamesSpineRow(game, dispatch)) return;
   if (tryOpenWnbaGameRowInBrowser(game)) return;
+  if (isTennisLeagueGame(game) && !resolveTennisGameCardEmbedUrl(game)) return;
   const tab = buildGameWorkspaceTabForRow(game);
   if (!tab) return;
   prepareDesktopWnbaGameCenterBrowserPane(game);
