@@ -27,6 +27,7 @@ import { isSportscapeAdminAuthed } from "../../grarf/desktop/src/lib/sportscape/
 import { useAdminModeStore } from "../../grarf/desktop/src/store/adminModeStore";
 import { resolveCenterPaneApplicationModeFromPath } from "../../grarf/desktop/src/lib/home/resolveCenterPaneApplicationModeFromPath";
 import { hydrateOperationalGameOverridesFromPersistence } from "../../grarf/desktop/src/lib/operationsSpine/hydrateOperationalGameOverrides";
+import { hydrateOperationalLiveWorkspaceFromPersistence } from "../../grarf/desktop/src/lib/operationsSpine/hydrateOperationalLiveWorkspace";
 
 let reactRoot: Root | null = null;
 
@@ -157,6 +158,7 @@ const autoRoot = document.getElementById("grarf-web-root");
 if (autoRoot) {
   void (async () => {
     await hydrateOperationalGameOverridesFromPersistence();
+    await hydrateOperationalLiveWorkspaceFromPersistence();
     // Returning admin.html visitors with a valid session token boot straight into
     // Operations Spine; first-time visitors authenticate via AdminEntryPasswordGate.
     if (isAdminHtmlEntry() && isSportscapeAdminAuthed()) {

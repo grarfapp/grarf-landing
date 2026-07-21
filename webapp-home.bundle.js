@@ -31054,6 +31054,7 @@ var GRARF_LEAGUE_KEY_NAV_ITEM_ID = {
   LIGUE1: "ligue-1",
   BUNDESLIGA: "bundesliga",
   BRA1: "brasileirao",
+  SUDAMERICANA: "copa-sudamericana",
   UCL: "ucl",
   UEL: "uel",
   WORLDCUP: "fifa-world-cup",
@@ -31759,6 +31760,10 @@ init_define_import_meta_env();
 init_define_import_meta_env();
 var BRA1_LEAGUE_LOGO_URL = "/league-logos/brasileirao.png";
 
+// ../grarf/desktop/src/lib/gamesSpine/copaSudamericanaLeagueLogoUrl.ts
+init_define_import_meta_env();
+var COPA_SUDAMERICANA_LEAGUE_LOGO_URL = "/league-logos/copa-sudamericana.png";
+
 // ../grarf/desktop/src/lib/gamesSpine/mcwsLeagueLogoUrl.ts
 init_define_import_meta_env();
 var MCWS_LEAGUE_LOGO_URL = "https://upload.wikimedia.org/wikipedia/en/c/c2/Cws_logo_new_ncaa2016.png";
@@ -31943,6 +31948,7 @@ var GAMES_SPINE_LEAGUE_LOGO_URL = {
   USLC: "/league-logos/usl-championship.png",
   BUNDESLIGA: "https://a.espncdn.com/i/leaguelogos/soccer/500/10.png",
   BRA1: BRA1_LEAGUE_LOGO_URL,
+  SUDAMERICANA: COPA_SUDAMERICANA_LEAGUE_LOGO_URL,
   UCL: UCL_LEAGUE_LOGO_URL,
   UEL: "https://a.espncdn.com/i/leaguelogos/soccer/500/2310.png",
   WWC: "https://a.espncdn.com/i/leaguelogos/soccer/500/60.png",
@@ -36580,10 +36586,17 @@ function operationsLiveWorkspaceItemsToHomeSources(items) {
 }
 function readLiveWorkspaceItemsByLeagueKey(itemsByLeagueKey) {
   const fromStore = useAdminOperationsLiveWorkspaceStore.getState().itemsByLeagueKey;
-  if (Object.keys(fromStore).length > 0) {
-    return fromStore;
+  const fromProp = itemsByLeagueKey ?? {};
+  const keys = /* @__PURE__ */ new Set([...Object.keys(fromStore), ...Object.keys(fromProp)]);
+  if (keys.size === 0) return fromStore;
+  const merged = {};
+  for (const key2 of keys) {
+    const storeItems = fromStore[key2];
+    const propItems = fromProp[key2];
+    if (storeItems?.length) merged[key2] = storeItems;
+    else if (propItems?.length) merged[key2] = propItems;
   }
-  return itemsByLeagueKey ?? fromStore;
+  return merged;
 }
 function resolveLiveWorkspaceTabSourcesForHub(hubId, itemsByLeagueKey) {
   const leagueKey = resolveHomeLeagueWorkspaceGrarfLeagueKey(hubId);
@@ -61265,7 +61278,12 @@ function mapOperationalLiveWorkspaceDocumentToStore(document2) {
 async function hydrateOperationalLiveWorkspaceFromPersistence() {
   try {
     const document2 = await fetchLeagueLiveWorkspaceDocument();
-    useAdminOperationsLiveWorkspaceStore.getState().hydrateLeagues(mapOperationalLiveWorkspaceDocumentToStore(document2));
+    const mapped = mapOperationalLiveWorkspaceDocumentToStore(document2);
+    const current = useAdminOperationsLiveWorkspaceStore.getState().itemsByLeagueKey;
+    if (Object.keys(mapped).length === 0 && Object.keys(current).length > 0) {
+      return;
+    }
+    useAdminOperationsLiveWorkspaceStore.getState().hydrateLeagues(mapped);
   } catch {
   }
 }
@@ -63701,6 +63719,9 @@ function HomeLeagueHubWorkspaceSurface({
   onSourceFullscreen
 }) {
   (0, import_react83.useEffect)(() => {
+    if (Object.keys(useAdminOperationsLiveWorkspaceStore.getState().itemsByLeagueKey).length > 0) {
+      return;
+    }
     void hydrateOperationalLiveWorkspaceFromPersistence();
   }, [hubId]);
   return /* @__PURE__ */ (0, import_jsx_runtime56.jsx)(
@@ -99614,6 +99635,7 @@ var autoRoot = document.getElementById("grarf-web-root");
 if (autoRoot) {
   void (async () => {
     await hydrateOperationalGameOverridesFromPersistence();
+    await hydrateOperationalLiveWorkspaceFromPersistence();
     if (isAdminHtmlEntry() && isSportscapeAdminAuthed()) {
       activateAdminEntry();
     }
