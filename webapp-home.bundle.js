@@ -14654,7 +14654,10 @@ var OPERATIONS = {
 // ../grarf/desktop/shared/operationalSlateDate.js
 init_define_import_meta_env();
 
-// ../grarf/desktop/shared/golfTournamentDate.js
+// ../grarf/shared/utils/operationalSlateDate.js
+init_define_import_meta_env();
+
+// ../grarf/shared/utils/golfTournamentDate.js
 init_define_import_meta_env();
 var GOLF_TOURNAMENT_DAY_TIMEZONE = "America/New_York";
 var GOLF_LEAGUE_KEYS = /* @__PURE__ */ new Set(["PGA", "LPGA", "LIV", "CHAMPIONS"]);
@@ -14675,7 +14678,7 @@ function formatGolfScheduledDayLabel(dateKey) {
   });
 }
 
-// ../grarf/desktop/shared/operationalSlateDate.js
+// ../grarf/shared/utils/operationalSlateDate.js
 var GRARF_OPERATIONAL_SLATE_TIMEZONE = "America/Chicago";
 var OPERATIONAL_SLATE_NEXT_DAY_CUTOFF_HOUR = 6;
 var OPERATIONAL_SPORTS_DAY_ROLLOVER_HOUR = 4;
@@ -24559,6 +24562,9 @@ init_define_import_meta_env();
 
 // ../grarf/desktop/shared/grarfSportHierarchy.js
 init_define_import_meta_env();
+
+// ../grarf/shared/config/grarfSportHierarchy.js
+init_define_import_meta_env();
 var GRARF_SPORT_HIERARCHY = {
   soccer: {
     title: "SOCCER",
@@ -25660,6 +25666,9 @@ init_define_import_meta_env();
 
 // ../grarf/desktop/shared/espnPausedCompetitionStatus.js
 init_define_import_meta_env();
+
+// ../grarf/shared/utils/espnPausedCompetitionStatus.js
+init_define_import_meta_env();
 var ESPN_PAUSED_STATUS_NAMES = /* @__PURE__ */ new Set([
   "STATUS_SUSPENDED",
   "STATUS_DELAYED",
@@ -26550,6 +26559,9 @@ init_isGrarfWebRenderer();
 init_define_import_meta_env();
 
 // ../grarf/desktop/shared/streamingProviders.js
+init_define_import_meta_env();
+
+// ../grarf/shared/config/streamingProviders.js
 init_define_import_meta_env();
 var DEFAULT_EMBED_CENTER_PARTITION = "persist:grarf-center";
 var INTELLIGENCE_EMBED_PARTITION = "persist:grarf-intelligence";
@@ -31778,6 +31790,9 @@ var THE_OPEN_LEAGUE_LOGO_URL = "/league-logos/the-open.png";
 
 // ../grarf/desktop/shared/golfWatchUrls.js
 init_define_import_meta_env();
+
+// ../grarf/shared/utils/golfWatchUrls.js
+init_define_import_meta_env();
 var PGA_TOUR_LEADERBOARD_URL = "https://www.pgatour.com/leaderboard";
 var LPGA_TOUR_LEADERBOARD_URL = "https://www.lpga.com/leaderboard";
 var PGA_TOUR_CHAMPIONS_LEADERBOARD_URL = "https://www.pgatour.com/pgatour-champions/leaderboard";
@@ -32072,6 +32087,9 @@ init_define_import_meta_env();
 init_define_import_meta_env();
 
 // ../grarf/desktop/shared/espnWatchBroadcast.js
+init_define_import_meta_env();
+
+// ../grarf/shared/utils/espnWatchBroadcast.js
 init_define_import_meta_env();
 var ESPN_PLUS_LABEL = /espn\s*\+|espn\s*plus|espn\s*unlimited|espn\s*unlmtd/i;
 function isEspnPlusBroadcastLabel(label) {
@@ -36648,6 +36666,9 @@ init_define_import_meta_env();
 
 // ../grarf/desktop/shared/espnOperationalIngestDisabledLeagues.js
 init_define_import_meta_env();
+
+// ../grarf/shared/config/espnOperationalIngestDisabledLeagues.js
+init_define_import_meta_env();
 var ESPN_OPERATIONAL_INGEST_DISABLED_LEAGUE_KEYS = /* @__PURE__ */ new Set(["LIV"]);
 function isEspnOperationalIngestLeagueDisabled(key2) {
   return ESPN_OPERATIONAL_INGEST_DISABLED_LEAGUE_KEYS.has(String(key2));
@@ -37707,6 +37728,9 @@ init_define_import_meta_env();
 init_define_import_meta_env();
 
 // ../grarf/desktop/shared/mcwsEspnCatchupSeasonFilter.js
+init_define_import_meta_env();
+
+// ../grarf/shared/utils/mcwsEspnCatchupSeasonFilter.js
 init_define_import_meta_env();
 var MCWS_ACCEPTED_SEASON_SLUGS = /* @__PURE__ */ new Set(["world-series", "championship-series"]);
 function readMcwsSeasonSlug(event) {
@@ -50758,6 +50782,9 @@ init_define_import_meta_env();
 
 // ../grarf/desktop/shared/eventPriority/eventPrioritySeed.js
 init_define_import_meta_env();
+
+// ../grarf/shared/domain/eventPriority/eventPrioritySeed.js
+init_define_import_meta_env();
 var EVENT_PRIORITY_ORDER = [
   { league: "PGA", title: "The Open" }
 ];
@@ -50766,6 +50793,9 @@ function getEventPriorityOrder() {
 }
 
 // ../grarf/desktop/shared/eventPriority/eventPriorityService.js
+init_define_import_meta_env();
+
+// ../grarf/shared/domain/eventPriority/eventPriorityService.js
 init_define_import_meta_env();
 var EVENT_REPOSITORY_LEAGUE_ALIASES = {
   "PGA TOUR": "PGA",
@@ -51271,6 +51301,9 @@ init_define_import_meta_env();
 
 // ../grarf/desktop/shared/motorsportLeagues.js
 init_define_import_meta_env();
+
+// ../grarf/shared/config/motorsportLeagues.js
+init_define_import_meta_env();
 var MOTORSPORT_SESSION_LEAGUES = /* @__PURE__ */ new Set(["F1", "F2", "F3", "FORMULA_E"]);
 var MOTORSPORT_STANDALONE_LEAGUES = /* @__PURE__ */ new Set([
   "NASCAR",
@@ -51610,6 +51643,9 @@ init_operationalIngestConfig();
 
 // ../grarf/desktop/shared/youtubeCanonicalThumbnail.ts
 init_define_import_meta_env();
+
+// ../grarf/shared/media/youtubeCanonicalThumbnail.ts
+init_define_import_meta_env();
 var YOUTUBE_CANONICAL_THUMBNAIL_VARIANTS = [
   "maxresdefault",
   "sddefault",
@@ -51744,7 +51780,10 @@ init_define_import_meta_env();
 // ../grarf/desktop/shared/youtubeAllGamesHighlightFetch.js
 init_define_import_meta_env();
 
-// ../grarf/desktop/shared/mlbAllGamesHighlightDate.js
+// ../grarf/shared/media/youtubeAllGamesHighlightFetch.js
+init_define_import_meta_env();
+
+// ../grarf/shared/media/mlbAllGamesHighlightDate.js
 init_define_import_meta_env();
 var MONTH_NAMES = [
   "January",
@@ -51845,7 +51884,7 @@ function describeMlbAllGamesHighlightTitleRejection(title, targetSlateDateYmd) {
   return "accepted";
 }
 
-// ../grarf/desktop/shared/mlbAllGamesHighlightSelection.js
+// ../grarf/shared/media/mlbAllGamesHighlightSelection.js
 init_define_import_meta_env();
 var MLB_CATCHUP_DAILY_HIGHLIGHT_TITLE_PATTERNS = [MLB_ALL_GAMES_HIGHLIGHT_TITLE_NEEDLE];
 function entryTitle(entry) {
@@ -51922,7 +51961,7 @@ function logMlbAllGamesHighlightSelection(verification, rssUrl) {
 ${JSON.stringify(payload, null, 2)}`);
 }
 
-// ../grarf/desktop/shared/youtubeAllGamesHighlightFetch.js
+// ../grarf/shared/media/youtubeAllGamesHighlightFetch.js
 var DEFAULT_MLB_CHANNEL_ID = "UCoLrcjPV5PbUrUyXq5mjc_A";
 var CHROME_UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36";
 var MLB_CATCHUP_DAILY_HIGHLIGHT_TITLE_PATTERNS2 = [
@@ -52841,6 +52880,11 @@ init_define_import_meta_env();
 
 // ../grarf/desktop/src/lib/gamesSpine/formatGameDisplayTime.ts
 init_define_import_meta_env();
+
+// ../grarf/desktop/shared/golfTournamentDate.js
+init_define_import_meta_env();
+
+// ../grarf/desktop/src/lib/gamesSpine/formatGameDisplayTime.ts
 function formatGameDisplayTimeLocal(game) {
   if (isGolfTournamentLeagueKey(game.league) && game.status === "scheduled" && game.scheduledDateKey?.trim()) {
     return formatGolfScheduledDayLabel(game.scheduledDateKey);
@@ -60523,6 +60567,9 @@ async function openExternalUrl2(url) {
 init_define_import_meta_env();
 
 // ../grarf/desktop/shared/intelligence/articleUrl.js
+init_define_import_meta_env();
+
+// ../grarf/shared/search/intelligence/articleUrl.js
 init_define_import_meta_env();
 function pickCanonicalUrl(url) {
   if (!url || typeof url !== "string") return null;
@@ -71742,6 +71789,9 @@ init_define_import_meta_env();
 // ../grarf/desktop/shared/motorsportRaceState.js
 init_define_import_meta_env();
 
+// ../grarf/shared/domain/motorsportRaceState.js
+init_define_import_meta_env();
+
 // ../grarf/desktop/electron/espn/normalizeMma.js
 init_define_import_meta_env();
 
@@ -71755,6 +71805,9 @@ init_define_import_meta_env();
 init_define_import_meta_env();
 
 // ../grarf/desktop/shared/fifaMenWorldRankingsJune2026.js
+init_define_import_meta_env();
+
+// ../grarf/shared/config/fifaMenWorldRankingsJune2026.js
 init_define_import_meta_env();
 var FIFA_MEN_WORLD_RANKINGS_JUNE_2026 = Object.freeze({
   france: 1,
@@ -82289,6 +82342,9 @@ var MLB_OFFICIAL_UPLOADS_CHANNEL_ID = mlb?.channelId ?? "UCoLrcjPV5PbUrUyXq5mjc_
 var ALL_GAMES_HIGHLIGHT_TITLE_SUBSTRING = "Highlights from ALL GAMES";
 
 // ../grarf/desktop/src/lib/mlbCatchUp/mlbAllGamesHighlightDate.ts
+init_define_import_meta_env();
+
+// ../grarf/desktop/shared/mlbAllGamesHighlightDate.js
 init_define_import_meta_env();
 
 // ../grarf/desktop/src/data/youtubeLineLabsConfig.ts
