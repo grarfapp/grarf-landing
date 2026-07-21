@@ -26107,6 +26107,96 @@ init_operationalIngestConfig();
 // ../grarf/desktop/src/lib/ticker/rssNews.ts
 init_define_import_meta_env();
 
+// ../grarf/shared/search/matching/headlineSimilarity.ts
+init_define_import_meta_env();
+var STOP = /* @__PURE__ */ new Set([
+  "the",
+  "a",
+  "an",
+  "to",
+  "in",
+  "for",
+  "of",
+  "and",
+  "on",
+  "is",
+  "at",
+  "as",
+  "by",
+  "it",
+  "or",
+  "be",
+  "with",
+  "from",
+  "this",
+  "that",
+  "his",
+  "her",
+  "their",
+  "has",
+  "have",
+  "was",
+  "were",
+  "are",
+  "will",
+  "not",
+  "vs"
+]);
+var MLB_HINTS = /\b(mlb|yankees|dodgers|mets|red sox|astros|cubs|cardinals|braves|phillies|orioles|rays|guardians|tigers|twins|royals|white sox|brewers|reds|pirates|rockies|diamondbacks|padres|giants|marlins|nationals|blue jays|mariners|rangers|angels|athletics|a'?s\b)\b/i;
+var NBA_HINTS = /\b(nba|lakers|celtics|warriors|bucks|heat|knicks|nets|sixers|76ers|bulls|suns|nuggets|mavericks|mavs|rockets|clippers|kings|pelicans|grizzlies|timberwolves|wolves|thunder|jazz|trail blazers|blazers|magic|hawks|hornets|pacers|cavaliers|cavs|pistons|raptors|wizards|spurs|tatum|lebron|curry|giannis|luka|jokic)\b/i;
+var WNBA_HINTS = /\b(wnba|liberty|aces|fever|lynx|sparks|storm|sky|wings|sun|mystics)\b/i;
+var NHL_HINTS = /\b(nhl|rangers|bruins|maple leafs|leafs|oilers|avalanche|golden knights|canadiens|penguins|blackhawks|red wings|flyers|hurricanes|panthers|lightning|capitals|sabres|blue jackets|islanders|devils|predators|stars|wild|jets|flames|canucks|kraken|ducks|kings|sharks|coyotes|blues)\b/i;
+var MLS_HINTS = /\b(mls|messi|inter miami|mls cup|premier league|champions league|la liga|bundesliga|serie a|uefa|world cup|usmnt|uswnt|soccer|football club|fc dallas|lafc|galaxy|sounders|atlanta united)\b/i;
+function inferLeagueFromHeadline(headline) {
+  const t2 = headline;
+  if (WNBA_HINTS.test(t2)) return "WNBA";
+  if (NBA_HINTS.test(t2)) return "NBA";
+  if (NHL_HINTS.test(t2)) return "NHL";
+  if (MLS_HINTS.test(t2)) return "MLS";
+  if (MLB_HINTS.test(t2)) return "MLB";
+  return "NBA";
+}
+function canonicalHeadlineKey(headline) {
+  const words = headline.toLowerCase().replace(/[^a-z0-9\s]+/g, " ").trim().split(/\s+/).filter((w2) => w2.length > 1 && !STOP.has(w2));
+  return words.join(" ");
+}
+function tokenSet(s2) {
+  return new Set(s2.split(" ").filter(Boolean));
+}
+function headlinesSimilar(a2, b2) {
+  if (!a2 || !b2) return a2 === b2;
+  if (a2 === b2) return true;
+  const shorter = a2.length <= b2.length ? a2 : b2;
+  const longer = a2.length > b2.length ? a2 : b2;
+  if (shorter.length >= 24 && longer.includes(shorter)) return true;
+  const ta2 = tokenSet(a2);
+  const tb = tokenSet(b2);
+  if (ta2.size === 0 || tb.size === 0) return false;
+  let inter = 0;
+  for (const w2 of ta2) {
+    if (tb.has(w2)) inter += 1;
+  }
+  const union = ta2.size + tb.size - inter;
+  return union > 0 && inter / union >= 0.72;
+}
+function createRecentHeadlineDeduper(maxEntries = 400) {
+  const recentCanonicalKeys = [];
+  return {
+    remember(key2) {
+      recentCanonicalKeys.push(key2);
+      if (recentCanonicalKeys.length > maxEntries) {
+        recentCanonicalKeys.splice(0, recentCanonicalKeys.length - maxEntries);
+      }
+    },
+    isDuplicate(key2) {
+      for (const prev of recentCanonicalKeys) {
+        if (headlinesSimilar(prev, key2)) return true;
+      }
+      return false;
+    }
+  };
+}
+
 // ../grarf/desktop/src/lib/ticker/normalizeGameForTicker.ts
 init_define_import_meta_env();
 function leagueKeyToSport(league) {
@@ -26195,89 +26285,7 @@ var TICKER_RSS_SOURCES = [
   { id: "yahoo", label: "Yahoo Sports", url: "https://sports.yahoo.com/rss/" },
   { id: "cbssports", label: "CBS Sports", url: "https://www.cbssports.com/rss/headlines/" }
 ];
-var STOP = /* @__PURE__ */ new Set([
-  "the",
-  "a",
-  "an",
-  "to",
-  "in",
-  "for",
-  "of",
-  "and",
-  "on",
-  "is",
-  "at",
-  "as",
-  "by",
-  "it",
-  "or",
-  "be",
-  "with",
-  "from",
-  "this",
-  "that",
-  "his",
-  "her",
-  "their",
-  "has",
-  "have",
-  "was",
-  "were",
-  "are",
-  "will",
-  "not",
-  "vs"
-]);
-var MLB_HINTS = /\b(mlb|yankees|dodgers|mets|red sox|astros|cubs|cardinals|braves|phillies|orioles|rays|guardians|tigers|twins|royals|white sox|brewers|reds|pirates|rockies|diamondbacks|padres|giants|marlins|nationals|blue jays|mariners|rangers|angels|athletics|a'?s\b)\b/i;
-var NBA_HINTS = /\b(nba|lakers|celtics|warriors|bucks|heat|knicks|nets|sixers|76ers|bulls|suns|nuggets|mavericks|mavs|rockets|clippers|kings|pelicans|grizzlies|timberwolves|wolves|thunder|jazz|trail blazers|blazers|magic|hawks|hornets|pacers|cavaliers|cavs|pistons|raptors|wizards|spurs|tatum|lebron|curry|giannis|luka|jokic)\b/i;
-var WNBA_HINTS = /\b(wnba|liberty|aces|fever|lynx|sparks|storm|sky|wings|sun|mystics)\b/i;
-var NHL_HINTS = /\b(nhl|rangers|bruins|maple leafs|leafs|oilers|avalanche|golden knights|canadiens|penguins|blackhawks|red wings|flyers|hurricanes|panthers|lightning|capitals|sabres|blue jackets|islanders|devils|predators|stars|wild|jets|flames|canucks|kraken|ducks|kings|sharks|coyotes|blues)\b/i;
-var MLS_HINTS = /\b(mls|messi|inter miami|mls cup|premier league|champions league|la liga|bundesliga|serie a|uefa|world cup|usmnt|uswnt|soccer|football club|fc dallas|lafc|galaxy|sounders|atlanta united)\b/i;
-function inferLeagueFromHeadline(headline) {
-  const t2 = headline;
-  if (WNBA_HINTS.test(t2)) return "WNBA";
-  if (NBA_HINTS.test(t2)) return "NBA";
-  if (NHL_HINTS.test(t2)) return "NHL";
-  if (MLS_HINTS.test(t2)) return "MLS";
-  if (MLB_HINTS.test(t2)) return "MLB";
-  return "NBA";
-}
-function canonicalHeadlineKey(headline) {
-  const words = headline.toLowerCase().replace(/[^a-z0-9\s]+/g, " ").trim().split(/\s+/).filter((w2) => w2.length > 1 && !STOP.has(w2));
-  return words.join(" ");
-}
-function tokenSet(s2) {
-  return new Set(s2.split(" ").filter(Boolean));
-}
-function headlinesSimilar(a2, b2) {
-  if (!a2 || !b2) return a2 === b2;
-  if (a2 === b2) return true;
-  const shorter = a2.length <= b2.length ? a2 : b2;
-  const longer = a2.length > b2.length ? a2 : b2;
-  if (shorter.length >= 24 && longer.includes(shorter)) return true;
-  const ta2 = tokenSet(a2);
-  const tb = tokenSet(b2);
-  if (ta2.size === 0 || tb.size === 0) return false;
-  let inter = 0;
-  for (const w2 of ta2) {
-    if (tb.has(w2)) inter += 1;
-  }
-  const union = ta2.size + tb.size - inter;
-  return union > 0 && inter / union >= 0.72;
-}
-var recentCanonicalKeys = [];
-function rememberCanonical(key2) {
-  recentCanonicalKeys.push(key2);
-  if (recentCanonicalKeys.length > 400) {
-    recentCanonicalKeys.splice(0, recentCanonicalKeys.length - 400);
-  }
-}
-function isDuplicateHeadline(key2) {
-  for (const prev of recentCanonicalKeys) {
-    if (headlinesSimilar(prev, key2)) return true;
-  }
-  return false;
-}
+var headlineDeduper = createRecentHeadlineDeduper(400);
 async function fetchFeedXml(url) {
   const bridge3 = typeof window !== "undefined" ? window.grarf?.tickerRssFetch : void 0;
   if (bridge3) {
@@ -26409,8 +26417,8 @@ async function refreshTickerRssNews() {
       const sport = leagueKeyToSport(league);
       const canon = canonicalHeadlineKey(row.headline);
       if (!canon || canon.length < 8) continue;
-      if (isDuplicateHeadline(canon)) continue;
-      rememberCanonical(canon);
+      if (headlineDeduper.isDuplicate(canon)) continue;
+      headlineDeduper.remember(canon);
       merged.push({ ...row, league, sport });
     }
   }
@@ -44396,6 +44404,9 @@ init_define_import_meta_env();
 
 // ../grarf/desktop/src/lib/livetrack/preserveLiveTrackPostText.ts
 init_define_import_meta_env();
+
+// ../grarf/shared/search/normalization/preservePostText.ts
+init_define_import_meta_env();
 var MAX_CONSECUTIVE_BLANK_LINES = 2;
 function preserveLiveTrackPostText(raw) {
   if (!raw) return "";
@@ -45132,6 +45143,9 @@ function mapFeedItemToLiveTrackEvent(item, options = {}) {
 init_define_import_meta_env();
 
 // ../grarf/desktop/src/services/rssIngest/normalizeFeedItems.ts
+init_define_import_meta_env();
+
+// ../grarf/shared/search/feeds/normalizeFeedItems.ts
 init_define_import_meta_env();
 function stableHash2(input) {
   let h2 = 2166136261;
@@ -51778,6 +51792,9 @@ async function resolveYoutubeCanonicalThumbnailUrls2(videoIds) {
 
 // ../grarf/desktop/src/lib/highlightsTv/applyHighlightsTvIngestionKeywordFilters.ts
 init_define_import_meta_env();
+
+// ../grarf/shared/search/matching/keywordFilters.ts
+init_define_import_meta_env();
 function splitKeywordCell(cell) {
   return cell.split("|").map((keyword) => keyword.trim()).filter(Boolean);
 }
@@ -57462,7 +57479,10 @@ init_define_import_meta_env();
 // ../grarf/desktop/src/lib/newswire/dedupeNewswireStories.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/newswire/sanitizeNewswireText.ts
+// ../grarf/shared/search/matching/dedupeNewswireStories.ts
+init_define_import_meta_env();
+
+// ../grarf/shared/search/normalization/sanitizeWireText.ts
 init_define_import_meta_env();
 function sanitizeNewswireText(raw) {
   if (!raw) return "";
@@ -57471,7 +57491,7 @@ function sanitizeNewswireText(raw) {
   return text2.replace(/\s+/g, " ").trim();
 }
 
-// ../grarf/desktop/src/lib/newswire/dedupeNewswireStories.ts
+// ../grarf/shared/search/matching/dedupeNewswireStories.ts
 function normalizeNewswireHeadlineKey(headline) {
   return sanitizeNewswireText(headline).toLowerCase().replace(/[^\w\s]/g, "").replace(/\s+/g, " ").trim();
 }
@@ -57499,6 +57519,9 @@ function dedupeNewswireStories(stories) {
 init_define_import_meta_env();
 
 // ../grarf/desktop/src/lib/newswire/normalizeNewswireSource.ts
+init_define_import_meta_env();
+
+// ../grarf/shared/search/matching/newswireSource.ts
 init_define_import_meta_env();
 var SOURCE_BY_HOST = {
   "espn.com": "ESPN",
@@ -57546,6 +57569,9 @@ function normalizeNewswireSource(url, author) {
   if (fromAuthor) return fromAuthor;
   return "News";
 }
+
+// ../grarf/desktop/src/lib/newswire/sanitizeNewswireText.ts
+init_define_import_meta_env();
 
 // ../grarf/desktop/src/lib/newswire/mapFeedItemToNewswireStory.ts
 function stableHash3(input) {
