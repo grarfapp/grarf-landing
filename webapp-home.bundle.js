@@ -36215,7 +36215,10 @@ init_define_import_meta_env();
 // ../grarf/desktop/src/lib/gameHighlights/canonicalGameHighlight.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/youtubeUrl.ts
+// ../grarf/shared/media/entities/manualHighlightVideo.ts
+init_define_import_meta_env();
+
+// ../grarf/shared/media/utils/youtubeUrl.ts
 init_define_import_meta_env();
 function parseYoutubeTimeParam(t2) {
   const s2 = t2.trim();
@@ -36240,9 +36243,6 @@ function youtubeStartSecondsFromUrl(raw) {
   }
   return 0;
 }
-function isYoutubeEmbedPath(pathname) {
-  return /\/embed\/[\w-]+/.test(pathname);
-}
 function youtubeVideoIdFromUrl(raw) {
   try {
     const u2 = new URL(raw);
@@ -36251,7 +36251,7 @@ function youtubeVideoIdFromUrl(raw) {
       const id = u2.pathname.replace(/^\//, "").split("/")[0];
       return id && /^[\w-]{6,32}$/.test(id) ? id : null;
     }
-    if (host.includes("youtube.com")) {
+    if (host === "youtube.com" || host === "m.youtube.com" || host === "music.youtube.com") {
       const v2 = u2.searchParams.get("v");
       if (v2 && /^[\w-]{6,32}$/.test(v2)) return v2;
       const shorts = u2.pathname.match(/\/shorts\/([\w-]+)/);
@@ -36274,49 +36274,29 @@ function youtubeWatchUrl(videoId) {
 function youtubeCanonicalWatchUrl(videoId) {
   return `https://www.youtube.com/watch?v=${encodeURIComponent(videoId)}`;
 }
-function logMlbDailyHighlightsSelection(location2, item, source) {
-  if (!item?.videoId) return;
-  console.log(
-    `[MLB DAILY HIGHLIGHTS]
-${location2} selected videoId=${item.videoId}
-${location2} source=${source}`
-  );
+
+// ../grarf/shared/media/entities/manualHighlightVideo.ts
+function buildManualGameHighlightVideo(highlightVideoUrl, title, options = {}) {
+  const videoUrl = highlightVideoUrl.trim();
+  if (!videoUrl) return null;
+  const youtubeVideoId = youtubeVideoIdFromUrl(videoUrl);
+  const resolvedTitle = title.trim() || "Highlight";
+  const sportLabel = options.sport?.trim();
+  return {
+    videoUrl,
+    title: resolvedTitle,
+    source: "manual",
+    ...sportLabel ? { sport: sportLabel } : {},
+    ...youtubeVideoId ? {
+      youtubeVideoId,
+      thumbnailUrl: options.thumbnailForYoutubeId?.(youtubeVideoId)
+    } : {}
+  };
 }
-function buildYoutubeIframeEmbedSrc(videoId, opts) {
-  const params = new URLSearchParams({ rel: "0", modestbranding: "1" });
-  if (opts?.autoplay) {
-    params.set("autoplay", "1");
-    params.set("playsinline", "1");
-  }
-  const start = opts?.start;
-  if (start != null && start > 0) params.set("start", String(start));
-  return `https://www.youtube.com/embed/${encodeURIComponent(videoId)}?${params.toString()}`;
-}
-function toYoutubeStreamEmbedUrl(raw) {
-  try {
-    const u2 = new URL(raw);
-    if (u2.hostname.replace(/^www\./, "").includes("youtube.com") && isYoutubeEmbedPath(u2.pathname)) {
-      return null;
-    }
-  } catch {
-  }
-  const videoId = youtubeVideoIdFromUrl(raw);
-  if (!videoId) return null;
-  const params = new URLSearchParams({
-    autoplay: "1",
-    rel: "0",
-    modestbranding: "1",
-    playsinline: "1",
-    controls: "1",
-    fs: "1",
-    iv_load_policy: "3"
+function manualHighlightUrlToGameHighlightVideo(url, thumbnailForYoutubeId) {
+  return buildManualGameHighlightVideo(url, "Manual highlight video", {
+    thumbnailForYoutubeId
   });
-  const start = youtubeStartSecondsFromUrl(raw);
-  if (start > 0) params.set("start", String(start));
-  return `https://www.youtube.com/embed/${encodeURIComponent(videoId)}?${params.toString()}`;
-}
-function resolveWorkspaceEmbedUrl(raw) {
-  return raw.trim();
 }
 
 // ../grarf/desktop/src/lib/gameHighlights/canonicalGameHighlight.ts
@@ -36338,19 +36318,8 @@ function mlbCatchupHighlightToGameHighlightVideo(highlight) {
     source: "mlb-catchup"
   };
 }
-function manualHighlightUrlToGameHighlightVideo(url) {
-  const videoUrl = url.trim();
-  if (!videoUrl) return null;
-  const youtubeVideoId = youtubeVideoIdFromUrl(videoUrl);
-  return {
-    videoUrl,
-    title: "Manual highlight video",
-    ...youtubeVideoId ? {
-      youtubeVideoId,
-      thumbnailUrl: youtubeThumbnailUrl(youtubeVideoId, "hqdefault")
-    } : {},
-    source: "manual"
-  };
+function manualHighlightUrlToGameHighlightVideo2(url) {
+  return manualHighlightUrlToGameHighlightVideo(url, (videoId) => youtubeThumbnailUrl(videoId, "hqdefault"));
 }
 
 // ../grarf/desktop/src/lib/gameStatus/statusOverride.ts
@@ -36427,7 +36396,7 @@ function applyCanonicalGamesSpineOperationsEnrichment(game, operationsFields) {
   );
 }
 function resolveCanonicalGamesSpineHighlightVideo(game, operationsFields, context2) {
-  const manualHighlight = manualHighlightUrlToGameHighlightVideo(
+  const manualHighlight = manualHighlightUrlToGameHighlightVideo2(
     operationsFields?.highlightVideoUrl ?? ""
   );
   const catchupHighlight = context2.catchupHighlight ? mlbCatchupHighlightToGameHighlightVideo(context2.catchupHighlight) : null;
@@ -47920,6 +47889,58 @@ init_define_import_meta_env();
 
 // ../grarf/desktop/src/lib/workspace/buildYoutubeWorkspaceTab.ts
 init_define_import_meta_env();
+
+// ../grarf/desktop/src/lib/youtubeUrl.ts
+init_define_import_meta_env();
+function isYoutubeEmbedPath(pathname) {
+  return /\/embed\/[\w-]+/.test(pathname);
+}
+function logMlbDailyHighlightsSelection(location2, item, source) {
+  if (!item?.videoId) return;
+  console.log(
+    `[MLB DAILY HIGHLIGHTS]
+${location2} selected videoId=${item.videoId}
+${location2} source=${source}`
+  );
+}
+function buildYoutubeIframeEmbedSrc(videoId, opts) {
+  const params = new URLSearchParams({ rel: "0", modestbranding: "1" });
+  if (opts?.autoplay) {
+    params.set("autoplay", "1");
+    params.set("playsinline", "1");
+  }
+  const start = opts?.start;
+  if (start != null && start > 0) params.set("start", String(start));
+  return `https://www.youtube.com/embed/${encodeURIComponent(videoId)}?${params.toString()}`;
+}
+function toYoutubeStreamEmbedUrl(raw) {
+  try {
+    const u2 = new URL(raw);
+    if (u2.hostname.replace(/^www\./, "").includes("youtube.com") && isYoutubeEmbedPath(u2.pathname)) {
+      return null;
+    }
+  } catch {
+  }
+  const videoId = youtubeVideoIdFromUrl(raw);
+  if (!videoId) return null;
+  const params = new URLSearchParams({
+    autoplay: "1",
+    rel: "0",
+    modestbranding: "1",
+    playsinline: "1",
+    controls: "1",
+    fs: "1",
+    iv_load_policy: "3"
+  });
+  const start = youtubeStartSecondsFromUrl(raw);
+  if (start > 0) params.set("start", String(start));
+  return `https://www.youtube.com/embed/${encodeURIComponent(videoId)}?${params.toString()}`;
+}
+function resolveWorkspaceEmbedUrl(raw) {
+  return raw.trim();
+}
+
+// ../grarf/desktop/src/lib/workspace/buildYoutubeWorkspaceTab.ts
 function resolveYoutubeWorkspaceVideoId(raw) {
   const trimmed = raw.trim();
   if (/^[\w-]{6,32}$/.test(trimmed)) return trimmed;
@@ -50572,7 +50593,7 @@ init_define_import_meta_env();
 // ../grarf/desktop/src/services/highlights/providers/registry.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/services/highlights/providers/mlb.ts
+// ../grarf/shared/media/services/highlights/providers/registry.js
 init_define_import_meta_env();
 var MLB_HIGHLIGHTS_PLAYLIST_ID = "PLL-lmlkrmJak3neKKEataBelAVfdkBbDX";
 var MLB_HIGHLIGHT_PROVIDER = {
@@ -50582,13 +50603,11 @@ var MLB_HIGHLIGHT_PROVIDER = {
   cacheTtlMs: 45 * 60 * 1e3,
   maxPlaylistItems: 75
 };
-
-// ../grarf/desktop/src/services/highlights/providers/registry.ts
 var REGISTRY = {
   MLB: MLB_HIGHLIGHT_PROVIDER
 };
 function getHighlightProvider(league) {
-  const key2 = league.trim().toUpperCase();
+  const key2 = String(league || "").trim().toUpperCase();
   return REGISTRY[key2] ?? null;
 }
 
@@ -50976,7 +50995,10 @@ function resolveLeagueHighlightFetchKey(payload) {
 // ../grarf/desktop/src/services/mediaResolution/scoreTitleMatch.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/services/mediaResolution/teamAliases.ts
+// ../grarf/shared/media/services/mediaResolution/scoreTitleMatch.js
+init_define_import_meta_env();
+
+// ../grarf/shared/media/services/mediaResolution/teamAliases.js
 init_define_import_meta_env();
 function normalizeTeamToken(s2) {
   return String(s2 || "").toLowerCase().replace(/\./g, "").replace(/[^a-z0-9\s]/g, " ").replace(/\s+/g, " ").trim();
@@ -50987,8 +51009,7 @@ function buildTeamAliasTerms(game, side) {
   const city = side === "away" ? game.awayCity : game.homeCity;
   const official = side === "away" ? game.officialAwayName : game.officialHomeName;
   for (const raw of [team, city, official]) {
-    if (raw == null || !String(raw).trim()) continue;
-    const n2 = normalizeTeamToken(String(raw));
+    const n2 = normalizeTeamToken(raw);
     if (n2.length < 3) continue;
     terms.add(n2);
     const parts = n2.split(" ").filter(Boolean);
@@ -51001,7 +51022,8 @@ function buildTeamAliasTerms(game, side) {
   return [...terms];
 }
 
-// ../grarf/desktop/src/services/mediaResolution/scoreTitleMatch.ts
+// ../grarf/shared/media/services/mediaResolution/scoreTitleMatch.js
+var MIN_STRONG_MATCH_SCORE = 8;
 function fragmentMatchesTerms(fragment, terms) {
   const f2 = normalizeTeamToken(fragment);
   if (!f2) return false;
@@ -51015,8 +51037,8 @@ function scoreTitleAgainstGame(title, game, titlePatterns = ["highlight", "highl
   let teamMatch = false;
   const vs2 = title.match(/(.+?)\s+vs\.?\s+(.+?)(?:\s|—|-|:|\||$)/i);
   if (vs2) {
-    const left = vs2[1] ?? "";
-    const right = vs2[2] ?? "";
+    const left = vs2[1];
+    const right = vs2[2];
     const aLeft = fragmentMatchesTerms(left, awayTerms);
     const hLeft = fragmentMatchesTerms(left, homeTerms);
     const aRight = fragmentMatchesTerms(right, awayTerms);
@@ -51143,7 +51165,6 @@ function scoreDateProximity(game, publishedAt) {
   }
   return { score: 0 };
 }
-var MIN_STRONG_MATCH_SCORE = 8;
 
 // ../grarf/desktop/src/lib/highlightsTv/resolveHighlightsTvCanonicalEventChannels.ts
 init_define_import_meta_env();
@@ -51188,6 +51209,11 @@ init_define_import_meta_env();
 
 // ../grarf/desktop/src/lib/highlightsTv/f1HighlightTitleMatching.ts
 init_define_import_meta_env();
+
+// ../grarf/desktop/src/services/mediaResolution/teamAliases.ts
+init_define_import_meta_env();
+
+// ../grarf/desktop/src/lib/highlightsTv/f1HighlightTitleMatching.ts
 var F1_MULTI_WORD_GP_LOCATIONS = [
   "united arab emirates",
   "united states",
@@ -58952,7 +58978,7 @@ function GameWorkspaceHighlightsPlaceholder({
     (s2) => s2.fieldsByGameId[gameId]?.highlightVideoUrl ?? EMPTY_ADMIN_OPERATIONS_CARD_FIELDS.highlightVideoUrl
   );
   const manualHighlight = (0, import_react61.useMemo)(
-    () => manualHighlightUrlToGameHighlightVideo(operationsHighlightUrl),
+    () => manualHighlightUrlToGameHighlightVideo2(operationsHighlightUrl),
     [operationsHighlightUrl]
   );
   const canonicalGame = useCanonicalLiveGameRow(gameId, "game_workspace_highlights");
