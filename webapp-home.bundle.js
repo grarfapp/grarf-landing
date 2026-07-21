@@ -76180,13 +76180,6 @@ var HOME_LEAGUE_WORKSPACE_SOCIAL_RAIL_FEEDS = [
     teamKey: "pga-tour"
   },
   {
-    workspaceId: "tour-de-france",
-    feedId: "league-workspace-tour-de-france",
-    feedUrl: "https://rss.app/feeds/TnnJqxRRwZysPhwE.xml",
-    sourceLabel: "Tour de France",
-    teamKey: "tour-de-france"
-  },
-  {
     workspaceId: "ufc",
     feedId: "league-workspace-ufc",
     feedUrl: "https://rss.app/feeds/4a4tE1P8K4mbV2Fj.xml",
@@ -76260,8 +76253,29 @@ function resolveLeagueSocialRailFeedResolution(leagueKey) {
     mergeFeeds: false
   };
 }
+function resolveLiveTrackerSocialRailFeedResolution(feed, teamKey) {
+  return {
+    tab: "game",
+    feeds: [
+      {
+        feedId: feed.feedId,
+        feedUrl: feed.feedUrl,
+        teamKey,
+        sourceLabel: feed.label
+      }
+    ],
+    mergeFeeds: false
+  };
+}
 function resolveHomeLeagueWorkspaceSocialRailFeedResolution(workspaceId) {
   if (!workspaceId) return null;
+  const grarfLeagueKey = resolveHomeLeagueWorkspaceGrarfLeagueKey(workspaceId);
+  if (grarfLeagueKey === "TDF") {
+    const liveTrackerFeed = resolveLiveTrackerFeedForLeague("TDF");
+    if (liveTrackerFeed) {
+      return resolveLiveTrackerSocialRailFeedResolution(liveTrackerFeed, workspaceId);
+    }
+  }
   const entry = HOME_LEAGUE_WORKSPACE_SOCIAL_RAIL_FEEDS.find(
     (feed) => feed.workspaceId === workspaceId
   );
@@ -77026,7 +77040,8 @@ function ActivityRail({
   hideScopeHeader = false,
   gameAwayTeamLabel,
   gameHomeTeamLabel,
-  activeGame
+  activeGame,
+  suppressPulseSubmenu = false
 }) {
   const [tab, setTab] = (0, import_react134.useState)("social");
   const [pulseSubmenuIdx, setPulseSubmenuIdx] = (0, import_react134.useState)(0);
@@ -77079,7 +77094,7 @@ function ActivityRail({
     if (webGameSocialLeagueFeed) return "game";
     return null;
   }, [webGameSocialTabs, webGameSocialLeagueFeed, tab]);
-  const showPulseSubmenu = isGrarfWebRenderer() && tab === "social" && !webGameSocialTabs && !webGameSocialLeagueFeed;
+  const showPulseSubmenu = isGrarfWebRenderer() && tab === "social" && !webGameSocialTabs && !webGameSocialLeagueFeed && !suppressPulseSubmenu;
   const pulseSocialRailResolution = (0, import_react134.useMemo)(
     () => showPulseSubmenu ? resolvePulseSubmenuSocialRailFeedResolution(pulseSubmenuIdx) : null,
     [showPulseSubmenu, pulseSubmenuIdx]
@@ -78388,6 +78403,7 @@ function HomeRightRail({
         gameAwayTeamLabel: webGameTeamLabels?.away,
         gameHomeTeamLabel: webGameTeamLabels?.home,
         activeGame: activeGame ?? null,
+        suppressPulseSubmenu: Boolean(leagueWorkspaceId),
         asideClassName: "h-full w-full min-w-0 flex-1 border-l-0",
         onOpenIntelligence,
         onOpenLiveShow
