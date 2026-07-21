@@ -44928,7 +44928,7 @@ var HOME_SPORTSCAPE_HEADLINES_SOURCE_FEEDS = [
   {
     id: "espn",
     label: "ESPN",
-    url: "https://rss.app/feeds/ZlRHckgaNwVnhMNd.xml"
+    url: "https://rss.app/feeds/TP4AI5dr5OhKOqMH.xml"
   },
   {
     id: "cbs",
