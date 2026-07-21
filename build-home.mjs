@@ -10,6 +10,7 @@ import { fileURLToPath } from "node:url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const desktopSrc = path.resolve(__dirname, "../grarf/desktop/src");
+const sharedRoot = path.resolve(__dirname, "../grarf/shared");
 const outJs = path.join(__dirname, "webapp-home.bundle.js");
 const outCss = path.join(__dirname, "webapp-home.css");
 
@@ -51,6 +52,7 @@ await esbuild.build({
   loader: { ".tsx": "tsx", ".ts": "ts", ".png": "file", ".svg": "file", ".css": "css" },
   alias: {
     "@": desktopSrc,
+    "@grarf/shared": sharedRoot,
     // Single React + Router — desktop and landing each have their own node_modules trees.
     react: path.resolve(__dirname, "node_modules/react"),
     "react-dom": path.resolve(__dirname, "node_modules/react-dom"),

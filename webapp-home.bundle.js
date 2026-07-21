@@ -42673,7 +42673,10 @@ async function enrichOperationalTransport(rawTransport) {
 
 // ../grarf/desktop/src/services/operationalIngest/normalizeOperationalSnapshot.ts
 init_define_import_meta_env();
-function normalizeOperationalSnapshot(response) {
+
+// ../grarf/shared/domain/operational/normalizeOperationalSnapshot.ts
+init_define_import_meta_env();
+function normalizeOperationalSnapshot(response, options) {
   const leagues = {};
   for (const [key2, rows] of Object.entries(response.leagues ?? {})) {
     if (isEspnOperationalIngestLeagueDisabled(key2)) continue;
@@ -42681,13 +42684,11 @@ function normalizeOperationalSnapshot(response) {
       leagues[key2] = rows;
     }
   }
-  const canonical = {
+  return {
     leagues,
     updatedAt: response.generatedAt,
-    /** Local adapter still originates from ESPN scoreboard IPC until cloud cutover. */
-    sourceProvider: "espn_scoreboard_ipc"
+    sourceProvider: options?.sourceProvider ?? "espn_scoreboard_ipc"
   };
-  return canonical;
 }
 
 // ../grarf/desktop/src/services/operationalIngest/startOperationalSnapshotPolling.ts

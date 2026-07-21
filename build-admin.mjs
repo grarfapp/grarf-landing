@@ -43,6 +43,7 @@ const buildOptions = {
   jsx: "automatic",
   loader: { ".tsx": "tsx", ".ts": "ts", ".css": "css", ".png": "file", ".svg": "file" },
   alias: {
+    "@grarf/shared": sharedRoot,
     react: path.resolve(__dirname, "node_modules/react"),
     "react-dom": path.resolve(__dirname, "node_modules/react-dom"),
     "react-dom/client": path.resolve(__dirname, "node_modules/react-dom/client"),

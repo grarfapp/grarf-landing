@@ -9,6 +9,7 @@ import { fileURLToPath } from "node:url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const desktopSrc = path.resolve(__dirname, "../grarf/desktop/src");
+const sharedRoot = path.resolve(__dirname, "../grarf/shared");
 const outJs = path.join(__dirname, "webapp-games-spine.bundle.js");
 const outCss = path.join(__dirname, "webapp-games-spine.css");
 
@@ -29,6 +30,7 @@ await esbuild.build({
   loader: { ".tsx": "tsx", ".ts": "ts", ".png": "file", ".svg": "file" },
   alias: {
     "@": desktopSrc,
+    "@grarf/shared": sharedRoot,
   },
   define: {
     "import.meta.env.DEV": "false",
