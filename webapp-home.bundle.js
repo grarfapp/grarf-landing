@@ -109495,7 +109495,12 @@ function loadScript(src) {
     document.body.appendChild(script);
   });
 }
-async function bootGrarfMobileWebClient(container, manifestUrl = "mobile-web/manifest.json") {
+function resolveBundleScriptUrl(bundleUrl) {
+  if (/^https?:\/\//.test(bundleUrl)) return bundleUrl;
+  if (bundleUrl.startsWith("/")) return bundleUrl;
+  return `/${bundleUrl.replace(/^\/+/, "")}`;
+}
+async function bootGrarfMobileWebClient(container, manifestUrl = "/mobile-web/manifest.json") {
   const response = await fetch(manifestUrl, { cache: "no-store" });
   if (!response.ok) {
     throw new Error(`Failed to load mobile web manifest (${response.status})`);
@@ -109506,7 +109511,7 @@ async function bootGrarfMobileWebClient(container, manifestUrl = "mobile-web/man
   }
   container.id = "root";
   ensureExpoRootStyles();
-  await loadScript(manifest.bundleUrl);
+  await loadScript(resolveBundleScriptUrl(manifest.bundleUrl));
 }
 
 // ../grarf/desktop/src/lib/platform/shouldRenderGrarfMobileWebClient.ts

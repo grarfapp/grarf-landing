@@ -49,11 +49,14 @@ const landingAssetsDir = path.join(__dirname, "assets");
 fs.rmSync(landingAssetsDir, { recursive: true, force: true });
 copyRecursive(path.join(mobileDistDir, "assets"), landingAssetsDir);
 
+const bundleUrl = `/mobile-web/_expo/static/js/web/${bundleFile}`;
 const manifest = {
-  bundleUrl: `mobile-web/_expo/static/js/web/${bundleFile}`,
+  bundleUrl,
 };
 
 fs.writeFileSync(path.join(landingMobileWebDir, "manifest.json"), JSON.stringify(manifest, null, 2));
+fs.writeFileSync(path.join(__dirname, ".nojekyll"), "");
+console.log("[build-mobile] ensured GitHub Pages .nojekyll (disables Jekyll _path filtering)");
 console.log("[build-mobile] synced mobile web assets to", landingAssetsDir);
 console.log("[build-mobile] wrote", path.join(landingMobileWebDir, "manifest.json"));
-console.log("[build-mobile] done:", manifest.bundleUrl);
+console.log("[build-mobile] done:", bundleUrl);
