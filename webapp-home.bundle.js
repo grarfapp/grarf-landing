@@ -92328,10 +92328,7 @@ init_define_import_meta_env();
 // ../grarf/desktop/src/lib/routing/captureInitialBrowserPathname.ts
 init_define_import_meta_env();
 var INITIAL_BROWSER_PATHNAME = typeof window !== "undefined" ? window.location.pathname : "/";
-var consumed = false;
-function consumeInitialBrowserPathname() {
-  if (consumed) return null;
-  consumed = true;
+function peekInitialBrowserPathname() {
   return INITIAL_BROWSER_PATHNAME;
 }
 
@@ -92616,11 +92613,8 @@ function shouldApplyStartupBootstrap(capturedPath) {
   if (resolveCenterPaneApplicationModeFromPath(captured)) return true;
   return false;
 }
-var bootstrapApplied = false;
 async function runInitialUrlBootstrap(handlers2) {
-  if (bootstrapApplied) return false;
-  bootstrapApplied = true;
-  const pathname = consumeInitialBrowserPathname();
+  const pathname = peekInitialBrowserPathname();
   if (!pathname || !shouldApplyStartupBootstrap(pathname)) return false;
   const result = resolveInitialUrlBootstrapIntent(pathname);
   const canonicalUrl = await applyUrlNavigationIntent(result, handlers2);
@@ -92716,6 +92710,10 @@ function HomePage() {
   const [gameUtilityTab, setGameUtilityTab] = (0, import_react190.useState)("signals");
   const homeStartupResetDone = (0, import_react190.useRef)(false);
   const focusSessionKeysRef = (0, import_react190.useRef)(/* @__PURE__ */ new Set());
+  const skipStartupResetForBootstrap = (0, import_react190.useMemo)(() => {
+    const intent = resolveInitialUrlBootstrapIntent(peekInitialBrowserPathname()).intent;
+    return intent.kind === "league-hub" || intent.kind === "game" || intent.kind === "intel";
+  }, []);
   const isHomeOps = homeShellMode === "home";
   const centerPaneMode = useCenterPaneApplicationModeStore((s2) => s2.mode);
   const liveSubmenuId = useHomeLiveSubmenuStore((s2) => s2.activeId);
@@ -92857,14 +92855,6 @@ function HomePage() {
     return lastClickedGameId;
   }, [isHomeOps, overlay, lastClickedGameId]);
   (0, import_react190.useEffect)(() => {
-    if (!isHomeOps || homeStartupResetDone.current) return;
-    homeStartupResetDone.current = true;
-    clearCenterEmbedForSpineGameSelect();
-    dispatchOverlay({ type: "dismissWatchSessions" });
-    dispatchOverlay({ type: "dismissWorkspaceTabs" });
-    dispatchOverlay({ type: "select", id: null });
-  }, [isHomeOps]);
-  (0, import_react190.useEffect)(() => {
     if (!isHomeOps) return;
     const current = new Set(
       overlay.tabs.map((tab) => resolveHomeSourceFocusSessionKey(tab)).filter((key2) => key2 != null)
@@ -93001,6 +92991,15 @@ function HomePage() {
     openGame: onSelectGame,
     openIntelBriefing: onOpenIntelligence
   });
+  (0, import_react190.useEffect)(() => {
+    if (!isHomeOps || homeStartupResetDone.current) return;
+    homeStartupResetDone.current = true;
+    if (skipStartupResetForBootstrap) return;
+    clearCenterEmbedForSpineGameSelect();
+    dispatchOverlay({ type: "dismissWatchSessions" });
+    dispatchOverlay({ type: "dismissWorkspaceTabs" });
+    dispatchOverlay({ type: "select", id: null });
+  }, [isHomeOps, skipStartupResetForBootstrap]);
   const onOpenYoutubeWorkspace = (0, import_react190.useCallback)(
     (title, videoId) => {
       void clearWorkspaceEmbedsForYoutubeLaunch();
