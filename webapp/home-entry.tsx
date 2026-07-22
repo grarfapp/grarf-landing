@@ -8,7 +8,6 @@ import { StrictMode, useEffect, useState } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { AnalyticsProvider } from "../../grarf/desktop/src/components/analytics/AnalyticsProvider";
-import { WebMobileGateRoot } from "../../grarf/desktop/src/components/webMobileGate/WebMobileGateRoot";
 import { AppShellLayout } from "../../grarf/desktop/src/layouts/AppShellLayout";
 import { leagueDirectoryUniqueRoutes } from "../../grarf/desktop/src/data/leagueDirectoryV1";
 import { GameWorkspacePage } from "../../grarf/desktop/src/pages/GameWorkspacePage";
@@ -144,11 +143,9 @@ export function mountWebHome(container: HTMLElement): void {
   reactRoot.render(
     <StrictMode>
       <BrowserRouter>
-        <WebMobileGateRoot>
-          <AdminEntryPasswordGate>
-            <WebHomeApp />
-          </AdminEntryPasswordGate>
-        </WebMobileGateRoot>
+        <AdminEntryPasswordGate>
+          <WebHomeApp />
+        </AdminEntryPasswordGate>
       </BrowserRouter>
     </StrictMode>
   );
