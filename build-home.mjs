@@ -39,10 +39,10 @@ const importMetaEnv = {
   VITE_POSTHOG_HOST: posthogHost,
 };
 
-console.log("[build-home] bundling Desktop Home from desktop/src …");
+console.log("[build-home] bundling GRARF web client entry from desktop/src …");
 
 await esbuild.build({
-  entryPoints: [path.join(__dirname, "webapp/home-entry.tsx")],
+  entryPoints: [path.join(__dirname, "webapp/client-entry.tsx")],
   bundle: true,
   format: "esm",
   outfile: outJs,
@@ -143,3 +143,6 @@ fs.writeFileSync(spa404Path, spa404Html);
 console.log("[build-home] wrote GitHub Pages SPA fallback:", spa404Path);
 
 console.log("[build-home] done:", outJs, outCss);
+
+console.log("[build-home] building Mobile Web bundle …");
+execSync("node build-mobile.mjs", { stdio: "inherit", cwd: __dirname });
