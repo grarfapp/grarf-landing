@@ -15847,6 +15847,9 @@ init_define_import_meta_env();
 
 // ../grarf/desktop/src/lib/tennisChannelPlus/nameUtils.ts
 init_define_import_meta_env();
+
+// ../grarf/shared/domain/tennis/nameUtils.ts
+init_define_import_meta_env();
 function normalizeTennisText(value) {
   return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9\s]/g, " ").replace(/\s+/g, " ").trim();
 }
@@ -17389,6 +17392,9 @@ init_define_import_meta_env();
 
 // ../grarf/desktop/src/lib/foxWorldCup/teamSlugUtils.ts
 init_define_import_meta_env();
+
+// ../grarf/shared/domain/foxWorldCup/teamSlugUtils.ts
+init_define_import_meta_env();
 var SLUG_STOP_WORDS = /* @__PURE__ */ new Set(["and"]);
 var FOX_TEAM_SLUG_OVERRIDES = {
   turkey: "turkiye",
@@ -17413,7 +17419,6 @@ function teamNameToFoxSlug(name) {
 }
 var FOX_MONTHS = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"];
 var FOX_WORLD_CUP_SCHEDULE_TIMEZONE = "America/New_York";
-var LOG3 = "[FoxWorldCup]";
 function foxDateSlugFromCalendarParts(year, monthIndex, day) {
   const month = FOX_MONTHS[monthIndex];
   if (!month || !Number.isFinite(year) || !Number.isFinite(day)) return null;
@@ -17435,36 +17440,12 @@ function calendarPartsInTimeZone3(ms, timeZone) {
 function formatFoxMatchHubDateSlug(isoTime) {
   const ms = Date.parse(isoTime);
   if (!Number.isFinite(ms)) return null;
-  const utc = new Date(ms);
-  const utcSlug = foxDateSlugFromCalendarParts(
-    utc.getUTCFullYear(),
-    utc.getUTCMonth(),
-    utc.getUTCDate()
-  );
-  const machineTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-  const machineParts = calendarPartsInTimeZone3(ms, machineTimeZone);
-  const localSlug = foxDateSlugFromCalendarParts(
-    machineParts.year,
-    machineParts.monthIndex,
-    machineParts.day
-  );
   const scheduleParts = calendarPartsInTimeZone3(ms, FOX_WORLD_CUP_SCHEDULE_TIMEZONE);
-  const generatedSlug = foxDateSlugFromCalendarParts(
+  return foxDateSlugFromCalendarParts(
     scheduleParts.year,
     scheduleParts.monthIndex,
     scheduleParts.day
   );
-  if (define_import_meta_env_default.DEV) {
-    console.log(
-      `${LOG3} match hub date slug
-raw match timestamp=${isoTime}
-timezone=${FOX_WORLD_CUP_SCHEDULE_TIMEZONE}
-UTC date=${utcSlug}
-local date=${localSlug}
-generated FOX slug date=${generatedSlug}`
-    );
-  }
-  return generatedSlug;
 }
 function formatFoxGroupSlug(gameNotes) {
   const match = gameNotes?.trim().match(/\bGROUP\s+([A-Z])\b/i);
@@ -17546,7 +17527,7 @@ function matchFotmobWorldCupMatch(game, catalog) {
 }
 
 // ../grarf/desktop/src/lib/fotmob/enrichWorldCupGamesWithFotmobUrls.ts
-var LOG4 = "[FotMob]";
+var LOG3 = "[FotMob]";
 function isWorldCupRow(game) {
   return game.league === "WORLDCUP";
 }
@@ -17558,7 +17539,7 @@ async function enrichWorldCupGamesWithFotmobUrls(games) {
     catalog = await fetchFotmobWorldCupCatalog(worldCupRows);
   } catch (error) {
     if (define_import_meta_env_default.DEV) {
-      console.warn(`${LOG4} catalog fetch failed`, error);
+      console.warn(`${LOG3} catalog fetch failed`, error);
     }
     return games;
   }
@@ -17583,7 +17564,7 @@ async function enrichWorldCupGamesWithFotmobUrls(games) {
     };
   });
   if (define_import_meta_env_default.DEV && matched > 0) {
-    console.log(`${LOG4} matched ${matched} World Cup row(s)`, { catalogSize: catalog.length });
+    console.log(`${LOG3} matched ${matched} World Cup row(s)`, { catalogSize: catalog.length });
   }
   return out;
 }
@@ -17615,7 +17596,10 @@ init_define_import_meta_env();
 // ../grarf/desktop/src/lib/foxWorldCup/discoverFoxWorldCupDetailUrls.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/foxWorldCup/parseFoxWorldCupEvent.ts
+// ../grarf/shared/domain/foxWorldCup/discoverFoxWorldCupDetailUrls.ts
+init_define_import_meta_env();
+
+// ../grarf/shared/domain/foxWorldCup/parseFoxWorldCupEvent.ts
 init_define_import_meta_env();
 var FOX_EVENT_BASE = "https://www.fox.com";
 var FOX_EVENT_PATH_RE = /detail\/event\/([a-f0-9-]{36})\/(fifa-world-cup-\d{4}-[a-z0-9-]+)/i;
@@ -17646,7 +17630,7 @@ function parseFoxWorldCupEventPath(pathOrUrl) {
   };
 }
 
-// ../grarf/desktop/src/lib/foxWorldCup/discoverFoxWorldCupDetailUrls.ts
+// ../grarf/shared/domain/foxWorldCup/discoverFoxWorldCupDetailUrls.ts
 var FOX_EVENT_BASE2 = "https://www.fox.com";
 var FETCH_TIMEOUT_MS2 = 1e4;
 var MAX_UUID_PROBES = 24;
@@ -17810,6 +17794,9 @@ async function fetchFoxWorldCupBifrostCatalog() {
   return [...bySlug.values()];
 }
 
+// ../grarf/desktop/src/lib/foxWorldCup/parseFoxWorldCupEvent.ts
+init_define_import_meta_env();
+
 // ../grarf/desktop/src/lib/foxWorldCup/fetchFoxWorldCupEventCatalog.ts
 var FOX_WORLD_CUP_HUB_URL = "https://www.fox.com/soccer/fifa-world-cup";
 var FOX_SPORTS_PAGE_URL = "https://www.fox.com/sports";
@@ -17886,7 +17873,10 @@ async function fetchFoxWorldCupEventCatalog(now = Date.now(), forceRefresh = fal
 // ../grarf/desktop/src/lib/foxWorldCup/lookupFoxWorldCupStreamForGame.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/foxWorldCup/buildFoxWorldCupMatchHubUrlFromGame.ts
+// ../grarf/shared/domain/foxWorldCup/lookupFoxWorldCupStreamForGame.ts
+init_define_import_meta_env();
+
+// ../grarf/shared/domain/foxWorldCup/buildFoxWorldCupMatchHubUrlFromGame.ts
 init_define_import_meta_env();
 var FOX_WORLD_CUP_HUB_PREFIX = "https://www.fox.com/soccer/fifa-world-cup/";
 function resolveWorldCupGroupNotes(game) {
@@ -17913,7 +17903,7 @@ function buildFoxWorldCupMatchHubUrlFromGame(game) {
   return `${FOX_WORLD_CUP_HUB_PREFIX}${homeSlug}-vs-${awaySlug}-${dateSlug}-${groupSlug}`;
 }
 
-// ../grarf/desktop/src/lib/foxWorldCup/gameHasFoxOrFs1Broadcast.ts
+// ../grarf/shared/domain/foxWorldCup/gameHasFoxOrFs1Broadcast.ts
 init_define_import_meta_env();
 var FOX_BROADCAST = /\b(fox|fs1|fox\s*one)\b/i;
 function gameHasFoxOrFs1Broadcast(game) {
@@ -17921,7 +17911,7 @@ function gameHasFoxOrFs1Broadcast(game) {
   return hints.some((label) => FOX_BROADCAST.test(label.trim()));
 }
 
-// ../grarf/desktop/src/lib/foxWorldCup/matchFoxWorldCupStream.ts
+// ../grarf/shared/domain/foxWorldCup/matchFoxWorldCupStream.ts
 init_define_import_meta_env();
 var MIN_TEAM_SCORE2 = 0.55;
 var MIN_TOTAL_SCORE3 = 0.62;
@@ -17956,7 +17946,7 @@ function matchFoxWorldCupStream(game, catalog) {
   return best;
 }
 
-// ../grarf/desktop/src/lib/foxWorldCup/lookupFoxWorldCupStreamForGame.ts
+// ../grarf/shared/domain/foxWorldCup/lookupFoxWorldCupStreamForGame.ts
 function catalogKey(homeSlug, awaySlug) {
   return `${homeSlug}-vs-${awaySlug}`;
 }
@@ -17981,7 +17971,7 @@ function lookupFoxWorldCupStreamForGame(game, catalog) {
   if (game.league !== "WORLDCUP") return null;
   if (game.status !== "live" && game.status !== "scheduled") return null;
   if (!gameHasFoxOrFs1Broadcast(game)) return null;
-  const fuzzy = matchFoxWorldCupStream(game, catalog);
+  const fuzzy = matchFoxWorldCupStream(game, [...catalog]);
   if (fuzzy) return fuzzy;
   const indexed = lookupByTeamSlugs(game, buildCatalogIndex(catalog));
   if (indexed) return indexed;
@@ -17998,7 +17988,7 @@ function lookupFoxWorldCupStreamForGame(game, catalog) {
 }
 
 // ../grarf/desktop/src/lib/foxWorldCup/enrichWorldCupGamesWithFoxStreams.ts
-var LOG5 = "[FoxWorldCup]";
+var LOG4 = "[FoxWorldCup]";
 function isWorldCupRow2(game) {
   return game.league === "WORLDCUP";
 }
@@ -18012,7 +18002,7 @@ async function enrichWorldCupGamesWithFoxStreams(games) {
     catalog = await fetchFoxWorldCupEventCatalog();
   } catch (error) {
     if (define_import_meta_env_default.DEV) {
-      console.warn(`${LOG5} catalog fetch failed \u2014 using deterministic FOX hub URLs`, error);
+      console.warn(`${LOG4} catalog fetch failed \u2014 using deterministic FOX hub URLs`, error);
     }
   }
   let matched = 0;
@@ -18030,7 +18020,7 @@ async function enrichWorldCupGamesWithFoxStreams(games) {
     };
   });
   if (define_import_meta_env_default.DEV && matched > 0) {
-    console.log(`${LOG5} matched ${matched} World Cup row(s)`, { catalogSize: catalog.length });
+    console.log(`${LOG4} matched ${matched} World Cup row(s)`, { catalogSize: catalog.length });
   }
   return out;
 }
@@ -18683,6 +18673,9 @@ init_define_import_meta_env();
 
 // ../grarf/desktop/src/lib/wimbledon/types.ts
 init_define_import_meta_env();
+
+// ../grarf/shared/domain/wimbledon/types.ts
+init_define_import_meta_env();
 var WIMBLEDON_DRAW_CODES = ["MS", "LS", "MD", "LD", "XD"];
 
 // ../grarf/desktop/src/lib/wimbledon/fetchWimbledonDrawCatalog.ts
@@ -18870,6 +18863,9 @@ init_define_import_meta_env();
 
 // ../grarf/desktop/src/lib/wimbledon/buildWimbledonSlamTrackerUrl.ts
 init_define_import_meta_env();
+
+// ../grarf/shared/domain/wimbledon/buildWimbledonSlamTrackerUrl.ts
+init_define_import_meta_env();
 function buildWimbledonSlamTrackerUrl(matchId) {
   const id = String(matchId).trim();
   return `https://www.wimbledon.com/en_GB/scores/slamtracker/${encodeURIComponent(id)}`;
@@ -19047,7 +19043,7 @@ function matchWimbledonSlamTrackerGame(game, catalog) {
 }
 
 // ../grarf/desktop/src/lib/wimbledon/enrichWimbledonSlamTrackerMatches.ts
-var LOG6 = "[WimbledonSlamTracker]";
+var LOG5 = "[WimbledonSlamTracker]";
 function attachSlamTrackerResolution(game, matchId, url) {
   game.externalIds = {
     ...game.externalIds,
@@ -19099,7 +19095,7 @@ async function enrichWimbledonSlamTrackerMatches(games) {
     attachSlamTrackerResolution(game, resolution.matchId, resolution.url);
   }
   if (define_import_meta_env_default?.DEV && matched > 0) {
-    console.log(`${LOG6} matched ${matched} Wimbledon row(s)`, { targets: targets.length });
+    console.log(`${LOG5} matched ${matched} Wimbledon row(s)`, { targets: targets.length });
   }
 }
 
@@ -19307,6 +19303,9 @@ init_define_import_meta_env();
 
 // ../grarf/desktop/src/lib/tennisChannelPlus/buildTennisChannelStreamUrl.ts
 init_define_import_meta_env();
+
+// ../grarf/shared/domain/tennisChannelPlus/buildTennisChannelStreamUrl.ts
+init_define_import_meta_env();
 var TENNIS_CHANNEL_VIDEO_BASE = "https://www.tennischannel.com/en-us/video";
 function buildTennisChannelPlusStreamUrl(slug, contentId) {
   const safeSlug = slug.trim().replace(/^\/+|\/+$/g, "");
@@ -19447,7 +19446,7 @@ function matchTennisChannelPlusStream(game, catalog) {
 }
 
 // ../grarf/desktop/src/lib/tennisChannelPlus/enrichTennisGamesWithTennisChannelPlus.ts
-var LOG7 = "[TennisChannelPlus]";
+var LOG6 = "[TennisChannelPlus]";
 function isTennisLeague3(game) {
   return game.league === "ATP" || game.league === "WTA";
 }
@@ -19469,7 +19468,7 @@ async function enrichTennisGamesWithTennisChannelPlus(games) {
     catalog = await fetchTennisChannelPlusLiveCatalog();
   } catch (error) {
     if (define_import_meta_env_default.DEV) {
-      console.warn(`${LOG7} catalog fetch failed`, error);
+      console.warn(`${LOG6} catalog fetch failed`, error);
     }
     return games;
   }
@@ -19488,7 +19487,7 @@ async function enrichTennisGamesWithTennisChannelPlus(games) {
     };
   });
   if (define_import_meta_env_default.DEV && matched > 0) {
-    console.log(`${LOG7} matched ${matched} tennis row(s)`, { catalogSize: catalog.length });
+    console.log(`${LOG6} matched ${matched} tennis row(s)`, { catalogSize: catalog.length });
   }
   return out;
 }
@@ -19645,7 +19644,7 @@ async function supplementOperationalSnapshotFromLocalIpc(transport) {
 }
 
 // ../grarf/desktop/src/services/operationalIngest/enrichOperationalTransport.ts
-var LOG8 = "[OperationalIngest]";
+var LOG7 = "[OperationalIngest]";
 function cloudRowMissingMlbPk2(row) {
   if (typeof row.gamePk === "number" && row.gamePk > 0) return false;
   const mlb = row.externalIds?.mlb?.trim();
@@ -19672,17 +19671,17 @@ async function enrichOperationalSnapshotWatchStreamsLocal(transport) {
   try {
     next = sanitizeOperationalSnapshotWatchStreams(next);
   } catch (e) {
-    console.warn(`${LOG8} watch stream sanitize failed`, e);
+    console.warn(`${LOG7} watch stream sanitize failed`, e);
   }
   try {
     next = enrichOperationalSnapshotManualGameOverrides(next);
   } catch (e) {
-    console.warn(`${LOG8} manual game override enrich failed`, e);
+    console.warn(`${LOG7} manual game override enrich failed`, e);
   }
   try {
     next = enrichOperationalSnapshotEspnWatchStreams(next);
   } catch (e) {
-    console.warn(`${LOG8} ESPN Watch stream enrich failed`, e);
+    console.warn(`${LOG7} ESPN Watch stream enrich failed`, e);
   }
   try {
     for (const key of ["ATP", "WTA"]) {
@@ -19691,42 +19690,42 @@ async function enrichOperationalSnapshotWatchStreamsLocal(transport) {
       await enrichWimbledonEspnWatchStreams(rows);
     }
   } catch (e) {
-    console.warn(`${LOG8} Wimbledon ESPN Watch enrich failed`, e);
+    console.warn(`${LOG7} Wimbledon ESPN Watch enrich failed`, e);
   }
   try {
     next = await enrichOperationalSnapshotWimbledonSlamTracker(next);
   } catch (e) {
-    console.warn(`${LOG8} Wimbledon SlamTracker enrich failed`, e);
+    console.warn(`${LOG7} Wimbledon SlamTracker enrich failed`, e);
   }
   try {
     next = await enrichOperationalSnapshotEspnWatchPickerStreams(next);
   } catch (e) {
-    console.warn(`${LOG8} ESPN Watch picker enrich failed`, e);
+    console.warn(`${LOG7} ESPN Watch picker enrich failed`, e);
   }
   try {
     next = enrichOperationalSnapshotUsaNetworkStreams(next);
   } catch (e) {
-    console.warn(`${LOG8} USA Network stream enrich failed`, e);
+    console.warn(`${LOG7} USA Network stream enrich failed`, e);
   }
   try {
     next = await enrichOperationalSnapshotTennisChannel(next);
   } catch (e) {
-    console.warn(`${LOG8} Tennis Channel Plus enrich failed`, e);
+    console.warn(`${LOG7} Tennis Channel Plus enrich failed`, e);
   }
   try {
     next = await enrichOperationalSnapshotFoxWorldCup(next);
   } catch (e) {
-    console.warn(`${LOG8} FOX World Cup enrich failed`, e);
+    console.warn(`${LOG7} FOX World Cup enrich failed`, e);
   }
   try {
     next = await enrichOperationalSnapshotWnbaStreams(next);
   } catch (e) {
-    console.warn(`${LOG8} WNBA Prime Video enrich failed`, e);
+    console.warn(`${LOG7} WNBA Prime Video enrich failed`, e);
   }
   try {
     next = await enrichOperationalSnapshotFotmob(next);
   } catch (e) {
-    console.warn(`${LOG8} FotMob World Cup enrich failed`, e);
+    console.warn(`${LOG7} FotMob World Cup enrich failed`, e);
   }
   return next;
 }
@@ -19735,18 +19734,18 @@ async function enrichOperationalTransport(rawTransport) {
   try {
     transport = await supplementOperationalSnapshotFromLocalIpc(transport);
   } catch (e) {
-    console.warn(`${LOG8} local IPC supplement failed`, e);
+    console.warn(`${LOG7} local IPC supplement failed`, e);
   }
   if (!isGrarfWebRenderer()) {
     try {
       transport = await enrichOperationalSnapshotWatchStreamsLocal(transport);
     } catch (e) {
-      console.warn(`${LOG8} watch/stream enrich failed`, e);
+      console.warn(`${LOG7} watch/stream enrich failed`, e);
     }
     try {
       transport = await joinMissingMlbProviderIds(transport);
     } catch (e) {
-      console.warn(`${LOG8} MLB provider join failed`, e);
+      console.warn(`${LOG7} MLB provider join failed`, e);
     }
   }
   return transport;
@@ -19786,7 +19785,7 @@ function getOperationalIngestConfig() {
 }
 
 // ../grarf/desktop/src/services/operationalIngest/fetchOperationalSnapshot.ts
-var LOG9 = "[OperationalIngest]";
+var LOG8 = "[OperationalIngest]";
 var CLOUD_STALE_THRESHOLD_MS = 9e4;
 var CLOUD_FETCH_TIMEOUT_MS = 2e4;
 var WEB_CLOUD_BOOTSTRAP_TIMEOUT_MS = 2500;
@@ -19831,7 +19830,7 @@ async function fetchViaEspnLocalIpcAdapter() {
   const api = window.grarf?.gamesGetSnapshot;
   if (!api) {
     if (define_import_meta_env_default.DEV) {
-      console.warn(`${LOG9} source=espn_local_adapter unavailable (no Electron IPC)`);
+      console.warn(`${LOG8} source=espn_local_adapter unavailable (no Electron IPC)`);
     }
     return emptyOperationalSnapshot();
   }
@@ -19907,7 +19906,7 @@ async function fetchViaGrarfCloudWithLocalFallback() {
   if (!electronIpc) {
     if (cloud) {
       if (define_import_meta_env_default.DEV && !cloudFresh) {
-        console.warn(`${LOG9} browser/web using cloud snapshot (stale but authoritative)`, {
+        console.warn(`${LOG8} browser/web using cloud snapshot (stale but authoritative)`, {
           cloudAgeMs,
           cloudError
         });
@@ -19925,7 +19924,7 @@ async function fetchViaGrarfCloudWithLocalFallback() {
     return cloud;
   }
   if (define_import_meta_env_default.DEV && (cloudError || cloud && !cloudFresh)) {
-    console.warn(`${LOG9} using local IPC fallback (cloud stale or failed)`, {
+    console.warn(`${LOG8} using local IPC fallback (cloud stale or failed)`, {
       cloudError,
       cloudAgeMs: cloud ? cloudAgeMs : null,
       localAgeMs,
