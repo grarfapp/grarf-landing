@@ -15233,7 +15233,10 @@ init_define_import_meta_env();
 // ../grarf/desktop/src/lib/operations/resolveOperationsDateEntry.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/data/operations.ts
+// ../grarf/shared/operations/lookup/resolveOperationsDateEntry.ts
+init_define_import_meta_env();
+
+// ../grarf/shared/operations/config/operations.ts
 init_define_import_meta_env();
 var OPERATIONS = {
   dates: {
@@ -15531,7 +15534,7 @@ var OPERATIONS = {
   }
 };
 
-// ../grarf/desktop/src/lib/operations/resolveOperationsDateEntry.ts
+// ../grarf/shared/operations/lookup/resolveOperationsDateEntry.ts
 var EMPTY_OPERATIONS_DATE_ENTRY = {
   featuredGames: { selections: [] },
   manualEventOverrides: {},
@@ -16714,6 +16717,9 @@ function mergeOperationalLeagueGames(leagues, now = /* @__PURE__ */ new Date()) 
 
 // ../grarf/desktop/src/lib/gamesSpine/applyManualGameOverrides.ts
 init_define_import_meta_env();
+
+// ../grarf/shared/operations/lookup/applyManualGameOverrides.ts
+init_define_import_meta_env();
 function resolveManualGameOverride(gameKey, operationalDateKey = getOperationalSportsDayDateKey()) {
   const overrides = resolveOperationsDateEntry(operationalDateKey).manualGameOverrides;
   return overrides[gameKey];
@@ -16750,8 +16756,12 @@ function applyManualGameOverride(game, operationalDateKey = getOperationalSports
 
 // ../grarf/desktop/src/lib/gamesSpine/resolveManualGameCardNavigationOverride.ts
 init_define_import_meta_env();
+
+// ../grarf/shared/operations/lookup/resolveManualGameCardNavigationOverride.ts
+init_define_import_meta_env();
 function parseManualGameCardNavigationOverrideFields(source) {
-  const url = source?.centerPaneUrlWhenGameCardClicked?.trim();
+  if (!source) return null;
+  const url = source.centerPaneUrlWhenGameCardClicked?.trim();
   if (!url) return null;
   const openInCenterPane = source.centerPane?.trim().toUpperCase() === "Y";
   const openInBrowserTab = source.browserTab?.trim().toUpperCase() === "Y";
@@ -19254,6 +19264,9 @@ function sanitizeOperationalSnapshotWatchStreams(transport) {
 }
 
 // ../grarf/desktop/src/lib/watch/enrichOperationalSnapshotManualGameOverrides.ts
+init_define_import_meta_env();
+
+// ../grarf/shared/operations/lookup/enrichOperationalSnapshotManualGameOverrides.ts
 init_define_import_meta_env();
 function enrichLeagueRows3(rows) {
   if (!Array.isArray(rows) || rows.length === 0) {

@@ -14353,7 +14353,10 @@ init_define_import_meta_env();
 // ../grarf/desktop/src/lib/operations/resolveOperationsDateEntry.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/data/operations.ts
+// ../grarf/shared/operations/lookup/resolveOperationsDateEntry.ts
+init_define_import_meta_env();
+
+// ../grarf/shared/operations/config/operations.ts
 init_define_import_meta_env();
 var OPERATIONS = {
   dates: {
@@ -14651,9 +14654,6 @@ var OPERATIONS = {
   }
 };
 
-// ../grarf/desktop/shared/operationalSlateDate.js
-init_define_import_meta_env();
-
 // ../grarf/shared/utils/operationalSlateDate.js
 init_define_import_meta_env();
 
@@ -14819,7 +14819,7 @@ function isScheduledOnOperationalEveningSlate(game, operationalDateKey, now = /*
   return false;
 }
 
-// ../grarf/desktop/src/lib/operations/resolveOperationsDateEntry.ts
+// ../grarf/shared/operations/lookup/resolveOperationsDateEntry.ts
 var EMPTY_OPERATIONS_DATE_ENTRY = {
   featuredGames: { selections: [] },
   manualEventOverrides: {},
@@ -14849,6 +14849,9 @@ function resolveAggregatedTdfManualEventOverride() {
   if (stages.length === 0) return void 0;
   return { timeZone, highlightsTv, stages };
 }
+
+// ../grarf/desktop/shared/operationalSlateDate.js
+init_define_import_meta_env();
 
 // ../grarf/desktop/src/lib/gamesSpine/manual/mergeBundledGamesSpineManualDocument.ts
 function leagueStorageKey(league) {
@@ -25051,8 +25054,12 @@ function resolveManualGameCardNavigationTarget(game) {
 
 // ../grarf/desktop/src/lib/gamesSpine/resolveManualGameCardNavigationOverride.ts
 init_define_import_meta_env();
+
+// ../grarf/shared/operations/lookup/resolveManualGameCardNavigationOverride.ts
+init_define_import_meta_env();
 function parseManualGameCardNavigationOverrideFields(source) {
-  const url = source?.centerPaneUrlWhenGameCardClicked?.trim();
+  if (!source) return null;
+  const url = source.centerPaneUrlWhenGameCardClicked?.trim();
   if (!url) return null;
   const openInCenterPane = source.centerPane?.trim().toUpperCase() === "Y";
   const openInBrowserTab = source.browserTab?.trim().toUpperCase() === "Y";
@@ -39385,6 +39392,9 @@ var import_zustand17 = __toESM(require_zustand(), 1);
 
 // ../grarf/desktop/src/lib/editorial/buildFeaturedGamesFromConfig.ts
 init_define_import_meta_env();
+
+// ../grarf/shared/operations/lookup/buildFeaturedGamesFromConfig.ts
+init_define_import_meta_env();
 function buildFeaturedGamesFromConfig(operationalDateKey = getOperationalSportsDayDateKey()) {
   const { selections } = resolveOperationsDateEntry(operationalDateKey).featuredGames;
   const out = {};
@@ -39396,6 +39406,11 @@ function buildFeaturedGamesFromConfig(operationalDateKey = getOperationalSportsD
     out[gameKey] = { briefingPriority: rank };
   }
   return out;
+}
+
+// ../grarf/desktop/src/lib/editorial/buildFeaturedGamesFromConfig.ts
+function buildFeaturedGamesFromConfig2(operationalDateKey = getOperationalSportsDayDateKey()) {
+  return buildFeaturedGamesFromConfig(operationalDateKey);
 }
 
 // ../grarf/desktop/src/store/editorialStore.ts
@@ -39457,7 +39472,7 @@ function normalizeEditorialBundle(raw) {
 function withCodeFeaturedGames(bundle) {
   return {
     ...bundle,
-    featuredGames: buildFeaturedGamesFromConfig()
+    featuredGames: buildFeaturedGamesFromConfig2()
   };
 }
 function readEditMode() {
@@ -42123,7 +42138,10 @@ function sanitizeOperationalSnapshotWatchStreams(transport) {
 // ../grarf/desktop/src/lib/watch/enrichOperationalSnapshotManualGameOverrides.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/gamesSpine/applyManualGameOverrides.ts
+// ../grarf/shared/operations/lookup/enrichOperationalSnapshotManualGameOverrides.ts
+init_define_import_meta_env();
+
+// ../grarf/shared/operations/lookup/applyManualGameOverrides.ts
 init_define_import_meta_env();
 function resolveManualGameOverride(gameKey, operationalDateKey = getOperationalSportsDayDateKey()) {
   const overrides = resolveOperationsDateEntry(operationalDateKey).manualGameOverrides;
@@ -42159,7 +42177,7 @@ function applyManualGameOverride(game, operationalDateKey = getOperationalSports
   return next;
 }
 
-// ../grarf/desktop/src/lib/watch/enrichOperationalSnapshotManualGameOverrides.ts
+// ../grarf/shared/operations/lookup/enrichOperationalSnapshotManualGameOverrides.ts
 function enrichLeagueRows3(rows) {
   if (!Array.isArray(rows) || rows.length === 0) {
     return { rows: rows ?? [], changed: false };
@@ -68903,7 +68921,7 @@ function collectManualSpineGames(manualGames) {
 }
 function resolveFeaturedGamesForBestGame() {
   if (!isGrarfWebRenderer()) return {};
-  return buildFeaturedGamesFromConfig();
+  return buildFeaturedGamesFromConfig2();
 }
 function hasAdminFeaturedPriority(game, adminFeaturedPriorities) {
   if (!adminFeaturedPriorities) return false;
@@ -86413,6 +86431,9 @@ async function saveOperationsSpine() {
 init_define_import_meta_env();
 
 // ../grarf/desktop/src/data/operationsLeagueResourceLinks.ts
+init_define_import_meta_env();
+
+// ../grarf/shared/operations/config/operationsLeagueResourceLinks.ts
 init_define_import_meta_env();
 var OPERATIONS_LEAGUE_RESOURCE_LINKS_BY_LEAGUE_KEY = {
   ATP: [
