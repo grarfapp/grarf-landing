@@ -11319,10 +11319,10 @@ var require_react_dom_client_production = __commonJS({
     function estimateBandwidth() {
       if ("function" === typeof performance.getEntriesByType) {
         for (var count = 0, bits = 0, resourceEntries = performance.getEntriesByType("resource"), i2 = 0; i2 < resourceEntries.length; i2++) {
-          var entry = resourceEntries[i2], transferSize = entry.transferSize, initiatorType = entry.initiatorType, duration = entry.duration;
+          var entry2 = resourceEntries[i2], transferSize = entry2.transferSize, initiatorType = entry2.initiatorType, duration = entry2.duration;
           if (transferSize && duration && isLikelyStaticResource(initiatorType)) {
             initiatorType = 0;
-            duration = entry.responseEnd;
+            duration = entry2.responseEnd;
             for (i2 += 1; i2 < resourceEntries.length; i2++) {
               var overlapEntry = resourceEntries[i2], overlapStartTime = overlapEntry.startTime;
               if (overlapStartTime > duration) break;
@@ -11330,7 +11330,7 @@ var require_react_dom_client_production = __commonJS({
               overlapTransferSize && isLikelyStaticResource(overlapInitiatorType) && (overlapEntry = overlapEntry.responseEnd, initiatorType += overlapTransferSize * (overlapEntry < duration ? 1 : (duration - overlapStartTime) / (overlapEntry - overlapStartTime)));
             }
             --i2;
-            bits += 8 * (transferSize + initiatorType) / (entry.duration / 1e3);
+            bits += 8 * (transferSize + initiatorType) / (entry2.duration / 1e3);
             count++;
             if (10 < count) break;
           }
@@ -13591,12 +13591,12 @@ async function fetchChannelRssXml(channelId) {
 async function fetchRssViaSharedIngest(sources, onTrace) {
   const sourceTraces = [];
   const batches = await Promise.all(
-    sources.map(async ({ league, channelId }) => {
+    sources.map(async ({ league: league2, channelId }) => {
       try {
         const xml = await fetchChannelRssXml(channelId);
         if (!xml) {
           sourceTraces.push({
-            league,
+            league: league2,
             channelId,
             ok: false,
             rawEntryCount: 0,
@@ -13604,9 +13604,9 @@ async function fetchRssViaSharedIngest(sources, onTrace) {
           });
           return [];
         }
-        const parsed = parseYoutubeAtomFeed(xml, league, 24);
+        const parsed = parseYoutubeAtomFeed(xml, league2, 24);
         sourceTraces.push({
-          league,
+          league: league2,
           channelId,
           ok: parsed.length > 0,
           rawEntryCount: parsed.length,
@@ -13615,7 +13615,7 @@ async function fetchRssViaSharedIngest(sources, onTrace) {
         return parsed;
       } catch {
         sourceTraces.push({
-          league,
+          league: league2,
           channelId,
           ok: false,
           rawEntryCount: 0,
@@ -13907,7 +13907,7 @@ function collectOperationalShortMediaPipelineDiagnostics(input) {
   return {
     polledAt,
     sourceCount: input.sources.length,
-    sources: input.sources.map(({ league, channelId }) => ({ league, channelId })),
+    sources: input.sources.map(({ league: league2, channelId }) => ({ league: league2, channelId })),
     fetchedUploads: input.rss.rawEntryCount,
     normalizedUploads: input.rss.normalizedUploadCount,
     pollUploads: input.pollUploads.length,
@@ -13981,8 +13981,8 @@ function emptyYoutubeRssIngestTrace(sources) {
   return {
     viaBridge: false,
     bridgeAvailable: false,
-    sources: sources.map(({ league, channelId }) => ({
-      league,
+    sources: sources.map(({ league: league2, channelId }) => ({
+      league: league2,
       channelId,
       ok: false,
       rawEntryCount: 0,
@@ -14661,8 +14661,8 @@ init_define_import_meta_env();
 init_define_import_meta_env();
 var GOLF_TOURNAMENT_DAY_TIMEZONE = "America/New_York";
 var GOLF_LEAGUE_KEYS = /* @__PURE__ */ new Set(["PGA", "LPGA", "LIV", "CHAMPIONS"]);
-function isGolfTournamentLeagueKey(league) {
-  return typeof league === "string" && GOLF_LEAGUE_KEYS.has(league);
+function isGolfTournamentLeagueKey(league2) {
+  return typeof league2 === "string" && GOLF_LEAGUE_KEYS.has(league2);
 }
 function formatGolfScheduledDayLabel(dateKey) {
   const trimmed = dateKey.trim();
@@ -14826,16 +14826,16 @@ var EMPTY_OPERATIONS_DATE_ENTRY = {
   manualGameOverrides: {}
 };
 function resolveOperationsDateEntry(operationalDateKey = getOperationalSportsDayDateKey()) {
-  const entry = OPERATIONS.dates[operationalDateKey];
-  return entry ?? EMPTY_OPERATIONS_DATE_ENTRY;
+  const entry2 = OPERATIONS.dates[operationalDateKey];
+  return entry2 ?? EMPTY_OPERATIONS_DATE_ENTRY;
 }
 function resolveAggregatedTdfManualEventOverride() {
   const stages = [];
   const seen = /* @__PURE__ */ new Set();
   let timeZone = "America/New_York";
   let highlightsTv;
-  for (const entry of Object.values(OPERATIONS.dates)) {
-    const tdf = entry.manualEventOverrides.TDF;
+  for (const entry2 of Object.values(OPERATIONS.dates)) {
+    const tdf = entry2.manualEventOverrides.TDF;
     if (!tdf) continue;
     timeZone = tdf.timeZone;
     if (tdf.highlightsTv) highlightsTv = tdf.highlightsTv;
@@ -14854,11 +14854,11 @@ function resolveAggregatedTdfManualEventOverride() {
 init_define_import_meta_env();
 
 // ../grarf/desktop/src/lib/gamesSpine/manual/mergeBundledGamesSpineManualDocument.ts
-function leagueStorageKey(league) {
-  return league.trim().toLowerCase();
+function leagueStorageKey(league2) {
+  return league2.trim().toLowerCase();
 }
-function isManualGamesSpineLeagueEntry(entry) {
-  return typeof entry === "object" && entry !== null && "games" in entry && Array.isArray(entry.games);
+function isManualGamesSpineLeagueEntry(entry2) {
+  return typeof entry2 === "object" && entry2 !== null && "games" in entry2 && Array.isArray(entry2.games);
 }
 function resolveBundledManualGamesSpineLeagues(operationalDateKey = getOperationalSportsDayDateKey()) {
   return Object.values(resolveOperationsDateEntry(operationalDateKey).manualEventOverrides).filter(
@@ -14867,7 +14867,7 @@ function resolveBundledManualGamesSpineLeagues(operationalDateKey = getOperation
 }
 function mergeBundledGamesSpineManualDocument(document2, operationalDateKey = getOperationalSportsDayDateKey()) {
   const byKey = new Map(
-    document2.leagues.map((league) => [leagueStorageKey(league.league), league])
+    document2.leagues.map((league2) => [leagueStorageKey(league2.league), league2])
   );
   for (const bundled of resolveBundledManualGamesSpineLeagues(operationalDateKey)) {
     byKey.set(leagueStorageKey(bundled.league), bundled);
@@ -15452,14 +15452,14 @@ function ensureEmbedLayer(slot) {
     "pointer-events:auto"
   ].join(";");
   document.body.appendChild(iframe);
-  const entry = { iframe, url: "" };
-  embedLayers.set(slot, entry);
-  return entry;
+  const entry2 = { iframe, url: "" };
+  embedLayers.set(slot, entry2);
+  return entry2;
 }
 function clearEmbedLayer(slot) {
-  const entry = embedLayers.get(slot);
-  if (!entry) return;
-  entry.iframe.remove();
+  const entry2 = embedLayers.get(slot);
+  if (!entry2) return;
+  entry2.iframe.remove();
   embedLayers.delete(slot);
 }
 async function workspaceEmbedSync(payload) {
@@ -15468,26 +15468,26 @@ async function workspaceEmbedSync(payload) {
     clearEmbedLayer(slot);
     return true;
   }
-  const entry = ensureEmbedLayer(slot);
-  applyBounds(entry.iframe, payload.bounds);
+  const entry2 = ensureEmbedLayer(slot);
+  applyBounds(entry2.iframe, payload.bounds);
   const target = payload.url.trim();
-  if (target && entry.url !== target) {
-    entry.iframe.src = target;
-    entry.url = target;
+  if (target && entry2.url !== target) {
+    entry2.iframe.src = target;
+    entry2.url = target;
   }
-  entry.iframe.style.display = "block";
+  entry2.iframe.style.display = "block";
   return true;
 }
 function workspaceEmbedSetBounds(payload) {
   const slot = payload.slot ?? "center";
-  const entry = embedLayers.get(slot);
-  if (!entry) return;
+  const entry2 = embedLayers.get(slot);
+  if (!entry2) return;
   if (payload.bounds.width <= 0 || payload.bounds.height <= 0) {
-    entry.iframe.style.display = "none";
+    entry2.iframe.style.display = "none";
     return;
   }
-  applyBounds(entry.iframe, payload.bounds);
-  entry.iframe.style.display = "block";
+  applyBounds(entry2.iframe, payload.bounds);
+  entry2.iframe.style.display = "block";
 }
 async function workspaceEmbedClear(slot) {
   if (slot) {
@@ -17943,8 +17943,8 @@ function usePrefetchBehavior(prefetch, theirElementProps) {
     }
     if (prefetch === "viewport") {
       let callback = (entries) => {
-        entries.forEach((entry) => {
-          setShouldPrefetch(entry.isIntersecting);
+        entries.forEach((entry2) => {
+          setShouldPrefetch(entry2.isIntersecting);
         });
       };
       let observer = new IntersectionObserver(callback, { threshold: 0.5 });
@@ -24261,8 +24261,8 @@ var analytics = {
     getPostHogClient()?.reset();
   }
 };
-function trackLeagueOpened(league, source = "route") {
-  analytics.track("league_opened", { league, source });
+function trackLeagueOpened(league2, source = "route") {
+  analytics.track("league_opened", { league: league2, source });
 }
 function trackGameOpened(params) {
   analytics.track("game_opened", params);
@@ -25060,9 +25060,9 @@ function resolveManualGameCardNavigationOverride(game, operationalDateKey = getO
     resolveManualGameNavigationOverrideFields(game.grarfGameId, operationalDateKey)
   ) : null);
   if (perGame) return perGame;
-  const entry = resolveOperationsDateEntry(operationalDateKey);
+  const entry2 = resolveOperationsDateEntry(operationalDateKey);
   return parseManualGameCardNavigationOverrideFields(
-    resolveEventWideNavigationOverrideFields(game, entry.manualEventOverrides)
+    resolveEventWideNavigationOverrideFields(game, entry2.manualEventOverrides)
   );
 }
 
@@ -25116,12 +25116,12 @@ var VALID_LEAGUE_KEYS = new Set(getGamesColumnLeagueOrder());
 function parseEspnGameIdFromRowId(gameId) {
   const m2 = ESPN_GAME_ID_RE.exec(gameId.trim());
   if (!m2) return null;
-  const league = m2[1].toUpperCase();
-  if (!VALID_LEAGUE_KEYS.has(league)) return null;
-  return { league, eventId: m2[2] };
+  const league2 = m2[1].toUpperCase();
+  if (!VALID_LEAGUE_KEYS.has(league2)) return null;
+  return { league: league2, eventId: m2[2] };
 }
-function isEspnSoccerLeague(league) {
-  return SOCCER_LEAGUE_KEYS.has(league);
+function isEspnSoccerLeague(league2) {
+  return SOCCER_LEAGUE_KEYS.has(league2);
 }
 var TENNIS_LEAGUE_KEYS = /* @__PURE__ */ new Set(["ATP", "WTA"]);
 function buildEspnFightcenterUrl(cardEventId, fightCompetitionId) {
@@ -25134,28 +25134,28 @@ function buildEspnFightcenterUrl(cardEventId, fightCompetitionId) {
 function buildEspnGolfLeaderboardUrl(eventId) {
   return `https://www.espn.com/golf/leaderboard/_/tournamentId/${eventId}`;
 }
-function buildEspnGamecastUrl(league, eventId, options) {
-  if (league === "UFC") {
+function buildEspnGamecastUrl(league2, eventId, options) {
+  if (league2 === "UFC") {
     const cardId = options?.ufcCardEventId?.trim();
     if (cardId) return buildEspnFightcenterUrl(cardId, eventId);
     return buildEspnFightcenterUrl(eventId);
   }
-  if (isEspnSoccerLeague(league)) {
+  if (isEspnSoccerLeague(league2)) {
     return `https://www.espn.com/soccer/match/_/gameId/${eventId}`;
   }
-  if (TENNIS_LEAGUE_KEYS.has(league)) {
+  if (TENNIS_LEAGUE_KEYS.has(league2)) {
     return `https://www.espn.com/tennis/match/_/gameId/${eventId}`;
   }
-  if (isGolfLeagueKey(league)) {
+  if (isGolfLeagueKey(league2)) {
     return buildEspnGolfLeaderboardUrl(eventId);
   }
-  if (league === "NCAABB") {
+  if (league2 === "NCAABB") {
     return `https://www.espn.com/college-baseball/game/_/gameId/${eventId}`;
   }
-  if (league === "AFL") {
+  if (league2 === "AFL") {
     return `https://www.espn.com/afl/game?gameId=${eventId}`;
   }
-  const slug = league === "WNBA" ? "wnba" : league === "NBASUMMER" ? "nba-summer-league" : league.toLowerCase();
+  const slug = league2 === "WNBA" ? "wnba" : league2 === "NBASUMMER" ? "nba-summer-league" : league2.toLowerCase();
   return `https://www.espn.com/${slug}/game/_/gameId/${eventId}`;
 }
 function parseEspnEventIdFromGame(game) {
@@ -25294,9 +25294,9 @@ function AnalyticsProvider({ children }) {
     return startEngagementTracking((event, properties) => analytics.track(event, properties));
   }, []);
   (0, import_react.useEffect)(() => {
-    const league = LEAGUE_PATHS[pathname];
-    if (league) {
-      trackLeagueOpened(league, "route");
+    const league2 = LEAGUE_PATHS[pathname];
+    if (league2) {
+      trackLeagueOpened(league2, "route");
       return;
     }
     const fromGame = leagueFromGamePath(pathname);
@@ -25997,11 +25997,11 @@ function resolvePollingMode(provider) {
 function leaguesWithCentralizedRetention(meta) {
   if (!meta?.sourceByGameId) return [];
   const out = [];
-  for (const league of getGamesColumnLeagueOrder()) {
-    const map = meta.sourceByGameId[league];
+  for (const league2 of getGamesColumnLeagueOrder()) {
+    const map = meta.sourceByGameId[league2];
     if (!map) continue;
     if (Object.values(map).some((source) => source === "centralized_retention")) {
-      out.push(league);
+      out.push(league2);
     }
   }
   return out;
@@ -26184,8 +26184,8 @@ function createRecentHeadlineDeduper(maxEntries = 400) {
 
 // ../grarf/desktop/src/lib/ticker/normalizeGameForTicker.ts
 init_define_import_meta_env();
-function leagueKeyToSport(league) {
-  switch (league) {
+function leagueKeyToSport(league2) {
+  switch (league2) {
     case "MLB":
     case "NCAABB":
       return "mlb";
@@ -26226,13 +26226,13 @@ function parsePeriodFromGame(game) {
   return null;
 }
 function normalizeGameForTicker(game) {
-  const league = game.league ?? "MLB";
-  const sport = leagueKeyToSport(league);
+  const league2 = game.league ?? "MLB";
+  const sport = leagueKeyToSport(league2);
   const { inning, half } = sport === "mlb" ? parseMlbInningFromStatusLine(game.statusLine) : { inning: null, half: null };
   const period = sport === "mlb" ? null : parsePeriodFromGame(game);
   return {
     gameId: game.id,
-    league,
+    league: league2,
     sport,
     awayTeam: game.awayTeam,
     homeTeam: game.homeTeam,
@@ -26292,8 +26292,8 @@ async function fetchFeedXml(url) {
 function textContent(el) {
   return el?.textContent?.replace(/\s+/g, " ").trim() ?? "";
 }
-function atomEntryLink(entry) {
-  const links = entry.querySelectorAll("link");
+function atomEntryLink(entry2) {
+  const links = entry2.querySelectorAll("link");
   for (let i2 = 0; i2 < links.length; i2++) {
     const link = links[i2];
     const href = link.getAttribute("href")?.trim();
@@ -26333,15 +26333,15 @@ function parseRssOrAtom(xml, sourceLabel, maxItems) {
   if (out.length > 0) return out;
   const entries = doc.getElementsByTagName("entry");
   for (let i2 = 0; i2 < entries.length && out.length < maxItems; i2++) {
-    const entry = entries[i2];
-    const title = textContent(entry.querySelector("title"));
-    let url = atomEntryLink(entry);
+    const entry2 = entries[i2];
+    const title = textContent(entry2.querySelector("title"));
+    let url = atomEntryLink(entry2);
     if (!url) {
-      const idTag = entry.getElementsByTagNameNS("http://www.w3.org/2005/Atom", "id")[0];
+      const idTag = entry2.getElementsByTagNameNS("http://www.w3.org/2005/Atom", "id")[0];
       const idText = idTag?.textContent?.trim();
       if (idText && /^https?:\/\//i.test(idText)) url = idText;
     }
-    const pubRaw = textContent(entry.querySelector("published")) || textContent(entry.querySelector("updated"));
+    const pubRaw = textContent(entry2.querySelector("published")) || textContent(entry2.querySelector("updated"));
     const publishedAt = pubRaw ? Date.parse(pubRaw) || Date.now() : Date.now();
     if (!title || !url || !/^https?:\/\//i.test(url)) continue;
     const id = `rss:${sourceLabel}:${hashUrl(url)}`;
@@ -26366,7 +26366,7 @@ function hashUrl(url) {
   return (h2 >>> 0).toString(36);
 }
 function rssItemToInferredLine(item) {
-  const league = item.league;
+  const league2 = item.league;
   const sport = item.sport;
   const headline = item.headline.length > 140 ? `${item.headline.slice(0, 137)}\u2026` : item.headline;
   const day = (/* @__PURE__ */ new Date()).toISOString().slice(0, 10);
@@ -26376,7 +26376,7 @@ function rssItemToInferredLine(item) {
     chipLabel: "BREAKING",
     message: `\u{1F534} ${headline}`,
     priority: item.priority,
-    league,
+    league: league2,
     sport,
     gameId: item.id,
     mode: "sports",
@@ -26398,13 +26398,13 @@ async function refreshTickerRssNews() {
     if (!got.ok) continue;
     const raw = parseRssOrAtom(got.xml, src.label, perFeed);
     for (const row of raw) {
-      const league = inferLeagueFromHeadline(row.headline);
-      const sport = leagueKeyToSport(league);
+      const league2 = inferLeagueFromHeadline(row.headline);
+      const sport = leagueKeyToSport(league2);
       const canon = canonicalHeadlineKey(row.headline);
       if (!canon || canon.length < 8) continue;
       if (headlineDeduper.isDuplicate(canon)) continue;
       headlineDeduper.remember(canon);
-      merged.push({ ...row, league, sport });
+      merged.push({ ...row, league: league2, sport });
     }
   }
   merged.sort((a2, b2) => b2.publishedAt - a2.publishedAt);
@@ -31035,8 +31035,8 @@ var GRARF_LEAGUE_ROUTE_PATHS = {
   SAUDI: "/saudi-pro-league",
   SUPERLIG: "/super-lig"
 };
-function leagueRoutePath(league) {
-  return GRARF_LEAGUE_ROUTE_PATHS[league] ?? "/";
+function leagueRoutePath(league2) {
+  return GRARF_LEAGUE_ROUTE_PATHS[league2] ?? "/";
 }
 
 // ../grarf/desktop/src/data/resolveLeagueDirectoryNavItemLogo.ts
@@ -31988,12 +31988,12 @@ var GAMES_SPINE_LEAGUE_LOGO_URL = {
   PLL: "/league-logos/pll.png",
   USLCUP: "/league-logos/usl-cup.png"
 };
-function resolveGamesSpineLeagueLogoUrl(league, options) {
+function resolveGamesSpineLeagueLogoUrl(league2, options) {
   const tournamentTitle = options?.tournamentTitle ?? options?.game?.awayTeam;
-  if (isPgaTourOpenChampionshipEvent(league, tournamentTitle)) {
+  if (isPgaTourOpenChampionshipEvent(league2, tournamentTitle)) {
     return THE_OPEN_LEAGUE_LOGO_URL;
   }
-  return GAMES_SPINE_LEAGUE_LOGO_URL[league] ?? resolveCanonicalLeagueLogoUrl({ grarfLeagueKey: league });
+  return GAMES_SPINE_LEAGUE_LOGO_URL[league2] ?? resolveCanonicalLeagueLogoUrl({ grarfLeagueKey: league2 });
 }
 function resolveGamesSpineLeagueLogoImgClassName(_league, _logoUrl) {
   return grarfLogoImgClassName();
@@ -32358,10 +32358,10 @@ function resolveFinalizedRetentionExpiry(game, retainedAt) {
 }
 function pruneRetainedFinals(byId, now = Date.now()) {
   const next = {};
-  for (const [id, entry] of Object.entries(byId)) {
-    if (!entry?.game || entry.game.status !== "final") continue;
-    if (typeof entry.expiresAt !== "number" || entry.expiresAt <= now) continue;
-    next[id] = entry;
+  for (const [id, entry2] of Object.entries(byId)) {
+    if (!entry2?.game || entry2.game.status !== "final") continue;
+    if (typeof entry2.expiresAt !== "number" || entry2.expiresAt <= now) continue;
+    next[id] = entry2;
   }
   return next;
 }
@@ -32467,10 +32467,10 @@ function recordLiveObservations(byId, games, ingestCycle, now = Date.now()) {
 }
 function pruneLiveRecency(byId, ingestCycle, now = Date.now()) {
   const next = {};
-  for (const [id, entry] of Object.entries(byId)) {
-    if (ingestCycle - entry.lastLiveIngestCycle > LIVE_RECENCY_MAX_INGEST_CYCLES) continue;
-    if (now - entry.lastLiveAtMs > LIVE_RECENCY_MAX_MS) continue;
-    next[id] = entry;
+  for (const [id, entry2] of Object.entries(byId)) {
+    if (ingestCycle - entry2.lastLiveIngestCycle > LIVE_RECENCY_MAX_INGEST_CYCLES) continue;
+    if (now - entry2.lastLiveAtMs > LIVE_RECENCY_MAX_MS) continue;
+    next[id] = entry2;
   }
   return next;
 }
@@ -32551,13 +32551,13 @@ var useRecentFinalizedGamesStore = (0, import_zustand7.create)((set, get) => ({
   harvestFinalizedFromLeagues: (leagues) => {
     get().mergeFinalizedGames(collectFinalGamesFromLeagues(leagues));
   },
-  getRetainedForLeague: (league) => {
+  getRetainedForLeague: (league2) => {
     const now = Date.now();
     const out = [];
-    for (const entry of Object.values(get().byId)) {
-      if (entry.expiresAt <= now || entry.game.status !== "final") continue;
-      if ((entry.game.league ?? "MLB") !== league) continue;
-      out.push(entry.game);
+    for (const entry2 of Object.values(get().byId)) {
+      if (entry2.expiresAt <= now || entry2.game.status !== "final") continue;
+      if ((entry2.game.league ?? "MLB") !== league2) continue;
+      out.push(entry2.game);
     }
     return out;
   },
@@ -32586,9 +32586,9 @@ if (typeof window !== "undefined") {
 // ../grarf/desktop/src/lib/gamesSpine/wimbledonGamesSpinePresentation.ts
 var WIMBLEDON_MEN_GAMES_SPINE_LEAGUE = "WIMBLEDON_MEN";
 var WIMBLEDON_WOMEN_GAMES_SPINE_LEAGUE = "WIMBLEDON_WOMEN";
-function resolveWimbledonGamesSpineSourceLeague(league) {
-  if (league === WIMBLEDON_MEN_GAMES_SPINE_LEAGUE) return "ATP";
-  if (league === WIMBLEDON_WOMEN_GAMES_SPINE_LEAGUE) return "WTA";
+function resolveWimbledonGamesSpineSourceLeague(league2) {
+  if (league2 === WIMBLEDON_MEN_GAMES_SPINE_LEAGUE) return "ATP";
+  if (league2 === WIMBLEDON_WOMEN_GAMES_SPINE_LEAGUE) return "WTA";
   return null;
 }
 function resolveWimbledonGameLeagueImportanceKey(game) {
@@ -32597,13 +32597,13 @@ function resolveWimbledonGameLeagueImportanceKey(game) {
   if (game.league === "WTA") return WIMBLEDON_WOMEN_GAMES_SPINE_LEAGUE;
   return null;
 }
-function filterGamesForWimbledonGamesSpineSection(league, games) {
+function filterGamesForWimbledonGamesSpineSection(league2, games) {
   if (!isGrarfWebRenderer()) return [...games];
-  const sourceLeague = resolveWimbledonGamesSpineSourceLeague(league);
+  const sourceLeague = resolveWimbledonGamesSpineSourceLeague(league2);
   if (sourceLeague) {
     return games.filter((game) => game.league === sourceLeague && isWimbledonTennisGame(game));
   }
-  if (league === "ATP" || league === "WTA") {
+  if (league2 === "ATP" || league2 === "WTA") {
     return games.filter((game) => !isWimbledonTennisGame(game));
   }
   return [...games];
@@ -32647,10 +32647,10 @@ function applyWimbledonGamesSpinePresentationPartition(leagues) {
   }
   return out;
 }
-function resolveGamesSpineRetainedForLeague(league) {
-  const sourceLeague = resolveWimbledonGamesSpineSourceLeague(league) ?? league;
+function resolveGamesSpineRetainedForLeague(league2) {
+  const sourceLeague = resolveWimbledonGamesSpineSourceLeague(league2) ?? league2;
   return filterGamesForWimbledonGamesSpineSection(
-    league,
+    league2,
     useRecentFinalizedGamesStore.getState().getRetainedForLeague(sourceLeague)
   );
 }
@@ -32676,21 +32676,21 @@ function isPgaTourMajorExcludingUsOpen(title) {
   return /\bmasters\b/i.test(title) || /\bpga championship\b/i.test(title) || /\b(the )?open championship\b/i.test(title) || /\bbritish open\b/i.test(title);
 }
 function resolveGolfGameImportanceV1(game) {
-  const league = game.league;
+  const league2 = game.league;
   const title = golfTournamentTitle(game);
-  if (isPgaTourUsOpenEvent(league, title)) {
+  if (isPgaTourUsOpenEvent(league2, title)) {
     return GOLF_GAME_IMPORTANCE_V1.US_OPEN;
   }
-  if (league === "PGA") {
+  if (league2 === "PGA") {
     if (isPgaTourMajorExcludingUsOpen(title)) return GOLF_GAME_IMPORTANCE_V1.PGA_MAJOR;
     return GOLF_GAME_IMPORTANCE_V1.PGA;
   }
-  if (league === "LPGA") {
+  if (league2 === "LPGA") {
     if (isLpgaMajorTournamentTitle(title)) return GOLF_GAME_IMPORTANCE_V1.LPGA_MAJOR;
     return GOLF_GAME_IMPORTANCE_V1.LPGA;
   }
-  if (league === "CHAMPIONS") return GOLF_GAME_IMPORTANCE_V1.CHAMPIONS;
-  if (league === "LIV") return GOLF_GAME_IMPORTANCE_V1.LIV;
+  if (league2 === "CHAMPIONS") return GOLF_GAME_IMPORTANCE_V1.CHAMPIONS;
+  if (league2 === "LIV") return GOLF_GAME_IMPORTANCE_V1.LIV;
   return null;
 }
 function resolveLeagueImportanceV1ForLeagueKey(leagueKey, _context) {
@@ -33266,8 +33266,8 @@ var GAMES_SPINE_LEAGUE_DISPLAY_LABEL = {
   WIMBLEDON_MEN: "Wimbledon (Men's)",
   WIMBLEDON_WOMEN: "Wimbledon (Women's)"
 };
-function resolveGamesSpineLeagueDisplayLabel(league) {
-  return GAMES_SPINE_LEAGUE_DISPLAY_LABEL[league] ?? GAMES_COLUMN_LEAGUE_LABEL[league] ?? resolveEspnOperationalLeagueLabel(league) ?? league;
+function resolveGamesSpineLeagueDisplayLabel(league2) {
+  return GAMES_SPINE_LEAGUE_DISPLAY_LABEL[league2] ?? GAMES_COLUMN_LEAGUE_LABEL[league2] ?? resolveEspnOperationalLeagueLabel(league2) ?? league2;
 }
 
 // ../grarf/desktop/src/lib/navigation/resolveOnTodayNavItems.ts
@@ -33818,7 +33818,7 @@ function refreshManualTourDeFranceSpineGameIfNeeded(game, now = /* @__PURE__ */ 
 function resolveTourDeFranceSpineGameById(gameId, now = /* @__PURE__ */ new Date()) {
   if (!isTourDeFranceSpineGameId(gameId)) return void 0;
   const stageNumber = Number.parseInt(gameId.match(/manual-tdf-stage-(\d+)-/)?.[1] ?? "", 10);
-  const stage2 = resolveTourDeFranceStages().find((entry) => entry.stage === stageNumber);
+  const stage2 = resolveTourDeFranceStages().find((entry2) => entry2.stage === stageNumber);
   if (!stage2) return void 0;
   return resolveTourDeFranceSpineGame(stage2, now);
 }
@@ -35376,13 +35376,13 @@ var GAMES_SPINE_PERMANENT_BROWSER_SOCIAL_RAIL_FEEDS = [
 
 // ../grarf/desktop/src/data/gamesSpinePermanentBrowserScheduleUrls.ts
 function resolveGamesSpinePermanentBrowserScheduleUrl(teamKey) {
-  const entry = GAMES_SPINE_PERMANENT_BROWSER_SOCIAL_RAIL_FEEDS.find(
+  const entry2 = GAMES_SPINE_PERMANENT_BROWSER_SOCIAL_RAIL_FEEDS.find(
     (feed) => feed.teamKey === teamKey
   );
-  if (!entry) {
+  if (!entry2) {
     throw new Error(`Unknown Games Spine permanent browser team key: ${teamKey}`);
   }
-  return entry.url;
+  return entry2.url;
 }
 
 // ../grarf/desktop/src/data/homeLeagueWorkspaceHorseRacingNavigation.ts
@@ -36152,19 +36152,596 @@ var useHomeLeagueWorkspaceMainMenuStore = (0, import_zustand9.create)((set) => (
 
 // ../grarf/desktop/src/lib/home/buildHomeLeagueWorkspaceTab.ts
 init_define_import_meta_env();
+
+// ../grarf/desktop/src/lib/routing/workspaceAddress.ts
+init_define_import_meta_env();
+
+// ../grarf/shared/routing/index.ts
+init_define_import_meta_env();
+
+// ../grarf/shared/routing/types.ts
+init_define_import_meta_env();
+
+// ../grarf/shared/routing/reservedSlugs.ts
+init_define_import_meta_env();
+var RESERVED_SLUGS = /* @__PURE__ */ new Set([
+  "",
+  "today",
+  "games",
+  "leagues",
+  "browser",
+  "intel",
+  "search",
+  "settings",
+  "login",
+  "about",
+  "privacy",
+  "help",
+  "admin",
+  "api",
+  "health",
+  "game",
+  "team",
+  "player",
+  "article",
+  "video",
+  "competition",
+  "collection",
+  "watch-party",
+  "saved",
+  "workspace"
+]);
+function isReservedSlug(slug) {
+  const normalized = slug.trim().toLowerCase().replace(/^\/+|\/+$/g, "");
+  const firstSegment = normalized.split("/")[0] ?? "";
+  return RESERVED_SLUGS.has(firstSegment);
+}
+
+// ../grarf/shared/routing/normalizeSlug.ts
+init_define_import_meta_env();
+function normalizeSlug(input) {
+  return input.trim().toLowerCase().replace(/^\/+|\/+$/g, "").replace(/[_\s]+/g, "-").replace(/'/g, "").replace(/-+/g, "-").replace(/^-|-$/g, "");
+}
+function compactSlug(input) {
+  return normalizeSlug(input).replace(/-/g, "");
+}
+function slugLookupKeys(input) {
+  const normalized = normalizeSlug(input);
+  if (!normalized) return [];
+  const compact = compactSlug(normalized);
+  return compact === normalized ? [normalized] : [normalized, compact];
+}
+function normalizePath(input) {
+  const trimmed = input.trim();
+  if (!trimmed || trimmed === "/") return "/";
+  const segments = trimmed.split("/").map((segment) => normalizeSlug(segment)).filter(Boolean);
+  return `/${segments.join("/")}`;
+}
+
+// ../grarf/shared/routing/canonicalRegistry.ts
+init_define_import_meta_env();
+function entry(displayName, id, kind, canonicalPath, options = {}) {
+  return {
+    id,
+    displayName,
+    kind,
+    canonicalPath,
+    aliases: options.aliases,
+    status: options.status ?? (options.leagueKey ? "active" : "nav"),
+    leagueKey: options.leagueKey,
+    sportKey: options.sportKey
+  };
+}
+function league(displayName, leagueKey, canonicalSlug, aliases = [], status = "active") {
+  return entry(displayName, leagueKey, "league", `/${canonicalSlug}`, {
+    leagueKey,
+    aliases,
+    status
+  });
+}
+function navLeague(displayName, canonicalSlug, aliases = [], id) {
+  return entry(displayName, id ?? `nav.${canonicalSlug}`, "league", `/${canonicalSlug}`, {
+    aliases,
+    status: "nav"
+  });
+}
+var CANONICAL_REGISTRY_ENTRIES = [
+  entry("Today", "destination.today", "destination", "/today", { status: "active" }),
+  entry("Today News", "today.news", "today_section", "/today/news", { status: "active" }),
+  entry("Today Sportscape", "today.news.sportscape", "today_section", "/today/news/sportscape", {
+    aliases: ["sportscape"],
+    status: "active"
+  }),
+  entry("Today Newswire", "today.news.newswire", "today_section", "/today/news/newswire", {
+    aliases: ["newswire"],
+    status: "active"
+  }),
+  entry("Today Pulse", "today.pulse", "today_section", "/today/pulse", { status: "active" }),
+  entry("Today LiveTracker", "today.pulse.livetracker", "today_section", "/today/pulse/livetracker", {
+    aliases: ["livetracker"],
+    status: "active"
+  }),
+  entry("Today Social", "today.pulse.social", "today_section", "/today/pulse/social", { status: "active" }),
+  entry("Today Videos", "today.videos", "today_section", "/today/videos", {
+    aliases: ["highlightstv"],
+    status: "active"
+  }),
+  entry("Today Clips", "today.videos.clips", "today_section", "/today/videos/clips", { status: "active" }),
+  entry("Today Highlights", "today.videos.highlights", "today_section", "/today/videos/highlights", {
+    status: "active"
+  }),
+  entry("Games", "destination.games", "destination", "/games", { status: "active" }),
+  entry("Games Live", "games.live", "games_collection", "/games/live", { status: "active" }),
+  entry("Games Upcoming", "games.upcoming", "games_collection", "/games/upcoming", { status: "active" }),
+  entry("Games Final", "games.final", "games_collection", "/games/final", { status: "active" }),
+  entry("Leagues Directory", "destination.leagues", "destination", "/leagues", { status: "active" }),
+  entry("Browser", "destination.browser", "destination", "/browser", { status: "active" }),
+  entry("Intel", "destination.intel", "destination", "/intel", { status: "active" }),
+  entry("Intel Podcasts", "intel.podcasts", "intel_section", "/intel/podcasts", { status: "active" }),
+  entry("Intel Newsletters", "intel.newsletters", "intel_section", "/intel/newsletters", { status: "active" }),
+  entry("Intel Shows", "intel.shows", "intel_section", "/intel/shows", { status: "active" }),
+  entry("Soccer", "sport.soccer", "sport", "/leagues/soccer", { sportKey: "soccer", status: "active" }),
+  entry("Baseball", "sport.baseball", "sport", "/leagues/baseball", { status: "active" }),
+  entry("Basketball", "sport.basketball", "sport", "/leagues/basketball", {
+    sportKey: "basketball",
+    status: "active"
+  }),
+  entry("Football", "sport.football", "sport", "/leagues/football", { sportKey: "football", status: "active" }),
+  entry("Hockey", "sport.hockey", "sport", "/leagues/hockey", { status: "active" }),
+  entry("Tennis", "sport.tennis", "sport", "/leagues/tennis", { sportKey: "tennis", status: "active" }),
+  entry("Golf", "sport.golf", "sport", "/leagues/golf", { sportKey: "golf", status: "active" }),
+  entry("Motorsports", "sport.motorsports", "sport", "/leagues/motorsports", {
+    sportKey: "motorsports",
+    status: "active"
+  }),
+  entry("Combat", "sport.combat", "sport", "/leagues/combat", { sportKey: "combat", status: "active" }),
+  entry("Cycling", "sport.cycling", "sport", "/leagues/cycling", { status: "active" }),
+  entry("Rugby", "sport.rugby", "sport", "/leagues/rugby", { status: "active" }),
+  entry("Cricket", "sport.cricket", "sport", "/leagues/cricket", { status: "active" }),
+  entry("Volleyball", "sport.volleyball", "sport", "/leagues/volleyball", { status: "active" }),
+  entry("Softball", "sport.softball", "sport", "/leagues/softball", { status: "active" }),
+  entry("Olympics", "sport.olympics", "sport", "/olympics", { status: "future" }),
+  entry("Esports", "sport.esports", "sport", "/esports", { status: "future" }),
+  entry("Browser Standings", "browser.standings", "browser_category", "/browser/standings", { status: "active" }),
+  entry("Browser Schedules", "browser.schedules", "browser_category", "/browser/schedules", { status: "active" }),
+  entry("Browser Rankings", "browser.rankings", "browser_category", "/browser/rankings", { status: "active" }),
+  entry("Browser Statistics", "browser.stats", "browser_category", "/browser/stats", { status: "active" }),
+  entry("Browser Fantasy", "browser.fantasy", "browser_category", "/browser/fantasy", { status: "active" }),
+  entry("Browser Betting", "browser.betting", "browser_category", "/browser/betting", { status: "active" }),
+  entry("Browser Transactions", "browser.transactions", "browser_category", "/browser/transactions", {
+    status: "active"
+  }),
+  league("MLB", "MLB", "mlb", ["major-league-baseball"]),
+  league("NCAA Baseball (MCWS)", "NCAABB", "college-world-series", ["ncaa-baseball", "ncaabb", "mcws", "cws"]),
+  navLeague("NCAA Softball (WCWS)", "womens-college-world-series", ["wcws", "ncaa-softball"], "NCAASB"),
+  navLeague("MiLB", "milb", ["minor-league-baseball"]),
+  navLeague("NPB", "npb"),
+  navLeague("KBO", "kbo", ["korean-baseball"]),
+  navLeague("Liga Mexicana", "liga-mexicana"),
+  navLeague("Caribbean Series", "caribbean-series"),
+  league("NBA", "NBA", "nba", ["national-basketball-association"]),
+  league("WNBA", "WNBA", "wnba"),
+  navLeague("NCAA Men's Basketball", "ncaa-mens-basketball", ["ncaam", "march-madness-mens"], "MNCAAB"),
+  navLeague("NCAA Women's Basketball", "ncaa-womens-basketball", ["ncaaw", "womens-march-madness"], "WNCAAB"),
+  navLeague("G League", "g-league", ["nba-g-league", "gleague"]),
+  navLeague("BIG3", "big3"),
+  navLeague("EuroLeague", "euroleague"),
+  league("NFL", "NFL", "nfl", ["national-football-league"]),
+  league("NCAA Football", "NCAAF", "ncaa-football", ["ncaaf", "college-football"]),
+  navLeague("UFL", "ufl", ["united-football-league"]),
+  league("CFL", "CFL", "cfl", ["canadian-football-league"], "nav"),
+  entry("XFL", "XFL", "league", "/xfl", { leagueKey: "XFL", status: "future" }),
+  league("NHL", "NHL", "nhl", ["national-hockey-league"]),
+  navLeague("PWHL", "pwhl", ["professional-womens-hockey-league"]),
+  navLeague("KHL", "khl", ["kontinental-hockey-league"]),
+  navLeague("NCAA Men's Hockey", "ncaa-mens-hockey"),
+  navLeague("NCAA Women's Hockey", "ncaa-womens-hockey"),
+  navLeague("AHL", "ahl", ["american-hockey-league"]),
+  league("FIFA World Cup", "WORLDCUP", "world-cup", ["fifa-world-cup", "worldcup", "fwc"]),
+  league("Premier League", "EPL", "premier-league", ["epl", "english-premier-league"]),
+  league("UEFA Champions League", "UCL", "champions-league", ["ucl", "uefa-champions-league"]),
+  league("UEFA Europa League", "UEL", "europa-league", ["uel", "uefa-europa-league"]),
+  league("UEFA Conference League", "UECL", "conference-league", ["uecl", "uefa-conference-league"]),
+  league("MLS", "MLS", "mls", ["major-league-soccer"]),
+  league("NWSL", "NWSL", "nwsl", ["national-womens-soccer-league"]),
+  league("LaLiga", "LALIGA", "la-liga", ["laliga", "spanish-la-liga"]),
+  league("Bundesliga", "BUNDESLIGA", "bundesliga", ["german-bundesliga"]),
+  league("Serie A", "SERIEA", "serie-a", ["italian-serie-a"]),
+  league("Ligue 1", "LIGUE1", "ligue-1", ["french-ligue-1", "ligue1"]),
+  league("Liga MX", "LIGAMX", "liga-mx", ["ligamx", "mexican-liga-mx"]),
+  league("Eredivisie", "EREDIVISIE", "eredivisie", ["dutch-eredivisie"]),
+  league("Scottish Premiership", "SPFL", "scottish-premiership", ["spfl", "scottish-prem"]),
+  league("Saudi Pro League", "SAUDI", "saudi-pro-league", ["saudi", "rsl"]),
+  league("S\xFCper Lig", "SUPERLIG", "super-lig", ["superlig", "turkish-super-lig"]),
+  league("UEFA Women's Euro", "EURO", "euro", ["uefa-euro", "european-championship"]),
+  league("Copa Am\xE9rica", "COPA", "copa-america", ["copa"]),
+  league("CONCACAF Gold Cup", "GOLDCUP", "gold-cup", ["goldcup", "concacaf-gold-cup"]),
+  league("UEFA Nations League", "NATIONS", "nations-league", ["nations", "uefa-nations-league"]),
+  league("FIFA Club World Cup", "CLUBWC", "club-world-cup", ["clubwc", "fifa-club-world-cup"]),
+  league("FIFA Women's World Cup", "WWC", "womens-world-cup", ["wwc", "fifa-womens-world-cup"]),
+  league("Leagues Cup", "USLCUP", "leagues-cup", ["uslcup"]),
+  league("USL Championship", "USLC", "usl-championship", ["usl"], "nav"),
+  league("USL League One", "USL1", "usl-league-one", ["usl1"], "nav"),
+  league("Copa Libertadores", "LIBERTADORES", "copa-libertadores", ["libertadores"], "nav"),
+  league("Copa Sudamericana", "SUDAMERICANA", "copa-sudamericana", ["sudamericana"], "nav"),
+  league("Brasileir\xE3o", "BRA1", "brasileirao", ["brazilian-serie-a"], "nav"),
+  league("Argentine Primera", "ARG1", "argentine-primera", ["liga-profesional"], "nav"),
+  league("Primeira Liga", "POR1", "primeira-liga", ["portuguese-primeira-liga"], "nav"),
+  league("Belgian Pro League", "BEL1", "belgian-pro-league", ["belgian-pro"], "nav"),
+  navLeague("FA Cup", "fa-cup"),
+  navLeague("EFL Championship", "efl-championship", ["championship"]),
+  navLeague("Women's Champions League", "womens-champions-league", ["womens-ucl"]),
+  navLeague("J1 League", "j1-league", ["j1"]),
+  league("CONCACAF Champions Cup", "CONCACAF_CL", "concacaf-champions-cup", ["concacaf-champions"], "nav"),
+  league("International Friendlies", "INTFRIENDLY", "international-friendlies", [], "nav"),
+  league("ATP Tour", "ATP", "atp", ["atp-tour"]),
+  league("WTA Tour", "WTA", "wta", ["wta-tour"]),
+  league("Wimbledon", "WIMBLEDON", "wimbledon"),
+  navLeague("French Open", "french-open", ["roland-garros", "rolandgarros"]),
+  navLeague("US Open", "us-open-tennis", ["us-open", "usopen"]),
+  navLeague("Australian Open", "australian-open", ["australianopen"]),
+  league("PGA Tour", "PGA", "pga-tour", ["pga", "pgatour"]),
+  league("LPGA Tour", "LPGA", "lpga-tour", ["lpga", "lpgatour"]),
+  league("LIV Golf", "LIV", "liv-golf", ["liv"]),
+  league("PGA Champions Tour", "CHAMPIONS", "pga-champions-tour", ["pga-champions", "champions-tour"]),
+  league("DP World Tour", "DP_WORLD", "dp-world-tour", ["dpworld", "european-tour"], "nav"),
+  navLeague("The Masters", "the-masters", ["masters", "augusta"]),
+  navLeague("The Open Championship", "the-open", ["british-open", "open-championship"]),
+  navLeague("PGA Championship", "pga-championship"),
+  navLeague("US Open Golf", "us-open-golf"),
+  league("Formula 1", "F1", "formula-1", ["f1", "formula1", "formulaone", "formula-one"]),
+  league("Formula 2", "F2", "formula-2", ["f2"]),
+  league("Formula 3", "F3", "formula-3", ["f3"]),
+  league("Formula E", "FORMULA_E", "formula-e", ["formulae"]),
+  league("NASCAR Cup Series", "NASCAR", "nascar-cup-series", ["nascar", "nascar-cup"]),
+  league("NASCAR Xfinity Series", "NASCAR_XFINITY", "nascar-xfinity", ["nascar-oreilly", "xfinity"]),
+  league("NASCAR Truck Series", "NASCAR_TRUCK", "nascar-trucks", ["nascar-truck", "trucks"]),
+  league("IndyCar", "INDYCAR", "indycar", ["indy-car", "indycar-series"]),
+  league("MotoGP", "MOTOGP", "motogp", ["moto-gp"]),
+  league("Moto2", "MOTO2", "moto2"),
+  league("Moto3", "MOTO3", "moto3"),
+  league("FIA World Endurance Championship", "WEC", "wec", ["world-endurance-championship"]),
+  navLeague("IMSA", "imsa"),
+  navLeague("NHRA", "nhra"),
+  navLeague("World Rally Championship", "world-rally", ["wrc"]),
+  league("Tour de France", "TDF", "tour-de-france", ["tdf", "tourdefrance"]),
+  navLeague("Giro d'Italia", "giro-d-italia", ["giro", "giro-italia"]),
+  navLeague("Vuelta a Espa\xF1a", "vuelta-a-espana", ["vuelta", "la-vuelta"]),
+  league("UFC", "UFC", "ufc", ["ultimate-fighting-championship"]),
+  navLeague("Boxing", "boxing"),
+  navLeague("PFL", "pfl", ["professional-fighters-league"]),
+  league("Rugby World Cup", "RUGBYWC", "rugby-world-cup", ["rugbywc"], "nav"),
+  league("Premiership Rugby", "RUGBYPREM", "premiership-rugby", ["premiership"], "nav"),
+  league("Top 14", "RUGBYTOP14", "top-14", ["top14", "rugby-top-14"], "nav"),
+  navLeague("Major League Rugby", "major-league-rugby", ["mlr"]),
+  navLeague("Rugby Union", "rugby-union"),
+  navLeague("IPL", "ipl", ["indian-premier-league"]),
+  navLeague("Big Bash League", "big-bash-league", ["bbl", "big-bash"]),
+  navLeague("ICC T20 Women's World Cup", "t20-womens-world-cup", ["t20-wwc"]),
+  navLeague("ODI Cricket", "odi-cricket", ["odi"]),
+  navLeague("NCAA Volleyball (Women)", "ncaa-volleyball-women", ["volleyball-ncaaw"]),
+  navLeague("NCAA Volleyball (Men)", "ncaa-volleyball-men", ["volleyball-ncaam"]),
+  navLeague("AVP Beach Volleyball", "avp"),
+  navLeague("NCAA Softball", "ncaa-softball", ["softball-ncaa"]),
+  navLeague("Horse Racing", "horse-racing"),
+  navLeague("Track and Field", "track-and-field", ["track-field"]),
+  navLeague("Swimming", "swimming"),
+  navLeague("Winter Sports", "winter-sports"),
+  navLeague("Lacrosse", "lacrosse"),
+  navLeague("PLL Lacrosse", "pll", ["premier-lacrosse-league"])
+];
+var PATH_ALIASES = [
+  { from: "/whiparound", to: "/today" }
+];
+var LEAGUE_SUB_RESOURCE_SUFFIXES = [
+  "standings",
+  "schedule",
+  "teams",
+  "stats",
+  "rankings",
+  "news",
+  "games"
+];
+var LEAGUE_SUB_RESOURCE_SUFFIX_SET = new Set(LEAGUE_SUB_RESOURCE_SUFFIXES);
+
+// ../grarf/shared/routing/registryIndexes.ts
+init_define_import_meta_env();
+function toCanonicalSlug(canonicalPath) {
+  return canonicalPath.replace(/^\//, "");
+}
+function toResource(definition) {
+  return {
+    id: definition.id,
+    displayName: definition.displayName,
+    kind: definition.kind,
+    canonicalSlug: toCanonicalSlug(definition.canonicalPath),
+    canonicalPath: definition.canonicalPath,
+    status: definition.status ?? (definition.leagueKey ? "active" : "nav"),
+    leagueKey: definition.leagueKey,
+    sportKey: definition.sportKey
+  };
+}
+function registerSlugAlias(slugToCanonicalPath, aliasSlugs, alias, canonicalPath, canonicalSlug) {
+  for (const key2 of slugLookupKeys(alias)) {
+    if (key2 === canonicalSlug) continue;
+    slugToCanonicalPath.set(key2, canonicalPath);
+    aliasSlugs.add(key2);
+  }
+}
+function validateEntry(resource) {
+  const firstSegment = resource.canonicalSlug.split("/")[0] ?? "";
+  if (resource.kind === "league" && firstSegment && !resource.canonicalSlug.includes("/") && isReservedSlug(firstSegment)) {
+    throw new Error(
+      `Registry entry "${resource.id}" uses reserved slug "${firstSegment}" at ${resource.canonicalPath}`
+    );
+  }
+}
+function buildRegistryIndexes(definitions, pathAliases = []) {
+  const entries = definitions.map(toResource);
+  const byId = /* @__PURE__ */ new Map();
+  const byCanonicalPath = /* @__PURE__ */ new Map();
+  const slugToCanonicalPath = /* @__PURE__ */ new Map();
+  const aliasSlugs = /* @__PURE__ */ new Set();
+  const pathAliasMap = /* @__PURE__ */ new Map();
+  for (const resource of entries) {
+    validateEntry(resource);
+    byId.set(resource.id, resource);
+    byCanonicalPath.set(resource.canonicalPath, resource);
+    for (const key2 of slugLookupKeys(resource.canonicalSlug)) {
+      slugToCanonicalPath.set(key2, resource.canonicalPath);
+    }
+    const definition = definitions.find((item) => item.id === resource.id);
+    const aliases = definition?.aliases ?? [];
+    for (const alias of aliases) {
+      registerSlugAlias(slugToCanonicalPath, aliasSlugs, alias, resource.canonicalPath, resource.canonicalSlug);
+    }
+  }
+  for (const alias of pathAliases) {
+    pathAliasMap.set(normalizePath(alias.from), normalizePath(alias.to));
+  }
+  return {
+    entries,
+    byId,
+    byCanonicalPath,
+    slugToCanonicalPath,
+    aliasSlugs,
+    pathAliases: pathAliasMap
+  };
+}
+function resolveCanonicalPathFromSlug(indexes, slugInput) {
+  for (const key2 of slugLookupKeys(slugInput)) {
+    const canonicalPath = indexes.slugToCanonicalPath.get(key2);
+    if (!canonicalPath) continue;
+    const wasAlias = indexes.aliasSlugs.has(key2);
+    return { canonicalPath, wasAlias };
+  }
+  return null;
+}
+
+// ../grarf/shared/routing/addressService.ts
+init_define_import_meta_env();
+var LEAGUE_LIKE_KINDS = /* @__PURE__ */ new Set(["league", "competition"]);
+var GrarfAddressService = class {
+  constructor(definitions = CANONICAL_REGISTRY_ENTRIES) {
+    __publicField(this, "indexes");
+    this.indexes = buildRegistryIndexes(definitions, PATH_ALIASES);
+  }
+  normalizeSlug(input) {
+    return normalizeSlug(input);
+  }
+  isAlias(slug) {
+    const normalized = normalizeSlug(slug);
+    return normalized ? this.indexes.aliasSlugs.has(normalized) : false;
+  }
+  getResourceById(id) {
+    return this.indexes.byId.get(id) ?? null;
+  }
+  getResourceBySlug(slug) {
+    const resolution = this.resolveSlug(slug);
+    return resolution?.resource ?? null;
+  }
+  getCanonicalSlug(input) {
+    const resolution = this.resolveAddress(input);
+    if (!resolution) return null;
+    if (resolution.subResource) {
+      const base = resolution.resource.canonicalSlug;
+      return `${base}/${resolution.subResource}`;
+    }
+    return resolution.resource.canonicalSlug;
+  }
+  getCanonicalUrl(input) {
+    const resolution = this.resolveAddress(input);
+    return resolution?.canonicalUrl ?? null;
+  }
+  resolveSlug(slug) {
+    const resolved = resolveCanonicalPathFromSlug(this.indexes, slug);
+    if (!resolved) return null;
+    const resource = this.indexes.byCanonicalPath.get(resolved.canonicalPath);
+    if (!resource) return null;
+    return { resource, wasAlias: resolved.wasAlias };
+  }
+  resolveAddress(input) {
+    const normalizedInput = this.normalizeAddressInput(input);
+    if (!normalizedInput) return null;
+    const pathAliasTarget = this.indexes.pathAliases.get(normalizedInput);
+    const pathToResolve = pathAliasTarget ?? normalizedInput;
+    if (pathToResolve === "/") {
+      return this.resolutionForPath("/today", input, true);
+    }
+    const exact = this.indexes.byCanonicalPath.get(pathToResolve);
+    if (exact) {
+      return this.resolutionForResource(exact, input, false);
+    }
+    const segments = pathToResolve.replace(/^\//, "").split("/").filter(Boolean);
+    if (segments.length === 0) return null;
+    const subResource = segments.length > 1 && LEAGUE_SUB_RESOURCE_SUFFIX_SET.has(segments[segments.length - 1]) ? segments.pop() : void 0;
+    const basePath = `/${segments.join("/")}`;
+    const baseSlug = segments.join("/");
+    const baseExact = this.indexes.byCanonicalPath.get(basePath);
+    if (baseExact && subResource) {
+      return this.resolutionForResource(baseExact, input, false, subResource);
+    }
+    const resolvedBase = resolveCanonicalPathFromSlug(this.indexes, baseSlug);
+    if (!resolvedBase) return null;
+    const resource = this.indexes.byCanonicalPath.get(resolvedBase.canonicalPath);
+    if (!resource) return null;
+    if (subResource && !this.supportsSubResource(resource)) {
+      return null;
+    }
+    return this.resolutionForResource(resource, input, resolvedBase.wasAlias, subResource);
+  }
+  getCanonicalUrlForId(id) {
+    const resource = this.getResourceById(id);
+    return resource?.canonicalPath ?? null;
+  }
+  getCanonicalUrlForLeagueKey(leagueKey) {
+    const resource = this.indexes.entries.find((entry2) => entry2.leagueKey === leagueKey);
+    return resource?.canonicalPath ?? null;
+  }
+  listResources() {
+    return this.indexes.entries;
+  }
+  normalizeAddressInput(input) {
+    const trimmed = input.trim();
+    if (!trimmed) return null;
+    if (trimmed.startsWith("/")) return normalizePath(trimmed);
+    return normalizePath(`/${normalizeSlug(trimmed)}`);
+  }
+  supportsSubResource(resource) {
+    return LEAGUE_LIKE_KINDS.has(resource.kind);
+  }
+  resolutionForPath(path, input, wasAlias) {
+    const resource = this.indexes.byCanonicalPath.get(path);
+    if (!resource) return null;
+    return this.resolutionForResource(resource, input, wasAlias);
+  }
+  resolutionForResource(resource, input, wasAlias, subResource) {
+    const canonicalPath = subResource ? `${resource.canonicalPath}/${subResource}` : resource.canonicalPath;
+    return {
+      resource,
+      canonicalPath,
+      canonicalUrl: canonicalPath,
+      input,
+      wasAlias,
+      subResource
+    };
+  }
+};
+var grarfAddressService = new GrarfAddressService();
+
+// ../grarf/desktop/src/lib/routing/workspaceAddress.ts
+function toMetadata(resolution, resourceId, resourceKind = resolution.resource.kind, leagueKey) {
+  return {
+    canonicalUrl: resolution.canonicalUrl,
+    canonicalSlug: resolution.subResource ? `${resolution.resource.canonicalSlug}/${resolution.subResource}` : resolution.resource.canonicalSlug,
+    resourceKind,
+    resourceId,
+    leagueKey: leagueKey ?? resolution.resource.leagueKey,
+    subResource: resolution.subResource
+  };
+}
+function resolveRegistryAddress(input) {
+  return grarfAddressService.resolveAddress(input);
+}
+function mapLeagueHubCategoryToSubResource(categoryId) {
+  if (!categoryId) return void 0;
+  const normalized = categoryId.trim().toLowerCase();
+  return LEAGUE_SUB_RESOURCE_SUFFIX_SET.has(normalized) ? normalized : void 0;
+}
+function resolveLeagueHubWorkspaceAddress(hubId, categoryId) {
+  const subResource = mapLeagueHubCategoryToSubResource(categoryId);
+  const hubResolution = resolveRegistryAddress(hubId);
+  if (!hubResolution) return null;
+  if (subResource) {
+    const withSubResource = resolveRegistryAddress(`${hubId}/${subResource}`);
+    if (withSubResource) {
+      return toMetadata(
+        withSubResource,
+        hubResolution.resource.leagueKey ?? hubResolution.resource.id,
+        hubResolution.resource.kind,
+        hubResolution.resource.leagueKey
+      );
+    }
+  }
+  return toMetadata(
+    hubResolution,
+    hubResolution.resource.leagueKey ?? hubResolution.resource.id,
+    hubResolution.resource.kind,
+    hubResolution.resource.leagueKey
+  );
+}
+function resolveGameWorkspaceAddress(gameId, leagueKey) {
+  const canonicalUrl = `/game/${gameId}`;
+  return {
+    canonicalUrl,
+    canonicalSlug: `game/${gameId}`,
+    resourceKind: "game",
+    resourceId: gameId,
+    leagueKey: leagueKey ?? void 0
+  };
+}
+function resolveIntelligenceWorkspaceAddress(briefingId) {
+  const resolution = resolveRegistryAddress("/intel");
+  if (resolution) {
+    return {
+      ...toMetadata(resolution, briefingId, "intelligence"),
+      resourceId: briefingId
+    };
+  }
+  return {
+    canonicalUrl: "/intel",
+    canonicalSlug: "intel",
+    resourceKind: "intelligence",
+    resourceId: briefingId
+  };
+}
+function resolveWorkspaceAddress(workspace, context2) {
+  if (workspace.type === "league-hub" && workspace.leagueHubId) {
+    return resolveLeagueHubWorkspaceAddress(
+      workspace.leagueHubId,
+      context2?.leagueHubCategoryId
+    );
+  }
+  if (workspace.type === "game" && workspace.gamePayload?.gameId) {
+    return resolveGameWorkspaceAddress(
+      workspace.gamePayload.gameId,
+      workspace.gamePayload.sport === "mlb" ? "MLB" : void 0
+    );
+  }
+  if (workspace.type === "intelligence" && workspace.intelligenceBriefingId) {
+    return resolveIntelligenceWorkspaceAddress(workspace.intelligenceBriefingId);
+  }
+  if (workspace.type === "game" || workspace.id.startsWith("game-") || workspace.id.includes("-game-")) {
+    const gameId = workspace.gamePayload?.gameId ?? workspace.id.replace(/^.*-game-/, "").replace(/^game-/, "");
+    if (gameId) {
+      return resolveGameWorkspaceAddress(gameId);
+    }
+  }
+  return null;
+}
+function withWorkspaceAddress(workspace, context2) {
+  const address = resolveWorkspaceAddress(workspace, context2);
+  if (!address) return workspace;
+  if (workspace.address?.canonicalUrl === address.canonicalUrl && workspace.address?.resourceId === address.resourceId && workspace.address?.subResource === address.subResource) {
+    return workspace;
+  }
+  return { ...workspace, address };
+}
+
+// ../grarf/desktop/src/lib/home/buildHomeLeagueWorkspaceTab.ts
 var HOME_LEAGUE_HUB_TAB_PREFIX = "league-hub-";
 function resolveHomeLeagueHubWorkspaceLogoUrl(hubId) {
   return resolveCanonicalLeagueLogoUrl({ hubId });
 }
 function buildHomeLeagueWorkspaceTab(hubId) {
-  return {
+  return withWorkspaceAddress({
     id: `${HOME_LEAGUE_HUB_TAB_PREFIX}${hubId}`,
     type: "league-hub",
     title: resolveHomeLeagueWorkspaceHubTitle(hubId),
     url: "",
     closable: true,
     leagueHubId: hubId
-  };
+  });
 }
 function isHomeLeagueHubWorkspaceTab(workspace) {
   return workspace?.type === "league-hub" && workspace.leagueHubId != null;
@@ -36668,9 +37245,9 @@ function preserveMissingOperationalIngestGames(incoming, previousGames) {
   if (preserved.length === 0) return incoming;
   const leagues = { ...incoming.leagues };
   for (const game of preserved) {
-    const league = game.league ?? "MLB";
-    if (!leagues[league]) leagues[league] = [];
-    leagues[league] = [...leagues[league], { ...game }];
+    const league2 = game.league ?? "MLB";
+    if (!leagues[league2]) leagues[league2] = [];
+    leagues[league2] = [...leagues[league2], { ...game }];
   }
   return { ...incoming, leagues };
 }
@@ -36728,9 +37305,9 @@ function mergeSupplementalRetainedFinals(snap, retained) {
   const byLeague = {};
   for (const game of retained) {
     if (game.status !== "final") continue;
-    const league = game.league ?? "MLB";
-    if (!byLeague[league]) byLeague[league] = [];
-    byLeague[league].push(game);
+    const league2 = game.league ?? "MLB";
+    if (!byLeague[league2]) byLeague[league2] = [];
+    byLeague[league2].push(game);
   }
   return mergeFinalRowsIntoSnapshot(snap, byLeague);
 }
@@ -36962,8 +37539,8 @@ function buildFinalizedTransitionCoverageSnapshot() {
     (t2) => t2.wasEverFinal || t2.droppedBeforeFinalSeen || t2.finalSeenInIncoming
   );
   const coverageRate = eligible.length === 0 ? 1 : harvested.filter((t2) => eligible.includes(t2)).length / eligible.length;
-  const byLeague = getGamesColumnLeagueOrder().map((league) => {
-    const leagueTracks = all.filter((t2) => t2.league === league);
+  const byLeague = getGamesColumnLeagueOrder().map((league2) => {
+    const leagueTracks = all.filter((t2) => t2.league === league2);
     const leagueEligible = leagueTracks.filter(
       (t2) => t2.wasEverFinal || t2.droppedBeforeFinalSeen || t2.finalSeenInIncoming
     );
@@ -36971,7 +37548,7 @@ function buildFinalizedTransitionCoverageSnapshot() {
     const leagueMissed = leagueTracks.filter(isMissedFinal);
     const leagueCoverage = leagueEligible.length === 0 ? 1 : leagueHarvested.filter((t2) => leagueEligible.includes(t2)).length / leagueEligible.length;
     return {
-      league,
+      league: league2,
       tracked: leagueTracks.length,
       everFinal: leagueTracks.filter((t2) => t2.wasEverFinal).length,
       everLive: leagueTracks.filter((t2) => t2.wasEverLive).length,
@@ -37271,11 +37848,11 @@ function isMlbRegionalBroadcastLabel(label) {
     u2
   );
 }
-function broadcastLabelScore(label, league) {
+function broadcastLabelScore(label, league2) {
   const raw = label.trim();
   if (!raw || raw === "TV TBD") return 0;
   const u2 = raw.toUpperCase();
-  if (league === "MLB") {
+  if (league2 === "MLB") {
     if (isMlbNationalBroadcastLabel(raw)) return 100;
     if (isMlbTvBroadcastLabel(raw)) return 88;
     if (isMlbRegionalBroadcastLabel(raw)) return 80;
@@ -37297,7 +37874,7 @@ function broadcastLabelScore(label, league) {
   if (/BALLY/.test(u2)) return 82;
   return 50;
 }
-function rankBroadcastLabels(labels, league, max = 6) {
+function rankBroadcastLabels(labels, league2, max = 6) {
   const seen = /* @__PURE__ */ new Set();
   const unique = [];
   for (const raw of labels) {
@@ -37309,7 +37886,7 @@ function rankBroadcastLabels(labels, league, max = 6) {
     unique.push(t2);
   }
   return unique.sort((a2, b2) => {
-    const delta = broadcastLabelScore(b2, league) - broadcastLabelScore(a2, league);
+    const delta = broadcastLabelScore(b2, league2) - broadcastLabelScore(a2, league2);
     if (delta !== 0) return delta;
     return a2.localeCompare(b2);
   }).slice(0, max);
@@ -37335,8 +37912,8 @@ function attachBroadcastFields(game) {
 // ../grarf/desktop/src/lib/broadcast/broadcastLabelRank.ts
 init_define_import_meta_env();
 var WNBA_REAL_BROADCASTER = /prime|nba\s*tv|peacock|usa|ion|cnbc|paramount|cbs|abc|cw\b|league\s*pass|wwor|kfaa|vegas/i;
-function filterWnbaMisattributedEspn(labels, league) {
-  if (league !== "WNBA") return [...labels];
+function filterWnbaMisattributedEspn(labels, league2) {
+  if (league2 !== "WNBA") return [...labels];
   const hasRealBroadcaster = labels.some((label) => WNBA_REAL_BROADCASTER.test(label));
   if (!hasRealBroadcaster) return [...labels];
   return labels.filter((label) => {
@@ -37356,11 +37933,11 @@ function rankBroadcastLabelsForGame(game, max = 6) {
 // ../grarf/desktop/src/services/canonicalLiveGame/normalize.ts
 init_isGrarfWebRenderer();
 function normalizeCanonicalLiveGame(game, input) {
-  const league = game.league ?? "MLB";
-  const enriched = isGrarfWebRenderer() ? { ...game, league } : attachBroadcastFields({ ...game, league });
+  const league2 = game.league ?? "MLB";
+  const enriched = isGrarfWebRenderer() ? { ...game, league: league2 } : attachBroadcastFields({ ...game, league: league2 });
   const meta = {
     gameId: enriched.id,
-    league,
+    league: league2,
     updatedAt: input.updatedAt,
     sourceProvider: input.sourceProvider,
     normalizedVersion: input.normalizedVersion,
@@ -37378,9 +37955,9 @@ function emptyLeagues() {
 function rebuildLeaguesFromCanonical(gamesById) {
   const leagues = emptyLeagues();
   for (const record of Object.values(gamesById)) {
-    const league = record.meta.league;
-    if (!leagues[league]) leagues[league] = [];
-    leagues[league].push(record.game);
+    const league2 = record.meta.league;
+    if (!leagues[league2]) leagues[league2] = [];
+    leagues[league2].push(record.game);
   }
   return leagues;
 }
@@ -37490,14 +38067,14 @@ var useLiveGamesStore = (0, import_zustand13.create)((set) => ({
     }
     if (define_import_meta_env_default.DEV && define_import_meta_env_default.VITE_TRACE_FINAL_LIVE_FIELDS === "1") {
       try {
-        for (const [league, rows] of Object.entries(snap.leagues ?? {})) {
+        for (const [league2, rows] of Object.entries(snap.leagues ?? {})) {
           if (!Array.isArray(rows)) continue;
           const candidate = rows.find(
             (g2) => g2?.status === "final" && (g2.displayClock || g2.period != null && Number.isFinite(g2.period) && g2.period > 0 || g2.situation)
           );
           if (candidate) {
             console.log("[TRACE][final-live-fields][renderer:hydrate:snap]", {
-              league,
+              league: league2,
               gameId: candidate.id,
               updatedAt: snap.updatedAt ?? null,
               status: candidate.status,
@@ -37805,7 +38382,7 @@ var IMPORTANT_LEAGUES = [
   { label: "College Softball", key: "SOFTBALL" }
 ];
 var IMPORTANT_LEAGUE_KEYS = IMPORTANT_LEAGUES.map(
-  (entry) => entry.key
+  (entry2) => entry2.key
 );
 var IMPORTANT_LEAGUE_KEY_SET = new Set(
   IMPORTANT_LEAGUE_KEYS
@@ -38663,8 +39240,8 @@ init_define_import_meta_env();
 function textContent2(el) {
   return el?.textContent?.replace(/\s+/g, " ").trim() ?? "";
 }
-function atomEntryLink2(entry) {
-  for (const link of entry.querySelectorAll("link")) {
+function atomEntryLink2(entry2) {
+  for (const link of entry2.querySelectorAll("link")) {
     const href = link.getAttribute("href")?.trim();
     if (!href) continue;
     const rel = (link.getAttribute("rel") || "alternate").toLowerCase();
@@ -38699,11 +39276,11 @@ function parseGlobalHeaderTickerRss(xml, maxItems = GLOBAL_HEADER_TICKER_RSS_MAX
   if (out.length > 0) return out;
   const entries = doc.getElementsByTagName("entry");
   for (let i2 = 0; i2 < entries.length && out.length < maxItems; i2++) {
-    const entry = entries[i2];
-    const title = normalizeTitle(textContent2(entry.querySelector("title")));
-    let url = atomEntryLink2(entry);
+    const entry2 = entries[i2];
+    const title = normalizeTitle(textContent2(entry2.querySelector("title")));
+    let url = atomEntryLink2(entry2);
     if (!url) {
-      const idText = entry.getElementsByTagNameNS("http://www.w3.org/2005/Atom", "id")[0]?.textContent?.trim();
+      const idText = entry2.getElementsByTagNameNS("http://www.w3.org/2005/Atom", "id")[0]?.textContent?.trim();
       if (idText && /^https?:\/\//i.test(idText)) url = idText;
     }
     if (!title || !url || !/^https?:\/\//i.test(url)) continue;
@@ -39359,8 +39936,8 @@ function isDemoNhlVegasCarolinaGame(game) {
   const home = game.homeTeam.toLowerCase();
   return game.league === "NHL" && away.includes("vegas") && home.includes("carolina");
 }
-function applyDemoNhlSpineGames(games, league) {
-  if (!isDemoDataModeEnabled() || league !== "NHL") return games;
+function applyDemoNhlSpineGames(games, league2) {
+  if (!isDemoDataModeEnabled() || league2 !== "NHL") return games;
   return games.map(
     (g2) => isDemoNhlVegasCarolinaGame(g2) ? { ...g2, streamUrl: DEMO_NHL_VEGAS_CAROLINA_WATCH_URL } : g2
   );
@@ -39857,10 +40434,10 @@ function buildOperationalSlateTrace(statusFilter = "all") {
   const traces = [];
   const byRemovalReason = {};
   const byRemovedAt = {};
-  for (const league of getGamesColumnLeagueOrder()) {
-    const liveIngestGames = leagues[league] ?? [];
+  for (const league2 of getGamesColumnLeagueOrder()) {
+    const liveIngestGames = leagues[league2] ?? [];
     const supplementalFinals = mergeCatchUpSupplementalFinals(
-      useLocalSupplemental ? getRetained(league) : []
+      useLocalSupplemental ? getRetained(league2) : []
     );
     const dateSlate = buildGamesSpineOperationalSlate(
       liveIngestGames,
@@ -39872,7 +40449,7 @@ function buildOperationalSlateTrace(statusFilter = "all") {
     const visibleGames = sortGamesSpineChronologically2(statusSlate);
     traces.push(
       ...buildLeagueOperationalSlateTrace({
-        league,
+        league: league2,
         liveIngestGames,
         supplementalFinals,
         operationalMode,
@@ -40019,11 +40596,11 @@ function buildCentralizedRetentionTrace(statusFilter = "all", transportMeta = nu
   const getRetained = useRecentFinalizedGamesStore.getState().getRetainedForLeague;
   const traces = [];
   const byRemovalStage = {};
-  for (const league of getGamesColumnLeagueOrder()) {
-    const liveIngestGames = leagues[league] ?? [];
-    const supplementalFinals = mergeCatchUpSupplementalFinals(getRetained(league));
+  for (const league2 of getGamesColumnLeagueOrder()) {
+    const liveIngestGames = leagues[league2] ?? [];
+    const supplementalFinals = mergeCatchUpSupplementalFinals(getRetained(league2));
     const leagueTraces3 = buildLeagueCentralizedRetentionTrace({
-      league,
+      league: league2,
       liveIngestGames,
       supplementalFinals,
       statusFilter,
@@ -40079,12 +40656,12 @@ function traceSupplementalFinalsById(persistedFinals, localRetainedFinals) {
 function stage(gameIds, stageName) {
   return { stage: stageName, gameIds: [...gameIds], count: gameIds.length };
 }
-function resolveSourceForIngestGame(game, league, transportMeta, supplementalById) {
+function resolveSourceForIngestGame(game, league2, transportMeta, supplementalById) {
   const supplemental = supplementalById.get(game.id);
   if (supplemental) {
     return { source: supplemental.source, includedBy: supplemental.includedBy };
   }
-  const transportSource = transportMeta?.sourceByGameId?.[league]?.[game.id];
+  const transportSource = transportMeta?.sourceByGameId?.[league2]?.[game.id];
   if (transportSource) {
     const includedBy = transportSource === "centralized_retention" ? "retained_final_merge" : "today_ingest";
     return { source: transportSource, includedBy };
@@ -40231,15 +40808,15 @@ function recordCentralizedTransportIngest(transport) {
   let gameCount = 0;
   let finalCount = 0;
   let retainedFinalCount = 0;
-  for (const league of getGamesColumnLeagueOrder()) {
-    const rows = transport.leagues[league] ?? [];
+  for (const league2 of getGamesColumnLeagueOrder()) {
+    const rows = transport.leagues[league2] ?? [];
     gameCount += rows.length;
-    sourceByGameId[league] = {};
+    sourceByGameId[league2] = {};
     for (const game of rows) {
       if (game.status !== "final") continue;
       finalCount += 1;
       const source = classifyTransportGameSource(game);
-      sourceByGameId[league][game.id] = source;
+      sourceByGameId[league2][game.id] = source;
       if (source === "centralized_retention") retainedFinalCount += 1;
     }
   }
@@ -41445,7 +42022,7 @@ function enrichOperationalSnapshotEspnWatchStreams(transport) {
   return changed ? { ...transport, leagues } : transport;
 }
 function resolveEspnOperationalLeagueConfig(leagueKey) {
-  const row = ESPN_OPERATIONAL_INGEST_LEAGUES.find((entry) => entry.key === leagueKey);
+  const row = ESPN_OPERATIONAL_INGEST_LEAGUES.find((entry2) => entry2.key === leagueKey);
   if (!row) return null;
   return { sport: row.sport, league: row.slug };
 }
@@ -41495,8 +42072,8 @@ function pickPlayerIdFromPicker(pickerJson) {
   }
   if (!contents.length) return null;
   const uuidRe = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-  const live = contents.find((entry) => entry?.status === "live" && uuidRe.test(String(entry?.id ?? "")));
-  const first = contents.find((entry) => uuidRe.test(String(entry?.id ?? "")));
+  const live = contents.find((entry2) => entry2?.status === "live" && uuidRe.test(String(entry2?.id ?? "")));
+  const first = contents.find((entry2) => uuidRe.test(String(entry2?.id ?? "")));
   const pick = live ?? first;
   return pick?.id ? String(pick.id) : null;
 }
@@ -42424,12 +43001,12 @@ var TENNIS_LEAGUES = ["ATP", "WTA"];
 async function enrichOperationalSnapshotTennisChannel(transport) {
   const leagues = { ...transport.leagues };
   let changed = false;
-  for (const league of TENNIS_LEAGUES) {
-    const rows = leagues[league];
+  for (const league2 of TENNIS_LEAGUES) {
+    const rows = leagues[league2];
     if (!Array.isArray(rows) || rows.length === 0) continue;
     const enriched = await enrichTennisGamesWithTennisChannelPlus(rows);
     if (enriched.some((row, index) => row !== rows[index])) {
-      leagues[league] = enriched;
+      leagues[league2] = enriched;
       changed = true;
     }
   }
@@ -43116,15 +43693,15 @@ var LIVE_TRACKER_FEED_REGISTRY = [
   }
 ];
 var FEED_BY_LEAGUE = new Map(
-  LIVE_TRACKER_FEED_REGISTRY.map((entry) => [entry.league, entry])
+  LIVE_TRACKER_FEED_REGISTRY.map((entry2) => [entry2.league, entry2])
 );
 function getLiveTrackerFeedRegistry() {
   return LIVE_TRACKER_FEED_REGISTRY;
 }
-function resolveLiveTrackerFeedForLeague(league, options) {
-  const base = FEED_BY_LEAGUE.get(league) ?? null;
+function resolveLiveTrackerFeedForLeague(league2, options) {
+  const base = FEED_BY_LEAGUE.get(league2) ?? null;
   if (!base) return null;
-  if (league !== "PGA" || !options?.leagueGames?.length) return base;
+  if (league2 !== "PGA" || !options?.leagueGames?.length) return base;
   if (!options.leagueGames.some((game) => isPgaTourOpenChampionshipEvent(game.league, game.awayTeam))) {
     return base;
   }
@@ -43135,8 +43712,8 @@ function resolveLiveTrackerFeedForLeague(league, options) {
     label: "The Open"
   };
 }
-function hasLiveTrackerFeedForLeague(league) {
-  return FEED_BY_LEAGUE.has(league);
+function hasLiveTrackerFeedForLeague(league2) {
+  return FEED_BY_LEAGUE.has(league2);
 }
 
 // ../grarf/desktop/src/lib/liveTracker/resolveManualLiveTrackerLeagueGames.ts
@@ -43157,8 +43734,8 @@ var MANUAL_GAMES_SPINE_LEAGUE_LOGO_BY_KEY = {
   "royal ascot": ROYAL_ASCOT_LEAGUE_LOGO_URL,
   "royal-ascot": ROYAL_ASCOT_LEAGUE_LOGO_URL
 };
-function resolveManualGamesSpineLeagueLogoUrl(league) {
-  const candidates = typeof league === "string" || league == null ? [league] : [league.displayName, league.league];
+function resolveManualGamesSpineLeagueLogoUrl(league2) {
+  const candidates = typeof league2 === "string" || league2 == null ? [league2] : [league2.displayName, league2.league];
   for (const candidate of candidates) {
     const key2 = candidate?.trim().toLowerCase();
     if (!key2) continue;
@@ -43170,26 +43747,26 @@ function resolveManualGamesSpineLeagueLogoUrl(league) {
 
 // ../grarf/desktop/src/lib/gamesSpine/manual/resolveManualGamesSpineLeagueDisplayName.ts
 init_define_import_meta_env();
-function resolveManualGamesSpineLeagueDisplayName(league) {
-  const displayName = league.displayName?.trim();
+function resolveManualGamesSpineLeagueDisplayName(league2) {
+  const displayName = league2.displayName?.trim();
   if (displayName) return displayName;
-  return league.league.trim();
+  return league2.league.trim();
 }
 
 // ../grarf/desktop/src/lib/gamesSpine/manual/convertManualGamesSpineDocument.ts
-function convertEventToMlbGame(league, event, now, operationalDateKey) {
-  const startTimeMs = parseManualGamesSpineEventTimeMs(event.startTime, league.sourceTimeZone);
-  const endTimeMs = parseManualGamesSpineEventTimeMs(event.endTime, league.sourceTimeZone);
+function convertEventToMlbGame(league2, event, now, operationalDateKey) {
+  const startTimeMs = parseManualGamesSpineEventTimeMs(event.startTime, league2.sourceTimeZone);
+  const endTimeMs = parseManualGamesSpineEventTimeMs(event.endTime, league2.sourceTimeZone);
   if (!Number.isFinite(startTimeMs) || !Number.isFinite(endTimeMs)) return null;
   const nowMs = now.getTime();
   const status = resolveManualGamesSpineStatus(nowMs, startTimeMs, endTimeMs);
-  const gameId = manualGamesSpineEventId(league.league, event.eventName, event.date);
+  const gameId = manualGamesSpineEventId(league2.league, event.eventName, event.date);
   const watchOverride = resolveOperationsDateEntry(operationalDateKey).manualGameOverrides[gameId];
-  const channel = watchOverride?.channel ?? resolveManualGamesSpineChannelValue(event.channel, league.channel) ?? "";
-  const channelUrl = watchOverride?.channelUrl ?? resolveManualGamesSpineChannelValue(event.channelUrl, league.channelUrl);
+  const channel = watchOverride?.channel ?? resolveManualGamesSpineChannelValue(event.channel, league2.channel) ?? "";
+  const channelUrl = watchOverride?.channelUrl ?? resolveManualGamesSpineChannelValue(event.channelUrl, league2.channelUrl);
   const streamProvider = resolveManualGamesSpineStreamProvider(channel, channelUrl);
-  const leagueLogoUrl = resolveManualGamesSpineLeagueLogoUrl(league);
-  const leagueDisplayName = resolveManualGamesSpineLeagueDisplayName(league);
+  const leagueLogoUrl = resolveManualGamesSpineLeagueLogoUrl(league2);
+  const leagueDisplayName = resolveManualGamesSpineLeagueDisplayName(league2);
   const broadcasts = channel ? [channel] : [];
   return {
     id: gameId,
@@ -43218,17 +43795,17 @@ function convertEventToMlbGame(league, event, now, operationalDateKey) {
       leagueLabel: leagueDisplayName,
       manualGamesSpine: {
         leagueLabel: leagueDisplayName,
-        leagueKey: league.league,
-        displayName: league.displayName?.trim() ? league.displayName.trim() : null,
-        leaguePriority: league.leaguePriority ?? void 0,
-        insertAfterLeague: league.insertAfterLeague ?? null,
-        insertBeforeLeague: league.insertBeforeLeague ?? null,
+        leagueKey: league2.league,
+        displayName: league2.displayName?.trim() ? league2.displayName.trim() : null,
+        leaguePriority: league2.leaguePriority ?? void 0,
+        insertAfterLeague: league2.insertAfterLeague ?? null,
+        insertBeforeLeague: league2.insertBeforeLeague ?? null,
         bestGamePriority: event.bestGamePriority != null && Number.isFinite(event.bestGamePriority) ? event.bestGamePriority : void 0,
         eventName: event.eventName,
         date: event.date,
         startTimeIso: event.startTime,
         endTimeIso: event.endTime,
-        sourceTimeZone: league.sourceTimeZone?.trim() ? league.sourceTimeZone.trim() : null,
+        sourceTimeZone: league2.sourceTimeZone?.trim() ? league2.sourceTimeZone.trim() : null,
         channel,
         channelUrl
       }
@@ -43239,21 +43816,21 @@ function convertManualGamesSpineDocument(document2, now = /* @__PURE__ */ new Da
   const merged = mergeBundledGamesSpineManualDocument(document2 ?? { leagues: [] }, operationalDateKey);
   if (!merged.leagues.length) return [];
   const sections = [];
-  for (const league of merged.leagues) {
+  for (const league2 of merged.leagues) {
     const games = [];
-    for (const event of league.games) {
+    for (const event of league2.games) {
       if (event.date !== operationalDateKey) continue;
-      const row = convertEventToMlbGame(league, event, now, operationalDateKey);
+      const row = convertEventToMlbGame(league2, event, now, operationalDateKey);
       if (row) games.push(row);
     }
     if (games.length === 0) continue;
     sections.push({
-      slug: manualGamesSpineLeagueSlug(league.league),
-      leagueKey: league.league,
-      leagueLabel: resolveManualGamesSpineLeagueDisplayName(league),
-      leaguePriority: league.leaguePriority ?? null,
-      insertAfterLeague: league.insertAfterLeague ?? null,
-      insertBeforeLeague: league.insertBeforeLeague ?? null,
+      slug: manualGamesSpineLeagueSlug(league2.league),
+      leagueKey: league2.league,
+      leagueLabel: resolveManualGamesSpineLeagueDisplayName(league2),
+      leaguePriority: league2.leaguePriority ?? null,
+      insertAfterLeague: league2.insertAfterLeague ?? null,
+      insertBeforeLeague: league2.insertBeforeLeague ?? null,
       games: sortGamesSpineChronologically2(games)
     });
   }
@@ -43312,28 +43889,28 @@ function resolveLiveTrackerFinalObservationMs(game, retainedAtById) {
 function wasLiveTrackerLiveGame(game) {
   return game.status === "live" || isGameActivelyLive(game);
 }
-function collectLeagueGamesWithRetainedFinals(league, leagues, retainedFinals) {
+function collectLeagueGamesWithRetainedFinals(league2, leagues, retainedFinals) {
   const byId = /* @__PURE__ */ new Map();
-  for (const game of leagues[league] ?? []) {
+  for (const game of leagues[league2] ?? []) {
     byId.set(game.id, game);
   }
   for (const game of retainedFinals) {
-    if ((game.league ?? "MLB") !== league) continue;
+    if ((game.league ?? "MLB") !== league2) continue;
     if (!byId.has(game.id)) byId.set(game.id, game);
   }
   return [...byId.values()];
 }
 function collectSpineLeaguesGamesWithRetainedFinals(spineLeagues, leagues, retainedFinals) {
   const byId = /* @__PURE__ */ new Map();
-  for (const league of spineLeagues) {
-    for (const game of collectLeagueGamesWithRetainedFinals(league, leagues, retainedFinals)) {
+  for (const league2 of spineLeagues) {
+    for (const game of collectLeagueGamesWithRetainedFinals(league2, leagues, retainedFinals)) {
       byId.set(game.id, game);
     }
   }
   return [...byId.values()];
 }
 function updateLeagueRetentionCompletedAtMs(input) {
-  const { league, games, previousGamesById: previousGamesById3, nowMs } = input;
+  const { league: league2, games, previousGamesById: previousGamesById3, nowMs } = input;
   if (games.some(isGameActivelyLive)) {
     return void 0;
   }
@@ -43345,7 +43922,7 @@ function updateLeagueRetentionCompletedAtMs(input) {
     completedAtMs = completedAtMs == null ? nowMs : Math.max(completedAtMs, nowMs);
   }
   for (const previous of previousGamesById3.values()) {
-    if ((previous.league ?? "MLB") !== league || !wasLiveTrackerLiveGame(previous)) continue;
+    if ((previous.league ?? "MLB") !== league2 || !wasLiveTrackerLiveGame(previous)) continue;
     const current = games.find((game) => game.id === previous.id);
     if (current && wasLiveTrackerLiveGame(current)) continue;
     if (current?.status === "final") {
@@ -43406,9 +43983,9 @@ function resolveManualLiveTrackerGamesByLeague(nowMs = Date.now(), documentOverr
   }
   return out;
 }
-function collectLiveTrackerLeagueGames(league, leagues, retainedFinals, nowMs = Date.now()) {
-  const operational = collectLeagueGamesWithRetainedFinals(league, leagues, retainedFinals);
-  const adjunct = hasLiveTrackerFeedForLeague(league) ? resolveManualOperationalLeagueGames(new Date(nowMs))[league] ?? [] : [];
+function collectLiveTrackerLeagueGames(league2, leagues, retainedFinals, nowMs = Date.now()) {
+  const operational = collectLeagueGamesWithRetainedFinals(league2, leagues, retainedFinals);
+  const adjunct = hasLiveTrackerFeedForLeague(league2) ? resolveManualOperationalLeagueGames(new Date(nowMs))[league2] ?? [] : [];
   if (adjunct.length > 0) {
     const seen = new Set(operational.map((game) => game.id));
     const merged = [...operational];
@@ -43420,21 +43997,21 @@ function collectLiveTrackerLeagueGames(league, leagues, retainedFinals, nowMs = 
     if (merged.length > 0) return merged;
   }
   if (operational.length > 0) return operational;
-  return resolveManualLiveTrackerGamesByLeague(nowMs).get(league) ?? [];
+  return resolveManualLiveTrackerGamesByLeague(nowMs).get(league2) ?? [];
 }
 
 // ../grarf/desktop/src/lib/liveTracker/resolveActiveLiveTrackerFeeds.ts
 function resolveActiveLiveTrackerFeeds(liveLeagueKeys, context2) {
   const feeds = [];
   const nowMs = context2?.nowMs ?? Date.now();
-  for (const league of liveLeagueKeys) {
+  for (const league2 of liveLeagueKeys) {
     const leagueGames = context2 ? collectLiveTrackerLeagueGames(
-      league,
+      league2,
       context2.leagues ?? {},
       context2.retainedFinals ?? [],
       nowMs
     ) : void 0;
-    const feed = resolveLiveTrackerFeedForLeague(league, { leagueGames });
+    const feed = resolveLiveTrackerFeedForLeague(league2, { leagueGames });
     if (feed) feeds.push(feed);
   }
   return feeds;
@@ -43456,28 +44033,28 @@ var import_zustand21 = __toESM(require_zustand(), 1);
 init_define_import_meta_env();
 function resolveCurrentlyLiveGamesSpineLeagues(leagues) {
   const liveLeagues = [];
-  for (const league of getGamesColumnLeagueOrder()) {
-    const games = leagues[league] ?? [];
+  for (const league2 of getGamesColumnLeagueOrder()) {
+    const games = leagues[league2] ?? [];
     const liveGameCount = games.filter(isGameActivelyLive).length;
     if (liveGameCount > 0) {
-      liveLeagues.push({ league, liveGameCount });
+      liveLeagues.push({ league: league2, liveGameCount });
     }
   }
   return liveLeagues;
 }
 function resolveCurrentlyLiveGamesSpineLeagueKeys(leagues) {
-  return resolveCurrentlyLiveGamesSpineLeagues(leagues).map((entry) => entry.league);
+  return resolveCurrentlyLiveGamesSpineLeagues(leagues).map((entry2) => entry2.league);
 }
 function buildLiveTrackerDisplayLeaguesSnapshot(leagues, completedAtMsByLeague, updatedAt = null, nowMs = Date.now(), retainedFinals = []) {
   const displayLeagues = [];
   const seenLeagues = /* @__PURE__ */ new Set();
-  for (const league of getGamesColumnLeagueOrder()) {
-    if (!hasLiveTrackerFeedForLeague(league)) continue;
-    const games = collectLiveTrackerLeagueGames(league, leagues, retainedFinals, nowMs);
-    if (!isLeagueActiveForLiveTracker(games, completedAtMsByLeague[league], nowMs)) continue;
-    seenLeagues.add(league);
+  for (const league2 of getGamesColumnLeagueOrder()) {
+    if (!hasLiveTrackerFeedForLeague(league2)) continue;
+    const games = collectLiveTrackerLeagueGames(league2, leagues, retainedFinals, nowMs);
+    if (!isLeagueActiveForLiveTracker(games, completedAtMsByLeague[league2], nowMs)) continue;
+    seenLeagues.add(league2);
     displayLeagues.push({
-      league,
+      league: league2,
       liveGameCount: games.filter(isGameActivelyLive).length
     });
   }
@@ -43495,21 +44072,21 @@ function buildLiveTrackerDisplayLeaguesSnapshot(leagues, completedAtMsByLeague, 
   }
   return {
     leagues: displayLeagues,
-    leagueKeys: displayLeagues.map((entry) => entry.league),
+    leagueKeys: displayLeagues.map((entry2) => entry2.league),
     updatedAt
   };
 }
 function resolveLiveTrackerRssIngestLeagueKeys(leagues, completedAtMsByLeague, nowMs = Date.now(), retainedFinals = []) {
   const ingestLeagues = [];
   const seenLeagues = /* @__PURE__ */ new Set();
-  for (const league of getGamesColumnLeagueOrder()) {
-    if (!hasLiveTrackerFeedForLeague(league)) continue;
-    const games = collectLiveTrackerLeagueGames(league, leagues, retainedFinals, nowMs);
-    if (!isLeagueActiveForLiveTrackerRssIngestion(games, completedAtMsByLeague[league], nowMs)) {
+  for (const league2 of getGamesColumnLeagueOrder()) {
+    if (!hasLiveTrackerFeedForLeague(league2)) continue;
+    const games = collectLiveTrackerLeagueGames(league2, leagues, retainedFinals, nowMs);
+    if (!isLeagueActiveForLiveTrackerRssIngestion(games, completedAtMsByLeague[league2], nowMs)) {
       continue;
     }
-    seenLeagues.add(league);
-    ingestLeagues.push(league);
+    seenLeagues.add(league2);
+    ingestLeagues.push(league2);
   }
   const manualGamesByLeague = resolveManualLiveTrackerGamesByLeague(nowMs);
   for (const feed of getLiveTrackerFeedRegistry()) {
@@ -43740,13 +44317,13 @@ var LIVE_TRACKER_THE_OPEN_LABEL = "The Open";
 function isPgaOpenLiveTrackerFeedActive(activeFeeds) {
   return activeFeeds?.some((feed) => feed.feedId === LIVE_TRACKER_PGA_OPEN_FEED_ID) ?? false;
 }
-function resolveLiveTrackerLeagueDisplayLabel(league, options) {
-  if (isPgaTourOpenChampionshipEvent(league, options?.tournamentTitle) || league === "PGA" && isPgaOpenLiveTrackerFeedActive(options?.activeFeeds)) {
+function resolveLiveTrackerLeagueDisplayLabel(league2, options) {
+  if (isPgaTourOpenChampionshipEvent(league2, options?.tournamentTitle) || league2 === "PGA" && isPgaOpenLiveTrackerFeedActive(options?.activeFeeds)) {
     return LIVE_TRACKER_THE_OPEN_LABEL;
   }
   const explicit = options?.leagueLabel?.trim();
   if (explicit) return explicit;
-  return resolveGamesSpineLeagueDisplayLabel(league);
+  return resolveGamesSpineLeagueDisplayLabel(league2);
 }
 
 // ../grarf/desktop/src/lib/liveTracker/liveTrackerWebPersistenceStorage.ts
@@ -43795,16 +44372,16 @@ function wasLiveTrackerLiveGame2(game) {
 function liveTrackerFinalScorePostUrl(gameId) {
   return `grarf:livetracker:final:${gameId}`;
 }
-function resolveFinalScoreLeagueLabel(game, league) {
+function resolveFinalScoreLeagueLabel(game, league2) {
   const manualLabel = game.metadata?.manualGamesSpine?.displayName?.trim() || game.metadata?.manualGamesSpine?.leagueLabel?.trim() || game.metadata?.leagueLabel?.trim();
-  return resolveLiveTrackerLeagueDisplayLabel(league, {
+  return resolveLiveTrackerLeagueDisplayLabel(league2, {
     leagueLabel: manualLabel,
     tournamentTitle: game.awayTeam
   });
 }
 function buildLiveTrackerFinalScorePost(game, publishedAtMs) {
-  const league = game.league ?? "MLB";
-  const leagueLabel = resolveFinalScoreLeagueLabel(game, league);
+  const league2 = game.league ?? "MLB";
+  const leagueLabel = resolveFinalScoreLeagueLabel(game, league2);
   const awayTeam = game.awayTeam.trim();
   const homeTeam = game.homeTeam.trim();
   const awayScore = game.awayScore ?? 0;
@@ -43812,7 +44389,7 @@ function buildLiveTrackerFinalScorePost(game, publishedAtMs) {
   return {
     kind: "final_score",
     gameId: game.id,
-    league,
+    league: league2,
     leagueLabel,
     source: "GRARF",
     title: "FINAL",
@@ -44099,10 +44676,10 @@ function readPersistedCompletedAtMsByLeague(nowMs) {
     if (!raw) return {};
     const parsed = JSON.parse(raw);
     const pruned = {};
-    for (const [league, completedAtMs] of Object.entries(parsed)) {
+    for (const [league2, completedAtMs] of Object.entries(parsed)) {
       if (typeof completedAtMs !== "number" || !Number.isFinite(completedAtMs)) continue;
       if (nowMs - completedAtMs >= LIVE_TRACKER_LEAGUE_RETENTION_MS) continue;
-      pruned[league] = completedAtMs;
+      pruned[league2] = completedAtMs;
     }
     return pruned;
   } catch {
@@ -44124,8 +44701,8 @@ function trackedLeagueKeys() {
     keys.add(feed.league);
   }
   for (const feed of getLiveTrackLeagueFeedRegistry()) {
-    for (const league of feed.spineLeagues) {
-      keys.add(league);
+    for (const league2 of feed.spineLeagues) {
+      keys.add(league2);
     }
   }
   if (isGrarfWebRenderer()) {
@@ -44154,25 +44731,25 @@ function runLiveTrackerRetentionSync(nowMs) {
     const nextCompletedAtMsByLeague = {
       ...readPersistedCompletedAtMsByLeague(nowMs)
     };
-    for (const league of trackedLeagueKeys()) {
-      const games = collectLiveTrackerLeagueGames(league, leagues, retainedFinals, nowMs);
+    for (const league2 of trackedLeagueKeys()) {
+      const games = collectLiveTrackerLeagueGames(league2, leagues, retainedFinals, nowMs);
       const completedAtMs = updateLeagueRetentionCompletedAtMs({
-        league,
+        league: league2,
         games,
         previousGamesById,
-        existingCompletedAtMs: useLiveTrackerLeagueRetentionStore.getState().completedAtMsByLeague[league] ?? nextCompletedAtMsByLeague[league],
+        existingCompletedAtMs: useLiveTrackerLeagueRetentionStore.getState().completedAtMsByLeague[league2] ?? nextCompletedAtMsByLeague[league2],
         retainedAtById,
         nowMs
       });
       if (completedAtMs != null) {
-        nextCompletedAtMsByLeague[league] = completedAtMs;
+        nextCompletedAtMsByLeague[league2] = completedAtMs;
       } else {
-        delete nextCompletedAtMsByLeague[league];
+        delete nextCompletedAtMsByLeague[league2];
       }
     }
     const nextGamesById = /* @__PURE__ */ new Map();
-    for (const league of trackedLeagueKeys()) {
-      for (const game of collectLiveTrackerLeagueGames(league, leagues, retainedFinals, nowMs)) {
+    for (const league2 of trackedLeagueKeys()) {
+      for (const game of collectLiveTrackerLeagueGames(league2, leagues, retainedFinals, nowMs)) {
         nextGamesById.set(game.id, game);
       }
     }
@@ -44197,9 +44774,9 @@ function runLiveTrackerRetentionSync(nowMs) {
 }
 function buildRetainedAtById() {
   return Object.fromEntries(
-    Object.entries(useRecentFinalizedGamesStore.getState().byId).map(([id, entry]) => [
+    Object.entries(useRecentFinalizedGamesStore.getState().byId).map(([id, entry2]) => [
       id,
-      entry.retainedAt
+      entry2.retainedAt
     ])
   );
 }
@@ -44209,16 +44786,16 @@ var useLiveTrackerLeagueRetentionStore = (0, import_zustand20.create)((set, get)
   syncFromCanonical: (nowMs = Date.now()) => {
     runLiveTrackerRetentionSync(nowMs);
   },
-  getCompletedAtMs: (league) => get().completedAtMsByLeague[league],
-  isLeagueDisplayActive: (league, nowMs = Date.now()) => {
+  getCompletedAtMs: (league2) => get().completedAtMsByLeague[league2],
+  isLeagueDisplayActive: (league2, nowMs = Date.now()) => {
     const leagues = useCanonicalLiveGameStore.getState().leagues;
     const retainedFinals = useRecentFinalizedGamesStore.getState().getAllRetained();
-    const games = collectLiveTrackerLeagueGames(league, leagues, retainedFinals, nowMs);
-    return isLeagueActiveForLiveTracker(games, get().completedAtMsByLeague[league], nowMs);
+    const games = collectLiveTrackerLeagueGames(league2, leagues, retainedFinals, nowMs);
+    return isLeagueActiveForLiveTracker(games, get().completedAtMsByLeague[league2], nowMs);
   },
   getDisplayActiveLeagueKeys: (nowMs = Date.now()) => {
     get().syncFromCanonical(nowMs);
-    return trackedLeagueKeys().filter((league) => get().isLeagueDisplayActive(league, nowMs));
+    return trackedLeagueKeys().filter((league2) => get().isLeagueDisplayActive(league2, nowMs));
   }
 }));
 function syncLiveTrackerLeagueRetention(nowMs = Date.now()) {
@@ -44488,8 +45065,8 @@ function firstImgSrc(html) {
   const m2 = html.match(/<img[^>]+src=["']([^"']+)["']/i);
   return m2?.[1]?.trim() || void 0;
 }
-function atomEntryLink3(entry) {
-  const links = entry.querySelectorAll("link");
+function atomEntryLink3(entry2) {
+  const links = entry2.querySelectorAll("link");
   for (let i2 = 0; i2 < links.length; i2++) {
     const link = links[i2];
     const href = link.getAttribute("href")?.trim();
@@ -44632,25 +45209,25 @@ function parseAtomEntries(doc, maxItems, maxSummaryChars) {
   const out = [];
   const entries = doc.getElementsByTagName("entry");
   for (let i2 = 0; i2 < entries.length && out.length < maxItems; i2++) {
-    const entry = entries[i2];
-    const title = preserveLiveTrackPostText(entry.querySelector("title")?.textContent ?? "");
-    let url = atomEntryLink3(entry);
+    const entry2 = entries[i2];
+    const title = preserveLiveTrackPostText(entry2.querySelector("title")?.textContent ?? "");
+    let url = atomEntryLink3(entry2);
     if (!url) {
-      const idText = textContent3(entry.querySelector("id"));
+      const idText = textContent3(entry2.querySelector("id"));
       if (/^https?:\/\//i.test(idText)) url = idText;
     }
-    const pubRaw = textContent3(entry.querySelector("published")) || textContent3(entry.querySelector("updated"));
+    const pubRaw = textContent3(entry2.querySelector("published")) || textContent3(entry2.querySelector("updated"));
     const publishedAtMs = parsePublishedMs(pubRaw);
-    const author = textContent3(entry.querySelector("author > name")) || textContent3(entry.querySelector("dc\\:creator")) || textContent3(entry.getElementsByTagNameNS("http://purl.org/dc/elements/1.1/", "creator")[0]) || void 0;
+    const author = textContent3(entry2.querySelector("author > name")) || textContent3(entry2.querySelector("dc\\:creator")) || textContent3(entry2.getElementsByTagNameNS("http://purl.org/dc/elements/1.1/", "creator")[0]) || void 0;
     if (!title || !url || !/^https?:\/\//i.test(url)) continue;
     out.push({
       title,
       url,
       publishedAtMs,
-      summary: itemSummary(entry, maxSummaryChars),
-      imageUrl: itemImageUrl(entry),
-      videoUrl: itemVideoUrl(entry),
-      guid: textContent3(entry.querySelector("id")) || void 0,
+      summary: itemSummary(entry2, maxSummaryChars),
+      imageUrl: itemImageUrl(entry2),
+      videoUrl: itemVideoUrl(entry2),
+      guid: textContent3(entry2.querySelector("id")) || void 0,
       ...author ? { author } : {}
     });
   }
@@ -44667,25 +45244,25 @@ function parseRssXml(xml, maxItems = 50, options = {}) {
 
 // ../grarf/desktop/src/lib/liveTracker/normalizeLiveTrackerPosts.ts
 init_define_import_meta_env();
-function resolveLiveTrackerPostSource(feed, entry) {
-  const author = entry.author?.trim();
+function resolveLiveTrackerPostSource(feed, entry2) {
+  const author = entry2.author?.trim();
   if (author) return author;
   return feed.label;
 }
-function resolveLiveTrackerPostDescription(entry) {
-  return entry.summary ?? "";
+function resolveLiveTrackerPostDescription(entry2) {
+  return entry2.summary ?? "";
 }
 function normalizeLiveTrackerPosts(feed, entries) {
-  return entries.map((entry) => ({
+  return entries.map((entry2) => ({
     league: feed.league,
     leagueLabel: feed.label,
-    source: resolveLiveTrackerPostSource(feed, entry),
-    title: entry.title,
-    description: resolveLiveTrackerPostDescription(entry),
-    publishedAt: new Date(entry.publishedAtMs).toISOString(),
-    url: entry.url,
-    ...entry.imageUrl ? { imageUrl: entry.imageUrl } : {},
-    ...entry.videoUrl ? { videoUrl: entry.videoUrl } : {}
+    source: resolveLiveTrackerPostSource(feed, entry2),
+    title: entry2.title,
+    description: resolveLiveTrackerPostDescription(entry2),
+    publishedAt: new Date(entry2.publishedAtMs).toISOString(),
+    url: entry2.url,
+    ...entry2.imageUrl ? { imageUrl: entry2.imageUrl } : {},
+    ...entry2.videoUrl ? { videoUrl: entry2.videoUrl } : {}
   }));
 }
 
@@ -45144,11 +45721,11 @@ function mapFeedItemToLiveTrackEvent(item, options = {}) {
   const sportFromTitle = parseSportFromTitle(item.title);
   const headlineTitle = stripSportPrefixFromTitle(item.title, sportFromTitle);
   const sourceLabel = resolveSourceLabel(item);
-  const league = options.league;
-  const sport = league || item.league?.trim() || sportFromTitle || (item.sport?.trim() ? item.sport.trim().toUpperCase() : "") || sourceLabel.replace(/^@/, "") || "News";
+  const league2 = options.league;
+  const sport = league2 || item.league?.trim() || sportFromTitle || (item.sport?.trim() ? item.sport.trim().toUpperCase() : "") || sourceLabel.replace(/^@/, "") || "News";
   return {
     id: resolveLiveTrackEventIdFromFeedItem(item),
-    ...league ? { league } : {},
+    ...league2 ? { league: league2 } : {},
     sport,
     sourceLabel,
     gameState: {
@@ -45188,26 +45765,26 @@ function stableHash2(input) {
   }
   return (h2 >>> 0).toString(36);
 }
-function entryId(feedId, entry) {
-  const key2 = entry.guid?.trim() || entry.url;
+function entryId(feedId, entry2) {
+  const key2 = entry2.guid?.trim() || entry2.url;
   return `rss:${feedId}:${stableHash2(key2)}`;
 }
 function normalizeFeedItems(feed, entries) {
-  const league = feed.league ?? null;
+  const league2 = feed.league ?? null;
   const sport = feed.sport ?? null;
-  return entries.map((entry) => ({
-    id: entryId(feed.id, entry),
+  return entries.map((entry2) => ({
+    id: entryId(feed.id, entry2),
     feedId: feed.id,
-    title: entry.title,
-    url: entry.url,
-    publishedAt: new Date(entry.publishedAtMs).toISOString(),
+    title: entry2.title,
+    url: entry2.url,
+    publishedAt: new Date(entry2.publishedAtMs).toISOString(),
     source: feed.source,
-    league,
+    league: league2,
     sport,
-    ...entry.summary ? { summary: entry.summary } : {},
-    ...entry.imageUrl ? { imageUrl: entry.imageUrl } : {},
-    ...entry.videoUrl ? { videoUrl: entry.videoUrl } : {},
-    ...entry.author ? { author: entry.author } : {}
+    ...entry2.summary ? { summary: entry2.summary } : {},
+    ...entry2.imageUrl ? { imageUrl: entry2.imageUrl } : {},
+    ...entry2.videoUrl ? { videoUrl: entry2.videoUrl } : {},
+    ...entry2.author ? { author: entry2.author } : {}
   }));
 }
 
@@ -46116,11 +46693,11 @@ function editorialLookupKeysForGame(game) {
 // ../grarf/desktop/src/lib/commandBriefing/briefingPersistence.ts
 var LOG14 = "[CommandBriefing]";
 function snapshotFromGame(game) {
-  const league = game.league ?? "MLB";
+  const league2 = game.league ?? "MLB";
   return {
     gameId: game.id,
-    league,
-    sport: league,
+    league: league2,
+    sport: league2,
     espnEventId: game.espnEventId != null ? String(game.espnEventId) : game.externalIds?.espn != null ? String(game.externalIds.espn) : void 0,
     homeTeam: game.homeTeam,
     awayTeam: game.awayTeam,
@@ -46215,7 +46792,7 @@ function analyzeOneGame(game, input) {
     filteredBy
   };
 }
-function summarizeLeague(league, ingestRows, finals) {
+function summarizeLeague(league2, ingestRows, finals) {
   const ingestFinalCount = ingestRows.filter((g2) => g2.status === "final").length;
   const canonicalFinalCount = finals.length;
   const afterTodayFilterFinalCount = finals.filter((g2) => g2.passesTodayFilter).length;
@@ -46230,7 +46807,7 @@ function summarizeLeague(league, ingestRows, finals) {
     primaryDropStage = "operational_mode_filter";
   }
   return {
-    league,
+    league: league2,
     ingestTotal: ingestRows.length,
     ingestFinalCount,
     canonicalFinalCount,
@@ -46252,10 +46829,10 @@ function collectFinalizedGameRetentionSnapshot(input) {
   const allTraced = [];
   const leagueSummaries = [];
   let catchUpVisibleFinalCount = 0;
-  for (const league of getGamesColumnLeagueOrder()) {
-    const ingestRows = input.leagues[league] ?? [];
+  for (const league2 of getGamesColumnLeagueOrder()) {
+    const ingestRows = input.leagues[league2] ?? [];
     allIngest.push(...ingestRows);
-    const retainedLeague = retained.filter((g2) => (g2.league ?? "MLB") === league);
+    const retainedLeague = retained.filter((g2) => (g2.league ?? "MLB") === league2);
     if (mode === "CATCH_UP") {
       const catchUpSlate = buildGamesSpineOperationalSlate(ingestRows, retainedLeague, "CATCH_UP", now);
       catchUpVisibleFinalCount += catchUpSlate.filter((g2) => g2.status === "final").length;
@@ -46292,7 +46869,7 @@ function collectFinalizedGameRetentionSnapshot(input) {
       leagueFinals.push(record);
       allFinalRecords.push(record);
     }
-    leagueSummaries.push(summarizeLeague(league, ingestRows, leagueFinals));
+    leagueSummaries.push(summarizeLeague(league2, ingestRows, leagueFinals));
   }
   const currentFinalIds = new Set(allFinalRecords.map((r3) => r3.gameId));
   const removedFromPreviousIngest = [];
@@ -46501,7 +47078,7 @@ function pitcherLast(name) {
   if (!t2 || t2 === "\u2014") return "";
   return t2.split(/\s+/).pop() ?? t2;
 }
-function resolveLeagueContextStrip(league, games) {
+function resolveLeagueContextStrip(league2, games) {
   const ingestLabel = games.find((g2) => g2.leagueContextLabel?.trim())?.leagueContextLabel?.trim();
   if (ingestLabel) {
     return { label: ingestLabel.toUpperCase(), source: "ingest" };
@@ -46509,7 +47086,7 @@ function resolveLeagueContextStrip(league, games) {
   const live = games.filter((g2) => isGameActivelyLive(g2)).length;
   const scheduled = games.filter((g2) => g2.status === "scheduled").length;
   const final = games.filter((g2) => g2.status === "final").length;
-  if (league === "F1") {
+  if (league2 === "F1") {
     if (live > 0) return { label: "SESSION LIVE", source: "rules" };
     return { label: "RACE WEEKEND", source: "rules" };
   }
@@ -46519,13 +47096,13 @@ function resolveLeagueContextStrip(league, games) {
   if (live > 0) return { label: "LIVE NOW", source: "rules" };
   if (scheduled > 0 && final === 0) return { label: "UPCOMING SLATE", source: "rules" };
   if (final > 0 && live === 0 && scheduled === 0) return { label: "FINALS WRAP", source: "rules" };
-  if (league === "MLB" && scheduled >= 8) return { label: "FULL SLATE", source: "rules" };
-  if (league === "NBA" || league === "WNBA") {
+  if (league2 === "MLB" && scheduled >= 8) return { label: "FULL SLATE", source: "rules" };
+  if (league2 === "NBA" || league2 === "WNBA") {
     if (live > 0) return { label: "GAME NIGHT", source: "rules" };
     return { label: "SLATE BOARD", source: "rules" };
   }
-  if (league === "MLS") return { label: "MATCH DAY", source: "rules" };
-  if (league === "NHL") return { label: "HOCKEY NIGHT", source: "rules" };
+  if (league2 === "MLS") return { label: "MATCH DAY", source: "rules" };
+  if (league2 === "NHL") return { label: "HOCKEY NIGHT", source: "rules" };
   return null;
 }
 function resolveGameNarrative(game) {
@@ -46594,20 +47171,20 @@ function gameMatchesSummaryKind(game, kind) {
   return game.status === "scheduled";
 }
 function resolveGeneratedBlurbForKind(game, bundle, kind) {
-  const entry = entryForGame(bundle, game);
+  const entry2 = entryForGame(bundle, game);
   if (kind === "recap") {
-    return entry?.recap?.blurb?.trim() || entry?.preview?.blurb?.trim() || null;
+    return entry2?.recap?.blurb?.trim() || entry2?.preview?.blurb?.trim() || null;
   }
-  return entry?.preview?.blurb?.trim() || entry?.recap?.blurb?.trim() || null;
+  return entry2?.preview?.blurb?.trim() || entry2?.recap?.blurb?.trim() || null;
 }
 function resolveGeneratedBlurb(game, bundle) {
-  const entry = entryForGame(bundle, game);
-  const blurb = game.status === "final" ? entry?.recap?.blurb?.trim() ?? entry?.preview?.blurb?.trim() : entry?.preview?.blurb?.trim() ?? entry?.recap?.blurb?.trim();
+  const entry2 = entryForGame(bundle, game);
+  const blurb = game.status === "final" ? entry2?.recap?.blurb?.trim() ?? entry2?.preview?.blurb?.trim() : entry2?.preview?.blurb?.trim() ?? entry2?.recap?.blurb?.trim();
   return blurb || null;
 }
 function resolveGeneratedSummaryText(game, bundle) {
-  const entry = entryForGame(bundle, game);
-  const summary = game.status === "final" ? entry?.recap?.summary?.trim() ?? entry?.preview?.summary?.trim() : entry?.preview?.summary?.trim() ?? entry?.recap?.summary?.trim();
+  const entry2 = entryForGame(bundle, game);
+  const summary = game.status === "final" ? entry2?.recap?.summary?.trim() ?? entry2?.preview?.summary?.trim() : entry2?.preview?.summary?.trim() ?? entry2?.recap?.summary?.trim();
   return summary || null;
 }
 
@@ -46619,9 +47196,9 @@ function featuredEntry(bundle, scopedKey, baseKey) {
   const direct = bundle?.featuredGames?.[scopedKey] ?? bundle?.featuredGames?.[baseKey];
   if (direct) return direct;
   if (!bundle?.featuredGames) return void 0;
-  for (const [storageKey, entry] of Object.entries(bundle.featuredGames)) {
+  for (const [storageKey, entry2] of Object.entries(bundle.featuredGames)) {
     const storageBase = storageKey.includes("::") ? storageKey.split("::")[0] : storageKey;
-    if (editorialKeysMatch(storageBase, baseKey)) return entry;
+    if (editorialKeysMatch(storageBase, baseKey)) return entry2;
   }
   return void 0;
 }
@@ -46654,14 +47231,14 @@ function resolveEditorialFeaturedRank(game, bundle, dateKey) {
 function resolveBriefingPriority(game, bundle, dateKey) {
   const baseKey = editorialGameKey(game);
   const scopedKey = editorialScopedKey(game, dateKey);
-  let entry = featuredEntry(bundle, scopedKey, baseKey);
-  if (!entry && bundle?.featuredGames) {
+  let entry2 = featuredEntry(bundle, scopedKey, baseKey);
+  if (!entry2 && bundle?.featuredGames) {
     for (const lookupKey of editorialLookupKeysForGame(game)) {
-      entry = bundle.featuredGames[lookupKey] ?? (dateKey && dateKey !== formatBriefingDateKey() ? bundle.featuredGames[`${lookupKey}::${dateKey}`] : void 0);
-      if (entry) break;
+      entry2 = bundle.featuredGames[lookupKey] ?? (dateKey && dateKey !== formatBriefingDateKey() ? bundle.featuredGames[`${lookupKey}::${dateKey}`] : void 0);
+      if (entry2) break;
     }
   }
-  const raw = entry?.briefingPriority ?? entry?.featuredRank;
+  const raw = entry2?.briefingPriority ?? entry2?.featuredRank;
   return parseBriefingPriorityRank(raw ?? void 0);
 }
 
@@ -46891,30 +47468,30 @@ function logResidualGravityDecay(states) {
 
 // ../grarf/desktop/src/lib/attentionRuntime/residualGravityState.ts
 init_define_import_meta_env();
-function computeCurrentGravity(entry, now) {
-  const elapsed = Math.max(0, now - entry.startedAt);
-  const progress = Math.min(1, elapsed / entry.decayDurationMs);
-  const current = entry.peakGravity * (1 - progress);
+function computeCurrentGravity(entry2, now) {
+  const elapsed = Math.max(0, now - entry2.startedAt);
+  const progress = Math.min(1, elapsed / entry2.decayDurationMs);
+  const current = entry2.peakGravity * (1 - progress);
   return Math.max(0, Math.round(current * 10) / 10);
 }
-function materializeResidualState(entry, now) {
-  const elapsed = Math.max(0, now - entry.startedAt);
-  const decayProgress = Math.min(1, elapsed / entry.decayDurationMs);
+function materializeResidualState(entry2, now) {
+  const elapsed = Math.max(0, now - entry2.startedAt);
+  const decayProgress = Math.min(1, elapsed / entry2.decayDurationMs);
   const currentGravity = computeCurrentGravity(
-    { ...entry, decayProgress, currentGravity: 0 },
+    { ...entry2, decayProgress, currentGravity: 0 },
     now
   );
-  return { ...entry, decayProgress, currentGravity };
+  return { ...entry2, decayProgress, currentGravity };
 }
 function pruneExpiredResiduals(store, now) {
   const out = {};
-  for (const [id, entry] of Object.entries(store)) {
+  for (const [id, entry2] of Object.entries(store)) {
     const current = computeCurrentGravity(
-      { ...entry, decayProgress: 0, currentGravity: 0 },
+      { ...entry2, decayProgress: 0, currentGravity: 0 },
       now
     );
     if (current > 0.05) {
-      out[id] = materializeResidualState(entry, now);
+      out[id] = materializeResidualState(entry2, now);
     }
   }
   return out;
@@ -47027,9 +47604,9 @@ function updateResidualGravity(games, now) {
   const pruned = pruneExpiredResiduals(state.residualById, now);
   const decayed = Object.keys(pruned).length !== Object.keys(state.residualById).length;
   state.residualById = Object.fromEntries(
-    Object.entries(pruned).map(([id, entry]) => [
+    Object.entries(pruned).map(([id, entry2]) => [
       id,
-      { ...entry, currentGravity: entry.currentGravity }
+      { ...entry2, currentGravity: entry2.currentGravity }
     ])
   );
   return startedAny || decayed;
@@ -47101,7 +47678,7 @@ function tickAttentionResidualDecay() {
 function hasActiveAttentionResidualGravity() {
   const now = Date.now();
   return Object.values(state.residualById).some(
-    (entry) => computeCurrentGravity(entry, now) > 0.5
+    (entry2) => computeCurrentGravity(entry2, now) > 0.5
   );
 }
 function buildDiagnosticsSnapshot() {
@@ -47538,8 +48115,8 @@ function mlbBasesSketch(game) {
 
 // ../grarf/desktop/src/lib/gamesSpine/isTennisLeague.ts
 init_define_import_meta_env();
-function isTennisLeague4(league) {
-  return league === "ATP" || league === "WTA";
+function isTennisLeague4(league2) {
+  return league2 === "ATP" || league2 === "WTA";
 }
 function isTennisGame(game) {
   return isTennisLeague4(game.league);
@@ -47739,8 +48316,8 @@ function syncRecommendationPresentation() {
   if (recommendations.primaryRecommendation) {
     elevatedIds[recommendations.primaryRecommendation] = true;
   }
-  for (const entry of recommendations.rankedRecommendations.slice(0, 3)) {
-    elevatedIds[entry.eventId] = true;
+  for (const entry2 of recommendations.rankedRecommendations.slice(0, 3)) {
+    elevatedIds[entry2.eventId] = true;
   }
   const attentionScoreById = {};
   const urgencyById = {};
@@ -48200,8 +48777,8 @@ function hintsMentionEspn(game) {
 }
 function resolveEspnWatchOption(game) {
   const now = (/* @__PURE__ */ new Date()).toISOString();
-  const league = resolveLeague(game);
-  if (league === "NBASUMMER") {
+  const league2 = resolveLeague(game);
+  if (league2 === "NBASUMMER") {
     const published = resolveLiveGameWatchTarget(game);
     if (!published) return null;
     resolverDebug("Resolved NBA Summer League worker-published ESPN Watch URL", { confidence: 0.97 });
@@ -48241,14 +48818,14 @@ function resolveEspnWatchOption(game) {
   if (!hintsMentionEspn(game) && !gameHasEspnPlusBroadcast2(game)) return null;
   const eventId = parseEspnEventId(game);
   if (eventId) {
-    const deepLink = buildEspnGamecastUrl(league, eventId, {
+    const deepLink = buildEspnGamecastUrl(league2, eventId, {
       ufcCardEventId: game.metadata?.ufcCardEventId
     });
-    resolverDebug("Resolved ESPN event URL", { confidence: 0.94, tier: "event", league });
+    resolverDebug("Resolved ESPN event URL", { confidence: 0.94, tier: "event", league: league2 });
     return {
       id: `espn-event-${eventId}`,
       provider: "ESPN",
-      displayName: isEspnSoccerLeague(league) ? "ESPN \u2014 match page" : "ESPN \u2014 game page",
+      displayName: isEspnSoccerLeague(league2) ? "ESPN \u2014 match page" : "ESPN \u2014 game page",
       launchStrategy: "deep-link",
       deepLink,
       confidence: 0.94,
@@ -48262,8 +48839,8 @@ function resolveEspnWatchOption(game) {
     if (playerId) {
       const deepLink = buildEspnPlusPlayerUrlByUuid(playerId);
       if (deepLink) {
-        console.log("[ESPN] Resolved canonical ESPN+ streamUrl (renderer)", { playerId, league });
-        resolverDebug("Resolved ESPN+ player UUID URL (renderer fallback)", { confidence: 0.92, league });
+        console.log("[ESPN] Resolved canonical ESPN+ streamUrl (renderer)", { playerId, league: league2 });
+        resolverDebug("Resolved ESPN+ player UUID URL (renderer fallback)", { confidence: 0.92, league: league2 });
         return {
           id: `espn-plus-stream-${playerId}`,
           provider: "ESPN",
@@ -48284,7 +48861,7 @@ function resolveEspnWatchOption(game) {
         console.log("[ESPN] Current generated URL (renderer calendar fallback):", deepLink);
         resolverDebug("Resolved ESPN+ eventCalendarId URL (renderer fallback)", {
           confidence: 0.85,
-          league,
+          league: league2,
           watchEventId
         });
         return {
@@ -49264,7 +49841,7 @@ function buildMlbGameWorkspaceTab(game, options) {
       canonicalGame: game
     })
   );
-  return tab;
+  return withWorkspaceAddress(tab);
 }
 
 // ../grarf/desktop/src/lib/watch/legacyMlbWatch.ts
@@ -49977,8 +50554,8 @@ function tennisTournamentHaystack(game) {
 function isAtpMajorTournament(haystack3) {
   return ATP_MAJOR_TOURNAMENT.test(haystack3);
 }
-function resolveTennisDecidingSetNumber(league, haystack3) {
-  if (league === "WTA") return 3;
+function resolveTennisDecidingSetNumber(league2, haystack3) {
+  if (league2 === "WTA") return 3;
   return isAtpMajorTournament(haystack3) ? 5 : 3;
 }
 function parseTennisCurrentSetNumber(game) {
@@ -50653,8 +51230,8 @@ var MLB_HIGHLIGHT_PROVIDER = {
 var REGISTRY = {
   MLB: MLB_HIGHLIGHT_PROVIDER
 };
-function getHighlightProvider(league) {
-  const key2 = String(league || "").trim().toUpperCase();
+function getHighlightProvider(league2) {
+  const key2 = String(league2 || "").trim().toUpperCase();
   return REGISTRY[key2] ?? null;
 }
 
@@ -50886,19 +51463,19 @@ function resolveCanonicalEventRepositoryLeagueKey(value) {
 }
 function buildIndexByEventKey(order) {
   return new Map(
-    order.map((entry, index) => {
-      const league = resolveCanonicalEventRepositoryLeagueKey(entry.league);
-      const title = normalizeEventTitle(entry.title).toLowerCase();
-      return [`${league}::${title}`, index];
+    order.map((entry2, index) => {
+      const league2 = resolveCanonicalEventRepositoryLeagueKey(entry2.league);
+      const title = normalizeEventTitle(entry2.title).toLowerCase();
+      return [`${league2}::${title}`, index];
     })
   );
 }
 function buildScoreByEventKey(order) {
   return new Map(
-    order.map((entry, index) => {
-      const league = resolveCanonicalEventRepositoryLeagueKey(entry.league);
-      const title = normalizeEventTitle(entry.title).toLowerCase();
-      return [`${league}::${title}`, order.length - index];
+    order.map((entry2, index) => {
+      const league2 = resolveCanonicalEventRepositoryLeagueKey(entry2.league);
+      const title = normalizeEventTitle(entry2.title).toLowerCase();
+      return [`${league2}::${title}`, order.length - index];
     })
   );
 }
@@ -50906,10 +51483,10 @@ var eventOrder = getEventPriorityOrder();
 var indexByEventKey = buildIndexByEventKey(eventOrder);
 var scoreByEventKey = buildScoreByEventKey(eventOrder);
 function resolveEventMatchKey(game) {
-  const league = resolveCanonicalEventRepositoryLeagueKey(game.league);
+  const league2 = resolveCanonicalEventRepositoryLeagueKey(game.league);
   const title = normalizeEventTitle(resolveCanonicalEventDisplayTitle(game)).toLowerCase();
-  if (!league || !title) return null;
-  return `${league}::${title}`;
+  if (!league2 || !title) return null;
+  return `${league2}::${title}`;
 }
 function resolveCanonicalEventDisplayTitle(game) {
   return game.metadata?.canonicalEvent?.title?.trim() || game.metadata?.manualGamesSpine?.eventName?.trim() || game.awayTeam?.trim() || "";
@@ -51419,9 +51996,9 @@ var STANDALONE_SPINE_LEAGUE_KEYS = /* @__PURE__ */ new Set([
     ])
   )
 ]);
-function isStandaloneSpineLeague(league) {
-  if (league == null) return false;
-  return STANDALONE_SPINE_LEAGUE_KEYS.has(league) || isMotorsportLeagueKey(league);
+function isStandaloneSpineLeague(league2) {
+  if (league2 == null) return false;
+  return STANDALONE_SPINE_LEAGUE_KEYS.has(league2) || isMotorsportLeagueKey(league2);
 }
 function isStandaloneSpineEvent(game) {
   if (!isStandaloneSpineLeague(game.league)) return false;
@@ -51478,12 +52055,12 @@ function readSoloCompetitionLeague(game) {
 }
 var SOLO_COMPETITION_HIGHLIGHT_LEAGUE_KEYS = /* @__PURE__ */ new Set(["TDF"]);
 function isSoloCompetitionHighlightResolverGame(game) {
-  const league = readSoloCompetitionLeague(game);
-  if (!league) return false;
-  if (isGolfLeagueKey(league)) return true;
-  if (isMotorsportLeagueKey(league)) return true;
-  if (SOLO_COMPETITION_HIGHLIGHT_LEAGUE_KEYS.has(league)) return true;
-  if (isStandaloneSpineLeague(league)) return true;
+  const league2 = readSoloCompetitionLeague(game);
+  if (!league2) return false;
+  if (isGolfLeagueKey(league2)) return true;
+  if (isMotorsportLeagueKey(league2)) return true;
+  if (SOLO_COMPETITION_HIGHLIGHT_LEAGUE_KEYS.has(league2)) return true;
+  if (isStandaloneSpineLeague(league2)) return true;
   const homeTeam = game.homeTeam?.trim() ?? "";
   const awayTeam = game.awayTeam?.trim() ?? "";
   return awayTeam.length > 0 && homeTeam.length === 0;
@@ -51540,11 +52117,11 @@ function buildSoloCompetitionHighlightSearchTerms(game) {
   }
   appendSoloEventSearchTerms(terms, game.awayTeam);
   appendSoloEventSearchTerms(terms, game.officialAwayName);
-  const league = readSoloCompetitionLeague(game);
-  if (league) {
-    const tournamentLabel = resolveGamesSpineLeagueDisplayLabel(league);
+  const league2 = readSoloCompetitionLeague(game);
+  if (league2) {
+    const tournamentLabel = resolveGamesSpineLeagueDisplayLabel(league2);
     appendSoloEventSearchTerms(terms, tournamentLabel);
-    appendSoloEventSearchTerms(terms, league);
+    appendSoloEventSearchTerms(terms, league2);
   }
   const requiredIdentifier = resolveRequiredSoloEventIdentifierTerm(game.awayTeam ?? "");
   if (requiredIdentifier) {
@@ -51642,8 +52219,8 @@ function scoreHighlightsTvClipAgainstGame(clip, game) {
   if (!publishedAt) return null;
   const publishedMs = Date.parse(publishedAt);
   if (!Number.isFinite(publishedMs) || publishedMs <= 0) return null;
-  const league = String(game.league || "").trim().toUpperCase();
-  if (league === "MLB") {
+  const league2 = String(game.league || "").trim().toUpperCase();
+  if (league2 === "MLB") {
     if (!titleScore.highlightKeyword) return null;
     if (!mlbGameHighlightTitleMatchesGameDay(clip.title, game)) return null;
     return MIN_STRONG_MATCH_SCORE + 2;
@@ -51964,14 +52541,14 @@ function describeMlbAllGamesHighlightTitleRejection(title, targetSlateDateYmd) {
 // ../grarf/shared/media/mlbAllGamesHighlightSelection.js
 init_define_import_meta_env();
 var MLB_CATCHUP_DAILY_HIGHLIGHT_TITLE_PATTERNS = [MLB_ALL_GAMES_HIGHLIGHT_TITLE_NEEDLE];
-function entryTitle(entry) {
-  return entry?.title ?? entry?.snippet?.title ?? "";
+function entryTitle(entry2) {
+  return entry2?.title ?? entry2?.snippet?.title ?? "";
 }
-function entryVideoId(entry) {
-  return entry?.videoId ?? entry?.id?.videoId ?? null;
+function entryVideoId(entry2) {
+  return entry2?.videoId ?? entry2?.id?.videoId ?? null;
 }
-function entryPublishedAt(entry) {
-  return entry?.publishedAt ?? entry?.published ?? entry?.snippet?.publishedAt ?? "";
+function entryPublishedAt(entry2) {
+  return entry2?.publishedAt ?? entry2?.published ?? entry2?.snippet?.publishedAt ?? "";
 }
 function isMlbAllGamesHighlightCandidate(title) {
   const lower = String(title ?? "").trim().toLowerCase();
@@ -51983,15 +52560,15 @@ function selectMlbAllGamesHighlightForSlateDate(entries, targetSlateDateYmd, now
   const targetSlateDate = targetSlateDateYmd ?? getMlbAllGamesHighlightTargetSlateDate(now);
   const candidates = [];
   const rejected = [];
-  for (const entry of entries) {
-    const title = entryTitle(entry);
+  for (const entry2 of entries) {
+    const title = entryTitle(entry2);
     if (!isMlbAllGamesHighlightCandidate(title)) continue;
     const parsedTitleDate = parseMlbAllGamesHighlightTitleDate(title, targetSlateDate);
     const candidate = {
-      videoId: entryVideoId(entry),
+      videoId: entryVideoId(entry2),
       title,
       parsedTitleDate,
-      publishedAt: entryPublishedAt(entry)
+      publishedAt: entryPublishedAt(entry2)
     };
     candidates.push(candidate);
     const reason = describeMlbAllGamesHighlightTitleRejection(title, targetSlateDate);
@@ -52056,8 +52633,8 @@ function titleMatchesMlbCatchupDailyPatterns(title) {
   if (!lower) return false;
   return MLB_CATCHUP_DAILY_HIGHLIGHT_TITLE_PATTERNS2.some((pattern) => lower.includes(pattern));
 }
-function entryMatchesDailyHighlight(entry, needle) {
-  const title = entry?.title ?? entry?.snippet?.title ?? "";
+function entryMatchesDailyHighlight(entry2, needle) {
+  const title = entry2?.title ?? entry2?.snippet?.title ?? "";
   if (titleMatchesMlbCatchupDailyPatterns(title)) return true;
   if (needle) return titleMatchesNeedle(title, needle);
   return false;
@@ -52072,9 +52649,9 @@ function pickDailyHighlightForDate(entries, needle, targetDateYmd, options = {})
     );
     logMlbAllGamesHighlightSelection(verification, options.rssUrl);
     if (!selected) return null;
-    return entries.find((entry) => {
-      const title = entry?.title ?? entry?.snippet?.title ?? "";
-      const videoId = entry?.videoId ?? entry?.id?.videoId ?? null;
+    return entries.find((entry2) => {
+      const title = entry2?.title ?? entry2?.snippet?.title ?? "";
+      const videoId = entry2?.videoId ?? entry2?.id?.videoId ?? null;
       return title === selected.title && videoId === selected.videoId;
     }) ?? {
       title: selected.title,
@@ -52083,11 +52660,11 @@ function pickDailyHighlightForDate(entries, needle, targetDateYmd, options = {})
       videoId: selected.videoId
     };
   }
-  const matches = entries.filter((entry) => entryMatchesDailyHighlight(entry, needle));
+  const matches = entries.filter((entry2) => entryMatchesDailyHighlight(entry2, needle));
   if (matches.length === 0) return null;
   if (targetDateYmd) {
-    const dated = matches.filter((entry) => {
-      const title = entry?.title ?? entry?.snippet?.title ?? "";
+    const dated = matches.filter((entry2) => {
+      const title = entry2?.title ?? entry2?.snippet?.title ?? "";
       return titleMatchesCatchupDate(title, targetDateYmd);
     });
     if (dated.length > 0) {
@@ -52315,16 +52892,16 @@ var MORNING_LINEUP_HIGHLIGHT_API_PATH = "/api/youtube/morning-lineup-highlight";
 function morningLineupPlaylistRssUrl(playlistId) {
   return `${MORNING_LINEUP_PLAYLIST_RSS_PATH}/${encodeURIComponent(playlistId)}`;
 }
-function normalizePlaylistEntry(entry) {
+function normalizePlaylistEntry(entry2) {
   return {
     ok: true,
     video: {
-      videoId: entry.videoId,
-      title: entry.title,
-      videoUrl: `https://www.youtube.com/watch?v=${encodeURIComponent(entry.videoId)}`,
-      thumbnailUrl: `https://i.ytimg.com/vi/${encodeURIComponent(entry.videoId)}/mqdefault.jpg`,
-      channelTitle: entry.channel,
-      publishedAt: entry.published
+      videoId: entry2.videoId,
+      title: entry2.title,
+      videoUrl: `https://www.youtube.com/watch?v=${encodeURIComponent(entry2.videoId)}`,
+      thumbnailUrl: `https://i.ytimg.com/vi/${encodeURIComponent(entry2.videoId)}/mqdefault.jpg`,
+      channelTitle: entry2.channel,
+      publishedAt: entry2.published
     }
   };
 }
@@ -52387,10 +52964,10 @@ async function fetchSportscapeYoutubePlaylist(sourceUrl) {
     });
     if (res.ok) {
       const xml = await res.text();
-      return parseAtomEntries2(xml).map((entry) => ({
-        videoId: entry.videoId,
-        title: entry.title,
-        published: entry.published
+      return parseAtomEntries2(xml).map((entry2) => ({
+        videoId: entry2.videoId,
+        title: entry2.title,
+        published: entry2.published
       }));
     }
     lastStatus = res.status;
@@ -52427,10 +53004,10 @@ async function fetchSportscapeYoutubeChannel(sourceUrl) {
     throw new Error(`invalid_youtube_channel_source:${sourceUrl}`);
   }
   const xml = await fetchYoutubeChannelRssXml(channelId);
-  return parseAtomEntries2(xml).map((entry) => ({
-    videoId: entry.videoId,
-    title: entry.title,
-    published: entry.published
+  return parseAtomEntries2(xml).map((entry2) => ({
+    videoId: entry2.videoId,
+    title: entry2.title,
+    published: entry2.published
   }));
 }
 
@@ -52660,16 +53237,16 @@ async function ingestHighlightsTvClipsFromIngestionRow(row, leagueKey, leagueLab
   );
   filtered = applyHighlightsTvExcludedKeywordFilter(filtered, row.EXCLUDED_KEYWORDS);
   const thumbnailUrls = await resolveYoutubeCanonicalThumbnailUrls2(
-    filtered.map((entry) => entry.videoId)
+    filtered.map((entry2) => entry2.videoId)
   );
-  const clips = filtered.map((entry, index) => ({
-    id: `${leagueKey}-ingest-${index}-${entry.videoId}`,
-    title: entry.title,
+  const clips = filtered.map((entry2, index) => ({
+    id: `${leagueKey}-ingest-${index}-${entry2.videoId}`,
+    title: entry2.title,
     leagueLabel,
     durationLabel: "\u2014",
-    youtubeVideoId: entry.videoId,
-    thumbnailUrl: thumbnailUrls.get(entry.videoId),
-    publishedAt: entry.published
+    youtubeVideoId: entry2.videoId,
+    thumbnailUrl: thumbnailUrls.get(entry2.videoId),
+    publishedAt: entry2.published
   }));
   return playlistOnly ? clips : sortHighlightsTvClipsNewestFirst(clips);
 }
@@ -52804,10 +53381,10 @@ function cacheKey2(payload) {
   return resolveLeagueHighlightFetchKey(payload);
 }
 async function fetchGameLeagueHighlight(payload) {
-  const league = payload.league;
+  const league2 = payload.league;
   const electronResolve = window.grarf?.leagueHighlightsResolveGame;
   const resolve = electronResolve ?? (isGrarfWebRenderer() ? fetchGameLeagueHighlightViaHighlightsTv : null);
-  if (electronResolve && !getHighlightProvider(league)) return null;
+  if (electronResolve && !getHighlightProvider(league2)) return null;
   if (!resolve) return null;
   const key2 = cacheKey2(payload);
   const hit = resolveCache.get(key2);
@@ -58813,8 +59390,8 @@ var import_react60 = __toESM(require_react(), 1);
 
 // ../grarf/desktop/src/lib/highlights/f1HighlightPlayback.ts
 init_define_import_meta_env();
-function isF1HighlightLeague(league) {
-  return league?.trim().toUpperCase() === "F1";
+function isF1HighlightLeague(league2) {
+  return league2?.trim().toUpperCase() === "F1";
 }
 function openF1HighlightOnYoutube(videoId) {
   const trimmed = videoId.trim();
@@ -58896,7 +59473,7 @@ var F1HighlightYoutubeLink = (0, import_react60.memo)(function F1HighlightYoutub
   );
 });
 var LeagueHighlightYoutubePlayer = (0, import_react60.memo)(function LeagueHighlightYoutubePlayer2({
-  league,
+  league: league2,
   videoId,
   title,
   thumbnailUrl,
@@ -58904,7 +59481,7 @@ var LeagueHighlightYoutubePlayer = (0, import_react60.memo)(function LeagueHighl
   embedHost = "youtube",
   playOverlay = "compact"
 }) {
-  if (isF1HighlightLeague(league)) {
+  if (isF1HighlightLeague(league2)) {
     return /* @__PURE__ */ (0, import_jsx_runtime30.jsx)(
       F1HighlightYoutubeLink,
       {
@@ -58961,7 +59538,7 @@ function GameWorkspaceManualHighlightPlayer({
   video,
   videoOnly,
   className,
-  league
+  league: league2
 }) {
   return /* @__PURE__ */ (0, import_jsx_runtime31.jsxs)(
     "div",
@@ -58979,7 +59556,7 @@ function GameWorkspaceManualHighlightPlayer({
         /* @__PURE__ */ (0, import_jsx_runtime31.jsx)(GameWorkspaceHighlightMediaViewport, { videoOnly, children: video.youtubeVideoId ? /* @__PURE__ */ (0, import_jsx_runtime31.jsx)(
           LeagueHighlightYoutubePlayer,
           {
-            league,
+            league: league2,
             videoId: video.youtubeVideoId,
             title: video.title,
             thumbnailUrl: video.thumbnailUrl,
@@ -59013,13 +59590,13 @@ function GameWorkspaceManualHighlightPlayer({
 var GameWorkspaceLeagueHighlightIframe = (0, import_react61.memo)(function GameWorkspaceLeagueHighlightIframe2({
   videoId,
   title,
-  league,
+  league: league2,
   thumbnailUrl
 }) {
   return /* @__PURE__ */ (0, import_jsx_runtime31.jsx)(
     LeagueHighlightYoutubePlayer,
     {
-      league,
+      league: league2,
       videoId,
       title,
       thumbnailUrl,
@@ -59240,9 +59817,9 @@ var WNBA = {
   // Add entries as needed
 };
 var OVERRIDES = { MLB, NBA, NHL, WNBA };
-function getDarkThemeLogoUrl(league, abbrev) {
-  if (!league || !abbrev) return void 0;
-  return OVERRIDES[league]?.[abbrev.toLowerCase()];
+function getDarkThemeLogoUrl(league2, abbrev) {
+  if (!league2 || !abbrev) return void 0;
+  return OVERRIDES[league2]?.[abbrev.toLowerCase()];
 }
 
 // ../grarf/desktop/src/lib/gamesSpine/mlbEspnLogoSlug.ts
@@ -60040,9 +60617,9 @@ function GameWorkspace({ workspace, className, watchCoordination, suppressWorksp
     [useCoord, watchCoordination]
   );
   const onWatchLive = (0, import_react64.useCallback)(() => {
-    const league = leagueKeyFromSport(payload.sport);
+    const league2 = leagueKeyFromSport(payload.sport);
     trackWatchLiveClicked({
-      league: league ?? payload.sport,
+      league: league2 ?? payload.sport,
       gameId: payload.gameId,
       source: "game_workspace"
     });
@@ -60065,17 +60642,17 @@ function GameWorkspace({ workspace, className, watchCoordination, suppressWorksp
   }, [setWatch]);
   (0, import_react64.useEffect)(() => {
     if (!payload || !isWatchingLive) return;
-    const league = leagueKeyFromSport(payload.sport);
+    const league2 = leagueKeyFromSport(payload.sport);
     const provider = payload.stream.provider;
     trackStreamWatchStarted({
-      league: league ?? payload.sport,
+      league: league2 ?? payload.sport,
       gameId: payload.gameId,
       provider,
       source: "game_workspace"
     });
     return () => {
       trackStreamWatchEnded({
-        league: league ?? payload.sport,
+        league: league2 ?? payload.sport,
         gameId: payload.gameId,
         provider,
         source: "game_workspace"
@@ -60593,14 +61170,14 @@ function gameMatchesTeam(game, teamLabel) {
 function buildIntelligenceContext(entities, liveGames) {
   const relatedGames = [];
   const leagues = entities.leagues.length ? entities.leagues.filter((l2) => LEAGUE_KEYS.includes(l2)) : LEAGUE_KEYS;
-  for (const league of leagues) {
-    const games = liveGames[league] ?? [];
+  for (const league2 of leagues) {
+    const games = liveGames[league2] ?? [];
     for (const g2 of games) {
       const hit = entities.teams.some((team) => gameMatchesTeam(g2, team));
       if (!hit && entities.teams.length > 0) continue;
       relatedGames.push({
         gameId: g2.id,
-        league,
+        league: league2,
         label: `${g2.awayTeam} @ ${g2.homeTeam}`,
         status: g2.status === "live" ? "LIVE" : g2.status === "final" ? "FINAL" : "SCHED"
       });
@@ -61508,7 +62085,7 @@ function resolveHomeLeagueHubPaneSources(hubId, categoryId, liveLeagues, liveWor
   );
   if (!config) return null;
   const resolvedCategoryId = categoryId ?? config.defaultCategoryId;
-  const category = config.categories.find((entry) => entry.id === resolvedCategoryId) ?? config.categories.find((entry) => entry.id === config.defaultCategoryId);
+  const category = config.categories.find((entry2) => entry2.id === resolvedCategoryId) ?? config.categories.find((entry2) => entry2.id === config.defaultCategoryId);
   if (!category) return null;
   return category.sources.length > 0 ? [...category.sources] : null;
 }
@@ -61661,8 +62238,8 @@ var import_react70 = __toESM(require_react(), 1);
 init_define_import_meta_env();
 var LEAGUE_HOME_PANE_MIN_WIDTH_PX = 300;
 var LEAGUE_HOME_PANE_LAYOUT_STORAGE_KEY = "grarf-league-home-pane-layouts";
-function normalizeLeagueHomePaneLayoutKey(league) {
-  return league.trim().toUpperCase();
+function normalizeLeagueHomePaneLayoutKey(league2) {
+  return league2.trim().toUpperCase();
 }
 function isValidLeaguePaneWidth(value) {
   return typeof value === "number" && Number.isFinite(value) && value >= LEAGUE_HOME_PANE_MIN_WIDTH_PX;
@@ -61698,8 +62275,8 @@ function readAllLeaguePaneLayoutsSync() {
     return {};
   }
 }
-function readSavedLeaguePaneWidthsSync(league) {
-  const key2 = normalizeLeagueHomePaneLayoutKey(league);
+function readSavedLeaguePaneWidthsSync(league2) {
+  const key2 = normalizeLeagueHomePaneLayoutKey(league2);
   return readAllLeaguePaneLayoutsSync()[key2] ?? null;
 }
 function pickSavedPaneWidthsForRail(saved, paneIds) {
@@ -61720,14 +62297,14 @@ var useLeagueHomePaneLayoutStore = (0, import_zustand41.create)()(
   (0, import_middleware.persist)(
     (set) => ({
       byLeague: {},
-      setLeaguePaneWidths: (league, widths) => set((state3) => ({
+      setLeaguePaneWidths: (league2, widths) => set((state3) => ({
         byLeague: {
           ...state3.byLeague,
-          [normalizeLeagueHomePaneLayoutKey(league)]: { ...widths }
+          [normalizeLeagueHomePaneLayoutKey(league2)]: { ...widths }
         }
       })),
-      resetLeaguePaneLayouts: (league) => set((state3) => {
-        const key2 = normalizeLeagueHomePaneLayoutKey(league);
+      resetLeaguePaneLayouts: (league2) => set((state3) => {
+        const key2 = normalizeLeagueHomePaneLayoutKey(league2);
         if (!(key2 in state3.byLeague)) return state3;
         const next = { ...state3.byLeague };
         delete next[key2];
@@ -61863,15 +62440,15 @@ function LeagueHomePaneResizeHandle({ onResize, onResizeCommit }) {
     }
   );
 }
-function buildInitialPaneWidths(league, children) {
-  if (!league) return {};
+function buildInitialPaneWidths(league2, children) {
+  if (!league2) return {};
   const paneIds = import_react70.Children.toArray(children).map((pane, index) => readPaneId(pane, index));
-  return pickSavedPaneWidthsForRail(readSavedLeaguePaneWidthsSync(league), paneIds);
+  return pickSavedPaneWidthsForRail(readSavedLeaguePaneWidthsSync(league2), paneIds);
 }
 function LeagueHomePaneRail({
   children,
   className,
-  league,
+  league: league2,
   paneWidthRatios,
   focusedPaneId: focusedPaneIdProp,
   onFocusedPaneIdChange,
@@ -61885,7 +62462,7 @@ function LeagueHomePaneRail({
   const [viewportW, setViewportW] = (0, import_react70.useState)(0);
   const [internalFocusedPaneId, setInternalFocusedPaneId] = (0, import_react70.useState)(null);
   const [paneWidths, setPaneWidths] = (0, import_react70.useState)(
-    () => buildInitialPaneWidths(league, children)
+    () => buildInitialPaneWidths(league2, children)
   );
   const focusedPaneId = focusedPaneIdProp !== void 0 ? focusedPaneIdProp : internalFocusedPaneId;
   const setFocusedPaneId = (paneId) => {
@@ -61902,17 +62479,17 @@ function LeagueHomePaneRail({
     })),
     [children]
   );
-  const paneIdsKey = paneEntries.map((entry) => entry.paneId).join("\0");
-  const prevLeagueRef = (0, import_react70.useRef)(league);
+  const paneIdsKey = paneEntries.map((entry2) => entry2.paneId).join("\0");
+  const prevLeagueRef = (0, import_react70.useRef)(league2);
   const latestPaneWidthsRef = (0, import_react70.useRef)(paneWidths);
   latestPaneWidthsRef.current = paneWidths;
   const persistPaneWidths = (0, import_react70.useCallback)(
     (widths) => {
-      if (!league) return;
+      if (!league2) return;
       if (Object.keys(widths).length === 0) return;
-      useLeagueHomePaneLayoutStore.getState().setLeaguePaneWidths(league, widths);
+      useLeagueHomePaneLayoutStore.getState().setLeaguePaneWidths(league2, widths);
     },
-    [league]
+    [league2]
   );
   const commitResizePersist = (0, import_react70.useCallback)(() => {
     persistPaneWidths(latestPaneWidthsRef.current);
@@ -61923,31 +62500,31 @@ function LeagueHomePaneRail({
     });
   }, []);
   (0, import_react70.useEffect)(() => {
-    if (prevLeagueRef.current === league) return;
-    prevLeagueRef.current = league;
+    if (prevLeagueRef.current === league2) return;
+    prevLeagueRef.current = league2;
     skipPersistRef.current = true;
-    if (!league) {
+    if (!league2) {
       setPaneWidths({});
       requestAnimationFrame(() => {
         skipPersistRef.current = false;
       });
       return;
     }
-    const paneIds = paneEntries.map((entry) => entry.paneId);
+    const paneIds = paneEntries.map((entry2) => entry2.paneId);
     setPaneWidths(
-      pickSavedPaneWidthsForRail(readSavedLeaguePaneWidthsSync(league), paneIds)
+      pickSavedPaneWidthsForRail(readSavedLeaguePaneWidthsSync(league2), paneIds)
     );
     requestAnimationFrame(() => {
       skipPersistRef.current = false;
     });
-  }, [league, paneEntries]);
+  }, [league2, paneEntries]);
   (0, import_react70.useEffect)(() => {
     return () => {
-      if (league && Object.keys(latestPaneWidthsRef.current).length > 0) {
-        useLeagueHomePaneLayoutStore.getState().setLeaguePaneWidths(league, latestPaneWidthsRef.current);
+      if (league2 && Object.keys(latestPaneWidthsRef.current).length > 0) {
+        useLeagueHomePaneLayoutStore.getState().setLeaguePaneWidths(league2, latestPaneWidthsRef.current);
       }
     };
-  }, [league]);
+  }, [league2]);
   (0, import_react70.useEffect)(() => {
     const el = viewportRef.current;
     if (!el) return;
@@ -61970,7 +62547,7 @@ function LeagueHomePaneRail({
         changed = true;
       }
       for (const id of Object.keys(next)) {
-        if (!paneEntries.some((entry) => entry.paneId === id)) {
+        if (!paneEntries.some((entry2) => entry2.paneId === id)) {
           delete next[id];
           changed = true;
         }
@@ -61988,7 +62565,7 @@ function LeagueHomePaneRail({
     if (requestId <= fulfilledScrollRequestRef.current) return;
     const el = viewportRef.current;
     if (!el) return;
-    const targetIndex = paneEntries.findIndex((entry) => entry.paneId === scrollToPaneId);
+    const targetIndex = paneEntries.findIndex((entry2) => entry2.paneId === scrollToPaneId);
     if (targetIndex < 0) return;
     const scrollToTarget = () => {
       let left = 0;
@@ -62042,9 +62619,9 @@ function LeagueHomePaneRail({
     });
   };
   const resetLayout = (0, import_react70.useCallback)(() => {
-    if (!league) return;
+    if (!league2) return;
     skipPersistRef.current = true;
-    useLeagueHomePaneLayoutStore.getState().resetLeaguePaneLayouts(league);
+    useLeagueHomePaneLayoutStore.getState().resetLeaguePaneLayouts(league2);
     setPaneWidths(() => {
       const next = {};
       for (const { paneId, index } of paneEntries) {
@@ -62058,9 +62635,9 @@ function LeagueHomePaneRail({
     requestAnimationFrame(() => {
       skipPersistRef.current = false;
     });
-  }, [league, paneEntries, paneWidthRatios, viewportW]);
+  }, [league2, paneEntries, paneWidthRatios, viewportW]);
   return /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: cn2("relative flex h-full min-h-0 flex-col", className), children: [
-    league && !isFocusActive ? /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
+    league2 && !isFocusActive ? /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
       "button",
       {
         type: "button",
@@ -62283,13 +62860,13 @@ function PlaceholderRailPane({ label, hint }) {
   return /* @__PURE__ */ (0, import_jsx_runtime45.jsx)(LeagueHomePanel, { label, children: /* @__PURE__ */ (0, import_jsx_runtime45.jsx)("div", { className: "flex h-full items-center justify-center p-3", children: /* @__PURE__ */ (0, import_jsx_runtime45.jsx)("span", { className: "text-center font-mono text-[8px] leading-relaxed tracking-[0.12em] text-textdim/25", children: hint ?? "Content module placeholder" }) }) });
 }
 function LeagueHomePageLayout({
-  league,
+  league: league2,
   className,
   topRowClassName,
   slots,
   focusedPaneId = null
 }) {
-  const leagueLabel = league?.toUpperCase() ?? "LEAGUE";
+  const leagueLabel = league2?.toUpperCase() ?? "LEAGUE";
   const isPaneFocusActive = focusedPaneId != null;
   const topCenterOmitted = slots != null && "topCenter" in slots && slots.topCenter === null;
   const topLeft = slots?.topLeft ?? /* @__PURE__ */ (0, import_jsx_runtime45.jsx)(
@@ -62313,7 +62890,7 @@ function LeagueHomePageLayout({
       hint: "AI insight / key performers placeholder"
     }
   );
-  const bottomRail = slots?.bottomRail ?? /* @__PURE__ */ (0, import_jsx_runtime45.jsxs)(LeagueHomePaneRail, { league, children: [
+  const bottomRail = slots?.bottomRail ?? /* @__PURE__ */ (0, import_jsx_runtime45.jsxs)(LeagueHomePaneRail, { league: league2, children: [
     /* @__PURE__ */ (0, import_jsx_runtime45.jsx)(
       PlaceholderRailPane,
       {
@@ -63598,7 +64175,7 @@ function HomeHeadlinesWebsiteSubmenu({
         {
           type: "button",
           onClick: () => {
-            const source = sources?.find((entry) => entry.id === item.id);
+            const source = sources?.find((entry2) => entry2.id === item.id);
             if (source?.openInNewBrowserTab && source.url.trim()) {
               window.open(source.url.trim(), "_blank", "noopener,noreferrer");
               return;
@@ -63690,7 +64267,7 @@ function HomeLeagueWorkspaceMainMenu({ hubId, config }) {
   );
   if (!items.length) return null;
   const handleSelect = (categoryId) => {
-    const category = config?.categories.find((entry) => entry.id === categoryId);
+    const category = config?.categories.find((entry2) => entry2.id === categoryId);
     if (category?.openInNewBrowserTab && isGrarfWebRenderer() && category.sources.some((source) => source.url.trim().length > 0)) {
       const url = category.sources.find((source) => source.url.trim())?.url;
       if (url) {
@@ -64110,14 +64687,14 @@ function findGamesSpineGameForWatchLive(gameId, consumerId = "watch_live_click")
 // ../grarf/desktop/src/pages/GameWorkspacePage.tsx
 var import_jsx_runtime58 = __toESM(require_jsx_runtime(), 1);
 function backHrefForGameId(rawId) {
-  const league = leagueKeyFromGameId(rawId);
-  if (!league) return "/";
-  return leagueRoutePath(league);
+  const league2 = leagueKeyFromGameId(rawId);
+  if (!league2) return "/";
+  return leagueRoutePath(league2);
 }
 function gameWorkspaceTitle(game, id) {
   if (game) return `${game.awayTeam} @ ${game.homeTeam}`;
-  const league = leagueKeyFromGameId(id);
-  if (league) return GAMES_COLUMN_LEAGUE_LABEL[league];
+  const league2 = leagueKeyFromGameId(id);
+  if (league2) return GAMES_COLUMN_LEAGUE_LABEL[league2];
   return id;
 }
 function GameWorkspacePage() {
@@ -64141,10 +64718,10 @@ function GameWorkspacePage() {
   }, [game, id]);
   (0, import_react85.useEffect)(() => {
     if (!id) return;
-    const league = leagueKeyFromGameId(id);
+    const league2 = leagueKeyFromGameId(id);
     trackGameOpened({
       gameId: id,
-      league: league ?? "unknown",
+      league: league2 ?? "unknown",
       source: "route"
     });
   }, [id]);
@@ -64881,11 +65458,11 @@ var GAMES_SPINE_TEMPORARILY_HIDDEN_LEAGUES = [
 var HIDDEN_GAMES_SPINE_LEAGUE_SET = new Set(
   GAMES_SPINE_TEMPORARILY_HIDDEN_LEAGUES
 );
-function isGamesSpineLeagueTemporarilyHidden(league) {
-  return HIDDEN_GAMES_SPINE_LEAGUE_SET.has(league);
+function isGamesSpineLeagueTemporarilyHidden(league2) {
+  return HIDDEN_GAMES_SPINE_LEAGUE_SET.has(league2);
 }
 function withoutGamesSpineHiddenLeagues(leagues) {
-  return leagues.filter((league) => !isGamesSpineLeagueTemporarilyHidden(league));
+  return leagues.filter((league2) => !isGamesSpineLeagueTemporarilyHidden(league2));
 }
 function omitHiddenGamesSpineLeagueGames(mergedLeagues) {
   const visible = {};
@@ -64931,8 +65508,8 @@ function resolveViewOperationalMode(selectedDate, operationalMode) {
   if (isSelectedDateOperationalSportsDay(selectedDate)) return operationalMode;
   return "PREPARE";
 }
-function resolveViewLeagueGames(league, selectedDate, liveLeagues, scheduleByDate) {
-  const sourceLeague = resolveWimbledonGamesSpineSourceLeague(league) ?? league;
+function resolveViewLeagueGames(league2, selectedDate, liveLeagues, scheduleByDate) {
+  const sourceLeague = resolveWimbledonGamesSpineSourceLeague(league2) ?? league2;
   const mergedLeagues = mergeOperationalLeagueGames(liveLeagues);
   const dateKey = resolveGamesSpineSelectedDateKey(selectedDate);
   let games;
@@ -64955,7 +65532,7 @@ function resolveViewLeagueGames(league, selectedDate, liveLeagues, scheduleByDat
   } else {
     games = scheduleByDate[dateKey]?.[sourceLeague] ?? [];
   }
-  return filterGamesForWimbledonGamesSpineSection(league, games);
+  return filterGamesForWimbledonGamesSpineSection(league2, games);
 }
 
 // ../grarf/desktop/src/lib/gamesSpine/buildVisibleSpineGames.ts
@@ -65793,8 +66370,8 @@ init_define_import_meta_env();
 
 // ../grarf/desktop/src/lib/gamesSpine/isUfcLeague.ts
 init_define_import_meta_env();
-function isUfcLeague(league) {
-  return league === "UFC";
+function isUfcLeague(league2) {
+  return league2 === "UFC";
 }
 function isUfcGame(game) {
   return isUfcLeague(game.league);
@@ -65845,11 +66422,11 @@ function compactTeamSide(game, side) {
   return name || (side === "away" ? "Away" : "Home");
 }
 function formatCommandBriefingCompactLine(game, leagueLabel) {
-  const league = leagueLabel?.trim() || game.league || "GAME";
+  const league2 = leagueLabel?.trim() || game.league || "GAME";
   const away = compactTeamSide(game, "away");
   const home = compactTeamSide(game, "home");
   const schedule = resolveCommandBriefingScheduleLabel(game);
-  return `${league} \xB7 ${away} \xB7 ${home} \xB7 ${schedule}`;
+  return `${league2} \xB7 ${away} \xB7 ${home} \xB7 ${schedule}`;
 }
 
 // ../grarf/desktop/src/lib/commandBriefing/commandBriefingLeagueLabel.ts
@@ -66016,11 +66593,11 @@ function resolveMotorsportSpineTimingLabel(game) {
   return state3.statusDetail ?? game.statusLine?.trim() ?? null;
 }
 function formatRunningOrderLine(state3) {
-  const entries = state3.runningOrder.filter((entry) => entry.name?.trim());
+  const entries = state3.runningOrder.filter((entry2) => entry2.name?.trim());
   if (entries.length === 0) return null;
-  const segments = entries.slice(0, 5).map((entry) => {
-    if (entry.position === 1) return entry.name;
-    return `P${entry.position} ${entry.name}`;
+  const segments = entries.slice(0, 5).map((entry2) => {
+    if (entry2.position === 1) return entry2.name;
+    return `P${entry2.position} ${entry2.name}`;
   });
   return segments.join(" \xB7 ");
 }
@@ -66319,11 +66896,11 @@ init_define_import_meta_env();
 // ../grarf/desktop/src/lib/gamesSpine/isSoccerLeague.ts
 init_define_import_meta_env();
 var PRIMARY_SOCCER_LEAGUE_KEYS = /* @__PURE__ */ new Set(["EPL"]);
-function isSoccerLeague(league) {
-  if (!league) return false;
-  if (PRIMARY_SOCCER_LEAGUE_KEYS.has(league)) return true;
-  if (ESPN_SOCCER_OPERATIONAL_LEAGUE_KEYS.has(league)) return true;
-  return resolveSportKeyForLeague(league) === "soccer";
+function isSoccerLeague(league2) {
+  if (!league2) return false;
+  if (PRIMARY_SOCCER_LEAGUE_KEYS.has(league2)) return true;
+  if (ESPN_SOCCER_OPERATIONAL_LEAGUE_KEYS.has(league2)) return true;
+  return resolveSportKeyForLeague(league2) === "soccer";
 }
 
 // ../grarf/desktop/src/lib/gamesSpine/resolveGamesSpineMatchupSideOrder.ts
@@ -66408,12 +66985,12 @@ var SOCCER_LEAGUES2 = /* @__PURE__ */ new Set([
   "USLCUP",
   "WORLDCUP"
 ]);
-function isSoccerLeague2(league) {
-  return league != null && SOCCER_LEAGUES2.has(league);
+function isSoccerLeague2(league2) {
+  return league2 != null && SOCCER_LEAGUES2.has(league2);
 }
 function isMlbFamilyGame(game) {
-  const league = game.league;
-  return league === "MLB" || league === "NCAABB" || /^espn-MLB-/i.test(game.id) || /^espn-NCAABB-/i.test(game.id);
+  const league2 = game.league;
+  return league2 === "MLB" || league2 === "NCAABB" || /^espn-MLB-/i.test(game.id) || /^espn-NCAABB-/i.test(game.id);
 }
 function stripLivePrefix(scheduleLabel) {
   if (!scheduleLabel?.trim()) return null;
@@ -66435,8 +67012,8 @@ function resolveGolfSpineLiveTimingLabel(game, scheduleLabel) {
   if (stripped) return stripGolfLiveInProgressSuffix(stripped);
   return null;
 }
-function isNbaFamilyBasketballLeague(league) {
-  return league === "NBA" || league === "NBASUMMER" || league === "WNBA";
+function isNbaFamilyBasketballLeague(league2) {
+  return league2 === "NBA" || league2 === "NBASUMMER" || league2 === "WNBA";
 }
 function formatNbaFamilyBasketballPeriodLabel(periodNum) {
   if (periodNum >= 1 && periodNum <= 4) return `Q${periodNum}`;
@@ -66690,42 +67267,42 @@ var SOCCER_LEAGUES3 = /* @__PURE__ */ new Set([
   "USLCUP",
   "WORLDCUP"
 ]);
-function espnCdnLogo(league, abbrev, teamId, game) {
+function espnCdnLogo(league2, abbrev, teamId, game) {
   const abbr = abbrev?.trim().toLowerCase();
   const id = teamId?.trim();
-  if (league && NATIONAL_TEAM_SOCCER_LEAGUES.has(league) && abbr) {
+  if (league2 && NATIONAL_TEAM_SOCCER_LEAGUES.has(league2) && abbr) {
     return `https://a.espncdn.com/i/teamlogos/countries/500/${abbr}.png`;
   }
-  if (league === "NCAABB" && id) {
+  if (league2 === "NCAABB" && id) {
     return `https://a.espncdn.com/i/teamlogos/ncaa/500/${id}.png`;
   }
-  if (league && SOCCER_LEAGUES3.has(league) && id) {
+  if (league2 && SOCCER_LEAGUES3.has(league2) && id) {
     return `https://a.espncdn.com/i/teamlogos/soccer/500/${id}.png`;
   }
-  if (league === "MLB" && abbr) {
+  if (league2 === "MLB" && abbr) {
     return buildMlbEspnScoreboardLogoUrl(abbr);
   }
-  if (league === "NBA" && abbr) {
+  if (league2 === "NBA" && abbr) {
     return `https://a.espncdn.com/i/teamlogos/nba/500/scoreboard/${abbr}.png`;
   }
-  if (league === "WNBA" && abbr) {
+  if (league2 === "WNBA" && abbr) {
     return buildWnbaEspnLogoUrl(abbr);
   }
-  if (league === "NHL" && abbr) {
+  if (league2 === "NHL" && abbr) {
     return `https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/${abbr}.png`;
   }
-  if (league === "MLS" && id) {
+  if (league2 === "MLS" && id) {
     return `https://a.espncdn.com/i/teamlogos/soccer/500/${id}.png`;
   }
-  if (league && isStandaloneSpineLeague(league)) {
-    return resolveGamesSpineLeagueLogoUrl(league, { game });
+  if (league2 && isStandaloneSpineLeague(league2)) {
+    return resolveGamesSpineLeagueLogoUrl(league2, { game });
   }
   return void 0;
 }
 function resolveDarkThemeLogoUrl(game, side) {
   const abbrev = side === "away" ? game.awayTeamAbbrev : game.homeTeamAbbrev;
-  const league = game.league ?? (game.id.startsWith("espn-") ? parseLeagueFromEspnId(game.id) : void 0);
-  const override = getDarkThemeLogoUrl(league, abbrev);
+  const league2 = game.league ?? (game.id.startsWith("espn-") ? parseLeagueFromEspnId(game.id) : void 0);
+  const override = getDarkThemeLogoUrl(league2, abbrev);
   if (override) return override;
   return resolveTeamLogoUrl(game, side);
 }
@@ -66733,8 +67310,8 @@ function resolveTeamLogoUrl(game, side) {
   const direct = side === "away" ? game.awayLogoUrl : game.homeLogoUrl;
   if (direct?.trim()) return direct.trim();
   const abbrev = side === "away" ? game.awayTeamAbbrev : game.homeTeamAbbrev;
-  const league = game.league ?? (game.id.startsWith("espn-") ? parseLeagueFromEspnId(game.id) : void 0);
-  return espnCdnLogo(league, abbrev, void 0, game);
+  const league2 = game.league ?? (game.id.startsWith("espn-") ? parseLeagueFromEspnId(game.id) : void 0);
+  return espnCdnLogo(league2, abbrev, void 0, game);
 }
 function parseLeagueFromEspnId(id) {
   const m2 = /^espn-([A-Z]+)-/i.exec(id);
@@ -67159,13 +67736,13 @@ var import_jsx_runtime79 = __toESM(require_jsx_runtime(), 1);
 function DemoMatchup({
   awayTeamLabel,
   homeTeamLabel,
-  league
+  league: league2
 }) {
   const sideLabel = {
     away: awayTeamLabel,
     home: homeTeamLabel
   };
-  const [topSide, bottomSide] = resolveGamesSpineMatchupSideOrder({ league });
+  const [topSide, bottomSide] = resolveGamesSpineMatchupSideOrder({ league: league2 });
   return /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "flex min-w-0 flex-col gap-0.5 pr-1 text-[11px] leading-tight text-white", children: [
     /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "truncate", children: sideLabel[topSide] }),
     /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "truncate", children: sideLabel[bottomSide] })
@@ -67203,18 +67780,18 @@ function GamesSpineUnifiedGameCard({
   const showActionButtons = showFollowLive || showWatchLiveButton;
   const bothActionButtons = showFollowLive && showWatchLiveButton;
   const actionButtonLayoutClass = bothActionButtons ? "!w-auto min-w-max flex-1 basis-[calc(50%-0.125rem)] whitespace-nowrap" : "w-full whitespace-nowrap";
-  const league = game?.league;
-  const leagueLogoUrl = league ? resolveGamesSpineLeagueLogoUrl(league, { game }) : void 0;
+  const league2 = game?.league;
+  const leagueLogoUrl = league2 ? resolveGamesSpineLeagueLogoUrl(league2, { game }) : void 0;
   return /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: cn2(GAMES_SPINE_CARD_SHELL_CLASS, className), children: [
     /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "flex min-w-0 items-center justify-between", children: /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "inline-flex min-w-0 items-center gap-1", children: [
-      league && leagueLogoUrl ? /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(
+      league2 && leagueLogoUrl ? /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(
         "img",
         {
           src: leagueLogoUrl,
           alt: "",
           className: cn2(
             "h-2.5 w-2.5 shrink-0 object-contain",
-            resolveGamesSpineLeagueLogoImgClassName(league, leagueLogoUrl)
+            resolveGamesSpineLeagueLogoImgClassName(league2, leagueLogoUrl)
           ),
           loading: "lazy",
           decoding: "async"
@@ -67437,8 +68014,8 @@ function gamesSpineCompactChannelLogoImageClass(align = "left", logo) {
   );
 }
 function isMlbFamilyGame2(game) {
-  const league = game.league;
-  return league === "MLB" || league === "NCAABB" || league === "NCAASB" || /^espn-MLB-/i.test(game.id) || /^espn-NCAABB-/i.test(game.id) || /^espn-NCAASB-/i.test(game.id);
+  const league2 = game.league;
+  return league2 === "MLB" || league2 === "NCAABB" || league2 === "NCAASB" || /^espn-MLB-/i.test(game.id) || /^espn-NCAABB-/i.test(game.id) || /^espn-NCAASB-/i.test(game.id);
 }
 function formatCompactBaseballInningLabel(label) {
   const top = label.match(/^Top\s+(\d+)/i);
@@ -67629,7 +68206,7 @@ function resolveResultEmphasis(side, winnerSide) {
 function CompetitorLogo({
   logoUrl,
   alignTop,
-  league
+  league: league2
 }) {
   return /* @__PURE__ */ (0, import_jsx_runtime81.jsx)(
     "span",
@@ -67645,7 +68222,7 @@ function CompetitorLogo({
           alt: "",
           className: cn2(
             "h-2.5 w-2.5 shrink-0 object-contain",
-            resolveGamesSpineLeagueLogoImgClassName(league, logoUrl)
+            resolveGamesSpineLeagueLogoImgClassName(league2, logoUrl)
           ),
           loading: "lazy",
           decoding: "async"
@@ -67955,8 +68532,8 @@ function getDemoWnbaWhipAroundGame() {
     streamUrl: DEMO_WNBA_WHIP_AROUND_WATCH_URL
   };
 }
-function applyDemoWnbaSpineGames(games, league) {
-  if (!isDemoDataModeEnabled() || league !== "WNBA") return games;
+function applyDemoWnbaSpineGames(games, league2) {
+  if (!isDemoDataModeEnabled() || league2 !== "WNBA") return games;
   const demo = getDemoWnbaWhipAroundGame();
   const withoutLegacyDemo = games.filter((g2) => !isDemoAcesSparksWnbaGame(g2));
   const withoutDemoDup = withoutLegacyDemo.filter((g2) => g2.id !== demo.id);
@@ -68501,8 +69078,8 @@ function GameRow({
 init_define_import_meta_env();
 var import_react102 = __toESM(require_react(), 1);
 var import_jsx_runtime85 = __toESM(require_jsx_runtime(), 1);
-function GamesSpineLeagueHeaderMark({ league }) {
-  const logoUrl = resolveGamesSpineLeagueLogoUrl(league) ?? resolveCanonicalLeagueLogoUrl({ grarfLeagueKey: league });
+function GamesSpineLeagueHeaderMark({ league: league2 }) {
+  const logoUrl = resolveGamesSpineLeagueLogoUrl(league2) ?? resolveCanonicalLeagueLogoUrl({ grarfLeagueKey: league2 });
   const [failed, setFailed] = (0, import_react102.useState)(false);
   if (!logoUrl || failed) return null;
   return /* @__PURE__ */ (0, import_jsx_runtime85.jsx)(
@@ -68517,7 +69094,7 @@ function GamesSpineLeagueHeaderMark({ league }) {
       onError: () => setFailed(true),
       className: cn2(
         "h-4 w-4 shrink-0 object-contain brightness-110 contrast-110",
-        resolveGamesSpineLeagueLogoImgClassName(league, logoUrl)
+        resolveGamesSpineLeagueLogoImgClassName(league2, logoUrl)
       )
     }
   );
@@ -68527,14 +69104,14 @@ function GamesSpineLeagueHeaderMark({ league }) {
 init_define_import_meta_env();
 var import_jsx_runtime86 = __toESM(require_jsx_runtime(), 1);
 function EditableLeagueContextStrip({
-  league,
+  league: league2,
   fallbackLabel,
   trailingMetadata
 }) {
   const bundle = useEditorialStore((s2) => s2.bundle);
   const editMode = useEditorialStore((s2) => s2.editMode);
   const saveLeagueContext = useEditorialStore((s2) => s2.saveLeagueContext);
-  const manual = bundle.leagueContexts?.[league]?.leagueContext?.trim() ?? "";
+  const manual = bundle.leagueContexts?.[league2]?.leagueContext?.trim() ?? "";
   const displayText = manual || fallbackLabel;
   const isManual = Boolean(manual);
   const trailing = trailingMetadata?.trim() ?? "";
@@ -68556,7 +69133,7 @@ function EditableLeagueContextStrip({
             editMode,
             showWhenEmpty: editMode,
             placeholder: "League context\u2026",
-            onDraftChange: (next) => saveLeagueContext(league, next),
+            onDraftChange: (next) => saveLeagueContext(league2, next),
             displayClassName: "text-[8px] tracking-[0.24em] text-cyansys/50 uppercase",
             className: "text-[8px] uppercase tracking-[0.2em]"
           }
@@ -68595,18 +69172,18 @@ var SOCCER_LEAGUES4 = /* @__PURE__ */ new Set([
 ]);
 var TENNIS_LEAGUES2 = /* @__PURE__ */ new Set(["ATP", "WTA"]);
 var MMA_LEAGUES = /* @__PURE__ */ new Set(["UFC"]);
-function unitForLeague(league) {
-  if (league === "F1") return "sessions";
-  if (MMA_LEAGUES.has(league)) return "fights";
-  if (SOCCER_LEAGUES4.has(league) || TENNIS_LEAGUES2.has(league)) return "matches";
+function unitForLeague(league2) {
+  if (league2 === "F1") return "sessions";
+  if (MMA_LEAGUES.has(league2)) return "fights";
+  if (SOCCER_LEAGUES4.has(league2) || TENNIS_LEAGUES2.has(league2)) return "matches";
   return "games";
 }
-function buildLeagueSummaryLine(league, games, statusFilter = "all") {
+function buildLeagueSummaryLine(league2, games, statusFilter = "all") {
   const live = games.filter((g2) => g2.status === "live").length;
   const upcoming = games.filter((g2) => g2.status === "scheduled").length;
   const final = games.filter((g2) => g2.status === "final").length;
   const total = games.length;
-  const unit = unitForLeague(league);
+  const unit = unitForLeague(league2);
   let summaryLine = "";
   if (statusFilter === "live") {
     summaryLine = live > 0 ? `${live} LIVE` : "NO LIVE";
@@ -68619,7 +69196,7 @@ function buildLeagueSummaryLine(league, games, statusFilter = "all") {
   } else {
     summaryLine = `${total} ${unit}`;
   }
-  if (league === "F1" && statusFilter === "all" && total > 0) {
+  if (league2 === "F1" && statusFilter === "all" && total > 0) {
     summaryLine = "Race Weekend";
   }
   return { total, live, upcoming, final, unit, summaryLine };
@@ -68627,12 +69204,12 @@ function buildLeagueSummaryLine(league, games, statusFilter = "all") {
 
 // ../grarf/desktop/src/lib/editorial/resolveEditorialLeagueContext.ts
 init_define_import_meta_env();
-function resolveEditorialLeagueContext(league, games, bundle) {
-  const manual = bundle?.leagueContexts?.[league]?.leagueContext?.trim();
+function resolveEditorialLeagueContext(league2, games, bundle) {
+  const manual = bundle?.leagueContexts?.[league2]?.leagueContext?.trim();
   if (manual) {
     return { label: manual.toUpperCase(), source: "manual" };
   }
-  return resolveLeagueContextStrip(league, games);
+  return resolveLeagueContextStrip(league2, games);
 }
 
 // ../grarf/desktop/src/lib/bestGameRightNow/bestGameRightNowPresentation.ts
@@ -68717,18 +69294,18 @@ function resolveGamesSpineBestGameRightNowPlacement(bestGameResult, featuredSpin
   }
   return { standaloneResult: bestGameResult, featuredInlineResult: null, leagueInlineResult: null };
 }
-function isBestGameRightNowInLeague(bestGameResult, league) {
-  if (!bestGameResult?.game.league || !league) return false;
-  if (bestGameResult.game.league === league) return true;
+function isBestGameRightNowInLeague(bestGameResult, league2) {
+  if (!bestGameResult?.game.league || !league2) return false;
+  if (bestGameResult.game.league === league2) return true;
   if (!isGrarfWebRenderer()) return false;
-  const sourceLeague = resolveWimbledonGamesSpineSourceLeague(league);
+  const sourceLeague = resolveWimbledonGamesSpineSourceLeague(league2);
   if (!sourceLeague) return false;
   return bestGameResult.game.league === sourceLeague && isWimbledonTennisGame(bestGameResult.game);
 }
-function shouldApplyCollapsedBestGameLeagueHeaderStyle(bestGameResult, collapsed, league, bestGameFeaturedInFeaturedSection = false) {
+function shouldApplyCollapsedBestGameLeagueHeaderStyle(bestGameResult, collapsed, league2, bestGameFeaturedInFeaturedSection = false) {
   if (isGrarfWebRenderer()) return false;
   if (bestGameFeaturedInFeaturedSection) return false;
-  return collapsed && isBestGameRightNowInLeague(bestGameResult, league);
+  return collapsed && isBestGameRightNowInLeague(bestGameResult, league2);
 }
 function shouldApplyCollapsedBestGameFeaturedHeaderStyle(bestGameRightNowFeatured, collapsed) {
   return collapsed && bestGameRightNowFeatured != null;
@@ -69101,10 +69678,10 @@ var import_react103 = __toESM(require_react(), 1);
 init_isGrarfWebRenderer();
 var import_jsx_runtime87 = __toESM(require_jsx_runtime(), 1);
 function BestGameRightNowHeaderLeagueLogo({
-  league,
+  league: league2,
   game
 }) {
-  const logoUrl = resolveGamesSpineLeagueLogoUrl(league, { game });
+  const logoUrl = resolveGamesSpineLeagueLogoUrl(league2, { game });
   const [logoFailed, setLogoFailed] = (0, import_react103.useState)(false);
   if (!logoUrl || logoFailed) return null;
   return /* @__PURE__ */ (0, import_jsx_runtime87.jsx)(
@@ -69120,20 +69697,20 @@ function BestGameRightNowHeaderLeagueLogo({
       onError: () => setLogoFailed(true),
       className: cn2(
         "h-3.5 w-3.5 shrink-0 object-contain brightness-110 contrast-110",
-        resolveGamesSpineLeagueLogoImgClassName(league, logoUrl)
+        resolveGamesSpineLeagueLogoImgClassName(league2, logoUrl)
       )
     }
   );
 }
 function BestGameRightNowFeaturedShell({
   label,
-  league,
+  league: league2,
   game,
   children,
   className,
   bodyClassName
 }) {
-  const showLeagueLogo = isGrarfWebRenderer() && league != null;
+  const showLeagueLogo = isGrarfWebRenderer() && league2 != null;
   return /* @__PURE__ */ (0, import_jsx_runtime87.jsxs)("section", { className: cn2(BEST_GAME_RIGHT_NOW_SHELL_CLASS, className), children: [
     /* @__PURE__ */ (0, import_jsx_runtime87.jsxs)("header", { className: BEST_GAME_RIGHT_NOW_HEADER_SHELL_CLASS, children: [
       /* @__PURE__ */ (0, import_jsx_runtime87.jsx)("div", { className: BEST_GAME_RIGHT_NOW_HEADER_ACCENT_CLASS, "aria-hidden": true }),
@@ -69146,7 +69723,7 @@ function BestGameRightNowFeaturedShell({
           ),
           children: [
             /* @__PURE__ */ (0, import_jsx_runtime87.jsx)("span", { className: BEST_GAME_RIGHT_NOW_HEADER_LABEL_CLASS, children: label }),
-            showLeagueLogo ? /* @__PURE__ */ (0, import_jsx_runtime87.jsx)(BestGameRightNowHeaderLeagueLogo, { league, game }) : null
+            showLeagueLogo ? /* @__PURE__ */ (0, import_jsx_runtime87.jsx)(BestGameRightNowHeaderLeagueLogo, { league: league2, game }) : null
           ]
         }
       )
@@ -69192,8 +69769,8 @@ function WhipAroundPlaceholderIcon({ className }) {
     }
   );
 }
-function WhipAroundAlertHeader({ alertTypeLabel, league, game, variant }) {
-  const leagueLogoUrl = resolveGamesSpineLeagueLogoUrl(league, { game });
+function WhipAroundAlertHeader({ alertTypeLabel, league: league2, game, variant }) {
+  const leagueLogoUrl = resolveGamesSpineLeagueLogoUrl(league2, { game });
   const [logoFailed, setLogoFailed] = (0, import_react104.useState)(false);
   return /* @__PURE__ */ (0, import_jsx_runtime88.jsx)("header", { className: resolveGamesSpineTransientAlertHeaderShellClass(variant), children: /* @__PURE__ */ (0, import_jsx_runtime88.jsxs)("div", { className: "flex items-center justify-between gap-3 px-2.5 py-2", children: [
     /* @__PURE__ */ (0, import_jsx_runtime88.jsxs)("div", { className: "flex min-w-0 items-center gap-1", children: [
@@ -69226,7 +69803,7 @@ function WhipAroundAlertHeader({ alertTypeLabel, league, game, variant }) {
         onError: () => setLogoFailed(true),
         className: cn2(
           "h-3.5 w-3.5 shrink-0 object-contain brightness-110 contrast-110",
-          resolveGamesSpineLeagueLogoImgClassName(league, leagueLogoUrl)
+          resolveGamesSpineLeagueLogoImgClassName(league2, leagueLogoUrl)
         )
       }
     ) : null
@@ -69241,7 +69818,7 @@ function BestGameRightNowTransientOverlayShell({
   ariaLabel,
   visibleMs,
   instanceId,
-  league,
+  league: league2,
   game,
   onComplete,
   className,
@@ -69262,7 +69839,7 @@ function BestGameRightNowTransientOverlayShell({
           WhipAroundAlertHeader,
           {
             alertTypeLabel: headerLabel,
-            league,
+            league: league2,
             game,
             variant
           }
@@ -69517,9 +70094,9 @@ function TdfStage8MediaShell({
 function TdfStage8CollapsedThumbnail({
   video,
   onExpand,
-  league
+  league: league2
 }) {
-  const openOnYoutube = isF1HighlightLeague(league) && Boolean(video.youtubeVideoId);
+  const openOnYoutube = isF1HighlightLeague(league2) && Boolean(video.youtubeVideoId);
   return /* @__PURE__ */ (0, import_jsx_runtime90.jsx)(
     TdfStage8MediaShell,
     {
@@ -69586,12 +70163,12 @@ function TdfStage8CollapsedThumbnail({
 function TdfStage8InlinePlayer({
   video,
   onCollapse,
-  league
+  league: league2
 }) {
   return /* @__PURE__ */ (0, import_jsx_runtime90.jsx)(TdfStage8MediaShell, { expanded: true, onToggle: onCollapse, children: /* @__PURE__ */ (0, import_jsx_runtime90.jsx)("div", { className: "relative w-full", style: { paddingTop: "56.25%" }, children: video.youtubeVideoId ? /* @__PURE__ */ (0, import_jsx_runtime90.jsx)(
     LeagueHighlightYoutubePlayer,
     {
-      league,
+      league: league2,
       videoId: video.youtubeVideoId,
       title: video.title,
       thumbnailUrl: video.thumbnailUrl,
@@ -69707,7 +70284,7 @@ function MlbInlineHighlightPrototypeSection(props) {
 // ../grarf/desktop/src/components/homeMvp/HomeLeagueSpineSection.tsx
 var import_jsx_runtime91 = __toESM(require_jsx_runtime(), 1);
 var HomeLeagueSpineSection = (0, import_react109.memo)(function HomeLeagueSpineSection2({
-  league,
+  league: league2,
   statusFilter,
   collapsed,
   onToggleCollapse,
@@ -69723,7 +70300,7 @@ var HomeLeagueSpineSection = (0, import_react109.memo)(function HomeLeagueSpineS
   isFirstLeagueInSpine = false,
   compactFirstLeagueStickyTop = false
 }) {
-  if (isGamesSpineLeagueTemporarilyHidden(league)) return null;
+  if (isGamesSpineLeagueTemporarilyHidden(league2)) return null;
   const liveLeagues = useLiveGamesStore((s2) => s2.leagues);
   const scheduleByDate = useScheduleCacheStore((s2) => s2.byDate);
   const retainedById = useRecentFinalizedGamesStore((s2) => s2.byId);
@@ -69741,12 +70318,12 @@ var HomeLeagueSpineSection = (0, import_react109.memo)(function HomeLeagueSpineS
   const gamesMode = useGamesSpineDisplayStore((state3) => state3.gamesMode);
   const cardListClass = isGrarfWebRenderer() ? resolveGamesSpineCardListLayoutClass(gamesMode) : GAMES_SPINE_CARD_LIST_CLASS;
   const useOperationalModePipeline = briefingScrollContext === "home" || briefingScrollContext === "league";
-  const displayName = resolveGamesSpineLeagueDisplayLabel(league);
+  const displayName = resolveGamesSpineLeagueDisplayLabel(league2);
   const headerRef = (0, import_react109.useRef)(null);
   const stickyLogged = (0, import_react109.useRef)(false);
   const games = (0, import_react109.useMemo)(() => {
     const viewDate = briefingScrollContext === "home" && statusFilter === "live" ? getOperationalSportsDayDateKey() : selectedDate;
-    const rows = resolveViewLeagueGames(league, viewDate, liveLeagues, scheduleByDate);
+    const rows = resolveViewLeagueGames(league2, viewDate, liveLeagues, scheduleByDate);
     const now = new Date(Math.max(manualLeMansRefreshMs, manualTourDeFranceRefreshMs));
     return rows.map(
       (game) => refreshManualTourDeFranceSpineGameIfNeeded(
@@ -69755,7 +70332,7 @@ var HomeLeagueSpineSection = (0, import_react109.memo)(function HomeLeagueSpineS
       )
     );
   }, [
-    league,
+    league2,
     selectedDate,
     liveLeagues,
     scheduleByDate,
@@ -69766,8 +70343,8 @@ var HomeLeagueSpineSection = (0, import_react109.memo)(function HomeLeagueSpineS
   ]);
   const gamesWithStatusOverrides = useGamesWithCanonicalStatusOverrides(games);
   const localRetainedFinals = (0, import_react109.useMemo)(() => {
-    return resolveGamesSpineRetainedForLeague(league);
-  }, [retainedById, league]);
+    return resolveGamesSpineRetainedForLeague(league2);
+  }, [retainedById, league2]);
   const supplementalFinals = (0, import_react109.useMemo)(
     () => selectedDate === getOperationalSportsDayDateKey() ? mergeCatchUpSupplementalFinals(localRetainedFinals) : [],
     [localRetainedFinals, selectedDate]
@@ -69786,9 +70363,9 @@ var HomeLeagueSpineSection = (0, import_react109.memo)(function HomeLeagueSpineS
           useOperationalModePipeline,
           skipOperationalModeFilter: briefingScrollContext === "home"
         }),
-        league
+        league2
       ),
-      league
+      league2
     ),
     [
       gamesWithStatusOverrides,
@@ -69798,7 +70375,7 @@ var HomeLeagueSpineSection = (0, import_react109.memo)(function HomeLeagueSpineS
       selectedDate,
       useOperationalModePipeline,
       operationalMode,
-      league
+      league2
     ]
   );
   const highlightedVisibleGames = useGamesWithCanonicalHighlights(visibleGames);
@@ -69806,7 +70383,7 @@ var HomeLeagueSpineSection = (0, import_react109.memo)(function HomeLeagueSpineS
     if (!useOperationalModePipeline) return;
     if (operationalMode === "LIVE" || operationalMode === "PREPARE") {
       recordOperationalSlateLeagueTrace({
-        league,
+        league: league2,
         liveIngestGames: games ?? [],
         supplementalFinals,
         operationalMode,
@@ -69817,7 +70394,7 @@ var HomeLeagueSpineSection = (0, import_react109.memo)(function HomeLeagueSpineS
     }
     if (operationalMode !== "CATCH_UP") return;
     recordCatchUpLeagueTrace({
-      league,
+      league: league2,
       liveIngestGames: games ?? [],
       persistedFinals: [],
       localRetainedFinals,
@@ -69826,7 +70403,7 @@ var HomeLeagueSpineSection = (0, import_react109.memo)(function HomeLeagueSpineS
       visibleGames
     });
   }, [
-    league,
+    league2,
     games,
     localRetainedFinals,
     supplementalFinals,
@@ -69844,12 +70421,12 @@ var HomeLeagueSpineSection = (0, import_react109.memo)(function HomeLeagueSpineS
   );
   (0, import_react109.useEffect)(() => {
     if (!isGrarfWebRenderer() || !isAdminMode) return;
-    const operationsKey = `league:${league}`;
+    const operationsKey = `league:${league2}`;
     publishOperationsSectionGames(operationsKey, highlightedVisibleGames);
     return () => removeOperationsSectionGames(operationsKey);
   }, [
     isAdminMode,
-    league,
+    league2,
     highlightedVisibleGames,
     publishOperationsSectionGames,
     removeOperationsSectionGames
@@ -69884,23 +70461,23 @@ var HomeLeagueSpineSection = (0, import_react109.memo)(function HomeLeagueSpineS
   }, [shouldGroupPrepareTimes, visibleGames]);
   const isPrepareGrouped = prepareGroupStarters.size > 0;
   const summary = (0, import_react109.useMemo)(
-    () => buildLeagueSummaryLine(league, highlightedVisibleGames, statusFilter),
-    [league, highlightedVisibleGames, statusFilter]
+    () => buildLeagueSummaryLine(league2, highlightedVisibleGames, statusFilter),
+    [league2, highlightedVisibleGames, statusFilter]
   );
   const hasLiveEvents = (0, import_react109.useMemo)(
     () => gamesWithStatusOverrides.some(isGameActivelyLive),
     [gamesWithStatusOverrides]
   );
   const contextStrip = (0, import_react109.useMemo)(
-    () => resolveEditorialLeagueContext(league, highlightedVisibleGames, bundle),
-    [league, highlightedVisibleGames, bundle]
+    () => resolveEditorialLeagueContext(league2, highlightedVisibleGames, bundle),
+    [league2, highlightedVisibleGames, bundle]
   );
   (0, import_react109.useEffect)(() => {
     if (!headerRef.current || stickyLogged.current || visibleGames.length === 0) return;
     const el = headerRef.current;
     const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry?.isIntersecting && entry.intersectionRatio < 1 && !stickyLogged.current) {
+      ([entry2]) => {
+        if (entry2?.isIntersecting && entry2.intersectionRatio < 1 && !stickyLogged.current) {
           stickyLogged.current = true;
         }
       },
@@ -69908,7 +70485,7 @@ var HomeLeagueSpineSection = (0, import_react109.memo)(function HomeLeagueSpineS
     );
     observer.observe(el);
     return () => observer.disconnect();
-  }, [league, visibleGames.length, parentScrolls]);
+  }, [league2, visibleGames.length, parentScrolls]);
   const isWebOperationalLoading = isGrarfWebRenderer() && briefingScrollContext === "home" && !operationalIngestComplete && visibleGames.length === 0;
   if (visibleGames.length === 0 && !isWebOperationalLoading) return null;
   const hideSpineGeneratedSummaryHeadline = briefingScrollContext === "league" && operationalMode === "CATCH_UP";
@@ -69919,15 +70496,15 @@ var HomeLeagueSpineSection = (0, import_react109.memo)(function HomeLeagueSpineS
   const showCollapsedBestGameHeader = !isWebSpine && shouldApplyCollapsedBestGameLeagueHeaderStyle(
     bestGameRightNow,
     collapsed,
-    league,
+    league2,
     bestGameFeaturedInFeaturedSection
   );
   return /* @__PURE__ */ (0, import_jsx_runtime91.jsxs)(
     "section",
     {
       className: "min-w-0 w-full max-w-full",
-      "data-league": league,
-      "aria-label": `${league} games`,
+      "data-league": league2,
+      "aria-label": `${league2} games`,
       children: [
         /* @__PURE__ */ (0, import_jsx_runtime91.jsxs)(
           "header",
@@ -69967,7 +70544,7 @@ var HomeLeagueSpineSection = (0, import_react109.memo)(function HomeLeagueSpineS
                   children: [
                     /* @__PURE__ */ (0, import_jsx_runtime91.jsxs)("span", { className: "flex min-w-0 items-center gap-2", children: [
                       /* @__PURE__ */ (0, import_jsx_runtime91.jsx)("span", { className: "w-3 shrink-0 text-center text-[9px] text-cyansys/55", "aria-hidden": true, children: collapsed ? "\u25B6" : "\u25BC" }),
-                      /* @__PURE__ */ (0, import_jsx_runtime91.jsx)(GamesSpineLeagueHeaderMark, { league }),
+                      /* @__PURE__ */ (0, import_jsx_runtime91.jsx)(GamesSpineLeagueHeaderMark, { league: league2 }),
                       /* @__PURE__ */ (0, import_jsx_runtime91.jsx)("span", { className: "truncate text-[17px] font-bold leading-none tracking-[0.14em] text-[#eef6f6]", children: displayName })
                     ] }),
                     /* @__PURE__ */ (0, import_jsx_runtime91.jsxs)("span", { className: "flex shrink-0 items-center gap-2", children: [
@@ -69980,7 +70557,7 @@ var HomeLeagueSpineSection = (0, import_react109.memo)(function HomeLeagueSpineS
               showContextStrip ? /* @__PURE__ */ (0, import_jsx_runtime91.jsx)(
                 EditableLeagueContextStrip,
                 {
-                  league,
+                  league: league2,
                   fallbackLabel: contextStrip?.label ?? "",
                   trailingMetadata: isWebSpine ? summary.summaryLine : void 0
                 }
@@ -71342,7 +71919,7 @@ var import_react118 = __toESM(require_react(), 1);
 
 // ../grarf/desktop/src/lib/gamesSpine/gamesSpineTransientAlertPlaceholderGames.ts
 init_define_import_meta_env();
-function spineTransientAlertPlaceholderBase(id, league, awayTeam, homeTeam) {
+function spineTransientAlertPlaceholderBase(id, league2, awayTeam, homeTeam) {
   return {
     id,
     time: "3:00 PM",
@@ -71359,7 +71936,7 @@ function spineTransientAlertPlaceholderBase(id, league, awayTeam, homeTeam) {
     channels: ["FOX"],
     broadcasts: ["FOX"],
     status: "scheduled",
-    league,
+    league: league2,
     streamProvider: "FOX Sports"
   };
 }
@@ -71449,7 +72026,7 @@ function GamesSpineTransientAlertShell({
   headerLabel,
   ariaLabel,
   visibleMs,
-  league,
+  league: league2,
   game,
   children,
   className,
@@ -71520,11 +72097,11 @@ function GamesSpineTransientAlertShell({
           ),
           "aria-label": ariaLabel,
           children: [
-            isGrarfWebRenderer() && league ? /* @__PURE__ */ (0, import_jsx_runtime99.jsx)(
+            isGrarfWebRenderer() && league2 ? /* @__PURE__ */ (0, import_jsx_runtime99.jsx)(
               WhipAroundAlertHeader,
               {
                 alertTypeLabel: headerLabel,
-                league,
+                league: league2,
                 game,
                 variant
               }
@@ -72382,8 +72959,8 @@ function HomeGamesToday({
       }
       return;
     }
-    const league = leagueKeyFromGameId(id);
-    trackGameOpened({ gameId: id, league: league ?? "unknown", source: "home_scoreboard" });
+    const league2 = leagueKeyFromGameId(id);
+    trackGameOpened({ gameId: id, league: league2 ?? "unknown", source: "home_scoreboard" });
     if (onSelectGame) {
       onSelectGame(id, game);
       return;
@@ -72397,15 +72974,15 @@ function HomeGamesToday({
     []
   );
   const gamesSpineWebFooter = isGrarfWebRenderer() ? /* @__PURE__ */ (0, import_jsx_runtime102.jsxs)("div", { className: "overflow-visible [&>section:first-of-type]:mt-4 [&>section:not(:first-of-type)]:mt-4", children: [
-    GAMES_SPINE_PERMANENT_BROWSER_SOCIAL_RAIL_FEEDS.map((entry) => /* @__PURE__ */ (0, import_jsx_runtime102.jsx)(
+    GAMES_SPINE_PERMANENT_BROWSER_SOCIAL_RAIL_FEEDS.map((entry2) => /* @__PURE__ */ (0, import_jsx_runtime102.jsx)(
       GamesSpinePermanentLeagueHeader,
       {
-        label: entry.label,
+        label: entry2.label,
         parentScrolls,
-        showLiveIndicator: entry.teamKey === "horse-racing",
-        onClick: () => onPermanentLeagueWorkspaceOpen(entry.teamKey)
+        showLiveIndicator: entry2.teamKey === "horse-racing",
+        onClick: () => onPermanentLeagueWorkspaceOpen(entry2.teamKey)
       },
-      entry.tabId
+      entry2.tabId
     )),
     /* @__PURE__ */ (0, import_jsx_runtime102.jsx)(
       MoreLeaguesWaitlistCard,
@@ -72591,8 +73168,8 @@ function useHomeSpineGameInteractions({
         onSelectGame?.(id);
         return;
       }
-      const league = leagueKeyFromGameId(id);
-      trackGameOpened({ gameId: id, league: league ?? "unknown", source: watchSource });
+      const league2 = leagueKeyFromGameId(id);
+      trackGameOpened({ gameId: id, league: league2 ?? "unknown", source: watchSource });
       if (onSelectGame) {
         onSelectGame(id);
         return;
@@ -74070,8 +74647,8 @@ var MOTORSPORT_LEAGUES = /* @__PURE__ */ new Set([
   "WEC",
   "GT_WORLD_CHALLENGE"
 ]);
-function grarfLeagueToPodcastBucket(league) {
-  switch (league) {
+function grarfLeagueToPodcastBucket(league2) {
+  switch (league2) {
     case "MLB":
     case "NCAABB":
     case "NCAASB":
@@ -74098,13 +74675,13 @@ function grarfLeagueToPodcastBucket(league) {
     default:
       break;
   }
-  if (isEspnSoccerLeague(league) || resolveSportKeyForLeague(league) === "soccer") return "Soccer";
-  if (resolveSportKeyForLeague(league) === "golf" || league === "DP_WORLD") return "Golf";
-  if (resolveSportKeyForLeague(league) === "tennis") return "ATP/WTA";
-  if (resolveSportKeyForLeague(league) === "motorsports" || MOTORSPORT_LEAGUES.has(league)) {
+  if (isEspnSoccerLeague(league2) || resolveSportKeyForLeague(league2) === "soccer") return "Soccer";
+  if (resolveSportKeyForLeague(league2) === "golf" || league2 === "DP_WORLD") return "Golf";
+  if (resolveSportKeyForLeague(league2) === "tennis") return "ATP/WTA";
+  if (resolveSportKeyForLeague(league2) === "motorsports" || MOTORSPORT_LEAGUES.has(league2)) {
     return "Motorsports";
   }
-  if (resolveSportKeyForLeague(league) === "combat") return "MMA";
+  if (resolveSportKeyForLeague(league2) === "combat") return "MMA";
   return null;
 }
 function resolvePodcastWorkspaceContextLeague(opts) {
@@ -74225,11 +74802,11 @@ function formatDur(sec) {
   return `${m2}:${s2.toString().padStart(2, "0")}`;
 }
 function resolvePodcastFilterLabel(opts) {
-  const league = resolvePodcastWorkspaceContextLeague({
+  const league2 = resolvePodcastWorkspaceContextLeague({
     pathname: opts.pathname,
     workspaceGameLeague: opts.workspaceGameLeague
   });
-  if (league) return resolveGamesSpineLeagueDisplayLabel(league);
+  if (league2) return resolveGamesSpineLeagueDisplayLabel(league2);
   return "All Sports";
 }
 function PodcastRailPanel({
@@ -75143,8 +75720,8 @@ function resolveHomeRightRailContext(game) {
     };
   }
   const label = matchupLabel(game);
-  const league = game.league ?? "MLB";
-  if (league === "MLB") {
+  const league2 = game.league ?? "MLB";
+  if (league2 === "MLB") {
     const signals = resolveGameTeamSignalFeeds("mlb", game);
     const reddits = resolveGameTeamRedditFeeds("mlb", game);
     const socialTeamFeeds2 = signals.map((s2) => ({
@@ -75171,7 +75748,7 @@ function resolveHomeRightRailContext(game) {
     };
   }
   const matchupQuery = `${game.awayTeam} ${game.homeTeam}`;
-  const leagueSub = league in LEAGUE_SUBREDDITS ? LEAGUE_SUBREDDITS[league] : void 0;
+  const leagueSub = league2 in LEAGUE_SUBREDDITS ? LEAGUE_SUBREDDITS[league2] : void 0;
   const socialTeamFeeds = [
     {
       key: "away",
@@ -75200,7 +75777,7 @@ function resolveHomeRightRailContext(game) {
   const redditDefaultIdx = defaultHomeTeamFeedIndex(redditTeamFeeds);
   return {
     suggestedScope: "game",
-    leagueLabel: league,
+    leagueLabel: league2,
     gameContextLabel: label,
     socialTeamFeeds,
     redditTeamFeeds,
@@ -75561,27 +76138,27 @@ function resolveGameLeagueKey(game) {
 function resolveGameSocialRailLeagueSignalsConfig(game) {
   if (!game) return null;
   const leagueKey = resolveGameLeagueKey(game);
-  return GAME_SOCIAL_RAIL_LEAGUE_SIGNALS_REGISTRY.find((entry) => entry.leagueKey === leagueKey) ?? null;
+  return GAME_SOCIAL_RAIL_LEAGUE_SIGNALS_REGISTRY.find((entry2) => entry2.leagueKey === leagueKey) ?? null;
 }
 
 // ../grarf/desktop/src/lib/social/gameSocialRail/resolveFeedsForSelectedGame.ts
 function normalizeTeamLabel(label) {
   return label.trim().toLowerCase().replace(/\s+/g, " ");
 }
-function toResolvedFeedSource(entry) {
+function toResolvedFeedSource(entry2) {
   return {
-    feedId: entry.feedId,
-    feedUrl: entry.feedUrl,
-    teamKey: entry.teamKey,
-    sourceLabel: entry.sourceLabel
+    feedId: entry2.feedId,
+    feedUrl: entry2.feedUrl,
+    teamKey: entry2.teamKey,
+    sourceLabel: entry2.sourceLabel
   };
 }
 function lookupTeamFeedSource(teamName) {
   const normalized = normalizeTeamLabel(teamName);
   if (!normalized) return null;
-  for (const entry of GAME_SOCIAL_RAIL_TEAM_FEED_REGISTRY) {
-    if (entry.matchLabels.some((label) => normalizeTeamLabel(label) === normalized)) {
-      return toResolvedFeedSource(entry);
+  for (const entry2 of GAME_SOCIAL_RAIL_TEAM_FEED_REGISTRY) {
+    if (entry2.matchLabels.some((label) => normalizeTeamLabel(label) === normalized)) {
+      return toResolvedFeedSource(entry2);
     }
   }
   return null;
@@ -75644,10 +76221,10 @@ init_define_import_meta_env();
 function directoryLogo(id) {
   return LEAGUE_DIRECTORY_ITEMS.find((item) => item.id === id)?.logoUrl;
 }
-function resolveLogo(entry) {
-  if (entry.logoUrl) return entry.logoUrl;
-  if (entry.grarfKey) return resolveGamesSpineLeagueLogoUrl(entry.grarfKey);
-  if (entry.directoryId) return directoryLogo(entry.directoryId);
+function resolveLogo(entry2) {
+  if (entry2.logoUrl) return entry2.logoUrl;
+  if (entry2.grarfKey) return resolveGamesSpineLeagueLogoUrl(entry2.grarfKey);
+  if (entry2.directoryId) return directoryLogo(entry2.directoryId);
   return void 0;
 }
 var LIVE_TRACK_LEAGUE_ALIASES = {
@@ -75684,16 +76261,16 @@ var LIVE_TRACK_LEAGUE_ALIASES = {
   }
 };
 var LIVE_TRACK_LEAGUE_ALIASES_LOWER = new Map(
-  Object.entries(LIVE_TRACK_LEAGUE_ALIASES).map(([sport, entry]) => [sport.toLowerCase(), entry])
+  Object.entries(LIVE_TRACK_LEAGUE_ALIASES).map(([sport, entry2]) => [sport.toLowerCase(), entry2])
 );
 function resolveLiveTrackLeagueIdentity(sport) {
   const trimmed = sport.trim();
   if (!trimmed) return { displayName: "" };
-  const entry = LIVE_TRACK_LEAGUE_ALIASES[trimmed] ?? LIVE_TRACK_LEAGUE_ALIASES_LOWER.get(trimmed.toLowerCase());
-  if (entry) {
+  const entry2 = LIVE_TRACK_LEAGUE_ALIASES[trimmed] ?? LIVE_TRACK_LEAGUE_ALIASES_LOWER.get(trimmed.toLowerCase());
+  if (entry2) {
     return {
-      displayName: entry.displayName,
-      logoUrl: resolveLogo(entry)
+      displayName: entry2.displayName,
+      logoUrl: resolveLogo(entry2)
     };
   }
   return { displayName: trimmed };
@@ -75722,9 +76299,9 @@ function formatSocialWireHandle(event) {
   }
 }
 function formatSocialWireMeta(event) {
-  const league = formatLiveTrackLeagueDisplayName(event.league ?? event.sport);
+  const league2 = formatLiveTrackLeagueDisplayName(event.league ?? event.sport);
   const clock = formatSocialWireClock(event.timestamp);
-  return clock ? `${league} \u2022 ${clock}` : league;
+  return clock ? `${league2} \u2022 ${clock}` : league2;
 }
 
 // ../grarf/desktop/src/components/homeMvp/HomeLiveTrackPostRow.tsx
@@ -76376,7 +76953,7 @@ function resolveAllSportsSocialRailFeedResolution() {
 }
 function resolveLeagueSocialRailFeedResolution(leagueKey) {
   const feed = LIVE_TRACK_LEAGUE_FEED_REGISTRY.find(
-    (entry) => entry.spineLeagues.includes(leagueKey)
+    (entry2) => entry2.spineLeagues.includes(leagueKey)
   );
   if (!feed) return null;
   return {
@@ -76415,18 +76992,18 @@ function resolveHomeLeagueWorkspaceSocialRailFeedResolution(workspaceId) {
       return resolveLiveTrackerSocialRailFeedResolution(liveTrackerFeed, workspaceId);
     }
   }
-  const entry = HOME_LEAGUE_WORKSPACE_SOCIAL_RAIL_FEEDS.find(
+  const entry2 = HOME_LEAGUE_WORKSPACE_SOCIAL_RAIL_FEEDS.find(
     (feed) => feed.workspaceId === workspaceId
   );
-  if (!entry) return null;
+  if (!entry2) return null;
   return {
     tab: "game",
     feeds: [
       {
-        feedId: entry.feedId,
-        feedUrl: entry.feedUrl,
-        teamKey: entry.teamKey,
-        sourceLabel: entry.sourceLabel
+        feedId: entry2.feedId,
+        feedUrl: entry2.feedUrl,
+        teamKey: entry2.teamKey,
+        sourceLabel: entry2.sourceLabel
       }
     ],
     mergeFeeds: false
@@ -76434,18 +77011,18 @@ function resolveHomeLeagueWorkspaceSocialRailFeedResolution(workspaceId) {
 }
 function resolveGamesSpinePermanentBrowserSocialRailFeedResolution(workspaceTabId) {
   if (!workspaceTabId) return null;
-  const entry = GAMES_SPINE_PERMANENT_BROWSER_SOCIAL_RAIL_FEEDS.find(
+  const entry2 = GAMES_SPINE_PERMANENT_BROWSER_SOCIAL_RAIL_FEEDS.find(
     (feed) => feed.tabId === workspaceTabId
   );
-  if (!entry) return null;
+  if (!entry2) return null;
   return {
     tab: "game",
     feeds: [
       {
-        feedId: entry.feedId,
-        feedUrl: entry.feedUrl,
-        teamKey: entry.teamKey,
-        sourceLabel: entry.sourceLabel
+        feedId: entry2.feedId,
+        feedUrl: entry2.feedUrl,
+        teamKey: entry2.teamKey,
+        sourceLabel: entry2.sourceLabel
       }
     ],
     mergeFeeds: false
@@ -76460,15 +77037,15 @@ function resolveHomeSocialRailFeedResolution(activeLeagueId) {
   return resolveAllSportsSocialRailFeedResolution();
 }
 function resolvePulseSubmenuSocialRailFeedResolution(submenuIdx) {
-  const entry = HOME_WEB_PULSE_SUBMENU_FEEDS[submenuIdx] ?? HOME_WEB_PULSE_SUBMENU_FEEDS[0];
+  const entry2 = HOME_WEB_PULSE_SUBMENU_FEEDS[submenuIdx] ?? HOME_WEB_PULSE_SUBMENU_FEEDS[0];
   return {
     tab: "game",
     feeds: [
       {
-        feedId: entry.feedId,
-        feedUrl: entry.feedUrl,
-        teamKey: entry.teamKey,
-        sourceLabel: entry.sourceLabel
+        feedId: entry2.feedId,
+        feedUrl: entry2.feedUrl,
+        teamKey: entry2.teamKey,
+        sourceLabel: entry2.sourceLabel
       }
     ],
     mergeFeeds: false
@@ -77433,9 +78010,9 @@ init_define_import_meta_env();
 init_isGrarfWebRenderer();
 function buildRetainedAtById2() {
   return Object.fromEntries(
-    Object.entries(useRecentFinalizedGamesStore.getState().byId).map(([id, entry]) => [
+    Object.entries(useRecentFinalizedGamesStore.getState().byId).map(([id, entry2]) => [
       id,
-      entry.retainedAt
+      entry2.retainedAt
     ])
   );
 }
@@ -78680,20 +79257,20 @@ var SPORTSCAPE_HIGHLIGHT_SOURCE_REGISTRY = {
     matchingStrategy: "teams_and_date"
   }
 };
-function getSportscapeHighlightSource(league) {
-  return SPORTSCAPE_HIGHLIGHT_SOURCE_REGISTRY[league];
+function getSportscapeHighlightSource(league2) {
+  return SPORTSCAPE_HIGHLIGHT_SOURCE_REGISTRY[league2];
 }
 
 // ../grarf/desktop/src/lib/sportscape/highlights/fetchSportscapeHighlightPlaylist.ts
-async function fetchSportscapeHighlightPlaylist(league) {
-  const source = getSportscapeHighlightSource(league);
+async function fetchSportscapeHighlightPlaylist(league2) {
+  const source = getSportscapeHighlightSource(league2);
   if (source.sourceType === "youtube_playlist") {
     return fetchSportscapeYoutubePlaylist(source.source);
   }
   if (source.sourceType === "youtube_channel") {
     return fetchSportscapeYoutubeChannel(source.source);
   }
-  throw new Error(`sportscape_highlight_source_unsupported:${league}:${source.sourceType}`);
+  throw new Error(`sportscape_highlight_source_unsupported:${league2}:${source.sourceType}`);
 }
 
 // ../grarf/desktop/src/lib/sportscape/nhl/resolveNhlSportscapeHighlight.ts
@@ -79410,14 +79987,14 @@ function buildNationalSoccerTeams() {
   for (const [countryName, abbrev] of Object.entries(SOCCER_COUNTRY_ABBREV_BY_NAME)) {
     const tokenClass = LIVE_TRACK_NATIONAL_TEAM_TOKEN_BY_ABBREV[abbrev] ?? DEFAULT_TEAM_TOKEN_CLASS;
     const titleCase = countryName.replace(/\b\w/g, (char) => char.toUpperCase());
-    let entry = byAbbrev.get(abbrev);
-    if (!entry) {
-      entry = { names: /* @__PURE__ */ new Set(), tokenClass };
-      byAbbrev.set(abbrev, entry);
+    let entry2 = byAbbrev.get(abbrev);
+    if (!entry2) {
+      entry2 = { names: /* @__PURE__ */ new Set(), tokenClass };
+      byAbbrev.set(abbrev, entry2);
     }
-    entry.names.add(countryName);
-    entry.names.add(titleCase);
-    entry.names.add(abbrev);
+    entry2.names.add(countryName);
+    entry2.names.add(titleCase);
+    entry2.names.add(abbrev);
   }
   return [...byAbbrev.entries()].map(([abbrev, { names, tokenClass }]) => ({
     names: [...names],
@@ -79564,13 +80141,13 @@ function resolveEspnMlbScoreboardLogoUrl(abbrev) {
 }
 function resolveDarkThemeLogoForMeta(meta, bucket) {
   if (bucket !== "mlb" && bucket !== "nhl") return void 0;
-  const league = bucket === "mlb" ? "MLB" : "NHL";
+  const league2 = bucket === "mlb" ? "MLB" : "NHL";
   let abbrev = meta.abbrev.toLowerCase();
-  if (league === "MLB" && abbrev === "ath") abbrev = "oak";
-  if (league === "NHL") {
+  if (league2 === "MLB" && abbrev === "ath") abbrev = "oak";
+  if (league2 === "NHL") {
     abbrev = NHL_ESPN_LOGO_SLUG[meta.abbrev.toUpperCase()] ?? abbrev;
   }
-  return getDarkThemeLogoUrl(league, abbrev);
+  return getDarkThemeLogoUrl(league2, abbrev);
 }
 function resolveLogoUrlForMeta(meta, sport) {
   const bucket = sport ? resolveSportBucket(sport) : null;
@@ -79691,19 +80268,19 @@ function titleContainsGameDate(title, gameDateYmd) {
   }
   return false;
 }
-function scoreTeamsAndDateMatch(entry, params) {
-  if (!titleMatchesBothTeams(entry.title, params.awayTeam, params.homeTeam, params.sport)) {
+function scoreTeamsAndDateMatch(entry2, params) {
+  if (!titleMatchesBothTeams(entry2.title, params.awayTeam, params.homeTeam, params.sport)) {
     return 0;
   }
   let score2 = 10;
-  const lower = entry.title.toLowerCase();
+  const lower = entry2.title.toLowerCase();
   if (/highlights?/.test(lower)) score2 += 5;
   if (/game highlights/.test(lower)) score2 += 3;
   if (params.sport === "ncaa" && /men'?s college world series|college world series|\bmcws\b/i.test(lower)) {
     score2 += 8;
   }
-  if (titleContainsGameDate(entry.title, params.gameDateYmd)) score2 += 20;
-  const publishedMs = Date.parse(entry.published);
+  if (titleContainsGameDate(entry2.title, params.gameDateYmd)) score2 += 20;
+  const publishedMs = Date.parse(entry2.published);
   const gameMs = Date.parse(`${params.gameDateYmd}T18:00:00`);
   if (Number.isFinite(publishedMs) && Number.isFinite(gameMs)) {
     const dayDelta = Math.abs(publishedMs - gameMs) / (24 * 60 * 60 * 1e3);
@@ -79714,11 +80291,11 @@ function scoreTeamsAndDateMatch(entry, params) {
 }
 function matchTeamsAndDateHighlight(entries, params) {
   let best = null;
-  for (const entry of entries) {
-    const score2 = scoreTeamsAndDateMatch(entry, params);
+  for (const entry2 of entries) {
+    const score2 = scoreTeamsAndDateMatch(entry2, params);
     if (score2 <= 0) continue;
     if (!best || score2 > best.score) {
-      best = { entry, score: score2 };
+      best = { entry: entry2, score: score2 };
     }
   }
   if (!best || best.score < 10) return null;
@@ -80166,8 +80743,8 @@ function titleIncludesGameDate(title, gameDateYmd) {
   }
   return false;
 }
-function scoreWnbaPlaylistEntry(entry, params) {
-  const title = entry.title.trim();
+function scoreWnbaPlaylistEntry(entry2, params) {
+  const title = entry2.title.trim();
   if (!titleIncludesTeam(title, params.awayTeam) || !titleIncludesTeam(title, params.homeTeam)) {
     return 0;
   }
@@ -80176,7 +80753,7 @@ function scoreWnbaPlaylistEntry(entry, params) {
   if (/full game highlights/.test(lower)) score2 += 15;
   else if (/highlights?/.test(lower)) score2 += 8;
   if (titleIncludesGameDate(title, params.gameDateYmd)) score2 += 25;
-  const publishedMs = Date.parse(entry.published);
+  const publishedMs = Date.parse(entry2.published);
   const gameMs = Date.parse(`${params.gameDateYmd}T12:00:00`);
   if (Number.isFinite(publishedMs) && Number.isFinite(gameMs)) {
     const dayDelta = Math.abs(publishedMs - gameMs) / (24 * 60 * 60 * 1e3);
@@ -80187,11 +80764,11 @@ function scoreWnbaPlaylistEntry(entry, params) {
 }
 function matchWnbaYoutubePlaylistHighlight(entries, params) {
   let best = null;
-  for (const entry of entries) {
-    const score2 = scoreWnbaPlaylistEntry(entry, params);
+  for (const entry2 of entries) {
+    const score2 = scoreWnbaPlaylistEntry(entry2, params);
     if (score2 <= 0) continue;
     if (!best || score2 > best.score) {
-      best = { entry, score: score2 };
+      best = { entry: entry2, score: score2 };
     }
   }
   if (!best) return null;
@@ -80843,8 +81420,8 @@ var SPORTSCAPE_EDITORIAL_MANUAL_LEAGUE_QUICK_PICKS = [
 function isSportscapeEditorialLeagueKey(value) {
   return Object.prototype.hasOwnProperty.call(SPORTSCAPE_EDITORIAL_LEAGUE_LABEL, value);
 }
-function resolveSportscapeEditorialLeagueDisplayLabel(league) {
-  const trimmed = league.trim();
+function resolveSportscapeEditorialLeagueDisplayLabel(league2) {
+  const trimmed = league2.trim();
   if (!trimmed) return "";
   return isSportscapeEditorialLeagueKey(trimmed) ? SPORTSCAPE_EDITORIAL_LEAGUE_LABEL[trimmed] : trimmed;
 }
@@ -80879,16 +81456,16 @@ function resolveSportscapeEditorialEventTitle(game) {
   if (away && home) return `${away} vs ${home}`;
   return away || home || game.id;
 }
-function resolveEditorialLeagueImportanceScore(league) {
-  if (isSportscapeEditorialLeagueKey(league)) {
-    return resolveLeagueImportanceScore(grarfKeyForEditorialLeague(league));
+function resolveEditorialLeagueImportanceScore(league2) {
+  if (isSportscapeEditorialLeagueKey(league2)) {
+    return resolveLeagueImportanceScore(grarfKeyForEditorialLeague(league2));
   }
-  return resolveLeagueImportanceScore(league);
+  return resolveLeagueImportanceScore(league2);
 }
 function groupSportscapeEditorialEventsByLeague(events) {
   const grouped = /* @__PURE__ */ new Map();
-  for (const league of getSportscapeEditorialLeagueDisplayOrder()) {
-    grouped.set(league, []);
+  for (const league2 of getSportscapeEditorialLeagueDisplayOrder()) {
+    grouped.set(league2, []);
   }
   for (const event of events) {
     const key2 = event.league.trim();
@@ -80905,8 +81482,8 @@ function listSportscapeEditorialAdminLeagueSections(grouped) {
     if (importanceDelta !== 0) return importanceDelta;
     return a2.localeCompare(b2);
   });
-  for (const league of freeform) {
-    if (!sections.includes(league)) sections.push(league);
+  for (const league2 of freeform) {
+    if (!sections.includes(league2)) sections.push(league2);
   }
   return sections;
 }
@@ -80920,8 +81497,8 @@ function sortSportscapeEditorialAdminEvents(events) {
 
 // ../grarf/desktop/src/lib/sportscape/resolveSportscapeScoreSideLabel.ts
 init_define_import_meta_env();
-function inferSportscapeScoreSportFromEditorialLeague(league) {
-  switch (league) {
+function inferSportscapeScoreSportFromEditorialLeague(league2) {
+  switch (league2) {
     case "NHL":
       return "nhl";
     case "WNBA":
@@ -80934,8 +81511,8 @@ function inferSportscapeScoreSportFromEditorialLeague(league) {
       return "mlb";
   }
 }
-function inferSportscapeScoreSportFromLeague(league) {
-  switch (league) {
+function inferSportscapeScoreSportFromLeague(league2) {
+  switch (league2) {
     case "NHL":
       return "nhl";
     case "WNBA":
@@ -80945,7 +81522,7 @@ function inferSportscapeScoreSportFromLeague(league) {
     case "MLB":
       return "mlb";
     default:
-      return league ? "soccer" : "mlb";
+      return league2 ? "soccer" : "mlb";
   }
 }
 function resolveSportscapeScoreSideLabel(teamName, sport, options) {
@@ -81051,10 +81628,10 @@ function resolveSportscapeArticleScoreLines(article, sport, sources) {
     return normalizeSportscapeScoreLines(article.scoreLines, sport);
   }
   if (article.awayScore != null && article.homeScore != null && article.awayTeam?.trim() && article.homeTeam?.trim()) {
-    const league = sources?.game?.league ?? inferGrarfLeagueFromSportscapeSport(sport);
+    const league2 = sources?.game?.league ?? inferGrarfLeagueFromSportscapeSport(sport);
     return buildSportscapeMatchupScoreLines({
       sport,
-      league,
+      league: league2,
       awayTeam: article.awayTeam,
       homeTeam: article.homeTeam,
       awayScore: article.awayScore,
@@ -82047,7 +82624,7 @@ function useMlbSportscapeArticles() {
   const scheduleByDate = useScheduleCacheStore((state3) => state3.byDate);
   return (0, import_react148.useMemo)(() => {
     const catchupDate = getYesterdayDateString();
-    const retainedMlb = Object.values(retainedById).filter((entry) => entry.expiresAt > Date.now() && entry.game.status === "final").map((entry) => entry.game).filter((game) => (game.league ?? "MLB") === "MLB");
+    const retainedMlb = Object.values(retainedById).filter((entry2) => entry2.expiresAt > Date.now() && entry2.game.status === "final").map((entry2) => entry2.game).filter((game) => (game.league ?? "MLB") === "MLB");
     const spineGames = collectMlbSpineGames({
       catchupDate,
       liveMlb,
@@ -82184,9 +82761,9 @@ init_define_import_meta_env();
 
 // ../grarf/desktop/src/lib/sportscape/editorial/isCompleteSportscapeEditorialEntry.ts
 init_define_import_meta_env();
-function isCompleteSportscapeEditorialEntry(entry) {
+function isCompleteSportscapeEditorialEntry(entry2) {
   return Boolean(
-    entry.headline?.trim() && entry.articleUrl?.trim() && entry.highlightUrl?.trim()
+    entry2.headline?.trim() && entry2.articleUrl?.trim() && entry2.highlightUrl?.trim()
   );
 }
 function filterCompleteSportscapeEditorialEntries(entries) {
@@ -82195,8 +82772,8 @@ function filterCompleteSportscapeEditorialEntries(entries) {
 
 // ../grarf/desktop/src/lib/sportscape/editorial/sportscapeEditorialVisibility.ts
 init_define_import_meta_env();
-function editorialEntryShowsInLeagueSection(entry) {
-  return entry.showInLeagueSection !== false;
+function editorialEntryShowsInLeagueSection(entry2) {
+  return entry2.showInLeagueSection !== false;
 }
 
 // ../grarf/desktop/src/lib/sportscape/editorial/resolveEditorialHighlightPresentation.ts
@@ -82218,10 +82795,10 @@ function parseEditorialHighlightUrl(highlightUrl) {
 }
 
 // ../grarf/desktop/src/lib/sportscape/editorial/resolveEditorialHighlightPresentation.ts
-function resolveEditorialHighlightPresentation(entry) {
-  const highlightVideoUrl = entry.highlightUrl.trim();
+function resolveEditorialHighlightPresentation(entry2) {
+  const highlightVideoUrl = entry2.highlightUrl.trim();
   const destination = parseEditorialHighlightUrl(highlightVideoUrl);
-  const thumbnailSourceUrl = entry.highlightsVideoThumbnailUrl?.trim() ?? "";
+  const thumbnailSourceUrl = entry2.highlightsVideoThumbnailUrl?.trim() ?? "";
   if (!thumbnailSourceUrl) {
     return {
       highlightVideoUrl,
@@ -82250,16 +82827,16 @@ var EDITORIAL_LEAGUE_LOGO_URL = {
   F1: "https://a.espncdn.com/i/teamlogos/leagues/500/f1.png",
   NASCAR: "https://a.espncdn.com/i/teamlogos/leagues/500/nascar.png"
 };
-function mapEditorialLeagueToGrarfLeague(league) {
-  const source = SPORTSCAPE_EDITORIAL_SOURCE_LEAGUES[league];
+function mapEditorialLeagueToGrarfLeague(league2) {
+  const source = SPORTSCAPE_EDITORIAL_SOURCE_LEAGUES[league2];
   return Array.isArray(source) ? source[0] : source;
 }
-function resolveSportscapeEditorialLeagueShell(league) {
-  const grarfLeague = mapEditorialLeagueToGrarfLeague(league);
-  const logoUrl = GAMES_SPINE_LEAGUE_LOGO_URL[grarfLeague] ?? EDITORIAL_LEAGUE_LOGO_URL[league] ?? "";
+function resolveSportscapeEditorialLeagueShell(league2) {
+  const grarfLeague = mapEditorialLeagueToGrarfLeague(league2);
+  const logoUrl = GAMES_SPINE_LEAGUE_LOGO_URL[grarfLeague] ?? EDITORIAL_LEAGUE_LOGO_URL[league2] ?? "";
   return {
-    id: `sportscape-editorial-${league.toLowerCase()}-shell`,
-    leagueEventName: SPORTSCAPE_EDITORIAL_LEAGUE_LABEL[league],
+    id: `sportscape-editorial-${league2.toLowerCase()}-shell`,
+    leagueEventName: SPORTSCAPE_EDITORIAL_LEAGUE_LABEL[league2],
     logoIdentifier: grarfLeague,
     logoUrl,
     score: { lines: [], statusLabel: "" },
@@ -82275,20 +82852,20 @@ function resolveEditorialScoreSources(eventId, gamesByEventId, gameScoresByEvent
     gameScore: gameScoresByEventId?.get(eventId)
   };
 }
-function editorialEntryToSportscapeArticle(entry, options) {
-  const highlight = resolveEditorialHighlightPresentation(entry);
+function editorialEntryToSportscapeArticle(entry2, options) {
+  const highlight = resolveEditorialHighlightPresentation(entry2);
   const game = options?.game;
   const gameScore = options?.gameScore;
   const preserveFrom = options?.preserveFrom;
   const sport = options?.league ? inferSportscapeScoreSportFromEditorialLeague(options.league) : void 0;
   const articleDraft = {
-    headline: entry.headline.trim(),
-    url: entry.articleUrl.trim(),
-    eventId: entry.eventId,
+    headline: entry2.headline.trim(),
+    url: entry2.articleUrl.trim(),
+    eventId: entry2.eventId,
     highlightVideoUrl: highlight.highlightVideoUrl,
     highlightThumbnailUrl: highlight.highlightThumbnailUrl,
     highlightYoutubeVideoId: highlight.highlightYoutubeVideoId,
-    highlightTitle: entry.headline.trim(),
+    highlightTitle: entry2.headline.trim(),
     gamePk: game?.gamePk ?? preserveFrom?.gamePk,
     homeTeam: game?.homeTeam ?? gameScore?.homeTeam ?? preserveFrom?.homeTeam,
     awayTeam: game?.awayTeam ?? gameScore?.awayTeam ?? preserveFrom?.awayTeam,
@@ -82352,12 +82929,12 @@ function findMatchingEditorialEntry(article, editorialByEventId, gamesByEventId)
   return void 0;
 }
 function mergeSportscapeArticlesWithEditorial(params) {
-  const { automatic, editorialEntries, league, gamesByEventId, gameScoresByEventId } = params;
+  const { automatic, editorialEntries, league: league2, gamesByEventId, gameScoresByEventId } = params;
   const completeForLeague = filterCompleteSportscapeEditorialEntries(editorialEntries).filter(
-    (entry) => entry.league === league && editorialEntryShowsInLeagueSection(entry)
+    (entry2) => entry2.league === league2 && editorialEntryShowsInLeagueSection(entry2)
   );
   const editorialByEventId = new Map(
-    completeForLeague.map((entry) => [entry.eventId, entry])
+    completeForLeague.map((entry2) => [entry2.eventId, entry2])
   );
   const merged = [];
   const consumedEditorialEventIds = /* @__PURE__ */ new Set();
@@ -82381,19 +82958,19 @@ function mergeSportscapeArticlesWithEditorial(params) {
         game,
         gameScore,
         preserveFrom: automaticArticle,
-        league
+        league: league2
       })
     );
     consumedEditorialEventIds.add(editorial.eventId);
   }
-  for (const entry of completeForLeague) {
-    if (consumedEditorialEventIds.has(entry.eventId)) continue;
+  for (const entry2 of completeForLeague) {
+    if (consumedEditorialEventIds.has(entry2.eventId)) continue;
     merged.push(
       editorialEntryToSportscapeArticle(
-        entry,
+        entry2,
         {
-          ...resolveEditorialScoreSources(entry.eventId, gamesByEventId, gameScoresByEventId),
-          league
+          ...resolveEditorialScoreSources(entry2.eventId, gamesByEventId, gameScoresByEventId),
+          league: league2
         }
       )
     );
@@ -83386,7 +83963,7 @@ var SPORTSCAPE_WNBA_LEAGUE_CARD_ID = "sportscape-wnba-shell";
 var SPORTSCAPE_WORLD_CUP_LEAGUE_CARD_ID = "sportscape-world-cup-shell";
 var SPORTSCAPE_MCWS_LEAGUE_CARD_ID = "sportscape-mcws-shell";
 function HomeSportscapeCard({
-  entry,
+  entry: entry2,
   onCatchupHeadlineClick,
   onExpandRecapWorkspace,
   activeCatchupGamePk = null,
@@ -83395,11 +83972,11 @@ function HomeSportscapeCard({
   onActiveRowMount
 }) {
   const articleRowRefs = (0, import_react154.useRef)(/* @__PURE__ */ new Map());
-  const isMlbLeagueCard = entry.id === SPORTSCAPE_MLB_LEAGUE_CARD_ID;
-  const isNhlLeagueCard = entry.id === SPORTSCAPE_NHL_LEAGUE_CARD_ID;
-  const isWnbaLeagueCard = entry.id === SPORTSCAPE_WNBA_LEAGUE_CARD_ID;
-  const isWorldCupLeagueCard = entry.id === SPORTSCAPE_WORLD_CUP_LEAGUE_CARD_ID;
-  const isMcwsLeagueCard = entry.id === SPORTSCAPE_MCWS_LEAGUE_CARD_ID;
+  const isMlbLeagueCard = entry2.id === SPORTSCAPE_MLB_LEAGUE_CARD_ID;
+  const isNhlLeagueCard = entry2.id === SPORTSCAPE_NHL_LEAGUE_CARD_ID;
+  const isWnbaLeagueCard = entry2.id === SPORTSCAPE_WNBA_LEAGUE_CARD_ID;
+  const isWorldCupLeagueCard = entry2.id === SPORTSCAPE_WORLD_CUP_LEAGUE_CARD_ID;
+  const isMcwsLeagueCard = entry2.id === SPORTSCAPE_MCWS_LEAGUE_CARD_ID;
   const isEspnRecapLeagueCard = isNhlLeagueCard || isWnbaLeagueCard || isWorldCupLeagueCard || isMcwsLeagueCard;
   const operationalMode = useOperationalModeStore((s2) => s2.mode);
   const showMlbMorningPodcast = isMlbLeagueCard && operationalMode !== "PREPARE" && !(operationalMode === "CATCH_UP" && isMlbCatchUpWeekend());
@@ -83494,7 +84071,7 @@ function HomeSportscapeCard({
       /* @__PURE__ */ (0, import_jsx_runtime131.jsx)(
         "img",
         {
-          src: entry.logoUrl,
+          src: entry2.logoUrl,
           alt: "",
           width: 16,
           height: 16,
@@ -83506,7 +84083,7 @@ function HomeSportscapeCard({
           )
         }
       ),
-      /* @__PURE__ */ (0, import_jsx_runtime131.jsx)("span", { className: "text-[12px] font-bold tracking-[0.12em] text-cyansys", children: entry.leagueEventName })
+      /* @__PURE__ */ (0, import_jsx_runtime131.jsx)("span", { className: "text-[12px] font-bold tracking-[0.12em] text-cyansys", children: entry2.leagueEventName })
     ] }) }),
     isMlbLeagueCard ? /* @__PURE__ */ (0, import_jsx_runtime131.jsx)(
       SportscapeMlbCompactHeaderActions,
@@ -83517,7 +84094,7 @@ function HomeSportscapeCard({
         onExpandWorkspace: onSportscapeHighlightExpand
       }
     ) : null,
-    /* @__PURE__ */ (0, import_jsx_runtime131.jsx)("div", { className: "flex min-h-0 flex-col gap-2", "aria-label": "Articles", children: entry.articles.map((article, index) => {
+    /* @__PURE__ */ (0, import_jsx_runtime131.jsx)("div", { className: "flex min-h-0 flex-col gap-2", "aria-label": "Articles", children: entry2.articles.map((article, index) => {
       const headlineClassName = cn2(
         "text-[12px] leading-snug tracking-[0.05em]",
         index === 0 ? "text-[#b8cccc]" : "text-[#9aaeae]"
@@ -83652,8 +84229,8 @@ function sortAiBriefSelectionsByRank(selections) {
 }
 function editorialEntryByEventId(entries) {
   const next = /* @__PURE__ */ new Map();
-  for (const entry of entries) {
-    next.set(entry.eventId, entry);
+  for (const entry2 of entries) {
+    next.set(entry2.eventId, entry2);
   }
   return next;
 }
@@ -83661,17 +84238,17 @@ function buildSportscapeEditorialAiBriefStories(document2) {
   const entriesByEventId = editorialEntryByEventId(document2.entries);
   const stories = [];
   for (const selection of sortAiBriefSelectionsByRank(document2.aiBriefSelections)) {
-    const entry = entriesByEventId.get(selection.eventId);
-    if (!entry) continue;
-    const headline = entry.headline.trim();
-    const url = entry.articleUrl.trim();
+    const entry2 = entriesByEventId.get(selection.eventId);
+    if (!entry2) continue;
+    const headline = entry2.headline.trim();
+    const url = entry2.articleUrl.trim();
     if (!headline || !/^https?:\/\//i.test(url)) continue;
     stories.push({
       rank: selection.rank,
       eventId: selection.eventId,
       headline,
       url,
-      league: resolveSportscapeEditorialLeagueDisplayLabel(entry.league)
+      league: resolveSportscapeEditorialLeagueDisplayLabel(entry2.league)
     });
   }
   return stories;
@@ -83991,8 +84568,8 @@ function SportscapeMoreLeaguesDesktopWaitlistRow() {
 // ../grarf/desktop/src/components/homeMvp/HomeSportscapeSurface.tsx
 init_isGrarfWebRenderer();
 var import_jsx_runtime134 = __toESM(require_jsx_runtime(), 1);
-function sportscapeCardSpineOrderIndex(league) {
-  const index = getGamesColumnLeagueOrder().indexOf(league);
+function sportscapeCardSpineOrderIndex(league2) {
+  const index = getGamesColumnLeagueOrder().indexOf(league2);
   return index === -1 ? Number.MAX_SAFE_INTEGER : index;
 }
 var SPORTSCAPE_ROW_SCROLL_PADDING_PX = 8;
@@ -84159,22 +84736,22 @@ function HomeSportscapeSurface({
       mergedMcwsSportscapeArticles,
       "mcws"
     );
-    for (const league of getSportscapeEditorialLeagueDisplayOrder()) {
-      if (automatedSet.has(league)) continue;
+    for (const league2 of getSportscapeEditorialLeagueDisplayOrder()) {
+      if (automatedSet.has(league2)) continue;
       const articles = mergeSportscapeArticlesWithEditorial({
         automatic: [],
         editorialEntries: editorialDocument.entries,
-        league,
+        league: league2,
         gamesByEventId
       });
       if (articles.length === 0) continue;
-      const shell = resolveSportscapeEditorialLeagueShell(league);
+      const shell = resolveSportscapeEditorialLeagueShell(league2);
       cards.push({
         id: shell.id,
         entry: {
           ...shell,
           articles,
-          highlights: buildEspnRecapHighlights(articles, league.toLowerCase())
+          highlights: buildEspnRecapHighlights(articles, league2.toLowerCase())
         }
       });
     }
@@ -84707,10 +85284,10 @@ function TabLeagueIdentity({
   game,
   leagueLabelOverride
 }) {
-  const league = game.league;
-  if (!league) return null;
-  const leagueLogoUrl = resolveGamesSpineLeagueLogoUrl(league, { game });
-  const leagueLabel = leagueLabelOverride?.trim() || resolveGamesSpineLeagueDisplayLabel(league);
+  const league2 = game.league;
+  if (!league2) return null;
+  const leagueLogoUrl = resolveGamesSpineLeagueLogoUrl(league2, { game });
+  const leagueLabel = leagueLabelOverride?.trim() || resolveGamesSpineLeagueDisplayLabel(league2);
   return /* @__PURE__ */ (0, import_jsx_runtime140.jsxs)("span", { className: "inline-flex shrink-0 items-center gap-0.5 whitespace-nowrap font-mono text-[8px] font-semibold leading-none tracking-[0.06em] text-[#eef6f6]/90", children: [
     leagueLogoUrl ? /* @__PURE__ */ (0, import_jsx_runtime140.jsx)(
       "img",
@@ -84719,7 +85296,7 @@ function TabLeagueIdentity({
         alt: "",
         className: cn2(
           "h-2.5 w-2.5 shrink-0 object-contain",
-          resolveGamesSpineLeagueLogoImgClassName(league, leagueLogoUrl)
+          resolveGamesSpineLeagueLogoImgClassName(league2, leagueLogoUrl)
         ),
         loading: "lazy",
         decoding: "async"
@@ -86731,8 +87308,8 @@ function openWimbledonGamesSpineRow(game, _dispatch) {
 // ../grarf/desktop/src/lib/gamesSpine/resolveWnbaGameCenterUrl.ts
 init_define_import_meta_env();
 function isWnbaSpineGame(game) {
-  const league = game.league ?? leagueKeyFromEspnGameId(game.id);
-  return league === "WNBA";
+  const league2 = game.league ?? leagueKeyFromEspnGameId(game.id);
+  return league2 === "WNBA";
 }
 function watchLinkRecord(link) {
   if (!link || typeof link !== "object") return null;
@@ -86965,7 +87542,8 @@ function buildGameWorkspaceTabForRow(game, options) {
       type: "website",
       title,
       url,
-      closable: true
+      closable: true,
+      address: resolveGameWorkspaceAddress(game.id, game.league)
     };
   }
   if (slug && !isTennisLeagueGame(game)) {
@@ -86974,7 +87552,8 @@ function buildGameWorkspaceTabForRow(game, options) {
       type: "website",
       title,
       url: leagueScoreboardFallbackUrl(slug),
-      closable: true
+      closable: true,
+      address: resolveGameWorkspaceAddress(game.id, game.league)
     };
   }
   return null;
@@ -86998,7 +87577,8 @@ function tryOpenOperationsWorkspaceNavigation(game, dispatch) {
       type: "website",
       title: `${game.awayTeam} @ ${game.homeTeam}`,
       url: target.url,
-      closable: true
+      closable: true,
+      address: resolveGameWorkspaceAddress(game.id, game.league)
     }
   });
   return true;
@@ -87067,11 +87647,11 @@ function buildTennisProviderDiagnosticSlice(input) {
 function uniqueAutomaticEntries(entries) {
   const seen = /* @__PURE__ */ new Set();
   const out = [];
-  for (const entry of entries) {
-    const url = entry.url.trim();
+  for (const entry2 of entries) {
+    const url = entry2.url.trim();
     if (!url || seen.has(url)) continue;
     seen.add(url);
-    out.push({ url, sourceLabel: entry.sourceLabel.trim() || "Automatic" });
+    out.push({ url, sourceLabel: entry2.sourceLabel.trim() || "Automatic" });
   }
   return out;
 }
@@ -87377,10 +87957,10 @@ function OperationsAutomaticDiagnosticEntries({
   if (entries.length === 0) {
     return /* @__PURE__ */ (0, import_jsx_runtime153.jsx)("span", { className: "font-mono text-[8px] tracking-[0.1em] text-redsys", children: "Missing" });
   }
-  return /* @__PURE__ */ (0, import_jsx_runtime153.jsx)("div", { className: "space-y-1", children: entries.map((entry) => /* @__PURE__ */ (0, import_jsx_runtime153.jsxs)("div", { className: "space-y-0.5", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime153.jsx)("span", { className: "font-mono text-[8px] tracking-[0.1em] text-greensys", children: entry.sourceLabel }),
-    /* @__PURE__ */ (0, import_jsx_runtime153.jsx)(OperationsDiagnosticReadOnlyUrl, { url: entry.url })
-  ] }, entry.url)) });
+  return /* @__PURE__ */ (0, import_jsx_runtime153.jsx)("div", { className: "space-y-1", children: entries.map((entry2) => /* @__PURE__ */ (0, import_jsx_runtime153.jsxs)("div", { className: "space-y-0.5", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime153.jsx)("span", { className: "font-mono text-[8px] tracking-[0.1em] text-greensys", children: entry2.sourceLabel }),
+    /* @__PURE__ */ (0, import_jsx_runtime153.jsx)(OperationsDiagnosticReadOnlyUrl, { url: entry2.url })
+  ] }, entry2.url)) });
 }
 function OperationsDiagnosticOverrideValue({ value }) {
   if (!value) {
@@ -88299,14 +88879,14 @@ function useWorkspaceUrlLauncher(openTab) {
 init_define_import_meta_env();
 function buildIntelligenceWorkspaceTab(briefingId, title, articleUrl) {
   const short = title.length > 72 ? `${title.slice(0, 69)}\u2026` : title;
-  return {
+  return withWorkspaceAddress({
     id: `intel-${briefingId}`,
     type: "intelligence",
     title: short,
     url: articleUrl ?? "",
     intelligenceBriefingId: briefingId,
     closable: true
-  };
+  });
 }
 
 // ../grarf/desktop/src/lib/overlayWorkspaceReducer.ts
@@ -88746,18 +89326,18 @@ function collapseLeagueColorLookupToken(input) {
 function isLeagueColorKey(key2) {
   return LEAGUE_COLOR_KEY_SET.has(key2);
 }
-function normalizeLeagueColorKey(league) {
-  const collapsed = collapseLeagueColorLookupToken(league);
+function normalizeLeagueColorKey(league2) {
+  const collapsed = collapseLeagueColorLookupToken(league2);
   if (!collapsed) return null;
   if (isLeagueColorKey(collapsed)) return collapsed;
   return LEAGUE_COLOR_ALIASES[collapsed] ?? null;
 }
-function resolveLeagueColor(league) {
-  const key2 = normalizeLeagueColorKey(league);
+function resolveLeagueColor(league2) {
+  const key2 = normalizeLeagueColorKey(league2);
   return key2 ? LEAGUE_COLORS[key2] : LEAGUE_COLOR_FALLBACK;
 }
-function resolveGrarfLeagueColor(league) {
-  return resolveLeagueColor(league);
+function resolveGrarfLeagueColor(league2) {
+  return resolveLeagueColor(league2);
 }
 
 // ../grarf/desktop/src/components/homeMvp/HomeLiveTrackerFinalScoreStrip.tsx
@@ -88785,8 +89365,8 @@ function resolveFinalScoreTeamBorderToken(tokenClass) {
   const match = tokenClass.match(/\bborder-(?:\[[^\]]+\]|[\w-]+(?:\/[\d]+)?)/);
   return match?.[0] ?? "border-cyansys/35";
 }
-function resolveLiveTrackSportForFinalScore(league) {
-  return FINAL_SCORE_LIVE_TRACK_SPORT_BY_LEAGUE[league];
+function resolveLiveTrackSportForFinalScore(league2) {
+  return FINAL_SCORE_LIVE_TRACK_SPORT_BY_LEAGUE[league2];
 }
 function TeamScoreStrip({
   teamName,
@@ -91085,7 +91665,7 @@ function useHighlightsTvAmbientPlayback() {
         rawClipsByLeagueRef.current.get(clip.leagueKey) ?? []
       );
       const manualIdx = leagueClips.findIndex(
-        (entry) => entry.youtubeVideoId === clip.youtubeVideoId
+        (entry2) => entry2.youtubeVideoId === clip.youtubeVideoId
       );
       enterManual(clip.leagueKey, manualIdx >= 0 ? manualIdx : 0);
     },
@@ -91173,17 +91753,17 @@ init_define_import_meta_env();
 async function fetchHighlightsTvPlaylistClips(playlistUrl, leagueKey, leagueLabel) {
   const entries = await fetchSportscapeYoutubePlaylist(playlistUrl);
   const thumbnailUrls = await resolveYoutubeCanonicalThumbnailUrls2(
-    entries.map((entry) => entry.videoId)
+    entries.map((entry2) => entry2.videoId)
   );
   return sortHighlightsTvClipsNewestFirst(
-    entries.map((entry, index) => ({
-      id: `${leagueKey}-pl-${index}-${entry.videoId}`,
-      title: entry.title,
+    entries.map((entry2, index) => ({
+      id: `${leagueKey}-pl-${index}-${entry2.videoId}`,
+      title: entry2.title,
       leagueLabel,
       durationLabel: "\u2014",
-      youtubeVideoId: entry.videoId,
-      thumbnailUrl: thumbnailUrls.get(entry.videoId),
-      publishedAt: entry.published
+      youtubeVideoId: entry2.videoId,
+      thumbnailUrl: thumbnailUrls.get(entry2.videoId),
+      publishedAt: entry2.published
     }))
   );
 }
@@ -91229,8 +91809,8 @@ var HIGHLIGHTS_TV_MVP_SEED = {
     }
   ]
 };
-for (const league of HIGHLIGHTS_TV_MVP_SEED.leagues) {
-  for (const clip of league.clips) {
+for (const league2 of HIGHLIGHTS_TV_MVP_SEED.leagues) {
+  for (const clip of league2.clips) {
     clip.thumbnailUrl = youtubeThumbnailUrl(clip.youtubeVideoId, "mqdefault");
   }
 }
@@ -91238,13 +91818,13 @@ for (const league of HIGHLIGHTS_TV_MVP_SEED.leagues) {
 // ../grarf/desktop/src/hooks/useHighlightsTvChannelPlayback.ts
 function resolveSeedLeagueSection(leagueKey) {
   const seedKey = resolveHighlightsTvSeedLeagueKey(leagueKey);
-  return HIGHLIGHTS_TV_MVP_SEED.leagues.find((league) => league.leagueKey === seedKey);
+  return HIGHLIGHTS_TV_MVP_SEED.leagues.find((league2) => league2.leagueKey === seedKey);
 }
 function resolveDefaultLeague() {
-  return HIGHLIGHTS_TV_MVP_SEED.leagues.find((league) => league.defaultExpanded !== false) ?? HIGHLIGHTS_TV_MVP_SEED.leagues[0];
+  return HIGHLIGHTS_TV_MVP_SEED.leagues.find((league2) => league2.defaultExpanded !== false) ?? HIGHLIGHTS_TV_MVP_SEED.leagues[0];
 }
 function resolveChannelLabel2(leagueKey) {
-  const channel = HIGHLIGHTS_TV_CHANNEL_ORDER.find((entry) => entry.leagueKey === leagueKey);
+  const channel = HIGHLIGHTS_TV_CHANNEL_ORDER.find((entry2) => entry2.leagueKey === leagueKey);
   if (channel) return channel.label;
   return resolveSeedLeagueSection(leagueKey)?.leagueLabel ?? leagueKey;
 }
@@ -91261,18 +91841,18 @@ async function resolveLeagueClipsWithConfig(leagueKey, leagueLabel) {
     const clips2 = await ingestHighlightsTvClipsFromIngestionRow(row, leagueKey, leagueLabel);
     return { clips: clips2, config: { type: "sheet", row } };
   }
-  const league = resolveSeedLeagueSection(leagueKey);
-  if (!league) return { clips: [], config: null };
-  if (league.clips.length > 0) return { clips: league.clips, config: null };
-  if (!league.youtubePlaylistUrl?.trim()) return { clips: [], config: null };
+  const league2 = resolveSeedLeagueSection(leagueKey);
+  if (!league2) return { clips: [], config: null };
+  if (league2.clips.length > 0) return { clips: league2.clips, config: null };
+  if (!league2.youtubePlaylistUrl?.trim()) return { clips: [], config: null };
   const clips = await fetchHighlightsTvPlaylistClips(
-    league.youtubePlaylistUrl,
-    league.leagueKey,
-    league.leagueLabel
+    league2.youtubePlaylistUrl,
+    league2.leagueKey,
+    league2.leagueLabel
   );
   return {
     clips,
-    config: { type: "seed-playlist", playlistUrl: league.youtubePlaylistUrl }
+    config: { type: "seed-playlist", playlistUrl: league2.youtubePlaylistUrl }
   };
 }
 async function refreshClipsFromConfig(leagueKey, leagueLabel, config) {
@@ -91295,7 +91875,7 @@ function useHighlightsTvChannelPlayback() {
     activeLeagueKeyRef.current = activeLeagueKey;
   }, [activeLeagueKey]);
   const loadChannel = (0, import_react185.useCallback)(async (leagueKey, startIndex = 0) => {
-    const inChannelOrder = HIGHLIGHTS_TV_CHANNEL_ORDER.some((entry) => entry.leagueKey === leagueKey);
+    const inChannelOrder = HIGHLIGHTS_TV_CHANNEL_ORDER.some((entry2) => entry2.leagueKey === leagueKey);
     if (!inChannelOrder) {
       setClips([]);
       setCurrentIndex(0);
@@ -92245,7 +92825,7 @@ var DEFAULT_SUB_NAV = {
   ]
 };
 function LeaguePageHeader({
-  league,
+  league: league2,
   logoUrl,
   liveCount = 0,
   layoutId,
@@ -92284,7 +92864,7 @@ function LeaguePageHeader({
     {
       className: "shrink-0 border-b border-line bg-[#020707]/95 font-mono",
       role: "navigation",
-      "aria-label": `${league} league navigation`,
+      "aria-label": `${league2} league navigation`,
       children: [
         /* @__PURE__ */ (0, import_jsx_runtime176.jsxs)("div", { className: "flex h-7 items-stretch", children: [
           /* @__PURE__ */ (0, import_jsx_runtime176.jsxs)(
@@ -92311,7 +92891,7 @@ function LeaguePageHeader({
                     "aria-hidden": true
                   }
                 ),
-                !layout.leftCollapsed && /* @__PURE__ */ (0, import_jsx_runtime176.jsx)("span", { className: "truncate text-[10px] font-semibold tracking-[0.18em] text-white", children: league })
+                !layout.leftCollapsed && /* @__PURE__ */ (0, import_jsx_runtime176.jsx)("span", { className: "truncate text-[10px] font-semibold tracking-[0.18em] text-white", children: league2 })
               ]
             }
           ),
@@ -93189,7 +93769,7 @@ function CommandBriefingModule(props) {
   return /* @__PURE__ */ (0, import_jsx_runtime183.jsx)(CommandBriefingModuleProduction, { ...props });
 }
 function CommandBriefingModuleProduction({
-  league,
+  league: league2,
   statusFilter: _statusFilter = "all",
   briefingDisplayMode = "expanded",
   briefingScope: _briefingScope,
@@ -93230,9 +93810,9 @@ function CommandBriefingModuleProduction({
       scheduleByDate,
       getSupplementalFinalsForLeague: () => [],
       selectedDate,
-      league
+      league: league2
     }),
-    [liveLeagues, scheduleByDate, selectedDate, league]
+    [liveLeagues, scheduleByDate, selectedDate, league2]
   );
   const briefingGamePool = (0, import_react194.useMemo)(
     () => buildCommandBriefingGamePool(poolInput),
@@ -93263,20 +93843,20 @@ function CommandBriefingModuleProduction({
     [persistedSnapshots, fallbacks]
   );
   const scopedFallbacks = (0, import_react194.useMemo)(() => {
-    if (!league) return mergedFallbacks;
+    if (!league2) return mergedFallbacks;
     return Object.fromEntries(
-      Object.entries(mergedFallbacks).filter(([, snap]) => snap.league === league)
+      Object.entries(mergedFallbacks).filter(([, snap]) => snap.league === league2)
     );
-  }, [mergedFallbacks, league]);
+  }, [mergedFallbacks, league2]);
   const ranked = (0, import_react194.useMemo)(
     () => selectBriefingGames(
       briefingGamePool,
       bundle,
       selectedDate,
       scopedFallbacks,
-      league
+      league2
     ),
-    [briefingGamePool, bundle, selectedDate, scopedFallbacks, league]
+    [briefingGamePool, bundle, selectedDate, scopedFallbacks, league2]
   );
   const displayRanked = (0, import_react194.useMemo)(
     () => resolveCommandBriefingDisplayRankedGames(ranked, bestGameRightNow),
@@ -93339,11 +93919,11 @@ function CommandBriefingModuleProduction({
     "section",
     {
       className: "border-b border-line/70 bg-[#020506]/95 font-mono",
-      "aria-label": league ? `${league} command briefing` : "Command briefing",
+      "aria-label": league2 ? `${league2} command briefing` : "Command briefing",
       children: [
         !hideHeader ? /* @__PURE__ */ (0, import_jsx_runtime183.jsxs)("header", { className: "flex items-center justify-between gap-2 border-b border-line/50 px-2 py-1.5", children: [
           /* @__PURE__ */ (0, import_jsx_runtime183.jsxs)("div", { children: [
-            /* @__PURE__ */ (0, import_jsx_runtime183.jsx)("div", { className: "text-[9px] tracking-[0.22em] text-cyansys/85", children: isCompactMode ? `${league ? `${league} ` : ""}COMMAND BRIEFING (${briefingCount})` : league ? `${league} COMMAND BRIEFING` : "COMMAND BRIEFING" }),
+            /* @__PURE__ */ (0, import_jsx_runtime183.jsx)("div", { className: "text-[9px] tracking-[0.22em] text-cyansys/85", children: isCompactMode ? `${league2 ? `${league2} ` : ""}COMMAND BRIEFING (${briefingCount})` : league2 ? `${league2} COMMAND BRIEFING` : "COMMAND BRIEFING" }),
             /* @__PURE__ */ (0, import_jsx_runtime183.jsx)("div", { className: "mt-0.5 h-px w-full bg-line/60", "aria-hidden": true })
           ] }),
           /* @__PURE__ */ (0, import_jsx_runtime183.jsxs)("div", { className: "flex shrink-0 items-center gap-1.5", children: [
@@ -93436,13 +94016,13 @@ function CommandBriefingModuleProduction({
 init_define_import_meta_env();
 var import_jsx_runtime184 = __toESM(require_jsx_runtime(), 1);
 function LeagueGamesSpineFeed({
-  league,
+  league: league2,
   selectedId,
   onOpen,
   onWatchLive,
   canShowWatchLive
 }) {
-  const displayName = resolveGamesSpineLeagueDisplayLabel(league);
+  const displayName = resolveGamesSpineLeagueDisplayLabel(league2);
   return /* @__PURE__ */ (0, import_jsx_runtime184.jsxs)("div", { className: "min-w-0 w-full max-w-full flex-col font-mono", children: [
     /* @__PURE__ */ (0, import_jsx_runtime184.jsxs)(
       "div",
@@ -93463,7 +94043,7 @@ function LeagueGamesSpineFeed({
     /* @__PURE__ */ (0, import_jsx_runtime184.jsx)(
       HomeLeagueSpineSection,
       {
-        league,
+        league: league2,
         statusFilter: "all",
         collapsed: false,
         onToggleCollapse: () => {
@@ -93482,7 +94062,7 @@ function LeagueGamesSpineFeed({
 // ../grarf/desktop/src/components/league/LeagueGamesContextColumn.tsx
 var import_jsx_runtime185 = __toESM(require_jsx_runtime(), 1);
 function LeagueGamesContextColumn({
-  league,
+  league: league2,
   games: _games,
   selectedId,
   onSelectGame,
@@ -93498,11 +94078,11 @@ function LeagueGamesContextColumn({
         "flex min-h-0 flex-col overflow-hidden bg-[#020404] font-mono",
         hostedInPaneLayout ? "h-full w-full min-w-0" : "w-[min(22%,300px)] shrink-0 min-w-[200px] max-w-[320px] border-r border-line"
       ),
-      "aria-label": `${league} command briefing`,
+      "aria-label": `${league2} command briefing`,
       children: [
         /* @__PURE__ */ (0, import_jsx_runtime185.jsxs)("div", { className: "shrink-0 border-b border-line bg-[#030606]/90 px-2 py-1.5", children: [
           /* @__PURE__ */ (0, import_jsx_runtime185.jsxs)("div", { className: "text-[10px] tracking-[0.2em] text-textdim", children: [
-            league,
+            league2,
             " \xB7 OPERATIONS"
           ] }),
           /* @__PURE__ */ (0, import_jsx_runtime185.jsx)("div", { className: "text-[11px] tracking-wide text-white", children: "Briefing to board" })
@@ -93511,7 +94091,7 @@ function LeagueGamesContextColumn({
           /* @__PURE__ */ (0, import_jsx_runtime185.jsx)(
             CommandBriefingModule,
             {
-              league,
+              league: league2,
               briefingDisplayMode: "compact",
               onSelectGame,
               watchDispatch
@@ -93520,7 +94100,7 @@ function LeagueGamesContextColumn({
           /* @__PURE__ */ (0, import_jsx_runtime185.jsx)(
             LeagueGamesSpineFeed,
             {
-              league,
+              league: league2,
               selectedId,
               onOpen: onSelectGame,
               onWatchLive,
@@ -93554,19 +94134,19 @@ function useGamesCatchUpAutoSelect(isGamesCatchUp, leadingGameId, onSelectGame) 
 // ../grarf/desktop/src/hooks/useLeadingOperationalSpineGameId.ts
 init_define_import_meta_env();
 var import_react196 = __toESM(require_react(), 1);
-function useLeadingOperationalSpineGameId(league) {
-  const games = useLiveGamesStore((s2) => s2.leagues[league]);
+function useLeadingOperationalSpineGameId(league2) {
+  const games = useLiveGamesStore((s2) => s2.leagues[league2]);
   const operationalMode = useOperationalModeStore((s2) => s2.mode);
   const retainedById = useRecentFinalizedGamesStore((s2) => s2.byId);
   return (0, import_react196.useMemo)(() => {
     const supplementalFinals = mergeCatchUpSupplementalFinals(
-      useRecentFinalizedGamesStore.getState().getRetainedForLeague(league)
+      useRecentFinalizedGamesStore.getState().getRetainedForLeague(league2)
     );
     const dateSlate = buildGamesSpineOperationalSlate(games, supplementalFinals, operationalMode);
     const modeSlate = dateSlate.filter((g2) => matchOperationalModeSpineFilter(g2, operationalMode));
     const sorted = sortGamesSpineChronologically2(modeSlate);
     return sorted[0]?.id ?? null;
-  }, [games, operationalMode, retainedById, league]);
+  }, [games, operationalMode, retainedById, league2]);
 }
 
 // ../grarf/desktop/src/pages/LeagueBoardPage.tsx
@@ -93585,10 +94165,10 @@ var SLUG_BY_LEAGUE = {
   ATP: "atp",
   WTA: "wta"
 };
-function LeagueBoardPage({ league }) {
+function LeagueBoardPage({ league: league2 }) {
   const navigate = useNavigate();
-  const slug = SLUG_BY_LEAGUE[league];
-  const games = useLiveGamesStore((s2) => s2.leagues[league]);
+  const slug = SLUG_BY_LEAGUE[league2];
+  const games = useLiveGamesStore((s2) => s2.leagues[league2]);
   const liveCount = (0, import_react197.useMemo)(() => games.filter((g2) => g2.status === "live").length, [games]);
   const [lastClickedGameId, setLastClickedGameId] = (0, import_react197.useState)(null);
   const [watchPicker, setWatchPicker] = (0, import_react197.useState)(null);
@@ -93686,16 +94266,16 @@ function LeagueBoardPage({ league }) {
     (gameId) => {
       setLastClickedGameId(gameId);
       if (isDemoWnbaWhipAroundGameId(gameId)) return;
-      trackGameOpened({ league, gameId, source: `${slug}_scoreboard` });
+      trackGameOpened({ league: league2, gameId, source: `${slug}_scoreboard` });
       const game = games.find((g2) => g2.id === gameId);
       if (!game) return;
       clearCenterEmbedForSpineGameSelect();
       dispatchOverlay({ type: "dismissWatchSessions" });
       openGamesSpineRowInWorkspace(game, dispatchOverlay);
     },
-    [games, league, slug]
+    [games, league2, slug]
   );
-  const leadingSpineGameId = useLeadingOperationalSpineGameId(league);
+  const leadingSpineGameId = useLeadingOperationalSpineGameId(league2);
   const isGamesCatchUp = headerPrimaryTab === "games" && operationalMode === "CATCH_UP";
   useGamesCatchUpAutoSelect(isGamesCatchUp, leadingSpineGameId, onSelectGame);
   const onWatchLive = (0, import_react197.useCallback)(
@@ -93703,28 +94283,28 @@ function LeagueBoardPage({ league }) {
       setLastClickedGameId(gameId);
       if (isDemoNhlVegasCarolinaGameId(gameId)) {
         console.log("[Watch] WATCH LIVE clicked", { source: `${slug}_scoreboard`, gameId });
-        trackWatchLiveClicked({ league, gameId, source: `${slug}_scoreboard` });
+        trackWatchLiveClicked({ league: league2, gameId, source: `${slug}_scoreboard` });
         launchDemoNhlVegasCarolinaWatch(dispatchOverlay);
         return;
       }
       if (isDemoWnbaWhipAroundGameId(gameId)) {
         console.log("[Watch] WATCH LIVE clicked", { source: `${slug}_scoreboard`, gameId });
         logWnbaWatchLiveClicked(getDemoWnbaWhipAroundGame());
-        trackWatchLiveClicked({ league, gameId, source: `${slug}_scoreboard` });
+        trackWatchLiveClicked({ league: league2, gameId, source: `${slug}_scoreboard` });
         launchDemoWnbaWhipAroundWatch(dispatchOverlay);
         return;
       }
       const game = games.find((g2) => g2.id === gameId);
       if (!game || !gameHasHomeSpineWatchLive(game)) return;
       console.log("[Watch] WATCH LIVE clicked", { source: `${slug}_scoreboard`, gameId });
-      if (league === "WNBA") logWnbaWatchLiveClicked(game);
-      trackWatchLiveClicked({ league, gameId, source: `${slug}_scoreboard` });
+      if (league2 === "WNBA") logWnbaWatchLiveClicked(game);
+      trackWatchLiveClicked({ league: league2, gameId, source: `${slug}_scoreboard` });
       const result = handleWatchLiveClick(game, dispatchOverlay);
       if (result.action === "picker") {
         setWatchPicker({ game: result.game, options: result.options });
       }
     },
-    [games, league, slug, dispatchOverlay]
+    [games, league2, slug, dispatchOverlay]
   );
   const operationalAlertActions = (0, import_react197.useMemo)(
     () => ({
@@ -93748,7 +94328,7 @@ function LeagueBoardPage({ league }) {
         const url = p2.articleUrl ?? (p2.nav.kind === "article" ? p2.nav.url : null);
         if (!url) return;
         const title = p2.nav.kind === "article" ? p2.nav.title : "Story";
-        trackStoryOpened({ league, source: "ticker", url });
+        trackStoryOpened({ league: league2, source: "ticker", url });
         dispatchOverlay({
           type: "open",
           tab: {
@@ -93762,20 +94342,20 @@ function LeagueBoardPage({ league }) {
         return;
       }
       if (p2.nav.kind !== "league-game") return;
-      if (p2.nav.league !== league) {
+      if (p2.nav.league !== league2) {
         navigate(leagueRoutePath(p2.nav.league));
         return;
       }
       onSelectGame(p2.gameId);
     },
-    [league, navigate, onSelectGame, slug]
+    [league2, navigate, onSelectGame, slug]
   );
   return /* @__PURE__ */ (0, import_jsx_runtime186.jsxs)("div", { className: "flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden bg-[#020404]", children: [
     /* @__PURE__ */ (0, import_jsx_runtime186.jsx)(
       LeaguePageHeader,
       {
-        league,
-        logoUrl: resolveGamesSpineLeagueLogoUrl(league),
+        league: league2,
+        logoUrl: resolveGamesSpineLeagueLogoUrl(league2),
         liveCount,
         layoutId: "league",
         activePrimaryId: headerActivePrimaryId,
@@ -93793,7 +94373,7 @@ function LeagueBoardPage({ league }) {
           LeagueGamesContextColumn,
           {
             hostedInPaneLayout: true,
-            league,
+            league: league2,
             games,
             selectedId,
             onSelectGame,
@@ -93802,7 +94382,7 @@ function LeagueBoardPage({ league }) {
             canShowWatchLive: gameHasHomeSpineWatchLive
           }
         ),
-        center: showHomeSurface && !overlay.activeId ? /* @__PURE__ */ (0, import_jsx_runtime186.jsx)(LeagueHomePageLayout, { league }) : /* @__PURE__ */ (0, import_jsx_runtime186.jsxs)("div", { className: "grid h-full min-h-0 min-w-0 grid-rows-[minmax(0,1fr)_auto]", children: [
+        center: showHomeSurface && !overlay.activeId ? /* @__PURE__ */ (0, import_jsx_runtime186.jsx)(LeagueHomePageLayout, { league: league2 }) : /* @__PURE__ */ (0, import_jsx_runtime186.jsxs)("div", { className: "grid h-full min-h-0 min-w-0 grid-rows-[minmax(0,1fr)_auto]", children: [
           /* @__PURE__ */ (0, import_jsx_runtime186.jsx)(
             CommandWorkspaceColumn,
             {
@@ -93821,7 +94401,7 @@ function LeagueBoardPage({ league }) {
               gameContextOnly: true
             }
           ),
-          /* @__PURE__ */ (0, import_jsx_runtime186.jsx)(LiveSportsTicker, { leagueFilter: league, onNavigate: onTickerNavigate })
+          /* @__PURE__ */ (0, import_jsx_runtime186.jsx)(LiveSportsTicker, { leagueFilter: league2, onNavigate: onTickerNavigate })
         ] })
       }
     ),
@@ -94499,61 +95079,61 @@ function LeagueOverviewSectionFrame({ title, children, className }) {
 function LeagueOverviewSectionEmpty() {
   return /* @__PURE__ */ (0, import_jsx_runtime190.jsx)("div", { className: leagueOverviewSectionEmptyClass, children: "\u2014" });
 }
-function LeaderRow({ entry }) {
+function LeaderRow({ entry: entry2 }) {
   return /* @__PURE__ */ (0, import_jsx_runtime190.jsxs)("li", { className: leagueOverviewRowClass, children: [
     /* @__PURE__ */ (0, import_jsx_runtime190.jsxs)("span", { className: leagueOverviewRowPrimaryClass, children: [
-      entry.rank != null ? `${entry.rank}. ` : null,
-      entry.primaryLabel,
-      entry.secondaryLabel ? /* @__PURE__ */ (0, import_jsx_runtime190.jsxs)("span", { className: "text-textdim/55", children: [
+      entry2.rank != null ? `${entry2.rank}. ` : null,
+      entry2.primaryLabel,
+      entry2.secondaryLabel ? /* @__PURE__ */ (0, import_jsx_runtime190.jsxs)("span", { className: "text-textdim/55", children: [
         " \xB7 ",
-        entry.secondaryLabel
+        entry2.secondaryLabel
       ] }) : null
     ] }),
-    entry.metric ? /* @__PURE__ */ (0, import_jsx_runtime190.jsx)("span", { className: leagueOverviewRowMetricClass, children: entry.metric }) : null
+    entry2.metric ? /* @__PURE__ */ (0, import_jsx_runtime190.jsx)("span", { className: leagueOverviewRowMetricClass, children: entry2.metric }) : null
   ] });
 }
 function LeagueOverviewLeadersSection({
   section
 }) {
   if (!section) return null;
-  return /* @__PURE__ */ (0, import_jsx_runtime190.jsx)(LeagueOverviewSectionFrame, { title: section.title, children: section.entries.length > 0 ? /* @__PURE__ */ (0, import_jsx_runtime190.jsx)("ul", { className: "list-none pb-1", children: section.entries.map((entry) => /* @__PURE__ */ (0, import_jsx_runtime190.jsx)(LeaderRow, { entry }, entry.id)) }) : /* @__PURE__ */ (0, import_jsx_runtime190.jsx)(LeagueOverviewSectionEmpty, {}) });
+  return /* @__PURE__ */ (0, import_jsx_runtime190.jsx)(LeagueOverviewSectionFrame, { title: section.title, children: section.entries.length > 0 ? /* @__PURE__ */ (0, import_jsx_runtime190.jsx)("ul", { className: "list-none pb-1", children: section.entries.map((entry2) => /* @__PURE__ */ (0, import_jsx_runtime190.jsx)(LeaderRow, { entry: entry2 }, entry2.id)) }) : /* @__PURE__ */ (0, import_jsx_runtime190.jsx)(LeagueOverviewSectionEmpty, {}) });
 }
-function RaceRow({ entry }) {
+function RaceRow({ entry: entry2 }) {
   return /* @__PURE__ */ (0, import_jsx_runtime190.jsxs)("li", { className: leagueOverviewRowClass, children: [
     /* @__PURE__ */ (0, import_jsx_runtime190.jsxs)("span", { className: leagueOverviewRowPrimaryClass, children: [
-      entry.rank != null ? `${entry.rank}. ` : null,
-      entry.primaryLabel,
-      entry.statusLabel ? /* @__PURE__ */ (0, import_jsx_runtime190.jsxs)("span", { className: "text-textdim/55", children: [
+      entry2.rank != null ? `${entry2.rank}. ` : null,
+      entry2.primaryLabel,
+      entry2.statusLabel ? /* @__PURE__ */ (0, import_jsx_runtime190.jsxs)("span", { className: "text-textdim/55", children: [
         " \xB7 ",
-        entry.statusLabel
+        entry2.statusLabel
       ] }) : null
     ] }),
-    entry.metric ? /* @__PURE__ */ (0, import_jsx_runtime190.jsx)("span", { className: leagueOverviewRowMetricClass, children: entry.metric }) : null
+    entry2.metric ? /* @__PURE__ */ (0, import_jsx_runtime190.jsx)("span", { className: leagueOverviewRowMetricClass, children: entry2.metric }) : null
   ] });
 }
 function LeagueOverviewPlayoffRaceSection({
   section
 }) {
   if (!section) return null;
-  return /* @__PURE__ */ (0, import_jsx_runtime190.jsx)(LeagueOverviewSectionFrame, { title: section.title, children: section.entries.length > 0 ? /* @__PURE__ */ (0, import_jsx_runtime190.jsx)("ul", { className: "list-none pb-1", children: section.entries.map((entry) => /* @__PURE__ */ (0, import_jsx_runtime190.jsx)(RaceRow, { entry }, entry.id)) }) : /* @__PURE__ */ (0, import_jsx_runtime190.jsx)(LeagueOverviewSectionEmpty, {}) });
+  return /* @__PURE__ */ (0, import_jsx_runtime190.jsx)(LeagueOverviewSectionFrame, { title: section.title, children: section.entries.length > 0 ? /* @__PURE__ */ (0, import_jsx_runtime190.jsx)("ul", { className: "list-none pb-1", children: section.entries.map((entry2) => /* @__PURE__ */ (0, import_jsx_runtime190.jsx)(RaceRow, { entry: entry2 }, entry2.id)) }) : /* @__PURE__ */ (0, import_jsx_runtime190.jsx)(LeagueOverviewSectionEmpty, {}) });
 }
-function StatLeaderRow({ entry }) {
+function StatLeaderRow({ entry: entry2 }) {
   return /* @__PURE__ */ (0, import_jsx_runtime190.jsxs)("li", { className: leagueOverviewRowClass, children: [
     /* @__PURE__ */ (0, import_jsx_runtime190.jsxs)("span", { className: leagueOverviewRowPrimaryClass, children: [
       /* @__PURE__ */ (0, import_jsx_runtime190.jsxs)("span", { className: "text-textdim/55", children: [
-        entry.categoryLabel,
+        entry2.categoryLabel,
         ": "
       ] }),
-      entry.leaderLabel
+      entry2.leaderLabel
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime190.jsx)("span", { className: leagueOverviewRowMetricClass, children: entry.valueLabel })
+    /* @__PURE__ */ (0, import_jsx_runtime190.jsx)("span", { className: leagueOverviewRowMetricClass, children: entry2.valueLabel })
   ] });
 }
 function LeagueOverviewStatLeadersSection({
   section
 }) {
   if (!section) return null;
-  return /* @__PURE__ */ (0, import_jsx_runtime190.jsx)(LeagueOverviewSectionFrame, { title: section.title, children: section.entries.length > 0 ? /* @__PURE__ */ (0, import_jsx_runtime190.jsx)("ul", { className: "list-none pb-1", children: section.entries.map((entry) => /* @__PURE__ */ (0, import_jsx_runtime190.jsx)(StatLeaderRow, { entry }, entry.id)) }) : /* @__PURE__ */ (0, import_jsx_runtime190.jsx)(LeagueOverviewSectionEmpty, {}) });
+  return /* @__PURE__ */ (0, import_jsx_runtime190.jsx)(LeagueOverviewSectionFrame, { title: section.title, children: section.entries.length > 0 ? /* @__PURE__ */ (0, import_jsx_runtime190.jsx)("ul", { className: "list-none pb-1", children: section.entries.map((entry2) => /* @__PURE__ */ (0, import_jsx_runtime190.jsx)(StatLeaderRow, { entry: entry2 }, entry2.id)) }) : /* @__PURE__ */ (0, import_jsx_runtime190.jsx)(LeagueOverviewSectionEmpty, {}) });
 }
 
 // ../grarf/desktop/src/components/leagueOverview/LeagueOverviewSnapshotContent.tsx
@@ -94906,13 +95486,13 @@ function resolveSeasonProgress(records) {
   };
 }
 function mapStatHighlight(leaders, category, valueSuffix) {
-  const entry = pickMlbLeader(leaders, category);
-  if (!entry?.person?.fullName) return null;
-  const playerId = entry.person.id;
+  const entry2 = pickMlbLeader(leaders, category);
+  if (!entry2?.person?.fullName) return null;
+  const playerId = entry2.person.id;
   return {
-    playerName: entry.person.fullName,
-    teamName: entry.team?.name ?? "\u2014",
-    valueLabel: `${entry.value} ${valueSuffix}`.trim(),
+    playerName: entry2.person.fullName,
+    teamName: entry2.team?.name ?? "\u2014",
+    valueLabel: `${entry2.value} ${valueSuffix}`.trim(),
     ...playerId != null ? { playerId, headshotUrl: resolveMlbPlayerHeadshotUrl(playerId) } : {}
   };
 }
@@ -96976,32 +97556,32 @@ function materializeManualGamesSpineEventStreamDefaults(event, leagueDefaults) {
   }
   return materialized;
 }
-function resolveManualGamesSpineEventStream(event, league) {
+function resolveManualGamesSpineEventStream(event, league2) {
   return {
-    channel: event.channel?.trim() || league.channel?.trim() || null,
-    channelUrl: event.channelUrl?.trim() || league.channelUrl?.trim() || null
+    channel: event.channel?.trim() || league2.channel?.trim() || null,
+    channelUrl: event.channelUrl?.trim() || league2.channelUrl?.trim() || null
   };
 }
-function sanitizeManualGamesSpineLeagueForStorage(league) {
-  const insertAfterLeague = league.insertAfterLeague?.trim() ? league.insertAfterLeague.trim() : null;
-  const insertBeforeLeague = league.insertBeforeLeague?.trim() ? league.insertBeforeLeague.trim() : null;
+function sanitizeManualGamesSpineLeagueForStorage(league2) {
+  const insertAfterLeague = league2.insertAfterLeague?.trim() ? league2.insertAfterLeague.trim() : null;
+  const insertBeforeLeague = league2.insertBeforeLeague?.trim() ? league2.insertBeforeLeague.trim() : null;
   const usesNameBasedPlacement = Boolean(insertAfterLeague || insertBeforeLeague);
   const sanitized = {
-    league: league.league.trim(),
+    league: league2.league.trim(),
     insertAfterLeague,
     insertBeforeLeague,
-    channel: league.channel?.trim() ? league.channel.trim() : null,
-    channelUrl: league.channelUrl?.trim() ? league.channelUrl.trim() : null,
-    games: league.games
+    channel: league2.channel?.trim() ? league2.channel.trim() : null,
+    channelUrl: league2.channelUrl?.trim() ? league2.channelUrl.trim() : null,
+    games: league2.games
   };
-  if (league.displayName?.trim()) {
-    sanitized.displayName = league.displayName.trim();
+  if (league2.displayName?.trim()) {
+    sanitized.displayName = league2.displayName.trim();
   }
-  if (!usesNameBasedPlacement && league.leaguePriority != null && Number.isFinite(league.leaguePriority)) {
-    sanitized.leaguePriority = league.leaguePriority;
+  if (!usesNameBasedPlacement && league2.leaguePriority != null && Number.isFinite(league2.leaguePriority)) {
+    sanitized.leaguePriority = league2.leaguePriority;
   }
-  if (league.sourceTimeZone?.trim()) {
-    sanitized.sourceTimeZone = league.sourceTimeZone.trim();
+  if (league2.sourceTimeZone?.trim()) {
+    sanitized.sourceTimeZone = league2.sourceTimeZone.trim();
   }
   return sanitized;
 }
@@ -97057,10 +97637,10 @@ function groupManualGamesSpineEventsByDateWithIndex(events) {
 function leagueDocumentKey(leagueName) {
   return leagueName.trim().toLowerCase();
 }
-function upsertManualGamesSpineLeague(document2, league) {
-  const key2 = leagueDocumentKey(league.league);
+function upsertManualGamesSpineLeague(document2, league2) {
+  const key2 = leagueDocumentKey(league2.league);
   const leagues = document2.leagues.filter((row) => leagueDocumentKey(row.league) !== key2);
-  leagues.push(sanitizeManualGamesSpineLeagueForStorage(league));
+  leagues.push(sanitizeManualGamesSpineLeagueForStorage(league2));
   return { leagues };
 }
 function deleteManualGamesSpineLeague(document2, leagueName) {
@@ -97141,28 +97721,28 @@ function formatManualGamesSpineAdminEventTime(startTimeIso) {
     hour12: true
   });
 }
-function formatManualGamesSpinePlacementLabel(league) {
-  if (league.insertAfterLeague?.trim()) {
-    return `After ${league.insertAfterLeague.trim()}`;
+function formatManualGamesSpinePlacementLabel(league2) {
+  if (league2.insertAfterLeague?.trim()) {
+    return `After ${league2.insertAfterLeague.trim()}`;
   }
-  if (league.insertBeforeLeague?.trim()) {
-    return `Before ${league.insertBeforeLeague.trim()}`;
+  if (league2.insertBeforeLeague?.trim()) {
+    return `Before ${league2.insertBeforeLeague.trim()}`;
   }
-  if (league.leaguePriority != null && Number.isFinite(league.leaguePriority)) {
+  if (league2.leaguePriority != null && Number.isFinite(league2.leaguePriority)) {
     return "After operational leagues (legacy placement)";
   }
   return "After operational leagues";
 }
-function resolveManualGamesSpineAdminEventChannel(event, league) {
-  return resolveManualGamesSpineEventStream(event, league).channel;
+function resolveManualGamesSpineAdminEventChannel(event, league2) {
+  return resolveManualGamesSpineEventStream(event, league2).channel;
 }
-function resolveManualGamesSpineAdminEventChannelUrl(event, league) {
-  return resolveManualGamesSpineEventStream(event, league).channelUrl;
+function resolveManualGamesSpineAdminEventChannelUrl(event, league2) {
+  return resolveManualGamesSpineEventStream(event, league2).channelUrl;
 }
-function cloneManualGamesSpineLeague(league) {
+function cloneManualGamesSpineLeague(league2) {
   return {
-    ...league,
-    games: league.games.map((game) => ({ ...game }))
+    ...league2,
+    games: league2.games.map((game) => ({ ...game }))
   };
 }
 function createBlankManualGamesSpineEvent() {
@@ -97235,12 +97815,12 @@ function normalizeCanonicalManualImportLeague(raw) {
 function normalizeCanonicalManualImportEditorPayload(raw) {
   if (raw == null) return raw;
   if (Array.isArray(raw)) {
-    return raw.map((entry) => normalizeCanonicalManualImportLeague(entry));
+    return raw.map((entry2) => normalizeCanonicalManualImportLeague(entry2));
   }
   if (typeof raw === "object") {
     const obj = raw;
     if (Array.isArray(obj.leagues)) {
-      return { leagues: obj.leagues.map((entry) => normalizeCanonicalManualImportLeague(entry)) };
+      return { leagues: obj.leagues.map((entry2) => normalizeCanonicalManualImportLeague(entry2)) };
     }
     return normalizeCanonicalManualImportLeague(raw);
   }
@@ -97415,8 +97995,8 @@ function parseGamesSpineManualLeagueEditorJson(text2) {
     return { ok: false, error: "Invalid JSON" };
   }
 }
-function validateGamesSpineManualLeagueDraft(league) {
-  const parsed = validateLeague(league);
+function validateGamesSpineManualLeagueDraft(league2) {
+  const parsed = validateLeague(league2);
   if (typeof parsed === "string") return { ok: false, error: parsed };
   return { ok: true, league: parsed };
 }
@@ -97465,8 +98045,8 @@ async function importPersistedManualGamesSpineLeague(input) {
       skippedDuplicateCount: appended.skippedDuplicateCount
     };
   }
-  const league = existing && input.mode === "replace" ? replaceManualGamesSpineLeague(existing, input.league) : input.league;
-  const merged = upsertManualGamesSpineLeague(document2, league);
+  const league2 = existing && input.mode === "replace" ? replaceManualGamesSpineLeague(existing, input.league) : input.league;
+  const merged = upsertManualGamesSpineLeague(document2, league2);
   return { document: await persistManualGamesSpineDocument(merged) };
 }
 
@@ -97834,14 +98414,14 @@ function SavedLeaguesBrowser({
       ] }),
       /* @__PURE__ */ (0, import_jsx_runtime213.jsx)("p", { className: "mt-1 text-[11px] leading-relaxed text-textdim", children: "Authoritative visual editor and preview for manual leagues on the live web app." })
     ] }),
-    leagues.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime213.jsx)("div", { className: "rounded border border-line/60 bg-[#071012] px-3 py-6 text-center text-[11px] text-textdim", children: "No saved leagues yet. Paste new league JSON above and save." }) : /* @__PURE__ */ (0, import_jsx_runtime213.jsx)("div", { className: "flex flex-col gap-3", children: leagues.map((league) => {
-      const isEditing = editingLeagueKey === league.league;
-      const expanded = isEditing || expandedByLeague[league.league] === true;
-      const eventCount = league.games.length;
-      const dateRangeLabel = formatManualGamesSpineAdminLeagueDateRange(league.games);
-      const eventsByDate = groupManualGamesSpineEventsByDate(league.games);
-      const deleting = deletingLeague === league.league;
-      const displayName = resolveManualGamesSpineLeagueDisplayName(league);
+    leagues.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime213.jsx)("div", { className: "rounded border border-line/60 bg-[#071012] px-3 py-6 text-center text-[11px] text-textdim", children: "No saved leagues yet. Paste new league JSON above and save." }) : /* @__PURE__ */ (0, import_jsx_runtime213.jsx)("div", { className: "flex flex-col gap-3", children: leagues.map((league2) => {
+      const isEditing = editingLeagueKey === league2.league;
+      const expanded = isEditing || expandedByLeague[league2.league] === true;
+      const eventCount = league2.games.length;
+      const dateRangeLabel = formatManualGamesSpineAdminLeagueDateRange(league2.games);
+      const eventsByDate = groupManualGamesSpineEventsByDate(league2.games);
+      const deleting = deletingLeague === league2.league;
+      const displayName = resolveManualGamesSpineLeagueDisplayName(league2);
       return /* @__PURE__ */ (0, import_jsx_runtime213.jsxs)(
         "article",
         {
@@ -97855,7 +98435,7 @@ function SavedLeaguesBrowser({
               "button",
               {
                 type: "button",
-                onClick: () => toggleExpanded(league.league),
+                onClick: () => toggleExpanded(league2.league),
                 className: cn2(
                   "flex w-full items-center justify-between gap-3 border-l-2 border-l-cyansys/35 py-2 pl-2.5 pr-2 text-left",
                   "transition duration-150 hover:border-l-cyansys/55 hover:bg-[#0e181d]/90",
@@ -97874,9 +98454,9 @@ function SavedLeaguesBrowser({
                       }
                     ),
                     /* @__PURE__ */ (0, import_jsx_runtime213.jsx)("span", { className: "truncate font-mono text-[15px] font-bold leading-none tracking-[0.12em] text-[#eef6f6]", children: displayName }),
-                    displayName !== league.league ? /* @__PURE__ */ (0, import_jsx_runtime213.jsxs)("span", { className: "shrink-0 text-[9px] tracking-[0.08em] text-[#5f7a7a]", children: [
+                    displayName !== league2.league ? /* @__PURE__ */ (0, import_jsx_runtime213.jsxs)("span", { className: "shrink-0 text-[9px] tracking-[0.08em] text-[#5f7a7a]", children: [
                       "(",
-                      league.league,
+                      league2.league,
                       ")"
                     ] }) : null,
                     /* @__PURE__ */ (0, import_jsx_runtime213.jsxs)("span", { className: "shrink-0 text-[10px] tracking-[0.08em] text-[#5f7a7a]", children: [
@@ -97908,29 +98488,29 @@ function SavedLeaguesBrowser({
                     onChange: onDraftChange,
                     onSave: onSaveVisualLeague,
                     onCancel: onCancelEdit,
-                    onDeleteLeague: () => onDelete(league.league)
+                    onDeleteLeague: () => onDelete(league2.league)
                   }
                 ) : /* @__PURE__ */ (0, import_jsx_runtime213.jsxs)(import_jsx_runtime213.Fragment, { children: [
                   /* @__PURE__ */ (0, import_jsx_runtime213.jsxs)("div", { className: "grid gap-2 rounded border border-line/40 bg-[#071012] px-3 py-3 text-[10px] leading-relaxed text-textdim", children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime213.jsx)("div", { className: "text-[11px] font-medium tracking-[0.08em] text-[#d8e8e8]", children: league.league }),
+                    /* @__PURE__ */ (0, import_jsx_runtime213.jsx)("div", { className: "text-[11px] font-medium tracking-[0.08em] text-[#d8e8e8]", children: league2.league }),
                     /* @__PURE__ */ (0, import_jsx_runtime213.jsxs)("div", { children: [
                       /* @__PURE__ */ (0, import_jsx_runtime213.jsx)("span", { className: "tracking-[0.12em] text-[#5f7a7a]", children: "PLACEMENT" }),
                       /* @__PURE__ */ (0, import_jsx_runtime213.jsxs)("div", { className: "mt-2 grid gap-1", children: [
                         /* @__PURE__ */ (0, import_jsx_runtime213.jsxs)("div", { className: "text-[#d8e8e8]", children: [
                           "After League: ",
-                          league.insertAfterLeague?.trim() || "\u2014"
+                          league2.insertAfterLeague?.trim() || "\u2014"
                         ] }),
                         /* @__PURE__ */ (0, import_jsx_runtime213.jsxs)("div", { className: "text-[#d8e8e8]", children: [
                           "Before League: ",
-                          league.insertBeforeLeague?.trim() || "\u2014"
+                          league2.insertBeforeLeague?.trim() || "\u2014"
                         ] }),
-                        !league.insertAfterLeague?.trim() && !league.insertBeforeLeague?.trim() ? /* @__PURE__ */ (0, import_jsx_runtime213.jsx)("div", { className: "text-textdim", children: formatManualGamesSpinePlacementLabel(league) }) : null
+                        !league2.insertAfterLeague?.trim() && !league2.insertBeforeLeague?.trim() ? /* @__PURE__ */ (0, import_jsx_runtime213.jsx)("div", { className: "text-textdim", children: formatManualGamesSpinePlacementLabel(league2) }) : null
                       ] })
                     ] }),
                     /* @__PURE__ */ (0, import_jsx_runtime213.jsxs)("div", { children: [
                       /* @__PURE__ */ (0, import_jsx_runtime213.jsx)("span", { className: "tracking-[0.12em] text-[#5f7a7a]", children: "LEAGUE STREAM" }),
-                      /* @__PURE__ */ (0, import_jsx_runtime213.jsx)("div", { className: "mt-1 text-[#d8e8e8]", children: league.channel?.trim() || "\u2014" }),
-                      /* @__PURE__ */ (0, import_jsx_runtime213.jsx)("div", { className: "mt-1 break-all font-mono text-[9px] text-textdim", children: league.channelUrl?.trim() || "\u2014" })
+                      /* @__PURE__ */ (0, import_jsx_runtime213.jsx)("div", { className: "mt-1 text-[#d8e8e8]", children: league2.channel?.trim() || "\u2014" }),
+                      /* @__PURE__ */ (0, import_jsx_runtime213.jsx)("div", { className: "mt-1 break-all font-mono text-[9px] text-textdim", children: league2.channelUrl?.trim() || "\u2014" })
                     ] }),
                     /* @__PURE__ */ (0, import_jsx_runtime213.jsxs)("div", { children: [
                       /* @__PURE__ */ (0, import_jsx_runtime213.jsx)("span", { className: "tracking-[0.12em] text-[#5f7a7a]", children: "DATE RANGE" }),
@@ -97954,11 +98534,11 @@ function SavedLeaguesBrowser({
                         events.map((event) => {
                           const channel = resolveManualGamesSpineAdminEventChannel(
                             event,
-                            league
+                            league2
                           );
                           const channelUrl = resolveManualGamesSpineAdminEventChannelUrl(
                             event,
-                            league
+                            league2
                           );
                           return /* @__PURE__ */ (0, import_jsx_runtime213.jsxs)(
                             "div",
@@ -97986,7 +98566,7 @@ function SavedLeaguesBrowser({
                       "button",
                       {
                         type: "button",
-                        onClick: () => onStartEdit(league.league),
+                        onClick: () => onStartEdit(league2.league),
                         disabled: editingLeagueKey !== null,
                         className: "rounded border border-line/70 px-3 py-1.5 text-[10px] tracking-[0.14em] text-[#d8e8e8] hover:border-greensys/50 disabled:opacity-50",
                         children: "Edit"
@@ -97997,7 +98577,7 @@ function SavedLeaguesBrowser({
                       {
                         type: "button",
                         disabled: deleting || editingLeagueKey !== null,
-                        onClick: () => onDelete(league.league),
+                        onClick: () => onDelete(league2.league),
                         className: "rounded border border-redsys/40 px-3 py-1.5 text-[10px] tracking-[0.14em] text-redsys hover:border-redsys/70 disabled:opacity-50",
                         children: deleting ? "Deleting\u2026" : "Delete"
                       }
@@ -98008,7 +98588,7 @@ function SavedLeaguesBrowser({
             )
           ]
         },
-        league.league
+        league2.league
       );
     }) })
   ] });
@@ -98075,11 +98655,11 @@ function GamesSpineAdminPanel() {
     setBusy(null);
   }, [importJsonText]);
   const executeImport = (0, import_react210.useCallback)(
-    async (league, mode) => {
+    async (league2, mode) => {
       setBusy("save");
       setActionError(null);
       try {
-        const outcome = await importPersistedManualGamesSpineLeague({ league, mode });
+        const outcome = await importPersistedManualGamesSpineLeague({ league: league2, mode });
         syncPersistedDocument(outcome.document);
         setImportJsonText("");
         setPendingImport(null);
@@ -98087,15 +98667,15 @@ function GamesSpineAdminPanel() {
         if (mode === "append") {
           const skipped = outcome.skippedDuplicateCount && outcome.skippedDuplicateCount > 0 ? ` \xB7 skipped ${outcome.skippedDuplicateCount} duplicate(s)` : "";
           setValidationMessage(
-            `Appended \xB7 ${league.league} \xB7 added ${outcome.addedCount ?? 0} event(s)${skipped}`
+            `Appended \xB7 ${league2.league} \xB7 added ${outcome.addedCount ?? 0} event(s)${skipped}`
           );
         } else if (mode === "replace") {
           setValidationMessage(
-            `Replaced \xB7 ${league.league} \xB7 ${league.games.length} event(s) in import`
+            `Replaced \xB7 ${league2.league} \xB7 ${league2.games.length} event(s) in import`
           );
         } else {
           setValidationMessage(
-            `Imported \xB7 ${league.league} \xB7 edit visually in Saved Leagues below`
+            `Imported \xB7 ${league2.league} \xB7 edit visually in Saved Leagues below`
           );
         }
       } catch (err) {
@@ -98162,11 +98742,11 @@ function GamesSpineAdminPanel() {
   }, []);
   const onStartEdit = (0, import_react210.useCallback)(
     (leagueName) => {
-      const league = findManualGamesSpineLeague(savedDocument, leagueName);
-      if (!league) return;
-      setEditingLeagueKey(league.league);
-      setDraftLeague(cloneManualGamesSpineLeague(league));
-      setValidationMessage(`Visual edit \xB7 ${league.league}`);
+      const league2 = findManualGamesSpineLeague(savedDocument, leagueName);
+      if (!league2) return;
+      setEditingLeagueKey(league2.league);
+      setDraftLeague(cloneManualGamesSpineLeague(league2));
+      setValidationMessage(`Visual edit \xB7 ${league2.league}`);
       setActionError(null);
     },
     [savedDocument]
@@ -98386,14 +98966,14 @@ function formatLocalCalendarDateKey(now = /* @__PURE__ */ new Date()) {
   const day = String(now.getDate()).padStart(2, "0");
   return `${year}-${month}-${day}`;
 }
-function leagueSlugForManualEventId(league) {
-  const slug = league.trim().toLowerCase().replace(/_/g, "-").replace(/[^a-z0-9]+/g, "-").replace(/-+/g, "-").replace(/^-|-$/g, "");
+function leagueSlugForManualEventId(league2) {
+  const slug = league2.trim().toLowerCase().replace(/_/g, "-").replace(/[^a-z0-9]+/g, "-").replace(/-+/g, "-").replace(/^-|-$/g, "");
   if (slug) return slug.slice(0, 64);
   return "manual";
 }
-function generateManualEditorialEventId(league, existingEventIds, now = /* @__PURE__ */ new Date()) {
+function generateManualEditorialEventId(league2, existingEventIds, now = /* @__PURE__ */ new Date()) {
   const dateKey = formatLocalCalendarDateKey(now);
-  const prefix = `${MANUAL_EDITORIAL_EVENT_ID_PREFIX}${leagueSlugForManualEventId(league)}-${dateKey}-`;
+  const prefix = `${MANUAL_EDITORIAL_EVENT_ID_PREFIX}${leagueSlugForManualEventId(league2)}-${dateKey}-`;
   const taken = new Set(
     [...existingEventIds].map((id) => id.trim()).filter(Boolean)
   );
@@ -98511,7 +99091,7 @@ function SportscapeEditorialManualAiBriefEntry({
     setBusy(true);
     try {
       const eventId = generateManualEditorialEventId(values.league, existingEventIds);
-      const entry = await saveSportscapeEditorialEntry({
+      const entry2 = await saveSportscapeEditorialEntry({
         league: values.league,
         eventId,
         headline: values.headline,
@@ -98520,7 +99100,7 @@ function SportscapeEditorialManualAiBriefEntry({
         highlightsVideoThumbnailUrl: values.highlightsVideoThumbnailUrl,
         showInLeagueSection
       });
-      onEntrySaved(entry);
+      onEntrySaved(entry2);
       if (addToAiBrief) {
         const selection = await saveAiBriefSelection({
           eventId,
@@ -98812,8 +99392,8 @@ function resolveGameForArticle(article, gamesByEventId) {
   }
   return void 0;
 }
-function buildGameFromArticle(article, league, eventId) {
-  const grarfLeague = isSportscapeEditorialLeagueKey(league) ? mapEditorialLeagueToGrarfLeague(league) : "ATP";
+function buildGameFromArticle(article, league2, eventId) {
+  const grarfLeague = isSportscapeEditorialLeagueKey(league2) ? mapEditorialLeagueToGrarfLeague(league2) : "ATP";
   const espnEventId = article.eventId?.trim() || void 0;
   return {
     id: espnEventId ? `espn-${grarfLeague}-${espnEventId}` : `sportscape-${grarfLeague}-${eventId}`,
@@ -98837,16 +99417,16 @@ function resolveArticleTitle(article, game) {
   if (article.headline.trim()) return article.headline.trim();
   return resolveSportscapeEditorialEventTitle(game);
 }
-function adminEventFromArticle(article, league, gamesByEventId) {
+function adminEventFromArticle(article, league2, gamesByEventId) {
   const alternateEventIds = collectArticleEventIds(article, gamesByEventId);
   const game = resolveGameForArticle(article, gamesByEventId);
-  const eventId = game ? resolveSportscapeEditorialEventId(game) : alternateEventIds[0] ?? `${league.toLowerCase()}-${article.headline.trim().slice(0, 48)}`;
-  const resolvedGame = game ?? buildGameFromArticle(article, league, eventId);
+  const eventId = game ? resolveSportscapeEditorialEventId(game) : alternateEventIds[0] ?? `${league2.toLowerCase()}-${article.headline.trim().slice(0, 48)}`;
+  const resolvedGame = game ?? buildGameFromArticle(article, league2, eventId);
   return {
     eventId,
     alternateEventIds: alternateEventIds.filter((id) => id !== eventId),
     title: resolveArticleTitle(article, resolvedGame),
-    league,
+    league: league2,
     game: resolvedGame,
     sportscapeDefaults: {
       headline: article.headline.trim(),
@@ -98855,26 +99435,26 @@ function adminEventFromArticle(article, league, gamesByEventId) {
     }
   };
 }
-function adminEventFromEditorialEntry(entry, gamesByEventId) {
-  const game = gamesByEventId.get(entry.eventId) ?? buildGameFromArticle(
+function adminEventFromEditorialEntry(entry2, gamesByEventId) {
+  const game = gamesByEventId.get(entry2.eventId) ?? buildGameFromArticle(
     {
-      headline: entry.headline,
-      url: entry.articleUrl,
+      headline: entry2.headline,
+      url: entry2.articleUrl,
       homeTeam: "Home",
       awayTeam: "Away"
     },
-    entry.league,
-    entry.eventId
+    entry2.league,
+    entry2.eventId
   );
   return {
-    eventId: entry.eventId,
-    title: entry.headline.trim() || resolveSportscapeEditorialEventTitle(game),
-    league: entry.league,
-    game: { ...game, id: entry.eventId, grarfGameId: entry.eventId },
+    eventId: entry2.eventId,
+    title: entry2.headline.trim() || resolveSportscapeEditorialEventTitle(game),
+    league: entry2.league,
+    game: { ...game, id: entry2.eventId, grarfGameId: entry2.eventId },
     sportscapeDefaults: {
-      headline: entry.headline.trim(),
-      articleUrl: entry.articleUrl.trim() || void 0,
-      highlightUrl: entry.highlightUrl.trim() || void 0
+      headline: entry2.headline.trim(),
+      articleUrl: entry2.articleUrl.trim() || void 0,
+      highlightUrl: entry2.highlightUrl.trim() || void 0
     }
   };
 }
@@ -98884,21 +99464,21 @@ function collectSportscapeAdminEventsFromWebSportscape(params) {
   const markSeen = (eventId) => {
     seenEventIds.add(eventId);
   };
-  for (const league of AUTOMATED_SPORTSCAPE_EDITORIAL_LEAGUES) {
-    const articles = params.mergedArticlesByLeague[league] ?? [];
+  for (const league2 of AUTOMATED_SPORTSCAPE_EDITORIAL_LEAGUES) {
+    const articles = params.mergedArticlesByLeague[league2] ?? [];
     for (const article of articles) {
-      const event = adminEventFromArticle(article, league, params.gamesByEventId);
+      const event = adminEventFromArticle(article, league2, params.gamesByEventId);
       if (seenEventIds.has(event.eventId)) continue;
       markSeen(event.eventId);
       for (const alt of event.alternateEventIds ?? []) markSeen(alt);
       events.push(event);
     }
   }
-  for (const entry of params.editorialEntries) {
-    if (!editorialEntryShowsInLeagueSection(entry)) continue;
-    if (seenEventIds.has(entry.eventId)) continue;
-    markSeen(entry.eventId);
-    events.push(adminEventFromEditorialEntry(entry, params.gamesByEventId));
+  for (const entry2 of params.editorialEntries) {
+    if (!editorialEntryShowsInLeagueSection(entry2)) continue;
+    if (seenEventIds.has(entry2.eventId)) continue;
+    markSeen(entry2.eventId);
+    events.push(adminEventFromEditorialEntry(entry2, params.gamesByEventId));
   }
   const editorialLeagueOrder = getSportscapeEditorialLeagueDisplayOrder();
   events.sort((a2, b2) => {
@@ -98978,8 +99558,8 @@ var SPORTSCAPE_EDITORIAL_HIGHLIGHT_REGISTRY = {
     highlightsUrl: "https://www.youtube.com/@PGATOURChampions/videos"
   }
 };
-function getSportscapeEditorialHighlightSource(league) {
-  return SPORTSCAPE_EDITORIAL_HIGHLIGHT_REGISTRY[league];
+function getSportscapeEditorialHighlightSource(league2) {
+  return SPORTSCAPE_EDITORIAL_HIGHLIGHT_REGISTRY[league2];
 }
 
 // ../grarf/desktop/src/components/sportscapeEditorial/SportscapeEditorialEventRow.tsx
@@ -99038,7 +99618,7 @@ function SportscapeEditorialEventRow({
     setBusy(true);
     setError(null);
     try {
-      const entry = await saveSportscapeEditorialEntry({
+      const entry2 = await saveSportscapeEditorialEntry({
         id: existing?.id,
         league: event.league,
         eventId: event.eventId,
@@ -99046,8 +99626,8 @@ function SportscapeEditorialEventRow({
         articleUrl: articleUrl.trim(),
         highlightUrl: highlightUrl.trim()
       });
-      onSaved(entry);
-      setSavedAt(entry.updatedAt);
+      onSaved(entry2);
+      setSavedAt(entry2.updatedAt);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Save failed");
     } finally {
@@ -99219,7 +99799,7 @@ function SportscapeEditorialEventRow({
 // ../grarf/desktop/src/components/sportscapeEditorial/SportscapeEditorialLeagueSection.tsx
 var import_jsx_runtime218 = __toESM(require_jsx_runtime(), 1);
 function SportscapeEditorialLeagueSection({
-  league,
+  league: league2,
   events,
   entriesByEventId,
   aiBriefSelectionsByEventId,
@@ -99228,11 +99808,11 @@ function SportscapeEditorialLeagueSection({
   onAiBriefSelectionChange
 }) {
   const [expanded, setExpanded] = (0, import_react214.useState)(() => {
-    if (!isSportscapeEditorialLeagueKey(league)) return true;
-    return !SPORTSCAPE_EDITORIAL_LEAGUES_COLLAPSED_BY_DEFAULT.has(league);
+    if (!isSportscapeEditorialLeagueKey(league2)) return true;
+    return !SPORTSCAPE_EDITORIAL_LEAGUES_COLLAPSED_BY_DEFAULT.has(league2);
   });
-  const highlightSource = isSportscapeEditorialLeagueKey(league) ? getSportscapeEditorialHighlightSource(league) : null;
-  const label = resolveSportscapeEditorialLeagueDisplayLabel(league);
+  const highlightSource = isSportscapeEditorialLeagueKey(league2) ? getSportscapeEditorialHighlightSource(league2) : null;
+  const label = resolveSportscapeEditorialLeagueDisplayLabel(league2);
   const highlightLabel = (0, import_react214.useMemo)(() => {
     if (!highlightSource) return null;
     try {
@@ -99288,7 +99868,7 @@ function SportscapeEditorialLeagueSection({
           onSaved: onEntrySaved,
           onAiBriefSelectionChange
         },
-        `${league}:${event.eventId}`
+        `${league2}:${event.eventId}`
       )),
       expanded && events.length > 0 && highlightLabel ? /* @__PURE__ */ (0, import_jsx_runtime218.jsx)("p", { className: "text-[10px] text-textdim", children: highlightLabel }) : null
     ] }) : null
@@ -99310,8 +99890,8 @@ init_define_import_meta_env();
 var import_react216 = __toESM(require_react(), 1);
 function countAutomatedArticles(mergedByLeague) {
   let total = 0;
-  for (const league of AUTOMATED_SPORTSCAPE_EDITORIAL_LEAGUES) {
-    total += mergedByLeague[league]?.length ?? 0;
+  for (const league2 of AUTOMATED_SPORTSCAPE_EDITORIAL_LEAGUES) {
+    total += mergedByLeague[league2]?.length ?? 0;
   }
   return total;
 }
@@ -99471,8 +100051,8 @@ function SportscapeEditorialAdminContent() {
   (0, import_react217.useEffect)(() => {
     void fetchSportscapeEditorialDocument().then((document2) => {
       const nextEntries = /* @__PURE__ */ new Map();
-      for (const entry of document2.entries) {
-        nextEntries.set(entry.eventId, entry);
+      for (const entry2 of document2.entries) {
+        nextEntries.set(entry2.eventId, entry2);
       }
       setEntriesByEventId(nextEntries);
       setAiBriefSelectionsByEventId(buildAiBriefSelectionsByEventId(document2.aiBriefSelections));
@@ -99502,8 +100082,8 @@ function SportscapeEditorialAdminContent() {
         existing?.headline?.trim() || event.sportscapeDefaults?.headline?.trim() || event.title
       );
     }
-    for (const [eventId, entry] of entriesByEventId) {
-      const headline = entry.headline?.trim();
+    for (const [eventId, entry2] of entriesByEventId) {
+      const headline = entry2.headline?.trim();
       if (headline) next.set(eventId, headline);
     }
     return next;
@@ -99519,10 +100099,10 @@ function SportscapeEditorialAdminContent() {
     }),
     [aiBriefSelectionsByEventId, headlineByEventId]
   );
-  const onEntrySaved = (entry) => {
+  const onEntrySaved = (entry2) => {
     setEntriesByEventId((prev) => {
       const next = new Map(prev);
-      next.set(entry.eventId, entry);
+      next.set(entry2.eventId, entry2);
       return next;
     });
   };
@@ -99606,18 +100186,18 @@ function SportscapeEditorialAdminContent() {
           error: aiBriefActionError
         }
       ),
-      leagueSections.map((league) => /* @__PURE__ */ (0, import_jsx_runtime220.jsx)(
+      leagueSections.map((league2) => /* @__PURE__ */ (0, import_jsx_runtime220.jsx)(
         SportscapeEditorialLeagueSection,
         {
-          league,
-          events: grouped.get(league) ?? [],
+          league: league2,
+          events: grouped.get(league2) ?? [],
           entriesByEventId,
           aiBriefSelectionsByEventId,
           suggestedRank,
           onEntrySaved,
           onAiBriefSelectionChange
         },
-        league
+        league2
       ))
     ] })
   ] });
