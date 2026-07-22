@@ -92604,11 +92604,12 @@ function shouldApplyStartupBootstrap(capturedPath) {
   const captured = normalizeBootstrapPathname2(capturedPath);
   const current = normalizeBootstrapPathname2(window.location.pathname);
   if (captured === current) return true;
-  if (current !== "/") return false;
   const bootstrapResult = resolveInitialUrlBootstrapIntent(captured);
   if (bootstrapResult.intent.kind === "league-hub") return true;
   if (bootstrapResult.intent.kind === "center-pane") return true;
   if (bootstrapResult.intent.kind === "intel") return true;
+  if (bootstrapResult.intent.kind === "game") return true;
+  if (current !== "/") return false;
   if (bootstrapResult.intent.kind === "default") return true;
   if (resolveCenterPaneApplicationModeFromPath(captured)) return true;
   return false;
