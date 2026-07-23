@@ -97201,8 +97201,8 @@ function HomeLiveTrackerPostLine({ post }) {
             )
           ] })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime157.jsxs)("div", { className: "mt-0.5 flex min-h-[90px] min-w-0 items-start gap-2", children: [
-          body ? /* @__PURE__ */ (0, import_jsx_runtime157.jsx)("p", { className: "min-w-0 flex-1 font-mono text-[15px] leading-snug tracking-[0.01em] text-[#e0b16b] [display:-webkit-box] [-webkit-line-clamp:4] [-webkit-box-orient:vertical] overflow-hidden", children: body }) : /* @__PURE__ */ (0, import_jsx_runtime157.jsx)("span", { className: "min-w-0 flex-1" }),
+        /* @__PURE__ */ (0, import_jsx_runtime157.jsxs)("div", { className: "mt-0.5 flex min-h-[180px] min-w-0 items-start gap-2", children: [
+          body ? /* @__PURE__ */ (0, import_jsx_runtime157.jsx)("p", { className: "min-w-0 flex-1 font-mono text-[15px] leading-snug tracking-[0.01em] text-[#e0b16b] [display:-webkit-box] [-webkit-line-clamp:8] [-webkit-box-orient:vertical] overflow-hidden", children: body }) : /* @__PURE__ */ (0, import_jsx_runtime157.jsx)("span", { className: "min-w-0 flex-1" }),
           /* @__PURE__ */ (0, import_jsx_runtime157.jsx)(LiveTrackerWireThumb, { post })
         ] }),
         /* @__PURE__ */ (0, import_jsx_runtime157.jsxs)("div", { className: "mt-0.5 flex min-w-0 max-w-full items-baseline", children: [
