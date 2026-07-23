@@ -90298,6 +90298,23 @@ var init_resolveSportscapeHeadlinesSourceLogoUrl = __esm({
   }
 });
 
+// ../grarf/desktop/src/lib/sportscape/sportscapeHeadlinesSourceSelectorTypography.css
+var require_sportscapeHeadlinesSourceSelectorTypography = __commonJS({
+  "../grarf/desktop/src/lib/sportscape/sportscapeHeadlinesSourceSelectorTypography.css"(exports, module) {
+    module.exports = {};
+  }
+});
+
+// ../grarf/desktop/src/lib/sportscape/sportscapeHeadlinesSourceSelectorTypography.ts
+var SPORTSCAPE_HEADLINES_SOURCE_SELECTOR_LABEL_CLASS;
+var init_sportscapeHeadlinesSourceSelectorTypography = __esm({
+  "../grarf/desktop/src/lib/sportscape/sportscapeHeadlinesSourceSelectorTypography.ts"() {
+    init_define_import_meta_env();
+    SPORTSCAPE_HEADLINES_SOURCE_SELECTOR_LABEL_CLASS = "sportscape-headlines-source-selector-label";
+    void Promise.resolve().then(() => __toESM(require_sportscapeHeadlinesSourceSelectorTypography(), 1));
+  }
+});
+
 // ../grarf/desktop/src/components/homeMvp/HomeSportscapeHeadlinesRow.tsx
 function openHeadlineArticle(url) {
   void openExternalUrl2(url);
@@ -90437,7 +90454,16 @@ function HomeSportscapeHeadlinesSourceBlock({
       children: [
         /* @__PURE__ */ (0, import_jsx_runtime130.jsxs)("header", { className: "flex h-6 shrink-0 items-center gap-1.5 border-b border-[#24363c]/55 bg-[#020707]/90 px-2", children: [
           /* @__PURE__ */ (0, import_jsx_runtime130.jsx)(SportscapeHeadlinesSourceLogo, { sourceId: id }),
-          /* @__PURE__ */ (0, import_jsx_runtime130.jsx)("span", { className: "truncate text-[8px] tracking-[0.14em] text-cyansys/85", children: label })
+          /* @__PURE__ */ (0, import_jsx_runtime130.jsx)(
+            "span",
+            {
+              className: cn2(
+                "truncate text-[8px] tracking-[0.14em] text-cyansys/85",
+                SPORTSCAPE_HEADLINES_SOURCE_SELECTOR_LABEL_CLASS
+              ),
+              children: label
+            }
+          )
         ] }),
         /* @__PURE__ */ (0, import_jsx_runtime130.jsx)(HeadlinesSourceBlockBullets, { blockId: id, headlines })
       ]
@@ -90484,6 +90510,7 @@ var init_HomeSportscapeHeadlinesRow = __esm({
     init_isGrarfWebRenderer();
     init_LeagueHomePanel();
     init_getYesterdayDateString();
+    init_sportscapeHeadlinesSourceSelectorTypography();
     import_jsx_runtime130 = __toESM(require_jsx_runtime(), 1);
     SOURCE_BLOCK_WIDTH_CLASS = "w-[19.5rem] shrink-0";
     AI_BRIEF_BLOCK_WIDTH_CLASS = "w-[25rem] shrink-0";

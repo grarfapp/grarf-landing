@@ -1,4 +1,5 @@
 @import "https://fonts.googleapis.com/css2?family=DM+Mono:wght@400&display=swap";
+@import "https://fonts.googleapis.com/css2?family=Datatype&display=swap";
 
 /* ../grarf/desktop/src/lib/social/socialSignalBodyTypography.css */
 .grarf-signal-body {
@@ -7,4 +8,12 @@
     ui-monospace,
     monospace;
   font-weight: 400;
+}
+
+/* ../grarf/desktop/src/lib/sportscape/sportscapeHeadlinesSourceSelectorTypography.css */
+.sportscape-headlines-source-selector-label {
+  font-family:
+    "Datatype",
+    ui-monospace,
+    monospace;
 }
