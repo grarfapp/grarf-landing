@@ -39596,9 +39596,8 @@ function GlobalHeaderTickerFeedLabel() {
     {
       className: cn2(
         "relative z-[2] flex h-full shrink-0 items-center justify-center",
-        "border-r border-[#0a1010]/95 bg-gradient-to-b from-[#1c2f2f] to-[#161f1f]",
-        "font-mono text-[10px] font-bold uppercase tracking-[0.28em] text-[#4bc4cc]",
-        "shadow-[inset_0_1px_0_rgba(86,247,255,0.14),inset_0_-1px_0_rgba(0,0,0,0.5),2px_0_6px_rgba(0,0,0,0.38)]"
+        "border-r border-[#0a1010]/95 bg-[#1c2f2f]",
+        "font-mono text-[10px] font-bold uppercase tracking-[0.28em] text-[#4bc4cc]"
       ),
       style: { width: TICKER_FEED_LABEL_WIDTH_PX },
       "aria-hidden": true,
