@@ -30312,6 +30312,7 @@ var init_resolveLeagueDirectoryNavItemLogo = __esm({
       LIGUE1: "ligue-1",
       BUNDESLIGA: "bundesliga",
       BRA1: "brasileirao",
+      ARG1: "lpf",
       SUDAMERICANA: "copa-sudamericana",
       UCL: "ucl",
       UEL: "uel",
@@ -31027,6 +31028,15 @@ var init_OnTodayNavRowWithTallies = __esm({
   }
 });
 
+// ../grarf/desktop/src/lib/gamesSpine/arg1LeagueLogoUrl.ts
+var ARG1_LEAGUE_LOGO_URL;
+var init_arg1LeagueLogoUrl = __esm({
+  "../grarf/desktop/src/lib/gamesSpine/arg1LeagueLogoUrl.ts"() {
+    init_define_import_meta_env();
+    ARG1_LEAGUE_LOGO_URL = "/league-logos/lpf.png";
+  }
+});
+
 // ../grarf/desktop/src/lib/gamesSpine/bra1LeagueLogoUrl.ts
 var BRA1_LEAGUE_LOGO_URL;
 var init_bra1LeagueLogoUrl = __esm({
@@ -31271,6 +31281,7 @@ var init_gamesSpineLeagueLogoUrls = __esm({
   "../grarf/desktop/src/lib/gamesSpine/gamesSpineLeagueLogoUrls.ts"() {
     init_define_import_meta_env();
     init_resolveLeagueDirectoryNavItemLogo();
+    init_arg1LeagueLogoUrl();
     init_bra1LeagueLogoUrl();
     init_copaSudamericanaLeagueLogoUrl();
     init_mcwsLeagueLogoUrl();
@@ -31306,6 +31317,7 @@ var init_gamesSpineLeagueLogoUrls = __esm({
       USLC: "/league-logos/usl-championship.png",
       BUNDESLIGA: "https://a.espncdn.com/i/leaguelogos/soccer/500/10.png",
       BRA1: BRA1_LEAGUE_LOGO_URL,
+      ARG1: ARG1_LEAGUE_LOGO_URL,
       SUDAMERICANA: COPA_SUDAMERICANA_LEAGUE_LOGO_URL,
       UCL: UCL_LEAGUE_LOGO_URL,
       UEL: "https://a.espncdn.com/i/leaguelogos/soccer/500/2310.png",
@@ -32676,7 +32688,10 @@ var init_espnOperationalLeagueEndpoints = __esm({
 function resolveGamesSpineLeagueDisplayLabel(league2) {
   return GAMES_SPINE_LEAGUE_DISPLAY_LABEL[league2] ?? GAMES_COLUMN_LEAGUE_LABEL[league2] ?? resolveEspnOperationalLeagueLabel(league2) ?? league2;
 }
-var GAMES_SPINE_LEAGUE_DISPLAY_LABEL;
+function resolveGamesSpineLeagueSectionHeaderLabel(league2) {
+  return GAMES_SPINE_LEAGUE_SECTION_HEADER_LABEL[league2] ?? resolveGamesSpineLeagueDisplayLabel(league2);
+}
+var GAMES_SPINE_LEAGUE_DISPLAY_LABEL, GAMES_SPINE_LEAGUE_SECTION_HEADER_LABEL;
 var init_gamesSpineLeagueDisplayLabel = __esm({
   "../grarf/desktop/src/lib/gamesSpine/gamesSpineLeagueDisplayLabel.ts"() {
     init_define_import_meta_env();
@@ -32690,6 +32705,9 @@ var init_gamesSpineLeagueDisplayLabel = __esm({
       PLL: "PLL",
       WIMBLEDON_MEN: "Wimbledon (Men's)",
       WIMBLEDON_WOMEN: "Wimbledon (Women's)"
+    };
+    GAMES_SPINE_LEAGUE_SECTION_HEADER_LABEL = {
+      ARG1: "LPF"
     };
   }
 });
@@ -70809,6 +70827,26 @@ var init_commandBriefingLeagueLabel = __esm({
   }
 });
 
+// ../grarf/desktop/src/lib/gamesSpine/resolveGamesSpineGameCardLeagueLabel.ts
+function resolveGamesSpineGameCardLeagueLabel(game) {
+  const key2 = game.league ?? leagueKeyFromGameId(game.id) ?? null;
+  if (key2 && GAMES_SPINE_GAME_CARD_LEAGUE_LABEL_OVERRIDES[key2]) {
+    return GAMES_SPINE_GAME_CARD_LEAGUE_LABEL_OVERRIDES[key2];
+  }
+  return resolveCommandBriefingLeagueLabel(game);
+}
+var GAMES_SPINE_GAME_CARD_LEAGUE_LABEL_OVERRIDES;
+var init_resolveGamesSpineGameCardLeagueLabel = __esm({
+  "../grarf/desktop/src/lib/gamesSpine/resolveGamesSpineGameCardLeagueLabel.ts"() {
+    init_define_import_meta_env();
+    init_leagueKey();
+    init_commandBriefingLeagueLabel();
+    GAMES_SPINE_GAME_CARD_LEAGUE_LABEL_OVERRIDES = {
+      ARG1: "Argentine Primera Divisi\xF3n"
+    };
+  }
+});
+
 // ../grarf/desktop/src/lib/gamesSpine/motorsportSpinePresentation.ts
 function isMotorsportGame(game) {
   return isMotorsportLeagueKey(game.league);
@@ -72377,7 +72415,7 @@ function GamesSpineHomeParityGameRow({
   matchupRef,
   applyFinalResultNameEmphasis = false
 }) {
-  const leagueLabel = resolveCommandBriefingLeagueLabel(game);
+  const leagueLabel = resolveGamesSpineGameCardLeagueLabel(game);
   const channel = resolveCommandBriefingChannel(game);
   const scheduleLabel = resolveCommandBriefingScheduleLabel(game);
   const athleteMatch = isTennisGame(game) || isUfcGame(game);
@@ -72455,7 +72493,7 @@ var init_GamesSpineHomeParityGameRow = __esm({
   "../grarf/desktop/src/components/gamesSpine/GamesSpineHomeParityGameRow.tsx"() {
     init_define_import_meta_env();
     init_commandBriefingGameCardContent();
-    init_commandBriefingLeagueLabel();
+    init_resolveGamesSpineGameCardLeagueLabel();
     init_isTennisLeague();
     init_resolveTennisGameCardEmbedUrl();
     init_isUfcLeague();
@@ -75107,7 +75145,7 @@ var init_HomeLeagueSpineSection = __esm({
       const gamesMode = useGamesSpineDisplayStore((state3) => state3.gamesMode);
       const cardListClass = isGrarfWebRenderer() ? resolveGamesSpineCardListLayoutClass(gamesMode) : GAMES_SPINE_CARD_LIST_CLASS;
       const useOperationalModePipeline = briefingScrollContext === "home" || briefingScrollContext === "league";
-      const displayName = resolveGamesSpineLeagueDisplayLabel(league2);
+      const displayName = resolveGamesSpineLeagueSectionHeaderLabel(league2);
       const headerRef = (0, import_react108.useRef)(null);
       const stickyLogged = (0, import_react108.useRef)(false);
       const games = (0, import_react108.useMemo)(() => {
@@ -102238,7 +102276,7 @@ function CommandBriefingItemRow({
   const navigate = useNavigate();
   const canonicalGame = useCanonicalGamesSpineGame(game);
   if (!canonicalGame) return null;
-  const leagueLabel = resolveCommandBriefingLeagueLabel(canonicalGame);
+  const leagueLabel = resolveGamesSpineGameCardLeagueLabel(canonicalGame);
   const card = buildCommandBriefingGameCardContent(canonicalGame, leagueLabel);
   const showWatchLive = !!onWatchLive && gameHasHomeSpineWatchLive(canonicalGame);
   const openGame = (gameId = canonicalGame.id) => {
@@ -102312,6 +102350,7 @@ var init_CommandBriefingItemRow = __esm({
     init_gamesSpineCardLayout();
     init_commandBriefingGameCardContent();
     init_commandBriefingLeagueLabel();
+    init_resolveGamesSpineGameCardLeagueLabel();
     init_commandBriefingLayout();
     init_homeSpineWatchLive();
     init_operationalWatchLive();
