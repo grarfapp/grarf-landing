@@ -74451,6 +74451,23 @@ var init_gamesSpineStickyLayout = __esm({
   }
 });
 
+// ../grarf/desktop/src/lib/gamesSpine/gamesSpineLeagueHeaderTypography.css
+var require_gamesSpineLeagueHeaderTypography = __commonJS({
+  "../grarf/desktop/src/lib/gamesSpine/gamesSpineLeagueHeaderTypography.css"(exports, module) {
+    module.exports = {};
+  }
+});
+
+// ../grarf/desktop/src/lib/gamesSpine/gamesSpineLeagueHeaderTypography.ts
+var GAMES_SPINE_LEAGUE_HEADER_NAME_CLASS;
+var init_gamesSpineLeagueHeaderTypography = __esm({
+  "../grarf/desktop/src/lib/gamesSpine/gamesSpineLeagueHeaderTypography.ts"() {
+    init_define_import_meta_env();
+    GAMES_SPINE_LEAGUE_HEADER_NAME_CLASS = "games-spine-league-header-name";
+    void Promise.resolve().then(() => __toESM(require_gamesSpineLeagueHeaderTypography(), 1));
+  }
+});
+
 // ../grarf/desktop/src/store/gamesSpineOperationsGamesStore.ts
 var import_zustand49, useGamesSpineOperationsGamesStore;
 var init_gamesSpineOperationsGamesStore = __esm({
@@ -74882,6 +74899,7 @@ var init_HomeLeagueSpineSection = __esm({
     init_gamesSpineDisplayStore();
     init_manualLeMans2026SpineEntry();
     init_manualTourDeFranceSpineEntry();
+    init_gamesSpineLeagueHeaderTypography();
     init_wimbledonGamesSpinePresentation();
     init_gamesSpineRenderStore();
     init_adminModeStore();
@@ -75152,7 +75170,16 @@ var init_HomeLeagueSpineSection = __esm({
                         /* @__PURE__ */ (0, import_jsx_runtime89.jsxs)("span", { className: "flex min-w-0 items-center gap-2", children: [
                           /* @__PURE__ */ (0, import_jsx_runtime89.jsx)("span", { className: "w-3 shrink-0 text-center text-[9px] text-cyansys/55", "aria-hidden": true, children: collapsed ? "\u25B6" : "\u25BC" }),
                           /* @__PURE__ */ (0, import_jsx_runtime89.jsx)(GamesSpineLeagueHeaderMark, { league: league2 }),
-                          /* @__PURE__ */ (0, import_jsx_runtime89.jsx)("span", { className: "truncate text-[17px] font-bold leading-none tracking-[0.14em] text-[#eef6f6]", children: displayName })
+                          /* @__PURE__ */ (0, import_jsx_runtime89.jsx)(
+                            "span",
+                            {
+                              className: cn2(
+                                GAMES_SPINE_LEAGUE_HEADER_NAME_CLASS,
+                                "truncate text-[17px] font-bold leading-none tracking-[0.14em] text-[#eef6f6]"
+                              ),
+                              children: displayName
+                            }
+                          )
                         ] }),
                         /* @__PURE__ */ (0, import_jsx_runtime89.jsxs)("span", { className: "flex shrink-0 items-center gap-2", children: [
                           showSummaryInHeader ? /* @__PURE__ */ (0, import_jsx_runtime89.jsx)("span", { className: "text-right text-[9px] tracking-[0.08em] text-[#5f7a7a]", children: summary.summaryLine }) : null,
@@ -75679,7 +75706,16 @@ function GamesSpinePermanentLeagueHeader({
           children: [
             /* @__PURE__ */ (0, import_jsx_runtime91.jsxs)("span", { className: "flex min-w-0 items-center gap-2", children: [
               /* @__PURE__ */ (0, import_jsx_runtime91.jsx)("span", { className: "flex w-3 shrink-0 items-center justify-center text-cyansys/55", "aria-hidden": true, children: /* @__PURE__ */ (0, import_jsx_runtime91.jsx)(SquareArrowOutUpRight, { size: 9, strokeWidth: 2 }) }),
-              /* @__PURE__ */ (0, import_jsx_runtime91.jsx)("span", { className: "truncate text-[17px] font-bold leading-none tracking-[0.14em] text-[#eef6f6]", children: label })
+              /* @__PURE__ */ (0, import_jsx_runtime91.jsx)(
+                "span",
+                {
+                  className: cn2(
+                    GAMES_SPINE_LEAGUE_HEADER_NAME_CLASS,
+                    "truncate text-[17px] font-bold leading-none tracking-[0.14em] text-[#eef6f6]"
+                  ),
+                  children: label
+                }
+              )
             ] }),
             showLiveIndicator ? /* @__PURE__ */ (0, import_jsx_runtime91.jsx)("span", { className: "flex shrink-0 items-center", children: /* @__PURE__ */ (0, import_jsx_runtime91.jsx)("span", { className: "h-[5px] w-[5px] shrink-0 rounded-full bg-red-500", "aria-hidden": true }) }) : null
           ]
@@ -75694,6 +75730,7 @@ var init_GamesSpinePermanentLeagueHeader = __esm({
     init_define_import_meta_env();
     init_lucide_react();
     init_cn();
+    init_gamesSpineLeagueHeaderTypography();
     init_gamesSpineStickyLayout();
     import_jsx_runtime91 = __toESM(require_jsx_runtime(), 1);
   }
@@ -77000,6 +77037,7 @@ var init_HomeManualGamesSpineSection = __esm({
     init_useManualGamesSpineLiveRefreshMs();
     init_commandBriefingStore();
     init_gamesSpineCardLayout();
+    init_gamesSpineLeagueHeaderTypography();
     init_homeGamesSpineScoreParity();
     init_gamesSpineStickyLayout();
     init_isGrarfWebRenderer();
@@ -77140,7 +77178,16 @@ var init_HomeManualGamesSpineSection = __esm({
                               )
                             }
                           ) : null,
-                          /* @__PURE__ */ (0, import_jsx_runtime99.jsx)("span", { className: "truncate text-[17px] font-bold leading-none tracking-[0.14em] text-[#eef6f6]", children: section.leagueLabel })
+                          /* @__PURE__ */ (0, import_jsx_runtime99.jsx)(
+                            "span",
+                            {
+                              className: cn2(
+                                GAMES_SPINE_LEAGUE_HEADER_NAME_CLASS,
+                                "truncate text-[17px] font-bold leading-none tracking-[0.14em] text-[#eef6f6]"
+                              ),
+                              children: section.leagueLabel
+                            }
+                          )
                         ] }),
                         statusFilter === "all" && hasLiveEvents ? /* @__PURE__ */ (0, import_jsx_runtime99.jsx)("span", { className: "flex shrink-0 items-center", children: /* @__PURE__ */ (0, import_jsx_runtime99.jsx)("span", { className: "h-[5px] w-[5px] shrink-0 rounded-full bg-red-500", "aria-hidden": true }) }) : null
                       ]
