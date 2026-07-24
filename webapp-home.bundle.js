@@ -96802,7 +96802,7 @@ var init_homeLiveTrackerSpacing = __esm({
   "../grarf/desktop/src/lib/liveTracker/homeLiveTrackerSpacing.ts"() {
     init_define_import_meta_env();
     LIVE_TRACKER_TIMELINE_LIST = "flex w-full flex-col";
-    LIVE_TRACKER_TIMELINE_EVENT = "py-[5px]";
+    LIVE_TRACKER_TIMELINE_EVENT = "py-[3px]";
     LIVE_TRACKER_TIMELINE_EVENT_DIVIDER = "border-b border-[#010303]";
   }
 });
@@ -97079,7 +97079,7 @@ function HomeLiveTrackerFinalScoreStrip({ post }) {
   return /* @__PURE__ */ (0, import_jsx_runtime156.jsx)(
     "article",
     {
-      className: "w-full [container-type:inline-size] rounded-none border border-line/60 bg-[#020606]/90 px-1.5 py-px transition-colors hover:bg-cyansys/[0.04]",
+      className: "w-full [container-type:inline-size] rounded-none border border-line/60 bg-[#020606]/90 px-1.5 py-0 transition-colors hover:bg-cyansys/[0.04]",
       "aria-label": `Final score: ${score2.awayTeam} ${score2.awayScore}, ${score2.homeTeam} ${score2.homeScore}`,
       children: /* @__PURE__ */ (0, import_jsx_runtime156.jsxs)("div", { className: "flex w-full min-w-0 flex-nowrap items-center gap-0.5 overflow-hidden", children: [
         /* @__PURE__ */ (0, import_jsx_runtime156.jsx)(
@@ -97232,7 +97232,7 @@ function HomeLiveTrackerPostLine({ post }) {
       target: "_blank",
       rel: "noopener noreferrer",
       title: post.url,
-      className: "block cursor-pointer rounded-none border border-line px-2 py-0.5 text-inherit no-underline transition-colors hover:bg-cyansys/[0.04]",
+      className: "block cursor-pointer rounded-none border border-line px-2 py-px text-inherit no-underline transition-colors hover:bg-cyansys/[0.04]",
       children: [
         /* @__PURE__ */ (0, import_jsx_runtime157.jsxs)("div", { className: "flex min-w-0 items-center gap-1", children: [
           /* @__PURE__ */ (0, import_jsx_runtime157.jsx)(
@@ -97283,11 +97283,11 @@ function HomeLiveTrackerPostLine({ post }) {
             )
           ] })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime157.jsxs)("div", { className: "mt-px flex min-h-[180px] min-w-0 items-start gap-1", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime157.jsxs)("div", { className: "flex min-h-[135px] min-w-0 items-start gap-1", children: [
           body ? /* @__PURE__ */ (0, import_jsx_runtime157.jsx)("p", { className: "min-w-0 flex-1 font-mono text-[15px] leading-snug tracking-[0.01em] text-[#e0b16b] [display:-webkit-box] [-webkit-line-clamp:8] [-webkit-box-orient:vertical] overflow-hidden", children: body }) : /* @__PURE__ */ (0, import_jsx_runtime157.jsx)("span", { className: "min-w-0 flex-1" }),
           /* @__PURE__ */ (0, import_jsx_runtime157.jsx)(LiveTrackerWireThumb, { post })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime157.jsxs)("div", { className: "mt-px flex min-w-0 max-w-full items-baseline", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime157.jsxs)("div", { className: "flex min-w-0 max-w-full items-baseline", children: [
           account ? /* @__PURE__ */ (0, import_jsx_runtime157.jsxs)(import_jsx_runtime157.Fragment, { children: [
             /* @__PURE__ */ (0, import_jsx_runtime157.jsx)("span", { className: "shrink-0 font-mono text-[9px] leading-none tracking-[0.05em] text-cyansys/80", children: account }),
             /* @__PURE__ */ (0, import_jsx_runtime157.jsx)(
