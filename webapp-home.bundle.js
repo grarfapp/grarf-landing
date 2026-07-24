@@ -97586,10 +97586,10 @@ function liveTrackerPostKey(post, index) {
 }
 function HomeLiveTrackerSurface({ posts, statusMessage }) {
   return /* @__PURE__ */ (0, import_jsx_runtime160.jsxs)("div", { className: "flex h-full min-h-0 min-w-0 flex-col bg-[#010303]", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime160.jsxs)("div", { className: "shrink-0 border-b border-[#24363c]/45 bg-[#020707]/90 px-2 py-1.5", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime160.jsx)("p", { className: "font-mono text-[8px] tracking-[0.14em] text-cyansys/80", children: "LIVETRACKER" }),
-      /* @__PURE__ */ (0, import_jsx_runtime160.jsx)("p", { className: "mt-0.5 font-mono text-[7px] tracking-[0.08em] text-textdim/70", children: "LIVE FEED - All leagues in progress" })
-    ] }),
+    /* @__PURE__ */ (0, import_jsx_runtime160.jsx)("div", { className: "shrink-0 border-b border-[#24363c]/45 bg-[#020707]/90 px-2 py-1.5", children: /* @__PURE__ */ (0, import_jsx_runtime160.jsxs)("div", { className: "flex min-w-0 items-center justify-between gap-2", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime160.jsx)("p", { className: "shrink-0 font-mono text-[8px] tracking-[0.14em] text-cyansys/80", children: "LIVETRACKER" }),
+      /* @__PURE__ */ (0, import_jsx_runtime160.jsx)("p", { className: "min-w-0 text-right font-mono text-[7px] tracking-[0.08em] text-textdim/70", children: "LIVE FEED - All leagues in progress" })
+    ] }) }),
     /* @__PURE__ */ (0, import_jsx_runtime160.jsxs)(
       "div",
       {
@@ -98406,10 +98406,10 @@ function HomeNewswireSurface({ stories }) {
     return () => observer.disconnect();
   }, [followActiveReveal, typingStoryId]);
   return /* @__PURE__ */ (0, import_jsx_runtime163.jsxs)("div", { className: "flex h-full min-h-0 min-w-0 flex-col bg-[#010303]", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime163.jsxs)("div", { className: "shrink-0 border-b border-[#24363c]/45 bg-[#020707]/90 px-2 py-1.5", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime163.jsx)("p", { className: "font-mono text-[8px] tracking-[0.14em] text-cyansys/80", children: "NEWSWIRE" }),
-      /* @__PURE__ */ (0, import_jsx_runtime163.jsx)("p", { className: "mt-0.5 font-mono text-[7px] tracking-[0.08em] text-textdim/70", children: "LATEST NEWS - All leagues" })
-    ] }),
+    /* @__PURE__ */ (0, import_jsx_runtime163.jsx)("div", { className: "shrink-0 border-b border-[#24363c]/45 bg-[#020707]/90 px-2 py-1.5", children: /* @__PURE__ */ (0, import_jsx_runtime163.jsxs)("div", { className: "flex min-w-0 items-center justify-between gap-2", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime163.jsx)("p", { className: "shrink-0 font-mono text-[8px] tracking-[0.14em] text-cyansys/80", children: "NEWSWIRE" }),
+      /* @__PURE__ */ (0, import_jsx_runtime163.jsx)("p", { className: "min-w-0 text-right font-mono text-[7px] tracking-[0.08em] text-textdim/70", children: "LATEST NEWS - All leagues" })
+    ] }) }),
     /* @__PURE__ */ (0, import_jsx_runtime163.jsx)(
       "div",
       {
