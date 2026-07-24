@@ -94401,7 +94401,10 @@ var init_operationsLeagueResourceLinks = __esm({
       ],
       TDF: [{ label: "Peacock", url: "https://www.peacocktv.com/sports/cycling" }],
       MLS: [{ label: "Apple", url: "https://tv.apple.com/us/channel/mls/tvs.sbd.7000" }],
-      NWSL: [{ label: "NWSL", url: "https://www.nwslsoccer.com/schedule" }],
+      NWSL: [
+        { label: "NWSL", url: "https://www.nwslsoccer.com/schedule" },
+        { label: "Victory+", url: "https://victoryplus.com/hub/NWSL?source=navigation_link" }
+      ],
       BRA1: [{ label: "Fanatiz", url: "https://watch.fanatiz.com/brasileirao" }],
       PLL: [
         {
@@ -94416,13 +94419,26 @@ var init_operationsLeagueResourceLinks = __esm({
           url: "https://www.espn.com/watch/schedule/_/type/upcoming/categoryId/119cfa41-71d4-39bf-a790-6273a52b0259"
         }
       ],
+      USLC: [
+        {
+          label: "ESPN",
+          url: "https://www.espn.com/watch/schedule/_/type/upcoming/categoryId/119cfa41-71d4-39bf-a790-6273a52b0259"
+        }
+      ],
       LIGAMX: [
         { label: "LSTV", url: "https://www.livesoccertv.com/competitions/mexico/primera-division/" },
         { label: "ViX", url: "https://vix.com/es-es/deportes" },
         { label: "YT TV", url: "https://tv.youtube.com/browse/UCXyaZYAYAU1MQx1N37IbqAA?btab=1" }
       ],
       AFL: [{ label: "FS2", url: "https://www.foxsports.com/live/fs2" }],
-      PGA: [{ label: "GOLF", url: "https://www.golfchannel.com/watch/live" }]
+      ARG1: [{ label: "Fanatiz", url: "https://watch.fanatiz.com/lpf" }],
+      PGA: [{ label: "GOLF", url: "https://www.golfchannel.com/watch/live" }],
+      NASCAR_TRUCK: [
+        {
+          label: "FOX",
+          url: "https://www.fox.com/sports/motorsports/nascar-craftsman-truck-series"
+        }
+      ]
     };
     OPERATIONS_LEAGUE_RESOURCE_LINKS_BY_SECTION_LABEL = {
       "Soccer ESPN": [
