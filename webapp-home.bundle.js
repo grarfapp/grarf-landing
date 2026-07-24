@@ -98485,15 +98485,18 @@ var init_HomeNewswirePane = __esm({
 
 // ../grarf/desktop/src/components/homeMvp/HomeLiveTrackerSplitPane.tsx
 function HomeLiveTrackerSplitPane() {
-  return /* @__PURE__ */ (0, import_jsx_runtime165.jsxs)("div", { className: "grid h-full min-h-0 min-w-0 grid-cols-[40%_60%] overflow-hidden", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime165.jsx)("div", { className: "min-h-0 min-w-0 overflow-hidden", children: /* @__PURE__ */ (0, import_jsx_runtime165.jsx)(HomeLiveTrackerFoundationPane, {}) }),
-    /* @__PURE__ */ (0, import_jsx_runtime165.jsx)("div", { className: "min-h-0 min-w-0 overflow-hidden", children: /* @__PURE__ */ (0, import_jsx_runtime165.jsx)(HomeNewswirePane, {}) })
+  return /* @__PURE__ */ (0, import_jsx_runtime165.jsxs)("div", { className: "grid h-full min-h-0 min-w-0 grid-cols-[minmax(0,40fr)_minmax(0,60fr)] gap-2 overflow-hidden p-2", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime165.jsx)("div", { className: cn2(PANE_CONTENT_CONTAIN, leagueHomePanelShellClass), children: /* @__PURE__ */ (0, import_jsx_runtime165.jsx)("div", { className: cn2(PANE_CONTENT_CONTAIN, "min-h-0 flex-1 overflow-hidden p-1.5"), children: /* @__PURE__ */ (0, import_jsx_runtime165.jsx)(HomeLiveTrackerFoundationPane, {}) }) }),
+    /* @__PURE__ */ (0, import_jsx_runtime165.jsx)("div", { className: cn2(PANE_CONTENT_CONTAIN, leagueHomePanelShellClass), children: /* @__PURE__ */ (0, import_jsx_runtime165.jsx)("div", { className: cn2(PANE_CONTENT_CONTAIN, "min-h-0 flex-1 overflow-hidden p-1.5"), children: /* @__PURE__ */ (0, import_jsx_runtime165.jsx)(HomeNewswirePane, {}) }) })
   ] });
 }
 var import_jsx_runtime165;
 var init_HomeLiveTrackerSplitPane = __esm({
   "../grarf/desktop/src/components/homeMvp/HomeLiveTrackerSplitPane.tsx"() {
     init_define_import_meta_env();
+    init_cn();
+    init_paneContainment();
+    init_LeagueHomePanel();
     init_HomeLiveTrackerFoundationPane();
     init_HomeNewswirePane();
     import_jsx_runtime165 = __toESM(require_jsx_runtime(), 1);
