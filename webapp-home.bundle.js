@@ -44382,9 +44382,21 @@ var init_liveTrackerFeedRegistry = __esm({
       },
       {
         league: "BRA1",
-        feedUrl: "https://rss.app/feeds/K3xmXidHsqWfoVj3.xml",
+        feedUrl: "https://rss.app/feeds/WsqAILI0XmBomTWX.xml",
         feedId: "live-tracker-bra1",
         label: "Brasileirao"
+      },
+      {
+        league: "SUDAMERICANA",
+        feedUrl: "https://rss.app/feeds/T385BF9vEoXXHkqL.xml",
+        feedId: "live-tracker-sudamericana",
+        label: "Copa Sudamericana"
+      },
+      {
+        league: "ARG1",
+        feedUrl: "https://rss.app/feeds/i5QmuX2IX3jivxen.xml",
+        feedId: "live-tracker-arg1",
+        label: "LPF"
       },
       {
         league: "MLS",
