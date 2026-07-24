@@ -44906,7 +44906,7 @@ var init_liveTrackerLeagueRetention = __esm({
     init_define_import_meta_env();
     init_isGameActivelyLive();
     LIVE_TRACKER_LEAGUE_RETENTION_MS = 2 * 60 * 60 * 1e3;
-    LIVE_TRACKER_RSS_INGESTION_POST_FINAL_MS = 60 * 60 * 1e3;
+    LIVE_TRACKER_RSS_INGESTION_POST_FINAL_MS = 45 * 60 * 1e3;
   }
 });
 
@@ -45546,11 +45546,9 @@ function readPersistedLiveTrackerPosts() {
   if (!isGrarfWebRenderer()) return [];
   const raw = readLiveTrackerPersistenceItem(LIVE_TRACKER_POSTS_STORAGE_KEY);
   if (!raw) return [];
-  const currentOperationalSportsDayKey = getOperationalSportsDayDateKey();
   try {
     const parsed = JSON.parse(raw);
-    if (parsed.operationalSportsDayKey !== currentOperationalSportsDayKey || !Array.isArray(parsed.posts)) {
-      removeLiveTrackerPersistenceItem(LIVE_TRACKER_POSTS_STORAGE_KEY);
+    if (!Array.isArray(parsed.posts)) {
       return [];
     }
     const posts = [];
@@ -46470,43 +46468,17 @@ var init_fetchActiveLiveTrackerPosts = __esm({
 });
 
 // ../grarf/desktop/src/lib/liveTracker/liveTrackerPostRetention.ts
-function isLiveTrackerPostWithinOperationalSportsDay(post, now = Date.now()) {
-  const timelineMs = resolveLiveTrackerPostTimelineMs(post);
-  if (timelineMs <= 0) return true;
-  return getOperationalSportsDayDateKey(new Date(timelineMs)) === getOperationalSportsDayDateKey(new Date(now));
+function pruneLiveTrackerPostsByFeedLength(posts, maxPosts = LIVE_TRACKER_FEED_MAX_POSTS) {
+  const sorted = sortLiveTrackerPostsNewestFirst(posts);
+  if (sorted.length <= maxPosts) return sorted;
+  return sorted.slice(0, maxPosts);
 }
-function isLiveTrackerPostWithinRetention(post, context2, now = Date.now()) {
-  if (isGrarfWebRenderer()) {
-    return isLiveTrackerPostWithinOperationalSportsDay(post, now);
-  }
-  if (post.kind !== "final_score") {
-    return true;
-  }
-  const timelineMs = resolveLiveTrackerPostTimelineMs(post);
-  if (timelineMs > 0 && now - timelineMs < LIVE_TRACKER_POST_RETENTION_MS) {
-    return true;
-  }
-  if (context2.liveIngestLeagueKeys.includes(post.league)) {
-    return true;
-  }
-  const completedAtMs = context2.completedAtMsByLeague[post.league];
-  if (completedAtMs == null || !Number.isFinite(completedAtMs) || completedAtMs <= 0) {
-    return false;
-  }
-  return now - completedAtMs < LIVE_TRACKER_POST_RETENTION_MS;
-}
-function pruneLiveTrackerPostsByRetention(posts, context2, now = Date.now()) {
-  return posts.filter((post) => isLiveTrackerPostWithinRetention(post, context2, now));
-}
-var LIVE_TRACKER_POST_RETENTION_MS;
+var LIVE_TRACKER_FEED_MAX_POSTS;
 var init_liveTrackerPostRetention = __esm({
   "../grarf/desktop/src/lib/liveTracker/liveTrackerPostRetention.ts"() {
     init_define_import_meta_env();
-    init_operationalSlateDate2();
-    init_isGrarfWebRenderer();
     init_sortLiveTrackerPosts();
-    init_liveTrackerLeagueRetention();
-    LIVE_TRACKER_POST_RETENTION_MS = LIVE_TRACKER_LEAGUE_RETENTION_MS;
+    LIVE_TRACKER_FEED_MAX_POSTS = 200;
   }
 });
 
@@ -46523,7 +46495,7 @@ function hydrateInitialLiveTrackerPosts() {
   if (!isGrarfWebRenderer()) return [];
   const persisted = readPersistedLiveTrackerPosts();
   if (persisted.length === 0) return [];
-  return pruneLiveTrackerPostsByRetention(persisted, buildPostRetentionContext());
+  return pruneLiveTrackerPostsByFeedLength(persisted);
 }
 function persistLiveTrackerPostsIfWeb(posts) {
   if (!isGrarfWebRenderer()) return;
@@ -46544,23 +46516,21 @@ function stampIncomingLiveTrackerPosts(incoming, previousByUrl, nowMs = Date.now
     return stampLiveTrackerPostTimeline(post, timelineAddedAtMs, existing);
   });
 }
-function mergeRetainedLiveTrackerPosts(incoming, previous, context2, nowMs = Date.now()) {
+function mergeRetainedLiveTrackerPosts(incoming, previous, _context, nowMs = Date.now()) {
   const previousByUrl = new Map(previous.map((post) => [post.url, post]));
   const merged = /* @__PURE__ */ new Map();
   for (const post of previous) {
-    if (!isLiveTrackerPostWithinRetention(post, context2, nowMs)) continue;
     merged.set(post.url, post);
   }
   for (const post of stampIncomingLiveTrackerPosts(incoming, previousByUrl, nowMs)) {
     merged.set(post.url, post);
   }
-  return sortLiveTrackerPostsNewestFirst([...merged.values()]);
+  return pruneLiveTrackerPostsByFeedLength(
+    sortLiveTrackerPostsNewestFirst([...merged.values()])
+  );
 }
 function resolveLiveIngestLeagueKeys(nowMs = Date.now()) {
   const leagues = mergeOperationalLeagueGames(useCanonicalLiveGameStore.getState().leagues);
-  if (!isGrarfWebRenderer()) {
-    return resolveCurrentlyLiveGamesSpineLeagueKeys(leagues);
-  }
   return resolveLiveTrackerRssIngestLeagueKeys(
     leagues,
     useLiveTrackerLeagueRetentionStore.getState().completedAtMsByLeague,
@@ -46601,9 +46571,9 @@ function appendLiveTrackerFinalScorePosts(posts) {
     posts.map((post) => post.gameId).filter((id) => Boolean(id?.trim()))
   );
 }
-function pruneLiveTrackerPostsIfNeeded(retentionContext) {
+function pruneLiveTrackerPostsIfNeeded() {
   useLiveTrackerPostsStore.setState((prev) => {
-    const posts = pruneLiveTrackerPostsByRetention(prev.posts, retentionContext);
+    const posts = pruneLiveTrackerPostsByFeedLength(prev.posts);
     if (posts.length === prev.posts.length) return prev;
     persistLiveTrackerPostsIfWeb(posts);
     return { ...prev, posts };
@@ -46660,7 +46630,7 @@ var init_liveTrackerPostsStore = __esm({
         appendLiveTrackerFinalScorePosts(pendingFinalScorePosts2);
       }
       const retentionContext = buildPostRetentionContext();
-      pruneLiveTrackerPostsIfNeeded(retentionContext);
+      pruneLiveTrackerPostsIfNeeded();
       const liveIngestLeagueKeys = retentionContext.liveIngestLeagueKeys;
       if (!leagueKeysChanged(liveIngestLeagueKeys, previousLiveIngestLeagueKeys)) return;
       previousLiveIngestLeagueKeys = liveIngestLeagueKeys;
@@ -46668,7 +46638,7 @@ var init_liveTrackerPostsStore = __esm({
     });
     useLiveTrackerLeagueRetentionStore.subscribe(() => {
       const retentionContext = buildPostRetentionContext();
-      pruneLiveTrackerPostsIfNeeded(retentionContext);
+      pruneLiveTrackerPostsIfNeeded();
       const liveIngestLeagueKeys = retentionContext.liveIngestLeagueKeys;
       if (!leagueKeysChanged(liveIngestLeagueKeys, previousLiveIngestLeagueKeys)) return;
       previousLiveIngestLeagueKeys = liveIngestLeagueKeys;
