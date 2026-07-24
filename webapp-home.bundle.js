@@ -34144,7 +34144,6 @@ var init_canonicalPermanentLeagueWorkspaces = __esm({
       "t20-womens-world-cup"
     ];
     CANONICAL_LEAGUE_WORKSPACE_BY_HEADLINES_LEAGUE_SUBMENU = {
-      soccer: "more-soccer",
       horse_racing: "horse-racing",
       cricket: "t20-womens-world-cup"
     };
