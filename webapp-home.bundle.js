@@ -74658,12 +74658,33 @@ var init_BestGameRightNowSection = __esm({
 });
 
 // ../grarf/desktop/src/lib/gamesSpine/gamesSpineStickyLayout.ts
-var HOME_GAMES_SPINE_LEAGUE_STICKY_TOP, HOME_GAMES_SPINE_FIRST_LEAGUE_STICKY_TOP, HOME_GAMES_SPINE_LEAGUE_STICKY_Z;
+function resolveHomeGamesSpineLeagueStickyTop({
+  parentScrolls,
+  briefingScrollContext = "home",
+  isFirstLeagueInSpine = false,
+  compactFirstLeagueStickyTop = false,
+  showEditorialControls = false
+}) {
+  if (!parentScrolls) return "top-0";
+  if (briefingScrollContext === "league") return "top-[3.25rem]";
+  if (isGrarfWebRenderer()) {
+    if (showEditorialControls) return HOME_GAMES_SPINE_LEAGUE_STICKY_TOP_WEB_WITH_EDITORIAL;
+    if (isFirstLeagueInSpine && compactFirstLeagueStickyTop) {
+      return HOME_GAMES_SPINE_FIRST_LEAGUE_STICKY_TOP;
+    }
+    return HOME_GAMES_SPINE_WEB_STICKY_CHROME_TOP;
+  }
+  return HOME_GAMES_SPINE_LEAGUE_STICKY_TOP;
+}
+var HOME_GAMES_SPINE_WEB_STICKY_CHROME_TOP, HOME_GAMES_SPINE_FIRST_LEAGUE_STICKY_TOP, HOME_GAMES_SPINE_LEAGUE_STICKY_TOP_WEB_WITH_EDITORIAL, HOME_GAMES_SPINE_LEAGUE_STICKY_TOP, HOME_GAMES_SPINE_LEAGUE_STICKY_Z;
 var init_gamesSpineStickyLayout = __esm({
   "../grarf/desktop/src/lib/gamesSpine/gamesSpineStickyLayout.ts"() {
     init_define_import_meta_env();
+    init_isGrarfWebRenderer();
+    HOME_GAMES_SPINE_WEB_STICKY_CHROME_TOP = "top-[3.5rem]";
+    HOME_GAMES_SPINE_FIRST_LEAGUE_STICKY_TOP = HOME_GAMES_SPINE_WEB_STICKY_CHROME_TOP;
+    HOME_GAMES_SPINE_LEAGUE_STICKY_TOP_WEB_WITH_EDITORIAL = "top-[5rem]";
     HOME_GAMES_SPINE_LEAGUE_STICKY_TOP = "top-[3.75rem]";
-    HOME_GAMES_SPINE_FIRST_LEAGUE_STICKY_TOP = "top-[2.25rem]";
     HOME_GAMES_SPINE_LEAGUE_STICKY_Z = "z-[11]";
   }
 });
@@ -75140,7 +75161,8 @@ var init_HomeLeagueSpineSection = __esm({
       bestGameRightNow = null,
       bestGameFeaturedInFeaturedSection = false,
       isFirstLeagueInSpine = false,
-      compactFirstLeagueStickyTop = false
+      compactFirstLeagueStickyTop = false,
+      showEditorialControls = false
     }) {
       if (isGamesSpineLeagueTemporarilyHidden(league2)) return null;
       const liveLeagues = useLiveGamesStore((s2) => s2.leagues);
@@ -75332,7 +75354,13 @@ var init_HomeLeagueSpineSection = __esm({
       if (visibleGames.length === 0 && !isWebOperationalLoading) return null;
       const hideSpineGeneratedSummaryHeadline = briefingScrollContext === "league" && operationalMode === "CATCH_UP";
       const isWebSpine = isGrarfWebRenderer();
-      const stickyTop = parentScrolls ? briefingScrollContext === "league" ? "top-[3.25rem]" : isFirstLeagueInSpine && isWebSpine && compactFirstLeagueStickyTop ? HOME_GAMES_SPINE_FIRST_LEAGUE_STICKY_TOP : HOME_GAMES_SPINE_LEAGUE_STICKY_TOP : "top-0";
+      const stickyTop = resolveHomeGamesSpineLeagueStickyTop({
+        parentScrolls,
+        briefingScrollContext,
+        isFirstLeagueInSpine,
+        compactFirstLeagueStickyTop,
+        showEditorialControls
+      });
       const showSummaryInHeader = !isWebSpine;
       const showContextStrip = !collapsed && (Boolean(contextStrip?.label) || editMode || isWebSpine && Boolean(summary.summaryLine));
       const showCollapsedBestGameHeader = !isWebSpine && shouldApplyCollapsedBestGameLeagueHeaderStyle(
@@ -75669,6 +75697,7 @@ var init_HomeFeaturedSpineSection = __esm({
       collapsed,
       onToggleCollapse,
       parentScrolls,
+      showEditorialControls = false,
       selectedId = null,
       onOpen,
       onWatchLive,
@@ -75750,7 +75779,10 @@ var init_HomeFeaturedSpineSection = __esm({
         return gamesForLiveIndicator.some(isGameActivelyLive);
       }, [displayGames, highlightedVisibleGames]);
       if (highlightedVisibleGames.length === 0) return null;
-      const stickyTop = parentScrolls ? HOME_GAMES_SPINE_LEAGUE_STICKY_TOP : "top-0";
+      const stickyTop = resolveHomeGamesSpineLeagueStickyTop({
+        parentScrolls,
+        showEditorialControls
+      });
       const showCollapsedBestGameHeader = isGrarfWebRenderer() && shouldApplyCollapsedBestGameFeaturedHeaderStyle(bestGameRightNowFeatured, collapsed);
       return /* @__PURE__ */ (0, import_jsx_runtime90.jsxs)(
         "section",
@@ -75895,10 +75927,14 @@ var init_HomeFeaturedSpineSection = __esm({
 function GamesSpinePermanentLeagueHeader({
   label,
   parentScrolls = false,
+  showEditorialControls = false,
   onClick,
   showLiveIndicator = false
 }) {
-  const stickyTop = parentScrolls ? HOME_GAMES_SPINE_LEAGUE_STICKY_TOP : "top-0";
+  const stickyTop = resolveHomeGamesSpineLeagueStickyTop({
+    parentScrolls,
+    showEditorialControls
+  });
   return /* @__PURE__ */ (0, import_jsx_runtime91.jsx)("section", { className: "min-w-0 w-full max-w-full", "aria-label": label, children: /* @__PURE__ */ (0, import_jsx_runtime91.jsx)(
     "header",
     {
@@ -75968,7 +76004,8 @@ var init_moreLeagues = __esm({
 function MoreLeaguesWaitlistCard({
   collapsed,
   onToggleCollapse,
-  parentScrolls = false
+  parentScrolls = false,
+  showEditorialControls = false
 }) {
   const [email, setEmail] = (0, import_react110.useState)("");
   const [status, setStatus] = (0, import_react110.useState)("idle");
@@ -75994,7 +76031,10 @@ function MoreLeaguesWaitlistCard({
     },
     [email, status]
   );
-  const stickyTop = parentScrolls ? HOME_GAMES_SPINE_LEAGUE_STICKY_TOP : "top-0";
+  const stickyTop = resolveHomeGamesSpineLeagueStickyTop({
+    parentScrolls,
+    showEditorialControls
+  });
   return /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("section", { className: "min-w-0 w-full max-w-full", "aria-label": "More leagues waitlist", children: [
     /* @__PURE__ */ (0, import_jsx_runtime92.jsx)(
       "header",
@@ -77281,7 +77321,8 @@ var init_HomeManualGamesSpineSection = __esm({
       bestGameRightNow = null,
       bestGameFeaturedInFeaturedSection = false,
       isFirstLeagueInSpine = false,
-      compactFirstLeagueStickyTop = false
+      compactFirstLeagueStickyTop = false,
+      showEditorialControls = false
     }) {
       const selectedDate = useCommandBriefingStore((state3) => state3.selectedDate);
       const manualRefreshMs = useManualGamesSpineLiveRefreshMs();
@@ -77329,7 +77370,12 @@ var init_HomeManualGamesSpineSection = __esm({
       ]);
       if (visibleGames.length === 0) return null;
       const isWebSpine = isGrarfWebRenderer();
-      const stickyTop = parentScrolls ? isFirstLeagueInSpine && isWebSpine && compactFirstLeagueStickyTop ? HOME_GAMES_SPINE_FIRST_LEAGUE_STICKY_TOP : HOME_GAMES_SPINE_LEAGUE_STICKY_TOP : "top-0";
+      const stickyTop = resolveHomeGamesSpineLeagueStickyTop({
+        parentScrolls,
+        isFirstLeagueInSpine,
+        compactFirstLeagueStickyTop,
+        showEditorialControls
+      });
       const showCollapsedBestGameHeader = !isWebSpine && shouldApplyCollapsedBestGameLeagueHeaderStyle(
         bestGameRightNow,
         collapsed,
@@ -78192,6 +78238,7 @@ function HomeGamesToday({
       {
         label: entry2.label,
         parentScrolls,
+        showEditorialControls,
         showLiveIndicator: entry2.teamKey === "horse-racing",
         onClick: () => onPermanentLeagueWorkspaceOpen(entry2.teamKey)
       },
@@ -78202,7 +78249,8 @@ function HomeGamesToday({
       {
         collapsed: isCollapsed(GAMES_SPINE_MORE_LEAGUES_COLLAPSE_KEY),
         onToggleCollapse: () => toggleCollapsed(GAMES_SPINE_MORE_LEAGUES_COLLAPSE_KEY),
-        parentScrolls
+        parentScrolls,
+        showEditorialControls
       }
     )
   ] }) : null;
@@ -78239,6 +78287,7 @@ function HomeGamesToday({
           collapsed: isCollapsed(GAMES_SPINE_FEATURED_COLLAPSE_KEY),
           onToggleCollapse: () => toggleCollapsed(GAMES_SPINE_FEATURED_COLLAPSE_KEY),
           parentScrolls,
+          showEditorialControls,
           selectedId,
           onOpen,
           onWatchLive,
@@ -78256,6 +78305,7 @@ function HomeGamesToday({
             collapsed: isCollapsed(section.leagueKey),
             onToggleCollapse: () => toggleCollapsed(section.leagueKey),
             parentScrolls,
+            showEditorialControls,
             selectedId,
             onOpen,
             onWatchLive,
@@ -78275,6 +78325,7 @@ function HomeGamesToday({
             collapsed: isCollapsed(gamesSpineManualCollapseKey(section.slug)),
             onToggleCollapse: () => toggleCollapsed(gamesSpineManualCollapseKey(section.slug)),
             parentScrolls,
+            showEditorialControls,
             selectedId,
             onOpen,
             onWatchLive,
