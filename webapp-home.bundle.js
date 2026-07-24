@@ -23157,13 +23157,13 @@ var init_leaguePriorityAliases = __esm({
   }
 });
 
-// ../grarf/desktop/src/lib/leaguePriority/leaguePrioritySeed.ts
+// ../grarf/desktop/src/lib/leaguePriority/leaguePrioritySeed.data.js
 function getLeaguePrioritySeedOrder() {
   return LEAGUE_PRIORITY_SEED_ORDER;
 }
 var LEAGUE_PRIORITY_SEED_ORDER;
-var init_leaguePrioritySeed = __esm({
-  "../grarf/desktop/src/lib/leaguePriority/leaguePrioritySeed.ts"() {
+var init_leaguePrioritySeed_data = __esm({
+  "../grarf/desktop/src/lib/leaguePriority/leaguePrioritySeed.data.js"() {
     init_define_import_meta_env();
     LEAGUE_PRIORITY_SEED_ORDER = [
       "WORLDCUP",
@@ -23174,6 +23174,7 @@ var init_leaguePrioritySeed = __esm({
       "TDF",
       "NBASUMMER",
       "WNBA",
+      "PGA",
       "ATP",
       "WTA",
       "WWC",
@@ -23190,7 +23191,6 @@ var init_leaguePrioritySeed = __esm({
       "SERIEA",
       "LIGUE1",
       "UEL",
-      "PGA",
       "LPGA",
       "INDYCAR",
       "NASCAR",
@@ -23216,6 +23216,17 @@ var init_leaguePrioritySeed = __esm({
   }
 });
 
+// ../grarf/desktop/src/lib/leaguePriority/leaguePrioritySeed.ts
+function getLeaguePrioritySeedOrder2() {
+  return getLeaguePrioritySeedOrder();
+}
+var init_leaguePrioritySeed = __esm({
+  "../grarf/desktop/src/lib/leaguePriority/leaguePrioritySeed.ts"() {
+    init_define_import_meta_env();
+    init_leaguePrioritySeed_data();
+  }
+});
+
 // ../grarf/desktop/src/lib/leaguePriority/leaguePriorityService.ts
 function normalizeLeagueLabel(value) {
   return value.trim().toUpperCase().replace(/['']/g, "'");
@@ -23230,7 +23241,7 @@ function resolveManualEditorialLeagueImportanceScore(raw) {
   return anchorScore > 0 ? anchorScore - 0.5 : null;
 }
 function getLeaguePriorityOrder() {
-  return getLeaguePrioritySeedOrder();
+  return getLeaguePrioritySeedOrder2();
 }
 function resolveCanonicalLeagueImportanceKey(raw) {
   if (!raw) return null;
@@ -23262,7 +23273,7 @@ var init_leaguePriorityService = __esm({
     init_define_import_meta_env();
     init_leaguePriorityAliases();
     init_leaguePrioritySeed();
-    scoreByLeagueKey = buildScoreByLeagueKey(getLeaguePrioritySeedOrder());
+    scoreByLeagueKey = buildScoreByLeagueKey(getLeaguePrioritySeedOrder2());
   }
 });
 
@@ -33552,6 +33563,7 @@ var init_homeWebHeadlinesSoccerSources = __esm({
   "../grarf/desktop/src/data/homeWebHeadlinesSoccerSources.ts"() {
     init_define_import_meta_env();
     WEB_HEADLINES_SOCCER_SOURCES = [
+      { id: "fotmob_news", label: "FotMob", url: "https://www.fotmob.com/news" },
       { id: "soccerway_news", label: "Soccerway.com", url: "https://www.soccerway.com/news/" },
       { id: "football365", label: "Football365.com", url: "https://www.football365.com/" },
       {

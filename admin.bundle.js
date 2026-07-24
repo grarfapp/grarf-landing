@@ -13865,6 +13865,9 @@ var LEAGUE_PRIORITY_MANUAL_AFTER = {
 
 // ../grarf/desktop/src/lib/leaguePriority/leaguePrioritySeed.ts
 init_define_import_meta_env();
+
+// ../grarf/desktop/src/lib/leaguePriority/leaguePrioritySeed.data.js
+init_define_import_meta_env();
 var LEAGUE_PRIORITY_SEED_ORDER = [
   "WORLDCUP",
   "WIMBLEDON_MEN",
@@ -13874,6 +13877,7 @@ var LEAGUE_PRIORITY_SEED_ORDER = [
   "TDF",
   "NBASUMMER",
   "WNBA",
+  "PGA",
   "ATP",
   "WTA",
   "WWC",
@@ -13890,7 +13894,6 @@ var LEAGUE_PRIORITY_SEED_ORDER = [
   "SERIEA",
   "LIGUE1",
   "UEL",
-  "PGA",
   "LPGA",
   "INDYCAR",
   "NASCAR",
@@ -13917,6 +13920,11 @@ function getLeaguePrioritySeedOrder() {
   return LEAGUE_PRIORITY_SEED_ORDER;
 }
 
+// ../grarf/desktop/src/lib/leaguePriority/leaguePrioritySeed.ts
+function getLeaguePrioritySeedOrder2() {
+  return getLeaguePrioritySeedOrder();
+}
+
 // ../grarf/desktop/src/lib/leaguePriority/leaguePriorityService.ts
 function normalizeLeagueLabel(value) {
   return value.trim().toUpperCase().replace(/['']/g, "'");
@@ -13924,7 +13932,7 @@ function normalizeLeagueLabel(value) {
 function buildScoreByLeagueKey(order) {
   return new Map(order.map((key, index) => [key, order.length - index]));
 }
-var scoreByLeagueKey = buildScoreByLeagueKey(getLeaguePrioritySeedOrder());
+var scoreByLeagueKey = buildScoreByLeagueKey(getLeaguePrioritySeedOrder2());
 function resolveManualEditorialLeagueImportanceScore(raw) {
   const anchor = LEAGUE_PRIORITY_MANUAL_AFTER[normalizeLeagueLabel(raw)];
   if (!anchor) return null;
@@ -13932,7 +13940,7 @@ function resolveManualEditorialLeagueImportanceScore(raw) {
   return anchorScore > 0 ? anchorScore - 0.5 : null;
 }
 function getLeaguePriorityOrder() {
-  return getLeaguePrioritySeedOrder();
+  return getLeaguePrioritySeedOrder2();
 }
 function resolveCanonicalLeagueImportanceKey(raw) {
   if (!raw) return null;
