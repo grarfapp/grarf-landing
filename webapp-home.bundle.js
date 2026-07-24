@@ -33558,7 +33558,73 @@ var init_homeWebHeadlinesRugbySources = __esm({
   }
 });
 
+// ../grarf/desktop/src/types/homeLiveSoccerCompetitionSubmenu.ts
+function isHomeLiveSoccerCompetitionSubmenuId(id) {
+  return HOME_LIVE_SOCCER_COMPETITION_SUBMENU_IDS.has(id);
+}
+var HOME_LIVE_SOCCER_COMPETITION_SUBMENU_ITEMS, HOME_LIVE_SOCCER_COMPETITION_SUBMENU_IDS;
+var init_homeLiveSoccerCompetitionSubmenu = __esm({
+  "../grarf/desktop/src/types/homeLiveSoccerCompetitionSubmenu.ts"() {
+    init_define_import_meta_env();
+    HOME_LIVE_SOCCER_COMPETITION_SUBMENU_ITEMS = [
+      { id: "epl", label: "EPL" },
+      { id: "ucl", label: "UCL" },
+      { id: "mls", label: "MLS" },
+      { id: "nwsl", label: "NWSL" },
+      { id: "laliga", label: "LALIGA" },
+      { id: "bundesliga", label: "BUNDESLIGA" },
+      { id: "serie_a", label: "SERIE A" },
+      { id: "ligue_1", label: "LIGUE 1" },
+      { id: "liga_mx", label: "LIGA MX" },
+      { id: "europa_league", label: "EUROPA LEAGUE" },
+      { id: "conference_league", label: "CONFERENCE LEAGUE" },
+      { id: "championship", label: "CHAMPIONSHIP" }
+    ];
+    HOME_LIVE_SOCCER_COMPETITION_SUBMENU_IDS = new Set(
+      HOME_LIVE_SOCCER_COMPETITION_SUBMENU_ITEMS.map((item) => item.id)
+    );
+  }
+});
+
 // ../grarf/desktop/src/data/homeWebHeadlinesSoccerSources.ts
+function buildSoccerTransfersLeagueShortcutSourceId(competitionId) {
+  return `${SOCCER_TRANSFERS_LEAGUE_SHORTCUT_SOURCE_ID_PREFIX}${competitionId}`;
+}
+function resolveWebHeadlinesSoccerWideTransfersSources() {
+  const leagueShortcuts = HOME_LIVE_SOCCER_COMPETITION_SUBMENU_ITEMS.flatMap((item) => {
+    if (!isHomeLiveSoccerCompetitionSubmenuId(item.id)) return [];
+    const transfersUrl = FOTMOB_SOCCER_LEAGUE_TRANSFERS_URL_BY_COMPETITION[item.id];
+    if (!transfersUrl) return [];
+    return [
+      {
+        id: buildSoccerTransfersLeagueShortcutSourceId(item.id),
+        label: item.label,
+        url: transfersUrl,
+        submenuVisualTier: "leagueShortcut"
+      }
+    ];
+  });
+  return [...WEB_HEADLINES_SOCCER_TRANSFERS_SOURCES, ...leagueShortcuts];
+}
+function buildSoccerStatsLeagueShortcutSourceId(competitionId) {
+  return `${SOCCER_STATS_LEAGUE_SHORTCUT_SOURCE_ID_PREFIX}${competitionId}`;
+}
+function resolveWebHeadlinesSoccerWideStatsSources() {
+  const leagueShortcuts = HOME_LIVE_SOCCER_COMPETITION_SUBMENU_ITEMS.flatMap((item) => {
+    if (!isHomeLiveSoccerCompetitionSubmenuId(item.id)) return [];
+    const statsUrl = SOCCERSTATS_SOCCER_LEAGUE_STATS_URL_BY_COMPETITION[item.id];
+    if (!statsUrl) return [];
+    return [
+      {
+        id: buildSoccerStatsLeagueShortcutSourceId(item.id),
+        label: item.label,
+        url: statsUrl,
+        submenuVisualTier: "leagueShortcut"
+      }
+    ];
+  });
+  return [...WEB_HEADLINES_SOCCER_STATS_SOURCES, ...leagueShortcuts];
+}
 function resolveWebHeadlinesSoccerNewsSources(liveSoccerCompetitionSubmenuId) {
   const fotmobNewsUrl = liveSoccerCompetitionSubmenuId != null ? FOTMOB_SOCCER_LEAGUE_NEWS_URL_BY_COMPETITION[liveSoccerCompetitionSubmenuId] : WEB_HEADLINES_SOCCER_SOURCES[0].url;
   return WEB_HEADLINES_SOCCER_SOURCES.filter((source) => {
@@ -33605,10 +33671,12 @@ function resolveWebHeadlinesSoccerTransfersSources(liveSoccerCompetitionSubmenuI
 function isHomeLiveSoccerCompetitionTransfersSupported(competitionId) {
   return competitionId != null && FOTMOB_SOCCER_LEAGUE_TRANSFERS_URL_BY_COMPETITION[competitionId] != null;
 }
-var FOTMOB_SOCCER_LEAGUE_NEWS_URL_BY_COMPETITION, FOTMOB_SOCCER_LEAGUE_TRANSFERS_URL_BY_COMPETITION, FOOTBALL365_SOCCER_LEAGUE_NEWS_URL_BY_COMPETITION, SOCCERWAY_SOCCER_LEAGUE_NEWS_URL_BY_COMPETITION, SOCCERSTATS_SOCCER_LEAGUE_STATS_URL_BY_COMPETITION, WEB_HEADLINES_SOCCER_SOURCES, WEB_HEADLINES_SOCCER_TRANSFERS_SOURCES, WEB_HEADLINES_SOCCER_STATS_SOURCES, WEB_HEADLINES_SOCCER_SCHEDULE_SOURCES;
+var FOTMOB_SOCCER_LEAGUE_NEWS_URL_BY_COMPETITION, FOTMOB_SOCCER_LEAGUE_TRANSFERS_URL_BY_COMPETITION, FOOTBALL365_SOCCER_LEAGUE_NEWS_URL_BY_COMPETITION, SOCCERWAY_SOCCER_LEAGUE_NEWS_URL_BY_COMPETITION, SOCCERSTATS_SOCCER_LEAGUE_STATS_URL_BY_COMPETITION, WEB_HEADLINES_SOCCER_SOURCES, WEB_HEADLINES_SOCCER_TRANSFERS_SOURCES, WEB_HEADLINES_SOCCER_STATS_SOURCES, WEB_HEADLINES_SOCCER_SCHEDULE_SOURCES, SOCCER_TRANSFERS_LEAGUE_SHORTCUT_SOURCE_ID_PREFIX, SOCCER_STATS_LEAGUE_SHORTCUT_SOURCE_ID_PREFIX;
 var init_homeWebHeadlinesSoccerSources = __esm({
   "../grarf/desktop/src/data/homeWebHeadlinesSoccerSources.ts"() {
     init_define_import_meta_env();
+    init_homeLiveSoccerCompetitionSubmenu();
+    init_homeLiveSoccerCompetitionSubmenu();
     FOTMOB_SOCCER_LEAGUE_NEWS_URL_BY_COMPETITION = {
       epl: "https://www.fotmob.com/leagues/47/news/premier-league",
       ucl: "https://www.fotmob.com/leagues/42/news/champions-league",
@@ -33686,6 +33754,8 @@ var init_homeWebHeadlinesSoccerSources = __esm({
     WEB_HEADLINES_SOCCER_SCHEDULE_SOURCES = [
       { id: "aiscore", label: "AiScore.com", url: "https://www.aiscore.com/" }
     ];
+    SOCCER_TRANSFERS_LEAGUE_SHORTCUT_SOURCE_ID_PREFIX = "soccer_transfers_league_";
+    SOCCER_STATS_LEAGUE_SHORTCUT_SOURCE_ID_PREFIX = "soccer_stats_league_";
   }
 });
 
@@ -34299,13 +34369,16 @@ function resolveWebHeadlinesSoccerPaneSources(liveSoccerCompetitionSubmenuId, li
   switch (liveSoccerSubmenuId) {
     case "transfers":
       if (liveSoccerCompetitionSubmenuId == null) {
-        return WEB_HEADLINES_SOCCER_TRANSFERS_SOURCES;
+        return resolveWebHeadlinesSoccerWideTransfersSources();
       }
       if (!isHomeLiveSoccerCompetitionTransfersSupported(liveSoccerCompetitionSubmenuId)) {
         return resolveWebHeadlinesSoccerNewsSources(liveSoccerCompetitionSubmenuId);
       }
       return resolveWebHeadlinesSoccerTransfersSources(liveSoccerCompetitionSubmenuId);
     case "stats":
+      if (liveSoccerCompetitionSubmenuId == null) {
+        return resolveWebHeadlinesSoccerWideStatsSources();
+      }
       return resolveWebHeadlinesSoccerStatsSources(liveSoccerCompetitionSubmenuId);
     case "schedule":
       return WEB_HEADLINES_SOCCER_SCHEDULE_SOURCES;
@@ -68137,10 +68210,23 @@ var init_useHomeHeadlinesWebsiteSubmenuEntryDefaults = __esm({
 
 // ../grarf/desktop/src/lib/home/buildHeadlinesWebsiteSubmenuItems.ts
 function buildHeadlinesWebsiteSubmenuItems(sources, browserWorkspacePlaceholder) {
-  const items = sources.map((source) => ({
-    id: source.id,
-    label: formatWebsitePaneHeaderLabel(source.label, source.url)
-  }));
+  const items = [];
+  let insertedLeagueTransfersSeparator = false;
+  for (const source of sources) {
+    if (!insertedLeagueTransfersSeparator && source.submenuVisualTier === "leagueShortcut") {
+      items.push({
+        id: "soccer_transfers_league_separator",
+        label: "",
+        isSubmenuSeparator: true
+      });
+      insertedLeagueTransfersSeparator = true;
+    }
+    items.push({
+      id: source.id,
+      label: source.submenuVisualTier === "leagueShortcut" ? source.label : formatWebsitePaneHeaderLabel(source.label, source.url),
+      submenuVisualTier: source.submenuVisualTier
+    });
+  }
   if (browserWorkspacePlaceholder) {
     items.push({
       id: browserWorkspacePlaceholder.id,
@@ -68240,31 +68326,45 @@ function HomeHeadlinesWebsiteSubmenu({
     {
       className: HOME_LEAGUE_SUBNAV_ROW_SCROLL_CLASS,
       "aria-label": ariaLabel ?? (liveSubmenuId === "fantasy" ? "Fantasy websites" : liveSubmenuId === "betting" ? "Betting websites" : "Headlines websites"),
-      children: items.map((item) => /* @__PURE__ */ (0, import_jsx_runtime49.jsx)(
-        "button",
-        {
-          type: "button",
-          onClick: () => {
-            const source = sources?.find((entry2) => entry2.id === item.id);
-            if (source?.openInNewBrowserTab && source.url.trim()) {
-              window.open(source.url.trim(), "_blank", "noopener,noreferrer");
-              return;
-            }
-            selectWebsite(buildHeadlinesWebsitePaneSessionKey(item.id), item.id);
+      children: items.map((item) => {
+        if (item.isSubmenuSeparator) {
+          return /* @__PURE__ */ (0, import_jsx_runtime49.jsx)(
+            "span",
+            {
+              role: "separator",
+              "aria-orientation": "vertical",
+              className: "mx-1 inline-block h-4 w-px shrink-0 self-center bg-line/80"
+            },
+            item.id
+          );
+        }
+        const isLeagueShortcut = item.submenuVisualTier === "leagueShortcut";
+        return /* @__PURE__ */ (0, import_jsx_runtime49.jsx)(
+          "button",
+          {
+            type: "button",
+            onClick: () => {
+              const source = sources?.find((entry2) => entry2.id === item.id);
+              if (source?.openInNewBrowserTab && source.url.trim()) {
+                window.open(source.url.trim(), "_blank", "noopener,noreferrer");
+                return;
+              }
+              selectWebsite(buildHeadlinesWebsitePaneSessionKey(item.id), item.id);
+            },
+            className: cn2(
+              HOME_SUBNAV_BUTTON_CLASS,
+              item.id === activeSourceId && (isLeagueWorkspaceNav && isGrarfWebRenderer() ? HOME_LEAGUE_WORKSPACE_NAV_BUTTON_ACTIVE_CLASS : isLeagueShortcut ? "border-greensys/20 bg-greensys/[0.04] text-greensys/85" : "border-greensys/35 bg-greensys/[0.08] text-greensys"),
+              item.id !== activeSourceId && (isLeagueWorkspaceNav && isGrarfWebRenderer() ? HOME_LEAGUE_WORKSPACE_NAV_BUTTON_INACTIVE_CLASS : isLeagueShortcut ? "border-transparent text-[#6f8383] hover:border-line/60 hover:bg-white/[0.02] hover:text-[#8a9e9e]" : "border-transparent text-[#8a9e9e] hover:border-line/80 hover:bg-white/[0.03] hover:text-white"),
+              item.showGatedLock && isGrarfWebRenderer() && item.id !== activeSourceId && "opacity-[0.30] hover:opacity-100"
+            ),
+            children: /* @__PURE__ */ (0, import_jsx_runtime49.jsxs)("span", { className: "inline-flex items-center gap-1", children: [
+              item.label,
+              item.showGatedLock ? /* @__PURE__ */ (0, import_jsx_runtime49.jsx)(GatedFeatureLockIcon, { size: 11, className: "text-cyansys/80" }) : null
+            ] })
           },
-          className: cn2(
-            HOME_SUBNAV_BUTTON_CLASS,
-            item.id === activeSourceId && (isLeagueWorkspaceNav && isGrarfWebRenderer() ? HOME_LEAGUE_WORKSPACE_NAV_BUTTON_ACTIVE_CLASS : "border-greensys/35 bg-greensys/[0.08] text-greensys"),
-            item.id !== activeSourceId && (isLeagueWorkspaceNav && isGrarfWebRenderer() ? HOME_LEAGUE_WORKSPACE_NAV_BUTTON_INACTIVE_CLASS : "border-transparent text-[#8a9e9e] hover:border-line/80 hover:bg-white/[0.03] hover:text-white"),
-            item.showGatedLock && isGrarfWebRenderer() && item.id !== activeSourceId && "opacity-[0.30] hover:opacity-100"
-          ),
-          children: /* @__PURE__ */ (0, import_jsx_runtime49.jsxs)("span", { className: "inline-flex items-center gap-1", children: [
-            item.label,
-            item.showGatedLock ? /* @__PURE__ */ (0, import_jsx_runtime49.jsx)(GatedFeatureLockIcon, { size: 11, className: "text-cyansys/80" }) : null
-          ] })
-        },
-        item.id
-      ))
+          item.id
+        );
+      })
     }
   );
 }
@@ -69391,34 +69491,6 @@ var init_homeLiveMotorsportsSubmenu = __esm({
     ];
     HOME_LIVE_MOTORSPORTS_SUBMENU_IDS = new Set(
       HOME_LIVE_MOTORSPORTS_SUBMENU_ITEMS.map((item) => item.id)
-    );
-  }
-});
-
-// ../grarf/desktop/src/types/homeLiveSoccerCompetitionSubmenu.ts
-function isHomeLiveSoccerCompetitionSubmenuId(id) {
-  return HOME_LIVE_SOCCER_COMPETITION_SUBMENU_IDS.has(id);
-}
-var HOME_LIVE_SOCCER_COMPETITION_SUBMENU_ITEMS, HOME_LIVE_SOCCER_COMPETITION_SUBMENU_IDS;
-var init_homeLiveSoccerCompetitionSubmenu = __esm({
-  "../grarf/desktop/src/types/homeLiveSoccerCompetitionSubmenu.ts"() {
-    init_define_import_meta_env();
-    HOME_LIVE_SOCCER_COMPETITION_SUBMENU_ITEMS = [
-      { id: "epl", label: "EPL" },
-      { id: "ucl", label: "UCL" },
-      { id: "mls", label: "MLS" },
-      { id: "nwsl", label: "NWSL" },
-      { id: "laliga", label: "LALIGA" },
-      { id: "bundesliga", label: "BUNDESLIGA" },
-      { id: "serie_a", label: "SERIE A" },
-      { id: "ligue_1", label: "LIGUE 1" },
-      { id: "liga_mx", label: "LIGA MX" },
-      { id: "europa_league", label: "EUROPA LEAGUE" },
-      { id: "conference_league", label: "CONFERENCE LEAGUE" },
-      { id: "championship", label: "CHAMPIONSHIP" }
-    ];
-    HOME_LIVE_SOCCER_COMPETITION_SUBMENU_IDS = new Set(
-      HOME_LIVE_SOCCER_COMPETITION_SUBMENU_ITEMS.map((item) => item.id)
     );
   }
 });
