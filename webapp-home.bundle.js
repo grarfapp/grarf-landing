@@ -71133,7 +71133,7 @@ var init_adminFeaturedPriorityStore = __esm({
 });
 
 // ../grarf/desktop/src/components/adminMode/AdminFeaturedPriorityField.tsx
-function AdminFeaturedPriorityField({ game }) {
+function AdminFeaturedPriorityField({ game, operationsPanel = false }) {
   const { editableProps, triggerEdit, isAdminMode } = useAdminEditable(
     "games-spine",
     "featured-priority",
@@ -71168,7 +71168,16 @@ function AdminFeaturedPriorityField({ game }) {
       ...editableProps,
       className: "mt-1 flex items-center gap-1.5 border-t border-[#1f3530]/60 pt-1",
       children: [
-        /* @__PURE__ */ (0, import_jsx_runtime69.jsx)("span", { className: "shrink-0 font-mono text-[7px] tracking-[0.22em] text-[#3a6b5e]", children: "FP" }),
+        /* @__PURE__ */ (0, import_jsx_runtime69.jsx)(
+          "span",
+          {
+            className: cn2(
+              "shrink-0 font-mono tracking-[0.22em] text-[#3a6b5e]",
+              operationsPanel ? "text-[10px]" : "text-[7px]"
+            ),
+            children: "FP"
+          }
+        ),
         /* @__PURE__ */ (0, import_jsx_runtime69.jsx)(
           "input",
           {
@@ -71180,7 +71189,8 @@ function AdminFeaturedPriorityField({ game }) {
             placeholder: "\u2014",
             "aria-label": `Featured Priority for ${game.awayTeam} at ${game.homeTeam}`,
             className: cn2(
-              "w-7 border bg-transparent px-0.5 py-px text-center font-mono text-[9px] leading-none",
+              "border bg-transparent px-0.5 py-px text-center font-mono leading-none",
+              operationsPanel ? "w-8 text-[12px]" : "w-7 text-[9px]",
               "focus:outline-none focus:ring-0",
               "placeholder:text-[#3a5e58] [appearance:textfield]",
               "[&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none",
@@ -71191,7 +71201,25 @@ function AdminFeaturedPriorityField({ game }) {
             onKeyDown: stopCard
           }
         ),
-        isDuplicate ? /* @__PURE__ */ (0, import_jsx_runtime69.jsx)("span", { className: "font-mono text-[7px] tracking-[0.15em] text-red-400/80", children: "DUP" }) : priority !== void 0 ? /* @__PURE__ */ (0, import_jsx_runtime69.jsx)("span", { className: "font-mono text-[7px] tracking-[0.15em] text-[#3a6b5e]", children: "\u2605" }) : null
+        isDuplicate ? /* @__PURE__ */ (0, import_jsx_runtime69.jsx)(
+          "span",
+          {
+            className: cn2(
+              "font-mono tracking-[0.15em] text-red-400/80",
+              operationsPanel ? "text-[10px]" : "text-[7px]"
+            ),
+            children: "DUP"
+          }
+        ) : priority !== void 0 ? /* @__PURE__ */ (0, import_jsx_runtime69.jsx)(
+          "span",
+          {
+            className: cn2(
+              "font-mono tracking-[0.15em] text-[#3a6b5e]",
+              operationsPanel ? "text-[10px]" : "text-[7px]"
+            ),
+            children: "\u2605"
+          }
+        ) : null
       ]
     }
   );
@@ -95198,7 +95226,7 @@ function OpenModeSelector({
         type: "button",
         onClick: () => onChange(option.value),
         className: cn2(
-          "min-w-0 flex-1 border px-1.5 py-1 font-mono text-[7px] tracking-[0.06em] transition",
+          "min-w-0 flex-1 border px-1.5 py-1 font-mono text-[10px] tracking-[0.06em] transition",
           active2 ? "border-cyansys/45 bg-cyansys/10 text-cyansys" : "border-[#243b37] bg-transparent text-[#5f7a7a] hover:border-[#3a6b5e] hover:text-[#d7eeee]"
         ),
         "aria-pressed": active2,
@@ -95218,24 +95246,24 @@ function OperationsLiveWorkspacePanel({ leagueKey }) {
   const moveItem = useAdminOperationsLiveWorkspaceStore((s2) => s2.moveItem);
   return /* @__PURE__ */ (0, import_jsx_runtime150.jsxs)("div", { className: "border border-[#1c2e2a] bg-[#050a09] px-2 py-2", children: [
     /* @__PURE__ */ (0, import_jsx_runtime150.jsxs)("div", { className: "mb-2 flex items-center justify-between gap-2", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime150.jsx)("span", { className: "font-mono text-[8px] tracking-[0.16em] text-[#d7eeee]", children: "LIVE WORKSPACE" }),
+      /* @__PURE__ */ (0, import_jsx_runtime150.jsx)("span", { className: "font-mono text-[11px] tracking-[0.16em] text-[#d7eeee]", children: "LIVE WORKSPACE" }),
       /* @__PURE__ */ (0, import_jsx_runtime150.jsx)(
         "button",
         {
           type: "button",
           onClick: () => addItem(leagueKey),
-          className: "rounded border border-cyansys/35 bg-cyansys/10 px-1.5 py-0.5 font-mono text-[8px] tracking-[0.12em] text-cyansys hover:bg-cyansys/20",
+          className: "rounded border border-cyansys/35 bg-cyansys/10 px-1.5 py-0.5 font-mono text-[11px] tracking-[0.12em] text-cyansys hover:bg-cyansys/20",
           children: "+ ADD"
         }
       )
     ] }),
-    items.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime150.jsx)("p", { className: "font-mono text-[8px] tracking-[0.1em] text-[#5f7a7a]", children: "No Live Workspace items configured for this league." }) : /* @__PURE__ */ (0, import_jsx_runtime150.jsx)("div", { className: "space-y-2", children: items.map((item, index) => /* @__PURE__ */ (0, import_jsx_runtime150.jsxs)(
+    items.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime150.jsx)("p", { className: "font-mono text-[11px] tracking-[0.1em] text-[#5f7a7a]", children: "No Live Workspace items configured for this league." }) : /* @__PURE__ */ (0, import_jsx_runtime150.jsx)("div", { className: "space-y-2", children: items.map((item, index) => /* @__PURE__ */ (0, import_jsx_runtime150.jsxs)(
       "div",
       {
         className: "space-y-1 border border-[#1a2b28]/70 bg-[#030606]/35 px-2 py-2",
         children: [
           /* @__PURE__ */ (0, import_jsx_runtime150.jsxs)("div", { className: "flex items-center justify-between gap-2", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime150.jsxs)("span", { className: "font-mono text-[7px] tracking-[0.14em] text-[#7aada4]", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime150.jsxs)("span", { className: "font-mono text-[10px] tracking-[0.14em] text-[#7aada4]", children: [
               "ITEM ",
               index + 1
             ] }),
@@ -95246,7 +95274,7 @@ function OperationsLiveWorkspacePanel({ leagueKey }) {
                   type: "button",
                   disabled: index === 0,
                   onClick: () => moveItem(leagueKey, item.id, "up"),
-                  className: "border border-[#243b37] px-1 py-0.5 font-mono text-[8px] text-[#8ab4b4] disabled:opacity-30",
+                  className: "border border-[#243b37] px-1 py-0.5 font-mono text-[11px] text-[#8ab4b4] disabled:opacity-30",
                   "aria-label": "Move up",
                   children: "\u2191"
                 }
@@ -95257,7 +95285,7 @@ function OperationsLiveWorkspacePanel({ leagueKey }) {
                   type: "button",
                   disabled: index === items.length - 1,
                   onClick: () => moveItem(leagueKey, item.id, "down"),
-                  className: "border border-[#243b37] px-1 py-0.5 font-mono text-[8px] text-[#8ab4b4] disabled:opacity-30",
+                  className: "border border-[#243b37] px-1 py-0.5 font-mono text-[11px] text-[#8ab4b4] disabled:opacity-30",
                   "aria-label": "Move down",
                   children: "\u2193"
                 }
@@ -95271,14 +95299,14 @@ function OperationsLiveWorkspacePanel({ leagueKey }) {
                     if (!confirmed) return;
                     deleteItem(leagueKey, item.id);
                   },
-                  className: "border border-redsys/35 px-1 py-0.5 font-mono text-[8px] text-redsys/90",
+                  className: "border border-redsys/35 px-1 py-0.5 font-mono text-[11px] text-redsys/90",
                   children: "DELETE"
                 }
               )
             ] })
           ] }),
           /* @__PURE__ */ (0, import_jsx_runtime150.jsxs)("div", { className: "flex items-center gap-2 py-0.5", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime150.jsx)("span", { className: "w-[72px] shrink-0 font-mono text-[8px] tracking-[0.12em] text-[#7aada4]", children: "LABEL" }),
+            /* @__PURE__ */ (0, import_jsx_runtime150.jsx)("span", { className: "w-[72px] shrink-0 font-mono text-[11px] tracking-[0.12em] text-[#7aada4]", children: "LABEL" }),
             /* @__PURE__ */ (0, import_jsx_runtime150.jsx)(
               "input",
               {
@@ -95291,7 +95319,7 @@ function OperationsLiveWorkspacePanel({ leagueKey }) {
             )
           ] }),
           /* @__PURE__ */ (0, import_jsx_runtime150.jsxs)("div", { className: "flex items-center gap-2 py-0.5", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime150.jsx)("span", { className: "w-[72px] shrink-0 font-mono text-[8px] tracking-[0.12em] text-[#7aada4]", children: "URL" }),
+            /* @__PURE__ */ (0, import_jsx_runtime150.jsx)("span", { className: "w-[72px] shrink-0 font-mono text-[11px] tracking-[0.12em] text-[#7aada4]", children: "URL" }),
             /* @__PURE__ */ (0, import_jsx_runtime150.jsx)(
               "input",
               {
@@ -95304,7 +95332,7 @@ function OperationsLiveWorkspacePanel({ leagueKey }) {
             )
           ] }),
           /* @__PURE__ */ (0, import_jsx_runtime150.jsxs)("div", { className: "flex items-center gap-2 py-0.5", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime150.jsx)("span", { className: "w-[72px] shrink-0 font-mono text-[8px] tracking-[0.12em] text-[#7aada4]", children: "OPEN MODE" }),
+            /* @__PURE__ */ (0, import_jsx_runtime150.jsx)("span", { className: "w-[72px] shrink-0 font-mono text-[11px] tracking-[0.12em] text-[#7aada4]", children: "OPEN MODE" }),
             /* @__PURE__ */ (0, import_jsx_runtime150.jsx)("div", { className: "min-w-0 flex-1", children: /* @__PURE__ */ (0, import_jsx_runtime150.jsx)(
               OpenModeSelector,
               {
@@ -95332,7 +95360,7 @@ var init_OperationsLiveWorkspacePanel = __esm({
     init_adminOperationsLiveWorkspaceStore();
     import_jsx_runtime150 = __toESM(require_jsx_runtime(), 1);
     EMPTY_LIVE_WORKSPACE_ITEMS = [];
-    FIELD_CLASS = "w-full border border-[#243b37] bg-transparent px-1.5 py-1 font-mono text-[10px] leading-tight text-[#d7eeee] placeholder:text-[#3a5e58] focus:border-[#3a6b5e] focus:outline-none focus:ring-0";
+    FIELD_CLASS = "w-full border border-[#243b37] bg-transparent px-1.5 py-1 font-mono text-[13px] leading-tight text-[#d7eeee] placeholder:text-[#3a5e58] focus:border-[#3a6b5e] focus:outline-none focus:ring-0";
   }
 });
 
@@ -95356,7 +95384,7 @@ function OperationsFieldRow({
 }) {
   return /* @__PURE__ */ (0, import_jsx_runtime151.jsxs)("div", { className: "flex items-center gap-2 py-1", children: [
     /* @__PURE__ */ (0, import_jsx_runtime151.jsx)(OperationsFieldCompletenessDot, { complete }),
-    /* @__PURE__ */ (0, import_jsx_runtime151.jsx)("span", { className: "w-[104px] shrink-0 font-mono text-[8px] tracking-[0.12em] text-[#7aada4]", children: label }),
+    /* @__PURE__ */ (0, import_jsx_runtime151.jsx)("span", { className: "w-[104px] shrink-0 font-mono text-[11px] tracking-[0.12em] text-[#7aada4]", children: label }),
     /* @__PURE__ */ (0, import_jsx_runtime151.jsx)("div", { className: "min-w-0 flex-1", children })
   ] });
 }
@@ -95364,7 +95392,7 @@ function OperationsDiagnosticReadOnlyUrl({ url }) {
   return /* @__PURE__ */ (0, import_jsx_runtime151.jsx)(
     "div",
     {
-      className: "truncate border border-[#1a2b28]/80 bg-[#030606]/60 px-1.5 py-1 font-mono text-[9px] leading-tight text-[#9eb8b3]",
+      className: "truncate border border-[#1a2b28]/80 bg-[#030606]/60 px-1.5 py-1 font-mono text-[12px] leading-tight text-[#9eb8b3]",
       title: url,
       children: url
     }
@@ -95381,14 +95409,14 @@ function OperationsDiagnosticSubsection({
         "span",
         {
           className: cn2(
-            "font-mono text-[7px] tracking-[0.12em]",
+            "font-mono text-[10px] tracking-[0.12em]",
             present ? "text-greensys" : "text-[#5f7a7a]"
           ),
           "aria-hidden": true,
           children: present ? "\u2713" : "\u2014"
         }
       ),
-      /* @__PURE__ */ (0, import_jsx_runtime151.jsx)("span", { className: "font-mono text-[7px] tracking-[0.14em] text-[#7aada4]", children: title })
+      /* @__PURE__ */ (0, import_jsx_runtime151.jsx)("span", { className: "font-mono text-[10px] tracking-[0.14em] text-[#7aada4]", children: title })
     ] }),
     /* @__PURE__ */ (0, import_jsx_runtime151.jsx)("div", { className: "pl-3.5", children })
   ] });
@@ -95397,22 +95425,22 @@ function OperationsAutomaticDiagnosticEntries({
   entries
 }) {
   if (entries.length === 0) {
-    return /* @__PURE__ */ (0, import_jsx_runtime151.jsx)("span", { className: "font-mono text-[8px] tracking-[0.1em] text-redsys", children: "Missing" });
+    return /* @__PURE__ */ (0, import_jsx_runtime151.jsx)("span", { className: "font-mono text-[11px] tracking-[0.1em] text-redsys", children: "Missing" });
   }
   return /* @__PURE__ */ (0, import_jsx_runtime151.jsx)("div", { className: "space-y-1", children: entries.map((entry2) => /* @__PURE__ */ (0, import_jsx_runtime151.jsxs)("div", { className: "space-y-0.5", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime151.jsx)("span", { className: "font-mono text-[8px] tracking-[0.1em] text-greensys", children: entry2.sourceLabel }),
+    /* @__PURE__ */ (0, import_jsx_runtime151.jsx)("span", { className: "font-mono text-[11px] tracking-[0.1em] text-greensys", children: entry2.sourceLabel }),
     /* @__PURE__ */ (0, import_jsx_runtime151.jsx)(OperationsDiagnosticReadOnlyUrl, { url: entry2.url })
   ] }, entry2.url)) });
 }
 function OperationsDiagnosticOverrideValue({ value }) {
   if (!value) {
-    return /* @__PURE__ */ (0, import_jsx_runtime151.jsx)("span", { className: "font-mono text-[8px] tracking-[0.1em] text-[#5f7a7a]", children: "\u2014" });
+    return /* @__PURE__ */ (0, import_jsx_runtime151.jsx)("span", { className: "font-mono text-[11px] tracking-[0.1em] text-[#5f7a7a]", children: "\u2014" });
   }
   return /* @__PURE__ */ (0, import_jsx_runtime151.jsx)(OperationsDiagnosticReadOnlyUrl, { url: value });
 }
 function OperationsDiagnosticEffectiveValue({ value }) {
   if (!value) {
-    return /* @__PURE__ */ (0, import_jsx_runtime151.jsx)("span", { className: "font-mono text-[8px] tracking-[0.1em] text-redsys", children: "Missing" });
+    return /* @__PURE__ */ (0, import_jsx_runtime151.jsx)("span", { className: "font-mono text-[11px] tracking-[0.1em] text-redsys", children: "Missing" });
   }
   return /* @__PURE__ */ (0, import_jsx_runtime151.jsx)(OperationsDiagnosticReadOnlyUrl, { url: value });
 }
@@ -95421,7 +95449,7 @@ function OperationsUrlDiagnosticProviderGroup({
   diagnostic
 }) {
   return /* @__PURE__ */ (0, import_jsx_runtime151.jsxs)("div", { className: "space-y-2 border border-[#1a2b28]/50 bg-[#030606]/25 px-2 py-2", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime151.jsx)("span", { className: "font-mono text-[7px] tracking-[0.14em] text-[#9eb8b3]", children: title }),
+    /* @__PURE__ */ (0, import_jsx_runtime151.jsx)("span", { className: "font-mono text-[10px] tracking-[0.14em] text-[#9eb8b3]", children: title }),
     /* @__PURE__ */ (0, import_jsx_runtime151.jsx)(
       OperationsDiagnosticSubsection,
       {
@@ -95438,7 +95466,7 @@ function OperationsTennisGameCardUrlDiagnostics({
   diagnostic
 }) {
   return /* @__PURE__ */ (0, import_jsx_runtime151.jsxs)("div", { className: "space-y-2 border border-[#1a2b28]/70 bg-[#030606]/35 px-2 py-2", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime151.jsx)("span", { className: "font-mono text-[8px] tracking-[0.16em] text-[#d7eeee]", children: "GAME CARD" }),
+    /* @__PURE__ */ (0, import_jsx_runtime151.jsx)("span", { className: "font-mono text-[11px] tracking-[0.16em] text-[#d7eeee]", children: "GAME CARD" }),
     /* @__PURE__ */ (0, import_jsx_runtime151.jsx)(OperationsUrlDiagnosticProviderGroup, { title: "FlashscoreUSA", diagnostic: diagnostic.flashscore }),
     /* @__PURE__ */ (0, import_jsx_runtime151.jsx)(OperationsUrlDiagnosticProviderGroup, { title: "Tennis.com", diagnostic: diagnostic.tennisCom }),
     /* @__PURE__ */ (0, import_jsx_runtime151.jsx)(
@@ -95455,7 +95483,7 @@ function OperationsUrlDiagnosticGroup({
   diagnostic
 }) {
   return /* @__PURE__ */ (0, import_jsx_runtime151.jsxs)("div", { className: "space-y-2 border border-[#1a2b28]/70 bg-[#030606]/35 px-2 py-2", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime151.jsx)("span", { className: "font-mono text-[8px] tracking-[0.16em] text-[#d7eeee]", children: title }),
+    /* @__PURE__ */ (0, import_jsx_runtime151.jsx)("span", { className: "font-mono text-[11px] tracking-[0.16em] text-[#d7eeee]", children: title }),
     /* @__PURE__ */ (0, import_jsx_runtime151.jsx)(
       OperationsDiagnosticSubsection,
       {
@@ -95487,7 +95515,7 @@ function OperationsUrlDiagnosticsSection({
     [upstreamGame, fields]
   );
   return /* @__PURE__ */ (0, import_jsx_runtime151.jsxs)("div", { className: "mb-2 space-y-2 border-b border-[#1a2b28]/70 pb-2", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime151.jsx)("span", { className: "font-mono text-[7px] tracking-[0.2em] text-[#5f7a7a]", children: "URL DIAGNOSTICS (READ-ONLY)" }),
+    /* @__PURE__ */ (0, import_jsx_runtime151.jsx)("span", { className: "font-mono text-[10px] tracking-[0.2em] text-[#5f7a7a]", children: "URL DIAGNOSTICS (READ-ONLY)" }),
     tennisGameCardDiagnostic ? /* @__PURE__ */ (0, import_jsx_runtime151.jsx)(OperationsTennisGameCardUrlDiagnostics, { diagnostic: tennisGameCardDiagnostic }) : gameCardDiagnostic ? /* @__PURE__ */ (0, import_jsx_runtime151.jsx)(OperationsUrlDiagnosticGroup, { title: "GAME CARD", diagnostic: gameCardDiagnostic }) : null,
     /* @__PURE__ */ (0, import_jsx_runtime151.jsx)(OperationsUrlDiagnosticGroup, { title: "LIVE STREAM", diagnostic: liveStreamDiagnostic })
   ] });
@@ -95498,7 +95526,7 @@ function OperationsOptionalFieldRow({
 }) {
   return /* @__PURE__ */ (0, import_jsx_runtime151.jsxs)("div", { className: "flex items-center gap-2 py-1", children: [
     /* @__PURE__ */ (0, import_jsx_runtime151.jsx)("span", { className: "w-[6px] shrink-0", "aria-hidden": true }),
-    /* @__PURE__ */ (0, import_jsx_runtime151.jsx)("span", { className: "w-[104px] shrink-0 font-mono text-[8px] tracking-[0.12em] text-[#7aada4]", children: label }),
+    /* @__PURE__ */ (0, import_jsx_runtime151.jsx)("span", { className: "w-[104px] shrink-0 font-mono text-[11px] tracking-[0.12em] text-[#7aada4]", children: label }),
     /* @__PURE__ */ (0, import_jsx_runtime151.jsx)("div", { className: "min-w-0 flex-1", children })
   ] });
 }
@@ -95547,7 +95575,7 @@ function OperationsNavigationModeSelector({
         type: "button",
         onClick: () => onChange(option.value),
         className: cn2(
-          "min-w-0 flex-1 border px-1.5 py-1 font-mono text-[8px] tracking-[0.08em] transition",
+          "min-w-0 flex-1 border px-1.5 py-1 font-mono text-[11px] tracking-[0.08em] transition",
           active2 ? "border-cyansys/45 bg-cyansys/10 text-cyansys" : "border-[#243b37] bg-transparent text-[#5f7a7a] hover:border-[#3a6b5e] hover:text-[#d7eeee]"
         ),
         "aria-pressed": active2,
@@ -95569,7 +95597,7 @@ function OperationsStatusOverrideSelector({
       {
         value: selectedValue,
         onChange: (e2) => onChange(e2.target.value),
-        className: cn2(OPERATIONS_TEXT_FIELD_CLASS, "h-[26px]"),
+        className: cn2(OPERATIONS_TEXT_FIELD_CLASS, "h-[29px]"),
         "aria-label": "Status override",
         children: [
           /* @__PURE__ */ (0, import_jsx_runtime151.jsx)("option", { value: "", children: "None (use upstream status)" }),
@@ -95577,19 +95605,19 @@ function OperationsStatusOverrideSelector({
         ]
       }
     ),
-    /* @__PURE__ */ (0, import_jsx_runtime151.jsx)("span", { className: "shrink-0 font-mono text-[7px] tracking-[0.1em] text-[#5f7a7a]", children: overrideValue ? "OVERRIDE" : `FEED: ${gameStatusDisplayLabel(effectiveStatus).toUpperCase()}` })
+    /* @__PURE__ */ (0, import_jsx_runtime151.jsx)("span", { className: "shrink-0 font-mono text-[10px] tracking-[0.1em] text-[#5f7a7a]", children: overrideValue ? "OVERRIDE" : `FEED: ${gameStatusDisplayLabel(effectiveStatus).toUpperCase()}` })
   ] });
 }
 function OperationsFutureEditorialSlot() {
   return /* @__PURE__ */ (0, import_jsx_runtime151.jsxs)("div", { className: "mt-2 border-t border-[#1a2b28]/70 pt-2 opacity-45", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime151.jsx)("span", { className: "font-mono text-[7px] tracking-[0.2em] text-[#5f7a7a]", children: "FUTURE EDITORIAL (PLANNED)" }),
+    /* @__PURE__ */ (0, import_jsx_runtime151.jsx)("span", { className: "font-mono text-[10px] tracking-[0.2em] text-[#5f7a7a]", children: "FUTURE EDITORIAL (PLANNED)" }),
     /* @__PURE__ */ (0, import_jsx_runtime151.jsx)("div", { className: "mt-1 flex flex-col gap-1", children: ["AI GAME PREVIEW", "AI GAME RECAP", "MANUAL EDITORIAL OVERRIDE"].map((label) => /* @__PURE__ */ (0, import_jsx_runtime151.jsxs)(
       "div",
       {
         className: "flex items-center gap-2 border border-dashed border-[#243b37]/70 px-1.5 py-1",
         children: [
           /* @__PURE__ */ (0, import_jsx_runtime151.jsx)("span", { className: "h-[6px] w-[6px] shrink-0 rounded-full bg-[#3a5e58]", "aria-hidden": true }),
-          /* @__PURE__ */ (0, import_jsx_runtime151.jsx)("span", { className: "font-mono text-[8px] tracking-[0.1em] text-[#5f7a7a]", children: label })
+          /* @__PURE__ */ (0, import_jsx_runtime151.jsx)("span", { className: "font-mono text-[11px] tracking-[0.1em] text-[#5f7a7a]", children: label })
         ]
       },
       label
@@ -95616,11 +95644,11 @@ function OperationsCard({
   const canWatchLive = gameHasHomeSpineWatchLive(game);
   return /* @__PURE__ */ (0, import_jsx_runtime151.jsxs)("div", { className: "border border-[#1c2e2a] bg-[#050a09] px-2 py-2", children: [
     /* @__PURE__ */ (0, import_jsx_runtime151.jsxs)("div", { className: "mb-1 flex items-center justify-between gap-2", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime151.jsx)("span", { className: "truncate font-mono text-[10px] tracking-[0.04em] text-[#e0e8e6]", children: gameLabel2 }),
-      !canWatchLive ? /* @__PURE__ */ (0, import_jsx_runtime151.jsx)("span", { className: "shrink-0 font-mono text-[7px] tracking-[0.12em] text-[#5f7a7a]", children: "PRE-LIVE" }) : null
+      /* @__PURE__ */ (0, import_jsx_runtime151.jsx)("span", { className: "truncate font-mono text-[13px] tracking-[0.04em] text-[#e0e8e6]", children: gameLabel2 }),
+      !canWatchLive ? /* @__PURE__ */ (0, import_jsx_runtime151.jsx)("span", { className: "shrink-0 font-mono text-[10px] tracking-[0.12em] text-[#5f7a7a]", children: "PRE-LIVE" }) : null
     ] }),
     /* @__PURE__ */ (0, import_jsx_runtime151.jsx)(OperationsUrlDiagnosticsSection, { game, fields }),
-    /* @__PURE__ */ (0, import_jsx_runtime151.jsx)(OperationsFieldRow, { label: "FEATURED PRIORITY", complete: priority !== void 0, children: /* @__PURE__ */ (0, import_jsx_runtime151.jsx)(AdminFeaturedPriorityField, { game }) }),
+    /* @__PURE__ */ (0, import_jsx_runtime151.jsx)(OperationsFieldRow, { label: "FEATURED PRIORITY", complete: priority !== void 0, children: /* @__PURE__ */ (0, import_jsx_runtime151.jsx)(AdminFeaturedPriorityField, { game, operationsPanel: true }) }),
     /* @__PURE__ */ (0, import_jsx_runtime151.jsx)(OperationsOptionalFieldRow, { label: "GAME CARD URL", children: /* @__PURE__ */ (0, import_jsx_runtime151.jsx)(
       OperationsTextField,
       {
@@ -95703,7 +95731,7 @@ var init_OperationsCard = __esm({
     init_AdminFeaturedPriorityField();
     init_OperationsLiveWorkspacePanel();
     import_jsx_runtime151 = __toESM(require_jsx_runtime(), 1);
-    OPERATIONS_TEXT_FIELD_CLASS = "w-full border border-[#243b37] bg-transparent px-1.5 py-1 font-mono text-[10px] leading-tight text-[#d7eeee] placeholder:text-[#3a5e58] focus:border-[#3a6b5e] focus:outline-none focus:ring-0";
+    OPERATIONS_TEXT_FIELD_CLASS = "w-full border border-[#243b37] bg-transparent px-1.5 py-1 font-mono text-[13px] leading-tight text-[#d7eeee] placeholder:text-[#3a5e58] focus:border-[#3a6b5e] focus:outline-none focus:ring-0";
   }
 });
 
@@ -95721,8 +95749,8 @@ function OperationsSpineSection({ section }) {
           className: "flex min-w-0 flex-1 items-center gap-2 text-left",
           "aria-expanded": !section.collapsed,
           children: [
-            /* @__PURE__ */ (0, import_jsx_runtime152.jsx)("span", { className: "w-3 shrink-0 text-center text-[9px] text-cyansys/55", "aria-hidden": true, children: section.collapsed ? "\u25B6" : "\u25BC" }),
-            /* @__PURE__ */ (0, import_jsx_runtime152.jsx)("span", { className: "truncate text-[13px] font-bold leading-none tracking-[0.14em] text-[#eef6f6]", children: section.label })
+            /* @__PURE__ */ (0, import_jsx_runtime152.jsx)("span", { className: "w-3 shrink-0 text-center text-[12px] text-cyansys/55", "aria-hidden": true, children: section.collapsed ? "\u25B6" : "\u25BC" }),
+            /* @__PURE__ */ (0, import_jsx_runtime152.jsx)("span", { className: "truncate text-[16px] font-bold leading-none tracking-[0.14em] text-[#eef6f6]", children: section.label })
           ]
         }
       ),
@@ -95733,12 +95761,12 @@ function OperationsSpineSection({ section }) {
             href: link.url,
             target: "_blank",
             rel: "noopener noreferrer",
-            className: "shrink-0 rounded border border-[#243b37]/90 bg-[#0e181d]/60 px-1.5 py-0.5 font-mono text-[8px] tracking-[0.08em] text-[#8ab4b4] transition hover:border-cyansys/35 hover:text-cyansys/90",
+            className: "shrink-0 rounded border border-[#243b37]/90 bg-[#0e181d]/60 px-1.5 py-0.5 font-mono text-[11px] tracking-[0.08em] text-[#8ab4b4] transition hover:border-cyansys/35 hover:text-cyansys/90",
             children: link.label
           },
           `${link.label}:${link.url}`
         )) }) : null,
-        /* @__PURE__ */ (0, import_jsx_runtime152.jsxs)("span", { className: "shrink-0 font-mono text-[8px] tracking-[0.1em] text-[#5f7a7a]", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime152.jsxs)("span", { className: "shrink-0 font-mono text-[11px] tracking-[0.1em] text-[#5f7a7a]", children: [
           section.games.length,
           " game",
           section.games.length === 1 ? "" : "s"
@@ -95842,15 +95870,15 @@ function OperationsSpine() {
       children: [
         /* @__PURE__ */ (0, import_jsx_runtime153.jsxs)("header", { className: "flex shrink-0 items-center justify-between gap-3 border-b border-line/60 bg-[#030606]/90 px-2 py-1.5", children: [
           /* @__PURE__ */ (0, import_jsx_runtime153.jsxs)("div", { className: "min-w-0", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime153.jsx)("span", { className: "font-mono text-[10px] tracking-[0.22em] text-cyansys/80", children: "OPERATIONS SPINE" }),
-            /* @__PURE__ */ (0, import_jsx_runtime153.jsx)("span", { className: "ml-2 font-mono text-[8px] tracking-[0.14em] text-textdim/60", children: "Operator checklist \u2014 mirrors Games Spine 1:1" })
+            /* @__PURE__ */ (0, import_jsx_runtime153.jsx)("span", { className: "font-mono text-[13px] tracking-[0.22em] text-cyansys/80", children: "OPERATIONS SPINE" }),
+            /* @__PURE__ */ (0, import_jsx_runtime153.jsx)("span", { className: "ml-2 font-mono text-[11px] tracking-[0.14em] text-textdim/60", children: "Operator checklist \u2014 mirrors Games Spine 1:1" })
           ] }),
           /* @__PURE__ */ (0, import_jsx_runtime153.jsxs)("div", { className: "flex shrink-0 items-center gap-2", children: [
-            hasDuplicateFeaturedPriorities ? /* @__PURE__ */ (0, import_jsx_runtime153.jsx)("span", { className: "font-mono text-[8px] tracking-[0.12em] text-redsys", children: "Duplicate featured priorities \u2014 resolve before saving" }) : null,
+            hasDuplicateFeaturedPriorities ? /* @__PURE__ */ (0, import_jsx_runtime153.jsx)("span", { className: "font-mono text-[11px] tracking-[0.12em] text-redsys", children: "Duplicate featured priorities \u2014 resolve before saving" }) : null,
             statusLabel ? /* @__PURE__ */ (0, import_jsx_runtime153.jsx)(
               "span",
               {
-                className: saveStatus === "failed" ? "font-mono text-[8px] tracking-[0.14em] text-redsys" : saveStatus === "saved" ? "font-mono text-[8px] tracking-[0.14em] text-greensys" : "font-mono text-[8px] tracking-[0.14em] text-cyansys/80",
+                className: saveStatus === "failed" ? "font-mono text-[11px] tracking-[0.14em] text-redsys" : saveStatus === "saved" ? "font-mono text-[11px] tracking-[0.14em] text-greensys" : "font-mono text-[11px] tracking-[0.14em] text-cyansys/80",
                 children: statusLabel
               }
             ) : null,
@@ -95860,13 +95888,13 @@ function OperationsSpine() {
                 type: "button",
                 onClick: () => void onSave(),
                 disabled: !canSave,
-                className: "rounded border border-greensys/50 bg-greensys/10 px-2 py-1 font-mono text-[8px] tracking-[0.14em] text-greensys hover:bg-greensys/20 disabled:cursor-not-allowed disabled:opacity-40",
+                className: "rounded border border-greensys/50 bg-greensys/10 px-2 py-1 font-mono text-[11px] tracking-[0.14em] text-greensys hover:bg-greensys/20 disabled:cursor-not-allowed disabled:opacity-40",
                 children: "Save"
               }
             )
           ] })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime153.jsx)("div", { className: "min-h-0 flex-1 overflow-y-auto overscroll-contain", children: sections.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime153.jsx)("div", { className: "px-3 py-6 text-center text-[9px] tracking-[0.14em] text-[#5f7a7a]", children: "No games to operate on." }) : /* @__PURE__ */ (0, import_jsx_runtime153.jsx)("div", { className: "flex flex-col gap-3 py-2", children: sections.map((section) => /* @__PURE__ */ (0, import_jsx_runtime153.jsx)(OperationsSpineSection, { section }, section.key)) }) })
+        /* @__PURE__ */ (0, import_jsx_runtime153.jsx)("div", { className: "min-h-0 flex-1 overflow-y-auto overscroll-contain", children: sections.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime153.jsx)("div", { className: "px-3 py-6 text-center text-[12px] tracking-[0.14em] text-[#5f7a7a]", children: "No games to operate on." }) : /* @__PURE__ */ (0, import_jsx_runtime153.jsx)("div", { className: "flex flex-col gap-3 py-2", children: sections.map((section) => /* @__PURE__ */ (0, import_jsx_runtime153.jsx)(OperationsSpineSection, { section }, section.key)) }) })
       ]
     }
   );
