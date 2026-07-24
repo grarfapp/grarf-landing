@@ -33561,8 +33561,38 @@ var init_homeWebHeadlinesRugbySources = __esm({
 // ../grarf/desktop/src/data/homeWebHeadlinesSoccerSources.ts
 function resolveWebHeadlinesSoccerNewsSources(liveSoccerCompetitionSubmenuId) {
   const fotmobNewsUrl = liveSoccerCompetitionSubmenuId != null ? FOTMOB_SOCCER_LEAGUE_NEWS_URL_BY_COMPETITION[liveSoccerCompetitionSubmenuId] : WEB_HEADLINES_SOCCER_SOURCES[0].url;
-  return WEB_HEADLINES_SOCCER_SOURCES.map(
-    (source) => source.id === "fotmob_news" ? { ...source, url: fotmobNewsUrl } : source
+  return WEB_HEADLINES_SOCCER_SOURCES.filter((source) => {
+    if (liveSoccerCompetitionSubmenuId == null) return true;
+    if (source.id === "football365") {
+      return liveSoccerCompetitionSubmenuId in FOOTBALL365_SOCCER_LEAGUE_NEWS_URL_BY_COMPETITION;
+    }
+    if (source.id === "soccerway_news") {
+      return liveSoccerCompetitionSubmenuId in SOCCERWAY_SOCCER_LEAGUE_NEWS_URL_BY_COMPETITION;
+    }
+    return true;
+  }).map((source) => {
+    if (source.id === "fotmob_news") {
+      return { ...source, url: fotmobNewsUrl };
+    }
+    if (source.id === "football365" && liveSoccerCompetitionSubmenuId != null) {
+      return {
+        ...source,
+        url: FOOTBALL365_SOCCER_LEAGUE_NEWS_URL_BY_COMPETITION[liveSoccerCompetitionSubmenuId]
+      };
+    }
+    if (source.id === "soccerway_news" && liveSoccerCompetitionSubmenuId != null) {
+      return {
+        ...source,
+        url: SOCCERWAY_SOCCER_LEAGUE_NEWS_URL_BY_COMPETITION[liveSoccerCompetitionSubmenuId]
+      };
+    }
+    return source;
+  });
+}
+function resolveWebHeadlinesSoccerStatsSources(liveSoccerCompetitionSubmenuId) {
+  const soccerStatsUrl = liveSoccerCompetitionSubmenuId != null ? SOCCERSTATS_SOCCER_LEAGUE_STATS_URL_BY_COMPETITION[liveSoccerCompetitionSubmenuId] : WEB_HEADLINES_SOCCER_STATS_SOURCES[0].url;
+  return WEB_HEADLINES_SOCCER_STATS_SOURCES.map(
+    (source) => source.id === "soccerstats" ? { ...source, url: soccerStatsUrl } : source
   );
 }
 function resolveWebHeadlinesSoccerTransfersSources(liveSoccerCompetitionSubmenuId) {
@@ -33575,7 +33605,7 @@ function resolveWebHeadlinesSoccerTransfersSources(liveSoccerCompetitionSubmenuI
 function isHomeLiveSoccerCompetitionTransfersSupported(competitionId) {
   return competitionId != null && FOTMOB_SOCCER_LEAGUE_TRANSFERS_URL_BY_COMPETITION[competitionId] != null;
 }
-var FOTMOB_SOCCER_LEAGUE_NEWS_URL_BY_COMPETITION, FOTMOB_SOCCER_LEAGUE_TRANSFERS_URL_BY_COMPETITION, WEB_HEADLINES_SOCCER_SOURCES, WEB_HEADLINES_SOCCER_TRANSFERS_SOURCES, WEB_HEADLINES_SOCCER_STATS_SOURCES, WEB_HEADLINES_SOCCER_SCHEDULE_SOURCES;
+var FOTMOB_SOCCER_LEAGUE_NEWS_URL_BY_COMPETITION, FOTMOB_SOCCER_LEAGUE_TRANSFERS_URL_BY_COMPETITION, FOOTBALL365_SOCCER_LEAGUE_NEWS_URL_BY_COMPETITION, SOCCERWAY_SOCCER_LEAGUE_NEWS_URL_BY_COMPETITION, SOCCERSTATS_SOCCER_LEAGUE_STATS_URL_BY_COMPETITION, WEB_HEADLINES_SOCCER_SOURCES, WEB_HEADLINES_SOCCER_TRANSFERS_SOURCES, WEB_HEADLINES_SOCCER_STATS_SOURCES, WEB_HEADLINES_SOCCER_SCHEDULE_SOURCES;
 var init_homeWebHeadlinesSoccerSources = __esm({
   "../grarf/desktop/src/data/homeWebHeadlinesSoccerSources.ts"() {
     init_define_import_meta_env();
@@ -33605,6 +33635,32 @@ var init_homeWebHeadlinesSoccerSources = __esm({
       europa_league: "https://www.fotmob.com/leagues/73/transfers/europa-league",
       championship: "https://www.fotmob.com/leagues/48/transfers/championship"
     };
+    FOOTBALL365_SOCCER_LEAGUE_NEWS_URL_BY_COMPETITION = {
+      epl: "https://www.football365.com/competitions/premier-league"
+    };
+    SOCCERWAY_SOCCER_LEAGUE_NEWS_URL_BY_COMPETITION = {
+      epl: "https://www.soccerway.com/news/premier-league/dYlOSQODCdnS0XT8/",
+      laliga: "https://www.soccerway.com/news/laliga/QVmLl54oCdnS0XT8/",
+      bundesliga: "https://www.soccerway.com/news/bundesliga/W6BOzpK2CdnS0XT8/",
+      ligue_1: "https://www.soccerway.com/news/ligue-1/KIShoMk3CdnS0XT8/",
+      serie_a: "https://www.soccerway.com/news/serie-a/COuk57CiCdnS0XT8/",
+      europa_league: "https://www.soccerway.com/news/europa-league/ClDjv3V5CdnS0XT8/",
+      conference_league: "https://www.soccerway.com/news/conference-league"
+    };
+    SOCCERSTATS_SOCCER_LEAGUE_STATS_URL_BY_COMPETITION = {
+      epl: "https://www.soccerstats.com/latest.asp?league=england",
+      ucl: "https://www.soccerstats.com/leagueview.asp?league=cleague",
+      mls: "https://www.soccerstats.com/latest.asp?league=usa",
+      laliga: "https://www.soccerstats.com/latest.asp?league=spain",
+      bundesliga: "https://www.soccerstats.com/latest.asp?league=germany",
+      ligue_1: "https://www.soccerstats.com/latest.asp?league=france",
+      nwsl: "https://www.soccerstats.com/latest.asp?league=usa6",
+      serie_a: "https://www.soccerstats.com/latest.asp?league=italy",
+      liga_mx: "https://www.soccerstats.com/latest.asp?league=mexico",
+      europa_league: "https://www.soccerstats.com/leagueview.asp?league=uefa",
+      conference_league: "https://www.soccerstats.com/leagueview.asp?league=uefaconference",
+      championship: "https://www.soccerstats.com/latest.asp?league=england2"
+    };
     WEB_HEADLINES_SOCCER_SOURCES = [
       { id: "fotmob_news", label: "FotMob", url: "https://www.fotmob.com/news" },
       { id: "soccerway_news", label: "Soccerway.com", url: "https://www.soccerway.com/news/" },
@@ -33617,6 +33673,11 @@ var init_homeWebHeadlinesSoccerSources = __esm({
       { id: "headlines_soccer_placeholder", label: "Browser Workspace", url: "" }
     ];
     WEB_HEADLINES_SOCCER_TRANSFERS_SOURCES = [
+      {
+        id: "soccerway_transfers",
+        label: "Soccerway",
+        url: "https://www.soccerway.com/news/transfer-news/C8OAR7gMWSzc94ws/"
+      },
       { id: "fotmob_transfers", label: "FotMob", url: "https://www.fotmob.com/transfers" }
     ];
     WEB_HEADLINES_SOCCER_STATS_SOURCES = [
@@ -34245,7 +34306,7 @@ function resolveWebHeadlinesSoccerPaneSources(liveSoccerCompetitionSubmenuId, li
       }
       return resolveWebHeadlinesSoccerTransfersSources(liveSoccerCompetitionSubmenuId);
     case "stats":
-      return WEB_HEADLINES_SOCCER_STATS_SOURCES;
+      return resolveWebHeadlinesSoccerStatsSources(liveSoccerCompetitionSubmenuId);
     case "schedule":
       return WEB_HEADLINES_SOCCER_SCHEDULE_SOURCES;
     case "news":
