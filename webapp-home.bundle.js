@@ -96361,6 +96361,59 @@ var init_resolveManualEventDefinitionFromGame = __esm({
   }
 });
 
+// ../grarf/shared/domain/manualEvents/findManualEventDefinitionForGame.ts
+function findManualEventDefinitionForGame(game, source) {
+  const leaguesById = new Map(
+    (source.leagues.leagues ?? []).map((league2) => [
+      league2.leagueId.trim().toUpperCase(),
+      league2
+    ])
+  );
+  for (const event of source.events.events ?? []) {
+    const leagueId = event.leagueId.trim().toUpperCase();
+    const league2 = leaguesById.get(leagueId);
+    if (!league2) continue;
+    const normalized = normalizeManualEventDefinition(event, league2);
+    if (normalized?.game.id === game.id) {
+      return event;
+    }
+  }
+  return resolveManualEventDefinitionFromGame(game);
+}
+var init_findManualEventDefinitionForGame = __esm({
+  "../grarf/shared/domain/manualEvents/findManualEventDefinitionForGame.ts"() {
+    init_define_import_meta_env();
+    init_normalizeManualEvent();
+    init_resolveManualEventDefinitionFromGame();
+  }
+});
+
+// ../grarf/desktop/src/lib/manualEvents/manualEventsOverlayCache.ts
+function invalidateManualEventsOverlayCache() {
+  cachedOverlay = void 0;
+  cachedOverlayPromise = null;
+}
+function getManualEventsSourceOverlayCached() {
+  if (cachedOverlay !== void 0) {
+    return Promise.resolve(cachedOverlay);
+  }
+  if (!cachedOverlayPromise) {
+    cachedOverlayPromise = fetchManualEventsSourceOverlay().then((overlay) => {
+      cachedOverlay = overlay;
+      return overlay;
+    });
+  }
+  return cachedOverlayPromise;
+}
+var cachedOverlay, cachedOverlayPromise;
+var init_manualEventsOverlayCache = __esm({
+  "../grarf/desktop/src/lib/manualEvents/manualEventsOverlayCache.ts"() {
+    init_define_import_meta_env();
+    init_manualEventsPersistenceApi();
+    cachedOverlayPromise = null;
+  }
+});
+
 // ../grarf/desktop/src/lib/manualEvents/removeManualGameFromLiveGames.ts
 function removeManualGameFromLiveGames(gameId) {
   const prev = useLiveGamesStore.getState();
@@ -96388,13 +96441,15 @@ var init_removeManualGameFromLiveGames = __esm({
 
 // ../grarf/desktop/src/lib/manualEvents/deleteOperationsManualGameEntry.ts
 async function deleteOperationsManualGameEntry(game) {
-  const event = resolveManualEventDefinitionFromGame(game);
+  const overlay = await getManualEventsSourceOverlayCached();
+  const event = overlay ? findManualEventDefinitionForGame(game, overlay) : null;
   if (!event) {
     return { ok: false, errors: ["not_a_manual_game"] };
   }
   try {
     await deleteManualEventsSourceEntry({ event });
     invalidateManualEventsSourcePrefetch();
+    invalidateManualEventsOverlayCache();
     removeManualGameFromLiveGames(game.id);
     return { ok: true };
   } catch (error) {
@@ -96405,55 +96460,41 @@ async function deleteOperationsManualGameEntry(game) {
 var init_deleteOperationsManualGameEntry = __esm({
   "../grarf/desktop/src/lib/manualEvents/deleteOperationsManualGameEntry.ts"() {
     init_define_import_meta_env();
-    init_resolveManualEventDefinitionFromGame();
+    init_findManualEventDefinitionForGame();
     init_manualEventsPersistenceApi();
+    init_manualEventsOverlayCache();
     init_manualEventsSourceResolver();
     init_removeManualGameFromLiveGames();
-  }
-});
-
-// ../grarf/shared/domain/manualEvents/deleteManualEventsSourceEntry.ts
-function isManualEventInSource(event, source) {
-  const targetKey = manualEventIdentityKey(event);
-  return (source.events.events ?? []).some((row) => manualEventIdentityKey(row) === targetKey);
-}
-var init_deleteManualEventsSourceEntry = __esm({
-  "../grarf/shared/domain/manualEvents/deleteManualEventsSourceEntry.ts"() {
-    init_define_import_meta_env();
-    init_mergeManualEventsSourceBundles();
   }
 });
 
 // ../grarf/desktop/src/lib/manualEvents/useOperationsManualGameDeletable.ts
 function useOperationsManualGameDeletable(game) {
   const [deletable, setDeletable] = (0, import_react168.useState)(false);
+  const isManualGame = Boolean(game.metadata?.manualEvent) || game.id.startsWith("manual-event-");
   (0, import_react168.useEffect)(() => {
+    if (!isManualGame) {
+      setDeletable(false);
+      return;
+    }
     let cancelled = false;
-    void (async () => {
-      const event = resolveManualEventDefinitionFromGame(game);
-      if (!event) {
-        if (!cancelled) setDeletable(false);
-        return;
-      }
-      const overlay = await fetchManualEventsSourceOverlay();
-      if (!cancelled) {
-        setDeletable(Boolean(overlay && isManualEventInSource(event, overlay)));
-      }
-    })();
+    void getManualEventsSourceOverlayCached().then((overlay) => {
+      if (cancelled) return;
+      setDeletable(Boolean(overlay && findManualEventDefinitionForGame(game, overlay)));
+    });
     return () => {
       cancelled = true;
     };
-  }, [game]);
+  }, [game.id, isManualGame]);
   return deletable;
 }
 var import_react168;
 var init_useOperationsManualGameDeletable = __esm({
   "../grarf/desktop/src/lib/manualEvents/useOperationsManualGameDeletable.ts"() {
     init_define_import_meta_env();
-    init_deleteManualEventsSourceEntry();
-    init_resolveManualEventDefinitionFromGame();
+    init_findManualEventDefinitionForGame();
     import_react168 = __toESM(require_react(), 1);
-    init_manualEventsPersistenceApi();
+    init_manualEventsOverlayCache();
   }
 });
 
@@ -97998,6 +98039,7 @@ async function saveOperationsManualGameEntry(draft) {
       { requestId }
     );
     invalidateManualEventsSourcePrefetch();
+    invalidateManualEventsOverlayCache();
     const source = await resolveManualEventsSourceBundle();
     applyManualEventsSourceToLiveGames(source);
     const scheduledDateKey = built.event.startTime.slice(0, 10);
@@ -98020,6 +98062,7 @@ var init_saveOperationsManualGameEntry = __esm({
     init_define_import_meta_env();
     init_buildManualEventFromOperationsEditorDraft();
     init_applyManualEventsSourceToLiveGames();
+    init_manualEventsOverlayCache();
     init_manualEventsPersistenceApi();
     init_manualEventsSourceResolver();
     init_manualEventsSaveDiagnostics();
@@ -98428,6 +98471,9 @@ function OperationsSpine() {
     const timer = window.setTimeout(() => setSaveStatus("idle"), 2500);
     return () => window.clearTimeout(timer);
   }, [saveStatus]);
+  (0, import_react171.useEffect)(() => {
+    void getManualEventsSourceOverlayCached();
+  }, []);
   const onSave = (0, import_react171.useCallback)(async () => {
     if (!canSave) return;
     setSaveStatus("saving");
@@ -98505,6 +98551,7 @@ var init_OperationsSpine = __esm({
     init_saveOperationsSpine();
     init_OperationsSpineSection();
     init_OperationsManualGameEntryEditorSection();
+    init_manualEventsOverlayCache();
     import_jsx_runtime155 = __toESM(require_jsx_runtime(), 1);
   }
 });
