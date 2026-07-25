@@ -96323,6 +96323,12 @@ var init_operationsLeagueResourceLinks2 = __esm({
 });
 
 // ../grarf/shared/domain/manualEvents/resolveManualEventDefinitionFromGame.ts
+function isEventOnlyManualGame(game, manual) {
+  if (manual.layout === "event-only") return true;
+  if (manual.layout === "head-to-head") return false;
+  if (manual.eventName?.trim()) return true;
+  return !game.homeTeam?.trim() && Boolean(game.awayTeam?.trim());
+}
 function resolveManualEventDefinitionFromGame(game) {
   const manual = game.metadata?.manualEvent;
   if (!manual) return null;
@@ -96340,7 +96346,7 @@ function resolveManualEventDefinitionFromGame(game) {
     gameCardUrl,
     openBehavior: manual.openBehavior
   };
-  if (manual.layout === "event-only") {
+  if (isEventOnlyManualGame(game, manual)) {
     const eventName = manual.eventName?.trim() || game.awayTeam?.trim() || "";
     if (!eventName) return null;
     return { ...base, eventName, team1: null, team2: null };
@@ -96362,6 +96368,15 @@ var init_resolveManualEventDefinitionFromGame = __esm({
 });
 
 // ../grarf/shared/domain/manualEvents/findManualEventDefinitionForGame.ts
+function resolveLeagueForManualEvent(event, leaguesById) {
+  const leagueId = event.leagueId.trim().toUpperCase();
+  return leaguesById.get(leagueId) ?? {
+    leagueId,
+    displayName: leagueId,
+    logo: "/league-logos/placeholder-manual.png",
+    branding: null
+  };
+}
 function findManualEventDefinitionForGame(game, source) {
   const leaguesById = new Map(
     (source.leagues.leagues ?? []).map((league2) => [
@@ -96370,19 +96385,26 @@ function findManualEventDefinitionForGame(game, source) {
     ])
   );
   for (const event of source.events.events ?? []) {
-    const leagueId = event.leagueId.trim().toUpperCase();
-    const league2 = leaguesById.get(leagueId);
-    if (!league2) continue;
+    const league2 = resolveLeagueForManualEvent(event, leaguesById);
     const normalized = normalizeManualEventDefinition(event, league2);
     if (normalized?.game.id === game.id) {
       return event;
     }
   }
-  return resolveManualEventDefinitionFromGame(game);
+  const resolved = resolveManualEventDefinitionFromGame(game);
+  if (!resolved) return null;
+  const resolvedKey = manualEventIdentityKey(resolved);
+  for (const event of source.events.events ?? []) {
+    if (manualEventIdentityKey(event) === resolvedKey) {
+      return event;
+    }
+  }
+  return null;
 }
 var init_findManualEventDefinitionForGame = __esm({
   "../grarf/shared/domain/manualEvents/findManualEventDefinitionForGame.ts"() {
     init_define_import_meta_env();
+    init_mergeManualEventsSourceBundles();
     init_normalizeManualEvent();
     init_resolveManualEventDefinitionFromGame();
   }
