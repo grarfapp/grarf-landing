@@ -31279,6 +31279,8 @@ var init_grarfLogoImgClassName = __esm({
 
 // ../grarf/desktop/src/lib/gamesSpine/gamesSpineLeagueLogoUrls.ts
 function resolveGamesSpineLeagueLogoUrl(league2, options) {
+  const manualLeagueLogoUrl = options?.game?.metadata?.manualEvent?.leagueLogoUrl?.trim();
+  if (manualLeagueLogoUrl) return manualLeagueLogoUrl;
   const tournamentTitle = options?.tournamentTitle ?? options?.game?.awayTeam;
   if (isPgaTourOpenChampionshipEvent(league2, tournamentTitle)) {
     return THE_OPEN_LEAGUE_LOGO_URL;
@@ -31357,7 +31359,8 @@ var init_gamesSpineLeagueLogoUrls = __esm({
       NASCAR_TRUCK: "/league-logos/nascar-trucks.png",
       NASCAR_XFINITY: "/league-logos/nascar-oreilly.png",
       PLL: "/league-logos/pll.png",
-      USLCUP: "/league-logos/usl-cup.png"
+      USLCUP: "/league-logos/usl-cup.png",
+      USATF: "https://upload.wikimedia.org/wikipedia/en/b/be/USA_Track_and_Field.svg"
     };
   }
 });
@@ -32716,7 +32719,8 @@ var init_gamesSpineLeagueDisplayLabel = __esm({
       WORLDCUP: "World Cup",
       PLL: "PLL",
       WIMBLEDON_MEN: "Wimbledon (Men's)",
-      WIMBLEDON_WOMEN: "Wimbledon (Women's)"
+      WIMBLEDON_WOMEN: "Wimbledon (Women's)",
+      USATF: "Track & Field"
     };
     GAMES_SPINE_LEAGUE_SECTION_HEADER_LABEL = {
       ARG1: "LPF"
@@ -71302,6 +71306,8 @@ var init_commandBriefingLeagueLabel = __esm({
 
 // ../grarf/desktop/src/lib/gamesSpine/resolveGamesSpineGameCardLeagueLabel.ts
 function resolveGamesSpineGameCardLeagueLabel(game) {
+  const manualLeagueLabel = game.metadata?.manualEvent?.leagueDisplayName?.trim();
+  if (manualLeagueLabel) return manualLeagueLabel;
   const key2 = game.league ?? leagueKeyFromGameId(game.id) ?? null;
   if (key2 && GAMES_SPINE_GAME_CARD_LEAGUE_LABEL_OVERRIDES[key2]) {
     return GAMES_SPINE_GAME_CARD_LEAGUE_LABEL_OVERRIDES[key2];
