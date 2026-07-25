@@ -37412,6 +37412,32 @@ var init_ufcJul252026LiveBrowserTemporaryOverride = __esm({
   }
 });
 
+// ../grarf/desktop/src/lib/gamesSpine/pgaTourFollowLiveWorkspaceIntent.ts
+function armPgaTourFollowLiveWorkspaceIntent() {
+  followLiveWorkspaceArmed = true;
+}
+function disarmPgaTourFollowLiveWorkspaceIntent() {
+  followLiveWorkspaceArmed = false;
+}
+function resolvePgaTourFollowLiveWorkspaceTabSources() {
+  if (!followLiveWorkspaceArmed) return null;
+  return [
+    {
+      id: "pga-tour__follow-live-leaderboard",
+      label: "PGA Tour Leaderboard",
+      url: PGA_TOUR_LEADERBOARD_URL
+    }
+  ];
+}
+var followLiveWorkspaceArmed;
+var init_pgaTourFollowLiveWorkspaceIntent = __esm({
+  "../grarf/desktop/src/lib/gamesSpine/pgaTourFollowLiveWorkspaceIntent.ts"() {
+    init_define_import_meta_env();
+    init_golfWatchUrls2();
+    followLiveWorkspaceArmed = false;
+  }
+});
+
 // ../grarf/desktop/src/lib/operations/resolveOperationsLiveWorkspaceNavigation.ts
 function operationsLiveWorkspaceItemsToHomeSources(items) {
   return (items ?? []).filter((item) => item.url.trim().length > 0).map((item) => ({
@@ -37439,6 +37465,10 @@ function resolveLiveWorkspaceTabSourcesForHub(hubId, itemsByLeagueKey) {
   if (hubId === "ufc") {
     const temporaryOverride = resolveUfcJul252026LiveBrowserOverrideSources();
     if (temporaryOverride) return temporaryOverride;
+  }
+  const followLiveSources = resolvePgaTourFollowLiveWorkspaceTabSources();
+  if (hubId === "pga-tour" && followLiveSources) {
+    return followLiveSources;
   }
   const leagueKey = resolveHomeLeagueWorkspaceGrarfLeagueKey(hubId);
   const configuredSources = leagueKey ? operationsLiveWorkspaceItemsToHomeSources(
@@ -37473,6 +37503,7 @@ var init_resolveOperationsLiveWorkspaceNavigation = __esm({
     init_homeLeagueWorkspaceHubRegistry();
     init_adminOperationsLiveWorkspaceStore();
     init_ufcJul252026LiveBrowserTemporaryOverride();
+    init_pgaTourFollowLiveWorkspaceIntent();
   }
 });
 
@@ -38607,6 +38638,9 @@ function openGamesSpinePermanentLeagueWorkspace(teamKey) {
   openCanonicalLeagueWorkspaceWithScheduleTab(hubId);
 }
 function openCanonicalLeagueWorkspaceFromMainMenu(hubId) {
+  if (hubId === "pga-tour") {
+    disarmPgaTourFollowLiveWorkspaceIntent();
+  }
   const config = resolveHomeLeagueWorkspaceNavigationConfig(hubId);
   if (config?.defaultCategoryId) {
     useHomeLeagueWorkspaceMainMenuStore.getState().setActiveCategory(hubId, config.defaultCategoryId);
@@ -38623,6 +38657,7 @@ var init_openGamesSpinePermanentLeagueWorkspace = __esm({
     init_homeLeagueWorkspaceStore();
     init_canonicalPermanentLeagueWorkspaces();
     init_openF1LeagueWorkspace();
+    init_pgaTourFollowLiveWorkspaceIntent();
     LEAGUE_HUB_SCHEDULE_CATEGORY_ID = "schedule";
   }
 });
@@ -72919,6 +72954,34 @@ var init_GamesSpineUnifiedGameCard = __esm({
   }
 });
 
+// ../grarf/desktop/src/lib/gamesSpine/tryOpenPgaTourFollowLiveInLeagueWorkspace.ts
+function isPgaTourGameRow(game) {
+  return game.league === "PGA";
+}
+function tryOpenPgaTourFollowLiveInLeagueWorkspace(game) {
+  if (!isGrarfWebRenderer()) return false;
+  if (!isPgaTourGameRow(game)) return false;
+  if (!isGameActivelyLive(game)) return false;
+  clearCenterEmbedForSpineGameSelect();
+  armPgaTourFollowLiveWorkspaceIntent();
+  useHomeLeagueWorkspaceMainMenuStore.getState().setActiveCategory(PGA_TOUR_HUB_ID, "live");
+  openHomeLeagueWorkspace(PGA_TOUR_HUB_ID);
+  return true;
+}
+var PGA_TOUR_HUB_ID;
+var init_tryOpenPgaTourFollowLiveInLeagueWorkspace = __esm({
+  "../grarf/desktop/src/lib/gamesSpine/tryOpenPgaTourFollowLiveInLeagueWorkspace.ts"() {
+    init_define_import_meta_env();
+    init_openF1LeagueWorkspace();
+    init_clearCenterEmbedForSpineGameSelect();
+    init_pgaTourFollowLiveWorkspaceIntent();
+    init_isGameActivelyLive();
+    init_isGrarfWebRenderer();
+    init_homeLeagueWorkspaceMainMenuStore();
+    PGA_TOUR_HUB_ID = "pga-tour";
+  }
+});
+
 // ../grarf/desktop/src/components/gamesSpine/GamesSpineHomeParityGameRow.tsx
 function pitcherShort(name) {
   const t2 = name.trim();
@@ -73008,6 +73071,7 @@ function GamesSpineHomeParityGameRow({
       },
       onFollowLive: hasEffectiveGameCardUrl ? (e2) => {
         e2.stopPropagation();
+        if (tryOpenPgaTourFollowLiveInLeagueWorkspace(game)) return;
         onOpen(game.id, game);
       } : void 0,
       statusSupplement,
@@ -73033,6 +73097,7 @@ var init_GamesSpineHomeParityGameRow = __esm({
     init_GameNarrativeCapsule();
     init_GamesSpineUnifiedGameCard();
     init_resolveGamesSpineBroadcastOutlets();
+    init_tryOpenPgaTourFollowLiveInLeagueWorkspace();
     import_jsx_runtime79 = __toESM(require_jsx_runtime(), 1);
   }
 });
