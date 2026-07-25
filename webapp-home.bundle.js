@@ -445,7 +445,9 @@ function summarizeManualEventsSaveDraft(draft) {
     eventName: draft.eventType === "event-only" ? draft.eventName.trim() || null : null,
     team1Name: draft.eventType === "head-to-head" ? draft.team1Name.trim() || null : null,
     team2Name: draft.eventType === "head-to-head" ? draft.team2Name.trim() || null : null,
-    dateStartTime: draft.dateStartTime.trim() || null,
+    eventDate: draft.eventDate.trim() || null,
+    startTime: draft.startTime.trim() || null,
+    endTime: draft.endTime.trim() || null,
     broadcastChannelName: draft.broadcastChannelName.trim() || null,
     launchBehavior: draft.launchBehavior,
     hasLeagueLogoUrl: Boolean(draft.leagueLogoUrl.trim()),
@@ -473,7 +475,14 @@ function summarizeManualEventsSavePayload(input) {
       openBehavior: input.event.openBehavior,
       hasStreamUrl: Boolean(input.event.streamUrl?.trim()),
       hasGameCardUrl: Boolean(input.event.gameCardUrl?.trim())
-    }
+    },
+    replaceEvent: input.replaceEvent ? {
+      leagueId: input.replaceEvent.leagueId,
+      startTime: input.replaceEvent.startTime,
+      eventName: input.replaceEvent.eventName ?? null,
+      team1Name: input.replaceEvent.team1?.name ?? null,
+      team2Name: input.replaceEvent.team2?.name ?? null
+    } : null
   };
 }
 function extractStructuredErrors(responseBody) {
@@ -2734,8 +2743,8 @@ var require_react_production = __commonJS({
     exports.useDeferredValue = function(value, initialValue) {
       return ReactSharedInternals.H.useDeferredValue(value, initialValue);
     };
-    exports.useEffect = function(create57, deps) {
-      return ReactSharedInternals.H.useEffect(create57, deps);
+    exports.useEffect = function(create58, deps) {
+      return ReactSharedInternals.H.useEffect(create58, deps);
     };
     exports.useEffectEvent = function(callback) {
       return ReactSharedInternals.H.useEffectEvent(callback);
@@ -2743,17 +2752,17 @@ var require_react_production = __commonJS({
     exports.useId = function() {
       return ReactSharedInternals.H.useId();
     };
-    exports.useImperativeHandle = function(ref, create57, deps) {
-      return ReactSharedInternals.H.useImperativeHandle(ref, create57, deps);
+    exports.useImperativeHandle = function(ref, create58, deps) {
+      return ReactSharedInternals.H.useImperativeHandle(ref, create58, deps);
     };
-    exports.useInsertionEffect = function(create57, deps) {
-      return ReactSharedInternals.H.useInsertionEffect(create57, deps);
+    exports.useInsertionEffect = function(create58, deps) {
+      return ReactSharedInternals.H.useInsertionEffect(create58, deps);
     };
-    exports.useLayoutEffect = function(create57, deps) {
-      return ReactSharedInternals.H.useLayoutEffect(create57, deps);
+    exports.useLayoutEffect = function(create58, deps) {
+      return ReactSharedInternals.H.useLayoutEffect(create58, deps);
     };
-    exports.useMemo = function(create57, deps) {
-      return ReactSharedInternals.H.useMemo(create57, deps);
+    exports.useMemo = function(create58, deps) {
+      return ReactSharedInternals.H.useMemo(create58, deps);
     };
     exports.useOptimistic = function(passthrough, reducer) {
       return ReactSharedInternals.H.useOptimistic(passthrough, reducer);
@@ -2817,8 +2826,8 @@ var require_react2 = __commonJS({
       Object.assign(useBoundStore, api);
       return useBoundStore;
     };
-    var create57 = ((createState) => createState ? createImpl(createState) : createImpl);
-    exports.create = create57;
+    var create58 = ((createState) => createState ? createImpl(createState) : createImpl);
+    exports.create = create58;
     exports.useStore = useStore;
   }
 });
@@ -7461,43 +7470,43 @@ var require_react_dom_client_production = __commonJS({
       currentStateHook.memoizedState = action;
       return [stateHook, dispatch, false];
     }
-    function pushSimpleEffect(tag, inst, create57, deps) {
-      tag = { tag, create: create57, deps, inst, next: null };
+    function pushSimpleEffect(tag, inst, create58, deps) {
+      tag = { tag, create: create58, deps, inst, next: null };
       inst = currentlyRenderingFiber.updateQueue;
       null === inst && (inst = createFunctionComponentUpdateQueue(), currentlyRenderingFiber.updateQueue = inst);
-      create57 = inst.lastEffect;
-      null === create57 ? inst.lastEffect = tag.next = tag : (deps = create57.next, create57.next = tag, tag.next = deps, inst.lastEffect = tag);
+      create58 = inst.lastEffect;
+      null === create58 ? inst.lastEffect = tag.next = tag : (deps = create58.next, create58.next = tag, tag.next = deps, inst.lastEffect = tag);
       return tag;
     }
     function updateRef() {
       return updateWorkInProgressHook().memoizedState;
     }
-    function mountEffectImpl(fiberFlags, hookFlags, create57, deps) {
+    function mountEffectImpl(fiberFlags, hookFlags, create58, deps) {
       var hook = mountWorkInProgressHook();
       currentlyRenderingFiber.flags |= fiberFlags;
       hook.memoizedState = pushSimpleEffect(
         1 | hookFlags,
         { destroy: void 0 },
-        create57,
+        create58,
         void 0 === deps ? null : deps
       );
     }
-    function updateEffectImpl(fiberFlags, hookFlags, create57, deps) {
+    function updateEffectImpl(fiberFlags, hookFlags, create58, deps) {
       var hook = updateWorkInProgressHook();
       deps = void 0 === deps ? null : deps;
       var inst = hook.memoizedState.inst;
-      null !== currentHook && null !== deps && areHookInputsEqual(deps, currentHook.memoizedState.deps) ? hook.memoizedState = pushSimpleEffect(hookFlags, inst, create57, deps) : (currentlyRenderingFiber.flags |= fiberFlags, hook.memoizedState = pushSimpleEffect(
+      null !== currentHook && null !== deps && areHookInputsEqual(deps, currentHook.memoizedState.deps) ? hook.memoizedState = pushSimpleEffect(hookFlags, inst, create58, deps) : (currentlyRenderingFiber.flags |= fiberFlags, hook.memoizedState = pushSimpleEffect(
         1 | hookFlags,
         inst,
-        create57,
+        create58,
         deps
       ));
     }
-    function mountEffect(create57, deps) {
-      mountEffectImpl(8390656, 8, create57, deps);
+    function mountEffect(create58, deps) {
+      mountEffectImpl(8390656, 8, create58, deps);
     }
-    function updateEffect(create57, deps) {
-      updateEffectImpl(2048, 8, create57, deps);
+    function updateEffect(create58, deps) {
+      updateEffectImpl(2048, 8, create58, deps);
     }
     function useEffectEventImpl(payload) {
       currentlyRenderingFiber.flags |= 4;
@@ -7517,28 +7526,28 @@ var require_react_dom_client_production = __commonJS({
         return ref.impl.apply(void 0, arguments);
       };
     }
-    function updateInsertionEffect(create57, deps) {
-      return updateEffectImpl(4, 2, create57, deps);
+    function updateInsertionEffect(create58, deps) {
+      return updateEffectImpl(4, 2, create58, deps);
     }
-    function updateLayoutEffect(create57, deps) {
-      return updateEffectImpl(4, 4, create57, deps);
+    function updateLayoutEffect(create58, deps) {
+      return updateEffectImpl(4, 4, create58, deps);
     }
-    function imperativeHandleEffect(create57, ref) {
+    function imperativeHandleEffect(create58, ref) {
       if ("function" === typeof ref) {
-        create57 = create57();
-        var refCleanup = ref(create57);
+        create58 = create58();
+        var refCleanup = ref(create58);
         return function() {
           "function" === typeof refCleanup ? refCleanup() : ref(null);
         };
       }
       if (null !== ref && void 0 !== ref)
-        return create57 = create57(), ref.current = create57, function() {
+        return create58 = create58(), ref.current = create58, function() {
           ref.current = null;
         };
     }
-    function updateImperativeHandle(ref, create57, deps) {
+    function updateImperativeHandle(ref, create58, deps) {
       deps = null !== deps && void 0 !== deps ? deps.concat([ref]) : null;
-      updateEffectImpl(4, 4, imperativeHandleEffect.bind(null, create57, ref), deps);
+      updateEffectImpl(4, 4, imperativeHandleEffect.bind(null, create58, ref), deps);
     }
     function mountDebugValue() {
     }
@@ -7837,20 +7846,20 @@ var require_react_dom_client_production = __commonJS({
       },
       useContext: readContext,
       useEffect: mountEffect,
-      useImperativeHandle: function(ref, create57, deps) {
+      useImperativeHandle: function(ref, create58, deps) {
         deps = null !== deps && void 0 !== deps ? deps.concat([ref]) : null;
         mountEffectImpl(
           4194308,
           4,
-          imperativeHandleEffect.bind(null, create57, ref),
+          imperativeHandleEffect.bind(null, create58, ref),
           deps
         );
       },
-      useLayoutEffect: function(create57, deps) {
-        return mountEffectImpl(4194308, 4, create57, deps);
+      useLayoutEffect: function(create58, deps) {
+        return mountEffectImpl(4194308, 4, create58, deps);
       },
-      useInsertionEffect: function(create57, deps) {
-        mountEffectImpl(4, 2, create57, deps);
+      useInsertionEffect: function(create58, deps) {
+        mountEffectImpl(4, 2, create58, deps);
       },
       useMemo: function(nextCreate, deps) {
         var hook = mountWorkInProgressHook();
@@ -9878,8 +9887,8 @@ var require_react_dom_client_production = __commonJS({
           do {
             if ((updateQueue.tag & flags) === flags) {
               lastEffect = void 0;
-              var create57 = updateQueue.create, inst = updateQueue.inst;
-              lastEffect = create57();
+              var create58 = updateQueue.create, inst = updateQueue.inst;
+              lastEffect = create58();
               inst.destroy = lastEffect;
             }
             updateQueue = updateQueue.next;
@@ -45466,6 +45475,18 @@ function validateManualEventDefinition(event, index) {
   if (!isNonEmptyString(event.endTime)) {
     errors.push({ index, field: "endTime", message: "endTime is required" });
   }
+  if (isNonEmptyString(event.startTime) && isNonEmptyString(event.endTime) && (event.sourceTimezone === "ET" || event.sourceTimezone === "CT")) {
+    const sourceTimezoneIana = resolveManualEventSourceTimezoneIana(event.sourceTimezone);
+    const startTimeMs = parseManualGamesSpineEventTimeMs(event.startTime, sourceTimezoneIana);
+    const endTimeMs = parseManualGamesSpineEventTimeMs(event.endTime, sourceTimezoneIana);
+    if (startTimeMs != null && endTimeMs != null && endTimeMs <= startTimeMs) {
+      errors.push({
+        index,
+        field: "endTime",
+        message: "endTime must be after startTime"
+      });
+    }
+  }
   if (event.sourceTimezone !== "ET" && event.sourceTimezone !== "CT") {
     errors.push({
       index,
@@ -45498,6 +45519,8 @@ function validateManualEventDefinition(event, index) {
 var init_validateManualEventDefinition = __esm({
   "../grarf/shared/domain/manualEvents/validateManualEventDefinition.ts"() {
     init_define_import_meta_env();
+    init_manualGamesSpineTime();
+    init_resolveSourceTimezone();
   }
 });
 
@@ -46185,14 +46208,9 @@ function formatManualGamesSpineDisplayTime2(startTimeMs) {
     timeZoneName: "short"
   });
 }
-function refreshManualGamesSpineGameIfNeeded(game, now) {
-  const manual = game.metadata?.manualGamesSpine;
-  if (!manual) return game;
-  const startTimeMs = parseManualGamesSpineEventTimeMs2(
-    manual.startTimeIso,
-    manual.sourceTimeZone
-  );
-  const endTimeMs = parseManualGamesSpineEventTimeMs2(manual.endTimeIso, manual.sourceTimeZone);
+function refreshManualScheduledGameIfNeeded(game, now, startTime, endTime, sourceTimeZone) {
+  const startTimeMs = game.startTimeMs ?? parseManualGamesSpineEventTimeMs2(startTime, sourceTimeZone);
+  const endTimeMs = parseManualGamesSpineEventTimeMs2(endTime, sourceTimeZone);
   if (!Number.isFinite(startTimeMs) || !Number.isFinite(endTimeMs)) return game;
   const nowMs = now.getTime();
   const status = resolveManualGamesSpineStatus2(nowMs, startTimeMs, endTimeMs);
@@ -46201,8 +46219,32 @@ function refreshManualGamesSpineGameIfNeeded(game, now) {
   return {
     ...game,
     status,
-    statusLine
+    statusLine,
+    startTimeMs
   };
+}
+function refreshManualGamesSpineGameIfNeeded(game, now) {
+  const manualGamesSpine = game.metadata?.manualGamesSpine;
+  if (manualGamesSpine) {
+    return refreshManualScheduledGameIfNeeded(
+      game,
+      now,
+      manualGamesSpine.startTimeIso,
+      manualGamesSpine.endTimeIso,
+      manualGamesSpine.sourceTimeZone
+    );
+  }
+  const manualEvent = game.metadata?.manualEvent;
+  if (manualEvent) {
+    return refreshManualScheduledGameIfNeeded(
+      game,
+      now,
+      manualEvent.startTime,
+      manualEvent.endTime,
+      manualEvent.sourceTimezoneIana
+    );
+  }
+  return game;
 }
 var WALL_CLOCK_RE2, CHANNEL_LABEL_TO_STREAM_PROVIDER2;
 var init_manualGamesSpineUtils = __esm({
@@ -67373,8 +67415,8 @@ var require_middleware = __commonJS({
       return initialState2;
     };
     var subscribeWithSelector = subscribeWithSelectorImpl;
-    function combine(initialState2, create57) {
-      return (...args) => Object.assign({}, initialState2, create57(...args));
+    function combine(initialState2, create58) {
+      return (...args) => Object.assign({}, initialState2, create58(...args));
     }
     function createJSONStorage(getStorage, options) {
       let storage;
@@ -76477,6 +76519,43 @@ var init_gamesSpineStickyLayout = __esm({
   }
 });
 
+// ../grarf/desktop/src/hooks/useManualGamesSpineLiveRefreshMs.ts
+function liveGamesHaveManualScheduledGames(leagues) {
+  for (const rows of Object.values(leagues)) {
+    if (!Array.isArray(rows)) continue;
+    for (const row of rows) {
+      if (row && typeof row === "object" && "metadata" in row && row.metadata && typeof row.metadata === "object" && ("manualGamesSpine" in row.metadata || "manualEvent" in row.metadata)) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+function useManualGamesSpineLiveRefreshMs() {
+  const document2 = useGamesSpineManualStore((state3) => state3.document);
+  const hasManualScheduledGames = useLiveGamesStore(
+    (state3) => liveGamesHaveManualScheduledGames(state3.leagues)
+  );
+  const [nowMs, setNowMs] = (0, import_react107.useState)(() => Date.now());
+  (0, import_react107.useEffect)(() => {
+    if (!document2?.leagues?.length && !hasManualScheduledGames) return;
+    const tick = () => setNowMs(Date.now());
+    tick();
+    const id = window.setInterval(tick, 3e4);
+    return () => window.clearInterval(id);
+  }, [document2, hasManualScheduledGames]);
+  return nowMs;
+}
+var import_react107;
+var init_useManualGamesSpineLiveRefreshMs = __esm({
+  "../grarf/desktop/src/hooks/useManualGamesSpineLiveRefreshMs.ts"() {
+    init_define_import_meta_env();
+    import_react107 = __toESM(require_react(), 1);
+    init_gamesSpineManualStore();
+    init_liveGamesStore();
+  }
+});
+
 // ../grarf/desktop/src/lib/gamesSpine/gamesSpineLeagueHeaderTypography.css
 var require_gamesSpineLeagueHeaderTypography = __commonJS({
   "../grarf/desktop/src/lib/gamesSpine/gamesSpineLeagueHeaderTypography.css"(exports, module) {
@@ -76529,10 +76608,10 @@ function useGamesWithCanonicalHighlights(games) {
   const setResolvedHighlight = useGameHighlightStore((s2) => s2.setResolvedHighlight);
   const operationsFieldsByGameId = useAdminOperationsCardStore((s2) => s2.fieldsByGameId);
   const mlbCatchupHighlightsByGamePk = useMlbCatchupHighlightsStore((s2) => s2.highlightsByGamePk);
-  const [highlightsTvGameLeagues, setHighlightsTvGameLeagues] = (0, import_react107.useState)(
+  const [highlightsTvGameLeagues, setHighlightsTvGameLeagues] = (0, import_react108.useState)(
     null
   );
-  (0, import_react107.useEffect)(() => {
+  (0, import_react108.useEffect)(() => {
     if (!isGrarfWebRenderer()) return;
     let cancelled = false;
     void loadHighlightsTvWebAutomaticHighlightGameLeagues().then((leagues) => {
@@ -76542,7 +76621,7 @@ function useGamesWithCanonicalHighlights(games) {
       cancelled = true;
     };
   }, []);
-  (0, import_react107.useEffect)(() => {
+  (0, import_react108.useEffect)(() => {
     if (!isGrarfWebRenderer() || !highlightsTvGameLeagues) return;
     games.forEach((game) => {
       if (!shouldResolveAutomaticHighlight2(game, highlightsTvGameLeagues)) return;
@@ -76564,7 +76643,7 @@ function useGamesWithCanonicalHighlights(games) {
     mlbCatchupHighlightsByGamePk,
     setResolvedHighlight
   ]);
-  return (0, import_react107.useMemo)(() => {
+  return (0, import_react108.useMemo)(() => {
     return games.map((game) => {
       const operationsFields = operationsFieldsByGameId[game.id];
       const catchupHighlight = game.gamePk != null && Number.isFinite(game.gamePk) ? (mlbCatchupHighlightsByGamePk[game.gamePk] ?? EMPTY_MLB_CATCHUP_HIGHLIGHTS2)[0] : null;
@@ -76575,11 +76654,11 @@ function useGamesWithCanonicalHighlights(games) {
     });
   }, [games, operationsFieldsByGameId, mlbCatchupHighlightsByGamePk, automaticHighlightsByGameId]);
 }
-var import_react107, EMPTY_MLB_CATCHUP_HIGHLIGHTS2;
+var import_react108, EMPTY_MLB_CATCHUP_HIGHLIGHTS2;
 var init_useGamesWithCanonicalHighlights = __esm({
   "../grarf/desktop/src/hooks/useGamesWithCanonicalHighlights.ts"() {
     init_define_import_meta_env();
-    import_react107 = __toESM(require_react(), 1);
+    import_react108 = __toESM(require_react(), 1);
     init_applyCanonicalGamesSpineEnrichment();
     init_fetchGameLeagueHighlight();
     init_fetchGameLeagueHighlightWeb();
@@ -76595,7 +76674,7 @@ var init_useGamesWithCanonicalHighlights = __esm({
 // ../grarf/desktop/src/hooks/useGamesWithCanonicalStatusOverrides.ts
 function useGamesWithCanonicalStatusOverrides(games) {
   const operationsFieldsByGameId = useAdminOperationsCardStore((s2) => s2.fieldsByGameId);
-  return (0, import_react108.useMemo)(
+  return (0, import_react109.useMemo)(
     () => games.map(
       (game) => applyCanonicalGamesSpineOperationsEnrichment(
         game,
@@ -76605,11 +76684,11 @@ function useGamesWithCanonicalStatusOverrides(games) {
     [games, operationsFieldsByGameId]
   );
 }
-var import_react108;
+var import_react109;
 var init_useGamesWithCanonicalStatusOverrides = __esm({
   "../grarf/desktop/src/hooks/useGamesWithCanonicalStatusOverrides.ts"() {
     init_define_import_meta_env();
-    import_react108 = __toESM(require_react(), 1);
+    import_react109 = __toESM(require_react(), 1);
     init_applyCanonicalGamesSpineEnrichment();
     init_adminOperationsCardStore();
   }
@@ -76798,7 +76877,7 @@ function TdfStage8HighlightSection({
   showSpineNarrative,
   hideSpineGeneratedSummaryHeadline
 }) {
-  const [expanded, setExpanded] = (0, import_react109.useState)(false);
+  const [expanded, setExpanded] = (0, import_react110.useState)(false);
   const f1ExternalPlayback = isF1HighlightLeague(game.league) && Boolean(video.youtubeVideoId);
   const narrativeSlot = f1ExternalPlayback ? /* @__PURE__ */ (0, import_jsx_runtime89.jsx)(TdfStage8CollapsedThumbnail, { video, onExpand: () => void 0, league: game.league }) : expanded ? /* @__PURE__ */ (0, import_jsx_runtime89.jsx)(TdfStage8InlinePlayer, { video, onCollapse: () => setExpanded(false), league: game.league }) : /* @__PURE__ */ (0, import_jsx_runtime89.jsx)(TdfStage8CollapsedThumbnail, { video, onExpand: () => setExpanded(true), league: game.league });
   return /* @__PURE__ */ (0, import_jsx_runtime89.jsx)(
@@ -76862,11 +76941,11 @@ function MlbInlineHighlightPrototypeSection(props) {
     }
   );
 }
-var import_react109, import_jsx_runtime89, TOUR_DE_FRANCE_STAGE_8_VIDEO, EMPTY_MLB_CATCHUP_HIGHLIGHTS3;
+var import_react110, import_jsx_runtime89, TOUR_DE_FRANCE_STAGE_8_VIDEO, EMPTY_MLB_CATCHUP_HIGHLIGHTS3;
 var init_TdfStage8HighlightPrototype = __esm({
   "../grarf/desktop/src/components/gamesSpine/TdfStage8HighlightPrototype.tsx"() {
     init_define_import_meta_env();
-    import_react109 = __toESM(require_react(), 1);
+    import_react110 = __toESM(require_react(), 1);
     init_cn();
     init_canonicalGameHighlight();
     init_mlbCatchupHighlightsStore();
@@ -76886,11 +76965,11 @@ var init_TdfStage8HighlightPrototype = __esm({
 });
 
 // ../grarf/desktop/src/components/homeMvp/HomeLeagueSpineSection.tsx
-var import_react110, import_jsx_runtime90, HomeLeagueSpineSection;
+var import_react111, import_jsx_runtime90, HomeLeagueSpineSection;
 var init_HomeLeagueSpineSection = __esm({
   "../grarf/desktop/src/components/homeMvp/HomeLeagueSpineSection.tsx"() {
     init_define_import_meta_env();
-    import_react110 = __toESM(require_react(), 1);
+    import_react111 = __toESM(require_react(), 1);
     init_GameRow();
     init_GamesSpineLeagueHeaderMark();
     init_EditableLeagueContextStrip();
@@ -76925,6 +77004,8 @@ var init_HomeLeagueSpineSection = __esm({
     init_gamesSpineDisplayStore();
     init_manualLeMans2026SpineEntry();
     init_manualTourDeFranceSpineEntry();
+    init_manualGamesSpineUtils();
+    init_useManualGamesSpineLiveRefreshMs();
     init_gamesSpineLeagueHeaderTypography();
     init_wimbledonGamesSpinePresentation();
     init_gamesSpineRenderStore();
@@ -76934,7 +77015,7 @@ var init_HomeLeagueSpineSection = __esm({
     init_useGamesWithCanonicalStatusOverrides();
     init_TdfStage8HighlightPrototype();
     import_jsx_runtime90 = __toESM(require_jsx_runtime(), 1);
-    HomeLeagueSpineSection = (0, import_react110.memo)(function HomeLeagueSpineSection2({
+    HomeLeagueSpineSection = (0, import_react111.memo)(function HomeLeagueSpineSection2({
       league: league2,
       statusFilter,
       collapsed,
@@ -76966,20 +77047,24 @@ var init_HomeLeagueSpineSection = __esm({
       );
       const manualLeMansRefreshMs = useManualLeMans2026LiveRefreshMs();
       const manualTourDeFranceRefreshMs = useManualTourDeFranceLiveRefreshMs();
+      const manualRefreshMs = useManualGamesSpineLiveRefreshMs();
       const operationalIngestComplete = useGamesSpineRenderStore((s2) => s2.operationalIngestComplete);
       const gamesMode = useGamesSpineDisplayStore((state3) => state3.gamesMode);
       const cardListClass = isGrarfWebRenderer() ? resolveGamesSpineCardListLayoutClass(gamesMode) : GAMES_SPINE_CARD_LIST_CLASS;
       const useOperationalModePipeline = briefingScrollContext === "home" || briefingScrollContext === "league";
       const displayName = resolveGamesSpineLeagueSectionHeaderLabel(league2);
-      const headerRef = (0, import_react110.useRef)(null);
-      const stickyLogged = (0, import_react110.useRef)(false);
-      const games = (0, import_react110.useMemo)(() => {
+      const headerRef = (0, import_react111.useRef)(null);
+      const stickyLogged = (0, import_react111.useRef)(false);
+      const games = (0, import_react111.useMemo)(() => {
         const viewDate = briefingScrollContext === "home" && statusFilter === "live" ? getOperationalSportsDayDateKey() : selectedDate;
         const rows = resolveViewLeagueGames(league2, viewDate, liveLeagues, scheduleByDate);
-        const now = new Date(Math.max(manualLeMansRefreshMs, manualTourDeFranceRefreshMs));
+        const now = new Date(Math.max(manualLeMansRefreshMs, manualTourDeFranceRefreshMs, manualRefreshMs));
         return rows.map(
-          (game) => refreshManualTourDeFranceSpineGameIfNeeded(
-            refreshManualLeMans2026SpineGameIfNeeded(game, now),
+          (game) => refreshManualGamesSpineGameIfNeeded(
+            refreshManualTourDeFranceSpineGameIfNeeded(
+              refreshManualLeMans2026SpineGameIfNeeded(game, now),
+              now
+            ),
             now
           )
         );
@@ -76991,18 +77076,19 @@ var init_HomeLeagueSpineSection = __esm({
         briefingScrollContext,
         statusFilter,
         manualLeMansRefreshMs,
-        manualTourDeFranceRefreshMs
+        manualTourDeFranceRefreshMs,
+        manualRefreshMs
       ]);
       const gamesWithStatusOverrides = useGamesWithCanonicalStatusOverrides(games);
-      const localRetainedFinals = (0, import_react110.useMemo)(() => {
+      const localRetainedFinals = (0, import_react111.useMemo)(() => {
         return resolveGamesSpineRetainedForLeague(league2);
       }, [retainedById, league2]);
-      const supplementalFinals = (0, import_react110.useMemo)(
+      const supplementalFinals = (0, import_react111.useMemo)(
         () => selectedDate === getOperationalSportsDayDateKey() ? mergeCatchUpSupplementalFinals(localRetainedFinals) : [],
         [localRetainedFinals, selectedDate]
       );
       const supplementalFinalsWithStatusOverrides = useGamesWithCanonicalStatusOverrides(supplementalFinals);
-      const visibleGames = (0, import_react110.useMemo)(
+      const visibleGames = (0, import_react111.useMemo)(
         () => applyDemoNhlSpineGames(
           applyDemoWnbaSpineGames(
             buildVisibleSpineGames({
@@ -77031,7 +77117,7 @@ var init_HomeLeagueSpineSection = __esm({
         ]
       );
       const highlightedVisibleGames = useGamesWithCanonicalHighlights(visibleGames);
-      (0, import_react110.useEffect)(() => {
+      (0, import_react111.useEffect)(() => {
         if (!useOperationalModePipeline) return;
         if (operationalMode === "LIVE" || operationalMode === "PREPARE") {
           recordOperationalSlateLeagueTrace({
@@ -77071,7 +77157,7 @@ var init_HomeLeagueSpineSection = __esm({
       const removeOperationsSectionGames = useGamesSpineOperationsGamesStore(
         (s2) => s2.removeSectionGames
       );
-      (0, import_react110.useEffect)(() => {
+      (0, import_react111.useEffect)(() => {
         if (!isGrarfWebRenderer() || !isAdminMode) return;
         const operationsKey = `league:${league2}`;
         publishOperationsSectionGames(operationsKey, highlightedVisibleGames);
@@ -77083,18 +77169,18 @@ var init_HomeLeagueSpineSection = __esm({
         publishOperationsSectionGames,
         removeOperationsSectionGames
       ]);
-      const viewOperationalMode = (0, import_react110.useMemo)(
+      const viewOperationalMode = (0, import_react111.useMemo)(
         () => resolveViewOperationalMode(selectedDate, operationalMode),
         [selectedDate, operationalMode]
       );
-      const shouldGroupPrepareTimes = (0, import_react110.useMemo)(() => {
+      const shouldGroupPrepareTimes = (0, import_react111.useMemo)(() => {
         if (viewOperationalMode === "PREPARE") return true;
         if (briefingScrollContext === "home") {
           return visibleGames.some((g2) => g2.status === "scheduled");
         }
         return false;
       }, [viewOperationalMode, briefingScrollContext, visibleGames]);
-      const prepareGroupStarters = (0, import_react110.useMemo)(() => {
+      const prepareGroupStarters = (0, import_react111.useMemo)(() => {
         if (!shouldGroupPrepareTimes) return /* @__PURE__ */ new Map();
         const starters = /* @__PURE__ */ new Map();
         let lastScheduledTime = null;
@@ -77112,19 +77198,19 @@ var init_HomeLeagueSpineSection = __esm({
         return starters;
       }, [shouldGroupPrepareTimes, visibleGames]);
       const isPrepareGrouped = prepareGroupStarters.size > 0;
-      const summary = (0, import_react110.useMemo)(
+      const summary = (0, import_react111.useMemo)(
         () => buildLeagueSummaryLine(league2, highlightedVisibleGames, statusFilter),
         [league2, highlightedVisibleGames, statusFilter]
       );
-      const hasLiveEvents = (0, import_react110.useMemo)(
+      const hasLiveEvents = (0, import_react111.useMemo)(
         () => gamesWithStatusOverrides.some(isGameActivelyLive),
         [gamesWithStatusOverrides]
       );
-      const contextStrip = (0, import_react110.useMemo)(
+      const contextStrip = (0, import_react111.useMemo)(
         () => resolveEditorialLeagueContext(league2, highlightedVisibleGames, bundle),
         [league2, highlightedVisibleGames, bundle]
       );
-      (0, import_react110.useEffect)(() => {
+      (0, import_react111.useEffect)(() => {
         if (!headerRef.current || stickyLogged.current || visibleGames.length === 0) return;
         const el = headerRef.current;
         const observer = new IntersectionObserver(
@@ -77445,11 +77531,11 @@ var init_selectFeaturedGames = __esm({
 });
 
 // ../grarf/desktop/src/components/homeMvp/HomeFeaturedSpineSection.tsx
-var import_react111, import_jsx_runtime91, HomeFeaturedSpineSection;
+var import_react112, import_jsx_runtime91, HomeFeaturedSpineSection;
 var init_HomeFeaturedSpineSection = __esm({
   "../grarf/desktop/src/components/homeMvp/HomeFeaturedSpineSection.tsx"() {
     init_define_import_meta_env();
-    import_react111 = __toESM(require_react(), 1);
+    import_react112 = __toESM(require_react(), 1);
     init_GameRow();
     init_cn();
     init_gamesColumnLeagues();
@@ -77481,7 +77567,7 @@ var init_HomeFeaturedSpineSection = __esm({
     init_BestGameRightNowSection();
     init_TdfStage8HighlightPrototype();
     import_jsx_runtime91 = __toESM(require_jsx_runtime(), 1);
-    HomeFeaturedSpineSection = (0, import_react111.memo)(function HomeFeaturedSpineSection2({
+    HomeFeaturedSpineSection = (0, import_react112.memo)(function HomeFeaturedSpineSection2({
       statusFilter,
       collapsed,
       onToggleCollapse,
@@ -77503,7 +77589,7 @@ var init_HomeFeaturedSpineSection = __esm({
       const gamesMode = useGamesSpineDisplayStore((state3) => state3.gamesMode);
       const adminPriorities = useAdminFeaturedPriorityStore((s2) => s2.priorities);
       const cardListClass = isGrarfWebRenderer() ? resolveGamesSpineCardListLayoutClass(gamesMode) : GAMES_SPINE_CARD_LIST_CLASS;
-      const gamePool = (0, import_react111.useMemo)(() => {
+      const gamePool = (0, import_react112.useMemo)(() => {
         const supplementalFinals = statusFilter === "final" && isSelectedDateOperationalSportsDay(selectedDate) ? mergeCatchUpSupplementalFinals(
           ...withoutGamesSpineHiddenLeagues(getGamesColumnLeagueOrder()).map(
             (key2) => useRecentFinalizedGamesStore.getState().getRetainedForLeague(key2)
@@ -77519,7 +77605,7 @@ var init_HomeFeaturedSpineSection = __esm({
         );
       }, [liveLeagues, scheduleByDate, selectedDate, statusFilter, retainedById]);
       const gamePoolWithStatusOverrides = useGamesWithCanonicalStatusOverrides(gamePool);
-      const visibleGames = (0, import_react111.useMemo)(
+      const visibleGames = (0, import_react112.useMemo)(
         () => selectUnifiedFeaturedGames(
           [...gamePoolWithStatusOverrides],
           bundle,
@@ -77537,7 +77623,7 @@ var init_HomeFeaturedSpineSection = __esm({
       const removeOperationsSectionGames = useGamesSpineOperationsGamesStore(
         (s2) => s2.removeSectionGames
       );
-      (0, import_react111.useEffect)(() => {
+      (0, import_react112.useEffect)(() => {
         if (!isGrarfWebRenderer() || !isAdminMode) return;
         publishOperationsSectionGames("featured", highlightedVisibleGames);
         return () => removeOperationsSectionGames("featured");
@@ -77547,7 +77633,7 @@ var init_HomeFeaturedSpineSection = __esm({
         publishOperationsSectionGames,
         removeOperationsSectionGames
       ]);
-      const displayGames = (0, import_react111.useMemo)(() => {
+      const displayGames = (0, import_react112.useMemo)(() => {
         if (!bestGameRightNowFeatured) {
           let games = highlightedVisibleGames;
           if (isGrarfWebRenderer() && bestGameRightNowAtSpineTop) {
@@ -77563,7 +77649,7 @@ var init_HomeFeaturedSpineSection = __esm({
           bestGameRightNowFeatured.game.id
         );
       }, [highlightedVisibleGames, bestGameRightNowFeatured, bestGameRightNowAtSpineTop]);
-      const hasLiveEvents = (0, import_react111.useMemo)(() => {
+      const hasLiveEvents = (0, import_react112.useMemo)(() => {
         const gamesForLiveIndicator = isGrarfWebRenderer() ? displayGames : highlightedVisibleGames;
         return gamesForLiveIndicator.some(isGameActivelyLive);
       }, [displayGames, highlightedVisibleGames]);
@@ -77796,10 +77882,10 @@ function MoreLeaguesWaitlistCard({
   parentScrolls = false,
   showEditorialControls = false
 }) {
-  const [email, setEmail] = (0, import_react112.useState)("");
-  const [status, setStatus] = (0, import_react112.useState)("idle");
-  const [errorMessage, setErrorMessage] = (0, import_react112.useState)(null);
-  const onSubmit = (0, import_react112.useCallback)(
+  const [email, setEmail] = (0, import_react113.useState)("");
+  const [status, setStatus] = (0, import_react113.useState)("idle");
+  const [errorMessage, setErrorMessage] = (0, import_react113.useState)(null);
+  const onSubmit = (0, import_react113.useCallback)(
     async (event) => {
       event.preventDefault();
       if (status === "loading" || status === "success") return;
@@ -77939,11 +78025,11 @@ function MoreLeaguesWaitlistCard({
     )
   ] });
 }
-var import_react112, import_jsx_runtime93;
+var import_react113, import_jsx_runtime93;
 var init_MoreLeaguesWaitlistCard = __esm({
   "../grarf/desktop/src/components/homeMvp/MoreLeaguesWaitlistCard.tsx"() {
     init_define_import_meta_env();
-    import_react112 = __toESM(require_react(), 1);
+    import_react113 = __toESM(require_react(), 1);
     init_lucide_react();
     init_cn();
     init_moreLeagues();
@@ -78075,9 +78161,9 @@ function SportscapeEditorialPasswordForm({
   compact = false,
   onSuccess
 }) {
-  const [password, setPassword] = (0, import_react113.useState)("");
-  const [error, setError] = (0, import_react113.useState)(null);
-  const [busy, setBusy] = (0, import_react113.useState)(false);
+  const [password, setPassword] = (0, import_react114.useState)("");
+  const [error, setError] = (0, import_react114.useState)(null);
+  const [busy, setBusy] = (0, import_react114.useState)(false);
   const onSubmit = async (event) => {
     event.preventDefault();
     setError(null);
@@ -78132,11 +78218,11 @@ function SportscapeEditorialPasswordForm({
     )
   ] });
 }
-var import_react113, import_jsx_runtime94;
+var import_react114, import_jsx_runtime94;
 var init_SportscapeEditorialPasswordForm = __esm({
   "../grarf/desktop/src/components/sportscapeEditorial/SportscapeEditorialPasswordForm.tsx"() {
     init_define_import_meta_env();
-    import_react113 = __toESM(require_react(), 1);
+    import_react114 = __toESM(require_react(), 1);
     init_sportscapeEditorialApi();
     import_jsx_runtime94 = __toESM(require_jsx_runtime(), 1);
   }
@@ -78202,9 +78288,9 @@ var init_SportscapeEditorialPasswordModal = __esm({
 function HomeEditorialModeBar({ className }) {
   const editMode = useEditorialStore((s2) => s2.editMode);
   const setEditMode = useEditorialStore((s2) => s2.setEditMode);
-  const [busy, setBusy] = (0, import_react114.useState)(null);
-  const [status, setStatus] = (0, import_react114.useState)(null);
-  const [passwordPromptOpen, setPasswordPromptOpen] = (0, import_react114.useState)(false);
+  const [busy, setBusy] = (0, import_react115.useState)(null);
+  const [status, setStatus] = (0, import_react115.useState)(null);
+  const [passwordPromptOpen, setPasswordPromptOpen] = (0, import_react115.useState)(false);
   const requestEditMode = () => {
     if (editMode) {
       setEditMode(false);
@@ -78312,11 +78398,11 @@ function HomeEditorialModeBar({ className }) {
     )
   ] });
 }
-var import_react114, import_jsx_runtime96;
+var import_react115, import_jsx_runtime96;
 var init_HomeEditorialModeBar = __esm({
   "../grarf/desktop/src/components/editorial/HomeEditorialModeBar.tsx"() {
     init_define_import_meta_env();
-    import_react114 = __toESM(require_react(), 1);
+    import_react115 = __toESM(require_react(), 1);
     init_cn();
     init_grarfAdminFlag();
     init_sportscapeEditorialAdminAuth();
@@ -78482,15 +78568,15 @@ function writeCollapseMap(map) {
   }
 }
 function useGamesSpineCollapse(statusFilter) {
-  const [collapsed, setCollapsed] = (0, import_react115.useState)(() => readCollapseMap());
-  (0, import_react115.useEffect)(() => {
+  const [collapsed, setCollapsed] = (0, import_react116.useState)(() => readCollapseMap());
+  (0, import_react116.useEffect)(() => {
     writeCollapseMap(collapsed);
   }, [collapsed]);
-  const isCollapsed = (0, import_react115.useCallback)(
+  const isCollapsed = (0, import_react116.useCallback)(
     (key2) => leagueCollapsedForFilter(collapsed, key2, statusFilter),
     [collapsed, statusFilter]
   );
-  const toggleCollapsed = (0, import_react115.useCallback)(
+  const toggleCollapsed = (0, import_react116.useCallback)(
     (leagueKey) => {
       const storageKey = collapseStorageKey(statusFilter, leagueKey);
       setCollapsed((prev) => {
@@ -78501,7 +78587,7 @@ function useGamesSpineCollapse(statusFilter) {
     },
     [statusFilter]
   );
-  const setAllLeaguesCollapsed = (0, import_react115.useCallback)(
+  const setAllLeaguesCollapsed = (0, import_react116.useCallback)(
     (leagueKeys, collapsed2) => {
       if (leagueKeys.length === 0) return;
       setCollapsed((prev) => {
@@ -78516,37 +78602,15 @@ function useGamesSpineCollapse(statusFilter) {
   );
   return { isCollapsed, toggleCollapsed, setAllLeaguesCollapsed };
 }
-var import_react115, STORAGE_KEY4, LOG33;
+var import_react116, STORAGE_KEY4, LOG33;
 var init_useGamesSpineCollapse = __esm({
   "../grarf/desktop/src/hooks/useGamesSpineCollapse.ts"() {
     init_define_import_meta_env();
-    import_react115 = __toESM(require_react(), 1);
+    import_react116 = __toESM(require_react(), 1);
     init_mergeGamesSpineSectionsByPriority();
     init_isGrarfWebRenderer();
     STORAGE_KEY4 = "grarf-games-spine-collapse-v2";
     LOG33 = "[GamesSpine]";
-  }
-});
-
-// ../grarf/desktop/src/hooks/useManualGamesSpineLiveRefreshMs.ts
-function useManualGamesSpineLiveRefreshMs() {
-  const document2 = useGamesSpineManualStore((state3) => state3.document);
-  const [nowMs, setNowMs] = (0, import_react116.useState)(() => Date.now());
-  (0, import_react116.useEffect)(() => {
-    if (!document2?.leagues?.length) return;
-    const tick = () => setNowMs(Date.now());
-    tick();
-    const id = window.setInterval(tick, 3e4);
-    return () => window.clearInterval(id);
-  }, [document2]);
-  return nowMs;
-}
-var import_react116;
-var init_useManualGamesSpineLiveRefreshMs = __esm({
-  "../grarf/desktop/src/hooks/useManualGamesSpineLiveRefreshMs.ts"() {
-    init_define_import_meta_env();
-    import_react116 = __toESM(require_react(), 1);
-    init_gamesSpineManualStore();
   }
 });
 
@@ -96471,6 +96535,103 @@ var init_deleteOperationsManualGameEntry = __esm({
   }
 });
 
+// ../grarf/shared/domain/manualEvents/buildOperationsManualGameEntryEditorDraftFromManualGame.ts
+function parseWallClockDateAndTime(value) {
+  const match = value.trim().match(/^(\d{4}-\d{2}-\d{2})T(\d{2}):(\d{2})/);
+  if (!match) return null;
+  return { date: match[1], time: `${match[2]}:${match[3]}` };
+}
+function buildOperationsManualGameEntryEditorDraftFromManualGame(game, league2, event) {
+  const manual = game.metadata?.manualEvent;
+  const startParts = parseWallClockDateAndTime(event.startTime);
+  const endParts = parseWallClockDateAndTime(event.endTime);
+  const eventType = event.eventName?.trim() ? "event-only" : "head-to-head";
+  const broadcastLogoUrl = manual?.broadcastLogoUrl?.trim() || "";
+  return {
+    leagueLogoUrl: manual?.leagueLogoUrl?.trim() || league2.logo.trim(),
+    leagueName: manual?.leagueDisplayName?.trim() || league2.displayName.trim(),
+    eventDate: startParts?.date ?? "",
+    startTime: startParts?.time ?? "",
+    endTime: endParts?.time ?? "",
+    broadcastChannelLogoUrl: broadcastLogoUrl,
+    eventType,
+    eventName: event.eventName?.trim() || "",
+    team1Name: event.team1?.name?.trim() || "",
+    team2Name: event.team2?.name?.trim() || "",
+    broadcastChannelName: event.broadcastName.trim(),
+    broadcastLogoUrl,
+    streamUrl: event.streamUrl.trim(),
+    gameCardUrl: event.gameCardUrl.trim(),
+    launchBehavior: event.openBehavior
+  };
+}
+var init_buildOperationsManualGameEntryEditorDraftFromManualGame = __esm({
+  "../grarf/shared/domain/manualEvents/buildOperationsManualGameEntryEditorDraftFromManualGame.ts"() {
+    init_define_import_meta_env();
+  }
+});
+
+// ../grarf/desktop/src/store/operationsManualGameEditorStore.ts
+var import_zustand55, useOperationsManualGameEditorStore;
+var init_operationsManualGameEditorStore = __esm({
+  "../grarf/desktop/src/store/operationsManualGameEditorStore.ts"() {
+    init_define_import_meta_env();
+    import_zustand55 = __toESM(require_zustand(), 1);
+    useOperationsManualGameEditorStore = (0, import_zustand55.create)(
+      (set) => ({
+        session: null,
+        beginEdit: (session) => set({ session }),
+        clearEdit: () => set({ session: null }),
+        setDraft: (draft) => set(
+          (state3) => state3.session ? { session: { ...state3.session, draft } } : state3
+        )
+      })
+    );
+  }
+});
+
+// ../grarf/desktop/src/lib/manualEvents/beginOperationsManualGameEdit.ts
+function resolveLeagueForManualEvent2(leagueId, leagues) {
+  const normalized = leagueId.trim().toUpperCase();
+  const league2 = leagues.find((row) => row.leagueId.trim().toUpperCase() === normalized);
+  return league2 ?? {
+    leagueId: normalized,
+    displayName: normalized,
+    logo: "/league-logos/placeholder-manual.png",
+    branding: null
+  };
+}
+async function beginOperationsManualGameEdit(game) {
+  const overlay = await getManualEventsSourceOverlayCached();
+  if (!overlay) {
+    return { ok: false, errors: ["not_a_manual_game"] };
+  }
+  const event = findManualEventDefinitionForGame(game, overlay);
+  if (!event) {
+    return { ok: false, errors: ["not_a_manual_game"] };
+  }
+  const league2 = resolveLeagueForManualEvent2(
+    event.leagueId,
+    overlay.leagues.leagues ?? []
+  );
+  const draft = buildOperationsManualGameEntryEditorDraftFromManualGame(game, league2, event);
+  useOperationsManualGameEditorStore.getState().beginEdit({
+    gameId: game.id,
+    replaceEvent: event,
+    draft
+  });
+  return { ok: true };
+}
+var init_beginOperationsManualGameEdit = __esm({
+  "../grarf/desktop/src/lib/manualEvents/beginOperationsManualGameEdit.ts"() {
+    init_define_import_meta_env();
+    init_buildOperationsManualGameEntryEditorDraftFromManualGame();
+    init_findManualEventDefinitionForGame();
+    init_operationsManualGameEditorStore();
+    init_manualEventsOverlayCache();
+  }
+});
+
 // ../grarf/desktop/src/lib/manualEvents/useOperationsManualGameDeletable.ts
 function useOperationsManualGameDeletable(game) {
   const [deletable, setDeletable] = (0, import_react168.useState)(false);
@@ -97688,8 +97849,11 @@ function OperationsCard({
   showLiveWorkspacePanel = false
 }) {
   const deletable = useOperationsManualGameDeletable(game);
+  const editable = deletable;
   const [deleteError, setDeleteError] = (0, import_react169.useState)(null);
+  const [editError, setEditError] = (0, import_react169.useState)(null);
   const [deleting, setDeleting] = (0, import_react169.useState)(false);
+  const [editing, setEditing] = (0, import_react169.useState)(false);
   const priority = useAdminFeaturedPriorityStore((s2) => s2.priorities[game.id]);
   const fields = useAdminOperationsCardStore(
     (s2) => s2.fieldsByGameId[game.id] ?? EMPTY_ADMIN_OPERATIONS_CARD_FIELDS
@@ -97704,6 +97868,16 @@ function OperationsCard({
   const gameLabel2 = `${game.awayTeam} @ ${game.homeTeam}`;
   const canWatchLive = gameHasHomeSpineWatchLive(game);
   const deleteLabel = game.metadata?.manualEvent?.eventName?.trim() || (game.homeTeam?.trim() ? `${game.awayTeam} vs ${game.homeTeam}` : game.awayTeam) || gameLabel2;
+  const onEditManualGame = async () => {
+    if (!editable || editing) return;
+    setEditing(true);
+    setEditError(null);
+    const result = await beginOperationsManualGameEdit(game);
+    setEditing(false);
+    if (!result.ok) {
+      setEditError(result.errors[0] ?? "Edit failed");
+    }
+  };
   const onDeleteManualGame = async () => {
     if (!deletable || deleting) return;
     const confirmed = window.confirm(`Delete manual game "${deleteLabel}"? This cannot be undone.`);
@@ -97720,7 +97894,20 @@ function OperationsCard({
     /* @__PURE__ */ (0, import_jsx_runtime152.jsxs)("div", { className: "mb-1 flex items-center justify-between gap-2", children: [
       /* @__PURE__ */ (0, import_jsx_runtime152.jsx)("span", { className: "truncate font-mono text-[13px] tracking-[0.04em] text-[#e0e8e6]", children: gameLabel2 }),
       /* @__PURE__ */ (0, import_jsx_runtime152.jsxs)("div", { className: "flex shrink-0 items-center gap-2", children: [
+        editError ? /* @__PURE__ */ (0, import_jsx_runtime152.jsx)("span", { className: "font-mono text-[10px] tracking-[0.1em] text-redsys", children: editError }) : null,
         deleteError ? /* @__PURE__ */ (0, import_jsx_runtime152.jsx)("span", { className: "font-mono text-[10px] tracking-[0.1em] text-redsys", children: deleteError }) : null,
+        editable ? /* @__PURE__ */ (0, import_jsx_runtime152.jsx)(
+          "button",
+          {
+            type: "button",
+            onClick: () => void onEditManualGame(),
+            disabled: editing,
+            className: "rounded border border-cyansys/40 bg-cyansys/10 px-1.5 py-0.5 font-mono text-[10px] tracking-[0.12em] text-cyansys hover:bg-cyansys/20 disabled:cursor-not-allowed disabled:opacity-50",
+            "aria-label": `Edit manual game ${deleteLabel}`,
+            title: "Edit manual game",
+            children: editing ? "\u2026" : "Edit"
+          }
+        ) : null,
         deletable ? /* @__PURE__ */ (0, import_jsx_runtime152.jsx)(
           "button",
           {
@@ -97812,6 +97999,7 @@ var init_OperationsCard = __esm({
     import_react169 = __toESM(require_react(), 1);
     init_cn();
     init_deleteOperationsManualGameEntry();
+    init_beginOperationsManualGameEdit();
     init_useOperationsManualGameDeletable();
     init_canonicalLiveGameStore();
     init_resolveOperationsCardAutomaticValues();
@@ -97898,42 +98086,30 @@ var init_resolveManualLeagueIdFromDisplayName = __esm({
 });
 
 // ../grarf/shared/domain/manualEvents/buildManualEventFromOperationsEditorDraft.ts
-function formatManualEventWallClockFromDateTimeLocal(value) {
-  const trimmed = value.trim();
-  if (!trimmed) return null;
-  const match = trimmed.match(/^(\d{4}-\d{2}-\d{2})T(\d{2}):(\d{2})/);
-  if (!match) return null;
-  return `${match[1]}T${match[2]}:${match[3]}:00`;
-}
-function formatWallClockInTimeZone(ms2, timeZone) {
-  const parts = new Intl.DateTimeFormat("en-US", {
-    timeZone,
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-    hourCycle: "h23"
-  }).formatToParts(new Date(ms2));
-  const read3 = (type) => parts.find((part) => part.type === type)?.value ?? "00";
-  return `${read3("year")}-${read3("month")}-${read3("day")}T${read3("hour")}:${read3("minute")}:${read3("second")}`;
-}
-function resolveDefaultEndTime(startTime, sourceTimezone) {
-  const iana = resolveManualEventSourceTimezoneIana(sourceTimezone);
-  const startTimeMs = parseManualGamesSpineEventTimeMs(startTime, iana);
-  if (startTimeMs == null) return null;
-  return formatWallClockInTimeZone(
-    startTimeMs + DEFAULT_OPERATIONS_MANUAL_EVENT_DURATION_MS,
-    iana
-  );
+function formatManualEventWallClockFromDateAndTime(date, time) {
+  const dateTrimmed = date.trim();
+  const timeTrimmed = time.trim();
+  if (!dateTrimmed || !timeTrimmed) return null;
+  const dateMatch = dateTrimmed.match(/^(\d{4}-\d{2}-\d{2})$/);
+  const timeMatch = timeTrimmed.match(/^(\d{2}):(\d{2})/);
+  if (!dateMatch || !timeMatch) return null;
+  return `${dateMatch[1]}T${timeMatch[1]}:${timeMatch[2]}:00`;
 }
 function buildManualEventFromOperationsEditorDraft(draft, options) {
   const errors = [];
   const leagueName = draft.leagueName.trim();
   if (!leagueName) errors.push("League name is required");
-  const startTime = formatManualEventWallClockFromDateTimeLocal(draft.dateStartTime);
-  if (!startTime) errors.push("Date & start time is required");
+  if (!draft.eventDate.trim()) errors.push("Date is required");
+  if (!draft.startTime.trim()) errors.push("Start time is required");
+  if (!draft.endTime.trim()) errors.push("End time is required");
+  const startTime = formatManualEventWallClockFromDateAndTime(draft.eventDate, draft.startTime);
+  if (draft.eventDate.trim() && draft.startTime.trim() && !startTime) {
+    errors.push("Start time is invalid");
+  }
+  const endTime = formatManualEventWallClockFromDateAndTime(draft.eventDate, draft.endTime);
+  if (draft.eventDate.trim() && draft.endTime.trim() && !endTime) {
+    errors.push("End time is invalid");
+  }
   const broadcastName = draft.broadcastChannelName.trim();
   if (!broadcastName) errors.push("Broadcast channel name is required");
   const streamUrl = draft.streamUrl.trim();
@@ -97946,13 +98122,18 @@ function buildManualEventFromOperationsEditorDraft(draft, options) {
     if (!draft.team1Name.trim()) errors.push("Team 1 is required");
     if (!draft.team2Name.trim()) errors.push("Team 2 is required");
   }
-  if (errors.length > 0 || !startTime) {
+  if (errors.length > 0 || !startTime || !endTime) {
     return { ok: false, errors };
   }
   const sourceTimezone = options?.sourceTimezone ?? DEFAULT_OPERATIONS_MANUAL_EVENT_SOURCE_TIMEZONE;
-  const endTime = resolveDefaultEndTime(startTime, sourceTimezone);
-  if (!endTime) {
-    return { ok: false, errors: ["Could not derive end time from start time"] };
+  const sourceTimezoneIana = resolveManualEventSourceTimezoneIana(sourceTimezone);
+  const startTimeMs = parseManualGamesSpineEventTimeMs(startTime, sourceTimezoneIana);
+  const endTimeMs = parseManualGamesSpineEventTimeMs(endTime, sourceTimezoneIana);
+  if (startTimeMs == null || endTimeMs == null) {
+    return { ok: false, errors: ["Could not parse event schedule"] };
+  }
+  if (endTimeMs <= startTimeMs) {
+    return { ok: false, errors: ["End time must be after start time"] };
   }
   const leagueId = resolveManualLeagueIdFromDisplayName(leagueName);
   const league2 = {
@@ -98011,7 +98192,7 @@ var init_buildManualEventFromOperationsEditorDraft = __esm({
 });
 
 // ../grarf/desktop/src/lib/manualEvents/saveOperationsManualGameEntry.ts
-async function saveOperationsManualGameEntry(draft) {
+async function saveOperationsManualGameEntry(draft, options) {
   const requestId = createManualEventsSaveRequestId();
   logManualEventsSaveStage("save_started", {
     requestId,
@@ -98030,19 +98211,24 @@ async function saveOperationsManualGameEntry(draft) {
     requestId,
     payload: summarizeManualEventsSavePayload({
       league: built.league,
-      event: built.event
+      event: built.event,
+      replaceEvent: options?.replaceEvent
     })
   });
   try {
     await saveManualEventsSourceEntry(
       {
         league: built.league,
-        event: built.event
+        event: built.event,
+        replaceEvent: options?.replaceEvent
       },
       { requestId }
     );
     invalidateManualEventsSourcePrefetch();
     invalidateManualEventsOverlayCache();
+    if (options?.replaceGameId) {
+      removeManualGameFromLiveGames(options.replaceGameId);
+    }
     const source = await resolveManualEventsSourceBundle();
     applyManualEventsSourceToLiveGames(source);
     const scheduledDateKey = built.event.startTime.slice(0, 10);
@@ -98067,6 +98253,7 @@ var init_saveOperationsManualGameEntry = __esm({
     init_applyManualEventsSourceToLiveGames();
     init_manualEventsOverlayCache();
     init_manualEventsPersistenceApi();
+    init_removeManualGameFromLiveGames();
     init_manualEventsSourceResolver();
     init_manualEventsSaveDiagnostics();
   }
@@ -98077,7 +98264,9 @@ function createBlankOperationsManualGameEntryDraft() {
   return {
     leagueLogoUrl: "",
     leagueName: "",
-    dateStartTime: "",
+    eventDate: "",
+    startTime: "",
+    endTime: "",
     broadcastChannelLogoUrl: "",
     eventType: "event-only",
     eventName: "",
@@ -98164,7 +98353,9 @@ function OperationsManualGameEntryEditorCard({
   saving,
   saveError,
   onDraftChange,
-  onSave
+  onSave,
+  onCancel,
+  saveLabel
 }) {
   const updateField = (key2, value) => {
     onDraftChange({ ...draft, [key2]: value });
@@ -98226,13 +98417,35 @@ function OperationsManualGameEntryEditorCard({
         )
       ] }),
       /* @__PURE__ */ (0, import_jsx_runtime154.jsxs)("div", { className: "min-w-0 space-y-1", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime154.jsx)(OperationsManualEntryFieldLabel, { children: "Date & Start Time" }),
+        /* @__PURE__ */ (0, import_jsx_runtime154.jsx)(OperationsManualEntryFieldLabel, { children: "Date" }),
         /* @__PURE__ */ (0, import_jsx_runtime154.jsx)(
           OperationsManualEntryTextField,
           {
-            value: draft.dateStartTime,
-            onChange: (value) => updateField("dateStartTime", value),
-            type: "datetime-local"
+            value: draft.eventDate,
+            onChange: (value) => updateField("eventDate", value),
+            type: "date"
+          }
+        )
+      ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime154.jsxs)("div", { className: "min-w-0 space-y-1", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime154.jsx)(OperationsManualEntryFieldLabel, { children: "Start Time" }),
+        /* @__PURE__ */ (0, import_jsx_runtime154.jsx)(
+          OperationsManualEntryTextField,
+          {
+            value: draft.startTime,
+            onChange: (value) => updateField("startTime", value),
+            type: "time"
+          }
+        )
+      ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime154.jsxs)("div", { className: "min-w-0 space-y-1", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime154.jsx)(OperationsManualEntryFieldLabel, { children: "End Time" }),
+        /* @__PURE__ */ (0, import_jsx_runtime154.jsx)(
+          OperationsManualEntryTextField,
+          {
+            value: draft.endTime,
+            onChange: (value) => updateField("endTime", value),
+            type: "time"
           }
         )
       ] }),
@@ -98353,62 +98566,122 @@ function OperationsManualGameEntryEditorCard({
       )
     ] }),
     saveError ? /* @__PURE__ */ (0, import_jsx_runtime154.jsx)("p", { className: "font-mono text-[11px] tracking-[0.08em] text-redsys", children: saveError }) : null,
-    /* @__PURE__ */ (0, import_jsx_runtime154.jsx)(
-      "button",
-      {
-        type: "button",
-        disabled: saving,
-        onClick: onSave,
-        className: "mt-1 w-full rounded border border-greensys/50 bg-greensys/10 px-2 py-1.5 font-mono text-[11px] tracking-[0.14em] text-greensys hover:bg-greensys/20 disabled:cursor-not-allowed disabled:opacity-50",
-        children: saving ? "Saving\u2026" : "Save"
-      }
-    )
+    /* @__PURE__ */ (0, import_jsx_runtime154.jsxs)("div", { className: "mt-1 flex gap-2", children: [
+      onCancel ? /* @__PURE__ */ (0, import_jsx_runtime154.jsx)(
+        "button",
+        {
+          type: "button",
+          disabled: saving,
+          onClick: onCancel,
+          className: "flex-1 rounded border border-[#243b37] bg-transparent px-2 py-1.5 font-mono text-[11px] tracking-[0.14em] text-[#9eb8b3] hover:border-[#3a6b5e] hover:text-[#d7eeee] disabled:cursor-not-allowed disabled:opacity-50",
+          children: "Cancel"
+        }
+      ) : null,
+      /* @__PURE__ */ (0, import_jsx_runtime154.jsx)(
+        "button",
+        {
+          type: "button",
+          disabled: saving,
+          onClick: onSave,
+          className: cn2(
+            "rounded border border-greensys/50 bg-greensys/10 px-2 py-1.5 font-mono text-[11px] tracking-[0.14em] text-greensys hover:bg-greensys/20 disabled:cursor-not-allowed disabled:opacity-50",
+            onCancel ? "flex-1" : "w-full"
+          ),
+          children: saving ? "Saving\u2026" : saveLabel
+        }
+      )
+    ] })
   ] });
 }
 function OperationsManualGameEntryEditorSection() {
+  const sectionRef = (0, import_react170.useRef)(null);
+  const editSession = useOperationsManualGameEditorStore((state3) => state3.session);
+  const clearEdit = useOperationsManualGameEditorStore((state3) => state3.clearEdit);
+  const setEditDraft = useOperationsManualGameEditorStore((state3) => state3.setDraft);
   const [expanded, setExpanded] = (0, import_react170.useState)(false);
-  const [draft, setDraft] = (0, import_react170.useState)(createBlankOperationsManualGameEntryDraft);
+  const [createDraft, setCreateDraft] = (0, import_react170.useState)(createBlankOperationsManualGameEntryDraft);
   const [saving, setSaving] = (0, import_react170.useState)(false);
   const [saveError, setSaveError] = (0, import_react170.useState)(null);
+  const isEditing = Boolean(editSession);
+  const draft = editSession?.draft ?? createDraft;
+  const onDraftChange = isEditing ? setEditDraft : setCreateDraft;
+  (0, import_react170.useEffect)(() => {
+    if (!editSession) return;
+    setExpanded(true);
+    setSaveError(null);
+    sectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, [editSession?.gameId]);
+  const resetCreateDraft = () => {
+    setCreateDraft(createBlankOperationsManualGameEntryDraft());
+  };
+  const onCancelEdit = () => {
+    clearEdit();
+    setSaveError(null);
+    setExpanded(false);
+  };
   const onSave = () => {
-    logManualEventsSaveStage("save_clicked", {});
+    logManualEventsSaveStage("save_clicked", { editing: isEditing });
     void (async () => {
       setSaving(true);
       setSaveError(null);
-      const result = await saveOperationsManualGameEntry(draft);
+      const result = await saveOperationsManualGameEntry(
+        draft,
+        isEditing && editSession ? {
+          replaceEvent: editSession.replaceEvent,
+          replaceGameId: editSession.gameId
+        } : void 0
+      );
       setSaving(false);
       if (!result.ok) {
         setSaveError(result.errors.join(" \xB7 "));
         return;
       }
-      setDraft(createBlankOperationsManualGameEntryDraft());
+      clearEdit();
+      resetCreateDraft();
       setExpanded(false);
     })();
   };
-  return /* @__PURE__ */ (0, import_jsx_runtime154.jsxs)("section", { className: "min-w-0", "aria-label": "Manual game entry editor", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime154.jsx)("header", { className: "sticky top-0 z-[2] mx-1 border border-[#24363c]/75 bg-[#0b1216]", children: /* @__PURE__ */ (0, import_jsx_runtime154.jsx)("div", { className: "flex w-full items-center justify-end gap-2 border-l-2 border-l-cyansys/35 py-2 pl-2.5 pr-2", children: /* @__PURE__ */ (0, import_jsx_runtime154.jsx)(
-      "button",
-      {
-        type: "button",
-        onClick: () => setExpanded((current) => !current),
-        className: cn2(
-          "flex h-7 w-7 shrink-0 items-center justify-center rounded border border-[#243b37] font-mono text-[16px] leading-none text-cyansys/90 transition",
-          "hover:border-cyansys/45 hover:bg-[#0e181d]/90",
-          "focus-visible:outline focus-visible:outline-1 focus-visible:outline-cyansys/35"
-        ),
-        "aria-expanded": expanded,
-        "aria-label": expanded ? "Collapse manual game entry editor" : "Add manual game entry",
-        children: expanded ? "\u2212" : "+"
-      }
-    ) }) }),
+  const onToggleExpanded = () => {
+    if (expanded && isEditing) {
+      onCancelEdit();
+      return;
+    }
+    if (!expanded) {
+      clearEdit();
+      resetCreateDraft();
+      setSaveError(null);
+    }
+    setExpanded((current) => !current);
+  };
+  return /* @__PURE__ */ (0, import_jsx_runtime154.jsxs)("section", { ref: sectionRef, className: "min-w-0", "aria-label": "Manual game entry editor", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime154.jsx)("header", { className: "sticky top-0 z-[2] mx-1 border border-[#24363c]/75 bg-[#0b1216]", children: /* @__PURE__ */ (0, import_jsx_runtime154.jsxs)("div", { className: "flex w-full items-center justify-between gap-2 border-l-2 border-l-cyansys/35 py-2 pl-2.5 pr-2", children: [
+      isEditing ? /* @__PURE__ */ (0, import_jsx_runtime154.jsx)("span", { className: "truncate font-mono text-[10px] tracking-[0.12em] text-cyansys/80", children: "EDITING MANUAL GAME" }) : /* @__PURE__ */ (0, import_jsx_runtime154.jsx)("span", { className: "font-mono text-[10px] tracking-[0.12em] text-[#5f7a7a]", children: "ADD MANUAL GAME" }),
+      /* @__PURE__ */ (0, import_jsx_runtime154.jsx)(
+        "button",
+        {
+          type: "button",
+          onClick: onToggleExpanded,
+          className: cn2(
+            "flex h-7 w-7 shrink-0 items-center justify-center rounded border border-[#243b37] font-mono text-[16px] leading-none text-cyansys/90 transition",
+            "hover:border-cyansys/45 hover:bg-[#0e181d]/90",
+            "focus-visible:outline focus-visible:outline-1 focus-visible:outline-cyansys/35"
+          ),
+          "aria-expanded": expanded,
+          "aria-label": expanded ? isEditing ? "Cancel editing manual game" : "Collapse manual game entry editor" : isEditing ? "Continue editing manual game" : "Add manual game entry",
+          children: expanded ? "\u2212" : "+"
+        }
+      )
+    ] }) }),
     expanded ? /* @__PURE__ */ (0, import_jsx_runtime154.jsx)("div", { className: "mx-1 px-2 py-2", children: /* @__PURE__ */ (0, import_jsx_runtime154.jsx)(
       OperationsManualGameEntryEditorCard,
       {
         draft,
         saving,
         saveError,
-        onDraftChange: setDraft,
-        onSave
+        onDraftChange,
+        onSave,
+        onCancel: isEditing ? onCancelEdit : void 0,
+        saveLabel: isEditing ? "Update" : "Save"
       }
     ) }) : null
   ] });
@@ -98423,6 +98696,7 @@ var init_OperationsManualGameEntryEditorSection = __esm({
     init_gamesSpineLeagueLogoUrls();
     init_saveOperationsManualGameEntry();
     init_manualEventsSaveDiagnostics();
+    init_operationsManualGameEditorStore();
     init_GamesSpineCardSectionDivider();
     import_jsx_runtime154 = __toESM(require_jsx_runtime(), 1);
     OPERATIONS_MANUAL_ENTRY_FIELD_CLASS = "w-full min-w-0 border border-[#243b37] bg-transparent px-1.5 py-1 font-mono text-[12px] leading-tight text-[#d7eeee] placeholder:text-[#3a5e58] focus:border-[#3a6b5e] focus:outline-none focus:ring-0";
@@ -99018,13 +99292,13 @@ var init_orchestrationExecutionEngine = __esm({
 });
 
 // ../grarf/desktop/src/store/orchestrationExecutionStore.ts
-var import_zustand55, useOrchestrationExecutionStore;
+var import_zustand56, useOrchestrationExecutionStore;
 var init_orchestrationExecutionStore = __esm({
   "../grarf/desktop/src/store/orchestrationExecutionStore.ts"() {
     init_define_import_meta_env();
-    import_zustand55 = __toESM(require_zustand(), 1);
+    import_zustand56 = __toESM(require_zustand(), 1);
     init_orchestrationExecutionEngine();
-    useOrchestrationExecutionStore = (0, import_zustand55.create)(() => {
+    useOrchestrationExecutionStore = (0, import_zustand56.create)(() => {
       const engine = getOrchestrationExecutionEngine();
       return {
         interruptState: engine.getState(),
@@ -100389,12 +100663,12 @@ function filterNewswireStoriesForDisplay(stories, heldStoryIds) {
 function getNewswireStagedQueueStore() {
   return useNewswireStagedQueueStore;
 }
-var import_zustand56, useNewswireStagedQueueStore;
+var import_zustand57, useNewswireStagedQueueStore;
 var init_newswireStagedQueueStore = __esm({
   "../grarf/desktop/src/store/newswireStagedQueueStore.ts"() {
     init_define_import_meta_env();
-    import_zustand56 = __toESM(require_zustand(), 1);
-    useNewswireStagedQueueStore = (0, import_zustand56.create)((set, get) => ({
+    import_zustand57 = __toESM(require_zustand(), 1);
+    useNewswireStagedQueueStore = (0, import_zustand57.create)((set, get) => ({
       heldStoryIds: [],
       initialized: false,
       initializeFromStories: (stories) => {
