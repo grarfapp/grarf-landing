@@ -16205,7 +16205,7 @@ function isEspnLinearBroadcastLabel(label) {
 function gameHasEspnPlusBroadcast(broadcastLabels) {
   return broadcastLabels.some(isEspnPlusBroadcastLabel);
 }
-var LINEAR_ESPN_WATCH_LEAGUES = /* @__PURE__ */ new Set(["NHL", "ATP", "WTA", "NCAABB", "USLC", "USL1"]);
+var LINEAR_ESPN_WATCH_LEAGUES = /* @__PURE__ */ new Set(["NHL", "ATP", "WTA", "NCAABB", "USLC", "USL1", "PLL"]);
 function gameHasEspnWatchBroadcast(broadcastLabels, leagueKey) {
   if (gameHasEspnPlusBroadcast(broadcastLabels)) return true;
   if (leagueKey && LINEAR_ESPN_WATCH_LEAGUES.has(leagueKey)) {
@@ -18618,7 +18618,7 @@ var ESPN_WATCH_CALENDAR_LEAGUES = /* @__PURE__ */ new Set([
   "NHL",
   "NCAABB"
 ]);
-var ESPN_WATCH_PICKER_LEAGUES = /* @__PURE__ */ new Set(["ATP", "WTA", "USLC", "USL1"]);
+var ESPN_WATCH_PICKER_LEAGUES = /* @__PURE__ */ new Set(["ATP", "WTA", "USLC", "USL1", "PLL"]);
 var ESPN_FETCH_UA2 = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36";
 var pickerPlayerCache = /* @__PURE__ */ new Map();
 function enrichGameRow2(game) {
