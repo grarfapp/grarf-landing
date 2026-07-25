@@ -129,18 +129,33 @@ if (fs.existsSync(desktopMobileGateGif)) {
 }
 
 const webappHtmlPath = path.join(__dirname, "webapp.html");
+const adminHtmlPath = path.join(__dirname, "admin.html");
 const spa404Path = path.join(__dirname, "404.html");
 const buildStamp = String(Date.now());
+
+function stampWebappAssetUrls(html) {
+  return html
+    .replace(/href="webapp-home\.css(?:\?[^"]*)?"/, `href="webapp-home.css?v=${buildStamp}"`)
+    .replace(
+      /src="webapp-home\.bundle\.js(?:\?[^"]*)?"/,
+      `src="webapp-home.bundle.js?v=${buildStamp}"`
+    )
+    .replace(/__GRARF_WEBAPP_BUILD_STAMP__/g, buildStamp);
+}
+
 const webappHtmlTemplate = fs.readFileSync(webappHtmlPath, "utf8");
-const webappHtml = webappHtmlTemplate
-  .replace(/href="webapp-home\.css(?:\?[^"]*)?"/, `href="webapp-home.css?v=${buildStamp}"`)
-  .replace(/src="webapp-home\.bundle\.js(?:\?[^"]*)?"/, `src="webapp-home.bundle.js?v=${buildStamp}"`);
+const webappHtml = stampWebappAssetUrls(webappHtmlTemplate);
 fs.writeFileSync(webappHtmlPath, webappHtml);
+
+const adminHtmlTemplate = fs.readFileSync(adminHtmlPath, "utf8");
+fs.writeFileSync(adminHtmlPath, stampWebappAssetUrls(adminHtmlTemplate));
+
 const spa404Html = webappHtml.includes("<base ")
   ? webappHtml
   : webappHtml.replace("<head>", '<head>\n  <base href="/">');
 fs.writeFileSync(spa404Path, spa404Html);
 console.log("[build-home] wrote GitHub Pages SPA fallback:", spa404Path);
+console.log("[build-home] stamped admin.html asset URLs:", buildStamp);
 
 console.log("[build-home] done:", outJs, outCss);
 
