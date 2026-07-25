@@ -23173,6 +23173,7 @@ var init_leaguePrioritySeed_data = __esm({
       "F1",
       "TDF",
       "NBASUMMER",
+      "UFC",
       "WNBA",
       "PGA",
       "ATP",
@@ -23183,7 +23184,6 @@ var init_leaguePrioritySeed_data = __esm({
       "NBA",
       "NHL",
       "COPA",
-      "UFC",
       "UCL",
       "MLS",
       "LALIGA",
@@ -67992,6 +67992,20 @@ function resolveFocusedWebsitePaneSourceId(root) {
   }
   return best?.sourceId ?? null;
 }
+function measureWebsitePaneScrollLeft(root, pane) {
+  const rootRect = root.getBoundingClientRect();
+  const paneRect = pane.getBoundingClientRect();
+  return root.scrollLeft + (paneRect.left - rootRect.left);
+}
+function scrollWebsitePaneToViewportStart(root, pane, control) {
+  const targetScrollLeft = measureWebsitePaneScrollLeft(root, pane);
+  control.allowProgrammaticScroll = true;
+  root.scrollLeft = targetScrollLeft;
+  control.lockedLeft = targetScrollLeft;
+  window.requestAnimationFrame(() => {
+    control.allowProgrammaticScroll = false;
+  });
+}
 var import_react73, import_jsx_runtime48, HomeLeagueStackSection;
 var init_HomeLeagueStackSection = __esm({
   "../grarf/desktop/src/components/homeMvp/HomeLeagueStackSection.tsx"() {
@@ -68073,18 +68087,55 @@ var init_HomeLeagueStackSection = __esm({
       (0, import_react73.useEffect)(() => {
         if (!focusSessionKey || hasWebFullscreen) return;
         const root = scrollRef.current;
-        const pane = root?.querySelector(`[data-home-website-pane-session="${focusSessionKey}"]`);
-        if (!root || !pane) return;
+        if (!root) return;
         const control = horizontalScrollControlRef.current;
-        control.allowProgrammaticScroll = true;
-        pane.scrollIntoView({ behavior: "smooth", inline: "start", block: "nearest" });
-        if (control.programmaticScrollTimer) window.clearTimeout(control.programmaticScrollTimer);
-        control.programmaticScrollTimer = window.setTimeout(() => {
-          control.lockedLeft = root.scrollLeft;
-          control.allowProgrammaticScroll = false;
-          control.programmaticScrollTimer = 0;
-        }, 500);
-      }, [focusSessionKey, focusGeneration, hasWebFullscreen]);
+        let cancelled = false;
+        let rafId = 0;
+        let resizeObserver = null;
+        let lastMeasuredTarget = null;
+        let stableFrames = 0;
+        const completeScroll = (pane) => {
+          scrollWebsitePaneToViewportStart(root, pane, control);
+        };
+        const tryScroll = () => {
+          if (cancelled) return;
+          const pane = root.querySelector(
+            `[data-home-website-pane-session="${focusSessionKey}"]`
+          );
+          if (!pane) {
+            rafId = window.requestAnimationFrame(tryScroll);
+            return;
+          }
+          const targetScrollLeft = measureWebsitePaneScrollLeft(root, pane);
+          if (lastMeasuredTarget != null && Math.abs(targetScrollLeft - lastMeasuredTarget) < 1) {
+            stableFrames += 1;
+          } else {
+            stableFrames = 0;
+            lastMeasuredTarget = targetScrollLeft;
+          }
+          if (stableFrames < 2) {
+            rafId = window.requestAnimationFrame(tryScroll);
+            return;
+          }
+          completeScroll(pane);
+        };
+        const flexRow = root.firstElementChild;
+        if (flexRow instanceof HTMLElement) {
+          resizeObserver = new ResizeObserver(() => {
+            stableFrames = 0;
+            lastMeasuredTarget = null;
+            if (rafId) window.cancelAnimationFrame(rafId);
+            rafId = window.requestAnimationFrame(tryScroll);
+          });
+          resizeObserver.observe(flexRow);
+        }
+        rafId = window.requestAnimationFrame(tryScroll);
+        return () => {
+          cancelled = true;
+          if (rafId) window.cancelAnimationFrame(rafId);
+          resizeObserver?.disconnect();
+        };
+      }, [focusSessionKey, focusGeneration, hasWebFullscreen, section.sources]);
       (0, import_react73.useEffect)(() => {
         if (hasWebFullscreen || !isWebRenderer) return;
         const root = scrollRef.current;
@@ -68205,7 +68256,7 @@ var init_useHomeLeagueWorkspaceMainMenuEntryDefaults = __esm({
 // ../grarf/desktop/src/hooks/useHomeLeagueWorkspaceWebsiteSubmenuEntryDefaults.ts
 function useHomeLeagueWorkspaceWebsiteSubmenuEntryDefaults(sources) {
   const clearSelection = useHomeHeadlinesWebsiteSubmenuStore((s2) => s2.clearSelection);
-  const setActiveSourceId = useHomeHeadlinesWebsiteSubmenuStore((s2) => s2.setActiveSourceId);
+  const selectWebsite = useHomeHeadlinesWebsiteSubmenuStore((s2) => s2.selectWebsite);
   const autoOpenedBrowserTabRef = (0, import_react75.useRef)(null);
   (0, import_react75.useEffect)(() => {
     if (sources === null) return;
@@ -68216,7 +68267,7 @@ function useHomeLeagueWorkspaceWebsiteSubmenuEntryDefaults(sources) {
       return;
     }
     const first = configured[0];
-    setActiveSourceId(first.id);
+    selectWebsite(buildHeadlinesWebsitePaneSessionKey(first.id), first.id);
     if (!first.openInNewBrowserTab) {
       autoOpenedBrowserTabRef.current = null;
       return;
@@ -68228,7 +68279,7 @@ function useHomeLeagueWorkspaceWebsiteSubmenuEntryDefaults(sources) {
       autoOpenedBrowserTabRef.current = autoOpenKey;
       window.open(url, "_blank", "noopener,noreferrer");
     }
-  }, [sources, clearSelection, setActiveSourceId]);
+  }, [sources, clearSelection, selectWebsite]);
 }
 var import_react75;
 var init_useHomeLeagueWorkspaceWebsiteSubmenuEntryDefaults = __esm({
@@ -68252,7 +68303,7 @@ function useHomeHeadlinesWebsiteSubmenuEntryDefaults(options) {
   const fantasySubmenuId = useHomeLiveFantasySubmenuStore((s2) => s2.activeId);
   const bettingSubmenuId = useHomeLiveBettingSubmenuStore((s2) => s2.activeId);
   const clearSelection = useHomeHeadlinesWebsiteSubmenuStore((s2) => s2.clearSelection);
-  const setActiveSourceId = useHomeHeadlinesWebsiteSubmenuStore((s2) => s2.setActiveSourceId);
+  const selectWebsite = useHomeHeadlinesWebsiteSubmenuStore((s2) => s2.selectWebsite);
   (0, import_react76.useEffect)(() => {
     if (disabled) return;
     const sources = liveSubmenuId === "livetrack" ? resolveHeadlinesWebsitePaneSources(
@@ -68268,7 +68319,7 @@ function useHomeHeadlinesWebsiteSubmenuEntryDefaults(options) {
     }
     const pendingSourceId = consumePendingBrowserHeadlinesWebsiteSubmenuEntry();
     const nextSourceId = pendingSourceId && sources.some((source) => source.id === pendingSourceId) ? pendingSourceId : sources[0].id;
-    setActiveSourceId(nextSourceId);
+    selectWebsite(buildHeadlinesWebsitePaneSessionKey(nextSourceId), nextSourceId);
   }, [
     disabled,
     liveSubmenuId,
@@ -68279,7 +68330,7 @@ function useHomeHeadlinesWebsiteSubmenuEntryDefaults(options) {
     fantasySubmenuId,
     bettingSubmenuId,
     clearSelection,
-    setActiveSourceId
+    selectWebsite
   ]);
 }
 var import_react76;
