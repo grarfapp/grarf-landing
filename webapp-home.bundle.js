@@ -74575,6 +74575,9 @@ var init_mlbLiveGameLeverageImportance = __esm({
 });
 
 // ../grarf/desktop/src/lib/bestGameRightNow/resolveBestGameRightNowV1.ts
+function isBestGameRightNowEligible(game) {
+  return !isSpineFinalizedGame(game);
+}
 function resolveManualLeagueBaseImportance(manual) {
   if (manual.leaguePriority != null && Number.isFinite(manual.leaguePriority)) {
     return manual.leaguePriority;
@@ -74722,7 +74725,7 @@ function resolveBestGameRightNowV1(mergedLeagues, manualGames = [], options) {
   const games = [
     ...collectOperationalSpineGames(mergedLeagues),
     ...collectManualSpineGames(manualGames)
-  ].filter((g2) => g2.status !== "postponed");
+  ].filter((g2) => g2.status !== "postponed" && isBestGameRightNowEligible(g2));
   if (games.length === 0) return null;
   const featuredGames = resolveFeaturedGamesForBestGame();
   const liveGames = games.filter((g2) => isGameActivelyLive(g2));
@@ -74756,6 +74759,7 @@ var init_resolveBestGameRightNowV1 = __esm({
     init_define_import_meta_env();
     init_gamesSpineOperationalDate();
     init_isGameActivelyLive();
+    init_isSpineFinalizedGame();
     init_isTennisLeague();
     init_leaguePriority();
     init_buildFeaturedGamesFromConfig2();
@@ -77255,6 +77259,7 @@ function useHomeBestGameRightNowResult() {
   const manualTourDeFranceRefreshMs = useManualTourDeFranceLiveRefreshMs();
   const manualGamesSpineRefreshMs = useManualGamesSpineLiveRefreshMs();
   const adminFeaturedPriorities = useAdminFeaturedPriorityStore((s2) => s2.priorities);
+  const operationsFieldsByGameId = useAdminOperationsCardStore((s2) => s2.fieldsByGameId);
   return (0, import_react116.useMemo)(() => {
     if (!isGrarfWebRenderer()) return null;
     const mergedLeagues = omitHiddenGamesSpineLeagueGames(mergeOperationalLeagueGames(leagues));
@@ -77262,7 +77267,15 @@ function useHomeBestGameRightNowResult() {
     const manualGames = flattenManualGamesSpineGames(
       convertManualGamesSpineDocument(manualDocument, now)
     ).map((game2) => refreshManualGamesSpineGameIfNeeded(game2, now));
-    const result = resolveBestGameRightNowV1(mergedLeagues, manualGames, {
+    const enrichedLeagues = applyOperationalEnrichmentToLeagues(
+      mergedLeagues,
+      operationsFieldsByGameId
+    );
+    const enrichedManualGames = applyOperationalEnrichmentToGames(
+      manualGames,
+      operationsFieldsByGameId
+    );
+    const result = resolveBestGameRightNowV1(enrichedLeagues, enrichedManualGames, {
       adminFeaturedPriorities
     });
     if (!result) return null;
@@ -77283,7 +77296,8 @@ function useHomeBestGameRightNowResult() {
     manualLeMansRefreshMs,
     manualTourDeFranceRefreshMs,
     manualGamesSpineRefreshMs,
-    adminFeaturedPriorities
+    adminFeaturedPriorities,
+    operationsFieldsByGameId
   ]);
 }
 var import_react116;
@@ -77296,11 +77310,13 @@ var init_useHomeBestGameRightNowResult = __esm({
     init_convertManualGamesSpineDocument();
     init_manualGamesSpineUtils();
     init_useManualGamesSpineLiveRefreshMs();
+    init_applyOperationalEnrichmentToLeagues();
     init_operationalManualLeagueGames();
     init_gamesSpineTemporarilyHiddenLeagues();
     init_resolveBestGameRightNowV1();
     init_isGrarfWebRenderer();
     init_adminFeaturedPriorityStore();
+    init_adminOperationsCardStore();
     init_liveGamesStore();
     init_gamesSpineManualStore();
   }
