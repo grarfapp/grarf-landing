@@ -32222,6 +32222,7 @@ var init_gamesSpineLeagueLogoUrls = __esm({
       GOLDCUP: "https://a.espncdn.com/i/leaguelogos/soccer/500/59.png",
       NATIONS: "https://a.espncdn.com/i/leaguelogos/soccer/500/2395.png",
       CLUBWC: "https://a.espncdn.com/i/leaguelogos/soccer/500/1932.png",
+      CLUBFRIENDLY: "/league-logos/soccer-ball.png",
       WORLDCUP: WORLD_CUP_LEAGUE_LOGO_URL,
       ATP: "/league-logos/atp.png",
       WTA: "/league-logos/wta.png",
