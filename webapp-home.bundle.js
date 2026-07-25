@@ -32150,6 +32150,15 @@ var init_grarfLogoImgClassName = __esm({
 });
 
 // ../grarf/desktop/src/lib/gamesSpine/gamesSpineLeagueLogoUrls.ts
+function resolveGamesSpineLeagueHeaderLogoUrl(league2, games) {
+  const gameWithManualLogo = games?.find(
+    (game) => game.metadata?.manualEvent?.leagueLogoUrl?.trim()
+  );
+  return resolveGamesSpineLeagueLogoUrl(
+    league2,
+    gameWithManualLogo ? { game: gameWithManualLogo } : void 0
+  );
+}
 function resolveGamesSpineLeagueLogoUrl(league2, options) {
   const manualLeagueLogoUrl = options?.game?.metadata?.manualEvent?.leagueLogoUrl?.trim();
   if (manualLeagueLogoUrl) return manualLeagueLogoUrl;
@@ -75774,8 +75783,8 @@ var init_GameRow = __esm({
 });
 
 // ../grarf/desktop/src/components/gamesSpine/GamesSpineLeagueHeaderMark.tsx
-function GamesSpineLeagueHeaderMark({ league: league2 }) {
-  const logoUrl = resolveGamesSpineLeagueLogoUrl(league2) ?? resolveCanonicalLeagueLogoUrl({ grarfLeagueKey: league2 });
+function GamesSpineLeagueHeaderMark({ league: league2, games }) {
+  const logoUrl = resolveGamesSpineLeagueHeaderLogoUrl(league2, games) ?? resolveCanonicalLeagueLogoUrl({ grarfLeagueKey: league2 });
   const [failed, setFailed] = (0, import_react103.useState)(false);
   if (!logoUrl || failed) return null;
   return /* @__PURE__ */ (0, import_jsx_runtime84.jsx)(
@@ -77522,7 +77531,7 @@ var init_HomeLeagueSpineSection = __esm({
                       children: [
                         /* @__PURE__ */ (0, import_jsx_runtime90.jsxs)("span", { className: "flex min-w-0 items-center gap-2", children: [
                           /* @__PURE__ */ (0, import_jsx_runtime90.jsx)("span", { className: "w-3 shrink-0 text-center text-[11px] text-cyansys/55", "aria-hidden": true, children: collapsed ? "\u25B6" : "\u25BC" }),
-                          /* @__PURE__ */ (0, import_jsx_runtime90.jsx)(GamesSpineLeagueHeaderMark, { league: league2 }),
+                          /* @__PURE__ */ (0, import_jsx_runtime90.jsx)(GamesSpineLeagueHeaderMark, { league: league2, games: highlightedVisibleGames }),
                           /* @__PURE__ */ (0, import_jsx_runtime90.jsx)(
                             "span",
                             {
