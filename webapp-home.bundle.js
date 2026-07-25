@@ -72982,6 +72982,30 @@ var init_tryOpenPgaTourFollowLiveInLeagueWorkspace = __esm({
   }
 });
 
+// ../grarf/desktop/src/lib/gamesSpine/tryOpenUfcFollowLiveInLeagueWorkspace.ts
+function tryOpenUfcFollowLiveInLeagueWorkspace(game) {
+  if (!isGrarfWebRenderer()) return false;
+  if (!isUfcGame(game)) return false;
+  if (!isGameActivelyLive(game)) return false;
+  clearCenterEmbedForSpineGameSelect();
+  useHomeLeagueWorkspaceMainMenuStore.getState().setActiveCategory(UFC_HUB_ID, "live");
+  openHomeLeagueWorkspace(UFC_HUB_ID);
+  return true;
+}
+var UFC_HUB_ID;
+var init_tryOpenUfcFollowLiveInLeagueWorkspace = __esm({
+  "../grarf/desktop/src/lib/gamesSpine/tryOpenUfcFollowLiveInLeagueWorkspace.ts"() {
+    init_define_import_meta_env();
+    init_openF1LeagueWorkspace();
+    init_clearCenterEmbedForSpineGameSelect();
+    init_isUfcLeague();
+    init_isGameActivelyLive();
+    init_isGrarfWebRenderer();
+    init_homeLeagueWorkspaceMainMenuStore();
+    UFC_HUB_ID = "ufc";
+  }
+});
+
 // ../grarf/desktop/src/components/gamesSpine/GamesSpineHomeParityGameRow.tsx
 function pitcherShort(name) {
   const t2 = name.trim();
@@ -73071,6 +73095,7 @@ function GamesSpineHomeParityGameRow({
       },
       onFollowLive: hasEffectiveGameCardUrl ? (e2) => {
         e2.stopPropagation();
+        if (tryOpenUfcFollowLiveInLeagueWorkspace(game)) return;
         if (tryOpenPgaTourFollowLiveInLeagueWorkspace(game)) return;
         onOpen(game.id, game);
       } : void 0,
@@ -73098,6 +73123,7 @@ var init_GamesSpineHomeParityGameRow = __esm({
     init_GamesSpineUnifiedGameCard();
     init_resolveGamesSpineBroadcastOutlets();
     init_tryOpenPgaTourFollowLiveInLeagueWorkspace();
+    init_tryOpenUfcFollowLiveInLeagueWorkspace();
     import_jsx_runtime79 = __toESM(require_jsx_runtime(), 1);
   }
 });
