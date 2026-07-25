@@ -72120,18 +72120,33 @@ var init_gamesSpineFinalResultNameEmphasis = __esm({
 });
 
 // ../grarf/desktop/src/lib/gamesSpine/wnbaEspnLogoUrl.ts
-function buildWnbaEspnLogoUrl(abbrev) {
-  const trimmed = abbrev?.trim();
-  if (!trimmed) return void 0;
-  return `https://a.espncdn.com/i/teamlogos/wnba/500/${trimmed.toLowerCase()}.png`;
+function isWnbaBundledTeamLogoAbbrev(abbrev) {
+  const trimmed = abbrev?.trim().toLowerCase();
+  return trimmed === "coop" || trimmed === "spo";
 }
+function buildWnbaEspnLogoUrl(abbrev) {
+  const trimmed = abbrev?.trim().toLowerCase();
+  if (!trimmed) return void 0;
+  return WNBA_LOCAL_TEAM_LOGO_BY_ABBREV[trimmed] ?? `https://a.espncdn.com/i/teamlogos/wnba/500/${trimmed}.png`;
+}
+var WNBA_LOCAL_TEAM_LOGO_BY_ABBREV;
 var init_wnbaEspnLogoUrl = __esm({
   "../grarf/desktop/src/lib/gamesSpine/wnbaEspnLogoUrl.ts"() {
     init_define_import_meta_env();
+    WNBA_LOCAL_TEAM_LOGO_BY_ABBREV = {
+      coop: "/league-logos/wnba-team-coop.png",
+      spo: "/league-logos/wnba-team-spoon.png"
+    };
   }
 });
 
 // ../grarf/desktop/src/lib/gamesSpine/resolveTeamLogoUrl.ts
+function resolveGrarfLogoSrc(logoUrl) {
+  const trimmed = logoUrl?.trim();
+  if (!trimmed) return void 0;
+  if (/^(https?:|data:)/i.test(trimmed)) return trimmed;
+  return publicAssetUrl(trimmed);
+}
 function espnCdnLogo(league2, abbrev, teamId, game) {
   const abbr = abbrev?.trim().toLowerCase();
   const id = teamId?.trim();
@@ -72172,11 +72187,14 @@ function resolveDarkThemeLogoUrl(game, side) {
   return resolveTeamLogoUrl(game, side);
 }
 function resolveTeamLogoUrl(game, side) {
-  const direct = side === "away" ? game.awayLogoUrl : game.homeLogoUrl;
-  if (direct?.trim()) return direct.trim();
   const abbrev = side === "away" ? game.awayTeamAbbrev : game.homeTeamAbbrev;
   const league2 = game.league ?? (game.id.startsWith("espn-") ? parseLeagueFromEspnId(game.id) : void 0);
-  return espnCdnLogo(league2, abbrev, void 0, game);
+  if (league2 === "WNBA" && isWnbaBundledTeamLogoAbbrev(abbrev)) {
+    return resolveGrarfLogoSrc(buildWnbaEspnLogoUrl(abbrev));
+  }
+  const direct = side === "away" ? game.awayLogoUrl : game.homeLogoUrl;
+  if (direct?.trim()) return resolveGrarfLogoSrc(direct.trim());
+  return resolveGrarfLogoSrc(espnCdnLogo(league2, abbrev, void 0, game));
 }
 function parseLeagueFromEspnId(id) {
   const m2 = /^espn-([A-Z]+)-/i.exec(id);
@@ -72188,6 +72206,7 @@ var NATIONAL_TEAM_SOCCER_LEAGUES, SOCCER_LEAGUES3;
 var init_resolveTeamLogoUrl = __esm({
   "../grarf/desktop/src/lib/gamesSpine/resolveTeamLogoUrl.ts"() {
     init_define_import_meta_env();
+    init_publicAssetUrl();
     init_darkThemeLogoOverrides();
     init_mlbEspnLogoSlug();
     init_wnbaEspnLogoUrl();
@@ -86173,7 +86192,9 @@ var init_wnbaTeamMetadata = __esm({
       wnbaTeam("POR", "Portland Fire", ["Fire"]),
       wnbaTeam("SEA", "Seattle Storm", ["Storm"]),
       wnbaTeam("TOR", "Toronto Tempo", ["Tempo"]),
-      wnbaTeam("WSH", "Washington Mystics", ["Mystics"])
+      wnbaTeam("WSH", "Washington Mystics", ["Mystics"]),
+      wnbaTeam("COOP", "TEAM COOP", ["Team Coop"]),
+      wnbaTeam("SPO", "TEAM SPOON", ["Team Spoon"])
     ];
   }
 });
@@ -86241,6 +86262,10 @@ function resolveDarkThemeLogoForMeta(meta, bucket) {
   }
   return getDarkThemeLogoUrl(league2, abbrev);
 }
+function resolveBundledLogoSrc(url) {
+  if (!url || /^(https?:|data:)/i.test(url)) return url;
+  return publicAssetUrl(url);
+}
 function resolveLogoUrlForMeta(meta, sport) {
   const bucket = sport ? resolveSportBucket(sport) : null;
   let url = meta.logoUrl;
@@ -86251,7 +86276,7 @@ function resolveLogoUrlForMeta(meta, sport) {
     const dark = resolveDarkThemeLogoForMeta(meta, bucket);
     if (dark) return dark;
   }
-  return url;
+  return resolveBundledLogoSrc(url);
 }
 function resolveBrandTokenClass(meta, sport) {
   if (!sport) return meta.tokenClass;
@@ -86291,6 +86316,7 @@ var init_liveTrackTeamMetadata = __esm({
     init_define_import_meta_env();
     init_darkThemeLogoOverrides();
     init_mlbEspnLogoSlug();
+    init_publicAssetUrl();
     init_soccerCountryAbbrev();
     init_liveTrackNationalTeamTokens();
     init_liveTrackNcaaBaseballTeams();
@@ -86916,7 +86942,9 @@ function resolveSportscapeTeamIdentity(input) {
     abbrev = deriveCompactAbbrevFromName(teamName, sport);
   }
   let logoUrl = input.logoUrl?.trim() || void 0;
-  if (!logoUrl) {
+  if (sport === "wnba" && isWnbaBundledTeamLogoAbbrev(abbrev)) {
+    logoUrl = buildWnbaEspnLogoUrl(abbrev);
+  } else if (!logoUrl) {
     const liveTrackSport = resolveLiveTrackSport(sport);
     if (liveTrackSport) {
       logoUrl = resolveLiveTrackTeamLogoUrlFromMeta(teamName, liveTrackSport) ?? void 0;
@@ -86924,6 +86952,9 @@ function resolveSportscapeTeamIdentity(input) {
   }
   if (!logoUrl && abbrev) {
     logoUrl = buildClubLogoFromAbbrev(sport, abbrev);
+  }
+  if (logoUrl && !/^(https?:|data:)/i.test(logoUrl)) {
+    logoUrl = publicAssetUrl(logoUrl);
   }
   if (!logoUrl && sport === "soccer" && abbrev) {
     logoUrl = buildWorldCupCountryLogoUrl(abbrev);
@@ -86966,6 +86997,7 @@ var init_resolveSportscapeTeamIdentity = __esm({
     init_define_import_meta_env();
     init_mlbEspnLogoSlug();
     init_wnbaEspnLogoUrl();
+    init_publicAssetUrl();
     init_worldCupCountryLogoUrl();
     init_liveTrackTeamMetadata();
     init_soccerCountryAbbrev();
