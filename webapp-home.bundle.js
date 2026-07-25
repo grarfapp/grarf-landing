@@ -31478,7 +31478,7 @@ var init_espnWatchBroadcast = __esm({
   "../grarf/shared/utils/espnWatchBroadcast.js"() {
     init_define_import_meta_env();
     ESPN_PLUS_LABEL = /espn\s*\+|espn\s*plus|espn\s*unlimited|espn\s*unlmtd/i;
-    LINEAR_ESPN_WATCH_LEAGUES = /* @__PURE__ */ new Set(["NHL", "ATP", "WTA", "NCAABB"]);
+    LINEAR_ESPN_WATCH_LEAGUES = /* @__PURE__ */ new Set(["NHL", "ATP", "WTA", "NCAABB", "USLC", "USL1"]);
   }
 });
 
@@ -42944,7 +42944,7 @@ var init_enrichOperationalSnapshotEspnWatchStreams = __esm({
       "NHL",
       "NCAABB"
     ]);
-    ESPN_WATCH_PICKER_LEAGUES = /* @__PURE__ */ new Set(["ATP", "WTA"]);
+    ESPN_WATCH_PICKER_LEAGUES = /* @__PURE__ */ new Set(["ATP", "WTA", "USLC", "USL1"]);
     ESPN_FETCH_UA2 = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36";
     pickerPlayerCache = /* @__PURE__ */ new Map();
   }
