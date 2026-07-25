@@ -78058,6 +78058,80 @@ var init_supplementOperationalSnapshotWithTennis = __esm({
   }
 });
 
+// ../grarf/shared/operations/mergeOperationalScoreboards.js
+var init_mergeOperationalScoreboards = __esm({
+  "../grarf/shared/operations/mergeOperationalScoreboards.js"() {
+    init_define_import_meta_env();
+  }
+});
+
+// ../grarf/shared/domain/manualEvents/manualEventsSourceBundle.ts
+var init_manualEventsSourceBundle = __esm({
+  "../grarf/shared/domain/manualEvents/manualEventsSourceBundle.ts"() {
+    init_define_import_meta_env();
+  }
+});
+
+// ../grarf/shared/domain/broadcast/resolveChannelLogoUrl.ts
+var init_resolveChannelLogoUrl2 = __esm({
+  "../grarf/shared/domain/broadcast/resolveChannelLogoUrl.ts"() {
+    init_define_import_meta_env();
+  }
+});
+
+// ../grarf/shared/domain/watch/streamUrlChannelFallback.ts
+var init_streamUrlChannelFallback2 = __esm({
+  "../grarf/shared/domain/watch/streamUrlChannelFallback.ts"() {
+    init_define_import_meta_env();
+  }
+});
+
+// ../grarf/shared/domain/manualEvents/resolveSourceTimezone.ts
+var init_resolveSourceTimezone = __esm({
+  "../grarf/shared/domain/manualEvents/resolveSourceTimezone.ts"() {
+    init_define_import_meta_env();
+  }
+});
+
+// ../grarf/shared/domain/manualEvents/normalizeManualEvent.ts
+var init_normalizeManualEvent = __esm({
+  "../grarf/shared/domain/manualEvents/normalizeManualEvent.ts"() {
+    init_define_import_meta_env();
+    init_resolveChannelLogoUrl2();
+    init_manualGamesSpineTime();
+    init_streamUrlChannelFallback2();
+    init_operationalSlateDate();
+    init_resolveSourceTimezone();
+  }
+});
+
+// ../grarf/shared/domain/manualEvents/validateManualEventDefinition.ts
+var init_validateManualEventDefinition = __esm({
+  "../grarf/shared/domain/manualEvents/validateManualEventDefinition.ts"() {
+    init_define_import_meta_env();
+  }
+});
+
+// ../grarf/shared/domain/manualEvents/ingestManualEvents.ts
+var init_ingestManualEvents = __esm({
+  "../grarf/shared/domain/manualEvents/ingestManualEvents.ts"() {
+    init_define_import_meta_env();
+    init_manualEventsSourceBundle();
+    init_normalizeManualEvent();
+    init_validateManualEventDefinition();
+  }
+});
+
+// ../grarf/shared/domain/manualEvents/mergeIngestedManualEventsIntoLeagueGames.ts
+var init_mergeIngestedManualEventsIntoLeagueGames = __esm({
+  "../grarf/shared/domain/manualEvents/mergeIngestedManualEventsIntoLeagueGames.ts"() {
+    init_define_import_meta_env();
+    init_mergeOperationalScoreboards();
+    init_ingestManualEvents();
+    init_manualEventsSourceBundle();
+  }
+});
+
 // ../grarf/desktop/electron/espn/espnOperationalLeagueConstants.generated.js
 var init_espnOperationalLeagueConstants_generated = __esm({
   "../grarf/desktop/electron/espn/espnOperationalLeagueConstants.generated.js"() {
@@ -78152,7 +78226,7 @@ var init_normalizeGolf = __esm({
 });
 
 // ../grarf/desktop/electron/espn/mergeOperationalScoreboards.js
-var init_mergeOperationalScoreboards = __esm({
+var init_mergeOperationalScoreboards2 = __esm({
   "../grarf/desktop/electron/espn/mergeOperationalScoreboards.js"() {
     init_define_import_meta_env();
   }
@@ -78306,7 +78380,7 @@ var init_normalize2 = __esm({
     init_normalizeTennis();
     init_normalizeTennis();
     init_normalizeGolf();
-    init_mergeOperationalScoreboards();
+    init_mergeOperationalScoreboards2();
     init_operationalDate2();
     init_fifaMenWorldRankingsJune20262();
   }
@@ -78321,6 +78395,7 @@ var init_fetchWebEspnOperationalSnapshot = __esm({
     init_espnOperationalIngestDisabledLeagues2();
     init_operationalDate();
     init_supplementOperationalSnapshotWithTennis();
+    init_mergeIngestedManualEventsIntoLeagueGames();
     init_normalize2();
     WEB_PRIORITY_OPERATIONAL_LEAGUES = [
       "WORLDCUP",
