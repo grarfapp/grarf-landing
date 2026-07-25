@@ -113,19 +113,6 @@ var init_manualEvents = __esm({
           streamUrl: "https://www.peacocktv.com/watch/asset/sports/usatf-outdoor-champs-day-3/7ea233f4-dba1-3918-8c1b-4afdd03bb75f",
           gameCardUrl: "https://results.usatf.org/2026outdoors",
           openBehavior: "Center Pane"
-        },
-        {
-          leagueId: "AUSL",
-          eventName: "AUSL Championship",
-          team1: null,
-          team2: null,
-          startTime: "2026-07-25T04:00:00",
-          endTime: "2026-07-25T07:00:00",
-          sourceTimezone: "ET",
-          broadcastName: "ABC",
-          streamUrl: "https://www.espn.com",
-          gameCardUrl: "https://www.espn.com/watch",
-          openBehavior: "New Browser Tab"
         }
       ]
     };
@@ -156,12 +143,6 @@ var init_manualLeagues = __esm({
           leagueId: "PLL",
           displayName: "Premier Lacrosse League",
           logo: "/league-logos/pll.png",
-          branding: null
-        },
-        {
-          leagueId: "AUSL",
-          displayName: "AUSL",
-          logo: "/league-logos/placeholder-manual.png",
           branding: null
         }
       ]
