@@ -12879,8 +12879,10 @@ function resolveSportscapeEditorialApiBaseUrls() {
     seen.add(normalized);
     out.push(normalized);
   };
-  if (isGrarfWebRenderer() && typeof window !== "undefined") {
+  if (typeof window !== "undefined") {
     push(resolveSameOriginSportscapeEditorialApiUrl());
+  }
+  if (isGrarfWebRenderer() && typeof window !== "undefined") {
     for (const base of SPORTSCAPE_EDITORIAL_FAILOVER_BASE_URLS) {
       push(base);
     }

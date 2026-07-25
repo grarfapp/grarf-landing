@@ -78,8 +78,10 @@ function resolveSportscapeEditorialApiBaseUrls() {
     seen.add(normalized);
     out.push(normalized);
   };
-  if (isGrarfWebRenderer() && typeof window !== "undefined") {
+  if (typeof window !== "undefined") {
     push2(resolveSameOriginSportscapeEditorialApiUrl());
+  }
+  if (isGrarfWebRenderer() && typeof window !== "undefined") {
     for (const base of SPORTSCAPE_EDITORIAL_FAILOVER_BASE_URLS) {
       push2(base);
     }
@@ -605,6 +607,12 @@ function offsetOperationalDateKey(dateKey, dayOffset, timeZone = GRARF_OPERATION
   const [y2, m2, d2] = dateKey.split("-").map(Number);
   const anchor = Date.UTC(y2, (m2 ?? 1) - 1, (d2 ?? 1) + dayOffset, 12, 0, 0);
   return formatOperationalDateKeyFromMs(anchor, timeZone) ?? dateKey;
+}
+function resolveScheduledDateKey(isoStart, slateDateKey, timeZone = GRARF_OPERATIONAL_SLATE_TIMEZONE) {
+  const fromStart = formatOperationalDateKeyFromMs(Date.parse(isoStart || ""), timeZone);
+  if (fromStart) return fromStart;
+  const slate = typeof slateDateKey === "string" ? slateDateKey.trim() : "";
+  return slate || void 0;
 }
 function getNextDayCutoffMs(operationalDateKey, cutoffHour, timeZone) {
   const cacheKey3 = `${operationalDateKey}|${cutoffHour}|${timeZone}`;
@@ -51142,7 +51150,7 @@ var init_providerRegistry = __esm({
 function normalizeTeamName(name) {
   return name?.trim().toLowerCase() ?? "";
 }
-function resolveScheduledDateKey(game) {
+function resolveScheduledDateKey2(game) {
   const fromPayload = game.scheduledDateKey?.trim();
   if (fromPayload) return fromPayload;
   if (typeof game.startTimeMs !== "number" || !Number.isFinite(game.startTimeMs)) {
@@ -51162,7 +51170,7 @@ function isRaysRedSoxJul172026WorkspaceOverrideGame(game) {
   if (!isMlbGameRow(game)) return false;
   if (normalizeTeamName(game.awayTeam) !== "rays") return false;
   if (normalizeTeamName(game.homeTeam) !== "red sox") return false;
-  return resolveScheduledDateKey(game) === OVERRIDE_SCHEDULED_DATE_KEY;
+  return resolveScheduledDateKey2(game) === OVERRIDE_SCHEDULED_DATE_KEY;
 }
 var MLB_RAYS_RED_SOX_JUL_17_2026_WORKSPACE_OVERRIDE, OVERRIDE_SCHEDULED_DATE_KEY;
 var init_mlbRaysRedSoxJul172026WorkspaceOverride = __esm({
@@ -78206,41 +78214,435 @@ var init_supplementOperationalSnapshotWithTennis = __esm({
 });
 
 // ../grarf/shared/operations/mergeOperationalScoreboards.js
+function operationalGameMatchupKey(game) {
+  const league2 = game?.league;
+  const away = typeof game?.awayTeam === "string" ? game.awayTeam.trim().toLowerCase() : "";
+  const home = typeof game?.homeTeam === "string" ? game.homeTeam.trim().toLowerCase() : "";
+  if (!league2 || !away || !home) return null;
+  const teams = [away, home].sort();
+  return `${league2}|${teams[0]}|${teams[1]}`;
+}
+function findPrimaryMatchupGame(primary, matchupKey) {
+  for (const game of primary ?? []) {
+    if (operationalGameMatchupKey(game) === matchupKey) return game;
+  }
+  return null;
+}
+function mergeNormalizedGamesById(primary, secondary) {
+  const byId = /* @__PURE__ */ new Map();
+  const primaryMatchups = /* @__PURE__ */ new Set();
+  for (const game of primary ?? []) {
+    if (game?.id) byId.set(game.id, game);
+    const matchupKey = operationalGameMatchupKey(game);
+    if (matchupKey) primaryMatchups.add(matchupKey);
+  }
+  for (const game of secondary ?? []) {
+    if (!game?.id) continue;
+    if (byId.has(game.id)) {
+      if (mergeDedupeDiagnosticsHook) {
+        mergeDedupeDiagnosticsHook({
+          league: game.league ?? "MLB",
+          droppedGameId: game.id,
+          droppedEspnEventId: game.espnEventId != null ? String(game.espnEventId) : null,
+          retainedGameId: game.id,
+          retainedEspnEventId: game.espnEventId != null ? String(game.espnEventId) : null,
+          matchupKey: operationalGameMatchupKey(game) ?? game.id,
+          reason: "duplicate_id"
+        });
+      }
+      continue;
+    }
+    const matchupKey = operationalGameMatchupKey(game);
+    if (matchupKey && primaryMatchups.has(matchupKey)) {
+      if (mergeDedupeDiagnosticsHook) {
+        const retained = findPrimaryMatchupGame(primary, matchupKey);
+        mergeDedupeDiagnosticsHook({
+          league: game.league ?? retained?.league ?? "MLB",
+          droppedGameId: game.id,
+          droppedEspnEventId: game.espnEventId != null ? String(game.espnEventId) : null,
+          retainedGameId: retained?.id ?? "",
+          retainedEspnEventId: retained?.espnEventId != null ? String(retained.espnEventId) : null,
+          matchupKey,
+          reason: "matchup_dedupe"
+        });
+      }
+      continue;
+    }
+    byId.set(game.id, game);
+  }
+  return [...byId.values()];
+}
+var mergeDedupeDiagnosticsHook;
 var init_mergeOperationalScoreboards = __esm({
   "../grarf/shared/operations/mergeOperationalScoreboards.js"() {
     init_define_import_meta_env();
+    mergeDedupeDiagnosticsHook = null;
+  }
+});
+
+// ../grarf/operations/generated/manualEvents.json
+var manualEvents_default;
+var init_manualEvents = __esm({
+  "../grarf/operations/generated/manualEvents.json"() {
+    manualEvents_default = {
+      version: 1,
+      description: "Canonical manual event definitions. Each event references a league by leagueId. Identity rule: eventName XOR (team1 + team2). Placeholder entries document schema only \u2014 not real events.",
+      events: [
+        {
+          __placeholder: true,
+          __exampleType: "head-to-head",
+          __description: "Schema example only. Head-to-head layout: team1 + team2 populated, eventName null.",
+          leagueId: "BOXING",
+          eventName: null,
+          team1: {
+            name: "Example Team A",
+            logo: null
+          },
+          team2: {
+            name: "Example Team B",
+            logo: null
+          },
+          startTime: "2099-01-01T22:00:00",
+          endTime: "2099-01-02T01:30:00",
+          sourceTimezone: "ET",
+          broadcastName: "ESPN",
+          streamUrl: "https://example.com/placeholder-stream",
+          gameCardUrl: "https://example.com/placeholder-game-card",
+          openBehavior: "New Browser Tab"
+        },
+        {
+          __placeholder: true,
+          __exampleType: "event-only",
+          __description: "Schema example only. Event-only layout: eventName populated, team1 and team2 null.",
+          leagueId: "USATF",
+          eventName: "Men's 100m Final",
+          team1: null,
+          team2: null,
+          startTime: "2099-06-15T20:45:00",
+          endTime: "2099-06-15T21:15:00",
+          sourceTimezone: "CT",
+          broadcastName: "NBC",
+          streamUrl: "https://example.com/placeholder-stream",
+          gameCardUrl: "https://example.com/placeholder-game-card",
+          openBehavior: "Center Pane"
+        },
+        {
+          leagueId: "USATF",
+          eventName: "USATF Outdoor Championships, Day 3",
+          team1: null,
+          team2: null,
+          startTime: "2026-07-25T13:00:00",
+          endTime: "2026-07-25T17:00:00",
+          sourceTimezone: "CT",
+          broadcastName: "Peacock",
+          streamUrl: "https://www.peacocktv.com/watch/asset/sports/usatf-outdoor-champs-day-3/7ea233f4-dba1-3918-8c1b-4afdd03bb75f",
+          gameCardUrl: "https://results.usatf.org/2026outdoors",
+          openBehavior: "Center Pane"
+        }
+      ]
+    };
+  }
+});
+
+// ../grarf/operations/generated/manualLeagues.json
+var manualLeagues_default;
+var init_manualLeagues = __esm({
+  "../grarf/operations/generated/manualLeagues.json"() {
+    manualLeagues_default = {
+      version: 1,
+      description: "Canonical league definitions for manually-authored events. League metadata is defined once and referenced by leagueId in manualEvents.json.",
+      leagues: [
+        {
+          leagueId: "BOXING",
+          displayName: "Boxing",
+          logo: "/league-logos/placeholder-boxing.png",
+          branding: null
+        },
+        {
+          leagueId: "USATF",
+          displayName: "Track & Field",
+          logo: "https://upload.wikimedia.org/wikipedia/en/b/be/USA_Track_and_Field.svg",
+          branding: null
+        },
+        {
+          leagueId: "PLL",
+          displayName: "Premier Lacrosse League",
+          logo: "/league-logos/pll.png",
+          branding: null
+        }
+      ]
+    };
   }
 });
 
 // ../grarf/shared/domain/manualEvents/manualEventsSourceBundle.ts
+function loadManualEventsSourceBundle() {
+  return MANUAL_EVENTS_SOURCE_BUNDLE;
+}
+var MANUAL_EVENTS_SOURCE_BUNDLE;
 var init_manualEventsSourceBundle = __esm({
   "../grarf/shared/domain/manualEvents/manualEventsSourceBundle.ts"() {
     init_define_import_meta_env();
+    init_manualEvents();
+    init_manualLeagues();
+    MANUAL_EVENTS_SOURCE_BUNDLE = {
+      leagues: manualLeagues_default,
+      events: manualEvents_default
+    };
   }
 });
 
 // ../grarf/shared/domain/broadcast/resolveChannelLogoUrl.ts
+function normalizeChannelLogoKey2(label) {
+  return label.trim().replace(/\s+/g, " ").toUpperCase();
+}
+function isNbaTvBroadcastLabel2(label) {
+  return /\bNBA[\s.-]*TV\b/i.test(label);
+}
+function resolveChannelLogoUrl2(channelLabel) {
+  const key2 = normalizeChannelLogoKey2(channelLabel);
+  if (!key2) return null;
+  const direct = CHANNEL_LOGO_BY_LABEL2[key2];
+  if (direct) return direct;
+  if (/\bFS1\b/.test(key2)) return CHANNEL_LOGO_BY_LABEL2.FS1 ?? null;
+  if (/\bFS2\b/.test(key2)) return CHANNEL_LOGO_BY_LABEL2.FS2 ?? null;
+  if (/\bFOX\b/.test(key2)) return CHANNEL_LOGO_BY_LABEL2.FOX ?? null;
+  if (/\bPRIME\s*VIDEO\b/.test(key2)) return CHANNEL_LOGO_BY_LABEL2["PRIME VIDEO"] ?? null;
+  if (key2 === "PRIME") return CHANNEL_LOGO_BY_LABEL2.PRIME ?? null;
+  if (/^USA(\s+NET(WORK)?)?$/.test(key2)) return CHANNEL_LOGO_BY_LABEL2.USA ?? null;
+  if (isNbaTvBroadcastLabel2(key2)) return CHANNEL_LOGO_BY_LABEL2["NBA TV"] ?? null;
+  if (/\bWNBA\s+LEAGUE\s+PASS\b/.test(key2) || key2 === "LEAGUE PASS") {
+    return CHANNEL_LOGO_BY_LABEL2["WNBA LEAGUE PASS"] ?? null;
+  }
+  return null;
+}
+var CHANNEL_LOGO_BY_LABEL2;
 var init_resolveChannelLogoUrl2 = __esm({
   "../grarf/shared/domain/broadcast/resolveChannelLogoUrl.ts"() {
     init_define_import_meta_env();
+    CHANNEL_LOGO_BY_LABEL2 = {
+      ABC: "/league-logos/channel-abc.png",
+      CBS: "/league-logos/channel-cbs.png",
+      ESPN: "/league-logos/channel-espn.png",
+      ESPN2: "/league-logos/channel-espn2.png",
+      "ESPN+": "/league-logos/channel-espn-plus.png",
+      "ESPN PLUS": "/league-logos/channel-espn-plus.png",
+      "ESPN UNLIMITED": "/league-logos/channel-espn-plus.png",
+      "ESPN UNLMTD": "/league-logos/channel-espn-plus.png",
+      ESPNU: "/league-logos/channel-espnu.png",
+      USA: "/league-logos/channel-usa.png",
+      "USA NETWORK": "/league-logos/channel-usa.png",
+      "USA NET": "/league-logos/channel-usa.png",
+      ION: "/league-logos/channel-ion.png",
+      "NBA TV": "/league-logos/channel-nba-tv.png",
+      NBATV: "/league-logos/channel-nba-tv.png",
+      "NBA.TV": "/league-logos/channel-nba-tv.png",
+      "NBA-TV": "/league-logos/channel-nba-tv.png",
+      CNBC: "/league-logos/channel-cnbc.png",
+      "PARAMOUNT+": "/league-logos/channel-paramount-plus.png",
+      TNT: "/league-logos/channel-tnt.png",
+      TBS: "/league-logos/channel-tbs.png",
+      "MLB.TV": "/league-logos/channel-mlbtv.png",
+      "MLB TV": "/league-logos/channel-mlbtv.png",
+      MLBTV: "/league-logos/channel-mlbtv.png",
+      DAZN: "/league-logos/channel-dazn.png",
+      FANATIZ: "/league-logos/channel-fanatiz.png",
+      PEACOCK: "/league-logos/channel-peacock.png",
+      FOX: "/league-logos/channel-fox.png",
+      FS1: "/league-logos/channel-fs1.png",
+      FS2: "/league-logos/channel-fs2.png",
+      "FOX SPORTS": "/league-logos/channel-fox.png",
+      "CBS SPORTS NETWORK": "/league-logos/channel-cbs-sports.png",
+      "APPLE TV MLB": "/league-logos/channel-apple-tv.png",
+      "APPLE TV": "/league-logos/channel-apple-tv.png",
+      "TENNIS CHANNEL": "/league-logos/channel-tennis-channel.png",
+      "TENNIS CHANNEL+": "/league-logos/channel-tennis-channel.png",
+      "PRIME VIDEO": "/league-logos/channel-prime-video.png",
+      PRIME: "/league-logos/channel-prime-video.png",
+      "WNBA LEAGUE PASS": "/league-logos/channel-wnba-league-pass.png",
+      "GOLF CHANNEL": "/league-logos/channel-golf-channel.png",
+      "GOLF CHNL": "/league-logos/channel-golf-channel.png"
+    };
   }
 });
 
 // ../grarf/shared/domain/watch/streamUrlChannelFallback.ts
+function normalizeStreamHostname2(streamUrl) {
+  try {
+    const host = new URL(streamUrl.trim()).hostname.toLowerCase();
+    return host.replace(/^www\./, "");
+  } catch {
+    return null;
+  }
+}
+function hostnameMatchesDomain2(hostname, domain) {
+  return hostname === domain || hostname.endsWith(`.${domain}`);
+}
+function deriveChannelLabelFromStreamUrl2(streamUrl) {
+  const hostname = normalizeStreamHostname2(streamUrl);
+  if (!hostname) return null;
+  for (const mapping of STREAM_URL_CHANNEL_MAPPINGS2) {
+    for (const domain of mapping.domains) {
+      if (!hostnameMatchesDomain2(hostname, domain)) continue;
+      if (mapping.pathPattern && !mapping.pathPattern.test(streamUrl)) continue;
+      return mapping.label;
+    }
+  }
+  return null;
+}
+var STREAM_URL_CHANNEL_MAPPINGS2;
 var init_streamUrlChannelFallback2 = __esm({
   "../grarf/shared/domain/watch/streamUrlChannelFallback.ts"() {
     init_define_import_meta_env();
+    STREAM_URL_CHANNEL_MAPPINGS2 = [
+      { domains: ["tennischannel.com"], label: "Tennis Channel" },
+      { domains: ["watch.mlb.com", "mlb.com"], label: "MLB.TV" },
+      { domains: ["peacocktv.com", "peacock.com"], label: "Peacock" },
+      { domains: ["paramountplus.com"], label: "Paramount+" },
+      { domains: ["fox.com"], label: "FOX" },
+      { domains: ["foxsports.com"], label: "FOX Sports" },
+      { domains: ["plus.espn.com"], label: "ESPN+" },
+      { domains: ["espn.com"], label: "ESPN+", pathPattern: /\/watch\/player(?:\/|\?)/i },
+      { domains: ["tv.apple.com"], label: "Apple TV" },
+      { domains: ["usanetwork.com"], label: "USA Network" }
+    ];
   }
 });
 
 // ../grarf/shared/domain/manualEvents/resolveSourceTimezone.ts
+function resolveManualEventSourceTimezoneIana(sourceTimezone) {
+  return SOURCE_TIMEZONE_TO_IANA[sourceTimezone];
+}
+var SOURCE_TIMEZONE_TO_IANA;
 var init_resolveSourceTimezone = __esm({
   "../grarf/shared/domain/manualEvents/resolveSourceTimezone.ts"() {
     init_define_import_meta_env();
+    SOURCE_TIMEZONE_TO_IANA = {
+      ET: "America/New_York",
+      CT: "America/Chicago"
+    };
   }
 });
 
 // ../grarf/shared/domain/manualEvents/normalizeManualEvent.ts
+function slugPart2(value) {
+  return value.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+}
+function resolveLayout(event) {
+  return event.eventName?.trim() ? "event-only" : "head-to-head";
+}
+function resolveIdentitySlug(event) {
+  if (event.eventName?.trim()) return slugPart2(event.eventName);
+  const away = event.team1?.name?.trim() ?? "away";
+  const home = event.team2?.name?.trim() ?? "home";
+  return `${slugPart2(away)}-vs-${slugPart2(home)}`;
+}
+function manualEventGameId(leagueId, event, scheduledDateKey) {
+  return `manual-event-${slugPart2(leagueId)}-${resolveIdentitySlug(event)}-${scheduledDateKey}`;
+}
+function resolveGameCardNavigationMode(openBehavior) {
+  return openBehavior === "New Browser Tab" ? "new-browser-tab" : "center-pane";
+}
+function resolveStreamProviderFromChannelLabel2(channelLabel) {
+  const trimmed = channelLabel?.trim();
+  if (!trimmed) return null;
+  if (CHANNEL_LABEL_TO_STREAM_PROVIDER2[trimmed]) {
+    return CHANNEL_LABEL_TO_STREAM_PROVIDER2[trimmed];
+  }
+  if (/\bpeacock\b/i.test(trimmed)) return "Peacock";
+  if (/\bespn\+?\b/i.test(trimmed)) return "ESPN+";
+  if (/\bparamount\+?\b/i.test(trimmed)) return "Paramount+";
+  if (/\bfox sports\b/i.test(trimmed)) return "FOX Sports";
+  if (/\bapple tv\b/i.test(trimmed)) return "Apple TV";
+  if (/\busa network\b/i.test(trimmed)) return "USA";
+  if (/\btennis channel\b/i.test(trimmed)) return "Tennis Channel+";
+  return null;
+}
+function resolveManualEventStreamProvider(broadcastName, streamUrl) {
+  const urlLabel = deriveChannelLabelFromStreamUrl2(streamUrl);
+  return resolveStreamProviderFromChannelLabel2(urlLabel) ?? resolveStreamProviderFromChannelLabel2(broadcastName);
+}
+function normalizeManualEventDefinition(event, league2, now = /* @__PURE__ */ new Date()) {
+  const sourceTimezoneIana = resolveManualEventSourceTimezoneIana(event.sourceTimezone);
+  const startTimeMs = parseManualGamesSpineEventTimeMs(event.startTime, sourceTimezoneIana);
+  const endTimeMs = parseManualGamesSpineEventTimeMs(event.endTime, sourceTimezoneIana);
+  if (startTimeMs == null || endTimeMs == null || endTimeMs <= startTimeMs) {
+    return null;
+  }
+  const nowMs = now.getTime();
+  const status = resolveManualGamesSpineStatus(nowMs, startTimeMs, endTimeMs);
+  const scheduledDateKey = resolveScheduledDateKey(new Date(startTimeMs).toISOString(), void 0) ?? new Date(startTimeMs).toISOString().slice(0, 10);
+  const layout = resolveLayout(event);
+  const broadcasts = [event.broadcastName.trim()];
+  const broadcastLogoUrl = resolveChannelLogoUrl2(event.broadcastName);
+  const gameId = manualEventGameId(league2.leagueId, event, scheduledDateKey);
+  const streamProvider = resolveManualEventStreamProvider(event.broadcastName, event.streamUrl);
+  let awayTeam = "";
+  let homeTeam = "";
+  let awayLogoUrl;
+  let homeLogoUrl;
+  if (layout === "event-only") {
+    awayTeam = event.eventName.trim();
+    awayLogoUrl = league2.logo;
+  } else {
+    awayTeam = event.team1.name.trim();
+    homeTeam = event.team2.name.trim();
+    awayLogoUrl = event.team1.logo?.trim() || void 0;
+    homeLogoUrl = event.team2.logo?.trim() || void 0;
+  }
+  const game = {
+    id: gameId,
+    grarfGameId: gameId,
+    league: league2.leagueId,
+    time: formatManualGamesSpineDisplayTime(startTimeMs),
+    awayTeam,
+    awayLogoUrl,
+    awayRecord: "\u2014",
+    homeTeam,
+    homeLogoUrl,
+    homeRecord: "\u2014",
+    awayCity: "",
+    homeCity: "",
+    awayPitcher: "\u2014",
+    awayPitcherStats: "",
+    homePitcher: "\u2014",
+    homePitcherStats: "",
+    channels: broadcasts,
+    broadcasts,
+    status,
+    statusLine: formatManualGamesSpineStatusLine(status, endTimeMs, nowMs),
+    startTimeMs,
+    scheduledDateKey,
+    streamUrl: event.streamUrl.trim(),
+    streamProvider,
+    gameCardUrl: event.gameCardUrl.trim(),
+    gameCardNavigationMode: resolveGameCardNavigationMode(event.openBehavior),
+    lastUpdated: now.toISOString(),
+    metadata: {
+      manualEvent: {
+        sourceTimezone: event.sourceTimezone,
+        sourceTimezoneIana,
+        layout,
+        leagueDisplayName: league2.displayName,
+        leagueLogoUrl: league2.logo,
+        broadcastLogoUrl,
+        eventName: event.eventName?.trim() || null,
+        openBehavior: event.openBehavior,
+        startTime: event.startTime,
+        endTime: event.endTime
+      }
+    }
+  };
+  return {
+    game,
+    layout,
+    sourceTimezone: event.sourceTimezone,
+    leagueDisplayName: league2.displayName,
+    leagueLogoUrl: league2.logo,
+    broadcastLogoUrl
+  };
+}
+var CHANNEL_LABEL_TO_STREAM_PROVIDER2;
 var init_normalizeManualEvent = __esm({
   "../grarf/shared/domain/manualEvents/normalizeManualEvent.ts"() {
     init_define_import_meta_env();
@@ -78249,10 +78651,102 @@ var init_normalizeManualEvent = __esm({
     init_streamUrlChannelFallback2();
     init_operationalSlateDate();
     init_resolveSourceTimezone();
+    CHANNEL_LABEL_TO_STREAM_PROVIDER2 = {
+      Peacock: "Peacock",
+      "ESPN+": "ESPN+",
+      ESPN: "ESPN+",
+      "Paramount+": "Paramount+",
+      "FOX Sports": "FOX Sports",
+      "Apple TV": "Apple TV",
+      "USA Network": "USA",
+      "Tennis Channel": "Tennis Channel+"
+    };
   }
 });
 
 // ../grarf/shared/domain/manualEvents/validateManualEventDefinition.ts
+function isNonEmptyString(value) {
+  return typeof value === "string" && value.trim().length > 0;
+}
+function isHttpsUrl(value) {
+  try {
+    const url = new URL(value.trim());
+    return url.protocol === "https:" || url.protocol === "http:";
+  } catch {
+    return false;
+  }
+}
+function validateTeam(team, field, index, errors) {
+  if (!team || typeof team !== "object") {
+    errors.push({ index, field, message: `${field} must be an object with a name` });
+    return false;
+  }
+  if (!isNonEmptyString(team.name)) {
+    errors.push({ index, field: `${field}.name`, message: `${field} name is required` });
+    return false;
+  }
+  return true;
+}
+function validateManualEventDefinition(event, index) {
+  const errors = [];
+  if (!isNonEmptyString(event.leagueId)) {
+    errors.push({ index, field: "leagueId", message: "leagueId is required" });
+  }
+  const hasEventName = isNonEmptyString(event.eventName);
+  const hasTeam1 = event.team1 != null;
+  const hasTeam2 = event.team2 != null;
+  const hasTeams = hasTeam1 || hasTeam2;
+  if (hasEventName && hasTeams) {
+    errors.push({
+      index,
+      field: "identity",
+      message: "Use eventName OR team1 + team2 \u2014 never both"
+    });
+  } else if (!hasEventName && !(hasTeam1 && hasTeam2)) {
+    errors.push({
+      index,
+      field: "identity",
+      message: "Provide eventName OR both team1 and team2"
+    });
+  } else if (hasTeams) {
+    validateTeam(event.team1, "team1", index, errors);
+    validateTeam(event.team2, "team2", index, errors);
+  }
+  if (!isNonEmptyString(event.startTime)) {
+    errors.push({ index, field: "startTime", message: "startTime is required" });
+  }
+  if (!isNonEmptyString(event.endTime)) {
+    errors.push({ index, field: "endTime", message: "endTime is required" });
+  }
+  if (event.sourceTimezone !== "ET" && event.sourceTimezone !== "CT") {
+    errors.push({
+      index,
+      field: "sourceTimezone",
+      message: 'sourceTimezone must be "ET" or "CT"'
+    });
+  }
+  if (!isNonEmptyString(event.broadcastName)) {
+    errors.push({ index, field: "broadcastName", message: "broadcastName is required" });
+  }
+  if (!isNonEmptyString(event.streamUrl)) {
+    errors.push({ index, field: "streamUrl", message: "streamUrl is required" });
+  } else if (!isHttpsUrl(event.streamUrl)) {
+    errors.push({ index, field: "streamUrl", message: "streamUrl must be a valid http(s) URL" });
+  }
+  if (!isNonEmptyString(event.gameCardUrl)) {
+    errors.push({ index, field: "gameCardUrl", message: "gameCardUrl is required" });
+  } else if (!isHttpsUrl(event.gameCardUrl)) {
+    errors.push({ index, field: "gameCardUrl", message: "gameCardUrl must be a valid http(s) URL" });
+  }
+  if (event.openBehavior !== "Center Pane" && event.openBehavior !== "New Browser Tab") {
+    errors.push({
+      index,
+      field: "openBehavior",
+      message: 'openBehavior must be "Center Pane" or "New Browser Tab"'
+    });
+  }
+  return errors;
+}
 var init_validateManualEventDefinition = __esm({
   "../grarf/shared/domain/manualEvents/validateManualEventDefinition.ts"() {
     init_define_import_meta_env();
@@ -78260,6 +78754,61 @@ var init_validateManualEventDefinition = __esm({
 });
 
 // ../grarf/shared/domain/manualEvents/ingestManualEvents.ts
+function buildLeagueIndex(leagues) {
+  const index = /* @__PURE__ */ new Map();
+  for (const league2 of leagues) {
+    index.set(league2.leagueId.trim().toUpperCase(), league2);
+  }
+  return index;
+}
+function shouldIngestEvent(event, includePlaceholders) {
+  if (event.__placeholder === true && !includePlaceholders) return false;
+  return true;
+}
+function ingestManualEventsFromSource(source, options = {}) {
+  const includePlaceholders = options.includePlaceholders ?? false;
+  const now = options.now ?? /* @__PURE__ */ new Date();
+  const leagueIndex = buildLeagueIndex(source.leagues.leagues ?? []);
+  const errors = [];
+  const events = [];
+  let skippedPlaceholderCount = 0;
+  const rows = source.events.events ?? [];
+  rows.forEach((event, index) => {
+    if (!shouldIngestEvent(event, includePlaceholders)) {
+      skippedPlaceholderCount += 1;
+      return;
+    }
+    const validationErrors = validateManualEventDefinition(event, index);
+    errors.push(...validationErrors);
+    if (validationErrors.length > 0) {
+      return;
+    }
+    const league2 = leagueIndex.get(event.leagueId.trim().toUpperCase());
+    if (!league2) {
+      errors.push({
+        index,
+        field: "leagueId",
+        message: `Unknown leagueId "${event.leagueId}"`
+      });
+      return;
+    }
+    const normalized = normalizeManualEventDefinition(event, league2, now);
+    if (!normalized) {
+      errors.push({
+        index,
+        field: "schedule",
+        message: "Could not parse startTime/endTime in sourceTimezone"
+      });
+      return;
+    }
+    events.push(normalized);
+  });
+  return {
+    events,
+    errors,
+    skippedPlaceholderCount
+  };
+}
 var init_ingestManualEvents = __esm({
   "../grarf/shared/domain/manualEvents/ingestManualEvents.ts"() {
     init_define_import_meta_env();
@@ -78270,6 +78819,29 @@ var init_ingestManualEvents = __esm({
 });
 
 // ../grarf/shared/domain/manualEvents/mergeIngestedManualEventsIntoLeagueGames.ts
+function resolveManualEventsSource(options) {
+  return options.source ?? loadManualEventsSourceBundle();
+}
+function mergeIngestedManualEventsIntoLeagueGames(leagueGames, options = {}) {
+  const ingest = ingestManualEventsFromSource(resolveManualEventsSource(options), {
+    now: options.now,
+    includePlaceholders: options.includePlaceholders ?? false
+  });
+  if (ingest.errors.length > 0) {
+    options.onIngestErrors?.(ingest.errors);
+  }
+  if (ingest.events.length === 0) {
+    return leagueGames;
+  }
+  const merged = { ...leagueGames };
+  for (const { game } of ingest.events) {
+    const leagueKey = game.league;
+    if (!leagueKey) continue;
+    const existing = merged[leagueKey] ?? [];
+    merged[leagueKey] = mergeNormalizedGamesById(existing, [game]);
+  }
+  return merged;
+}
 var init_mergeIngestedManualEventsIntoLeagueGames = __esm({
   "../grarf/shared/domain/manualEvents/mergeIngestedManualEventsIntoLeagueGames.ts"() {
     init_define_import_meta_env();
@@ -96553,6 +97125,215 @@ var init_OperationsSpineSection = __esm({
   }
 });
 
+// ../grarf/shared/domain/manualEvents/resolveManualLeagueIdFromDisplayName.ts
+function resolveManualLeagueIdFromDisplayName(displayName) {
+  const slug = displayName.trim().toUpperCase().replace(/[^A-Z0-9]+/g, "_").replace(/^_+|_+$/g, "");
+  return slug || "MANUAL";
+}
+var init_resolveManualLeagueIdFromDisplayName = __esm({
+  "../grarf/shared/domain/manualEvents/resolveManualLeagueIdFromDisplayName.ts"() {
+    init_define_import_meta_env();
+  }
+});
+
+// ../grarf/shared/domain/manualEvents/buildManualEventFromOperationsEditorDraft.ts
+function formatManualEventWallClockFromDateTimeLocal(value) {
+  const trimmed = value.trim();
+  if (!trimmed) return null;
+  const match = trimmed.match(/^(\d{4}-\d{2}-\d{2})T(\d{2}):(\d{2})/);
+  if (!match) return null;
+  return `${match[1]}T${match[2]}:${match[3]}:00`;
+}
+function formatWallClockInTimeZone(ms2, timeZone) {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hourCycle: "h23"
+  }).formatToParts(new Date(ms2));
+  const read3 = (type) => parts.find((part) => part.type === type)?.value ?? "00";
+  return `${read3("year")}-${read3("month")}-${read3("day")}T${read3("hour")}:${read3("minute")}:${read3("second")}`;
+}
+function resolveDefaultEndTime(startTime, sourceTimezone) {
+  const iana = resolveManualEventSourceTimezoneIana(sourceTimezone);
+  const startTimeMs = parseManualGamesSpineEventTimeMs(startTime, iana);
+  if (startTimeMs == null) return null;
+  return formatWallClockInTimeZone(
+    startTimeMs + DEFAULT_OPERATIONS_MANUAL_EVENT_DURATION_MS,
+    iana
+  );
+}
+function buildManualEventFromOperationsEditorDraft(draft, options) {
+  const errors = [];
+  const leagueName = draft.leagueName.trim();
+  if (!leagueName) errors.push("League name is required");
+  const startTime = formatManualEventWallClockFromDateTimeLocal(draft.dateStartTime);
+  if (!startTime) errors.push("Date & start time is required");
+  const broadcastName = draft.broadcastChannelName.trim();
+  if (!broadcastName) errors.push("Broadcast channel name is required");
+  const streamUrl = draft.streamUrl.trim();
+  if (!streamUrl) errors.push("Stream URL is required");
+  const gameCardUrl = draft.gameCardUrl.trim();
+  if (!gameCardUrl) errors.push("Game card URL is required");
+  if (draft.eventType === "event-only") {
+    if (!draft.eventName.trim()) errors.push("Event name is required");
+  } else {
+    if (!draft.team1Name.trim()) errors.push("Team 1 is required");
+    if (!draft.team2Name.trim()) errors.push("Team 2 is required");
+  }
+  if (errors.length > 0 || !startTime) {
+    return { ok: false, errors };
+  }
+  const sourceTimezone = options?.sourceTimezone ?? DEFAULT_OPERATIONS_MANUAL_EVENT_SOURCE_TIMEZONE;
+  const endTime = resolveDefaultEndTime(startTime, sourceTimezone);
+  if (!endTime) {
+    return { ok: false, errors: ["Could not derive end time from start time"] };
+  }
+  const leagueId = resolveManualLeagueIdFromDisplayName(leagueName);
+  const league2 = {
+    leagueId,
+    displayName: leagueName,
+    logo: draft.leagueLogoUrl.trim() || "/league-logos/placeholder-manual.png",
+    branding: null
+  };
+  const event = draft.eventType === "event-only" ? {
+    leagueId,
+    eventName: draft.eventName.trim(),
+    team1: null,
+    team2: null,
+    startTime,
+    endTime,
+    sourceTimezone,
+    broadcastName,
+    streamUrl,
+    gameCardUrl,
+    openBehavior: draft.launchBehavior
+  } : {
+    leagueId,
+    eventName: null,
+    team1: { name: draft.team1Name.trim(), logo: null },
+    team2: { name: draft.team2Name.trim(), logo: null },
+    startTime,
+    endTime,
+    sourceTimezone,
+    broadcastName,
+    streamUrl,
+    gameCardUrl,
+    openBehavior: draft.launchBehavior
+  };
+  const validationErrors = validateManualEventDefinition(event, 0);
+  if (validationErrors.length > 0) {
+    return {
+      ok: false,
+      errors: validationErrors.map((row) => row.message)
+    };
+  }
+  void draft.broadcastChannelLogoUrl;
+  void draft.broadcastLogoUrl;
+  return { ok: true, league: league2, event };
+}
+var DEFAULT_OPERATIONS_MANUAL_EVENT_SOURCE_TIMEZONE, DEFAULT_OPERATIONS_MANUAL_EVENT_DURATION_MS;
+var init_buildManualEventFromOperationsEditorDraft = __esm({
+  "../grarf/shared/domain/manualEvents/buildManualEventFromOperationsEditorDraft.ts"() {
+    init_define_import_meta_env();
+    init_manualGamesSpineTime();
+    init_resolveManualLeagueIdFromDisplayName();
+    init_resolveSourceTimezone();
+    init_validateManualEventDefinition();
+    DEFAULT_OPERATIONS_MANUAL_EVENT_SOURCE_TIMEZONE = "ET";
+    DEFAULT_OPERATIONS_MANUAL_EVENT_DURATION_MS = 3 * 60 * 60 * 1e3;
+  }
+});
+
+// ../grarf/desktop/src/lib/manualEvents/applyManualEventsSourceToLiveGames.ts
+function applyManualEventsSourceToLiveGames(source) {
+  const prev = useLiveGamesStore.getState();
+  const mergedLeagues = mergeIngestedManualEventsIntoLeagueGames(prev.leagues, {
+    source,
+    now: /* @__PURE__ */ new Date()
+  });
+  prev.hydrate({
+    leagues: mergedLeagues,
+    updatedAt: (/* @__PURE__ */ new Date()).toISOString()
+  });
+}
+var init_applyManualEventsSourceToLiveGames = __esm({
+  "../grarf/desktop/src/lib/manualEvents/applyManualEventsSourceToLiveGames.ts"() {
+    init_define_import_meta_env();
+    init_mergeIngestedManualEventsIntoLeagueGames();
+    init_liveGamesStore();
+  }
+});
+
+// ../grarf/desktop/src/lib/manualEvents/manualEventsPersistenceApi.ts
+function workerWriteHeaders5() {
+  const headers = {
+    "Content-Type": "application/json"
+  };
+  const token = getSportscapeAdminToken();
+  if (token) headers.Authorization = `Bearer ${token}`;
+  return headers;
+}
+async function saveManualEventsSourceEntry(input) {
+  const { response: res } = await fetchSportscapeEditorialWithFailover(SAVE_PATH3, {
+    method: "POST",
+    headers: workerWriteHeaders5(),
+    body: JSON.stringify(input)
+  });
+  const body = await res.json();
+  if (!res.ok || !body.ok || !body.source) {
+    const errors = Array.isArray(body.errors) ? body.errors.map((row) => typeof row === "string" ? row : row.message ?? "save_failed") : ["save_failed"];
+    throw new Error(errors.join("; "));
+  }
+  return body.source;
+}
+var SAVE_PATH3;
+var init_manualEventsPersistenceApi = __esm({
+  "../grarf/desktop/src/lib/manualEvents/manualEventsPersistenceApi.ts"() {
+    init_define_import_meta_env();
+    init_fetchSportscapeEditorialWithFailover();
+    init_sportscapeEditorialAdminAuth();
+    SAVE_PATH3 = "/manual-events-source";
+  }
+});
+
+// ../grarf/desktop/src/lib/manualEvents/saveOperationsManualGameEntry.ts
+async function saveOperationsManualGameEntry(draft) {
+  const built = buildManualEventFromOperationsEditorDraft(draft);
+  if (!built.ok) {
+    return { ok: false, errors: built.errors };
+  }
+  try {
+    const source = await saveManualEventsSourceEntry({
+      league: built.league,
+      event: built.event
+    });
+    applyManualEventsSourceToLiveGames(source);
+    return {
+      ok: true,
+      source,
+      scheduledDateKey: built.event.startTime.slice(0, 10)
+    };
+  } catch (error) {
+    return {
+      ok: false,
+      errors: [error instanceof Error ? error.message : "Unable to save manual event"]
+    };
+  }
+}
+var init_saveOperationsManualGameEntry = __esm({
+  "../grarf/desktop/src/lib/manualEvents/saveOperationsManualGameEntry.ts"() {
+    init_define_import_meta_env();
+    init_buildManualEventFromOperationsEditorDraft();
+    init_applyManualEventsSourceToLiveGames();
+    init_manualEventsPersistenceApi();
+  }
+});
+
 // ../grarf/desktop/src/components/adminMode/OperationsManualGameEntryEditorSection.tsx
 function createBlankOperationsManualGameEntryDraft() {
   return {
@@ -96642,7 +97423,10 @@ function OperationsManualEntryEventTypeSelector({
 }
 function OperationsManualGameEntryEditorCard({
   draft,
-  onDraftChange
+  saving,
+  saveError,
+  onDraftChange,
+  onSave
 }) {
   const updateField = (key2, value) => {
     onDraftChange({ ...draft, [key2]: value });
@@ -96830,12 +97614,15 @@ function OperationsManualGameEntryEditorCard({
         }
       )
     ] }),
+    saveError ? /* @__PURE__ */ (0, import_jsx_runtime154.jsx)("p", { className: "font-mono text-[11px] tracking-[0.08em] text-redsys", children: saveError }) : null,
     /* @__PURE__ */ (0, import_jsx_runtime154.jsx)(
       "button",
       {
         type: "button",
-        className: "mt-1 w-full rounded border border-greensys/50 bg-greensys/10 px-2 py-1.5 font-mono text-[11px] tracking-[0.14em] text-greensys hover:bg-greensys/20",
-        children: "Save"
+        disabled: saving,
+        onClick: onSave,
+        className: "mt-1 w-full rounded border border-greensys/50 bg-greensys/10 px-2 py-1.5 font-mono text-[11px] tracking-[0.14em] text-greensys hover:bg-greensys/20 disabled:cursor-not-allowed disabled:opacity-50",
+        children: saving ? "Saving\u2026" : "Save"
       }
     )
   ] });
@@ -96843,6 +97630,22 @@ function OperationsManualGameEntryEditorCard({
 function OperationsManualGameEntryEditorSection() {
   const [expanded, setExpanded] = (0, import_react168.useState)(false);
   const [draft, setDraft] = (0, import_react168.useState)(createBlankOperationsManualGameEntryDraft);
+  const [saving, setSaving] = (0, import_react168.useState)(false);
+  const [saveError, setSaveError] = (0, import_react168.useState)(null);
+  const onSave = () => {
+    void (async () => {
+      setSaving(true);
+      setSaveError(null);
+      const result = await saveOperationsManualGameEntry(draft);
+      setSaving(false);
+      if (!result.ok) {
+        setSaveError(result.errors.join(" \xB7 "));
+        return;
+      }
+      setDraft(createBlankOperationsManualGameEntryDraft());
+      setExpanded(false);
+    })();
+  };
   return /* @__PURE__ */ (0, import_jsx_runtime154.jsxs)("section", { className: "min-w-0", "aria-label": "Manual game entry editor", children: [
     /* @__PURE__ */ (0, import_jsx_runtime154.jsx)("header", { className: "sticky top-0 z-[2] mx-1 border border-[#24363c]/75 bg-[#0b1216]", children: /* @__PURE__ */ (0, import_jsx_runtime154.jsx)("div", { className: "flex w-full items-center justify-end gap-2 border-l-2 border-l-cyansys/35 py-2 pl-2.5 pr-2", children: /* @__PURE__ */ (0, import_jsx_runtime154.jsx)(
       "button",
@@ -96859,7 +97662,16 @@ function OperationsManualGameEntryEditorSection() {
         children: expanded ? "\u2212" : "+"
       }
     ) }) }),
-    expanded ? /* @__PURE__ */ (0, import_jsx_runtime154.jsx)("div", { className: "mx-1 px-2 py-2", children: /* @__PURE__ */ (0, import_jsx_runtime154.jsx)(OperationsManualGameEntryEditorCard, { draft, onDraftChange: setDraft }) }) : null
+    expanded ? /* @__PURE__ */ (0, import_jsx_runtime154.jsx)("div", { className: "mx-1 px-2 py-2", children: /* @__PURE__ */ (0, import_jsx_runtime154.jsx)(
+      OperationsManualGameEntryEditorCard,
+      {
+        draft,
+        saving,
+        saveError,
+        onDraftChange: setDraft,
+        onSave
+      }
+    ) }) : null
   ] });
 }
 var import_react168, import_jsx_runtime154, OPERATIONS_MANUAL_ENTRY_FIELD_CLASS;
@@ -96870,6 +97682,7 @@ var init_OperationsManualGameEntryEditorSection = __esm({
     init_cn();
     init_gamesSpineCardLayout();
     init_gamesSpineLeagueLogoUrls();
+    init_saveOperationsManualGameEntry();
     init_GamesSpineCardSectionDivider();
     import_jsx_runtime154 = __toESM(require_jsx_runtime(), 1);
     OPERATIONS_MANUAL_ENTRY_FIELD_CLASS = "w-full min-w-0 border border-[#243b37] bg-transparent px-1.5 py-1 font-mono text-[12px] leading-tight text-[#d7eeee] placeholder:text-[#3a5e58] focus:border-[#3a6b5e] focus:outline-none focus:ring-0";
@@ -108152,7 +108965,7 @@ var init_normalizeCanonicalManualImport = __esm({
 });
 
 // ../grarf/desktop/src/lib/gamesSpine/manual/validateGamesSpineManualDocument.ts
-function isNonEmptyString(value) {
+function isNonEmptyString2(value) {
   return typeof value === "string" && value.trim().length > 0;
 }
 function parsePriority(value) {
@@ -108196,10 +109009,10 @@ function validateEvent(raw, index, sourceTimeZone) {
     return `games[${index}] must be an object`;
   }
   const row = raw;
-  if (!isNonEmptyString(row.date)) return `games[${index}].date is required`;
-  if (!isNonEmptyString(row.eventName)) return `games[${index}].eventName is required`;
-  if (!isNonEmptyString(row.startTime)) return `games[${index}].startTime is required`;
-  if (!isNonEmptyString(row.endTime)) return `games[${index}].endTime is required`;
+  if (!isNonEmptyString2(row.date)) return `games[${index}].date is required`;
+  if (!isNonEmptyString2(row.eventName)) return `games[${index}].eventName is required`;
+  if (!isNonEmptyString2(row.startTime)) return `games[${index}].startTime is required`;
+  if (!isNonEmptyString2(row.endTime)) return `games[${index}].endTime is required`;
   const startTimeMs = parseManualGamesSpineEventTimeMs2(String(row.startTime), sourceTimeZone);
   if (startTimeMs == null) {
     return sourceTimeZone ? `games[${index}].startTime must be a valid datetime in ${sourceTimeZone}` : `games[${index}].startTime must be a valid ISO datetime`;
@@ -108238,7 +109051,7 @@ function validateLeague(raw) {
     return "document must be a league object or { leagues: [...] }";
   }
   const row = raw;
-  if (!isNonEmptyString(row.league)) return "league is required";
+  if (!isNonEmptyString2(row.league)) return "league is required";
   const leaguePriority = parsePriority(row.leaguePriority);
   if (row.leaguePriority != null && row.leaguePriority !== "" && leaguePriority == null) {
     return "leaguePriority must be a number when provided";
