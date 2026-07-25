@@ -33094,6 +33094,13 @@ var init_espnOperationalLeagueRegistry_generated = __esm({
         "endpoint": "https://site.api.espn.com/apis/site/v2/sports/golf/champions-tour/scoreboard"
       },
       {
+        "key": "CLUBFRIENDLY",
+        "sport": "soccer",
+        "label": "Club Friendly",
+        "slug": "club.friendly",
+        "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/club.friendly/scoreboard"
+      },
+      {
         "key": "CLUBWC",
         "sport": "soccer",
         "label": "Club World Cup",
