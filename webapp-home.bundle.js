@@ -37388,6 +37388,30 @@ var init_adminOperationsLiveWorkspaceStore = __esm({
   }
 });
 
+// ../grarf/desktop/src/lib/home/ufcJul252026LiveBrowserTemporaryOverride.ts
+function isUfcJul252026LiveBrowserOverrideActive(now = /* @__PURE__ */ new Date()) {
+  return getOperationalSportsDayDateKey(now) === UFC_JUL_25_2026_LIVE_BROWSER_OVERRIDE_DATE_KEY;
+}
+function resolveUfcJul252026LiveBrowserOverrideSources() {
+  if (!isUfcJul252026LiveBrowserOverrideActive()) return null;
+  return [
+    {
+      id: "ufc__temporary_live_sherdog_abu_dhabi_jul_25_2026",
+      label: "Sherdog Live Play-by-Play",
+      url: UFC_JUL_25_2026_LIVE_BROWSER_SHERDOG_URL
+    }
+  ];
+}
+var UFC_JUL_25_2026_LIVE_BROWSER_OVERRIDE_DATE_KEY, UFC_JUL_25_2026_LIVE_BROWSER_SHERDOG_URL;
+var init_ufcJul252026LiveBrowserTemporaryOverride = __esm({
+  "../grarf/desktop/src/lib/home/ufcJul252026LiveBrowserTemporaryOverride.ts"() {
+    init_define_import_meta_env();
+    init_operationalSlateDate2();
+    UFC_JUL_25_2026_LIVE_BROWSER_OVERRIDE_DATE_KEY = "2026-07-25";
+    UFC_JUL_25_2026_LIVE_BROWSER_SHERDOG_URL = "https://www.sherdog.com/news/news/UFC-Abu-Dhabi-Ankalaev-vs-Guskov-playbyplay-results-round-scoring-202068";
+  }
+});
+
 // ../grarf/desktop/src/lib/operations/resolveOperationsLiveWorkspaceNavigation.ts
 function operationsLiveWorkspaceItemsToHomeSources(items) {
   return (items ?? []).filter((item) => item.url.trim().length > 0).map((item) => ({
@@ -37412,6 +37436,10 @@ function readLiveWorkspaceItemsByLeagueKey(itemsByLeagueKey) {
   return merged;
 }
 function resolveLiveWorkspaceTabSourcesForHub(hubId, itemsByLeagueKey) {
+  if (hubId === "ufc") {
+    const temporaryOverride = resolveUfcJul252026LiveBrowserOverrideSources();
+    if (temporaryOverride) return temporaryOverride;
+  }
   const leagueKey = resolveHomeLeagueWorkspaceGrarfLeagueKey(hubId);
   const configuredSources = leagueKey ? operationsLiveWorkspaceItemsToHomeSources(
     readLiveWorkspaceItemsByLeagueKey(itemsByLeagueKey)[leagueKey]
@@ -37444,6 +37472,7 @@ var init_resolveOperationsLiveWorkspaceNavigation = __esm({
     init_define_import_meta_env();
     init_homeLeagueWorkspaceHubRegistry();
     init_adminOperationsLiveWorkspaceStore();
+    init_ufcJul252026LiveBrowserTemporaryOverride();
   }
 });
 
