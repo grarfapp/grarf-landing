@@ -37,7 +37,7 @@ var __publicField = (obj, key2, value) => __defNormalProp(obj, typeof key2 !== "
 var define_import_meta_env_default;
 var init_define_import_meta_env = __esm({
   "<define:import.meta.env>"() {
-    define_import_meta_env_default = { DEV: false, PROD: true, MODE: "production", VITE_OPERATIONAL_INGEST_PROVIDER: "grarf_cloud", VITE_GRARF_OPERATIONAL_INGEST_URL: "https://grarf-operational-service.grarf.workers.dev", VITE_SPORTSCAPE_EDITORIAL_API_URL: "https://grarf-operational-service.grarf.workers.dev/sportscape-editorial", VITE_TRACE_FINAL_LIVE_FIELDS: "", VITE_ENABLE_ESPN_RESOLVER: "false", VITE_POSTHOG_KEY: "", VITE_POSTHOG_HOST: "" };
+    define_import_meta_env_default = { DEV: false, PROD: true, MODE: "production", VITE_OPERATIONAL_INGEST_PROVIDER: "grarf_cloud", VITE_GRARF_OPERATIONAL_INGEST_URL: "https://grarf-operational-service.grarf.workers.dev", VITE_SPORTSCAPE_EDITORIAL_API_URL: "https://grarf-operational-service.grarf.workers.dev/sportscape-editorial", VITE_TRACE_FINAL_LIVE_FIELDS: "", VITE_ENABLE_ESPN_RESOLVER: "false", VITE_POSTHOG_KEY: "phc_AGQGsddTcRefiXfaR634tAiCEvfkyWk5mtKR4qzQbcxP", VITE_POSTHOG_HOST: "https://us.i.posthog.com" };
   }
 });
 
