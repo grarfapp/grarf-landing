@@ -1024,6 +1024,32 @@ var init_manualEventsPersistenceApi = __esm({
   }
 });
 
+// ../grarf/desktop/src/lib/manualEvents/manualEventsOverlayCache.ts
+function setManualEventsOverlayCache(overlay) {
+  cachedOverlay = overlay;
+  cachedOverlayPromise = Promise.resolve(overlay);
+}
+function getManualEventsSourceOverlayCached() {
+  if (cachedOverlay !== void 0) {
+    return Promise.resolve(cachedOverlay);
+  }
+  if (!cachedOverlayPromise) {
+    cachedOverlayPromise = fetchManualEventsSourceOverlay().then((overlay) => {
+      cachedOverlay = overlay;
+      return overlay;
+    });
+  }
+  return cachedOverlayPromise;
+}
+var cachedOverlay, cachedOverlayPromise;
+var init_manualEventsOverlayCache = __esm({
+  "../grarf/desktop/src/lib/manualEvents/manualEventsOverlayCache.ts"() {
+    init_define_import_meta_env();
+    init_manualEventsPersistenceApi();
+    cachedOverlayPromise = null;
+  }
+});
+
 // ../grarf/desktop/src/lib/manualEvents/manualEventsSourceResolver.ts
 function invalidateManualEventsSourcePrefetch() {
   manualEventsSourcePrefetch = null;
@@ -1034,9 +1060,12 @@ function prefetchManualEventsSourceBundle() {
   }
   return manualEventsSourcePrefetch;
 }
+function resolveManualEventsSourceBundleFromOverlay(overlay) {
+  return mergeManualEventsSourceBundles(loadManualEventsSourceBundle(), overlay);
+}
 async function resolveManualEventsSourceBundle() {
   const bundled = loadManualEventsSourceBundle();
-  const overlay = await fetchManualEventsSourceOverlay();
+  const overlay = await getManualEventsSourceOverlayCached();
   if (!overlay) return bundled;
   return mergeManualEventsSourceBundles(bundled, overlay);
 }
@@ -1046,7 +1075,7 @@ var init_manualEventsSourceResolver = __esm({
     init_define_import_meta_env();
     init_manualEventsSourceBundle();
     init_mergeManualEventsSourceBundles();
-    init_manualEventsPersistenceApi();
+    init_manualEventsOverlayCache();
     manualEventsSourcePrefetch = null;
   }
 });
@@ -80825,32 +80854,6 @@ var init_operationsManualGameEntrySessionDraft = __esm({
   }
 });
 
-// ../grarf/desktop/src/lib/manualEvents/manualEventsOverlayCache.ts
-function invalidateManualEventsOverlayCache() {
-  cachedOverlay = void 0;
-  cachedOverlayPromise = null;
-}
-function getManualEventsSourceOverlayCached() {
-  if (cachedOverlay !== void 0) {
-    return Promise.resolve(cachedOverlay);
-  }
-  if (!cachedOverlayPromise) {
-    cachedOverlayPromise = fetchManualEventsSourceOverlay().then((overlay) => {
-      cachedOverlay = overlay;
-      return overlay;
-    });
-  }
-  return cachedOverlayPromise;
-}
-var cachedOverlay, cachedOverlayPromise;
-var init_manualEventsOverlayCache = __esm({
-  "../grarf/desktop/src/lib/manualEvents/manualEventsOverlayCache.ts"() {
-    init_define_import_meta_env();
-    init_manualEventsPersistenceApi();
-    cachedOverlayPromise = null;
-  }
-});
-
 // ../grarf/desktop/src/lib/manualEvents/wysiwygPrototypeManualGameEntry.ts
 function resolveLaunchBehavior(mode) {
   return mode === "new-browser-tab" ? "New Browser Tab" : "Center Pane";
@@ -81009,9 +81012,9 @@ async function deleteOperationsManualGameEntry(game) {
     return { ok: false, errors: ["not_a_manual_game"] };
   }
   try {
-    await deleteManualEventsSourceEntry({ event });
+    const overlay2 = await deleteManualEventsSourceEntry({ event });
     invalidateManualEventsSourcePrefetch();
-    invalidateManualEventsOverlayCache();
+    setManualEventsOverlayCache(overlay2);
     removeManualGameFromLiveGames(game.id);
     return { ok: true };
   } catch (error) {
@@ -81060,7 +81063,7 @@ async function saveOperationsManualGameEntry(draft, options) {
     })
   });
   try {
-    await saveManualEventsSourceEntry(
+    const overlay = await saveManualEventsSourceEntry(
       {
         league: built.league,
         broadcaster: built.broadcaster,
@@ -81074,11 +81077,11 @@ async function saveOperationsManualGameEntry(draft, options) {
       { requestId }
     );
     invalidateManualEventsSourcePrefetch();
-    invalidateManualEventsOverlayCache();
+    setManualEventsOverlayCache(overlay);
     if (options?.replaceGameId) {
       removeManualGameFromLiveGames(options.replaceGameId);
     }
-    const source = await resolveManualEventsSourceBundle();
+    const source = resolveManualEventsSourceBundleFromOverlay(overlay);
     applyManualEventsSourceToLiveGames(source);
     const scheduledDateKey = built.event.startTime.slice(0, 10);
     logManualEventsSaveStage("save_success", { requestId, scheduledDateKey });
@@ -99811,9 +99814,10 @@ async function saveOperationsManualGameEntrySession(session, options) {
     return { ok: false, errors: validated.errors };
   }
   try {
+    let overlay = null;
     for (let index = 0; index < validated.built.length; index += 1) {
       const built = validated.built[index];
-      await saveManualEventsSourceEntry(
+      overlay = await saveManualEventsSourceEntry(
         {
           league: built.league,
           broadcaster: built.broadcaster,
@@ -99826,9 +99830,12 @@ async function saveOperationsManualGameEntrySession(session, options) {
         { requestId }
       );
     }
+    if (!overlay) {
+      return { ok: false, errors: ["Unable to save manual events"] };
+    }
     invalidateManualEventsSourcePrefetch();
-    invalidateManualEventsOverlayCache();
-    const source = await resolveManualEventsSourceBundle();
+    setManualEventsOverlayCache(overlay);
+    const source = resolveManualEventsSourceBundleFromOverlay(overlay);
     applyManualEventsSourceToLiveGames(source);
     logManualEventsSaveStage("save_success", {
       requestId,
