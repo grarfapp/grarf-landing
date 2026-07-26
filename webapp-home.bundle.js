@@ -24284,6 +24284,7 @@ var init_gamesColumnLeagues = __esm({
       MLB: "MLB",
       NCAABB: "NCAA Baseball",
       NBA: "NBA",
+      NBA2K: "NBA G League",
       NBASUMMER: "NBA Summer League",
       WNBA: "WNBA",
       NHL: "NHL",
@@ -24315,6 +24316,13 @@ var init_gamesColumnLeagues = __esm({
       WTA: "WTA",
       TDF: "Tour de France",
       UFC: "UFC",
+      BOXING: "Boxing",
+      USATF: "Track & Field",
+      XFL: "United Football League",
+      CRICKET_BBL: "Big Bash League",
+      NCAAVB: "NCAA Women's Volleyball",
+      NCAAVB_M: "NCAA Men's Volleyball",
+      PLL: "Premier Lacrosse League",
       F1: "Formula 1",
       NASCAR: "NASCAR",
       INDYCAR: "IndyCar",
@@ -24400,7 +24408,7 @@ var init_grarfSportHierarchy = __esm({
       combat: {
         title: "COMBAT",
         directorySectionId: "combat",
-        leagueKeys: ["UFC"]
+        leagueKeys: ["UFC", "BOXING"]
       },
       football: {
         title: "FOOTBALL",
@@ -31188,8 +31196,16 @@ var init_leagueRoutePaths = __esm({
       TDF: "/tour-de-france",
       NCAABB: "/ncaa-baseball",
       NBA: "/nba",
+      NBA2K: "/g-league",
       WNBA: "/wnba",
       NHL: "/nhl",
+      XFL: "/xfl",
+      CRICKET_BBL: "/big-bash-league",
+      NCAAVB: "/ncaa-volleyball-women",
+      NCAAVB_M: "/ncaa-volleyball-men",
+      BOXING: "/boxing",
+      USATF: "/track-and-field",
+      PLL: "/pll",
       MLS: "/mls",
       EPL: "/premier-league",
       BUNDESLIGA: "/bundesliga",
@@ -31274,6 +31290,7 @@ var init_resolveLeagueDirectoryNavItemLogo = __esm({
       MLB: "mlb",
       NHL: "nhl",
       NBA: "nba",
+      NBA2K: "g-league",
       WNBA: "wnba",
       NFL: "nfl",
       MLS: "mls",
@@ -31294,6 +31311,12 @@ var init_resolveLeagueDirectoryNavItemLogo = __esm({
       ATP: "atp",
       WTA: "wta",
       UFC: "ufc",
+      BOXING: "boxing",
+      USATF: "track-and-field",
+      XFL: "ufl",
+      CRICKET_BBL: "big-bash-league",
+      NCAAVB: "volleyball-ncaaw",
+      NCAAVB_M: "volleyball-ncaam",
       F1: "f1",
       NASCAR: "nascar-cup-series",
       INDYCAR: "indycar",
@@ -31386,7 +31409,7 @@ function buildLeagueDirectoryNavSections(logos) {
         ["ncaaf", "NCAAF", { collapsedLabel: "NCAAF", grarfLeagueKey: "NCAAF" }]
       ],
       [
-        ["ufl", "UFL", { collapsedLabel: "UFL" }],
+        ["ufl", "UFL", { collapsedLabel: "UFL", grarfLeagueKey: "XFL" }],
         ["cfl", "CFL"]
       ]
     ),
@@ -31402,7 +31425,7 @@ function buildLeagueDirectoryNavSections(logos) {
       [
         ["ncaam", "NCAAM", { collapsedLabel: "NCAAM" }],
         ["ncaaw", "NCAAW", { collapsedLabel: "NCAAW" }],
-        ["g-league", "G League"],
+        ["g-league", "G League", { grarfLeagueKey: "NBA2K" }],
         ["big3", "BIG3"],
         ["euroleague", "EuroLeague"]
       ]
@@ -31568,7 +31591,7 @@ function buildLeagueDirectoryNavSections(logos) {
       "combat",
       [
         ["ufc", "UFC", { route: "/ufc", grarfLeagueKey: "UFC", collapsedLabel: "UFC" }],
-        ["boxing", "Boxing", { collapsedLabel: "BOX" }]
+        ["boxing", "Boxing", { collapsedLabel: "BOX", grarfLeagueKey: "BOXING" }]
       ],
       [["pfl", "PFL"]]
     ),
@@ -31589,12 +31612,12 @@ function buildLeagueDirectoryNavSections(logos) {
       logos,
       void 0,
       [
-        ["volleyball-ncaaw", "NCAAW"],
+        ["volleyball-ncaaw", "NCAAW", { grarfLeagueKey: "NCAAVB" }],
         ["avp", "AVP"],
         ["lovb", "LOVB"],
         ["pfv", "PFV"]
       ],
-      [["volleyball-ncaam", "NCAAM"]]
+      [["volleyball-ncaam", "NCAAM", { grarfLeagueKey: "NCAAVB_M" }]]
     ),
     sportSection(
       "cricket",
@@ -31604,7 +31627,7 @@ function buildLeagueDirectoryNavSections(logos) {
       [["t20-womens-world-cup", "ICC", { collapsedLabel: "WWC" }]],
       [
         ["ipl", "IPL"],
-        ["big-bash-league", "Big Bash League"],
+        ["big-bash-league", "Big Bash League", { grarfLeagueKey: "CRICKET_BBL" }],
         ["odi", "ODI"]
       ]
     ),
@@ -31621,10 +31644,11 @@ function buildLeagueDirectoryNavSections(logos) {
     ungroupedSection(logos, [
       ["more-soccer", "More Soccer", { grarfSportKey: "soccer" }],
       ["horse-racing", "Horse Racing"],
-      ["track-and-field", "Track & Field"],
+      ["track-and-field", "Track & Field", { grarfLeagueKey: "USATF" }],
       ["swimming", "Swimming"],
       ["winter-sports", "Winter Sports"],
-      ["lacrosse", "Lacrosse"]
+      ["lacrosse", "Lacrosse"],
+      ["pll", "PLL", { grarfLeagueKey: "PLL", collapsedLabel: "PLL" }]
     ])
   ];
 }
@@ -32283,6 +32307,7 @@ var init_gamesSpineLeagueLogoUrls = __esm({
       MLB: "https://a.espncdn.com/i/teamlogos/leagues/500/mlb.png",
       NCAABB: MCWS_LEAGUE_LOGO_URL,
       NBA: "https://a.espncdn.com/i/teamlogos/leagues/500/nba.png",
+      NBA2K: "/league-logos/nav/g-league.png",
       NBASUMMER: "https://a.espncdn.com/i/teamlogos/leagues/500/nba.png",
       WNBA: "https://a.espncdn.com/i/teamlogos/leagues/500/wnba.png",
       NHL: "https://a.espncdn.com/i/teamlogos/leagues/500/nhl.png",
@@ -32319,6 +32344,11 @@ var init_gamesSpineLeagueLogoUrls = __esm({
       WIMBLEDON_MEN: "/league-logos/wimbledon.png",
       WIMBLEDON_WOMEN: "/league-logos/wimbledon.png",
       UFC: "https://a.espncdn.com/i/teamlogos/leagues/500/ufc.png",
+      BOXING: "/league-logos/placeholder-boxing.png",
+      XFL: "/league-logos/nav/ufl.png",
+      CRICKET_BBL: "/league-logos/nav/big-bash-league.png",
+      NCAAVB: "/league-logos/nav/volleyball-ncaaw.png",
+      NCAAVB_M: "/league-logos/nav/volleyball-ncaam.png",
       F1: "https://a.espncdn.com/i/teamlogos/leagues/500/f1.png",
       NASCAR: "/league-logos/nav/nascar-cup-series.png",
       INDYCAR: "/league-logos/nav/indycar.png",
@@ -37425,14 +37455,13 @@ var init_canonicalRegistry = __esm({
       league("WNBA", "WNBA", "wnba"),
       navLeague("NCAA Men's Basketball", "ncaa-mens-basketball", ["ncaam", "march-madness-mens"], "MNCAAB"),
       navLeague("NCAA Women's Basketball", "ncaa-womens-basketball", ["ncaaw", "womens-march-madness"], "WNCAAB"),
-      navLeague("G League", "g-league", ["nba-g-league", "gleague"]),
+      league("NBA G League", "NBA2K", "g-league", ["nba-g-league", "gleague"]),
       navLeague("BIG3", "big3"),
       navLeague("EuroLeague", "euroleague"),
       league("NFL", "NFL", "nfl", ["national-football-league"]),
       league("NCAA Football", "NCAAF", "ncaa-football", ["ncaaf", "college-football"]),
-      navLeague("UFL", "ufl", ["united-football-league"]),
       league("CFL", "CFL", "cfl", ["canadian-football-league"], "nav"),
-      entry("XFL", "XFL", "league", "/xfl", { leagueKey: "XFL", status: "future" }),
+      league("United Football League", "XFL", "xfl", ["ufl", "united-football-league"]),
       league("NHL", "NHL", "nhl", ["national-hockey-league"]),
       navLeague("PWHL", "pwhl", ["professional-womens-hockey-league"]),
       navLeague("KHL", "khl", ["kontinental-hockey-league"]),
@@ -37510,7 +37539,7 @@ var init_canonicalRegistry = __esm({
       navLeague("Giro d'Italia", "giro-d-italia", ["giro", "giro-italia"]),
       navLeague("Vuelta a Espa\xF1a", "vuelta-a-espana", ["vuelta", "la-vuelta"]),
       league("UFC", "UFC", "ufc", ["ultimate-fighting-championship"]),
-      navLeague("Boxing", "boxing"),
+      league("Boxing", "BOXING", "boxing"),
       navLeague("PFL", "pfl", ["professional-fighters-league"]),
       league("Rugby World Cup", "RUGBYWC", "rugby-world-cup", ["rugbywc"], "nav"),
       league("Premiership Rugby", "RUGBYPREM", "premiership-rugby", ["premiership"], "nav"),
@@ -37518,19 +37547,19 @@ var init_canonicalRegistry = __esm({
       navLeague("Major League Rugby", "major-league-rugby", ["mlr"]),
       navLeague("Rugby Union", "rugby-union"),
       navLeague("IPL", "ipl", ["indian-premier-league"]),
-      navLeague("Big Bash League", "big-bash-league", ["bbl", "big-bash"]),
+      league("Big Bash League", "CRICKET_BBL", "big-bash-league", ["bbl", "big-bash"]),
       navLeague("ICC T20 Women's World Cup", "t20-womens-world-cup", ["t20-wwc"]),
       navLeague("ODI Cricket", "odi-cricket", ["odi"]),
-      navLeague("NCAA Volleyball (Women)", "ncaa-volleyball-women", ["volleyball-ncaaw"]),
-      navLeague("NCAA Volleyball (Men)", "ncaa-volleyball-men", ["volleyball-ncaam"]),
+      league("NCAA Volleyball (Women)", "NCAAVB", "ncaa-volleyball-women", ["volleyball-ncaaw"]),
+      league("NCAA Volleyball (Men)", "NCAAVB_M", "ncaa-volleyball-men", ["volleyball-ncaam"]),
       navLeague("AVP Beach Volleyball", "avp"),
       navLeague("NCAA Softball", "ncaa-softball", ["softball-ncaa"]),
       navLeague("Horse Racing", "horse-racing"),
-      navLeague("Track and Field", "track-and-field", ["track-field"]),
+      league("Track and Field", "USATF", "track-and-field", ["track-field"]),
       navLeague("Swimming", "swimming"),
       navLeague("Winter Sports", "winter-sports"),
       navLeague("Lacrosse", "lacrosse"),
-      navLeague("PLL Lacrosse", "pll", ["premier-lacrosse-league"])
+      league("Premier Lacrosse League", "PLL", "pll", ["premier-lacrosse-league"])
     ];
     PATH_ALIASES = [
       { from: "/whiparound", to: "/today" }

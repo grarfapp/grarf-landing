@@ -14075,6 +14075,7 @@ var GAMES_COLUMN_LEAGUE_LABEL = {
   MLB: "MLB",
   NCAABB: "NCAA Baseball",
   NBA: "NBA",
+  NBA2K: "NBA G League",
   NBASUMMER: "NBA Summer League",
   WNBA: "WNBA",
   NHL: "NHL",
@@ -14106,6 +14107,13 @@ var GAMES_COLUMN_LEAGUE_LABEL = {
   WTA: "WTA",
   TDF: "Tour de France",
   UFC: "UFC",
+  BOXING: "Boxing",
+  USATF: "Track & Field",
+  XFL: "United Football League",
+  CRICKET_BBL: "Big Bash League",
+  NCAAVB: "NCAA Women's Volleyball",
+  NCAAVB_M: "NCAA Men's Volleyball",
+  PLL: "Premier Lacrosse League",
   F1: "Formula 1",
   NASCAR: "NASCAR",
   INDYCAR: "IndyCar",
@@ -14956,7 +14964,7 @@ var GRARF_SPORT_HIERARCHY = {
   combat: {
     title: "COMBAT",
     directorySectionId: "combat",
-    leagueKeys: ["UFC"]
+    leagueKeys: ["UFC", "BOXING"]
   },
   football: {
     title: "FOOTBALL",
