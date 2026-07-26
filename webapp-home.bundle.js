@@ -1026,6 +1026,7 @@ var init_manualEventsPersistenceApi = __esm({
 
 // ../grarf/desktop/src/lib/manualEvents/manualEventsOverlayCache.ts
 function setManualEventsOverlayCache(overlay) {
+  overlayFetchGeneration += 1;
   cachedOverlay = overlay;
   cachedOverlayPromise = Promise.resolve(overlay);
 }
@@ -1034,19 +1035,24 @@ function getManualEventsSourceOverlayCached() {
     return Promise.resolve(cachedOverlay);
   }
   if (!cachedOverlayPromise) {
+    const generation = overlayFetchGeneration;
     cachedOverlayPromise = fetchManualEventsSourceOverlay().then((overlay) => {
+      if (generation !== overlayFetchGeneration) {
+        return cachedOverlay ?? overlay;
+      }
       cachedOverlay = overlay;
       return overlay;
     });
   }
   return cachedOverlayPromise;
 }
-var cachedOverlay, cachedOverlayPromise;
+var cachedOverlay, cachedOverlayPromise, overlayFetchGeneration;
 var init_manualEventsOverlayCache = __esm({
   "../grarf/desktop/src/lib/manualEvents/manualEventsOverlayCache.ts"() {
     init_define_import_meta_env();
     init_manualEventsPersistenceApi();
     cachedOverlayPromise = null;
+    overlayFetchGeneration = 0;
   }
 });
 
@@ -80961,6 +80967,40 @@ async function loadWysiwygManualGameEditSession(game) {
     })
   };
 }
+function wysiwygDraftToManualGameEntryCreateSession(draft) {
+  const gameId = crypto.randomUUID();
+  const eventType = resolveEventType(draft.team1, draft.team2);
+  return {
+    shared: {
+      leagueLogoUrl: draft.leagueLogoUrl,
+      leagueName: draft.leagueName,
+      broadcastChannelLogoUrl: draft.channelLogoUrl,
+      broadcastChannelName: draft.broadcastName,
+      broadcastLogoUrl: draft.channelLogoUrl,
+      streamUrl: draft.streamUrl,
+      launchBehavior: resolveLaunchBehavior(draft.navigationMode)
+    },
+    games: [
+      {
+        ...createBlankOperationsManualGameEntryGameRow(gameId),
+        eventDate: draft.eventDate,
+        startTime: draft.startTime,
+        endTime: draft.endTime,
+        eventType,
+        eventName: eventType === "event-only" ? draft.team1 : "",
+        team1Name: eventType === "head-to-head" ? draft.team1 : "",
+        team2Name: draft.team2,
+        gameCardUrl: draft.gameCardUrl
+      }
+    ]
+  };
+}
+function resolveWysiwygSavedManualGameId(session) {
+  const game = session.games[0];
+  if (!game) return null;
+  const merged = mergeOperationsManualGameEntryCreateSessionDraft(session, game);
+  return resolveWysiwygSavedManualGameIdFromEditorDraft(merged);
+}
 var init_wysiwygPrototypeManualGameEntry = __esm({
   "../grarf/desktop/src/lib/manualEvents/wysiwygPrototypeManualGameEntry.ts"() {
     init_define_import_meta_env();
@@ -81111,6 +81151,75 @@ var init_saveOperationsManualGameEntry = __esm({
   }
 });
 
+// ../grarf/desktop/src/lib/manualEvents/saveOperationsManualGameEntrySession.ts
+async function saveOperationsManualGameEntrySession(session, options) {
+  const requestId = createManualEventsSaveRequestId();
+  logManualEventsSaveStage("save_started", {
+    requestId,
+    gameCount: session.games.length
+  });
+  const validated = validateOperationsManualGameEntryCreateSession(session);
+  logManualEventsSaveStage("validation_result", {
+    requestId,
+    ok: validated.ok,
+    errors: validated.ok ? [] : validated.errors
+  });
+  if (!validated.ok) {
+    return { ok: false, errors: validated.errors };
+  }
+  try {
+    let overlay = null;
+    for (let index = 0; index < validated.built.length; index += 1) {
+      const built = validated.built[index];
+      overlay = await saveManualEventsSourceEntry(
+        {
+          league: built.league,
+          broadcaster: built.broadcaster,
+          event: built.event,
+          leagueLogoChanged: index === 0 ? options?.leagueLogoChanged : false,
+          broadcasterLogoChanged: index === 0 ? options?.broadcasterLogoChanged : false,
+          broadcasterStreamUrlChanged: index === 0 ? options?.broadcasterStreamUrlChanged : false,
+          broadcasterOpenBehaviorChanged: index === 0 ? options?.broadcasterOpenBehaviorChanged : false
+        },
+        { requestId }
+      );
+    }
+    if (!overlay) {
+      return { ok: false, errors: ["Unable to save manual events"] };
+    }
+    invalidateManualEventsSourcePrefetch();
+    setManualEventsOverlayCache(overlay);
+    const source = resolveManualEventsSourceBundleFromOverlay(overlay);
+    applyManualEventsSourceToLiveGames(source);
+    logManualEventsSaveStage("save_success", {
+      requestId,
+      gameCount: validated.built.length
+    });
+    return {
+      ok: true,
+      source,
+      gameCount: validated.built.length
+    };
+  } catch (error) {
+    const reason = error instanceof ManualEventsSaveError ? error.reason : error instanceof Error ? error.message : "Unable to save manual events";
+    return {
+      ok: false,
+      errors: [reason]
+    };
+  }
+}
+var init_saveOperationsManualGameEntrySession = __esm({
+  "../grarf/desktop/src/lib/manualEvents/saveOperationsManualGameEntrySession.ts"() {
+    init_define_import_meta_env();
+    init_operationsManualGameEntrySessionDraft();
+    init_applyManualEventsSourceToLiveGames();
+    init_manualEventsOverlayCache();
+    init_manualEventsPersistenceApi();
+    init_manualEventsSourceResolver();
+    init_manualEventsSaveDiagnostics();
+  }
+});
+
 // ../grarf/desktop/src/components/adminMode/GamesSpineWysiwygGameCardPrototype.tsx
 function createInitialDraft() {
   return {
@@ -81244,23 +81353,31 @@ function GamesSpineWysiwygGameCardPrototype() {
     void (async () => {
       setSaving(true);
       setSaveError(null);
-      const editorDraft = wysiwygDraftToOperationsManualGameEntryEditorDraft(draft);
-      const result = await saveOperationsManualGameEntry(editorDraft, {
-        ...editSession ? {
-          replaceEvent: editSession.replaceEvent,
-          replaceGameId: editSession.game.id
-        } : {},
+      const touchOptions = {
         leagueLogoChanged: leagueLogoTouched,
         broadcasterLogoChanged: broadcasterFieldsTouched.logo,
         broadcasterStreamUrlChanged: broadcasterFieldsTouched.streamUrl,
         broadcasterOpenBehaviorChanged: broadcasterFieldsTouched.openBehavior
-      });
+      };
+      const result = editSession ? await saveOperationsManualGameEntry(
+        wysiwygDraftToOperationsManualGameEntryEditorDraft(draft),
+        {
+          replaceEvent: editSession.replaceEvent,
+          replaceGameId: editSession.game.id,
+          ...touchOptions
+        }
+      ) : await saveOperationsManualGameEntrySession(
+        wysiwygDraftToManualGameEntryCreateSession(draft),
+        touchOptions
+      );
       setSaving(false);
       if (!result.ok) {
         setSaveError(result.errors.join(" \xB7 "));
         return;
       }
-      const gameId = resolveWysiwygSavedManualGameIdFromEditorDraft(editorDraft) ?? editSession?.game.id ?? null;
+      const gameId = editSession ? resolveWysiwygSavedManualGameIdFromEditorDraft(
+        wysiwygDraftToOperationsManualGameEntryEditorDraft(draft)
+      ) ?? editSession.game.id : resolveWysiwygSavedManualGameId(wysiwygDraftToManualGameEntryCreateSession(draft));
       if (gameId) {
         applyPriorityAndStatusOverride(gameId);
       }
@@ -81639,6 +81756,7 @@ var init_GamesSpineWysiwygGameCardPrototype = __esm({
     init_wysiwygPrototypeManualGameEntry();
     init_deleteOperationsManualGameEntry();
     init_saveOperationsManualGameEntry();
+    init_saveOperationsManualGameEntrySession();
     init_manualEventsSaveDiagnostics();
     init_gamesSpineCardLayout();
     init_gamesSpineScoreLayout();
@@ -99794,75 +99912,6 @@ var init_OperationsSpineSection = __esm({
     init_OperationsCard();
     init_OperationsLiveWorkspacePanel();
     import_jsx_runtime154 = __toESM(require_jsx_runtime(), 1);
-  }
-});
-
-// ../grarf/desktop/src/lib/manualEvents/saveOperationsManualGameEntrySession.ts
-async function saveOperationsManualGameEntrySession(session, options) {
-  const requestId = createManualEventsSaveRequestId();
-  logManualEventsSaveStage("save_started", {
-    requestId,
-    gameCount: session.games.length
-  });
-  const validated = validateOperationsManualGameEntryCreateSession(session);
-  logManualEventsSaveStage("validation_result", {
-    requestId,
-    ok: validated.ok,
-    errors: validated.ok ? [] : validated.errors
-  });
-  if (!validated.ok) {
-    return { ok: false, errors: validated.errors };
-  }
-  try {
-    let overlay = null;
-    for (let index = 0; index < validated.built.length; index += 1) {
-      const built = validated.built[index];
-      overlay = await saveManualEventsSourceEntry(
-        {
-          league: built.league,
-          broadcaster: built.broadcaster,
-          event: built.event,
-          leagueLogoChanged: index === 0 ? options?.leagueLogoChanged : false,
-          broadcasterLogoChanged: index === 0 ? options?.broadcasterLogoChanged : false,
-          broadcasterStreamUrlChanged: index === 0 ? options?.broadcasterStreamUrlChanged : false,
-          broadcasterOpenBehaviorChanged: index === 0 ? options?.broadcasterOpenBehaviorChanged : false
-        },
-        { requestId }
-      );
-    }
-    if (!overlay) {
-      return { ok: false, errors: ["Unable to save manual events"] };
-    }
-    invalidateManualEventsSourcePrefetch();
-    setManualEventsOverlayCache(overlay);
-    const source = resolveManualEventsSourceBundleFromOverlay(overlay);
-    applyManualEventsSourceToLiveGames(source);
-    logManualEventsSaveStage("save_success", {
-      requestId,
-      gameCount: validated.built.length
-    });
-    return {
-      ok: true,
-      source,
-      gameCount: validated.built.length
-    };
-  } catch (error) {
-    const reason = error instanceof ManualEventsSaveError ? error.reason : error instanceof Error ? error.message : "Unable to save manual events";
-    return {
-      ok: false,
-      errors: [reason]
-    };
-  }
-}
-var init_saveOperationsManualGameEntrySession = __esm({
-  "../grarf/desktop/src/lib/manualEvents/saveOperationsManualGameEntrySession.ts"() {
-    init_define_import_meta_env();
-    init_operationsManualGameEntrySessionDraft();
-    init_applyManualEventsSourceToLiveGames();
-    init_manualEventsOverlayCache();
-    init_manualEventsPersistenceApi();
-    init_manualEventsSourceResolver();
-    init_manualEventsSaveDiagnostics();
   }
 });
 
