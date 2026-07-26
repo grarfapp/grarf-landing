@@ -24138,7 +24138,7 @@ var init_leaguePrioritySeed_data = __esm({
       "nav.imsa",
       "nav.rugby-union",
       "RUGBYPREM",
-      "nav.major-league-rugby",
+      "RUGB_289262",
       "nav.milb",
       "NBA2K",
       "USLCUP",
@@ -24160,9 +24160,9 @@ var init_leaguePrioritySeed_data = __esm({
       "nav.lacrosse",
       "nav.ahl",
       "nav.khl",
-      "nav.ncaa-mens-hockey",
-      "nav.ncaa-womens-hockey",
-      "nav.caribbean-series",
+      "NCAAH",
+      "CWHOC",
+      "CBWS",
       "nav.liga-mexicana",
       "NCAALAX",
       "NCAAFH",
@@ -24288,6 +24288,9 @@ var init_gamesColumnLeagues = __esm({
       NBASUMMER: "NBA Summer League",
       WNBA: "WNBA",
       NHL: "NHL",
+      NCAAH: "NCAA Men's Hockey",
+      CWHOC: "NCAA Women's Hockey",
+      CBWS: "Caribbean Series",
       AFL: "AFL",
       MLS: "MLS",
       EPL: "EPL",
@@ -24323,6 +24326,7 @@ var init_gamesColumnLeagues = __esm({
       NCAAVB: "NCAA Women's Volleyball",
       NCAAVB_M: "NCAA Men's Volleyball",
       PLL: "Premier Lacrosse League",
+      RUGB_289262: "Major League Rugby",
       F1: "Formula 1",
       NASCAR: "NASCAR",
       INDYCAR: "IndyCar",
@@ -31199,6 +31203,9 @@ var init_leagueRoutePaths = __esm({
       NBA2K: "/g-league",
       WNBA: "/wnba",
       NHL: "/nhl",
+      NCAAH: "/ncaa-mens-hockey",
+      CWHOC: "/ncaa-womens-hockey",
+      CBWS: "/caribbean-series",
       XFL: "/xfl",
       CRICKET_BBL: "/big-bash-league",
       NCAAVB: "/ncaa-volleyball-women",
@@ -31206,6 +31213,7 @@ var init_leagueRoutePaths = __esm({
       BOXING: "/boxing",
       USATF: "/track-and-field",
       PLL: "/pll",
+      RUGB_289262: "/major-league-rugby",
       MLS: "/mls",
       EPL: "/premier-league",
       BUNDESLIGA: "/bundesliga",
@@ -31289,6 +31297,9 @@ var init_resolveLeagueDirectoryNavItemLogo = __esm({
       TDF: "tour-de-france",
       MLB: "mlb",
       NHL: "nhl",
+      NCAAH: "ncaa-mens-hockey",
+      CWHOC: "ncaa-womens-hockey",
+      CBWS: "caribbean-series",
       NBA: "nba",
       NBA2K: "g-league",
       WNBA: "wnba",
@@ -31328,6 +31339,7 @@ var init_resolveLeagueDirectoryNavItemLogo = __esm({
       NASCAR_TRUCK: "nascar-trucks",
       NASCAR_XFINITY: "nascar-oreilly",
       PLL: "pll",
+      RUGB_289262: "mlr",
       USLCUP: "usl-cup"
     };
     HUB_ID_NAV_ITEM_ID = {
@@ -31444,7 +31456,7 @@ function buildLeagueDirectoryNavSections(logos) {
         ["npb", "NPB"],
         ["kbo", "KBO"],
         ["liga-mexicana", "Liga Mexicana"],
-        ["caribbean-series", "Caribbean Series"]
+        ["caribbean-series", "Caribbean Series", { grarfLeagueKey: "CBWS" }]
       ]
     ),
     sportSection(
@@ -31514,8 +31526,8 @@ function buildLeagueDirectoryNavSections(logos) {
       [
         ["pwhl", "PWHL"],
         ["khl", "KHL"],
-        ["ncaa-mens-hockey", "NCAA Men's"],
-        ["ncaa-womens-hockey", "NCAA Women's"],
+        ["ncaa-mens-hockey", "NCAA Men's", { grarfLeagueKey: "NCAAH" }],
+        ["ncaa-womens-hockey", "NCAA Women's", { grarfLeagueKey: "CWHOC" }],
         ["ahl", "AHL"]
       ]
     ),
@@ -31602,7 +31614,7 @@ function buildLeagueDirectoryNavSections(logos) {
       void 0,
       [
         ["rugby-union", "Rugby Union"],
-        ["mlr", "MLR"]
+        ["mlr", "MLR", { grarfLeagueKey: "RUGB_289262" }]
       ],
       [["premiership-rugby", "Premiership"]]
     ),
@@ -32311,6 +32323,9 @@ var init_gamesSpineLeagueLogoUrls = __esm({
       NBASUMMER: "https://a.espncdn.com/i/teamlogos/leagues/500/nba.png",
       WNBA: "https://a.espncdn.com/i/teamlogos/leagues/500/wnba.png",
       NHL: "https://a.espncdn.com/i/teamlogos/leagues/500/nhl.png",
+      NCAAH: "/league-logos/nav/ncaa-mens-hockey.png",
+      CWHOC: "/league-logos/nav/ncaa-womens-hockey.png",
+      CBWS: "/league-logos/nav/caribbean-series.png",
       AFL: "https://a.espncdn.com/i/teamlogos/leagues/500/afl.png",
       MLS: "https://a.espncdn.com/i/leaguelogos/soccer/500/19.png",
       EPL: EPL_LEAGUE_LOGO_URL,
@@ -32361,6 +32376,7 @@ var init_gamesSpineLeagueLogoUrls = __esm({
       NASCAR_TRUCK: "/league-logos/nascar-trucks.png",
       NASCAR_XFINITY: "/league-logos/nascar-oreilly.png",
       PLL: "/league-logos/pll.png",
+      RUGB_289262: "/league-logos/nav/mlr.png",
       USLCUP: "/league-logos/usl-cup.png",
       USATF: "https://upload.wikimedia.org/wikipedia/en/b/be/USA_Track_and_Field.svg"
     };
@@ -33201,6 +33217,13 @@ var init_espnOperationalLeagueRegistry_generated = __esm({
         "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/ger.1/scoreboard"
       },
       {
+        "key": "CBWS",
+        "sport": "baseball",
+        "label": "Caribbean Series",
+        "slug": "caribbean-series",
+        "endpoint": "https://site.api.espn.com/apis/site/v2/sports/baseball/caribbean-series/scoreboard"
+      },
+      {
         "key": "CFL",
         "sport": "football",
         "label": "CFL",
@@ -33269,6 +33292,13 @@ var init_espnOperationalLeagueRegistry_generated = __esm({
         "label": "ICC Cricket",
         "slug": "24527",
         "endpoint": "https://site.api.espn.com/apis/site/v2/sports/cricket/24527/scoreboard"
+      },
+      {
+        "key": "CWHOC",
+        "sport": "hockey",
+        "label": "NCAA Women's Hockey",
+        "slug": "womens-college-hockey",
+        "endpoint": "https://site.api.espn.com/apis/site/v2/sports/hockey/womens-college-hockey/scoreboard"
       },
       {
         "key": "DP_WORLD",
@@ -33460,6 +33490,13 @@ var init_espnOperationalLeagueRegistry_generated = __esm({
         "endpoint": "https://site.api.espn.com/apis/site/v2/sports/field-hockey/womens-college-field-hockey/scoreboard"
       },
       {
+        "key": "NCAAH",
+        "sport": "hockey",
+        "label": "NCAA Men's Ice Hockey",
+        "slug": "mens-college-hockey",
+        "endpoint": "https://site.api.espn.com/apis/site/v2/sports/hockey/mens-college-hockey/scoreboard"
+      },
+      {
         "key": "NCAALAX",
         "sport": "lacrosse",
         "label": "NCAA Lacrosse",
@@ -33528,6 +33565,13 @@ var init_espnOperationalLeagueRegistry_generated = __esm({
         "label": "Primeira Liga",
         "slug": "por.1",
         "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/por.1/scoreboard"
+      },
+      {
+        "key": "RUGB_289262",
+        "sport": "rugby",
+        "label": "Major League Rugby",
+        "slug": "289262",
+        "endpoint": "https://site.api.espn.com/apis/site/v2/sports/rugby/289262/scoreboard"
       },
       {
         "key": "RUGBYPREM",
@@ -37450,7 +37494,7 @@ var init_canonicalRegistry = __esm({
       navLeague("NPB", "npb"),
       navLeague("KBO", "kbo", ["korean-baseball"]),
       navLeague("Liga Mexicana", "liga-mexicana"),
-      navLeague("Caribbean Series", "caribbean-series"),
+      league("Caribbean Series", "CBWS", "caribbean-series"),
       league("NBA", "NBA", "nba", ["national-basketball-association"]),
       league("WNBA", "WNBA", "wnba"),
       navLeague("NCAA Men's Basketball", "ncaa-mens-basketball", ["ncaam", "march-madness-mens"], "MNCAAB"),
@@ -37465,8 +37509,8 @@ var init_canonicalRegistry = __esm({
       league("NHL", "NHL", "nhl", ["national-hockey-league"]),
       navLeague("PWHL", "pwhl", ["professional-womens-hockey-league"]),
       navLeague("KHL", "khl", ["kontinental-hockey-league"]),
-      navLeague("NCAA Men's Hockey", "ncaa-mens-hockey"),
-      navLeague("NCAA Women's Hockey", "ncaa-womens-hockey"),
+      league("NCAA Men's Hockey", "NCAAH", "ncaa-mens-hockey", ["mens-college-hockey"]),
+      league("NCAA Women's Hockey", "CWHOC", "ncaa-womens-hockey", ["womens-college-hockey"]),
       navLeague("AHL", "ahl", ["american-hockey-league"]),
       league("FIFA World Cup", "WORLDCUP", "world-cup", ["fifa-world-cup", "worldcup", "fwc"]),
       league("Premier League", "EPL", "premier-league", ["epl", "english-premier-league"]),
@@ -37544,7 +37588,7 @@ var init_canonicalRegistry = __esm({
       league("Rugby World Cup", "RUGBYWC", "rugby-world-cup", ["rugbywc"], "nav"),
       league("Premiership Rugby", "RUGBYPREM", "premiership-rugby", ["premiership"], "nav"),
       league("Top 14", "RUGBYTOP14", "top-14", ["top14", "rugby-top-14"], "nav"),
-      navLeague("Major League Rugby", "major-league-rugby", ["mlr"]),
+      league("Major League Rugby", "RUGB_289262", "major-league-rugby", ["mlr"]),
       navLeague("Rugby Union", "rugby-union"),
       navLeague("IPL", "ipl", ["indian-premier-league"]),
       league("Big Bash League", "CRICKET_BBL", "big-bash-league", ["bbl", "big-bash"]),

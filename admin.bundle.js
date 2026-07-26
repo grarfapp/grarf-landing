@@ -13971,7 +13971,7 @@ var LEAGUE_PRIORITY_SEED_ORDER = [
   "nav.imsa",
   "nav.rugby-union",
   "RUGBYPREM",
-  "nav.major-league-rugby",
+  "RUGB_289262",
   "nav.milb",
   "NBA2K",
   "USLCUP",
@@ -13993,9 +13993,9 @@ var LEAGUE_PRIORITY_SEED_ORDER = [
   "nav.lacrosse",
   "nav.ahl",
   "nav.khl",
-  "nav.ncaa-mens-hockey",
-  "nav.ncaa-womens-hockey",
-  "nav.caribbean-series",
+  "NCAAH",
+  "CWHOC",
+  "CBWS",
   "nav.liga-mexicana",
   "NCAALAX",
   "NCAAFH",
@@ -14079,6 +14079,9 @@ var GAMES_COLUMN_LEAGUE_LABEL = {
   NBASUMMER: "NBA Summer League",
   WNBA: "WNBA",
   NHL: "NHL",
+  NCAAH: "NCAA Men's Hockey",
+  CWHOC: "NCAA Women's Hockey",
+  CBWS: "Caribbean Series",
   AFL: "AFL",
   MLS: "MLS",
   EPL: "EPL",
@@ -14114,6 +14117,7 @@ var GAMES_COLUMN_LEAGUE_LABEL = {
   NCAAVB: "NCAA Women's Volleyball",
   NCAAVB_M: "NCAA Men's Volleyball",
   PLL: "Premier Lacrosse League",
+  RUGB_289262: "Major League Rugby",
   F1: "Formula 1",
   NASCAR: "NASCAR",
   INDYCAR: "IndyCar",
@@ -14174,6 +14178,13 @@ var ESPN_OPERATIONAL_INGEST_LEAGUES = [
     "label": "Bundesliga",
     "slug": "ger.1",
     "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/ger.1/scoreboard"
+  },
+  {
+    "key": "CBWS",
+    "sport": "baseball",
+    "label": "Caribbean Series",
+    "slug": "caribbean-series",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/baseball/caribbean-series/scoreboard"
   },
   {
     "key": "CFL",
@@ -14244,6 +14255,13 @@ var ESPN_OPERATIONAL_INGEST_LEAGUES = [
     "label": "ICC Cricket",
     "slug": "24527",
     "endpoint": "https://site.api.espn.com/apis/site/v2/sports/cricket/24527/scoreboard"
+  },
+  {
+    "key": "CWHOC",
+    "sport": "hockey",
+    "label": "NCAA Women's Hockey",
+    "slug": "womens-college-hockey",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/hockey/womens-college-hockey/scoreboard"
   },
   {
     "key": "DP_WORLD",
@@ -14435,6 +14453,13 @@ var ESPN_OPERATIONAL_INGEST_LEAGUES = [
     "endpoint": "https://site.api.espn.com/apis/site/v2/sports/field-hockey/womens-college-field-hockey/scoreboard"
   },
   {
+    "key": "NCAAH",
+    "sport": "hockey",
+    "label": "NCAA Men's Ice Hockey",
+    "slug": "mens-college-hockey",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/hockey/mens-college-hockey/scoreboard"
+  },
+  {
     "key": "NCAALAX",
     "sport": "lacrosse",
     "label": "NCAA Lacrosse",
@@ -14503,6 +14528,13 @@ var ESPN_OPERATIONAL_INGEST_LEAGUES = [
     "label": "Primeira Liga",
     "slug": "por.1",
     "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/por.1/scoreboard"
+  },
+  {
+    "key": "RUGB_289262",
+    "sport": "rugby",
+    "label": "Major League Rugby",
+    "slug": "289262",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/rugby/289262/scoreboard"
   },
   {
     "key": "RUGBYPREM",
