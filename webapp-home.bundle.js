@@ -46384,6 +46384,26 @@ var init_ingestManualEvents = __esm({
 function resolveManualEventsSource(options) {
   return options.source ?? loadManualEventsSourceBundle();
 }
+function isManualEventGame(game) {
+  return Boolean(game.metadata?.manualEvent) || game.id.startsWith("manual-event-");
+}
+function mergeIngestedManualEventIntoLeagueGames(existing, game) {
+  if (!isManualEventGame(game)) {
+    return mergeNormalizedGamesById(existing, [game]);
+  }
+  const matchupKey = operationalGameMatchupKey(game);
+  if (matchupKey) {
+    const blockedByAutomatic = existing.some(
+      (row) => !isManualEventGame(row) && operationalGameMatchupKey(row) === matchupKey
+    );
+    if (blockedByAutomatic) return existing;
+  }
+  const index = existing.findIndex((row) => row.id === game.id);
+  if (index < 0) return [...existing, game];
+  const next = existing.slice();
+  next[index] = game;
+  return next;
+}
 function mergeIngestedManualEventsIntoLeagueGames(leagueGames, options = {}) {
   const ingest = ingestManualEventsFromSource(resolveManualEventsSource(options), {
     now: options.now,
@@ -46400,7 +46420,7 @@ function mergeIngestedManualEventsIntoLeagueGames(leagueGames, options = {}) {
     const leagueKey = game.league;
     if (!leagueKey) continue;
     const existing = merged[leagueKey] ?? [];
-    merged[leagueKey] = mergeNormalizedGamesById(existing, [game]);
+    merged[leagueKey] = mergeIngestedManualEventIntoLeagueGames(existing, game);
   }
   return merged;
 }

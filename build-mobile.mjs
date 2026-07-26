@@ -12,6 +12,16 @@ const mobileDir = path.resolve(__dirname, "../grarf/mobile");
 const mobileDistDir = path.join(mobileDir, "dist");
 const landingMobileWebDir = path.join(__dirname, "mobile-web");
 
+function removePath(target) {
+  if (!fs.existsSync(target)) return;
+  fs.rmSync(target, {
+    recursive: true,
+    force: true,
+    maxRetries: 5,
+    retryDelay: 200,
+  });
+}
+
 function copyRecursive(src, dest) {
   const stat = fs.statSync(src);
   if (stat.isDirectory()) {
@@ -42,11 +52,11 @@ if (!bundleFile) {
   process.exit(1);
 }
 
-fs.rmSync(landingMobileWebDir, { recursive: true, force: true });
+removePath(landingMobileWebDir);
 copyRecursive(mobileDistDir, landingMobileWebDir);
 
 const landingAssetsDir = path.join(__dirname, "assets");
-fs.rmSync(landingAssetsDir, { recursive: true, force: true });
+removePath(landingAssetsDir);
 copyRecursive(path.join(mobileDistDir, "assets"), landingAssetsDir);
 
 const bundleUrl = `/mobile-web/_expo/static/js/web/${bundleFile}`;
