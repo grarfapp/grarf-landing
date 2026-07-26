@@ -34089,10 +34089,21 @@ var init_espnOperationalLeagueEndpoints = __esm({
 });
 
 // ../grarf/desktop/src/lib/gamesSpine/gamesSpineLeagueDisplayLabel.ts
-function resolveGamesSpineLeagueDisplayLabel(league2) {
+function resolveManualGamesSpineLeagueDisplayName(games) {
+  for (const game of games ?? []) {
+    const name = game.metadata?.manualEvent?.leagueDisplayName?.trim();
+    if (name) return name;
+  }
+  return null;
+}
+function resolveGamesSpineLeagueDisplayLabel(league2, games) {
+  const manualName = resolveManualGamesSpineLeagueDisplayName(games);
+  if (manualName) return manualName;
   return GAMES_SPINE_LEAGUE_DISPLAY_LABEL[league2] ?? GAMES_COLUMN_LEAGUE_LABEL[league2] ?? resolveEspnOperationalLeagueLabel(league2) ?? league2;
 }
-function resolveGamesSpineLeagueSectionHeaderLabel(league2) {
+function resolveGamesSpineLeagueSectionHeaderLabel(league2, games) {
+  const manualName = resolveManualGamesSpineLeagueDisplayName(games);
+  if (manualName) return manualName;
   return GAMES_SPINE_LEAGUE_SECTION_HEADER_LABEL[league2] ?? resolveGamesSpineLeagueDisplayLabel(league2);
 }
 var GAMES_SPINE_LEAGUE_DISPLAY_LABEL, GAMES_SPINE_LEAGUE_SECTION_HEADER_LABEL;
@@ -46824,7 +46835,7 @@ var init_manualGamesSpineLeagueLogoUrls = __esm({
 });
 
 // ../grarf/desktop/src/lib/gamesSpine/manual/resolveManualGamesSpineLeagueDisplayName.ts
-function resolveManualGamesSpineLeagueDisplayName(league2) {
+function resolveManualGamesSpineLeagueDisplayName2(league2) {
   const displayName = league2.displayName?.trim();
   if (displayName) return displayName;
   return league2.league.trim();
@@ -47089,7 +47100,7 @@ function convertEventToMlbGame(league2, event, now, operationalDateKey) {
   const channelUrl = watchOverride?.channelUrl ?? resolveManualGamesSpineChannelValue(event.channelUrl, league2.channelUrl);
   const streamProvider = resolveManualGamesSpineStreamProvider(channel, channelUrl);
   const leagueLogoUrl = resolveManualGamesSpineLeagueLogoUrl(league2);
-  const leagueDisplayName = resolveManualGamesSpineLeagueDisplayName(league2);
+  const leagueDisplayName = resolveManualGamesSpineLeagueDisplayName2(league2);
   const broadcasts = channel ? [channel] : [];
   return {
     id: gameId,
@@ -47150,7 +47161,7 @@ function convertManualGamesSpineDocument(document2, now = /* @__PURE__ */ new Da
     sections.push({
       slug: manualGamesSpineLeagueSlug(league2.league),
       leagueKey: league2.league,
-      leagueLabel: resolveManualGamesSpineLeagueDisplayName(league2),
+      leagueLabel: resolveManualGamesSpineLeagueDisplayName2(league2),
       leaguePriority: league2.leaguePriority ?? null,
       insertAfterLeague: league2.insertAfterLeague ?? null,
       insertBeforeLeague: league2.insertBeforeLeague ?? null,
@@ -77897,7 +77908,6 @@ var init_HomeLeagueSpineSection = __esm({
       const gamesMode = useGamesSpineDisplayStore((state3) => state3.gamesMode);
       const cardListClass = isGrarfWebRenderer() ? resolveGamesSpineCardListLayoutClass(gamesMode) : GAMES_SPINE_CARD_LIST_CLASS;
       const useOperationalModePipeline = briefingScrollContext === "home" || briefingScrollContext === "league";
-      const displayName = resolveGamesSpineLeagueSectionHeaderLabel(league2);
       const headerRef = (0, import_react111.useRef)(null);
       const stickyLogged = (0, import_react111.useRef)(false);
       const games = (0, import_react111.useMemo)(() => {
@@ -77925,6 +77935,10 @@ var init_HomeLeagueSpineSection = __esm({
         manualRefreshMs
       ]);
       const gamesWithStatusOverrides = useGamesWithCanonicalStatusOverrides(games);
+      const displayName = (0, import_react111.useMemo)(
+        () => resolveGamesSpineLeagueSectionHeaderLabel(league2, games),
+        [league2, games]
+      );
       const localRetainedFinals = (0, import_react111.useMemo)(() => {
         return resolveGamesSpineRetainedForLeague(league2);
       }, [retainedById, league2]);
@@ -81957,7 +81971,10 @@ function HomeGamesToday({
         if (isGamesSpineLeagueTemporarilyHidden(section.leagueKey)) return;
         out.push({
           key: `league:${section.leagueKey}`,
-          label: resolveGamesSpineLeagueDisplayLabel(section.leagueKey),
+          label: resolveGamesSpineLeagueSectionHeaderLabel(
+            section.leagueKey,
+            mergedLeagues[section.leagueKey]
+          ),
           order: index + 1,
           collapsed: isCollapsed(section.leagueKey),
           onToggleCollapse: () => toggleCollapsed(section.leagueKey)
@@ -81973,7 +81990,7 @@ function HomeGamesToday({
       });
     });
     return out;
-  }, [isAdminMode, spineSections, isCollapsed, toggleCollapsed]);
+  }, [isAdminMode, spineSections, mergedLeagues, isCollapsed, toggleCollapsed]);
   (0, import_react122.useEffect)(() => {
     setOperationsStructureSections(operationsStructureSections);
   }, [operationsStructureSections, setOperationsStructureSections]);
@@ -108028,7 +108045,8 @@ function LeagueGamesSpineFeed({
   onWatchLive,
   canShowWatchLive
 }) {
-  const displayName = resolveGamesSpineLeagueDisplayLabel(league2);
+  const games = useLiveGamesStore((s2) => s2.leagues[league2]);
+  const displayName = resolveGamesSpineLeagueSectionHeaderLabel(league2, games);
   return /* @__PURE__ */ (0, import_jsx_runtime186.jsxs)("div", { className: "min-w-0 w-full max-w-full flex-col font-mono", children: [
     /* @__PURE__ */ (0, import_jsx_runtime186.jsxs)(
       "div",
@@ -108070,6 +108088,7 @@ var init_LeagueGamesSpineFeed = __esm({
     init_define_import_meta_env();
     init_HomeLeagueSpineSection();
     init_gamesSpineLeagueDisplayLabel();
+    init_liveGamesStore();
     init_cn();
     import_jsx_runtime186 = __toESM(require_jsx_runtime(), 1);
   }
@@ -112870,7 +112889,7 @@ function SavedLeaguesBrowser({
       const dateRangeLabel = formatManualGamesSpineAdminLeagueDateRange(league2.games);
       const eventsByDate = groupManualGamesSpineEventsByDate(league2.games);
       const deleting = deletingLeague === league2.league;
-      const displayName = resolveManualGamesSpineLeagueDisplayName(league2);
+      const displayName = resolveManualGamesSpineLeagueDisplayName2(league2);
       return /* @__PURE__ */ (0, import_jsx_runtime215.jsxs)(
         "article",
         {

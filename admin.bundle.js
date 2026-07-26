@@ -14719,7 +14719,16 @@ var GAMES_SPINE_LEAGUE_DISPLAY_LABEL = {
   WIMBLEDON_WOMEN: "Wimbledon (Women's)",
   USATF: "Track & Field"
 };
-function resolveGamesSpineLeagueDisplayLabel(league) {
+function resolveManualGamesSpineLeagueDisplayName(games) {
+  for (const game of games ?? []) {
+    const name = game.metadata?.manualEvent?.leagueDisplayName?.trim();
+    if (name) return name;
+  }
+  return null;
+}
+function resolveGamesSpineLeagueDisplayLabel(league, games) {
+  const manualName = resolveManualGamesSpineLeagueDisplayName(games);
+  if (manualName) return manualName;
   return GAMES_SPINE_LEAGUE_DISPLAY_LABEL[league] ?? GAMES_COLUMN_LEAGUE_LABEL[league] ?? resolveEspnOperationalLeagueLabel(league) ?? league;
 }
 
@@ -15185,7 +15194,7 @@ function sortGamesSpineChronologically(games) {
 
 // ../grarf/desktop/src/lib/gamesSpine/manual/resolveManualGamesSpineLeagueDisplayName.ts
 init_define_import_meta_env();
-function resolveManualGamesSpineLeagueDisplayName(league) {
+function resolveManualGamesSpineLeagueDisplayName2(league) {
   const displayName = league.displayName?.trim();
   if (displayName) return displayName;
   return league.league.trim();
@@ -15748,7 +15757,7 @@ function convertEventToMlbGame(league, event, now, operationalDateKey) {
   const channelUrl = watchOverride?.channelUrl ?? resolveManualGamesSpineChannelValue(event.channelUrl, league.channelUrl);
   const streamProvider = resolveManualGamesSpineStreamProvider(channel, channelUrl);
   const leagueLogoUrl = resolveManualGamesSpineLeagueLogoUrl(league);
-  const leagueDisplayName = resolveManualGamesSpineLeagueDisplayName(league);
+  const leagueDisplayName = resolveManualGamesSpineLeagueDisplayName2(league);
   const broadcasts = channel ? [channel] : [];
   return {
     id: gameId,
@@ -15809,7 +15818,7 @@ function convertManualGamesSpineDocument(document2, now = /* @__PURE__ */ new Da
     sections.push({
       slug: manualGamesSpineLeagueSlug(league.league),
       leagueKey: league.league,
-      leagueLabel: resolveManualGamesSpineLeagueDisplayName(league),
+      leagueLabel: resolveManualGamesSpineLeagueDisplayName2(league),
       leaguePriority: league.leaguePriority ?? null,
       insertAfterLeague: league.insertAfterLeague ?? null,
       insertBeforeLeague: league.insertBeforeLeague ?? null,
