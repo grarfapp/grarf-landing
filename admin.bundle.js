@@ -16193,11 +16193,34 @@ var ESPN_PAUSED_STATUS_NAMES = /* @__PURE__ */ new Set([
   "STATUS_INTERRUPTED",
   "STATUS_WEATHER_DELAY"
 ]);
+var ESPN_HALFTIME_STATUS_NAMES = /* @__PURE__ */ new Set([
+  "STATUS_HALFTIME",
+  "STATUS_HALF_TIME",
+  "STATUS_INTERMISSION"
+]);
 function safeEspnText(value) {
   return typeof value === "string" && value.trim() ? value.trim() : "";
 }
+function detailHasHalftimeOrIntermissionToken(text) {
+  const normalized = safeEspnText(text).toLowerCase();
+  if (!normalized) return false;
+  if (normalized === "ht") return true;
+  if (/\bhalftime\b/.test(normalized)) return true;
+  if (/\bhalf[- ]?time\b/.test(normalized)) return true;
+  if (/\bintermission\b/.test(normalized)) return true;
+  if (/\bht\b/.test(normalized)) return true;
+  return false;
+}
+function isEspnHalftimeOrIntermissionStatus(statusType) {
+  if (!statusType || typeof statusType !== "object") return false;
+  const statusName = safeEspnText(statusType.name).toUpperCase();
+  if (ESPN_HALFTIME_STATUS_NAMES.has(statusName)) return true;
+  if (statusName.includes("HALFTIME") || statusName.includes("INTERMISSION")) return true;
+  return detailHasHalftimeOrIntermissionToken(statusType.shortDetail) || detailHasHalftimeOrIntermissionToken(statusType.detail) || detailHasHalftimeOrIntermissionToken(statusType.description);
+}
 function isEspnPausedCompetitionStatus(statusType) {
   if (!statusType || typeof statusType !== "object") return false;
+  if (isEspnHalftimeOrIntermissionStatus(statusType)) return false;
   const statusName = safeEspnText(statusType.name).toUpperCase();
   if (statusName === "STATUS_POSTPONED") return false;
   if (ESPN_PAUSED_STATUS_NAMES.has(statusName)) return true;
@@ -16219,14 +16242,25 @@ function pausedFromStatusLine(statusLine) {
     description: line
   });
 }
+function halftimeFromStatusLine(statusLine) {
+  const line = statusLine?.trim();
+  if (!line) return false;
+  return isEspnHalftimeOrIntermissionStatus({
+    shortDetail: line,
+    detail: line,
+    description: line
+  });
+}
 function isGameCompetitionPaused(game) {
+  if (halftimeFromStatusLine(game.statusLine)) return false;
   if (game.status === "delayed" || game.status === "suspended") return true;
   if (game.status === "postponed") return true;
   return pausedFromStatusLine(game.statusLine);
 }
 function isGameActivelyLive(game) {
-  if (game.status !== "live") return false;
-  return !isGameCompetitionPaused(game);
+  if (game.status === "live") return !isGameCompetitionPaused(game);
+  if (game.status === "scheduled" && halftimeFromStatusLine(game.statusLine)) return true;
+  return false;
 }
 
 // ../grarf/desktop/src/lib/watch/externalWatchLaunch.ts

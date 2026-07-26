@@ -25675,8 +25675,26 @@ var init_performanceContext = __esm({
 function safeEspnText(value) {
   return typeof value === "string" && value.trim() ? value.trim() : "";
 }
+function detailHasHalftimeOrIntermissionToken(text2) {
+  const normalized = safeEspnText(text2).toLowerCase();
+  if (!normalized) return false;
+  if (normalized === "ht") return true;
+  if (/\bhalftime\b/.test(normalized)) return true;
+  if (/\bhalf[- ]?time\b/.test(normalized)) return true;
+  if (/\bintermission\b/.test(normalized)) return true;
+  if (/\bht\b/.test(normalized)) return true;
+  return false;
+}
+function isEspnHalftimeOrIntermissionStatus(statusType) {
+  if (!statusType || typeof statusType !== "object") return false;
+  const statusName = safeEspnText(statusType.name).toUpperCase();
+  if (ESPN_HALFTIME_STATUS_NAMES.has(statusName)) return true;
+  if (statusName.includes("HALFTIME") || statusName.includes("INTERMISSION")) return true;
+  return detailHasHalftimeOrIntermissionToken(statusType.shortDetail) || detailHasHalftimeOrIntermissionToken(statusType.detail) || detailHasHalftimeOrIntermissionToken(statusType.description);
+}
 function isEspnPausedCompetitionStatus(statusType) {
   if (!statusType || typeof statusType !== "object") return false;
+  if (isEspnHalftimeOrIntermissionStatus(statusType)) return false;
   const statusName = safeEspnText(statusType.name).toUpperCase();
   if (statusName === "STATUS_POSTPONED") return false;
   if (ESPN_PAUSED_STATUS_NAMES.has(statusName)) return true;
@@ -25687,7 +25705,7 @@ function isEspnPausedCompetitionStatus(statusType) {
   }
   return false;
 }
-var ESPN_PAUSED_STATUS_NAMES;
+var ESPN_PAUSED_STATUS_NAMES, ESPN_HALFTIME_STATUS_NAMES;
 var init_espnPausedCompetitionStatus = __esm({
   "../grarf/shared/utils/espnPausedCompetitionStatus.js"() {
     init_define_import_meta_env();
@@ -25697,6 +25715,11 @@ var init_espnPausedCompetitionStatus = __esm({
       "STATUS_HALTED",
       "STATUS_INTERRUPTED",
       "STATUS_WEATHER_DELAY"
+    ]);
+    ESPN_HALFTIME_STATUS_NAMES = /* @__PURE__ */ new Set([
+      "STATUS_HALFTIME",
+      "STATUS_HALF_TIME",
+      "STATUS_INTERMISSION"
     ]);
   }
 });
@@ -25719,14 +25742,25 @@ function pausedFromStatusLine(statusLine) {
     description: line
   });
 }
+function halftimeFromStatusLine(statusLine) {
+  const line = statusLine?.trim();
+  if (!line) return false;
+  return isEspnHalftimeOrIntermissionStatus({
+    shortDetail: line,
+    detail: line,
+    description: line
+  });
+}
 function isGameCompetitionPaused(game) {
+  if (halftimeFromStatusLine(game.statusLine)) return false;
   if (game.status === "delayed" || game.status === "suspended") return true;
   if (game.status === "postponed") return true;
   return pausedFromStatusLine(game.statusLine);
 }
 function isGameActivelyLive(game) {
-  if (game.status !== "live") return false;
-  return !isGameCompetitionPaused(game);
+  if (game.status === "live") return !isGameCompetitionPaused(game);
+  if (game.status === "scheduled" && halftimeFromStatusLine(game.statusLine)) return true;
+  return false;
 }
 var init_isGameActivelyLive = __esm({
   "../grarf/desktop/src/lib/gamesSpine/isGameActivelyLive.ts"() {
@@ -80480,7 +80514,349 @@ var init_resolveWebGamesSpineBootstrapOperationalLeagueOrder = __esm({
   }
 });
 
+// ../grarf/shared/domain/manualEvents/buildManualEventFromOperationsEditorDraft.ts
+function formatManualEventWallClockFromDateAndTime(date, time) {
+  const dateTrimmed = date.trim();
+  const timeTrimmed = time.trim();
+  if (!dateTrimmed || !timeTrimmed) return null;
+  const dateMatch = dateTrimmed.match(/^(\d{4}-\d{2}-\d{2})$/);
+  const timeMatch = timeTrimmed.match(/^(\d{2}):(\d{2})/);
+  if (!dateMatch || !timeMatch) return null;
+  return `${dateMatch[1]}T${timeMatch[1]}:${timeMatch[2]}:00`;
+}
+function buildManualEventFromOperationsEditorDraft(draft, options) {
+  const errors = [];
+  const leagueName = draft.leagueName.trim();
+  if (!leagueName) errors.push("League name is required");
+  if (!draft.eventDate.trim()) errors.push("Date is required");
+  if (!draft.startTime.trim()) errors.push("Start time is required");
+  if (!draft.endTime.trim()) errors.push("End time is required");
+  const startTime = formatManualEventWallClockFromDateAndTime(draft.eventDate, draft.startTime);
+  if (draft.eventDate.trim() && draft.startTime.trim() && !startTime) {
+    errors.push("Start time is invalid");
+  }
+  const endTime = formatManualEventWallClockFromDateAndTime(draft.eventDate, draft.endTime);
+  if (draft.eventDate.trim() && draft.endTime.trim() && !endTime) {
+    errors.push("End time is invalid");
+  }
+  const broadcastName = draft.broadcastChannelName.trim();
+  if (!broadcastName) errors.push("Broadcast channel name is required");
+  const streamUrl = draft.streamUrl.trim();
+  if (!streamUrl) errors.push("Stream URL is required");
+  const gameCardUrl = draft.gameCardUrl.trim();
+  if (!gameCardUrl) errors.push("Game card URL is required");
+  if (draft.eventType === "event-only") {
+    if (!draft.eventName.trim()) errors.push("Event name is required");
+  } else {
+    if (!draft.team1Name.trim()) errors.push("Team 1 is required");
+    if (!draft.team2Name.trim()) errors.push("Team 2 is required");
+  }
+  if (errors.length > 0 || !startTime || !endTime) {
+    return { ok: false, errors };
+  }
+  const sourceTimezone = options?.sourceTimezone ?? DEFAULT_OPERATIONS_MANUAL_EVENT_SOURCE_TIMEZONE;
+  const sourceTimezoneIana = resolveManualEventSourceTimezoneIana(sourceTimezone);
+  const startTimeMs = parseManualGamesSpineEventTimeMs(startTime, sourceTimezoneIana);
+  const endTimeMs = parseManualGamesSpineEventTimeMs(endTime, sourceTimezoneIana);
+  if (startTimeMs == null || endTimeMs == null) {
+    return { ok: false, errors: ["Could not parse event schedule"] };
+  }
+  if (endTimeMs <= startTimeMs) {
+    return { ok: false, errors: ["End time must be after start time"] };
+  }
+  const league2 = buildManualLeagueDefinitionFromDisplayName(leagueName, draft.leagueLogoUrl);
+  const broadcaster = buildManualBroadcasterDefinitionFromEditorDraft(draft);
+  const leagueId = league2.leagueId;
+  const event = draft.eventType === "event-only" ? {
+    leagueId,
+    eventName: draft.eventName.trim(),
+    team1: null,
+    team2: null,
+    startTime,
+    endTime,
+    sourceTimezone,
+    broadcastName,
+    streamUrl,
+    gameCardUrl,
+    openBehavior: draft.launchBehavior
+  } : {
+    leagueId,
+    eventName: null,
+    team1: { name: draft.team1Name.trim(), logo: null },
+    team2: { name: draft.team2Name.trim(), logo: null },
+    startTime,
+    endTime,
+    sourceTimezone,
+    broadcastName,
+    streamUrl,
+    gameCardUrl,
+    openBehavior: draft.launchBehavior
+  };
+  const validationErrors = validateManualEventDefinition(event, 0);
+  if (validationErrors.length > 0) {
+    return {
+      ok: false,
+      errors: validationErrors.map((row) => row.message)
+    };
+  }
+  void draft.broadcastChannelLogoUrl;
+  void draft.broadcastLogoUrl;
+  return { ok: true, league: league2, broadcaster, event };
+}
+var DEFAULT_OPERATIONS_MANUAL_EVENT_SOURCE_TIMEZONE, DEFAULT_OPERATIONS_MANUAL_EVENT_DURATION_MS;
+var init_buildManualEventFromOperationsEditorDraft = __esm({
+  "../grarf/shared/domain/manualEvents/buildManualEventFromOperationsEditorDraft.ts"() {
+    init_define_import_meta_env();
+    init_manualGamesSpineTime();
+    init_manualBroadcastersStore();
+    init_manualLeaguesStore();
+    init_resolveSourceTimezone();
+    init_validateManualEventDefinition();
+    DEFAULT_OPERATIONS_MANUAL_EVENT_SOURCE_TIMEZONE = "ET";
+    DEFAULT_OPERATIONS_MANUAL_EVENT_DURATION_MS = 3 * 60 * 60 * 1e3;
+  }
+});
+
+// ../grarf/shared/domain/manualEvents/operationsManualGameEntrySessionDraft.ts
+function createBlankOperationsManualGameEntryGameRow(id) {
+  return {
+    id,
+    eventDate: "",
+    startTime: "",
+    endTime: "",
+    eventType: "event-only",
+    eventName: "",
+    team1Name: "",
+    team2Name: "",
+    gameCardUrl: ""
+  };
+}
+function createBlankOperationsManualGameEntryCreateSession(firstGameId) {
+  return {
+    shared: {
+      leagueLogoUrl: "",
+      leagueName: "",
+      broadcastChannelLogoUrl: "",
+      broadcastChannelName: "",
+      broadcastLogoUrl: "",
+      streamUrl: "",
+      launchBehavior: "Center Pane"
+    },
+    games: [createBlankOperationsManualGameEntryGameRow(firstGameId)]
+  };
+}
+function mergeOperationsManualGameEntryCreateSessionDraft(session, game) {
+  return {
+    ...session.shared,
+    eventDate: game.eventDate,
+    startTime: game.startTime,
+    endTime: game.endTime,
+    eventType: game.eventType,
+    eventName: game.eventName,
+    team1Name: game.team1Name,
+    team2Name: game.team2Name,
+    gameCardUrl: game.gameCardUrl
+  };
+}
+function validateOperationsManualGameEntryCreateSession(session) {
+  if (session.games.length === 0) {
+    return { ok: false, errors: ["At least one game is required"] };
+  }
+  const errors = [];
+  const built = [];
+  session.games.forEach((game, index) => {
+    const merged = mergeOperationsManualGameEntryCreateSessionDraft(session, game);
+    const result = buildManualEventFromOperationsEditorDraft(merged);
+    if (!result.ok) {
+      for (const message of result.errors) {
+        errors.push(`Game ${index + 1}: ${message}`);
+      }
+      return;
+    }
+    built.push(result);
+  });
+  if (errors.length > 0) {
+    return { ok: false, errors };
+  }
+  return { ok: true, built };
+}
+var init_operationsManualGameEntrySessionDraft = __esm({
+  "../grarf/shared/domain/manualEvents/operationsManualGameEntrySessionDraft.ts"() {
+    init_define_import_meta_env();
+    init_buildManualEventFromOperationsEditorDraft();
+  }
+});
+
+// ../grarf/desktop/src/lib/manualEvents/wysiwygPrototypeManualGameEntry.ts
+function resolveLaunchBehavior(mode) {
+  return mode === "new-browser-tab" ? "New Browser Tab" : "Center Pane";
+}
+function resolveEventType(team1, team2) {
+  return team2.trim() ? "head-to-head" : "event-only";
+}
+function wysiwygDraftToManualGameEntryCreateSession(draft) {
+  const gameId = crypto.randomUUID();
+  const eventType = resolveEventType(draft.team1, draft.team2);
+  return {
+    shared: {
+      leagueLogoUrl: draft.leagueLogoUrl,
+      leagueName: draft.leagueName,
+      broadcastChannelLogoUrl: draft.channelLogoUrl,
+      broadcastChannelName: draft.broadcastName,
+      broadcastLogoUrl: draft.channelLogoUrl,
+      streamUrl: draft.streamUrl,
+      launchBehavior: resolveLaunchBehavior(draft.navigationMode)
+    },
+    games: [
+      {
+        ...createBlankOperationsManualGameEntryGameRow(gameId),
+        eventDate: draft.eventDate,
+        startTime: draft.startTime,
+        endTime: draft.endTime,
+        eventType,
+        eventName: eventType === "event-only" ? draft.team1 : "",
+        team1Name: eventType === "head-to-head" ? draft.team1 : "",
+        team2Name: draft.team2,
+        gameCardUrl: draft.gameCardUrl
+      }
+    ]
+  };
+}
+function resolveWysiwygSavedManualGameId(session) {
+  const game = session.games[0];
+  if (!game) return null;
+  const merged = mergeOperationsManualGameEntryCreateSessionDraft(session, game);
+  const built = buildManualEventFromOperationsEditorDraft(merged);
+  if (!built.ok) return null;
+  const normalized = normalizeManualEventDefinition(built.event, built.league, built.broadcaster);
+  return normalized?.game.id ?? null;
+}
+var init_wysiwygPrototypeManualGameEntry = __esm({
+  "../grarf/desktop/src/lib/manualEvents/wysiwygPrototypeManualGameEntry.ts"() {
+    init_define_import_meta_env();
+    init_buildManualEventFromOperationsEditorDraft();
+    init_normalizeManualEvent();
+    init_operationsManualGameEntrySessionDraft();
+  }
+});
+
+// ../grarf/desktop/src/lib/manualEvents/manualEventsOverlayCache.ts
+function invalidateManualEventsOverlayCache() {
+  cachedOverlay = void 0;
+  cachedOverlayPromise = null;
+}
+function getManualEventsSourceOverlayCached() {
+  if (cachedOverlay !== void 0) {
+    return Promise.resolve(cachedOverlay);
+  }
+  if (!cachedOverlayPromise) {
+    cachedOverlayPromise = fetchManualEventsSourceOverlay().then((overlay) => {
+      cachedOverlay = overlay;
+      return overlay;
+    });
+  }
+  return cachedOverlayPromise;
+}
+var cachedOverlay, cachedOverlayPromise;
+var init_manualEventsOverlayCache = __esm({
+  "../grarf/desktop/src/lib/manualEvents/manualEventsOverlayCache.ts"() {
+    init_define_import_meta_env();
+    init_manualEventsPersistenceApi();
+    cachedOverlayPromise = null;
+  }
+});
+
+// ../grarf/desktop/src/lib/manualEvents/saveOperationsManualGameEntrySession.ts
+async function saveOperationsManualGameEntrySession(session, options) {
+  const requestId = createManualEventsSaveRequestId();
+  logManualEventsSaveStage("save_started", {
+    requestId,
+    gameCount: session.games.length
+  });
+  const validated = validateOperationsManualGameEntryCreateSession(session);
+  logManualEventsSaveStage("validation_result", {
+    requestId,
+    ok: validated.ok,
+    errors: validated.ok ? [] : validated.errors
+  });
+  if (!validated.ok) {
+    return { ok: false, errors: validated.errors };
+  }
+  try {
+    for (let index = 0; index < validated.built.length; index += 1) {
+      const built = validated.built[index];
+      await saveManualEventsSourceEntry(
+        {
+          league: built.league,
+          broadcaster: built.broadcaster,
+          event: built.event,
+          leagueLogoChanged: index === 0 ? options?.leagueLogoChanged : false,
+          broadcasterLogoChanged: index === 0 ? options?.broadcasterLogoChanged : false,
+          broadcasterStreamUrlChanged: index === 0 ? options?.broadcasterStreamUrlChanged : false,
+          broadcasterOpenBehaviorChanged: index === 0 ? options?.broadcasterOpenBehaviorChanged : false
+        },
+        { requestId }
+      );
+    }
+    invalidateManualEventsSourcePrefetch();
+    invalidateManualEventsOverlayCache();
+    const source = await resolveManualEventsSourceBundle();
+    applyManualEventsSourceToLiveGames(source);
+    logManualEventsSaveStage("save_success", {
+      requestId,
+      gameCount: validated.built.length
+    });
+    return {
+      ok: true,
+      source,
+      gameCount: validated.built.length
+    };
+  } catch (error) {
+    const reason = error instanceof ManualEventsSaveError ? error.reason : error instanceof Error ? error.message : "Unable to save manual events";
+    return {
+      ok: false,
+      errors: [reason]
+    };
+  }
+}
+var init_saveOperationsManualGameEntrySession = __esm({
+  "../grarf/desktop/src/lib/manualEvents/saveOperationsManualGameEntrySession.ts"() {
+    init_define_import_meta_env();
+    init_operationsManualGameEntrySessionDraft();
+    init_applyManualEventsSourceToLiveGames();
+    init_manualEventsOverlayCache();
+    init_manualEventsPersistenceApi();
+    init_manualEventsSourceResolver();
+    init_manualEventsSaveDiagnostics();
+  }
+});
+
 // ../grarf/desktop/src/components/adminMode/GamesSpineWysiwygGameCardPrototype.tsx
+function createInitialDraft() {
+  return {
+    leagueLogoUrl: "",
+    leagueName: "",
+    eventDate: getOperationalSportsDayDateKey(),
+    startTime: "",
+    endTime: "",
+    status: "live",
+    channelLogoUrl: "",
+    team1: "",
+    team2: "",
+    broadcastName: "",
+    streamUrl: "",
+    gameCardUrl: "",
+    navigationMode: "center-pane",
+    priority: ""
+  };
+}
+function createBlankBroadcasterFieldsTouched() {
+  return {
+    logo: false,
+    streamUrl: false,
+    openBehavior: false
+  };
+}
 function stopCardInteraction(event) {
   event.stopPropagation();
 }
@@ -80515,9 +80891,48 @@ function WysiwygNavigationModeSelector({
   }) });
 }
 function GamesSpineWysiwygGameCardPrototype() {
-  const [draft, setDraft] = (0, import_react121.useState)(INITIAL_DRAFT);
+  const [draft, setDraft] = (0, import_react121.useState)(createInitialDraft);
+  const [saving, setSaving] = (0, import_react121.useState)(false);
+  const [saveError, setSaveError] = (0, import_react121.useState)(null);
+  const [leagueLogoTouched, setLeagueLogoTouched] = (0, import_react121.useState)(false);
+  const [broadcasterFieldsTouched, setBroadcasterFieldsTouched] = (0, import_react121.useState)(
+    createBlankBroadcasterFieldsTouched
+  );
   const updateDraft = (key2, value) => {
     setDraft((current) => ({ ...current, [key2]: value }));
+  };
+  const onSave = () => {
+    logManualEventsSaveStage("save_clicked", { wysiwyg: true });
+    void (async () => {
+      setSaving(true);
+      setSaveError(null);
+      const session = wysiwygDraftToManualGameEntryCreateSession(draft);
+      const result = await saveOperationsManualGameEntrySession(session, {
+        leagueLogoChanged: leagueLogoTouched,
+        broadcasterLogoChanged: broadcasterFieldsTouched.logo,
+        broadcasterStreamUrlChanged: broadcasterFieldsTouched.streamUrl,
+        broadcasterOpenBehaviorChanged: broadcasterFieldsTouched.openBehavior
+      });
+      setSaving(false);
+      if (!result.ok) {
+        setSaveError(result.errors.join(" \xB7 "));
+        return;
+      }
+      const gameId = resolveWysiwygSavedManualGameId(session);
+      if (gameId) {
+        const priorityRaw = draft.priority.trim();
+        if (priorityRaw) {
+          const priority = Math.round(Number(priorityRaw));
+          if (Number.isFinite(priority) && priority >= 1 && priority <= 10) {
+            useAdminFeaturedPriorityStore.getState().setPriority(gameId, priority, draft.eventDate.trim() || void 0);
+          }
+        }
+        useAdminOperationsCardStore.getState().setStatusOverride(gameId, draft.status);
+      }
+      setDraft(createInitialDraft());
+      setLeagueLogoTouched(false);
+      setBroadcasterFieldsTouched(createBlankBroadcasterFieldsTouched());
+    })();
   };
   return /* @__PURE__ */ (0, import_jsx_runtime101.jsx)("div", { className: cn2(HOME_GAMES_SPINE_GAME_STACK, "mx-1 px-2 pt-2"), children: /* @__PURE__ */ (0, import_jsx_runtime101.jsx)(
     "div",
@@ -80535,7 +80950,10 @@ function GamesSpineWysiwygGameCardPrototype() {
               type: "url",
               value: draft.leagueLogoUrl,
               placeholder: "Lg. logo",
-              onChange: (event) => updateDraft("leagueLogoUrl", event.target.value),
+              onChange: (event) => {
+                setLeagueLogoTouched(true);
+                updateDraft("leagueLogoUrl", event.target.value);
+              },
               onClick: stopCardInteraction,
               onPointerDown: stopCardInteraction,
               onKeyDown: stopCardInteraction,
@@ -80622,7 +81040,10 @@ function GamesSpineWysiwygGameCardPrototype() {
               type: "url",
               value: draft.channelLogoUrl,
               placeholder: "Ch. logo",
-              onChange: (event) => updateDraft("channelLogoUrl", event.target.value),
+              onChange: (event) => {
+                setBroadcasterFieldsTouched((current) => ({ ...current, logo: true }));
+                updateDraft("channelLogoUrl", event.target.value);
+              },
               onClick: stopCardInteraction,
               onPointerDown: stopCardInteraction,
               onKeyDown: stopCardInteraction,
@@ -80719,7 +81140,10 @@ function GamesSpineWysiwygGameCardPrototype() {
               type: "url",
               value: draft.streamUrl,
               placeholder: "Stream URL",
-              onChange: (event) => updateDraft("streamUrl", event.target.value),
+              onChange: (event) => {
+                setBroadcasterFieldsTouched((current) => ({ ...current, streamUrl: true }));
+                updateDraft("streamUrl", event.target.value);
+              },
               onClick: stopCardInteraction,
               onPointerDown: stopCardInteraction,
               onKeyDown: stopCardInteraction,
@@ -80756,7 +81180,10 @@ function GamesSpineWysiwygGameCardPrototype() {
             {
               relaxed: true,
               value: draft.navigationMode,
-              onChange: (value) => updateDraft("navigationMode", value)
+              onChange: (value) => {
+                setBroadcasterFieldsTouched((current) => ({ ...current, openBehavior: true }));
+                updateDraft("navigationMode", value);
+              }
             }
           ),
           /* @__PURE__ */ (0, import_jsx_runtime101.jsx)("div", { className: WYSIWYG_LOWER_SECTION_ROW_SPACER_CLASS, "aria-hidden": true }),
@@ -80775,24 +81202,44 @@ function GamesSpineWysiwygGameCardPrototype() {
               className: WYSIWYG_LOWER_PRIORITY_INPUT_CLASS,
               "aria-label": "Featured priority"
             }
+          ),
+          /* @__PURE__ */ (0, import_jsx_runtime101.jsx)("div", { className: WYSIWYG_LOWER_SECTION_ROW_SPACER_CLASS, "aria-hidden": true }),
+          saveError ? /* @__PURE__ */ (0, import_jsx_runtime101.jsx)("p", { className: "font-mono text-[10px] leading-snug tracking-[0.06em] text-redsys", children: saveError }) : null,
+          /* @__PURE__ */ (0, import_jsx_runtime101.jsx)(
+            "button",
+            {
+              type: "button",
+              disabled: saving,
+              onClick: (event) => {
+                stopCardInteraction(event);
+                onSave();
+              },
+              className: "w-full rounded border border-greensys/50 bg-greensys/10 px-2 py-1.5 font-mono text-[11px] tracking-[0.14em] text-greensys hover:bg-greensys/20 disabled:cursor-not-allowed disabled:opacity-50",
+              children: saving ? "Saving\u2026" : "Save Manual Game"
+            }
           )
         ] })
       ] })
     }
   ) });
 }
-var import_react121, import_jsx_runtime101, DISPLAY_CLOCK, DISPLAY_AWAY_SCORE, DISPLAY_HOME_SCORE, MUTED_INFO_CLASS, WYSIWYG_LOGO_INPUT_CLASS, WYSIWYG_INLINE_INPUT_CLASS, WYSIWYG_STATUS_SELECT_CLASS, WYSIWYG_SCHEDULE_INPUT_CLASS, WYSIWYG_ACTION_INPUT_CLASS, WYSIWYG_LOWER_SECTION_ROW_SPACER_CLASS, WYSIWYG_LOWER_ACTION_INPUT_CLASS, WYSIWYG_LOWER_PRIORITY_INPUT_CLASS, INITIAL_DRAFT;
+var import_react121, import_jsx_runtime101, DISPLAY_CLOCK, DISPLAY_AWAY_SCORE, DISPLAY_HOME_SCORE, MUTED_INFO_CLASS, WYSIWYG_LOGO_INPUT_CLASS, WYSIWYG_INLINE_INPUT_CLASS, WYSIWYG_STATUS_SELECT_CLASS, WYSIWYG_SCHEDULE_INPUT_CLASS, WYSIWYG_ACTION_INPUT_CLASS, WYSIWYG_LOWER_SECTION_ROW_SPACER_CLASS, WYSIWYG_LOWER_ACTION_INPUT_CLASS, WYSIWYG_LOWER_PRIORITY_INPUT_CLASS;
 var init_GamesSpineWysiwygGameCardPrototype = __esm({
   "../grarf/desktop/src/components/adminMode/GamesSpineWysiwygGameCardPrototype.tsx"() {
     init_define_import_meta_env();
     import_react121 = __toESM(require_react(), 1);
     init_cn();
     init_statusOverride();
+    init_wysiwygPrototypeManualGameEntry();
+    init_saveOperationsManualGameEntrySession();
+    init_manualEventsSaveDiagnostics();
     init_gamesSpineCardLayout();
     init_gamesSpineScoreLayout();
     init_gamesSpineMatchupLayout();
     init_homeGamesSpineScoreParity();
     init_operationalSlateDate2();
+    init_adminFeaturedPriorityStore();
+    init_adminOperationsCardStore();
     init_GamesSpineCardSectionDivider();
     import_jsx_runtime101 = __toESM(require_jsx_runtime(), 1);
     DISPLAY_CLOCK = "Q3 4:22";
@@ -80813,22 +81260,6 @@ var init_GamesSpineWysiwygGameCardPrototype = __esm({
       "w-full border border-[#243b37]/80 bg-transparent px-1 min-h-[30px] py-1.5 text-center font-mono text-[11px] leading-snug text-[#7aada4] placeholder:text-[#3a5e58] focus:border-[#3a6b5e] focus:outline-none focus:ring-0",
       "[appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
     );
-    INITIAL_DRAFT = {
-      leagueLogoUrl: "",
-      leagueName: "",
-      eventDate: getOperationalSportsDayDateKey(),
-      startTime: "",
-      endTime: "",
-      status: "live",
-      channelLogoUrl: "",
-      team1: "",
-      team2: "",
-      broadcastName: "",
-      streamUrl: "",
-      gameCardUrl: "",
-      navigationMode: "center-pane",
-      priority: ""
-    };
   }
 });
 
@@ -97529,32 +97960,6 @@ var init_findManualEventDefinitionForGame = __esm({
   }
 });
 
-// ../grarf/desktop/src/lib/manualEvents/manualEventsOverlayCache.ts
-function invalidateManualEventsOverlayCache() {
-  cachedOverlay = void 0;
-  cachedOverlayPromise = null;
-}
-function getManualEventsSourceOverlayCached() {
-  if (cachedOverlay !== void 0) {
-    return Promise.resolve(cachedOverlay);
-  }
-  if (!cachedOverlayPromise) {
-    cachedOverlayPromise = fetchManualEventsSourceOverlay().then((overlay) => {
-      cachedOverlay = overlay;
-      return overlay;
-    });
-  }
-  return cachedOverlayPromise;
-}
-var cachedOverlay, cachedOverlayPromise;
-var init_manualEventsOverlayCache = __esm({
-  "../grarf/desktop/src/lib/manualEvents/manualEventsOverlayCache.ts"() {
-    init_define_import_meta_env();
-    init_manualEventsPersistenceApi();
-    cachedOverlayPromise = null;
-  }
-});
-
 // ../grarf/desktop/src/lib/manualEvents/removeManualGameFromLiveGames.ts
 function removeManualGameFromLiveGames(gameId) {
   const prev = useLiveGamesStore.getState();
@@ -99150,109 +99555,6 @@ var init_OperationsSpineSection = __esm({
   }
 });
 
-// ../grarf/shared/domain/manualEvents/buildManualEventFromOperationsEditorDraft.ts
-function formatManualEventWallClockFromDateAndTime(date, time) {
-  const dateTrimmed = date.trim();
-  const timeTrimmed = time.trim();
-  if (!dateTrimmed || !timeTrimmed) return null;
-  const dateMatch = dateTrimmed.match(/^(\d{4}-\d{2}-\d{2})$/);
-  const timeMatch = timeTrimmed.match(/^(\d{2}):(\d{2})/);
-  if (!dateMatch || !timeMatch) return null;
-  return `${dateMatch[1]}T${timeMatch[1]}:${timeMatch[2]}:00`;
-}
-function buildManualEventFromOperationsEditorDraft(draft, options) {
-  const errors = [];
-  const leagueName = draft.leagueName.trim();
-  if (!leagueName) errors.push("League name is required");
-  if (!draft.eventDate.trim()) errors.push("Date is required");
-  if (!draft.startTime.trim()) errors.push("Start time is required");
-  if (!draft.endTime.trim()) errors.push("End time is required");
-  const startTime = formatManualEventWallClockFromDateAndTime(draft.eventDate, draft.startTime);
-  if (draft.eventDate.trim() && draft.startTime.trim() && !startTime) {
-    errors.push("Start time is invalid");
-  }
-  const endTime = formatManualEventWallClockFromDateAndTime(draft.eventDate, draft.endTime);
-  if (draft.eventDate.trim() && draft.endTime.trim() && !endTime) {
-    errors.push("End time is invalid");
-  }
-  const broadcastName = draft.broadcastChannelName.trim();
-  if (!broadcastName) errors.push("Broadcast channel name is required");
-  const streamUrl = draft.streamUrl.trim();
-  if (!streamUrl) errors.push("Stream URL is required");
-  const gameCardUrl = draft.gameCardUrl.trim();
-  if (!gameCardUrl) errors.push("Game card URL is required");
-  if (draft.eventType === "event-only") {
-    if (!draft.eventName.trim()) errors.push("Event name is required");
-  } else {
-    if (!draft.team1Name.trim()) errors.push("Team 1 is required");
-    if (!draft.team2Name.trim()) errors.push("Team 2 is required");
-  }
-  if (errors.length > 0 || !startTime || !endTime) {
-    return { ok: false, errors };
-  }
-  const sourceTimezone = options?.sourceTimezone ?? DEFAULT_OPERATIONS_MANUAL_EVENT_SOURCE_TIMEZONE;
-  const sourceTimezoneIana = resolveManualEventSourceTimezoneIana(sourceTimezone);
-  const startTimeMs = parseManualGamesSpineEventTimeMs(startTime, sourceTimezoneIana);
-  const endTimeMs = parseManualGamesSpineEventTimeMs(endTime, sourceTimezoneIana);
-  if (startTimeMs == null || endTimeMs == null) {
-    return { ok: false, errors: ["Could not parse event schedule"] };
-  }
-  if (endTimeMs <= startTimeMs) {
-    return { ok: false, errors: ["End time must be after start time"] };
-  }
-  const league2 = buildManualLeagueDefinitionFromDisplayName(leagueName, draft.leagueLogoUrl);
-  const broadcaster = buildManualBroadcasterDefinitionFromEditorDraft(draft);
-  const leagueId = league2.leagueId;
-  const event = draft.eventType === "event-only" ? {
-    leagueId,
-    eventName: draft.eventName.trim(),
-    team1: null,
-    team2: null,
-    startTime,
-    endTime,
-    sourceTimezone,
-    broadcastName,
-    streamUrl,
-    gameCardUrl,
-    openBehavior: draft.launchBehavior
-  } : {
-    leagueId,
-    eventName: null,
-    team1: { name: draft.team1Name.trim(), logo: null },
-    team2: { name: draft.team2Name.trim(), logo: null },
-    startTime,
-    endTime,
-    sourceTimezone,
-    broadcastName,
-    streamUrl,
-    gameCardUrl,
-    openBehavior: draft.launchBehavior
-  };
-  const validationErrors = validateManualEventDefinition(event, 0);
-  if (validationErrors.length > 0) {
-    return {
-      ok: false,
-      errors: validationErrors.map((row) => row.message)
-    };
-  }
-  void draft.broadcastChannelLogoUrl;
-  void draft.broadcastLogoUrl;
-  return { ok: true, league: league2, broadcaster, event };
-}
-var DEFAULT_OPERATIONS_MANUAL_EVENT_SOURCE_TIMEZONE, DEFAULT_OPERATIONS_MANUAL_EVENT_DURATION_MS;
-var init_buildManualEventFromOperationsEditorDraft = __esm({
-  "../grarf/shared/domain/manualEvents/buildManualEventFromOperationsEditorDraft.ts"() {
-    init_define_import_meta_env();
-    init_manualGamesSpineTime();
-    init_manualBroadcastersStore();
-    init_manualLeaguesStore();
-    init_resolveSourceTimezone();
-    init_validateManualEventDefinition();
-    DEFAULT_OPERATIONS_MANUAL_EVENT_SOURCE_TIMEZONE = "ET";
-    DEFAULT_OPERATIONS_MANUAL_EVENT_DURATION_MS = 3 * 60 * 60 * 1e3;
-  }
-});
-
 // ../grarf/desktop/src/lib/manualEvents/saveOperationsManualGameEntry.ts
 async function saveOperationsManualGameEntry(draft, options) {
   const requestId = createManualEventsSaveRequestId();
@@ -99331,141 +99633,6 @@ var init_saveOperationsManualGameEntry = __esm({
   }
 });
 
-// ../grarf/shared/domain/manualEvents/operationsManualGameEntrySessionDraft.ts
-function createBlankOperationsManualGameEntryGameRow(id) {
-  return {
-    id,
-    eventDate: "",
-    startTime: "",
-    endTime: "",
-    eventType: "event-only",
-    eventName: "",
-    team1Name: "",
-    team2Name: "",
-    gameCardUrl: ""
-  };
-}
-function createBlankOperationsManualGameEntryCreateSession(firstGameId) {
-  return {
-    shared: {
-      leagueLogoUrl: "",
-      leagueName: "",
-      broadcastChannelLogoUrl: "",
-      broadcastChannelName: "",
-      broadcastLogoUrl: "",
-      streamUrl: "",
-      launchBehavior: "Center Pane"
-    },
-    games: [createBlankOperationsManualGameEntryGameRow(firstGameId)]
-  };
-}
-function mergeOperationsManualGameEntryCreateSessionDraft(session, game) {
-  return {
-    ...session.shared,
-    eventDate: game.eventDate,
-    startTime: game.startTime,
-    endTime: game.endTime,
-    eventType: game.eventType,
-    eventName: game.eventName,
-    team1Name: game.team1Name,
-    team2Name: game.team2Name,
-    gameCardUrl: game.gameCardUrl
-  };
-}
-function validateOperationsManualGameEntryCreateSession(session) {
-  if (session.games.length === 0) {
-    return { ok: false, errors: ["At least one game is required"] };
-  }
-  const errors = [];
-  const built = [];
-  session.games.forEach((game, index) => {
-    const merged = mergeOperationsManualGameEntryCreateSessionDraft(session, game);
-    const result = buildManualEventFromOperationsEditorDraft(merged);
-    if (!result.ok) {
-      for (const message of result.errors) {
-        errors.push(`Game ${index + 1}: ${message}`);
-      }
-      return;
-    }
-    built.push(result);
-  });
-  if (errors.length > 0) {
-    return { ok: false, errors };
-  }
-  return { ok: true, built };
-}
-var init_operationsManualGameEntrySessionDraft = __esm({
-  "../grarf/shared/domain/manualEvents/operationsManualGameEntrySessionDraft.ts"() {
-    init_define_import_meta_env();
-    init_buildManualEventFromOperationsEditorDraft();
-  }
-});
-
-// ../grarf/desktop/src/lib/manualEvents/saveOperationsManualGameEntrySession.ts
-async function saveOperationsManualGameEntrySession(session, options) {
-  const requestId = createManualEventsSaveRequestId();
-  logManualEventsSaveStage("save_started", {
-    requestId,
-    gameCount: session.games.length
-  });
-  const validated = validateOperationsManualGameEntryCreateSession(session);
-  logManualEventsSaveStage("validation_result", {
-    requestId,
-    ok: validated.ok,
-    errors: validated.ok ? [] : validated.errors
-  });
-  if (!validated.ok) {
-    return { ok: false, errors: validated.errors };
-  }
-  try {
-    for (let index = 0; index < validated.built.length; index += 1) {
-      const built = validated.built[index];
-      await saveManualEventsSourceEntry(
-        {
-          league: built.league,
-          broadcaster: built.broadcaster,
-          event: built.event,
-          leagueLogoChanged: index === 0 ? options?.leagueLogoChanged : false,
-          broadcasterLogoChanged: index === 0 ? options?.broadcasterLogoChanged : false,
-          broadcasterStreamUrlChanged: index === 0 ? options?.broadcasterStreamUrlChanged : false,
-          broadcasterOpenBehaviorChanged: index === 0 ? options?.broadcasterOpenBehaviorChanged : false
-        },
-        { requestId }
-      );
-    }
-    invalidateManualEventsSourcePrefetch();
-    invalidateManualEventsOverlayCache();
-    const source = await resolveManualEventsSourceBundle();
-    applyManualEventsSourceToLiveGames(source);
-    logManualEventsSaveStage("save_success", {
-      requestId,
-      gameCount: validated.built.length
-    });
-    return {
-      ok: true,
-      source,
-      gameCount: validated.built.length
-    };
-  } catch (error) {
-    const reason = error instanceof ManualEventsSaveError ? error.reason : error instanceof Error ? error.message : "Unable to save manual events";
-    return {
-      ok: false,
-      errors: [reason]
-    };
-  }
-}
-var init_saveOperationsManualGameEntrySession = __esm({
-  "../grarf/desktop/src/lib/manualEvents/saveOperationsManualGameEntrySession.ts"() {
-    init_define_import_meta_env();
-    init_operationsManualGameEntrySessionDraft();
-    init_applyManualEventsSourceToLiveGames();
-    init_manualEventsOverlayCache();
-    init_manualEventsPersistenceApi();
-    init_manualEventsSourceResolver();
-    init_manualEventsSaveDiagnostics();
-  }
-});
-
 // ../grarf/desktop/src/components/adminMode/OperationsManualGameEntryCreateSessionEditor.tsx
 function OperationsManualEntryFieldLabel({ children }) {
   return /* @__PURE__ */ (0, import_jsx_runtime155.jsx)("span", { className: "font-mono text-[10px] tracking-[0.12em] text-[#7aada4]", children });
@@ -99536,7 +99703,7 @@ function OperationsManualEntryEventTypeSelector({
     );
   }) });
 }
-function createBlankBroadcasterFieldsTouched() {
+function createBlankBroadcasterFieldsTouched2() {
   return {
     logo: false,
     streamUrl: false,
@@ -99795,7 +99962,7 @@ function OperationsManualGameEntryCreateSessionEditor({
   const [saveError, setSaveError] = (0, import_react171.useState)(null);
   const [leagueLogoTouched, setLeagueLogoTouched] = (0, import_react171.useState)(false);
   const [broadcasterFieldsTouched, setBroadcasterFieldsTouched] = (0, import_react171.useState)(
-    createBlankBroadcasterFieldsTouched
+    createBlankBroadcasterFieldsTouched2
   );
   (0, import_react171.useEffect)(() => {
     const leagueName = session.shared.leagueName.trim();
@@ -100015,7 +100182,7 @@ function OperationsManualEntryEventTypeSelector2({
     );
   }) });
 }
-function createBlankBroadcasterFieldsTouched2() {
+function createBlankBroadcasterFieldsTouched3() {
   return {
     logo: false,
     streamUrl: false,
@@ -100297,7 +100464,7 @@ function OperationsManualGameEntryEditorSection() {
   const [saveError, setSaveError] = (0, import_react172.useState)(null);
   const [leagueLogoTouched, setLeagueLogoTouched] = (0, import_react172.useState)(false);
   const [broadcasterFieldsTouched, setBroadcasterFieldsTouched] = (0, import_react172.useState)(
-    createBlankBroadcasterFieldsTouched2
+    createBlankBroadcasterFieldsTouched3
   );
   const isEditing = Boolean(editSession);
   const editDraft = editSession?.draft;
@@ -100363,7 +100530,7 @@ function OperationsManualGameEntryEditorSection() {
     setExpanded(true);
     setSaveError(null);
     setLeagueLogoTouched(false);
-    setBroadcasterFieldsTouched(createBlankBroadcasterFieldsTouched2());
+    setBroadcasterFieldsTouched(createBlankBroadcasterFieldsTouched3());
     sectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   }, [editSession?.gameId]);
   const resetCreateSession = () => {
@@ -100377,7 +100544,7 @@ function OperationsManualGameEntryEditorSection() {
     clearEdit();
     setSaveError(null);
     setLeagueLogoTouched(false);
-    setBroadcasterFieldsTouched(createBlankBroadcasterFieldsTouched2());
+    setBroadcasterFieldsTouched(createBlankBroadcasterFieldsTouched3());
     setExpanded(false);
   };
   const onSaveEdit = () => {
