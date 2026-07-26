@@ -80481,291 +80481,273 @@ var init_resolveWebGamesSpineBootstrapOperationalLeagueOrder = __esm({
 });
 
 // ../grarf/desktop/src/components/adminMode/GamesSpineWysiwygGameCardPrototype.tsx
-function createSampleGame() {
-  return {
-    id: PROTOTYPE_GAME_ID,
-    league: "NBA",
-    status: "live",
-    time: "7:30 PM",
-    statusLine: "Q3 4:22",
-    period: 3,
-    displayClock: "4:22",
-    scheduledDateKey: "2026-07-26",
-    awayTeam: "Celtics",
-    homeTeam: "Lakers",
-    awayTeamAbbrev: "BOS",
-    homeTeamAbbrev: "LAL",
-    awayLogoUrl: "https://a.espncdn.com/i/teamlogos/nba/500/bos.png",
-    homeLogoUrl: "https://a.espncdn.com/i/teamlogos/nba/500/lal.png",
-    awayRecord: "44-18",
-    homeRecord: "40-22",
-    awayTeamStandings: {
-      source: "espn",
-      leagueKey: "NBA",
-      espnTeamId: "2",
-      divisionName: "Atlantic",
-      divisionRank: 1,
-      displayLabel: "#2 East"
-    },
-    homeTeamStandings: {
-      source: "espn",
-      leagueKey: "NBA",
-      espnTeamId: "13",
-      divisionName: "Pacific",
-      divisionRank: 3,
-      displayLabel: "#5 West"
-    },
-    awayCity: "Boston",
-    homeCity: "Los Angeles",
-    awayPitcher: "\u2014",
-    homePitcher: "\u2014",
-    awayPitcherStats: "",
-    homePitcherStats: "",
-    channels: ["ESPN"],
-    broadcasts: ["ESPN", "ABC"],
-    streamUrl: "https://example.com/watch",
-    awayScore: 92,
-    homeScore: 88,
-    espnEventId: PROTOTYPE_GAME_ID,
-    metadata: {
-      manualEvent: {
-        sourceTimezone: "ET",
-        sourceTimezoneIana: "America/New_York",
-        layout: "head-to-head",
-        leagueDisplayName: "NBA",
-        leagueLogoUrl: "https://a.espncdn.com/i/teamlogos/leagues/500/nba.png",
-        openBehavior: "Center Pane",
-        startTime: "2026-07-26T19:30:00",
-        endTime: "2026-07-26T22:00:00"
-      }
-    }
-  };
+function stopCardInteraction(event) {
+  event.stopPropagation();
 }
-function findLeafByExactText(root, text2, claimed) {
-  const normalized = text2.trim();
-  if (!normalized) return null;
-  const candidates = root.querySelectorAll("span, time, button, p");
-  for (const element of candidates) {
-    if (claimed.has(element)) continue;
-    if (element.childElementCount > 0) continue;
-    if ((element.textContent ?? "").trim() === normalized) return element;
-  }
-  return null;
-}
-function attachEditable(element, onCommit) {
-  if (!element) return void 0;
-  element.contentEditable = "true";
-  element.classList.add(
-    "cursor-text",
-    "rounded-sm",
-    "outline-none",
-    "focus-visible:ring-1",
-    "focus-visible:ring-cyansys/35"
-  );
-  const onBlur = () => {
-    onCommit((element.textContent ?? "").trim());
-  };
-  const onKeyDown = (event) => {
-    event.stopPropagation();
-    if (event.key === "Enter") {
-      event.preventDefault();
-      element.blur();
-    }
-  };
-  const onClick = (event) => {
-    event.stopPropagation();
-  };
-  element.addEventListener("blur", onBlur);
-  element.addEventListener("keydown", onKeyDown);
-  element.addEventListener("click", onClick);
-  return () => {
-    element.contentEditable = "false";
-    element.classList.remove(
-      "cursor-text",
-      "rounded-sm",
-      "outline-none",
-      "focus-visible:ring-1",
-      "focus-visible:ring-cyansys/35"
-    );
-    element.removeEventListener("blur", onBlur);
-    element.removeEventListener("keydown", onKeyDown);
-    element.removeEventListener("click", onClick);
-  };
-}
-function resolveBroadcastBadgeLine(game) {
-  const outlets = resolveAdditionalGamesSpineBroadcastOutlets(game);
-  if (outlets.length === 0) return null;
-  return outlets.map((outlet) => outlet.label).join(" \u2022 ");
-}
-function buildTextBindings(game, patchGame) {
-  const channel = resolveCommandBriefingChannel(game);
-  const timingLabel = resolveGamesSpineCardTimingLabel(game);
-  const broadcastLine = resolveBroadcastBadgeLine(game);
-  const bindings = [
-    {
-      text: resolveGamesSpineGameCardLeagueLabel(game),
-      onCommit: (value) => patchGame((current) => ({
-        ...current,
-        metadata: {
-          ...current.metadata,
-          manualEvent: current.metadata?.manualEvent ? { ...current.metadata.manualEvent, leagueDisplayName: value } : current.metadata?.manualEvent
-        }
-      }))
-    },
-    {
-      text: "LIVE",
-      onCommit: () => void 0
-    },
-    {
-      text: game.awayTeam,
-      onCommit: (value) => patchGame((current) => ({ ...current, awayTeam: value }))
-    },
-    {
-      text: game.homeTeam,
-      onCommit: (value) => patchGame((current) => ({ ...current, homeTeam: value }))
-    },
-    {
-      text: game.awayRecord,
-      onCommit: (value) => patchGame((current) => ({ ...current, awayRecord: value }))
-    },
-    {
-      text: game.homeRecord,
-      onCommit: (value) => patchGame((current) => ({ ...current, homeRecord: value }))
-    },
-    {
-      text: String(game.awayScore ?? ""),
-      onCommit: (value) => {
-        const parsed = Number.parseInt(value, 10);
-        if (Number.isNaN(parsed)) return;
-        patchGame((current) => ({ ...current, awayScore: parsed }));
-      }
-    },
-    {
-      text: String(game.homeScore ?? ""),
-      onCommit: (value) => {
-        const parsed = Number.parseInt(value, 10);
-        if (Number.isNaN(parsed)) return;
-        patchGame((current) => ({ ...current, homeScore: parsed }));
-      }
-    },
-    {
-      text: channel.label,
-      onCommit: (value) => patchGame((current) => ({
-        ...current,
-        channels: value ? [value] : current.channels,
-        broadcasts: value ? [value, ...(current.broadcasts ?? []).slice(1)] : current.broadcasts
-      }))
-    },
-    {
-      text: "[ WATCH LIVE ]",
-      onCommit: () => void 0
-    },
-    {
-      text: "[ FOLLOW LIVE ]",
-      onCommit: () => void 0
-    }
+function WysiwygNavigationModeSelector({
+  value,
+  onChange
+}) {
+  const options = [
+    { value: "center-pane", label: "CENTER PANE" },
+    { value: "new-browser-tab", label: "NEW TAB" }
   ];
-  if (game.awayTeamStandings?.displayLabel) {
-    bindings.push({
-      text: game.awayTeamStandings.displayLabel,
-      onCommit: (value) => patchGame((current) => ({
-        ...current,
-        awayTeamStandings: current.awayTeamStandings ? { ...current.awayTeamStandings, displayLabel: value } : current.awayTeamStandings
-      }))
-    });
-  }
-  if (game.homeTeamStandings?.displayLabel) {
-    bindings.push({
-      text: game.homeTeamStandings.displayLabel,
-      onCommit: (value) => patchGame((current) => ({
-        ...current,
-        homeTeamStandings: current.homeTeamStandings ? { ...current.homeTeamStandings, displayLabel: value } : current.homeTeamStandings
-      }))
-    });
-  }
-  if (timingLabel) {
-    bindings.push({
-      text: timingLabel,
-      onCommit: (value) => patchGame((current) => ({
-        ...current,
-        statusLine: value,
-        displayClock: value
-      }))
-    });
-  }
-  if (broadcastLine) {
-    bindings.push({
-      text: broadcastLine,
-      onCommit: (value) => patchGame((current) => ({
-        ...current,
-        broadcasts: value.split("\u2022").map((part) => part.trim()).filter(Boolean)
-      }))
-    });
-  }
-  const viewerMessage = game.viewerMessage?.trim();
-  if (viewerMessage) {
-    bindings.push({
-      text: viewerMessage,
-      onCommit: (value) => patchGame((current) => ({ ...current, viewerMessage: value || null }))
-    });
-  }
-  return bindings.sort((left, right) => right.text.length - left.text.length);
-}
-function attachWysiwygBindings(root, bindings) {
-  const claimed = /* @__PURE__ */ new Set();
-  const cleanups = [];
-  for (const binding of bindings) {
-    const element = findLeafByExactText(root, binding.text, claimed);
-    if (!element) continue;
-    claimed.add(element);
-    const cleanup = attachEditable(element, binding.onCommit);
-    if (cleanup) cleanups.push(cleanup);
-  }
-  return () => {
-    for (const cleanup of cleanups) cleanup();
-  };
+  return /* @__PURE__ */ (0, import_jsx_runtime101.jsx)("div", { className: "flex min-w-0 items-center gap-0.5", children: options.map((option) => {
+    const active2 = value === option.value;
+    return /* @__PURE__ */ (0, import_jsx_runtime101.jsx)(
+      "button",
+      {
+        type: "button",
+        onClick: (event) => {
+          stopCardInteraction(event);
+          onChange(option.value);
+        },
+        className: cn2(
+          "min-w-0 flex-1 border px-1 py-px font-mono text-[8px] leading-none tracking-[0.06em] transition",
+          active2 ? "border-cyansys/45 bg-cyansys/10 text-cyansys" : "border-[#243b37]/90 bg-transparent text-[#5f7a7a] hover:border-[#3a6b5e] hover:text-[#d7eeee]"
+        ),
+        "aria-pressed": active2,
+        children: option.label
+      },
+      option.value
+    );
+  }) });
 }
 function GamesSpineWysiwygGameCardPrototype() {
-  const [game, setGame] = (0, import_react121.useState)(createSampleGame);
-  const shellRef = (0, import_react121.useRef)(null);
-  const patchGame = (0, import_react121.useCallback)((updater) => {
-    setGame((current) => updater(current));
-  }, []);
-  (0, import_react121.useLayoutEffect)(() => {
-    const shell = shellRef.current;
-    if (!shell) return;
-    const card = shell.querySelector("[class*='rounded-lg'][class*='border']");
-    if (!card) return;
-    const bindings = buildTextBindings(game, patchGame);
-    return attachWysiwygBindings(card, bindings);
-  }, [game, patchGame]);
-  return /* @__PURE__ */ (0, import_jsx_runtime101.jsx)("div", { ref: shellRef, className: cn2(HOME_GAMES_SPINE_GAME_STACK, "mx-1 px-2 pt-2"), children: /* @__PURE__ */ (0, import_jsx_runtime101.jsx)(
-    GameRow,
+  const [draft, setDraft] = (0, import_react121.useState)(INITIAL_DRAFT);
+  const updateDraft = (key2, value) => {
+    setDraft((current) => ({ ...current, [key2]: value }));
+  };
+  return /* @__PURE__ */ (0, import_jsx_runtime101.jsx)("div", { className: cn2(HOME_GAMES_SPINE_GAME_STACK, "mx-1 px-2 pt-2"), children: /* @__PURE__ */ (0, import_jsx_runtime101.jsx)(
+    "div",
     {
-      game,
-      variant: "rail",
-      homeSpineParity: true,
-      exemptFromCompactGamesMode: true,
-      onOpen: () => void 0,
-      onWatchLive: () => void 0,
-      canShowWatchLive: () => true
+      className: cn2(
+        GAMES_SPINE_ROW_WIDTH_BOUND,
+        gamesSpineCardPanelSurfaceClass({ primaryElevated: true }),
+        "text-left"
+      ),
+      children: /* @__PURE__ */ (0, import_jsx_runtime101.jsxs)("div", { className: GAMES_SPINE_CARD_SHELL_CLASS, children: [
+        /* @__PURE__ */ (0, import_jsx_runtime101.jsxs)("div", { className: "flex min-w-0 items-center gap-1", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime101.jsx)(
+            "input",
+            {
+              type: "url",
+              value: draft.leagueLogoUrl,
+              placeholder: "Lg. logo",
+              onChange: (event) => updateDraft("leagueLogoUrl", event.target.value),
+              onClick: stopCardInteraction,
+              onPointerDown: stopCardInteraction,
+              onKeyDown: stopCardInteraction,
+              className: WYSIWYG_LOGO_INPUT_CLASS,
+              "aria-label": "League logo URL"
+            }
+          ),
+          /* @__PURE__ */ (0, import_jsx_runtime101.jsx)(
+            "input",
+            {
+              type: "text",
+              value: draft.leagueName,
+              placeholder: "League",
+              onChange: (event) => updateDraft("leagueName", event.target.value),
+              onClick: stopCardInteraction,
+              onPointerDown: stopCardInteraction,
+              onKeyDown: stopCardInteraction,
+              className: cn2(WYSIWYG_INLINE_INPUT_CLASS, GAMES_SPINE_CARD_LEAGUE_LABEL_CLASS),
+              "aria-label": "League name"
+            }
+          )
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime101.jsxs)("div", { className: cn2(GAMES_SPINE_CARD_STATUS_GRID_CLASS, "pr-0.5"), children: [
+          /* @__PURE__ */ (0, import_jsx_runtime101.jsx)("div", { className: "min-w-0", children: /* @__PURE__ */ (0, import_jsx_runtime101.jsx)(
+            "select",
+            {
+              value: draft.status,
+              onChange: (event) => updateDraft("status", event.target.value),
+              onClick: stopCardInteraction,
+              onPointerDown: stopCardInteraction,
+              onKeyDown: stopCardInteraction,
+              className: WYSIWYG_STATUS_SELECT_CLASS,
+              "aria-label": "Game status",
+              children: GAME_STATUS_OVERRIDE_OPTIONS.map((option) => /* @__PURE__ */ (0, import_jsx_runtime101.jsx)("option", { value: option.value, children: option.label }, option.value))
+            }
+          ) }),
+          /* @__PURE__ */ (0, import_jsx_runtime101.jsx)("div", { className: "min-w-0 px-1 text-center", children: /* @__PURE__ */ (0, import_jsx_runtime101.jsx)("span", { className: cn2(GAMES_SPINE_CARD_TIMING_CLASS, MUTED_INFO_CLASS), "aria-hidden": true, children: DISPLAY_CLOCK }) }),
+          /* @__PURE__ */ (0, import_jsx_runtime101.jsx)("div", { className: "flex min-w-0 justify-end", children: /* @__PURE__ */ (0, import_jsx_runtime101.jsx)(
+            "input",
+            {
+              type: "url",
+              value: draft.channelLogoUrl,
+              placeholder: "Ch. logo",
+              onChange: (event) => updateDraft("channelLogoUrl", event.target.value),
+              onClick: stopCardInteraction,
+              onPointerDown: stopCardInteraction,
+              onKeyDown: stopCardInteraction,
+              className: WYSIWYG_LOGO_INPUT_CLASS,
+              "aria-label": "Channel logo URL"
+            }
+          ) })
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime101.jsx)(GamesSpineCardSectionDivider, {}),
+        /* @__PURE__ */ (0, import_jsx_runtime101.jsxs)("div", { className: cn2("min-w-0 space-y-1 py-0.5", GAMES_SPINE_CARD_MATCHUP_TEXT_CLASS), children: [
+          /* @__PURE__ */ (0, import_jsx_runtime101.jsxs)("div", { className: GAMES_SPINE_MATCHUP_GRID, children: [
+            /* @__PURE__ */ (0, import_jsx_runtime101.jsx)(
+              "input",
+              {
+                type: "text",
+                value: draft.team1,
+                placeholder: "Team 1 or Event line 1",
+                onChange: (event) => updateDraft("team1", event.target.value),
+                onClick: stopCardInteraction,
+                onPointerDown: stopCardInteraction,
+                onKeyDown: stopCardInteraction,
+                className: WYSIWYG_INLINE_INPUT_CLASS,
+                "aria-label": "Team 1 or event line 1"
+              }
+            ),
+            /* @__PURE__ */ (0, import_jsx_runtime101.jsx)("span", { "aria-hidden": true }),
+            /* @__PURE__ */ (0, import_jsx_runtime101.jsx)(
+              "span",
+              {
+                className: cn2(
+                  GAMES_SPINE_META_CELL,
+                  GAMES_SPINE_CARD_SCORE_CLASS,
+                  MUTED_INFO_CLASS
+                ),
+                "aria-hidden": true,
+                children: DISPLAY_AWAY_SCORE
+              }
+            )
+          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime101.jsxs)("div", { className: GAMES_SPINE_MATCHUP_GRID, children: [
+            /* @__PURE__ */ (0, import_jsx_runtime101.jsx)(
+              "input",
+              {
+                type: "text",
+                value: draft.team2,
+                placeholder: "Team 2 or Event line 2",
+                onChange: (event) => updateDraft("team2", event.target.value),
+                onClick: stopCardInteraction,
+                onPointerDown: stopCardInteraction,
+                onKeyDown: stopCardInteraction,
+                className: WYSIWYG_INLINE_INPUT_CLASS,
+                "aria-label": "Team 2 or event line 2"
+              }
+            ),
+            /* @__PURE__ */ (0, import_jsx_runtime101.jsx)("span", { "aria-hidden": true }),
+            /* @__PURE__ */ (0, import_jsx_runtime101.jsx)(
+              "span",
+              {
+                className: cn2(
+                  GAMES_SPINE_META_CELL,
+                  GAMES_SPINE_CARD_SCORE_CLASS,
+                  MUTED_INFO_CLASS
+                ),
+                "aria-hidden": true,
+                children: DISPLAY_HOME_SCORE
+              }
+            )
+          ] })
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime101.jsx)(GamesSpineCardSectionDivider, {}),
+        /* @__PURE__ */ (0, import_jsx_runtime101.jsxs)("div", { className: "flex w-full min-w-0 gap-1", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime101.jsx)(
+            "input",
+            {
+              type: "url",
+              value: draft.streamUrl,
+              placeholder: "Stream URL",
+              onChange: (event) => updateDraft("streamUrl", event.target.value),
+              onClick: stopCardInteraction,
+              onPointerDown: stopCardInteraction,
+              onKeyDown: stopCardInteraction,
+              className: cn2(
+                GAMES_SPINE_WATCH_LIVE_BUTTON_CLASS,
+                "!w-auto min-w-0 flex-1 basis-[calc(50%-0.125rem)]",
+                WYSIWYG_ACTION_INPUT_CLASS
+              ),
+              "aria-label": "Stream URL"
+            }
+          ),
+          /* @__PURE__ */ (0, import_jsx_runtime101.jsxs)("div", { className: "flex min-w-0 flex-1 basis-[calc(50%-0.125rem)] flex-col gap-0.5", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime101.jsx)(
+              "input",
+              {
+                type: "url",
+                value: draft.gameCardUrl,
+                placeholder: "Game Card URL",
+                onChange: (event) => updateDraft("gameCardUrl", event.target.value),
+                onClick: stopCardInteraction,
+                onPointerDown: stopCardInteraction,
+                onKeyDown: stopCardInteraction,
+                className: cn2(GAMES_SPINE_FOLLOW_LIVE_BUTTON_CLASS, "w-full", WYSIWYG_ACTION_INPUT_CLASS),
+                "aria-label": "Game Card URL"
+              }
+            ),
+            /* @__PURE__ */ (0, import_jsx_runtime101.jsx)(
+              WysiwygNavigationModeSelector,
+              {
+                value: draft.navigationMode,
+                onChange: (value) => updateDraft("navigationMode", value)
+              }
+            )
+          ] })
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime101.jsx)(
+          "input",
+          {
+            type: "number",
+            min: 1,
+            max: 10,
+            value: draft.priority,
+            placeholder: "Priority",
+            onChange: (event) => updateDraft("priority", event.target.value),
+            onClick: stopCardInteraction,
+            onPointerDown: stopCardInteraction,
+            onKeyDown: stopCardInteraction,
+            className: cn2(
+              "mt-1 w-full border border-[#243b37]/80 bg-transparent px-1 py-px text-center font-mono text-[10px] leading-none text-[#7aada4] placeholder:text-[#3a5e58] focus:border-[#3a6b5e] focus:outline-none focus:ring-0",
+              "[appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+            ),
+            "aria-label": "Featured priority"
+          }
+        )
+      ] })
     }
   ) });
 }
-var import_react121, import_jsx_runtime101, PROTOTYPE_GAME_ID;
+var import_react121, import_jsx_runtime101, DISPLAY_CLOCK, DISPLAY_AWAY_SCORE, DISPLAY_HOME_SCORE, MUTED_INFO_CLASS, WYSIWYG_LOGO_INPUT_CLASS, WYSIWYG_INLINE_INPUT_CLASS, WYSIWYG_STATUS_SELECT_CLASS, WYSIWYG_ACTION_INPUT_CLASS, INITIAL_DRAFT;
 var init_GamesSpineWysiwygGameCardPrototype = __esm({
   "../grarf/desktop/src/components/adminMode/GamesSpineWysiwygGameCardPrototype.tsx"() {
     init_define_import_meta_env();
     import_react121 = __toESM(require_react(), 1);
     init_cn();
-    init_commandBriefingGameCardContent();
-    init_resolveGamesSpineBroadcastOutlets();
-    init_resolveGamesSpineCardTimingLabel();
-    init_resolveGamesSpineGameCardLeagueLabel();
+    init_statusOverride();
+    init_gamesSpineCardLayout();
+    init_gamesSpineScoreLayout();
+    init_gamesSpineMatchupLayout();
     init_homeGamesSpineScoreParity();
-    init_GameRow();
+    init_GamesSpineCardSectionDivider();
     import_jsx_runtime101 = __toESM(require_jsx_runtime(), 1);
-    PROTOTYPE_GAME_ID = "admin-wysiwyg-prototype-nba";
+    DISPLAY_CLOCK = "Q3 4:22";
+    DISPLAY_AWAY_SCORE = "92";
+    DISPLAY_HOME_SCORE = "88";
+    MUTED_INFO_CLASS = "text-textdim/35 pointer-events-none select-none";
+    WYSIWYG_LOGO_INPUT_CLASS = "w-[3.75rem] min-w-0 shrink-0 border border-[#243b37]/90 bg-transparent px-1 py-px font-mono text-[9px] leading-none text-[#d7eeee] placeholder:text-[#3a5e58] focus:border-[#3a6b5e] focus:outline-none focus:ring-0";
+    WYSIWYG_INLINE_INPUT_CLASS = "min-w-0 w-full border-0 border-b border-[#243b37]/70 bg-transparent px-0 py-px font-mono text-[#d7eeee] placeholder:text-[#3a5e58] focus:border-cyansys/45 focus:outline-none focus:ring-0";
+    WYSIWYG_STATUS_SELECT_CLASS = "h-[22px] min-w-0 max-w-full border border-[#243b37]/90 bg-transparent px-1 py-0 font-mono text-[10px] leading-none tracking-[0.06em] text-[#d7eeee] focus:border-[#3a6b5e] focus:outline-none focus:ring-0";
+    WYSIWYG_ACTION_INPUT_CLASS = "min-w-0 w-full border-0 bg-transparent px-1 py-0.5 text-center font-mono text-[10px] tracking-[0.08em] text-[#d7eeee] placeholder:text-textdim/45 focus:outline-none focus:ring-0";
+    INITIAL_DRAFT = {
+      leagueLogoUrl: "",
+      leagueName: "NBA",
+      status: "live",
+      channelLogoUrl: "",
+      team1: "Celtics",
+      team2: "Lakers",
+      streamUrl: "",
+      gameCardUrl: "",
+      navigationMode: "center-pane",
+      priority: ""
+    };
   }
 });
 
