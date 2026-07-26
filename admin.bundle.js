@@ -16251,15 +16251,19 @@ function halftimeFromStatusLine(statusLine) {
     description: line
   });
 }
+function gameHasHalftimeOrIntermissionSignal(game) {
+  if (halftimeFromStatusLine(game.statusLine)) return true;
+  return halftimeFromStatusLine(game.displayClock);
+}
 function isGameCompetitionPaused(game) {
-  if (halftimeFromStatusLine(game.statusLine)) return false;
+  if (gameHasHalftimeOrIntermissionSignal(game)) return false;
   if (game.status === "delayed" || game.status === "suspended") return true;
   if (game.status === "postponed") return true;
   return pausedFromStatusLine(game.statusLine);
 }
 function isGameActivelyLive(game) {
   if (game.status === "live") return !isGameCompetitionPaused(game);
-  if (game.status === "scheduled" && halftimeFromStatusLine(game.statusLine)) return true;
+  if (game.status === "scheduled" && gameHasHalftimeOrIntermissionSignal(game)) return true;
   return false;
 }
 
@@ -20194,16 +20198,6 @@ async function joinMissingMlbProviderIds(transport) {
 async function enrichOperationalSnapshotWatchStreamsLocal(transport) {
   let next = transport;
   try {
-    next = sanitizeOperationalSnapshotWatchStreams(next);
-  } catch (e) {
-    console.warn(`${LOG7} watch stream sanitize failed`, e);
-  }
-  try {
-    next = enrichOperationalSnapshotManualGameOverrides(next);
-  } catch (e) {
-    console.warn(`${LOG7} manual game override enrich failed`, e);
-  }
-  try {
     next = enrichOperationalSnapshotEspnWatchStreams(next);
   } catch (e) {
     console.warn(`${LOG7} ESPN Watch stream enrich failed`, e);
@@ -20265,6 +20259,16 @@ async function enrichOperationalTransport(rawTransport) {
     transport = await enrichOperationalSnapshotPllGameCardRouting(transport);
   } catch (e) {
     console.warn(`${LOG7} PLL game card enrich failed`, e);
+  }
+  try {
+    transport = sanitizeOperationalSnapshotWatchStreams(transport);
+  } catch (e) {
+    console.warn(`${LOG7} watch stream sanitize failed`, e);
+  }
+  try {
+    transport = enrichOperationalSnapshotManualGameOverrides(transport);
+  } catch (e) {
+    console.warn(`${LOG7} manual game override enrich failed`, e);
   }
   if (!isGrarfWebRenderer()) {
     try {
