@@ -24712,6 +24712,266 @@ var init_resolveFlashscoreMatchUrl = __esm({
   }
 });
 
+// ../grarf/shared/domain/pll/pllGameCenterUrl.ts
+function buildPllGameCenterUrl(seasonYear, gameSlug) {
+  const season = String(seasonYear).trim();
+  const slug = gameSlug.trim();
+  if (!season || !slug) return "";
+  return `${PLL_STATS_GAME_CENTER_ORIGIN}/games/${season}/${slug}`;
+}
+function buildPllGameSlug(seasonYear, gameNumber) {
+  if (!Number.isFinite(seasonYear) || seasonYear <= 0) return "";
+  if (!Number.isFinite(gameNumber) || gameNumber <= 0) return "";
+  return `${seasonYear}-ev-${gameNumber}`;
+}
+var PLL_STATS_GAME_CENTER_ORIGIN;
+var init_pllGameCenterUrl = __esm({
+  "../grarf/shared/domain/pll/pllGameCenterUrl.ts"() {
+    init_define_import_meta_env();
+    PLL_STATS_GAME_CENTER_ORIGIN = "https://stats.premierlacrosseleague.com";
+  }
+});
+
+// ../grarf/shared/domain/pll/parsePllSeasonSchedulePayload.ts
+function readString(value) {
+  return typeof value === "string" ? value.trim() : "";
+}
+function readNumber(value) {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : NaN;
+}
+function readTeamOfficialId(team) {
+  if (!team || typeof team !== "object") return "";
+  return readString(team.officialId).toUpperCase();
+}
+function parsePllScheduleRow(raw) {
+  if (!raw || typeof raw !== "object") return null;
+  const row = raw;
+  const seasonYear = readNumber(row.year);
+  const gameNumber = readNumber(row.gameNumber);
+  const slugname = readString(row.slugname) || buildPllGameSlug(seasonYear, gameNumber);
+  const startTimeSec = readNumber(row.startTime);
+  const awayOfficialId = readTeamOfficialId(row.awayTeam);
+  const homeOfficialId = readTeamOfficialId(row.homeTeam);
+  if (!seasonYear || !slugname || !awayOfficialId || !homeOfficialId || !Number.isFinite(startTimeSec)) {
+    return null;
+  }
+  return {
+    seasonYear,
+    slugname,
+    gameNumber,
+    startTimeMs: startTimeSec * 1e3,
+    awayOfficialId,
+    homeOfficialId
+  };
+}
+function parsePllSeasonSchedulePayload(payload) {
+  const rows = Array.isArray(payload) ? payload : payload && typeof payload === "object" ? payload.games ?? payload.events ?? payload.data : null;
+  if (!Array.isArray(rows)) return [];
+  const games = [];
+  for (const row of rows) {
+    const parsed = parsePllScheduleRow(row);
+    if (parsed) games.push(parsed);
+  }
+  return games;
+}
+var init_parsePllSeasonSchedulePayload = __esm({
+  "../grarf/shared/domain/pll/parsePllSeasonSchedulePayload.ts"() {
+    init_define_import_meta_env();
+    init_pllGameCenterUrl();
+  }
+});
+
+// ../grarf/shared/domain/pll/fetchPllSeasonSchedule.ts
+function pllSeasonScheduleUrl(seasonYear) {
+  return `${PLL_STATS_SCHEDULE_URL}/${seasonYear}`;
+}
+async function fetchPllSeasonScheduleUncached(seasonYear) {
+  try {
+    const response = await fetch(pllSeasonScheduleUrl(seasonYear), {
+      headers: {
+        Accept: "application/json, text/plain, */*",
+        "Accept-Language": "en-US,en;q=0.9",
+        Origin: "https://stats.premierlacrosseleague.com",
+        Referer: `https://stats.premierlacrosseleague.com/games/${seasonYear}`,
+        "User-Agent": PLL_STATS_FETCH_UA
+      }
+    });
+    if (!response.ok) return [];
+    const payload = await response.json();
+    return parsePllSeasonSchedulePayload(payload);
+  } catch {
+    return [];
+  }
+}
+async function fetchPllSeasonSchedule(seasonYear) {
+  const cached = scheduleCacheBySeason.get(seasonYear);
+  const now = Date.now();
+  if (cached && now - cached.fetchedAt < SCHEDULE_CACHE_TTL_MS) {
+    return cached.games;
+  }
+  const games = await fetchPllSeasonScheduleUncached(seasonYear);
+  scheduleCacheBySeason.set(seasonYear, { fetchedAt: now, games });
+  return games;
+}
+var PLL_STATS_SCHEDULE_URL, PLL_STATS_FETCH_UA, SCHEDULE_CACHE_TTL_MS, scheduleCacheBySeason;
+var init_fetchPllSeasonSchedule = __esm({
+  "../grarf/shared/domain/pll/fetchPllSeasonSchedule.ts"() {
+    init_define_import_meta_env();
+    init_parsePllSeasonSchedulePayload();
+    PLL_STATS_SCHEDULE_URL = "https://stats.premierlacrosseleague.com/api/v1/games";
+    PLL_STATS_FETCH_UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36";
+    SCHEDULE_CACHE_TTL_MS = 5 * 60 * 1e3;
+    scheduleCacheBySeason = /* @__PURE__ */ new Map();
+  }
+});
+
+// ../grarf/shared/domain/pll/matchPllScheduleGame.ts
+function normalizeAbbrev(value) {
+  return value?.trim().toUpperCase() ?? "";
+}
+function startTimeScore(gameMs, scheduleMs) {
+  if (!Number.isFinite(gameMs) || !gameMs || !Number.isFinite(scheduleMs) || !scheduleMs) return 0.85;
+  const delta = Math.abs(gameMs - scheduleMs);
+  if (delta > PLL_START_TIME_MAX_DELTA_MS) return 0;
+  if (delta <= PLL_START_TIME_EXACT_MATCH_MS) return 1;
+  return 1 - Math.min(delta / PLL_START_TIME_MAX_DELTA_MS, 1) * 0.35;
+}
+function teamPairMatches(game, schedule) {
+  const away = normalizeAbbrev(game.awayTeamAbbrev);
+  const home = normalizeAbbrev(game.homeTeamAbbrev);
+  if (!away || !home) return false;
+  const direct = away === schedule.awayOfficialId && home === schedule.homeOfficialId;
+  const swapped = away === schedule.homeOfficialId && home === schedule.awayOfficialId;
+  return direct || swapped;
+}
+function matchPllScheduleGame(game, schedule) {
+  const seasonYear = game.seasonYear ?? void 0;
+  const candidates = seasonYear ? schedule.filter((row) => row.seasonYear === seasonYear) : schedule;
+  if (candidates.length === 0) return null;
+  let best = null;
+  let bestScore = 0;
+  for (const candidate of candidates) {
+    if (!teamPairMatches(game, candidate)) continue;
+    const score2 = startTimeScore(game.startTimeMs ?? 0, candidate.startTimeMs);
+    if (score2 > bestScore) {
+      bestScore = score2;
+      best = candidate;
+    }
+  }
+  if (!best || bestScore <= 0) return null;
+  const url = buildPllGameCenterUrl(best.seasonYear, best.slugname);
+  if (!url) return null;
+  return {
+    url,
+    slugname: best.slugname,
+    seasonYear: best.seasonYear
+  };
+}
+var PLL_START_TIME_EXACT_MATCH_MS, PLL_START_TIME_MAX_DELTA_MS;
+var init_matchPllScheduleGame = __esm({
+  "../grarf/shared/domain/pll/matchPllScheduleGame.ts"() {
+    init_define_import_meta_env();
+    init_pllGameCenterUrl();
+    PLL_START_TIME_EXACT_MATCH_MS = 60 * 1e3;
+    PLL_START_TIME_MAX_DELTA_MS = 3 * 60 * 60 * 1e3;
+  }
+});
+
+// ../grarf/shared/domain/pll/enrichPllGameCardRouting.ts
+function resolvePllSeasonYear(game) {
+  const fromMetadata = game.metadata?.pllSeasonYear;
+  if (Number.isFinite(fromMetadata) && fromMetadata > 0) return fromMetadata;
+  if (Number.isFinite(game.startTimeMs) && (game.startTimeMs ?? 0) > 0) {
+    return new Date(game.startTimeMs).getUTCFullYear();
+  }
+  return null;
+}
+function hasPllGameCenterRouting(game) {
+  return Boolean(game.metadata?.pllGameCenterUrl?.trim() || game.gameCardUrl?.trim());
+}
+function attachPllGameCenterRouting(game, match) {
+  if (game.gameCardUrl === match.url && game.metadata?.pllGameCenterUrl === match.url) {
+    return game;
+  }
+  return {
+    ...game,
+    gameCardUrl: match.url,
+    metadata: {
+      ...game.metadata,
+      pllGameCenterUrl: match.url,
+      pllGameSlug: match.slugname,
+      pllSeasonYear: match.seasonYear
+    }
+  };
+}
+function matchGameToSchedule(game, schedule) {
+  return matchPllScheduleGame(
+    {
+      seasonYear: resolvePllSeasonYear(game),
+      awayTeamAbbrev: game.awayTeamAbbrev,
+      homeTeamAbbrev: game.homeTeamAbbrev,
+      startTimeMs: game.startTimeMs
+    },
+    schedule
+  );
+}
+function enrichPllGameRow(game, schedule) {
+  if (game.league !== "PLL" || hasPllGameCenterRouting(game)) return game;
+  const match = matchGameToSchedule(game, schedule);
+  if (!match) return game;
+  return attachPllGameCenterRouting(game, match);
+}
+async function enrichPllGameCardRouting(games) {
+  const pending = games.filter((game) => game.league === "PLL" && !hasPllGameCenterRouting(game));
+  if (pending.length === 0) return games;
+  const seasonYears = [];
+  for (const game of pending) {
+    const year = resolvePllSeasonYear(game);
+    if (year != null && Number.isFinite(year) && year > 0 && !seasonYears.includes(year)) {
+      seasonYears.push(year);
+    }
+  }
+  const schedules = await Promise.all(seasonYears.map((year) => fetchPllSeasonSchedule(year)));
+  const schedule = schedules.flat();
+  if (schedule.length === 0) return games;
+  return games.map((game) => enrichPllGameRow(game, schedule));
+}
+function readPllGameCenterUrlFromGame(game) {
+  const fromMetadata = game.metadata?.pllGameCenterUrl?.trim();
+  if (fromMetadata) return fromMetadata;
+  const fromGameCard = game.gameCardUrl?.trim();
+  if (fromGameCard?.includes("stats.premierlacrosseleague.com/games/")) {
+    return fromGameCard;
+  }
+  const slug = game.metadata?.pllGameSlug?.trim();
+  const seasonYear = game.metadata?.pllSeasonYear;
+  if (slug && Number.isFinite(seasonYear) && seasonYear > 0) {
+    return buildPllGameCenterUrl(seasonYear, slug) || null;
+  }
+  return null;
+}
+var init_enrichPllGameCardRouting = __esm({
+  "../grarf/shared/domain/pll/enrichPllGameCardRouting.ts"() {
+    init_define_import_meta_env();
+    init_pllGameCenterUrl();
+    init_fetchPllSeasonSchedule();
+    init_matchPllScheduleGame();
+  }
+});
+
+// ../grarf/desktop/src/lib/pll/resolvePllGameCenterUrl.ts
+function resolvePllGameCenterUrl(game) {
+  if (game.league !== "PLL") return null;
+  return readPllGameCenterUrlFromGame(game);
+}
+var init_resolvePllGameCenterUrl = __esm({
+  "../grarf/desktop/src/lib/pll/resolvePllGameCenterUrl.ts"() {
+    init_define_import_meta_env();
+    init_enrichPllGameCardRouting();
+  }
+});
+
 // ../grarf/desktop/src/store/adminOperationsCardStore.ts
 function cloneFieldsByGameId(source) {
   const out = {};
@@ -24999,6 +25259,8 @@ function resolveGameWorkspaceEmbedUrl(game, gameId) {
     if (game.league === "NBASUMMER") {
       return game.gameCardUrl?.trim() || null;
     }
+    const pllUrl = resolvePllGameCenterUrl(game);
+    if (pllUrl) return pllUrl;
   }
   if (game?.streamUrl?.trim()) {
     if (isGolfLeagueKey(game.league) && game.launchMode === "external") {
@@ -25065,6 +25327,7 @@ var init_espnGameUrls = __esm({
     init_resolveWorldCupWorkspaceEmbedUrl();
     init_buildFotmobMatchUrl();
     init_resolveFlashscoreMatchUrl();
+    init_resolvePllGameCenterUrl();
     init_resolveTennisGameCardEmbedUrl();
     ESPN_GAME_ID_RE = /^espn-([A-Z0-9]+)-(\d+)$/i;
     SOCCER_LEAGUE_KEYS = /* @__PURE__ */ new Set([
@@ -43552,7 +43815,7 @@ var init_wnbaScheduleConfig = __esm({
 // ../grarf/desktop/src/lib/wnba/fetchWnbaScheduleRows.ts
 async function fetchWnbaScheduleRows(seasonYear = resolveWnbaScheduleSeasonYear()) {
   const cached = cacheBySeason.get(seasonYear);
-  if (cached && Date.now() - cached.fetchedAtMs < SCHEDULE_CACHE_TTL_MS) {
+  if (cached && Date.now() - cached.fetchedAtMs < SCHEDULE_CACHE_TTL_MS2) {
     return cached.rows;
   }
   const inFlight3 = inFlightBySeason.get(seasonYear);
@@ -43576,12 +43839,12 @@ async function fetchWnbaScheduleRows(seasonYear = resolveWnbaScheduleSeasonYear(
     inFlightBySeason.delete(seasonYear);
   }
 }
-var SCHEDULE_CACHE_TTL_MS, cacheBySeason, inFlightBySeason;
+var SCHEDULE_CACHE_TTL_MS2, cacheBySeason, inFlightBySeason;
 var init_fetchWnbaScheduleRows = __esm({
   "../grarf/desktop/src/lib/wnba/fetchWnbaScheduleRows.ts"() {
     init_define_import_meta_env();
     init_wnbaScheduleConfig();
-    SCHEDULE_CACHE_TTL_MS = 60 * 60 * 1e3;
+    SCHEDULE_CACHE_TTL_MS2 = 60 * 60 * 1e3;
     cacheBySeason = /* @__PURE__ */ new Map();
     inFlightBySeason = /* @__PURE__ */ new Map();
   }
@@ -45040,6 +45303,26 @@ var init_enrichOperationalSnapshotTennisChannel = __esm({
   }
 });
 
+// ../grarf/desktop/src/lib/pll/enrichOperationalSnapshotPllGameCardRouting.ts
+async function enrichOperationalSnapshotPllGameCardRouting(transport) {
+  const rows = transport.leagues.PLL;
+  if (!Array.isArray(rows) || rows.length === 0) return transport;
+  const enriched = await enrichPllGameCardRouting(rows);
+  return {
+    ...transport,
+    leagues: {
+      ...transport.leagues,
+      PLL: enriched
+    }
+  };
+}
+var init_enrichOperationalSnapshotPllGameCardRouting = __esm({
+  "../grarf/desktop/src/lib/pll/enrichOperationalSnapshotPllGameCardRouting.ts"() {
+    init_define_import_meta_env();
+    init_enrichPllGameCardRouting();
+  }
+});
+
 // ../grarf/desktop/src/services/operationalIngest/supplementOperationalSnapshotFromLocalIpc.ts
 function cloudRowMissingMlbPk(row) {
   if (typeof row.gamePk === "number" && row.gamePk > 0) return false;
@@ -45271,6 +45554,11 @@ async function enrichOperationalTransport(rawTransport) {
   } catch (e2) {
     console.warn(`${LOG12} local IPC supplement failed`, e2);
   }
+  try {
+    transport = await enrichOperationalSnapshotPllGameCardRouting(transport);
+  } catch (e2) {
+    console.warn(`${LOG12} PLL game card enrich failed`, e2);
+  }
   if (!isGrarfWebRenderer()) {
     try {
       transport = await enrichOperationalSnapshotWatchStreamsLocal(transport);
@@ -45300,6 +45588,7 @@ var init_enrichOperationalTransport = __esm({
     init_sanitizeOperationalSnapshotWatchStreams();
     init_enrichOperationalSnapshotManualGameOverrides2();
     init_enrichOperationalSnapshotTennisChannel();
+    init_enrichOperationalSnapshotPllGameCardRouting();
     init_isGrarfWebRenderer();
     init_supplementOperationalSnapshotFromLocalIpc();
     LOG12 = "[OperationalIngest]";
@@ -74586,6 +74875,32 @@ var init_GamesSpineUnifiedGameCard = __esm({
   }
 });
 
+// ../grarf/desktop/src/lib/gamesSpine/tryOpenF1FollowLiveInLeagueWorkspace.ts
+function isF1GameRow(game) {
+  return game.league === "F1";
+}
+function tryOpenF1FollowLiveInLeagueWorkspace(game) {
+  if (!isGrarfWebRenderer()) return false;
+  if (!isF1GameRow(game)) return false;
+  if (!isGameActivelyLive(game)) return false;
+  clearCenterEmbedForSpineGameSelect();
+  useHomeLeagueWorkspaceMainMenuStore.getState().setActiveCategory(F1_HUB_ID, "live");
+  openHomeLeagueWorkspace(F1_HUB_ID);
+  return true;
+}
+var F1_HUB_ID;
+var init_tryOpenF1FollowLiveInLeagueWorkspace = __esm({
+  "../grarf/desktop/src/lib/gamesSpine/tryOpenF1FollowLiveInLeagueWorkspace.ts"() {
+    init_define_import_meta_env();
+    init_openF1LeagueWorkspace();
+    init_clearCenterEmbedForSpineGameSelect();
+    init_isGameActivelyLive();
+    init_isGrarfWebRenderer();
+    init_homeLeagueWorkspaceMainMenuStore();
+    F1_HUB_ID = "f1";
+  }
+});
+
 // ../grarf/desktop/src/lib/gamesSpine/tryOpenPgaTourFollowLiveInLeagueWorkspace.ts
 function isPgaTourGameRow(game) {
   return game.league === "PGA";
@@ -74729,6 +75044,7 @@ function GamesSpineHomeParityGameRow({
         e2.stopPropagation();
         if (tryOpenUfcFollowLiveInLeagueWorkspace(game)) return;
         if (tryOpenPgaTourFollowLiveInLeagueWorkspace(game)) return;
+        if (tryOpenF1FollowLiveInLeagueWorkspace(game)) return;
         onOpen(game.id, game);
       } : void 0,
       statusSupplement,
@@ -74754,6 +75070,7 @@ var init_GamesSpineHomeParityGameRow = __esm({
     init_GameNarrativeCapsule();
     init_GamesSpineUnifiedGameCard();
     init_resolveGamesSpineBroadcastOutlets();
+    init_tryOpenF1FollowLiveInLeagueWorkspace();
     init_tryOpenPgaTourFollowLiveInLeagueWorkspace();
     init_tryOpenUfcFollowLiveInLeagueWorkspace();
     import_jsx_runtime79 = __toESM(require_jsx_runtime(), 1);
@@ -97520,6 +97837,10 @@ function resolveSpineRowWorkspaceEmbedUrl(game) {
   if (game.league === "NBASUMMER") {
     return game.gameCardUrl?.trim() || null;
   }
+  if (game.league === "PLL") {
+    const pllUrl = resolvePllGameCenterUrl(game);
+    if (pllUrl) return pllUrl;
+  }
   if (isWnbaSpineGame(game)) {
     const wnbaUrl = resolveWnbaGameCenterUrl(game);
     if (wnbaUrl) return wnbaUrl;
@@ -97653,6 +97974,7 @@ var init_openGameWorkspaceTab = __esm({
     init_tryOpenNbaSummerLeagueGameRowInBrowser();
     init_tryOpenWnbaGameRowInBrowser();
     init_resolveFlashscoreMatchUrl();
+    init_resolvePllGameCenterUrl();
     init_resolveTennisGameCardEmbedUrl();
     init_gameCardNavigation();
     init_isGrarfWebRenderer();
