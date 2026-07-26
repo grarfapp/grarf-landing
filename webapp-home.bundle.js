@@ -80486,7 +80486,8 @@ function stopCardInteraction(event) {
 }
 function WysiwygNavigationModeSelector({
   value,
-  onChange
+  onChange,
+  relaxed = false
 }) {
   const options = [
     { value: "center-pane", label: "CENTER PANE" },
@@ -80503,7 +80504,7 @@ function WysiwygNavigationModeSelector({
           onChange(option.value);
         },
         className: cn2(
-          "min-w-0 flex-1 border px-1 py-px font-mono text-[8px] leading-none tracking-[0.06em] transition",
+          relaxed ? "min-w-0 flex-1 border px-1.5 py-1.5 min-h-[30px] font-mono text-[9px] leading-snug tracking-[0.06em] transition" : "min-w-0 flex-1 border px-1 py-px font-mono text-[8px] leading-none tracking-[0.06em] transition",
           active2 ? "border-cyansys/45 bg-cyansys/10 text-cyansys" : "border-[#243b37]/90 bg-transparent text-[#5f7a7a] hover:border-[#3a6b5e] hover:text-[#d7eeee]"
         ),
         "aria-pressed": active2,
@@ -80526,7 +80527,7 @@ function GamesSpineWysiwygGameCardPrototype() {
         gamesSpineCardPanelSurfaceClass({ primaryElevated: true }),
         "text-left"
       ),
-      children: /* @__PURE__ */ (0, import_jsx_runtime101.jsxs)("div", { className: GAMES_SPINE_CARD_SHELL_CLASS, children: [
+      children: /* @__PURE__ */ (0, import_jsx_runtime101.jsxs)("div", { className: cn2(GAMES_SPINE_CARD_SHELL_CLASS, "!gap-0.5"), children: [
         /* @__PURE__ */ (0, import_jsx_runtime101.jsxs)("div", { className: "flex min-w-0 items-center gap-1", children: [
           /* @__PURE__ */ (0, import_jsx_runtime101.jsx)(
             "input",
@@ -80554,6 +80555,49 @@ function GamesSpineWysiwygGameCardPrototype() {
               onKeyDown: stopCardInteraction,
               className: cn2(WYSIWYG_INLINE_INPUT_CLASS, GAMES_SPINE_CARD_LEAGUE_LABEL_CLASS),
               "aria-label": "League name"
+            }
+          )
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime101.jsxs)("div", { className: "grid min-w-0 grid-cols-3 gap-1", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime101.jsx)(
+            "input",
+            {
+              type: "text",
+              value: draft.eventDate,
+              onChange: (event) => updateDraft("eventDate", event.target.value),
+              onClick: stopCardInteraction,
+              onPointerDown: stopCardInteraction,
+              onKeyDown: stopCardInteraction,
+              className: WYSIWYG_SCHEDULE_INPUT_CLASS,
+              "aria-label": "Event date"
+            }
+          ),
+          /* @__PURE__ */ (0, import_jsx_runtime101.jsx)(
+            "input",
+            {
+              type: "text",
+              value: draft.startTime,
+              placeholder: "Start time",
+              onChange: (event) => updateDraft("startTime", event.target.value),
+              onClick: stopCardInteraction,
+              onPointerDown: stopCardInteraction,
+              onKeyDown: stopCardInteraction,
+              className: WYSIWYG_SCHEDULE_INPUT_CLASS,
+              "aria-label": "Start time"
+            }
+          ),
+          /* @__PURE__ */ (0, import_jsx_runtime101.jsx)(
+            "input",
+            {
+              type: "text",
+              value: draft.endTime,
+              placeholder: "End time",
+              onChange: (event) => updateDraft("endTime", event.target.value),
+              onClick: stopCardInteraction,
+              onPointerDown: stopCardInteraction,
+              onKeyDown: stopCardInteraction,
+              className: WYSIWYG_SCHEDULE_INPUT_CLASS,
+              "aria-label": "End time"
             }
           )
         ] }),
@@ -80588,7 +80632,7 @@ function GamesSpineWysiwygGameCardPrototype() {
           ) })
         ] }),
         /* @__PURE__ */ (0, import_jsx_runtime101.jsx)(GamesSpineCardSectionDivider, {}),
-        /* @__PURE__ */ (0, import_jsx_runtime101.jsxs)("div", { className: cn2("min-w-0 space-y-1 py-0.5", GAMES_SPINE_CARD_MATCHUP_TEXT_CLASS), children: [
+        /* @__PURE__ */ (0, import_jsx_runtime101.jsxs)("div", { className: cn2("min-w-0 space-y-0.5", GAMES_SPINE_CARD_MATCHUP_TEXT_CLASS), children: [
           /* @__PURE__ */ (0, import_jsx_runtime101.jsxs)("div", { className: GAMES_SPINE_MATCHUP_GRID, children: [
             /* @__PURE__ */ (0, import_jsx_runtime101.jsx)(
               "input",
@@ -80649,7 +80693,26 @@ function GamesSpineWysiwygGameCardPrototype() {
           ] })
         ] }),
         /* @__PURE__ */ (0, import_jsx_runtime101.jsx)(GamesSpineCardSectionDivider, {}),
-        /* @__PURE__ */ (0, import_jsx_runtime101.jsxs)("div", { className: "flex w-full min-w-0 gap-1", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime101.jsxs)("div", { className: "flex w-full min-w-0 flex-col", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime101.jsx)(
+            "input",
+            {
+              type: "text",
+              value: draft.broadcastName,
+              placeholder: "Broadcast Name",
+              onChange: (event) => updateDraft("broadcastName", event.target.value),
+              onClick: stopCardInteraction,
+              onPointerDown: stopCardInteraction,
+              onKeyDown: stopCardInteraction,
+              className: cn2(
+                GAMES_SPINE_WATCH_LIVE_BUTTON_CLASS,
+                "w-full",
+                WYSIWYG_LOWER_ACTION_INPUT_CLASS
+              ),
+              "aria-label": "Broadcast name"
+            }
+          ),
+          /* @__PURE__ */ (0, import_jsx_runtime101.jsx)("div", { className: WYSIWYG_LOWER_SECTION_ROW_SPACER_CLASS, "aria-hidden": true }),
           /* @__PURE__ */ (0, import_jsx_runtime101.jsx)(
             "input",
             {
@@ -80662,60 +80725,63 @@ function GamesSpineWysiwygGameCardPrototype() {
               onKeyDown: stopCardInteraction,
               className: cn2(
                 GAMES_SPINE_WATCH_LIVE_BUTTON_CLASS,
-                "!w-auto min-w-0 flex-1 basis-[calc(50%-0.125rem)]",
-                WYSIWYG_ACTION_INPUT_CLASS
+                "w-full",
+                WYSIWYG_LOWER_ACTION_INPUT_CLASS
               ),
               "aria-label": "Stream URL"
             }
           ),
-          /* @__PURE__ */ (0, import_jsx_runtime101.jsxs)("div", { className: "flex min-w-0 flex-1 basis-[calc(50%-0.125rem)] flex-col gap-0.5", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime101.jsx)(
-              "input",
-              {
-                type: "url",
-                value: draft.gameCardUrl,
-                placeholder: "Game Card URL",
-                onChange: (event) => updateDraft("gameCardUrl", event.target.value),
-                onClick: stopCardInteraction,
-                onPointerDown: stopCardInteraction,
-                onKeyDown: stopCardInteraction,
-                className: cn2(GAMES_SPINE_FOLLOW_LIVE_BUTTON_CLASS, "w-full", WYSIWYG_ACTION_INPUT_CLASS),
-                "aria-label": "Game Card URL"
-              }
-            ),
-            /* @__PURE__ */ (0, import_jsx_runtime101.jsx)(
-              WysiwygNavigationModeSelector,
-              {
-                value: draft.navigationMode,
-                onChange: (value) => updateDraft("navigationMode", value)
-              }
-            )
-          ] })
-        ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime101.jsx)(
-          "input",
-          {
-            type: "number",
-            min: 1,
-            max: 10,
-            value: draft.priority,
-            placeholder: "Priority",
-            onChange: (event) => updateDraft("priority", event.target.value),
-            onClick: stopCardInteraction,
-            onPointerDown: stopCardInteraction,
-            onKeyDown: stopCardInteraction,
-            className: cn2(
-              "mt-1 w-full border border-[#243b37]/80 bg-transparent px-1 py-px text-center font-mono text-[10px] leading-none text-[#7aada4] placeholder:text-[#3a5e58] focus:border-[#3a6b5e] focus:outline-none focus:ring-0",
-              "[appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
-            ),
-            "aria-label": "Featured priority"
-          }
-        )
+          /* @__PURE__ */ (0, import_jsx_runtime101.jsx)("div", { className: WYSIWYG_LOWER_SECTION_ROW_SPACER_CLASS, "aria-hidden": true }),
+          /* @__PURE__ */ (0, import_jsx_runtime101.jsx)(
+            "input",
+            {
+              type: "url",
+              value: draft.gameCardUrl,
+              placeholder: "Game Card URL",
+              onChange: (event) => updateDraft("gameCardUrl", event.target.value),
+              onClick: stopCardInteraction,
+              onPointerDown: stopCardInteraction,
+              onKeyDown: stopCardInteraction,
+              className: cn2(
+                GAMES_SPINE_FOLLOW_LIVE_BUTTON_CLASS,
+                "w-full",
+                WYSIWYG_LOWER_ACTION_INPUT_CLASS
+              ),
+              "aria-label": "Game Card URL"
+            }
+          ),
+          /* @__PURE__ */ (0, import_jsx_runtime101.jsx)("div", { className: WYSIWYG_LOWER_SECTION_ROW_SPACER_CLASS, "aria-hidden": true }),
+          /* @__PURE__ */ (0, import_jsx_runtime101.jsx)(
+            WysiwygNavigationModeSelector,
+            {
+              relaxed: true,
+              value: draft.navigationMode,
+              onChange: (value) => updateDraft("navigationMode", value)
+            }
+          ),
+          /* @__PURE__ */ (0, import_jsx_runtime101.jsx)("div", { className: WYSIWYG_LOWER_SECTION_ROW_SPACER_CLASS, "aria-hidden": true }),
+          /* @__PURE__ */ (0, import_jsx_runtime101.jsx)(
+            "input",
+            {
+              type: "number",
+              min: 1,
+              max: 10,
+              value: draft.priority,
+              placeholder: "Priority",
+              onChange: (event) => updateDraft("priority", event.target.value),
+              onClick: stopCardInteraction,
+              onPointerDown: stopCardInteraction,
+              onKeyDown: stopCardInteraction,
+              className: WYSIWYG_LOWER_PRIORITY_INPUT_CLASS,
+              "aria-label": "Featured priority"
+            }
+          )
+        ] })
       ] })
     }
   ) });
 }
-var import_react121, import_jsx_runtime101, DISPLAY_CLOCK, DISPLAY_AWAY_SCORE, DISPLAY_HOME_SCORE, MUTED_INFO_CLASS, WYSIWYG_LOGO_INPUT_CLASS, WYSIWYG_INLINE_INPUT_CLASS, WYSIWYG_STATUS_SELECT_CLASS, WYSIWYG_ACTION_INPUT_CLASS, INITIAL_DRAFT;
+var import_react121, import_jsx_runtime101, DISPLAY_CLOCK, DISPLAY_AWAY_SCORE, DISPLAY_HOME_SCORE, MUTED_INFO_CLASS, WYSIWYG_LOGO_INPUT_CLASS, WYSIWYG_INLINE_INPUT_CLASS, WYSIWYG_STATUS_SELECT_CLASS, WYSIWYG_SCHEDULE_INPUT_CLASS, WYSIWYG_ACTION_INPUT_CLASS, WYSIWYG_LOWER_SECTION_ROW_SPACER_CLASS, WYSIWYG_LOWER_ACTION_INPUT_CLASS, WYSIWYG_LOWER_PRIORITY_INPUT_CLASS, INITIAL_DRAFT;
 var init_GamesSpineWysiwygGameCardPrototype = __esm({
   "../grarf/desktop/src/components/adminMode/GamesSpineWysiwygGameCardPrototype.tsx"() {
     init_define_import_meta_env();
@@ -80726,6 +80792,7 @@ var init_GamesSpineWysiwygGameCardPrototype = __esm({
     init_gamesSpineScoreLayout();
     init_gamesSpineMatchupLayout();
     init_homeGamesSpineScoreParity();
+    init_operationalSlateDate2();
     init_GamesSpineCardSectionDivider();
     import_jsx_runtime101 = __toESM(require_jsx_runtime(), 1);
     DISPLAY_CLOCK = "Q3 4:22";
@@ -80735,14 +80802,28 @@ var init_GamesSpineWysiwygGameCardPrototype = __esm({
     WYSIWYG_LOGO_INPUT_CLASS = "w-[3.75rem] min-w-0 shrink-0 border border-[#243b37]/90 bg-transparent px-1 py-px font-mono text-[9px] leading-none text-[#d7eeee] placeholder:text-[#3a5e58] focus:border-[#3a6b5e] focus:outline-none focus:ring-0";
     WYSIWYG_INLINE_INPUT_CLASS = "min-w-0 w-full border-0 border-b border-[#243b37]/70 bg-transparent px-0 py-px font-mono text-[#d7eeee] placeholder:text-[#3a5e58] focus:border-cyansys/45 focus:outline-none focus:ring-0";
     WYSIWYG_STATUS_SELECT_CLASS = "h-[22px] min-w-0 max-w-full border border-[#243b37]/90 bg-transparent px-1 py-0 font-mono text-[10px] leading-none tracking-[0.06em] text-[#d7eeee] focus:border-[#3a6b5e] focus:outline-none focus:ring-0";
-    WYSIWYG_ACTION_INPUT_CLASS = "min-w-0 w-full border-0 bg-transparent px-1 py-0.5 text-center font-mono text-[10px] tracking-[0.08em] text-[#d7eeee] placeholder:text-textdim/45 focus:outline-none focus:ring-0";
+    WYSIWYG_SCHEDULE_INPUT_CLASS = "h-[22px] min-w-0 w-full border border-[#243b37]/90 bg-transparent px-1 py-0 font-mono text-[10px] leading-none text-[#d7eeee] placeholder:text-[#3a5e58] focus:border-[#3a6b5e] focus:outline-none focus:ring-0";
+    WYSIWYG_ACTION_INPUT_CLASS = "min-w-0 w-full border-0 bg-transparent px-1 py-px text-center font-mono text-[10px] leading-none tracking-[0.08em] text-[#d7eeee] placeholder:text-textdim/45 focus:outline-none focus:ring-0";
+    WYSIWYG_LOWER_SECTION_ROW_SPACER_CLASS = "h-4 shrink-0";
+    WYSIWYG_LOWER_ACTION_INPUT_CLASS = cn2(
+      WYSIWYG_ACTION_INPUT_CLASS,
+      "min-h-[30px] !py-1.5 text-[11px] leading-snug"
+    );
+    WYSIWYG_LOWER_PRIORITY_INPUT_CLASS = cn2(
+      "w-full border border-[#243b37]/80 bg-transparent px-1 min-h-[30px] py-1.5 text-center font-mono text-[11px] leading-snug text-[#7aada4] placeholder:text-[#3a5e58] focus:border-[#3a6b5e] focus:outline-none focus:ring-0",
+      "[appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+    );
     INITIAL_DRAFT = {
       leagueLogoUrl: "",
-      leagueName: "NBA",
+      leagueName: "",
+      eventDate: getOperationalSportsDayDateKey(),
+      startTime: "",
+      endTime: "",
       status: "live",
       channelLogoUrl: "",
-      team1: "Celtics",
-      team2: "Lakers",
+      team1: "",
+      team2: "",
+      broadcastName: "",
       streamUrl: "",
       gameCardUrl: "",
       navigationMode: "center-pane",
