@@ -104519,6 +104519,19 @@ var init_buildCenterPaneApplicationModeTab = __esm({
 });
 
 // ../grarf/desktop/src/lib/routing/browserUrlSync.ts
+function resolveLeagueHubUrlCategoryId(hubId, categoryId) {
+  if (hubId !== F1_HUB_ID2 || categoryId !== "news") return categoryId;
+  if (typeof window === "undefined") return null;
+  const segments = window.location.pathname.replace(/\/+$/, "").split("/").filter(Boolean);
+  if (segments.length === 2 && segments[1] === "news") return "news";
+  return null;
+}
+function preserveFormulaOneRootPath(canonicalPath) {
+  if (typeof window === "undefined") return canonicalPath;
+  const current = window.location.pathname.replace(/\/+$/, "") || "/";
+  if (current === FORMULA_ONE_ROOT_PATH) return FORMULA_ONE_ROOT_PATH;
+  return canonicalPath;
+}
 function normalizeCanonicalPath(path) {
   const trimmed = path.trim();
   if (!trimmed) return DEFAULT_HOME_CANONICAL_URL;
@@ -104534,9 +104547,14 @@ function resolveActiveWorkspaceCanonicalUrl(input) {
   } = input;
   if (activeWorkspace) {
     if (activeWorkspace.type === "league-hub" && activeWorkspace.leagueHubId) {
-      const categoryId = leagueHubCategoryId ?? useHomeLeagueWorkspaceMainMenuStore.getState().activeCategoryByHub[activeWorkspace.leagueHubId] ?? null;
+      const categoryId = resolveLeagueHubUrlCategoryId(
+        activeWorkspace.leagueHubId,
+        leagueHubCategoryId ?? useHomeLeagueWorkspaceMainMenuStore.getState().activeCategoryByHub[activeWorkspace.leagueHubId] ?? null
+      );
       const resolved2 = resolveWorkspaceAddress(activeWorkspace, { leagueHubCategoryId: categoryId });
-      if (resolved2?.canonicalUrl) return resolved2.canonicalUrl;
+      if (resolved2?.canonicalUrl) {
+        return preserveFormulaOneRootPath(resolved2.canonicalUrl);
+      }
     }
     if (activeWorkspace.address?.canonicalUrl) {
       return activeWorkspace.address.canonicalUrl;
@@ -104558,7 +104576,7 @@ function resolveActiveWorkspaceCanonicalUrl(input) {
 }
 function writeBrowserCanonicalPath(canonicalPath, replace2) {
   if (typeof window === "undefined") return;
-  const nextPath = normalizeCanonicalPath(canonicalPath);
+  const nextPath = preserveFormulaOneRootPath(normalizeCanonicalPath(canonicalPath));
   const currentPath = window.location.pathname;
   if (currentPath === nextPath) return;
   if (replace2) {
@@ -104573,12 +104591,14 @@ function syncBrowserUrlToCanonical(canonicalPath) {
 function replaceBrowserUrlWithCanonical(canonicalPath) {
   writeBrowserCanonicalPath(canonicalPath, true);
 }
-var DEFAULT_HOME_CANONICAL_URL;
+var F1_HUB_ID2, FORMULA_ONE_ROOT_PATH, DEFAULT_HOME_CANONICAL_URL;
 var init_browserUrlSync = __esm({
   "../grarf/desktop/src/lib/routing/browserUrlSync.ts"() {
     init_define_import_meta_env();
     init_homeLeagueWorkspaceMainMenuStore();
     init_workspaceAddress();
+    F1_HUB_ID2 = "f1";
+    FORMULA_ONE_ROOT_PATH = "/formula-one";
     DEFAULT_HOME_CANONICAL_URL = "/today";
   }
 });
@@ -104942,8 +104962,12 @@ function normalizeBootstrapPathname2(pathname) {
   if (!trimmed || trimmed === "/") return "/";
   return trimmed.replace(/\/+$/, "") || "/";
 }
+function shouldPreserveFormulaOneStartupPath(pathname) {
+  return normalizeBootstrapPathname2(pathname) === FORMULA_ONE_ROOT_PATH2;
+}
 function shouldNormalizeStartupUrl(pathname, canonicalUrl) {
   if (!canonicalUrl) return false;
+  if (shouldPreserveFormulaOneStartupPath(pathname)) return false;
   const normalizedPath = normalizeBootstrapPathname2(pathname);
   const normalizedCanonical = normalizeBootstrapPathname2(canonicalUrl);
   if (normalizedPath === normalizedCanonical) return false;
@@ -104974,6 +104998,7 @@ async function runInitialUrlBootstrap(handlers2) {
   }
   return true;
 }
+var FORMULA_ONE_ROOT_PATH2;
 var init_initialUrlBootstrap = __esm({
   "../grarf/desktop/src/lib/routing/initialUrlBootstrap.ts"() {
     init_define_import_meta_env();
@@ -104983,6 +105008,7 @@ var init_initialUrlBootstrap = __esm({
     init_resolveCenterPaneApplicationModeFromPath();
     init_resolveInitialUrlBootstrapIntent();
     init_resolveInitialUrlBootstrapIntent();
+    FORMULA_ONE_ROOT_PATH2 = "/formula-one";
   }
 });
 
