@@ -22411,7 +22411,11 @@ function SingularityEvidenceExplorer() {
   const [selectedEvidenceId, setSelectedEvidenceId] = (0, import_react8.useState)(null);
   const [filters, setFilters] = (0, import_react8.useState)(EMPTY_EVIDENCE_EXPLORER_FILTERS);
   const catalogGeneration = useEvidenceCatalogStore((state) => state.catalogGeneration);
-  const evidenceItems = useEvidenceCatalogStore((state) => state.getAllEvidence());
+  const evidenceById = useEvidenceCatalogStore((state) => state.evidenceById);
+  const evidenceItems = (0, import_react8.useMemo)(
+    () => Object.values(evidenceById),
+    [evidenceById, catalogGeneration]
+  );
   const catalog = (0, import_react8.useMemo)(() => getGenerateOnceCanonicalEntityCatalog(), [catalogGeneration]);
   const filteredEvidence = (0, import_react8.useMemo)(
     () => filterEvidenceCatalog(evidenceItems, filters, catalog),
