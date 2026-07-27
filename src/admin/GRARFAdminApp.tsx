@@ -1,55 +1,47 @@
 import { useCallback, useMemo } from "react";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
 import "../../admin.css";
 import { AdminSidebar } from "./AdminSidebar";
 import type { AdminNavItemId } from "./adminNav";
 import { OperationsModule } from "./modules/OperationsModule";
 import { SingularityModule } from "./modules/SingularityModule";
 import {
-  buildAdminOperationsPath,
   isAdminHtmlEntry,
-  resolveAdminNavFromPath,
+  resolveAdminNavFromHash,
 } from "./resolveAdminNavFromPath";
-import {
-  buildSingularityAdminPath,
-  DEFAULT_SINGULARITY_ADMIN_PAGE_ID,
-  isSingularityAdminPageId,
-  resolveSingularityAdminPageIdFromPath,
-  type SingularityAdminPageId,
-} from "./singularityAdminNav";
+import { DEFAULT_SINGULARITY_ADMIN_PAGE_ID, type SingularityAdminPageId } from "./singularityAdminNav";
+import { useAdminHashNavigation } from "./useAdminHashNavigation";
+import { useCenterPaneApplicationModeStore } from "../../../grarf/desktop/src/store/centerPaneApplicationModeStore";
 
 export function GRARFAdminApp() {
-  const navigate = useNavigate();
-  const { pathname } = useLocation();
-  const { pageId } = useParams<{ pageId?: string }>();
+  const { hash, parsed, setAdminSection } = useAdminHashNavigation();
 
-  const activeNavItemId = useMemo(() => resolveAdminNavFromPath(pathname), [pathname]);
+  const activeNavItemId = useMemo(() => resolveAdminNavFromHash(hash), [hash]);
 
   const activeSingularityPageId = useMemo((): SingularityAdminPageId => {
-    const fromPath = resolveSingularityAdminPageIdFromPath(pathname);
-    if (fromPath) return fromPath;
-    if (pageId && isSingularityAdminPageId(pageId)) return pageId;
-    return DEFAULT_SINGULARITY_ADMIN_PAGE_ID;
-  }, [pageId, pathname]);
+    return parsed.singularityPageId ?? DEFAULT_SINGULARITY_ADMIN_PAGE_ID;
+  }, [parsed.singularityPageId]);
 
   const onSelectNavItem = useCallback(
     (itemId: AdminNavItemId) => {
       if (itemId === "singularity") {
-        navigate(buildSingularityAdminPath(DEFAULT_SINGULARITY_ADMIN_PAGE_ID, pathname));
+        setAdminSection("singularity", DEFAULT_SINGULARITY_ADMIN_PAGE_ID);
         return;
       }
       if (itemId === "operations") {
-        navigate(buildAdminOperationsPath(pathname));
+        if (isAdminHtmlEntry()) {
+          setAdminSection("operations");
+          useCenterPaneApplicationModeStore.getState().setModeExplicit("operations");
+        }
       }
     },
-    [navigate, pathname]
+    [setAdminSection]
   );
 
   const onSelectSingularityPage = useCallback(
     (nextPageId: SingularityAdminPageId) => {
-      navigate(buildSingularityAdminPath(nextPageId, pathname));
+      setAdminSection("singularity", nextPageId);
     },
-    [navigate, pathname]
+    [setAdminSection]
   );
 
   return (

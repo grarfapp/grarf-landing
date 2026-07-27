@@ -76,26 +76,3 @@ export function resolveSingularityAdminPage(
 ): SingularityAdminPage {
   return SINGULARITY_PAGE_BY_ID.get(pageId)!;
 }
-
-export function buildSingularityAdminPath(
-  pageId: SingularityAdminPageId = DEFAULT_SINGULARITY_ADMIN_PAGE_ID,
-  pathname = window.location.pathname
-): string {
-  const segments = pathname.replace(/\/+$/, "").split("/").filter(Boolean);
-  const adminIdx = segments.lastIndexOf("admin.html");
-  const page = resolveSingularityAdminPage(pageId);
-  if (adminIdx >= 0) {
-    const prefix = `/${segments.slice(0, adminIdx + 1).join("/")}`;
-    return `${prefix}/singularity/${page.pathSegment}`;
-  }
-  return `/singularity/${page.pathSegment}`;
-}
-
-export function resolveSingularityAdminPageIdFromPath(
-  pathname: string
-): SingularityAdminPageId | null {
-  const segments = pathname.replace(/\/+$/, "").split("/").filter(Boolean);
-  const singularityIdx = segments.indexOf("singularity");
-  if (singularityIdx < 0) return null;
-  return resolveSingularityAdminPageIdFromSegment(segments[singularityIdx + 1]);
-}
