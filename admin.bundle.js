@@ -15245,6 +15245,9 @@ function deriveChannelLabelFromStreamUrl(streamUrl) {
   return null;
 }
 
+// ../grarf/shared/domain/manualEvents/resolveSourceTimezone.ts
+init_define_import_meta_env();
+
 // ../grarf/desktop/src/lib/gamesSpine/manual/manualGamesSpineUtils.ts
 var WALL_CLOCK_RE = /^(\d{4})-(\d{2})-(\d{2})[T ](\d{2}):(\d{2})(?::(\d{2}))?(?:\.\d{1,3})?(?:Z|[+-]\d{2}:?\d{2})?$/;
 function calendarPartsInTimeZone2(ms, timeZone) {
