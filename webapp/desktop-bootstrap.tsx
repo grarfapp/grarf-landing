@@ -6,7 +6,9 @@ import "./grarf-web-shim";
 import "../../grarf/desktop/src/lib/livetrack/bootLiveTrack";
 import { StrictMode, useEffect, useState } from "react";
 import { createRoot, type Root } from "react-dom/client";
-import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes, useParams } from "react-router-dom";
+import { GRARFAdminApp } from "../src/admin/GRARFAdminApp";
+import { isSingularityAdminPageId } from "../src/admin/singularityAdminNav";
 import { AnalyticsProvider } from "../../grarf/desktop/src/components/analytics/AnalyticsProvider";
 import { AppShellLayout } from "../../grarf/desktop/src/layouts/AppShellLayout";
 import { leagueDirectoryUniqueRoutes } from "../../grarf/desktop/src/data/leagueDirectoryV1";
@@ -27,6 +29,10 @@ import { useAdminModeStore } from "../../grarf/desktop/src/store/adminModeStore"
 import { resolveCenterPaneApplicationModeFromPath } from "../../grarf/desktop/src/lib/home/resolveCenterPaneApplicationModeFromPath";
 import { hydrateOperationalGameOverridesFromPersistence } from "../../grarf/desktop/src/lib/operationsSpine/hydrateOperationalGameOverrides";
 import { hydrateOperationalLiveWorkspaceFromPersistence } from "../../grarf/desktop/src/lib/operationsSpine/hydrateOperationalLiveWorkspace";
+import { LiveGamesBridge } from "../../grarf/desktop/src/components/LiveGamesBridge";
+import { HomeLiveTrackIngestBridge } from "../../grarf/desktop/src/components/homeMvp/HomeLiveTrackIngestBridge";
+import { HomeLiveTrackWireFeedBridge } from "../../grarf/desktop/src/components/homeMvp/HomeLiveTrackWireFeedBridge";
+import { resolveSingularityAdminPageIdFromPath } from "../src/admin/singularityAdminNav";
 
 let reactRoot: Root | null = null;
 
@@ -38,6 +44,7 @@ function isAdminHtmlEntry(): boolean {
 function activateAdminEntry(): void {
   markGrarfAdmin();
   useAdminModeStore.getState().enterAdminMode();
+  if (resolveSingularityAdminPageIdFromPath(window.location.pathname)) return;
   if (!resolveCenterPaneApplicationModeFromPath(window.location.pathname)) {
     useCenterPaneApplicationModeStore.getState().setModeExplicit("operations");
   }
@@ -104,6 +111,29 @@ const adminAppShellRouteElements = (
   </>
 );
 
+function SingularityAdminRuntimeBridge() {
+  return (
+    <>
+      <LiveGamesBridge />
+      <HomeLiveTrackWireFeedBridge />
+      <HomeLiveTrackIngestBridge />
+    </>
+  );
+}
+
+function SingularityAdminRoute() {
+  const { pageId } = useParams<{ pageId?: string }>();
+  if (pageId && !isSingularityAdminPageId(pageId)) {
+    return <Navigate to="../evidence" replace />;
+  }
+  return (
+    <>
+      <SingularityAdminRuntimeBridge />
+      <GRARFAdminApp />
+    </>
+  );
+}
+
 function WebHomeApp() {
   return (
     <AnalyticsProvider>
@@ -119,6 +149,8 @@ function WebHomeApp() {
         <Route path="admin.html" element={<AppShellLayout />}>
           {adminAppShellRouteElements}
         </Route>
+        <Route path="admin.html/singularity" element={<Navigate to="evidence" replace />} />
+        <Route path="admin.html/singularity/:pageId" element={<SingularityAdminRoute />} />
         <Route path="admin/sportscape" element={<SportscapeEditorialAdminPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

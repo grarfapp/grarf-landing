@@ -1,6 +1,993 @@
 @import "https://fonts.googleapis.com/css2?family=DM+Mono:wght@400&display=swap";
 @import "https://fonts.googleapis.com/css2?family=Datatype&display=swap";
 
+/* admin.css */
+:root {
+  color-scheme: dark;
+  --admin-bg: #0c0e12;
+  --admin-surface: #141820;
+  --admin-surface-raised: #1a1f2a;
+  --admin-border: #2a3140;
+  --admin-text: #e8ecf4;
+  --admin-text-muted: #8b95a8;
+  --admin-accent: #5b8def;
+  --admin-accent-muted: #3d5f99;
+  --admin-sidebar-width: 240px;
+  --admin-console-width: 440px;
+  font-family:
+    Inter,
+    system-ui,
+    -apple-system,
+    sans-serif;
+}
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+html,
+body,
+#root {
+  margin: 0;
+  min-height: 100%;
+  height: 100%;
+  background: var(--admin-bg);
+  color: var(--admin-text);
+}
+.grarf-admin {
+  display: flex;
+  min-height: 100%;
+  height: 100%;
+}
+.grarf-admin__sidebar {
+  width: var(--admin-sidebar-width);
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--admin-border);
+  background: var(--admin-surface);
+}
+.grarf-admin__brand {
+  padding: 20px 18px 16px;
+  border-bottom: 1px solid var(--admin-border);
+}
+.grarf-admin__brand-title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+.grarf-admin__brand-subtitle {
+  margin: 4px 0 0;
+  font-size: 12px;
+  color: var(--admin-text-muted);
+}
+.grarf-admin__nav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 12px 10px;
+  flex: 1;
+}
+.grarf-admin__nav-item {
+  display: block;
+  width: 100%;
+  padding: 10px 12px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--admin-text);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+}
+.grarf-admin__nav-item:hover:not(:disabled) {
+  background: var(--admin-surface-raised);
+}
+.grarf-admin__nav-item--active {
+  background: var(--admin-accent-muted);
+  color: #fff;
+}
+.grarf-admin__nav-item:disabled {
+  color: var(--admin-text-muted);
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+.grarf-admin__main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.grarf-admin__module-header {
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid var(--admin-border);
+}
+.grarf-admin__module-title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+}
+.grarf-admin__module-description {
+  margin: 6px 0 0;
+  font-size: 13px;
+  color: var(--admin-text-muted);
+  max-width: 72ch;
+}
+.grarf-admin__toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 14px;
+}
+.grarf-admin__label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--admin-text-muted);
+}
+.grarf-admin__select {
+  min-width: 160px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--admin-border);
+  background: var(--admin-surface-raised);
+  color: var(--admin-text);
+  font: inherit;
+  font-size: 13px;
+}
+.grarf-admin__status {
+  font-size: 12px;
+  color: var(--admin-text-muted);
+}
+.grarf-admin__status--error {
+  color: #f87171;
+}
+.grarf-admin__operations-body {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(220px, 280px) minmax(260px, 1fr) var(--admin-console-width);
+}
+.grarf-admin__operations-search {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+  padding: 0 2px;
+}
+.grarf-admin__operations-search-label {
+  flex-shrink: 0;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--admin-text-muted);
+}
+.grarf-admin__operations-search-input {
+  flex: 1;
+  min-width: 0;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--admin-border);
+  background: var(--admin-surface-raised);
+  color: var(--admin-text);
+  font: inherit;
+  font-size: 13px;
+}
+.grarf-admin__operations-search-input::placeholder {
+  color: var(--admin-text-muted);
+}
+.grarf-admin__operations-search-input:focus {
+  outline: none;
+  border-color: var(--admin-accent-muted);
+  box-shadow: 0 0 0 1px rgba(91, 141, 239, 0.25);
+}
+.grarf-admin__panel {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--admin-border);
+}
+.grarf-admin__panel:last-child {
+  border-right: none;
+}
+.grarf-admin__panel-header {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--admin-border);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--admin-text-muted);
+}
+.grarf-admin__panel-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+}
+.grarf-admin__list {
+  list-style: none;
+  margin: 0;
+  padding: 6px;
+}
+.grarf-admin__list-item {
+  margin: 0;
+}
+.grarf-admin__list-button {
+  display: block;
+  width: 100%;
+  padding: 10px 12px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--admin-text);
+  font: inherit;
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+}
+.grarf-admin__list-button:hover {
+  background: var(--admin-surface-raised);
+}
+.grarf-admin__list-button--active {
+  background: rgba(91, 141, 239, 0.18);
+  outline: 1px solid var(--admin-accent-muted);
+}
+.grarf-admin__list-button-subtitle {
+  display: block;
+  margin-top: 3px;
+  font-size: 11px;
+  color: var(--admin-text-muted);
+}
+.grarf-admin__list-button-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+.grarf-admin__list-button-label {
+  min-width: 0;
+  flex: 1;
+}
+.grarf-admin__game-indicators {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 2px;
+}
+.grarf-admin__game-indicator {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  font-size: 11px;
+  line-height: 1;
+}
+.grarf-admin__game-indicator-emoji {
+  display: block;
+  transform: scale(0.92);
+}
+.grarf-admin__game-indicator--needs-attention {
+  background: rgba(251, 191, 36, 0.14);
+}
+.grarf-admin__game-indicator--missing-stream {
+  background: rgba(248, 113, 113, 0.12);
+}
+.grarf-admin__game-indicator--manual-override {
+  background: rgba(192, 132, 252, 0.12);
+}
+.grarf-admin__game-indicator--navigation-override {
+  background: rgba(74, 222, 128, 0.12);
+}
+.grarf-admin__game-indicator--featured {
+  background: rgba(250, 204, 21, 0.12);
+}
+.grarf-admin__empty {
+  padding: 24px 16px;
+  font-size: 13px;
+  color: var(--admin-text-muted);
+}
+.grarf-admin__console {
+  padding: 14px 16px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.grarf-admin__console-section {
+  border: 1px solid var(--admin-border);
+  border-radius: 10px;
+  background: var(--admin-surface);
+  overflow: hidden;
+}
+.grarf-admin__console-section--prominent {
+  border-color: #3a4f73;
+  background:
+    linear-gradient(
+      180deg,
+      #171d28 0%,
+      var(--admin-surface) 100%);
+}
+.grarf-admin__console-section--system {
+  border-style: dashed;
+  background: transparent;
+}
+.grarf-admin__console-section-header {
+  padding: 12px 14px 0;
+}
+.grarf-admin__console-section-title {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--admin-text);
+}
+.grarf-admin__console-section-description {
+  margin: 6px 0 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--admin-text-muted);
+}
+.grarf-admin__console-section-body {
+  padding: 12px 14px 14px;
+}
+.grarf-admin__console-game-summary {
+  margin-bottom: 12px;
+  padding: 12px 14px;
+  border-radius: 8px;
+  background: rgba(91, 141, 239, 0.08);
+  border: 1px solid rgba(91, 141, 239, 0.18);
+}
+.grarf-admin__console-game-title {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+.grarf-admin__console-game-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+.grarf-admin__console-status-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: rgba(91, 141, 239, 0.16);
+  color: #dbe7ff;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+.grarf-admin__console-status-line {
+  font-size: 12px;
+  color: var(--admin-text-muted);
+}
+.grarf-admin__console-field-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+.grarf-admin__console-field-grid--compact {
+  gap: 8px;
+}
+.grarf-admin__console-field {
+  display: grid;
+  gap: 4px;
+}
+.grarf-admin__console-field-label {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--admin-text-muted);
+}
+.grarf-admin__console-field-value {
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--admin-text);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.grarf-admin__console-field-value--mono {
+  font-family:
+    "JetBrains Mono",
+    ui-monospace,
+    monospace;
+  font-size: 11px;
+}
+.grarf-admin__console-field-empty {
+  font-size: 12px;
+  font-style: italic;
+  color: #6f7a8f;
+}
+.grarf-admin__console-override-grid {
+  display: grid;
+  gap: 12px;
+}
+.grarf-admin__console-override-field {
+  display: grid;
+  gap: 6px;
+}
+.grarf-admin__console-override-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--admin-text);
+}
+.grarf-admin__console-override-value {
+  padding: 10px 12px;
+  border: 1px solid var(--admin-border);
+  border-radius: 8px;
+  background: var(--admin-surface-raised);
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--admin-text);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.grarf-admin__console-override-value--mono {
+  font-family:
+    "JetBrains Mono",
+    ui-monospace,
+    monospace;
+  font-size: 11px;
+}
+.grarf-admin__console-override-empty {
+  padding: 10px 12px;
+  border: 1px dashed #3a4254;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.02);
+  font-size: 12px;
+  color: #7d879b;
+}
+.grarf-admin__console-input,
+.grarf-admin__console-textarea,
+.grarf-admin__console-select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--admin-border);
+  border-radius: 8px;
+  background: var(--admin-bg);
+  color: var(--admin-text);
+  font: inherit;
+  font-size: 13px;
+  line-height: 1.45;
+}
+.grarf-admin__console-input:focus,
+.grarf-admin__console-textarea:focus,
+.grarf-admin__console-select:focus {
+  outline: none;
+  border-color: var(--admin-accent-muted);
+  box-shadow: 0 0 0 2px rgba(91, 141, 239, 0.15);
+}
+.grarf-admin__console-input::placeholder,
+.grarf-admin__console-textarea::placeholder {
+  color: #5f6b80;
+}
+.grarf-admin__console-input--mono,
+.grarf-admin__console-textarea--mono {
+  font-family:
+    "JetBrains Mono",
+    ui-monospace,
+    monospace;
+  font-size: 11px;
+}
+.grarf-admin__console-textarea {
+  resize: vertical;
+  min-height: 72px;
+}
+.grarf-admin__console-select {
+  cursor: pointer;
+}
+.grarf-admin__console-save-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--admin-border);
+}
+.grarf-admin__console-save-meta {
+  min-width: 0;
+  flex: 1;
+}
+.grarf-admin__console-save-pending {
+  font-size: 12px;
+  color: #fbbf24;
+}
+.grarf-admin__console-save-pending--idle {
+  color: var(--admin-text-muted);
+}
+.grarf-admin__console-save-button {
+  flex-shrink: 0;
+  padding: 8px 14px;
+  border: 1px solid var(--admin-accent-muted);
+  border-radius: 8px;
+  background: rgba(91, 141, 239, 0.14);
+  color: #dbe7ff;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.grarf-admin__console-save-button:hover:not(:disabled) {
+  background: rgba(91, 141, 239, 0.22);
+}
+.grarf-admin__console-save-button:disabled,
+.grarf-admin__pending-discard-button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.grarf-admin__pending-discard-button {
+  flex-shrink: 0;
+  padding: 8px 14px;
+  border: 1px solid var(--admin-border);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--admin-text-muted);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.grarf-admin__pending-discard-button:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--admin-text);
+}
+.grarf-admin__pending-bar {
+  margin-bottom: 16px;
+  padding: 14px 16px;
+  border: 1px solid rgba(251, 191, 36, 0.28);
+  border-radius: 10px;
+  background: rgba(251, 191, 36, 0.06);
+}
+.grarf-admin__pending-bar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.grarf-admin__pending-bar-summary {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+.grarf-admin__pending-bar-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  height: 40px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: rgba(251, 191, 36, 0.18);
+  border: 1px solid rgba(251, 191, 36, 0.45);
+  color: #fde68a;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1;
+}
+.grarf-admin__pending-bar-copy {
+  min-width: 0;
+}
+.grarf-admin__pending-bar-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--admin-text);
+}
+.grarf-admin__pending-bar-subtitle {
+  margin-top: 2px;
+  font-size: 12px;
+  color: var(--admin-text-muted);
+}
+.grarf-admin__pending-bar-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.grarf-admin__pending-game-list {
+  list-style: none;
+  margin: 14px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+.grarf-admin__pending-game-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.16);
+  border: 1px solid var(--admin-border);
+}
+.grarf-admin__pending-game-marker {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: #fbbf24;
+  flex-shrink: 0;
+}
+.grarf-admin__pending-game-copy {
+  min-width: 0;
+  flex: 1;
+}
+.grarf-admin__pending-game-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--admin-text);
+}
+.grarf-admin__pending-game-meta {
+  margin-top: 2px;
+  font-size: 11px;
+  color: var(--admin-text-muted);
+}
+.grarf-admin__pending-game-ready {
+  flex-shrink: 0;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: rgba(74, 222, 128, 0.12);
+  border: 1px solid rgba(74, 222, 128, 0.28);
+  color: #86efac;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.grarf-admin__pending-collection {
+  display: grid;
+  gap: 10px;
+  margin-top: 12px;
+}
+.grarf-admin__pending-collection-item {
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.14);
+  border: 1px solid var(--admin-border);
+}
+.grarf-admin__pending-collection-game {
+  margin-bottom: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--admin-text);
+}
+.grarf-admin__list-button--pending {
+  border-color: rgba(251, 191, 36, 0.35);
+}
+.grarf-admin__list-pending-badge {
+  flex-shrink: 0;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: rgba(251, 191, 36, 0.14);
+  border: 1px solid rgba(251, 191, 36, 0.35);
+  color: #fde68a;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+.grarf-admin__console-save-feedback {
+  margin-top: 14px;
+  padding: 12px 14px;
+  border-radius: 8px;
+}
+.grarf-admin__console-save-feedback--error {
+  border: 1px solid rgba(248, 113, 113, 0.35);
+  background: rgba(248, 113, 113, 0.08);
+}
+.grarf-admin__console-save-feedback--success {
+  border: 1px solid rgba(74, 222, 128, 0.28);
+  background: rgba(74, 222, 128, 0.08);
+}
+.grarf-admin__console-save-feedback-title {
+  margin: 0 0 8px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.grarf-admin__console-save-feedback--error .grarf-admin__console-save-feedback-title {
+  color: #fca5a5;
+}
+.grarf-admin__console-save-feedback--success .grarf-admin__console-save-feedback-title {
+  color: #86efac;
+}
+.grarf-admin__console-save-message {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--admin-text);
+}
+.grarf-admin__console-save-error-list {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 12px;
+  line-height: 1.45;
+  color: #fecaca;
+}
+.grarf-admin__console-change-set {
+  display: grid;
+  gap: 10px;
+}
+.grarf-admin__console-change-set-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+.grarf-admin__console-change-set-item {
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.18);
+  border: 1px solid var(--admin-border);
+}
+.grarf-admin__console-change-set-field {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--admin-text-muted);
+}
+.grarf-admin__console-change-set-values {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 4px;
+  font-size: 12px;
+  line-height: 1.45;
+}
+.grarf-admin__console-change-set-original {
+  color: #9aa6bb;
+  word-break: break-word;
+}
+.grarf-admin__console-change-set-arrow {
+  flex-shrink: 0;
+  color: var(--admin-text-muted);
+}
+.grarf-admin__console-change-set-edited {
+  color: var(--admin-text);
+  word-break: break-word;
+}
+.grarf-admin__mono {
+  font-family:
+    "JetBrains Mono",
+    ui-monospace,
+    monospace;
+  font-size: 11px;
+}
+.grarf-admin__console-system-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 12px 14px;
+  border: none;
+  background: transparent;
+  color: var(--admin-text-muted);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.grarf-admin__console-system-toggle:hover {
+  color: var(--admin-text);
+  background: var(--admin-surface-raised);
+}
+.grarf-admin__console-system-toggle-icon {
+  font-size: 16px;
+  line-height: 1;
+}
+.grarf-admin__console-system-body {
+  border-top: 1px solid var(--admin-border);
+  padding-top: 12px;
+}
+.grarf-admin__singularity {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.grarf-admin__subnav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 16px 24px 0;
+}
+.grarf-admin__subnav-item {
+  padding: 8px 12px;
+  border: 1px solid var(--admin-border);
+  border-radius: 8px;
+  background: var(--admin-surface-raised);
+  color: var(--admin-text);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.grarf-admin__subnav-item:hover {
+  border-color: var(--admin-accent-muted);
+}
+.grarf-admin__subnav-item--active {
+  border-color: var(--admin-accent);
+  background: var(--admin-accent-muted);
+  color: #fff;
+}
+.grarf-admin__placeholder {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.grarf-admin__placeholder-body {
+  flex: 1;
+  padding: 24px;
+}
+.grarf-admin__placeholder-notice {
+  margin: 0;
+  max-width: 48ch;
+  padding: 16px 18px;
+  border: 1px dashed var(--admin-border);
+  border-radius: 10px;
+  background: var(--admin-surface-raised);
+  color: var(--admin-text-muted);
+  font-size: 13px;
+}
+.grarf-admin__singularity .grarf-admin__evidence-explorer {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.grarf-admin__evidence-meta {
+  margin-top: 8px;
+  font-size: 12px;
+  color: var(--admin-text-muted);
+}
+.grarf-admin__evidence-filters {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px 12px;
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--admin-border);
+}
+.grarf-admin__evidence-filter {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+.grarf-admin__evidence-body {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(220px, 280px) minmax(240px, 1fr) minmax(280px, 360px);
+}
+.grarf-admin__evidence-games,
+.grarf-admin__evidence-list,
+.grarf-admin__evidence-detail {
+  min-height: 0;
+  overflow-y: auto;
+  border-right: 1px solid var(--admin-border);
+}
+.grarf-admin__evidence-detail {
+  border-right: none;
+}
+.grarf-admin__evidence-column-title {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--admin-border);
+  background: var(--admin-bg);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--admin-text-muted);
+}
+.grarf-admin__evidence-empty {
+  padding: 16px;
+  font-size: 13px;
+  color: var(--admin-text-muted);
+}
+.grarf-admin__evidence-game,
+.grarf-admin__evidence-item {
+  display: block;
+  width: 100%;
+  padding: 12px 16px;
+  border: none;
+  border-bottom: 1px solid var(--admin-border);
+  background: transparent;
+  color: var(--admin-text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.grarf-admin__evidence-game:hover,
+.grarf-admin__evidence-item:hover {
+  background: var(--admin-surface-raised);
+}
+.grarf-admin__evidence-game--active,
+.grarf-admin__evidence-item--active {
+  background: var(--admin-accent-muted);
+  color: #fff;
+}
+.grarf-admin__evidence-game--unattached {
+  margin-top: 8px;
+  border-top: 1px solid var(--admin-border);
+}
+.grarf-admin__evidence-game-title,
+.grarf-admin__evidence-item-title {
+  font-size: 13px;
+  font-weight: 600;
+}
+.grarf-admin__evidence-game-meta,
+.grarf-admin__evidence-item-meta {
+  margin-top: 4px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--admin-text-muted);
+}
+.grarf-admin__evidence-game--active .grarf-admin__evidence-game-meta,
+.grarf-admin__evidence-item--active .grarf-admin__evidence-item-meta {
+  color: rgba(255, 255, 255, 0.82);
+}
+.grarf-admin__evidence-game-id {
+  margin-top: 6px;
+  color: var(--admin-text-muted);
+  word-break: break-all;
+}
+.grarf-admin__evidence-game--active .grarf-admin__evidence-game-id {
+  color: rgba(255, 255, 255, 0.72);
+}
+.grarf-admin__evidence-detail-body {
+  padding: 16px;
+}
+.grarf-admin__evidence-detail-section + .grarf-admin__evidence-detail-section {
+  margin-top: 18px;
+}
+.grarf-admin__evidence-detail-section-title {
+  margin-bottom: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--admin-accent);
+}
+.grarf-admin__evidence-detail-row + .grarf-admin__evidence-detail-row {
+  margin-top: 8px;
+}
+.grarf-admin__evidence-detail-value {
+  margin-top: 2px;
+  font-size: 13px;
+  word-break: break-word;
+}
+.grarf-admin__evidence-attachment {
+  padding: 10px 12px;
+  border: 1px solid var(--admin-border);
+  border-radius: 8px;
+  background: var(--admin-surface-raised);
+}
+.grarf-admin__evidence-attachment + .grarf-admin__evidence-attachment {
+  margin-top: 8px;
+}
+.grarf-admin__evidence-warning {
+  font-size: 13px;
+  line-height: 1.5;
+  color: #f0d7a8;
+}
+
 /* ../grarf/desktop/src/lib/gamesSpine/gamesSpineLeagueHeaderTypography.css */
 .games-spine-league-header-name {
   font-family:
