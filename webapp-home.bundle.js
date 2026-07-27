@@ -74289,6 +74289,13 @@ function resolveGamesSpineCardTimingLabel(game, scheduleLabel) {
   }
   return stripLivePrefix(scheduleLabel);
 }
+function isManuallyEnteredGame(game) {
+  return Boolean(game.metadata?.manualEvent) || Boolean(game.metadata?.manualGamesSpine) || game.id.startsWith("manual-event-") || game.id.startsWith("manual-gs-");
+}
+function shouldShowGamesSpineCardLiveTimingLabel(game) {
+  if (!isManuallyEnteredGame(game)) return true;
+  return game.league === "F1";
+}
 var SOCCER_LEAGUES2, GOLF_SPINE_LIVE_ROUND_LABEL_LEAGUES;
 var init_resolveGamesSpineCardTimingLabel = __esm({
   "../grarf/desktop/src/lib/gamesSpine/resolveGamesSpineCardTimingLabel.ts"() {
@@ -75141,7 +75148,7 @@ function GamesSpineCardStatusRow({
       {
         className: "min-w-0 px-1",
         "aria-hidden": isScheduled || isFinal || isDelayed || isPostponed || isSuspended || void 0,
-        children: timingLabel && isLive ? /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: GAMES_SPINE_CARD_TIMING_CLASS, children: timingLabel }) : null
+        children: timingLabel && isLive && shouldShowGamesSpineCardLiveTimingLabel(game) ? /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: GAMES_SPINE_CARD_TIMING_CLASS, children: timingLabel }) : null
       }
     ),
     /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "flex min-w-0 items-center justify-end", children: !isFinal && !isDelayed && !isPostponed && !isSuspended ? /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(
