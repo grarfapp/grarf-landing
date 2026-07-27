@@ -38868,30 +38868,6 @@ var init_ufcJul252026LiveBrowserTemporaryOverride = __esm({
   }
 });
 
-// ../grarf/desktop/src/lib/home/boxingJul262026LiveBrowserTemporaryOverride.ts
-function isBoxingJul262026LiveBrowserOverrideActive(now = /* @__PURE__ */ new Date()) {
-  return getOperationalSportsDayDateKey(now) === BOXING_JUL_26_2026_LIVE_BROWSER_OVERRIDE_DATE_KEY;
-}
-function resolveBoxingJul262026LiveBrowserOverrideSources() {
-  if (!isBoxingJul262026LiveBrowserOverrideActive()) return null;
-  return [
-    {
-      id: "boxing__temporary_live_berlanga_vs_butler_jul_26_2026",
-      label: "Box.Live \u2014 Berlanga vs Butler",
-      url: BOXING_JUL_26_2026_LIVE_BROWSER_BOX_LIVE_URL
-    }
-  ];
-}
-var BOXING_JUL_26_2026_LIVE_BROWSER_OVERRIDE_DATE_KEY, BOXING_JUL_26_2026_LIVE_BROWSER_BOX_LIVE_URL;
-var init_boxingJul262026LiveBrowserTemporaryOverride = __esm({
-  "../grarf/desktop/src/lib/home/boxingJul262026LiveBrowserTemporaryOverride.ts"() {
-    init_define_import_meta_env();
-    init_operationalSlateDate2();
-    BOXING_JUL_26_2026_LIVE_BROWSER_OVERRIDE_DATE_KEY = "2026-07-26";
-    BOXING_JUL_26_2026_LIVE_BROWSER_BOX_LIVE_URL = "https://box.live/fights/berlanga-vs-butler/";
-  }
-});
-
 // ../grarf/desktop/src/lib/gamesSpine/pgaTourFollowLiveWorkspaceIntent.ts
 function armPgaTourFollowLiveWorkspaceIntent() {
   followLiveWorkspaceArmed = true;
@@ -38946,10 +38922,6 @@ function resolveLiveWorkspaceTabSourcesForHub(hubId, itemsByLeagueKey) {
     const temporaryOverride = resolveUfcJul252026LiveBrowserOverrideSources();
     if (temporaryOverride) return temporaryOverride;
   }
-  if (hubId === "boxing") {
-    const temporaryOverride = resolveBoxingJul262026LiveBrowserOverrideSources();
-    if (temporaryOverride) return temporaryOverride;
-  }
   const followLiveSources = resolvePgaTourFollowLiveWorkspaceTabSources();
   if (hubId === "pga-tour" && followLiveSources) {
     return followLiveSources;
@@ -38987,7 +38959,6 @@ var init_resolveOperationsLiveWorkspaceNavigation = __esm({
     init_homeLeagueWorkspaceHubRegistry();
     init_adminOperationsLiveWorkspaceStore();
     init_ufcJul252026LiveBrowserTemporaryOverride();
-    init_boxingJul262026LiveBrowserTemporaryOverride();
     init_pgaTourFollowLiveWorkspaceIntent();
   }
 });
