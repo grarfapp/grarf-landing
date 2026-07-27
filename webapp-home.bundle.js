@@ -46081,6 +46081,49 @@ var init_resolveSourceTimezone = __esm({
   }
 });
 
+// ../grarf/shared/domain/manualEvents/manualEventCardSections.ts
+function resolveManualEventCardHasTitle(event) {
+  return Boolean(event.eventName?.trim());
+}
+function resolveManualEventCardHasFeaturedMatchup(event) {
+  return Boolean(event.team1?.name?.trim() && event.team2?.name?.trim());
+}
+function resolveManualEventCardHasUndercard(event) {
+  return (event.undercard ?? []).some(
+    (matchup) => Boolean(matchup.team1?.name?.trim() && matchup.team2?.name?.trim())
+  );
+}
+function resolveManualEventCardHasPartialFeaturedMatchup(event) {
+  const team1Name = event.team1?.name?.trim() ?? "";
+  const team2Name = event.team2?.name?.trim() ?? "";
+  return Boolean(team1Name || team2Name) && !(team1Name && team2Name);
+}
+function resolveManualEventCardHasContent(event) {
+  return resolveManualEventCardHasTitle(event) || resolveManualEventCardHasFeaturedMatchup(event) || resolveManualEventCardHasUndercard(event);
+}
+function resolveOperationsEventCardHasTitle(eventName) {
+  return Boolean(eventName.trim());
+}
+function resolveOperationsEventCardHasFeaturedMatchup(team1Name, team2Name) {
+  return Boolean(team1Name.trim() && team2Name.trim());
+}
+function resolveOperationsEventCardHasPartialFeaturedMatchup(team1Name, team2Name) {
+  const away = team1Name.trim();
+  const home = team2Name.trim();
+  return Boolean(away || home) && !(away && home);
+}
+function resolveOperationsEventCardHasUndercard(undercard) {
+  return undercard.some((row) => Boolean(row.team1Name.trim() && row.team2Name.trim()));
+}
+function resolveOperationsEventCardHasContent(input) {
+  return resolveOperationsEventCardHasTitle(input.eventName) || resolveOperationsEventCardHasFeaturedMatchup(input.team1Name, input.team2Name) || resolveOperationsEventCardHasUndercard(input.undercard);
+}
+var init_manualEventCardSections = __esm({
+  "../grarf/shared/domain/manualEvents/manualEventCardSections.ts"() {
+    init_define_import_meta_env();
+  }
+});
+
 // ../grarf/shared/domain/manualEvents/normalizeManualEvent.ts
 function slugPart(value) {
   return value.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
@@ -46090,8 +46133,20 @@ function resolveLayout(event) {
   return event.eventName?.trim() ? "event-only" : "head-to-head";
 }
 function resolveIdentitySlug(event) {
-  if (event.cardLayout === "event-card" && event.eventName?.trim()) {
-    return slugPart(event.eventName);
+  if (event.cardLayout === "event-card") {
+    if (event.eventName?.trim()) return slugPart(event.eventName);
+    if (resolveManualEventCardHasFeaturedMatchup(event)) {
+      const away2 = event.team1.name.trim();
+      const home2 = event.team2.name.trim();
+      return `${slugPart(away2)}-vs-${slugPart(home2)}`;
+    }
+    const firstUndercard = (event.undercard ?? []).find(
+      (matchup) => matchup.team1?.name?.trim() && matchup.team2?.name?.trim()
+    );
+    if (firstUndercard) {
+      return `${slugPart(firstUndercard.team1.name)}-vs-${slugPart(firstUndercard.team2.name)}`;
+    }
+    return "event-card";
   }
   if (event.eventName?.trim()) return slugPart(event.eventName);
   const away = event.team1?.name?.trim() ?? "away";
@@ -46151,6 +46206,30 @@ function normalizeManualEventDefinition(event, league2, broadcaster = resolveFal
   if (layout === "event-only") {
     awayTeam = event.eventName.trim();
     awayLogoUrl = resolveManualLeagueLogo(league2);
+  } else if (layout === "event-card") {
+    const title = event.eventName?.trim();
+    const team1Name = event.team1?.name?.trim();
+    const team2Name = event.team2?.name?.trim();
+    if (team1Name && team2Name) {
+      awayTeam = team1Name;
+      homeTeam = team2Name;
+      awayLogoUrl = event.team1.logo?.trim() || void 0;
+      homeLogoUrl = event.team2.logo?.trim() || void 0;
+      awayParticipantImageUrl = awayLogoUrl;
+      homeParticipantImageUrl = homeLogoUrl;
+    } else if (title) {
+      awayTeam = title;
+      awayLogoUrl = resolveManualLeagueLogo(league2);
+    } else {
+      const firstUndercard = (event.undercard ?? []).find(
+        (matchup) => matchup.team1?.name?.trim() && matchup.team2?.name?.trim()
+      );
+      if (firstUndercard) {
+        awayTeam = `${firstUndercard.team1.name.trim()} vs ${firstUndercard.team2.name.trim()}`;
+      } else {
+        awayTeam = resolveManualLeagueDisplayName(league2);
+      }
+    }
   } else {
     awayTeam = event.team1.name.trim();
     homeTeam = event.team2.name.trim();
@@ -46234,6 +46313,7 @@ var init_normalizeManualEvent = __esm({
     init_manualLeaguesStore();
     init_manualBroadcastersStore();
     init_resolveSourceTimezone();
+    init_manualEventCardSections();
     CHANNEL_LABEL_TO_STREAM_PROVIDER = {
       Peacock: "Peacock",
       "ESPN+": "ESPN+",
@@ -46281,16 +46361,20 @@ function validateManualEventDefinition(event, index) {
   const hasTeams = hasTeam1 || hasTeam2;
   const isEventCard = event.cardLayout === "event-card";
   if (isEventCard) {
-    if (!hasEventName) {
-      errors.push({ index, field: "eventName", message: "eventName is required for event cards" });
-    }
-    if (!hasTeam1 || !hasTeam2) {
+    if (!resolveManualEventCardHasContent(event)) {
       errors.push({
         index,
         field: "identity",
-        message: "Event cards require both featured matchup participants"
+        message: "Event card must include an event title, featured matchup, or undercard"
       });
-    } else {
+    }
+    if (resolveManualEventCardHasPartialFeaturedMatchup(event)) {
+      errors.push({
+        index,
+        field: "identity",
+        message: "Featured matchup requires both participants"
+      });
+    } else if (resolveManualEventCardHasFeaturedMatchup(event)) {
       validateTeam(event.team1, "team1", index, errors);
       validateTeam(event.team2, "team2", index, errors);
     }
@@ -46303,15 +46387,20 @@ function validateManualEventDefinition(event, index) {
         });
         continue;
       }
+      const team1Name = matchup.team1?.name?.trim() ?? "";
+      const team2Name = matchup.team2?.name?.trim() ?? "";
+      if (!team1Name && !team2Name) continue;
+      if (!team1Name || !team2Name) {
+        errors.push({
+          index,
+          field: `undercard[${matchupIndex}]`,
+          message: `Undercard matchup ${matchupIndex + 1} requires both participant names`
+        });
+        continue;
+      }
       validateTeam(matchup.team1, `undercard[${matchupIndex}].team1`, index, errors);
       validateTeam(matchup.team2, `undercard[${matchupIndex}].team2`, index, errors);
     }
-  } else if (hasEventName && hasTeams) {
-    errors.push({
-      index,
-      field: "identity",
-      message: "Use eventName OR team1 + team2 \u2014 never both"
-    });
   } else if (!hasEventName && !(hasTeam1 && hasTeam2)) {
     errors.push({
       index,
@@ -46374,6 +46463,7 @@ var init_validateManualEventDefinition = __esm({
     init_define_import_meta_env();
     init_manualGamesSpineTime();
     init_resolveSourceTimezone();
+    init_manualEventCardSections();
   }
 });
 
@@ -74433,6 +74523,21 @@ var init_isGamesSpineEventCard = __esm({
 });
 
 // ../grarf/desktop/src/lib/gamesSpine/resolveGamesSpineEventCardPresentation.ts
+function resolveFeaturedMatchupPresentation(game) {
+  const awayTeam = game.awayTeam?.trim() ?? "";
+  const homeTeam = game.homeTeam?.trim() ?? "";
+  if (!awayTeam || !homeTeam) return null;
+  return {
+    participantA: {
+      name: homeTeam,
+      imageUrl: resolveDarkThemeLogoUrl(game, "home")
+    },
+    participantB: {
+      name: awayTeam,
+      imageUrl: resolveDarkThemeLogoUrl(game, "away")
+    }
+  };
+}
 function resolveUndercardParticipant(team) {
   return {
     name: team?.name?.trim() ?? "",
@@ -74454,16 +74559,7 @@ function resolveGamesSpineEventCardPresentation(game) {
   );
   return {
     eventTitle,
-    featuredMatchup: {
-      participantA: {
-        name: game.homeTeam?.trim() ?? "",
-        imageUrl: resolveDarkThemeLogoUrl(game, "home")
-      },
-      participantB: {
-        name: game.awayTeam?.trim() ?? "",
-        imageUrl: resolveDarkThemeLogoUrl(game, "away")
-      }
-    },
+    featuredMatchup: resolveFeaturedMatchupPresentation(game),
     undercard
   };
 }
@@ -74561,25 +74657,38 @@ function GamesSpineEventCardMatchupBody({
   textClassName,
   teamLogoClassName
 }) {
+  const hasTitle = Boolean(presentation.eventTitle);
+  const hasFeatured = presentation.featuredMatchup != null;
+  const hasUndercard = presentation.undercard.length > 0;
   return /* @__PURE__ */ (0, import_jsx_runtime74.jsxs)(import_jsx_runtime74.Fragment, { children: [
-    presentation.eventTitle ? /* @__PURE__ */ (0, import_jsx_runtime74.jsx)("div", { className: "truncate font-semibold leading-snug text-white", children: presentation.eventTitle }) : null,
-    /* @__PURE__ */ (0, import_jsx_runtime74.jsx)(
+    hasTitle ? /* @__PURE__ */ (0, import_jsx_runtime74.jsx)("div", { className: "truncate font-semibold leading-snug text-white", children: presentation.eventTitle }) : null,
+    hasTitle && hasFeatured ? /* @__PURE__ */ (0, import_jsx_runtime74.jsx)("div", { className: "h-4 shrink-0", "aria-hidden": true }) : null,
+    hasFeatured ? /* @__PURE__ */ (0, import_jsx_runtime74.jsx)(
       GamesSpineEventCardVersusRow,
       {
         matchup: presentation.featuredMatchup,
         textClassName,
         teamLogoClassName
       }
-    ),
-    presentation.undercard.length > 0 ? /* @__PURE__ */ (0, import_jsx_runtime74.jsx)("div", { className: "space-y-1 border-t border-[#2B3239]/35 pt-1", children: presentation.undercard.map((matchup, index) => /* @__PURE__ */ (0, import_jsx_runtime74.jsx)(
-      GamesSpineEventCardVersusRow,
+    ) : null,
+    hasUndercard ? /* @__PURE__ */ (0, import_jsx_runtime74.jsx)(
+      "div",
       {
-        matchup,
-        textClassName,
-        teamLogoClassName
-      },
-      `undercard-${index}`
-    )) }) : null
+        className: cn2(
+          "space-y-1",
+          (hasFeatured || hasTitle) && "border-t border-[#2B3239]/35 pt-1"
+        ),
+        children: presentation.undercard.map((matchup, index) => /* @__PURE__ */ (0, import_jsx_runtime74.jsx)(
+          GamesSpineEventCardVersusRow,
+          {
+            matchup,
+            textClassName,
+            teamLogoClassName
+          },
+          `undercard-${index}`
+        ))
+      }
+    ) : null
   ] });
 }
 function GamesSpineEventCardMatchup({
@@ -74590,6 +74699,10 @@ function GamesSpineEventCardMatchup({
 }) {
   const presentation = resolveGamesSpineEventCardPresentation(game);
   if (!presentation) return null;
+  const hasTitle = Boolean(presentation.eventTitle);
+  const hasFeatured = presentation.featuredMatchup != null;
+  const hasUndercard = presentation.undercard.length > 0;
+  if (!hasTitle && !hasFeatured && !hasUndercard) return null;
   return /* @__PURE__ */ (0, import_jsx_runtime74.jsx)("div", { className: cn2(GAMES_SPINE_MATCHUP_BLOCK, className, "space-y-1.5", textClassName), children: /* @__PURE__ */ (0, import_jsx_runtime74.jsx)(
     GamesSpineEventCardMatchupBody,
     {
@@ -80885,9 +80998,17 @@ function buildManualEventFromOperationsEditorDraft(draft, options) {
   if (draft.eventType === "event-only") {
     if (!draft.eventName.trim()) errors.push("Event name is required");
   } else if (draft.eventType === "event-card") {
-    if (!draft.eventName.trim()) errors.push("Event title is required");
-    if (!draft.team1Name.trim()) errors.push("Featured participant B is required");
-    if (!draft.team2Name.trim()) errors.push("Featured participant A is required");
+    if (!resolveOperationsEventCardHasContent({
+      eventName: draft.eventName,
+      team1Name: draft.team1Name,
+      team2Name: draft.team2Name,
+      undercard: draft.undercard
+    })) {
+      errors.push("Event card must include an event title, featured matchup, or undercard");
+    }
+    if (resolveOperationsEventCardHasPartialFeaturedMatchup(draft.team1Name, draft.team2Name)) {
+      errors.push("Featured matchup requires both participants");
+    }
     for (const [index, row] of draft.undercard.entries()) {
       const team1Name = row.team1Name.trim();
       const team2Name = row.team2Name.trim();
@@ -80928,27 +81049,34 @@ function buildManualEventFromOperationsEditorDraft(draft, options) {
     streamUrl,
     gameCardUrl,
     openBehavior: draft.launchBehavior
-  } : draft.eventType === "event-card" ? {
-    leagueId,
-    cardLayout: "event-card",
-    eventName: draft.eventName.trim(),
-    team1: {
-      name: draft.team1Name.trim(),
-      logo: draft.team1ParticipantImageUrl.trim() || null
-    },
-    team2: {
-      name: draft.team2Name.trim(),
-      logo: draft.team2ParticipantImageUrl.trim() || null
-    },
-    undercard: buildManualEventUndercardFromEditorDraft(draft.undercard),
-    startTime,
-    endTime,
-    sourceTimezone,
-    broadcastName,
-    streamUrl,
-    gameCardUrl,
-    openBehavior: draft.launchBehavior
-  } : {
+  } : draft.eventType === "event-card" ? (() => {
+    const eventTitle = draft.eventName.trim();
+    const team1Name = draft.team1Name.trim();
+    const team2Name = draft.team2Name.trim();
+    const hasFeatured = Boolean(team1Name && team2Name);
+    const undercard = buildManualEventUndercardFromEditorDraft(draft.undercard);
+    return {
+      leagueId,
+      cardLayout: "event-card",
+      eventName: eventTitle || null,
+      team1: hasFeatured ? {
+        name: team1Name,
+        logo: draft.team1ParticipantImageUrl.trim() || null
+      } : null,
+      team2: hasFeatured ? {
+        name: team2Name,
+        logo: draft.team2ParticipantImageUrl.trim() || null
+      } : null,
+      undercard: undercard.length > 0 ? undercard : null,
+      startTime,
+      endTime,
+      sourceTimezone,
+      broadcastName,
+      streamUrl,
+      gameCardUrl,
+      openBehavior: draft.launchBehavior
+    };
+  })() : {
     leagueId,
     eventName: null,
     team1: {
@@ -80988,6 +81116,7 @@ var init_buildManualEventFromOperationsEditorDraft = __esm({
     init_resolveSourceTimezone();
     init_validateManualEventDefinition();
     init_manualEventUndercardDraft();
+    init_manualEventCardSections();
     DEFAULT_OPERATIONS_MANUAL_EVENT_SOURCE_TIMEZONE = "ET";
     DEFAULT_OPERATIONS_MANUAL_EVENT_DURATION_MS = 3 * 60 * 60 * 1e3;
   }
@@ -81067,25 +81196,25 @@ function resolveManualEventDefinitionFromGame(game) {
   }
   const awayTeam = game.awayTeam?.trim() || "";
   const homeTeam = game.homeTeam?.trim() || "";
-  if (!awayTeam || !homeTeam) return null;
   if (manual.layout === "event-card") {
-    const eventName = manual.eventName?.trim() || "";
-    if (!eventName) return null;
+    const eventName = manual.eventName?.trim() || null;
+    const hasFeatured = Boolean(awayTeam && homeTeam);
     return {
       ...base,
       cardLayout: "event-card",
       eventName,
-      team1: {
+      team1: hasFeatured ? {
         name: awayTeam,
         logo: (game.awayParticipantImageUrl?.trim() || game.awayLogoUrl) ?? null
-      },
-      team2: {
+      } : null,
+      team2: hasFeatured ? {
         name: homeTeam,
         logo: (game.homeParticipantImageUrl?.trim() || game.homeLogoUrl) ?? null
-      },
+      } : null,
       undercard: manual.undercard ?? []
     };
   }
+  if (!awayTeam || !homeTeam) return null;
   return {
     ...base,
     eventName: null,
