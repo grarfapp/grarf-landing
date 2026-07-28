@@ -70293,11 +70293,21 @@ var init_GamesSpineHomeParityGameRow = __esm({
 });
 
 // ../grarf/desktop/src/lib/gamesSpine/gamesSpineCompactGameRowContent.ts
-function resolveGamesSpineCompactRowGridClass(game) {
+function resolveGamesSpineCompactRowGridClass(game, options) {
+  const featured = options?.featuredLeagueLogoColumn === true;
   if (game && isGrarfWebRenderer() && isGamesSpineCompactEventRow(game)) {
-    return GAMES_SPINE_COMPACT_EVENT_ROW_WEB_GRID_CLASS;
+    return featured ? GAMES_SPINE_COMPACT_EVENT_ROW_WEB_FEATURED_GRID_CLASS : GAMES_SPINE_COMPACT_EVENT_ROW_WEB_GRID_CLASS;
   }
-  return isGrarfWebRenderer() ? GAMES_SPINE_COMPACT_ROW_WEB_GRID_CLASS : GAMES_SPINE_COMPACT_ROW_GRID_CLASS;
+  if (isGrarfWebRenderer()) {
+    return featured ? GAMES_SPINE_COMPACT_ROW_WEB_FEATURED_GRID_CLASS : GAMES_SPINE_COMPACT_ROW_WEB_GRID_CLASS;
+  }
+  return featured ? GAMES_SPINE_COMPACT_ROW_FEATURED_GRID_CLASS : GAMES_SPINE_COMPACT_ROW_GRID_CLASS;
+}
+function shouldShowFeaturedCompactStartTimeBadge(game, options) {
+  if (!options?.featuredLeagueLogoColumn || options?.hideTime) return false;
+  if (game.status === "final" || isSpineFinalizedGame(game)) return false;
+  if (game.status === "postponed" || game.status === "live") return false;
+  return game.status === "scheduled" || isGameCompetitionPaused(game);
 }
 function resolveGamesSpineCompactScoreCellClass() {
   return isGrarfWebRenderer() ? GAMES_SPINE_COMPACT_SCORE_CELL_WEB_CLASS : GAMES_SPINE_COMPACT_SCORE_CELL_CLASS;
@@ -70477,7 +70487,7 @@ function resolveGamesSpineCompactStatusLabel(game, options) {
   const label = resolveGamesSpineCardTimingLabel(game, scheduleLabel) ?? "";
   return label ? applyCompactBaseballStatusFormatting(game, label) : "";
 }
-var GAMES_SPINE_COMPACT_ROW_GRID_CLASS, GAMES_SPINE_COMPACT_ROW_WEB_GRID_CLASS, GAMES_SPINE_COMPACT_EVENT_ROW_WEB_GRID_CLASS, GAMES_SPINE_COMPACT_EVENT_CONTENT_CLASS, GAMES_SPINE_COMPACT_STATUS_CELL_CLASS, GAMES_SPINE_COMPACT_SCORE_CELL_CLASS, GAMES_SPINE_COMPACT_SCORE_CELL_WEB_CLASS, GAMES_SPINE_COMPACT_COMPETITOR_CELL_CLASS, GAMES_SPINE_COMPACT_COMPETITOR_LABEL_CLASS, GAMES_SPINE_COMPACT_STANDINGS_LABEL_CLASS, GAMES_SPINE_COMPACT_CHANNEL_LOGO_HEIGHT_CLASS, GAMES_SPINE_COMPACT_CHANNEL_LOGO_MAX_WIDTH_CLASS, GAMES_SPINE_COMPACT_BROADCAST_COLUMN_WEB_WIDTH_CLASS, GAMES_SPINE_COMPACT_CHANNEL_LOGO_SLOT_CLASS;
+var GAMES_SPINE_COMPACT_ROW_GRID_CLASS, GAMES_SPINE_COMPACT_ROW_WEB_GRID_CLASS, GAMES_SPINE_COMPACT_ROW_WEB_FEATURED_GRID_CLASS, GAMES_SPINE_COMPACT_ROW_FEATURED_GRID_CLASS, GAMES_SPINE_COMPACT_EVENT_ROW_WEB_GRID_CLASS, GAMES_SPINE_COMPACT_EVENT_ROW_WEB_FEATURED_GRID_CLASS, GAMES_SPINE_COMPACT_FEATURED_LEAGUE_LOGO_COLUMN_CLASS, GAMES_SPINE_COMPACT_FEATURED_LEAGUE_LOGO_IMG_CLASS, GAMES_SPINE_COMPACT_EVENT_CONTENT_CLASS, GAMES_SPINE_COMPACT_STATUS_CELL_CLASS, GAMES_SPINE_COMPACT_FEATURED_START_TIME_CELL_CLASS, GAMES_SPINE_COMPACT_FEATURED_START_TIME_BADGE_CLASS, GAMES_SPINE_COMPACT_SCORE_CELL_CLASS, GAMES_SPINE_COMPACT_SCORE_CELL_WEB_CLASS, GAMES_SPINE_COMPACT_COMPETITOR_CELL_CLASS, GAMES_SPINE_COMPACT_COMPETITOR_LABEL_CLASS, GAMES_SPINE_COMPACT_STANDINGS_LABEL_CLASS, GAMES_SPINE_COMPACT_CHANNEL_LOGO_HEIGHT_CLASS, GAMES_SPINE_COMPACT_CHANNEL_LOGO_MAX_WIDTH_CLASS, GAMES_SPINE_COMPACT_BROADCAST_COLUMN_WEB_WIDTH_CLASS, GAMES_SPINE_COMPACT_CHANNEL_LOGO_SLOT_CLASS;
 var init_gamesSpineCompactGameRowContent = __esm({
   "../grarf/desktop/src/lib/gamesSpine/gamesSpineCompactGameRowContent.ts"() {
     init_define_import_meta_env();
@@ -70500,9 +70510,16 @@ var init_gamesSpineCompactGameRowContent = __esm({
     init_gamesSpineSideStat();
     GAMES_SPINE_COMPACT_ROW_GRID_CLASS = "grid w-full min-w-0 grid-cols-[3.625rem_minmax(0,1fr)_1.25rem_minmax(0,1fr)_1.25rem_minmax(2.25rem,max-content)] items-center gap-x-[0.5ch]";
     GAMES_SPINE_COMPACT_ROW_WEB_GRID_CLASS = "grid w-full min-w-0 grid-cols-[3.625rem_minmax(0,1fr)_1.375rem_minmax(0,1fr)_1.375rem_2.2rem] items-center gap-x-[0.5ch]";
+    GAMES_SPINE_COMPACT_ROW_WEB_FEATURED_GRID_CLASS = "grid w-full min-w-0 grid-cols-[2rem_3.625rem_minmax(0,1fr)_1.375rem_minmax(0,1fr)_1.375rem_2.2rem] items-center gap-x-[0.5ch]";
+    GAMES_SPINE_COMPACT_ROW_FEATURED_GRID_CLASS = "grid w-full min-w-0 grid-cols-[2rem_3.625rem_minmax(0,1fr)_1.25rem_minmax(0,1fr)_1.25rem_minmax(2.25rem,max-content)] items-center gap-x-[0.5ch]";
     GAMES_SPINE_COMPACT_EVENT_ROW_WEB_GRID_CLASS = "grid w-full min-w-0 grid-cols-[3.625rem_minmax(0,1fr)_2.2rem] items-center gap-x-[0.5ch]";
+    GAMES_SPINE_COMPACT_EVENT_ROW_WEB_FEATURED_GRID_CLASS = "grid w-full min-w-0 grid-cols-[2rem_3.625rem_minmax(0,1fr)_2.2rem] items-center gap-x-[0.5ch]";
+    GAMES_SPINE_COMPACT_FEATURED_LEAGUE_LOGO_COLUMN_CLASS = "flex w-8 shrink-0 items-center justify-center self-center";
+    GAMES_SPINE_COMPACT_FEATURED_LEAGUE_LOGO_IMG_CLASS = "h-5 w-5 shrink-0 object-contain brightness-110 contrast-110";
     GAMES_SPINE_COMPACT_EVENT_CONTENT_CLASS = "min-w-0 truncate text-left font-mono text-[13px] leading-none tracking-[0.06em] text-white/90";
     GAMES_SPINE_COMPACT_STATUS_CELL_CLASS = "inline-block w-[3.625rem] shrink-0 truncate text-left text-[11px] leading-none tabular-nums tracking-wide";
+    GAMES_SPINE_COMPACT_FEATURED_START_TIME_CELL_CLASS = "!flex self-stretch items-center py-px";
+    GAMES_SPINE_COMPACT_FEATURED_START_TIME_BADGE_CLASS = "flex h-full w-full min-w-0 items-center truncate rounded-sm bg-[#050808] px-1 text-[11px] leading-none tabular-nums tracking-wide text-white/95";
     GAMES_SPINE_COMPACT_SCORE_CELL_CLASS = "inline-flex w-[1.25rem] shrink-0 items-center justify-start text-left font-mono text-[13px] leading-none tabular-nums whitespace-nowrap";
     GAMES_SPINE_COMPACT_SCORE_CELL_WEB_CLASS = "inline-flex w-[1.375rem] shrink-0 items-center justify-start text-left font-mono text-[13px] leading-none tabular-nums whitespace-nowrap";
     GAMES_SPINE_COMPACT_COMPETITOR_CELL_CLASS = "grid min-w-0 grid-cols-[12px_minmax(0,1fr)] items-center gap-x-[0.5ch]";
@@ -70697,7 +70714,12 @@ function shouldShowCompactChannelLogo(game) {
   if (game.status === "live") return true;
   return game.status === "scheduled" || isGameCompetitionPaused(game);
 }
-function GamesSpineCompactGameRow({ game, hideTime = false, className }) {
+function GamesSpineCompactGameRow({
+  game,
+  hideTime = false,
+  className,
+  featuredLeagueLogoColumn = false
+}) {
   const statusLabel = resolveGamesSpineCompactStatusLabel(game, { hideTime });
   const channel = resolveGameChannelPresentation(game);
   const showChannelLogo = shouldShowCompactChannelLogo(game);
@@ -70705,24 +70727,45 @@ function GamesSpineCompactGameRow({ game, hideTime = false, className }) {
   const matchupModel = resolveGamesSpineCompactMatchupModel(game);
   const hasStandings = isGrarfWebRenderer() && matchupModel.kind === "matchup" && Boolean(matchupModel.left.standingsLabel?.trim() || matchupModel.right.standingsLabel?.trim());
   const viewerMessage = game.viewerMessage?.trim();
+  const leagueLogoUrl = featuredLeagueLogoColumn ? resolveGamesSpineLeagueLogoUrl(game.league, { game }) : void 0;
+  const showFeaturedStartTimeBadge = shouldShowFeaturedCompactStartTimeBadge(game, {
+    hideTime,
+    featuredLeagueLogoColumn
+  });
   return /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)("div", { className: cn2("min-w-0", className), children: [
     /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)(
       "div",
       {
         className: cn2(
-          resolveGamesSpineCompactRowGridClass(game),
+          resolveGamesSpineCompactRowGridClass(game, { featuredLeagueLogoColumn }),
           hasStandings && "items-start"
         ),
         children: [
+          featuredLeagueLogoColumn && game.league ? /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("div", { className: GAMES_SPINE_COMPACT_FEATURED_LEAGUE_LOGO_COLUMN_CLASS, children: leagueLogoUrl ? /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(
+            "img",
+            {
+              src: leagueLogoUrl,
+              alt: "",
+              width: 20,
+              height: 20,
+              className: cn2(
+                GAMES_SPINE_COMPACT_FEATURED_LEAGUE_LOGO_IMG_CLASS,
+                resolveGamesSpineLeagueLogoImgClassName(game.league, leagueLogoUrl)
+              ),
+              loading: "lazy",
+              decoding: "async"
+            }
+          ) : null }) : null,
           /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(
             "span",
             {
               className: cn2(
                 GAMES_SPINE_COMPACT_STATUS_CELL_CLASS,
-                isLive ? "text-ambersys/95" : "text-textdim/90",
-                hasStandings && "mt-0.5"
+                showFeaturedStartTimeBadge && GAMES_SPINE_COMPACT_FEATURED_START_TIME_CELL_CLASS,
+                !showFeaturedStartTimeBadge && (isLive ? "text-ambersys/95" : "text-textdim/90"),
+                hasStandings && !showFeaturedStartTimeBadge && "mt-0.5"
               ),
-              children: statusLabel || /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("span", { "aria-hidden": true, children: "\xA0" })
+              children: showFeaturedStartTimeBadge && statusLabel ? /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("span", { className: GAMES_SPINE_COMPACT_FEATURED_START_TIME_BADGE_CLASS, children: statusLabel }) : statusLabel || /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("span", { "aria-hidden": true, children: "\xA0" })
             }
           ),
           /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(GamesSpineCompactMatchupColumns, { game }),
@@ -70772,6 +70815,7 @@ var init_GamesSpineCompactGameRow = __esm({
     init_isSpineFinalizedGame();
     init_gamesSpineCompactGameRowContent();
     init_gamesSpineCardLayout();
+    init_gamesSpineLeagueLogoUrls();
     init_isGrarfWebRenderer();
     init_BroadcastChannelLogo();
     init_GamesSpineCompactMatchupPills();
@@ -70926,6 +70970,121 @@ var init_demoWnbaWhipAroundGame = __esm({
   }
 });
 
+// ../grarf/desktop/src/lib/gamesSpine/mergeGamesSpineSectionsByPriority.ts
+function normalizePlacementLabel(value) {
+  return value.trim().toLowerCase();
+}
+function operationalKeyMatchesAnchor(leagueKey, anchor) {
+  const normalized = normalizePlacementLabel(anchor);
+  if (normalizePlacementLabel(leagueKey) === normalized) return true;
+  return normalizePlacementLabel(resolveGamesSpineLeagueDisplayLabel(leagueKey)) === normalized;
+}
+function manualSectionMatchesAnchor(section, anchor) {
+  const normalized = normalizePlacementLabel(anchor);
+  if (normalizePlacementLabel(section.leagueKey) === normalized) return true;
+  return normalizePlacementLabel(section.leagueLabel) === normalized;
+}
+function findVisibleAnchorIndex(sections, anchor) {
+  for (let index = 0; index < sections.length; index += 1) {
+    const section = sections[index];
+    if (section.kind === "operational" && operationalKeyMatchesAnchor(section.leagueKey, anchor)) {
+      return index;
+    }
+    if (section.kind === "manual" && manualSectionMatchesAnchor(section.section, anchor)) {
+      return index;
+    }
+  }
+  return -1;
+}
+function findOperationalOrderAnchorIndex(operationalLeagueOrder, anchor) {
+  return operationalLeagueOrder.findIndex((key2) => operationalKeyMatchesAnchor(key2, anchor));
+}
+function resolveAnchorIndex(sections, operationalLeagueOrder, anchor, mode) {
+  const visibleIndex = findVisibleAnchorIndex(sections, anchor);
+  if (visibleIndex >= 0) {
+    return mode === "before" ? visibleIndex : visibleIndex + 1;
+  }
+  const orderIndex = findOperationalOrderAnchorIndex(operationalLeagueOrder, anchor);
+  if (orderIndex < 0) return sections.length;
+  if (mode === "before") {
+    for (let index = orderIndex; index < operationalLeagueOrder.length; index += 1) {
+      const key2 = operationalLeagueOrder[index];
+      const visible = sections.findIndex(
+        (section) => section.kind === "operational" && section.leagueKey === key2
+      );
+      if (visible >= 0) return visible;
+    }
+    return sections.length;
+  }
+  for (let index = orderIndex; index >= 0; index -= 1) {
+    const key2 = operationalLeagueOrder[index];
+    const visible = sections.findIndex(
+      (section) => section.kind === "operational" && section.leagueKey === key2
+    );
+    if (visible >= 0) return visible + 1;
+  }
+  return 0;
+}
+function resolveLegacyPriorityInsertionIndex(sections, leaguePriority) {
+  for (let index = 0; index < sections.length; index += 1) {
+    const section = sections[index];
+    if (section.kind !== "operational") continue;
+    const importance = resolveLeagueImportanceV1ForLeagueKey(section.leagueKey);
+    if (leaguePriority > importance) return index;
+  }
+  return sections.length;
+}
+function resolveManualInsertionIndex(sections, manual, operationalLeagueOrder) {
+  const insertBefore = manual.insertBeforeLeague?.trim();
+  if (insertBefore) {
+    return resolveAnchorIndex(sections, operationalLeagueOrder, insertBefore, "before");
+  }
+  const insertAfter = manual.insertAfterLeague?.trim();
+  if (insertAfter) {
+    return resolveAnchorIndex(sections, operationalLeagueOrder, insertAfter, "after");
+  }
+  if (manual.leaguePriority != null && Number.isFinite(manual.leaguePriority)) {
+    return resolveLegacyPriorityInsertionIndex(sections, manual.leaguePriority);
+  }
+  return sections.length;
+}
+function mergeGamesSpineSectionsByPriority(operationalLeagueOrder, mergedLeagues, manualSections, skeletonOperationalLeagues) {
+  const operationalWithGames = operationalLeagueOrder.filter((key2) => {
+    if (skeletonOperationalLeagues?.has(key2)) return true;
+    const games = mergedLeagues[key2] ?? [];
+    if (filterGamesSpineSlateForOperationalSportsDay(games).length > 0) return true;
+    return isGrarfWebRenderer() && filterGamesSpineSlateForUpcoming(games).length > 0;
+  });
+  let sections = operationalWithGames.map((leagueKey) => ({
+    kind: "operational",
+    leagueKey
+  }));
+  for (const manual of manualSections) {
+    const insertAt = resolveManualInsertionIndex(sections, manual, operationalLeagueOrder);
+    sections = [
+      ...sections.slice(0, insertAt),
+      { kind: "manual", slug: manual.slug, section: manual },
+      ...sections.slice(insertAt)
+    ];
+  }
+  return sections;
+}
+function gamesSpineManualCollapseKey(slug) {
+  return `manual:${slug}`;
+}
+var GAMES_SPINE_FEATURED_COLLAPSE_KEY, GAMES_SPINE_MORE_LEAGUES_COLLAPSE_KEY;
+var init_mergeGamesSpineSectionsByPriority = __esm({
+  "../grarf/desktop/src/lib/gamesSpine/mergeGamesSpineSectionsByPriority.ts"() {
+    init_define_import_meta_env();
+    init_leagueImportanceV1();
+    init_gamesSpineLeagueDisplayLabel();
+    init_gamesSpineOperationalDate();
+    init_isGrarfWebRenderer();
+    GAMES_SPINE_FEATURED_COLLAPSE_KEY = "FEATURED";
+    GAMES_SPINE_MORE_LEAGUES_COLLAPSE_KEY = "MORE_LEAGUES";
+  }
+});
+
 // ../grarf/desktop/src/components/GameRow.tsx
 function pitcherShort2(name) {
   const t2 = name.trim();
@@ -71005,6 +71164,7 @@ function GameRow({
   const gamesDisplayMode = spineSectionCollapseKey && supportsSectionGamesMode ? resolveGamesSpineSectionGamesMode(spineSectionCollapseKey, gamesSpineDisplayState) : gamesSpineDisplayState.gamesMode;
   const isWebHomeSpineParity = isRail && homeSpineParity && supportsSectionGamesMode;
   const isCompactSpineRow = isWebHomeSpineParity && gamesDisplayMode === "compact" && !exemptFromCompactGamesMode;
+  const featuredCompactLeagueLogoColumn = isCompactSpineRow && spineSectionCollapseKey === GAMES_SPINE_FEATURED_COLLAPSE_KEY;
   const gameCardClickable = !isTennisGame(game) || tennisGameHasEffectiveGameCardUrl(game);
   const renderRailMatchup = (className) => /* @__PURE__ */ (0, import_jsx_runtime54.jsx)(GamesSpineMatchupStack, { game, className });
   const [boardTopSide, boardBottomSide] = game.league === "AFL" ? resolveGamesSpineMatchupSideOrder(game) : ["away", "home"];
@@ -71107,7 +71267,8 @@ function GameRow({
             GamesSpineCompactGameRow,
             {
               game,
-              hideTime: hideTime || hideSpineStartTime
+              hideTime: hideTime || hideSpineStartTime,
+              featuredLeagueLogoColumn: featuredCompactLeagueLogoColumn
             }
           )
         }
@@ -71485,6 +71646,7 @@ var init_GameRow = __esm({
     init_resolveGamesSpineMatchupSideOrder();
     init_isGrarfWebRenderer();
     init_gamesSpineDisplayStore();
+    init_mergeGamesSpineSectionsByPriority();
     import_jsx_runtime54 = __toESM(require_jsx_runtime(), 1);
   }
 });
@@ -73601,121 +73763,6 @@ var init_selectFeaturedGames = __esm({
     init_resolveViewLeagueGames();
     init_editorialGameKey();
     init_resolveEditorialNarrative();
-  }
-});
-
-// ../grarf/desktop/src/lib/gamesSpine/mergeGamesSpineSectionsByPriority.ts
-function normalizePlacementLabel(value) {
-  return value.trim().toLowerCase();
-}
-function operationalKeyMatchesAnchor(leagueKey, anchor) {
-  const normalized = normalizePlacementLabel(anchor);
-  if (normalizePlacementLabel(leagueKey) === normalized) return true;
-  return normalizePlacementLabel(resolveGamesSpineLeagueDisplayLabel(leagueKey)) === normalized;
-}
-function manualSectionMatchesAnchor(section, anchor) {
-  const normalized = normalizePlacementLabel(anchor);
-  if (normalizePlacementLabel(section.leagueKey) === normalized) return true;
-  return normalizePlacementLabel(section.leagueLabel) === normalized;
-}
-function findVisibleAnchorIndex(sections, anchor) {
-  for (let index = 0; index < sections.length; index += 1) {
-    const section = sections[index];
-    if (section.kind === "operational" && operationalKeyMatchesAnchor(section.leagueKey, anchor)) {
-      return index;
-    }
-    if (section.kind === "manual" && manualSectionMatchesAnchor(section.section, anchor)) {
-      return index;
-    }
-  }
-  return -1;
-}
-function findOperationalOrderAnchorIndex(operationalLeagueOrder, anchor) {
-  return operationalLeagueOrder.findIndex((key2) => operationalKeyMatchesAnchor(key2, anchor));
-}
-function resolveAnchorIndex(sections, operationalLeagueOrder, anchor, mode) {
-  const visibleIndex = findVisibleAnchorIndex(sections, anchor);
-  if (visibleIndex >= 0) {
-    return mode === "before" ? visibleIndex : visibleIndex + 1;
-  }
-  const orderIndex = findOperationalOrderAnchorIndex(operationalLeagueOrder, anchor);
-  if (orderIndex < 0) return sections.length;
-  if (mode === "before") {
-    for (let index = orderIndex; index < operationalLeagueOrder.length; index += 1) {
-      const key2 = operationalLeagueOrder[index];
-      const visible = sections.findIndex(
-        (section) => section.kind === "operational" && section.leagueKey === key2
-      );
-      if (visible >= 0) return visible;
-    }
-    return sections.length;
-  }
-  for (let index = orderIndex; index >= 0; index -= 1) {
-    const key2 = operationalLeagueOrder[index];
-    const visible = sections.findIndex(
-      (section) => section.kind === "operational" && section.leagueKey === key2
-    );
-    if (visible >= 0) return visible + 1;
-  }
-  return 0;
-}
-function resolveLegacyPriorityInsertionIndex(sections, leaguePriority) {
-  for (let index = 0; index < sections.length; index += 1) {
-    const section = sections[index];
-    if (section.kind !== "operational") continue;
-    const importance = resolveLeagueImportanceV1ForLeagueKey(section.leagueKey);
-    if (leaguePriority > importance) return index;
-  }
-  return sections.length;
-}
-function resolveManualInsertionIndex(sections, manual, operationalLeagueOrder) {
-  const insertBefore = manual.insertBeforeLeague?.trim();
-  if (insertBefore) {
-    return resolveAnchorIndex(sections, operationalLeagueOrder, insertBefore, "before");
-  }
-  const insertAfter = manual.insertAfterLeague?.trim();
-  if (insertAfter) {
-    return resolveAnchorIndex(sections, operationalLeagueOrder, insertAfter, "after");
-  }
-  if (manual.leaguePriority != null && Number.isFinite(manual.leaguePriority)) {
-    return resolveLegacyPriorityInsertionIndex(sections, manual.leaguePriority);
-  }
-  return sections.length;
-}
-function mergeGamesSpineSectionsByPriority(operationalLeagueOrder, mergedLeagues, manualSections, skeletonOperationalLeagues) {
-  const operationalWithGames = operationalLeagueOrder.filter((key2) => {
-    if (skeletonOperationalLeagues?.has(key2)) return true;
-    const games = mergedLeagues[key2] ?? [];
-    if (filterGamesSpineSlateForOperationalSportsDay(games).length > 0) return true;
-    return isGrarfWebRenderer() && filterGamesSpineSlateForUpcoming(games).length > 0;
-  });
-  let sections = operationalWithGames.map((leagueKey) => ({
-    kind: "operational",
-    leagueKey
-  }));
-  for (const manual of manualSections) {
-    const insertAt = resolveManualInsertionIndex(sections, manual, operationalLeagueOrder);
-    sections = [
-      ...sections.slice(0, insertAt),
-      { kind: "manual", slug: manual.slug, section: manual },
-      ...sections.slice(insertAt)
-    ];
-  }
-  return sections;
-}
-function gamesSpineManualCollapseKey(slug) {
-  return `manual:${slug}`;
-}
-var GAMES_SPINE_FEATURED_COLLAPSE_KEY, GAMES_SPINE_MORE_LEAGUES_COLLAPSE_KEY;
-var init_mergeGamesSpineSectionsByPriority = __esm({
-  "../grarf/desktop/src/lib/gamesSpine/mergeGamesSpineSectionsByPriority.ts"() {
-    init_define_import_meta_env();
-    init_leagueImportanceV1();
-    init_gamesSpineLeagueDisplayLabel();
-    init_gamesSpineOperationalDate();
-    init_isGrarfWebRenderer();
-    GAMES_SPINE_FEATURED_COLLAPSE_KEY = "FEATURED";
-    GAMES_SPINE_MORE_LEAGUES_COLLAPSE_KEY = "MORE_LEAGUES";
   }
 });
 
@@ -84136,6 +84183,29 @@ var init_SocialRssAppFeedPanel = __esm({
 });
 
 // ../grarf/desktop/src/components/gameWorkspace/GameUtilityRail.tsx
+function GameWorkspaceTeamTabLabel({
+  game,
+  side,
+  label
+}) {
+  const logoUrl = resolveDarkThemeLogoUrl(game, side);
+  return /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)("span", { className: "inline-flex max-w-full items-center justify-center gap-1", children: [
+    logoUrl ? /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(
+      "img",
+      {
+        src: logoUrl,
+        alt: "",
+        className: cn2(
+          "h-3 w-3 shrink-0 object-contain",
+          resolveGamesSpineLeagueLogoImgClassName(game.league, logoUrl)
+        ),
+        loading: "lazy",
+        decoding: "async"
+      }
+    ) : null,
+    /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("span", { className: "truncate", children: label })
+  ] });
+}
 function GameUtilityRail({
   workspaceTitle,
   liveStateLabel: _liveStateLabel,
@@ -84194,6 +84264,7 @@ function GameUtilityRail({
     }
     return null;
   }, [webGameSocialTabs, webGameSocialLeagueFeed, tab]);
+  const gameWorkspaceSocialTabs = webGameSocialTabs || webGameSocialLeagueFeed;
   const visibleTabRows = (0, import_react114.useMemo)(() => {
     if (webGameSocialLeagueFeed) {
       return [["signals", "GAME"]];
@@ -84267,9 +84338,10 @@ function GameUtilityRail({
             onClick: () => onTabSelect(id),
             className: cn2(
               tabCls2,
+              gameWorkspaceSocialTabs ? gameWorkspaceTabLabelCls : utilityTabLabelCls,
               tab === id ? "border-line bg-white/[0.06] text-cyansys shadow-[inset_0_-1px_0_rgba(86,247,255,0.45)]" : "text-textdim hover:bg-white/[0.03] hover:text-[#b8cccc]"
             ),
-            children: label
+            children: webGameSocialTabs && activeGame && id === "chat" ? /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(GameWorkspaceTeamTabLabel, { game: activeGame, side: "away", label }) : webGameSocialTabs && activeGame && id === "reddit" ? /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(GameWorkspaceTeamTabLabel, { game: activeGame, side: "home", label }) : label
           },
           id
         )) }),
@@ -84397,7 +84469,7 @@ function GameUtilityRail({
     }
   );
 }
-var import_react114, import_jsx_runtime93, tabCls2, MONITOR_UTILITY_TAB_ROWS, WATCH_UTILITY_TAB_ROWS;
+var import_react114, import_jsx_runtime93, tabCls2, gameWorkspaceTabLabelCls, utilityTabLabelCls, MONITOR_UTILITY_TAB_ROWS, WATCH_UTILITY_TAB_ROWS;
 var init_GameUtilityRail = __esm({
   "../grarf/desktop/src/components/gameWorkspace/GameUtilityRail.tsx"() {
     init_define_import_meta_env();
@@ -84412,9 +84484,13 @@ var init_GameUtilityRail = __esm({
     init_resolveGameSocialRailLeagueSignals();
     init_resolveSocialRailFeedContext();
     init_isGrarfWebRenderer();
+    init_gamesSpineLeagueLogoUrls();
+    init_resolveTeamLogoUrl();
     init_workspaceIdentityDiagnostics();
     import_jsx_runtime93 = __toESM(require_jsx_runtime(), 1);
-    tabCls2 = "shrink-0 min-w-[3.75rem] border border-transparent px-0.5 py-1 text-center text-[7px] tracking-[0.05em] transition duration-150";
+    tabCls2 = "shrink-0 min-w-[3.75rem] border border-transparent px-0.5 py-1 text-center tracking-[0.05em] transition duration-150";
+    gameWorkspaceTabLabelCls = "text-[12px]";
+    utilityTabLabelCls = "text-[7px]";
     MONITOR_UTILITY_TAB_ROWS = [
       ["signals", "PULSE"],
       ["chat", "CHAT"],
