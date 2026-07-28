@@ -6,14 +6,10 @@ import "./grarf-web-shim";
 import "../../grarf/desktop/src/lib/livetrack/bootLiveTrack";
 import { StrictMode, useEffect, useState } from "react";
 import { createRoot, type Root } from "react-dom/client";
-import { BrowserRouter, Navigate, Outlet, Route, Routes } from "react-router-dom";
-import { GRARFAdminApp } from "../src/admin/GRARFAdminApp";
-import { isSingularityAdminHash } from "../src/admin/adminHashNav";
-import { useAdminHashNavigation } from "../src/admin/useAdminHashNavigation";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { AnalyticsProvider } from "../../grarf/desktop/src/components/analytics/AnalyticsProvider";
 import { AppShellLayout } from "../../grarf/desktop/src/layouts/AppShellLayout";
 import { leagueDirectoryUniqueRoutes } from "../../grarf/desktop/src/data/leagueDirectoryV1";
-import { GameWorkspacePage } from "../../grarf/desktop/src/pages/GameWorkspacePage";
 import { HomePage } from "../../grarf/desktop/src/pages/HomePage";
 import { LeagueDirectoryRoutePage } from "../../grarf/desktop/src/pages/LeagueDirectoryRoutePage";
 import { SportscapeEditorialAdminPage } from "../../grarf/desktop/src/pages/SportscapeEditorialAdminPage";
@@ -30,10 +26,6 @@ import { useAdminModeStore } from "../../grarf/desktop/src/store/adminModeStore"
 import { resolveCenterPaneApplicationModeFromPath } from "../../grarf/desktop/src/lib/home/resolveCenterPaneApplicationModeFromPath";
 import { hydrateOperationalGameOverridesFromPersistence } from "../../grarf/desktop/src/lib/operationsSpine/hydrateOperationalGameOverrides";
 import { hydrateOperationalLiveWorkspaceFromPersistence } from "../../grarf/desktop/src/lib/operationsSpine/hydrateOperationalLiveWorkspace";
-import { LiveGamesBridge } from "../../grarf/desktop/src/components/LiveGamesBridge";
-import { HomeLiveTrackIngestBridge } from "../../grarf/desktop/src/components/homeMvp/HomeLiveTrackIngestBridge";
-import { HomeLiveTrackWireFeedBridge } from "../../grarf/desktop/src/components/homeMvp/HomeLiveTrackWireFeedBridge";
-
 
 let reactRoot: Root | null = null;
 
@@ -45,7 +37,6 @@ function isAdminHtmlEntry(): boolean {
 function activateAdminEntry(): void {
   markGrarfAdmin();
   useAdminModeStore.getState().enterAdminMode();
-  if (isSingularityAdminHash(window.location.hash)) return;
   if (!resolveCenterPaneApplicationModeFromPath(window.location.pathname)) {
     useCenterPaneApplicationModeStore.getState().setModeExplicit("operations");
   }
@@ -101,7 +92,7 @@ const appShellRouteElements = (
         element={<LeagueDirectoryRoutePage />}
       />
     ))}
-    <Route path="game/:id" element={<GameWorkspacePage />} />
+    <Route path="game/:id" element={<HomePage />} />
   </>
 );
 
@@ -111,31 +102,6 @@ const adminAppShellRouteElements = (
     <Route path="operations" element={<HomePage />} />
   </>
 );
-
-function SingularityAdminRuntimeBridge() {
-  return (
-    <>
-      <LiveGamesBridge />
-      <HomeLiveTrackWireFeedBridge />
-      <HomeLiveTrackIngestBridge />
-    </>
-  );
-}
-
-function AdminHtmlShell() {
-  const { parsed } = useAdminHashNavigation();
-
-  if (parsed.section === "singularity") {
-    return (
-      <>
-        <SingularityAdminRuntimeBridge />
-        <GRARFAdminApp />
-      </>
-    );
-  }
-
-  return <Outlet />;
-}
 
 function WebHomeApp() {
   return (
@@ -148,9 +114,9 @@ function WebHomeApp() {
         <Route path="webapp.html" element={<AppShellLayout />}>
           {appShellRouteElements}
         </Route>
-        {/* admin.html — hash selects Operations shell vs Singularity admin */}
-        <Route path="admin.html" element={<AdminHtmlShell />}>
-          <Route element={<AppShellLayout />}>{adminAppShellRouteElements}</Route>
+        {/* admin.html — same AppShellLayout as public, Admin Mode pre-activated before mount */}
+        <Route path="admin.html" element={<AppShellLayout />}>
+          {adminAppShellRouteElements}
         </Route>
         <Route path="admin/sportscape" element={<SportscapeEditorialAdminPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />

@@ -1,6 +1,5 @@
 export type AdminNavItemId =
   | "operations"
-  | "singularity"
   | "editorial"
   | "featured-games"
   | "streams"
@@ -17,7 +16,6 @@ export type AdminNavItem = {
 
 export const ADMIN_NAV_ITEMS: AdminNavItem[] = [
   { id: "operations", label: "Operations", enabled: true },
-  { id: "singularity", label: "Singularity", enabled: true },
   { id: "editorial", label: "Editorial", enabled: false },
   { id: "featured-games", label: "Featured Games", enabled: false },
   { id: "streams", label: "Streams", enabled: false },
