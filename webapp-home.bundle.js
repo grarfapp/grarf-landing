@@ -84182,7 +84182,1204 @@ var init_SocialRssAppFeedPanel = __esm({
   }
 });
 
+// ../grarf/desktop/src/lib/sportscape/soccerCountryAbbrev.ts
+function normalizeCountryLookupKey(name) {
+  return name.trim().replace(/\s+/g, " ").toLowerCase();
+}
+function resolveSoccerCountryAbbrev(teamName) {
+  const key2 = normalizeCountryLookupKey(teamName);
+  if (!key2) return void 0;
+  const direct = SOCCER_COUNTRY_LOOKUP[key2];
+  if (direct) return direct;
+  for (const [country, abbrev] of Object.entries(SOCCER_COUNTRY_ABBREV_BY_NAME)) {
+    if (key2.includes(country)) return abbrev;
+    if (key2.length >= 4 && country.includes(key2)) return abbrev;
+  }
+  return void 0;
+}
+var SOCCER_COUNTRY_ABBREV_BY_NAME, SOCCER_COUNTRY_ABBREV_BY_CODE, SOCCER_COUNTRY_LOOKUP;
+var init_soccerCountryAbbrev = __esm({
+  "../grarf/desktop/src/lib/sportscape/soccerCountryAbbrev.ts"() {
+    init_define_import_meta_env();
+    SOCCER_COUNTRY_ABBREV_BY_NAME = {
+      algeria: "ALG",
+      argentina: "ARG",
+      australia: "AUS",
+      austria: "AUT",
+      belgium: "BEL",
+      bolivia: "BOL",
+      brazil: "BRA",
+      cameroon: "CMR",
+      canada: "CAN",
+      "cape verde": "CPV",
+      chile: "CHI",
+      china: "CHN",
+      colombia: "COL",
+      "costa rica": "CRC",
+      croatia: "CRO",
+      "czech republic": "CZE",
+      czechia: "CZE",
+      denmark: "DEN",
+      ecuador: "ECU",
+      egypt: "EGY",
+      england: "ENG",
+      france: "FRA",
+      germany: "GER",
+      ghana: "GHA",
+      greece: "GRE",
+      honduras: "HON",
+      hungary: "HUN",
+      iran: "IRN",
+      iraq: "IRQ",
+      italy: "ITA",
+      ivory: "CIV",
+      "ivory coast": "CIV",
+      "cote d'ivoire": "CIV",
+      japan: "JPN",
+      jordan: "JOR",
+      mexico: "MEX",
+      morocco: "MAR",
+      netherlands: "NED",
+      "new zealand": "NZL",
+      nigeria: "NGA",
+      "north korea": "PRK",
+      norway: "NOR",
+      panama: "PAN",
+      paraguay: "PAR",
+      peru: "PER",
+      poland: "POL",
+      portugal: "POR",
+      qatar: "QAT",
+      romania: "ROU",
+      russia: "RUS",
+      "saudi arabia": "KSA",
+      scotland: "SCO",
+      senegal: "SEN",
+      serbia: "SRB",
+      "south africa": "RSA",
+      "south korea": "KOR",
+      korea: "KOR",
+      spain: "ESP",
+      sweden: "SWE",
+      switzerland: "SUI",
+      tunisia: "TUN",
+      turkey: "TUR",
+      ukraine: "UKR",
+      uruguay: "URU",
+      usa: "USA",
+      "united states": "USA",
+      uzbekistan: "UZB",
+      venezuela: "VEN",
+      wales: "WAL",
+      "congo dr": "COD",
+      "dr congo": "COD",
+      "democratic republic of congo": "COD"
+    };
+    SOCCER_COUNTRY_ABBREV_BY_CODE = Object.fromEntries(
+      [...new Set(Object.values(SOCCER_COUNTRY_ABBREV_BY_NAME))].map((abbrev) => [
+        abbrev.toLowerCase(),
+        abbrev
+      ])
+    );
+    SOCCER_COUNTRY_LOOKUP = {
+      ...SOCCER_COUNTRY_ABBREV_BY_NAME,
+      ...SOCCER_COUNTRY_ABBREV_BY_CODE,
+      /** ESPN sometimes uses MOR; FIFA code is MAR. */
+      mor: "MAR"
+    };
+  }
+});
+
+// ../grarf/desktop/src/lib/livetrack/liveTrackNationalTeamTokens.ts
+var LIVE_TRACK_NATIONAL_TEAM_TOKEN_BY_ABBREV;
+var init_liveTrackNationalTeamTokens = __esm({
+  "../grarf/desktop/src/lib/livetrack/liveTrackNationalTeamTokens.ts"() {
+    init_define_import_meta_env();
+    LIVE_TRACK_NATIONAL_TEAM_TOKEN_BY_ABBREV = {
+      ALG: "border-green-600/40 bg-green-600/[0.1] text-green-200",
+      ARG: "border-sky-400/40 bg-sky-400/[0.1] text-sky-200",
+      AUS: "border-green-600/40 bg-green-600/[0.1] text-green-200",
+      AUT: "border-red-600/40 bg-red-600/[0.1] text-red-200",
+      BEL: "border-red-500/40 bg-red-500/[0.1] text-red-200",
+      BOL: "border-green-600/40 bg-green-600/[0.1] text-green-200",
+      BRA: "border-green-500/40 bg-green-500/[0.1] text-green-200",
+      CMR: "border-green-600/40 bg-green-600/[0.1] text-green-200",
+      CAN: "border-red-500/40 bg-red-500/[0.1] text-red-200",
+      CPV: "border-blue-600/40 bg-blue-600/[0.1] text-blue-200",
+      CHI: "border-red-600/40 bg-red-600/[0.1] text-red-200",
+      CHN: "border-red-600/40 bg-red-600/[0.1] text-red-200",
+      COL: "border-yellow-400/35 bg-yellow-400/[0.08] text-yellow-200",
+      COD: "border-blue-700/40 bg-blue-700/[0.12] text-blue-200",
+      CRC: "border-red-600/40 bg-red-600/[0.1] text-red-200",
+      CIV: "border-orange-500/45 bg-orange-500/[0.12] text-orange-300",
+      CRO: "border-red-600/40 bg-red-600/[0.1] text-red-200",
+      CZE: "border-red-600/40 bg-red-600/[0.1] text-red-200",
+      DEN: "border-red-500/40 bg-red-500/[0.1] text-red-200",
+      ECU: "border-yellow-400/35 bg-yellow-400/[0.08] text-yellow-200",
+      EGY: "border-red-600/40 bg-red-600/[0.1] text-red-200",
+      ENG: "border-white/25 bg-white/[0.06] text-[#e8ecec]",
+      ESP: "border-red-500/40 bg-red-500/[0.1] text-red-200",
+      FRA: "border-blue-600/40 bg-blue-600/[0.1] text-blue-200",
+      GER: "border-slate-300/30 bg-slate-300/[0.08] text-slate-200",
+      GHA: "border-yellow-400/35 bg-yellow-400/[0.08] text-yellow-200",
+      GRE: "border-blue-600/40 bg-blue-600/[0.1] text-blue-200",
+      HON: "border-blue-600/40 bg-blue-600/[0.1] text-blue-200",
+      HUN: "border-red-600/40 bg-red-600/[0.1] text-red-200",
+      IRN: "border-green-600/40 bg-green-600/[0.1] text-green-200",
+      IRQ: "border-green-600/40 bg-green-600/[0.1] text-green-200",
+      ITA: "border-blue-700/40 bg-blue-700/[0.12] text-blue-200",
+      JPN: "border-blue-600/40 bg-blue-600/[0.1] text-blue-200",
+      JOR: "border-red-600/40 bg-red-600/[0.1] text-red-200",
+      KOR: "border-red-500/40 bg-red-500/[0.1] text-red-200",
+      KSA: "border-green-600/40 bg-green-600/[0.1] text-green-200",
+      MAR: "border-red-600/40 bg-red-600/[0.1] text-red-200",
+      MEX: "border-green-600/40 bg-green-600/[0.1] text-green-200",
+      NED: "border-orange-500/45 bg-orange-500/[0.12] text-orange-300",
+      NGA: "border-green-600/40 bg-green-600/[0.1] text-green-200",
+      NOR: "border-red-600/40 bg-red-600/[0.1] text-red-200",
+      NZL: "border-white/25 bg-white/[0.06] text-[#e8ecec]",
+      PAN: "border-red-600/40 bg-red-600/[0.1] text-red-200",
+      PAR: "border-red-600/40 bg-red-600/[0.1] text-red-200",
+      PER: "border-red-600/40 bg-red-600/[0.1] text-red-200",
+      POL: "border-red-600/40 bg-red-600/[0.1] text-red-200",
+      POR: "border-red-600/40 bg-red-600/[0.1] text-red-200",
+      PRK: "border-red-600/40 bg-red-600/[0.1] text-red-200",
+      QAT: "border-red-800/40 bg-red-800/[0.12] text-red-200",
+      ROU: "border-yellow-400/35 bg-yellow-400/[0.08] text-yellow-200",
+      RSA: "border-yellow-400/35 bg-yellow-400/[0.08] text-yellow-200",
+      RUS: "border-red-600/40 bg-red-600/[0.1] text-red-200",
+      SCO: "border-blue-700/40 bg-blue-700/[0.12] text-blue-200",
+      SEN: "border-green-600/40 bg-green-600/[0.1] text-green-200",
+      SRB: "border-red-600/40 bg-red-600/[0.1] text-red-200",
+      SUI: "border-red-600/40 bg-red-600/[0.1] text-red-200",
+      SWE: "border-yellow-400/35 bg-yellow-400/[0.08] text-yellow-200",
+      TUN: "border-red-600/40 bg-red-600/[0.1] text-red-200",
+      TUR: "border-red-600/40 bg-red-600/[0.1] text-red-200",
+      UKR: "border-yellow-400/35 bg-yellow-400/[0.08] text-yellow-200",
+      URU: "border-sky-400/40 bg-sky-400/[0.1] text-sky-200",
+      USA: "border-red-600/40 bg-red-600/[0.1] text-red-200",
+      UZB: "border-blue-600/40 bg-blue-600/[0.1] text-blue-200",
+      VEN: "border-red-800/40 bg-red-800/[0.12] text-red-200",
+      WAL: "border-red-600/40 bg-red-600/[0.1] text-red-200"
+    };
+  }
+});
+
+// ../grarf/desktop/src/lib/livetrack/liveTrackNcaaBaseballTeams.ts
+var LIVE_TRACK_NCAA_BASEBALL_TEAMS;
+var init_liveTrackNcaaBaseballTeams = __esm({
+  "../grarf/desktop/src/lib/livetrack/liveTrackNcaaBaseballTeams.ts"() {
+    init_define_import_meta_env();
+    LIVE_TRACK_NCAA_BASEBALL_TEAMS = [
+      { names: ["Abilene Christian Wildcats", "Abilene Chrstn"], abbrev: "ACU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2000.png", tokenClass: "border-rose-400/35 bg-rose-400/[0.08] text-rose-200" },
+      { names: ["Air Force Falcons", "Air Force"], abbrev: "AFA", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2005.png", tokenClass: "border-blue-400/40 bg-blue-400/[0.1] text-blue-200" },
+      { names: ["Akron Zips", "Akron"], abbrev: "AKR", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2006.png", tokenClass: "border-amber-400/35 bg-amber-400/[0.08] text-amber-200" },
+      { names: ["Alabama A&M Bulldogs", "Alabama A&M"], abbrev: "AAMU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2010.png", tokenClass: "border-indigo-400/35 bg-indigo-400/[0.08] text-indigo-200" },
+      { names: ["Alabama Crimson Tide", "Alabama"], abbrev: "ALA", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/333.png", tokenClass: "border-red-400/35 bg-red-400/[0.08] text-red-200" },
+      { names: ["Alabama State Hornets", "Alabama St"], abbrev: "ALST", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2011.png", tokenClass: "border-teal-400/35 bg-teal-400/[0.08] text-teal-200" },
+      { names: ["Alcorn State Braves", "Alcorn St"], abbrev: "ALCN", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2016.png", tokenClass: "border-pink-400/35 bg-pink-400/[0.08] text-pink-200" },
+      { names: ["Alma Scots", "Alma"], abbrev: "ALMA", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2800.png", tokenClass: "border-lime-400/35 bg-lime-400/[0.08] text-lime-200" },
+      { names: ["American University Eagles", "American"], abbrev: "AMER", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/44.png", tokenClass: "border-fuchsia-400/35 bg-fuchsia-400/[0.08] text-fuchsia-200" },
+      { names: ["Anderson (IN) Ravens", "Anderson IND"], abbrev: "ANDC", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2023.png", tokenClass: "border-cyan-400/35 bg-cyan-400/[0.08] text-cyan-200" },
+      { names: ["App State Mountaineers", "App State"], abbrev: "APP", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2026.png", tokenClass: "border-violet-400/35 bg-violet-400/[0.08] text-violet-200" },
+      { names: ["Arizona State Sun Devils", "Arizona St"], abbrev: "ASU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/9.png", tokenClass: "border-orange-400/40 bg-orange-400/[0.1] text-orange-200" },
+      { names: ["Arizona Wildcats", "Arizona"], abbrev: "ARIZ", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/12.png", tokenClass: "border-green-500/35 bg-green-500/[0.08] text-green-200" },
+      { names: ["Arkansas Razorbacks", "Arkansas"], abbrev: "ARK", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/8.png", tokenClass: "border-sky-400/35 bg-sky-400/[0.08] text-sky-200" },
+      { names: ["Arkansas State Red Wolves", "Arkansas St"], abbrev: "ARST", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2032.png", tokenClass: "border-orange-500/45 bg-orange-500/[0.12] text-orange-300" },
+      { names: ["Arkansas-Pine Bluff Golden Lions", "AR-Pine Bluff"], abbrev: "UAPB", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2029.png", tokenClass: "border-red-500/40 bg-red-500/[0.1] text-red-200" },
+      { names: ["Army Black Knights", "Army"], abbrev: "ARMY", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/349.png", tokenClass: "border-blue-500/35 bg-blue-500/[0.08] text-blue-200" },
+      { names: ["Auburn Tigers", "Auburn"], abbrev: "AUB", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2.png", tokenClass: "border-rose-400/35 bg-rose-400/[0.08] text-rose-200" },
+      { names: ["Augustana (IL) Vikings", "Augustana (IL)"], abbrev: "AUG", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2042.png", tokenClass: "border-blue-400/40 bg-blue-400/[0.1] text-blue-200" },
+      { names: ["Aurora Spartans", "Aurora"], abbrev: "AUR", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2044.png", tokenClass: "border-amber-400/35 bg-amber-400/[0.08] text-amber-200" },
+      { names: ["Austin Peay Governors", "Austin Peay"], abbrev: "APSU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2046.png", tokenClass: "border-indigo-400/35 bg-indigo-400/[0.08] text-indigo-200" },
+      { names: ["BYU Cougars", "BYU"], abbrev: "BYU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/252.png", tokenClass: "border-red-400/35 bg-red-400/[0.08] text-red-200" },
+      { names: ["Ball State Cardinals", "Ball State"], abbrev: "BALL", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2050.png", tokenClass: "border-pink-400/35 bg-pink-400/[0.08] text-pink-200" },
+      { names: ["Baylor Bears", "Baylor"], abbrev: "BAY", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/239.png", tokenClass: "border-fuchsia-400/35 bg-fuchsia-400/[0.08] text-fuchsia-200" },
+      { names: ["Bellarmine Knights", "Bellarmine"], abbrev: "BELL", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/91.png", tokenClass: "border-cyan-400/35 bg-cyan-400/[0.08] text-cyan-200" },
+      { names: ["Belmont Bruins", "Belmont"], abbrev: "BEL", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2057.png", tokenClass: "border-violet-400/35 bg-violet-400/[0.08] text-violet-200" },
+      { names: ["Bethune-Cookman Wildcats", "Bethune"], abbrev: "BCU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2065.png", tokenClass: "border-green-500/35 bg-green-500/[0.08] text-green-200" },
+      { names: ["Binghamton Bearcats", "Binghamton"], abbrev: "BING", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2066.png", tokenClass: "border-sky-400/35 bg-sky-400/[0.08] text-sky-200" },
+      { names: ["Birmingham Southern Panthers", "Birmingham-So."], abbrev: "BSC", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/3.png", tokenClass: "border-orange-500/45 bg-orange-500/[0.12] text-orange-300" },
+      { names: ["Boise State Broncos", "Boise St"], abbrev: "BOIS", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/68.png", tokenClass: "border-red-500/40 bg-red-500/[0.1] text-red-200" },
+      { names: ["Boise State Broncos", "Boise St"], abbrev: "BOIS", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/68.png", tokenClass: "border-blue-500/35 bg-blue-500/[0.08] text-blue-200" },
+      { names: ["Boston College Eagles", "Boston College"], abbrev: "BC", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/103.png", tokenClass: "border-rose-400/35 bg-rose-400/[0.08] text-rose-200" },
+      { names: ["Boston University Terriers", "Boston U"], abbrev: "BU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/104.png", tokenClass: "border-blue-400/40 bg-blue-400/[0.1] text-blue-200" },
+      { names: ["Bowling Green Falcons", "Bowling Green"], abbrev: "BGSU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/189.png", tokenClass: "border-amber-400/35 bg-amber-400/[0.08] text-amber-200" },
+      { names: ["Bradley Braves", "Bradley"], abbrev: "BRAD", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/71.png", tokenClass: "border-indigo-400/35 bg-indigo-400/[0.08] text-indigo-200" },
+      { names: ["Brown Bears", "Brown"], abbrev: "BRWN", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/225.png", tokenClass: "border-red-400/35 bg-red-400/[0.08] text-red-200" },
+      { names: ["Bryant Bulldogs", "Bryant"], abbrev: "BRY", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2803.png", tokenClass: "border-teal-400/35 bg-teal-400/[0.08] text-teal-200" },
+      { names: ["Bucknell Bison", "Bucknell"], abbrev: "BUCK", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2083.png", tokenClass: "border-pink-400/35 bg-pink-400/[0.08] text-pink-200" },
+      { names: ["Buffalo Bulls", "Buffalo"], abbrev: "BUF", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2084.png", tokenClass: "border-lime-400/35 bg-lime-400/[0.08] text-lime-200" },
+      { names: ["Butler Bulldogs", "Butler"], abbrev: "BUT", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2086.png", tokenClass: "border-fuchsia-400/35 bg-fuchsia-400/[0.08] text-fuchsia-200" },
+      { names: ["Cal Poly Mustangs", "Cal Poly"], abbrev: "CP", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/13.png", tokenClass: "border-cyan-400/35 bg-cyan-400/[0.08] text-cyan-200" },
+      { names: ["Cal State Bakersfield Roadrunners", "Bakersfield"], abbrev: "CSUB", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2934.png", tokenClass: "border-orange-400/40 bg-orange-400/[0.1] text-orange-200" },
+      { names: ["Cal State Fullerton Titans", "Fullerton"], abbrev: "CSUF", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2239.png", tokenClass: "border-green-500/35 bg-green-500/[0.08] text-green-200" },
+      { names: ["Cal State Los Angeles Golden Eagles", "Cal State LA"], abbrev: "CSLA", logoUrl: "https://a.espncdn.com/guid/01aa35b6-c8e3-3ab4-80a6-6e84895c47a2/logos/default.png", tokenClass: "border-sky-400/35 bg-sky-400/[0.08] text-sky-200" },
+      { names: ["Cal State Northridge Matadors", "CSU Northridge"], abbrev: "CSUN", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2463.png", tokenClass: "border-orange-500/45 bg-orange-500/[0.12] text-orange-300" },
+      { names: ["California Baptist Lancers", "CA Baptist"], abbrev: "CBU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2856.png", tokenClass: "border-red-500/40 bg-red-500/[0.1] text-red-200" },
+      { names: ["California Golden Bears", "California"], abbrev: "CAL", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/25.png", tokenClass: "border-blue-500/35 bg-blue-500/[0.08] text-blue-200" },
+      { names: ["Campbell Fighting Camels", "Campbell"], abbrev: "CAM", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2097.png", tokenClass: "border-rose-400/35 bg-rose-400/[0.08] text-rose-200" },
+      { names: ["Canisius Golden Griffins", "Canisius"], abbrev: "CAN", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2099.png", tokenClass: "border-blue-400/40 bg-blue-400/[0.1] text-blue-200" },
+      { names: ["Centenary (LA) Gentlemen", "Centenary (LA)"], abbrev: "CENT", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2113.png", tokenClass: "border-amber-400/35 bg-amber-400/[0.08] text-amber-200" },
+      { names: ["Central Arkansas Bears", "C Arkansas"], abbrev: "CARK", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2110.png", tokenClass: "border-indigo-400/35 bg-indigo-400/[0.08] text-indigo-200" },
+      { names: ["Central Connecticut Blue Devils", "C Connecticut"], abbrev: "CCSU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2115.png", tokenClass: "border-red-400/35 bg-red-400/[0.08] text-red-200" },
+      { names: ["Central Michigan Chippewas", "C Michigan"], abbrev: "CMU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2117.png", tokenClass: "border-teal-400/35 bg-teal-400/[0.08] text-teal-200" },
+      { names: ["Central Missouri Mules", "C Missouri"], abbrev: "CAO", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2118.png", tokenClass: "border-pink-400/35 bg-pink-400/[0.08] text-pink-200" },
+      { names: ["Charleston Cougars", "Charleston"], abbrev: "COFC", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/232.png", tokenClass: "border-lime-400/35 bg-lime-400/[0.08] text-lime-200" },
+      { names: ["Charleston Southern Buccaneers", "Charleston So"], abbrev: "CHSO", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2127.png", tokenClass: "border-fuchsia-400/35 bg-fuchsia-400/[0.08] text-fuchsia-200" },
+      { names: ["Charlotte 49ers", "Charlotte"], abbrev: "CLT", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2429.png", tokenClass: "border-cyan-400/35 bg-cyan-400/[0.08] text-cyan-200" },
+      { names: ["Chattanooga Mocs", "Chattanooga"], abbrev: "UTC", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/236.png", tokenClass: "border-violet-400/35 bg-violet-400/[0.08] text-violet-200" },
+      { names: ["Chicago St Cougars", "Chicago St"], abbrev: "CHST", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2130.png", tokenClass: "border-orange-400/40 bg-orange-400/[0.1] text-orange-200" },
+      { names: ["Cincinnati Bearcats", "Cincinnati"], abbrev: "CIN", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2132.png", tokenClass: "border-green-500/35 bg-green-500/[0.08] text-green-200" },
+      { names: ["Clemson Tigers", "Clemson"], abbrev: "CLEM", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/228.png", tokenClass: "border-sky-400/35 bg-sky-400/[0.08] text-sky-200" },
+      { names: ["Cleveland State Vikings", "Cleveland St"], abbrev: "CLE", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/325.png", tokenClass: "border-orange-500/45 bg-orange-500/[0.12] text-orange-300" },
+      { names: ["Coastal Carolina Chanticleers", "Coastal"], abbrev: "CCU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/324.png", tokenClass: "border-red-500/40 bg-red-500/[0.1] text-red-200" },
+      { names: ["Coe Kohawks", "Coe"], abbrev: "COE", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2141.png", tokenClass: "border-blue-500/35 bg-blue-500/[0.08] text-blue-200" },
+      { names: ["Colgate Raiders", "Colgate"], abbrev: "COLG", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2142.png", tokenClass: "border-rose-400/35 bg-rose-400/[0.08] text-rose-200" },
+      { names: ["Colorado Buffaloes", "Colorado"], abbrev: "COLO", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/38.png", tokenClass: "border-blue-400/40 bg-blue-400/[0.1] text-blue-200" },
+      { names: ["Colorado State Rams", "Colorado St"], abbrev: "CSU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/36.png", tokenClass: "border-amber-400/35 bg-amber-400/[0.08] text-amber-200" },
+      { names: ["Columbia Lions", "Columbia"], abbrev: "COLU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/171.png", tokenClass: "border-indigo-400/35 bg-indigo-400/[0.08] text-indigo-200" },
+      { names: ["Concordia St. Paul Golden Bears", "Concordia St P"], abbrev: "CON", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/3066.png", tokenClass: "border-red-400/35 bg-red-400/[0.08] text-red-200" },
+      { names: ["Coppin State Eagles", "Coppin St"], abbrev: "COPP", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2154.png", tokenClass: "border-pink-400/35 bg-pink-400/[0.08] text-pink-200" },
+      { names: ["Cornell (IA) Rams", "Cornell (IA)"], abbrev: "CRIA", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2155.png", tokenClass: "border-lime-400/35 bg-lime-400/[0.08] text-lime-200" },
+      { names: ["Cornell Big Red", "Cornell"], abbrev: "COR", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/172.png", tokenClass: "border-fuchsia-400/35 bg-fuchsia-400/[0.08] text-fuchsia-200" },
+      { names: ["Creighton Bluejays", "Creighton"], abbrev: "CREI", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/156.png", tokenClass: "border-cyan-400/35 bg-cyan-400/[0.08] text-cyan-200" },
+      { names: ["Dallas Baptist Patriots", "Dallas Baptist"], abbrev: "DBU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2164.png", tokenClass: "border-violet-400/35 bg-violet-400/[0.08] text-violet-200" },
+      { names: ["Dartmouth Big Green", "Dartmouth"], abbrev: "DART", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/159.png", tokenClass: "border-orange-400/40 bg-orange-400/[0.1] text-orange-200" },
+      { names: ["Davidson Wildcats", "Davidson"], abbrev: "DAV", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2166.png", tokenClass: "border-green-500/35 bg-green-500/[0.08] text-green-200" },
+      { names: ["Dayton Flyers", "Dayton"], abbrev: "DAY", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2168.png", tokenClass: "border-sky-400/35 bg-sky-400/[0.08] text-sky-200" },
+      { names: ["DePaul Blue Demons", "DePaul"], abbrev: "DEP", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/305.png", tokenClass: "border-orange-500/45 bg-orange-500/[0.12] text-orange-300" },
+      { names: ["DePauw Tigers", "DePauw"], abbrev: "DEP", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/83.png", tokenClass: "border-red-500/40 bg-red-500/[0.1] text-red-200" },
+      { names: ["Delaware Blue Hens", "Delaware"], abbrev: "DEL", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/48.png", tokenClass: "border-blue-500/35 bg-blue-500/[0.08] text-blue-200" },
+      { names: ["Delaware State Hornets", "Delaware St"], abbrev: "DSU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2169.png", tokenClass: "border-rose-400/35 bg-rose-400/[0.08] text-rose-200" },
+      { names: ["Denver Pioneers", "Denver"], abbrev: "DEN", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2172.png", tokenClass: "border-blue-400/40 bg-blue-400/[0.1] text-blue-200" },
+      { names: ["Detroit Mercy Titans", "Detroit Mercy"], abbrev: "DETM", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2174.png", tokenClass: "border-amber-400/35 bg-amber-400/[0.08] text-amber-200" },
+      { names: ["Drake Bulldogs", "Drake"], abbrev: "DRKE", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2181.png", tokenClass: "border-indigo-400/35 bg-indigo-400/[0.08] text-indigo-200" },
+      { names: ["Drexel Dragons", "Drexel"], abbrev: "DREX", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2182.png", tokenClass: "border-red-400/35 bg-red-400/[0.08] text-red-200" },
+      { names: ["Duke Blue Devils", "Duke"], abbrev: "DUKE", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/150.png", tokenClass: "border-teal-400/35 bg-teal-400/[0.08] text-teal-200" },
+      { names: ["Duquesne Dukes", "Duquesne"], abbrev: "DUQ", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2184.png", tokenClass: "border-pink-400/35 bg-pink-400/[0.08] text-pink-200" },
+      { names: ["East Carolina Pirates", "East Carolina"], abbrev: "ECU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/151.png", tokenClass: "border-lime-400/35 bg-lime-400/[0.08] text-lime-200" },
+      { names: ["East Tennessee State Buccaneers", "ETSU"], abbrev: "ETSU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2193.png", tokenClass: "border-fuchsia-400/35 bg-fuchsia-400/[0.08] text-fuchsia-200" },
+      { names: ["Eastern Illinois Panthers", "E Illinois"], abbrev: "EIU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2197.png", tokenClass: "border-cyan-400/35 bg-cyan-400/[0.08] text-cyan-200" },
+      { names: ["Eastern Kentucky Colonels", "E Kentucky"], abbrev: "EKU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2198.png", tokenClass: "border-violet-400/35 bg-violet-400/[0.08] text-violet-200" },
+      { names: ["Eastern Michigan Eagles", "E Michigan"], abbrev: "EMU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2199.png", tokenClass: "border-orange-400/40 bg-orange-400/[0.1] text-orange-200" },
+      { names: ["Eastern Washington Eagles", "E Washington"], abbrev: "EWU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/331.png", tokenClass: "border-green-500/35 bg-green-500/[0.08] text-green-200" },
+      { names: ["Elon Phoenix", "Elon"], abbrev: "ELON", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2210.png", tokenClass: "border-sky-400/35 bg-sky-400/[0.08] text-sky-200" },
+      { names: ["Emporia State Hornets", "Emporia St"], abbrev: "EMP", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2214.png", tokenClass: "border-orange-500/45 bg-orange-500/[0.12] text-orange-300" },
+      { names: ["Evansville Purple Aces", "Evansville"], abbrev: "EVAN", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/339.png", tokenClass: "border-red-500/40 bg-red-500/[0.1] text-red-200" },
+      { names: ["Fairfield Stags", "Fairfield"], abbrev: "FAIR", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2217.png", tokenClass: "border-blue-500/35 bg-blue-500/[0.08] text-blue-200" },
+      { names: ["Fairleigh Dickinson Knights", "FDU"], abbrev: "FDU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/161.png", tokenClass: "border-rose-400/35 bg-rose-400/[0.08] text-rose-200" },
+      { names: ["Florida A&M Rattlers", "Florida A&M"], abbrev: "FAMU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/50.png", tokenClass: "border-amber-400/35 bg-amber-400/[0.08] text-amber-200" },
+      { names: ["Florida Atlantic Owls", "FAU"], abbrev: "FAU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2226.png", tokenClass: "border-indigo-400/35 bg-indigo-400/[0.08] text-indigo-200" },
+      { names: ["Florida Gators", "Florida"], abbrev: "FLA", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/57.png", tokenClass: "border-red-400/35 bg-red-400/[0.08] text-red-200" },
+      { names: ["Florida Gulf Coast Eagles", "FGCU"], abbrev: "FGCU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/526.png", tokenClass: "border-teal-400/35 bg-teal-400/[0.08] text-teal-200" },
+      { names: ["Florida International Panthers", "FIU"], abbrev: "FIU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2229.png", tokenClass: "border-pink-400/35 bg-pink-400/[0.08] text-pink-200" },
+      { names: ["Florida State Seminoles", "Florida St"], abbrev: "FSU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/52.png", tokenClass: "border-fuchsia-400/35 bg-fuchsia-400/[0.08] text-fuchsia-200" },
+      { names: ["Fordham Rams", "Fordham"], abbrev: "FOR", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2230.png", tokenClass: "border-cyan-400/35 bg-cyan-400/[0.08] text-cyan-200" },
+      { names: ["Fresno State Bulldogs", "Fresno St"], abbrev: "FRES", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/278.png", tokenClass: "border-orange-400/40 bg-orange-400/[0.1] text-orange-200" },
+      { names: ["Furman Paladins", "Furman"], abbrev: "FUR", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/231.png", tokenClass: "border-green-500/35 bg-green-500/[0.08] text-green-200" },
+      { names: ["Gardner-Webb Runnin' Bulldogs", "Gardner-Webb"], abbrev: "GWEB", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2241.png", tokenClass: "border-sky-400/35 bg-sky-400/[0.08] text-sky-200" },
+      { names: ["George Mason Patriots", "George Mason"], abbrev: "GMU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2244.png", tokenClass: "border-orange-500/45 bg-orange-500/[0.12] text-orange-300" },
+      { names: ["George Washington Revolutionaries", "G Washington"], abbrev: "GW", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/45.png", tokenClass: "border-red-500/40 bg-red-500/[0.1] text-red-200" },
+      { names: ["Georgetown Hoyas", "Georgetown"], abbrev: "GTWN", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/46.png", tokenClass: "border-blue-500/35 bg-blue-500/[0.08] text-blue-200" },
+      { names: ["Georgia Bulldogs", "Georgia"], abbrev: "UGA", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/61.png", tokenClass: "border-rose-400/35 bg-rose-400/[0.08] text-rose-200" },
+      { names: ["Georgia Southern Eagles", "GA Southern"], abbrev: "GASO", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/290.png", tokenClass: "border-blue-400/40 bg-blue-400/[0.1] text-blue-200" },
+      { names: ["Georgia State Panthers", "Georgia St"], abbrev: "GAST", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2247.png", tokenClass: "border-amber-400/35 bg-amber-400/[0.08] text-amber-200" },
+      { names: ["Georgia Tech Yellow Jackets", "Georgia Tech"], abbrev: "GT", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/59.png", tokenClass: "border-indigo-400/35 bg-indigo-400/[0.08] text-indigo-200" },
+      { names: ["Gonzaga Bulldogs", "Gonzaga"], abbrev: "GONZ", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2250.png", tokenClass: "border-red-400/35 bg-red-400/[0.08] text-red-200" },
+      { names: ["Grambling Tigers", "Grambling"], abbrev: "GRAM", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2755.png", tokenClass: "border-teal-400/35 bg-teal-400/[0.08] text-teal-200" },
+      { names: ["Grand Canyon Lopes", "Grand Canyon"], abbrev: "GCU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2253.png", tokenClass: "border-pink-400/35 bg-pink-400/[0.08] text-pink-200" },
+      { names: ["Grand View Vikings", "Grand View"], abbrev: "GRA", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2254.png", tokenClass: "border-lime-400/35 bg-lime-400/[0.08] text-lime-200" },
+      { names: ["Green Bay Phoenix", "Green Bay"], abbrev: "GB", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2739.png", tokenClass: "border-fuchsia-400/35 bg-fuchsia-400/[0.08] text-fuchsia-200" },
+      { names: ["Hampton Pirates", "Hampton"], abbrev: "HAMP", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2261.png", tokenClass: "border-cyan-400/35 bg-cyan-400/[0.08] text-cyan-200" },
+      { names: ["Hartford Hawks", "Hartford"], abbrev: "HART", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/42.png", tokenClass: "border-violet-400/35 bg-violet-400/[0.08] text-violet-200" },
+      { names: ["Harvard Crimson", "Harvard"], abbrev: "HARV", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/108.png", tokenClass: "border-orange-400/40 bg-orange-400/[0.1] text-orange-200" },
+      { names: ["Hawai'i Rainbow Warriors", "Hawai'i"], abbrev: "HAW", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/62.png", tokenClass: "border-green-500/35 bg-green-500/[0.08] text-green-200" },
+      { names: ["Hawai\u02BBi Pacific Sea Warriors", "HI Pacific"], abbrev: "HPU", logoUrl: "https://a.espncdn.com/guid/cf8e81e2-4cc5-310a-838f-c046b0d505b7/logos/default.png", tokenClass: "border-orange-500/45 bg-orange-500/[0.12] text-orange-300" },
+      { names: ["High Point Panthers", "High Point"], abbrev: "HPU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2272.png", tokenClass: "border-red-500/40 bg-red-500/[0.1] text-red-200" },
+      { names: ["Hofstra Pride", "Hofstra"], abbrev: "HOF", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2275.png", tokenClass: "border-blue-500/35 bg-blue-500/[0.08] text-blue-200" },
+      { names: ["Holy Cross Crusaders", "Holy Cross"], abbrev: "HC", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/107.png", tokenClass: "border-rose-400/35 bg-rose-400/[0.08] text-rose-200" },
+      { names: ["Houston Christian Huskies", "Hou Christian"], abbrev: "HCU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2277.png", tokenClass: "border-blue-400/40 bg-blue-400/[0.1] text-blue-200" },
+      { names: ["Houston Cougars", "Houston"], abbrev: "HOU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/248.png", tokenClass: "border-amber-400/35 bg-amber-400/[0.08] text-amber-200" },
+      { names: ["Howard Bison", "Howard"], abbrev: "HOW", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/47.png", tokenClass: "border-indigo-400/35 bg-indigo-400/[0.08] text-indigo-200" },
+      { names: ["IU Indianapolis Jaguars", "IU Indy"], abbrev: "IUIN", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/85.png", tokenClass: "border-red-400/35 bg-red-400/[0.08] text-red-200" },
+      { names: ["Idaho State Bengals", "Idaho St"], abbrev: "IDST", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/304.png", tokenClass: "border-teal-400/35 bg-teal-400/[0.08] text-teal-200" },
+      { names: ["Idaho Vandals", "Idaho"], abbrev: "IDHO", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/70.png", tokenClass: "border-pink-400/35 bg-pink-400/[0.08] text-pink-200" },
+      { names: ["Illinois Fighting Illini", "Illinois"], abbrev: "ILL", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/356.png", tokenClass: "border-lime-400/35 bg-lime-400/[0.08] text-lime-200" },
+      { names: ["Illinois State Redbirds", "Illinois St"], abbrev: "ILST", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2287.png", tokenClass: "border-fuchsia-400/35 bg-fuchsia-400/[0.08] text-fuchsia-200" },
+      { names: ["Incarnate Word Cardinals", "Incarnate Word"], abbrev: "UIW", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2916.png", tokenClass: "border-cyan-400/35 bg-cyan-400/[0.08] text-cyan-200" },
+      { names: ["Indiana Hoosiers", "Indiana"], abbrev: "IU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/84.png", tokenClass: "border-violet-400/35 bg-violet-400/[0.08] text-violet-200" },
+      { names: ["Indiana State Sycamores", "Indiana St"], abbrev: "INST", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/282.png", tokenClass: "border-orange-400/40 bg-orange-400/[0.1] text-orange-200" },
+      { names: ["Iona Gaels", "Iona"], abbrev: "IONA", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/314.png", tokenClass: "border-green-500/35 bg-green-500/[0.08] text-green-200" },
+      { names: ["Iowa Hawkeyes", "Iowa"], abbrev: "IOWA", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2294.png", tokenClass: "border-sky-400/35 bg-sky-400/[0.08] text-sky-200" },
+      { names: ["Iowa State Cyclones", "Iowa St"], abbrev: "ISU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/66.png", tokenClass: "border-orange-500/45 bg-orange-500/[0.12] text-orange-300" },
+      { names: ["Jackson State Tigers", "Jackson St"], abbrev: "JKST", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2296.png", tokenClass: "border-red-500/40 bg-red-500/[0.1] text-red-200" },
+      { names: ["Jacksonville Dolphins", "Jacksonville"], abbrev: "JAX", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/294.png", tokenClass: "border-blue-500/35 bg-blue-500/[0.08] text-blue-200" },
+      { names: ["Jacksonville State Gamecocks", "Jax State"], abbrev: "JVST", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/55.png", tokenClass: "border-rose-400/35 bg-rose-400/[0.08] text-rose-200" },
+      { names: ["James Madison Dukes", "James Madison"], abbrev: "JMU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/256.png", tokenClass: "border-blue-400/40 bg-blue-400/[0.1] text-blue-200" },
+      { names: ["Kansas City Roos", "Kansas City"], abbrev: "KC", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/140.png", tokenClass: "border-indigo-400/35 bg-indigo-400/[0.08] text-indigo-200" },
+      { names: ["Kansas Jayhawks", "Kansas"], abbrev: "KU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2305.png", tokenClass: "border-red-400/35 bg-red-400/[0.08] text-red-200" },
+      { names: ["Kansas State Wildcats", "Kansas St"], abbrev: "KSU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2306.png", tokenClass: "border-teal-400/35 bg-teal-400/[0.08] text-teal-200" },
+      { names: ["Kennesaw State Owls", "Kennesaw St"], abbrev: "KENN", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/338.png", tokenClass: "border-pink-400/35 bg-pink-400/[0.08] text-pink-200" },
+      { names: ["Kent State Golden Flashes", "Kent State"], abbrev: "KENT", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2309.png", tokenClass: "border-lime-400/35 bg-lime-400/[0.08] text-lime-200" },
+      { names: ["Kentucky Wildcats", "Kentucky"], abbrev: "UK", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/96.png", tokenClass: "border-fuchsia-400/35 bg-fuchsia-400/[0.08] text-fuchsia-200" },
+      { names: ["LSU Tigers", "LSU"], abbrev: "LSU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/99.png", tokenClass: "border-cyan-400/35 bg-cyan-400/[0.08] text-cyan-200" },
+      { names: ["La Salle Explorers", "La Salle"], abbrev: "LAS", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2325.png", tokenClass: "border-violet-400/35 bg-violet-400/[0.08] text-violet-200" },
+      { names: ["Lafayette Leopards", "Lafayette"], abbrev: "LAF", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/322.png", tokenClass: "border-orange-400/40 bg-orange-400/[0.1] text-orange-200" },
+      { names: ["Lamar Cardinals", "Lamar"], abbrev: "LAM", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2320.png", tokenClass: "border-green-500/35 bg-green-500/[0.08] text-green-200" },
+      { names: ["Le Moyne Dolphins", "Le Moyne"], abbrev: "LEM", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2330.png", tokenClass: "border-sky-400/35 bg-sky-400/[0.08] text-sky-200" },
+      { names: ["Lehigh Mountain Hawks", "Lehigh"], abbrev: "LEH", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2329.png", tokenClass: "border-orange-500/45 bg-orange-500/[0.12] text-orange-300" },
+      { names: ["Lenoir Rhyne Bears", "Lenoir Rhyne"], abbrev: "LEN", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2331.png", tokenClass: "border-red-500/40 bg-red-500/[0.1] text-red-200" },
+      { names: ["Liberty Flames", "Liberty"], abbrev: "LIB", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2335.png", tokenClass: "border-blue-500/35 bg-blue-500/[0.08] text-blue-200" },
+      { names: ["Lindenwood Lions", "Lindenwood"], abbrev: "LIN", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2815.png", tokenClass: "border-blue-400/40 bg-blue-400/[0.1] text-blue-200" },
+      { names: ["Linfield Wildcats", "Linfield"], abbrev: "LIN", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/203.png", tokenClass: "border-amber-400/35 bg-amber-400/[0.08] text-amber-200" },
+      { names: ["Lipscomb Bisons", "Lipscomb"], abbrev: "LIP", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/288.png", tokenClass: "border-indigo-400/35 bg-indigo-400/[0.08] text-indigo-200" },
+      { names: ["Little Rock Trojans", "Little Rock"], abbrev: "LR", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2031.png", tokenClass: "border-red-400/35 bg-red-400/[0.08] text-red-200" },
+      { names: ["Long Beach State Beach", "Long Beach St"], abbrev: "LBSU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/299.png", tokenClass: "border-teal-400/35 bg-teal-400/[0.08] text-teal-200" },
+      { names: ["Long Island University Sharks", "Long Island"], abbrev: "LIU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2341.png", tokenClass: "border-pink-400/35 bg-pink-400/[0.08] text-pink-200" },
+      { names: ["Longwood Lancers", "Longwood"], abbrev: "LONG", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2344.png", tokenClass: "border-lime-400/35 bg-lime-400/[0.08] text-lime-200" },
+      { names: ["Loras Duhawks", "Loras"], abbrev: "LOR", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/263.png", tokenClass: "border-fuchsia-400/35 bg-fuchsia-400/[0.08] text-fuchsia-200" },
+      { names: ["Louisiana Ragin' Cajuns", "Louisiana"], abbrev: "UL", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/309.png", tokenClass: "border-violet-400/35 bg-violet-400/[0.08] text-violet-200" },
+      { names: ["Louisiana Tech Bulldogs", "Louisiana Tech"], abbrev: "LT", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2348.png", tokenClass: "border-orange-400/40 bg-orange-400/[0.1] text-orange-200" },
+      { names: ["Louisville Cardinals", "Louisville"], abbrev: "LOU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/97.png", tokenClass: "border-green-500/35 bg-green-500/[0.08] text-green-200" },
+      { names: ["Loyola Chicago Ramblers", "Loyola Chicago"], abbrev: "LUC", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2350.png", tokenClass: "border-sky-400/35 bg-sky-400/[0.08] text-sky-200" },
+      { names: ["Loyola Maryland Greyhounds", "Loyola MD"], abbrev: "L-MD", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2352.png", tokenClass: "border-orange-500/45 bg-orange-500/[0.12] text-orange-300" },
+      { names: ["Loyola Marymount Lions", "LMU"], abbrev: "LMU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2351.png", tokenClass: "border-red-500/40 bg-red-500/[0.1] text-red-200" },
+      { names: ["Maine Black Bears", "Maine"], abbrev: "ME", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/311.png", tokenClass: "border-blue-400/40 bg-blue-400/[0.1] text-blue-200" },
+      { names: ["Manhattan Jaspers", "Manhattan"], abbrev: "MAN", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2363.png", tokenClass: "border-amber-400/35 bg-amber-400/[0.08] text-amber-200" },
+      { names: ["Marist Red Foxes", "Marist"], abbrev: "MRST", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2368.png", tokenClass: "border-indigo-400/35 bg-indigo-400/[0.08] text-indigo-200" },
+      { names: ["Marquette Golden Eagles", "Marquette"], abbrev: "MARQ", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/269.png", tokenClass: "border-red-400/35 bg-red-400/[0.08] text-red-200" },
+      { names: ["Marshall Thundering Herd", "Marshall"], abbrev: "MRSH", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/276.png", tokenClass: "border-teal-400/35 bg-teal-400/[0.08] text-teal-200" },
+      { names: ["Maryland Eastern Shore Hawks", "MD Eastern"], abbrev: "UMES", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2379.png", tokenClass: "border-pink-400/35 bg-pink-400/[0.08] text-pink-200" },
+      { names: ["Maryland Terrapins", "Maryland"], abbrev: "MD", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/120.png", tokenClass: "border-lime-400/35 bg-lime-400/[0.08] text-lime-200" },
+      { names: ["Massachusetts Minutemen", "UMass"], abbrev: "MASS", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/113.png", tokenClass: "border-fuchsia-400/35 bg-fuchsia-400/[0.08] text-fuchsia-200" },
+      { names: ["McNeese Cowboys", "McNeese"], abbrev: "MCN", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2377.png", tokenClass: "border-cyan-400/35 bg-cyan-400/[0.08] text-cyan-200" },
+      { names: ["Memphis Tigers", "Memphis"], abbrev: "MEM", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/235.png", tokenClass: "border-violet-400/35 bg-violet-400/[0.08] text-violet-200" },
+      { names: ["Mercer Bears", "Mercer"], abbrev: "MER", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2382.png", tokenClass: "border-orange-400/40 bg-orange-400/[0.1] text-orange-200" },
+      { names: ["Mercyhurst Lakers", "Mercyhurst"], abbrev: "MER", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2385.png", tokenClass: "border-green-500/35 bg-green-500/[0.08] text-green-200" },
+      { names: ["Merrimack Warriors", "Merrimack"], abbrev: "MRMK", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2771.png", tokenClass: "border-sky-400/35 bg-sky-400/[0.08] text-sky-200" },
+      { names: ["Miami (OH) RedHawks", "Miami OH"], abbrev: "M-OH", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/193.png", tokenClass: "border-orange-500/45 bg-orange-500/[0.12] text-orange-300" },
+      { names: ["Miami Hurricanes", "Miami"], abbrev: "MIA", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2390.png", tokenClass: "border-red-500/40 bg-red-500/[0.1] text-red-200" },
+      { names: ["Michigan State Spartans", "Michigan St"], abbrev: "MSU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/127.png", tokenClass: "border-blue-500/35 bg-blue-500/[0.08] text-blue-200" },
+      { names: ["Michigan Wolverines", "Michigan"], abbrev: "MICH", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/130.png", tokenClass: "border-rose-400/35 bg-rose-400/[0.08] text-rose-200" },
+      { names: ["Middle Tennessee Blue Raiders", "MTSU"], abbrev: "MTSU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2393.png", tokenClass: "border-amber-400/35 bg-amber-400/[0.08] text-amber-200" },
+      { names: ["Milwaukee Panthers", "Milwaukee"], abbrev: "MILW", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/270.png", tokenClass: "border-indigo-400/35 bg-indigo-400/[0.08] text-indigo-200" },
+      { names: ["Minnesota Golden Gophers", "Minnesota"], abbrev: "MINN", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/135.png", tokenClass: "border-red-400/35 bg-red-400/[0.08] text-red-200" },
+      { names: ["Mississippi State Bulldogs", "Mississippi St"], abbrev: "MSST", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/344.png", tokenClass: "border-teal-400/35 bg-teal-400/[0.08] text-teal-200" },
+      { names: ["Mississippi Valley State Delta Devils", "Miss Valley St"], abbrev: "MVSU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2400.png", tokenClass: "border-pink-400/35 bg-pink-400/[0.08] text-pink-200" },
+      { names: ["Missouri State Bears", "Missouri St"], abbrev: "MOST", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2623.png", tokenClass: "border-lime-400/35 bg-lime-400/[0.08] text-lime-200" },
+      { names: ["Missouri Tigers", "Missouri"], abbrev: "MIZ", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/142.png", tokenClass: "border-fuchsia-400/35 bg-fuchsia-400/[0.08] text-fuchsia-200" },
+      { names: ["Monmouth Hawks", "Monmouth"], abbrev: "MONM", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2405.png", tokenClass: "border-cyan-400/35 bg-cyan-400/[0.08] text-cyan-200" },
+      { names: ["Montana Grizzlies", "Montana"], abbrev: "MONT", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/149.png", tokenClass: "border-violet-400/35 bg-violet-400/[0.08] text-violet-200" },
+      { names: ["Montana State Bobcats", "Montana St"], abbrev: "MTST", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/147.png", tokenClass: "border-orange-400/40 bg-orange-400/[0.1] text-orange-200" },
+      { names: ["Morehead State Eagles", "Morehead St"], abbrev: "MORE", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2413.png", tokenClass: "border-green-500/35 bg-green-500/[0.08] text-green-200" },
+      { names: ["Morgan State Bears", "Morgan St"], abbrev: "MORG", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2415.png", tokenClass: "border-sky-400/35 bg-sky-400/[0.08] text-sky-200" },
+      { names: ["Mount St. Mary's Mountaineers", "Mount St Marys"], abbrev: "MSM", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/116.png", tokenClass: "border-orange-500/45 bg-orange-500/[0.12] text-orange-300" },
+      { names: ["Murray State Racers", "Murray St"], abbrev: "MUR", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/93.png", tokenClass: "border-red-500/40 bg-red-500/[0.1] text-red-200" },
+      { names: ["NC State Wolfpack", "NC State"], abbrev: "NCSU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/152.png", tokenClass: "border-blue-500/35 bg-blue-500/[0.08] text-blue-200" },
+      { names: ["NJIT Highlanders", "NJIT"], abbrev: "NJIT", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2885.png", tokenClass: "border-rose-400/35 bg-rose-400/[0.08] text-rose-200" },
+      { names: ["Navy Midshipmen", "Navy"], abbrev: "NAVY", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2426.png", tokenClass: "border-amber-400/35 bg-amber-400/[0.08] text-amber-200" },
+      { names: ["Nebraska Cornhuskers", "Nebraska"], abbrev: "NEB", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/158.png", tokenClass: "border-indigo-400/35 bg-indigo-400/[0.08] text-indigo-200" },
+      { names: ["Nebraska Kearney Lopers", "NE Kearney"], abbrev: "NK", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2438.png", tokenClass: "border-red-400/35 bg-red-400/[0.08] text-red-200" },
+      { names: ["Nevada Wolf Pack", "Nevada"], abbrev: "NEV", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2440.png", tokenClass: "border-teal-400/35 bg-teal-400/[0.08] text-teal-200" },
+      { names: ["New Hampshire Wildcats", "New Hampshire"], abbrev: "UNH", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/160.png", tokenClass: "border-pink-400/35 bg-pink-400/[0.08] text-pink-200" },
+      { names: ["New Haven Chargers", "New Haven"], abbrev: "NHVN", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2441.png", tokenClass: "border-lime-400/35 bg-lime-400/[0.08] text-lime-200" },
+      { names: ["New Mexico Lobos", "New Mexico"], abbrev: "UNM", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/167.png", tokenClass: "border-fuchsia-400/35 bg-fuchsia-400/[0.08] text-fuchsia-200" },
+      { names: ["New Mexico State Aggies", "New Mexico St"], abbrev: "NMSU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/166.png", tokenClass: "border-cyan-400/35 bg-cyan-400/[0.08] text-cyan-200" },
+      { names: ["New Orleans Privateers", "New Orleans"], abbrev: "UNO", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2443.png", tokenClass: "border-violet-400/35 bg-violet-400/[0.08] text-violet-200" },
+      { names: ["Niagara Purple Eagles", "Niagara"], abbrev: "NIA", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/315.png", tokenClass: "border-orange-400/40 bg-orange-400/[0.1] text-orange-200" },
+      { names: ["Nicholls Colonels", "Nicholls"], abbrev: "NICH", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2447.png", tokenClass: "border-green-500/35 bg-green-500/[0.08] text-green-200" },
+      { names: ["Norfolk State Spartans", "Norfolk St"], abbrev: "NORF", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2450.png", tokenClass: "border-sky-400/35 bg-sky-400/[0.08] text-sky-200" },
+      { names: ["North Alabama Lions", "North Alabama"], abbrev: "UNA", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2453.png", tokenClass: "border-orange-500/45 bg-orange-500/[0.12] text-orange-300" },
+      { names: ["North Carolina A&T Aggies", "NC A&T"], abbrev: "NCAT", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2448.png", tokenClass: "border-red-500/40 bg-red-500/[0.1] text-red-200" },
+      { names: ["North Carolina Central Eagles", "NC Central"], abbrev: "NCCU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2428.png", tokenClass: "border-blue-500/35 bg-blue-500/[0.08] text-blue-200" },
+      { names: ["North Carolina Tar Heels", "North Carolina"], abbrev: "UNC", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/153.png", tokenClass: "border-sky-400/35 bg-sky-400/[0.08] text-sky-200" },
+      { names: ["North Dakota Fighting Hawks", "North Dakota"], abbrev: "UND", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/155.png", tokenClass: "border-blue-400/40 bg-blue-400/[0.1] text-blue-200" },
+      { names: ["North Dakota State Bison", "N Dakota St"], abbrev: "NDSU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2449.png", tokenClass: "border-amber-400/35 bg-amber-400/[0.08] text-amber-200" },
+      { names: ["North Florida Ospreys", "North Florida"], abbrev: "UNF", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2454.png", tokenClass: "border-indigo-400/35 bg-indigo-400/[0.08] text-indigo-200" },
+      { names: ["North Texas Mean Green", "North Texas"], abbrev: "UNT", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/249.png", tokenClass: "border-teal-400/35 bg-teal-400/[0.08] text-teal-200" },
+      { names: ["Northeastern Huskies", "Northeastern"], abbrev: "NE", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/111.png", tokenClass: "border-pink-400/35 bg-pink-400/[0.08] text-pink-200" },
+      { names: ["Northern Arizona Lumberjacks", "N Arizona"], abbrev: "NAU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2464.png", tokenClass: "border-lime-400/35 bg-lime-400/[0.08] text-lime-200" },
+      { names: ["Northern Colorado Bears", "N Colorado"], abbrev: "UNCO", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2458.png", tokenClass: "border-fuchsia-400/35 bg-fuchsia-400/[0.08] text-fuchsia-200" },
+      { names: ["Northern Illinois Huskies", "N Illinois"], abbrev: "NIU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2459.png", tokenClass: "border-cyan-400/35 bg-cyan-400/[0.08] text-cyan-200" },
+      { names: ["Northern Iowa Panthers", "Northern Iowa"], abbrev: "UNI", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2460.png", tokenClass: "border-violet-400/35 bg-violet-400/[0.08] text-violet-200" },
+      { names: ["Northern Kentucky Norse", "N Kentucky"], abbrev: "NKU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/94.png", tokenClass: "border-orange-400/40 bg-orange-400/[0.1] text-orange-200" },
+      { names: ["Northwestern State Demons", "N'Western St"], abbrev: "NWST", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2466.png", tokenClass: "border-orange-500/45 bg-orange-500/[0.12] text-orange-300" },
+      { names: ["Northwestern Wildcats", "Northwestern"], abbrev: "NU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/77.png", tokenClass: "border-red-500/40 bg-red-500/[0.1] text-red-200" },
+      { names: ["Notre Dame Fighting Irish", "Notre Dame"], abbrev: "ND", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/87.png", tokenClass: "border-blue-500/35 bg-blue-500/[0.08] text-blue-200" },
+      { names: ["Oakland Golden Grizzlies", "Oakland"], abbrev: "OAK", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2473.png", tokenClass: "border-amber-400/35 bg-amber-400/[0.08] text-amber-200" },
+      { names: ["Ohio Bobcats", "Ohio"], abbrev: "OHIO", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/195.png", tokenClass: "border-indigo-400/35 bg-indigo-400/[0.08] text-indigo-200" },
+      { names: ["Ohio State Buckeyes", "Ohio State"], abbrev: "OSU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/194.png", tokenClass: "border-red-400/35 bg-red-400/[0.08] text-red-200" },
+      { names: ["Oklahoma Sooners", "Oklahoma"], abbrev: "OU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/201.png", tokenClass: "border-teal-400/35 bg-teal-400/[0.08] text-teal-200" },
+      { names: ["Oklahoma State Cowboys", "Oklahoma St"], abbrev: "OKST", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/197.png", tokenClass: "border-pink-400/35 bg-pink-400/[0.08] text-pink-200" },
+      { names: ["Old Dominion Monarchs", "Old Dominion"], abbrev: "ODU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/295.png", tokenClass: "border-lime-400/35 bg-lime-400/[0.08] text-lime-200" },
+      { names: ["Ole Miss Rebels", "Ole Miss"], abbrev: "MISS", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/145.png", tokenClass: "border-fuchsia-400/35 bg-fuchsia-400/[0.08] text-fuchsia-200" },
+      { names: ["Omaha Mavericks", "Omaha"], abbrev: "OMA", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2437.png", tokenClass: "border-cyan-400/35 bg-cyan-400/[0.08] text-cyan-200" },
+      { names: ["Oral Roberts Golden Eagles", "Oral Roberts"], abbrev: "ORU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/198.png", tokenClass: "border-violet-400/35 bg-violet-400/[0.08] text-violet-200" },
+      { names: ["Oregon Ducks", "Oregon"], abbrev: "ORE", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2483.png", tokenClass: "border-orange-400/40 bg-orange-400/[0.1] text-orange-200" },
+      { names: ["Oregon State Beavers", "Oregon St"], abbrev: "ORST", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/204.png", tokenClass: "border-green-500/35 bg-green-500/[0.08] text-green-200" },
+      { names: ["Pacific Lutheran Lutes", "Pac Lutheran"], abbrev: "PAC", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2486.png", tokenClass: "border-sky-400/35 bg-sky-400/[0.08] text-sky-200" },
+      { names: ["Pacific Tigers", "Pacific"], abbrev: "PAC", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/279.png", tokenClass: "border-orange-500/45 bg-orange-500/[0.12] text-orange-300" },
+      { names: ["Penn State Nittany Lions", "Penn State"], abbrev: "PSU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/213.png", tokenClass: "border-blue-500/35 bg-blue-500/[0.08] text-blue-200" },
+      { names: ["Pennsylvania Quakers", "Penn"], abbrev: "PENN", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/219.png", tokenClass: "border-rose-400/35 bg-rose-400/[0.08] text-rose-200" },
+      { names: ["Pepperdine Waves", "Pepperdine"], abbrev: "PEPP", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2492.png", tokenClass: "border-blue-400/40 bg-blue-400/[0.1] text-blue-200" },
+      { names: ["Pittsburgh Panthers", "Pitt"], abbrev: "PITT", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/221.png", tokenClass: "border-amber-400/35 bg-amber-400/[0.08] text-amber-200" },
+      { names: ["Portland Pilots", "Portland"], abbrev: "PORT", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2501.png", tokenClass: "border-indigo-400/35 bg-indigo-400/[0.08] text-indigo-200" },
+      { names: ["Portland State Vikings", "Portland St"], abbrev: "PRST", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2502.png", tokenClass: "border-red-400/35 bg-red-400/[0.08] text-red-200" },
+      { names: ["Prairie View A&M Panthers", "Prairie View"], abbrev: "PV", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2504.png", tokenClass: "border-teal-400/35 bg-teal-400/[0.08] text-teal-200" },
+      { names: ["Presbyterian Blue Hose", "Presbyterian"], abbrev: "PRES", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2506.png", tokenClass: "border-pink-400/35 bg-pink-400/[0.08] text-pink-200" },
+      { names: ["Princeton Tigers", "Princeton"], abbrev: "PRIN", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/163.png", tokenClass: "border-lime-400/35 bg-lime-400/[0.08] text-lime-200" },
+      { names: ["Providence Friars", "Providence"], abbrev: "PROV", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2507.png", tokenClass: "border-fuchsia-400/35 bg-fuchsia-400/[0.08] text-fuchsia-200" },
+      { names: ["Purdue Boilermakers", "Purdue"], abbrev: "PUR", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2509.png", tokenClass: "border-cyan-400/35 bg-cyan-400/[0.08] text-cyan-200" },
+      { names: ["Purdue Fort Wayne Mastodons", "Purdue FW"], abbrev: "PFW", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2870.png", tokenClass: "border-violet-400/35 bg-violet-400/[0.08] text-violet-200" },
+      { names: ["Queens University Royals", "Queens"], abbrev: "QUOC", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2511.png", tokenClass: "border-orange-400/40 bg-orange-400/[0.1] text-orange-200" },
+      { names: ["Quinnipiac Bobcats", "Quinnipiac"], abbrev: "QUIN", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2514.png", tokenClass: "border-green-500/35 bg-green-500/[0.08] text-green-200" },
+      { names: ["Radford Highlanders", "Radford"], abbrev: "RAD", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2515.png", tokenClass: "border-sky-400/35 bg-sky-400/[0.08] text-sky-200" },
+      { names: ["Rhode Island Rams", "Rhode Island"], abbrev: "URI", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/227.png", tokenClass: "border-orange-500/45 bg-orange-500/[0.12] text-orange-300" },
+      { names: ["Rice Owls", "Rice"], abbrev: "RICE", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/242.png", tokenClass: "border-red-500/40 bg-red-500/[0.1] text-red-200" },
+      { names: ["Richmond Spiders", "Richmond"], abbrev: "RICH", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/257.png", tokenClass: "border-blue-500/35 bg-blue-500/[0.08] text-blue-200" },
+      { names: ["Rider Broncs", "Rider"], abbrev: "RID", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2520.png", tokenClass: "border-rose-400/35 bg-rose-400/[0.08] text-rose-200" },
+      { names: ["Robert Morris Colonials", "Robert Morris"], abbrev: "RMU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2523.png", tokenClass: "border-blue-400/40 bg-blue-400/[0.1] text-blue-200" },
+      { names: ["Rutgers Scarlet Knights", "Rutgers"], abbrev: "RUTG", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/164.png", tokenClass: "border-indigo-400/35 bg-indigo-400/[0.08] text-indigo-200" },
+      { names: ["SE Louisiana Lions", "SE Louisiana"], abbrev: "SELA", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2545.png", tokenClass: "border-red-400/35 bg-red-400/[0.08] text-red-200" },
+      { names: ["SIU Edwardsville Cougars", "SIUE"], abbrev: "SIUE", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2565.png", tokenClass: "border-teal-400/35 bg-teal-400/[0.08] text-teal-200" },
+      { names: ["SMU Mustangs", "SMU"], abbrev: "SMU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2567.png", tokenClass: "border-pink-400/35 bg-pink-400/[0.08] text-pink-200" },
+      { names: ["Sacramento State Hornets", "Sacramento St"], abbrev: "SAC", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/16.png", tokenClass: "border-lime-400/35 bg-lime-400/[0.08] text-lime-200" },
+      { names: ["Sacred Heart Pioneers", "Sacred Heart"], abbrev: "SHU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2529.png", tokenClass: "border-fuchsia-400/35 bg-fuchsia-400/[0.08] text-fuchsia-200" },
+      { names: ["Saint Francis Red Flash", "Saint Francis"], abbrev: "SFPA", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2598.png", tokenClass: "border-cyan-400/35 bg-cyan-400/[0.08] text-cyan-200" },
+      { names: ["Saint Joseph's Hawks", "Saint Joseph's"], abbrev: "JOES", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2603.png", tokenClass: "border-violet-400/35 bg-violet-400/[0.08] text-violet-200" },
+      { names: ["Saint Louis Billikens", "Saint Louis"], abbrev: "SLU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/139.png", tokenClass: "border-orange-400/40 bg-orange-400/[0.1] text-orange-200" },
+      { names: ["Saint Martin's Saints", "Saint Martin's"], abbrev: "SM", logoUrl: "https://a.espncdn.com/guid/08d18faa-f47d-3616-a74e-4dd0c338c6c2/logos/default.png", tokenClass: "border-green-500/35 bg-green-500/[0.08] text-green-200" },
+      { names: ["Saint Mary's Gaels", "Saint Mary's"], abbrev: "SMC", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2608.png", tokenClass: "border-sky-400/35 bg-sky-400/[0.08] text-sky-200" },
+      { names: ["Saint Peter's Peacocks", "Saint Peter's"], abbrev: "SPU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2612.png", tokenClass: "border-orange-500/45 bg-orange-500/[0.12] text-orange-300" },
+      { names: ["Salisbury Sea Gulls", "Salisbury"], abbrev: "SSU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2532.png", tokenClass: "border-red-500/40 bg-red-500/[0.1] text-red-200" },
+      { names: ["Sam Houston Bearkats", "Sam Houston"], abbrev: "SHSU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2534.png", tokenClass: "border-blue-500/35 bg-blue-500/[0.08] text-blue-200" },
+      { names: ["Samford Bulldogs", "Samford"], abbrev: "SAM", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2535.png", tokenClass: "border-rose-400/35 bg-rose-400/[0.08] text-rose-200" },
+      { names: ["San Diego State Aztecs", "San Diego St"], abbrev: "SDSU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/21.png", tokenClass: "border-blue-400/40 bg-blue-400/[0.1] text-blue-200" },
+      { names: ["San Diego Toreros", "San Diego"], abbrev: "USD", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/301.png", tokenClass: "border-amber-400/35 bg-amber-400/[0.08] text-amber-200" },
+      { names: ["San Francisco Dons", "San Francisco"], abbrev: "SF", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2539.png", tokenClass: "border-indigo-400/35 bg-indigo-400/[0.08] text-indigo-200" },
+      { names: ["San Jos\xE9 State Spartans", "San Jos\xE9 St"], abbrev: "SJSU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/23.png", tokenClass: "border-teal-400/35 bg-teal-400/[0.08] text-teal-200" },
+      { names: ["Santa Clara Broncos", "Santa Clara"], abbrev: "SCU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2541.png", tokenClass: "border-pink-400/35 bg-pink-400/[0.08] text-pink-200" },
+      { names: ["Savannah State Tigers", "Savannah St"], abbrev: "SAV", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2542.png", tokenClass: "border-lime-400/35 bg-lime-400/[0.08] text-lime-200" },
+      { names: ["Seattle U Redhawks", "Seattle U"], abbrev: "SEA", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2547.png", tokenClass: "border-fuchsia-400/35 bg-fuchsia-400/[0.08] text-fuchsia-200" },
+      { names: ["Seton Hall Pirates", "Seton Hall"], abbrev: "HALL", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2550.png", tokenClass: "border-cyan-400/35 bg-cyan-400/[0.08] text-cyan-200" },
+      { names: ["Siena Saints", "Siena"], abbrev: "SIE", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2561.png", tokenClass: "border-violet-400/35 bg-violet-400/[0.08] text-violet-200" },
+      { names: ["South Alabama Jaguars", "South Alabama"], abbrev: "USA", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/6.png", tokenClass: "border-orange-400/40 bg-orange-400/[0.1] text-orange-200" },
+      { names: ["South Carolina Gamecocks", "South Carolina"], abbrev: "SC", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2579.png", tokenClass: "border-green-500/35 bg-green-500/[0.08] text-green-200" },
+      { names: ["South Carolina State Bulldogs", "SC State"], abbrev: "SCST", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2569.png", tokenClass: "border-sky-400/35 bg-sky-400/[0.08] text-sky-200" },
+      { names: ["South Carolina Upstate Spartans", "SC Upstate"], abbrev: "UPST", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2908.png", tokenClass: "border-orange-500/45 bg-orange-500/[0.12] text-orange-300" },
+      { names: ["South Dakota Coyotes", "South Dakota"], abbrev: "SDAK", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/233.png", tokenClass: "border-red-500/40 bg-red-500/[0.1] text-red-200" },
+      { names: ["South Dakota State Jackrabbits", "S Dakota St"], abbrev: "SDST", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2571.png", tokenClass: "border-blue-500/35 bg-blue-500/[0.08] text-blue-200" },
+      { names: ["South Florida Bulls", "South Florida"], abbrev: "USF", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/58.png", tokenClass: "border-rose-400/35 bg-rose-400/[0.08] text-rose-200" },
+      { names: ["Southeast Missouri State Redhawks", "SE Missouri"], abbrev: "SEMO", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2546.png", tokenClass: "border-blue-400/40 bg-blue-400/[0.1] text-blue-200" },
+      { names: ["Southern Illinois Salukis", "S Illinois"], abbrev: "SIU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/79.png", tokenClass: "border-indigo-400/35 bg-indigo-400/[0.08] text-indigo-200" },
+      { names: ["Southern Indiana Screaming Eagles", "So Indiana"], abbrev: "USI", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/88.png", tokenClass: "border-red-400/35 bg-red-400/[0.08] text-red-200" },
+      { names: ["Southern Jaguars", "Southern"], abbrev: "SOU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2582.png", tokenClass: "border-teal-400/35 bg-teal-400/[0.08] text-teal-200" },
+      { names: ["Southern Miss Golden Eagles", "Southern Miss"], abbrev: "USM", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2572.png", tokenClass: "border-pink-400/35 bg-pink-400/[0.08] text-pink-200" },
+      { names: ["Southern Utah Thunderbirds", "Southern Utah"], abbrev: "SUU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/253.png", tokenClass: "border-fuchsia-400/35 bg-fuchsia-400/[0.08] text-fuchsia-200" },
+      { names: ["Southwestern Oklahoma State Bulldogs", "SW Oklahoma St"], abbrev: "SWOS", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2927.png", tokenClass: "border-violet-400/35 bg-violet-400/[0.08] text-violet-200" },
+      { names: ["St. Bonaventure Bonnies", "St Bonaventure"], abbrev: "SBU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/179.png", tokenClass: "border-orange-400/40 bg-orange-400/[0.1] text-orange-200" },
+      { names: ["St. Francis (BKN) Terriers", "St Francis BK"], abbrev: "SFBK", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2597.png", tokenClass: "border-green-500/35 bg-green-500/[0.08] text-green-200" },
+      { names: ["St. John's Red Storm", "St John's"], abbrev: "SJU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2599.png", tokenClass: "border-orange-500/45 bg-orange-500/[0.12] text-orange-300" },
+      { names: ["St. Olaf Oles", "St Olaf"], abbrev: "ST.", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/133.png", tokenClass: "border-red-500/40 bg-red-500/[0.1] text-red-200" },
+      { names: ["St. Thomas-Minnesota Tommies", "St Thomas (MN)"], abbrev: "STMN", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2900.png", tokenClass: "border-rose-400/35 bg-rose-400/[0.08] text-rose-200" },
+      { names: ["Stanford Cardinal", "Stanford"], abbrev: "STAN", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/24.png", tokenClass: "border-blue-400/40 bg-blue-400/[0.1] text-blue-200" },
+      { names: ["Stephen F. Austin Lumberjacks", "SF Austin"], abbrev: "SFA", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2617.png", tokenClass: "border-indigo-400/35 bg-indigo-400/[0.08] text-indigo-200" },
+      { names: ["Stetson Hatters", "Stetson"], abbrev: "STET", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/56.png", tokenClass: "border-red-400/35 bg-red-400/[0.08] text-red-200" },
+      { names: ["Stonehill Skyhawks", "Stonehill"], abbrev: "STO", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/284.png", tokenClass: "border-teal-400/35 bg-teal-400/[0.08] text-teal-200" },
+      { names: ["Stony Brook Seawolves", "Stony Brook"], abbrev: "STBK", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2619.png", tokenClass: "border-pink-400/35 bg-pink-400/[0.08] text-pink-200" },
+      { names: ["Syracuse Orange", "Syracuse"], abbrev: "SYR", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/183.png", tokenClass: "border-lime-400/35 bg-lime-400/[0.08] text-lime-200" },
+      { names: ["TCU Horned Frogs", "TCU"], abbrev: "TCU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2628.png", tokenClass: "border-violet-400/35 bg-violet-400/[0.08] text-violet-200" },
+      { names: ["Tarleton State Texans", "Tarleton St"], abbrev: "TAR", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2627.png", tokenClass: "border-sky-400/35 bg-sky-400/[0.08] text-sky-200" },
+      { names: ["Temple Owls", "Temple"], abbrev: "TEM", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/218.png", tokenClass: "border-orange-500/45 bg-orange-500/[0.12] text-orange-300" },
+      { names: ["Tennessee State Tigers", "Tennessee St"], abbrev: "TNST", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2634.png", tokenClass: "border-red-500/40 bg-red-500/[0.1] text-red-200" },
+      { names: ["Tennessee Tech Golden Eagles", "Tennessee Tech"], abbrev: "TNTC", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2635.png", tokenClass: "border-blue-500/35 bg-blue-500/[0.08] text-blue-200" },
+      { names: ["Tennessee Volunteers", "Tennessee"], abbrev: "TENN", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2633.png", tokenClass: "border-rose-400/35 bg-rose-400/[0.08] text-rose-200" },
+      { names: ["Texas A&M Aggies", "Texas A&M"], abbrev: "TA&M", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/245.png", tokenClass: "border-blue-400/40 bg-blue-400/[0.1] text-blue-200" },
+      { names: ["Texas A&M-Corpus Christi Islanders", "Texas A&M-CC"], abbrev: "AMCC", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/357.png", tokenClass: "border-amber-400/35 bg-amber-400/[0.08] text-amber-200" },
+      { names: ["Texas Longhorns", "Texas"], abbrev: "TEX", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/251.png", tokenClass: "border-indigo-400/35 bg-indigo-400/[0.08] text-indigo-200" },
+      { names: ["Texas Lutheran Bulldogs", "Texas Lutheran"], abbrev: "TL", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2639.png", tokenClass: "border-red-400/35 bg-red-400/[0.08] text-red-200" },
+      { names: ["Texas Southern Tigers", "Texas Southern"], abbrev: "TXSO", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2640.png", tokenClass: "border-teal-400/35 bg-teal-400/[0.08] text-teal-200" },
+      { names: ["Texas State Bobcats", "Texas St"], abbrev: "TXST", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/326.png", tokenClass: "border-pink-400/35 bg-pink-400/[0.08] text-pink-200" },
+      { names: ["Texas Tech Red Raiders", "Texas Tech"], abbrev: "TTU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2641.png", tokenClass: "border-lime-400/35 bg-lime-400/[0.08] text-lime-200" },
+      { names: ["Texas-Pan American Broncs", "TX-Pan American"], abbrev: "UTPA", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/292.png", tokenClass: "border-fuchsia-400/35 bg-fuchsia-400/[0.08] text-fuchsia-200" },
+      { names: ["The Citadel Bulldogs", "The Citadel"], abbrev: "CIT", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2643.png", tokenClass: "border-cyan-400/35 bg-cyan-400/[0.08] text-cyan-200" },
+      { names: ["Toledo Rockets", "Toledo"], abbrev: "TOL", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2649.png", tokenClass: "border-violet-400/35 bg-violet-400/[0.08] text-violet-200" },
+      { names: ["Towson Tigers", "Towson"], abbrev: "TOW", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/119.png", tokenClass: "border-orange-400/40 bg-orange-400/[0.1] text-orange-200" },
+      { names: ["Troy Trojans", "Troy"], abbrev: "TROY", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2653.png", tokenClass: "border-green-500/35 bg-green-500/[0.08] text-green-200" },
+      { names: ["Truman State Bulldogs", "Truman St"], abbrev: "TRST", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2654.png", tokenClass: "border-sky-400/35 bg-sky-400/[0.08] text-sky-200" },
+      { names: ["Tulane Green Wave", "Tulane"], abbrev: "TULN", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2655.png", tokenClass: "border-orange-500/45 bg-orange-500/[0.12] text-orange-300" },
+      { names: ["Tulsa Golden Hurricane", "Tulsa"], abbrev: "TLSA", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/202.png", tokenClass: "border-red-500/40 bg-red-500/[0.1] text-red-200" },
+      { names: ["UAB Blazers", "UAB"], abbrev: "UAB", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/5.png", tokenClass: "border-blue-500/35 bg-blue-500/[0.08] text-blue-200" },
+      { names: ["UAlbany Great Danes", "UAlbany"], abbrev: "ALB", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/399.png", tokenClass: "border-rose-400/35 bg-rose-400/[0.08] text-rose-200" },
+      { names: ["UC Davis Aggies", "UC Davis"], abbrev: "UCD", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/302.png", tokenClass: "border-blue-400/40 bg-blue-400/[0.1] text-blue-200" },
+      { names: ["UC Irvine Anteaters", "UC Irvine"], abbrev: "UCI", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/300.png", tokenClass: "border-amber-400/35 bg-amber-400/[0.08] text-amber-200" },
+      { names: ["UC Riverside Highlanders", "UC Riverside"], abbrev: "UCR", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/27.png", tokenClass: "border-indigo-400/35 bg-indigo-400/[0.08] text-indigo-200" },
+      { names: ["UC San Diego Tritons", "UC San Diego"], abbrev: "UCSD", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/28.png", tokenClass: "border-red-400/35 bg-red-400/[0.08] text-red-200" },
+      { names: ["UC Santa Barbara Gauchos", "Santa Barbara"], abbrev: "UCSB", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2540.png", tokenClass: "border-teal-400/35 bg-teal-400/[0.08] text-teal-200" },
+      { names: ["UCF Knights", "UCF"], abbrev: "UCF", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2116.png", tokenClass: "border-pink-400/35 bg-pink-400/[0.08] text-pink-200" },
+      { names: ["UCLA Bruins", "UCLA"], abbrev: "UCLA", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/26.png", tokenClass: "border-lime-400/35 bg-lime-400/[0.08] text-lime-200" },
+      { names: ["UConn Huskies", "UConn"], abbrev: "CONN", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/41.png", tokenClass: "border-fuchsia-400/35 bg-fuchsia-400/[0.08] text-fuchsia-200" },
+      { names: ["UIC Flames", "UIC"], abbrev: "UIC", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/82.png", tokenClass: "border-cyan-400/35 bg-cyan-400/[0.08] text-cyan-200" },
+      { names: ["UL Monroe Warhawks", "UL Monroe"], abbrev: "ULM", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2433.png", tokenClass: "border-violet-400/35 bg-violet-400/[0.08] text-violet-200" },
+      { names: ["UMBC Retrievers", "UMBC"], abbrev: "UMBC", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2378.png", tokenClass: "border-orange-400/40 bg-orange-400/[0.1] text-orange-200" },
+      { names: ["UMass Lowell River Hawks", "UMass Lowell"], abbrev: "UML", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2349.png", tokenClass: "border-green-500/35 bg-green-500/[0.08] text-green-200" },
+      { names: ["UNC Asheville Bulldogs", "UNC Asheville"], abbrev: "UNCA", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2427.png", tokenClass: "border-sky-400/35 bg-sky-400/[0.08] text-sky-200" },
+      { names: ["UNC Greensboro Spartans", "UNC Greensboro"], abbrev: "UNCG", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2430.png", tokenClass: "border-orange-500/45 bg-orange-500/[0.12] text-orange-300" },
+      { names: ["UNC Wilmington Seahawks", "UNC Wilmington"], abbrev: "UNCW", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/350.png", tokenClass: "border-red-500/40 bg-red-500/[0.1] text-red-200" },
+      { names: ["UNLV Rebels", "UNLV"], abbrev: "UNLV", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2439.png", tokenClass: "border-blue-500/35 bg-blue-500/[0.08] text-blue-200" },
+      { names: ["USC Trojans", "USC"], abbrev: "USC", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/30.png", tokenClass: "border-red-500/40 bg-red-500/[0.1] text-red-200" },
+      { names: ["UT Arlington Mavericks", "UT Arlington"], abbrev: "UTA", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/250.png", tokenClass: "border-blue-400/40 bg-blue-400/[0.1] text-blue-200" },
+      { names: ["UT Martin Skyhawks", "UT Martin"], abbrev: "UTM", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2630.png", tokenClass: "border-amber-400/35 bg-amber-400/[0.08] text-amber-200" },
+      { names: ["UT Rio Grande Valley Vaqueros", "UT Rio Grande"], abbrev: "RGV", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/292.png", tokenClass: "border-indigo-400/35 bg-indigo-400/[0.08] text-indigo-200" },
+      { names: ["UTEP Miners", "UTEP"], abbrev: "UTEP", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2638.png", tokenClass: "border-red-400/35 bg-red-400/[0.08] text-red-200" },
+      { names: ["UTSA Roadrunners", "UTSA"], abbrev: "UTSA", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2636.png", tokenClass: "border-teal-400/35 bg-teal-400/[0.08] text-teal-200" },
+      { names: ["Upper Iowa Peacocks", "Upper Iowa"], abbrev: "UPP", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/389.png", tokenClass: "border-pink-400/35 bg-pink-400/[0.08] text-pink-200" },
+      { names: ["Utah State Aggies", "Utah State"], abbrev: "USU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/328.png", tokenClass: "border-lime-400/35 bg-lime-400/[0.08] text-lime-200" },
+      { names: ["Utah Tech Trailblazers", "Utah Tech"], abbrev: "UTU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/3101.png", tokenClass: "border-fuchsia-400/35 bg-fuchsia-400/[0.08] text-fuchsia-200" },
+      { names: ["Utah Utes", "Utah"], abbrev: "UTAH", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/254.png", tokenClass: "border-cyan-400/35 bg-cyan-400/[0.08] text-cyan-200" },
+      { names: ["Utah Valley Wolverines", "Utah Valley"], abbrev: "UVU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/3084.png", tokenClass: "border-violet-400/35 bg-violet-400/[0.08] text-violet-200" },
+      { names: ["VCU Rams", "VCU"], abbrev: "VCU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2670.png", tokenClass: "border-orange-400/40 bg-orange-400/[0.1] text-orange-200" },
+      { names: ["VMI Keydets", "VMI"], abbrev: "VMI", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2678.png", tokenClass: "border-green-500/35 bg-green-500/[0.08] text-green-200" },
+      { names: ["Valdosta State Blazers", "Valdosta St"], abbrev: "VAL", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2673.png", tokenClass: "border-sky-400/35 bg-sky-400/[0.08] text-sky-200" },
+      { names: ["Valparaiso Beacons", "Valparaiso"], abbrev: "VAL", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2674.png", tokenClass: "border-orange-500/45 bg-orange-500/[0.12] text-orange-300" },
+      { names: ["Vanderbilt Commodores", "Vanderbilt"], abbrev: "VAN", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/238.png", tokenClass: "border-red-500/40 bg-red-500/[0.1] text-red-200" },
+      { names: ["Vermont Catamounts", "Vermont"], abbrev: "UVM", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/261.png", tokenClass: "border-blue-500/35 bg-blue-500/[0.08] text-blue-200" },
+      { names: ["Villanova Wildcats", "Villanova"], abbrev: "VILL", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/222.png", tokenClass: "border-rose-400/35 bg-rose-400/[0.08] text-rose-200" },
+      { names: ["Virginia Cavaliers", "Virginia"], abbrev: "UVA", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/258.png", tokenClass: "border-blue-400/40 bg-blue-400/[0.1] text-blue-200" },
+      { names: ["Virginia Tech Hokies", "Virginia Tech"], abbrev: "VT", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/259.png", tokenClass: "border-amber-400/35 bg-amber-400/[0.08] text-amber-200" },
+      { names: ["Wagner Seahawks", "Wagner"], abbrev: "WAG", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2681.png", tokenClass: "border-indigo-400/35 bg-indigo-400/[0.08] text-indigo-200" },
+      { names: ["Wake Forest Demon Deacons", "Wake Forest"], abbrev: "WAKE", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/154.png", tokenClass: "border-red-400/35 bg-red-400/[0.08] text-red-200" },
+      { names: ["Wartburg Knights", "Wartburg"], abbrev: "WTBG", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2685.png", tokenClass: "border-teal-400/35 bg-teal-400/[0.08] text-teal-200" },
+      { names: ["Washburn Ichabods", "Washburn"], abbrev: "WSBN", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2687.png", tokenClass: "border-pink-400/35 bg-pink-400/[0.08] text-pink-200" },
+      { names: ["Washington Huskies", "Washington"], abbrev: "WASH", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/264.png", tokenClass: "border-lime-400/35 bg-lime-400/[0.08] text-lime-200" },
+      { names: ["Washington State Cougars", "Washington St"], abbrev: "WSU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/265.png", tokenClass: "border-fuchsia-400/35 bg-fuchsia-400/[0.08] text-fuchsia-200" },
+      { names: ["Wayne State (NE) Wildcats", "Wayne St (NE)"], abbrev: "WAY", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2844.png", tokenClass: "border-cyan-400/35 bg-cyan-400/[0.08] text-cyan-200" },
+      { names: ["Weber State Wildcats", "Weber St"], abbrev: "WEB", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2692.png", tokenClass: "border-violet-400/35 bg-violet-400/[0.08] text-violet-200" },
+      { names: ["West Georgia Wolves", "West Georgia"], abbrev: "WES", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2698.png", tokenClass: "border-orange-400/40 bg-orange-400/[0.1] text-orange-200" },
+      { names: ["West Virginia Mountaineers", "West Virginia"], abbrev: "WVU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/277.png", tokenClass: "border-green-500/35 bg-green-500/[0.08] text-green-200" },
+      { names: ["Western Carolina Catamounts", "W Carolina"], abbrev: "WCU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2717.png", tokenClass: "border-sky-400/35 bg-sky-400/[0.08] text-sky-200" },
+      { names: ["Western Illinois Leathernecks", "W Illinois"], abbrev: "WIU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2710.png", tokenClass: "border-orange-500/45 bg-orange-500/[0.12] text-orange-300" },
+      { names: ["Western Kentucky Hilltoppers", "Western KY"], abbrev: "WKU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/98.png", tokenClass: "border-red-500/40 bg-red-500/[0.1] text-red-200" },
+      { names: ["Western Michigan Broncos", "W Michigan"], abbrev: "WMU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2711.png", tokenClass: "border-blue-500/35 bg-blue-500/[0.08] text-blue-200" },
+      { names: ["Wichita State Shockers", "Wichita St"], abbrev: "WICH", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2724.png", tokenClass: "border-rose-400/35 bg-rose-400/[0.08] text-rose-200" },
+      { names: ["William & Mary Tribe", "William & Mary"], abbrev: "W&M", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2729.png", tokenClass: "border-blue-400/40 bg-blue-400/[0.1] text-blue-200" },
+      { names: ["Winthrop Eagles", "Winthrop"], abbrev: "WIN", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2737.png", tokenClass: "border-indigo-400/35 bg-indigo-400/[0.08] text-indigo-200" },
+      { names: ["Wisconsin Badgers", "Wisconsin"], abbrev: "WIS", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/275.png", tokenClass: "border-red-400/35 bg-red-400/[0.08] text-red-200" },
+      { names: ["Wisconsin Platteville Pioneers", "UW-Platteville"], abbrev: "UWP", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/272.png", tokenClass: "border-teal-400/35 bg-teal-400/[0.08] text-teal-200" },
+      { names: ["Wofford Terriers", "Wofford"], abbrev: "WOF", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2747.png", tokenClass: "border-pink-400/35 bg-pink-400/[0.08] text-pink-200" },
+      { names: ["Wright State Raiders", "Wright St"], abbrev: "WRST", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2750.png", tokenClass: "border-lime-400/35 bg-lime-400/[0.08] text-lime-200" },
+      { names: ["Wyoming Cowboys", "Wyoming"], abbrev: "WYO", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2751.png", tokenClass: "border-fuchsia-400/35 bg-fuchsia-400/[0.08] text-fuchsia-200" },
+      { names: ["Xavier Musketeers", "Xavier"], abbrev: "XAV", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2752.png", tokenClass: "border-cyan-400/35 bg-cyan-400/[0.08] text-cyan-200" },
+      { names: ["Yale Bulldogs", "Yale"], abbrev: "YALE", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/43.png", tokenClass: "border-violet-400/35 bg-violet-400/[0.08] text-violet-200" },
+      { names: ["Youngstown State Penguins", "Youngstown St"], abbrev: "YSU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2754.png", tokenClass: "border-orange-400/40 bg-orange-400/[0.1] text-orange-200" }
+    ];
+  }
+});
+
+// ../grarf/desktop/src/lib/livetrack/wnbaTeamMetadata.ts
+function wnbaTeam(abbrev, displayName, nicknames = []) {
+  const logoUrl = buildWnbaEspnLogoUrl(abbrev) ?? "";
+  return {
+    names: [displayName, ...nicknames, abbrev],
+    abbrev,
+    logoUrl,
+    tokenClass: "border-cyansys/35 bg-cyansys/[0.08] text-cyansys"
+  };
+}
+var WNBA_TEAMS;
+var init_wnbaTeamMetadata = __esm({
+  "../grarf/desktop/src/lib/livetrack/wnbaTeamMetadata.ts"() {
+    init_define_import_meta_env();
+    init_wnbaEspnLogoUrl();
+    WNBA_TEAMS = [
+      wnbaTeam("ATL", "Atlanta Dream", ["Dream"]),
+      wnbaTeam("CHI", "Chicago Sky", ["Sky"]),
+      wnbaTeam("CON", "Connecticut Sun", ["Sun"]),
+      wnbaTeam("DAL", "Dallas Wings", ["Wings"]),
+      wnbaTeam("GS", "Golden State Valkyries", ["Valkyries"]),
+      wnbaTeam("IND", "Indiana Fever", ["Fever"]),
+      wnbaTeam("LV", "Las Vegas Aces", ["Aces"]),
+      wnbaTeam("LA", "Los Angeles Sparks", ["Sparks"]),
+      wnbaTeam("MIN", "Minnesota Lynx", ["Lynx"]),
+      wnbaTeam("NY", "New York Liberty", ["Liberty"]),
+      wnbaTeam("PHX", "Phoenix Mercury", ["Mercury"]),
+      wnbaTeam("POR", "Portland Fire", ["Fire"]),
+      wnbaTeam("SEA", "Seattle Storm", ["Storm"]),
+      wnbaTeam("TOR", "Toronto Tempo", ["Tempo"]),
+      wnbaTeam("WSH", "Washington Mystics", ["Mystics"]),
+      wnbaTeam("COOP", "TEAM COOP", ["Team Coop"]),
+      wnbaTeam("SPO", "TEAM SPOON", ["Team Spoon"])
+    ];
+  }
+});
+
+// ../grarf/desktop/src/lib/livetrack/liveTrackTeamMetadata.ts
+function buildNationalSoccerTeams() {
+  const byAbbrev = /* @__PURE__ */ new Map();
+  for (const [countryName, abbrev] of Object.entries(SOCCER_COUNTRY_ABBREV_BY_NAME)) {
+    const tokenClass = LIVE_TRACK_NATIONAL_TEAM_TOKEN_BY_ABBREV[abbrev] ?? DEFAULT_TEAM_TOKEN_CLASS;
+    const titleCase = countryName.replace(/\b\w/g, (char) => char.toUpperCase());
+    let entry2 = byAbbrev.get(abbrev);
+    if (!entry2) {
+      entry2 = { names: /* @__PURE__ */ new Set(), tokenClass };
+      byAbbrev.set(abbrev, entry2);
+    }
+    entry2.names.add(countryName);
+    entry2.names.add(titleCase);
+    entry2.names.add(abbrev);
+  }
+  return [...byAbbrev.entries()].map(([abbrev, { names, tokenClass }]) => ({
+    names: [...names],
+    abbrev,
+    logoUrl: "",
+    tokenClass
+  }));
+}
+function normalizeTeamLookupKey(name) {
+  return name.trim().replace(/\s+/g, " ").toLowerCase();
+}
+function registerTeamMeta(bucket, team) {
+  for (const name of team.names) {
+    const key2 = normalizeTeamLookupKey(name);
+    if (!key2) continue;
+    LOOKUP_BY_BUCKET[bucket].set(key2, team);
+    TEAM_LOOKUP.set(key2, team);
+  }
+}
+function resolveSportBucket(sport) {
+  const normalized = sport.trim().toLowerCase();
+  if (normalized === "mlb") return "mlb";
+  if (normalized === "nhl") return "nhl";
+  if (normalized === "wnba") return "wnba";
+  if (normalized === "ncaa" || normalized === "ncaa baseball" || normalized === "college baseball") {
+    return "ncaa";
+  }
+  if (normalized === "soccer" || normalized === "football" || normalized.startsWith("fifa")) {
+    return "soccer";
+  }
+  return "legacy";
+}
+function resolveEspnNhlScoreboardLogoUrl(abbrev) {
+  const slug = NHL_ESPN_LOGO_SLUG[abbrev.toUpperCase()] ?? abbrev.toLowerCase();
+  return `https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/${slug}.png`;
+}
+function resolveEspnMlbScoreboardLogoUrl(abbrev) {
+  return buildMlbEspnScoreboardLogoUrl(abbrev) ?? "";
+}
+function resolveDarkThemeLogoForMeta(meta, bucket) {
+  if (bucket !== "mlb" && bucket !== "nhl") return void 0;
+  const league2 = bucket === "mlb" ? "MLB" : "NHL";
+  let abbrev = meta.abbrev.toLowerCase();
+  if (league2 === "MLB" && abbrev === "ath") abbrev = "oak";
+  if (league2 === "NHL") {
+    abbrev = NHL_ESPN_LOGO_SLUG[meta.abbrev.toUpperCase()] ?? abbrev;
+  }
+  return getDarkThemeLogoUrl(league2, abbrev);
+}
+function resolveBundledLogoSrc(url) {
+  if (!url || /^(https?:|data:)/i.test(url)) return url;
+  return publicAssetUrl(url);
+}
+function resolveLogoUrlForMeta(meta, sport) {
+  const bucket = sport ? resolveSportBucket(sport) : null;
+  let url = meta.logoUrl;
+  if (bucket === "nhl") url = resolveEspnNhlScoreboardLogoUrl(meta.abbrev);
+  if (bucket === "mlb") url = resolveEspnMlbScoreboardLogoUrl(meta.abbrev);
+  if (bucket === "wnba") url = meta.logoUrl;
+  if (bucket) {
+    const dark = resolveDarkThemeLogoForMeta(meta, bucket);
+    if (dark) return dark;
+  }
+  return resolveBundledLogoSrc(url);
+}
+function resolveBrandTokenClass(meta, sport) {
+  if (!sport) return meta.tokenClass;
+  const bucket = resolveSportBucket(sport);
+  const brand = LIVE_TRACK_BRAND_TOKEN_BY_BUCKET[bucket]?.[meta.abbrev.toUpperCase()];
+  return brand ?? meta.tokenClass;
+}
+function resolveLiveTrackTeamMetaForSport(teamName, sport) {
+  const key2 = normalizeTeamLookupKey(teamName);
+  if (!key2) return null;
+  if (sport) {
+    const bucket = resolveSportBucket(sport);
+    return LOOKUP_BY_BUCKET[bucket].get(key2) ?? null;
+  }
+  return TEAM_LOOKUP.get(key2) ?? null;
+}
+function resolveLiveTrackTeamAbbrev(teamName, sport) {
+  return resolveLiveTrackTeamMetaForSport(teamName, sport)?.abbrev ?? null;
+}
+function resolveLiveTrackTeamLogoUrlFromMeta(teamName, sport) {
+  const meta = resolveLiveTrackTeamMetaForSport(teamName, sport);
+  if (!meta) return null;
+  return resolveLogoUrlForMeta(meta, sport);
+}
+function resolveLiveTrackTeamTokenClass(teamName, sport) {
+  const meta = resolveLiveTrackTeamMetaForSport(teamName, sport);
+  if (meta) return resolveBrandTokenClass(meta, sport);
+  const countryAbbrev = resolveSoccerCountryAbbrev(teamName);
+  if (countryAbbrev) {
+    return LIVE_TRACK_NATIONAL_TEAM_TOKEN_BY_ABBREV[countryAbbrev] ?? DEFAULT_TEAM_TOKEN_CLASS;
+  }
+  return DEFAULT_TEAM_TOKEN_CLASS;
+}
+var DEFAULT_TEAM_TOKEN_CLASS, LIVE_TRACK_BRAND_TOKEN_BY_BUCKET, NATIONAL_SOCCER_TEAMS, MLB_TEAMS, NHL_TEAMS, LEGACY_MOCK_TEAMS, NHL_ESPN_LOGO_SLUG, TEAM_LOOKUP, LOOKUP_BY_BUCKET, LIVE_TRACK_MLB_TEAM_COUNT, LIVE_TRACK_NHL_TEAM_COUNT, LIVE_TRACK_NCAA_BASEBALL_TEAM_COUNT;
+var init_liveTrackTeamMetadata = __esm({
+  "../grarf/desktop/src/lib/livetrack/liveTrackTeamMetadata.ts"() {
+    init_define_import_meta_env();
+    init_darkThemeLogoOverrides();
+    init_mlbEspnLogoSlug();
+    init_publicAssetUrl();
+    init_soccerCountryAbbrev();
+    init_liveTrackNationalTeamTokens();
+    init_liveTrackNcaaBaseballTeams();
+    init_wnbaTeamMetadata();
+    DEFAULT_TEAM_TOKEN_CLASS = "border-cyansys/35 bg-cyansys/[0.08] text-cyansys";
+    LIVE_TRACK_BRAND_TOKEN_BY_BUCKET = {
+      mlb: {
+        ARI: "border-red-500/40 bg-red-500/[0.1] text-red-200",
+        AZ: "border-red-500/40 bg-red-500/[0.1] text-red-200",
+        ATH: "border-emerald-500/35 bg-emerald-500/[0.08] text-emerald-200",
+        ATL: "border-red-600/40 bg-red-600/[0.1] text-red-200",
+        BAL: "border-orange-500/45 bg-orange-500/[0.12] text-orange-300",
+        BOS: "border-red-500/40 bg-red-500/[0.1] text-red-200",
+        CHC: "border-blue-400/40 bg-blue-400/[0.1] text-blue-200",
+        CWS: "border-slate-300/30 bg-slate-300/[0.08] text-slate-200",
+        CIN: "border-red-600/40 bg-red-600/[0.1] text-red-200",
+        CLE: "border-red-500/35 bg-red-500/[0.08] text-red-200",
+        COL: "border-purple-500/35 bg-purple-500/[0.08] text-purple-200",
+        DET: "border-orange-400/40 bg-orange-400/[0.1] text-orange-200",
+        HOU: "border-orange-500/45 bg-orange-500/[0.12] text-orange-300",
+        KC: "border-sky-400/35 bg-sky-400/[0.08] text-sky-200",
+        LAA: "border-red-500/35 bg-red-500/[0.08] text-red-200",
+        LAD: "border-blue-500/40 bg-blue-500/[0.1] text-blue-200",
+        MIA: "border-cyan-400/35 bg-cyan-400/[0.08] text-cyan-200",
+        MIL: "border-yellow-400/35 bg-yellow-400/[0.08] text-yellow-200",
+        MIN: "border-red-400/35 bg-red-400/[0.08] text-red-200",
+        NYM: "border-orange-400/40 bg-orange-400/[0.1] text-orange-200",
+        NYY: "border-blue-800/40 bg-blue-800/[0.12] text-blue-200",
+        PHI: "border-red-500/40 bg-red-500/[0.1] text-red-200",
+        PIT: "border-yellow-400/35 bg-yellow-400/[0.08] text-yellow-200",
+        SD: "border-amber-500/35 bg-amber-500/[0.08] text-amber-200",
+        SF: "border-orange-500/45 bg-orange-500/[0.12] text-orange-300",
+        SEA: "border-teal-500/35 bg-teal-500/[0.08] text-teal-200",
+        STL: "border-red-600/40 bg-red-600/[0.1] text-red-200",
+        TB: "border-sky-400/35 bg-sky-400/[0.08] text-sky-200",
+        TEX: "border-red-500/35 bg-red-500/[0.08] text-red-200",
+        TOR: "border-blue-500/35 bg-blue-500/[0.08] text-blue-200",
+        WSH: "border-red-500/35 bg-red-500/[0.08] text-red-200"
+      },
+      nhl: {
+        ANA: "border-orange-500/45 bg-orange-500/[0.12] text-orange-300",
+        BOS: "border-yellow-400/35 bg-yellow-400/[0.08] text-yellow-200",
+        BUF: "border-blue-500/35 bg-blue-500/[0.08] text-blue-200",
+        CGY: "border-red-600/40 bg-red-600/[0.1] text-red-200",
+        CAR: "border-red-500/35 bg-red-500/[0.08] text-red-200",
+        CHI: "border-red-600/40 bg-red-600/[0.1] text-red-200",
+        COL: "border-blue-600/40 bg-blue-600/[0.1] text-blue-200",
+        CBJ: "border-red-500/35 bg-red-500/[0.08] text-red-200",
+        DAL: "border-green-500/35 bg-green-500/[0.08] text-green-200",
+        DET: "border-red-600/40 bg-red-600/[0.1] text-red-200",
+        EDM: "border-blue-600/40 bg-blue-600/[0.1] text-blue-200",
+        FLA: "border-red-500/35 bg-red-500/[0.08] text-red-200",
+        LAK: "border-slate-300/30 bg-slate-300/[0.08] text-slate-200",
+        MIN: "border-emerald-500/35 bg-emerald-500/[0.08] text-emerald-200",
+        MTL: "border-red-600/40 bg-red-600/[0.1] text-red-200",
+        NSH: "border-yellow-400/35 bg-yellow-400/[0.08] text-yellow-200",
+        NJD: "border-red-600/40 bg-red-600/[0.1] text-red-200",
+        NYI: "border-orange-400/40 bg-orange-400/[0.1] text-orange-200",
+        NYR: "border-blue-500/35 bg-blue-500/[0.08] text-blue-200",
+        OTT: "border-red-500/35 bg-red-500/[0.08] text-red-200",
+        PHI: "border-orange-500/45 bg-orange-500/[0.12] text-orange-300",
+        PIT: "border-yellow-400/35 bg-yellow-400/[0.08] text-yellow-200",
+        SJS: "border-teal-500/35 bg-teal-500/[0.08] text-teal-200",
+        SEA: "border-teal-400/35 bg-teal-400/[0.08] text-teal-200",
+        STL: "border-blue-500/40 bg-blue-500/[0.1] text-blue-200",
+        TBL: "border-blue-400/40 bg-blue-400/[0.1] text-blue-200",
+        TOR: "border-blue-600/40 bg-blue-600/[0.1] text-blue-200",
+        UTA: "border-slate-400/35 bg-slate-400/[0.08] text-slate-200",
+        VAN: "border-blue-600/40 bg-blue-600/[0.1] text-blue-200",
+        VGK: "border-yellow-400/35 bg-yellow-400/[0.08] text-yellow-200",
+        WSH: "border-red-600/40 bg-red-600/[0.1] text-red-200",
+        WPG: "border-sky-400/35 bg-sky-400/[0.08] text-sky-200"
+      },
+      wnba: {},
+      ncaa: {
+        USC: "border-red-500/40 bg-red-500/[0.1] text-red-200",
+        UNC: "border-sky-400/35 bg-sky-400/[0.08] text-sky-200",
+        LR: "border-red-400/35 bg-red-400/[0.08] text-red-200",
+        TROY: "border-purple-400/35 bg-purple-400/[0.08] text-purple-200",
+        CP: "border-orange-400/40 bg-orange-400/[0.1] text-orange-200",
+        WVU: "border-yellow-400/35 bg-yellow-400/[0.08] text-yellow-200",
+        ALA: "border-red-400/35 bg-red-400/[0.08] text-red-200",
+        ARK: "border-orange-500/45 bg-orange-500/[0.12] text-orange-300",
+        LSU: "border-purple-500/35 bg-purple-500/[0.08] text-purple-200",
+        TEX: "border-orange-500/45 bg-orange-500/[0.12] text-orange-300",
+        OU: "border-red-600/40 bg-red-600/[0.1] text-red-200",
+        TENN: "border-orange-400/40 bg-orange-400/[0.1] text-orange-200"
+      },
+      legacy: {},
+      soccer: {}
+    };
+    NATIONAL_SOCCER_TEAMS = buildNationalSoccerTeams();
+    MLB_TEAMS = [
+      {
+        names: ["Arizona Diamondbacks", "Diamondbacks", "D-backs", "Dbacks", "ARI", "AZ"],
+        abbrev: "ARI",
+        logoUrl: "https://a.espncdn.com/i/teamlogos/mlb/500/scoreboard/ari.png",
+        tokenClass: "border-red-500/40 bg-red-500/[0.1] text-red-200"
+      },
+      { names: ["Athletics", "A's"], abbrev: "ATH", logoUrl: "https://a.espncdn.com/i/teamlogos/mlb/500/scoreboard/ath.png", tokenClass: "border-emerald-500/35 bg-emerald-500/[0.08] text-emerald-200" },
+      { names: ["Atlanta Braves", "Braves"], abbrev: "ATL", logoUrl: "https://a.espncdn.com/i/teamlogos/mlb/500/scoreboard/atl.png", tokenClass: "border-red-600/40 bg-red-600/[0.1] text-red-200" },
+      { names: ["Baltimore Orioles", "Orioles"], abbrev: "BAL", logoUrl: "https://a.espncdn.com/i/teamlogos/mlb/500/scoreboard/bal.png", tokenClass: "border-orange-500/45 bg-orange-500/[0.12] text-orange-300" },
+      { names: ["Boston Red Sox", "Red Sox"], abbrev: "BOS", logoUrl: "https://a.espncdn.com/i/teamlogos/mlb/500/scoreboard/bos.png", tokenClass: "border-red-500/40 bg-red-500/[0.1] text-red-200" },
+      { names: ["Chicago Cubs", "Cubs"], abbrev: "CHC", logoUrl: "https://a.espncdn.com/i/teamlogos/mlb/500/scoreboard/chc.png", tokenClass: "border-blue-400/40 bg-blue-400/[0.1] text-blue-200" },
+      { names: ["Chicago White Sox", "White Sox"], abbrev: "CWS", logoUrl: "https://a.espncdn.com/i/teamlogos/mlb/500/scoreboard/cws.png", tokenClass: "border-slate-300/30 bg-slate-300/[0.08] text-slate-200" },
+      { names: ["Cincinnati Reds", "Reds"], abbrev: "CIN", logoUrl: "https://a.espncdn.com/i/teamlogos/mlb/500/scoreboard/cin.png", tokenClass: "border-red-600/40 bg-red-600/[0.1] text-red-200" },
+      { names: ["Cleveland Guardians", "Guardians"], abbrev: "CLE", logoUrl: "https://a.espncdn.com/i/teamlogos/mlb/500/scoreboard/cle.png", tokenClass: "border-red-500/35 bg-red-500/[0.08] text-red-200" },
+      { names: ["Colorado Rockies", "Rockies"], abbrev: "COL", logoUrl: "https://a.espncdn.com/i/teamlogos/mlb/500/scoreboard/col.png", tokenClass: "border-purple-500/35 bg-purple-500/[0.08] text-purple-200" },
+      { names: ["Detroit Tigers", "Tigers"], abbrev: "DET", logoUrl: "https://a.espncdn.com/i/teamlogos/mlb/500/scoreboard/det.png", tokenClass: "border-orange-400/40 bg-orange-400/[0.1] text-orange-200" },
+      { names: ["Houston Astros", "Astros"], abbrev: "HOU", logoUrl: "https://a.espncdn.com/i/teamlogos/mlb/500/scoreboard/hou.png", tokenClass: "border-orange-500/45 bg-orange-500/[0.12] text-orange-300" },
+      { names: ["Kansas City Royals", "Royals"], abbrev: "KC", logoUrl: "https://a.espncdn.com/i/teamlogos/mlb/500/scoreboard/kc.png", tokenClass: "border-sky-400/35 bg-sky-400/[0.08] text-sky-200" },
+      { names: ["Los Angeles Angels", "Angels"], abbrev: "LAA", logoUrl: "https://a.espncdn.com/i/teamlogos/mlb/500/scoreboard/laa.png", tokenClass: "border-red-500/35 bg-red-500/[0.08] text-red-200" },
+      { names: ["Los Angeles Dodgers", "Dodgers"], abbrev: "LAD", logoUrl: "https://a.espncdn.com/i/teamlogos/mlb/500/scoreboard/lad.png", tokenClass: "border-blue-500/40 bg-blue-500/[0.1] text-blue-200" },
+      { names: ["Miami Marlins", "Marlins"], abbrev: "MIA", logoUrl: "https://a.espncdn.com/i/teamlogos/mlb/500/scoreboard/mia.png", tokenClass: "border-cyan-400/35 bg-cyan-400/[0.08] text-cyan-200" },
+      { names: ["Milwaukee Brewers", "Brewers"], abbrev: "MIL", logoUrl: "https://a.espncdn.com/i/teamlogos/mlb/500/scoreboard/mil.png", tokenClass: "border-yellow-400/35 bg-yellow-400/[0.08] text-yellow-200" },
+      { names: ["Minnesota Twins", "Twins"], abbrev: "MIN", logoUrl: "https://a.espncdn.com/i/teamlogos/mlb/500/scoreboard/min.png", tokenClass: "border-red-400/35 bg-red-400/[0.08] text-red-200" },
+      { names: ["New York Mets", "Mets"], abbrev: "NYM", logoUrl: "https://a.espncdn.com/i/teamlogos/mlb/500/scoreboard/nym.png", tokenClass: "border-orange-400/40 bg-orange-400/[0.1] text-orange-200" },
+      { names: ["New York Yankees", "Yankees"], abbrev: "NYY", logoUrl: "https://a.espncdn.com/i/teamlogos/mlb/500/scoreboard/nyy.png", tokenClass: "border-blue-800/40 bg-blue-800/[0.12] text-blue-200" },
+      { names: ["Philadelphia Phillies", "Phillies"], abbrev: "PHI", logoUrl: "https://a.espncdn.com/i/teamlogos/mlb/500/scoreboard/phi.png", tokenClass: "border-red-500/40 bg-red-500/[0.1] text-red-200" },
+      { names: ["Pittsburgh Pirates", "Pirates"], abbrev: "PIT", logoUrl: "https://a.espncdn.com/i/teamlogos/mlb/500/scoreboard/pit.png", tokenClass: "border-yellow-400/35 bg-yellow-400/[0.08] text-yellow-200" },
+      { names: ["San Diego Padres", "Padres"], abbrev: "SD", logoUrl: "https://a.espncdn.com/i/teamlogos/mlb/500/scoreboard/sd.png", tokenClass: "border-amber-500/35 bg-amber-500/[0.08] text-amber-200" },
+      { names: ["San Francisco Giants", "Giants"], abbrev: "SF", logoUrl: "https://a.espncdn.com/i/teamlogos/mlb/500/scoreboard/sf.png", tokenClass: "border-orange-500/45 bg-orange-500/[0.12] text-orange-300" },
+      { names: ["Seattle Mariners", "Mariners"], abbrev: "SEA", logoUrl: "https://a.espncdn.com/i/teamlogos/mlb/500/scoreboard/sea.png", tokenClass: "border-teal-500/35 bg-teal-500/[0.08] text-teal-200" },
+      { names: ["St. Louis Cardinals", "Cardinals"], abbrev: "STL", logoUrl: "https://a.espncdn.com/i/teamlogos/mlb/500/scoreboard/stl.png", tokenClass: "border-red-600/40 bg-red-600/[0.1] text-red-200" },
+      { names: ["Tampa Bay Rays", "Rays"], abbrev: "TB", logoUrl: "https://a.espncdn.com/i/teamlogos/mlb/500/scoreboard/tb.png", tokenClass: "border-sky-400/35 bg-sky-400/[0.08] text-sky-200" },
+      { names: ["Texas Rangers", "Rangers"], abbrev: "TEX", logoUrl: "https://a.espncdn.com/i/teamlogos/mlb/500/scoreboard/tex.png", tokenClass: "border-red-500/35 bg-red-500/[0.08] text-red-200" },
+      { names: ["Toronto Blue Jays", "Blue Jays"], abbrev: "TOR", logoUrl: "https://a.espncdn.com/i/teamlogos/mlb/500/scoreboard/tor.png", tokenClass: "border-blue-500/35 bg-blue-500/[0.08] text-blue-200" },
+      { names: ["Washington Nationals", "Nationals"], abbrev: "WSH", logoUrl: "https://a.espncdn.com/i/teamlogos/mlb/500/scoreboard/wsh.png", tokenClass: "border-red-500/35 bg-red-500/[0.08] text-red-200" }
+    ];
+    NHL_TEAMS = [
+      { names: ["Anaheim Ducks", "Ducks"], abbrev: "ANA", logoUrl: "https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/ana.png", tokenClass: "border-orange-500/45 bg-orange-500/[0.12] text-orange-300" },
+      { names: ["Boston Bruins", "Bruins"], abbrev: "BOS", logoUrl: "https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/bos.png", tokenClass: "border-yellow-400/35 bg-yellow-400/[0.08] text-yellow-200" },
+      { names: ["Buffalo Sabres", "Sabres"], abbrev: "BUF", logoUrl: "https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/buf.png", tokenClass: "border-blue-500/35 bg-blue-500/[0.08] text-blue-200" },
+      { names: ["Calgary Flames", "Flames"], abbrev: "CGY", logoUrl: "https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/cgy.png", tokenClass: "border-red-600/40 bg-red-600/[0.1] text-red-200" },
+      { names: ["Carolina Hurricanes", "Hurricanes"], abbrev: "CAR", logoUrl: "https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/car.png", tokenClass: "border-red-500/35 bg-red-500/[0.08] text-red-200" },
+      { names: ["Chicago Blackhawks", "Blackhawks"], abbrev: "CHI", logoUrl: "https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/chi.png", tokenClass: "border-red-600/40 bg-red-600/[0.1] text-red-200" },
+      { names: ["Colorado Avalanche", "Avalanche"], abbrev: "COL", logoUrl: "https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/col.png", tokenClass: "border-blue-600/40 bg-blue-600/[0.1] text-blue-200" },
+      { names: ["Columbus Blue Jackets", "Blue Jackets"], abbrev: "CBJ", logoUrl: "https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/cbj.png", tokenClass: "border-red-500/35 bg-red-500/[0.08] text-red-200" },
+      { names: ["Dallas Stars", "Stars"], abbrev: "DAL", logoUrl: "https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/dal.png", tokenClass: "border-green-500/35 bg-green-500/[0.08] text-green-200" },
+      { names: ["Detroit Red Wings", "Red Wings"], abbrev: "DET", logoUrl: "https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/det.png", tokenClass: "border-red-600/40 bg-red-600/[0.1] text-red-200" },
+      { names: ["Edmonton Oilers", "Oilers"], abbrev: "EDM", logoUrl: "https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/edm.png", tokenClass: "border-blue-600/40 bg-blue-600/[0.1] text-blue-200" },
+      { names: ["Florida Panthers", "Panthers"], abbrev: "FLA", logoUrl: "https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/fla.png", tokenClass: "border-red-500/35 bg-red-500/[0.08] text-red-200" },
+      { names: ["Los Angeles Kings", "Kings"], abbrev: "LAK", logoUrl: "https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/lak.png", tokenClass: "border-slate-300/30 bg-slate-300/[0.08] text-slate-200" },
+      { names: ["Minnesota Wild", "Wild"], abbrev: "MIN", logoUrl: "https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/min.png", tokenClass: "border-emerald-500/35 bg-emerald-500/[0.08] text-emerald-200" },
+      { names: ["Montr\xE9al Canadiens", "Montreal Canadiens", "Canadiens"], abbrev: "MTL", logoUrl: "https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/mtl.png", tokenClass: "border-red-600/40 bg-red-600/[0.1] text-red-200" },
+      { names: ["Nashville Predators", "Predators"], abbrev: "NSH", logoUrl: "https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/nsh.png", tokenClass: "border-yellow-400/35 bg-yellow-400/[0.08] text-yellow-200" },
+      { names: ["New Jersey Devils", "Devils"], abbrev: "NJD", logoUrl: "https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/njd.png", tokenClass: "border-red-600/40 bg-red-600/[0.1] text-red-200" },
+      { names: ["New York Islanders", "Islanders"], abbrev: "NYI", logoUrl: "https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/nyi.png", tokenClass: "border-orange-400/40 bg-orange-400/[0.1] text-orange-200" },
+      { names: ["New York Rangers", "Rangers"], abbrev: "NYR", logoUrl: "https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/nyr.png", tokenClass: "border-blue-500/35 bg-blue-500/[0.08] text-blue-200" },
+      { names: ["Ottawa Senators", "Senators"], abbrev: "OTT", logoUrl: "https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/ott.png", tokenClass: "border-red-500/35 bg-red-500/[0.08] text-red-200" },
+      { names: ["Philadelphia Flyers", "Flyers"], abbrev: "PHI", logoUrl: "https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/phi.png", tokenClass: "border-orange-500/45 bg-orange-500/[0.12] text-orange-300" },
+      { names: ["Pittsburgh Penguins", "Penguins"], abbrev: "PIT", logoUrl: "https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/pit.png", tokenClass: "border-yellow-400/35 bg-yellow-400/[0.08] text-yellow-200" },
+      { names: ["San Jose Sharks", "Sharks"], abbrev: "SJS", logoUrl: "https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/sjs.png", tokenClass: "border-teal-500/35 bg-teal-500/[0.08] text-teal-200" },
+      { names: ["Seattle Kraken", "Kraken"], abbrev: "SEA", logoUrl: "https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/sea.png", tokenClass: "border-teal-400/35 bg-teal-400/[0.08] text-teal-200" },
+      { names: ["St. Louis Blues", "Blues"], abbrev: "STL", logoUrl: "https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/stl.png", tokenClass: "border-blue-500/40 bg-blue-500/[0.1] text-blue-200" },
+      { names: ["Tampa Bay Lightning", "Lightning"], abbrev: "TBL", logoUrl: "https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/tbl.png", tokenClass: "border-blue-400/40 bg-blue-400/[0.1] text-blue-200" },
+      { names: ["Toronto Maple Leafs", "Maple Leafs"], abbrev: "TOR", logoUrl: "https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/tor.png", tokenClass: "border-blue-600/40 bg-blue-600/[0.1] text-blue-200" },
+      { names: ["Utah Mammoth", "Mammoth"], abbrev: "UTA", logoUrl: "https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/uta.png", tokenClass: "border-slate-400/35 bg-slate-400/[0.08] text-slate-200" },
+      { names: ["Vancouver Canucks", "Canucks"], abbrev: "VAN", logoUrl: "https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/van.png", tokenClass: "border-blue-600/40 bg-blue-600/[0.1] text-blue-200" },
+      { names: ["Vegas Golden Knights", "Golden Knights"], abbrev: "VGK", logoUrl: "https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/vgk.png", tokenClass: "border-yellow-400/35 bg-yellow-400/[0.08] text-yellow-200" },
+      { names: ["Washington Capitals", "Capitals"], abbrev: "WSH", logoUrl: "https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/wsh.png", tokenClass: "border-red-600/40 bg-red-600/[0.1] text-red-200" },
+      { names: ["Winnipeg Jets", "Jets"], abbrev: "WPG", logoUrl: "https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/wpg.png", tokenClass: "border-sky-400/35 bg-sky-400/[0.08] text-sky-200" }
+    ];
+    LEGACY_MOCK_TEAMS = [
+      {
+        names: ["Nelly Korda"],
+        abbrev: "N. Korda",
+        logoUrl: "",
+        tokenClass: "border-fuchsia-400/35 bg-fuchsia-400/[0.08] text-fuchsia-200"
+      },
+      { names: ["England"], abbrev: "ENG", logoUrl: "https://a.espncdn.com/i/teamlogos/soccer/500/448.png", tokenClass: "border-white/25 bg-white/[0.06] text-[#e8ecec]" },
+      { names: ["Montenegro"], abbrev: "MNE", logoUrl: "/livetrack/montenegro-flag.png", tokenClass: "border-red-500/35 bg-red-500/[0.08] text-red-200" },
+      { names: ["Slovakia"], abbrev: "SVK", logoUrl: "https://a.espncdn.com/i/teamlogos/soccer/500/469.png", tokenClass: "border-blue-500/35 bg-blue-500/[0.08] text-blue-200" },
+      { names: ["Spain"], abbrev: "ESP", logoUrl: "https://a.espncdn.com/i/teamlogos/soccer/500/469.png", tokenClass: "border-red-500/40 bg-red-500/[0.1] text-red-200" }
+    ];
+    NHL_ESPN_LOGO_SLUG = {
+      LAK: "la",
+      NJD: "nj",
+      SJS: "sj",
+      TBL: "tb"
+    };
+    TEAM_LOOKUP = /* @__PURE__ */ new Map();
+    LOOKUP_BY_BUCKET = {
+      mlb: /* @__PURE__ */ new Map(),
+      nhl: /* @__PURE__ */ new Map(),
+      wnba: /* @__PURE__ */ new Map(),
+      ncaa: /* @__PURE__ */ new Map(),
+      soccer: /* @__PURE__ */ new Map(),
+      legacy: /* @__PURE__ */ new Map()
+    };
+    for (const team of MLB_TEAMS) registerTeamMeta("mlb", team);
+    for (const team of NHL_TEAMS) registerTeamMeta("nhl", team);
+    for (const team of WNBA_TEAMS) registerTeamMeta("wnba", team);
+    for (const team of LIVE_TRACK_NCAA_BASEBALL_TEAMS) registerTeamMeta("ncaa", team);
+    for (const team of NATIONAL_SOCCER_TEAMS) registerTeamMeta("soccer", team);
+    for (const team of LEGACY_MOCK_TEAMS) registerTeamMeta("legacy", team);
+    LIVE_TRACK_MLB_TEAM_COUNT = MLB_TEAMS.length;
+    LIVE_TRACK_NHL_TEAM_COUNT = NHL_TEAMS.length;
+    LIVE_TRACK_NCAA_BASEBALL_TEAM_COUNT = LIVE_TRACK_NCAA_BASEBALL_TEAMS.length;
+  }
+});
+
+// ../grarf/desktop/src/lib/gamesSpine/worldCupCountryLogoUrl.ts
+function buildWorldCupCountryLogoUrl(abbrev) {
+  const trimmed = abbrev?.trim();
+  if (!trimmed) return void 0;
+  return `https://a.espncdn.com/i/teamlogos/countries/500/${trimmed.toLowerCase()}.png`;
+}
+var init_worldCupCountryLogoUrl = __esm({
+  "../grarf/desktop/src/lib/gamesSpine/worldCupCountryLogoUrl.ts"() {
+    init_define_import_meta_env();
+  }
+});
+
+// ../grarf/desktop/src/lib/sportscape/resolveSportscapeTeamIdentity.ts
+function abbrevFromSportscapeLogoUrl(logoUrl) {
+  if (!logoUrl) return void 0;
+  const countryMatch = logoUrl.match(/\/countries\/\d+\/([^.]+)\.png/i);
+  if (countryMatch) return countryMatch[1].toUpperCase();
+  const scoreboardMatch = logoUrl.match(/\/scoreboard\/([^.]+)\.png/i);
+  if (scoreboardMatch) return scoreboardMatch[1].toUpperCase();
+  return void 0;
+}
+function resolveLiveTrackSport(sport) {
+  if (sport === "mlb" || sport === "nhl" || sport === "wnba" || sport === "ncaa") return sport;
+  return void 0;
+}
+function isLikelyAbbrevToken(teamName, sport) {
+  const trimmed = teamName.trim();
+  if (!/^[A-Za-z]{2,4}$/.test(trimmed)) return false;
+  if (sport === "soccer" && resolveSoccerCountryAbbrev(trimmed)) return false;
+  return true;
+}
+function deriveCompactAbbrevFromName(teamName, sport) {
+  const trimmed = teamName.trim();
+  if (!trimmed) return "\u2014";
+  if (sport === "soccer") {
+    const country = resolveSoccerCountryAbbrev(trimmed);
+    if (country) return country;
+  }
+  if (isLikelyAbbrevToken(trimmed, sport)) return trimmed.toUpperCase();
+  const liveTrackSport = resolveLiveTrackSport(sport);
+  if (liveTrackSport) {
+    const fromMeta = resolveLiveTrackTeamAbbrev(trimmed, liveTrackSport);
+    if (fromMeta) return fromMeta;
+  }
+  const words = trimmed.split(/\s+/).filter(Boolean);
+  if (words.length >= 2) {
+    const acronym = words.slice(0, 3).map((word) => word[0]).join("").toUpperCase();
+    if (acronym.length >= 2) return acronym.slice(0, 4);
+  }
+  return trimmed.slice(0, 3).toUpperCase();
+}
+function buildClubLogoFromAbbrev(sport, abbrev) {
+  const code = abbrev.trim();
+  if (!code) return void 0;
+  switch (sport) {
+    case "mlb":
+      return buildMlbEspnScoreboardLogoUrl(code);
+    case "nhl":
+      return `https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/${code.toLowerCase()}.png`;
+    case "wnba":
+      return buildWnbaEspnLogoUrl(code);
+    case "ncaa":
+      return void 0;
+    case "soccer":
+      return buildWorldCupCountryLogoUrl(code);
+    default:
+      return void 0;
+  }
+}
+function resolveMarkKind(sport, logoUrl) {
+  if (!logoUrl) return "fallback";
+  if (sport === "soccer" && /\/countries\//i.test(logoUrl)) return "country-flag";
+  return "club-logo";
+}
+function resolveSportscapeTeamIdentity(input) {
+  const teamName = input.teamName.trim();
+  const sport = input.sport;
+  let abbrev = input.abbrev?.trim().toUpperCase();
+  if (sport === "soccer") {
+    const fromName = resolveSoccerCountryAbbrev(teamName);
+    if (fromName) abbrev = fromName;
+  }
+  if (!abbrev) {
+    const liveTrackSport = resolveLiveTrackSport(sport);
+    if (liveTrackSport) {
+      abbrev = resolveLiveTrackTeamAbbrev(teamName, liveTrackSport) ?? void 0;
+    }
+  }
+  if (!abbrev && isLikelyAbbrevToken(teamName, sport)) {
+    abbrev = teamName.toUpperCase();
+  }
+  if (!abbrev) {
+    abbrev = abbrevFromSportscapeLogoUrl(input.logoUrl);
+  }
+  if (!abbrev) {
+    abbrev = deriveCompactAbbrevFromName(teamName, sport);
+  }
+  let logoUrl = input.logoUrl?.trim() || void 0;
+  if (sport === "wnba" && isWnbaBundledTeamLogoAbbrev(abbrev)) {
+    logoUrl = buildWnbaEspnLogoUrl(abbrev);
+  } else if (!logoUrl) {
+    const liveTrackSport = resolveLiveTrackSport(sport);
+    if (liveTrackSport) {
+      logoUrl = resolveLiveTrackTeamLogoUrlFromMeta(teamName, liveTrackSport) ?? void 0;
+    }
+  }
+  if (!logoUrl && abbrev) {
+    logoUrl = buildClubLogoFromAbbrev(sport, abbrev);
+  }
+  if (logoUrl && !/^(https?:|data:)/i.test(logoUrl)) {
+    logoUrl = publicAssetUrl(logoUrl);
+  }
+  if (!logoUrl && sport === "soccer" && abbrev) {
+    logoUrl = buildWorldCupCountryLogoUrl(abbrev);
+  }
+  return {
+    abbrev,
+    logoUrl,
+    markKind: resolveMarkKind(sport, logoUrl)
+  };
+}
+function buildSportscapeScoreLine(input) {
+  const identity = resolveSportscapeTeamIdentity(input);
+  return {
+    sideLabel: identity.abbrev,
+    score: input.score,
+    logoUrl: identity.logoUrl
+  };
+}
+function buildSportscapeMatchupScoreLines(input) {
+  const away = buildSportscapeScoreLine({
+    teamName: input.awayTeam,
+    sport: input.sport,
+    abbrev: input.awayAbbrev,
+    logoUrl: input.awayLogoUrl,
+    league: input.league,
+    score: String(input.awayScore)
+  });
+  const home = buildSportscapeScoreLine({
+    teamName: input.homeTeam,
+    sport: input.sport,
+    abbrev: input.homeAbbrev,
+    logoUrl: input.homeLogoUrl,
+    league: input.league,
+    score: String(input.homeScore)
+  });
+  return [away, { ...home, homeLogoUrl: home.logoUrl }];
+}
+var init_resolveSportscapeTeamIdentity = __esm({
+  "../grarf/desktop/src/lib/sportscape/resolveSportscapeTeamIdentity.ts"() {
+    init_define_import_meta_env();
+    init_mlbEspnLogoSlug();
+    init_wnbaEspnLogoUrl();
+    init_publicAssetUrl();
+    init_worldCupCountryLogoUrl();
+    init_liveTrackTeamMetadata();
+    init_soccerCountryAbbrev();
+  }
+});
+
+// ../grarf/desktop/src/lib/sportscape/resolveSportscapeScoreSideLabel.ts
+function inferSportscapeScoreSportFromEditorialLeague(league2) {
+  switch (league2) {
+    case "NHL":
+      return "nhl";
+    case "WNBA":
+      return "wnba";
+    case "WORLD_CUP":
+      return "soccer";
+    case "MCWS":
+      return "ncaa";
+    default:
+      return "mlb";
+  }
+}
+function inferSportscapeScoreSportFromLeague(league2) {
+  switch (league2) {
+    case "NHL":
+      return "nhl";
+    case "WNBA":
+      return "wnba";
+    case "NCAABB":
+      return "ncaa";
+    case "MLB":
+      return "mlb";
+    default:
+      return league2 ? "soccer" : "mlb";
+  }
+}
+function resolveSportscapeScoreSideLabel(teamName, sport, options) {
+  return resolveSportscapeTeamIdentity({
+    teamName,
+    sport,
+    abbrev: options?.abbrev,
+    logoUrl: options?.logoUrl
+  }).abbrev;
+}
+function normalizeSportscapeScoreLines(lines, sport) {
+  return lines.map((line) => {
+    const identity = resolveSportscapeTeamIdentity({
+      teamName: line.sideLabel,
+      sport,
+      logoUrl: line.logoUrl
+    });
+    return {
+      ...line,
+      sideLabel: identity.abbrev,
+      logoUrl: identity.logoUrl ?? line.logoUrl
+    };
+  });
+}
+var init_resolveSportscapeScoreSideLabel = __esm({
+  "../grarf/desktop/src/lib/sportscape/resolveSportscapeScoreSideLabel.ts"() {
+    init_define_import_meta_env();
+    init_resolveSportscapeTeamIdentity();
+  }
+});
+
 // ../grarf/desktop/src/components/gameWorkspace/GameUtilityRail.tsx
+function resolveTeamTokenTextClass(tokenClass) {
+  const match = tokenClass.match(/\btext-(?:\[[^\]]+\]|[\w-]+(?:\/[\d]+)?)/);
+  return match?.[0] ?? "text-cyansys";
+}
+function resolveGameWorkspaceTeamTabActiveClass(teamName, sport) {
+  const tokenClass = resolveLiveTrackTeamTokenClass(teamName, sport);
+  return cn2(
+    "border-line bg-white/[0.06]",
+    resolveTeamTokenTextClass(tokenClass),
+    "shadow-[inset_0_-1px_0_currentColor]"
+  );
+}
+function resolveGameWorkspaceTabActiveClass(id, activeGame, webGameSocialTabs) {
+  if (webGameSocialTabs && activeGame && id === "chat") {
+    return resolveGameWorkspaceTeamTabActiveClass(
+      activeGame.awayTeam,
+      inferSportscapeScoreSportFromLeague(activeGame.league)
+    );
+  }
+  if (webGameSocialTabs && activeGame && id === "reddit") {
+    return resolveGameWorkspaceTeamTabActiveClass(
+      activeGame.homeTeam,
+      inferSportscapeScoreSportFromLeague(activeGame.league)
+    );
+  }
+  return GAME_WORKSPACE_TAB_ACTIVE_CYAN_CLASS;
+}
 function GameWorkspaceTeamTabLabel({
   game,
   side,
@@ -84331,20 +85528,29 @@ function GameUtilityRail({
       "aria-label": "Game mode utility rail",
       children: [
         hierarchyHeader,
-        /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("div", { className: "flex shrink-0 overflow-x-auto border-b border-line whitespace-nowrap", children: visibleTabRows.map(([id, label]) => /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(
-          "button",
+        /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(
+          "div",
           {
-            type: "button",
-            onClick: () => onTabSelect(id),
             className: cn2(
-              tabCls2,
-              gameWorkspaceSocialTabs ? gameWorkspaceTabLabelCls : utilityTabLabelCls,
-              tab === id ? "border-line bg-white/[0.06] text-cyansys shadow-[inset_0_-1px_0_rgba(86,247,255,0.45)]" : "text-textdim hover:bg-white/[0.03] hover:text-[#b8cccc]"
+              "flex shrink-0 overflow-x-auto border-b border-line whitespace-nowrap",
+              webGameSocialTabs && "gap-x-2"
             ),
-            children: webGameSocialTabs && activeGame && id === "chat" ? /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(GameWorkspaceTeamTabLabel, { game: activeGame, side: "away", label }) : webGameSocialTabs && activeGame && id === "reddit" ? /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(GameWorkspaceTeamTabLabel, { game: activeGame, side: "home", label }) : label
-          },
-          id
-        )) }),
+            children: visibleTabRows.map(([id, label]) => /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(
+              "button",
+              {
+                type: "button",
+                onClick: () => onTabSelect(id),
+                className: cn2(
+                  tabCls2,
+                  gameWorkspaceSocialTabs ? gameWorkspaceTabLabelCls : utilityTabLabelCls,
+                  tab === id ? resolveGameWorkspaceTabActiveClass(id, activeGame, webGameSocialTabs) : "text-textdim hover:bg-white/[0.03] hover:text-[#b8cccc]"
+                ),
+                children: webGameSocialTabs && activeGame && id === "chat" ? /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(GameWorkspaceTeamTabLabel, { game: activeGame, side: "away", label }) : webGameSocialTabs && activeGame && id === "reddit" ? /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(GameWorkspaceTeamTabLabel, { game: activeGame, side: "home", label }) : label
+              },
+              id
+            ))
+          }
+        ),
         /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)("div", { className: "relative min-h-0 flex-1", children: [
           webGameSocialRailTab && activeGame ? /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(
             GameSocialRailFeedPanel,
@@ -84469,7 +85675,7 @@ function GameUtilityRail({
     }
   );
 }
-var import_react114, import_jsx_runtime93, tabCls2, gameWorkspaceTabLabelCls, utilityTabLabelCls, MONITOR_UTILITY_TAB_ROWS, WATCH_UTILITY_TAB_ROWS;
+var import_react114, import_jsx_runtime93, tabCls2, gameWorkspaceTabLabelCls, utilityTabLabelCls, GAME_WORKSPACE_TAB_ACTIVE_CYAN_CLASS, MONITOR_UTILITY_TAB_ROWS, WATCH_UTILITY_TAB_ROWS;
 var init_GameUtilityRail = __esm({
   "../grarf/desktop/src/components/gameWorkspace/GameUtilityRail.tsx"() {
     init_define_import_meta_env();
@@ -84486,11 +85692,14 @@ var init_GameUtilityRail = __esm({
     init_isGrarfWebRenderer();
     init_gamesSpineLeagueLogoUrls();
     init_resolveTeamLogoUrl();
+    init_liveTrackTeamMetadata();
+    init_resolveSportscapeScoreSideLabel();
     init_workspaceIdentityDiagnostics();
     import_jsx_runtime93 = __toESM(require_jsx_runtime(), 1);
     tabCls2 = "shrink-0 min-w-[3.75rem] border border-transparent px-0.5 py-1 text-center tracking-[0.05em] transition duration-150";
     gameWorkspaceTabLabelCls = "text-[12px]";
     utilityTabLabelCls = "text-[7px]";
+    GAME_WORKSPACE_TAB_ACTIVE_CYAN_CLASS = "border-line bg-white/[0.06] text-cyansys shadow-[inset_0_-1px_0_rgba(86,247,255,0.45)]";
     MONITOR_UTILITY_TAB_ROWS = [
       ["signals", "PULSE"],
       ["chat", "CHAT"],
@@ -87564,958 +88773,6 @@ var init_fetchSportscapeHighlightPlaylist = __esm({
   }
 });
 
-// ../grarf/desktop/src/lib/sportscape/soccerCountryAbbrev.ts
-function normalizeCountryLookupKey(name) {
-  return name.trim().replace(/\s+/g, " ").toLowerCase();
-}
-function resolveSoccerCountryAbbrev(teamName) {
-  const key2 = normalizeCountryLookupKey(teamName);
-  if (!key2) return void 0;
-  const direct = SOCCER_COUNTRY_LOOKUP[key2];
-  if (direct) return direct;
-  for (const [country, abbrev] of Object.entries(SOCCER_COUNTRY_ABBREV_BY_NAME)) {
-    if (key2.includes(country)) return abbrev;
-    if (key2.length >= 4 && country.includes(key2)) return abbrev;
-  }
-  return void 0;
-}
-var SOCCER_COUNTRY_ABBREV_BY_NAME, SOCCER_COUNTRY_ABBREV_BY_CODE, SOCCER_COUNTRY_LOOKUP;
-var init_soccerCountryAbbrev = __esm({
-  "../grarf/desktop/src/lib/sportscape/soccerCountryAbbrev.ts"() {
-    init_define_import_meta_env();
-    SOCCER_COUNTRY_ABBREV_BY_NAME = {
-      algeria: "ALG",
-      argentina: "ARG",
-      australia: "AUS",
-      austria: "AUT",
-      belgium: "BEL",
-      bolivia: "BOL",
-      brazil: "BRA",
-      cameroon: "CMR",
-      canada: "CAN",
-      "cape verde": "CPV",
-      chile: "CHI",
-      china: "CHN",
-      colombia: "COL",
-      "costa rica": "CRC",
-      croatia: "CRO",
-      "czech republic": "CZE",
-      czechia: "CZE",
-      denmark: "DEN",
-      ecuador: "ECU",
-      egypt: "EGY",
-      england: "ENG",
-      france: "FRA",
-      germany: "GER",
-      ghana: "GHA",
-      greece: "GRE",
-      honduras: "HON",
-      hungary: "HUN",
-      iran: "IRN",
-      iraq: "IRQ",
-      italy: "ITA",
-      ivory: "CIV",
-      "ivory coast": "CIV",
-      "cote d'ivoire": "CIV",
-      japan: "JPN",
-      jordan: "JOR",
-      mexico: "MEX",
-      morocco: "MAR",
-      netherlands: "NED",
-      "new zealand": "NZL",
-      nigeria: "NGA",
-      "north korea": "PRK",
-      norway: "NOR",
-      panama: "PAN",
-      paraguay: "PAR",
-      peru: "PER",
-      poland: "POL",
-      portugal: "POR",
-      qatar: "QAT",
-      romania: "ROU",
-      russia: "RUS",
-      "saudi arabia": "KSA",
-      scotland: "SCO",
-      senegal: "SEN",
-      serbia: "SRB",
-      "south africa": "RSA",
-      "south korea": "KOR",
-      korea: "KOR",
-      spain: "ESP",
-      sweden: "SWE",
-      switzerland: "SUI",
-      tunisia: "TUN",
-      turkey: "TUR",
-      ukraine: "UKR",
-      uruguay: "URU",
-      usa: "USA",
-      "united states": "USA",
-      uzbekistan: "UZB",
-      venezuela: "VEN",
-      wales: "WAL",
-      "congo dr": "COD",
-      "dr congo": "COD",
-      "democratic republic of congo": "COD"
-    };
-    SOCCER_COUNTRY_ABBREV_BY_CODE = Object.fromEntries(
-      [...new Set(Object.values(SOCCER_COUNTRY_ABBREV_BY_NAME))].map((abbrev) => [
-        abbrev.toLowerCase(),
-        abbrev
-      ])
-    );
-    SOCCER_COUNTRY_LOOKUP = {
-      ...SOCCER_COUNTRY_ABBREV_BY_NAME,
-      ...SOCCER_COUNTRY_ABBREV_BY_CODE,
-      /** ESPN sometimes uses MOR; FIFA code is MAR. */
-      mor: "MAR"
-    };
-  }
-});
-
-// ../grarf/desktop/src/lib/livetrack/liveTrackNationalTeamTokens.ts
-var LIVE_TRACK_NATIONAL_TEAM_TOKEN_BY_ABBREV;
-var init_liveTrackNationalTeamTokens = __esm({
-  "../grarf/desktop/src/lib/livetrack/liveTrackNationalTeamTokens.ts"() {
-    init_define_import_meta_env();
-    LIVE_TRACK_NATIONAL_TEAM_TOKEN_BY_ABBREV = {
-      ALG: "border-green-600/40 bg-green-600/[0.1] text-green-200",
-      ARG: "border-sky-400/40 bg-sky-400/[0.1] text-sky-200",
-      AUS: "border-green-600/40 bg-green-600/[0.1] text-green-200",
-      AUT: "border-red-600/40 bg-red-600/[0.1] text-red-200",
-      BEL: "border-red-500/40 bg-red-500/[0.1] text-red-200",
-      BOL: "border-green-600/40 bg-green-600/[0.1] text-green-200",
-      BRA: "border-green-500/40 bg-green-500/[0.1] text-green-200",
-      CMR: "border-green-600/40 bg-green-600/[0.1] text-green-200",
-      CAN: "border-red-500/40 bg-red-500/[0.1] text-red-200",
-      CPV: "border-blue-600/40 bg-blue-600/[0.1] text-blue-200",
-      CHI: "border-red-600/40 bg-red-600/[0.1] text-red-200",
-      CHN: "border-red-600/40 bg-red-600/[0.1] text-red-200",
-      COL: "border-yellow-400/35 bg-yellow-400/[0.08] text-yellow-200",
-      COD: "border-blue-700/40 bg-blue-700/[0.12] text-blue-200",
-      CRC: "border-red-600/40 bg-red-600/[0.1] text-red-200",
-      CIV: "border-orange-500/45 bg-orange-500/[0.12] text-orange-300",
-      CRO: "border-red-600/40 bg-red-600/[0.1] text-red-200",
-      CZE: "border-red-600/40 bg-red-600/[0.1] text-red-200",
-      DEN: "border-red-500/40 bg-red-500/[0.1] text-red-200",
-      ECU: "border-yellow-400/35 bg-yellow-400/[0.08] text-yellow-200",
-      EGY: "border-red-600/40 bg-red-600/[0.1] text-red-200",
-      ENG: "border-white/25 bg-white/[0.06] text-[#e8ecec]",
-      ESP: "border-red-500/40 bg-red-500/[0.1] text-red-200",
-      FRA: "border-blue-600/40 bg-blue-600/[0.1] text-blue-200",
-      GER: "border-slate-300/30 bg-slate-300/[0.08] text-slate-200",
-      GHA: "border-yellow-400/35 bg-yellow-400/[0.08] text-yellow-200",
-      GRE: "border-blue-600/40 bg-blue-600/[0.1] text-blue-200",
-      HON: "border-blue-600/40 bg-blue-600/[0.1] text-blue-200",
-      HUN: "border-red-600/40 bg-red-600/[0.1] text-red-200",
-      IRN: "border-green-600/40 bg-green-600/[0.1] text-green-200",
-      IRQ: "border-green-600/40 bg-green-600/[0.1] text-green-200",
-      ITA: "border-blue-700/40 bg-blue-700/[0.12] text-blue-200",
-      JPN: "border-blue-600/40 bg-blue-600/[0.1] text-blue-200",
-      JOR: "border-red-600/40 bg-red-600/[0.1] text-red-200",
-      KOR: "border-red-500/40 bg-red-500/[0.1] text-red-200",
-      KSA: "border-green-600/40 bg-green-600/[0.1] text-green-200",
-      MAR: "border-red-600/40 bg-red-600/[0.1] text-red-200",
-      MEX: "border-green-600/40 bg-green-600/[0.1] text-green-200",
-      NED: "border-orange-500/45 bg-orange-500/[0.12] text-orange-300",
-      NGA: "border-green-600/40 bg-green-600/[0.1] text-green-200",
-      NOR: "border-red-600/40 bg-red-600/[0.1] text-red-200",
-      NZL: "border-white/25 bg-white/[0.06] text-[#e8ecec]",
-      PAN: "border-red-600/40 bg-red-600/[0.1] text-red-200",
-      PAR: "border-red-600/40 bg-red-600/[0.1] text-red-200",
-      PER: "border-red-600/40 bg-red-600/[0.1] text-red-200",
-      POL: "border-red-600/40 bg-red-600/[0.1] text-red-200",
-      POR: "border-red-600/40 bg-red-600/[0.1] text-red-200",
-      PRK: "border-red-600/40 bg-red-600/[0.1] text-red-200",
-      QAT: "border-red-800/40 bg-red-800/[0.12] text-red-200",
-      ROU: "border-yellow-400/35 bg-yellow-400/[0.08] text-yellow-200",
-      RSA: "border-yellow-400/35 bg-yellow-400/[0.08] text-yellow-200",
-      RUS: "border-red-600/40 bg-red-600/[0.1] text-red-200",
-      SCO: "border-blue-700/40 bg-blue-700/[0.12] text-blue-200",
-      SEN: "border-green-600/40 bg-green-600/[0.1] text-green-200",
-      SRB: "border-red-600/40 bg-red-600/[0.1] text-red-200",
-      SUI: "border-red-600/40 bg-red-600/[0.1] text-red-200",
-      SWE: "border-yellow-400/35 bg-yellow-400/[0.08] text-yellow-200",
-      TUN: "border-red-600/40 bg-red-600/[0.1] text-red-200",
-      TUR: "border-red-600/40 bg-red-600/[0.1] text-red-200",
-      UKR: "border-yellow-400/35 bg-yellow-400/[0.08] text-yellow-200",
-      URU: "border-sky-400/40 bg-sky-400/[0.1] text-sky-200",
-      USA: "border-red-600/40 bg-red-600/[0.1] text-red-200",
-      UZB: "border-blue-600/40 bg-blue-600/[0.1] text-blue-200",
-      VEN: "border-red-800/40 bg-red-800/[0.12] text-red-200",
-      WAL: "border-red-600/40 bg-red-600/[0.1] text-red-200"
-    };
-  }
-});
-
-// ../grarf/desktop/src/lib/livetrack/liveTrackNcaaBaseballTeams.ts
-var LIVE_TRACK_NCAA_BASEBALL_TEAMS;
-var init_liveTrackNcaaBaseballTeams = __esm({
-  "../grarf/desktop/src/lib/livetrack/liveTrackNcaaBaseballTeams.ts"() {
-    init_define_import_meta_env();
-    LIVE_TRACK_NCAA_BASEBALL_TEAMS = [
-      { names: ["Abilene Christian Wildcats", "Abilene Chrstn"], abbrev: "ACU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2000.png", tokenClass: "border-rose-400/35 bg-rose-400/[0.08] text-rose-200" },
-      { names: ["Air Force Falcons", "Air Force"], abbrev: "AFA", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2005.png", tokenClass: "border-blue-400/40 bg-blue-400/[0.1] text-blue-200" },
-      { names: ["Akron Zips", "Akron"], abbrev: "AKR", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2006.png", tokenClass: "border-amber-400/35 bg-amber-400/[0.08] text-amber-200" },
-      { names: ["Alabama A&M Bulldogs", "Alabama A&M"], abbrev: "AAMU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2010.png", tokenClass: "border-indigo-400/35 bg-indigo-400/[0.08] text-indigo-200" },
-      { names: ["Alabama Crimson Tide", "Alabama"], abbrev: "ALA", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/333.png", tokenClass: "border-red-400/35 bg-red-400/[0.08] text-red-200" },
-      { names: ["Alabama State Hornets", "Alabama St"], abbrev: "ALST", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2011.png", tokenClass: "border-teal-400/35 bg-teal-400/[0.08] text-teal-200" },
-      { names: ["Alcorn State Braves", "Alcorn St"], abbrev: "ALCN", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2016.png", tokenClass: "border-pink-400/35 bg-pink-400/[0.08] text-pink-200" },
-      { names: ["Alma Scots", "Alma"], abbrev: "ALMA", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2800.png", tokenClass: "border-lime-400/35 bg-lime-400/[0.08] text-lime-200" },
-      { names: ["American University Eagles", "American"], abbrev: "AMER", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/44.png", tokenClass: "border-fuchsia-400/35 bg-fuchsia-400/[0.08] text-fuchsia-200" },
-      { names: ["Anderson (IN) Ravens", "Anderson IND"], abbrev: "ANDC", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2023.png", tokenClass: "border-cyan-400/35 bg-cyan-400/[0.08] text-cyan-200" },
-      { names: ["App State Mountaineers", "App State"], abbrev: "APP", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2026.png", tokenClass: "border-violet-400/35 bg-violet-400/[0.08] text-violet-200" },
-      { names: ["Arizona State Sun Devils", "Arizona St"], abbrev: "ASU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/9.png", tokenClass: "border-orange-400/40 bg-orange-400/[0.1] text-orange-200" },
-      { names: ["Arizona Wildcats", "Arizona"], abbrev: "ARIZ", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/12.png", tokenClass: "border-green-500/35 bg-green-500/[0.08] text-green-200" },
-      { names: ["Arkansas Razorbacks", "Arkansas"], abbrev: "ARK", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/8.png", tokenClass: "border-sky-400/35 bg-sky-400/[0.08] text-sky-200" },
-      { names: ["Arkansas State Red Wolves", "Arkansas St"], abbrev: "ARST", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2032.png", tokenClass: "border-orange-500/45 bg-orange-500/[0.12] text-orange-300" },
-      { names: ["Arkansas-Pine Bluff Golden Lions", "AR-Pine Bluff"], abbrev: "UAPB", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2029.png", tokenClass: "border-red-500/40 bg-red-500/[0.1] text-red-200" },
-      { names: ["Army Black Knights", "Army"], abbrev: "ARMY", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/349.png", tokenClass: "border-blue-500/35 bg-blue-500/[0.08] text-blue-200" },
-      { names: ["Auburn Tigers", "Auburn"], abbrev: "AUB", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2.png", tokenClass: "border-rose-400/35 bg-rose-400/[0.08] text-rose-200" },
-      { names: ["Augustana (IL) Vikings", "Augustana (IL)"], abbrev: "AUG", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2042.png", tokenClass: "border-blue-400/40 bg-blue-400/[0.1] text-blue-200" },
-      { names: ["Aurora Spartans", "Aurora"], abbrev: "AUR", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2044.png", tokenClass: "border-amber-400/35 bg-amber-400/[0.08] text-amber-200" },
-      { names: ["Austin Peay Governors", "Austin Peay"], abbrev: "APSU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2046.png", tokenClass: "border-indigo-400/35 bg-indigo-400/[0.08] text-indigo-200" },
-      { names: ["BYU Cougars", "BYU"], abbrev: "BYU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/252.png", tokenClass: "border-red-400/35 bg-red-400/[0.08] text-red-200" },
-      { names: ["Ball State Cardinals", "Ball State"], abbrev: "BALL", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2050.png", tokenClass: "border-pink-400/35 bg-pink-400/[0.08] text-pink-200" },
-      { names: ["Baylor Bears", "Baylor"], abbrev: "BAY", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/239.png", tokenClass: "border-fuchsia-400/35 bg-fuchsia-400/[0.08] text-fuchsia-200" },
-      { names: ["Bellarmine Knights", "Bellarmine"], abbrev: "BELL", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/91.png", tokenClass: "border-cyan-400/35 bg-cyan-400/[0.08] text-cyan-200" },
-      { names: ["Belmont Bruins", "Belmont"], abbrev: "BEL", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2057.png", tokenClass: "border-violet-400/35 bg-violet-400/[0.08] text-violet-200" },
-      { names: ["Bethune-Cookman Wildcats", "Bethune"], abbrev: "BCU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2065.png", tokenClass: "border-green-500/35 bg-green-500/[0.08] text-green-200" },
-      { names: ["Binghamton Bearcats", "Binghamton"], abbrev: "BING", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2066.png", tokenClass: "border-sky-400/35 bg-sky-400/[0.08] text-sky-200" },
-      { names: ["Birmingham Southern Panthers", "Birmingham-So."], abbrev: "BSC", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/3.png", tokenClass: "border-orange-500/45 bg-orange-500/[0.12] text-orange-300" },
-      { names: ["Boise State Broncos", "Boise St"], abbrev: "BOIS", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/68.png", tokenClass: "border-red-500/40 bg-red-500/[0.1] text-red-200" },
-      { names: ["Boise State Broncos", "Boise St"], abbrev: "BOIS", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/68.png", tokenClass: "border-blue-500/35 bg-blue-500/[0.08] text-blue-200" },
-      { names: ["Boston College Eagles", "Boston College"], abbrev: "BC", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/103.png", tokenClass: "border-rose-400/35 bg-rose-400/[0.08] text-rose-200" },
-      { names: ["Boston University Terriers", "Boston U"], abbrev: "BU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/104.png", tokenClass: "border-blue-400/40 bg-blue-400/[0.1] text-blue-200" },
-      { names: ["Bowling Green Falcons", "Bowling Green"], abbrev: "BGSU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/189.png", tokenClass: "border-amber-400/35 bg-amber-400/[0.08] text-amber-200" },
-      { names: ["Bradley Braves", "Bradley"], abbrev: "BRAD", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/71.png", tokenClass: "border-indigo-400/35 bg-indigo-400/[0.08] text-indigo-200" },
-      { names: ["Brown Bears", "Brown"], abbrev: "BRWN", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/225.png", tokenClass: "border-red-400/35 bg-red-400/[0.08] text-red-200" },
-      { names: ["Bryant Bulldogs", "Bryant"], abbrev: "BRY", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2803.png", tokenClass: "border-teal-400/35 bg-teal-400/[0.08] text-teal-200" },
-      { names: ["Bucknell Bison", "Bucknell"], abbrev: "BUCK", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2083.png", tokenClass: "border-pink-400/35 bg-pink-400/[0.08] text-pink-200" },
-      { names: ["Buffalo Bulls", "Buffalo"], abbrev: "BUF", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2084.png", tokenClass: "border-lime-400/35 bg-lime-400/[0.08] text-lime-200" },
-      { names: ["Butler Bulldogs", "Butler"], abbrev: "BUT", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2086.png", tokenClass: "border-fuchsia-400/35 bg-fuchsia-400/[0.08] text-fuchsia-200" },
-      { names: ["Cal Poly Mustangs", "Cal Poly"], abbrev: "CP", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/13.png", tokenClass: "border-cyan-400/35 bg-cyan-400/[0.08] text-cyan-200" },
-      { names: ["Cal State Bakersfield Roadrunners", "Bakersfield"], abbrev: "CSUB", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2934.png", tokenClass: "border-orange-400/40 bg-orange-400/[0.1] text-orange-200" },
-      { names: ["Cal State Fullerton Titans", "Fullerton"], abbrev: "CSUF", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2239.png", tokenClass: "border-green-500/35 bg-green-500/[0.08] text-green-200" },
-      { names: ["Cal State Los Angeles Golden Eagles", "Cal State LA"], abbrev: "CSLA", logoUrl: "https://a.espncdn.com/guid/01aa35b6-c8e3-3ab4-80a6-6e84895c47a2/logos/default.png", tokenClass: "border-sky-400/35 bg-sky-400/[0.08] text-sky-200" },
-      { names: ["Cal State Northridge Matadors", "CSU Northridge"], abbrev: "CSUN", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2463.png", tokenClass: "border-orange-500/45 bg-orange-500/[0.12] text-orange-300" },
-      { names: ["California Baptist Lancers", "CA Baptist"], abbrev: "CBU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2856.png", tokenClass: "border-red-500/40 bg-red-500/[0.1] text-red-200" },
-      { names: ["California Golden Bears", "California"], abbrev: "CAL", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/25.png", tokenClass: "border-blue-500/35 bg-blue-500/[0.08] text-blue-200" },
-      { names: ["Campbell Fighting Camels", "Campbell"], abbrev: "CAM", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2097.png", tokenClass: "border-rose-400/35 bg-rose-400/[0.08] text-rose-200" },
-      { names: ["Canisius Golden Griffins", "Canisius"], abbrev: "CAN", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2099.png", tokenClass: "border-blue-400/40 bg-blue-400/[0.1] text-blue-200" },
-      { names: ["Centenary (LA) Gentlemen", "Centenary (LA)"], abbrev: "CENT", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2113.png", tokenClass: "border-amber-400/35 bg-amber-400/[0.08] text-amber-200" },
-      { names: ["Central Arkansas Bears", "C Arkansas"], abbrev: "CARK", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2110.png", tokenClass: "border-indigo-400/35 bg-indigo-400/[0.08] text-indigo-200" },
-      { names: ["Central Connecticut Blue Devils", "C Connecticut"], abbrev: "CCSU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2115.png", tokenClass: "border-red-400/35 bg-red-400/[0.08] text-red-200" },
-      { names: ["Central Michigan Chippewas", "C Michigan"], abbrev: "CMU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2117.png", tokenClass: "border-teal-400/35 bg-teal-400/[0.08] text-teal-200" },
-      { names: ["Central Missouri Mules", "C Missouri"], abbrev: "CAO", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2118.png", tokenClass: "border-pink-400/35 bg-pink-400/[0.08] text-pink-200" },
-      { names: ["Charleston Cougars", "Charleston"], abbrev: "COFC", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/232.png", tokenClass: "border-lime-400/35 bg-lime-400/[0.08] text-lime-200" },
-      { names: ["Charleston Southern Buccaneers", "Charleston So"], abbrev: "CHSO", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2127.png", tokenClass: "border-fuchsia-400/35 bg-fuchsia-400/[0.08] text-fuchsia-200" },
-      { names: ["Charlotte 49ers", "Charlotte"], abbrev: "CLT", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2429.png", tokenClass: "border-cyan-400/35 bg-cyan-400/[0.08] text-cyan-200" },
-      { names: ["Chattanooga Mocs", "Chattanooga"], abbrev: "UTC", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/236.png", tokenClass: "border-violet-400/35 bg-violet-400/[0.08] text-violet-200" },
-      { names: ["Chicago St Cougars", "Chicago St"], abbrev: "CHST", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2130.png", tokenClass: "border-orange-400/40 bg-orange-400/[0.1] text-orange-200" },
-      { names: ["Cincinnati Bearcats", "Cincinnati"], abbrev: "CIN", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2132.png", tokenClass: "border-green-500/35 bg-green-500/[0.08] text-green-200" },
-      { names: ["Clemson Tigers", "Clemson"], abbrev: "CLEM", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/228.png", tokenClass: "border-sky-400/35 bg-sky-400/[0.08] text-sky-200" },
-      { names: ["Cleveland State Vikings", "Cleveland St"], abbrev: "CLE", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/325.png", tokenClass: "border-orange-500/45 bg-orange-500/[0.12] text-orange-300" },
-      { names: ["Coastal Carolina Chanticleers", "Coastal"], abbrev: "CCU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/324.png", tokenClass: "border-red-500/40 bg-red-500/[0.1] text-red-200" },
-      { names: ["Coe Kohawks", "Coe"], abbrev: "COE", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2141.png", tokenClass: "border-blue-500/35 bg-blue-500/[0.08] text-blue-200" },
-      { names: ["Colgate Raiders", "Colgate"], abbrev: "COLG", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2142.png", tokenClass: "border-rose-400/35 bg-rose-400/[0.08] text-rose-200" },
-      { names: ["Colorado Buffaloes", "Colorado"], abbrev: "COLO", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/38.png", tokenClass: "border-blue-400/40 bg-blue-400/[0.1] text-blue-200" },
-      { names: ["Colorado State Rams", "Colorado St"], abbrev: "CSU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/36.png", tokenClass: "border-amber-400/35 bg-amber-400/[0.08] text-amber-200" },
-      { names: ["Columbia Lions", "Columbia"], abbrev: "COLU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/171.png", tokenClass: "border-indigo-400/35 bg-indigo-400/[0.08] text-indigo-200" },
-      { names: ["Concordia St. Paul Golden Bears", "Concordia St P"], abbrev: "CON", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/3066.png", tokenClass: "border-red-400/35 bg-red-400/[0.08] text-red-200" },
-      { names: ["Coppin State Eagles", "Coppin St"], abbrev: "COPP", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2154.png", tokenClass: "border-pink-400/35 bg-pink-400/[0.08] text-pink-200" },
-      { names: ["Cornell (IA) Rams", "Cornell (IA)"], abbrev: "CRIA", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2155.png", tokenClass: "border-lime-400/35 bg-lime-400/[0.08] text-lime-200" },
-      { names: ["Cornell Big Red", "Cornell"], abbrev: "COR", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/172.png", tokenClass: "border-fuchsia-400/35 bg-fuchsia-400/[0.08] text-fuchsia-200" },
-      { names: ["Creighton Bluejays", "Creighton"], abbrev: "CREI", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/156.png", tokenClass: "border-cyan-400/35 bg-cyan-400/[0.08] text-cyan-200" },
-      { names: ["Dallas Baptist Patriots", "Dallas Baptist"], abbrev: "DBU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2164.png", tokenClass: "border-violet-400/35 bg-violet-400/[0.08] text-violet-200" },
-      { names: ["Dartmouth Big Green", "Dartmouth"], abbrev: "DART", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/159.png", tokenClass: "border-orange-400/40 bg-orange-400/[0.1] text-orange-200" },
-      { names: ["Davidson Wildcats", "Davidson"], abbrev: "DAV", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2166.png", tokenClass: "border-green-500/35 bg-green-500/[0.08] text-green-200" },
-      { names: ["Dayton Flyers", "Dayton"], abbrev: "DAY", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2168.png", tokenClass: "border-sky-400/35 bg-sky-400/[0.08] text-sky-200" },
-      { names: ["DePaul Blue Demons", "DePaul"], abbrev: "DEP", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/305.png", tokenClass: "border-orange-500/45 bg-orange-500/[0.12] text-orange-300" },
-      { names: ["DePauw Tigers", "DePauw"], abbrev: "DEP", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/83.png", tokenClass: "border-red-500/40 bg-red-500/[0.1] text-red-200" },
-      { names: ["Delaware Blue Hens", "Delaware"], abbrev: "DEL", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/48.png", tokenClass: "border-blue-500/35 bg-blue-500/[0.08] text-blue-200" },
-      { names: ["Delaware State Hornets", "Delaware St"], abbrev: "DSU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2169.png", tokenClass: "border-rose-400/35 bg-rose-400/[0.08] text-rose-200" },
-      { names: ["Denver Pioneers", "Denver"], abbrev: "DEN", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2172.png", tokenClass: "border-blue-400/40 bg-blue-400/[0.1] text-blue-200" },
-      { names: ["Detroit Mercy Titans", "Detroit Mercy"], abbrev: "DETM", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2174.png", tokenClass: "border-amber-400/35 bg-amber-400/[0.08] text-amber-200" },
-      { names: ["Drake Bulldogs", "Drake"], abbrev: "DRKE", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2181.png", tokenClass: "border-indigo-400/35 bg-indigo-400/[0.08] text-indigo-200" },
-      { names: ["Drexel Dragons", "Drexel"], abbrev: "DREX", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2182.png", tokenClass: "border-red-400/35 bg-red-400/[0.08] text-red-200" },
-      { names: ["Duke Blue Devils", "Duke"], abbrev: "DUKE", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/150.png", tokenClass: "border-teal-400/35 bg-teal-400/[0.08] text-teal-200" },
-      { names: ["Duquesne Dukes", "Duquesne"], abbrev: "DUQ", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2184.png", tokenClass: "border-pink-400/35 bg-pink-400/[0.08] text-pink-200" },
-      { names: ["East Carolina Pirates", "East Carolina"], abbrev: "ECU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/151.png", tokenClass: "border-lime-400/35 bg-lime-400/[0.08] text-lime-200" },
-      { names: ["East Tennessee State Buccaneers", "ETSU"], abbrev: "ETSU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2193.png", tokenClass: "border-fuchsia-400/35 bg-fuchsia-400/[0.08] text-fuchsia-200" },
-      { names: ["Eastern Illinois Panthers", "E Illinois"], abbrev: "EIU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2197.png", tokenClass: "border-cyan-400/35 bg-cyan-400/[0.08] text-cyan-200" },
-      { names: ["Eastern Kentucky Colonels", "E Kentucky"], abbrev: "EKU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2198.png", tokenClass: "border-violet-400/35 bg-violet-400/[0.08] text-violet-200" },
-      { names: ["Eastern Michigan Eagles", "E Michigan"], abbrev: "EMU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2199.png", tokenClass: "border-orange-400/40 bg-orange-400/[0.1] text-orange-200" },
-      { names: ["Eastern Washington Eagles", "E Washington"], abbrev: "EWU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/331.png", tokenClass: "border-green-500/35 bg-green-500/[0.08] text-green-200" },
-      { names: ["Elon Phoenix", "Elon"], abbrev: "ELON", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2210.png", tokenClass: "border-sky-400/35 bg-sky-400/[0.08] text-sky-200" },
-      { names: ["Emporia State Hornets", "Emporia St"], abbrev: "EMP", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2214.png", tokenClass: "border-orange-500/45 bg-orange-500/[0.12] text-orange-300" },
-      { names: ["Evansville Purple Aces", "Evansville"], abbrev: "EVAN", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/339.png", tokenClass: "border-red-500/40 bg-red-500/[0.1] text-red-200" },
-      { names: ["Fairfield Stags", "Fairfield"], abbrev: "FAIR", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2217.png", tokenClass: "border-blue-500/35 bg-blue-500/[0.08] text-blue-200" },
-      { names: ["Fairleigh Dickinson Knights", "FDU"], abbrev: "FDU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/161.png", tokenClass: "border-rose-400/35 bg-rose-400/[0.08] text-rose-200" },
-      { names: ["Florida A&M Rattlers", "Florida A&M"], abbrev: "FAMU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/50.png", tokenClass: "border-amber-400/35 bg-amber-400/[0.08] text-amber-200" },
-      { names: ["Florida Atlantic Owls", "FAU"], abbrev: "FAU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2226.png", tokenClass: "border-indigo-400/35 bg-indigo-400/[0.08] text-indigo-200" },
-      { names: ["Florida Gators", "Florida"], abbrev: "FLA", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/57.png", tokenClass: "border-red-400/35 bg-red-400/[0.08] text-red-200" },
-      { names: ["Florida Gulf Coast Eagles", "FGCU"], abbrev: "FGCU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/526.png", tokenClass: "border-teal-400/35 bg-teal-400/[0.08] text-teal-200" },
-      { names: ["Florida International Panthers", "FIU"], abbrev: "FIU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2229.png", tokenClass: "border-pink-400/35 bg-pink-400/[0.08] text-pink-200" },
-      { names: ["Florida State Seminoles", "Florida St"], abbrev: "FSU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/52.png", tokenClass: "border-fuchsia-400/35 bg-fuchsia-400/[0.08] text-fuchsia-200" },
-      { names: ["Fordham Rams", "Fordham"], abbrev: "FOR", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2230.png", tokenClass: "border-cyan-400/35 bg-cyan-400/[0.08] text-cyan-200" },
-      { names: ["Fresno State Bulldogs", "Fresno St"], abbrev: "FRES", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/278.png", tokenClass: "border-orange-400/40 bg-orange-400/[0.1] text-orange-200" },
-      { names: ["Furman Paladins", "Furman"], abbrev: "FUR", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/231.png", tokenClass: "border-green-500/35 bg-green-500/[0.08] text-green-200" },
-      { names: ["Gardner-Webb Runnin' Bulldogs", "Gardner-Webb"], abbrev: "GWEB", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2241.png", tokenClass: "border-sky-400/35 bg-sky-400/[0.08] text-sky-200" },
-      { names: ["George Mason Patriots", "George Mason"], abbrev: "GMU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2244.png", tokenClass: "border-orange-500/45 bg-orange-500/[0.12] text-orange-300" },
-      { names: ["George Washington Revolutionaries", "G Washington"], abbrev: "GW", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/45.png", tokenClass: "border-red-500/40 bg-red-500/[0.1] text-red-200" },
-      { names: ["Georgetown Hoyas", "Georgetown"], abbrev: "GTWN", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/46.png", tokenClass: "border-blue-500/35 bg-blue-500/[0.08] text-blue-200" },
-      { names: ["Georgia Bulldogs", "Georgia"], abbrev: "UGA", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/61.png", tokenClass: "border-rose-400/35 bg-rose-400/[0.08] text-rose-200" },
-      { names: ["Georgia Southern Eagles", "GA Southern"], abbrev: "GASO", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/290.png", tokenClass: "border-blue-400/40 bg-blue-400/[0.1] text-blue-200" },
-      { names: ["Georgia State Panthers", "Georgia St"], abbrev: "GAST", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2247.png", tokenClass: "border-amber-400/35 bg-amber-400/[0.08] text-amber-200" },
-      { names: ["Georgia Tech Yellow Jackets", "Georgia Tech"], abbrev: "GT", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/59.png", tokenClass: "border-indigo-400/35 bg-indigo-400/[0.08] text-indigo-200" },
-      { names: ["Gonzaga Bulldogs", "Gonzaga"], abbrev: "GONZ", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2250.png", tokenClass: "border-red-400/35 bg-red-400/[0.08] text-red-200" },
-      { names: ["Grambling Tigers", "Grambling"], abbrev: "GRAM", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2755.png", tokenClass: "border-teal-400/35 bg-teal-400/[0.08] text-teal-200" },
-      { names: ["Grand Canyon Lopes", "Grand Canyon"], abbrev: "GCU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2253.png", tokenClass: "border-pink-400/35 bg-pink-400/[0.08] text-pink-200" },
-      { names: ["Grand View Vikings", "Grand View"], abbrev: "GRA", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2254.png", tokenClass: "border-lime-400/35 bg-lime-400/[0.08] text-lime-200" },
-      { names: ["Green Bay Phoenix", "Green Bay"], abbrev: "GB", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2739.png", tokenClass: "border-fuchsia-400/35 bg-fuchsia-400/[0.08] text-fuchsia-200" },
-      { names: ["Hampton Pirates", "Hampton"], abbrev: "HAMP", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2261.png", tokenClass: "border-cyan-400/35 bg-cyan-400/[0.08] text-cyan-200" },
-      { names: ["Hartford Hawks", "Hartford"], abbrev: "HART", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/42.png", tokenClass: "border-violet-400/35 bg-violet-400/[0.08] text-violet-200" },
-      { names: ["Harvard Crimson", "Harvard"], abbrev: "HARV", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/108.png", tokenClass: "border-orange-400/40 bg-orange-400/[0.1] text-orange-200" },
-      { names: ["Hawai'i Rainbow Warriors", "Hawai'i"], abbrev: "HAW", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/62.png", tokenClass: "border-green-500/35 bg-green-500/[0.08] text-green-200" },
-      { names: ["Hawai\u02BBi Pacific Sea Warriors", "HI Pacific"], abbrev: "HPU", logoUrl: "https://a.espncdn.com/guid/cf8e81e2-4cc5-310a-838f-c046b0d505b7/logos/default.png", tokenClass: "border-orange-500/45 bg-orange-500/[0.12] text-orange-300" },
-      { names: ["High Point Panthers", "High Point"], abbrev: "HPU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2272.png", tokenClass: "border-red-500/40 bg-red-500/[0.1] text-red-200" },
-      { names: ["Hofstra Pride", "Hofstra"], abbrev: "HOF", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2275.png", tokenClass: "border-blue-500/35 bg-blue-500/[0.08] text-blue-200" },
-      { names: ["Holy Cross Crusaders", "Holy Cross"], abbrev: "HC", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/107.png", tokenClass: "border-rose-400/35 bg-rose-400/[0.08] text-rose-200" },
-      { names: ["Houston Christian Huskies", "Hou Christian"], abbrev: "HCU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2277.png", tokenClass: "border-blue-400/40 bg-blue-400/[0.1] text-blue-200" },
-      { names: ["Houston Cougars", "Houston"], abbrev: "HOU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/248.png", tokenClass: "border-amber-400/35 bg-amber-400/[0.08] text-amber-200" },
-      { names: ["Howard Bison", "Howard"], abbrev: "HOW", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/47.png", tokenClass: "border-indigo-400/35 bg-indigo-400/[0.08] text-indigo-200" },
-      { names: ["IU Indianapolis Jaguars", "IU Indy"], abbrev: "IUIN", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/85.png", tokenClass: "border-red-400/35 bg-red-400/[0.08] text-red-200" },
-      { names: ["Idaho State Bengals", "Idaho St"], abbrev: "IDST", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/304.png", tokenClass: "border-teal-400/35 bg-teal-400/[0.08] text-teal-200" },
-      { names: ["Idaho Vandals", "Idaho"], abbrev: "IDHO", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/70.png", tokenClass: "border-pink-400/35 bg-pink-400/[0.08] text-pink-200" },
-      { names: ["Illinois Fighting Illini", "Illinois"], abbrev: "ILL", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/356.png", tokenClass: "border-lime-400/35 bg-lime-400/[0.08] text-lime-200" },
-      { names: ["Illinois State Redbirds", "Illinois St"], abbrev: "ILST", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2287.png", tokenClass: "border-fuchsia-400/35 bg-fuchsia-400/[0.08] text-fuchsia-200" },
-      { names: ["Incarnate Word Cardinals", "Incarnate Word"], abbrev: "UIW", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2916.png", tokenClass: "border-cyan-400/35 bg-cyan-400/[0.08] text-cyan-200" },
-      { names: ["Indiana Hoosiers", "Indiana"], abbrev: "IU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/84.png", tokenClass: "border-violet-400/35 bg-violet-400/[0.08] text-violet-200" },
-      { names: ["Indiana State Sycamores", "Indiana St"], abbrev: "INST", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/282.png", tokenClass: "border-orange-400/40 bg-orange-400/[0.1] text-orange-200" },
-      { names: ["Iona Gaels", "Iona"], abbrev: "IONA", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/314.png", tokenClass: "border-green-500/35 bg-green-500/[0.08] text-green-200" },
-      { names: ["Iowa Hawkeyes", "Iowa"], abbrev: "IOWA", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2294.png", tokenClass: "border-sky-400/35 bg-sky-400/[0.08] text-sky-200" },
-      { names: ["Iowa State Cyclones", "Iowa St"], abbrev: "ISU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/66.png", tokenClass: "border-orange-500/45 bg-orange-500/[0.12] text-orange-300" },
-      { names: ["Jackson State Tigers", "Jackson St"], abbrev: "JKST", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2296.png", tokenClass: "border-red-500/40 bg-red-500/[0.1] text-red-200" },
-      { names: ["Jacksonville Dolphins", "Jacksonville"], abbrev: "JAX", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/294.png", tokenClass: "border-blue-500/35 bg-blue-500/[0.08] text-blue-200" },
-      { names: ["Jacksonville State Gamecocks", "Jax State"], abbrev: "JVST", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/55.png", tokenClass: "border-rose-400/35 bg-rose-400/[0.08] text-rose-200" },
-      { names: ["James Madison Dukes", "James Madison"], abbrev: "JMU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/256.png", tokenClass: "border-blue-400/40 bg-blue-400/[0.1] text-blue-200" },
-      { names: ["Kansas City Roos", "Kansas City"], abbrev: "KC", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/140.png", tokenClass: "border-indigo-400/35 bg-indigo-400/[0.08] text-indigo-200" },
-      { names: ["Kansas Jayhawks", "Kansas"], abbrev: "KU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2305.png", tokenClass: "border-red-400/35 bg-red-400/[0.08] text-red-200" },
-      { names: ["Kansas State Wildcats", "Kansas St"], abbrev: "KSU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2306.png", tokenClass: "border-teal-400/35 bg-teal-400/[0.08] text-teal-200" },
-      { names: ["Kennesaw State Owls", "Kennesaw St"], abbrev: "KENN", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/338.png", tokenClass: "border-pink-400/35 bg-pink-400/[0.08] text-pink-200" },
-      { names: ["Kent State Golden Flashes", "Kent State"], abbrev: "KENT", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2309.png", tokenClass: "border-lime-400/35 bg-lime-400/[0.08] text-lime-200" },
-      { names: ["Kentucky Wildcats", "Kentucky"], abbrev: "UK", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/96.png", tokenClass: "border-fuchsia-400/35 bg-fuchsia-400/[0.08] text-fuchsia-200" },
-      { names: ["LSU Tigers", "LSU"], abbrev: "LSU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/99.png", tokenClass: "border-cyan-400/35 bg-cyan-400/[0.08] text-cyan-200" },
-      { names: ["La Salle Explorers", "La Salle"], abbrev: "LAS", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2325.png", tokenClass: "border-violet-400/35 bg-violet-400/[0.08] text-violet-200" },
-      { names: ["Lafayette Leopards", "Lafayette"], abbrev: "LAF", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/322.png", tokenClass: "border-orange-400/40 bg-orange-400/[0.1] text-orange-200" },
-      { names: ["Lamar Cardinals", "Lamar"], abbrev: "LAM", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2320.png", tokenClass: "border-green-500/35 bg-green-500/[0.08] text-green-200" },
-      { names: ["Le Moyne Dolphins", "Le Moyne"], abbrev: "LEM", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2330.png", tokenClass: "border-sky-400/35 bg-sky-400/[0.08] text-sky-200" },
-      { names: ["Lehigh Mountain Hawks", "Lehigh"], abbrev: "LEH", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2329.png", tokenClass: "border-orange-500/45 bg-orange-500/[0.12] text-orange-300" },
-      { names: ["Lenoir Rhyne Bears", "Lenoir Rhyne"], abbrev: "LEN", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2331.png", tokenClass: "border-red-500/40 bg-red-500/[0.1] text-red-200" },
-      { names: ["Liberty Flames", "Liberty"], abbrev: "LIB", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2335.png", tokenClass: "border-blue-500/35 bg-blue-500/[0.08] text-blue-200" },
-      { names: ["Lindenwood Lions", "Lindenwood"], abbrev: "LIN", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2815.png", tokenClass: "border-blue-400/40 bg-blue-400/[0.1] text-blue-200" },
-      { names: ["Linfield Wildcats", "Linfield"], abbrev: "LIN", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/203.png", tokenClass: "border-amber-400/35 bg-amber-400/[0.08] text-amber-200" },
-      { names: ["Lipscomb Bisons", "Lipscomb"], abbrev: "LIP", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/288.png", tokenClass: "border-indigo-400/35 bg-indigo-400/[0.08] text-indigo-200" },
-      { names: ["Little Rock Trojans", "Little Rock"], abbrev: "LR", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2031.png", tokenClass: "border-red-400/35 bg-red-400/[0.08] text-red-200" },
-      { names: ["Long Beach State Beach", "Long Beach St"], abbrev: "LBSU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/299.png", tokenClass: "border-teal-400/35 bg-teal-400/[0.08] text-teal-200" },
-      { names: ["Long Island University Sharks", "Long Island"], abbrev: "LIU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2341.png", tokenClass: "border-pink-400/35 bg-pink-400/[0.08] text-pink-200" },
-      { names: ["Longwood Lancers", "Longwood"], abbrev: "LONG", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2344.png", tokenClass: "border-lime-400/35 bg-lime-400/[0.08] text-lime-200" },
-      { names: ["Loras Duhawks", "Loras"], abbrev: "LOR", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/263.png", tokenClass: "border-fuchsia-400/35 bg-fuchsia-400/[0.08] text-fuchsia-200" },
-      { names: ["Louisiana Ragin' Cajuns", "Louisiana"], abbrev: "UL", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/309.png", tokenClass: "border-violet-400/35 bg-violet-400/[0.08] text-violet-200" },
-      { names: ["Louisiana Tech Bulldogs", "Louisiana Tech"], abbrev: "LT", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2348.png", tokenClass: "border-orange-400/40 bg-orange-400/[0.1] text-orange-200" },
-      { names: ["Louisville Cardinals", "Louisville"], abbrev: "LOU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/97.png", tokenClass: "border-green-500/35 bg-green-500/[0.08] text-green-200" },
-      { names: ["Loyola Chicago Ramblers", "Loyola Chicago"], abbrev: "LUC", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2350.png", tokenClass: "border-sky-400/35 bg-sky-400/[0.08] text-sky-200" },
-      { names: ["Loyola Maryland Greyhounds", "Loyola MD"], abbrev: "L-MD", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2352.png", tokenClass: "border-orange-500/45 bg-orange-500/[0.12] text-orange-300" },
-      { names: ["Loyola Marymount Lions", "LMU"], abbrev: "LMU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2351.png", tokenClass: "border-red-500/40 bg-red-500/[0.1] text-red-200" },
-      { names: ["Maine Black Bears", "Maine"], abbrev: "ME", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/311.png", tokenClass: "border-blue-400/40 bg-blue-400/[0.1] text-blue-200" },
-      { names: ["Manhattan Jaspers", "Manhattan"], abbrev: "MAN", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2363.png", tokenClass: "border-amber-400/35 bg-amber-400/[0.08] text-amber-200" },
-      { names: ["Marist Red Foxes", "Marist"], abbrev: "MRST", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2368.png", tokenClass: "border-indigo-400/35 bg-indigo-400/[0.08] text-indigo-200" },
-      { names: ["Marquette Golden Eagles", "Marquette"], abbrev: "MARQ", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/269.png", tokenClass: "border-red-400/35 bg-red-400/[0.08] text-red-200" },
-      { names: ["Marshall Thundering Herd", "Marshall"], abbrev: "MRSH", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/276.png", tokenClass: "border-teal-400/35 bg-teal-400/[0.08] text-teal-200" },
-      { names: ["Maryland Eastern Shore Hawks", "MD Eastern"], abbrev: "UMES", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2379.png", tokenClass: "border-pink-400/35 bg-pink-400/[0.08] text-pink-200" },
-      { names: ["Maryland Terrapins", "Maryland"], abbrev: "MD", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/120.png", tokenClass: "border-lime-400/35 bg-lime-400/[0.08] text-lime-200" },
-      { names: ["Massachusetts Minutemen", "UMass"], abbrev: "MASS", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/113.png", tokenClass: "border-fuchsia-400/35 bg-fuchsia-400/[0.08] text-fuchsia-200" },
-      { names: ["McNeese Cowboys", "McNeese"], abbrev: "MCN", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2377.png", tokenClass: "border-cyan-400/35 bg-cyan-400/[0.08] text-cyan-200" },
-      { names: ["Memphis Tigers", "Memphis"], abbrev: "MEM", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/235.png", tokenClass: "border-violet-400/35 bg-violet-400/[0.08] text-violet-200" },
-      { names: ["Mercer Bears", "Mercer"], abbrev: "MER", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2382.png", tokenClass: "border-orange-400/40 bg-orange-400/[0.1] text-orange-200" },
-      { names: ["Mercyhurst Lakers", "Mercyhurst"], abbrev: "MER", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2385.png", tokenClass: "border-green-500/35 bg-green-500/[0.08] text-green-200" },
-      { names: ["Merrimack Warriors", "Merrimack"], abbrev: "MRMK", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2771.png", tokenClass: "border-sky-400/35 bg-sky-400/[0.08] text-sky-200" },
-      { names: ["Miami (OH) RedHawks", "Miami OH"], abbrev: "M-OH", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/193.png", tokenClass: "border-orange-500/45 bg-orange-500/[0.12] text-orange-300" },
-      { names: ["Miami Hurricanes", "Miami"], abbrev: "MIA", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2390.png", tokenClass: "border-red-500/40 bg-red-500/[0.1] text-red-200" },
-      { names: ["Michigan State Spartans", "Michigan St"], abbrev: "MSU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/127.png", tokenClass: "border-blue-500/35 bg-blue-500/[0.08] text-blue-200" },
-      { names: ["Michigan Wolverines", "Michigan"], abbrev: "MICH", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/130.png", tokenClass: "border-rose-400/35 bg-rose-400/[0.08] text-rose-200" },
-      { names: ["Middle Tennessee Blue Raiders", "MTSU"], abbrev: "MTSU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2393.png", tokenClass: "border-amber-400/35 bg-amber-400/[0.08] text-amber-200" },
-      { names: ["Milwaukee Panthers", "Milwaukee"], abbrev: "MILW", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/270.png", tokenClass: "border-indigo-400/35 bg-indigo-400/[0.08] text-indigo-200" },
-      { names: ["Minnesota Golden Gophers", "Minnesota"], abbrev: "MINN", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/135.png", tokenClass: "border-red-400/35 bg-red-400/[0.08] text-red-200" },
-      { names: ["Mississippi State Bulldogs", "Mississippi St"], abbrev: "MSST", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/344.png", tokenClass: "border-teal-400/35 bg-teal-400/[0.08] text-teal-200" },
-      { names: ["Mississippi Valley State Delta Devils", "Miss Valley St"], abbrev: "MVSU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2400.png", tokenClass: "border-pink-400/35 bg-pink-400/[0.08] text-pink-200" },
-      { names: ["Missouri State Bears", "Missouri St"], abbrev: "MOST", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2623.png", tokenClass: "border-lime-400/35 bg-lime-400/[0.08] text-lime-200" },
-      { names: ["Missouri Tigers", "Missouri"], abbrev: "MIZ", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/142.png", tokenClass: "border-fuchsia-400/35 bg-fuchsia-400/[0.08] text-fuchsia-200" },
-      { names: ["Monmouth Hawks", "Monmouth"], abbrev: "MONM", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2405.png", tokenClass: "border-cyan-400/35 bg-cyan-400/[0.08] text-cyan-200" },
-      { names: ["Montana Grizzlies", "Montana"], abbrev: "MONT", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/149.png", tokenClass: "border-violet-400/35 bg-violet-400/[0.08] text-violet-200" },
-      { names: ["Montana State Bobcats", "Montana St"], abbrev: "MTST", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/147.png", tokenClass: "border-orange-400/40 bg-orange-400/[0.1] text-orange-200" },
-      { names: ["Morehead State Eagles", "Morehead St"], abbrev: "MORE", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2413.png", tokenClass: "border-green-500/35 bg-green-500/[0.08] text-green-200" },
-      { names: ["Morgan State Bears", "Morgan St"], abbrev: "MORG", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2415.png", tokenClass: "border-sky-400/35 bg-sky-400/[0.08] text-sky-200" },
-      { names: ["Mount St. Mary's Mountaineers", "Mount St Marys"], abbrev: "MSM", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/116.png", tokenClass: "border-orange-500/45 bg-orange-500/[0.12] text-orange-300" },
-      { names: ["Murray State Racers", "Murray St"], abbrev: "MUR", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/93.png", tokenClass: "border-red-500/40 bg-red-500/[0.1] text-red-200" },
-      { names: ["NC State Wolfpack", "NC State"], abbrev: "NCSU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/152.png", tokenClass: "border-blue-500/35 bg-blue-500/[0.08] text-blue-200" },
-      { names: ["NJIT Highlanders", "NJIT"], abbrev: "NJIT", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2885.png", tokenClass: "border-rose-400/35 bg-rose-400/[0.08] text-rose-200" },
-      { names: ["Navy Midshipmen", "Navy"], abbrev: "NAVY", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2426.png", tokenClass: "border-amber-400/35 bg-amber-400/[0.08] text-amber-200" },
-      { names: ["Nebraska Cornhuskers", "Nebraska"], abbrev: "NEB", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/158.png", tokenClass: "border-indigo-400/35 bg-indigo-400/[0.08] text-indigo-200" },
-      { names: ["Nebraska Kearney Lopers", "NE Kearney"], abbrev: "NK", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2438.png", tokenClass: "border-red-400/35 bg-red-400/[0.08] text-red-200" },
-      { names: ["Nevada Wolf Pack", "Nevada"], abbrev: "NEV", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2440.png", tokenClass: "border-teal-400/35 bg-teal-400/[0.08] text-teal-200" },
-      { names: ["New Hampshire Wildcats", "New Hampshire"], abbrev: "UNH", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/160.png", tokenClass: "border-pink-400/35 bg-pink-400/[0.08] text-pink-200" },
-      { names: ["New Haven Chargers", "New Haven"], abbrev: "NHVN", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2441.png", tokenClass: "border-lime-400/35 bg-lime-400/[0.08] text-lime-200" },
-      { names: ["New Mexico Lobos", "New Mexico"], abbrev: "UNM", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/167.png", tokenClass: "border-fuchsia-400/35 bg-fuchsia-400/[0.08] text-fuchsia-200" },
-      { names: ["New Mexico State Aggies", "New Mexico St"], abbrev: "NMSU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/166.png", tokenClass: "border-cyan-400/35 bg-cyan-400/[0.08] text-cyan-200" },
-      { names: ["New Orleans Privateers", "New Orleans"], abbrev: "UNO", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2443.png", tokenClass: "border-violet-400/35 bg-violet-400/[0.08] text-violet-200" },
-      { names: ["Niagara Purple Eagles", "Niagara"], abbrev: "NIA", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/315.png", tokenClass: "border-orange-400/40 bg-orange-400/[0.1] text-orange-200" },
-      { names: ["Nicholls Colonels", "Nicholls"], abbrev: "NICH", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2447.png", tokenClass: "border-green-500/35 bg-green-500/[0.08] text-green-200" },
-      { names: ["Norfolk State Spartans", "Norfolk St"], abbrev: "NORF", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2450.png", tokenClass: "border-sky-400/35 bg-sky-400/[0.08] text-sky-200" },
-      { names: ["North Alabama Lions", "North Alabama"], abbrev: "UNA", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2453.png", tokenClass: "border-orange-500/45 bg-orange-500/[0.12] text-orange-300" },
-      { names: ["North Carolina A&T Aggies", "NC A&T"], abbrev: "NCAT", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2448.png", tokenClass: "border-red-500/40 bg-red-500/[0.1] text-red-200" },
-      { names: ["North Carolina Central Eagles", "NC Central"], abbrev: "NCCU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2428.png", tokenClass: "border-blue-500/35 bg-blue-500/[0.08] text-blue-200" },
-      { names: ["North Carolina Tar Heels", "North Carolina"], abbrev: "UNC", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/153.png", tokenClass: "border-sky-400/35 bg-sky-400/[0.08] text-sky-200" },
-      { names: ["North Dakota Fighting Hawks", "North Dakota"], abbrev: "UND", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/155.png", tokenClass: "border-blue-400/40 bg-blue-400/[0.1] text-blue-200" },
-      { names: ["North Dakota State Bison", "N Dakota St"], abbrev: "NDSU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2449.png", tokenClass: "border-amber-400/35 bg-amber-400/[0.08] text-amber-200" },
-      { names: ["North Florida Ospreys", "North Florida"], abbrev: "UNF", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2454.png", tokenClass: "border-indigo-400/35 bg-indigo-400/[0.08] text-indigo-200" },
-      { names: ["North Texas Mean Green", "North Texas"], abbrev: "UNT", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/249.png", tokenClass: "border-teal-400/35 bg-teal-400/[0.08] text-teal-200" },
-      { names: ["Northeastern Huskies", "Northeastern"], abbrev: "NE", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/111.png", tokenClass: "border-pink-400/35 bg-pink-400/[0.08] text-pink-200" },
-      { names: ["Northern Arizona Lumberjacks", "N Arizona"], abbrev: "NAU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2464.png", tokenClass: "border-lime-400/35 bg-lime-400/[0.08] text-lime-200" },
-      { names: ["Northern Colorado Bears", "N Colorado"], abbrev: "UNCO", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2458.png", tokenClass: "border-fuchsia-400/35 bg-fuchsia-400/[0.08] text-fuchsia-200" },
-      { names: ["Northern Illinois Huskies", "N Illinois"], abbrev: "NIU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2459.png", tokenClass: "border-cyan-400/35 bg-cyan-400/[0.08] text-cyan-200" },
-      { names: ["Northern Iowa Panthers", "Northern Iowa"], abbrev: "UNI", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2460.png", tokenClass: "border-violet-400/35 bg-violet-400/[0.08] text-violet-200" },
-      { names: ["Northern Kentucky Norse", "N Kentucky"], abbrev: "NKU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/94.png", tokenClass: "border-orange-400/40 bg-orange-400/[0.1] text-orange-200" },
-      { names: ["Northwestern State Demons", "N'Western St"], abbrev: "NWST", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2466.png", tokenClass: "border-orange-500/45 bg-orange-500/[0.12] text-orange-300" },
-      { names: ["Northwestern Wildcats", "Northwestern"], abbrev: "NU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/77.png", tokenClass: "border-red-500/40 bg-red-500/[0.1] text-red-200" },
-      { names: ["Notre Dame Fighting Irish", "Notre Dame"], abbrev: "ND", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/87.png", tokenClass: "border-blue-500/35 bg-blue-500/[0.08] text-blue-200" },
-      { names: ["Oakland Golden Grizzlies", "Oakland"], abbrev: "OAK", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2473.png", tokenClass: "border-amber-400/35 bg-amber-400/[0.08] text-amber-200" },
-      { names: ["Ohio Bobcats", "Ohio"], abbrev: "OHIO", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/195.png", tokenClass: "border-indigo-400/35 bg-indigo-400/[0.08] text-indigo-200" },
-      { names: ["Ohio State Buckeyes", "Ohio State"], abbrev: "OSU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/194.png", tokenClass: "border-red-400/35 bg-red-400/[0.08] text-red-200" },
-      { names: ["Oklahoma Sooners", "Oklahoma"], abbrev: "OU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/201.png", tokenClass: "border-teal-400/35 bg-teal-400/[0.08] text-teal-200" },
-      { names: ["Oklahoma State Cowboys", "Oklahoma St"], abbrev: "OKST", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/197.png", tokenClass: "border-pink-400/35 bg-pink-400/[0.08] text-pink-200" },
-      { names: ["Old Dominion Monarchs", "Old Dominion"], abbrev: "ODU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/295.png", tokenClass: "border-lime-400/35 bg-lime-400/[0.08] text-lime-200" },
-      { names: ["Ole Miss Rebels", "Ole Miss"], abbrev: "MISS", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/145.png", tokenClass: "border-fuchsia-400/35 bg-fuchsia-400/[0.08] text-fuchsia-200" },
-      { names: ["Omaha Mavericks", "Omaha"], abbrev: "OMA", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2437.png", tokenClass: "border-cyan-400/35 bg-cyan-400/[0.08] text-cyan-200" },
-      { names: ["Oral Roberts Golden Eagles", "Oral Roberts"], abbrev: "ORU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/198.png", tokenClass: "border-violet-400/35 bg-violet-400/[0.08] text-violet-200" },
-      { names: ["Oregon Ducks", "Oregon"], abbrev: "ORE", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2483.png", tokenClass: "border-orange-400/40 bg-orange-400/[0.1] text-orange-200" },
-      { names: ["Oregon State Beavers", "Oregon St"], abbrev: "ORST", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/204.png", tokenClass: "border-green-500/35 bg-green-500/[0.08] text-green-200" },
-      { names: ["Pacific Lutheran Lutes", "Pac Lutheran"], abbrev: "PAC", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2486.png", tokenClass: "border-sky-400/35 bg-sky-400/[0.08] text-sky-200" },
-      { names: ["Pacific Tigers", "Pacific"], abbrev: "PAC", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/279.png", tokenClass: "border-orange-500/45 bg-orange-500/[0.12] text-orange-300" },
-      { names: ["Penn State Nittany Lions", "Penn State"], abbrev: "PSU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/213.png", tokenClass: "border-blue-500/35 bg-blue-500/[0.08] text-blue-200" },
-      { names: ["Pennsylvania Quakers", "Penn"], abbrev: "PENN", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/219.png", tokenClass: "border-rose-400/35 bg-rose-400/[0.08] text-rose-200" },
-      { names: ["Pepperdine Waves", "Pepperdine"], abbrev: "PEPP", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2492.png", tokenClass: "border-blue-400/40 bg-blue-400/[0.1] text-blue-200" },
-      { names: ["Pittsburgh Panthers", "Pitt"], abbrev: "PITT", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/221.png", tokenClass: "border-amber-400/35 bg-amber-400/[0.08] text-amber-200" },
-      { names: ["Portland Pilots", "Portland"], abbrev: "PORT", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2501.png", tokenClass: "border-indigo-400/35 bg-indigo-400/[0.08] text-indigo-200" },
-      { names: ["Portland State Vikings", "Portland St"], abbrev: "PRST", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2502.png", tokenClass: "border-red-400/35 bg-red-400/[0.08] text-red-200" },
-      { names: ["Prairie View A&M Panthers", "Prairie View"], abbrev: "PV", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2504.png", tokenClass: "border-teal-400/35 bg-teal-400/[0.08] text-teal-200" },
-      { names: ["Presbyterian Blue Hose", "Presbyterian"], abbrev: "PRES", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2506.png", tokenClass: "border-pink-400/35 bg-pink-400/[0.08] text-pink-200" },
-      { names: ["Princeton Tigers", "Princeton"], abbrev: "PRIN", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/163.png", tokenClass: "border-lime-400/35 bg-lime-400/[0.08] text-lime-200" },
-      { names: ["Providence Friars", "Providence"], abbrev: "PROV", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2507.png", tokenClass: "border-fuchsia-400/35 bg-fuchsia-400/[0.08] text-fuchsia-200" },
-      { names: ["Purdue Boilermakers", "Purdue"], abbrev: "PUR", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2509.png", tokenClass: "border-cyan-400/35 bg-cyan-400/[0.08] text-cyan-200" },
-      { names: ["Purdue Fort Wayne Mastodons", "Purdue FW"], abbrev: "PFW", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2870.png", tokenClass: "border-violet-400/35 bg-violet-400/[0.08] text-violet-200" },
-      { names: ["Queens University Royals", "Queens"], abbrev: "QUOC", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2511.png", tokenClass: "border-orange-400/40 bg-orange-400/[0.1] text-orange-200" },
-      { names: ["Quinnipiac Bobcats", "Quinnipiac"], abbrev: "QUIN", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2514.png", tokenClass: "border-green-500/35 bg-green-500/[0.08] text-green-200" },
-      { names: ["Radford Highlanders", "Radford"], abbrev: "RAD", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2515.png", tokenClass: "border-sky-400/35 bg-sky-400/[0.08] text-sky-200" },
-      { names: ["Rhode Island Rams", "Rhode Island"], abbrev: "URI", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/227.png", tokenClass: "border-orange-500/45 bg-orange-500/[0.12] text-orange-300" },
-      { names: ["Rice Owls", "Rice"], abbrev: "RICE", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/242.png", tokenClass: "border-red-500/40 bg-red-500/[0.1] text-red-200" },
-      { names: ["Richmond Spiders", "Richmond"], abbrev: "RICH", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/257.png", tokenClass: "border-blue-500/35 bg-blue-500/[0.08] text-blue-200" },
-      { names: ["Rider Broncs", "Rider"], abbrev: "RID", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2520.png", tokenClass: "border-rose-400/35 bg-rose-400/[0.08] text-rose-200" },
-      { names: ["Robert Morris Colonials", "Robert Morris"], abbrev: "RMU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2523.png", tokenClass: "border-blue-400/40 bg-blue-400/[0.1] text-blue-200" },
-      { names: ["Rutgers Scarlet Knights", "Rutgers"], abbrev: "RUTG", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/164.png", tokenClass: "border-indigo-400/35 bg-indigo-400/[0.08] text-indigo-200" },
-      { names: ["SE Louisiana Lions", "SE Louisiana"], abbrev: "SELA", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2545.png", tokenClass: "border-red-400/35 bg-red-400/[0.08] text-red-200" },
-      { names: ["SIU Edwardsville Cougars", "SIUE"], abbrev: "SIUE", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2565.png", tokenClass: "border-teal-400/35 bg-teal-400/[0.08] text-teal-200" },
-      { names: ["SMU Mustangs", "SMU"], abbrev: "SMU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2567.png", tokenClass: "border-pink-400/35 bg-pink-400/[0.08] text-pink-200" },
-      { names: ["Sacramento State Hornets", "Sacramento St"], abbrev: "SAC", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/16.png", tokenClass: "border-lime-400/35 bg-lime-400/[0.08] text-lime-200" },
-      { names: ["Sacred Heart Pioneers", "Sacred Heart"], abbrev: "SHU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2529.png", tokenClass: "border-fuchsia-400/35 bg-fuchsia-400/[0.08] text-fuchsia-200" },
-      { names: ["Saint Francis Red Flash", "Saint Francis"], abbrev: "SFPA", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2598.png", tokenClass: "border-cyan-400/35 bg-cyan-400/[0.08] text-cyan-200" },
-      { names: ["Saint Joseph's Hawks", "Saint Joseph's"], abbrev: "JOES", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2603.png", tokenClass: "border-violet-400/35 bg-violet-400/[0.08] text-violet-200" },
-      { names: ["Saint Louis Billikens", "Saint Louis"], abbrev: "SLU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/139.png", tokenClass: "border-orange-400/40 bg-orange-400/[0.1] text-orange-200" },
-      { names: ["Saint Martin's Saints", "Saint Martin's"], abbrev: "SM", logoUrl: "https://a.espncdn.com/guid/08d18faa-f47d-3616-a74e-4dd0c338c6c2/logos/default.png", tokenClass: "border-green-500/35 bg-green-500/[0.08] text-green-200" },
-      { names: ["Saint Mary's Gaels", "Saint Mary's"], abbrev: "SMC", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2608.png", tokenClass: "border-sky-400/35 bg-sky-400/[0.08] text-sky-200" },
-      { names: ["Saint Peter's Peacocks", "Saint Peter's"], abbrev: "SPU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2612.png", tokenClass: "border-orange-500/45 bg-orange-500/[0.12] text-orange-300" },
-      { names: ["Salisbury Sea Gulls", "Salisbury"], abbrev: "SSU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2532.png", tokenClass: "border-red-500/40 bg-red-500/[0.1] text-red-200" },
-      { names: ["Sam Houston Bearkats", "Sam Houston"], abbrev: "SHSU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2534.png", tokenClass: "border-blue-500/35 bg-blue-500/[0.08] text-blue-200" },
-      { names: ["Samford Bulldogs", "Samford"], abbrev: "SAM", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2535.png", tokenClass: "border-rose-400/35 bg-rose-400/[0.08] text-rose-200" },
-      { names: ["San Diego State Aztecs", "San Diego St"], abbrev: "SDSU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/21.png", tokenClass: "border-blue-400/40 bg-blue-400/[0.1] text-blue-200" },
-      { names: ["San Diego Toreros", "San Diego"], abbrev: "USD", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/301.png", tokenClass: "border-amber-400/35 bg-amber-400/[0.08] text-amber-200" },
-      { names: ["San Francisco Dons", "San Francisco"], abbrev: "SF", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2539.png", tokenClass: "border-indigo-400/35 bg-indigo-400/[0.08] text-indigo-200" },
-      { names: ["San Jos\xE9 State Spartans", "San Jos\xE9 St"], abbrev: "SJSU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/23.png", tokenClass: "border-teal-400/35 bg-teal-400/[0.08] text-teal-200" },
-      { names: ["Santa Clara Broncos", "Santa Clara"], abbrev: "SCU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2541.png", tokenClass: "border-pink-400/35 bg-pink-400/[0.08] text-pink-200" },
-      { names: ["Savannah State Tigers", "Savannah St"], abbrev: "SAV", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2542.png", tokenClass: "border-lime-400/35 bg-lime-400/[0.08] text-lime-200" },
-      { names: ["Seattle U Redhawks", "Seattle U"], abbrev: "SEA", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2547.png", tokenClass: "border-fuchsia-400/35 bg-fuchsia-400/[0.08] text-fuchsia-200" },
-      { names: ["Seton Hall Pirates", "Seton Hall"], abbrev: "HALL", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2550.png", tokenClass: "border-cyan-400/35 bg-cyan-400/[0.08] text-cyan-200" },
-      { names: ["Siena Saints", "Siena"], abbrev: "SIE", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2561.png", tokenClass: "border-violet-400/35 bg-violet-400/[0.08] text-violet-200" },
-      { names: ["South Alabama Jaguars", "South Alabama"], abbrev: "USA", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/6.png", tokenClass: "border-orange-400/40 bg-orange-400/[0.1] text-orange-200" },
-      { names: ["South Carolina Gamecocks", "South Carolina"], abbrev: "SC", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2579.png", tokenClass: "border-green-500/35 bg-green-500/[0.08] text-green-200" },
-      { names: ["South Carolina State Bulldogs", "SC State"], abbrev: "SCST", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2569.png", tokenClass: "border-sky-400/35 bg-sky-400/[0.08] text-sky-200" },
-      { names: ["South Carolina Upstate Spartans", "SC Upstate"], abbrev: "UPST", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2908.png", tokenClass: "border-orange-500/45 bg-orange-500/[0.12] text-orange-300" },
-      { names: ["South Dakota Coyotes", "South Dakota"], abbrev: "SDAK", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/233.png", tokenClass: "border-red-500/40 bg-red-500/[0.1] text-red-200" },
-      { names: ["South Dakota State Jackrabbits", "S Dakota St"], abbrev: "SDST", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2571.png", tokenClass: "border-blue-500/35 bg-blue-500/[0.08] text-blue-200" },
-      { names: ["South Florida Bulls", "South Florida"], abbrev: "USF", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/58.png", tokenClass: "border-rose-400/35 bg-rose-400/[0.08] text-rose-200" },
-      { names: ["Southeast Missouri State Redhawks", "SE Missouri"], abbrev: "SEMO", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2546.png", tokenClass: "border-blue-400/40 bg-blue-400/[0.1] text-blue-200" },
-      { names: ["Southern Illinois Salukis", "S Illinois"], abbrev: "SIU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/79.png", tokenClass: "border-indigo-400/35 bg-indigo-400/[0.08] text-indigo-200" },
-      { names: ["Southern Indiana Screaming Eagles", "So Indiana"], abbrev: "USI", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/88.png", tokenClass: "border-red-400/35 bg-red-400/[0.08] text-red-200" },
-      { names: ["Southern Jaguars", "Southern"], abbrev: "SOU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2582.png", tokenClass: "border-teal-400/35 bg-teal-400/[0.08] text-teal-200" },
-      { names: ["Southern Miss Golden Eagles", "Southern Miss"], abbrev: "USM", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2572.png", tokenClass: "border-pink-400/35 bg-pink-400/[0.08] text-pink-200" },
-      { names: ["Southern Utah Thunderbirds", "Southern Utah"], abbrev: "SUU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/253.png", tokenClass: "border-fuchsia-400/35 bg-fuchsia-400/[0.08] text-fuchsia-200" },
-      { names: ["Southwestern Oklahoma State Bulldogs", "SW Oklahoma St"], abbrev: "SWOS", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2927.png", tokenClass: "border-violet-400/35 bg-violet-400/[0.08] text-violet-200" },
-      { names: ["St. Bonaventure Bonnies", "St Bonaventure"], abbrev: "SBU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/179.png", tokenClass: "border-orange-400/40 bg-orange-400/[0.1] text-orange-200" },
-      { names: ["St. Francis (BKN) Terriers", "St Francis BK"], abbrev: "SFBK", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2597.png", tokenClass: "border-green-500/35 bg-green-500/[0.08] text-green-200" },
-      { names: ["St. John's Red Storm", "St John's"], abbrev: "SJU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2599.png", tokenClass: "border-orange-500/45 bg-orange-500/[0.12] text-orange-300" },
-      { names: ["St. Olaf Oles", "St Olaf"], abbrev: "ST.", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/133.png", tokenClass: "border-red-500/40 bg-red-500/[0.1] text-red-200" },
-      { names: ["St. Thomas-Minnesota Tommies", "St Thomas (MN)"], abbrev: "STMN", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2900.png", tokenClass: "border-rose-400/35 bg-rose-400/[0.08] text-rose-200" },
-      { names: ["Stanford Cardinal", "Stanford"], abbrev: "STAN", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/24.png", tokenClass: "border-blue-400/40 bg-blue-400/[0.1] text-blue-200" },
-      { names: ["Stephen F. Austin Lumberjacks", "SF Austin"], abbrev: "SFA", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2617.png", tokenClass: "border-indigo-400/35 bg-indigo-400/[0.08] text-indigo-200" },
-      { names: ["Stetson Hatters", "Stetson"], abbrev: "STET", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/56.png", tokenClass: "border-red-400/35 bg-red-400/[0.08] text-red-200" },
-      { names: ["Stonehill Skyhawks", "Stonehill"], abbrev: "STO", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/284.png", tokenClass: "border-teal-400/35 bg-teal-400/[0.08] text-teal-200" },
-      { names: ["Stony Brook Seawolves", "Stony Brook"], abbrev: "STBK", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2619.png", tokenClass: "border-pink-400/35 bg-pink-400/[0.08] text-pink-200" },
-      { names: ["Syracuse Orange", "Syracuse"], abbrev: "SYR", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/183.png", tokenClass: "border-lime-400/35 bg-lime-400/[0.08] text-lime-200" },
-      { names: ["TCU Horned Frogs", "TCU"], abbrev: "TCU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2628.png", tokenClass: "border-violet-400/35 bg-violet-400/[0.08] text-violet-200" },
-      { names: ["Tarleton State Texans", "Tarleton St"], abbrev: "TAR", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2627.png", tokenClass: "border-sky-400/35 bg-sky-400/[0.08] text-sky-200" },
-      { names: ["Temple Owls", "Temple"], abbrev: "TEM", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/218.png", tokenClass: "border-orange-500/45 bg-orange-500/[0.12] text-orange-300" },
-      { names: ["Tennessee State Tigers", "Tennessee St"], abbrev: "TNST", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2634.png", tokenClass: "border-red-500/40 bg-red-500/[0.1] text-red-200" },
-      { names: ["Tennessee Tech Golden Eagles", "Tennessee Tech"], abbrev: "TNTC", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2635.png", tokenClass: "border-blue-500/35 bg-blue-500/[0.08] text-blue-200" },
-      { names: ["Tennessee Volunteers", "Tennessee"], abbrev: "TENN", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2633.png", tokenClass: "border-rose-400/35 bg-rose-400/[0.08] text-rose-200" },
-      { names: ["Texas A&M Aggies", "Texas A&M"], abbrev: "TA&M", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/245.png", tokenClass: "border-blue-400/40 bg-blue-400/[0.1] text-blue-200" },
-      { names: ["Texas A&M-Corpus Christi Islanders", "Texas A&M-CC"], abbrev: "AMCC", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/357.png", tokenClass: "border-amber-400/35 bg-amber-400/[0.08] text-amber-200" },
-      { names: ["Texas Longhorns", "Texas"], abbrev: "TEX", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/251.png", tokenClass: "border-indigo-400/35 bg-indigo-400/[0.08] text-indigo-200" },
-      { names: ["Texas Lutheran Bulldogs", "Texas Lutheran"], abbrev: "TL", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2639.png", tokenClass: "border-red-400/35 bg-red-400/[0.08] text-red-200" },
-      { names: ["Texas Southern Tigers", "Texas Southern"], abbrev: "TXSO", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2640.png", tokenClass: "border-teal-400/35 bg-teal-400/[0.08] text-teal-200" },
-      { names: ["Texas State Bobcats", "Texas St"], abbrev: "TXST", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/326.png", tokenClass: "border-pink-400/35 bg-pink-400/[0.08] text-pink-200" },
-      { names: ["Texas Tech Red Raiders", "Texas Tech"], abbrev: "TTU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2641.png", tokenClass: "border-lime-400/35 bg-lime-400/[0.08] text-lime-200" },
-      { names: ["Texas-Pan American Broncs", "TX-Pan American"], abbrev: "UTPA", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/292.png", tokenClass: "border-fuchsia-400/35 bg-fuchsia-400/[0.08] text-fuchsia-200" },
-      { names: ["The Citadel Bulldogs", "The Citadel"], abbrev: "CIT", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2643.png", tokenClass: "border-cyan-400/35 bg-cyan-400/[0.08] text-cyan-200" },
-      { names: ["Toledo Rockets", "Toledo"], abbrev: "TOL", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2649.png", tokenClass: "border-violet-400/35 bg-violet-400/[0.08] text-violet-200" },
-      { names: ["Towson Tigers", "Towson"], abbrev: "TOW", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/119.png", tokenClass: "border-orange-400/40 bg-orange-400/[0.1] text-orange-200" },
-      { names: ["Troy Trojans", "Troy"], abbrev: "TROY", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2653.png", tokenClass: "border-green-500/35 bg-green-500/[0.08] text-green-200" },
-      { names: ["Truman State Bulldogs", "Truman St"], abbrev: "TRST", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2654.png", tokenClass: "border-sky-400/35 bg-sky-400/[0.08] text-sky-200" },
-      { names: ["Tulane Green Wave", "Tulane"], abbrev: "TULN", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2655.png", tokenClass: "border-orange-500/45 bg-orange-500/[0.12] text-orange-300" },
-      { names: ["Tulsa Golden Hurricane", "Tulsa"], abbrev: "TLSA", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/202.png", tokenClass: "border-red-500/40 bg-red-500/[0.1] text-red-200" },
-      { names: ["UAB Blazers", "UAB"], abbrev: "UAB", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/5.png", tokenClass: "border-blue-500/35 bg-blue-500/[0.08] text-blue-200" },
-      { names: ["UAlbany Great Danes", "UAlbany"], abbrev: "ALB", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/399.png", tokenClass: "border-rose-400/35 bg-rose-400/[0.08] text-rose-200" },
-      { names: ["UC Davis Aggies", "UC Davis"], abbrev: "UCD", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/302.png", tokenClass: "border-blue-400/40 bg-blue-400/[0.1] text-blue-200" },
-      { names: ["UC Irvine Anteaters", "UC Irvine"], abbrev: "UCI", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/300.png", tokenClass: "border-amber-400/35 bg-amber-400/[0.08] text-amber-200" },
-      { names: ["UC Riverside Highlanders", "UC Riverside"], abbrev: "UCR", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/27.png", tokenClass: "border-indigo-400/35 bg-indigo-400/[0.08] text-indigo-200" },
-      { names: ["UC San Diego Tritons", "UC San Diego"], abbrev: "UCSD", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/28.png", tokenClass: "border-red-400/35 bg-red-400/[0.08] text-red-200" },
-      { names: ["UC Santa Barbara Gauchos", "Santa Barbara"], abbrev: "UCSB", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2540.png", tokenClass: "border-teal-400/35 bg-teal-400/[0.08] text-teal-200" },
-      { names: ["UCF Knights", "UCF"], abbrev: "UCF", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2116.png", tokenClass: "border-pink-400/35 bg-pink-400/[0.08] text-pink-200" },
-      { names: ["UCLA Bruins", "UCLA"], abbrev: "UCLA", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/26.png", tokenClass: "border-lime-400/35 bg-lime-400/[0.08] text-lime-200" },
-      { names: ["UConn Huskies", "UConn"], abbrev: "CONN", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/41.png", tokenClass: "border-fuchsia-400/35 bg-fuchsia-400/[0.08] text-fuchsia-200" },
-      { names: ["UIC Flames", "UIC"], abbrev: "UIC", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/82.png", tokenClass: "border-cyan-400/35 bg-cyan-400/[0.08] text-cyan-200" },
-      { names: ["UL Monroe Warhawks", "UL Monroe"], abbrev: "ULM", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2433.png", tokenClass: "border-violet-400/35 bg-violet-400/[0.08] text-violet-200" },
-      { names: ["UMBC Retrievers", "UMBC"], abbrev: "UMBC", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2378.png", tokenClass: "border-orange-400/40 bg-orange-400/[0.1] text-orange-200" },
-      { names: ["UMass Lowell River Hawks", "UMass Lowell"], abbrev: "UML", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2349.png", tokenClass: "border-green-500/35 bg-green-500/[0.08] text-green-200" },
-      { names: ["UNC Asheville Bulldogs", "UNC Asheville"], abbrev: "UNCA", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2427.png", tokenClass: "border-sky-400/35 bg-sky-400/[0.08] text-sky-200" },
-      { names: ["UNC Greensboro Spartans", "UNC Greensboro"], abbrev: "UNCG", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2430.png", tokenClass: "border-orange-500/45 bg-orange-500/[0.12] text-orange-300" },
-      { names: ["UNC Wilmington Seahawks", "UNC Wilmington"], abbrev: "UNCW", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/350.png", tokenClass: "border-red-500/40 bg-red-500/[0.1] text-red-200" },
-      { names: ["UNLV Rebels", "UNLV"], abbrev: "UNLV", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2439.png", tokenClass: "border-blue-500/35 bg-blue-500/[0.08] text-blue-200" },
-      { names: ["USC Trojans", "USC"], abbrev: "USC", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/30.png", tokenClass: "border-red-500/40 bg-red-500/[0.1] text-red-200" },
-      { names: ["UT Arlington Mavericks", "UT Arlington"], abbrev: "UTA", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/250.png", tokenClass: "border-blue-400/40 bg-blue-400/[0.1] text-blue-200" },
-      { names: ["UT Martin Skyhawks", "UT Martin"], abbrev: "UTM", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2630.png", tokenClass: "border-amber-400/35 bg-amber-400/[0.08] text-amber-200" },
-      { names: ["UT Rio Grande Valley Vaqueros", "UT Rio Grande"], abbrev: "RGV", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/292.png", tokenClass: "border-indigo-400/35 bg-indigo-400/[0.08] text-indigo-200" },
-      { names: ["UTEP Miners", "UTEP"], abbrev: "UTEP", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2638.png", tokenClass: "border-red-400/35 bg-red-400/[0.08] text-red-200" },
-      { names: ["UTSA Roadrunners", "UTSA"], abbrev: "UTSA", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2636.png", tokenClass: "border-teal-400/35 bg-teal-400/[0.08] text-teal-200" },
-      { names: ["Upper Iowa Peacocks", "Upper Iowa"], abbrev: "UPP", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/389.png", tokenClass: "border-pink-400/35 bg-pink-400/[0.08] text-pink-200" },
-      { names: ["Utah State Aggies", "Utah State"], abbrev: "USU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/328.png", tokenClass: "border-lime-400/35 bg-lime-400/[0.08] text-lime-200" },
-      { names: ["Utah Tech Trailblazers", "Utah Tech"], abbrev: "UTU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/3101.png", tokenClass: "border-fuchsia-400/35 bg-fuchsia-400/[0.08] text-fuchsia-200" },
-      { names: ["Utah Utes", "Utah"], abbrev: "UTAH", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/254.png", tokenClass: "border-cyan-400/35 bg-cyan-400/[0.08] text-cyan-200" },
-      { names: ["Utah Valley Wolverines", "Utah Valley"], abbrev: "UVU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/3084.png", tokenClass: "border-violet-400/35 bg-violet-400/[0.08] text-violet-200" },
-      { names: ["VCU Rams", "VCU"], abbrev: "VCU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2670.png", tokenClass: "border-orange-400/40 bg-orange-400/[0.1] text-orange-200" },
-      { names: ["VMI Keydets", "VMI"], abbrev: "VMI", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2678.png", tokenClass: "border-green-500/35 bg-green-500/[0.08] text-green-200" },
-      { names: ["Valdosta State Blazers", "Valdosta St"], abbrev: "VAL", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2673.png", tokenClass: "border-sky-400/35 bg-sky-400/[0.08] text-sky-200" },
-      { names: ["Valparaiso Beacons", "Valparaiso"], abbrev: "VAL", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2674.png", tokenClass: "border-orange-500/45 bg-orange-500/[0.12] text-orange-300" },
-      { names: ["Vanderbilt Commodores", "Vanderbilt"], abbrev: "VAN", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/238.png", tokenClass: "border-red-500/40 bg-red-500/[0.1] text-red-200" },
-      { names: ["Vermont Catamounts", "Vermont"], abbrev: "UVM", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/261.png", tokenClass: "border-blue-500/35 bg-blue-500/[0.08] text-blue-200" },
-      { names: ["Villanova Wildcats", "Villanova"], abbrev: "VILL", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/222.png", tokenClass: "border-rose-400/35 bg-rose-400/[0.08] text-rose-200" },
-      { names: ["Virginia Cavaliers", "Virginia"], abbrev: "UVA", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/258.png", tokenClass: "border-blue-400/40 bg-blue-400/[0.1] text-blue-200" },
-      { names: ["Virginia Tech Hokies", "Virginia Tech"], abbrev: "VT", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/259.png", tokenClass: "border-amber-400/35 bg-amber-400/[0.08] text-amber-200" },
-      { names: ["Wagner Seahawks", "Wagner"], abbrev: "WAG", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2681.png", tokenClass: "border-indigo-400/35 bg-indigo-400/[0.08] text-indigo-200" },
-      { names: ["Wake Forest Demon Deacons", "Wake Forest"], abbrev: "WAKE", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/154.png", tokenClass: "border-red-400/35 bg-red-400/[0.08] text-red-200" },
-      { names: ["Wartburg Knights", "Wartburg"], abbrev: "WTBG", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2685.png", tokenClass: "border-teal-400/35 bg-teal-400/[0.08] text-teal-200" },
-      { names: ["Washburn Ichabods", "Washburn"], abbrev: "WSBN", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2687.png", tokenClass: "border-pink-400/35 bg-pink-400/[0.08] text-pink-200" },
-      { names: ["Washington Huskies", "Washington"], abbrev: "WASH", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/264.png", tokenClass: "border-lime-400/35 bg-lime-400/[0.08] text-lime-200" },
-      { names: ["Washington State Cougars", "Washington St"], abbrev: "WSU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/265.png", tokenClass: "border-fuchsia-400/35 bg-fuchsia-400/[0.08] text-fuchsia-200" },
-      { names: ["Wayne State (NE) Wildcats", "Wayne St (NE)"], abbrev: "WAY", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2844.png", tokenClass: "border-cyan-400/35 bg-cyan-400/[0.08] text-cyan-200" },
-      { names: ["Weber State Wildcats", "Weber St"], abbrev: "WEB", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2692.png", tokenClass: "border-violet-400/35 bg-violet-400/[0.08] text-violet-200" },
-      { names: ["West Georgia Wolves", "West Georgia"], abbrev: "WES", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2698.png", tokenClass: "border-orange-400/40 bg-orange-400/[0.1] text-orange-200" },
-      { names: ["West Virginia Mountaineers", "West Virginia"], abbrev: "WVU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/277.png", tokenClass: "border-green-500/35 bg-green-500/[0.08] text-green-200" },
-      { names: ["Western Carolina Catamounts", "W Carolina"], abbrev: "WCU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2717.png", tokenClass: "border-sky-400/35 bg-sky-400/[0.08] text-sky-200" },
-      { names: ["Western Illinois Leathernecks", "W Illinois"], abbrev: "WIU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2710.png", tokenClass: "border-orange-500/45 bg-orange-500/[0.12] text-orange-300" },
-      { names: ["Western Kentucky Hilltoppers", "Western KY"], abbrev: "WKU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/98.png", tokenClass: "border-red-500/40 bg-red-500/[0.1] text-red-200" },
-      { names: ["Western Michigan Broncos", "W Michigan"], abbrev: "WMU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2711.png", tokenClass: "border-blue-500/35 bg-blue-500/[0.08] text-blue-200" },
-      { names: ["Wichita State Shockers", "Wichita St"], abbrev: "WICH", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2724.png", tokenClass: "border-rose-400/35 bg-rose-400/[0.08] text-rose-200" },
-      { names: ["William & Mary Tribe", "William & Mary"], abbrev: "W&M", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2729.png", tokenClass: "border-blue-400/40 bg-blue-400/[0.1] text-blue-200" },
-      { names: ["Winthrop Eagles", "Winthrop"], abbrev: "WIN", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2737.png", tokenClass: "border-indigo-400/35 bg-indigo-400/[0.08] text-indigo-200" },
-      { names: ["Wisconsin Badgers", "Wisconsin"], abbrev: "WIS", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/275.png", tokenClass: "border-red-400/35 bg-red-400/[0.08] text-red-200" },
-      { names: ["Wisconsin Platteville Pioneers", "UW-Platteville"], abbrev: "UWP", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/272.png", tokenClass: "border-teal-400/35 bg-teal-400/[0.08] text-teal-200" },
-      { names: ["Wofford Terriers", "Wofford"], abbrev: "WOF", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2747.png", tokenClass: "border-pink-400/35 bg-pink-400/[0.08] text-pink-200" },
-      { names: ["Wright State Raiders", "Wright St"], abbrev: "WRST", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2750.png", tokenClass: "border-lime-400/35 bg-lime-400/[0.08] text-lime-200" },
-      { names: ["Wyoming Cowboys", "Wyoming"], abbrev: "WYO", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2751.png", tokenClass: "border-fuchsia-400/35 bg-fuchsia-400/[0.08] text-fuchsia-200" },
-      { names: ["Xavier Musketeers", "Xavier"], abbrev: "XAV", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2752.png", tokenClass: "border-cyan-400/35 bg-cyan-400/[0.08] text-cyan-200" },
-      { names: ["Yale Bulldogs", "Yale"], abbrev: "YALE", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/43.png", tokenClass: "border-violet-400/35 bg-violet-400/[0.08] text-violet-200" },
-      { names: ["Youngstown State Penguins", "Youngstown St"], abbrev: "YSU", logoUrl: "https://a.espncdn.com/i/teamlogos/ncaa/500/2754.png", tokenClass: "border-orange-400/40 bg-orange-400/[0.1] text-orange-200" }
-    ];
-  }
-});
-
-// ../grarf/desktop/src/lib/livetrack/wnbaTeamMetadata.ts
-function wnbaTeam(abbrev, displayName, nicknames = []) {
-  const logoUrl = buildWnbaEspnLogoUrl(abbrev) ?? "";
-  return {
-    names: [displayName, ...nicknames, abbrev],
-    abbrev,
-    logoUrl,
-    tokenClass: "border-cyansys/35 bg-cyansys/[0.08] text-cyansys"
-  };
-}
-var WNBA_TEAMS;
-var init_wnbaTeamMetadata = __esm({
-  "../grarf/desktop/src/lib/livetrack/wnbaTeamMetadata.ts"() {
-    init_define_import_meta_env();
-    init_wnbaEspnLogoUrl();
-    WNBA_TEAMS = [
-      wnbaTeam("ATL", "Atlanta Dream", ["Dream"]),
-      wnbaTeam("CHI", "Chicago Sky", ["Sky"]),
-      wnbaTeam("CON", "Connecticut Sun", ["Sun"]),
-      wnbaTeam("DAL", "Dallas Wings", ["Wings"]),
-      wnbaTeam("GS", "Golden State Valkyries", ["Valkyries"]),
-      wnbaTeam("IND", "Indiana Fever", ["Fever"]),
-      wnbaTeam("LV", "Las Vegas Aces", ["Aces"]),
-      wnbaTeam("LA", "Los Angeles Sparks", ["Sparks"]),
-      wnbaTeam("MIN", "Minnesota Lynx", ["Lynx"]),
-      wnbaTeam("NY", "New York Liberty", ["Liberty"]),
-      wnbaTeam("PHX", "Phoenix Mercury", ["Mercury"]),
-      wnbaTeam("POR", "Portland Fire", ["Fire"]),
-      wnbaTeam("SEA", "Seattle Storm", ["Storm"]),
-      wnbaTeam("TOR", "Toronto Tempo", ["Tempo"]),
-      wnbaTeam("WSH", "Washington Mystics", ["Mystics"]),
-      wnbaTeam("COOP", "TEAM COOP", ["Team Coop"]),
-      wnbaTeam("SPO", "TEAM SPOON", ["Team Spoon"])
-    ];
-  }
-});
-
-// ../grarf/desktop/src/lib/livetrack/liveTrackTeamMetadata.ts
-function buildNationalSoccerTeams() {
-  const byAbbrev = /* @__PURE__ */ new Map();
-  for (const [countryName, abbrev] of Object.entries(SOCCER_COUNTRY_ABBREV_BY_NAME)) {
-    const tokenClass = LIVE_TRACK_NATIONAL_TEAM_TOKEN_BY_ABBREV[abbrev] ?? DEFAULT_TEAM_TOKEN_CLASS;
-    const titleCase = countryName.replace(/\b\w/g, (char) => char.toUpperCase());
-    let entry2 = byAbbrev.get(abbrev);
-    if (!entry2) {
-      entry2 = { names: /* @__PURE__ */ new Set(), tokenClass };
-      byAbbrev.set(abbrev, entry2);
-    }
-    entry2.names.add(countryName);
-    entry2.names.add(titleCase);
-    entry2.names.add(abbrev);
-  }
-  return [...byAbbrev.entries()].map(([abbrev, { names, tokenClass }]) => ({
-    names: [...names],
-    abbrev,
-    logoUrl: "",
-    tokenClass
-  }));
-}
-function normalizeTeamLookupKey(name) {
-  return name.trim().replace(/\s+/g, " ").toLowerCase();
-}
-function registerTeamMeta(bucket, team) {
-  for (const name of team.names) {
-    const key2 = normalizeTeamLookupKey(name);
-    if (!key2) continue;
-    LOOKUP_BY_BUCKET[bucket].set(key2, team);
-    TEAM_LOOKUP.set(key2, team);
-  }
-}
-function resolveSportBucket(sport) {
-  const normalized = sport.trim().toLowerCase();
-  if (normalized === "mlb") return "mlb";
-  if (normalized === "nhl") return "nhl";
-  if (normalized === "wnba") return "wnba";
-  if (normalized === "ncaa" || normalized === "ncaa baseball" || normalized === "college baseball") {
-    return "ncaa";
-  }
-  if (normalized === "soccer" || normalized === "football" || normalized.startsWith("fifa")) {
-    return "soccer";
-  }
-  return "legacy";
-}
-function resolveEspnNhlScoreboardLogoUrl(abbrev) {
-  const slug = NHL_ESPN_LOGO_SLUG[abbrev.toUpperCase()] ?? abbrev.toLowerCase();
-  return `https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/${slug}.png`;
-}
-function resolveEspnMlbScoreboardLogoUrl(abbrev) {
-  return buildMlbEspnScoreboardLogoUrl(abbrev) ?? "";
-}
-function resolveDarkThemeLogoForMeta(meta, bucket) {
-  if (bucket !== "mlb" && bucket !== "nhl") return void 0;
-  const league2 = bucket === "mlb" ? "MLB" : "NHL";
-  let abbrev = meta.abbrev.toLowerCase();
-  if (league2 === "MLB" && abbrev === "ath") abbrev = "oak";
-  if (league2 === "NHL") {
-    abbrev = NHL_ESPN_LOGO_SLUG[meta.abbrev.toUpperCase()] ?? abbrev;
-  }
-  return getDarkThemeLogoUrl(league2, abbrev);
-}
-function resolveBundledLogoSrc(url) {
-  if (!url || /^(https?:|data:)/i.test(url)) return url;
-  return publicAssetUrl(url);
-}
-function resolveLogoUrlForMeta(meta, sport) {
-  const bucket = sport ? resolveSportBucket(sport) : null;
-  let url = meta.logoUrl;
-  if (bucket === "nhl") url = resolveEspnNhlScoreboardLogoUrl(meta.abbrev);
-  if (bucket === "mlb") url = resolveEspnMlbScoreboardLogoUrl(meta.abbrev);
-  if (bucket === "wnba") url = meta.logoUrl;
-  if (bucket) {
-    const dark = resolveDarkThemeLogoForMeta(meta, bucket);
-    if (dark) return dark;
-  }
-  return resolveBundledLogoSrc(url);
-}
-function resolveBrandTokenClass(meta, sport) {
-  if (!sport) return meta.tokenClass;
-  const bucket = resolveSportBucket(sport);
-  const brand = LIVE_TRACK_BRAND_TOKEN_BY_BUCKET[bucket]?.[meta.abbrev.toUpperCase()];
-  return brand ?? meta.tokenClass;
-}
-function resolveLiveTrackTeamMetaForSport(teamName, sport) {
-  const key2 = normalizeTeamLookupKey(teamName);
-  if (!key2) return null;
-  if (sport) {
-    const bucket = resolveSportBucket(sport);
-    return LOOKUP_BY_BUCKET[bucket].get(key2) ?? null;
-  }
-  return TEAM_LOOKUP.get(key2) ?? null;
-}
-function resolveLiveTrackTeamAbbrev(teamName, sport) {
-  return resolveLiveTrackTeamMetaForSport(teamName, sport)?.abbrev ?? null;
-}
-function resolveLiveTrackTeamLogoUrlFromMeta(teamName, sport) {
-  const meta = resolveLiveTrackTeamMetaForSport(teamName, sport);
-  if (!meta) return null;
-  return resolveLogoUrlForMeta(meta, sport);
-}
-function resolveLiveTrackTeamTokenClass(teamName, sport) {
-  const meta = resolveLiveTrackTeamMetaForSport(teamName, sport);
-  if (meta) return resolveBrandTokenClass(meta, sport);
-  const countryAbbrev = resolveSoccerCountryAbbrev(teamName);
-  if (countryAbbrev) {
-    return LIVE_TRACK_NATIONAL_TEAM_TOKEN_BY_ABBREV[countryAbbrev] ?? DEFAULT_TEAM_TOKEN_CLASS;
-  }
-  return DEFAULT_TEAM_TOKEN_CLASS;
-}
-var DEFAULT_TEAM_TOKEN_CLASS, LIVE_TRACK_BRAND_TOKEN_BY_BUCKET, NATIONAL_SOCCER_TEAMS, MLB_TEAMS, NHL_TEAMS, LEGACY_MOCK_TEAMS, NHL_ESPN_LOGO_SLUG, TEAM_LOOKUP, LOOKUP_BY_BUCKET, LIVE_TRACK_MLB_TEAM_COUNT, LIVE_TRACK_NHL_TEAM_COUNT, LIVE_TRACK_NCAA_BASEBALL_TEAM_COUNT;
-var init_liveTrackTeamMetadata = __esm({
-  "../grarf/desktop/src/lib/livetrack/liveTrackTeamMetadata.ts"() {
-    init_define_import_meta_env();
-    init_darkThemeLogoOverrides();
-    init_mlbEspnLogoSlug();
-    init_publicAssetUrl();
-    init_soccerCountryAbbrev();
-    init_liveTrackNationalTeamTokens();
-    init_liveTrackNcaaBaseballTeams();
-    init_wnbaTeamMetadata();
-    DEFAULT_TEAM_TOKEN_CLASS = "border-cyansys/35 bg-cyansys/[0.08] text-cyansys";
-    LIVE_TRACK_BRAND_TOKEN_BY_BUCKET = {
-      mlb: {
-        ARI: "border-red-500/40 bg-red-500/[0.1] text-red-200",
-        AZ: "border-red-500/40 bg-red-500/[0.1] text-red-200",
-        ATH: "border-emerald-500/35 bg-emerald-500/[0.08] text-emerald-200",
-        ATL: "border-red-600/40 bg-red-600/[0.1] text-red-200",
-        BAL: "border-orange-500/45 bg-orange-500/[0.12] text-orange-300",
-        BOS: "border-red-500/40 bg-red-500/[0.1] text-red-200",
-        CHC: "border-blue-400/40 bg-blue-400/[0.1] text-blue-200",
-        CWS: "border-slate-300/30 bg-slate-300/[0.08] text-slate-200",
-        CIN: "border-red-600/40 bg-red-600/[0.1] text-red-200",
-        CLE: "border-red-500/35 bg-red-500/[0.08] text-red-200",
-        COL: "border-purple-500/35 bg-purple-500/[0.08] text-purple-200",
-        DET: "border-orange-400/40 bg-orange-400/[0.1] text-orange-200",
-        HOU: "border-orange-500/45 bg-orange-500/[0.12] text-orange-300",
-        KC: "border-sky-400/35 bg-sky-400/[0.08] text-sky-200",
-        LAA: "border-red-500/35 bg-red-500/[0.08] text-red-200",
-        LAD: "border-blue-500/40 bg-blue-500/[0.1] text-blue-200",
-        MIA: "border-cyan-400/35 bg-cyan-400/[0.08] text-cyan-200",
-        MIL: "border-yellow-400/35 bg-yellow-400/[0.08] text-yellow-200",
-        MIN: "border-red-400/35 bg-red-400/[0.08] text-red-200",
-        NYM: "border-orange-400/40 bg-orange-400/[0.1] text-orange-200",
-        NYY: "border-blue-800/40 bg-blue-800/[0.12] text-blue-200",
-        PHI: "border-red-500/40 bg-red-500/[0.1] text-red-200",
-        PIT: "border-yellow-400/35 bg-yellow-400/[0.08] text-yellow-200",
-        SD: "border-amber-500/35 bg-amber-500/[0.08] text-amber-200",
-        SF: "border-orange-500/45 bg-orange-500/[0.12] text-orange-300",
-        SEA: "border-teal-500/35 bg-teal-500/[0.08] text-teal-200",
-        STL: "border-red-600/40 bg-red-600/[0.1] text-red-200",
-        TB: "border-sky-400/35 bg-sky-400/[0.08] text-sky-200",
-        TEX: "border-red-500/35 bg-red-500/[0.08] text-red-200",
-        TOR: "border-blue-500/35 bg-blue-500/[0.08] text-blue-200",
-        WSH: "border-red-500/35 bg-red-500/[0.08] text-red-200"
-      },
-      nhl: {
-        ANA: "border-orange-500/45 bg-orange-500/[0.12] text-orange-300",
-        BOS: "border-yellow-400/35 bg-yellow-400/[0.08] text-yellow-200",
-        BUF: "border-blue-500/35 bg-blue-500/[0.08] text-blue-200",
-        CGY: "border-red-600/40 bg-red-600/[0.1] text-red-200",
-        CAR: "border-red-500/35 bg-red-500/[0.08] text-red-200",
-        CHI: "border-red-600/40 bg-red-600/[0.1] text-red-200",
-        COL: "border-blue-600/40 bg-blue-600/[0.1] text-blue-200",
-        CBJ: "border-red-500/35 bg-red-500/[0.08] text-red-200",
-        DAL: "border-green-500/35 bg-green-500/[0.08] text-green-200",
-        DET: "border-red-600/40 bg-red-600/[0.1] text-red-200",
-        EDM: "border-blue-600/40 bg-blue-600/[0.1] text-blue-200",
-        FLA: "border-red-500/35 bg-red-500/[0.08] text-red-200",
-        LAK: "border-slate-300/30 bg-slate-300/[0.08] text-slate-200",
-        MIN: "border-emerald-500/35 bg-emerald-500/[0.08] text-emerald-200",
-        MTL: "border-red-600/40 bg-red-600/[0.1] text-red-200",
-        NSH: "border-yellow-400/35 bg-yellow-400/[0.08] text-yellow-200",
-        NJD: "border-red-600/40 bg-red-600/[0.1] text-red-200",
-        NYI: "border-orange-400/40 bg-orange-400/[0.1] text-orange-200",
-        NYR: "border-blue-500/35 bg-blue-500/[0.08] text-blue-200",
-        OTT: "border-red-500/35 bg-red-500/[0.08] text-red-200",
-        PHI: "border-orange-500/45 bg-orange-500/[0.12] text-orange-300",
-        PIT: "border-yellow-400/35 bg-yellow-400/[0.08] text-yellow-200",
-        SJS: "border-teal-500/35 bg-teal-500/[0.08] text-teal-200",
-        SEA: "border-teal-400/35 bg-teal-400/[0.08] text-teal-200",
-        STL: "border-blue-500/40 bg-blue-500/[0.1] text-blue-200",
-        TBL: "border-blue-400/40 bg-blue-400/[0.1] text-blue-200",
-        TOR: "border-blue-600/40 bg-blue-600/[0.1] text-blue-200",
-        UTA: "border-slate-400/35 bg-slate-400/[0.08] text-slate-200",
-        VAN: "border-blue-600/40 bg-blue-600/[0.1] text-blue-200",
-        VGK: "border-yellow-400/35 bg-yellow-400/[0.08] text-yellow-200",
-        WSH: "border-red-600/40 bg-red-600/[0.1] text-red-200",
-        WPG: "border-sky-400/35 bg-sky-400/[0.08] text-sky-200"
-      },
-      wnba: {},
-      ncaa: {
-        USC: "border-red-500/40 bg-red-500/[0.1] text-red-200",
-        UNC: "border-sky-400/35 bg-sky-400/[0.08] text-sky-200",
-        LR: "border-red-400/35 bg-red-400/[0.08] text-red-200",
-        TROY: "border-purple-400/35 bg-purple-400/[0.08] text-purple-200",
-        CP: "border-orange-400/40 bg-orange-400/[0.1] text-orange-200",
-        WVU: "border-yellow-400/35 bg-yellow-400/[0.08] text-yellow-200",
-        ALA: "border-red-400/35 bg-red-400/[0.08] text-red-200",
-        ARK: "border-orange-500/45 bg-orange-500/[0.12] text-orange-300",
-        LSU: "border-purple-500/35 bg-purple-500/[0.08] text-purple-200",
-        TEX: "border-orange-500/45 bg-orange-500/[0.12] text-orange-300",
-        OU: "border-red-600/40 bg-red-600/[0.1] text-red-200",
-        TENN: "border-orange-400/40 bg-orange-400/[0.1] text-orange-200"
-      },
-      legacy: {},
-      soccer: {}
-    };
-    NATIONAL_SOCCER_TEAMS = buildNationalSoccerTeams();
-    MLB_TEAMS = [
-      {
-        names: ["Arizona Diamondbacks", "Diamondbacks", "D-backs", "Dbacks", "ARI", "AZ"],
-        abbrev: "ARI",
-        logoUrl: "https://a.espncdn.com/i/teamlogos/mlb/500/scoreboard/ari.png",
-        tokenClass: "border-red-500/40 bg-red-500/[0.1] text-red-200"
-      },
-      { names: ["Athletics", "A's"], abbrev: "ATH", logoUrl: "https://a.espncdn.com/i/teamlogos/mlb/500/scoreboard/ath.png", tokenClass: "border-emerald-500/35 bg-emerald-500/[0.08] text-emerald-200" },
-      { names: ["Atlanta Braves", "Braves"], abbrev: "ATL", logoUrl: "https://a.espncdn.com/i/teamlogos/mlb/500/scoreboard/atl.png", tokenClass: "border-red-600/40 bg-red-600/[0.1] text-red-200" },
-      { names: ["Baltimore Orioles", "Orioles"], abbrev: "BAL", logoUrl: "https://a.espncdn.com/i/teamlogos/mlb/500/scoreboard/bal.png", tokenClass: "border-orange-500/45 bg-orange-500/[0.12] text-orange-300" },
-      { names: ["Boston Red Sox", "Red Sox"], abbrev: "BOS", logoUrl: "https://a.espncdn.com/i/teamlogos/mlb/500/scoreboard/bos.png", tokenClass: "border-red-500/40 bg-red-500/[0.1] text-red-200" },
-      { names: ["Chicago Cubs", "Cubs"], abbrev: "CHC", logoUrl: "https://a.espncdn.com/i/teamlogos/mlb/500/scoreboard/chc.png", tokenClass: "border-blue-400/40 bg-blue-400/[0.1] text-blue-200" },
-      { names: ["Chicago White Sox", "White Sox"], abbrev: "CWS", logoUrl: "https://a.espncdn.com/i/teamlogos/mlb/500/scoreboard/cws.png", tokenClass: "border-slate-300/30 bg-slate-300/[0.08] text-slate-200" },
-      { names: ["Cincinnati Reds", "Reds"], abbrev: "CIN", logoUrl: "https://a.espncdn.com/i/teamlogos/mlb/500/scoreboard/cin.png", tokenClass: "border-red-600/40 bg-red-600/[0.1] text-red-200" },
-      { names: ["Cleveland Guardians", "Guardians"], abbrev: "CLE", logoUrl: "https://a.espncdn.com/i/teamlogos/mlb/500/scoreboard/cle.png", tokenClass: "border-red-500/35 bg-red-500/[0.08] text-red-200" },
-      { names: ["Colorado Rockies", "Rockies"], abbrev: "COL", logoUrl: "https://a.espncdn.com/i/teamlogos/mlb/500/scoreboard/col.png", tokenClass: "border-purple-500/35 bg-purple-500/[0.08] text-purple-200" },
-      { names: ["Detroit Tigers", "Tigers"], abbrev: "DET", logoUrl: "https://a.espncdn.com/i/teamlogos/mlb/500/scoreboard/det.png", tokenClass: "border-orange-400/40 bg-orange-400/[0.1] text-orange-200" },
-      { names: ["Houston Astros", "Astros"], abbrev: "HOU", logoUrl: "https://a.espncdn.com/i/teamlogos/mlb/500/scoreboard/hou.png", tokenClass: "border-orange-500/45 bg-orange-500/[0.12] text-orange-300" },
-      { names: ["Kansas City Royals", "Royals"], abbrev: "KC", logoUrl: "https://a.espncdn.com/i/teamlogos/mlb/500/scoreboard/kc.png", tokenClass: "border-sky-400/35 bg-sky-400/[0.08] text-sky-200" },
-      { names: ["Los Angeles Angels", "Angels"], abbrev: "LAA", logoUrl: "https://a.espncdn.com/i/teamlogos/mlb/500/scoreboard/laa.png", tokenClass: "border-red-500/35 bg-red-500/[0.08] text-red-200" },
-      { names: ["Los Angeles Dodgers", "Dodgers"], abbrev: "LAD", logoUrl: "https://a.espncdn.com/i/teamlogos/mlb/500/scoreboard/lad.png", tokenClass: "border-blue-500/40 bg-blue-500/[0.1] text-blue-200" },
-      { names: ["Miami Marlins", "Marlins"], abbrev: "MIA", logoUrl: "https://a.espncdn.com/i/teamlogos/mlb/500/scoreboard/mia.png", tokenClass: "border-cyan-400/35 bg-cyan-400/[0.08] text-cyan-200" },
-      { names: ["Milwaukee Brewers", "Brewers"], abbrev: "MIL", logoUrl: "https://a.espncdn.com/i/teamlogos/mlb/500/scoreboard/mil.png", tokenClass: "border-yellow-400/35 bg-yellow-400/[0.08] text-yellow-200" },
-      { names: ["Minnesota Twins", "Twins"], abbrev: "MIN", logoUrl: "https://a.espncdn.com/i/teamlogos/mlb/500/scoreboard/min.png", tokenClass: "border-red-400/35 bg-red-400/[0.08] text-red-200" },
-      { names: ["New York Mets", "Mets"], abbrev: "NYM", logoUrl: "https://a.espncdn.com/i/teamlogos/mlb/500/scoreboard/nym.png", tokenClass: "border-orange-400/40 bg-orange-400/[0.1] text-orange-200" },
-      { names: ["New York Yankees", "Yankees"], abbrev: "NYY", logoUrl: "https://a.espncdn.com/i/teamlogos/mlb/500/scoreboard/nyy.png", tokenClass: "border-blue-800/40 bg-blue-800/[0.12] text-blue-200" },
-      { names: ["Philadelphia Phillies", "Phillies"], abbrev: "PHI", logoUrl: "https://a.espncdn.com/i/teamlogos/mlb/500/scoreboard/phi.png", tokenClass: "border-red-500/40 bg-red-500/[0.1] text-red-200" },
-      { names: ["Pittsburgh Pirates", "Pirates"], abbrev: "PIT", logoUrl: "https://a.espncdn.com/i/teamlogos/mlb/500/scoreboard/pit.png", tokenClass: "border-yellow-400/35 bg-yellow-400/[0.08] text-yellow-200" },
-      { names: ["San Diego Padres", "Padres"], abbrev: "SD", logoUrl: "https://a.espncdn.com/i/teamlogos/mlb/500/scoreboard/sd.png", tokenClass: "border-amber-500/35 bg-amber-500/[0.08] text-amber-200" },
-      { names: ["San Francisco Giants", "Giants"], abbrev: "SF", logoUrl: "https://a.espncdn.com/i/teamlogos/mlb/500/scoreboard/sf.png", tokenClass: "border-orange-500/45 bg-orange-500/[0.12] text-orange-300" },
-      { names: ["Seattle Mariners", "Mariners"], abbrev: "SEA", logoUrl: "https://a.espncdn.com/i/teamlogos/mlb/500/scoreboard/sea.png", tokenClass: "border-teal-500/35 bg-teal-500/[0.08] text-teal-200" },
-      { names: ["St. Louis Cardinals", "Cardinals"], abbrev: "STL", logoUrl: "https://a.espncdn.com/i/teamlogos/mlb/500/scoreboard/stl.png", tokenClass: "border-red-600/40 bg-red-600/[0.1] text-red-200" },
-      { names: ["Tampa Bay Rays", "Rays"], abbrev: "TB", logoUrl: "https://a.espncdn.com/i/teamlogos/mlb/500/scoreboard/tb.png", tokenClass: "border-sky-400/35 bg-sky-400/[0.08] text-sky-200" },
-      { names: ["Texas Rangers", "Rangers"], abbrev: "TEX", logoUrl: "https://a.espncdn.com/i/teamlogos/mlb/500/scoreboard/tex.png", tokenClass: "border-red-500/35 bg-red-500/[0.08] text-red-200" },
-      { names: ["Toronto Blue Jays", "Blue Jays"], abbrev: "TOR", logoUrl: "https://a.espncdn.com/i/teamlogos/mlb/500/scoreboard/tor.png", tokenClass: "border-blue-500/35 bg-blue-500/[0.08] text-blue-200" },
-      { names: ["Washington Nationals", "Nationals"], abbrev: "WSH", logoUrl: "https://a.espncdn.com/i/teamlogos/mlb/500/scoreboard/wsh.png", tokenClass: "border-red-500/35 bg-red-500/[0.08] text-red-200" }
-    ];
-    NHL_TEAMS = [
-      { names: ["Anaheim Ducks", "Ducks"], abbrev: "ANA", logoUrl: "https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/ana.png", tokenClass: "border-orange-500/45 bg-orange-500/[0.12] text-orange-300" },
-      { names: ["Boston Bruins", "Bruins"], abbrev: "BOS", logoUrl: "https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/bos.png", tokenClass: "border-yellow-400/35 bg-yellow-400/[0.08] text-yellow-200" },
-      { names: ["Buffalo Sabres", "Sabres"], abbrev: "BUF", logoUrl: "https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/buf.png", tokenClass: "border-blue-500/35 bg-blue-500/[0.08] text-blue-200" },
-      { names: ["Calgary Flames", "Flames"], abbrev: "CGY", logoUrl: "https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/cgy.png", tokenClass: "border-red-600/40 bg-red-600/[0.1] text-red-200" },
-      { names: ["Carolina Hurricanes", "Hurricanes"], abbrev: "CAR", logoUrl: "https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/car.png", tokenClass: "border-red-500/35 bg-red-500/[0.08] text-red-200" },
-      { names: ["Chicago Blackhawks", "Blackhawks"], abbrev: "CHI", logoUrl: "https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/chi.png", tokenClass: "border-red-600/40 bg-red-600/[0.1] text-red-200" },
-      { names: ["Colorado Avalanche", "Avalanche"], abbrev: "COL", logoUrl: "https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/col.png", tokenClass: "border-blue-600/40 bg-blue-600/[0.1] text-blue-200" },
-      { names: ["Columbus Blue Jackets", "Blue Jackets"], abbrev: "CBJ", logoUrl: "https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/cbj.png", tokenClass: "border-red-500/35 bg-red-500/[0.08] text-red-200" },
-      { names: ["Dallas Stars", "Stars"], abbrev: "DAL", logoUrl: "https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/dal.png", tokenClass: "border-green-500/35 bg-green-500/[0.08] text-green-200" },
-      { names: ["Detroit Red Wings", "Red Wings"], abbrev: "DET", logoUrl: "https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/det.png", tokenClass: "border-red-600/40 bg-red-600/[0.1] text-red-200" },
-      { names: ["Edmonton Oilers", "Oilers"], abbrev: "EDM", logoUrl: "https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/edm.png", tokenClass: "border-blue-600/40 bg-blue-600/[0.1] text-blue-200" },
-      { names: ["Florida Panthers", "Panthers"], abbrev: "FLA", logoUrl: "https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/fla.png", tokenClass: "border-red-500/35 bg-red-500/[0.08] text-red-200" },
-      { names: ["Los Angeles Kings", "Kings"], abbrev: "LAK", logoUrl: "https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/lak.png", tokenClass: "border-slate-300/30 bg-slate-300/[0.08] text-slate-200" },
-      { names: ["Minnesota Wild", "Wild"], abbrev: "MIN", logoUrl: "https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/min.png", tokenClass: "border-emerald-500/35 bg-emerald-500/[0.08] text-emerald-200" },
-      { names: ["Montr\xE9al Canadiens", "Montreal Canadiens", "Canadiens"], abbrev: "MTL", logoUrl: "https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/mtl.png", tokenClass: "border-red-600/40 bg-red-600/[0.1] text-red-200" },
-      { names: ["Nashville Predators", "Predators"], abbrev: "NSH", logoUrl: "https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/nsh.png", tokenClass: "border-yellow-400/35 bg-yellow-400/[0.08] text-yellow-200" },
-      { names: ["New Jersey Devils", "Devils"], abbrev: "NJD", logoUrl: "https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/njd.png", tokenClass: "border-red-600/40 bg-red-600/[0.1] text-red-200" },
-      { names: ["New York Islanders", "Islanders"], abbrev: "NYI", logoUrl: "https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/nyi.png", tokenClass: "border-orange-400/40 bg-orange-400/[0.1] text-orange-200" },
-      { names: ["New York Rangers", "Rangers"], abbrev: "NYR", logoUrl: "https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/nyr.png", tokenClass: "border-blue-500/35 bg-blue-500/[0.08] text-blue-200" },
-      { names: ["Ottawa Senators", "Senators"], abbrev: "OTT", logoUrl: "https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/ott.png", tokenClass: "border-red-500/35 bg-red-500/[0.08] text-red-200" },
-      { names: ["Philadelphia Flyers", "Flyers"], abbrev: "PHI", logoUrl: "https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/phi.png", tokenClass: "border-orange-500/45 bg-orange-500/[0.12] text-orange-300" },
-      { names: ["Pittsburgh Penguins", "Penguins"], abbrev: "PIT", logoUrl: "https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/pit.png", tokenClass: "border-yellow-400/35 bg-yellow-400/[0.08] text-yellow-200" },
-      { names: ["San Jose Sharks", "Sharks"], abbrev: "SJS", logoUrl: "https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/sjs.png", tokenClass: "border-teal-500/35 bg-teal-500/[0.08] text-teal-200" },
-      { names: ["Seattle Kraken", "Kraken"], abbrev: "SEA", logoUrl: "https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/sea.png", tokenClass: "border-teal-400/35 bg-teal-400/[0.08] text-teal-200" },
-      { names: ["St. Louis Blues", "Blues"], abbrev: "STL", logoUrl: "https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/stl.png", tokenClass: "border-blue-500/40 bg-blue-500/[0.1] text-blue-200" },
-      { names: ["Tampa Bay Lightning", "Lightning"], abbrev: "TBL", logoUrl: "https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/tbl.png", tokenClass: "border-blue-400/40 bg-blue-400/[0.1] text-blue-200" },
-      { names: ["Toronto Maple Leafs", "Maple Leafs"], abbrev: "TOR", logoUrl: "https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/tor.png", tokenClass: "border-blue-600/40 bg-blue-600/[0.1] text-blue-200" },
-      { names: ["Utah Mammoth", "Mammoth"], abbrev: "UTA", logoUrl: "https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/uta.png", tokenClass: "border-slate-400/35 bg-slate-400/[0.08] text-slate-200" },
-      { names: ["Vancouver Canucks", "Canucks"], abbrev: "VAN", logoUrl: "https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/van.png", tokenClass: "border-blue-600/40 bg-blue-600/[0.1] text-blue-200" },
-      { names: ["Vegas Golden Knights", "Golden Knights"], abbrev: "VGK", logoUrl: "https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/vgk.png", tokenClass: "border-yellow-400/35 bg-yellow-400/[0.08] text-yellow-200" },
-      { names: ["Washington Capitals", "Capitals"], abbrev: "WSH", logoUrl: "https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/wsh.png", tokenClass: "border-red-600/40 bg-red-600/[0.1] text-red-200" },
-      { names: ["Winnipeg Jets", "Jets"], abbrev: "WPG", logoUrl: "https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/wpg.png", tokenClass: "border-sky-400/35 bg-sky-400/[0.08] text-sky-200" }
-    ];
-    LEGACY_MOCK_TEAMS = [
-      {
-        names: ["Nelly Korda"],
-        abbrev: "N. Korda",
-        logoUrl: "",
-        tokenClass: "border-fuchsia-400/35 bg-fuchsia-400/[0.08] text-fuchsia-200"
-      },
-      { names: ["England"], abbrev: "ENG", logoUrl: "https://a.espncdn.com/i/teamlogos/soccer/500/448.png", tokenClass: "border-white/25 bg-white/[0.06] text-[#e8ecec]" },
-      { names: ["Montenegro"], abbrev: "MNE", logoUrl: "/livetrack/montenegro-flag.png", tokenClass: "border-red-500/35 bg-red-500/[0.08] text-red-200" },
-      { names: ["Slovakia"], abbrev: "SVK", logoUrl: "https://a.espncdn.com/i/teamlogos/soccer/500/469.png", tokenClass: "border-blue-500/35 bg-blue-500/[0.08] text-blue-200" },
-      { names: ["Spain"], abbrev: "ESP", logoUrl: "https://a.espncdn.com/i/teamlogos/soccer/500/469.png", tokenClass: "border-red-500/40 bg-red-500/[0.1] text-red-200" }
-    ];
-    NHL_ESPN_LOGO_SLUG = {
-      LAK: "la",
-      NJD: "nj",
-      SJS: "sj",
-      TBL: "tb"
-    };
-    TEAM_LOOKUP = /* @__PURE__ */ new Map();
-    LOOKUP_BY_BUCKET = {
-      mlb: /* @__PURE__ */ new Map(),
-      nhl: /* @__PURE__ */ new Map(),
-      wnba: /* @__PURE__ */ new Map(),
-      ncaa: /* @__PURE__ */ new Map(),
-      soccer: /* @__PURE__ */ new Map(),
-      legacy: /* @__PURE__ */ new Map()
-    };
-    for (const team of MLB_TEAMS) registerTeamMeta("mlb", team);
-    for (const team of NHL_TEAMS) registerTeamMeta("nhl", team);
-    for (const team of WNBA_TEAMS) registerTeamMeta("wnba", team);
-    for (const team of LIVE_TRACK_NCAA_BASEBALL_TEAMS) registerTeamMeta("ncaa", team);
-    for (const team of NATIONAL_SOCCER_TEAMS) registerTeamMeta("soccer", team);
-    for (const team of LEGACY_MOCK_TEAMS) registerTeamMeta("legacy", team);
-    LIVE_TRACK_MLB_TEAM_COUNT = MLB_TEAMS.length;
-    LIVE_TRACK_NHL_TEAM_COUNT = NHL_TEAMS.length;
-    LIVE_TRACK_NCAA_BASEBALL_TEAM_COUNT = LIVE_TRACK_NCAA_BASEBALL_TEAMS.length;
-  }
-});
-
 // ../grarf/desktop/src/lib/sportscape/highlights/matchTeamsAndDateHighlight.ts
 function buildTeamSearchTerms(teamName, sport) {
   const terms = /* @__PURE__ */ new Set();
@@ -88838,166 +89095,6 @@ var init_nhlEspnCatchupFeedGenerator = __esm({
       Accept: "application/json",
       "User-Agent": "Mozilla/5.0 (compatible; GrarfNhlSportscape/1.0)"
     };
-  }
-});
-
-// ../grarf/desktop/src/lib/gamesSpine/worldCupCountryLogoUrl.ts
-function buildWorldCupCountryLogoUrl(abbrev) {
-  const trimmed = abbrev?.trim();
-  if (!trimmed) return void 0;
-  return `https://a.espncdn.com/i/teamlogos/countries/500/${trimmed.toLowerCase()}.png`;
-}
-var init_worldCupCountryLogoUrl = __esm({
-  "../grarf/desktop/src/lib/gamesSpine/worldCupCountryLogoUrl.ts"() {
-    init_define_import_meta_env();
-  }
-});
-
-// ../grarf/desktop/src/lib/sportscape/resolveSportscapeTeamIdentity.ts
-function abbrevFromSportscapeLogoUrl(logoUrl) {
-  if (!logoUrl) return void 0;
-  const countryMatch = logoUrl.match(/\/countries\/\d+\/([^.]+)\.png/i);
-  if (countryMatch) return countryMatch[1].toUpperCase();
-  const scoreboardMatch = logoUrl.match(/\/scoreboard\/([^.]+)\.png/i);
-  if (scoreboardMatch) return scoreboardMatch[1].toUpperCase();
-  return void 0;
-}
-function resolveLiveTrackSport(sport) {
-  if (sport === "mlb" || sport === "nhl" || sport === "wnba" || sport === "ncaa") return sport;
-  return void 0;
-}
-function isLikelyAbbrevToken(teamName, sport) {
-  const trimmed = teamName.trim();
-  if (!/^[A-Za-z]{2,4}$/.test(trimmed)) return false;
-  if (sport === "soccer" && resolveSoccerCountryAbbrev(trimmed)) return false;
-  return true;
-}
-function deriveCompactAbbrevFromName(teamName, sport) {
-  const trimmed = teamName.trim();
-  if (!trimmed) return "\u2014";
-  if (sport === "soccer") {
-    const country = resolveSoccerCountryAbbrev(trimmed);
-    if (country) return country;
-  }
-  if (isLikelyAbbrevToken(trimmed, sport)) return trimmed.toUpperCase();
-  const liveTrackSport = resolveLiveTrackSport(sport);
-  if (liveTrackSport) {
-    const fromMeta = resolveLiveTrackTeamAbbrev(trimmed, liveTrackSport);
-    if (fromMeta) return fromMeta;
-  }
-  const words = trimmed.split(/\s+/).filter(Boolean);
-  if (words.length >= 2) {
-    const acronym = words.slice(0, 3).map((word) => word[0]).join("").toUpperCase();
-    if (acronym.length >= 2) return acronym.slice(0, 4);
-  }
-  return trimmed.slice(0, 3).toUpperCase();
-}
-function buildClubLogoFromAbbrev(sport, abbrev) {
-  const code = abbrev.trim();
-  if (!code) return void 0;
-  switch (sport) {
-    case "mlb":
-      return buildMlbEspnScoreboardLogoUrl(code);
-    case "nhl":
-      return `https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/${code.toLowerCase()}.png`;
-    case "wnba":
-      return buildWnbaEspnLogoUrl(code);
-    case "ncaa":
-      return void 0;
-    case "soccer":
-      return buildWorldCupCountryLogoUrl(code);
-    default:
-      return void 0;
-  }
-}
-function resolveMarkKind(sport, logoUrl) {
-  if (!logoUrl) return "fallback";
-  if (sport === "soccer" && /\/countries\//i.test(logoUrl)) return "country-flag";
-  return "club-logo";
-}
-function resolveSportscapeTeamIdentity(input) {
-  const teamName = input.teamName.trim();
-  const sport = input.sport;
-  let abbrev = input.abbrev?.trim().toUpperCase();
-  if (sport === "soccer") {
-    const fromName = resolveSoccerCountryAbbrev(teamName);
-    if (fromName) abbrev = fromName;
-  }
-  if (!abbrev) {
-    const liveTrackSport = resolveLiveTrackSport(sport);
-    if (liveTrackSport) {
-      abbrev = resolveLiveTrackTeamAbbrev(teamName, liveTrackSport) ?? void 0;
-    }
-  }
-  if (!abbrev && isLikelyAbbrevToken(teamName, sport)) {
-    abbrev = teamName.toUpperCase();
-  }
-  if (!abbrev) {
-    abbrev = abbrevFromSportscapeLogoUrl(input.logoUrl);
-  }
-  if (!abbrev) {
-    abbrev = deriveCompactAbbrevFromName(teamName, sport);
-  }
-  let logoUrl = input.logoUrl?.trim() || void 0;
-  if (sport === "wnba" && isWnbaBundledTeamLogoAbbrev(abbrev)) {
-    logoUrl = buildWnbaEspnLogoUrl(abbrev);
-  } else if (!logoUrl) {
-    const liveTrackSport = resolveLiveTrackSport(sport);
-    if (liveTrackSport) {
-      logoUrl = resolveLiveTrackTeamLogoUrlFromMeta(teamName, liveTrackSport) ?? void 0;
-    }
-  }
-  if (!logoUrl && abbrev) {
-    logoUrl = buildClubLogoFromAbbrev(sport, abbrev);
-  }
-  if (logoUrl && !/^(https?:|data:)/i.test(logoUrl)) {
-    logoUrl = publicAssetUrl(logoUrl);
-  }
-  if (!logoUrl && sport === "soccer" && abbrev) {
-    logoUrl = buildWorldCupCountryLogoUrl(abbrev);
-  }
-  return {
-    abbrev,
-    logoUrl,
-    markKind: resolveMarkKind(sport, logoUrl)
-  };
-}
-function buildSportscapeScoreLine(input) {
-  const identity = resolveSportscapeTeamIdentity(input);
-  return {
-    sideLabel: identity.abbrev,
-    score: input.score,
-    logoUrl: identity.logoUrl
-  };
-}
-function buildSportscapeMatchupScoreLines(input) {
-  const away = buildSportscapeScoreLine({
-    teamName: input.awayTeam,
-    sport: input.sport,
-    abbrev: input.awayAbbrev,
-    logoUrl: input.awayLogoUrl,
-    league: input.league,
-    score: String(input.awayScore)
-  });
-  const home = buildSportscapeScoreLine({
-    teamName: input.homeTeam,
-    sport: input.sport,
-    abbrev: input.homeAbbrev,
-    logoUrl: input.homeLogoUrl,
-    league: input.league,
-    score: String(input.homeScore)
-  });
-  return [away, { ...home, homeLogoUrl: home.logoUrl }];
-}
-var init_resolveSportscapeTeamIdentity = __esm({
-  "../grarf/desktop/src/lib/sportscape/resolveSportscapeTeamIdentity.ts"() {
-    init_define_import_meta_env();
-    init_mlbEspnLogoSlug();
-    init_wnbaEspnLogoUrl();
-    init_publicAssetUrl();
-    init_worldCupCountryLogoUrl();
-    init_liveTrackTeamMetadata();
-    init_soccerCountryAbbrev();
   }
 });
 
@@ -89949,64 +90046,6 @@ var init_sportscapeEditorialLeagueMapping = __esm({
         GRARF_TO_EDITORIAL.set(grarfLeague, editorialLeague);
       }
     }
-  }
-});
-
-// ../grarf/desktop/src/lib/sportscape/resolveSportscapeScoreSideLabel.ts
-function inferSportscapeScoreSportFromEditorialLeague(league2) {
-  switch (league2) {
-    case "NHL":
-      return "nhl";
-    case "WNBA":
-      return "wnba";
-    case "WORLD_CUP":
-      return "soccer";
-    case "MCWS":
-      return "ncaa";
-    default:
-      return "mlb";
-  }
-}
-function inferSportscapeScoreSportFromLeague(league2) {
-  switch (league2) {
-    case "NHL":
-      return "nhl";
-    case "WNBA":
-      return "wnba";
-    case "NCAABB":
-      return "ncaa";
-    case "MLB":
-      return "mlb";
-    default:
-      return league2 ? "soccer" : "mlb";
-  }
-}
-function resolveSportscapeScoreSideLabel(teamName, sport, options) {
-  return resolveSportscapeTeamIdentity({
-    teamName,
-    sport,
-    abbrev: options?.abbrev,
-    logoUrl: options?.logoUrl
-  }).abbrev;
-}
-function normalizeSportscapeScoreLines(lines, sport) {
-  return lines.map((line) => {
-    const identity = resolveSportscapeTeamIdentity({
-      teamName: line.sideLabel,
-      sport,
-      logoUrl: line.logoUrl
-    });
-    return {
-      ...line,
-      sideLabel: identity.abbrev,
-      logoUrl: identity.logoUrl ?? line.logoUrl
-    };
-  });
-}
-var init_resolveSportscapeScoreSideLabel = __esm({
-  "../grarf/desktop/src/lib/sportscape/resolveSportscapeScoreSideLabel.ts"() {
-    init_define_import_meta_env();
-    init_resolveSportscapeTeamIdentity();
   }
 });
 
