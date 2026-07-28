@@ -67311,22 +67311,61 @@ var init_gamesSpineCompactLeftWidth = __esm({
 });
 
 // ../grarf/desktop/src/store/gamesSpineDisplayStore.ts
+function defaultGamesSpineGamesMode() {
+  return isGrarfWebRenderer() || isGrarfElectronRenderer() ? "compact" : "full";
+}
+function resolveGamesSpineSectionGamesMode(sectionKey, state3) {
+  if (state3.toolbarPinned) return state3.gamesMode;
+  return state3.leagueGamesMode[sectionKey] ?? state3.gamesMode;
+}
+function useGamesSpineSectionGamesMode(sectionKey) {
+  return useGamesSpineDisplayStore((state3) => resolveGamesSpineSectionGamesMode(sectionKey, state3));
+}
 var import_zustand47, useGamesSpineDisplayStore;
 var init_gamesSpineDisplayStore = __esm({
   "../grarf/desktop/src/store/gamesSpineDisplayStore.ts"() {
     init_define_import_meta_env();
     import_zustand47 = __toESM(require_zustand(), 1);
     init_gamesSpineCompactLeftWidth();
+    init_isGrarfWebRenderer();
     useGamesSpineDisplayStore = (0, import_zustand47.create)((set, get) => ({
-      gamesMode: "full",
+      gamesMode: defaultGamesSpineGamesMode(),
+      leagueGamesMode: {},
+      toolbarPinned: false,
       compactLeftWidthRestorePx: null,
       setGamesMode: (gamesMode) => {
-        if (get().gamesMode === gamesMode) return;
+        if (get().gamesMode === gamesMode && get().toolbarPinned) return;
         const compactLeftWidthRestorePx = applyGamesSpineCompactLeftWidth(
           gamesMode,
           get().compactLeftWidthRestorePx
         );
-        set({ gamesMode, compactLeftWidthRestorePx });
+        set({ gamesMode, compactLeftWidthRestorePx, toolbarPinned: true, leagueGamesMode: {} });
+      },
+      setLeagueGamesMode: (sectionKey, mode) => {
+        if (get().toolbarPinned) return;
+        set((state3) => ({
+          leagueGamesMode: {
+            ...state3.leagueGamesMode,
+            [sectionKey]: mode
+          }
+        }));
+      },
+      applyToolbarExpandAllGames: (sectionKeys) => {
+        const leagueGamesMode = {};
+        for (const sectionKey of sectionKeys) {
+          leagueGamesMode[sectionKey] = "full";
+        }
+        set({ toolbarPinned: false, leagueGamesMode });
+      },
+      applyToolbarCollapseAllLeagues: () => {
+        set({ toolbarPinned: false });
+      },
+      bootstrapInitialCompactLeftWidth: () => {
+        const state3 = get();
+        if (state3.compactLeftWidthRestorePx != null) return;
+        if (state3.gamesMode !== "compact") return;
+        const compactLeftWidthRestorePx = applyGamesSpineCompactLeftWidth("compact", null);
+        set({ compactLeftWidthRestorePx });
       }
     }));
   }
@@ -70908,7 +70947,8 @@ function GameRow({
   hideTime = false,
   prepareStartTimeRepeat = false,
   applyFinalResultNameEmphasis = false,
-  narrativeSlot
+  narrativeSlot,
+  spineSectionCollapseKey
 }) {
   const traceLogged = (0, import_react73.useRef)(false);
   (0, import_react73.useEffect)(() => {
@@ -70960,8 +71000,10 @@ function GameRow({
   const scoreAnchorRef = useGamesSpineScoreAnchor(isRail && scoreMode, homeSpineParity);
   const isPrepare = isRail && game.status === "scheduled";
   const tennisPresentation = tennis ? resolveTennisMatchPresentation(game) : null;
-  const gamesDisplayMode = useGamesSpineDisplayStore((state3) => state3.gamesMode);
-  const isWebHomeSpineParity = isRail && homeSpineParity && isGrarfWebRenderer();
+  const supportsSectionGamesMode = isGrarfWebRenderer() || isGrarfElectronRenderer();
+  const gamesSpineDisplayState = useGamesSpineDisplayStore((state3) => state3);
+  const gamesDisplayMode = spineSectionCollapseKey && supportsSectionGamesMode ? resolveGamesSpineSectionGamesMode(spineSectionCollapseKey, gamesSpineDisplayState) : gamesSpineDisplayState.gamesMode;
+  const isWebHomeSpineParity = isRail && homeSpineParity && supportsSectionGamesMode;
   const isCompactSpineRow = isWebHomeSpineParity && gamesDisplayMode === "compact" && !exemptFromCompactGamesMode;
   const gameCardClickable = !isTennisGame(game) || tennisGameHasEffectiveGameCardUrl(game);
   const renderRailMatchup = (className) => /* @__PURE__ */ (0, import_jsx_runtime54.jsx)(GamesSpineMatchupStack, { game, className });
@@ -73077,8 +73119,8 @@ var init_HomeLeagueSpineSection = __esm({
       const manualTourDeFranceRefreshMs = useManualTourDeFranceLiveRefreshMs();
       const manualRefreshMs = useManualGamesSpineLiveRefreshMs();
       const operationalIngestComplete = useGamesSpineRenderStore((s2) => s2.operationalIngestComplete);
-      const gamesMode = useGamesSpineDisplayStore((state3) => state3.gamesMode);
-      const cardListClass = isGrarfWebRenderer() ? resolveGamesSpineCardListLayoutClass(gamesMode) : GAMES_SPINE_CARD_LIST_CLASS;
+      const gamesMode = useGamesSpineSectionGamesMode(league2);
+      const cardListClass = isGrarfWebRenderer() || isGrarfElectronRenderer() ? resolveGamesSpineCardListLayoutClass(gamesMode) : GAMES_SPINE_CARD_LIST_CLASS;
       const useOperationalModePipeline = briefingScrollContext === "home" || briefingScrollContext === "league";
       const headerRef = (0, import_react83.useRef)(null);
       const stickyLogged = (0, import_react83.useRef)(false);
@@ -73440,6 +73482,7 @@ var init_HomeLeagueSpineSection = __esm({
                                   game: g2,
                                   variant: "rail",
                                   homeSpineParity: true,
+                                  spineSectionCollapseKey: league2,
                                   hideTime: hideGroupedPrepareTime,
                                   prepareStartTimeRepeat,
                                   isSelected: selectedId === g2.id,
@@ -73561,6 +73604,121 @@ var init_selectFeaturedGames = __esm({
   }
 });
 
+// ../grarf/desktop/src/lib/gamesSpine/mergeGamesSpineSectionsByPriority.ts
+function normalizePlacementLabel(value) {
+  return value.trim().toLowerCase();
+}
+function operationalKeyMatchesAnchor(leagueKey, anchor) {
+  const normalized = normalizePlacementLabel(anchor);
+  if (normalizePlacementLabel(leagueKey) === normalized) return true;
+  return normalizePlacementLabel(resolveGamesSpineLeagueDisplayLabel(leagueKey)) === normalized;
+}
+function manualSectionMatchesAnchor(section, anchor) {
+  const normalized = normalizePlacementLabel(anchor);
+  if (normalizePlacementLabel(section.leagueKey) === normalized) return true;
+  return normalizePlacementLabel(section.leagueLabel) === normalized;
+}
+function findVisibleAnchorIndex(sections, anchor) {
+  for (let index = 0; index < sections.length; index += 1) {
+    const section = sections[index];
+    if (section.kind === "operational" && operationalKeyMatchesAnchor(section.leagueKey, anchor)) {
+      return index;
+    }
+    if (section.kind === "manual" && manualSectionMatchesAnchor(section.section, anchor)) {
+      return index;
+    }
+  }
+  return -1;
+}
+function findOperationalOrderAnchorIndex(operationalLeagueOrder, anchor) {
+  return operationalLeagueOrder.findIndex((key2) => operationalKeyMatchesAnchor(key2, anchor));
+}
+function resolveAnchorIndex(sections, operationalLeagueOrder, anchor, mode) {
+  const visibleIndex = findVisibleAnchorIndex(sections, anchor);
+  if (visibleIndex >= 0) {
+    return mode === "before" ? visibleIndex : visibleIndex + 1;
+  }
+  const orderIndex = findOperationalOrderAnchorIndex(operationalLeagueOrder, anchor);
+  if (orderIndex < 0) return sections.length;
+  if (mode === "before") {
+    for (let index = orderIndex; index < operationalLeagueOrder.length; index += 1) {
+      const key2 = operationalLeagueOrder[index];
+      const visible = sections.findIndex(
+        (section) => section.kind === "operational" && section.leagueKey === key2
+      );
+      if (visible >= 0) return visible;
+    }
+    return sections.length;
+  }
+  for (let index = orderIndex; index >= 0; index -= 1) {
+    const key2 = operationalLeagueOrder[index];
+    const visible = sections.findIndex(
+      (section) => section.kind === "operational" && section.leagueKey === key2
+    );
+    if (visible >= 0) return visible + 1;
+  }
+  return 0;
+}
+function resolveLegacyPriorityInsertionIndex(sections, leaguePriority) {
+  for (let index = 0; index < sections.length; index += 1) {
+    const section = sections[index];
+    if (section.kind !== "operational") continue;
+    const importance = resolveLeagueImportanceV1ForLeagueKey(section.leagueKey);
+    if (leaguePriority > importance) return index;
+  }
+  return sections.length;
+}
+function resolveManualInsertionIndex(sections, manual, operationalLeagueOrder) {
+  const insertBefore = manual.insertBeforeLeague?.trim();
+  if (insertBefore) {
+    return resolveAnchorIndex(sections, operationalLeagueOrder, insertBefore, "before");
+  }
+  const insertAfter = manual.insertAfterLeague?.trim();
+  if (insertAfter) {
+    return resolveAnchorIndex(sections, operationalLeagueOrder, insertAfter, "after");
+  }
+  if (manual.leaguePriority != null && Number.isFinite(manual.leaguePriority)) {
+    return resolveLegacyPriorityInsertionIndex(sections, manual.leaguePriority);
+  }
+  return sections.length;
+}
+function mergeGamesSpineSectionsByPriority(operationalLeagueOrder, mergedLeagues, manualSections, skeletonOperationalLeagues) {
+  const operationalWithGames = operationalLeagueOrder.filter((key2) => {
+    if (skeletonOperationalLeagues?.has(key2)) return true;
+    const games = mergedLeagues[key2] ?? [];
+    if (filterGamesSpineSlateForOperationalSportsDay(games).length > 0) return true;
+    return isGrarfWebRenderer() && filterGamesSpineSlateForUpcoming(games).length > 0;
+  });
+  let sections = operationalWithGames.map((leagueKey) => ({
+    kind: "operational",
+    leagueKey
+  }));
+  for (const manual of manualSections) {
+    const insertAt = resolveManualInsertionIndex(sections, manual, operationalLeagueOrder);
+    sections = [
+      ...sections.slice(0, insertAt),
+      { kind: "manual", slug: manual.slug, section: manual },
+      ...sections.slice(insertAt)
+    ];
+  }
+  return sections;
+}
+function gamesSpineManualCollapseKey(slug) {
+  return `manual:${slug}`;
+}
+var GAMES_SPINE_FEATURED_COLLAPSE_KEY, GAMES_SPINE_MORE_LEAGUES_COLLAPSE_KEY;
+var init_mergeGamesSpineSectionsByPriority = __esm({
+  "../grarf/desktop/src/lib/gamesSpine/mergeGamesSpineSectionsByPriority.ts"() {
+    init_define_import_meta_env();
+    init_leagueImportanceV1();
+    init_gamesSpineLeagueDisplayLabel();
+    init_gamesSpineOperationalDate();
+    init_isGrarfWebRenderer();
+    GAMES_SPINE_FEATURED_COLLAPSE_KEY = "FEATURED";
+    GAMES_SPINE_MORE_LEAGUES_COLLAPSE_KEY = "MORE_LEAGUES";
+  }
+});
+
 // ../grarf/desktop/src/components/homeMvp/HomeFeaturedSpineSection.tsx
 var import_react84, import_jsx_runtime63, HomeFeaturedSpineSection;
 var init_HomeFeaturedSpineSection = __esm({
@@ -73592,6 +73750,7 @@ var init_HomeFeaturedSpineSection = __esm({
     init_gamesSpineStickyLayout();
     init_isGrarfWebRenderer();
     init_gamesSpineDisplayStore();
+    init_mergeGamesSpineSectionsByPriority();
     init_useGamesWithCanonicalHighlights();
     init_useGamesWithCanonicalStatusOverrides();
     init_bestGameRightNowPresentation();
@@ -73617,9 +73776,9 @@ var init_HomeFeaturedSpineSection = __esm({
       const editMode = useEditorialStore((s2) => s2.editMode);
       const selectedDate = useCommandBriefingStore((s2) => s2.selectedDate);
       const retainedById = useRecentFinalizedGamesStore((s2) => s2.byId);
-      const gamesMode = useGamesSpineDisplayStore((state3) => state3.gamesMode);
+      const gamesMode = useGamesSpineSectionGamesMode(GAMES_SPINE_FEATURED_COLLAPSE_KEY);
       const adminPriorities = useAdminFeaturedPriorityStore((s2) => s2.priorities);
-      const cardListClass = isGrarfWebRenderer() ? resolveGamesSpineCardListLayoutClass(gamesMode) : GAMES_SPINE_CARD_LIST_CLASS;
+      const cardListClass = isGrarfWebRenderer() || isGrarfElectronRenderer() ? resolveGamesSpineCardListLayoutClass(gamesMode) : GAMES_SPINE_CARD_LIST_CLASS;
       const gamePool = (0, import_react84.useMemo)(() => {
         const supplementalFinals = statusFilter === "final" && isSelectedDateOperationalSportsDay(selectedDate) ? mergeCatchUpSupplementalFinals(
           ...withoutGamesSpineHiddenLeagues(getGamesColumnLeagueOrder()).map(
@@ -73805,6 +73964,7 @@ var init_HomeFeaturedSpineSection = __esm({
                                 game,
                                 variant: "rail",
                                 homeSpineParity: true,
+                                spineSectionCollapseKey: GAMES_SPINE_FEATURED_COLLAPSE_KEY,
                                 isSelected: selectedId === game.id,
                                 applyFinalResultNameEmphasis: isGrarfWebRenderer() && isSpineFinalizedGame(game),
                                 onOpen,
@@ -74443,124 +74603,12 @@ var init_HomeEditorialModeBar = __esm({
   }
 });
 
-// ../grarf/desktop/src/lib/gamesSpine/mergeGamesSpineSectionsByPriority.ts
-function normalizePlacementLabel(value) {
-  return value.trim().toLowerCase();
-}
-function operationalKeyMatchesAnchor(leagueKey, anchor) {
-  const normalized = normalizePlacementLabel(anchor);
-  if (normalizePlacementLabel(leagueKey) === normalized) return true;
-  return normalizePlacementLabel(resolveGamesSpineLeagueDisplayLabel(leagueKey)) === normalized;
-}
-function manualSectionMatchesAnchor(section, anchor) {
-  const normalized = normalizePlacementLabel(anchor);
-  if (normalizePlacementLabel(section.leagueKey) === normalized) return true;
-  return normalizePlacementLabel(section.leagueLabel) === normalized;
-}
-function findVisibleAnchorIndex(sections, anchor) {
-  for (let index = 0; index < sections.length; index += 1) {
-    const section = sections[index];
-    if (section.kind === "operational" && operationalKeyMatchesAnchor(section.leagueKey, anchor)) {
-      return index;
-    }
-    if (section.kind === "manual" && manualSectionMatchesAnchor(section.section, anchor)) {
-      return index;
-    }
-  }
-  return -1;
-}
-function findOperationalOrderAnchorIndex(operationalLeagueOrder, anchor) {
-  return operationalLeagueOrder.findIndex((key2) => operationalKeyMatchesAnchor(key2, anchor));
-}
-function resolveAnchorIndex(sections, operationalLeagueOrder, anchor, mode) {
-  const visibleIndex = findVisibleAnchorIndex(sections, anchor);
-  if (visibleIndex >= 0) {
-    return mode === "before" ? visibleIndex : visibleIndex + 1;
-  }
-  const orderIndex = findOperationalOrderAnchorIndex(operationalLeagueOrder, anchor);
-  if (orderIndex < 0) return sections.length;
-  if (mode === "before") {
-    for (let index = orderIndex; index < operationalLeagueOrder.length; index += 1) {
-      const key2 = operationalLeagueOrder[index];
-      const visible = sections.findIndex(
-        (section) => section.kind === "operational" && section.leagueKey === key2
-      );
-      if (visible >= 0) return visible;
-    }
-    return sections.length;
-  }
-  for (let index = orderIndex; index >= 0; index -= 1) {
-    const key2 = operationalLeagueOrder[index];
-    const visible = sections.findIndex(
-      (section) => section.kind === "operational" && section.leagueKey === key2
-    );
-    if (visible >= 0) return visible + 1;
-  }
-  return 0;
-}
-function resolveLegacyPriorityInsertionIndex(sections, leaguePriority) {
-  for (let index = 0; index < sections.length; index += 1) {
-    const section = sections[index];
-    if (section.kind !== "operational") continue;
-    const importance = resolveLeagueImportanceV1ForLeagueKey(section.leagueKey);
-    if (leaguePriority > importance) return index;
-  }
-  return sections.length;
-}
-function resolveManualInsertionIndex(sections, manual, operationalLeagueOrder) {
-  const insertBefore = manual.insertBeforeLeague?.trim();
-  if (insertBefore) {
-    return resolveAnchorIndex(sections, operationalLeagueOrder, insertBefore, "before");
-  }
-  const insertAfter = manual.insertAfterLeague?.trim();
-  if (insertAfter) {
-    return resolveAnchorIndex(sections, operationalLeagueOrder, insertAfter, "after");
-  }
-  if (manual.leaguePriority != null && Number.isFinite(manual.leaguePriority)) {
-    return resolveLegacyPriorityInsertionIndex(sections, manual.leaguePriority);
-  }
-  return sections.length;
-}
-function mergeGamesSpineSectionsByPriority(operationalLeagueOrder, mergedLeagues, manualSections, skeletonOperationalLeagues) {
-  const operationalWithGames = operationalLeagueOrder.filter((key2) => {
-    if (skeletonOperationalLeagues?.has(key2)) return true;
-    const games = mergedLeagues[key2] ?? [];
-    if (filterGamesSpineSlateForOperationalSportsDay(games).length > 0) return true;
-    return isGrarfWebRenderer() && filterGamesSpineSlateForUpcoming(games).length > 0;
-  });
-  let sections = operationalWithGames.map((leagueKey) => ({
-    kind: "operational",
-    leagueKey
-  }));
-  for (const manual of manualSections) {
-    const insertAt = resolveManualInsertionIndex(sections, manual, operationalLeagueOrder);
-    sections = [
-      ...sections.slice(0, insertAt),
-      { kind: "manual", slug: manual.slug, section: manual },
-      ...sections.slice(insertAt)
-    ];
-  }
-  return sections;
-}
-function gamesSpineManualCollapseKey(slug) {
-  return `manual:${slug}`;
-}
-var GAMES_SPINE_FEATURED_COLLAPSE_KEY, GAMES_SPINE_MORE_LEAGUES_COLLAPSE_KEY;
-var init_mergeGamesSpineSectionsByPriority = __esm({
-  "../grarf/desktop/src/lib/gamesSpine/mergeGamesSpineSectionsByPriority.ts"() {
-    init_define_import_meta_env();
-    init_leagueImportanceV1();
-    init_gamesSpineLeagueDisplayLabel();
-    init_gamesSpineOperationalDate();
-    init_isGrarfWebRenderer();
-    GAMES_SPINE_FEATURED_COLLAPSE_KEY = "FEATURED";
-    GAMES_SPINE_MORE_LEAGUES_COLLAPSE_KEY = "MORE_LEAGUES";
-  }
-});
-
 // ../grarf/desktop/src/hooks/useGamesSpineCollapse.ts
 function collapseStorageKey(statusFilter, leagueKey) {
   return `${statusFilter}:${leagueKey}`;
+}
+function isDesktopGamesSpine() {
+  return isGrarfWebRenderer() || isGrarfElectronRenderer();
 }
 function filterDefaultsCollapsed(statusFilter) {
   if (isGrarfWebRenderer()) return true;
@@ -74573,11 +74621,18 @@ function filterDefaultsCollapsed(statusFilter) {
       return false;
   }
 }
+function defaultLeagueCollapsed(leagueKey, statusFilter) {
+  if (leagueKey === GAMES_SPINE_MORE_LEAGUES_COLLAPSE_KEY) return true;
+  if (isDesktopGamesSpine()) {
+    if (leagueKey === GAMES_SPINE_FEATURED_COLLAPSE_KEY) return false;
+    return true;
+  }
+  return filterDefaultsCollapsed(statusFilter);
+}
 function leagueCollapsedForFilter(map, leagueKey, statusFilter) {
   const stored = map[collapseStorageKey(statusFilter, leagueKey)];
   if (stored === void 0) {
-    if (leagueKey === GAMES_SPINE_MORE_LEAGUES_COLLAPSE_KEY) return true;
-    return filterDefaultsCollapsed(statusFilter);
+    return defaultLeagueCollapsed(leagueKey, statusFilter);
   }
   return stored;
 }
@@ -74611,7 +74666,11 @@ function useGamesSpineCollapse(statusFilter) {
     (leagueKey) => {
       const storageKey = collapseStorageKey(statusFilter, leagueKey);
       setCollapsed((prev) => {
-        const next = !leagueCollapsedForFilter(prev, leagueKey, statusFilter);
+        const wasCollapsed = leagueCollapsedForFilter(prev, leagueKey, statusFilter);
+        const next = !wasCollapsed;
+        if (isDesktopGamesSpine() && wasCollapsed && !next) {
+          useGamesSpineDisplayStore.getState().setLeagueGamesMode(leagueKey, "full");
+        }
         console.log(`${LOG33} League ${next ? "collapsed" : "expanded"}:`, leagueKey);
         return { ...prev, [storageKey]: next };
       });
@@ -74640,6 +74699,7 @@ var init_useGamesSpineCollapse = __esm({
     import_react88 = __toESM(require_react(), 1);
     init_mergeGamesSpineSectionsByPriority();
     init_isGrarfWebRenderer();
+    init_gamesSpineDisplayStore();
     STORAGE_KEY4 = "grarf-games-spine-collapse-v2";
     LOG33 = "[GamesSpine]";
   }
@@ -75236,6 +75296,7 @@ var init_HomeManualGamesSpineSection = __esm({
     init_gamesSpineStickyLayout();
     init_isGrarfWebRenderer();
     init_gamesSpineDisplayStore();
+    init_mergeGamesSpineSectionsByPriority();
     init_bestGameRightNowPresentation();
     init_BestGameRightNowSection();
     init_adminModeStore();
@@ -75269,8 +75330,9 @@ var init_HomeManualGamesSpineSection = __esm({
         displayName: section.leagueLabel
       });
       const [logoFailed, setLogoFailed] = (0, import_react92.useState)(false);
-      const gamesMode = useGamesSpineDisplayStore((state3) => state3.gamesMode);
-      const cardListClass = isGrarfWebRenderer() ? resolveGamesSpineCardListLayoutClass(gamesMode) : GAMES_SPINE_CARD_LIST_CLASS;
+      const manualCollapseKey = gamesSpineManualCollapseKey(section.slug);
+      const gamesMode = useGamesSpineSectionGamesMode(manualCollapseKey);
+      const cardListClass = isGrarfWebRenderer() || isGrarfElectronRenderer() ? resolveGamesSpineCardListLayoutClass(gamesMode) : GAMES_SPINE_CARD_LIST_CLASS;
       const refreshedGames = (0, import_react92.useMemo)(() => {
         if (selectedDate !== todayKey) return [];
         const now = new Date(manualRefreshMs);
@@ -75448,6 +75510,7 @@ var init_HomeManualGamesSpineSection = __esm({
                           game,
                           variant: "rail",
                           homeSpineParity: true,
+                          spineSectionCollapseKey: manualCollapseKey,
                           isSelected: selectedId === game.id,
                           onOpen,
                           onWatchLive,
@@ -77506,6 +77569,10 @@ function HomeGamesToday({
   const isAdminMode = useAdminModeStore((s2) => s2.isAdminMode);
   const showEditorialControls = isGrarfAdmin() && !isAdminMode;
   const { isCollapsed, toggleCollapsed, setAllLeaguesCollapsed } = useGamesSpineCollapse(filter);
+  (0, import_react94.useEffect)(() => {
+    if (!isGrarfWebRenderer()) return;
+    useGamesSpineDisplayStore.getState().bootstrapInitialCompactLeftWidth();
+  }, []);
   const leagues = useLiveGamesStore((s2) => s2.leagues);
   const bundle = useEditorialStore((s2) => s2.bundle);
   const selectedDate = useCommandBriefingStore((s2) => s2.selectedDate);
@@ -77630,10 +77697,12 @@ function HomeGamesToday({
   const expandAllLeagues = (0, import_react94.useCallback)(() => {
     if (gamesSpineLeagueCollapseKeys.length === 0) return;
     setAllLeaguesCollapsed(gamesSpineLeagueCollapseKeys, false);
+    useGamesSpineDisplayStore.getState().applyToolbarExpandAllGames(gamesSpineLeagueCollapseKeys);
   }, [gamesSpineLeagueCollapseKeys, setAllLeaguesCollapsed]);
   const collapseAllLeagues = (0, import_react94.useCallback)(() => {
     if (gamesSpineLeagueCollapseKeys.length === 0) return;
     setAllLeaguesCollapsed(gamesSpineLeagueCollapseKeys, true);
+    useGamesSpineDisplayStore.getState().applyToolbarCollapseAllLeagues();
   }, [gamesSpineLeagueCollapseKeys, setAllLeaguesCollapsed]);
   const allLeaguesExpanded = (0, import_react94.useMemo)(() => {
     if (gamesSpineLeagueCollapseKeys.length === 0) return false;
@@ -78022,6 +78091,7 @@ var init_HomeGamesToday = __esm({
     init_MoreLeaguesWaitlistCard();
     init_HomeEditorialModeBar();
     init_useGamesSpineCollapse();
+    init_gamesSpineDisplayStore();
     init_findLiveGame();
     init_handleWatchLiveClick();
     init_executeWatchOption();
