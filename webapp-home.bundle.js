@@ -24512,22 +24512,35 @@ function tokenizeTennisLabel(raw) {
 function tokenSetFromLabel(raw) {
   return new Set(tokenizeTennisLabel(raw));
 }
+function tennisTokensMatch(a2, b2) {
+  if (a2 === b2) return true;
+  return a2.length >= 4 && b2.length >= 4 && (a2.includes(b2) || b2.includes(a2));
+}
+function tokenMatchesSet(token, set) {
+  if (set.has(token)) return true;
+  for (const other of set) {
+    if (tennisTokensMatch(token, other)) return true;
+  }
+  return false;
+}
+function subsetTokenOverlapScore(a2, b2) {
+  const [smaller, larger] = a2.size <= b2.size ? [a2, b2] : [b2, a2];
+  if (smaller.size === 0) return 0;
+  for (const token of smaller) {
+    if (!tokenMatchesSet(token, larger)) return 0;
+  }
+  return 1;
+}
 function tokenOverlapScore(a2, b2) {
   if (a2.size === 0 || b2.size === 0) return 0;
   let matched = 0;
   for (const token of a2) {
-    if (b2.has(token)) {
-      matched += 1;
-      continue;
-    }
-    for (const other of b2) {
-      if (token.length >= 4 && other.length >= 4 && (token.includes(other) || other.includes(token))) {
-        matched += 0.9;
-        break;
-      }
+    if (tokenMatchesSet(token, b2)) {
+      matched += b2.has(token) ? 1 : 0.9;
     }
   }
-  return matched / Math.max(a2.size, b2.size);
+  const proportional = matched / Math.max(a2.size, b2.size);
+  return Math.max(proportional, subsetTokenOverlapScore(a2, b2));
 }
 function tokenizeTournamentText(raw) {
   const tokens = normalizeTennisText(raw).split(" ").filter((token) => token.length >= 3 && !TOURNAMENT_STOP_WORDS.has(token));
@@ -45422,11 +45435,18 @@ function pickCourtName(metadata) {
   }
   return null;
 }
+function hasPlayableEditorial(row) {
+  return Boolean(row?.id && row?.editorial?.translations?.en?.slug?.trim());
+}
 function pickPrimaryContent(event) {
   const rows = Array.isArray(event.content) ? event.content : [];
   if (rows.length === 0) return null;
-  const live = rows.find((row) => row?.status?.isLive || row?.distributionType?.name === "Live");
-  return live ?? rows[0] ?? null;
+  const playable = rows.filter((row) => hasPlayableEditorial(row));
+  const candidates = playable.length > 0 ? playable : rows;
+  const live = candidates.find(
+    (row) => row?.status?.isLive || row?.distributionType?.name === "Live"
+  );
+  return live ?? candidates[0] ?? null;
 }
 function parseTennisChannelPlusEvent(event) {
   const awayName = event.awayCompetitor?.name?.trim() ?? "";
@@ -45494,9 +45514,22 @@ function isTennisLeague2(game) {
 function isMatchableTennisGame(game) {
   return isTennisLeague2(game) && (game.status === "scheduled" || game.status === "live");
 }
+function unionTokenSets(...sets) {
+  const out = /* @__PURE__ */ new Set();
+  for (const set of sets) {
+    for (const token of set) out.add(token);
+  }
+  return out;
+}
 function gamePlayerTokenSets2(game) {
-  const away = tokenSetFromLabel(game.metadata?.officialAwayName || game.awayTeam || "");
-  const home = tokenSetFromLabel(game.metadata?.officialHomeName || game.homeTeam || "");
+  const away = unionTokenSets(
+    tokenSetFromLabel(game.metadata?.officialAwayName || ""),
+    tokenSetFromLabel(game.awayTeam || "")
+  );
+  const home = unionTokenSets(
+    tokenSetFromLabel(game.metadata?.officialHomeName || ""),
+    tokenSetFromLabel(game.homeTeam || "")
+  );
   return [away, home];
 }
 function eventPlayerTokenSets(stream) {
