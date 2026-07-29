@@ -49067,6 +49067,10 @@ function mergeRetainedLiveTrackerPosts(incoming, previous, _context, nowMs = Dat
     sortLiveTrackerPostsNewestFirst([...merged.values()])
   );
 }
+function resolveCurrentlyLiveLeagueKeys() {
+  const leagues = mergeOperationalLeagueGames(useCanonicalLiveGameStore.getState().leagues);
+  return resolveCurrentlyLiveGamesSpineLeagueKeys(leagues);
+}
 function resolveLiveIngestLeagueKeys(nowMs = Date.now()) {
   const leagues = mergeOperationalLeagueGames(useCanonicalLiveGameStore.getState().leagues);
   return resolveLiveTrackerRssIngestLeagueKeys(
@@ -49084,6 +49088,10 @@ function buildPostRetentionContext() {
 }
 function leagueKeysChanged(a2, b2) {
   return a2.length !== b2.length || a2.some((key2, index) => key2 !== b2[index]);
+}
+function getLiveTrackerPostsSnapshot() {
+  const { posts, byFeedId, activeFeedIds, fetchedAt } = useLiveTrackerPostsStore.getState();
+  return { posts, byFeedId, activeFeedIds, fetchedAt };
 }
 function getLiveTrackerPosts() {
   return useLiveTrackerPostsStore.getState().posts;
@@ -49142,6 +49150,9 @@ var init_liveTrackerPostsStore = __esm({
     useLiveTrackerPostsStore = (0, import_zustand23.create)((set, get) => ({
       ...emptySnapshot3(),
       refresh: async () => {
+        if (resolveCurrentlyLiveLeagueKeys().length === 0) {
+          return getLiveTrackerPostsSnapshot();
+        }
         const retentionContext = buildPostRetentionContext();
         const leagues = mergeOperationalLeagueGames(useCanonicalLiveGameStore.getState().leagues);
         const feeds = resolveActiveLiveTrackerFeeds(retentionContext.liveIngestLeagueKeys, {
@@ -104184,6 +104195,12 @@ var init_HomeLiveTrackerPostLine = __esm({
 });
 
 // ../grarf/desktop/src/components/homeMvp/HomeLiveTrackerLeagueFilterMenu.tsx
+function resolveMaxTilesPerRowAtMinWidth(containerWidth, minTileWidthPx, gapPx = LIVE_TRACKER_LEAGUE_FILTER_TILE_GAP_PX) {
+  if (containerWidth <= 0 || minTileWidthPx <= 0) {
+    return 0;
+  }
+  return Math.floor((containerWidth + gapPx) / (minTileWidthPx + gapPx));
+}
 function resolveLiveTrackerLeagueFilterTileWidth(containerWidth, tileCount, minTileWidthPx, gapPx = LIVE_TRACKER_LEAGUE_FILTER_TILE_GAP_PX) {
   if (tileCount <= 0 || containerWidth <= 0) {
     return minTileWidthPx;
@@ -104208,7 +104225,7 @@ function resolveLiveTrackerLeagueFilterLogoUrl(league2, posts) {
   if (samplePost) {
     return resolveLiveTrackerPostLeagueLogoUrl(samplePost);
   }
-  return void 0;
+  return resolveGamesSpineLeagueLogoUrl(league2);
 }
 function resolveLiveTrackerLeagueFilterDisplayLabel(league2) {
   if (league2 === "ARG1") return "LPF";
@@ -104238,21 +104255,22 @@ function LiveTrackerLeagueFilterTileContent({
 function HomeLiveTrackerLeagueFilterMenu({ posts }) {
   const toggleLeague = useLiveTrackerLeagueFilterStore((state3) => state3.toggleLeague);
   const isLeagueEnabled = useLiveTrackerLeagueFilterStore((state3) => state3.isLeagueEnabled);
+  const leagues = useCanonicalLiveGameStore((state3) => state3.leagues);
   const measureRef = (0, import_react180.useRef)(null);
   const containerRef = (0, import_react180.useRef)(null);
   const [minTileWidthPx, setMinTileWidthPx] = (0, import_react180.useState)(null);
   const [uniformTileWidthPx, setUniformTileWidthPx] = (0, import_react180.useState)(null);
-  const contentLeagueKeys = (0, import_react180.useMemo)(
-    () => sortGrarfLeagueKeysByImportance(deriveLiveTrackerContentLeagueKeys(posts)),
-    [posts]
+  const liveLeagueKeys = (0, import_react180.useMemo)(
+    () => sortGrarfLeagueKeysByImportance(resolveCurrentlyLiveGamesSpineLeagueKeys(leagues)),
+    [leagues]
   );
   const logoUrlByLeague = (0, import_react180.useMemo)(() => {
     const byLeague = /* @__PURE__ */ new Map();
-    for (const league2 of contentLeagueKeys) {
+    for (const league2 of liveLeagueKeys) {
       byLeague.set(league2, resolveLiveTrackerLeagueFilterLogoUrl(league2, posts));
     }
     return byLeague;
-  }, [contentLeagueKeys, posts]);
+  }, [liveLeagueKeys, posts]);
   (0, import_react180.useLayoutEffect)(() => {
     const container = measureRef.current;
     if (!container) return;
@@ -104264,14 +104282,19 @@ function HomeLiveTrackerLeagueFilterMenu({ posts }) {
       maxWidth = Math.max(maxWidth, tile.offsetWidth);
     }
     setMinTileWidthPx(maxWidth > 0 ? Math.ceil(maxWidth) : null);
-  }, [contentLeagueKeys, logoUrlByLeague]);
+  }, [liveLeagueKeys, logoUrlByLeague]);
   (0, import_react180.useLayoutEffect)(() => {
     const container = containerRef.current;
     if (!container || minTileWidthPx == null) return;
     const updateTileWidth = () => {
-      const width = resolveLiveTrackerLeagueFilterTileWidth(
-        container.clientWidth,
-        contentLeagueKeys.length,
+      const containerWidth = container.clientWidth;
+      const maxTilesPerRowAtMinWidth = resolveMaxTilesPerRowAtMinWidth(
+        containerWidth,
+        minTileWidthPx
+      );
+      const width = liveLeagueKeys.length < maxTilesPerRowAtMinWidth ? minTileWidthPx : resolveLiveTrackerLeagueFilterTileWidth(
+        containerWidth,
+        liveLeagueKeys.length,
         minTileWidthPx
       );
       setUniformTileWidthPx(width);
@@ -104280,12 +104303,12 @@ function HomeLiveTrackerLeagueFilterMenu({ posts }) {
     const observer = new ResizeObserver(updateTileWidth);
     observer.observe(container);
     return () => observer.disconnect();
-  }, [contentLeagueKeys.length, minTileWidthPx]);
-  if (contentLeagueKeys.length === 0) {
+  }, [liveLeagueKeys.length, minTileWidthPx]);
+  if (liveLeagueKeys.length === 0) {
     return null;
   }
   return /* @__PURE__ */ (0, import_jsx_runtime161.jsxs)("div", { className: "shrink-0 border-b border-line/40 bg-[#040808]/95 px-2 py-1", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime161.jsx)("div", { className: "pointer-events-none invisible h-0 overflow-hidden", "aria-hidden": true, children: /* @__PURE__ */ (0, import_jsx_runtime161.jsx)("div", { ref: measureRef, className: "flex gap-1", children: contentLeagueKeys.map((league2) => /* @__PURE__ */ (0, import_jsx_runtime161.jsx)(
+    /* @__PURE__ */ (0, import_jsx_runtime161.jsx)("div", { className: "pointer-events-none invisible h-0 overflow-hidden", "aria-hidden": true, children: /* @__PURE__ */ (0, import_jsx_runtime161.jsx)("div", { ref: measureRef, className: "flex gap-1", children: liveLeagueKeys.map((league2) => /* @__PURE__ */ (0, import_jsx_runtime161.jsx)(
       "span",
       {
         "data-livetracker-league-filter-tile-measure": true,
@@ -104307,7 +104330,7 @@ function HomeLiveTrackerLeagueFilterMenu({ posts }) {
         className: "flex flex-wrap items-center gap-1",
         role: "group",
         "aria-label": "LiveTracker league filter",
-        children: contentLeagueKeys.map((league2) => {
+        children: liveLeagueKeys.map((league2) => {
           const enabled = isLeagueEnabled(league2);
           const logoUrl = logoUrlByLeague.get(league2);
           return /* @__PURE__ */ (0, import_jsx_runtime161.jsx)(
@@ -104336,11 +104359,12 @@ var init_HomeLiveTrackerLeagueFilterMenu = __esm({
   "../grarf/desktop/src/components/homeMvp/HomeLiveTrackerLeagueFilterMenu.tsx"() {
     init_define_import_meta_env();
     import_react180 = __toESM(require_react(), 1);
-    init_liveTrackerLeagueFilter();
     init_cn();
     init_gamesSpineLeagueLogoUrls();
     init_resolveLiveTrackerPostLeagueLogoUrl();
+    init_resolveCurrentlyLiveGamesSpineLeagues();
     init_leaguePriority();
+    init_canonicalLiveGameStore();
     init_liveTrackerLeagueFilterStore();
     import_jsx_runtime161 = __toESM(require_jsx_runtime(), 1);
     LIVE_TRACKER_LEAGUE_FILTER_TILE_CLASS = "inline-flex shrink-0 flex-row items-center justify-center gap-1 rounded-sm border px-1.5 py-0.5";
@@ -104762,7 +104786,7 @@ var init_HomeLiveTrackerFoundationPane = __esm({
     init_HomeLiveTrackerSurface();
     import_jsx_runtime165 = __toESM(require_jsx_runtime(), 1);
     LIVE_TRACKER_FEED_POLL_MS = 3e4;
-    LIVE_TRACKER_IDLE_BANNER_COPY = "No leagues are currently live. Catch up on the latest action from today's games.";
+    LIVE_TRACKER_IDLE_BANNER_COPY = "No leagues are currently live. Catch up on the latest action.";
     LIVE_TRACKER_FILTER_EMPTY_COPY = "No LiveTracker posts match the selected leagues.";
   }
 });
