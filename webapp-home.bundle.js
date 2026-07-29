@@ -32731,7 +32731,7 @@ function resolveChannelLogoUrl(channelLabel) {
   }
   return null;
 }
-var NBA_TV_CHANNEL_LOGO_URL, GOLF_CHANNEL_LOGO_URL, PARAMOUNT_CHANNEL_LOGO_URL, CHANNEL_LOGO_BY_LABEL;
+var NBA_TV_CHANNEL_LOGO_URL, GOLF_CHANNEL_LOGO_URL, PARAMOUNT_CHANNEL_LOGO_URL, NWSL_PLUS_CHANNEL_LOGO_URL, CBSSN_CHANNEL_LOGO_URL, CHANNEL_LOGO_BY_LABEL;
 var init_resolveChannelLogoUrl = __esm({
   "../grarf/desktop/src/lib/broadcast/resolveChannelLogoUrl.ts"() {
     init_define_import_meta_env();
@@ -32739,6 +32739,8 @@ var init_resolveChannelLogoUrl = __esm({
     NBA_TV_CHANNEL_LOGO_URL = "/league-logos/channel-nba-tv.png";
     GOLF_CHANNEL_LOGO_URL = "/league-logos/channel-golf-channel.png";
     PARAMOUNT_CHANNEL_LOGO_URL = "/league-logos/channel-paramount-plus.png";
+    NWSL_PLUS_CHANNEL_LOGO_URL = "/league-logos/channel-nwsl-plus.png";
+    CBSSN_CHANNEL_LOGO_URL = "/league-logos/channel-cbs-sports.png";
     CHANNEL_LOGO_BY_LABEL = {
       ABC: "/league-logos/channel-abc.png",
       CBS: "/league-logos/channel-cbs.png",
@@ -32771,7 +32773,11 @@ var init_resolveChannelLogoUrl = __esm({
       FS1: "/league-logos/channel-fs1.png",
       FS2: "/league-logos/channel-fs2.png",
       "FOX SPORTS": "/league-logos/channel-fox.png",
-      "CBS SPORTS NETWORK": "/league-logos/channel-cbs-sports.png",
+      "CBS SPORTS NETWORK": CBSSN_CHANNEL_LOGO_URL,
+      CBSSN: CBSSN_CHANNEL_LOGO_URL,
+      "CBS SPORTS NET": CBSSN_CHANNEL_LOGO_URL,
+      "NWSL+": NWSL_PLUS_CHANNEL_LOGO_URL,
+      "NWSL PLUS": NWSL_PLUS_CHANNEL_LOGO_URL,
       "APPLE TV MLB": "/league-logos/channel-apple-tv.png",
       "APPLE TV": "/league-logos/channel-apple-tv.png",
       "TENNIS CHANNEL": "/league-logos/channel-tennis-channel.png",
@@ -32799,6 +32805,12 @@ function isFoxLogo(options) {
   if (label && resolveChannelLogoUrl(label) === FOX_CHANNEL_LOGO_PATH) return true;
   return false;
 }
+function logoUrlIsNwslPlusAsset(logoUrl) {
+  return logoUrl.trim().toLowerCase().includes("channel-nwsl-plus");
+}
+function logoUrlIsCbssnAsset(logoUrl) {
+  return logoUrl.trim().toLowerCase().includes("channel-cbs-sports");
+}
 function isParamountLogo(options) {
   const logoUrl = options?.logoUrl?.trim();
   if (logoUrl && logoUrlIsParamountAsset(logoUrl)) return true;
@@ -32806,8 +32818,24 @@ function isParamountLogo(options) {
   if (label && resolveChannelLogoUrl(label) === PARAMOUNT_CHANNEL_LOGO_URL) return true;
   return false;
 }
+function isNwslPlusLogo(options) {
+  const logoUrl = options?.logoUrl?.trim();
+  if (logoUrl && logoUrlIsNwslPlusAsset(logoUrl)) return true;
+  const label = options?.label?.trim();
+  if (label && resolveChannelLogoUrl(label) === NWSL_PLUS_CHANNEL_LOGO_URL) return true;
+  return false;
+}
+function isCbssnLogo(options) {
+  const logoUrl = options?.logoUrl?.trim();
+  if (logoUrl && logoUrlIsCbssnAsset(logoUrl)) return true;
+  const label = options?.label?.trim();
+  if (label && resolveChannelLogoUrl(label) === CBSSN_CHANNEL_LOGO_URL) return true;
+  return false;
+}
 function grarfLogoImgBorderRadiusClass(options) {
-  if (isFoxLogo(options) || isParamountLogo(options)) return "rounded-none";
+  if (isFoxLogo(options) || isParamountLogo(options) || isNwslPlusLogo(options) || isCbssnLogo(options)) {
+    return "rounded-none";
+  }
   return GRARF_LOGO_IMG_BORDER_RADIUS_CLASS;
 }
 function grarfLogoImgClassName(...classNames) {
@@ -46226,6 +46254,10 @@ var init_resolveChannelLogoUrl2 = __esm({
       FS2: "/league-logos/channel-fs2.png",
       "FOX SPORTS": "/league-logos/channel-fox.png",
       "CBS SPORTS NETWORK": "/league-logos/channel-cbs-sports.png",
+      CBSSN: "/league-logos/channel-cbs-sports.png",
+      "CBS SPORTS NET": "/league-logos/channel-cbs-sports.png",
+      "NWSL+": "/league-logos/channel-nwsl-plus.png",
+      "NWSL PLUS": "/league-logos/channel-nwsl-plus.png",
       "APPLE TV MLB": "/league-logos/channel-apple-tv.png",
       "APPLE TV": "/league-logos/channel-apple-tv.png",
       "TENNIS CHANNEL": "/league-logos/channel-tennis-channel.png",
@@ -92845,9 +92877,9 @@ function MlbWorkspaceStoryBody({
       {
         className: cn2(
           PANE_CONTENT_CONTAIN,
-          fillColumn ? "flex min-h-0 flex-1 flex-col bg-black" : "flex min-h-0 flex-1 items-center justify-center bg-black p-1"
+          fillColumn ? "flex min-h-0 flex-1 flex-col overflow-hidden bg-black" : "flex min-h-0 flex-1 items-center justify-center bg-black p-1"
         ),
-        children: /* @__PURE__ */ (0, import_jsx_runtime118.jsx)("div", { className: fillColumn ? "h-full w-full" : MLB_WORKSPACE_STORY_FRAME_CLASS, children: hasStoryUrl && story && appVisible ? /* @__PURE__ */ (0, import_jsx_runtime118.jsx)(
+        children: /* @__PURE__ */ (0, import_jsx_runtime118.jsx)("div", { className: fillColumn ? "min-h-0 w-full flex-1" : MLB_WORKSPACE_STORY_FRAME_CLASS, children: hasStoryUrl && story && appVisible ? /* @__PURE__ */ (0, import_jsx_runtime118.jsx)(
           "iframe",
           {
             title: story.title ?? "Game story",
@@ -92858,7 +92890,7 @@ function MlbWorkspaceStoryBody({
             allow: "fullscreen; autoplay; clipboard-write; encrypted-media; picture-in-picture"
           },
           story.storyUrl
-        ) : /* @__PURE__ */ (0, import_jsx_runtime118.jsxs)("div", { className: "flex h-full w-full flex-col gap-2 overflow-y-auto p-2 text-[8px] leading-relaxed text-textdim/95", children: [
+        ) : /* @__PURE__ */ (0, import_jsx_runtime118.jsxs)("div", { className: "flex h-full min-h-0 w-full flex-col gap-2 overflow-y-auto p-2 text-[8px] leading-relaxed text-textdim/95", children: [
           /* @__PURE__ */ (0, import_jsx_runtime118.jsx)("p", { className: "text-[7px] tracking-[0.18em] text-textdim", children: "NO STORY FEED YET" }),
           /* @__PURE__ */ (0, import_jsx_runtime118.jsx)("p", { children: "Official recap / vertical story will load here when MLB content is attached for this game." }),
           /* @__PURE__ */ (0, import_jsx_runtime118.jsxs)("ul", { className: "mt-1 space-y-1 border-t border-line/30 pt-2 text-[8px] text-ambersys/75", children: [
@@ -93289,7 +93321,7 @@ function GameWorkspace({ workspace, className, watchCoordination, suppressWorksp
             {
               className: cn2(
                 PANE_CONTENT_CONTAIN,
-                "flex flex-col",
+                "flex min-h-0 min-w-0 flex-col self-stretch",
                 !isMlbWorkspaceSeparatedPaneLayout && "bg-[#010303]",
                 isMlbWorkspaceSeparatedPaneLayout && !storyColumnCollapsed && cn2(leagueHomePanelShellClass, "min-h-0"),
                 MLB_WORKSPACE_LAYOUT_TRANSITION_CLASS,
@@ -93308,7 +93340,8 @@ function GameWorkspace({ workspace, className, watchCoordination, suppressWorksp
                 {
                   className: cn2(
                     "flex min-h-0 min-w-0 flex-col",
-                    isMlbWorkspaceSeparatedPaneLayout && !storyColumnCollapsed && cn2(PANE_CONTENT_CONTAIN, "min-h-0 flex-1 overflow-hidden p-1.5")
+                    !storyColumnCollapsed && "min-h-0 flex-1",
+                    isMlbWorkspaceSeparatedPaneLayout && !storyColumnCollapsed && cn2(PANE_CONTENT_CONTAIN, "overflow-hidden p-1.5")
                   ),
                   children: [
                     /* @__PURE__ */ (0, import_jsx_runtime118.jsx)(
@@ -93335,7 +93368,7 @@ function GameWorkspace({ workspace, className, watchCoordination, suppressWorksp
                             story,
                             hasStoryUrl,
                             appVisible,
-                            fillColumn: !isMlbWorkspaceFinalGame
+                            fillColumn: true
                           }
                         )
                       }
