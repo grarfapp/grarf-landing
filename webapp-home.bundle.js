@@ -104177,6 +104177,10 @@ function resolveLiveTrackerLeagueFilterLogoUrl(league2, posts) {
   }
   return void 0;
 }
+function resolveLiveTrackerLeagueFilterDisplayLabel(league2) {
+  if (league2 === "ARG1") return "LPF";
+  return league2;
+}
 function LiveTrackerLeagueFilterTileContent({
   league: league2,
   logoUrl
@@ -104195,7 +104199,7 @@ function LiveTrackerLeagueFilterTileContent({
         decoding: "async"
       }
     ) : /* @__PURE__ */ (0, import_jsx_runtime161.jsx)("span", { className: "h-3.5 w-3.5 shrink-0", "aria-hidden": true }),
-    /* @__PURE__ */ (0, import_jsx_runtime161.jsx)("span", { className: "whitespace-nowrap font-mono text-[11px] leading-[11px] tracking-[0.06em]", children: league2 })
+    /* @__PURE__ */ (0, import_jsx_runtime161.jsx)("span", { className: "whitespace-nowrap font-mono text-[11px] leading-[11px] tracking-[0.06em]", children: resolveLiveTrackerLeagueFilterDisplayLabel(league2) })
   ] });
 }
 function HomeLiveTrackerLeagueFilterMenu({ posts }) {
