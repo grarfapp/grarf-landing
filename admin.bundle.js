@@ -13902,6 +13902,7 @@ var LEAGUE_PRIORITY_SEED_ORDER = [
   "UFC",
   "MLS",
   "UEL",
+  "UELQ",
   "LIGUE1",
   "PGA",
   "WNBA",
@@ -13920,6 +13921,7 @@ var LEAGUE_PRIORITY_SEED_ORDER = [
   "LPGA",
   "NCAABB",
   "UECL",
+  "UECLQ",
   "NASCAR_XFINITY",
   "NASCAR_TRUCK",
   "NATIONS",
@@ -14094,6 +14096,9 @@ var GAMES_COLUMN_LEAGUE_LABEL = {
   BUNDESLIGA: "Bundesliga",
   UCL: "Champions League",
   UEL: "Europa League",
+  UELQ: "Europa League Qualifying",
+  UECL: "Conference League",
+  UECLQ: "Conference League Qualifying",
   WWC: "Women's World Cup",
   EURO: "UEFA Euro",
   COPA: "Copa America",
@@ -14180,13 +14185,6 @@ var ESPN_OPERATIONAL_INGEST_LEAGUES = [
     "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/ger.1/scoreboard"
   },
   {
-    "key": "CBWS",
-    "sport": "baseball",
-    "label": "Caribbean Series",
-    "slug": "caribbean-series",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/baseball/caribbean-series/scoreboard"
-  },
-  {
     "key": "CFL",
     "sport": "football",
     "label": "CFL",
@@ -14253,15 +14251,8 @@ var ESPN_OPERATIONAL_INGEST_LEAGUES = [
     "key": "CRICKET_ICC",
     "sport": "cricket",
     "label": "ICC Cricket",
-    "slug": "24527",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/cricket/24527/scoreboard"
-  },
-  {
-    "key": "CWHOC",
-    "sport": "hockey",
-    "label": "NCAA Women's Hockey",
-    "slug": "womens-college-hockey",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/hockey/womens-college-hockey/scoreboard"
+    "slug": "24597",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/cricket/24597/scoreboard"
   },
   {
     "key": "DP_WORLD",
@@ -14453,13 +14444,6 @@ var ESPN_OPERATIONAL_INGEST_LEAGUES = [
     "endpoint": "https://site.api.espn.com/apis/site/v2/sports/field-hockey/womens-college-field-hockey/scoreboard"
   },
   {
-    "key": "NCAAH",
-    "sport": "hockey",
-    "label": "NCAA Men's Ice Hockey",
-    "slug": "mens-college-hockey",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/hockey/mens-college-hockey/scoreboard"
-  },
-  {
     "key": "NCAALAX",
     "sport": "lacrosse",
     "label": "NCAA Lacrosse",
@@ -14528,13 +14512,6 @@ var ESPN_OPERATIONAL_INGEST_LEAGUES = [
     "label": "Primeira Liga",
     "slug": "por.1",
     "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/por.1/scoreboard"
-  },
-  {
-    "key": "RUGB_289262",
-    "sport": "rugby",
-    "label": "Major League Rugby",
-    "slug": "289262",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/rugby/289262/scoreboard"
   },
   {
     "key": "RUGBYPREM",
@@ -14614,11 +14591,25 @@ var ESPN_OPERATIONAL_INGEST_LEAGUES = [
     "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/uefa.europa.conf/scoreboard"
   },
   {
+    "key": "UECLQ",
+    "sport": "soccer",
+    "label": "UEFA Conference League Qualifying",
+    "slug": "uefa.europa.conf_qual",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/uefa.europa.conf_qual/scoreboard"
+  },
+  {
     "key": "UEL",
     "sport": "soccer",
     "label": "Europa League",
     "slug": "uefa.europa",
     "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/uefa.europa/scoreboard"
+  },
+  {
+    "key": "UELQ",
+    "sport": "soccer",
+    "label": "UEFA Europa League Qualifying",
+    "slug": "uefa.europa_qual",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/uefa.europa_qual/scoreboard"
   },
   {
     "key": "UFC",
@@ -14972,6 +14963,9 @@ var GRARF_SPORT_HIERARCHY = {
       "SAUDI",
       "SUPERLIG",
       "UEL",
+      "UELQ",
+      "UECL",
+      "UECLQ",
       "WWC",
       "EURO",
       "COPA",

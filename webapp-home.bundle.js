@@ -24099,6 +24099,7 @@ var init_leaguePrioritySeed_data = __esm({
       "UFC",
       "MLS",
       "UEL",
+      "UELQ",
       "LIGUE1",
       "PGA",
       "WNBA",
@@ -24117,6 +24118,7 @@ var init_leaguePrioritySeed_data = __esm({
       "LPGA",
       "NCAABB",
       "UECL",
+      "UECLQ",
       "NASCAR_XFINITY",
       "NASCAR_TRUCK",
       "NATIONS",
@@ -24333,6 +24335,9 @@ var init_gamesColumnLeagues = __esm({
       BUNDESLIGA: "Bundesliga",
       UCL: "Champions League",
       UEL: "Europa League",
+      UELQ: "Europa League Qualifying",
+      UECL: "Conference League",
+      UECLQ: "Conference League Qualifying",
       WWC: "Women's World Cup",
       EURO: "UEFA Euro",
       COPA: "Copa America",
@@ -24409,6 +24414,9 @@ var init_grarfSportHierarchy = __esm({
           "SAUDI",
           "SUPERLIG",
           "UEL",
+          "UELQ",
+          "UECL",
+          "UECLQ",
           "WWC",
           "EURO",
           "COPA",
@@ -25313,6 +25321,9 @@ var init_espnGameUrls = __esm({
       "BUNDESLIGA",
       "UCL",
       "UEL",
+      "UELQ",
+      "UECL",
+      "UECLQ",
       "WWC",
       "EURO",
       "COPA",
@@ -32939,6 +32950,9 @@ var init_gamesSpineLeagueLogoUrls = __esm({
       SUDAMERICANA: COPA_SUDAMERICANA_LEAGUE_LOGO_URL,
       UCL: UCL_LEAGUE_LOGO_URL,
       UEL: "https://a.espncdn.com/i/leaguelogos/soccer/500/2310.png",
+      UELQ: "https://a.espncdn.com/i/leaguelogos/soccer/500/2310.png",
+      UECL: "https://a.espncdn.com/i/leaguelogos/soccer/500/20296.png",
+      UECLQ: "https://a.espncdn.com/i/leaguelogos/soccer/500/20296.png",
       WWC: "https://a.espncdn.com/i/leaguelogos/soccer/500/60.png",
       EURO: "https://a.espncdn.com/i/leaguelogos/soccer/500/74.png",
       COPA: "https://a.espncdn.com/i/leaguelogos/soccer/500/83.png",
@@ -33810,13 +33824,6 @@ var init_espnOperationalLeagueRegistry_generated = __esm({
         "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/ger.1/scoreboard"
       },
       {
-        "key": "CBWS",
-        "sport": "baseball",
-        "label": "Caribbean Series",
-        "slug": "caribbean-series",
-        "endpoint": "https://site.api.espn.com/apis/site/v2/sports/baseball/caribbean-series/scoreboard"
-      },
-      {
         "key": "CFL",
         "sport": "football",
         "label": "CFL",
@@ -33883,15 +33890,8 @@ var init_espnOperationalLeagueRegistry_generated = __esm({
         "key": "CRICKET_ICC",
         "sport": "cricket",
         "label": "ICC Cricket",
-        "slug": "24527",
-        "endpoint": "https://site.api.espn.com/apis/site/v2/sports/cricket/24527/scoreboard"
-      },
-      {
-        "key": "CWHOC",
-        "sport": "hockey",
-        "label": "NCAA Women's Hockey",
-        "slug": "womens-college-hockey",
-        "endpoint": "https://site.api.espn.com/apis/site/v2/sports/hockey/womens-college-hockey/scoreboard"
+        "slug": "24597",
+        "endpoint": "https://site.api.espn.com/apis/site/v2/sports/cricket/24597/scoreboard"
       },
       {
         "key": "DP_WORLD",
@@ -34083,13 +34083,6 @@ var init_espnOperationalLeagueRegistry_generated = __esm({
         "endpoint": "https://site.api.espn.com/apis/site/v2/sports/field-hockey/womens-college-field-hockey/scoreboard"
       },
       {
-        "key": "NCAAH",
-        "sport": "hockey",
-        "label": "NCAA Men's Ice Hockey",
-        "slug": "mens-college-hockey",
-        "endpoint": "https://site.api.espn.com/apis/site/v2/sports/hockey/mens-college-hockey/scoreboard"
-      },
-      {
         "key": "NCAALAX",
         "sport": "lacrosse",
         "label": "NCAA Lacrosse",
@@ -34158,13 +34151,6 @@ var init_espnOperationalLeagueRegistry_generated = __esm({
         "label": "Primeira Liga",
         "slug": "por.1",
         "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/por.1/scoreboard"
-      },
-      {
-        "key": "RUGB_289262",
-        "sport": "rugby",
-        "label": "Major League Rugby",
-        "slug": "289262",
-        "endpoint": "https://site.api.espn.com/apis/site/v2/sports/rugby/289262/scoreboard"
       },
       {
         "key": "RUGBYPREM",
@@ -34244,11 +34230,25 @@ var init_espnOperationalLeagueRegistry_generated = __esm({
         "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/uefa.europa.conf/scoreboard"
       },
       {
+        "key": "UECLQ",
+        "sport": "soccer",
+        "label": "UEFA Conference League Qualifying",
+        "slug": "uefa.europa.conf_qual",
+        "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/uefa.europa.conf_qual/scoreboard"
+      },
+      {
         "key": "UEL",
         "sport": "soccer",
         "label": "Europa League",
         "slug": "uefa.europa",
         "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/uefa.europa/scoreboard"
+      },
+      {
+        "key": "UELQ",
+        "sport": "soccer",
+        "label": "UEFA Europa League Qualifying",
+        "slug": "uefa.europa_qual",
+        "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/uefa.europa_qual/scoreboard"
       },
       {
         "key": "UFC",
@@ -55410,6 +55410,9 @@ var init_inferOperationalAlerts = __esm({
       "BUNDESLIGA",
       "UCL",
       "UEL",
+      "UELQ",
+      "UECL",
+      "UECLQ",
       "WWC",
       "EURO",
       "COPA",
@@ -68276,6 +68279,9 @@ var init_commandBriefingLeagueLabel = __esm({
       BRA1: "BRASILEIR\xC3O",
       UCL: "CHAMPIONS LEAGUE",
       UEL: "EUROPA LEAGUE",
+      UELQ: "EUROPA LEAGUE QUALIFYING",
+      UECL: "CONFERENCE LEAGUE",
+      UECLQ: "CONFERENCE LEAGUE QUALIFYING",
       WWC: "WOMEN'S WORLD CUP",
       EURO: "UEFA EURO",
       COPA: "COPA AMERICA",
@@ -69056,6 +69062,9 @@ var init_resolveGamesSpineCardTimingLabel = __esm({
       "BUNDESLIGA",
       "UCL",
       "UEL",
+      "UELQ",
+      "UECL",
+      "UECLQ",
       "WWC",
       "EURO",
       "COPA",
@@ -69345,6 +69354,9 @@ var init_resolveTeamLogoUrl = __esm({
       "BUNDESLIGA",
       "UCL",
       "UEL",
+      "UELQ",
+      "UECL",
+      "UECLQ",
       "WWC",
       "EURO",
       "COPA",
@@ -71865,6 +71877,9 @@ var init_gamesSpineSummary = __esm({
       "BUNDESLIGA",
       "UCL",
       "UEL",
+      "UELQ",
+      "UECL",
+      "UECLQ",
       "WWC",
       "EURO",
       "COPA",
@@ -103880,7 +103895,9 @@ var init_leagueColors = __esm({
       LIGAMX: "#00A859",
       UCL: "#001F5B",
       UEL: "#FF5A00",
+      UELQ: "#FF5A00",
       UECL: "#00B388",
+      UECLQ: "#00B388",
       FACUP: "#0066CC",
       CARABAOCUP: "#00843D",
       COPADELREY: "#C41230",
@@ -103967,7 +103984,11 @@ var init_leagueColors = __esm({
       UEFACHAMPIONSLEAGUE: "UCL",
       UECL: "UECL",
       UEFACONFERENCELEAGUE: "UECL",
+      UEFACONFERENCELEAGUEQUALIFYING: "UECL",
+      UECLQ: "UECL",
       UEFAEUROPALEAGUE: "UEL",
+      UEFAEUROPAQUALIFYING: "UEL",
+      UELQ: "UEL",
       UFCMMA: "UFC",
       USLCHAMPIONSHIP: "USL",
       USLLEAGUEONE: "USL1",
