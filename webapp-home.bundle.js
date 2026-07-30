@@ -88215,15 +88215,20 @@ function measureWebsitePaneScrollLeft(root, pane) {
   return root.scrollLeft + (paneRect.left - rootRect.left);
 }
 function scrollWebsitePaneToViewportStart(root, pane, control) {
-  const targetScrollLeft = measureWebsitePaneScrollLeft(root, pane);
+  const targetScrollLeft = Math.max(0, measureWebsitePaneScrollLeft(root, pane));
   control.allowProgrammaticScroll = true;
-  root.scrollLeft = targetScrollLeft;
+  if (control.programmaticScrollTimer) {
+    window.clearTimeout(control.programmaticScrollTimer);
+  }
+  root.scrollTo({ left: targetScrollLeft, behavior: "smooth" });
   control.lockedLeft = targetScrollLeft;
-  window.requestAnimationFrame(() => {
+  control.programmaticScrollTimer = window.setTimeout(() => {
+    control.lockedLeft = root.scrollLeft;
     control.allowProgrammaticScroll = false;
-  });
+    control.programmaticScrollTimer = 0;
+  }, BROWSER_WEBSITE_PANE_PROGRAMMATIC_SCROLL_MS);
 }
-var import_react124, import_jsx_runtime109, HomeLeagueStackSection;
+var import_react124, import_jsx_runtime109, BROWSER_WEBSITE_PANE_PROGRAMMATIC_SCROLL_MS, BROWSER_WEBSITE_PANE_SCROLL_RETRY_MAX_FRAMES, HomeLeagueStackSection;
 var init_HomeLeagueStackSection = __esm({
   "../grarf/desktop/src/components/homeMvp/HomeLeagueStackSection.tsx"() {
     init_define_import_meta_env();
@@ -88234,6 +88239,8 @@ var init_HomeLeagueStackSection = __esm({
     init_homeSourceFocusStore();
     init_HomeSourceWebPane();
     import_jsx_runtime109 = __toESM(require_jsx_runtime(), 1);
+    BROWSER_WEBSITE_PANE_PROGRAMMATIC_SCROLL_MS = 500;
+    BROWSER_WEBSITE_PANE_SCROLL_RETRY_MAX_FRAMES = 180;
     HomeLeagueStackSection = (0, import_react124.forwardRef)(function HomeLeagueStackSection2({ section, mountWebviews = true, onSourceArticleNavigate, onSourceFullscreen, leagueWorkspacePane = false }, ref) {
       const isWebRenderer = isGrarfWebRenderer();
       const webFullscreenSessionKey = useHomeSourceFocusStore((state3) => state3.webFullscreenSessionKey);
@@ -88302,15 +88309,15 @@ var init_HomeLeagueStackSection = __esm({
         }
       }, [hasWebFullscreen, section, activeSourceId, focusSessionKey, focusGeneration]);
       (0, import_react124.useEffect)(() => {
-        if (!focusSessionKey || hasWebFullscreen) return;
+        if (!isWebRenderer || leagueWorkspacePane || !focusSessionKey || hasWebFullscreen) return;
         const root = scrollRef.current;
         if (!root) return;
         const control = horizontalScrollControlRef.current;
         let cancelled = false;
         let rafId = 0;
         let resizeObserver = null;
-        let lastMeasuredTarget = null;
-        let stableFrames = 0;
+        let resizeDebounceTimer = 0;
+        let retryFrames = 0;
         const completeScroll = (pane) => {
           scrollWebsitePaneToViewportStart(root, pane, control);
         };
@@ -88320,39 +88327,44 @@ var init_HomeLeagueStackSection = __esm({
             `[data-home-website-pane-session="${focusSessionKey}"]`
           );
           if (!pane) {
-            rafId = window.requestAnimationFrame(tryScroll);
-            return;
-          }
-          const targetScrollLeft = measureWebsitePaneScrollLeft(root, pane);
-          if (lastMeasuredTarget != null && Math.abs(targetScrollLeft - lastMeasuredTarget) < 1) {
-            stableFrames += 1;
-          } else {
-            stableFrames = 0;
-            lastMeasuredTarget = targetScrollLeft;
-          }
-          if (stableFrames < 2) {
-            rafId = window.requestAnimationFrame(tryScroll);
+            retryFrames += 1;
+            if (retryFrames < BROWSER_WEBSITE_PANE_SCROLL_RETRY_MAX_FRAMES) {
+              rafId = window.requestAnimationFrame(tryScroll);
+            }
             return;
           }
           completeScroll(pane);
         };
+        const scheduleScroll = () => {
+          if (rafId) window.cancelAnimationFrame(rafId);
+          rafId = window.requestAnimationFrame(tryScroll);
+        };
         const flexRow = root.firstElementChild;
         if (flexRow instanceof HTMLElement) {
           resizeObserver = new ResizeObserver(() => {
-            stableFrames = 0;
-            lastMeasuredTarget = null;
-            if (rafId) window.cancelAnimationFrame(rafId);
-            rafId = window.requestAnimationFrame(tryScroll);
+            if (resizeDebounceTimer) window.clearTimeout(resizeDebounceTimer);
+            resizeDebounceTimer = window.setTimeout(() => {
+              resizeDebounceTimer = 0;
+              scheduleScroll();
+            }, 50);
           });
           resizeObserver.observe(flexRow);
         }
-        rafId = window.requestAnimationFrame(tryScroll);
+        scheduleScroll();
         return () => {
           cancelled = true;
           if (rafId) window.cancelAnimationFrame(rafId);
+          if (resizeDebounceTimer) window.clearTimeout(resizeDebounceTimer);
           resizeObserver?.disconnect();
         };
-      }, [focusSessionKey, focusGeneration, hasWebFullscreen, section.sources]);
+      }, [
+        focusSessionKey,
+        focusGeneration,
+        hasWebFullscreen,
+        isWebRenderer,
+        leagueWorkspacePane,
+        section.sources
+      ]);
       (0, import_react124.useEffect)(() => {
         if (hasWebFullscreen || !isWebRenderer) return;
         const root = scrollRef.current;
