@@ -93213,7 +93213,8 @@ function GameWorkspace({ workspace, className, watchCoordination, suppressWorksp
   const isMlbWorkspaceFinalGame = workspaceGame?.status === "final";
   const isMlbWorkspaceLiveGame = workspaceGame?.status === "live";
   const isMlbWorkspaceUpcomingGame = workspaceGame?.status === "scheduled";
-  const isMlbWorkspaceSeparatedPaneLayout = isMlbWorkspaceLiveGame || isMlbWorkspaceUpcomingGame;
+  const isMlbWorkspaceSeparatedPaneLayout = isMlbWorkspaceLiveGame || isMlbWorkspaceUpcomingGame || isMlbWorkspaceFinalGame;
+  const isMlbWorkspaceStackedFinalPaneLayout = isMlbWorkspaceFinalGame && isMlbWorkspaceSeparatedPaneLayout;
   const showMlbWorkspaceStoryCollapseControl = isMlbWorkspaceLiveGame;
   const storyColumnCollapsed = showMlbWorkspaceStoryCollapseControl && storyCollapsed;
   const watchHeaderGame = canonicalGame ?? workspaceGame ?? null;
@@ -93289,84 +93290,119 @@ function GameWorkspace({ workspace, className, watchCoordination, suppressWorksp
             "div",
             {
               className: cn2(
-                isMlbWorkspaceSeparatedPaneLayout ? cn2(leagueHomePanelShellClass, "flex min-h-0 min-w-0 flex-1 flex-col") : "flex min-h-0 min-w-0 flex-1 flex-col",
+                "flex min-h-0 min-w-0 flex-1 flex-col",
+                isMlbWorkspaceSeparatedPaneLayout && !isMlbWorkspaceStackedFinalPaneLayout && cn2(leagueHomePanelShellClass, "flex min-h-0 min-w-0 flex-1 flex-col"),
+                isMlbWorkspaceStackedFinalPaneLayout && "gap-2.5",
                 !isMlbWorkspaceSeparatedPaneLayout && !storyColumnCollapsed && "border-r border-line/50",
                 MLB_WORKSPACE_LAYOUT_TRANSITION_CLASS
               ),
-              children: /* @__PURE__ */ (0, import_jsx_runtime118.jsxs)(
-                "div",
-                {
-                  className: cn2(
-                    "flex min-h-0 min-w-0 flex-1 flex-col",
-                    isMlbWorkspaceSeparatedPaneLayout && cn2(PANE_CONTENT_CONTAIN, "min-h-0 overflow-hidden p-1.5")
-                  ),
-                  children: [
-                    showMlbWorkspaceWatchReplayHeader && watchHeaderGame && !hasMlbWorkspaceMatchedHighlight ? /* @__PURE__ */ (0, import_jsx_runtime118.jsx)("div", { className: "shrink-0 w-full border-b border-line/40", children: /* @__PURE__ */ (0, import_jsx_runtime118.jsx)(
+              children: isMlbWorkspaceStackedFinalPaneLayout ? /* @__PURE__ */ (0, import_jsx_runtime118.jsxs)(import_jsx_runtime118.Fragment, { children: [
+                showMlbWorkspaceWatchReplayHeader && watchHeaderGame && !hasMlbWorkspaceMatchedHighlight ? /* @__PURE__ */ (0, import_jsx_runtime118.jsx)("div", { className: cn2(MLB_WORKSPACE_SECTION_PANEL_CLASS, "shrink-0"), children: /* @__PURE__ */ (0, import_jsx_runtime118.jsx)("div", { className: MLB_WORKSPACE_SECTION_PANEL_BODY_CLASS, children: /* @__PURE__ */ (0, import_jsx_runtime118.jsx)(
+                  MlbWorkspaceWatchHeaderButton,
+                  {
+                    watchLiveGame: watchHeaderGame,
+                    onWatchLive,
+                    label: "[ WATCH REPLAY ]"
+                  }
+                ) }) }) : showMlbWorkspaceWatchReplayEnhancedFinalLayout && watchHeaderGame ? /* @__PURE__ */ (0, import_jsx_runtime118.jsxs)("div", { className: "flex shrink-0 flex-row items-stretch gap-2.5", children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime118.jsx)("div", { className: cn2(MLB_WORKSPACE_SECTION_PANEL_CLASS, "min-w-0 flex-1"), children: /* @__PURE__ */ (0, import_jsx_runtime118.jsx)("div", { className: MLB_WORKSPACE_SECTION_PANEL_BODY_CLASS, children: /* @__PURE__ */ (0, import_jsx_runtime118.jsx)(
+                    GameWorkspaceHighlightsPlaceholder,
+                    {
+                      gameId: payload.gameId,
+                      catchupContextGame,
+                      videoOnly: true,
+                      className: "border-l-0"
+                    }
+                  ) }) }),
+                  /* @__PURE__ */ (0, import_jsx_runtime118.jsxs)("div", { className: "flex min-h-0 min-w-0 shrink-0 flex-col gap-2.5 self-stretch", children: [
+                    /* @__PURE__ */ (0, import_jsx_runtime118.jsx)("div", { className: cn2(MLB_WORKSPACE_SECTION_PANEL_CLASS, "shrink-0"), children: /* @__PURE__ */ (0, import_jsx_runtime118.jsx)("div", { className: MLB_WORKSPACE_SECTION_PANEL_BODY_CLASS, children: /* @__PURE__ */ (0, import_jsx_runtime118.jsx)(
                       MlbWorkspaceWatchHeaderButton,
                       {
                         watchLiveGame: watchHeaderGame,
                         onWatchLive,
-                        label: "[ WATCH REPLAY ]"
+                        label: "[ WATCH REPLAY ]",
+                        fullWidth: false
                       }
-                    ) }) : showMlbWorkspaceWatchReplayEnhancedFinalLayout && watchHeaderGame ? /* @__PURE__ */ (0, import_jsx_runtime118.jsxs)("div", { className: "mb-2.5 flex shrink-0 flex-row items-stretch gap-2", children: [
-                      /* @__PURE__ */ (0, import_jsx_runtime118.jsx)(
-                        "div",
-                        {
-                          className: cn2(
-                            GAMES_SPINE_CARD_PANEL_BASE_CLASS,
-                            "min-w-0 flex-1 overflow-hidden"
-                          ),
-                          children: /* @__PURE__ */ (0, import_jsx_runtime118.jsx)(
-                            GameWorkspaceHighlightsPlaceholder,
-                            {
-                              gameId: payload.gameId,
-                              catchupContextGame,
-                              videoOnly: true,
-                              className: "border-l-0"
-                            }
-                          )
-                        }
-                      ),
-                      /* @__PURE__ */ (0, import_jsx_runtime118.jsxs)("div", { className: "flex min-h-0 shrink-0 flex-col gap-2 self-stretch", children: [
-                        /* @__PURE__ */ (0, import_jsx_runtime118.jsx)("div", { className: cn2(MLB_WORKSPACE_WATCH_REPLAY_PANEL_CLASS, "shrink-0 overflow-hidden"), children: /* @__PURE__ */ (0, import_jsx_runtime118.jsx)(
-                          MlbWorkspaceWatchHeaderButton,
-                          {
-                            watchLiveGame: watchHeaderGame,
-                            onWatchLive,
-                            label: "[ WATCH REPLAY ]",
-                            fullWidth: false
-                          }
-                        ) }),
-                        /* @__PURE__ */ (0, import_jsx_runtime118.jsx)(
-                          "div",
-                          {
-                            className: cn2(
-                              GAMES_SPINE_CARD_PANEL_BASE_CLASS,
-                              "flex min-h-0 flex-1 flex-col overflow-hidden"
-                            ),
-                            children: /* @__PURE__ */ (0, import_jsx_runtime118.jsx)(MlbWorkspaceStandingsContextPrototype, { game: watchHeaderGame })
-                          }
-                        )
-                      ] })
-                    ] }) : isMlbWorkspaceFinalGame ? /* @__PURE__ */ (0, import_jsx_runtime118.jsx)(
+                    ) }) }),
+                    /* @__PURE__ */ (0, import_jsx_runtime118.jsx)(
                       "div",
                       {
                         className: cn2(
-                          GAMES_SPINE_CARD_PANEL_BASE_CLASS,
-                          "shrink-0 overflow-hidden border-b border-line/40"
+                          MLB_WORKSPACE_SECTION_PANEL_CLASS,
+                          "flex min-h-0 min-w-[11rem] flex-1 flex-col self-stretch"
                         ),
                         children: /* @__PURE__ */ (0, import_jsx_runtime118.jsx)(
-                          GameWorkspaceHighlightsPlaceholder,
+                          MlbWorkspaceStandingsContextPrototype,
                           {
-                            gameId: payload.gameId,
-                            catchupContextGame,
-                            videoOnly: true,
-                            className: "shrink-0 border-l-0"
+                            game: watchHeaderGame,
+                            className: "min-h-0 flex-1"
                           }
                         )
                       }
-                    ) : null,
-                    !(showMlbWorkspaceWatchReplayHeader && watchHeaderGame) ? /* @__PURE__ */ (0, import_jsx_runtime118.jsx)(
+                    )
+                  ] })
+                ] }) : /* @__PURE__ */ (0, import_jsx_runtime118.jsx)("div", { className: cn2(MLB_WORKSPACE_SECTION_PANEL_CLASS, "shrink-0"), children: /* @__PURE__ */ (0, import_jsx_runtime118.jsx)("div", { className: MLB_WORKSPACE_SECTION_PANEL_BODY_CLASS, children: /* @__PURE__ */ (0, import_jsx_runtime118.jsx)(
+                  GameWorkspaceHighlightsPlaceholder,
+                  {
+                    gameId: payload.gameId,
+                    catchupContextGame,
+                    videoOnly: true,
+                    className: "shrink-0 border-l-0"
+                  }
+                ) }) }),
+                /* @__PURE__ */ (0, import_jsx_runtime118.jsx)(
+                  "div",
+                  {
+                    className: cn2(
+                      MLB_WORKSPACE_SECTION_PANEL_CLASS,
+                      "flex min-h-0 min-w-0 flex-1 flex-col"
+                    ),
+                    children: /* @__PURE__ */ (0, import_jsx_runtime118.jsxs)(
+                      "div",
+                      {
+                        className: cn2(
+                          MLB_WORKSPACE_SECTION_PANEL_BODY_CLASS,
+                          "flex min-h-0 flex-1 flex-col"
+                        ),
+                        children: [
+                          !(showMlbWorkspaceWatchReplayHeader && watchHeaderGame) ? /* @__PURE__ */ (0, import_jsx_runtime118.jsx)(
+                            MlbWorkspaceGamecenterHeader,
+                            {
+                              showGcSwitcher,
+                              activeGamecenter,
+                              gamecenterProviders: payload.gamecenterProviders,
+                              setGcId,
+                              showWatchLiveHeader: showMlbWorkspaceWatchLiveHeader,
+                              watchLiveGame: watchHeaderGame,
+                              onWatchLive
+                            }
+                          ) : null,
+                          /* @__PURE__ */ (0, import_jsx_runtime118.jsx)(
+                            MlbWebWorkspaceGamecenterPanel,
+                            {
+                              showGcSwitcher,
+                              activeGamecenter,
+                              gamecenterProviders: payload.gamecenterProviders,
+                              setGcId,
+                              appVisible,
+                              suppressWorkspaceChrome,
+                              chromeHeaderInParent: true
+                            }
+                          )
+                        ]
+                      }
+                    )
+                  }
+                )
+              ] }) : /* @__PURE__ */ (0, import_jsx_runtime118.jsxs)(
+                "div",
+                {
+                  className: cn2(
+                    "flex min-h-0 min-w-0 flex-1 flex-col",
+                    isMlbWorkspaceSeparatedPaneLayout && MLB_WORKSPACE_SECTION_PANEL_BODY_CLASS
+                  ),
+                  children: [
+                    /* @__PURE__ */ (0, import_jsx_runtime118.jsx)(
                       MlbWorkspaceGamecenterHeader,
                       {
                         showGcSwitcher,
@@ -93377,7 +93413,7 @@ function GameWorkspace({ workspace, className, watchCoordination, suppressWorksp
                         watchLiveGame: watchHeaderGame,
                         onWatchLive
                       }
-                    ) : null,
+                    ),
                     /* @__PURE__ */ (0, import_jsx_runtime118.jsx)(
                       MlbWebWorkspaceGamecenterPanel,
                       {
@@ -93592,7 +93628,7 @@ function GameWorkspace({ workspace, className, watchCoordination, suppressWorksp
     ] }) })
   ] });
 }
-var import_react147, import_jsx_runtime118, MLB_WORKSPACE_WATCH_REPLAY_PANEL_CLASS, STORY_COLUMN_CLASS, MLB_WORKSPACE_STORY_FRAME_CLASS, STORY_COLUMN_EXPANDED_CLASS, STORY_COLUMN_CONTENT_COLLAPSED_CLASS, MLB_WORKSPACE_LAYOUT_TRANSITION_CLASS, STORY_COLUMN_COLLAPSED_SHELL_CLASS, STORY_PANEL_MODE_CONTROL_BTN, MLB_WORKSPACE_COLUMN_HEADER_ROW_CLASS, MLB_WORKSPACE_WATCH_LIVE_HEADER_BUTTON_CLASS, WEB_MLB_RENDER_GAMECENTER_PROVIDER_SELECTOR;
+var import_react147, import_jsx_runtime118, STORY_COLUMN_CLASS, MLB_WORKSPACE_STORY_FRAME_CLASS, STORY_COLUMN_EXPANDED_CLASS, STORY_COLUMN_CONTENT_COLLAPSED_CLASS, MLB_WORKSPACE_SECTION_PANEL_CLASS, MLB_WORKSPACE_SECTION_PANEL_BODY_CLASS, MLB_WORKSPACE_LAYOUT_TRANSITION_CLASS, STORY_COLUMN_COLLAPSED_SHELL_CLASS, STORY_PANEL_MODE_CONTROL_BTN, MLB_WORKSPACE_COLUMN_HEADER_ROW_CLASS, MLB_WORKSPACE_WATCH_LIVE_HEADER_BUTTON_CLASS, WEB_MLB_RENDER_GAMECENTER_PROVIDER_SELECTOR;
 var init_GameWorkspace = __esm({
   "../grarf/desktop/src/components/gameWorkspace/GameWorkspace.tsx"() {
     init_define_import_meta_env();
@@ -93623,21 +93659,17 @@ var init_GameWorkspace = __esm({
     init_operationalModeStore();
     init_BroadcastChannelLogo();
     init_resolveGameChannelPresentation();
-    init_gamesSpineCardLayout();
     init_LeagueHomePanel();
     import_jsx_runtime118 = __toESM(require_jsx_runtime(), 1);
-    MLB_WORKSPACE_WATCH_REPLAY_PANEL_CLASS = cn2(
-      "box-border w-full min-w-0 max-w-full rounded-lg border border-[#071014] bg-[#071014]",
-      "[&_button]:!border-[#071014] [&_button]:!border-l-[#071014]",
-      "[&_button]:!shadow-none [&_button]:!outline-none [&_button]:!ring-0",
-      "[&_button:hover]:!border-[#071014] [&_button:hover]:!border-l-[#071014] [&_button:hover]:!shadow-none",
-      "[&_button:focus-visible]:!border-[#071014] [&_button:focus-visible]:!border-l-[#071014]",
-      "[&_button:focus-visible]:!shadow-none [&_button:focus-visible]:!outline-none [&_button:focus-visible]:!ring-0"
-    );
     STORY_COLUMN_CLASS = "flex min-h-0 min-w-0 max-w-[38%] flex-[0_1_38%] flex-col border-l border-line/40 bg-[#010303]";
     MLB_WORKSPACE_STORY_FRAME_CLASS = "aspect-[9/16] h-full max-h-full w-auto max-w-full";
     STORY_COLUMN_EXPANDED_CLASS = "min-w-0 max-w-[38%] flex-[0_1_38%] basis-[38%]";
     STORY_COLUMN_CONTENT_COLLAPSED_CLASS = "max-w-0 flex-[0_0_0px] basis-0 overflow-hidden border-l-0 opacity-0 pointer-events-none";
+    MLB_WORKSPACE_SECTION_PANEL_CLASS = "flex min-w-0 flex-col overflow-hidden rounded-[2px] border border-[#24363c]/55 bg-[#010303] shadow-[inset_0_0_0_1px_rgba(10,20,24,0.92),inset_0_1px_0_rgba(86,247,255,0.02)]";
+    MLB_WORKSPACE_SECTION_PANEL_BODY_CLASS = cn2(
+      PANE_CONTENT_CONTAIN,
+      "min-h-0 overflow-hidden p-1.5"
+    );
     MLB_WORKSPACE_LAYOUT_TRANSITION_CLASS = "transition-[flex-basis,max-width,opacity] duration-200 ease-out";
     STORY_COLUMN_COLLAPSED_SHELL_CLASS = "w-auto max-w-none shrink-0 self-start";
     STORY_PANEL_MODE_CONTROL_BTN = "flex h-5 w-5 shrink-0 items-center justify-center rounded-sm border text-[11px] leading-none transition duration-150";
