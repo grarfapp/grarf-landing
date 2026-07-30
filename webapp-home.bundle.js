@@ -81729,11 +81729,165 @@ var init_gameSocialRailTeamFeedRegistry = __esm({
   }
 });
 
+// ../grarf/desktop/src/data/homeLeagueWorkspaceSocialRailFeeds.ts
+var WNBA_SOCIAL_RAIL_FEED, HOME_LEAGUE_WORKSPACE_SOCIAL_RAIL_FEEDS;
+var init_homeLeagueWorkspaceSocialRailFeeds = __esm({
+  "../grarf/desktop/src/data/homeLeagueWorkspaceSocialRailFeeds.ts"() {
+    init_define_import_meta_env();
+    WNBA_SOCIAL_RAIL_FEED = {
+      feedId: "league-workspace-wnba",
+      feedUrl: "https://rss.app/feeds/lZxrpLmh4sbuSaPJ.xml",
+      sourceLabel: "WNBA",
+      teamKey: "wnba"
+    };
+    HOME_LEAGUE_WORKSPACE_SOCIAL_RAIL_FEEDS = [
+      {
+        workspaceId: "atp",
+        feedId: "league-workspace-atp",
+        feedUrl: "https://rss.app/feeds/yMkZujQRn7NswZhD.xml",
+        sourceLabel: "ATP",
+        teamKey: "atp"
+      },
+      {
+        workspaceId: "boxing",
+        feedId: "league-workspace-boxing",
+        feedUrl: "https://rss.app/feeds/MJrikBtbLJqj5aA3.xml",
+        sourceLabel: "Boxing",
+        teamKey: "boxing"
+      },
+      {
+        workspaceId: "cfl",
+        feedId: "league-workspace-cfl",
+        feedUrl: "https://rss.app/feeds/3Io0cpOu8A63siop.xml",
+        sourceLabel: "CFL",
+        teamKey: "cfl"
+      },
+      {
+        workspaceId: "f1",
+        feedId: "league-workspace-f1",
+        feedUrl: "https://rss.app/feeds/85DuBMMSch58hKHF.xml",
+        sourceLabel: "Formula 1",
+        teamKey: "f1"
+      },
+      {
+        workspaceId: "fifa-world-cup",
+        feedId: "league-workspace-fifa-world-cup",
+        feedUrl: "https://rss.app/feeds/pvwg5OG789xoaKMB.xml",
+        sourceLabel: "World Cup",
+        teamKey: "fifa-world-cup"
+      },
+      {
+        workspaceId: "indycar",
+        feedId: "league-workspace-indycar",
+        feedUrl: "https://rss.app/feeds/LLpwDdLRZarlDs78.xml",
+        sourceLabel: "IndyCar",
+        teamKey: "indycar"
+      },
+      {
+        workspaceId: "lpga",
+        feedId: "league-workspace-lpga",
+        feedUrl: "https://rss.app/feeds/TQWM2VIsYizjluyn.xml",
+        sourceLabel: "LPGA",
+        teamKey: "lpga"
+      },
+      {
+        workspaceId: "mlb",
+        feedId: "league-workspace-mlb",
+        feedUrl: "https://rss.app/feeds/mRQV0B9sds3rGoKo.xml",
+        sourceLabel: "MLB",
+        teamKey: "mlb"
+      },
+      {
+        workspaceId: "motogp",
+        feedId: "league-workspace-motogp",
+        feedUrl: "https://rss.app/feeds/ZPC3ES4fSxa4l0H6.xml",
+        sourceLabel: "MotoGP",
+        teamKey: "motogp"
+      },
+      {
+        workspaceId: "nascar",
+        feedId: "league-workspace-nascar",
+        feedUrl: "https://rss.app/feeds/OlHlmb0EkcaW9TQp.xml",
+        sourceLabel: "NASCAR Cup",
+        teamKey: "nascar"
+      },
+      {
+        workspaceId: "nba",
+        feedId: "league-workspace-nba",
+        feedUrl: "https://rss.app/feeds/cRj71mRy79WgV8OG.xml",
+        sourceLabel: "NBA",
+        teamKey: "nba"
+      },
+      {
+        workspaceId: "nfl",
+        feedId: "league-workspace-nfl",
+        feedUrl: "https://rss.app/feeds/UAzJHgahaJHhRxGk.xml",
+        sourceLabel: "NFL",
+        teamKey: "nfl"
+      },
+      {
+        workspaceId: "nhl",
+        feedId: "league-workspace-nhl",
+        feedUrl: "https://rss.app/feeds/hqLuDRqoZiUYHNcu.xml",
+        sourceLabel: "NHL",
+        teamKey: "nhl"
+      },
+      {
+        workspaceId: "nwsl",
+        feedId: "league-workspace-nwsl",
+        feedUrl: "https://rss.app/feeds/48Y5dSV6vGn0byCb.xml",
+        sourceLabel: "NWSL",
+        teamKey: "nwsl"
+      },
+      {
+        workspaceId: "pga-tour",
+        feedId: "league-workspace-pga-tour",
+        feedUrl: "https://rss.app/feeds/apjSGknjd7sHCSVw.xml",
+        sourceLabel: "PGA",
+        teamKey: "pga-tour"
+      },
+      {
+        workspaceId: "ufc",
+        feedId: "league-workspace-ufc",
+        feedUrl: "https://rss.app/feeds/4a4tE1P8K4mbV2Fj.xml",
+        sourceLabel: "UFC",
+        teamKey: "ufc"
+      },
+      {
+        workspaceId: "wnba",
+        ...WNBA_SOCIAL_RAIL_FEED
+      },
+      {
+        workspaceId: "liga-mx",
+        feedId: "league-workspace-liga-mx",
+        feedUrl: "https://rss.app/feeds/xDYRvY2i3a6NsZVR.xml",
+        sourceLabel: "Liga MX",
+        teamKey: "liga-mx"
+      },
+      {
+        workspaceId: "mls",
+        feedId: "league-workspace-mls",
+        feedUrl: "https://rss.app/feeds/W6TnfjiLa8qj4pTh.xml",
+        sourceLabel: "MLS",
+        teamKey: "mls"
+      },
+      {
+        workspaceId: "wta",
+        feedId: "league-workspace-wta",
+        feedUrl: "https://rss.app/feeds/yMkZujQRn7NswZhD.xml",
+        sourceLabel: "WTA",
+        teamKey: "wta"
+      }
+    ];
+  }
+});
+
 // ../grarf/desktop/src/data/gameSocialRailLeagueSignalsRegistry.ts
 var GAME_SOCIAL_RAIL_ATP_WTA_FEED, GAME_SOCIAL_RAIL_LEAGUE_SIGNALS_REGISTRY;
 var init_gameSocialRailLeagueSignalsRegistry = __esm({
   "../grarf/desktop/src/data/gameSocialRailLeagueSignalsRegistry.ts"() {
     init_define_import_meta_env();
+    init_homeLeagueWorkspaceSocialRailFeeds();
     GAME_SOCIAL_RAIL_ATP_WTA_FEED = {
       feedId: "game-social-rail-atp-wta",
       feedUrl: "https://rss.app/feeds/_S4dxUWMNemGKdqB5.xml",
@@ -81759,9 +81913,7 @@ var init_gameSocialRailLeagueSignalsRegistry = __esm({
       {
         tabMode: "league-feed",
         leagueKey: "WNBA",
-        feedId: "game-social-rail-wnba",
-        feedUrl: "https://rss.app/feeds/SzlBSFSLBqmTaEvf.xml",
-        sourceLabel: "WNBA"
+        ...WNBA_SOCIAL_RAIL_FEED
       },
       {
         tabMode: "league-feed",
@@ -82586,156 +82738,6 @@ var init_homeWebSocialRssAppEmbed = __esm({
   }
 });
 
-// ../grarf/desktop/src/data/homeLeagueWorkspaceSocialRailFeeds.ts
-var HOME_LEAGUE_WORKSPACE_SOCIAL_RAIL_FEEDS;
-var init_homeLeagueWorkspaceSocialRailFeeds = __esm({
-  "../grarf/desktop/src/data/homeLeagueWorkspaceSocialRailFeeds.ts"() {
-    init_define_import_meta_env();
-    HOME_LEAGUE_WORKSPACE_SOCIAL_RAIL_FEEDS = [
-      {
-        workspaceId: "atp",
-        feedId: "league-workspace-atp",
-        feedUrl: "https://rss.app/feeds/yMkZujQRn7NswZhD.xml",
-        sourceLabel: "ATP",
-        teamKey: "atp"
-      },
-      {
-        workspaceId: "boxing",
-        feedId: "league-workspace-boxing",
-        feedUrl: "https://rss.app/feeds/MJrikBtbLJqj5aA3.xml",
-        sourceLabel: "Boxing",
-        teamKey: "boxing"
-      },
-      {
-        workspaceId: "cfl",
-        feedId: "league-workspace-cfl",
-        feedUrl: "https://rss.app/feeds/3Io0cpOu8A63siop.xml",
-        sourceLabel: "CFL",
-        teamKey: "cfl"
-      },
-      {
-        workspaceId: "f1",
-        feedId: "league-workspace-f1",
-        feedUrl: "https://rss.app/feeds/85DuBMMSch58hKHF.xml",
-        sourceLabel: "Formula 1",
-        teamKey: "f1"
-      },
-      {
-        workspaceId: "fifa-world-cup",
-        feedId: "league-workspace-fifa-world-cup",
-        feedUrl: "https://rss.app/feeds/pvwg5OG789xoaKMB.xml",
-        sourceLabel: "World Cup",
-        teamKey: "fifa-world-cup"
-      },
-      {
-        workspaceId: "indycar",
-        feedId: "league-workspace-indycar",
-        feedUrl: "https://rss.app/feeds/LLpwDdLRZarlDs78.xml",
-        sourceLabel: "IndyCar",
-        teamKey: "indycar"
-      },
-      {
-        workspaceId: "lpga",
-        feedId: "league-workspace-lpga",
-        feedUrl: "https://rss.app/feeds/TQWM2VIsYizjluyn.xml",
-        sourceLabel: "LPGA",
-        teamKey: "lpga"
-      },
-      {
-        workspaceId: "mlb",
-        feedId: "league-workspace-mlb",
-        feedUrl: "https://rss.app/feeds/mRQV0B9sds3rGoKo.xml",
-        sourceLabel: "MLB",
-        teamKey: "mlb"
-      },
-      {
-        workspaceId: "motogp",
-        feedId: "league-workspace-motogp",
-        feedUrl: "https://rss.app/feeds/ZPC3ES4fSxa4l0H6.xml",
-        sourceLabel: "MotoGP",
-        teamKey: "motogp"
-      },
-      {
-        workspaceId: "nascar",
-        feedId: "league-workspace-nascar",
-        feedUrl: "https://rss.app/feeds/OlHlmb0EkcaW9TQp.xml",
-        sourceLabel: "NASCAR Cup",
-        teamKey: "nascar"
-      },
-      {
-        workspaceId: "nba",
-        feedId: "league-workspace-nba",
-        feedUrl: "https://rss.app/feeds/cRj71mRy79WgV8OG.xml",
-        sourceLabel: "NBA",
-        teamKey: "nba"
-      },
-      {
-        workspaceId: "nfl",
-        feedId: "league-workspace-nfl",
-        feedUrl: "https://rss.app/feeds/UAzJHgahaJHhRxGk.xml",
-        sourceLabel: "NFL",
-        teamKey: "nfl"
-      },
-      {
-        workspaceId: "nhl",
-        feedId: "league-workspace-nhl",
-        feedUrl: "https://rss.app/feeds/hqLuDRqoZiUYHNcu.xml",
-        sourceLabel: "NHL",
-        teamKey: "nhl"
-      },
-      {
-        workspaceId: "nwsl",
-        feedId: "league-workspace-nwsl",
-        feedUrl: "https://rss.app/feeds/48Y5dSV6vGn0byCb.xml",
-        sourceLabel: "NWSL",
-        teamKey: "nwsl"
-      },
-      {
-        workspaceId: "pga-tour",
-        feedId: "league-workspace-pga-tour",
-        feedUrl: "https://rss.app/feeds/apjSGknjd7sHCSVw.xml",
-        sourceLabel: "PGA",
-        teamKey: "pga-tour"
-      },
-      {
-        workspaceId: "ufc",
-        feedId: "league-workspace-ufc",
-        feedUrl: "https://rss.app/feeds/4a4tE1P8K4mbV2Fj.xml",
-        sourceLabel: "UFC",
-        teamKey: "ufc"
-      },
-      {
-        workspaceId: "wnba",
-        feedId: "league-workspace-wnba",
-        feedUrl: "https://rss.app/feeds/lZxrpLmh4sbuSaPJ.xml",
-        sourceLabel: "WNBA",
-        teamKey: "wnba"
-      },
-      {
-        workspaceId: "liga-mx",
-        feedId: "league-workspace-liga-mx",
-        feedUrl: "https://rss.app/feeds/xDYRvY2i3a6NsZVR.xml",
-        sourceLabel: "Liga MX",
-        teamKey: "liga-mx"
-      },
-      {
-        workspaceId: "mls",
-        feedId: "league-workspace-mls",
-        feedUrl: "https://rss.app/feeds/W6TnfjiLa8qj4pTh.xml",
-        sourceLabel: "MLS",
-        teamKey: "mls"
-      },
-      {
-        workspaceId: "wta",
-        feedId: "league-workspace-wta",
-        feedUrl: "https://rss.app/feeds/yMkZujQRn7NswZhD.xml",
-        sourceLabel: "WTA",
-        teamKey: "wta"
-      }
-    ];
-  }
-});
-
 // ../grarf/desktop/src/lib/social/gameSocialRail/resolveSocialRailFeedContext.ts
 function resolveSocialRailActiveGame(game) {
   if (!game) return null;
@@ -82780,6 +82782,30 @@ function resolveLiveTrackerSocialRailFeedResolution(feed, teamKey) {
     ],
     mergeFeeds: false
   };
+}
+function resolveWnbaSocialRailFeedResolution() {
+  return {
+    tab: "game",
+    feeds: [
+      {
+        feedId: WNBA_SOCIAL_RAIL_FEED.feedId,
+        feedUrl: WNBA_SOCIAL_RAIL_FEED.feedUrl,
+        teamKey: WNBA_SOCIAL_RAIL_FEED.teamKey,
+        sourceLabel: WNBA_SOCIAL_RAIL_FEED.sourceLabel
+      }
+    ],
+    mergeFeeds: false
+  };
+}
+function isWnbaCenterPaneGameWorkspace(workspace) {
+  if (!workspace) return false;
+  if (WNBA_CENTER_PANE_GAME_TAB_ID.test(workspace.id)) return true;
+  if (workspace.type === "website" && workspace.address?.leagueKey === "WNBA") return true;
+  return false;
+}
+function resolveWnbaSocialRailFeedFromActiveCenterWorkspace(workspace) {
+  if (!isWnbaCenterPaneGameWorkspace(workspace)) return null;
+  return resolveWnbaSocialRailFeedResolution();
 }
 function resolveHomeLeagueWorkspaceSocialRailFeedResolution(workspaceId) {
   if (!workspaceId) return null;
@@ -82849,7 +82875,7 @@ function resolvePulseSubmenuSocialRailFeedResolution(submenuIdx) {
     mergeFeeds: false
   };
 }
-var ALL_SPORTS_SOCIAL_RAIL_FEED;
+var ALL_SPORTS_SOCIAL_RAIL_FEED, WNBA_CENTER_PANE_GAME_TAB_ID;
 var init_resolveSocialRailFeedContext = __esm({
   "../grarf/desktop/src/lib/social/gameSocialRail/resolveSocialRailFeedContext.ts"() {
     init_define_import_meta_env();
@@ -82868,6 +82894,7 @@ var init_resolveSocialRailFeedContext = __esm({
       teamKey: "all-sports",
       sourceLabel: "All Sports"
     };
+    WNBA_CENTER_PANE_GAME_TAB_ID = /^wnba-(?:game|fallback)-/;
   }
 });
 
@@ -85503,7 +85530,8 @@ function GameUtilityRail({
   hierarchyHeader,
   awayTeamLabel,
   homeTeamLabel,
-  activeGame
+  activeGame,
+  socialRailResolution = null
 }) {
   const appVisible = useAppVisible();
   const hasStory = !!(storyPanel?.storyUrl && storyPanel.storyUrl.length > 0);
@@ -85525,7 +85553,7 @@ function GameUtilityRail({
   );
   const allSportsFeedResolution = (0, import_react114.useMemo)(() => resolveAllSportsSocialRailFeedResolution(), []);
   const canonicalSignalsFallback = isGrarfWebRenderer() ? /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(GameSocialRailFeedPanel, { resolution: allSportsFeedResolution }) : /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(SocialRssAppFeedPanel, {});
-  const webGameSocialLeagueFeed = isGrarfWebRenderer() && leagueSignalsConfig?.tabMode === "league-feed" && !!activeGame && !watchLiveActive;
+  const webGameSocialLeagueFeed = isGrarfWebRenderer() && !watchLiveActive && (leagueSignalsConfig?.tabMode === "league-feed" && !!activeGame || Boolean(socialRailResolution));
   const webGameSocialTabs = isGrarfWebRenderer() && leagueSignalsConfig?.tabMode === "team-tabs" && !!awayTeamLabel && !!homeTeamLabel && !watchLiveActive;
   const webGameSocialRailTab = (0, import_react114.useMemo)(() => {
     if (webGameSocialTabs) {
@@ -85631,11 +85659,12 @@ function GameUtilityRail({
           }
         ),
         /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)("div", { className: "relative min-h-0 flex-1", children: [
-          webGameSocialRailTab && activeGame ? /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(
+          webGameSocialRailTab && (activeGame || socialRailResolution) ? /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(
             GameSocialRailFeedPanel,
             {
-              game: activeGame,
+              game: socialRailResolution ? null : activeGame ?? null,
               tab: webGameSocialRailTab,
+              resolution: socialRailResolution ?? void 0,
               fallback: tab === "signals" || tab === "chat" || tab === "reddit" ? canonicalSignalsFallback : null
             }
           ) : /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)(import_jsx_runtime93.Fragment, { children: [
@@ -86329,7 +86358,11 @@ function HomeRightRail({
     () => resolveGameSocialRailLeagueSignalsConfig(activeGame),
     [activeGame]
   );
-  const webLeagueFeedGameScope = isGrarfWebRenderer() && !!activeGameId && !!activeGame && leagueSocialSignalsConfig?.tabMode === "league-feed";
+  const wnbaCenterSocialRailResolution = (0, import_react117.useMemo)(
+    () => resolveWnbaSocialRailFeedFromActiveCenterWorkspace(activeGameWorkspace),
+    [activeGameWorkspace]
+  );
+  const webLeagueFeedGameScope = isGrarfWebRenderer() && !gameWatchActive && (!!activeGameId && !!activeGame && leagueSocialSignalsConfig?.tabMode === "league-feed" || Boolean(wnbaCenterSocialRailResolution));
   const useGameUtilityRail = isGameWorkspace && (isGrarfWebRenderer() || isMlbGameWorkspace) || webLeagueFeedGameScope;
   const utilityRailWorkspaceTitle = activeGameWorkspace?.title ?? (activeGame ? `${activeGame.awayTeam} @ ${activeGame.homeTeam}` : "Game");
   const canonicalActiveGame = useCanonicalLiveGameRow(
@@ -86364,12 +86397,13 @@ function HomeRightRail({
     if (!isGrarfWebRenderer()) return null;
     const fromLeagueWorkspace = resolveHomeLeagueWorkspaceSocialRailFeedResolution(leagueWorkspaceId);
     if (fromLeagueWorkspace) return fromLeagueWorkspace;
+    if (wnbaCenterSocialRailResolution) return wnbaCenterSocialRailResolution;
     const fromPermanentBrowser = resolveGamesSpinePermanentBrowserSocialRailFeedResolution(
       activeGameWorkspace?.id
     );
     if (fromPermanentBrowser) return fromPermanentBrowser;
     return resolveHomeSocialRailFeedResolution(activeLeagueId);
-  }, [leagueWorkspaceId, activeGameWorkspace, activeLeagueId]);
+  }, [leagueWorkspaceId, wnbaCenterSocialRailResolution, activeGameWorkspace, activeLeagueId]);
   (0, import_react117.useLayoutEffect)(() => {
     if (!isGrarfWebRenderer() || !onSocialRailTvPanelHeightChange) return;
     const el = socialRailTvPanelRef.current;
@@ -86419,9 +86453,10 @@ function HomeRightRail({
         awayTeamLabel: webGameTeamLabels?.away,
         homeTeamLabel: webGameTeamLabels?.home,
         activeGame: activeGame ?? null,
+        socialRailResolution: wnbaCenterSocialRailResolution,
         className: "h-full min-h-0 w-full min-w-0 border-l-0"
       },
-      activeGamePayload?.gameId ?? activeGameId ?? "utility-rail"
+      activeGamePayload?.gameId ?? activeGameId ?? activeGameWorkspace?.id ?? "utility-rail"
     ) : /* @__PURE__ */ (0, import_jsx_runtime99.jsx)(
       ActivityRail,
       {
@@ -86447,7 +86482,7 @@ function HomeRightRail({
         onOpenIntelligence,
         onOpenLiveShow
       },
-      leagueWorkspaceId ? `league-workspace-${leagueWorkspaceId}` : railContext.contextKey
+      leagueWorkspaceId ? `league-workspace-${leagueWorkspaceId}` : activeGameWorkspace?.id ?? railContext.contextKey
     ) }),
     isGrarfWebRenderer() ? /* @__PURE__ */ (0, import_jsx_runtime99.jsx)("div", { ref: socialRailTvPanelRef, className: "shrink-0", children: /* @__PURE__ */ (0, import_jsx_runtime99.jsx)(HomeHeadlinesWebPlaylistPanel, { embedsEnabled: appVisible && embedsReady }) }) : /* @__PURE__ */ (0, import_jsx_runtime99.jsx)(
       HomeHeadlinesCbsPanel,
