@@ -57073,13 +57073,14 @@ var init_highlightsTvChannelIngestionConfig = __esm({
   }
 });
 
-// ../grarf/shared/media/youtubeCanonicalThumbnail.ts
+// ../grarf/shared/media/youtubeCanonicalThumbnail.js
 function buildYoutubeCanonicalThumbnailUrl(videoId, variant = "mqdefault") {
   const trimmed = String(videoId ?? "").trim();
   return `https://i.ytimg.com/vi/${encodeURIComponent(trimmed)}/${variant}.jpg`;
 }
 function isYoutubeThumbnailResponseAvailable(response) {
-  if (!response || !response.ok) return false;
+  if (!response || !response.ok)
+    return false;
   const contentLength = response.headers.get("content-length");
   if (contentLength) {
     const bytes = Number.parseInt(contentLength, 10);
@@ -57115,17 +57116,15 @@ async function resolveYoutubeCanonicalThumbnailUrls(videoIds, fetchImpl = fetch)
   const concurrency = 8;
   for (let index = 0; index < unique.length; index += concurrency) {
     const batch = unique.slice(index, index + concurrency);
-    await Promise.all(
-      batch.map(async (videoId) => {
-        thumbnails[videoId] = await resolveYoutubeCanonicalThumbnailUrl(videoId, fetchImpl);
-      })
-    );
+    await Promise.all(batch.map(async (videoId) => {
+      thumbnails[videoId] = await resolveYoutubeCanonicalThumbnailUrl(videoId, fetchImpl);
+    }));
   }
   return thumbnails;
 }
 var YOUTUBE_CANONICAL_THUMBNAIL_VARIANTS;
 var init_youtubeCanonicalThumbnail = __esm({
-  "../grarf/shared/media/youtubeCanonicalThumbnail.ts"() {
+  "../grarf/shared/media/youtubeCanonicalThumbnail.js"() {
     init_define_import_meta_env();
     YOUTUBE_CANONICAL_THUMBNAIL_VARIANTS = [
       "maxresdefault",
