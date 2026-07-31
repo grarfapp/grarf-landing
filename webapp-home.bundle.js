@@ -53048,6 +53048,82 @@ var init_demoNcaaBaseballAlert = __esm({
   }
 });
 
+// ../grarf/desktop/src/types/livetrack.ts
+function buildLiveTrackTwitterEmbedSrc(tweetId, options) {
+  const params = new URLSearchParams({
+    dnt: "true",
+    id: tweetId,
+    theme: options?.theme ?? "dark",
+    width: String(options?.width ?? 320)
+  });
+  return `https://platform.twitter.com/embed/Tweet.html?${params.toString()}`;
+}
+var init_livetrack = __esm({
+  "../grarf/desktop/src/types/livetrack.ts"() {
+    init_define_import_meta_env();
+  }
+});
+
+// ../grarf/desktop/src/lib/social/socialRssAppMediaLayout.ts
+var RSSAPP_TWITTER_EMBED_WIDTH_PX, RSSAPP_FEED_MEDIA_CONTAINER_CLASS, RSSAPP_FEED_IMAGE_CLASS, RSSAPP_FEED_VIDEO_SHELL_CLASS, RSSAPP_FEED_VIDEO_SHELL_WEB_CLASS, RSSAPP_FEED_VIDEO_POSTER_WEB_CLASS, RSSAPP_FEED_VIDEO_POSTER_CLASS, RSSAPP_FEED_VIDEO_IMAGE_CLASS;
+var init_socialRssAppMediaLayout = __esm({
+  "../grarf/desktop/src/lib/social/socialRssAppMediaLayout.ts"() {
+    init_define_import_meta_env();
+    init_cn();
+    RSSAPP_TWITTER_EMBED_WIDTH_PX = 550;
+    RSSAPP_FEED_MEDIA_CONTAINER_CLASS = cn2(
+      "w-full max-w-[600px] shrink-0"
+    );
+    RSSAPP_FEED_IMAGE_CLASS = "block h-auto w-full max-w-full";
+    RSSAPP_FEED_VIDEO_SHELL_CLASS = cn2(
+      RSSAPP_FEED_MEDIA_CONTAINER_CLASS,
+      "relative block aspect-video w-full overflow-hidden"
+    );
+    RSSAPP_FEED_VIDEO_SHELL_WEB_CLASS = cn2(
+      RSSAPP_FEED_MEDIA_CONTAINER_CLASS,
+      "relative block w-full"
+    );
+    RSSAPP_FEED_VIDEO_POSTER_WEB_CLASS = cn2(
+      RSSAPP_FEED_VIDEO_SHELL_WEB_CLASS,
+      "block cursor-pointer border-0 bg-transparent p-0 text-left"
+    );
+    RSSAPP_FEED_VIDEO_POSTER_CLASS = cn2(
+      RSSAPP_FEED_VIDEO_SHELL_CLASS,
+      "block cursor-pointer border-0 bg-transparent p-0 text-left"
+    );
+    RSSAPP_FEED_VIDEO_IMAGE_CLASS = "block h-full w-full object-cover";
+  }
+});
+
+// ../grarf/desktop/src/lib/social/resolveTwitterStatusIdFromPostUrl.ts
+function resolveTwitterStatusIdFromPostUrl(url) {
+  const match = url.trim().match(/\/status\/(\d+)/i);
+  return match?.[1] ?? null;
+}
+var init_resolveTwitterStatusIdFromPostUrl = __esm({
+  "../grarf/desktop/src/lib/social/resolveTwitterStatusIdFromPostUrl.ts"() {
+    init_define_import_meta_env();
+  }
+});
+
+// ../grarf/desktop/src/lib/social/resolveXPostWorkspaceEmbedUrl.ts
+function resolveXPostWorkspaceEmbedUrl(raw) {
+  const statusId = resolveTwitterStatusIdFromPostUrl(raw);
+  if (!statusId) return null;
+  return buildLiveTrackTwitterEmbedSrc(statusId, {
+    width: RSSAPP_TWITTER_EMBED_WIDTH_PX,
+    theme: "dark"
+  });
+}
+var init_resolveXPostWorkspaceEmbedUrl = __esm({
+  "../grarf/desktop/src/lib/social/resolveXPostWorkspaceEmbedUrl.ts"() {
+    init_define_import_meta_env();
+    init_livetrack();
+    init_socialRssAppMediaLayout();
+    init_resolveTwitterStatusIdFromPostUrl();
+  }
+});
+
 // ../grarf/desktop/src/lib/youtubeUrl.ts
 function isYoutubeEmbedPath(pathname) {
   return /\/embed\/[\w-]+/.test(pathname);
@@ -53094,12 +53170,14 @@ function toYoutubeStreamEmbedUrl(raw) {
   return `https://www.youtube.com/embed/${encodeURIComponent(videoId)}?${params.toString()}`;
 }
 function resolveWorkspaceEmbedUrl(raw) {
-  return raw.trim();
+  const trimmed = raw.trim();
+  return resolveXPostWorkspaceEmbedUrl(trimmed) ?? trimmed;
 }
 var init_youtubeUrl2 = __esm({
   "../grarf/desktop/src/lib/youtubeUrl.ts"() {
     init_define_import_meta_env();
     init_youtubeUrl();
+    init_resolveXPostWorkspaceEmbedUrl();
   }
 });
 
@@ -82546,6 +82624,27 @@ var init_formatSocialWirePostMeta = __esm({
   }
 });
 
+// ../grarf/desktop/src/lib/social/openXPostUrl.ts
+function isXPostUrl(url) {
+  return resolveTwitterStatusIdFromPostUrl(url) !== null;
+}
+function openXPostUrl(url, metadata) {
+  const href = url.trim();
+  if (!href || !isXPostUrl(href)) return false;
+  return navigateToDestination({
+    intent: "NEW_SURFACE",
+    destination: { kind: "webpage", url: href },
+    metadata
+  });
+}
+var init_openXPostUrl = __esm({
+  "../grarf/desktop/src/lib/social/openXPostUrl.ts"() {
+    init_define_import_meta_env();
+    init_canonical();
+    init_resolveTwitterStatusIdFromPostUrl();
+  }
+});
+
 // ../grarf/desktop/src/lib/livetrack/homeLiveTrackMockMedia.ts
 var LIVE_TRACK_GRAND_SLAM_MOCK_VIDEO_URL, LIVE_TRACK_USC_ESPN_GRAND_SLAM_EVENT_ID;
 var init_homeLiveTrackMockMedia = __esm({
@@ -82602,10 +82701,12 @@ var init_resolveLiveTrackMomentMedia = __esm({
 function openLiveTrackPostUrl(event) {
   const url = resolveLiveTrackPostUrl(event);
   if (!url || !/^https?:\/\//i.test(url)) return false;
+  const metadata = { source: "livetrack_post" };
+  if (openXPostUrl(url, metadata)) return true;
   void navigateToDestinationAsync({
     intent: "SYSTEM_EXTERNAL",
     destination: { kind: "webpage", url },
-    metadata: { source: "livetrack_post" }
+    metadata
   });
   return true;
 }
@@ -82613,6 +82714,7 @@ var init_openLiveTrackPostUrl = __esm({
   "../grarf/desktop/src/lib/livetrack/openLiveTrackPostUrl.ts"() {
     init_define_import_meta_env();
     init_canonical();
+    init_openXPostUrl();
     init_resolveLiveTrackMomentMedia();
   }
 });
@@ -82684,64 +82786,6 @@ var init_HomeLiveTrackPostRow = __esm({
     init_openLiveTrackPostUrl();
     init_resolveLiveTrackPostInteraction();
     import_jsx_runtime81 = __toESM(require_jsx_runtime(), 1);
-  }
-});
-
-// ../grarf/desktop/src/lib/social/socialRssAppMediaLayout.ts
-var RSSAPP_TWITTER_EMBED_WIDTH_PX, RSSAPP_FEED_MEDIA_CONTAINER_CLASS, RSSAPP_FEED_IMAGE_CLASS, RSSAPP_FEED_VIDEO_SHELL_CLASS, RSSAPP_FEED_VIDEO_SHELL_WEB_CLASS, RSSAPP_FEED_VIDEO_POSTER_WEB_CLASS, RSSAPP_FEED_VIDEO_POSTER_CLASS, RSSAPP_FEED_VIDEO_IMAGE_CLASS;
-var init_socialRssAppMediaLayout = __esm({
-  "../grarf/desktop/src/lib/social/socialRssAppMediaLayout.ts"() {
-    init_define_import_meta_env();
-    init_cn();
-    RSSAPP_TWITTER_EMBED_WIDTH_PX = 550;
-    RSSAPP_FEED_MEDIA_CONTAINER_CLASS = cn2(
-      "w-full max-w-[600px] shrink-0"
-    );
-    RSSAPP_FEED_IMAGE_CLASS = "block h-auto w-full max-w-full";
-    RSSAPP_FEED_VIDEO_SHELL_CLASS = cn2(
-      RSSAPP_FEED_MEDIA_CONTAINER_CLASS,
-      "relative block aspect-video w-full overflow-hidden"
-    );
-    RSSAPP_FEED_VIDEO_SHELL_WEB_CLASS = cn2(
-      RSSAPP_FEED_MEDIA_CONTAINER_CLASS,
-      "relative block w-full"
-    );
-    RSSAPP_FEED_VIDEO_POSTER_WEB_CLASS = cn2(
-      RSSAPP_FEED_VIDEO_SHELL_WEB_CLASS,
-      "block cursor-pointer border-0 bg-transparent p-0 text-left"
-    );
-    RSSAPP_FEED_VIDEO_POSTER_CLASS = cn2(
-      RSSAPP_FEED_VIDEO_SHELL_CLASS,
-      "block cursor-pointer border-0 bg-transparent p-0 text-left"
-    );
-    RSSAPP_FEED_VIDEO_IMAGE_CLASS = "block h-full w-full object-cover";
-  }
-});
-
-// ../grarf/desktop/src/lib/social/resolveTwitterStatusIdFromPostUrl.ts
-function resolveTwitterStatusIdFromPostUrl(url) {
-  const match = url.trim().match(/\/status\/(\d+)/i);
-  return match?.[1] ?? null;
-}
-var init_resolveTwitterStatusIdFromPostUrl = __esm({
-  "../grarf/desktop/src/lib/social/resolveTwitterStatusIdFromPostUrl.ts"() {
-    init_define_import_meta_env();
-  }
-});
-
-// ../grarf/desktop/src/types/livetrack.ts
-function buildLiveTrackTwitterEmbedSrc(tweetId, options) {
-  const params = new URLSearchParams({
-    dnt: "true",
-    id: tweetId,
-    theme: options?.theme ?? "dark",
-    width: String(options?.width ?? 320)
-  });
-  return `https://platform.twitter.com/embed/Tweet.html?${params.toString()}`;
-}
-var init_livetrack = __esm({
-  "../grarf/desktop/src/types/livetrack.ts"() {
-    init_define_import_meta_env();
   }
 });
 
@@ -104655,6 +104699,7 @@ function HomeLiveTrackerPostLine({ post }) {
       title: post.url,
       onClick: (event) => {
         event.preventDefault();
+        if (openXPostUrl(post.url, { source: "livetracker_post_line" })) return;
         navigateToDestination({
           intent: "SYSTEM_EXTERNAL",
           destination: { kind: "webpage", url: post.url },
@@ -104740,6 +104785,7 @@ var init_HomeLiveTrackerPostLine = __esm({
     init_define_import_meta_env();
     init_cn();
     init_canonical();
+    init_openXPostUrl();
     init_gamesSpineLeagueLogoUrls();
     init_resolveLiveTrackerLeagueDisplayLabel();
     init_resolveLiveTrackerPostLeagueLogoUrl();
