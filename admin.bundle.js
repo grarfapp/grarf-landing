@@ -12840,11 +12840,7 @@ init_define_import_meta_env();
 
 // ../grarf/desktop/src/lib/platform/isGrarfWebRenderer.ts
 init_define_import_meta_env();
-function isGrarfElectronRenderer() {
-  return typeof window !== "undefined" && window.GRARF_ELECTRON === true;
-}
 function isGrarfWebRenderer() {
-  if (isGrarfElectronRenderer()) return false;
   return typeof window !== "undefined" && window.GRARF_WEB_CONFIG != null;
 }
 
@@ -12879,7 +12875,7 @@ function resolveSportscapeEditorialApiBaseUrls() {
     seen.add(normalized);
     out.push(normalized);
   };
-  if (typeof window !== "undefined") {
+  if (typeof window !== "undefined" && shouldUseLocalSportscapeEditorialFallback()) {
     push(resolveSameOriginSportscapeEditorialApiUrl());
   }
   if (isGrarfWebRenderer() && typeof window !== "undefined") {
@@ -12898,6 +12894,13 @@ function resolveSportscapeEditorialApiBaseUrls() {
   push(define_import_meta_env_default.VITE_SPORTSCAPE_EDITORIAL_API_URL?.trim());
   push(DEFAULT_SPORTSCAPE_EDITORIAL_API_URL);
   return out;
+}
+function shouldUseLocalSportscapeEditorialFallback() {
+  if (!define_import_meta_env_default.DEV) return false;
+  if (define_import_meta_env_default.VITE_SPORTSCAPE_EDITORIAL_USE_LOCAL !== "1") return false;
+  return Boolean(
+    typeof window !== "undefined" && window.grarf?.sportscapeEditorialGetDocument
+  );
 }
 function sportscapeEditorialUrlForBase(base, path) {
   const normalized = base.replace(/\/+$/, "");

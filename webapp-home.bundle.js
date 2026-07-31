@@ -46,7 +46,6 @@ function isGrarfElectronRenderer() {
   return typeof window !== "undefined" && window.GRARF_ELECTRON === true;
 }
 function isGrarfWebRenderer() {
-  if (isGrarfElectronRenderer()) return false;
   return typeof window !== "undefined" && window.GRARF_WEB_CONFIG != null;
 }
 var init_isGrarfWebRenderer = __esm({
@@ -476,7 +475,7 @@ function resolveSportscapeEditorialApiBaseUrls() {
     seen.add(normalized);
     out.push(normalized);
   };
-  if (typeof window !== "undefined") {
+  if (typeof window !== "undefined" && shouldUseLocalSportscapeEditorialFallback()) {
     push2(resolveSameOriginSportscapeEditorialApiUrl());
   }
   if (isGrarfWebRenderer() && typeof window !== "undefined") {
@@ -50661,6 +50660,29 @@ function editorialLookupKeysForGame(game) {
   if (espn != null && String(espn).trim()) keys.add(String(espn).trim());
   return [...keys];
 }
+function canonicalFeaturedPriorityKey(key2) {
+  return normalizeEditorialLookupKey(key2);
+}
+function resolveAdminFeaturedPriority(game, adminPriorities) {
+  const lookupKeys = editorialLookupKeysForGame(game);
+  for (const lookupKey of lookupKeys) {
+    const direct = adminPriorities[lookupKey];
+    if (direct !== void 0) return direct;
+  }
+  for (const [storageKey, priority] of Object.entries(adminPriorities)) {
+    if (lookupKeys.some((lookupKey) => editorialKeysMatch(lookupKey, storageKey))) {
+      return priority;
+    }
+  }
+  return void 0;
+}
+function normalizeFeaturedPriorityMap(priorities) {
+  const out = {};
+  for (const [key2, priority] of Object.entries(priorities)) {
+    out[canonicalFeaturedPriorityKey(key2)] = priority;
+  }
+  return out;
+}
 var init_editorialGameKey = __esm({
   "../grarf/desktop/src/lib/editorial/editorialGameKey.ts"() {
     init_define_import_meta_env();
@@ -68535,6 +68557,7 @@ var init_adminFeaturedPriorityStore = __esm({
   "../grarf/desktop/src/store/adminFeaturedPriorityStore.ts"() {
     init_define_import_meta_env();
     import_zustand48 = __toESM(require_zustand(), 1);
+    init_editorialGameKey();
     init_gamesSpineOperationalDate();
     useAdminFeaturedPriorityStore = (0, import_zustand48.create)((set, get) => ({
       priorities: {},
@@ -68542,16 +68565,17 @@ var init_adminFeaturedPriorityStore = __esm({
       gameDateKeys: {},
       duplicateIds: /* @__PURE__ */ new Set(),
       setPriority: (gameId, value, operationalDateKey) => {
+        const key2 = canonicalFeaturedPriorityKey(gameId);
         const next = { ...get().priorities };
         const nextDateKeys = { ...get().gameDateKeys };
         if (operationalDateKey?.trim()) {
-          nextDateKeys[gameId] = operationalDateKey.trim();
+          nextDateKeys[key2] = operationalDateKey.trim();
         }
         if (value === void 0) {
-          delete next[gameId];
-          delete nextDateKeys[gameId];
+          delete next[key2];
+          delete nextDateKeys[key2];
         } else {
-          next[gameId] = value;
+          next[key2] = value;
         }
         set({
           priorities: next,
@@ -68565,8 +68589,9 @@ var init_adminFeaturedPriorityStore = __esm({
         for (const game of games) {
           const dateKey = resolveGameOperationalDateKey(game);
           if (!dateKey) continue;
-          if (nextDateKeys[game.id] !== dateKey) {
-            nextDateKeys[game.id] = dateKey;
+          const key2 = editorialGameKey(game);
+          if (nextDateKeys[key2] !== dateKey) {
+            nextDateKeys[key2] = dateKey;
             changed = true;
           }
         }
@@ -68578,7 +68603,7 @@ var init_adminFeaturedPriorityStore = __esm({
         });
       },
       hydratePriorities: (priorities) => {
-        const baseline = clonePriorities(priorities);
+        const baseline = normalizeFeaturedPriorityMap(priorities);
         const gameDateKeys = { ...get().gameDateKeys };
         set({
           priorities: baseline,
@@ -68602,7 +68627,10 @@ var init_adminFeaturedPriorityStore = __esm({
           const workingPriority = priorities[gameKey] ?? null;
           const baselinePriority = persistedBaselinePriorities[gameKey] ?? null;
           if (workingPriority !== baselinePriority) {
-            records.push({ gameKey, featuredPriority: workingPriority });
+            records.push({
+              gameKey: canonicalFeaturedPriorityKey(gameKey),
+              featuredPriority: workingPriority
+            });
           }
         }
         return records;
@@ -68626,8 +68654,9 @@ function AdminFeaturedPriorityField({ game, operationsPanel = false }) {
     // payload is stable for the lifetime of this game card render
     { gameId: game.id }
   );
-  const priority = useAdminFeaturedPriorityStore((s2) => s2.priorities[game.id]);
-  const isDuplicate = useAdminFeaturedPriorityStore((s2) => s2.duplicateIds.has(game.id));
+  const gameKey = editorialGameKey(game);
+  const priority = useAdminFeaturedPriorityStore((s2) => resolveAdminFeaturedPriority(game, s2.priorities));
+  const isDuplicate = useAdminFeaturedPriorityStore((s2) => s2.duplicateIds.has(gameKey));
   const setPriority = useAdminFeaturedPriorityStore((s2) => s2.setPriority);
   if (!isAdminMode) return null;
   const operationalDateKey = resolveGameOperationalDateKey(game) ?? void 0;
@@ -68715,6 +68744,7 @@ var init_AdminFeaturedPriorityField = __esm({
     init_define_import_meta_env();
     init_useAdminEditable();
     init_gamesSpineOperationalDate();
+    init_editorialGameKey();
     init_adminFeaturedPriorityStore();
     init_cn();
     import_jsx_runtime40 = __toESM(require_jsx_runtime(), 1);
@@ -72228,7 +72258,7 @@ function resolveFeaturedGamesForBestGame() {
 }
 function hasAdminFeaturedPriority(game, adminFeaturedPriorities) {
   if (!adminFeaturedPriorities) return false;
-  const rank = adminFeaturedPriorities[game.id];
+  const rank = resolveAdminFeaturedPriority(game, adminFeaturedPriorities);
   return rank != null && Number.isFinite(rank) && rank >= 1;
 }
 function isFeaturedGameForBestGame(game, featuredGames, adminFeaturedPriorities) {
@@ -73833,7 +73863,7 @@ function selectUnifiedFeaturedGames(games, bundle, adminPriorities, statusFilter
   const entries = [];
   for (const game of games) {
     if (!matchFeaturedGamesSpineStatusFilter(game, statusFilter, selectedDate)) continue;
-    const adminPriority = adminPriorities[game.id];
+    const adminPriority = resolveAdminFeaturedPriority(game, adminPriorities);
     if (adminPriority !== void 0) {
       entries.push({ game, effectivePriority: adminPriority });
       continue;
@@ -101495,7 +101525,7 @@ function OperationsCard({
   const [editError, setEditError] = (0, import_react170.useState)(null);
   const [deleting, setDeleting] = (0, import_react170.useState)(false);
   const [editing, setEditing] = (0, import_react170.useState)(false);
-  const priority = useAdminFeaturedPriorityStore((s2) => s2.priorities[game.id]);
+  const priority = useAdminFeaturedPriorityStore((s2) => resolveAdminFeaturedPriority(game, s2.priorities));
   const fields = useAdminOperationsCardStore(
     (s2) => s2.fieldsByGameId[game.id] ?? EMPTY_ADMIN_OPERATIONS_CARD_FIELDS
   );
@@ -101646,6 +101676,7 @@ var init_OperationsCard = __esm({
     init_resolveOperationsCardAutomaticValues();
     init_statusOverride();
     init_adminFeaturedPriorityStore();
+    init_editorialGameKey();
     init_adminOperationsCardStore();
     init_homeSpineWatchLive();
     init_AdminFeaturedPriorityField();
