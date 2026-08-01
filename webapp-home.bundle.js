@@ -38090,6 +38090,9 @@ function logoUrlIsFoxAsset(logoUrl) {
 function logoUrlIsParamountAsset(logoUrl) {
   return logoUrl.trim().toLowerCase().includes("channel-paramount-plus");
 }
+function logoUrlIsIonAsset(logoUrl) {
+  return logoUrl.trim().toLowerCase().includes("channel-ion");
+}
 function isFoxLogo(options) {
   const logoUrl = options?.logoUrl?.trim();
   if (logoUrl && logoUrlIsFoxAsset(logoUrl)) return true;
@@ -38117,6 +38120,13 @@ function isNwslPlusLogo(options) {
   if (label && resolveChannelLogoUrl(label) === NWSL_PLUS_CHANNEL_LOGO_URL) return true;
   return false;
 }
+function isIonLogo(options) {
+  const logoUrl = options?.logoUrl?.trim();
+  if (logoUrl && logoUrlIsIonAsset(logoUrl)) return true;
+  const label = options?.label?.trim();
+  if (label && resolveChannelLogoUrl(label) === ION_CHANNEL_LOGO_PATH) return true;
+  return false;
+}
 function isCbssnLogo(options) {
   const logoUrl = options?.logoUrl?.trim();
   if (logoUrl && logoUrlIsCbssnAsset(logoUrl)) return true;
@@ -38125,7 +38135,7 @@ function isCbssnLogo(options) {
   return false;
 }
 function grarfLogoImgBorderRadiusClass(options) {
-  if (isFoxLogo(options) || isParamountLogo(options) || isNwslPlusLogo(options) || isCbssnLogo(options)) {
+  if (isFoxLogo(options) || isIonLogo(options) || isParamountLogo(options) || isNwslPlusLogo(options) || isCbssnLogo(options)) {
     return "rounded-none";
   }
   return GRARF_LOGO_IMG_BORDER_RADIUS_CLASS;
@@ -38136,7 +38146,7 @@ function grarfLogoImgClassName(...classNames) {
 function grarfLogoImgClassNameFor(logo, ...classNames) {
   return cn2(grarfLogoImgBorderRadiusClass(logo), ...classNames);
 }
-var GRARF_LOGO_IMG_BORDER_RADIUS_CLASS, FOX_CHANNEL_LOGO_PATH;
+var GRARF_LOGO_IMG_BORDER_RADIUS_CLASS, FOX_CHANNEL_LOGO_PATH, ION_CHANNEL_LOGO_PATH;
 var init_grarfLogoImgClassName = __esm({
   "../grarf/desktop/src/lib/logo/grarfLogoImgClassName.ts"() {
     init_define_import_meta_env();
@@ -38144,6 +38154,7 @@ var init_grarfLogoImgClassName = __esm({
     init_cn();
     GRARF_LOGO_IMG_BORDER_RADIUS_CLASS = "rounded-[3px]";
     FOX_CHANNEL_LOGO_PATH = "/league-logos/channel-fox.png";
+    ION_CHANNEL_LOGO_PATH = "/league-logos/channel-ion.png";
   }
 });
 
