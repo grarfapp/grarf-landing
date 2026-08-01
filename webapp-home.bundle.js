@@ -38023,7 +38023,7 @@ function resolveChannelLogoUrl(channelLabel) {
   }
   return null;
 }
-var NBA_TV_CHANNEL_LOGO_URL, GOLF_CHANNEL_LOGO_URL, PARAMOUNT_CHANNEL_LOGO_URL, NWSL_PLUS_CHANNEL_LOGO_URL, CBSSN_CHANNEL_LOGO_URL, CHANNEL_LOGO_BY_LABEL;
+var NBA_TV_CHANNEL_LOGO_URL, GOLF_CHANNEL_LOGO_URL, PARAMOUNT_CHANNEL_LOGO_URL, NWSL_PLUS_CHANNEL_LOGO_URL, CBSSN_CHANNEL_LOGO_URL, ESPN_UNLIMITED_CHANNEL_LOGO_URL, CHANNEL_LOGO_BY_LABEL;
 var init_resolveChannelLogoUrl = __esm({
   "../grarf/desktop/src/lib/broadcast/resolveChannelLogoUrl.ts"() {
     init_define_import_meta_env();
@@ -38033,6 +38033,7 @@ var init_resolveChannelLogoUrl = __esm({
     PARAMOUNT_CHANNEL_LOGO_URL = "/league-logos/channel-paramount-plus.png";
     NWSL_PLUS_CHANNEL_LOGO_URL = "/league-logos/channel-nwsl-plus.png";
     CBSSN_CHANNEL_LOGO_URL = "/league-logos/channel-cbs-sports.png";
+    ESPN_UNLIMITED_CHANNEL_LOGO_URL = "/league-logos/espn_unlimited.png";
     CHANNEL_LOGO_BY_LABEL = {
       ABC: "/league-logos/channel-abc.png",
       CBS: "/league-logos/channel-cbs.png",
@@ -38040,8 +38041,8 @@ var init_resolveChannelLogoUrl = __esm({
       ESPN2: "/league-logos/channel-espn2.png",
       "ESPN+": "/league-logos/channel-espn-plus.png",
       "ESPN PLUS": "/league-logos/channel-espn-plus.png",
-      "ESPN UNLIMITED": "/league-logos/channel-espn-plus.png",
-      "ESPN UNLMTD": "/league-logos/channel-espn-plus.png",
+      "ESPN UNLIMITED": ESPN_UNLIMITED_CHANNEL_LOGO_URL,
+      "ESPN UNLMTD": ESPN_UNLIMITED_CHANNEL_LOGO_URL,
       ESPNU: "/league-logos/channel-espnu.png",
       USA: "/league-logos/channel-usa.png",
       "USA NETWORK": "/league-logos/channel-usa.png",
@@ -38093,6 +38094,9 @@ function logoUrlIsParamountAsset(logoUrl) {
 function logoUrlIsIonAsset(logoUrl) {
   return logoUrl.trim().toLowerCase().includes("channel-ion");
 }
+function logoUrlIsEspnUnlimitedAsset(logoUrl) {
+  return logoUrl.trim().toLowerCase().includes("espn_unlimited");
+}
 function isFoxLogo(options) {
   const logoUrl = options?.logoUrl?.trim();
   if (logoUrl && logoUrlIsFoxAsset(logoUrl)) return true;
@@ -38127,6 +38131,13 @@ function isIonLogo(options) {
   if (label && resolveChannelLogoUrl(label) === ION_CHANNEL_LOGO_PATH) return true;
   return false;
 }
+function isEspnUnlimitedLogo(options) {
+  const logoUrl = options?.logoUrl?.trim();
+  if (logoUrl && logoUrlIsEspnUnlimitedAsset(logoUrl)) return true;
+  const label = options?.label?.trim();
+  if (label && resolveChannelLogoUrl(label) === ESPN_UNLIMITED_CHANNEL_LOGO_URL) return true;
+  return false;
+}
 function isCbssnLogo(options) {
   const logoUrl = options?.logoUrl?.trim();
   if (logoUrl && logoUrlIsCbssnAsset(logoUrl)) return true;
@@ -38135,7 +38146,7 @@ function isCbssnLogo(options) {
   return false;
 }
 function grarfLogoImgBorderRadiusClass(options) {
-  if (isFoxLogo(options) || isIonLogo(options) || isParamountLogo(options) || isNwslPlusLogo(options) || isCbssnLogo(options)) {
+  if (isFoxLogo(options) || isIonLogo(options) || isEspnUnlimitedLogo(options) || isParamountLogo(options) || isNwslPlusLogo(options) || isCbssnLogo(options)) {
     return "rounded-none";
   }
   return GRARF_LOGO_IMG_BORDER_RADIUS_CLASS;
@@ -47798,8 +47809,8 @@ var init_resolveChannelLogoUrl2 = __esm({
       ESPN2: "/league-logos/channel-espn2.png",
       "ESPN+": "/league-logos/channel-espn-plus.png",
       "ESPN PLUS": "/league-logos/channel-espn-plus.png",
-      "ESPN UNLIMITED": "/league-logos/channel-espn-plus.png",
-      "ESPN UNLMTD": "/league-logos/channel-espn-plus.png",
+      "ESPN UNLIMITED": "/league-logos/espn_unlimited.png",
+      "ESPN UNLMTD": "/league-logos/espn_unlimited.png",
       ESPNU: "/league-logos/channel-espnu.png",
       USA: "/league-logos/channel-usa.png",
       "USA NETWORK": "/league-logos/channel-usa.png",
