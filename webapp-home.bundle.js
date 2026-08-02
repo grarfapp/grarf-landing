@@ -38014,6 +38014,7 @@ function resolveChannelLogoUrl(channelLabel) {
   if (/\bFS1\b/.test(key2)) return CHANNEL_LOGO_BY_LABEL.FS1 ?? null;
   if (/\bFS2\b/.test(key2)) return CHANNEL_LOGO_BY_LABEL.FS2 ?? null;
   if (/\bFOX\b/.test(key2)) return CHANNEL_LOGO_BY_LABEL.FOX ?? null;
+  if (/\bPEACOCK\b/.test(key2)) return PEACOCK_CHANNEL_LOGO_URL;
   if (/\bPRIME\s*VIDEO\b/.test(key2)) return CHANNEL_LOGO_BY_LABEL["PRIME VIDEO"] ?? null;
   if (key2 === "PRIME") return CHANNEL_LOGO_BY_LABEL.PRIME ?? null;
   if (/^USA(\s+NET(WORK)?)?$/.test(key2)) return CHANNEL_LOGO_BY_LABEL.USA ?? null;
@@ -38023,7 +38024,7 @@ function resolveChannelLogoUrl(channelLabel) {
   }
   return null;
 }
-var NBA_TV_CHANNEL_LOGO_URL, GOLF_CHANNEL_LOGO_URL, PARAMOUNT_CHANNEL_LOGO_URL, NWSL_PLUS_CHANNEL_LOGO_URL, CBSSN_CHANNEL_LOGO_URL, ESPN_UNLIMITED_CHANNEL_LOGO_URL, CHANNEL_LOGO_BY_LABEL;
+var NBA_TV_CHANNEL_LOGO_URL, GOLF_CHANNEL_LOGO_URL, PARAMOUNT_CHANNEL_LOGO_URL, NWSL_PLUS_CHANNEL_LOGO_URL, CBSSN_CHANNEL_LOGO_URL, ESPN_UNLIMITED_CHANNEL_LOGO_URL, PEACOCK_CHANNEL_LOGO_URL, CHANNEL_LOGO_BY_LABEL;
 var init_resolveChannelLogoUrl = __esm({
   "../grarf/desktop/src/lib/broadcast/resolveChannelLogoUrl.ts"() {
     init_define_import_meta_env();
@@ -38034,6 +38035,7 @@ var init_resolveChannelLogoUrl = __esm({
     NWSL_PLUS_CHANNEL_LOGO_URL = "/league-logos/channel-nwsl-plus.png";
     CBSSN_CHANNEL_LOGO_URL = "/league-logos/channel-cbs-sports.png";
     ESPN_UNLIMITED_CHANNEL_LOGO_URL = "/league-logos/espn_unlimited.png";
+    PEACOCK_CHANNEL_LOGO_URL = "/league-logos/channel-peacock.png";
     CHANNEL_LOGO_BY_LABEL = {
       ABC: "/league-logos/channel-abc.png",
       CBS: "/league-logos/channel-cbs.png",
@@ -38061,7 +38063,7 @@ var init_resolveChannelLogoUrl = __esm({
       MLBTV: "/league-logos/channel-mlbtv.png",
       DAZN: "/league-logos/channel-dazn.png",
       FANATIZ: "/league-logos/channel-fanatiz.png",
-      PEACOCK: "/league-logos/channel-peacock.png",
+      PEACOCK: PEACOCK_CHANNEL_LOGO_URL,
       FOX: "/league-logos/channel-fox.png",
       FS1: "/league-logos/channel-fs1.png",
       FS2: "/league-logos/channel-fs2.png",
@@ -38096,6 +38098,12 @@ function logoUrlIsIonAsset(logoUrl) {
 }
 function logoUrlIsEspnUnlimitedAsset(logoUrl) {
   return logoUrl.trim().toLowerCase().includes("espn_unlimited");
+}
+function logoUrlIsAbcAsset(logoUrl) {
+  return logoUrl.trim().toLowerCase().includes("channel-abc");
+}
+function logoUrlIsPeacockAsset(logoUrl) {
+  return logoUrl.trim().toLowerCase().includes("channel-peacock");
 }
 function isFoxLogo(options) {
   const logoUrl = options?.logoUrl?.trim();
@@ -38138,6 +38146,22 @@ function isEspnUnlimitedLogo(options) {
   if (label && resolveChannelLogoUrl(label) === ESPN_UNLIMITED_CHANNEL_LOGO_URL) return true;
   return false;
 }
+function isAbcLogo(options) {
+  const logoUrl = options?.logoUrl?.trim();
+  if (logoUrl && logoUrlIsAbcAsset(logoUrl)) return true;
+  const label = options?.label?.trim();
+  if (label && resolveChannelLogoUrl(label) === ABC_CHANNEL_LOGO_PATH) return true;
+  return false;
+}
+function isPeacockLogo(options) {
+  const logoUrl = options?.logoUrl?.trim();
+  if (logoUrl && logoUrlIsPeacockAsset(logoUrl)) return true;
+  const label = options?.label?.trim();
+  if (!label) return false;
+  if (/\bpeacock\b/i.test(label)) return true;
+  if (resolveChannelLogoUrl(label) === PEACOCK_CHANNEL_LOGO_URL) return true;
+  return false;
+}
 function isCbssnLogo(options) {
   const logoUrl = options?.logoUrl?.trim();
   if (logoUrl && logoUrlIsCbssnAsset(logoUrl)) return true;
@@ -38146,7 +38170,7 @@ function isCbssnLogo(options) {
   return false;
 }
 function grarfLogoImgBorderRadiusClass(options) {
-  if (isFoxLogo(options) || isIonLogo(options) || isEspnUnlimitedLogo(options) || isParamountLogo(options) || isNwslPlusLogo(options) || isCbssnLogo(options)) {
+  if (isFoxLogo(options) || isIonLogo(options) || isAbcLogo(options) || isPeacockLogo(options) || isEspnUnlimitedLogo(options) || isParamountLogo(options) || isNwslPlusLogo(options) || isCbssnLogo(options)) {
     return "rounded-none";
   }
   return GRARF_LOGO_IMG_BORDER_RADIUS_CLASS;
@@ -38157,7 +38181,7 @@ function grarfLogoImgClassName(...classNames) {
 function grarfLogoImgClassNameFor(logo, ...classNames) {
   return cn2(grarfLogoImgBorderRadiusClass(logo), ...classNames);
 }
-var GRARF_LOGO_IMG_BORDER_RADIUS_CLASS, FOX_CHANNEL_LOGO_PATH, ION_CHANNEL_LOGO_PATH;
+var GRARF_LOGO_IMG_BORDER_RADIUS_CLASS, FOX_CHANNEL_LOGO_PATH, ION_CHANNEL_LOGO_PATH, ABC_CHANNEL_LOGO_PATH;
 var init_grarfLogoImgClassName = __esm({
   "../grarf/desktop/src/lib/logo/grarfLogoImgClassName.ts"() {
     init_define_import_meta_env();
@@ -38166,6 +38190,7 @@ var init_grarfLogoImgClassName = __esm({
     GRARF_LOGO_IMG_BORDER_RADIUS_CLASS = "rounded-[3px]";
     FOX_CHANNEL_LOGO_PATH = "/league-logos/channel-fox.png";
     ION_CHANNEL_LOGO_PATH = "/league-logos/channel-ion.png";
+    ABC_CHANNEL_LOGO_PATH = "/league-logos/channel-abc.png";
   }
 });
 
@@ -47789,6 +47814,7 @@ function resolveChannelLogoUrl2(channelLabel) {
   if (/\bFS1\b/.test(key2)) return CHANNEL_LOGO_BY_LABEL2.FS1 ?? null;
   if (/\bFS2\b/.test(key2)) return CHANNEL_LOGO_BY_LABEL2.FS2 ?? null;
   if (/\bFOX\b/.test(key2)) return CHANNEL_LOGO_BY_LABEL2.FOX ?? null;
+  if (/\bPEACOCK\b/.test(key2)) return PEACOCK_CHANNEL_LOGO_URL2;
   if (/\bPRIME\s*VIDEO\b/.test(key2)) return CHANNEL_LOGO_BY_LABEL2["PRIME VIDEO"] ?? null;
   if (key2 === "PRIME") return CHANNEL_LOGO_BY_LABEL2.PRIME ?? null;
   if (/^USA(\s+NET(WORK)?)?$/.test(key2)) return CHANNEL_LOGO_BY_LABEL2.USA ?? null;
@@ -47798,10 +47824,11 @@ function resolveChannelLogoUrl2(channelLabel) {
   }
   return null;
 }
-var CHANNEL_LOGO_BY_LABEL2;
+var PEACOCK_CHANNEL_LOGO_URL2, CHANNEL_LOGO_BY_LABEL2;
 var init_resolveChannelLogoUrl2 = __esm({
   "../grarf/shared/domain/broadcast/resolveChannelLogoUrl.ts"() {
     init_define_import_meta_env();
+    PEACOCK_CHANNEL_LOGO_URL2 = "/league-logos/channel-peacock.png";
     CHANNEL_LOGO_BY_LABEL2 = {
       ABC: "/league-logos/channel-abc.png",
       CBS: "/league-logos/channel-cbs.png",
@@ -47829,7 +47856,7 @@ var init_resolveChannelLogoUrl2 = __esm({
       MLBTV: "/league-logos/channel-mlbtv.png",
       DAZN: "/league-logos/channel-dazn.png",
       FANATIZ: "/league-logos/channel-fanatiz.png",
-      PEACOCK: "/league-logos/channel-peacock.png",
+      PEACOCK: PEACOCK_CHANNEL_LOGO_URL2,
       FOX: "/league-logos/channel-fox.png",
       FS1: "/league-logos/channel-fs1.png",
       FS2: "/league-logos/channel-fs2.png",
@@ -86135,8 +86162,10 @@ function GameUtilityRail({
   const effectiveStoryPanel = isGrarfElectronRenderer() && activeGame?.league === "MLB" ? resolvedStoryPanel : storyPanel;
   const hasStory = !!(effectiveStoryPanel?.storyUrl && effectiveStoryPanel.storyUrl.length > 0);
   const [redditTeamIdx, setRedditTeamIdx] = (0, import_react116.useState)(0);
+  const [pulseSocialTab, setPulseSocialTab] = (0, import_react116.useState)("game");
   (0, import_react116.useEffect)(() => {
     setRedditTeamIdx(0);
+    setPulseSocialTab("game");
   }, [workspaceTitle]);
   (0, import_react116.useEffect)(() => {
     if (!catchupContextGame?.gamePk) return;
@@ -86154,6 +86183,7 @@ function GameUtilityRail({
   const canonicalSignalsFallback = isCanonicalMlbGameWorkspaceRenderer() ? /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(GameSocialRailFeedPanel, { resolution: allSportsFeedResolution }) : /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(SocialRssAppFeedPanel, {});
   const webGameSocialLeagueFeed = isCanonicalMlbGameWorkspaceRenderer() && !watchLiveActive && (leagueSignalsConfig?.tabMode === "league-feed" && !!activeGame || Boolean(socialRailResolution));
   const webGameSocialTabs = isCanonicalMlbGameWorkspaceRenderer() && leagueSignalsConfig?.tabMode === "team-tabs" && !!awayTeamLabel && !!homeTeamLabel && !watchLiveActive;
+  const watchPulseTeamSocialTabs = watchLiveActive && isCanonicalMlbGameWorkspaceRenderer() && leagueSignalsConfig?.tabMode === "team-tabs" && !!activeGame && !!awayTeamLabel && !!homeTeamLabel;
   const webGameSocialRailTab = (0, import_react116.useMemo)(() => {
     if (webGameSocialTabs) {
       if (tab === "signals") return "game";
@@ -86266,7 +86296,45 @@ function GameUtilityRail({
               resolution: socialRailResolution ?? void 0,
               fallback: tab === "signals" || tab === "chat" || tab === "reddit" ? canonicalSignalsFallback : null
             }
-          ) : /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)(import_jsx_runtime93.Fragment, { children: [
+          ) : tab === "signals" && watchPulseTeamSocialTabs && activeGame ? /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)("div", { className: "absolute inset-0 flex min-h-0 flex-col bg-black", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(
+              "div",
+              {
+                className: "flex shrink-0 gap-x-2 border-b border-line/50 bg-[#040808]/95",
+                "aria-label": "Pulse submenu",
+                children: [
+                  ["game", "GAME"],
+                  ["away", awayTeamLabel ?? "AWAY"],
+                  ["home", homeTeamLabel ?? "HOME"]
+                ].map(([socialTab, label]) => /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(
+                  "button",
+                  {
+                    type: "button",
+                    onClick: () => setPulseSocialTab(socialTab),
+                    className: cn2(
+                      tabCls2,
+                      gameWorkspaceTabLabelCls,
+                      pulseSocialTab === socialTab ? socialTab === "game" ? GAME_WORKSPACE_TAB_ACTIVE_CYAN_CLASS : resolveGameWorkspaceTeamTabActiveClass(
+                        socialTab === "away" ? activeGame.awayTeam : activeGame.homeTeam,
+                        inferSportscapeScoreSportFromLeague(activeGame.league)
+                      ) : "text-textdim hover:bg-white/[0.03] hover:text-[#b8cccc]"
+                    ),
+                    children: socialTab === "away" ? /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(GameWorkspaceTeamTabLabel, { game: activeGame, side: "away", label }) : socialTab === "home" ? /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(GameWorkspaceTeamTabLabel, { game: activeGame, side: "home", label }) : label
+                  },
+                  socialTab
+                ))
+              }
+            ),
+            /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(
+              GameSocialRailFeedPanel,
+              {
+                game: activeGame,
+                tab: pulseSocialTab,
+                className: "relative min-h-0 flex-1",
+                fallback: canonicalSignalsFallback
+              }
+            )
+          ] }) : /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)(import_jsx_runtime93.Fragment, { children: [
             tab === "signals" ? canonicalSignalsFallback : null,
             tab === "chat" && !webGameSocialTabs ? /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)("div", { className: "absolute inset-0 flex flex-col items-center justify-center gap-2 overflow-y-auto border-t border-line/30 bg-[#020506] p-3 text-center", children: [
               /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("p", { className: "text-[8px] tracking-[0.18em] text-cyansys/85", children: "LIVE CHAT" }),
