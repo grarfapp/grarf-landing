@@ -55666,6 +55666,16 @@ var init_peacockExternalLaunch = __esm({
   }
 });
 
+// ../grarf/desktop/src/lib/watch/resolveDesktopWatchLivePresentation.ts
+function desktopWatchDeepLinkRequiresSystemExternal(option) {
+  return option.provider === "PEACOCK";
+}
+var init_resolveDesktopWatchLivePresentation = __esm({
+  "../grarf/desktop/src/lib/watch/resolveDesktopWatchLivePresentation.ts"() {
+    init_define_import_meta_env();
+  }
+});
+
 // ../grarf/desktop/src/lib/watch/executeWatchOption.ts
 function executeWatchOption(game, option, dispatch) {
   const navOptions = { workspaceDispatch: dispatch };
@@ -55684,8 +55694,7 @@ function executeWatchOption(game, option, dispatch) {
       );
       return;
     }
-    const launchMode = option.launchMode ?? (option.provider === "PEACOCK" ? "external" : "embedded");
-    if (launchMode === "external" || option.provider === "PEACOCK") {
+    if (desktopWatchDeepLinkRequiresSystemExternal(option)) {
       console.log("[Watch] Provider launchMode: external");
       console.log("[Watch] Opening Peacock stream externally");
       openPeacockPlaybackExternally(option.deepLink);
@@ -55729,6 +55738,7 @@ var init_executeWatchOption = __esm({
     init_canonical();
     init_legacyMlbWatch();
     init_peacockExternalLaunch();
+    init_resolveDesktopWatchLivePresentation();
     init_watchDebug();
     init_streamingProviders2();
   }
