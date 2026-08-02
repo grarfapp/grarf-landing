@@ -27391,7 +27391,7 @@ function isCompleteOperationalSnapshot(leagues, meta) {
     return false;
   }
   if (meta.source === "espn_local_adapter" || meta.source === "espn_scoreboard_ipc") {
-    return countLeaguesWithTodaySlate(leagues) > 0;
+    return true;
   }
   return countLeaguesWithTodaySlate(leagues) > 0;
 }
@@ -27401,14 +27401,13 @@ var init_gamesSpineRenderStore = __esm({
     init_define_import_meta_env();
     import_zustand6 = __toESM(require_zustand(), 1);
     init_espnOperationalLeagueEndpoints();
-    init_isGrarfWebRenderer();
     init_preserveMissingOperationalLeagueSections();
     useGamesSpineRenderStore = (0, import_zustand6.create)((set, get) => ({
       operationalReady: true,
-      operationalIngestComplete: !isGrarfWebRenderer(),
+      operationalIngestComplete: false,
       /** Manual KV overrides load async — never block the operational spine on them. */
       manualReady: true,
-      hasPromotedInitialSnapshot: !isGrarfWebRenderer(),
+      hasPromotedInitialSnapshot: false,
       markOperationalIngest: (leagues, meta) => {
         const complete = isCompleteOperationalSnapshot(leagues, meta);
         set((state3) => ({
@@ -27427,9 +27426,9 @@ var init_gamesSpineRenderStore = __esm({
       resetForTests: () => {
         set({
           operationalReady: true,
-          operationalIngestComplete: !isGrarfWebRenderer(),
+          operationalIngestComplete: false,
           manualReady: true,
-          hasPromotedInitialSnapshot: !isGrarfWebRenderer()
+          hasPromotedInitialSnapshot: false
         });
       }
     }));
@@ -76422,359 +76421,6 @@ var init_HomeManualGamesSpineSection = __esm({
   }
 });
 
-// ../grarf/desktop/src/services/operationalIngest/tennis/operationalDate.ts
-var init_operationalDate = __esm({
-  "../grarf/desktop/src/services/operationalIngest/tennis/operationalDate.ts"() {
-    init_define_import_meta_env();
-    init_operationalSlateDate2();
-  }
-});
-
-// ../grarf/desktop/src/services/operationalIngest/tennis/fetchEspnTennisScoreboard.ts
-var init_fetchEspnTennisScoreboard = __esm({
-  "../grarf/desktop/src/services/operationalIngest/tennis/fetchEspnTennisScoreboard.ts"() {
-    init_define_import_meta_env();
-    init_operationalDate();
-  }
-});
-
-// ../grarf/desktop/src/services/operationalIngest/tennis/normalizeTennisOperational.ts
-var init_normalizeTennisOperational = __esm({
-  "../grarf/desktop/src/services/operationalIngest/tennis/normalizeTennisOperational.ts"() {
-    init_define_import_meta_env();
-    init_espnPlusStream();
-    init_operationalDate();
-  }
-});
-
-// ../grarf/desktop/src/services/operationalIngest/tennis/fetchTennisOperationalLeagues.ts
-var TENNIS_BASE2, TENNIS_ENDPOINTS;
-var init_fetchTennisOperationalLeagues = __esm({
-  "../grarf/desktop/src/services/operationalIngest/tennis/fetchTennisOperationalLeagues.ts"() {
-    init_define_import_meta_env();
-    init_fetchEspnTennisScoreboard();
-    init_normalizeTennisOperational();
-    TENNIS_BASE2 = "https://site.api.espn.com/apis/site/v2/sports/tennis";
-    TENNIS_ENDPOINTS = [
-      { key: "ATP", endpoint: `${TENNIS_BASE2}/atp/scoreboard` },
-      { key: "WTA", endpoint: `${TENNIS_BASE2}/wta/scoreboard` }
-    ];
-  }
-});
-
-// ../grarf/desktop/src/services/operationalIngest/supplementOperationalSnapshotWithTennis.ts
-var init_supplementOperationalSnapshotWithTennis = __esm({
-  "../grarf/desktop/src/services/operationalIngest/supplementOperationalSnapshotWithTennis.ts"() {
-    init_define_import_meta_env();
-    init_fetchTennisOperationalLeagues();
-    init_normalizeTennisOperational();
-  }
-});
-
-// ../grarf/desktop/electron/espn/espnOperationalLeagueConstants.generated.js
-var init_espnOperationalLeagueConstants_generated = __esm({
-  "../grarf/desktop/electron/espn/espnOperationalLeagueConstants.generated.js"() {
-    init_define_import_meta_env();
-  }
-});
-
-// ../grarf/desktop/electron/espn/espnPlusStream.js
-var init_espnPlusStream2 = __esm({
-  "../grarf/desktop/electron/espn/espnPlusStream.js"() {
-    init_define_import_meta_env();
-    init_espnWatchBroadcast2();
-  }
-});
-
-// ../grarf/desktop/electron/espn/canonicalEventMetadata.js
-var init_canonicalEventMetadata = __esm({
-  "../grarf/desktop/electron/espn/canonicalEventMetadata.js"() {
-    init_define_import_meta_env();
-  }
-});
-
-// ../grarf/desktop/electron/espn/operationalDate.js
-var init_operationalDate2 = __esm({
-  "../grarf/desktop/electron/espn/operationalDate.js"() {
-    init_define_import_meta_env();
-    init_operationalSlateDate2();
-  }
-});
-
-// ../grarf/shared/domain/motorsportRaceState.js
-var init_motorsportRaceState = __esm({
-  "../grarf/shared/domain/motorsportRaceState.js"() {
-    init_define_import_meta_env();
-  }
-});
-
-// ../grarf/desktop/shared/motorsportRaceState.js
-var init_motorsportRaceState2 = __esm({
-  "../grarf/desktop/shared/motorsportRaceState.js"() {
-    init_define_import_meta_env();
-    init_motorsportRaceState();
-  }
-});
-
-// ../grarf/desktop/electron/espn/normalizeRacing.js
-var init_normalizeRacing = __esm({
-  "../grarf/desktop/electron/espn/normalizeRacing.js"() {
-    init_define_import_meta_env();
-    init_normalize2();
-    init_espnPausedCompetitionStatus2();
-    init_canonicalEventMetadata();
-    init_operationalDate2();
-    init_motorsportRaceState2();
-    init_motorsportLeagues2();
-  }
-});
-
-// ../grarf/desktop/electron/espn/normalizeMma.js
-var init_normalizeMma = __esm({
-  "../grarf/desktop/electron/espn/normalizeMma.js"() {
-    init_define_import_meta_env();
-    init_operationalDate2();
-    init_canonicalEventMetadata();
-    init_espnPausedCompetitionStatus2();
-  }
-});
-
-// ../grarf/desktop/electron/espn/normalizeTennis.js
-var init_normalizeTennis = __esm({
-  "../grarf/desktop/electron/espn/normalizeTennis.js"() {
-    init_define_import_meta_env();
-    init_operationalDate2();
-    init_canonicalEventMetadata();
-    init_espnPlusStream2();
-    init_espnPausedCompetitionStatus2();
-  }
-});
-
-// ../grarf/desktop/electron/espn/normalizeGolf.js
-var init_normalizeGolf = __esm({
-  "../grarf/desktop/electron/espn/normalizeGolf.js"() {
-    init_define_import_meta_env();
-    init_normalize2();
-    init_canonicalEventMetadata();
-    init_operationalDate2();
-    init_golfTournamentDate2();
-    init_espnPausedCompetitionStatus2();
-    init_grarfSportHierarchy2();
-    init_golfWatchUrls2();
-  }
-});
-
-// ../grarf/desktop/electron/espn/mergeOperationalScoreboards.js
-var init_mergeOperationalScoreboards2 = __esm({
-  "../grarf/desktop/electron/espn/mergeOperationalScoreboards.js"() {
-    init_define_import_meta_env();
-  }
-});
-
-// ../grarf/shared/config/fifaMenWorldRankingsJune2026.js
-var FIFA_MEN_WORLD_RANKINGS_JUNE_2026, FIFA_RANKING_ALIASES;
-var init_fifaMenWorldRankingsJune2026 = __esm({
-  "../grarf/shared/config/fifaMenWorldRankingsJune2026.js"() {
-    init_define_import_meta_env();
-    FIFA_MEN_WORLD_RANKINGS_JUNE_2026 = Object.freeze({
-      france: 1,
-      argentina: 2,
-      spain: 3,
-      england: 4,
-      brazil: 5,
-      morocco: 6,
-      netherlands: 7,
-      portugal: 8,
-      mexico: 9,
-      belgium: 10,
-      colombia: 11,
-      germany: 12,
-      croatia: 13,
-      italy: 14,
-      usa: 15,
-      switzerland: 16,
-      japan: 17,
-      senegal: 18,
-      uruguay: 19,
-      denmark: 20,
-      "ir iran": 21,
-      austria: 22,
-      norway: 23,
-      ecuador: 24,
-      nigeria: 25,
-      egypt: 26,
-      turkiye: 27,
-      australia: 28,
-      algeria: 29,
-      "cote d ivoire": 30,
-      "korea republic": 31,
-      canada: 32,
-      ukraine: 33,
-      russia: 34,
-      poland: 35,
-      sweden: 36,
-      paraguay: 37,
-      wales: 38,
-      hungary: 39,
-      serbia: 40,
-      scotland: 41,
-      panama: 42,
-      cameroon: 43,
-      slovakia: 44,
-      greece: 45,
-      "congo dr": 46,
-      venezuela: 47,
-      czechia: 48,
-      chile: 49,
-      peru: 50,
-      "costa rica": 51,
-      romania: 52,
-      mali: 53,
-      "south africa": 54,
-      "republic of ireland": 55,
-      slovenia: 56,
-      uzbekistan: 57,
-      tunisia: 58,
-      "saudi arabia": 59,
-      "bosnia and herzegovina": 61,
-      "burkina faso": 62,
-      iraq: 63,
-      "cabo verde": 64,
-      ghana: 65,
-      honduras: 66,
-      albania: 67,
-      "united arab emirates": 68,
-      "north macedonia": 69,
-      "northern ireland": 70,
-      jamaica: 71,
-      jordan: 72,
-      georgia: 73,
-      iceland: 74,
-      finland: 75,
-      israel: 76,
-      bolivia: 77,
-      kosovo: 78,
-      oman: 79,
-      montenegro: 80,
-      guinea: 81,
-      curacao: 82,
-      syria: 83,
-      "new zealand": 84,
-      gabon: 85,
-      bulgaria: 86,
-      angola: 87,
-      haiti: 88,
-      uganda: 89,
-      zambia: 90,
-      "china pr": 91,
-      bahrain: 92,
-      benin: 93,
-      thailand: 94,
-      palestine: 95,
-      belarus: 96,
-      guatemala: 97,
-      luxembourg: 98,
-      vietnam: 99,
-      "el salvador": 100
-    });
-    FIFA_RANKING_ALIASES = Object.freeze({
-      "united states": "usa",
-      us: "usa",
-      iran: "ir iran",
-      "south korea": "korea republic",
-      turkey: "turkiye",
-      "ivory coast": "cote d ivoire",
-      "cape verde": "cabo verde",
-      "czech republic": "czechia",
-      china: "china pr",
-      "dr congo": "congo dr",
-      "democratic republic of the congo": "congo dr",
-      "democratic republic of congo": "congo dr",
-      uae: "united arab emirates",
-      ireland: "republic of ireland",
-      "bosnia herzegovina": "bosnia and herzegovina",
-      macedonia: "north macedonia"
-    });
-  }
-});
-
-// ../grarf/desktop/shared/fifaMenWorldRankingsJune2026.js
-var init_fifaMenWorldRankingsJune20262 = __esm({
-  "../grarf/desktop/shared/fifaMenWorldRankingsJune2026.js"() {
-    init_define_import_meta_env();
-    init_fifaMenWorldRankingsJune2026();
-  }
-});
-
-// ../grarf/desktop/electron/espn/normalize.js
-var init_normalize2 = __esm({
-  "../grarf/desktop/electron/espn/normalize.js"() {
-    init_define_import_meta_env();
-    init_espnOperationalLeagueConstants_generated();
-    init_espnPlusStream2();
-    init_espnPausedCompetitionStatus2();
-    init_normalizeRacing();
-    init_normalizeMma();
-    init_normalizeMma();
-    init_normalizeTennis();
-    init_normalizeTennis();
-    init_normalizeGolf();
-    init_mergeOperationalScoreboards2();
-    init_operationalDate2();
-    init_fifaMenWorldRankingsJune20262();
-  }
-});
-
-// ../grarf/desktop/src/services/operationalIngest/web/fetchWebEspnOperationalSnapshot.ts
-var WEB_PRIORITY_OPERATIONAL_LEAGUES;
-var init_fetchWebEspnOperationalSnapshot = __esm({
-  "../grarf/desktop/src/services/operationalIngest/web/fetchWebEspnOperationalSnapshot.ts"() {
-    init_define_import_meta_env();
-    init_espnOperationalLeagueEndpoints();
-    init_espnOperationalIngestDisabledLeagues2();
-    init_operationalDate();
-    init_supplementOperationalSnapshotWithTennis();
-    init_mergeIngestedManualEventsIntoLeagueGames();
-    init_manualEventsSourceResolver();
-    init_normalize2();
-    WEB_PRIORITY_OPERATIONAL_LEAGUES = [
-      "WORLDCUP",
-      "MLB",
-      "NBA",
-      "NBASUMMER",
-      "NHL",
-      "WNBA",
-      "MLS",
-      "EPL",
-      "NCAABB",
-      "PGA",
-      "LPGA",
-      "CHAMPIONS",
-      "ATP",
-      "WTA"
-    ];
-  }
-});
-
-// ../grarf/desktop/src/lib/gamesSpine/resolveWebGamesSpineBootstrapOperationalLeagueOrder.ts
-function resolveWebGamesSpineBootstrapOperationalLeagueOrder() {
-  return sortGrarfLeagueKeysByImportance([...new Set(WEB_GAMES_SPINE_BOOTSTRAP_LEAGUES)]);
-}
-var WEB_GAMES_SPINE_BOOTSTRAP_LEAGUES;
-var init_resolveWebGamesSpineBootstrapOperationalLeagueOrder = __esm({
-  "../grarf/desktop/src/lib/gamesSpine/resolveWebGamesSpineBootstrapOperationalLeagueOrder.ts"() {
-    init_define_import_meta_env();
-    init_leaguePriority();
-    init_fetchWebEspnOperationalSnapshot();
-    init_wimbledonGamesSpinePresentation();
-    WEB_GAMES_SPINE_BOOTSTRAP_LEAGUES = [
-      ...WEB_PRIORITY_OPERATIONAL_LEAGUES,
-      WIMBLEDON_MEN_GAMES_SPINE_LEAGUE,
-      WIMBLEDON_WOMEN_GAMES_SPINE_LEAGUE
-    ];
-  }
-});
-
 // ../grarf/shared/domain/manualEvents/manualEventUndercardDraft.ts
 function buildManualEventUndercardFromEditorDraft(rows) {
   const undercard = [];
@@ -78458,7 +78104,7 @@ function HomeGamesToday({
     (s2) => s2.operationalReady && s2.manualReady
   );
   const operationalIngestComplete = useGamesSpineRenderStore((s2) => s2.operationalIngestComplete);
-  const webSpineBootstrapActive = isGrarfWebRenderer() && !operationalIngestComplete;
+  const operationalSlateReady = operationalIngestComplete;
   const isAdminMode = useAdminModeStore((s2) => s2.isAdminMode);
   const showEditorialControls = isGrarfAdmin() && !isAdminMode;
   const { isCollapsed, toggleCollapsed, setAllLeaguesCollapsed } = useGamesSpineCollapse(filter);
@@ -78494,19 +78140,11 @@ function HomeGamesToday({
       (key2) => filterGamesSpineSlateForOperationalSportsDay(merged[key2] ?? []).length > 0
     );
     const seen = new Set(base);
-    let withAdjunct = [
+    return withoutGamesSpineHiddenLeagues([
       ...base,
       ...adjunctVisible.filter((key2) => !seen.has(key2))
-    ];
-    if (webSpineBootstrapActive && parentScrolls) {
-      for (const key2 of resolveWebGamesSpineBootstrapOperationalLeagueOrder()) {
-        if (seen.has(key2)) continue;
-        seen.add(key2);
-        withAdjunct.push(key2);
-      }
-    }
-    return withoutGamesSpineHiddenLeagues(withAdjunct);
-  }, [activeLeagueId, parentScrolls, mergedLeagues, webSpineBootstrapActive]);
+    ]);
+  }, [activeLeagueId, parentScrolls, mergedLeagues]);
   const spineContextLabel = (0, import_react94.useMemo)(
     () => parentScrolls ? "All Sports" : resolveHomeActiveLeagueSpineLabel(activeLeagueId),
     [activeLeagueId, parentScrolls]
@@ -78515,21 +78153,9 @@ function HomeGamesToday({
     () => convertManualGamesSpineDocument(manualDocument, new Date(manualRefreshMs)),
     [manualDocument, manualRefreshMs]
   );
-  const skeletonOperationalLeagues = (0, import_react94.useMemo)(() => {
-    if (!webSpineBootstrapActive || !parentScrolls) return void 0;
-    const withGames = new Set(resolveGamesSpineOperationalLeagueOrder(mergedLeagues));
-    return new Set(
-      resolveWebGamesSpineBootstrapOperationalLeagueOrder().filter((key2) => !withGames.has(key2))
-    );
-  }, [webSpineBootstrapActive, parentScrolls, mergedLeagues]);
   const spineSections = (0, import_react94.useMemo)(
-    () => mergeGamesSpineSectionsByPriority(
-      spineLeagueOrder,
-      mergedLeagues,
-      manualSections,
-      skeletonOperationalLeagues
-    ),
-    [spineLeagueOrder, mergedLeagues, manualSections, skeletonOperationalLeagues]
+    () => mergeGamesSpineSectionsByPriority(spineLeagueOrder, mergedLeagues, manualSections),
+    [spineLeagueOrder, mergedLeagues, manualSections]
   );
   const gamesSpineLeagueCollapseKeys = (0, import_react94.useMemo)(() => {
     if (!isGrarfWebRenderer()) return [];
@@ -78799,11 +78425,11 @@ function HomeGamesToday({
   ] }) : null;
   const bestGameFeaturedInFeaturedSection = !isGrarfWebRenderer() && gamesSpineBestGamePlacement.featuredInlineResult != null;
   const gamesSpineMain = /* @__PURE__ */ (0, import_jsx_runtime76.jsxs)(import_jsx_runtime76.Fragment, { children: [
-    !renderReady ? /* @__PURE__ */ (0, import_jsx_runtime76.jsx)("div", { className: "border-b border-line/60 px-2 py-6 text-center text-[11px] tracking-[0.14em] text-[#5f7a7a]", children: "Loading scoreboard\u2026" }) : !anyGames && !webSpineBootstrapActive ? /* @__PURE__ */ (0, import_jsx_runtime76.jsx)("div", { className: "border-b border-line/60 px-2 py-3 text-[11px] leading-relaxed text-textdim", children: "No slate loaded. Open the desktop app to sync ESPN scoreboards from the main process." }) : spineSections.length === 0 && featuredFilteredCount === 0 && !webSpineBootstrapActive ? /* @__PURE__ */ (0, import_jsx_runtime76.jsxs)("div", { className: "border-b border-line/60 px-2 py-6 text-center text-[11px] tracking-[0.14em] text-[#5f7a7a]", children: [
+    !operationalSlateReady ? /* @__PURE__ */ (0, import_jsx_runtime76.jsx)("div", { className: "border-b border-line/60 px-2 py-6 text-center text-[11px] tracking-[0.14em] text-[#5f7a7a]", children: "Loading operational slate\u2026" }) : !renderReady ? /* @__PURE__ */ (0, import_jsx_runtime76.jsx)("div", { className: "border-b border-line/60 px-2 py-6 text-center text-[11px] tracking-[0.14em] text-[#5f7a7a]", children: "Loading scoreboard\u2026" }) : !anyGames ? /* @__PURE__ */ (0, import_jsx_runtime76.jsx)("div", { className: "border-b border-line/60 px-2 py-3 text-[11px] leading-relaxed text-textdim", children: "No slate loaded. Open the desktop app to sync ESPN scoreboards from the main process." }) : spineSections.length === 0 && featuredFilteredCount === 0 ? /* @__PURE__ */ (0, import_jsx_runtime76.jsxs)("div", { className: "border-b border-line/60 px-2 py-6 text-center text-[11px] tracking-[0.14em] text-[#5f7a7a]", children: [
       "No scoreboard for ",
       spineContextLabel,
       "."
-    ] }) : totalFilteredCount === 0 && !webSpineBootstrapActive ? /* @__PURE__ */ (0, import_jsx_runtime76.jsx)("div", { className: "border-b border-line/60 px-2 py-6 text-center text-[11px] tracking-[0.14em] text-[#5f7a7a] transition-opacity duration-150", children: homeGamesFilterEmptyLabel(filter) }) : /* @__PURE__ */ (0, import_jsx_runtime76.jsxs)("div", { className: "overflow-visible transition-opacity duration-150 [&>section:first-of-type]:mt-2 [&>section:not(:first-of-type)]:mt-4", children: [
+    ] }) : totalFilteredCount === 0 ? /* @__PURE__ */ (0, import_jsx_runtime76.jsx)("div", { className: "border-b border-line/60 px-2 py-6 text-center text-[11px] tracking-[0.14em] text-[#5f7a7a] transition-opacity duration-150", children: homeGamesFilterEmptyLabel(filter) }) : /* @__PURE__ */ (0, import_jsx_runtime76.jsxs)("div", { className: "overflow-visible transition-opacity duration-150 [&>section:first-of-type]:mt-2 [&>section:not(:first-of-type)]:mt-4", children: [
       isGrarfWebRenderer() && isAdminMode ? /* @__PURE__ */ (0, import_jsx_runtime76.jsx)(GamesSpineWysiwygGameCardPrototype, {}) : null,
       isGrarfWebRenderer() ? bestGameRightNow && /* @__PURE__ */ (0, import_jsx_runtime76.jsx)(
         BestGameRightNowSection,
@@ -79025,7 +78651,6 @@ var init_HomeGamesToday = __esm({
     init_gamesSpineTemporarilyHiddenLeagues();
     init_gamesSpinePermanentBrowserSocialRailFeeds();
     init_openGamesSpinePermanentLeagueWorkspace();
-    init_resolveWebGamesSpineBootstrapOperationalLeagueOrder();
     init_GamesSpineWysiwygGameCardPrototype();
     import_jsx_runtime76 = __toESM(require_jsx_runtime(), 1);
   }
@@ -105772,13 +105397,16 @@ function HomeLiveTrackerFoundationPane() {
   const allPosts = useLiveTrackerPostsStore((state3) => state3.posts);
   const disabledLeagueKeys = useLiveTrackerLeagueFilterStore((state3) => state3.disabledLeagueKeys);
   const leagues = useCanonicalLiveGameStore((state3) => state3.leagues);
+  const operationalSlateReady = useGamesSpineRenderStore((state3) => state3.operationalIngestComplete);
   const activeFeeds = useLiveTrackerActiveFeedsStore((state3) => state3.feeds);
   const fetchedAt = useLiveTrackerPostsStore((state3) => state3.fetchedAt);
-  const [loading, setLoading] = (0, import_react184.useState)(() => fetchedAt === null && posts.length === 0);
-  const activelyLiveLeagueKeys = (0, import_react184.useMemo)(
-    () => resolveCurrentlyLiveGamesSpineLeagueKeys(leagues),
-    [leagues]
+  const [loading, setLoading] = (0, import_react184.useState)(
+    () => !operationalSlateReady || fetchedAt === null && posts.length === 0
   );
+  const activelyLiveLeagueKeys = (0, import_react184.useMemo)(() => {
+    const merged = mergeOperationalLeagueGames(leagues);
+    return resolveCurrentlyLiveGamesSpineLeagueKeys(merged);
+  }, [leagues]);
   const contentLeagueKeys = (0, import_react184.useMemo)(
     () => deriveLiveTrackerContentLeagueKeys(allPosts ?? []),
     [allPosts]
@@ -105790,6 +105418,10 @@ function HomeLiveTrackerFoundationPane() {
   (0, import_react184.useEffect)(() => {
     exposeLiveTrackerLeagueFilterForVerification();
   }, []);
+  (0, import_react184.useEffect)(() => {
+    if (!operationalSlateReady) return;
+    void refreshLiveTrackerPosts().then(() => setLoading(false));
+  }, [operationalSlateReady]);
   (0, import_react184.useEffect)(() => {
     let cancelled = false;
     const load = async () => {
@@ -105820,6 +105452,9 @@ function HomeLiveTrackerFoundationPane() {
     if (allContentLeaguesDisabled) {
       return LIVE_TRACKER_FILTER_EMPTY_COPY;
     }
+    if (!operationalSlateReady) {
+      return "Loading live RSS feeds\u2026";
+    }
     if (loading && fetchedAt === null && posts.length === 0) {
       return "Loading live RSS feeds\u2026";
     }
@@ -105841,6 +105476,7 @@ function HomeLiveTrackerFoundationPane() {
     allContentLeaguesDisabled,
     fetchedAt,
     loading,
+    operationalSlateReady,
     posts.length
   ]);
   return /* @__PURE__ */ (0, import_jsx_runtime167.jsx)(HomeLiveTrackerSurface, { posts, allPosts: allPosts ?? [], statusMessage });
@@ -105853,9 +105489,11 @@ var init_HomeLiveTrackerFoundationPane = __esm({
     init_liveTrackerLeagueFilter();
     init_useHomeLiveTrackerPosts();
     init_liveTrackerLeagueFilterDev();
+    init_operationalManualLeagueGames();
     init_resolveCurrentlyLiveGamesSpineLeagues();
     init_isGrarfWebRenderer();
     init_canonicalLiveGameStore();
+    init_gamesSpineRenderStore();
     init_liveTrackerActiveFeedsStore();
     init_liveTrackerLeagueFilterStore();
     init_liveTrackerLiveLeaguesStore();

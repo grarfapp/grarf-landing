@@ -18048,16 +18048,16 @@ function isCompleteOperationalSnapshot(leagues, meta) {
     return false;
   }
   if (meta.source === "espn_local_adapter" || meta.source === "espn_scoreboard_ipc") {
-    return countLeaguesWithTodaySlate(leagues) > 0;
+    return true;
   }
   return countLeaguesWithTodaySlate(leagues) > 0;
 }
 var useGamesSpineRenderStore = create((set, get) => ({
   operationalReady: true,
-  operationalIngestComplete: !isGrarfWebRenderer(),
+  operationalIngestComplete: false,
   /** Manual KV overrides load async — never block the operational spine on them. */
   manualReady: true,
-  hasPromotedInitialSnapshot: !isGrarfWebRenderer(),
+  hasPromotedInitialSnapshot: false,
   markOperationalIngest: (leagues, meta) => {
     const complete = isCompleteOperationalSnapshot(leagues, meta);
     set((state) => ({
@@ -18076,9 +18076,9 @@ var useGamesSpineRenderStore = create((set, get) => ({
   resetForTests: () => {
     set({
       operationalReady: true,
-      operationalIngestComplete: !isGrarfWebRenderer(),
+      operationalIngestComplete: false,
       manualReady: true,
-      hasPromotedInitialSnapshot: !isGrarfWebRenderer()
+      hasPromotedInitialSnapshot: false
     });
   }
 }));
