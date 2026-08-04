@@ -28137,6 +28137,7 @@ var init_leaguePrioritySeed_data = __esm({
       "CLUBWC",
       "INTFRIENDLY",
       "CLUBFRIENDLY",
+      "LEAGUES_CUP",
       "UWCQ",
       "INDYCAR",
       "NASCAR",
@@ -28233,8 +28234,7 @@ var init_leaguePrioritySeed_data = __esm({
       "nav.winter-sports",
       "nav.world-rally",
       "MOTO2",
-      "MOTO3",
-      "LEAGUES_CUP"
+      "MOTO3"
     ];
   }
 });

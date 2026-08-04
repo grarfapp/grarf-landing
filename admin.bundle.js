@@ -13916,6 +13916,7 @@ var LEAGUE_PRIORITY_SEED_ORDER = [
   "CLUBWC",
   "INTFRIENDLY",
   "CLUBFRIENDLY",
+  "LEAGUES_CUP",
   "UWCQ",
   "INDYCAR",
   "NASCAR",
@@ -14012,8 +14013,7 @@ var LEAGUE_PRIORITY_SEED_ORDER = [
   "nav.winter-sports",
   "nav.world-rally",
   "MOTO2",
-  "MOTO3",
-  "LEAGUES_CUP"
+  "MOTO3"
 ];
 function getLeaguePrioritySeedOrder() {
   return LEAGUE_PRIORITY_SEED_ORDER;
