@@ -1990,6 +1990,13 @@ var init_espnOperationalLeagueRegistry_generated = __esm({
         "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/esp.1/scoreboard"
       },
       {
+        "key": "LEAGUES_CUP",
+        "sport": "soccer",
+        "label": "Leagues Cup",
+        "slug": "concacaf.leagues.cup",
+        "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/concacaf.leagues.cup/scoreboard"
+      },
+      {
         "key": "LIBERTADORES",
         "sport": "soccer",
         "label": "Copa Libertadores",
@@ -3827,7 +3834,7 @@ var SOCCER_LEAGUE_KEYS, NATIONAL_TEAM_SOCCER_LEAGUE_KEYS;
 var init_espnOperationalLeagueConstants_generated = __esm({
   "../grarf/desktop/electron/espn/espnOperationalLeagueConstants.generated.js"() {
     init_define_import_meta_env();
-    SOCCER_LEAGUE_KEYS = /* @__PURE__ */ new Set(["ARG1", "BEL1", "BRA1", "BUNDESLIGA", "CAF_WNATIONS", "CLUBFRIENDLY", "CLUBWC", "CONCACAF_CAC", "CONCACAF_CL", "CONCACAF_NG", "CONCACAF_WC", "COPA", "COPA_BRASIL", "EPL", "EREDIVISIE", "EURO", "GOLDCUP", "INTFRIENDLY", "LALIGA", "LIBERTADORES", "LIGAMX", "LIGUE1", "MLS", "NATIONS", "NWSL", "POR1", "SAUDI", "SERIEA", "SPFL", "SUDAMERICANA", "SUPERLIG", "UCL", "UECL", "UECLQ", "UEL", "UELQ", "USL1", "USLC", "USLCUP", "UWCQ", "WORLDCUP", "WWC"]);
+    SOCCER_LEAGUE_KEYS = /* @__PURE__ */ new Set(["ARG1", "BEL1", "BRA1", "BUNDESLIGA", "CAF_WNATIONS", "CLUBFRIENDLY", "CLUBWC", "CONCACAF_CAC", "CONCACAF_CL", "CONCACAF_NG", "CONCACAF_WC", "COPA", "COPA_BRASIL", "EPL", "EREDIVISIE", "EURO", "GOLDCUP", "INTFRIENDLY", "LALIGA", "LEAGUES_CUP", "LIBERTADORES", "LIGAMX", "LIGUE1", "MLS", "NATIONS", "NWSL", "POR1", "SAUDI", "SERIEA", "SPFL", "SUDAMERICANA", "SUPERLIG", "UCL", "UECL", "UECLQ", "UEL", "UELQ", "USL1", "USLC", "USLCUP", "UWCQ", "WORLDCUP", "WWC"]);
     NATIONAL_TEAM_SOCCER_LEAGUE_KEYS = /* @__PURE__ */ new Set(["CONCACAF_NG", "CONCACAF_WC", "COPA", "EURO", "GOLDCUP", "INTFRIENDLY", "NATIONS", "UWCQ", "WORLDCUP", "WWC"]);
   }
 });
@@ -28226,7 +28233,8 @@ var init_leaguePrioritySeed_data = __esm({
       "nav.winter-sports",
       "nav.world-rally",
       "MOTO2",
-      "MOTO3"
+      "MOTO3",
+      "LEAGUES_CUP"
     ];
   }
 });
@@ -40985,7 +40993,8 @@ var init_resolveLeagueDirectoryNavItemLogo = __esm({
       NASCAR_XFINITY: "nascar-oreilly",
       PLL: "pll",
       RUGB_289262: "mlr",
-      USLCUP: "usl-cup"
+      USLCUP: "usl-cup",
+      LEAGUES_CUP: "leagues-cup"
     };
     HUB_ID_NAV_ITEM_ID = {
       "pga-champions": "dp-world-tour"
@@ -42059,6 +42068,7 @@ var init_gamesSpineLeagueLogoUrls = __esm({
       PLL: "/league-logos/pll.png",
       RUGB_289262: "/league-logos/nav/mlr.png",
       USLCUP: "/league-logos/usl-cup.png",
+      LEAGUES_CUP: "/league-logos/leagues-cup.png",
       USATF: "https://upload.wikimedia.org/wikipedia/en/b/be/USA_Track_and_Field.svg"
     };
   }
