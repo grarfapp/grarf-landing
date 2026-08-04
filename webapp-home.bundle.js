@@ -3015,8 +3015,8 @@ var require_react_production = __commonJS({
     exports.useDeferredValue = function(value, initialValue) {
       return ReactSharedInternals.H.useDeferredValue(value, initialValue);
     };
-    exports.useEffect = function(create61, deps) {
-      return ReactSharedInternals.H.useEffect(create61, deps);
+    exports.useEffect = function(create62, deps) {
+      return ReactSharedInternals.H.useEffect(create62, deps);
     };
     exports.useEffectEvent = function(callback) {
       return ReactSharedInternals.H.useEffectEvent(callback);
@@ -3024,17 +3024,17 @@ var require_react_production = __commonJS({
     exports.useId = function() {
       return ReactSharedInternals.H.useId();
     };
-    exports.useImperativeHandle = function(ref, create61, deps) {
-      return ReactSharedInternals.H.useImperativeHandle(ref, create61, deps);
+    exports.useImperativeHandle = function(ref, create62, deps) {
+      return ReactSharedInternals.H.useImperativeHandle(ref, create62, deps);
     };
-    exports.useInsertionEffect = function(create61, deps) {
-      return ReactSharedInternals.H.useInsertionEffect(create61, deps);
+    exports.useInsertionEffect = function(create62, deps) {
+      return ReactSharedInternals.H.useInsertionEffect(create62, deps);
     };
-    exports.useLayoutEffect = function(create61, deps) {
-      return ReactSharedInternals.H.useLayoutEffect(create61, deps);
+    exports.useLayoutEffect = function(create62, deps) {
+      return ReactSharedInternals.H.useLayoutEffect(create62, deps);
     };
-    exports.useMemo = function(create61, deps) {
-      return ReactSharedInternals.H.useMemo(create61, deps);
+    exports.useMemo = function(create62, deps) {
+      return ReactSharedInternals.H.useMemo(create62, deps);
     };
     exports.useOptimistic = function(passthrough, reducer) {
       return ReactSharedInternals.H.useOptimistic(passthrough, reducer);
@@ -3098,8 +3098,8 @@ var require_react2 = __commonJS({
       Object.assign(useBoundStore, api);
       return useBoundStore;
     };
-    var create61 = ((createState) => createState ? createImpl(createState) : createImpl);
-    exports.create = create61;
+    var create62 = ((createState) => createState ? createImpl(createState) : createImpl);
+    exports.create = create62;
     exports.useStore = useStore;
   }
 });
@@ -7742,43 +7742,43 @@ var require_react_dom_client_production = __commonJS({
       currentStateHook.memoizedState = action;
       return [stateHook, dispatch, false];
     }
-    function pushSimpleEffect(tag, inst, create61, deps) {
-      tag = { tag, create: create61, deps, inst, next: null };
+    function pushSimpleEffect(tag, inst, create62, deps) {
+      tag = { tag, create: create62, deps, inst, next: null };
       inst = currentlyRenderingFiber.updateQueue;
       null === inst && (inst = createFunctionComponentUpdateQueue(), currentlyRenderingFiber.updateQueue = inst);
-      create61 = inst.lastEffect;
-      null === create61 ? inst.lastEffect = tag.next = tag : (deps = create61.next, create61.next = tag, tag.next = deps, inst.lastEffect = tag);
+      create62 = inst.lastEffect;
+      null === create62 ? inst.lastEffect = tag.next = tag : (deps = create62.next, create62.next = tag, tag.next = deps, inst.lastEffect = tag);
       return tag;
     }
     function updateRef() {
       return updateWorkInProgressHook().memoizedState;
     }
-    function mountEffectImpl(fiberFlags, hookFlags, create61, deps) {
+    function mountEffectImpl(fiberFlags, hookFlags, create62, deps) {
       var hook = mountWorkInProgressHook();
       currentlyRenderingFiber.flags |= fiberFlags;
       hook.memoizedState = pushSimpleEffect(
         1 | hookFlags,
         { destroy: void 0 },
-        create61,
+        create62,
         void 0 === deps ? null : deps
       );
     }
-    function updateEffectImpl(fiberFlags, hookFlags, create61, deps) {
+    function updateEffectImpl(fiberFlags, hookFlags, create62, deps) {
       var hook = updateWorkInProgressHook();
       deps = void 0 === deps ? null : deps;
       var inst = hook.memoizedState.inst;
-      null !== currentHook && null !== deps && areHookInputsEqual(deps, currentHook.memoizedState.deps) ? hook.memoizedState = pushSimpleEffect(hookFlags, inst, create61, deps) : (currentlyRenderingFiber.flags |= fiberFlags, hook.memoizedState = pushSimpleEffect(
+      null !== currentHook && null !== deps && areHookInputsEqual(deps, currentHook.memoizedState.deps) ? hook.memoizedState = pushSimpleEffect(hookFlags, inst, create62, deps) : (currentlyRenderingFiber.flags |= fiberFlags, hook.memoizedState = pushSimpleEffect(
         1 | hookFlags,
         inst,
-        create61,
+        create62,
         deps
       ));
     }
-    function mountEffect(create61, deps) {
-      mountEffectImpl(8390656, 8, create61, deps);
+    function mountEffect(create62, deps) {
+      mountEffectImpl(8390656, 8, create62, deps);
     }
-    function updateEffect(create61, deps) {
-      updateEffectImpl(2048, 8, create61, deps);
+    function updateEffect(create62, deps) {
+      updateEffectImpl(2048, 8, create62, deps);
     }
     function useEffectEventImpl(payload) {
       currentlyRenderingFiber.flags |= 4;
@@ -7798,28 +7798,28 @@ var require_react_dom_client_production = __commonJS({
         return ref.impl.apply(void 0, arguments);
       };
     }
-    function updateInsertionEffect(create61, deps) {
-      return updateEffectImpl(4, 2, create61, deps);
+    function updateInsertionEffect(create62, deps) {
+      return updateEffectImpl(4, 2, create62, deps);
     }
-    function updateLayoutEffect(create61, deps) {
-      return updateEffectImpl(4, 4, create61, deps);
+    function updateLayoutEffect(create62, deps) {
+      return updateEffectImpl(4, 4, create62, deps);
     }
-    function imperativeHandleEffect(create61, ref) {
+    function imperativeHandleEffect(create62, ref) {
       if ("function" === typeof ref) {
-        create61 = create61();
-        var refCleanup = ref(create61);
+        create62 = create62();
+        var refCleanup = ref(create62);
         return function() {
           "function" === typeof refCleanup ? refCleanup() : ref(null);
         };
       }
       if (null !== ref && void 0 !== ref)
-        return create61 = create61(), ref.current = create61, function() {
+        return create62 = create62(), ref.current = create62, function() {
           ref.current = null;
         };
     }
-    function updateImperativeHandle(ref, create61, deps) {
+    function updateImperativeHandle(ref, create62, deps) {
       deps = null !== deps && void 0 !== deps ? deps.concat([ref]) : null;
-      updateEffectImpl(4, 4, imperativeHandleEffect.bind(null, create61, ref), deps);
+      updateEffectImpl(4, 4, imperativeHandleEffect.bind(null, create62, ref), deps);
     }
     function mountDebugValue() {
     }
@@ -8118,20 +8118,20 @@ var require_react_dom_client_production = __commonJS({
       },
       useContext: readContext,
       useEffect: mountEffect,
-      useImperativeHandle: function(ref, create61, deps) {
+      useImperativeHandle: function(ref, create62, deps) {
         deps = null !== deps && void 0 !== deps ? deps.concat([ref]) : null;
         mountEffectImpl(
           4194308,
           4,
-          imperativeHandleEffect.bind(null, create61, ref),
+          imperativeHandleEffect.bind(null, create62, ref),
           deps
         );
       },
-      useLayoutEffect: function(create61, deps) {
-        return mountEffectImpl(4194308, 4, create61, deps);
+      useLayoutEffect: function(create62, deps) {
+        return mountEffectImpl(4194308, 4, create62, deps);
       },
-      useInsertionEffect: function(create61, deps) {
-        mountEffectImpl(4, 2, create61, deps);
+      useInsertionEffect: function(create62, deps) {
+        mountEffectImpl(4, 2, create62, deps);
       },
       useMemo: function(nextCreate, deps) {
         var hook = mountWorkInProgressHook();
@@ -10159,8 +10159,8 @@ var require_react_dom_client_production = __commonJS({
           do {
             if ((updateQueue.tag & flags) === flags) {
               lastEffect = void 0;
-              var create61 = updateQueue.create, inst = updateQueue.inst;
-              lastEffect = create61();
+              var create62 = updateQueue.create, inst = updateQueue.inst;
+              lastEffect = create62();
               inst.destroy = lastEffect;
             }
             updateQueue = updateQueue.next;
@@ -37278,8 +37278,8 @@ var require_middleware = __commonJS({
       return initialState2;
     };
     var subscribeWithSelector = subscribeWithSelectorImpl;
-    function combine(initialState2, create61) {
-      return (...args) => Object.assign({}, initialState2, create61(...args));
+    function combine(initialState2, create62) {
+      return (...args) => Object.assign({}, initialState2, create62(...args));
     }
     function createJSONStorage(getStorage, options) {
       let storage;
@@ -48386,6 +48386,312 @@ var init_liveGamesPollRegistry = __esm({
   }
 });
 
+// ../grarf/shared/domain/intelligence/registryTypes.ts
+function createEmptyCanonicalIntelligenceRegistry() {
+  return { entitiesById: {}, storiesById: {} };
+}
+var init_registryTypes = __esm({
+  "../grarf/shared/domain/intelligence/registryTypes.ts"() {
+    init_define_import_meta_env();
+  }
+});
+
+// ../grarf/shared/domain/intelligence/entityIds.ts
+function canonicalIntelligenceGameEntityId(gameId) {
+  return `${ENTITY_PREFIX}:game:${gameId}`;
+}
+function canonicalIntelligenceLeagueEntityId(leagueKey) {
+  return `${ENTITY_PREFIX}:league:${leagueKey}`;
+}
+function canonicalIntelligenceTeamEntityId(leagueKey, teamKey) {
+  return `${ENTITY_PREFIX}:team:${leagueKey}:${teamKey}`;
+}
+function canonicalIntelligenceGameStoryId(gameId) {
+  return `gie-story:game:${gameId}`;
+}
+function canonicalIntelligenceTeamKey(abbrev, displayName) {
+  const raw = (abbrev?.trim() || displayName.trim()).toLowerCase();
+  const slug = raw.replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+  return slug || "unknown";
+}
+var ENTITY_PREFIX;
+var init_entityIds = __esm({
+  "../grarf/shared/domain/intelligence/entityIds.ts"() {
+    init_define_import_meta_env();
+    ENTITY_PREFIX = "gie-entity";
+  }
+});
+
+// ../grarf/shared/domain/intelligence/producers/gameStoryProducer.ts
+function resolveStoryPhase(status) {
+  switch (status) {
+    case "live":
+      return "live";
+    case "final":
+      return "catch_up";
+    case "scheduled":
+      return "prepare";
+    case "delayed":
+    case "postponed":
+    case "suspended":
+      return "discovered";
+    default:
+      return "discovered";
+  }
+}
+function resolveGameStoryTitle(game) {
+  const away = game.awayTeam?.trim();
+  const home = game.homeTeam?.trim();
+  if (away && home) return `${away} vs ${home}`;
+  if (home) return home;
+  if (away) return away;
+  return game.id;
+}
+function buildTeamEntity(leagueKey, displayName, abbrev) {
+  const name = displayName.trim();
+  if (!name) return null;
+  const teamKey = canonicalIntelligenceTeamKey(abbrev, name);
+  return {
+    entityId: canonicalIntelligenceTeamEntityId(leagueKey, teamKey),
+    entityType: "team",
+    displayName: name,
+    aliases: abbrev?.trim() ? [abbrev.trim()] : void 0,
+    metadata: { leagueKey }
+  };
+}
+function buildCanonicalGameStoryArtifacts(game) {
+  const leagueKey = game.league ?? "MLB";
+  const updatedAt = game.lastUpdated?.trim() || (/* @__PURE__ */ new Date()).toISOString();
+  const startedAt = game.startTimeMs != null && Number.isFinite(game.startTimeMs) ? new Date(game.startTimeMs).toISOString() : void 0;
+  const leagueEntity = {
+    entityId: canonicalIntelligenceLeagueEntityId(leagueKey),
+    entityType: "league",
+    displayName: leagueKey,
+    metadata: { leagueKey }
+  };
+  const gameEntity = {
+    entityId: canonicalIntelligenceGameEntityId(game.id),
+    entityType: "game",
+    displayName: resolveGameStoryTitle(game),
+    metadata: {
+      leagueKey,
+      grarfGameId: game.grarfGameId ?? game.id,
+      status: game.status
+    }
+  };
+  const entities = [leagueEntity, gameEntity];
+  const awayTeamEntity = buildTeamEntity(leagueKey, game.awayTeam, game.awayTeamAbbrev);
+  if (awayTeamEntity) entities.push(awayTeamEntity);
+  const homeTeamEntity = buildTeamEntity(leagueKey, game.homeTeam, game.homeTeamAbbrev);
+  if (homeTeamEntity) entities.push(homeTeamEntity);
+  const entityIds = entities.map((entity) => entity.entityId);
+  const story = {
+    storyId: canonicalIntelligenceGameStoryId(game.id),
+    storyType: "matchup",
+    phase: resolveStoryPhase(game.status),
+    title: resolveGameStoryTitle(game),
+    entityIds,
+    startedAt,
+    updatedAt,
+    metadata: {
+      leagueKey,
+      grarfGameId: game.grarfGameId ?? game.id,
+      gameStatus: game.status
+    }
+  };
+  return { entities, story };
+}
+function produceGameStoryOutput(context2) {
+  const entities = [];
+  const stories = [];
+  for (const game of context2.games) {
+    if (!game?.id?.trim()) continue;
+    const artifacts = buildCanonicalGameStoryArtifacts(game);
+    entities.push(...artifacts.entities);
+    stories.push(artifacts.story);
+  }
+  return { entities, stories };
+}
+var gameStoryProducer;
+var init_gameStoryProducer = __esm({
+  "../grarf/shared/domain/intelligence/producers/gameStoryProducer.ts"() {
+    init_define_import_meta_env();
+    init_entityIds();
+    gameStoryProducer = {
+      id: "game",
+      produce: produceGameStoryOutput
+    };
+  }
+});
+
+// ../grarf/shared/domain/intelligence/producers/mergeStoryProducerOutput.ts
+function mergeStoryUpdate(existingStory, story) {
+  return {
+    ...existingStory,
+    phase: story.phase,
+    title: story.title,
+    entityIds: story.entityIds,
+    startedAt: existingStory.startedAt ?? story.startedAt,
+    updatedAt: story.updatedAt,
+    metadata: {
+      ...existingStory.metadata ?? {},
+      ...story.metadata ?? {}
+    }
+  };
+}
+function storyChanged(existingStory, nextStory) {
+  return nextStory.phase !== existingStory.phase || nextStory.title !== existingStory.title || nextStory.updatedAt !== existingStory.updatedAt || nextStory.entityIds.join("|") !== existingStory.entityIds.join("|");
+}
+function mergeStoryProducerOutputIntoRegistry(registry3, output) {
+  if (output.entities.length === 0 && output.stories.length === 0) return registry3;
+  let entitiesById = registry3.entitiesById;
+  let storiesById = registry3.storiesById;
+  let entitiesChanged = false;
+  let storiesChanged = false;
+  for (const entity of output.entities) {
+    if (entitiesById[entity.entityId]) continue;
+    if (!entitiesChanged) {
+      entitiesById = { ...entitiesById };
+      entitiesChanged = true;
+    }
+    entitiesById[entity.entityId] = entity;
+  }
+  for (const story of output.stories) {
+    const existingStory = storiesById[story.storyId];
+    if (!existingStory) {
+      if (!storiesChanged) {
+        storiesById = { ...storiesById };
+        storiesChanged = true;
+      }
+      storiesById[story.storyId] = story;
+      continue;
+    }
+    const nextStory = mergeStoryUpdate(existingStory, story);
+    if (!storyChanged(existingStory, nextStory)) continue;
+    if (!storiesChanged) {
+      storiesById = { ...storiesById };
+      storiesChanged = true;
+    }
+    storiesById[story.storyId] = nextStory;
+  }
+  if (!entitiesChanged && !storiesChanged) return registry3;
+  return { entitiesById, storiesById };
+}
+var init_mergeStoryProducerOutput = __esm({
+  "../grarf/shared/domain/intelligence/producers/mergeStoryProducerOutput.ts"() {
+    init_define_import_meta_env();
+  }
+});
+
+// ../grarf/shared/domain/intelligence/producers/runCanonicalStoryProducers.ts
+function applyCanonicalStoryProducersToRegistry(registry3, context2) {
+  let next = registry3;
+  for (const producer of CANONICAL_STORY_PRODUCERS) {
+    const output = producer.produce(context2);
+    next = mergeStoryProducerOutputIntoRegistry(next, output);
+  }
+  return next;
+}
+var CANONICAL_STORY_PRODUCERS;
+var init_runCanonicalStoryProducers = __esm({
+  "../grarf/shared/domain/intelligence/producers/runCanonicalStoryProducers.ts"() {
+    init_define_import_meta_env();
+    init_gameStoryProducer();
+    init_mergeStoryProducerOutput();
+    CANONICAL_STORY_PRODUCERS = [
+      gameStoryProducer
+    ];
+  }
+});
+
+// ../grarf/shared/domain/intelligence/applyIngestedGamesToRegistry.ts
+function applyIngestedGamesToIntelligenceRegistry(registry3, games) {
+  if (games.length === 0) return registry3;
+  return applyCanonicalStoryProducersToRegistry(registry3, { games });
+}
+var init_applyIngestedGamesToRegistry = __esm({
+  "../grarf/shared/domain/intelligence/applyIngestedGamesToRegistry.ts"() {
+    init_define_import_meta_env();
+    init_runCanonicalStoryProducers();
+  }
+});
+
+// ../grarf/shared/domain/intelligence/producers/index.ts
+var init_producers = __esm({
+  "../grarf/shared/domain/intelligence/producers/index.ts"() {
+    init_define_import_meta_env();
+    init_mergeStoryProducerOutput();
+    init_gameStoryProducer();
+    init_runCanonicalStoryProducers();
+  }
+});
+
+// ../grarf/shared/domain/intelligence/index.ts
+var init_intelligence = __esm({
+  "../grarf/shared/domain/intelligence/index.ts"() {
+    init_define_import_meta_env();
+    init_registryTypes();
+    init_applyIngestedGamesToRegistry();
+    init_producers();
+  }
+});
+
+// ../grarf/desktop/src/store/canonicalIntelligenceRegistryStore.ts
+var import_zustand21, useCanonicalIntelligenceRegistryStore;
+var init_canonicalIntelligenceRegistryStore = __esm({
+  "../grarf/desktop/src/store/canonicalIntelligenceRegistryStore.ts"() {
+    init_define_import_meta_env();
+    import_zustand21 = __toESM(require_zustand(), 1);
+    init_intelligence();
+    useCanonicalIntelligenceRegistryStore = (0, import_zustand21.create)((set, get) => ({
+      ...createEmptyCanonicalIntelligenceRegistry(),
+      syncFromIngestedGames: (games) => {
+        const prev = get();
+        const next = applyIngestedGamesToIntelligenceRegistry(
+          { entitiesById: prev.entitiesById, storiesById: prev.storiesById },
+          games
+        );
+        if (next.entitiesById === prev.entitiesById && next.storiesById === prev.storiesById) {
+          return;
+        }
+        set({
+          entitiesById: next.entitiesById,
+          storiesById: next.storiesById
+        });
+      }
+    }));
+  }
+});
+
+// ../grarf/desktop/src/store/bindCanonicalIntelligenceRegistrySync.ts
+function bindCanonicalIntelligenceRegistrySync() {
+  let syncScheduled = false;
+  return useCanonicalLiveGameStore.subscribe(() => {
+    if (syncScheduled) return;
+    syncScheduled = true;
+    queueMicrotask(() => {
+      syncScheduled = false;
+      const games = Object.values(useCanonicalLiveGameStore.getState().gamesById).map(
+        (record) => record.game
+      );
+      try {
+        useCanonicalIntelligenceRegistryStore.getState().syncFromIngestedGames(games);
+      } catch (error) {
+        if (define_import_meta_env_default.DEV) {
+          console.warn("[CanonicalIntelligence] registry sync failed", error);
+        }
+      }
+    });
+  });
+}
+var init_bindCanonicalIntelligenceRegistrySync = __esm({
+  "../grarf/desktop/src/store/bindCanonicalIntelligenceRegistrySync.ts"() {
+    init_define_import_meta_env();
+    init_canonicalLiveGameStore();
+    init_canonicalIntelligenceRegistryStore();
+  }
+});
+
 // ../grarf/desktop/src/services/operationalIngest/index.ts
 async function loadCanonicalOperationalSnapshot() {
   const rawTransport = await fetchOperationalSnapshot();
@@ -49158,6 +49464,7 @@ function LiveGamesBridge() {
   const lastCloudLeaguesRef = (0, import_react19.useRef)({});
   (0, import_react19.useEffect)(() => {
     logOperationalRuntimeStartupBanner();
+    const stopIntelligenceRegistrySync = bindCanonicalIntelligenceRegistrySync();
     const config = getOperationalIngestConfig();
     const applySnapshot = (transport, canonical, completeness) => {
       const incomingMs = parseUpdatedAtMs(canonical.updatedAt);
@@ -49232,7 +49539,10 @@ function LiveGamesBridge() {
       const stopCloudPoll = isGrarfWebRenderer() ? registerWebLiveGamesHydrate(cloudHydrate) : startOperationalSnapshotPolling(cloudHydrate);
       const api2 = window.grarf;
       if (!api2?.gamesSubscribe) {
-        return stopCloudPoll;
+        return () => {
+          stopCloudPoll();
+          stopIntelligenceRegistrySync();
+        };
       }
       void (async () => {
         if (!api2.gamesGetSnapshot) return;
@@ -49272,19 +49582,28 @@ function LiveGamesBridge() {
       return () => {
         stopCloudPoll();
         stopLocal?.();
+        stopIntelligenceRegistrySync();
       };
     }
     const api = window.grarf;
-    if (!api?.gamesSubscribe) return void 0;
+    if (!api?.gamesSubscribe) {
+      return () => {
+        stopIntelligenceRegistrySync();
+      };
+    }
     void loadCanonicalOperationalSnapshot().then(({ transport, canonical }) => {
       applySnapshot(transport, canonical, { source: "espn_scoreboard_ipc" });
     });
-    return api.gamesSubscribe((snap) => {
+    const stopIpc = api.gamesSubscribe((snap) => {
       const transport = operationalResponseFromIpcPush(
         snap
       );
       applyEnrichedSnapshot(transport, { source: "espn_scoreboard_ipc" });
     });
+    return () => {
+      stopIpc?.();
+      stopIntelligenceRegistrySync();
+    };
   }, [hydrate]);
   return null;
 }
@@ -49298,6 +49617,7 @@ var init_LiveGamesBridge = __esm({
     init_operationalIngestConfig();
     init_isGrarfWebRenderer();
     init_liveGamesPollRegistry();
+    init_bindCanonicalIntelligenceRegistrySync();
     init_operationalIngest();
     init_enrichOperationalTransport();
     init_mergeCatchUpIngestSnapshot();
@@ -50469,11 +50789,11 @@ function buildRetainedAtById() {
 function syncLiveTrackerLeagueRetention(nowMs = Date.now()) {
   useLiveTrackerLeagueRetentionStore.getState().syncFromCanonical(nowMs);
 }
-var import_zustand21, previousGamesById, pendingFinalScorePosts, RETENTION_STORAGE_KEY, retentionSyncChain, useLiveTrackerLeagueRetentionStore;
+var import_zustand22, previousGamesById, pendingFinalScorePosts, RETENTION_STORAGE_KEY, retentionSyncChain, useLiveTrackerLeagueRetentionStore;
 var init_liveTrackerLeagueRetentionStore = __esm({
   "../grarf/desktop/src/store/liveTrackerLeagueRetentionStore.ts"() {
     init_define_import_meta_env();
-    import_zustand21 = __toESM(require_zustand(), 1);
+    import_zustand22 = __toESM(require_zustand(), 1);
     init_isGrarfWebRenderer();
     init_gamesColumnLeagues();
     init_liveTrackerFeedRegistry();
@@ -50491,7 +50811,7 @@ var init_liveTrackerLeagueRetentionStore = __esm({
     pendingFinalScorePosts = [];
     RETENTION_STORAGE_KEY = "grarf-live-tracker-league-retention-v1";
     retentionSyncChain = Promise.resolve();
-    useLiveTrackerLeagueRetentionStore = (0, import_zustand21.create)((set, get) => ({
+    useLiveTrackerLeagueRetentionStore = (0, import_zustand22.create)((set, get) => ({
       completedAtMsByLeague: readPersistedCompletedAtMsByLeague(Date.now()),
       persistedTrackedGamesById: isGrarfWebRenderer() ? {} : readLiveTrackerTrackedGameScores(),
       syncFromCanonical: (nowMs = Date.now()) => {
@@ -50546,18 +50866,18 @@ function emptySnapshot() {
     updatedAt: null
   };
 }
-var import_zustand22, MANUAL_LIVE_TRACKER_REFRESH_MS, useLiveTrackerLiveLeaguesStore;
+var import_zustand23, MANUAL_LIVE_TRACKER_REFRESH_MS, useLiveTrackerLiveLeaguesStore;
 var init_liveTrackerLiveLeaguesStore = __esm({
   "../grarf/desktop/src/store/liveTrackerLiveLeaguesStore.ts"() {
     init_define_import_meta_env();
-    import_zustand22 = __toESM(require_zustand(), 1);
+    import_zustand23 = __toESM(require_zustand(), 1);
     init_resolveCurrentlyLiveGamesSpineLeagues();
     init_canonicalLiveGameStore();
     init_gamesSpineManualStore();
     init_liveTrackerLeagueRetentionStore();
     init_recentFinalizedGamesStore();
     MANUAL_LIVE_TRACKER_REFRESH_MS = 3e4;
-    useLiveTrackerLiveLeaguesStore = (0, import_zustand22.create)((set) => ({
+    useLiveTrackerLiveLeaguesStore = (0, import_zustand23.create)((set) => ({
       ...emptySnapshot(),
       syncFromGamesSpine: (nowMs = Date.now()) => {
         const { leagues, updatedAt } = useCanonicalLiveGameStore.getState();
@@ -50606,16 +50926,16 @@ function emptySnapshot2() {
 function getActiveLiveTrackerFeeds() {
   return useLiveTrackerActiveFeedsStore.getState().feeds;
 }
-var import_zustand23, useLiveTrackerActiveFeedsStore;
+var import_zustand24, useLiveTrackerActiveFeedsStore;
 var init_liveTrackerActiveFeedsStore = __esm({
   "../grarf/desktop/src/store/liveTrackerActiveFeedsStore.ts"() {
     init_define_import_meta_env();
-    import_zustand23 = __toESM(require_zustand(), 1);
+    import_zustand24 = __toESM(require_zustand(), 1);
     init_resolveActiveLiveTrackerFeeds();
     init_canonicalLiveGameStore();
     init_liveTrackerLiveLeaguesStore();
     init_recentFinalizedGamesStore();
-    useLiveTrackerActiveFeedsStore = (0, import_zustand23.create)((set, get) => ({
+    useLiveTrackerActiveFeedsStore = (0, import_zustand24.create)((set, get) => ({
       ...emptySnapshot2(),
       syncFromLiveLeagues: () => {
         const { leagueKeys, updatedAt } = useLiveTrackerLiveLeaguesStore.getState();
@@ -51240,11 +51560,11 @@ function pruneLiveTrackerPostsIfNeeded() {
     return { ...prev, posts };
   });
 }
-var import_zustand24, LIVE_TRACKER_RSS_INGEST_REFRESH_MS, useLiveTrackerPostsStore, previousLiveIngestLeagueKeys;
+var import_zustand25, LIVE_TRACKER_RSS_INGEST_REFRESH_MS, useLiveTrackerPostsStore, previousLiveIngestLeagueKeys;
 var init_liveTrackerPostsStore = __esm({
   "../grarf/desktop/src/store/liveTrackerPostsStore.ts"() {
     init_define_import_meta_env();
-    import_zustand24 = __toESM(require_zustand(), 1);
+    import_zustand25 = __toESM(require_zustand(), 1);
     init_isGrarfWebRenderer();
     init_fetchActiveLiveTrackerPosts();
     init_sortLiveTrackerPosts();
@@ -51259,7 +51579,7 @@ var init_liveTrackerPostsStore = __esm({
     init_liveTrackerLeagueRetentionStore();
     init_recentFinalizedGamesStore();
     LIVE_TRACKER_RSS_INGEST_REFRESH_MS = 3e4;
-    useLiveTrackerPostsStore = (0, import_zustand24.create)((set, get) => ({
+    useLiveTrackerPostsStore = (0, import_zustand25.create)((set, get) => ({
       ...emptySnapshot3(),
       refresh: async () => {
         if (resolveCurrentlyLiveLeagueKeys().length === 0) {
@@ -51407,14 +51727,14 @@ async function fetchAllHeadlines() {
   );
   return Object.fromEntries(results);
 }
-var import_zustand25, useHomeSportscapeHeadlinesStore;
+var import_zustand26, useHomeSportscapeHeadlinesStore;
 var init_homeSportscapeHeadlinesStore = __esm({
   "../grarf/desktop/src/store/homeSportscapeHeadlinesStore.ts"() {
     init_define_import_meta_env();
-    import_zustand25 = __toESM(require_zustand(), 1);
+    import_zustand26 = __toESM(require_zustand(), 1);
     init_homeSportscapeHeadlinesFeeds();
     init_fetchHomeSportscapeHeadlineFeed();
-    useHomeSportscapeHeadlinesStore = (0, import_zustand25.create)((set, get) => ({
+    useHomeSportscapeHeadlinesStore = (0, import_zustand26.create)((set, get) => ({
       headlinesBySourceId: {},
       loading: true,
       refresh: async () => {
@@ -51769,13 +52089,13 @@ function mergeSignalsFeedEvents(previous, incoming) {
   }
   return merged;
 }
-var import_zustand26, useWebSignalsFeedStore;
+var import_zustand27, useWebSignalsFeedStore;
 var init_webSignalsFeedStore = __esm({
   "../grarf/desktop/src/store/webSignalsFeedStore.ts"() {
     init_define_import_meta_env();
-    import_zustand26 = __toESM(require_zustand(), 1);
+    import_zustand27 = __toESM(require_zustand(), 1);
     init_fetchGameSocialRailFeedEvents();
-    useWebSignalsFeedStore = (0, import_zustand26.create)((set, get) => ({
+    useWebSignalsFeedStore = (0, import_zustand27.create)((set, get) => ({
       activeResolution: null,
       events: [],
       loading: false,
@@ -52070,12 +52390,12 @@ var init_EditorialBridge = __esm({
 });
 
 // ../grarf/desktop/src/store/briefingPersistenceFallbackStore.ts
-var import_zustand27, useBriefingPersistenceFallbackStore;
+var import_zustand28, useBriefingPersistenceFallbackStore;
 var init_briefingPersistenceFallbackStore = __esm({
   "../grarf/desktop/src/store/briefingPersistenceFallbackStore.ts"() {
     init_define_import_meta_env();
-    import_zustand27 = __toESM(require_zustand(), 1);
-    useBriefingPersistenceFallbackStore = (0, import_zustand27.create)((set) => ({
+    import_zustand28 = __toESM(require_zustand(), 1);
+    useBriefingPersistenceFallbackStore = (0, import_zustand28.create)((set) => ({
       snapshots: {},
       loaded: false,
       setSnapshots: (snapshots) => set({ snapshots, loaded: true }),
@@ -54593,14 +54913,14 @@ function syncRecommendationPresentation() {
     urgencyById
   }));
 }
-var import_zustand28, useRecommendationPresentationStore;
+var import_zustand29, useRecommendationPresentationStore;
 var init_recommendationPresentationStore = __esm({
   "../grarf/desktop/src/lib/recommendationPresentation/recommendationPresentationStore.ts"() {
     init_define_import_meta_env();
-    import_zustand28 = __toESM(require_zustand(), 1);
+    import_zustand29 = __toESM(require_zustand(), 1);
     init_attentionRuntime();
     init_recommendationRuntime();
-    useRecommendationPresentationStore = (0, import_zustand28.create)(() => ({
+    useRecommendationPresentationStore = (0, import_zustand29.create)(() => ({
       syncVersion: 0,
       primaryRecommendationId: null,
       elevatedIds: {},
@@ -56219,14 +56539,14 @@ function activateNextFromQueue(set, get) {
   const [next, ...rest] = queue;
   set({ active: next, queue: rest });
 }
-var import_zustand29, MAX_QUEUE, useGamesSpineTransientAlertStore;
+var import_zustand30, MAX_QUEUE, useGamesSpineTransientAlertStore;
 var init_gamesSpineTransientAlertStore = __esm({
   "../grarf/desktop/src/store/gamesSpineTransientAlertStore.ts"() {
     init_define_import_meta_env();
-    import_zustand29 = __toESM(require_zustand(), 1);
+    import_zustand30 = __toESM(require_zustand(), 1);
     init_gamesSpineTransientAlertScheduler();
     MAX_QUEUE = 24;
-    useGamesSpineTransientAlertStore = (0, import_zustand29.create)((set, get) => ({
+    useGamesSpineTransientAlertStore = (0, import_zustand30.create)((set, get) => ({
       active: null,
       queue: [],
       enqueue: (items) => {
@@ -56279,13 +56599,13 @@ function toTransientQueueItems(items) {
     gameId: item.gameId
   }));
 }
-var import_zustand30, useGamesSpineCloseGameAlertStore;
+var import_zustand31, useGamesSpineCloseGameAlertStore;
 var init_gamesSpineCloseGameAlertStore = __esm({
   "../grarf/desktop/src/store/gamesSpineCloseGameAlertStore.ts"() {
     init_define_import_meta_env();
-    import_zustand30 = __toESM(require_zustand(), 1);
+    import_zustand31 = __toESM(require_zustand(), 1);
     init_gamesSpineTransientAlertStore();
-    useGamesSpineCloseGameAlertStore = (0, import_zustand30.create)(() => ({
+    useGamesSpineCloseGameAlertStore = (0, import_zustand31.create)(() => ({
       queue: [],
       active: null,
       enqueue: (items) => {
@@ -56358,11 +56678,11 @@ function appendOperationalAlert(get, set, alert) {
     logOperationalAlertInsertedBelowStack(addedToStack, nextVisible.length);
   }
 }
-var import_zustand31, OPERATIONAL_ALERT_APPEARANCE_DELAY_MIN_MS, OPERATIONAL_ALERT_APPEARANCE_DELAY_MAX_MS, sessionOnceEmitted2, useOperationalAlertStore;
+var import_zustand32, OPERATIONAL_ALERT_APPEARANCE_DELAY_MIN_MS, OPERATIONAL_ALERT_APPEARANCE_DELAY_MAX_MS, sessionOnceEmitted2, useOperationalAlertStore;
 var init_operationalAlertStore = __esm({
   "../grarf/desktop/src/store/operationalAlertStore.ts"() {
     init_define_import_meta_env();
-    import_zustand31 = __toESM(require_zustand(), 1);
+    import_zustand32 = __toESM(require_zustand(), 1);
     init_alertActions();
     init_isGrarfWebRenderer();
     init_operationalAlerts();
@@ -56371,7 +56691,7 @@ var init_operationalAlertStore = __esm({
     OPERATIONAL_ALERT_APPEARANCE_DELAY_MIN_MS = 3e3;
     OPERATIONAL_ALERT_APPEARANCE_DELAY_MAX_MS = 1e4;
     sessionOnceEmitted2 = /* @__PURE__ */ new Set();
-    useOperationalAlertStore = (0, import_zustand31.create)((set, get) => ({
+    useOperationalAlertStore = (0, import_zustand32.create)((set, get) => ({
       visible: [],
       queue: [],
       enqueueInferred: (items) => {
@@ -59628,12 +59948,12 @@ var init_fetchGameLeagueHighlight = __esm({
 });
 
 // ../grarf/desktop/src/store/gameHighlightStore.ts
-var import_zustand32, useGameHighlightStore;
+var import_zustand33, useGameHighlightStore;
 var init_gameHighlightStore = __esm({
   "../grarf/desktop/src/store/gameHighlightStore.ts"() {
     init_define_import_meta_env();
-    import_zustand32 = __toESM(require_zustand(), 1);
-    useGameHighlightStore = (0, import_zustand32.create)((set, get) => ({
+    import_zustand33 = __toESM(require_zustand(), 1);
+    useGameHighlightStore = (0, import_zustand33.create)((set, get) => ({
       highlightsByGameId: {},
       setResolvedHighlight: (gameId, highlight) => {
         if (get().highlightsByGameId[gameId] === highlight) return;
@@ -59650,13 +59970,13 @@ var init_gameHighlightStore = __esm({
 });
 
 // ../grarf/desktop/src/store/mlbCatchupHighlightsStore.ts
-var import_zustand33, EMPTY_MAP, useMlbCatchupHighlightsStore;
+var import_zustand34, EMPTY_MAP, useMlbCatchupHighlightsStore;
 var init_mlbCatchupHighlightsStore = __esm({
   "../grarf/desktop/src/store/mlbCatchupHighlightsStore.ts"() {
     init_define_import_meta_env();
-    import_zustand33 = __toESM(require_zustand(), 1);
+    import_zustand34 = __toESM(require_zustand(), 1);
     EMPTY_MAP = {};
-    useMlbCatchupHighlightsStore = (0, import_zustand33.create)((set, get) => ({
+    useMlbCatchupHighlightsStore = (0, import_zustand34.create)((set, get) => ({
       date: "",
       highlightsByGamePk: EMPTY_MAP,
       setFeed: (snapshot) => set(snapshot),
@@ -59766,12 +60086,12 @@ var init_useGameForOperationalAlert = __esm({
 });
 
 // ../grarf/desktop/src/store/operationalAlertActionsStore.ts
-var import_zustand34, useOperationalAlertActionsStore;
+var import_zustand35, useOperationalAlertActionsStore;
 var init_operationalAlertActionsStore = __esm({
   "../grarf/desktop/src/store/operationalAlertActionsStore.ts"() {
     init_define_import_meta_env();
-    import_zustand34 = __toESM(require_zustand(), 1);
-    useOperationalAlertActionsStore = (0, import_zustand34.create)((set, get) => ({
+    import_zustand35 = __toESM(require_zustand(), 1);
+    useOperationalAlertActionsStore = (0, import_zustand35.create)((set, get) => ({
       actions: null,
       register: (actions) => {
         set({ actions });
@@ -60447,12 +60767,12 @@ var init_DemoModeAlertBridge = __esm({
 });
 
 // ../grarf/desktop/src/store/podcastPlayerStore.ts
-var import_zustand35, usePodcastPlayerStore;
+var import_zustand36, usePodcastPlayerStore;
 var init_podcastPlayerStore = __esm({
   "../grarf/desktop/src/store/podcastPlayerStore.ts"() {
     init_define_import_meta_env();
-    import_zustand35 = __toESM(require_zustand(), 1);
-    usePodcastPlayerStore = (0, import_zustand35.create)((set, get) => ({
+    import_zustand36 = __toESM(require_zustand(), 1);
+    usePodcastPlayerStore = (0, import_zustand36.create)((set, get) => ({
       episode: null,
       isPlaying: false,
       volume: 0.9,
@@ -64938,12 +65258,12 @@ var init_normalizeLiveTrackEventToEvidence = __esm({
 function getEvidenceCatalogStore() {
   return useEvidenceCatalogStore;
 }
-var import_zustand36, useEvidenceCatalogStore;
+var import_zustand37, useEvidenceCatalogStore;
 var init_evidenceCatalogStore = __esm({
   "../grarf/desktop/src/singularity/store/evidenceCatalogStore.ts"() {
     init_define_import_meta_env();
-    import_zustand36 = __toESM(require_zustand(), 1);
-    useEvidenceCatalogStore = (0, import_zustand36.create)((set, get) => ({
+    import_zustand37 = __toESM(require_zustand(), 1);
+    useEvidenceCatalogStore = (0, import_zustand37.create)((set, get) => ({
       evidenceById: {},
       catalogGeneration: 0,
       upsertEvidence: (evidence) => {
@@ -65402,15 +65722,15 @@ function hydrateTimelineFromStorage2(now = Date.now()) {
 function getNewswireTimelineStore() {
   return useNewswireTimelineStore;
 }
-var import_zustand37, initialStoriesById, useNewswireTimelineStore;
+var import_zustand38, initialStoriesById, useNewswireTimelineStore;
 var init_newswireTimelineStore = __esm({
   "../grarf/desktop/src/store/newswireTimelineStore.ts"() {
     init_define_import_meta_env();
-    import_zustand37 = __toESM(require_zustand(), 1);
+    import_zustand38 = __toESM(require_zustand(), 1);
     init_newswireTimelineStorage();
     init_liveTrackAnimationStore();
     initialStoriesById = hydrateTimelineFromStorage2();
-    useNewswireTimelineStore = (0, import_zustand37.create)((set, get) => ({
+    useNewswireTimelineStore = (0, import_zustand38.create)((set, get) => ({
       storiesById: initialStoriesById,
       version: 0,
       appendStory: (story) => {
@@ -66158,14 +66478,14 @@ var init_AppShellLayout = __esm({
 });
 
 // ../grarf/desktop/src/store/adminModeStore.ts
-var import_zustand38, useAdminModeStore;
+var import_zustand39, useAdminModeStore;
 var init_adminModeStore = __esm({
   "../grarf/desktop/src/store/adminModeStore.ts"() {
     init_define_import_meta_env();
-    import_zustand38 = __toESM(require_zustand(), 1);
+    import_zustand39 = __toESM(require_zustand(), 1);
     init_isGrarfWebRenderer();
     init_centerPaneApplicationModeStore();
-    useAdminModeStore = (0, import_zustand38.create)((set, get) => ({
+    useAdminModeStore = (0, import_zustand39.create)((set, get) => ({
       isAdminMode: false,
       enterAdminMode: () => {
         set({ isAdminMode: true });
@@ -66586,14 +66906,14 @@ function consumePendingBrowserLiveLeagueSubmenuEntry() {
   pendingBrowserEntryLeagueSubmenuId = null;
   return id;
 }
-var import_zustand39, pendingBrowserEntryLeagueSubmenuId, useHomeLiveLeagueSubmenuStore;
+var import_zustand40, pendingBrowserEntryLeagueSubmenuId, useHomeLiveLeagueSubmenuStore;
 var init_homeLiveLeagueSubmenuStore = __esm({
   "../grarf/desktop/src/store/homeLiveLeagueSubmenuStore.ts"() {
     init_define_import_meta_env();
-    import_zustand39 = __toESM(require_zustand(), 1);
+    import_zustand40 = __toESM(require_zustand(), 1);
     init_homeLiveLeagueSubmenu();
     pendingBrowserEntryLeagueSubmenuId = null;
-    useHomeLiveLeagueSubmenuStore = (0, import_zustand39.create)((set) => ({
+    useHomeLiveLeagueSubmenuStore = (0, import_zustand40.create)((set) => ({
       activeId: HOME_LIVE_LEAGUE_SUBMENU_DEFAULT,
       setActiveId: (id) => set({ activeId: id }),
       resetToDefault: () => set({ activeId: HOME_LIVE_LEAGUE_SUBMENU_DEFAULT })
@@ -66634,12 +66954,12 @@ var init_useHomeLiveLeagueSubmenuEntryDefaults = __esm({
 });
 
 // ../grarf/desktop/src/store/homeLiveMotorsportsSubmenuStore.ts
-var import_zustand40, useHomeLiveMotorsportsSubmenuStore;
+var import_zustand41, useHomeLiveMotorsportsSubmenuStore;
 var init_homeLiveMotorsportsSubmenuStore = __esm({
   "../grarf/desktop/src/store/homeLiveMotorsportsSubmenuStore.ts"() {
     init_define_import_meta_env();
-    import_zustand40 = __toESM(require_zustand(), 1);
-    useHomeLiveMotorsportsSubmenuStore = (0, import_zustand40.create)((set) => ({
+    import_zustand41 = __toESM(require_zustand(), 1);
+    useHomeLiveMotorsportsSubmenuStore = (0, import_zustand41.create)((set) => ({
       activeId: null,
       setActiveId: (id) => set({ activeId: id }),
       clearActiveId: () => set({ activeId: null }),
@@ -66743,12 +67063,12 @@ var init_homeLiveSoccerSubmenu = __esm({
 });
 
 // ../grarf/desktop/src/store/homeLiveSoccerCompetitionSubmenuStore.ts
-var import_zustand41, useHomeLiveSoccerCompetitionSubmenuStore;
+var import_zustand42, useHomeLiveSoccerCompetitionSubmenuStore;
 var init_homeLiveSoccerCompetitionSubmenuStore = __esm({
   "../grarf/desktop/src/store/homeLiveSoccerCompetitionSubmenuStore.ts"() {
     init_define_import_meta_env();
-    import_zustand41 = __toESM(require_zustand(), 1);
-    useHomeLiveSoccerCompetitionSubmenuStore = (0, import_zustand41.create)((set) => ({
+    import_zustand42 = __toESM(require_zustand(), 1);
+    useHomeLiveSoccerCompetitionSubmenuStore = (0, import_zustand42.create)((set) => ({
       activeId: null,
       setActiveId: (id) => set({ activeId: id }),
       clearActiveId: () => set({ activeId: null }),
@@ -66758,13 +67078,13 @@ var init_homeLiveSoccerCompetitionSubmenuStore = __esm({
 });
 
 // ../grarf/desktop/src/store/homeLiveSoccerSubmenuStore.ts
-var import_zustand42, useHomeLiveSoccerSubmenuStore;
+var import_zustand43, useHomeLiveSoccerSubmenuStore;
 var init_homeLiveSoccerSubmenuStore = __esm({
   "../grarf/desktop/src/store/homeLiveSoccerSubmenuStore.ts"() {
     init_define_import_meta_env();
-    import_zustand42 = __toESM(require_zustand(), 1);
+    import_zustand43 = __toESM(require_zustand(), 1);
     init_homeLiveSoccerSubmenu();
-    useHomeLiveSoccerSubmenuStore = (0, import_zustand42.create)((set) => ({
+    useHomeLiveSoccerSubmenuStore = (0, import_zustand43.create)((set) => ({
       activeId: HOME_LIVE_SOCCER_SUBMENU_DEFAULT,
       setActiveId: (id) => set({ activeId: id }),
       clearActiveId: () => set({ activeId: null }),
@@ -66924,13 +67244,13 @@ function consumePendingBrowserHeadlinesWebsiteSubmenuEntry() {
   pendingActiveSourceId = null;
   return sourceId;
 }
-var import_zustand43, pendingActiveSourceId, useHomeHeadlinesWebsiteSubmenuStore;
+var import_zustand44, pendingActiveSourceId, useHomeHeadlinesWebsiteSubmenuStore;
 var init_homeHeadlinesWebsiteSubmenuStore = __esm({
   "../grarf/desktop/src/store/homeHeadlinesWebsiteSubmenuStore.ts"() {
     init_define_import_meta_env();
-    import_zustand43 = __toESM(require_zustand(), 1);
+    import_zustand44 = __toESM(require_zustand(), 1);
     pendingActiveSourceId = null;
-    useHomeHeadlinesWebsiteSubmenuStore = (0, import_zustand43.create)((set) => ({
+    useHomeHeadlinesWebsiteSubmenuStore = (0, import_zustand44.create)((set) => ({
       activeSourceId: null,
       focusSessionKey: null,
       focusGeneration: 0,
@@ -66972,13 +67292,13 @@ var init_homeLiveBettingSubmenu = __esm({
 });
 
 // ../grarf/desktop/src/store/homeLiveBettingSubmenuStore.ts
-var import_zustand44, useHomeLiveBettingSubmenuStore;
+var import_zustand45, useHomeLiveBettingSubmenuStore;
 var init_homeLiveBettingSubmenuStore = __esm({
   "../grarf/desktop/src/store/homeLiveBettingSubmenuStore.ts"() {
     init_define_import_meta_env();
-    import_zustand44 = __toESM(require_zustand(), 1);
+    import_zustand45 = __toESM(require_zustand(), 1);
     init_homeLiveBettingSubmenu();
-    useHomeLiveBettingSubmenuStore = (0, import_zustand44.create)((set) => ({
+    useHomeLiveBettingSubmenuStore = (0, import_zustand45.create)((set) => ({
       activeId: HOME_LIVE_BETTING_SUBMENU_DEFAULT,
       setActiveId: (id) => set({ activeId: id }),
       resetToDefault: () => set({ activeId: HOME_LIVE_BETTING_SUBMENU_DEFAULT })
@@ -67018,13 +67338,13 @@ var init_homeLiveFantasySubmenu = __esm({
 });
 
 // ../grarf/desktop/src/store/homeLiveFantasySubmenuStore.ts
-var import_zustand45, useHomeLiveFantasySubmenuStore;
+var import_zustand46, useHomeLiveFantasySubmenuStore;
 var init_homeLiveFantasySubmenuStore = __esm({
   "../grarf/desktop/src/store/homeLiveFantasySubmenuStore.ts"() {
     init_define_import_meta_env();
-    import_zustand45 = __toESM(require_zustand(), 1);
+    import_zustand46 = __toESM(require_zustand(), 1);
     init_homeLiveFantasySubmenu();
-    useHomeLiveFantasySubmenuStore = (0, import_zustand45.create)((set) => ({
+    useHomeLiveFantasySubmenuStore = (0, import_zustand46.create)((set) => ({
       activeId: HOME_LIVE_FANTASY_SUBMENU_DEFAULT,
       setActiveId: (id) => set({ activeId: id }),
       resetToDefault: () => set({ activeId: HOME_LIVE_FANTASY_SUBMENU_DEFAULT })
@@ -67846,12 +68166,12 @@ var init_resolveCanonicalWebHomeGamesSpineOperationalMode = __esm({
 });
 
 // ../grarf/desktop/src/store/scheduleCacheStore.ts
-var import_zustand46, useScheduleCacheStore;
+var import_zustand47, useScheduleCacheStore;
 var init_scheduleCacheStore = __esm({
   "../grarf/desktop/src/store/scheduleCacheStore.ts"() {
     init_define_import_meta_env();
-    import_zustand46 = __toESM(require_zustand(), 1);
-    useScheduleCacheStore = (0, import_zustand46.create)((set) => ({
+    import_zustand47 = __toESM(require_zustand(), 1);
+    useScheduleCacheStore = (0, import_zustand47.create)((set) => ({
       byDate: {},
       loadingByDate: {},
       errorByDate: {},
@@ -68058,14 +68378,14 @@ function selectPaneLayout(id) {
 function usePaneLayout(id) {
   return useWorkspaceLayoutStore(selectPaneLayout(id));
 }
-var import_zustand47, import_middleware2, useWorkspaceLayoutStore;
+var import_zustand48, import_middleware2, useWorkspaceLayoutStore;
 var init_workspaceLayoutStore = __esm({
   "../grarf/desktop/src/store/workspaceLayoutStore.ts"() {
     init_define_import_meta_env();
-    import_zustand47 = __toESM(require_zustand(), 1);
+    import_zustand48 = __toESM(require_zustand(), 1);
     import_middleware2 = __toESM(require_middleware(), 1);
     init_paneLayoutDefaults();
-    useWorkspaceLayoutStore = (0, import_zustand47.create)()(
+    useWorkspaceLayoutStore = (0, import_zustand48.create)()(
       (0, import_middleware2.persist)(
         (set) => ({
           layouts: mergePersistedPaneLayouts(),
@@ -68196,14 +68516,14 @@ function resolveGamesSpineSectionGamesMode(sectionKey, state3) {
 function useGamesSpineSectionGamesMode(sectionKey) {
   return useGamesSpineDisplayStore((state3) => resolveGamesSpineSectionGamesMode(sectionKey, state3));
 }
-var import_zustand48, useGamesSpineDisplayStore;
+var import_zustand49, useGamesSpineDisplayStore;
 var init_gamesSpineDisplayStore = __esm({
   "../grarf/desktop/src/store/gamesSpineDisplayStore.ts"() {
     init_define_import_meta_env();
-    import_zustand48 = __toESM(require_zustand(), 1);
+    import_zustand49 = __toESM(require_zustand(), 1);
     init_gamesSpineCompactLeftWidth();
     init_isGrarfWebRenderer();
-    useGamesSpineDisplayStore = (0, import_zustand48.create)((set, get) => ({
+    useGamesSpineDisplayStore = (0, import_zustand49.create)((set, get) => ({
       gamesMode: defaultGamesSpineGamesMode(),
       leagueGamesMode: {},
       toolbarPinned: false,
@@ -69324,14 +69644,14 @@ function computeDuplicateIds(priorities, gameDateKeys) {
 function clonePriorities(source) {
   return { ...source };
 }
-var import_zustand49, useAdminFeaturedPriorityStore;
+var import_zustand50, useAdminFeaturedPriorityStore;
 var init_adminFeaturedPriorityStore = __esm({
   "../grarf/desktop/src/store/adminFeaturedPriorityStore.ts"() {
     init_define_import_meta_env();
-    import_zustand49 = __toESM(require_zustand(), 1);
+    import_zustand50 = __toESM(require_zustand(), 1);
     init_editorialGameKey();
     init_gamesSpineOperationalDate();
-    useAdminFeaturedPriorityStore = (0, import_zustand49.create)((set, get) => ({
+    useAdminFeaturedPriorityStore = (0, import_zustand50.create)((set, get) => ({
       priorities: {},
       persistedBaselinePriorities: {},
       gameDateKeys: {},
@@ -73544,13 +73864,13 @@ var init_gamesSpineLeagueHeaderTypography = __esm({
 });
 
 // ../grarf/desktop/src/store/gamesSpineOperationsGamesStore.ts
-var import_zustand50, useGamesSpineOperationsGamesStore;
+var import_zustand51, useGamesSpineOperationsGamesStore;
 var init_gamesSpineOperationsGamesStore = __esm({
   "../grarf/desktop/src/store/gamesSpineOperationsGamesStore.ts"() {
     init_define_import_meta_env();
-    import_zustand50 = __toESM(require_zustand(), 1);
+    import_zustand51 = __toESM(require_zustand(), 1);
     init_adminFeaturedPriorityStore();
-    useGamesSpineOperationsGamesStore = (0, import_zustand50.create)(
+    useGamesSpineOperationsGamesStore = (0, import_zustand51.create)(
       (set, get) => ({
         gamesByKey: {},
         publishSectionGames: (key2, games) => {
@@ -76139,12 +76459,12 @@ var init_GamesSpineTransientAlertQueue = __esm({
 });
 
 // ../grarf/desktop/src/store/gamesSpineOperationsStructureStore.ts
-var import_zustand51, useGamesSpineOperationsStructureStore;
+var import_zustand52, useGamesSpineOperationsStructureStore;
 var init_gamesSpineOperationsStructureStore = __esm({
   "../grarf/desktop/src/store/gamesSpineOperationsStructureStore.ts"() {
     init_define_import_meta_env();
-    import_zustand51 = __toESM(require_zustand(), 1);
-    useGamesSpineOperationsStructureStore = (0, import_zustand51.create)(
+    import_zustand52 = __toESM(require_zustand(), 1);
+    useGamesSpineOperationsStructureStore = (0, import_zustand52.create)(
       (set) => ({
         sections: [],
         setSections: (sections) => set({ sections })
@@ -79448,13 +79768,13 @@ function bindIntelligenceStoreUpdates() {
     });
   });
 }
-var import_zustand52, useIntelligenceStore;
+var import_zustand53, useIntelligenceStore;
 var init_intelligenceStore = __esm({
   "../grarf/desktop/src/store/intelligenceStore.ts"() {
     init_define_import_meta_env();
-    import_zustand52 = __toESM(require_zustand(), 1);
+    import_zustand53 = __toESM(require_zustand(), 1);
     init_intelligenceApi();
-    useIntelligenceStore = (0, import_zustand52.create)((set, get) => ({
+    useIntelligenceStore = (0, import_zustand53.create)((set, get) => ({
       items: [],
       loading: false,
       syncing: false,
@@ -87108,14 +87428,14 @@ var init_leagueHomePaneLayoutStorage = __esm({
 });
 
 // ../grarf/desktop/src/store/leagueHomePaneLayoutStore.ts
-var import_zustand53, import_middleware3, useLeagueHomePaneLayoutStore;
+var import_zustand54, import_middleware3, useLeagueHomePaneLayoutStore;
 var init_leagueHomePaneLayoutStore = __esm({
   "../grarf/desktop/src/store/leagueHomePaneLayoutStore.ts"() {
     init_define_import_meta_env();
-    import_zustand53 = __toESM(require_zustand(), 1);
+    import_zustand54 = __toESM(require_zustand(), 1);
     import_middleware3 = __toESM(require_middleware(), 1);
     init_leagueHomePaneLayoutStorage();
-    useLeagueHomePaneLayoutStore = (0, import_zustand53.create)()(
+    useLeagueHomePaneLayoutStore = (0, import_zustand54.create)()(
       (0, import_middleware3.persist)(
         (set) => ({
           byLeague: {},
@@ -87792,12 +88112,12 @@ var init_LeagueHomePageLayout = __esm({
 });
 
 // ../grarf/desktop/src/store/homeSourceFocusStore.ts
-var import_zustand54, useHomeSourceFocusStore;
+var import_zustand55, useHomeSourceFocusStore;
 var init_homeSourceFocusStore = __esm({
   "../grarf/desktop/src/store/homeSourceFocusStore.ts"() {
     init_define_import_meta_env();
-    import_zustand54 = __toESM(require_zustand(), 1);
-    useHomeSourceFocusStore = (0, import_zustand54.create)((set) => ({
+    import_zustand55 = __toESM(require_zustand(), 1);
+    useHomeSourceFocusStore = (0, import_zustand55.create)((set) => ({
       selectedArticleUrlBySession: {},
       borrowedCardWebviewKeys: {},
       webFullscreenSessionKey: null,
@@ -95490,11 +95810,11 @@ function stickyDisplayHighlight(authoritative) {
   if (authoritative && isValidAllGamesHighlight(authoritative)) return authoritative;
   return null;
 }
-var import_zustand55, REFRESH_MS, STORAGE_KEY7, loadInFlight, useMlbAllGamesHighlightStore;
+var import_zustand56, REFRESH_MS, STORAGE_KEY7, loadInFlight, useMlbAllGamesHighlightStore;
 var init_mlbAllGamesHighlightStore = __esm({
   "../grarf/desktop/src/store/mlbAllGamesHighlightStore.ts"() {
     init_define_import_meta_env();
-    import_zustand55 = __toESM(require_zustand(), 1);
+    import_zustand56 = __toESM(require_zustand(), 1);
     init_youtubeAllGamesHighlight();
     init_mlbAllGamesHighlightDate3();
     init_operatorApi();
@@ -95502,7 +95822,7 @@ var init_mlbAllGamesHighlightStore = __esm({
     REFRESH_MS = 6 * 60 * 60 * 1e3;
     STORAGE_KEY7 = "grarf.mlbAllGamesHighlight.v4";
     loadInFlight = null;
-    useMlbAllGamesHighlightStore = (0, import_zustand55.create)((set, get) => {
+    useMlbAllGamesHighlightStore = (0, import_zustand56.create)((set, get) => {
       const cached = readCachedHighlight();
       const initialDisplay = stickyDisplayHighlight(cached);
       if (cached) {
@@ -96305,16 +96625,16 @@ function writeCachedHighlight2(item) {
   } catch {
   }
 }
-var import_zustand56, REFRESH_MS3, STORAGE_KEY8, loadInFlight2, useMlbMorningLineupHighlightStore;
+var import_zustand57, REFRESH_MS3, STORAGE_KEY8, loadInFlight2, useMlbMorningLineupHighlightStore;
 var init_mlbMorningLineupHighlightStore = __esm({
   "../grarf/desktop/src/store/mlbMorningLineupHighlightStore.ts"() {
     init_define_import_meta_env();
-    import_zustand56 = __toESM(require_zustand(), 1);
+    import_zustand57 = __toESM(require_zustand(), 1);
     init_youtubeMorningLineupHighlight();
     REFRESH_MS3 = 6 * 60 * 60 * 1e3;
     STORAGE_KEY8 = "grarf.mlbMorningLineupHighlight.v1";
     loadInFlight2 = null;
-    useMlbMorningLineupHighlightStore = (0, import_zustand56.create)((set, get) => {
+    useMlbMorningLineupHighlightStore = (0, import_zustand57.create)((set, get) => {
       const cached = readCachedHighlight2();
       const loadHighlight = async () => {
         if (loadInFlight2) return loadInFlight2;
@@ -100724,12 +101044,12 @@ var init_operationsLeagueResourceLinks2 = __esm({
 });
 
 // ../grarf/desktop/src/store/operationsManualGameEditorStore.ts
-var import_zustand57, useOperationsManualGameEditorStore;
+var import_zustand58, useOperationsManualGameEditorStore;
 var init_operationsManualGameEditorStore = __esm({
   "../grarf/desktop/src/store/operationsManualGameEditorStore.ts"() {
     init_define_import_meta_env();
-    import_zustand57 = __toESM(require_zustand(), 1);
-    useOperationsManualGameEditorStore = (0, import_zustand57.create)(
+    import_zustand58 = __toESM(require_zustand(), 1);
+    useOperationsManualGameEditorStore = (0, import_zustand58.create)(
       (set) => ({
         session: null,
         beginEdit: (session) => set({ session }),
@@ -103941,13 +104261,13 @@ var init_orchestrationExecutionEngine = __esm({
 });
 
 // ../grarf/desktop/src/store/orchestrationExecutionStore.ts
-var import_zustand58, useOrchestrationExecutionStore;
+var import_zustand59, useOrchestrationExecutionStore;
 var init_orchestrationExecutionStore = __esm({
   "../grarf/desktop/src/store/orchestrationExecutionStore.ts"() {
     init_define_import_meta_env();
-    import_zustand58 = __toESM(require_zustand(), 1);
+    import_zustand59 = __toESM(require_zustand(), 1);
     init_orchestrationExecutionEngine();
-    useOrchestrationExecutionStore = (0, import_zustand58.create)(() => {
+    useOrchestrationExecutionStore = (0, import_zustand59.create)(() => {
       const engine = getOrchestrationExecutionEngine();
       return {
         interruptState: engine.getState(),
@@ -104270,13 +104590,13 @@ var init_liveTrackerLeagueFilter = __esm({
 });
 
 // ../grarf/desktop/src/store/liveTrackerLeagueFilterStore.ts
-var import_zustand59, useLiveTrackerLeagueFilterStore;
+var import_zustand60, useLiveTrackerLeagueFilterStore;
 var init_liveTrackerLeagueFilterStore = __esm({
   "../grarf/desktop/src/store/liveTrackerLeagueFilterStore.ts"() {
     init_define_import_meta_env();
-    import_zustand59 = __toESM(require_zustand(), 1);
+    import_zustand60 = __toESM(require_zustand(), 1);
     init_liveTrackerLeagueFilter();
-    useLiveTrackerLeagueFilterStore = (0, import_zustand59.create)((set, get) => ({
+    useLiveTrackerLeagueFilterStore = (0, import_zustand60.create)((set, get) => ({
       disabledLeagueKeys: [],
       disableLeague: (league2) => {
         set((state3) => {
@@ -105580,12 +105900,12 @@ function filterNewswireStoriesForDisplay(stories, heldStoryIds) {
 function getNewswireStagedQueueStore() {
   return useNewswireStagedQueueStore;
 }
-var import_zustand60, useNewswireStagedQueueStore;
+var import_zustand61, useNewswireStagedQueueStore;
 var init_newswireStagedQueueStore = __esm({
   "../grarf/desktop/src/store/newswireStagedQueueStore.ts"() {
     init_define_import_meta_env();
-    import_zustand60 = __toESM(require_zustand(), 1);
-    useNewswireStagedQueueStore = (0, import_zustand60.create)((set, get) => ({
+    import_zustand61 = __toESM(require_zustand(), 1);
+    useNewswireStagedQueueStore = (0, import_zustand61.create)((set, get) => ({
       heldStoryIds: [],
       initialized: false,
       initializeFromStories: (stories) => {
