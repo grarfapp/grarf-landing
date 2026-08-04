@@ -14111,6 +14111,8 @@ var GAMES_COLUMN_LEAGUE_LABEL = {
   NATIONS: "Nations League",
   CLUBWC: "Club World Cup",
   CLUBFRIENDLY: "Club Friendly",
+  CONCACAF_CAC: "Central American Cup",
+  CAF_WNATIONS: "Women's AFCON",
   SPFL: "SPFL",
   SAUDI: "RSL",
   SUPERLIG: "Super Lig",
@@ -14190,6 +14192,13 @@ var ESPN_OPERATIONAL_INGEST_LEAGUES = [
     "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/ger.1/scoreboard"
   },
   {
+    "key": "CAF_WNATIONS",
+    "sport": "soccer",
+    "label": "Women's AFCON",
+    "slug": "caf.w.nations",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/caf.w.nations/scoreboard"
+  },
+  {
     "key": "CFL",
     "sport": "football",
     "label": "CFL",
@@ -14218,6 +14227,13 @@ var ESPN_OPERATIONAL_INGEST_LEAGUES = [
     "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.cwc/scoreboard"
   },
   {
+    "key": "CONCACAF_CAC",
+    "sport": "soccer",
+    "label": "Central American Cup",
+    "slug": "concacaf.central.american.cup",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/concacaf.central.american.cup/scoreboard"
+  },
+  {
     "key": "CONCACAF_CL",
     "sport": "soccer",
     "label": "CONCACAF Champions Cup",
@@ -14244,6 +14260,13 @@ var ESPN_OPERATIONAL_INGEST_LEAGUES = [
     "label": "Copa America",
     "slug": "conmebol.america",
     "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/conmebol.america/scoreboard"
+  },
+  {
+    "key": "COPA_BRASIL",
+    "sport": "soccer",
+    "label": "Copa do Brasil",
+    "slug": "bra.copa_do_brazil",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/bra.copa_do_brazil/scoreboard"
   },
   {
     "key": "CRICKET_BBL",

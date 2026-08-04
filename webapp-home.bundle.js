@@ -24350,6 +24350,8 @@ var init_gamesColumnLeagues = __esm({
       NATIONS: "Nations League",
       CLUBWC: "Club World Cup",
       CLUBFRIENDLY: "Club Friendly",
+      CONCACAF_CAC: "Central American Cup",
+      CAF_WNATIONS: "Women's AFCON",
       SPFL: "SPFL",
       SAUDI: "RSL",
       SUPERLIG: "Super Lig",
@@ -26862,6 +26864,13 @@ var init_espnOperationalLeagueRegistry_generated = __esm({
         "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/ger.1/scoreboard"
       },
       {
+        "key": "CAF_WNATIONS",
+        "sport": "soccer",
+        "label": "Women's AFCON",
+        "slug": "caf.w.nations",
+        "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/caf.w.nations/scoreboard"
+      },
+      {
         "key": "CFL",
         "sport": "football",
         "label": "CFL",
@@ -26890,6 +26899,13 @@ var init_espnOperationalLeagueRegistry_generated = __esm({
         "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.cwc/scoreboard"
       },
       {
+        "key": "CONCACAF_CAC",
+        "sport": "soccer",
+        "label": "Central American Cup",
+        "slug": "concacaf.central.american.cup",
+        "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/concacaf.central.american.cup/scoreboard"
+      },
+      {
         "key": "CONCACAF_CL",
         "sport": "soccer",
         "label": "CONCACAF Champions Cup",
@@ -26916,6 +26932,13 @@ var init_espnOperationalLeagueRegistry_generated = __esm({
         "label": "Copa America",
         "slug": "conmebol.america",
         "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/conmebol.america/scoreboard"
+      },
+      {
+        "key": "COPA_BRASIL",
+        "sport": "soccer",
+        "label": "Copa do Brasil",
+        "slug": "bra.copa_do_brazil",
+        "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/bra.copa_do_brazil/scoreboard"
       },
       {
         "key": "CRICKET_BBL",
@@ -38916,6 +38939,9 @@ var init_gamesSpineLeagueLogoUrls = __esm({
       NATIONS: "https://a.espncdn.com/i/leaguelogos/soccer/500/2395.png",
       CLUBWC: "https://a.espncdn.com/i/leaguelogos/soccer/500/1932.png",
       CLUBFRIENDLY: "/league-logos/soccer-ball.png",
+      CONCACAF_CAC: "/league-logos/central-american-cup.png",
+      CAF_WNATIONS: "/league-logos/womens-afcon.png",
+      COPA_BRASIL: "/league-logos/copa-do-brasil.png",
       WORLDCUP: WORLD_CUP_LEAGUE_LOGO_URL,
       ATP: "/league-logos/atp.png",
       WTA: "/league-logos/wta.png",
@@ -69403,6 +69429,8 @@ var init_commandBriefingLeagueLabel = __esm({
       NATIONS: "NATIONS LEAGUE",
       CLUBWC: "CLUB WORLD CUP",
       CLUBFRIENDLY: "Club Friendly",
+      CONCACAF_CAC: "Central American Cup",
+      CAF_WNATIONS: "Women's AFCON",
       SPFL: "SCOTTISH PREMIERSHIP",
       SAUDI: "SAUDI PRO LEAGUE",
       SUPERLIG: "SUPER LIG",
