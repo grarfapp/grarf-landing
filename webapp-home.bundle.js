@@ -53751,35 +53751,6 @@ function buildLiveTrackerDisplayLeaguesSnapshot(leagues, completedAtMsByLeague, 
     updatedAt
   };
 }
-function resolveLiveTrackerRssIngestLeagueKeys(leagues, completedAtMsByLeague, nowMs = Date.now(), retainedFinals = []) {
-  const ingestLeagues = [];
-  const seenLeagues = /* @__PURE__ */ new Set();
-  for (const league2 of getGamesColumnLeagueOrder()) {
-    if (!hasLiveTrackerFeedForLeague(league2)) continue;
-    const games = collectLiveTrackerLeagueGames(league2, leagues, retainedFinals, nowMs);
-    if (!isLeagueActiveForLiveTrackerRssIngestion(games, completedAtMsByLeague[league2], nowMs)) {
-      continue;
-    }
-    seenLeagues.add(league2);
-    ingestLeagues.push(league2);
-  }
-  const manualGamesByLeague = resolveManualLiveTrackerGamesByLeague(nowMs);
-  for (const feed of getLiveTrackerFeedRegistry()) {
-    if (seenLeagues.has(feed.league)) continue;
-    const games = manualGamesByLeague.get(feed.league);
-    if (!games?.length) continue;
-    if (!isLeagueActiveForLiveTrackerRssIngestion(
-      games,
-      completedAtMsByLeague[feed.league],
-      nowMs
-    )) {
-      continue;
-    }
-    seenLeagues.add(feed.league);
-    ingestLeagues.push(feed.league);
-  }
-  return ingestLeagues;
-}
 var init_resolveCurrentlyLiveGamesSpineLeagues = __esm({
   "../grarf/desktop/src/lib/liveTracker/resolveCurrentlyLiveGamesSpineLeagues.ts"() {
     init_define_import_meta_env();
@@ -54879,18 +54850,13 @@ function mergeRetainedLiveTrackerPosts(incoming, previous, _context, nowMs = Dat
     sortLiveTrackerPostsNewestFirst([...merged.values()])
   );
 }
-function resolveLiveIngestLeagueKeys(nowMs = Date.now()) {
+function resolveActiveLiveLeagueKeys() {
   const leagues = mergeOperationalLeagueGames(useCanonicalLiveGameStore.getState().leagues);
-  return resolveLiveTrackerRssIngestLeagueKeys(
-    leagues,
-    useLiveTrackerLeagueRetentionStore.getState().completedAtMsByLeague,
-    nowMs,
-    useRecentFinalizedGamesStore.getState().getAllRetained()
-  );
+  return resolveCurrentlyLiveGamesSpineLeagueKeys(leagues);
 }
 function buildPostRetentionContext() {
   return {
-    liveIngestLeagueKeys: resolveLiveIngestLeagueKeys(),
+    liveIngestLeagueKeys: resolveActiveLiveLeagueKeys(),
     completedAtMsByLeague: useLiveTrackerLeagueRetentionStore.getState().completedAtMsByLeague
   };
 }
@@ -54916,7 +54882,12 @@ function appendLiveTrackerFinalScorePosts(posts) {
     };
   });
   useLiveTrackerPostsStore.setState((prev) => {
-    const merged = mergeRetainedLiveTrackerPosts(stampedPosts, prev.posts, retentionContext, nowMs);
+    const merged = mergeRetainedLiveTrackerPosts(
+      stampedPosts,
+      prev.posts,
+      retentionContext,
+      nowMs
+    );
     persistLiveTrackerPostsIfWeb(merged);
     return { ...prev, posts: merged };
   });
@@ -54932,7 +54903,7 @@ function pruneLiveTrackerPostsIfNeeded() {
     return { ...prev, posts };
   });
 }
-var import_zustand27, LIVE_TRACKER_RSS_INGEST_REFRESH_MS, useLiveTrackerPostsStore, previousLiveIngestLeagueKeys;
+var import_zustand27, LIVE_TRACKER_RSS_INGEST_REFRESH_MS, useLiveTrackerPostsStore, previousActiveLiveLeagueKeys;
 var init_liveTrackerPostsStore = __esm({
   "../grarf/desktop/src/store/liveTrackerPostsStore.ts"() {
     init_define_import_meta_env();
@@ -54942,7 +54913,6 @@ var init_liveTrackerPostsStore = __esm({
     init_sortLiveTrackerPosts();
     init_liveTrackerFinalScoreEvents();
     init_operationalManualLeagueGames();
-    init_liveTrackerFeedRegistry();
     init_resolveActiveLiveTrackerFeeds();
     init_liveTrackerPostRetention();
     init_liveTrackerPostsPersistence();
@@ -54950,25 +54920,27 @@ var init_liveTrackerPostsStore = __esm({
     init_liveTrackerActiveFeedsStore();
     init_canonicalLiveGameStore();
     init_liveTrackerLeagueRetentionStore();
-    init_recentFinalizedGamesStore();
     LIVE_TRACKER_RSS_INGEST_REFRESH_MS = 3e4;
     useLiveTrackerPostsStore = (0, import_zustand27.create)((set, get) => ({
       ...emptySnapshot3(),
       refresh: async () => {
+        const activeLeagueKeys = resolveActiveLiveLeagueKeys();
         const retentionContext = buildPostRetentionContext();
         const leagues = mergeOperationalLeagueGames(useCanonicalLiveGameStore.getState().leagues);
-        const activeFeeds = resolveActiveLiveTrackerFeeds(retentionContext.liveIngestLeagueKeys, {
-          leagues,
-          retainedFinals: useRecentFinalizedGamesStore.getState().getAllRetained()
+        const feeds = resolveActiveLiveTrackerFeeds(activeLeagueKeys, {
+          leagues
         });
-        const feeds = activeFeeds.length > 0 ? activeFeeds : getLiveTrackerFeedRegistry();
         useLiveTrackerActiveFeedsStore.setState({
           feeds,
           feedUrls: feeds.map((feed) => feed.feedUrl),
           updatedAt: useCanonicalLiveGameStore.getState().updatedAt
         });
         const snapshot = await fetchActiveLiveTrackerPosts({ feeds });
-        const posts = mergeRetainedLiveTrackerPosts(snapshot.posts, get().posts, retentionContext);
+        const posts = mergeRetainedLiveTrackerPosts(
+          snapshot.posts,
+          get().posts,
+          retentionContext
+        );
         const nextSnapshot = {
           ...snapshot,
           posts
@@ -54978,32 +54950,30 @@ var init_liveTrackerPostsStore = __esm({
         return nextSnapshot;
       }
     }));
-    previousLiveIngestLeagueKeys = resolveLiveIngestLeagueKeys();
+    previousActiveLiveLeagueKeys = resolveActiveLiveLeagueKeys();
     useCanonicalLiveGameStore.subscribe(() => {
       const pendingFinalScorePosts2 = consumePendingLiveTrackerFinalScorePosts();
       if (pendingFinalScorePosts2.length > 0) {
         appendLiveTrackerFinalScorePosts(pendingFinalScorePosts2);
       }
-      const retentionContext = buildPostRetentionContext();
       pruneLiveTrackerPostsIfNeeded();
-      const liveIngestLeagueKeys = retentionContext.liveIngestLeagueKeys;
-      if (!leagueKeysChanged(liveIngestLeagueKeys, previousLiveIngestLeagueKeys)) return;
-      previousLiveIngestLeagueKeys = liveIngestLeagueKeys;
+      const activeLiveLeagueKeys = resolveActiveLiveLeagueKeys();
+      if (!leagueKeysChanged(activeLiveLeagueKeys, previousActiveLiveLeagueKeys)) return;
+      previousActiveLiveLeagueKeys = activeLiveLeagueKeys;
       void useLiveTrackerPostsStore.getState().refresh();
     });
     useLiveTrackerLeagueRetentionStore.subscribe(() => {
-      const retentionContext = buildPostRetentionContext();
       pruneLiveTrackerPostsIfNeeded();
-      const liveIngestLeagueKeys = retentionContext.liveIngestLeagueKeys;
-      if (!leagueKeysChanged(liveIngestLeagueKeys, previousLiveIngestLeagueKeys)) return;
-      previousLiveIngestLeagueKeys = liveIngestLeagueKeys;
+      const activeLiveLeagueKeys = resolveActiveLiveLeagueKeys();
+      if (!leagueKeysChanged(activeLiveLeagueKeys, previousActiveLiveLeagueKeys)) return;
+      previousActiveLiveLeagueKeys = activeLiveLeagueKeys;
       void useLiveTrackerPostsStore.getState().refresh();
     });
     if (typeof window !== "undefined" && isGrarfWebRenderer()) {
       window.setInterval(() => {
-        const liveIngestLeagueKeys = resolveLiveIngestLeagueKeys();
-        if (!leagueKeysChanged(liveIngestLeagueKeys, previousLiveIngestLeagueKeys)) return;
-        previousLiveIngestLeagueKeys = liveIngestLeagueKeys;
+        const activeLiveLeagueKeys = resolveActiveLiveLeagueKeys();
+        if (!leagueKeysChanged(activeLiveLeagueKeys, previousActiveLiveLeagueKeys)) return;
+        previousActiveLiveLeagueKeys = activeLiveLeagueKeys;
         void useLiveTrackerPostsStore.getState().refresh();
       }, LIVE_TRACKER_RSS_INGEST_REFRESH_MS);
     }
