@@ -52603,6 +52603,15 @@ function canonicalIntelligenceGameStoryId(gameId) {
 function canonicalIntelligenceEditorialStoryId(editorialId) {
   return `gie-story:editorial:${editorialId.trim()}`;
 }
+function canonicalIntelligenceLeagueStoryId(leagueKey) {
+  return `gie-story:league:${leagueKey}`;
+}
+function canonicalIntelligenceTournamentEntityId(tournamentId) {
+  return `${ENTITY_PREFIX}:tournament:${tournamentId.trim()}`;
+}
+function canonicalIntelligenceTournamentStoryId(tournamentId) {
+  return `gie-story:tournament:${tournamentId.trim()}`;
+}
 function canonicalIntelligenceTeamKey(abbrev, displayName) {
   const raw = (abbrev?.trim() || displayName.trim()).toLowerCase();
   const slug = raw.replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
@@ -52613,6 +52622,93 @@ var init_entityIds = __esm({
   "../grarf/shared/domain/intelligence/entityIds.ts"() {
     init_define_import_meta_env();
     ENTITY_PREFIX = "gie-entity";
+  }
+});
+
+// ../grarf/shared/domain/intelligence/producers/editorialStoryCatalog.ts
+function mapEditorialStoryDefinitionToInput(definition) {
+  const {
+    editorialId,
+    title,
+    description,
+    leagueKey,
+    tournamentId,
+    scheduledStartAt,
+    scheduledEndAt,
+    storyType,
+    metadata
+  } = definition;
+  return {
+    editorialId,
+    title,
+    storyType,
+    metadata: {
+      ...metadata ?? {},
+      ...description ? { description } : {},
+      ...leagueKey ? { leagueKey } : {},
+      ...tournamentId ? { tournamentId } : {},
+      ...scheduledStartAt ? { scheduledStartAt } : {},
+      ...scheduledEndAt ? { scheduledEndAt } : {}
+    }
+  };
+}
+var CANONICAL_EDITORIAL_STORY_CATALOG, EDITORIAL_STORY_INPUTS;
+var init_editorialStoryCatalog = __esm({
+  "../grarf/shared/domain/intelligence/producers/editorialStoryCatalog.ts"() {
+    init_define_import_meta_env();
+    CANONICAL_EDITORIAL_STORY_CATALOG = [
+      {
+        editorialId: "mlb-trade-deadline-2026",
+        title: "MLB Trade Deadline 2026",
+        description: "Major League Baseball trade deadline coverage.",
+        leagueKey: "MLB",
+        storyType: "trade_deadline",
+        scheduledStartAt: "2026-07-28T00:00:00.000Z",
+        scheduledEndAt: "2026-08-01T23:59:59.000Z",
+        metadata: { seasonYear: 2026 }
+      },
+      {
+        editorialId: "nfl-free-agency-2026",
+        title: "NFL Free Agency 2026",
+        description: "NFL free agency signing period coverage.",
+        leagueKey: "NFL",
+        storyType: "league_event",
+        scheduledStartAt: "2026-03-11T00:00:00.000Z",
+        scheduledEndAt: "2026-03-18T23:59:59.000Z",
+        metadata: { seasonYear: 2026 }
+      },
+      {
+        editorialId: "nba-trade-deadline-2026",
+        title: "NBA Trade Deadline 2026",
+        description: "NBA trade deadline coverage.",
+        leagueKey: "NBA",
+        storyType: "trade_deadline",
+        scheduledStartAt: "2026-02-05T00:00:00.000Z",
+        scheduledEndAt: "2026-02-06T23:59:59.000Z",
+        metadata: { seasonYear: 2026 }
+      },
+      {
+        editorialId: "nhl-trade-deadline-2026",
+        title: "NHL Trade Deadline 2026",
+        description: "NHL trade deadline coverage.",
+        leagueKey: "NHL",
+        storyType: "trade_deadline",
+        scheduledStartAt: "2026-03-06T00:00:00.000Z",
+        scheduledEndAt: "2026-03-07T23:59:59.000Z",
+        metadata: { seasonYear: 2026 }
+      },
+      {
+        editorialId: "epl-transfer-window-summer-2026",
+        title: "Premier League Summer Transfer Window 2026",
+        description: "Premier League summer transfer window coverage.",
+        leagueKey: "EPL",
+        storyType: "league_event",
+        scheduledStartAt: "2026-06-10T00:00:00.000Z",
+        scheduledEndAt: "2026-09-01T23:59:59.000Z",
+        metadata: { seasonYear: 2026, transferWindow: "summer" }
+      }
+    ];
+    EDITORIAL_STORY_INPUTS = CANONICAL_EDITORIAL_STORY_CATALOG.map(mapEditorialStoryDefinitionToInput);
   }
 });
 
@@ -52644,12 +52740,13 @@ function produceEditorialStoryOutput(context2) {
   }
   return { entities: [], stories };
 }
-var EDITORIAL_STORY_INPUTS, editorialStoryProducer;
+var editorialStoryProducer;
 var init_editorialStoryProducer = __esm({
   "../grarf/shared/domain/intelligence/producers/editorialStoryProducer.ts"() {
     init_define_import_meta_env();
     init_entityIds();
-    EDITORIAL_STORY_INPUTS = [];
+    init_editorialStoryCatalog();
+    init_editorialStoryCatalog();
     editorialStoryProducer = {
       id: "editorial",
       produce: produceEditorialStoryOutput
@@ -52759,6 +52856,159 @@ var init_gameStoryProducer = __esm({
   }
 });
 
+// ../grarf/shared/domain/intelligence/producers/leagueStoryProducer.ts
+function resolveLeagueKeyFromGame(game) {
+  return game.league ?? "MLB";
+}
+function collectLeagueKeysFromGames(games) {
+  const keys = /* @__PURE__ */ new Set();
+  for (const game of games) {
+    if (!game?.id?.trim()) continue;
+    keys.add(resolveLeagueKeyFromGame(game));
+  }
+  return [...keys].sort();
+}
+function buildCanonicalLeagueStoryArtifacts(leagueKey) {
+  const updatedAt = (/* @__PURE__ */ new Date()).toISOString();
+  return {
+    story: {
+      storyId: canonicalIntelligenceLeagueStoryId(leagueKey),
+      storyType: "league_event",
+      phase: "live",
+      title: leagueKey,
+      entityIds: [canonicalIntelligenceLeagueEntityId(leagueKey)],
+      updatedAt,
+      metadata: { leagueKey }
+    }
+  };
+}
+function produceLeagueStoryOutput(context2) {
+  const leagueKeys = collectLeagueKeysFromGames(context2.games ?? []);
+  const stories = leagueKeys.map((leagueKey) => buildCanonicalLeagueStoryArtifacts(leagueKey).story);
+  return {
+    entities: [],
+    stories
+  };
+}
+var leagueStoryProducer;
+var init_leagueStoryProducer = __esm({
+  "../grarf/shared/domain/intelligence/producers/leagueStoryProducer.ts"() {
+    init_define_import_meta_env();
+    init_entityIds();
+    leagueStoryProducer = {
+      id: "league",
+      produce: produceLeagueStoryOutput
+    };
+  }
+});
+
+// ../grarf/shared/domain/intelligence/producers/tournamentStoryProducer.ts
+function resolveLeagueKeyFromGame2(game) {
+  return game.league ?? "MLB";
+}
+function resolveRacingTournamentTitle(game) {
+  const awayTeam = game.awayTeam?.trim();
+  const sessionLabel = game.metadata?.racingSessionLabel?.trim();
+  if (awayTeam && sessionLabel && awayTeam.includes(" \xB7 ")) {
+    return awayTeam.split(" \xB7 ")[0]?.trim() || awayTeam;
+  }
+  return awayTeam || game.metadata?.canonicalEvent?.title?.trim() || game.id;
+}
+function resolveTournamentIdentityFromGame(game) {
+  if (!game?.id?.trim()) return null;
+  const leagueKey = resolveLeagueKeyFromGame2(game);
+  const racingEventId = game.metadata?.racingEventId?.trim();
+  if (racingEventId) {
+    return {
+      tournamentId: `espn-${leagueKey}-${racingEventId}`,
+      title: resolveRacingTournamentTitle(game),
+      leagueKey
+    };
+  }
+  const ufcCardEventId = game.metadata?.ufcCardEventId?.trim();
+  if (ufcCardEventId) {
+    return {
+      tournamentId: `espn-UFC-${ufcCardEventId}`,
+      title: game.metadata?.ufcCardName?.trim() || "UFC Card",
+      leagueKey
+    };
+  }
+  const canonicalEvent = game.metadata?.canonicalEvent;
+  const eventId = canonicalEvent?.eventId?.trim();
+  if (eventId && canonicalEvent) {
+    const eventLeague = canonicalEvent.league ?? leagueKey;
+    return {
+      tournamentId: `espn-${eventLeague}-${eventId}`,
+      title: canonicalEvent.title?.trim() || game.awayTeam?.trim() || eventId,
+      leagueKey: eventLeague
+    };
+  }
+  return null;
+}
+function collectTournamentIdentitiesFromGames(games) {
+  const byId = /* @__PURE__ */ new Map();
+  for (const game of games) {
+    const identity = resolveTournamentIdentityFromGame(game);
+    if (!identity) continue;
+    const existing = byId.get(identity.tournamentId);
+    if (!existing || existing.title === identity.tournamentId) {
+      byId.set(identity.tournamentId, identity);
+    }
+  }
+  return [...byId.values()].sort(
+    (left, right) => left.tournamentId.localeCompare(right.tournamentId)
+  );
+}
+function buildCanonicalTournamentStoryArtifacts(identity) {
+  const updatedAt = (/* @__PURE__ */ new Date()).toISOString();
+  const entity = {
+    entityId: canonicalIntelligenceTournamentEntityId(identity.tournamentId),
+    entityType: "tournament",
+    displayName: identity.title,
+    metadata: {
+      leagueKey: identity.leagueKey,
+      tournamentId: identity.tournamentId
+    }
+  };
+  return {
+    entity,
+    story: {
+      storyId: canonicalIntelligenceTournamentStoryId(identity.tournamentId),
+      storyType: "tournament",
+      phase: "live",
+      title: identity.title,
+      entityIds: [entity.entityId],
+      updatedAt,
+      metadata: {
+        leagueKey: identity.leagueKey,
+        tournamentId: identity.tournamentId
+      }
+    }
+  };
+}
+function produceTournamentStoryOutput(context2) {
+  const identities = collectTournamentIdentitiesFromGames(context2.games ?? []);
+  const entities = [];
+  const stories = [];
+  for (const identity of identities) {
+    const artifacts = buildCanonicalTournamentStoryArtifacts(identity);
+    entities.push(artifacts.entity);
+    stories.push(artifacts.story);
+  }
+  return { entities, stories };
+}
+var tournamentStoryProducer;
+var init_tournamentStoryProducer = __esm({
+  "../grarf/shared/domain/intelligence/producers/tournamentStoryProducer.ts"() {
+    init_define_import_meta_env();
+    init_entityIds();
+    tournamentStoryProducer = {
+      id: "tournament",
+      produce: produceTournamentStoryOutput
+    };
+  }
+});
+
 // ../grarf/shared/domain/intelligence/producers/mergeStoryProducerOutput.ts
 function mergeStoryUpdate(existingStory, story) {
   return {
@@ -52841,9 +53091,13 @@ var init_runCanonicalStoryProducers = __esm({
     init_define_import_meta_env();
     init_editorialStoryProducer();
     init_gameStoryProducer();
+    init_leagueStoryProducer();
+    init_tournamentStoryProducer();
     init_mergeStoryProducerOutput();
     CANONICAL_STORY_PRODUCERS = [
       gameStoryProducer,
+      leagueStoryProducer,
+      tournamentStoryProducer,
       editorialStoryProducer
     ];
   }
@@ -52858,6 +53112,650 @@ var init_applyIngestedGamesToRegistry = __esm({
   "../grarf/shared/domain/intelligence/applyIngestedGamesToRegistry.ts"() {
     init_define_import_meta_env();
     init_runCanonicalStoryProducers();
+  }
+});
+
+// ../grarf/shared/domain/intelligencePipeline/buildPipelineEnrichmentReferences.ts
+function resolveEnrichmentKind(contentKind) {
+  switch (contentKind) {
+    case "rss_item":
+    case "newswire_item":
+      return "rss_item";
+    case "social_post":
+    case "livetrack_event":
+      return "social_post";
+    case "video":
+    case "podcast":
+      return "video";
+    case "statistic":
+      return "statistic";
+    case "odds_update":
+      return "odds";
+    case "standings_update":
+      return "standings";
+    case "transaction":
+      return "signal";
+    default:
+      return "article";
+  }
+}
+function buildEnrichmentReference(sourceContentId, contentKind, association, content) {
+  const metadata = {
+    contentKind,
+    associationReason: association.reason,
+    objectKind: association.objectReference.kind,
+    objectId: association.objectReference.objectId,
+    ...content?.metadata ?? {}
+  };
+  if (content?.publishedAt) {
+    metadata.publishedAt = content.publishedAt;
+  }
+  if (content?.source) {
+    metadata.contentSource = content.source;
+  }
+  return {
+    refId: sourceContentId,
+    kind: resolveEnrichmentKind(contentKind),
+    attachedAt: (/* @__PURE__ */ new Date()).toISOString(),
+    source: PIPELINE_SOURCE,
+    metadata
+  };
+}
+function buildPipelineEnrichmentReferences(sourceContentId, contentKind, associations, content) {
+  return associations.map((association) => ({
+    storyId: association.storyId,
+    reference: buildEnrichmentReference(sourceContentId, contentKind, association, content),
+    association
+  }));
+}
+var PIPELINE_SOURCE;
+var init_buildPipelineEnrichmentReferences = __esm({
+  "../grarf/shared/domain/intelligencePipeline/buildPipelineEnrichmentReferences.ts"() {
+    init_define_import_meta_env();
+    PIPELINE_SOURCE = "canonical-intelligence-pipeline";
+  }
+});
+
+// ../grarf/shared/domain/storyAssociation/resolveStoryCandidateForObjectReference.ts
+function canonicalLeagueStoryId(leagueKey) {
+  return `${LEAGUE_STORY_PREFIX}${leagueKey.trim()}`;
+}
+function canonicalTournamentStoryId(tournamentId) {
+  return `${TOURNAMENT_STORY_PREFIX}${tournamentId.trim()}`;
+}
+function resolveStoryCandidateForObjectReference(reference) {
+  switch (reference.kind) {
+    case "game":
+      return {
+        storyId: canonicalIntelligenceGameStoryId(reference.objectId),
+        reason: "game_reference"
+      };
+    case "league":
+      return {
+        storyId: canonicalLeagueStoryId(reference.objectId),
+        reason: "league_reference"
+      };
+    case "tournament":
+      return {
+        storyId: canonicalTournamentStoryId(reference.objectId),
+        reason: "tournament_reference"
+      };
+    default:
+      return null;
+  }
+}
+var LEAGUE_STORY_PREFIX, TOURNAMENT_STORY_PREFIX;
+var init_resolveStoryCandidateForObjectReference = __esm({
+  "../grarf/shared/domain/storyAssociation/resolveStoryCandidateForObjectReference.ts"() {
+    init_define_import_meta_env();
+    init_entityIds();
+    LEAGUE_STORY_PREFIX = "gie-story:league:";
+    TOURNAMENT_STORY_PREFIX = "gie-story:tournament:";
+  }
+});
+
+// ../grarf/shared/domain/storyAssociation/associateUnderstandingWithStories.ts
+function isPrimaryGameReference(reference) {
+  return reference.kind === "game" && reference.role !== "secondary";
+}
+function selectAssociationReferences(references) {
+  const gameReferences = references.filter((reference) => reference.kind === "game");
+  if (gameReferences.length > 0) {
+    const primaryGames = gameReferences.filter(isPrimaryGameReference);
+    return primaryGames.length > 0 ? primaryGames : gameReferences;
+  }
+  const tournamentReferences = references.filter((reference) => reference.kind === "tournament");
+  if (tournamentReferences.length > 0) {
+    return tournamentReferences;
+  }
+  return references.filter((reference) => reference.kind === "league");
+}
+function associateUnderstandingWithStories(understanding, registry3) {
+  const associations = [];
+  const seenStoryIds = /* @__PURE__ */ new Set();
+  const candidateReferences = selectAssociationReferences(understanding.references);
+  for (const objectReference of candidateReferences) {
+    const candidate = resolveStoryCandidateForObjectReference(objectReference);
+    if (!candidate) continue;
+    if (!registry3.storiesById[candidate.storyId]) continue;
+    if (seenStoryIds.has(candidate.storyId)) continue;
+    seenStoryIds.add(candidate.storyId);
+    associations.push({
+      storyId: candidate.storyId,
+      reason: candidate.reason,
+      objectReference
+    });
+  }
+  return {
+    sourceContentId: understanding.sourceContentId,
+    associations
+  };
+}
+var init_associateUnderstandingWithStories = __esm({
+  "../grarf/shared/domain/storyAssociation/associateUnderstandingWithStories.ts"() {
+    init_define_import_meta_env();
+    init_resolveStoryCandidateForObjectReference();
+  }
+});
+
+// ../grarf/shared/domain/storyAssociation/index.ts
+var init_storyAssociation = __esm({
+  "../grarf/shared/domain/storyAssociation/index.ts"() {
+    init_define_import_meta_env();
+    init_associateUnderstandingWithStories();
+    init_resolveStoryCandidateForObjectReference();
+  }
+});
+
+// ../grarf/shared/domain/understanding/teamObjectId.ts
+function buildTeamObjectId(leagueKey, displayName, abbrev) {
+  const raw = (abbrev?.trim() || displayName.trim()).toLowerCase();
+  const slug = raw.replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+  const teamKey = slug || "unknown";
+  return `${leagueKey}:${teamKey}`;
+}
+var init_teamObjectId = __esm({
+  "../grarf/shared/domain/understanding/teamObjectId.ts"() {
+    init_define_import_meta_env();
+  }
+});
+
+// ../grarf/shared/domain/understanding/parseLiveTrackEventId.ts
+function resolveLeagueKeyFromSegment(segment) {
+  const normalized = segment.trim().toUpperCase();
+  return normalized ? normalized : void 0;
+}
+function parseLiveTrackEventId(eventId) {
+  const trimmed = eventId.trim();
+  if (!trimmed) return null;
+  const mlbMatch = MLB_EVENT_ID.exec(trimmed);
+  if (mlbMatch) {
+    return {
+      leagueKey: "MLB",
+      mlbGamePk: Number(mlbMatch[1])
+    };
+  }
+  const nhlMatch = NHL_EVENT_ID.exec(trimmed);
+  if (nhlMatch) {
+    return {
+      leagueKey: "NHL",
+      nhlGameId: nhlMatch[1]
+    };
+  }
+  const tennisMatch = TENNIS_EVENT_ID.exec(trimmed);
+  if (tennisMatch) {
+    const tennisLeagueKey = resolveLeagueKeyFromSegment(tennisMatch[1]);
+    return {
+      leagueKey: tennisLeagueKey,
+      tennisLeagueKey,
+      tennisMatchId: tennisMatch[2]
+    };
+  }
+  const espnMatch = ESPN_EVENT_ID.exec(trimmed);
+  if (espnMatch) {
+    const leagueKey = resolveLeagueKeyFromSegment(espnMatch[1]);
+    return {
+      leagueKey,
+      espnEventId: espnMatch[2]
+    };
+  }
+  return null;
+}
+var MLB_EVENT_ID, ESPN_EVENT_ID, NHL_EVENT_ID, TENNIS_EVENT_ID;
+var init_parseLiveTrackEventId = __esm({
+  "../grarf/shared/domain/understanding/parseLiveTrackEventId.ts"() {
+    init_define_import_meta_env();
+    MLB_EVENT_ID = /^livetrack-mlb-(\d+)-/i;
+    ESPN_EVENT_ID = /^livetrack-([a-z0-9]+)-(\d+)-/i;
+    NHL_EVENT_ID = /^livetrack-nhl-([^-]+)-/i;
+    TENNIS_EVENT_ID = /^livetrack-(atp|wta)-([^-]+)-/i;
+  }
+});
+
+// ../grarf/shared/domain/understanding/resolveStructuredGameIdentity.ts
+function normalizeTeamLabel(value) {
+  return value.trim().toLowerCase();
+}
+function structuredTeamLabelsMatch(left, right) {
+  return normalizeTeamLabel(left) === normalizeTeamLabel(right);
+}
+function resolveGameLeagueKey(game) {
+  return game.league ?? "MLB";
+}
+function findGameById(games, gameId) {
+  return games.find((game) => game.id === gameId || game.grarfGameId === gameId);
+}
+function findGameByMlbGamePk(games, gamePk) {
+  return games.find(
+    (game) => game.gamePk === gamePk || game.externalIds?.mlb === String(gamePk)
+  );
+}
+function findGameByEspnEventId(games, espnEventId, leagueKey) {
+  return games.find((game) => {
+    if (game.espnEventId !== espnEventId && game.externalIds?.espn !== espnEventId) {
+      return false;
+    }
+    if (leagueKey && resolveGameLeagueKey(game) !== leagueKey) return false;
+    return true;
+  });
+}
+function resolveByDirectGameId(hints, games) {
+  const directId = hints.grarfGameId?.trim() || hints.gameId?.trim();
+  if (!directId) return null;
+  const game = findGameById(games, directId);
+  return {
+    gameId: game?.grarfGameId ?? game?.id ?? directId,
+    method: "game_id",
+    game
+  };
+}
+function resolveByGamePk(hints, games) {
+  if (hints.gamePk == null || !Number.isFinite(hints.gamePk)) return null;
+  const game = findGameByMlbGamePk(games, hints.gamePk);
+  if (game) {
+    return {
+      gameId: game.grarfGameId ?? game.id,
+      method: "game_pk",
+      game
+    };
+  }
+  return {
+    gameId: `mlb-${hints.gamePk}`,
+    method: "game_pk"
+  };
+}
+function resolveByEspnEventId(hints, games) {
+  const espnEventId = hints.espnEventId?.trim();
+  if (!espnEventId) return null;
+  const game = findGameByEspnEventId(games, espnEventId, hints.leagueKey);
+  if (game) {
+    return {
+      gameId: game.grarfGameId ?? game.id,
+      method: "espn_event_id",
+      game
+    };
+  }
+  return null;
+}
+function resolveByStructuredTeams(hints, games) {
+  const leagueKey = hints.leagueKey;
+  const awayTeam = hints.awayTeam?.trim();
+  const homeTeam = hints.homeTeam?.trim();
+  if (!leagueKey || !awayTeam || !homeTeam) return null;
+  const matchingGames = games.filter((game2) => {
+    if (resolveGameLeagueKey(game2) !== leagueKey) return false;
+    return structuredTeamLabelsMatch(game2.awayTeam, awayTeam) && structuredTeamLabelsMatch(game2.homeTeam, homeTeam);
+  });
+  if (matchingGames.length !== 1) return null;
+  const game = matchingGames[0];
+  return {
+    gameId: game.grarfGameId ?? game.id,
+    method: "structured_teams",
+    game
+  };
+}
+function resolveStructuredGameIdentity(hints, games = []) {
+  const direct = resolveByDirectGameId(hints, games);
+  if (direct) return direct;
+  const byPk = resolveByGamePk(hints, games);
+  if (byPk) return byPk;
+  const byEspn = resolveByEspnEventId(hints, games);
+  if (byEspn) return byEspn;
+  return resolveByStructuredTeams(hints, games);
+}
+function buildReferencesForGameResolution(resolution, hints) {
+  const references = [
+    {
+      kind: "game",
+      objectId: resolution.gameId,
+      method: resolution.method,
+      role: "primary"
+    }
+  ];
+  const game = resolution.game;
+  const leagueKey = (game ? resolveGameLeagueKey(game) : hints.leagueKey) ?? (resolution.gameId.startsWith("mlb-") ? "MLB" : void 0);
+  if (leagueKey) {
+    references.push({
+      kind: "league",
+      objectId: leagueKey,
+      method: resolution.method,
+      role: "secondary"
+    });
+  }
+  const awayName = game?.awayTeam ?? hints.awayTeam;
+  const homeName = game?.homeTeam ?? hints.homeTeam;
+  const awayAbbrev = game?.awayTeamAbbrev ?? hints.awayTeamAbbrev;
+  const homeAbbrev = game?.homeTeamAbbrev ?? hints.homeTeamAbbrev;
+  if (leagueKey && awayName?.trim()) {
+    references.push({
+      kind: "team",
+      objectId: buildTeamObjectId(leagueKey, awayName, awayAbbrev),
+      method: resolution.method,
+      role: "secondary",
+      metadata: { side: "away" }
+    });
+  }
+  if (leagueKey && homeName?.trim()) {
+    references.push({
+      kind: "team",
+      objectId: buildTeamObjectId(leagueKey, homeName, homeAbbrev),
+      method: resolution.method,
+      role: "secondary",
+      metadata: { side: "home" }
+    });
+  }
+  return references;
+}
+function buildLeagueOnlyReference(leagueKey) {
+  return {
+    kind: "league",
+    objectId: leagueKey,
+    method: "league_key",
+    role: "primary"
+  };
+}
+var init_resolveStructuredGameIdentity = __esm({
+  "../grarf/shared/domain/understanding/resolveStructuredGameIdentity.ts"() {
+    init_define_import_meta_env();
+    init_teamObjectId();
+  }
+});
+
+// ../grarf/shared/domain/understanding/resolveUnderstandingReferences.ts
+function findGameById2(games, gameId) {
+  return games.find((game) => game.id === gameId || game.grarfGameId === gameId);
+}
+function findGameByMlbGamePk2(games, gamePk) {
+  return games.find(
+    (game) => game.gamePk === gamePk || game.externalIds?.mlb === String(gamePk)
+  );
+}
+function findGameByEspnEventId2(games, espnEventId, leagueKey) {
+  return games.find((game) => {
+    if (game.espnEventId !== espnEventId && game.externalIds?.espn !== espnEventId) {
+      return false;
+    }
+    if (leagueKey && (game.league ?? "MLB") !== leagueKey) return false;
+    return true;
+  });
+}
+function resolveLiveTrackGame(hints, games) {
+  const eventId = hints.liveTrackEventId?.trim();
+  if (!eventId) return null;
+  const parsed = parseLiveTrackEventId(eventId);
+  if (!parsed) return null;
+  if (parsed.mlbGamePk != null) {
+    const game = findGameByMlbGamePk2(games, parsed.mlbGamePk);
+    return {
+      gameId: game?.grarfGameId ?? game?.id ?? `mlb-${parsed.mlbGamePk}`,
+      method: "livetrack_mlb_game_pk",
+      game
+    };
+  }
+  if (parsed.nhlGameId) {
+    const game = findGameById2(games, parsed.nhlGameId);
+    if (!game || game.league !== "NHL") return null;
+    return {
+      gameId: game.grarfGameId ?? game.id,
+      method: "livetrack_nhl_game_id",
+      game
+    };
+  }
+  if (parsed.tennisMatchId && parsed.tennisLeagueKey) {
+    const byEspn = findGameByEspnEventId2(
+      games,
+      parsed.tennisMatchId,
+      parsed.tennisLeagueKey
+    );
+    if (byEspn) {
+      return {
+        gameId: byEspn.grarfGameId ?? byEspn.id,
+        method: "livetrack_tennis_match_id",
+        game: byEspn
+      };
+    }
+    const byId = findGameById2(games, parsed.tennisMatchId);
+    if (byId && byId.league === parsed.tennisLeagueKey) {
+      return {
+        gameId: byId.grarfGameId ?? byId.id,
+        method: "livetrack_tennis_match_id",
+        game: byId
+      };
+    }
+    return null;
+  }
+  if (parsed.espnEventId) {
+    const game = findGameByEspnEventId2(games, parsed.espnEventId, parsed.leagueKey);
+    if (!game) return null;
+    return {
+      gameId: game.grarfGameId ?? game.id,
+      method: "livetrack_espn_event_id",
+      game
+    };
+  }
+  return null;
+}
+function buildDirectObjectReferences(hints) {
+  const references = [];
+  const playerId = hints.playerId?.trim();
+  if (playerId) {
+    references.push({
+      kind: "player",
+      objectId: playerId,
+      method: "structured_object_id",
+      role: "primary"
+    });
+  }
+  const tournamentId = hints.tournamentId?.trim();
+  if (tournamentId) {
+    references.push({
+      kind: "tournament",
+      objectId: tournamentId,
+      method: "structured_object_id",
+      role: "primary"
+    });
+  }
+  const venueId = hints.venueId?.trim();
+  if (venueId) {
+    references.push({
+      kind: "venue",
+      objectId: venueId,
+      method: "structured_object_id",
+      role: "primary"
+    });
+  }
+  const seasonId = hints.seasonId?.trim();
+  if (seasonId) {
+    references.push({
+      kind: "season",
+      objectId: seasonId,
+      method: "structured_object_id",
+      role: "primary"
+    });
+  }
+  return references;
+}
+function hasStructuredTeamMatchHints(hints) {
+  return Boolean(
+    hints.leagueKey && hints.awayTeam?.trim() && hints.homeTeam?.trim()
+  );
+}
+function resolveUnderstandingReferences(hints, games = []) {
+  const liveTrackResolution = resolveLiveTrackGame(hints, games);
+  if (liveTrackResolution) {
+    return buildReferencesForGameResolution(liveTrackResolution, hints);
+  }
+  const gameResolution = resolveStructuredGameIdentity(hints, games);
+  if (gameResolution) {
+    return buildReferencesForGameResolution(gameResolution, hints);
+  }
+  if (hasStructuredTeamMatchHints(hints)) {
+    return [];
+  }
+  const directReferences = buildDirectObjectReferences(hints);
+  if (directReferences.length > 0) {
+    return directReferences;
+  }
+  const leagueKey = hints.leagueKey;
+  if (leagueKey) {
+    return [buildLeagueOnlyReference(leagueKey)];
+  }
+  return [];
+}
+var init_resolveUnderstandingReferences = __esm({
+  "../grarf/shared/domain/understanding/resolveUnderstandingReferences.ts"() {
+    init_define_import_meta_env();
+    init_parseLiveTrackEventId();
+    init_resolveStructuredGameIdentity();
+  }
+});
+
+// ../grarf/shared/domain/understanding/understandContent.ts
+function hasStructuredHints(hints) {
+  return Object.values(hints).some((value) => {
+    if (value == null) return false;
+    if (typeof value === "string") return value.trim().length > 0;
+    return true;
+  });
+}
+function understandContent(request, context2 = {}) {
+  const sourceContentId = request.sourceContentId.trim();
+  if (!sourceContentId || !hasStructuredHints(request.hints)) return null;
+  const references = resolveUnderstandingReferences(request.hints, context2.games ?? []);
+  if (references.length === 0) return null;
+  return {
+    contentKind: request.contentKind,
+    sourceContentId,
+    references,
+    understoodAt: (/* @__PURE__ */ new Date()).toISOString()
+  };
+}
+function createUnderstandingRequestFromNewsArticle(article, contentKind = "news_article") {
+  return {
+    contentKind,
+    sourceContentId: article.articleId,
+    hints: {
+      gameId: article.gameId,
+      grarfGameId: article.grarfGameId,
+      gamePk: article.gamePk,
+      espnEventId: article.espnEventId,
+      leagueKey: article.leagueKey,
+      awayTeam: article.awayTeam,
+      homeTeam: article.homeTeam,
+      awayTeamAbbrev: article.awayTeamAbbrev,
+      homeTeamAbbrev: article.homeTeamAbbrev
+    }
+  };
+}
+var init_understandContent = __esm({
+  "../grarf/shared/domain/understanding/understandContent.ts"() {
+    init_define_import_meta_env();
+    init_resolveUnderstandingReferences();
+  }
+});
+
+// ../grarf/shared/domain/understanding/index.ts
+var init_understanding = __esm({
+  "../grarf/shared/domain/understanding/index.ts"() {
+    init_define_import_meta_env();
+    init_teamObjectId();
+    init_parseLiveTrackEventId();
+    init_resolveStructuredGameIdentity();
+    init_resolveUnderstandingReferences();
+    init_understandContent();
+  }
+});
+
+// ../grarf/shared/domain/intelligencePipeline/runCanonicalIntelligencePipeline.ts
+function createEmptyPipelineResult(sourceContentId) {
+  return {
+    sourceContentId,
+    understanding: null,
+    associations: [],
+    enrichments: []
+  };
+}
+function runCanonicalIntelligencePipeline(input, context2) {
+  const sourceContentId = input.sourceContentId.trim();
+  if (!sourceContentId) {
+    return createEmptyPipelineResult("");
+  }
+  const understanding = understandContent(
+    {
+      contentKind: input.contentKind,
+      sourceContentId,
+      hints: input.hints
+    },
+    { games: context2.games }
+  );
+  if (!understanding) {
+    return createEmptyPipelineResult(sourceContentId);
+  }
+  const associationResult = associateUnderstandingWithStories(understanding, context2.registry);
+  const enrichments = buildPipelineEnrichmentReferences(
+    sourceContentId,
+    input.contentKind,
+    associationResult.associations,
+    input.content
+  );
+  return {
+    sourceContentId,
+    understanding,
+    associations: associationResult.associations,
+    enrichments
+  };
+}
+function runCanonicalIntelligencePipelineForNewsArticle(article, context2, contentKind = "news_article") {
+  const request = createUnderstandingRequestFromNewsArticle(article, contentKind);
+  return runCanonicalIntelligencePipeline(
+    {
+      contentKind: request.contentKind,
+      sourceContentId: request.sourceContentId,
+      hints: request.hints,
+      content: {
+        source: article.source,
+        publishedAt: article.publishedAt,
+        ...article.headline ? { metadata: { headline: article.headline } } : {}
+      }
+    },
+    context2
+  );
+}
+var init_runCanonicalIntelligencePipeline = __esm({
+  "../grarf/shared/domain/intelligencePipeline/runCanonicalIntelligencePipeline.ts"() {
+    init_define_import_meta_env();
+    init_storyAssociation();
+    init_understanding();
+    init_buildPipelineEnrichmentReferences();
+  }
+});
+
+// ../grarf/shared/domain/intelligencePipeline/index.ts
+var init_intelligencePipeline = __esm({
+  "../grarf/shared/domain/intelligencePipeline/index.ts"() {
+    init_define_import_meta_env();
+    init_buildPipelineEnrichmentReferences();
+    init_runCanonicalIntelligencePipeline();
   }
 });
 
@@ -52906,192 +53804,140 @@ var init_mergeStoryEnrichmentOutput = __esm({
   }
 });
 
-// ../grarf/shared/domain/intelligence/enrichment/matchNewsArticleToStory.ts
-function normalizeTeamLabel(value) {
-  return value.trim().toLowerCase();
-}
-function structuredTeamLabelsMatch(left, right) {
-  return normalizeTeamLabel(left) === normalizeTeamLabel(right);
-}
-function resolveGameLeagueKey(game) {
-  return game.league ?? "MLB";
-}
-function resolveGameIdFromArticle(article, games) {
-  const directId = article.grarfGameId?.trim() || article.gameId?.trim();
-  if (directId) return directId;
-  if (article.gamePk != null && Number.isFinite(article.gamePk)) {
-    const byPk = games.find(
-      (game) => game.gamePk === article.gamePk || game.externalIds?.mlb === String(article.gamePk)
-    );
-    if (byPk) return byPk.grarfGameId ?? byPk.id;
-    return `mlb-${article.gamePk}`;
-  }
-  const espnEventId = article.espnEventId?.trim();
-  if (espnEventId) {
-    const byEspn = games.find(
-      (game) => game.espnEventId === espnEventId || game.externalIds?.espn === espnEventId
-    );
-    if (byEspn) return byEspn.grarfGameId ?? byEspn.id;
-  }
-  return null;
-}
-function matchStoryByStructuredTeams(article, registry3, games) {
-  const leagueKey = article.leagueKey;
-  const awayTeam = article.awayTeam?.trim();
-  const homeTeam = article.homeTeam?.trim();
-  if (!leagueKey || !awayTeam || !homeTeam) return null;
-  const matchingGames = games.filter((game) => {
-    if (resolveGameLeagueKey(game) !== leagueKey) return false;
-    return structuredTeamLabelsMatch(game.awayTeam, awayTeam) && structuredTeamLabelsMatch(game.homeTeam, homeTeam);
-  });
-  if (matchingGames.length !== 1) return null;
-  const gameId = matchingGames[0].grarfGameId ?? matchingGames[0].id;
-  const storyId = canonicalIntelligenceGameStoryId(gameId);
-  if (!registry3.storiesById[storyId]) return null;
-  return { storyId, reason: "structured_teams" };
-}
-function matchStoryByGameId(gameId, registry3, reason) {
-  const storyId = canonicalIntelligenceGameStoryId(gameId);
-  if (!registry3.storiesById[storyId]) return null;
-  return { storyId, reason };
-}
-function matchNewsArticleToStory(article, registry3, games = []) {
-  const resolvedGameId = resolveGameIdFromArticle(article, games);
-  if (resolvedGameId) {
-    if (article.gamePk != null && Number.isFinite(article.gamePk)) {
-      return matchStoryByGameId(resolvedGameId, registry3, "game_pk");
-    }
-    if (article.espnEventId?.trim()) {
-      return matchStoryByGameId(resolvedGameId, registry3, "espn_event_id");
-    }
-    return matchStoryByGameId(resolvedGameId, registry3, "game_id");
-  }
-  return matchStoryByStructuredTeams(article, registry3, games);
-}
-var init_matchNewsArticleToStory = __esm({
-  "../grarf/shared/domain/intelligence/enrichment/matchNewsArticleToStory.ts"() {
-    init_define_import_meta_env();
-    init_entityIds();
-  }
-});
-
-// ../grarf/shared/domain/intelligence/enrichment/newsStoryEnrichmentProducer.ts
-function buildArticleReference(article, matchReason) {
-  return {
-    refId: article.articleId,
-    kind: "article",
-    attachedAt: (/* @__PURE__ */ new Date()).toISOString(),
-    source: "news",
-    metadata: {
-      matchReason,
-      ...article.source ? { articleSource: article.source } : {},
-      ...article.publishedAt ? { publishedAt: article.publishedAt } : {}
-    }
-  };
-}
-function produceNewsStoryEnrichment(context2) {
-  const games = context2.games ?? [];
-  const attachments2 = [];
-  const attachedArticleIds = [];
-  const unattachedArticleIds = [];
-  for (const article of context2.articles) {
-    if (!article.articleId?.trim()) continue;
-    const match = matchNewsArticleToStory(article, context2.registry, games);
-    if (!match) {
-      unattachedArticleIds.push(article.articleId);
-      continue;
-    }
-    attachments2.push({
-      storyId: match.storyId,
-      reference: buildArticleReference(article, match.reason)
-    });
-    attachedArticleIds.push(article.articleId);
-  }
-  return {
-    attachments: attachments2,
-    attachedArticleIds,
-    unattachedArticleIds
-  };
-}
-var newsStoryEnrichmentProducer;
-var init_newsStoryEnrichmentProducer = __esm({
-  "../grarf/shared/domain/intelligence/enrichment/newsStoryEnrichmentProducer.ts"() {
-    init_define_import_meta_env();
-    init_matchNewsArticleToStory();
-    newsStoryEnrichmentProducer = {
-      id: "news",
-      produce: produceNewsStoryEnrichment
-    };
-  }
-});
-
-// ../grarf/shared/domain/intelligence/enrichment/runCanonicalStoryEnrichmentProducers.ts
-function applyCanonicalStoryEnrichmentProducersToRegistry(registry3, context2) {
-  const producerContext = {
-    registry: registry3,
-    games: context2.games,
-    articles: context2.articles ?? []
-  };
-  let next = registry3;
-  let combinedOutput = {
-    attachments: [],
-    attachedArticleIds: [],
-    unattachedArticleIds: []
-  };
-  for (const producer of CANONICAL_STORY_ENRICHMENT_PRODUCERS) {
-    const output = producer.produce(producerContext);
-    next = mergeStoryEnrichmentOutputIntoRegistry(next, output.attachments);
-    combinedOutput = {
-      attachments: [...combinedOutput.attachments, ...output.attachments],
-      attachedArticleIds: [
-        ...combinedOutput.attachedArticleIds,
-        ...output.attachedArticleIds
-      ],
-      unattachedArticleIds: [
-        ...combinedOutput.unattachedArticleIds,
-        ...output.unattachedArticleIds
-      ]
-    };
-    producerContext.registry = next;
-  }
-  return { registry: next, output: combinedOutput };
-}
-var CANONICAL_STORY_ENRICHMENT_PRODUCERS;
-var init_runCanonicalStoryEnrichmentProducers = __esm({
-  "../grarf/shared/domain/intelligence/enrichment/runCanonicalStoryEnrichmentProducers.ts"() {
-    init_define_import_meta_env();
-    init_mergeStoryEnrichmentOutput();
-    init_newsStoryEnrichmentProducer();
-    CANONICAL_STORY_ENRICHMENT_PRODUCERS = [newsStoryEnrichmentProducer];
-  }
-});
-
 // ../grarf/shared/domain/intelligence/applyIngestedNewsArticlesToRegistry.ts
 function applyIngestedNewsArticlesToIntelligenceRegistry(registry3, articles, games = []) {
   if (articles.length === 0) {
-    return {
-      registry: registry3,
-      output: {
-        attachments: [],
-        attachedArticleIds: [],
-        unattachedArticleIds: []
-      }
-    };
+    return { registry: registry3, output: EMPTY_OUTPUT };
   }
-  return applyCanonicalStoryEnrichmentProducersToRegistry(registry3, {
-    registry: registry3,
-    articles,
-    games
-  });
+  const pipelineContext = { registry: registry3, games };
+  const attachments2 = [];
+  const attachedArticleIds = [];
+  const unattachedArticleIds = [];
+  for (const article of articles) {
+    if (!article.articleId?.trim()) continue;
+    const pipelineResult = runCanonicalIntelligencePipelineForNewsArticle(
+      article,
+      pipelineContext
+    );
+    if (pipelineResult.enrichments.length === 0) {
+      unattachedArticleIds.push(article.articleId);
+      continue;
+    }
+    for (const enrichment of pipelineResult.enrichments) {
+      attachments2.push({
+        storyId: enrichment.storyId,
+        reference: enrichment.reference
+      });
+    }
+    attachedArticleIds.push(article.articleId);
+  }
+  const nextRegistry = mergeStoryEnrichmentOutputIntoRegistry(registry3, attachments2);
+  return {
+    registry: nextRegistry,
+    output: {
+      attachments: attachments2,
+      attachedArticleIds,
+      unattachedArticleIds
+    }
+  };
 }
+var EMPTY_OUTPUT;
 var init_applyIngestedNewsArticlesToRegistry = __esm({
   "../grarf/shared/domain/intelligence/applyIngestedNewsArticlesToRegistry.ts"() {
     init_define_import_meta_env();
-    init_runCanonicalStoryEnrichmentProducers();
+    init_intelligencePipeline();
+    init_mergeStoryEnrichmentOutput();
+    EMPTY_OUTPUT = {
+      attachments: [],
+      attachedArticleIds: [],
+      unattachedArticleIds: []
+    };
   }
 });
 
 // ../grarf/shared/domain/intelligence/promotion/storyPromotionEngine.ts
+function toTimeMs(value) {
+  if (value instanceof Date) return value.getTime();
+  if (typeof value === "number") return value;
+  return Date.parse(value);
+}
+function metadataString(story, key2) {
+  const value = story.metadata?.[key2];
+  return typeof value === "string" && value.trim() ? value.trim() : null;
+}
+function metadataTimeMs(story, key2) {
+  const value = metadataString(story, key2);
+  if (!value) return null;
+  const ms2 = Date.parse(value);
+  return Number.isFinite(ms2) ? ms2 : null;
+}
+function isEditorialStory(story) {
+  return story.storyId.startsWith("gie-story:editorial:");
+}
+function isGameStory(story) {
+  return story.storyId.startsWith("gie-story:game:");
+}
+function determineEditorialPhase(story, nowMs) {
+  const startMs = metadataTimeMs(story, "scheduledStartAt");
+  const endMs = metadataTimeMs(story, "scheduledEndAt");
+  if (endMs != null && nowMs > endMs) {
+    return { toPhase: "catch_up", reason: "editorial_past_end" };
+  }
+  if (startMs != null && nowMs < startMs) {
+    return { toPhase: "prepare", reason: "editorial_future_start" };
+  }
+  if (startMs != null && nowMs >= startMs && (endMs == null || nowMs <= endMs)) {
+    return { toPhase: "live", reason: "editorial_active_window" };
+  }
+  return null;
+}
+function determineGamePhase(story) {
+  const status = metadataString(story, "gameStatus");
+  switch (status) {
+    case "scheduled":
+      return { toPhase: "prepare", reason: "game_scheduled" };
+    case "live":
+      return { toPhase: "live", reason: "game_live" };
+    case "final":
+      return { toPhase: "catch_up", reason: "game_final" };
+    default:
+      return null;
+  }
+}
+function evaluateStoryPromotion(story, context2) {
+  const nowMs = toTimeMs(context2.now);
+  if (!Number.isFinite(nowMs)) return null;
+  const result = isEditorialStory(story) ? determineEditorialPhase(story, nowMs) : isGameStory(story) ? determineGamePhase(story) : null;
+  if (!result || result.toPhase === story.phase) return null;
+  return {
+    storyId: story.storyId,
+    fromPhase: story.phase,
+    toPhase: result.toPhase,
+    reason: result.reason
+  };
+}
+function evaluateStoryPromotions(registry3, context2) {
+  const decisions = [];
+  for (const story of Object.values(registry3.storiesById)) {
+    const decision = evaluateStoryPromotion(story, context2);
+    if (decision) decisions.push(decision);
+  }
+  return decisions;
+}
+function applyStoryPromotionDecisionsToRegistry(registry3, decisions) {
+  if (decisions.length === 0) return registry3;
+  const stories = [];
+  for (const decision of decisions) {
+    const story = registry3.storiesById[decision.storyId];
+    if (!story || story.phase === decision.toPhase) continue;
+    stories.push({
+      ...story,
+      phase: decision.toPhase
+    });
+  }
+  if (stories.length === 0) return registry3;
+  return mergeStoryProducerOutputIntoRegistry(registry3, { entities: [], stories });
+}
 var init_storyPromotionEngine = __esm({
   "../grarf/shared/domain/intelligence/promotion/storyPromotionEngine.ts"() {
     init_define_import_meta_env();
@@ -53099,10 +53945,23 @@ var init_storyPromotionEngine = __esm({
   }
 });
 
+// ../grarf/shared/domain/intelligence/promotion/applyStoryPromotionsToIntelligenceRegistry.ts
+function applyStoryPromotionsToIntelligenceRegistry(registry3, context2 = { now: /* @__PURE__ */ new Date() }) {
+  const decisions = evaluateStoryPromotions(registry3, context2);
+  return applyStoryPromotionDecisionsToRegistry(registry3, decisions);
+}
+var init_applyStoryPromotionsToIntelligenceRegistry = __esm({
+  "../grarf/shared/domain/intelligence/promotion/applyStoryPromotionsToIntelligenceRegistry.ts"() {
+    init_define_import_meta_env();
+    init_storyPromotionEngine();
+  }
+});
+
 // ../grarf/shared/domain/intelligence/promotion/index.ts
 var init_promotion = __esm({
   "../grarf/shared/domain/intelligence/promotion/index.ts"() {
     init_define_import_meta_env();
+    init_applyStoryPromotionsToIntelligenceRegistry();
     init_storyPromotionEngine();
   }
 });
@@ -53135,6 +53994,31 @@ var init_ingestedNewsArticle = __esm({
   }
 });
 
+// ../grarf/shared/domain/intelligence/enrichment/matchNewsArticleToStory.ts
+var init_matchNewsArticleToStory = __esm({
+  "../grarf/shared/domain/intelligence/enrichment/matchNewsArticleToStory.ts"() {
+    init_define_import_meta_env();
+    init_entityIds();
+  }
+});
+
+// ../grarf/shared/domain/intelligence/enrichment/newsStoryEnrichmentProducer.ts
+var init_newsStoryEnrichmentProducer = __esm({
+  "../grarf/shared/domain/intelligence/enrichment/newsStoryEnrichmentProducer.ts"() {
+    init_define_import_meta_env();
+    init_matchNewsArticleToStory();
+  }
+});
+
+// ../grarf/shared/domain/intelligence/enrichment/runCanonicalStoryEnrichmentProducers.ts
+var init_runCanonicalStoryEnrichmentProducers = __esm({
+  "../grarf/shared/domain/intelligence/enrichment/runCanonicalStoryEnrichmentProducers.ts"() {
+    init_define_import_meta_env();
+    init_mergeStoryEnrichmentOutput();
+    init_newsStoryEnrichmentProducer();
+  }
+});
+
 // ../grarf/shared/domain/intelligence/enrichment/index.ts
 var init_enrichment = __esm({
   "../grarf/shared/domain/intelligence/enrichment/index.ts"() {
@@ -53153,8 +54037,59 @@ var init_producers = __esm({
     init_define_import_meta_env();
     init_mergeStoryProducerOutput();
     init_editorialStoryProducer();
+    init_editorialStoryCatalog();
     init_gameStoryProducer();
+    init_leagueStoryProducer();
+    init_tournamentStoryProducer();
     init_runCanonicalStoryProducers();
+  }
+});
+
+// ../grarf/shared/domain/intelligence/shadowMode/types.ts
+var init_types4 = __esm({
+  "../grarf/shared/domain/intelligence/shadowMode/types.ts"() {
+    init_define_import_meta_env();
+  }
+});
+
+// ../grarf/shared/domain/intelligence/shadowMode/index.ts
+var init_shadowMode = __esm({
+  "../grarf/shared/domain/intelligence/shadowMode/index.ts"() {
+    init_define_import_meta_env();
+    init_types4();
+  }
+});
+
+// ../grarf/shared/domain/intelligence/workspace/createStoryWorkspace.ts
+var init_createStoryWorkspace = __esm({
+  "../grarf/shared/domain/intelligence/workspace/createStoryWorkspace.ts"() {
+    init_define_import_meta_env();
+  }
+});
+
+// ../grarf/shared/domain/intelligence/workspace/types.ts
+var init_types5 = __esm({
+  "../grarf/shared/domain/intelligence/workspace/types.ts"() {
+    init_define_import_meta_env();
+  }
+});
+
+// ../grarf/shared/domain/intelligence/workspace/developerModeEntryPoint.ts
+var init_developerModeEntryPoint = __esm({
+  "../grarf/shared/domain/intelligence/workspace/developerModeEntryPoint.ts"() {
+    init_define_import_meta_env();
+    init_createStoryWorkspace();
+    init_types5();
+  }
+});
+
+// ../grarf/shared/domain/intelligence/workspace/index.ts
+var init_workspace = __esm({
+  "../grarf/shared/domain/intelligence/workspace/index.ts"() {
+    init_define_import_meta_env();
+    init_createStoryWorkspace();
+    init_developerModeEntryPoint();
+    init_types5();
   }
 });
 
@@ -53169,10 +54104,22 @@ var init_intelligence = __esm({
     init_promotion();
     init_enrichment();
     init_producers();
+    init_shadowMode();
+    init_workspace();
   }
 });
 
 // ../grarf/desktop/src/store/canonicalIntelligenceRegistryStore.ts
+function commitIntelligenceRegistry(set, prev, next) {
+  const promoted = applyStoryPromotionsToIntelligenceRegistry(next);
+  if (promoted.entitiesById === prev.entitiesById && promoted.storiesById === prev.storiesById) {
+    return;
+  }
+  set({
+    entitiesById: promoted.entitiesById,
+    storiesById: promoted.storiesById
+  });
+}
 var import_zustand21, useCanonicalIntelligenceRegistryStore;
 var init_canonicalIntelligenceRegistryStore = __esm({
   "../grarf/desktop/src/store/canonicalIntelligenceRegistryStore.ts"() {
@@ -53187,13 +54134,7 @@ var init_canonicalIntelligenceRegistryStore = __esm({
           { entitiesById: prev.entitiesById, storiesById: prev.storiesById },
           games
         );
-        if (next.entitiesById === prev.entitiesById && next.storiesById === prev.storiesById) {
-          return;
-        }
-        set({
-          entitiesById: next.entitiesById,
-          storiesById: next.storiesById
-        });
+        commitIntelligenceRegistry(set, prev, next);
       },
       syncNewsStoryEnrichment: (articles, games) => {
         if (articles.length === 0) return;
@@ -53203,13 +54144,7 @@ var init_canonicalIntelligenceRegistryStore = __esm({
           articles,
           games
         );
-        if (next.entitiesById === prev.entitiesById && next.storiesById === prev.storiesById) {
-          return;
-        }
-        set({
-          entitiesById: next.entitiesById,
-          storiesById: next.storiesById
-        });
+        commitIntelligenceRegistry(set, prev, next);
       }
     }));
   }
@@ -57765,7 +58700,7 @@ var init_YesterdayCatchUpSeedBridge = __esm({
 
 // ../grarf/desktop/src/lib/attentionRuntime/types.ts
 var RESIDUAL_DECAY_DURATION_MS, RESIDUAL_DECAY_TICK_MS;
-var init_types4 = __esm({
+var init_types6 = __esm({
   "../grarf/desktop/src/lib/attentionRuntime/types.ts"() {
     init_define_import_meta_env();
     RESIDUAL_DECAY_DURATION_MS = 15 * 60 * 1e3;
@@ -58275,7 +59210,7 @@ var init_residualGravityState = __esm({
   "../grarf/desktop/src/lib/attentionRuntime/residualGravityState.ts"() {
     init_define_import_meta_env();
     init_signals();
-    init_types4();
+    init_types6();
   }
 });
 
@@ -58489,7 +59424,7 @@ var init_attentionRuntime = __esm({
 var init_attentionRuntime2 = __esm({
   "../grarf/desktop/src/lib/attentionRuntime/index.ts"() {
     init_define_import_meta_env();
-    init_types4();
+    init_types6();
     init_attentionRuntime();
     init_computeAttentionScore();
   }
@@ -58527,7 +59462,7 @@ var init_AttentionRuntimeBridge = __esm({
     init_define_import_meta_env();
     import_react34 = __toESM(require_react(), 1);
     init_attentionRuntime2();
-    init_types4();
+    init_types6();
     init_canonicalLiveGameStore();
     init_editorialStore();
   }
@@ -69051,26 +69986,26 @@ function resolveLiveTrackMatchHints(event) {
     const sportLeague = LIVE_TRACK_SPORT_TO_LEAGUE[event.sport.trim().toUpperCase()];
     if (sportLeague) hints.leagueKey = sportLeague;
   }
-  const mlbMatch = MLB_EVENT_ID.exec(event.id);
+  const mlbMatch = MLB_EVENT_ID2.exec(event.id);
   if (mlbMatch) {
     hints.mlbGamePk = Number(mlbMatch[1]);
     hints.leagueKey = "MLB";
     return hints;
   }
-  const nhlMatch = NHL_EVENT_ID.exec(event.id);
+  const nhlMatch = NHL_EVENT_ID2.exec(event.id);
   if (nhlMatch) {
     hints.nhlGameId = nhlMatch[1];
     hints.leagueKey = "NHL";
     return hints;
   }
-  const tennisMatch = TENNIS_EVENT_ID.exec(event.id);
+  const tennisMatch = TENNIS_EVENT_ID2.exec(event.id);
   if (tennisMatch) {
     hints.tennisLeagueKey = resolveLeagueKeyFromLiveTrackSegment(tennisMatch[1]);
     hints.tennisMatchId = tennisMatch[2];
     if (hints.tennisLeagueKey) hints.leagueKey = hints.tennisLeagueKey;
     return hints;
   }
-  const espnMatch = ESPN_EVENT_ID.exec(event.id);
+  const espnMatch = ESPN_EVENT_ID2.exec(event.id);
   if (espnMatch) {
     const leagueKey = resolveLeagueKeyFromLiveTrackSegment(espnMatch[1]);
     if (leagueKey) hints.leagueKey = leagueKey;
@@ -69078,14 +70013,14 @@ function resolveLiveTrackMatchHints(event) {
   }
   return hints;
 }
-var MLB_EVENT_ID, ESPN_EVENT_ID, NHL_EVENT_ID, TENNIS_EVENT_ID, LIVE_TRACK_SPORT_TO_LEAGUE;
+var MLB_EVENT_ID2, ESPN_EVENT_ID2, NHL_EVENT_ID2, TENNIS_EVENT_ID2, LIVE_TRACK_SPORT_TO_LEAGUE;
 var init_resolveLiveTrackMatchHints = __esm({
   "../grarf/desktop/src/singularity/matching/livetrack/resolveLiveTrackMatchHints.ts"() {
     init_define_import_meta_env();
-    MLB_EVENT_ID = /^livetrack-mlb-(\d+)-/i;
-    ESPN_EVENT_ID = /^livetrack-([a-z0-9]+)-(\d+)-/i;
-    NHL_EVENT_ID = /^livetrack-nhl-([^-]+)-/i;
-    TENNIS_EVENT_ID = /^livetrack-(atp|wta)-([^-]+)-/i;
+    MLB_EVENT_ID2 = /^livetrack-mlb-(\d+)-/i;
+    ESPN_EVENT_ID2 = /^livetrack-([a-z0-9]+)-(\d+)-/i;
+    NHL_EVENT_ID2 = /^livetrack-nhl-([^-]+)-/i;
+    TENNIS_EVENT_ID2 = /^livetrack-(atp|wta)-([^-]+)-/i;
     LIVE_TRACK_SPORT_TO_LEAGUE = {
       MLB: "MLB",
       NBA: "NBA",
