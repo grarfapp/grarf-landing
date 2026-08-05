@@ -55394,6 +55394,24 @@ var init_liveTrackerFeedRegistry = __esm({
         feedUrl: "https://rss.app/feeds/DQ8yGfZd9upXVYCj.xml",
         feedId: "live-tracker-ufc",
         label: "UFC"
+      },
+      {
+        league: "UELQ",
+        feedUrl: "https://rss.app/feeds/k3hUQlu10jPCQmZ3.xml",
+        feedId: "live-tracker-uelq",
+        label: "UELQ"
+      },
+      {
+        league: "UECLQ",
+        feedUrl: "https://rss.app/feeds/T0C96SZLx5G4Sl4D.xml",
+        feedId: "live-tracker-ueclq",
+        label: "UECLQ"
+      },
+      {
+        league: "UECL",
+        feedUrl: "https://rss.app/feeds/T0C96SZLx5G4Sl4D.xml",
+        feedId: "live-tracker-uecl",
+        label: "UECL"
       }
     ];
     FEED_BY_LEAGUE = new Map(
