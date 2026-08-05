@@ -51649,6 +51649,9 @@ function canonicalIntelligenceTeamEntityId(leagueKey, teamKey) {
 function canonicalIntelligenceGameStoryId(gameId) {
   return `gie-story:game:${gameId}`;
 }
+function canonicalIntelligenceEditorialStoryId(editorialId) {
+  return `gie-story:editorial:${editorialId.trim()}`;
+}
 function canonicalIntelligenceTeamKey(abbrev, displayName) {
   const raw = (abbrev?.trim() || displayName.trim()).toLowerCase();
   const slug = raw.replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
@@ -51659,6 +51662,47 @@ var init_entityIds = __esm({
   "../grarf/shared/domain/intelligence/entityIds.ts"() {
     init_define_import_meta_env();
     ENTITY_PREFIX = "gie-entity";
+  }
+});
+
+// ../grarf/shared/domain/intelligence/producers/editorialStoryProducer.ts
+function buildCanonicalEditorialStoryArtifacts(input) {
+  const editorialId = input.editorialId.trim();
+  const title = input.title.trim();
+  if (!editorialId || !title) return null;
+  return {
+    story: {
+      storyId: canonicalIntelligenceEditorialStoryId(editorialId),
+      storyType: input.storyType ?? "other",
+      phase: "discovered",
+      title,
+      entityIds: [...input.entityIds ?? []],
+      updatedAt: input.updatedAt?.trim() || "1970-01-01T00:00:00.000Z",
+      metadata: {
+        ...input.metadata ?? {},
+        editorialId
+      }
+    }
+  };
+}
+function produceEditorialStoryOutput(context2) {
+  const stories = [];
+  for (const input of context2.editorialStories ?? EDITORIAL_STORY_INPUTS) {
+    const artifacts = buildCanonicalEditorialStoryArtifacts(input);
+    if (artifacts) stories.push(artifacts.story);
+  }
+  return { entities: [], stories };
+}
+var EDITORIAL_STORY_INPUTS, editorialStoryProducer;
+var init_editorialStoryProducer = __esm({
+  "../grarf/shared/domain/intelligence/producers/editorialStoryProducer.ts"() {
+    init_define_import_meta_env();
+    init_entityIds();
+    EDITORIAL_STORY_INPUTS = [];
+    editorialStoryProducer = {
+      id: "editorial",
+      produce: produceEditorialStoryOutput
+    };
   }
 });
 
@@ -51744,7 +51788,7 @@ function buildCanonicalGameStoryArtifacts(game) {
 function produceGameStoryOutput(context2) {
   const entities = [];
   const stories = [];
-  for (const game of context2.games) {
+  for (const game of context2.games ?? []) {
     if (!game?.id?.trim()) continue;
     const artifacts = buildCanonicalGameStoryArtifacts(game);
     entities.push(...artifacts.entities);
@@ -51824,22 +51868,32 @@ var init_mergeStoryProducerOutput = __esm({
 });
 
 // ../grarf/shared/domain/intelligence/producers/runCanonicalStoryProducers.ts
-function applyCanonicalStoryProducersToRegistry(registry3, context2) {
-  let next = registry3;
-  for (const producer of CANONICAL_STORY_PRODUCERS) {
-    const output = producer.produce(context2);
-    next = mergeStoryProducerOutputIntoRegistry(next, output);
+function runCanonicalStoryProducers(context2, producers = CANONICAL_STORY_PRODUCERS) {
+  const output = {
+    entities: [],
+    stories: []
+  };
+  for (const producer of producers) {
+    const producerOutput = producer.produce(context2);
+    output.entities.push(...producerOutput.entities);
+    output.stories.push(...producerOutput.stories);
   }
-  return next;
+  return output;
+}
+function applyCanonicalStoryProducersToRegistry(registry3, context2) {
+  const output = runCanonicalStoryProducers(context2);
+  return mergeStoryProducerOutputIntoRegistry(registry3, output);
 }
 var CANONICAL_STORY_PRODUCERS;
 var init_runCanonicalStoryProducers = __esm({
   "../grarf/shared/domain/intelligence/producers/runCanonicalStoryProducers.ts"() {
     init_define_import_meta_env();
+    init_editorialStoryProducer();
     init_gameStoryProducer();
     init_mergeStoryProducerOutput();
     CANONICAL_STORY_PRODUCERS = [
-      gameStoryProducer
+      gameStoryProducer,
+      editorialStoryProducer
     ];
   }
 });
@@ -52086,6 +52140,22 @@ var init_applyIngestedNewsArticlesToRegistry = __esm({
   }
 });
 
+// ../grarf/shared/domain/intelligence/promotion/storyPromotionEngine.ts
+var init_storyPromotionEngine = __esm({
+  "../grarf/shared/domain/intelligence/promotion/storyPromotionEngine.ts"() {
+    init_define_import_meta_env();
+    init_mergeStoryProducerOutput();
+  }
+});
+
+// ../grarf/shared/domain/intelligence/promotion/index.ts
+var init_promotion = __esm({
+  "../grarf/shared/domain/intelligence/promotion/index.ts"() {
+    init_define_import_meta_env();
+    init_storyPromotionEngine();
+  }
+});
+
 // ../grarf/shared/domain/intelligence/enrichment/ingestedNewsArticle.ts
 function parseLeagueKey(value) {
   const trimmed = value?.trim();
@@ -52131,6 +52201,7 @@ var init_producers = __esm({
   "../grarf/shared/domain/intelligence/producers/index.ts"() {
     init_define_import_meta_env();
     init_mergeStoryProducerOutput();
+    init_editorialStoryProducer();
     init_gameStoryProducer();
     init_runCanonicalStoryProducers();
   }
@@ -52144,6 +52215,7 @@ var init_intelligence = __esm({
     init_registryTypes();
     init_applyIngestedGamesToRegistry();
     init_applyIngestedNewsArticlesToRegistry();
+    init_promotion();
     init_enrichment();
     init_producers();
   }
@@ -54807,10 +54879,6 @@ function mergeRetainedLiveTrackerPosts(incoming, previous, _context, nowMs = Dat
     sortLiveTrackerPostsNewestFirst([...merged.values()])
   );
 }
-function resolveCurrentlyLiveLeagueKeys() {
-  const leagues = mergeOperationalLeagueGames(useCanonicalLiveGameStore.getState().leagues);
-  return resolveCurrentlyLiveGamesSpineLeagueKeys(leagues);
-}
 function resolveLiveIngestLeagueKeys(nowMs = Date.now()) {
   const leagues = mergeOperationalLeagueGames(useCanonicalLiveGameStore.getState().leagues);
   return resolveLiveTrackerRssIngestLeagueKeys(
@@ -54828,10 +54896,6 @@ function buildPostRetentionContext() {
 }
 function leagueKeysChanged(a2, b2) {
   return a2.length !== b2.length || a2.some((key2, index) => key2 !== b2[index]);
-}
-function getLiveTrackerPostsSnapshot() {
-  const { posts, byFeedId, activeFeedIds, fetchedAt } = useLiveTrackerPostsStore.getState();
-  return { posts, byFeedId, activeFeedIds, fetchedAt };
 }
 function getLiveTrackerPosts() {
   return useLiveTrackerPostsStore.getState().posts;
@@ -54878,6 +54942,7 @@ var init_liveTrackerPostsStore = __esm({
     init_sortLiveTrackerPosts();
     init_liveTrackerFinalScoreEvents();
     init_operationalManualLeagueGames();
+    init_liveTrackerFeedRegistry();
     init_resolveActiveLiveTrackerFeeds();
     init_liveTrackerPostRetention();
     init_liveTrackerPostsPersistence();
@@ -54890,15 +54955,13 @@ var init_liveTrackerPostsStore = __esm({
     useLiveTrackerPostsStore = (0, import_zustand27.create)((set, get) => ({
       ...emptySnapshot3(),
       refresh: async () => {
-        if (resolveCurrentlyLiveLeagueKeys().length === 0) {
-          return getLiveTrackerPostsSnapshot();
-        }
         const retentionContext = buildPostRetentionContext();
         const leagues = mergeOperationalLeagueGames(useCanonicalLiveGameStore.getState().leagues);
-        const feeds = resolveActiveLiveTrackerFeeds(retentionContext.liveIngestLeagueKeys, {
+        const activeFeeds = resolveActiveLiveTrackerFeeds(retentionContext.liveIngestLeagueKeys, {
           leagues,
           retainedFinals: useRecentFinalizedGamesStore.getState().getAllRetained()
         });
+        const feeds = activeFeeds.length > 0 ? activeFeeds : getLiveTrackerFeedRegistry();
         useLiveTrackerActiveFeedsStore.setState({
           feeds,
           feedUrls: feeds.map((feed) => feed.feedUrl),
