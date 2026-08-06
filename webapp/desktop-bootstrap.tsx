@@ -8,6 +8,8 @@ import { StrictMode, useEffect, useState } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { AnalyticsProvider } from "../../grarf/desktop/src/components/analytics/AnalyticsProvider";
+import { GrarfDataModeProvider } from "../../grarf/desktop/src/intelligence/GrarfDataModeProvider";
+import { exposeGrarfDeveloperModeOnWindow } from "../../grarf/desktop/src/intelligence/exposeGrarfDeveloperModeOnWindow";
 import { AppShellLayout } from "../../grarf/desktop/src/layouts/AppShellLayout";
 import { leagueDirectoryUniqueRoutes } from "../../grarf/desktop/src/data/leagueDirectoryV1";
 import { HomePage } from "../../grarf/desktop/src/pages/HomePage";
@@ -105,24 +107,26 @@ const adminAppShellRouteElements = (
 
 function WebHomeApp() {
   return (
-    <AnalyticsProvider>
-      <IntelligenceSyncBridge />
-      <Routes>
-        <Route path="/" element={<AppShellLayout />}>
-          {appShellRouteElements}
-        </Route>
-        <Route path="webapp.html" element={<AppShellLayout />}>
-          {appShellRouteElements}
-        </Route>
-        {/* admin.html — same AppShellLayout as public, Admin Mode pre-activated before mount */}
-        <Route path="admin.html" element={<AppShellLayout />}>
-          {adminAppShellRouteElements}
-        </Route>
-        <Route path="admin/sportscape" element={<SportscapeEditorialAdminPage />} />
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-      <AdminModeOverlay />
-    </AnalyticsProvider>
+    <GrarfDataModeProvider>
+      <AnalyticsProvider>
+        <IntelligenceSyncBridge />
+        <Routes>
+          <Route path="/" element={<AppShellLayout />}>
+            {appShellRouteElements}
+          </Route>
+          <Route path="webapp.html" element={<AppShellLayout />}>
+            {appShellRouteElements}
+          </Route>
+          {/* admin.html — same AppShellLayout as public, Admin Mode pre-activated before mount */}
+          <Route path="admin.html" element={<AppShellLayout />}>
+            {adminAppShellRouteElements}
+          </Route>
+          <Route path="admin/sportscape" element={<SportscapeEditorialAdminPage />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+        <AdminModeOverlay />
+      </AnalyticsProvider>
+    </GrarfDataModeProvider>
   );
 }
 
@@ -151,6 +155,7 @@ export function mountWebHome(container: HTMLElement): void {
 }
 
 export async function bootDesktopWebClient(container: HTMLElement): Promise<void> {
+  exposeGrarfDeveloperModeOnWindow();
   await hydrateOperationalGameOverridesFromPersistence();
   await hydrateOperationalLiveWorkspaceFromPersistence();
   if (isAdminHtmlEntry() && isSportscapeAdminAuthed()) {
