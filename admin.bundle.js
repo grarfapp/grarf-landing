@@ -22534,7 +22534,7 @@ async function hydrateMlbStandingsAbbrevs(entries, season) {
           displayName: payload.shortDisplayName ?? payload.displayName
         });
       } catch (error) {
-        if (define_import_meta_env_default.DEV) {
+        if (define_import_meta_env_default?.DEV) {
           console.warn(`${LOG11} Team abbrev fetch failed`, entry2.espnTeamId, error);
         }
       }
@@ -22568,7 +22568,7 @@ async function buildMlbEspnStandingsIndex(now = /* @__PURE__ */ new Date()) {
     );
     entries = parseEspnSiteStandingsPayload(sitePayload);
   } catch (error) {
-    if (define_import_meta_env_default.DEV) {
+    if (define_import_meta_env_default?.DEV) {
       console.warn(`${LOG11} Site standings fetch failed`, error);
     }
   }
@@ -22579,7 +22579,7 @@ async function buildMlbEspnStandingsIndex(now = /* @__PURE__ */ new Date()) {
   for (const entry2 of entries) {
     registerStandingsEntry(index, entry2);
   }
-  if (define_import_meta_env_default.DEV) {
+  if (define_import_meta_env_default?.DEV) {
     console.log(`${LOG11} Built MLB standings index`, {
       teams: index.byEspnTeamId.size,
       season
@@ -22636,7 +22636,7 @@ async function enrichMlbGamesWithStandings2(games, index) {
   for (let i = 0; i < games.length; i += 1) {
     if (enriched[i] !== games[i]) attached += 1;
   }
-  if (define_import_meta_env_default.DEV && attached > 0) {
+  if (define_import_meta_env_default?.DEV && attached > 0) {
     console.log(`${LOG12} Attached standings to games`, { games: games.length, attached });
   }
   return enriched;
@@ -22945,11 +22945,13 @@ async function enrichLeagueGamesWithStandings(games, cacheKey2, buildIndex, enri
   }
   return enrichGames(games, index);
 }
-async function enrichOperationalSnapshotTeamStandings(transport) {
+async function enrichOperationalSnapshotTeamStandings(transport, options) {
   const leagues = transport.leagues ?? {};
   let changed = false;
   const nextLeagues = { ...leagues };
+  const leagueFilter = options?.leagueKeys ? new Set(options.leagueKeys) : null;
   for (const [leagueKey, config] of Object.entries(TEAM_STANDINGS_LEAGUE_ENRICHERS)) {
+    if (leagueFilter && !leagueFilter.has(leagueKey)) continue;
     const rows = leagues[leagueKey];
     if (!Array.isArray(rows) || rows.length === 0 || !config) continue;
     try {
@@ -23204,11 +23206,16 @@ async function enrichOperationalTransport(rawTransport) {
   } catch (e) {
     console.warn(`${LOG16} manual game override enrich failed`, e);
   }
+  try {
+    transport = await enrichOperationalSnapshotTeamStandings(transport, { leagueKeys: ["MLB"] });
+  } catch (e) {
+    console.warn(`${LOG16} MLB team standings enrich failed`, e);
+  }
   if (isGrarfWebRenderer()) {
     try {
-      transport = await enrichOperationalSnapshotTeamStandings(transport);
+      transport = await enrichOperationalSnapshotTeamStandings(transport, { leagueKeys: ["WNBA"] });
     } catch (e) {
-      console.warn(`${LOG16} team standings enrich failed`, e);
+      console.warn(`${LOG16} WNBA team standings enrich failed`, e);
     }
     try {
       transport = await enrichOperationalSnapshotPlayerRanks(transport);
