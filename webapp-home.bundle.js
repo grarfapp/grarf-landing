@@ -8999,14 +8999,6 @@ function readMlbStandingsIndex() {
   }
   return mlbStandingsIndexMemory;
 }
-async function ensureMlbStandingsIndexCached() {
-  if (readMlbStandingsIndex()) return;
-  const index = await resolveMlbEspnStandingsIndex();
-  if (index.byEspnTeamId.size === 0) return;
-  mlbStandingsIndexMemory = index;
-  writeCachedStandingsValue(MLB_STANDINGS_CACHE_KEY, index);
-  notifyMlbStandingsCacheReady();
-}
 function isMlbSpineGame(game) {
   return game.league === "MLB" || game.id.startsWith("espn-MLB-");
 }
@@ -9062,12 +9054,12 @@ function mlbSnapshotNeedsStandingsSync(leagues) {
   return rows.some(mlbGameMissingStandings);
 }
 async function prepareGamesSpineSnapshotForHydrate(snap) {
-  if (isGrarfWebRenderer()) {
-    await ensureMlbStandingsIndexCached();
-  }
   let prepared = syncMlbTeamStandingsFromCacheOnSnapshot(snap);
   const mlbRows = prepared.leagues?.MLB ?? [];
   if (!mlbRows.length || !mlbRows.some(mlbGameMissingStandings)) {
+    return prepared;
+  }
+  if (isGrarfWebRenderer()) {
     return prepared;
   }
   try {
@@ -51405,21 +51397,83 @@ function attachMlbStandingsFromAbbrevMap(game, standingsByAbbrev) {
 function supplementMlbTeamStandingsFromCloudSnapshot(primary, cloud) {
   const cloudMlb = cloud.leagues?.MLB;
   if (!Array.isArray(cloudMlb) || cloudMlb.length === 0) return primary;
-  const standingsByAbbrev = collectMlbStandingsByAbbrev(cloudMlb);
-  const canonicalEntries = [...standingsByAbbrev.values()];
-  if (canonicalEntries.length > 0) {
-    seedMlbStandingsCacheFromCanonicalEntries(canonicalEntries);
-  }
-  const primaryMlb = primary.leagues?.MLB ?? [];
-  const nextMlb = primaryMlb.length > 0 ? primaryMlb.map((game) => attachMlbStandingsFromAbbrevMap(game, standingsByAbbrev)) : [...cloudMlb];
-  const changed = primaryMlb.length !== (primary.leagues?.MLB?.length ?? 0) || nextMlb.some((game, index) => game !== primaryMlb[index]);
-  if (!changed) return primary;
+  const espnMlb = primary.leagues?.MLB ?? [];
+  const nextMlb = mergeWebMlbLeagueFromCloudSnapshot(espnMlb, cloudMlb);
+  if (nextMlb === espnMlb) return primary;
   return {
     ...primary,
     leagues: {
       ...primary.leagues,
       MLB: nextMlb
     }
+  };
+}
+function mergeWebMlbLeagueFromCloudSnapshot(espnMlb, cloudMlb) {
+  const standingsByAbbrev = collectMlbStandingsByAbbrev(cloudMlb);
+  const canonicalEntries = [...standingsByAbbrev.values()];
+  if (canonicalEntries.length > 0) {
+    seedMlbStandingsCacheFromCanonicalEntries(canonicalEntries);
+  }
+  if (espnMlb.length === 0) return [...cloudMlb];
+  const espnById = new Map(espnMlb.map((game) => [game.id, game]));
+  const espnByAbbrevPair = new Map(
+    espnMlb.map((game) => [`${game.awayTeamAbbrev}|${game.homeTeamAbbrev}`, game])
+  );
+  const merged = cloudMlb.map((cloudRow) => {
+    const espnRow = espnById.get(cloudRow.id) ?? espnByAbbrevPair.get(`${cloudRow.awayTeamAbbrev}|${cloudRow.homeTeamAbbrev}`);
+    return espnRow ? mergeEspnOperationalFieldsFromSupplement(cloudRow, espnRow) : cloudRow;
+  });
+  const mergedIds = new Set(merged.map((game) => game.id));
+  const mergedPairs = new Set(
+    merged.map((game) => `${game.awayTeamAbbrev}|${game.homeTeamAbbrev}`)
+  );
+  for (const espnRow of espnMlb) {
+    if (mergedIds.has(espnRow.id)) continue;
+    const pair = `${espnRow.awayTeamAbbrev}|${espnRow.homeTeamAbbrev}`;
+    if (mergedPairs.has(pair)) continue;
+    merged.push(attachMlbStandingsFromAbbrevMap(espnRow, standingsByAbbrev));
+  }
+  return merged;
+}
+function mergeEspnWatchFieldsFromSupplement(cloud, espn) {
+  let next = cloud;
+  if (!cloud.streamUrl?.trim() && espn.streamUrl?.trim()) {
+    next = {
+      ...next,
+      streamUrl: espn.streamUrl,
+      streamProvider: espn.streamProvider ?? next.streamProvider,
+      espnWatchEventId: espn.espnWatchEventId ?? next.espnWatchEventId,
+      espnPlusPlayerId: espn.espnPlusPlayerId ?? next.espnPlusPlayerId
+    };
+  }
+  const cloudBroadcast = cloud.broadcasts?.find((label) => label?.trim() && label !== "TV TBD");
+  const espnBroadcast = espn.broadcasts?.find((label) => label?.trim() && label !== "TV TBD");
+  if (!cloudBroadcast && espnBroadcast) {
+    next = {
+      ...next,
+      broadcasts: espn.broadcasts,
+      channels: espn.channels ?? espn.broadcasts
+    };
+  }
+  return next;
+}
+function mergeEspnOperationalFieldsFromSupplement(cloud, espn) {
+  const next = mergeEspnWatchFieldsFromSupplement(cloud, espn);
+  const mergedMetadata = espn.metadata?.tennis && !cloud.metadata?.tennis ? { ...cloud.metadata, ...espn.metadata, tennis: espn.metadata.tennis } : cloud.metadata?.tennis || espn.metadata ? { ...cloud.metadata, ...espn.metadata, tennis: espn.metadata?.tennis ?? cloud.metadata?.tennis } : cloud.metadata;
+  return {
+    ...next,
+    status: espn.status,
+    statusLine: espn.statusLine,
+    period: espn.period,
+    displayClock: espn.displayClock,
+    awayScore: espn.awayScore,
+    homeScore: espn.homeScore,
+    scheduledDateKey: espn.scheduledDateKey,
+    startTimeMs: espn.startTimeMs,
+    time: espn.time,
+    situation: espn.situation,
+    lastUpdated: espn.lastUpdated ?? next.lastUpdated,
+    ...mergedMetadata ? { metadata: mergedMetadata } : {}
   };
 }
 function hasElectronGamesIpc() {
@@ -56495,7 +56549,9 @@ async function enrichOperationalTransport(rawTransport) {
     console.warn(`${LOG24} manual game override enrich failed`, e2);
   }
   try {
-    transport = await enrichOperationalSnapshotTeamStandings(transport, { leagueKeys: ["MLB"] });
+    if (!isGrarfWebRenderer()) {
+      transport = await enrichOperationalSnapshotTeamStandings(transport, { leagueKeys: ["MLB"] });
+    }
   } catch (e2) {
     console.warn(`${LOG24} MLB team standings enrich failed`, e2);
   }
