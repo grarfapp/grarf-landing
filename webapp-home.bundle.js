@@ -8932,9 +8932,13 @@ function mlbGameMissingStandings(game) {
   if (!isMlbSpineGame(game)) return false;
   return !game.awayTeamStandings?.displayLabel?.trim() || !game.homeTeamStandings?.displayLabel?.trim();
 }
+function mlbSnapshotNeedsStandingsSync(leagues) {
+  const rows = leagues?.MLB ?? [];
+  return rows.some(mlbGameMissingStandings);
+}
 async function prepareGamesSpineSnapshotForHydrate(snap) {
-  const mlbRows = snap.leagues?.MLB ?? [];
   let prepared = syncMlbTeamStandingsFromCacheOnSnapshot(snap);
+  const mlbRows = prepared.leagues?.MLB ?? [];
   if (!mlbRows.length || !mlbRows.some(mlbGameMissingStandings)) {
     return prepared;
   }
@@ -10792,12 +10796,30 @@ var init_liveGamesStore = __esm({
 function refreshGamesSpineStoreFromStandingsCache() {
   const state3 = useLiveGamesStore.getState();
   if (!state3.updatedAt || !state3.leagues?.MLB?.length) return;
+  if (!mlbSnapshotNeedsStandingsSync(state3.leagues)) return;
+  if (!standingsCacheIsReady()) return;
+  const refreshKey = `${state3.updatedAt}:${state3.leagues.MLB.length}`;
+  if (refreshKey === lastStandingsRefreshKey || standingsRefreshInFlight) return;
+  lastStandingsRefreshKey = refreshKey;
+  standingsRefreshInFlight = true;
   void prepareGamesSpineSnapshotForHydrate({
     leagues: state3.leagues,
     updatedAt: state3.updatedAt
   }).then((prepared) => {
+    if (!mlbSnapshotNeedsStandingsSync(prepared.leagues)) {
+      lastStandingsRefreshKey = null;
+    }
     useLiveGamesStore.getState().hydrate(prepared);
+  }).finally(() => {
+    standingsRefreshInFlight = false;
   });
+}
+function standingsCacheIsReady() {
+  const index = readCachedStandingsValue(
+    MLB_STANDINGS_CACHE_KEY2,
+    ESPN_STANDINGS_CACHE_TTL_MS
+  );
+  return Boolean(index && index.byEspnTeamId.size > 0);
 }
 function bootstrapGamesSpineRuntime() {
   if (isGrarfWebRenderer()) {
@@ -10806,7 +10828,13 @@ function bootstrapGamesSpineRuntime() {
     prefetchManualEventsSourceBundle();
   }
   prefetchMlbTeamStandingsIndex(refreshGamesSpineStoreFromStandingsCache);
+  useLiveGamesStore.subscribe((state3) => {
+    if (!state3.updatedAt || !mlbSnapshotNeedsStandingsSync(state3.leagues)) return;
+    if (!standingsCacheIsReady()) return;
+    refreshGamesSpineStoreFromStandingsCache();
+  });
 }
+var MLB_STANDINGS_CACHE_KEY2, standingsRefreshInFlight, lastStandingsRefreshKey;
 var init_gamesSpineBootstrap = __esm({
   "../grarf/desktop/src/lib/gamesSpine/gamesSpineBootstrap.ts"() {
     init_define_import_meta_env();
@@ -10815,7 +10843,11 @@ var init_gamesSpineBootstrap = __esm({
     init_gamesSpineManualApi();
     init_fetchWebEspnOperationalSnapshot();
     init_gamesSpineGamePresentation();
+    init_teamStandingsCache();
     init_liveGamesStore();
+    MLB_STANDINGS_CACHE_KEY2 = "espn-standings:MLB";
+    standingsRefreshInFlight = false;
+    lastStandingsRefreshKey = null;
     if (typeof window !== "undefined") {
       bootstrapGamesSpineRuntime();
     }
@@ -73947,11 +73979,24 @@ var init_gamesSpineTemporarilyHiddenLeagues = __esm({
 });
 
 // ../grarf/desktop/src/lib/gamesSpine/resolveViewLeagueGames.ts
+function mergeGamesSpineLeagueGameRow(existing, incoming) {
+  const awayTeamStandings = incoming.awayTeamStandings ?? existing.awayTeamStandings;
+  const homeTeamStandings = incoming.homeTeamStandings ?? existing.homeTeamStandings;
+  if (awayTeamStandings === incoming.awayTeamStandings && homeTeamStandings === incoming.homeTeamStandings) {
+    return incoming;
+  }
+  return {
+    ...incoming,
+    ...awayTeamStandings ? { awayTeamStandings } : {},
+    ...homeTeamStandings ? { homeTeamStandings } : {}
+  };
+}
 function mergeGamesSpineLeagueGamesById(...groups) {
   const byId = /* @__PURE__ */ new Map();
   for (const group of groups) {
     for (const game of group) {
-      byId.set(game.id, game);
+      const existing = byId.get(game.id);
+      byId.set(game.id, existing ? mergeGamesSpineLeagueGameRow(existing, game) : game);
     }
   }
   return [...byId.values()];
@@ -73981,20 +74026,16 @@ function resolveViewLeagueGames(league2, selectedDate, liveLeagues, scheduleByDa
   let games;
   if (isSelectedDateOperationalSportsDay(dateKey)) {
     const liveGames = mergedLeagues[sourceLeague] ?? [];
-    if (!isGrarfWebRenderer()) {
-      games = liveGames;
-    } else {
-      const now = /* @__PURE__ */ new Date();
-      const operationalSportsDayKey = getOperationalSportsDayDateKey(now);
-      const operationalSportsDayUpcomingKey = getOperationalSportsDayTomorrowDateKey(now);
-      const fromOperationalSportsDaySchedule = scheduleByDate[operationalSportsDayKey]?.[sourceLeague] ?? [];
-      const fromOperationalSportsDayUpcomingSchedule = scheduleByDate[operationalSportsDayUpcomingKey]?.[sourceLeague] ?? [];
-      games = mergeGamesSpineLeagueGamesById(
-        liveGames,
-        fromOperationalSportsDaySchedule,
-        fromOperationalSportsDayUpcomingSchedule
-      );
-    }
+    const now = /* @__PURE__ */ new Date();
+    const operationalSportsDayKey = getOperationalSportsDayDateKey(now);
+    const operationalSportsDayUpcomingKey = getOperationalSportsDayTomorrowDateKey(now);
+    const fromOperationalSportsDaySchedule = scheduleByDate[operationalSportsDayKey]?.[sourceLeague] ?? [];
+    const fromOperationalSportsDayUpcomingSchedule = scheduleByDate[operationalSportsDayUpcomingKey]?.[sourceLeague] ?? [];
+    games = mergeGamesSpineLeagueGamesById(
+      fromOperationalSportsDaySchedule,
+      fromOperationalSportsDayUpcomingSchedule,
+      liveGames
+    );
   } else {
     games = scheduleByDate[dateKey]?.[sourceLeague] ?? [];
   }

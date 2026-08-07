@@ -20657,11 +20657,24 @@ function resolveGamesSpineOperationalLeagueOrder(mergedLeagues) {
 
 // ../grarf/desktop/src/lib/gamesSpine/resolveViewLeagueGames.ts
 init_define_import_meta_env();
+function mergeGamesSpineLeagueGameRow(existing, incoming) {
+  const awayTeamStandings = incoming.awayTeamStandings ?? existing.awayTeamStandings;
+  const homeTeamStandings = incoming.homeTeamStandings ?? existing.homeTeamStandings;
+  if (awayTeamStandings === incoming.awayTeamStandings && homeTeamStandings === incoming.homeTeamStandings) {
+    return incoming;
+  }
+  return {
+    ...incoming,
+    ...awayTeamStandings ? { awayTeamStandings } : {},
+    ...homeTeamStandings ? { homeTeamStandings } : {}
+  };
+}
 function mergeGamesSpineLeagueGamesById(...groups) {
   const byId = /* @__PURE__ */ new Map();
   for (const group of groups) {
     for (const game of group) {
-      byId.set(game.id, game);
+      const existing = byId.get(game.id);
+      byId.set(game.id, existing ? mergeGamesSpineLeagueGameRow(existing, game) : game);
     }
   }
   return [...byId.values()];
@@ -20687,20 +20700,16 @@ function resolveViewLeagueGames(league2, selectedDate, liveLeagues, scheduleByDa
   let games;
   if (isSelectedDateOperationalSportsDay(dateKey)) {
     const liveGames = mergedLeagues[sourceLeague] ?? [];
-    if (!isGrarfWebRenderer()) {
-      games = liveGames;
-    } else {
-      const now = /* @__PURE__ */ new Date();
-      const operationalSportsDayKey = getOperationalSportsDayDateKey(now);
-      const operationalSportsDayUpcomingKey = getOperationalSportsDayTomorrowDateKey(now);
-      const fromOperationalSportsDaySchedule = scheduleByDate[operationalSportsDayKey]?.[sourceLeague] ?? [];
-      const fromOperationalSportsDayUpcomingSchedule = scheduleByDate[operationalSportsDayUpcomingKey]?.[sourceLeague] ?? [];
-      games = mergeGamesSpineLeagueGamesById(
-        liveGames,
-        fromOperationalSportsDaySchedule,
-        fromOperationalSportsDayUpcomingSchedule
-      );
-    }
+    const now = /* @__PURE__ */ new Date();
+    const operationalSportsDayKey = getOperationalSportsDayDateKey(now);
+    const operationalSportsDayUpcomingKey = getOperationalSportsDayTomorrowDateKey(now);
+    const fromOperationalSportsDaySchedule = scheduleByDate[operationalSportsDayKey]?.[sourceLeague] ?? [];
+    const fromOperationalSportsDayUpcomingSchedule = scheduleByDate[operationalSportsDayUpcomingKey]?.[sourceLeague] ?? [];
+    games = mergeGamesSpineLeagueGamesById(
+      fromOperationalSportsDaySchedule,
+      fromOperationalSportsDayUpcomingSchedule,
+      liveGames
+    );
   } else {
     games = scheduleByDate[dateKey]?.[sourceLeague] ?? [];
   }
