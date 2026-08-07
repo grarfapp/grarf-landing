@@ -51256,11 +51256,54 @@ var init_GlobalAppBar = __esm({
 });
 
 // ../grarf/desktop/src/services/operationalIngest/fetchOperationalSnapshot.ts
+function prefetchWebOperationalCloudSnapshot() {
+  if (!isGrarfWebRenderer()) return Promise.resolve(null);
+  if (!webCloudSnapshotPrefetch) {
+    webCloudSnapshotPrefetch = fetchViaGrarfCloudService({ webBootstrap: true }).then((snap) => countOperationalGames(snap) > 0 ? snap : null).catch((e2) => {
+      if (define_import_meta_env_default.DEV) {
+        console.warn(`${LOG13} web cloud prefetch failed`, e2);
+      }
+      return null;
+    });
+  }
+  return webCloudSnapshotPrefetch;
+}
 function countOperationalGames(snap) {
   return Object.values(snap.leagues ?? {}).reduce(
     (total, rows) => total + (Array.isArray(rows) ? rows.length : 0),
     0
   );
+}
+function supplementMlbTeamStandingsFromCloudSnapshot(primary, cloud) {
+  const cloudMlb = cloud.leagues?.MLB;
+  const primaryMlb = primary.leagues?.MLB;
+  if (!Array.isArray(cloudMlb) || cloudMlb.length === 0) return primary;
+  if (!Array.isArray(primaryMlb) || primaryMlb.length === 0) return primary;
+  const cloudById = new Map(cloudMlb.map((game) => [game.id, game]));
+  let changed = false;
+  const nextMlb = primaryMlb.map((game) => {
+    const cloudGame = cloudById.get(game.id);
+    if (!cloudGame) return game;
+    const awayTeamStandings = game.awayTeamStandings ?? cloudGame.awayTeamStandings;
+    const homeTeamStandings = game.homeTeamStandings ?? cloudGame.homeTeamStandings;
+    if (awayTeamStandings === game.awayTeamStandings && homeTeamStandings === game.homeTeamStandings) {
+      return game;
+    }
+    changed = true;
+    return {
+      ...game,
+      ...awayTeamStandings ? { awayTeamStandings } : {},
+      ...homeTeamStandings ? { homeTeamStandings } : {}
+    };
+  });
+  if (!changed) return primary;
+  return {
+    ...primary,
+    leagues: {
+      ...primary.leagues,
+      MLB: nextMlb
+    }
+  };
 }
 function hasElectronGamesIpc() {
   return Boolean(typeof window !== "undefined" && window.grarf?.gamesGetSnapshot);
@@ -51348,21 +51391,29 @@ async function fetchViaGrarfCloudService(options) {
   throw new Error(lastError ?? "[OperationalIngest] grarf_cloud fetch failed");
 }
 async function fetchViaWebOperationalIngest() {
+  let espn = null;
   try {
-    const espn = await fetchWebEspnOperationalSnapshot();
-    if (countOperationalGames(espn) > 0) {
-      return espn;
-    }
+    espn = await fetchWebEspnOperationalSnapshot();
   } catch (e2) {
     if (define_import_meta_env_default.DEV) {
-      console.warn(`${LOG13} web ESPN slate unavailable \u2014 falling back to grarf_cloud`, e2);
+      console.warn(`${LOG13} web ESPN slate unavailable`, e2);
     }
   }
-  const cloud = await fetchViaGrarfCloudService();
-  if (countOperationalGames(cloud) > 0) {
+  let cloud = null;
+  try {
+    cloud = await prefetchWebOperationalCloudSnapshot() ?? await fetchViaGrarfCloudService();
+  } catch (e2) {
+    if (define_import_meta_env_default.DEV) {
+      console.warn(`${LOG13} web cloud snapshot unavailable for MLB standings supplement`, e2);
+    }
+  }
+  if (espn && countOperationalGames(espn) > 0) {
+    return cloud ? supplementMlbTeamStandingsFromCloudSnapshot(espn, cloud) : espn;
+  }
+  if (cloud && countOperationalGames(cloud) > 0) {
     return cloud;
   }
-  return fetchWebEspnOperationalSnapshot();
+  return espn ?? fetchWebEspnOperationalSnapshot();
 }
 async function fetchViaGrarfCloudWithLocalFallback() {
   let cloud = null;
@@ -51424,7 +51475,7 @@ async function fetchOperationalSnapshot() {
 function operationalResponseFromIpcPush(snap) {
   return ipcSnapshotToOperationalResponse(snap);
 }
-var LOG13, CLOUD_STALE_THRESHOLD_MS, CLOUD_FETCH_TIMEOUT_MS, WEB_CLOUD_BOOTSTRAP_TIMEOUT_MS, CLOUD_FETCH_MAX_ATTEMPTS, CLOUD_FETCH_RETRY_MS;
+var LOG13, CLOUD_STALE_THRESHOLD_MS, CLOUD_FETCH_TIMEOUT_MS, WEB_CLOUD_BOOTSTRAP_TIMEOUT_MS, CLOUD_FETCH_MAX_ATTEMPTS, CLOUD_FETCH_RETRY_MS, webCloudSnapshotPrefetch;
 var init_fetchOperationalSnapshot = __esm({
   "../grarf/desktop/src/services/operationalIngest/fetchOperationalSnapshot.ts"() {
     init_define_import_meta_env();
@@ -51437,6 +51488,7 @@ var init_fetchOperationalSnapshot = __esm({
     WEB_CLOUD_BOOTSTRAP_TIMEOUT_MS = 2500;
     CLOUD_FETCH_MAX_ATTEMPTS = 3;
     CLOUD_FETCH_RETRY_MS = 1500;
+    webCloudSnapshotPrefetch = null;
   }
 });
 
