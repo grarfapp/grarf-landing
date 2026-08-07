@@ -27042,12 +27042,28 @@ async function fetchViaWebOperationalIngest() {
     }
   }
   if (espn && countOperationalGames(espn) > 0) {
-    return cloud ? supplementMlbTeamStandingsFromCloudSnapshot(espn, cloud) : espn;
+    return joinWebMlbProviderIds(
+      cloud ? supplementMlbTeamStandingsFromCloudSnapshot(espn, cloud) : espn
+    );
   }
   if (cloud && countOperationalGames(cloud) > 0) {
-    return cloud;
+    return joinWebMlbProviderIds(cloud);
   }
-  return espn ?? fetchWebEspnOperationalSnapshot();
+  return joinWebMlbProviderIds(espn ?? await fetchWebEspnOperationalSnapshot());
+}
+async function joinWebMlbProviderIds(transport) {
+  const mlbRows = transport.leagues?.MLB;
+  if (!Array.isArray(mlbRows) || mlbRows.length === 0) return transport;
+  try {
+    const joined = await joinMlbProviderIdsOnGames(mlbRows);
+    if (joined === mlbRows) return transport;
+    return { ...transport, leagues: { ...transport.leagues, MLB: joined } };
+  } catch (e) {
+    if (define_import_meta_env_default.DEV) {
+      console.warn(`${LOG21} web MLB provider id join failed`, e);
+    }
+    return transport;
+  }
 }
 async function fetchViaGrarfCloudWithLocalFallback() {
   let cloud = null;

@@ -51446,6 +51446,93 @@ var init_GlobalAppBar = __esm({
   }
 });
 
+// ../grarf/desktop/src/lib/mlb/joinMlbProviderIdsClient.ts
+function hasMlbGamePk(game) {
+  if (typeof game.gamePk === "number" && Number.isFinite(game.gamePk) && game.gamePk > 0) {
+    return true;
+  }
+  const mlb2 = game.externalIds?.mlb?.trim();
+  return !!mlb2 && /^\d+$/.test(mlb2);
+}
+async function fetchMlbSchedulePkMap(dateYmd) {
+  const cached = scheduleCache.get(dateYmd);
+  if (cached) return cached;
+  const url = `https://statsapi.mlb.com/api/v1/schedule?sportId=1&date=${encodeURIComponent(dateYmd)}`;
+  const res = await fetch(url, { headers: { Accept: "application/json" } });
+  if (!res.ok) {
+    throw new Error(`MLB schedule ${res.status}`);
+  }
+  const data2 = await res.json();
+  const map = /* @__PURE__ */ new Map();
+  for (const day of data2.dates ?? []) {
+    for (const g2 of day.games ?? []) {
+      const away = g2?.teams?.away?.team?.name?.trim()?.toLowerCase();
+      const home = g2?.teams?.home?.team?.name?.trim()?.toLowerCase();
+      const pk = g2?.gamePk;
+      if (!away || !home || pk == null) continue;
+      const pkNum = Number(pk);
+      if (!Number.isFinite(pkNum) || pkNum <= 0) continue;
+      map.set(`${away}|${home}`, pkNum);
+      map.set(`${home}|${away}`, pkNum);
+    }
+  }
+  scheduleCache.set(dateYmd, map);
+  return map;
+}
+function resolveJoinDateYmd(game) {
+  const key2 = game.scheduledDateKey?.trim();
+  if (key2 && /^\d{4}-\d{2}-\d{2}$/.test(key2)) return key2;
+  return void 0;
+}
+function isMlbBucketRow(game) {
+  return game.league === "MLB" || game.id.startsWith("espn-MLB-");
+}
+async function joinMlbProviderIdsOnGames(games) {
+  const needJoin = games.filter((g2) => isMlbBucketRow(g2) && !hasMlbGamePk(g2));
+  if (needJoin.length === 0) return games;
+  const dates = [
+    ...new Set(
+      needJoin.map(resolveJoinDateYmd).filter((d2) => !!d2)
+    )
+  ];
+  if (dates.length === 0) return games;
+  const pkMaps = /* @__PURE__ */ new Map();
+  await Promise.all(
+    dates.map(async (dateYmd) => {
+      try {
+        pkMaps.set(dateYmd, await fetchMlbSchedulePkMap(dateYmd));
+      } catch {
+      }
+    })
+  );
+  return games.map((g2) => {
+    if (!isMlbBucketRow(g2) || hasMlbGamePk(g2)) return g2;
+    const dateYmd = resolveJoinDateYmd(g2);
+    const pkMap = dateYmd ? pkMaps.get(dateYmd) : void 0;
+    const away = g2.metadata?.officialAwayName?.trim()?.toLowerCase();
+    const home = g2.metadata?.officialHomeName?.trim()?.toLowerCase();
+    const pk = away && home && pkMap ? pkMap.get(`${away}|${home}`) : void 0;
+    const pkNum = pk != null && Number.isFinite(Number(pk)) ? Number(pk) : void 0;
+    if (pkNum == null) return g2;
+    return {
+      ...g2,
+      gamePk: pkNum,
+      externalIds: {
+        ...g2.externalIds ?? {},
+        espn: g2.externalIds?.espn ?? g2.espnEventId ?? null,
+        mlb: String(pkNum)
+      }
+    };
+  });
+}
+var scheduleCache;
+var init_joinMlbProviderIdsClient = __esm({
+  "../grarf/desktop/src/lib/mlb/joinMlbProviderIdsClient.ts"() {
+    init_define_import_meta_env();
+    scheduleCache = /* @__PURE__ */ new Map();
+  }
+});
+
 // ../grarf/desktop/src/services/operationalIngest/fetchOperationalSnapshot.ts
 function prefetchWebOperationalCloudSnapshot() {
   if (!isGrarfWebRenderer()) return Promise.resolve(null);
@@ -51680,12 +51767,28 @@ async function fetchViaWebOperationalIngest() {
     }
   }
   if (espn && countOperationalGames(espn) > 0) {
-    return cloud ? supplementMlbTeamStandingsFromCloudSnapshot(espn, cloud) : espn;
+    return joinWebMlbProviderIds(
+      cloud ? supplementMlbTeamStandingsFromCloudSnapshot(espn, cloud) : espn
+    );
   }
   if (cloud && countOperationalGames(cloud) > 0) {
-    return cloud;
+    return joinWebMlbProviderIds(cloud);
   }
-  return espn ?? fetchWebEspnOperationalSnapshot();
+  return joinWebMlbProviderIds(espn ?? await fetchWebEspnOperationalSnapshot());
+}
+async function joinWebMlbProviderIds(transport) {
+  const mlbRows = transport.leagues?.MLB;
+  if (!Array.isArray(mlbRows) || mlbRows.length === 0) return transport;
+  try {
+    const joined = await joinMlbProviderIdsOnGames(mlbRows);
+    if (joined === mlbRows) return transport;
+    return { ...transport, leagues: { ...transport.leagues, MLB: joined } };
+  } catch (e2) {
+    if (define_import_meta_env_default.DEV) {
+      console.warn(`${LOG13} web MLB provider id join failed`, e2);
+    }
+    return transport;
+  }
 }
 async function fetchViaGrarfCloudWithLocalFallback() {
   let cloud = null;
@@ -51753,6 +51856,7 @@ var init_fetchOperationalSnapshot = __esm({
     init_define_import_meta_env();
     init_operationalIngestConfig();
     init_gamesSpineGamePresentation();
+    init_joinMlbProviderIdsClient();
     init_isGrarfWebRenderer();
     init_fetchWebEspnOperationalSnapshot();
     LOG13 = "[OperationalIngest]";
@@ -53936,93 +54040,6 @@ var init_mergeLiveGamesSnapshotWithManualEventsSource = __esm({
     init_manualGamesSpineUtils();
     init_isGrarfWebRenderer();
     init_manualEventsSourceResolver();
-  }
-});
-
-// ../grarf/desktop/src/lib/mlb/joinMlbProviderIdsClient.ts
-function hasMlbGamePk(game) {
-  if (typeof game.gamePk === "number" && Number.isFinite(game.gamePk) && game.gamePk > 0) {
-    return true;
-  }
-  const mlb2 = game.externalIds?.mlb?.trim();
-  return !!mlb2 && /^\d+$/.test(mlb2);
-}
-async function fetchMlbSchedulePkMap(dateYmd) {
-  const cached = scheduleCache.get(dateYmd);
-  if (cached) return cached;
-  const url = `https://statsapi.mlb.com/api/v1/schedule?sportId=1&date=${encodeURIComponent(dateYmd)}`;
-  const res = await fetch(url, { headers: { Accept: "application/json" } });
-  if (!res.ok) {
-    throw new Error(`MLB schedule ${res.status}`);
-  }
-  const data2 = await res.json();
-  const map = /* @__PURE__ */ new Map();
-  for (const day of data2.dates ?? []) {
-    for (const g2 of day.games ?? []) {
-      const away = g2?.teams?.away?.team?.name?.trim()?.toLowerCase();
-      const home = g2?.teams?.home?.team?.name?.trim()?.toLowerCase();
-      const pk = g2?.gamePk;
-      if (!away || !home || pk == null) continue;
-      const pkNum = Number(pk);
-      if (!Number.isFinite(pkNum) || pkNum <= 0) continue;
-      map.set(`${away}|${home}`, pkNum);
-      map.set(`${home}|${away}`, pkNum);
-    }
-  }
-  scheduleCache.set(dateYmd, map);
-  return map;
-}
-function resolveJoinDateYmd(game) {
-  const key2 = game.scheduledDateKey?.trim();
-  if (key2 && /^\d{4}-\d{2}-\d{2}$/.test(key2)) return key2;
-  return void 0;
-}
-function isMlbBucketRow(game) {
-  return game.league === "MLB" || game.id.startsWith("espn-MLB-");
-}
-async function joinMlbProviderIdsOnGames(games) {
-  const needJoin = games.filter((g2) => isMlbBucketRow(g2) && !hasMlbGamePk(g2));
-  if (needJoin.length === 0) return games;
-  const dates = [
-    ...new Set(
-      needJoin.map(resolveJoinDateYmd).filter((d2) => !!d2)
-    )
-  ];
-  if (dates.length === 0) return games;
-  const pkMaps = /* @__PURE__ */ new Map();
-  await Promise.all(
-    dates.map(async (dateYmd) => {
-      try {
-        pkMaps.set(dateYmd, await fetchMlbSchedulePkMap(dateYmd));
-      } catch {
-      }
-    })
-  );
-  return games.map((g2) => {
-    if (!isMlbBucketRow(g2) || hasMlbGamePk(g2)) return g2;
-    const dateYmd = resolveJoinDateYmd(g2);
-    const pkMap = dateYmd ? pkMaps.get(dateYmd) : void 0;
-    const away = g2.metadata?.officialAwayName?.trim()?.toLowerCase();
-    const home = g2.metadata?.officialHomeName?.trim()?.toLowerCase();
-    const pk = away && home && pkMap ? pkMap.get(`${away}|${home}`) : void 0;
-    const pkNum = pk != null && Number.isFinite(Number(pk)) ? Number(pk) : void 0;
-    if (pkNum == null) return g2;
-    return {
-      ...g2,
-      gamePk: pkNum,
-      externalIds: {
-        ...g2.externalIds ?? {},
-        espn: g2.externalIds?.espn ?? g2.espnEventId ?? null,
-        mlb: String(pkNum)
-      }
-    };
-  });
-}
-var scheduleCache;
-var init_joinMlbProviderIdsClient = __esm({
-  "../grarf/desktop/src/lib/mlb/joinMlbProviderIdsClient.ts"() {
-    init_define_import_meta_env();
-    scheduleCache = /* @__PURE__ */ new Map();
   }
 });
 
@@ -73897,7 +73914,6 @@ var init_HomeHeadlinesWebsiteSubmenu = __esm({
     init_homeLeagueWorkspaceChrome();
     init_homeSubnavChrome();
     init_isGrarfWebRenderer();
-    init_resolveHeadlinesAllWebsitePaneSources();
     init_canonical();
     init_centerPaneApplicationModeStore();
     init_homeHeadlinesWebsiteSubmenuStore();
