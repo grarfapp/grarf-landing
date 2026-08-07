@@ -54329,7 +54329,7 @@ function startOperationalSnapshotPolling(hydrate, options) {
         const applyHydrate = async (transport, completeness) => {
           recordCentralizedTransportIngest(transport);
           const canonical = normalizeOperationalSnapshot(transport);
-          hydrate(canonical, completeness);
+          await Promise.resolve(hydrate(canonical, completeness));
         };
         clearRetry();
         try {
@@ -55387,54 +55387,52 @@ function LiveGamesBridge() {
       if (define_import_meta_env_default.DEV) {
         console.log(`${LOG25} grarf_cloud with local IPC supplement (fresher wins)`);
       }
-      const cloudHydrate = (snap) => {
-        void (async () => {
-          let hydratedSnap = snap;
-          try {
-            const withMlbStandings = await enrichOperationalSnapshotTeamStandings(
-              {
-                generatedAt: snap.updatedAt ?? (/* @__PURE__ */ new Date()).toISOString(),
-                leagues: snap.leagues ?? {},
-                source: "grarf_cloud"
-              },
-              { leagueKeys: ["MLB"] }
-            );
-            hydratedSnap = {
-              ...snap,
-              leagues: withMlbStandings.leagues
-            };
-          } catch (e2) {
-            console.warn(`${LOG25} cloud hydrate standings enrich failed`, e2);
-          }
-          lastCloudLeaguesRef.current = hydratedSnap.leagues ?? {};
-          const prev = useLiveGamesStore.getState();
-          const previousGames = Object.values(useCanonicalLiveGameStore.getState().gamesById).map(
-            (r3) => r3.game
-          );
-          const incomingMs = parseUpdatedAtMs(snap.updatedAt);
-          const currentMs = parseUpdatedAtMs(prev.updatedAt);
-          let mergedLeagues = supplementOperationalSnapshotLeagues(
-            hydratedSnap.leagues ?? {},
-            prev.leagues
-          );
-          let merged = preserveMissingOperationalIngestGames(
+      const cloudHydrate = async (snap) => {
+        let hydratedSnap = snap;
+        try {
+          const withMlbStandings = await enrichOperationalSnapshotTeamStandings(
             {
-              ...hydratedSnap,
-              leagues: mergedLeagues
+              generatedAt: snap.updatedAt ?? (/* @__PURE__ */ new Date()).toISOString(),
+              leagues: snap.leagues ?? {},
+              source: "grarf_cloud"
             },
+            { leagueKeys: ["MLB"] }
+          );
+          hydratedSnap = {
+            ...snap,
+            leagues: withMlbStandings.leagues
+          };
+        } catch (e2) {
+          console.warn(`${LOG25} cloud hydrate standings enrich failed`, e2);
+        }
+        lastCloudLeaguesRef.current = hydratedSnap.leagues ?? {};
+        const prev = useLiveGamesStore.getState();
+        const previousGames = Object.values(useCanonicalLiveGameStore.getState().gamesById).map(
+          (r3) => r3.game
+        );
+        const incomingMs = parseUpdatedAtMs(snap.updatedAt);
+        const currentMs = parseUpdatedAtMs(prev.updatedAt);
+        let mergedLeagues = supplementOperationalSnapshotLeagues(
+          hydratedSnap.leagues ?? {},
+          prev.leagues
+        );
+        let merged = preserveMissingOperationalIngestGames(
+          {
+            ...hydratedSnap,
+            leagues: mergedLeagues
+          },
+          previousGames
+        );
+        if (incomingMs > 0 && currentMs > 0 && incomingMs <= currentMs) {
+          merged = mergeFinalRowsWithoutContradictingProtectedGames(
+            merged,
+            prev.leagues,
             previousGames
           );
-          if (incomingMs > 0 && currentMs > 0 && incomingMs <= currentMs) {
-            merged = mergeFinalRowsWithoutContradictingProtectedGames(
-              merged,
-              prev.leagues,
-              previousGames
-            );
-            merged = { ...merged, updatedAt: prev.updatedAt ?? hydratedSnap.updatedAt };
-          }
-          merged = await mergeLiveGamesSnapshotWithManualEventsSource(merged);
-          hydrate(merged, { source: "grarf_cloud" });
-        })();
+          merged = { ...merged, updatedAt: prev.updatedAt ?? hydratedSnap.updatedAt };
+        }
+        merged = await mergeLiveGamesSnapshotWithManualEventsSource(merged);
+        hydrate(merged, { source: "grarf_cloud" });
       };
       if (isGrarfWebRenderer()) {
         void (async () => {
