@@ -18519,6 +18519,44 @@ var F1_PRACTICE_SESSION_DURATION_MS = 60 * 60 * 1e3;
 init_define_import_meta_env();
 
 // ../grarf/desktop/src/lib/gamesSpine/gamesSpineGamePresentation.ts
+var MLB_STANDINGS_CACHE_KEY = "espn-standings:MLB";
+function isMlbSpineGame(game) {
+  return game.league === "MLB" || game.id.startsWith("espn-MLB-");
+}
+function syncMlbTeamStandingsFromCacheOnSnapshot(incoming) {
+  const index = readCachedStandingsValue(
+    MLB_STANDINGS_CACHE_KEY,
+    ESPN_STANDINGS_CACHE_TTL_MS
+  );
+  if (!index || index.byEspnTeamId.size === 0) return incoming;
+  const mlbRows = incoming.leagues?.MLB;
+  if (!Array.isArray(mlbRows) || mlbRows.length === 0) return incoming;
+  let changed = false;
+  const nextMlb = mlbRows.map((game) => {
+    if (!isMlbSpineGame(game)) return game;
+    let next = game;
+    for (const side of ["away", "home"]) {
+      const existing = side === "away" ? next.awayTeamStandings : next.homeTeamStandings;
+      if (existing?.displayLabel?.trim()) continue;
+      const resolved = resolveMlbTeamStandingsFromIndex(next, side, index);
+      if (!resolved) continue;
+      next = {
+        ...next,
+        ...side === "away" ? { awayTeamStandings: resolved } : { homeTeamStandings: resolved }
+      };
+      changed = true;
+    }
+    return next;
+  });
+  if (!changed) return incoming;
+  return {
+    ...incoming,
+    leagues: {
+      ...incoming.leagues,
+      MLB: nextMlb
+    }
+  };
+}
 function preserveMlbTeamStandingsOnGamesSnapshot(incoming, previousGames) {
   const mlbRows = incoming.leagues?.MLB;
   if (!Array.isArray(mlbRows) || mlbRows.length === 0 || previousGames.length === 0) {
@@ -18785,9 +18823,8 @@ var useLiveGamesStore = create((set) => ({
       withStableLive,
       previousLeagues
     );
-    const withMlbStandings = preserveMlbTeamStandingsOnGamesSnapshot(
-      withStableLeagues,
-      previousGames
+    const withMlbStandings = syncMlbTeamStandingsFromCacheOnSnapshot(
+      preserveMlbTeamStandingsOnGamesSnapshot(withStableLeagues, previousGames)
     );
     useCanonicalLiveGameStore.getState().ingestSnapshot({
       leagues: withMlbStandings.leagues,
