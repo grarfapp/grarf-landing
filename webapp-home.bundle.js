@@ -8932,7 +8932,7 @@ function mlbGameMissingStandings(game) {
   if (!isMlbSpineGame(game)) return false;
   return !game.awayTeamStandings?.displayLabel?.trim() || !game.homeTeamStandings?.displayLabel?.trim();
 }
-async function enrichMlbStandingsOnGamesSnapshot(snap) {
+async function prepareGamesSpineSnapshotForHydrate(snap) {
   const mlbRows = snap.leagues?.MLB ?? [];
   let prepared = syncMlbTeamStandingsFromCacheOnSnapshot(snap);
   if (!mlbRows.length || !mlbRows.some(mlbGameMissingStandings)) {
@@ -8956,7 +8956,7 @@ async function enrichMlbStandingsOnGamesSnapshot(snap) {
   }
   return prepared;
 }
-function prefetchMlbTeamStandingsForWeb(onReady) {
+function prefetchMlbTeamStandingsIndex(onReady) {
   if (readCachedStandingsValue(MLB_STANDINGS_CACHE_KEY, ESPN_STANDINGS_CACHE_TTL_MS)) {
     onReady?.();
     return;
@@ -10788,25 +10788,27 @@ var init_liveGamesStore = __esm({
   }
 });
 
-// ../grarf/desktop/src/lib/gamesSpine/webGamesSpineBootstrap.ts
-function bootstrapWebGamesSpineIngest() {
-  if (!isGrarfWebRenderer()) return;
-  prefetchWebEspnOperationalSnapshot();
-  prefetchGamesSpineManualDocument();
-  prefetchManualEventsSourceBundle();
-  prefetchMlbTeamStandingsForWeb(() => {
-    const state3 = useLiveGamesStore.getState();
-    if (!state3.updatedAt || !state3.leagues?.MLB?.length) return;
-    void enrichMlbStandingsOnGamesSnapshot({
-      leagues: state3.leagues,
-      updatedAt: state3.updatedAt
-    }).then((prepared) => {
-      useLiveGamesStore.getState().hydrate(prepared);
-    });
+// ../grarf/desktop/src/lib/gamesSpine/gamesSpineBootstrap.ts
+function refreshGamesSpineStoreFromStandingsCache() {
+  const state3 = useLiveGamesStore.getState();
+  if (!state3.updatedAt || !state3.leagues?.MLB?.length) return;
+  void prepareGamesSpineSnapshotForHydrate({
+    leagues: state3.leagues,
+    updatedAt: state3.updatedAt
+  }).then((prepared) => {
+    useLiveGamesStore.getState().hydrate(prepared);
   });
 }
-var init_webGamesSpineBootstrap = __esm({
-  "../grarf/desktop/src/lib/gamesSpine/webGamesSpineBootstrap.ts"() {
+function bootstrapGamesSpineRuntime() {
+  if (isGrarfWebRenderer()) {
+    prefetchWebEspnOperationalSnapshot();
+    prefetchGamesSpineManualDocument();
+    prefetchManualEventsSourceBundle();
+  }
+  prefetchMlbTeamStandingsIndex(refreshGamesSpineStoreFromStandingsCache);
+}
+var init_gamesSpineBootstrap = __esm({
+  "../grarf/desktop/src/lib/gamesSpine/gamesSpineBootstrap.ts"() {
     init_define_import_meta_env();
     init_isGrarfWebRenderer();
     init_manualEventsSourceResolver();
@@ -10815,7 +10817,7 @@ var init_webGamesSpineBootstrap = __esm({
     init_gamesSpineGamePresentation();
     init_liveGamesStore();
     if (typeof window !== "undefined") {
-      bootstrapWebGamesSpineIngest();
+      bootstrapGamesSpineRuntime();
     }
   }
 });
@@ -56394,6 +56396,7 @@ async function hydrateOperationalSnapshotFromTransport(rawTransport, hydrate, co
       merged,
       canonical2.leagues?.MLB ?? []
     );
+    merged = await prepareGamesSpineSnapshotForHydrate(merged);
     await Promise.resolve(hydrate(merged, completeness));
     return;
   }
@@ -56406,7 +56409,8 @@ async function hydrateOperationalSnapshotFromTransport(rawTransport, hydrate, co
     }
   }
   if (shouldRejectStaleSnapshot(canonical.updatedAt)) return;
-  await Promise.resolve(hydrate(canonical, completeness));
+  const prepared = await prepareGamesSpineSnapshotForHydrate(canonical);
+  await Promise.resolve(hydrate(prepared, completeness));
 }
 var LOG25;
 var init_hydrateOperationalSnapshotFromTransport = __esm({
@@ -56443,7 +56447,6 @@ var init_operationalIngest = __esm({
 function LiveGamesBridge() {
   const hydrate = useLiveGamesStore((s2) => s2.hydrate);
   const lastCloudLeaguesRef = (0, import_react24.useRef)({});
-  const hydrateGenerationRef = (0, import_react24.useRef)(0);
   (0, import_react24.useEffect)(() => {
     logOperationalRuntimeStartupBanner();
     const stopIntelligenceRegistrySync = bindCanonicalIntelligenceRegistrySync();
@@ -56452,13 +56455,7 @@ function LiveGamesBridge() {
     const hydrateContext = {
       lastCloudLeaguesRef
     };
-    const hydrateWithMlbStandings = async (snap, completeness) => {
-      const generation = ++hydrateGenerationRef.current;
-      const prepared = isGrarfWebRenderer() ? await enrichMlbStandingsOnGamesSnapshot(snap) : snap;
-      if (generation !== hydrateGenerationRef.current) return;
-      hydrate(prepared, completeness);
-    };
-    const ingestFromTransport = (transport, completeness) => hydrateOperationalSnapshotFromTransport(transport, hydrateWithMlbStandings, {
+    const ingestFromTransport = (transport, completeness) => hydrateOperationalSnapshotFromTransport(transport, hydrate, {
       ...hydrateContext,
       completeness
     });
@@ -56535,7 +56532,6 @@ var init_LiveGamesBridge = __esm({
     init_bindCanonicalNewsStoryEnrichmentSync();
     init_operationalIngest();
     init_hydrateOperationalSnapshotFromTransport();
-    init_gamesSpineGamePresentation();
     init_liveGamesStore();
   }
 });
@@ -72345,7 +72341,7 @@ var import_react58, import_jsx_runtime27;
 var init_AppShellLayout = __esm({
   "../grarf/desktop/src/layouts/AppShellLayout.tsx"() {
     init_define_import_meta_env();
-    init_webGamesSpineBootstrap();
+    init_gamesSpineBootstrap();
     import_react58 = __toESM(require_react(), 1);
     init_dist();
     init_perfDiagnostics();
@@ -77920,9 +77916,8 @@ function GameRow({
   const scoreAnchorRef = useGamesSpineScoreAnchor(isRail && scoreMode, homeSpineParity);
   const isPrepare = isRail && game.status === "scheduled";
   const tennisPresentation = tennis ? resolveTennisMatchPresentation(game) : null;
-  const supportsSectionGamesMode = isGrarfWebRenderer() || isGrarfElectronRenderer();
   const gamesSpineDisplayState = useGamesSpineDisplayStore((state3) => state3);
-  const gamesDisplayMode = spineSectionCollapseKey && supportsSectionGamesMode ? resolveGamesSpineSectionGamesMode(spineSectionCollapseKey, gamesSpineDisplayState) : gamesSpineDisplayState.gamesMode;
+  const gamesDisplayMode = spineSectionCollapseKey ? resolveGamesSpineSectionGamesMode(spineSectionCollapseKey, gamesSpineDisplayState) : gamesSpineDisplayState.gamesMode;
   const groupedStartTimePresentation = (0, import_react79.useMemo)(() => {
     if (!homeSpineParity || !sectionVisibleGames?.length) {
       return { hideGroupedCompactStartTime: false, prepareStartTimeRepeat: false };
@@ -77935,8 +77930,8 @@ function GameRow({
   }, [homeSpineParity, sectionVisibleGames, game, gamesDisplayMode]);
   const resolvedHideTime = hideTime || groupedStartTimePresentation.hideGroupedCompactStartTime;
   const resolvedPrepareStartTimeRepeat = prepareStartTimeRepeat || groupedStartTimePresentation.prepareStartTimeRepeat;
-  const isWebHomeSpineParity = isRail && homeSpineParity && supportsSectionGamesMode;
-  const isCompactSpineRow = isWebHomeSpineParity && gamesDisplayMode === "compact" && !exemptFromCompactGamesMode;
+  const isHomeSpineParity = isRail && homeSpineParity;
+  const isCompactSpineRow = isHomeSpineParity && gamesDisplayMode === "compact" && !exemptFromCompactGamesMode;
   const featuredCompactLeagueLogoColumn = isCompactSpineRow && spineSectionCollapseKey === GAMES_SPINE_FEATURED_COLLAPSE_KEY;
   const gameCardClickable = !isTennisGame(game) || tennisGameHasEffectiveGameCardUrl(game);
   const renderRailMatchup = (className) => /* @__PURE__ */ (0, import_jsx_runtime59.jsx)(GamesSpineMatchupStack, { game, className });
@@ -77994,7 +77989,7 @@ function GameRow({
               operationalDeprioritized
             }),
             isCompactSpineRow && GAMES_SPINE_COLLAPSED_SURFACE_CORNER_CLASS,
-            isWebHomeSpineParity && GAMES_SPINE_DISPLAY_MODE_TRANSITION_CLASS,
+            isHomeSpineParity && GAMES_SPINE_DISPLAY_MODE_TRANSITION_CLASS,
             isCompactSpineRow ? "px-2 py-1" : null,
             "text-left"
           ) : cn2(
@@ -78009,7 +78004,7 @@ function GameRow({
         )
       ),
       "aria-current": isSelected ? "true" : void 0,
-      children: isRail ? homeSpineParity ? isWebHomeSpineParity ? /* @__PURE__ */ (0, import_jsx_runtime59.jsx)(
+      children: isRail ? homeSpineParity ? isHomeSpineParity ? /* @__PURE__ */ (0, import_jsx_runtime59.jsx)(
         GamesSpineGameDisplayTransition,
         {
           isCompact: isCompactSpineRow,
@@ -78417,7 +78412,6 @@ var init_GameRow = __esm({
     init_tennisMatchPresentation();
     init_gamesSpineSideStat();
     init_resolveGamesSpineMatchupSideOrder();
-    init_isGrarfWebRenderer();
     init_gamesSpineDisplayStore();
     init_mergeGamesSpineSectionsByPriority();
     init_gamesSpineGamePresentation();
@@ -80041,7 +80035,7 @@ var init_HomeLeagueSpineSection = __esm({
       const manualRefreshMs = useManualGamesSpineLiveRefreshMs();
       const operationalIngestComplete = useGamesSpineRenderStore((s2) => s2.operationalIngestComplete);
       const gamesMode = useGamesSpineSectionGamesMode(league2);
-      const cardListClass = isGrarfWebRenderer() || isGrarfElectronRenderer() ? resolveGamesSpineCardListLayoutClass(gamesMode) : GAMES_SPINE_CARD_LIST_CLASS;
+      const cardListClass = resolveGamesSpineCardListLayoutClass(gamesMode);
       const useOperationalModePipeline = briefingScrollContext === "home" || briefingScrollContext === "league";
       const headerRef = (0, import_react88.useRef)(null);
       const stickyLogged = (0, import_react88.useRef)(false);
@@ -80547,7 +80541,7 @@ var init_HomeFeaturedSpineSection = __esm({
       const retainedById = useRecentFinalizedGamesStore((s2) => s2.byId);
       const gamesMode = useGamesSpineSectionGamesMode(GAMES_SPINE_FEATURED_COLLAPSE_KEY);
       const adminPriorities = useAdminFeaturedPriorityStore((s2) => s2.priorities);
-      const cardListClass = isGrarfWebRenderer() || isGrarfElectronRenderer() ? resolveGamesSpineCardListLayoutClass(gamesMode) : GAMES_SPINE_CARD_LIST_CLASS;
+      const cardListClass = resolveGamesSpineCardListLayoutClass(gamesMode);
       const gamePool = (0, import_react89.useMemo)(() => {
         const supplementalFinals = statusFilter === "final" && isSelectedDateOperationalSportsDay(selectedDate) ? mergeCatchUpSupplementalFinals(
           ...withoutGamesSpineHiddenLeagues(getGamesColumnLeagueOrder()).map(
@@ -82067,7 +82061,7 @@ var init_HomeManualGamesSpineSection = __esm({
       const [logoFailed, setLogoFailed] = (0, import_react97.useState)(false);
       const manualCollapseKey = gamesSpineManualCollapseKey(section.slug);
       const gamesMode = useGamesSpineSectionGamesMode(manualCollapseKey);
-      const cardListClass = isGrarfWebRenderer() || isGrarfElectronRenderer() ? resolveGamesSpineCardListLayoutClass(gamesMode) : GAMES_SPINE_CARD_LIST_CLASS;
+      const cardListClass = resolveGamesSpineCardListLayoutClass(gamesMode);
       const refreshedGames = (0, import_react97.useMemo)(() => {
         if (selectedDate !== todayKey) return [];
         const now = new Date(manualRefreshMs);
@@ -123764,7 +123758,7 @@ var import_react238, import_client, import_jsx_runtime229, reactRoot, appShellRo
 var init_desktop_bootstrap = __esm({
   "webapp/desktop-bootstrap.tsx"() {
     init_define_import_meta_env();
-    init_webGamesSpineBootstrap();
+    init_gamesSpineBootstrap();
     init_grarf_web_shim();
     init_bootLiveTrack();
     import_react238 = __toESM(require_react());

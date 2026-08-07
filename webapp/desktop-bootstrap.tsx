@@ -1,7 +1,7 @@
 /**
  * Full Desktop Home port — AppShellLayout + HomePage and supporting routes.
  */
-import "../../grarf/desktop/src/lib/gamesSpine/webGamesSpineBootstrap";
+import "../../grarf/desktop/src/lib/gamesSpine/gamesSpineBootstrap";
 import "./grarf-web-shim";
 import "../../grarf/desktop/src/lib/livetrack/bootLiveTrack";
 import { StrictMode, useEffect, useState } from "react";
