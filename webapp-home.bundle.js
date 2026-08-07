@@ -6716,6 +6716,58 @@ var init_teamStandingsCache = __esm({
   }
 });
 
+// ../grarf/desktop/src/lib/standings/mlb/mlbTeamStandingsIndexCache.ts
+function isBareMlbTeamStandingsIndex(value) {
+  return Boolean(value) && typeof value === "object" && "byEspnTeamId" in value && value.byEspnTeamId instanceof Map;
+}
+function normalizeMlbStandingsCacheEntry(value) {
+  if (!value || typeof value !== "object") return null;
+  if ("complete" in value && "index" in value) {
+    const entry2 = value;
+    if (!isBareMlbTeamStandingsIndex(entry2.index)) return null;
+    if (entry2.complete !== true && entry2.complete !== false) return null;
+    return entry2;
+  }
+  if (isBareMlbTeamStandingsIndex(value)) {
+    return { index: value, complete: false };
+  }
+  return null;
+}
+function isCompleteMlbTeamStandingsCacheEntry(entry2) {
+  return entry2?.complete === true;
+}
+function readMlbTeamStandingsCacheEntry() {
+  const raw = readCachedStandingsValue(MLB_STANDINGS_CACHE_KEY, ESPN_STANDINGS_CACHE_TTL_MS);
+  return normalizeMlbStandingsCacheEntry(raw);
+}
+function readCompleteMlbStandingsIndex() {
+  const entry2 = readMlbTeamStandingsCacheEntry();
+  if (!isCompleteMlbTeamStandingsCacheEntry(entry2)) return null;
+  if (entry2.index.byEspnTeamId.size === 0) return null;
+  return entry2.index;
+}
+function writePartialMlbStandingsIndex(index) {
+  if (index.byEspnTeamId.size === 0) return;
+  const entry2 = { index, complete: false };
+  writeCachedStandingsValue(MLB_STANDINGS_CACHE_KEY, entry2);
+}
+function writeCompleteMlbStandingsIndex(index) {
+  if (index.byEspnTeamId.size === 0) return;
+  const entry2 = { index, complete: true };
+  writeCachedStandingsValue(MLB_STANDINGS_CACHE_KEY, entry2);
+}
+function hasCompleteMlbStandingsIndexCached() {
+  return readCompleteMlbStandingsIndex() != null;
+}
+var MLB_STANDINGS_CACHE_KEY;
+var init_mlbTeamStandingsIndexCache = __esm({
+  "../grarf/desktop/src/lib/standings/mlb/mlbTeamStandingsIndexCache.ts"() {
+    init_define_import_meta_env();
+    init_teamStandingsCache();
+    MLB_STANDINGS_CACHE_KEY = "espn-standings:MLB";
+  }
+});
+
 // ../grarf/shared/domain/standings/formatCanonicalStandingsDisplayLabel.ts
 function formatOrdinal(rank) {
   const mod100 = rank % 100;
@@ -7450,11 +7502,15 @@ var init_enrichWnbaGamesWithStandings2 = __esm({
 
 // ../grarf/desktop/src/lib/standings/enrichOperationalSnapshotTeamStandings.ts
 async function enrichLeagueGamesWithStandings(games, cacheKey3, buildIndex, enrichGames) {
-  let index = readCachedStandingsValue(cacheKey3, ESPN_STANDINGS_CACHE_TTL_MS);
+  let index = cacheKey3 === MLB_STANDINGS_CACHE_KEY ? readCompleteMlbStandingsIndex() : readCachedStandingsValue(cacheKey3, ESPN_STANDINGS_CACHE_TTL_MS);
   if (!index || index.byEspnTeamId.size === 0) {
     index = await buildIndex();
     if (index.byEspnTeamId.size > 0) {
-      writeCachedStandingsValue(cacheKey3, index);
+      if (cacheKey3 === MLB_STANDINGS_CACHE_KEY) {
+        writeCompleteMlbStandingsIndex(index);
+      } else {
+        writeCachedStandingsValue(cacheKey3, index);
+      }
     }
   }
   return enrichGames(games, index);
@@ -7493,6 +7549,7 @@ var init_enrichOperationalSnapshotTeamStandings = __esm({
     init_define_import_meta_env();
     init_teamStandingsCache();
     init_resolveMlbEspnStandingsIndex();
+    init_mlbTeamStandingsIndexCache();
     init_enrichMlbGamesWithStandings2();
     init_buildWnbaEspnStandingsIndex();
     init_enrichWnbaGamesWithStandings2();
@@ -8989,13 +9046,10 @@ var init_resolveGroupedCompactStartTimePresentation = __esm({
 
 // ../grarf/desktop/src/lib/gamesSpine/gamesSpineGamePresentation.ts
 function readMlbStandingsIndex() {
-  const cached = readCachedStandingsValue(
-    MLB_STANDINGS_CACHE_KEY,
-    ESPN_STANDINGS_CACHE_TTL_MS
-  );
-  if (cached && cached.byEspnTeamId.size > 0) {
-    mlbStandingsIndexMemory = cached;
-    return cached;
+  const complete = readCompleteMlbStandingsIndex();
+  if (complete) {
+    mlbStandingsIndexMemory = complete;
+    return complete;
   }
   return mlbStandingsIndexMemory;
 }
@@ -9068,78 +9122,41 @@ function attachMlbStandingsFromIndex(game, index) {
   }
   return next;
 }
-async function loadMlbStandingsIndexForWebSlate() {
-  const existing = readMlbStandingsIndex();
-  if (existing && existing.byEspnTeamId.size > 0) return existing;
+async function loadMlbStandingsIndexForSlate() {
+  const existing = readCompleteMlbStandingsIndex();
+  if (existing) {
+    mlbStandingsIndexMemory = existing;
+    return existing;
+  }
   try {
     const index = await resolveMlbEspnStandingsIndex();
     if (index.byEspnTeamId.size === 0) return null;
     mlbStandingsIndexMemory = index;
-    writeCachedStandingsValue(MLB_STANDINGS_CACHE_KEY, index);
+    writeCompleteMlbStandingsIndex(index);
     return index;
   } catch {
     return null;
   }
 }
-async function ensureWebMlbSlateStandingsComplete(snap) {
+async function ensureMlbSlateStandingsAttached(snap) {
   let prepared = syncMlbTeamStandingsFromCacheOnSnapshot(snap);
   const mlbRows = prepared.leagues?.MLB ?? [];
   if (!mlbRows.length || !mlbRows.some(mlbGameMissingStandings)) {
     return prepared;
   }
-  for (let attempt = 0; attempt < 4; attempt += 1) {
-    const rows = prepared.leagues?.MLB ?? [];
-    if (!rows.length || !rows.some(mlbGameMissingStandings)) break;
-    await loadMlbStandingsIndexForWebSlate();
-    prepared = syncMlbTeamStandingsFromCacheOnSnapshot(prepared);
-    if (!prepared.leagues?.MLB?.some(mlbGameMissingStandings)) break;
-    try {
-      const enriched = await enrichOperationalSnapshotTeamStandings(
-        {
-          generatedAt: prepared.updatedAt ?? (/* @__PURE__ */ new Date()).toISOString(),
-          leagues: { MLB: prepared.leagues?.MLB ?? [] },
-          source: "grarf_cloud"
-        },
-        { leagueKeys: ["MLB"] }
-      );
-      prepared = carryForwardMlbTeamStandingsFromEnrichedRows(
-        prepared,
-        enriched.leagues?.MLB ?? []
-      );
-      prepared = syncMlbTeamStandingsFromCacheOnSnapshot(prepared);
-    } catch {
-    }
-  }
-  const index = readMlbStandingsIndex();
-  if (index && index.byEspnTeamId.size > 0 && prepared.leagues?.MLB?.some(mlbGameMissingStandings)) {
-    const nextMlb = (prepared.leagues?.MLB ?? []).map((game) => attachMlbStandingsFromIndex(game, index));
-    prepared = {
-      ...prepared,
-      leagues: {
-        ...prepared.leagues,
-        MLB: nextMlb
-      }
-    };
-  }
-  if (prepared.leagues?.MLB?.some(mlbGameMissingStandings)) {
-    notifyMlbStandingsCacheReady();
-  }
-  return prepared;
-}
-async function prepareGamesSpineSnapshotForHydrate(snap) {
   if (isGrarfWebRenderer()) {
-    return ensureWebMlbSlateStandingsComplete(snap);
+    return prepared;
   }
-  let prepared = syncMlbTeamStandingsFromCacheOnSnapshot(snap);
-  const mlbRows = prepared.leagues?.MLB ?? [];
-  if (!mlbRows.length || !mlbRows.some(mlbGameMissingStandings)) {
+  await loadMlbStandingsIndexForSlate();
+  prepared = syncMlbTeamStandingsFromCacheOnSnapshot(prepared);
+  if (!prepared.leagues?.MLB?.some(mlbGameMissingStandings)) {
     return prepared;
   }
   try {
     const enriched = await enrichOperationalSnapshotTeamStandings(
       {
         generatedAt: snap.updatedAt ?? (/* @__PURE__ */ new Date()).toISOString(),
-        leagues: { MLB: mlbRows },
+        leagues: { MLB: prepared.leagues?.MLB ?? [] },
         source: "grarf_cloud"
       },
       { leagueKeys: ["MLB"] }
@@ -9151,17 +9168,33 @@ async function prepareGamesSpineSnapshotForHydrate(snap) {
     prepared = syncMlbTeamStandingsFromCacheOnSnapshot(prepared);
   } catch {
   }
+  const index = readMlbStandingsIndex();
+  if (index && index.byEspnTeamId.size > 0 && prepared.leagues?.MLB?.some(mlbGameMissingStandings)) {
+    const nextMlb = (prepared.leagues?.MLB ?? []).map(
+      (game) => attachMlbStandingsFromIndex(game, index)
+    );
+    prepared = {
+      ...prepared,
+      leagues: {
+        ...prepared.leagues,
+        MLB: nextMlb
+      }
+    };
+  }
   return prepared;
+}
+async function prepareGamesSpineSnapshotForHydrate(snap) {
+  return ensureMlbSlateStandingsAttached(snap);
 }
 function seedMlbStandingsCacheFromCanonicalEntries(entries) {
   if (!entries.length) return;
   const index = deserializeMlbTeamStandingsIndex({ teams: [...entries] });
   if (index.byEspnTeamId.size === 0) return;
-  writeCachedStandingsValue(MLB_STANDINGS_CACHE_KEY, index);
-  notifyMlbStandingsCacheReady();
+  writePartialMlbStandingsIndex(index);
 }
 function prefetchMlbTeamStandingsIndex(onReady) {
-  if (readCachedStandingsValue(MLB_STANDINGS_CACHE_KEY, ESPN_STANDINGS_CACHE_TTL_MS)) {
+  if (hasCompleteMlbStandingsIndexCached()) {
+    mlbStandingsIndexMemory = readCompleteMlbStandingsIndex();
     notifyMlbStandingsCacheReady();
     onReady?.();
     return;
@@ -9169,7 +9202,7 @@ function prefetchMlbTeamStandingsIndex(onReady) {
   void resolveMlbEspnStandingsIndex().then((index) => {
     if (index.byEspnTeamId.size > 0) {
       mlbStandingsIndexMemory = index;
-      writeCachedStandingsValue(MLB_STANDINGS_CACHE_KEY, index);
+      writeCompleteMlbStandingsIndex(index);
       notifyMlbStandingsCacheReady();
     }
   }).finally(() => {
@@ -9193,7 +9226,12 @@ function resolveMlbGamesSpineViewRows(liveMlbGames) {
     leagues: { MLB: [...liveMlbGames] },
     updatedAt: null
   });
-  return synced.leagues?.MLB ?? [...liveMlbGames];
+  let rows = synced.leagues?.MLB ?? [...liveMlbGames];
+  const index = readMlbStandingsIndex();
+  if (index && index.byEspnTeamId.size > 0 && rows.some(mlbGameMissingStandings)) {
+    rows = rows.map((game) => attachMlbStandingsFromIndex(game, index));
+  }
+  return rows;
 }
 function syncMlbTeamStandingsFromCacheOnSnapshot(incoming) {
   const index = readMlbStandingsIndex();
@@ -9258,18 +9296,17 @@ function preserveMlbTeamStandingsOnGamesSnapshot(incoming, previousGames) {
     }
   };
 }
-var MLB_STANDINGS_CACHE_KEY, mlbStandingsIndexMemory, mlbStandingsCacheReadyListeners;
+var mlbStandingsIndexMemory, mlbStandingsCacheReadyListeners;
 var init_gamesSpineGamePresentation = __esm({
   "../grarf/desktop/src/lib/gamesSpine/gamesSpineGamePresentation.ts"() {
     init_define_import_meta_env();
     init_enrichMlbGamesWithStandings();
-    init_teamStandingsCache();
+    init_mlbTeamStandingsIndexCache();
     init_resolveMlbEspnStandingsIndex();
     init_isGrarfWebRenderer();
     init_serializeMlbTeamStandingsIndex();
     init_enrichOperationalSnapshotTeamStandings();
     init_resolveGroupedCompactStartTimePresentation();
-    MLB_STANDINGS_CACHE_KEY = "espn-standings:MLB";
     mlbStandingsIndexMemory = null;
     mlbStandingsCacheReadyListeners = /* @__PURE__ */ new Set();
   }
@@ -10716,19 +10753,14 @@ var init_preserveMissingOperationalLeagueSections = __esm({
 
 // ../grarf/desktop/src/store/gamesSpineRenderStore.ts
 function isCompleteOperationalSnapshot(leagues, meta) {
-  if (meta.source === "grarf_cloud") {
-    if (isGrarfWebRenderer() && mlbSnapshotNeedsStandingsSync(leagues)) return false;
-    return true;
-  }
+  if (meta.source === "grarf_cloud") return true;
   const requested = meta.requestedLeagueCount;
   if (requested != null && Number.isFinite(requested) && requested > 0 && requested < ESPN_OPERATIONAL_INGEST_LEAGUE_KEYS.length) {
     return false;
   }
   if (meta.source === "espn_local_adapter" || meta.source === "espn_scoreboard_ipc") {
-    if (isGrarfWebRenderer() && mlbSnapshotNeedsStandingsSync(leagues)) return false;
     return true;
   }
-  if (isGrarfWebRenderer() && mlbSnapshotNeedsStandingsSync(leagues)) return false;
   return countLeaguesWithTodaySlate(leagues) > 0;
 }
 var import_zustand3, useGamesSpineRenderStore;
@@ -10738,8 +10770,6 @@ var init_gamesSpineRenderStore = __esm({
     import_zustand3 = __toESM(require_zustand(), 1);
     init_espnOperationalLeagueEndpoints();
     init_preserveMissingOperationalLeagueSections();
-    init_gamesSpineGamePresentation();
-    init_isGrarfWebRenderer();
     useGamesSpineRenderStore = (0, import_zustand3.create)((set, get) => ({
       operationalReady: true,
       operationalIngestComplete: false,
@@ -11045,11 +11075,7 @@ function refreshGamesSpineStoreFromStandingsCache() {
   });
 }
 function standingsCacheIsReady() {
-  const index = readCachedStandingsValue(
-    MLB_STANDINGS_CACHE_KEY2,
-    ESPN_STANDINGS_CACHE_TTL_MS
-  );
-  return Boolean(index && index.byEspnTeamId.size > 0);
+  return hasCompleteMlbStandingsIndexCached();
 }
 function bootstrapGamesSpineRuntime() {
   if (isGrarfWebRenderer()) {
@@ -11064,7 +11090,7 @@ function bootstrapGamesSpineRuntime() {
     refreshGamesSpineStoreFromStandingsCache();
   });
 }
-var MLB_STANDINGS_CACHE_KEY2, standingsRefreshInFlight, lastStandingsRefreshKey;
+var standingsRefreshInFlight, lastStandingsRefreshKey;
 var init_gamesSpineBootstrap = __esm({
   "../grarf/desktop/src/lib/gamesSpine/gamesSpineBootstrap.ts"() {
     init_define_import_meta_env();
@@ -11073,9 +11099,8 @@ var init_gamesSpineBootstrap = __esm({
     init_gamesSpineManualApi();
     init_fetchWebEspnOperationalSnapshot();
     init_gamesSpineGamePresentation();
-    init_teamStandingsCache();
+    init_mlbTeamStandingsIndexCache();
     init_liveGamesStore();
-    MLB_STANDINGS_CACHE_KEY2 = "espn-standings:MLB";
     standingsRefreshInFlight = false;
     lastStandingsRefreshKey = null;
     if (typeof window !== "undefined") {
@@ -80388,7 +80413,6 @@ var init_HomeLeagueSpineSection = __esm({
     init_useManualGamesSpineLiveRefreshMs();
     init_gamesSpineLeagueHeaderTypography();
     init_wimbledonGamesSpinePresentation();
-    init_gamesSpineGamePresentation();
     init_gamesSpineRenderStore();
     init_adminModeStore();
     init_gamesSpineOperationsGamesStore();
@@ -80416,7 +80440,6 @@ var init_HomeLeagueSpineSection = __esm({
     }) {
       if (isGamesSpineLeagueTemporarilyHidden(league2)) return null;
       const liveLeagues = useLiveGamesStore((s2) => s2.leagues);
-      const webMlbStandingsPending = isGrarfWebRenderer() && league2 === "MLB" && mlbSnapshotNeedsStandingsSync(liveLeagues);
       const scheduleByDate = useScheduleCacheStore((s2) => s2.byDate);
       const retainedById = useRecentFinalizedGamesStore((s2) => s2.byId);
       const bundle = useEditorialStore((s2) => s2.bundle);
@@ -80503,8 +80526,7 @@ var init_HomeLeagueSpineSection = __esm({
           league2
         ]
       );
-      const displayVisibleGames = webMlbStandingsPending ? [] : visibleGames;
-      const highlightedVisibleGames = useGamesWithCanonicalHighlights(displayVisibleGames);
+      const highlightedVisibleGames = useGamesWithCanonicalHighlights(visibleGames);
       (0, import_react89.useEffect)(() => {
         if (!useOperationalModePipeline) return;
         if (operationalMode === "LIVE" || operationalMode === "PREPARE") {
@@ -80583,8 +80605,8 @@ var init_HomeLeagueSpineSection = __esm({
         observer.observe(el);
         return () => observer.disconnect();
       }, [league2, visibleGames.length, parentScrolls]);
-      const isWebOperationalLoading = isGrarfWebRenderer() && briefingScrollContext === "home" && (webMlbStandingsPending || !operationalIngestComplete && displayVisibleGames.length === 0);
-      if (displayVisibleGames.length === 0 && !isWebOperationalLoading) return null;
+      const isWebOperationalLoading = isGrarfWebRenderer() && briefingScrollContext === "home" && !operationalIngestComplete && visibleGames.length === 0;
+      if (visibleGames.length === 0 && !isWebOperationalLoading) return null;
       const hideSpineGeneratedSummaryHeadline = briefingScrollContext === "league" && operationalMode === "CATCH_UP";
       const isWebSpine = isGrarfWebRenderer();
       const stickyTop = resolveHomeGamesSpineLeagueStickyTop({
