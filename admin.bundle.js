@@ -18245,6 +18245,9 @@ function writeCachedStandingsValue(cacheKey2, value) {
 }
 var ESPN_STANDINGS_CACHE_TTL_MS = DEFAULT_TTL_MS;
 
+// ../grarf/desktop/src/lib/standings/mlb/resolveMlbEspnStandingsIndex.ts
+init_define_import_meta_env();
+
 // ../grarf/desktop/src/lib/standings/mlb/buildMlbEspnStandingsIndex.ts
 init_define_import_meta_env();
 
@@ -18529,6 +18532,90 @@ async function buildMlbEspnStandingsIndex(now = /* @__PURE__ */ new Date()) {
   return index;
 }
 
+// ../grarf/desktop/src/lib/standings/mlb/fetchWebMlbTeamStandingsIndex.ts
+init_define_import_meta_env();
+
+// ../grarf/desktop/src/config/operationalIngestConfig.ts
+init_define_import_meta_env();
+function resolveWebOperationalIngestUrl() {
+  if (typeof window === "undefined") return null;
+  return window.GRARF_WEB_CONFIG?.operationalIngestUrl?.trim() || null;
+}
+function getOperationalIngestConfig() {
+  const isWeb = isGrarfWebRenderer();
+  const envProvider = define_import_meta_env_default.VITE_OPERATIONAL_INGEST_PROVIDER;
+  let provider;
+  if (envProvider === "grarf_cloud" || envProvider === "espn_local_ipc") {
+    provider = envProvider;
+  } else {
+    provider = isWeb ? "grarf_cloud" : "espn_local_ipc";
+  }
+  if (isWeb && provider === "espn_local_ipc") {
+    provider = "grarf_cloud";
+  }
+  const pollRaw = define_import_meta_env_default.VITE_OPERATIONAL_INGEST_POLL_MS ?? (typeof window !== "undefined" ? String(window.GRARF_WEB_CONFIG?.operationalPollIntervalMs ?? "") : "");
+  const pollParsed = pollRaw != null ? Number(pollRaw) : NaN;
+  const pollIntervalMs = Number.isFinite(pollParsed) && pollParsed >= 15e3 ? pollParsed : 6e4;
+  const cloudBaseUrl = define_import_meta_env_default.VITE_GRARF_OPERATIONAL_INGEST_URL?.trim() || resolveWebOperationalIngestUrl() || null;
+  return {
+    provider,
+    cloudBaseUrl,
+    pollIntervalMs,
+    defaultSource: "espn_local_adapter"
+  };
+}
+
+// ../grarf/desktop/src/lib/standings/mlb/serializeMlbTeamStandingsIndex.ts
+init_define_import_meta_env();
+function normalizeTeamLookupKey3(value) {
+  return String(value ?? "").trim().toLowerCase().replace(/\s+/g, " ");
+}
+function deserializeMlbTeamStandingsIndex(payload) {
+  const index = {
+    byEspnTeamId: /* @__PURE__ */ new Map(),
+    byAbbrev: /* @__PURE__ */ new Map(),
+    byDisplayName: /* @__PURE__ */ new Map()
+  };
+  for (const entry2 of payload.teams ?? []) {
+    if (!entry2?.espnTeamId) continue;
+    index.byEspnTeamId.set(entry2.espnTeamId, entry2);
+    if (entry2.teamAbbreviation) {
+      index.byAbbrev.set(entry2.teamAbbreviation.toUpperCase(), entry2);
+    }
+    if (entry2.teamDisplayName) {
+      index.byDisplayName.set(normalizeTeamLookupKey3(entry2.teamDisplayName), entry2);
+    }
+  }
+  return index;
+}
+
+// ../grarf/desktop/src/lib/standings/mlb/fetchWebMlbTeamStandingsIndex.ts
+var FETCH_TIMEOUT_MS2 = 15e3;
+async function fetchWebMlbTeamStandingsIndex() {
+  const { cloudBaseUrl } = getOperationalIngestConfig();
+  if (!cloudBaseUrl?.trim()) {
+    throw new Error("[StandingsEnrich:MLB] grarf_cloud base URL required for web standings index");
+  }
+  const url = `${cloudBaseUrl.replace(/\/$/, "")}/mlb/team-standings-index`;
+  const res = await fetch(url, {
+    headers: { Accept: "application/json" },
+    signal: AbortSignal.timeout(FETCH_TIMEOUT_MS2)
+  });
+  if (!res.ok) {
+    throw new Error(`[StandingsEnrich:MLB] web standings index failed (${res.status})`);
+  }
+  const json = await res.json();
+  return deserializeMlbTeamStandingsIndex(json);
+}
+
+// ../grarf/desktop/src/lib/standings/mlb/resolveMlbEspnStandingsIndex.ts
+async function resolveMlbEspnStandingsIndex(now = /* @__PURE__ */ new Date()) {
+  if (isGrarfWebRenderer()) {
+    return fetchWebMlbTeamStandingsIndex();
+  }
+  return buildMlbEspnStandingsIndex(now);
+}
+
 // ../grarf/desktop/src/lib/standings/enrichOperationalSnapshotTeamStandings.ts
 init_define_import_meta_env();
 
@@ -18554,7 +18641,7 @@ var LOG6 = "[StandingsEnrich:WNBA]";
 var WNBA_ESPN_STANDINGS_URL = "https://site.api.espn.com/apis/site/v2/sports/basketball/wnba/standings";
 var WNBA_ESPN_CORE_BASE = "https://sports.core.api.espn.com/v2/sports/basketball/leagues/wnba";
 var WNBA_CONFERENCE_GROUP_IDS = [1, 2];
-function normalizeTeamLookupKey3(value) {
+function normalizeTeamLookupKey4(value) {
   return String(value ?? "").trim().toLowerCase().replace(/\s+/g, " ");
 }
 function parseRecordSummary2(summary) {
@@ -18596,7 +18683,7 @@ function registerStandingsEntry2(index, entry2) {
     index.byAbbrev.set(entry2.teamAbbreviation.toUpperCase(), entry2);
   }
   if (entry2.teamDisplayName) {
-    index.byDisplayName.set(normalizeTeamLookupKey3(entry2.teamDisplayName), entry2);
+    index.byDisplayName.set(normalizeTeamLookupKey4(entry2.teamDisplayName), entry2);
   }
 }
 function buildCanonicalEntry2(input) {
@@ -18782,7 +18869,7 @@ init_define_import_meta_env();
 
 // ../grarf/shared/domain/standings/enrichWnbaGamesWithStandings.ts
 init_define_import_meta_env();
-function normalizeTeamLookupKey4(value) {
+function normalizeTeamLookupKey5(value) {
   return String(value ?? "").trim().toLowerCase().replace(/\s+/g, " ");
 }
 function resolveTeamStandings(game, side, index) {
@@ -18794,7 +18881,7 @@ function resolveTeamStandings(game, side, index) {
   const officialName = side === "away" ? game.metadata?.officialAwayName : game.metadata?.officialHomeName;
   const displayName = side === "away" ? game.awayTeam : game.homeTeam;
   for (const candidate of [officialName, displayName]) {
-    const key = normalizeTeamLookupKey4(candidate);
+    const key = normalizeTeamLookupKey5(candidate);
     if (!key) continue;
     const hit = index.byDisplayName.get(key);
     if (hit) return hit;
@@ -18835,7 +18922,7 @@ async function enrichWnbaGamesWithStandings2(games, index) {
 var LOG8 = "[StandingsEnrich]";
 var TEAM_STANDINGS_LEAGUE_ENRICHERS = {
   MLB: {
-    buildIndex: buildMlbEspnStandingsIndex,
+    buildIndex: resolveMlbEspnStandingsIndex,
     enrichGames: enrichMlbGamesWithStandings2
   },
   WNBA: {
@@ -19157,8 +19244,41 @@ init_define_import_meta_env();
 
 // ../grarf/desktop/src/lib/gamesSpine/gamesSpineGamePresentation.ts
 var MLB_STANDINGS_CACHE_KEY = "espn-standings:MLB";
+var mlbStandingsIndexMemory = null;
+function readMlbStandingsIndex() {
+  const cached = readCachedStandingsValue(
+    MLB_STANDINGS_CACHE_KEY,
+    ESPN_STANDINGS_CACHE_TTL_MS
+  );
+  if (cached && cached.byEspnTeamId.size > 0) {
+    mlbStandingsIndexMemory = cached;
+    return cached;
+  }
+  return mlbStandingsIndexMemory;
+}
 function isMlbSpineGame(game) {
   return game.league === "MLB" || game.id.startsWith("espn-MLB-");
+}
+function mlbGameMissingStandings(game) {
+  if (!isMlbSpineGame(game)) return false;
+  return !game.awayTeamStandings?.displayLabel?.trim() || !game.homeTeamStandings?.displayLabel?.trim();
+}
+function mlbSnapshotNeedsStandingsSync(leagues) {
+  const rows = leagues?.MLB ?? [];
+  return rows.some(mlbGameMissingStandings);
+}
+function seedMlbStandingsCacheFromCanonicalEntries(entries) {
+  if (!entries.length) return;
+  const index = deserializeMlbTeamStandingsIndex({ teams: [...entries] });
+  if (index.byEspnTeamId.size === 0) return;
+  writeCachedStandingsValue(MLB_STANDINGS_CACHE_KEY, index);
+  notifyMlbStandingsCacheReady();
+}
+var mlbStandingsCacheReadyListeners = /* @__PURE__ */ new Set();
+function notifyMlbStandingsCacheReady() {
+  for (const listener of mlbStandingsCacheReadyListeners) {
+    listener();
+  }
 }
 function resolveMlbGamesSpineViewRows(liveMlbGames) {
   if (liveMlbGames.length === 0) return [];
@@ -19169,10 +19289,7 @@ function resolveMlbGamesSpineViewRows(liveMlbGames) {
   return synced.leagues?.MLB ?? [...liveMlbGames];
 }
 function syncMlbTeamStandingsFromCacheOnSnapshot(incoming) {
-  const index = readCachedStandingsValue(
-    MLB_STANDINGS_CACHE_KEY,
-    ESPN_STANDINGS_CACHE_TTL_MS
-  );
+  const index = readMlbStandingsIndex();
   if (!index || index.byEspnTeamId.size === 0) return incoming;
   const mlbRows = incoming.leagues?.MLB;
   if (!Array.isArray(mlbRows) || mlbRows.length === 0) return incoming;
@@ -19238,14 +19355,19 @@ function preserveMlbTeamStandingsOnGamesSnapshot(incoming, previousGames) {
 // ../grarf/desktop/src/store/gamesSpineRenderStore.ts
 init_define_import_meta_env();
 function isCompleteOperationalSnapshot(leagues, meta) {
-  if (meta.source === "grarf_cloud") return true;
+  if (meta.source === "grarf_cloud") {
+    if (isGrarfWebRenderer() && mlbSnapshotNeedsStandingsSync(leagues)) return false;
+    return true;
+  }
   const requested = meta.requestedLeagueCount;
   if (requested != null && Number.isFinite(requested) && requested > 0 && requested < ESPN_OPERATIONAL_INGEST_LEAGUE_KEYS.length) {
     return false;
   }
   if (meta.source === "espn_local_adapter" || meta.source === "espn_scoreboard_ipc") {
+    if (isGrarfWebRenderer() && mlbSnapshotNeedsStandingsSync(leagues)) return false;
     return true;
   }
+  if (isGrarfWebRenderer() && mlbSnapshotNeedsStandingsSync(leagues)) return false;
   return countLeaguesWithTodaySlate(leagues) > 0;
 }
 var useGamesSpineRenderStore = create((set, get) => ({
@@ -21277,7 +21399,7 @@ function parseFoxWorldCupEventPath(pathOrUrl) {
 
 // ../grarf/shared/domain/foxWorldCup/discoverFoxWorldCupDetailUrls.ts
 var FOX_EVENT_BASE2 = "https://www.fox.com";
-var FETCH_TIMEOUT_MS2 = 1e4;
+var FETCH_TIMEOUT_MS3 = 1e4;
 var MAX_UUID_PROBES = 24;
 var HTML_HEADERS = {
   Accept: "text/html,application/xhtml+xml",
@@ -21307,7 +21429,7 @@ function extractEventDetailUuids(html) {
 async function fetchFoxHtml(url) {
   const res = await fetch(url, {
     headers: HTML_HEADERS,
-    signal: AbortSignal.timeout(FETCH_TIMEOUT_MS2)
+    signal: AbortSignal.timeout(FETCH_TIMEOUT_MS3)
   });
   if (!res.ok) throw new Error(`FOX page fetch failed: ${res.status} ${url}`);
   return res.text();
@@ -21366,7 +21488,7 @@ async function discoverFoxWorldCupDetailUrls(htmlSources) {
 init_define_import_meta_env();
 var BIFROST_API_KEY = "jE7yBJVRNAwdDesMgTzTXUUSx1It41Fq";
 var WORLD_CUP_GROUP_ID = "12";
-var FETCH_TIMEOUT_MS3 = 15e3;
+var FETCH_TIMEOUT_MS4 = 15e3;
 function parseFoxHubStreamUrlFromSponsorship(sponsorship) {
   const raw = sponsorship?.url?.trim();
   if (!raw) return null;
@@ -21414,7 +21536,7 @@ function parseBifrostEvent(event) {
 async function fetchBifrostJson(url) {
   const res = await fetch(url, {
     headers: { Accept: "application/json" },
-    signal: AbortSignal.timeout(FETCH_TIMEOUT_MS3)
+    signal: AbortSignal.timeout(FETCH_TIMEOUT_MS4)
   });
   if (!res.ok) throw new Error(`Fox Sports bifrost fetch failed: ${res.status}`);
   return await res.json();
@@ -21445,7 +21567,7 @@ init_define_import_meta_env();
 // ../grarf/desktop/src/lib/foxWorldCup/fetchFoxWorldCupEventCatalog.ts
 var FOX_WORLD_CUP_HUB_URL = "https://www.fox.com/soccer/fifa-world-cup";
 var FOX_SPORTS_PAGE_URL = "https://www.fox.com/sports";
-var FETCH_TIMEOUT_MS4 = 15e3;
+var FETCH_TIMEOUT_MS5 = 15e3;
 var CACHE_TTL_MS = 6e4;
 var HTML_HEADERS2 = {
   Accept: "text/html,application/xhtml+xml",
@@ -21478,7 +21600,7 @@ function mergeCatalogRows(rows) {
 async function fetchFoxHtml2(url) {
   const res = await fetch(url, {
     headers: HTML_HEADERS2,
-    signal: AbortSignal.timeout(FETCH_TIMEOUT_MS4)
+    signal: AbortSignal.timeout(FETCH_TIMEOUT_MS5)
   });
   if (!res.ok) throw new Error(`FOX page fetch failed: ${res.status} ${url}`);
   return res.text();
@@ -22797,7 +22919,7 @@ function parseTennisChannelPlusEvent(event) {
 
 // ../grarf/desktop/src/lib/tennisChannelPlus/fetchTennisChannelPlusLiveCatalog.ts
 var TENNIS_CHANNEL_EVENTS_URL = "https://www.tennischannel.com/api/v2/events";
-var FETCH_TIMEOUT_MS5 = 12e3;
+var FETCH_TIMEOUT_MS6 = 12e3;
 var cachedCatalog3 = null;
 var cachedAtMs3 = 0;
 var CACHE_TTL_MS2 = 6e4;
@@ -22807,7 +22929,7 @@ async function fetchTennisChannelPlusLiveCatalog(now = Date.now(), forceRefresh 
   }
   const res = await fetch(TENNIS_CHANNEL_EVENTS_URL, {
     headers: { Accept: "application/json" },
-    signal: AbortSignal.timeout(FETCH_TIMEOUT_MS5)
+    signal: AbortSignal.timeout(FETCH_TIMEOUT_MS6)
   });
   if (!res.ok) {
     throw new Error(`Tennis Channel Plus events fetch failed: ${res.status}`);
@@ -23380,7 +23502,9 @@ async function enrichOperationalTransport(rawTransport) {
     console.warn(`${LOG16} manual game override enrich failed`, e);
   }
   try {
-    transport = await enrichOperationalSnapshotTeamStandings(transport, { leagueKeys: ["MLB"] });
+    if (!isGrarfWebRenderer()) {
+      transport = await enrichOperationalSnapshotTeamStandings(transport, { leagueKeys: ["MLB"] });
+    }
   } catch (e) {
     console.warn(`${LOG16} MLB team standings enrich failed`, e);
   }
@@ -23413,36 +23537,6 @@ async function enrichOperationalTransport(rawTransport) {
 
 // ../grarf/desktop/src/services/operationalIngest/fetchOperationalSnapshot.ts
 init_define_import_meta_env();
-
-// ../grarf/desktop/src/config/operationalIngestConfig.ts
-init_define_import_meta_env();
-function resolveWebOperationalIngestUrl() {
-  if (typeof window === "undefined") return null;
-  return window.GRARF_WEB_CONFIG?.operationalIngestUrl?.trim() || null;
-}
-function getOperationalIngestConfig() {
-  const isWeb = isGrarfWebRenderer();
-  const envProvider = define_import_meta_env_default.VITE_OPERATIONAL_INGEST_PROVIDER;
-  let provider;
-  if (envProvider === "grarf_cloud" || envProvider === "espn_local_ipc") {
-    provider = envProvider;
-  } else {
-    provider = isWeb ? "grarf_cloud" : "espn_local_ipc";
-  }
-  if (isWeb && provider === "espn_local_ipc") {
-    provider = "grarf_cloud";
-  }
-  const pollRaw = define_import_meta_env_default.VITE_OPERATIONAL_INGEST_POLL_MS ?? (typeof window !== "undefined" ? String(window.GRARF_WEB_CONFIG?.operationalPollIntervalMs ?? "") : "");
-  const pollParsed = pollRaw != null ? Number(pollRaw) : NaN;
-  const pollIntervalMs = Number.isFinite(pollParsed) && pollParsed >= 15e3 ? pollParsed : 6e4;
-  const cloudBaseUrl = define_import_meta_env_default.VITE_GRARF_OPERATIONAL_INGEST_URL?.trim() || resolveWebOperationalIngestUrl() || null;
-  return {
-    provider,
-    cloudBaseUrl,
-    pollIntervalMs,
-    defaultSource: "espn_local_adapter"
-  };
-}
 
 // ../grarf/desktop/src/services/operationalIngest/web/fetchWebEspnOperationalSnapshot.ts
 init_define_import_meta_env();
@@ -26665,11 +26759,136 @@ var CLOUD_FETCH_TIMEOUT_MS = 2e4;
 var WEB_CLOUD_BOOTSTRAP_TIMEOUT_MS = 2500;
 var CLOUD_FETCH_MAX_ATTEMPTS = 3;
 var CLOUD_FETCH_RETRY_MS = 1500;
+var webCloudSnapshotPrefetch = null;
+function prefetchWebOperationalCloudSnapshot() {
+  if (!isGrarfWebRenderer()) return Promise.resolve(null);
+  if (!webCloudSnapshotPrefetch) {
+    webCloudSnapshotPrefetch = fetchViaGrarfCloudService({ webBootstrap: true }).then((snap) => countOperationalGames(snap) > 0 ? snap : null).catch((e) => {
+      if (define_import_meta_env_default.DEV) {
+        console.warn(`${LOG21} web cloud prefetch failed`, e);
+      }
+      return null;
+    });
+  }
+  return webCloudSnapshotPrefetch;
+}
 function countOperationalGames(snap) {
   return Object.values(snap.leagues ?? {}).reduce(
     (total, rows) => total + (Array.isArray(rows) ? rows.length : 0),
     0
   );
+}
+function collectMlbStandingsByAbbrev(games) {
+  const byAbbrev = /* @__PURE__ */ new Map();
+  for (const game of games) {
+    if (game.awayTeamAbbrev && game.awayTeamStandings?.displayLabel?.trim()) {
+      byAbbrev.set(game.awayTeamAbbrev.toUpperCase(), game.awayTeamStandings);
+    }
+    if (game.homeTeamAbbrev && game.homeTeamStandings?.displayLabel?.trim()) {
+      byAbbrev.set(game.homeTeamAbbrev.toUpperCase(), game.homeTeamStandings);
+    }
+  }
+  return byAbbrev;
+}
+function attachMlbStandingsFromAbbrevMap(game, standingsByAbbrev) {
+  let next = game;
+  let changed = false;
+  for (const side of ["away", "home"]) {
+    const existing = side === "away" ? next.awayTeamStandings : next.homeTeamStandings;
+    if (existing?.displayLabel?.trim()) continue;
+    const abbrev = (side === "away" ? next.awayTeamAbbrev : next.homeTeamAbbrev)?.trim();
+    if (!abbrev) continue;
+    const resolved = standingsByAbbrev.get(abbrev.toUpperCase());
+    if (!resolved) continue;
+    next = {
+      ...next,
+      ...side === "away" ? { awayTeamStandings: resolved } : { homeTeamStandings: resolved }
+    };
+    changed = true;
+  }
+  return changed ? next : game;
+}
+function supplementMlbTeamStandingsFromCloudSnapshot(primary, cloud) {
+  const cloudMlb = cloud.leagues?.MLB;
+  if (!Array.isArray(cloudMlb) || cloudMlb.length === 0) return primary;
+  const espnMlb = primary.leagues?.MLB ?? [];
+  const nextMlb = mergeWebMlbLeagueFromCloudSnapshot(espnMlb, cloudMlb);
+  if (nextMlb === espnMlb) return primary;
+  return {
+    ...primary,
+    leagues: {
+      ...primary.leagues,
+      MLB: nextMlb
+    }
+  };
+}
+function mergeWebMlbLeagueFromCloudSnapshot(espnMlb, cloudMlb) {
+  const standingsByAbbrev = collectMlbStandingsByAbbrev(cloudMlb);
+  const canonicalEntries = [...standingsByAbbrev.values()];
+  if (canonicalEntries.length > 0) {
+    seedMlbStandingsCacheFromCanonicalEntries(canonicalEntries);
+  }
+  if (espnMlb.length === 0) return [...cloudMlb];
+  const espnById = new Map(espnMlb.map((game) => [game.id, game]));
+  const espnByAbbrevPair = new Map(
+    espnMlb.map((game) => [`${game.awayTeamAbbrev}|${game.homeTeamAbbrev}`, game])
+  );
+  const merged = cloudMlb.map((cloudRow) => {
+    const espnRow = espnById.get(cloudRow.id) ?? espnByAbbrevPair.get(`${cloudRow.awayTeamAbbrev}|${cloudRow.homeTeamAbbrev}`);
+    return espnRow ? mergeEspnOperationalFieldsFromSupplement(cloudRow, espnRow) : cloudRow;
+  });
+  const mergedIds = new Set(merged.map((game) => game.id));
+  const mergedPairs = new Set(
+    merged.map((game) => `${game.awayTeamAbbrev}|${game.homeTeamAbbrev}`)
+  );
+  for (const espnRow of espnMlb) {
+    if (mergedIds.has(espnRow.id)) continue;
+    const pair = `${espnRow.awayTeamAbbrev}|${espnRow.homeTeamAbbrev}`;
+    if (mergedPairs.has(pair)) continue;
+    merged.push(attachMlbStandingsFromAbbrevMap(espnRow, standingsByAbbrev));
+  }
+  return merged;
+}
+function mergeEspnWatchFieldsFromSupplement(cloud, espn) {
+  let next = cloud;
+  if (!cloud.streamUrl?.trim() && espn.streamUrl?.trim()) {
+    next = {
+      ...next,
+      streamUrl: espn.streamUrl,
+      streamProvider: espn.streamProvider ?? next.streamProvider,
+      espnWatchEventId: espn.espnWatchEventId ?? next.espnWatchEventId,
+      espnPlusPlayerId: espn.espnPlusPlayerId ?? next.espnPlusPlayerId
+    };
+  }
+  const cloudBroadcast = cloud.broadcasts?.find((label) => label?.trim() && label !== "TV TBD");
+  const espnBroadcast = espn.broadcasts?.find((label) => label?.trim() && label !== "TV TBD");
+  if (!cloudBroadcast && espnBroadcast) {
+    next = {
+      ...next,
+      broadcasts: espn.broadcasts,
+      channels: espn.channels ?? espn.broadcasts
+    };
+  }
+  return next;
+}
+function mergeEspnOperationalFieldsFromSupplement(cloud, espn) {
+  const next = mergeEspnWatchFieldsFromSupplement(cloud, espn);
+  const mergedMetadata = espn.metadata?.tennis && !cloud.metadata?.tennis ? { ...cloud.metadata, ...espn.metadata, tennis: espn.metadata.tennis } : cloud.metadata?.tennis || espn.metadata ? { ...cloud.metadata, ...espn.metadata, tennis: espn.metadata?.tennis ?? cloud.metadata?.tennis } : cloud.metadata;
+  return {
+    ...next,
+    status: espn.status,
+    statusLine: espn.statusLine,
+    period: espn.period,
+    displayClock: espn.displayClock,
+    awayScore: espn.awayScore,
+    homeScore: espn.homeScore,
+    scheduledDateKey: espn.scheduledDateKey,
+    startTimeMs: espn.startTimeMs,
+    time: espn.time,
+    situation: espn.situation,
+    lastUpdated: espn.lastUpdated ?? next.lastUpdated,
+    ...mergedMetadata ? { metadata: mergedMetadata } : {}
+  };
 }
 function hasElectronGamesIpc() {
   return Boolean(typeof window !== "undefined" && window.grarf?.gamesGetSnapshot);
@@ -26757,21 +26976,29 @@ async function fetchViaGrarfCloudService(options) {
   throw new Error(lastError ?? "[OperationalIngest] grarf_cloud fetch failed");
 }
 async function fetchViaWebOperationalIngest() {
+  let espn = null;
   try {
-    const espn = await fetchWebEspnOperationalSnapshot();
-    if (countOperationalGames(espn) > 0) {
-      return espn;
-    }
+    espn = await fetchWebEspnOperationalSnapshot();
   } catch (e) {
     if (define_import_meta_env_default.DEV) {
-      console.warn(`${LOG21} web ESPN slate unavailable \u2014 falling back to grarf_cloud`, e);
+      console.warn(`${LOG21} web ESPN slate unavailable`, e);
     }
   }
-  const cloud = await fetchViaGrarfCloudService();
-  if (countOperationalGames(cloud) > 0) {
+  let cloud = null;
+  try {
+    cloud = await prefetchWebOperationalCloudSnapshot() ?? await fetchViaGrarfCloudService();
+  } catch (e) {
+    if (define_import_meta_env_default.DEV) {
+      console.warn(`${LOG21} web cloud snapshot unavailable for MLB standings supplement`, e);
+    }
+  }
+  if (espn && countOperationalGames(espn) > 0) {
+    return cloud ? supplementMlbTeamStandingsFromCloudSnapshot(espn, cloud) : espn;
+  }
+  if (cloud && countOperationalGames(cloud) > 0) {
     return cloud;
   }
-  return fetchWebEspnOperationalSnapshot();
+  return espn ?? fetchWebEspnOperationalSnapshot();
 }
 async function fetchViaGrarfCloudWithLocalFallback() {
   let cloud = null;
