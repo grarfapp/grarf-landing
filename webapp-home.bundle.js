@@ -49352,6 +49352,1184 @@ var init_GlobalAppBar = __esm({
   }
 });
 
+// ../grarf/desktop/src/services/operationalIngest/fetchOperationalSnapshot.ts
+function countOperationalGames(snap) {
+  return Object.values(snap.leagues ?? {}).reduce(
+    (total, rows) => total + (Array.isArray(rows) ? rows.length : 0),
+    0
+  );
+}
+function hasElectronGamesIpc() {
+  return Boolean(typeof window !== "undefined" && window.grarf?.gamesGetSnapshot);
+}
+function emptyOperationalSnapshot() {
+  return {
+    generatedAt: (/* @__PURE__ */ new Date()).toISOString(),
+    source: "espn_local_adapter",
+    leagues: {}
+  };
+}
+function snapshotAgeMs(generatedAt) {
+  if (!generatedAt?.trim()) return Number.POSITIVE_INFINITY;
+  const ms2 = Date.parse(generatedAt);
+  if (!Number.isFinite(ms2)) return Number.POSITIVE_INFINITY;
+  return Math.max(0, Date.now() - ms2);
+}
+function ipcSnapshotToOperationalResponse(snap, source = "espn_local_adapter") {
+  const leagues = {};
+  for (const [key2, rows] of Object.entries(snap.leagues ?? {})) {
+    if (Array.isArray(rows) && rows.length > 0) {
+      leagues[key2] = rows;
+    }
+  }
+  return {
+    generatedAt: snap.updatedAt ?? (/* @__PURE__ */ new Date()).toISOString(),
+    source,
+    leagues
+  };
+}
+async function fetchViaEspnLocalIpcAdapter() {
+  const api = window.grarf?.gamesGetSnapshot;
+  if (!api) {
+    if (define_import_meta_env_default.DEV) {
+      console.warn(`${LOG8} source=espn_local_adapter unavailable (no Electron IPC)`);
+    }
+    return emptyOperationalSnapshot();
+  }
+  const snap = await api();
+  return ipcSnapshotToOperationalResponse(snap);
+}
+async function fetchViaGrarfCloudService(options) {
+  const { cloudBaseUrl } = getOperationalIngestConfig();
+  if (!cloudBaseUrl) {
+    throw new Error("[OperationalIngest] grarf_cloud provider requires VITE_GRARF_OPERATIONAL_INGEST_URL");
+  }
+  const url = `${cloudBaseUrl.replace(/\/$/, "")}/operational/snapshot`;
+  const maxAttempts = options?.webBootstrap ? 1 : CLOUD_FETCH_MAX_ATTEMPTS;
+  let lastError;
+  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+    try {
+      const res = await fetch(url, {
+        headers: { Accept: "application/json" },
+        signal: AbortSignal.timeout(
+          options?.webBootstrap ? WEB_CLOUD_BOOTSTRAP_TIMEOUT_MS : CLOUD_FETCH_TIMEOUT_MS
+        )
+      });
+      if (res.status === 503) {
+        lastError = "grarf_cloud snapshot warming (503)";
+        if (attempt < maxAttempts) {
+          await new Promise((resolve) => window.setTimeout(resolve, CLOUD_FETCH_RETRY_MS * attempt));
+          continue;
+        }
+        throw new Error(lastError);
+      }
+      if (!res.ok) {
+        throw new Error(`[OperationalIngest] grarf_cloud fetch failed: ${res.status}`);
+      }
+      const json = await res.json();
+      const transport = {
+        generatedAt: json.generatedAt ?? (/* @__PURE__ */ new Date()).toISOString(),
+        source: json.source ?? "grarf_operational_service",
+        leagues: json.leagues ?? {}
+      };
+      return transport;
+    } catch (e2) {
+      lastError = e2 instanceof Error ? e2.message : String(e2);
+      if (attempt < maxAttempts) {
+        await new Promise((resolve) => window.setTimeout(resolve, CLOUD_FETCH_RETRY_MS * attempt));
+        continue;
+      }
+      throw e2;
+    }
+  }
+  throw new Error(lastError ?? "[OperationalIngest] grarf_cloud fetch failed");
+}
+async function fetchViaWebOperationalIngest() {
+  try {
+    const espn = await fetchWebEspnOperationalSnapshot();
+    if (countOperationalGames(espn) > 0) {
+      return espn;
+    }
+  } catch (e2) {
+    if (define_import_meta_env_default.DEV) {
+      console.warn(`${LOG8} web ESPN slate unavailable \u2014 falling back to grarf_cloud`, e2);
+    }
+  }
+  const cloud = await fetchViaGrarfCloudService();
+  if (countOperationalGames(cloud) > 0) {
+    return cloud;
+  }
+  return fetchWebEspnOperationalSnapshot();
+}
+async function fetchViaGrarfCloudWithLocalFallback() {
+  let cloud = null;
+  let cloudError = null;
+  try {
+    cloud = await fetchViaGrarfCloudService();
+  } catch (e2) {
+    cloudError = e2 instanceof Error ? e2.message : String(e2);
+  }
+  const cloudAgeMs = cloud ? snapshotAgeMs(cloud.generatedAt) : Number.POSITIVE_INFINITY;
+  const cloudFresh = cloud != null && cloudAgeMs <= CLOUD_STALE_THRESHOLD_MS;
+  const electronIpc = hasElectronGamesIpc();
+  if (cloudFresh && cloud) {
+    return cloud;
+  }
+  if (!electronIpc) {
+    if (cloud) {
+      if (define_import_meta_env_default.DEV && !cloudFresh) {
+        console.warn(`${LOG8} browser/web using cloud snapshot (stale but authoritative)`, {
+          cloudAgeMs,
+          cloudError
+        });
+      }
+      return cloud;
+    }
+    if (isGrarfWebRenderer()) {
+      throw new Error(cloudError ?? "[OperationalIngest] grarf_cloud unavailable in browser");
+    }
+    throw new Error(cloudError ?? "[OperationalIngest] grarf_cloud unavailable in browser");
+  }
+  const local = await fetchViaEspnLocalIpcAdapter();
+  const localAgeMs = snapshotAgeMs(local.generatedAt);
+  if (cloud && cloudAgeMs <= localAgeMs) {
+    return cloud;
+  }
+  if (define_import_meta_env_default.DEV && (cloudError || cloud && !cloudFresh)) {
+    console.warn(`${LOG8} using local IPC fallback (cloud stale or failed)`, {
+      cloudError,
+      cloudAgeMs: cloud ? cloudAgeMs : null,
+      localAgeMs,
+      localGeneratedAt: local.generatedAt
+    });
+  }
+  return {
+    ...local,
+    source: "espn_local_adapter"
+  };
+}
+async function fetchOperationalSnapshot() {
+  const config = getOperationalIngestConfig();
+  if (isGrarfWebRenderer()) {
+    return fetchViaWebOperationalIngest();
+  }
+  if (config.provider === "grarf_cloud") {
+    return fetchViaGrarfCloudWithLocalFallback();
+  }
+  return fetchViaEspnLocalIpcAdapter();
+}
+function operationalResponseFromIpcPush(snap) {
+  return ipcSnapshotToOperationalResponse(snap);
+}
+var LOG8, CLOUD_STALE_THRESHOLD_MS, CLOUD_FETCH_TIMEOUT_MS, WEB_CLOUD_BOOTSTRAP_TIMEOUT_MS, CLOUD_FETCH_MAX_ATTEMPTS, CLOUD_FETCH_RETRY_MS;
+var init_fetchOperationalSnapshot = __esm({
+  "../grarf/desktop/src/services/operationalIngest/fetchOperationalSnapshot.ts"() {
+    init_define_import_meta_env();
+    init_operationalIngestConfig();
+    init_isGrarfWebRenderer();
+    init_fetchWebEspnOperationalSnapshot();
+    LOG8 = "[OperationalIngest]";
+    CLOUD_STALE_THRESHOLD_MS = 9e4;
+    CLOUD_FETCH_TIMEOUT_MS = 2e4;
+    WEB_CLOUD_BOOTSTRAP_TIMEOUT_MS = 2500;
+    CLOUD_FETCH_MAX_ATTEMPTS = 3;
+    CLOUD_FETCH_RETRY_MS = 1500;
+  }
+});
+
+// ../grarf/desktop/src/services/operationalIngest/startOperationalSnapshotPolling.ts
+function startOperationalSnapshotPolling(onTransport, options) {
+  const config = getOperationalIngestConfig();
+  if (config.provider !== "grarf_cloud") {
+    return () => {
+    };
+  }
+  const intervalMs = options?.intervalMs ?? config.pollIntervalMs ?? DEFAULT_POLL_INTERVAL_MS;
+  let stopped = false;
+  let pollInFlight = null;
+  let retryTimer = null;
+  let intervalId = null;
+  if (define_import_meta_env_default.DEV) {
+    console.log(`${LOG9} provider=grarf_cloud polling centralized snapshot`);
+  }
+  const clearRetry = () => {
+    if (retryTimer != null) {
+      clearTimeout(retryTimer);
+      retryTimer = null;
+    }
+  };
+  const runPoll = async () => {
+    if (stopped) return;
+    if (pollInFlight) {
+      await pollInFlight;
+      return;
+    }
+    pollInFlight = (async () => {
+      try {
+        const rawTransport = await fetchOperationalSnapshot();
+        if (stopped) return;
+        clearRetry();
+        await Promise.resolve(onTransport(rawTransport));
+      } catch (e2) {
+        const msg = e2 instanceof Error ? e2.message : String(e2);
+        console.warn(`${LOG9} poll failed`, msg);
+        if (!stopped && retryTimer == null) {
+          retryTimer = setTimeout(() => {
+            retryTimer = null;
+            void runPoll();
+          }, RETRY_MS);
+        }
+      }
+    })().finally(() => {
+      pollInFlight = null;
+    });
+    await pollInFlight;
+  };
+  void runPoll();
+  intervalId = setInterval(() => {
+    void runPoll();
+  }, intervalMs);
+  return () => {
+    stopped = true;
+    if (intervalId != null) clearInterval(intervalId);
+    clearRetry();
+  };
+}
+var LOG9, DEFAULT_POLL_INTERVAL_MS, RETRY_MS;
+var init_startOperationalSnapshotPolling = __esm({
+  "../grarf/desktop/src/services/operationalIngest/startOperationalSnapshotPolling.ts"() {
+    init_define_import_meta_env();
+    init_operationalIngestConfig();
+    init_fetchOperationalSnapshot();
+    LOG9 = "[OperationalIngest]";
+    DEFAULT_POLL_INTERVAL_MS = 6e4;
+    RETRY_MS = 15e3;
+  }
+});
+
+// ../grarf/desktop/src/lib/updateEngine/updateEngineCadences.ts
+var WEB_UPDATE_ENGINE_LIVE_GAMES_POLL_MS, WEB_UPDATE_ENGINE_SIGNALS_POLL_MS, WEB_UPDATE_ENGINE_BROWSER_POLL_MS, WEB_UPDATE_ENGINE_HIGHLIGHTS_TV_POLL_MS;
+var init_updateEngineCadences = __esm({
+  "../grarf/desktop/src/lib/updateEngine/updateEngineCadences.ts"() {
+    init_define_import_meta_env();
+    WEB_UPDATE_ENGINE_LIVE_GAMES_POLL_MS = 15e3;
+    WEB_UPDATE_ENGINE_SIGNALS_POLL_MS = 3e4;
+    WEB_UPDATE_ENGINE_BROWSER_POLL_MS = 2 * 6e4;
+    WEB_UPDATE_ENGINE_HIGHLIGHTS_TV_POLL_MS = 5 * 6e4;
+  }
+});
+
+// ../grarf/desktop/src/lib/updateEngine/liveGamesPollRegistry.ts
+function isWebLiveGamesHydrateRegistered() {
+  return onTransportFn != null;
+}
+function registerWebLiveGamesHydrate(fn2) {
+  onTransportFn = fn2;
+  return () => {
+    if (onTransportFn === fn2) onTransportFn = null;
+  };
+}
+function startWebLiveGamesPoller() {
+  if (!onTransportFn) return () => {
+  };
+  stopPoll?.();
+  stopPoll = startOperationalSnapshotPolling(onTransportFn, {
+    intervalMs: WEB_UPDATE_ENGINE_LIVE_GAMES_POLL_MS
+  });
+  return () => {
+    stopPoll?.();
+    stopPoll = null;
+  };
+}
+var onTransportFn, stopPoll;
+var init_liveGamesPollRegistry = __esm({
+  "../grarf/desktop/src/lib/updateEngine/liveGamesPollRegistry.ts"() {
+    init_define_import_meta_env();
+    init_startOperationalSnapshotPolling();
+    init_updateEngineCadences();
+    onTransportFn = null;
+    stopPoll = null;
+  }
+});
+
+// ../grarf/desktop/src/store/bindCanonicalIntelligenceRegistrySync.ts
+function bindCanonicalIntelligenceRegistrySync() {
+  let syncScheduled = false;
+  return useCanonicalLiveGameStore.subscribe(() => {
+    if (syncScheduled) return;
+    syncScheduled = true;
+    queueMicrotask(() => {
+      syncScheduled = false;
+      const games = Object.values(useCanonicalLiveGameStore.getState().gamesById).map(
+        (record) => record.game
+      );
+      try {
+        useCanonicalIntelligenceRegistryStore.getState().syncFromIngestedGames(games);
+      } catch (error) {
+        if (define_import_meta_env_default.DEV) {
+          console.warn("[CanonicalIntelligence] registry sync failed", error);
+        }
+      }
+    });
+  });
+}
+var init_bindCanonicalIntelligenceRegistrySync = __esm({
+  "../grarf/desktop/src/store/bindCanonicalIntelligenceRegistrySync.ts"() {
+    init_define_import_meta_env();
+    init_canonicalLiveGameStore();
+    init_canonicalIntelligenceRegistryStore();
+  }
+});
+
+// ../grarf/desktop/src/lib/newswire/newswireTimelineStorage.ts
+function isValidNewswireStory(value) {
+  if (!value || typeof value !== "object") return false;
+  const row = value;
+  return typeof row.id === "string" && row.id.length > 0 && typeof row.source === "string" && typeof row.headline === "string" && typeof row.timestamp === "string" && typeof row.url === "string";
+}
+function sanitizeStories(raw) {
+  if (!Array.isArray(raw)) return [];
+  const stories = [];
+  for (const item of raw) {
+    if (isValidNewswireStory(item)) stories.push(item);
+  }
+  return stories;
+}
+function pruneStories(stories, now = Date.now()) {
+  return stories.filter((story) => {
+    const age = now - new Date(story.timestamp).getTime();
+    return Number.isFinite(age) && age >= 0 && age <= MAX_STORY_AGE_MS;
+  });
+}
+function readNewswireTimelineSync(now = Date.now()) {
+  if (typeof localStorage === "undefined") return [];
+  try {
+    const raw = localStorage.getItem(NEWSWIRE_TIMELINE_STORAGE_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    const version = parsed.version;
+    if (version !== NEWSWIRE_TIMELINE_STORAGE_VERSION) return [];
+    const storiesRaw = parsed.stories ?? parsed.events;
+    const sanitized = sanitizeStories(storiesRaw);
+    const pruned = pruneStories(sanitized, now);
+    if (pruned.length < sanitized.length) {
+      writeNewswireTimelineSync(pruned);
+    }
+    return pruned;
+  } catch {
+    return [];
+  }
+}
+function writeNewswireTimelineSync(stories) {
+  if (typeof localStorage === "undefined") return;
+  try {
+    const payload = {
+      version: NEWSWIRE_TIMELINE_STORAGE_VERSION,
+      stories
+    };
+    localStorage.setItem(NEWSWIRE_TIMELINE_STORAGE_KEY, JSON.stringify(payload));
+  } catch {
+  }
+}
+var NEWSWIRE_TIMELINE_STORAGE_KEY, NEWSWIRE_TIMELINE_STORAGE_VERSION, MAX_STORY_AGE_MS;
+var init_newswireTimelineStorage = __esm({
+  "../grarf/desktop/src/lib/newswire/newswireTimelineStorage.ts"() {
+    init_define_import_meta_env();
+    NEWSWIRE_TIMELINE_STORAGE_KEY = "grarf-newswire-timeline";
+    NEWSWIRE_TIMELINE_STORAGE_VERSION = 2;
+    MAX_STORY_AGE_MS = 7 * 24 * 60 * 60 * 1e3;
+  }
+});
+
+// ../grarf/desktop/src/store/newswireTimelineStore.ts
+function storiesByIdFromList(stories) {
+  const byId = {};
+  for (const story of stories) {
+    byId[story.id] = story;
+  }
+  return byId;
+}
+function sortStoriesChronologically(stories) {
+  return [...stories].sort(
+    (a2, b2) => new Date(a2.timestamp).getTime() - new Date(b2.timestamp).getTime()
+  );
+}
+function persistTimeline2(storiesById) {
+  writeNewswireTimelineSync(sortStoriesChronologically(Object.values(storiesById)));
+}
+function hydrateTimelineFromStorage2(now = Date.now()) {
+  const pruned = readNewswireTimelineSync(now);
+  return storiesByIdFromList(pruned);
+}
+function getNewswireTimelineStore() {
+  return useNewswireTimelineStore;
+}
+var import_zustand21, initialStoriesById, useNewswireTimelineStore;
+var init_newswireTimelineStore = __esm({
+  "../grarf/desktop/src/store/newswireTimelineStore.ts"() {
+    init_define_import_meta_env();
+    import_zustand21 = __toESM(require_zustand(), 1);
+    init_newswireTimelineStorage();
+    init_liveTrackAnimationStore();
+    initialStoriesById = hydrateTimelineFromStorage2();
+    useNewswireTimelineStore = (0, import_zustand21.create)((set, get) => ({
+      storiesById: initialStoriesById,
+      version: 0,
+      appendStory: (story) => {
+        if (get().storiesById[story.id]) return false;
+        const storiesById = { ...get().storiesById, [story.id]: story };
+        persistTimeline2(storiesById);
+        set((state3) => ({
+          storiesById,
+          version: state3.version + 1
+        }));
+        useLiveTrackAnimationStore.getState().onNewswireStoryAppended(story.id, Object.keys(storiesById));
+        return true;
+      },
+      appendStoriesBatch: (stories, options) => {
+        const current = get().storiesById;
+        const appended = [];
+        for (const story of stories) {
+          if (current[story.id] || appended.some((row) => row.id === story.id)) continue;
+          appended.push(story);
+        }
+        if (appended.length === 0) return 0;
+        const storiesById = { ...current };
+        for (const story of appended) {
+          storiesById[story.id] = story;
+        }
+        persistTimeline2(storiesById);
+        set((state3) => ({
+          storiesById,
+          version: state3.version + 1
+        }));
+        const appendedIds = appended.map((story) => story.id);
+        const allStoryIds = Object.keys(storiesById);
+        if (options?.suppressAnimation) {
+          useLiveTrackAnimationStore.getState().markHydratedTimeline(appendedIds);
+        } else if (appendedIds.length === 1) {
+          useLiveTrackAnimationStore.getState().onNewswireStoryAppended(appendedIds[0], allStoryIds);
+        } else {
+          const newestAppended = [...appended].sort(
+            (a2, b2) => new Date(b2.timestamp).getTime() - new Date(a2.timestamp).getTime()
+          )[0];
+          useLiveTrackAnimationStore.getState().onNewswireStoryAppended(newestAppended.id, allStoryIds);
+          for (const story of appended) {
+            if (story.id === newestAppended.id) continue;
+            useLiveTrackAnimationStore.getState().markAnimationComplete(story.id);
+          }
+        }
+        return appended.length;
+      },
+      pruneExpired: (now = Date.now()) => {
+        const prunedList = readNewswireTimelineSync(now);
+        const prunedById = storiesByIdFromList(prunedList);
+        const current = get().storiesById;
+        if (Object.keys(prunedById).length === Object.keys(current).length) return;
+        persistTimeline2(prunedById);
+        useLiveTrackAnimationStore.getState().pruneCompletedIds(new Set(Object.keys(prunedById)));
+        set((state3) => ({
+          storiesById: prunedById,
+          version: state3.version + 1
+        }));
+      }
+    }));
+  }
+});
+
+// ../grarf/shared/search/feeds/feedRegistry.ts
+function getEnabledRssFeeds() {
+  return GRARF_RSS_FEED_REGISTRY.filter((f2) => f2.enabled !== false).map((f2) => ({ ...f2 }));
+}
+function getRssFeedById(feedId) {
+  const hit = GRARF_RSS_FEED_REGISTRY.find((f2) => f2.id === feedId);
+  return hit ? { ...hit } : void 0;
+}
+var ESPN_MLB_NEWS_FEED_ID, GRARF_RSS_FEED_REGISTRY;
+var init_feedRegistry = __esm({
+  "../grarf/shared/search/feeds/feedRegistry.ts"() {
+    init_define_import_meta_env();
+    ESPN_MLB_NEWS_FEED_ID = "espn-mlb-news";
+    GRARF_RSS_FEED_REGISTRY = [
+      {
+        id: ESPN_MLB_NEWS_FEED_ID,
+        url: "https://www.espn.com/espn/rss/mlb/news",
+        source: "ESPN",
+        category: "news",
+        league: "MLB",
+        sport: "mlb",
+        enabled: true
+      }
+    ];
+  }
+});
+
+// ../grarf/desktop/src/services/rssIngest/feedRegistry.ts
+var init_feedRegistry2 = __esm({
+  "../grarf/desktop/src/services/rssIngest/feedRegistry.ts"() {
+    init_define_import_meta_env();
+    init_feedRegistry();
+  }
+});
+
+// ../grarf/desktop/src/lib/rss/resolveProxiedRssFetchUrl.ts
+function extractRssAppFeedId(feedUrl) {
+  const trimmed = feedUrl.trim();
+  const patterns = [
+    /^https?:\/\/rss\.app\/feeds\/([A-Za-z0-9_-]+)\.xml\/?$/i,
+    /^https?:\/\/rss\.app\/r\/feed\/([A-Za-z0-9_-]+)\/?$/i
+  ];
+  for (const pattern of patterns) {
+    const match = trimmed.match(pattern);
+    const feedId = match?.[1]?.trim();
+    if (feedId && RSS_APP_FEED_ID_RE.test(feedId)) return feedId;
+  }
+  return null;
+}
+function resolveProxiedRssFetchUrl(feedUrl) {
+  const trimmed = feedUrl.trim();
+  if (!trimmed || !isGrarfWebRenderer()) return trimmed;
+  const feedId = extractRssAppFeedId(trimmed);
+  if (!feedId) return trimmed;
+  const proxiedPath = `/livetrack/rss-app/${encodeURIComponent(feedId)}.xml`;
+  const operationalBase = getOperationalIngestConfig().cloudBaseUrl?.replace(/\/+$/, "");
+  if (operationalBase) {
+    return `${operationalBase}${proxiedPath}`;
+  }
+  return proxiedPath;
+}
+var RSS_APP_FEED_ID_RE;
+var init_resolveProxiedRssFetchUrl = __esm({
+  "../grarf/desktop/src/lib/rss/resolveProxiedRssFetchUrl.ts"() {
+    init_define_import_meta_env();
+    init_operationalIngestConfig();
+    init_isGrarfWebRenderer();
+    RSS_APP_FEED_ID_RE = /^[A-Za-z0-9_-]{6,64}$/;
+  }
+});
+
+// ../grarf/desktop/src/services/rssIngest/fetchRssXml.ts
+function extractLiveTrackRssAppPath(url) {
+  try {
+    const pathname = new URL(url).pathname;
+    if (!pathname.startsWith("/livetrack/rss-app/")) return null;
+    return pathname;
+  } catch {
+    return null;
+  }
+}
+async function fetchRssXmlDirect(url) {
+  try {
+    const res = await fetch(url, {
+      mode: "cors",
+      headers: { Accept: "application/rss+xml, application/xml, text/xml, */*" }
+    });
+    if (!res.ok) {
+      return {
+        ok: false,
+        status: res.status,
+        statusText: res.statusText,
+        error: `http ${res.status}`
+      };
+    }
+    const xml = await res.text();
+    return { ok: true, status: res.status, xml };
+  } catch (e2) {
+    return { ok: false, error: e2 instanceof Error ? e2.message : String(e2) };
+  }
+}
+async function fetchRssXml2(url) {
+  const trimmed = url.trim();
+  if (!trimmed || !/^https?:\/\//i.test(trimmed)) {
+    return { ok: false, error: "invalid url" };
+  }
+  const fetchUrl = resolveProxiedRssFetchUrl(trimmed);
+  const bridge3 = typeof window !== "undefined" ? window.grarf?.tickerRssFetch : void 0;
+  if (bridge3) {
+    try {
+      const r3 = await bridge3(fetchUrl);
+      if (define_import_meta_env_default.DEV && r3 && typeof r3 === "object" && "_rssDebug" in r3) {
+        console.log("[RSS DEBUG][fetchRssXml] electron-helper attempts", r3._rssDebug);
+      }
+      if (r3 && typeof r3 === "object" && "ok" in r3 && r3.ok === true && typeof r3.xml === "string") {
+        return { ok: true, status: r3.status ?? 200, xml: r3.xml };
+      }
+      if (define_import_meta_env_default.DEV) {
+        console.warn("[RSS DEBUG][fetchRssXml] electron-helper failed, trying direct fetch", r3);
+      }
+    } catch (e2) {
+      if (define_import_meta_env_default.DEV) {
+        console.warn("[RSS DEBUG][fetchRssXml] electron-helper threw, trying direct fetch", e2);
+      }
+    }
+  }
+  return fetchRssXmlDirect(fetchUrl).then(async (result) => {
+    if (result.ok || !isGrarfWebRenderer() || !/^https?:\/\//i.test(fetchUrl)) {
+      return result;
+    }
+    const sameOriginPath = extractLiveTrackRssAppPath(fetchUrl);
+    if (!sameOriginPath || sameOriginPath === fetchUrl) return result;
+    const fallback = await fetchRssXmlDirect(sameOriginPath);
+    return fallback.ok ? fallback : result;
+  });
+}
+var init_fetchRssXml = __esm({
+  "../grarf/desktop/src/services/rssIngest/fetchRssXml.ts"() {
+    init_define_import_meta_env();
+    init_resolveProxiedRssFetchUrl();
+    init_isGrarfWebRenderer();
+  }
+});
+
+// ../grarf/shared/search/feeds/normalizeFeedItems.ts
+function stableHash(input) {
+  let h2 = 2166136261;
+  for (let i2 = 0; i2 < input.length; i2++) {
+    h2 ^= input.charCodeAt(i2);
+    h2 = Math.imul(h2, 16777619);
+  }
+  return (h2 >>> 0).toString(36);
+}
+function entryId(feedId, entry2) {
+  const key2 = entry2.guid?.trim() || entry2.url;
+  return `rss:${feedId}:${stableHash(key2)}`;
+}
+function normalizeFeedItems(feed, entries) {
+  const league2 = feed.league ?? null;
+  const sport = feed.sport ?? null;
+  return entries.map((entry2) => ({
+    id: entryId(feed.id, entry2),
+    feedId: feed.id,
+    title: entry2.title,
+    url: entry2.url,
+    publishedAt: new Date(entry2.publishedAtMs).toISOString(),
+    source: feed.source,
+    league: league2,
+    sport,
+    ...entry2.summary ? { summary: entry2.summary } : {},
+    ...entry2.imageUrl ? { imageUrl: entry2.imageUrl } : {},
+    ...entry2.videoUrl ? { videoUrl: entry2.videoUrl } : {},
+    ...entry2.author ? { author: entry2.author } : {}
+  }));
+}
+function sortNormalizedItemsNewestFirst(items) {
+  return [...items].sort(
+    (a2, b2) => new Date(b2.publishedAt).getTime() - new Date(a2.publishedAt).getTime()
+  );
+}
+var init_normalizeFeedItems = __esm({
+  "../grarf/shared/search/feeds/normalizeFeedItems.ts"() {
+    init_define_import_meta_env();
+  }
+});
+
+// ../grarf/desktop/src/services/rssIngest/normalizeFeedItems.ts
+var init_normalizeFeedItems2 = __esm({
+  "../grarf/desktop/src/services/rssIngest/normalizeFeedItems.ts"() {
+    init_define_import_meta_env();
+    init_normalizeFeedItems();
+  }
+});
+
+// ../grarf/shared/search/normalization/preservePostText.ts
+function preserveLiveTrackPostText(raw) {
+  if (!raw) return "";
+  let text2 = raw.replace(/\r\n?/g, "\n");
+  text2 = text2.split("\n").map((line) => line.replace(/[ \t]+$/g, "")).join("\n");
+  const maxNewlines = MAX_CONSECUTIVE_BLANK_LINES + 1;
+  text2 = text2.replace(new RegExp(`\\n{${maxNewlines + 1},}`, "g"), "\n".repeat(maxNewlines));
+  return text2.trim();
+}
+var MAX_CONSECUTIVE_BLANK_LINES;
+var init_preservePostText = __esm({
+  "../grarf/shared/search/normalization/preservePostText.ts"() {
+    init_define_import_meta_env();
+    MAX_CONSECUTIVE_BLANK_LINES = 2;
+  }
+});
+
+// ../grarf/desktop/src/lib/livetrack/preserveLiveTrackPostText.ts
+var init_preserveLiveTrackPostText = __esm({
+  "../grarf/desktop/src/lib/livetrack/preserveLiveTrackPostText.ts"() {
+    init_define_import_meta_env();
+    init_preservePostText();
+  }
+});
+
+// ../grarf/desktop/src/services/rssIngest/parseRssXml.ts
+function resolveMaxSummaryChars(options = {}) {
+  return options.maxSummaryChars ?? DEFAULT_RSS_SUMMARY_MAX_CHARS;
+}
+function capSummaryText(text2, maxSummaryChars) {
+  if (!text2) return void 0;
+  if (!Number.isFinite(maxSummaryChars)) return text2;
+  return text2.slice(0, maxSummaryChars);
+}
+function textContent3(el) {
+  return el?.textContent?.replace(/\s+/g, " ").trim() ?? "";
+}
+function itemTitleText(item) {
+  const el = item.querySelector("title");
+  if (!el) return "";
+  return preserveLiveTrackPostText(el.textContent ?? "");
+}
+function elementContentMarkup(el) {
+  if (!el) return "";
+  return el.innerHTML?.trim() || el.textContent?.trim() || "";
+}
+function decodeXmlEntities(s2) {
+  return s2.replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&apos;/g, "'").replace(/&amp;/g, "&");
+}
+function htmlToPlainPreserveFormatting(html) {
+  let text2 = decodeXmlEntities(html);
+  text2 = text2.replace(/<br\s*\/?>/gi, "\n");
+  text2 = text2.replace(/<\/(p|div|blockquote|section|article|h[1-6])>/gi, "\n\n");
+  text2 = text2.replace(/<\/li>/gi, "\n");
+  text2 = text2.replace(/<[^>]+>/g, "");
+  return preserveLiveTrackPostText(text2);
+}
+function firstImgSrc(html) {
+  const m2 = html.match(/<img[^>]+src=["']([^"']+)["']/i);
+  return m2?.[1]?.trim() || void 0;
+}
+function atomEntryLink3(entry2) {
+  const links = entry2.querySelectorAll("link");
+  for (let i2 = 0; i2 < links.length; i2++) {
+    const link = links[i2];
+    const href = link.getAttribute("href")?.trim();
+    if (!href) continue;
+    const rel = (link.getAttribute("rel") || "alternate").toLowerCase();
+    if (rel === "alternate" || rel === "") return href;
+  }
+  return "";
+}
+function itemMediaContents(item) {
+  const medias = item.getElementsByTagNameNS(MRSS_NS, "content");
+  return Array.from({ length: medias.length }, (_2, i2) => medias[i2]);
+}
+function isVideoMediaUrl(url, type, medium) {
+  const hay = `${type} ${medium} ${url}`.toLowerCase();
+  return type.includes("video") || medium === "video" || /\.mp4(\?|$)/i.test(url) || /video\.twimg\.com/i.test(url);
+}
+function itemVideoUrl(item) {
+  for (const el of itemMediaContents(item)) {
+    const u2 = el.getAttribute("url")?.trim() ?? "";
+    const type = (el.getAttribute("type") ?? "").toLowerCase();
+    const medium = (el.getAttribute("medium") ?? "").toLowerCase();
+    if (u2 && isVideoMediaUrl(u2, type, medium)) return u2;
+  }
+  const enc = item.querySelector("enclosure");
+  if (enc) {
+    const u2 = enc.getAttribute("url")?.trim() ?? "";
+    const type = (enc.getAttribute("type") ?? "").toLowerCase();
+    if (u2 && type.includes("video")) return u2;
+  }
+  const desc = textContent3(item.querySelector("description"));
+  const videoMatch = desc.match(
+    /https?:\/\/video\.twimg\.com\/[^\s"'<>]+\.mp4[^\s"'<>]*/i
+  );
+  if (videoMatch?.[0]) return videoMatch[0];
+  return void 0;
+}
+function itemImageUrl(item) {
+  const thumb = item.querySelector("media\\:thumbnail, thumbnail");
+  const thumbHref = thumb?.getAttribute("url")?.trim();
+  if (thumbHref) return thumbHref;
+  for (const el of itemMediaContents(item)) {
+    const u2 = el.getAttribute("url")?.trim() ?? "";
+    const type = (el.getAttribute("type") ?? "").toLowerCase();
+    const medium = (el.getAttribute("medium") ?? "").toLowerCase();
+    if (!u2 || isVideoMediaUrl(u2, type, medium)) continue;
+    if (type.includes("image") || medium === "image" || /\.(jpg|jpeg|png|gif|webp)(\?|$)/i.test(u2)) {
+      return u2;
+    }
+  }
+  const enc = item.querySelector("enclosure");
+  if (enc) {
+    const u2 = enc.getAttribute("url")?.trim() ?? "";
+    const type = (enc.getAttribute("type") ?? "").toLowerCase();
+    if (u2 && type.includes("image")) return u2;
+  }
+  const descMarkup = elementContentMarkup(item.querySelector("description"));
+  if (descMarkup.includes("<img")) return firstImgSrc(descMarkup);
+  return void 0;
+}
+function plainFromMarkup(raw) {
+  if (!raw) return "";
+  if (raw.includes("<")) return htmlToPlainPreserveFormatting(raw);
+  return preserveLiveTrackPostText(decodeXmlEntities(raw));
+}
+function stripTwitterAttributionSuffix(text2) {
+  return text2.replace(/\s*—\s*@[\w]+[\s\S]*$/u, "").trim();
+}
+function extractTwitterBlockquotePostText(html) {
+  if (!/twitter-tweet/i.test(html)) return null;
+  const pMatch = html.match(/<blockquote[^>]*>[\s\S]*?<p[^>]*>([\s\S]*?)<\/p>/i);
+  if (!pMatch?.[1]) return null;
+  return stripTwitterAttributionSuffix(htmlToPlainPreserveFormatting(pMatch[1]));
+}
+function itemContentEncodedText(item, maxSummaryChars) {
+  const encoded = item.getElementsByTagNameNS(CONTENT_NS, "encoded")[0] ?? [...item.children].find((el) => el.localName === "encoded");
+  if (!encoded) return void 0;
+  const raw = elementContentMarkup(encoded);
+  if (!raw) return void 0;
+  const tweetBody = extractTwitterBlockquotePostText(raw);
+  const plain = tweetBody ?? plainFromMarkup(raw);
+  return capSummaryText(plain || void 0, maxSummaryChars);
+}
+function itemDescriptionText(item, maxSummaryChars) {
+  const descRaw = elementContentMarkup(item.querySelector("description"));
+  if (!descRaw) return void 0;
+  const tweetBody = extractTwitterBlockquotePostText(descRaw);
+  const plain = stripTwitterAttributionSuffix(tweetBody ?? plainFromMarkup(descRaw));
+  return capSummaryText(plain || void 0, maxSummaryChars);
+}
+function itemSummary(item, maxSummaryChars) {
+  const encoded = itemContentEncodedText(item, maxSummaryChars);
+  if (encoded) return encoded;
+  const description = itemDescriptionText(item, maxSummaryChars);
+  if (description) return description;
+  const summary = item.getElementsByTagNameNS("http://www.w3.org/2005/Atom", "summary")[0];
+  if (summary) {
+    const raw = elementContentMarkup(summary);
+    const tweetBody = raw ? extractTwitterBlockquotePostText(raw) : null;
+    const plain = stripTwitterAttributionSuffix(tweetBody ?? plainFromMarkup(raw));
+    return capSummaryText(plain || void 0, maxSummaryChars);
+  }
+  return void 0;
+}
+function parsePublishedMs(raw) {
+  if (!raw) return Date.now();
+  const ms2 = Date.parse(raw);
+  return Number.isFinite(ms2) ? ms2 : Date.now();
+}
+function parseRss2Items(doc, maxItems, maxSummaryChars) {
+  const out = [];
+  const items = doc.getElementsByTagName("item");
+  for (let i2 = 0; i2 < items.length && out.length < maxItems; i2++) {
+    const item = items[i2];
+    const title = itemTitleText(item);
+    let url = textContent3(item.querySelector("link"));
+    if (!url) {
+      url = item.querySelector("link[href]")?.getAttribute("href")?.trim() ?? "";
+    }
+    const pubRaw = textContent3(item.querySelector("pubDate")) || textContent3(item.querySelector("published")) || textContent3(item.querySelector("dc\\:date"));
+    const publishedAtMs = parsePublishedMs(pubRaw);
+    const guid = textContent3(item.querySelector("guid")) || void 0;
+    const author = textContent3(item.querySelector("dc\\:creator")) || textContent3(item.getElementsByTagNameNS("http://purl.org/dc/elements/1.1/", "creator")[0]) || void 0;
+    if (!title || !url || !/^https?:\/\//i.test(url)) continue;
+    out.push({
+      title,
+      url,
+      publishedAtMs,
+      summary: itemSummary(item, maxSummaryChars),
+      imageUrl: itemImageUrl(item),
+      videoUrl: itemVideoUrl(item),
+      guid,
+      ...author ? { author } : {}
+    });
+  }
+  return out;
+}
+function parseAtomEntries(doc, maxItems, maxSummaryChars) {
+  const out = [];
+  const entries = doc.getElementsByTagName("entry");
+  for (let i2 = 0; i2 < entries.length && out.length < maxItems; i2++) {
+    const entry2 = entries[i2];
+    const title = preserveLiveTrackPostText(entry2.querySelector("title")?.textContent ?? "");
+    let url = atomEntryLink3(entry2);
+    if (!url) {
+      const idText = textContent3(entry2.querySelector("id"));
+      if (/^https?:\/\//i.test(idText)) url = idText;
+    }
+    const pubRaw = textContent3(entry2.querySelector("published")) || textContent3(entry2.querySelector("updated"));
+    const publishedAtMs = parsePublishedMs(pubRaw);
+    const author = textContent3(entry2.querySelector("author > name")) || textContent3(entry2.querySelector("dc\\:creator")) || textContent3(entry2.getElementsByTagNameNS("http://purl.org/dc/elements/1.1/", "creator")[0]) || void 0;
+    if (!title || !url || !/^https?:\/\//i.test(url)) continue;
+    out.push({
+      title,
+      url,
+      publishedAtMs,
+      summary: itemSummary(entry2, maxSummaryChars),
+      imageUrl: itemImageUrl(entry2),
+      videoUrl: itemVideoUrl(entry2),
+      guid: textContent3(entry2.querySelector("id")) || void 0,
+      ...author ? { author } : {}
+    });
+  }
+  return out;
+}
+function parseRssXml(xml, maxItems = 50, options = {}) {
+  const doc = new DOMParser().parseFromString(xml, "text/xml");
+  if (doc.querySelector("parsererror")) return [];
+  const maxSummaryChars = resolveMaxSummaryChars(options);
+  const rssItems = parseRss2Items(doc, maxItems, maxSummaryChars);
+  if (rssItems.length > 0) return rssItems;
+  return parseAtomEntries(doc, maxItems, maxSummaryChars);
+}
+var MRSS_NS, DEFAULT_RSS_SUMMARY_MAX_CHARS, CONTENT_NS;
+var init_parseRssXml = __esm({
+  "../grarf/desktop/src/services/rssIngest/parseRssXml.ts"() {
+    init_define_import_meta_env();
+    init_preserveLiveTrackPostText();
+    MRSS_NS = "http://search.yahoo.com/mrss/";
+    DEFAULT_RSS_SUMMARY_MAX_CHARS = 2e3;
+    CONTENT_NS = "http://purl.org/rss/1.0/modules/content/";
+  }
+});
+
+// ../grarf/desktop/src/services/rssIngest/rssIngestService.ts
+function getRssIngestSnapshot() {
+  return cachedSnapshot;
+}
+async function ingestRssFeed(feed, options = {}) {
+  const maxItems = options.maxItems ?? DEFAULT_MAX_ITEMS;
+  const fetchedAt = (/* @__PURE__ */ new Date()).toISOString();
+  const fetched = await fetchRssXml2(feed.url);
+  if (!fetched.ok) {
+    return {
+      feedId: feed.id,
+      ok: false,
+      items: [],
+      fetchedAt: null,
+      error: fetched.error
+    };
+  }
+  try {
+    const raw = parseRssXml(fetched.xml, maxItems);
+    const items = normalizeFeedItems(feed, raw);
+    return {
+      feedId: feed.id,
+      ok: true,
+      items,
+      fetchedAt
+    };
+  } catch (e2) {
+    return {
+      feedId: feed.id,
+      ok: false,
+      items: [],
+      fetchedAt: null,
+      error: e2 instanceof Error ? e2.message : String(e2)
+    };
+  }
+}
+async function refreshRssIngest(options = {}) {
+  const maxItems = options.maxItemsPerFeed ?? DEFAULT_MAX_ITEMS;
+  const feeds = options.feedIds?.length ? options.feedIds.map((id) => getRssFeedById(id)).filter((f2) => Boolean(f2)) : getEnabledRssFeeds();
+  const byFeedId = {};
+  const merged = [];
+  for (const feed of feeds) {
+    const result = await ingestRssFeed(feed, { maxItems });
+    byFeedId[feed.id] = result;
+    if (result.ok) merged.push(...result.items);
+  }
+  const snapshot = {
+    byFeedId,
+    allItems: sortNormalizedItemsNewestFirst(merged),
+    lastRefreshAt: (/* @__PURE__ */ new Date()).toISOString()
+  };
+  cachedSnapshot = snapshot;
+  return snapshot;
+}
+async function refreshRssFeedById(feedId, options = {}) {
+  const feed = getRssFeedById(feedId);
+  if (!feed) {
+    return {
+      feedId,
+      ok: false,
+      items: [],
+      fetchedAt: null,
+      error: `unknown feed: ${feedId}`
+    };
+  }
+  const result = await ingestRssFeed(feed, options);
+  const prev = cachedSnapshot ?? {
+    byFeedId: {},
+    allItems: [],
+    lastRefreshAt: null
+  };
+  const otherItems = prev.allItems.filter((item) => item.feedId !== feedId);
+  const allItems = result.ok ? sortNormalizedItemsNewestFirst([...otherItems, ...result.items]) : prev.allItems;
+  cachedSnapshot = {
+    byFeedId: { ...prev.byFeedId, [feedId]: result },
+    allItems,
+    lastRefreshAt: (/* @__PURE__ */ new Date()).toISOString()
+  };
+  return result;
+}
+var DEFAULT_MAX_ITEMS, cachedSnapshot;
+var init_rssIngestService = __esm({
+  "../grarf/desktop/src/services/rssIngest/rssIngestService.ts"() {
+    init_define_import_meta_env();
+    init_feedRegistry2();
+    init_fetchRssXml();
+    init_normalizeFeedItems2();
+    init_parseRssXml();
+    DEFAULT_MAX_ITEMS = 50;
+    cachedSnapshot = null;
+  }
+});
+
+// ../grarf/desktop/src/store/rssIngestStore.ts
+function syncFromService(set) {
+  const snapshot = getRssIngestSnapshot();
+  const failed = snapshot ? Object.values(snapshot.byFeedId).filter((r3) => !r3.ok) : [];
+  set({
+    snapshot,
+    error: failed.length > 0 ? failed.map((r3) => `${r3.feedId}: ${r3.error ?? "ingest failed"}`).join("; ") : null
+  });
+}
+var import_zustand22, EMPTY_RSS_ITEMS, useRssIngestStore;
+var init_rssIngestStore = __esm({
+  "../grarf/desktop/src/store/rssIngestStore.ts"() {
+    init_define_import_meta_env();
+    import_zustand22 = __toESM(require_zustand(), 1);
+    init_feedRegistry2();
+    init_rssIngestService();
+    EMPTY_RSS_ITEMS = [];
+    useRssIngestStore = (0, import_zustand22.create)((set, get) => ({
+      snapshot: null,
+      loading: false,
+      error: null,
+      hydrated: false,
+      hydrate: async (options) => {
+        const serviceSnapshot = getRssIngestSnapshot();
+        if (get().hydrated && !options?.force && serviceSnapshot) {
+          syncFromService(set);
+          set({ loading: false });
+          return;
+        }
+        set({ loading: true, error: null });
+        try {
+          await refreshRssIngest();
+          syncFromService(set);
+          set({ hydrated: true, loading: false });
+        } catch (e2) {
+          set({
+            loading: false,
+            hydrated: true,
+            error: e2 instanceof Error ? e2.message : String(e2)
+          });
+        }
+      },
+      refresh: async () => {
+        set({ loading: true, error: null });
+        try {
+          await refreshRssIngest();
+          syncFromService(set);
+          set({ loading: false, hydrated: true });
+        } catch (e2) {
+          set({
+            loading: false,
+            error: e2 instanceof Error ? e2.message : String(e2)
+          });
+        }
+      },
+      refreshFeed: async (feedId) => {
+        set({ loading: true, error: null });
+        try {
+          await refreshRssFeedById(feedId);
+          syncFromService(set);
+          set({ loading: false, hydrated: true });
+        } catch (e2) {
+          set({
+            loading: false,
+            error: e2 instanceof Error ? e2.message : String(e2)
+          });
+        }
+      },
+      getAllItems: () => get().snapshot?.allItems ?? EMPTY_RSS_ITEMS,
+      getItemsForFeed: (feedId) => get().snapshot?.byFeedId[feedId]?.items ?? EMPTY_RSS_ITEMS
+    }));
+  }
+});
+
+// ../grarf/desktop/src/store/bindCanonicalNewsStoryEnrichmentSync.ts
+function collectObservedNewsArticles() {
+  const byId = /* @__PURE__ */ new Map();
+  for (const item of useRssIngestStore.getState().getAllItems()) {
+    const article = mapNormalizedRssItemToIngestedNewsArticle(item);
+    byId.set(article.articleId, article);
+  }
+  for (const story of Object.values(useNewswireTimelineStore.getState().storiesById)) {
+    const article = mapNewswireStoryToIngestedNewsArticle(story);
+    byId.set(article.articleId, article);
+  }
+  return [...byId.values()];
+}
+function bindCanonicalNewsStoryEnrichmentSync() {
+  let syncScheduled = false;
+  const scheduleSync = () => {
+    if (syncScheduled) return;
+    syncScheduled = true;
+    queueMicrotask(() => {
+      syncScheduled = false;
+      const articles = collectObservedNewsArticles();
+      if (articles.length === 0) return;
+      const games = Object.values(useCanonicalLiveGameStore.getState().gamesById).map(
+        (record) => record.game
+      );
+      try {
+        useCanonicalIntelligenceRegistryStore.getState().syncNewsStoryEnrichment(articles, games);
+      } catch (error) {
+        if (define_import_meta_env_default.DEV) {
+          console.warn("[CanonicalIntelligence] news enrichment sync failed", error);
+        }
+      }
+    });
+  };
+  const unsubscribeRss = useRssIngestStore.subscribe(scheduleSync);
+  const unsubscribeNewswire = useNewswireTimelineStore.subscribe(scheduleSync);
+  const unsubscribeGames = useCanonicalLiveGameStore.subscribe(scheduleSync);
+  scheduleSync();
+  return () => {
+    unsubscribeRss();
+    unsubscribeNewswire();
+    unsubscribeGames();
+  };
+}
+var init_bindCanonicalNewsStoryEnrichmentSync = __esm({
+  "../grarf/desktop/src/store/bindCanonicalNewsStoryEnrichmentSync.ts"() {
+    init_define_import_meta_env();
+    init_intelligence();
+    init_canonicalLiveGameStore();
+    init_canonicalIntelligenceRegistryStore();
+    init_newswireTimelineStore();
+    init_rssIngestStore();
+  }
+});
+
+// ../grarf/shared/domain/operational/normalizeOperationalSnapshot.ts
+function normalizeOperationalSnapshot(response, options) {
+  const leagues = {};
+  for (const [key2, rows] of Object.entries(response.leagues ?? {})) {
+    if (isEspnOperationalIngestLeagueDisabled(key2)) continue;
+    if (Array.isArray(rows) && rows.length > 0) {
+      leagues[key2] = rows;
+    }
+  }
+  return {
+    leagues,
+    updatedAt: response.generatedAt,
+    sourceProvider: options?.sourceProvider ?? "espn_scoreboard_ipc"
+  };
+}
+var init_normalizeOperationalSnapshot = __esm({
+  "../grarf/shared/domain/operational/normalizeOperationalSnapshot.ts"() {
+    init_define_import_meta_env();
+    init_espnOperationalIngestDisabledLeagues();
+  }
+});
+
+// ../grarf/desktop/src/services/operationalIngest/normalizeOperationalSnapshot.ts
+var init_normalizeOperationalSnapshot2 = __esm({
+  "../grarf/desktop/src/services/operationalIngest/normalizeOperationalSnapshot.ts"() {
+    init_define_import_meta_env();
+    init_normalizeOperationalSnapshot();
+  }
+});
+
 // ../grarf/desktop/src/lib/finalizedGameRetention/buildOperationalSpineSlate.ts
 function mergeRetainedFinalsIntoSpineSlate(slate, leagueGames, retainedFinals) {
   const seen = new Set(slate.map((g2) => g2.id));
@@ -49630,14 +50808,14 @@ function mergeGeneratedSummaries(summaries) {
     bundle: { ...s2.bundle, generatedSummaries: summaries ?? {} }
   }));
 }
-var import_zustand21, LOG8, EDIT_MODE_KEY, AUTOSAVE_MS, emptyBundle, pendingTimers, useEditorialStore;
+var import_zustand23, LOG10, EDIT_MODE_KEY, AUTOSAVE_MS, emptyBundle, pendingTimers, useEditorialStore;
 var init_editorialStore = __esm({
   "../grarf/desktop/src/store/editorialStore.ts"() {
     init_define_import_meta_env();
-    import_zustand21 = __toESM(require_zustand(), 1);
+    import_zustand23 = __toESM(require_zustand(), 1);
     init_grarfAdminFlag();
     init_buildFeaturedGamesFromConfig2();
-    LOG8 = "[Editorial]";
+    LOG10 = "[Editorial]";
     EDIT_MODE_KEY = "grarf-editorial-edit-mode-v1";
     AUTOSAVE_MS = 1e3;
     emptyBundle = () => ({
@@ -49647,7 +50825,7 @@ var init_editorialStore = __esm({
       generatedSummaries: {}
     });
     pendingTimers = /* @__PURE__ */ new Map();
-    useEditorialStore = (0, import_zustand21.create)((set, get) => ({
+    useEditorialStore = (0, import_zustand23.create)((set, get) => ({
       bundle: emptyBundle(),
       generationState: {},
       loaded: false,
@@ -49665,7 +50843,7 @@ var init_editorialStore = __esm({
         if (!isGrarfAdmin()) return;
         writeEditMode(on2);
         set({ editMode: on2 });
-        console.log(`${LOG8} Edit mode ${on2 ? "enabled" : "disabled"}`);
+        console.log(`${LOG10} Edit mode ${on2 ? "enabled" : "disabled"}`);
       },
       setManualNarrativeLocal: (gameKey, text2) => {
         set((s2) => {
@@ -49708,7 +50886,7 @@ var init_editorialStore = __esm({
       saveManualNarrative: (gameKey, text2) => {
         const trimmed = text2.trim();
         if (trimmed) {
-          console.log(`${LOG8} Narrative updated: "${trimmed}"`);
+          console.log(`${LOG10} Narrative updated: "${trimmed}"`);
         }
         get().setManualNarrativeLocal(gameKey, text2);
         debounced(`narrative:${gameKey}`, () => {
@@ -49770,7 +50948,7 @@ function getBriefingDateOptions(now = /* @__PURE__ */ new Date()) {
     options.push({ key: key2, label });
   }
   if (define_import_meta_env_default.DEV) {
-    console.log(`${LOG9} Loaded briefing date options`, { today: todayKey, count: options.length });
+    console.log(`${LOG11} Loaded briefing date options`, { today: todayKey, count: options.length });
   }
   return options;
 }
@@ -49786,7 +50964,7 @@ function resolveActiveBriefingDateKey(selectedKey, now = /* @__PURE__ */ new Dat
   const calendarTodayCentral = getOperationalCalendarDateKey(now, GRARF_OPERATIONAL_SLATE_TIMEZONE);
   if (selectedKey === calendarTodayCentral && calendarTodayCentral !== sportsDayKey) {
     if (define_import_meta_env_default.DEV) {
-      console.log(`${LOG9} Mapped calendar today to operational sports day`, {
+      console.log(`${LOG11} Mapped calendar today to operational sports day`, {
         was: selectedKey,
         now: sportsDayKey
       });
@@ -49795,7 +50973,7 @@ function resolveActiveBriefingDateKey(selectedKey, now = /* @__PURE__ */ new Dat
   }
   if (selectedKey === legacyBrowserLocalTodayKey(now) && selectedKey !== sportsDayKey) {
     if (define_import_meta_env_default.DEV) {
-      console.log(`${LOG9} Migrated legacy local today to operational sports day`, {
+      console.log(`${LOG11} Migrated legacy local today to operational sports day`, {
         was: selectedKey,
         now: sportsDayKey
       });
@@ -49811,7 +50989,7 @@ function resolveActiveBriefingDateKey(selectedKey, now = /* @__PURE__ */ new Dat
   );
   if (selectedStart.getTime() < sportsDayStart.getTime()) {
     if (define_import_meta_env_default.DEV) {
-      console.log(`${LOG9} Date rollover \u2014 using operational sports day`, {
+      console.log(`${LOG11} Date rollover \u2014 using operational sports day`, {
         was: selectedKey,
         now: sportsDayKey
       });
@@ -49826,12 +51004,12 @@ function daysUntilBriefingDate(key2, now = /* @__PURE__ */ new Date()) {
   const target = parseBriefingDateKey(key2).getTime();
   return Math.round((target - todayStart) / DAY_MS);
 }
-var LOG9, DAY_MS;
+var LOG11, DAY_MS;
 var init_commandBriefingDates = __esm({
   "../grarf/desktop/src/lib/commandBriefing/commandBriefingDates.ts"() {
     init_define_import_meta_env();
     init_operationalSlateDate2();
-    LOG9 = "[CommandBriefing]";
+    LOG11 = "[CommandBriefing]";
     DAY_MS = 24 * 60 * 60 * 1e3;
   }
 });
@@ -49851,14 +51029,14 @@ function writeSelectedDate(key2) {
   } catch {
   }
 }
-var import_zustand22, DATE_KEY, useCommandBriefingStore;
+var import_zustand24, DATE_KEY, useCommandBriefingStore;
 var init_commandBriefingStore = __esm({
   "../grarf/desktop/src/store/commandBriefingStore.ts"() {
     init_define_import_meta_env();
-    import_zustand22 = __toESM(require_zustand(), 1);
+    import_zustand24 = __toESM(require_zustand(), 1);
     init_commandBriefingDates();
     DATE_KEY = "grarf-command-briefing-date-v1";
-    useCommandBriefingStore = (0, import_zustand22.create)((set) => ({
+    useCommandBriefingStore = (0, import_zustand24.create)((set) => ({
       selectedDate: resolveActiveBriefingDateKey(readSelectedDate()),
       setSelectedDate: (dateKey) => {
         writeSelectedDate(dateKey);
@@ -50503,6 +51681,36 @@ var init_catchUpDiagnostics = __esm({
   }
 });
 
+// ../grarf/desktop/src/lib/manualEvents/mergeLiveGamesSnapshotWithManualEventsSource.ts
+async function mergeLiveGamesSnapshotWithManualEventsSource(snap) {
+  if (!isGrarfWebRenderer()) return snap;
+  try {
+    const source = await resolveManualEventsSourceBundle();
+    const now = /* @__PURE__ */ new Date();
+    return {
+      ...snap,
+      leagues: refreshManualGamesSpineGamesInLeagues(
+        mergeIngestedManualEventsIntoLeagueGames(snap.leagues ?? {}, {
+          source,
+          now
+        }),
+        now
+      )
+    };
+  } catch {
+    return snap;
+  }
+}
+var init_mergeLiveGamesSnapshotWithManualEventsSource = __esm({
+  "../grarf/desktop/src/lib/manualEvents/mergeLiveGamesSnapshotWithManualEventsSource.ts"() {
+    init_define_import_meta_env();
+    init_mergeIngestedManualEventsIntoLeagueGames();
+    init_manualGamesSpineUtils();
+    init_isGrarfWebRenderer();
+    init_manualEventsSourceResolver();
+  }
+});
+
 // ../grarf/desktop/src/lib/mlb/joinMlbProviderIdsClient.ts
 function hasMlbGamePk(game) {
   if (typeof game.gamePk === "number" && Number.isFinite(game.gamePk) && game.gamePk > 0) {
@@ -50631,17 +51839,17 @@ async function fetchFotmobWorldCupMatchesByDate(dateKey) {
     return matches;
   } catch (error) {
     if (define_import_meta_env_default.DEV) {
-      console.warn(`${LOG10} matches fetch failed for ${normalized}`, error);
+      console.warn(`${LOG12} matches fetch failed for ${normalized}`, error);
     }
     return [];
   }
 }
-var FOTMOB_MATCHES_API, LOG10;
+var FOTMOB_MATCHES_API, LOG12;
 var init_fetchFotmobMatchesByDate = __esm({
   "../grarf/desktop/src/lib/fotmob/fetchFotmobMatchesByDate.ts"() {
     init_define_import_meta_env();
     FOTMOB_MATCHES_API = "https://www.fotmob.com/api/data/matches";
-    LOG10 = "[FotMob]";
+    LOG12 = "[FotMob]";
   }
 });
 
@@ -50754,7 +51962,7 @@ async function enrichWorldCupGamesWithFotmobUrls(games) {
     catalog = await fetchFotmobWorldCupCatalog(worldCupRows);
   } catch (error) {
     if (define_import_meta_env_default.DEV) {
-      console.warn(`${LOG11} catalog fetch failed`, error);
+      console.warn(`${LOG13} catalog fetch failed`, error);
     }
     return games;
   }
@@ -50779,18 +51987,18 @@ async function enrichWorldCupGamesWithFotmobUrls(games) {
     };
   });
   if (define_import_meta_env_default.DEV && matched > 0) {
-    console.log(`${LOG11} matched ${matched} World Cup row(s)`, { catalogSize: catalog.length });
+    console.log(`${LOG13} matched ${matched} World Cup row(s)`, { catalogSize: catalog.length });
   }
   return out;
 }
-var LOG11;
+var LOG13;
 var init_enrichWorldCupGamesWithFotmobUrls = __esm({
   "../grarf/desktop/src/lib/fotmob/enrichWorldCupGamesWithFotmobUrls.ts"() {
     init_define_import_meta_env();
     init_buildFotmobMatchUrl();
     init_fetchFotmobWorldCupCatalog();
     init_matchFotmobWorldCupMatch();
-    LOG11 = "[FotMob]";
+    LOG13 = "[FotMob]";
   }
 });
 
@@ -51285,7 +52493,7 @@ async function enrichWorldCupGamesWithFoxStreams(games) {
     catalog = await fetchFoxWorldCupEventCatalog();
   } catch (error) {
     if (define_import_meta_env_default.DEV) {
-      console.warn(`${LOG12} catalog fetch failed \u2014 using deterministic FOX hub URLs`, error);
+      console.warn(`${LOG14} catalog fetch failed \u2014 using deterministic FOX hub URLs`, error);
     }
   }
   let matched = 0;
@@ -51303,17 +52511,17 @@ async function enrichWorldCupGamesWithFoxStreams(games) {
     };
   });
   if (define_import_meta_env_default.DEV && matched > 0) {
-    console.log(`${LOG12} matched ${matched} World Cup row(s)`, { catalogSize: catalog.length });
+    console.log(`${LOG14} matched ${matched} World Cup row(s)`, { catalogSize: catalog.length });
   }
   return out;
 }
-var LOG12;
+var LOG14;
 var init_enrichWorldCupGamesWithFoxStreams = __esm({
   "../grarf/desktop/src/lib/foxWorldCup/enrichWorldCupGamesWithFoxStreams.ts"() {
     init_define_import_meta_env();
     init_fetchFoxWorldCupEventCatalog();
     init_lookupFoxWorldCupStreamForGame2();
-    LOG12 = "[FoxWorldCup]";
+    LOG14 = "[FoxWorldCup]";
   }
 });
 
@@ -52316,17 +53524,17 @@ async function enrichWimbledonSlamTrackerMatches(games) {
     attachSlamTrackerResolution(game, resolution.matchId, resolution.url);
   }
   if (define_import_meta_env_default?.DEV && matched > 0) {
-    console.log(`${LOG13} matched ${matched} Wimbledon row(s)`, { targets: targets.length });
+    console.log(`${LOG15} matched ${matched} Wimbledon row(s)`, { targets: targets.length });
   }
 }
-var LOG13;
+var LOG15;
 var init_enrichWimbledonSlamTrackerMatches = __esm({
   "../grarf/desktop/src/lib/wimbledon/enrichWimbledonSlamTrackerMatches.ts"() {
     init_define_import_meta_env();
     init_enrichWimbledonEspnWatchStreams();
     init_fetchWimbledonDrawCatalog();
     init_matchWimbledonSlamTrackerGame();
-    LOG13 = "[WimbledonSlamTracker]";
+    LOG15 = "[WimbledonSlamTracker]";
   }
 });
 
@@ -52770,7 +53978,7 @@ async function enrichTennisGamesWithTennisChannelPlus(games) {
     catalog = await fetchTennisChannelPlusLiveCatalog();
   } catch (error) {
     if (define_import_meta_env_default.DEV) {
-      console.warn(`${LOG14} catalog fetch failed`, error);
+      console.warn(`${LOG16} catalog fetch failed`, error);
     }
     return games;
   }
@@ -52789,18 +53997,18 @@ async function enrichTennisGamesWithTennisChannelPlus(games) {
     };
   });
   if (define_import_meta_env_default.DEV && matched > 0) {
-    console.log(`${LOG14} matched ${matched} tennis row(s)`, { catalogSize: catalog.length });
+    console.log(`${LOG16} matched ${matched} tennis row(s)`, { catalogSize: catalog.length });
   }
   return out;
 }
-var LOG14;
+var LOG16;
 var init_enrichTennisGamesWithTennisChannelPlus = __esm({
   "../grarf/desktop/src/lib/tennisChannelPlus/enrichTennisGamesWithTennisChannelPlus.ts"() {
     init_define_import_meta_env();
     init_isGrarfWebRenderer();
     init_fetchTennisChannelPlusLiveCatalog();
     init_matchTennisChannelStream();
-    LOG14 = "[TennisChannelPlus]";
+    LOG16 = "[TennisChannelPlus]";
   }
 });
 
@@ -52971,11 +54179,11 @@ async function enrichTennisGamesWithPlayerRanks(games, catalogByYear) {
     return next;
   });
   if (define_import_meta_env_default.DEV && attached > 0) {
-    console.log(`${LOG15} Attached player ranks`, { games: games.length, attached });
+    console.log(`${LOG17} Attached player ranks`, { games: games.length, attached });
   }
   return enriched;
 }
-var LOG15;
+var LOG17;
 var init_enrichTennisGamesWithPlayerRanks = __esm({
   "../grarf/desktop/src/lib/playerRank/enrichTennisGamesWithPlayerRanks.ts"() {
     init_define_import_meta_env();
@@ -52983,7 +54191,7 @@ var init_enrichTennisGamesWithPlayerRanks = __esm({
     init_matchWimbledonSlamTrackerGame();
     init_buildCanonicalPlayerRank2();
     init_resolveWimbledonFeedSeedsForGame2();
-    LOG15 = "[PlayerRankEnrich:Tennis]";
+    LOG17 = "[PlayerRankEnrich:Tennis]";
   }
 });
 
@@ -53025,13 +54233,13 @@ async function enrichOperationalSnapshotPlayerRanks(transport) {
         changed = true;
       }
     } catch (error) {
-      console.warn(`${LOG16} ${leagueKey} player rank enrich failed`, error);
+      console.warn(`${LOG18} ${leagueKey} player rank enrich failed`, error);
     }
   }
   if (!changed) return transport;
   return { ...transport, leagues: nextLeagues };
 }
-var LOG16, TENNIS_PLAYER_RANK_LEAGUES;
+var LOG18, TENNIS_PLAYER_RANK_LEAGUES;
 var init_enrichOperationalSnapshotPlayerRanks = __esm({
   "../grarf/desktop/src/lib/playerRank/enrichOperationalSnapshotPlayerRanks.ts"() {
     init_define_import_meta_env();
@@ -53039,7 +54247,7 @@ var init_enrichOperationalSnapshotPlayerRanks = __esm({
     init_fetchWimbledonDrawCatalog();
     init_matchWimbledonSlamTrackerGame();
     init_enrichTennisGamesWithPlayerRanks();
-    LOG16 = "[PlayerRankEnrich]";
+    LOG18 = "[PlayerRankEnrich]";
     TENNIS_PLAYER_RANK_LEAGUES = ["ATP", "WTA"];
   }
 });
@@ -53302,7 +54510,7 @@ async function hydrateMlbStandingsAbbrevs(entries, season) {
         });
       } catch (error) {
         if (define_import_meta_env_default?.DEV) {
-          console.warn(`${LOG17} Team abbrev fetch failed`, entry2.espnTeamId, error);
+          console.warn(`${LOG19} Team abbrev fetch failed`, entry2.espnTeamId, error);
         }
       }
     })
@@ -53336,7 +54544,7 @@ async function buildMlbEspnStandingsIndex(now = /* @__PURE__ */ new Date()) {
     entries = parseEspnSiteStandingsPayload(sitePayload);
   } catch (error) {
     if (define_import_meta_env_default?.DEV) {
-      console.warn(`${LOG17} Site standings fetch failed`, error);
+      console.warn(`${LOG19} Site standings fetch failed`, error);
     }
   }
   if (entries.length === 0) {
@@ -53347,20 +54555,20 @@ async function buildMlbEspnStandingsIndex(now = /* @__PURE__ */ new Date()) {
     registerStandingsEntry(index, entry2);
   }
   if (define_import_meta_env_default?.DEV) {
-    console.log(`${LOG17} Built MLB standings index`, {
+    console.log(`${LOG19} Built MLB standings index`, {
       teams: index.byEspnTeamId.size,
       season
     });
   }
   return index;
 }
-var LOG17, MLB_ESPN_STANDINGS_URL, MLB_ESPN_CORE_BASE, MLB_DIVISION_GROUP_IDS;
+var LOG19, MLB_ESPN_STANDINGS_URL, MLB_ESPN_CORE_BASE, MLB_DIVISION_GROUP_IDS;
 var init_buildMlbEspnStandingsIndex = __esm({
   "../grarf/desktop/src/lib/standings/mlb/buildMlbEspnStandingsIndex.ts"() {
     init_define_import_meta_env();
     init_formatCanonicalStandingsDisplayLabel2();
     init_fetchEspnStandingsJson();
-    LOG17 = "[StandingsEnrich:MLB]";
+    LOG19 = "[StandingsEnrich:MLB]";
     MLB_ESPN_STANDINGS_URL = "https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/standings";
     MLB_ESPN_CORE_BASE = "https://sports.core.api.espn.com/v2/sports/baseball/leagues/mlb";
     MLB_DIVISION_GROUP_IDS = [1, 2, 3, 4, 5, 6];
@@ -53416,16 +54624,16 @@ async function enrichMlbGamesWithStandings2(games, index) {
     if (enriched[i2] !== games[i2]) attached += 1;
   }
   if (define_import_meta_env_default?.DEV && attached > 0) {
-    console.log(`${LOG18} Attached standings to games`, { games: games.length, attached });
+    console.log(`${LOG20} Attached standings to games`, { games: games.length, attached });
   }
   return enriched;
 }
-var LOG18;
+var LOG20;
 var init_enrichMlbGamesWithStandings2 = __esm({
   "../grarf/desktop/src/lib/standings/mlb/enrichMlbGamesWithStandings.ts"() {
     init_define_import_meta_env();
     init_enrichMlbGamesWithStandings();
-    LOG18 = "[StandingsEnrich:MLB]";
+    LOG20 = "[StandingsEnrich:MLB]";
   }
 });
 
@@ -53600,7 +54808,7 @@ async function hydrateWnbaStandingsAbbrevs(entries, season) {
         });
       } catch (error) {
         if (define_import_meta_env_default.DEV) {
-          console.warn(`${LOG19} Team abbrev fetch failed`, entry2.espnTeamId, error);
+          console.warn(`${LOG21} Team abbrev fetch failed`, entry2.espnTeamId, error);
         }
       }
     })
@@ -53634,7 +54842,7 @@ async function buildWnbaEspnStandingsIndex(now = /* @__PURE__ */ new Date()) {
     entries = parseEspnSiteStandingsPayload2(sitePayload);
   } catch (error) {
     if (define_import_meta_env_default.DEV) {
-      console.warn(`${LOG19} Site standings fetch failed`, error);
+      console.warn(`${LOG21} Site standings fetch failed`, error);
     }
   }
   if (entries.length === 0) {
@@ -53645,20 +54853,20 @@ async function buildWnbaEspnStandingsIndex(now = /* @__PURE__ */ new Date()) {
     registerStandingsEntry2(index, entry2);
   }
   if (define_import_meta_env_default.DEV) {
-    console.log(`${LOG19} Built WNBA standings index`, {
+    console.log(`${LOG21} Built WNBA standings index`, {
       teams: index.byEspnTeamId.size,
       season
     });
   }
   return index;
 }
-var LOG19, WNBA_ESPN_STANDINGS_URL, WNBA_ESPN_CORE_BASE, WNBA_CONFERENCE_GROUP_IDS;
+var LOG21, WNBA_ESPN_STANDINGS_URL, WNBA_ESPN_CORE_BASE, WNBA_CONFERENCE_GROUP_IDS;
 var init_buildWnbaEspnStandingsIndex = __esm({
   "../grarf/desktop/src/lib/standings/wnba/buildWnbaEspnStandingsIndex.ts"() {
     init_define_import_meta_env();
     init_formatCanonicalStandingsDisplayLabel2();
     init_fetchEspnStandingsJson();
-    LOG19 = "[StandingsEnrich:WNBA]";
+    LOG21 = "[StandingsEnrich:WNBA]";
     WNBA_ESPN_STANDINGS_URL = "https://site.api.espn.com/apis/site/v2/sports/basketball/wnba/standings";
     WNBA_ESPN_CORE_BASE = "https://sports.core.api.espn.com/v2/sports/basketball/leagues/wnba";
     WNBA_CONFERENCE_GROUP_IDS = [1, 2];
@@ -53714,16 +54922,16 @@ async function enrichWnbaGamesWithStandings2(games, index) {
     if (enriched[i2] !== games[i2]) attached += 1;
   }
   if (define_import_meta_env_default.DEV && attached > 0) {
-    console.log(`${LOG20} Attached standings to games`, { games: games.length, attached });
+    console.log(`${LOG22} Attached standings to games`, { games: games.length, attached });
   }
   return enriched;
 }
-var LOG20;
+var LOG22;
 var init_enrichWnbaGamesWithStandings2 = __esm({
   "../grarf/desktop/src/lib/standings/wnba/enrichWnbaGamesWithStandings.ts"() {
     init_define_import_meta_env();
     init_enrichWnbaGamesWithStandings();
-    LOG20 = "[StandingsEnrich:WNBA]";
+    LOG22 = "[StandingsEnrich:WNBA]";
   }
 });
 
@@ -53760,13 +54968,13 @@ async function enrichOperationalSnapshotTeamStandings(transport, options) {
         changed = true;
       }
     } catch (error) {
-      console.warn(`${LOG21} ${leagueKey} standings enrich failed`, error);
+      console.warn(`${LOG23} ${leagueKey} standings enrich failed`, error);
     }
   }
   if (!changed) return transport;
   return { ...transport, leagues: nextLeagues };
 }
-var LOG21, TEAM_STANDINGS_LEAGUE_ENRICHERS;
+var LOG23, TEAM_STANDINGS_LEAGUE_ENRICHERS;
 var init_enrichOperationalSnapshotTeamStandings = __esm({
   "../grarf/desktop/src/lib/standings/enrichOperationalSnapshotTeamStandings.ts"() {
     init_define_import_meta_env();
@@ -53775,7 +54983,7 @@ var init_enrichOperationalSnapshotTeamStandings = __esm({
     init_enrichMlbGamesWithStandings2();
     init_buildWnbaEspnStandingsIndex();
     init_enrichWnbaGamesWithStandings2();
-    LOG21 = "[StandingsEnrich]";
+    LOG23 = "[StandingsEnrich]";
     TEAM_STANDINGS_LEAGUE_ENRICHERS = {
       MLB: {
         buildIndex: buildMlbEspnStandingsIndex,
@@ -53955,7 +55163,7 @@ async function enrichOperationalSnapshotWatchStreamsLocal(transport) {
   try {
     next = enrichOperationalSnapshotEspnWatchStreams(next);
   } catch (e2) {
-    console.warn(`${LOG22} ESPN Watch stream enrich failed`, e2);
+    console.warn(`${LOG24} ESPN Watch stream enrich failed`, e2);
   }
   try {
     for (const key2 of ["ATP", "WTA"]) {
@@ -53964,42 +55172,42 @@ async function enrichOperationalSnapshotWatchStreamsLocal(transport) {
       await enrichWimbledonEspnWatchStreams(rows);
     }
   } catch (e2) {
-    console.warn(`${LOG22} Wimbledon ESPN Watch enrich failed`, e2);
+    console.warn(`${LOG24} Wimbledon ESPN Watch enrich failed`, e2);
   }
   try {
     next = await enrichOperationalSnapshotWimbledonSlamTracker(next);
   } catch (e2) {
-    console.warn(`${LOG22} Wimbledon SlamTracker enrich failed`, e2);
+    console.warn(`${LOG24} Wimbledon SlamTracker enrich failed`, e2);
   }
   try {
     next = await enrichOperationalSnapshotEspnWatchPickerStreams(next);
   } catch (e2) {
-    console.warn(`${LOG22} ESPN Watch picker enrich failed`, e2);
+    console.warn(`${LOG24} ESPN Watch picker enrich failed`, e2);
   }
   try {
     next = enrichOperationalSnapshotUsaNetworkStreams(next);
   } catch (e2) {
-    console.warn(`${LOG22} USA Network stream enrich failed`, e2);
+    console.warn(`${LOG24} USA Network stream enrich failed`, e2);
   }
   try {
     next = await enrichOperationalSnapshotTennisChannel(next);
   } catch (e2) {
-    console.warn(`${LOG22} Tennis Channel Plus enrich failed`, e2);
+    console.warn(`${LOG24} Tennis Channel Plus enrich failed`, e2);
   }
   try {
     next = await enrichOperationalSnapshotFoxWorldCup(next);
   } catch (e2) {
-    console.warn(`${LOG22} FOX World Cup enrich failed`, e2);
+    console.warn(`${LOG24} FOX World Cup enrich failed`, e2);
   }
   try {
     next = await enrichOperationalSnapshotWnbaStreams(next);
   } catch (e2) {
-    console.warn(`${LOG22} WNBA Prime Video enrich failed`, e2);
+    console.warn(`${LOG24} WNBA Prime Video enrich failed`, e2);
   }
   try {
     next = await enrichOperationalSnapshotFotmob(next);
   } catch (e2) {
-    console.warn(`${LOG22} FotMob World Cup enrich failed`, e2);
+    console.warn(`${LOG24} FotMob World Cup enrich failed`, e2);
   }
   return next;
 }
@@ -54008,55 +55216,55 @@ async function enrichOperationalTransport(rawTransport) {
   try {
     transport = await supplementOperationalSnapshotFromLocalIpc(transport);
   } catch (e2) {
-    console.warn(`${LOG22} local IPC supplement failed`, e2);
+    console.warn(`${LOG24} local IPC supplement failed`, e2);
   }
   try {
     transport = await enrichOperationalSnapshotPllGameCardRouting(transport);
   } catch (e2) {
-    console.warn(`${LOG22} PLL game card enrich failed`, e2);
+    console.warn(`${LOG24} PLL game card enrich failed`, e2);
   }
   try {
     transport = sanitizeOperationalSnapshotWatchStreams(transport);
   } catch (e2) {
-    console.warn(`${LOG22} watch stream sanitize failed`, e2);
+    console.warn(`${LOG24} watch stream sanitize failed`, e2);
   }
   try {
     transport = enrichOperationalSnapshotManualGameOverrides(transport);
   } catch (e2) {
-    console.warn(`${LOG22} manual game override enrich failed`, e2);
+    console.warn(`${LOG24} manual game override enrich failed`, e2);
   }
   try {
     transport = await enrichOperationalSnapshotTeamStandings(transport, { leagueKeys: ["MLB"] });
   } catch (e2) {
-    console.warn(`${LOG22} MLB team standings enrich failed`, e2);
+    console.warn(`${LOG24} MLB team standings enrich failed`, e2);
   }
   if (isGrarfWebRenderer()) {
     try {
       transport = await enrichOperationalSnapshotTeamStandings(transport, { leagueKeys: ["WNBA"] });
     } catch (e2) {
-      console.warn(`${LOG22} WNBA team standings enrich failed`, e2);
+      console.warn(`${LOG24} WNBA team standings enrich failed`, e2);
     }
     try {
       transport = await enrichOperationalSnapshotPlayerRanks(transport);
     } catch (e2) {
-      console.warn(`${LOG22} player rank enrich failed`, e2);
+      console.warn(`${LOG24} player rank enrich failed`, e2);
     }
   }
   if (!isGrarfWebRenderer()) {
     try {
       transport = await enrichOperationalSnapshotWatchStreamsLocal(transport);
     } catch (e2) {
-      console.warn(`${LOG22} watch/stream enrich failed`, e2);
+      console.warn(`${LOG24} watch/stream enrich failed`, e2);
     }
     try {
       transport = await joinMissingMlbProviderIds(transport);
     } catch (e2) {
-      console.warn(`${LOG22} MLB provider join failed`, e2);
+      console.warn(`${LOG24} MLB provider join failed`, e2);
     }
   }
   return transport;
 }
-var LOG22;
+var LOG24;
 var init_enrichOperationalTransport = __esm({
   "../grarf/desktop/src/services/operationalIngest/enrichOperationalTransport.ts"() {
     init_define_import_meta_env();
@@ -54076,1262 +55284,11 @@ var init_enrichOperationalTransport = __esm({
     init_enrichOperationalSnapshotTeamStandings();
     init_isGrarfWebRenderer();
     init_supplementOperationalSnapshotFromLocalIpc();
-    LOG22 = "[OperationalIngest]";
-  }
-});
-
-// ../grarf/desktop/src/services/operationalIngest/fetchOperationalSnapshot.ts
-function countOperationalGames(snap) {
-  return Object.values(snap.leagues ?? {}).reduce(
-    (total, rows) => total + (Array.isArray(rows) ? rows.length : 0),
-    0
-  );
-}
-function hasElectronGamesIpc() {
-  return Boolean(typeof window !== "undefined" && window.grarf?.gamesGetSnapshot);
-}
-function emptyOperationalSnapshot() {
-  return {
-    generatedAt: (/* @__PURE__ */ new Date()).toISOString(),
-    source: "espn_local_adapter",
-    leagues: {}
-  };
-}
-function snapshotAgeMs(generatedAt) {
-  if (!generatedAt?.trim()) return Number.POSITIVE_INFINITY;
-  const ms2 = Date.parse(generatedAt);
-  if (!Number.isFinite(ms2)) return Number.POSITIVE_INFINITY;
-  return Math.max(0, Date.now() - ms2);
-}
-function ipcSnapshotToOperationalResponse(snap, source = "espn_local_adapter") {
-  const leagues = {};
-  for (const [key2, rows] of Object.entries(snap.leagues ?? {})) {
-    if (Array.isArray(rows) && rows.length > 0) {
-      leagues[key2] = rows;
-    }
-  }
-  return {
-    generatedAt: snap.updatedAt ?? (/* @__PURE__ */ new Date()).toISOString(),
-    source,
-    leagues
-  };
-}
-async function fetchViaEspnLocalIpcAdapter() {
-  const api = window.grarf?.gamesGetSnapshot;
-  if (!api) {
-    if (define_import_meta_env_default.DEV) {
-      console.warn(`${LOG23} source=espn_local_adapter unavailable (no Electron IPC)`);
-    }
-    return emptyOperationalSnapshot();
-  }
-  const snap = await api();
-  return ipcSnapshotToOperationalResponse(snap);
-}
-async function fetchViaGrarfCloudService(options) {
-  const { cloudBaseUrl } = getOperationalIngestConfig();
-  if (!cloudBaseUrl) {
-    throw new Error("[OperationalIngest] grarf_cloud provider requires VITE_GRARF_OPERATIONAL_INGEST_URL");
-  }
-  const url = `${cloudBaseUrl.replace(/\/$/, "")}/operational/snapshot`;
-  const maxAttempts = options?.webBootstrap ? 1 : CLOUD_FETCH_MAX_ATTEMPTS;
-  let lastError;
-  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
-    try {
-      const res = await fetch(url, {
-        headers: { Accept: "application/json" },
-        signal: AbortSignal.timeout(
-          options?.webBootstrap ? WEB_CLOUD_BOOTSTRAP_TIMEOUT_MS : CLOUD_FETCH_TIMEOUT_MS
-        )
-      });
-      if (res.status === 503) {
-        lastError = "grarf_cloud snapshot warming (503)";
-        if (attempt < maxAttempts) {
-          await new Promise((resolve) => window.setTimeout(resolve, CLOUD_FETCH_RETRY_MS * attempt));
-          continue;
-        }
-        throw new Error(lastError);
-      }
-      if (!res.ok) {
-        throw new Error(`[OperationalIngest] grarf_cloud fetch failed: ${res.status}`);
-      }
-      const json = await res.json();
-      const transport = {
-        generatedAt: json.generatedAt ?? (/* @__PURE__ */ new Date()).toISOString(),
-        source: json.source ?? "grarf_operational_service",
-        leagues: json.leagues ?? {}
-      };
-      return transport;
-    } catch (e2) {
-      lastError = e2 instanceof Error ? e2.message : String(e2);
-      if (attempt < maxAttempts) {
-        await new Promise((resolve) => window.setTimeout(resolve, CLOUD_FETCH_RETRY_MS * attempt));
-        continue;
-      }
-      throw e2;
-    }
-  }
-  throw new Error(lastError ?? "[OperationalIngest] grarf_cloud fetch failed");
-}
-async function fetchViaWebOperationalIngest() {
-  try {
-    const espn = await fetchWebEspnOperationalSnapshot();
-    if (countOperationalGames(espn) > 0) {
-      return espn;
-    }
-  } catch (e2) {
-    if (define_import_meta_env_default.DEV) {
-      console.warn(`${LOG23} web ESPN slate unavailable \u2014 falling back to grarf_cloud`, e2);
-    }
-  }
-  const cloud = await fetchViaGrarfCloudService();
-  if (countOperationalGames(cloud) > 0) {
-    return cloud;
-  }
-  return fetchWebEspnOperationalSnapshot();
-}
-async function fetchViaGrarfCloudWithLocalFallback() {
-  let cloud = null;
-  let cloudError = null;
-  try {
-    cloud = await fetchViaGrarfCloudService();
-  } catch (e2) {
-    cloudError = e2 instanceof Error ? e2.message : String(e2);
-  }
-  const cloudAgeMs = cloud ? snapshotAgeMs(cloud.generatedAt) : Number.POSITIVE_INFINITY;
-  const cloudFresh = cloud != null && cloudAgeMs <= CLOUD_STALE_THRESHOLD_MS;
-  const electronIpc = hasElectronGamesIpc();
-  if (cloudFresh && cloud) {
-    return cloud;
-  }
-  if (!electronIpc) {
-    if (cloud) {
-      if (define_import_meta_env_default.DEV && !cloudFresh) {
-        console.warn(`${LOG23} browser/web using cloud snapshot (stale but authoritative)`, {
-          cloudAgeMs,
-          cloudError
-        });
-      }
-      return cloud;
-    }
-    if (isGrarfWebRenderer()) {
-      throw new Error(cloudError ?? "[OperationalIngest] grarf_cloud unavailable in browser");
-    }
-    throw new Error(cloudError ?? "[OperationalIngest] grarf_cloud unavailable in browser");
-  }
-  const local = await fetchViaEspnLocalIpcAdapter();
-  const localAgeMs = snapshotAgeMs(local.generatedAt);
-  if (cloud && cloudAgeMs <= localAgeMs) {
-    return cloud;
-  }
-  if (define_import_meta_env_default.DEV && (cloudError || cloud && !cloudFresh)) {
-    console.warn(`${LOG23} using local IPC fallback (cloud stale or failed)`, {
-      cloudError,
-      cloudAgeMs: cloud ? cloudAgeMs : null,
-      localAgeMs,
-      localGeneratedAt: local.generatedAt
-    });
-  }
-  return {
-    ...local,
-    source: "espn_local_adapter"
-  };
-}
-async function fetchOperationalSnapshot() {
-  const config = getOperationalIngestConfig();
-  if (isGrarfWebRenderer()) {
-    return fetchViaWebOperationalIngest();
-  }
-  if (config.provider === "grarf_cloud") {
-    return fetchViaGrarfCloudWithLocalFallback();
-  }
-  return fetchViaEspnLocalIpcAdapter();
-}
-function operationalResponseFromIpcPush(snap) {
-  return ipcSnapshotToOperationalResponse(snap);
-}
-var LOG23, CLOUD_STALE_THRESHOLD_MS, CLOUD_FETCH_TIMEOUT_MS, WEB_CLOUD_BOOTSTRAP_TIMEOUT_MS, CLOUD_FETCH_MAX_ATTEMPTS, CLOUD_FETCH_RETRY_MS;
-var init_fetchOperationalSnapshot = __esm({
-  "../grarf/desktop/src/services/operationalIngest/fetchOperationalSnapshot.ts"() {
-    init_define_import_meta_env();
-    init_operationalIngestConfig();
-    init_isGrarfWebRenderer();
-    init_fetchWebEspnOperationalSnapshot();
-    LOG23 = "[OperationalIngest]";
-    CLOUD_STALE_THRESHOLD_MS = 9e4;
-    CLOUD_FETCH_TIMEOUT_MS = 2e4;
-    WEB_CLOUD_BOOTSTRAP_TIMEOUT_MS = 2500;
-    CLOUD_FETCH_MAX_ATTEMPTS = 3;
-    CLOUD_FETCH_RETRY_MS = 1500;
-  }
-});
-
-// ../grarf/shared/domain/operational/normalizeOperationalSnapshot.ts
-function normalizeOperationalSnapshot(response, options) {
-  const leagues = {};
-  for (const [key2, rows] of Object.entries(response.leagues ?? {})) {
-    if (isEspnOperationalIngestLeagueDisabled(key2)) continue;
-    if (Array.isArray(rows) && rows.length > 0) {
-      leagues[key2] = rows;
-    }
-  }
-  return {
-    leagues,
-    updatedAt: response.generatedAt,
-    sourceProvider: options?.sourceProvider ?? "espn_scoreboard_ipc"
-  };
-}
-var init_normalizeOperationalSnapshot = __esm({
-  "../grarf/shared/domain/operational/normalizeOperationalSnapshot.ts"() {
-    init_define_import_meta_env();
-    init_espnOperationalIngestDisabledLeagues();
-  }
-});
-
-// ../grarf/desktop/src/services/operationalIngest/normalizeOperationalSnapshot.ts
-var init_normalizeOperationalSnapshot2 = __esm({
-  "../grarf/desktop/src/services/operationalIngest/normalizeOperationalSnapshot.ts"() {
-    init_define_import_meta_env();
-    init_normalizeOperationalSnapshot();
-  }
-});
-
-// ../grarf/desktop/src/services/operationalIngest/startOperationalSnapshotPolling.ts
-function startOperationalSnapshotPolling(hydrate, options) {
-  const config = getOperationalIngestConfig();
-  if (config.provider !== "grarf_cloud") {
-    return () => {
-    };
-  }
-  const intervalMs = options?.intervalMs ?? config.pollIntervalMs ?? DEFAULT_POLL_INTERVAL_MS;
-  let stopped = false;
-  let pollInFlight = null;
-  let retryTimer = null;
-  let intervalId = null;
-  if (define_import_meta_env_default.DEV) {
-    console.log(`${LOG24} provider=grarf_cloud polling centralized snapshot`);
-  }
-  const clearRetry = () => {
-    if (retryTimer != null) {
-      clearTimeout(retryTimer);
-      retryTimer = null;
-    }
-  };
-  const runPoll = async () => {
-    if (stopped) return;
-    if (pollInFlight) {
-      await pollInFlight;
-      return;
-    }
-    pollInFlight = (async () => {
-      try {
-        const rawTransport = await fetchOperationalSnapshot();
-        if (stopped) return;
-        const applyHydrate = async (transport, completeness) => {
-          recordCentralizedTransportIngest(transport);
-          const canonical = normalizeOperationalSnapshot(transport);
-          await Promise.resolve(hydrate(canonical, completeness));
-        };
-        clearRetry();
-        try {
-          const enriched = await enrichOperationalTransport(rawTransport);
-          if (stopped) return;
-          await applyHydrate(
-            enriched,
-            isGrarfWebRenderer() ? { source: "grarf_cloud" } : void 0
-          );
-        } catch (e2) {
-          const msg = e2 instanceof Error ? e2.message : String(e2);
-          console.warn(`${LOG24} enrich hydrate failed`, msg);
-          if (stopped) return;
-          await applyHydrate(
-            rawTransport,
-            isGrarfWebRenderer() ? { source: "grarf_cloud" } : void 0
-          );
-        }
-      } catch (e2) {
-        const msg = e2 instanceof Error ? e2.message : String(e2);
-        console.warn(`${LOG24} poll failed`, msg);
-        if (!stopped && retryTimer == null) {
-          retryTimer = setTimeout(() => {
-            retryTimer = null;
-            void runPoll();
-          }, RETRY_MS);
-        }
-      }
-    })().finally(() => {
-      pollInFlight = null;
-    });
-    await pollInFlight;
-  };
-  void runPoll();
-  intervalId = setInterval(() => {
-    void runPoll();
-  }, intervalMs);
-  return () => {
-    stopped = true;
-    if (intervalId != null) clearInterval(intervalId);
-    clearRetry();
-  };
-}
-var LOG24, DEFAULT_POLL_INTERVAL_MS, RETRY_MS;
-var init_startOperationalSnapshotPolling = __esm({
-  "../grarf/desktop/src/services/operationalIngest/startOperationalSnapshotPolling.ts"() {
-    init_define_import_meta_env();
-    init_operationalIngestConfig();
-    init_catchUpDiagnostics();
-    init_isGrarfWebRenderer();
-    init_enrichOperationalTransport();
-    init_fetchOperationalSnapshot();
-    init_normalizeOperationalSnapshot2();
     LOG24 = "[OperationalIngest]";
-    DEFAULT_POLL_INTERVAL_MS = 6e4;
-    RETRY_MS = 15e3;
   }
 });
 
-// ../grarf/desktop/src/lib/updateEngine/updateEngineCadences.ts
-var WEB_UPDATE_ENGINE_LIVE_GAMES_POLL_MS, WEB_UPDATE_ENGINE_SIGNALS_POLL_MS, WEB_UPDATE_ENGINE_BROWSER_POLL_MS, WEB_UPDATE_ENGINE_HIGHLIGHTS_TV_POLL_MS;
-var init_updateEngineCadences = __esm({
-  "../grarf/desktop/src/lib/updateEngine/updateEngineCadences.ts"() {
-    init_define_import_meta_env();
-    WEB_UPDATE_ENGINE_LIVE_GAMES_POLL_MS = 15e3;
-    WEB_UPDATE_ENGINE_SIGNALS_POLL_MS = 3e4;
-    WEB_UPDATE_ENGINE_BROWSER_POLL_MS = 2 * 6e4;
-    WEB_UPDATE_ENGINE_HIGHLIGHTS_TV_POLL_MS = 5 * 6e4;
-  }
-});
-
-// ../grarf/desktop/src/lib/updateEngine/liveGamesPollRegistry.ts
-function isWebLiveGamesHydrateRegistered() {
-  return hydrateFn != null;
-}
-function registerWebLiveGamesHydrate(fn2) {
-  hydrateFn = fn2;
-  return () => {
-    if (hydrateFn === fn2) hydrateFn = null;
-  };
-}
-function startWebLiveGamesPoller() {
-  if (!hydrateFn) return () => {
-  };
-  stopPoll?.();
-  stopPoll = startOperationalSnapshotPolling(hydrateFn, {
-    intervalMs: WEB_UPDATE_ENGINE_LIVE_GAMES_POLL_MS
-  });
-  return () => {
-    stopPoll?.();
-    stopPoll = null;
-  };
-}
-var hydrateFn, stopPoll;
-var init_liveGamesPollRegistry = __esm({
-  "../grarf/desktop/src/lib/updateEngine/liveGamesPollRegistry.ts"() {
-    init_define_import_meta_env();
-    init_startOperationalSnapshotPolling();
-    init_updateEngineCadences();
-    hydrateFn = null;
-    stopPoll = null;
-  }
-});
-
-// ../grarf/desktop/src/store/bindCanonicalIntelligenceRegistrySync.ts
-function bindCanonicalIntelligenceRegistrySync() {
-  let syncScheduled = false;
-  return useCanonicalLiveGameStore.subscribe(() => {
-    if (syncScheduled) return;
-    syncScheduled = true;
-    queueMicrotask(() => {
-      syncScheduled = false;
-      const games = Object.values(useCanonicalLiveGameStore.getState().gamesById).map(
-        (record) => record.game
-      );
-      try {
-        useCanonicalIntelligenceRegistryStore.getState().syncFromIngestedGames(games);
-      } catch (error) {
-        if (define_import_meta_env_default.DEV) {
-          console.warn("[CanonicalIntelligence] registry sync failed", error);
-        }
-      }
-    });
-  });
-}
-var init_bindCanonicalIntelligenceRegistrySync = __esm({
-  "../grarf/desktop/src/store/bindCanonicalIntelligenceRegistrySync.ts"() {
-    init_define_import_meta_env();
-    init_canonicalLiveGameStore();
-    init_canonicalIntelligenceRegistryStore();
-  }
-});
-
-// ../grarf/desktop/src/lib/newswire/newswireTimelineStorage.ts
-function isValidNewswireStory(value) {
-  if (!value || typeof value !== "object") return false;
-  const row = value;
-  return typeof row.id === "string" && row.id.length > 0 && typeof row.source === "string" && typeof row.headline === "string" && typeof row.timestamp === "string" && typeof row.url === "string";
-}
-function sanitizeStories(raw) {
-  if (!Array.isArray(raw)) return [];
-  const stories = [];
-  for (const item of raw) {
-    if (isValidNewswireStory(item)) stories.push(item);
-  }
-  return stories;
-}
-function pruneStories(stories, now = Date.now()) {
-  return stories.filter((story) => {
-    const age = now - new Date(story.timestamp).getTime();
-    return Number.isFinite(age) && age >= 0 && age <= MAX_STORY_AGE_MS;
-  });
-}
-function readNewswireTimelineSync(now = Date.now()) {
-  if (typeof localStorage === "undefined") return [];
-  try {
-    const raw = localStorage.getItem(NEWSWIRE_TIMELINE_STORAGE_KEY);
-    if (!raw) return [];
-    const parsed = JSON.parse(raw);
-    const version = parsed.version;
-    if (version !== NEWSWIRE_TIMELINE_STORAGE_VERSION) return [];
-    const storiesRaw = parsed.stories ?? parsed.events;
-    const sanitized = sanitizeStories(storiesRaw);
-    const pruned = pruneStories(sanitized, now);
-    if (pruned.length < sanitized.length) {
-      writeNewswireTimelineSync(pruned);
-    }
-    return pruned;
-  } catch {
-    return [];
-  }
-}
-function writeNewswireTimelineSync(stories) {
-  if (typeof localStorage === "undefined") return;
-  try {
-    const payload = {
-      version: NEWSWIRE_TIMELINE_STORAGE_VERSION,
-      stories
-    };
-    localStorage.setItem(NEWSWIRE_TIMELINE_STORAGE_KEY, JSON.stringify(payload));
-  } catch {
-  }
-}
-var NEWSWIRE_TIMELINE_STORAGE_KEY, NEWSWIRE_TIMELINE_STORAGE_VERSION, MAX_STORY_AGE_MS;
-var init_newswireTimelineStorage = __esm({
-  "../grarf/desktop/src/lib/newswire/newswireTimelineStorage.ts"() {
-    init_define_import_meta_env();
-    NEWSWIRE_TIMELINE_STORAGE_KEY = "grarf-newswire-timeline";
-    NEWSWIRE_TIMELINE_STORAGE_VERSION = 2;
-    MAX_STORY_AGE_MS = 7 * 24 * 60 * 60 * 1e3;
-  }
-});
-
-// ../grarf/desktop/src/store/newswireTimelineStore.ts
-function storiesByIdFromList(stories) {
-  const byId = {};
-  for (const story of stories) {
-    byId[story.id] = story;
-  }
-  return byId;
-}
-function sortStoriesChronologically(stories) {
-  return [...stories].sort(
-    (a2, b2) => new Date(a2.timestamp).getTime() - new Date(b2.timestamp).getTime()
-  );
-}
-function persistTimeline2(storiesById) {
-  writeNewswireTimelineSync(sortStoriesChronologically(Object.values(storiesById)));
-}
-function hydrateTimelineFromStorage2(now = Date.now()) {
-  const pruned = readNewswireTimelineSync(now);
-  return storiesByIdFromList(pruned);
-}
-function getNewswireTimelineStore() {
-  return useNewswireTimelineStore;
-}
-var import_zustand23, initialStoriesById, useNewswireTimelineStore;
-var init_newswireTimelineStore = __esm({
-  "../grarf/desktop/src/store/newswireTimelineStore.ts"() {
-    init_define_import_meta_env();
-    import_zustand23 = __toESM(require_zustand(), 1);
-    init_newswireTimelineStorage();
-    init_liveTrackAnimationStore();
-    initialStoriesById = hydrateTimelineFromStorage2();
-    useNewswireTimelineStore = (0, import_zustand23.create)((set, get) => ({
-      storiesById: initialStoriesById,
-      version: 0,
-      appendStory: (story) => {
-        if (get().storiesById[story.id]) return false;
-        const storiesById = { ...get().storiesById, [story.id]: story };
-        persistTimeline2(storiesById);
-        set((state3) => ({
-          storiesById,
-          version: state3.version + 1
-        }));
-        useLiveTrackAnimationStore.getState().onNewswireStoryAppended(story.id, Object.keys(storiesById));
-        return true;
-      },
-      appendStoriesBatch: (stories, options) => {
-        const current = get().storiesById;
-        const appended = [];
-        for (const story of stories) {
-          if (current[story.id] || appended.some((row) => row.id === story.id)) continue;
-          appended.push(story);
-        }
-        if (appended.length === 0) return 0;
-        const storiesById = { ...current };
-        for (const story of appended) {
-          storiesById[story.id] = story;
-        }
-        persistTimeline2(storiesById);
-        set((state3) => ({
-          storiesById,
-          version: state3.version + 1
-        }));
-        const appendedIds = appended.map((story) => story.id);
-        const allStoryIds = Object.keys(storiesById);
-        if (options?.suppressAnimation) {
-          useLiveTrackAnimationStore.getState().markHydratedTimeline(appendedIds);
-        } else if (appendedIds.length === 1) {
-          useLiveTrackAnimationStore.getState().onNewswireStoryAppended(appendedIds[0], allStoryIds);
-        } else {
-          const newestAppended = [...appended].sort(
-            (a2, b2) => new Date(b2.timestamp).getTime() - new Date(a2.timestamp).getTime()
-          )[0];
-          useLiveTrackAnimationStore.getState().onNewswireStoryAppended(newestAppended.id, allStoryIds);
-          for (const story of appended) {
-            if (story.id === newestAppended.id) continue;
-            useLiveTrackAnimationStore.getState().markAnimationComplete(story.id);
-          }
-        }
-        return appended.length;
-      },
-      pruneExpired: (now = Date.now()) => {
-        const prunedList = readNewswireTimelineSync(now);
-        const prunedById = storiesByIdFromList(prunedList);
-        const current = get().storiesById;
-        if (Object.keys(prunedById).length === Object.keys(current).length) return;
-        persistTimeline2(prunedById);
-        useLiveTrackAnimationStore.getState().pruneCompletedIds(new Set(Object.keys(prunedById)));
-        set((state3) => ({
-          storiesById: prunedById,
-          version: state3.version + 1
-        }));
-      }
-    }));
-  }
-});
-
-// ../grarf/shared/search/feeds/feedRegistry.ts
-function getEnabledRssFeeds() {
-  return GRARF_RSS_FEED_REGISTRY.filter((f2) => f2.enabled !== false).map((f2) => ({ ...f2 }));
-}
-function getRssFeedById(feedId) {
-  const hit = GRARF_RSS_FEED_REGISTRY.find((f2) => f2.id === feedId);
-  return hit ? { ...hit } : void 0;
-}
-var ESPN_MLB_NEWS_FEED_ID, GRARF_RSS_FEED_REGISTRY;
-var init_feedRegistry = __esm({
-  "../grarf/shared/search/feeds/feedRegistry.ts"() {
-    init_define_import_meta_env();
-    ESPN_MLB_NEWS_FEED_ID = "espn-mlb-news";
-    GRARF_RSS_FEED_REGISTRY = [
-      {
-        id: ESPN_MLB_NEWS_FEED_ID,
-        url: "https://www.espn.com/espn/rss/mlb/news",
-        source: "ESPN",
-        category: "news",
-        league: "MLB",
-        sport: "mlb",
-        enabled: true
-      }
-    ];
-  }
-});
-
-// ../grarf/desktop/src/services/rssIngest/feedRegistry.ts
-var init_feedRegistry2 = __esm({
-  "../grarf/desktop/src/services/rssIngest/feedRegistry.ts"() {
-    init_define_import_meta_env();
-    init_feedRegistry();
-  }
-});
-
-// ../grarf/desktop/src/lib/rss/resolveProxiedRssFetchUrl.ts
-function extractRssAppFeedId(feedUrl) {
-  const trimmed = feedUrl.trim();
-  const patterns = [
-    /^https?:\/\/rss\.app\/feeds\/([A-Za-z0-9_-]+)\.xml\/?$/i,
-    /^https?:\/\/rss\.app\/r\/feed\/([A-Za-z0-9_-]+)\/?$/i
-  ];
-  for (const pattern of patterns) {
-    const match = trimmed.match(pattern);
-    const feedId = match?.[1]?.trim();
-    if (feedId && RSS_APP_FEED_ID_RE.test(feedId)) return feedId;
-  }
-  return null;
-}
-function resolveProxiedRssFetchUrl(feedUrl) {
-  const trimmed = feedUrl.trim();
-  if (!trimmed || !isGrarfWebRenderer()) return trimmed;
-  const feedId = extractRssAppFeedId(trimmed);
-  if (!feedId) return trimmed;
-  const proxiedPath = `/livetrack/rss-app/${encodeURIComponent(feedId)}.xml`;
-  const operationalBase = getOperationalIngestConfig().cloudBaseUrl?.replace(/\/+$/, "");
-  if (operationalBase) {
-    return `${operationalBase}${proxiedPath}`;
-  }
-  return proxiedPath;
-}
-var RSS_APP_FEED_ID_RE;
-var init_resolveProxiedRssFetchUrl = __esm({
-  "../grarf/desktop/src/lib/rss/resolveProxiedRssFetchUrl.ts"() {
-    init_define_import_meta_env();
-    init_operationalIngestConfig();
-    init_isGrarfWebRenderer();
-    RSS_APP_FEED_ID_RE = /^[A-Za-z0-9_-]{6,64}$/;
-  }
-});
-
-// ../grarf/desktop/src/services/rssIngest/fetchRssXml.ts
-function extractLiveTrackRssAppPath(url) {
-  try {
-    const pathname = new URL(url).pathname;
-    if (!pathname.startsWith("/livetrack/rss-app/")) return null;
-    return pathname;
-  } catch {
-    return null;
-  }
-}
-async function fetchRssXmlDirect(url) {
-  try {
-    const res = await fetch(url, {
-      mode: "cors",
-      headers: { Accept: "application/rss+xml, application/xml, text/xml, */*" }
-    });
-    if (!res.ok) {
-      return {
-        ok: false,
-        status: res.status,
-        statusText: res.statusText,
-        error: `http ${res.status}`
-      };
-    }
-    const xml = await res.text();
-    return { ok: true, status: res.status, xml };
-  } catch (e2) {
-    return { ok: false, error: e2 instanceof Error ? e2.message : String(e2) };
-  }
-}
-async function fetchRssXml2(url) {
-  const trimmed = url.trim();
-  if (!trimmed || !/^https?:\/\//i.test(trimmed)) {
-    return { ok: false, error: "invalid url" };
-  }
-  const fetchUrl = resolveProxiedRssFetchUrl(trimmed);
-  const bridge3 = typeof window !== "undefined" ? window.grarf?.tickerRssFetch : void 0;
-  if (bridge3) {
-    try {
-      const r3 = await bridge3(fetchUrl);
-      if (define_import_meta_env_default.DEV && r3 && typeof r3 === "object" && "_rssDebug" in r3) {
-        console.log("[RSS DEBUG][fetchRssXml] electron-helper attempts", r3._rssDebug);
-      }
-      if (r3 && typeof r3 === "object" && "ok" in r3 && r3.ok === true && typeof r3.xml === "string") {
-        return { ok: true, status: r3.status ?? 200, xml: r3.xml };
-      }
-      if (define_import_meta_env_default.DEV) {
-        console.warn("[RSS DEBUG][fetchRssXml] electron-helper failed, trying direct fetch", r3);
-      }
-    } catch (e2) {
-      if (define_import_meta_env_default.DEV) {
-        console.warn("[RSS DEBUG][fetchRssXml] electron-helper threw, trying direct fetch", e2);
-      }
-    }
-  }
-  return fetchRssXmlDirect(fetchUrl).then(async (result) => {
-    if (result.ok || !isGrarfWebRenderer() || !/^https?:\/\//i.test(fetchUrl)) {
-      return result;
-    }
-    const sameOriginPath = extractLiveTrackRssAppPath(fetchUrl);
-    if (!sameOriginPath || sameOriginPath === fetchUrl) return result;
-    const fallback = await fetchRssXmlDirect(sameOriginPath);
-    return fallback.ok ? fallback : result;
-  });
-}
-var init_fetchRssXml = __esm({
-  "../grarf/desktop/src/services/rssIngest/fetchRssXml.ts"() {
-    init_define_import_meta_env();
-    init_resolveProxiedRssFetchUrl();
-    init_isGrarfWebRenderer();
-  }
-});
-
-// ../grarf/shared/search/feeds/normalizeFeedItems.ts
-function stableHash(input) {
-  let h2 = 2166136261;
-  for (let i2 = 0; i2 < input.length; i2++) {
-    h2 ^= input.charCodeAt(i2);
-    h2 = Math.imul(h2, 16777619);
-  }
-  return (h2 >>> 0).toString(36);
-}
-function entryId(feedId, entry2) {
-  const key2 = entry2.guid?.trim() || entry2.url;
-  return `rss:${feedId}:${stableHash(key2)}`;
-}
-function normalizeFeedItems(feed, entries) {
-  const league2 = feed.league ?? null;
-  const sport = feed.sport ?? null;
-  return entries.map((entry2) => ({
-    id: entryId(feed.id, entry2),
-    feedId: feed.id,
-    title: entry2.title,
-    url: entry2.url,
-    publishedAt: new Date(entry2.publishedAtMs).toISOString(),
-    source: feed.source,
-    league: league2,
-    sport,
-    ...entry2.summary ? { summary: entry2.summary } : {},
-    ...entry2.imageUrl ? { imageUrl: entry2.imageUrl } : {},
-    ...entry2.videoUrl ? { videoUrl: entry2.videoUrl } : {},
-    ...entry2.author ? { author: entry2.author } : {}
-  }));
-}
-function sortNormalizedItemsNewestFirst(items) {
-  return [...items].sort(
-    (a2, b2) => new Date(b2.publishedAt).getTime() - new Date(a2.publishedAt).getTime()
-  );
-}
-var init_normalizeFeedItems = __esm({
-  "../grarf/shared/search/feeds/normalizeFeedItems.ts"() {
-    init_define_import_meta_env();
-  }
-});
-
-// ../grarf/desktop/src/services/rssIngest/normalizeFeedItems.ts
-var init_normalizeFeedItems2 = __esm({
-  "../grarf/desktop/src/services/rssIngest/normalizeFeedItems.ts"() {
-    init_define_import_meta_env();
-    init_normalizeFeedItems();
-  }
-});
-
-// ../grarf/shared/search/normalization/preservePostText.ts
-function preserveLiveTrackPostText(raw) {
-  if (!raw) return "";
-  let text2 = raw.replace(/\r\n?/g, "\n");
-  text2 = text2.split("\n").map((line) => line.replace(/[ \t]+$/g, "")).join("\n");
-  const maxNewlines = MAX_CONSECUTIVE_BLANK_LINES + 1;
-  text2 = text2.replace(new RegExp(`\\n{${maxNewlines + 1},}`, "g"), "\n".repeat(maxNewlines));
-  return text2.trim();
-}
-var MAX_CONSECUTIVE_BLANK_LINES;
-var init_preservePostText = __esm({
-  "../grarf/shared/search/normalization/preservePostText.ts"() {
-    init_define_import_meta_env();
-    MAX_CONSECUTIVE_BLANK_LINES = 2;
-  }
-});
-
-// ../grarf/desktop/src/lib/livetrack/preserveLiveTrackPostText.ts
-var init_preserveLiveTrackPostText = __esm({
-  "../grarf/desktop/src/lib/livetrack/preserveLiveTrackPostText.ts"() {
-    init_define_import_meta_env();
-    init_preservePostText();
-  }
-});
-
-// ../grarf/desktop/src/services/rssIngest/parseRssXml.ts
-function resolveMaxSummaryChars(options = {}) {
-  return options.maxSummaryChars ?? DEFAULT_RSS_SUMMARY_MAX_CHARS;
-}
-function capSummaryText(text2, maxSummaryChars) {
-  if (!text2) return void 0;
-  if (!Number.isFinite(maxSummaryChars)) return text2;
-  return text2.slice(0, maxSummaryChars);
-}
-function textContent3(el) {
-  return el?.textContent?.replace(/\s+/g, " ").trim() ?? "";
-}
-function itemTitleText(item) {
-  const el = item.querySelector("title");
-  if (!el) return "";
-  return preserveLiveTrackPostText(el.textContent ?? "");
-}
-function elementContentMarkup(el) {
-  if (!el) return "";
-  return el.innerHTML?.trim() || el.textContent?.trim() || "";
-}
-function decodeXmlEntities(s2) {
-  return s2.replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&apos;/g, "'").replace(/&amp;/g, "&");
-}
-function htmlToPlainPreserveFormatting(html) {
-  let text2 = decodeXmlEntities(html);
-  text2 = text2.replace(/<br\s*\/?>/gi, "\n");
-  text2 = text2.replace(/<\/(p|div|blockquote|section|article|h[1-6])>/gi, "\n\n");
-  text2 = text2.replace(/<\/li>/gi, "\n");
-  text2 = text2.replace(/<[^>]+>/g, "");
-  return preserveLiveTrackPostText(text2);
-}
-function firstImgSrc(html) {
-  const m2 = html.match(/<img[^>]+src=["']([^"']+)["']/i);
-  return m2?.[1]?.trim() || void 0;
-}
-function atomEntryLink3(entry2) {
-  const links = entry2.querySelectorAll("link");
-  for (let i2 = 0; i2 < links.length; i2++) {
-    const link = links[i2];
-    const href = link.getAttribute("href")?.trim();
-    if (!href) continue;
-    const rel = (link.getAttribute("rel") || "alternate").toLowerCase();
-    if (rel === "alternate" || rel === "") return href;
-  }
-  return "";
-}
-function itemMediaContents(item) {
-  const medias = item.getElementsByTagNameNS(MRSS_NS, "content");
-  return Array.from({ length: medias.length }, (_2, i2) => medias[i2]);
-}
-function isVideoMediaUrl(url, type, medium) {
-  const hay = `${type} ${medium} ${url}`.toLowerCase();
-  return type.includes("video") || medium === "video" || /\.mp4(\?|$)/i.test(url) || /video\.twimg\.com/i.test(url);
-}
-function itemVideoUrl(item) {
-  for (const el of itemMediaContents(item)) {
-    const u2 = el.getAttribute("url")?.trim() ?? "";
-    const type = (el.getAttribute("type") ?? "").toLowerCase();
-    const medium = (el.getAttribute("medium") ?? "").toLowerCase();
-    if (u2 && isVideoMediaUrl(u2, type, medium)) return u2;
-  }
-  const enc = item.querySelector("enclosure");
-  if (enc) {
-    const u2 = enc.getAttribute("url")?.trim() ?? "";
-    const type = (enc.getAttribute("type") ?? "").toLowerCase();
-    if (u2 && type.includes("video")) return u2;
-  }
-  const desc = textContent3(item.querySelector("description"));
-  const videoMatch = desc.match(
-    /https?:\/\/video\.twimg\.com\/[^\s"'<>]+\.mp4[^\s"'<>]*/i
-  );
-  if (videoMatch?.[0]) return videoMatch[0];
-  return void 0;
-}
-function itemImageUrl(item) {
-  const thumb = item.querySelector("media\\:thumbnail, thumbnail");
-  const thumbHref = thumb?.getAttribute("url")?.trim();
-  if (thumbHref) return thumbHref;
-  for (const el of itemMediaContents(item)) {
-    const u2 = el.getAttribute("url")?.trim() ?? "";
-    const type = (el.getAttribute("type") ?? "").toLowerCase();
-    const medium = (el.getAttribute("medium") ?? "").toLowerCase();
-    if (!u2 || isVideoMediaUrl(u2, type, medium)) continue;
-    if (type.includes("image") || medium === "image" || /\.(jpg|jpeg|png|gif|webp)(\?|$)/i.test(u2)) {
-      return u2;
-    }
-  }
-  const enc = item.querySelector("enclosure");
-  if (enc) {
-    const u2 = enc.getAttribute("url")?.trim() ?? "";
-    const type = (enc.getAttribute("type") ?? "").toLowerCase();
-    if (u2 && type.includes("image")) return u2;
-  }
-  const descMarkup = elementContentMarkup(item.querySelector("description"));
-  if (descMarkup.includes("<img")) return firstImgSrc(descMarkup);
-  return void 0;
-}
-function plainFromMarkup(raw) {
-  if (!raw) return "";
-  if (raw.includes("<")) return htmlToPlainPreserveFormatting(raw);
-  return preserveLiveTrackPostText(decodeXmlEntities(raw));
-}
-function stripTwitterAttributionSuffix(text2) {
-  return text2.replace(/\s*—\s*@[\w]+[\s\S]*$/u, "").trim();
-}
-function extractTwitterBlockquotePostText(html) {
-  if (!/twitter-tweet/i.test(html)) return null;
-  const pMatch = html.match(/<blockquote[^>]*>[\s\S]*?<p[^>]*>([\s\S]*?)<\/p>/i);
-  if (!pMatch?.[1]) return null;
-  return stripTwitterAttributionSuffix(htmlToPlainPreserveFormatting(pMatch[1]));
-}
-function itemContentEncodedText(item, maxSummaryChars) {
-  const encoded = item.getElementsByTagNameNS(CONTENT_NS, "encoded")[0] ?? [...item.children].find((el) => el.localName === "encoded");
-  if (!encoded) return void 0;
-  const raw = elementContentMarkup(encoded);
-  if (!raw) return void 0;
-  const tweetBody = extractTwitterBlockquotePostText(raw);
-  const plain = tweetBody ?? plainFromMarkup(raw);
-  return capSummaryText(plain || void 0, maxSummaryChars);
-}
-function itemDescriptionText(item, maxSummaryChars) {
-  const descRaw = elementContentMarkup(item.querySelector("description"));
-  if (!descRaw) return void 0;
-  const tweetBody = extractTwitterBlockquotePostText(descRaw);
-  const plain = stripTwitterAttributionSuffix(tweetBody ?? plainFromMarkup(descRaw));
-  return capSummaryText(plain || void 0, maxSummaryChars);
-}
-function itemSummary(item, maxSummaryChars) {
-  const encoded = itemContentEncodedText(item, maxSummaryChars);
-  if (encoded) return encoded;
-  const description = itemDescriptionText(item, maxSummaryChars);
-  if (description) return description;
-  const summary = item.getElementsByTagNameNS("http://www.w3.org/2005/Atom", "summary")[0];
-  if (summary) {
-    const raw = elementContentMarkup(summary);
-    const tweetBody = raw ? extractTwitterBlockquotePostText(raw) : null;
-    const plain = stripTwitterAttributionSuffix(tweetBody ?? plainFromMarkup(raw));
-    return capSummaryText(plain || void 0, maxSummaryChars);
-  }
-  return void 0;
-}
-function parsePublishedMs(raw) {
-  if (!raw) return Date.now();
-  const ms2 = Date.parse(raw);
-  return Number.isFinite(ms2) ? ms2 : Date.now();
-}
-function parseRss2Items(doc, maxItems, maxSummaryChars) {
-  const out = [];
-  const items = doc.getElementsByTagName("item");
-  for (let i2 = 0; i2 < items.length && out.length < maxItems; i2++) {
-    const item = items[i2];
-    const title = itemTitleText(item);
-    let url = textContent3(item.querySelector("link"));
-    if (!url) {
-      url = item.querySelector("link[href]")?.getAttribute("href")?.trim() ?? "";
-    }
-    const pubRaw = textContent3(item.querySelector("pubDate")) || textContent3(item.querySelector("published")) || textContent3(item.querySelector("dc\\:date"));
-    const publishedAtMs = parsePublishedMs(pubRaw);
-    const guid = textContent3(item.querySelector("guid")) || void 0;
-    const author = textContent3(item.querySelector("dc\\:creator")) || textContent3(item.getElementsByTagNameNS("http://purl.org/dc/elements/1.1/", "creator")[0]) || void 0;
-    if (!title || !url || !/^https?:\/\//i.test(url)) continue;
-    out.push({
-      title,
-      url,
-      publishedAtMs,
-      summary: itemSummary(item, maxSummaryChars),
-      imageUrl: itemImageUrl(item),
-      videoUrl: itemVideoUrl(item),
-      guid,
-      ...author ? { author } : {}
-    });
-  }
-  return out;
-}
-function parseAtomEntries(doc, maxItems, maxSummaryChars) {
-  const out = [];
-  const entries = doc.getElementsByTagName("entry");
-  for (let i2 = 0; i2 < entries.length && out.length < maxItems; i2++) {
-    const entry2 = entries[i2];
-    const title = preserveLiveTrackPostText(entry2.querySelector("title")?.textContent ?? "");
-    let url = atomEntryLink3(entry2);
-    if (!url) {
-      const idText = textContent3(entry2.querySelector("id"));
-      if (/^https?:\/\//i.test(idText)) url = idText;
-    }
-    const pubRaw = textContent3(entry2.querySelector("published")) || textContent3(entry2.querySelector("updated"));
-    const publishedAtMs = parsePublishedMs(pubRaw);
-    const author = textContent3(entry2.querySelector("author > name")) || textContent3(entry2.querySelector("dc\\:creator")) || textContent3(entry2.getElementsByTagNameNS("http://purl.org/dc/elements/1.1/", "creator")[0]) || void 0;
-    if (!title || !url || !/^https?:\/\//i.test(url)) continue;
-    out.push({
-      title,
-      url,
-      publishedAtMs,
-      summary: itemSummary(entry2, maxSummaryChars),
-      imageUrl: itemImageUrl(entry2),
-      videoUrl: itemVideoUrl(entry2),
-      guid: textContent3(entry2.querySelector("id")) || void 0,
-      ...author ? { author } : {}
-    });
-  }
-  return out;
-}
-function parseRssXml(xml, maxItems = 50, options = {}) {
-  const doc = new DOMParser().parseFromString(xml, "text/xml");
-  if (doc.querySelector("parsererror")) return [];
-  const maxSummaryChars = resolveMaxSummaryChars(options);
-  const rssItems = parseRss2Items(doc, maxItems, maxSummaryChars);
-  if (rssItems.length > 0) return rssItems;
-  return parseAtomEntries(doc, maxItems, maxSummaryChars);
-}
-var MRSS_NS, DEFAULT_RSS_SUMMARY_MAX_CHARS, CONTENT_NS;
-var init_parseRssXml = __esm({
-  "../grarf/desktop/src/services/rssIngest/parseRssXml.ts"() {
-    init_define_import_meta_env();
-    init_preserveLiveTrackPostText();
-    MRSS_NS = "http://search.yahoo.com/mrss/";
-    DEFAULT_RSS_SUMMARY_MAX_CHARS = 2e3;
-    CONTENT_NS = "http://purl.org/rss/1.0/modules/content/";
-  }
-});
-
-// ../grarf/desktop/src/services/rssIngest/rssIngestService.ts
-function getRssIngestSnapshot() {
-  return cachedSnapshot;
-}
-async function ingestRssFeed(feed, options = {}) {
-  const maxItems = options.maxItems ?? DEFAULT_MAX_ITEMS;
-  const fetchedAt = (/* @__PURE__ */ new Date()).toISOString();
-  const fetched = await fetchRssXml2(feed.url);
-  if (!fetched.ok) {
-    return {
-      feedId: feed.id,
-      ok: false,
-      items: [],
-      fetchedAt: null,
-      error: fetched.error
-    };
-  }
-  try {
-    const raw = parseRssXml(fetched.xml, maxItems);
-    const items = normalizeFeedItems(feed, raw);
-    return {
-      feedId: feed.id,
-      ok: true,
-      items,
-      fetchedAt
-    };
-  } catch (e2) {
-    return {
-      feedId: feed.id,
-      ok: false,
-      items: [],
-      fetchedAt: null,
-      error: e2 instanceof Error ? e2.message : String(e2)
-    };
-  }
-}
-async function refreshRssIngest(options = {}) {
-  const maxItems = options.maxItemsPerFeed ?? DEFAULT_MAX_ITEMS;
-  const feeds = options.feedIds?.length ? options.feedIds.map((id) => getRssFeedById(id)).filter((f2) => Boolean(f2)) : getEnabledRssFeeds();
-  const byFeedId = {};
-  const merged = [];
-  for (const feed of feeds) {
-    const result = await ingestRssFeed(feed, { maxItems });
-    byFeedId[feed.id] = result;
-    if (result.ok) merged.push(...result.items);
-  }
-  const snapshot = {
-    byFeedId,
-    allItems: sortNormalizedItemsNewestFirst(merged),
-    lastRefreshAt: (/* @__PURE__ */ new Date()).toISOString()
-  };
-  cachedSnapshot = snapshot;
-  return snapshot;
-}
-async function refreshRssFeedById(feedId, options = {}) {
-  const feed = getRssFeedById(feedId);
-  if (!feed) {
-    return {
-      feedId,
-      ok: false,
-      items: [],
-      fetchedAt: null,
-      error: `unknown feed: ${feedId}`
-    };
-  }
-  const result = await ingestRssFeed(feed, options);
-  const prev = cachedSnapshot ?? {
-    byFeedId: {},
-    allItems: [],
-    lastRefreshAt: null
-  };
-  const otherItems = prev.allItems.filter((item) => item.feedId !== feedId);
-  const allItems = result.ok ? sortNormalizedItemsNewestFirst([...otherItems, ...result.items]) : prev.allItems;
-  cachedSnapshot = {
-    byFeedId: { ...prev.byFeedId, [feedId]: result },
-    allItems,
-    lastRefreshAt: (/* @__PURE__ */ new Date()).toISOString()
-  };
-  return result;
-}
-var DEFAULT_MAX_ITEMS, cachedSnapshot;
-var init_rssIngestService = __esm({
-  "../grarf/desktop/src/services/rssIngest/rssIngestService.ts"() {
-    init_define_import_meta_env();
-    init_feedRegistry2();
-    init_fetchRssXml();
-    init_normalizeFeedItems2();
-    init_parseRssXml();
-    DEFAULT_MAX_ITEMS = 50;
-    cachedSnapshot = null;
-  }
-});
-
-// ../grarf/desktop/src/store/rssIngestStore.ts
-function syncFromService(set) {
-  const snapshot = getRssIngestSnapshot();
-  const failed = snapshot ? Object.values(snapshot.byFeedId).filter((r3) => !r3.ok) : [];
-  set({
-    snapshot,
-    error: failed.length > 0 ? failed.map((r3) => `${r3.feedId}: ${r3.error ?? "ingest failed"}`).join("; ") : null
-  });
-}
-var import_zustand24, EMPTY_RSS_ITEMS, useRssIngestStore;
-var init_rssIngestStore = __esm({
-  "../grarf/desktop/src/store/rssIngestStore.ts"() {
-    init_define_import_meta_env();
-    import_zustand24 = __toESM(require_zustand(), 1);
-    init_feedRegistry2();
-    init_rssIngestService();
-    EMPTY_RSS_ITEMS = [];
-    useRssIngestStore = (0, import_zustand24.create)((set, get) => ({
-      snapshot: null,
-      loading: false,
-      error: null,
-      hydrated: false,
-      hydrate: async (options) => {
-        const serviceSnapshot = getRssIngestSnapshot();
-        if (get().hydrated && !options?.force && serviceSnapshot) {
-          syncFromService(set);
-          set({ loading: false });
-          return;
-        }
-        set({ loading: true, error: null });
-        try {
-          await refreshRssIngest();
-          syncFromService(set);
-          set({ hydrated: true, loading: false });
-        } catch (e2) {
-          set({
-            loading: false,
-            hydrated: true,
-            error: e2 instanceof Error ? e2.message : String(e2)
-          });
-        }
-      },
-      refresh: async () => {
-        set({ loading: true, error: null });
-        try {
-          await refreshRssIngest();
-          syncFromService(set);
-          set({ loading: false, hydrated: true });
-        } catch (e2) {
-          set({
-            loading: false,
-            error: e2 instanceof Error ? e2.message : String(e2)
-          });
-        }
-      },
-      refreshFeed: async (feedId) => {
-        set({ loading: true, error: null });
-        try {
-          await refreshRssFeedById(feedId);
-          syncFromService(set);
-          set({ loading: false, hydrated: true });
-        } catch (e2) {
-          set({
-            loading: false,
-            error: e2 instanceof Error ? e2.message : String(e2)
-          });
-        }
-      },
-      getAllItems: () => get().snapshot?.allItems ?? EMPTY_RSS_ITEMS,
-      getItemsForFeed: (feedId) => get().snapshot?.byFeedId[feedId]?.items ?? EMPTY_RSS_ITEMS
-    }));
-  }
-});
-
-// ../grarf/desktop/src/store/bindCanonicalNewsStoryEnrichmentSync.ts
-function collectObservedNewsArticles() {
-  const byId = /* @__PURE__ */ new Map();
-  for (const item of useRssIngestStore.getState().getAllItems()) {
-    const article = mapNormalizedRssItemToIngestedNewsArticle(item);
-    byId.set(article.articleId, article);
-  }
-  for (const story of Object.values(useNewswireTimelineStore.getState().storiesById)) {
-    const article = mapNewswireStoryToIngestedNewsArticle(story);
-    byId.set(article.articleId, article);
-  }
-  return [...byId.values()];
-}
-function bindCanonicalNewsStoryEnrichmentSync() {
-  let syncScheduled = false;
-  const scheduleSync = () => {
-    if (syncScheduled) return;
-    syncScheduled = true;
-    queueMicrotask(() => {
-      syncScheduled = false;
-      const articles = collectObservedNewsArticles();
-      if (articles.length === 0) return;
-      const games = Object.values(useCanonicalLiveGameStore.getState().gamesById).map(
-        (record) => record.game
-      );
-      try {
-        useCanonicalIntelligenceRegistryStore.getState().syncNewsStoryEnrichment(articles, games);
-      } catch (error) {
-        if (define_import_meta_env_default.DEV) {
-          console.warn("[CanonicalIntelligence] news enrichment sync failed", error);
-        }
-      }
-    });
-  };
-  const unsubscribeRss = useRssIngestStore.subscribe(scheduleSync);
-  const unsubscribeNewswire = useNewswireTimelineStore.subscribe(scheduleSync);
-  const unsubscribeGames = useCanonicalLiveGameStore.subscribe(scheduleSync);
-  scheduleSync();
-  return () => {
-    unsubscribeRss();
-    unsubscribeNewswire();
-    unsubscribeGames();
-  };
-}
-var init_bindCanonicalNewsStoryEnrichmentSync = __esm({
-  "../grarf/desktop/src/store/bindCanonicalNewsStoryEnrichmentSync.ts"() {
-    init_define_import_meta_env();
-    init_intelligence();
-    init_canonicalLiveGameStore();
-    init_canonicalIntelligenceRegistryStore();
-    init_newswireTimelineStore();
-    init_rssIngestStore();
-  }
-});
-
-// ../grarf/desktop/src/services/operationalIngest/index.ts
-async function loadCanonicalOperationalSnapshot() {
-  const rawTransport = await fetchOperationalSnapshot();
-  const transport = await enrichOperationalTransport(rawTransport);
-  return { transport, canonical: normalizeOperationalSnapshot(transport) };
-}
-var init_operationalIngest = __esm({
-  "../grarf/desktop/src/services/operationalIngest/index.ts"() {
-    init_define_import_meta_env();
-    init_fetchOperationalSnapshot();
-    init_normalizeOperationalSnapshot2();
-    init_startOperationalSnapshotPolling();
-    init_operationalIngestConfig();
-    init_enrichOperationalTransport();
-    init_fetchOperationalSnapshot();
-    init_normalizeOperationalSnapshot2();
-  }
-});
-
-// ../grarf/desktop/src/lib/manualEvents/mergeLiveGamesSnapshotWithManualEventsSource.ts
-async function mergeLiveGamesSnapshotWithManualEventsSource(snap) {
-  if (!isGrarfWebRenderer()) return snap;
-  try {
-    const source = await resolveManualEventsSourceBundle();
-    const now = /* @__PURE__ */ new Date();
-    return {
-      ...snap,
-      leagues: refreshManualGamesSpineGamesInLeagues(
-        mergeIngestedManualEventsIntoLeagueGames(snap.leagues ?? {}, {
-          source,
-          now
-        }),
-        now
-      )
-    };
-  } catch {
-    return snap;
-  }
-}
-var init_mergeLiveGamesSnapshotWithManualEventsSource = __esm({
-  "../grarf/desktop/src/lib/manualEvents/mergeLiveGamesSnapshotWithManualEventsSource.ts"() {
-    init_define_import_meta_env();
-    init_mergeIngestedManualEventsIntoLeagueGames();
-    init_manualGamesSpineUtils();
-    init_isGrarfWebRenderer();
-    init_manualEventsSourceResolver();
-  }
-});
-
-// ../grarf/desktop/src/components/LiveGamesBridge.tsx
+// ../grarf/desktop/src/services/operationalIngest/hydrateOperationalSnapshotFromTransport.ts
 function supplementOperationalSnapshotLeagues(primary, supplement) {
   const merged = { ...primary };
   let changed = false;
@@ -55351,12 +55308,98 @@ function parseUpdatedAtMs(updatedAt) {
   const ms2 = Date.parse(updatedAt);
   return Number.isFinite(ms2) ? ms2 : 0;
 }
-function countOperationalGames2(leagues) {
-  return Object.values(leagues).reduce(
-    (total, rows) => total + (Array.isArray(rows) ? rows.length : 0),
-    0
-  );
+function shouldRejectStaleSnapshot(canonicalUpdatedAt) {
+  const incomingMs = parseUpdatedAtMs(canonicalUpdatedAt);
+  const currentMs = parseUpdatedAtMs(useLiveGamesStore.getState().updatedAt);
+  return incomingMs > 0 && currentMs > 0 && incomingMs <= currentMs;
 }
+async function hydrateOperationalSnapshotFromTransport(rawTransport, hydrate, context2 = {}) {
+  recordCentralizedTransportIngest(rawTransport);
+  let transport;
+  try {
+    transport = await enrichOperationalTransport(rawTransport);
+  } catch (e2) {
+    console.warn(`${LOG25} transport enrich failed`, e2);
+    transport = rawTransport;
+  }
+  const completeness = context2.completeness ?? { source: "unknown" };
+  const source = completeness.source;
+  if (source === "grarf_cloud") {
+    const canonical2 = normalizeOperationalSnapshot(transport);
+    if (context2.lastCloudLeaguesRef) {
+      context2.lastCloudLeaguesRef.current = canonical2.leagues ?? {};
+    }
+    const prev = useLiveGamesStore.getState();
+    const previousGames = Object.values(useCanonicalLiveGameStore.getState().gamesById).map(
+      (r3) => r3.game
+    );
+    const incomingMs = parseUpdatedAtMs(canonical2.updatedAt);
+    const currentMs = parseUpdatedAtMs(prev.updatedAt);
+    const mergedLeagues = supplementOperationalSnapshotLeagues(
+      canonical2.leagues ?? {},
+      prev.leagues
+    );
+    let merged = preserveMissingOperationalIngestGames(
+      {
+        ...canonical2,
+        leagues: mergedLeagues
+      },
+      previousGames
+    );
+    if (incomingMs > 0 && currentMs > 0 && incomingMs <= currentMs) {
+      merged = mergeFinalRowsWithoutContradictingProtectedGames(
+        merged,
+        prev.leagues,
+        previousGames
+      );
+      merged = { ...merged, updatedAt: prev.updatedAt ?? canonical2.updatedAt };
+    }
+    merged = await mergeLiveGamesSnapshotWithManualEventsSource(merged);
+    hydrate(merged, completeness);
+    return;
+  }
+  let canonical = normalizeOperationalSnapshot(transport);
+  if (source === "espn_local_adapter") {
+    const prevLeagues = useLiveGamesStore.getState().leagues;
+    canonical = preserveStoreFinalsOnLocalHydrate(canonical, prevLeagues);
+    if (context2.lastCloudLeaguesRef) {
+      canonical = mergeFinalRowsIntoSnapshot(canonical, context2.lastCloudLeaguesRef.current);
+    }
+  }
+  if (shouldRejectStaleSnapshot(canonical.updatedAt)) return;
+  hydrate(canonical, completeness);
+}
+var LOG25;
+var init_hydrateOperationalSnapshotFromTransport = __esm({
+  "../grarf/desktop/src/services/operationalIngest/hydrateOperationalSnapshotFromTransport.ts"() {
+    init_define_import_meta_env();
+    init_catchUpDiagnostics();
+    init_mergeCatchUpIngestSnapshot();
+    init_preserveMissingOperationalIngestGames();
+    init_mergeLiveGamesSnapshotWithManualEventsSource();
+    init_canonicalLiveGameStore();
+    init_liveGamesStore();
+    init_enrichOperationalTransport();
+    init_normalizeOperationalSnapshot2();
+    LOG25 = "[OperationalIngest]";
+  }
+});
+
+// ../grarf/desktop/src/services/operationalIngest/index.ts
+var init_operationalIngest = __esm({
+  "../grarf/desktop/src/services/operationalIngest/index.ts"() {
+    init_define_import_meta_env();
+    init_fetchOperationalSnapshot();
+    init_normalizeOperationalSnapshot2();
+    init_startOperationalSnapshotPolling();
+    init_hydrateOperationalSnapshotFromTransport();
+    init_operationalIngestConfig();
+    init_fetchOperationalSnapshot();
+    init_normalizeOperationalSnapshot2();
+  }
+});
+
+// ../grarf/desktop/src/components/LiveGamesBridge.tsx
 function LiveGamesBridge() {
   const hydrate = useLiveGamesStore((s2) => s2.hydrate);
   const lastCloudLeaguesRef = (0, import_react24.useRef)({});
@@ -55365,93 +55408,16 @@ function LiveGamesBridge() {
     const stopIntelligenceRegistrySync = bindCanonicalIntelligenceRegistrySync();
     const stopNewsStoryEnrichmentSync = bindCanonicalNewsStoryEnrichmentSync();
     const config = getOperationalIngestConfig();
-    const applySnapshot = (transport, canonical, completeness) => {
-      const incomingMs = parseUpdatedAtMs(canonical.updatedAt);
-      const currentMs = parseUpdatedAtMs(useLiveGamesStore.getState().updatedAt);
-      if (incomingMs > 0 && currentMs > 0 && incomingMs <= currentMs) return;
-      recordCentralizedTransportIngest(transport);
-      hydrate(canonical, completeness);
+    const hydrateContext = {
+      lastCloudLeaguesRef
     };
-    const applyEnrichedSnapshot = (transport, completeness) => {
-      void (async () => {
-        try {
-          const enriched = await enrichOperationalTransport(transport);
-          applySnapshot(enriched, normalizeOperationalSnapshot(enriched), completeness);
-        } catch (e2) {
-          console.warn(`${LOG25} transport enrich failed`, e2);
-          applySnapshot(transport, normalizeOperationalSnapshot(transport), completeness);
-        }
-      })();
-    };
+    const ingestFromTransport = (transport, completeness) => hydrateOperationalSnapshotFromTransport(transport, hydrate, { ...hydrateContext, completeness });
     if (config.provider === "grarf_cloud") {
       if (define_import_meta_env_default.DEV) {
-        console.log(`${LOG25} grarf_cloud with local IPC supplement (fresher wins)`);
+        console.log("[OperationalIngest] grarf_cloud with local IPC supplement (fresher wins)");
       }
-      const cloudHydrate = async (snap) => {
-        let hydratedSnap = snap;
-        try {
-          const withMlbStandings = await enrichOperationalSnapshotTeamStandings(
-            {
-              generatedAt: snap.updatedAt ?? (/* @__PURE__ */ new Date()).toISOString(),
-              leagues: snap.leagues ?? {},
-              source: "grarf_cloud"
-            },
-            { leagueKeys: ["MLB"] }
-          );
-          hydratedSnap = {
-            ...snap,
-            leagues: withMlbStandings.leagues
-          };
-        } catch (e2) {
-          console.warn(`${LOG25} cloud hydrate standings enrich failed`, e2);
-        }
-        lastCloudLeaguesRef.current = hydratedSnap.leagues ?? {};
-        const prev = useLiveGamesStore.getState();
-        const previousGames = Object.values(useCanonicalLiveGameStore.getState().gamesById).map(
-          (r3) => r3.game
-        );
-        const incomingMs = parseUpdatedAtMs(snap.updatedAt);
-        const currentMs = parseUpdatedAtMs(prev.updatedAt);
-        let mergedLeagues = supplementOperationalSnapshotLeagues(
-          hydratedSnap.leagues ?? {},
-          prev.leagues
-        );
-        let merged = preserveMissingOperationalIngestGames(
-          {
-            ...hydratedSnap,
-            leagues: mergedLeagues
-          },
-          previousGames
-        );
-        if (incomingMs > 0 && currentMs > 0 && incomingMs <= currentMs) {
-          merged = mergeFinalRowsWithoutContradictingProtectedGames(
-            merged,
-            prev.leagues,
-            previousGames
-          );
-          merged = { ...merged, updatedAt: prev.updatedAt ?? hydratedSnap.updatedAt };
-        }
-        merged = await mergeLiveGamesSnapshotWithManualEventsSource(merged);
-        hydrate(merged, { source: "grarf_cloud" });
-      };
-      if (isGrarfWebRenderer()) {
-        void (async () => {
-          const hydrateIfEmpty = async (snap) => {
-            if (useLiveGamesStore.getState().updatedAt != null) return;
-            const merged = await mergeLiveGamesSnapshotWithManualEventsSource(snap);
-            hydrate(merged, { source: "grarf_cloud" });
-          };
-          try {
-            const transport = await prefetchWebEspnOperationalSnapshot();
-            if (transport && countOperationalGames2(transport.leagues ?? {}) > 0) {
-              const enriched = await enrichOperationalTransport(transport);
-              hydrateIfEmpty(normalizeOperationalSnapshot(enriched));
-            }
-          } catch {
-          }
-        })();
-      }
-      const stopCloudPoll = isGrarfWebRenderer() ? registerWebLiveGamesHydrate(cloudHydrate) : startOperationalSnapshotPolling(cloudHydrate);
+      const onCloudTransport = (transport) => ingestFromTransport(transport, { source: "grarf_cloud" });
+      const stopCloudPoll = isGrarfWebRenderer() ? registerWebLiveGamesHydrate(onCloudTransport) : startOperationalSnapshotPolling(onCloudTransport);
       const api2 = window.grarf;
       if (!api2?.gamesSubscribe) {
         return () => {
@@ -55465,7 +55431,7 @@ function LiveGamesBridge() {
         try {
           const snap = await api2.gamesGetSnapshot();
           const transport = operationalResponseFromIpcPush(snap);
-          applyEnrichedSnapshot(transport, { source: "espn_local_adapter" });
+          await ingestFromTransport(transport, { source: "espn_local_adapter" });
         } catch {
         }
       })();
@@ -55473,27 +55439,7 @@ function LiveGamesBridge() {
         const transport = operationalResponseFromIpcPush(
           snap
         );
-        void (async () => {
-          try {
-            const enriched = await enrichOperationalTransport(transport);
-            let canonical = normalizeOperationalSnapshot(enriched);
-            if (transport.source === "espn_local_adapter") {
-              const prevLeagues = useLiveGamesStore.getState().leagues;
-              canonical = preserveStoreFinalsOnLocalHydrate(canonical, prevLeagues);
-              canonical = mergeFinalRowsIntoSnapshot(canonical, lastCloudLeaguesRef.current);
-            }
-            applySnapshot(enriched, canonical, { source: "espn_local_adapter" });
-          } catch (e2) {
-            console.warn(`${LOG25} local IPC enrich failed`, e2);
-            let canonical = normalizeOperationalSnapshot(transport);
-            if (transport.source === "espn_local_adapter") {
-              const prevLeagues = useLiveGamesStore.getState().leagues;
-              canonical = preserveStoreFinalsOnLocalHydrate(canonical, prevLeagues);
-              canonical = mergeFinalRowsIntoSnapshot(canonical, lastCloudLeaguesRef.current);
-            }
-            applySnapshot(transport, canonical, { source: "espn_local_adapter" });
-          }
-        })();
+        void ingestFromTransport(transport, { source: "espn_local_adapter" });
       });
       return () => {
         stopCloudPoll();
@@ -55509,14 +55455,14 @@ function LiveGamesBridge() {
         stopNewsStoryEnrichmentSync();
       };
     }
-    void loadCanonicalOperationalSnapshot().then(({ transport, canonical }) => {
-      applySnapshot(transport, canonical, { source: "espn_scoreboard_ipc" });
-    });
+    void fetchOperationalSnapshot().then(
+      (transport) => ingestFromTransport(transport, { source: "espn_scoreboard_ipc" })
+    );
     const stopIpc = api.gamesSubscribe((snap) => {
       const transport = operationalResponseFromIpcPush(
         snap
       );
-      applyEnrichedSnapshot(transport, { source: "espn_scoreboard_ipc" });
+      void ingestFromTransport(transport, { source: "espn_scoreboard_ipc" });
     });
     return () => {
       stopIpc?.();
@@ -55526,12 +55472,11 @@ function LiveGamesBridge() {
   }, [hydrate]);
   return null;
 }
-var import_react24, LOG25;
+var import_react24;
 var init_LiveGamesBridge = __esm({
   "../grarf/desktop/src/components/LiveGamesBridge.tsx"() {
     init_define_import_meta_env();
     import_react24 = __toESM(require_react(), 1);
-    init_catchUpDiagnostics();
     init_operationalRuntimeObservability();
     init_operationalIngestConfig();
     init_isGrarfWebRenderer();
@@ -55539,15 +55484,8 @@ var init_LiveGamesBridge = __esm({
     init_bindCanonicalIntelligenceRegistrySync();
     init_bindCanonicalNewsStoryEnrichmentSync();
     init_operationalIngest();
-    init_fetchWebEspnOperationalSnapshot();
-    init_enrichOperationalTransport();
-    init_enrichOperationalSnapshotTeamStandings();
-    init_mergeCatchUpIngestSnapshot();
-    init_preserveMissingOperationalIngestGames();
-    init_mergeLiveGamesSnapshotWithManualEventsSource();
-    init_canonicalLiveGameStore();
+    init_hydrateOperationalSnapshotFromTransport();
     init_liveGamesStore();
-    LOG25 = "[OperationalIngest]";
   }
 });
 
