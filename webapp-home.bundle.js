@@ -9138,13 +9138,10 @@ async function loadMlbStandingsIndexForSlate() {
     return null;
   }
 }
-async function ensureMlbSlateStandingsAttached(snap) {
+async function progressivelyEnrichGamesSpineSnapshot(snap) {
   let prepared = syncMlbTeamStandingsFromCacheOnSnapshot(snap);
   const mlbRows = prepared.leagues?.MLB ?? [];
   if (!mlbRows.length || !mlbRows.some(mlbGameMissingStandings)) {
-    return prepared;
-  }
-  if (isGrarfWebRenderer()) {
     return prepared;
   }
   await loadMlbStandingsIndexForSlate();
@@ -9183,8 +9180,8 @@ async function ensureMlbSlateStandingsAttached(snap) {
   }
   return prepared;
 }
-async function prepareGamesSpineSnapshotForHydrate(snap) {
-  return ensureMlbSlateStandingsAttached(snap);
+function prepareGamesSpineSnapshotForHydrate(snap) {
+  return syncMlbTeamStandingsFromCacheOnSnapshot(snap);
 }
 function seedMlbStandingsCacheFromCanonicalEntries(entries) {
   if (!entries.length) return;
@@ -9303,7 +9300,6 @@ var init_gamesSpineGamePresentation = __esm({
     init_enrichMlbGamesWithStandings();
     init_mlbTeamStandingsIndexCache();
     init_resolveMlbEspnStandingsIndex();
-    init_isGrarfWebRenderer();
     init_serializeMlbTeamStandingsIndex();
     init_enrichOperationalSnapshotTeamStandings();
     init_resolveGroupedCompactStartTimePresentation();
@@ -11062,7 +11058,7 @@ function refreshGamesSpineStoreFromStandingsCache() {
   if (refreshKey === lastStandingsRefreshKey || standingsRefreshInFlight) return;
   lastStandingsRefreshKey = refreshKey;
   standingsRefreshInFlight = true;
-  void prepareGamesSpineSnapshotForHydrate({
+  void progressivelyEnrichGamesSpineSnapshot({
     leagues: state3.leagues,
     updatedAt: state3.updatedAt
   }).then((prepared) => {
@@ -56735,16 +56731,7 @@ function shouldRejectStaleSnapshot(canonicalUpdatedAt) {
   const currentMs = parseUpdatedAtMs(useLiveGamesStore.getState().updatedAt);
   return incomingMs > 0 && currentMs > 0 && incomingMs <= currentMs;
 }
-async function hydrateOperationalSnapshotFromTransport(rawTransport, hydrate, context2 = {}) {
-  recordCentralizedTransportIngest(rawTransport);
-  let transport;
-  try {
-    transport = await enrichOperationalTransport(rawTransport);
-  } catch (e2) {
-    console.warn(`${LOG25} transport enrich failed`, e2);
-    transport = rawTransport;
-  }
-  const completeness = context2.completeness ?? { source: "unknown" };
+async function buildGamesSnapshotForHydrate(transport, context2, completeness, options = {}) {
   const source = completeness.source;
   if (source === "grarf_cloud") {
     const canonical2 = normalizeOperationalSnapshot(transport);
@@ -56781,9 +56768,7 @@ async function hydrateOperationalSnapshotFromTransport(rawTransport, hydrate, co
       merged,
       canonical2.leagues?.MLB ?? []
     );
-    merged = await prepareGamesSpineSnapshotForHydrate(merged);
-    await Promise.resolve(hydrate(merged, completeness));
-    return;
+    return prepareGamesSpineSnapshotForHydrate(merged);
   }
   let canonical = normalizeOperationalSnapshot(transport);
   if (source === "espn_local_adapter") {
@@ -56793,9 +56778,33 @@ async function hydrateOperationalSnapshotFromTransport(rawTransport, hydrate, co
       canonical = mergeFinalRowsIntoSnapshot(canonical, context2.lastCloudLeaguesRef.current);
     }
   }
-  if (shouldRejectStaleSnapshot(canonical.updatedAt)) return;
-  const prepared = await prepareGamesSpineSnapshotForHydrate(canonical);
-  await Promise.resolve(hydrate(prepared, completeness));
+  if (!options.skipStaleTimestampGuard && shouldRejectStaleSnapshot(canonical.updatedAt)) {
+    return null;
+  }
+  return prepareGamesSpineSnapshotForHydrate(canonical);
+}
+async function runProgressiveGamesSpineEnrichment(rawTransport, hydrate, context2, completeness) {
+  let transport = rawTransport;
+  try {
+    transport = await enrichOperationalTransport(rawTransport);
+  } catch (e2) {
+    console.warn(`${LOG25} transport enrich failed`, e2);
+  }
+  const enrichedSnap = await buildGamesSnapshotForHydrate(transport, context2, completeness, {
+    skipStaleTimestampGuard: true
+  });
+  if (!enrichedSnap) return;
+  const withEnrichment = await progressivelyEnrichGamesSpineSnapshot(enrichedSnap);
+  await Promise.resolve(hydrate(withEnrichment, completeness));
+}
+async function hydrateOperationalSnapshotFromTransport(rawTransport, hydrate, context2 = {}) {
+  recordCentralizedTransportIngest(rawTransport);
+  const completeness = context2.completeness ?? { source: "unknown" };
+  const coreSnap = await buildGamesSnapshotForHydrate(rawTransport, context2, completeness);
+  if (coreSnap) {
+    await Promise.resolve(hydrate(coreSnap, completeness));
+  }
+  void runProgressiveGamesSpineEnrichment(rawTransport, hydrate, context2, completeness);
 }
 var LOG25;
 var init_hydrateOperationalSnapshotFromTransport = __esm({
