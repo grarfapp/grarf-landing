@@ -43871,6 +43871,8 @@ var init_gamesSpineLeagueLogoUrls = __esm({
       LIGAMX: "/league-logos/liga-mx.png",
       SERIEA: "https://a.espncdn.com/i/leaguelogos/soccer/500/12.png",
       LIGUE1: "/league-logos/ligue-1.png",
+      BEL1: "/league-logos/belgian-pro-league.png",
+      POR1: "/league-logos/primeira-liga.png",
       EREDIVISIE: "https://a.espncdn.com/i/leaguelogos/soccer/500/11.png",
       SPFL: "https://a.espncdn.com/i/leaguelogos/soccer/500/45.png",
       SAUDI: "https://a.espncdn.com/i/leaguelogos/soccer/500/2488.png",
