@@ -42845,7 +42845,9 @@ var init_resolveLeagueDirectoryNavItemLogo = __esm({
       PLL: "pll",
       RUGB_289262: "mlr",
       USLCUP: "usl-cup",
-      LEAGUES_CUP: "leagues-cup"
+      LEAGUES_CUP: "leagues-cup",
+      BEL1: "belgian-pro-league",
+      POR1: "primeira-liga"
     };
     HUB_ID_NAV_ITEM_ID = {
       "pga-champions": "dp-world-tour"
@@ -53726,9 +53728,11 @@ var init_enrichWnbaGamesWithStandings2 = __esm({
 // ../grarf/desktop/src/lib/standings/enrichOperationalSnapshotTeamStandings.ts
 async function enrichLeagueGamesWithStandings(games, cacheKey3, buildIndex, enrichGames) {
   let index = readCachedStandingsValue(cacheKey3, ESPN_STANDINGS_CACHE_TTL_MS);
-  if (!index) {
+  if (!index || index.byEspnTeamId.size === 0) {
     index = await buildIndex();
-    writeCachedStandingsValue(cacheKey3, index);
+    if (index.byEspnTeamId.size > 0) {
+      writeCachedStandingsValue(cacheKey3, index);
+    }
   }
   return enrichGames(games, index);
 }
@@ -55383,7 +55387,24 @@ function LiveGamesBridge() {
       }
       const cloudHydrate = (snap) => {
         void (async () => {
-          lastCloudLeaguesRef.current = snap.leagues ?? {};
+          let hydratedSnap = snap;
+          try {
+            const withMlbStandings = await enrichOperationalSnapshotTeamStandings(
+              {
+                generatedAt: snap.updatedAt ?? (/* @__PURE__ */ new Date()).toISOString(),
+                leagues: snap.leagues ?? {},
+                source: "grarf_cloud"
+              },
+              { leagueKeys: ["MLB"] }
+            );
+            hydratedSnap = {
+              ...snap,
+              leagues: withMlbStandings.leagues
+            };
+          } catch (e2) {
+            console.warn(`${LOG25} cloud hydrate standings enrich failed`, e2);
+          }
+          lastCloudLeaguesRef.current = hydratedSnap.leagues ?? {};
           const prev = useLiveGamesStore.getState();
           const previousGames = Object.values(useCanonicalLiveGameStore.getState().gamesById).map(
             (r3) => r3.game
@@ -55391,12 +55412,12 @@ function LiveGamesBridge() {
           const incomingMs = parseUpdatedAtMs(snap.updatedAt);
           const currentMs = parseUpdatedAtMs(prev.updatedAt);
           let mergedLeagues = supplementOperationalSnapshotLeagues(
-            snap.leagues ?? {},
+            hydratedSnap.leagues ?? {},
             prev.leagues
           );
           let merged = preserveMissingOperationalIngestGames(
             {
-              ...snap,
+              ...hydratedSnap,
               leagues: mergedLeagues
             },
             previousGames
@@ -55407,7 +55428,7 @@ function LiveGamesBridge() {
               prev.leagues,
               previousGames
             );
-            merged = { ...merged, updatedAt: prev.updatedAt ?? snap.updatedAt };
+            merged = { ...merged, updatedAt: prev.updatedAt ?? hydratedSnap.updatedAt };
           }
           merged = await mergeLiveGamesSnapshotWithManualEventsSource(merged);
           hydrate(merged, { source: "grarf_cloud" });
@@ -55520,6 +55541,7 @@ var init_LiveGamesBridge = __esm({
     init_operationalIngest();
     init_fetchWebEspnOperationalSnapshot();
     init_enrichOperationalTransport();
+    init_enrichOperationalSnapshotTeamStandings();
     init_mergeCatchUpIngestSnapshot();
     init_preserveMissingOperationalIngestGames();
     init_mergeLiveGamesSnapshotWithManualEventsSource();
@@ -77111,7 +77133,7 @@ function GamesSpineCompactCompetitorColumn({ game, pill, resultEmphasis }) {
   const logoUrl = resolveDarkThemeLogoUrl(game, pill.side);
   const weightClass = resultEmphasis === "winner" ? "font-bold" : "font-normal";
   const labelColorClass = resultEmphasis === "loser" ? "text-white/60" : "text-white/90";
-  const showStandings = isGrarfWebRenderer() && Boolean(pill.standingsLabel);
+  const showStandings = Boolean(pill.standingsLabel);
   return /* @__PURE__ */ (0, import_jsx_runtime56.jsxs)(
     "div",
     {
@@ -77184,7 +77206,9 @@ function GamesSpineCompactMatchupColumns({ game }) {
     ] });
   }
   const winnerSide = resolveCompactWinnerSide(game, model.left, model.right);
-  const hasStandings = isGrarfWebRenderer() && Boolean(model.left.standingsLabel?.trim() || model.right.standingsLabel?.trim());
+  const hasStandings = Boolean(
+    model.left.standingsLabel?.trim() || model.right.standingsLabel?.trim()
+  );
   return /* @__PURE__ */ (0, import_jsx_runtime56.jsxs)(import_jsx_runtime56.Fragment, { children: [
     /* @__PURE__ */ (0, import_jsx_runtime56.jsx)(
       GamesSpineCompactCompetitorColumn,
@@ -77255,7 +77279,7 @@ function GamesSpineCompactGameRow({
   const showChannelLogo = shouldShowCompactChannelLogo(game);
   const isLive = isGameActivelyLive(game);
   const matchupModel = resolveGamesSpineCompactMatchupModel(game);
-  const hasStandings = isGrarfWebRenderer() && matchupModel.kind === "matchup" && Boolean(matchupModel.left.standingsLabel?.trim() || matchupModel.right.standingsLabel?.trim());
+  const hasStandings = matchupModel.kind === "matchup" && Boolean(matchupModel.left.standingsLabel?.trim() || matchupModel.right.standingsLabel?.trim());
   const viewerMessage = game.viewerMessage?.trim();
   const leagueLogoUrl = featuredLeagueLogoColumn ? resolveGamesSpineLeagueLogoUrl(game.league, { game }) : void 0;
   const showFeaturedStartTimeBadge = shouldShowFeaturedCompactStartTimeBadge(game, {

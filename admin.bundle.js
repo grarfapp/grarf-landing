@@ -22939,9 +22939,11 @@ var TEAM_STANDINGS_LEAGUE_ENRICHERS = {
 };
 async function enrichLeagueGamesWithStandings(games, cacheKey2, buildIndex, enrichGames) {
   let index = readCachedStandingsValue(cacheKey2, ESPN_STANDINGS_CACHE_TTL_MS);
-  if (!index) {
+  if (!index || index.byEspnTeamId.size === 0) {
     index = await buildIndex();
-    writeCachedStandingsValue(cacheKey2, index);
+    if (index.byEspnTeamId.size > 0) {
+      writeCachedStandingsValue(cacheKey2, index);
+    }
   }
   return enrichGames(games, index);
 }
