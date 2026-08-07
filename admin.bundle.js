@@ -19160,6 +19160,14 @@ var MLB_STANDINGS_CACHE_KEY = "espn-standings:MLB";
 function isMlbSpineGame(game) {
   return game.league === "MLB" || game.id.startsWith("espn-MLB-");
 }
+function resolveMlbGamesSpineViewRows(liveMlbGames) {
+  if (liveMlbGames.length === 0) return [];
+  const synced = syncMlbTeamStandingsFromCacheOnSnapshot({
+    leagues: { MLB: [...liveMlbGames] },
+    updatedAt: null
+  });
+  return synced.leagues?.MLB ?? [...liveMlbGames];
+}
 function syncMlbTeamStandingsFromCacheOnSnapshot(incoming) {
   const index = readCachedStandingsValue(
     MLB_STANDINGS_CACHE_KEY,
@@ -20700,16 +20708,20 @@ function resolveViewLeagueGames(league2, selectedDate, liveLeagues, scheduleByDa
   let games;
   if (isSelectedDateOperationalSportsDay(dateKey)) {
     const liveGames = mergedLeagues[sourceLeague] ?? [];
-    const now = /* @__PURE__ */ new Date();
-    const operationalSportsDayKey = getOperationalSportsDayDateKey(now);
-    const operationalSportsDayUpcomingKey = getOperationalSportsDayTomorrowDateKey(now);
-    const fromOperationalSportsDaySchedule = scheduleByDate[operationalSportsDayKey]?.[sourceLeague] ?? [];
-    const fromOperationalSportsDayUpcomingSchedule = scheduleByDate[operationalSportsDayUpcomingKey]?.[sourceLeague] ?? [];
-    games = mergeGamesSpineLeagueGamesById(
-      fromOperationalSportsDaySchedule,
-      fromOperationalSportsDayUpcomingSchedule,
-      liveGames
-    );
+    if (sourceLeague === "MLB") {
+      games = resolveMlbGamesSpineViewRows(liveGames);
+    } else {
+      const now = /* @__PURE__ */ new Date();
+      const operationalSportsDayKey = getOperationalSportsDayDateKey(now);
+      const operationalSportsDayUpcomingKey = getOperationalSportsDayTomorrowDateKey(now);
+      const fromOperationalSportsDaySchedule = scheduleByDate[operationalSportsDayKey]?.[sourceLeague] ?? [];
+      const fromOperationalSportsDayUpcomingSchedule = scheduleByDate[operationalSportsDayUpcomingKey]?.[sourceLeague] ?? [];
+      games = mergeGamesSpineLeagueGamesById(
+        fromOperationalSportsDaySchedule,
+        fromOperationalSportsDayUpcomingSchedule,
+        liveGames
+      );
+    }
   } else {
     games = scheduleByDate[dateKey]?.[sourceLeague] ?? [];
   }
