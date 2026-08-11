@@ -2540,6 +2540,13 @@ var init_espnOperationalLeagueRegistry_generated = __esm({
         "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/caf.w.nations/scoreboard"
       },
       {
+        "key": "CARABAO_CUP",
+        "sport": "soccer",
+        "label": "Carabao Cup",
+        "slug": "eng.league_cup",
+        "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/eng.league_cup/scoreboard"
+      },
+      {
         "key": "CFL",
         "sport": "football",
         "label": "CFL",
@@ -4531,7 +4538,7 @@ var SOCCER_LEAGUE_KEYS, NATIONAL_TEAM_SOCCER_LEAGUE_KEYS;
 var init_espnOperationalLeagueConstants_generated = __esm({
   "../grarf/desktop/electron/espn/espnOperationalLeagueConstants.generated.js"() {
     init_define_import_meta_env();
-    SOCCER_LEAGUE_KEYS = /* @__PURE__ */ new Set(["ARG1", "BEL1", "BRA1", "BUNDESLIGA", "CAF_WNATIONS", "CLUBFRIENDLY", "CLUBWC", "CONCACAF_CAC", "CONCACAF_CL", "CONCACAF_NG", "CONCACAF_WC", "COPA", "COPA_BRASIL", "EPL", "EREDIVISIE", "EURO", "GOLDCUP", "INTFRIENDLY", "LALIGA", "LEAGUES_CUP", "LIBERTADORES", "LIGAMX", "LIGUE1", "MLS", "NATIONS", "NWSL", "POR1", "SAUDI", "SERIEA", "SPFL", "SUDAMERICANA", "SUPERLIG", "UCL", "UECL", "UECLQ", "UEL", "UELQ", "USL1", "USLC", "USLCUP", "UWCQ", "WORLDCUP", "WWC"]);
+    SOCCER_LEAGUE_KEYS = /* @__PURE__ */ new Set(["ARG1", "BEL1", "BRA1", "BUNDESLIGA", "CAF_WNATIONS", "CARABAO_CUP", "CLUBFRIENDLY", "CLUBWC", "CONCACAF_CAC", "CONCACAF_CL", "CONCACAF_NG", "CONCACAF_WC", "COPA", "COPA_BRASIL", "EPL", "EREDIVISIE", "EURO", "GOLDCUP", "INTFRIENDLY", "LALIGA", "LEAGUES_CUP", "LIBERTADORES", "LIGAMX", "LIGUE1", "MLS", "NATIONS", "NWSL", "POR1", "SAUDI", "SERIEA", "SPFL", "SUDAMERICANA", "SUPERLIG", "UCL", "UECL", "UECLQ", "UEL", "UELQ", "USL1", "USLC", "USLCUP", "UWCQ", "WORLDCUP", "WWC"]);
     NATIONAL_TEAM_SOCCER_LEAGUE_KEYS = /* @__PURE__ */ new Set(["CONCACAF_NG", "CONCACAF_WC", "COPA", "EURO", "GOLDCUP", "INTFRIENDLY", "NATIONS", "UWCQ", "WORLDCUP", "WWC"]);
   }
 });
@@ -9404,6 +9411,7 @@ var init_leaguePrioritySeed_data = __esm({
       "UWCQ",
       "INDYCAR",
       "NASCAR",
+      "CARABAO_CUP",
       "WNCAAB",
       "NWSL",
       "DP_WORLD",
@@ -45006,6 +45014,7 @@ var init_resolveLeagueDirectoryNavItemLogo = __esm({
       BUNDESLIGA: "bundesliga",
       BRA1: "brasileirao",
       ARG1: "lpf",
+      LIBERTADORES: "copa-libertadores",
       SUDAMERICANA: "copa-sudamericana",
       UCL: "ucl",
       UEL: "uel",
@@ -45033,6 +45042,7 @@ var init_resolveLeagueDirectoryNavItemLogo = __esm({
       PLL: "pll",
       RUGB_289262: "mlr",
       USLCUP: "usl-cup",
+      CARABAO_CUP: "carabao-cup",
       LEAGUES_CUP: "leagues-cup",
       BEL1: "belgian-pro-league",
       POR1: "primeira-liga"
@@ -45976,6 +45986,7 @@ var init_gamesSpineLeagueLogoUrls = __esm({
       BUNDESLIGA: "https://a.espncdn.com/i/leaguelogos/soccer/500/10.png",
       BRA1: BRA1_LEAGUE_LOGO_URL,
       ARG1: ARG1_LEAGUE_LOGO_URL,
+      LIBERTADORES: "/league-logos/copa-libertadores.png",
       SUDAMERICANA: COPA_SUDAMERICANA_LEAGUE_LOGO_URL,
       UCL: UCL_LEAGUE_LOGO_URL,
       UEL: "https://a.espncdn.com/i/leaguelogos/soccer/500/2310.png",
@@ -46017,6 +46028,7 @@ var init_gamesSpineLeagueLogoUrls = __esm({
       PLL: "/league-logos/pll.png",
       RUGB_289262: "/league-logos/nav/mlr.png",
       USLCUP: "/league-logos/usl-cup.png",
+      CARABAO_CUP: "/league-logos/carabao-cup.png",
       LEAGUES_CUP: "/league-logos/leagues-cup.png",
       USATF: "https://upload.wikimedia.org/wikipedia/en/b/be/USA_Track_and_Field.svg"
     };

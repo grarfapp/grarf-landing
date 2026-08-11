@@ -13920,6 +13920,7 @@ var LEAGUE_PRIORITY_SEED_ORDER = [
   "UWCQ",
   "INDYCAR",
   "NASCAR",
+  "CARABAO_CUP",
   "WNCAAB",
   "NWSL",
   "DP_WORLD",
@@ -14198,6 +14199,13 @@ var ESPN_OPERATIONAL_INGEST_LEAGUES = [
     "label": "Women's AFCON",
     "slug": "caf.w.nations",
     "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/caf.w.nations/scoreboard"
+  },
+  {
+    "key": "CARABAO_CUP",
+    "sport": "soccer",
+    "label": "Carabao Cup",
+    "slug": "eng.league_cup",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/eng.league_cup/scoreboard"
   },
   {
     "key": "CFL",
@@ -25050,7 +25058,7 @@ init_define_import_meta_env();
 
 // ../grarf/desktop/electron/espn/espnOperationalLeagueConstants.generated.js
 init_define_import_meta_env();
-var SOCCER_LEAGUE_KEYS = /* @__PURE__ */ new Set(["ARG1", "BEL1", "BRA1", "BUNDESLIGA", "CAF_WNATIONS", "CLUBFRIENDLY", "CLUBWC", "CONCACAF_CAC", "CONCACAF_CL", "CONCACAF_NG", "CONCACAF_WC", "COPA", "COPA_BRASIL", "EPL", "EREDIVISIE", "EURO", "GOLDCUP", "INTFRIENDLY", "LALIGA", "LEAGUES_CUP", "LIBERTADORES", "LIGAMX", "LIGUE1", "MLS", "NATIONS", "NWSL", "POR1", "SAUDI", "SERIEA", "SPFL", "SUDAMERICANA", "SUPERLIG", "UCL", "UECL", "UECLQ", "UEL", "UELQ", "USL1", "USLC", "USLCUP", "UWCQ", "WORLDCUP", "WWC"]);
+var SOCCER_LEAGUE_KEYS = /* @__PURE__ */ new Set(["ARG1", "BEL1", "BRA1", "BUNDESLIGA", "CAF_WNATIONS", "CARABAO_CUP", "CLUBFRIENDLY", "CLUBWC", "CONCACAF_CAC", "CONCACAF_CL", "CONCACAF_NG", "CONCACAF_WC", "COPA", "COPA_BRASIL", "EPL", "EREDIVISIE", "EURO", "GOLDCUP", "INTFRIENDLY", "LALIGA", "LEAGUES_CUP", "LIBERTADORES", "LIGAMX", "LIGUE1", "MLS", "NATIONS", "NWSL", "POR1", "SAUDI", "SERIEA", "SPFL", "SUDAMERICANA", "SUPERLIG", "UCL", "UECL", "UECLQ", "UEL", "UELQ", "USL1", "USLC", "USLCUP", "UWCQ", "WORLDCUP", "WWC"]);
 var NATIONAL_TEAM_SOCCER_LEAGUE_KEYS = /* @__PURE__ */ new Set(["CONCACAF_NG", "CONCACAF_WC", "COPA", "EURO", "GOLDCUP", "INTFRIENDLY", "NATIONS", "UWCQ", "WORLDCUP", "WWC"]);
 
 // ../grarf/desktop/electron/espn/espnPlusStream.js
