@@ -76534,6 +76534,22 @@ var init_resolveGamesSpineEventCardPresentation = __esm({
   }
 });
 
+// ../grarf/desktop/src/lib/gamesSpine/gamesSpineTeamWorkspaceHover.ts
+var GAMES_SPINE_TEAM_WORKSPACE_HOVER_CLASS, GAMES_SPINE_TEAM_WORKSPACE_BUTTON_RESET_CLASS;
+var init_gamesSpineTeamWorkspaceHover = __esm({
+  "../grarf/desktop/src/lib/gamesSpine/gamesSpineTeamWorkspaceHover.ts"() {
+    init_define_import_meta_env();
+    init_cn();
+    GAMES_SPINE_TEAM_WORKSPACE_HOVER_CLASS = cn2(
+      "cursor-pointer rounded-[2px] border border-transparent text-left",
+      "transition duration-150",
+      "hover:border-cyansys/45 hover:bg-cyansys/[0.06] hover:text-cyansys/95",
+      "hover:shadow-[0_0_10px_rgba(86,247,255,0.14),inset_0_0_14px_rgba(86,247,255,0.05)]"
+    );
+    GAMES_SPINE_TEAM_WORKSPACE_BUTTON_RESET_CLASS = "m-0 appearance-none bg-transparent p-0 font-inherit";
+  }
+});
+
 // ../grarf/desktop/src/components/gamesSpine/GamesSpineTeamMark.tsx
 function GamesSpineTeamMark({
   teamName,
@@ -76545,7 +76561,7 @@ function GamesSpineTeamMark({
   onClick
 }) {
   const rootClass = cn2(GAMES_SPINE_MATCHUP_TEAM, standingsLabel && "items-start", className);
-  const interactiveClass = onClick ? "cursor-pointer text-left transition duration-150 hover:text-cyansys/90" : void 0;
+  const interactiveClass = onClick ? cn2(GAMES_SPINE_TEAM_WORKSPACE_BUTTON_RESET_CLASS, GAMES_SPINE_TEAM_WORKSPACE_HOVER_CLASS) : void 0;
   const content = /* @__PURE__ */ (0, import_jsx_runtime48.jsxs)(import_jsx_runtime48.Fragment, { children: [
     logoUrl ? /* @__PURE__ */ (0, import_jsx_runtime48.jsx)(
       "img",
@@ -76601,6 +76617,7 @@ var init_GamesSpineTeamMark = __esm({
     init_grarfLogoImgClassName();
     init_gamesSpineFinalResultNameEmphasis();
     init_gamesSpineScoreLayout();
+    init_gamesSpineTeamWorkspaceHover();
     import_jsx_runtime48 = __toESM(require_jsx_runtime(), 1);
   }
 });
@@ -77806,7 +77823,7 @@ function GamesSpineCompactCompetitorColumn({
   const cellClass = cn2(
     GAMES_SPINE_COMPACT_COMPETITOR_CELL_CLASS,
     showStandings ? "items-start" : "items-center",
-    onTeamClick && pill.teamName && "cursor-pointer text-left transition duration-150 hover:text-cyansys/90"
+    onTeamClick && pill.teamName && cn2(GAMES_SPINE_TEAM_WORKSPACE_BUTTON_RESET_CLASS, GAMES_SPINE_TEAM_WORKSPACE_HOVER_CLASS)
   );
   const content = /* @__PURE__ */ (0, import_jsx_runtime56.jsxs)(import_jsx_runtime56.Fragment, { children: [
     /* @__PURE__ */ (0, import_jsx_runtime56.jsx)(CompetitorLogo, { logoUrl, alignTop: showStandings }),
@@ -77938,6 +77955,7 @@ var init_GamesSpineCompactMatchupPills = __esm({
     init_isSpineFinalizedGame();
     init_gamesSpineLeagueLogoUrls();
     init_resolveTeamLogoUrl();
+    init_gamesSpineTeamWorkspaceHover();
     import_jsx_runtime56 = __toESM(require_jsx_runtime(), 1);
   }
 });
@@ -79843,7 +79861,9 @@ function GameRow({
                 },
                 className: cn2(
                   GAMES_SPINE_TEAM_NAME,
-                  "tracking-wide text-left transition duration-150 hover:text-cyansys/90"
+                  "tracking-wide",
+                  GAMES_SPINE_TEAM_WORKSPACE_BUTTON_RESET_CLASS,
+                  GAMES_SPINE_TEAM_WORKSPACE_HOVER_CLASS
                 ),
                 children: boardSideTeamName[side]
               }
@@ -79954,6 +79974,7 @@ var init_GameRow = __esm({
     init_mergeGamesSpineSectionsByPriority();
     init_gamesSpineGamePresentation();
     init_openMlbTeamWorkspaceFromGamesSpine();
+    init_gamesSpineTeamWorkspaceHover();
     import_jsx_runtime59 = __toESM(require_jsx_runtime(), 1);
   }
 });
