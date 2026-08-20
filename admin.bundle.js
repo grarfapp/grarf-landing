@@ -13894,6 +13894,7 @@ var LEAGUE_PRIORITY_SEED_ORDER = [
   "MLB",
   "NHL",
   "UCL",
+  "UCLQ",
   "F1",
   "TDF",
   "nav.french-open",
@@ -14102,6 +14103,7 @@ var GAMES_COLUMN_LEAGUE_LABEL = {
   EREDIVISIE: "Eredivisie",
   BUNDESLIGA: "Bundesliga",
   UCL: "Champions League",
+  UCLQ: "UCL Qualifying",
   UEL: "Europa League",
   UELQ: "Europa League Qualifying",
   UECL: "Conference League",
@@ -14628,6 +14630,13 @@ var ESPN_OPERATIONAL_INGEST_LEAGUES = [
     "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/uefa.champions/scoreboard"
   },
   {
+    "key": "UCLQ",
+    "sport": "soccer",
+    "label": "UEFA Champions League Qualifying",
+    "slug": "uefa.champions_qual",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/uefa.champions_qual/scoreboard"
+  },
+  {
     "key": "UECL",
     "sport": "soccer",
     "label": "UEFA Conference League",
@@ -15098,6 +15107,7 @@ var GRARF_SPORT_HIERARCHY = {
       "BUNDESLIGA",
       "SERIEA",
       "UCL",
+      "UCLQ",
       "LIGUE1",
       "LIGAMX",
       "EREDIVISIE",
@@ -25058,7 +25068,7 @@ init_define_import_meta_env();
 
 // ../grarf/desktop/electron/espn/espnOperationalLeagueConstants.generated.js
 init_define_import_meta_env();
-var SOCCER_LEAGUE_KEYS = /* @__PURE__ */ new Set(["ARG1", "BEL1", "BRA1", "BUNDESLIGA", "CAF_WNATIONS", "CARABAO_CUP", "CLUBFRIENDLY", "CLUBWC", "CONCACAF_CAC", "CONCACAF_CL", "CONCACAF_NG", "CONCACAF_WC", "COPA", "COPA_BRASIL", "EPL", "EREDIVISIE", "EURO", "GOLDCUP", "INTFRIENDLY", "LALIGA", "LEAGUES_CUP", "LIBERTADORES", "LIGAMX", "LIGUE1", "MLS", "NATIONS", "NWSL", "POR1", "SAUDI", "SERIEA", "SPFL", "SUDAMERICANA", "SUPERLIG", "UCL", "UECL", "UECLQ", "UEL", "UELQ", "USL1", "USLC", "USLCUP", "UWCQ", "WORLDCUP", "WWC"]);
+var SOCCER_LEAGUE_KEYS = /* @__PURE__ */ new Set(["ARG1", "BEL1", "BRA1", "BUNDESLIGA", "CAF_WNATIONS", "CARABAO_CUP", "CLUBFRIENDLY", "CLUBWC", "CONCACAF_CAC", "CONCACAF_CL", "CONCACAF_NG", "CONCACAF_WC", "COPA", "COPA_BRASIL", "EPL", "EREDIVISIE", "EURO", "GOLDCUP", "INTFRIENDLY", "LALIGA", "LEAGUES_CUP", "LIBERTADORES", "LIGAMX", "LIGUE1", "MLS", "NATIONS", "NWSL", "POR1", "SAUDI", "SERIEA", "SPFL", "SUDAMERICANA", "SUPERLIG", "UCL", "UCLQ", "UECL", "UECLQ", "UEL", "UELQ", "USL1", "USLC", "USLCUP", "UWCQ", "WORLDCUP", "WWC"]);
 var NATIONAL_TEAM_SOCCER_LEAGUE_KEYS = /* @__PURE__ */ new Set(["CONCACAF_NG", "CONCACAF_WC", "COPA", "EURO", "GOLDCUP", "INTFRIENDLY", "NATIONS", "UWCQ", "WORLDCUP", "WWC"]);
 
 // ../grarf/desktop/electron/espn/espnPlusStream.js
