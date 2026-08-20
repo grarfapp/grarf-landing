@@ -14788,6 +14788,7 @@ init_define_import_meta_env();
 // ../grarf/shared/utils/golfTournamentDate.js
 init_define_import_meta_env();
 var GOLF_TOURNAMENT_DAY_TIMEZONE = "America/New_York";
+var AFL_OPERATIONAL_DATE_TIMEZONE = "Australia/Melbourne";
 var GOLF_LEAGUE_KEYS = /* @__PURE__ */ new Set(["PGA", "LPGA", "LIV", "CHAMPIONS"]);
 function isGolfTournamentLeagueKey(league2) {
   return typeof league2 === "string" && GOLF_LEAGUE_KEYS.has(league2);
@@ -14965,8 +14966,15 @@ function isScheduledOnOperationalEveningSlate(game, operationalDateKey, now = /*
   if (startKey === tomorrowKey) {
     const ms = game.startTimeMs;
     if (ms != null && Number.isFinite(ms) && ms > 0) {
-      const cutoff = getNextDayCutoffMs(operationalDateKey, OPERATIONAL_SLATE_NEXT_DAY_CUTOFF_HOUR, timeZone);
-      if (ms < cutoff) return true;
+      const startHour = calendarPartsInTimeZone(ms, timeZone).hour;
+      if (startHour < 4) {
+        const cutoff = getNextDayCutoffMs(
+          operationalDateKey,
+          OPERATIONAL_SLATE_NEXT_DAY_CUTOFF_HOUR,
+          timeZone
+        );
+        if (ms < cutoff) return true;
+      }
     }
   }
   if (!startKey && payloadKey === operationalDateKey) return true;
@@ -15171,6 +15179,32 @@ function sportLeagueKeys(sportKey) {
 // ../grarf/desktop/src/data/grarfSportHierarchy.ts
 var GOLF_TOUR_LEAGUE_ORDER = sportLeagueKeys("golf");
 
+// ../grarf/desktop/shared/motorsportLeagues.js
+init_define_import_meta_env();
+
+// ../grarf/shared/config/motorsportLeagues.js
+init_define_import_meta_env();
+var MOTORSPORT_SESSION_LEAGUES = /* @__PURE__ */ new Set(["F1", "F2", "F3", "FORMULA_E"]);
+var MOTORSPORT_STANDALONE_LEAGUES = /* @__PURE__ */ new Set([
+  "NASCAR",
+  "NASCAR_XFINITY",
+  "NASCAR_TRUCK",
+  "INDYCAR",
+  "MOTOGP",
+  "MOTO2",
+  "MOTO3"
+]);
+var MOTORSPORT_LEAGUE_KEYS = /* @__PURE__ */ new Set([
+  ...MOTORSPORT_SESSION_LEAGUES,
+  ...MOTORSPORT_STANDALONE_LEAGUES
+]);
+function isMotorsportSessionLeagueKey(leagueKey) {
+  return typeof leagueKey === "string" && MOTORSPORT_SESSION_LEAGUES.has(leagueKey);
+}
+function isMotorsportStandaloneLeagueKey(leagueKey) {
+  return typeof leagueKey === "string" && MOTORSPORT_STANDALONE_LEAGUES.has(leagueKey);
+}
+
 // ../grarf/desktop/src/lib/gamesSpine/gamesSpineOperationalDate.ts
 function gamesSpineOperationalTimeZone() {
   return resolveOperationalSlateTimeZone();
@@ -15190,22 +15224,27 @@ function buildGamesSpineOperationalDateContext(operationalDateKey, now) {
     yesterdayKey: getOperationalSportsDayYesterdayDateKey(now)
   };
 }
+function usesAuthoritativeScheduledDateKeyForSpineFilter(game) {
+  if (isGolfLeagueKey(game.league)) return true;
+  if (game.league === "AFL") return true;
+  if (isMotorsportSessionLeagueKey(game.league)) return true;
+  return false;
+}
 function isGameOnGamesSpineOperationalDateWithContext(game, ctx, now = /* @__PURE__ */ new Date()) {
   const payloadKey = game.scheduledDateKey?.trim();
   const startKey = formatOperationalDateKeyFromMs(
     game.startTimeMs,
     gamesSpineOperationalTimeZone()
   );
+  if (game.status === "scheduled" && usesAuthoritativeScheduledDateKeyForSpineFilter(game)) {
+    return payloadKey ? payloadKey === ctx.operationalDateKey : false;
+  }
   if (ctx.operationalDateKey === ctx.sportsDayKey) {
     if (payloadKey === ctx.sportsDayKey || startKey === ctx.sportsDayKey) {
       return true;
     }
   }
   if (game.status === "scheduled") {
-    if (isGolfLeagueKey(game.league)) {
-      const key = game.scheduledDateKey?.trim();
-      return key ? key === ctx.operationalDateKey : false;
-    }
     return isScheduledOnOperationalEveningSlate2(
       game,
       ctx.operationalDateKey,
@@ -19276,34 +19315,6 @@ init_define_import_meta_env();
 
 // ../grarf/desktop/src/lib/gamesSpine/motorsportSpinePresentation.ts
 init_define_import_meta_env();
-
-// ../grarf/desktop/shared/motorsportLeagues.js
-init_define_import_meta_env();
-
-// ../grarf/shared/config/motorsportLeagues.js
-init_define_import_meta_env();
-var MOTORSPORT_SESSION_LEAGUES = /* @__PURE__ */ new Set(["F1", "F2", "F3", "FORMULA_E"]);
-var MOTORSPORT_STANDALONE_LEAGUES = /* @__PURE__ */ new Set([
-  "NASCAR",
-  "NASCAR_XFINITY",
-  "NASCAR_TRUCK",
-  "INDYCAR",
-  "MOTOGP",
-  "MOTO2",
-  "MOTO3"
-]);
-var MOTORSPORT_LEAGUE_KEYS = /* @__PURE__ */ new Set([
-  ...MOTORSPORT_SESSION_LEAGUES,
-  ...MOTORSPORT_STANDALONE_LEAGUES
-]);
-function isMotorsportSessionLeagueKey(leagueKey) {
-  return typeof leagueKey === "string" && MOTORSPORT_SESSION_LEAGUES.has(leagueKey);
-}
-function isMotorsportStandaloneLeagueKey(leagueKey) {
-  return typeof leagueKey === "string" && MOTORSPORT_STANDALONE_LEAGUES.has(leagueKey);
-}
-
-// ../grarf/desktop/src/lib/gamesSpine/motorsportSpinePresentation.ts
 var F1_PRACTICE_SESSION_DURATION_MS = 60 * 60 * 1e3;
 
 // ../grarf/desktop/src/lib/gamesSpine/tennisMatchPresentation.ts
@@ -25382,7 +25393,7 @@ function normalizeRacingCompetition(event, comp, leagueKey, slateDateKey) {
     league: leagueKey,
     espnEventId: compId,
     externalIds: { espn: compId, mlb: null },
-    time: formatTimeEt2(isoStart),
+    time: cardStatus === "scheduled" && isMotorsportSessionLeagueKey(leagueKey) && scheduledDateKey ? formatGolfScheduledDayLabel(scheduledDateKey) : formatTimeEt2(isoStart),
     awayTeam: title,
     awayRecord: "\u2014",
     homeTeam: "",
@@ -26038,7 +26049,12 @@ function normalizeGolfEvent(event, leagueKey, slateDateKey) {
   else if (final) cardStatus = "final";
   const broadcasts = collectBroadcastLabels2(comp);
   const channels = broadcasts;
-  let scheduledDateKey = scoreboardDayKey || resolveScheduledDateKey(isoStart, slateDateKey) || formatOperationalDateKeyFromMs(startTimeMs);
+  let scheduledDateKey;
+  if (scheduled && tournamentStartKey) {
+    scheduledDateKey = tournamentStartKey;
+  } else {
+    scheduledDateKey = scoreboardDayKey || resolveScheduledDateKey(isoStart, slateDateKey) || formatOperationalDateKeyFromMs(startTimeMs);
+  }
   if (scheduled && tournamentStartKey) {
     if (!scheduledDateKey || scheduledDateKey < tournamentStartKey) {
       scheduledDateKey = tournamentStartKey;
@@ -26538,7 +26554,7 @@ function normalizeEspnEvent(event, leagueKey, slateDateKey) {
   const oddsSummary = pickOddsSummary(comp);
   const isoStart = comp.date || event.date;
   const startTimeMs = Date.parse(isoStart || "") || 0;
-  const scheduledDateKey = resolveScheduledDateKey(isoStart, slateDateKey);
+  const scheduledDateKey = leagueKey === "AFL" ? resolveScheduledDateKey(isoStart, slateDateKey, AFL_OPERATIONAL_DATE_TIMEZONE) : resolveScheduledDateKey(isoStart, slateDateKey);
   const st = status;
   const periodNum = st.period != null ? Number(st.period) : NaN;
   const period = Number.isFinite(periodNum) ? periodNum : void 0;
