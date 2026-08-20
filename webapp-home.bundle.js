@@ -2126,7 +2126,7 @@ var init_golfTournamentDate = __esm({
     init_define_import_meta_env();
     GOLF_TOURNAMENT_DAY_TIMEZONE = "America/New_York";
     AFL_OPERATIONAL_DATE_TIMEZONE = "Australia/Melbourne";
-    GOLF_LEAGUE_KEYS = /* @__PURE__ */ new Set(["PGA", "LPGA", "LIV", "CHAMPIONS"]);
+    GOLF_LEAGUE_KEYS = /* @__PURE__ */ new Set(["PGA", "LPGA", "DP_WORLD", "KORNFERRY", "LIV", "CHAMPIONS"]);
   }
 });
 
@@ -2695,6 +2695,13 @@ var init_espnOperationalLeagueRegistry_generated = __esm({
         "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.friendly/scoreboard"
       },
       {
+        "key": "KORNFERRY",
+        "sport": "golf",
+        "label": "Korn Ferry Tour",
+        "slug": "ntw",
+        "endpoint": "https://site.api.espn.com/apis/site/v2/sports/golf/ntw/scoreboard"
+      },
+      {
         "key": "LALIGA",
         "sport": "soccer",
         "label": "La Liga",
@@ -2735,6 +2742,13 @@ var init_espnOperationalLeagueRegistry_generated = __esm({
         "label": "LIV Golf",
         "slug": "liv",
         "endpoint": "https://site.api.espn.com/apis/site/v2/sports/golf/liv/scoreboard"
+      },
+      {
+        "key": "LLBWS",
+        "sport": "baseball",
+        "label": "LLBWS",
+        "slug": "llb",
+        "endpoint": "https://site.api.espn.com/apis/site/v2/sports/baseball/llb/scoreboard"
       },
       {
         "key": "LPGA",
@@ -5698,7 +5712,7 @@ var init_grarfSportHierarchy = __esm({
       golf: {
         title: "GOLF",
         directorySectionId: "golf",
-        leagueKeys: ["PGA", "LPGA", "LIV", "CHAMPIONS"]
+        leagueKeys: ["PGA", "LPGA", "DP_WORLD", "KORNFERRY", "LIV", "CHAMPIONS"]
       },
       tennis: {
         title: "TENNIS",
@@ -9440,6 +9454,7 @@ var init_leaguePrioritySeed_data = __esm({
       "NWSL",
       "DP_WORLD",
       "LPGA",
+      "KORNFERRY",
       "NCAABB",
       "UECL",
       "NASCAR_XFINITY",
@@ -9520,6 +9535,7 @@ var init_leaguePrioritySeed_data = __esm({
       "NCAAH",
       "CWHOC",
       "CBWS",
+      "LLBWS",
       "nav.liga-mexicana",
       "NCAALAX",
       "NCAAFH",
@@ -9648,6 +9664,7 @@ var init_gamesColumnLeagues = __esm({
       NCAAH: "NCAA Men's Hockey",
       CWHOC: "NCAA Women's Hockey",
       CBWS: "Caribbean Series",
+      LLBWS: "LLBWS",
       AFL: "AFL",
       MLS: "MLS",
       EPL: "EPL",
@@ -9696,6 +9713,8 @@ var init_gamesColumnLeagues = __esm({
       WEC: "WEC",
       PGA: "PGA Tour",
       LPGA: "LPGA Tour",
+      DP_WORLD: "DP World Tour",
+      KORNFERRY: "Korn Ferry Tour",
       LIV: "LIV Golf",
       CHAMPIONS: "PGA Champions"
     };
@@ -45359,6 +45378,7 @@ var init_resolveLeagueDirectoryNavItemLogo = __esm({
       INDYCAR: "indycar",
       PGA: "pga-tour",
       LPGA: "lpga",
+      DP_WORLD: "dp-world-tour",
       LIV: "liv-golf",
       CHAMPIONS: "dp-world-tour",
       WEC: "wec",
@@ -46105,6 +46125,33 @@ var init_mcwsLeagueLogoUrl = __esm({
   }
 });
 
+// ../grarf/desktop/src/lib/gamesSpine/dpWorldTourLeagueLogoUrl.ts
+var DP_WORLD_TOUR_LEAGUE_LOGO_URL;
+var init_dpWorldTourLeagueLogoUrl = __esm({
+  "../grarf/desktop/src/lib/gamesSpine/dpWorldTourLeagueLogoUrl.ts"() {
+    init_define_import_meta_env();
+    DP_WORLD_TOUR_LEAGUE_LOGO_URL = "/league-logos/dp-world-tour.png";
+  }
+});
+
+// ../grarf/desktop/src/lib/gamesSpine/kornFerryTourLeagueLogoUrl.ts
+var KORN_FERRY_TOUR_LEAGUE_LOGO_URL;
+var init_kornFerryTourLeagueLogoUrl = __esm({
+  "../grarf/desktop/src/lib/gamesSpine/kornFerryTourLeagueLogoUrl.ts"() {
+    init_define_import_meta_env();
+    KORN_FERRY_TOUR_LEAGUE_LOGO_URL = "/league-logos/korn-ferry-tour.png";
+  }
+});
+
+// ../grarf/desktop/src/lib/gamesSpine/llbwsLeagueLogoUrl.ts
+var LLBWS_LEAGUE_LOGO_URL;
+var init_llbwsLeagueLogoUrl = __esm({
+  "../grarf/desktop/src/lib/gamesSpine/llbwsLeagueLogoUrl.ts"() {
+    init_define_import_meta_env();
+    LLBWS_LEAGUE_LOGO_URL = "/league-logos/llbws.png";
+  }
+});
+
 // ../grarf/desktop/src/lib/gamesSpine/worldCupLeagueLogoUrl.ts
 var WORLD_CUP_LEAGUE_LOGO_URL;
 var init_worldCupLeagueLogoUrl = __esm({
@@ -46274,6 +46321,9 @@ var init_gamesSpineLeagueLogoUrls = __esm({
     init_mcwsLeagueLogoUrl();
     init_eplLeagueLogoUrl();
     init_lpgaLeagueLogoUrl();
+    init_dpWorldTourLeagueLogoUrl();
+    init_kornFerryTourLeagueLogoUrl();
+    init_llbwsLeagueLogoUrl();
     init_ncaafLeagueLogoUrl();
     init_uclLeagueLogoUrl();
     init_worldCupLeagueLogoUrl();
@@ -46292,6 +46342,7 @@ var init_gamesSpineLeagueLogoUrls = __esm({
       NCAAH: "/league-logos/nav/ncaa-mens-hockey.png",
       CWHOC: "/league-logos/nav/ncaa-womens-hockey.png",
       CBWS: "/league-logos/nav/caribbean-series.png",
+      LLBWS: LLBWS_LEAGUE_LOGO_URL,
       AFL: "https://a.espncdn.com/i/teamlogos/leagues/500/afl.png",
       MLS: "https://a.espncdn.com/i/leaguelogos/soccer/500/19.png",
       EPL: EPL_LEAGUE_LOGO_URL,
@@ -46347,6 +46398,8 @@ var init_gamesSpineLeagueLogoUrls = __esm({
       WEC: WEC_LEAGUE_LOGO_URL,
       PGA: "https://a.espncdn.com/combiner/i?img=/i/teamlogos/leagues/500/pgatour.png",
       LPGA: LPGA_LEAGUE_LOGO_URL,
+      DP_WORLD: DP_WORLD_TOUR_LEAGUE_LOGO_URL,
+      KORNFERRY: KORN_FERRY_TOUR_LEAGUE_LOGO_URL,
       LIV: "https://a.espncdn.com/combiner/i?img=/i/teamlogos/leagues/500/livgolf.png",
       CHAMPIONS: "https://a.espncdn.com/combiner/i?img=/i/espn/teamlogos/500/pga_champions_tour.png",
       NASCAR_TRUCK: "/league-logos/nascar-trucks.png",
@@ -76274,8 +76327,11 @@ var init_commandBriefingLeagueLabel = __esm({
       WEC: "WEC",
       PGA: "PGA TOUR",
       LPGA: "LPGA TOUR",
+      DP_WORLD: "DP WORLD TOUR",
+      KORNFERRY: "KORN FERRY TOUR",
       LIV: "LIV GOLF",
       CHAMPIONS: "PGA CHAMPIONS",
+      LLBWS: "LLBWS",
       GOLF: "GOLF",
       TENNIS: "TENNIS",
       OLYMPICS: "OLYMPICS"

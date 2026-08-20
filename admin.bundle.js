@@ -13926,6 +13926,7 @@ var LEAGUE_PRIORITY_SEED_ORDER = [
   "NWSL",
   "DP_WORLD",
   "LPGA",
+  "KORNFERRY",
   "NCAABB",
   "UECL",
   "NASCAR_XFINITY",
@@ -14006,6 +14007,7 @@ var LEAGUE_PRIORITY_SEED_ORDER = [
   "NCAAH",
   "CWHOC",
   "CBWS",
+  "LLBWS",
   "nav.liga-mexicana",
   "NCAALAX",
   "NCAAFH",
@@ -14092,6 +14094,7 @@ var GAMES_COLUMN_LEAGUE_LABEL = {
   NCAAH: "NCAA Men's Hockey",
   CWHOC: "NCAA Women's Hockey",
   CBWS: "Caribbean Series",
+  LLBWS: "LLBWS",
   AFL: "AFL",
   MLS: "MLS",
   EPL: "EPL",
@@ -14140,6 +14143,8 @@ var GAMES_COLUMN_LEAGUE_LABEL = {
   WEC: "WEC",
   PGA: "PGA Tour",
   LPGA: "LPGA Tour",
+  DP_WORLD: "DP World Tour",
+  KORNFERRY: "Korn Ferry Tour",
   LIV: "LIV Golf",
   CHAMPIONS: "PGA Champions"
 };
@@ -14350,6 +14355,13 @@ var ESPN_OPERATIONAL_INGEST_LEAGUES = [
     "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.friendly/scoreboard"
   },
   {
+    "key": "KORNFERRY",
+    "sport": "golf",
+    "label": "Korn Ferry Tour",
+    "slug": "ntw",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/golf/ntw/scoreboard"
+  },
+  {
     "key": "LALIGA",
     "sport": "soccer",
     "label": "La Liga",
@@ -14390,6 +14402,13 @@ var ESPN_OPERATIONAL_INGEST_LEAGUES = [
     "label": "LIV Golf",
     "slug": "liv",
     "endpoint": "https://site.api.espn.com/apis/site/v2/sports/golf/liv/scoreboard"
+  },
+  {
+    "key": "LLBWS",
+    "sport": "baseball",
+    "label": "LLBWS",
+    "slug": "llb",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/baseball/llb/scoreboard"
   },
   {
     "key": "LPGA",
@@ -14789,7 +14808,7 @@ init_define_import_meta_env();
 init_define_import_meta_env();
 var GOLF_TOURNAMENT_DAY_TIMEZONE = "America/New_York";
 var AFL_OPERATIONAL_DATE_TIMEZONE = "Australia/Melbourne";
-var GOLF_LEAGUE_KEYS = /* @__PURE__ */ new Set(["PGA", "LPGA", "LIV", "CHAMPIONS"]);
+var GOLF_LEAGUE_KEYS = /* @__PURE__ */ new Set(["PGA", "LPGA", "DP_WORLD", "KORNFERRY", "LIV", "CHAMPIONS"]);
 function isGolfTournamentLeagueKey(league2) {
   return typeof league2 === "string" && GOLF_LEAGUE_KEYS.has(league2);
 }
@@ -15139,7 +15158,7 @@ var GRARF_SPORT_HIERARCHY = {
   golf: {
     title: "GOLF",
     directorySectionId: "golf",
-    leagueKeys: ["PGA", "LPGA", "LIV", "CHAMPIONS"]
+    leagueKeys: ["PGA", "LPGA", "DP_WORLD", "KORNFERRY", "LIV", "CHAMPIONS"]
   },
   tennis: {
     title: "TENNIS",
