@@ -13925,6 +13925,8 @@ var LEAGUE_PRIORITY_SEED_ORDER = [
   "CARABAO_CUP",
   "WNCAAB",
   "NWSL",
+  "NCAAMSOC",
+  "NCAAWSOC",
   "DP_WORLD",
   "LPGA",
   "KORNFERRY",
@@ -14100,6 +14102,8 @@ var GAMES_COLUMN_LEAGUE_LABEL = {
   EPL: "EPL",
   LALIGA: "LaLiga",
   NWSL: "NWSL",
+  NCAAMSOC: "NCAA Men's Soccer",
+  NCAAWSOC: "NCAA Women's Soccer",
   LIGAMX: "Liga MX",
   SERIEA: "Serie A",
   LIGUE1: "Ligue 1",
@@ -14516,6 +14520,13 @@ var ESPN_OPERATIONAL_INGEST_LEAGUES = [
     "endpoint": "https://site.api.espn.com/apis/site/v2/sports/lacrosse/mens-college-lacrosse/scoreboard"
   },
   {
+    "key": "NCAAMSOC",
+    "sport": "soccer",
+    "label": "NCAA Men's Soccer",
+    "slug": "usa.ncaa.m.1",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/usa.ncaa.m.1/scoreboard"
+  },
+  {
     "key": "NCAAVB",
     "sport": "volleyball",
     "label": "NCAA Women's Volleyball",
@@ -14535,6 +14546,13 @@ var ESPN_OPERATIONAL_INGEST_LEAGUES = [
     "label": "NCAA Water Polo",
     "slug": "mens-college-water-polo",
     "endpoint": "https://site.api.espn.com/apis/site/v2/sports/water-polo/mens-college-water-polo/scoreboard"
+  },
+  {
+    "key": "NCAAWSOC",
+    "sport": "soccer",
+    "label": "NCAA Women's Soccer",
+    "slug": "usa.ncaa.w.1",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/usa.ncaa.w.1/scoreboard"
   },
   {
     "key": "NFL",
@@ -15130,6 +15148,8 @@ var GRARF_SPORT_HIERARCHY = {
     leagueKeys: [
       "MLS",
       "NWSL",
+      "NCAAMSOC",
+      "NCAAWSOC",
       "LALIGA",
       "BUNDESLIGA",
       "SERIEA",
@@ -25098,7 +25118,7 @@ init_define_import_meta_env();
 
 // ../grarf/desktop/electron/espn/espnOperationalLeagueConstants.generated.js
 init_define_import_meta_env();
-var SOCCER_LEAGUE_KEYS = /* @__PURE__ */ new Set(["ARG1", "BEL1", "BRA1", "BUNDESLIGA", "CAF_WNATIONS", "CARABAO_CUP", "CLUBFRIENDLY", "CLUBWC", "CONCACAF_CAC", "CONCACAF_CL", "CONCACAF_NG", "CONCACAF_WC", "COPA", "COPA_BRASIL", "EPL", "EREDIVISIE", "EURO", "GOLDCUP", "INTFRIENDLY", "LALIGA", "LEAGUES_CUP", "LIBERTADORES", "LIGAMX", "LIGUE1", "MLS", "NATIONS", "NWSL", "POR1", "SAUDI", "SERIEA", "SPFL", "SUDAMERICANA", "SUPERLIG", "UCL", "UCLQ", "UECL", "UECLQ", "UEL", "UELQ", "USL1", "USLC", "USLCUP", "UWCQ", "WORLDCUP", "WWC"]);
+var SOCCER_LEAGUE_KEYS = /* @__PURE__ */ new Set(["ARG1", "BEL1", "BRA1", "BUNDESLIGA", "CAF_WNATIONS", "CARABAO_CUP", "CLUBFRIENDLY", "CLUBWC", "CONCACAF_CAC", "CONCACAF_CL", "CONCACAF_NG", "CONCACAF_WC", "COPA", "COPA_BRASIL", "EPL", "EREDIVISIE", "EURO", "GOLDCUP", "INTFRIENDLY", "LALIGA", "LEAGUES_CUP", "LIBERTADORES", "LIGAMX", "LIGUE1", "MLS", "NATIONS", "NCAAMSOC", "NCAAWSOC", "NWSL", "POR1", "SAUDI", "SERIEA", "SPFL", "SUDAMERICANA", "SUPERLIG", "UCL", "UCLQ", "UECL", "UECLQ", "UEL", "UELQ", "USL1", "USLC", "USLCUP", "UWCQ", "WORLDCUP", "WWC"]);
 var NATIONAL_TEAM_SOCCER_LEAGUE_KEYS = /* @__PURE__ */ new Set(["CONCACAF_NG", "CONCACAF_WC", "COPA", "EURO", "GOLDCUP", "INTFRIENDLY", "NATIONS", "UWCQ", "WORLDCUP", "WWC"]);
 
 // ../grarf/desktop/electron/espn/espnPlusStream.js

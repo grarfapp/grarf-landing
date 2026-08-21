@@ -2856,6 +2856,13 @@ var init_espnOperationalLeagueRegistry_generated = __esm({
         "endpoint": "https://site.api.espn.com/apis/site/v2/sports/lacrosse/mens-college-lacrosse/scoreboard"
       },
       {
+        "key": "NCAAMSOC",
+        "sport": "soccer",
+        "label": "NCAA Men's Soccer",
+        "slug": "usa.ncaa.m.1",
+        "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/usa.ncaa.m.1/scoreboard"
+      },
+      {
         "key": "NCAAVB",
         "sport": "volleyball",
         "label": "NCAA Women's Volleyball",
@@ -2875,6 +2882,13 @@ var init_espnOperationalLeagueRegistry_generated = __esm({
         "label": "NCAA Water Polo",
         "slug": "mens-college-water-polo",
         "endpoint": "https://site.api.espn.com/apis/site/v2/sports/water-polo/mens-college-water-polo/scoreboard"
+      },
+      {
+        "key": "NCAAWSOC",
+        "sport": "soccer",
+        "label": "NCAA Women's Soccer",
+        "slug": "usa.ncaa.w.1",
+        "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/usa.ncaa.w.1/scoreboard"
       },
       {
         "key": "NFL",
@@ -4567,7 +4581,7 @@ var SOCCER_LEAGUE_KEYS, NATIONAL_TEAM_SOCCER_LEAGUE_KEYS;
 var init_espnOperationalLeagueConstants_generated = __esm({
   "../grarf/desktop/electron/espn/espnOperationalLeagueConstants.generated.js"() {
     init_define_import_meta_env();
-    SOCCER_LEAGUE_KEYS = /* @__PURE__ */ new Set(["ARG1", "BEL1", "BRA1", "BUNDESLIGA", "CAF_WNATIONS", "CARABAO_CUP", "CLUBFRIENDLY", "CLUBWC", "CONCACAF_CAC", "CONCACAF_CL", "CONCACAF_NG", "CONCACAF_WC", "COPA", "COPA_BRASIL", "EPL", "EREDIVISIE", "EURO", "GOLDCUP", "INTFRIENDLY", "LALIGA", "LEAGUES_CUP", "LIBERTADORES", "LIGAMX", "LIGUE1", "MLS", "NATIONS", "NWSL", "POR1", "SAUDI", "SERIEA", "SPFL", "SUDAMERICANA", "SUPERLIG", "UCL", "UCLQ", "UECL", "UECLQ", "UEL", "UELQ", "USL1", "USLC", "USLCUP", "UWCQ", "WORLDCUP", "WWC"]);
+    SOCCER_LEAGUE_KEYS = /* @__PURE__ */ new Set(["ARG1", "BEL1", "BRA1", "BUNDESLIGA", "CAF_WNATIONS", "CARABAO_CUP", "CLUBFRIENDLY", "CLUBWC", "CONCACAF_CAC", "CONCACAF_CL", "CONCACAF_NG", "CONCACAF_WC", "COPA", "COPA_BRASIL", "EPL", "EREDIVISIE", "EURO", "GOLDCUP", "INTFRIENDLY", "LALIGA", "LEAGUES_CUP", "LIBERTADORES", "LIGAMX", "LIGUE1", "MLS", "NATIONS", "NCAAMSOC", "NCAAWSOC", "NWSL", "POR1", "SAUDI", "SERIEA", "SPFL", "SUDAMERICANA", "SUPERLIG", "UCL", "UCLQ", "UECL", "UECLQ", "UEL", "UELQ", "USL1", "USLC", "USLCUP", "UWCQ", "WORLDCUP", "WWC"]);
     NATIONAL_TEAM_SOCCER_LEAGUE_KEYS = /* @__PURE__ */ new Set(["CONCACAF_NG", "CONCACAF_WC", "COPA", "EURO", "GOLDCUP", "INTFRIENDLY", "NATIONS", "UWCQ", "WORLDCUP", "WWC"]);
   }
 });
@@ -5684,6 +5698,8 @@ var init_grarfSportHierarchy = __esm({
         leagueKeys: [
           "MLS",
           "NWSL",
+          "NCAAMSOC",
+          "NCAAWSOC",
           "LALIGA",
           "BUNDESLIGA",
           "SERIEA",
@@ -9038,6 +9054,8 @@ var init_resolveGamesSpineCardTimingLabel = __esm({
       "LALIGA",
       "MLS",
       "NWSL",
+      "NCAAMSOC",
+      "NCAAWSOC",
       "LIGAMX",
       "SERIEA",
       "LIGUE1",
@@ -9453,6 +9471,8 @@ var init_leaguePrioritySeed_data = __esm({
       "CARABAO_CUP",
       "WNCAAB",
       "NWSL",
+      "NCAAMSOC",
+      "NCAAWSOC",
       "DP_WORLD",
       "LPGA",
       "KORNFERRY",
@@ -9670,6 +9690,8 @@ var init_gamesColumnLeagues = __esm({
       EPL: "EPL",
       LALIGA: "LaLiga",
       NWSL: "NWSL",
+      NCAAMSOC: "NCAA Men's Soccer",
+      NCAAWSOC: "NCAA Women's Soccer",
       LIGAMX: "Liga MX",
       SERIEA: "Serie A",
       LIGUE1: "Ligue 1",
@@ -36879,6 +36901,8 @@ var init_espnGameUrls = __esm({
       "EPL",
       "LALIGA",
       "NWSL",
+      "NCAAMSOC",
+      "NCAAWSOC",
       "LIGAMX",
       "SERIEA",
       "LIGUE1",
@@ -46152,6 +46176,24 @@ var init_llbwsLeagueLogoUrl = __esm({
   }
 });
 
+// ../grarf/desktop/src/lib/gamesSpine/ncaamsocLeagueLogoUrl.ts
+var NCAAMSOC_LEAGUE_LOGO_URL;
+var init_ncaamsocLeagueLogoUrl = __esm({
+  "../grarf/desktop/src/lib/gamesSpine/ncaamsocLeagueLogoUrl.ts"() {
+    init_define_import_meta_env();
+    NCAAMSOC_LEAGUE_LOGO_URL = "/league-logos/ncaa-mens-soccer.png";
+  }
+});
+
+// ../grarf/desktop/src/lib/gamesSpine/ncaawsocLeagueLogoUrl.ts
+var NCAAWSOC_LEAGUE_LOGO_URL;
+var init_ncaawsocLeagueLogoUrl = __esm({
+  "../grarf/desktop/src/lib/gamesSpine/ncaawsocLeagueLogoUrl.ts"() {
+    init_define_import_meta_env();
+    NCAAWSOC_LEAGUE_LOGO_URL = "/league-logos/ncaa-womens-soccer.png";
+  }
+});
+
 // ../grarf/desktop/src/lib/gamesSpine/worldCupLeagueLogoUrl.ts
 var WORLD_CUP_LEAGUE_LOGO_URL;
 var init_worldCupLeagueLogoUrl = __esm({
@@ -46324,6 +46366,8 @@ var init_gamesSpineLeagueLogoUrls = __esm({
     init_dpWorldTourLeagueLogoUrl();
     init_kornFerryTourLeagueLogoUrl();
     init_llbwsLeagueLogoUrl();
+    init_ncaamsocLeagueLogoUrl();
+    init_ncaawsocLeagueLogoUrl();
     init_ncaafLeagueLogoUrl();
     init_uclLeagueLogoUrl();
     init_worldCupLeagueLogoUrl();
@@ -46348,6 +46392,8 @@ var init_gamesSpineLeagueLogoUrls = __esm({
       EPL: EPL_LEAGUE_LOGO_URL,
       LALIGA: "https://a.espncdn.com/i/leaguelogos/soccer/500/15.png",
       NWSL: "https://a.espncdn.com/i/leaguelogos/soccer/500/2323.png",
+      NCAAMSOC: NCAAMSOC_LEAGUE_LOGO_URL,
+      NCAAWSOC: NCAAWSOC_LEAGUE_LOGO_URL,
       LIGAMX: "/league-logos/liga-mx.png",
       SERIEA: "https://a.espncdn.com/i/leaguelogos/soccer/500/12.png",
       LIGUE1: "/league-logos/ligue-1.png",
@@ -77082,6 +77128,8 @@ var init_resolveTeamLogoUrl = __esm({
       "EPL",
       "LALIGA",
       "NWSL",
+      "NCAAMSOC",
+      "NCAAWSOC",
       "LIGAMX",
       "SERIEA",
       "LIGUE1",
@@ -80896,6 +80944,8 @@ var init_gamesSpineSummary = __esm({
       "EPL",
       "LALIGA",
       "NWSL",
+      "NCAAMSOC",
+      "NCAAWSOC",
       "LIGAMX",
       "SERIEA",
       "LIGUE1",
@@ -93413,7 +93463,7 @@ function useGameSocialIngest(game) {
   const inflightGameIdRef = (0, import_react125.useRef)(null);
   (0, import_react125.useEffect)(() => {
     if (!game?.id) return;
-    if (!isCanonicalMlbGameWorkspaceRenderer()) return;
+    if (!isGrarfElectronRenderer()) return;
     if (game.league !== "MLB") return;
     const gameId = game.id;
     if (inflightGameIdRef.current === gameId) return;
