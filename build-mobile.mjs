@@ -14,12 +14,20 @@ const landingMobileWebDir = path.join(__dirname, "mobile-web");
 
 function removePath(target) {
   if (!fs.existsSync(target)) return;
-  fs.rmSync(target, {
-    recursive: true,
-    force: true,
-    maxRetries: 5,
-    retryDelay: 200,
-  });
+  try {
+    fs.rmSync(target, {
+      recursive: true,
+      force: true,
+      maxRetries: 10,
+      retryDelay: 250,
+    });
+  } catch (error) {
+    const code = error && typeof error === "object" ? error.code : undefined;
+    if (code !== "ENOTEMPTY" && code !== "EBUSY" && code !== "EPERM") {
+      throw error;
+    }
+    execSync(`rm -rf ${JSON.stringify(target)}`, { stdio: "inherit" });
+  }
 }
 
 function copyRecursive(src, dest) {
