@@ -9471,8 +9471,6 @@ var init_leaguePrioritySeed_data = __esm({
       "CARABAO_CUP",
       "WNCAAB",
       "NWSL",
-      "NCAAMSOC",
-      "NCAAWSOC",
       "DP_WORLD",
       "LPGA",
       "KORNFERRY",
@@ -9565,7 +9563,9 @@ var init_leaguePrioritySeed_data = __esm({
       "nav.winter-sports",
       "nav.world-rally",
       "MOTO2",
-      "MOTO3"
+      "MOTO3",
+      "NCAAMSOC",
+      "NCAAWSOC"
     ];
   }
 });

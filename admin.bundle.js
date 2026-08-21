@@ -13925,8 +13925,6 @@ var LEAGUE_PRIORITY_SEED_ORDER = [
   "CARABAO_CUP",
   "WNCAAB",
   "NWSL",
-  "NCAAMSOC",
-  "NCAAWSOC",
   "DP_WORLD",
   "LPGA",
   "KORNFERRY",
@@ -14019,7 +14017,9 @@ var LEAGUE_PRIORITY_SEED_ORDER = [
   "nav.winter-sports",
   "nav.world-rally",
   "MOTO2",
-  "MOTO3"
+  "MOTO3",
+  "NCAAMSOC",
+  "NCAAWSOC"
 ];
 function getLeaguePrioritySeedOrder() {
   return LEAGUE_PRIORITY_SEED_ORDER;
