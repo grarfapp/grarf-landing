@@ -15371,12 +15371,16 @@ function filterGamesSpineSlateForOperationalDate(games, operationalDateKey = get
 function filterGamesSpineSlateForOperationalSportsDay(games, now = /* @__PURE__ */ new Date()) {
   return filterGamesSpineSlateForOperationalDate(games, getOperationalSportsDayDateKey(now), now);
 }
-function filterGamesSpineSlateForUpcoming(games, now = /* @__PURE__ */ new Date()) {
-  if (!isGrarfWebRenderer() || games.length === 0) return [];
+function filterGamesSpineSlateForTodayUpcoming(games, now = /* @__PURE__ */ new Date()) {
+  if (games.length === 0) return [];
   const todayKey = getOperationalSportsDayDateKey(now);
   return games.filter(
     (g) => g.status === "scheduled" && isGameOnGamesSpineOperationalDate(g, todayKey, now)
   );
+}
+function filterGamesSpineSlateForUpcoming(games, now = /* @__PURE__ */ new Date()) {
+  if (!isGrarfWebRenderer()) return [];
+  return filterGamesSpineSlateForTodayUpcoming(games, now);
 }
 
 // ../grarf/desktop/src/lib/gamesSpine/sortGamesSpineChronologically.ts
