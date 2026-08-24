@@ -58394,6 +58394,34 @@ var init_leagueFeedRegistry = __esm({
         spineLeagues: ["ATP", "WTA"],
         feedId: "livetrack-tennis",
         sourceLabel: "Tennis Wire"
+      },
+      {
+        league: "Pulse1",
+        feedUrl: "https://rss.app/feeds/qgSTKEvXeURBPWZ6.xml",
+        spineLeagues: [],
+        feedId: "pulse-submenu-1",
+        sourceLabel: "Pulse 1"
+      },
+      {
+        league: "Pulse2",
+        feedUrl: "https://rss.app/feeds/A5cZ5XPYdaf14rPD.xml",
+        spineLeagues: [],
+        feedId: "pulse-submenu-2",
+        sourceLabel: "Pulse 2"
+      },
+      {
+        league: "Pulse3",
+        feedUrl: "https://rss.app/feeds/xA45V3rNGAk74xQy.xml",
+        spineLeagues: [],
+        feedId: "pulse-submenu-3",
+        sourceLabel: "Pulse 3"
+      },
+      {
+        league: "Pulse4",
+        feedUrl: "https://rss.app/feeds/RIxAtrwK7wRqxob9.xml",
+        spineLeagues: [],
+        feedId: "pulse-submenu-4",
+        sourceLabel: "Pulse 4"
       }
     ];
   }
