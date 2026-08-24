@@ -40509,35 +40509,57 @@ var init_calendar = __esm({
   }
 });
 
+// ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/chevron-down.mjs
+var __iconNode2, ChevronDown;
+var init_chevron_down = __esm({
+  "../grarf/desktop/node_modules/lucide-react/dist/esm/icons/chevron-down.mjs"() {
+    init_define_import_meta_env();
+    init_createLucideIcon();
+    __iconNode2 = [["path", { d: "m6 9 6 6 6-6", key: "qrunsl" }]];
+    ChevronDown = createLucideIcon("chevron-down", __iconNode2);
+  }
+});
+
 // ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/chevron-left.mjs
-var __iconNode2, ChevronLeft;
+var __iconNode3, ChevronLeft;
 var init_chevron_left = __esm({
   "../grarf/desktop/node_modules/lucide-react/dist/esm/icons/chevron-left.mjs"() {
     init_define_import_meta_env();
     init_createLucideIcon();
-    __iconNode2 = [["path", { d: "m15 18-6-6 6-6", key: "1wnfg3" }]];
-    ChevronLeft = createLucideIcon("chevron-left", __iconNode2);
+    __iconNode3 = [["path", { d: "m15 18-6-6 6-6", key: "1wnfg3" }]];
+    ChevronLeft = createLucideIcon("chevron-left", __iconNode3);
   }
 });
 
 // ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/chevron-right.mjs
-var __iconNode3, ChevronRight;
+var __iconNode4, ChevronRight;
 var init_chevron_right = __esm({
   "../grarf/desktop/node_modules/lucide-react/dist/esm/icons/chevron-right.mjs"() {
     init_define_import_meta_env();
     init_createLucideIcon();
-    __iconNode3 = [["path", { d: "m9 18 6-6-6-6", key: "mthhwq" }]];
-    ChevronRight = createLucideIcon("chevron-right", __iconNode3);
+    __iconNode4 = [["path", { d: "m9 18 6-6-6-6", key: "mthhwq" }]];
+    ChevronRight = createLucideIcon("chevron-right", __iconNode4);
+  }
+});
+
+// ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/chevron-up.mjs
+var __iconNode5, ChevronUp;
+var init_chevron_up = __esm({
+  "../grarf/desktop/node_modules/lucide-react/dist/esm/icons/chevron-up.mjs"() {
+    init_define_import_meta_env();
+    init_createLucideIcon();
+    __iconNode5 = [["path", { d: "m18 15-6-6-6 6", key: "153udz" }]];
+    ChevronUp = createLucideIcon("chevron-up", __iconNode5);
   }
 });
 
 // ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/clipboard-list.mjs
-var __iconNode4, ClipboardList;
+var __iconNode6, ClipboardList;
 var init_clipboard_list = __esm({
   "../grarf/desktop/node_modules/lucide-react/dist/esm/icons/clipboard-list.mjs"() {
     init_define_import_meta_env();
     init_createLucideIcon();
-    __iconNode4 = [
+    __iconNode6 = [
       ["rect", { width: "8", height: "4", x: "8", y: "2", rx: "1", ry: "1", key: "tgr4d6" }],
       [
         "path",
@@ -40551,17 +40573,17 @@ var init_clipboard_list = __esm({
       ["path", { d: "M8 11h.01", key: "1dfujw" }],
       ["path", { d: "M8 16h.01", key: "18s6g9" }]
     ];
-    ClipboardList = createLucideIcon("clipboard-list", __iconNode4);
+    ClipboardList = createLucideIcon("clipboard-list", __iconNode6);
   }
 });
 
 // ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/compass.mjs
-var __iconNode5, Compass;
+var __iconNode7, Compass;
 var init_compass = __esm({
   "../grarf/desktop/node_modules/lucide-react/dist/esm/icons/compass.mjs"() {
     init_define_import_meta_env();
     init_createLucideIcon();
-    __iconNode5 = [
+    __iconNode7 = [
       ["circle", { cx: "12", cy: "12", r: "10", key: "1mglay" }],
       [
         "path",
@@ -40571,32 +40593,32 @@ var init_compass = __esm({
         }
       ]
     ];
-    Compass = createLucideIcon("compass", __iconNode5);
+    Compass = createLucideIcon("compass", __iconNode7);
   }
 });
 
 // ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/globe.mjs
-var __iconNode6, Globe;
+var __iconNode8, Globe;
 var init_globe = __esm({
   "../grarf/desktop/node_modules/lucide-react/dist/esm/icons/globe.mjs"() {
     init_define_import_meta_env();
     init_createLucideIcon();
-    __iconNode6 = [
+    __iconNode8 = [
       ["circle", { cx: "12", cy: "12", r: "10", key: "1mglay" }],
       ["path", { d: "M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20", key: "13o1zl" }],
       ["path", { d: "M2 12h20", key: "9i4pu4" }]
     ];
-    Globe = createLucideIcon("globe", __iconNode6);
+    Globe = createLucideIcon("globe", __iconNode8);
   }
 });
 
 // ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/headphones.mjs
-var __iconNode7, Headphones;
+var __iconNode9, Headphones;
 var init_headphones = __esm({
   "../grarf/desktop/node_modules/lucide-react/dist/esm/icons/headphones.mjs"() {
     init_define_import_meta_env();
     init_createLucideIcon();
-    __iconNode7 = [
+    __iconNode9 = [
       [
         "path",
         {
@@ -40605,65 +40627,65 @@ var init_headphones = __esm({
         }
       ]
     ];
-    Headphones = createLucideIcon("headphones", __iconNode7);
+    Headphones = createLucideIcon("headphones", __iconNode9);
   }
 });
 
 // ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/history.mjs
-var __iconNode8, History;
+var __iconNode10, History;
 var init_history = __esm({
   "../grarf/desktop/node_modules/lucide-react/dist/esm/icons/history.mjs"() {
     init_define_import_meta_env();
     init_createLucideIcon();
-    __iconNode8 = [
+    __iconNode10 = [
       ["path", { d: "M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8", key: "1357e3" }],
       ["path", { d: "M3 3v5h5", key: "1xhq8a" }],
       ["path", { d: "M12 7v5l4 2", key: "1fdv2h" }]
     ];
-    History = createLucideIcon("history", __iconNode8);
+    History = createLucideIcon("history", __iconNode10);
   }
 });
 
 // ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/layout-grid.mjs
-var __iconNode9, LayoutGrid;
+var __iconNode11, LayoutGrid;
 var init_layout_grid = __esm({
   "../grarf/desktop/node_modules/lucide-react/dist/esm/icons/layout-grid.mjs"() {
     init_define_import_meta_env();
     init_createLucideIcon();
-    __iconNode9 = [
+    __iconNode11 = [
       ["rect", { width: "7", height: "7", x: "3", y: "3", rx: "1", key: "1g98yp" }],
       ["rect", { width: "7", height: "7", x: "14", y: "3", rx: "1", key: "6d4xhi" }],
       ["rect", { width: "7", height: "7", x: "14", y: "14", rx: "1", key: "nxv5o0" }],
       ["rect", { width: "7", height: "7", x: "3", y: "14", rx: "1", key: "1bb6yr" }]
     ];
-    LayoutGrid = createLucideIcon("layout-grid", __iconNode9);
+    LayoutGrid = createLucideIcon("layout-grid", __iconNode11);
   }
 });
 
 // ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/lightbulb-off.mjs
-var __iconNode10, LightbulbOff;
+var __iconNode12, LightbulbOff;
 var init_lightbulb_off = __esm({
   "../grarf/desktop/node_modules/lucide-react/dist/esm/icons/lightbulb-off.mjs"() {
     init_define_import_meta_env();
     init_createLucideIcon();
-    __iconNode10 = [
+    __iconNode12 = [
       ["path", { d: "M16.8 11.2c.8-.9 1.2-2 1.2-3.2a6 6 0 0 0-9.3-5", key: "1fkcox" }],
       ["path", { d: "m2 2 20 20", key: "1ooewy" }],
       ["path", { d: "M6.3 6.3a4.67 4.67 0 0 0 1.2 5.2c.7.7 1.3 1.5 1.5 2.5", key: "10m8kw" }],
       ["path", { d: "M9 18h6", key: "x1upvd" }],
       ["path", { d: "M10 22h4", key: "ceow96" }]
     ];
-    LightbulbOff = createLucideIcon("lightbulb-off", __iconNode10);
+    LightbulbOff = createLucideIcon("lightbulb-off", __iconNode12);
   }
 });
 
 // ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/lightbulb.mjs
-var __iconNode11, Lightbulb;
+var __iconNode13, Lightbulb;
 var init_lightbulb = __esm({
   "../grarf/desktop/node_modules/lucide-react/dist/esm/icons/lightbulb.mjs"() {
     init_define_import_meta_env();
     init_createLucideIcon();
-    __iconNode11 = [
+    __iconNode13 = [
       [
         "path",
         {
@@ -40674,28 +40696,28 @@ var init_lightbulb = __esm({
       ["path", { d: "M9 18h6", key: "x1upvd" }],
       ["path", { d: "M10 22h4", key: "ceow96" }]
     ];
-    Lightbulb = createLucideIcon("lightbulb", __iconNode11);
+    Lightbulb = createLucideIcon("lightbulb", __iconNode13);
   }
 });
 
 // ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/loader-circle.mjs
-var __iconNode12, LoaderCircle;
+var __iconNode14, LoaderCircle;
 var init_loader_circle = __esm({
   "../grarf/desktop/node_modules/lucide-react/dist/esm/icons/loader-circle.mjs"() {
     init_define_import_meta_env();
     init_createLucideIcon();
-    __iconNode12 = [["path", { d: "M21 12a9 9 0 1 1-6.219-8.56", key: "13zald" }]];
-    LoaderCircle = createLucideIcon("loader-circle", __iconNode12);
+    __iconNode14 = [["path", { d: "M21 12a9 9 0 1 1-6.219-8.56", key: "13zald" }]];
+    LoaderCircle = createLucideIcon("loader-circle", __iconNode14);
   }
 });
 
 // ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/newspaper.mjs
-var __iconNode13, Newspaper;
+var __iconNode15, Newspaper;
 var init_newspaper = __esm({
   "../grarf/desktop/node_modules/lucide-react/dist/esm/icons/newspaper.mjs"() {
     init_define_import_meta_env();
     init_createLucideIcon();
-    __iconNode13 = [
+    __iconNode15 = [
       ["path", { d: "M15 18h-5", key: "95g1m2" }],
       ["path", { d: "M18 14h-8", key: "sponae" }],
       [
@@ -40707,48 +40729,48 @@ var init_newspaper = __esm({
       ],
       ["rect", { width: "8", height: "4", x: "10", y: "6", rx: "1", key: "aywv1n" }]
     ];
-    Newspaper = createLucideIcon("newspaper", __iconNode13);
+    Newspaper = createLucideIcon("newspaper", __iconNode15);
   }
 });
 
 // ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/radio.mjs
-var __iconNode14, Radio;
+var __iconNode16, Radio;
 var init_radio = __esm({
   "../grarf/desktop/node_modules/lucide-react/dist/esm/icons/radio.mjs"() {
     init_define_import_meta_env();
     init_createLucideIcon();
-    __iconNode14 = [
+    __iconNode16 = [
       ["path", { d: "M16.247 7.761a6 6 0 0 1 0 8.478", key: "1fwjs5" }],
       ["path", { d: "M19.075 4.933a10 10 0 0 1 0 14.134", key: "ehdyv1" }],
       ["path", { d: "M4.925 19.067a10 10 0 0 1 0-14.134", key: "1q22gi" }],
       ["path", { d: "M7.753 16.239a6 6 0 0 1 0-8.478", key: "r2q7qm" }],
       ["circle", { cx: "12", cy: "12", r: "2", key: "1c9p78" }]
     ];
-    Radio = createLucideIcon("radio", __iconNode14);
+    Radio = createLucideIcon("radio", __iconNode16);
   }
 });
 
 // ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/search.mjs
-var __iconNode15, Search;
+var __iconNode17, Search;
 var init_search = __esm({
   "../grarf/desktop/node_modules/lucide-react/dist/esm/icons/search.mjs"() {
     init_define_import_meta_env();
     init_createLucideIcon();
-    __iconNode15 = [
+    __iconNode17 = [
       ["path", { d: "m21 21-4.34-4.34", key: "14j7rj" }],
       ["circle", { cx: "11", cy: "11", r: "8", key: "4ej97u" }]
     ];
-    Search = createLucideIcon("search", __iconNode15);
+    Search = createLucideIcon("search", __iconNode17);
   }
 });
 
 // ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/settings.mjs
-var __iconNode16, Settings;
+var __iconNode18, Settings;
 var init_settings = __esm({
   "../grarf/desktop/node_modules/lucide-react/dist/esm/icons/settings.mjs"() {
     init_define_import_meta_env();
     init_createLucideIcon();
-    __iconNode16 = [
+    __iconNode18 = [
       [
         "path",
         {
@@ -40758,32 +40780,32 @@ var init_settings = __esm({
       ],
       ["circle", { cx: "12", cy: "12", r: "3", key: "1v7zrd" }]
     ];
-    Settings = createLucideIcon("settings", __iconNode16);
+    Settings = createLucideIcon("settings", __iconNode18);
   }
 });
 
 // ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/square-arrow-out-up-right.mjs
-var __iconNode17, SquareArrowOutUpRight;
+var __iconNode19, SquareArrowOutUpRight;
 var init_square_arrow_out_up_right = __esm({
   "../grarf/desktop/node_modules/lucide-react/dist/esm/icons/square-arrow-out-up-right.mjs"() {
     init_define_import_meta_env();
     init_createLucideIcon();
-    __iconNode17 = [
+    __iconNode19 = [
       ["path", { d: "M21 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h6", key: "y09zxi" }],
       ["path", { d: "m21 3-9 9", key: "mpx6sq" }],
       ["path", { d: "M15 3h6v6", key: "1q9fwt" }]
     ];
-    SquareArrowOutUpRight = createLucideIcon("square-arrow-out-up-right", __iconNode17);
+    SquareArrowOutUpRight = createLucideIcon("square-arrow-out-up-right", __iconNode19);
   }
 });
 
 // ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/triangle-alert.mjs
-var __iconNode18, TriangleAlert;
+var __iconNode20, TriangleAlert;
 var init_triangle_alert = __esm({
   "../grarf/desktop/node_modules/lucide-react/dist/esm/icons/triangle-alert.mjs"() {
     init_define_import_meta_env();
     init_createLucideIcon();
-    __iconNode18 = [
+    __iconNode20 = [
       [
         "path",
         {
@@ -40794,33 +40816,33 @@ var init_triangle_alert = __esm({
       ["path", { d: "M12 9v4", key: "juzpu7" }],
       ["path", { d: "M12 17h.01", key: "p32p05" }]
     ];
-    TriangleAlert = createLucideIcon("triangle-alert", __iconNode18);
+    TriangleAlert = createLucideIcon("triangle-alert", __iconNode20);
   }
 });
 
 // ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/users.mjs
-var __iconNode19, Users;
+var __iconNode21, Users;
 var init_users = __esm({
   "../grarf/desktop/node_modules/lucide-react/dist/esm/icons/users.mjs"() {
     init_define_import_meta_env();
     init_createLucideIcon();
-    __iconNode19 = [
+    __iconNode21 = [
       ["path", { d: "M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2", key: "1yyitq" }],
       ["path", { d: "M16 3.128a4 4 0 0 1 0 7.744", key: "16gr8j" }],
       ["path", { d: "M22 21v-2a4 4 0 0 0-3-3.87", key: "kshegd" }],
       ["circle", { cx: "9", cy: "7", r: "4", key: "nufk8" }]
     ];
-    Users = createLucideIcon("users", __iconNode19);
+    Users = createLucideIcon("users", __iconNode21);
   }
 });
 
 // ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/video.mjs
-var __iconNode20, Video;
+var __iconNode22, Video;
 var init_video = __esm({
   "../grarf/desktop/node_modules/lucide-react/dist/esm/icons/video.mjs"() {
     init_define_import_meta_env();
     init_createLucideIcon();
-    __iconNode20 = [
+    __iconNode22 = [
       [
         "path",
         {
@@ -40830,37 +40852,37 @@ var init_video = __esm({
       ],
       ["rect", { x: "2", y: "6", width: "14", height: "12", rx: "2", key: "158x01" }]
     ];
-    Video = createLucideIcon("video", __iconNode20);
+    Video = createLucideIcon("video", __iconNode22);
   }
 });
 
 // ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/wifi.mjs
-var __iconNode21, Wifi;
+var __iconNode23, Wifi;
 var init_wifi = __esm({
   "../grarf/desktop/node_modules/lucide-react/dist/esm/icons/wifi.mjs"() {
     init_define_import_meta_env();
     init_createLucideIcon();
-    __iconNode21 = [
+    __iconNode23 = [
       ["path", { d: "M12 20h.01", key: "zekei9" }],
       ["path", { d: "M2 8.82a15 15 0 0 1 20 0", key: "dnpr2z" }],
       ["path", { d: "M5 12.859a10 10 0 0 1 14 0", key: "1x1e6c" }],
       ["path", { d: "M8.5 16.429a5 5 0 0 1 7 0", key: "1bycff" }]
     ];
-    Wifi = createLucideIcon("wifi", __iconNode21);
+    Wifi = createLucideIcon("wifi", __iconNode23);
   }
 });
 
 // ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/x.mjs
-var __iconNode22, X2;
+var __iconNode24, X2;
 var init_x = __esm({
   "../grarf/desktop/node_modules/lucide-react/dist/esm/icons/x.mjs"() {
     init_define_import_meta_env();
     init_createLucideIcon();
-    __iconNode22 = [
+    __iconNode24 = [
       ["path", { d: "M18 6 6 18", key: "1bl5f8" }],
       ["path", { d: "m6 6 12 12", key: "d8bk6v" }]
     ];
-    X2 = createLucideIcon("x", __iconNode22);
+    X2 = createLucideIcon("x", __iconNode24);
   }
 });
 
@@ -40873,8 +40895,10 @@ var init_lucide_react = __esm({
     init_square_arrow_out_up_right();
     init_triangle_alert();
     init_calendar();
+    init_chevron_down();
     init_chevron_left();
     init_chevron_right();
+    init_chevron_up();
     init_clipboard_list();
     init_compass();
     init_globe();
@@ -59186,6 +59210,25 @@ function getCardClasses(variant) {
       };
   }
 }
+function getMinimizedCardShellClass(variant) {
+  switch (variant) {
+    case "best-event":
+      return cn2(
+        "rounded-sm border border-ambersys/25 bg-[#100a06]",
+        "shadow-[inset_0_1px_0_rgba(251,191,36,0.08),0_1px_2px_rgba(0,0,0,0.35)]"
+      );
+    case "game-update":
+      return cn2(
+        "rounded-sm border border-greensys/25 bg-[#060c08]",
+        "shadow-[inset_0_1px_0_rgba(86,255,140,0.06),0_1px_2px_rgba(0,0,0,0.35)]"
+      );
+    default:
+      return cn2(
+        "rounded-sm border border-[#1A242B] bg-[#040808]",
+        "shadow-[inset_0_1px_0_rgba(86,247,255,0.03),0_1px_2px_rgba(0,0,0,0.35)]"
+      );
+  }
+}
 function parseOddsSummary(oddsSummary) {
   if (!oddsSummary) return null;
   const parts = oddsSummary.split(/\s*\/\s*/);
@@ -59326,7 +59369,7 @@ function TopRailGameCard({
               ) : null,
               /* @__PURE__ */ (0, import_jsx_runtime24.jsx)("span", { className: "truncate font-medium uppercase tracking-[0.12em] text-white/85", children: leagueLabel })
             ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime24.jsx)("span", { className: "text-center tabular-nums text-cyansys/90", children: timingLabel }),
+            /* @__PURE__ */ (0, import_jsx_runtime24.jsx)("span", { className: "text-center tabular-nums text-ambersys/95", children: timingLabel }),
             /* @__PURE__ */ (0, import_jsx_runtime24.jsx)("div", { className: "flex items-center justify-end", children: /* @__PURE__ */ (0, import_jsx_runtime24.jsx)(
               BroadcastChannelLogo,
               {
@@ -59367,6 +59410,134 @@ function TopRailGameCard({
     }
   );
 }
+function TopRailMinimizedGameCard({
+  game,
+  variant = "normal",
+  onOpen,
+  onWatchLive,
+  onFollowLive,
+  className
+}) {
+  const canonicalGame = useCanonicalGamesSpineGame(game);
+  const displayGame = canonicalGame ?? game;
+  const leagueLabel = resolveGamesSpineGameCardLeagueLabel(displayGame);
+  const leagueLogoUrl = displayGame.league ? resolveGamesSpineLeagueLogoUrl(displayGame.league, { game: displayGame }) : void 0;
+  const channel = resolveGameChannelPresentation(displayGame);
+  const timingLabel = resolveGamesSpineCardTimingLabel(displayGame) ?? formatGameDisplayTimeLocal(displayGame);
+  const isLive = isGameActivelyLive(displayGame);
+  const isFinal = displayGame.status === "final";
+  const [topSide, bottomSide] = resolveGamesSpineMatchupSideOrder(displayGame);
+  const sideTeamName = {
+    away: displayGame.awayTeam,
+    home: displayGame.homeTeam
+  };
+  const topLogoUrl = resolveDarkThemeLogoUrl(displayGame, topSide);
+  const bottomLogoUrl = resolveDarkThemeLogoUrl(displayGame, bottomSide);
+  const topScore = isLive || isFinal ? resolveGamesSpineSideStat(displayGame, topSide) : null;
+  const bottomScore = isLive || isFinal ? resolveGamesSpineSideStat(displayGame, bottomSide) : null;
+  const showWatchLive = Boolean(onWatchLive);
+  const showFollowLive = Boolean(isLive && onFollowLive);
+  const handleWatchLive = (e2) => {
+    e2.stopPropagation();
+    onWatchLive?.(displayGame.id);
+  };
+  const handleFollowLive = (e2) => {
+    e2.stopPropagation();
+    onFollowLive?.(displayGame.id);
+  };
+  const shellClass = getMinimizedCardShellClass(variant);
+  return /* @__PURE__ */ (0, import_jsx_runtime24.jsxs)(
+    "article",
+    {
+      role: "button",
+      tabIndex: 0,
+      onClick: () => onOpen(displayGame.id),
+      onKeyDown: (e2) => {
+        if (e2.key === "Enter" || e2.key === " ") {
+          e2.preventDefault();
+          onOpen(displayGame.id);
+        }
+      },
+      className: cn2(
+        "group flex shrink-0 cursor-pointer items-center gap-2 px-2 py-1.5 font-mono transition duration-200",
+        shellClass,
+        "hover:brightness-110",
+        className
+      ),
+      children: [
+        leagueLogoUrl ? /* @__PURE__ */ (0, import_jsx_runtime24.jsx)(
+          "img",
+          {
+            src: leagueLogoUrl,
+            alt: "",
+            className: cn2(
+              "h-4 w-4 shrink-0 object-contain",
+              displayGame.league && resolveGamesSpineLeagueLogoImgClassName(displayGame.league, leagueLogoUrl)
+            ),
+            loading: "lazy",
+            decoding: "async"
+          }
+        ) : /* @__PURE__ */ (0, import_jsx_runtime24.jsx)("div", { className: "h-4 w-4 shrink-0" }),
+        /* @__PURE__ */ (0, import_jsx_runtime24.jsx)("span", { className: "shrink-0 text-[10px] font-medium uppercase tracking-[0.1em] text-white/80", children: leagueLabel }),
+        /* @__PURE__ */ (0, import_jsx_runtime24.jsx)("div", { className: "h-3 w-px shrink-0 bg-line/30" }),
+        topLogoUrl ? /* @__PURE__ */ (0, import_jsx_runtime24.jsx)(
+          "img",
+          {
+            src: topLogoUrl,
+            alt: "",
+            className: "h-4 w-4 shrink-0 rounded-full object-contain",
+            loading: "lazy",
+            decoding: "async"
+          }
+        ) : /* @__PURE__ */ (0, import_jsx_runtime24.jsx)("div", { className: "h-4 w-4 shrink-0" }),
+        /* @__PURE__ */ (0, import_jsx_runtime24.jsx)("span", { className: "shrink-0 text-[11px] text-white/90", children: sideTeamName[topSide] }),
+        topScore != null ? /* @__PURE__ */ (0, import_jsx_runtime24.jsx)("span", { className: "shrink-0 text-[12px] font-medium tabular-nums text-white", children: topScore }) : null,
+        /* @__PURE__ */ (0, import_jsx_runtime24.jsx)("span", { className: "shrink-0 text-[9px] text-textdim/50", children: "vs" }),
+        bottomLogoUrl ? /* @__PURE__ */ (0, import_jsx_runtime24.jsx)(
+          "img",
+          {
+            src: bottomLogoUrl,
+            alt: "",
+            className: "h-4 w-4 shrink-0 rounded-full object-contain",
+            loading: "lazy",
+            decoding: "async"
+          }
+        ) : /* @__PURE__ */ (0, import_jsx_runtime24.jsx)("div", { className: "h-4 w-4 shrink-0" }),
+        /* @__PURE__ */ (0, import_jsx_runtime24.jsx)("span", { className: "shrink-0 text-[11px] text-white/90", children: sideTeamName[bottomSide] }),
+        bottomScore != null ? /* @__PURE__ */ (0, import_jsx_runtime24.jsx)("span", { className: "shrink-0 text-[12px] font-medium tabular-nums text-white", children: bottomScore }) : null,
+        /* @__PURE__ */ (0, import_jsx_runtime24.jsx)("div", { className: "h-3 w-px shrink-0 bg-line/30" }),
+        /* @__PURE__ */ (0, import_jsx_runtime24.jsx)("span", { className: "shrink-0 text-[10px] tabular-nums text-ambersys/95", children: timingLabel }),
+        /* @__PURE__ */ (0, import_jsx_runtime24.jsx)(
+          BroadcastChannelLogo,
+          {
+            logoUrl: channel.logoUrl,
+            label: channel.label,
+            align: "left",
+            fallbackClassName: "text-[9px] text-textdim/70"
+          }
+        ),
+        showWatchLive ? /* @__PURE__ */ (0, import_jsx_runtime24.jsx)(
+          "button",
+          {
+            type: "button",
+            className: "shrink-0 border border-cyansys/45 bg-[#050a0a] px-1.5 py-0.5 text-center font-mono text-[8px] tracking-[0.06em] text-cyansys/95 transition hover:border-cyansys/55",
+            onClick: handleWatchLive,
+            children: isSpineFinalizedGame(displayGame) ? "REPLAY" : "WATCH"
+          }
+        ) : null,
+        showFollowLive ? /* @__PURE__ */ (0, import_jsx_runtime24.jsx)(
+          "button",
+          {
+            type: "button",
+            className: "shrink-0 border border-line bg-[#050a0a] px-1.5 py-0.5 text-center font-mono text-[8px] tracking-[0.06em] text-textdim/90 transition hover:border-line/80",
+            onClick: handleFollowLive,
+            children: "FOLLOW"
+          }
+        ) : null
+      ]
+    }
+  );
+}
 function TopRailGameUpdateCard({
   gameId,
   alertType,
@@ -59392,8 +59563,31 @@ function TopRailGameUpdateCard({
     }
   );
 }
+function TopRailMinimizedGameUpdateCard({
+  gameId,
+  onOpen,
+  onWatchLive,
+  onFollowLive,
+  className
+}) {
+  const liveGame = useGameForOperationalAlert(gameId);
+  const game = resolveTransientAlertPlaceholderGame(gameId) ?? liveGame;
+  if (!game) return null;
+  return /* @__PURE__ */ (0, import_jsx_runtime24.jsx)(
+    TopRailMinimizedGameCard,
+    {
+      game,
+      variant: "game-update",
+      onOpen,
+      onWatchLive,
+      onFollowLive,
+      className
+    }
+  );
+}
 function TopRailGameUpdateSlot({
   activeAlert,
+  isExpanded,
   onOpen,
   onWatchLive,
   onFollowLive,
@@ -59463,6 +59657,18 @@ function TopRailGameUpdateSlot({
   if (phase === "hidden" && !currentAlert) {
     return null;
   }
+  if (!isExpanded) {
+    return currentAlert ? /* @__PURE__ */ (0, import_jsx_runtime24.jsx)(
+      TopRailMinimizedGameUpdateCard,
+      {
+        gameId: currentAlert.gameId,
+        alertType: currentAlert.type,
+        onOpen,
+        onWatchLive,
+        onFollowLive
+      }
+    ) : null;
+  }
   const slotWidth = slotExpanded ? TOP_RAIL_CARD_WIDTH_PX + TOP_RAIL_GAP_PX : 0;
   return /* @__PURE__ */ (0, import_jsx_runtime24.jsx)(
     "div",
@@ -59519,8 +59725,31 @@ function useImportantGames(count, excludeGameId) {
     return [...liveGames, ...scheduledGames];
   }, [leagues, count, excludeGameId]);
 }
+function TopRailExpandCollapseControl({ isExpanded, onToggle }) {
+  const Icon2 = isExpanded ? ChevronUp : ChevronDown;
+  const label = isExpanded ? "Minimize Top Rail" : "Expand Top Rail";
+  return /* @__PURE__ */ (0, import_jsx_runtime24.jsx)(
+    "button",
+    {
+      type: "button",
+      onClick: onToggle,
+      title: label,
+      "aria-expanded": isExpanded,
+      "aria-label": label,
+      className: cn2(
+        "flex w-10 shrink-0 items-center justify-center",
+        "rounded-sm border border-line/40 bg-[#050909]",
+        "text-textdim/70 transition duration-150",
+        "hover:border-line/60 hover:bg-[#070b0b] hover:text-textdim/90",
+        "focus-visible:outline focus-visible:outline-1 focus-visible:outline-cyansys/40"
+      ),
+      children: /* @__PURE__ */ (0, import_jsx_runtime24.jsx)(Icon2, { size: 16, strokeWidth: 2, "aria-hidden": true })
+    }
+  );
+}
 function TopRailGameStrip({ className }) {
   const scrollRef = (0, import_react30.useRef)(null);
+  const [isExpanded, setIsExpanded] = (0, import_react30.useState)(true);
   const bestGameResult = useHomeBestGameRightNowResult();
   const activeAlert = useGamesSpineTransientAlertStore((s2) => s2.active);
   const completeActive = useGamesSpineTransientAlertStore((s2) => s2.completeActive);
@@ -59539,6 +59768,9 @@ function TopRailGameStrip({ className }) {
   const onUpdateExited = (0, import_react30.useCallback)(() => {
     completeActive();
   }, [completeActive]);
+  const toggleExpanded = (0, import_react30.useCallback)(() => {
+    setIsExpanded((prev) => !prev);
+  }, []);
   if (!isGrarfElectronRenderer()) return null;
   if (!bestGameResult && importantGames.length === 0) return null;
   return /* @__PURE__ */ (0, import_jsx_runtime24.jsxs)(
@@ -59546,24 +59778,32 @@ function TopRailGameStrip({ className }) {
     {
       className: cn2(
         "relative flex h-auto shrink-0 items-stretch border-b border-line/50 bg-[#020404]",
+        "transition-all duration-[250ms] ease-out",
         className
       ),
       children: [
         /* @__PURE__ */ (0, import_jsx_runtime24.jsxs)("div", { className: "relative z-10 flex shrink-0 items-stretch gap-2 bg-[#020404] py-2 pl-3 pr-2", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime24.jsx)("div", { className: "flex shrink-0 items-center", children: /* @__PURE__ */ (0, import_jsx_runtime24.jsx)(
-            "img",
+          /* @__PURE__ */ (0, import_jsx_runtime24.jsx)(
+            TopRailExpandCollapseControl,
             {
-              src: "/grarf_logo-white.png",
-              alt: "GRARF",
-              className: "h-6 w-auto object-contain opacity-80",
-              draggable: false
+              isExpanded,
+              onToggle: toggleExpanded
             }
-          ) }),
-          bestGameResult ? /* @__PURE__ */ (0, import_jsx_runtime24.jsx)(
+          ),
+          bestGameResult ? isExpanded ? /* @__PURE__ */ (0, import_jsx_runtime24.jsx)(
             TopRailGameCard,
             {
               game: bestGameResult.game,
               label: bestGameResult.kind === "best_live" ? "BEST EVENT RIGHT NOW" : "NEXT BIG EVENT",
+              variant: "best-event",
+              onOpen,
+              onWatchLive,
+              onFollowLive
+            }
+          ) : /* @__PURE__ */ (0, import_jsx_runtime24.jsx)(
+            TopRailMinimizedGameCard,
+            {
+              game: bestGameResult.game,
               variant: "best-event",
               onOpen,
               onWatchLive,
@@ -59584,13 +59824,14 @@ function TopRailGameStrip({ className }) {
                 TopRailGameUpdateSlot,
                 {
                   activeAlert,
+                  isExpanded,
                   onOpen,
                   onWatchLive,
                   onFollowLive,
                   onExited: onUpdateExited
                 }
               ),
-              importantGames.map((game) => /* @__PURE__ */ (0, import_jsx_runtime24.jsx)(
+              isExpanded ? importantGames.map((game) => /* @__PURE__ */ (0, import_jsx_runtime24.jsx)(
                 TopRailGameCard,
                 {
                   game,
@@ -59599,6 +59840,16 @@ function TopRailGameStrip({ className }) {
                   onWatchLive,
                   onFollowLive,
                   className: "transition-transform duration-300 ease-out"
+                },
+                game.id
+              )) : importantGames.map((game) => /* @__PURE__ */ (0, import_jsx_runtime24.jsx)(
+                TopRailMinimizedGameCard,
+                {
+                  game,
+                  variant: "normal",
+                  onOpen,
+                  onWatchLive,
+                  onFollowLive
                 },
                 game.id
               ))
@@ -59615,6 +59866,7 @@ var init_TopRailGameStrip = __esm({
     init_define_import_meta_env();
     import_react30 = __toESM(require_react(), 1);
     init_dist();
+    init_lucide_react();
     init_cn();
     init_useHomeBestGameRightNowResult();
     init_useCanonicalGamesSpineGame();
@@ -141629,8 +141881,10 @@ lucide-react/dist/esm/context.mjs:
 lucide-react/dist/esm/Icon.mjs:
 lucide-react/dist/esm/createLucideIcon.mjs:
 lucide-react/dist/esm/icons/calendar.mjs:
+lucide-react/dist/esm/icons/chevron-down.mjs:
 lucide-react/dist/esm/icons/chevron-left.mjs:
 lucide-react/dist/esm/icons/chevron-right.mjs:
+lucide-react/dist/esm/icons/chevron-up.mjs:
 lucide-react/dist/esm/icons/clipboard-list.mjs:
 lucide-react/dist/esm/icons/compass.mjs:
 lucide-react/dist/esm/icons/globe.mjs:
