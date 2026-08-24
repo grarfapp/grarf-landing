@@ -81558,7 +81558,7 @@ function formatAccount(source) {
   if (!trimmed) return "";
   return trimmed.startsWith("@") ? trimmed : `@${trimmed.replace(/\s+/g, "")}`;
 }
-function TimelineLiveTrackerPost({ post, onExpand }) {
+function TimelineLiveTrackerPost({ post, onExpand, isExpanded = false }) {
   if (post.kind === "final_score") {
     return /* @__PURE__ */ (0, import_jsx_runtime36.jsx)(TimelineFinalScoreStrip, { post });
   }
@@ -81595,6 +81595,7 @@ function TimelineLiveTrackerPost({ post, onExpand }) {
     body ? /* @__PURE__ */ (0, import_jsx_runtime36.jsx)("p", { className: cn2(TIMELINE_PRIMARY_TEXT_CLASS, "line-clamp-4"), children: body }) : null,
     account ? /* @__PURE__ */ (0, import_jsx_runtime36.jsx)("p", { className: cn2(TIMELINE_METADATA_TEXT_CLASS, "mt-1"), children: account }) : null
   ] });
+  const showThumb = hasThumb && !isExpanded;
   return /* @__PURE__ */ (0, import_jsx_runtime36.jsx)(
     TimelineItemShell,
     {
@@ -81603,7 +81604,7 @@ function TimelineLiveTrackerPost({ post, onExpand }) {
       logoUrl: leagueLogoUrl,
       logoClassName,
       onClick: handleClick,
-      children: hasThumb ? /* @__PURE__ */ (0, import_jsx_runtime36.jsxs)("div", { className: TIMELINE_THUMB_ROW_CLASS, children: [
+      children: showThumb ? /* @__PURE__ */ (0, import_jsx_runtime36.jsxs)("div", { className: TIMELINE_THUMB_ROW_CLASS, children: [
         thumb,
         textContent4
       ] }) : textContent4
@@ -81893,7 +81894,7 @@ function getSocialMediaConstraints(orientation) {
     maxHeight: TIMELINE_SOCIAL_VERTICAL_MAX_HEIGHT_PX
   };
 }
-function TimelineSocialPost({ event, isPlaying = false, onPlayVideo, onExpand }) {
+function TimelineSocialPost({ event, isPlaying = false, onPlayVideo, onExpand, isExpanded = false }) {
   const handle = formatHandle(event);
   const body = event.embed.headline.trim();
   const previewImageUrl = resolveLiveTrackPreviewImageUrl(event).trim();
@@ -81938,7 +81939,7 @@ function TimelineSocialPost({ event, isPlaying = false, onPlayVideo, onExpand })
       onClick: handleClick,
       children: [
         body ? /* @__PURE__ */ (0, import_jsx_runtime39.jsx)("p", { className: cn2(TIMELINE_PRIMARY_TEXT_CLASS, "whitespace-pre-wrap"), children: body }) : null,
-        hasVideoMedia ? /* @__PURE__ */ (0, import_jsx_runtime39.jsx)(
+        !isExpanded && hasVideoMedia ? /* @__PURE__ */ (0, import_jsx_runtime39.jsx)(
           TimelineMediaFrame,
           {
             src: mediaUrl,
@@ -81960,7 +81961,7 @@ function TimelineSocialPost({ event, isPlaying = false, onPlayVideo, onExpand })
               videoSrc
             ) : null
           }
-        ) : hasMedia ? /* @__PURE__ */ (0, import_jsx_runtime39.jsx)(
+        ) : !isExpanded && hasMedia ? /* @__PURE__ */ (0, import_jsx_runtime39.jsx)(
           TimelineMediaFrame,
           {
             src: previewImageUrl,
@@ -82000,7 +82001,7 @@ function formatRelative(iso) {
   const d2 = Math.floor(hr2 / 24);
   return `${d2}d ago`;
 }
-function TimelineClipCard({ clip, onClipOpen, onExpand }) {
+function TimelineClipCard({ clip, onClipOpen, onExpand, isExpanded = false }) {
   const handleClick = () => {
     if (onExpand) {
       onExpand();
@@ -82014,7 +82015,13 @@ function TimelineClipCard({ clip, onClipOpen, onExpand }) {
       type: "clip",
       source: clip.source,
       onClick: handleClick,
-      children: /* @__PURE__ */ (0, import_jsx_runtime40.jsxs)("div", { className: TIMELINE_THUMB_ROW_CLASS, children: [
+      children: isExpanded ? /* @__PURE__ */ (0, import_jsx_runtime40.jsxs)("div", { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime40.jsx)("p", { className: cn2(TIMELINE_PRIMARY_TEXT_CLASS, "line-clamp-2"), children: clip.title }),
+        /* @__PURE__ */ (0, import_jsx_runtime40.jsxs)("p", { className: cn2(TIMELINE_METADATA_TEXT_CLASS, "mt-1"), children: [
+          formatRelative(clip.publishedAt),
+          " \u2022 YT"
+        ] })
+      ] }) : /* @__PURE__ */ (0, import_jsx_runtime40.jsxs)("div", { className: TIMELINE_THUMB_ROW_CLASS, children: [
         /* @__PURE__ */ (0, import_jsx_runtime40.jsxs)("span", { className: TIMELINE_THUMB_FRAME_CLASS, children: [
           /* @__PURE__ */ (0, import_jsx_runtime40.jsx)(
             "img",
@@ -82322,7 +82329,8 @@ function HomeCenterPaneTimelineRow({ item, onClipOpen, registerItemRef }) {
           TimelineLiveTrackerPost,
           {
             post: item.liveTrackerPost,
-            onExpand: hasUrl ? handleExpand : void 0
+            onExpand: hasUrl ? handleExpand : void 0,
+            isExpanded
           }
         ) : null,
         item.sourceKind === "newswire" && item.newswireStory ? /* @__PURE__ */ (0, import_jsx_runtime44.jsx)(
@@ -82354,7 +82362,8 @@ function HomeCenterPaneTimelineRow({ item, onClipOpen, registerItemRef }) {
             event: item.socialEvent,
             isPlaying: isSocialPlaying,
             onPlayVideo: handleSocialPlayVideo,
-            onExpand: hasUrl ? handleExpand : void 0
+            onExpand: hasUrl ? handleExpand : void 0,
+            isExpanded
           }
         ) : null,
         item.sourceKind === "clip" && item.clip ? /* @__PURE__ */ (0, import_jsx_runtime44.jsx)(
@@ -82362,7 +82371,8 @@ function HomeCenterPaneTimelineRow({ item, onClipOpen, registerItemRef }) {
           {
             clip: item.clip,
             onClipOpen,
-            onExpand: hasUrl ? handleExpand : void 0
+            onExpand: hasUrl ? handleExpand : void 0,
+            isExpanded
           }
         ) : null,
         isExpanded ? /* @__PURE__ */ (0, import_jsx_runtime44.jsx)(
