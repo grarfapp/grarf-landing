@@ -81011,16 +81011,21 @@ function hasWebviewTag() {
   return typeof customElements !== "undefined" && !!customElements.get("webview");
 }
 function navigateWebview(wv, url) {
+  console.log(`${LOG41} navigateWebview`, { url });
   try {
     if (typeof wv.loadURL === "function") {
       wv.loadURL(url);
+      console.log(`${LOG41} navigateWebview via loadURL succeeded`);
       return;
     }
-  } catch {
+  } catch (err) {
+    console.warn(`${LOG41} loadURL failed, trying src`, err);
   }
   try {
     wv.src = url;
-  } catch {
+    console.log(`${LOG41} navigateWebview via src succeeded`);
+  } catch (err) {
+    console.error(`${LOG41} navigateWebview failed entirely`, err);
   }
 }
 function applyTimelineWebviewSize(wv, heightPx) {
@@ -81158,6 +81163,28 @@ function HomeCenterPaneTimelineArticleExpansionPane({
       const currentUrl = e2.url?.trim() ?? wv.getURL?.() ?? "";
       console.log(`${LOG41} did-navigate-in-page`, { url: currentUrl });
     };
+    const onDidStartNavigation = (event) => {
+      const e2 = event;
+      if (e2.isMainFrame === false) return;
+      const nextUrl = e2.url?.trim() ?? "";
+      console.log(`${LOG41} did-start-navigation`, { url: nextUrl });
+      if (nextUrl) {
+        setShowLoadingHint(true);
+        setLoadFailed(false);
+      }
+    };
+    const onConsoleMessage = (event) => {
+      const e2 = event;
+      const level = e2.level ?? 0;
+      if (level >= 2) {
+        console.warn(`${LOG41} webview-console`, {
+          level,
+          message: e2.message,
+          line: e2.line,
+          sourceId: e2.sourceId
+        });
+      }
+    };
     const onNewWindow = (event) => {
       const e2 = event;
       const nextUrl = e2.url?.trim() ?? "";
@@ -81182,7 +81209,9 @@ function HomeCenterPaneTimelineArticleExpansionPane({
     wv.addEventListener("will-navigate", onWillNavigate);
     wv.addEventListener("did-navigate", onDidNavigate);
     wv.addEventListener("did-navigate-in-page", onDidNavigateInPage);
+    wv.addEventListener("did-start-navigation", onDidStartNavigation);
     wv.addEventListener("new-window", onNewWindow);
+    wv.addEventListener("console-message", onConsoleMessage);
     return () => {
       wv.removeEventListener("dom-ready", onDomReady);
       wv.removeEventListener("did-finish-load", onFinishLoad);
@@ -81190,7 +81219,9 @@ function HomeCenterPaneTimelineArticleExpansionPane({
       wv.removeEventListener("will-navigate", onWillNavigate);
       wv.removeEventListener("did-navigate", onDidNavigate);
       wv.removeEventListener("did-navigate-in-page", onDidNavigateInPage);
+      wv.removeEventListener("did-start-navigation", onDidStartNavigation);
       wv.removeEventListener("new-window", onNewWindow);
+      wv.removeEventListener("console-message", onConsoleMessage);
     };
   }, [canEmbed, articleUrl, applyCurrentWebviewSize]);
   const handleOpenExternal = () => {
@@ -81252,6 +81283,7 @@ function HomeCenterPaneTimelineArticleExpansionPane({
             src: articleUrl ?? void 0,
             partition,
             webpreferences: WEBVIEW_WEB_PREFS,
+            allowpopups: "true",
             className: "border-0",
             style: webviewElementStyle
           },
