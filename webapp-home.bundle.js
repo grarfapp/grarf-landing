@@ -80503,8 +80503,9 @@ function toFeedSourceDefinition(definition) {
     enabled: true
   };
 }
-async function fetchLiveTrackFeedEvents() {
-  const activeFeeds = resolveActiveLiveTrackLeagueFeeds();
+async function fetchLiveTrackFeedEvents(options = {}) {
+  const { fetchAllFeeds = false } = options;
+  const feeds = fetchAllFeeds ? getLiveTrackLeagueFeedRegistry() : resolveActiveLiveTrackLeagueFeeds();
   if (define_import_meta_env_default.DEV) {
     const states = resolveLiveTrackLeagueActivationStates();
     console.log(
@@ -80514,14 +80515,15 @@ async function fetchLiveTrackFeedEvents() {
         active: state3.active,
         live: state3.liveGameCount,
         minutesSinceLastFinal: state3.minutesSinceLastFinal
-      }))
+      })),
+      { fetchAllFeeds, feedCount: feeds.length }
     );
   }
-  if (activeFeeds.length === 0) {
+  if (feeds.length === 0) {
     return [];
   }
   const results = await Promise.all(
-    activeFeeds.map(async (definition) => {
+    feeds.map(async (definition) => {
       const feedSource = createLiveTrackFeedSource(toFeedSourceDefinition(definition));
       const result = await feedSource.fetchItems({ maxItems: MAX_ITEMS_PER_LEAGUE });
       return { definition, result };
@@ -80558,6 +80560,7 @@ var init_fetchLiveTrackFeedEvents = __esm({
     init_define_import_meta_env();
     init_sortLiveTrackEvents();
     init_createLiveTrackFeedSource();
+    init_leagueFeedRegistry();
     init_mapFeedItemToLiveTrackEvent();
     init_resolveLiveTrackLeagueActivation();
     MAX_ITEMS_PER_LEAGUE = 50;
@@ -80571,7 +80574,7 @@ function useSocialRssFeedEvents() {
   const [error, setError] = (0, import_react79.useState)(null);
   const refresh = (0, import_react79.useCallback)(async () => {
     try {
-      const next = await fetchLiveTrackFeedEvents();
+      const next = await fetchLiveTrackFeedEvents({ fetchAllFeeds: true });
       setEvents(next);
       setError(null);
     } catch (err) {
@@ -80867,6 +80870,50 @@ var init_openNewswireStoryInBrowser = __esm({
   }
 });
 
+// ../grarf/desktop/src/lib/timeline/resolveGameUpdateWorkspaceUrl.ts
+function findGameById3(gameId) {
+  const leagues = useLiveGamesStore.getState().leagues;
+  for (const rows of Object.values(leagues)) {
+    if (!Array.isArray(rows)) continue;
+    for (const game of rows) {
+      if (game.id === gameId || game.grarfGameId === gameId) return game;
+    }
+  }
+  return void 0;
+}
+function resolveGameEmbedUrl(game) {
+  if (game.gameCardUrl?.trim()) {
+    return game.gameCardUrl.trim();
+  }
+  const parsed = parseEspnGameIdFromRowId(game.id);
+  if (parsed) {
+    return buildEspnGamecastUrl(parsed.league, parsed.eventId, {
+      ufcCardEventId: game.metadata?.ufcCardEventId
+    });
+  }
+  return null;
+}
+function resolveGameUpdateWorkspaceUrl(update) {
+  const gameId = update.gameId?.trim();
+  if (!gameId) return null;
+  const game = findGameById3(gameId);
+  if (!game) {
+    const parsed = parseEspnGameIdFromRowId(gameId);
+    if (parsed) {
+      return buildEspnGamecastUrl(parsed.league, parsed.eventId);
+    }
+    return null;
+  }
+  return resolveGameEmbedUrl(game);
+}
+var init_resolveGameUpdateWorkspaceUrl = __esm({
+  "../grarf/desktop/src/lib/timeline/resolveGameUpdateWorkspaceUrl.ts"() {
+    init_define_import_meta_env();
+    init_liveGamesStore();
+    init_espnGameUrls();
+  }
+});
+
 // ../grarf/desktop/src/lib/timeline/resolveTimelineItemUrl.ts
 function resolveTimelineItemUrl(item) {
   switch (item.sourceKind) {
@@ -80881,7 +80928,7 @@ function resolveTimelineItemUrl(item) {
     case "clip":
       return item.clip?.videoUrl?.trim() || null;
     case "game_update":
-      return null;
+      return item.gameUpdate ? resolveGameUpdateWorkspaceUrl(item.gameUpdate) : null;
     default:
       return null;
   }
@@ -80890,6 +80937,7 @@ var init_resolveTimelineItemUrl = __esm({
   "../grarf/desktop/src/lib/timeline/resolveTimelineItemUrl.ts"() {
     init_define_import_meta_env();
     init_openNewswireStoryInBrowser();
+    init_resolveGameUpdateWorkspaceUrl();
   }
 });
 
@@ -80954,6 +81002,8 @@ function resolveWebpaneTypeLabel(sourceKind) {
       return "RECAP";
     case "clip":
       return "VIDEO";
+    case "game_update":
+      return "GAME";
     default:
       return "CONTENT";
   }
@@ -81924,11 +81974,11 @@ function formatRelative(iso) {
 }
 function TimelineClipCard({ clip, onClipOpen, onExpand }) {
   const handleClick = () => {
-    if (onClipOpen) {
-      onClipOpen(clip);
+    if (onExpand) {
+      onExpand();
       return;
     }
-    onExpand?.();
+    onClipOpen?.(clip);
   };
   return /* @__PURE__ */ (0, import_jsx_runtime40.jsx)(
     TimelineItemShell,
@@ -82098,7 +82148,7 @@ function resolveScoreLine(game) {
 function resolveDetailLine(game, fallback) {
   return game.statusLine?.trim() || game.operationalNarrative?.trim() || resolveGamesSpineCardTimingLabel(game) || fallback.trim();
 }
-function TimelineGameUpdate({ update }) {
+function TimelineGameUpdate({ update, onExpand }) {
   const gameId = update.gameId;
   const game = useLiveGamesStore(
     (state3) => gameId ? findGameInLeagues(gameId, state3.leagues) : void 0
@@ -82110,7 +82160,8 @@ function TimelineGameUpdate({ update }) {
   const scoreLine3 = game ? resolveScoreLine(game) : update.headline;
   const detail = game ? resolveDetailLine(game, update.headline) : update.headline;
   const accentColor = TIMELINE_ACCENT_COLORS.game_update;
-  return /* @__PURE__ */ (0, import_jsx_runtime43.jsxs)("div", { className: cn2(TIMELINE_ITEM_SHELL_CLASS, "flex min-w-0"), children: [
+  const isClickable = Boolean(onExpand);
+  const content = /* @__PURE__ */ (0, import_jsx_runtime43.jsxs)(import_jsx_runtime43.Fragment, { children: [
     /* @__PURE__ */ (0, import_jsx_runtime43.jsx)("span", { className: timelineAccentBarClass("game_update"), style: { backgroundColor: accentColor }, "aria-hidden": true }),
     /* @__PURE__ */ (0, import_jsx_runtime43.jsx)("div", { className: "min-w-0 flex-1 px-2 py-1.5", children: /* @__PURE__ */ (0, import_jsx_runtime43.jsxs)("div", { className: "flex min-w-0 flex-wrap items-center gap-x-2 gap-y-0.5 font-mono text-[11px] leading-snug tracking-[0.04em]", children: [
       /* @__PURE__ */ (0, import_jsx_runtime43.jsx)("span", { className: "shrink-0 font-semibold text-greensys", children: update.source ?? "SCORE" }),
@@ -82119,6 +82170,23 @@ function TimelineGameUpdate({ update }) {
       /* @__PURE__ */ (0, import_jsx_runtime43.jsx)("span", { className: "min-w-0 truncate text-[#b8cccc]", children: detail })
     ] }) })
   ] });
+  const shellClass = cn2(
+    TIMELINE_ITEM_SHELL_CLASS,
+    "flex min-w-0",
+    isClickable && "cursor-pointer transition-colors hover:bg-[#0e1a1d]/80 hover:border-[#24363c]/70"
+  );
+  if (isClickable) {
+    return /* @__PURE__ */ (0, import_jsx_runtime43.jsx)(
+      "button",
+      {
+        type: "button",
+        onClick: onExpand,
+        className: cn2(shellClass, "w-full text-left"),
+        children: content
+      }
+    );
+  }
+  return /* @__PURE__ */ (0, import_jsx_runtime43.jsx)("div", { className: shellClass, children: content });
 }
 var import_react85, import_jsx_runtime43;
 var init_TimelineGameUpdate = __esm({
@@ -82150,6 +82218,8 @@ function resolveItemHeadline(item) {
       return item.sportscapeGameCard?.article.headline ?? "";
     case "clip":
       return item.clip?.title ?? "";
+    case "game_update":
+      return item.gameUpdate?.headline ?? "";
     default:
       return "";
   }
@@ -82166,6 +82236,8 @@ function resolveItemSource(item) {
       return item.sportscapeGameCard?.entry.leagueEventName ?? "";
     case "clip":
       return item.clip?.source ?? "";
+    case "game_update":
+      return item.gameUpdate?.source ?? "";
     default:
       return "";
   }
@@ -82182,8 +82254,12 @@ function HomeCenterPaneTimelineRow({ item, onClipOpen, registerItemRef }) {
   const hasUrl = Boolean(itemUrl);
   const handleExpand = (0, import_react86.useCallback)(() => {
     if (!itemUrl) return;
-    expandItem(item.id, itemUrl, item.sourceKind);
-  }, [expandItem, item.id, item.sourceKind, itemUrl]);
+    if (isExpanded) {
+      collapse();
+    } else {
+      expandItem(item.id, itemUrl, item.sourceKind);
+    }
+  }, [expandItem, collapse, item.id, item.sourceKind, itemUrl, isExpanded]);
   const handleSocialPlayVideo = (0, import_react86.useCallback)(() => {
     setIsSocialPlaying(true);
   }, []);
@@ -82237,7 +82313,13 @@ function HomeCenterPaneTimelineRow({ item, onClipOpen, registerItemRef }) {
             onExpand: hasUrl ? handleExpand : void 0
           }
         ) : null,
-        item.sourceKind === "game_update" && item.gameUpdate ? /* @__PURE__ */ (0, import_jsx_runtime44.jsx)(TimelineGameUpdate, { update: item.gameUpdate }) : null,
+        item.sourceKind === "game_update" && item.gameUpdate ? /* @__PURE__ */ (0, import_jsx_runtime44.jsx)(
+          TimelineGameUpdate,
+          {
+            update: item.gameUpdate,
+            onExpand: hasUrl ? handleExpand : void 0
+          }
+        ) : null,
         item.sourceKind === "social" && item.socialEvent ? /* @__PURE__ */ (0, import_jsx_runtime44.jsx)(
           TimelineSocialPost,
           {
@@ -131319,8 +131401,8 @@ var init_useGameWorkspacePathNavigation = __esm({
 });
 
 // ../grarf/desktop/src/lib/centerPane/isCenterPaneNowActive.ts
-function isCenterPaneNowActive(isElectronDesktopObjectsSpine, operationalMode) {
-  return isElectronDesktopObjectsSpine && operationalMode === "LIVE";
+function isCenterPaneNowActive(isElectronDesktopObjectsSpine, _operationalMode) {
+  return isElectronDesktopObjectsSpine;
 }
 var init_isCenterPaneNowActive = __esm({
   "../grarf/desktop/src/lib/centerPane/isCenterPaneNowActive.ts"() {
@@ -132036,7 +132118,7 @@ function HomePage() {
         }
       ),
       center: centerStack,
-      right: /* @__PURE__ */ (0, import_jsx_runtime211.jsx)(
+      right: showCenterPaneTimelineSurface ? null : /* @__PURE__ */ (0, import_jsx_runtime211.jsx)(
         GuidedAttentionPanel,
         {
           paneId: "right",
@@ -132055,8 +132137,7 @@ function HomePage() {
               onOpenIntelligence,
               onOpenLiveShow,
               headlinesVideoUrl: inSportscapeCenter ? SPORTSCAPE_CBS_SPORTS_HQ_VIDEO_URL : void 0,
-              onSocialRailTvPanelHeightChange: isGrarfWebRenderer() ? onSocialRailTvPanelHeightChange : void 0,
-              suppressSocialRail: showCenterPaneTimelineSurface
+              onSocialRailTvPanelHeightChange: isGrarfWebRenderer() ? onSocialRailTvPanelHeightChange : void 0
             }
           )
         }
