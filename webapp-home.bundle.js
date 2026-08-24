@@ -81010,6 +81010,19 @@ var init_openExternal = __esm({
 function hasWebviewTag() {
   return typeof customElements !== "undefined" && !!customElements.get("webview");
 }
+function navigateWebview(wv, url) {
+  try {
+    if (typeof wv.loadURL === "function") {
+      wv.loadURL(url);
+      return;
+    }
+  } catch {
+  }
+  try {
+    wv.src = url;
+  } catch {
+  }
+}
 function applyTimelineWebviewSize(wv, heightPx) {
   wv.style.display = "inline-flex";
   wv.style.width = "100%";
@@ -81123,21 +81136,60 @@ function HomeCenterPaneTimelineArticleExpansionPane({
       setShowLoadingHint(false);
       setLoadFailed(true);
     };
+    const onWillNavigate = (event) => {
+      const e2 = event;
+      if (e2.isMainFrame === false) return;
+      const nextUrl = e2.url?.trim() ?? "";
+      if (!nextUrl) return;
+      console.log(`${LOG41} will-navigate`, { url: nextUrl });
+      setShowLoadingHint(true);
+      setLoadFailed(false);
+    };
+    const onDidNavigate = (event) => {
+      const e2 = event;
+      if (e2.isMainFrame === false) return;
+      const currentUrl = e2.url?.trim() ?? wv.getURL?.() ?? "";
+      console.log(`${LOG41} did-navigate`, { url: currentUrl });
+      setShowLoadingHint(false);
+    };
+    const onDidNavigateInPage = (event) => {
+      const e2 = event;
+      if (e2.isMainFrame === false) return;
+      const currentUrl = e2.url?.trim() ?? wv.getURL?.() ?? "";
+      console.log(`${LOG41} did-navigate-in-page`, { url: currentUrl });
+    };
     const onNewWindow = (event) => {
       const e2 = event;
       const nextUrl = e2.url?.trim() ?? "";
+      if (!nextUrl) return;
       event.preventDefault();
-      if (nextUrl) void openExternalUrl2(nextUrl);
+      const disposition = e2.disposition ?? "";
+      const isTabRequest = disposition === "foreground-tab" || disposition === "background-tab" || disposition === "default";
+      if (isTabRequest) {
+        console.log(`${LOG41} new-window \u2192 navigate in-pane`, { url: nextUrl, disposition });
+        setShowLoadingHint(true);
+        setLoadFailed(false);
+        navigateWebview(wv, nextUrl);
+      } else {
+        console.log(`${LOG41} new-window \u2192 open external`, { url: nextUrl, disposition });
+        void openExternalUrl2(nextUrl);
+      }
     };
     applyCurrentWebviewSize();
     wv.addEventListener("dom-ready", onDomReady);
     wv.addEventListener("did-finish-load", onFinishLoad);
     wv.addEventListener("did-fail-load", onFailLoad);
+    wv.addEventListener("will-navigate", onWillNavigate);
+    wv.addEventListener("did-navigate", onDidNavigate);
+    wv.addEventListener("did-navigate-in-page", onDidNavigateInPage);
     wv.addEventListener("new-window", onNewWindow);
     return () => {
       wv.removeEventListener("dom-ready", onDomReady);
       wv.removeEventListener("did-finish-load", onFinishLoad);
       wv.removeEventListener("did-fail-load", onFailLoad);
+      wv.removeEventListener("will-navigate", onWillNavigate);
+      wv.removeEventListener("did-navigate", onDidNavigate);
+      wv.removeEventListener("did-navigate-in-page", onDidNavigateInPage);
       wv.removeEventListener("new-window", onNewWindow);
     };
   }, [canEmbed, articleUrl, applyCurrentWebviewSize]);
@@ -81794,7 +81846,8 @@ function TimelineMediaFrame({
   videoElement,
   className,
   maxWidth,
-  maxHeight
+  maxHeight,
+  onClick
 }) {
   const frameStyle = (0, import_react83.useMemo)(
     () => ({
@@ -81814,7 +81867,7 @@ function TimelineMediaFrame({
       }
     );
   }
-  if (isVideo && onPlay) {
+  if (isVideo && !isPlaying) {
     return /* @__PURE__ */ (0, import_jsx_runtime38.jsxs)(
       "button",
       {
@@ -81826,9 +81879,10 @@ function TimelineMediaFrame({
         ),
         onClick: (e2) => {
           stopPropagation(e2);
-          onPlay();
+          onClick?.();
         },
-        "aria-label": "Play video",
+        style: frameStyle,
+        "aria-label": "View video",
         children: [
           /* @__PURE__ */ (0, import_jsx_runtime38.jsx)(
             "img",
@@ -81846,7 +81900,37 @@ function TimelineMediaFrame({
       }
     );
   }
-  return /* @__PURE__ */ (0, import_jsx_runtime38.jsx)("div", { className: cn2(TIMELINE_MEDIA_CONTAINER_CLASS, className), "aria-hidden": true, children: /* @__PURE__ */ (0, import_jsx_runtime38.jsx)(
+  if (onClick) {
+    return /* @__PURE__ */ (0, import_jsx_runtime38.jsx)(
+      "button",
+      {
+        type: "button",
+        className: cn2(
+          TIMELINE_MEDIA_CONTAINER_CLASS,
+          "cursor-pointer border-0 bg-transparent p-0 text-left",
+          className
+        ),
+        onClick: (e2) => {
+          stopPropagation(e2);
+          onClick();
+        },
+        style: frameStyle,
+        "aria-label": "View content",
+        children: /* @__PURE__ */ (0, import_jsx_runtime38.jsx)(
+          "img",
+          {
+            src,
+            alt,
+            className: TIMELINE_MEDIA_FRAME_CLASS,
+            style: frameStyle,
+            loading: "lazy",
+            decoding: "async"
+          }
+        )
+      }
+    );
+  }
+  return /* @__PURE__ */ (0, import_jsx_runtime38.jsx)("div", { className: cn2(TIMELINE_MEDIA_CONTAINER_CLASS, className), style: frameStyle, children: /* @__PURE__ */ (0, import_jsx_runtime38.jsx)(
     "img",
     {
       src,
@@ -81923,12 +82007,8 @@ function TimelineSocialPost({ event, isPlaying = false, onPlayVideo, onExpand, i
     };
   }, [mediaUrl]);
   const handleClick = (0, import_react84.useCallback)(() => {
-    if (isVideo && !isPlaying && onPlayVideo) {
-      onPlayVideo();
-      return;
-    }
     onExpand?.();
-  }, [isVideo, isPlaying, onPlayVideo, onExpand]);
+  }, [onExpand]);
   const leagueLabel = event.league ?? event.sport ?? "";
   const constraints = getSocialMediaConstraints(orientation === "unknown" ? "horizontal" : orientation);
   return /* @__PURE__ */ (0, import_jsx_runtime39.jsxs)(
@@ -81946,6 +82026,7 @@ function TimelineSocialPost({ event, isPlaying = false, onPlayVideo, onExpand, i
             isVideo: true,
             isPlaying,
             onPlay: onPlayVideo,
+            onClick: handleClick,
             maxWidth: constraints.maxWidth,
             maxHeight: constraints.maxHeight,
             videoElement: videoSrc ? /* @__PURE__ */ (0, import_jsx_runtime39.jsx)(
@@ -81965,6 +82046,7 @@ function TimelineSocialPost({ event, isPlaying = false, onPlayVideo, onExpand, i
           TimelineMediaFrame,
           {
             src: previewImageUrl,
+            onClick: handleClick,
             maxWidth: constraints.maxWidth,
             maxHeight: constraints.maxHeight
           }
