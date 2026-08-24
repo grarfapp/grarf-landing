@@ -7925,7 +7925,7 @@ function resolveChannelLogoUrl2(channelLabel) {
   }
   return null;
 }
-var NBA_TV_CHANNEL_LOGO_URL, GOLF_CHANNEL_LOGO_URL, PARAMOUNT_CHANNEL_LOGO_URL, NWSL_PLUS_CHANNEL_LOGO_URL, CBSSN_CHANNEL_LOGO_URL, ESPN_UNLIMITED_CHANNEL_LOGO_URL, PEACOCK_CHANNEL_LOGO_URL2, NBC_CHANNEL_LOGO_URL2, NFL_NETWORK_CHANNEL_LOGO_URL, CHANNEL_LOGO_BY_LABEL2;
+var NBA_TV_CHANNEL_LOGO_URL, GOLF_CHANNEL_LOGO_URL, PARAMOUNT_CHANNEL_LOGO_URL, NWSL_PLUS_CHANNEL_LOGO_URL, CBSSN_CHANNEL_LOGO_URL, ESPN_UNLIMITED_CHANNEL_LOGO_URL, PEACOCK_CHANNEL_LOGO_URL2, NBC_CHANNEL_LOGO_URL2, NFL_NETWORK_CHANNEL_LOGO_URL, ESPN_DEPORTES_CHANNEL_LOGO_URL, CHANNEL_LOGO_BY_LABEL2;
 var init_resolveChannelLogoUrl2 = __esm({
   "../grarf/desktop/src/lib/broadcast/resolveChannelLogoUrl.ts"() {
     init_define_import_meta_env();
@@ -7939,6 +7939,7 @@ var init_resolveChannelLogoUrl2 = __esm({
     PEACOCK_CHANNEL_LOGO_URL2 = "/league-logos/channel-peacock.png";
     NBC_CHANNEL_LOGO_URL2 = "/league-logos/channel-nbc.png";
     NFL_NETWORK_CHANNEL_LOGO_URL = "/league-logos/channel-nfl-network.png";
+    ESPN_DEPORTES_CHANNEL_LOGO_URL = "/league-logos/channel-espn-deportes.png";
     CHANNEL_LOGO_BY_LABEL2 = {
       ABC: "/league-logos/channel-abc.png",
       CBS: "/league-logos/channel-cbs.png",
@@ -7949,6 +7950,8 @@ var init_resolveChannelLogoUrl2 = __esm({
       "ESPN UNLIMITED": ESPN_UNLIMITED_CHANNEL_LOGO_URL,
       "ESPN UNLMTD": ESPN_UNLIMITED_CHANNEL_LOGO_URL,
       ESPNU: "/league-logos/channel-espnu.png",
+      "ESPN DEPORTES": ESPN_DEPORTES_CHANNEL_LOGO_URL,
+      ESPNDEPORTES: ESPN_DEPORTES_CHANNEL_LOGO_URL,
       USA: "/league-logos/channel-usa.png",
       "USA NETWORK": "/league-logos/channel-usa.png",
       "USA NET": "/league-logos/channel-usa.png",
@@ -56743,7 +56746,7 @@ function resolveGamesSpineTransientAlertAriaLabel(type) {
       return "Game Update";
   }
 }
-var GAMES_SPINE_TRANSIENT_ALERT_VISIBLE_MS, TOP_RAIL_GAME_UPDATE_DURATION_MULTIPLIER;
+var GAMES_SPINE_TRANSIENT_ALERT_VISIBLE_MS;
 var init_gamesSpineTransientAlertScheduler = __esm({
   "../grarf/desktop/src/lib/gamesSpine/gamesSpineTransientAlertScheduler.ts"() {
     init_define_import_meta_env();
@@ -56756,7 +56759,6 @@ var init_gamesSpineTransientAlertScheduler = __esm({
       "starts-soon": 45e3,
       "game-update": 3e4
     };
-    TOP_RAIL_GAME_UPDATE_DURATION_MULTIPLIER = 2;
   }
 });
 
@@ -59198,7 +59200,8 @@ function TopRailGameCard({
   variant = "normal",
   onOpen,
   onWatchLive,
-  onFollowLive
+  onFollowLive,
+  className
 }) {
   const canonicalGame = useCanonicalGamesSpineGame(game);
   const displayGame = canonicalGame ?? game;
@@ -59297,7 +59300,8 @@ function TopRailGameCard({
         "group shrink-0 cursor-pointer font-mono transition duration-200",
         TOP_RAIL_CARD_WIDTH,
         classes.shell,
-        "hover:brightness-110"
+        "hover:brightness-110",
+        className
       ),
       children: [
         label ? /* @__PURE__ */ (0, import_jsx_runtime24.jsxs)("header", { className: classes.header, children: [
@@ -59368,7 +59372,8 @@ function TopRailGameUpdateCard({
   alertType,
   onOpen,
   onWatchLive,
-  onFollowLive
+  onFollowLive,
+  className
 }) {
   const liveGame = useGameForOperationalAlert(gameId);
   const game = resolveTransientAlertPlaceholderGame(gameId) ?? liveGame;
@@ -59382,7 +59387,113 @@ function TopRailGameUpdateCard({
       variant: "game-update",
       onOpen,
       onWatchLive,
-      onFollowLive
+      onFollowLive,
+      className
+    }
+  );
+}
+function TopRailGameUpdateSlot({
+  activeAlert,
+  onOpen,
+  onWatchLive,
+  onFollowLive,
+  onExited
+}) {
+  const [phase, setPhase] = (0, import_react30.useState)("hidden");
+  const [currentAlert, setCurrentAlert] = (0, import_react30.useState)(null);
+  const [slotExpanded, setSlotExpanded] = (0, import_react30.useState)(false);
+  const [cardVisible, setCardVisible] = (0, import_react30.useState)(false);
+  const exitTimerRef = (0, import_react30.useRef)(null);
+  (0, import_react30.useEffect)(() => {
+    if (activeAlert && activeAlert.instanceId !== currentAlert?.instanceId) {
+      if (exitTimerRef.current) {
+        clearTimeout(exitTimerRef.current);
+        exitTimerRef.current = null;
+      }
+      setCurrentAlert(activeAlert);
+      setPhase("entering");
+      setSlotExpanded(false);
+      setCardVisible(false);
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          setSlotExpanded(true);
+          setTimeout(() => {
+            setCardVisible(true);
+          }, 50);
+        });
+      });
+      setTimeout(() => {
+        setPhase("open");
+      }, TOP_RAIL_ANIMATION_MS);
+      const visibleMs = resolveGamesSpineTransientAlertVisibleMs(activeAlert.type);
+      exitTimerRef.current = setTimeout(() => {
+        setPhase("exiting");
+        setCardVisible(false);
+        setTimeout(() => {
+          setSlotExpanded(false);
+        }, TOP_RAIL_ANIMATION_MS / 2);
+        setTimeout(() => {
+          setPhase("hidden");
+          setCurrentAlert(null);
+          onExited();
+        }, TOP_RAIL_ANIMATION_MS);
+      }, visibleMs);
+    } else if (!activeAlert && currentAlert) {
+      if (exitTimerRef.current) {
+        clearTimeout(exitTimerRef.current);
+        exitTimerRef.current = null;
+      }
+      setPhase("exiting");
+      setCardVisible(false);
+      setTimeout(() => {
+        setSlotExpanded(false);
+      }, TOP_RAIL_ANIMATION_MS / 2);
+      setTimeout(() => {
+        setPhase("hidden");
+        setCurrentAlert(null);
+        onExited();
+      }, TOP_RAIL_ANIMATION_MS);
+    }
+    return () => {
+      if (exitTimerRef.current) {
+        clearTimeout(exitTimerRef.current);
+      }
+    };
+  }, [activeAlert?.instanceId, activeAlert?.type, currentAlert?.instanceId, onExited]);
+  if (phase === "hidden" && !currentAlert) {
+    return null;
+  }
+  const slotWidth = slotExpanded ? TOP_RAIL_CARD_WIDTH_PX + TOP_RAIL_GAP_PX : 0;
+  return /* @__PURE__ */ (0, import_jsx_runtime24.jsx)(
+    "div",
+    {
+      className: "shrink-0 overflow-visible",
+      style: {
+        width: slotWidth,
+        transition: `width ${TOP_RAIL_ANIMATION_MS}ms cubic-bezier(0.4, 0, 0.2, 1)`
+      },
+      children: /* @__PURE__ */ (0, import_jsx_runtime24.jsx)(
+        "div",
+        {
+          className: "relative",
+          style: {
+            width: TOP_RAIL_CARD_WIDTH_PX,
+            transform: cardVisible ? "translateY(0)" : "translateY(-100%)",
+            opacity: cardVisible ? 1 : 0,
+            transition: `transform ${TOP_RAIL_ANIMATION_MS}ms cubic-bezier(0.4, 0, 0.2, 1), opacity ${TOP_RAIL_ANIMATION_MS}ms ease-out`
+          },
+          children: currentAlert ? /* @__PURE__ */ (0, import_jsx_runtime24.jsx)(
+            TopRailGameUpdateCard,
+            {
+              gameId: currentAlert.gameId,
+              alertType: currentAlert.type,
+              onOpen,
+              onWatchLive,
+              onFollowLive
+            }
+          ) : null
+        }
+      )
     }
   );
 }
@@ -59415,20 +59526,6 @@ function TopRailGameStrip({ className }) {
   const completeActive = useGamesSpineTransientAlertStore((s2) => s2.completeActive);
   const bestGameId = bestGameResult?.game.id ?? null;
   const importantGames = useImportantGames(4, bestGameId);
-  const [visibleUpdateId, setVisibleUpdateId] = (0, import_react30.useState)(null);
-  (0, import_react30.useEffect)(() => {
-    if (!activeAlert) {
-      setVisibleUpdateId(null);
-      return;
-    }
-    setVisibleUpdateId(activeAlert.instanceId);
-    const visibleMs = resolveGamesSpineTransientAlertVisibleMs(activeAlert.type) * TOP_RAIL_GAME_UPDATE_DURATION_MULTIPLIER;
-    const timer = setTimeout(() => {
-      setVisibleUpdateId(null);
-      completeActive();
-    }, visibleMs);
-    return () => clearTimeout(timer);
-  }, [activeAlert?.instanceId, activeAlert?.type, completeActive]);
   const navigate = useNavigate();
   const onOpen = (0, import_react30.useCallback)((gameId) => {
     navigate(`/game/${encodeURIComponent(gameId)}`);
@@ -59439,56 +59536,80 @@ function TopRailGameStrip({ className }) {
   const onFollowLive = (0, import_react30.useCallback)((gameId) => {
     navigate(`/game/${encodeURIComponent(gameId)}`);
   }, [navigate]);
+  const onUpdateExited = (0, import_react30.useCallback)(() => {
+    completeActive();
+  }, [completeActive]);
   if (!isGrarfElectronRenderer()) return null;
   if (!bestGameResult && importantGames.length === 0) return null;
-  const showUpdate = visibleUpdateId && activeAlert;
   return /* @__PURE__ */ (0, import_jsx_runtime24.jsxs)(
     "div",
     {
       className: cn2(
-        "flex h-auto shrink-0 items-stretch gap-2 overflow-x-auto overflow-y-hidden border-b border-line/50 bg-[#020404] px-3 py-2",
-        "scrollbar-thin scrollbar-track-transparent scrollbar-thumb-line/40",
+        "relative flex h-auto shrink-0 items-stretch border-b border-line/50 bg-[#020404]",
         className
       ),
-      ref: scrollRef,
       children: [
-        bestGameResult ? /* @__PURE__ */ (0, import_jsx_runtime24.jsx)(
-          TopRailGameCard,
+        /* @__PURE__ */ (0, import_jsx_runtime24.jsxs)("div", { className: "relative z-10 flex shrink-0 items-stretch gap-2 bg-[#020404] py-2 pl-3 pr-2", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime24.jsx)("div", { className: "flex shrink-0 items-center", children: /* @__PURE__ */ (0, import_jsx_runtime24.jsx)(
+            "img",
+            {
+              src: "/grarf_logo-white.png",
+              alt: "GRARF",
+              className: "h-6 w-auto object-contain opacity-80",
+              draggable: false
+            }
+          ) }),
+          bestGameResult ? /* @__PURE__ */ (0, import_jsx_runtime24.jsx)(
+            TopRailGameCard,
+            {
+              game: bestGameResult.game,
+              label: bestGameResult.kind === "best_live" ? "BEST EVENT RIGHT NOW" : "NEXT BIG EVENT",
+              variant: "best-event",
+              onOpen,
+              onWatchLive,
+              onFollowLive
+            }
+          ) : null
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime24.jsxs)(
+          "div",
           {
-            game: bestGameResult.game,
-            label: bestGameResult.kind === "best_live" ? "BEST EVENT RIGHT NOW" : "NEXT BIG EVENT",
-            variant: "best-event",
-            onOpen,
-            onWatchLive,
-            onFollowLive
+            className: cn2(
+              "flex min-w-0 flex-1 items-stretch gap-2 overflow-x-auto overflow-y-hidden py-2 pr-3",
+              "scrollbar-thin scrollbar-track-transparent scrollbar-thumb-line/40"
+            ),
+            ref: scrollRef,
+            children: [
+              /* @__PURE__ */ (0, import_jsx_runtime24.jsx)(
+                TopRailGameUpdateSlot,
+                {
+                  activeAlert,
+                  onOpen,
+                  onWatchLive,
+                  onFollowLive,
+                  onExited: onUpdateExited
+                }
+              ),
+              importantGames.map((game) => /* @__PURE__ */ (0, import_jsx_runtime24.jsx)(
+                TopRailGameCard,
+                {
+                  game,
+                  variant: "normal",
+                  onOpen,
+                  onWatchLive,
+                  onFollowLive,
+                  className: "transition-transform duration-300 ease-out"
+                },
+                game.id
+              ))
+            ]
           }
-        ) : null,
-        showUpdate ? /* @__PURE__ */ (0, import_jsx_runtime24.jsx)(
-          TopRailGameUpdateCard,
-          {
-            gameId: activeAlert.gameId,
-            alertType: activeAlert.type,
-            onOpen,
-            onWatchLive,
-            onFollowLive
-          }
-        ) : null,
-        importantGames.map((game) => /* @__PURE__ */ (0, import_jsx_runtime24.jsx)(
-          TopRailGameCard,
-          {
-            game,
-            variant: "normal",
-            onOpen,
-            onWatchLive,
-            onFollowLive
-          },
-          game.id
-        ))
+        )
       ]
     }
   );
 }
-var import_react30, import_jsx_runtime24, TOP_RAIL_CARD_WIDTH, CARD_BASE_CLASS, BEST_EVENT_SHELL_CLASS, BEST_EVENT_HEADER_CLASS, BEST_EVENT_LABEL_CLASS, GAME_UPDATE_SHELL_CLASS, GAME_UPDATE_HEADER_CLASS, GAME_UPDATE_LABEL_CLASS, NORMAL_CARD_SHELL_CLASS;
+var import_react30, import_jsx_runtime24, TOP_RAIL_CARD_WIDTH, TOP_RAIL_CARD_WIDTH_PX, TOP_RAIL_GAP_PX, TOP_RAIL_ANIMATION_MS, CARD_BASE_CLASS, BEST_EVENT_SHELL_CLASS, BEST_EVENT_HEADER_CLASS, BEST_EVENT_LABEL_CLASS, GAME_UPDATE_SHELL_CLASS, GAME_UPDATE_HEADER_CLASS, GAME_UPDATE_LABEL_CLASS, NORMAL_CARD_SHELL_CLASS;
 var init_TopRailGameStrip = __esm({
   "../grarf/desktop/src/components/shell/TopRailGameStrip.tsx"() {
     init_define_import_meta_env();
@@ -59522,6 +59643,9 @@ var init_TopRailGameStrip = __esm({
     init_BroadcastChannelLogo();
     import_jsx_runtime24 = __toESM(require_jsx_runtime(), 1);
     TOP_RAIL_CARD_WIDTH = "w-[280px]";
+    TOP_RAIL_CARD_WIDTH_PX = 280;
+    TOP_RAIL_GAP_PX = 8;
+    TOP_RAIL_ANIMATION_MS = 320;
     CARD_BASE_CLASS = "rounded-sm border bg-[#071014] shadow-[inset_0_1px_0_rgba(86,247,255,0.03),0_1px_2px_rgba(0,0,0,0.35)]";
     BEST_EVENT_SHELL_CLASS = cn2(
       CARD_BASE_CLASS,
@@ -59537,7 +59661,7 @@ var init_TopRailGameStrip = __esm({
     );
     GAME_UPDATE_HEADER_CLASS = "border-b border-greensys/30 bg-[#071009]";
     GAME_UPDATE_LABEL_CLASS = "text-[10px] font-bold tracking-[0.16em] text-greensys";
-    NORMAL_CARD_SHELL_CLASS = cn2(CARD_BASE_CLASS, "border-[#1A242B]");
+    NORMAL_CARD_SHELL_CLASS = cn2(CARD_BASE_CLASS, "border-[#1A242B] bg-[#040808]");
   }
 });
 
