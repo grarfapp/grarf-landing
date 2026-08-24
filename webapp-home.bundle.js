@@ -81115,6 +81115,27 @@ function HomeCenterPaneTimelineArticleExpansionPane({
     void window.grarf?.workspaceEmbedClear?.("centerChild");
   }, [canEmbed, articleUrl]);
   (0, import_react81.useLayoutEffect)(() => {
+    const unsubscribe = window.grarf?.webviewNavigateInPaneSubscribe?.((payload) => {
+      const wv = wvRef.current;
+      if (!wv) {
+        console.warn(`${LOG41} webview-navigate-in-pane: no webview ref`);
+        return;
+      }
+      const nextUrl = payload.url?.trim();
+      if (!nextUrl) {
+        console.warn(`${LOG41} webview-navigate-in-pane: empty url`);
+        return;
+      }
+      console.log(`${LOG41} webview-navigate-in-pane: navigating to`, nextUrl);
+      setShowLoadingHint(true);
+      setLoadFailed(false);
+      navigateWebview(wv, nextUrl);
+    });
+    return () => {
+      unsubscribe?.();
+    };
+  }, []);
+  (0, import_react81.useLayoutEffect)(() => {
     if (!canEmbed) return;
     const wv = wvRef.current;
     if (!wv) return;
@@ -81191,18 +81212,19 @@ function HomeCenterPaneTimelineArticleExpansionPane({
       if (!nextUrl) return;
       event.preventDefault();
       const disposition = e2.disposition ?? "";
-      const isTabRequest = disposition === "foreground-tab" || disposition === "background-tab" || disposition === "default";
-      if (isTabRequest) {
-        console.log(`${LOG41} new-window \u2192 navigate in-pane`, { url: nextUrl, disposition });
-        setShowLoadingHint(true);
-        setLoadFailed(false);
-        navigateWebview(wv, nextUrl);
-      } else {
-        console.log(`${LOG41} new-window \u2192 open external`, { url: nextUrl, disposition });
+      const isSpecialProtocol = nextUrl.startsWith("mailto:") || nextUrl.startsWith("tel:") || nextUrl.startsWith("sms:") || nextUrl.startsWith("file:");
+      if (isSpecialProtocol) {
+        console.log(`${LOG41} new-window \u2192 open external (special protocol)`, { url: nextUrl, disposition });
         void openExternalUrl2(nextUrl);
+        return;
       }
+      console.log(`${LOG41} new-window \u2192 navigate in-pane`, { url: nextUrl, disposition });
+      setShowLoadingHint(true);
+      setLoadFailed(false);
+      navigateWebview(wv, nextUrl);
     };
     applyCurrentWebviewSize();
+    console.log(`${LOG41} Attaching webview event listeners to:`, wv.tagName, wv.src);
     wv.addEventListener("dom-ready", onDomReady);
     wv.addEventListener("did-finish-load", onFinishLoad);
     wv.addEventListener("did-fail-load", onFailLoad);
@@ -81212,6 +81234,9 @@ function HomeCenterPaneTimelineArticleExpansionPane({
     wv.addEventListener("did-start-navigation", onDidStartNavigation);
     wv.addEventListener("new-window", onNewWindow);
     wv.addEventListener("console-message", onConsoleMessage);
+    wv.addEventListener("ipc-message", (e2) => {
+      console.log(`${LOG41} ipc-message from webview`, e2);
+    });
     return () => {
       wv.removeEventListener("dom-ready", onDomReady);
       wv.removeEventListener("did-finish-load", onFinishLoad);
