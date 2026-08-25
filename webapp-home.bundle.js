@@ -120019,7 +120019,7 @@ function buildLaskCelticPrototypeTabs(game) {
       indexLabel: "5)",
       sources: [
         { id: "celtic", label: "Celtic", indexLabel: "51)", url: "https://x.com/CelticFC" },
-        { id: "lask", label: "LASK", indexLabel: "52)", url: "https://x.com/LASK" }
+        { id: "lask", label: "LASK", indexLabel: "52)", url: "https://x.com/i/lists/2064756795352965483?s=20" }
       ]
     }
   ];
@@ -120048,10 +120048,88 @@ var init_laskCelticGameWorkspacePrototype = __esm({
 });
 
 // ../grarf/desktop/src/components/gameWorkspace/LaskCelticGameWorkspacePrototype.tsx
+function hasWebviewTag3() {
+  return typeof customElements !== "undefined" && !!customElements.get("webview");
+}
+function navigateWebview2(wv, url) {
+  try {
+    if (typeof wv.loadURL === "function") {
+      wv.loadURL(url);
+      return;
+    }
+  } catch {
+  }
+  wv.src = url;
+}
+function isSocialLaskXUrl(url) {
+  return url.trim() === SOCIAL_LASK_X_URL;
+}
 function hasElectronEmbedBridge() {
   return typeof window !== "undefined" && !!window.grarf?.workspaceEmbedSync;
 }
+function TimelineXWebpane({ url }) {
+  const wvRef = (0, import_react189.useRef)(null);
+  const partition = (0, import_react189.useMemo)(() => homeSourceFocusArticlePartition(url), [url]);
+  (0, import_react189.useLayoutEffect)(() => {
+    void window.grarf?.workspaceEmbedClear?.("center");
+    void window.grarf?.workspaceEmbedClear?.("centerChild");
+    return () => {
+      void window.grarf?.workspaceEmbedClear?.("center");
+      void window.grarf?.workspaceEmbedClear?.("centerChild");
+    };
+  }, [url]);
+  (0, import_react189.useLayoutEffect)(() => {
+    const unsubscribe = window.grarf?.webviewNavigateInPaneSubscribe?.((payload) => {
+      const wv = wvRef.current;
+      const nextUrl = payload.url?.trim();
+      if (!wv || !nextUrl) return;
+      navigateWebview2(wv, nextUrl);
+    });
+    return () => {
+      unsubscribe?.();
+    };
+  }, []);
+  (0, import_react189.useLayoutEffect)(() => {
+    const wv = wvRef.current;
+    if (!wv) return;
+    const onNewWindow = (event) => {
+      const nextUrl = event.url?.trim() ?? "";
+      if (!nextUrl) return;
+      event.preventDefault();
+      const isSpecialProtocol = nextUrl.startsWith("mailto:") || nextUrl.startsWith("tel:") || nextUrl.startsWith("sms:") || nextUrl.startsWith("file:");
+      if (isSpecialProtocol) {
+        void openExternalUrl2(nextUrl);
+        return;
+      }
+      navigateWebview2(wv, nextUrl);
+    };
+    wv.addEventListener("new-window", onNewWindow);
+    return () => {
+      wv.removeEventListener("new-window", onNewWindow);
+    };
+  }, [url]);
+  if (!hasWebviewTag3()) {
+    return /* @__PURE__ */ (0, import_jsx_runtime160.jsx)("div", { className: "flex h-full min-h-0 flex-1 items-center justify-center bg-[#010303] px-4 text-center font-mono text-[10px] text-textdim", children: "X.com requires the Electron webpane used by Timeline." });
+  }
+  return /* @__PURE__ */ (0, import_jsx_runtime160.jsx)("div", { className: cn2(PANE_EMBED_HOST, "h-full w-full bg-black"), children: /* @__PURE__ */ (0, import_jsx_runtime160.jsx)(
+    "webview",
+    {
+      ref: (element) => {
+        wvRef.current = element;
+      },
+      src: url,
+      partition,
+      webpreferences: TIMELINE_WEBVIEW_WEB_PREFS,
+      allowpopups: "true",
+      className: cn2(PANE_EMBED_ABSOLUTE_FILL, "border-0")
+    },
+    url
+  ) });
+}
 function PrototypeSourceSurface({ url, label }) {
+  if (isSocialLaskXUrl(url)) {
+    return /* @__PURE__ */ (0, import_jsx_runtime160.jsx)(TimelineXWebpane, { url });
+  }
   if (hasElectronEmbedBridge()) {
     return /* @__PURE__ */ (0, import_jsx_runtime160.jsx)(
       WorkspaceEmbedHost,
@@ -120081,70 +120159,35 @@ function PrototypeSourceSurface({ url, label }) {
     )
   ] });
 }
-function PrototypeGameHeader({ game }) {
-  const live = isGameActivelyLive(game);
-  const timing = resolveGamesSpineCardTimingLabel(game) ?? game.displayClock?.trim() ?? "11'";
-  const channel = resolveGameChannelPresentation(game);
-  const leagueLogoUrl = resolveGamesSpineLeagueLogoUrl("UCLQ", { game });
-  const [topSide, bottomSide] = resolveGamesSpineMatchupSideOrder(game);
-  const sideName = { away: game.awayTeam, home: game.homeTeam };
-  const sideScore = {
-    away: resolveGamesSpineSideStat(game, "away"),
-    home: resolveGamesSpineSideStat(game, "home")
+function resolvePrototypeGame(workspace, liveGame) {
+  const gameId = extractLaskCelticPrototypeGameId(workspace);
+  if (liveGame) return liveGame;
+  if (gameId) {
+    const spineGame = findGamesSpineGameById(gameId, "lask_celtic_prototype");
+    if (spineGame) return spineGame;
+  }
+  return {
+    id: gameId ?? workspace.id,
+    league: "UCLQ",
+    time: "",
+    awayTeam: "Celtic",
+    awayRecord: "",
+    homeTeam: "LASK Linz",
+    homeRecord: "",
+    awayCity: "",
+    homeCity: "",
+    awayPitcher: "",
+    awayPitcherStats: "",
+    homePitcher: "",
+    homePitcherStats: "",
+    status: "scheduled",
+    channels: []
   };
-  return /* @__PURE__ */ (0, import_jsx_runtime160.jsx)("header", { className: "shrink-0 border-b border-line bg-[#071014] px-2.5 py-1.5", children: /* @__PURE__ */ (0, import_jsx_runtime160.jsxs)("div", { className: "flex items-start justify-between gap-3", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime160.jsxs)("div", { className: "min-w-0 flex-1", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime160.jsxs)("div", { className: "flex items-center gap-1.5", children: [
-        leagueLogoUrl ? /* @__PURE__ */ (0, import_jsx_runtime160.jsx)(
-          "img",
-          {
-            src: leagueLogoUrl,
-            alt: "",
-            className: cn2(resolveGamesSpineLeagueLogoImgClassName("UCLQ"), "h-3.5 w-3.5")
-          }
-        ) : null,
-        /* @__PURE__ */ (0, import_jsx_runtime160.jsx)("span", { className: GAMES_SPINE_CARD_LEAGUE_LABEL_CLASS, children: "UCLQ" })
-      ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime160.jsxs)("div", { className: "mt-1.5 flex items-center gap-2", children: [
-        live ? /* @__PURE__ */ (0, import_jsx_runtime160.jsx)(GamesSpineLiveBadge, { operationalPulse: true }) : null,
-        /* @__PURE__ */ (0, import_jsx_runtime160.jsx)("span", { className: "truncate text-[13px] leading-none tracking-wide text-ambersys/95", children: timing })
-      ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime160.jsx)("div", { className: cn2("mt-1.5 min-w-0 space-y-0.5", GAMES_SPINE_CARD_MATCHUP_TEXT_CLASS), children: [topSide, bottomSide].map((side) => /* @__PURE__ */ (0, import_jsx_runtime160.jsxs)("div", { className: "grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime160.jsx)(
-          GamesSpineTeamMark,
-          {
-            teamName: sideName[side],
-            logoUrl: resolveDarkThemeLogoUrl(game, side),
-            logoClassName: "h-4 w-4"
-          }
-        ),
-        /* @__PURE__ */ (0, import_jsx_runtime160.jsx)("span", { className: GAMES_SPINE_CARD_SCORE_CLASS, children: sideScore[side] || "0" })
-      ] }, side)) }),
-      /* @__PURE__ */ (0, import_jsx_runtime160.jsx)("div", { className: "mt-1.5", children: /* @__PURE__ */ (0, import_jsx_runtime160.jsx)(
-        BroadcastChannelLogo,
-        {
-          logoUrl: channel.logoUrl,
-          label: channel.label || "TV TBD",
-          align: "left",
-          fallbackClassName: "max-w-[4.5rem] truncate text-[12px] font-bold uppercase leading-none tracking-[0.06em] text-white"
-        }
-      ) })
-    ] }),
-    live ? /* @__PURE__ */ (0, import_jsx_runtime160.jsx)(
-      "button",
-      {
-        type: "button",
-        className: cn2(GAMES_SPINE_FOLLOW_LIVE_BUTTON_CLASS, "w-auto shrink-0 self-start px-2.5"),
-        "aria-pressed": "true",
-        children: "[ FOLLOW LIVE ]"
-      }
-    ) : null
-  ] }) });
 }
 function LaskCelticGameWorkspacePrototype({ workspace, className }) {
   const gameId = extractLaskCelticPrototypeGameId(workspace);
   const liveGame = useCanonicalLiveGameRow(gameId, "lask_celtic_prototype");
-  const game = liveGame ?? (gameId ? findGamesSpineGameById(gameId, "lask_celtic_prototype") : void 0) ?? FALLBACK_GAME;
+  const game = resolvePrototypeGame(workspace, liveGame);
   const tabs = (0, import_react189.useMemo)(() => buildLaskCelticPrototypeTabs(game), [game]);
   const [activeTabId, setActiveTabId] = (0, import_react189.useState)("gamecenter");
   const [sourceByTab, setSourceByTab] = (0, import_react189.useState)({
@@ -120166,7 +120209,6 @@ function LaskCelticGameWorkspacePrototype({ workspace, className }) {
         className
       ),
       children: [
-        /* @__PURE__ */ (0, import_jsx_runtime160.jsx)(PrototypeGameHeader, { game }),
         /* @__PURE__ */ (0, import_jsx_runtime160.jsxs)("nav", { className: "shrink-0", "aria-label": "Game workspace folders", children: [
           /* @__PURE__ */ (0, import_jsx_runtime160.jsx)("div", { className: "flex items-end bg-[#020404] px-1 pt-1", children: tabs.map((tab, index) => {
             const selected = tab.id === activeTab.id;
@@ -120220,51 +120262,23 @@ function LaskCelticGameWorkspacePrototype({ workspace, className }) {
     }
   );
 }
-var import_react189, import_jsx_runtime160, FALLBACK_GAME, FOLDER_TAB_CLIP;
+var import_react189, import_jsx_runtime160, FOLDER_TAB_CLIP, SOCIAL_LASK_X_URL, TIMELINE_WEBVIEW_WEB_PREFS;
 var init_LaskCelticGameWorkspacePrototype = __esm({
   "../grarf/desktop/src/components/gameWorkspace/LaskCelticGameWorkspacePrototype.tsx"() {
     init_define_import_meta_env();
     import_react189 = __toESM(require_react(), 1);
     init_cn();
-    init_BroadcastChannelLogo();
-    init_GamesSpineRailLivePresentation();
     init_WorkspaceEmbedHost();
-    init_gamesSpineCardLayout();
-    init_gamesSpineLeagueLogoUrls();
-    init_resolveGameChannelPresentation();
-    init_isGameActivelyLive();
-    init_resolveGamesSpineCardTimingLabel();
-    init_resolveGamesSpineMatchupSideOrder();
-    init_gamesSpineSideStat();
-    init_resolveTeamLogoUrl();
-    init_GamesSpineTeamMark();
     init_useCanonicalLiveGame();
     init_findLiveGame();
+    init_homeSourceWebPartition();
+    init_openExternal();
     init_paneContainment();
     init_laskCelticGameWorkspacePrototype();
     import_jsx_runtime160 = __toESM(require_jsx_runtime(), 1);
-    FALLBACK_GAME = {
-      id: "prototype-lask-celtic",
-      league: "UCLQ",
-      time: "LIVE",
-      awayTeam: "Celtic",
-      awayRecord: "",
-      homeTeam: "LASK Linz",
-      homeRecord: "",
-      awayCity: "",
-      homeCity: "",
-      awayPitcher: "",
-      awayPitcherStats: "",
-      homePitcher: "",
-      homePitcherStats: "",
-      awayScore: 0,
-      homeScore: 0,
-      status: "live",
-      displayClock: "11'",
-      channels: ["TV TBD"],
-      broadcasts: ["TV TBD"]
-    };
     FOLDER_TAB_CLIP = "[clip-path:polygon(0_0,calc(100%-8px)_0,100%_100%,0_100%)]";
+    SOCIAL_LASK_X_URL = "https://x.com/i/lists/2064756795352965483?s=20";
+    TIMELINE_WEBVIEW_WEB_PREFS = "contextIsolation=yes,nodeIntegration=no,javascript=yes";
   }
 });
 
