@@ -13863,7 +13863,10 @@ var LEAGUE_PRIORITY_ALIASES = {
   "FORMULA ONE": "F1",
   "NASCAR CUP SERIES": "NASCAR",
   "NASCAR OREILLY AUTO PARTS SERIES": "NASCAR",
-  "NBA SUMMER LEAGUE": "NBASUMMER"
+  "NBA SUMMER LEAGUE": "NBASUMMER",
+  "NAV.US-OPEN-TENNIS": "US_OPEN_TENNIS",
+  "U.S. OPEN TENNIS": "US_OPEN_TENNIS",
+  "US OPEN TENNIS": "US_OPEN_TENNIS"
 };
 var LEAGUE_PRIORITY_MANUAL_AFTER = {
   "GT WORLD": "WEC",
@@ -13885,12 +13888,12 @@ var LEAGUE_PRIORITY_SEED_ORDER = [
   "nav.the-open",
   "EURO",
   "NFL",
-  "nav.us-open-tennis",
   "EPL",
   "NCAAF",
   "nav.us-open-golf",
   "nav.pga-championship",
   "NBA",
+  "US_OPEN_TENNIS",
   "MLB",
   "NHL",
   "UCL",
@@ -14077,7 +14080,8 @@ function sortGrarfLeagueKeysByImportance(keys) {
 init_define_import_meta_env();
 var GAMES_COLUMN_PRESENTATION_ONLY_LEAGUE_KEYS = /* @__PURE__ */ new Set([
   "WIMBLEDON_MEN",
-  "WIMBLEDON_WOMEN"
+  "WIMBLEDON_WOMEN",
+  "US_OPEN_TENNIS"
 ]);
 function getGamesColumnLeagueOrder() {
   return getLeaguePriorityOrder().filter(
@@ -14133,6 +14137,7 @@ var GAMES_COLUMN_LEAGUE_LABEL = {
   WORLDCUP: "FIFA World Cup",
   ATP: "ATP",
   WTA: "WTA",
+  US_OPEN_TENNIS: "U.S. Open",
   TDF: "Tour de France",
   UFC: "UFC",
   BOXING: "Boxing",
@@ -14807,6 +14812,7 @@ var GAMES_SPINE_LEAGUE_DISPLAY_LABEL = {
   PLL: "PLL",
   WIMBLEDON_MEN: "Wimbledon (Men's)",
   WIMBLEDON_WOMEN: "Wimbledon (Women's)",
+  US_OPEN_TENNIS: "U.S. Open",
   USATF: "Track & Field"
 };
 function resolveManualGamesSpineLeagueDisplayName(games) {
@@ -15192,7 +15198,7 @@ var GRARF_SPORT_HIERARCHY = {
   tennis: {
     title: "TENNIS",
     directorySectionId: "tennis",
-    leagueKeys: ["ATP", "WTA"]
+    leagueKeys: ["US_OPEN_TENNIS", "ATP", "WTA"]
   },
   basketball: {
     title: "BASKETBALL",
@@ -20158,8 +20164,8 @@ var CANONICAL_REGISTRY_ENTRIES = [
   league("ATP Tour", "ATP", "atp", ["atp-tour"]),
   league("WTA Tour", "WTA", "wta", ["wta-tour"]),
   league("Wimbledon", "WIMBLEDON", "wimbledon"),
+  league("U.S. Open", "US_OPEN_TENNIS", "us-open-tennis", ["us-open", "usopen", "u-s-open"]),
   navLeague("French Open", "french-open", ["roland-garros", "rolandgarros"]),
-  navLeague("US Open", "us-open-tennis", ["us-open", "usopen"]),
   navLeague("Australian Open", "australian-open", ["australianopen"]),
   league("PGA Tour", "PGA", "pga-tour", ["pga", "pgatour"]),
   league("LPGA Tour", "LPGA", "lpga-tour", ["lpga", "lpgatour"]),
@@ -20652,6 +20658,32 @@ async function enrichWimbledonEspnWatchStreams(games) {
   }
 }
 
+// ../grarf/desktop/src/lib/gamesSpine/usOpenGamesSpinePresentation.ts
+init_define_import_meta_env();
+var US_OPEN_TENNIS_GAMES_SPINE_LEAGUE = "US_OPEN_TENNIS";
+function isTennisTourLeague(game) {
+  return game.league === "ATP" || game.league === "WTA";
+}
+function usOpenHaystack(game) {
+  return [game.metadata?.tennis?.contextLine, game.statusLine, game.leagueContextLabel].filter(Boolean).join(" ");
+}
+function isUsOpenTennisGame(game) {
+  if (!isTennisTourLeague(game)) return false;
+  return /\bu\.?s\.?\s+open\b/i.test(usOpenHaystack(game));
+}
+function isUsOpenGamesSpinePresentationLeague(league2) {
+  return league2 === US_OPEN_TENNIS_GAMES_SPINE_LEAGUE;
+}
+function filterGamesForUsOpenGamesSpineSection(league2, games) {
+  if (isUsOpenGamesSpinePresentationLeague(league2)) {
+    return games.filter(isUsOpenTennisGame);
+  }
+  if (league2 === "ATP" || league2 === "WTA") {
+    return games.filter((game) => !isUsOpenTennisGame(game));
+  }
+  return [...games];
+}
+
 // ../grarf/desktop/src/lib/gamesSpine/wimbledonGamesSpinePresentation.ts
 var WIMBLEDON_MEN_GAMES_SPINE_LEAGUE = "WIMBLEDON_MEN";
 var WIMBLEDON_WOMEN_GAMES_SPINE_LEAGUE = "WIMBLEDON_WOMEN";
@@ -20953,31 +20985,43 @@ function resolveGamesSpineSelectedDateKey(selectedDate, now = /* @__PURE__ */ ne
 function isSelectedDateOperationalSportsDay(selectedDate, now = /* @__PURE__ */ new Date()) {
   return resolveGamesSpineSelectedDateKey(selectedDate, now) === getOperationalSportsDayDateKey(now);
 }
-function resolveViewLeagueGames(league2, selectedDate, liveLeagues, scheduleByDate) {
-  const sourceLeague = resolveWimbledonGamesSpineSourceLeague(league2) ?? league2;
+function collectViewGamesForSourceLeague(sourceLeague, liveLeagues, scheduleByDate, dateKey) {
   const mergedLeagues = mergeOperationalLeagueGames(liveLeagues);
-  const dateKey = resolveGamesSpineSelectedDateKey(selectedDate);
-  let games;
   if (isSelectedDateOperationalSportsDay(dateKey)) {
     const liveGames = mergedLeagues[sourceLeague] ?? [];
     if (sourceLeague === "MLB") {
-      games = resolveMlbGamesSpineViewRows(liveGames);
-    } else {
-      const now = /* @__PURE__ */ new Date();
-      const operationalSportsDayKey = getOperationalSportsDayDateKey(now);
-      const operationalSportsDayUpcomingKey = getOperationalSportsDayTomorrowDateKey(now);
-      const fromOperationalSportsDaySchedule = scheduleByDate[operationalSportsDayKey]?.[sourceLeague] ?? [];
-      const fromOperationalSportsDayUpcomingSchedule = scheduleByDate[operationalSportsDayUpcomingKey]?.[sourceLeague] ?? [];
-      games = mergeGamesSpineLeagueGamesById(
-        fromOperationalSportsDaySchedule,
-        fromOperationalSportsDayUpcomingSchedule,
-        liveGames
-      );
+      return resolveMlbGamesSpineViewRows(liveGames);
     }
-  } else {
-    games = scheduleByDate[dateKey]?.[sourceLeague] ?? [];
+    const now = /* @__PURE__ */ new Date();
+    const operationalSportsDayKey = getOperationalSportsDayDateKey(now);
+    const operationalSportsDayUpcomingKey = getOperationalSportsDayTomorrowDateKey(now);
+    return mergeGamesSpineLeagueGamesById(
+      scheduleByDate[operationalSportsDayKey]?.[sourceLeague] ?? [],
+      scheduleByDate[operationalSportsDayUpcomingKey]?.[sourceLeague] ?? [],
+      liveGames
+    );
   }
-  return filterGamesForWimbledonGamesSpineSection(league2, games);
+  return scheduleByDate[dateKey]?.[sourceLeague] ?? [];
+}
+function resolveViewLeagueGames(league2, selectedDate, liveLeagues, scheduleByDate) {
+  const dateKey = resolveGamesSpineSelectedDateKey(selectedDate);
+  if (isUsOpenGamesSpinePresentationLeague(league2)) {
+    return mergeGamesSpineLeagueGamesById(
+      collectViewGamesForSourceLeague("ATP", liveLeagues, scheduleByDate, dateKey),
+      collectViewGamesForSourceLeague("WTA", liveLeagues, scheduleByDate, dateKey)
+    ).filter(isUsOpenTennisGame);
+  }
+  const sourceLeague = resolveWimbledonGamesSpineSourceLeague(league2) ?? league2;
+  const games = collectViewGamesForSourceLeague(
+    sourceLeague,
+    liveLeagues,
+    scheduleByDate,
+    dateKey
+  );
+  return filterGamesForUsOpenGamesSpineSection(
+    league2,
+    filterGamesForWimbledonGamesSpineSection(league2, games)
+  );
 }
 
 // ../grarf/desktop/src/lib/operations/buildOperationsDateSnapshot.ts
@@ -23741,7 +23785,7 @@ async function fetchOperationalTennisScoreboardJson(endpoint, now = /* @__PURE__
 init_define_import_meta_env();
 var MENS_DRAW_TYPE_SLUGS = /* @__PURE__ */ new Set(["mens-singles", "mens-doubles"]);
 var WOMENS_DRAW_TYPE_SLUGS = /* @__PURE__ */ new Set(["womens-singles", "womens-doubles"]);
-function resolveTennisTourLeague(competition, groupingLabel, groupingSlug, pollLeagueKey) {
+function resolveTennisTourLeague(competition, groupingLabel, groupingSlug, _pollLeagueKey) {
   const type = competition.type;
   const typeSlug = safe(type?.slug).toLowerCase();
   if (MENS_DRAW_TYPE_SLUGS.has(typeSlug)) return "ATP";
@@ -23753,9 +23797,12 @@ function resolveTennisTourLeague(competition, groupingLabel, groupingSlug, pollL
   if (label.startsWith("men")) return "ATP";
   if (label.startsWith("women")) return "WTA";
   if (typeSlug === "mixed-doubles" || groupingTypeSlug === "mixed-doubles") {
-    return pollLeagueKey;
+    return "ATP";
   }
   return null;
+}
+function isMixedDoublesDraw(typeSlug, groupingSlug) {
+  return typeSlug === "mixed-doubles" || groupingSlug === "mixed-doubles";
 }
 function safe(v) {
   return typeof v === "string" && v.trim() ? v.trim() : "";
@@ -23776,6 +23823,34 @@ function formatTimeEt(iso) {
 function pickPlayerName(athlete) {
   if (!athlete) return "TBD";
   return safe(athlete.shortName) || safe(athlete.displayName) || safe(athlete.fullName) || "TBD";
+}
+function pickCompetitorAthlete(competitor) {
+  if (!competitor) return void 0;
+  const athlete = competitor.athlete;
+  if (athlete && typeof athlete === "object") {
+    return athlete;
+  }
+  const roster = competitor.roster;
+  if (!roster || typeof roster !== "object") return void 0;
+  const r = roster;
+  const athletes = Array.isArray(r.athletes) ? r.athletes : [];
+  const first = athletes.find((row) => row && typeof row === "object");
+  const displayName = safe(r.displayName) || safe(first?.displayName) || safe(first?.fullName);
+  const shortName = safe(r.shortDisplayName) || safe(first?.shortName) || displayName;
+  if (!shortName && !displayName) return void 0;
+  return {
+    shortName: shortName || "TBD",
+    displayName: displayName || shortName || "TBD",
+    fullName: displayName || shortName || "TBD",
+    flag: first?.flag,
+    seed: r.seed ?? first?.seed
+  };
+}
+function buildTennisContextLine(tournamentName, roundName, groupingLabel, groupingSlug, typeSlug) {
+  if (isMixedDoublesDraw(typeSlug, safe(groupingSlug).toLowerCase())) {
+    return [tournamentName, groupingLabel || "Mixed Doubles", roundName].filter(Boolean).join(" \xB7 ");
+  }
+  return [tournamentName, roundName || groupingLabel].filter(Boolean).join(" \xB7 ");
 }
 function pickPlayerLogoUrl(athlete) {
   const flag = athlete?.flag;
@@ -23918,8 +23993,8 @@ function normalizeTennisCompetition(competition, tournament, groupingLabel, grou
     (c) => c && typeof c === "object" && c.homeAway === "home"
   );
   if (!away || !home) return null;
-  const awayAthlete = away.athlete;
-  const homeAthlete = home.athlete;
+  const awayAthlete = pickCompetitorAthlete(away);
+  const homeAthlete = pickCompetitorAthlete(home);
   if (!awayAthlete || !homeAthlete) return null;
   const status = competition.status || {};
   const statusType = status.type || {};
@@ -23951,8 +24026,14 @@ function normalizeTennisCompetition(competition, tournament, groupingLabel, grou
   const periodNum = status.period != null ? Number(status.period) : NaN;
   const period = Number.isFinite(periodNum) ? periodNum : void 0;
   const displayClock = safe(status.displayClock) || void 0;
-  const contextParts = [tournamentName, roundName || groupingLabel].filter(Boolean);
-  const contextLine = contextParts.join(" \xB7 ");
+  const typeSlug = safe(competition.type?.slug).toLowerCase();
+  const contextLine = buildTennisContextLine(
+    tournamentName,
+    roundName,
+    groupingLabel,
+    groupingSlug,
+    typeSlug
+  );
   let statusLine = contextLine;
   if (cardStatus === "scheduled") {
     const venueBits = [safe(venue?.fullName), safe(venue?.court)].filter(Boolean).join(" \xB7 ");
@@ -25797,9 +25878,12 @@ function resolveTennisTourLeague2(competition, groupingLabel, groupingSlug, poll
   if (label.startsWith("men")) return "ATP";
   if (label.startsWith("women")) return "WTA";
   if (typeSlug === "mixed-doubles" || groupingTypeSlug === "mixed-doubles") {
-    return pollLeagueKey;
+    return "ATP";
   }
   return null;
+}
+function isMixedDoublesDraw2(typeSlug, groupingSlug) {
+  return typeSlug === "mixed-doubles" || groupingSlug === "mixed-doubles";
 }
 function safe5(v) {
   return typeof v === "string" && v.trim() ? v.trim() : "";
@@ -25820,6 +25904,30 @@ function formatTimeEt4(iso) {
 function pickPlayerName2(athlete) {
   if (!athlete) return "TBD";
   return safe5(athlete.shortName) || safe5(athlete.displayName) || safe5(athlete.fullName) || "TBD";
+}
+function pickCompetitorAthlete2(competitor) {
+  const athlete = competitor?.athlete;
+  if (athlete && typeof athlete === "object") return athlete;
+  const roster = competitor?.roster;
+  if (!roster || typeof roster !== "object") return void 0;
+  const athletes = Array.isArray(roster.athletes) ? roster.athletes : [];
+  const first = athletes.find((row) => row && typeof row === "object");
+  const displayName = safe5(roster.displayName) || safe5(first?.displayName) || safe5(first?.fullName);
+  const shortName = safe5(roster.shortDisplayName) || safe5(first?.shortName) || displayName;
+  if (!shortName && !displayName) return void 0;
+  return {
+    shortName: shortName || "TBD",
+    displayName: displayName || shortName || "TBD",
+    fullName: displayName || shortName || "TBD",
+    flag: first?.flag,
+    seed: roster.seed ?? first?.seed
+  };
+}
+function buildTennisContextLine2(tournamentName, roundName, groupingLabel, groupingSlug, typeSlug) {
+  if (isMixedDoublesDraw2(typeSlug, safe5(groupingSlug).toLowerCase())) {
+    return [tournamentName, groupingLabel || "Mixed Doubles", roundName].filter(Boolean).join(" \xB7 ");
+  }
+  return [tournamentName, roundName || groupingLabel].filter(Boolean).join(" \xB7 ");
 }
 function pickPlayerLogoUrl2(athlete) {
   const href = athlete?.flag?.href;
@@ -25926,8 +26034,8 @@ function normalizeTennisCompetition2(competition, tournament, groupingLabel, gro
   const away = competitors.find((c) => c?.homeAway === "away");
   const home = competitors.find((c) => c?.homeAway === "home");
   if (!away || !home) return null;
-  const awayAthlete = away.athlete;
-  const homeAthlete = home.athlete;
+  const awayAthlete = pickCompetitorAthlete2(away);
+  const homeAthlete = pickCompetitorAthlete2(home);
   if (!awayAthlete || !homeAthlete) return null;
   const status = competition.status || {};
   const statusType = status.type || {};
@@ -25960,8 +26068,14 @@ function normalizeTennisCompetition2(competition, tournament, groupingLabel, gro
   const periodNum = status.period != null ? Number(status.period) : NaN;
   const period = Number.isFinite(periodNum) ? periodNum : void 0;
   const displayClock = safe5(status.displayClock) || void 0;
-  const contextParts = [tournamentName, roundName || groupingLabel].filter(Boolean);
-  const contextLine = contextParts.join(" \xB7 ");
+  const typeSlug = safe5(competition?.type?.slug).toLowerCase();
+  const contextLine = buildTennisContextLine2(
+    tournamentName,
+    roundName,
+    groupingLabel,
+    groupingSlug,
+    typeSlug
+  );
   let statusLine = contextLine;
   if (scheduled) {
     if (paused) {
