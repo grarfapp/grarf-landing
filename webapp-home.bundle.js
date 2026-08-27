@@ -51420,7 +51420,8 @@ var init_resolveCenterPaneApplicationModeFromPath = __esm({
 // ../grarf/desktop/src/lib/home/isHomeGamesSpineMigrationPath.ts
 function isHomeGamesSpineMigrationPath(pathname) {
   const normalized = pathname.replace(/\/+$/, "") || "/";
-  return normalized === "/" || isWebappHomeEntryPath(normalized);
+  if (normalized === "/" || isWebappHomeEntryPath(normalized)) return true;
+  return isHomeCenterPaneShellPath(normalized);
 }
 var init_isHomeGamesSpineMigrationPath = __esm({
   "../grarf/desktop/src/lib/home/isHomeGamesSpineMigrationPath.ts"() {
@@ -53324,13 +53325,26 @@ var init_DesktopSettingsPanel = __esm({
   }
 });
 
+// ../grarf/desktop/src/store/centerPaneNowPresentationModeStore.ts
+var import_zustand21, useCenterPaneNowPresentationModeStore;
+var init_centerPaneNowPresentationModeStore = __esm({
+  "../grarf/desktop/src/store/centerPaneNowPresentationModeStore.ts"() {
+    init_define_import_meta_env();
+    import_zustand21 = __toESM(require_zustand(), 1);
+    useCenterPaneNowPresentationModeStore = (0, import_zustand21.create)((set) => ({
+      mode: "timeline",
+      setMode: (mode) => set({ mode })
+    }));
+  }
+});
+
 // ../grarf/desktop/src/store/homeActivityRailTabStore.ts
-var import_zustand21, useHomeActivityRailTabStore;
+var import_zustand22, useHomeActivityRailTabStore;
 var init_homeActivityRailTabStore = __esm({
   "../grarf/desktop/src/store/homeActivityRailTabStore.ts"() {
     init_define_import_meta_env();
-    import_zustand21 = __toESM(require_zustand(), 1);
-    useHomeActivityRailTabStore = (0, import_zustand21.create)((set) => ({
+    import_zustand22 = __toESM(require_zustand(), 1);
+    useHomeActivityRailTabStore = (0, import_zustand22.create)((set) => ({
       activeTab: "social",
       setActiveTab: (tab) => set({ activeTab: tab }),
       resetForTests: () => set({ activeTab: "social" })
@@ -53339,13 +53353,13 @@ var init_homeActivityRailTabStore = __esm({
 });
 
 // ../grarf/desktop/src/store/desktopPrimaryNavigationStore.ts
-var import_zustand22, DEFAULT_SELECTION, useDesktopPrimaryNavigationStore;
+var import_zustand23, DEFAULT_SELECTION, useDesktopPrimaryNavigationStore;
 var init_desktopPrimaryNavigationStore = __esm({
   "../grarf/desktop/src/store/desktopPrimaryNavigationStore.ts"() {
     init_define_import_meta_env();
-    import_zustand22 = __toESM(require_zustand(), 1);
+    import_zustand23 = __toESM(require_zustand(), 1);
     DEFAULT_SELECTION = { kind: "primary", tab: "now" };
-    useDesktopPrimaryNavigationStore = (0, import_zustand22.create)((set) => ({
+    useDesktopPrimaryNavigationStore = (0, import_zustand23.create)((set) => ({
       activeSelection: DEFAULT_SELECTION,
       allScopePanelOpen: false,
       objectsSpineFocus: "now",
@@ -53433,7 +53447,8 @@ function applyDesktopPrimaryNavTab(tab, navigate, pathname) {
       return;
     case "now":
       useOperationalModeStore.getState().setModeByUser("LIVE");
-      applyCenterPaneMode("sportscape", navigate, pathname);
+      useCenterPaneNowPresentationModeStore.getState().setMode("timeline");
+      applyCenterPaneMode("livetracker", navigate, pathname);
       return;
     case "today":
       useOperationalModeStore.getState().setModeByUser("PREPARE");
@@ -53467,6 +53482,7 @@ var init_applyDesktopPrimaryNavigationSelection = __esm({
     init_buildCenterPaneApplicationModePath();
     init_deriveOperationalModeFromCenterPaneApplicationMode();
     init_centerPaneApplicationModeStore();
+    init_centerPaneNowPresentationModeStore();
     init_homeActivityRailTabStore();
     init_homeLiveSubmenuStore();
     init_operationalModeStore();
@@ -53475,18 +53491,31 @@ var init_applyDesktopPrimaryNavigationSelection = __esm({
 });
 
 // ../grarf/desktop/src/components/shell/DesktopPrimaryNavigationBar.tsx
-function primaryActiveClass(tab) {
+function primarySelectedClass(tab) {
+  const shell = "border-[#2a3d42] bg-[#0c1618] pb-1.5 pt-1.5";
   switch (tab) {
     case "workspaces":
-      return "bg-cyansys/12 text-cyansys shadow-[inset_0_0_0_1px_rgba(86,247,255,0.35),0_0_14px_rgba(86,247,255,0.14)]";
+      return cn2(
+        shell,
+        "text-cyansys shadow-[inset_0_1px_0_rgba(86,247,255,0.35)]"
+      );
     case "all":
-      return "bg-greensys/12 text-greensys shadow-[inset_0_0_0_1px_rgba(55,255,139,0.35),0_0_14px_rgba(55,255,139,0.14)]";
+      return cn2(
+        shell,
+        "text-greensys shadow-[inset_0_1px_0_rgba(55,255,139,0.35)]"
+      );
     case "catchUp":
     case "now":
     case "today":
-      return "bg-ambersys/15 text-ambersys shadow-[inset_0_0_0_1px_rgba(251,191,36,0.35),0_0_14px_rgba(251,191,36,0.15)]";
+      return cn2(
+        shell,
+        "text-ambersys shadow-[inset_0_1px_0_rgba(251,191,36,0.35)]"
+      );
     case "browser":
-      return "bg-redsys/20 text-redsys shadow-[inset_0_0_0_1px_rgba(239,68,68,0.35),0_0_14px_rgba(239,68,68,0.18)]";
+      return cn2(
+        shell,
+        "text-redsys shadow-[inset_0_1px_0_rgba(239,68,68,0.35)]"
+      );
   }
 }
 function DesktopPrimaryNavigationBar() {
@@ -53519,17 +53548,17 @@ function DesktopPrimaryNavigationBar() {
   return /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)(
     "nav",
     {
-      className: "flex min-w-0 flex-1 items-center gap-2 overflow-hidden pl-2",
+      className: "flex min-w-0 flex-1 items-end overflow-x-auto overflow-y-hidden overscroll-x-contain",
       "aria-label": "Desktop primary navigation",
       "data-desktop-primary-navigation": true,
       children: [
         /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(
           "div",
           {
-            className: "flex shrink-0 items-center gap-1.5 rounded-sm border border-line/50 bg-[#030707] p-0.5",
+            className: "flex min-w-0 shrink-0 items-end",
             role: "group",
             "aria-label": "Primary navigation",
-            children: PRIMARY_NAV_ITEMS.map(({ tab, label }) => {
+            children: PRIMARY_NAV_ITEMS.map(({ tab, label }, index) => {
               const active2 = activeSelection.kind === "primary" && activeSelection.tab === tab && (tab !== "all" || allScopePanelOpen);
               return /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(
                 "button",
@@ -53537,9 +53566,13 @@ function DesktopPrimaryNavigationBar() {
                   type: "button",
                   "aria-pressed": active2,
                   onClick: () => onPrimarySelect(tab),
+                  style: { zIndex: active2 ? 20 : 10 - index },
                   className: cn2(
-                    "flex h-[28px] shrink-0 items-center px-4 font-mono text-[11px] tracking-[0.16em] transition duration-150",
-                    active2 ? primaryActiveClass(tab) : PRIMARY_IDLE_CLASS
+                    FOLDER_TAB_BASE,
+                    PRIMARY_FOLDER_TAB_CLIP,
+                    "px-3 pr-4 text-[11px] tracking-[0.16em]",
+                    index > 0 && "-ml-[7px]",
+                    active2 ? primarySelectedClass(tab) : PRIMARY_IDLE_CLASS
                   ),
                   children: tab === "all" ? /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)("span", { className: "inline-flex items-center gap-1", children: [
                     "ALL",
@@ -53554,10 +53587,10 @@ function DesktopPrimaryNavigationBar() {
         /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(
           "div",
           {
-            className: "flex shrink-0 items-center gap-1 rounded-sm border border-line/50 bg-[#030707] p-0.5",
+            className: "ml-1 flex shrink-0 items-end border-l border-line/45 pl-1",
             role: "group",
             "aria-label": "Direct content navigation",
-            children: DIRECT_CONTENT_ITEMS.map(({ tab, label }) => {
+            children: DIRECT_CONTENT_ITEMS.map(({ tab, label }, index) => {
               const active2 = activeSelection.kind === "direct" && activeSelection.tab === tab;
               return /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(
                 "button",
@@ -53565,9 +53598,13 @@ function DesktopPrimaryNavigationBar() {
                   type: "button",
                   "aria-pressed": active2,
                   onClick: () => onDirectSelect(tab),
+                  style: { zIndex: active2 ? 20 : 10 - index },
                   className: cn2(
-                    "flex h-[22px] shrink-0 items-center border px-2 font-mono text-[9px] tracking-[0.14em] transition duration-150",
-                    active2 ? DIRECT_ACTIVE_CLASS : DIRECT_IDLE_CLASS
+                    FOLDER_TAB_BASE,
+                    DIRECT_FOLDER_TAB_CLIP,
+                    "px-2 pr-3 text-[9px] tracking-[0.14em]",
+                    index > 0 && "-ml-[6px]",
+                    active2 ? DIRECT_SELECTED_CLASS : DIRECT_IDLE_CLASS
                   ),
                   children: label
                 },
@@ -53580,7 +53617,7 @@ function DesktopPrimaryNavigationBar() {
     }
   );
 }
-var import_react23, import_jsx_runtime20, PRIMARY_NAV_ITEMS, DIRECT_CONTENT_ITEMS, PRIMARY_IDLE_CLASS, DIRECT_ACTIVE_CLASS, DIRECT_IDLE_CLASS;
+var import_react23, import_jsx_runtime20, PRIMARY_NAV_ITEMS, DIRECT_CONTENT_ITEMS, PRIMARY_FOLDER_TAB_CLIP, DIRECT_FOLDER_TAB_CLIP, FOLDER_TAB_BASE, PRIMARY_IDLE_CLASS, DIRECT_SELECTED_CLASS, DIRECT_IDLE_CLASS;
 var init_DesktopPrimaryNavigationBar = __esm({
   "../grarf/desktop/src/components/shell/DesktopPrimaryNavigationBar.tsx"() {
     init_define_import_meta_env();
@@ -53605,9 +53642,12 @@ var init_DesktopPrimaryNavigationBar = __esm({
       { tab: "podcasts", label: "PODCASTS" },
       { tab: "tv", label: "TV" }
     ];
-    PRIMARY_IDLE_CLASS = "bg-transparent text-textdim hover:bg-white/[0.04] hover:text-[#c9dddd]";
-    DIRECT_ACTIVE_CLASS = "border-greensys/45 bg-greensys/10 text-greensys shadow-[inset_0_0_0_1px_rgba(55,255,139,0.2)]";
-    DIRECT_IDLE_CLASS = "border-transparent bg-transparent text-textdim hover:bg-white/[0.04] hover:text-[#c9dddd]";
+    PRIMARY_FOLDER_TAB_CLIP = "[clip-path:polygon(0_0,calc(100%-8px)_0,100%_100%,0_100%)]";
+    DIRECT_FOLDER_TAB_CLIP = "[clip-path:polygon(0_0,calc(100%-6px)_0,100%_100%,0_100%)]";
+    FOLDER_TAB_BASE = "relative shrink-0 border border-b-0 font-mono transition duration-150";
+    PRIMARY_IDLE_CLASS = "border-line/80 bg-[#050808] pb-1 pt-1 text-textdim hover:bg-[#0a1114] hover:text-[#c4d8d8]";
+    DIRECT_SELECTED_CLASS = "border-[#2a3d42] bg-[#0c1618] pb-1 pt-0.5 text-greensys shadow-[inset_0_1px_0_rgba(55,255,139,0.3)]";
+    DIRECT_IDLE_CLASS = "border-line/80 bg-[#050808] pb-0.5 pt-0.5 text-textdim hover:bg-[#0a1114] hover:text-[#c4d8d8]";
   }
 });
 
@@ -53747,12 +53787,12 @@ var init_GatedFeatureSearchBar = __esm({
 });
 
 // ../grarf/desktop/src/store/centerPaneFeedAlignmentStore.ts
-var import_zustand23, useCenterPaneFeedAlignmentStore;
+var import_zustand24, useCenterPaneFeedAlignmentStore;
 var init_centerPaneFeedAlignmentStore = __esm({
   "../grarf/desktop/src/store/centerPaneFeedAlignmentStore.ts"() {
     init_define_import_meta_env();
-    import_zustand23 = __toESM(require_zustand(), 1);
-    useCenterPaneFeedAlignmentStore = (0, import_zustand23.create)((set) => ({
+    import_zustand24 = __toESM(require_zustand(), 1);
+    useCenterPaneFeedAlignmentStore = (0, import_zustand24.create)((set) => ({
       leftPx: null,
       widthPx: null,
       setAlignment: (leftPx, widthPx) => set({ leftPx, widthPx }),
@@ -53806,15 +53846,49 @@ function GlobalAppBar() {
   }, []);
   return /* @__PURE__ */ (0, import_jsx_runtime23.jsxs)(import_jsx_runtime23.Fragment, { children: [
     isElectron ? /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(DesktopSettingsPanel, { open: settingsOpen, onClose: closeSettings }) : null,
-    /* @__PURE__ */ (0, import_jsx_runtime23.jsxs)(
+    /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(
       "header",
       {
         className: cn2(
-          "z-40 flex h-11 shrink-0 items-center gap-2 border-b border-line bg-[#020404]/98 px-3 font-mono sm:gap-3",
-          isElectron ? "justify-start" : "grid grid-cols-[auto_minmax(0,1fr)_auto]"
+          "z-40 shrink-0 font-mono",
+          isElectron ? "border-b border-[#2a3d42] bg-[#020404] shadow-[inset_0_1px_0_rgba(86,247,255,0.05)]" : "flex h-11 shrink-0 items-center gap-2 border-b border-line bg-[#020404]/98 px-3 sm:gap-3"
         ),
         "aria-label": "Global application bar",
-        children: [
+        "data-desktop-menu-bar": isElectron ? true : void 0,
+        children: isElectron ? /* @__PURE__ */ (0, import_jsx_runtime23.jsxs)("div", { className: "flex min-h-[38px] items-end gap-2 px-2 pt-1", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(
+            Link,
+            {
+              to: "/",
+              "aria-label": "GRARF home",
+              className: "mb-1 shrink-0 self-center opacity-90 transition hover:opacity-100",
+              onClick: () => closeHomeLeagueWorkspace(),
+              children: /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(
+                "img",
+                {
+                  src: "/grarf_logo-white.png",
+                  alt: "GRARF",
+                  className: "h-7 w-auto object-contain",
+                  draggable: false
+                }
+              )
+            }
+          ),
+          /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(DesktopPrimaryNavigationBar, {}),
+          /* @__PURE__ */ (0, import_jsx_runtime23.jsxs)("div", { className: "mb-1 ml-auto flex shrink-0 items-center gap-2 self-center", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(GuidedAttentionToggleButton, {}),
+            /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(
+              "button",
+              {
+                type: "button",
+                "aria-label": "Settings",
+                onClick: openSettings,
+                className: "flex items-center justify-center text-textdim/60 transition hover:text-textdim",
+                children: /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(Settings, { size: 14, "aria-hidden": true })
+              }
+            )
+          ] })
+        ] }) : /* @__PURE__ */ (0, import_jsx_runtime23.jsxs)(import_jsx_runtime23.Fragment, { children: [
           /* @__PURE__ */ (0, import_jsx_runtime23.jsxs)("div", { className: "flex shrink-0 items-center gap-2 sm:gap-3", children: [
             /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(
               Link,
@@ -53836,7 +53910,7 @@ function GlobalAppBar() {
             ),
             showTopNavSearch ? /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(GatedFeatureSearchBar, { placeholder: "Search signals, markets, games\u2026", className: "flex-none" }) : null
           ] }),
-          isElectron ? /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(DesktopPrimaryNavigationBar, {}) : /* @__PURE__ */ (0, import_jsx_runtime23.jsx)("div", { className: "relative flex min-w-0 flex-1 items-center justify-center px-0.5 sm:px-1", children: paneAlignedFeed ? /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(
+          /* @__PURE__ */ (0, import_jsx_runtime23.jsx)("div", { className: "relative flex min-w-0 flex-1 items-center justify-center px-0.5 sm:px-1", children: paneAlignedFeed ? /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(
             "div",
             {
               className: "fixed z-[41] flex h-11 w-full items-center justify-center px-0.5 sm:px-1",
@@ -53844,16 +53918,16 @@ function GlobalAppBar() {
               children: /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(GlobalHeaderNewsTicker, { className: "mx-auto w-[70.875%] max-w-none shrink-0 flex-none" })
             }
           ) : /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(GlobalHeaderNewsTicker, { className: "mx-auto w-[70.875%] max-w-none shrink-0 flex-none" }) }),
-          /* @__PURE__ */ (0, import_jsx_runtime23.jsxs)("div", { className: "flex shrink-0 items-center justify-end gap-2 sm:gap-3 ml-auto", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime23.jsxs)("div", { className: "flex shrink-0 items-center justify-end gap-2 sm:gap-3", children: [
             /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(GuidedAttentionToggleButton, {}),
-            !isElectron ? /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(
+            /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(
               "span",
               {
                 className: "hidden shrink-0 text-[9px] tracking-[0.12em] text-textdim/80 xl:inline",
                 "aria-live": "off",
                 children: datetime
               }
-            ) : null,
+            ),
             /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(
               "button",
               {
@@ -53865,7 +53939,7 @@ function GlobalAppBar() {
               }
             )
           ] })
-        ]
+        ] })
       }
     )
   ] });
@@ -54865,14 +54939,14 @@ function computeDuplicateIds(priorities, gameDateKeys) {
 function clonePriorities(source) {
   return { ...source };
 }
-var import_zustand24, useAdminFeaturedPriorityStore;
+var import_zustand25, useAdminFeaturedPriorityStore;
 var init_adminFeaturedPriorityStore = __esm({
   "../grarf/desktop/src/store/adminFeaturedPriorityStore.ts"() {
     init_define_import_meta_env();
-    import_zustand24 = __toESM(require_zustand(), 1);
+    import_zustand25 = __toESM(require_zustand(), 1);
     init_editorialGameKey();
     init_gamesSpineOperationalDate();
-    useAdminFeaturedPriorityStore = (0, import_zustand24.create)((set, get) => ({
+    useAdminFeaturedPriorityStore = (0, import_zustand25.create)((set, get) => ({
       priorities: {},
       persistedBaselinePriorities: {},
       gameDateKeys: {},
@@ -57767,12 +57841,12 @@ var init_fetchGameLeagueHighlight = __esm({
 });
 
 // ../grarf/desktop/src/store/gameHighlightStore.ts
-var import_zustand25, useGameHighlightStore;
+var import_zustand26, useGameHighlightStore;
 var init_gameHighlightStore = __esm({
   "../grarf/desktop/src/store/gameHighlightStore.ts"() {
     init_define_import_meta_env();
-    import_zustand25 = __toESM(require_zustand(), 1);
-    useGameHighlightStore = (0, import_zustand25.create)((set, get) => ({
+    import_zustand26 = __toESM(require_zustand(), 1);
+    useGameHighlightStore = (0, import_zustand26.create)((set, get) => ({
       highlightsByGameId: {},
       setResolvedHighlight: (gameId, highlight) => {
         if (get().highlightsByGameId[gameId] === highlight) return;
@@ -57789,13 +57863,13 @@ var init_gameHighlightStore = __esm({
 });
 
 // ../grarf/desktop/src/store/mlbCatchupHighlightsStore.ts
-var import_zustand26, EMPTY_MAP, useMlbCatchupHighlightsStore;
+var import_zustand27, EMPTY_MAP, useMlbCatchupHighlightsStore;
 var init_mlbCatchupHighlightsStore = __esm({
   "../grarf/desktop/src/store/mlbCatchupHighlightsStore.ts"() {
     init_define_import_meta_env();
-    import_zustand26 = __toESM(require_zustand(), 1);
+    import_zustand27 = __toESM(require_zustand(), 1);
     EMPTY_MAP = {};
-    useMlbCatchupHighlightsStore = (0, import_zustand26.create)((set, get) => ({
+    useMlbCatchupHighlightsStore = (0, import_zustand27.create)((set, get) => ({
       date: "",
       highlightsByGamePk: EMPTY_MAP,
       setFeed: (snapshot) => set(snapshot),
@@ -58053,14 +58127,14 @@ function appendTimelineEvents(eventsById, items) {
   }
   return out;
 }
-var import_zustand27, MAX_PERSISTED_EVENTS, useCenterPaneTimelinePersistedEventStore;
+var import_zustand28, MAX_PERSISTED_EVENTS, useCenterPaneTimelinePersistedEventStore;
 var init_centerPaneTimelinePersistedEventStore = __esm({
   "../grarf/desktop/src/store/centerPaneTimelinePersistedEventStore.ts"() {
     init_define_import_meta_env();
-    import_zustand27 = __toESM(require_zustand(), 1);
+    import_zustand28 = __toESM(require_zustand(), 1);
     init_centerPaneTimelinePersistedEventAdapters();
     MAX_PERSISTED_EVENTS = 400;
-    useCenterPaneTimelinePersistedEventStore = (0, import_zustand27.create)((set, get) => ({
+    useCenterPaneTimelinePersistedEventStore = (0, import_zustand28.create)((set, get) => ({
       version: 0,
       eventsById: {},
       appendOperationalAlerts: (alerts) => {
@@ -58109,15 +58183,15 @@ function activateNextFromQueue(set, get) {
   const [next, ...rest] = queue;
   set({ active: next, queue: rest });
 }
-var import_zustand28, MAX_QUEUE, useGamesSpineTransientAlertStore;
+var import_zustand29, MAX_QUEUE, useGamesSpineTransientAlertStore;
 var init_gamesSpineTransientAlertStore = __esm({
   "../grarf/desktop/src/store/gamesSpineTransientAlertStore.ts"() {
     init_define_import_meta_env();
-    import_zustand28 = __toESM(require_zustand(), 1);
+    import_zustand29 = __toESM(require_zustand(), 1);
     init_gamesSpineTransientAlertScheduler();
     init_centerPaneTimelinePersistedEventStore();
     MAX_QUEUE = 24;
-    useGamesSpineTransientAlertStore = (0, import_zustand28.create)((set, get) => ({
+    useGamesSpineTransientAlertStore = (0, import_zustand29.create)((set, get) => ({
       active: null,
       queue: [],
       enqueue: (items) => {
@@ -58333,19 +58407,6 @@ var init_gamesSpineTransientAlertPresentation = __esm({
       "game-update": "text-[12px] font-bold tracking-[0.2em] text-greensys"
     };
     GAMES_SPINE_TRANSIENT_ALERT_BODY_CLASS = "px-2 py-2";
-  }
-});
-
-// ../grarf/desktop/src/store/centerPaneNowPresentationModeStore.ts
-var import_zustand29, useCenterPaneNowPresentationModeStore;
-var init_centerPaneNowPresentationModeStore = __esm({
-  "../grarf/desktop/src/store/centerPaneNowPresentationModeStore.ts"() {
-    init_define_import_meta_env();
-    import_zustand29 = __toESM(require_zustand(), 1);
-    useCenterPaneNowPresentationModeStore = (0, import_zustand29.create)((set) => ({
-      mode: "timeline",
-      setMode: (mode) => set({ mode })
-    }));
   }
 });
 
@@ -67118,6 +67179,10 @@ function useCenterPaneApplicationModeSync() {
       return;
     }
     if (!OPERATIONAL_AUTO_CENTER_PANE_MODES.has(mode)) return;
+    if (isGrarfElectronRenderer()) {
+      const { activeSelection } = useDesktopPrimaryNavigationStore.getState();
+      if (activeSelection.kind === "primary" && activeSelection.tab === "now") return;
+    }
     if (isGrarfWebRenderer()) {
       if (source === "explicit" || initialDefaultApplied) return;
       applyInitialDefaultFromGamesSpine(leagues);
@@ -67144,6 +67209,7 @@ var init_useCenterPaneApplicationModeSync = __esm({
     init_deriveOperationalModeFromCenterPaneApplicationMode();
     init_isGrarfWebRenderer();
     init_centerPaneApplicationModeStore();
+    init_desktopPrimaryNavigationStore();
     init_liveGamesStore();
     init_operationalModeStore();
     OPERATIONAL_AUTO_CENTER_PANE_MODES = /* @__PURE__ */ new Set([
