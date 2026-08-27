@@ -19674,6 +19674,28 @@ function preserveMlbTeamStandingsOnGamesSnapshot(incoming, previousGames) {
   };
 }
 
+// ../grarf/desktop/src/services/operationalIngest/operationalTransportFreshness.ts
+init_define_import_meta_env();
+var lastAppliedOperationalTransportGeneratedAtMs = Number.NEGATIVE_INFINITY;
+var lastAppliedOperationalTransportGeneratedAt = null;
+function parseOperationalTransportGeneratedAtMs(generatedAt) {
+  if (!generatedAt?.trim()) return Number.NEGATIVE_INFINITY;
+  const ms = Date.parse(generatedAt);
+  return Number.isFinite(ms) ? ms : Number.NEGATIVE_INFINITY;
+}
+function shouldAcceptOperationalTransportHydrate(transportGeneratedAt) {
+  const incomingMs = parseOperationalTransportGeneratedAtMs(transportGeneratedAt);
+  if (incomingMs === Number.NEGATIVE_INFINITY) return true;
+  return incomingMs > lastAppliedOperationalTransportGeneratedAtMs;
+}
+function recordAppliedOperationalTransportGeneratedAt(transportGeneratedAt) {
+  const incomingMs = parseOperationalTransportGeneratedAtMs(transportGeneratedAt);
+  if (incomingMs === Number.NEGATIVE_INFINITY) return;
+  if (incomingMs <= lastAppliedOperationalTransportGeneratedAtMs) return;
+  lastAppliedOperationalTransportGeneratedAtMs = incomingMs;
+  lastAppliedOperationalTransportGeneratedAt = transportGeneratedAt ?? null;
+}
+
 // ../grarf/desktop/src/store/gamesSpineRenderStore.ts
 init_define_import_meta_env();
 function isCompleteOperationalSnapshot(leagues, meta) {
@@ -19740,6 +19762,18 @@ var useLiveGamesStore = create((set) => ({
   leagues: useCanonicalLiveGameStore.getState().leagues,
   updatedAt: useCanonicalLiveGameStore.getState().updatedAt,
   hydrate: (snap, completeness) => {
+    const transportGeneratedAt = completeness?.transportGeneratedAt?.trim();
+    if (transportGeneratedAt) {
+      if (!shouldAcceptOperationalTransportHydrate(transportGeneratedAt)) {
+        if (define_import_meta_env_default.DEV) {
+          broadcastDebug(
+            `[CanonicalLive] Skip stale operational hydrate ${transportGeneratedAt}`
+          );
+        }
+        return;
+      }
+      recordAppliedOperationalTransportGeneratedAt(transportGeneratedAt);
+    }
     if (define_import_meta_env_default.DEV) {
       broadcastDebug(`[CanonicalLive] Ingest ${snap.updatedAt ?? "?"}`);
     }

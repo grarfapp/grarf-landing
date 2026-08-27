@@ -11615,6 +11615,33 @@ var init_preserveMissingOperationalLeagueSections = __esm({
   }
 });
 
+// ../grarf/desktop/src/services/operationalIngest/operationalTransportFreshness.ts
+function parseOperationalTransportGeneratedAtMs(generatedAt) {
+  if (!generatedAt?.trim()) return Number.NEGATIVE_INFINITY;
+  const ms2 = Date.parse(generatedAt);
+  return Number.isFinite(ms2) ? ms2 : Number.NEGATIVE_INFINITY;
+}
+function shouldAcceptOperationalTransportHydrate(transportGeneratedAt) {
+  const incomingMs = parseOperationalTransportGeneratedAtMs(transportGeneratedAt);
+  if (incomingMs === Number.NEGATIVE_INFINITY) return true;
+  return incomingMs > lastAppliedOperationalTransportGeneratedAtMs;
+}
+function recordAppliedOperationalTransportGeneratedAt(transportGeneratedAt) {
+  const incomingMs = parseOperationalTransportGeneratedAtMs(transportGeneratedAt);
+  if (incomingMs === Number.NEGATIVE_INFINITY) return;
+  if (incomingMs <= lastAppliedOperationalTransportGeneratedAtMs) return;
+  lastAppliedOperationalTransportGeneratedAtMs = incomingMs;
+  lastAppliedOperationalTransportGeneratedAt = transportGeneratedAt ?? null;
+}
+var lastAppliedOperationalTransportGeneratedAtMs, lastAppliedOperationalTransportGeneratedAt;
+var init_operationalTransportFreshness = __esm({
+  "../grarf/desktop/src/services/operationalIngest/operationalTransportFreshness.ts"() {
+    init_define_import_meta_env();
+    lastAppliedOperationalTransportGeneratedAtMs = Number.NEGATIVE_INFINITY;
+    lastAppliedOperationalTransportGeneratedAt = null;
+  }
+});
+
 // ../grarf/desktop/src/store/gamesSpineRenderStore.ts
 function isCompleteOperationalSnapshot(leagues, meta) {
   const hasAnyGames = Object.values(leagues).some(
@@ -11698,6 +11725,7 @@ var init_liveGamesStore = __esm({
     init_preserveLiveStatusOnIngest();
     init_preserveMissingOperationalLeagueSections();
     init_gamesSpineGamePresentation();
+    init_operationalTransportFreshness();
     init_gamesSpineRenderStore();
     init_canonicalLiveGameStore();
     init_recentFinalizedGamesStore();
@@ -11705,6 +11733,18 @@ var init_liveGamesStore = __esm({
       leagues: useCanonicalLiveGameStore.getState().leagues,
       updatedAt: useCanonicalLiveGameStore.getState().updatedAt,
       hydrate: (snap, completeness) => {
+        const transportGeneratedAt = completeness?.transportGeneratedAt?.trim();
+        if (transportGeneratedAt) {
+          if (!shouldAcceptOperationalTransportHydrate(transportGeneratedAt)) {
+            if (define_import_meta_env_default.DEV) {
+              broadcastDebug2(
+                `[CanonicalLive] Skip stale operational hydrate ${transportGeneratedAt}`
+              );
+            }
+            return;
+          }
+          recordAppliedOperationalTransportGeneratedAt(transportGeneratedAt);
+        }
         if (define_import_meta_env_default.DEV) {
           broadcastDebug2(`[CanonicalLive] Ingest ${snap.updatedAt ?? "?"}`);
         }
@@ -63873,7 +63913,7 @@ function shouldRejectStaleSnapshot(canonicalUpdatedAt) {
   const currentMs = parseUpdatedAtMs(useLiveGamesStore.getState().updatedAt);
   return incomingMs > 0 && currentMs > 0 && incomingMs <= currentMs;
 }
-async function buildGamesSnapshotForHydrate(transport, context2, completeness, options = {}) {
+async function buildGamesSnapshotForHydrate(transport, context2, completeness) {
   const source = completeness.source;
   if (source === "grarf_cloud") {
     const canonical2 = normalizeOperationalSnapshot(transport);
@@ -63920,7 +63960,7 @@ async function buildGamesSnapshotForHydrate(transport, context2, completeness, o
       canonical = mergeFinalRowsIntoSnapshot(canonical, context2.lastCloudLeaguesRef.current);
     }
   }
-  if (!options.skipStaleTimestampGuard && shouldRejectStaleSnapshot(canonical.updatedAt)) {
+  if (shouldRejectStaleSnapshot(canonical.updatedAt)) {
     const prev = useLiveGamesStore.getState();
     const supplementedLeagues = supplementOperationalSnapshotLeagues(
       prev.leagues ?? {},
@@ -63936,16 +63976,28 @@ async function buildGamesSnapshotForHydrate(transport, context2, completeness, o
   }
   return prepareGamesSpineSnapshotForHydrate(canonical);
 }
+async function applyProgressiveMetadataEnrichmentToCurrentStore(hydrate) {
+  const current = useLiveGamesStore.getState();
+  if (!current.updatedAt || !current.leagues) return;
+  const withEnrichment = await progressivelyEnrichGamesSpineSnapshot({
+    leagues: current.leagues,
+    updatedAt: current.updatedAt
+  });
+  await Promise.resolve(hydrate(withEnrichment));
+}
 async function runProgressiveGamesSpineEnrichment(rawTransport, hydrate, context2, completeness) {
+  const transportGeneratedAt = completeness.transportGeneratedAt ?? rawTransport.generatedAt;
   let transport = rawTransport;
   try {
     transport = await enrichOperationalTransport(rawTransport);
   } catch (e2) {
     console.warn(`${LOG27} transport enrich failed`, e2);
   }
-  const enrichedSnap = await buildGamesSnapshotForHydrate(transport, context2, completeness, {
-    skipStaleTimestampGuard: true
-  });
+  if (!shouldAcceptOperationalTransportHydrate(transportGeneratedAt)) {
+    await applyProgressiveMetadataEnrichmentToCurrentStore(hydrate);
+    return;
+  }
+  const enrichedSnap = await buildGamesSnapshotForHydrate(transport, context2, completeness);
   if (!enrichedSnap) return;
   const withEnrichment = await progressivelyEnrichGamesSpineSnapshot(enrichedSnap);
   await Promise.resolve(hydrate(withEnrichment, completeness));
@@ -63998,6 +64050,7 @@ var init_hydrateOperationalSnapshotFromTransport = __esm({
     init_liveGamesStore();
     init_enrichOperationalTransport();
     init_normalizeOperationalSnapshot2();
+    init_operationalTransportFreshness();
     LOG27 = "[OperationalIngest]";
     MAX_ACCEPTABLE_TRANSPORT_AGE_MS = 10 * 6e4;
   }
