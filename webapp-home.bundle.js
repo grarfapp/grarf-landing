@@ -37,7 +37,7 @@ var __publicField = (obj, key2, value) => __defNormalProp(obj, typeof key2 !== "
 var define_import_meta_env_default;
 var init_define_import_meta_env = __esm({
   "<define:import.meta.env>"() {
-    define_import_meta_env_default = { DEV: false, PROD: true, MODE: "production", VITE_OPERATIONAL_INGEST_PROVIDER: "grarf_cloud", VITE_GRARF_OPERATIONAL_INGEST_URL: "https://grarf-operational-service.grarf.workers.dev", VITE_SPORTSCAPE_EDITORIAL_API_URL: "https://grarf-operational-service.grarf.workers.dev/sportscape-editorial", VITE_TRACE_FINAL_LIVE_FIELDS: "", VITE_ENABLE_ESPN_RESOLVER: "false", VITE_POSTHOG_KEY: "phc_AGQGsddTcRefiXfaR634tAiCEvfkyWk5mtKR4qzQbcxP", VITE_POSTHOG_HOST: "https://us.i.posthog.com" };
+    define_import_meta_env_default = { DEV: false, PROD: true, MODE: "production", VITE_OPERATIONAL_INGEST_PROVIDER: "grarf_cloud", VITE_GRARF_OPERATIONAL_INGEST_URL: "https://grarf-operational-service.grarf.workers.dev", VITE_SPORTSCAPE_EDITORIAL_API_URL: "https://grarf-operational-service.grarf.workers.dev/sportscape-editorial", VITE_TRACE_FINAL_LIVE_FIELDS: "", VITE_ENABLE_ESPN_RESOLVER: "false", VITE_POSTHOG_KEY: "", VITE_POSTHOG_HOST: "" };
   }
 });
 
@@ -9789,7 +9789,7 @@ async function fetchViaWebOperationalIngest() {
   let cloud = null;
   let cloudError = null;
   try {
-    cloud = await prefetchWebOperationalCloudSnapshot() ?? await fetchViaGrarfCloudService();
+    cloud = await fetchViaGrarfCloudService();
   } catch (e2) {
     cloudError = e2 instanceof Error ? e2.message : String(e2);
     if (define_import_meta_env_default.DEV) {
@@ -54211,8 +54211,26 @@ var init_resolveGrarfOperationalPrioritization = __esm({
 });
 
 // ../grarf/desktop/src/lib/bestGameRightNow/resolveBestGameRightNowV1.ts
+function parseGameLastUpdatedMs(lastUpdated) {
+  if (!lastUpdated?.trim()) return null;
+  const ms2 = Date.parse(lastUpdated);
+  return Number.isFinite(ms2) ? ms2 : null;
+}
+function isGenuinelyActiveLiveForBestEvent(game, now = /* @__PURE__ */ new Date()) {
+  if (game.status !== "live") return true;
+  const sportsDayKey = getOperationalSportsDayDateKey(now);
+  const yesterdayKey2 = getOperationalSportsDayYesterdayDateKey(now);
+  const gameDateKey = resolveGameOperationalDateKey(game);
+  if (!gameDateKey || gameDateKey === sportsDayKey) return true;
+  if (gameDateKey < sportsDayKey && gameDateKey !== yesterdayKey2) return false;
+  const lastUpdatedMs = parseGameLastUpdatedMs(game.lastUpdated);
+  if (lastUpdatedMs == null) return false;
+  return now.getTime() - lastUpdatedMs <= BEST_EVENT_MAX_STALE_LIVE_UPDATE_MS;
+}
 function isBestGameRightNowEligible(game) {
-  return !isSpineFinalizedGame(game);
+  if (isSpineFinalizedGame(game)) return false;
+  if (!isGenuinelyActiveLiveForBestEvent(game)) return false;
+  return true;
 }
 function resolveManualLeagueBaseImportance(manual) {
   if (manual.leaguePriority != null && Number.isFinite(manual.leaguePriority)) {
@@ -54392,9 +54410,11 @@ function resolveBestGameRightNowV1(mergedLeagues, manualGames = [], options) {
 function bestGameRightNowV1SectionLabel(result) {
   return result.kind === "best_live" ? "BEST EVENT RIGHT NOW" : "NEXT BIG EVENT";
 }
+var BEST_EVENT_MAX_STALE_LIVE_UPDATE_MS;
 var init_resolveBestGameRightNowV1 = __esm({
   "../grarf/desktop/src/lib/bestGameRightNow/resolveBestGameRightNowV1.ts"() {
     init_define_import_meta_env();
+    init_operationalSlateDate2();
     init_gamesSpineOperationalDate();
     init_isGameActivelyLive();
     init_isSpineFinalizedGame();
@@ -54411,6 +54431,7 @@ var init_resolveBestGameRightNowV1 = __esm({
     init_wimbledonGamesSpinePresentation();
     init_usOpenGamesSpinePresentation();
     init_resolveGrarfOperationalPrioritization();
+    BEST_EVENT_MAX_STALE_LIVE_UPDATE_MS = 45 * 60 * 1e3;
   }
 });
 
