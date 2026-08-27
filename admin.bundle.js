@@ -27108,19 +27108,6 @@ var CLOUD_FETCH_TIMEOUT_MS = 2e4;
 var WEB_CLOUD_BOOTSTRAP_TIMEOUT_MS = 2500;
 var CLOUD_FETCH_MAX_ATTEMPTS = 3;
 var CLOUD_FETCH_RETRY_MS = 1500;
-var webCloudSnapshotPrefetch = null;
-function prefetchWebOperationalCloudSnapshot() {
-  if (!isGrarfWebRenderer()) return Promise.resolve(null);
-  if (!webCloudSnapshotPrefetch) {
-    webCloudSnapshotPrefetch = fetchViaGrarfCloudService({ webBootstrap: true }).then((snap) => countOperationalGames(snap) > 0 ? snap : null).catch((e) => {
-      if (define_import_meta_env_default.DEV) {
-        console.warn(`${LOG21} web cloud prefetch failed`, e);
-      }
-      return null;
-    });
-  }
-  return webCloudSnapshotPrefetch;
-}
 function countOperationalGames(snap) {
   return Object.values(snap.leagues ?? {}).reduce(
     (total, rows) => total + (Array.isArray(rows) ? rows.length : 0),
@@ -27328,7 +27315,7 @@ async function fetchViaWebOperationalIngest() {
   let cloud = null;
   let cloudError = null;
   try {
-    cloud = await prefetchWebOperationalCloudSnapshot() ?? await fetchViaGrarfCloudService();
+    cloud = await fetchViaGrarfCloudService();
   } catch (e) {
     cloudError = e instanceof Error ? e.message : String(e);
     if (define_import_meta_env_default.DEV) {
