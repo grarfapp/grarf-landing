@@ -53491,33 +53491,6 @@ var init_applyDesktopPrimaryNavigationSelection = __esm({
 });
 
 // ../grarf/desktop/src/components/shell/DesktopPrimaryNavigationBar.tsx
-function primarySelectedClass(tab) {
-  const shell = "border-[#2a3d42] bg-[#0c1618] pb-1.5 pt-1.5";
-  switch (tab) {
-    case "workspaces":
-      return cn2(
-        shell,
-        "text-cyansys shadow-[inset_0_1px_0_rgba(86,247,255,0.35)]"
-      );
-    case "all":
-      return cn2(
-        shell,
-        "text-greensys shadow-[inset_0_1px_0_rgba(55,255,139,0.35)]"
-      );
-    case "catchUp":
-    case "now":
-    case "today":
-      return cn2(
-        shell,
-        "text-ambersys shadow-[inset_0_1px_0_rgba(251,191,36,0.35)]"
-      );
-    case "browser":
-      return cn2(
-        shell,
-        "text-redsys shadow-[inset_0_1px_0_rgba(239,68,68,0.35)]"
-      );
-  }
-}
 function DesktopPrimaryNavigationBar() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
@@ -53545,39 +53518,64 @@ function DesktopPrimaryNavigationBar() {
     },
     [navigate, pathname]
   );
+  const isPrimaryActive = (0, import_react23.useCallback)(
+    (tab) => activeSelection.kind === "primary" && activeSelection.tab === tab && (tab !== "all" || allScopePanelOpen),
+    [activeSelection, allScopePanelOpen]
+  );
   return /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)(
     "nav",
     {
-      className: "flex min-w-0 flex-1 items-end overflow-x-auto overflow-y-hidden overscroll-x-contain",
+      className: "flex min-w-0 flex-1 items-end gap-0.5 overflow-x-auto overflow-y-hidden overscroll-x-contain",
       "aria-label": "Desktop primary navigation",
       "data-desktop-primary-navigation": true,
       children: [
         /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(
+          "button",
+          {
+            type: "button",
+            "aria-pressed": isPrimaryActive("workspaces"),
+            onClick: () => onPrimarySelect("workspaces"),
+            className: cn2(WORKSPACES_TAB_CLASS, "hover:bg-[#040a0c]"),
+            children: "WORKSPACES"
+          }
+        ),
+        /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(
+          "button",
+          {
+            type: "button",
+            "aria-pressed": isPrimaryActive("all"),
+            onClick: () => onPrimarySelect("all"),
+            className: cn2(
+              ALL_TAB_CLASS,
+              "hover:bg-[#0a1c22] hover:text-cyansys/95",
+              isPrimaryActive("all") && "bg-[#0c2028] text-cyansys"
+            ),
+            children: /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)("span", { className: "inline-flex items-center gap-0.5", children: [
+              "ALL",
+              /* @__PURE__ */ (0, import_jsx_runtime20.jsx)("span", { "aria-hidden": true, className: "text-[10px] leading-none", children: "\u25BC" })
+            ] })
+          }
+        ),
+        /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(
           "div",
           {
-            className: "flex min-w-0 shrink-0 items-end",
+            className: cn2("flex shrink-0 items-stretch", GROUP_GAP_CLASS),
             role: "group",
-            "aria-label": "Primary navigation",
-            children: PRIMARY_NAV_ITEMS.map(({ tab, label }, index) => {
-              const active2 = activeSelection.kind === "primary" && activeSelection.tab === tab && (tab !== "all" || allScopePanelOpen);
+            "aria-label": "Mode navigation",
+            children: TEMPORAL_NAV_ITEMS.map(({ tab, label }) => {
+              const active2 = isPrimaryActive(tab);
               return /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(
                 "button",
                 {
                   type: "button",
                   "aria-pressed": active2,
                   onClick: () => onPrimarySelect(tab),
-                  style: { zIndex: active2 ? 20 : 10 - index },
                   className: cn2(
-                    FOLDER_TAB_BASE,
-                    PRIMARY_FOLDER_TAB_CLIP,
-                    "px-3 pr-4 text-[11px] tracking-[0.16em]",
-                    index > 0 && "-ml-[7px]",
-                    active2 ? primarySelectedClass(tab) : PRIMARY_IDLE_CLASS
+                    PRIMARY_BLOCK_TAB_CLASS,
+                    tab === "now" && active2 ? NOW_ACTIVE_CLASS : active2 ? MODE_NAV_BLOCK_ACTIVE : MODE_NAV_BLOCK,
+                    "hover:brightness-105"
                   ),
-                  children: tab === "all" ? /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)("span", { className: "inline-flex items-center gap-1", children: [
-                    "ALL",
-                    /* @__PURE__ */ (0, import_jsx_runtime20.jsx)("span", { "aria-hidden": true, className: "text-[10px] leading-none", children: "\u25BC" })
-                  ] }) : label
+                  children: label
                 },
                 tab
               );
@@ -53585,12 +53583,26 @@ function DesktopPrimaryNavigationBar() {
           }
         ),
         /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(
+          "button",
+          {
+            type: "button",
+            "aria-pressed": isPrimaryActive("browser"),
+            onClick: () => onPrimarySelect("browser"),
+            className: cn2(
+              PRIMARY_BLOCK_TAB_CLASS,
+              isPrimaryActive("browser") ? BROWSER_BLOCK_ACTIVE : BROWSER_BLOCK,
+              "mx-[18px] hover:brightness-105"
+            ),
+            children: "BROWSER"
+          }
+        ),
+        /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(
           "div",
           {
-            className: "ml-1 flex shrink-0 items-end border-l border-line/45 pl-1",
+            className: cn2("flex shrink-0 items-stretch self-end", GROUP_GAP_CLASS),
             role: "group",
             "aria-label": "Direct content navigation",
-            children: DIRECT_CONTENT_ITEMS.map(({ tab, label }, index) => {
+            children: DIRECT_CONTENT_ITEMS.map(({ tab, label }) => {
               const active2 = activeSelection.kind === "direct" && activeSelection.tab === tab;
               return /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(
                 "button",
@@ -53598,13 +53610,10 @@ function DesktopPrimaryNavigationBar() {
                   type: "button",
                   "aria-pressed": active2,
                   onClick: () => onDirectSelect(tab),
-                  style: { zIndex: active2 ? 20 : 10 - index },
                   className: cn2(
-                    FOLDER_TAB_BASE,
-                    DIRECT_FOLDER_TAB_CLIP,
-                    "px-2 pr-3 text-[9px] tracking-[0.14em]",
-                    index > 0 && "-ml-[6px]",
-                    active2 ? DIRECT_SELECTED_CLASS : DIRECT_IDLE_CLASS
+                    SECONDARY_BLOCK_TAB_CLASS,
+                    active2 ? SECONDARY_BLOCK_ACTIVE : SECONDARY_BLOCK,
+                    "hover:brightness-105"
                   ),
                   children: label
                 },
@@ -53617,7 +53626,7 @@ function DesktopPrimaryNavigationBar() {
     }
   );
 }
-var import_react23, import_jsx_runtime20, PRIMARY_NAV_ITEMS, DIRECT_CONTENT_ITEMS, PRIMARY_FOLDER_TAB_CLIP, DIRECT_FOLDER_TAB_CLIP, FOLDER_TAB_BASE, PRIMARY_IDLE_CLASS, DIRECT_SELECTED_CLASS, DIRECT_IDLE_CLASS;
+var import_react23, import_jsx_runtime20, TEMPORAL_NAV_ITEMS, DIRECT_CONTENT_ITEMS, STANDARD_TAB_WIDTH_CLASS, GROUP_GAP_CLASS, BLOCK_BEVEL, PRIMARY_TAB_BASE, SECONDARY_TAB_BASE, WORKSPACES_TAB_CLASS, ALL_TAB_CLASS, PRIMARY_BLOCK_TAB_CLASS, SECONDARY_BLOCK_TAB_CLASS, MODE_NAV_BLOCK, MODE_NAV_BLOCK_ACTIVE, BROWSER_BLOCK, BROWSER_BLOCK_ACTIVE, SECONDARY_BLOCK, SECONDARY_BLOCK_ACTIVE, NOW_ACTIVE_CLASS;
 var init_DesktopPrimaryNavigationBar = __esm({
   "../grarf/desktop/src/components/shell/DesktopPrimaryNavigationBar.tsx"() {
     init_define_import_meta_env();
@@ -53627,13 +53636,10 @@ var init_DesktopPrimaryNavigationBar = __esm({
     init_applyDesktopPrimaryNavigationSelection();
     init_desktopPrimaryNavigationStore();
     import_jsx_runtime20 = __toESM(require_jsx_runtime(), 1);
-    PRIMARY_NAV_ITEMS = [
-      { tab: "workspaces", label: "MY WORKSPACES" },
-      { tab: "all", label: "ALL" },
+    TEMPORAL_NAV_ITEMS = [
       { tab: "catchUp", label: "CATCH UP" },
       { tab: "now", label: "NOW" },
-      { tab: "today", label: "TODAY" },
-      { tab: "browser", label: "BROWSER" }
+      { tab: "today", label: "TODAY" }
     ];
     DIRECT_CONTENT_ITEMS = [
       { tab: "news", label: "NEWS" },
@@ -53642,12 +53648,43 @@ var init_DesktopPrimaryNavigationBar = __esm({
       { tab: "podcasts", label: "PODCASTS" },
       { tab: "tv", label: "TV" }
     ];
-    PRIMARY_FOLDER_TAB_CLIP = "[clip-path:polygon(0_0,calc(100%-8px)_0,100%_100%,0_100%)]";
-    DIRECT_FOLDER_TAB_CLIP = "[clip-path:polygon(0_0,calc(100%-6px)_0,100%_100%,0_100%)]";
-    FOLDER_TAB_BASE = "relative shrink-0 border border-b-0 font-mono transition duration-150";
-    PRIMARY_IDLE_CLASS = "border-line/80 bg-[#050808] pb-1 pt-1 text-textdim hover:bg-[#0a1114] hover:text-[#c4d8d8]";
-    DIRECT_SELECTED_CLASS = "border-[#2a3d42] bg-[#0c1618] pb-1 pt-0.5 text-greensys shadow-[inset_0_1px_0_rgba(55,255,139,0.3)]";
-    DIRECT_IDLE_CLASS = "border-line/80 bg-[#050808] pb-0.5 pt-0.5 text-textdim hover:bg-[#0a1114] hover:text-[#c4d8d8]";
+    STANDARD_TAB_WIDTH_CLASS = "box-border w-[8rem] min-w-[8rem] max-w-[8rem] shrink-0 justify-center px-1";
+    GROUP_GAP_CLASS = "gap-[2px]";
+    BLOCK_BEVEL = "border border-cyansys/20 shadow-[inset_0_1px_0_rgba(86,247,255,0.14),inset_0_-1px_0_rgba(0,0,0,0.45)]";
+    PRIMARY_TAB_BASE = "flex min-h-[28px] items-center whitespace-nowrap py-1 font-mono text-[12px] font-medium leading-none tracking-[0.14em] transition-colors duration-100";
+    SECONDARY_TAB_BASE = "flex min-h-[28px] items-center whitespace-nowrap py-1 font-mono text-[12px] font-medium leading-none tracking-[0.12em] transition-colors duration-100";
+    WORKSPACES_TAB_CLASS = cn2(
+      PRIMARY_TAB_BASE,
+      STANDARD_TAB_WIDTH_CLASS,
+      BLOCK_BEVEL,
+      "border-cyansys/30 bg-[#020608] text-white"
+    );
+    ALL_TAB_CLASS = cn2(
+      PRIMARY_TAB_BASE,
+      "w-auto min-w-[calc((5ch+1.5rem)*1.5)] shrink-0 justify-center border-0 bg-[#081418]/90 px-3 text-cyansys/75 shadow-none"
+    );
+    PRIMARY_BLOCK_TAB_CLASS = cn2(
+      PRIMARY_TAB_BASE,
+      STANDARD_TAB_WIDTH_CLASS,
+      BLOCK_BEVEL,
+      "relative"
+    );
+    SECONDARY_BLOCK_TAB_CLASS = cn2(
+      SECONDARY_TAB_BASE,
+      STANDARD_TAB_WIDTH_CLASS,
+      BLOCK_BEVEL,
+      "relative"
+    );
+    MODE_NAV_BLOCK = "bg-[#0f1e24] text-[#cce8e8]";
+    MODE_NAV_BLOCK_ACTIVE = "border-cyansys/35 bg-[#153038] text-white";
+    BROWSER_BLOCK = "bg-[#0c1a1e] text-[#a8c8c8]";
+    BROWSER_BLOCK_ACTIVE = "border-cyansys/30 bg-[#102830] text-white";
+    SECONDARY_BLOCK = "bg-[#060e10] text-textdim";
+    SECONDARY_BLOCK_ACTIVE = "border-cyansys/25 bg-[#0a1418] text-[#c4d8d8]";
+    NOW_ACTIVE_CLASS = cn2(
+      BLOCK_BEVEL,
+      "border-redsys/50 bg-redsys text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.16),inset_0_-1px_0_rgba(0,0,0,0.35)]"
+    );
   }
 });
 
@@ -53851,17 +53888,17 @@ function GlobalAppBar() {
       {
         className: cn2(
           "z-40 shrink-0 font-mono",
-          isElectron ? "border-b border-[#2a3d42] bg-[#020404] shadow-[inset_0_1px_0_rgba(86,247,255,0.05)]" : "flex h-11 shrink-0 items-center gap-2 border-b border-line bg-[#020404]/98 px-3 sm:gap-3"
+          isElectron ? "bg-[#0a1c20]" : "flex h-11 shrink-0 items-center gap-2 border-b border-line bg-[#020404]/98 px-3 sm:gap-3"
         ),
         "aria-label": "Global application bar",
         "data-desktop-menu-bar": isElectron ? true : void 0,
-        children: isElectron ? /* @__PURE__ */ (0, import_jsx_runtime23.jsxs)("div", { className: "flex min-h-[38px] items-end gap-2 px-2 pt-1", children: [
+        children: isElectron ? /* @__PURE__ */ (0, import_jsx_runtime23.jsxs)("div", { className: "flex w-full items-end gap-2 border-b border-[#2e3844] border-t border-cyansys/30 px-2 pt-1 shadow-[inset_0_1px_0_rgba(86,247,255,0.1)]", children: [
           /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(
             Link,
             {
               to: "/",
               "aria-label": "GRARF home",
-              className: "mb-1 shrink-0 self-center opacity-90 transition hover:opacity-100",
+              className: "shrink-0 self-center pb-1 opacity-90 transition hover:opacity-100",
               onClick: () => closeHomeLeagueWorkspace(),
               children: /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(
                 "img",
@@ -53875,7 +53912,7 @@ function GlobalAppBar() {
             }
           ),
           /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(DesktopPrimaryNavigationBar, {}),
-          /* @__PURE__ */ (0, import_jsx_runtime23.jsxs)("div", { className: "mb-1 ml-auto flex shrink-0 items-center gap-2 self-center", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime23.jsxs)("div", { className: "ml-auto flex shrink-0 items-center gap-2 pb-1", children: [
             /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(GuidedAttentionToggleButton, {}),
             /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(
               "button",
@@ -53883,7 +53920,7 @@ function GlobalAppBar() {
                 type: "button",
                 "aria-label": "Settings",
                 onClick: openSettings,
-                className: "flex items-center justify-center text-textdim/60 transition hover:text-textdim",
+                className: "flex items-center justify-center text-cyansys/55 transition hover:text-cyansys/90",
                 children: /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(Settings, { size: 14, "aria-hidden": true })
               }
             )
