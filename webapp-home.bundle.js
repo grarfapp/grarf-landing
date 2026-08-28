@@ -53503,9 +53503,6 @@ function DesktopPrimaryNavigationBar() {
     (tab) => {
       if (tab === "all") {
         useDesktopPrimaryNavigationStore.getState().toggleAllScopePanel();
-        if (!useDesktopPrimaryNavigationStore.getState().allScopePanelOpen) {
-          applyDesktopPrimaryNavTab("now", navigate, pathname);
-        }
         return;
       }
       applyDesktopPrimaryNavTab(tab, navigate, pathname);
@@ -53533,16 +53530,6 @@ function DesktopPrimaryNavigationBar() {
           "button",
           {
             type: "button",
-            "aria-pressed": isPrimaryActive("workspaces"),
-            onClick: () => onPrimarySelect("workspaces"),
-            className: cn2(WORKSPACES_TAB_CLASS, "hover:bg-[#040a0c]"),
-            children: "WORKSPACES"
-          }
-        ),
-        /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(
-          "button",
-          {
-            type: "button",
             "aria-pressed": isPrimaryActive("all"),
             onClick: () => onPrimarySelect("all"),
             className: cn2(
@@ -53557,9 +53544,23 @@ function DesktopPrimaryNavigationBar() {
           }
         ),
         /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(
+          "button",
+          {
+            type: "button",
+            "aria-pressed": isPrimaryActive("workspaces"),
+            onClick: () => onPrimarySelect("workspaces"),
+            className: cn2(WORKSPACES_TAB_CLASS, "hover:bg-[#040a0c]"),
+            children: "WORKSPACES"
+          }
+        ),
+        /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(
           "div",
           {
-            className: cn2("flex shrink-0 items-stretch", GROUP_GAP_CLASS),
+            className: cn2(
+              "flex shrink-0 items-stretch",
+              GROUP_GAP_CLASS,
+              NAV_GROUP_SEPARATOR_CLASS
+            ),
             role: "group",
             "aria-label": "Mode navigation",
             children: TEMPORAL_NAV_ITEMS.map(({ tab, label }) => {
@@ -53582,51 +53583,57 @@ function DesktopPrimaryNavigationBar() {
             })
           }
         ),
-        /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(
-          "button",
-          {
-            type: "button",
-            "aria-pressed": isPrimaryActive("browser"),
-            onClick: () => onPrimarySelect("browser"),
-            className: cn2(
-              PRIMARY_BLOCK_TAB_CLASS,
-              isPrimaryActive("browser") ? BROWSER_BLOCK_ACTIVE : BROWSER_BLOCK,
-              "mx-[18px] hover:brightness-105"
-            ),
-            children: "BROWSER"
-          }
-        ),
-        /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(
+        /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)(
           "div",
           {
-            className: cn2("flex shrink-0 items-stretch self-end", GROUP_GAP_CLASS),
+            className: cn2(
+              "flex shrink-0 items-stretch",
+              GROUP_GAP_CLASS,
+              NAV_GROUP_SEPARATOR_CLASS
+            ),
             role: "group",
             "aria-label": "Direct content navigation",
-            children: DIRECT_CONTENT_ITEMS.map(({ tab, label }) => {
-              const active2 = activeSelection.kind === "direct" && activeSelection.tab === tab;
-              return /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(
+            children: [
+              /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(
                 "button",
                 {
                   type: "button",
-                  "aria-pressed": active2,
-                  onClick: () => onDirectSelect(tab),
+                  "aria-pressed": isPrimaryActive("browser"),
+                  onClick: () => onPrimarySelect("browser"),
                   className: cn2(
-                    SECONDARY_BLOCK_TAB_CLASS,
-                    active2 ? SECONDARY_BLOCK_ACTIVE : SECONDARY_BLOCK,
+                    PRIMARY_BLOCK_TAB_CLASS,
+                    isPrimaryActive("browser") ? BROWSER_BLOCK_ACTIVE : BROWSER_BLOCK,
                     "hover:brightness-105"
                   ),
-                  children: label
-                },
-                tab
-              );
-            })
+                  children: "BROWSER"
+                }
+              ),
+              DIRECT_CONTENT_ITEMS.map(({ tab, label }) => {
+                const active2 = activeSelection.kind === "direct" && activeSelection.tab === tab;
+                return /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(
+                  "button",
+                  {
+                    type: "button",
+                    "aria-pressed": active2,
+                    onClick: () => onDirectSelect(tab),
+                    className: cn2(
+                      SECONDARY_BLOCK_TAB_CLASS,
+                      active2 ? SECONDARY_BLOCK_ACTIVE : SECONDARY_BLOCK,
+                      "hover:brightness-105"
+                    ),
+                    children: label
+                  },
+                  tab
+                );
+              })
+            ]
           }
         )
       ]
     }
   );
 }
-var import_react23, import_jsx_runtime20, TEMPORAL_NAV_ITEMS, DIRECT_CONTENT_ITEMS, STANDARD_TAB_WIDTH_CLASS, GROUP_GAP_CLASS, BLOCK_BEVEL, PRIMARY_TAB_BASE, SECONDARY_TAB_BASE, WORKSPACES_TAB_CLASS, ALL_TAB_CLASS, PRIMARY_BLOCK_TAB_CLASS, SECONDARY_BLOCK_TAB_CLASS, MODE_NAV_BLOCK, MODE_NAV_BLOCK_ACTIVE, BROWSER_BLOCK, BROWSER_BLOCK_ACTIVE, SECONDARY_BLOCK, SECONDARY_BLOCK_ACTIVE, NOW_ACTIVE_CLASS;
+var import_react23, import_jsx_runtime20, TEMPORAL_NAV_ITEMS, DIRECT_CONTENT_ITEMS, STANDARD_TAB_WIDTH_CLASS, GROUP_GAP_CLASS, NAV_GROUP_SEPARATOR_CLASS, STANDARD_TAB_BG, BORDERLESS_TAB, PRIMARY_TAB_BASE, SECONDARY_TAB_BASE, WORKSPACES_TAB_CLASS, ALL_TAB_CLASS, PRIMARY_BLOCK_TAB_CLASS, SECONDARY_BLOCK_TAB_CLASS, MODE_NAV_BLOCK, MODE_NAV_BLOCK_ACTIVE, BROWSER_BLOCK, BROWSER_BLOCK_ACTIVE, SECONDARY_BLOCK, SECONDARY_BLOCK_ACTIVE, NOW_ACTIVE_CLASS;
 var init_DesktopPrimaryNavigationBar = __esm({
   "../grarf/desktop/src/components/shell/DesktopPrimaryNavigationBar.tsx"() {
     init_define_import_meta_env();
@@ -53650,41 +53657,43 @@ var init_DesktopPrimaryNavigationBar = __esm({
     ];
     STANDARD_TAB_WIDTH_CLASS = "box-border w-[8rem] min-w-[8rem] max-w-[8rem] shrink-0 justify-center px-1";
     GROUP_GAP_CLASS = "gap-[2px]";
-    BLOCK_BEVEL = "border border-cyansys/20 shadow-[inset_0_1px_0_rgba(86,247,255,0.14),inset_0_-1px_0_rgba(0,0,0,0.45)]";
+    NAV_GROUP_SEPARATOR_CLASS = "ml-[18px]";
+    STANDARD_TAB_BG = "bg-[#081418]/90";
+    BORDERLESS_TAB = "border-0 shadow-none";
     PRIMARY_TAB_BASE = "flex min-h-[28px] items-center whitespace-nowrap py-1 font-mono text-[12px] font-medium leading-none tracking-[0.14em] transition-colors duration-100";
     SECONDARY_TAB_BASE = "flex min-h-[28px] items-center whitespace-nowrap py-1 font-mono text-[12px] font-medium leading-none tracking-[0.12em] transition-colors duration-100";
     WORKSPACES_TAB_CLASS = cn2(
       PRIMARY_TAB_BASE,
       STANDARD_TAB_WIDTH_CLASS,
-      BLOCK_BEVEL,
-      "border-cyansys/30 bg-[#020608] text-white"
+      STANDARD_TAB_BG,
+      BORDERLESS_TAB,
+      "text-white"
     );
     ALL_TAB_CLASS = cn2(
       PRIMARY_TAB_BASE,
-      "w-auto min-w-[calc((5ch+1.5rem)*1.5)] shrink-0 justify-center border-0 bg-[#081418]/90 px-3 text-cyansys/75 shadow-none"
+      "w-auto min-w-[calc((5ch+1.5rem)*1.5)] shrink-0 justify-center px-3 text-cyansys/75",
+      STANDARD_TAB_BG,
+      BORDERLESS_TAB
     );
     PRIMARY_BLOCK_TAB_CLASS = cn2(
       PRIMARY_TAB_BASE,
       STANDARD_TAB_WIDTH_CLASS,
-      BLOCK_BEVEL,
+      BORDERLESS_TAB,
       "relative"
     );
     SECONDARY_BLOCK_TAB_CLASS = cn2(
       SECONDARY_TAB_BASE,
       STANDARD_TAB_WIDTH_CLASS,
-      BLOCK_BEVEL,
+      BORDERLESS_TAB,
       "relative"
     );
-    MODE_NAV_BLOCK = "bg-[#0f1e24] text-[#cce8e8]";
-    MODE_NAV_BLOCK_ACTIVE = "border-cyansys/35 bg-[#153038] text-white";
-    BROWSER_BLOCK = "bg-[#0c1a1e] text-[#a8c8c8]";
-    BROWSER_BLOCK_ACTIVE = "border-cyansys/30 bg-[#102830] text-white";
-    SECONDARY_BLOCK = "bg-[#060e10] text-textdim";
-    SECONDARY_BLOCK_ACTIVE = "border-cyansys/25 bg-[#0a1418] text-[#c4d8d8]";
-    NOW_ACTIVE_CLASS = cn2(
-      BLOCK_BEVEL,
-      "border-redsys/50 bg-redsys text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.16),inset_0_-1px_0_rgba(0,0,0,0.35)]"
-    );
+    MODE_NAV_BLOCK = cn2(STANDARD_TAB_BG, "text-[#cce8e8]");
+    MODE_NAV_BLOCK_ACTIVE = "bg-[#153038] text-white";
+    BROWSER_BLOCK = cn2(STANDARD_TAB_BG, "text-[#a8c8c8]");
+    BROWSER_BLOCK_ACTIVE = "bg-[#102830] text-white";
+    SECONDARY_BLOCK = cn2(STANDARD_TAB_BG, "text-textdim");
+    SECONDARY_BLOCK_ACTIVE = "bg-[#0a1418] text-[#c4d8d8]";
+    NOW_ACTIVE_CLASS = "bg-redsys text-white";
   }
 });
 
@@ -67297,7 +67306,7 @@ function useCenterPaneApplicationModeSync() {
     if (!OPERATIONAL_AUTO_CENTER_PANE_MODES.has(mode)) return;
     if (isGrarfElectronRenderer()) {
       const { activeSelection } = useDesktopPrimaryNavigationStore.getState();
-      if (activeSelection.kind === "primary" && activeSelection.tab === "now") return;
+      if (activeSelection.kind === "primary" && activeSelection.tab !== "all") return;
     }
     if (isGrarfWebRenderer()) {
       if (source === "explicit" || initialDefaultApplied) return;
@@ -76994,7 +77003,7 @@ function AppShellLayout() {
   const { pathname } = useLocation();
   const hideShellMainMenu = shouldUseHomeDesktopObjectsSpineTemporalSections() && isHomeGamesSpineMigrationPath(pathname);
   const allScopePanelOpen = useDesktopPrimaryNavigationStore((s2) => s2.allScopePanelOpen);
-  const showShellLeagueNav = !hideShellMainMenu || isGrarfElectronRenderer() && allScopePanelOpen && isHomeGamesSpineMigrationPath(pathname);
+  const showShellLeagueNav = !hideShellMainMenu || isGrarfElectronRenderer() && allScopePanelOpen;
   const [operatorEnabled, setOperatorEnabled] = (0, import_react66.useState)(false);
   const [operatorOpen, setOperatorOpen] = (0, import_react66.useState)(false);
   (0, import_react66.useEffect)(() => {
@@ -77057,10 +77066,12 @@ function AppShellLayout() {
     define_import_meta_env_default.DEV ? /* @__PURE__ */ (0, import_jsx_runtime32.jsx)(PerformanceDiagnosticsPanel, {}) : null,
     /* @__PURE__ */ (0, import_jsx_runtime32.jsxs)("div", { className: "flex h-screen min-h-0 min-w-0 flex-col overflow-hidden bg-[#020404] text-[#d7eeee]", children: [
       /* @__PURE__ */ (0, import_jsx_runtime32.jsx)(GlobalAppBar, {}),
-      /* @__PURE__ */ (0, import_jsx_runtime32.jsx)(DesktopTopRail, {}),
       /* @__PURE__ */ (0, import_jsx_runtime32.jsxs)("div", { className: "flex min-h-0 min-w-0 flex-1", children: [
         showShellLeagueNav ? /* @__PURE__ */ (0, import_jsx_runtime32.jsx)(GuidedAttentionPanel, { paneId: "main-menu", className: "flex h-full min-h-0 shrink-0", children: /* @__PURE__ */ (0, import_jsx_runtime32.jsx)(AppLeftNav, {}) }) : null,
-        /* @__PURE__ */ (0, import_jsx_runtime32.jsx)("div", { className: "flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden", children: /* @__PURE__ */ (0, import_jsx_runtime32.jsx)(Outlet, {}) })
+        /* @__PURE__ */ (0, import_jsx_runtime32.jsxs)("div", { className: "flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden", children: [
+          isGrarfElectronRenderer() ? /* @__PURE__ */ (0, import_jsx_runtime32.jsx)(DesktopTopRail, {}) : null,
+          /* @__PURE__ */ (0, import_jsx_runtime32.jsx)(Outlet, {})
+        ] })
       ] })
     ] }),
     /* @__PURE__ */ (0, import_jsx_runtime32.jsx)(OperationalAlertsStack, {})
@@ -77402,12 +77413,15 @@ function HomeCenterPaneNowModeSelector({ className }) {
   return /* @__PURE__ */ (0, import_jsx_runtime35.jsx)(
     "div",
     {
-      className: cn2(HOME_SUBNAV_ROW_CLASS, "justify-center", className),
+      className: cn2(
+        "pointer-events-none absolute inset-x-0 top-0 z-20 flex justify-center pt-1",
+        className
+      ),
       "data-center-pane-now-mode-nav": true,
       children: /* @__PURE__ */ (0, import_jsx_runtime35.jsx)(
         "div",
         {
-          className: "flex w-fit shrink-0 items-center gap-1 rounded-sm border border-line/50 bg-[#030707] p-0.5",
+          className: "pointer-events-auto flex w-fit shrink-0 items-center gap-1 rounded-sm border border-line/50 bg-[#030707] p-0.5",
           role: "group",
           "aria-label": "Center pane NOW mode",
           children: MODES.map(({ mode: nextMode, label }) => {
@@ -77437,7 +77451,6 @@ var init_HomeCenterPaneNowModeSelector = __esm({
   "../grarf/desktop/src/components/homeMvp/HomeCenterPaneNowModeSelector.tsx"() {
     init_define_import_meta_env();
     init_cn();
-    init_homeSubnavChrome();
     init_centerPaneNowPresentationModeStore();
     import_jsx_runtime35 = __toESM(require_jsx_runtime(), 1);
     MODES = [
@@ -134512,11 +134525,14 @@ var init_useGameWorkspacePathNavigation = __esm({
 
 // ../grarf/desktop/src/lib/centerPane/isCenterPaneNowActive.ts
 function isCenterPaneNowActive(isElectronDesktopObjectsSpine, _operationalMode) {
-  return isElectronDesktopObjectsSpine;
+  if (!isElectronDesktopObjectsSpine) return false;
+  const { activeSelection } = useDesktopPrimaryNavigationStore.getState();
+  return activeSelection.kind === "primary" && activeSelection.tab === "now";
 }
 var init_isCenterPaneNowActive = __esm({
   "../grarf/desktop/src/lib/centerPane/isCenterPaneNowActive.ts"() {
     init_define_import_meta_env();
+    init_desktopPrimaryNavigationStore();
   }
 });
 
@@ -134600,7 +134616,7 @@ function HomePage() {
   const showCenterPaneNowModeSelector = isHomeOps && isCenterPaneNowContextActive && !activeContentOverlayId;
   const showCenterPaneTimelineSurface = showCenterPaneNowModeSelector && centerPaneNowPresentationMode === "timeline" && !gameDeepLinkNotFoundId;
   const showWhipAroundCenterPane = isGrarfElectronRenderer() && centerPaneMode === "whiparound";
-  const showBrowserSubmenus = !activeContentOverlayId && centerPaneMode === "browser" && centerPaneNowPresentationMode === "terminal";
+  const showBrowserSubmenus = !activeContentOverlayId && centerPaneMode === "browser" && (isGrarfElectronRenderer() || centerPaneNowPresentationMode === "terminal");
   const showHomeBrowserSourceCardsCenter = showBrowserSubmenus && (liveSubmenuId === "livetrack" || liveSubmenuId === "fantasy" || liveSubmenuId === "betting");
   const activeGamePayload = activeContentOverlayWorkspace?.type === "game" ? activeContentOverlayWorkspace.gamePayload : null;
   (0, import_react241.useEffect)(() => {
@@ -135050,7 +135066,6 @@ function HomePage() {
         suppressActiveHighlight: activeContentOverlayId != null
       }
     ) : null,
-    showCenterPaneNowModeSelector ? /* @__PURE__ */ (0, import_jsx_runtime216.jsx)(HomeCenterPaneNowModeSelector, {}) : null,
     contentOverlayTabs.length > 0 ? /* @__PURE__ */ (0, import_jsx_runtime216.jsx)(
       EphemeralWorkspaceTabs,
       {
@@ -135062,6 +135077,7 @@ function HomePage() {
     ) : null,
     !activeContentOverlayId ? browserSubmenus : null,
     /* @__PURE__ */ (0, import_jsx_runtime216.jsxs)("div", { className: "relative flex min-h-0 flex-1 flex-col overflow-hidden", children: [
+      showCenterPaneNowModeSelector ? /* @__PURE__ */ (0, import_jsx_runtime216.jsx)(HomeCenterPaneNowModeSelector, {}) : null,
       showCenterPaneTimelineSurface ? /* @__PURE__ */ (0, import_jsx_runtime216.jsx)(
         GuidedAttentionPanel,
         {
