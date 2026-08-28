@@ -53865,6 +53865,16 @@ var init_useLiveDateTime = __esm({
   }
 });
 
+// ../grarf/desktop/src/components/shell/desktopTopRailLayout.ts
+var TOP_RAIL_EXPAND_COLLAPSE_CONTROL_WIDTH_CLASS, TOP_RAIL_FIXED_REGION_LEFT_PADDING_CLASS;
+var init_desktopTopRailLayout = __esm({
+  "../grarf/desktop/src/components/shell/desktopTopRailLayout.ts"() {
+    init_define_import_meta_env();
+    TOP_RAIL_EXPAND_COLLAPSE_CONTROL_WIDTH_CLASS = "w-10";
+    TOP_RAIL_FIXED_REGION_LEFT_PADDING_CLASS = "pl-3";
+  }
+});
+
 // ../grarf/desktop/src/components/shell/GlobalAppBar.tsx
 function GlobalAppBar() {
   const showTopNavSearch = isCanonicalWebBrowserRenderer();
@@ -53892,40 +53902,58 @@ function GlobalAppBar() {
         ),
         "aria-label": "Global application bar",
         "data-desktop-menu-bar": isElectron ? true : void 0,
-        children: isElectron ? /* @__PURE__ */ (0, import_jsx_runtime23.jsxs)("div", { className: "flex w-full items-end gap-2 border-b border-[#2e3844] border-t border-cyansys/30 px-2 pt-1 shadow-[inset_0_1px_0_rgba(86,247,255,0.1)]", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(
-            Link,
-            {
-              to: "/",
-              "aria-label": "GRARF home",
-              className: "shrink-0 self-center pb-1 opacity-90 transition hover:opacity-100",
-              onClick: () => closeHomeLeagueWorkspace(),
-              children: /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(
-                "img",
+        children: isElectron ? /* @__PURE__ */ (0, import_jsx_runtime23.jsxs)(
+          "div",
+          {
+            className: cn2(
+              "flex w-full items-end gap-2 border-b border-[#2e3844] border-t border-cyansys/30 pr-2 pt-1 shadow-[inset_0_1px_0_rgba(86,247,255,0.1)]",
+              TOP_RAIL_FIXED_REGION_LEFT_PADDING_CLASS
+            ),
+            children: [
+              /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(
+                "div",
                 {
-                  src: "/grarf_logo-white.png",
-                  alt: "GRARF",
-                  className: "h-7 w-auto object-contain",
-                  draggable: false
+                  className: cn2(
+                    TOP_RAIL_EXPAND_COLLAPSE_CONTROL_WIDTH_CLASS,
+                    "flex shrink-0 justify-center self-center pb-1"
+                  ),
+                  children: /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(
+                    Link,
+                    {
+                      to: "/",
+                      "aria-label": "GRARF home",
+                      className: "opacity-90 transition hover:opacity-100",
+                      onClick: () => closeHomeLeagueWorkspace(),
+                      children: /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(
+                        "img",
+                        {
+                          src: "/grarf_logo-white.png",
+                          alt: "GRARF",
+                          className: "h-7 w-auto object-contain",
+                          draggable: false
+                        }
+                      )
+                    }
+                  )
                 }
-              )
-            }
-          ),
-          /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(DesktopPrimaryNavigationBar, {}),
-          /* @__PURE__ */ (0, import_jsx_runtime23.jsxs)("div", { className: "ml-auto flex shrink-0 items-center gap-2 pb-1", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(GuidedAttentionToggleButton, {}),
-            /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(
-              "button",
-              {
-                type: "button",
-                "aria-label": "Settings",
-                onClick: openSettings,
-                className: "flex items-center justify-center text-cyansys/55 transition hover:text-cyansys/90",
-                children: /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(Settings, { size: 14, "aria-hidden": true })
-              }
-            )
-          ] })
-        ] }) : /* @__PURE__ */ (0, import_jsx_runtime23.jsxs)(import_jsx_runtime23.Fragment, { children: [
+              ),
+              /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(DesktopPrimaryNavigationBar, {}),
+              /* @__PURE__ */ (0, import_jsx_runtime23.jsxs)("div", { className: "ml-auto flex shrink-0 items-center gap-2 pb-1", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(GuidedAttentionToggleButton, {}),
+                /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(
+                  "button",
+                  {
+                    type: "button",
+                    "aria-label": "Settings",
+                    onClick: openSettings,
+                    className: "flex items-center justify-center text-cyansys/55 transition hover:text-cyansys/90",
+                    children: /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(Settings, { size: 14, "aria-hidden": true })
+                  }
+                )
+              ] })
+            ]
+          }
+        ) : /* @__PURE__ */ (0, import_jsx_runtime23.jsxs)(import_jsx_runtime23.Fragment, { children: [
           /* @__PURE__ */ (0, import_jsx_runtime23.jsxs)("div", { className: "flex shrink-0 items-center gap-2 sm:gap-3", children: [
             /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(
               Link,
@@ -53998,6 +54026,7 @@ var init_GlobalAppBar = __esm({
     init_centerPaneFeedAlignmentStore();
     init_useLiveDateTime();
     init_cn();
+    init_desktopTopRailLayout();
     import_jsx_runtime23 = __toESM(require_jsx_runtime(), 1);
   }
 });
@@ -59663,7 +59692,8 @@ function TopRailExpandCollapseControl({ isExpanded, onToggle }) {
       "aria-expanded": isExpanded,
       "aria-label": label,
       className: cn2(
-        "flex w-10 shrink-0 items-center justify-center",
+        "flex shrink-0 items-center justify-center",
+        TOP_RAIL_EXPAND_COLLAPSE_CONTROL_WIDTH_CLASS,
         "rounded-sm border border-line/40 bg-[#050909]",
         "text-textdim/70 transition duration-150",
         "hover:border-line/60 hover:bg-[#070b0b] hover:text-textdim/90",
@@ -59864,6 +59894,7 @@ var init_TopRailGameStrip = __esm({
     init_dist();
     init_lucide_react();
     init_cn();
+    init_desktopTopRailLayout();
     init_useHomeBestGameRightNowResult();
     init_useCanonicalGamesSpineGame();
     init_gamesSpineTransientAlertStore();
