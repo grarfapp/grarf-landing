@@ -47912,23 +47912,21 @@ function subscribeDesktopMenuTrailingTabsLayout(listener) {
   layoutListeners.add(listener);
   return () => layoutListeners.delete(listener);
 }
-function resolveDesktopMenuTrailingTabsMarginLeftPx(expandedPanelRightPx) {
+function getDesktopLeagueNavExpandedPanelRightPx() {
+  return committedExpandedPanelRightPx ?? measureDesktopLeagueNavExpandedWidthReferencePx();
+}
+function resolveDesktopMenuTrailingTabsMarginLeftPx(expandedPanelRightPx, scopeSelectorWidthPx = DESKTOP_LEAGUE_NAV_MINIMIZED_WIDTH_PX) {
   return Math.max(
     0,
-    expandedPanelRightPx - DESKTOP_LEAGUE_NAV_MINIMIZED_WIDTH_PX - DESKTOP_MENU_NAV_ITEM_GAP_PX
+    expandedPanelRightPx - scopeSelectorWidthPx - DESKTOP_MENU_NAV_ITEM_GAP_PX
   );
 }
-function getDesktopMenuTrailingTabsMarginLeftPx() {
+function getDesktopMenuTrailingTabsMarginLeftPxForScopeSelector(scopeSelectorWidthPx) {
   scheduleExpandedWidthFontsProbe();
-  if (committedExpandedPanelRightPx === void 0) {
-    return resolveDesktopMenuTrailingTabsMarginLeftPx(measureDesktopLeagueNavExpandedWidthReferencePx());
-  }
-  if (cachedDesktopMenuTrailingTabsMarginLeftPx === void 0) {
-    cachedDesktopMenuTrailingTabsMarginLeftPx = resolveDesktopMenuTrailingTabsMarginLeftPx(
-      committedExpandedPanelRightPx
-    );
-  }
-  return cachedDesktopMenuTrailingTabsMarginLeftPx;
+  return resolveDesktopMenuTrailingTabsMarginLeftPx(
+    getDesktopLeagueNavExpandedPanelRightPx(),
+    scopeSelectorWidthPx
+  );
 }
 var DESKTOP_LEAGUE_NAV_PANEL_BG_CLASS, DESKTOP_LEAGUE_NAV_PANEL_BORDER_CLASS, DESKTOP_MENU_ROW_BOTTOM_BORDER_COLOR_CLASS, DESKTOP_MENU_ROW_BOTTOM_BORDER_CLASS, DESKTOP_ALL_OPEN_OUTLINE_CLASS, DESKTOP_LEAGUE_NAV_MINIMIZED_WIDTH_PX, DESKTOP_LEAGUE_NAV_MINIMIZED_WIDTH_CLASS, DESKTOP_LEAGUE_NAV_EXPANDED_MIN_WIDTH_PX, DESKTOP_LEAGUE_NAV_EXPANDED_MAX_WIDTH_PX, DESKTOP_LEAGUE_NAV_EXPANDED_PAD_PX, DESKTOP_LEAGUE_NAV_EXPANDED_HEADER_MIN_PX, DESKTOP_LEAGUE_NAV_MEASURE_ROW_CLASS, DESKTOP_MENU_NAV_ITEM_GAP_PX, DESKTOP_MENU_PRIMARY_TAB_GAP_CLASS, committedExpandedPanelRightPx, cachedDesktopMenuTrailingTabsMarginLeftPx, fontsProbeScheduled, layoutListeners;
 var init_desktopMenuLayout = __esm({
@@ -53737,17 +53735,39 @@ function DesktopPrimaryNavigationBar() {
   const { sidebarCollapsed: leagueMenuMinimized } = useAppShell();
   const leagueWorkspaceId = useHomeLeagueWorkspaceStore((s2) => s2.activeId);
   const scopeLeague = resolveDesktopAllScopeLeagueDirectoryItem(pathname, leagueWorkspaceId);
-  const scopeLabel = scopeLeague ? resolveMainMenuLeagueDirectoryLabel(scopeLeague) : "All application scope";
+  const scopeLeagueLabel = scopeLeague ? resolveMainMenuLeagueDirectoryLabel(scopeLeague) : null;
+  const scopeSelectorExpanded = Boolean(scopeLeague) && !leagueMenuMinimized;
+  const scopeLabel = scopeLeagueLabel ?? "All application scope";
   const activeSelection = useDesktopPrimaryNavigationStore((s2) => s2.activeSelection);
   const allScopePanelOpen = useDesktopPrimaryNavigationStore((s2) => s2.allScopePanelOpen);
-  const [trailingTabsMarginLeftPx, setTrailingTabsMarginLeftPx] = (0, import_react23.useState)(
-    () => getDesktopMenuTrailingTabsMarginLeftPx()
+  const scopeButtonRef = (0, import_react23.useRef)(null);
+  const [expandedPanelRightPx, setExpandedPanelRightPx] = (0, import_react23.useState)(
+    () => getDesktopLeagueNavExpandedPanelRightPx()
+  );
+  const [scopeSelectorWidthPx, setScopeSelectorWidthPx] = (0, import_react23.useState)(
+    DESKTOP_LEAGUE_NAV_MINIMIZED_WIDTH_PX
   );
   (0, import_react23.useLayoutEffect)(() => {
     return subscribeDesktopMenuTrailingTabsLayout(() => {
-      setTrailingTabsMarginLeftPx(getDesktopMenuTrailingTabsMarginLeftPx());
+      setExpandedPanelRightPx(getDesktopLeagueNavExpandedPanelRightPx());
     });
   }, []);
+  (0, import_react23.useLayoutEffect)(() => {
+    if (!scopeSelectorExpanded) {
+      setScopeSelectorWidthPx(DESKTOP_LEAGUE_NAV_MINIMIZED_WIDTH_PX);
+      return;
+    }
+    const el = scopeButtonRef.current;
+    if (!el) return;
+    const measure = () => setScopeSelectorWidthPx(el.offsetWidth);
+    measure();
+    const ro2 = new ResizeObserver(measure);
+    ro2.observe(el);
+    return () => ro2.disconnect();
+  }, [scopeSelectorExpanded, scopeLeague?.id, scopeLeagueLabel, expandedPanelRightPx]);
+  const trailingTabsMarginLeftPx = getDesktopMenuTrailingTabsMarginLeftPxForScopeSelector(
+    scopeSelectorExpanded ? scopeSelectorWidthPx : DESKTOP_LEAGUE_NAV_MINIMIZED_WIDTH_PX
+  );
   (0, import_react23.useEffect)(() => {
     bootstrapDesktopPrimaryNavigation(navigate, pathname);
   }, [navigate, pathname]);
@@ -53781,24 +53801,26 @@ function DesktopPrimaryNavigationBar() {
         /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(
           "button",
           {
+            ref: scopeButtonRef,
             type: "button",
             "aria-pressed": isPrimaryActive("all"),
             "aria-label": scopeLabel,
             onClick: () => onPrimarySelect("all"),
             className: cn2(
-              ALL_TAB_CLASS,
+              scopeSelectorExpanded ? ALL_SCOPE_EXPANDED_LEAGUE_TAB_CLASS : ALL_TAB_CLASS,
               isPrimaryActive("all") ? cn2(
                 DESKTOP_LEAGUE_NAV_PANEL_BG_CLASS,
                 DESKTOP_ALL_OPEN_OUTLINE_CLASS,
                 "relative z-[2] -mb-px text-cyansys hover:bg-[#020404]/95 hover:text-cyansys"
               ) : "hover:bg-[#0a1c22] hover:text-cyansys/95"
             ),
+            style: scopeSelectorExpanded ? { maxWidth: expandedPanelRightPx } : void 0,
             children: /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(
               "span",
               {
                 className: cn2(
-                  "inline-flex min-w-0 max-w-full items-center justify-center gap-0.5",
-                  scopeLeague && !leagueMenuMinimized && "px-0.5"
+                  "inline-flex min-w-0 items-center gap-0.5",
+                  scopeSelectorExpanded ? "w-full max-w-full justify-start" : "justify-center"
                 ),
                 children: /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(
                   DesktopAllScopeSelectorLabel,
@@ -53893,7 +53915,7 @@ function DesktopPrimaryNavigationBar() {
     }
   );
 }
-var import_react23, import_jsx_runtime20, TEMPORAL_NAV_ITEMS, DIRECT_CONTENT_ITEMS, STANDARD_TAB_WIDTH_CLASS, GROUP_GAP_CLASS, NAV_GROUP_SEPARATOR_CLASS, STANDARD_TAB_BG, BORDERLESS_TAB, PRIMARY_TAB_BASE, SECONDARY_TAB_BASE, WORKSPACES_TAB_CLASS, ALL_TAB_CLASS, PRIMARY_BLOCK_TAB_CLASS, SECONDARY_BLOCK_TAB_CLASS, MODE_NAV_BLOCK, MODE_NAV_BLOCK_ACTIVE, BROWSER_BLOCK, BROWSER_BLOCK_ACTIVE, SECONDARY_BLOCK, SECONDARY_BLOCK_ACTIVE, NOW_ACTIVE_CLASS;
+var import_react23, import_jsx_runtime20, TEMPORAL_NAV_ITEMS, DIRECT_CONTENT_ITEMS, STANDARD_TAB_WIDTH_CLASS, GROUP_GAP_CLASS, NAV_GROUP_SEPARATOR_CLASS, STANDARD_TAB_BG, BORDERLESS_TAB, PRIMARY_TAB_BASE, SECONDARY_TAB_BASE, WORKSPACES_TAB_CLASS, ALL_SCOPE_TAB_BASE_CLASS, ALL_TAB_CLASS, ALL_SCOPE_EXPANDED_LEAGUE_TAB_CLASS, PRIMARY_BLOCK_TAB_CLASS, SECONDARY_BLOCK_TAB_CLASS, MODE_NAV_BLOCK, MODE_NAV_BLOCK_ACTIVE, BROWSER_BLOCK, BROWSER_BLOCK_ACTIVE, SECONDARY_BLOCK, SECONDARY_BLOCK_ACTIVE, NOW_ACTIVE_CLASS;
 var init_DesktopPrimaryNavigationBar = __esm({
   "../grarf/desktop/src/components/shell/DesktopPrimaryNavigationBar.tsx"() {
     init_define_import_meta_env();
@@ -53935,12 +53957,20 @@ var init_DesktopPrimaryNavigationBar = __esm({
       BORDERLESS_TAB,
       "text-white"
     );
-    ALL_TAB_CLASS = cn2(
+    ALL_SCOPE_TAB_BASE_CLASS = cn2(
       PRIMARY_TAB_BASE,
-      DESKTOP_LEAGUE_NAV_MINIMIZED_WIDTH_CLASS,
-      "shrink-0 justify-center px-0 text-cyansys/75",
+      "shrink-0 text-cyansys/75",
       STANDARD_TAB_BG,
       BORDERLESS_TAB
+    );
+    ALL_TAB_CLASS = cn2(
+      ALL_SCOPE_TAB_BASE_CLASS,
+      DESKTOP_LEAGUE_NAV_MINIMIZED_WIDTH_CLASS,
+      "justify-center px-0"
+    );
+    ALL_SCOPE_EXPANDED_LEAGUE_TAB_CLASS = cn2(
+      ALL_SCOPE_TAB_BASE_CLASS,
+      "box-border w-auto min-w-[64px] justify-center px-1"
     );
     PRIMARY_BLOCK_TAB_CLASS = cn2(
       PRIMARY_TAB_BASE,
