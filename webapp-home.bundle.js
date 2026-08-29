@@ -53986,7 +53986,7 @@ var init_desktopPrimaryNavigationStore = __esm({
         if (tab === "all") return;
         set({
           activeSelection: { kind: "primary", tab },
-          objectsSpineFocus: tab === "catchUp" ? "catchUp" : tab === "now" ? "now" : tab === "today" ? "comingUp" : null
+          objectsSpineFocus: tab === "catchUp" ? "catchUp" : tab === "now" ? "now" : tab === "upcoming" ? "comingUp" : null
         });
       },
       selectDirectContentTab: (tab) => set({
@@ -54055,6 +54055,9 @@ function applyDesktopPrimaryNavTab(tab, navigate, pathname) {
     case "workspaces":
       applyCenterPaneMode("sportscape", navigate, pathname);
       return;
+    case "yesterday":
+    case "today":
+      return;
     case "catchUp":
       useOperationalModeStore.getState().setModeByUser("CATCH_UP");
       applyCenterPaneMode("sportscape", navigate, pathname);
@@ -54064,7 +54067,7 @@ function applyDesktopPrimaryNavTab(tab, navigate, pathname) {
       useCenterPaneNowPresentationModeStore.getState().setMode("timeline");
       applyCenterPaneMode("livetracker", navigate, pathname);
       return;
-    case "today":
+    case "upcoming":
       useOperationalModeStore.getState().setModeByUser("PREPARE");
       applyCenterPaneMode("sportscape", navigate, pathname);
       return;
@@ -54194,6 +54197,27 @@ function DesktopPrimaryNavigationBar() {
     },
     [activeSelection, allScopePanelOpen]
   );
+  const renderPrimaryModeTab = (0, import_react24.useCallback)(
+    (tab, label) => {
+      const active2 = isPrimaryActive(tab);
+      return /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(
+        "button",
+        {
+          type: "button",
+          "aria-pressed": active2,
+          onClick: () => onPrimarySelect(tab),
+          className: cn2(
+            PRIMARY_BLOCK_TAB_CLASS,
+            tab === "now" && active2 ? NOW_ACTIVE_CLASS : active2 ? MODE_NAV_BLOCK_ACTIVE : MODE_NAV_BLOCK,
+            "hover:brightness-105"
+          ),
+          children: label
+        },
+        tab
+      );
+    },
+    [isPrimaryActive, onPrimarySelect]
+  );
   return /* @__PURE__ */ (0, import_jsx_runtime21.jsxs)(
     "nav",
     {
@@ -54243,30 +54267,36 @@ function DesktopPrimaryNavigationBar() {
             style: { left: catchUpLeftPx },
             "data-desktop-trailing-primary-navigation": true,
             children: [
-              /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(
+              /* @__PURE__ */ (0, import_jsx_runtime21.jsxs)(
                 "div",
                 {
                   className: cn2("flex shrink-0 items-stretch", GROUP_GAP_CLASS),
                   role: "group",
                   "aria-label": "Mode navigation",
-                  children: TEMPORAL_NAV_ITEMS.map(({ tab, label }) => {
-                    const active2 = isPrimaryActive(tab);
-                    return /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(
-                      "button",
+                  children: [
+                    renderPrimaryModeTab("yesterday", "YESTERDAY"),
+                    /* @__PURE__ */ (0, import_jsx_runtime21.jsxs)(
+                      "div",
                       {
-                        type: "button",
-                        "aria-pressed": active2,
-                        onClick: () => onPrimarySelect(tab),
-                        className: cn2(
-                          PRIMARY_BLOCK_TAB_CLASS,
-                          tab === "now" && active2 ? NOW_ACTIVE_CLASS : active2 ? MODE_NAV_BLOCK_ACTIVE : MODE_NAV_BLOCK,
-                          "hover:brightness-105"
-                        ),
-                        children: label
-                      },
-                      tab
-                    );
-                  })
+                        className: TODAY_NAV_GROUP_CLASS,
+                        role: "group",
+                        "aria-label": "Today navigation",
+                        "data-desktop-today-nav-group": true,
+                        children: [
+                          renderPrimaryModeTab("today", "TODAY"),
+                          /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(
+                            "div",
+                            {
+                              className: cn2("flex shrink-0 items-stretch", GROUP_GAP_CLASS),
+                              role: "group",
+                              "aria-label": "Today modes",
+                              children: TODAY_NESTED_NAV_ITEMS.map(({ tab, label }) => renderPrimaryModeTab(tab, label))
+                            }
+                          )
+                        ]
+                      }
+                    )
+                  ]
                 }
               ),
               /* @__PURE__ */ (0, import_jsx_runtime21.jsxs)(
@@ -54318,7 +54348,7 @@ function DesktopPrimaryNavigationBar() {
     }
   );
 }
-var import_react24, import_jsx_runtime21, TEMPORAL_NAV_ITEMS, DIRECT_CONTENT_ITEMS, STANDARD_TAB_WIDTH_CLASS, GROUP_GAP_CLASS, NAV_GROUP_SEPARATOR_CLASS, STANDARD_TAB_BG, BORDERLESS_TAB, PRIMARY_TAB_BASE, SECONDARY_TAB_BASE, WORKSPACES_TAB_CLASS, ALL_SCOPE_TAB_BASE_CLASS, ALL_TAB_CLASS, ALL_SCOPE_EXPANDED_LEAGUE_TAB_CLASS, PRIMARY_BLOCK_TAB_CLASS, SECONDARY_BLOCK_TAB_CLASS, MODE_NAV_BLOCK, MODE_NAV_BLOCK_ACTIVE, BROWSER_BLOCK, BROWSER_BLOCK_ACTIVE, SECONDARY_BLOCK, SECONDARY_BLOCK_ACTIVE, NOW_ACTIVE_CLASS;
+var import_react24, import_jsx_runtime21, TODAY_NESTED_NAV_ITEMS, DIRECT_CONTENT_ITEMS, STANDARD_TAB_WIDTH_CLASS, GROUP_GAP_CLASS, NAV_GROUP_SEPARATOR_CLASS, STANDARD_TAB_BG, BORDERLESS_TAB, PRIMARY_TAB_BASE, SECONDARY_TAB_BASE, WORKSPACES_TAB_CLASS, ALL_SCOPE_TAB_BASE_CLASS, ALL_TAB_CLASS, ALL_SCOPE_EXPANDED_LEAGUE_TAB_CLASS, PRIMARY_BLOCK_TAB_CLASS, SECONDARY_BLOCK_TAB_CLASS, MODE_NAV_BLOCK, MODE_NAV_BLOCK_ACTIVE, TODAY_NAV_GROUP_CLASS, BROWSER_BLOCK, BROWSER_BLOCK_ACTIVE, SECONDARY_BLOCK, SECONDARY_BLOCK_ACTIVE, NOW_ACTIVE_CLASS;
 var init_DesktopPrimaryNavigationBar = __esm({
   "../grarf/desktop/src/components/shell/DesktopPrimaryNavigationBar.tsx"() {
     init_define_import_meta_env();
@@ -54334,10 +54364,10 @@ var init_DesktopPrimaryNavigationBar = __esm({
     init_homeLeagueWorkspaceStore();
     init_desktopMenuLayout();
     import_jsx_runtime21 = __toESM(require_jsx_runtime(), 1);
-    TEMPORAL_NAV_ITEMS = [
+    TODAY_NESTED_NAV_ITEMS = [
       { tab: "catchUp", label: "CATCH UP" },
       { tab: "now", label: "NOW" },
-      { tab: "today", label: "TODAY" }
+      { tab: "upcoming", label: "UPCOMING" }
     ];
     DIRECT_CONTENT_ITEMS = [
       { tab: "news", label: "NEWS" },
@@ -54389,6 +54419,7 @@ var init_DesktopPrimaryNavigationBar = __esm({
     );
     MODE_NAV_BLOCK = cn2(STANDARD_TAB_BG, "text-[#cce8e8]");
     MODE_NAV_BLOCK_ACTIVE = "bg-[#153038] text-white";
+    TODAY_NAV_GROUP_CLASS = cn2("flex shrink-0 items-stretch", GROUP_GAP_CLASS, STANDARD_TAB_BG);
     BROWSER_BLOCK = cn2(STANDARD_TAB_BG, "text-[#a8c8c8]");
     BROWSER_BLOCK_ACTIVE = "bg-[#102830] text-white";
     SECONDARY_BLOCK = cn2(STANDARD_TAB_BG, "text-textdim");
