@@ -84657,7 +84657,8 @@ function HomeCenterPaneTimelineArticleExpansionPane({
   headline,
   source,
   sourceKind,
-  onCollapse
+  onCollapse,
+  heightPx = TIMELINE_ARTICLE_WEBVIEW_HEIGHT_PX
 }) {
   const typeLabel = resolveWebpaneTypeLabel(sourceKind);
   const wvRef = (0, import_react87.useRef)(null);
@@ -84671,38 +84672,38 @@ function HomeCenterPaneTimelineArticleExpansionPane({
   const showFailure = !articleUrl || !hasWebviewTag() || loadFailed;
   const webviewHostStyle = (0, import_react87.useMemo)(
     () => ({
-      height: TIMELINE_ARTICLE_WEBVIEW_HEIGHT_PX,
-      maxHeight: TIMELINE_ARTICLE_WEBVIEW_HEIGHT_PX,
+      height: heightPx,
+      maxHeight: heightPx,
       minHeight: 0
     }),
-    []
+    [heightPx]
   );
   const webviewElementStyle = (0, import_react87.useMemo)(
     () => ({
       display: "inline-flex",
       width: "100%",
-      height: TIMELINE_ARTICLE_WEBVIEW_HEIGHT_PX,
-      maxHeight: TIMELINE_ARTICLE_WEBVIEW_HEIGHT_PX,
+      height: heightPx,
+      maxHeight: heightPx,
       minHeight: 0,
       flex: "none",
       backgroundColor: PANE_WEB_SURFACE_BG
     }),
-    []
+    [heightPx]
   );
   const applyCurrentWebviewSize = (0, import_react87.useCallback)(() => {
     const wv = wvRef.current;
     if (!wv) return false;
-    applyTimelineWebviewSize(wv, TIMELINE_ARTICLE_WEBVIEW_HEIGHT_PX);
+    applyTimelineWebviewSize(wv, heightPx);
     return true;
-  }, []);
+  }, [heightPx]);
   const setWebviewRef = (0, import_react87.useCallback)(
     (element) => {
       wvRef.current = element;
       if (element && canEmbed && !showFailure) {
-        applyTimelineWebviewSize(element, TIMELINE_ARTICLE_WEBVIEW_HEIGHT_PX);
+        applyTimelineWebviewSize(element, heightPx);
       }
     },
-    [canEmbed, showFailure]
+    [canEmbed, heightPx, showFailure]
   );
   (0, import_react87.useLayoutEffect)(() => {
     if (!canEmbed || showFailure) return;
@@ -123628,6 +123629,11 @@ function HomeSportscapeCard({
   activeCatchupGamePk = null,
   activeInlineWorkspace = null,
   inlineWorkspaceHeight = 0,
+  activeArticleKey = null,
+  activeArticleUrl = null,
+  inlineWebpaneHeight = 0,
+  onArticleUrlExpand,
+  onInlineWebpaneCollapse,
   onActiveRowMount
 }) {
   const articleRowRefs = (0, import_react198.useRef)(/* @__PURE__ */ new Map());
@@ -123640,6 +123646,8 @@ function HomeSportscapeCard({
   const operationalMode = useOperationalModeStore((s2) => s2.mode);
   const showMlbMorningPodcast = isMlbLeagueCard && operationalMode !== "PREPARE" && !(operationalMode === "CATCH_UP" && isMlbCatchUpWeekend());
   const isWebRenderer = isGrarfWebRenderer();
+  const isDesktopElectron = isGrarfElectronRenderer();
+  const isBrowserWeb = isCanonicalWebBrowserRenderer();
   const mlbAllGamesHighlight = useMlbAllGamesDisplayHighlight(isMlbLeagueCard, "home");
   const mlbMorningLineupHighlight = useMlbMorningLineupDisplayHighlight(
     isMlbLeagueCard && isWebRenderer
@@ -123758,38 +123766,51 @@ function HomeSportscapeCard({
         "text-[12px] leading-snug tracking-[0.05em]",
         index === 0 ? "text-[#b8cccc]" : "text-[#9aaeae]"
       );
-      const clickableByUrl = Boolean(
-        article.url && (!isMlbLeagueCard || isWebRenderer)
-      );
-      const clickableByCatchup = !isWebRenderer && article.gamePk != null && onCatchupHeadlineClick != null;
-      const clickable = clickableByUrl || clickableByCatchup;
-      const isActive = activeCatchupGamePk != null && article.gamePk != null && article.gamePk === activeCatchupGamePk;
       const articleKey = article.gamePk != null ? `mlb-catchup-${article.gamePk}` : article.eventId != null ? `${isWorldCupLeagueCard ? "world-cup" : isMcwsLeagueCard ? "mcws" : isWnbaLeagueCard ? "wnba" : "nhl"}-catchup-${article.eventId}` : article.headline;
+      const clickableByDesktopUrl = isDesktopElectron && Boolean(article.url && onArticleUrlExpand);
+      const clickableByBrowserUrl = Boolean(
+        article.url && (isBrowserWeb || !isMlbLeagueCard && !isDesktopElectron)
+      );
+      const clickableByCatchup = isDesktopElectron && !article.url && article.gamePk != null && onCatchupHeadlineClick != null;
+      const clickable = clickableByDesktopUrl || clickableByBrowserUrl || clickableByCatchup;
+      const isUrlExpanded = activeArticleKey != null && activeArticleUrl != null && activeArticleKey === articleKey;
+      const isWorkspaceActive = activeCatchupGamePk != null && article.gamePk != null && article.gamePk === activeCatchupGamePk;
+      const isActive = isUrlExpanded || isWorkspaceActive;
       return /* @__PURE__ */ (0, import_jsx_runtime170.jsxs)("div", { className: "flex flex-col gap-2", children: [
         /* @__PURE__ */ (0, import_jsx_runtime170.jsx)(
           "div",
           {
             ref: (el) => {
-              if (article.gamePk != null) {
-                if (el) articleRowRefs.current.set(article.gamePk, el);
-                else articleRowRefs.current.delete(article.gamePk);
-              }
+              if (el) articleRowRefs.current.set(articleKey, el);
+              else articleRowRefs.current.delete(articleKey);
               if (isActive) onActiveRowMount?.(el);
             },
             className: cn2(
               "rounded-[2px] px-1.5 py-1",
-              isActive ? "border border-cyansys/45 bg-[#24363c]/35 shadow-[0_0_10px_rgba(86,247,255,0.14),inset_0_0_0_1px_rgba(86,247,255,0.1)]" : "border border-[#24363c]/40 bg-[#24363c]/35"
+              isActive ? "sticky top-0 z-20 border border-cyansys/45 bg-[#010303] shadow-[0_0_10px_rgba(86,247,255,0.14),inset_0_0_0_1px_rgba(86,247,255,0.1)]" : "border border-[#24363c]/40 bg-[#24363c]/35"
             ),
             children: renderArticleBody(
               article,
               headlineClassName,
               clickable ? () => {
-                if (article.url && (isWebRenderer || !isMlbLeagueCard)) {
+                if (clickableByDesktopUrl && article.url && onArticleUrlExpand) {
+                  const rowEl = articleRowRefs.current.get(articleKey);
+                  if (!rowEl) return;
+                  onArticleUrlExpand({
+                    articleKey,
+                    articleUrl: article.url,
+                    headline: article.headline,
+                    source: entry2.leagueEventName,
+                    rowEl
+                  });
+                  return;
+                }
+                if (clickableByBrowserUrl && article.url) {
                   openSportscapeArticleInBrowser(article.url);
                   return;
                 }
                 if (article.gamePk != null && onCatchupHeadlineClick) {
-                  const rowEl = articleRowRefs.current.get(article.gamePk);
+                  const rowEl = articleRowRefs.current.get(articleKey);
                   if (rowEl) onCatchupHeadlineClick(article, rowEl);
                   return;
                 }
@@ -123800,7 +123821,18 @@ function HomeSportscapeCard({
             )
           }
         ),
-        isActive && activeInlineWorkspace ? /* @__PURE__ */ (0, import_jsx_runtime170.jsx)(
+        isUrlExpanded ? /* @__PURE__ */ (0, import_jsx_runtime170.jsx)(
+          HomeCenterPaneTimelineArticleExpansionPane,
+          {
+            articleUrl: activeArticleUrl,
+            headline: article.headline,
+            source: entry2.leagueEventName,
+            sourceKind: "game_card",
+            heightPx: Math.max(0, inlineWebpaneHeight - SPORTSCAPE_INLINE_WEBPANE_CHROME_PX),
+            onCollapse: () => onInlineWebpaneCollapse?.()
+          }
+        ) : null,
+        isWorkspaceActive && activeInlineWorkspace ? /* @__PURE__ */ (0, import_jsx_runtime170.jsx)(
           "div",
           {
             className: cn2(
@@ -123824,7 +123856,7 @@ function HomeSportscapeCard({
     }) })
   ] }) });
 }
-var import_react198, import_jsx_runtime170, SPORTSCAPE_MLB_LEAGUE_CARD_ID, SPORTSCAPE_NHL_LEAGUE_CARD_ID, SPORTSCAPE_WNBA_LEAGUE_CARD_ID, SPORTSCAPE_WORLD_CUP_LEAGUE_CARD_ID, SPORTSCAPE_MCWS_LEAGUE_CARD_ID;
+var import_react198, import_jsx_runtime170, SPORTSCAPE_MLB_LEAGUE_CARD_ID, SPORTSCAPE_NHL_LEAGUE_CARD_ID, SPORTSCAPE_WNBA_LEAGUE_CARD_ID, SPORTSCAPE_WORLD_CUP_LEAGUE_CARD_ID, SPORTSCAPE_MCWS_LEAGUE_CARD_ID, SPORTSCAPE_INLINE_WEBPANE_CHROME_PX;
 var init_HomeSportscapeCard = __esm({
   "../grarf/desktop/src/components/homeMvp/HomeSportscapeCard.tsx"() {
     init_define_import_meta_env();
@@ -123849,12 +123881,14 @@ var init_HomeSportscapeCard = __esm({
     init_useMlbMorningLineupDisplayHighlight();
     init_operationalModeStore();
     init_sportscapeMediaLayout();
+    init_HomeCenterPaneTimelineArticleExpansionPane();
     import_jsx_runtime170 = __toESM(require_jsx_runtime(), 1);
     SPORTSCAPE_MLB_LEAGUE_CARD_ID = "sportscape-mlb-shell";
     SPORTSCAPE_NHL_LEAGUE_CARD_ID = "sportscape-nhl-shell";
     SPORTSCAPE_WNBA_LEAGUE_CARD_ID = "sportscape-wnba-shell";
     SPORTSCAPE_WORLD_CUP_LEAGUE_CARD_ID = "sportscape-world-cup-shell";
     SPORTSCAPE_MCWS_LEAGUE_CARD_ID = "sportscape-mcws-shell";
+    SPORTSCAPE_INLINE_WEBPANE_CHROME_PX = 32;
   }
 });
 
@@ -124308,18 +124342,18 @@ function scrollSportscapeRowIntoPane(scrollEl, row) {
   );
   void animateScrollTop(scrollEl, targetTop);
 }
-function useSportscapeExpansionHeight(expanded, paneRef, anchorRef, anchorKey) {
+function useSportscapeInlineWebpaneHeight(expanded, paneRef, headerRef, anchorKey) {
   const [expansionHeight, setExpansionHeight] = (0, import_react202.useState)(0);
   (0, import_react202.useLayoutEffect)(() => {
     if (!expanded) return;
     const pane = paneRef.current;
-    const anchor = anchorRef.current;
-    if (!pane || !anchor) return;
+    const header = headerRef.current;
+    if (!pane || !header) return;
     const updateHeight = () => {
       const paneRect = pane.getBoundingClientRect();
-      const anchorRect = anchor.getBoundingClientRect();
-      const available = paneRect.bottom - anchorRect.bottom;
-      setExpansionHeight(Math.max(0, available * 0.9));
+      const headerRect = header.getBoundingClientRect();
+      const available = paneRect.height - headerRect.height - SPORTSCAPE_INLINE_WEBPANE_RESERVED_BOTTOM_PX;
+      setExpansionHeight(Math.max(0, available));
       dispatchPaneLayoutResize();
     };
     updateHeight();
@@ -124327,19 +124361,22 @@ function useSportscapeExpansionHeight(expanded, paneRef, anchorRef, anchorKey) {
     window.addEventListener("resize", updateHeight);
     const observer = new ResizeObserver(updateHeight);
     observer.observe(pane);
-    observer.observe(anchor);
+    observer.observe(header);
     return () => {
       pane.removeEventListener("scroll", updateHeight);
       window.removeEventListener("resize", updateHeight);
       observer.disconnect();
     };
-  }, [expanded, paneRef, anchorRef, anchorKey]);
+  }, [expanded, paneRef, headerRef, anchorKey]);
   return expansionHeight;
 }
 function HomeSportscapeSurface({
   onExpandRecapWorkspace,
   onMlbInlineWorkspaceOpen
 }) {
+  const isDesktopElectron = isGrarfElectronRenderer();
+  const [activeArticleKey, setActiveArticleKey] = (0, import_react202.useState)(null);
+  const [activeArticleUrl, setActiveArticleUrl] = (0, import_react202.useState)(null);
   const [mlbActiveGamePk, setMlbActiveGamePk] = (0, import_react202.useState)(null);
   const liveLeagues = useLiveGamesStore((state3) => state3.leagues);
   const mlbSportscapeArticles = useMlbSportscapeArticles();
@@ -124352,8 +124389,8 @@ function HomeSportscapeSurface({
   const editorialDocument = useSportscapeEditorialDocument();
   useMlbCatchupGameHighlightsMap();
   const paneRef = (0, import_react202.useRef)(null);
-  const mlbActiveRowRef = (0, import_react202.useRef)(null);
-  const lastScrolledGamePkRef = (0, import_react202.useRef)(null);
+  const activeRowRef = (0, import_react202.useRef)(null);
+  const lastScrolledArticleKeyRef = (0, import_react202.useRef)(null);
   const gamesByEventId = (0, import_react202.useMemo)(
     () => buildEventIdGameIndex(liveLeagues),
     [liveLeagues]
@@ -124442,43 +124479,89 @@ function HomeSportscapeSurface({
       headline: mlbActiveArticle.headline
     });
   }, [mlbActiveArticle]);
+  const onArticleUrlExpand = (0, import_react202.useCallback)(
+    (request) => {
+      const nextKey = activeArticleKey === request.articleKey ? null : request.articleKey;
+      activeRowRef.current = nextKey == null ? null : request.rowEl;
+      if (nextKey != null) {
+        setMlbActiveGamePk(null);
+        onMlbInlineWorkspaceOpen?.();
+        setActiveArticleKey(nextKey);
+        setActiveArticleUrl(request.articleUrl);
+      } else {
+        setActiveArticleKey(null);
+        setActiveArticleUrl(null);
+      }
+    },
+    [activeArticleKey, onMlbInlineWorkspaceOpen]
+  );
   const onCatchupHeadlineClick = (0, import_react202.useCallback)(
     (article, rowEl) => {
       if (article.gamePk == null) return;
       const nextPk = mlbActiveGamePk === article.gamePk ? null : article.gamePk;
-      mlbActiveRowRef.current = rowEl instanceof HTMLDivElement ? rowEl : null;
+      activeRowRef.current = rowEl instanceof HTMLDivElement ? rowEl : null;
       if (nextPk != null) {
+        setActiveArticleKey(null);
+        setActiveArticleUrl(null);
         onMlbInlineWorkspaceOpen?.();
       }
       setMlbActiveGamePk(nextPk);
     },
     [mlbActiveGamePk, onMlbInlineWorkspaceOpen]
   );
+  const onInlineWebpaneCollapse = (0, import_react202.useCallback)(() => {
+    setActiveArticleKey(null);
+    setActiveArticleUrl(null);
+    activeRowRef.current = null;
+    lastScrolledArticleKeyRef.current = null;
+  }, []);
   (0, import_react202.useLayoutEffect)(() => {
-    if (mlbActiveGamePk == null) {
-      lastScrolledGamePkRef.current = null;
+    if (activeArticleKey == null) {
+      lastScrolledArticleKeyRef.current = null;
       return;
     }
-    if (lastScrolledGamePkRef.current === mlbActiveGamePk) return;
+    if (lastScrolledArticleKeyRef.current === activeArticleKey) return;
     const pane = paneRef.current;
-    const row = mlbActiveRowRef.current;
+    const row = activeRowRef.current;
     if (!pane || !row) return;
-    lastScrolledGamePkRef.current = mlbActiveGamePk;
+    lastScrolledArticleKeyRef.current = activeArticleKey;
+    scrollSportscapeRowIntoPane(pane, row);
+  }, [activeArticleKey]);
+  (0, import_react202.useLayoutEffect)(() => {
+    if (mlbActiveGamePk == null) return;
+    const pane = paneRef.current;
+    const row = activeRowRef.current;
+    if (!pane || !row) return;
     scrollSportscapeRowIntoPane(pane, row);
   }, [mlbActiveGamePk]);
   const onActiveRowMount = (0, import_react202.useCallback)((el) => {
-    mlbActiveRowRef.current = el;
+    activeRowRef.current = el;
   }, []);
   (0, import_react202.useEffect)(() => {
     if (mlbActiveGamePk == null || mlbActiveWorkspace != null) return;
     setMlbActiveGamePk(null);
   }, [mlbActiveGamePk, mlbActiveWorkspace]);
-  const mlbExpansionHeight = useSportscapeExpansionHeight(
+  const inlineWebpaneHeight = useSportscapeInlineWebpaneHeight(
+    activeArticleKey != null && activeArticleUrl != null,
+    paneRef,
+    activeRowRef,
+    activeArticleKey
+  );
+  const mlbWorkspaceHeight = useSportscapeInlineWebpaneHeight(
     mlbActiveWorkspace != null,
     paneRef,
-    mlbActiveRowRef,
-    mlbActiveGamePk
+    activeRowRef,
+    mlbActiveGamePk != null ? `mlb-${mlbActiveGamePk}` : null
   );
+  const sharedCardProps = {
+    activeArticleKey,
+    activeArticleUrl,
+    inlineWebpaneHeight,
+    onArticleUrlExpand: isDesktopElectron ? onArticleUrlExpand : void 0,
+    onInlineWebpaneCollapse: isDesktopElectron ? onInlineWebpaneCollapse : void 0,
+    onActiveRowMount,
+    onExpandRecapWorkspace
+  };
   return /* @__PURE__ */ (0, import_jsx_runtime173.jsx)(
     "div",
     {
@@ -124495,29 +124578,21 @@ function HomeSportscapeSurface({
                 entry: card.entry,
                 activeCatchupGamePk: mlbActiveGamePk,
                 activeInlineWorkspace: mlbActiveWorkspace,
-                inlineWorkspaceHeight: mlbExpansionHeight,
-                onActiveRowMount,
+                inlineWorkspaceHeight: mlbWorkspaceHeight,
                 onCatchupHeadlineClick,
-                onExpandRecapWorkspace
+                ...sharedCardProps
               },
               card.id
             );
           }
-          return /* @__PURE__ */ (0, import_jsx_runtime173.jsx)(
-            HomeSportscapeCard,
-            {
-              entry: card.entry,
-              onExpandRecapWorkspace
-            },
-            card.id
-          );
+          return /* @__PURE__ */ (0, import_jsx_runtime173.jsx)(HomeSportscapeCard, { entry: card.entry, ...sharedCardProps }, card.id);
         }),
         isGrarfWebRenderer() ? /* @__PURE__ */ (0, import_jsx_runtime173.jsx)(SportscapeMoreLeaguesDesktopWaitlistRow, {}) : null
       ] })
     }
   );
 }
-var import_react202, import_jsx_runtime173, SPORTSCAPE_ROW_SCROLL_PADDING_PX;
+var import_react202, import_jsx_runtime173, SPORTSCAPE_ROW_SCROLL_PADDING_PX, SPORTSCAPE_INLINE_WEBPANE_RESERVED_BOTTOM_PX;
 var init_HomeSportscapeSurface = __esm({
   "../grarf/desktop/src/components/homeMvp/HomeSportscapeSurface.tsx"() {
     init_define_import_meta_env();
@@ -124544,6 +124619,7 @@ var init_HomeSportscapeSurface = __esm({
     init_isGrarfWebRenderer();
     import_jsx_runtime173 = __toESM(require_jsx_runtime(), 1);
     SPORTSCAPE_ROW_SCROLL_PADDING_PX = 8;
+    SPORTSCAPE_INLINE_WEBPANE_RESERVED_BOTTOM_PX = 160;
   }
 });
 
