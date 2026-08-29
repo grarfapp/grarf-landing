@@ -123714,7 +123714,7 @@ function HomeSportscapeCard({
     []
   );
   const activateDesktopInlineUrl = (0, import_react198.useCallback)(
-    (articleKey, article, url) => {
+    (articleKey, article, url, contentPiece) => {
       if (!isDesktopElectron || !onArticleUrlExpand) return;
       const rowEl = articleRowRefs.current.get(articleKey);
       if (!rowEl) return;
@@ -123723,13 +123723,14 @@ function HomeSportscapeCard({
         articleUrl: url,
         headline: article.headline,
         source: entry2.leagueEventName,
-        rowEl
+        rowEl,
+        contentPiece
       });
     },
     [isDesktopElectron, onArticleUrlExpand, entry2.leagueEventName]
   );
   const renderArticleHighlightSlot = (article, articleKey) => {
-    const onDesktopHighlightActivate = isDesktopElectron ? (url) => activateDesktopInlineUrl(articleKey, article, url) : void 0;
+    const onDesktopHighlightActivate = isDesktopElectron ? (url) => activateDesktopInlineUrl(articleKey, article, url, "highlight") : void 0;
     if (isMlbLeagueCard && article.gamePk != null) {
       return /* @__PURE__ */ (0, import_jsx_runtime170.jsx)(
         SportscapeArticleGameHighlight,
@@ -123861,7 +123862,7 @@ function HomeSportscapeCard({
               headlineClassName,
               clickable ? () => {
                 if (clickableByDesktopUrl && article.url && onArticleUrlExpand) {
-                  activateDesktopInlineUrl(articleKey, article, article.url);
+                  activateDesktopInlineUrl(articleKey, article, article.url, "headline");
                   return;
                 }
                 if (clickableByBrowserUrl && article.url) {
@@ -124436,6 +124437,7 @@ function HomeSportscapeSurface({
   const isDesktopElectron = isGrarfElectronRenderer();
   const [activeArticleKey, setActiveArticleKey] = (0, import_react202.useState)(null);
   const [activeArticleUrl, setActiveArticleUrl] = (0, import_react202.useState)(null);
+  const [activeContentPiece, setActiveContentPiece] = (0, import_react202.useState)(null);
   const [mlbActiveGamePk, setMlbActiveGamePk] = (0, import_react202.useState)(null);
   const liveLeagues = useLiveGamesStore((state3) => state3.leagues);
   const mlbSportscapeArticles = useMlbSportscapeArticles();
@@ -124540,19 +124542,22 @@ function HomeSportscapeSurface({
   }, [mlbActiveArticle]);
   const onArticleUrlExpand = (0, import_react202.useCallback)(
     (request) => {
-      const nextKey = activeArticleKey === request.articleKey ? null : request.articleKey;
-      activeRowRef.current = nextKey == null ? null : request.rowEl;
-      if (nextKey != null) {
-        setMlbActiveGamePk(null);
-        onMlbInlineWorkspaceOpen?.();
-        setActiveArticleKey(nextKey);
-        setActiveArticleUrl(request.articleUrl);
-      } else {
+      const isSameExpansion = activeArticleKey === request.articleKey && activeContentPiece === request.contentPiece;
+      if (isSameExpansion) {
+        activeRowRef.current = null;
         setActiveArticleKey(null);
         setActiveArticleUrl(null);
+        setActiveContentPiece(null);
+        return;
       }
+      activeRowRef.current = request.rowEl;
+      setMlbActiveGamePk(null);
+      onMlbInlineWorkspaceOpen?.();
+      setActiveArticleKey(request.articleKey);
+      setActiveArticleUrl(request.articleUrl);
+      setActiveContentPiece(request.contentPiece);
     },
-    [activeArticleKey, onMlbInlineWorkspaceOpen]
+    [activeArticleKey, activeContentPiece, onMlbInlineWorkspaceOpen]
   );
   const onCatchupHeadlineClick = (0, import_react202.useCallback)(
     (article, rowEl) => {
@@ -124562,6 +124567,7 @@ function HomeSportscapeSurface({
       if (nextPk != null) {
         setActiveArticleKey(null);
         setActiveArticleUrl(null);
+        setActiveContentPiece(null);
         onMlbInlineWorkspaceOpen?.();
       }
       setMlbActiveGamePk(nextPk);
@@ -124571,6 +124577,7 @@ function HomeSportscapeSurface({
   const onInlineWebpaneCollapse = (0, import_react202.useCallback)(() => {
     setActiveArticleKey(null);
     setActiveArticleUrl(null);
+    setActiveContentPiece(null);
     activeRowRef.current = null;
     lastScrolledArticleKeyRef.current = null;
   }, []);
