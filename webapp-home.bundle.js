@@ -53636,10 +53636,108 @@ var init_applyDesktopPrimaryNavigationSelection = __esm({
   }
 });
 
+// ../grarf/desktop/src/lib/navigation/resolveDesktopAllScopeLeagueDirectoryItem.ts
+function gameIdFromPath2(pathname) {
+  if (!pathname.startsWith("/game/")) return null;
+  try {
+    return decodeURIComponent(pathname.slice("/game/".length));
+  } catch {
+    return null;
+  }
+}
+function resolveDesktopAllScopeLeagueDirectoryItem(pathname, leagueWorkspaceId) {
+  if (leagueWorkspaceId) {
+    return resolveLeagueDirectoryItemByHubId(leagueWorkspaceId) ?? null;
+  }
+  const hubId = resolveHomeLeagueWorkspaceHubIdFromRoute(pathname);
+  if (hubId) {
+    return resolveLeagueDirectoryItemByHubId(hubId) ?? null;
+  }
+  const normalized = pathname.replace(/\/+$/, "") || "/";
+  if (normalized === "/") return null;
+  const byRoute = LEAGUE_DIRECTORY_ITEMS.find(
+    (item) => item.id !== "home" && item.route !== "/" && (normalized === item.route || normalized.startsWith(`${item.route}/`))
+  );
+  if (byRoute) return byRoute;
+  const gameId = gameIdFromPath2(pathname);
+  if (gameId) {
+    for (const item of LEAGUE_DIRECTORY_ITEMS) {
+      if (item.grarfLeagueKey && gameId.startsWith(`espn-${item.grarfLeagueKey}-`)) {
+        return item;
+      }
+    }
+    const legacyMatch = /^espn-([A-Z0-9_]+)-/.exec(gameId);
+    const leagueKey = legacyMatch?.[1];
+    if (leagueKey) {
+      return LEAGUE_DIRECTORY_ITEMS.find((item) => item.grarfLeagueKey === leagueKey) ?? null;
+    }
+  }
+  return null;
+}
+var init_resolveDesktopAllScopeLeagueDirectoryItem = __esm({
+  "../grarf/desktop/src/lib/navigation/resolveDesktopAllScopeLeagueDirectoryItem.ts"() {
+    init_define_import_meta_env();
+    init_leagueDirectoryV1();
+    init_resolveLeagueDirectoryNavItemLogo();
+    init_homeLeagueWorkspaceHubRegistry();
+  }
+});
+
 // ../grarf/desktop/src/components/shell/DesktopPrimaryNavigationBar.tsx
+function DesktopAllScopeSelectorLogo({
+  item,
+  minimized
+}) {
+  const [failed, setFailed] = (0, import_react23.useState)(false);
+  if (!item.logoUrl || failed) return null;
+  return /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(
+    "img",
+    {
+      src: item.logoUrl,
+      alt: "",
+      width: minimized ? 16 : 14,
+      height: minimized ? 16 : 14,
+      loading: "lazy",
+      decoding: "async",
+      onError: () => setFailed(true),
+      className: cn2(
+        "shrink-0 object-contain brightness-125 contrast-110 drop-shadow-[0_0_1px_rgba(255,255,255,0.45)]",
+        minimized ? "h-4 w-4" : "h-3.5 w-3.5",
+        resolveGamesSpineLeagueLogoImgClassName(item.grarfLeagueKey, item.logoUrl)
+      )
+    }
+  );
+}
+function DesktopAllScopeSelectorLabel({
+  scopeLeague,
+  leagueMenuMinimized
+}) {
+  if (!scopeLeague) {
+    return /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)(import_jsx_runtime20.Fragment, { children: [
+      "ALL",
+      /* @__PURE__ */ (0, import_jsx_runtime20.jsx)("span", { "aria-hidden": true, className: "text-[10px] leading-none", children: "\u25BC" })
+    ] });
+  }
+  const leagueLabel = resolveMainMenuLeagueDirectoryLabel(scopeLeague);
+  if (leagueMenuMinimized) {
+    return /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)(import_jsx_runtime20.Fragment, { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(DesktopAllScopeSelectorLogo, { item: scopeLeague, minimized: true }),
+      /* @__PURE__ */ (0, import_jsx_runtime20.jsx)("span", { "aria-hidden": true, className: "text-[10px] leading-none", children: "\u25BC" })
+    ] });
+  }
+  return /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)(import_jsx_runtime20.Fragment, { children: [
+    /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(DesktopAllScopeSelectorLogo, { item: scopeLeague, minimized: false }),
+    /* @__PURE__ */ (0, import_jsx_runtime20.jsx)("span", { className: "min-w-0 truncate", children: leagueLabel }),
+    /* @__PURE__ */ (0, import_jsx_runtime20.jsx)("span", { "aria-hidden": true, className: "shrink-0 text-[10px] leading-none", children: "\u25BC" })
+  ] });
+}
 function DesktopPrimaryNavigationBar() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
+  const { sidebarCollapsed: leagueMenuMinimized } = useAppShell();
+  const leagueWorkspaceId = useHomeLeagueWorkspaceStore((s2) => s2.activeId);
+  const scopeLeague = resolveDesktopAllScopeLeagueDirectoryItem(pathname, leagueWorkspaceId);
+  const scopeLabel = scopeLeague ? resolveMainMenuLeagueDirectoryLabel(scopeLeague) : "All application scope";
   const activeSelection = useDesktopPrimaryNavigationStore((s2) => s2.activeSelection);
   const allScopePanelOpen = useDesktopPrimaryNavigationStore((s2) => s2.allScopePanelOpen);
   const [trailingTabsMarginLeftPx, setTrailingTabsMarginLeftPx] = (0, import_react23.useState)(
@@ -53685,6 +53783,7 @@ function DesktopPrimaryNavigationBar() {
           {
             type: "button",
             "aria-pressed": isPrimaryActive("all"),
+            "aria-label": scopeLabel,
             onClick: () => onPrimarySelect("all"),
             className: cn2(
               ALL_TAB_CLASS,
@@ -53694,10 +53793,22 @@ function DesktopPrimaryNavigationBar() {
                 "relative z-[2] -mb-px text-cyansys hover:bg-[#020404]/95 hover:text-cyansys"
               ) : "hover:bg-[#0a1c22] hover:text-cyansys/95"
             ),
-            children: /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)("span", { className: "inline-flex items-center gap-0.5", children: [
-              "ALL",
-              /* @__PURE__ */ (0, import_jsx_runtime20.jsx)("span", { "aria-hidden": true, className: "text-[10px] leading-none", children: "\u25BC" })
-            ] })
+            children: /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(
+              "span",
+              {
+                className: cn2(
+                  "inline-flex min-w-0 max-w-full items-center justify-center gap-0.5",
+                  scopeLeague && !leagueMenuMinimized && "px-0.5"
+                ),
+                children: /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(
+                  DesktopAllScopeSelectorLabel,
+                  {
+                    scopeLeague,
+                    leagueMenuMinimized
+                  }
+                )
+              }
+            )
           }
         ),
         /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)(
@@ -53789,8 +53900,13 @@ var init_DesktopPrimaryNavigationBar = __esm({
     import_react23 = __toESM(require_react(), 1);
     init_dist();
     init_cn();
+    init_AppShellContext();
     init_applyDesktopPrimaryNavigationSelection();
+    init_resolveDesktopAllScopeLeagueDirectoryItem();
+    init_resolveMainMenuLeagueDirectoryLabel();
+    init_gamesSpineLeagueLogoUrls();
     init_desktopPrimaryNavigationStore();
+    init_homeLeagueWorkspaceStore();
     init_desktopMenuLayout();
     import_jsx_runtime20 = __toESM(require_jsx_runtime(), 1);
     TEMPORAL_NAV_ITEMS = [
