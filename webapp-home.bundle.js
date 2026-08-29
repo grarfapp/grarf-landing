@@ -46605,7 +46605,7 @@ function leagueDirectorySectionTitleLabel(section) {
   if (section.id === "on-today") return section.title;
   return section.title;
 }
-var LOGO, WCWS_LEAGUE_LOGO_URL, LEAGUE_DIRECTORY_V1, LEAGUE_DIRECTORY_HOME, LEAGUE_DIRECTORY_ITEMS, ROUTE_INDEX;
+var LOGO, WCWS_LEAGUE_LOGO_URL, LEAGUE_DIRECTORY_V1, LEAGUE_DIRECTORY_HOME, LEAGUE_DIRECTORY_ALL, LEAGUE_DIRECTORY_ITEMS, ROUTE_INDEX;
 var init_leagueDirectoryV1 = __esm({
   "../grarf/desktop/src/data/leagueDirectoryV1.ts"() {
     init_define_import_meta_env();
@@ -46654,6 +46654,13 @@ var init_leagueDirectoryV1 = __esm({
       label: "HOME",
       route: "/",
       collapsedLabel: "HOME"
+    };
+    LEAGUE_DIRECTORY_ALL = {
+      id: "all",
+      label: "ALL",
+      route: "/",
+      collapsedLabel: "ALL",
+      logoUrl: "/league-logos/globe.png"
     };
     LEAGUE_DIRECTORY_ITEMS = [
       LEAGUE_DIRECTORY_HOME,
@@ -47926,550 +47933,6 @@ var init_desktopMenuLayout = __esm({
     DESKTOP_LEAGUE_NAV_EXPANDED_HEADER_MIN_PX = 44;
     DESKTOP_LEAGUE_NAV_MEASURE_ROW_CLASS = "block whitespace-nowrap px-2 py-1.5 font-mono text-left text-[10px] tracking-[0.12em]";
     DESKTOP_MENU_PRIMARY_TAB_GAP_CLASS = "gap-[2px]";
-  }
-});
-
-// ../grarf/desktop/src/lib/navigation/resolveLeagueNavActivityStatuses.ts
-function resolveActivityBucketStatus(game) {
-  if (game.status === "final") return "final";
-  if (isGameActivelyLive(game)) return "live";
-  return "scheduled";
-}
-function buildActivityTallyStatusesByBucket(statuses) {
-  let finalCount = 0;
-  let liveCount = 0;
-  let scheduledCount = 0;
-  for (const status of statuses) {
-    if (status === "final") finalCount++;
-    else if (status === "live") liveCount++;
-    else if (status === "scheduled") scheduledCount++;
-  }
-  return [
-    ...Array(finalCount).fill("final"),
-    ...Array(liveCount).fill("live"),
-    ...Array(scheduledCount).fill("scheduled")
-  ];
-}
-function resolveLeagueNavActivityStatusesByLeague(mergedLeagues) {
-  const out = /* @__PURE__ */ new Map();
-  for (const leagueKey of getOperationalSlateLeagueOrder()) {
-    const slate = filterGamesSpineSlateForOperationalSportsDay(mergedLeagues[leagueKey] ?? []);
-    if (slate.length === 0) continue;
-    out.set(
-      leagueKey,
-      buildActivityTallyStatusesByBucket(slate.map((game) => resolveActivityBucketStatus(game)))
-    );
-  }
-  return out;
-}
-var init_resolveLeagueNavActivityStatuses = __esm({
-  "../grarf/desktop/src/lib/navigation/resolveLeagueNavActivityStatuses.ts"() {
-    init_define_import_meta_env();
-    init_gamesColumnLeagues();
-    init_gamesSpineOperationalDate();
-    init_isGameActivelyLive();
-  }
-});
-
-// ../grarf/desktop/src/lib/navigation/filterLeagueDirectoryNavSections.ts
-function leagueMatchesSearchQuery(item, normalizedQuery) {
-  return item.label.toLowerCase().includes(normalizedQuery);
-}
-function filterLeagueDirectoryNavSections(sections, query) {
-  const normalizedQuery = query.trim().toLowerCase();
-  if (!normalizedQuery) {
-    return { sections: [...sections], searchActive: false, hasMatches: true };
-  }
-  const filteredSections = [];
-  for (const section of sections) {
-    const matchingItems = [...section.items, ...section.expansionItems ?? []].filter(
-      (item) => leagueMatchesSearchQuery(item, normalizedQuery)
-    );
-    if (matchingItems.length === 0) continue;
-    filteredSections.push({
-      ...section,
-      items: matchingItems,
-      expansionItems: void 0
-    });
-  }
-  return {
-    sections: filteredSections,
-    searchActive: true,
-    hasMatches: filteredSections.length > 0
-  };
-}
-var init_filterLeagueDirectoryNavSections = __esm({
-  "../grarf/desktop/src/lib/navigation/filterLeagueDirectoryNavSections.ts"() {
-    init_define_import_meta_env();
-  }
-});
-
-// ../grarf/desktop/src/lib/liveTracker/liveTrackerFeedRegistry.ts
-function getLiveTrackerFeedRegistry() {
-  return LIVE_TRACKER_FEED_REGISTRY;
-}
-function resolveLiveTrackerFeedForLeague(league2, options) {
-  const base = FEED_BY_LEAGUE.get(league2) ?? null;
-  if (!base) return null;
-  if (league2 !== "PGA" || !options?.leagueGames?.length) return base;
-  if (!options.leagueGames.some((game) => isPgaTourOpenChampionshipEvent(game.league, game.awayTeam))) {
-    return base;
-  }
-  return {
-    ...base,
-    feedUrl: PGA_OPEN_LIVE_TRACKER_FEED_URL,
-    feedId: LIVE_TRACKER_PGA_OPEN_FEED_ID,
-    label: "The Open"
-  };
-}
-function hasLiveTrackerFeedForLeague(league2) {
-  return FEED_BY_LEAGUE.has(league2);
-}
-var PGA_OPEN_LIVE_TRACKER_FEED_URL, LIVE_TRACKER_PGA_OPEN_FEED_ID, LIVE_TRACKER_FEED_REGISTRY, FEED_BY_LEAGUE;
-var init_liveTrackerFeedRegistry = __esm({
-  "../grarf/desktop/src/lib/liveTracker/liveTrackerFeedRegistry.ts"() {
-    init_define_import_meta_env();
-    init_golfWatchUrls2();
-    PGA_OPEN_LIVE_TRACKER_FEED_URL = "https://rss.app/feeds/c5Qh50PZLWqipg06.xml";
-    LIVE_TRACKER_PGA_OPEN_FEED_ID = "live-tracker-pga-open";
-    LIVE_TRACKER_FEED_REGISTRY = [
-      {
-        league: "MLB",
-        feedUrl: "https://rss.app/feeds/5I56VczaapQkNeCM.xml",
-        feedId: "live-tracker-mlb",
-        label: "MLB"
-      },
-      {
-        // X list: https://x.com/i/lists/2064767015949140226
-        league: "WNBA",
-        feedUrl: "https://rss.app/feeds/kYrwY6Duh0BEjQbr.xml",
-        feedId: "live-tracker-wnba",
-        label: "WNBA"
-      },
-      {
-        league: "NBASUMMER",
-        feedUrl: "https://rss.app/feeds/_tDZBj2VkDPknIrxv.xml",
-        feedId: "live-tracker-nbasummer",
-        label: "NBA Summer League"
-      },
-      {
-        league: "WORLDCUP",
-        feedUrl: "https://rss.app/feeds/i0RTt434yrat6hLW.xml",
-        feedId: "live-tracker-worldcup",
-        label: "FIFA World Cup"
-      },
-      {
-        league: "AFL",
-        feedUrl: "https://rss.app/feeds/jOSGNaMf3d3RSyr4.xml",
-        feedId: "live-tracker-afl",
-        label: "AFL"
-      },
-      {
-        league: "ATP",
-        feedUrl: "https://rss.app/feeds/_S4dxUWMNemGKdqB5.xml",
-        feedId: "live-tracker-atp",
-        label: "ATP"
-      },
-      {
-        league: "WTA",
-        feedUrl: "https://rss.app/feeds/_S4dxUWMNemGKdqB5.xml",
-        feedId: "live-tracker-wta",
-        label: "WTA"
-      },
-      {
-        league: "LPGA",
-        feedUrl: "https://rss.app/feeds/k44KVdVjc2ESKRIz.xml",
-        feedId: "live-tracker-lpga",
-        label: "LPGA"
-      },
-      {
-        league: "PGA",
-        feedUrl: "https://rss.app/feeds/isFH44Vg5V7wBj4x.xml",
-        feedId: "live-tracker-pga",
-        label: "PGA Tour"
-      },
-      {
-        league: "F1",
-        feedUrl: "https://rss.app/feeds/AWcSHm2UvsyooZd3.xml",
-        feedId: "live-tracker-f1",
-        label: "Formula 1"
-      },
-      {
-        league: "INDYCAR",
-        feedUrl: "https://rss.app/feeds/P1rkzScNrWflwYgk.xml",
-        feedId: "live-tracker-indycar",
-        label: "IndyCar"
-      },
-      {
-        league: "TDF",
-        feedUrl: "https://rss.app/feeds/E9kvtXBnSJECIOOZ.xml",
-        feedId: "live-tracker-tdf",
-        label: "Tour de France"
-      },
-      {
-        league: "GT_WORLD_CHALLENGE",
-        feedUrl: "https://rss.app/feeds/_hM2icu7rxpN7XUsq.xml",
-        feedId: "live-tracker-gt-world-challenge",
-        label: "GT World"
-      },
-      {
-        league: "LIGAMX",
-        feedUrl: "https://rss.app/feeds/XT9ITsZ6kSXIcLYF.xml",
-        feedId: "live-tracker-ligamx",
-        label: "Liga MX"
-      },
-      {
-        league: "BRA1",
-        feedUrl: "https://rss.app/feeds/WsqAILI0XmBomTWX.xml",
-        feedId: "live-tracker-bra1",
-        label: "Brasileirao"
-      },
-      {
-        league: "SUDAMERICANA",
-        feedUrl: "https://rss.app/feeds/T385BF9vEoXXHkqL.xml",
-        feedId: "live-tracker-sudamericana",
-        label: "Copa Sudamericana"
-      },
-      {
-        league: "ARG1",
-        feedUrl: "https://rss.app/feeds/i5QmuX2IX3jivxen.xml",
-        feedId: "live-tracker-arg1",
-        label: "LPF"
-      },
-      {
-        league: "MLS",
-        feedUrl: "https://rss.app/feeds/3F355cjf7OMwp2dF.xml",
-        feedId: "live-tracker-mls",
-        label: "MLS"
-      },
-      {
-        league: "UFC",
-        feedUrl: "https://rss.app/feeds/DQ8yGfZd9upXVYCj.xml",
-        feedId: "live-tracker-ufc",
-        label: "UFC"
-      },
-      {
-        league: "UELQ",
-        feedUrl: "https://rss.app/feeds/k3hUQlu10jPCQmZ3.xml",
-        feedId: "live-tracker-uelq",
-        label: "UELQ"
-      },
-      {
-        league: "UECLQ",
-        feedUrl: "https://rss.app/feeds/T0C96SZLx5G4Sl4D.xml",
-        feedId: "live-tracker-ueclq",
-        label: "UECLQ"
-      },
-      {
-        league: "UECL",
-        feedUrl: "https://rss.app/feeds/T0C96SZLx5G4Sl4D.xml",
-        feedId: "live-tracker-uecl",
-        label: "UECL"
-      }
-    ];
-    FEED_BY_LEAGUE = new Map(
-      LIVE_TRACKER_FEED_REGISTRY.map((entry2) => [entry2.league, entry2])
-    );
-  }
-});
-
-// ../grarf/desktop/src/lib/gamesSpine/operationalManualLeagueGames.ts
-var init_operationalManualLeagueGames = __esm({
-  "../grarf/desktop/src/lib/gamesSpine/operationalManualLeagueGames.ts"() {
-    init_define_import_meta_env();
-    init_gamesSpine();
-  }
-});
-
-// ../grarf/desktop/src/lib/liveTracker/liveTrackerLeagueRetention.ts
-function resolveLiveTrackerGameCompletionMs(game, retainedAtById) {
-  const observationMs = resolveLiveTrackerFinalObservationMs(game, retainedAtById);
-  if (observationMs != null) return observationMs;
-  if (game.startTimeMs != null && Number.isFinite(game.startTimeMs) && game.startTimeMs > 0) {
-    return game.startTimeMs;
-  }
-  return 0;
-}
-function resolveLiveTrackerFinalObservationMs(game, retainedAtById) {
-  const lastUpdated = game.lastUpdated?.trim();
-  if (lastUpdated) {
-    const parsed = Date.parse(lastUpdated);
-    if (Number.isFinite(parsed) && parsed > 0) return parsed;
-  }
-  const retainedAt = retainedAtById[game.id];
-  if (retainedAt != null && Number.isFinite(retainedAt) && retainedAt > 0) {
-    return retainedAt;
-  }
-  return null;
-}
-function wasLiveTrackerLiveGame(game) {
-  return game.status === "live" || isGameActivelyLive(game);
-}
-function collectLeagueGamesWithRetainedFinals(league2, leagues, retainedFinals) {
-  const byId = /* @__PURE__ */ new Map();
-  for (const game of leagues[league2] ?? []) {
-    byId.set(game.id, game);
-  }
-  for (const game of retainedFinals) {
-    if ((game.league ?? "MLB") !== league2) continue;
-    if (!byId.has(game.id)) byId.set(game.id, game);
-  }
-  return [...byId.values()];
-}
-function collectSpineLeaguesGamesWithRetainedFinals(spineLeagues, leagues, retainedFinals) {
-  const byId = /* @__PURE__ */ new Map();
-  for (const league2 of spineLeagues) {
-    for (const game of collectLeagueGamesWithRetainedFinals(league2, leagues, retainedFinals)) {
-      byId.set(game.id, game);
-    }
-  }
-  return [...byId.values()];
-}
-function updateLeagueRetentionCompletedAtMs(input) {
-  const { league: league2, games, previousGamesById: previousGamesById3, nowMs } = input;
-  if (games.some(isGameActivelyLive)) {
-    return void 0;
-  }
-  let completedAtMs = input.existingCompletedAtMs;
-  for (const game of games) {
-    if (game.status !== "final") continue;
-    const previous = previousGamesById3.get(game.id);
-    if (!previous || !wasLiveTrackerLiveGame(previous)) continue;
-    completedAtMs = completedAtMs == null ? nowMs : Math.max(completedAtMs, nowMs);
-  }
-  for (const previous of previousGamesById3.values()) {
-    if ((previous.league ?? "MLB") !== league2 || !wasLiveTrackerLiveGame(previous)) continue;
-    const current = games.find((game) => game.id === previous.id);
-    if (current && wasLiveTrackerLiveGame(current)) continue;
-    if (current?.status === "final") {
-      completedAtMs = completedAtMs == null ? nowMs : Math.max(completedAtMs, nowMs);
-      continue;
-    }
-    completedAtMs = completedAtMs == null ? nowMs : Math.max(completedAtMs, nowMs);
-  }
-  if (completedAtMs == null) return void 0;
-  if (nowMs - completedAtMs >= LIVE_TRACKER_LEAGUE_RETENTION_MS) return void 0;
-  return completedAtMs;
-}
-function isLeagueWithinRetentionWindow(completedAtMs, nowMs = Date.now()) {
-  if (completedAtMs == null || !Number.isFinite(completedAtMs) || completedAtMs <= 0) {
-    return false;
-  }
-  return nowMs - completedAtMs < LIVE_TRACKER_LEAGUE_RETENTION_MS;
-}
-function isLeagueWithinRssIngestionWindow(completedAtMs, nowMs = Date.now()) {
-  if (completedAtMs == null || !Number.isFinite(completedAtMs) || completedAtMs <= 0) {
-    return false;
-  }
-  return nowMs - completedAtMs < LIVE_TRACKER_RSS_INGESTION_POST_FINAL_MS;
-}
-function isLeagueActiveForLiveTracker(games, completedAtMs, nowMs = Date.now()) {
-  if (games.some(isGameActivelyLive)) return true;
-  return isLeagueWithinRetentionWindow(completedAtMs, nowMs);
-}
-function isLeagueActiveForLiveTrackerRssIngestion(games, completedAtMs, nowMs = Date.now()) {
-  if (games.some(isGameActivelyLive)) return true;
-  return isLeagueWithinRssIngestionWindow(completedAtMs, nowMs);
-}
-var LIVE_TRACKER_LEAGUE_RETENTION_MS, LIVE_TRACKER_RSS_INGESTION_POST_FINAL_MS;
-var init_liveTrackerLeagueRetention = __esm({
-  "../grarf/desktop/src/lib/liveTracker/liveTrackerLeagueRetention.ts"() {
-    init_define_import_meta_env();
-    init_isGameActivelyLive();
-    LIVE_TRACKER_LEAGUE_RETENTION_MS = 2 * 60 * 60 * 1e3;
-    LIVE_TRACKER_RSS_INGESTION_POST_FINAL_MS = 45 * 60 * 1e3;
-  }
-});
-
-// ../grarf/desktop/src/lib/liveTracker/resolveManualLiveTrackerLeagueGames.ts
-function resolveManualLiveTrackerGrarfLeagueKey(manualLeagueKey) {
-  return MANUAL_LIVE_TRACKER_LEAGUE_KEYS[manualLeagueKey.trim().toLowerCase()] ?? null;
-}
-function resolveManualLiveTrackerGamesByLeague(nowMs = Date.now(), documentOverride) {
-  const now = new Date(nowMs);
-  const document2 = documentOverride !== void 0 ? documentOverride : useGamesSpineManualStore.getState().document;
-  const sections = convertManualGamesSpineDocument(
-    document2,
-    now,
-    getOperationalSportsDayDateKey(now)
-  );
-  const out = /* @__PURE__ */ new Map();
-  for (const section of sections) {
-    const grarfKey = resolveManualLiveTrackerGrarfLeagueKey(section.leagueKey);
-    if (!grarfKey) continue;
-    const games = section.games.map((game) => refreshManualGamesSpineGameIfNeeded(game, now)).map((game) => ({ ...game, league: grarfKey }));
-    if (games.length === 0) continue;
-    const existing = out.get(grarfKey) ?? [];
-    out.set(grarfKey, [...existing, ...games]);
-  }
-  return out;
-}
-function collectLiveTrackerLeagueGames(league2, leagues, retainedFinals, nowMs = Date.now()) {
-  const operational = collectLeagueGamesWithRetainedFinals(league2, leagues, retainedFinals);
-  const adjunct = hasLiveTrackerFeedForLeague(league2) ? resolveManualOperationalLeagueGames(new Date(nowMs))[league2] ?? [] : [];
-  if (adjunct.length > 0) {
-    const seen = new Set(operational.map((game) => game.id));
-    const merged = [...operational];
-    for (const game of adjunct) {
-      if (seen.has(game.id)) continue;
-      seen.add(game.id);
-      merged.push(game);
-    }
-    if (merged.length > 0) return merged;
-  }
-  if (operational.length > 0) return operational;
-  return resolveManualLiveTrackerGamesByLeague(nowMs).get(league2) ?? [];
-}
-var MANUAL_LIVE_TRACKER_LEAGUE_KEYS;
-var init_resolveManualLiveTrackerLeagueGames = __esm({
-  "../grarf/desktop/src/lib/liveTracker/resolveManualLiveTrackerLeagueGames.ts"() {
-    init_define_import_meta_env();
-    init_convertManualGamesSpineDocument();
-    init_operationalManualLeagueGames();
-    init_operationalSlateDate2();
-    init_manualGamesSpineUtils();
-    init_liveTrackerFeedRegistry();
-    init_gamesSpineManualStore();
-    init_liveTrackerLeagueRetention();
-    MANUAL_LIVE_TRACKER_LEAGUE_KEYS = {
-      "gt-world-challenge": "GT_WORLD_CHALLENGE",
-      "wec-spa-24h": "GT_WORLD_CHALLENGE"
-    };
-  }
-});
-
-// ../grarf/desktop/src/lib/liveTracker/resolveCurrentlyLiveGamesSpineLeagues.ts
-function resolveCurrentlyLiveGamesSpineLeagues(leagues) {
-  const liveLeagues = [];
-  for (const league2 of getGamesColumnLeagueOrder()) {
-    const games = leagues[league2] ?? [];
-    const liveGameCount = games.filter(isGameActivelyLive).length;
-    if (liveGameCount > 0) {
-      liveLeagues.push({ league: league2, liveGameCount });
-    }
-  }
-  return liveLeagues;
-}
-function resolveCurrentlyLiveGamesSpineLeagueKeys(leagues) {
-  return resolveCurrentlyLiveGamesSpineLeagues(leagues).map((entry2) => entry2.league);
-}
-function buildLiveTrackerDisplayLeaguesSnapshot(leagues, completedAtMsByLeague, updatedAt = null, nowMs = Date.now(), retainedFinals = []) {
-  const displayLeagues = [];
-  const seenLeagues = /* @__PURE__ */ new Set();
-  for (const league2 of getGamesColumnLeagueOrder()) {
-    if (!hasLiveTrackerFeedForLeague(league2)) continue;
-    const games = collectLiveTrackerLeagueGames(league2, leagues, retainedFinals, nowMs);
-    if (!isLeagueActiveForLiveTracker(games, completedAtMsByLeague[league2], nowMs)) continue;
-    seenLeagues.add(league2);
-    displayLeagues.push({
-      league: league2,
-      liveGameCount: games.filter(isGameActivelyLive).length
-    });
-  }
-  const manualGamesByLeague = resolveManualLiveTrackerGamesByLeague(nowMs);
-  for (const feed of getLiveTrackerFeedRegistry()) {
-    if (seenLeagues.has(feed.league)) continue;
-    const games = manualGamesByLeague.get(feed.league);
-    if (!games?.length) continue;
-    if (!isLeagueActiveForLiveTracker(games, completedAtMsByLeague[feed.league], nowMs)) continue;
-    seenLeagues.add(feed.league);
-    displayLeagues.push({
-      league: feed.league,
-      liveGameCount: games.filter(isGameActivelyLive).length
-    });
-  }
-  return {
-    leagues: displayLeagues,
-    leagueKeys: displayLeagues.map((entry2) => entry2.league),
-    updatedAt
-  };
-}
-var init_resolveCurrentlyLiveGamesSpineLeagues = __esm({
-  "../grarf/desktop/src/lib/liveTracker/resolveCurrentlyLiveGamesSpineLeagues.ts"() {
-    init_define_import_meta_env();
-    init_gamesColumnLeagues();
-    init_liveTrackerFeedRegistry();
-    init_resolveManualLiveTrackerLeagueGames();
-    init_liveTrackerLeagueRetention();
-    init_isGameActivelyLive();
-  }
-});
-
-// ../grarf/desktop/src/lib/home/resolveHomeDesktopObjectsSpineTemporalLeagueNavSections.ts
-function filterDirectorySectionItems(section, excludeLeagueKeys) {
-  const items = section.items.filter(
-    (item) => !item.grarfLeagueKey || !excludeLeagueKeys.has(item.grarfLeagueKey)
-  );
-  const expansionItems = section.expansionItems?.filter(
-    (item) => !item.grarfLeagueKey || !excludeLeagueKeys.has(item.grarfLeagueKey)
-  );
-  if (items.length === 0 && !(expansionItems?.length ?? 0)) return null;
-  return {
-    ...section,
-    items,
-    expansionItems: expansionItems?.length ? expansionItems : void 0
-  };
-}
-function resolveUpcomingTodayGrarfLeagueKeys(mergedLeagues) {
-  const keys = [];
-  const seen = /* @__PURE__ */ new Set();
-  for (const leagueKey of [
-    ...getOperationalSlateLeagueOrder(),
-    ...OPERATIONAL_ADJUNCT_LEAGUE_KEYS
-  ]) {
-    if (seen.has(leagueKey)) continue;
-    const upcoming = filterGamesSpineSlateForTodayUpcoming(mergedLeagues[leagueKey] ?? []);
-    if (upcoming.length === 0) continue;
-    seen.add(leagueKey);
-    keys.push(leagueKey);
-  }
-  return keys;
-}
-function resolveHomeDesktopObjectsSpineNowLeagueNavSections(mergedLeagues) {
-  const liveLeagueKeys = resolveCurrentlyLiveGamesSpineLeagueKeys(mergedLeagues);
-  const items = buildLeagueDirectoryNavItemsForGrarfLeagueKeys(
-    liveLeagueKeys,
-    mergedLeagues,
-    "on-today"
-  );
-  if (items.length === 0) return [];
-  return [{ ...ON_TODAY_SECTION, items, hideHeader: true }];
-}
-function resolveHomeDesktopObjectsSpineComingUpLeagueNavSections(mergedLeagues) {
-  const upcomingTodayKeys = new Set(resolveUpcomingTodayGrarfLeagueKeys(mergedLeagues));
-  const upcomingTodayItems = buildLeagueDirectoryNavItemsForGrarfLeagueKeys(
-    [...upcomingTodayKeys],
-    mergedLeagues,
-    "on-today"
-  );
-  const fullSections = resolveLeagueDirectoryNavSections(mergedLeagues);
-  const otherCoveredSections = [];
-  for (const section of fullSections) {
-    if (section.id === "on-today") continue;
-    const filtered = filterDirectorySectionItems(section, upcomingTodayKeys);
-    if (filtered) otherCoveredSections.push(filtered);
-  }
-  const sections = [];
-  if (upcomingTodayItems.length > 0) {
-    sections.push({ ...ON_TODAY_SECTION, items: upcomingTodayItems });
-  }
-  sections.push(...otherCoveredSections);
-  return sections;
-}
-var ON_TODAY_SECTION;
-var init_resolveHomeDesktopObjectsSpineTemporalLeagueNavSections = __esm({
-  "../grarf/desktop/src/lib/home/resolveHomeDesktopObjectsSpineTemporalLeagueNavSections.ts"() {
-    init_define_import_meta_env();
-    init_gamesColumnLeagues();
-    init_gamesSpineOperationalDate();
-    init_resolveCurrentlyLiveGamesSpineLeagues();
-    init_resolveLeagueDirectoryNavSections();
-    init_resolveOnTodayNavItems();
-    ON_TODAY_SECTION = {
-      id: "on-today",
-      title: "ON TODAY",
-      items: []
-    };
   }
 });
 
@@ -51248,7 +50711,7 @@ function isHomeLeagueWorkspaceHubId(id) {
   return HUB_ID_SET.has(id);
 }
 function resolveHomeLeagueWorkspaceHubIdFromItem(item) {
-  if (item.id === "home" || item.route === "/") return null;
+  if (item.id === "home" || item.id === "all" || item.route === "/") return null;
   const hubId = item.route.replace(/^\//, "");
   return isHomeLeagueWorkspaceHubId(hubId) ? hubId : null;
 }
@@ -51435,6 +50898,53 @@ var init_homeLeagueWorkspaceHubRegistry = __esm({
   }
 });
 
+// ../grarf/desktop/src/lib/navigation/resolveDesktopAllScopeLeagueDirectoryItem.ts
+function gameIdFromPath(pathname) {
+  if (!pathname.startsWith("/game/")) return null;
+  try {
+    return decodeURIComponent(pathname.slice("/game/".length));
+  } catch {
+    return null;
+  }
+}
+function resolveDesktopAllScopeLeagueDirectoryItem(pathname, leagueWorkspaceId) {
+  if (leagueWorkspaceId) {
+    return resolveLeagueDirectoryItemByHubId(leagueWorkspaceId) ?? null;
+  }
+  const hubId = resolveHomeLeagueWorkspaceHubIdFromRoute(pathname);
+  if (hubId) {
+    return resolveLeagueDirectoryItemByHubId(hubId) ?? null;
+  }
+  const normalized = pathname.replace(/\/+$/, "") || "/";
+  if (normalized === "/") return null;
+  const byRoute = LEAGUE_DIRECTORY_ITEMS.find(
+    (item) => item.id !== "home" && item.route !== "/" && (normalized === item.route || normalized.startsWith(`${item.route}/`))
+  );
+  if (byRoute) return byRoute;
+  const gameId = gameIdFromPath(pathname);
+  if (gameId) {
+    for (const item of LEAGUE_DIRECTORY_ITEMS) {
+      if (item.grarfLeagueKey && gameId.startsWith(`espn-${item.grarfLeagueKey}-`)) {
+        return item;
+      }
+    }
+    const legacyMatch = /^espn-([A-Z0-9_]+)-/.exec(gameId);
+    const leagueKey = legacyMatch?.[1];
+    if (leagueKey) {
+      return LEAGUE_DIRECTORY_ITEMS.find((item) => item.grarfLeagueKey === leagueKey) ?? null;
+    }
+  }
+  return null;
+}
+var init_resolveDesktopAllScopeLeagueDirectoryItem = __esm({
+  "../grarf/desktop/src/lib/navigation/resolveDesktopAllScopeLeagueDirectoryItem.ts"() {
+    init_define_import_meta_env();
+    init_leagueDirectoryV1();
+    init_resolveLeagueDirectoryNavItemLogo();
+    init_homeLeagueWorkspaceHubRegistry();
+  }
+});
+
 // ../grarf/desktop/src/types/centerPaneApplicationMode.ts
 function isCenterPaneApplicationMode(value) {
   return CENTER_PANE_MODE_SET.has(value);
@@ -51496,6 +51006,571 @@ var init_resolveCenterPaneApplicationModeFromPath = __esm({
     init_homeLeagueWorkspaceHubRegistry();
     init_centerPaneApplicationMode();
     WEBAPP_HOME_ENTRY_TAIL_SEGMENTS = /* @__PURE__ */ new Set(["webapp", "webapp.html"]);
+  }
+});
+
+// ../grarf/desktop/src/lib/home/buildCenterPaneApplicationModePath.ts
+function buildCenterPaneApplicationModePath(pathname, mode) {
+  const segment = CENTER_PANE_APPLICATION_MODE_ROUTES[mode];
+  const segments = pathname.replace(/\/+$/, "").split("/").filter(Boolean);
+  const last = segments[segments.length - 1];
+  if (last && isCenterPaneApplicationMode(last)) {
+    segments[segments.length - 1] = segment;
+    return `/${segments.join("/")}`;
+  }
+  if (isWebappHomeEntryPath(pathname)) return `/${segment}`;
+  if (segments.length === 0) return `/${segment}`;
+  return `/${segments.join("/")}/${segment}`;
+}
+var init_buildCenterPaneApplicationModePath = __esm({
+  "../grarf/desktop/src/lib/home/buildCenterPaneApplicationModePath.ts"() {
+    init_define_import_meta_env();
+    init_centerPaneApplicationMode();
+    init_resolveCenterPaneApplicationModeFromPath();
+  }
+});
+
+// ../grarf/desktop/src/lib/navigation/resolveLeagueNavActivityStatuses.ts
+function resolveActivityBucketStatus(game) {
+  if (game.status === "final") return "final";
+  if (isGameActivelyLive(game)) return "live";
+  return "scheduled";
+}
+function buildActivityTallyStatusesByBucket(statuses) {
+  let finalCount = 0;
+  let liveCount = 0;
+  let scheduledCount = 0;
+  for (const status of statuses) {
+    if (status === "final") finalCount++;
+    else if (status === "live") liveCount++;
+    else if (status === "scheduled") scheduledCount++;
+  }
+  return [
+    ...Array(finalCount).fill("final"),
+    ...Array(liveCount).fill("live"),
+    ...Array(scheduledCount).fill("scheduled")
+  ];
+}
+function resolveLeagueNavActivityStatusesByLeague(mergedLeagues) {
+  const out = /* @__PURE__ */ new Map();
+  for (const leagueKey of getOperationalSlateLeagueOrder()) {
+    const slate = filterGamesSpineSlateForOperationalSportsDay(mergedLeagues[leagueKey] ?? []);
+    if (slate.length === 0) continue;
+    out.set(
+      leagueKey,
+      buildActivityTallyStatusesByBucket(slate.map((game) => resolveActivityBucketStatus(game)))
+    );
+  }
+  return out;
+}
+var init_resolveLeagueNavActivityStatuses = __esm({
+  "../grarf/desktop/src/lib/navigation/resolveLeagueNavActivityStatuses.ts"() {
+    init_define_import_meta_env();
+    init_gamesColumnLeagues();
+    init_gamesSpineOperationalDate();
+    init_isGameActivelyLive();
+  }
+});
+
+// ../grarf/desktop/src/lib/navigation/filterLeagueDirectoryNavSections.ts
+function leagueMatchesSearchQuery(item, normalizedQuery) {
+  return item.label.toLowerCase().includes(normalizedQuery);
+}
+function filterLeagueDirectoryNavSections(sections, query) {
+  const normalizedQuery = query.trim().toLowerCase();
+  if (!normalizedQuery) {
+    return { sections: [...sections], searchActive: false, hasMatches: true };
+  }
+  const filteredSections = [];
+  for (const section of sections) {
+    const matchingItems = [...section.items, ...section.expansionItems ?? []].filter(
+      (item) => leagueMatchesSearchQuery(item, normalizedQuery)
+    );
+    if (matchingItems.length === 0) continue;
+    filteredSections.push({
+      ...section,
+      items: matchingItems,
+      expansionItems: void 0
+    });
+  }
+  return {
+    sections: filteredSections,
+    searchActive: true,
+    hasMatches: filteredSections.length > 0
+  };
+}
+var init_filterLeagueDirectoryNavSections = __esm({
+  "../grarf/desktop/src/lib/navigation/filterLeagueDirectoryNavSections.ts"() {
+    init_define_import_meta_env();
+  }
+});
+
+// ../grarf/desktop/src/lib/liveTracker/liveTrackerFeedRegistry.ts
+function getLiveTrackerFeedRegistry() {
+  return LIVE_TRACKER_FEED_REGISTRY;
+}
+function resolveLiveTrackerFeedForLeague(league2, options) {
+  const base = FEED_BY_LEAGUE.get(league2) ?? null;
+  if (!base) return null;
+  if (league2 !== "PGA" || !options?.leagueGames?.length) return base;
+  if (!options.leagueGames.some((game) => isPgaTourOpenChampionshipEvent(game.league, game.awayTeam))) {
+    return base;
+  }
+  return {
+    ...base,
+    feedUrl: PGA_OPEN_LIVE_TRACKER_FEED_URL,
+    feedId: LIVE_TRACKER_PGA_OPEN_FEED_ID,
+    label: "The Open"
+  };
+}
+function hasLiveTrackerFeedForLeague(league2) {
+  return FEED_BY_LEAGUE.has(league2);
+}
+var PGA_OPEN_LIVE_TRACKER_FEED_URL, LIVE_TRACKER_PGA_OPEN_FEED_ID, LIVE_TRACKER_FEED_REGISTRY, FEED_BY_LEAGUE;
+var init_liveTrackerFeedRegistry = __esm({
+  "../grarf/desktop/src/lib/liveTracker/liveTrackerFeedRegistry.ts"() {
+    init_define_import_meta_env();
+    init_golfWatchUrls2();
+    PGA_OPEN_LIVE_TRACKER_FEED_URL = "https://rss.app/feeds/c5Qh50PZLWqipg06.xml";
+    LIVE_TRACKER_PGA_OPEN_FEED_ID = "live-tracker-pga-open";
+    LIVE_TRACKER_FEED_REGISTRY = [
+      {
+        league: "MLB",
+        feedUrl: "https://rss.app/feeds/5I56VczaapQkNeCM.xml",
+        feedId: "live-tracker-mlb",
+        label: "MLB"
+      },
+      {
+        // X list: https://x.com/i/lists/2064767015949140226
+        league: "WNBA",
+        feedUrl: "https://rss.app/feeds/kYrwY6Duh0BEjQbr.xml",
+        feedId: "live-tracker-wnba",
+        label: "WNBA"
+      },
+      {
+        league: "NBASUMMER",
+        feedUrl: "https://rss.app/feeds/_tDZBj2VkDPknIrxv.xml",
+        feedId: "live-tracker-nbasummer",
+        label: "NBA Summer League"
+      },
+      {
+        league: "WORLDCUP",
+        feedUrl: "https://rss.app/feeds/i0RTt434yrat6hLW.xml",
+        feedId: "live-tracker-worldcup",
+        label: "FIFA World Cup"
+      },
+      {
+        league: "AFL",
+        feedUrl: "https://rss.app/feeds/jOSGNaMf3d3RSyr4.xml",
+        feedId: "live-tracker-afl",
+        label: "AFL"
+      },
+      {
+        league: "ATP",
+        feedUrl: "https://rss.app/feeds/_S4dxUWMNemGKdqB5.xml",
+        feedId: "live-tracker-atp",
+        label: "ATP"
+      },
+      {
+        league: "WTA",
+        feedUrl: "https://rss.app/feeds/_S4dxUWMNemGKdqB5.xml",
+        feedId: "live-tracker-wta",
+        label: "WTA"
+      },
+      {
+        league: "LPGA",
+        feedUrl: "https://rss.app/feeds/k44KVdVjc2ESKRIz.xml",
+        feedId: "live-tracker-lpga",
+        label: "LPGA"
+      },
+      {
+        league: "PGA",
+        feedUrl: "https://rss.app/feeds/isFH44Vg5V7wBj4x.xml",
+        feedId: "live-tracker-pga",
+        label: "PGA Tour"
+      },
+      {
+        league: "F1",
+        feedUrl: "https://rss.app/feeds/AWcSHm2UvsyooZd3.xml",
+        feedId: "live-tracker-f1",
+        label: "Formula 1"
+      },
+      {
+        league: "INDYCAR",
+        feedUrl: "https://rss.app/feeds/P1rkzScNrWflwYgk.xml",
+        feedId: "live-tracker-indycar",
+        label: "IndyCar"
+      },
+      {
+        league: "TDF",
+        feedUrl: "https://rss.app/feeds/E9kvtXBnSJECIOOZ.xml",
+        feedId: "live-tracker-tdf",
+        label: "Tour de France"
+      },
+      {
+        league: "GT_WORLD_CHALLENGE",
+        feedUrl: "https://rss.app/feeds/_hM2icu7rxpN7XUsq.xml",
+        feedId: "live-tracker-gt-world-challenge",
+        label: "GT World"
+      },
+      {
+        league: "LIGAMX",
+        feedUrl: "https://rss.app/feeds/XT9ITsZ6kSXIcLYF.xml",
+        feedId: "live-tracker-ligamx",
+        label: "Liga MX"
+      },
+      {
+        league: "BRA1",
+        feedUrl: "https://rss.app/feeds/WsqAILI0XmBomTWX.xml",
+        feedId: "live-tracker-bra1",
+        label: "Brasileirao"
+      },
+      {
+        league: "SUDAMERICANA",
+        feedUrl: "https://rss.app/feeds/T385BF9vEoXXHkqL.xml",
+        feedId: "live-tracker-sudamericana",
+        label: "Copa Sudamericana"
+      },
+      {
+        league: "ARG1",
+        feedUrl: "https://rss.app/feeds/i5QmuX2IX3jivxen.xml",
+        feedId: "live-tracker-arg1",
+        label: "LPF"
+      },
+      {
+        league: "MLS",
+        feedUrl: "https://rss.app/feeds/3F355cjf7OMwp2dF.xml",
+        feedId: "live-tracker-mls",
+        label: "MLS"
+      },
+      {
+        league: "UFC",
+        feedUrl: "https://rss.app/feeds/DQ8yGfZd9upXVYCj.xml",
+        feedId: "live-tracker-ufc",
+        label: "UFC"
+      },
+      {
+        league: "UELQ",
+        feedUrl: "https://rss.app/feeds/k3hUQlu10jPCQmZ3.xml",
+        feedId: "live-tracker-uelq",
+        label: "UELQ"
+      },
+      {
+        league: "UECLQ",
+        feedUrl: "https://rss.app/feeds/T0C96SZLx5G4Sl4D.xml",
+        feedId: "live-tracker-ueclq",
+        label: "UECLQ"
+      },
+      {
+        league: "UECL",
+        feedUrl: "https://rss.app/feeds/T0C96SZLx5G4Sl4D.xml",
+        feedId: "live-tracker-uecl",
+        label: "UECL"
+      }
+    ];
+    FEED_BY_LEAGUE = new Map(
+      LIVE_TRACKER_FEED_REGISTRY.map((entry2) => [entry2.league, entry2])
+    );
+  }
+});
+
+// ../grarf/desktop/src/lib/gamesSpine/operationalManualLeagueGames.ts
+var init_operationalManualLeagueGames = __esm({
+  "../grarf/desktop/src/lib/gamesSpine/operationalManualLeagueGames.ts"() {
+    init_define_import_meta_env();
+    init_gamesSpine();
+  }
+});
+
+// ../grarf/desktop/src/lib/liveTracker/liveTrackerLeagueRetention.ts
+function resolveLiveTrackerGameCompletionMs(game, retainedAtById) {
+  const observationMs = resolveLiveTrackerFinalObservationMs(game, retainedAtById);
+  if (observationMs != null) return observationMs;
+  if (game.startTimeMs != null && Number.isFinite(game.startTimeMs) && game.startTimeMs > 0) {
+    return game.startTimeMs;
+  }
+  return 0;
+}
+function resolveLiveTrackerFinalObservationMs(game, retainedAtById) {
+  const lastUpdated = game.lastUpdated?.trim();
+  if (lastUpdated) {
+    const parsed = Date.parse(lastUpdated);
+    if (Number.isFinite(parsed) && parsed > 0) return parsed;
+  }
+  const retainedAt = retainedAtById[game.id];
+  if (retainedAt != null && Number.isFinite(retainedAt) && retainedAt > 0) {
+    return retainedAt;
+  }
+  return null;
+}
+function wasLiveTrackerLiveGame(game) {
+  return game.status === "live" || isGameActivelyLive(game);
+}
+function collectLeagueGamesWithRetainedFinals(league2, leagues, retainedFinals) {
+  const byId = /* @__PURE__ */ new Map();
+  for (const game of leagues[league2] ?? []) {
+    byId.set(game.id, game);
+  }
+  for (const game of retainedFinals) {
+    if ((game.league ?? "MLB") !== league2) continue;
+    if (!byId.has(game.id)) byId.set(game.id, game);
+  }
+  return [...byId.values()];
+}
+function collectSpineLeaguesGamesWithRetainedFinals(spineLeagues, leagues, retainedFinals) {
+  const byId = /* @__PURE__ */ new Map();
+  for (const league2 of spineLeagues) {
+    for (const game of collectLeagueGamesWithRetainedFinals(league2, leagues, retainedFinals)) {
+      byId.set(game.id, game);
+    }
+  }
+  return [...byId.values()];
+}
+function updateLeagueRetentionCompletedAtMs(input) {
+  const { league: league2, games, previousGamesById: previousGamesById3, nowMs } = input;
+  if (games.some(isGameActivelyLive)) {
+    return void 0;
+  }
+  let completedAtMs = input.existingCompletedAtMs;
+  for (const game of games) {
+    if (game.status !== "final") continue;
+    const previous = previousGamesById3.get(game.id);
+    if (!previous || !wasLiveTrackerLiveGame(previous)) continue;
+    completedAtMs = completedAtMs == null ? nowMs : Math.max(completedAtMs, nowMs);
+  }
+  for (const previous of previousGamesById3.values()) {
+    if ((previous.league ?? "MLB") !== league2 || !wasLiveTrackerLiveGame(previous)) continue;
+    const current = games.find((game) => game.id === previous.id);
+    if (current && wasLiveTrackerLiveGame(current)) continue;
+    if (current?.status === "final") {
+      completedAtMs = completedAtMs == null ? nowMs : Math.max(completedAtMs, nowMs);
+      continue;
+    }
+    completedAtMs = completedAtMs == null ? nowMs : Math.max(completedAtMs, nowMs);
+  }
+  if (completedAtMs == null) return void 0;
+  if (nowMs - completedAtMs >= LIVE_TRACKER_LEAGUE_RETENTION_MS) return void 0;
+  return completedAtMs;
+}
+function isLeagueWithinRetentionWindow(completedAtMs, nowMs = Date.now()) {
+  if (completedAtMs == null || !Number.isFinite(completedAtMs) || completedAtMs <= 0) {
+    return false;
+  }
+  return nowMs - completedAtMs < LIVE_TRACKER_LEAGUE_RETENTION_MS;
+}
+function isLeagueWithinRssIngestionWindow(completedAtMs, nowMs = Date.now()) {
+  if (completedAtMs == null || !Number.isFinite(completedAtMs) || completedAtMs <= 0) {
+    return false;
+  }
+  return nowMs - completedAtMs < LIVE_TRACKER_RSS_INGESTION_POST_FINAL_MS;
+}
+function isLeagueActiveForLiveTracker(games, completedAtMs, nowMs = Date.now()) {
+  if (games.some(isGameActivelyLive)) return true;
+  return isLeagueWithinRetentionWindow(completedAtMs, nowMs);
+}
+function isLeagueActiveForLiveTrackerRssIngestion(games, completedAtMs, nowMs = Date.now()) {
+  if (games.some(isGameActivelyLive)) return true;
+  return isLeagueWithinRssIngestionWindow(completedAtMs, nowMs);
+}
+var LIVE_TRACKER_LEAGUE_RETENTION_MS, LIVE_TRACKER_RSS_INGESTION_POST_FINAL_MS;
+var init_liveTrackerLeagueRetention = __esm({
+  "../grarf/desktop/src/lib/liveTracker/liveTrackerLeagueRetention.ts"() {
+    init_define_import_meta_env();
+    init_isGameActivelyLive();
+    LIVE_TRACKER_LEAGUE_RETENTION_MS = 2 * 60 * 60 * 1e3;
+    LIVE_TRACKER_RSS_INGESTION_POST_FINAL_MS = 45 * 60 * 1e3;
+  }
+});
+
+// ../grarf/desktop/src/lib/liveTracker/resolveManualLiveTrackerLeagueGames.ts
+function resolveManualLiveTrackerGrarfLeagueKey(manualLeagueKey) {
+  return MANUAL_LIVE_TRACKER_LEAGUE_KEYS[manualLeagueKey.trim().toLowerCase()] ?? null;
+}
+function resolveManualLiveTrackerGamesByLeague(nowMs = Date.now(), documentOverride) {
+  const now = new Date(nowMs);
+  const document2 = documentOverride !== void 0 ? documentOverride : useGamesSpineManualStore.getState().document;
+  const sections = convertManualGamesSpineDocument(
+    document2,
+    now,
+    getOperationalSportsDayDateKey(now)
+  );
+  const out = /* @__PURE__ */ new Map();
+  for (const section of sections) {
+    const grarfKey = resolveManualLiveTrackerGrarfLeagueKey(section.leagueKey);
+    if (!grarfKey) continue;
+    const games = section.games.map((game) => refreshManualGamesSpineGameIfNeeded(game, now)).map((game) => ({ ...game, league: grarfKey }));
+    if (games.length === 0) continue;
+    const existing = out.get(grarfKey) ?? [];
+    out.set(grarfKey, [...existing, ...games]);
+  }
+  return out;
+}
+function collectLiveTrackerLeagueGames(league2, leagues, retainedFinals, nowMs = Date.now()) {
+  const operational = collectLeagueGamesWithRetainedFinals(league2, leagues, retainedFinals);
+  const adjunct = hasLiveTrackerFeedForLeague(league2) ? resolveManualOperationalLeagueGames(new Date(nowMs))[league2] ?? [] : [];
+  if (adjunct.length > 0) {
+    const seen = new Set(operational.map((game) => game.id));
+    const merged = [...operational];
+    for (const game of adjunct) {
+      if (seen.has(game.id)) continue;
+      seen.add(game.id);
+      merged.push(game);
+    }
+    if (merged.length > 0) return merged;
+  }
+  if (operational.length > 0) return operational;
+  return resolveManualLiveTrackerGamesByLeague(nowMs).get(league2) ?? [];
+}
+var MANUAL_LIVE_TRACKER_LEAGUE_KEYS;
+var init_resolveManualLiveTrackerLeagueGames = __esm({
+  "../grarf/desktop/src/lib/liveTracker/resolveManualLiveTrackerLeagueGames.ts"() {
+    init_define_import_meta_env();
+    init_convertManualGamesSpineDocument();
+    init_operationalManualLeagueGames();
+    init_operationalSlateDate2();
+    init_manualGamesSpineUtils();
+    init_liveTrackerFeedRegistry();
+    init_gamesSpineManualStore();
+    init_liveTrackerLeagueRetention();
+    MANUAL_LIVE_TRACKER_LEAGUE_KEYS = {
+      "gt-world-challenge": "GT_WORLD_CHALLENGE",
+      "wec-spa-24h": "GT_WORLD_CHALLENGE"
+    };
+  }
+});
+
+// ../grarf/desktop/src/lib/liveTracker/resolveCurrentlyLiveGamesSpineLeagues.ts
+function resolveCurrentlyLiveGamesSpineLeagues(leagues) {
+  const liveLeagues = [];
+  for (const league2 of getGamesColumnLeagueOrder()) {
+    const games = leagues[league2] ?? [];
+    const liveGameCount = games.filter(isGameActivelyLive).length;
+    if (liveGameCount > 0) {
+      liveLeagues.push({ league: league2, liveGameCount });
+    }
+  }
+  return liveLeagues;
+}
+function resolveCurrentlyLiveGamesSpineLeagueKeys(leagues) {
+  return resolveCurrentlyLiveGamesSpineLeagues(leagues).map((entry2) => entry2.league);
+}
+function buildLiveTrackerDisplayLeaguesSnapshot(leagues, completedAtMsByLeague, updatedAt = null, nowMs = Date.now(), retainedFinals = []) {
+  const displayLeagues = [];
+  const seenLeagues = /* @__PURE__ */ new Set();
+  for (const league2 of getGamesColumnLeagueOrder()) {
+    if (!hasLiveTrackerFeedForLeague(league2)) continue;
+    const games = collectLiveTrackerLeagueGames(league2, leagues, retainedFinals, nowMs);
+    if (!isLeagueActiveForLiveTracker(games, completedAtMsByLeague[league2], nowMs)) continue;
+    seenLeagues.add(league2);
+    displayLeagues.push({
+      league: league2,
+      liveGameCount: games.filter(isGameActivelyLive).length
+    });
+  }
+  const manualGamesByLeague = resolveManualLiveTrackerGamesByLeague(nowMs);
+  for (const feed of getLiveTrackerFeedRegistry()) {
+    if (seenLeagues.has(feed.league)) continue;
+    const games = manualGamesByLeague.get(feed.league);
+    if (!games?.length) continue;
+    if (!isLeagueActiveForLiveTracker(games, completedAtMsByLeague[feed.league], nowMs)) continue;
+    seenLeagues.add(feed.league);
+    displayLeagues.push({
+      league: feed.league,
+      liveGameCount: games.filter(isGameActivelyLive).length
+    });
+  }
+  return {
+    leagues: displayLeagues,
+    leagueKeys: displayLeagues.map((entry2) => entry2.league),
+    updatedAt
+  };
+}
+var init_resolveCurrentlyLiveGamesSpineLeagues = __esm({
+  "../grarf/desktop/src/lib/liveTracker/resolveCurrentlyLiveGamesSpineLeagues.ts"() {
+    init_define_import_meta_env();
+    init_gamesColumnLeagues();
+    init_liveTrackerFeedRegistry();
+    init_resolveManualLiveTrackerLeagueGames();
+    init_liveTrackerLeagueRetention();
+    init_isGameActivelyLive();
+  }
+});
+
+// ../grarf/desktop/src/lib/home/resolveHomeDesktopObjectsSpineTemporalLeagueNavSections.ts
+function filterDirectorySectionItems(section, excludeLeagueKeys) {
+  const items = section.items.filter(
+    (item) => !item.grarfLeagueKey || !excludeLeagueKeys.has(item.grarfLeagueKey)
+  );
+  const expansionItems = section.expansionItems?.filter(
+    (item) => !item.grarfLeagueKey || !excludeLeagueKeys.has(item.grarfLeagueKey)
+  );
+  if (items.length === 0 && !(expansionItems?.length ?? 0)) return null;
+  return {
+    ...section,
+    items,
+    expansionItems: expansionItems?.length ? expansionItems : void 0
+  };
+}
+function resolveUpcomingTodayGrarfLeagueKeys(mergedLeagues) {
+  const keys = [];
+  const seen = /* @__PURE__ */ new Set();
+  for (const leagueKey of [
+    ...getOperationalSlateLeagueOrder(),
+    ...OPERATIONAL_ADJUNCT_LEAGUE_KEYS
+  ]) {
+    if (seen.has(leagueKey)) continue;
+    const upcoming = filterGamesSpineSlateForTodayUpcoming(mergedLeagues[leagueKey] ?? []);
+    if (upcoming.length === 0) continue;
+    seen.add(leagueKey);
+    keys.push(leagueKey);
+  }
+  return keys;
+}
+function resolveHomeDesktopObjectsSpineNowLeagueNavSections(mergedLeagues) {
+  const liveLeagueKeys = resolveCurrentlyLiveGamesSpineLeagueKeys(mergedLeagues);
+  const items = buildLeagueDirectoryNavItemsForGrarfLeagueKeys(
+    liveLeagueKeys,
+    mergedLeagues,
+    "on-today"
+  );
+  if (items.length === 0) return [];
+  return [{ ...ON_TODAY_SECTION, items, hideHeader: true }];
+}
+function resolveHomeDesktopObjectsSpineComingUpLeagueNavSections(mergedLeagues) {
+  const upcomingTodayKeys = new Set(resolveUpcomingTodayGrarfLeagueKeys(mergedLeagues));
+  const upcomingTodayItems = buildLeagueDirectoryNavItemsForGrarfLeagueKeys(
+    [...upcomingTodayKeys],
+    mergedLeagues,
+    "on-today"
+  );
+  const fullSections = resolveLeagueDirectoryNavSections(mergedLeagues);
+  const otherCoveredSections = [];
+  for (const section of fullSections) {
+    if (section.id === "on-today") continue;
+    const filtered = filterDirectorySectionItems(section, upcomingTodayKeys);
+    if (filtered) otherCoveredSections.push(filtered);
+  }
+  const sections = [];
+  if (upcomingTodayItems.length > 0) {
+    sections.push({ ...ON_TODAY_SECTION, items: upcomingTodayItems });
+  }
+  sections.push(...otherCoveredSections);
+  return sections;
+}
+var ON_TODAY_SECTION;
+var init_resolveHomeDesktopObjectsSpineTemporalLeagueNavSections = __esm({
+  "../grarf/desktop/src/lib/home/resolveHomeDesktopObjectsSpineTemporalLeagueNavSections.ts"() {
+    init_define_import_meta_env();
+    init_gamesColumnLeagues();
+    init_gamesSpineOperationalDate();
+    init_resolveCurrentlyLiveGamesSpineLeagues();
+    init_resolveLeagueDirectoryNavSections();
+    init_resolveOnTodayNavItems();
+    ON_TODAY_SECTION = {
+      id: "on-today",
+      title: "ON TODAY",
+      items: []
+    };
   }
 });
 
@@ -52094,27 +52169,6 @@ var init_openGamesSpinePermanentLeagueWorkspace = __esm({
   }
 });
 
-// ../grarf/desktop/src/lib/home/buildCenterPaneApplicationModePath.ts
-function buildCenterPaneApplicationModePath(pathname, mode) {
-  const segment = CENTER_PANE_APPLICATION_MODE_ROUTES[mode];
-  const segments = pathname.replace(/\/+$/, "").split("/").filter(Boolean);
-  const last = segments[segments.length - 1];
-  if (last && isCenterPaneApplicationMode(last)) {
-    segments[segments.length - 1] = segment;
-    return `/${segments.join("/")}`;
-  }
-  if (isWebappHomeEntryPath(pathname)) return `/${segment}`;
-  if (segments.length === 0) return `/${segment}`;
-  return `/${segments.join("/")}/${segment}`;
-}
-var init_buildCenterPaneApplicationModePath = __esm({
-  "../grarf/desktop/src/lib/home/buildCenterPaneApplicationModePath.ts"() {
-    init_define_import_meta_env();
-    init_centerPaneApplicationMode();
-    init_resolveCenterPaneApplicationModeFromPath();
-  }
-});
-
 // ../grarf/desktop/src/lib/home/deriveOperationalModeFromCenterPaneApplicationMode.ts
 function deriveOperationalModeFromCenterPaneApplicationMode(mode) {
   if (mode === "sportscape") return "CATCH_UP";
@@ -52191,28 +52245,28 @@ function measureLongestLabelPx(container) {
   }
   return Math.max(max, container.scrollWidth);
 }
-function gameIdFromPath(pathname) {
-  if (!pathname.startsWith("/game/")) return null;
-  try {
-    return decodeURIComponent(pathname.slice("/game/".length));
-  } catch {
-    return null;
+function isSameApplicationScopeLeague(activeScope, item) {
+  if (activeScope.id === item.id) return true;
+  if (activeScope.grarfLeagueKey && item.grarfLeagueKey && activeScope.grarfLeagueKey === item.grarfLeagueKey) {
+    return true;
   }
+  const activeHub = resolveHomeLeagueWorkspaceHubIdFromItem(activeScope);
+  const itemHub = resolveHomeLeagueWorkspaceHubIdFromItem(item);
+  return Boolean(activeHub && itemHub && activeHub === itemHub);
 }
-function isDirectoryItemActive(item, pathname, homeMode, leagueWorkspaceId) {
-  const hubId = resolveHomeLeagueWorkspaceHubIdFromItem(item);
-  if (hubId && leagueWorkspaceId === hubId) {
-    return pathname === "/" && homeMode === "home";
+function isDirectoryItemActive(item, pathname, _homeMode, leagueWorkspaceId) {
+  const activeScope = resolveDesktopAllScopeLeagueDirectoryItem(pathname, leagueWorkspaceId);
+  if (item.id === "all") {
+    return activeScope == null;
   }
-  if (item.route === "/") {
-    return pathname === "/" && homeMode === "home" && leagueWorkspaceId == null;
+  if (!activeScope) return false;
+  return isSameApplicationScopeLeague(activeScope, item);
+}
+function persistApplicationScopeFromDirectoryItem(item) {
+  const hubId = resolveHomeLeagueWorkspaceHubIdFromItem(item) ?? (item.grarfLeagueKey ? resolveHomeLeagueWorkspaceHubIdFromGrarfLeagueKey(item.grarfLeagueKey) : null);
+  if (hubId) {
+    useHomeLeagueWorkspaceStore.getState().setActiveId(hubId);
   }
-  if (pathname === item.route) return true;
-  if (item.grarfLeagueKey) {
-    const gid = gameIdFromPath(pathname);
-    if (gid && gid.startsWith(`espn-${item.grarfLeagueKey}-`)) return true;
-  }
-  return false;
 }
 function isUtilityActive(item, pathname, homeMode, centerPaneMode, liveSubmenuId, leagueWorkspaceId) {
   if (item.id === "fantasy" && isGrarfWebRenderer()) {
@@ -52290,6 +52344,7 @@ function DirectoryNavRow({
   onGatedLeagueActivate,
   onLeagueWorkspaceActivate,
   onActivate,
+  onScopeSelect,
   objectsSpineSelectionMode,
   forceActivityIndicators = false
 }) {
@@ -52346,7 +52401,10 @@ function DirectoryNavRow({
       "button",
       {
         type: "button",
-        onClick: () => onLeagueWorkspaceActivate?.(leagueHubId),
+        onClick: () => {
+          onScopeSelect?.(item);
+          onLeagueWorkspaceActivate?.(leagueHubId);
+        },
         title: item.label,
         className: rowClassName,
         children: content
@@ -52365,13 +52423,19 @@ function DirectoryNavRow({
       }
     );
   }
+  if (item.id === "all" && onActivate) {
+    return /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("button", { type: "button", onClick: onActivate, title: item.label, className: rowClassName, children: content });
+  }
   return /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(
     Link,
     {
       to: item.route,
       title: item.label,
       className: rowClassName,
-      onClick: () => onActivate?.(),
+      onClick: () => {
+        onScopeSelect?.(item);
+        onActivate?.();
+      },
       children: content
     }
   );
@@ -52411,6 +52475,7 @@ function DirectoryNavSection({
   gateLeagueNav,
   onGatedLeagueActivate,
   onLeagueWorkspaceActivate,
+  onScopeSelect,
   leagueWorkspaceId,
   objectsSpineSelectionMode,
   forceActivityIndicators = false
@@ -52450,6 +52515,7 @@ function DirectoryNavSection({
           showGatedLockIcon: resolveItemGatedLockIcon(item.id),
           onGatedLeagueActivate,
           onLeagueWorkspaceActivate,
+          onScopeSelect,
           activityStatuses: section.id === "on-today" && item.grarfLeagueKey ? onTodayActivityByLeague?.get(item.grarfLeagueKey) : void 0,
           objectsSpineSelectionMode: objectsSpineSelectionMode ? { onSelectLeague: objectsSpineSelectionMode.onSelectLeague } : void 0,
           forceActivityIndicators
@@ -52475,6 +52541,7 @@ function DirectoryNavSection({
           showGatedLockIcon: resolveItemGatedLockIcon(item.id),
           onGatedLeagueActivate,
           onLeagueWorkspaceActivate,
+          onScopeSelect,
           objectsSpineSelectionMode: objectsSpineSelectionMode ? { onSelectLeague: objectsSpineSelectionMode.onSelectLeague } : void 0,
           forceActivityIndicators
         },
@@ -52510,6 +52577,19 @@ function AppLeftNav({
       navigate(targetPath);
     }
   }, [navigate, pathname, setHomeShellMode]);
+  const activateAllApplicationScope = (0, import_react20.useCallback)(() => {
+    const activeLeagueWorkspaceId = useHomeLeagueWorkspaceStore.getState().activeId;
+    if (activeLeagueWorkspaceId == null && resolveDesktopAllScopeLeagueDirectoryItem(pathname, null) == null) {
+      return;
+    }
+    closeHomeLeagueWorkspace();
+    if (resolveDesktopAllScopeLeagueDirectoryItem(pathname, null) == null) return;
+    const mode = useCenterPaneApplicationModeStore.getState().mode;
+    const targetPath = buildCenterPaneApplicationModePath("/", mode);
+    if (pathname !== targetPath) {
+      navigate(targetPath, { replace: true });
+    }
+  }, [navigate, pathname]);
   const activateLeagueWorkspace = (0, import_react20.useCallback)(
     (hubId) => {
       setHomeShellMode("home");
@@ -52558,14 +52638,14 @@ function AppLeftNav({
   const showLeagueSearchInMainMenu = gateLeagueNav && !sidebarCollapsed && !showLeagueSearchInSpineHeader;
   const menuLabels = (0, import_react20.useMemo)(
     () => [
-      ...leagueSearchActive || objectsSpineTemporalLeagueList === "now" || hideHomeDirectoryRow ? [] : [LEAGUE_DIRECTORY_HOME.label],
+      ...leagueSearchActive || objectsSpineTemporalLeagueList === "now" ? [] : [LEAGUE_DIRECTORY_ALL.label],
       ...visibleLeagueDirectorySections.flatMap(
         (section) => section.items.map((item) => resolveMainMenuLeagueDirectoryLabel(item))
       ),
       "FANTASY",
       "BETTING"
     ],
-    [hideHomeDirectoryRow, leagueSearchActive, objectsSpineTemporalLeagueList, visibleLeagueDirectorySections]
+    [leagueSearchActive, objectsSpineTemporalLeagueList, visibleLeagueDirectorySections]
   );
   const [expandedWidthPx, setExpandedWidthPx] = (0, import_react20.useState)(DESKTOP_LEAGUE_NAV_EXPANDED_MIN_WIDTH_PX);
   const remeasure = (0, import_react20.useCallback)(() => {
@@ -52684,18 +52764,18 @@ function AppLeftNav({
                 ),
                 showNoLeagueSearchMatches ? /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("p", { className: "pt-1 font-mono text-[10px] tracking-[0.08em] text-textdim/80", children: "No leagues found" }) : null
               ] }) : null,
-              !leagueSearchActive && objectsSpineTemporalLeagueList !== "now" && !hideHomeDirectoryRow ? /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(
+              !leagueSearchActive && objectsSpineTemporalLeagueList !== "now" ? /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(
                 DirectoryNavRow,
                 {
-                  item: LEAGUE_DIRECTORY_HOME,
+                  item: LEAGUE_DIRECTORY_ALL,
                   active: isDirectoryItemActive(
-                    LEAGUE_DIRECTORY_HOME,
+                    LEAGUE_DIRECTORY_ALL,
                     pathname,
                     homeShellMode,
                     leagueWorkspaceId
                   ),
                   sidebarCollapsed,
-                  onActivate: closeHomeLeagueWorkspace
+                  onActivate: activateAllApplicationScope
                 }
               ) : null,
               visibleLeagueDirectorySections.map((section) => /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(
@@ -52711,6 +52791,7 @@ function AppLeftNav({
                   gateLeagueNav,
                   onGatedLeagueActivate: openGatedLeagueModal,
                   onLeagueWorkspaceActivate: activateLeagueWorkspace,
+                  onScopeSelect: persistApplicationScopeFromDirectoryItem,
                   leagueWorkspaceId
                 },
                 section.id
@@ -52869,6 +52950,9 @@ var init_AppLeftNav = __esm({
     init_OnTodayNavRowWithTallies();
     init_desktopMenuLayout();
     init_gamesSpineLeagueLogoUrls();
+    init_resolveDesktopAllScopeLeagueDirectoryItem();
+    init_buildCenterPaneApplicationModePath();
+    init_centerPaneApplicationModeStore();
     init_resolveLeagueNavActivityStatuses();
     init_resolveLeagueDirectoryNavSections();
     init_resolveMainMenuLeagueDirectoryLabel();
@@ -52890,12 +52974,10 @@ var init_AppLeftNav = __esm({
     init_openF1LeagueWorkspace();
     init_openGamesSpinePermanentLeagueWorkspace();
     init_homeLeagueWorkspaceHubRegistry();
-    init_buildCenterPaneApplicationModePath();
     init_openBrowserFantasyInCenterPane();
     init_resolveCenterPaneApplicationModeFromPath();
     init_homeLeagueWorkspaceChrome();
     init_homeLeagueWorkspaceStore();
-    init_centerPaneApplicationModeStore();
     init_homeLiveSubmenuStore();
     init_liveGamesStore();
     import_jsx_runtime16 = __toESM(require_jsx_runtime(), 1);
@@ -53486,13 +53568,11 @@ var init_desktopPrimaryNavigationStore = __esm({
         if (tab === "all") return;
         set({
           activeSelection: { kind: "primary", tab },
-          allScopePanelOpen: false,
           objectsSpineFocus: tab === "catchUp" ? "catchUp" : tab === "now" ? "now" : tab === "today" ? "comingUp" : null
         });
       },
       selectDirectContentTab: (tab) => set({
-        activeSelection: { kind: "direct", tab },
-        allScopePanelOpen: false
+        activeSelection: { kind: "direct", tab }
       }),
       setAllScopePanelOpen: (open) => set({ allScopePanelOpen: open }),
       toggleAllScopePanel: () => set((state3) => ({
@@ -53602,53 +53682,6 @@ var init_applyDesktopPrimaryNavigationSelection = __esm({
     init_homeLiveSubmenuStore();
     init_operationalModeStore();
     init_desktopPrimaryNavigationStore();
-  }
-});
-
-// ../grarf/desktop/src/lib/navigation/resolveDesktopAllScopeLeagueDirectoryItem.ts
-function gameIdFromPath2(pathname) {
-  if (!pathname.startsWith("/game/")) return null;
-  try {
-    return decodeURIComponent(pathname.slice("/game/".length));
-  } catch {
-    return null;
-  }
-}
-function resolveDesktopAllScopeLeagueDirectoryItem(pathname, leagueWorkspaceId) {
-  if (leagueWorkspaceId) {
-    return resolveLeagueDirectoryItemByHubId(leagueWorkspaceId) ?? null;
-  }
-  const hubId = resolveHomeLeagueWorkspaceHubIdFromRoute(pathname);
-  if (hubId) {
-    return resolveLeagueDirectoryItemByHubId(hubId) ?? null;
-  }
-  const normalized = pathname.replace(/\/+$/, "") || "/";
-  if (normalized === "/") return null;
-  const byRoute = LEAGUE_DIRECTORY_ITEMS.find(
-    (item) => item.id !== "home" && item.route !== "/" && (normalized === item.route || normalized.startsWith(`${item.route}/`))
-  );
-  if (byRoute) return byRoute;
-  const gameId = gameIdFromPath2(pathname);
-  if (gameId) {
-    for (const item of LEAGUE_DIRECTORY_ITEMS) {
-      if (item.grarfLeagueKey && gameId.startsWith(`espn-${item.grarfLeagueKey}-`)) {
-        return item;
-      }
-    }
-    const legacyMatch = /^espn-([A-Z0-9_]+)-/.exec(gameId);
-    const leagueKey = legacyMatch?.[1];
-    if (leagueKey) {
-      return LEAGUE_DIRECTORY_ITEMS.find((item) => item.grarfLeagueKey === leagueKey) ?? null;
-    }
-  }
-  return null;
-}
-var init_resolveDesktopAllScopeLeagueDirectoryItem = __esm({
-  "../grarf/desktop/src/lib/navigation/resolveDesktopAllScopeLeagueDirectoryItem.ts"() {
-    init_define_import_meta_env();
-    init_leagueDirectoryV1();
-    init_resolveLeagueDirectoryNavItemLogo();
-    init_homeLeagueWorkspaceHubRegistry();
   }
 });
 
@@ -134884,6 +134917,7 @@ function HomePage() {
   (0, import_react241.useEffect)(() => {
     if (!isHomeOps) return;
     const hubId = isHomeLeagueHubWorkspaceTab(activeContentOverlayWorkspace) ? activeContentOverlayWorkspace.leagueHubId : null;
+    if (!hubId) return;
     const current = useHomeLeagueWorkspaceStore.getState().activeId;
     if (current !== hubId) {
       useHomeLeagueWorkspaceStore.getState().setActiveId(hubId);
