@@ -47858,9 +47858,10 @@ function clampDesktopLeagueNavExpandedWidthPx(measuredPx) {
   );
 }
 function collectDesktopLeagueNavMeasureLabels() {
-  const labels = resolveLeagueDirectoryNavSections({}).flatMap(
-    (section) => section.items.map((item) => resolveMainMenuLeagueDirectoryLabel(item))
-  );
+  const labels = resolveLeagueDirectoryNavSections({}).flatMap((section) => [
+    ...section.items.map((item) => resolveMainMenuLeagueDirectoryLabel(item)),
+    ...(section.expansionItems ?? []).map((item) => resolveMainMenuLeagueDirectoryLabel(item))
+  ]);
   return [...labels, "FANTASY", "BETTING"];
 }
 function measureDesktopLeagueNavExpandedWidthReferencePx() {
@@ -47888,47 +47889,19 @@ function measureDesktopLeagueNavExpandedWidthReferencePx() {
     Math.max(maxLabelPx, DESKTOP_LEAGUE_NAV_EXPANDED_HEADER_MIN_PX)
   );
 }
-function notifyLayoutListeners() {
-  layoutListeners.forEach((listener) => listener());
-}
-function scheduleExpandedWidthFontsProbe() {
-  if (fontsProbeScheduled || typeof document === "undefined") return;
-  fontsProbeScheduled = true;
-  void document.fonts?.ready?.then(() => {
-    if (committedExpandedPanelRightPx !== void 0) return;
-    commitDesktopLeagueNavExpandedPanelRightPx(measureDesktopLeagueNavExpandedWidthReferencePx());
-  });
-}
-function commitDesktopLeagueNavExpandedPanelRightPx(widthPx) {
-  if (committedExpandedPanelRightPx !== void 0 && widthPx <= committedExpandedPanelRightPx) {
-    return;
+function ensureDesktopMenuCatchUpAnchorPx() {
+  if (fixedDesktopMenuCatchUpLeftPx === void 0) {
+    fixedDesktopMenuCatchUpLeftPx = measureDesktopLeagueNavExpandedWidthReferencePx();
   }
-  const changed = committedExpandedPanelRightPx !== widthPx;
-  committedExpandedPanelRightPx = widthPx;
-  cachedDesktopMenuTrailingTabsMarginLeftPx = void 0;
-  if (changed) notifyLayoutListeners();
-}
-function subscribeDesktopMenuTrailingTabsLayout(listener) {
-  layoutListeners.add(listener);
-  return () => layoutListeners.delete(listener);
+  return fixedDesktopMenuCatchUpLeftPx;
 }
 function getDesktopLeagueNavExpandedPanelRightPx() {
-  return committedExpandedPanelRightPx ?? measureDesktopLeagueNavExpandedWidthReferencePx();
+  return ensureDesktopMenuCatchUpAnchorPx();
 }
-function resolveDesktopMenuTrailingTabsMarginLeftPx(expandedPanelRightPx, scopeSelectorWidthPx = DESKTOP_LEAGUE_NAV_MINIMIZED_WIDTH_PX) {
-  return Math.max(
-    0,
-    expandedPanelRightPx - scopeSelectorWidthPx - DESKTOP_MENU_NAV_ITEM_GAP_PX
-  );
+function getDesktopMenuCatchUpLeftPx() {
+  return ensureDesktopMenuCatchUpAnchorPx();
 }
-function getDesktopMenuTrailingTabsMarginLeftPxForScopeSelector(scopeSelectorWidthPx) {
-  scheduleExpandedWidthFontsProbe();
-  return resolveDesktopMenuTrailingTabsMarginLeftPx(
-    getDesktopLeagueNavExpandedPanelRightPx(),
-    scopeSelectorWidthPx
-  );
-}
-var DESKTOP_LEAGUE_NAV_PANEL_BG_CLASS, DESKTOP_LEAGUE_NAV_PANEL_BORDER_CLASS, DESKTOP_MENU_ROW_BOTTOM_BORDER_COLOR_CLASS, DESKTOP_MENU_ROW_BOTTOM_BORDER_CLASS, DESKTOP_ALL_OPEN_OUTLINE_CLASS, DESKTOP_LEAGUE_NAV_MINIMIZED_WIDTH_PX, DESKTOP_LEAGUE_NAV_MINIMIZED_WIDTH_CLASS, DESKTOP_LEAGUE_NAV_EXPANDED_MIN_WIDTH_PX, DESKTOP_LEAGUE_NAV_EXPANDED_MAX_WIDTH_PX, DESKTOP_LEAGUE_NAV_EXPANDED_PAD_PX, DESKTOP_LEAGUE_NAV_EXPANDED_HEADER_MIN_PX, DESKTOP_LEAGUE_NAV_MEASURE_ROW_CLASS, DESKTOP_MENU_NAV_ITEM_GAP_PX, DESKTOP_MENU_PRIMARY_TAB_GAP_CLASS, committedExpandedPanelRightPx, cachedDesktopMenuTrailingTabsMarginLeftPx, fontsProbeScheduled, layoutListeners;
+var DESKTOP_LEAGUE_NAV_PANEL_BG_CLASS, DESKTOP_LEAGUE_NAV_PANEL_BORDER_CLASS, DESKTOP_MENU_ROW_BOTTOM_BORDER_COLOR_CLASS, DESKTOP_MENU_ROW_BOTTOM_BORDER_CLASS, DESKTOP_ALL_OPEN_OUTLINE_CLASS, DESKTOP_LEAGUE_NAV_MINIMIZED_WIDTH_PX, DESKTOP_LEAGUE_NAV_MINIMIZED_WIDTH_CLASS, DESKTOP_LEAGUE_NAV_EXPANDED_MIN_WIDTH_PX, DESKTOP_LEAGUE_NAV_EXPANDED_MAX_WIDTH_PX, DESKTOP_LEAGUE_NAV_EXPANDED_PAD_PX, DESKTOP_LEAGUE_NAV_EXPANDED_HEADER_MIN_PX, DESKTOP_LEAGUE_NAV_MEASURE_ROW_CLASS, DESKTOP_MENU_PRIMARY_TAB_GAP_CLASS, fixedDesktopMenuCatchUpLeftPx;
 var init_desktopMenuLayout = __esm({
   "../grarf/desktop/src/components/shell/desktopMenuLayout.ts"() {
     init_define_import_meta_env();
@@ -47952,10 +47925,7 @@ var init_desktopMenuLayout = __esm({
     DESKTOP_LEAGUE_NAV_EXPANDED_PAD_PX = 18;
     DESKTOP_LEAGUE_NAV_EXPANDED_HEADER_MIN_PX = 44;
     DESKTOP_LEAGUE_NAV_MEASURE_ROW_CLASS = "block whitespace-nowrap px-2 py-1.5 font-mono text-left text-[10px] tracking-[0.12em]";
-    DESKTOP_MENU_NAV_ITEM_GAP_PX = 2;
     DESKTOP_MENU_PRIMARY_TAB_GAP_CLASS = "gap-[2px]";
-    fontsProbeScheduled = false;
-    layoutListeners = /* @__PURE__ */ new Set();
   }
 });
 
@@ -52608,13 +52578,12 @@ function AppLeftNav({
     return width;
   }, []);
   (0, import_react20.useLayoutEffect)(() => {
+    ensureDesktopMenuCatchUpAnchorPx();
     if (sidebarCollapsed) return;
-    const width = remeasure();
-    if (width != null) commitDesktopLeagueNavExpandedPanelRightPx(width);
+    remeasure();
     void document.fonts?.ready?.then(() => {
       if (sidebarCollapsed) return;
-      const nextWidth = remeasure();
-      if (nextWidth != null) commitDesktopLeagueNavExpandedPanelRightPx(nextWidth);
+      remeasure();
     });
   }, [sidebarCollapsed, menuLabels, remeasure]);
   (0, import_react20.useLayoutEffect)(() => {
@@ -52625,7 +52594,12 @@ function AppLeftNav({
     ro2.observe(el);
     return () => ro2.disconnect();
   }, [sidebarCollapsed, remeasure]);
-  const expandedStyle = sidebarCollapsed ? void 0 : { width: expandedWidthPx, minWidth: expandedWidthPx, maxWidth: expandedWidthPx };
+  const expandedPanelWidthPx = getDesktopLeagueNavExpandedPanelRightPx();
+  const expandedStyle = sidebarCollapsed ? void 0 : {
+    width: expandedPanelWidthPx,
+    minWidth: expandedPanelWidthPx,
+    maxWidth: expandedPanelWidthPx
+  };
   return /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)(
     "nav",
     {
@@ -53508,24 +53482,22 @@ var init_desktopPrimaryNavigationStore = __esm({
       allScopePanelOpen: false,
       objectsSpineFocus: "now",
       bootstrapApplied: false,
-      selectPrimaryTab: (tab) => set({
-        activeSelection: { kind: "primary", tab },
-        allScopePanelOpen: tab === "all",
-        objectsSpineFocus: tab === "catchUp" ? "catchUp" : tab === "now" ? "now" : tab === "today" ? "comingUp" : null
-      }),
+      selectPrimaryTab: (tab) => {
+        if (tab === "all") return;
+        set({
+          activeSelection: { kind: "primary", tab },
+          allScopePanelOpen: false,
+          objectsSpineFocus: tab === "catchUp" ? "catchUp" : tab === "now" ? "now" : tab === "today" ? "comingUp" : null
+        });
+      },
       selectDirectContentTab: (tab) => set({
         activeSelection: { kind: "direct", tab },
         allScopePanelOpen: false
       }),
       setAllScopePanelOpen: (open) => set({ allScopePanelOpen: open }),
-      toggleAllScopePanel: () => set((state3) => {
-        const open = !state3.allScopePanelOpen;
-        return {
-          allScopePanelOpen: open,
-          activeSelection: open ? { kind: "primary", tab: "all" } : state3.activeSelection.kind === "primary" && state3.activeSelection.tab === "all" ? { kind: "primary", tab: "now" } : state3.activeSelection,
-          objectsSpineFocus: open ? null : state3.objectsSpineFocus ?? "now"
-        };
-      }),
+      toggleAllScopePanel: () => set((state3) => ({
+        allScopePanelOpen: !state3.allScopePanelOpen
+      })),
       setObjectsSpineFocus: (focus) => set({ objectsSpineFocus: focus }),
       markBootstrapApplied: () => set({ bootstrapApplied: true }),
       resetForTests: () => set({
@@ -53576,14 +53548,14 @@ function applyCenterPaneMode(mode, navigate, pathname) {
   }
 }
 function applyDesktopPrimaryNavTab(tab, navigate, pathname) {
+  if (tab === "all") {
+    useDesktopPrimaryNavigationStore.getState().setAllScopePanelOpen(true);
+    return;
+  }
   useDesktopPrimaryNavigationStore.getState().selectPrimaryTab(tab);
   switch (tab) {
     case "workspaces":
-      useDesktopPrimaryNavigationStore.getState().setAllScopePanelOpen(false);
       applyCenterPaneMode("sportscape", navigate, pathname);
-      return;
-    case "all":
-      useDesktopPrimaryNavigationStore.getState().setAllScopePanelOpen(true);
       return;
     case "catchUp":
       useOperationalModeStore.getState().setModeByUser("CATCH_UP");
@@ -53599,7 +53571,6 @@ function applyDesktopPrimaryNavTab(tab, navigate, pathname) {
       applyCenterPaneMode("sportscape", navigate, pathname);
       return;
     case "browser":
-      useDesktopPrimaryNavigationStore.getState().setAllScopePanelOpen(false);
       applyCenterPaneMode("browser", navigate, pathname);
       useHomeLiveSubmenuStore.getState().setActiveId("livetrack");
       return;
@@ -53741,33 +53712,11 @@ function DesktopPrimaryNavigationBar() {
   const activeSelection = useDesktopPrimaryNavigationStore((s2) => s2.activeSelection);
   const allScopePanelOpen = useDesktopPrimaryNavigationStore((s2) => s2.allScopePanelOpen);
   const scopeButtonRef = (0, import_react23.useRef)(null);
-  const [expandedPanelRightPx, setExpandedPanelRightPx] = (0, import_react23.useState)(
-    () => getDesktopLeagueNavExpandedPanelRightPx()
-  );
-  const [scopeSelectorWidthPx, setScopeSelectorWidthPx] = (0, import_react23.useState)(
-    DESKTOP_LEAGUE_NAV_MINIMIZED_WIDTH_PX
-  );
   (0, import_react23.useLayoutEffect)(() => {
-    return subscribeDesktopMenuTrailingTabsLayout(() => {
-      setExpandedPanelRightPx(getDesktopLeagueNavExpandedPanelRightPx());
-    });
+    ensureDesktopMenuCatchUpAnchorPx();
   }, []);
-  (0, import_react23.useLayoutEffect)(() => {
-    if (!scopeSelectorExpanded) {
-      setScopeSelectorWidthPx(DESKTOP_LEAGUE_NAV_MINIMIZED_WIDTH_PX);
-      return;
-    }
-    const el = scopeButtonRef.current;
-    if (!el) return;
-    const measure = () => setScopeSelectorWidthPx(el.offsetWidth);
-    measure();
-    const ro2 = new ResizeObserver(measure);
-    ro2.observe(el);
-    return () => ro2.disconnect();
-  }, [scopeSelectorExpanded, scopeLeague?.id, scopeLeagueLabel, expandedPanelRightPx]);
-  const trailingTabsMarginLeftPx = getDesktopMenuTrailingTabsMarginLeftPxForScopeSelector(
-    scopeSelectorExpanded ? scopeSelectorWidthPx : DESKTOP_LEAGUE_NAV_MINIMIZED_WIDTH_PX
-  );
+  const catchUpLeftPx = getDesktopMenuCatchUpLeftPx();
+  const expandedPanelRightPx = getDesktopLeagueNavExpandedPanelRightPx();
   (0, import_react23.useEffect)(() => {
     bootstrapDesktopPrimaryNavigation(navigate, pathname);
   }, [navigate, pathname]);
@@ -53788,13 +53737,16 @@ function DesktopPrimaryNavigationBar() {
     [navigate, pathname]
   );
   const isPrimaryActive = (0, import_react23.useCallback)(
-    (tab) => activeSelection.kind === "primary" && activeSelection.tab === tab && (tab !== "all" || allScopePanelOpen),
+    (tab) => {
+      if (tab === "all") return allScopePanelOpen;
+      return activeSelection.kind === "primary" && activeSelection.tab === tab;
+    },
     [activeSelection, allScopePanelOpen]
   );
   return /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)(
     "nav",
     {
-      className: "flex min-w-0 flex-1 items-end gap-0.5 overflow-x-auto overflow-y-hidden overscroll-x-contain",
+      className: "relative flex min-w-0 flex-1 items-end gap-0.5 overflow-x-auto overflow-y-hidden overscroll-x-contain",
       "aria-label": "Desktop primary navigation",
       "data-desktop-primary-navigation": true,
       children: [
@@ -53836,8 +53788,8 @@ function DesktopPrimaryNavigationBar() {
         /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)(
           "div",
           {
-            className: "flex shrink-0 items-stretch gap-0.5",
-            style: { marginLeft: trailingTabsMarginLeftPx },
+            className: "absolute bottom-0 flex shrink-0 items-stretch gap-0.5",
+            style: { left: catchUpLeftPx },
             "data-desktop-trailing-primary-navigation": true,
             children: [
               /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(
@@ -67580,10 +67532,7 @@ function useCenterPaneApplicationModeSync() {
       return;
     }
     if (!OPERATIONAL_AUTO_CENTER_PANE_MODES.has(mode)) return;
-    if (isGrarfElectronRenderer()) {
-      const { activeSelection } = useDesktopPrimaryNavigationStore.getState();
-      if (activeSelection.kind === "primary" && activeSelection.tab !== "all") return;
-    }
+    if (isGrarfElectronRenderer()) return;
     if (isGrarfWebRenderer()) {
       if (source === "explicit" || initialDefaultApplied) return;
       applyInitialDefaultFromGamesSpine(leagues);
@@ -67610,7 +67559,6 @@ var init_useCenterPaneApplicationModeSync = __esm({
     init_deriveOperationalModeFromCenterPaneApplicationMode();
     init_isGrarfWebRenderer();
     init_centerPaneApplicationModeStore();
-    init_desktopPrimaryNavigationStore();
     init_liveGamesStore();
     init_operationalModeStore();
     OPERATIONAL_AUTO_CENTER_PANE_MODES = /* @__PURE__ */ new Set([
