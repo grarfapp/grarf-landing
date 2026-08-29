@@ -17009,16 +17009,68 @@ function collectFinalizedHarvestFromIngestTransition(input) {
   return candidates.map((c) => c.game);
 }
 
+// ../grarf/desktop/src/lib/finalizedGameRetention/gameFinalizationTimestampPersistence.ts
+init_define_import_meta_env();
+var STORAGE_KEY = "grarf-game-finalization-timestamps-v1";
+var memoryStore = {};
+function readAllPersistedFinalizedAtMs() {
+  if (typeof localStorage !== "undefined") {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        const out = {};
+        for (const [gameId, value] of Object.entries(parsed)) {
+          if (typeof value !== "number" || !Number.isFinite(value) || value <= 0) continue;
+          out[gameId] = value;
+        }
+        return out;
+      }
+    } catch {
+    }
+  }
+  return { ...memoryStore };
+}
+function writeAllPersistedFinalizedAtMs(byId) {
+  memoryStore = { ...byId };
+  if (typeof localStorage === "undefined") return;
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(byId));
+  } catch {
+  }
+}
+function readPersistedFinalizedAtMs(gameId) {
+  const trimmed = gameId.trim();
+  if (!trimmed) return void 0;
+  const value = readAllPersistedFinalizedAtMs()[trimmed];
+  if (value == null || !Number.isFinite(value) || value <= 0) return void 0;
+  return value;
+}
+function persistFinalizedAtMsIfAbsent(gameId, finalizedAtMs) {
+  const trimmed = gameId.trim();
+  if (!trimmed || !Number.isFinite(finalizedAtMs) || finalizedAtMs <= 0) return;
+  const byId = readAllPersistedFinalizedAtMs();
+  if (byId[trimmed] != null) return;
+  byId[trimmed] = finalizedAtMs;
+  writeAllPersistedFinalizedAtMs(byId);
+}
+
 // ../grarf/desktop/src/store/recentFinalizedGamesStore.ts
-var STORAGE_KEY = "grarf-recent-finalized-games-v2";
+var STORAGE_KEY2 = "grarf-recent-finalized-games-v2";
+function mergeFinalizedAtMsOntoGame(game, existing) {
+  const finalizedAtMs = existing?.finalizedAtMs ?? game.finalizedAtMs ?? readPersistedFinalizedAtMs(game.id);
+  if (finalizedAtMs == null) return game;
+  if (game.finalizedAtMs === finalizedAtMs) return game;
+  return { ...game, finalizedAtMs };
+}
 function upsertFinals(byId, games, now) {
   const next = { ...byId };
   for (const raw of games) {
     if (raw.status !== "final") continue;
-    const game = copyFinalizedGame(raw);
-    const existing = next[game.id];
+    const existing = next[raw.id];
+    const game = mergeFinalizedAtMsOntoGame(copyFinalizedGame(raw), existing?.game);
     if (existing) {
-      next[game.id] = { ...existing, game };
+      next[raw.id] = { ...existing, game };
       continue;
     }
     const retainedAt = now;
@@ -17033,7 +17085,7 @@ function upsertFinals(byId, games, now) {
 function readPersistedById() {
   if (typeof sessionStorage === "undefined") return {};
   try {
-    const raw = sessionStorage.getItem(STORAGE_KEY);
+    const raw = sessionStorage.getItem(STORAGE_KEY2);
     if (!raw) return {};
     const parsed = JSON.parse(raw);
     return pruneRetainedFinals(parsed);
@@ -17044,7 +17096,7 @@ function readPersistedById() {
 function persistById(byId) {
   if (typeof sessionStorage === "undefined") return;
   try {
-    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(byId));
+    sessionStorage.setItem(STORAGE_KEY2, JSON.stringify(byId));
   } catch {
   }
 }
@@ -19801,6 +19853,74 @@ function preserveMlbTeamStandingsOnGamesSnapshot(incoming, previousGames) {
   };
 }
 
+// ../grarf/desktop/src/lib/finalizedGameRetention/recordGameFinalizedAtMs.ts
+init_define_import_meta_env();
+
+// ../grarf/desktop/src/lib/gamesSpine/isSpineFinalizedGame.ts
+init_define_import_meta_env();
+function isSpineFinalizedGame(game) {
+  if (game.status === "final") return true;
+  const line = game.statusLine?.trim();
+  return line != null && /^final$/i.test(line);
+}
+
+// ../grarf/desktop/src/lib/finalizedGameRetention/recordGameFinalizedAtMs.ts
+function isGameFinal(game) {
+  return game.status === "final" || isSpineFinalizedGame(game);
+}
+function wasLiveBeforeFinalization(game) {
+  if (isGameFinal(game)) return false;
+  return game.status === "live" || isGameActivelyLive(game);
+}
+function isGrarfLiveToFinalTransition(previous, next) {
+  if (!previous) return false;
+  if (isGameFinal(previous)) return false;
+  if (!isGameFinal(next)) return false;
+  return wasLiveBeforeFinalization(previous);
+}
+function resolveExistingFinalizedAtMs(gameId, game, previous) {
+  const candidates = [game?.finalizedAtMs, previous?.finalizedAtMs, readPersistedFinalizedAtMs(gameId)];
+  for (const value of candidates) {
+    if (value != null && Number.isFinite(value) && value > 0) return value;
+  }
+  return void 0;
+}
+function withFinalizedAtMs(game, finalizedAtMs) {
+  if (game.finalizedAtMs === finalizedAtMs) return game;
+  return { ...game, finalizedAtMs };
+}
+function applyFinalizedAtMsToGameRow(game, previous, nowMs) {
+  const existing = resolveExistingFinalizedAtMs(game.id, game, previous);
+  if (existing != null) {
+    persistFinalizedAtMsIfAbsent(game.id, existing);
+    return withFinalizedAtMs(game, existing);
+  }
+  if (!isGameFinal(game)) return game;
+  if (!isGrarfLiveToFinalTransition(previous, game)) return game;
+  persistFinalizedAtMsIfAbsent(game.id, nowMs);
+  return withFinalizedAtMs(game, nowMs);
+}
+function applyFinalizedAtMsToSnapshot(previousGames, snap, nowMs = Date.now()) {
+  const prevById = new Map(previousGames.map((game) => [game.id, game]));
+  let changed = false;
+  const leagues = {};
+  for (const [leagueKey, rows] of Object.entries(snap.leagues ?? {})) {
+    const league2 = leagueKey;
+    if (!Array.isArray(rows)) {
+      leagues[league2] = rows;
+      continue;
+    }
+    const nextRows = rows.map((game) => {
+      const previous = prevById.get(game.id);
+      const next = applyFinalizedAtMsToGameRow(game, previous, nowMs);
+      if (next !== game) changed = true;
+      return next;
+    });
+    leagues[league2] = nextRows;
+  }
+  return changed ? { ...snap, leagues } : snap;
+}
+
 // ../grarf/desktop/src/services/operationalIngest/operationalTransportFreshness.ts
 init_define_import_meta_env();
 var lastAppliedOperationalTransportGeneratedAtMs = Number.NEGATIVE_INFINITY;
@@ -19900,12 +20020,17 @@ var useLiveGamesStore = create((set) => ({
     const withMlbStandings = syncMlbTeamStandingsFromCacheOnSnapshot(
       preserveMlbTeamStandingsOnGamesSnapshot(withStableLeagues, previousGames)
     );
+    const withFinalizedAtMs2 = applyFinalizedAtMsToSnapshot(
+      previousGames,
+      withMlbStandings,
+      Date.now()
+    );
     useCanonicalLiveGameStore.getState().ingestSnapshot({
-      leagues: withMlbStandings.leagues,
-      updatedAt: withMlbStandings.updatedAt,
+      leagues: withFinalizedAtMs2.leagues,
+      updatedAt: withFinalizedAtMs2.updatedAt,
       sourceProvider: "espn_scoreboard_ipc"
     });
-    useGamesSpineRenderStore.getState().markOperationalIngest(withMlbStandings.leagues, {
+    useGamesSpineRenderStore.getState().markOperationalIngest(withFinalizedAtMs2.leagues, {
       source: completeness?.source ?? "espn_scoreboard_ipc",
       requestedLeagueCount: completeness?.requestedLeagueCount,
       transportGeneratedAt: completeness?.transportGeneratedAt ?? snap.updatedAt ?? void 0,
@@ -22303,14 +22428,14 @@ init_define_import_meta_env();
 
 // ../grarf/desktop/src/lib/stream/streamLinkCache.ts
 init_define_import_meta_env();
-var STORAGE_KEY2 = "grarf-stream-links-v1";
+var STORAGE_KEY3 = "grarf-stream-links-v1";
 var DEFAULT_TTL_MS2 = 30 * 60 * 1e3;
 function cacheKey(provider, gameId) {
   return `${provider}:${gameId}`;
 }
 function read() {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY2);
+    const raw = localStorage.getItem(STORAGE_KEY3);
     if (!raw) return {};
     const p = JSON.parse(raw);
     return p?.entries && typeof p.entries === "object" ? p.entries : {};
@@ -22320,7 +22445,7 @@ function read() {
 }
 function write(entries) {
   try {
-    localStorage.setItem(STORAGE_KEY2, JSON.stringify({ version: 1, entries }));
+    localStorage.setItem(STORAGE_KEY3, JSON.stringify({ version: 1, entries }));
   } catch {
   }
 }
