@@ -123017,6 +123017,7 @@ var init_SportscapeArticleHighlightPlaceholder = __esm({
 function SportscapeArticleGameHighlight({
   gamePk,
   onWebThumbnailActivate,
+  onDesktopInlineUrlActivate,
   className
 }) {
   const highlights = useMlbGameWorkspaceHighlights(gamePk);
@@ -123038,7 +123039,29 @@ function SportscapeArticleGameHighlight({
       className: "h-full w-full object-cover object-center"
     }
   );
-  if (isGrarfWebRenderer() && onWebThumbnailActivate) {
+  if (isGrarfElectronRenderer() && onDesktopInlineUrlActivate && highlight.sourceUrl) {
+    return /* @__PURE__ */ (0, import_jsx_runtime167.jsx)(
+      "button",
+      {
+        type: "button",
+        onClick: (event) => {
+          event.stopPropagation();
+          event.preventDefault();
+          onDesktopInlineUrlActivate(highlight.sourceUrl);
+        },
+        className: cn2(
+          frameClass,
+          "p-0 text-left transition duration-150",
+          "hover:border-cyansys/35 hover:shadow-[0_0_14px_rgba(86,247,255,0.08)]",
+          "focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-cyansys/50"
+        ),
+        "aria-label": `Watch game highlight: ${highlight.title}`,
+        "data-slot": "sportscape-article-highlight-thumbnail",
+        children: image
+      }
+    );
+  }
+  if (isCanonicalWebBrowserRenderer() && onWebThumbnailActivate) {
     return /* @__PURE__ */ (0, import_jsx_runtime167.jsx)(
       "button",
       {
@@ -123080,12 +123103,14 @@ function SportscapeArticleEspnVideoHighlight({
   videoUrl,
   youtubeVideoId,
   title,
-  className
+  className,
+  onDesktopInlineUrlActivate
 }) {
   const frameClass = cn2(SPORTSCAPE_ARTICLE_HIGHLIGHT_PLACEHOLDER_CLASS, "overflow-hidden", className);
   if (!thumbnailUrl) {
     return /* @__PURE__ */ (0, import_jsx_runtime168.jsx)(SportscapeArticleHighlightPlaceholder, { className });
   }
+  const highlightUrl = videoUrl?.trim() || (youtubeVideoId?.trim() ? youtubeWatchUrl(youtubeVideoId.trim()) : "");
   const image = /* @__PURE__ */ (0, import_jsx_runtime168.jsx)(
     "img",
     {
@@ -123099,7 +123124,29 @@ function SportscapeArticleEspnVideoHighlight({
       className: "h-full w-full object-cover object-center"
     }
   );
-  if (isGrarfWebRenderer() && (youtubeVideoId || videoUrl)) {
+  if (isGrarfElectronRenderer() && onDesktopInlineUrlActivate && highlightUrl) {
+    return /* @__PURE__ */ (0, import_jsx_runtime168.jsx)(
+      "button",
+      {
+        type: "button",
+        onClick: (event) => {
+          event.stopPropagation();
+          event.preventDefault();
+          onDesktopInlineUrlActivate(highlightUrl);
+        },
+        className: cn2(
+          frameClass,
+          "p-0 text-left transition duration-150",
+          "hover:border-cyansys/35 hover:shadow-[0_0_14px_rgba(86,247,255,0.08)]",
+          "focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-cyansys/50"
+        ),
+        "aria-label": `Watch game highlight: ${title}`,
+        "data-slot": "sportscape-article-highlight-thumbnail",
+        children: image
+      }
+    );
+  }
+  if (isCanonicalWebBrowserRenderer() && (youtubeVideoId || videoUrl)) {
     return /* @__PURE__ */ (0, import_jsx_runtime168.jsx)(
       "button",
       {
@@ -123141,6 +123188,7 @@ var init_SportscapeArticleEspnVideoHighlight = __esm({
     init_canonical();
     init_isGrarfWebRenderer();
     init_openSportscapeHighlightInBrowser();
+    init_youtubeUrl2();
     init_SportscapeArticleHighlightPlaceholder();
     import_jsx_runtime168 = __toESM(require_jsx_runtime(), 1);
   }
@@ -123665,13 +123713,30 @@ function HomeSportscapeCard({
     },
     []
   );
-  const renderArticleHighlightSlot = (article) => {
+  const activateDesktopInlineUrl = (0, import_react198.useCallback)(
+    (articleKey, article, url) => {
+      if (!isDesktopElectron || !onArticleUrlExpand) return;
+      const rowEl = articleRowRefs.current.get(articleKey);
+      if (!rowEl) return;
+      onArticleUrlExpand({
+        articleKey,
+        articleUrl: url,
+        headline: article.headline,
+        source: entry2.leagueEventName,
+        rowEl
+      });
+    },
+    [isDesktopElectron, onArticleUrlExpand, entry2.leagueEventName]
+  );
+  const renderArticleHighlightSlot = (article, articleKey) => {
+    const onDesktopHighlightActivate = isDesktopElectron ? (url) => activateDesktopInlineUrl(articleKey, article, url) : void 0;
     if (isMlbLeagueCard && article.gamePk != null) {
       return /* @__PURE__ */ (0, import_jsx_runtime170.jsx)(
         SportscapeArticleGameHighlight,
         {
           gamePk: article.gamePk,
-          onWebThumbnailActivate: onWebArticleHighlightClick
+          onWebThumbnailActivate: onWebArticleHighlightClick,
+          onDesktopInlineUrlActivate: onDesktopHighlightActivate
         }
       );
     }
@@ -123682,18 +123747,19 @@ function HomeSportscapeCard({
           thumbnailUrl: article.highlightThumbnailUrl,
           videoUrl: article.highlightVideoUrl,
           youtubeVideoId: article.highlightYoutubeVideoId,
-          title: article.highlightTitle ?? article.headline
+          title: article.highlightTitle ?? article.headline,
+          onDesktopInlineUrlActivate: onDesktopHighlightActivate
         }
       );
     }
     return /* @__PURE__ */ (0, import_jsx_runtime170.jsx)(SportscapeArticleHighlightPlaceholder, {});
   };
-  const renderArticleBody = (article, headlineClassName, onRowActivate) => {
+  const renderArticleBody = (article, articleKey, headlineClassName, onRowActivate) => {
     const scoreSport = isWorldCupLeagueCard ? "soccer" : isWnbaLeagueCard ? "wnba" : isNhlLeagueCard ? "nhl" : isMcwsLeagueCard ? "ncaa" : "mlb";
     const scoreLines = isMlbLeagueCard || isEspnRecapLeagueCard ? resolveSportscapeArticleScoreLines(article, scoreSport) : void 0;
     const headlineText = /* @__PURE__ */ (0, import_jsx_runtime170.jsx)("span", { className: cn2(headlineClassName, "leading-snug"), children: article.headline });
     const scoreboard = scoreLines?.length ? /* @__PURE__ */ (0, import_jsx_runtime170.jsx)(SportscapeArticleScoreBlock, { lines: scoreLines, sport: scoreSport }) : null;
-    const highlightSlot = renderArticleHighlightSlot(article);
+    const highlightSlot = renderArticleHighlightSlot(article, articleKey);
     const workspaceActivateProps = onRowActivate ? {
       type: "button",
       onClick: onRowActivate,
@@ -123791,18 +123857,11 @@ function HomeSportscapeCard({
             ),
             children: renderArticleBody(
               article,
+              articleKey,
               headlineClassName,
               clickable ? () => {
                 if (clickableByDesktopUrl && article.url && onArticleUrlExpand) {
-                  const rowEl = articleRowRefs.current.get(articleKey);
-                  if (!rowEl) return;
-                  onArticleUrlExpand({
-                    articleKey,
-                    articleUrl: article.url,
-                    headline: article.headline,
-                    source: entry2.leagueEventName,
-                    rowEl
-                  });
+                  activateDesktopInlineUrl(articleKey, article, article.url);
                   return;
                 }
                 if (clickableByBrowserUrl && article.url) {
