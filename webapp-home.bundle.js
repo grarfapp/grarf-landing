@@ -46944,6 +46944,478 @@ var init_OnTodayNavRowWithTallies = __esm({
   }
 });
 
+// ../grarf/desktop/src/lib/eventPriority/resolvePublishedEventImportanceScore.ts
+function resolvePublishedEventImportanceScore(game) {
+  const score2 = game.metadata?.eventPriority?.score;
+  if (score2 == null || !Number.isFinite(score2)) return null;
+  return score2;
+}
+var init_resolvePublishedEventImportanceScore = __esm({
+  "../grarf/desktop/src/lib/eventPriority/resolvePublishedEventImportanceScore.ts"() {
+    init_define_import_meta_env();
+  }
+});
+
+// ../grarf/desktop/src/lib/golf/lpgaMajorTournament.ts
+function isMensOpenChampionshipTitle(title) {
+  if (/\bwomen/i.test(title)) return false;
+  return /\b(the\s+)?open\s+championship\b/i.test(title) || /\bbritish\s+open\b/i.test(title);
+}
+function isLpgaMajorTournamentTitle(title) {
+  const trimmed = title?.trim();
+  if (!trimmed) return false;
+  if (isMensOpenChampionshipTitle(trimmed)) return false;
+  return LPGA_MAJOR_TITLE_PATTERNS.some((pattern) => pattern.test(trimmed));
+}
+var LPGA_MAJOR_TITLE_PATTERNS;
+var init_lpgaMajorTournament = __esm({
+  "../grarf/desktop/src/lib/golf/lpgaMajorTournament.ts"() {
+    init_define_import_meta_env();
+    init_gamesSpineOperationalDate();
+    LPGA_MAJOR_TITLE_PATTERNS = [
+      /\bevian championship\b/i,
+      /\bchevron championship\b/i,
+      /\bwomen'?s\s+pga(?:\s+championship)?\b/i,
+      /\bkpmg\s+women'?s\s+pga\b/i,
+      /\bu\.?\s*s\.?\s*women'?s\s+open\b/i,
+      /\bthe\s+women'?s\s+open\b/i,
+      /\bwomen'?s\s+british\s+open\b/i
+    ];
+  }
+});
+
+// ../grarf/desktop/src/lib/tennisChannelPlus/nameUtils.ts
+var init_nameUtils2 = __esm({
+  "../grarf/desktop/src/lib/tennisChannelPlus/nameUtils.ts"() {
+    init_define_import_meta_env();
+    init_nameUtils();
+  }
+});
+
+// ../grarf/desktop/src/lib/watch/enrichWimbledonEspnWatchStreams.ts
+function isTennisLeague2(game) {
+  return game.league === "ATP" || game.league === "WTA";
+}
+function wimbledonHaystack(game) {
+  return [
+    game.metadata?.tennis?.contextLine,
+    game.statusLine,
+    game.leagueContextLabel
+  ].filter(Boolean).join(" ");
+}
+function isWimbledonTennisGame(game) {
+  if (!isTennisLeague2(game)) return false;
+  return /\bwimbledon\b/i.test(wimbledonHaystack(game));
+}
+function gamePlayerTokenSets(game) {
+  const away = tokenSetFromLabel(game.metadata?.officialAwayName || game.awayTeam || "");
+  const home = tokenSetFromLabel(game.metadata?.officialHomeName || game.homeTeam || "");
+  return [away, home];
+}
+function parseEspnWatchMatchupNames(title) {
+  let cleaned = title.trim();
+  cleaned = cleaned.replace(/^\(\d+\)\s*/, "");
+  cleaned = cleaned.replace(/\s*\([^)]+\)\s*$/i, "");
+  const match = cleaned.match(/^(.+?)\s+vs\.?\s+(.+)$/i);
+  if (!match) return null;
+  return [match[1].trim(), match[2].trim()];
+}
+function listingPlayerTokenSets(listing) {
+  const parsed = parseEspnWatchMatchupNames(listing.shortName) ?? parseEspnWatchMatchupNames(listing.name);
+  if (!parsed) return [/* @__PURE__ */ new Set(), /* @__PURE__ */ new Set()];
+  return [tokenSetFromLabel(parsed[0]), tokenSetFromLabel(parsed[1])];
+}
+function scorePlayers(game, listing) {
+  const [gameAway, gameHome] = gamePlayerTokenSets(game);
+  const [listingAway, listingHome] = listingPlayerTokenSets(listing);
+  const direct = tokenOverlapScore(gameAway, listingAway) + tokenOverlapScore(gameHome, listingHome);
+  const swapped = tokenOverlapScore(gameAway, listingHome) + tokenOverlapScore(gameHome, listingAway);
+  return Math.max(direct, swapped) / 2;
+}
+function scoreListingMatch(game, listing) {
+  const players = scorePlayers(game, listing);
+  if (players < MIN_PLAYER_SCORE) return 0;
+  const liveBoost = listing.status === "live" ? 0.04 : 0;
+  return players + liveBoost;
+}
+function extractWebUrl(content) {
+  const links = content.links;
+  if (typeof links?.web === "string" && links.web.trim()) return links.web.trim();
+  const streams = content.streams;
+  for (const stream of streams ?? []) {
+    const web = stream.links?.web?.trim();
+    if (web) return web;
+  }
+  return null;
+}
+function parseWimbledonCatalogListings(json) {
+  const buckets = json?.page?.buckets;
+  if (!Array.isArray(buckets)) return [];
+  const listings = [];
+  for (const bucket of buckets) {
+    if (!bucket || typeof bucket !== "object") continue;
+    const contents = bucket.contents;
+    if (!Array.isArray(contents)) continue;
+    for (const raw of contents) {
+      if (!raw || typeof raw !== "object") continue;
+      const content = raw;
+      const status = String(content.status ?? "").toLowerCase();
+      if (status !== "live" && status !== "upcoming") continue;
+      const streamUrl = extractWebUrl(content);
+      const id = String(content.id ?? "").trim();
+      const name = String(content.name ?? "").trim();
+      const shortName = String(content.shortName ?? name).trim();
+      if (!streamUrl || !id || !name) continue;
+      listings.push({ id, name, shortName, streamUrl, status });
+    }
+  }
+  return listings;
+}
+async function fetchWimbledonEspnWatchCatalog() {
+  const now = Date.now();
+  if (catalogCache && now - catalogCache.fetchedAt < CATALOG_CACHE_TTL_MS) {
+    return catalogCache.listings;
+  }
+  try {
+    const res = await fetch(WIMBLEDON_ESPN_WATCH_CATALOG_URL, {
+      headers: { "User-Agent": ESPN_FETCH_UA, Accept: "application/json" }
+    });
+    if (!res.ok) return catalogCache?.listings ?? [];
+    const json = await res.json();
+    const listings = parseWimbledonCatalogListings(json);
+    catalogCache = { fetchedAt: now, listings };
+    return listings;
+  } catch {
+    return catalogCache?.listings ?? [];
+  }
+}
+function matchWimbledonEspnWatchListing(game, catalog) {
+  let best = null;
+  let bestScore = 0;
+  let secondBest = 0;
+  for (const listing of catalog) {
+    const score2 = scoreListingMatch(game, listing);
+    if (score2 > bestScore) {
+      secondBest = bestScore;
+      bestScore = score2;
+      best = listing;
+      continue;
+    }
+    if (score2 > secondBest) secondBest = score2;
+  }
+  if (!best || bestScore < MIN_TOTAL_SCORE) return null;
+  if (secondBest >= bestScore - 0.03) return null;
+  return best;
+}
+async function enrichWimbledonEspnWatchStreams(games) {
+  const targets = games.filter(
+    (game) => isWimbledonTennisGame(game) && game.status === "live"
+  );
+  if (targets.length === 0) return;
+  const catalog = await fetchWimbledonEspnWatchCatalog();
+  if (catalog.length === 0) return;
+  for (const game of targets) {
+    const listing = matchWimbledonEspnWatchListing(game, catalog);
+    if (!listing) {
+      continue;
+    }
+    attachEspnPlusStreamToGame(game, {
+      streamUrl: listing.streamUrl,
+      streamProvider: "ESPN+",
+      playerId: listing.id
+    });
+  }
+}
+var ESPN_FETCH_UA, WIMBLEDON_ESPN_WATCH_CATALOG_ID, WIMBLEDON_ESPN_WATCH_CATALOG_URL, MIN_PLAYER_SCORE, MIN_TOTAL_SCORE, CATALOG_CACHE_TTL_MS, catalogCache;
+var init_enrichWimbledonEspnWatchStreams = __esm({
+  "../grarf/desktop/src/lib/watch/enrichWimbledonEspnWatchStreams.ts"() {
+    init_define_import_meta_env();
+    init_nameUtils2();
+    init_espnPlusStream();
+    ESPN_FETCH_UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36";
+    WIMBLEDON_ESPN_WATCH_CATALOG_ID = "6929e7a4-2c40-3f82-a710-42baae9472c6";
+    WIMBLEDON_ESPN_WATCH_CATALOG_URL = `https://watch.product.api.espn.com/api/product/v3/watchespn/web/catalog/${WIMBLEDON_ESPN_WATCH_CATALOG_ID}?tz=America%2FChicago&lang=en&countryCode=US&deviceType=desktop`;
+    MIN_PLAYER_SCORE = 0.55;
+    MIN_TOTAL_SCORE = 0.62;
+    CATALOG_CACHE_TTL_MS = 3e4;
+    catalogCache = null;
+  }
+});
+
+// ../grarf/desktop/src/lib/gamesSpine/usOpenGamesSpinePresentation.ts
+function isTennisTourLeague(game) {
+  return game.league === "ATP" || game.league === "WTA";
+}
+function usOpenHaystack(game) {
+  return [game.metadata?.tennis?.contextLine, game.statusLine, game.leagueContextLabel].filter(Boolean).join(" ");
+}
+function isUsOpenTennisGame(game) {
+  if (!isTennisTourLeague(game)) return false;
+  return /\bu\.?s\.?\s+open\b/i.test(usOpenHaystack(game));
+}
+function isUsOpenGamesSpinePresentationLeague(league2) {
+  return league2 === US_OPEN_TENNIS_GAMES_SPINE_LEAGUE;
+}
+function resolveUsOpenGameLeagueImportanceKey(game) {
+  if (!isUsOpenTennisGame(game)) return null;
+  return US_OPEN_TENNIS_GAMES_SPINE_LEAGUE;
+}
+function filterGamesForUsOpenGamesSpineSection(league2, games) {
+  if (isUsOpenGamesSpinePresentationLeague(league2)) {
+    return games.filter(isUsOpenTennisGame);
+  }
+  if (league2 === "ATP" || league2 === "WTA") {
+    return games.filter((game) => !isUsOpenTennisGame(game));
+  }
+  return [...games];
+}
+function partitionUsOpenGames(games) {
+  const usOpen = [];
+  const remainder = [];
+  for (const game of games) {
+    if (isUsOpenTennisGame(game)) {
+      usOpen.push(game);
+      continue;
+    }
+    remainder.push(game);
+  }
+  return { usOpen, remainder };
+}
+function applyUsOpenGamesSpinePresentationPartition(leagues) {
+  const out = { ...leagues };
+  const usOpenById = /* @__PURE__ */ new Map();
+  const atpPartition = partitionUsOpenGames(out.ATP ?? []);
+  for (const game of atpPartition.usOpen) usOpenById.set(game.id, game);
+  if (atpPartition.remainder.length > 0) {
+    out.ATP = atpPartition.remainder;
+  } else {
+    delete out.ATP;
+  }
+  const wtaPartition = partitionUsOpenGames(out.WTA ?? []);
+  for (const game of wtaPartition.usOpen) usOpenById.set(game.id, game);
+  if (wtaPartition.remainder.length > 0) {
+    out.WTA = wtaPartition.remainder;
+  } else {
+    delete out.WTA;
+  }
+  if (usOpenById.size > 0) {
+    out[US_OPEN_TENNIS_GAMES_SPINE_LEAGUE] = [...usOpenById.values()];
+  } else {
+    delete out[US_OPEN_TENNIS_GAMES_SPINE_LEAGUE];
+  }
+  return out;
+}
+var US_OPEN_TENNIS_GAMES_SPINE_LEAGUE;
+var init_usOpenGamesSpinePresentation = __esm({
+  "../grarf/desktop/src/lib/gamesSpine/usOpenGamesSpinePresentation.ts"() {
+    init_define_import_meta_env();
+    US_OPEN_TENNIS_GAMES_SPINE_LEAGUE = "US_OPEN_TENNIS";
+  }
+});
+
+// ../grarf/desktop/src/lib/gamesSpine/wimbledonGamesSpinePresentation.ts
+function resolveWimbledonGamesSpineSourceLeague(league2) {
+  if (league2 === WIMBLEDON_MEN_GAMES_SPINE_LEAGUE) return "ATP";
+  if (league2 === WIMBLEDON_WOMEN_GAMES_SPINE_LEAGUE) return "WTA";
+  return null;
+}
+function resolveWimbledonGameLeagueImportanceKey(game) {
+  if (!isGrarfWebRenderer() || !isWimbledonTennisGame(game)) return null;
+  if (game.league === "ATP") return WIMBLEDON_MEN_GAMES_SPINE_LEAGUE;
+  if (game.league === "WTA") return WIMBLEDON_WOMEN_GAMES_SPINE_LEAGUE;
+  return null;
+}
+function filterGamesForWimbledonGamesSpineSection(league2, games) {
+  if (!isGrarfWebRenderer()) return [...games];
+  const sourceLeague = resolveWimbledonGamesSpineSourceLeague(league2);
+  if (sourceLeague) {
+    return games.filter((game) => game.league === sourceLeague && isWimbledonTennisGame(game));
+  }
+  if (league2 === "ATP" || league2 === "WTA") {
+    return games.filter((game) => !isWimbledonTennisGame(game));
+  }
+  return [...games];
+}
+function partitionTennisLeagueGames(games, tour) {
+  const wimbledon = [];
+  const remainder = [];
+  for (const game of games) {
+    if (game.league === tour && isWimbledonTennisGame(game)) {
+      wimbledon.push(game);
+      continue;
+    }
+    remainder.push(game);
+  }
+  return { wimbledon, remainder };
+}
+function applyWimbledonGamesSpinePresentationPartition(leagues) {
+  if (!isGrarfWebRenderer()) return leagues;
+  const out = { ...leagues };
+  const atpPartition = partitionTennisLeagueGames(out.ATP ?? [], "ATP");
+  if (atpPartition.wimbledon.length > 0) {
+    out[WIMBLEDON_MEN_GAMES_SPINE_LEAGUE] = atpPartition.wimbledon;
+  } else {
+    delete out[WIMBLEDON_MEN_GAMES_SPINE_LEAGUE];
+  }
+  if (atpPartition.remainder.length > 0) {
+    out.ATP = atpPartition.remainder;
+  } else {
+    delete out.ATP;
+  }
+  const wtaPartition = partitionTennisLeagueGames(out.WTA ?? [], "WTA");
+  if (wtaPartition.wimbledon.length > 0) {
+    out[WIMBLEDON_WOMEN_GAMES_SPINE_LEAGUE] = wtaPartition.wimbledon;
+  } else {
+    delete out[WIMBLEDON_WOMEN_GAMES_SPINE_LEAGUE];
+  }
+  if (wtaPartition.remainder.length > 0) {
+    out.WTA = wtaPartition.remainder;
+  } else {
+    delete out.WTA;
+  }
+  return out;
+}
+function resolveGamesSpineRetainedForLeague(league2) {
+  if (isUsOpenGamesSpinePresentationLeague(league2)) {
+    const retained = [
+      ...useRecentFinalizedGamesStore.getState().getRetainedForLeague("ATP"),
+      ...useRecentFinalizedGamesStore.getState().getRetainedForLeague("WTA")
+    ];
+    return filterGamesForUsOpenGamesSpineSection(league2, retained);
+  }
+  const sourceLeague = resolveWimbledonGamesSpineSourceLeague(league2) ?? league2;
+  return filterGamesForUsOpenGamesSpineSection(
+    league2,
+    filterGamesForWimbledonGamesSpineSection(
+      league2,
+      useRecentFinalizedGamesStore.getState().getRetainedForLeague(sourceLeague)
+    )
+  );
+}
+var WIMBLEDON_MEN_GAMES_SPINE_LEAGUE, WIMBLEDON_WOMEN_GAMES_SPINE_LEAGUE;
+var init_wimbledonGamesSpinePresentation = __esm({
+  "../grarf/desktop/src/lib/gamesSpine/wimbledonGamesSpinePresentation.ts"() {
+    init_define_import_meta_env();
+    init_enrichWimbledonEspnWatchStreams();
+    init_isGrarfWebRenderer();
+    init_recentFinalizedGamesStore();
+    init_usOpenGamesSpinePresentation();
+    WIMBLEDON_MEN_GAMES_SPINE_LEAGUE = "WIMBLEDON_MEN";
+    WIMBLEDON_WOMEN_GAMES_SPINE_LEAGUE = "WIMBLEDON_WOMEN";
+  }
+});
+
+// ../grarf/desktop/src/lib/bestGameRightNow/leagueImportanceV1.ts
+function resolveImportanceKey(raw) {
+  return resolveCanonicalLeagueImportanceKey(raw);
+}
+function golfTournamentTitle(game) {
+  return game.awayTeam?.trim() ?? "";
+}
+function isPgaTourMajorExcludingUsOpen(title) {
+  if (!title || isUsOpenTournamentTitle(title)) return false;
+  return /\bmasters\b/i.test(title) || /\bpga championship\b/i.test(title) || /\b(the )?open championship\b/i.test(title) || /\bbritish open\b/i.test(title);
+}
+function resolveGolfGameImportanceV1(game) {
+  const league2 = game.league;
+  const title = golfTournamentTitle(game);
+  if (isPgaTourUsOpenEvent(league2, title)) {
+    return GOLF_GAME_IMPORTANCE_V1.US_OPEN;
+  }
+  if (league2 === "PGA") {
+    if (isPgaTourMajorExcludingUsOpen(title)) return GOLF_GAME_IMPORTANCE_V1.PGA_MAJOR;
+    return GOLF_GAME_IMPORTANCE_V1.PGA;
+  }
+  if (league2 === "LPGA") {
+    if (isLpgaMajorTournamentTitle(title)) return GOLF_GAME_IMPORTANCE_V1.LPGA_MAJOR;
+    return GOLF_GAME_IMPORTANCE_V1.LPGA;
+  }
+  if (league2 === "CHAMPIONS") return GOLF_GAME_IMPORTANCE_V1.CHAMPIONS;
+  if (league2 === "LIV") return GOLF_GAME_IMPORTANCE_V1.LIV;
+  return null;
+}
+function resolveLeagueImportanceV1ForLeagueKey(leagueKey, _context) {
+  return resolveLeagueImportanceScore(leagueKey);
+}
+function resolveLeagueImportanceV1(game) {
+  const publishedEventScore = resolvePublishedEventImportanceScore(game);
+  if (publishedEventScore != null) return publishedEventScore;
+  const golfImportance = resolveGolfGameImportanceV1(game);
+  if (golfImportance != null) return golfImportance;
+  const usOpenKey = resolveUsOpenGameLeagueImportanceKey(game);
+  if (usOpenKey) return resolveLeagueImportanceScore(usOpenKey);
+  const wimbledonKey = resolveWimbledonGameLeagueImportanceKey(game);
+  if (wimbledonKey) return resolveLeagueImportanceScore(wimbledonKey);
+  const fromKey = resolveImportanceKey(game.league);
+  if (fromKey) return resolveLeagueImportanceScore(fromKey);
+  const metadataLeague = game.metadata?.leagueLabel;
+  const fromMetadata = resolveImportanceKey(metadataLeague);
+  if (fromMetadata) return resolveLeagueImportanceScore(fromMetadata);
+  return 0;
+}
+var GOLF_GAME_IMPORTANCE_V1;
+var init_leagueImportanceV1 = __esm({
+  "../grarf/desktop/src/lib/bestGameRightNow/leagueImportanceV1.ts"() {
+    init_define_import_meta_env();
+    init_resolvePublishedEventImportanceScore();
+    init_leaguePriority();
+    init_golfWatchUrls2();
+    init_lpgaMajorTournament();
+    init_wimbledonGamesSpinePresentation();
+    init_usOpenGamesSpinePresentation();
+    GOLF_GAME_IMPORTANCE_V1 = {
+      US_OPEN: 98.5,
+      PGA_MAJOR: 71,
+      PGA: resolveLeagueImportanceScore("PGA"),
+      LPGA_MAJOR: resolveLeagueImportanceScore("LPGA") + 1,
+      LPGA: resolveLeagueImportanceScore("LPGA"),
+      CHAMPIONS: resolveLeagueImportanceScore("CHAMPIONS"),
+      LIV: resolveLeagueImportanceScore("LIV")
+    };
+  }
+});
+
+// ../grarf/desktop/src/lib/gamesSpine/gamesSpineLeagueDisplayLabel.ts
+function resolveManualGamesSpineLeagueDisplayName2(games) {
+  for (const game of games ?? []) {
+    const name = game.metadata?.manualEvent?.leagueDisplayName?.trim();
+    if (name) return name;
+  }
+  return null;
+}
+function resolveGamesSpineLeagueDisplayLabel(league2, games) {
+  const manualName = resolveManualGamesSpineLeagueDisplayName2(games);
+  if (manualName) return manualName;
+  return GAMES_SPINE_LEAGUE_DISPLAY_LABEL[league2] ?? GAMES_COLUMN_LEAGUE_LABEL[league2] ?? resolveEspnOperationalLeagueLabel(league2) ?? league2;
+}
+function resolveGamesSpineLeagueSectionHeaderLabel(league2, games) {
+  const manualName = resolveManualGamesSpineLeagueDisplayName2(games);
+  if (manualName) return manualName;
+  return GAMES_SPINE_LEAGUE_SECTION_HEADER_LABEL[league2] ?? resolveGamesSpineLeagueDisplayLabel(league2);
+}
+var GAMES_SPINE_LEAGUE_DISPLAY_LABEL, GAMES_SPINE_LEAGUE_SECTION_HEADER_LABEL;
+var init_gamesSpineLeagueDisplayLabel = __esm({
+  "../grarf/desktop/src/lib/gamesSpine/gamesSpineLeagueDisplayLabel.ts"() {
+    init_define_import_meta_env();
+    init_gamesColumnLeagues();
+    init_espnOperationalLeagueEndpoints();
+    GAMES_SPINE_LEAGUE_DISPLAY_LABEL = {
+      EPL: "EPL",
+      NCAABB: "MCWS",
+      NASCAR: "NASCAR Cup Series",
+      WORLDCUP: "World Cup",
+      PLL: "PLL",
+      WIMBLEDON_MEN: "Wimbledon (Men's)",
+      WIMBLEDON_WOMEN: "Wimbledon (Women's)",
+      US_OPEN_TENNIS: "U.S. Open",
+      USATF: "Track & Field"
+    };
+    GAMES_SPINE_LEAGUE_SECTION_HEADER_LABEL = {
+      ARG1: "LPF"
+    };
+  }
+});
+
 // ../grarf/desktop/src/lib/gamesSpine/arg1LeagueLogoUrl.ts
 var ARG1_LEAGUE_LOGO_URL;
 var init_arg1LeagueLogoUrl = __esm({
@@ -47161,77 +47633,6 @@ var init_grarfLogoImgClassName = __esm({
   }
 });
 
-// ../grarf/desktop/src/lib/gamesSpine/usOpenGamesSpinePresentation.ts
-function isTennisTourLeague(game) {
-  return game.league === "ATP" || game.league === "WTA";
-}
-function usOpenHaystack(game) {
-  return [game.metadata?.tennis?.contextLine, game.statusLine, game.leagueContextLabel].filter(Boolean).join(" ");
-}
-function isUsOpenTennisGame(game) {
-  if (!isTennisTourLeague(game)) return false;
-  return /\bu\.?s\.?\s+open\b/i.test(usOpenHaystack(game));
-}
-function isUsOpenGamesSpinePresentationLeague(league2) {
-  return league2 === US_OPEN_TENNIS_GAMES_SPINE_LEAGUE;
-}
-function resolveUsOpenGameLeagueImportanceKey(game) {
-  if (!isUsOpenTennisGame(game)) return null;
-  return US_OPEN_TENNIS_GAMES_SPINE_LEAGUE;
-}
-function filterGamesForUsOpenGamesSpineSection(league2, games) {
-  if (isUsOpenGamesSpinePresentationLeague(league2)) {
-    return games.filter(isUsOpenTennisGame);
-  }
-  if (league2 === "ATP" || league2 === "WTA") {
-    return games.filter((game) => !isUsOpenTennisGame(game));
-  }
-  return [...games];
-}
-function partitionUsOpenGames(games) {
-  const usOpen = [];
-  const remainder = [];
-  for (const game of games) {
-    if (isUsOpenTennisGame(game)) {
-      usOpen.push(game);
-      continue;
-    }
-    remainder.push(game);
-  }
-  return { usOpen, remainder };
-}
-function applyUsOpenGamesSpinePresentationPartition(leagues) {
-  const out = { ...leagues };
-  const usOpenById = /* @__PURE__ */ new Map();
-  const atpPartition = partitionUsOpenGames(out.ATP ?? []);
-  for (const game of atpPartition.usOpen) usOpenById.set(game.id, game);
-  if (atpPartition.remainder.length > 0) {
-    out.ATP = atpPartition.remainder;
-  } else {
-    delete out.ATP;
-  }
-  const wtaPartition = partitionUsOpenGames(out.WTA ?? []);
-  for (const game of wtaPartition.usOpen) usOpenById.set(game.id, game);
-  if (wtaPartition.remainder.length > 0) {
-    out.WTA = wtaPartition.remainder;
-  } else {
-    delete out.WTA;
-  }
-  if (usOpenById.size > 0) {
-    out[US_OPEN_TENNIS_GAMES_SPINE_LEAGUE] = [...usOpenById.values()];
-  } else {
-    delete out[US_OPEN_TENNIS_GAMES_SPINE_LEAGUE];
-  }
-  return out;
-}
-var US_OPEN_TENNIS_GAMES_SPINE_LEAGUE;
-var init_usOpenGamesSpinePresentation = __esm({
-  "../grarf/desktop/src/lib/gamesSpine/usOpenGamesSpinePresentation.ts"() {
-    init_define_import_meta_env();
-    US_OPEN_TENNIS_GAMES_SPINE_LEAGUE = "US_OPEN_TENNIS";
-  }
-});
-
 // ../grarf/desktop/src/lib/gamesSpine/gamesSpineLeagueLogoUrls.ts
 function resolveGamesSpineLeagueHeaderLogoUrl(league2, games) {
   const gameWithManualLogo = games?.find(
@@ -47369,449 +47770,6 @@ var init_gamesSpineLeagueLogoUrls = __esm({
   }
 });
 
-// ../grarf/desktop/src/lib/navigation/resolveLeagueNavActivityStatuses.ts
-function resolveActivityBucketStatus(game) {
-  if (game.status === "final") return "final";
-  if (isGameActivelyLive(game)) return "live";
-  return "scheduled";
-}
-function buildActivityTallyStatusesByBucket(statuses) {
-  let finalCount = 0;
-  let liveCount = 0;
-  let scheduledCount = 0;
-  for (const status of statuses) {
-    if (status === "final") finalCount++;
-    else if (status === "live") liveCount++;
-    else if (status === "scheduled") scheduledCount++;
-  }
-  return [
-    ...Array(finalCount).fill("final"),
-    ...Array(liveCount).fill("live"),
-    ...Array(scheduledCount).fill("scheduled")
-  ];
-}
-function resolveLeagueNavActivityStatusesByLeague(mergedLeagues) {
-  const out = /* @__PURE__ */ new Map();
-  for (const leagueKey of getOperationalSlateLeagueOrder()) {
-    const slate = filterGamesSpineSlateForOperationalSportsDay(mergedLeagues[leagueKey] ?? []);
-    if (slate.length === 0) continue;
-    out.set(
-      leagueKey,
-      buildActivityTallyStatusesByBucket(slate.map((game) => resolveActivityBucketStatus(game)))
-    );
-  }
-  return out;
-}
-var init_resolveLeagueNavActivityStatuses = __esm({
-  "../grarf/desktop/src/lib/navigation/resolveLeagueNavActivityStatuses.ts"() {
-    init_define_import_meta_env();
-    init_gamesColumnLeagues();
-    init_gamesSpineOperationalDate();
-    init_isGameActivelyLive();
-  }
-});
-
-// ../grarf/desktop/src/lib/eventPriority/resolvePublishedEventImportanceScore.ts
-function resolvePublishedEventImportanceScore(game) {
-  const score2 = game.metadata?.eventPriority?.score;
-  if (score2 == null || !Number.isFinite(score2)) return null;
-  return score2;
-}
-var init_resolvePublishedEventImportanceScore = __esm({
-  "../grarf/desktop/src/lib/eventPriority/resolvePublishedEventImportanceScore.ts"() {
-    init_define_import_meta_env();
-  }
-});
-
-// ../grarf/desktop/src/lib/golf/lpgaMajorTournament.ts
-function isMensOpenChampionshipTitle(title) {
-  if (/\bwomen/i.test(title)) return false;
-  return /\b(the\s+)?open\s+championship\b/i.test(title) || /\bbritish\s+open\b/i.test(title);
-}
-function isLpgaMajorTournamentTitle(title) {
-  const trimmed = title?.trim();
-  if (!trimmed) return false;
-  if (isMensOpenChampionshipTitle(trimmed)) return false;
-  return LPGA_MAJOR_TITLE_PATTERNS.some((pattern) => pattern.test(trimmed));
-}
-var LPGA_MAJOR_TITLE_PATTERNS;
-var init_lpgaMajorTournament = __esm({
-  "../grarf/desktop/src/lib/golf/lpgaMajorTournament.ts"() {
-    init_define_import_meta_env();
-    init_gamesSpineOperationalDate();
-    LPGA_MAJOR_TITLE_PATTERNS = [
-      /\bevian championship\b/i,
-      /\bchevron championship\b/i,
-      /\bwomen'?s\s+pga(?:\s+championship)?\b/i,
-      /\bkpmg\s+women'?s\s+pga\b/i,
-      /\bu\.?\s*s\.?\s*women'?s\s+open\b/i,
-      /\bthe\s+women'?s\s+open\b/i,
-      /\bwomen'?s\s+british\s+open\b/i
-    ];
-  }
-});
-
-// ../grarf/desktop/src/lib/tennisChannelPlus/nameUtils.ts
-var init_nameUtils2 = __esm({
-  "../grarf/desktop/src/lib/tennisChannelPlus/nameUtils.ts"() {
-    init_define_import_meta_env();
-    init_nameUtils();
-  }
-});
-
-// ../grarf/desktop/src/lib/watch/enrichWimbledonEspnWatchStreams.ts
-function isTennisLeague2(game) {
-  return game.league === "ATP" || game.league === "WTA";
-}
-function wimbledonHaystack(game) {
-  return [
-    game.metadata?.tennis?.contextLine,
-    game.statusLine,
-    game.leagueContextLabel
-  ].filter(Boolean).join(" ");
-}
-function isWimbledonTennisGame(game) {
-  if (!isTennisLeague2(game)) return false;
-  return /\bwimbledon\b/i.test(wimbledonHaystack(game));
-}
-function gamePlayerTokenSets(game) {
-  const away = tokenSetFromLabel(game.metadata?.officialAwayName || game.awayTeam || "");
-  const home = tokenSetFromLabel(game.metadata?.officialHomeName || game.homeTeam || "");
-  return [away, home];
-}
-function parseEspnWatchMatchupNames(title) {
-  let cleaned = title.trim();
-  cleaned = cleaned.replace(/^\(\d+\)\s*/, "");
-  cleaned = cleaned.replace(/\s*\([^)]+\)\s*$/i, "");
-  const match = cleaned.match(/^(.+?)\s+vs\.?\s+(.+)$/i);
-  if (!match) return null;
-  return [match[1].trim(), match[2].trim()];
-}
-function listingPlayerTokenSets(listing) {
-  const parsed = parseEspnWatchMatchupNames(listing.shortName) ?? parseEspnWatchMatchupNames(listing.name);
-  if (!parsed) return [/* @__PURE__ */ new Set(), /* @__PURE__ */ new Set()];
-  return [tokenSetFromLabel(parsed[0]), tokenSetFromLabel(parsed[1])];
-}
-function scorePlayers(game, listing) {
-  const [gameAway, gameHome] = gamePlayerTokenSets(game);
-  const [listingAway, listingHome] = listingPlayerTokenSets(listing);
-  const direct = tokenOverlapScore(gameAway, listingAway) + tokenOverlapScore(gameHome, listingHome);
-  const swapped = tokenOverlapScore(gameAway, listingHome) + tokenOverlapScore(gameHome, listingAway);
-  return Math.max(direct, swapped) / 2;
-}
-function scoreListingMatch(game, listing) {
-  const players = scorePlayers(game, listing);
-  if (players < MIN_PLAYER_SCORE) return 0;
-  const liveBoost = listing.status === "live" ? 0.04 : 0;
-  return players + liveBoost;
-}
-function extractWebUrl(content) {
-  const links = content.links;
-  if (typeof links?.web === "string" && links.web.trim()) return links.web.trim();
-  const streams = content.streams;
-  for (const stream of streams ?? []) {
-    const web = stream.links?.web?.trim();
-    if (web) return web;
-  }
-  return null;
-}
-function parseWimbledonCatalogListings(json) {
-  const buckets = json?.page?.buckets;
-  if (!Array.isArray(buckets)) return [];
-  const listings = [];
-  for (const bucket of buckets) {
-    if (!bucket || typeof bucket !== "object") continue;
-    const contents = bucket.contents;
-    if (!Array.isArray(contents)) continue;
-    for (const raw of contents) {
-      if (!raw || typeof raw !== "object") continue;
-      const content = raw;
-      const status = String(content.status ?? "").toLowerCase();
-      if (status !== "live" && status !== "upcoming") continue;
-      const streamUrl = extractWebUrl(content);
-      const id = String(content.id ?? "").trim();
-      const name = String(content.name ?? "").trim();
-      const shortName = String(content.shortName ?? name).trim();
-      if (!streamUrl || !id || !name) continue;
-      listings.push({ id, name, shortName, streamUrl, status });
-    }
-  }
-  return listings;
-}
-async function fetchWimbledonEspnWatchCatalog() {
-  const now = Date.now();
-  if (catalogCache && now - catalogCache.fetchedAt < CATALOG_CACHE_TTL_MS) {
-    return catalogCache.listings;
-  }
-  try {
-    const res = await fetch(WIMBLEDON_ESPN_WATCH_CATALOG_URL, {
-      headers: { "User-Agent": ESPN_FETCH_UA, Accept: "application/json" }
-    });
-    if (!res.ok) return catalogCache?.listings ?? [];
-    const json = await res.json();
-    const listings = parseWimbledonCatalogListings(json);
-    catalogCache = { fetchedAt: now, listings };
-    return listings;
-  } catch {
-    return catalogCache?.listings ?? [];
-  }
-}
-function matchWimbledonEspnWatchListing(game, catalog) {
-  let best = null;
-  let bestScore = 0;
-  let secondBest = 0;
-  for (const listing of catalog) {
-    const score2 = scoreListingMatch(game, listing);
-    if (score2 > bestScore) {
-      secondBest = bestScore;
-      bestScore = score2;
-      best = listing;
-      continue;
-    }
-    if (score2 > secondBest) secondBest = score2;
-  }
-  if (!best || bestScore < MIN_TOTAL_SCORE) return null;
-  if (secondBest >= bestScore - 0.03) return null;
-  return best;
-}
-async function enrichWimbledonEspnWatchStreams(games) {
-  const targets = games.filter(
-    (game) => isWimbledonTennisGame(game) && game.status === "live"
-  );
-  if (targets.length === 0) return;
-  const catalog = await fetchWimbledonEspnWatchCatalog();
-  if (catalog.length === 0) return;
-  for (const game of targets) {
-    const listing = matchWimbledonEspnWatchListing(game, catalog);
-    if (!listing) {
-      continue;
-    }
-    attachEspnPlusStreamToGame(game, {
-      streamUrl: listing.streamUrl,
-      streamProvider: "ESPN+",
-      playerId: listing.id
-    });
-  }
-}
-var ESPN_FETCH_UA, WIMBLEDON_ESPN_WATCH_CATALOG_ID, WIMBLEDON_ESPN_WATCH_CATALOG_URL, MIN_PLAYER_SCORE, MIN_TOTAL_SCORE, CATALOG_CACHE_TTL_MS, catalogCache;
-var init_enrichWimbledonEspnWatchStreams = __esm({
-  "../grarf/desktop/src/lib/watch/enrichWimbledonEspnWatchStreams.ts"() {
-    init_define_import_meta_env();
-    init_nameUtils2();
-    init_espnPlusStream();
-    ESPN_FETCH_UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36";
-    WIMBLEDON_ESPN_WATCH_CATALOG_ID = "6929e7a4-2c40-3f82-a710-42baae9472c6";
-    WIMBLEDON_ESPN_WATCH_CATALOG_URL = `https://watch.product.api.espn.com/api/product/v3/watchespn/web/catalog/${WIMBLEDON_ESPN_WATCH_CATALOG_ID}?tz=America%2FChicago&lang=en&countryCode=US&deviceType=desktop`;
-    MIN_PLAYER_SCORE = 0.55;
-    MIN_TOTAL_SCORE = 0.62;
-    CATALOG_CACHE_TTL_MS = 3e4;
-    catalogCache = null;
-  }
-});
-
-// ../grarf/desktop/src/lib/gamesSpine/wimbledonGamesSpinePresentation.ts
-function resolveWimbledonGamesSpineSourceLeague(league2) {
-  if (league2 === WIMBLEDON_MEN_GAMES_SPINE_LEAGUE) return "ATP";
-  if (league2 === WIMBLEDON_WOMEN_GAMES_SPINE_LEAGUE) return "WTA";
-  return null;
-}
-function resolveWimbledonGameLeagueImportanceKey(game) {
-  if (!isGrarfWebRenderer() || !isWimbledonTennisGame(game)) return null;
-  if (game.league === "ATP") return WIMBLEDON_MEN_GAMES_SPINE_LEAGUE;
-  if (game.league === "WTA") return WIMBLEDON_WOMEN_GAMES_SPINE_LEAGUE;
-  return null;
-}
-function filterGamesForWimbledonGamesSpineSection(league2, games) {
-  if (!isGrarfWebRenderer()) return [...games];
-  const sourceLeague = resolveWimbledonGamesSpineSourceLeague(league2);
-  if (sourceLeague) {
-    return games.filter((game) => game.league === sourceLeague && isWimbledonTennisGame(game));
-  }
-  if (league2 === "ATP" || league2 === "WTA") {
-    return games.filter((game) => !isWimbledonTennisGame(game));
-  }
-  return [...games];
-}
-function partitionTennisLeagueGames(games, tour) {
-  const wimbledon = [];
-  const remainder = [];
-  for (const game of games) {
-    if (game.league === tour && isWimbledonTennisGame(game)) {
-      wimbledon.push(game);
-      continue;
-    }
-    remainder.push(game);
-  }
-  return { wimbledon, remainder };
-}
-function applyWimbledonGamesSpinePresentationPartition(leagues) {
-  if (!isGrarfWebRenderer()) return leagues;
-  const out = { ...leagues };
-  const atpPartition = partitionTennisLeagueGames(out.ATP ?? [], "ATP");
-  if (atpPartition.wimbledon.length > 0) {
-    out[WIMBLEDON_MEN_GAMES_SPINE_LEAGUE] = atpPartition.wimbledon;
-  } else {
-    delete out[WIMBLEDON_MEN_GAMES_SPINE_LEAGUE];
-  }
-  if (atpPartition.remainder.length > 0) {
-    out.ATP = atpPartition.remainder;
-  } else {
-    delete out.ATP;
-  }
-  const wtaPartition = partitionTennisLeagueGames(out.WTA ?? [], "WTA");
-  if (wtaPartition.wimbledon.length > 0) {
-    out[WIMBLEDON_WOMEN_GAMES_SPINE_LEAGUE] = wtaPartition.wimbledon;
-  } else {
-    delete out[WIMBLEDON_WOMEN_GAMES_SPINE_LEAGUE];
-  }
-  if (wtaPartition.remainder.length > 0) {
-    out.WTA = wtaPartition.remainder;
-  } else {
-    delete out.WTA;
-  }
-  return out;
-}
-function resolveGamesSpineRetainedForLeague(league2) {
-  if (isUsOpenGamesSpinePresentationLeague(league2)) {
-    const retained = [
-      ...useRecentFinalizedGamesStore.getState().getRetainedForLeague("ATP"),
-      ...useRecentFinalizedGamesStore.getState().getRetainedForLeague("WTA")
-    ];
-    return filterGamesForUsOpenGamesSpineSection(league2, retained);
-  }
-  const sourceLeague = resolveWimbledonGamesSpineSourceLeague(league2) ?? league2;
-  return filterGamesForUsOpenGamesSpineSection(
-    league2,
-    filterGamesForWimbledonGamesSpineSection(
-      league2,
-      useRecentFinalizedGamesStore.getState().getRetainedForLeague(sourceLeague)
-    )
-  );
-}
-var WIMBLEDON_MEN_GAMES_SPINE_LEAGUE, WIMBLEDON_WOMEN_GAMES_SPINE_LEAGUE;
-var init_wimbledonGamesSpinePresentation = __esm({
-  "../grarf/desktop/src/lib/gamesSpine/wimbledonGamesSpinePresentation.ts"() {
-    init_define_import_meta_env();
-    init_enrichWimbledonEspnWatchStreams();
-    init_isGrarfWebRenderer();
-    init_recentFinalizedGamesStore();
-    init_usOpenGamesSpinePresentation();
-    WIMBLEDON_MEN_GAMES_SPINE_LEAGUE = "WIMBLEDON_MEN";
-    WIMBLEDON_WOMEN_GAMES_SPINE_LEAGUE = "WIMBLEDON_WOMEN";
-  }
-});
-
-// ../grarf/desktop/src/lib/bestGameRightNow/leagueImportanceV1.ts
-function resolveImportanceKey(raw) {
-  return resolveCanonicalLeagueImportanceKey(raw);
-}
-function golfTournamentTitle(game) {
-  return game.awayTeam?.trim() ?? "";
-}
-function isPgaTourMajorExcludingUsOpen(title) {
-  if (!title || isUsOpenTournamentTitle(title)) return false;
-  return /\bmasters\b/i.test(title) || /\bpga championship\b/i.test(title) || /\b(the )?open championship\b/i.test(title) || /\bbritish open\b/i.test(title);
-}
-function resolveGolfGameImportanceV1(game) {
-  const league2 = game.league;
-  const title = golfTournamentTitle(game);
-  if (isPgaTourUsOpenEvent(league2, title)) {
-    return GOLF_GAME_IMPORTANCE_V1.US_OPEN;
-  }
-  if (league2 === "PGA") {
-    if (isPgaTourMajorExcludingUsOpen(title)) return GOLF_GAME_IMPORTANCE_V1.PGA_MAJOR;
-    return GOLF_GAME_IMPORTANCE_V1.PGA;
-  }
-  if (league2 === "LPGA") {
-    if (isLpgaMajorTournamentTitle(title)) return GOLF_GAME_IMPORTANCE_V1.LPGA_MAJOR;
-    return GOLF_GAME_IMPORTANCE_V1.LPGA;
-  }
-  if (league2 === "CHAMPIONS") return GOLF_GAME_IMPORTANCE_V1.CHAMPIONS;
-  if (league2 === "LIV") return GOLF_GAME_IMPORTANCE_V1.LIV;
-  return null;
-}
-function resolveLeagueImportanceV1ForLeagueKey(leagueKey, _context) {
-  return resolveLeagueImportanceScore(leagueKey);
-}
-function resolveLeagueImportanceV1(game) {
-  const publishedEventScore = resolvePublishedEventImportanceScore(game);
-  if (publishedEventScore != null) return publishedEventScore;
-  const golfImportance = resolveGolfGameImportanceV1(game);
-  if (golfImportance != null) return golfImportance;
-  const usOpenKey = resolveUsOpenGameLeagueImportanceKey(game);
-  if (usOpenKey) return resolveLeagueImportanceScore(usOpenKey);
-  const wimbledonKey = resolveWimbledonGameLeagueImportanceKey(game);
-  if (wimbledonKey) return resolveLeagueImportanceScore(wimbledonKey);
-  const fromKey = resolveImportanceKey(game.league);
-  if (fromKey) return resolveLeagueImportanceScore(fromKey);
-  const metadataLeague = game.metadata?.leagueLabel;
-  const fromMetadata = resolveImportanceKey(metadataLeague);
-  if (fromMetadata) return resolveLeagueImportanceScore(fromMetadata);
-  return 0;
-}
-var GOLF_GAME_IMPORTANCE_V1;
-var init_leagueImportanceV1 = __esm({
-  "../grarf/desktop/src/lib/bestGameRightNow/leagueImportanceV1.ts"() {
-    init_define_import_meta_env();
-    init_resolvePublishedEventImportanceScore();
-    init_leaguePriority();
-    init_golfWatchUrls2();
-    init_lpgaMajorTournament();
-    init_wimbledonGamesSpinePresentation();
-    init_usOpenGamesSpinePresentation();
-    GOLF_GAME_IMPORTANCE_V1 = {
-      US_OPEN: 98.5,
-      PGA_MAJOR: 71,
-      PGA: resolveLeagueImportanceScore("PGA"),
-      LPGA_MAJOR: resolveLeagueImportanceScore("LPGA") + 1,
-      LPGA: resolveLeagueImportanceScore("LPGA"),
-      CHAMPIONS: resolveLeagueImportanceScore("CHAMPIONS"),
-      LIV: resolveLeagueImportanceScore("LIV")
-    };
-  }
-});
-
-// ../grarf/desktop/src/lib/gamesSpine/gamesSpineLeagueDisplayLabel.ts
-function resolveManualGamesSpineLeagueDisplayName2(games) {
-  for (const game of games ?? []) {
-    const name = game.metadata?.manualEvent?.leagueDisplayName?.trim();
-    if (name) return name;
-  }
-  return null;
-}
-function resolveGamesSpineLeagueDisplayLabel(league2, games) {
-  const manualName = resolveManualGamesSpineLeagueDisplayName2(games);
-  if (manualName) return manualName;
-  return GAMES_SPINE_LEAGUE_DISPLAY_LABEL[league2] ?? GAMES_COLUMN_LEAGUE_LABEL[league2] ?? resolveEspnOperationalLeagueLabel(league2) ?? league2;
-}
-function resolveGamesSpineLeagueSectionHeaderLabel(league2, games) {
-  const manualName = resolveManualGamesSpineLeagueDisplayName2(games);
-  if (manualName) return manualName;
-  return GAMES_SPINE_LEAGUE_SECTION_HEADER_LABEL[league2] ?? resolveGamesSpineLeagueDisplayLabel(league2);
-}
-var GAMES_SPINE_LEAGUE_DISPLAY_LABEL, GAMES_SPINE_LEAGUE_SECTION_HEADER_LABEL;
-var init_gamesSpineLeagueDisplayLabel = __esm({
-  "../grarf/desktop/src/lib/gamesSpine/gamesSpineLeagueDisplayLabel.ts"() {
-    init_define_import_meta_env();
-    init_gamesColumnLeagues();
-    init_espnOperationalLeagueEndpoints();
-    GAMES_SPINE_LEAGUE_DISPLAY_LABEL = {
-      EPL: "EPL",
-      NCAABB: "MCWS",
-      NASCAR: "NASCAR Cup Series",
-      WORLDCUP: "World Cup",
-      PLL: "PLL",
-      WIMBLEDON_MEN: "Wimbledon (Men's)",
-      WIMBLEDON_WOMEN: "Wimbledon (Women's)",
-      US_OPEN_TENNIS: "U.S. Open",
-      USATF: "Track & Field"
-    };
-    GAMES_SPINE_LEAGUE_SECTION_HEADER_LABEL = {
-      ARG1: "LPF"
-    };
-  }
-});
-
 // ../grarf/desktop/src/lib/navigation/resolveOnTodayNavItems.ts
 function resolveOnTodayNavLogoUrl(leagueKey, existing) {
   return resolveCanonicalLeagueLogoUrl({ grarfLeagueKey: leagueKey }) ?? existing?.logoUrl ?? resolveGamesSpineLeagueLogoUrl(leagueKey);
@@ -47886,6 +47844,162 @@ var init_resolveLeagueDirectoryNavSections = __esm({
     init_define_import_meta_env();
     init_leagueDirectoryV1();
     init_resolveOnTodayNavItems();
+  }
+});
+
+// ../grarf/desktop/src/components/shell/desktopMenuLayout.ts
+function clampDesktopLeagueNavExpandedWidthPx(measuredPx) {
+  return Math.min(
+    DESKTOP_LEAGUE_NAV_EXPANDED_MAX_WIDTH_PX,
+    Math.max(
+      DESKTOP_LEAGUE_NAV_EXPANDED_MIN_WIDTH_PX,
+      Math.ceil(measuredPx + DESKTOP_LEAGUE_NAV_EXPANDED_PAD_PX)
+    )
+  );
+}
+function collectDesktopLeagueNavMeasureLabels() {
+  const labels = resolveLeagueDirectoryNavSections({}).flatMap(
+    (section) => section.items.map((item) => resolveMainMenuLeagueDirectoryLabel(item))
+  );
+  return [...labels, "FANTASY", "BETTING"];
+}
+function measureDesktopLeagueNavExpandedWidthReferencePx() {
+  if (typeof document === "undefined") {
+    return DESKTOP_LEAGUE_NAV_EXPANDED_MIN_WIDTH_PX;
+  }
+  const container = document.createElement("div");
+  container.setAttribute("aria-hidden", "true");
+  container.style.cssText = "position:absolute;left:-9999px;top:0;visibility:hidden;pointer-events:none;";
+  for (const label of collectDesktopLeagueNavMeasureLabels()) {
+    const span = document.createElement("span");
+    span.className = DESKTOP_LEAGUE_NAV_MEASURE_ROW_CLASS;
+    span.textContent = label;
+    container.appendChild(span);
+  }
+  document.body.appendChild(container);
+  let maxLabelPx = 0;
+  for (const child of container.children) {
+    if (child instanceof HTMLElement) {
+      maxLabelPx = Math.max(maxLabelPx, child.offsetWidth);
+    }
+  }
+  document.body.removeChild(container);
+  return clampDesktopLeagueNavExpandedWidthPx(
+    Math.max(maxLabelPx, DESKTOP_LEAGUE_NAV_EXPANDED_HEADER_MIN_PX)
+  );
+}
+function notifyLayoutListeners() {
+  layoutListeners.forEach((listener) => listener());
+}
+function scheduleExpandedWidthFontsProbe() {
+  if (fontsProbeScheduled || typeof document === "undefined") return;
+  fontsProbeScheduled = true;
+  void document.fonts?.ready?.then(() => {
+    if (committedExpandedPanelRightPx !== void 0) return;
+    commitDesktopLeagueNavExpandedPanelRightPx(measureDesktopLeagueNavExpandedWidthReferencePx());
+  });
+}
+function commitDesktopLeagueNavExpandedPanelRightPx(widthPx) {
+  if (committedExpandedPanelRightPx !== void 0 && widthPx <= committedExpandedPanelRightPx) {
+    return;
+  }
+  const changed = committedExpandedPanelRightPx !== widthPx;
+  committedExpandedPanelRightPx = widthPx;
+  cachedDesktopMenuTrailingTabsMarginLeftPx = void 0;
+  if (changed) notifyLayoutListeners();
+}
+function subscribeDesktopMenuTrailingTabsLayout(listener) {
+  layoutListeners.add(listener);
+  return () => layoutListeners.delete(listener);
+}
+function resolveDesktopMenuTrailingTabsMarginLeftPx(expandedPanelRightPx) {
+  return Math.max(
+    0,
+    expandedPanelRightPx - DESKTOP_LEAGUE_NAV_MINIMIZED_WIDTH_PX - DESKTOP_MENU_NAV_ITEM_GAP_PX
+  );
+}
+function getDesktopMenuTrailingTabsMarginLeftPx() {
+  scheduleExpandedWidthFontsProbe();
+  if (committedExpandedPanelRightPx === void 0) {
+    return resolveDesktopMenuTrailingTabsMarginLeftPx(measureDesktopLeagueNavExpandedWidthReferencePx());
+  }
+  if (cachedDesktopMenuTrailingTabsMarginLeftPx === void 0) {
+    cachedDesktopMenuTrailingTabsMarginLeftPx = resolveDesktopMenuTrailingTabsMarginLeftPx(
+      committedExpandedPanelRightPx
+    );
+  }
+  return cachedDesktopMenuTrailingTabsMarginLeftPx;
+}
+var DESKTOP_LEAGUE_NAV_PANEL_BG_CLASS, DESKTOP_LEAGUE_NAV_PANEL_BORDER_CLASS, DESKTOP_MENU_ROW_BOTTOM_BORDER_COLOR_CLASS, DESKTOP_MENU_ROW_BOTTOM_BORDER_CLASS, DESKTOP_ALL_OPEN_OUTLINE_CLASS, DESKTOP_LEAGUE_NAV_MINIMIZED_WIDTH_PX, DESKTOP_LEAGUE_NAV_MINIMIZED_WIDTH_CLASS, DESKTOP_LEAGUE_NAV_EXPANDED_MIN_WIDTH_PX, DESKTOP_LEAGUE_NAV_EXPANDED_MAX_WIDTH_PX, DESKTOP_LEAGUE_NAV_EXPANDED_PAD_PX, DESKTOP_LEAGUE_NAV_EXPANDED_HEADER_MIN_PX, DESKTOP_LEAGUE_NAV_MEASURE_ROW_CLASS, DESKTOP_MENU_NAV_ITEM_GAP_PX, DESKTOP_MENU_PRIMARY_TAB_GAP_CLASS, committedExpandedPanelRightPx, cachedDesktopMenuTrailingTabsMarginLeftPx, fontsProbeScheduled, layoutListeners;
+var init_desktopMenuLayout = __esm({
+  "../grarf/desktop/src/components/shell/desktopMenuLayout.ts"() {
+    init_define_import_meta_env();
+    init_cn();
+    init_resolveMainMenuLeagueDirectoryLabel();
+    init_resolveLeagueDirectoryNavSections();
+    DESKTOP_LEAGUE_NAV_PANEL_BG_CLASS = "bg-[#020404]/95";
+    DESKTOP_LEAGUE_NAV_PANEL_BORDER_CLASS = "border-line";
+    DESKTOP_MENU_ROW_BOTTOM_BORDER_COLOR_CLASS = "bg-[#2e3844]";
+    DESKTOP_MENU_ROW_BOTTOM_BORDER_CLASS = "border-[#2e3844]";
+    DESKTOP_ALL_OPEN_OUTLINE_CLASS = cn2(
+      "border border-b-0 border-t border-l border-r",
+      DESKTOP_LEAGUE_NAV_PANEL_BORDER_CLASS
+    );
+    DESKTOP_LEAGUE_NAV_MINIMIZED_WIDTH_PX = 64;
+    DESKTOP_LEAGUE_NAV_MINIMIZED_WIDTH_CLASS = cn2(
+      "box-border w-[64px] min-w-[64px] max-w-[64px]"
+    );
+    DESKTOP_LEAGUE_NAV_EXPANDED_MIN_WIDTH_PX = 132;
+    DESKTOP_LEAGUE_NAV_EXPANDED_MAX_WIDTH_PX = 248;
+    DESKTOP_LEAGUE_NAV_EXPANDED_PAD_PX = 18;
+    DESKTOP_LEAGUE_NAV_EXPANDED_HEADER_MIN_PX = 44;
+    DESKTOP_LEAGUE_NAV_MEASURE_ROW_CLASS = "block whitespace-nowrap px-2 py-1.5 font-mono text-left text-[10px] tracking-[0.12em]";
+    DESKTOP_MENU_NAV_ITEM_GAP_PX = 2;
+    DESKTOP_MENU_PRIMARY_TAB_GAP_CLASS = "gap-[2px]";
+    fontsProbeScheduled = false;
+    layoutListeners = /* @__PURE__ */ new Set();
+  }
+});
+
+// ../grarf/desktop/src/lib/navigation/resolveLeagueNavActivityStatuses.ts
+function resolveActivityBucketStatus(game) {
+  if (game.status === "final") return "final";
+  if (isGameActivelyLive(game)) return "live";
+  return "scheduled";
+}
+function buildActivityTallyStatusesByBucket(statuses) {
+  let finalCount = 0;
+  let liveCount = 0;
+  let scheduledCount = 0;
+  for (const status of statuses) {
+    if (status === "final") finalCount++;
+    else if (status === "live") liveCount++;
+    else if (status === "scheduled") scheduledCount++;
+  }
+  return [
+    ...Array(finalCount).fill("final"),
+    ...Array(liveCount).fill("live"),
+    ...Array(scheduledCount).fill("scheduled")
+  ];
+}
+function resolveLeagueNavActivityStatusesByLeague(mergedLeagues) {
+  const out = /* @__PURE__ */ new Map();
+  for (const leagueKey of getOperationalSlateLeagueOrder()) {
+    const slate = filterGamesSpineSlateForOperationalSportsDay(mergedLeagues[leagueKey] ?? []);
+    if (slate.length === 0) continue;
+    out.set(
+      leagueKey,
+      buildActivityTallyStatusesByBucket(slate.map((game) => resolveActivityBucketStatus(game)))
+    );
+  }
+  return out;
+}
+var init_resolveLeagueNavActivityStatuses = __esm({
+  "../grarf/desktop/src/lib/navigation/resolveLeagueNavActivityStatuses.ts"() {
+    init_define_import_meta_env();
+    init_gamesColumnLeagues();
+    init_gamesSpineOperationalDate();
+    init_isGameActivelyLive();
   }
 });
 
@@ -51430,6 +51544,17 @@ var init_isHomeGamesSpineMigrationPath = __esm({
   }
 });
 
+// ../grarf/desktop/src/lib/home/shouldUseHomeDesktopObjectsSpineTemporalSections.ts
+function shouldUseHomeDesktopObjectsSpineTemporalSections() {
+  return isGrarfElectronRenderer() && !isCanonicalWebBrowserRenderer();
+}
+var init_shouldUseHomeDesktopObjectsSpineTemporalSections = __esm({
+  "../grarf/desktop/src/lib/home/shouldUseHomeDesktopObjectsSpineTemporalSections.ts"() {
+    init_define_import_meta_env();
+    init_isGrarfWebRenderer();
+  }
+});
+
 // ../grarf/desktop/src/lib/home/shouldShowLeagueSearchInGamesSpineHeader.ts
 function shouldShowLeagueSearchInGamesSpineHeader(pathname) {
   return isGrarfElectronRenderer() && !isCanonicalWebBrowserRenderer() && isHomeGamesSpineMigrationPath(pathname);
@@ -52091,9 +52216,6 @@ var init_homeLeagueWorkspaceChrome = __esm({
 });
 
 // ../grarf/desktop/src/components/shell/AppLeftNav.tsx
-function clampExpandedWidth(measuredPx) {
-  return Math.min(EXPANDED_MAX_PX, Math.max(EXPANDED_MIN_PX, Math.ceil(measuredPx + EXPANDED_PAD_PX)));
-}
 function measureLongestLabelPx(container) {
   let max = 0;
   for (const child of container.children) {
@@ -52405,8 +52527,10 @@ function AppLeftNav({
     (s2) => s2.openBrowserBettingWaitlist
   );
   const gateLeagueNav = isGrarfWebRenderer();
+  const hideHomeDirectoryRow = isGrarfElectronRenderer() && shouldUseHomeDesktopObjectsSpineTemporalSections() && isHomeGamesSpineMigrationPath(pathname);
   const showLeagueSearchInSpineHeader = shouldShowLeagueSearchInGamesSpineHeader(pathname);
-  const leagueSearchEnabled = gateLeagueNav || showLeagueSearchInSpineHeader;
+  const showLeagueSearchInAllPanel = hideHomeDirectoryRow && !sidebarCollapsed;
+  const leagueSearchEnabled = gateLeagueNav || showLeagueSearchInAllPanel;
   const leagueWorkspaceId = useHomeLeagueWorkspaceStore((s2) => s2.activeId);
   const centerPaneMode = useCenterPaneApplicationModeStore((s2) => s2.mode);
   const liveSubmenuId = useHomeLiveSubmenuStore((s2) => s2.activeId);
@@ -52466,25 +52590,34 @@ function AppLeftNav({
   const showLeagueSearchInMainMenu = gateLeagueNav && !sidebarCollapsed && !showLeagueSearchInSpineHeader;
   const menuLabels = (0, import_react20.useMemo)(
     () => [
-      ...leagueSearchActive || objectsSpineTemporalLeagueList === "now" ? [] : [LEAGUE_DIRECTORY_HOME.label],
+      ...leagueSearchActive || objectsSpineTemporalLeagueList === "now" || hideHomeDirectoryRow ? [] : [LEAGUE_DIRECTORY_HOME.label],
       ...visibleLeagueDirectorySections.flatMap(
         (section) => section.items.map((item) => resolveMainMenuLeagueDirectoryLabel(item))
       ),
       "FANTASY",
       "BETTING"
     ],
-    [leagueSearchActive, visibleLeagueDirectorySections]
+    [hideHomeDirectoryRow, leagueSearchActive, objectsSpineTemporalLeagueList, visibleLeagueDirectorySections]
   );
-  const [expandedWidthPx, setExpandedWidthPx] = (0, import_react20.useState)(EXPANDED_MIN_PX);
+  const [expandedWidthPx, setExpandedWidthPx] = (0, import_react20.useState)(DESKTOP_LEAGUE_NAV_EXPANDED_MIN_WIDTH_PX);
   const remeasure = (0, import_react20.useCallback)(() => {
     const el = measureRef.current;
-    if (!el) return;
-    setExpandedWidthPx(clampExpandedWidth(Math.max(measureLongestLabelPx(el), HEADER_MIN_PX)));
+    if (!el) return null;
+    const width = clampDesktopLeagueNavExpandedWidthPx(
+      Math.max(measureLongestLabelPx(el), DESKTOP_LEAGUE_NAV_EXPANDED_HEADER_MIN_PX)
+    );
+    setExpandedWidthPx(width);
+    return width;
   }, []);
   (0, import_react20.useLayoutEffect)(() => {
     if (sidebarCollapsed) return;
-    remeasure();
-    void document.fonts?.ready?.then(() => remeasure());
+    const width = remeasure();
+    if (width != null) commitDesktopLeagueNavExpandedPanelRightPx(width);
+    void document.fonts?.ready?.then(() => {
+      if (sidebarCollapsed) return;
+      const nextWidth = remeasure();
+      if (nextWidth != null) commitDesktopLeagueNavExpandedPanelRightPx(nextWidth);
+    });
   }, [sidebarCollapsed, menuLabels, remeasure]);
   (0, import_react20.useLayoutEffect)(() => {
     if (sidebarCollapsed || typeof ResizeObserver === "undefined") return;
@@ -52495,19 +52628,14 @@ function AppLeftNav({
     return () => ro2.disconnect();
   }, [sidebarCollapsed, remeasure]);
   const expandedStyle = sidebarCollapsed ? void 0 : { width: expandedWidthPx, minWidth: expandedWidthPx, maxWidth: expandedWidthPx };
-  const homeActive = isDirectoryItemActive(
-    LEAGUE_DIRECTORY_HOME,
-    pathname,
-    homeShellMode,
-    leagueWorkspaceId
-  );
   return /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)(
     "nav",
     {
       className: cn2(
-        "relative flex shrink-0 flex-col border-r border-line bg-[#020404]/95 transition-[width,min-width,max-width] duration-300 ease-out",
+        "relative flex shrink-0 flex-col border-r border-line transition-[width,min-width,max-width] duration-300 ease-out",
+        DESKTOP_LEAGUE_NAV_PANEL_BG_CLASS,
         !objectsSpineContinuousDocumentScroll && "h-full min-h-0",
-        sidebarCollapsed && "w-[64px] min-w-[64px] max-w-[64px]"
+        sidebarCollapsed && DESKTOP_LEAGUE_NAV_MINIMIZED_WIDTH_CLASS
       ),
       style: expandedStyle,
       "aria-label": "Main navigation",
@@ -52518,7 +52646,7 @@ function AppLeftNav({
             ref: measureRef,
             "aria-hidden": true,
             className: "pointer-events-none absolute left-0 top-0 -z-10 inline-block opacity-0",
-            children: menuLabels.map((label) => /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("span", { className: MEASURE_ROW_CLASS, children: label }, label))
+            children: menuLabels.map((label) => /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("span", { className: DESKTOP_LEAGUE_NAV_MEASURE_ROW_CLASS, children: label }, label))
           }
         ) : null,
         /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)(
@@ -52562,7 +52690,7 @@ function AppLeftNav({
                   ]
                 }
               ),
-              showNoLeagueSearchMatches ? /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("p", { className: "px-2 pb-1.5 font-mono text-[10px] tracking-[0.08em] text-textdim/80", children: "No leagues found" }) : null
+              showNoLeagueSearchMatches && showLeagueSearchInMainMenu ? /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("p", { className: "px-2 pb-1.5 font-mono text-[10px] tracking-[0.08em] text-textdim/80", children: "No leagues found" }) : null
             ]
           }
         ),
@@ -52573,11 +52701,27 @@ function AppLeftNav({
               objectsSpineContinuousDocumentScroll ? "shrink-0" : "min-h-0 flex-1 overflow-y-auto overscroll-contain"
             ),
             children: /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("div", { className: cn2("space-y-px", sidebarCollapsed ? "py-1" : "py-0.5"), children: [
-              !leagueSearchActive && objectsSpineTemporalLeagueList !== "now" ? /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(
+              showLeagueSearchInAllPanel ? /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("div", { className: "px-1 pb-0.5", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(
+                  MainMenuLeagueSearchBar,
+                  {
+                    className: "min-w-0 w-full",
+                    value: leagueSearchQuery,
+                    onChange: setLeagueSearchQuery
+                  }
+                ),
+                showNoLeagueSearchMatches ? /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("p", { className: "pt-1 font-mono text-[10px] tracking-[0.08em] text-textdim/80", children: "No leagues found" }) : null
+              ] }) : null,
+              !leagueSearchActive && objectsSpineTemporalLeagueList !== "now" && !hideHomeDirectoryRow ? /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(
                 DirectoryNavRow,
                 {
                   item: LEAGUE_DIRECTORY_HOME,
-                  active: homeActive,
+                  active: isDirectoryItemActive(
+                    LEAGUE_DIRECTORY_HOME,
+                    pathname,
+                    homeShellMode,
+                    leagueWorkspaceId
+                  ),
                   sidebarCollapsed,
                   onActivate: closeHomeLeagueWorkspace
                 }
@@ -52682,11 +52826,15 @@ function ObjectsSpineTemporalLeagueNavList({
     [sections]
   );
   const measureRef = (0, import_react20.useRef)(null);
-  const [expandedWidthPx, setExpandedWidthPx] = (0, import_react20.useState)(EXPANDED_MIN_PX);
+  const [expandedWidthPx, setExpandedWidthPx] = (0, import_react20.useState)(DESKTOP_LEAGUE_NAV_EXPANDED_MIN_WIDTH_PX);
   const remeasure = (0, import_react20.useCallback)(() => {
     const el = measureRef.current;
     if (!el) return;
-    setExpandedWidthPx(clampExpandedWidth(Math.max(measureLongestLabelPx(el), HEADER_MIN_PX)));
+    setExpandedWidthPx(
+      clampDesktopLeagueNavExpandedWidthPx(
+        Math.max(measureLongestLabelPx(el), DESKTOP_LEAGUE_NAV_EXPANDED_HEADER_MIN_PX)
+      )
+    );
   }, []);
   (0, import_react20.useLayoutEffect)(() => {
     remeasure();
@@ -52712,7 +52860,7 @@ function ObjectsSpineTemporalLeagueNavList({
         ref: measureRef,
         "aria-hidden": true,
         className: "pointer-events-none absolute left-0 top-0 -z-10 inline-block opacity-0",
-        children: menuLabels.map((label) => /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("span", { className: MEASURE_ROW_CLASS, children: label }, label))
+        children: menuLabels.map((label) => /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("span", { className: DESKTOP_LEAGUE_NAV_MEASURE_ROW_CLASS, children: label }, label))
       }
     ),
     /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("div", { className: "space-y-px py-0.5", children: sections.map((section) => /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(
@@ -52733,7 +52881,7 @@ function ObjectsSpineTemporalLeagueNavList({
     )) })
   ] });
 }
-var import_react20, import_jsx_runtime16, EXPANDED_MIN_PX, EXPANDED_MAX_PX, EXPANDED_PAD_PX, HEADER_MIN_PX, MEASURE_ROW_CLASS, rowBase, utilityDestinationCardBase, utilityDestinationCardInactive, utilityDestinationCardActive;
+var import_react20, import_jsx_runtime16, rowBase, utilityDestinationCardBase, utilityDestinationCardInactive, utilityDestinationCardActive;
 var init_AppLeftNav = __esm({
   "../grarf/desktop/src/components/shell/AppLeftNav.tsx"() {
     init_define_import_meta_env();
@@ -52747,6 +52895,7 @@ var init_AppLeftNav = __esm({
     init_DirectoryNavSportGroupHeader();
     init_MainMenuLeagueSearchBar();
     init_OnTodayNavRowWithTallies();
+    init_desktopMenuLayout();
     init_gamesSpineLeagueLogoUrls();
     init_resolveLeagueNavActivityStatuses();
     init_resolveLeagueDirectoryNavSections();
@@ -52755,6 +52904,8 @@ var init_AppLeftNav = __esm({
     init_resolveHomeDesktopObjectsSpineTemporalLeagueNavSections();
     init_operationalManualLeagueGames();
     init_isGrarfWebRenderer();
+    init_isHomeGamesSpineMigrationPath();
+    init_shouldUseHomeDesktopObjectsSpineTemporalSections();
     init_shouldShowLeagueSearchInGamesSpineHeader();
     init_MainMenuLeagueSearchContext();
     init_GatedLeagueCommandCentersContext();
@@ -52776,11 +52927,6 @@ var init_AppLeftNav = __esm({
     init_homeLiveSubmenuStore();
     init_liveGamesStore();
     import_jsx_runtime16 = __toESM(require_jsx_runtime(), 1);
-    EXPANDED_MIN_PX = 132;
-    EXPANDED_MAX_PX = 248;
-    EXPANDED_PAD_PX = 18;
-    HEADER_MIN_PX = 44;
-    MEASURE_ROW_CLASS = "block whitespace-nowrap px-2 py-1.5 font-mono text-left text-[10px] tracking-[0.12em]";
     rowBase = "block w-full whitespace-nowrap border border-transparent font-mono text-left text-[10px] tracking-[0.12em] transition duration-200 ease-out";
     utilityDestinationCardBase = "rounded-[2px] border border-[#1a282c]/75 bg-[#080d0f] shadow-[inset_0_1px_0_rgba(255,255,255,0.05),inset_0_-1px_0_rgba(0,0,0,0.55)]";
     utilityDestinationCardInactive = "text-[#9eb0b0] hover:border-line/80 hover:bg-[#0b1214] hover:text-ambersys/90";
@@ -53496,6 +53642,14 @@ function DesktopPrimaryNavigationBar() {
   const { pathname } = useLocation();
   const activeSelection = useDesktopPrimaryNavigationStore((s2) => s2.activeSelection);
   const allScopePanelOpen = useDesktopPrimaryNavigationStore((s2) => s2.allScopePanelOpen);
+  const [trailingTabsMarginLeftPx, setTrailingTabsMarginLeftPx] = (0, import_react23.useState)(
+    () => getDesktopMenuTrailingTabsMarginLeftPx()
+  );
+  (0, import_react23.useLayoutEffect)(() => {
+    return subscribeDesktopMenuTrailingTabsLayout(() => {
+      setTrailingTabsMarginLeftPx(getDesktopMenuTrailingTabsMarginLeftPx());
+    });
+  }, []);
   (0, import_react23.useEffect)(() => {
     bootstrapDesktopPrimaryNavigation(navigate, pathname);
   }, [navigate, pathname]);
@@ -53534,8 +53688,11 @@ function DesktopPrimaryNavigationBar() {
             onClick: () => onPrimarySelect("all"),
             className: cn2(
               ALL_TAB_CLASS,
-              "hover:bg-[#0a1c22] hover:text-cyansys/95",
-              isPrimaryActive("all") && "bg-[#0c2028] text-cyansys"
+              isPrimaryActive("all") ? cn2(
+                DESKTOP_LEAGUE_NAV_PANEL_BG_CLASS,
+                DESKTOP_ALL_OPEN_OUTLINE_CLASS,
+                "relative z-[2] -mb-px text-cyansys hover:bg-[#020404]/95 hover:text-cyansys"
+              ) : "hover:bg-[#0a1c22] hover:text-cyansys/95"
             ),
             children: /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)("span", { className: "inline-flex items-center gap-0.5", children: [
               "ALL",
@@ -53543,89 +53700,81 @@ function DesktopPrimaryNavigationBar() {
             ] })
           }
         ),
-        /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(
-          "button",
-          {
-            type: "button",
-            "aria-pressed": isPrimaryActive("workspaces"),
-            onClick: () => onPrimarySelect("workspaces"),
-            className: cn2(WORKSPACES_TAB_CLASS, "hover:bg-[#040a0c]"),
-            children: "WORKSPACES"
-          }
-        ),
-        /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(
-          "div",
-          {
-            className: cn2(
-              "flex shrink-0 items-stretch",
-              GROUP_GAP_CLASS,
-              NAV_GROUP_SEPARATOR_CLASS
-            ),
-            role: "group",
-            "aria-label": "Mode navigation",
-            children: TEMPORAL_NAV_ITEMS.map(({ tab, label }) => {
-              const active2 = isPrimaryActive(tab);
-              return /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(
-                "button",
-                {
-                  type: "button",
-                  "aria-pressed": active2,
-                  onClick: () => onPrimarySelect(tab),
-                  className: cn2(
-                    PRIMARY_BLOCK_TAB_CLASS,
-                    tab === "now" && active2 ? NOW_ACTIVE_CLASS : active2 ? MODE_NAV_BLOCK_ACTIVE : MODE_NAV_BLOCK,
-                    "hover:brightness-105"
-                  ),
-                  children: label
-                },
-                tab
-              );
-            })
-          }
-        ),
         /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)(
           "div",
           {
-            className: cn2(
-              "flex shrink-0 items-stretch",
-              GROUP_GAP_CLASS,
-              NAV_GROUP_SEPARATOR_CLASS
-            ),
-            role: "group",
-            "aria-label": "Direct content navigation",
+            className: "flex shrink-0 items-stretch gap-0.5",
+            style: { marginLeft: trailingTabsMarginLeftPx },
+            "data-desktop-trailing-primary-navigation": true,
             children: [
               /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(
-                "button",
+                "div",
                 {
-                  type: "button",
-                  "aria-pressed": isPrimaryActive("browser"),
-                  onClick: () => onPrimarySelect("browser"),
-                  className: cn2(
-                    PRIMARY_BLOCK_TAB_CLASS,
-                    isPrimaryActive("browser") ? BROWSER_BLOCK_ACTIVE : BROWSER_BLOCK,
-                    "hover:brightness-105"
-                  ),
-                  children: "BROWSER"
+                  className: cn2("flex shrink-0 items-stretch", GROUP_GAP_CLASS),
+                  role: "group",
+                  "aria-label": "Mode navigation",
+                  children: TEMPORAL_NAV_ITEMS.map(({ tab, label }) => {
+                    const active2 = isPrimaryActive(tab);
+                    return /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(
+                      "button",
+                      {
+                        type: "button",
+                        "aria-pressed": active2,
+                        onClick: () => onPrimarySelect(tab),
+                        className: cn2(
+                          PRIMARY_BLOCK_TAB_CLASS,
+                          tab === "now" && active2 ? NOW_ACTIVE_CLASS : active2 ? MODE_NAV_BLOCK_ACTIVE : MODE_NAV_BLOCK,
+                          "hover:brightness-105"
+                        ),
+                        children: label
+                      },
+                      tab
+                    );
+                  })
                 }
               ),
-              DIRECT_CONTENT_ITEMS.map(({ tab, label }) => {
-                const active2 = activeSelection.kind === "direct" && activeSelection.tab === tab;
-                return /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(
-                  "button",
-                  {
-                    type: "button",
-                    "aria-pressed": active2,
-                    onClick: () => onDirectSelect(tab),
-                    className: cn2(
-                      SECONDARY_BLOCK_TAB_CLASS,
-                      active2 ? SECONDARY_BLOCK_ACTIVE : SECONDARY_BLOCK,
-                      "hover:brightness-105"
+              /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)(
+                "div",
+                {
+                  className: cn2("flex shrink-0 items-stretch", GROUP_GAP_CLASS, NAV_GROUP_SEPARATOR_CLASS),
+                  role: "group",
+                  "aria-label": "Direct content navigation",
+                  children: [
+                    /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(
+                      "button",
+                      {
+                        type: "button",
+                        "aria-pressed": isPrimaryActive("browser"),
+                        onClick: () => onPrimarySelect("browser"),
+                        className: cn2(
+                          PRIMARY_BLOCK_TAB_CLASS,
+                          isPrimaryActive("browser") ? BROWSER_BLOCK_ACTIVE : BROWSER_BLOCK,
+                          "hover:brightness-105"
+                        ),
+                        children: "BROWSER"
+                      }
                     ),
-                    children: label
-                  },
-                  tab
-                );
-              })
+                    DIRECT_CONTENT_ITEMS.map(({ tab, label }) => {
+                      const active2 = activeSelection.kind === "direct" && activeSelection.tab === tab;
+                      return /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(
+                        "button",
+                        {
+                          type: "button",
+                          "aria-pressed": active2,
+                          onClick: () => onDirectSelect(tab),
+                          className: cn2(
+                            SECONDARY_BLOCK_TAB_CLASS,
+                            active2 ? SECONDARY_BLOCK_ACTIVE : SECONDARY_BLOCK,
+                            "hover:brightness-105"
+                          ),
+                          children: label
+                        },
+                        tab
+                      );
+                    })
+                  ]
+                }
+              )
             ]
           }
         )
@@ -53642,6 +53791,7 @@ var init_DesktopPrimaryNavigationBar = __esm({
     init_cn();
     init_applyDesktopPrimaryNavigationSelection();
     init_desktopPrimaryNavigationStore();
+    init_desktopMenuLayout();
     import_jsx_runtime20 = __toESM(require_jsx_runtime(), 1);
     TEMPORAL_NAV_ITEMS = [
       { tab: "catchUp", label: "CATCH UP" },
@@ -53656,7 +53806,7 @@ var init_DesktopPrimaryNavigationBar = __esm({
       { tab: "tv", label: "TV" }
     ];
     STANDARD_TAB_WIDTH_CLASS = "box-border w-[8rem] min-w-[8rem] max-w-[8rem] shrink-0 justify-center px-1";
-    GROUP_GAP_CLASS = "gap-[2px]";
+    GROUP_GAP_CLASS = DESKTOP_MENU_PRIMARY_TAB_GAP_CLASS;
     NAV_GROUP_SEPARATOR_CLASS = "ml-[18px]";
     STANDARD_TAB_BG = "bg-[#081418]/90";
     BORDERLESS_TAB = "border-0 shadow-none";
@@ -53671,7 +53821,8 @@ var init_DesktopPrimaryNavigationBar = __esm({
     );
     ALL_TAB_CLASS = cn2(
       PRIMARY_TAB_BASE,
-      "w-auto min-w-[calc((5ch+1.5rem)*1.5)] shrink-0 justify-center px-3 text-cyansys/75",
+      DESKTOP_LEAGUE_NAV_MINIMIZED_WIDTH_CLASS,
+      "shrink-0 justify-center px-0 text-cyansys/75",
       STANDARD_TAB_BG,
       BORDERLESS_TAB
     );
@@ -53874,17 +54025,6 @@ var init_useLiveDateTime = __esm({
   }
 });
 
-// ../grarf/desktop/src/components/shell/desktopTopRailLayout.ts
-var TOP_RAIL_LEFT_GUTTER_WIDTH_CLASS, TOP_RAIL_EXPAND_COLLAPSE_CONTROL_WIDTH_CLASS, TOP_RAIL_FIXED_REGION_LEFT_PADDING_CLASS;
-var init_desktopTopRailLayout = __esm({
-  "../grarf/desktop/src/components/shell/desktopTopRailLayout.ts"() {
-    init_define_import_meta_env();
-    TOP_RAIL_LEFT_GUTTER_WIDTH_CLASS = "w-[calc(0.75rem+2.5rem)]";
-    TOP_RAIL_EXPAND_COLLAPSE_CONTROL_WIDTH_CLASS = "w-10";
-    TOP_RAIL_FIXED_REGION_LEFT_PADDING_CLASS = "pl-3";
-  }
-});
-
 // ../grarf/desktop/src/components/shell/GlobalAppBar.tsx
 function GlobalAppBar() {
   const showTopNavSearch = isCanonicalWebBrowserRenderer();
@@ -53894,6 +54034,8 @@ function GlobalAppBar() {
   const feedLeftPx = useCenterPaneFeedAlignmentStore((s2) => s2.leftPx);
   const feedWidthPx = useCenterPaneFeedAlignmentStore((s2) => s2.widthPx);
   const paneAlignedFeed = feedLeftPx != null && feedWidthPx != null && feedWidthPx > 0 ? { left: feedLeftPx, width: feedWidthPx } : null;
+  const allScopePanelOpen = useDesktopPrimaryNavigationStore((s2) => s2.allScopePanelOpen);
+  const showSegmentedMenuBottomBorder = allScopePanelOpen;
   const openSettings = (0, import_react26.useCallback)(() => {
     if (!isElectron) return;
     setSettingsOpen(true);
@@ -53903,118 +54045,105 @@ function GlobalAppBar() {
   }, []);
   return /* @__PURE__ */ (0, import_jsx_runtime23.jsxs)(import_jsx_runtime23.Fragment, { children: [
     isElectron ? /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(DesktopSettingsPanel, { open: settingsOpen, onClose: closeSettings }) : null,
-    /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(
+    /* @__PURE__ */ (0, import_jsx_runtime23.jsxs)(
       "header",
       {
         className: cn2(
           "z-40 shrink-0 font-mono",
-          isElectron ? "bg-[#0a1c20]" : "flex h-11 shrink-0 items-center gap-2 border-b border-line bg-[#020404]/98 px-3 sm:gap-3"
+          isElectron ? "relative bg-[#0a1c20]" : "flex h-11 shrink-0 items-center gap-2 border-b border-line bg-[#020404]/98 px-3 sm:gap-3"
         ),
         "aria-label": "Global application bar",
         "data-desktop-menu-bar": isElectron ? true : void 0,
-        children: isElectron ? /* @__PURE__ */ (0, import_jsx_runtime23.jsxs)(
-          "div",
-          {
-            className: cn2(
-              "flex w-full items-end gap-2 border-b border-[#2e3844] border-t border-cyansys/30 pr-2 pt-1 shadow-[inset_0_1px_0_rgba(86,247,255,0.1)]",
-              TOP_RAIL_FIXED_REGION_LEFT_PADDING_CLASS
-            ),
-            children: [
-              /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(
-                "div",
-                {
-                  className: cn2(
-                    TOP_RAIL_EXPAND_COLLAPSE_CONTROL_WIDTH_CLASS,
-                    "flex shrink-0 justify-center self-center pb-1"
-                  ),
-                  children: /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(
-                    Link,
+        children: [
+          isElectron && showSegmentedMenuBottomBorder ? /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(import_jsx_runtime23.Fragment, { children: /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(
+            "div",
+            {
+              "aria-hidden": true,
+              className: cn2(
+                "pointer-events-none absolute bottom-0 right-0 z-[1] h-px",
+                DESKTOP_MENU_ROW_BOTTOM_BORDER_COLOR_CLASS
+              ),
+              style: { left: DESKTOP_LEAGUE_NAV_MINIMIZED_WIDTH_PX },
+              "data-desktop-menu-bottom-border-right": true
+            }
+          ) }) : null,
+          isElectron ? /* @__PURE__ */ (0, import_jsx_runtime23.jsxs)(
+            "div",
+            {
+              className: cn2(
+                "flex w-full items-end gap-2 border-t border-cyansys/30 pr-2 pt-1 shadow-[inset_0_1px_0_rgba(86,247,255,0.1)]",
+                showSegmentedMenuBottomBorder ? "border-b-0" : cn2("border-b", DESKTOP_MENU_ROW_BOTTOM_BORDER_CLASS)
+              ),
+              children: [
+                /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(DesktopPrimaryNavigationBar, {}),
+                /* @__PURE__ */ (0, import_jsx_runtime23.jsxs)("div", { className: "ml-auto flex shrink-0 items-center gap-2 pb-1", children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(GuidedAttentionToggleButton, {}),
+                  /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(
+                    "button",
                     {
-                      to: "/",
-                      "aria-label": "GRARF home",
-                      className: "opacity-90 transition hover:opacity-100",
-                      onClick: () => closeHomeLeagueWorkspace(),
-                      children: /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(
-                        "img",
-                        {
-                          src: "/grarf_logo-white.png",
-                          alt: "GRARF",
-                          className: "h-7 w-auto object-contain",
-                          draggable: false
-                        }
-                      )
+                      type: "button",
+                      "aria-label": "Settings",
+                      onClick: openSettings,
+                      className: "flex items-center justify-center text-cyansys/55 transition hover:text-cyansys/90",
+                      children: /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(Settings, { size: 14, "aria-hidden": true })
+                    }
+                  )
+                ] })
+              ]
+            }
+          ) : /* @__PURE__ */ (0, import_jsx_runtime23.jsxs)(import_jsx_runtime23.Fragment, { children: [
+            /* @__PURE__ */ (0, import_jsx_runtime23.jsxs)("div", { className: "flex shrink-0 items-center gap-2 sm:gap-3", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(
+                Link,
+                {
+                  to: "/",
+                  "aria-label": "GRARF home",
+                  className: "flex items-center opacity-90 transition hover:opacity-100",
+                  onClick: () => closeHomeLeagueWorkspace(),
+                  children: /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(
+                    "img",
+                    {
+                      src: "/grarf_logo-white.png",
+                      alt: "GRARF",
+                      className: "h-7 w-auto object-contain",
+                      draggable: false
                     }
                   )
                 }
               ),
-              /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(DesktopPrimaryNavigationBar, {}),
-              /* @__PURE__ */ (0, import_jsx_runtime23.jsxs)("div", { className: "ml-auto flex shrink-0 items-center gap-2 pb-1", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(GuidedAttentionToggleButton, {}),
-                /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(
-                  "button",
-                  {
-                    type: "button",
-                    "aria-label": "Settings",
-                    onClick: openSettings,
-                    className: "flex items-center justify-center text-cyansys/55 transition hover:text-cyansys/90",
-                    children: /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(Settings, { size: 14, "aria-hidden": true })
-                  }
-                )
-              ] })
-            ]
-          }
-        ) : /* @__PURE__ */ (0, import_jsx_runtime23.jsxs)(import_jsx_runtime23.Fragment, { children: [
-          /* @__PURE__ */ (0, import_jsx_runtime23.jsxs)("div", { className: "flex shrink-0 items-center gap-2 sm:gap-3", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(
-              Link,
+              showTopNavSearch ? /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(GatedFeatureSearchBar, { placeholder: "Search signals, markets, games\u2026", className: "flex-none" }) : null
+            ] }),
+            /* @__PURE__ */ (0, import_jsx_runtime23.jsx)("div", { className: "relative flex min-w-0 flex-1 items-center justify-center px-0.5 sm:px-1", children: paneAlignedFeed ? /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(
+              "div",
               {
-                to: "/",
-                "aria-label": "GRARF home",
-                className: "flex items-center opacity-90 transition hover:opacity-100",
-                onClick: () => closeHomeLeagueWorkspace(),
-                children: /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(
-                  "img",
-                  {
-                    src: "/grarf_logo-white.png",
-                    alt: "GRARF",
-                    className: "h-7 w-auto object-contain",
-                    draggable: false
-                  }
-                )
+                className: "fixed z-[41] flex h-11 w-full items-center justify-center px-0.5 sm:px-1",
+                style: { left: paneAlignedFeed.left, width: paneAlignedFeed.width, top: 0 },
+                children: /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(GlobalHeaderNewsTicker, { className: "mx-auto w-[70.875%] max-w-none shrink-0 flex-none" })
               }
-            ),
-            showTopNavSearch ? /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(GatedFeatureSearchBar, { placeholder: "Search signals, markets, games\u2026", className: "flex-none" }) : null
-          ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime23.jsx)("div", { className: "relative flex min-w-0 flex-1 items-center justify-center px-0.5 sm:px-1", children: paneAlignedFeed ? /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(
-            "div",
-            {
-              className: "fixed z-[41] flex h-11 w-full items-center justify-center px-0.5 sm:px-1",
-              style: { left: paneAlignedFeed.left, width: paneAlignedFeed.width, top: 0 },
-              children: /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(GlobalHeaderNewsTicker, { className: "mx-auto w-[70.875%] max-w-none shrink-0 flex-none" })
-            }
-          ) : /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(GlobalHeaderNewsTicker, { className: "mx-auto w-[70.875%] max-w-none shrink-0 flex-none" }) }),
-          /* @__PURE__ */ (0, import_jsx_runtime23.jsxs)("div", { className: "flex shrink-0 items-center justify-end gap-2 sm:gap-3", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(GuidedAttentionToggleButton, {}),
-            /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(
-              "span",
-              {
-                className: "hidden shrink-0 text-[9px] tracking-[0.12em] text-textdim/80 xl:inline",
-                "aria-live": "off",
-                children: datetime
-              }
-            ),
-            /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(
-              "button",
-              {
-                type: "button",
-                "aria-label": "Settings",
-                onClick: openSettings,
-                className: "flex items-center justify-center text-textdim/60 transition hover:text-textdim",
-                children: /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(Settings, { size: 14, "aria-hidden": true })
-              }
-            )
+            ) : /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(GlobalHeaderNewsTicker, { className: "mx-auto w-[70.875%] max-w-none shrink-0 flex-none" }) }),
+            /* @__PURE__ */ (0, import_jsx_runtime23.jsxs)("div", { className: "flex shrink-0 items-center justify-end gap-2 sm:gap-3", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(GuidedAttentionToggleButton, {}),
+              /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(
+                "span",
+                {
+                  className: "hidden shrink-0 text-[9px] tracking-[0.12em] text-textdim/80 xl:inline",
+                  "aria-live": "off",
+                  children: datetime
+                }
+              ),
+              /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(
+                "button",
+                {
+                  type: "button",
+                  "aria-label": "Settings",
+                  onClick: openSettings,
+                  className: "flex items-center justify-center text-textdim/60 transition hover:text-textdim",
+                  children: /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(Settings, { size: 14, "aria-hidden": true })
+                }
+              )
+            ] })
           ] })
-        ] })
+        ]
       }
     )
   ] });
@@ -54034,10 +54163,22 @@ var init_GlobalAppBar = __esm({
     init_GatedFeatureSearchBar();
     init_openF1LeagueWorkspace();
     init_centerPaneFeedAlignmentStore();
+    init_desktopPrimaryNavigationStore();
     init_useLiveDateTime();
     init_cn();
-    init_desktopTopRailLayout();
+    init_desktopMenuLayout();
     import_jsx_runtime23 = __toESM(require_jsx_runtime(), 1);
+  }
+});
+
+// ../grarf/desktop/src/components/shell/desktopTopRailLayout.ts
+var TOP_RAIL_LEFT_GUTTER_WIDTH_CLASS, TOP_RAIL_EXPAND_COLLAPSE_CONTROL_WIDTH_CLASS, TOP_RAIL_FIXED_REGION_LEFT_PADDING_CLASS;
+var init_desktopTopRailLayout = __esm({
+  "../grarf/desktop/src/components/shell/desktopTopRailLayout.ts"() {
+    init_define_import_meta_env();
+    TOP_RAIL_LEFT_GUTTER_WIDTH_CLASS = "w-[calc(0.75rem+2.5rem)]";
+    TOP_RAIL_EXPAND_COLLAPSE_CONTROL_WIDTH_CLASS = "w-10";
+    TOP_RAIL_FIXED_REGION_LEFT_PADDING_CLASS = "pl-3";
   }
 });
 
@@ -60046,17 +60187,6 @@ var init_DesktopTopRail = __esm({
       "flex min-w-0 flex-1 flex-col overflow-hidden rounded-sm border border-[#24363c]/75 bg-[#0b1216]",
       "shadow-[inset_0_1px_0_rgba(255,255,255,0.05),0_1px_2px_rgba(0,0,0,0.4)]"
     );
-  }
-});
-
-// ../grarf/desktop/src/lib/home/shouldUseHomeDesktopObjectsSpineTemporalSections.ts
-function shouldUseHomeDesktopObjectsSpineTemporalSections() {
-  return isGrarfElectronRenderer() && !isCanonicalWebBrowserRenderer();
-}
-var init_shouldUseHomeDesktopObjectsSpineTemporalSections = __esm({
-  "../grarf/desktop/src/lib/home/shouldUseHomeDesktopObjectsSpineTemporalSections.ts"() {
-    init_define_import_meta_env();
-    init_isGrarfWebRenderer();
   }
 });
 
@@ -125667,22 +125797,12 @@ var init_WorkspacePaneLayout = __esm({
 
 // ../grarf/desktop/src/components/gamesSpine/GamesSpineCommandBriefingHeader.tsx
 function GamesSpineCommandBriefingHeader() {
-  const { pathname } = useLocation();
-  const { query, setQuery } = useMainMenuLeagueSearchState();
-  const showLeagueSearch = shouldShowLeagueSearchInGamesSpineHeader(pathname);
-  if (showLeagueSearch) {
-    return /* @__PURE__ */ (0, import_jsx_runtime188.jsx)(MainMenuLeagueSearchBar, { className: "min-w-0 flex-1 px-0.5", value: query, onChange: setQuery });
-  }
   return /* @__PURE__ */ (0, import_jsx_runtime188.jsx)("span", { className: "shrink-0 px-0.5 text-[11px] tracking-[0.2em] text-textdim", children: "SLATE" });
 }
 var import_jsx_runtime188;
 var init_GamesSpineCommandBriefingHeader = __esm({
   "../grarf/desktop/src/components/gamesSpine/GamesSpineCommandBriefingHeader.tsx"() {
     init_define_import_meta_env();
-    init_dist();
-    init_MainMenuLeagueSearchContext();
-    init_shouldShowLeagueSearchInGamesSpineHeader();
-    init_MainMenuLeagueSearchBar();
     import_jsx_runtime188 = __toESM(require_jsx_runtime(), 1);
   }
 });
