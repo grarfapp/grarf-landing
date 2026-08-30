@@ -58855,186 +58855,6 @@ var init_gamesSpineTransientAlertScheduler = __esm({
   }
 });
 
-// ../grarf/desktop/src/lib/centerPane/resolveCenterPaneTimelineGameUpdateEventTimestampMs.ts
-function resolveManualGameEndTimeMs(game) {
-  const manualSpine = game.metadata?.manualGamesSpine;
-  if (manualSpine?.endTimeIso) {
-    const endMs = parseManualGamesSpineEventTimeMs(
-      manualSpine.endTimeIso,
-      manualSpine.sourceTimeZone
-    );
-    if (endMs != null && Number.isFinite(endMs) && endMs > 0) return endMs;
-  }
-  const manualEvent = game.metadata?.manualEvent;
-  if (manualEvent?.endTime) {
-    const sourceTimeZone = manualEvent.sourceTimezoneIana?.trim() || (manualEvent.sourceTimezone === "ET" || manualEvent.sourceTimezone === "CT" ? resolveManualEventSourceTimezoneIana(manualEvent.sourceTimezone) : void 0);
-    const endMs = parseManualGamesSpineEventTimeMs(manualEvent.endTime, sourceTimeZone);
-    if (endMs != null && Number.isFinite(endMs) && endMs > 0) return endMs;
-  }
-  return null;
-}
-function resolveCenterPaneTimelineGameUpdateEventTimestampMs(game) {
-  const manualEndMs = resolveManualGameEndTimeMs(game);
-  if (manualEndMs != null) return manualEndMs;
-  if (game.finalizedAtMs != null && Number.isFinite(game.finalizedAtMs) && game.finalizedAtMs > 0) {
-    return game.finalizedAtMs;
-  }
-  const persisted = readPersistedFinalizedAtMs(game.id);
-  if (persisted != null) return persisted;
-  return null;
-}
-var init_resolveCenterPaneTimelineGameUpdateEventTimestampMs = __esm({
-  "../grarf/desktop/src/lib/centerPane/resolveCenterPaneTimelineGameUpdateEventTimestampMs.ts"() {
-    init_define_import_meta_env();
-    init_manualGamesSpineUtils();
-    init_resolveSourceTimezone();
-    init_gameFinalizationTimestampPersistence();
-  }
-});
-
-// ../grarf/desktop/src/lib/centerPane/centerPaneTimelinePersistedEventAdapters.ts
-function isGamesSpineTransientAlertEligibleForTimeline(item) {
-  if (item.type !== "game-update") return false;
-  const game = findOperationalGameRowById(item.gameId);
-  if (!game) return false;
-  return isSpineFinalizedGame(game);
-}
-function isOperationalAlertEligibleForTimeline(_alert) {
-  return false;
-}
-function resolveCenterPaneTimelineGameScoreHeadline(game) {
-  const away = game.awayTeam?.trim() || "Away";
-  const home = game.homeTeam?.trim() || "Home";
-  const awayScore = game.awayScore ?? 0;
-  const homeScore = game.homeScore ?? 0;
-  return `${away} ${awayScore} \u2014 ${home} ${homeScore}`;
-}
-function resolveOperationalAlertTypeLabel(kind) {
-  switch (kind) {
-    case "close_game":
-      return "CLOSE GAME";
-    case "overtime":
-      return "OVERTIME";
-    case "walk_off_threat":
-      return "WALK-OFF";
-    case "final_minutes":
-      return "FINAL MINUTES";
-    default:
-      return "GAME";
-  }
-}
-function resolveTransientAlertTypeLabel(type) {
-  switch (type) {
-    case "game-update":
-      return "SCORE UPDATE";
-    case "starts-soon":
-      return "STARTS SOON";
-    case "close-game":
-      return "CLOSE GAME";
-    case "overtime":
-      return "OVERTIME";
-    case "walk-off-threat":
-      return "WALK-OFF";
-    case "final-minutes":
-      return "FINAL MINUTES";
-    default:
-      return "GAME";
-  }
-}
-function mapOperationalAlertToTimelineItem(alert, nowMs = Date.now()) {
-  return {
-    id: `ops-alert:${alert.sessionOnceKey}`,
-    timestamp: new Date(nowMs).toISOString(),
-    timestampMs: nowMs,
-    headline: alert.body,
-    source: alert.title,
-    typeLabel: resolveOperationalAlertTypeLabel(alert.kind),
-    gameId: alert.gameId,
-    league: alert.league
-  };
-}
-function mapTransientAlertToTimelineItem(item) {
-  const game = findOperationalGameRowById(item.gameId);
-  if (!game) return null;
-  const eventTimestampMs = resolveCenterPaneTimelineGameUpdateEventTimestampMs(game);
-  if (eventTimestampMs == null) return null;
-  return {
-    id: `spine-alert:${item.instanceId}`,
-    timestamp: new Date(eventTimestampMs).toISOString(),
-    timestampMs: eventTimestampMs,
-    headline: resolveCenterPaneTimelineGameScoreHeadline(game),
-    source: resolveGamesSpineTransientAlertHeaderLabel(item.type),
-    typeLabel: resolveTransientAlertTypeLabel(item.type),
-    gameId: item.gameId,
-    league: game.league
-  };
-}
-var init_centerPaneTimelinePersistedEventAdapters = __esm({
-  "../grarf/desktop/src/lib/centerPane/centerPaneTimelinePersistedEventAdapters.ts"() {
-    init_define_import_meta_env();
-    init_findLiveGame();
-    init_isSpineFinalizedGame();
-    init_gamesSpineTransientAlertScheduler();
-    init_resolveCenterPaneTimelineGameUpdateEventTimestampMs();
-  }
-});
-
-// ../grarf/desktop/src/store/centerPaneTimelinePersistedEventStore.ts
-function appendTimelineEvents(eventsById, items) {
-  if (items.length === 0) return eventsById;
-  const next = { ...eventsById };
-  for (const item of items) {
-    next[item.id] = item;
-  }
-  const values = Object.values(next);
-  if (values.length <= MAX_PERSISTED_EVENTS) return next;
-  const pruned = values.sort((a2, b2) => b2.timestampMs - a2.timestampMs || a2.id.localeCompare(b2.id)).slice(0, MAX_PERSISTED_EVENTS);
-  const out = {};
-  for (const item of pruned) {
-    out[item.id] = item;
-  }
-  return out;
-}
-var import_zustand28, MAX_PERSISTED_EVENTS, useCenterPaneTimelinePersistedEventStore;
-var init_centerPaneTimelinePersistedEventStore = __esm({
-  "../grarf/desktop/src/store/centerPaneTimelinePersistedEventStore.ts"() {
-    init_define_import_meta_env();
-    import_zustand28 = __toESM(require_zustand(), 1);
-    init_centerPaneTimelinePersistedEventAdapters();
-    MAX_PERSISTED_EVENTS = 400;
-    useCenterPaneTimelinePersistedEventStore = (0, import_zustand28.create)((set, get) => ({
-      version: 0,
-      eventsById: {},
-      appendOperationalAlerts: (alerts) => {
-        const eligible = alerts.filter(isOperationalAlertEligibleForTimeline);
-        if (eligible.length === 0) return;
-        const nowMs = Date.now();
-        const mapped = eligible.map((alert) => mapOperationalAlertToTimelineItem(alert, nowMs));
-        set((state3) => ({
-          eventsById: appendTimelineEvents(state3.eventsById, mapped),
-          version: state3.version + 1
-        }));
-      },
-      appendTransientAlerts: (alerts) => {
-        const eligible = alerts.filter(isGamesSpineTransientAlertEligibleForTimeline);
-        if (eligible.length === 0) return;
-        const mapped = eligible.map((alert) => mapTransientAlertToTimelineItem(alert)).filter((item) => item != null);
-        if (mapped.length === 0) return;
-        set((state3) => ({
-          eventsById: appendTimelineEvents(state3.eventsById, mapped),
-          version: state3.version + 1
-        }));
-      },
-      getEvents: () => {
-        const { eventsById } = get();
-        return Object.values(eventsById).sort(
-          (a2, b2) => b2.timestampMs - a2.timestampMs || a2.id.localeCompare(b2.id)
-        );
-      }
-    }));
-  }
-});
-
 // ../grarf/desktop/src/store/gamesSpineTransientAlertStore.ts
 function collectDedupeKeys(active2, queue) {
   const keys = /* @__PURE__ */ new Set();
@@ -59050,15 +58870,14 @@ function activateNextFromQueue(set, get) {
   const [next, ...rest] = queue;
   set({ active: next, queue: rest });
 }
-var import_zustand29, MAX_QUEUE, useGamesSpineTransientAlertStore;
+var import_zustand28, MAX_QUEUE, useGamesSpineTransientAlertStore;
 var init_gamesSpineTransientAlertStore = __esm({
   "../grarf/desktop/src/store/gamesSpineTransientAlertStore.ts"() {
     init_define_import_meta_env();
-    import_zustand29 = __toESM(require_zustand(), 1);
+    import_zustand28 = __toESM(require_zustand(), 1);
     init_gamesSpineTransientAlertScheduler();
-    init_centerPaneTimelinePersistedEventStore();
     MAX_QUEUE = 24;
-    useGamesSpineTransientAlertStore = (0, import_zustand29.create)((set, get) => ({
+    useGamesSpineTransientAlertStore = (0, import_zustand28.create)((set, get) => ({
       active: null,
       queue: [],
       enqueue: (items) => {
@@ -59073,10 +58892,6 @@ var init_gamesSpineTransientAlertStore = __esm({
           accepted.push(item);
         }
         if (accepted.length === 0) return;
-        const gameUpdates = accepted.filter((item) => item.type === "game-update");
-        if (gameUpdates.length > 0) {
-          useCenterPaneTimelinePersistedEventStore.getState().appendTransientAlerts(gameUpdates);
-        }
         const shouldActivate = state3.active == null;
         set({
           queue: [...state3.queue, ...accepted].slice(-MAX_QUEUE)
@@ -61063,15 +60878,15 @@ function hydrateTimelineFromStorage2(now = Date.now()) {
 function getNewswireTimelineStore() {
   return useNewswireTimelineStore;
 }
-var import_zustand30, initialStoriesById, useNewswireTimelineStore;
+var import_zustand29, initialStoriesById, useNewswireTimelineStore;
 var init_newswireTimelineStore = __esm({
   "../grarf/desktop/src/store/newswireTimelineStore.ts"() {
     init_define_import_meta_env();
-    import_zustand30 = __toESM(require_zustand(), 1);
+    import_zustand29 = __toESM(require_zustand(), 1);
     init_newswireTimelineStorage();
     init_liveTrackAnimationStore();
     initialStoriesById = hydrateTimelineFromStorage2();
-    useNewswireTimelineStore = (0, import_zustand30.create)((set, get) => ({
+    useNewswireTimelineStore = (0, import_zustand29.create)((set, get) => ({
       storiesById: initialStoriesById,
       version: 0,
       appendStory: (story) => {
@@ -61323,15 +61138,15 @@ function syncFromService(set) {
     error: failed.length > 0 ? failed.map((r3) => `${r3.feedId}: ${r3.error ?? "ingest failed"}`).join("; ") : null
   });
 }
-var import_zustand31, EMPTY_RSS_ITEMS, useRssIngestStore;
+var import_zustand30, EMPTY_RSS_ITEMS, useRssIngestStore;
 var init_rssIngestStore = __esm({
   "../grarf/desktop/src/store/rssIngestStore.ts"() {
     init_define_import_meta_env();
-    import_zustand31 = __toESM(require_zustand(), 1);
+    import_zustand30 = __toESM(require_zustand(), 1);
     init_feedRegistry2();
     init_rssIngestService();
     EMPTY_RSS_ITEMS = [];
-    useRssIngestStore = (0, import_zustand31.create)((set, get) => ({
+    useRssIngestStore = (0, import_zustand30.create)((set, get) => ({
       snapshot: null,
       loading: false,
       error: null,
@@ -61396,16 +61211,16 @@ function buildUrlLookup(games) {
     gameStories: collectGameStoryUrlLookupRows(games)
   });
 }
-var import_zustand32, useGameCorrelatedNewsStore;
+var import_zustand31, useGameCorrelatedNewsStore;
 var init_gameCorrelatedNewsStore = __esm({
   "../grarf/desktop/src/store/gameCorrelatedNewsStore.ts"() {
     init_define_import_meta_env();
-    import_zustand32 = __toESM(require_zustand(), 1);
+    import_zustand31 = __toESM(require_zustand(), 1);
     init_gameNews();
     init_canonicalIntelligenceRegistryStore();
     init_newswireTimelineStore();
     init_rssIngestStore();
-    useGameCorrelatedNewsStore = (0, import_zustand32.create)((set, get) => ({
+    useGameCorrelatedNewsStore = (0, import_zustand31.create)((set, get) => ({
       articlesById: {},
       articleIdsByGameId: {},
       syncFromObservedArticles: (articles, games) => {
@@ -61763,11 +61578,11 @@ function mergeGeneratedSummaries(summaries) {
     bundle: { ...s2.bundle, generatedSummaries: summaries ?? {} }
   }));
 }
-var import_zustand33, LOG18, EDIT_MODE_KEY, AUTOSAVE_MS, emptyBundle, pendingTimers, useEditorialStore;
+var import_zustand32, LOG18, EDIT_MODE_KEY, AUTOSAVE_MS, emptyBundle, pendingTimers, useEditorialStore;
 var init_editorialStore = __esm({
   "../grarf/desktop/src/store/editorialStore.ts"() {
     init_define_import_meta_env();
-    import_zustand33 = __toESM(require_zustand(), 1);
+    import_zustand32 = __toESM(require_zustand(), 1);
     init_grarfAdminFlag();
     init_buildFeaturedGamesFromConfig2();
     LOG18 = "[Editorial]";
@@ -61780,7 +61595,7 @@ var init_editorialStore = __esm({
       generatedSummaries: {}
     });
     pendingTimers = /* @__PURE__ */ new Map();
-    useEditorialStore = (0, import_zustand33.create)((set, get) => ({
+    useEditorialStore = (0, import_zustand32.create)((set, get) => ({
       bundle: emptyBundle(),
       generationState: {},
       loaded: false,
@@ -61889,14 +61704,14 @@ function writeSelectedDate(key2) {
   } catch {
   }
 }
-var import_zustand34, DATE_KEY, useCommandBriefingStore;
+var import_zustand33, DATE_KEY, useCommandBriefingStore;
 var init_commandBriefingStore = __esm({
   "../grarf/desktop/src/store/commandBriefingStore.ts"() {
     init_define_import_meta_env();
-    import_zustand34 = __toESM(require_zustand(), 1);
+    import_zustand33 = __toESM(require_zustand(), 1);
     init_commandBriefingDates();
     DATE_KEY = "grarf-command-briefing-date-v1";
-    useCommandBriefingStore = (0, import_zustand34.create)((set) => ({
+    useCommandBriefingStore = (0, import_zustand33.create)((set) => ({
       selectedDate: resolveActiveBriefingDateKey(readSelectedDate()),
       setSelectedDate: (dateKey) => {
         writeSelectedDate(dateKey);
@@ -66356,11 +66171,11 @@ function buildRetainedAtById() {
 function syncLiveTrackerLeagueRetention(nowMs = Date.now()) {
   useLiveTrackerLeagueRetentionStore.getState().syncFromCanonical(nowMs);
 }
-var import_zustand35, previousGamesById, pendingFinalScorePosts, RETENTION_STORAGE_KEY, retentionSyncChain, useLiveTrackerLeagueRetentionStore;
+var import_zustand34, previousGamesById, pendingFinalScorePosts, RETENTION_STORAGE_KEY, retentionSyncChain, useLiveTrackerLeagueRetentionStore;
 var init_liveTrackerLeagueRetentionStore = __esm({
   "../grarf/desktop/src/store/liveTrackerLeagueRetentionStore.ts"() {
     init_define_import_meta_env();
-    import_zustand35 = __toESM(require_zustand(), 1);
+    import_zustand34 = __toESM(require_zustand(), 1);
     init_isGrarfWebRenderer();
     init_gamesColumnLeagues();
     init_liveTrackerFeedRegistry();
@@ -66378,7 +66193,7 @@ var init_liveTrackerLeagueRetentionStore = __esm({
     pendingFinalScorePosts = [];
     RETENTION_STORAGE_KEY = "grarf-live-tracker-league-retention-v1";
     retentionSyncChain = Promise.resolve();
-    useLiveTrackerLeagueRetentionStore = (0, import_zustand35.create)((set, get) => ({
+    useLiveTrackerLeagueRetentionStore = (0, import_zustand34.create)((set, get) => ({
       completedAtMsByLeague: readPersistedCompletedAtMsByLeague(Date.now()),
       persistedTrackedGamesById: isGrarfWebRenderer() ? {} : readLiveTrackerTrackedGameScores(),
       syncFromCanonical: (nowMs = Date.now()) => {
@@ -66433,18 +66248,18 @@ function emptySnapshot() {
     updatedAt: null
   };
 }
-var import_zustand36, MANUAL_LIVE_TRACKER_REFRESH_MS, useLiveTrackerLiveLeaguesStore;
+var import_zustand35, MANUAL_LIVE_TRACKER_REFRESH_MS, useLiveTrackerLiveLeaguesStore;
 var init_liveTrackerLiveLeaguesStore = __esm({
   "../grarf/desktop/src/store/liveTrackerLiveLeaguesStore.ts"() {
     init_define_import_meta_env();
-    import_zustand36 = __toESM(require_zustand(), 1);
+    import_zustand35 = __toESM(require_zustand(), 1);
     init_resolveCurrentlyLiveGamesSpineLeagues();
     init_canonicalLiveGameStore();
     init_gamesSpineManualStore();
     init_liveTrackerLeagueRetentionStore();
     init_recentFinalizedGamesStore();
     MANUAL_LIVE_TRACKER_REFRESH_MS = 3e4;
-    useLiveTrackerLiveLeaguesStore = (0, import_zustand36.create)((set) => ({
+    useLiveTrackerLiveLeaguesStore = (0, import_zustand35.create)((set) => ({
       ...emptySnapshot(),
       syncFromGamesSpine: (nowMs = Date.now()) => {
         const { leagues, updatedAt } = useCanonicalLiveGameStore.getState();
@@ -66493,16 +66308,16 @@ function emptySnapshot2() {
 function getActiveLiveTrackerFeeds() {
   return useLiveTrackerActiveFeedsStore.getState().feeds;
 }
-var import_zustand37, useLiveTrackerActiveFeedsStore;
+var import_zustand36, useLiveTrackerActiveFeedsStore;
 var init_liveTrackerActiveFeedsStore = __esm({
   "../grarf/desktop/src/store/liveTrackerActiveFeedsStore.ts"() {
     init_define_import_meta_env();
-    import_zustand37 = __toESM(require_zustand(), 1);
+    import_zustand36 = __toESM(require_zustand(), 1);
     init_resolveActiveLiveTrackerFeeds();
     init_canonicalLiveGameStore();
     init_liveTrackerLiveLeaguesStore();
     init_recentFinalizedGamesStore();
-    useLiveTrackerActiveFeedsStore = (0, import_zustand37.create)((set, get) => ({
+    useLiveTrackerActiveFeedsStore = (0, import_zustand36.create)((set, get) => ({
       ...emptySnapshot2(),
       syncFromLiveLeagues: () => {
         const { leagueKeys, updatedAt } = useLiveTrackerLiveLeaguesStore.getState();
@@ -66763,11 +66578,11 @@ function pruneLiveTrackerPostsIfNeeded() {
     return { ...prev, posts };
   });
 }
-var import_zustand38, LIVE_TRACKER_RSS_INGEST_REFRESH_MS, useLiveTrackerPostsStore, previousActiveLiveLeagueKeys;
+var import_zustand37, LIVE_TRACKER_RSS_INGEST_REFRESH_MS, useLiveTrackerPostsStore, previousActiveLiveLeagueKeys;
 var init_liveTrackerPostsStore = __esm({
   "../grarf/desktop/src/store/liveTrackerPostsStore.ts"() {
     init_define_import_meta_env();
-    import_zustand38 = __toESM(require_zustand(), 1);
+    import_zustand37 = __toESM(require_zustand(), 1);
     init_isGrarfWebRenderer();
     init_fetchActiveLiveTrackerPosts();
     init_sortLiveTrackerPosts();
@@ -66781,7 +66596,7 @@ var init_liveTrackerPostsStore = __esm({
     init_canonicalLiveGameStore();
     init_liveTrackerLeagueRetentionStore();
     LIVE_TRACKER_RSS_INGEST_REFRESH_MS = 3e4;
-    useLiveTrackerPostsStore = (0, import_zustand38.create)((set, get) => ({
+    useLiveTrackerPostsStore = (0, import_zustand37.create)((set, get) => ({
       ...emptySnapshot3(),
       refresh: async () => {
         const activeLeagueKeys = resolveActiveLiveLeagueKeys();
@@ -66930,14 +66745,14 @@ async function fetchAllHeadlines() {
   );
   return Object.fromEntries(results);
 }
-var import_zustand39, useHomeSportscapeHeadlinesStore;
+var import_zustand38, useHomeSportscapeHeadlinesStore;
 var init_homeSportscapeHeadlinesStore = __esm({
   "../grarf/desktop/src/store/homeSportscapeHeadlinesStore.ts"() {
     init_define_import_meta_env();
-    import_zustand39 = __toESM(require_zustand(), 1);
+    import_zustand38 = __toESM(require_zustand(), 1);
     init_homeSportscapeHeadlinesFeeds();
     init_fetchHomeSportscapeHeadlineFeed();
-    useHomeSportscapeHeadlinesStore = (0, import_zustand39.create)((set, get) => ({
+    useHomeSportscapeHeadlinesStore = (0, import_zustand38.create)((set, get) => ({
       headlinesBySourceId: {},
       loading: true,
       refresh: async () => {
@@ -67247,13 +67062,13 @@ function mergeSignalsFeedEvents(previous, incoming) {
   }
   return merged;
 }
-var import_zustand40, useWebSignalsFeedStore;
+var import_zustand39, useWebSignalsFeedStore;
 var init_webSignalsFeedStore = __esm({
   "../grarf/desktop/src/store/webSignalsFeedStore.ts"() {
     init_define_import_meta_env();
-    import_zustand40 = __toESM(require_zustand(), 1);
+    import_zustand39 = __toESM(require_zustand(), 1);
     init_fetchGameSocialRailFeedEvents();
-    useWebSignalsFeedStore = (0, import_zustand40.create)((set, get) => ({
+    useWebSignalsFeedStore = (0, import_zustand39.create)((set, get) => ({
       activeResolution: null,
       events: [],
       loading: false,
@@ -67511,12 +67326,12 @@ var init_EditorialBridge = __esm({
 });
 
 // ../grarf/desktop/src/store/briefingPersistenceFallbackStore.ts
-var import_zustand41, useBriefingPersistenceFallbackStore;
+var import_zustand40, useBriefingPersistenceFallbackStore;
 var init_briefingPersistenceFallbackStore = __esm({
   "../grarf/desktop/src/store/briefingPersistenceFallbackStore.ts"() {
     init_define_import_meta_env();
-    import_zustand41 = __toESM(require_zustand(), 1);
-    useBriefingPersistenceFallbackStore = (0, import_zustand41.create)((set) => ({
+    import_zustand40 = __toESM(require_zustand(), 1);
+    useBriefingPersistenceFallbackStore = (0, import_zustand40.create)((set) => ({
       snapshots: {},
       loaded: false,
       setSnapshots: (snapshots) => set({ snapshots, loaded: true }),
@@ -69606,14 +69421,14 @@ function syncRecommendationPresentation() {
     urgencyById
   }));
 }
-var import_zustand42, useRecommendationPresentationStore;
+var import_zustand41, useRecommendationPresentationStore;
 var init_recommendationPresentationStore = __esm({
   "../grarf/desktop/src/lib/recommendationPresentation/recommendationPresentationStore.ts"() {
     init_define_import_meta_env();
-    import_zustand42 = __toESM(require_zustand(), 1);
+    import_zustand41 = __toESM(require_zustand(), 1);
     init_attentionRuntime();
     init_recommendationRuntime();
-    useRecommendationPresentationStore = (0, import_zustand42.create)(() => ({
+    useRecommendationPresentationStore = (0, import_zustand41.create)(() => ({
       syncVersion: 0,
       primaryRecommendationId: null,
       elevatedIds: {},
@@ -71033,13 +70848,13 @@ function toTransientQueueItems(items) {
     gameId: item.gameId
   }));
 }
-var import_zustand43, useGamesSpineCloseGameAlertStore;
+var import_zustand42, useGamesSpineCloseGameAlertStore;
 var init_gamesSpineCloseGameAlertStore = __esm({
   "../grarf/desktop/src/store/gamesSpineCloseGameAlertStore.ts"() {
     init_define_import_meta_env();
-    import_zustand43 = __toESM(require_zustand(), 1);
+    import_zustand42 = __toESM(require_zustand(), 1);
     init_gamesSpineTransientAlertStore();
-    useGamesSpineCloseGameAlertStore = (0, import_zustand43.create)(() => ({
+    useGamesSpineCloseGameAlertStore = (0, import_zustand42.create)(() => ({
       queue: [],
       active: null,
       enqueue: (items) => {
@@ -71112,11 +70927,11 @@ function appendOperationalAlert(get, set, alert) {
     logOperationalAlertInsertedBelowStack(addedToStack, nextVisible.length);
   }
 }
-var import_zustand44, OPERATIONAL_ALERT_APPEARANCE_DELAY_MIN_MS, OPERATIONAL_ALERT_APPEARANCE_DELAY_MAX_MS, sessionOnceEmitted2, useOperationalAlertStore;
+var import_zustand43, OPERATIONAL_ALERT_APPEARANCE_DELAY_MIN_MS, OPERATIONAL_ALERT_APPEARANCE_DELAY_MAX_MS, sessionOnceEmitted2, useOperationalAlertStore;
 var init_operationalAlertStore = __esm({
   "../grarf/desktop/src/store/operationalAlertStore.ts"() {
     init_define_import_meta_env();
-    import_zustand44 = __toESM(require_zustand(), 1);
+    import_zustand43 = __toESM(require_zustand(), 1);
     init_alertActions();
     init_isGrarfWebRenderer();
     init_operationalAlerts();
@@ -71125,7 +70940,7 @@ var init_operationalAlertStore = __esm({
     OPERATIONAL_ALERT_APPEARANCE_DELAY_MIN_MS = 3e3;
     OPERATIONAL_ALERT_APPEARANCE_DELAY_MAX_MS = 1e4;
     sessionOnceEmitted2 = /* @__PURE__ */ new Set();
-    useOperationalAlertStore = (0, import_zustand44.create)((set, get) => ({
+    useOperationalAlertStore = (0, import_zustand43.create)((set, get) => ({
       visible: [],
       queue: [],
       enqueueInferred: (items) => {
@@ -71652,12 +71467,12 @@ var init_useGameForOperationalAlert = __esm({
 });
 
 // ../grarf/desktop/src/store/operationalAlertActionsStore.ts
-var import_zustand45, useOperationalAlertActionsStore;
+var import_zustand44, useOperationalAlertActionsStore;
 var init_operationalAlertActionsStore = __esm({
   "../grarf/desktop/src/store/operationalAlertActionsStore.ts"() {
     init_define_import_meta_env();
-    import_zustand45 = __toESM(require_zustand(), 1);
-    useOperationalAlertActionsStore = (0, import_zustand45.create)((set, get) => ({
+    import_zustand44 = __toESM(require_zustand(), 1);
+    useOperationalAlertActionsStore = (0, import_zustand44.create)((set, get) => ({
       actions: null,
       register: (actions) => {
         set({ actions });
@@ -72303,12 +72118,12 @@ var init_DemoModeAlertBridge = __esm({
 });
 
 // ../grarf/desktop/src/store/podcastPlayerStore.ts
-var import_zustand46, usePodcastPlayerStore;
+var import_zustand45, usePodcastPlayerStore;
 var init_podcastPlayerStore = __esm({
   "../grarf/desktop/src/store/podcastPlayerStore.ts"() {
     init_define_import_meta_env();
-    import_zustand46 = __toESM(require_zustand(), 1);
-    usePodcastPlayerStore = (0, import_zustand46.create)((set, get) => ({
+    import_zustand45 = __toESM(require_zustand(), 1);
+    usePodcastPlayerStore = (0, import_zustand45.create)((set, get) => ({
       episode: null,
       isPlaying: false,
       volume: 0.9,
@@ -76782,12 +76597,12 @@ var init_normalizeLiveTrackEventToEvidence = __esm({
 function getEvidenceCatalogStore() {
   return useEvidenceCatalogStore;
 }
-var import_zustand47, useEvidenceCatalogStore;
+var import_zustand46, useEvidenceCatalogStore;
 var init_evidenceCatalogStore = __esm({
   "../grarf/desktop/src/singularity/store/evidenceCatalogStore.ts"() {
     init_define_import_meta_env();
-    import_zustand47 = __toESM(require_zustand(), 1);
-    useEvidenceCatalogStore = (0, import_zustand47.create)((set, get) => ({
+    import_zustand46 = __toESM(require_zustand(), 1);
+    useEvidenceCatalogStore = (0, import_zustand46.create)((set, get) => ({
       evidenceById: {},
       catalogGeneration: 0,
       upsertEvidence: (evidence) => {
@@ -77204,6 +77019,218 @@ var init_HomeNewswireTimelineBridge = __esm({
   }
 });
 
+// ../grarf/desktop/src/lib/centerPane/resolveCenterPaneTimelineGameUpdateEventTimestampMs.ts
+function resolveManualGameEndTimeMs(game) {
+  const manualSpine = game.metadata?.manualGamesSpine;
+  if (manualSpine?.endTimeIso) {
+    const endMs = parseManualGamesSpineEventTimeMs(
+      manualSpine.endTimeIso,
+      manualSpine.sourceTimeZone
+    );
+    if (endMs != null && Number.isFinite(endMs) && endMs > 0) return endMs;
+  }
+  const manualEvent = game.metadata?.manualEvent;
+  if (manualEvent?.endTime) {
+    const sourceTimeZone = manualEvent.sourceTimezoneIana?.trim() || (manualEvent.sourceTimezone === "ET" || manualEvent.sourceTimezone === "CT" ? resolveManualEventSourceTimezoneIana(manualEvent.sourceTimezone) : void 0);
+    const endMs = parseManualGamesSpineEventTimeMs(manualEvent.endTime, sourceTimeZone);
+    if (endMs != null && Number.isFinite(endMs) && endMs > 0) return endMs;
+  }
+  return null;
+}
+function resolveCenterPaneTimelineGameUpdateEventTimestampMs(game) {
+  const manualEndMs = resolveManualGameEndTimeMs(game);
+  if (manualEndMs != null) return manualEndMs;
+  if (game.finalizedAtMs != null && Number.isFinite(game.finalizedAtMs) && game.finalizedAtMs > 0) {
+    return game.finalizedAtMs;
+  }
+  const persisted = readPersistedFinalizedAtMs(game.id);
+  if (persisted != null) return persisted;
+  return null;
+}
+var init_resolveCenterPaneTimelineGameUpdateEventTimestampMs = __esm({
+  "../grarf/desktop/src/lib/centerPane/resolveCenterPaneTimelineGameUpdateEventTimestampMs.ts"() {
+    init_define_import_meta_env();
+    init_manualGamesSpineUtils();
+    init_resolveSourceTimezone();
+    init_gameFinalizationTimestampPersistence();
+  }
+});
+
+// ../grarf/desktop/src/lib/centerPane/detectGamesSpineFinalScoreTimelineAlerts.ts
+function isFinalScoreTimelineGame(game) {
+  if (isStandaloneSpineEvent(game)) return false;
+  return isTennisGame(game) || Boolean(game.awayTeam?.trim() && game.homeTeam?.trim());
+}
+function detectGamesSpineFinalScoreTimelineAlerts(previousById, nextGames) {
+  const items = [];
+  for (const game of nextGames) {
+    if (!isFinalScoreTimelineGame(game)) continue;
+    const previous = previousById[game.id];
+    if (!isGrarfLiveToFinalTransition(previous, game)) continue;
+    if (resolveCenterPaneTimelineGameUpdateEventTimestampMs(game) == null) continue;
+    items.push({
+      instanceId: `game-final-${game.id}`,
+      type: "game-update",
+      gameId: game.id
+    });
+  }
+  return items;
+}
+var init_detectGamesSpineFinalScoreTimelineAlerts = __esm({
+  "../grarf/desktop/src/lib/centerPane/detectGamesSpineFinalScoreTimelineAlerts.ts"() {
+    init_define_import_meta_env();
+    init_recordGameFinalizedAtMs();
+    init_isStandaloneSpineEvent();
+    init_isTennisLeague();
+    init_resolveCenterPaneTimelineGameUpdateEventTimestampMs();
+  }
+});
+
+// ../grarf/desktop/src/lib/centerPane/centerPaneTimelinePersistedEventAdapters.ts
+function isGamesSpineTransientAlertEligibleForTimeline(item) {
+  if (item.type !== "game-update") return false;
+  if (!item.instanceId.startsWith("game-final-")) return false;
+  const game = findOperationalGameRowById(item.gameId);
+  if (!game) return false;
+  if (!isSpineFinalizedGame(game)) return false;
+  return resolveCenterPaneTimelineGameUpdateEventTimestampMs(game) != null;
+}
+function isOperationalAlertEligibleForTimeline(_alert) {
+  return false;
+}
+function resolveCenterPaneTimelineGameScoreHeadline(game) {
+  const away = game.awayTeam?.trim() || "Away";
+  const home = game.homeTeam?.trim() || "Home";
+  const awayScore = game.awayScore ?? 0;
+  const homeScore = game.homeScore ?? 0;
+  return `${away} ${awayScore} \u2014 ${home} ${homeScore}`;
+}
+function resolveOperationalAlertTypeLabel(kind) {
+  switch (kind) {
+    case "close_game":
+      return "CLOSE GAME";
+    case "overtime":
+      return "OVERTIME";
+    case "walk_off_threat":
+      return "WALK-OFF";
+    case "final_minutes":
+      return "FINAL MINUTES";
+    default:
+      return "GAME";
+  }
+}
+function resolveTransientAlertTypeLabel(type) {
+  switch (type) {
+    case "game-update":
+      return "SCORE UPDATE";
+    case "starts-soon":
+      return "STARTS SOON";
+    case "close-game":
+      return "CLOSE GAME";
+    case "overtime":
+      return "OVERTIME";
+    case "walk-off-threat":
+      return "WALK-OFF";
+    case "final-minutes":
+      return "FINAL MINUTES";
+    default:
+      return "GAME";
+  }
+}
+function mapOperationalAlertToTimelineItem(alert, nowMs = Date.now()) {
+  return {
+    id: `ops-alert:${alert.sessionOnceKey}`,
+    timestamp: new Date(nowMs).toISOString(),
+    timestampMs: nowMs,
+    headline: alert.body,
+    source: alert.title,
+    typeLabel: resolveOperationalAlertTypeLabel(alert.kind),
+    gameId: alert.gameId,
+    league: alert.league
+  };
+}
+function mapTransientAlertToTimelineItem(item) {
+  const game = findOperationalGameRowById(item.gameId);
+  if (!game) return null;
+  const eventTimestampMs = resolveCenterPaneTimelineGameUpdateEventTimestampMs(game);
+  if (eventTimestampMs == null) return null;
+  return {
+    id: `spine-alert:${item.instanceId}`,
+    timestamp: new Date(eventTimestampMs).toISOString(),
+    timestampMs: eventTimestampMs,
+    headline: resolveCenterPaneTimelineGameScoreHeadline(game),
+    source: resolveGamesSpineTransientAlertHeaderLabel(item.type),
+    typeLabel: resolveTransientAlertTypeLabel(item.type),
+    gameId: item.gameId,
+    league: game.league
+  };
+}
+var init_centerPaneTimelinePersistedEventAdapters = __esm({
+  "../grarf/desktop/src/lib/centerPane/centerPaneTimelinePersistedEventAdapters.ts"() {
+    init_define_import_meta_env();
+    init_findLiveGame();
+    init_isSpineFinalizedGame();
+    init_gamesSpineTransientAlertScheduler();
+    init_resolveCenterPaneTimelineGameUpdateEventTimestampMs();
+  }
+});
+
+// ../grarf/desktop/src/store/centerPaneTimelinePersistedEventStore.ts
+function appendTimelineEvents(eventsById, items) {
+  if (items.length === 0) return eventsById;
+  const next = { ...eventsById };
+  for (const item of items) {
+    next[item.id] = item;
+  }
+  const values = Object.values(next);
+  if (values.length <= MAX_PERSISTED_EVENTS) return next;
+  const pruned = values.sort((a2, b2) => b2.timestampMs - a2.timestampMs || a2.id.localeCompare(b2.id)).slice(0, MAX_PERSISTED_EVENTS);
+  const out = {};
+  for (const item of pruned) {
+    out[item.id] = item;
+  }
+  return out;
+}
+var import_zustand47, MAX_PERSISTED_EVENTS, useCenterPaneTimelinePersistedEventStore;
+var init_centerPaneTimelinePersistedEventStore = __esm({
+  "../grarf/desktop/src/store/centerPaneTimelinePersistedEventStore.ts"() {
+    init_define_import_meta_env();
+    import_zustand47 = __toESM(require_zustand(), 1);
+    init_centerPaneTimelinePersistedEventAdapters();
+    MAX_PERSISTED_EVENTS = 400;
+    useCenterPaneTimelinePersistedEventStore = (0, import_zustand47.create)((set, get) => ({
+      version: 0,
+      eventsById: {},
+      appendOperationalAlerts: (alerts) => {
+        const eligible = alerts.filter(isOperationalAlertEligibleForTimeline);
+        if (eligible.length === 0) return;
+        const nowMs = Date.now();
+        const mapped = eligible.map((alert) => mapOperationalAlertToTimelineItem(alert, nowMs));
+        set((state3) => ({
+          eventsById: appendTimelineEvents(state3.eventsById, mapped),
+          version: state3.version + 1
+        }));
+      },
+      appendTransientAlerts: (alerts) => {
+        const eligible = alerts.filter(isGamesSpineTransientAlertEligibleForTimeline);
+        if (eligible.length === 0) return;
+        const mapped = eligible.map((alert) => mapTransientAlertToTimelineItem(alert)).filter((item) => item != null);
+        if (mapped.length === 0) return;
+        set((state3) => ({
+          eventsById: appendTimelineEvents(state3.eventsById, mapped),
+          version: state3.version + 1
+        }));
+      },
+      getEvents: () => {
+        const { eventsById } = get();
+        return Object.values(eventsById).sort(
+          (a2, b2) => b2.timestampMs - a2.timestampMs || a2.id.localeCompare(b2.id)
+        );
+      }
+    }));
+  }
+});
+
 // ../grarf/desktop/src/components/homeMvp/HomeCenterPaneTimelineGameUpdateBridge.tsx
 function collectOperationalGames4(leagues) {
   const out = [];
@@ -77222,14 +77249,13 @@ function buildGamesById2(games) {
 }
 function HomeCenterPaneTimelineGameUpdateBridge() {
   (0, import_react64.useEffect)(() => {
-    if (isGrarfWebRenderer()) return;
     let previousGamesById3 = {};
     previousGamesById3 = buildGamesById2(
       collectOperationalGames4(useLiveGamesStore.getState().leagues)
     );
     const scanAndAppend = () => {
       const games = collectOperationalGames4(useLiveGamesStore.getState().leagues);
-      const items = detectGamesSpineGameUpdateAlerts(previousGamesById3, games);
+      const items = detectGamesSpineFinalScoreTimelineAlerts(previousGamesById3, games);
       previousGamesById3 = buildGamesById2(games);
       if (items.length > 0) {
         useCenterPaneTimelinePersistedEventStore.getState().appendTransientAlerts(items);
@@ -77248,8 +77274,7 @@ var init_HomeCenterPaneTimelineGameUpdateBridge = __esm({
   "../grarf/desktop/src/components/homeMvp/HomeCenterPaneTimelineGameUpdateBridge.tsx"() {
     init_define_import_meta_env();
     import_react64 = __toESM(require_react(), 1);
-    init_detectGamesSpineGameUpdateAlerts();
-    init_isGrarfWebRenderer();
+    init_detectGamesSpineFinalScoreTimelineAlerts();
     init_centerPaneTimelinePersistedEventStore();
     init_liveGamesStore();
   }
