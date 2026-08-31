@@ -16446,6 +16446,34 @@ init_define_import_meta_env();
 // ../grarf/desktop/src/lib/gamesSpine/isGameActivelyLive.ts
 init_define_import_meta_env();
 
+// ../grarf/shared/domain/operational/resolveOperationalGameEventEndedAtMs.ts
+init_define_import_meta_env();
+function resolveManualGameEndTimeMs(game) {
+  const manualSpine = game.metadata?.manualGamesSpine;
+  if (manualSpine?.endTimeIso) {
+    const endMs = parseManualGamesSpineEventTimeMs2(
+      manualSpine.endTimeIso,
+      manualSpine.sourceTimeZone
+    );
+    if (endMs != null && Number.isFinite(endMs) && endMs > 0) return endMs;
+  }
+  const manualEvent = game.metadata?.manualEvent;
+  if (manualEvent?.endTime) {
+    const sourceTimeZone = manualEvent.sourceTimezoneIana?.trim() || (manualEvent.sourceTimezone === "ET" || manualEvent.sourceTimezone === "CT" ? resolveManualEventSourceTimezoneIana(manualEvent.sourceTimezone) : void 0);
+    const endMs = parseManualGamesSpineEventTimeMs2(manualEvent.endTime, sourceTimeZone);
+    if (endMs != null && Number.isFinite(endMs) && endMs > 0) return endMs;
+  }
+  return null;
+}
+function resolveOperationalGameEventEndedAtMs(game) {
+  const manualEndMs = resolveManualGameEndTimeMs(game);
+  if (manualEndMs != null) return manualEndMs;
+  if (game.eventEndedAtMs != null && Number.isFinite(game.eventEndedAtMs) && game.eventEndedAtMs > 0) {
+    return game.eventEndedAtMs;
+  }
+  return null;
+}
+
 // ../grarf/desktop/shared/espnPausedCompetitionStatus.js
 init_define_import_meta_env();
 
@@ -16505,6 +16533,71 @@ function resolveEspnCardStatus(statusType) {
   if (statusName === "STATUS_IN_PROGRESS" || !completed && state === "in") return "live";
   if (statusName === "STATUS_FINAL" || completed || state === "post") return "final";
   return "scheduled";
+}
+
+// ../grarf/desktop/src/lib/finalizedGameRetention/gameFinalizationTimestampPersistence.ts
+init_define_import_meta_env();
+var FINALIZED_AT_STORAGE_KEY = "grarf-game-finalization-timestamps-v1";
+var EVENT_ENDED_AT_STORAGE_KEY = "grarf-game-event-ended-at-ms-v1";
+var finalizedAtMemoryStore = {};
+var eventEndedAtMemoryStore = {};
+function readStorage(key, memoryStore) {
+  if (typeof localStorage !== "undefined") {
+    try {
+      const raw = localStorage.getItem(key);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        const out = {};
+        for (const [gameId, value] of Object.entries(parsed)) {
+          if (typeof value !== "number" || !Number.isFinite(value) || value <= 0) continue;
+          out[gameId] = value;
+        }
+        return out;
+      }
+    } catch {
+    }
+  }
+  return { ...memoryStore };
+}
+function writeStorage(key, byId, memoryStoreRef) {
+  memoryStoreRef.current = { ...byId };
+  if (typeof localStorage === "undefined") return;
+  try {
+    localStorage.setItem(key, JSON.stringify(byId));
+  } catch {
+  }
+}
+var finalizedAtMemoryRef = { current: finalizedAtMemoryStore };
+var eventEndedAtMemoryRef = { current: eventEndedAtMemoryStore };
+function readPersistedFinalizedAtMs(gameId) {
+  const trimmed = gameId.trim();
+  if (!trimmed) return void 0;
+  const value = readStorage(FINALIZED_AT_STORAGE_KEY, finalizedAtMemoryRef.current)[trimmed];
+  if (value == null || !Number.isFinite(value) || value <= 0) return void 0;
+  return value;
+}
+function persistFinalizedAtMsIfAbsent(gameId, finalizedAtMs) {
+  const trimmed = gameId.trim();
+  if (!trimmed || !Number.isFinite(finalizedAtMs) || finalizedAtMs <= 0) return;
+  const byId = readStorage(FINALIZED_AT_STORAGE_KEY, finalizedAtMemoryRef.current);
+  if (byId[trimmed] != null) return;
+  byId[trimmed] = finalizedAtMs;
+  writeStorage(FINALIZED_AT_STORAGE_KEY, byId, finalizedAtMemoryRef);
+}
+function readPersistedEventEndedAtMs(gameId) {
+  const trimmed = gameId.trim();
+  if (!trimmed) return void 0;
+  const value = readStorage(EVENT_ENDED_AT_STORAGE_KEY, eventEndedAtMemoryRef.current)[trimmed];
+  if (value == null || !Number.isFinite(value) || value <= 0) return void 0;
+  return value;
+}
+function persistEventEndedAtMsIfAbsent(gameId, eventEndedAtMs) {
+  const trimmed = gameId.trim();
+  if (!trimmed || !Number.isFinite(eventEndedAtMs) || eventEndedAtMs <= 0) return;
+  const byId = readStorage(EVENT_ENDED_AT_STORAGE_KEY, eventEndedAtMemoryRef.current);
+  if (byId[trimmed] != null) return;
+  byId[trimmed] = eventEndedAtMs;
+  writeStorage(EVENT_ENDED_AT_STORAGE_KEY, byId, eventEndedAtMemoryRef);
 }
 
 // ../grarf/desktop/src/lib/operational/operationalLiveAuthority.ts
@@ -17029,71 +17122,6 @@ function collectFinalizedHarvestFromIngestTransition(input) {
   return candidates.map((c) => c.game);
 }
 
-// ../grarf/desktop/src/lib/finalizedGameRetention/gameFinalizationTimestampPersistence.ts
-init_define_import_meta_env();
-var FINALIZED_AT_STORAGE_KEY = "grarf-game-finalization-timestamps-v1";
-var EVENT_ENDED_AT_STORAGE_KEY = "grarf-game-event-ended-at-ms-v1";
-var finalizedAtMemoryStore = {};
-var eventEndedAtMemoryStore = {};
-function readStorage(key, memoryStore) {
-  if (typeof localStorage !== "undefined") {
-    try {
-      const raw = localStorage.getItem(key);
-      if (raw) {
-        const parsed = JSON.parse(raw);
-        const out = {};
-        for (const [gameId, value] of Object.entries(parsed)) {
-          if (typeof value !== "number" || !Number.isFinite(value) || value <= 0) continue;
-          out[gameId] = value;
-        }
-        return out;
-      }
-    } catch {
-    }
-  }
-  return { ...memoryStore };
-}
-function writeStorage(key, byId, memoryStoreRef) {
-  memoryStoreRef.current = { ...byId };
-  if (typeof localStorage === "undefined") return;
-  try {
-    localStorage.setItem(key, JSON.stringify(byId));
-  } catch {
-  }
-}
-var finalizedAtMemoryRef = { current: finalizedAtMemoryStore };
-var eventEndedAtMemoryRef = { current: eventEndedAtMemoryStore };
-function readPersistedFinalizedAtMs(gameId) {
-  const trimmed = gameId.trim();
-  if (!trimmed) return void 0;
-  const value = readStorage(FINALIZED_AT_STORAGE_KEY, finalizedAtMemoryRef.current)[trimmed];
-  if (value == null || !Number.isFinite(value) || value <= 0) return void 0;
-  return value;
-}
-function persistFinalizedAtMsIfAbsent(gameId, finalizedAtMs) {
-  const trimmed = gameId.trim();
-  if (!trimmed || !Number.isFinite(finalizedAtMs) || finalizedAtMs <= 0) return;
-  const byId = readStorage(FINALIZED_AT_STORAGE_KEY, finalizedAtMemoryRef.current);
-  if (byId[trimmed] != null) return;
-  byId[trimmed] = finalizedAtMs;
-  writeStorage(FINALIZED_AT_STORAGE_KEY, byId, finalizedAtMemoryRef);
-}
-function readPersistedEventEndedAtMs(gameId) {
-  const trimmed = gameId.trim();
-  if (!trimmed) return void 0;
-  const value = readStorage(EVENT_ENDED_AT_STORAGE_KEY, eventEndedAtMemoryRef.current)[trimmed];
-  if (value == null || !Number.isFinite(value) || value <= 0) return void 0;
-  return value;
-}
-function persistEventEndedAtMsIfAbsent(gameId, eventEndedAtMs) {
-  const trimmed = gameId.trim();
-  if (!trimmed || !Number.isFinite(eventEndedAtMs) || eventEndedAtMs <= 0) return;
-  const byId = readStorage(EVENT_ENDED_AT_STORAGE_KEY, eventEndedAtMemoryRef.current);
-  if (byId[trimmed] != null) return;
-  byId[trimmed] = eventEndedAtMs;
-  writeStorage(EVENT_ENDED_AT_STORAGE_KEY, byId, eventEndedAtMemoryRef);
-}
-
 // ../grarf/desktop/src/store/recentFinalizedGamesStore.ts
 var STORAGE_KEY = "grarf-recent-finalized-games-v2";
 function mergeFinalizedAtMsOntoGame(game, existing) {
@@ -17435,6 +17463,14 @@ function isProviderConfirmedLive(game, authorityState) {
   return isGameLastUpdatedProviderConfirmed(game, providerPollCompletedAt);
 }
 
+// ../grarf/desktop/src/lib/gamesSpine/isSpineFinalizedGame.ts
+init_define_import_meta_env();
+function isSpineFinalizedGame(game) {
+  if (game.status === "final") return true;
+  const line = game.statusLine?.trim();
+  return line != null && /^final$/i.test(line);
+}
+
 // ../grarf/desktop/src/lib/gamesSpine/isGameActivelyLive.ts
 function pausedFromStatusLine(statusLine) {
   const line = statusLine?.trim();
@@ -17458,6 +17494,23 @@ function gameHasHalftimeOrIntermissionSignal(game) {
   if (halftimeFromStatusLine(game.statusLine)) return true;
   return halftimeFromStatusLine(game.displayClock);
 }
+function resolveAuthoritativeEventEndedAtMs(game) {
+  const fromRow = resolveOperationalGameEventEndedAtMs(game);
+  if (fromRow != null) return fromRow;
+  return readPersistedEventEndedAtMs(game.id) ?? null;
+}
+function hasRetainedCanonicalFinalRow(gameId, nowMs = Date.now()) {
+  const entry2 = useRecentFinalizedGamesStore.getState().byId[gameId];
+  if (!entry2 || entry2.expiresAt <= nowMs) return false;
+  const retained = entry2.game;
+  return retained.status === "final" || isSpineFinalizedGame(retained);
+}
+function hasAuthoritativeOperationalGameEnded(game, nowMs = Date.now()) {
+  if (game.status === "final" || isSpineFinalizedGame(game)) return true;
+  if (hasRetainedCanonicalFinalRow(game.id, nowMs)) return true;
+  const endedAtMs = resolveAuthoritativeEventEndedAtMs(game);
+  return endedAtMs != null && endedAtMs <= nowMs;
+}
 function isGameCompetitionPaused(game) {
   if (gameHasHalftimeOrIntermissionSignal(game)) return false;
   if (game.status === "delayed" || game.status === "suspended") return true;
@@ -17465,6 +17518,7 @@ function isGameCompetitionPaused(game) {
   return pausedFromStatusLine(game.statusLine);
 }
 function isGameActivelyLive(game) {
+  if (hasAuthoritativeOperationalGameEnded(game)) return false;
   if (game.status === "scheduled" && gameHasHalftimeOrIntermissionSignal(game)) return true;
   if (game.status !== "live") return false;
   if (isGameCompetitionPaused(game)) return false;
@@ -19897,50 +19951,12 @@ init_define_import_meta_env();
 
 // ../grarf/desktop/src/lib/centerPane/resolveCenterPaneTimelineGameUpdateEventTimestampMs.ts
 init_define_import_meta_env();
-
-// ../grarf/shared/domain/operational/resolveOperationalGameEventEndedAtMs.ts
-init_define_import_meta_env();
-function resolveManualGameEndTimeMs(game) {
-  const manualSpine = game.metadata?.manualGamesSpine;
-  if (manualSpine?.endTimeIso) {
-    const endMs = parseManualGamesSpineEventTimeMs2(
-      manualSpine.endTimeIso,
-      manualSpine.sourceTimeZone
-    );
-    if (endMs != null && Number.isFinite(endMs) && endMs > 0) return endMs;
-  }
-  const manualEvent = game.metadata?.manualEvent;
-  if (manualEvent?.endTime) {
-    const sourceTimeZone = manualEvent.sourceTimezoneIana?.trim() || (manualEvent.sourceTimezone === "ET" || manualEvent.sourceTimezone === "CT" ? resolveManualEventSourceTimezoneIana(manualEvent.sourceTimezone) : void 0);
-    const endMs = parseManualGamesSpineEventTimeMs2(manualEvent.endTime, sourceTimeZone);
-    if (endMs != null && Number.isFinite(endMs) && endMs > 0) return endMs;
-  }
-  return null;
-}
-function resolveOperationalGameEventEndedAtMs(game) {
-  const manualEndMs = resolveManualGameEndTimeMs(game);
-  if (manualEndMs != null) return manualEndMs;
-  if (game.eventEndedAtMs != null && Number.isFinite(game.eventEndedAtMs) && game.eventEndedAtMs > 0) {
-    return game.eventEndedAtMs;
-  }
-  return null;
-}
-
-// ../grarf/desktop/src/lib/centerPane/resolveCenterPaneTimelineGameUpdateEventTimestampMs.ts
 function stampOperationalGameEventEndedAtMs(game) {
   const eventEndedAtMs = resolveOperationalGameEventEndedAtMs(game);
   if (eventEndedAtMs == null) return game;
   persistEventEndedAtMsIfAbsent(game.id, eventEndedAtMs);
   if (game.eventEndedAtMs === eventEndedAtMs) return game;
   return { ...game, eventEndedAtMs };
-}
-
-// ../grarf/desktop/src/lib/gamesSpine/isSpineFinalizedGame.ts
-init_define_import_meta_env();
-function isSpineFinalizedGame(game) {
-  if (game.status === "final") return true;
-  const line = game.statusLine?.trim();
-  return line != null && /^final$/i.test(line);
 }
 
 // ../grarf/desktop/src/lib/finalizedGameRetention/recordGameFinalizedAtMs.ts
