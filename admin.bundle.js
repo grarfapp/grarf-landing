@@ -17463,12 +17463,22 @@ function isProviderConfirmedLive(game, authorityState) {
   return isGameLastUpdatedProviderConfirmed(game, providerPollCompletedAt);
 }
 
+// ../grarf/desktop/src/lib/gamesSpine/reconcileOperationalGamesByEspnEventId.ts
+init_define_import_meta_env();
+
 // ../grarf/desktop/src/lib/gamesSpine/isSpineFinalizedGame.ts
 init_define_import_meta_env();
 function isSpineFinalizedGame(game) {
   if (game.status === "final") return true;
   const line = game.statusLine?.trim();
   return line != null && /^final$/i.test(line);
+}
+
+// ../grarf/desktop/src/lib/gamesSpine/reconcileOperationalGamesByEspnEventId.ts
+function readEspnCompetitionEventId(game) {
+  const id = game.espnEventId ?? game.externalIds?.espn;
+  const trimmed = id != null ? String(id).trim() : "";
+  return trimmed || null;
 }
 
 // ../grarf/desktop/src/lib/gamesSpine/isGameActivelyLive.ts
@@ -17508,8 +17518,21 @@ function hasRetainedCanonicalFinalRow(gameId, nowMs = Date.now()) {
 function hasAuthoritativeOperationalGameEnded(game, nowMs = Date.now()) {
   if (game.status === "final" || isSpineFinalizedGame(game)) return true;
   if (hasRetainedCanonicalFinalRow(game.id, nowMs)) return true;
+  if (isSupersededByAuthoritativeEspnEventRow(game)) return true;
   const endedAtMs = resolveAuthoritativeEventEndedAtMs(game);
   return endedAtMs != null && endedAtMs <= nowMs;
+}
+function isSupersededByAuthoritativeEspnEventRow(game) {
+  if (game.status !== "live") return false;
+  const eventId = readEspnCompetitionEventId(game);
+  if (!eventId) return false;
+  for (const record of Object.values(useCanonicalLiveGameStore.getState().gamesById)) {
+    const other = record.game;
+    if (other.id === game.id) continue;
+    if (readEspnCompetitionEventId(other) !== eventId) continue;
+    if (other.status === "final" || isSpineFinalizedGame(other)) return true;
+  }
+  return false;
 }
 function isGameCompetitionPaused(game) {
   if (gameHasHalftimeOrIntermissionSignal(game)) return false;

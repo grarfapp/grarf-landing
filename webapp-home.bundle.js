@@ -6622,6 +6622,48 @@ var init_isSpineFinalizedGame = __esm({
   }
 });
 
+// ../grarf/desktop/src/lib/gamesSpine/reconcileOperationalGamesByEspnEventId.ts
+function readEspnCompetitionEventId(game) {
+  const id = game.espnEventId ?? game.externalIds?.espn;
+  const trimmed = id != null ? String(id).trim() : "";
+  return trimmed || null;
+}
+function isAuthoritativeFinalOperationalRow(game) {
+  return game.status === "final" || isSpineFinalizedGame(game);
+}
+function parseLastUpdatedMs(game) {
+  const ms2 = Date.parse(game.lastUpdated ?? "");
+  return Number.isFinite(ms2) ? ms2 : 0;
+}
+function preferAuthoritativeOperationalGameRow(current, candidate) {
+  const currentFinal = isAuthoritativeFinalOperationalRow(current);
+  const candidateFinal = isAuthoritativeFinalOperationalRow(candidate);
+  if (currentFinal !== candidateFinal) {
+    return candidateFinal ? candidate : current;
+  }
+  return parseLastUpdatedMs(candidate) >= parseLastUpdatedMs(current) ? candidate : current;
+}
+function reconcileOperationalGamesByEspnEventId(games) {
+  const byEventId = /* @__PURE__ */ new Map();
+  const withoutEventId = [];
+  for (const game of games) {
+    const eventId = readEspnCompetitionEventId(game);
+    if (!eventId) {
+      withoutEventId.push(game);
+      continue;
+    }
+    const existing = byEventId.get(eventId);
+    byEventId.set(eventId, existing ? preferAuthoritativeOperationalGameRow(existing, game) : game);
+  }
+  return [...byEventId.values(), ...withoutEventId];
+}
+var init_reconcileOperationalGamesByEspnEventId = __esm({
+  "../grarf/desktop/src/lib/gamesSpine/reconcileOperationalGamesByEspnEventId.ts"() {
+    init_define_import_meta_env();
+    init_isSpineFinalizedGame();
+  }
+});
+
 // ../grarf/desktop/src/lib/gamesSpine/isGameActivelyLive.ts
 function pausedFromStatusLine(statusLine) {
   const line = statusLine?.trim();
@@ -6659,8 +6701,21 @@ function hasRetainedCanonicalFinalRow(gameId, nowMs = Date.now()) {
 function hasAuthoritativeOperationalGameEnded(game, nowMs = Date.now()) {
   if (game.status === "final" || isSpineFinalizedGame(game)) return true;
   if (hasRetainedCanonicalFinalRow(game.id, nowMs)) return true;
+  if (isSupersededByAuthoritativeEspnEventRow(game)) return true;
   const endedAtMs = resolveAuthoritativeEventEndedAtMs(game);
   return endedAtMs != null && endedAtMs <= nowMs;
+}
+function isSupersededByAuthoritativeEspnEventRow(game) {
+  if (game.status !== "live") return false;
+  const eventId = readEspnCompetitionEventId(game);
+  if (!eventId) return false;
+  for (const record of Object.values(useCanonicalLiveGameStore.getState().gamesById)) {
+    const other = record.game;
+    if (other.id === game.id) continue;
+    if (readEspnCompetitionEventId(other) !== eventId) continue;
+    if (other.status === "final" || isSpineFinalizedGame(other)) return true;
+  }
+  return false;
 }
 function isGameCompetitionPaused(game) {
   if (gameHasHalftimeOrIntermissionSignal(game)) return false;
@@ -6682,7 +6737,9 @@ var init_isGameActivelyLive = __esm({
     init_espnPausedCompetitionStatus2();
     init_gameFinalizationTimestampPersistence();
     init_operationalLiveAuthority();
+    init_canonicalLiveGameStore();
     init_recentFinalizedGamesStore();
+    init_reconcileOperationalGamesByEspnEventId();
     init_isSpineFinalizedGame();
   }
 });
@@ -48154,7 +48211,9 @@ function applyUsOpenGamesSpinePresentationPartition(leagues) {
     delete out.WTA;
   }
   if (usOpenById.size > 0) {
-    out[US_OPEN_TENNIS_GAMES_SPINE_LEAGUE] = [...usOpenById.values()];
+    out[US_OPEN_TENNIS_GAMES_SPINE_LEAGUE] = reconcileOperationalGamesByEspnEventId([
+      ...usOpenById.values()
+    ]);
   } else {
     delete out[US_OPEN_TENNIS_GAMES_SPINE_LEAGUE];
   }
@@ -48165,6 +48224,7 @@ var init_usOpenGamesSpinePresentation = __esm({
   "../grarf/desktop/src/lib/gamesSpine/usOpenGamesSpinePresentation.ts"() {
     init_define_import_meta_env();
     init_resolveTennisEventLeagueKey();
+    init_reconcileOperationalGamesByEspnEventId();
     US_OPEN_TENNIS_GAMES_SPINE_LEAGUE = "US_OPEN_TENNIS";
   }
 });
