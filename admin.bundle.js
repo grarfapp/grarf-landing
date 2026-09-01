@@ -20241,6 +20241,84 @@ function leaguesMateriallyEqual(next, prev) {
 function liveGamesMirrorMateriallyEqual(next, prev) {
   return next.updatedAt === prev.updatedAt && leaguesMateriallyEqual(next.leagues, prev.leagues);
 }
+var CANONICAL_CARRY_FORWARD_GAME_FIELDS = /* @__PURE__ */ new Set([
+  "finalizedAtMs",
+  "eventEndedAtMs",
+  "awayTeamStandings",
+  "homeTeamStandings"
+]);
+var INGEST_NOOP_IGNORED_GAME_FIELDS = /* @__PURE__ */ new Set(["lastUpdated"]);
+function snapRowMatchesCanonicalForIngest(snapRow, canonRow) {
+  if (snapRow.id !== canonRow.id) return false;
+  const keys = /* @__PURE__ */ new Set([
+    ...Object.keys(snapRow),
+    ...Object.keys(canonRow)
+  ]);
+  for (const key of keys) {
+    if (INGEST_NOOP_IGNORED_GAME_FIELDS.has(key)) continue;
+    const snapVal = snapRow[key];
+    const canonVal = canonRow[key];
+    if (snapVal === canonVal) continue;
+    if (snapVal == null && canonVal != null && CANONICAL_CARRY_FORWARD_GAME_FIELDS.has(key)) {
+      continue;
+    }
+    if (snapVal != null && canonVal != null && typeof snapVal === "object" && typeof canonVal === "object") {
+      if (JSON.stringify(snapVal) !== JSON.stringify(canonVal)) return false;
+      continue;
+    }
+    return false;
+  }
+  return true;
+}
+function supplementalRetainedFinalsWouldChangeCanonical(snap, previousGames, prevCanonical) {
+  const retention = useRecentFinalizedGamesStore.getState();
+  const retained = filterContradictorySupplementalFinals(
+    retention.getAllRetained(),
+    previousGames
+  );
+  for (const game of retained) {
+    const existing = prevCanonical.gamesById[game.id]?.game;
+    if (!existing || !gameRowsMateriallyEqual(game, existing)) {
+      return true;
+    }
+  }
+  const withRetainedFinals = mergeSupplementalRetainedFinals(snap, retained);
+  return !leaguesMateriallyEqual(withRetainedFinals.leagues ?? {}, prevCanonical.leagues);
+}
+function gamesSnapshotMateriallyMatchesCanonical(snap) {
+  const prevCanonical = useCanonicalLiveGameStore.getState();
+  if (Object.keys(prevCanonical.gamesById).length === 0) return false;
+  const previousGames = Object.values(prevCanonical.gamesById).map((row) => row.game);
+  const withPreservedMissing = preserveMissingOperationalIngestGames(snap, previousGames);
+  if (supplementalRetainedFinalsWouldChangeCanonical(
+    withPreservedMissing,
+    previousGames,
+    prevCanonical
+  )) {
+    return false;
+  }
+  for (const rows of Object.values(withPreservedMissing.leagues ?? {})) {
+    if (!Array.isArray(rows)) continue;
+    for (const game of rows) {
+      const canon = prevCanonical.gamesById[game.id]?.game;
+      if (!canon || !snapRowMatchesCanonicalForIngest(game, canon)) {
+        return false;
+      }
+    }
+  }
+  for (const gameId of Object.keys(prevCanonical.gamesById)) {
+    let found = false;
+    for (const rows of Object.values(withPreservedMissing.leagues ?? {})) {
+      if (!Array.isArray(rows)) continue;
+      if (rows.some((game) => game.id === gameId)) {
+        found = true;
+        break;
+      }
+    }
+    if (!found) return false;
+  }
+  return true;
+}
 var useLiveGamesStore = create((set, get) => ({
   leagues: useCanonicalLiveGameStore.getState().leagues,
   updatedAt: useCanonicalLiveGameStore.getState().updatedAt,
@@ -20256,6 +20334,12 @@ var useLiveGamesStore = create((set, get) => ({
         return;
       }
       recordAppliedOperationalTransportGeneratedAt(transportGeneratedAt);
+    }
+    if (gamesSnapshotMateriallyMatchesCanonical(snap)) {
+      if (define_import_meta_env_default.DEV) {
+        broadcastDebug(`[CanonicalLive] Skip no-op hydrate ${snap.updatedAt ?? "?"}`);
+      }
+      return;
     }
     if (define_import_meta_env_default.DEV) {
       broadcastDebug(`[CanonicalLive] Ingest ${snap.updatedAt ?? "?"}`);
