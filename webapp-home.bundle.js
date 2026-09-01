@@ -52648,6 +52648,174 @@ var init_filterLeagueDirectoryNavSections = __esm({
   }
 });
 
+// ../grarf/desktop/src/lib/gamesSpine/resolveGrarfCompetitionActiveCalendarWindow.ts
+function isDateKeyInWindow(calendarDateKey, window2) {
+  return calendarDateKey >= window2.startDateKey && calendarDateKey <= window2.endDateKey;
+}
+function mergeWindows(left, right) {
+  if (!left) return right;
+  if (!right) return left;
+  return {
+    startDateKey: left.startDateKey <= right.startDateKey ? left.startDateKey : right.startDateKey,
+    endDateKey: left.endDateKey >= right.endDateKey ? left.endDateKey : right.endDateKey
+  };
+}
+function windowFromIsoRange(startIso, endIso, timeZone) {
+  const startMs = startIso ? parseManualGamesSpineEventTimeMs(startIso, timeZone) : null;
+  const endMs = endIso ? parseManualGamesSpineEventTimeMs(endIso, timeZone) : null;
+  const startDateKey = (Number.isFinite(startMs) && startMs > 0 ? formatOperationalDateKeyFromMs(startMs, timeZone) : null) ?? startIso?.trim().slice(0, 10) ?? null;
+  const endDateKey = (Number.isFinite(endMs) && endMs > 0 ? formatOperationalDateKeyFromMs(endMs, timeZone) : null) ?? endIso?.trim().slice(0, 10) ?? null;
+  if (!startDateKey || !endDateKey) return null;
+  return { startDateKey, endDateKey };
+}
+function resolveWindowFromManualGameMetadata(game) {
+  const manualSpine = game.metadata?.manualGamesSpine;
+  if (manualSpine?.startTimeIso && manualSpine.endTimeIso) {
+    return windowFromIsoRange(
+      manualSpine.startTimeIso,
+      manualSpine.endTimeIso,
+      manualSpine.sourceTimeZone?.trim() || "America/New_York"
+    );
+  }
+  const manualEvent = game.metadata?.manualEvent;
+  if (manualEvent?.startTime && manualEvent.endTime) {
+    return windowFromIsoRange(
+      manualEvent.startTime,
+      manualEvent.endTime,
+      manualEvent.sourceTimezoneIana?.trim() || "America/New_York"
+    );
+  }
+  return null;
+}
+function resolveWindowFromGolfGame(game) {
+  if (!isGolfLeagueKey(game.league)) return null;
+  const endDateKey = game.metadata?.tournamentEndDateKey?.trim();
+  if (!endDateKey) return null;
+  const startDateKey = game.scheduledDateKey?.trim() || formatOperationalDateKeyFromMs(game.startTimeMs) || null;
+  if (!startDateKey) return null;
+  return { startDateKey, endDateKey };
+}
+function resolveWindowFromOperationsManualEventOverrides(leagueKey) {
+  let merged = null;
+  for (const entry2 of Object.values(OPERATIONS.dates)) {
+    const overrides = entry2.manualEventOverrides;
+    if (!overrides) continue;
+    for (const [overrideKey, rawOverride] of Object.entries(overrides)) {
+      if (!rawOverride || typeof rawOverride !== "object") continue;
+      const override = rawOverride;
+      const overrideLeagueKey = typeof override.league === "string" ? override.league.trim().toUpperCase() : overrideKey;
+      if (overrideLeagueKey !== leagueKey) continue;
+      const timeZone = typeof override.timeZone === "string" ? override.timeZone : typeof override.sourceTimeZone === "string" ? override.sourceTimeZone : "America/New_York";
+      const operationalDateKeys = Array.isArray(override.operationalDateKeys) ? override.operationalDateKeys.filter((key2) => typeof key2 === "string") : [];
+      if (operationalDateKeys.length > 0) {
+        const sorted = [...operationalDateKeys].sort();
+        merged = mergeWindows(merged, {
+          startDateKey: sorted[0],
+          endDateKey: sorted[sorted.length - 1]
+        });
+      }
+      const startTime = typeof override.startTime === "string" ? override.startTime : void 0;
+      const endTime = typeof override.endTime === "string" ? override.endTime : void 0;
+      merged = mergeWindows(merged, windowFromIsoRange(startTime, endTime, timeZone));
+      const games = Array.isArray(override.games) ? override.games : [];
+      for (const rawGame of games) {
+        if (!rawGame || typeof rawGame !== "object") continue;
+        const game = rawGame;
+        const dateKey = typeof game.date === "string" ? game.date.trim() : "";
+        const gameStart = typeof game.startTime === "string" ? game.startTime : void 0;
+        const gameEnd = typeof game.endTime === "string" ? game.endTime : void 0;
+        if (gameStart && gameEnd) {
+          merged = mergeWindows(merged, windowFromIsoRange(gameStart, gameEnd, timeZone));
+        } else if (dateKey) {
+          merged = mergeWindows(merged, { startDateKey: dateKey, endDateKey: dateKey });
+        }
+      }
+      const stages = Array.isArray(override.stages) ? override.stages : [];
+      for (const rawStage of stages) {
+        if (!rawStage || typeof rawStage !== "object") continue;
+        const stage2 = rawStage;
+        const dateKey = typeof stage2.date === "string" ? stage2.date.trim() : "";
+        if (!dateKey) continue;
+        merged = mergeWindows(merged, { startDateKey: dateKey, endDateKey: dateKey });
+      }
+    }
+  }
+  return merged;
+}
+function resolveWindowFromTourDeFranceStages() {
+  const stages = resolveTourDeFranceStages();
+  if (stages.length === 0) return null;
+  const dates = stages.map((stage2) => stage2.date).sort();
+  return { startDateKey: dates[0], endDateKey: dates[dates.length - 1] };
+}
+function resolveGrarfCompetitionActiveCalendarWindow(leagueKey, leagueGames = []) {
+  if (leagueKey === "TDF") {
+    return resolveWindowFromTourDeFranceStages();
+  }
+  let merged = resolveWindowFromOperationsManualEventOverrides(leagueKey);
+  for (const game of leagueGames) {
+    merged = mergeWindows(merged, resolveWindowFromManualGameMetadata(game));
+    merged = mergeWindows(merged, resolveWindowFromGolfGame(game));
+  }
+  return merged;
+}
+function leagueHasOperationalActivityOnCalendarDate(leagueGames, calendarDateKey, now) {
+  const yesterdayKey2 = getOperationalSportsDayYesterdayDateKey(now);
+  for (const game of leagueGames) {
+    if (game.status === "live") return true;
+    if (game.status === "final" && (isGameOnGamesSpineOperationalDate(game, calendarDateKey, now) || isGameOnGamesSpineOperationalDate(game, yesterdayKey2, now))) {
+      return true;
+    }
+    if (game.status === "scheduled" && isGameOnGamesSpineOperationalDate(game, calendarDateKey, now)) {
+      return true;
+    }
+  }
+  return false;
+}
+function isGrarfCompetitionActiveOnCalendarDate(leagueKey, leagueGames, calendarDateKey = getOperationalCalendarDateKey(), now = /* @__PURE__ */ new Date()) {
+  const window2 = resolveGrarfCompetitionActiveCalendarWindow(leagueKey, leagueGames);
+  if (window2) {
+    return isDateKeyInWindow(calendarDateKey, window2);
+  }
+  return leagueHasOperationalActivityOnCalendarDate(leagueGames, getOperationalSportsDayDateKey(now), now);
+}
+function isGrarfGameCompetitionActiveOnCalendarDate(game, calendarDateKey = getOperationalCalendarDateKey(), now = /* @__PURE__ */ new Date()) {
+  const leagueKey = game.league ?? "MLB";
+  const gameWindow = resolveWindowFromManualGameMetadata(game) ?? resolveWindowFromGolfGame(game);
+  if (gameWindow) {
+    return isDateKeyInWindow(calendarDateKey, gameWindow);
+  }
+  return isGrarfCompetitionActiveOnCalendarDate(leagueKey, [game], calendarDateKey, now);
+}
+var init_resolveGrarfCompetitionActiveCalendarWindow = __esm({
+  "../grarf/desktop/src/lib/gamesSpine/resolveGrarfCompetitionActiveCalendarWindow.ts"() {
+    init_define_import_meta_env();
+    init_grarfSportHierarchy3();
+    init_operations();
+    init_manualGamesSpineTime();
+    init_tourDeFranceOperationalSchedule();
+    init_operationalSlateDate2();
+    init_gamesSpineOperationalDate();
+  }
+});
+
+// ../grarf/desktop/src/lib/gamesSpine/filterGamesSpineSlateForObjectsSpineComingUp.ts
+function filterGamesSpineSlateForObjectsSpineComingUp(games, now = /* @__PURE__ */ new Date()) {
+  if (games.length === 0) return [];
+  const calendarDateKey = getOperationalCalendarDateKey(now);
+  return filterGamesSpineSlateForTodayUpcoming(games, now).filter(
+    (game) => isGrarfGameCompetitionActiveOnCalendarDate(game, calendarDateKey, now)
+  );
+}
+var init_filterGamesSpineSlateForObjectsSpineComingUp = __esm({
+  "../grarf/desktop/src/lib/gamesSpine/filterGamesSpineSlateForObjectsSpineComingUp.ts"() {
+    init_define_import_meta_env();
+    init_operationalSlateDate2();
+    init_gamesSpineOperationalDate();
+    init_resolveGrarfCompetitionActiveCalendarWindow();
+  }
+});
+
 // ../grarf/desktop/src/lib/gamesSpine/gamesSpineTemporarilyHiddenLeagues.ts
 function isGamesSpineLeagueTemporarilyHidden(league2) {
   return HIDDEN_GAMES_SPINE_LEAGUE_SET.has(league2);
@@ -52932,20 +53100,6 @@ var init_resolveCanonicalNowOperationalGames = __esm({
 });
 
 // ../grarf/desktop/src/lib/home/resolveHomeDesktopObjectsSpineTemporalLeagueNavSections.ts
-function filterDirectorySectionItems(section, excludeLeagueKeys) {
-  const items = section.items.filter(
-    (item) => !item.grarfLeagueKey || !excludeLeagueKeys.has(item.grarfLeagueKey)
-  );
-  const expansionItems = section.expansionItems?.filter(
-    (item) => !item.grarfLeagueKey || !excludeLeagueKeys.has(item.grarfLeagueKey)
-  );
-  if (items.length === 0 && !(expansionItems?.length ?? 0)) return null;
-  return {
-    ...section,
-    items,
-    expansionItems: expansionItems?.length ? expansionItems : void 0
-  };
-}
 function resolveUpcomingTodayGrarfLeagueKeys(mergedLeagues) {
   const keys = [];
   const seen = /* @__PURE__ */ new Set();
@@ -52954,7 +53108,9 @@ function resolveUpcomingTodayGrarfLeagueKeys(mergedLeagues) {
     ...OPERATIONAL_ADJUNCT_LEAGUE_KEYS
   ]) {
     if (seen.has(leagueKey)) continue;
-    const upcoming = filterGamesSpineSlateForTodayUpcoming(mergedLeagues[leagueKey] ?? []);
+    const leagueGames = mergedLeagues[leagueKey] ?? [];
+    if (!isGrarfCompetitionActiveOnCalendarDate(leagueKey, leagueGames)) continue;
+    const upcoming = filterGamesSpineSlateForObjectsSpineComingUp(leagueGames);
     if (upcoming.length === 0) continue;
     seen.add(leagueKey);
     keys.push(leagueKey);
@@ -52972,34 +53128,23 @@ function resolveHomeDesktopObjectsSpineNowLeagueNavSections(mergedLeagues) {
   return [{ ...ON_TODAY_SECTION, items, hideHeader: true }];
 }
 function resolveHomeDesktopObjectsSpineComingUpLeagueNavSections(mergedLeagues) {
-  const upcomingTodayKeys = new Set(resolveUpcomingTodayGrarfLeagueKeys(mergedLeagues));
+  const upcomingTodayKeys = resolveUpcomingTodayGrarfLeagueKeys(mergedLeagues);
   const upcomingTodayItems = buildLeagueDirectoryNavItemsForGrarfLeagueKeys(
-    [...upcomingTodayKeys],
+    upcomingTodayKeys,
     mergedLeagues,
     "on-today"
   );
-  const fullSections = resolveLeagueDirectoryNavSections(mergedLeagues);
-  const otherCoveredSections = [];
-  for (const section of fullSections) {
-    if (section.id === "on-today") continue;
-    const filtered = filterDirectorySectionItems(section, upcomingTodayKeys);
-    if (filtered) otherCoveredSections.push(filtered);
-  }
-  const sections = [];
-  if (upcomingTodayItems.length > 0) {
-    sections.push({ ...ON_TODAY_SECTION, items: upcomingTodayItems });
-  }
-  sections.push(...otherCoveredSections);
-  return sections;
+  if (upcomingTodayItems.length === 0) return [];
+  return [{ ...ON_TODAY_SECTION, items: upcomingTodayItems, hideHeader: true }];
 }
 var ON_TODAY_SECTION;
 var init_resolveHomeDesktopObjectsSpineTemporalLeagueNavSections = __esm({
   "../grarf/desktop/src/lib/home/resolveHomeDesktopObjectsSpineTemporalLeagueNavSections.ts"() {
     init_define_import_meta_env();
     init_gamesColumnLeagues();
-    init_gamesSpineOperationalDate();
+    init_filterGamesSpineSlateForObjectsSpineComingUp();
+    init_resolveGrarfCompetitionActiveCalendarWindow();
     init_resolveCanonicalNowOperationalGames();
-    init_resolveLeagueDirectoryNavSections();
     init_resolveOnTodayNavItems();
     ON_TODAY_SECTION = {
       id: "on-today",
@@ -92831,7 +92976,7 @@ function buildVisibleSpineGames(input) {
   }
   const useTodayUpcomingSlate = isToday && input.statusFilter === "upcoming" && (isGrarfWebRenderer() || input.useGamesSpineTodayUpcomingFilter === true);
   if (useTodayUpcomingSlate) {
-    const upcomingSlate = filterGamesSpineSlateForTodayUpcoming(games);
+    const upcomingSlate = input.useGamesSpineTodayUpcomingFilter ? filterGamesSpineSlateForObjectsSpineComingUp(games) : filterGamesSpineSlateForTodayUpcoming(games);
     const filtered2 = filterTbdVsTbdMatchups(
       upcomingSlate.filter((g2) => matchHomeGamesSpineStatusFilter(g2, input.statusFilter))
     );
@@ -92858,6 +93003,7 @@ var init_buildVisibleSpineGames = __esm({
     init_homeGamesColumnFilter();
     init_isGrarfWebRenderer();
     init_buildOperationalSpineSlate();
+    init_filterGamesSpineSlateForObjectsSpineComingUp();
     init_gamesSpineOperationalDate();
     init_resolveViewLeagueGames();
     init_sortGamesSpineChronologically();
@@ -99247,9 +99393,9 @@ function HomeObjectsSpineNowPresentation({
         if (isNowMode) {
           if (!liveLeagueKeys.has(section.leagueKey)) continue;
         } else {
-          const upcoming = filterGamesSpineSlateForTodayUpcoming(
-            mergedLeagues[section.leagueKey] ?? []
-          );
+          const leagueGames = mergedLeagues[section.leagueKey] ?? [];
+          if (!isGrarfCompetitionActiveOnCalendarDate(section.leagueKey, leagueGames)) continue;
+          const upcoming = filterGamesSpineSlateForObjectsSpineComingUp(leagueGames);
           if (upcoming.length === 0) continue;
         }
         entries.push({
@@ -99269,7 +99415,7 @@ function HomeObjectsSpineNowPresentation({
           if (!hasLiveGames) continue;
         } else {
           const hasUpcomingGames = section.section.games.some(
-            (game) => matchHomeGamesSpineStatusFilter(game, "upcoming")
+            (game) => matchHomeGamesSpineStatusFilter(game, "upcoming") && isGrarfGameCompetitionActiveOnCalendarDate(game)
           );
           if (!hasUpcomingGames) continue;
         }
@@ -99468,7 +99614,8 @@ var init_HomeObjectsSpineNowPresentation = __esm({
     init_AppLeftNav();
     init_resolveCanonicalNowOperationalGames();
     init_gamesSpineLeagueDisplayLabel();
-    init_gamesSpineOperationalDate();
+    init_filterGamesSpineSlateForObjectsSpineComingUp();
+    init_resolveGrarfCompetitionActiveCalendarWindow();
     init_gamesSpineTemporarilyHiddenLeagues();
     init_mergeGamesSpineSectionsByPriority();
     init_resolveFirstDisplayedGamesSpineLeagueGame();
