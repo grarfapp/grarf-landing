@@ -16944,6 +16944,46 @@ function rebuildLeaguesFromCanonical(gamesById) {
   }
   return leagues;
 }
+function patchChangesGameRow(game, patch) {
+  const changedEntries = Object.entries(patch).filter(
+    ([key, value]) => game[key] !== value
+  );
+  if (changedEntries.length === 0) return null;
+  return Object.fromEntries(changedEntries);
+}
+function gameRowMateriallyEqual(a, b) {
+  if (a === b) return true;
+  if (a.id !== b.id) return false;
+  const keys = /* @__PURE__ */ new Set([
+    ...Object.keys(a),
+    ...Object.keys(b)
+  ]);
+  for (const key of keys) {
+    const left = a[key];
+    const right = b[key];
+    if (left === right) continue;
+    if (left != null && right != null && typeof left === "object" && typeof right === "object") {
+      if (JSON.stringify(left) !== JSON.stringify(right)) return false;
+      continue;
+    }
+    return false;
+  }
+  return true;
+}
+function canonicalIngestMateriallyEqual(prev, nextGamesById, nextUpdatedAt) {
+  if (prev.updatedAt !== nextUpdatedAt) return false;
+  const prevIds = Object.keys(prev.gamesById).sort();
+  const nextIds = Object.keys(nextGamesById).sort();
+  if (prevIds.length !== nextIds.length) return false;
+  for (let index = 0; index < prevIds.length; index += 1) {
+    if (prevIds[index] !== nextIds[index]) return false;
+    const gameId = prevIds[index];
+    if (!gameRowMateriallyEqual(prev.gamesById[gameId].game, nextGamesById[gameId].game)) {
+      return false;
+    }
+  }
+  return true;
+}
 function touchConsumer(record, consumerId) {
   if (!consumerId) return record;
   const existing = record.meta.consumersUsingState;
@@ -17007,6 +17047,9 @@ var useCanonicalLiveGameStore = create((set, get) => ({
       }
     }
     const leagues = rebuildLeaguesFromCanonical(gamesById);
+    if (canonicalIngestMateriallyEqual(prev, gamesById, updatedAt)) {
+      return;
+    }
     set({
       gamesById,
       leagues,
@@ -17024,9 +17067,9 @@ var useCanonicalLiveGameStore = create((set, get) => ({
     for (const { gameId, patch } of patches) {
       const record = gamesById[gameId];
       if (!record) continue;
-      const nextGame = { ...record.game, ...patch };
-      if (nextGame === record.game) continue;
-      gamesById[gameId] = { ...record, game: nextGame };
+      const changedPatch = patchChangesGameRow(record.game, patch);
+      if (changedPatch == null) continue;
+      gamesById[gameId] = { ...record, game: { ...record.game, ...changedPatch } };
       changed = true;
     }
     if (!changed) return;
@@ -17466,19 +17509,79 @@ function isProviderConfirmedLive(game, authorityState) {
 // ../grarf/desktop/src/lib/gamesSpine/reconcileOperationalGamesByEspnEventId.ts
 init_define_import_meta_env();
 
+// ../grarf/shared/domain/operational/reconcileOperationalGamesByEspnEventId.ts
+init_define_import_meta_env();
+function readEspnCompetitionEventId(game) {
+  const id = game.espnEventId ?? game.externalIds?.espn;
+  const trimmed = id != null ? String(id).trim() : "";
+  return trimmed || null;
+}
+function isAuthoritativeFinalOperationalRow(game) {
+  if (game.status === "final") return true;
+  const line = game.statusLine?.trim();
+  return line != null && /^final$/i.test(line);
+}
+function parseLastUpdatedMs(game) {
+  const ms = Date.parse(game.lastUpdated ?? "");
+  return Number.isFinite(ms) ? ms : 0;
+}
+function preferAuthoritativeOperationalGameRow(current, candidate) {
+  const currentFinal = isAuthoritativeFinalOperationalRow(current);
+  const candidateFinal = isAuthoritativeFinalOperationalRow(candidate);
+  if (currentFinal !== candidateFinal) {
+    return candidateFinal ? candidate : current;
+  }
+  return parseLastUpdatedMs(candidate) >= parseLastUpdatedMs(current) ? candidate : current;
+}
+function reconcileOperationalGamesByEspnEventId(games) {
+  const byEventId = /* @__PURE__ */ new Map();
+  const withoutEventId = [];
+  for (const game of games) {
+    const eventId = readEspnCompetitionEventId(game);
+    if (!eventId) {
+      withoutEventId.push(game);
+      continue;
+    }
+    const existing = byEventId.get(eventId);
+    byEventId.set(eventId, existing ? preferAuthoritativeOperationalGameRow(existing, game) : game);
+  }
+  return [...byEventId.values(), ...withoutEventId];
+}
+function incomingHasAuthoritativeFinalForEspnEvent(incomingGames, eventId) {
+  for (const game of incomingGames) {
+    if (readEspnCompetitionEventId(game) !== eventId) continue;
+    if (isAuthoritativeFinalOperationalRow(game)) return true;
+  }
+  return false;
+}
+
+// ../grarf/desktop/src/lib/gamesSpine/reconcileOperationalGamesByEspnEventId.ts
+function reconcileOperationalGamesByEspnEventId2(games) {
+  return reconcileOperationalGamesByEspnEventId(games);
+}
+function collectSnapshotGames(snap) {
+  const out = [];
+  for (const rows of Object.values(snap.leagues ?? {})) {
+    if (Array.isArray(rows)) out.push(...rows);
+  }
+  return out;
+}
+function reconcileCanonicalLiveGamesSnapshot(snap) {
+  const reconciled = reconcileOperationalGamesByEspnEventId2(collectSnapshotGames(snap));
+  const leagues = {};
+  for (const game of reconciled) {
+    const league2 = game.league ?? "MLB";
+    (leagues[league2] ?? (leagues[league2] = [])).push(game);
+  }
+  return { ...snap, leagues };
+}
+
 // ../grarf/desktop/src/lib/gamesSpine/isSpineFinalizedGame.ts
 init_define_import_meta_env();
 function isSpineFinalizedGame(game) {
   if (game.status === "final") return true;
   const line = game.statusLine?.trim();
   return line != null && /^final$/i.test(line);
-}
-
-// ../grarf/desktop/src/lib/gamesSpine/reconcileOperationalGamesByEspnEventId.ts
-function readEspnCompetitionEventId(game) {
-  const id = game.espnEventId ?? game.externalIds?.espn;
-  const trimmed = id != null ? String(id).trim() : "";
-  return trimmed || null;
 }
 
 // ../grarf/desktop/src/lib/gamesSpine/isGameActivelyLive.ts
@@ -18492,6 +18595,13 @@ function filterEspnOperationalIngestLeagueKeys(keys) {
 }
 
 // ../grarf/desktop/src/lib/finalizedGameRetention/preserveMissingOperationalIngestGames.ts
+function collectIncomingGames(incoming) {
+  const out = [];
+  for (const rows of Object.values(incoming.leagues ?? {})) {
+    if (Array.isArray(rows)) out.push(...rows);
+  }
+  return out;
+}
 function preserveMissingOperationalIngestGames(incoming, previousGames) {
   if (previousGames.length === 0) return incoming;
   const incomingIds = /* @__PURE__ */ new Set();
@@ -18502,11 +18612,16 @@ function preserveMissingOperationalIngestGames(incoming, previousGames) {
   const sportsDayKey = getOperationalSportsDayDateKey();
   const ingestCycle = useCanonicalLiveGameStore.getState().ingestSequence;
   const liveRecencyById = useRecentFinalizedGamesStore.getState().liveRecencyById;
+  const incomingGames = collectIncomingGames(incoming);
   const preserved = [];
   for (const prev of previousGames) {
     if (!prev?.id || incomingIds.has(prev.id)) continue;
     if (isEspnOperationalIngestLeagueDisabled(prev.league)) continue;
     if (prev.status === "live") {
+      const eventId = readEspnCompetitionEventId(prev);
+      if (eventId && incomingHasAuthoritativeFinalForEspnEvent(incomingGames, eventId)) {
+        continue;
+      }
       if (!shouldPreserveMissingOperationalLiveGame(prev, ingestCycle, liveRecencyById)) {
         continue;
       }
@@ -20083,7 +20198,50 @@ function recordAppliedOperationalTransportGeneratedAt(transportGeneratedAt) {
 }
 
 // ../grarf/desktop/src/store/liveGamesStore.ts
-var useLiveGamesStore = create((set) => ({
+function gameRowsMateriallyEqual(a, b) {
+  if (a === b) return true;
+  if (a.id !== b.id) return false;
+  const keys = /* @__PURE__ */ new Set([
+    ...Object.keys(a),
+    ...Object.keys(b)
+  ]);
+  for (const key of keys) {
+    const left = a[key];
+    const right = b[key];
+    if (left === right) continue;
+    if (left != null && right != null && typeof left === "object" && typeof right === "object") {
+      if (JSON.stringify(left) !== JSON.stringify(right)) return false;
+      continue;
+    }
+    return false;
+  }
+  return true;
+}
+function leaguesMateriallyEqual(next, prev) {
+  if (next === prev) return true;
+  const nextKeys = Object.keys(next).sort();
+  const prevKeys = Object.keys(prev).sort();
+  if (nextKeys.length !== prevKeys.length) return false;
+  for (let index = 0; index < nextKeys.length; index += 1) {
+    if (nextKeys[index] !== prevKeys[index]) return false;
+    const leagueKey = nextKeys[index];
+    const nextRows = next[leagueKey];
+    const prevRows = prev[leagueKey];
+    if (nextRows === prevRows) continue;
+    if (!Array.isArray(nextRows) || !Array.isArray(prevRows)) return false;
+    if (nextRows.length !== prevRows.length) return false;
+    for (let rowIndex = 0; rowIndex < nextRows.length; rowIndex += 1) {
+      if (!gameRowsMateriallyEqual(nextRows[rowIndex], prevRows[rowIndex])) {
+        return false;
+      }
+    }
+  }
+  return true;
+}
+function liveGamesMirrorMateriallyEqual(next, prev) {
+  return next.updatedAt === prev.updatedAt && leaguesMateriallyEqual(next.leagues, prev.leagues);
+}
+var useLiveGamesStore = create((set, get) => ({
   leagues: useCanonicalLiveGameStore.getState().leagues,
   updatedAt: useCanonicalLiveGameStore.getState().updatedAt,
   hydrate: (snap, completeness) => {
@@ -20164,12 +20322,13 @@ var useLiveGamesStore = create((set) => ({
       withMlbStandings,
       Date.now()
     );
+    const withReconciledEspnState = reconcileCanonicalLiveGamesSnapshot(withFinalizedAtMs2);
     useCanonicalLiveGameStore.getState().ingestSnapshot({
-      leagues: withFinalizedAtMs2.leagues,
-      updatedAt: withFinalizedAtMs2.updatedAt,
+      leagues: withReconciledEspnState.leagues,
+      updatedAt: withReconciledEspnState.updatedAt,
       sourceProvider: "espn_scoreboard_ipc"
     });
-    useGamesSpineRenderStore.getState().markOperationalIngest(withFinalizedAtMs2.leagues, {
+    useGamesSpineRenderStore.getState().markOperationalIngest(withReconciledEspnState.leagues, {
       source: completeness?.source ?? "espn_scoreboard_ipc",
       requestedLeagueCount: completeness?.requestedLeagueCount,
       transportGeneratedAt: completeness?.transportGeneratedAt ?? snap.updatedAt ?? void 0,
@@ -20178,13 +20337,35 @@ var useLiveGamesStore = create((set) => ({
     retention.pruneExpired();
     syncTransitionCoverageRetention(useRecentFinalizedGamesStore.getState().byId);
     const canonical = useCanonicalLiveGameStore.getState();
-    set({
+    const nextMirror = {
       leagues: canonical.leagues,
       updatedAt: canonical.updatedAt
-    });
+    };
+    const prevMirror = {
+      leagues: get().leagues,
+      updatedAt: get().updatedAt
+    };
+    if (!liveGamesMirrorMateriallyEqual(nextMirror, prevMirror)) {
+      set({
+        leagues: canonical.leagues,
+        updatedAt: canonical.updatedAt
+      });
+    }
   }
 }));
-useCanonicalLiveGameStore.subscribe((canonical) => {
+function canonicalLiveGamesMirrorMateriallyEqual(next, prev) {
+  return liveGamesMirrorMateriallyEqual(next, prev);
+}
+useCanonicalLiveGameStore.subscribe((canonical, previousCanonical) => {
+  const nextMirror = {
+    leagues: canonical.leagues,
+    updatedAt: canonical.updatedAt
+  };
+  const prevMirror = {
+    leagues: previousCanonical.leagues,
+    updatedAt: previousCanonical.updatedAt
+  };
+  if (canonicalLiveGamesMirrorMateriallyEqual(nextMirror, prevMirror)) return;
   useLiveGamesStore.setState({
     leagues: canonical.leagues,
     updatedAt: canonical.updatedAt
