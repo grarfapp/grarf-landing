@@ -16931,6 +16931,110 @@ function normalizeCanonicalLiveGame(game, input) {
   return { game: enriched, meta };
 }
 
+// ../grarf/desktop/src/services/operationalIngest/operationalIngestWriteDiagnostic.ts
+init_define_import_meta_env();
+function summarizeLiveGames(leagues) {
+  const out = [];
+  for (const rows of Object.values(leagues ?? {})) {
+    if (!Array.isArray(rows)) continue;
+    for (const game of rows) {
+      if (game.status !== "live") continue;
+      out.push({
+        gameId: game.id,
+        league: game.league,
+        status: game.status
+      });
+    }
+  }
+  return out.sort((a, b) => a.gameId.localeCompare(b.gameId));
+}
+function countGames(leagues) {
+  let count = 0;
+  for (const rows of Object.values(leagues ?? {})) {
+    if (Array.isArray(rows)) count += rows.length;
+  }
+  return count;
+}
+var ENABLED = define_import_meta_env_default.DEV || define_import_meta_env_default.VITE_TRACE_OPERATIONAL_INGEST_WRITES === "1";
+function logOperationalHydrateDecision(input) {
+  if (!ENABLED) return;
+  console.log("[OperationalIngestWrite]", {
+    at: (/* @__PURE__ */ new Date()).toISOString(),
+    stage: input.stage,
+    outcome: input.outcome,
+    source: input.source ?? null,
+    transportGeneratedAt: input.transportGeneratedAt ?? null,
+    snapshotUpdatedAt: input.snapshotUpdatedAt ?? null,
+    gameCount: input.gameCount ?? null,
+    liveGameIds: (input.liveGames ?? []).map((game) => game.gameId),
+    liveGames: input.liveGames ?? [],
+    note: input.note ?? null
+  });
+}
+function logOperationalCanonicalIngestDecision(input) {
+  if (!ENABLED) return;
+  console.log("[OperationalIngestWrite]", {
+    at: (/* @__PURE__ */ new Date()).toISOString(),
+    stage: "canonical_ingestSnapshot",
+    outcome: input.outcome,
+    source: input.source ?? null,
+    transportGeneratedAt: input.transportGeneratedAt ?? null,
+    incomingUpdatedAt: input.incomingUpdatedAt ?? null,
+    previousUpdatedAt: input.previousUpdatedAt ?? null,
+    gameCount: countGames(input.snap.leagues),
+    liveGames: summarizeLiveGames(input.snap.leagues),
+    note: input.note ?? null
+  });
+}
+function summarizeLiveGamesForDiagnostic(leagues) {
+  return summarizeLiveGames(leagues);
+}
+
+// ../grarf/desktop/src/services/operationalIngest/operationalTransportFreshness.ts
+init_define_import_meta_env();
+var lastAppliedOperationalTransportGeneratedAtMs = Number.NEGATIVE_INFINITY;
+var lastAppliedOperationalTransportGeneratedAt = null;
+var lastAppliedCloudTransportGeneratedAtMs = Number.NEGATIVE_INFINITY;
+var lastAppliedEspnLocalTransportGeneratedAtMs = Number.NEGATIVE_INFINITY;
+function isCloudIngestSource(source) {
+  return source === "grarf_cloud";
+}
+function isEspnLocalIngestSource(source) {
+  return source === "espn_local_adapter" || source === "espn_scoreboard_ipc";
+}
+function parseOperationalTransportGeneratedAtMs(generatedAt) {
+  if (!generatedAt?.trim()) return Number.NEGATIVE_INFINITY;
+  const ms = Date.parse(generatedAt);
+  return Number.isFinite(ms) ? ms : Number.NEGATIVE_INFINITY;
+}
+function shouldAcceptOperationalTransportHydrate(transportGeneratedAt, ingestSource) {
+  const incomingMs = parseOperationalTransportGeneratedAtMs(transportGeneratedAt);
+  if (incomingMs === Number.NEGATIVE_INFINITY) return true;
+  if (isCloudIngestSource(ingestSource)) {
+    return incomingMs > lastAppliedCloudTransportGeneratedAtMs;
+  }
+  if (isEspnLocalIngestSource(ingestSource)) {
+    return incomingMs > lastAppliedEspnLocalTransportGeneratedAtMs;
+  }
+  return incomingMs > lastAppliedOperationalTransportGeneratedAtMs;
+}
+function recordAppliedOperationalTransportGeneratedAt(transportGeneratedAt, ingestSource) {
+  const incomingMs = parseOperationalTransportGeneratedAtMs(transportGeneratedAt);
+  if (incomingMs === Number.NEGATIVE_INFINITY) return;
+  if (isCloudIngestSource(ingestSource)) {
+    if (incomingMs <= lastAppliedCloudTransportGeneratedAtMs) return;
+    lastAppliedCloudTransportGeneratedAtMs = incomingMs;
+  } else if (isEspnLocalIngestSource(ingestSource)) {
+    if (incomingMs <= lastAppliedEspnLocalTransportGeneratedAtMs) return;
+    lastAppliedEspnLocalTransportGeneratedAtMs = incomingMs;
+  } else if (incomingMs <= lastAppliedOperationalTransportGeneratedAtMs) {
+    return;
+  }
+  if (incomingMs <= lastAppliedOperationalTransportGeneratedAtMs) return;
+  lastAppliedOperationalTransportGeneratedAtMs = incomingMs;
+  lastAppliedOperationalTransportGeneratedAt = transportGeneratedAt ?? null;
+}
+
 // ../grarf/desktop/src/store/canonicalLiveGameStore.ts
 function emptyLeagues() {
   return {};
@@ -16996,6 +17100,25 @@ function touchConsumer(record, consumerId) {
     }
   };
 }
+function shouldRejectIncomingCanonicalSnapshot(snap, prev, meta) {
+  const incomingAt = meta?.transportGeneratedAt ?? snap.updatedAt;
+  const incomingMs = parseOperationalTransportGeneratedAtMs(incomingAt);
+  const canonicalMs = parseOperationalTransportGeneratedAtMs(prev.updatedAt);
+  if (incomingMs !== Number.NEGATIVE_INFINITY && canonicalMs !== Number.NEGATIVE_INFINITY && incomingMs < canonicalMs) {
+    return "rejected_older_snapshot";
+  }
+  for (const rows of Object.values(snap.leagues ?? {})) {
+    if (!Array.isArray(rows)) continue;
+    for (const game of rows) {
+      if (game.status !== "live") continue;
+      const previous = prev.gamesById[game.id]?.game;
+      if (previous?.status === "final") {
+        return "rejected_live_status_regression";
+      }
+    }
+  }
+  return null;
+}
 var useCanonicalLiveGameStore = create((set, get) => ({
   gamesById: {},
   leagues: emptyLeagues(),
@@ -17003,11 +17126,24 @@ var useCanonicalLiveGameStore = create((set, get) => ({
   normalizedVersion: 0,
   ingestSequence: 0,
   sourceProvider: "espn_scoreboard_ipc",
-  ingestSnapshot: (snap) => {
+  ingestSnapshot: (snap, meta) => {
     const now = Date.now();
     const sourceProvider = snap.sourceProvider ?? "espn_scoreboard_ipc";
     const updatedAt = snap.updatedAt ?? new Date(now).toISOString();
     const prev = get();
+    const rejection = shouldRejectIncomingCanonicalSnapshot(snap, prev, meta);
+    if (rejection) {
+      logOperationalCanonicalIngestDecision({
+        outcome: rejection,
+        source: meta?.ingestSource,
+        transportGeneratedAt: meta?.transportGeneratedAt ?? null,
+        incomingUpdatedAt: updatedAt,
+        previousUpdatedAt: prev.updatedAt,
+        snap,
+        note: "canonical boundary rejected incoming snapshot"
+      });
+      return;
+    }
     const normalizedVersion = prev.normalizedVersion + 1;
     const ingestSequence = prev.ingestSequence + 1;
     const gamesById = {};
@@ -17048,8 +17184,24 @@ var useCanonicalLiveGameStore = create((set, get) => ({
     }
     const leagues = rebuildLeaguesFromCanonical(gamesById);
     if (canonicalIngestMateriallyEqual(prev, gamesById, updatedAt)) {
+      logOperationalCanonicalIngestDecision({
+        outcome: "rejected_no_op",
+        source: meta?.ingestSource,
+        transportGeneratedAt: meta?.transportGeneratedAt ?? null,
+        incomingUpdatedAt: updatedAt,
+        previousUpdatedAt: prev.updatedAt,
+        snap
+      });
       return;
     }
+    logOperationalCanonicalIngestDecision({
+      outcome: "accepted",
+      source: meta?.ingestSource,
+      transportGeneratedAt: meta?.transportGeneratedAt ?? null,
+      incomingUpdatedAt: updatedAt,
+      previousUpdatedAt: prev.updatedAt,
+      snap
+    });
     set({
       gamesById,
       leagues,
@@ -20175,28 +20327,6 @@ function applyFinalizedAtMsToSnapshot(previousGames, snap, nowMs = Date.now()) {
   return changed ? { ...snap, leagues } : snap;
 }
 
-// ../grarf/desktop/src/services/operationalIngest/operationalTransportFreshness.ts
-init_define_import_meta_env();
-var lastAppliedOperationalTransportGeneratedAtMs = Number.NEGATIVE_INFINITY;
-var lastAppliedOperationalTransportGeneratedAt = null;
-function parseOperationalTransportGeneratedAtMs(generatedAt) {
-  if (!generatedAt?.trim()) return Number.NEGATIVE_INFINITY;
-  const ms = Date.parse(generatedAt);
-  return Number.isFinite(ms) ? ms : Number.NEGATIVE_INFINITY;
-}
-function shouldAcceptOperationalTransportHydrate(transportGeneratedAt) {
-  const incomingMs = parseOperationalTransportGeneratedAtMs(transportGeneratedAt);
-  if (incomingMs === Number.NEGATIVE_INFINITY) return true;
-  return incomingMs > lastAppliedOperationalTransportGeneratedAtMs;
-}
-function recordAppliedOperationalTransportGeneratedAt(transportGeneratedAt) {
-  const incomingMs = parseOperationalTransportGeneratedAtMs(transportGeneratedAt);
-  if (incomingMs === Number.NEGATIVE_INFINITY) return;
-  if (incomingMs <= lastAppliedOperationalTransportGeneratedAtMs) return;
-  lastAppliedOperationalTransportGeneratedAtMs = incomingMs;
-  lastAppliedOperationalTransportGeneratedAt = transportGeneratedAt ?? null;
-}
-
 // ../grarf/desktop/src/store/liveGamesStore.ts
 function gameRowsMateriallyEqual(a, b) {
   if (a === b) return true;
@@ -20323,9 +20453,22 @@ var useLiveGamesStore = create((set, get) => ({
   leagues: useCanonicalLiveGameStore.getState().leagues,
   updatedAt: useCanonicalLiveGameStore.getState().updatedAt,
   hydrate: (snap, completeness) => {
+    const ingestSource = completeness?.source;
     const transportGeneratedAt = completeness?.transportGeneratedAt?.trim();
     if (transportGeneratedAt) {
-      if (!shouldAcceptOperationalTransportHydrate(transportGeneratedAt)) {
+      if (!shouldAcceptOperationalTransportHydrate(transportGeneratedAt, ingestSource)) {
+        logOperationalHydrateDecision({
+          stage: "hydrate_exit",
+          outcome: "rejected_stale_transport",
+          source: ingestSource,
+          transportGeneratedAt,
+          snapshotUpdatedAt: snap.updatedAt ?? null,
+          gameCount: Object.values(snap.leagues ?? {}).reduce(
+            (count, rows) => count + (Array.isArray(rows) ? rows.length : 0),
+            0
+          ),
+          liveGames: summarizeLiveGamesForDiagnostic(snap.leagues)
+        });
         if (define_import_meta_env_default.DEV) {
           broadcastDebug(
             `[CanonicalLive] Skip stale operational hydrate ${transportGeneratedAt}`
@@ -20333,14 +20476,30 @@ var useLiveGamesStore = create((set, get) => ({
         }
         return;
       }
-      recordAppliedOperationalTransportGeneratedAt(transportGeneratedAt);
+      recordAppliedOperationalTransportGeneratedAt(transportGeneratedAt, ingestSource);
     }
     if (gamesSnapshotMateriallyMatchesCanonical(snap)) {
+      logOperationalHydrateDecision({
+        stage: "hydrate_exit",
+        outcome: "skipped_no_op_hydrate",
+        source: ingestSource,
+        transportGeneratedAt: transportGeneratedAt ?? null,
+        snapshotUpdatedAt: snap.updatedAt ?? null,
+        liveGames: summarizeLiveGamesForDiagnostic(snap.leagues)
+      });
       if (define_import_meta_env_default.DEV) {
         broadcastDebug(`[CanonicalLive] Skip no-op hydrate ${snap.updatedAt ?? "?"}`);
       }
       return;
     }
+    logOperationalHydrateDecision({
+      stage: "hydrate_enter",
+      outcome: "accepted",
+      source: ingestSource,
+      transportGeneratedAt: transportGeneratedAt ?? null,
+      snapshotUpdatedAt: snap.updatedAt ?? null,
+      liveGames: summarizeLiveGamesForDiagnostic(snap.leagues)
+    });
     if (define_import_meta_env_default.DEV) {
       broadcastDebug(`[CanonicalLive] Ingest ${snap.updatedAt ?? "?"}`);
     }
@@ -20407,11 +20566,18 @@ var useLiveGamesStore = create((set, get) => ({
       Date.now()
     );
     const withReconciledEspnState = reconcileCanonicalLiveGamesSnapshot(withFinalizedAtMs2);
-    useCanonicalLiveGameStore.getState().ingestSnapshot({
-      leagues: withReconciledEspnState.leagues,
-      updatedAt: withReconciledEspnState.updatedAt,
-      sourceProvider: "espn_scoreboard_ipc"
-    });
+    const ingestMeta = {
+      ingestSource,
+      transportGeneratedAt: transportGeneratedAt ?? snap.updatedAt ?? null
+    };
+    useCanonicalLiveGameStore.getState().ingestSnapshot(
+      {
+        leagues: withReconciledEspnState.leagues,
+        updatedAt: withReconciledEspnState.updatedAt,
+        sourceProvider: "espn_scoreboard_ipc"
+      },
+      ingestMeta
+    );
     useGamesSpineRenderStore.getState().markOperationalIngest(withReconciledEspnState.leagues, {
       source: completeness?.source ?? "espn_scoreboard_ipc",
       requestedLeagueCount: completeness?.requestedLeagueCount,
