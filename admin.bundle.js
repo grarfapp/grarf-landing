@@ -17629,6 +17629,7 @@ var useGamesSpineRenderStore = create((set, get) => ({
 // ../grarf/desktop/src/lib/operational/operationalLiveAuthority.ts
 var OPERATIONAL_PROVIDER_CONFIRMED_LIVE_SLACK_MS = WEB_UPDATE_ENGINE_LIVE_GAMES_POLL_MS * 3;
 var LEGACY_CLOUD_LIVE_MAX_STALE_UPDATE_MS = 45 * 60 * 1e3;
+var PROVIDER_POLL_HYDRATION_LEGACY_SLACK_MS = 60 * 1e3;
 function getOperationalLiveAuthorityState() {
   const state = useGamesSpineRenderStore.getState();
   return {
@@ -17655,6 +17656,13 @@ function isLegacyCloudLiveRowFresh(game, nowMs = Date.now()) {
   if (lastUpdatedMs == null) return false;
   return nowMs - lastUpdatedMs <= LEGACY_CLOUD_LIVE_MAX_STALE_UPDATE_MS;
 }
+function isProviderPollHydrationFresh(game, providerPollCompletedAt) {
+  const completedMs = Date.parse(providerPollCompletedAt);
+  const lastUpdatedMs = parseGameLastUpdatedMs(game.lastUpdated);
+  if (!Number.isFinite(completedMs) || lastUpdatedMs == null) return false;
+  const ageBehindCompletionMs = completedMs - lastUpdatedMs;
+  return ageBehindCompletionMs > OPERATIONAL_PROVIDER_CONFIRMED_LIVE_SLACK_MS && ageBehindCompletionMs <= OPERATIONAL_PROVIDER_CONFIRMED_LIVE_SLACK_MS + PROVIDER_POLL_HYDRATION_LEGACY_SLACK_MS;
+}
 function shouldApplyProviderPollLiveGate(lastTransportSource) {
   return lastTransportSource === "grarf_cloud";
 }
@@ -17672,7 +17680,10 @@ function isProviderConfirmedLive(game, authorityState) {
   if (operationalProviderPoll.allLeaguesFailed) return false;
   const providerPollCompletedAt = operationalProviderPoll.providerPollCompletedAt;
   if (!providerPollCompletedAt?.trim()) return false;
-  return isGameLastUpdatedProviderConfirmed(game, providerPollCompletedAt);
+  if (isGameLastUpdatedProviderConfirmed(game, providerPollCompletedAt)) {
+    return true;
+  }
+  return isProviderPollHydrationFresh(game, providerPollCompletedAt);
 }
 
 // ../grarf/desktop/src/lib/gamesSpine/reconcileOperationalGamesByEspnEventId.ts
@@ -19603,11 +19614,14 @@ function resolveWebOperationalIngestUrl() {
 function getOperationalIngestConfig() {
   const isWeb = isGrarfWebRenderer();
   const envProvider = define_import_meta_env_default.VITE_OPERATIONAL_INGEST_PROVIDER;
+  const cloudBaseUrl = define_import_meta_env_default.VITE_GRARF_OPERATIONAL_INGEST_URL?.trim() || resolveWebOperationalIngestUrl() || null;
   let provider;
   if (envProvider === "grarf_cloud" || envProvider === "espn_local_ipc") {
     provider = envProvider;
+  } else if (isWeb || cloudBaseUrl) {
+    provider = "grarf_cloud";
   } else {
-    provider = isWeb ? "grarf_cloud" : "espn_local_ipc";
+    provider = "espn_local_ipc";
   }
   if (isWeb && provider === "espn_local_ipc") {
     provider = "grarf_cloud";
@@ -19615,7 +19629,6 @@ function getOperationalIngestConfig() {
   const pollRaw = define_import_meta_env_default.VITE_OPERATIONAL_INGEST_POLL_MS ?? (typeof window !== "undefined" ? String(window.GRARF_WEB_CONFIG?.operationalPollIntervalMs ?? "") : "");
   const pollParsed = pollRaw != null ? Number(pollRaw) : NaN;
   const pollIntervalMs = Number.isFinite(pollParsed) && pollParsed >= 15e3 ? pollParsed : 6e4;
-  const cloudBaseUrl = define_import_meta_env_default.VITE_GRARF_OPERATIONAL_INGEST_URL?.trim() || resolveWebOperationalIngestUrl() || null;
   return {
     provider,
     cloudBaseUrl,
@@ -24442,16 +24455,12 @@ function toElectronLocalRow(game) {
   };
 }
 function mergeLeagueRowsFromLocal(cloudRows, localRows) {
-  if (localRows.length === 0) return cloudRows;
-  if (cloudRows.length === 0) return localRows;
+  if (localRows.length === 0 || cloudRows.length === 0) return cloudRows;
   const byId = /* @__PURE__ */ new Map();
   for (const row of cloudRows) byId.set(row.id, row);
   for (const local of localRows) {
     const existing = byId.get(local.id);
-    if (!existing) {
-      byId.set(local.id, local);
-      continue;
-    }
+    if (!existing) continue;
     byId.set(local.id, mergeElectronRow(existing, toElectronLocalRow(local)));
   }
   return [...byId.values()];
@@ -24473,7 +24482,7 @@ async function supplementOperationalSnapshotFromLocalIpc(transport) {
   for (const key of getGamesColumnLeagueOrder()) {
     const cloudRows = mergedLeagues[key] ?? [];
     const localRows = local.leagues[key] ?? [];
-    if (localRows.length === 0) continue;
+    if (localRows.length === 0 || cloudRows.length === 0) continue;
     const nextRows = mergeLeagueRowsFromLocal(cloudRows, localRows);
     if (nextRows.length !== cloudRows.length || nextRows.some((g, i) => g !== cloudRows[i])) {
       mergedLeagues[key] = nextRows;
@@ -28520,14 +28529,17 @@ async function fetchWebEspnOperationalSnapshot(leagueKeys = filterEspnOperationa
 
 // ../grarf/desktop/src/services/operationalIngest/fetchOperationalSnapshot.ts
 var LOG21 = "[OperationalIngest]";
-var CLOUD_STALE_THRESHOLD_MS = 9e4;
 var CLOUD_FETCH_TIMEOUT_MS = 2e4;
 var WEB_CLOUD_BOOTSTRAP_TIMEOUT_MS = 2500;
 var CLOUD_FETCH_MAX_ATTEMPTS = 3;
 var CLOUD_FETCH_RETRY_MS = 1500;
 var webCloudSnapshotPrefetch = null;
 function prefetchWebOperationalCloudSnapshot() {
-  if (!isGrarfWebRenderer()) return Promise.resolve(null);
+  const config = getOperationalIngestConfig();
+  if (!config.cloudBaseUrl) return Promise.resolve(null);
+  if (!isGrarfWebRenderer() && config.provider !== "grarf_cloud") {
+    return Promise.resolve(null);
+  }
   if (!webCloudSnapshotPrefetch) {
     webCloudSnapshotPrefetch = fetchViaGrarfCloudService({ webBootstrap: true }).then((snap) => countOperationalGames(snap) > 0 ? snap : null).catch((e) => {
       if (define_import_meta_env_default.DEV) {
@@ -28656,21 +28668,12 @@ function mergeEspnOperationalFieldsFromSupplement(cloud, espn) {
     ...mergedMetadata ? { metadata: mergedMetadata } : {}
   };
 }
-function hasElectronGamesIpc() {
-  return Boolean(typeof window !== "undefined" && window.grarf?.gamesGetSnapshot);
-}
 function emptyOperationalSnapshot() {
   return {
     generatedAt: (/* @__PURE__ */ new Date()).toISOString(),
     source: "espn_local_adapter",
     leagues: {}
   };
-}
-function snapshotAgeMs(generatedAt) {
-  if (!generatedAt?.trim()) return Number.POSITIVE_INFINITY;
-  const ms = Date.parse(generatedAt);
-  if (!Number.isFinite(ms)) return Number.POSITIVE_INFINITY;
-  return Math.max(0, Date.now() - ms);
 }
 function ipcSnapshotToOperationalResponse(snap, source = "espn_local_adapter") {
   const leagues = {};
@@ -28791,91 +28794,13 @@ async function joinWebMlbProviderIds(transport) {
     return transport;
   }
 }
-function countLiveOperationalGames(snap) {
-  let live = 0;
-  for (const rows of Object.values(snap.leagues ?? {})) {
-    if (!Array.isArray(rows)) continue;
-    for (const game of rows) {
-      if (game?.status === "live") live += 1;
-    }
-  }
-  return live;
-}
-async function fetchViaGrarfCloudWithLocalFallback() {
-  let cloud = null;
-  let cloudError = null;
-  try {
-    cloud = await fetchViaGrarfCloudService();
-  } catch (e) {
-    cloudError = e instanceof Error ? e.message : String(e);
-  }
-  const cloudAgeMs = cloud ? snapshotAgeMs(cloud.generatedAt) : Number.POSITIVE_INFINITY;
-  const cloudFresh = cloud != null && cloudAgeMs <= CLOUD_STALE_THRESHOLD_MS;
-  const electronIpc = hasElectronGamesIpc();
-  if (electronIpc) {
-    const local2 = await fetchViaEspnLocalIpcAdapter();
-    const localAgeMs2 = snapshotAgeMs(local2.generatedAt);
-    const localGames = countOperationalGames(local2);
-    const cloudGames = cloud ? countOperationalGames(cloud) : 0;
-    const localLive = countLiveOperationalGames(local2);
-    const cloudLive = cloud ? countLiveOperationalGames(cloud) : 0;
-    if (localGames > 0) {
-      const localFresher = !cloud || !cloudFresh || localAgeMs2 + 3e4 < cloudAgeMs || localLive > cloudLive || localGames > cloudGames;
-      if (localFresher) {
-        if (define_import_meta_env_default.DEV && cloud && !cloudFresh) {
-          console.warn(`${LOG21} using local IPC (cloud stale or failed)`, {
-            cloudError,
-            cloudAgeMs,
-            localAgeMs: localAgeMs2
-          });
-        }
-        return { ...local2, source: "espn_local_adapter" };
-      }
-    }
-  }
-  if (cloudFresh && cloud) {
-    return cloud;
-  }
-  if (!electronIpc) {
-    if (cloud) {
-      if (define_import_meta_env_default.DEV && !cloudFresh) {
-        console.warn(`${LOG21} browser/web using cloud snapshot (stale but authoritative)`, {
-          cloudAgeMs,
-          cloudError
-        });
-      }
-      return cloud;
-    }
-    if (isGrarfWebRenderer()) {
-      throw new Error(cloudError ?? "[OperationalIngest] grarf_cloud unavailable in browser");
-    }
-    throw new Error(cloudError ?? "[OperationalIngest] grarf_cloud unavailable in browser");
-  }
-  const local = await fetchViaEspnLocalIpcAdapter();
-  const localAgeMs = snapshotAgeMs(local.generatedAt);
-  if (cloud && cloudAgeMs <= localAgeMs) {
-    return cloud;
-  }
-  if (define_import_meta_env_default.DEV && (cloudError || cloud && !cloudFresh)) {
-    console.warn(`${LOG21} using local IPC fallback (cloud stale or failed)`, {
-      cloudError,
-      cloudAgeMs: cloud ? cloudAgeMs : null,
-      localAgeMs,
-      localGeneratedAt: local.generatedAt
-    });
-  }
-  return {
-    ...local,
-    source: "espn_local_adapter"
-  };
-}
 async function fetchOperationalSnapshot() {
   const config = getOperationalIngestConfig();
   if (isGrarfWebRenderer()) {
     return fetchViaWebOperationalIngest();
   }
   if (config.provider === "grarf_cloud") {
-    return fetchViaGrarfCloudWithLocalFallback();
+    return fetchViaGrarfCloudService();
   }
   return fetchViaEspnLocalIpcAdapter();
 }
