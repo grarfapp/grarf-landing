@@ -14243,6 +14243,13 @@ var ESPN_OPERATIONAL_INGEST_LEAGUES = [
     "endpoint": "https://site.api.espn.com/apis/site/v2/sports/golf/champions-tour/scoreboard"
   },
   {
+    "key": "CHAMPIONSHIP",
+    "sport": "soccer",
+    "label": "Championship",
+    "slug": "eng.2",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/eng.2/scoreboard"
+  },
+  {
     "key": "CLUBFRIENDLY",
     "sport": "soccer",
     "label": "Club Friendly",
@@ -14297,6 +14304,13 @@ var ESPN_OPERATIONAL_INGEST_LEAGUES = [
     "label": "Copa do Brasil",
     "slug": "bra.copa_do_brazil",
     "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/bra.copa_do_brazil/scoreboard"
+  },
+  {
+    "key": "COPPAITALIA",
+    "sport": "soccer",
+    "label": "Coppa Italia",
+    "slug": "ita.coppa_italia",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/ita.coppa_italia/scoreboard"
   },
   {
     "key": "CRICKET_BBL",
@@ -26637,7 +26651,7 @@ init_define_import_meta_env();
 
 // ../grarf/desktop/electron/espn/espnOperationalLeagueConstants.generated.js
 init_define_import_meta_env();
-var SOCCER_LEAGUE_KEYS = /* @__PURE__ */ new Set(["ARG1", "BEL1", "BRA1", "BUNDESLIGA", "CAF_WNATIONS", "CARABAO_CUP", "CLUBFRIENDLY", "CLUBWC", "CONCACAF_CAC", "CONCACAF_CL", "CONCACAF_NG", "CONCACAF_WC", "COPA", "COPA_BRASIL", "EPL", "EREDIVISIE", "EURO", "GER_SUPER_CUP", "GOLDCUP", "INTFRIENDLY", "LALIGA", "LEAGUES_CUP", "LIBERTADORES", "LIGAMX", "LIGUE1", "MLS", "NATIONS", "NCAAMSOC", "NCAAWSOC", "NWSL", "POR1", "SAUDI", "SERIEA", "SPFL", "SUDAMERICANA", "SUPERLIG", "UCL", "UCLQ", "UECL", "UECLQ", "UEL", "UELQ", "USL1", "USLC", "USLCUP", "UWCQ", "WORLDCUP", "WWC"]);
+var SOCCER_LEAGUE_KEYS = /* @__PURE__ */ new Set(["ARG1", "BEL1", "BRA1", "BUNDESLIGA", "CAF_WNATIONS", "CARABAO_CUP", "CHAMPIONSHIP", "CLUBFRIENDLY", "CLUBWC", "CONCACAF_CAC", "CONCACAF_CL", "CONCACAF_NG", "CONCACAF_WC", "COPA", "COPA_BRASIL", "COPPAITALIA", "EPL", "EREDIVISIE", "EURO", "GER_SUPER_CUP", "GOLDCUP", "INTFRIENDLY", "LALIGA", "LEAGUES_CUP", "LIBERTADORES", "LIGAMX", "LIGUE1", "MLS", "NATIONS", "NCAAMSOC", "NCAAWSOC", "NWSL", "POR1", "SAUDI", "SERIEA", "SPFL", "SUDAMERICANA", "SUPERLIG", "UCL", "UCLQ", "UECL", "UECLQ", "UEL", "UELQ", "USL1", "USLC", "USLCUP", "UWCQ", "WORLDCUP", "WWC"]);
 var NATIONAL_TEAM_SOCCER_LEAGUE_KEYS = /* @__PURE__ */ new Set(["CONCACAF_NG", "CONCACAF_WC", "COPA", "EURO", "GOLDCUP", "INTFRIENDLY", "NATIONS", "UWCQ", "WORLDCUP", "WWC"]);
 
 // ../grarf/desktop/electron/espn/espnPlusStream.js
@@ -28511,6 +28525,19 @@ var CLOUD_FETCH_TIMEOUT_MS = 2e4;
 var WEB_CLOUD_BOOTSTRAP_TIMEOUT_MS = 2500;
 var CLOUD_FETCH_MAX_ATTEMPTS = 3;
 var CLOUD_FETCH_RETRY_MS = 1500;
+var webCloudSnapshotPrefetch = null;
+function prefetchWebOperationalCloudSnapshot() {
+  if (!isGrarfWebRenderer()) return Promise.resolve(null);
+  if (!webCloudSnapshotPrefetch) {
+    webCloudSnapshotPrefetch = fetchViaGrarfCloudService({ webBootstrap: true }).then((snap) => countOperationalGames(snap) > 0 ? snap : null).catch((e) => {
+      if (define_import_meta_env_default.DEV) {
+        console.warn(`${LOG21} web cloud prefetch failed`, e);
+      }
+      return null;
+    });
+  }
+  return webCloudSnapshotPrefetch;
+}
 function countOperationalGames(snap) {
   return Object.values(snap.leagues ?? {}).reduce(
     (total, rows) => total + (Array.isArray(rows) ? rows.length : 0),
@@ -28718,7 +28745,10 @@ async function fetchViaWebOperationalIngest() {
   let cloud = null;
   let cloudError = null;
   try {
-    cloud = await fetchViaGrarfCloudService();
+    cloud = await prefetchWebOperationalCloudSnapshot();
+    if (!cloud || countOperationalGames(cloud) === 0) {
+      cloud = await fetchViaGrarfCloudService();
+    }
   } catch (e) {
     cloudError = e instanceof Error ? e.message : String(e);
     if (define_import_meta_env_default.DEV) {

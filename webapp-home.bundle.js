@@ -4584,6 +4584,13 @@ var init_espnOperationalLeagueRegistry_generated = __esm({
         "endpoint": "https://site.api.espn.com/apis/site/v2/sports/golf/champions-tour/scoreboard"
       },
       {
+        "key": "CHAMPIONSHIP",
+        "sport": "soccer",
+        "label": "Championship",
+        "slug": "eng.2",
+        "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/eng.2/scoreboard"
+      },
+      {
         "key": "CLUBFRIENDLY",
         "sport": "soccer",
         "label": "Club Friendly",
@@ -4638,6 +4645,13 @@ var init_espnOperationalLeagueRegistry_generated = __esm({
         "label": "Copa do Brasil",
         "slug": "bra.copa_do_brazil",
         "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/bra.copa_do_brazil/scoreboard"
+      },
+      {
+        "key": "COPPAITALIA",
+        "sport": "soccer",
+        "label": "Coppa Italia",
+        "slug": "ita.coppa_italia",
+        "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/ita.coppa_italia/scoreboard"
       },
       {
         "key": "CRICKET_BBL",
@@ -9942,7 +9956,7 @@ var SOCCER_LEAGUE_KEYS, NATIONAL_TEAM_SOCCER_LEAGUE_KEYS;
 var init_espnOperationalLeagueConstants_generated = __esm({
   "../grarf/desktop/electron/espn/espnOperationalLeagueConstants.generated.js"() {
     init_define_import_meta_env();
-    SOCCER_LEAGUE_KEYS = /* @__PURE__ */ new Set(["ARG1", "BEL1", "BRA1", "BUNDESLIGA", "CAF_WNATIONS", "CARABAO_CUP", "CLUBFRIENDLY", "CLUBWC", "CONCACAF_CAC", "CONCACAF_CL", "CONCACAF_NG", "CONCACAF_WC", "COPA", "COPA_BRASIL", "EPL", "EREDIVISIE", "EURO", "GER_SUPER_CUP", "GOLDCUP", "INTFRIENDLY", "LALIGA", "LEAGUES_CUP", "LIBERTADORES", "LIGAMX", "LIGUE1", "MLS", "NATIONS", "NCAAMSOC", "NCAAWSOC", "NWSL", "POR1", "SAUDI", "SERIEA", "SPFL", "SUDAMERICANA", "SUPERLIG", "UCL", "UCLQ", "UECL", "UECLQ", "UEL", "UELQ", "USL1", "USLC", "USLCUP", "UWCQ", "WORLDCUP", "WWC"]);
+    SOCCER_LEAGUE_KEYS = /* @__PURE__ */ new Set(["ARG1", "BEL1", "BRA1", "BUNDESLIGA", "CAF_WNATIONS", "CARABAO_CUP", "CHAMPIONSHIP", "CLUBFRIENDLY", "CLUBWC", "CONCACAF_CAC", "CONCACAF_CL", "CONCACAF_NG", "CONCACAF_WC", "COPA", "COPA_BRASIL", "COPPAITALIA", "EPL", "EREDIVISIE", "EURO", "GER_SUPER_CUP", "GOLDCUP", "INTFRIENDLY", "LALIGA", "LEAGUES_CUP", "LIBERTADORES", "LIGAMX", "LIGUE1", "MLS", "NATIONS", "NCAAMSOC", "NCAAWSOC", "NWSL", "POR1", "SAUDI", "SERIEA", "SPFL", "SUDAMERICANA", "SUPERLIG", "UCL", "UCLQ", "UECL", "UECLQ", "UEL", "UELQ", "USL1", "USLC", "USLCUP", "UWCQ", "WORLDCUP", "WWC"]);
     NATIONAL_TEAM_SOCCER_LEAGUE_KEYS = /* @__PURE__ */ new Set(["CONCACAF_NG", "CONCACAF_WC", "COPA", "EURO", "GOLDCUP", "INTFRIENDLY", "NATIONS", "UWCQ", "WORLDCUP", "WWC"]);
   }
 });
@@ -12206,7 +12220,10 @@ async function fetchViaWebOperationalIngest() {
   let cloud = null;
   let cloudError = null;
   try {
-    cloud = await fetchViaGrarfCloudService();
+    cloud = await prefetchWebOperationalCloudSnapshot();
+    if (!cloud || countOperationalGames(cloud) === 0) {
+      cloud = await fetchViaGrarfCloudService();
+    }
   } catch (e2) {
     cloudError = e2 instanceof Error ? e2.message : String(e2);
     if (define_import_meta_env_default.DEV) {
@@ -78888,6 +78905,7 @@ var init_espnOperationalLeagues_generated = __esm({
       CARABAO_CUP: { sport: "soccer", league: "eng.league_cup", endpoint: "https://site.api.espn.com/apis/site/v2/sports/soccer/eng.league_cup/scoreboard", pollIntervalMs: 6e4, label: "Carabao Cup" },
       CFL: { sport: "football", league: "cfl", endpoint: "https://site.api.espn.com/apis/site/v2/sports/football/cfl/scoreboard", pollIntervalMs: 6e4, label: "CFL" },
       CHAMPIONS: { sport: "golf", league: "champions-tour", endpoint: "https://site.api.espn.com/apis/site/v2/sports/golf/champions-tour/scoreboard", pollIntervalMs: 6e4, label: "PGA Tour Champions" },
+      CHAMPIONSHIP: { sport: "soccer", league: "eng.2", endpoint: "https://site.api.espn.com/apis/site/v2/sports/soccer/eng.2/scoreboard", pollIntervalMs: 6e4, label: "Championship" },
       CLUBFRIENDLY: { sport: "soccer", league: "club.friendly", endpoint: "https://site.api.espn.com/apis/site/v2/sports/soccer/club.friendly/scoreboard", pollIntervalMs: 6e4, label: "Club Friendly" },
       CLUBWC: { sport: "soccer", league: "fifa.cwc", endpoint: "https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.cwc/scoreboard", pollIntervalMs: 6e4, label: "Club World Cup" },
       CONCACAF_CAC: { sport: "soccer", league: "concacaf.central.american.cup", endpoint: "https://site.api.espn.com/apis/site/v2/sports/soccer/concacaf.central.american.cup/scoreboard", pollIntervalMs: 6e4, label: "Central American Cup" },
@@ -78896,6 +78914,7 @@ var init_espnOperationalLeagues_generated = __esm({
       CONCACAF_WC: { sport: "soccer", league: "fifa.worldq.concacaf", endpoint: "https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.worldq.concacaf/scoreboard", pollIntervalMs: 6e4, label: "CONCACAF World Cup Qual" },
       COPA: { sport: "soccer", league: "conmebol.america", endpoint: "https://site.api.espn.com/apis/site/v2/sports/soccer/conmebol.america/scoreboard", pollIntervalMs: 6e4, label: "Copa America" },
       COPA_BRASIL: { sport: "soccer", league: "bra.copa_do_brazil", endpoint: "https://site.api.espn.com/apis/site/v2/sports/soccer/bra.copa_do_brazil/scoreboard", pollIntervalMs: 6e4, label: "Copa do Brasil" },
+      COPPAITALIA: { sport: "soccer", league: "ita.coppa_italia", endpoint: "https://site.api.espn.com/apis/site/v2/sports/soccer/ita.coppa_italia/scoreboard", pollIntervalMs: 6e4, label: "Coppa Italia" },
       CRICKET_BBL: { sport: "cricket", league: "24136", endpoint: "https://site.api.espn.com/apis/site/v2/sports/cricket/24136/scoreboard", pollIntervalMs: 6e4, label: "Big Bash League" },
       CRICKET_ICC: { sport: "cricket", league: "24597", endpoint: "https://site.api.espn.com/apis/site/v2/sports/cricket/24597/scoreboard", pollIntervalMs: 6e4, label: "ICC Cricket" },
       DP_WORLD: { sport: "golf", league: "eur", endpoint: "https://site.api.espn.com/apis/site/v2/sports/golf/eur/scoreboard", pollIntervalMs: 6e4, label: "DP World Tour" },
@@ -102697,7 +102716,6 @@ function HomeGamesToday({
   const operationalCloudProviderOutage = useGamesSpineRenderStore(
     selectOperationalCloudProviderOutageActive
   );
-  const operationalSlateReady = operationalIngestComplete;
   const isAdminMode = useAdminModeStore((s2) => s2.isAdminMode);
   const showEditorialControls = isGrarfAdmin() && !isAdminMode;
   const { isCollapsed, toggleCollapsed, setAllLeaguesCollapsed, expandOnlyLeague } = useGamesSpineCollapse(spineStatusFilter);
@@ -102724,6 +102742,7 @@ function HomeGamesToday({
     () => resolveCanonicalOperationalMergedLeagues(leagues),
     [leagues]
   );
+  const operationalSlateReady = operationalIngestComplete || anyOperationalSpineLeagueHasGames(mergedLeagues);
   const spineLeagueOrder = (0, import_react138.useMemo)(() => {
     const merged = mergedLeagues;
     const useOperationalOrder = parentScrolls || activeLeagueId === "general-sports";
