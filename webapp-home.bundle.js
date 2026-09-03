@@ -55969,6 +55969,9 @@ function GlobalAppBar() {
   const feedWidthPx = useCenterPaneFeedAlignmentStore((s2) => s2.widthPx);
   const paneAlignedFeed = feedLeftPx != null && feedWidthPx != null && feedWidthPx > 0 ? { left: feedLeftPx, width: feedWidthPx } : null;
   const allScopePanelOpen = useDesktopPrimaryNavigationStore((s2) => s2.allScopePanelOpen);
+  const isSportsBrowserPrototype = useDesktopPrimaryNavigationStore(
+    (s2) => s2.activeSelection.kind === "direct" && s2.activeSelection.tab === "news"
+  );
   const showSegmentedMenuBottomBorder = allScopePanelOpen;
   const openSettings = (0, import_react27.useCallback)(() => {
     if (!isElectron) return;
@@ -55984,7 +55987,8 @@ function GlobalAppBar() {
       {
         className: cn2(
           "z-40 shrink-0 font-mono",
-          isElectron ? "relative bg-[#0a1c20]" : "flex h-11 shrink-0 items-center gap-2 border-b border-line bg-[#020404]/98 px-3 sm:gap-3"
+          isElectron ? "relative bg-[#0a1c20]" : "flex h-11 shrink-0 items-center gap-2 border-b border-line bg-[#020404]/98 px-3 sm:gap-3",
+          isSportsBrowserPrototype && "hidden"
         ),
         "aria-label": "Global application bar",
         "data-desktop-menu-bar": isElectron ? true : void 0,
@@ -61675,6 +61679,7 @@ function DesktopTopRail() {
     setIsExpanded((prev) => !prev);
   }, []);
   if (!isGrarfElectronRenderer()) return null;
+  if (isSportsBrowserPrototype) return null;
   return /* @__PURE__ */ (0, import_jsx_runtime27.jsx)("section", { className: "shrink-0 font-mono", "aria-label": "Top rail", "data-desktop-top-rail": true, children: /* @__PURE__ */ (0, import_jsx_runtime27.jsxs)("div", { className: cn2("flex items-stretch", isExpanded ? "gap-2" : "gap-3"), children: [
     /* @__PURE__ */ (0, import_jsx_runtime27.jsx)(
       "div",
@@ -79777,7 +79782,10 @@ function AppShellLayout() {
   const { pathname } = useLocation();
   const hideShellMainMenu = shouldUseHomeDesktopObjectsSpineTemporalSections() && isHomeGamesSpineMigrationPath(pathname);
   const allScopePanelOpen = useDesktopPrimaryNavigationStore((s2) => s2.allScopePanelOpen);
-  const showShellLeagueNav = !hideShellMainMenu || isGrarfElectronRenderer() && allScopePanelOpen;
+  const isSportsBrowserPrototype = useDesktopPrimaryNavigationStore(
+    (s2) => s2.activeSelection.kind === "direct" && s2.activeSelection.tab === "news"
+  );
+  const showShellLeagueNav = !isSportsBrowserPrototype && (!hideShellMainMenu || isGrarfElectronRenderer() && allScopePanelOpen);
   const [operatorEnabled, setOperatorEnabled] = (0, import_react67.useState)(false);
   const [operatorOpen, setOperatorOpen] = (0, import_react67.useState)(false);
   (0, import_react67.useEffect)(() => {
@@ -141427,26 +141435,44 @@ function SportsBrowserPrototypeAddressBar({ className }) {
     "header",
     {
       className: cn2(
-        "flex h-10 shrink-0 items-center border-b border-[#24363c]/80 bg-[#0b1216] px-3",
-        "shadow-[inset_0_-1px_0_rgba(0,0,0,0.35)]",
+        "flex h-11 shrink-0 items-center border-b border-[#c8c4bc]/70 bg-[#ece9e2] px-4",
         className
       ),
       "data-sports-browser-prototype-chrome": true,
       "aria-label": "Browser controls",
-      children: /* @__PURE__ */ (0, import_jsx_runtime220.jsx)(
-        "input",
+      children: /* @__PURE__ */ (0, import_jsx_runtime220.jsxs)(
+        "div",
         {
-          type: "text",
-          name: "sports-browser-address",
-          autoComplete: "off",
-          spellCheck: false,
-          placeholder: "Search or enter a URL...",
           className: cn2(
-            "h-7 min-w-0 flex-1 rounded-sm border border-[#243b37]/90 bg-[#030808] px-2.5",
-            "font-sans text-[11px] leading-none text-[#d7eeee]",
-            "placeholder:text-[#5a7272] focus:border-cyansys/40 focus:outline-none focus:ring-0"
+            "flex h-8 min-w-0 flex-1 items-center gap-2.5 rounded-full border border-[#c5c0b8] bg-white px-3.5",
+            "shadow-[inset_0_0_0_1px_rgba(255,255,255,0.65),0_1px_2px_rgba(0,0,0,0.05)]"
           ),
-          "aria-label": "Search or enter a URL"
+          children: [
+            /* @__PURE__ */ (0, import_jsx_runtime220.jsx)(
+              Globe,
+              {
+                size: 14,
+                strokeWidth: 1.75,
+                className: "shrink-0 text-[#6f6a62]",
+                "aria-hidden": true
+              }
+            ),
+            /* @__PURE__ */ (0, import_jsx_runtime220.jsx)(
+              "input",
+              {
+                type: "text",
+                name: "sports-browser-address",
+                autoComplete: "off",
+                spellCheck: false,
+                placeholder: "Search the web or enter a URL",
+                className: cn2(
+                  "min-w-0 flex-1 bg-transparent font-sans text-[13px] leading-none text-[#1a1a1a]",
+                  "placeholder:text-[#8a8580] focus:outline-none focus:ring-0"
+                ),
+                "aria-label": "Search the web or enter a URL"
+              }
+            )
+          ]
         }
       )
     }
@@ -141456,6 +141482,7 @@ var import_jsx_runtime220;
 var init_SportsBrowserPrototypeAddressBar = __esm({
   "../grarf/desktop/src/components/homeMvp/SportsBrowserPrototypeAddressBar.tsx"() {
     init_define_import_meta_env();
+    init_lucide_react();
     init_cn();
     import_jsx_runtime220 = __toESM(require_jsx_runtime(), 1);
   }
@@ -141597,6 +141624,27 @@ function MlbGamesBox() {
     (game) => game.rows.map((row, index) => /* @__PURE__ */ (0, import_jsx_runtime222.jsx)(MlbGameTeamRow, { row }, `${game.id}-${index}`))
   ) });
 }
+function LeaguesFilterField() {
+  return /* @__PURE__ */ (0, import_jsx_runtime222.jsxs)("div", { className: "flex items-center gap-1.5 px-6 py-1", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime222.jsx)(Search, { size: 11, strokeWidth: 2, className: "shrink-0 text-[#8a847c]", "aria-hidden": true }),
+    /* @__PURE__ */ (0, import_jsx_runtime222.jsx)(
+      "input",
+      {
+        type: "text",
+        name: "sports-browser-leagues-filter",
+        autoComplete: "off",
+        spellCheck: false,
+        placeholder: "Filter leagues",
+        className: cn2(
+          "min-w-0 flex-1 border-0 border-b bg-transparent pb-0.5 font-sans text-[10px] font-normal normal-case leading-none tracking-normal text-[#1a1a1a]",
+          RULE2,
+          "placeholder:text-[#8a847c] focus:border-[#a8a298] focus:outline-none focus:ring-0"
+        ),
+        "aria-label": "Filter leagues"
+      }
+    )
+  ] });
+}
 function SportsBrowserPrototypeLeftNav({ className }) {
   return /* @__PURE__ */ (0, import_jsx_runtime222.jsx)(
     "nav",
@@ -141616,6 +141664,7 @@ function SportsBrowserPrototypeLeftNav({ className }) {
         /* @__PURE__ */ (0, import_jsx_runtime222.jsx)(NavRow, { label: "Now", indent: 2 }),
         /* @__PURE__ */ (0, import_jsx_runtime222.jsx)(NavRow, { label: "Upcoming", indent: 2 }),
         /* @__PURE__ */ (0, import_jsx_runtime222.jsx)(SectionHeader, { label: "Leagues", expanded: true }),
+        /* @__PURE__ */ (0, import_jsx_runtime222.jsx)(LeaguesFilterField, {}),
         /* @__PURE__ */ (0, import_jsx_runtime222.jsx)(NavRow, { label: "MLB", indent: 1, trailing: "expand" }),
         /* @__PURE__ */ (0, import_jsx_runtime222.jsx)(MlbGamesBox, {}),
         /* @__PURE__ */ (0, import_jsx_runtime222.jsx)(NavRow, { label: "NFL", indent: 1 }),
@@ -142422,10 +142471,10 @@ function HomePage() {
       className: "relative flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden bg-[#020404] text-[#d7eeee]",
       style: showSportsBrowserPrototypeBottomFeed ? { paddingBottom: SPORTS_BROWSER_PROTOTYPE_FEED_ROW_PX } : void 0,
       children: [
-        isSportsBrowserPrototype ? /* @__PURE__ */ (0, import_jsx_runtime223.jsxs)("div", { className: "flex min-h-0 min-w-0 flex-1 overflow-hidden", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime223.jsx)(SportsBrowserPrototypeLeftNav, {}),
-          /* @__PURE__ */ (0, import_jsx_runtime223.jsxs)("div", { className: "flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime223.jsx)(SportsBrowserPrototypeAddressBar, {}),
+        isSportsBrowserPrototype ? /* @__PURE__ */ (0, import_jsx_runtime223.jsxs)("div", { className: "flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime223.jsx)(SportsBrowserPrototypeAddressBar, {}),
+          /* @__PURE__ */ (0, import_jsx_runtime223.jsxs)("div", { className: "flex min-h-0 min-w-0 flex-1 overflow-hidden", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime223.jsx)(SportsBrowserPrototypeLeftNav, {}),
             /* @__PURE__ */ (0, import_jsx_runtime223.jsx)("div", { className: "flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden", children: centerStack })
           ] })
         ] }) : /* @__PURE__ */ (0, import_jsx_runtime223.jsx)(
