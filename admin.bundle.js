@@ -17704,6 +17704,9 @@ function isAuthoritativeFinalOperationalRow(game) {
   const line = game.statusLine?.trim();
   return line != null && /^final$/i.test(line);
 }
+function isAuthoritativeLiveOperationalRow(game) {
+  return game.status === "live";
+}
 function parseLastUpdatedMs(game) {
   const ms = Date.parse(game.lastUpdated ?? "");
   return Number.isFinite(ms) ? ms : 0;
@@ -17717,7 +17720,8 @@ function preferAuthoritativeOperationalGameRow(current, candidate) {
   const currentFinal = isAuthoritativeFinalOperationalRow(current);
   const candidateFinal = isAuthoritativeFinalOperationalRow(candidate);
   if (currentFinal !== candidateFinal) {
-    return candidateFinal ? candidate : current;
+    if (!currentFinal) return current;
+    if (!candidateFinal) return candidate;
   }
   return candidateUpdated >= currentUpdated ? candidate : current;
 }
@@ -17739,6 +17743,13 @@ function incomingHasAuthoritativeFinalForEspnEvent(incomingGames, eventId) {
   for (const game of incomingGames) {
     if (readEspnCompetitionEventId(game) !== eventId) continue;
     if (isAuthoritativeFinalOperationalRow(game)) return true;
+  }
+  return false;
+}
+function incomingHasAuthoritativeLiveForEspnEvent(incomingGames, eventId) {
+  for (const game of incomingGames) {
+    if (readEspnCompetitionEventId(game) !== eventId) continue;
+    if (isAuthoritativeLiveOperationalRow(game)) return true;
   }
   return false;
 }
@@ -18826,6 +18837,10 @@ function preserveMissingOperationalIngestGames(incoming, previousGames) {
       continue;
     }
     if (prev.status === "final" && isGameOnGamesSpineOperationalDate(prev, sportsDayKey)) {
+      const eventId = readEspnCompetitionEventId(prev);
+      if (eventId && incomingHasAuthoritativeLiveForEspnEvent(incomingGames, eventId)) {
+        continue;
+      }
       preserved.push({ ...prev });
       incomingIds.add(prev.id);
     }
