@@ -141761,6 +141761,25 @@ var init_SportsBrowserPrototypeLeagueWebsiteTabs = __esm({
   }
 });
 
+// ../grarf/desktop/src/lib/gamesSpine/dedupeSportsBrowserPrototypeNewsSidebarGames.ts
+function dedupeSportsBrowserPrototypeNewsSidebarGames(games) {
+  const byId = /* @__PURE__ */ new Map();
+  for (const game of games) {
+    const existing = byId.get(game.id);
+    byId.set(
+      game.id,
+      existing ? preferAuthoritativeOperationalGameRow(existing, game) : game
+    );
+  }
+  return reconcileOperationalGamesByEspnEventId2([...byId.values()]);
+}
+var init_dedupeSportsBrowserPrototypeNewsSidebarGames = __esm({
+  "../grarf/desktop/src/lib/gamesSpine/dedupeSportsBrowserPrototypeNewsSidebarGames.ts"() {
+    init_define_import_meta_env();
+    init_reconcileOperationalGamesByEspnEventId2();
+  }
+});
+
 // ../grarf/desktop/src/hooks/useSportsBrowserPrototypeTodayTemporalSlate.ts
 function applyCanonicalGameEnrichment(game, operationsFieldsByGameId) {
   return applyCanonicalGamesSpineOperationsEnrichment(
@@ -141922,7 +141941,9 @@ function buildTemporalLeagueSlates(spineSections, mergedLeagues, temporalMode, l
   const slates = [];
   for (const section of spineSections) {
     if (!sectionPassesTemporalFilter(section, mergedLeagues, temporalMode, liveLeagueKeys)) continue;
-    const games = resolveVisibleGames(section);
+    const games = sortGamesSpineChronologically2(
+      dedupeSportsBrowserPrototypeNewsSidebarGames(resolveVisibleGames(section))
+    );
     if (games.length === 0) continue;
     if (section.kind === "operational") {
       slates.push({
@@ -142112,6 +142133,7 @@ var init_useSportsBrowserPrototypeTodayTemporalSlate = __esm({
     init_resolveGamesSpineOperationalLeagueOrder();
     init_resolveViewLeagueGames();
     init_wimbledonGamesSpinePresentation();
+    init_dedupeSportsBrowserPrototypeNewsSidebarGames();
     init_sortGamesSpineChronologically();
     init_gamesSpineTemporarilyHiddenLeagues();
     init_mergeCatchUpSupplementalFinals();
@@ -142222,7 +142244,10 @@ function TodayEqualTabRow({
             onClick: () => onSelect(id),
             className: cn2(
               "relative flex min-w-0 flex-1 items-center justify-center border-r border-[#c8c4bc]/60 px-3.5 text-[11px] font-medium tracking-[0.01em] transition-colors",
-              active2 ? "bg-[#f8f6f1] text-[#1a1a1a] after:absolute after:inset-x-0 after:bottom-0 after:h-[2px] after:bg-[#1a1a1a]" : "bg-transparent text-[#6f6a62] hover:bg-[#ece9e2] hover:text-[#1a1a1a]"
+              active2 ? cn2(
+                "bg-[#f8f6f1] text-[#1a1a1a] after:absolute after:inset-x-0 after:bottom-0 after:h-[2px]",
+                id === "now" ? "after:bg-redsys" : "after:bg-[#1a1a1a]"
+              ) : "bg-transparent text-[#6f6a62] hover:bg-[#ece9e2] hover:text-[#1a1a1a]"
             ),
             children: label
           },
@@ -142265,7 +142290,7 @@ function buildTodayCompleteLeagueSlates(nowLeagues, upcomingLeagues, catchUpLeag
   return order.flatMap((key2) => {
     const entry2 = byKey.get(key2);
     if (!entry2) return [];
-    const games = orderTodayLeagueGames(entry2.games);
+    const games = orderTodayLeagueGames(dedupeSportsBrowserPrototypeNewsSidebarGames(entry2.games));
     if (games.length === 0) return [];
     return [{ key: key2, label: entry2.label, games }];
   });
@@ -142567,6 +142592,18 @@ function SportsBrowserPrototypeLeftNav({ className, onOpenUrl, onLeagueSelect })
   const [yesterdayOpen, setYesterdayOpen] = (0, import_react256.useState)(false);
   const [catchUpTodayActive, setCatchUpTodayActive] = (0, import_react256.useState)(false);
   const [todayTab, setTodayTab] = (0, import_react256.useState)("today");
+  const hasUserSelectedTodayTab = (0, import_react256.useRef)(false);
+  (0, import_react256.useEffect)(() => {
+    if (hasUserSelectedTodayTab.current) return;
+    const hasLiveGamesToday = nowLeagues.some((slate) => slate.games.length > 0);
+    if (hasLiveGamesToday) {
+      setTodayTab("now");
+    }
+  }, [nowLeagues]);
+  const onTodayTabSelect = (0, import_react256.useCallback)((tab) => {
+    hasUserSelectedTodayTab.current = true;
+    setTodayTab(tab);
+  }, []);
   const todayCompleteLeagues = (0, import_react256.useMemo)(
     () => buildTodayCompleteLeagueSlates(nowLeagues, upcomingLeagues, catchUpLeagues),
     [nowLeagues, upcomingLeagues, catchUpLeagues]
@@ -142644,7 +142681,7 @@ function SportsBrowserPrototypeLeftNav({ className, onOpenUrl, onLeagueSelect })
               /* @__PURE__ */ (0, import_jsx_runtime224.jsx)(NavRow, { label: "Now", indent: 1 }),
               /* @__PURE__ */ (0, import_jsx_runtime224.jsx)(NavRow, { label: "Upcoming", indent: 1 })
             ] }) : null,
-            /* @__PURE__ */ (0, import_jsx_runtime224.jsx)(TodayEqualTabRow, { activeTab: todayTab, onSelect: setTodayTab }),
+            /* @__PURE__ */ (0, import_jsx_runtime224.jsx)(TodayEqualTabRow, { activeTab: todayTab, onSelect: onTodayTabSelect }),
             todayTab === "today" ? todayCompleteLeagues.map((slate) => /* @__PURE__ */ (0, import_jsx_runtime224.jsx)(
               SidebarTemporalLeagueBlock,
               {
@@ -142757,6 +142794,7 @@ var init_SportsBrowserPrototypeLeftNav = __esm({
     init_isSpineFinalizedGame();
     init_gamesSpineLeagueLogoUrls();
     init_resolveTeamLogoUrl();
+    init_dedupeSportsBrowserPrototypeNewsSidebarGames();
     init_BroadcastChannelLogo();
     import_jsx_runtime224 = __toESM(require_jsx_runtime(), 1);
     MENU_SURFACE2 = "bg-[#f3f0ea] text-[#1a1a1a]";
@@ -142974,6 +143012,64 @@ var init_sportsBrowserPrototypeLeagueWebsites = __esm({
         {
           label: "Tennis World USA",
           url: "https://www.tennisworldusa.org/"
+        }
+      ],
+      NCAAF: [
+        {
+          label: "Yahoo!",
+          url: "https://sports.yahoo.com/"
+        },
+        {
+          label: "ESPN",
+          url: "https://www.espn.com/college-football/"
+        },
+        {
+          label: "B/R",
+          url: "https://bleacherreport.com/college-football"
+        },
+        {
+          label: "Reddit",
+          url: "https://www.reddit.com/r/CFB/"
+        },
+        {
+          label: "On3",
+          url: "https://www.on3.com/"
+        },
+        {
+          label: "CBS",
+          url: "https://www.cbssports.com/college-football/"
+        },
+        {
+          label: "247 Sports",
+          url: "https://247sports.com/"
+        },
+        {
+          label: "FOX",
+          url: "http://foxsports.com/college-football"
+        },
+        {
+          label: "The Athletic",
+          url: "https://theathletic.com/college-football"
+        },
+        {
+          label: "SI",
+          url: "https://si.com/college-football"
+        },
+        {
+          label: "USA Today",
+          url: "https://www.usatoday.com/sports/ncaaf/"
+        },
+        {
+          label: "SportSpyder",
+          url: "https://sportspyder.com/sports/cf/news"
+        },
+        {
+          label: "NewsNow",
+          url: "https://www.newsnow.com/us/Sports/NCAA+Football"
+        },
+        {
+          label: "Sports-Reference",
+          url: "https://www.sports-reference.com/cfb/"
         }
       ]
     };
