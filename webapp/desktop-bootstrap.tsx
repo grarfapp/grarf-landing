@@ -156,8 +156,8 @@ export function mountWebHome(container: HTMLElement): void {
 
 export async function bootDesktopWebClient(container: HTMLElement): Promise<void> {
   exposeGrarfDeveloperModeOnWindow();
-  await hydrateOperationalGameOverridesFromPersistence();
-  await hydrateOperationalLiveWorkspaceFromPersistence();
+  void hydrateOperationalGameOverridesFromPersistence();
+  void hydrateOperationalLiveWorkspaceFromPersistence();
   if (isAdminHtmlEntry() && isSportscapeAdminAuthed()) {
     activateAdminEntry();
   }

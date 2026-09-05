@@ -152308,8 +152308,8 @@ function mountWebHome(container) {
 }
 async function bootDesktopWebClient(container) {
   exposeGrarfDeveloperModeOnWindow();
-  await hydrateOperationalGameOverridesFromPersistence();
-  await hydrateOperationalLiveWorkspaceFromPersistence();
+  void hydrateOperationalGameOverridesFromPersistence();
+  void hydrateOperationalLiveWorkspaceFromPersistence();
   if (isAdminHtmlEntry2() && isSportscapeAdminAuthed()) {
     activateAdminEntry();
   }
