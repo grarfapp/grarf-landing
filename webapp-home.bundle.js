@@ -6833,7 +6833,10 @@ function isProviderConfirmedLive(game, authorityState) {
   if (isGameLastUpdatedProviderConfirmed(game, providerPollCompletedAt)) {
     return true;
   }
-  return isProviderPollHydrationFresh(game, providerPollCompletedAt);
+  if (isProviderPollHydrationFresh(game, providerPollCompletedAt)) {
+    return true;
+  }
+  return isLegacyCloudLiveRowFresh(game);
 }
 var OPERATIONAL_PROVIDER_CONFIRMED_LIVE_SLACK_MS, LEGACY_CLOUD_LIVE_MAX_STALE_UPDATE_MS, PROVIDER_POLL_HYDRATION_LEGACY_SLACK_MS;
 var init_operationalLiveAuthority = __esm({
@@ -6863,12 +6866,17 @@ function parseLastUpdatedMs(game) {
   return Number.isFinite(ms2) ? ms2 : 0;
 }
 function preferAuthoritativeOperationalGameRow(current, candidate) {
+  const currentUpdated = parseLastUpdatedMs(current);
+  const candidateUpdated = parseLastUpdatedMs(candidate);
+  if (candidateUpdated !== currentUpdated) {
+    return candidateUpdated > currentUpdated ? candidate : current;
+  }
   const currentFinal = isAuthoritativeFinalOperationalRow(current);
   const candidateFinal = isAuthoritativeFinalOperationalRow(candidate);
   if (currentFinal !== candidateFinal) {
     return candidateFinal ? candidate : current;
   }
-  return parseLastUpdatedMs(candidate) >= parseLastUpdatedMs(current) ? candidate : current;
+  return candidateUpdated >= currentUpdated ? candidate : current;
 }
 function reconcileOperationalGamesByEspnEventId(games) {
   const byEventId = /* @__PURE__ */ new Map();
@@ -6985,7 +6993,10 @@ function isSupersededByAuthoritativeEspnEventRow(game) {
     const other = record.game;
     if (other.id === game.id) continue;
     if (readEspnCompetitionEventId(other) !== eventId) continue;
-    if (other.status === "final" || isSpineFinalizedGame(other)) return true;
+    if (other.status !== "final" && !isSpineFinalizedGame(other)) continue;
+    if (preferAuthoritativeOperationalGameRow(game, other).id !== game.id) {
+      return true;
+    }
   }
   return false;
 }
@@ -12158,6 +12169,12 @@ function emptyOperationalSnapshot() {
     leagues: {}
   };
 }
+function snapshotAgeMs(generatedAt) {
+  if (!generatedAt?.trim()) return Number.POSITIVE_INFINITY;
+  const ms2 = Date.parse(generatedAt);
+  if (!Number.isFinite(ms2)) return Number.POSITIVE_INFINITY;
+  return Math.max(0, Date.now() - ms2);
+}
 function ipcSnapshotToOperationalResponse(snap, source = "espn_local_adapter") {
   const leagues = {};
   for (const [key2, rows] of Object.entries(snap.leagues ?? {})) {
@@ -12277,20 +12294,98 @@ async function joinWebMlbProviderIds(transport) {
     return transport;
   }
 }
+function countLiveOperationalGames(snap) {
+  let live = 0;
+  for (const rows of Object.values(snap.leagues ?? {})) {
+    if (!Array.isArray(rows)) continue;
+    for (const game of rows) {
+      if (game?.status === "live") live += 1;
+    }
+  }
+  return live;
+}
+async function fetchViaGrarfCloudWithLocalFallback() {
+  let cloud = null;
+  let cloudError = null;
+  try {
+    cloud = await fetchViaGrarfCloudService();
+  } catch (e2) {
+    cloudError = e2 instanceof Error ? e2.message : String(e2);
+  }
+  const cloudAgeMs = cloud ? snapshotAgeMs(cloud.generatedAt) : Number.POSITIVE_INFINITY;
+  const cloudFresh = cloud != null && cloudAgeMs <= CLOUD_STALE_THRESHOLD_MS;
+  const electronIpc = hasElectronGamesIpc();
+  if (electronIpc) {
+    const local2 = await fetchViaEspnLocalIpcAdapter();
+    const localAgeMs2 = snapshotAgeMs(local2.generatedAt);
+    const localGames = countOperationalGames(local2);
+    const cloudGames = cloud ? countOperationalGames(cloud) : 0;
+    const localLive = countLiveOperationalGames(local2);
+    const cloudLive = cloud ? countLiveOperationalGames(cloud) : 0;
+    if (localGames > 0) {
+      const localFresher = !cloud || !cloudFresh || localAgeMs2 + 3e4 < cloudAgeMs || localLive > cloudLive || localGames > cloudGames;
+      if (localFresher) {
+        if (define_import_meta_env_default.DEV && cloud && !cloudFresh) {
+          console.warn(`${LOG12} using local IPC (cloud stale or failed)`, {
+            cloudError,
+            cloudAgeMs,
+            localAgeMs: localAgeMs2
+          });
+        }
+        return { ...local2, source: "espn_local_adapter" };
+      }
+    }
+  }
+  if (cloudFresh && cloud) {
+    return cloud;
+  }
+  if (!electronIpc) {
+    if (cloud) {
+      if (define_import_meta_env_default.DEV && !cloudFresh) {
+        console.warn(`${LOG12} browser/web using cloud snapshot (stale but authoritative)`, {
+          cloudAgeMs,
+          cloudError
+        });
+      }
+      return cloud;
+    }
+    if (isGrarfWebRenderer()) {
+      throw new Error(cloudError ?? "[OperationalIngest] grarf_cloud unavailable in browser");
+    }
+    throw new Error(cloudError ?? "[OperationalIngest] grarf_cloud unavailable in browser");
+  }
+  const local = await fetchViaEspnLocalIpcAdapter();
+  const localAgeMs = snapshotAgeMs(local.generatedAt);
+  if (cloud && cloudAgeMs <= localAgeMs) {
+    return cloud;
+  }
+  if (define_import_meta_env_default.DEV && (cloudError || cloud && !cloudFresh)) {
+    console.warn(`${LOG12} using local IPC fallback (cloud stale or failed)`, {
+      cloudError,
+      cloudAgeMs: cloud ? cloudAgeMs : null,
+      localAgeMs,
+      localGeneratedAt: local.generatedAt
+    });
+  }
+  return {
+    ...local,
+    source: "espn_local_adapter"
+  };
+}
 async function fetchOperationalSnapshot() {
   const config = getOperationalIngestConfig();
-  if (isGrarfWebRenderer()) {
+  if (isGrarfWebRenderer() && !hasElectronGamesIpc()) {
     return fetchViaWebOperationalIngest();
   }
   if (config.provider === "grarf_cloud") {
-    return fetchViaGrarfCloudService();
+    return hasElectronGamesIpc() ? fetchViaGrarfCloudWithLocalFallback() : fetchViaGrarfCloudService();
   }
   return fetchViaEspnLocalIpcAdapter();
 }
 function operationalResponseFromIpcPush(snap) {
   return ipcSnapshotToOperationalResponse(snap);
 }
-var LOG12, CLOUD_FETCH_TIMEOUT_MS, WEB_CLOUD_BOOTSTRAP_TIMEOUT_MS, CLOUD_FETCH_MAX_ATTEMPTS, CLOUD_FETCH_RETRY_MS, webCloudSnapshotPrefetch;
+var LOG12, CLOUD_STALE_THRESHOLD_MS, CLOUD_FETCH_TIMEOUT_MS, WEB_CLOUD_BOOTSTRAP_TIMEOUT_MS, CLOUD_FETCH_MAX_ATTEMPTS, CLOUD_FETCH_RETRY_MS, webCloudSnapshotPrefetch;
 var init_fetchOperationalSnapshot = __esm({
   "../grarf/desktop/src/services/operationalIngest/fetchOperationalSnapshot.ts"() {
     init_define_import_meta_env();
@@ -12300,6 +12395,7 @@ var init_fetchOperationalSnapshot = __esm({
     init_isGrarfWebRenderer();
     init_fetchWebEspnOperationalSnapshot();
     LOG12 = "[OperationalIngest]";
+    CLOUD_STALE_THRESHOLD_MS = 9e4;
     CLOUD_FETCH_TIMEOUT_MS = 2e4;
     WEB_CLOUD_BOOTSTRAP_TIMEOUT_MS = 2500;
     CLOUD_FETCH_MAX_ATTEMPTS = 3;
@@ -13077,6 +13173,7 @@ var init_liveGamesStore = __esm({
     init_recordGameFinalizedAtMs();
     init_reconcileOperationalGamesByEspnEventId2();
     init_operationalTransportFreshness();
+    init_fetchOperationalSnapshot();
     init_operationalIngestWriteDiagnostic();
     init_gamesSpineRenderStore();
     init_canonicalLiveGameStore();
@@ -13093,6 +13190,9 @@ var init_liveGamesStore = __esm({
       updatedAt: useCanonicalLiveGameStore.getState().updatedAt,
       hydrate: (snap, completeness) => {
         const ingestSource = completeness?.source;
+        if (hasElectronGamesIpc() && ingestSource === "grarf_cloud") {
+          return;
+        }
         const transportGeneratedAt = completeness?.transportGeneratedAt?.trim();
         if (transportGeneratedAt) {
           if (!shouldAcceptOperationalTransportHydrate(transportGeneratedAt, ingestSource)) {
@@ -13118,6 +13218,14 @@ var init_liveGamesStore = __esm({
           recordAppliedOperationalTransportGeneratedAt(transportGeneratedAt, ingestSource);
         }
         if (gamesSnapshotMateriallyMatchesCanonical(snap)) {
+          const ipcTransportSource = ingestSource === "espn_local_adapter" || ingestSource === "espn_scoreboard_ipc";
+          if (hasElectronGamesIpc() && ipcTransportSource) {
+            useGamesSpineRenderStore.getState().markOperationalIngest(snap.leagues, {
+              source: ingestSource ?? "espn_scoreboard_ipc",
+              transportGeneratedAt: transportGeneratedAt ?? snap.updatedAt ?? void 0,
+              providerPoll: completeness?.providerPoll
+            });
+          }
           logOperationalHydrateDecision({
             stage: "hydrate_exit",
             outcome: "skipped_no_op_hydrate",
@@ -61748,6 +61856,10 @@ function startOperationalSnapshotPolling(onTransport, options) {
     return () => {
     };
   }
+  if (hasElectronGamesIpc()) {
+    return () => {
+    };
+  }
   const intervalMs = options?.intervalMs ?? config.pollIntervalMs ?? DEFAULT_POLL_INTERVAL_MS;
   let stopped = false;
   let pollInFlight = null;
@@ -61816,12 +61928,18 @@ function isWebLiveGamesHydrateRegistered() {
   return onTransportFn != null;
 }
 function registerWebLiveGamesHydrate(fn2) {
+  if (hasElectronGamesIpc()) {
+    return () => {
+    };
+  }
   onTransportFn = fn2;
   return () => {
     if (onTransportFn === fn2) onTransportFn = null;
   };
 }
 function startWebLiveGamesPoller() {
+  if (hasElectronGamesIpc()) return () => {
+  };
   if (!onTransportFn) return () => {
   };
   stopPoll?.();
@@ -61837,6 +61955,7 @@ var onTransportFn, stopPoll;
 var init_liveGamesPollRegistry = __esm({
   "../grarf/desktop/src/lib/updateEngine/liveGamesPollRegistry.ts"() {
     init_define_import_meta_env();
+    init_fetchOperationalSnapshot();
     init_startOperationalSnapshotPolling();
     init_updateEngineCadences();
     onTransportFn = null;
@@ -66152,117 +66271,6 @@ var init_enrichOperationalTransport = __esm({
   }
 });
 
-// ../grarf/desktop/src/services/operationalIngest/operationalSnapshotAuthority.ts
-function snapshotAgeMs(generatedAt) {
-  if (!generatedAt?.trim()) return Number.POSITIVE_INFINITY;
-  const ms2 = Date.parse(generatedAt);
-  if (!Number.isFinite(ms2)) return Number.POSITIVE_INFINITY;
-  return Math.max(0, Date.now() - ms2);
-}
-function countOperationalGames2(snap) {
-  return Object.values(snap.leagues ?? {}).reduce(
-    (total, rows) => total + (Array.isArray(rows) ? rows.length : 0),
-    0
-  );
-}
-function countLiveOperationalGames(snap) {
-  let live = 0;
-  for (const rows of Object.values(snap.leagues ?? {})) {
-    if (!Array.isArray(rows)) continue;
-    for (const game of rows) {
-      if (game?.status === "live") live += 1;
-    }
-  }
-  return live;
-}
-function collectOperationalGames(snap) {
-  const out = [];
-  for (const rows of Object.values(snap.leagues ?? {})) {
-    if (Array.isArray(rows)) out.push(...rows);
-  }
-  return out;
-}
-function shouldPreferLocalOperationalSnapshotOverCloud(local, cloud) {
-  if (countOperationalGames2(local) === 0) return false;
-  if (!cloud) return true;
-  const cloudAgeMs = snapshotAgeMs(cloud.generatedAt);
-  const localAgeMs = snapshotAgeMs(local.generatedAt);
-  const cloudFresh = cloudAgeMs <= CLOUD_STALE_THRESHOLD_MS;
-  const localGames = countOperationalGames2(local);
-  const cloudGames = countOperationalGames2(cloud);
-  const localLive = countLiveOperationalGames(local);
-  const cloudLive = countLiveOperationalGames(cloud);
-  if (!cloudFresh) return true;
-  if (localAgeMs + 3e4 < cloudAgeMs) return true;
-  if (localLive > cloudLive) return true;
-  if (localGames > cloudGames) return true;
-  if (cloudLive > localLive && localAgeMs <= CLOUD_STALE_THRESHOLD_MS) {
-    return true;
-  }
-  return false;
-}
-function alignCloudOperationalSnapshotToLocalLiveAuthority(cloud, local) {
-  const cloudLive = countLiveOperationalGames(cloud);
-  const localLive = countLiveOperationalGames(local);
-  if (cloudLive <= localLive) return cloud;
-  if (!shouldPreferLocalOperationalSnapshotOverCloud(local, cloud)) return cloud;
-  const localGames = collectOperationalGames(local);
-  const localLiveIds = new Set(
-    localGames.filter((game) => game.status === "live").map((game) => game.id)
-  );
-  const localLiveEventIds = /* @__PURE__ */ new Set();
-  for (const game of localGames) {
-    if (game.status !== "live") continue;
-    const eventId = readEspnCompetitionEventId(game);
-    if (eventId) localLiveEventIds.add(eventId);
-  }
-  let changed = false;
-  const leagues = { ...cloud.leagues };
-  for (const [leagueKey, rows] of Object.entries(leagues)) {
-    if (!Array.isArray(rows) || rows.length === 0) continue;
-    const localLeagueRows = local.leagues?.[leagueKey];
-    if (!Array.isArray(localLeagueRows) || localLeagueRows.length === 0) {
-      continue;
-    }
-    let leagueChanged = false;
-    const nextRows = [];
-    for (const game of rows) {
-      if (game.status !== "live") {
-        nextRows.push(game);
-        continue;
-      }
-      const eventId = readEspnCompetitionEventId(game);
-      if (eventId && incomingHasAuthoritativeFinalForEspnEvent(localGames, eventId)) {
-        leagueChanged = true;
-        continue;
-      }
-      if (localLiveIds.has(game.id)) {
-        nextRows.push(game);
-        continue;
-      }
-      if (eventId && localLiveEventIds.has(eventId)) {
-        nextRows.push(game);
-        continue;
-      }
-      leagueChanged = true;
-    }
-    if (leagueChanged) {
-      leagues[leagueKey] = nextRows;
-      changed = true;
-    }
-  }
-  if (!changed) return cloud;
-  return { ...cloud, leagues };
-}
-var CLOUD_STALE_THRESHOLD_MS;
-var init_operationalSnapshotAuthority = __esm({
-  "../grarf/desktop/src/services/operationalIngest/operationalSnapshotAuthority.ts"() {
-    init_define_import_meta_env();
-    init_reconcileOperationalGamesByEspnEventId2();
-    CLOUD_STALE_THRESHOLD_MS = 9e4;
-  }
-});
-
 // ../grarf/desktop/src/services/operationalIngest/hydrateOperationalSnapshotFromTransport.ts
 function supplementOperationalSnapshotLeagues(primary, supplement) {
   const merged = { ...primary };
@@ -66326,7 +66334,7 @@ async function buildGamesSnapshotForHydrate(transport, context2, completeness) {
     return prepareGamesSpineSnapshotForHydrate(merged);
   }
   let canonical = normalizeOperationalSnapshot(transport);
-  if (source === "espn_local_adapter") {
+  if (source === "espn_local_adapter" || source === "espn_scoreboard_ipc") {
     const prevLeagues = useLiveGamesStore.getState().leagues;
     canonical = preserveStoreFinalsOnLocalHydrate(canonical, prevLeagues);
     if (context2.lastCloudLeaguesRef) {
@@ -66334,18 +66342,21 @@ async function buildGamesSnapshotForHydrate(transport, context2, completeness) {
     }
   }
   if (shouldRejectStaleSnapshot(canonical.updatedAt)) {
-    const prev = useLiveGamesStore.getState();
-    const supplementedLeagues = supplementOperationalSnapshotLeagues(
-      prev.leagues ?? {},
-      canonical.leagues ?? {}
-    );
-    if (supplementedLeagues !== prev.leagues) {
-      return prepareGamesSpineSnapshotForHydrate({
-        ...prev,
-        leagues: supplementedLeagues
-      });
+    const ipcAuthoritative = hasElectronGamesIpc() && (source === "espn_local_adapter" || source === "espn_scoreboard_ipc");
+    if (!ipcAuthoritative) {
+      const prev = useLiveGamesStore.getState();
+      const supplementedLeagues = supplementOperationalSnapshotLeagues(
+        prev.leagues ?? {},
+        canonical.leagues ?? {}
+      );
+      if (supplementedLeagues !== prev.leagues) {
+        return prepareGamesSpineSnapshotForHydrate({
+          ...prev,
+          leagues: supplementedLeagues
+        });
+      }
+      return null;
     }
-    return null;
   }
   return prepareGamesSpineSnapshotForHydrate(canonical);
 }
@@ -66403,29 +66414,10 @@ function isTransportTooStaleForAuthoritativeHydrate(transport) {
 async function hydrateOperationalSnapshotFromTransport(rawTransport, hydrate, context2 = {}) {
   recordCentralizedTransportIngest(rawTransport);
   const completeness = context2.completeness ?? { source: "unknown" };
-  let transportForHydrate = rawTransport;
   if (completeness.source === "grarf_cloud" && hasElectronGamesIpc()) {
-    try {
-      const local = await fetchLatestEspnLocalOperationalSnapshot();
-      const aligned = alignCloudOperationalSnapshotToLocalLiveAuthority(rawTransport, local);
-      if (aligned !== rawTransport) {
-        logOperationalHydrateDecision({
-          stage: "hydrate_exit",
-          outcome: "skipped_cloud_local_authority",
-          source: completeness.source,
-          transportGeneratedAt: rawTransport.generatedAt,
-          snapshotUpdatedAt: rawTransport.generatedAt,
-          gameCount: Object.values(rawTransport.leagues ?? {}).reduce(
-            (count, rows) => count + (Array.isArray(rows) ? rows.length : 0),
-            0
-          ),
-          note: `dropped ${countLiveOperationalGames(rawTransport) - countLiveOperationalGames(aligned)} stale cloud LIVE rows using fresher ESPN IPC`
-        });
-        transportForHydrate = aligned;
-      }
-    } catch {
-    }
+    return;
   }
+  let transportForHydrate = rawTransport;
   const completenessWithTransport = {
     ...completeness,
     transportGeneratedAt: completeness.transportGeneratedAt ?? transportForHydrate.generatedAt,
@@ -66462,8 +66454,6 @@ var init_hydrateOperationalSnapshotFromTransport = __esm({
     init_liveGamesStore();
     init_enrichOperationalTransport();
     init_fetchOperationalSnapshot();
-    init_operationalSnapshotAuthority();
-    init_operationalIngestWriteDiagnostic();
     init_normalizeOperationalSnapshot2();
     init_operationalTransportFreshness();
     LOG27 = "[OperationalIngest]";
@@ -66500,6 +66490,12 @@ function resolveTransportCompleteness(transport) {
   }
   return { ...base, source: "unknown" };
 }
+function resolveElectronIpcTransportCompleteness(transport) {
+  return {
+    source: "espn_scoreboard_ipc",
+    transportGeneratedAt: transport.generatedAt
+  };
+}
 function LiveGamesBridge() {
   const hydrate = useLiveGamesStore((s2) => s2.hydrate);
   const lastCloudLeaguesRef = (0, import_react34.useRef)({});
@@ -66515,6 +66511,41 @@ function LiveGamesBridge() {
       ...hydrateContext,
       completeness
     });
+    const startElectronIpcIngest = (prefetchCloudForFinalMerge) => {
+      const ingestFromLocalIpc = (transport) => ingestFromTransport(transport, resolveElectronIpcTransportCompleteness(transport));
+      const api2 = window.grarf;
+      const stopIpc2 = api2?.gamesSubscribe?.((snap) => {
+        const transport = operationalResponseFromIpcPush(
+          snap
+        );
+        void ingestFromLocalIpc(transport);
+      });
+      void fetchLatestEspnLocalOperationalSnapshot().then((localTransport) => {
+        const hasGames = Object.values(localTransport.leagues ?? {}).some(
+          (rows) => Array.isArray(rows) && rows.length > 0
+        );
+        if (!hasGames) return;
+        void ingestFromLocalIpc(localTransport);
+      });
+      if (prefetchCloudForFinalMerge) {
+        void prefetchWebOperationalCloudSnapshot().then((cloudTransport) => {
+          if (cloudTransport?.leagues) {
+            lastCloudLeaguesRef.current = cloudTransport.leagues;
+          }
+        });
+      }
+      return () => {
+        stopIpc2?.();
+      };
+    };
+    if (hasElectronGamesIpc() || window.GRARF_ELECTRON) {
+      const stopIpc2 = startElectronIpcIngest(config.provider === "grarf_cloud");
+      return () => {
+        stopIpc2();
+        stopIntelligenceRegistrySync();
+        stopNewsStoryEnrichmentSync();
+      };
+    }
     if (config.provider === "grarf_cloud") {
       const onCloudTransport = (transport) => ingestFromTransport(transport, resolveTransportCompleteness(transport));
       const stopCloudPoll = isGrarfWebRenderer() ? registerWebLiveGamesHydrate(onCloudTransport) : startOperationalSnapshotPolling(onCloudTransport);
@@ -66560,6 +66591,7 @@ var init_LiveGamesBridge = __esm({
     init_bindCanonicalIntelligenceRegistrySync();
     init_bindCanonicalNewsStoryEnrichmentSync();
     init_operationalIngest();
+    init_fetchOperationalSnapshot();
     init_hydrateOperationalSnapshotFromTransport();
     init_liveGamesStore();
   }
@@ -70463,7 +70495,7 @@ function notifyAttentionScoreUpdates() {
     listener();
   }
 }
-function collectOperationalGames2() {
+function collectOperationalGames() {
   const gamesById = useCanonicalLiveGameStore.getState().gamesById;
   return Object.values(gamesById).map((row) => row.game);
 }
@@ -70545,7 +70577,7 @@ function buildRankings(scores) {
 }
 function recomputeAttentionScores(trigger) {
   const now = Date.now();
-  const games = collectOperationalGames2();
+  const games = collectOperationalGames();
   const effectiveTrigger = trigger === "ingest_update" && state.recomputeCount > 0 ? detectTrigger(games) : trigger;
   updateResidualGravity(games, now);
   const bundle = useEditorialStore.getState().bundle;
@@ -73631,14 +73663,14 @@ var init_detectGamesSpineStartsSoonAlerts = __esm({
 });
 
 // ../grarf/desktop/src/lib/gamesSpine/startGamesSpineStartsSoonObserver.ts
-function collectOperationalGames3(leagues) {
+function collectOperationalGames2(leagues) {
   const games = flattenLiveGames(leagues);
   const f1Games = leagues.F1 ?? [];
   return [...games, ...f1Games];
 }
 function scanAndEnqueueStartsSoonAlerts() {
   const { leagues } = useLiveGamesStore.getState();
-  const items = detectGamesSpineStartsSoonAlerts(collectOperationalGames3(leagues));
+  const items = detectGamesSpineStartsSoonAlerts(collectOperationalGames2(leagues));
   if (items.length > 0) {
     useGamesSpineTransientAlertStore.getState().enqueue(items);
   }
@@ -73768,7 +73800,7 @@ var init_detectGamesSpineGameUpdateAlerts = __esm({
 });
 
 // ../grarf/desktop/src/lib/gamesSpine/startGamesSpineGameUpdateObserver.ts
-function collectOperationalGames4(leagues) {
+function collectOperationalGames3(leagues) {
   const out = [];
   for (const rows of Object.values(leagues)) {
     if (!Array.isArray(rows)) continue;
@@ -73785,7 +73817,7 @@ function buildGamesById(games) {
 }
 function scanAndEnqueueGameUpdateAlerts() {
   const { leagues } = useLiveGamesStore.getState();
-  const games = collectOperationalGames4(leagues);
+  const games = collectOperationalGames3(leagues);
   const items = detectGamesSpineGameUpdateAlerts(previousGamesById2, games);
   previousGamesById2 = buildGamesById(games);
   if (items.length > 0) {
@@ -73796,7 +73828,7 @@ function startGamesSpineGameUpdateObserver() {
   if (!isGrarfWebRenderer()) return () => {
   };
   const { leagues } = useLiveGamesStore.getState();
-  previousGamesById2 = buildGamesById(collectOperationalGames4(leagues));
+  previousGamesById2 = buildGamesById(collectOperationalGames3(leagues));
   const unsubscribe = useLiveGamesStore.subscribe(scanAndEnqueueGameUpdateAlerts);
   const intervalId = window.setInterval(
     scanAndEnqueueGameUpdateAlerts,
@@ -79158,7 +79190,7 @@ var init_centerPaneTimelinePersistedEventStore = __esm({
 });
 
 // ../grarf/desktop/src/components/homeMvp/HomeCenterPaneTimelineGameUpdateBridge.tsx
-function collectOperationalGames5(leagues) {
+function collectOperationalGames4(leagues) {
   const out = [];
   for (const rows of Object.values(leagues)) {
     if (!Array.isArray(rows)) continue;
@@ -79182,10 +79214,10 @@ function HomeCenterPaneTimelineGameUpdateBridge() {
   (0, import_react64.useEffect)(() => {
     let previousGamesById3 = {};
     previousGamesById3 = buildGamesById2(
-      collectOperationalGames5(useLiveGamesStore.getState().leagues)
+      collectOperationalGames4(useLiveGamesStore.getState().leagues)
     );
     const scanAndAppend = () => {
-      const games = collectOperationalGames5(useLiveGamesStore.getState().leagues);
+      const games = collectOperationalGames4(useLiveGamesStore.getState().leagues);
       const items = detectGamesSpineFinalScoreTimelineAlerts(previousGamesById3, games);
       previousGamesById3 = buildGamesById2(games);
       if (items.length > 0) {
@@ -79197,7 +79229,7 @@ function HomeCenterPaneTimelineGameUpdateBridge() {
         enrichQueuedRef.current = true;
         return;
       }
-      const games = collectOperationalGames5(useLiveGamesStore.getState().leagues);
+      const games = collectOperationalGames4(useLiveGamesStore.getState().leagues);
       if (!gamesNeedEventEndedAtMsEnrichment(games)) {
         return;
       }
@@ -79217,7 +79249,7 @@ function HomeCenterPaneTimelineGameUpdateBridge() {
         if (enrichQueuedRef.current) {
           enrichQueuedRef.current = false;
           if (gamesNeedEventEndedAtMsEnrichment(
-            collectOperationalGames5(useLiveGamesStore.getState().leagues)
+            collectOperationalGames4(useLiveGamesStore.getState().leagues)
           )) {
             runEnrichment();
           }
@@ -79229,7 +79261,7 @@ function HomeCenterPaneTimelineGameUpdateBridge() {
         return;
       }
       scanAndAppend();
-      if (gamesNeedEventEndedAtMsEnrichment(collectOperationalGames5(state3.leagues))) {
+      if (gamesNeedEventEndedAtMsEnrichment(collectOperationalGames4(state3.leagues))) {
         runEnrichment();
       }
     };
@@ -141894,6 +141926,7 @@ function useSportsBrowserPrototypeTodayTemporalSlate() {
   const sharedOperationalInput = (0, import_react255.useMemo)(
     () => ({
       liveLeagues,
+      mergedLeagues,
       scheduleByDate,
       selectedDate,
       operationalMode,
@@ -141905,6 +141938,7 @@ function useSportsBrowserPrototypeTodayTemporalSlate() {
     }),
     [
       liveLeagues,
+      mergedLeagues,
       scheduleByDate,
       selectedDate,
       operationalMode,
@@ -142051,22 +142085,32 @@ function SectionHeader({ label, open, onToggle, first = false }) {
     }
   );
 }
-function NavRow({ label, indent = 1, bold = false, trailing, className }) {
-  const indentClass = indent === 1 ? "pl-6 pr-4" : indent === 2 ? "pl-10 pr-4" : "pl-14 pr-4";
+function NavRow({
+  label,
+  indent = 1,
+  bold = false,
+  trailing,
+  expanded = false,
+  onClick,
+  className
+}) {
+  const indentClass = indent === 0 ? "px-4" : indent === 1 ? "pl-6 pr-4" : indent === 2 ? "pl-10 pr-4" : "pl-14 pr-4";
   return /* @__PURE__ */ (0, import_jsx_runtime223.jsxs)(
     "button",
     {
       type: "button",
+      onClick,
       className: cn2(
-        "flex w-full items-center justify-between py-[4px] text-left text-[11px] uppercase tracking-[0.04em] text-[#1a1a1a]",
+        "flex w-full min-w-0 items-start justify-between gap-2 py-[4px] text-left text-[11px] uppercase tracking-[0.04em] text-[#1a1a1a]",
         "transition-colors hover:bg-[#e9e4db]",
         bold ? "font-semibold" : "font-normal",
         indentClass,
         className
       ),
+      "aria-expanded": onClick ? expanded : void 0,
       children: [
-        /* @__PURE__ */ (0, import_jsx_runtime223.jsx)("span", { className: "truncate", children: label }),
-        trailing === "expand" ? /* @__PURE__ */ (0, import_jsx_runtime223.jsx)(ChevronDown, { size: 12, strokeWidth: 2, className: "shrink-0 rotate-180", "aria-hidden": true }) : null
+        /* @__PURE__ */ (0, import_jsx_runtime223.jsx)("span", { className: "min-w-0 flex-1 break-words whitespace-normal", children: label }),
+        onClick ? expanded ? /* @__PURE__ */ (0, import_jsx_runtime223.jsx)(ChevronDown, { size: 12, strokeWidth: 2, className: "shrink-0 rotate-180", "aria-hidden": true }) : /* @__PURE__ */ (0, import_jsx_runtime223.jsx)(ChevronRight, { size: 12, strokeWidth: 2, className: "shrink-0 text-[#1a1a1a]", "aria-hidden": true }) : trailing === "expand" ? /* @__PURE__ */ (0, import_jsx_runtime223.jsx)(ChevronDown, { size: 12, strokeWidth: 2, className: "shrink-0 rotate-180", "aria-hidden": true }) : null
       ]
     }
   );
@@ -142103,7 +142147,7 @@ function SidebarCompetitorMark({
           "span",
           {
             className: cn2(
-              "min-w-0 truncate normal-case text-[#1a1a1a]",
+              "min-w-0 break-words whitespace-normal normal-case text-[#1a1a1a]",
               align === "end" && "text-right"
             ),
             children: name
@@ -142121,7 +142165,7 @@ function SidebarTemporalGameRow({
   if (model.kind === "event") {
     const logoUrl = resolveDarkThemeLogoUrl(game, "away") ?? (game.league ? resolveGamesSpineLeagueLogoUrl(game.league, { game }) : void 0);
     const label = resolveGamesSpineCompactEventDisplayLine(model.event);
-    return /* @__PURE__ */ (0, import_jsx_runtime223.jsxs)("div", { className: cn2("flex min-w-0 items-center gap-1", SIDEBAR_GAME_ROW_CLASS), children: [
+    return /* @__PURE__ */ (0, import_jsx_runtime223.jsxs)("div", { className: cn2("flex min-w-0 items-start gap-1", SIDEBAR_GAME_ROW_CLASS), children: [
       /* @__PURE__ */ (0, import_jsx_runtime223.jsx)("span", { className: "inline-flex h-[12px] w-[12px] shrink-0 items-center justify-center", children: logoUrl ? /* @__PURE__ */ (0, import_jsx_runtime223.jsx)(
         "img",
         {
@@ -142135,7 +142179,7 @@ function SidebarTemporalGameRow({
           decoding: "async"
         }
       ) : null }),
-      /* @__PURE__ */ (0, import_jsx_runtime223.jsx)("span", { className: "min-w-0 truncate normal-case text-[#1a1a1a]", children: label })
+      /* @__PURE__ */ (0, import_jsx_runtime223.jsx)("span", { className: "min-w-0 flex-1 break-words whitespace-normal normal-case text-[#1a1a1a]", children: label })
     ] });
   }
   const leftName = (model.left.teamName || model.left.abbrev).trim();
@@ -142172,15 +142216,75 @@ function SidebarTemporalGameRow({
   );
 }
 function SidebarTemporalGamesBox({ children }) {
-  return /* @__PURE__ */ (0, import_jsx_runtime223.jsx)("div", { className: cn2("mx-4 mb-1.5 ml-14 border bg-[#f8f6f1]", RULE2), children });
+  return /* @__PURE__ */ (0, import_jsx_runtime223.jsx)("div", { className: cn2("mb-2.5 min-w-0 w-full overflow-hidden border bg-[#f8f6f1]", RULE2), children });
+}
+function SidebarF1CatchUpMockLeagueBlock({ onOpenUrl }) {
+  const [open, setOpen] = (0, import_react256.useState)(false);
+  const logoUrl = resolveGamesSpineLeagueLogoUrl("F1");
+  return /* @__PURE__ */ (0, import_jsx_runtime223.jsxs)(import_jsx_runtime223.Fragment, { children: [
+    /* @__PURE__ */ (0, import_jsx_runtime223.jsxs)(
+      "button",
+      {
+        type: "button",
+        onClick: () => setOpen((expanded) => !expanded),
+        className: cn2(
+          "flex w-full min-w-0 items-start justify-between gap-2 px-4 py-[4px] text-left text-[11px] uppercase tracking-[0.04em] text-[#1a1a1a]",
+          "transition-colors hover:bg-[#e9e4db] font-normal"
+        ),
+        "aria-expanded": open,
+        children: [
+          /* @__PURE__ */ (0, import_jsx_runtime223.jsxs)("span", { className: "flex min-w-0 flex-1 items-start gap-1", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime223.jsx)("span", { className: "inline-flex h-[12px] w-[12px] shrink-0 items-center justify-center", children: logoUrl ? /* @__PURE__ */ (0, import_jsx_runtime223.jsx)(
+              "img",
+              {
+                src: logoUrl,
+                alt: "",
+                className: cn2(
+                  "h-2.5 w-2.5 shrink-0 object-contain",
+                  resolveGamesSpineLeagueLogoImgClassName("F1", logoUrl)
+                ),
+                loading: "lazy",
+                decoding: "async"
+              }
+            ) : null }),
+            /* @__PURE__ */ (0, import_jsx_runtime223.jsx)("span", { className: "min-w-0 flex-1 break-words whitespace-normal", children: "Formula 1" })
+          ] }),
+          open ? /* @__PURE__ */ (0, import_jsx_runtime223.jsx)(ChevronDown, { size: 12, strokeWidth: 2, className: "shrink-0 rotate-180", "aria-hidden": true }) : /* @__PURE__ */ (0, import_jsx_runtime223.jsx)(ChevronRight, { size: 12, strokeWidth: 2, className: "shrink-0 text-[#1a1a1a]", "aria-hidden": true })
+        ]
+      }
+    ),
+    open ? /* @__PURE__ */ (0, import_jsx_runtime223.jsx)(SidebarTemporalGamesBox, { children: F1_CATCH_UP_MOCK_HEADLINES.map((headline) => /* @__PURE__ */ (0, import_jsx_runtime223.jsx)(
+      "button",
+      {
+        type: "button",
+        onClick: () => onOpenUrl?.(headline.url),
+        className: cn2(
+          "block w-full min-w-0 text-left normal-case text-[#1a1a1a]",
+          SIDEBAR_F1_MOCK_HEADLINE_ROW_CLASS,
+          "transition-colors hover:bg-[#e9e4db]"
+        ),
+        children: /* @__PURE__ */ (0, import_jsx_runtime223.jsx)("span", { className: "block min-w-0 break-words whitespace-normal", children: headline.label })
+      },
+      headline.url
+    )) }) : null
+  ] });
 }
 function SidebarTemporalLeagueBlock({
   slate,
   variant
 }) {
+  const [open, setOpen] = (0, import_react256.useState)(false);
   return /* @__PURE__ */ (0, import_jsx_runtime223.jsxs)(import_jsx_runtime223.Fragment, { children: [
-    /* @__PURE__ */ (0, import_jsx_runtime223.jsx)(NavRow, { label: slate.label, indent: 2, trailing: "expand" }),
-    /* @__PURE__ */ (0, import_jsx_runtime223.jsx)(SidebarTemporalGamesBox, { children: slate.games.map((game) => /* @__PURE__ */ (0, import_jsx_runtime223.jsx)(SidebarTemporalGameRow, { game, variant }, game.id)) })
+    /* @__PURE__ */ (0, import_jsx_runtime223.jsx)(
+      NavRow,
+      {
+        label: slate.label,
+        indent: 0,
+        expanded: open,
+        onClick: () => setOpen((expanded) => !expanded)
+      }
+    ),
+    open ? /* @__PURE__ */ (0, import_jsx_runtime223.jsx)(SidebarTemporalGamesBox, { children: slate.games.map((game) => /* @__PURE__ */ (0, import_jsx_runtime223.jsx)(SidebarTemporalGameRow, { game, variant }, game.id)) }) : null
   ] });
 }
 function LeaguesFilterField() {
@@ -142210,12 +142314,67 @@ function BottomNavSection({ label, open, onToggle, first = false, children }) {
     open && children ? /* @__PURE__ */ (0, import_jsx_runtime223.jsx)("div", { className: "shrink-0", children }) : null
   ] });
 }
-function SportsBrowserPrototypeLeftNav({ className }) {
+function temporalLeaguesHaveGames(leagues) {
+  return leagues.some((slate) => slate.games.length > 0);
+}
+function countTodayTemporalSlateGames(catchUpLeagues, nowLeagues, upcomingLeagues) {
+  return [...catchUpLeagues, ...nowLeagues, ...upcomingLeagues].reduce(
+    (sum, slate) => sum + slate.games.length,
+    0
+  );
+}
+function resolveDefaultTodayTemporalSectionState(catchUpLeagues, nowLeagues) {
+  if (temporalLeaguesHaveGames(nowLeagues)) {
+    return { catchUp: false, now: true, upcoming: false };
+  }
+  if (temporalLeaguesHaveGames(catchUpLeagues)) {
+    return { catchUp: true, now: false, upcoming: false };
+  }
+  return { catchUp: false, now: false, upcoming: true };
+}
+function SidebarTodayTemporalSection({
+  label,
+  open,
+  onToggle,
+  children
+}) {
+  return /* @__PURE__ */ (0, import_jsx_runtime223.jsxs)(import_jsx_runtime223.Fragment, { children: [
+    /* @__PURE__ */ (0, import_jsx_runtime223.jsx)(NavRow, { label, indent: 0, bold: true, expanded: open, onClick: onToggle }),
+    open ? children : null
+  ] });
+}
+function SportsBrowserPrototypeLeftNav({ className, onOpenUrl }) {
   const { catchUpLeagues, nowLeagues, upcomingLeagues } = useSportsBrowserPrototypeTodayTemporalSlate();
   const [yesterdayOpen, setYesterdayOpen] = (0, import_react256.useState)(false);
   const [todayOpen, setTodayOpen] = (0, import_react256.useState)(true);
-  const [leaguesOpen, setLeaguesOpen] = (0, import_react256.useState)(true);
-  const [newsOpen, setNewsOpen] = (0, import_react256.useState)(true);
+  const [todayTemporalSections, setTodayTemporalSections] = (0, import_react256.useState)({
+    catchUp: false,
+    now: false,
+    upcoming: false
+  });
+  const todayTemporalSectionsInitRef = (0, import_react256.useRef)(false);
+  const todayTemporalSectionsUserTouchedRef = (0, import_react256.useRef)(false);
+  const deferEmptySlateInitRef = (0, import_react256.useRef)(false);
+  (0, import_react256.useEffect)(() => {
+    if (todayTemporalSectionsInitRef.current || todayTemporalSectionsUserTouchedRef.current) {
+      return;
+    }
+    const totalGames = countTodayTemporalSlateGames(catchUpLeagues, nowLeagues, upcomingLeagues);
+    if (totalGames === 0 && !deferEmptySlateInitRef.current) {
+      deferEmptySlateInitRef.current = true;
+      return;
+    }
+    setTodayTemporalSections(
+      resolveDefaultTodayTemporalSectionState(catchUpLeagues, nowLeagues)
+    );
+    todayTemporalSectionsInitRef.current = true;
+  }, [catchUpLeagues, nowLeagues, upcomingLeagues]);
+  const toggleTodayTemporalSection = (section) => {
+    todayTemporalSectionsUserTouchedRef.current = true;
+    setTodayTemporalSections((prev) => ({ ...prev, [section]: !prev[section] }));
+  };
+  const [leaguesOpen, setLeaguesOpen] = (0, import_react256.useState)(false);
+  const [newsOpen, setNewsOpen] = (0, import_react256.useState)(false);
   const [socialOpen, setSocialOpen] = (0, import_react256.useState)(false);
   const [highlightsOpen, setHighlightsOpen] = (0, import_react256.useState)(false);
   const [fantasyOpen, setFantasyOpen] = (0, import_react256.useState)(false);
@@ -142233,7 +142392,7 @@ function SportsBrowserPrototypeLeftNav({ className }) {
       "data-sports-browser-prototype-left-nav": true,
       "aria-label": "Sports browser menu",
       children: /* @__PURE__ */ (0, import_jsx_runtime223.jsxs)("div", { className: "flex min-h-0 flex-1 flex-col overflow-hidden", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime223.jsxs)("div", { className: "flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime223.jsxs)("div", { className: "flex min-h-0 flex-1 flex-col overflow-y-auto overflow-x-hidden overscroll-contain", children: [
           /* @__PURE__ */ (0, import_jsx_runtime223.jsxs)("div", { className: "shrink-0", children: [
             /* @__PURE__ */ (0, import_jsx_runtime223.jsx)(
               SectionHeader,
@@ -142258,33 +142417,62 @@ function SportsBrowserPrototypeLeftNav({ className }) {
               }
             ),
             todayOpen ? /* @__PURE__ */ (0, import_jsx_runtime223.jsxs)(import_jsx_runtime223.Fragment, { children: [
-              /* @__PURE__ */ (0, import_jsx_runtime223.jsx)(NavRow, { label: "Catch Up", indent: 1, bold: true }),
-              catchUpLeagues.map((slate) => /* @__PURE__ */ (0, import_jsx_runtime223.jsx)(
-                SidebarTemporalLeagueBlock,
+              /* @__PURE__ */ (0, import_jsx_runtime223.jsx)(
+                SidebarTodayTemporalSection,
                 {
-                  slate,
-                  variant: "catchUp"
-                },
-                `catch-up-${slate.key}`
-              )),
-              /* @__PURE__ */ (0, import_jsx_runtime223.jsx)(NavRow, { label: "Now", indent: 1, bold: true }),
-              nowLeagues.map((slate) => /* @__PURE__ */ (0, import_jsx_runtime223.jsx)(
-                SidebarTemporalLeagueBlock,
+                  label: "Catch Up",
+                  open: todayTemporalSections.catchUp,
+                  onToggle: () => toggleTodayTemporalSection("catchUp"),
+                  children: catchUpLeagues.map(
+                    (slate) => slate.key === "F1" ? /* @__PURE__ */ (0, import_jsx_runtime223.jsx)(
+                      SidebarF1CatchUpMockLeagueBlock,
+                      {
+                        onOpenUrl
+                      },
+                      `catch-up-${slate.key}`
+                    ) : /* @__PURE__ */ (0, import_jsx_runtime223.jsx)(
+                      SidebarTemporalLeagueBlock,
+                      {
+                        slate,
+                        variant: "catchUp"
+                      },
+                      `catch-up-${slate.key}`
+                    )
+                  )
+                }
+              ),
+              /* @__PURE__ */ (0, import_jsx_runtime223.jsx)(
+                SidebarTodayTemporalSection,
                 {
-                  slate,
-                  variant: "live"
-                },
-                `now-${slate.key}`
-              )),
-              /* @__PURE__ */ (0, import_jsx_runtime223.jsx)(NavRow, { label: "Upcoming", indent: 1, bold: true }),
-              upcomingLeagues.map((slate) => /* @__PURE__ */ (0, import_jsx_runtime223.jsx)(
-                SidebarTemporalLeagueBlock,
+                  label: "Now",
+                  open: todayTemporalSections.now,
+                  onToggle: () => toggleTodayTemporalSection("now"),
+                  children: nowLeagues.map((slate) => /* @__PURE__ */ (0, import_jsx_runtime223.jsx)(
+                    SidebarTemporalLeagueBlock,
+                    {
+                      slate,
+                      variant: "live"
+                    },
+                    `now-${slate.key}`
+                  ))
+                }
+              ),
+              /* @__PURE__ */ (0, import_jsx_runtime223.jsx)(
+                SidebarTodayTemporalSection,
                 {
-                  slate,
-                  variant: "upcoming"
-                },
-                `upcoming-${slate.key}`
-              ))
+                  label: "Upcoming",
+                  open: todayTemporalSections.upcoming,
+                  onToggle: () => toggleTodayTemporalSection("upcoming"),
+                  children: upcomingLeagues.map((slate) => /* @__PURE__ */ (0, import_jsx_runtime223.jsx)(
+                    SidebarTemporalLeagueBlock,
+                    {
+                      slate,
+                      variant: "upcoming"
+                    },
+                    `upcoming-${slate.key}`
+                  ))
+                }
+              )
             ] }) : null
           ] }),
           /* @__PURE__ */ (0, import_jsx_runtime223.jsx)("div", { className: "min-h-0 flex-1", "aria-hidden": true })
@@ -142357,7 +142545,7 @@ function SportsBrowserPrototypeLeftNav({ className }) {
     }
   );
 }
-var import_react256, import_jsx_runtime223, MENU_SURFACE2, RULE2, SIDEBAR_GAME_ROW_CLASS;
+var import_react256, import_jsx_runtime223, MENU_SURFACE2, RULE2, F1_CATCH_UP_MOCK_HEADLINES, SIDEBAR_GAME_ROW_CLASS, SIDEBAR_F1_MOCK_HEADLINE_ROW_CLASS;
 var init_SportsBrowserPrototypeLeftNav = __esm({
   "../grarf/desktop/src/components/homeMvp/SportsBrowserPrototypeLeftNav.tsx"() {
     init_define_import_meta_env();
@@ -142372,8 +142560,22 @@ var init_SportsBrowserPrototypeLeftNav = __esm({
     import_jsx_runtime223 = __toESM(require_jsx_runtime(), 1);
     MENU_SURFACE2 = "bg-[#f3f0ea] text-[#1a1a1a]";
     RULE2 = "border-[#d5d0c6]";
+    F1_CATCH_UP_MOCK_HEADLINES = [
+      {
+        label: "FP1: Leclerc leads Hamilton and Russell during first practice at the Italian Grand Prix",
+        url: "https://www.formula1.com/en/latest/article/fp1-leclerc-leads-hamilton-and-russell-during-first-practice-at-the-italian-grand-prix.7DUTqVtZlb4zvqNfBsyl1t"
+      },
+      {
+        label: "FP2: Russell beats Leclerc and Antonelli to the fastest time in Free Practice 2 ahead of Italian Grand Prix",
+        url: "https://www.formula1.com/en/latest/article/fp2-russell-beats-leclerc-and-antonelli-to-the-fastest-time-in-free-practice-2-ahead-of-italian-grand-prix.4mVLF757oe0NuWE9Caw1wO"
+      }
+    ];
     SIDEBAR_GAME_ROW_CLASS = cn2(
-      "border-t px-2 py-[5px] text-[10px] leading-none first:border-t-0",
+      "border-t px-4 py-[5px] text-[10px] leading-snug first:border-t-0 break-words whitespace-normal",
+      RULE2
+    );
+    SIDEBAR_F1_MOCK_HEADLINE_ROW_CLASS = cn2(
+      "border-t py-[5px] pl-8 pr-4 text-[10px] leading-snug first:border-t-0 break-words whitespace-normal",
       RULE2
     );
   }
@@ -143220,7 +143422,7 @@ function HomePage() {
         isSportsBrowserPrototype ? /* @__PURE__ */ (0, import_jsx_runtime225.jsxs)("div", { className: "flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden", children: [
           /* @__PURE__ */ (0, import_jsx_runtime225.jsx)(SportsBrowserPrototypeAddressBar, {}),
           /* @__PURE__ */ (0, import_jsx_runtime225.jsxs)("div", { className: "flex min-h-0 min-w-0 flex-1 overflow-hidden", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime225.jsx)(SportsBrowserPrototypeLeftNav, {}),
+            /* @__PURE__ */ (0, import_jsx_runtime225.jsx)(SportsBrowserPrototypeLeftNav, { onOpenUrl: setSportsBrowserActiveUrl }),
             /* @__PURE__ */ (0, import_jsx_runtime225.jsxs)("div", { className: "flex min-h-0 min-w-0 flex-1 overflow-hidden", children: [
               /* @__PURE__ */ (0, import_jsx_runtime225.jsx)("div", { className: "flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden", children: centerStack }),
               /* @__PURE__ */ (0, import_jsx_runtime225.jsx)(
