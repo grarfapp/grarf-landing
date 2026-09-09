@@ -142140,7 +142140,8 @@ function SportsBrowserPrototypeAddressBar({
     "header",
     {
       className: cn2(
-        "flex h-11 shrink-0 items-center gap-3 border-b border-[#c8c4bc]/70 bg-[#ece9e2] px-4 min-w-0 overflow-hidden",
+        "flex h-11 shrink-0 items-center gap-3 border-b border-[#c8c4bc]/70 bg-[#ece9e2] min-w-0 overflow-hidden",
+        trailing ? "pl-4 pr-0" : "px-4",
         className
       ),
       "data-sports-browser-prototype-chrome": true,
@@ -142635,6 +142636,7 @@ function SportsBrowserPrototypeBrowserTabStrip({
   activeTabId,
   onSelectTab,
   onAddTab,
+  terminalToggle,
   className
 }) {
   const gamesUpdatedAt = useLiveGamesStore((state3) => state3.updatedAt);
@@ -142679,7 +142681,8 @@ function SportsBrowserPrototypeBrowserTabStrip({
             className: cn2(addTabControlClass, "my-auto ml-1 shrink-0"),
             children: "+"
           }
-        )
+        ),
+        terminalToggle ? /* @__PURE__ */ (0, import_jsx_runtime223.jsx)("div", { className: "my-auto ml-auto flex shrink-0 items-center pl-2", children: terminalToggle }) : null
       ]
     }
   );
@@ -144696,7 +144699,7 @@ function HomePage() {
     setSportsBrowserTabs((tabs) => [...tabs, newTab]);
     setActiveSportsBrowserTabId(newTab.id);
   }, []);
-  const [sportsBrowserTerminalFeedOpen, setSportsBrowserTerminalFeedOpen] = (0, import_react260.useState)(true);
+  const [sportsBrowserTerminalFeedOpen, setSportsBrowserTerminalFeedOpen] = (0, import_react260.useState)(false);
   const [sportsBrowserNavState, setSportsBrowserNavState] = (0, import_react260.useState)({
     canGoBack: false,
     canGoForward: false
@@ -145500,7 +145503,29 @@ function HomePage() {
         tabs: sportsBrowserTabs,
         activeTabId: activeSportsBrowserTabId,
         onSelectTab: onSelectSportsBrowserTab,
-        onAddTab: onAddSportsBrowserTab
+        onAddTab: onAddSportsBrowserTab,
+        terminalToggle: showSportsBrowserPrototypeTopFeed ? /* @__PURE__ */ (0, import_jsx_runtime229.jsx)(
+          "button",
+          {
+            type: "button",
+            onClick: toggleSportsBrowserTerminalFeed,
+            "aria-label": sportsBrowserTerminalFeedOpen ? "Close terminal feed" : "Open terminal feed",
+            "aria-expanded": sportsBrowserTerminalFeedOpen,
+            className: "flex shrink-0 cursor-pointer items-center pl-1 pr-0 transition-opacity hover:opacity-75",
+            children: /* @__PURE__ */ (0, import_jsx_runtime229.jsx)(
+              "img",
+              {
+                src: terminal_default,
+                alt: "",
+                className: cn2(
+                  "pointer-events-none h-[22px] w-auto object-contain transition-[filter,opacity]",
+                  !sportsBrowserTerminalFeedOpen && "opacity-70 grayscale"
+                ),
+                draggable: false
+              }
+            )
+          }
+        ) : null
       }
     ),
     /* @__PURE__ */ (0, import_jsx_runtime229.jsx)(
@@ -145516,35 +145541,14 @@ function HomePage() {
         onNavigate: onSportsBrowserOmniboxNavigate,
         trailing: showSportsBrowserPrototypeTopFeed ? /* @__PURE__ */ (0, import_jsx_runtime229.jsxs)(import_jsx_runtime229.Fragment, { children: [
           /* @__PURE__ */ (0, import_jsx_runtime229.jsx)(SportsBrowserPrototypeBottomRailGames, { className: "min-w-0 flex-[1.5] shrink border-l border-[#c8c4bc]/70" }),
-          /* @__PURE__ */ (0, import_jsx_runtime229.jsxs)("div", { className: "flex h-full min-w-0 flex-1 shrink overflow-hidden border-l border-[#c8c4bc]/70 bg-[#f4b44b]", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime229.jsx)(
-              GlobalHeaderNewsTicker,
-              {
-                appearance: "bottomStrip",
-                className: "h-full min-w-0 flex-1",
-                onNavigateUrl: onSportsBrowserOpenUrl
-              }
-            ),
-            /* @__PURE__ */ (0, import_jsx_runtime229.jsx)(
-              "button",
-              {
-                type: "button",
-                onClick: toggleSportsBrowserTerminalFeed,
-                "aria-label": sportsBrowserTerminalFeedOpen ? "Close terminal feed" : "Open terminal feed",
-                "aria-expanded": sportsBrowserTerminalFeedOpen,
-                className: "flex shrink-0 cursor-pointer items-center pl-1 pr-2 transition-opacity hover:opacity-75",
-                children: /* @__PURE__ */ (0, import_jsx_runtime229.jsx)(
-                  "img",
-                  {
-                    src: terminal_default,
-                    alt: "",
-                    className: "pointer-events-none h-[22px] w-auto object-contain",
-                    draggable: false
-                  }
-                )
-              }
-            )
-          ] })
+          /* @__PURE__ */ (0, import_jsx_runtime229.jsx)("div", { className: "flex h-full min-w-0 flex-1 shrink overflow-hidden border-l border-[#c8c4bc]/70 bg-[#f4b44b]", children: /* @__PURE__ */ (0, import_jsx_runtime229.jsx)(
+            GlobalHeaderNewsTicker,
+            {
+              appearance: "bottomStrip",
+              className: "h-full min-w-0 flex-1",
+              onNavigateUrl: onSportsBrowserOpenUrl
+            }
+          ) })
         ] }) : null
       }
     ),
