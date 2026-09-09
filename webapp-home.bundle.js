@@ -113406,18 +113406,27 @@ var init_homeSourceFocusStore = __esm({
     import_zustand68 = __toESM(require_zustand(), 1);
     useHomeSourceFocusStore = (0, import_zustand68.create)((set) => ({
       selectedArticleUrlBySession: {},
+      selectedArticleSourceUrlBySession: {},
       borrowedCardWebviewKeys: {},
       webFullscreenSessionKey: null,
-      setSelectedArticle: (sessionKey, url) => set((state3) => ({
+      setSelectedArticle: (sessionKey, url, sourceUrl) => set((state3) => ({
         selectedArticleUrlBySession: {
           ...state3.selectedArticleUrlBySession,
           [sessionKey]: url
-        }
+        },
+        ...sourceUrl ? {
+          selectedArticleSourceUrlBySession: {
+            ...state3.selectedArticleSourceUrlBySession,
+            [sessionKey]: sourceUrl
+          }
+        } : {}
       })),
       clearSelectedArticle: (sessionKey) => set((state3) => {
         const selectedArticleUrlBySession = { ...state3.selectedArticleUrlBySession };
+        const selectedArticleSourceUrlBySession = { ...state3.selectedArticleSourceUrlBySession };
         delete selectedArticleUrlBySession[sessionKey];
-        return { selectedArticleUrlBySession };
+        delete selectedArticleSourceUrlBySession[sessionKey];
+        return { selectedArticleUrlBySession, selectedArticleSourceUrlBySession };
       }),
       setCardWebviewBorrowed: (sessionKey, borrowed) => set((state3) => {
         const borrowedCardWebviewKeys = { ...state3.borrowedCardWebviewKeys };
@@ -113461,7 +113470,7 @@ function isSameDocumentHomeSourceNavigation(currentUrl, nextUrl) {
     return false;
   }
 }
-function isHomeSourceArticleCandidateUrl(url) {
+function isHomeSourceFocusDestinationUrl(url) {
   const trimmed = url.trim();
   if (!trimmed || trimmed === "about:blank") return false;
   try {
@@ -113776,25 +113785,22 @@ function restoreSourceSurface(wv, sourceLockUrl) {
     } catch {
     }
     try {
-      if (readWebviewUrl(wv) !== sourceLockUrl) {
+      const currentOrigin = new URL(current).origin;
+      const lockOrigin = new URL(sourceLockUrl).origin;
+      if (currentOrigin !== lockOrigin && readWebviewUrl(wv) !== sourceLockUrl) {
         diagLog("restoreSourceSurface:set-src", {
           webviewId: diagWebviewId(wv),
           sourceLockUrl,
-          currentUrl: readWebviewUrl(wv)
+          currentUrl: current
         });
         wv.src = sourceLockUrl;
       }
     } catch {
-      diagLog("restoreSourceSurface:set-src-fallback", {
-        webviewId: diagWebviewId(wv),
-        sourceLockUrl
-      });
-      wv.src = sourceLockUrl;
     }
   });
 }
 function routeArticleFromSource(wv, sourceLockUrl, articleUrl, restoreSource, onArticleRoute) {
-  if (!isHomeSourceArticleCandidateUrl(articleUrl)) return;
+  if (!isHomeSourceFocusDestinationUrl(articleUrl)) return;
   if (isSameDocumentHomeSourceNavigation(sourceLockUrl, articleUrl)) return;
   const isDuplicateRoute = shouldSkipDuplicateArticleRoute(wv, articleUrl);
   diagLog("routeArticleFromSource", {
@@ -113826,8 +113832,15 @@ function attachArticleSelectionListeners(listenerKey, wv, onArticleRoute, initia
   let allowMainFrameNavigation = true;
   const lockFromCaller = initialSourceLockUrl?.trim() ?? "";
   if (lockFromCaller) {
-    sourceLock.url = lockFromCaller;
-    allowMainFrameNavigation = false;
+    const currentUrl = readWebviewUrl(wv);
+    const switchingSource = Boolean(currentUrl && currentUrl !== "about:blank") && !homeSourceWebviewMatchesTarget(currentUrl, lockFromCaller);
+    if (switchingSource) {
+      sourceLock.url = lockFromCaller;
+      allowMainFrameNavigation = true;
+    } else {
+      sourceLock.url = currentUrl && currentUrl !== "about:blank" ? currentUrl : lockFromCaller;
+      allowMainFrameNavigation = !sourceLock.url || sourceLock.url === "about:blank";
+    }
   } else {
     const initialUrl = readWebviewUrl(wv);
     if (initialUrl && initialUrl !== "about:blank") {
@@ -113835,6 +113848,11 @@ function attachArticleSelectionListeners(listenerKey, wv, onArticleRoute, initia
       allowMainFrameNavigation = false;
     }
   }
+  const commitSourceLock = (loaded) => {
+    if (lockFromCaller && !homeSourceWebviewMatchesTarget(loaded, lockFromCaller)) return;
+    sourceLock.url = loaded;
+    allowMainFrameNavigation = false;
+  };
   const onDidFinishLoad = (event) => {
     const e2 = event;
     if (e2.isMainFrame === false) return;
@@ -113842,13 +113860,12 @@ function attachArticleSelectionListeners(listenerKey, wv, onArticleRoute, initia
       const loaded = await probeWebviewUrl(wv);
       if (!loaded || loaded === "about:blank") return;
       if (!allowMainFrameNavigation && sourceLock.url) {
-        if (!isSameDocumentHomeSourceNavigation(sourceLock.url, loaded) && isHomeSourceArticleCandidateUrl(loaded)) {
-          routeArticleFromSource(wv, sourceLock.url, loaded, true, onArticleRoute);
+        if (!isSameDocumentHomeSourceNavigation(sourceLock.url, loaded) && isHomeSourceFocusDestinationUrl(loaded)) {
+          routeArticleFromSource(wv, sourceLock.url, loaded, false, onArticleRoute);
           return;
         }
       }
-      sourceLock.url = loaded;
-      allowMainFrameNavigation = false;
+      commitSourceLock(loaded);
     })();
   };
   const onEmbedNavigateMessage = (event) => {
@@ -113879,7 +113896,7 @@ function attachArticleSelectionListeners(listenerKey, wv, onArticleRoute, initia
   const onNewWindow = (event) => {
     const e2 = event;
     const nextUrl = e2.url?.trim() ?? "";
-    if (!nextUrl || !sourceLock.url) return;
+    if (!nextUrl || !sourceLock.url || allowMainFrameNavigation) return;
     event.preventDefault();
     routeArticleFromSource(wv, sourceLock.url, nextUrl, false, onArticleRoute);
   };
@@ -113890,7 +113907,7 @@ function attachArticleSelectionListeners(listenerKey, wv, onArticleRoute, initia
     const nextUrl = e2.url?.trim() ?? readWebviewUrl(wv);
     if (!nextUrl) return;
     if (isSameDocumentHomeSourceNavigation(sourceLock.url, nextUrl)) return;
-    routeArticleFromSource(wv, sourceLock.url, nextUrl, true, onArticleRoute);
+    routeArticleFromSource(wv, sourceLock.url, nextUrl, false, onArticleRoute);
   };
   const onDidNavigate = (event) => {
     const e2 = event;
@@ -113899,7 +113916,7 @@ function attachArticleSelectionListeners(listenerKey, wv, onArticleRoute, initia
     const nextUrl = e2.url?.trim() ?? readWebviewUrl(wv);
     if (!nextUrl) return;
     if (isSameDocumentHomeSourceNavigation(sourceLock.url, nextUrl)) return;
-    routeArticleFromSource(wv, sourceLock.url, nextUrl, true, onArticleRoute);
+    routeArticleFromSource(wv, sourceLock.url, nextUrl, false, onArticleRoute);
   };
   wv.addEventListener("did-finish-load", onDidFinishLoad);
   wv.addEventListener("will-navigate", onWillNavigate);
@@ -113921,7 +113938,8 @@ function cardArticleListenerKey(sessionKey) {
 }
 function focusArticleRouteHandler(sessionKey) {
   return (articleUrl) => {
-    useHomeSourceFocusStore.getState().setSelectedArticle(sessionKey, articleUrl);
+    const sourceUrl = readHomeSourceCardWebviewCurrentUrl(sessionKey);
+    useHomeSourceFocusStore.getState().setSelectedArticle(sessionKey, articleUrl, sourceUrl || void 0);
   };
 }
 function setCardWebviewBorrowed(sessionKey, borrowed) {
@@ -113983,11 +114001,11 @@ function registerHomeSourceCardHost(sessionKey, host) {
   if (host) cardHosts.set(sessionKey, host);
   else cardHosts.delete(sessionKey);
 }
-function bindHomeSourceCardArticleNavigation(sessionKey, wv, onArticleNavigate) {
+function bindHomeSourceCardArticleNavigation(sessionKey, wv, onArticleNavigate, sourceLockUrl) {
   const listenerKey = cardArticleListenerKey(sessionKey);
   detachArticleSelectionListeners(listenerKey);
   if (!wv || !onArticleNavigate) return;
-  diagLogWebview("bindHomeSourceCardArticleNavigation", wv, { sessionKey, listenerKey });
+  diagLogWebview("bindHomeSourceCardArticleNavigation", wv, { sessionKey, listenerKey, sourceLockUrl });
   attachArticleSelectionListeners(listenerKey, wv, (articleUrl) => {
     void diagLogWebviewWithScroll("onArticleRoute:before-setSelectedArticle", wv, {
       sessionKey,
@@ -113999,7 +114017,7 @@ function bindHomeSourceCardArticleNavigation(sessionKey, wv, onArticleNavigate) 
         articleUrl
       });
     });
-  });
+  }, sourceLockUrl);
 }
 function resolveEntryUrl(sessionKey, fallbackUrl) {
   const card = cardWebviews.get(sessionKey);
@@ -142057,18 +142075,27 @@ function SportsBrowserPrototypeBrowserPane({
     [activeUrl]
   );
   const usesImperativeSourceWebview = Boolean(articleFocusSessionKey);
-  const selectedArticleUrl = useHomeSourceFocusStore(
-    (state3) => articleFocusSessionKey ? state3.selectedArticleUrlBySession[articleFocusSessionKey] ?? null : null
-  );
+  const selectedArticleUrl = useHomeSourceFocusStore((state3) => {
+    if (!articleFocusSessionKey || !activeUrl) return null;
+    const articleUrl = state3.selectedArticleUrlBySession[articleFocusSessionKey];
+    const sourceUrl = state3.selectedArticleSourceUrlBySession[articleFocusSessionKey];
+    if (!articleUrl) return null;
+    if (!sourceUrl) return articleUrl;
+    return homeSourceWebviewMatchesTarget(activeUrl, sourceUrl) ? articleUrl : null;
+  });
   const split = Boolean(articleFocusSessionKey && selectedArticleUrl);
   const embedHostRef = (0, import_react254.useRef)(null);
   const webviewRef = (0, import_react254.useRef)(null);
-  const onArticleRoute = (0, import_react254.useCallback)(
-    (articleUrl) => {
+  const onDestinationRoute = (0, import_react254.useCallback)(
+    (destinationUrl) => {
       if (!articleFocusSessionKey) return;
-      useHomeSourceFocusStore.getState().setSelectedArticle(articleFocusSessionKey, articleUrl);
+      const liveSourceUrl = readHomeSourceCardWebviewCurrentUrl(
+        articleFocusSessionKey,
+        activeUrl
+      );
+      useHomeSourceFocusStore.getState().setSelectedArticle(articleFocusSessionKey, destinationUrl, liveSourceUrl);
     },
-    [articleFocusSessionKey]
+    [articleFocusSessionKey, activeUrl]
   );
   const onCloseArticlePane = (0, import_react254.useCallback)(() => {
     if (!articleFocusSessionKey) return;
@@ -142112,7 +142139,12 @@ function SportsBrowserPrototypeBrowserPane({
       partition
     );
     webviewRef.current = wv;
-    bindHomeSourceCardArticleNavigation(articleFocusSessionKey, wv, onArticleRoute);
+    bindHomeSourceCardArticleNavigation(
+      articleFocusSessionKey,
+      wv,
+      onDestinationRoute,
+      activeUrl
+    );
     void diagLogWebviewWithScroll("pane:acquire-effect:ready", wv, {
       sessionKey: articleFocusSessionKey,
       split
@@ -142124,7 +142156,7 @@ function SportsBrowserPrototypeBrowserPane({
       bindHomeSourceCardArticleNavigation(articleFocusSessionKey, null);
       registerHomeSourceCardHost(articleFocusSessionKey, null);
     };
-  }, [usesImperativeSourceWebview, articleFocusSessionKey, activeUrl, partition, onArticleRoute]);
+  }, [usesImperativeSourceWebview, articleFocusSessionKey, activeUrl, partition, onDestinationRoute]);
   (0, import_react254.useLayoutEffect)(() => {
     if (!articleFocusSessionKey) return;
     const wv = getHomeSourceCardWebview(articleFocusSessionKey) ?? webviewRef.current;
@@ -144562,6 +144594,7 @@ function HomePage() {
     (index) => {
       const websites = sportsBrowserLeagueWebsiteState ? getSportsBrowserPrototypeLeagueWebsites(sportsBrowserLeagueWebsiteState.leagueKey) : getSportsBrowserPrototypeGlobalWebsites();
       const url = websites?.[index]?.url ?? null;
+      useHomeSourceFocusStore.getState().clearSelectedArticle(NEWS_BROWSER_FOCUS_SESSION_KEY);
       setSportsBrowserPaneStates((states) => {
         const next = states.slice();
         const paneIndex = Math.min(sportsBrowserActivePaneIndex, next.length - 1);
@@ -145040,6 +145073,7 @@ var init_HomePage = __esm({
     init_SportsBrowserPrototypeLeagueWebsiteTabs();
     init_SportsBrowserPrototypeLeftNav();
     init_SportsBrowserPrototypeTerminalFeed();
+    init_newsBrowserFocusSession();
     init_sportsBrowserPrototypeLeagueWebsites();
     init_terminal();
     import_jsx_runtime228 = __toESM(require_jsx_runtime(), 1);
