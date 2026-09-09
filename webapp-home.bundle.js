@@ -95094,6 +95094,15 @@ var init_gamesSpineChannelPresentation = __esm({
 });
 
 // ../grarf/desktop/src/lib/gamesSpine/gamesSpineFinalResultNameEmphasis.ts
+function coerceFiniteScore(value) {
+  if (value == null) return null;
+  const parsed = typeof value === "number" ? value : Number(String(value).trim());
+  return Number.isFinite(parsed) ? parsed : null;
+}
+function parseCompactScoreValue(score2) {
+  if (!score2 || score2 === "\u2013" || score2 === "\u2014") return null;
+  return coerceFiniteScore(score2);
+}
 function resolveGamesSpineFinalWinnerSide(game) {
   if (game.status !== "final" && !isSpineFinalizedGame(game)) return null;
   if (isTennisGame(game)) {
@@ -95111,12 +95120,24 @@ function resolveGamesSpineFinalWinnerSide(game) {
       if (awayWon !== homeWon) return awayWon > homeWon ? "away" : "home";
     }
   }
-  const awayScore = game.awayScore;
-  const homeScore = game.homeScore;
-  if (awayScore != null && homeScore != null && Number.isFinite(awayScore) && Number.isFinite(homeScore) && awayScore !== homeScore) {
+  const awayScore = coerceFiniteScore(game.awayScore);
+  const homeScore = coerceFiniteScore(game.homeScore);
+  if (awayScore != null && homeScore != null && awayScore !== homeScore) {
     return awayScore > homeScore ? "away" : "home";
   }
   return null;
+}
+function resolveGamesSpineCompactMatchupFinalWinnerSide(game, left, right) {
+  if (game.status !== "final" && !isSpineFinalizedGame(game)) return null;
+  const canonicalWinner = resolveGamesSpineFinalWinnerSide(game);
+  if (canonicalWinner) return canonicalWinner;
+  const leftValue = parseCompactScoreValue(left.score);
+  const rightValue = parseCompactScoreValue(right.score);
+  if (leftValue == null || rightValue == null || leftValue === rightValue) return null;
+  return leftValue > rightValue ? left.side : right.side;
+}
+function resolveGamesSpineFinalWinnerBoldClass(side, winnerSide) {
+  return winnerSide === side ? "!font-bold" : void 0;
 }
 function resolveGamesSpineFinalResultNameEmphasis(game, side) {
   const winnerSide = resolveGamesSpineFinalWinnerSide(game);
@@ -96459,15 +96480,15 @@ var init_gamesSpineCompactGameRowContent = __esm({
 });
 
 // ../grarf/desktop/src/components/gamesSpine/GamesSpineCompactMatchupPills.tsx
-function parseCompactScoreValue(score2) {
+function parseCompactScoreValue2(score2) {
   if (!score2 || score2 === "\u2013" || score2 === "\u2014") return null;
   const parsed = Number(score2);
   return Number.isFinite(parsed) ? parsed : null;
 }
 function resolveCompactWinnerSide(game, left, right) {
   if (game.status !== "final" && !isSpineFinalizedGame(game)) return null;
-  const leftValue = parseCompactScoreValue(left.score);
-  const rightValue = parseCompactScoreValue(right.score);
+  const leftValue = parseCompactScoreValue2(left.score);
+  const rightValue = parseCompactScoreValue2(right.score);
   if (leftValue == null || rightValue == null || leftValue === rightValue) return null;
   return leftValue > rightValue ? left.side : right.side;
 }
@@ -142871,10 +142892,12 @@ function BottomRailTeamRow({
   row,
   flashScore,
   suppressScoreCell = false,
-  suppressNameCell = false
+  suppressNameCell = false,
+  finalWinnerSide = null
 }) {
   const logoUrl = resolveDarkThemeLogoUrl(game, side);
   const rowClass = row === 1 ? "row-start-1" : "row-start-2";
+  const winnerBoldClass = resolveGamesSpineFinalWinnerBoldClass(side, finalWinnerSide);
   return /* @__PURE__ */ (0, import_jsx_runtime223.jsxs)(import_jsx_runtime223.Fragment, { children: [
     /* @__PURE__ */ (0, import_jsx_runtime223.jsx)("span", { className: cn2(TEAM_LOGO_CELL_CLASS, rowClass, "col-start-1"), children: logoUrl ? /* @__PURE__ */ (0, import_jsx_runtime223.jsx)(
       "img",
@@ -142889,12 +142912,28 @@ function BottomRailTeamRow({
         decoding: "async"
       }
     ) : null }),
-    !suppressNameCell ? /* @__PURE__ */ (0, import_jsx_runtime223.jsx)("span", { className: cn2(TEAM_NAME_CELL_CLASS, rowClass, "col-start-2"), children: name }) : null,
+    !suppressNameCell ? /* @__PURE__ */ (0, import_jsx_runtime223.jsx)(
+      "span",
+      {
+        className: cn2(
+          TEAM_NAME_CELL_CLASS,
+          rowClass,
+          "col-start-2",
+          winnerBoldClass
+        ),
+        children: name
+      }
+    ) : null,
     !suppressScoreCell ? /* @__PURE__ */ (0, import_jsx_runtime223.jsx)(
       BottomRailFlashValue,
       {
         flash: flashScore,
-        className: cn2(TEAM_SCORE_CELL_CLASS, rowClass, "col-start-3"),
+        className: cn2(
+          TEAM_SCORE_CELL_CLASS,
+          rowClass,
+          "col-start-3",
+          winnerBoldClass
+        ),
         children: showScore ? score2 ?? "\u2013" : null
       }
     ) : null
@@ -142907,8 +142946,11 @@ function BottomRailTennisMatchupScoreGrid({
   topName,
   bottomName,
   topFlashCells,
-  bottomFlashCells
+  bottomFlashCells,
+  finalWinnerSide = null
 }) {
+  const topWinnerBoldClass = resolveGamesSpineFinalWinnerBoldClass(topSide, finalWinnerSide);
+  const bottomWinnerBoldClass = resolveGamesSpineFinalWinnerBoldClass(bottomSide, finalWinnerSide);
   return /* @__PURE__ */ (0, import_jsx_runtime223.jsxs)(
     "div",
     {
@@ -142917,8 +142959,28 @@ function BottomRailTennisMatchupScoreGrid({
         gridTemplateColumns: `minmax(0,1fr) repeat(${columns.length}, minmax(0.65rem, max-content))`
       },
       children: [
-        /* @__PURE__ */ (0, import_jsx_runtime223.jsx)("span", { className: cn2(TEAM_NAME_CELL_CLASS, "col-start-1 row-start-1"), children: topName }),
-        /* @__PURE__ */ (0, import_jsx_runtime223.jsx)("span", { className: cn2(TEAM_NAME_CELL_CLASS, "col-start-1 row-start-2"), children: bottomName }),
+        /* @__PURE__ */ (0, import_jsx_runtime223.jsx)(
+          "span",
+          {
+            className: cn2(
+              TEAM_NAME_CELL_CLASS,
+              "col-start-1 row-start-1",
+              topWinnerBoldClass
+            ),
+            children: topName
+          }
+        ),
+        /* @__PURE__ */ (0, import_jsx_runtime223.jsx)(
+          "span",
+          {
+            className: cn2(
+              TEAM_NAME_CELL_CLASS,
+              "col-start-1 row-start-2",
+              bottomWinnerBoldClass
+            ),
+            children: bottomName
+          }
+        ),
         columns.map((column, index) => {
           const topValue = topSide === "away" ? column.away : column.home;
           const bottomValue = bottomSide === "away" ? column.away : column.home;
@@ -142931,7 +142993,8 @@ function BottomRailTennisMatchupScoreGrid({
                 className: cn2(
                   BOTTOM_RAIL_TENNIS_SCORE_CELL_CLASS,
                   "row-start-1",
-                  column.isCurrentSet && "font-semibold"
+                  column.isCurrentSet && "font-semibold",
+                  topWinnerBoldClass
                 ),
                 style: { gridColumnStart: scoreColStart },
                 children: topValue ?? "\u2013"
@@ -142944,7 +143007,8 @@ function BottomRailTennisMatchupScoreGrid({
                 className: cn2(
                   BOTTOM_RAIL_TENNIS_SCORE_CELL_CLASS,
                   "row-start-2",
-                  column.isCurrentSet && "font-semibold"
+                  column.isCurrentSet && "font-semibold",
+                  bottomWinnerBoldClass
                 ),
                 style: { gridColumnStart: scoreColStart },
                 children: bottomValue ?? "\u2013"
@@ -142969,6 +143033,7 @@ function BottomRailGameCardBody({
   const channel = resolveNewsSportsBrowserChannelPresentation(game);
   const statusTimeLabel = resolveBottomRailStatusTimeLabel(game);
   const showChannelLogo = shouldShowBottomRailChannelLogo(game);
+  const finalWinnerSide = model.kind === "matchup" ? resolveGamesSpineCompactMatchupFinalWinnerSide(game, model.left, model.right) : null;
   return /* @__PURE__ */ (0, import_jsx_runtime223.jsxs)("div", { className: "flex min-h-0 min-w-0 w-full flex-1 flex-col justify-center gap-px px-1.5 py-0.5", children: [
     /* @__PURE__ */ (0, import_jsx_runtime223.jsxs)("div", { className: "flex min-w-0 items-center justify-between gap-1", children: [
       /* @__PURE__ */ (0, import_jsx_runtime223.jsxs)("div", { className: "flex min-w-0 items-center gap-0.5", children: [
@@ -143015,7 +143080,8 @@ function BottomRailGameCardBody({
               row: 1,
               flashScore: flashSpec?.leftScore,
               suppressScoreCell: showTennisSetScores,
-              suppressNameCell: showTennisSetScores
+              suppressNameCell: showTennisSetScores,
+              finalWinnerSide
             }
           ),
           /* @__PURE__ */ (0, import_jsx_runtime223.jsx)(
@@ -143029,7 +143095,8 @@ function BottomRailGameCardBody({
               row: 2,
               flashScore: flashSpec?.rightScore,
               suppressScoreCell: showTennisSetScores,
-              suppressNameCell: showTennisSetScores
+              suppressNameCell: showTennisSetScores,
+              finalWinnerSide
             }
           ),
           showTennisSetScores ? /* @__PURE__ */ (0, import_jsx_runtime223.jsx)(
@@ -143041,7 +143108,8 @@ function BottomRailGameCardBody({
               topName: (model.left.teamName || model.left.abbrev).trim(),
               bottomName: (model.right.teamName || model.right.abbrev).trim(),
               topFlashCells: flashSpec?.leftSetScoreCells,
-              bottomFlashCells: flashSpec?.rightSetScoreCells
+              bottomFlashCells: flashSpec?.rightSetScoreCells,
+              finalWinnerSide
             }
           ) : null,
           /* @__PURE__ */ (0, import_jsx_runtime223.jsx)(
@@ -143321,6 +143389,7 @@ var init_SportsBrowserPrototypeBottomRailGames = __esm({
     init_resolveNewsSportsBrowserChannelPresentation();
     init_resolveNewsSportsBrowserTennisScorePresentation();
     init_resolveGamesSpineGameCardLeagueLabel();
+    init_gamesSpineFinalResultNameEmphasis();
     init_resolveTeamLogoUrl();
     init_resolveGamesSpineMatchupSideOrder();
     init_NewsSportsBrowserChannelLogo();
@@ -145092,7 +145161,8 @@ function SidebarCompetitorMark({
   game,
   side,
   name,
-  row
+  row,
+  winnerBoldClass
 }) {
   const logoUrl = resolveDarkThemeLogoUrl(game, side);
   return /* @__PURE__ */ (0, import_jsx_runtime229.jsxs)(
@@ -145116,7 +145186,7 @@ function SidebarCompetitorMark({
             decoding: "async"
           }
         ) : null }),
-        /* @__PURE__ */ (0, import_jsx_runtime229.jsx)("span", { className: "min-w-0 break-words whitespace-normal normal-case text-[#1a1a1a]", children: name })
+        /* @__PURE__ */ (0, import_jsx_runtime229.jsx)("span", { className: cn2("min-w-0 break-words whitespace-normal normal-case text-[#1a1a1a]", winnerBoldClass), children: name })
       ]
     }
   );
@@ -145124,14 +145194,16 @@ function SidebarCompetitorMark({
 function SidebarGameRowScore({
   score: score2,
   showScore,
-  row
+  row,
+  winnerBoldClass
 }) {
   return /* @__PURE__ */ (0, import_jsx_runtime229.jsx)(
     "span",
     {
       className: cn2(
         SIDEBAR_GAME_ROW_SCORE_CLASS,
-        row === 1 ? "col-start-2 row-start-1" : "col-start-2 row-start-2"
+        row === 1 ? "col-start-2 row-start-1" : "col-start-2 row-start-2",
+        winnerBoldClass
       ),
       children: showScore ? score2 ?? "\u2013" : null
     }
@@ -145229,9 +145301,19 @@ function SidebarTemporalGameRow({
       "minmax(1.75rem,max-content) 1.5rem"
     )
   } : void 0;
+  const finalWinnerSide = variant === "catchUp" ? resolveGamesSpineCompactMatchupFinalWinnerSide(game, firstLine, secondLine) : null;
   if (secondIsTbd) {
     return /* @__PURE__ */ (0, import_jsx_runtime229.jsxs)("div", { className: cn2(rowGridClass, SIDEBAR_GAME_ROW_CLASS), style: rowGridStyle, children: [
-      /* @__PURE__ */ (0, import_jsx_runtime229.jsx)(SidebarCompetitorMark, { game, side: firstLine.side, name: firstName, row: 1 }),
+      /* @__PURE__ */ (0, import_jsx_runtime229.jsx)(
+        SidebarCompetitorMark,
+        {
+          game,
+          side: firstLine.side,
+          name: firstName,
+          row: 1,
+          winnerBoldClass: resolveGamesSpineFinalWinnerBoldClass(firstLine.side, finalWinnerSide)
+        }
+      ),
       showTennisSetScores ? /* @__PURE__ */ (0, import_jsx_runtime229.jsx)(
         NewsSportsBrowserTennisSetScoreCells,
         {
@@ -145239,7 +145321,10 @@ function SidebarTemporalGameRow({
           side: firstLine.side,
           row: 1,
           scoreColStart: 2,
-          cellClassName: SIDEBAR_GAME_ROW_TENNIS_SET_SCORE_CLASS
+          cellClassName: cn2(
+            SIDEBAR_GAME_ROW_TENNIS_SET_SCORE_CLASS,
+            resolveGamesSpineFinalWinnerBoldClass(firstLine.side, finalWinnerSide)
+          )
         }
       ) : /* @__PURE__ */ (0, import_jsx_runtime229.jsx)("span", { className: "col-start-2 row-start-1", "aria-hidden": true }),
       /* @__PURE__ */ (0, import_jsx_runtime229.jsx)(SidebarGameRowStatus, { game, variant, colStart: statusColStart }),
@@ -145247,7 +145332,16 @@ function SidebarTemporalGameRow({
     ] });
   }
   return /* @__PURE__ */ (0, import_jsx_runtime229.jsxs)("div", { className: cn2(rowGridClass, SIDEBAR_GAME_ROW_CLASS), style: rowGridStyle, children: [
-    /* @__PURE__ */ (0, import_jsx_runtime229.jsx)(SidebarCompetitorMark, { game, side: firstLine.side, name: firstName, row: 1 }),
+    /* @__PURE__ */ (0, import_jsx_runtime229.jsx)(
+      SidebarCompetitorMark,
+      {
+        game,
+        side: firstLine.side,
+        name: firstName,
+        row: 1,
+        winnerBoldClass: resolveGamesSpineFinalWinnerBoldClass(firstLine.side, finalWinnerSide)
+      }
+    ),
     showTennisSetScores ? /* @__PURE__ */ (0, import_jsx_runtime229.jsx)(
       NewsSportsBrowserTennisSetScoreCells,
       {
@@ -145255,10 +145349,30 @@ function SidebarTemporalGameRow({
         side: firstLine.side,
         row: 1,
         scoreColStart: 2,
-        cellClassName: SIDEBAR_GAME_ROW_TENNIS_SET_SCORE_CLASS
+        cellClassName: cn2(
+          SIDEBAR_GAME_ROW_TENNIS_SET_SCORE_CLASS,
+          resolveGamesSpineFinalWinnerBoldClass(firstLine.side, finalWinnerSide)
+        )
       }
-    ) : /* @__PURE__ */ (0, import_jsx_runtime229.jsx)(SidebarGameRowScore, { score: firstLine.score, showScore: model.showScores, row: 1 }),
-    /* @__PURE__ */ (0, import_jsx_runtime229.jsx)(SidebarCompetitorMark, { game, side: secondLine.side, name: secondName, row: 2 }),
+    ) : /* @__PURE__ */ (0, import_jsx_runtime229.jsx)(
+      SidebarGameRowScore,
+      {
+        score: firstLine.score,
+        showScore: model.showScores,
+        row: 1,
+        winnerBoldClass: resolveGamesSpineFinalWinnerBoldClass(firstLine.side, finalWinnerSide)
+      }
+    ),
+    /* @__PURE__ */ (0, import_jsx_runtime229.jsx)(
+      SidebarCompetitorMark,
+      {
+        game,
+        side: secondLine.side,
+        name: secondName,
+        row: 2,
+        winnerBoldClass: resolveGamesSpineFinalWinnerBoldClass(secondLine.side, finalWinnerSide)
+      }
+    ),
     showTennisSetScores ? /* @__PURE__ */ (0, import_jsx_runtime229.jsx)(
       NewsSportsBrowserTennisSetScoreCells,
       {
@@ -145266,9 +145380,20 @@ function SidebarTemporalGameRow({
         side: secondLine.side,
         row: 2,
         scoreColStart: 2,
-        cellClassName: SIDEBAR_GAME_ROW_TENNIS_SET_SCORE_CLASS
+        cellClassName: cn2(
+          SIDEBAR_GAME_ROW_TENNIS_SET_SCORE_CLASS,
+          resolveGamesSpineFinalWinnerBoldClass(secondLine.side, finalWinnerSide)
+        )
       }
-    ) : /* @__PURE__ */ (0, import_jsx_runtime229.jsx)(SidebarGameRowScore, { score: secondLine.score, showScore: model.showScores, row: 2 }),
+    ) : /* @__PURE__ */ (0, import_jsx_runtime229.jsx)(
+      SidebarGameRowScore,
+      {
+        score: secondLine.score,
+        showScore: model.showScores,
+        row: 2,
+        winnerBoldClass: resolveGamesSpineFinalWinnerBoldClass(secondLine.side, finalWinnerSide)
+      }
+    ),
     /* @__PURE__ */ (0, import_jsx_runtime229.jsx)(SidebarGameRowStatus, { game, variant, colStart: statusColStart }),
     /* @__PURE__ */ (0, import_jsx_runtime229.jsx)(SidebarGameRowBroadcast, { game, colStart: broadcastColStart })
   ] });
@@ -145674,6 +145799,7 @@ var init_SportsBrowserPrototypeLeftNav = __esm({
     init_BroadcastChannelLogo();
     init_isGameActivelyLive();
     init_isSpineFinalizedGame();
+    init_gamesSpineFinalResultNameEmphasis();
     init_gamesSpineLeagueLogoUrls();
     init_resolveTeamLogoUrl();
     init_useSportsBrowserPrototypeTodayTemporalSlate();
