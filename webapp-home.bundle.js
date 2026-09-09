@@ -55360,6 +55360,191 @@ var init_desktopPrimaryNavigationStore = __esm({
   }
 });
 
+// ../grarf/desktop/src/lib/routing/captureInitialBrowserPathname.ts
+function peekInitialBrowserPathname() {
+  return INITIAL_BROWSER_PATHNAME;
+}
+var INITIAL_BROWSER_PATHNAME;
+var init_captureInitialBrowserPathname = __esm({
+  "../grarf/desktop/src/lib/routing/captureInitialBrowserPathname.ts"() {
+    init_define_import_meta_env();
+    INITIAL_BROWSER_PATHNAME = typeof window !== "undefined" ? window.location.pathname : "/";
+  }
+});
+
+// ../grarf/desktop/src/lib/routing/resolveInitialUrlBootstrapIntent.ts
+function normalizeBootstrapPathname(pathname) {
+  const trimmed = pathname.trim();
+  if (!trimmed || trimmed === "/") return "/";
+  return trimmed.replace(/\/+$/, "") || "/";
+}
+function parseGameEventIdFromPath(pathname) {
+  const match = pathname.match(/^\/game\/([^/]+)$/);
+  if (!match?.[1]) return null;
+  try {
+    return decodeURIComponent(match[1]);
+  } catch {
+    return match[1];
+  }
+}
+function resolveHubIdFromAddressResolution(resolution) {
+  const fromRoute = resolveHomeLeagueWorkspaceHubIdFromRoute(resolution.canonicalUrl);
+  if (fromRoute) return fromRoute;
+  const leagueKey = resolution.resource.leagueKey;
+  if (leagueKey) {
+    const fromLeagueKey = resolveHomeLeagueWorkspaceHubIdFromGrarfLeagueKey(leagueKey);
+    if (fromLeagueKey) return fromLeagueKey;
+  }
+  const slug = resolution.resource.canonicalSlug;
+  if (isHomeLeagueWorkspaceHubId(slug)) return slug;
+  return null;
+}
+function resolveTodaySectionIntent(resolution) {
+  const resourceId = resolution.resource.id;
+  if (resourceId === "today.news.sportscape" || resourceId === "destination.today") {
+    return {
+      kind: "center-pane",
+      mode: "sportscape",
+      canonicalUrl: resourceId === "destination.today" ? "/today" : resolution.canonicalUrl
+    };
+  }
+  if (resourceId === "today.pulse.livetracker") {
+    return {
+      kind: "center-pane",
+      mode: "livetracker",
+      canonicalUrl: resolution.canonicalUrl
+    };
+  }
+  if (resourceId === "today.news.newswire") {
+    return {
+      kind: "center-pane",
+      mode: "newswire",
+      canonicalUrl: resolution.canonicalUrl
+    };
+  }
+  if (resourceId === "today.videos" || resourceId === "today.videos.clips" || resourceId === "today.videos.highlights") {
+    return {
+      kind: "center-pane",
+      mode: "highlightstv",
+      canonicalUrl: resolution.canonicalUrl
+    };
+  }
+  return {
+    kind: "center-pane",
+    mode: "sportscape",
+    canonicalUrl: resolution.canonicalUrl
+  };
+}
+function resolveBrowserIntent(resolution, pathname) {
+  if (pathname === "/browser/headlines" || pathname.endsWith("/browser/headlines")) {
+    return {
+      kind: "center-pane",
+      mode: "browser",
+      browserSubmenuId: "livetrack",
+      canonicalUrl: "/browser"
+    };
+  }
+  const resourceId = resolution.resource.id;
+  if (resourceId === "browser.fantasy") {
+    return {
+      kind: "center-pane",
+      mode: "browser",
+      browserSubmenuId: "fantasy",
+      canonicalUrl: resolution.canonicalUrl
+    };
+  }
+  if (resourceId === "browser.betting") {
+    return {
+      kind: "center-pane",
+      mode: "browser",
+      browserSubmenuId: "betting",
+      canonicalUrl: resolution.canonicalUrl
+    };
+  }
+  return {
+    kind: "center-pane",
+    mode: "browser",
+    canonicalUrl: resolution.canonicalUrl
+  };
+}
+function resolveInitialUrlBootstrapIntent(pathname) {
+  const normalized = normalizeBootstrapPathname(pathname);
+  const gameId = parseGameEventIdFromPath(normalized);
+  if (gameId) {
+    return {
+      intent: { kind: "game", gameId, canonicalUrl: `/game/${gameId}` },
+      canonicalUrl: `/game/${gameId}`
+    };
+  }
+  if (normalized === "/browser/headlines" || normalized.endsWith("/browser/headlines")) {
+    return {
+      intent: {
+        kind: "center-pane",
+        mode: "browser",
+        browserSubmenuId: "livetrack",
+        canonicalUrl: "/browser"
+      },
+      canonicalUrl: "/browser"
+    };
+  }
+  const resolution = grarfAddressService.resolveAddress(normalized);
+  if (!resolution) {
+    return { intent: { kind: "default" }, canonicalUrl: DEFAULT_LANDING_CANONICAL_URL };
+  }
+  const canonicalUrl = resolution.canonicalUrl;
+  if (resolution.resource.kind === "league" || resolution.resource.kind === "competition") {
+    const hubId = resolveHubIdFromAddressResolution(resolution);
+    if (hubId) {
+      return {
+        intent: {
+          kind: "league-hub",
+          hubId,
+          categoryId: resolution.subResource ?? null,
+          canonicalUrl
+        },
+        canonicalUrl
+      };
+    }
+    return { intent: { kind: "default" }, canonicalUrl: DEFAULT_LANDING_CANONICAL_URL };
+  }
+  if (resolution.resource.id === "destination.intel" || resolution.resource.kind === "intel_section") {
+    return {
+      intent: { kind: "intel", canonicalUrl },
+      canonicalUrl
+    };
+  }
+  if (resolution.resource.id === "destination.browser" || resolution.resource.kind === "browser_category") {
+    const intent = resolveBrowserIntent(resolution, normalized);
+    return { intent, canonicalUrl: intent.canonicalUrl };
+  }
+  if (resolution.resource.kind === "today_section" || resolution.resource.id === "destination.today") {
+    const intent = resolveTodaySectionIntent(resolution);
+    return { intent, canonicalUrl: intent.canonicalUrl };
+  }
+  if (resolution.resource.id === "destination.games" || resolution.resource.kind === "games_collection") {
+    return {
+      intent: { kind: "center-pane", mode: "operations", canonicalUrl },
+      canonicalUrl
+    };
+  }
+  if (resolution.canonicalUrl === "/today") {
+    return {
+      intent: { kind: "center-pane", mode: "sportscape", canonicalUrl: "/today" },
+      canonicalUrl: "/today"
+    };
+  }
+  return { intent: { kind: "default" }, canonicalUrl: DEFAULT_LANDING_CANONICAL_URL };
+}
+var DEFAULT_LANDING_CANONICAL_URL;
+var init_resolveInitialUrlBootstrapIntent = __esm({
+  "../grarf/desktop/src/lib/routing/resolveInitialUrlBootstrapIntent.ts"() {
+    init_define_import_meta_env();
+    init_routing();
+    init_homeLeagueWorkspaceHubRegistry();
+    DEFAULT_LANDING_CANONICAL_URL = "/today/news/sportscape";
+  }
+});
+
 // ../grarf/desktop/src/lib/navigation/applyDesktopPrimaryNavigationSelection.ts
 function mapDirectContentToActivityRailTab(tab) {
   switch (tab) {
@@ -55439,6 +55624,12 @@ function bootstrapDesktopPrimaryNavigation(navigate, pathname) {
   const store = useDesktopPrimaryNavigationStore.getState();
   if (store.bootstrapApplied) return;
   store.markBootstrapApplied();
+  const bootstrapIntent = resolveInitialUrlBootstrapIntent(peekInitialBrowserPathname()).intent;
+  const skipNewsBootstrapForDeepLink = bootstrapIntent.kind === "league-hub" || bootstrapIntent.kind === "game" || bootstrapIntent.kind === "intel";
+  if (isGrarfElectronRenderer() && !skipNewsBootstrapForDeepLink) {
+    applyDesktopDirectContentTab("news", navigate, pathname);
+    return;
+  }
   applyDesktopPrimaryNavTab("now", navigate, pathname);
 }
 var init_applyDesktopPrimaryNavigationSelection = __esm({
@@ -55452,6 +55643,9 @@ var init_applyDesktopPrimaryNavigationSelection = __esm({
     init_homeLiveSubmenuStore();
     init_operationalModeStore();
     init_desktopPrimaryNavigationStore();
+    init_isGrarfWebRenderer();
+    init_captureInitialBrowserPathname();
+    init_resolveInitialUrlBootstrapIntent();
   }
 });
 
@@ -140964,18 +141158,6 @@ var init_useSyncBrowserUrlWithActiveWorkspace = __esm({
   }
 });
 
-// ../grarf/desktop/src/lib/routing/captureInitialBrowserPathname.ts
-function peekInitialBrowserPathname() {
-  return INITIAL_BROWSER_PATHNAME;
-}
-var INITIAL_BROWSER_PATHNAME;
-var init_captureInitialBrowserPathname = __esm({
-  "../grarf/desktop/src/lib/routing/captureInitialBrowserPathname.ts"() {
-    init_define_import_meta_env();
-    INITIAL_BROWSER_PATHNAME = typeof window !== "undefined" ? window.location.pathname : "/";
-  }
-});
-
 // ../grarf/desktop/src/lib/routing/waitForGamesSpineGameById.ts
 function isGamesCatalogSettled() {
   const render = useGamesSpineRenderStore.getState();
@@ -141066,15 +141248,15 @@ function resolveCanonicalBrowserUrlForNavigationResult(result) {
     case "intel":
       return intent.canonicalUrl;
     case "default":
-      return result.canonicalUrl ?? DEFAULT_LANDING_CANONICAL_URL;
+      return result.canonicalUrl ?? DEFAULT_LANDING_CANONICAL_URL2;
   }
 }
-var DEFAULT_LANDING_CANONICAL_URL;
+var DEFAULT_LANDING_CANONICAL_URL2;
 var init_navigationCanonicalUrl = __esm({
   "../grarf/desktop/src/lib/routing/navigationCanonicalUrl.ts"() {
     init_define_import_meta_env();
     init_workspaceAddress();
-    DEFAULT_LANDING_CANONICAL_URL = "/today/news/sportscape";
+    DEFAULT_LANDING_CANONICAL_URL2 = "/today/news/sportscape";
   }
 });
 
@@ -141132,7 +141314,7 @@ async function applyUrlNavigationIntent(result, handlers2) {
       const opened = await applyIntelNavigation(handlers2);
       if (!opened) {
         applyDefaultLandingNavigation();
-        return DEFAULT_LANDING_CANONICAL_URL2;
+        return DEFAULT_LANDING_CANONICAL_URL3;
       }
       return intent.canonicalUrl;
     }
@@ -141142,7 +141324,7 @@ async function applyUrlNavigationIntent(result, handlers2) {
     }
   }
 }
-var DEFAULT_LANDING_CANONICAL_URL2;
+var DEFAULT_LANDING_CANONICAL_URL3;
 var init_applyUrlNavigationIntent = __esm({
   "../grarf/desktop/src/lib/routing/applyUrlNavigationIntent.ts"() {
     init_define_import_meta_env();
@@ -141157,179 +141339,6 @@ var init_applyUrlNavigationIntent = __esm({
     init_openF1LeagueWorkspace();
     init_navigateToGameFromUrl();
     init_navigationCanonicalUrl();
-    DEFAULT_LANDING_CANONICAL_URL2 = "/today/news/sportscape";
-  }
-});
-
-// ../grarf/desktop/src/lib/routing/resolveInitialUrlBootstrapIntent.ts
-function normalizeBootstrapPathname(pathname) {
-  const trimmed = pathname.trim();
-  if (!trimmed || trimmed === "/") return "/";
-  return trimmed.replace(/\/+$/, "") || "/";
-}
-function parseGameEventIdFromPath(pathname) {
-  const match = pathname.match(/^\/game\/([^/]+)$/);
-  if (!match?.[1]) return null;
-  try {
-    return decodeURIComponent(match[1]);
-  } catch {
-    return match[1];
-  }
-}
-function resolveHubIdFromAddressResolution(resolution) {
-  const fromRoute = resolveHomeLeagueWorkspaceHubIdFromRoute(resolution.canonicalUrl);
-  if (fromRoute) return fromRoute;
-  const leagueKey = resolution.resource.leagueKey;
-  if (leagueKey) {
-    const fromLeagueKey = resolveHomeLeagueWorkspaceHubIdFromGrarfLeagueKey(leagueKey);
-    if (fromLeagueKey) return fromLeagueKey;
-  }
-  const slug = resolution.resource.canonicalSlug;
-  if (isHomeLeagueWorkspaceHubId(slug)) return slug;
-  return null;
-}
-function resolveTodaySectionIntent(resolution) {
-  const resourceId = resolution.resource.id;
-  if (resourceId === "today.news.sportscape" || resourceId === "destination.today") {
-    return {
-      kind: "center-pane",
-      mode: "sportscape",
-      canonicalUrl: resourceId === "destination.today" ? "/today" : resolution.canonicalUrl
-    };
-  }
-  if (resourceId === "today.pulse.livetracker") {
-    return {
-      kind: "center-pane",
-      mode: "livetracker",
-      canonicalUrl: resolution.canonicalUrl
-    };
-  }
-  if (resourceId === "today.news.newswire") {
-    return {
-      kind: "center-pane",
-      mode: "newswire",
-      canonicalUrl: resolution.canonicalUrl
-    };
-  }
-  if (resourceId === "today.videos" || resourceId === "today.videos.clips" || resourceId === "today.videos.highlights") {
-    return {
-      kind: "center-pane",
-      mode: "highlightstv",
-      canonicalUrl: resolution.canonicalUrl
-    };
-  }
-  return {
-    kind: "center-pane",
-    mode: "sportscape",
-    canonicalUrl: resolution.canonicalUrl
-  };
-}
-function resolveBrowserIntent(resolution, pathname) {
-  if (pathname === "/browser/headlines" || pathname.endsWith("/browser/headlines")) {
-    return {
-      kind: "center-pane",
-      mode: "browser",
-      browserSubmenuId: "livetrack",
-      canonicalUrl: "/browser"
-    };
-  }
-  const resourceId = resolution.resource.id;
-  if (resourceId === "browser.fantasy") {
-    return {
-      kind: "center-pane",
-      mode: "browser",
-      browserSubmenuId: "fantasy",
-      canonicalUrl: resolution.canonicalUrl
-    };
-  }
-  if (resourceId === "browser.betting") {
-    return {
-      kind: "center-pane",
-      mode: "browser",
-      browserSubmenuId: "betting",
-      canonicalUrl: resolution.canonicalUrl
-    };
-  }
-  return {
-    kind: "center-pane",
-    mode: "browser",
-    canonicalUrl: resolution.canonicalUrl
-  };
-}
-function resolveInitialUrlBootstrapIntent(pathname) {
-  const normalized = normalizeBootstrapPathname(pathname);
-  const gameId = parseGameEventIdFromPath(normalized);
-  if (gameId) {
-    return {
-      intent: { kind: "game", gameId, canonicalUrl: `/game/${gameId}` },
-      canonicalUrl: `/game/${gameId}`
-    };
-  }
-  if (normalized === "/browser/headlines" || normalized.endsWith("/browser/headlines")) {
-    return {
-      intent: {
-        kind: "center-pane",
-        mode: "browser",
-        browserSubmenuId: "livetrack",
-        canonicalUrl: "/browser"
-      },
-      canonicalUrl: "/browser"
-    };
-  }
-  const resolution = grarfAddressService.resolveAddress(normalized);
-  if (!resolution) {
-    return { intent: { kind: "default" }, canonicalUrl: DEFAULT_LANDING_CANONICAL_URL3 };
-  }
-  const canonicalUrl = resolution.canonicalUrl;
-  if (resolution.resource.kind === "league" || resolution.resource.kind === "competition") {
-    const hubId = resolveHubIdFromAddressResolution(resolution);
-    if (hubId) {
-      return {
-        intent: {
-          kind: "league-hub",
-          hubId,
-          categoryId: resolution.subResource ?? null,
-          canonicalUrl
-        },
-        canonicalUrl
-      };
-    }
-    return { intent: { kind: "default" }, canonicalUrl: DEFAULT_LANDING_CANONICAL_URL3 };
-  }
-  if (resolution.resource.id === "destination.intel" || resolution.resource.kind === "intel_section") {
-    return {
-      intent: { kind: "intel", canonicalUrl },
-      canonicalUrl
-    };
-  }
-  if (resolution.resource.id === "destination.browser" || resolution.resource.kind === "browser_category") {
-    const intent = resolveBrowserIntent(resolution, normalized);
-    return { intent, canonicalUrl: intent.canonicalUrl };
-  }
-  if (resolution.resource.kind === "today_section" || resolution.resource.id === "destination.today") {
-    const intent = resolveTodaySectionIntent(resolution);
-    return { intent, canonicalUrl: intent.canonicalUrl };
-  }
-  if (resolution.resource.id === "destination.games" || resolution.resource.kind === "games_collection") {
-    return {
-      intent: { kind: "center-pane", mode: "operations", canonicalUrl },
-      canonicalUrl
-    };
-  }
-  if (resolution.canonicalUrl === "/today") {
-    return {
-      intent: { kind: "center-pane", mode: "sportscape", canonicalUrl: "/today" },
-      canonicalUrl: "/today"
-    };
-  }
-  return { intent: { kind: "default" }, canonicalUrl: DEFAULT_LANDING_CANONICAL_URL3 };
-}
-var DEFAULT_LANDING_CANONICAL_URL3;
-var init_resolveInitialUrlBootstrapIntent = __esm({
-  "../grarf/desktop/src/lib/routing/resolveInitialUrlBootstrapIntent.ts"() {
-    init_define_import_meta_env();
-    init_routing();
-    init_homeLeagueWorkspaceHubRegistry();
     DEFAULT_LANDING_CANONICAL_URL3 = "/today/news/sportscape";
   }
 });
@@ -142491,6 +142500,28 @@ function buildTodayCompleteLeagueSlates(nowLeagues, upcomingLeagues, catchUpLeag
     return [{ key: key2, label: entry2.label, games }];
   });
 }
+function SidebarLeagueNavLogoMark({
+  leagueKey,
+  games
+}) {
+  const [failed, setFailed] = (0, import_react257.useState)(false);
+  const logoUrl = resolveGamesSpineLeagueHeaderLogoUrl(leagueKey, games);
+  if (!logoUrl || failed) return null;
+  return /* @__PURE__ */ (0, import_jsx_runtime225.jsx)("span", { className: "inline-flex h-[12px] w-[12px] shrink-0 items-center justify-center", children: /* @__PURE__ */ (0, import_jsx_runtime225.jsx)(
+    "img",
+    {
+      src: logoUrl,
+      alt: "",
+      className: cn2(
+        "h-2.5 w-2.5 shrink-0 object-contain",
+        resolveGamesSpineLeagueLogoImgClassName(leagueKey, logoUrl)
+      ),
+      loading: "lazy",
+      decoding: "async",
+      onError: () => setFailed(true)
+    }
+  ) });
+}
 function NavRow({
   label,
   indent = 1,
@@ -142498,7 +142529,9 @@ function NavRow({
   trailing,
   expanded = false,
   onClick,
-  className
+  className,
+  leagueKey,
+  leagueGames
 }) {
   const indentClass = indent === 0 ? "px-4" : indent === 1 ? "pl-6 pr-4" : indent === 2 ? "pl-10 pr-4" : "pl-14 pr-4";
   return /* @__PURE__ */ (0, import_jsx_runtime225.jsxs)(
@@ -142515,7 +142548,10 @@ function NavRow({
       ),
       "aria-expanded": onClick ? expanded : void 0,
       children: [
-        /* @__PURE__ */ (0, import_jsx_runtime225.jsx)("span", { className: "min-w-0 flex-1 break-words whitespace-normal", children: label }),
+        /* @__PURE__ */ (0, import_jsx_runtime225.jsxs)("span", { className: "flex min-w-0 flex-1 items-start gap-1", children: [
+          leagueKey ? /* @__PURE__ */ (0, import_jsx_runtime225.jsx)(SidebarLeagueNavLogoMark, { leagueKey, games: leagueGames }) : null,
+          /* @__PURE__ */ (0, import_jsx_runtime225.jsx)("span", { className: "min-w-0 flex-1 break-words whitespace-normal", children: label })
+        ] }),
         onClick ? expanded ? /* @__PURE__ */ (0, import_jsx_runtime225.jsx)(ChevronDown, { size: 12, strokeWidth: 2, className: "shrink-0 rotate-180", "aria-hidden": true }) : /* @__PURE__ */ (0, import_jsx_runtime225.jsx)(ChevronRight, { size: 12, strokeWidth: 2, className: "shrink-0 text-[#1a1a1a]", "aria-hidden": true }) : trailing === "expand" ? /* @__PURE__ */ (0, import_jsx_runtime225.jsx)(ChevronDown, { size: 12, strokeWidth: 2, className: "shrink-0 rotate-180", "aria-hidden": true }) : null
       ]
     }
@@ -142675,7 +142711,6 @@ function SidebarTemporalGamesBox({ children }) {
 }
 function SidebarF1CatchUpMockLeagueBlock({ onOpenUrl }) {
   const [open, setOpen] = (0, import_react257.useState)(false);
-  const logoUrl = resolveGamesSpineLeagueLogoUrl("F1");
   return /* @__PURE__ */ (0, import_jsx_runtime225.jsxs)(import_jsx_runtime225.Fragment, { children: [
     /* @__PURE__ */ (0, import_jsx_runtime225.jsxs)(
       "button",
@@ -142689,19 +142724,7 @@ function SidebarF1CatchUpMockLeagueBlock({ onOpenUrl }) {
         "aria-expanded": open,
         children: [
           /* @__PURE__ */ (0, import_jsx_runtime225.jsxs)("span", { className: "flex min-w-0 flex-1 items-start gap-1", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime225.jsx)("span", { className: "inline-flex h-[12px] w-[12px] shrink-0 items-center justify-center", children: logoUrl ? /* @__PURE__ */ (0, import_jsx_runtime225.jsx)(
-              "img",
-              {
-                src: logoUrl,
-                alt: "",
-                className: cn2(
-                  "h-2.5 w-2.5 shrink-0 object-contain",
-                  resolveGamesSpineLeagueLogoImgClassName("F1", logoUrl)
-                ),
-                loading: "lazy",
-                decoding: "async"
-              }
-            ) : null }),
+            /* @__PURE__ */ (0, import_jsx_runtime225.jsx)(SidebarLeagueNavLogoMark, { leagueKey: "F1" }),
             /* @__PURE__ */ (0, import_jsx_runtime225.jsx)("span", { className: "min-w-0 flex-1 break-words whitespace-normal", children: "Formula 1" })
           ] }),
           open ? /* @__PURE__ */ (0, import_jsx_runtime225.jsx)(ChevronDown, { size: 12, strokeWidth: 2, className: "shrink-0 rotate-180", "aria-hidden": true }) : /* @__PURE__ */ (0, import_jsx_runtime225.jsx)(ChevronRight, { size: 12, strokeWidth: 2, className: "shrink-0 text-[#1a1a1a]", "aria-hidden": true })
@@ -142738,6 +142761,8 @@ function SidebarTemporalLeagueBlock({
         label: slate.label,
         indent: 0,
         expanded: open,
+        leagueKey: slate.key,
+        leagueGames: slate.games,
         onClick: () => {
           if (!open) {
             onLeagueSelect?.(slate.key);
@@ -143153,11 +143178,18 @@ var init_SportsBrowserPrototypeTerminalFeed = __esm({
 });
 
 // ../grarf/desktop/src/data/sportsBrowserPrototypeLeagueWebsites.ts
+function getSportsBrowserPrototypeGlobalWebsites() {
+  return SPORTS_BROWSER_PROTOTYPE_GLOBAL_WEBSITES;
+}
+function createDefaultSportsBrowserPrototypePaneState() {
+  const websites = getSportsBrowserPrototypeGlobalWebsites();
+  return { url: websites[0]?.url ?? null, activeTabIndex: 0 };
+}
 function getSportsBrowserPrototypeLeagueWebsites(leagueKey) {
   const websites = SPORTS_BROWSER_PROTOTYPE_LEAGUE_WEBSITES[leagueKey];
   return websites && websites.length > 0 ? websites : null;
 }
-var SPORTS_BROWSER_PROTOTYPE_LEAGUE_WEBSITES;
+var SPORTS_BROWSER_PROTOTYPE_LEAGUE_WEBSITES, SPORTS_BROWSER_PROTOTYPE_GLOBAL_WEBSITES;
 var init_sportsBrowserPrototypeLeagueWebsites = __esm({
   "../grarf/desktop/src/data/sportsBrowserPrototypeLeagueWebsites.ts"() {
     init_define_import_meta_env();
@@ -143327,6 +143359,18 @@ var init_sportsBrowserPrototypeLeagueWebsites = __esm({
         }
       ]
     };
+    SPORTS_BROWSER_PROTOTYPE_GLOBAL_WEBSITES = [
+      { label: "ESPN", url: "https://www.espn.com/" },
+      { label: "Yahoo!", url: "https://sports.yahoo.com/" },
+      { label: "The Athletic", url: "https://theathletic.com/" },
+      { label: "CBS Sports", url: "https://www.cbssports.com/" },
+      { label: "FOX Sports", url: "https://www.foxsports.com/" },
+      { label: "NBC Sports", url: "https://www.nbcsports.com/" },
+      { label: "Yardbarker", url: "https://www.yardbarker.com/" },
+      { label: "The Score", url: "https://www.thescore.com/" },
+      { label: "Bleacher Report", url: "https://bleacherreport.com/" },
+      { label: "USA Today Sports", url: "https://sports.usatoday.com/" }
+    ];
   }
 });
 
@@ -143349,7 +143393,7 @@ function HomePage() {
   const [socialRailTvPanelHeightPx, setSocialRailTvPanelHeightPx] = (0, import_react259.useState)(null);
   const [lastClickedGameId, setLastClickedGameId] = (0, import_react259.useState)(null);
   const [gameDeepLinkNotFoundId, setGameDeepLinkNotFoundId] = (0, import_react259.useState)(null);
-  const [sportsBrowserPaneStates, setSportsBrowserPaneStates] = (0, import_react259.useState)([{ url: null, activeTabIndex: 0 }]);
+  const [sportsBrowserPaneStates, setSportsBrowserPaneStates] = (0, import_react259.useState)(() => [createDefaultSportsBrowserPrototypePaneState()]);
   const [sportsBrowserActivePaneIndex, setSportsBrowserActivePaneIndex] = (0, import_react259.useState)(0);
   const [sportsBrowserLeagueWebsiteState, setSportsBrowserLeagueWebsiteState] = (0, import_react259.useState)(null);
   const [sportsBrowserTerminalFeedOpen, setSportsBrowserTerminalFeedOpen] = (0, import_react259.useState)(true);
@@ -143848,6 +143892,14 @@ function HomePage() {
       const websites = getSportsBrowserPrototypeLeagueWebsites(leagueKey);
       if (!websites || websites.length === 0) {
         setSportsBrowserLeagueWebsiteState(null);
+        const globalWebsites = getSportsBrowserPrototypeGlobalWebsites();
+        const url2 = globalWebsites[0]?.url ?? null;
+        setSportsBrowserPaneStates((states) => {
+          const next = states.slice();
+          const paneIndex = Math.min(sportsBrowserActivePaneIndex, next.length - 1);
+          next[paneIndex] = { url: url2, activeTabIndex: 0 };
+          return next;
+        });
         return;
       }
       setSportsBrowserLeagueWebsiteState({
@@ -143863,12 +143915,9 @@ function HomePage() {
     },
     [sportsBrowserActivePaneIndex]
   );
-  const onSportsBrowserLeagueWebsiteTabSelect = (0, import_react259.useCallback)(
+  const onSportsBrowserWebsiteTabSelect = (0, import_react259.useCallback)(
     (index) => {
-      if (!sportsBrowserLeagueWebsiteState) return;
-      const websites = getSportsBrowserPrototypeLeagueWebsites(
-        sportsBrowserLeagueWebsiteState.leagueKey
-      );
+      const websites = sportsBrowserLeagueWebsiteState ? getSportsBrowserPrototypeLeagueWebsites(sportsBrowserLeagueWebsiteState.leagueKey) : getSportsBrowserPrototypeGlobalWebsites();
       const url = websites?.[index]?.url ?? null;
       setSportsBrowserPaneStates((states) => {
         const next = states.slice();
@@ -143918,9 +143967,11 @@ function HomePage() {
   }, [sportsBrowserSplitPaneCount]);
   const sportsBrowserActivePaneWebsiteTabIndex = sportsBrowserPaneStates[sportsBrowserActivePaneIndex]?.activeTabIndex ?? 0;
   const sportsBrowserActivePaneUrl = sportsBrowserPaneStates[sportsBrowserActivePaneIndex]?.url ?? null;
-  const sportsBrowserLeagueWebsites = (0, import_react259.useMemo)(() => {
-    if (!sportsBrowserLeagueWebsiteState) return null;
-    return getSportsBrowserPrototypeLeagueWebsites(sportsBrowserLeagueWebsiteState.leagueKey);
+  const sportsBrowserWebsiteTabs = (0, import_react259.useMemo)(() => {
+    if (sportsBrowserLeagueWebsiteState) {
+      return getSportsBrowserPrototypeLeagueWebsites(sportsBrowserLeagueWebsiteState.leagueKey);
+    }
+    return getSportsBrowserPrototypeGlobalWebsites();
   }, [sportsBrowserLeagueWebsiteState]);
   const browserSubmenus = showBrowserSubmenus ? /* @__PURE__ */ (0, import_jsx_runtime227.jsxs)(import_jsx_runtime227.Fragment, { children: [
     /* @__PURE__ */ (0, import_jsx_runtime227.jsx)(HomeLiveSubmenu, {}),
@@ -144171,12 +144222,12 @@ function HomePage() {
             onAddSplitPane: onSportsBrowserAddSplitPane,
             onRemoveSplitPane: onSportsBrowserRemoveSplitPane,
             onActivePaneIndexChange: setSportsBrowserActivePaneIndex,
-            websiteTabs: sportsBrowserLeagueWebsites && sportsBrowserLeagueWebsiteState ? /* @__PURE__ */ (0, import_jsx_runtime227.jsx)(
+            websiteTabs: sportsBrowserWebsiteTabs && sportsBrowserWebsiteTabs.length > 0 ? /* @__PURE__ */ (0, import_jsx_runtime227.jsx)(
               SportsBrowserPrototypeLeagueWebsiteTabs,
               {
-                websites: sportsBrowserLeagueWebsites,
+                websites: sportsBrowserWebsiteTabs,
                 activeIndex: sportsBrowserActivePaneWebsiteTabIndex,
-                onSelectTab: onSportsBrowserLeagueWebsiteTabSelect
+                onSelectTab: onSportsBrowserWebsiteTabSelect
               }
             ) : null
           }
