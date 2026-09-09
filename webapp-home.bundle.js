@@ -142291,6 +142291,9 @@ function createEmptySportsBrowserPrototypePaneState() {
   return { url: null, activeTabIndex: 0, leagueKey: null };
 }
 function getSportsBrowserPrototypeWebsitesForPane(pane) {
+  if (pane.showWebsiteTabs === false) {
+    return [];
+  }
   if (!pane.url && !pane.leagueKey) {
     return [];
   }
@@ -142312,6 +142315,19 @@ function applySportsBrowserPrototypeUrlToPane(pane, url) {
     return { ...pane, url: websites[tabIndex].url, activeTabIndex: tabIndex };
   }
   return { ...pane, url: trimmed };
+}
+function applySportsBrowserPrototypeTerminalUrlToPane(pane, url) {
+  const trimmed = url.trim();
+  if (!trimmed) {
+    return { ...pane, url: null, leagueKey: null, gameId: null, showWebsiteTabs: false };
+  }
+  return {
+    url: trimmed,
+    activeTabIndex: 0,
+    leagueKey: null,
+    gameId: null,
+    showWebsiteTabs: false
+  };
 }
 var SPORTS_BROWSER_PROTOTYPE_LEAGUE_WEBSITES, SPORTS_BROWSER_PROTOTYPE_GLOBAL_WEBSITES;
 var init_sportsBrowserPrototypeLeagueWebsites = __esm({
@@ -145218,6 +145234,15 @@ function HomePage() {
       return { ...tab, paneStates: next };
     });
   }, [updateActiveSportsBrowserTab]);
+  const onSportsBrowserOpenTerminalPost = (0, import_react259.useCallback)((url) => {
+    updateActiveSportsBrowserTab((tab) => {
+      const next = tab.paneStates.slice();
+      const paneIndex = Math.min(sportsBrowserActivePaneIndexRef.current, next.length - 1);
+      const current = next[paneIndex] ?? createDefaultSportsBrowserPrototypePaneState();
+      next[paneIndex] = applySportsBrowserPrototypeTerminalUrlToPane(current, url);
+      return { ...tab, paneStates: next };
+    });
+  }, [updateActiveSportsBrowserTab]);
   const onSportsBrowserAddSplitPane = (0, import_react259.useCallback)(() => {
     updateActiveSportsBrowserTab((tab) => ({
       ...tab,
@@ -145513,7 +145538,7 @@ function HomePage() {
           SportsBrowserPrototypeTerminalFeed,
           {
             activeUrl: sportsBrowserActivePaneUrl,
-            onOpenPost: onSportsBrowserOpenUrl,
+            onOpenPost: onSportsBrowserOpenTerminalPost,
             className: cn2(!sportsBrowserTerminalFeedOpen && "hidden")
           }
         )
