@@ -90136,6 +90136,10 @@ function homeSourceFocusArticlePartition(url) {
     return "persist:grarf-home-focus-article-generic";
   }
 }
+function sportsBrowserPrototypePanePartition(paneId) {
+  const safeId = paneId.trim().replace(/[^a-z0-9-]/gi, "-") || "primary";
+  return `persist:grarf-sports-browser-${safeId}`;
+}
 var init_homeSourceWebPartition = __esm({
   "../grarf/desktop/src/lib/home/homeSourceWebPartition.ts"() {
     init_define_import_meta_env();
@@ -142725,8 +142729,8 @@ function SportsBrowserPrototypeBrowserPane({
 }) {
   const activeUrl = url?.trim() ?? "";
   const partition = (0, import_react255.useMemo)(
-    () => activeUrl ? homeSourceWebPartition(activeUrl) : "",
-    [activeUrl]
+    () => sportsBrowserPrototypePanePartition(paneId ?? "primary"),
+    [paneId]
   );
   const usesImperativeSourceWebview = Boolean(articleFocusSessionKey);
   const selectedArticleUrl = useHomeSourceFocusStore((state3) => {
@@ -142991,7 +142995,7 @@ function SportsBrowserPrototypeBrowserPane({
                       allowpopups: "true",
                       className: cn2(PANE_EMBED_ABSOLUTE_FILL, "border-0 bg-white")
                     },
-                    `${paneId ?? "primary"}-${partition}`
+                    paneId ?? "primary"
                   )
                 }
               ),
@@ -143128,7 +143132,7 @@ function SportsBrowserPrototypeBrowserWorkspace({
   }, [goBack, goForward, onBrowserNavigationReady]);
   (0, import_react256.useEffect)(() => {
     onBrowserNavStateChange?.({ canGoBack: false, canGoForward: false });
-  }, [safeActivePaneIndex, paneStates[safeActivePaneIndex]?.url, onBrowserNavStateChange]);
+  }, [safeActivePaneIndex, onBrowserNavStateChange]);
   const activatePane = (0, import_react256.useCallback)(
     (index) => {
       onActivePaneIndexChange?.(index);
@@ -145265,9 +145269,15 @@ function HomePage() {
     (input) => {
       const url = resolveOmniboxNavigationUrl(input);
       if (!url) return;
-      onSportsBrowserOpenUrl(url);
+      updateActiveSportsBrowserTab((tab) => {
+        const next = tab.paneStates.slice();
+        const paneIndex = Math.min(sportsBrowserActivePaneIndexRef.current, next.length - 1);
+        const current = next[paneIndex] ?? createDefaultSportsBrowserPrototypePaneState();
+        next[paneIndex] = applySportsBrowserPrototypeTerminalUrlToPane(current, url);
+        return { ...tab, paneStates: next };
+      });
     },
-    [onSportsBrowserOpenUrl]
+    [updateActiveSportsBrowserTab]
   );
   const onSportsBrowserAddSplitPane = (0, import_react260.useCallback)(() => {
     updateActiveSportsBrowserTab((tab) => ({
