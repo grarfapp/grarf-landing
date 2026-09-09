@@ -114098,7 +114098,7 @@ var init_homeSourceFocusSourceSession = __esm({
     dedicatedFocusWebviews = /* @__PURE__ */ new Set();
     articleListenerCleanups = /* @__PURE__ */ new Map();
     WEBVIEW_PREFS = "contextIsolation=yes,nodeIntegration=no,javascript=yes";
-    WEBVIEW_CLASS = "absolute inset-0 h-full w-full border-0 bg-white";
+    WEBVIEW_CLASS = "absolute inset-0 h-full w-full border-0 bg-black";
   }
 });
 
@@ -141985,11 +141985,12 @@ var init_SportsBrowserPrototypeBottomRailGames = __esm({
 });
 
 // ../grarf/desktop/src/lib/home/newsBrowserFocusSession.ts
-var NEWS_BROWSER_FOCUS_SESSION_KEY;
+var NEWS_BROWSER_FOCUS_SESSION_KEY, NEWS_BROWSER_3565_ENABLED;
 var init_newsBrowserFocusSession = __esm({
   "../grarf/desktop/src/lib/home/newsBrowserFocusSession.ts"() {
     init_define_import_meta_env();
     NEWS_BROWSER_FOCUS_SESSION_KEY = "news-main";
+    NEWS_BROWSER_3565_ENABLED = false;
   }
 });
 
@@ -142083,7 +142084,8 @@ function SportsBrowserPrototypeBrowserPane({
     if (!sourceUrl) return articleUrl;
     return homeSourceWebviewMatchesTarget(activeUrl, sourceUrl) ? articleUrl : null;
   });
-  const split = Boolean(articleFocusSessionKey && selectedArticleUrl);
+  const splitBrowsingEnabled = Boolean(articleFocusSessionKey);
+  const split = Boolean(splitBrowsingEnabled && selectedArticleUrl);
   const embedHostRef = (0, import_react254.useRef)(null);
   const webviewRef = (0, import_react254.useRef)(null);
   const onDestinationRoute = (0, import_react254.useCallback)(
@@ -142267,18 +142269,23 @@ function SportsBrowserPrototypeBrowserPane({
           className: cn2(
             PANE_CONTENT_CONTAIN,
             "h-full min-h-0 w-full",
-            split ? "grid grid-cols-[35%_65%]" : ""
+            splitBrowsingEnabled && "grid grid-cols-[35%_65%]"
           ),
           children: [
             /* @__PURE__ */ (0, import_jsx_runtime223.jsx)(
               "div",
               {
                 className: cn2(
-                  PANE_EMBED_HOST,
-                  "relative h-full min-h-0 w-full bg-black",
-                  split && "border-r border-[#c8c4bc]/70"
+                  "relative h-full min-h-0 min-w-0 max-h-full max-w-full overflow-hidden bg-black [contain:layout_paint]",
+                  splitBrowsingEnabled && (split ? "col-span-1 border-r border-[#c8c4bc]/70" : "col-span-2")
                 ),
-                children: usesImperativeSourceWebview ? /* @__PURE__ */ (0, import_jsx_runtime223.jsx)("div", { ref: embedHostRef, className: cn2(PANE_EMBED_HOST, "h-full w-full") }) : /* @__PURE__ */ (0, import_jsx_runtime223.jsx)(
+                children: usesImperativeSourceWebview ? /* @__PURE__ */ (0, import_jsx_runtime223.jsx)(
+                  "div",
+                  {
+                    ref: embedHostRef,
+                    className: "relative h-full w-full min-h-0 min-w-0 max-h-full max-w-full overflow-hidden bg-black [contain:layout_paint]"
+                  }
+                ) : /* @__PURE__ */ (0, import_jsx_runtime223.jsx)(
                   "webview",
                   {
                     ref: setDeclarativeWebviewRef,
@@ -142292,7 +142299,7 @@ function SportsBrowserPrototypeBrowserPane({
                 )
               }
             ),
-            split && selectedArticleUrl ? /* @__PURE__ */ (0, import_jsx_runtime223.jsxs)("div", { className: "flex min-h-0 min-w-0 flex-col bg-black", children: [
+            split && selectedArticleUrl ? /* @__PURE__ */ (0, import_jsx_runtime223.jsxs)("div", { className: "col-start-2 col-span-1 flex min-h-0 min-w-0 flex-col bg-black", children: [
               /* @__PURE__ */ (0, import_jsx_runtime223.jsx)("div", { className: "flex h-7 shrink-0 items-center justify-end border-b border-[#c8c4bc]/70 bg-[#050808] px-2", children: /* @__PURE__ */ (0, import_jsx_runtime223.jsx)(
                 "button",
                 {
@@ -142454,7 +142461,7 @@ function SportsBrowserPrototypeBrowserWorkspace({
                 url: paneUrls[index] ?? null,
                 isActive: activePaneIndex === index,
                 showActiveTreatment: splitPaneMode,
-                articleFocusSessionKey: index === 0 ? NEWS_BROWSER_FOCUS_SESSION_KEY : null,
+                articleFocusSessionKey: index === 0 && NEWS_BROWSER_3565_ENABLED ? NEWS_BROWSER_FOCUS_SESSION_KEY : null,
                 onActivate: () => activatePane(index),
                 onNavStateChange: activePaneIndex === index ? onNavStateChange : void 0,
                 registerActiveWebview: activePaneIndex === index ? registerActiveWebview : void 0,
