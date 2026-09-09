@@ -57393,8 +57393,31 @@ var init_adminFeaturedPriorityStore = __esm({
   }
 });
 
-// ../grarf/desktop/src/hooks/useHomeBestGameRightNowResult.ts
-function useHomeBestGameRightNowResult() {
+// ../grarf/desktop/src/hooks/useTopRailRankedGames.ts
+function refreshTopRailSlateGame(game, now, adjunctNow) {
+  return refreshManualTourDeFranceSpineGameIfNeeded(
+    refreshManualLeMans2026SpineGameIfNeeded(
+      refreshManualGamesSpineGameIfNeeded(game, now),
+      adjunctNow
+    ),
+    adjunctNow
+  );
+}
+function removeGameFromEnrichedSlate(enrichedLeagues, enrichedManualGames, gameId) {
+  const nextLeagues = {};
+  for (const [key2, rows] of Object.entries(enrichedLeagues)) {
+    if (!Array.isArray(rows)) continue;
+    const filtered = rows.filter((game) => game.id !== gameId);
+    if (filtered.length > 0) {
+      nextLeagues[key2] = filtered;
+    }
+  }
+  return {
+    enrichedLeagues: nextLeagues,
+    enrichedManualGames: enrichedManualGames.filter((game) => game.id !== gameId)
+  };
+}
+function useTopRailRankedGames(importantGameCount) {
   const leagues = useLiveGamesStore((s2) => s2.leagues);
   const manualDocument = useGamesSpineManualStore((s2) => s2.document);
   const manualLeMansRefreshMs = useManualLeMans2026LiveRefreshMs();
@@ -57403,36 +57426,45 @@ function useHomeBestGameRightNowResult() {
   const adminFeaturedPriorities = useAdminFeaturedPriorityStore((s2) => s2.priorities);
   const operationsFieldsByGameId = useAdminOperationsCardStore((s2) => s2.fieldsByGameId);
   return (0, import_react29.useMemo)(() => {
-    if (!isGrarfWebRenderer2()) return null;
     const mergedLeagues = omitHiddenGamesSpineLeagueGames(mergeOperationalLeagueGames(leagues));
     const now = new Date(manualGamesSpineRefreshMs);
+    const adjunctNow = new Date(Math.max(manualLeMansRefreshMs, manualTourDeFranceRefreshMs));
     const refreshedLeagues = refreshManualGamesSpineGamesInLeagues(mergedLeagues, now);
     const manualGames = flattenManualGamesSpineGames(
       convertManualGamesSpineDocument(manualDocument, now)
-    ).map((game2) => refreshManualGamesSpineGameIfNeeded(game2, now));
-    const enrichedLeagues = applyOperationalEnrichmentToLeagues(
+    ).map((game) => refreshManualGamesSpineGameIfNeeded(game, now));
+    let enrichedLeagues = applyOperationalEnrichmentToLeagues(
       refreshedLeagues,
       operationsFieldsByGameId
     );
-    const enrichedManualGames = applyOperationalEnrichmentToGames(
+    let enrichedManualGames = applyOperationalEnrichmentToGames(
       manualGames,
       operationsFieldsByGameId
     );
-    const result = resolveBestGameRightNowV1(enrichedLeagues, enrichedManualGames, {
-      adminFeaturedPriorities
-    });
-    if (!result) return null;
-    if (result.game.league && isGamesSpineLeagueTemporarilyHidden(result.game.league)) return null;
-    const adjunctNow = new Date(Math.max(manualLeMansRefreshMs, manualTourDeFranceRefreshMs));
-    const game = refreshManualTourDeFranceSpineGameIfNeeded(
-      refreshManualLeMans2026SpineGameIfNeeded(
-        refreshManualGamesSpineGameIfNeeded(result.game, now),
-        adjunctNow
-      ),
-      adjunctNow
-    );
-    if (game === result.game) return result;
-    return { ...result, game };
+    const rankedResults = [];
+    const totalRankedGames = 1 + importantGameCount;
+    for (let index = 0; index < totalRankedGames; index += 1) {
+      const result = resolveBestGameRightNowV1(enrichedLeagues, enrichedManualGames, {
+        adminFeaturedPriorities
+      });
+      if (!result) break;
+      const game = refreshTopRailSlateGame(result.game, now, adjunctNow);
+      if (index === 0 && game.league && isGamesSpineLeagueTemporarilyHidden(game.league)) {
+        break;
+      }
+      rankedResults.push(game === result.game ? result : { ...result, game });
+      const nextSlate = removeGameFromEnrichedSlate(
+        enrichedLeagues,
+        enrichedManualGames,
+        game.id
+      );
+      enrichedLeagues = nextSlate.enrichedLeagues;
+      enrichedManualGames = nextSlate.enrichedManualGames;
+    }
+    return {
+      bestGameResult: rankedResults[0] ?? null,
+      importantGames: rankedResults.slice(1).map((result) => result.game)
+    };
   }, [
     leagues,
     manualDocument,
@@ -57440,12 +57472,13 @@ function useHomeBestGameRightNowResult() {
     manualTourDeFranceRefreshMs,
     manualGamesSpineRefreshMs,
     adminFeaturedPriorities,
-    operationsFieldsByGameId
+    operationsFieldsByGameId,
+    importantGameCount
   ]);
 }
 var import_react29;
-var init_useHomeBestGameRightNowResult = __esm({
-  "../grarf/desktop/src/hooks/useHomeBestGameRightNowResult.ts"() {
+var init_useTopRailRankedGames = __esm({
+  "../grarf/desktop/src/hooks/useTopRailRankedGames.ts"() {
     init_define_import_meta_env();
     import_react29 = __toESM(require_react(), 1);
     init_manualLeMans2026SpineEntry();
@@ -57457,7 +57490,6 @@ var init_useHomeBestGameRightNowResult = __esm({
     init_operationalManualLeagueGames();
     init_gamesSpineTemporarilyHiddenLeagues();
     init_resolveBestGameRightNowV1();
-    init_isGrarfWebRenderer();
     init_adminFeaturedPriorityStore();
     init_adminOperationsCardStore();
     init_liveGamesStore();
@@ -61775,28 +61807,6 @@ function TopRailGameUpdateSlot({
     }
   );
 }
-function useImportantGames(count, excludeGameId) {
-  const leagues = useLiveGamesStore((s2) => s2.leagues);
-  return (0, import_react32.useMemo)(() => {
-    const { mergedLeagues, liveGames: canonicalLiveGames } = resolveCanonicalNowOperationalSnapshot(leagues);
-    const liveGames = canonicalLiveGames.filter((g2) => g2.id !== excludeGameId).slice(0, count);
-    if (liveGames.length >= count) return liveGames;
-    const leagueOrder = withoutGamesSpineHiddenLeagues(
-      resolveGamesSpineOperationalLeagueOrder(mergedLeagues)
-    );
-    const allGames2 = [];
-    for (const key2 of leagueOrder) {
-      const leagueGames = filterGamesSpineSlateForOperationalSportsDay(
-        mergedLeagues[key2] ?? []
-      );
-      allGames2.push(...leagueGames);
-    }
-    const scheduledGames = allGames2.filter(
-      (g2) => g2.status === "scheduled" && g2.id !== excludeGameId && !isOperationalScheduledGameOverdue(g2) && !liveGames.some((lg) => lg.id === g2.id)
-    ).sort((a2, b2) => (a2.startTimeMs ?? Infinity) - (b2.startTimeMs ?? Infinity)).slice(0, count - liveGames.length);
-    return [...liveGames, ...scheduledGames];
-  }, [leagues, count, excludeGameId]);
-}
 function TopRailExpandCollapseControl({ isExpanded, onToggle }) {
   const Icon2 = isExpanded ? ChevronUp : ChevronDown;
   const label = isExpanded ? "Minimize Top Rail" : "Expand Top Rail";
@@ -61831,12 +61841,10 @@ function TopRailGameStrip({
   const isExpanded = isExpandedProp ?? internalExpanded;
   const nowPresentationMode = useCenterPaneNowPresentationModeStore((s2) => s2.mode);
   const wasTimelineRef = (0, import_react32.useRef)(false);
-  const bestGameResult = useHomeBestGameRightNowResult();
+  const { bestGameResult, importantGames } = useTopRailRankedGames(4);
   const activeAlert = useGamesSpineTransientAlertStore((s2) => s2.active);
   const completeActive = useGamesSpineTransientAlertStore((s2) => s2.completeActive);
   const bestGame = bestGameResult?.game ?? null;
-  const bestGameId = bestGame?.id ?? null;
-  const importantGames = useImportantGames(4, bestGameId);
   const leagues = useLiveGamesStore((s2) => s2.leagues);
   const navigate = useNavigate();
   const onOpen = (0, import_react32.useCallback)((gameId) => {
@@ -62028,18 +62036,13 @@ var init_TopRailGameStrip = __esm({
     init_lucide_react();
     init_cn();
     init_desktopTopRailLayout();
-    init_useHomeBestGameRightNowResult();
+    init_useTopRailRankedGames();
     init_useCanonicalGamesSpineGame();
     init_gamesSpineTransientAlertStore();
     init_findLiveGame();
     init_liveGamesStore();
-    init_gamesSpineOperationalDate();
     init_isGameActivelyLive();
-    init_operationalGameFreshness();
     init_operationalManualLeagueGames();
-    init_resolveCanonicalNowOperationalGames();
-    init_resolveGamesSpineOperationalLeagueOrder();
-    init_gamesSpineTemporarilyHiddenLeagues();
     init_gamesSpineTransientAlertPlaceholderGames();
     init_gamesSpineTransientAlertScheduler();
     init_gamesSpineTransientAlertPresentation();
@@ -101097,6 +101100,78 @@ var init_useGamesSpineCollapse = __esm({
   }
 });
 
+// ../grarf/desktop/src/hooks/useHomeBestGameRightNowResult.ts
+function useHomeBestGameRightNowResult() {
+  const leagues = useLiveGamesStore((s2) => s2.leagues);
+  const manualDocument = useGamesSpineManualStore((s2) => s2.document);
+  const manualLeMansRefreshMs = useManualLeMans2026LiveRefreshMs();
+  const manualTourDeFranceRefreshMs = useManualTourDeFranceLiveRefreshMs();
+  const manualGamesSpineRefreshMs = useManualGamesSpineLiveRefreshMs();
+  const adminFeaturedPriorities = useAdminFeaturedPriorityStore((s2) => s2.priorities);
+  const operationsFieldsByGameId = useAdminOperationsCardStore((s2) => s2.fieldsByGameId);
+  return (0, import_react135.useMemo)(() => {
+    if (!isGrarfWebRenderer2()) return null;
+    const mergedLeagues = omitHiddenGamesSpineLeagueGames(mergeOperationalLeagueGames(leagues));
+    const now = new Date(manualGamesSpineRefreshMs);
+    const refreshedLeagues = refreshManualGamesSpineGamesInLeagues(mergedLeagues, now);
+    const manualGames = flattenManualGamesSpineGames(
+      convertManualGamesSpineDocument(manualDocument, now)
+    ).map((game2) => refreshManualGamesSpineGameIfNeeded(game2, now));
+    const enrichedLeagues = applyOperationalEnrichmentToLeagues(
+      refreshedLeagues,
+      operationsFieldsByGameId
+    );
+    const enrichedManualGames = applyOperationalEnrichmentToGames(
+      manualGames,
+      operationsFieldsByGameId
+    );
+    const result = resolveBestGameRightNowV1(enrichedLeagues, enrichedManualGames, {
+      adminFeaturedPriorities
+    });
+    if (!result) return null;
+    if (result.game.league && isGamesSpineLeagueTemporarilyHidden(result.game.league)) return null;
+    const adjunctNow = new Date(Math.max(manualLeMansRefreshMs, manualTourDeFranceRefreshMs));
+    const game = refreshManualTourDeFranceSpineGameIfNeeded(
+      refreshManualLeMans2026SpineGameIfNeeded(
+        refreshManualGamesSpineGameIfNeeded(result.game, now),
+        adjunctNow
+      ),
+      adjunctNow
+    );
+    if (game === result.game) return result;
+    return { ...result, game };
+  }, [
+    leagues,
+    manualDocument,
+    manualLeMansRefreshMs,
+    manualTourDeFranceRefreshMs,
+    manualGamesSpineRefreshMs,
+    adminFeaturedPriorities,
+    operationsFieldsByGameId
+  ]);
+}
+var import_react135;
+var init_useHomeBestGameRightNowResult = __esm({
+  "../grarf/desktop/src/hooks/useHomeBestGameRightNowResult.ts"() {
+    init_define_import_meta_env();
+    import_react135 = __toESM(require_react(), 1);
+    init_manualLeMans2026SpineEntry();
+    init_manualTourDeFranceSpineEntry();
+    init_convertManualGamesSpineDocument();
+    init_manualGamesSpineUtils();
+    init_useManualGamesSpineLiveRefreshMs();
+    init_applyOperationalEnrichmentToLeagues();
+    init_operationalManualLeagueGames();
+    init_gamesSpineTemporarilyHiddenLeagues();
+    init_resolveBestGameRightNowV1();
+    init_isGrarfWebRenderer();
+    init_adminFeaturedPriorityStore();
+    init_adminOperationsCardStore();
+    init_liveGamesStore();
+    init_gamesSpineManualStore();
+  }
+});
+
 // ../grarf/desktop/src/lib/gamesSpine/resolveFirstDisplayedFeaturedSpineGame.ts
 function resolveFeaturedSpineVisibleGames(input) {
   const supplementalFinals = input.statusFilter === "final" && isSelectedDateOperationalSportsDay(input.selectedDate) ? mergeCatchUpSupplementalFinals(
@@ -101189,16 +101264,16 @@ function GamesSpineTransientAlertShell({
   onExited
 }) {
   const entryDelayMs = resolveTransientAlertEntryDelay(startDelayMs, initialDelayMs);
-  const [shellPhase, setShellPhase] = (0, import_react135.useState)(
+  const [shellPhase, setShellPhase] = (0, import_react136.useState)(
     entryDelayMs > 0 ? "waiting" : "entering"
   );
-  const [panelVisible, setPanelVisible] = (0, import_react135.useState)(false);
-  (0, import_react135.useEffect)(() => {
+  const [panelVisible, setPanelVisible] = (0, import_react136.useState)(false);
+  (0, import_react136.useEffect)(() => {
     if (shellPhase !== "waiting") return;
     const enterAt = window.setTimeout(() => setShellPhase("entering"), entryDelayMs);
     return () => window.clearTimeout(enterAt);
   }, [shellPhase, entryDelayMs]);
-  (0, import_react135.useEffect)(() => {
+  (0, import_react136.useEffect)(() => {
     if (shellPhase !== "entering") return;
     setPanelVisible(false);
     const frame = requestAnimationFrame(() => {
@@ -101213,7 +101288,7 @@ function GamesSpineTransientAlertShell({
       window.clearTimeout(openAt);
     };
   }, [shellPhase]);
-  (0, import_react135.useEffect)(() => {
+  (0, import_react136.useEffect)(() => {
     if (shellPhase !== "open") return;
     const exitAt = window.setTimeout(() => {
       setPanelVisible(false);
@@ -101221,14 +101296,14 @@ function GamesSpineTransientAlertShell({
     }, visibleMs);
     return () => window.clearTimeout(exitAt);
   }, [shellPhase, visibleMs]);
-  (0, import_react135.useEffect)(() => {
+  (0, import_react136.useEffect)(() => {
     if (shellPhase !== "exiting") return;
     const unmountAt = window.setTimeout(() => {
       setShellPhase("unmounted");
     }, GAMES_SPINE_TRANSIENT_ALERT_TRANSITION_MS);
     return () => window.clearTimeout(unmountAt);
   }, [shellPhase]);
-  (0, import_react135.useEffect)(() => {
+  (0, import_react136.useEffect)(() => {
     if (shellPhase !== "unmounted") return;
     onExited?.();
   }, [shellPhase, onExited]);
@@ -101276,11 +101351,11 @@ function GamesSpineTransientAlertShell({
     }
   );
 }
-var import_react135, import_jsx_runtime100;
+var import_react136, import_jsx_runtime100;
 var init_GamesSpineTransientAlertShell = __esm({
   "../grarf/desktop/src/components/gamesSpine/GamesSpineTransientAlertShell.tsx"() {
     init_define_import_meta_env();
-    import_react135 = __toESM(require_react(), 1);
+    import_react136 = __toESM(require_react(), 1);
     init_cn();
     init_isGrarfWebRenderer();
     init_gamesSpineTransientAlertPresentation();
@@ -101300,11 +101375,11 @@ function GamesSpineTransientAlertQueue({
   const active2 = useGamesSpineTransientAlertStore((s2) => s2.active);
   const completeActive = useGamesSpineTransientAlertStore((s2) => s2.completeActive);
   const liveGame = useGameForOperationalAlert(active2?.gameId ?? "");
-  const game = (0, import_react136.useMemo)(() => {
+  const game = (0, import_react137.useMemo)(() => {
     if (!active2) return void 0;
     return resolveTransientAlertPlaceholderGame(active2.gameId) ?? liveGame;
   }, [active2, liveGame]);
-  const onExited = (0, import_react136.useCallback)(() => {
+  const onExited = (0, import_react137.useCallback)(() => {
     completeActive();
   }, [completeActive]);
   if (!active2 || !game) return null;
@@ -101336,11 +101411,11 @@ function GamesSpineTransientAlertQueue({
     active2.instanceId
   );
 }
-var import_react136, import_jsx_runtime101;
+var import_react137, import_jsx_runtime101;
 var init_GamesSpineTransientAlertQueue = __esm({
   "../grarf/desktop/src/components/gamesSpine/GamesSpineTransientAlertQueue.tsx"() {
     init_define_import_meta_env();
-    import_react136 = __toESM(require_react(), 1);
+    import_react137 = __toESM(require_react(), 1);
     init_useGameForOperationalAlert();
     init_isSpineFinalizedGame();
     init_gamesSpineTransientAlertPlaceholderGames();
@@ -102473,20 +102548,20 @@ function WysiwygNavigationModeSelector({
 function GamesSpineWysiwygGameCardPrototype() {
   const operationalDateKey = getOperationalSportsDayDateKey();
   const liveLeagues = useLiveGamesStore((state3) => state3.leagues);
-  const manualGames = (0, import_react137.useMemo)(
+  const manualGames = (0, import_react138.useMemo)(
     () => collectWysiwygManagedManualEventGames(liveLeagues, operationalDateKey),
     [liveLeagues, operationalDateKey]
   );
-  const [draft, setDraft] = (0, import_react137.useState)(createInitialDraft);
-  const [editSession, setEditSession] = (0, import_react137.useState)(null);
-  const [selectedGameId, setSelectedGameId] = (0, import_react137.useState)("");
-  const [loadingEdit, setLoadingEdit] = (0, import_react137.useState)(false);
-  const [saving, setSaving] = (0, import_react137.useState)(false);
-  const [deleting, setDeleting] = (0, import_react137.useState)(false);
-  const [saveError, setSaveError] = (0, import_react137.useState)(null);
-  const [actionError, setActionError] = (0, import_react137.useState)(null);
-  const [leagueLogoTouched, setLeagueLogoTouched] = (0, import_react137.useState)(false);
-  const [broadcasterFieldsTouched, setBroadcasterFieldsTouched] = (0, import_react137.useState)(
+  const [draft, setDraft] = (0, import_react138.useState)(createInitialDraft);
+  const [editSession, setEditSession] = (0, import_react138.useState)(null);
+  const [selectedGameId, setSelectedGameId] = (0, import_react138.useState)("");
+  const [loadingEdit, setLoadingEdit] = (0, import_react138.useState)(false);
+  const [saving, setSaving] = (0, import_react138.useState)(false);
+  const [deleting, setDeleting] = (0, import_react138.useState)(false);
+  const [saveError, setSaveError] = (0, import_react138.useState)(null);
+  const [actionError, setActionError] = (0, import_react138.useState)(null);
+  const [leagueLogoTouched, setLeagueLogoTouched] = (0, import_react138.useState)(false);
+  const [broadcasterFieldsTouched, setBroadcasterFieldsTouched] = (0, import_react138.useState)(
     createBlankBroadcasterFieldsTouched
   );
   const isEditing = editSession != null;
@@ -103016,11 +103091,11 @@ function GamesSpineWysiwygGameCardPrototype() {
     )
   ] });
 }
-var import_react137, import_jsx_runtime103, DISPLAY_CLOCK, DISPLAY_AWAY_SCORE, DISPLAY_HOME_SCORE, MUTED_INFO_CLASS, WYSIWYG_LOGO_INPUT_CLASS, WYSIWYG_INLINE_INPUT_CLASS, WYSIWYG_STATUS_SELECT_CLASS, WYSIWYG_SCHEDULE_INPUT_CLASS, WYSIWYG_ACTION_INPUT_CLASS, WYSIWYG_LOWER_SECTION_ROW_SPACER_CLASS, WYSIWYG_LOWER_ACTION_INPUT_CLASS, WYSIWYG_LOWER_PRIORITY_INPUT_CLASS, WYSIWYG_MANAGER_SELECT_CLASS, WYSIWYG_MANAGER_BUTTON_CLASS;
+var import_react138, import_jsx_runtime103, DISPLAY_CLOCK, DISPLAY_AWAY_SCORE, DISPLAY_HOME_SCORE, MUTED_INFO_CLASS, WYSIWYG_LOGO_INPUT_CLASS, WYSIWYG_INLINE_INPUT_CLASS, WYSIWYG_STATUS_SELECT_CLASS, WYSIWYG_SCHEDULE_INPUT_CLASS, WYSIWYG_ACTION_INPUT_CLASS, WYSIWYG_LOWER_SECTION_ROW_SPACER_CLASS, WYSIWYG_LOWER_ACTION_INPUT_CLASS, WYSIWYG_LOWER_PRIORITY_INPUT_CLASS, WYSIWYG_MANAGER_SELECT_CLASS, WYSIWYG_MANAGER_BUTTON_CLASS;
 var init_GamesSpineWysiwygGameCardPrototype = __esm({
   "../grarf/desktop/src/components/adminMode/GamesSpineWysiwygGameCardPrototype.tsx"() {
     init_define_import_meta_env();
-    import_react137 = __toESM(require_react(), 1);
+    import_react138 = __toESM(require_react(), 1);
     init_cn();
     init_statusOverride();
     init_wysiwygPrototypeManualGameEntry();
@@ -103069,7 +103144,7 @@ function useAnyGamesLoaded() {
   const renderReady = useGamesSpineRenderStore(
     (s2) => s2.operationalReady && s2.manualReady
   );
-  return (0, import_react138.useMemo)(() => {
+  return (0, import_react139.useMemo)(() => {
     if (!renderReady) return false;
     const manualSections = convertManualGamesSpineDocument(
       manualDocument,
@@ -103097,7 +103172,7 @@ function useElectronWhipAroundSpineFocalGameId() {
   const manualGamesSpineRefreshMs = useManualGamesSpineLiveRefreshMs();
   const adminFeaturedPriorities = useAdminFeaturedPriorityStore((s2) => s2.priorities);
   const operationsFieldsByGameId = useAdminOperationsCardStore((s2) => s2.fieldsByGameId);
-  return (0, import_react138.useMemo)(() => {
+  return (0, import_react139.useMemo)(() => {
     if (!isGrarfElectronRenderer() || centerPaneMode !== "whiparound") return null;
     const mergedLeagues = omitHiddenGamesSpineLeagueGames(mergeOperationalLeagueGames(leagues));
     const now = new Date(manualGamesSpineRefreshMs);
@@ -103174,7 +103249,7 @@ function HomeGamesToday({
   const isAdminMode = useAdminModeStore((s2) => s2.isAdminMode);
   const showEditorialControls = isGrarfAdmin() && !isAdminMode;
   const { isCollapsed, toggleCollapsed, setAllLeaguesCollapsed, expandOnlyLeague } = useGamesSpineCollapse(spineStatusFilter);
-  (0, import_react138.useEffect)(() => {
+  (0, import_react139.useEffect)(() => {
     if (!isGrarfWebRenderer2()) return;
     useGamesSpineDisplayStore.getState().bootstrapInitialCompactLeftWidth();
   }, []);
@@ -103193,12 +103268,12 @@ function HomeGamesToday({
     "home"
   );
   const computedBestGameRightNow = useHomeBestGameRightNowResult();
-  const mergedLeagues = (0, import_react138.useMemo)(
+  const mergedLeagues = (0, import_react139.useMemo)(
     () => resolveCanonicalOperationalMergedLeagues(leagues),
     [leagues]
   );
   const operationalSlateReady = operationalIngestComplete || anyOperationalSpineLeagueHasGames(mergedLeagues);
-  const spineLeagueOrder = (0, import_react138.useMemo)(() => {
+  const spineLeagueOrder = (0, import_react139.useMemo)(() => {
     const merged = mergedLeagues;
     const useOperationalOrder = parentScrolls || activeLeagueId === "general-sports";
     const base = useOperationalOrder ? resolveGamesSpineOperationalLeagueOrder(merged) : resolveHomeActiveLeagueSpineOrder(activeLeagueId).filter(
@@ -103213,19 +103288,19 @@ function HomeGamesToday({
       ...adjunctVisible.filter((key2) => !seen.has(key2))
     ]);
   }, [activeLeagueId, parentScrolls, mergedLeagues]);
-  const spineContextLabel = (0, import_react138.useMemo)(
+  const spineContextLabel = (0, import_react139.useMemo)(
     () => parentScrolls ? "All Sports" : resolveHomeActiveLeagueSpineLabel(activeLeagueId),
     [activeLeagueId, parentScrolls]
   );
-  const manualSections = (0, import_react138.useMemo)(
+  const manualSections = (0, import_react139.useMemo)(
     () => convertManualGamesSpineDocument(manualDocument, new Date(manualRefreshMs)),
     [manualDocument, manualRefreshMs]
   );
-  const spineSections = (0, import_react138.useMemo)(
+  const spineSections = (0, import_react139.useMemo)(
     () => mergeGamesSpineSectionsByPriority(spineLeagueOrder, mergedLeagues, manualSections),
     [spineLeagueOrder, mergedLeagues, manualSections]
   );
-  const gamesSpineLeagueCollapseKeys = (0, import_react138.useMemo)(() => {
+  const gamesSpineLeagueCollapseKeys = (0, import_react139.useMemo)(() => {
     const objectsSpineDesktopTemporal = usesObjectsSpineTemporalSection && shouldUseHomeDesktopObjectsSpineTemporalSections();
     if (!isGrarfWebRenderer2() && !objectsSpineDesktopTemporal) return [];
     const keys = [];
@@ -103248,7 +103323,7 @@ function HomeGamesToday({
   const setOperationsStructureSections = useGamesSpineOperationsStructureStore(
     (s2) => s2.setSections
   );
-  const operationsStructureSections = (0, import_react138.useMemo)(() => {
+  const operationsStructureSections = (0, import_react139.useMemo)(() => {
     if (!isGrarfWebRenderer2() || !isAdminMode) return [];
     const out = [
       {
@@ -103284,28 +103359,28 @@ function HomeGamesToday({
     });
     return out;
   }, [isAdminMode, spineSections, mergedLeagues, isCollapsed, toggleCollapsed]);
-  (0, import_react138.useEffect)(() => {
+  (0, import_react139.useEffect)(() => {
     setOperationsStructureSections(operationsStructureSections);
   }, [operationsStructureSections, setOperationsStructureSections]);
-  const expandAllLeagues = (0, import_react138.useCallback)(() => {
+  const expandAllLeagues = (0, import_react139.useCallback)(() => {
     if (gamesSpineLeagueCollapseKeys.length === 0) return;
     setAllLeaguesCollapsed(gamesSpineLeagueCollapseKeys, false);
     useGamesSpineDisplayStore.getState().applyToolbarExpandAllGames(gamesSpineLeagueCollapseKeys);
   }, [gamesSpineLeagueCollapseKeys, setAllLeaguesCollapsed]);
-  const collapseAllLeagues = (0, import_react138.useCallback)(() => {
+  const collapseAllLeagues = (0, import_react139.useCallback)(() => {
     if (gamesSpineLeagueCollapseKeys.length === 0) return;
     setAllLeaguesCollapsed(gamesSpineLeagueCollapseKeys, true);
     useGamesSpineDisplayStore.getState().applyToolbarCollapseAllLeagues();
   }, [gamesSpineLeagueCollapseKeys, setAllLeaguesCollapsed]);
-  const allLeaguesExpanded = (0, import_react138.useMemo)(() => {
+  const allLeaguesExpanded = (0, import_react139.useMemo)(() => {
     if (gamesSpineLeagueCollapseKeys.length === 0) return false;
     return gamesSpineLeagueCollapseKeys.every((key2) => !isCollapsed(key2));
   }, [gamesSpineLeagueCollapseKeys, isCollapsed]);
-  const allLeaguesCollapsed = (0, import_react138.useMemo)(() => {
+  const allLeaguesCollapsed = (0, import_react139.useMemo)(() => {
     if (gamesSpineLeagueCollapseKeys.length === 0) return false;
     return gamesSpineLeagueCollapseKeys.every((key2) => isCollapsed(key2));
   }, [gamesSpineLeagueCollapseKeys, isCollapsed]);
-  const featuredFilteredCount = (0, import_react138.useMemo)(() => {
+  const featuredFilteredCount = (0, import_react139.useMemo)(() => {
     const supplementalFinals = spineStatusFilter === "final" && isSelectedDateOperationalSportsDay(selectedDate) ? mergeCatchUpSupplementalFinals(
       ...withoutGamesSpineHiddenLeagues(getGamesColumnLeagueOrder()).map(
         (key2) => useRecentFinalizedGamesStore.getState().getRetainedForLeague(key2)
@@ -103321,7 +103396,7 @@ function HomeGamesToday({
     );
     return selectFeaturedGames(pool, bundle, spineStatusFilter, selectedDate).length;
   }, [leagues, scheduleByDate, selectedDate, bundle, spineStatusFilter, retainedById]);
-  const manualFilteredCount = (0, import_react138.useMemo)(() => {
+  const manualFilteredCount = (0, import_react139.useMemo)(() => {
     const now = new Date(manualRefreshMs);
     let count = 0;
     for (const section of manualSections) {
@@ -103332,7 +103407,7 @@ function HomeGamesToday({
     }
     return count;
   }, [manualSections, spineStatusFilter, manualRefreshMs]);
-  const objectsSpineComingUpLeagueFilteredCount = (0, import_react138.useMemo)(() => {
+  const objectsSpineComingUpLeagueFilteredCount = (0, import_react139.useMemo)(() => {
     if (!usesObjectsSpineComingUpSection) return null;
     let count = 0;
     const isToday = isSelectedDateOperationalSportsDay(selectedDate);
@@ -103370,7 +103445,7 @@ function HomeGamesToday({
   ]);
   const totalFilteredCount = usesObjectsSpineComingUpSection ? (objectsSpineComingUpLeagueFilteredCount ?? 0) + featuredFilteredCount + manualFilteredCount : filteredCount + featuredFilteredCount + manualFilteredCount;
   const bestGameRightNow = standaloneBestGameRightNowProp !== void 0 ? standaloneBestGameRightNowProp : computedBestGameRightNow;
-  const featuredSpineGameIds = (0, import_react138.useMemo)(
+  const featuredSpineGameIds = (0, import_react139.useMemo)(
     () => isGrarfWebRenderer2() ? resolveFeaturedSpineVisibleGameIds({
       statusFilter: spineStatusFilter,
       liveLeagues: leagues,
@@ -103380,7 +103455,7 @@ function HomeGamesToday({
     }) : [],
     [spineStatusFilter, leagues, scheduleByDate, selectedDate, bundle, retainedById]
   );
-  const firstDisplayedLeagueGame = (0, import_react138.useMemo)(
+  const firstDisplayedLeagueGame = (0, import_react139.useMemo)(
     () => isGrarfWebRenderer2() ? resolveFirstDisplayedGamesSpineLeagueGame({
       spineSections,
       statusFilter: spineStatusFilter,
@@ -103406,7 +103481,7 @@ function HomeGamesToday({
       manualTourDeFranceRefreshMs
     ]
   );
-  const gamesSpineBestGamePlacement = (0, import_react138.useMemo)(
+  const gamesSpineBestGamePlacement = (0, import_react139.useMemo)(
     () => resolveGamesSpineBestGameRightNowPlacement(
       bestGameRightNow,
       featuredSpineGameIds,
@@ -103414,7 +103489,7 @@ function HomeGamesToday({
     ),
     [bestGameRightNow, featuredSpineGameIds, firstDisplayedLeagueGame]
   );
-  const firstLeagueSectionKey = (0, import_react138.useMemo)(() => {
+  const firstLeagueSectionKey = (0, import_react139.useMemo)(() => {
     for (const section of spineSections) {
       if (section.kind === "operational") {
         if (isGamesSpineLeagueTemporarilyHidden(section.leagueKey)) continue;
@@ -103425,7 +103500,7 @@ function HomeGamesToday({
     return null;
   }, [spineSections]);
   const compactFirstLeagueStickyTop = isGrarfWebRenderer2() && !showEditorialControls;
-  const liveGames = (0, import_react138.useMemo)(() => {
+  const liveGames = (0, import_react139.useMemo)(() => {
     const out = [];
     for (const key2 of withoutGamesSpineHiddenLeagues(
       resolveGamesSpineOperationalLeagueOrder(mergedLeagues)
@@ -103436,15 +103511,15 @@ function HomeGamesToday({
     }
     return out;
   }, [leagues, mergedLeagues]);
-  const [watchPicker, setWatchPicker] = (0, import_react138.useState)(
+  const [watchPicker, setWatchPicker] = (0, import_react139.useState)(
     null
   );
-  (0, import_react138.useEffect)(() => {
+  (0, import_react139.useEffect)(() => {
     for (const game of liveGames) {
       logHomeSpineWatchLiveState(game);
     }
   }, [liveGames]);
-  const onWatchLive = (0, import_react138.useCallback)((gameId) => {
+  const onWatchLive = (0, import_react139.useCallback)((gameId) => {
     if (isDemoNhlVegasCarolinaGameId(gameId)) {
       trackWatchLiveClicked({
         league: "NHL",
@@ -103480,7 +103555,7 @@ function HomeGamesToday({
       setWatchPicker({ game: result.game, options: result.options });
     }
   }, [watchDispatch]);
-  const onWatchOptionChosen = (0, import_react138.useCallback)(
+  const onWatchOptionChosen = (0, import_react139.useCallback)(
     (opt) => {
       if (!watchPicker) return;
       executeWatchOption(watchPicker.game, opt, watchDispatch ?? (() => {
@@ -103505,7 +103580,7 @@ function HomeGamesToday({
     }
     navigate(`/game/${encodeURIComponent(id)}`);
   };
-  const onPermanentLeagueWorkspaceOpen = (0, import_react138.useCallback)(
+  const onPermanentLeagueWorkspaceOpen = (0, import_react139.useCallback)(
     (teamKey) => {
       openGamesSpinePermanentLeagueWorkspace(teamKey);
     },
@@ -103753,11 +103828,11 @@ function HomeGamesToday({
     }
   );
 }
-var import_react138, import_jsx_runtime104;
+var import_react139, import_jsx_runtime104;
 var init_HomeGamesToday = __esm({
   "../grarf/desktop/src/components/homeMvp/HomeGamesToday.tsx"() {
     init_define_import_meta_env();
-    import_react138 = __toESM(require_react(), 1);
+    import_react139 = __toESM(require_react(), 1);
     init_dist();
     init_cn();
     init_HomeActiveLeagueContext();
@@ -103849,10 +103924,10 @@ function useHomeSpineGameInteractions({
   watchSource = "home_scoreboard"
 }) {
   const navigate = useNavigate();
-  const [watchPicker, setWatchPicker] = (0, import_react139.useState)(
+  const [watchPicker, setWatchPicker] = (0, import_react140.useState)(
     null
   );
-  const onOpen = (0, import_react139.useCallback)(
+  const onOpen = (0, import_react140.useCallback)(
     (id) => {
       if (isDemoWnbaWhipAroundGameId(id)) {
         onSelectGame?.(id);
@@ -103868,7 +103943,7 @@ function useHomeSpineGameInteractions({
     },
     [navigate, onSelectGame, watchSource]
   );
-  const onWatchLive = (0, import_react139.useCallback)(
+  const onWatchLive = (0, import_react140.useCallback)(
     (gameId) => {
       if (isDemoNhlVegasCarolinaGameId(gameId)) {
         trackWatchLiveClicked({ league: "NHL", gameId, source: watchSource });
@@ -103899,7 +103974,7 @@ function useHomeSpineGameInteractions({
     },
     [watchDispatch, watchSource]
   );
-  const onWatchOptionChosen = (0, import_react139.useCallback)(
+  const onWatchOptionChosen = (0, import_react140.useCallback)(
     (opt) => {
       if (!watchPicker) return;
       executeWatchOption(watchPicker.game, opt, watchDispatch ?? (() => {
@@ -103908,7 +103983,7 @@ function useHomeSpineGameInteractions({
     },
     [watchPicker, watchDispatch]
   );
-  const closeWatchPicker = (0, import_react139.useCallback)(() => setWatchPicker(null), []);
+  const closeWatchPicker = (0, import_react140.useCallback)(() => setWatchPicker(null), []);
   return {
     onOpen,
     onWatchLive,
@@ -103918,11 +103993,11 @@ function useHomeSpineGameInteractions({
     canShowWatchLive: gameHasHomeSpineWatchLive
   };
 }
-var import_react139;
+var import_react140;
 var init_useHomeSpineGameInteractions = __esm({
   "../grarf/desktop/src/hooks/useHomeSpineGameInteractions.ts"() {
     init_define_import_meta_env();
-    import_react139 = __toESM(require_react(), 1);
+    import_react140 = __toESM(require_react(), 1);
     init_dist();
     init_analytics2();
     init_demoWnbaWhipAroundGame();
@@ -104143,28 +104218,28 @@ function persistFractions(fractions) {
   }
 }
 function useHomeDesktopObjectsSpineTemporalSections() {
-  const [expanded, setExpanded] = (0, import_react140.useState)(() => readInitialExpandedState());
-  const [layoutSizingMode, setLayoutSizingMode] = (0, import_react140.useState)(
+  const [expanded, setExpanded] = (0, import_react141.useState)(() => readInitialExpandedState());
+  const [layoutSizingMode, setLayoutSizingMode] = (0, import_react141.useState)(
     () => readInitialLayoutSizingMode(readInitialExpandedState())
   );
-  const [sectionFractions, setSectionFractions] = (0, import_react140.useState)(
+  const [sectionFractions, setSectionFractions] = (0, import_react141.useState)(
     () => readInitialFractions(readInitialExpandedState())
   );
-  const commitResponsiveLayoutSizing = (0, import_react140.useCallback)(() => {
+  const commitResponsiveLayoutSizing = (0, import_react141.useCallback)(() => {
     setLayoutSizingMode((mode) => {
       if (mode !== "default") return mode;
       persistLayoutSizingMode("responsive");
       return "responsive";
     });
   }, []);
-  const commitManualLayoutSizing = (0, import_react140.useCallback)((nextFractions) => {
+  const commitManualLayoutSizing = (0, import_react141.useCallback)((nextFractions) => {
     const normalized = normalizeHomeDesktopObjectsSpineSectionFractions(expanded, nextFractions);
     setSectionFractions(normalized);
     setLayoutSizingMode("manual");
     persistLayoutSizingMode("manual");
     persistFractions(normalized);
   }, [expanded]);
-  const beginManualLayoutSizing = (0, import_react140.useCallback)(
+  const beginManualLayoutSizing = (0, import_react141.useCallback)(
     (nextFractions) => {
       const normalized = normalizeHomeDesktopObjectsSpineSectionFractions(expanded, nextFractions);
       setSectionFractions(normalized);
@@ -104172,7 +104247,7 @@ function useHomeDesktopObjectsSpineTemporalSections() {
     },
     [expanded]
   );
-  const toggleSection = (0, import_react140.useCallback)(
+  const toggleSection = (0, import_react141.useCallback)(
     (id) => {
       if (layoutSizingMode !== "manual") {
         commitResponsiveLayoutSizing();
@@ -104196,7 +104271,7 @@ function useHomeDesktopObjectsSpineTemporalSections() {
     },
     [commitResponsiveLayoutSizing, layoutSizingMode]
   );
-  const focusSingleSection = (0, import_react140.useCallback)((id) => {
+  const focusSingleSection = (0, import_react141.useCallback)((id) => {
     const next = {
       catchUp: id === "catchUp",
       now: id === "now",
@@ -104224,11 +104299,11 @@ function useHomeDesktopObjectsSpineTemporalSections() {
     commitManualLayoutSizing
   };
 }
-var import_react140, EXPANDED_STORAGE_KEY, LAYOUT_SIZING_STORAGE_KEY, FRACTIONS_STORAGE_KEY, DEFAULT_EXPANDED;
+var import_react141, EXPANDED_STORAGE_KEY, LAYOUT_SIZING_STORAGE_KEY, FRACTIONS_STORAGE_KEY, DEFAULT_EXPANDED;
 var init_useHomeDesktopObjectsSpineTemporalSections = __esm({
   "../grarf/desktop/src/hooks/useHomeDesktopObjectsSpineTemporalSections.ts"() {
     init_define_import_meta_env();
-    import_react140 = __toESM(require_react(), 1);
+    import_react141 = __toESM(require_react(), 1);
     init_homeDesktopObjectsSpineSectionLayout();
     EXPANDED_STORAGE_KEY = "grarf-home-desktop-objects-spine-temporal-v1";
     LAYOUT_SIZING_STORAGE_KEY = "grarf-home-desktop-objects-spine-layout-sizing-v1";
@@ -104246,13 +104321,13 @@ function resolveScrollOffsetTop(container, target) {
   return target.getBoundingClientRect().top - container.getBoundingClientRect().top + container.scrollTop;
 }
 function useObjectsSpineCatchUpLeagueNavSync(sections, scrollContainerRef) {
-  const [activeLeague, setActiveLeague] = (0, import_react141.useState)(
+  const [activeLeague, setActiveLeague] = (0, import_react142.useState)(
     sections[0]?.league ?? null
   );
-  const sectionRefs = (0, import_react141.useRef)(/* @__PURE__ */ new Map());
-  const programmaticScrollRef = (0, import_react141.useRef)(false);
-  const programmaticScrollTimerRef = (0, import_react141.useRef)(null);
-  (0, import_react141.useEffect)(() => {
+  const sectionRefs = (0, import_react142.useRef)(/* @__PURE__ */ new Map());
+  const programmaticScrollRef = (0, import_react142.useRef)(false);
+  const programmaticScrollTimerRef = (0, import_react142.useRef)(null);
+  (0, import_react142.useEffect)(() => {
     if (sections.length === 0) {
       setActiveLeague(null);
       return;
@@ -104261,14 +104336,14 @@ function useObjectsSpineCatchUpLeagueNavSync(sections, scrollContainerRef) {
       (current) => current && sections.some((section) => section.league === current) ? current : sections[0].league
     );
   }, [sections]);
-  const registerSectionRef = (0, import_react141.useCallback)((league2, element) => {
+  const registerSectionRef = (0, import_react142.useCallback)((league2, element) => {
     if (element) {
       sectionRefs.current.set(league2, element);
       return;
     }
     sectionRefs.current.delete(league2);
   }, []);
-  const resolveActiveFromScroll = (0, import_react141.useCallback)(() => {
+  const resolveActiveFromScroll = (0, import_react142.useCallback)(() => {
     const container = scrollContainerRef.current;
     if (!container || sections.length === 0) {
       return;
@@ -104287,10 +104362,10 @@ function useObjectsSpineCatchUpLeagueNavSync(sections, scrollContainerRef) {
     }
     setActiveLeague(nextActive);
   }, [scrollContainerRef, sections]);
-  (0, import_react141.useEffect)(() => {
+  (0, import_react142.useEffect)(() => {
     resolveActiveFromScroll();
   }, [sections, resolveActiveFromScroll]);
-  (0, import_react141.useEffect)(() => {
+  (0, import_react142.useEffect)(() => {
     const container = scrollContainerRef.current;
     if (!container) {
       return;
@@ -104304,7 +104379,7 @@ function useObjectsSpineCatchUpLeagueNavSync(sections, scrollContainerRef) {
     container.addEventListener("scroll", onScroll, { passive: true });
     return () => container.removeEventListener("scroll", onScroll);
   }, [scrollContainerRef, resolveActiveFromScroll]);
-  const scrollToLeague = (0, import_react141.useCallback)(
+  const scrollToLeague = (0, import_react142.useCallback)(
     (league2) => {
       const container = scrollContainerRef.current;
       const element = sectionRefs.current.get(league2);
@@ -104326,7 +104401,7 @@ function useObjectsSpineCatchUpLeagueNavSync(sections, scrollContainerRef) {
     },
     [scrollContainerRef]
   );
-  (0, import_react141.useEffect)(
+  (0, import_react142.useEffect)(
     () => () => {
       if (programmaticScrollTimerRef.current) {
         clearTimeout(programmaticScrollTimerRef.current);
@@ -104340,11 +104415,11 @@ function useObjectsSpineCatchUpLeagueNavSync(sections, scrollContainerRef) {
     scrollToLeague
   };
 }
-var import_react141, SCROLL_ACTIVE_THRESHOLD_PX, PROGRAMMATIC_SCROLL_MS;
+var import_react142, SCROLL_ACTIVE_THRESHOLD_PX, PROGRAMMATIC_SCROLL_MS;
 var init_useObjectsSpineCatchUpLeagueNavSync = __esm({
   "../grarf/desktop/src/hooks/useObjectsSpineCatchUpLeagueNavSync.ts"() {
     init_define_import_meta_env();
-    import_react141 = __toESM(require_react(), 1);
+    import_react142 = __toESM(require_react(), 1);
     SCROLL_ACTIVE_THRESHOLD_PX = 6;
     PROGRAMMATIC_SCROLL_MS = 600;
   }
@@ -104588,7 +104663,7 @@ function useObjectsSpineCatchUpSportscapeGames(enabled) {
   );
   const liveLeagues = useLiveGamesStore((state3) => state3.leagues);
   const retainedById = useRecentFinalizedGamesStore((state3) => state3.byId);
-  const retainedGames = (0, import_react142.useMemo)(
+  const retainedGames = (0, import_react143.useMemo)(
     () => Object.values(retainedById).map((entry2) => entry2.game),
     [retainedById]
   );
@@ -104604,7 +104679,7 @@ function useObjectsSpineCatchUpSportscapeGames(enabled) {
   const eplCatchupGames = useEplCatchupGames();
   const wnbaCatchupGames = useWnbaCatchupGames();
   const editorialDocument = useSportscapeEditorialDocument();
-  return (0, import_react142.useMemo)(() => {
+  return (0, import_react143.useMemo)(() => {
     if (!enabled) return [];
     const gamesByEventId = mergeEplCatchupGamesIntoEventIndex(
       mergeWnbaCatchupGamesIntoEventIndex(
@@ -104684,11 +104759,11 @@ function useObjectsSpineCatchUpSportscapeGames(enabled) {
     editorialDocument.entries
   ]);
 }
-var import_react142;
+var import_react143;
 var init_useObjectsSpineCatchUpSportscapeGames = __esm({
   "../grarf/desktop/src/hooks/useObjectsSpineCatchUpSportscapeGames.ts"() {
     init_define_import_meta_env();
-    import_react142 = __toESM(require_react(), 1);
+    import_react143 = __toESM(require_react(), 1);
     init_useMcwsSportscapeGameScores();
     init_useMlbSportscapeArticles();
     init_useMcwsSportscapeArticles();
@@ -104725,7 +104800,7 @@ function HomeDesktopObjectsSpineCatchUpDaySelector() {
   const setSelectedOperationalDateKey = useObjectsSpineCatchUpDayStore(
     (state3) => state3.setSelectedOperationalDateKey
   );
-  const dayOptions = (0, import_react143.useMemo)(() => getObjectsSpineCatchUpDayOptions(), []);
+  const dayOptions = (0, import_react144.useMemo)(() => getObjectsSpineCatchUpDayOptions(), []);
   return /* @__PURE__ */ (0, import_jsx_runtime106.jsxs)("label", { className: "relative ml-1.5 inline-flex shrink-0 items-center", onClick: stopHeaderToggle, children: [
     /* @__PURE__ */ (0, import_jsx_runtime106.jsx)("span", { className: "sr-only", children: "Catch Up day" }),
     /* @__PURE__ */ (0, import_jsx_runtime106.jsx)(
@@ -104748,11 +104823,11 @@ function HomeDesktopObjectsSpineCatchUpDaySelector() {
     )
   ] });
 }
-var import_react143, import_jsx_runtime106;
+var import_react144, import_jsx_runtime106;
 var init_HomeDesktopObjectsSpineCatchUpDaySelector = __esm({
   "../grarf/desktop/src/components/homeMvp/HomeDesktopObjectsSpineCatchUpDaySelector.tsx"() {
     init_define_import_meta_env();
-    import_react143 = __toESM(require_react(), 1);
+    import_react144 = __toESM(require_react(), 1);
     init_objectsSpineCatchUpDayOptions();
     init_objectsSpineCatchUpDayStore();
     import_jsx_runtime106 = __toESM(require_jsx_runtime(), 1);
@@ -104837,8 +104912,8 @@ function HomeDesktopObjectsSpineTemporalSection({
   headerTrailing,
   headerVariant = "default"
 }) {
-  const contentScrollCommittedRef = (0, import_react144.useRef)(false);
-  const handleContentScroll = (0, import_react144.useCallback)(
+  const contentScrollCommittedRef = (0, import_react145.useRef)(false);
+  const handleContentScroll = (0, import_react145.useCallback)(
     (event) => {
       if (contentScrollCommittedRef.current) return;
       contentScrollCommittedRef.current = true;
@@ -104903,11 +104978,11 @@ function HomeDesktopObjectsSpineTemporalSection({
     }
   );
 }
-var import_react144, import_jsx_runtime108;
+var import_react145, import_jsx_runtime108;
 var init_HomeDesktopObjectsSpineTemporalSection = __esm({
   "../grarf/desktop/src/components/homeMvp/HomeDesktopObjectsSpineTemporalSection.tsx"() {
     init_define_import_meta_env();
-    import_react144 = __toESM(require_react(), 1);
+    import_react145 = __toESM(require_react(), 1);
     init_cn();
     init_HomeDesktopObjectsSpineSectionHeader();
     import_jsx_runtime108 = __toESM(require_jsx_runtime(), 1);
@@ -104920,9 +104995,9 @@ function HomeObjectsSpineCatchUpLeagueNav({
   activeLeague,
   onSelectLeague
 }) {
-  const navRef = (0, import_react145.useRef)(null);
-  const tabRefs = (0, import_react145.useRef)(/* @__PURE__ */ new Map());
-  (0, import_react145.useEffect)(() => {
+  const navRef = (0, import_react146.useRef)(null);
+  const tabRefs = (0, import_react146.useRef)(/* @__PURE__ */ new Map());
+  (0, import_react146.useEffect)(() => {
     if (!activeLeague) {
       return;
     }
@@ -104987,11 +105062,11 @@ function HomeObjectsSpineCatchUpLeagueNav({
     }
   );
 }
-var import_react145, import_jsx_runtime109;
+var import_react146, import_jsx_runtime109;
 var init_HomeObjectsSpineCatchUpLeagueNav = __esm({
   "../grarf/desktop/src/components/homeMvp/HomeObjectsSpineCatchUpLeagueNav.tsx"() {
     init_define_import_meta_env();
-    import_react145 = __toESM(require_react(), 1);
+    import_react146 = __toESM(require_react(), 1);
     init_cn();
     init_grarfLogoImgClassName();
     init_homeSubnavChrome();
@@ -105163,21 +105238,21 @@ function HomeDesktopObjectsSpineCatchUpSection({
   const selectedOperationalDateKey = useObjectsSpineCatchUpDayStore(
     (state3) => state3.selectedOperationalDateKey
   );
-  const selectedDayLabel = (0, import_react146.useMemo)(
+  const selectedDayLabel = (0, import_react147.useMemo)(
     () => resolveObjectsSpineCatchUpDayLabel(selectedOperationalDateKey),
     [selectedOperationalDateKey]
   );
   const sportscapeCatchUpSections = useObjectsSpineCatchUpSportscapeGames(true);
-  const visibleSections = (0, import_react146.useMemo)(
+  const visibleSections = (0, import_react147.useMemo)(
     () => sportscapeCatchUpSections.filter(
       (section) => !isGamesSpineLeagueTemporarilyHidden(section.league)
     ),
     [sportscapeCatchUpSections]
   );
-  const contentScrollRef = (0, import_react146.useRef)(null);
+  const contentScrollRef = (0, import_react147.useRef)(null);
   const leagueNavScrollRef = continuousDocumentScroll && parentScrollContainerRef ? parentScrollContainerRef : contentScrollRef;
-  const contentBodyRef = (0, import_react146.useRef)(null);
-  (0, import_react146.useEffect)(() => {
+  const contentBodyRef = (0, import_react147.useRef)(null);
+  (0, import_react147.useEffect)(() => {
     const container = leagueNavScrollRef.current;
     if (!container) return;
     container.scrollTop = 0;
@@ -105227,11 +105302,11 @@ function HomeDesktopObjectsSpineCatchUpSection({
     }
   );
 }
-var import_react146, import_jsx_runtime111;
+var import_react147, import_jsx_runtime111;
 var init_HomeDesktopObjectsSpineCatchUpSection = __esm({
   "../grarf/desktop/src/components/homeMvp/HomeDesktopObjectsSpineCatchUpSection.tsx"() {
     init_define_import_meta_env();
-    import_react146 = __toESM(require_react(), 1);
+    import_react147 = __toESM(require_react(), 1);
     init_useObjectsSpineCatchUpLeagueNavSync();
     init_analytics2();
     init_gamesSpineTemporarilyHiddenLeagues();
@@ -105274,13 +105349,13 @@ function HomeDesktopObjectsSpineCombinedColumn({
   onSelectGame,
   watchDispatch
 }) {
-  const objectsSpineScrollRef = (0, import_react147.useRef)(null);
+  const objectsSpineScrollRef = (0, import_react148.useRef)(null);
   const columnFilter = useHomeGamesColumnFilter();
   useMlbCatchupGameHighlightsMap();
   const { expanded, toggleSection, focusSingleSection } = useHomeDesktopObjectsSpineTemporalSections();
   const objectsSpineFocus = useDesktopPrimaryNavigationStore((s2) => s2.objectsSpineFocus);
-  const lastObjectsSpineFocusRef = (0, import_react147.useRef)(null);
-  (0, import_react147.useEffect)(() => {
+  const lastObjectsSpineFocusRef = (0, import_react148.useRef)(null);
+  (0, import_react148.useEffect)(() => {
     if (!objectsSpineFocus || lastObjectsSpineFocusRef.current === objectsSpineFocus) return;
     lastObjectsSpineFocusRef.current = objectsSpineFocus;
     focusSingleSection(objectsSpineFocus);
@@ -105365,11 +105440,11 @@ function HomeDesktopObjectsSpineCombinedColumn({
     }
   );
 }
-var import_react147, import_jsx_runtime113, OBJECTS_SPINE_CONTINUOUS_SECTION_STYLE;
+var import_react148, import_jsx_runtime113, OBJECTS_SPINE_CONTINUOUS_SECTION_STYLE;
 var init_HomeDesktopObjectsSpineCombinedColumn = __esm({
   "../grarf/desktop/src/components/homeMvp/HomeDesktopObjectsSpineCombinedColumn.tsx"() {
     init_define_import_meta_env();
-    import_react147 = __toESM(require_react(), 1);
+    import_react148 = __toESM(require_react(), 1);
     init_GuidedAttentionPanel();
     init_useHomeDesktopObjectsSpineTemporalSections();
     init_desktopPrimaryNavigationStore();
@@ -105432,13 +105507,13 @@ function SportscapeCatchUpLeagueNavProvider({
   feedCards,
   children
 }) {
-  const scrollContainerRef = (0, import_react148.useRef)(null);
-  const sections = (0, import_react148.useMemo)(() => buildCatchUpLeagueNavSections(feedCards), [feedCards]);
+  const scrollContainerRef = (0, import_react149.useRef)(null);
+  const sections = (0, import_react149.useMemo)(() => buildCatchUpLeagueNavSections(feedCards), [feedCards]);
   const { activeLeague, registerSectionRef, scrollToLeague } = useObjectsSpineCatchUpLeagueNavSync(
     sections,
     scrollContainerRef
   );
-  const value = (0, import_react148.useMemo)(
+  const value = (0, import_react149.useMemo)(
     () => ({
       sections,
       activeLeague,
@@ -105451,23 +105526,23 @@ function SportscapeCatchUpLeagueNavProvider({
   return /* @__PURE__ */ (0, import_jsx_runtime114.jsx)(SportscapeCatchUpLeagueNavContext.Provider, { value, children });
 }
 function useSportscapeCatchUpLeagueNav() {
-  const context2 = (0, import_react148.useContext)(SportscapeCatchUpLeagueNavContext);
+  const context2 = (0, import_react149.useContext)(SportscapeCatchUpLeagueNavContext);
   if (!context2) {
     throw new Error("useSportscapeCatchUpLeagueNav requires SportscapeCatchUpLeagueNavProvider");
   }
   return context2;
 }
 function useSportscapeCatchUpLeagueNavOptional() {
-  return (0, import_react148.useContext)(SportscapeCatchUpLeagueNavContext);
+  return (0, import_react149.useContext)(SportscapeCatchUpLeagueNavContext);
 }
-var import_react148, import_jsx_runtime114, SportscapeCatchUpLeagueNavContext;
+var import_react149, import_jsx_runtime114, SportscapeCatchUpLeagueNavContext;
 var init_SportscapeCatchUpLeagueNavContext = __esm({
   "../grarf/desktop/src/context/SportscapeCatchUpLeagueNavContext.tsx"() {
     init_define_import_meta_env();
-    import_react148 = __toESM(require_react(), 1);
+    import_react149 = __toESM(require_react(), 1);
     init_useObjectsSpineCatchUpLeagueNavSync();
     import_jsx_runtime114 = __toESM(require_jsx_runtime(), 1);
-    SportscapeCatchUpLeagueNavContext = (0, import_react148.createContext)(null);
+    SportscapeCatchUpLeagueNavContext = (0, import_react149.createContext)(null);
   }
 });
 
@@ -105534,9 +105609,9 @@ var init_objectsSpineCatchUpLeftWidth = __esm({
 
 // ../grarf/desktop/src/hooks/useHomeDesktopObjectsSpineCatchUpLeftWidth.ts
 function useHomeDesktopObjectsSpineCatchUpLeftWidth(active2, measuredContentPx) {
-  const sessionRef = (0, import_react149.useRef)(EMPTY_SESSION);
-  const applyingRef = (0, import_react149.useRef)(false);
-  (0, import_react149.useEffect)(() => {
+  const sessionRef = (0, import_react150.useRef)(EMPTY_SESSION);
+  const applyingRef = (0, import_react150.useRef)(false);
+  (0, import_react150.useEffect)(() => {
     if (!active2) {
       return;
     }
@@ -105558,7 +105633,7 @@ function useHomeDesktopObjectsSpineCatchUpLeftWidth(active2, measuredContentPx) 
       }
     });
   }, [active2]);
-  (0, import_react149.useLayoutEffect)(() => {
+  (0, import_react150.useLayoutEffect)(() => {
     if (!active2) {
       restoreObjectsSpineCatchUpLeftWidth(sessionRef.current.restorePx);
       sessionRef.current = EMPTY_SESSION;
@@ -105574,7 +105649,7 @@ function useHomeDesktopObjectsSpineCatchUpLeftWidth(active2, measuredContentPx) 
     );
     applyingRef.current = false;
   }, [active2, measuredContentPx]);
-  (0, import_react149.useEffect)(
+  (0, import_react150.useEffect)(
     () => () => {
       restoreObjectsSpineCatchUpLeftWidth(sessionRef.current.restorePx);
       sessionRef.current = EMPTY_SESSION;
@@ -105582,11 +105657,11 @@ function useHomeDesktopObjectsSpineCatchUpLeftWidth(active2, measuredContentPx) 
     []
   );
 }
-var import_react149, EMPTY_SESSION;
+var import_react150, EMPTY_SESSION;
 var init_useHomeDesktopObjectsSpineCatchUpLeftWidth = __esm({
   "../grarf/desktop/src/hooks/useHomeDesktopObjectsSpineCatchUpLeftWidth.ts"() {
     init_define_import_meta_env();
-    import_react149 = __toESM(require_react(), 1);
+    import_react150 = __toESM(require_react(), 1);
     init_objectsSpineCatchUpLeftWidth();
     init_workspaceLayoutStore();
     EMPTY_SESSION = {
@@ -105662,15 +105737,15 @@ var init_measureObjectsSpineLeagueIndexColumnWidth = __esm({
 function HomeDesktopObjectsSpineCatchUpLeagueIndexColumn({ feedCards }) {
   const { activeLeague, scrollToLeague } = useSportscapeCatchUpLeagueNav();
   const liveLeagues = useLiveGamesStore((state3) => state3.leagues);
-  const mergedOperationalLeagues = (0, import_react150.useMemo)(
+  const mergedOperationalLeagues = (0, import_react151.useMemo)(
     () => mergeOperationalLeagueGames(liveLeagues),
     [liveLeagues]
   );
-  const leagueNavSections = (0, import_react150.useMemo)(
+  const leagueNavSections = (0, import_react151.useMemo)(
     () => buildSportscapeLeagueIndexSectionsFromFeedCards(feedCards),
     [feedCards]
   );
-  const leagueIndexLabels = (0, import_react150.useMemo)(() => {
+  const leagueIndexLabels = (0, import_react151.useMemo)(() => {
     const labels = [];
     for (const section of leagueNavSections) {
       for (const item of section.items) {
@@ -105685,10 +105760,10 @@ function HomeDesktopObjectsSpineCatchUpLeagueIndexColumn({ feedCards }) {
     }
     return labels;
   }, [leagueNavSections, mergedOperationalLeagues]);
-  const [leagueColumnWidthPx, setLeagueColumnWidthPx] = (0, import_react150.useState)(
+  const [leagueColumnWidthPx, setLeagueColumnWidthPx] = (0, import_react151.useState)(
     OBJECTS_SPINE_DUAL_COLUMN_LEAGUE_COLUMN_WIDTH_PX2
   );
-  (0, import_react150.useLayoutEffect)(() => {
+  (0, import_react151.useLayoutEffect)(() => {
     const measure = () => {
       setLeagueColumnWidthPx(measureObjectsSpineLeagueIndexColumnWidthPx(leagueIndexLabels));
     };
@@ -105699,7 +105774,7 @@ function HomeDesktopObjectsSpineCatchUpLeagueIndexColumn({ feedCards }) {
     leagueIndexLabels.length > 0,
     leagueColumnWidthPx
   );
-  const displayedLeagueKeys = (0, import_react150.useMemo)(() => {
+  const displayedLeagueKeys = (0, import_react151.useMemo)(() => {
     if (!activeLeague) return null;
     return /* @__PURE__ */ new Set([activeLeague]);
   }, [activeLeague]);
@@ -105729,11 +105804,11 @@ function HomeDesktopObjectsSpineCatchUpLeagueIndexColumn({ feedCards }) {
     }
   );
 }
-var import_react150, import_jsx_runtime115;
+var import_react151, import_jsx_runtime115;
 var init_HomeDesktopObjectsSpineCatchUpLeagueIndexColumn = __esm({
   "../grarf/desktop/src/components/homeMvp/HomeDesktopObjectsSpineCatchUpLeagueIndexColumn.tsx"() {
     init_define_import_meta_env();
-    import_react150 = __toESM(require_react(), 1);
+    import_react151 = __toESM(require_react(), 1);
     init_GuidedAttentionPanel();
     init_AppLeftNav();
     init_operationalManualLeagueGames();
@@ -106115,17 +106190,17 @@ function WorkspaceEmbedHost({
   onEmbedBlocked,
   onEmbedLoadFailed
 }) {
-  const hostRef = (0, import_react151.useRef)(null);
-  const embedUrl = (0, import_react151.useMemo)(() => resolveWorkspaceEmbedUrl(url), [url]);
+  const hostRef = (0, import_react152.useRef)(null);
+  const embedUrl = (0, import_react152.useMemo)(() => resolveWorkspaceEmbedUrl(url), [url]);
   const appVisible = useAppVisible();
   const embedLive = active2 && appVisible && !isCenterEmbedSuppressed(slot);
-  const callbacksRef = (0, import_react151.useRef)({ onEmbedBlocked, onEmbedLoadFailed });
+  const callbacksRef = (0, import_react152.useRef)({ onEmbedBlocked, onEmbedLoadFailed });
   callbacksRef.current = { onEmbedBlocked, onEmbedLoadFailed };
-  const lastSizeRef = (0, import_react151.useRef)({ w: 0, h: 0 });
-  const lastBoundsRef = (0, import_react151.useRef)(null);
-  const syncGenerationRef = (0, import_react151.useRef)(0);
-  const lastSyncedTargetRef = (0, import_react151.useRef)(null);
-  (0, import_react151.useEffect)(() => {
+  const lastSizeRef = (0, import_react152.useRef)({ w: 0, h: 0 });
+  const lastBoundsRef = (0, import_react152.useRef)(null);
+  const syncGenerationRef = (0, import_react152.useRef)(0);
+  const lastSyncedTargetRef = (0, import_react152.useRef)(null);
+  (0, import_react152.useEffect)(() => {
     const unsub = window.grarf?.workspaceEmbedSubscribeLoadFailed?.((payload) => {
       if (payload.slot !== slot) return;
       if (payload.url && payload.url !== embedUrl) return;
@@ -106133,7 +106208,7 @@ function WorkspaceEmbedHost({
     });
     return unsub;
   }, [slot, embedUrl]);
-  (0, import_react151.useLayoutEffect)(() => {
+  (0, import_react152.useLayoutEffect)(() => {
     if (!hasEmbedBridge()) return;
     if (!embedLive) {
       lastSyncedTargetRef.current = null;
@@ -106283,11 +106358,11 @@ function WorkspaceEmbedHost({
     }
   );
 }
-var import_react151, import_jsx_runtime116;
+var import_react152, import_jsx_runtime116;
 var init_WorkspaceEmbedHost = __esm({
   "../grarf/desktop/src/components/WorkspaceEmbedHost.tsx"() {
     init_define_import_meta_env();
-    import_react151 = __toESM(require_react(), 1);
+    import_react152 = __toESM(require_react(), 1);
     init_youtubeUrl2();
     init_cn();
     init_embedRegistry();
@@ -106489,7 +106564,7 @@ function IntelligenceCard({
 }
 function IntelligenceRailPanel({ onOpenBriefing, className }) {
   const { items, loading, syncing, error, configured, lastSyncAt, hydrate, refresh } = useIntelligenceStore();
-  (0, import_react152.useEffect)(() => {
+  (0, import_react153.useEffect)(() => {
     void hydrate();
   }, [hydrate]);
   return /* @__PURE__ */ (0, import_jsx_runtime117.jsxs)(
@@ -106539,11 +106614,11 @@ function IntelligenceRailPanel({ onOpenBriefing, className }) {
     }
   );
 }
-var import_react152, import_jsx_runtime117;
+var import_react153, import_jsx_runtime117;
 var init_IntelligenceRailPanel = __esm({
   "../grarf/desktop/src/components/intelligence/IntelligenceRailPanel.tsx"() {
     init_define_import_meta_env();
-    import_react152 = __toESM(require_react(), 1);
+    import_react153 = __toESM(require_react(), 1);
     init_cn();
     init_intelligenceStore();
     import_jsx_runtime117 = __toESM(require_jsx_runtime(), 1);
@@ -107719,7 +107794,7 @@ function PodcastRailPanel({
 }) {
   const location2 = useLocation();
   const workspaceGameLeague = activeGame?.league ?? null;
-  const podcastRoutingOpts = (0, import_react153.useMemo)(
+  const podcastRoutingOpts = (0, import_react154.useMemo)(
     () => ({
       pathname: location2.pathname,
       liveTags: ["all_sports"],
@@ -107727,19 +107802,19 @@ function PodcastRailPanel({
     }),
     [location2.pathname, workspaceGameLeague]
   );
-  const orderedFeeds = (0, import_react153.useMemo)(
+  const orderedFeeds = (0, import_react154.useMemo)(
     () => sortPodcastsForContext([...PODCAST_FEEDS], podcastRoutingOpts),
     [podcastRoutingOpts]
   );
-  const [episodes, setEpisodes] = (0, import_react153.useState)([]);
-  const [loading, setLoading] = (0, import_react153.useState)(true);
-  const [err, setErr] = (0, import_react153.useState)(null);
-  const [feedErrors, setFeedErrors] = (0, import_react153.useState)(0);
+  const [episodes, setEpisodes] = (0, import_react154.useState)([]);
+  const [loading, setLoading] = (0, import_react154.useState)(true);
+  const [err, setErr] = (0, import_react154.useState)(null);
+  const [feedErrors, setFeedErrors] = (0, import_react154.useState)(0);
   const loadEpisode = usePodcastPlayerStore((s2) => s2.loadEpisode);
   const episode = usePodcastPlayerStore((s2) => s2.episode);
   const isPlaying = usePodcastPlayerStore((s2) => s2.isPlaying);
   const togglePlay = usePodcastPlayerStore((s2) => s2.togglePlay);
-  const refresh = (0, import_react153.useCallback)(
+  const refresh = (0, import_react154.useCallback)(
     async (opts) => {
       const force = opts?.forceNetwork ?? false;
       if (force) clearPodcastCache();
@@ -107794,10 +107869,10 @@ function PodcastRailPanel({
     },
     [orderedFeeds, podcastRoutingOpts]
   );
-  (0, import_react153.useEffect)(() => {
+  (0, import_react154.useEffect)(() => {
     void refresh();
   }, [refresh]);
-  const filterLabel = (0, import_react153.useMemo)(
+  const filterLabel = (0, import_react154.useMemo)(
     () => resolvePodcastFilterLabel({
       pathname: location2.pathname,
       workspaceGameLeague
@@ -107888,11 +107963,11 @@ function PodcastRailPanel({
     }
   );
 }
-var import_react153, import_jsx_runtime118, LOG48;
+var import_react154, import_jsx_runtime118, LOG48;
 var init_PodcastRailPanel = __esm({
   "../grarf/desktop/src/components/media/PodcastRailPanel.tsx"() {
     init_define_import_meta_env();
-    import_react153 = __toESM(require_react(), 1);
+    import_react154 = __toESM(require_react(), 1);
     init_dist();
     init_cn();
     init_podcastFeeds();
@@ -107931,10 +108006,10 @@ var init_podcasts = __esm({
 
 // ../grarf/desktop/src/components/activity/PodcastsWaitlistPanel.tsx
 function PodcastsWaitlistPanel({ className }) {
-  const [email, setEmail] = (0, import_react154.useState)("");
-  const [status, setStatus] = (0, import_react154.useState)("idle");
-  const [errorMessage, setErrorMessage] = (0, import_react154.useState)(null);
-  const onSubmit = (0, import_react154.useCallback)(
+  const [email, setEmail] = (0, import_react155.useState)("");
+  const [status, setStatus] = (0, import_react155.useState)("idle");
+  const [errorMessage, setErrorMessage] = (0, import_react155.useState)(null);
+  const onSubmit = (0, import_react155.useCallback)(
     async (event) => {
       event.preventDefault();
       if (status === "loading" || status === "success") return;
@@ -108034,11 +108109,11 @@ function PodcastsWaitlistPanel({ className }) {
     }
   );
 }
-var import_react154, import_jsx_runtime119, FEATURED_PODCASTS;
+var import_react155, import_jsx_runtime119, FEATURED_PODCASTS;
 var init_PodcastsWaitlistPanel = __esm({
   "../grarf/desktop/src/components/activity/PodcastsWaitlistPanel.tsx"() {
     init_define_import_meta_env();
-    import_react154 = __toESM(require_react(), 1);
+    import_react155 = __toESM(require_react(), 1);
     init_lucide_react();
     init_cn();
     init_podcasts();
@@ -108460,12 +108535,12 @@ function ShowsRailPanel({
   onWatch
 }) {
   const location2 = useLocation();
-  const liveChannels = (0, import_react155.useMemo)(() => resolveLiveChannelsForDisplay(), []);
+  const liveChannels = (0, import_react156.useMemo)(() => resolveLiveChannelsForDisplay(), []);
   const leagues = useLiveGamesStore((s2) => s2.leagues);
-  const hint = (0, import_react155.useMemo)(() => selectMediaContext({ leagues }), [leagues]);
-  const tags = (0, import_react155.useMemo)(() => computeMediaContext(hint), [hint]);
-  const [imgFailed, setImgFailed] = (0, import_react155.useState)({});
-  const liveGameCounts = (0, import_react155.useMemo)(() => {
+  const hint = (0, import_react156.useMemo)(() => selectMediaContext({ leagues }), [leagues]);
+  const tags = (0, import_react156.useMemo)(() => computeMediaContext(hint), [hint]);
+  const [imgFailed, setImgFailed] = (0, import_react156.useState)({});
+  const liveGameCounts = (0, import_react156.useMemo)(() => {
     const out = {};
     ["MLB", "NBA", "WNBA", "NHL", "MLS"].forEach((L2) => {
       const n2 = (leagues[L2] ?? []).filter((g2) => g2.status === "live").length;
@@ -108473,7 +108548,7 @@ function ShowsRailPanel({
     });
     return out;
   }, [leagues]);
-  const channels = (0, import_react155.useMemo)(
+  const channels = (0, import_react156.useMemo)(
     () => sortLiveChannelsForContext([...liveChannels], {
       pathname: location2.pathname,
       liveTags: tags,
@@ -108481,7 +108556,7 @@ function ShowsRailPanel({
     }),
     [location2.pathname, tags, liveGameCounts, liveChannels]
   );
-  const [enriched, setEnriched] = (0, import_react155.useState)(() => {
+  const [enriched, setEnriched] = (0, import_react156.useState)(() => {
     const o2 = {};
     for (const ch of liveChannels) {
       primeCuratedLiveChannelArt(ch);
@@ -108490,10 +108565,10 @@ function ShowsRailPanel({
     }
     return o2;
   });
-  const onImgError = (0, import_react155.useCallback)((id) => {
+  const onImgError = (0, import_react156.useCallback)((id) => {
     setImgFailed((prev) => ({ ...prev, [id]: true }));
   }, []);
-  (0, import_react155.useEffect)(() => {
+  (0, import_react156.useEffect)(() => {
     for (const ch of liveChannels) {
       primeCuratedLiveChannelArt(ch);
     }
@@ -108519,7 +108594,7 @@ function ShowsRailPanel({
       cancelled = true;
     };
   }, [liveChannels]);
-  const routeLabel = (0, import_react155.useMemo)(() => {
+  const routeLabel = (0, import_react156.useMemo)(() => {
     const p2 = location2.pathname;
     if (p2.startsWith("/mlb")) return "MLB";
     if (p2.startsWith("/nba")) return "NBA";
@@ -108528,7 +108603,7 @@ function ShowsRailPanel({
     if (p2.startsWith("/mls")) return "MLS / Soccer";
     return hint.primaryLeague ? `${hint.primaryLeague} live` : "All sports";
   }, [location2.pathname, hint.primaryLeague]);
-  const openWatch = (0, import_react155.useCallback)(
+  const openWatch = (0, import_react156.useCallback)(
     (ch) => {
       if (!onWatch) return;
       analytics.track("show_card_clicked", { channel_id: ch.id, name: ch.name });
@@ -108648,11 +108723,11 @@ function ShowsRailPanel({
     }
   );
 }
-var import_react155, import_jsx_runtime120;
+var import_react156, import_jsx_runtime120;
 var init_ShowsRailPanel = __esm({
   "../grarf/desktop/src/components/media/ShowsRailPanel.tsx"() {
     init_define_import_meta_env();
-    import_react155 = __toESM(require_react(), 1);
+    import_react156 = __toESM(require_react(), 1);
     init_dist();
     init_cn();
     init_demoLiveChannels();
@@ -108778,10 +108853,10 @@ function useGameSocialRailFeedEvents(resolution) {
   const webError = useWebSignalsFeedStore((state3) => state3.error);
   const webRefresh = useWebSignalsFeedStore((state3) => state3.refresh);
   const setWebActiveResolution = useWebSignalsFeedStore((state3) => state3.setActiveResolution);
-  const [events, setEvents] = (0, import_react156.useState)([]);
-  const [loading, setLoading] = (0, import_react156.useState)(true);
-  const [error, setError] = (0, import_react156.useState)(null);
-  const refresh = (0, import_react156.useCallback)(async () => {
+  const [events, setEvents] = (0, import_react157.useState)([]);
+  const [loading, setLoading] = (0, import_react157.useState)(true);
+  const [error, setError] = (0, import_react157.useState)(null);
+  const refresh = (0, import_react157.useCallback)(async () => {
     if (!resolution) {
       setEvents([]);
       setError(null);
@@ -108798,7 +108873,7 @@ function useGameSocialRailFeedEvents(resolution) {
       setLoading(false);
     }
   }, [resolution]);
-  (0, import_react156.useEffect)(() => {
+  (0, import_react157.useEffect)(() => {
     if (isGrarfWebRenderer2()) {
       setWebActiveResolution(resolution);
       return () => setWebActiveResolution(null);
@@ -108814,11 +108889,11 @@ function useGameSocialRailFeedEvents(resolution) {
   }
   return { events, loading, error, refresh };
 }
-var import_react156, GAME_SOCIAL_RAIL_FEED_POLL_MS;
+var import_react157, GAME_SOCIAL_RAIL_FEED_POLL_MS;
 var init_useGameSocialRailFeedEvents = __esm({
   "../grarf/desktop/src/hooks/useGameSocialRailFeedEvents.ts"() {
     init_define_import_meta_env();
-    import_react156 = __toESM(require_react(), 1);
+    import_react157 = __toESM(require_react(), 1);
     init_fetchGameSocialRailFeedEvents();
     init_isGrarfWebRenderer();
     init_webSignalsFeedStore();
@@ -109585,7 +109660,7 @@ function GameSocialRailFeedPanel({
   className,
   fallback = null
 }) {
-  const resolvedFeed = (0, import_react157.useMemo)(() => {
+  const resolvedFeed = (0, import_react158.useMemo)(() => {
     if (resolution) return resolution;
     if (!isGrarfWebRenderer2()) return null;
     return resolveFeedsForSelectedGame(game, tab);
@@ -109607,12 +109682,12 @@ function GameSocialRailFeedPanelBody({
   className
 }) {
   const { events, loading, error, refresh } = useGameSocialRailFeedEvents(resolution);
-  const [playingEventIds, setPlayingEventIds] = (0, import_react157.useState)(() => /* @__PURE__ */ new Set());
-  const scrollRef = (0, import_react157.useRef)(null);
-  const previousEventCountRef = (0, import_react157.useRef)(0);
-  const previousScrollHeightRef = (0, import_react157.useRef)(0);
-  const displayEvents = (0, import_react157.useMemo)(() => [...events].reverse(), [events]);
-  (0, import_react157.useLayoutEffect)(() => {
+  const [playingEventIds, setPlayingEventIds] = (0, import_react158.useState)(() => /* @__PURE__ */ new Set());
+  const scrollRef = (0, import_react158.useRef)(null);
+  const previousEventCountRef = (0, import_react158.useRef)(0);
+  const previousScrollHeightRef = (0, import_react158.useRef)(0);
+  const displayEvents = (0, import_react158.useMemo)(() => [...events].reverse(), [events]);
+  (0, import_react158.useLayoutEffect)(() => {
     const el = scrollRef.current;
     if (!el) return;
     const previousCount = previousEventCountRef.current;
@@ -109631,7 +109706,7 @@ function GameSocialRailFeedPanelBody({
     previousEventCountRef.current = nextCount;
     previousScrollHeightRef.current = el.scrollHeight;
   }, [displayEvents]);
-  const handlePlayVideo = (0, import_react157.useCallback)((eventId) => {
+  const handlePlayVideo = (0, import_react158.useCallback)((eventId) => {
     setPlayingEventIds((current) => {
       if (current.has(eventId)) return current;
       const next = new Set(current);
@@ -109639,7 +109714,7 @@ function GameSocialRailFeedPanelBody({
       return next;
     });
   }, []);
-  (0, import_react157.useEffect)(() => {
+  (0, import_react158.useEffect)(() => {
     void window.grarf?.workspaceEmbedClear?.("right");
   }, []);
   return /* @__PURE__ */ (0, import_jsx_runtime123.jsx)(
@@ -109680,11 +109755,11 @@ function GameSocialRailFeedPanelBody({
     }
   );
 }
-var import_react157, import_jsx_runtime123;
+var import_react158, import_jsx_runtime123;
 var init_GameSocialRailFeedPanel = __esm({
   "../grarf/desktop/src/components/social/GameSocialRailFeedPanel.tsx"() {
     init_define_import_meta_env();
-    import_react157 = __toESM(require_react(), 1);
+    import_react158 = __toESM(require_react(), 1);
     init_cn();
     init_useGameSocialRailFeedEvents();
     init_resolveFeedsForSelectedGame();
@@ -109882,7 +109957,7 @@ var init_signalsIntel = __esm({
 
 // ../grarf/desktop/src/components/activity/SignalsIntelWaitlistPanel.tsx
 function NewsletterExampleLogo({ logoUrl, label }) {
-  const [failed, setFailed] = (0, import_react158.useState)(false);
+  const [failed, setFailed] = (0, import_react159.useState)(false);
   if (!logoUrl || failed) {
     return /* @__PURE__ */ (0, import_jsx_runtime124.jsx)("span", { className: cn2(LOGO_BOX_CLASS, "rounded-full bg-textdim/25"), "aria-hidden": true, children: /* @__PURE__ */ (0, import_jsx_runtime124.jsx)("span", { className: "h-1.5 w-1.5 rounded-full bg-textdim/55" }) });
   }
@@ -109903,10 +109978,10 @@ function NewsletterExampleLogo({ logoUrl, label }) {
   ) });
 }
 function SignalsIntelWaitlistPanel({ className }) {
-  const [email, setEmail] = (0, import_react158.useState)("");
-  const [status, setStatus] = (0, import_react158.useState)("idle");
-  const [errorMessage, setErrorMessage] = (0, import_react158.useState)(null);
-  const onSubmit = (0, import_react158.useCallback)(
+  const [email, setEmail] = (0, import_react159.useState)("");
+  const [status, setStatus] = (0, import_react159.useState)("idle");
+  const [errorMessage, setErrorMessage] = (0, import_react159.useState)(null);
+  const onSubmit = (0, import_react159.useCallback)(
     async (event) => {
       event.preventDefault();
       if (status === "loading" || status === "success") return;
@@ -110007,11 +110082,11 @@ function SignalsIntelWaitlistPanel({ className }) {
     }
   );
 }
-var import_react158, import_jsx_runtime124, LOGO_BOX_CLASS, INTEL_NEWSLETTER_EXAMPLES;
+var import_react159, import_jsx_runtime124, LOGO_BOX_CLASS, INTEL_NEWSLETTER_EXAMPLES;
 var init_SignalsIntelWaitlistPanel = __esm({
   "../grarf/desktop/src/components/activity/SignalsIntelWaitlistPanel.tsx"() {
     init_define_import_meta_env();
-    import_react158 = __toESM(require_react(), 1);
+    import_react159 = __toESM(require_react(), 1);
     init_lucide_react();
     init_cn();
     init_signalsIntel();
@@ -110059,7 +110134,7 @@ var init_signalsShow = __esm({
 
 // ../grarf/desktop/src/components/activity/SignalsShowWaitlistPanel.tsx
 function ShowExampleLogo({ logoUrl, label }) {
-  const [failed, setFailed] = (0, import_react159.useState)(false);
+  const [failed, setFailed] = (0, import_react160.useState)(false);
   if (!logoUrl || failed) {
     return /* @__PURE__ */ (0, import_jsx_runtime125.jsx)("span", { className: cn2(LOGO_BOX_CLASS2, "rounded-full bg-textdim/25"), "aria-hidden": true, children: /* @__PURE__ */ (0, import_jsx_runtime125.jsx)("span", { className: "h-1.5 w-1.5 rounded-full bg-textdim/55" }) });
   }
@@ -110080,10 +110155,10 @@ function ShowExampleLogo({ logoUrl, label }) {
   ) });
 }
 function SignalsShowWaitlistPanel({ className }) {
-  const [email, setEmail] = (0, import_react159.useState)("");
-  const [status, setStatus] = (0, import_react159.useState)("idle");
-  const [errorMessage, setErrorMessage] = (0, import_react159.useState)(null);
-  const onSubmit = (0, import_react159.useCallback)(
+  const [email, setEmail] = (0, import_react160.useState)("");
+  const [status, setStatus] = (0, import_react160.useState)("idle");
+  const [errorMessage, setErrorMessage] = (0, import_react160.useState)(null);
+  const onSubmit = (0, import_react160.useCallback)(
     async (event) => {
       event.preventDefault();
       if (status === "loading" || status === "success") return;
@@ -110184,11 +110259,11 @@ function SignalsShowWaitlistPanel({ className }) {
     }
   );
 }
-var import_react159, import_jsx_runtime125, LOGO_BOX_CLASS2, SHOW_EXAMPLES;
+var import_react160, import_jsx_runtime125, LOGO_BOX_CLASS2, SHOW_EXAMPLES;
 var init_SignalsShowWaitlistPanel = __esm({
   "../grarf/desktop/src/components/activity/SignalsShowWaitlistPanel.tsx"() {
     init_define_import_meta_env();
-    import_react159 = __toESM(require_react(), 1);
+    import_react160 = __toESM(require_react(), 1);
     init_lucide_react();
     init_cn();
     init_signalsShow();
@@ -110239,7 +110314,7 @@ var init_signalsConvo = __esm({
 
 // ../grarf/desktop/src/components/activity/SignalsConvoWaitlistPanel.tsx
 function CommunityExampleLogo({ logoUrl, label }) {
-  const [failed, setFailed] = (0, import_react160.useState)(false);
+  const [failed, setFailed] = (0, import_react161.useState)(false);
   if (!logoUrl || failed) {
     return /* @__PURE__ */ (0, import_jsx_runtime126.jsx)("span", { className: cn2(LOGO_BOX_CLASS3, "rounded-full bg-textdim/25"), "aria-hidden": true, children: /* @__PURE__ */ (0, import_jsx_runtime126.jsx)("span", { className: "h-1.5 w-1.5 rounded-full bg-textdim/55" }) });
   }
@@ -110260,10 +110335,10 @@ function CommunityExampleLogo({ logoUrl, label }) {
   ) });
 }
 function SignalsConvoWaitlistPanel({ className }) {
-  const [email, setEmail] = (0, import_react160.useState)("");
-  const [status, setStatus] = (0, import_react160.useState)("idle");
-  const [errorMessage, setErrorMessage] = (0, import_react160.useState)(null);
-  const onSubmit = (0, import_react160.useCallback)(
+  const [email, setEmail] = (0, import_react161.useState)("");
+  const [status, setStatus] = (0, import_react161.useState)("idle");
+  const [errorMessage, setErrorMessage] = (0, import_react161.useState)(null);
+  const onSubmit = (0, import_react161.useCallback)(
     async (event) => {
       event.preventDefault();
       if (status === "loading" || status === "success") return;
@@ -110364,11 +110439,11 @@ function SignalsConvoWaitlistPanel({ className }) {
     }
   );
 }
-var import_react160, import_jsx_runtime126, LOGO_BOX_CLASS3, CONVO_COMMUNITY_EXAMPLES;
+var import_react161, import_jsx_runtime126, LOGO_BOX_CLASS3, CONVO_COMMUNITY_EXAMPLES;
 var init_SignalsConvoWaitlistPanel = __esm({
   "../grarf/desktop/src/components/activity/SignalsConvoWaitlistPanel.tsx"() {
     init_define_import_meta_env();
-    import_react160 = __toESM(require_react(), 1);
+    import_react161 = __toESM(require_react(), 1);
     init_lucide_react();
     init_cn();
     init_signalsConvo();
@@ -110420,10 +110495,10 @@ var init_signalsChat = __esm({
 
 // ../grarf/desktop/src/components/activity/SignalsChatWaitlistPanel.tsx
 function SignalsChatWaitlistPanel({ className }) {
-  const [email, setEmail] = (0, import_react161.useState)("");
-  const [status, setStatus] = (0, import_react161.useState)("idle");
-  const [errorMessage, setErrorMessage] = (0, import_react161.useState)(null);
-  const onSubmit = (0, import_react161.useCallback)(
+  const [email, setEmail] = (0, import_react162.useState)("");
+  const [status, setStatus] = (0, import_react162.useState)("idle");
+  const [errorMessage, setErrorMessage] = (0, import_react162.useState)(null);
+  const onSubmit = (0, import_react162.useCallback)(
     async (event) => {
       event.preventDefault();
       if (status === "loading" || status === "success") return;
@@ -110524,11 +110599,11 @@ function SignalsChatWaitlistPanel({ className }) {
     }
   );
 }
-var import_react161, import_jsx_runtime127, LOGO_BOX_CLASS4, CHAT_ROOM_EXAMPLES;
+var import_react162, import_jsx_runtime127, LOGO_BOX_CLASS4, CHAT_ROOM_EXAMPLES;
 var init_SignalsChatWaitlistPanel = __esm({
   "../grarf/desktop/src/components/activity/SignalsChatWaitlistPanel.tsx"() {
     init_define_import_meta_env();
-    import_react161 = __toESM(require_react(), 1);
+    import_react162 = __toESM(require_react(), 1);
     init_lucide_react();
     init_cn();
     init_signalsChat();
@@ -110559,18 +110634,18 @@ function navigateWebview2(wv, url) {
   wv.src = url;
 }
 function DesktopPulse1XListWebpane({ className }) {
-  const wvRef = (0, import_react162.useRef)(null);
-  const partition = (0, import_react162.useMemo)(
+  const wvRef = (0, import_react163.useRef)(null);
+  const partition = (0, import_react163.useMemo)(
     () => homeSourceFocusArticlePartition(DESKTOP_PULSE_1_X_LIST_URL),
     []
   );
-  (0, import_react162.useLayoutEffect)(() => {
+  (0, import_react163.useLayoutEffect)(() => {
     void window.grarf?.workspaceEmbedClear?.("right");
     return () => {
       void window.grarf?.workspaceEmbedClear?.("right");
     };
   }, []);
-  (0, import_react162.useLayoutEffect)(() => {
+  (0, import_react163.useLayoutEffect)(() => {
     const unsubscribe = window.grarf?.webviewNavigateInPaneSubscribe?.((payload) => {
       const wv = wvRef.current;
       const nextUrl = payload.url?.trim();
@@ -110581,7 +110656,7 @@ function DesktopPulse1XListWebpane({ className }) {
       unsubscribe?.();
     };
   }, []);
-  (0, import_react162.useLayoutEffect)(() => {
+  (0, import_react163.useLayoutEffect)(() => {
     const wv = wvRef.current;
     if (!wv) return;
     const onNewWindow = (event) => {
@@ -110691,18 +110766,18 @@ function ActivityRail({
   suppressPulseSubmenu = false,
   hideTabBar = false
 }) {
-  const [internalTab, setInternalTab] = (0, import_react162.useState)("social");
+  const [internalTab, setInternalTab] = (0, import_react163.useState)("social");
   const tab = activeTabProp ?? internalTab;
   const setTab = onTabChange ?? setInternalTab;
-  const [pulseSubmenuIdx, setPulseSubmenuIdx] = (0, import_react162.useState)(0);
-  const [manualScope, setManualScope] = (0, import_react162.useState)(null);
-  const [socialTeamIdx, setSocialTeamIdx] = (0, import_react162.useState)(0);
-  const [redditTeamIdx, setRedditTeamIdx] = (0, import_react162.useState)(0);
+  const [pulseSubmenuIdx, setPulseSubmenuIdx] = (0, import_react163.useState)(0);
+  const [manualScope, setManualScope] = (0, import_react163.useState)(null);
+  const [socialTeamIdx, setSocialTeamIdx] = (0, import_react163.useState)(0);
+  const [redditTeamIdx, setRedditTeamIdx] = (0, import_react163.useState)(0);
   const suggested = suggestedScope ?? "home";
-  (0, import_react162.useEffect)(() => {
+  (0, import_react163.useEffect)(() => {
     setManualScope(null);
   }, [suggestedScope, gameContextLabel, socialUrl, redditUrl]);
-  (0, import_react162.useEffect)(() => {
+  (0, import_react163.useEffect)(() => {
     if (socialTeamFeeds && socialTeamFeeds.length > 0) {
       setSocialTeamIdx(defaultHomeTeamFeedIndex(socialTeamFeeds));
     } else {
@@ -110718,23 +110793,23 @@ function ActivityRail({
   const activeRedditUrl = redditTeamFeeds && redditTeamFeeds.length > 0 ? (redditTeamFeeds[redditTeamIdx] ?? redditTeamFeeds[0])?.url : redditUrl;
   const showSocialTeamToggles = !!(socialTeamFeeds && socialTeamFeeds.length > 1);
   const showRedditTeamToggles = !!(redditTeamFeeds && redditTeamFeeds.length > 1);
-  (0, import_react162.useEffect)(() => {
+  (0, import_react163.useEffect)(() => {
     if (tab === "podcasts") analytics.track("media_tab_opened", { tab: "podcasts" });
     if (tab === "shows") analytics.track("media_tab_opened", { tab: "shows" });
   }, [tab]);
   const effectiveScope = manualScope ?? suggested;
-  const pulseLines = (0, import_react162.useMemo)(
+  const pulseLines = (0, import_react163.useMemo)(
     () => mockSignalPulseLines(effectiveScope, { leagueLabel, gameContextLabel }),
     [effectiveScope, leagueLabel, gameContextLabel]
   );
   const scopeUiEnabled = suggestedScope !== void 0;
-  const leagueSignalsConfig = (0, import_react162.useMemo)(
+  const leagueSignalsConfig = (0, import_react163.useMemo)(
     () => resolveGameSocialRailLeagueSignalsConfig(activeGame),
     [activeGame]
   );
   const webGameSocialTabs = isGrarfWebRenderer2() && suggested === "game" && leagueSignalsConfig?.tabMode === "team-tabs" && !!gameAwayTeamLabel && !!gameHomeTeamLabel;
   const webGameSocialLeagueFeed = isGrarfWebRenderer2() && suggested === "game" && leagueSignalsConfig?.tabMode === "league-feed" && !!activeGame;
-  const webGameSocialRailTab = (0, import_react162.useMemo)(() => {
+  const webGameSocialRailTab = (0, import_react163.useMemo)(() => {
     if (webGameSocialTabs) {
       if (tab === "social") return "game";
       if (tab === "chat") return "away";
@@ -110744,7 +110819,7 @@ function ActivityRail({
     if (webGameSocialLeagueFeed) return "game";
     return null;
   }, [webGameSocialTabs, webGameSocialLeagueFeed, tab]);
-  const railTabItems = (0, import_react162.useMemo)(() => {
+  const railTabItems = (0, import_react163.useMemo)(() => {
     const items = webGameSocialTabs ? [
       ["social", "GAME", "Game"],
       ["chat", gameAwayTeamLabel, gameAwayTeamLabel],
@@ -110761,12 +110836,12 @@ function ActivityRail({
     return items.filter(([id]) => id === "reddit" || id === "chat");
   }, [webGameSocialTabs, gameAwayTeamLabel, gameHomeTeamLabel, hideTabBar]);
   const showPulseSubmenu = isGrarfWebRenderer2() && tab === "social" && !webGameSocialTabs && !webGameSocialLeagueFeed && !suppressPulseSubmenu;
-  const pulseSocialRailResolution = (0, import_react162.useMemo)(
+  const pulseSocialRailResolution = (0, import_react163.useMemo)(
     () => showPulseSubmenu ? resolvePulseSubmenuSocialRailFeedResolution(pulseSubmenuIdx) : null,
     [showPulseSubmenu, pulseSubmenuIdx]
   );
   const usesRightEmbed = embedsEnabled && !webGameSocialTabs && !webGameSocialLeagueFeed && (tab === "reddit" || tab === "social" && !socialPanel && !!(activeSocialUrl || socialUrl));
-  (0, import_react162.useEffect)(() => {
+  (0, import_react163.useEffect)(() => {
     if (!usesRightEmbed) {
       void window.grarf?.workspaceEmbedClear?.("right");
     }
@@ -110928,11 +111003,11 @@ function ActivityRail({
     }
   );
 }
-var import_react162, import_jsx_runtime128, tabCls, WEB_PREMIUM_SIGNAL_TAB_LOCK_IDS, teamToggleCls, PULSE_SUBMENU_ITEMS, DESKTOP_PULSE_1_X_LIST_URL, TIMELINE_WEBVIEW_WEB_PREFS;
+var import_react163, import_jsx_runtime128, tabCls, WEB_PREMIUM_SIGNAL_TAB_LOCK_IDS, teamToggleCls, PULSE_SUBMENU_ITEMS, DESKTOP_PULSE_1_X_LIST_URL, TIMELINE_WEBVIEW_WEB_PREFS;
 var init_ActivityRail = __esm({
   "../grarf/desktop/src/components/activity/ActivityRail.tsx"() {
     init_define_import_meta_env();
-    import_react162 = __toESM(require_react(), 1);
+    import_react163 = __toESM(require_react(), 1);
     init_cn();
     init_homeMvp();
     init_signalScopeContent();
@@ -111007,7 +111082,7 @@ function useCanonicalLiveGame(gameId, consumerId = "react_subscriber") {
   const record = useCanonicalLiveGameStore(
     (s2) => gameId ? s2.gamesById[gameId] : void 0
   );
-  (0, import_react163.useEffect)(() => {
+  (0, import_react164.useEffect)(() => {
     if (!gameId) return;
     useCanonicalLiveGameStore.getState().getCanonicalGame(gameId, consumerId);
   }, [gameId, consumerId, record?.meta.ingestSequence]);
@@ -111018,16 +111093,16 @@ function useCanonicalLiveGameRow(gameId, consumerId = "react_subscriber") {
   const operationsFields = useAdminOperationsCardStore(
     (s2) => gameId ? s2.fieldsByGameId[gameId] : void 0
   );
-  return (0, import_react163.useMemo)(
+  return (0, import_react164.useMemo)(
     () => game ? applyCanonicalGamesSpineOperationsEnrichment(game, operationsFields) : void 0,
     [game, operationsFields]
   );
 }
-var import_react163;
+var import_react164;
 var init_useCanonicalLiveGame = __esm({
   "../grarf/desktop/src/hooks/useCanonicalLiveGame.ts"() {
     init_define_import_meta_env();
-    import_react163 = __toESM(require_react(), 1);
+    import_react164 = __toESM(require_react(), 1);
     init_applyCanonicalGamesSpineEnrichment();
     init_canonicalLiveGameStore();
     init_adminOperationsCardStore();
@@ -111041,8 +111116,8 @@ function GameWorkspaceEditorialDetail({ gameId, catchupContextGame, className })
   const game = canonicalGame ?? resolveWorkspaceGameRow(gameId, catchupContextGame);
   const blurb = game ? resolveGeneratedBlurb(game, bundle) : null;
   const summary = game ? resolveGeneratedSummaryText(game, bundle) : null;
-  const autoTriggered = (0, import_react164.useRef)(/* @__PURE__ */ new Set());
-  (0, import_react164.useEffect)(() => {
+  const autoTriggered = (0, import_react165.useRef)(/* @__PURE__ */ new Set());
+  (0, import_react165.useEffect)(() => {
     if (!game || game.status !== "final") return;
     if (blurb) return;
     if (autoTriggered.current.has(game.id)) return;
@@ -111065,11 +111140,11 @@ function GameWorkspaceEditorialDetail({ gameId, catchupContextGame, className })
     summary ? /* @__PURE__ */ (0, import_jsx_runtime129.jsx)(GameEditorialSummaryDetail, { summary, variant: "expanded" }) : null
   ] });
 }
-var import_react164, import_jsx_runtime129;
+var import_react165, import_jsx_runtime129;
 var init_GameWorkspaceEditorialDetail = __esm({
   "../grarf/desktop/src/components/editorial/GameWorkspaceEditorialDetail.tsx"() {
     init_define_import_meta_env();
-    import_react164 = __toESM(require_react(), 1);
+    import_react165 = __toESM(require_react(), 1);
     init_cn();
     init_resolveGeneratedSummary();
     init_historicalMlbWorkspace();
@@ -111173,9 +111248,9 @@ var init_GameCorrelatedSocialList = __esm({
 // ../grarf/desktop/src/components/social/SocialRssAppFeedPanel.tsx
 function SocialRssAppFeedPanel({ className }) {
   const { events, loading, error, refresh } = useSocialRssFeedEvents();
-  const [playingEventIds, setPlayingEventIds] = (0, import_react165.useState)(() => /* @__PURE__ */ new Set());
-  const displayEvents = (0, import_react165.useMemo)(() => [...events].reverse(), [events]);
-  const handlePlayVideo = (0, import_react165.useCallback)((eventId) => {
+  const [playingEventIds, setPlayingEventIds] = (0, import_react166.useState)(() => /* @__PURE__ */ new Set());
+  const displayEvents = (0, import_react166.useMemo)(() => [...events].reverse(), [events]);
+  const handlePlayVideo = (0, import_react166.useCallback)((eventId) => {
     setPlayingEventIds((current) => {
       if (current.has(eventId)) return current;
       const next = new Set(current);
@@ -111183,7 +111258,7 @@ function SocialRssAppFeedPanel({ className }) {
       return next;
     });
   }, []);
-  (0, import_react165.useEffect)(() => {
+  (0, import_react166.useEffect)(() => {
     void window.grarf?.workspaceEmbedClear?.("right");
   }, []);
   return /* @__PURE__ */ (0, import_jsx_runtime132.jsx)(
@@ -111217,11 +111292,11 @@ function SocialRssAppFeedPanel({ className }) {
     }
   );
 }
-var import_react165, import_jsx_runtime132;
+var import_react166, import_jsx_runtime132;
 var init_SocialRssAppFeedPanel = __esm({
   "../grarf/desktop/src/components/social/SocialRssAppFeedPanel.tsx"() {
     init_define_import_meta_env();
-    import_react165 = __toESM(require_react(), 1);
+    import_react166 = __toESM(require_react(), 1);
     init_cn();
     init_useSocialRssFeedEvents();
     init_SocialRssFeedPostRow();
@@ -111263,8 +111338,8 @@ async function fetchMlbLiveGameStoryAvailable(game) {
   return fetchMlbGameStoryDapiAvailable(gamePk);
 }
 function useMlbLiveGameStoryAvailability(game) {
-  const [liveGameStoryAvailable, setLiveGameStoryAvailable] = (0, import_react166.useState)(false);
-  (0, import_react166.useEffect)(() => {
+  const [liveGameStoryAvailable, setLiveGameStoryAvailable] = (0, import_react167.useState)(false);
+  (0, import_react167.useEffect)(() => {
     if (!game || game.status !== "live" && game.status !== "final") {
       setLiveGameStoryAvailable(false);
       return;
@@ -111290,11 +111365,11 @@ function useMlbLiveGameStoryAvailability(game) {
   }, [game?.id, game?.status, game?.gamePk, game?.externalIds?.mlb]);
   return liveGameStoryAvailable;
 }
-var import_react166, MLB_CONTENT_POLL_MS;
+var import_react167, MLB_CONTENT_POLL_MS;
 var init_useMlbLiveGameStoryAvailability = __esm({
   "../grarf/desktop/src/hooks/useMlbLiveGameStoryAvailability.ts"() {
     init_define_import_meta_env();
-    import_react166 = __toESM(require_react(), 1);
+    import_react167 = __toESM(require_react(), 1);
     init_mlbGamedayUrl();
     MLB_CONTENT_POLL_MS = 6e4;
   }
@@ -111304,16 +111379,16 @@ var init_useMlbLiveGameStoryAvailability = __esm({
 function useMlbWorkspaceStoryPanel(game, fallbackStoryPanel) {
   const isMlbGame3 = game?.league === "MLB";
   const liveGameStoryAvailable = useMlbLiveGameStoryAvailability(isMlbGame3 ? game : null);
-  return (0, import_react167.useMemo)(() => {
+  return (0, import_react168.useMemo)(() => {
     if (!isMlbGame3 || !game) return fallbackStoryPanel;
     return resolveMlbWorkspaceStoryPanel(game, { liveGameStoryAvailable }) ?? fallbackStoryPanel ?? null;
   }, [game, isMlbGame3, fallbackStoryPanel, liveGameStoryAvailable]);
 }
-var import_react167;
+var import_react168;
 var init_useMlbWorkspaceStoryPanel = __esm({
   "../grarf/desktop/src/hooks/useMlbWorkspaceStoryPanel.ts"() {
     init_define_import_meta_env();
-    import_react167 = __toESM(require_react(), 1);
+    import_react168 = __toESM(require_react(), 1);
     init_mlbGamedayUrl();
     init_useMlbLiveGameStoryAvailability();
   }
@@ -111323,18 +111398,18 @@ var init_useMlbWorkspaceStoryPanel = __esm({
 function useGameCorrelatedNewsArticles(gameId) {
   const articlesById = useGameCorrelatedNewsStore((state3) => state3.articlesById);
   const articleIdsByGameId = useGameCorrelatedNewsStore((state3) => state3.articleIdsByGameId);
-  return (0, import_react168.useMemo)(() => {
+  return (0, import_react169.useMemo)(() => {
     const key2 = gameId?.trim();
     if (!key2) return [];
     const ids = articleIdsByGameId[key2] ?? [];
     return ids.map((id) => articlesById[id]).filter((row) => row != null);
   }, [articleIdsByGameId, articlesById, gameId]);
 }
-var import_react168;
+var import_react169;
 var init_useGameCorrelatedNewsArticles = __esm({
   "../grarf/desktop/src/hooks/useGameCorrelatedNewsArticles.ts"() {
     init_define_import_meta_env();
-    import_react168 = __toESM(require_react(), 1);
+    import_react169 = __toESM(require_react(), 1);
     init_gameCorrelatedNewsStore();
   }
 });
@@ -111624,18 +111699,18 @@ var init_gameCorrelatedSocialStore = __esm({
 function useGameCorrelatedSocialPosts(gameId) {
   const postsById = useGameCorrelatedSocialStore((state3) => state3.postsById);
   const postIdsByGameId = useGameCorrelatedSocialStore((state3) => state3.postIdsByGameId);
-  return (0, import_react169.useMemo)(() => {
+  return (0, import_react170.useMemo)(() => {
     const key2 = gameId?.trim();
     if (!key2) return [];
     const ids = postIdsByGameId[key2] ?? [];
     return ids.map((id) => postsById[id]).filter((row) => row != null);
   }, [postIdsByGameId, postsById, gameId]);
 }
-var import_react169;
+var import_react170;
 var init_useGameCorrelatedSocialPosts = __esm({
   "../grarf/desktop/src/hooks/useGameCorrelatedSocialPosts.ts"() {
     init_define_import_meta_env();
-    import_react169 = __toESM(require_react(), 1);
+    import_react170 = __toESM(require_react(), 1);
     init_gameCorrelatedSocialStore();
   }
 });
@@ -111645,8 +111720,8 @@ function useGameSocialIngest(game) {
   const mergeFromNormalizedPosts = useGameCorrelatedSocialStore(
     (state3) => state3.mergeFromNormalizedPosts
   );
-  const inflightGameIdRef = (0, import_react170.useRef)(null);
-  (0, import_react170.useEffect)(() => {
+  const inflightGameIdRef = (0, import_react171.useRef)(null);
+  (0, import_react171.useEffect)(() => {
     if (!game?.id) return;
     if (!isGrarfElectronRenderer()) return;
     if (game.league !== "MLB") return;
@@ -111679,11 +111754,11 @@ function useGameSocialIngest(game) {
     };
   }, [game, mergeFromNormalizedPosts]);
 }
-var import_react170;
+var import_react171;
 var init_useGameSocialIngest = __esm({
   "../grarf/desktop/src/hooks/useGameSocialIngest.ts"() {
     init_define_import_meta_env();
-    import_react170 = __toESM(require_react(), 1);
+    import_react171 = __toESM(require_react(), 1);
     init_gameSocial();
     init_isGrarfWebRenderer();
     init_gameCorrelatedSocialStore();
@@ -111775,30 +111850,30 @@ function GameUtilityRail({
   const correlatedNewsArticles = useGameCorrelatedNewsArticles(gameId);
   const correlatedSocialPosts = useGameCorrelatedSocialPosts(gameId);
   useGameSocialIngest(activeGame);
-  const [redditTeamIdx, setRedditTeamIdx] = (0, import_react171.useState)(0);
-  const [pulseSocialTab, setPulseSocialTab] = (0, import_react171.useState)("game");
-  (0, import_react171.useEffect)(() => {
+  const [redditTeamIdx, setRedditTeamIdx] = (0, import_react172.useState)(0);
+  const [pulseSocialTab, setPulseSocialTab] = (0, import_react172.useState)("game");
+  (0, import_react172.useEffect)(() => {
     setRedditTeamIdx(0);
     setPulseSocialTab("game");
   }, [workspaceTitle]);
-  (0, import_react171.useEffect)(() => {
+  (0, import_react172.useEffect)(() => {
     if (!catchupContextGame?.gamePk) return;
     logHistoricalMlbWorkspacePanel("Social rail loaded", catchupContextGame.gamePk);
   }, [catchupContextGame?.gamePk]);
-  const redditSlots = (0, import_react171.useMemo)(() => {
+  const redditSlots = (0, import_react172.useMemo)(() => {
     if (redditTeamFeeds && redditTeamFeeds.length > 0) return redditTeamFeeds;
     return null;
   }, [redditTeamFeeds]);
-  const leagueSignalsConfig = (0, import_react171.useMemo)(
+  const leagueSignalsConfig = (0, import_react172.useMemo)(
     () => resolveGameSocialRailLeagueSignalsConfig(activeGame),
     [activeGame]
   );
-  const allSportsFeedResolution = (0, import_react171.useMemo)(() => resolveAllSportsSocialRailFeedResolution(), []);
+  const allSportsFeedResolution = (0, import_react172.useMemo)(() => resolveAllSportsSocialRailFeedResolution(), []);
   const canonicalSignalsFallback = isCanonicalMlbGameWorkspaceRenderer() ? /* @__PURE__ */ (0, import_jsx_runtime133.jsx)(GameSocialRailFeedPanel, { resolution: allSportsFeedResolution }) : /* @__PURE__ */ (0, import_jsx_runtime133.jsx)(SocialRssAppFeedPanel, {});
   const webGameSocialLeagueFeed = isCanonicalMlbGameWorkspaceRenderer() && !watchLiveActive && (leagueSignalsConfig?.tabMode === "league-feed" && !!activeGame || Boolean(socialRailResolution));
   const webGameSocialTabs = isCanonicalMlbGameWorkspaceRenderer() && leagueSignalsConfig?.tabMode === "team-tabs" && !!awayTeamLabel && !!homeTeamLabel && !watchLiveActive;
   const watchPulseTeamSocialTabs = watchLiveActive && isCanonicalMlbGameWorkspaceRenderer() && leagueSignalsConfig?.tabMode === "team-tabs" && !!activeGame && !!awayTeamLabel && !!homeTeamLabel;
-  const webGameSocialRailTab = (0, import_react171.useMemo)(() => {
+  const webGameSocialRailTab = (0, import_react172.useMemo)(() => {
     if (webGameSocialTabs) {
       if (tab === "signals") return "game";
       if (tab === "chat") return "away";
@@ -111812,7 +111887,7 @@ function GameUtilityRail({
     return null;
   }, [webGameSocialTabs, webGameSocialLeagueFeed, tab]);
   const gameWorkspaceSocialTabs = webGameSocialTabs || webGameSocialLeagueFeed;
-  const visibleTabRows = (0, import_react171.useMemo)(() => {
+  const visibleTabRows = (0, import_react172.useMemo)(() => {
     if (webGameSocialLeagueFeed) {
       return [["signals", "GAME"]];
     }
@@ -111826,15 +111901,15 @@ function GameUtilityRail({
     if (watchLiveActive) return WATCH_UTILITY_TAB_ROWS;
     return MONITOR_UTILITY_TAB_ROWS;
   }, [webGameSocialLeagueFeed, webGameSocialTabs, watchLiveActive, awayTeamLabel, homeTeamLabel]);
-  (0, import_react171.useEffect)(() => {
+  (0, import_react172.useEffect)(() => {
     if (watchLiveActive) return;
     if (tab === "story" || tab === "gamecenter") setTab("signals");
   }, [watchLiveActive, tab, setTab]);
-  const activeGc = (0, import_react171.useMemo)(() => {
+  const activeGc = (0, import_react172.useMemo)(() => {
     const id = selectedGamecenterProviderId ?? defaultGamecenterProvider;
     return gamecenterProviders.find((p2) => p2.id === id) ?? gamecenterProviders[0] ?? null;
   }, [gamecenterProviders, defaultGamecenterProvider, selectedGamecenterProviderId]);
-  (0, import_react171.useEffect)(() => {
+  (0, import_react172.useEffect)(() => {
     if (!activeGc || tab !== "gamecenter") return;
     recordWorkspaceIdentitySnapshot(
       buildWorkspaceIdentitySnapshot({
@@ -112068,11 +112143,11 @@ function GameUtilityRail({
     }
   );
 }
-var import_react171, import_jsx_runtime133, tabCls2, gameWorkspaceTabLabelCls, utilityTabLabelCls, GAME_WORKSPACE_TAB_ACTIVE_CYAN_CLASS, MONITOR_UTILITY_TAB_ROWS, WATCH_UTILITY_TAB_ROWS;
+var import_react172, import_jsx_runtime133, tabCls2, gameWorkspaceTabLabelCls, utilityTabLabelCls, GAME_WORKSPACE_TAB_ACTIVE_CYAN_CLASS, MONITOR_UTILITY_TAB_ROWS, WATCH_UTILITY_TAB_ROWS;
 var init_GameUtilityRail = __esm({
   "../grarf/desktop/src/components/gameWorkspace/GameUtilityRail.tsx"() {
     init_define_import_meta_env();
-    import_react171 = __toESM(require_react(), 1);
+    import_react172 = __toESM(require_react(), 1);
     init_useAppVisible();
     init_cn();
     init_analytics2();
@@ -112202,12 +112277,12 @@ function formatLoadError(event) {
 }
 function HomeHeadlinesCbsPanel({ embedsEnabled = true, videoUrl }) {
   const navigationUrl = videoUrl ?? CBS_SPORTS_HQ_LIVE_URL;
-  const wvRef = (0, import_react172.useRef)(null);
-  const finalUrlRef = (0, import_react172.useRef)(navigationUrl);
-  const [loadError, setLoadError] = (0, import_react172.useState)(null);
-  const partition = (0, import_react172.useMemo)(() => "persist:grarf-cbs-headlines", []);
+  const wvRef = (0, import_react173.useRef)(null);
+  const finalUrlRef = (0, import_react173.useRef)(navigationUrl);
+  const [loadError, setLoadError] = (0, import_react173.useState)(null);
+  const partition = (0, import_react173.useMemo)(() => "persist:grarf-cbs-headlines", []);
   const showSurface = embedsEnabled && hasWebviewTag3();
-  (0, import_react172.useLayoutEffect)(() => {
+  (0, import_react173.useLayoutEffect)(() => {
     if (!showSurface) {
       console.warn(`${LOG49} webview unavailable \u2014 embedsEnabled=${embedsEnabled}`);
       return;
@@ -112365,11 +112440,11 @@ function HomeHeadlinesCbsPanel({ embedsEnabled = true, videoUrl }) {
     }
   );
 }
-var import_react172, import_jsx_runtime134, CBS_SPORTS_HQ_LIVE_URL, LOG49, BROWSER_SURFACE_TYPE, HEADLINES_CONTENT_HEIGHT, CBS_WEB_PREFS;
+var import_react173, import_jsx_runtime134, CBS_SPORTS_HQ_LIVE_URL, LOG49, BROWSER_SURFACE_TYPE, HEADLINES_CONTENT_HEIGHT, CBS_WEB_PREFS;
 var init_HomeHeadlinesCbsPanel = __esm({
   "../grarf/desktop/src/components/homeMvp/HomeHeadlinesCbsPanel.tsx"() {
     init_define_import_meta_env();
-    import_react172 = __toESM(require_react(), 1);
+    import_react173 = __toESM(require_react(), 1);
     init_cn();
     init_cbsHeadlinesVideoProbe();
     init_paneContainment();
@@ -112584,8 +112659,8 @@ var init_PersistentPodcastPlayer = __esm({
 
 // ../grarf/desktop/src/lib/perf/useDeferredMount.ts
 function useDeferredMount(delayMs = 900, enabled = true) {
-  const [ready, setReady] = (0, import_react173.useState)(false);
-  (0, import_react173.useEffect)(() => {
+  const [ready, setReady] = (0, import_react174.useState)(false);
+  (0, import_react174.useEffect)(() => {
     if (!enabled) {
       setReady(false);
       return;
@@ -112611,11 +112686,11 @@ function useDeferredMount(delayMs = 900, enabled = true) {
   }, [delayMs, enabled]);
   return ready;
 }
-var import_react173;
+var import_react174;
 var init_useDeferredMount = __esm({
   "../grarf/desktop/src/lib/perf/useDeferredMount.ts"() {
     init_define_import_meta_env();
-    import_react173 = __toESM(require_react(), 1);
+    import_react174 = __toESM(require_react(), 1);
   }
 });
 
@@ -112639,21 +112714,21 @@ function HomeRightRail({
   const embedsReady = useDeferredMount(1200);
   const activityRailTab = useHomeActivityRailTabStore((s2) => s2.activeTab);
   const setActivityRailTab = useHomeActivityRailTabStore((s2) => s2.setActiveTab);
-  const socialRailTvPanelRef = (0, import_react174.useRef)(null);
+  const socialRailTvPanelRef = (0, import_react175.useRef)(null);
   const { activeLeagueId } = useHomeActiveLeagueContextOptional();
   const leagueWorkspaceId = isHomeLeagueHubWorkspaceTab(activeGameWorkspace) ? activeGameWorkspace.leagueHubId : null;
-  const activeGame = (0, import_react174.useMemo)(
+  const activeGame = (0, import_react175.useMemo)(
     () => activeGameId ? findLiveGameById(activeGameId) : void 0,
     [activeGameId]
   );
   const activeGamePayload = activeGameWorkspace?.type === "game" ? activeGameWorkspace.gamePayload : null;
   const isMlbGameWorkspace = activeGamePayload?.sport === "mlb";
   const isGameWorkspace = activeGameWorkspace?.type === "game" && !!activeGamePayload;
-  const leagueSocialSignalsConfig = (0, import_react174.useMemo)(
+  const leagueSocialSignalsConfig = (0, import_react175.useMemo)(
     () => resolveGameSocialRailLeagueSignalsConfig(activeGame),
     [activeGame]
   );
-  const wnbaCenterSocialRailResolution = (0, import_react174.useMemo)(
+  const wnbaCenterSocialRailResolution = (0, import_react175.useMemo)(
     () => resolveWnbaSocialRailFeedFromActiveCenterWorkspace(activeGameWorkspace),
     [activeGameWorkspace]
   );
@@ -112665,11 +112740,11 @@ function HomeRightRail({
     "home_utility_rail"
   );
   const utilityLiveStateLabel = (canonicalActiveGame && buildCanonicalLiveStateLabel(canonicalActiveGame)) ?? activeGamePayload?.liveStateLabel;
-  const railContext = (0, import_react174.useMemo)(() => {
+  const railContext = (0, import_react175.useMemo)(() => {
     if (activeGame) return resolveHomeRightRailContext(activeGame);
     return resolveHomeActiveLeagueRailContext(activeLeagueId);
   }, [activeGame, activeLeagueId]);
-  const hierarchyHeader = (0, import_react174.useMemo)(
+  const hierarchyHeader = (0, import_react175.useMemo)(
     () => isGrarfWebRenderer2() ? null : /* @__PURE__ */ (0, import_jsx_runtime139.jsx)(
       SocialRailHierarchyHeader,
       {
@@ -112681,14 +112756,14 @@ function HomeRightRail({
     ),
     [isMlbGameWorkspace, activeGameWorkspace, onReturnToLeagueFromSocialRail]
   );
-  const webGameTeamLabels = (0, import_react174.useMemo)(() => {
+  const webGameTeamLabels = (0, import_react175.useMemo)(() => {
     if (!isGrarfWebRenderer2() && !isGrarfElectronRenderer() || !activeGame) return void 0;
     return {
       away: activeGame.awayTeam.trim().toUpperCase() || "AWAY",
       home: activeGame.homeTeam.trim().toUpperCase() || "HOME"
     };
   }, [activeGame]);
-  const homeSocialRailResolution = (0, import_react174.useMemo)(() => {
+  const homeSocialRailResolution = (0, import_react175.useMemo)(() => {
     if (!isGrarfWebRenderer2()) return null;
     const fromLeagueWorkspace = resolveHomeLeagueWorkspaceSocialRailFeedResolution(leagueWorkspaceId);
     if (fromLeagueWorkspace) return fromLeagueWorkspace;
@@ -112699,7 +112774,7 @@ function HomeRightRail({
     if (fromPermanentBrowser) return fromPermanentBrowser;
     return resolveHomeSocialRailFeedResolution(activeLeagueId);
   }, [leagueWorkspaceId, wnbaCenterSocialRailResolution, activeGameWorkspace, activeLeagueId]);
-  (0, import_react174.useLayoutEffect)(() => {
+  (0, import_react175.useLayoutEffect)(() => {
     if (!isGrarfWebRenderer2() || !onSocialRailTvPanelHeightChange) return;
     const el = socialRailTvPanelRef.current;
     if (!el) return;
@@ -112792,11 +112867,11 @@ function HomeRightRail({
     !isGrarfWebRenderer2() ? /* @__PURE__ */ (0, import_jsx_runtime139.jsx)(PersistentPodcastPlayer, {}) : null
   ] });
 }
-var import_react174, import_jsx_runtime139;
+var import_react175, import_jsx_runtime139;
 var init_HomeRightRail = __esm({
   "../grarf/desktop/src/components/homeMvp/HomeRightRail.tsx"() {
     init_define_import_meta_env();
-    import_react174 = __toESM(require_react(), 1);
+    import_react175 = __toESM(require_react(), 1);
     init_ActivityRail();
     init_GameUtilityRail();
     init_HomeHeadlinesCbsPanel();
@@ -112972,7 +113047,7 @@ function LeagueHomePaneFocusProvider({
   );
 }
 function useLeagueHomePaneFocus() {
-  return (0, import_react175.useContext)(LeagueHomePaneFocusContext);
+  return (0, import_react176.useContext)(LeagueHomePaneFocusContext);
 }
 function LeagueHomePaneFocusHeaderActions() {
   const ctx = useLeagueHomePaneFocus();
@@ -112984,21 +113059,21 @@ function LeagueHomePaneFocusHeaderActions() {
   if (focusedPaneId != null) return null;
   return /* @__PURE__ */ (0, import_jsx_runtime140.jsx)("button", { type: "button", onClick: enterFullFocus, className: focusControlClass, children: "FULL" });
 }
-var import_react175, import_jsx_runtime140, LeagueHomePaneFocusContext, focusControlClass;
+var import_react176, import_jsx_runtime140, LeagueHomePaneFocusContext, focusControlClass;
 var init_leagueHomePaneFocus = __esm({
   "../grarf/desktop/src/components/league/leagueHomePaneFocus.tsx"() {
     init_define_import_meta_env();
-    import_react175 = __toESM(require_react(), 1);
+    import_react176 = __toESM(require_react(), 1);
     init_cn();
     import_jsx_runtime140 = __toESM(require_jsx_runtime(), 1);
-    LeagueHomePaneFocusContext = (0, import_react175.createContext)(null);
+    LeagueHomePaneFocusContext = (0, import_react176.createContext)(null);
     focusControlClass = "border border-line/80 px-2 py-0.5 font-mono text-[8px] tracking-[0.14em] text-textdim transition hover:border-cyansys/40 hover:text-cyansys";
   }
 });
 
 // ../grarf/desktop/src/components/league/LeagueHomePaneRail.tsx
 function readPaneId(child, index) {
-  if ((0, import_react176.isValidElement)(child)) {
+  if ((0, import_react177.isValidElement)(child)) {
     const id = child.props.paneId;
     if (typeof id === "string" && id.length > 0) return id;
   }
@@ -113017,9 +113092,9 @@ function resizePaneWidth(width, delta, minWidth) {
   return Math.max(minWidth, width + delta);
 }
 function LeagueHomePaneResizeHandle({ onResize, onResizeCommit }) {
-  const draggingRef = (0, import_react176.useRef)(false);
-  const lastXRef = (0, import_react176.useRef)(0);
-  const endDrag = (0, import_react176.useCallback)(
+  const draggingRef = (0, import_react177.useRef)(false);
+  const lastXRef = (0, import_react177.useRef)(0);
+  const endDrag = (0, import_react177.useCallback)(
     (target, pointerId) => {
       const wasDragging = draggingRef.current;
       draggingRef.current = false;
@@ -113075,7 +113150,7 @@ function LeagueHomePaneResizeHandle({ onResize, onResizeCommit }) {
 }
 function buildInitialPaneWidths(league2, children) {
   if (!league2) return {};
-  const paneIds = import_react176.Children.toArray(children).map((pane, index) => readPaneId(pane, index));
+  const paneIds = import_react177.Children.toArray(children).map((pane, index) => readPaneId(pane, index));
   return pickSavedPaneWidthsForRail(readSavedLeaguePaneWidthsSync(league2), paneIds);
 }
 function LeagueHomePaneRail({
@@ -113088,13 +113163,13 @@ function LeagueHomePaneRail({
   scrollToPaneId,
   scrollToPaneRequestId
 }) {
-  const viewportRef = (0, import_react176.useRef)(null);
-  const scrollLeftRef = (0, import_react176.useRef)(0);
-  const fulfilledScrollRequestRef = (0, import_react176.useRef)(0);
-  const skipPersistRef = (0, import_react176.useRef)(true);
-  const [viewportW, setViewportW] = (0, import_react176.useState)(0);
-  const [internalFocusedPaneId, setInternalFocusedPaneId] = (0, import_react176.useState)(null);
-  const [paneWidths, setPaneWidths] = (0, import_react176.useState)(
+  const viewportRef = (0, import_react177.useRef)(null);
+  const scrollLeftRef = (0, import_react177.useRef)(0);
+  const fulfilledScrollRequestRef = (0, import_react177.useRef)(0);
+  const skipPersistRef = (0, import_react177.useRef)(true);
+  const [viewportW, setViewportW] = (0, import_react177.useState)(0);
+  const [internalFocusedPaneId, setInternalFocusedPaneId] = (0, import_react177.useState)(null);
+  const [paneWidths, setPaneWidths] = (0, import_react177.useState)(
     () => buildInitialPaneWidths(league2, children)
   );
   const focusedPaneId = focusedPaneIdProp !== void 0 ? focusedPaneIdProp : internalFocusedPaneId;
@@ -113104,8 +113179,8 @@ function LeagueHomePaneRail({
     }
     onFocusedPaneIdChange?.(paneId);
   };
-  const paneEntries = (0, import_react176.useMemo)(
-    () => import_react176.Children.toArray(children).map((pane, index) => ({
+  const paneEntries = (0, import_react177.useMemo)(
+    () => import_react177.Children.toArray(children).map((pane, index) => ({
       pane,
       paneId: readPaneId(pane, index),
       index
@@ -113113,10 +113188,10 @@ function LeagueHomePaneRail({
     [children]
   );
   const paneIdsKey = paneEntries.map((entry2) => entry2.paneId).join("\0");
-  const prevLeagueRef = (0, import_react176.useRef)(league2);
-  const latestPaneWidthsRef = (0, import_react176.useRef)(paneWidths);
+  const prevLeagueRef = (0, import_react177.useRef)(league2);
+  const latestPaneWidthsRef = (0, import_react177.useRef)(paneWidths);
   latestPaneWidthsRef.current = paneWidths;
-  const persistPaneWidths = (0, import_react176.useCallback)(
+  const persistPaneWidths = (0, import_react177.useCallback)(
     (widths) => {
       if (!league2) return;
       if (Object.keys(widths).length === 0) return;
@@ -113124,15 +113199,15 @@ function LeagueHomePaneRail({
     },
     [league2]
   );
-  const commitResizePersist = (0, import_react176.useCallback)(() => {
+  const commitResizePersist = (0, import_react177.useCallback)(() => {
     persistPaneWidths(latestPaneWidthsRef.current);
   }, [persistPaneWidths]);
-  (0, import_react176.useEffect)(() => {
+  (0, import_react177.useEffect)(() => {
     requestAnimationFrame(() => {
       skipPersistRef.current = false;
     });
   }, []);
-  (0, import_react176.useEffect)(() => {
+  (0, import_react177.useEffect)(() => {
     if (prevLeagueRef.current === league2) return;
     prevLeagueRef.current = league2;
     skipPersistRef.current = true;
@@ -113151,14 +113226,14 @@ function LeagueHomePaneRail({
       skipPersistRef.current = false;
     });
   }, [league2, paneEntries]);
-  (0, import_react176.useEffect)(() => {
+  (0, import_react177.useEffect)(() => {
     return () => {
       if (league2 && Object.keys(latestPaneWidthsRef.current).length > 0) {
         useLeagueHomePaneLayoutStore.getState().setLeaguePaneWidths(league2, latestPaneWidthsRef.current);
       }
     };
   }, [league2]);
-  (0, import_react176.useEffect)(() => {
+  (0, import_react177.useEffect)(() => {
     const el = viewportRef.current;
     if (!el) return;
     const ro2 = new ResizeObserver((entries) => {
@@ -113168,7 +113243,7 @@ function LeagueHomePaneRail({
     ro2.observe(el);
     return () => ro2.disconnect();
   }, []);
-  (0, import_react176.useEffect)(() => {
+  (0, import_react177.useEffect)(() => {
     if (viewportW <= 0) return;
     setPaneWidths((prev) => {
       let changed = false;
@@ -113189,7 +113264,7 @@ function LeagueHomePaneRail({
     });
   }, [viewportW, paneIdsKey, paneWidthRatios, paneEntries]);
   const isFocusActive = focusedPaneId != null;
-  (0, import_react176.useEffect)(() => {
+  (0, import_react177.useEffect)(() => {
     if (!scrollToPaneId || isFocusActive) {
       if (!scrollToPaneId) fulfilledScrollRequestRef.current = 0;
       return;
@@ -113215,7 +113290,7 @@ function LeagueHomePaneRail({
       requestAnimationFrame(scrollToTarget);
     });
   }, [scrollToPaneId, scrollToPaneRequestId, paneEntries, paneWidths, isFocusActive]);
-  (0, import_react176.useEffect)(() => {
+  (0, import_react177.useEffect)(() => {
     const el = viewportRef.current;
     if (!el) return;
     if (focusedPaneId != null) return;
@@ -113228,7 +113303,7 @@ function LeagueHomePaneRail({
     el.addEventListener("wheel", onWheel, { passive: false });
     return () => el.removeEventListener("wheel", onWheel);
   }, [isFocusActive]);
-  const resizePane = (0, import_react176.useCallback)((paneId, delta) => {
+  const resizePane = (0, import_react177.useCallback)((paneId, delta) => {
     setPaneWidths((prev) => {
       const width = prev[paneId];
       if (width == null) return prev;
@@ -113251,7 +113326,7 @@ function LeagueHomePaneRail({
       if (el) el.scrollLeft = scrollLeftRef.current;
     });
   };
-  const resetLayout = (0, import_react176.useCallback)(() => {
+  const resetLayout = (0, import_react177.useCallback)(() => {
     if (!league2) return;
     skipPersistRef.current = true;
     useLeagueHomePaneLayoutStore.getState().resetLeaguePaneLayouts(league2);
@@ -113301,7 +113376,7 @@ function LeagueHomePaneRail({
               const widthPercent = `${Math.round(ratio * 1e3) / 10}%`;
               const fallbackWidthPx = viewportW > 0 ? Math.max(MIN_PANE_WIDTH_PX, Math.round(viewportW * ratio)) : 0;
               const resolvedWidthPx = widthPx != null ? widthPx : viewportW > 0 ? fallbackWidthPx : null;
-              return /* @__PURE__ */ (0, import_jsx_runtime141.jsxs)(import_react176.Fragment, { children: [
+              return /* @__PURE__ */ (0, import_jsx_runtime141.jsxs)(import_react177.Fragment, { children: [
                 /* @__PURE__ */ (0, import_jsx_runtime141.jsx)(
                   LeagueHomePaneFocusProvider,
                   {
@@ -113347,11 +113422,11 @@ function LeagueHomePaneRail({
     )
   ] });
 }
-var import_react176, import_jsx_runtime141, PANE_RESIZE_HANDLE_WIDTH_PX, RAIL_PANE_WIDTH_RATIO, MIN_PANE_WIDTH_PX;
+var import_react177, import_jsx_runtime141, PANE_RESIZE_HANDLE_WIDTH_PX, RAIL_PANE_WIDTH_RATIO, MIN_PANE_WIDTH_PX;
 var init_LeagueHomePaneRail = __esm({
   "../grarf/desktop/src/components/league/LeagueHomePaneRail.tsx"() {
     init_define_import_meta_env();
-    import_react176 = __toESM(require_react(), 1);
+    import_react177 = __toESM(require_react(), 1);
     init_cn();
     init_leagueHomePaneLayoutStorage();
     init_leagueHomePaneLayoutStore();
@@ -113365,8 +113440,8 @@ var init_LeagueHomePaneRail = __esm({
 
 // ../grarf/desktop/src/components/league/WebsitePaneSiteIcon.tsx
 function WebsitePaneSiteIcon({ url, className }) {
-  const faviconUrl = (0, import_react177.useMemo)(() => resolveWebsiteFaviconUrl(url), [url]);
-  const [failed, setFailed] = (0, import_react177.useState)(false);
+  const faviconUrl = (0, import_react178.useMemo)(() => resolveWebsiteFaviconUrl(url), [url]);
+  const [failed, setFailed] = (0, import_react178.useState)(false);
   if (!faviconUrl || failed) {
     return /* @__PURE__ */ (0, import_jsx_runtime142.jsx)("span", { className: cn2("h-1 w-1 shrink-0 rounded-full bg-textdim/55", className), "aria-hidden": true });
   }
@@ -113386,11 +113461,11 @@ function WebsitePaneSiteIcon({ url, className }) {
     }
   );
 }
-var import_react177, import_jsx_runtime142;
+var import_react178, import_jsx_runtime142;
 var init_WebsitePaneSiteIcon = __esm({
   "../grarf/desktop/src/components/league/WebsitePaneSiteIcon.tsx"() {
     init_define_import_meta_env();
-    import_react177 = __toESM(require_react(), 1);
+    import_react178 = __toESM(require_react(), 1);
     init_cn();
     init_websitePaneBranding();
     import_jsx_runtime142 = __toESM(require_jsx_runtime(), 1);
@@ -114325,7 +114400,7 @@ var init_browserWorkspace = __esm({
 
 // ../grarf/desktop/src/components/homeMvp/HomeBrowserWebsitePanePlaceholder.tsx
 function BrowserDestinationLogo({ logoUrl, label }) {
-  const [failed, setFailed] = (0, import_react178.useState)(false);
+  const [failed, setFailed] = (0, import_react179.useState)(false);
   if (!logoUrl || failed) {
     return /* @__PURE__ */ (0, import_jsx_runtime145.jsx)("span", { className: cn2(LOGO_BOX_CLASS5, "rounded-full bg-textdim/25"), "aria-hidden": true, children: /* @__PURE__ */ (0, import_jsx_runtime145.jsx)("span", { className: "h-1.5 w-1.5 rounded-full bg-textdim/55" }) });
   }
@@ -114346,10 +114421,10 @@ function BrowserDestinationLogo({ logoUrl, label }) {
   ) });
 }
 function HomeBrowserWebsitePanePlaceholder() {
-  const [email, setEmail] = (0, import_react178.useState)("");
-  const [status, setStatus] = (0, import_react178.useState)("idle");
-  const [errorMessage, setErrorMessage] = (0, import_react178.useState)(null);
-  const onSubmit = (0, import_react178.useCallback)(
+  const [email, setEmail] = (0, import_react179.useState)("");
+  const [status, setStatus] = (0, import_react179.useState)("idle");
+  const [errorMessage, setErrorMessage] = (0, import_react179.useState)(null);
+  const onSubmit = (0, import_react179.useCallback)(
     async (event) => {
       event.preventDefault();
       if (status === "loading" || status === "success") return;
@@ -114436,11 +114511,11 @@ function HomeBrowserWebsitePanePlaceholder() {
     ] })
   ] }) }) });
 }
-var import_react178, import_jsx_runtime145, LOGO_BOX_CLASS5, BROWSER_DESTINATIONS;
+var import_react179, import_jsx_runtime145, LOGO_BOX_CLASS5, BROWSER_DESTINATIONS;
 var init_HomeBrowserWebsitePanePlaceholder = __esm({
   "../grarf/desktop/src/components/homeMvp/HomeBrowserWebsitePanePlaceholder.tsx"() {
     init_define_import_meta_env();
-    import_react178 = __toESM(require_react(), 1);
+    import_react179 = __toESM(require_react(), 1);
     init_lucide_react();
     init_cn();
     init_browserWorkspace();
@@ -114515,12 +114590,12 @@ var init_desktopBrowsing = __esm({
 
 // ../grarf/desktop/src/components/homeMvp/WebsitePaneBrowsingLayoutIndicator.tsx
 function WebsitePaneBrowsingLayoutIndicator({ className }) {
-  const [open, setOpen] = (0, import_react179.useState)(false);
+  const [open, setOpen] = (0, import_react180.useState)(false);
   const isWeb = isGrarfWebRenderer2();
-  const openModal = (0, import_react179.useCallback)(() => {
+  const openModal = (0, import_react180.useCallback)(() => {
     setOpen(true);
   }, []);
-  const closeModal = (0, import_react179.useCallback)(() => {
+  const closeModal = (0, import_react180.useCallback)(() => {
     setOpen(false);
   }, []);
   if (!isWeb) {
@@ -114574,11 +114649,11 @@ function WebsitePaneBrowsingLayoutIndicator({ className }) {
     )
   ] });
 }
-var import_react179, import_jsx_runtime147, indicatorClassName;
+var import_react180, import_jsx_runtime147, indicatorClassName;
 var init_WebsitePaneBrowsingLayoutIndicator = __esm({
   "../grarf/desktop/src/components/homeMvp/WebsitePaneBrowsingLayoutIndicator.tsx"() {
     init_define_import_meta_env();
-    import_react179 = __toESM(require_react(), 1);
+    import_react180 = __toESM(require_react(), 1);
     init_GatedFeatureModal();
     init_desktopBrowsing();
     init_isGrarfWebRenderer();
@@ -114598,9 +114673,9 @@ function HomeSourceWebPane({
   onFullscreen,
   leagueWorkspacePane = false
 }) {
-  const embedHostRef = (0, import_react180.useRef)(null);
+  const embedHostRef = (0, import_react181.useRef)(null);
   const hasEmbedUrl = Boolean(source.url?.trim());
-  const youtubeIframeEmbedSrc = (0, import_react180.useMemo)(
+  const youtubeIframeEmbedSrc = (0, import_react181.useMemo)(
     () => resolveHomeSourceYoutubeIframeEmbedSrc(source.url ?? ""),
     [source.url]
   );
@@ -114613,17 +114688,17 @@ function HomeSourceWebPane({
   const webFullscreenSessionKey = useHomeSourceFocusStore((state3) => state3.webFullscreenSessionKey);
   const isWebRenderer = isGrarfWebRenderer2();
   const isWebFullscreen = isWebRenderer && webFullscreenSessionKey === sessionKey;
-  const partition = (0, import_react180.useMemo)(() => {
+  const partition = (0, import_react181.useMemo)(() => {
     if (!hasEmbedUrl) return "persist:grarf-home-generic";
     return homeSourceWebPartition(source.url);
   }, [source.url, hasEmbedUrl]);
   const embedSrc = resolveHomeSourceEmbedUrl(source.url);
-  (0, import_react180.useEffect)(() => {
+  (0, import_react181.useEffect)(() => {
     if (!showEmbed) return;
     void window.grarf?.workspaceEmbedClear?.("center");
     void window.grarf?.workspaceEmbedClear?.("centerChild");
   }, [showEmbed]);
-  (0, import_react180.useLayoutEffect)(() => {
+  (0, import_react181.useLayoutEffect)(() => {
     const host = embedHostRef.current;
     if (!showWebviewEmbed || !host) {
       registerHomeSourceCardHost(sessionKey, null);
@@ -114637,12 +114712,12 @@ function HomeSourceWebPane({
       registerHomeSourceCardHost(sessionKey, null);
     };
   }, [sessionKey, showWebviewEmbed, embedSrc, partition, isBorrowed]);
-  const onNavHome = (0, import_react180.useCallback)(() => {
+  const onNavHome = (0, import_react181.useCallback)(() => {
     const wv = getHomeSourceCardWebview(sessionKey);
     if (!wv || !embedSrc) return;
     homeSourceWebviewGoHome(wv, embedSrc);
   }, [sessionKey, embedSrc]);
-  const onExitWebFullscreen = (0, import_react180.useCallback)(() => {
+  const onExitWebFullscreen = (0, import_react181.useCallback)(() => {
     useHomeSourceFocusStore.getState().clearWebFullscreenSessionKey();
   }, []);
   const paneBorderClass = leagueWorkspacePane ? "border-2 border-[#24363c]/55" : "border border-[#24363c]/55";
@@ -114725,11 +114800,11 @@ function HomeSourceWebPane({
     }
   );
 }
-var import_react180, import_jsx_runtime148;
+var import_react181, import_jsx_runtime148;
 var init_HomeSourceWebPane = __esm({
   "../grarf/desktop/src/components/homeMvp/HomeSourceWebPane.tsx"() {
     init_define_import_meta_env();
-    import_react180 = __toESM(require_react(), 1);
+    import_react181 = __toESM(require_react(), 1);
     init_cn();
     init_homeWebPaneFrame();
     init_homeSourceFocusSourceSession();
@@ -114804,11 +114879,11 @@ function scrollWebsitePaneToViewportStart(root, pane, control) {
     control.programmaticScrollTimer = 0;
   }, BROWSER_WEBSITE_PANE_PROGRAMMATIC_SCROLL_MS);
 }
-var import_react181, import_jsx_runtime149, BROWSER_WEBSITE_PANE_PROGRAMMATIC_SCROLL_MS, BROWSER_WEBSITE_PANE_SCROLL_RETRY_MAX_FRAMES, HomeLeagueStackSection;
+var import_react182, import_jsx_runtime149, BROWSER_WEBSITE_PANE_PROGRAMMATIC_SCROLL_MS, BROWSER_WEBSITE_PANE_SCROLL_RETRY_MAX_FRAMES, HomeLeagueStackSection;
 var init_HomeLeagueStackSection = __esm({
   "../grarf/desktop/src/components/homeMvp/HomeLeagueStackSection.tsx"() {
     init_define_import_meta_env();
-    import_react181 = __toESM(require_react(), 1);
+    import_react182 = __toESM(require_react(), 1);
     init_cn();
     init_isGrarfWebRenderer();
     init_homeHeadlinesWebsiteSubmenuStore();
@@ -114817,7 +114892,7 @@ var init_HomeLeagueStackSection = __esm({
     import_jsx_runtime149 = __toESM(require_jsx_runtime(), 1);
     BROWSER_WEBSITE_PANE_PROGRAMMATIC_SCROLL_MS = 500;
     BROWSER_WEBSITE_PANE_SCROLL_RETRY_MAX_FRAMES = 180;
-    HomeLeagueStackSection = (0, import_react181.forwardRef)(function HomeLeagueStackSection2({ section, mountWebviews = true, onSourceArticleNavigate, onSourceFullscreen, leagueWorkspacePane = false, horizontalPaneTrack = false, suppressPaneMenuSync = false }, ref) {
+    HomeLeagueStackSection = (0, import_react182.forwardRef)(function HomeLeagueStackSection2({ section, mountWebviews = true, onSourceArticleNavigate, onSourceFullscreen, leagueWorkspacePane = false, horizontalPaneTrack = false, suppressPaneMenuSync = false }, ref) {
       const isWebRenderer = isGrarfWebRenderer2();
       const webFullscreenSessionKey = useHomeSourceFocusStore((state3) => state3.webFullscreenSessionKey);
       const hasWebFullscreen = isWebRenderer && webFullscreenSessionKey != null;
@@ -114825,16 +114900,16 @@ var init_HomeLeagueStackSection = __esm({
       const activeSourceId = useHomeHeadlinesWebsiteSubmenuStore((state3) => state3.activeSourceId);
       const focusSessionKey = useHomeHeadlinesWebsiteSubmenuStore((state3) => state3.focusSessionKey);
       const focusGeneration = useHomeHeadlinesWebsiteSubmenuStore((state3) => state3.focusGeneration);
-      const scrollRef = (0, import_react181.useRef)(null);
-      const leagueFullscreenDismissedRef = (0, import_react181.useRef)(false);
-      const prevFullscreenSessionKeyRef = (0, import_react181.useRef)(null);
-      const horizontalScrollControlRef = (0, import_react181.useRef)({
+      const scrollRef = (0, import_react182.useRef)(null);
+      const leagueFullscreenDismissedRef = (0, import_react182.useRef)(false);
+      const prevFullscreenSessionKeyRef = (0, import_react182.useRef)(null);
+      const horizontalScrollControlRef = (0, import_react182.useRef)({
         lockedLeft: 0,
         allowProgrammaticScroll: false,
         userInitiatedScroll: false,
         programmaticScrollTimer: 0
       });
-      (0, import_react181.useEffect)(() => {
+      (0, import_react182.useEffect)(() => {
         if (!useLeagueWebFullscreenPane || !isWebRenderer) return;
         const prev = prevFullscreenSessionKeyRef.current;
         const current = webFullscreenSessionKey;
@@ -114843,7 +114918,7 @@ var init_HomeLeagueStackSection = __esm({
         }
         prevFullscreenSessionKeyRef.current = current;
       }, [useLeagueWebFullscreenPane, isWebRenderer, webFullscreenSessionKey]);
-      (0, import_react181.useEffect)(() => {
+      (0, import_react182.useEffect)(() => {
         if (!useLeagueWebFullscreenPane || !isWebRenderer) return;
         return () => {
           const store = useHomeSourceFocusStore.getState();
@@ -114852,7 +114927,7 @@ var init_HomeLeagueStackSection = __esm({
           }
         };
       }, [useLeagueWebFullscreenPane, isWebRenderer]);
-      (0, import_react181.useEffect)(() => {
+      (0, import_react182.useEffect)(() => {
         if (!useLeagueWebFullscreenPane || !isWebRenderer || leagueFullscreenDismissedRef.current) return;
         const nextSessionKey = resolveActiveWebsitePaneSessionKey(
           section,
@@ -114872,7 +114947,7 @@ var init_HomeLeagueStackSection = __esm({
         focusSessionKey,
         focusGeneration
       ]);
-      (0, import_react181.useEffect)(() => {
+      (0, import_react182.useEffect)(() => {
         if (!hasWebFullscreen) return;
         const nextSessionKey = resolveActiveWebsitePaneSessionKey(
           section,
@@ -114885,7 +114960,7 @@ var init_HomeLeagueStackSection = __esm({
           useHomeSourceFocusStore.getState().setWebFullscreenSessionKey(nextSessionKey);
         }
       }, [hasWebFullscreen, section, activeSourceId, focusSessionKey, focusGeneration]);
-      (0, import_react181.useEffect)(() => {
+      (0, import_react182.useEffect)(() => {
         const skipMenuScroll = !focusSessionKey || hasWebFullscreen || leagueWorkspacePane && !horizontalPaneTrack || !isWebRenderer && !horizontalPaneTrack || horizontalPaneTrack && suppressPaneMenuSync;
         if (skipMenuScroll) return;
         const root = scrollRef.current;
@@ -114945,7 +115020,7 @@ var init_HomeLeagueStackSection = __esm({
         leagueWorkspacePane,
         section.sources
       ]);
-      (0, import_react181.useEffect)(() => {
+      (0, import_react182.useEffect)(() => {
         if (hasWebFullscreen || !isWebRenderer || suppressPaneMenuSync) return;
         const root = scrollRef.current;
         if (!root) return;
@@ -115044,7 +115119,7 @@ var init_HomeLeagueStackSection = __esm({
 // ../grarf/desktop/src/hooks/useHomeLeagueWorkspaceMainMenuEntryDefaults.ts
 function useHomeLeagueWorkspaceMainMenuEntryDefaults(hubId, config) {
   const setActiveCategory = useHomeLeagueWorkspaceMainMenuStore((s2) => s2.setActiveCategory);
-  (0, import_react182.useEffect)(() => {
+  (0, import_react183.useEffect)(() => {
     if (!config?.defaultCategoryId) return;
     const current = useHomeLeagueWorkspaceMainMenuStore.getState().activeCategoryByHub[hubId];
     const valid = current && config.categories.some((category) => category.id === current);
@@ -115053,11 +115128,11 @@ function useHomeLeagueWorkspaceMainMenuEntryDefaults(hubId, config) {
     }
   }, [hubId, config, setActiveCategory]);
 }
-var import_react182;
+var import_react183;
 var init_useHomeLeagueWorkspaceMainMenuEntryDefaults = __esm({
   "../grarf/desktop/src/hooks/useHomeLeagueWorkspaceMainMenuEntryDefaults.ts"() {
     init_define_import_meta_env();
-    import_react182 = __toESM(require_react(), 1);
+    import_react183 = __toESM(require_react(), 1);
     init_homeLeagueWorkspaceMainMenuStore();
   }
 });
@@ -115066,8 +115141,8 @@ var init_useHomeLeagueWorkspaceMainMenuEntryDefaults = __esm({
 function useHomeLeagueWorkspaceWebsiteSubmenuEntryDefaults(sources, paneSectionId) {
   const clearSelection = useHomeHeadlinesWebsiteSubmenuStore((s2) => s2.clearSelection);
   const selectWebsite = useHomeHeadlinesWebsiteSubmenuStore((s2) => s2.selectWebsite);
-  const autoOpenedBrowserTabRef = (0, import_react183.useRef)(null);
-  (0, import_react183.useEffect)(() => {
+  const autoOpenedBrowserTabRef = (0, import_react184.useRef)(null);
+  (0, import_react184.useEffect)(() => {
     if (sources === null) return;
     const configured = filterEmbeddableHomeSources(sources);
     if (!configured.length) {
@@ -115095,11 +115170,11 @@ function useHomeLeagueWorkspaceWebsiteSubmenuEntryDefaults(sources, paneSectionI
     }
   }, [sources, paneSectionId, clearSelection, selectWebsite]);
 }
-var import_react183;
+var import_react184;
 var init_useHomeLeagueWorkspaceWebsiteSubmenuEntryDefaults = __esm({
   "../grarf/desktop/src/hooks/useHomeLeagueWorkspaceWebsiteSubmenuEntryDefaults.ts"() {
     init_define_import_meta_env();
-    import_react183 = __toESM(require_react(), 1);
+    import_react184 = __toESM(require_react(), 1);
     init_resolveHeadlinesAllWebsitePaneSources();
     init_canonical();
     init_isGrarfWebRenderer();
@@ -115113,7 +115188,7 @@ function HomeLeagueWorkspaceMainMenu({ hubId, config }) {
     (s2) => s2.activeCategoryByHub[hubId] ?? config?.defaultCategoryId ?? null
   );
   const setActiveCategory = useHomeLeagueWorkspaceMainMenuStore((s2) => s2.setActiveCategory);
-  const items = (0, import_react184.useMemo)(
+  const items = (0, import_react185.useMemo)(
     () => config?.categories.map((category) => ({
       id: category.id,
       label: category.label,
@@ -115149,11 +115224,11 @@ function HomeLeagueWorkspaceMainMenu({ hubId, config }) {
     }
   );
 }
-var import_react184, import_jsx_runtime150;
+var import_react185, import_jsx_runtime150;
 var init_HomeLeagueWorkspaceMainMenu = __esm({
   "../grarf/desktop/src/components/homeMvp/HomeLeagueWorkspaceMainMenu.tsx"() {
     init_define_import_meta_env();
-    import_react184 = __toESM(require_react(), 1);
+    import_react185 = __toESM(require_react(), 1);
     init_WorkspaceSubnav();
     init_homeSubnavChrome();
     init_canonical();
@@ -115170,7 +115245,7 @@ function HomeLeagueWorkspacePageNav({ hubId }) {
   const liveWorkspaceItemsByLeagueKey = useAdminOperationsLiveWorkspaceStore(
     (s2) => s2.itemsByLeagueKey
   );
-  const config = (0, import_react185.useMemo)(
+  const config = (0, import_react186.useMemo)(
     () => resolveHomeLeagueWorkspaceNavigationConfig(
       hubId,
       liveLeagues,
@@ -115182,7 +115257,7 @@ function HomeLeagueWorkspacePageNav({ hubId }) {
     (s2) => s2.activeCategoryByHub[hubId] ?? config?.defaultCategoryId ?? null
   );
   useHomeLeagueWorkspaceMainMenuEntryDefaults(hubId, config);
-  const submenuSources = (0, import_react185.useMemo)(
+  const submenuSources = (0, import_react186.useMemo)(
     () => resolveHomeLeagueHubPaneSources(
       hubId,
       activeCategoryId,
@@ -115192,7 +115267,7 @@ function HomeLeagueWorkspacePageNav({ hubId }) {
     [hubId, activeCategoryId, liveLeagues, operationsFieldsByGameId, liveWorkspaceItemsByLeagueKey]
   );
   useHomeLeagueWorkspaceWebsiteSubmenuEntryDefaults(submenuSources ?? null);
-  const showWebsiteSubmenu = (0, import_react185.useMemo)(() => {
+  const showWebsiteSubmenu = (0, import_react186.useMemo)(() => {
     if (!submenuSources?.length) return false;
     return filterEmbeddableHomeSources(submenuSources).length > 1;
   }, [submenuSources]);
@@ -115207,11 +115282,11 @@ function HomeLeagueWorkspacePageNav({ hubId }) {
     ) : null
   ] });
 }
-var import_react185, import_jsx_runtime151;
+var import_react186, import_jsx_runtime151;
 var init_HomeLeagueWorkspacePageNav = __esm({
   "../grarf/desktop/src/components/homeMvp/HomeLeagueWorkspacePageNav.tsx"() {
     init_define_import_meta_env();
-    import_react185 = __toESM(require_react(), 1);
+    import_react186 = __toESM(require_react(), 1);
     init_homeLeagueWorkspaceNavigationRegistry();
     init_useHomeLeagueWorkspaceMainMenuEntryDefaults();
     init_useHomeLeagueWorkspaceWebsiteSubmenuEntryDefaults();
@@ -115250,7 +115325,7 @@ function HomeSourceCardsSurface({
   const liveWorkspaceItemsByLeagueKey = useAdminOperationsLiveWorkspaceStore(
     (s2) => s2.itemsByLeagueKey
   );
-  const section = (0, import_react186.useMemo)(() => {
+  const section = (0, import_react187.useMemo)(() => {
     if (activeSection.id !== "general-sports") return activeSection;
     if (leagueHubId) {
       const hubSources = resolveHomeLeagueHubPaneSources(
@@ -115313,11 +115388,11 @@ function HomeSourceCardsSurface({
     }
   );
 }
-var import_react186, import_jsx_runtime152;
+var import_react187, import_jsx_runtime152;
 var init_HomeSourceCardsSurface = __esm({
   "../grarf/desktop/src/components/homeMvp/HomeSourceCardsSurface.tsx"() {
     init_define_import_meta_env();
-    import_react186 = __toESM(require_react(), 1);
+    import_react187 = __toESM(require_react(), 1);
     init_cn();
     init_HomeActiveLeagueContext();
     init_resolveWebBettingPaneSources();
@@ -115487,17 +115562,17 @@ function childPaneLabel(raw) {
   }
 }
 function ContextualSplitEmbed({ url, className, partition, active: active2 = true }) {
-  const [childUrl, setChildUrl] = (0, import_react187.useState)(null);
+  const [childUrl, setChildUrl] = (0, import_react188.useState)(null);
   const sessionPartition = partition?.trim() || DEFAULT_EMBED_CENTER_PARTITION;
   const contextPaneEnabled = isContextPaneBrowsingPartition(sessionPartition);
-  const childLabel = (0, import_react187.useMemo)(() => childUrl ? childPaneLabel(childUrl) : "", [childUrl]);
-  (0, import_react187.useEffect)(() => {
+  const childLabel = (0, import_react188.useMemo)(() => childUrl ? childPaneLabel(childUrl) : "", [childUrl]);
+  (0, import_react188.useEffect)(() => {
     setChildUrl(null);
     if (!active2) {
       void window.grarf?.workspaceEmbedClear?.("centerChild");
     }
   }, [url, active2]);
-  (0, import_react187.useEffect)(() => {
+  (0, import_react188.useEffect)(() => {
     if (!active2 || !contextPaneEnabled) return;
     const unsub = window.grarf?.contextPaneSubscribe?.((payload) => {
       if (!payload?.url) return;
@@ -115509,7 +115584,7 @@ function ContextualSplitEmbed({ url, className, partition, active: active2 = tru
     });
     return unsub;
   }, [active2, contextPaneEnabled]);
-  const closeChild = (0, import_react187.useCallback)(() => {
+  const closeChild = (0, import_react188.useCallback)(() => {
     setChildUrl(null);
     void window.grarf?.workspaceEmbedClear?.("centerChild");
     console.log("[ContextPane] Restored parent width");
@@ -115572,11 +115647,11 @@ function ContextualSplitEmbed({ url, className, partition, active: active2 = tru
     }
   );
 }
-var import_react187, import_jsx_runtime153, SOURCE_PANE_PERCENT, CHILD_PANE_PERCENT;
+var import_react188, import_jsx_runtime153, SOURCE_PANE_PERCENT, CHILD_PANE_PERCENT;
 var init_ContextualSplitEmbed = __esm({
   "../grarf/desktop/src/components/ContextualSplitEmbed.tsx"() {
     init_define_import_meta_env();
-    import_react187 = __toESM(require_react(), 1);
+    import_react188 = __toESM(require_react(), 1);
     init_cn();
     init_streamingProviders2();
     init_paneContainment();
@@ -115589,8 +115664,8 @@ var init_ContextualSplitEmbed = __esm({
 
 // ../grarf/desktop/src/components/streaming/StreamWorkspaceWebview.tsx
 function StreamWorkspaceWebview({ url, partition, title, className }) {
-  const wvRef = (0, import_react188.useRef)(null);
-  (0, import_react188.useEffect)(() => {
+  const wvRef = (0, import_react189.useRef)(null);
+  (0, import_react189.useEffect)(() => {
     void window.grarf?.workspaceEmbedClear?.("center");
     return () => {
       void window.grarf?.workspaceEmbedClear?.("center");
@@ -115608,11 +115683,11 @@ function StreamWorkspaceWebview({ url, partition, title, className }) {
     }
   ) });
 }
-var import_react188, import_jsx_runtime154, STREAM_WEB_PREFS;
+var import_react189, import_jsx_runtime154, STREAM_WEB_PREFS;
 var init_StreamWorkspaceWebview = __esm({
   "../grarf/desktop/src/components/streaming/StreamWorkspaceWebview.tsx"() {
     init_define_import_meta_env();
-    import_react188 = __toESM(require_react(), 1);
+    import_react189 = __toESM(require_react(), 1);
     init_cn();
     init_paneContainment();
     import_jsx_runtime154 = __toESM(require_jsx_runtime(), 1);
@@ -115646,11 +115721,11 @@ var init_resolveWorkspaceGamePk = __esm({
 // ../grarf/desktop/src/hooks/useMlbGameWorkspaceHighlights.ts
 function useMlbGameWorkspaceHighlights(gamePk) {
   const highlightsByGamePk = useMlbCatchupHighlightsStore((s2) => s2.highlightsByGamePk);
-  const highlights = (0, import_react189.useMemo)(() => {
+  const highlights = (0, import_react190.useMemo)(() => {
     if (gamePk == null || !Number.isFinite(gamePk)) return [];
     return highlightsByGamePk[gamePk] ?? [];
   }, [gamePk, highlightsByGamePk]);
-  (0, import_react189.useEffect)(() => {
+  (0, import_react190.useEffect)(() => {
     if (gamePk == null || !Number.isFinite(gamePk)) return;
     console.log(`[MLB HIGHLIGHTS]
 gamePk=${gamePk}
@@ -115658,11 +115733,11 @@ highlights=${highlights.length}`);
   }, [gamePk, highlights.length]);
   return highlights;
 }
-var import_react189;
+var import_react190;
 var init_useMlbGameWorkspaceHighlights = __esm({
   "../grarf/desktop/src/hooks/useMlbGameWorkspaceHighlights.ts"() {
     init_define_import_meta_env();
-    import_react189 = __toESM(require_react(), 1);
+    import_react190 = __toESM(require_react(), 1);
     init_mlbCatchupHighlightsStore();
   }
 });
@@ -115671,13 +115746,13 @@ var init_useMlbGameWorkspaceHighlights = __esm({
 function useGameWorkspaceHighlight(gameId, catchupContextGame) {
   const canonicalGame = useCanonicalLiveGameRow(gameId, "game_workspace_highlights");
   const game = canonicalGame ?? (gameId ? resolveWorkspaceGameRow(gameId, catchupContextGame) : void 0);
-  const gameRef = (0, import_react190.useRef)(game);
+  const gameRef = (0, import_react191.useRef)(game);
   gameRef.current = game;
-  const supported = (0, import_react190.useMemo)(() => {
+  const supported = (0, import_react191.useMemo)(() => {
     if (!game?.league) return false;
     return !!getHighlightProvider(game.league);
   }, [game?.league]);
-  const highlightFetchKey = (0, import_react190.useMemo)(() => {
+  const highlightFetchKey = (0, import_react191.useMemo)(() => {
     if (!game) return null;
     return resolveLeagueHighlightFetchKey(resolveLeagueHighlightGamePayload(game));
   }, [
@@ -115692,17 +115767,17 @@ function useGameWorkspaceHighlight(gameId, catchupContextGame) {
     game?.metadata?.round,
     game?.startTimeMs
   ]);
-  const [loading, setLoading] = (0, import_react190.useState)(false);
-  const [video, setVideo] = (0, import_react190.useState)(null);
-  const [error, setError] = (0, import_react190.useState)(null);
-  const resolvedVideoIdRef = (0, import_react190.useRef)(null);
-  (0, import_react190.useEffect)(() => {
+  const [loading, setLoading] = (0, import_react191.useState)(false);
+  const [video, setVideo] = (0, import_react191.useState)(null);
+  const [error, setError] = (0, import_react191.useState)(null);
+  const resolvedVideoIdRef = (0, import_react191.useRef)(null);
+  (0, import_react191.useEffect)(() => {
     resolvedVideoIdRef.current = null;
     setVideo(null);
     setError(null);
     setLoading(false);
   }, [gameId]);
-  (0, import_react190.useEffect)(() => {
+  (0, import_react191.useEffect)(() => {
     const currentGame = gameRef.current;
     if (!gameId || !highlightFetchKey || !supported || !currentGame) {
       return;
@@ -115742,11 +115817,11 @@ function useGameWorkspaceHighlight(gameId, catchupContextGame) {
   }, [gameId, highlightFetchKey, supported]);
   return { loading, video, error, supported };
 }
-var import_react190;
+var import_react191;
 var init_useGameWorkspaceHighlight = __esm({
   "../grarf/desktop/src/hooks/useGameWorkspaceHighlight.ts"() {
     init_define_import_meta_env();
-    import_react190 = __toESM(require_react(), 1);
+    import_react191 = __toESM(require_react(), 1);
     init_fetchGameLeagueHighlight();
     init_resolveLeagueHighlightGamePayload();
     init_leagueHighlightProviders();
@@ -115839,7 +115914,7 @@ function GameWorkspaceHighlightsPlaceholder({
   const operationsHighlightUrl = useAdminOperationsCardStore(
     (s2) => s2.fieldsByGameId[gameId]?.highlightVideoUrl ?? EMPTY_ADMIN_OPERATIONS_CARD_FIELDS.highlightVideoUrl
   );
-  const manualHighlight = (0, import_react191.useMemo)(
+  const manualHighlight = (0, import_react192.useMemo)(
     () => manualHighlightUrlToGameHighlightVideo2(operationsHighlightUrl),
     [operationsHighlightUrl]
   );
@@ -115848,10 +115923,10 @@ function GameWorkspaceHighlightsPlaceholder({
   const gamePk = resolveWorkspaceGamePk(gameId, workspaceGame);
   const mlbHighlights = useMlbGameWorkspaceHighlights(gamePk);
   const hasMlbHighlights = mlbHighlights.length > 0;
-  const [highlightIndex, setHighlightIndex] = (0, import_react191.useState)(0);
+  const [highlightIndex, setHighlightIndex] = (0, import_react192.useState)(0);
   const currentMlbHighlight = mlbHighlights[highlightIndex] ?? mlbHighlights[0];
   const showMlbHighlightNav = mlbHighlights.length > 1;
-  (0, import_react191.useEffect)(() => {
+  (0, import_react192.useEffect)(() => {
     setHighlightIndex(0);
   }, [gamePk, mlbHighlights.length]);
   const { loading, video, error, supported } = useGameWorkspaceHighlight(gameId, catchupContextGame);
@@ -115996,11 +116071,11 @@ function GameWorkspaceHighlightsPlaceholder({
     }
   );
 }
-var import_react191, import_jsx_runtime155, WEB_GAME_WORKSPACE_HIGHLIGHT_FRAME_CLASS, GameWorkspaceLeagueHighlightIframe;
+var import_react192, import_jsx_runtime155, WEB_GAME_WORKSPACE_HIGHLIGHT_FRAME_CLASS, GameWorkspaceLeagueHighlightIframe;
 var init_GameWorkspaceHighlightsPlaceholder = __esm({
   "../grarf/desktop/src/components/gameWorkspace/GameWorkspaceHighlightsPlaceholder.tsx"() {
     init_define_import_meta_env();
-    import_react191 = __toESM(require_react(), 1);
+    import_react192 = __toESM(require_react(), 1);
     init_cn();
     init_canonicalGameHighlight();
     init_resolveWorkspaceGamePk();
@@ -116013,7 +116088,7 @@ var init_GameWorkspaceHighlightsPlaceholder = __esm({
     init_LeagueHighlightYoutubePlayer();
     import_jsx_runtime155 = __toESM(require_jsx_runtime(), 1);
     WEB_GAME_WORKSPACE_HIGHLIGHT_FRAME_CLASS = "aspect-video w-full max-w-full max-h-full";
-    GameWorkspaceLeagueHighlightIframe = (0, import_react191.memo)(function GameWorkspaceLeagueHighlightIframe2({
+    GameWorkspaceLeagueHighlightIframe = (0, import_react192.memo)(function GameWorkspaceLeagueHighlightIframe2({
       videoId,
       title,
       league: league2,
@@ -116147,8 +116222,8 @@ async function loadMlbWorkspaceStandingsRecords(signal) {
   return cachedStandingsPromise;
 }
 function useMlbWorkspaceStandingsContext(game) {
-  const [activeTab, setActiveTab] = (0, import_react192.useState)("away");
-  const [state3, setState] = (0, import_react192.useState)({
+  const [activeTab, setActiveTab] = (0, import_react193.useState)("away");
+  const [state3, setState] = (0, import_react193.useState)({
     loading: true,
     error: null,
     records: []
@@ -116158,10 +116233,10 @@ function useMlbWorkspaceStandingsContext(game) {
   const homeAbbrev = normalizeMlbWorkspaceTeamAbbrev(game?.homeTeamAbbrev);
   const awayTeamName = game?.awayTeam;
   const homeTeamName = game?.homeTeam;
-  (0, import_react192.useEffect)(() => {
+  (0, import_react193.useEffect)(() => {
     setActiveTab("away");
   }, [gameId]);
-  (0, import_react192.useEffect)(() => {
+  (0, import_react193.useEffect)(() => {
     const controller = new AbortController();
     let cancelled = false;
     setState((prev) => ({ ...prev, loading: true, error: null }));
@@ -116184,7 +116259,7 @@ function useMlbWorkspaceStandingsContext(game) {
   const activeTeamAbbrev = activeTab === "away" ? awayAbbrev : homeAbbrev;
   const activeTeamName = activeTab === "away" ? awayTeamName : homeTeamName;
   const highlightTeamAbbrev = activeTeamAbbrev;
-  const divisionStandings = (0, import_react192.useMemo)(() => {
+  const divisionStandings = (0, import_react193.useMemo)(() => {
     if (!activeTeamAbbrev || state3.records.length === 0) return null;
     return resolveMlbWorkspaceDivisionStandingsForTeam(
       state3.records,
@@ -116203,11 +116278,11 @@ function useMlbWorkspaceStandingsContext(game) {
     error: state3.error
   };
 }
-var import_react192, cachedStandingsRecords, cachedStandingsPromise;
+var import_react193, cachedStandingsRecords, cachedStandingsPromise;
 var init_useMlbWorkspaceStandingsContext = __esm({
   "../grarf/desktop/src/hooks/useMlbWorkspaceStandingsContext.ts"() {
     init_define_import_meta_env();
-    import_react192 = __toESM(require_react(), 1);
+    import_react193 = __toESM(require_react(), 1);
     init_fetchMlbWorkspaceStandings();
     init_normalizeMlbWorkspaceTeamAbbrev();
     init_resolveMlbWorkspaceDivisionStandings();
@@ -116407,11 +116482,11 @@ var init_resolveGameWorkspaceContextSnapshot = __esm({
 function GameWorkspaceStandingsSnapshot({ gameId, catchupContextGame, className }) {
   const canonicalGame = useCanonicalLiveGameRow(gameId, "game_workspace_standings");
   const game = canonicalGame ?? resolveWorkspaceGameRow(gameId, catchupContextGame);
-  const lines = (0, import_react193.useMemo)(
+  const lines = (0, import_react194.useMemo)(
     () => game ? resolveGameWorkspaceContextSnapshot(game) : [],
     [game]
   );
-  (0, import_react193.useEffect)(() => {
+  (0, import_react194.useEffect)(() => {
     if (!catchupContextGame?.gamePk || lines.length === 0) return;
     logHistoricalMlbWorkspacePanel("Context loaded", catchupContextGame.gamePk);
   }, [catchupContextGame?.gamePk, lines.length]);
@@ -116447,11 +116522,11 @@ function GameWorkspaceStandingsSnapshot({ gameId, catchupContextGame, className 
     }
   );
 }
-var import_react193, import_jsx_runtime157;
+var import_react194, import_jsx_runtime157;
 var init_GameWorkspaceStandingsSnapshot = __esm({
   "../grarf/desktop/src/components/gameWorkspace/GameWorkspaceStandingsSnapshot.tsx"() {
     init_define_import_meta_env();
-    import_react193 = __toESM(require_react(), 1);
+    import_react194 = __toESM(require_react(), 1);
     init_cn();
     init_resolveGameWorkspaceContextSnapshot();
     init_historicalMlbWorkspace();
@@ -116724,42 +116799,42 @@ function GameWorkspace({ workspace, className, watchCoordination, suppressWorksp
   const initialWatch = !!(payload && payload.startInWatchMode);
   const defaultGcId = payload?.defaultGamecenterProvider;
   const useCoord = !!watchCoordination;
-  const [internalWatch, setInternalWatch] = (0, import_react194.useState)(initialWatch);
-  const [internalGcId, setInternalGcId] = (0, import_react194.useState)(defaultGcId);
-  const [storyCollapsed, setStoryCollapsed] = (0, import_react194.useState)(false);
+  const [internalWatch, setInternalWatch] = (0, import_react195.useState)(initialWatch);
+  const [internalGcId, setInternalGcId] = (0, import_react195.useState)(defaultGcId);
+  const [storyCollapsed, setStoryCollapsed] = (0, import_react195.useState)(false);
   const isWatchingLive = useCoord ? watchCoordination.watchActive : internalWatch;
   const selectedGcId = useCoord ? watchCoordination.selectedGamecenterProviderId ?? defaultGcId : internalGcId;
-  (0, import_react194.useEffect)(() => {
+  (0, import_react195.useEffect)(() => {
     if (useCoord) return;
     setInternalGcId(payload?.defaultGamecenterProvider);
   }, [workspace.id, payload?.defaultGamecenterProvider, useCoord]);
-  (0, import_react194.useEffect)(() => {
+  (0, import_react195.useEffect)(() => {
     if (useCoord) return;
     setInternalWatch(initialWatch);
   }, [workspace.id, initialWatch, useCoord]);
-  (0, import_react194.useEffect)(() => {
+  (0, import_react195.useEffect)(() => {
     setStoryCollapsed(false);
   }, [workspace.id]);
-  (0, import_react194.useEffect)(() => {
+  (0, import_react195.useEffect)(() => {
     if (workspaceGame?.status !== "live") {
       setStoryCollapsed(false);
     }
   }, [workspaceGame?.id, workspaceGame?.status]);
-  const setWatch = (0, import_react194.useCallback)(
+  const setWatch = (0, import_react195.useCallback)(
     (v2) => {
       if (useCoord) watchCoordination.onWatchActiveChange(v2);
       else setInternalWatch(v2);
     },
     [useCoord, watchCoordination]
   );
-  const setGcId = (0, import_react194.useCallback)(
+  const setGcId = (0, import_react195.useCallback)(
     (id) => {
       if (useCoord) watchCoordination.onGamecenterProviderChange(id);
       else setInternalGcId(id);
     },
     [useCoord, watchCoordination]
   );
-  const onWatchLive = (0, import_react194.useCallback)(() => {
+  const onWatchLive = (0, import_react195.useCallback)(() => {
     const league2 = leagueKeyFromSport(payload.sport);
     trackWatchLiveClicked({
       league: league2 ?? payload.sport,
@@ -116784,10 +116859,10 @@ function GameWorkspace({ workspace, className, watchCoordination, suppressWorksp
     }
     setWatch(true);
   }, [setWatch, payload, canonicalGame]);
-  const onExitStream = (0, import_react194.useCallback)(() => {
+  const onExitStream = (0, import_react195.useCallback)(() => {
     setWatch(false);
   }, [setWatch]);
-  (0, import_react194.useEffect)(() => {
+  (0, import_react195.useEffect)(() => {
     if (!payload || !isWatchingLive) return;
     const league2 = leagueKeyFromSport(payload.sport);
     const provider = payload.stream.provider;
@@ -116806,12 +116881,12 @@ function GameWorkspace({ workspace, className, watchCoordination, suppressWorksp
       });
     };
   }, [isWatchingLive, payload?.gameId, payload?.sport, payload?.stream.provider]);
-  const activeGamecenter = (0, import_react194.useMemo)(() => {
+  const activeGamecenter = (0, import_react195.useMemo)(() => {
     if (!payload?.gamecenterProviders?.length) return null;
     const id = selectedGcId ?? payload.defaultGamecenterProvider;
     return payload.gamecenterProviders.find((p2) => p2.id === id) ?? payload.gamecenterProviders[0] ?? null;
   }, [payload, selectedGcId]);
-  (0, import_react194.useEffect)(() => {
+  (0, import_react195.useEffect)(() => {
     if (!payload || !activeGamecenter) return;
     recordWorkspaceIdentitySnapshot(
       buildWorkspaceIdentitySnapshot({
@@ -116834,11 +116909,11 @@ function GameWorkspace({ workspace, className, watchCoordination, suppressWorksp
     storyPanelPayload
   );
   const hasStoryUrl = !!(story?.storyUrl && story.storyUrl.length > 0);
-  (0, import_react194.useEffect)(() => {
+  (0, import_react195.useEffect)(() => {
     if (!isHistoricalWorkspace || historicalGamePk == null || !activeGamecenter) return;
     logHistoricalMlbWorkspacePanel("Game Center loaded", historicalGamePk);
   }, [isHistoricalWorkspace, historicalGamePk, activeGamecenter?.url]);
-  (0, import_react194.useEffect)(() => {
+  (0, import_react195.useEffect)(() => {
     if (!isHistoricalWorkspace || historicalGamePk == null || !hasStoryUrl) return;
     logHistoricalMlbWorkspacePanel("Story loaded", historicalGamePk);
   }, [isHistoricalWorkspace, historicalGamePk, hasStoryUrl]);
@@ -117269,11 +117344,11 @@ function GameWorkspace({ workspace, className, watchCoordination, suppressWorksp
     ] }) })
   ] });
 }
-var import_react194, import_jsx_runtime158, STORY_COLUMN_CLASS, MLB_WORKSPACE_STORY_FRAME_CLASS, STORY_COLUMN_EXPANDED_CLASS, STORY_COLUMN_CONTENT_COLLAPSED_CLASS, MLB_WORKSPACE_SECTION_PANEL_CLASS, MLB_WORKSPACE_SECTION_PANEL_BODY_CLASS, MLB_WORKSPACE_LAYOUT_TRANSITION_CLASS, STORY_COLUMN_COLLAPSED_SHELL_CLASS, STORY_PANEL_MODE_CONTROL_BTN, MLB_WORKSPACE_COLUMN_HEADER_ROW_CLASS, MLB_WORKSPACE_WATCH_LIVE_HEADER_BUTTON_CLASS, WEB_MLB_RENDER_GAMECENTER_PROVIDER_SELECTOR;
+var import_react195, import_jsx_runtime158, STORY_COLUMN_CLASS, MLB_WORKSPACE_STORY_FRAME_CLASS, STORY_COLUMN_EXPANDED_CLASS, STORY_COLUMN_CONTENT_COLLAPSED_CLASS, MLB_WORKSPACE_SECTION_PANEL_CLASS, MLB_WORKSPACE_SECTION_PANEL_BODY_CLASS, MLB_WORKSPACE_LAYOUT_TRANSITION_CLASS, STORY_COLUMN_COLLAPSED_SHELL_CLASS, STORY_PANEL_MODE_CONTROL_BTN, MLB_WORKSPACE_COLUMN_HEADER_ROW_CLASS, MLB_WORKSPACE_WATCH_LIVE_HEADER_BUTTON_CLASS, WEB_MLB_RENDER_GAMECENTER_PROVIDER_SELECTOR;
 var init_GameWorkspace = __esm({
   "../grarf/desktop/src/components/gameWorkspace/GameWorkspace.tsx"() {
     init_define_import_meta_env();
-    import_react194 = __toESM(require_react(), 1);
+    import_react195 = __toESM(require_react(), 1);
     init_useAppVisible();
     init_cn();
     init_WorkspaceEmbedHost();
@@ -117545,13 +117620,13 @@ function formatDate(iso) {
 }
 function IntelligenceWorkspace({ workspace, className, onSelectGame }) {
   const briefingId = workspace.intelligenceBriefingId ?? "";
-  const [briefing, setBriefing] = (0, import_react195.useState)(null);
-  const [loading, setLoading] = (0, import_react195.useState)(true);
-  const [error, setError] = (0, import_react195.useState)(null);
-  const [embedBlocked, setEmbedBlocked] = (0, import_react195.useState)(false);
-  const [embedFailed, setEmbedFailed] = (0, import_react195.useState)(false);
+  const [briefing, setBriefing] = (0, import_react196.useState)(null);
+  const [loading, setLoading] = (0, import_react196.useState)(true);
+  const [error, setError] = (0, import_react196.useState)(null);
+  const [embedBlocked, setEmbedBlocked] = (0, import_react196.useState)(false);
+  const [embedFailed, setEmbedFailed] = (0, import_react196.useState)(false);
   const liveGames = useLiveGamesStore((s2) => s2.leagues);
-  (0, import_react195.useEffect)(() => {
+  (0, import_react196.useEffect)(() => {
     let cancelled = false;
     setLoading(true);
     setError(null);
@@ -117571,16 +117646,16 @@ function IntelligenceWorkspace({ workspace, className, onSelectGame }) {
       cancelled = true;
     };
   }, [briefingId]);
-  const articleUrl = (0, import_react195.useMemo)(() => briefing ? resolveArticleUrl(briefing) : null, [briefing]);
-  const context2 = (0, import_react195.useMemo)(() => {
+  const articleUrl = (0, import_react196.useMemo)(() => briefing ? resolveArticleUrl(briefing) : null, [briefing]);
+  const context2 = (0, import_react196.useMemo)(() => {
     if (!briefing) return null;
     return mergeIntelligenceContext(briefing, liveGames);
   }, [briefing, liveGames]);
   const showEmbed = Boolean(articleUrl && !embedBlocked && !embedFailed);
-  const handleOpenExternal = (0, import_react195.useCallback)((url) => {
+  const handleOpenExternal = (0, import_react196.useCallback)((url) => {
     void openExternalUrl2(url);
   }, []);
-  (0, import_react195.useEffect)(() => {
+  (0, import_react196.useEffect)(() => {
     return () => {
       void window.grarf?.workspaceEmbedClear?.("center");
     };
@@ -117677,11 +117752,11 @@ function IntelligenceWorkspace({ workspace, className, onSelectGame }) {
     }
   );
 }
-var import_react195, import_jsx_runtime161;
+var import_react196, import_jsx_runtime161;
 var init_IntelligenceWorkspace = __esm({
   "../grarf/desktop/src/components/intelligence/IntelligenceWorkspace.tsx"() {
     init_define_import_meta_env();
-    import_react195 = __toESM(require_react(), 1);
+    import_react196 = __toESM(require_react(), 1);
     init_cn();
     init_intelligenceApi();
     init_mergeContext();
@@ -117765,11 +117840,11 @@ function YoutubeIframeApiPlayer({
   onStateChange,
   onError
 }) {
-  const containerRef = (0, import_react196.useRef)(null);
-  const playerRef = (0, import_react196.useRef)(null);
-  const callbacksRef = (0, import_react196.useRef)({ onReady, onStateChange, onError });
+  const containerRef = (0, import_react197.useRef)(null);
+  const playerRef = (0, import_react197.useRef)(null);
+  const callbacksRef = (0, import_react197.useRef)({ onReady, onStateChange, onError });
   callbacksRef.current = { onReady, onStateChange, onError };
-  (0, import_react196.useEffect)(() => {
+  (0, import_react197.useEffect)(() => {
     if (!active2 || !videoId) return void 0;
     let cancelled = false;
     const destroyPlayer = () => {
@@ -117816,11 +117891,11 @@ function YoutubeIframeApiPlayer({
     }
   );
 }
-var import_react196, import_jsx_runtime162, YOUTUBE_IFRAME_API_NOCOOKIE_HOST;
+var import_react197, import_jsx_runtime162, YOUTUBE_IFRAME_API_NOCOOKIE_HOST;
 var init_YoutubeIframeApiPlayer = __esm({
   "../grarf/desktop/src/components/youtube/YoutubeIframeApiPlayer.tsx"() {
     init_define_import_meta_env();
-    import_react196 = __toESM(require_react(), 1);
+    import_react197 = __toESM(require_react(), 1);
     init_cn();
     init_loadYoutubeIframeApi();
     import_jsx_runtime162 = __toESM(require_jsx_runtime(), 1);
@@ -118150,7 +118225,7 @@ function HomeLeagueHubWorkspaceSurface({
   onSourceArticleNavigate,
   onSourceFullscreen
 }) {
-  (0, import_react197.useEffect)(() => {
+  (0, import_react198.useEffect)(() => {
     if (Object.keys(useAdminOperationsLiveWorkspaceStore.getState().itemsByLeagueKey).length > 0) {
       return;
     }
@@ -118166,11 +118241,11 @@ function HomeLeagueHubWorkspaceSurface({
     }
   );
 }
-var import_react197, import_jsx_runtime163;
+var import_react198, import_jsx_runtime163;
 var init_HomeLeagueHubWorkspaceSurface = __esm({
   "../grarf/desktop/src/components/homeMvp/HomeLeagueHubWorkspaceSurface.tsx"() {
     init_define_import_meta_env();
-    import_react197 = __toESM(require_react(), 1);
+    import_react198 = __toESM(require_react(), 1);
     init_hydrateOperationalLiveWorkspace();
     init_adminOperationsLiveWorkspaceStore();
     init_HomeSourceCardsSurface();
@@ -128373,27 +128448,27 @@ function MlbTeamWorkspaceSurface({
   teamAbbrev: teamAbbrev2,
   className
 }) {
-  const [nav, setNav] = (0, import_react198.useState)(defaultMlbTeamWorkspaceNavState);
+  const [nav, setNav] = (0, import_react199.useState)(defaultMlbTeamWorkspaceNavState);
   const isMlbSport = sportKey === "mlb";
-  const teamMeta = (0, import_react198.useMemo)(
+  const teamMeta = (0, import_react199.useMemo)(
     () => resolveLiveTrackTeamMetaForSport(teamName, sportKey),
     [teamName, sportKey]
   );
   const resolvedAbbrev = teamMeta?.abbrev ?? teamAbbrev2?.trim().toUpperCase() ?? null;
-  const newsSources = (0, import_react198.useMemo)(() => {
+  const newsSources = (0, import_react199.useMemo)(() => {
     if (isMlbSport) {
       return resolveMlbTeamNewsSourcesForTeam(teamName);
     }
     return resolveNonMlbTeamNewsSourcesForTeam(teamName, sportKey, teamAbbrev2);
   }, [isMlbSport, teamName, sportKey, teamAbbrev2]);
-  const paneSectionId = (0, import_react198.useMemo)(() => {
+  const paneSectionId = (0, import_react199.useMemo)(() => {
     if (!resolvedAbbrev) return null;
     if (isMlbSport) {
       return buildMlbTeamWebsitePaneSectionId(resolvedAbbrev);
     }
     return buildTeamWebsitePaneSectionId(sportKey, resolvedAbbrev);
   }, [isMlbSport, resolvedAbbrev, sportKey]);
-  const mappedSources = (0, import_react198.useMemo)(() => {
+  const mappedSources = (0, import_react199.useMemo)(() => {
     const mapped = isMlbSport ? mapMlbTeamNewsSourcesToHomeSourceConfig(newsSources) : mapNonMlbTeamNewsSourcesToHomeSourceConfig(newsSources);
     return filterEmbeddableHomeSources(mapped);
   }, [isMlbSport, newsSources]);
@@ -128401,7 +128476,7 @@ function MlbTeamWorkspaceSurface({
     nav.categoryId === "news" ? mappedSources : null,
     paneSectionId ?? void 0
   );
-  const section = (0, import_react198.useMemo)(() => {
+  const section = (0, import_react199.useMemo)(() => {
     if (!paneSectionId) return null;
     return {
       id: paneSectionId,
@@ -128471,11 +128546,11 @@ function MlbTeamWorkspaceSurface({
     }
   );
 }
-var import_react198, import_jsx_runtime165;
+var import_react199, import_jsx_runtime165;
 var init_MlbTeamWorkspaceSurface = __esm({
   "../grarf/desktop/src/components/teamWorkspace/MlbTeamWorkspaceSurface.tsx"() {
     init_define_import_meta_env();
-    import_react198 = __toESM(require_react(), 1);
+    import_react199 = __toESM(require_react(), 1);
     init_cn();
     init_mlbTeamWorkspace();
     init_useHomeLeagueWorkspaceWebsiteSubmenuEntryDefaults();
@@ -128621,9 +128696,9 @@ function hasElectronEmbedBridge() {
   return typeof window !== "undefined" && !!window.grarf?.workspaceEmbedSync;
 }
 function TimelineXWebpane({ url }) {
-  const wvRef = (0, import_react199.useRef)(null);
-  const partition = (0, import_react199.useMemo)(() => homeSourceFocusArticlePartition(url), [url]);
-  (0, import_react199.useLayoutEffect)(() => {
+  const wvRef = (0, import_react200.useRef)(null);
+  const partition = (0, import_react200.useMemo)(() => homeSourceFocusArticlePartition(url), [url]);
+  (0, import_react200.useLayoutEffect)(() => {
     void window.grarf?.workspaceEmbedClear?.("center");
     void window.grarf?.workspaceEmbedClear?.("centerChild");
     return () => {
@@ -128631,7 +128706,7 @@ function TimelineXWebpane({ url }) {
       void window.grarf?.workspaceEmbedClear?.("centerChild");
     };
   }, [url]);
-  (0, import_react199.useLayoutEffect)(() => {
+  (0, import_react200.useLayoutEffect)(() => {
     const unsubscribe = window.grarf?.webviewNavigateInPaneSubscribe?.((payload) => {
       const wv = wvRef.current;
       const nextUrl = payload.url?.trim();
@@ -128642,7 +128717,7 @@ function TimelineXWebpane({ url }) {
       unsubscribe?.();
     };
   }, []);
-  (0, import_react199.useLayoutEffect)(() => {
+  (0, import_react200.useLayoutEffect)(() => {
     const wv = wvRef.current;
     if (!wv) return;
     const onNewWindow = (event) => {
@@ -128743,9 +128818,9 @@ function LaskCelticGameWorkspacePrototype({ workspace, className }) {
   const gameId = extractLaskCelticPrototypeGameId(workspace);
   const liveGame = useCanonicalLiveGameRow(gameId, "lask_celtic_prototype");
   const game = resolvePrototypeGame(workspace, liveGame);
-  const tabs = (0, import_react199.useMemo)(() => buildLaskCelticPrototypeTabs(game), [game]);
-  const [activeTabId, setActiveTabId] = (0, import_react199.useState)("gamecenter");
-  const [sourceByTab, setSourceByTab] = (0, import_react199.useState)({
+  const tabs = (0, import_react200.useMemo)(() => buildLaskCelticPrototypeTabs(game), [game]);
+  const [activeTabId, setActiveTabId] = (0, import_react200.useState)("gamecenter");
+  const [sourceByTab, setSourceByTab] = (0, import_react200.useState)({
     gamecenter: "espn",
     celtic: "official",
     lask: "official",
@@ -128817,11 +128892,11 @@ function LaskCelticGameWorkspacePrototype({ workspace, className }) {
     }
   );
 }
-var import_react199, import_jsx_runtime166, FOLDER_TAB_CLIP, SOCIAL_LASK_X_URL, TIMELINE_WEBVIEW_WEB_PREFS2;
+var import_react200, import_jsx_runtime166, FOLDER_TAB_CLIP, SOCIAL_LASK_X_URL, TIMELINE_WEBVIEW_WEB_PREFS2;
 var init_LaskCelticGameWorkspacePrototype = __esm({
   "../grarf/desktop/src/components/gameWorkspace/LaskCelticGameWorkspacePrototype.tsx"() {
     init_define_import_meta_env();
-    import_react199 = __toESM(require_react(), 1);
+    import_react200 = __toESM(require_react(), 1);
     init_cn();
     init_WorkspaceEmbedHost();
     init_useCanonicalLiveGame();
@@ -128844,7 +128919,7 @@ function WebsiteWorkspaceEmbed({
   active: active2,
   className
 }) {
-  (0, import_react200.useEffect)(() => {
+  (0, import_react201.useEffect)(() => {
     const cid = workspace.liveShowChannelId;
     if (!cid) return;
     const start = Date.now();
@@ -128870,7 +128945,7 @@ function WebsiteWorkspaceEmbed({
 function StreamWorkspacePanel({ workspace, className }) {
   const prov = workspace.streamingProviderId ? getStreamingProvider(workspace.streamingProviderId) : null;
   const streamProviderId = workspace.streamingProviderId;
-  (0, import_react200.useEffect)(() => {
+  (0, import_react201.useEffect)(() => {
     if (!streamProviderId) return;
     trackStreamWatchStarted({ provider: streamProviderId, source: "stream_workspace" });
     return () => {
@@ -128909,7 +128984,7 @@ function WorkspaceRenderer({
   onLeagueHubSourceFullscreen
 }) {
   const appVisible = useAppVisible();
-  (0, import_react200.useEffect)(() => {
+  (0, import_react201.useEffect)(() => {
     if (!workspace || WEB_KINDS.has(workspace.type) || workspace.type === "stream" || workspace.type === "game" || workspace.type === "intelligence" || workspace.type === "league-hub" || workspace.type === "team-hub")
       return;
     return () => {
@@ -129073,11 +129148,11 @@ loadedUrl=${src}`);
   }
   return null;
 }
-var import_react200, import_jsx_runtime167, WEB_KINDS;
+var import_react201, import_jsx_runtime167, WEB_KINDS;
 var init_WorkspaceRenderer = __esm({
   "../grarf/desktop/src/components/workspace/WorkspaceRenderer.tsx"() {
     init_define_import_meta_env();
-    import_react200 = __toESM(require_react(), 1);
+    import_react201 = __toESM(require_react(), 1);
     init_useAppVisible();
     init_cn();
     init_ContextualSplitEmbed();
@@ -129420,11 +129495,11 @@ title=${next.title}`
 function useMlbAllGamesDisplayHighlight(enabled = true, logLocation) {
   const displayHighlight = useMlbAllGamesHighlightStore((s2) => s2.displayHighlight);
   const authoritativeHighlight = useMlbAllGamesHighlightStore((s2) => s2.authoritativeHighlight);
-  (0, import_react201.useEffect)(() => {
+  (0, import_react202.useEffect)(() => {
     if (!enabled) return;
     return useMlbAllGamesHighlightStore.getState().subscribeEnabled();
   }, [enabled]);
-  (0, import_react201.useEffect)(() => {
+  (0, import_react202.useEffect)(() => {
     if (!enabled || !logLocation || !displayHighlight) return;
     logMlbDailyHighlightsSelection(
       logLocation,
@@ -129440,11 +129515,11 @@ function useMlbAllGamesDisplayHighlight(enabled = true, logLocation) {
     authoritativeHighlight
   };
 }
-var import_react201;
+var import_react202;
 var init_useMlbAllGamesHighlight = __esm({
   "../grarf/desktop/src/hooks/useMlbAllGamesHighlight.ts"() {
     init_define_import_meta_env();
-    import_react201 = __toESM(require_react(), 1);
+    import_react202 = __toESM(require_react(), 1);
     init_youtubeUrl2();
     init_mlbAllGamesHighlightStore();
   }
@@ -129531,7 +129606,7 @@ function SportscapeArticleScoreBlock({
           logoUrl: line.logoUrl
         });
         const textClass = isWinner ? "font-bold text-white" : "text-[#c9dddd]";
-        return /* @__PURE__ */ (0, import_jsx_runtime168.jsxs)(import_react202.Fragment, { children: [
+        return /* @__PURE__ */ (0, import_jsx_runtime168.jsxs)(import_react203.Fragment, { children: [
           /* @__PURE__ */ (0, import_jsx_runtime168.jsx)("div", { className: "flex h-3 w-3 items-center justify-center", children: /* @__PURE__ */ (0, import_jsx_runtime168.jsx)(
             SportscapeTeamMark,
             {
@@ -129556,11 +129631,11 @@ function SportscapeArticleScoreBlock({
     }
   );
 }
-var import_react202, import_jsx_runtime168;
+var import_react203, import_jsx_runtime168;
 var init_MlbSportscapeArticleScoreBlock = __esm({
   "../grarf/desktop/src/components/homeMvp/MlbSportscapeArticleScoreBlock.tsx"() {
     init_define_import_meta_env();
-    import_react202 = __toESM(require_react(), 1);
+    import_react203 = __toESM(require_react(), 1);
     init_cn();
     init_grarfLogoImgClassName();
     init_resolveSportscapeTeamIdentity();
@@ -129795,16 +129870,16 @@ var init_spotifyLatestEpisode = __esm({
 
 // ../grarf/desktop/src/hooks/useSpotifyLatestEpisode.ts
 function useSpotifyLatestEpisode(showId) {
-  const [state3, setState] = (0, import_react203.useState)({ status: "loading" });
-  const load = (0, import_react203.useCallback)(
+  const [state3, setState] = (0, import_react204.useState)({ status: "loading" });
+  const load = (0, import_react204.useCallback)(
     async (mode) => {
       if (mode === "initial") {
-        (0, import_react203.startTransition)(() => {
+        (0, import_react204.startTransition)(() => {
           setState({ status: "loading" });
         });
       }
       if (typeof window !== "undefined" && !window.grarf?.spotifyFetchLatestEpisode) {
-        (0, import_react203.startTransition)(() => {
+        (0, import_react204.startTransition)(() => {
           setState({
             status: "error",
             message: "Spotify bridge unavailable (run Electron desktop app)."
@@ -129815,7 +129890,7 @@ function useSpotifyLatestEpisode(showId) {
       try {
         const res = await invokeSpotifyLatestEpisode(showId);
         if (!res) {
-          (0, import_react203.startTransition)(() => {
+          (0, import_react204.startTransition)(() => {
             setState((prev) => {
               if (mode === "refresh" && prev.status === "ready") return prev;
               return { status: "error", message: "Empty response from Spotify bridge." };
@@ -129824,7 +129899,7 @@ function useSpotifyLatestEpisode(showId) {
           return;
         }
         if (!res.ok) {
-          (0, import_react203.startTransition)(() => {
+          (0, import_react204.startTransition)(() => {
             setState((prev) => {
               if (mode === "refresh" && prev.status === "ready") return prev;
               return { status: "error", message: res.error };
@@ -129832,12 +129907,12 @@ function useSpotifyLatestEpisode(showId) {
           });
           return;
         }
-        (0, import_react203.startTransition)(() => {
+        (0, import_react204.startTransition)(() => {
           setState({ status: "ready", data: res });
         });
       } catch (error) {
         const message = error instanceof Error ? error.message : "Request failed";
-        (0, import_react203.startTransition)(() => {
+        (0, import_react204.startTransition)(() => {
           setState((prev) => {
             if (mode === "refresh" && prev.status === "ready") return prev;
             return { status: "error", message };
@@ -129847,7 +129922,7 @@ function useSpotifyLatestEpisode(showId) {
     },
     [showId]
   );
-  (0, import_react203.useEffect)(() => {
+  (0, import_react204.useEffect)(() => {
     void load("initial");
     const id = window.setInterval(() => {
       void load("refresh");
@@ -129856,11 +129931,11 @@ function useSpotifyLatestEpisode(showId) {
   }, [load]);
   return state3;
 }
-var import_react203, REFRESH_MS2;
+var import_react204, REFRESH_MS2;
 var init_useSpotifyLatestEpisode = __esm({
   "../grarf/desktop/src/hooks/useSpotifyLatestEpisode.ts"() {
     init_define_import_meta_env();
-    import_react203 = __toESM(require_react(), 1);
+    import_react204 = __toESM(require_react(), 1);
     init_spotifyLatestEpisode();
     REFRESH_MS2 = 45 * 60 * 1e3;
   }
@@ -130219,7 +130294,7 @@ var init_mlbMorningLineupHighlightStore = __esm({
 function useMlbMorningLineupDisplayHighlight(enabled = true) {
   const displayHighlight = useMlbMorningLineupHighlightStore((s2) => s2.displayHighlight);
   const authoritativeHighlight = useMlbMorningLineupHighlightStore((s2) => s2.authoritativeHighlight);
-  (0, import_react204.useEffect)(() => {
+  (0, import_react205.useEffect)(() => {
     if (!enabled) return;
     return useMlbMorningLineupHighlightStore.getState().subscribeEnabled();
   }, [enabled]);
@@ -130229,11 +130304,11 @@ function useMlbMorningLineupDisplayHighlight(enabled = true) {
     initialLoading: false
   };
 }
-var import_react204;
+var import_react205;
 var init_useMlbMorningLineupDisplayHighlight = __esm({
   "../grarf/desktop/src/hooks/useMlbMorningLineupDisplayHighlight.ts"() {
     init_define_import_meta_env();
-    import_react204 = __toESM(require_react(), 1);
+    import_react205 = __toESM(require_react(), 1);
     init_mlbMorningLineupHighlightStore();
   }
 });
@@ -130254,7 +130329,7 @@ function contentTypeButtonClass(active2) {
   );
 }
 function SportscapeLeagueContentTypeIcons({ leagueName }) {
-  const [contentType, setContentType] = (0, import_react205.useState)("website");
+  const [contentType, setContentType] = (0, import_react206.useState)("website");
   return /* @__PURE__ */ (0, import_jsx_runtime173.jsxs)(
     "div",
     {
@@ -130288,11 +130363,11 @@ function SportscapeLeagueContentTypeIcons({ leagueName }) {
     }
   );
 }
-var import_react205, import_jsx_runtime173, CONTENT_TYPE_BTN_CLASS;
+var import_react206, import_jsx_runtime173, CONTENT_TYPE_BTN_CLASS;
 var init_SportscapeLeagueContentTypeIcons = __esm({
   "../grarf/desktop/src/components/homeMvp/SportscapeLeagueContentTypeIcons.tsx"() {
     init_define_import_meta_env();
-    import_react205 = __toESM(require_react(), 1);
+    import_react206 = __toESM(require_react(), 1);
     init_lucide_react();
     init_cn();
     import_jsx_runtime173 = __toESM(require_jsx_runtime(), 1);
@@ -130316,7 +130391,7 @@ function HomeSportscapeCard({
   onActiveRowMount,
   registerLeagueSectionRef
 }) {
-  const articleRowRefs = (0, import_react206.useRef)(/* @__PURE__ */ new Map());
+  const articleRowRefs = (0, import_react207.useRef)(/* @__PURE__ */ new Map());
   const isMlbLeagueCard = entry2.id === SPORTSCAPE_MLB_LEAGUE_CARD_ID;
   const isNhlLeagueCard = entry2.id === SPORTSCAPE_NHL_LEAGUE_CARD_ID;
   const isWnbaLeagueCard = entry2.id === SPORTSCAPE_WNBA_LEAGUE_CARD_ID;
@@ -130333,20 +130408,20 @@ function HomeSportscapeCard({
   const mlbMorningLineupHighlight = useMlbMorningLineupDisplayHighlight(
     isMlbLeagueCard && isWebRenderer
   );
-  const onSportscapeHighlightExpand = (0, import_react206.useCallback)(
+  const onSportscapeHighlightExpand = (0, import_react207.useCallback)(
     (title, videoId) => {
       if (openSportscapeHighlightInBrowser(videoId)) return;
       onExpandRecapWorkspace?.(title, videoId);
     },
     [onExpandRecapWorkspace]
   );
-  const onWebArticleHighlightClick = (0, import_react206.useCallback)(
+  const onWebArticleHighlightClick = (0, import_react207.useCallback)(
     (highlight) => {
       openSportscapeHighlightInBrowser("", highlight.sourceUrl);
     },
     []
   );
-  const activateDesktopInlineUrl = (0, import_react206.useCallback)(
+  const activateDesktopInlineUrl = (0, import_react207.useCallback)(
     (articleKey, article, url, contentPiece) => {
       if (!isDesktopElectron || !onArticleUrlExpand) return;
       const rowEl = articleRowRefs.current.get(articleKey);
@@ -130560,11 +130635,11 @@ function HomeSportscapeCard({
     }
   );
 }
-var import_react206, import_jsx_runtime174, SPORTSCAPE_MLB_LEAGUE_CARD_ID, SPORTSCAPE_NHL_LEAGUE_CARD_ID, SPORTSCAPE_WNBA_LEAGUE_CARD_ID, SPORTSCAPE_WORLD_CUP_LEAGUE_CARD_ID, SPORTSCAPE_MCWS_LEAGUE_CARD_ID, SPORTSCAPE_EPL_LEAGUE_CARD_ID, SPORTSCAPE_INLINE_WEBPANE_CHROME_PX;
+var import_react207, import_jsx_runtime174, SPORTSCAPE_MLB_LEAGUE_CARD_ID, SPORTSCAPE_NHL_LEAGUE_CARD_ID, SPORTSCAPE_WNBA_LEAGUE_CARD_ID, SPORTSCAPE_WORLD_CUP_LEAGUE_CARD_ID, SPORTSCAPE_MCWS_LEAGUE_CARD_ID, SPORTSCAPE_EPL_LEAGUE_CARD_ID, SPORTSCAPE_INLINE_WEBPANE_CHROME_PX;
 var init_HomeSportscapeCard = __esm({
   "../grarf/desktop/src/components/homeMvp/HomeSportscapeCard.tsx"() {
     init_define_import_meta_env();
-    import_react206 = __toESM(require_react(), 1);
+    import_react207 = __toESM(require_react(), 1);
     init_cn();
     init_grarfLogoImgClassName();
     init_LeagueHomePanel();
@@ -130605,9 +130680,9 @@ function useHomeSportscapeHeadlinesRss() {
   );
   const webLoading = useHomeSportscapeHeadlinesStore((state3) => state3.loading);
   const webRefresh = useHomeSportscapeHeadlinesStore((state3) => state3.refresh);
-  const [headlinesBySourceId, setHeadlinesBySourceId] = (0, import_react207.useState)({});
-  const [loading, setLoading] = (0, import_react207.useState)(true);
-  const refresh = (0, import_react207.useCallback)(async () => {
+  const [headlinesBySourceId, setHeadlinesBySourceId] = (0, import_react208.useState)({});
+  const [loading, setLoading] = (0, import_react208.useState)(true);
+  const refresh = (0, import_react208.useCallback)(async () => {
     const results = await Promise.all(
       HOME_SPORTSCAPE_HEADLINES_SOURCE_FEEDS.map(async (feed) => {
         try {
@@ -130622,7 +130697,7 @@ function useHomeSportscapeHeadlinesRss() {
     setHeadlinesBySourceId(Object.fromEntries(results));
     setLoading(false);
   }, []);
-  (0, import_react207.useEffect)(() => {
+  (0, import_react208.useEffect)(() => {
     if (isGrarfWebRenderer2()) return void 0;
     void refresh();
     const timer = window.setInterval(() => void refresh(), POLL_MS8);
@@ -130633,11 +130708,11 @@ function useHomeSportscapeHeadlinesRss() {
   }
   return { headlinesBySourceId, loading, refresh };
 }
-var import_react207, POLL_MS8;
+var import_react208, POLL_MS8;
 var init_useHomeSportscapeHeadlinesRss = __esm({
   "../grarf/desktop/src/hooks/useHomeSportscapeHeadlinesRss.ts"() {
     init_define_import_meta_env();
-    import_react207 = __toESM(require_react(), 1);
+    import_react208 = __toESM(require_react(), 1);
     init_homeSportscapeHeadlinesFeeds();
     init_fetchHomeSportscapeHeadlineFeed();
     init_isGrarfWebRenderer();
@@ -130728,7 +130803,7 @@ function openHeadlineArticle(url) {
 }
 function HomeSportscapeAiBriefBlock() {
   const editorialDocument = useSportscapeEditorialDocument();
-  const stories = (0, import_react208.useMemo)(
+  const stories = (0, import_react209.useMemo)(
     () => buildSportscapeEditorialAiBriefStories(editorialDocument),
     [editorialDocument]
   );
@@ -130819,8 +130894,8 @@ function HeadlinesSourceBlockBullets({
   );
 }
 function SportscapeHeadlinesSourceLogo({ sourceId }) {
-  const logoUrl = (0, import_react208.useMemo)(() => resolveSportscapeHeadlinesSourceLogoUrl(sourceId), [sourceId]);
-  const [failed, setFailed] = (0, import_react208.useState)(false);
+  const logoUrl = (0, import_react209.useMemo)(() => resolveSportscapeHeadlinesSourceLogoUrl(sourceId), [sourceId]);
+  const [failed, setFailed] = (0, import_react209.useState)(false);
   if (!logoUrl || failed) {
     return /* @__PURE__ */ (0, import_jsx_runtime175.jsx)("span", { className: "h-1 w-1 shrink-0 rounded-full bg-textdim/55", "aria-hidden": true });
   }
@@ -130901,11 +130976,11 @@ function HomeSportscapeHeadlinesRow() {
     }
   ) });
 }
-var import_react208, import_jsx_runtime175, SOURCE_BLOCK_WIDTH_CLASS, AI_BRIEF_BLOCK_WIDTH_CLASS, HEADLINES_BLOCK_HEIGHT_CLASS, SOURCE_HEADLINE_TEXT_CLASS, AI_BRIEF_HEADLINE_TEXT_CLASS, AI_BRIEF_STORY_ROW_CLASS, AI_BRIEF_STORY_INDICATOR_CLASS, HEADLINE_LIST_CLASS, AI_BRIEF_HEADLINE_BUTTON_CLASS, WEB_SPORTSCAPE_AI_BRIEF_ENABLED;
+var import_react209, import_jsx_runtime175, SOURCE_BLOCK_WIDTH_CLASS, AI_BRIEF_BLOCK_WIDTH_CLASS, HEADLINES_BLOCK_HEIGHT_CLASS, SOURCE_HEADLINE_TEXT_CLASS, AI_BRIEF_HEADLINE_TEXT_CLASS, AI_BRIEF_STORY_ROW_CLASS, AI_BRIEF_STORY_INDICATOR_CLASS, HEADLINE_LIST_CLASS, AI_BRIEF_HEADLINE_BUTTON_CLASS, WEB_SPORTSCAPE_AI_BRIEF_ENABLED;
 var init_HomeSportscapeHeadlinesRow = __esm({
   "../grarf/desktop/src/components/homeMvp/HomeSportscapeHeadlinesRow.tsx"() {
     init_define_import_meta_env();
-    import_react208 = __toESM(require_react(), 1);
+    import_react209 = __toESM(require_react(), 1);
     init_cn();
     init_homeSportscapeHeadlinesFeeds();
     init_useHomeSportscapeHeadlinesRss();
@@ -130934,10 +131009,10 @@ var init_HomeSportscapeHeadlinesRow = __esm({
 
 // ../grarf/desktop/src/components/homeMvp/SportscapeMoreLeaguesDesktopWaitlistRow.tsx
 function SportscapeMoreLeaguesDesktopWaitlistRow() {
-  const [email, setEmail] = (0, import_react209.useState)("");
-  const [status, setStatus] = (0, import_react209.useState)("idle");
-  const [errorMessage, setErrorMessage] = (0, import_react209.useState)(null);
-  const onSubmit = (0, import_react209.useCallback)(
+  const [email, setEmail] = (0, import_react210.useState)("");
+  const [status, setStatus] = (0, import_react210.useState)("idle");
+  const [errorMessage, setErrorMessage] = (0, import_react210.useState)(null);
+  const onSubmit = (0, import_react210.useCallback)(
     async (event) => {
       event.preventDefault();
       if (status === "loading" || status === "success") return;
@@ -131026,11 +131101,11 @@ function SportscapeMoreLeaguesDesktopWaitlistRow() {
     }
   );
 }
-var import_react209, import_jsx_runtime176;
+var import_react210, import_jsx_runtime176;
 var init_SportscapeMoreLeaguesDesktopWaitlistRow = __esm({
   "../grarf/desktop/src/components/homeMvp/SportscapeMoreLeaguesDesktopWaitlistRow.tsx"() {
     init_define_import_meta_env();
-    import_react209 = __toESM(require_react(), 1);
+    import_react210 = __toESM(require_react(), 1);
     init_lucide_react();
     init_cn();
     init_moreLeagues();
@@ -131049,8 +131124,8 @@ function scrollSportscapeRowIntoPane(scrollEl, row) {
   void animateScrollTop(scrollEl, targetTop);
 }
 function useSportscapeInlineWebpaneHeight(expanded, paneRef, headerRef, anchorKey) {
-  const [expansionHeight, setExpansionHeight] = (0, import_react210.useState)(0);
-  (0, import_react210.useLayoutEffect)(() => {
+  const [expansionHeight, setExpansionHeight] = (0, import_react211.useState)(0);
+  (0, import_react211.useLayoutEffect)(() => {
     if (!expanded) return;
     const pane = paneRef.current;
     const header = headerRef.current;
@@ -131081,19 +131156,19 @@ function HomeSportscapeSurface({
   onExpandRecapWorkspace,
   onMlbInlineWorkspaceOpen
 }) {
-  const [activeArticleKey, setActiveArticleKey] = (0, import_react210.useState)(null);
-  const [activeArticleUrl, setActiveArticleUrl] = (0, import_react210.useState)(null);
-  const [activeContentPiece, setActiveContentPiece] = (0, import_react210.useState)(null);
-  const [mlbActiveGamePk, setMlbActiveGamePk] = (0, import_react210.useState)(null);
+  const [activeArticleKey, setActiveArticleKey] = (0, import_react211.useState)(null);
+  const [activeArticleUrl, setActiveArticleUrl] = (0, import_react211.useState)(null);
+  const [activeContentPiece, setActiveContentPiece] = (0, import_react211.useState)(null);
+  const [mlbActiveGamePk, setMlbActiveGamePk] = (0, import_react211.useState)(null);
   const sportscapeCards = feedCards;
   const catchUpLeagueNav = useSportscapeCatchUpLeagueNavOptional();
-  const localPaneRef = (0, import_react210.useRef)(null);
+  const localPaneRef = (0, import_react211.useRef)(null);
   const paneRef = catchUpLeagueNav?.scrollContainerRef ?? localPaneRef;
   const isDesktopElectron = isGrarfElectronRenderer();
   useMlbCatchupGameHighlightsMap();
-  const activeRowRef = (0, import_react210.useRef)(null);
-  const lastScrolledArticleKeyRef = (0, import_react210.useRef)(null);
-  const mlbActiveArticle = (0, import_react210.useMemo)(
+  const activeRowRef = (0, import_react211.useRef)(null);
+  const lastScrolledArticleKeyRef = (0, import_react211.useRef)(null);
+  const mlbActiveArticle = (0, import_react211.useMemo)(
     () => {
       if (mlbActiveGamePk == null) return null;
       const mlbCard = sportscapeCards.find((card) => card.id === HOME_SPORTSCAPE_MLB_SHELL_ID);
@@ -131101,7 +131176,7 @@ function HomeSportscapeSurface({
     },
     [mlbActiveGamePk, sportscapeCards]
   );
-  const mlbActiveWorkspace = (0, import_react210.useMemo)(() => {
+  const mlbActiveWorkspace = (0, import_react211.useMemo)(() => {
     if (!mlbActiveArticle || mlbActiveArticle.gamePk == null) return null;
     return resolveMlbCatchupGameWorkspaceTab({
       gamePk: mlbActiveArticle.gamePk,
@@ -131110,7 +131185,7 @@ function HomeSportscapeSurface({
       headline: mlbActiveArticle.headline
     });
   }, [mlbActiveArticle]);
-  const onArticleUrlExpand = (0, import_react210.useCallback)(
+  const onArticleUrlExpand = (0, import_react211.useCallback)(
     (request) => {
       const isSameExpansion = activeArticleKey === request.articleKey && activeContentPiece === request.contentPiece;
       if (isSameExpansion) {
@@ -131129,7 +131204,7 @@ function HomeSportscapeSurface({
     },
     [activeArticleKey, activeContentPiece, onMlbInlineWorkspaceOpen]
   );
-  const onCatchupHeadlineClick = (0, import_react210.useCallback)(
+  const onCatchupHeadlineClick = (0, import_react211.useCallback)(
     (article, rowEl) => {
       if (article.gamePk == null) return;
       const nextPk = mlbActiveGamePk === article.gamePk ? null : article.gamePk;
@@ -131144,14 +131219,14 @@ function HomeSportscapeSurface({
     },
     [mlbActiveGamePk, onMlbInlineWorkspaceOpen]
   );
-  const onInlineWebpaneCollapse = (0, import_react210.useCallback)(() => {
+  const onInlineWebpaneCollapse = (0, import_react211.useCallback)(() => {
     setActiveArticleKey(null);
     setActiveArticleUrl(null);
     setActiveContentPiece(null);
     activeRowRef.current = null;
     lastScrolledArticleKeyRef.current = null;
   }, []);
-  (0, import_react210.useLayoutEffect)(() => {
+  (0, import_react211.useLayoutEffect)(() => {
     if (activeArticleKey == null) {
       lastScrolledArticleKeyRef.current = null;
       return;
@@ -131163,17 +131238,17 @@ function HomeSportscapeSurface({
     lastScrolledArticleKeyRef.current = activeArticleKey;
     scrollSportscapeRowIntoPane(pane, row);
   }, [activeArticleKey]);
-  (0, import_react210.useLayoutEffect)(() => {
+  (0, import_react211.useLayoutEffect)(() => {
     if (mlbActiveGamePk == null) return;
     const pane = paneRef.current;
     const row = activeRowRef.current;
     if (!pane || !row) return;
     scrollSportscapeRowIntoPane(pane, row);
   }, [mlbActiveGamePk]);
-  const onActiveRowMount = (0, import_react210.useCallback)((el) => {
+  const onActiveRowMount = (0, import_react211.useCallback)((el) => {
     activeRowRef.current = el;
   }, []);
-  (0, import_react210.useEffect)(() => {
+  (0, import_react211.useEffect)(() => {
     if (mlbActiveGamePk == null || mlbActiveWorkspace != null) return;
     setMlbActiveGamePk(null);
   }, [mlbActiveGamePk, mlbActiveWorkspace]);
@@ -131241,11 +131316,11 @@ function HomeSportscapeSurface({
     }
   );
 }
-var import_react210, import_jsx_runtime177, SPORTSCAPE_ROW_SCROLL_PADDING_PX, SPORTSCAPE_INLINE_WEBPANE_RESERVED_BOTTOM_PX;
+var import_react211, import_jsx_runtime177, SPORTSCAPE_ROW_SCROLL_PADDING_PX, SPORTSCAPE_INLINE_WEBPANE_RESERVED_BOTTOM_PX;
 var init_HomeSportscapeSurface = __esm({
   "../grarf/desktop/src/components/homeMvp/HomeSportscapeSurface.tsx"() {
     init_define_import_meta_env();
-    import_react210 = __toESM(require_react(), 1);
+    import_react211 = __toESM(require_react(), 1);
     init_paneContainment();
     init_homeActiveLeagueScrollTransition();
     init_homeSportscapeShells();
@@ -131274,8 +131349,8 @@ function useHomeSportscapeFeedCards() {
   const mcwsGameScoresByEventId = useMcwsSportscapeGameScores();
   const eplSportscapeArticles = useEplSportscapeArticles();
   const editorialDocument = useSportscapeEditorialDocument();
-  const gamesByEventId = (0, import_react211.useMemo)(() => buildEventIdGameIndex(liveLeagues), [liveLeagues]);
-  const mergedMlbSportscapeArticles = (0, import_react211.useMemo)(
+  const gamesByEventId = (0, import_react212.useMemo)(() => buildEventIdGameIndex(liveLeagues), [liveLeagues]);
+  const mergedMlbSportscapeArticles = (0, import_react212.useMemo)(
     () => mergeSportscapeArticlesWithEditorial({
       automatic: mlbSportscapeArticles,
       editorialEntries: editorialDocument.entries,
@@ -131284,7 +131359,7 @@ function useHomeSportscapeFeedCards() {
     }),
     [mlbSportscapeArticles, editorialDocument.entries, gamesByEventId]
   );
-  const mergedNhlSportscapeArticles = (0, import_react211.useMemo)(
+  const mergedNhlSportscapeArticles = (0, import_react212.useMemo)(
     () => mergeSportscapeArticlesWithEditorial({
       automatic: nhlSportscapeArticles,
       editorialEntries: editorialDocument.entries,
@@ -131293,7 +131368,7 @@ function useHomeSportscapeFeedCards() {
     }),
     [nhlSportscapeArticles, editorialDocument.entries, gamesByEventId]
   );
-  const mergedWnbaSportscapeArticles = (0, import_react211.useMemo)(
+  const mergedWnbaSportscapeArticles = (0, import_react212.useMemo)(
     () => mergeSportscapeArticlesWithEditorial({
       automatic: wnbaSportscapeArticles,
       editorialEntries: editorialDocument.entries,
@@ -131302,7 +131377,7 @@ function useHomeSportscapeFeedCards() {
     }),
     [wnbaSportscapeArticles, editorialDocument.entries, gamesByEventId]
   );
-  const mergedWorldCupSportscapeArticles = (0, import_react211.useMemo)(
+  const mergedWorldCupSportscapeArticles = (0, import_react212.useMemo)(
     () => mergeSportscapeArticlesWithEditorial({
       automatic: worldCupSportscapeArticles,
       editorialEntries: editorialDocument.entries,
@@ -131312,7 +131387,7 @@ function useHomeSportscapeFeedCards() {
     }),
     [worldCupSportscapeArticles, editorialDocument.entries, gamesByEventId, worldCupGameScoresByEventId]
   );
-  const mergedMcwsSportscapeArticles = (0, import_react211.useMemo)(
+  const mergedMcwsSportscapeArticles = (0, import_react212.useMemo)(
     () => mergeSportscapeArticlesWithEditorial({
       automatic: mcwsSportscapeArticles,
       editorialEntries: editorialDocument.entries,
@@ -131323,7 +131398,7 @@ function useHomeSportscapeFeedCards() {
     [mcwsSportscapeArticles, editorialDocument.entries, gamesByEventId, mcwsGameScoresByEventId]
   );
   const mergedEplSportscapeArticles = eplSportscapeArticles;
-  return (0, import_react211.useMemo)(
+  return (0, import_react212.useMemo)(
     () => buildHomeSportscapeFeedCards({
       mergedMlbSportscapeArticles,
       mergedNhlSportscapeArticles,
@@ -131350,11 +131425,11 @@ function useHomeSportscapeFeedCards() {
     ]
   );
 }
-var import_react211;
+var import_react212;
 var init_useHomeSportscapeFeedCards = __esm({
   "../grarf/desktop/src/hooks/useHomeSportscapeFeedCards.ts"() {
     init_define_import_meta_env();
-    import_react211 = __toESM(require_react(), 1);
+    import_react212 = __toESM(require_react(), 1);
     init_useMcwsSportscapeGameScores();
     init_useMlbSportscapeArticles();
     init_useMcwsSportscapeArticles();
@@ -131483,7 +131558,7 @@ var init_buildHomeSourceFocusTab = __esm({
 
 // ../grarf/desktop/src/components/homeMvp/HomeSourceFocusArticlePane.tsx
 function HomeSourceFocusArticlePane({ url }) {
-  const partition = (0, import_react212.useMemo)(() => homeSourceFocusArticlePartition(url), [url]);
+  const partition = (0, import_react213.useMemo)(() => homeSourceFocusArticlePartition(url), [url]);
   return /* @__PURE__ */ (0, import_jsx_runtime179.jsx)(
     "div",
     {
@@ -131507,11 +131582,11 @@ function HomeSourceFocusArticlePane({ url }) {
     }
   );
 }
-var import_react212, import_jsx_runtime179;
+var import_react213, import_jsx_runtime179;
 var init_HomeSourceFocusArticlePane = __esm({
   "../grarf/desktop/src/components/homeMvp/HomeSourceFocusArticlePane.tsx"() {
     init_define_import_meta_env();
-    import_react212 = __toESM(require_react(), 1);
+    import_react213 = __toESM(require_react(), 1);
     init_cn();
     init_homeSourceWebPartition();
     init_paneContainment();
@@ -131521,12 +131596,12 @@ var init_HomeSourceFocusArticlePane = __esm({
 
 // ../grarf/desktop/src/components/homeMvp/HomeSourceFocusSourcePane.tsx
 function HomeSourceFocusSourcePane({ sessionKey, fallbackUrl }) {
-  const hostRef = (0, import_react213.useRef)(null);
-  (0, import_react213.useEffect)(() => {
+  const hostRef = (0, import_react214.useRef)(null);
+  (0, import_react214.useEffect)(() => {
     void window.grarf?.workspaceEmbedClear?.("center");
     void window.grarf?.workspaceEmbedClear?.("centerChild");
   }, []);
-  (0, import_react213.useLayoutEffect)(() => {
+  (0, import_react214.useLayoutEffect)(() => {
     const host = hostRef.current;
     if (!host) return;
     const wv = acquireHomeSourceFocusWebview(sessionKey, fallbackUrl);
@@ -131547,11 +131622,11 @@ function HomeSourceFocusSourcePane({ sessionKey, fallbackUrl }) {
     }
   );
 }
-var import_react213, import_jsx_runtime180;
+var import_react214, import_jsx_runtime180;
 var init_HomeSourceFocusSourcePane = __esm({
   "../grarf/desktop/src/components/homeMvp/HomeSourceFocusSourcePane.tsx"() {
     init_define_import_meta_env();
-    import_react213 = __toESM(require_react(), 1);
+    import_react214 = __toESM(require_react(), 1);
     init_cn();
     init_homeSourceFocusSourceSession();
     init_isGrarfWebRenderer();
@@ -132009,7 +132084,7 @@ var init_GameWorkspaceTabScorebug = __esm({
 // ../grarf/desktop/src/components/workspace/LeagueHubWorkspaceTabLabel.tsx
 function LeagueHubWorkspaceTabLabel({ hubId, title }) {
   const logoUrl = resolveHomeLeagueHubWorkspaceLogoUrl(hubId);
-  const [failed, setFailed] = (0, import_react214.useState)(false);
+  const [failed, setFailed] = (0, import_react215.useState)(false);
   return /* @__PURE__ */ (0, import_jsx_runtime183.jsxs)("span", { className: "inline-flex min-w-0 items-center gap-1", children: [
     logoUrl && !failed ? /* @__PURE__ */ (0, import_jsx_runtime183.jsx)(
       "img",
@@ -132030,11 +132105,11 @@ function LeagueHubWorkspaceTabLabel({ hubId, title }) {
     /* @__PURE__ */ (0, import_jsx_runtime183.jsx)("span", { className: "truncate", children: title })
   ] });
 }
-var import_react214, import_jsx_runtime183;
+var import_react215, import_jsx_runtime183;
 var init_LeagueHubWorkspaceTabLabel = __esm({
   "../grarf/desktop/src/components/workspace/LeagueHubWorkspaceTabLabel.tsx"() {
     init_define_import_meta_env();
-    import_react214 = __toESM(require_react(), 1);
+    import_react215 = __toESM(require_react(), 1);
     init_buildHomeLeagueWorkspaceTab();
     init_grarfLogoImgClassName();
     import_jsx_runtime183 = __toESM(require_jsx_runtime(), 1);
@@ -132286,14 +132361,14 @@ function LiveSportsClipsFeed({
 }) {
   const collapsed = railExpanded === false;
   const appVisible = useAppVisible();
-  const lastGoodClipsRef = (0, import_react215.useRef)(readPersistedClipInventory());
-  const [clips, setClips] = (0, import_react215.useState)(() => lastGoodClipsRef.current);
-  const [loading, setLoading] = (0, import_react215.useState)(() => lastGoodClipsRef.current.length === 0);
-  const [error, setError] = (0, import_react215.useState)(null);
-  const mounted = (0, import_react215.useRef)(true);
-  const retryDelayRef = (0, import_react215.useRef)(RETRY_MS2);
-  const retryTimerRef = (0, import_react215.useRef)(null);
-  const applyClips = (0, import_react215.useCallback)((next) => {
+  const lastGoodClipsRef = (0, import_react216.useRef)(readPersistedClipInventory());
+  const [clips, setClips] = (0, import_react216.useState)(() => lastGoodClipsRef.current);
+  const [loading, setLoading] = (0, import_react216.useState)(() => lastGoodClipsRef.current.length === 0);
+  const [error, setError] = (0, import_react216.useState)(null);
+  const mounted = (0, import_react216.useRef)(true);
+  const retryDelayRef = (0, import_react216.useRef)(RETRY_MS2);
+  const retryTimerRef = (0, import_react216.useRef)(null);
+  const applyClips = (0, import_react216.useCallback)((next) => {
     if (next.length > 0) {
       lastGoodClipsRef.current = next;
       setClips(next);
@@ -132307,9 +132382,9 @@ function LiveSportsClipsFeed({
     }
     setClips([]);
   }, []);
-  const loadRef = (0, import_react215.useRef)(async () => {
+  const loadRef = (0, import_react216.useRef)(async () => {
   });
-  const load = (0, import_react215.useCallback)(async () => {
+  const load = (0, import_react216.useCallback)(async () => {
     const showLoading = lastGoodClipsRef.current.length === 0;
     if (showLoading) setLoading(true);
     try {
@@ -132337,7 +132412,7 @@ function LiveSportsClipsFeed({
     }
   }, [applyClips, clipSources]);
   loadRef.current = load;
-  (0, import_react215.useEffect)(() => {
+  (0, import_react216.useEffect)(() => {
     mounted.current = true;
     void load();
     const pollId = window.setInterval(() => {
@@ -132353,7 +132428,7 @@ function LiveSportsClipsFeed({
       }
     };
   }, [load]);
-  (0, import_react215.useEffect)(() => {
+  (0, import_react216.useEffect)(() => {
     if (!appVisible) return;
     if (lastGoodClipsRef.current.length > 0) return;
     void load();
@@ -132503,11 +132578,11 @@ function LiveSportsClipsFeed({
     }
   );
 }
-var import_react215, import_jsx_runtime186, POLL_MS9, RETRY_MS2, MAX_RETRY_MS;
+var import_react216, import_jsx_runtime186, POLL_MS9, RETRY_MS2, MAX_RETRY_MS;
 var init_LiveSportsClipsFeed = __esm({
   "../grarf/desktop/src/components/homeMvp/LiveSportsClipsFeed.tsx"() {
     init_define_import_meta_env();
-    import_react215 = __toESM(require_react(), 1);
+    import_react216 = __toESM(require_react(), 1);
     init_useAppVisible();
     init_cn();
     init_canonical();
@@ -132657,8 +132732,8 @@ var init_CollapsibleMediaRail = __esm({
 
 // ../grarf/desktop/src/hooks/usePaneDragResize.ts
 function usePaneDragResize({ side, min, max, getWidth, onLiveResize, onCommit }) {
-  const draggingRef = (0, import_react216.useRef)(false);
-  const onPointerDown = (0, import_react216.useCallback)(
+  const draggingRef = (0, import_react217.useRef)(false);
+  const onPointerDown = (0, import_react217.useCallback)(
     (e2) => {
       if (e2.button !== 0) return;
       e2.preventDefault();
@@ -132691,11 +132766,11 @@ function usePaneDragResize({ side, min, max, getWidth, onLiveResize, onCommit })
   );
   return { onPointerDown, isDragging: () => draggingRef.current };
 }
-var import_react216;
+var import_react217;
 var init_usePaneDragResize = __esm({
   "../grarf/desktop/src/hooks/usePaneDragResize.ts"() {
     init_define_import_meta_env();
-    import_react216 = __toESM(require_react(), 1);
+    import_react217 = __toESM(require_react(), 1);
   }
 });
 
@@ -132703,7 +132778,7 @@ var init_usePaneDragResize = __esm({
 function CenterPaneFeedAlignmentBridge({ centerRef }) {
   const setAlignment = useCenterPaneFeedAlignmentStore((s2) => s2.setAlignment);
   const clearAlignment = useCenterPaneFeedAlignmentStore((s2) => s2.clearAlignment);
-  (0, import_react217.useLayoutEffect)(() => {
+  (0, import_react218.useLayoutEffect)(() => {
     const el = centerRef.current;
     if (!el) return;
     const update = () => {
@@ -132725,11 +132800,11 @@ function CenterPaneFeedAlignmentBridge({ centerRef }) {
   }, [centerRef, setAlignment, clearAlignment]);
   return null;
 }
-var import_react217;
+var import_react218;
 var init_CenterPaneFeedAlignmentBridge = __esm({
   "../grarf/desktop/src/components/layout/CenterPaneFeedAlignmentBridge.tsx"() {
     init_define_import_meta_env();
-    import_react217 = __toESM(require_react(), 1);
+    import_react218 = __toESM(require_react(), 1);
     init_paneContainment();
     init_centerPaneFeedAlignmentStore();
   }
@@ -132824,14 +132899,14 @@ function WorkspacePaneLayoutInner({
   const setRightWidth = useWorkspaceLayoutStore((s2) => s2.setRightWidth);
   const toggleLeftCollapsed = useWorkspaceLayoutStore((s2) => s2.toggleLeftCollapsed);
   const toggleRightCollapsed = useWorkspaceLayoutStore((s2) => s2.toggleRightCollapsed);
-  const gridRef = (0, import_react218.useRef)(null);
-  const centerPaneRef = (0, import_react218.useRef)(null);
-  const liveLeftRef = (0, import_react218.useRef)(layout.leftWidth);
-  const liveRightRef = (0, import_react218.useRef)(layout.rightWidth);
-  const draggingRef = (0, import_react218.useRef)(false);
+  const gridRef = (0, import_react219.useRef)(null);
+  const centerPaneRef = (0, import_react219.useRef)(null);
+  const liveLeftRef = (0, import_react219.useRef)(layout.leftWidth);
+  const liveRightRef = (0, import_react219.useRef)(layout.rightWidth);
+  const draggingRef = (0, import_react219.useRef)(false);
   const leftPx = layout.leftCollapsed ? PANE_COLLAPSED_WIDTH_PX : layout.leftWidth;
   const rightPx = !hasRight || layout.rightCollapsed ? hasRight ? PANE_COLLAPSED_WIDTH_PX : 0 : layout.rightWidth;
-  const applyGrid = (0, import_react218.useCallback)(
+  const applyGrid = (0, import_react219.useCallback)(
     (l2, r3, animate) => {
       const el = gridRef.current;
       if (!el) return;
@@ -132843,16 +132918,16 @@ function WorkspacePaneLayoutInner({
     },
     [hasRight, layout.leftCollapsed, layout.rightCollapsed]
   );
-  (0, import_react218.useEffect)(() => {
+  (0, import_react219.useEffect)(() => {
     logPaneContainmentApplied("workspace-pane-layout");
   }, []);
-  (0, import_react218.useEffect)(() => {
+  (0, import_react219.useEffect)(() => {
     if (draggingRef.current) return;
     liveLeftRef.current = layout.leftWidth;
     liveRightRef.current = layout.rightWidth;
     applyGrid(layout.leftWidth, layout.rightWidth, true);
   }, [layout.leftWidth, layout.rightWidth, layout.leftCollapsed, layout.rightCollapsed, applyGrid]);
-  (0, import_react218.useEffect)(() => {
+  (0, import_react219.useEffect)(() => {
     if (!hasEmbedBridge2()) return;
     if (layout.rightCollapsed && hasRight) {
       void window.grarf?.workspaceEmbedClear?.("right");
@@ -133040,11 +133115,11 @@ function WorkspacePaneLayoutInner({
     )
   ] });
 }
-var import_react218, import_jsx_runtime191, WorkspacePaneLayout;
+var import_react219, import_jsx_runtime191, WorkspacePaneLayout;
 var init_WorkspacePaneLayout = __esm({
   "../grarf/desktop/src/components/layout/WorkspacePaneLayout.tsx"() {
     init_define_import_meta_env();
-    import_react218 = __toESM(require_react(), 1);
+    import_react219 = __toESM(require_react(), 1);
     init_paneLayoutDefaults();
     init_usePaneDragResize();
     init_workspaceLayoutStore();
@@ -133055,7 +133130,7 @@ var init_WorkspacePaneLayout = __esm({
     init_PaneCollapseButton();
     init_PaneResizeHandle();
     import_jsx_runtime191 = __toESM(require_jsx_runtime(), 1);
-    WorkspacePaneLayout = (0, import_react218.memo)(WorkspacePaneLayoutInner);
+    WorkspacePaneLayout = (0, import_react219.memo)(WorkspacePaneLayoutInner);
   }
 });
 
@@ -133118,25 +133193,25 @@ function computeTickerDwellMs(ev, hoverSlow) {
 }
 function LiveSportsTickerInner({ className, leagueFilter, onNavigate }) {
   const allEvents = useTickerEventQueue((s2) => s2.events);
-  const sorted = (0, import_react219.useMemo)(() => {
+  const sorted = (0, import_react220.useMemo)(() => {
     const filtered = leagueFilter == null ? allEvents : allEvents.filter((e2) => e2.league === leagueFilter);
     return buildTickerDisplayOrder(filtered);
   }, [allEvents, leagueFilter]);
-  const sortedRef = (0, import_react219.useRef)(sorted);
+  const sortedRef = (0, import_react220.useRef)(sorted);
   sortedRef.current = sorted;
   const n2 = sorted.length;
-  const [tick, setTick] = (0, import_react219.useState)(0);
-  const [phase, setPhase] = (0, import_react219.useState)("stable");
-  const [hoverSlow, setHoverSlow] = (0, import_react219.useState)(false);
-  const wrapRef = (0, import_react219.useRef)(null);
-  const textRef = (0, import_react219.useRef)(null);
-  const [innerPan, setInnerPan] = (0, import_react219.useState)(false);
-  (0, import_react219.useEffect)(() => {
+  const [tick, setTick] = (0, import_react220.useState)(0);
+  const [phase, setPhase] = (0, import_react220.useState)("stable");
+  const [hoverSlow, setHoverSlow] = (0, import_react220.useState)(false);
+  const wrapRef = (0, import_react220.useRef)(null);
+  const textRef = (0, import_react220.useRef)(null);
+  const [innerPan, setInnerPan] = (0, import_react220.useState)(false);
+  (0, import_react220.useEffect)(() => {
     if (n2 === 0) return;
     setTick((t2) => t2 % n2);
   }, [n2]);
   const current = n2 > 0 ? sorted[tick % n2] : null;
-  (0, import_react219.useLayoutEffect)(() => {
+  (0, import_react220.useLayoutEffect)(() => {
     if (!current) {
       setInnerPan(false);
       return;
@@ -133153,7 +133228,7 @@ function LiveSportsTickerInner({ className, leagueFilter, onNavigate }) {
       el.style.removeProperty("--grarf-tx");
     }
   }, [current?.id, current?.message, phase]);
-  (0, import_react219.useEffect)(() => {
+  (0, import_react220.useEffect)(() => {
     if (n2 === 0) return;
     const ev = sortedRef.current[tick % n2];
     if (!ev) return;
@@ -133168,11 +133243,11 @@ function LiveSportsTickerInner({ className, leagueFilter, onNavigate }) {
       window.clearTimeout(advanceAt);
     };
   }, [tick, n2, hoverSlow]);
-  const idle = (0, import_react219.useMemo)(
+  const idle = (0, import_react220.useMemo)(
     () => /* @__PURE__ */ (0, import_jsx_runtime193.jsx)("span", { className: "shrink-0 whitespace-nowrap px-4 text-[9px] tracking-wide text-textdim/80", children: leagueFilter ? `Live scoreboard pulse \xB7 waiting for ${leagueFilter} updates\u2026` : "Live scoreboard pulse \xB7 waiting for updates\u2026" }),
     [leagueFilter]
   );
-  const onClick = (0, import_react219.useCallback)(
+  const onClick = (0, import_react220.useCallback)(
     (ev) => {
       trackTickerItemClicked({
         tickerEventType: ev.tickerEventType,
@@ -133255,18 +133330,18 @@ function LiveSportsTickerInner({ className, leagueFilter, onNavigate }) {
     }
   );
 }
-var import_react219, import_jsx_runtime193, TICKER_BREAKING_INTERLEAVE_GAP, LiveSportsTicker;
+var import_react220, import_jsx_runtime193, TICKER_BREAKING_INTERLEAVE_GAP, LiveSportsTicker;
 var init_LiveSportsTicker = __esm({
   "../grarf/desktop/src/components/ticker/LiveSportsTicker.tsx"() {
     init_define_import_meta_env();
-    import_react219 = __toESM(require_react(), 1);
+    import_react220 = __toESM(require_react(), 1);
     init_cn();
     init_tickerEventQueueStore();
     init_analytics2();
     init_liveSportsTicker();
     import_jsx_runtime193 = __toESM(require_jsx_runtime(), 1);
     TICKER_BREAKING_INTERLEAVE_GAP = 4;
-    LiveSportsTicker = (0, import_react219.memo)(LiveSportsTickerInner);
+    LiveSportsTicker = (0, import_react220.memo)(LiveSportsTickerInner);
   }
 });
 
@@ -133795,9 +133870,9 @@ var init_beginOperationsManualGameEdit = __esm({
 
 // ../grarf/desktop/src/lib/manualEvents/useOperationsManualGameDeletable.ts
 function useOperationsManualGameDeletable(game) {
-  const [deletable, setDeletable] = (0, import_react220.useState)(false);
+  const [deletable, setDeletable] = (0, import_react221.useState)(false);
   const isManualGame = Boolean(game.metadata?.manualEvent) || game.id.startsWith("manual-event-");
-  (0, import_react220.useEffect)(() => {
+  (0, import_react221.useEffect)(() => {
     if (!isManualGame) {
       setDeletable(false);
       return;
@@ -133813,12 +133888,12 @@ function useOperationsManualGameDeletable(game) {
   }, [game.id, isManualGame]);
   return deletable;
 }
-var import_react220;
+var import_react221;
 var init_useOperationsManualGameDeletable = __esm({
   "../grarf/desktop/src/lib/manualEvents/useOperationsManualGameDeletable.ts"() {
     init_define_import_meta_env();
     init_findManualEventDefinitionForGame();
-    import_react220 = __toESM(require_react(), 1);
+    import_react221 = __toESM(require_react(), 1);
     init_manualEventsOverlayCache();
   }
 });
@@ -134951,15 +135026,15 @@ function OperationsUrlDiagnosticsSection({
 }) {
   const upstreamGame = useCanonicalLiveGameStore((s2) => s2.gamesById[game.id]?.game) ?? game;
   const isTennisGameCardDiagnostics = isOperationsTennisGameCardDiagnosticsGame(upstreamGame);
-  const gameCardDiagnostic = (0, import_react221.useMemo)(
+  const gameCardDiagnostic = (0, import_react222.useMemo)(
     () => isTennisGameCardDiagnostics ? null : resolveOperationsGameCardUrlDiagnostic({ upstreamGame, fields }),
     [isTennisGameCardDiagnostics, upstreamGame, fields]
   );
-  const tennisGameCardDiagnostic = (0, import_react221.useMemo)(
+  const tennisGameCardDiagnostic = (0, import_react222.useMemo)(
     () => isTennisGameCardDiagnostics ? resolveOperationsTennisGameCardUrlDiagnostic({ upstreamGame, fields }) : null,
     [isTennisGameCardDiagnostics, upstreamGame, fields]
   );
-  const liveStreamDiagnostic = (0, import_react221.useMemo)(
+  const liveStreamDiagnostic = (0, import_react222.useMemo)(
     () => resolveOperationsLiveStreamUrlDiagnostic({ upstreamGame, fields }),
     [upstreamGame, fields]
   );
@@ -135080,10 +135155,10 @@ function OperationsCard({
 }) {
   const deletable = useOperationsManualGameDeletable(game);
   const editable = deletable;
-  const [deleteError, setDeleteError] = (0, import_react221.useState)(null);
-  const [editError, setEditError] = (0, import_react221.useState)(null);
-  const [deleting, setDeleting] = (0, import_react221.useState)(false);
-  const [editing, setEditing] = (0, import_react221.useState)(false);
+  const [deleteError, setDeleteError] = (0, import_react222.useState)(null);
+  const [editError, setEditError] = (0, import_react222.useState)(null);
+  const [deleting, setDeleting] = (0, import_react222.useState)(false);
+  const [editing, setEditing] = (0, import_react222.useState)(false);
   const priority = useAdminFeaturedPriorityStore((s2) => resolveAdminFeaturedPriority(game, s2.priorities));
   const fields = useAdminOperationsCardStore(
     (s2) => s2.fieldsByGameId[game.id] ?? EMPTY_ADMIN_OPERATIONS_CARD_FIELDS
@@ -135222,11 +135297,11 @@ function OperationsCard({
     /* @__PURE__ */ (0, import_jsx_runtime195.jsx)(OperationsFutureEditorialSlot, {})
   ] });
 }
-var import_react221, import_jsx_runtime195, OPERATIONS_TEXT_FIELD_CLASS;
+var import_react222, import_jsx_runtime195, OPERATIONS_TEXT_FIELD_CLASS;
 var init_OperationsCard = __esm({
   "../grarf/desktop/src/components/adminMode/OperationsCard.tsx"() {
     init_define_import_meta_env();
-    import_react221 = __toESM(require_react(), 1);
+    import_react222 = __toESM(require_react(), 1);
     init_cn();
     init_deleteOperationsManualGameEntry();
     init_beginOperationsManualGameEdit();
@@ -135638,13 +135713,13 @@ function OperationsManualGameEntryCreateSessionEditor({
   onSessionChange,
   onSaved
 }) {
-  const [saving, setSaving] = (0, import_react222.useState)(false);
-  const [saveError, setSaveError] = (0, import_react222.useState)(null);
-  const [leagueLogoTouched, setLeagueLogoTouched] = (0, import_react222.useState)(false);
-  const [broadcasterFieldsTouched, setBroadcasterFieldsTouched] = (0, import_react222.useState)(
+  const [saving, setSaving] = (0, import_react223.useState)(false);
+  const [saveError, setSaveError] = (0, import_react223.useState)(null);
+  const [leagueLogoTouched, setLeagueLogoTouched] = (0, import_react223.useState)(false);
+  const [broadcasterFieldsTouched, setBroadcasterFieldsTouched] = (0, import_react223.useState)(
     createBlankBroadcasterFieldsTouched2
   );
-  (0, import_react222.useEffect)(() => {
+  (0, import_react223.useEffect)(() => {
     const leagueName = session.shared.leagueName.trim();
     if (!leagueName) return;
     let cancelled = false;
@@ -135662,7 +135737,7 @@ function OperationsManualGameEntryCreateSessionEditor({
       cancelled = true;
     };
   }, [session.shared.leagueName, onSessionChange]);
-  (0, import_react222.useEffect)(() => {
+  (0, import_react223.useEffect)(() => {
     const broadcasterName = session.shared.broadcastChannelName.trim();
     if (!broadcasterName) return;
     let cancelled = false;
@@ -135769,11 +135844,11 @@ function OperationsManualGameEntryCreateSessionEditor({
     )
   ] });
 }
-var import_react222, import_jsx_runtime197, OPERATIONS_MANUAL_ENTRY_FIELD_CLASS;
+var import_react223, import_jsx_runtime197, OPERATIONS_MANUAL_ENTRY_FIELD_CLASS;
 var init_OperationsManualGameEntryCreateSessionEditor = __esm({
   "../grarf/desktop/src/components/adminMode/OperationsManualGameEntryCreateSessionEditor.tsx"() {
     init_define_import_meta_env();
-    import_react222 = __toESM(require_react(), 1);
+    import_react223 = __toESM(require_react(), 1);
     init_cn();
     init_gamesSpineCardLayout();
     init_gamesSpineLeagueLogoUrls();
@@ -136134,21 +136209,21 @@ function OperationsManualGameEntryEditorCard({
   ] });
 }
 function OperationsManualGameEntryEditorSection() {
-  const sectionRef = (0, import_react223.useRef)(null);
+  const sectionRef = (0, import_react224.useRef)(null);
   const editSession = useOperationsManualGameEditorStore((state3) => state3.session);
   const clearEdit = useOperationsManualGameEditorStore((state3) => state3.clearEdit);
   const setEditDraft = useOperationsManualGameEditorStore((state3) => state3.setDraft);
-  const [expanded, setExpanded] = (0, import_react223.useState)(false);
-  const [createSession, setCreateSession] = (0, import_react223.useState)(createInitialCreateSession);
-  const [saving, setSaving] = (0, import_react223.useState)(false);
-  const [saveError, setSaveError] = (0, import_react223.useState)(null);
-  const [leagueLogoTouched, setLeagueLogoTouched] = (0, import_react223.useState)(false);
-  const [broadcasterFieldsTouched, setBroadcasterFieldsTouched] = (0, import_react223.useState)(
+  const [expanded, setExpanded] = (0, import_react224.useState)(false);
+  const [createSession, setCreateSession] = (0, import_react224.useState)(createInitialCreateSession);
+  const [saving, setSaving] = (0, import_react224.useState)(false);
+  const [saveError, setSaveError] = (0, import_react224.useState)(null);
+  const [leagueLogoTouched, setLeagueLogoTouched] = (0, import_react224.useState)(false);
+  const [broadcasterFieldsTouched, setBroadcasterFieldsTouched] = (0, import_react224.useState)(
     createBlankBroadcasterFieldsTouched3
   );
   const isEditing = Boolean(editSession);
   const editDraft = editSession?.draft;
-  (0, import_react223.useEffect)(() => {
+  (0, import_react224.useEffect)(() => {
     if (!isEditing || !editDraft) return;
     const leagueName = editDraft.leagueName.trim();
     if (!leagueName) return;
@@ -136167,7 +136242,7 @@ function OperationsManualGameEntryEditorSection() {
       cancelled = true;
     };
   }, [editDraft?.leagueName, isEditing, setEditDraft]);
-  (0, import_react223.useEffect)(() => {
+  (0, import_react224.useEffect)(() => {
     if (!isEditing || !editDraft) return;
     const broadcasterName = editDraft.broadcastChannelName.trim();
     if (!broadcasterName) return;
@@ -136205,7 +136280,7 @@ function OperationsManualGameEntryEditorSection() {
     isEditing,
     setEditDraft
   ]);
-  (0, import_react223.useEffect)(() => {
+  (0, import_react224.useEffect)(() => {
     if (!editSession) return;
     setExpanded(true);
     setSaveError(null);
@@ -136309,11 +136384,11 @@ function OperationsManualGameEntryEditorSection() {
     ) }) : null
   ] });
 }
-var import_react223, import_jsx_runtime198, OPERATIONS_MANUAL_ENTRY_FIELD_CLASS2;
+var import_react224, import_jsx_runtime198, OPERATIONS_MANUAL_ENTRY_FIELD_CLASS2;
 var init_OperationsManualGameEntryEditorSection = __esm({
   "../grarf/desktop/src/components/adminMode/OperationsManualGameEntryEditorSection.tsx"() {
     init_define_import_meta_env();
-    import_react223 = __toESM(require_react(), 1);
+    import_react224 = __toESM(require_react(), 1);
     init_cn();
     init_gamesSpineCardLayout();
     init_gamesSpineLeagueLogoUrls();
@@ -136350,15 +136425,15 @@ function OperationsSpine() {
     (s2) => s2.persistedBaselineItemsByLeagueKey
   );
   const duplicateIds = useAdminFeaturedPriorityStore((s2) => s2.duplicateIds);
-  const [saveStatus, setSaveStatus] = (0, import_react224.useState)("idle");
-  const [saveFailureReason, setSaveFailureReason] = (0, import_react224.useState)(null);
-  const sections = (0, import_react224.useMemo)(() => {
+  const [saveStatus, setSaveStatus] = (0, import_react225.useState)("idle");
+  const [saveFailureReason, setSaveFailureReason] = (0, import_react225.useState)(null);
+  const sections = (0, import_react225.useMemo)(() => {
     return structureSections.map((structure) => ({
       ...structure,
       games: gamesByKey[structure.key] ?? []
     })).filter((section) => section.games.length > 0).sort((a2, b2) => a2.order - b2.order);
   }, [structureSections, gamesByKey]);
-  const isDirty = (0, import_react224.useMemo)(
+  const isDirty = (0, import_react225.useMemo)(
     () => selectOperationsSpineIsDirty(),
     [
       fieldsByGameId,
@@ -136371,15 +136446,15 @@ function OperationsSpine() {
   );
   const hasDuplicateFeaturedPriorities = duplicateIds.size > 0;
   const canSave = isDirty && !hasDuplicateFeaturedPriorities && saveStatus !== "saving";
-  (0, import_react224.useEffect)(() => {
+  (0, import_react225.useEffect)(() => {
     if (saveStatus !== "saved") return;
     const timer = window.setTimeout(() => setSaveStatus("idle"), 2500);
     return () => window.clearTimeout(timer);
   }, [saveStatus]);
-  (0, import_react224.useEffect)(() => {
+  (0, import_react225.useEffect)(() => {
     void getManualEventsSourceOverlayCached();
   }, []);
-  const onSave = (0, import_react224.useCallback)(async () => {
+  const onSave = (0, import_react225.useCallback)(async () => {
     if (!canSave) return;
     setSaveStatus("saving");
     setSaveFailureReason(null);
@@ -136392,7 +136467,7 @@ function OperationsSpine() {
       setSaveStatus("failed");
     }
   }, [canSave]);
-  const statusLabel = (0, import_react224.useMemo)(() => {
+  const statusLabel = (0, import_react225.useMemo)(() => {
     if (saveStatus === "saving") return "Saving\u2026";
     if (saveStatus === "saved") return "Saved";
     if (saveStatus === "failed") {
@@ -136441,11 +136516,11 @@ function OperationsSpine() {
     }
   );
 }
-var import_react224, import_jsx_runtime199;
+var import_react225, import_jsx_runtime199;
 var init_OperationsSpine = __esm({
   "../grarf/desktop/src/components/adminMode/OperationsSpine.tsx"() {
     init_define_import_meta_env();
-    import_react224 = __toESM(require_react(), 1);
+    import_react225 = __toESM(require_react(), 1);
     init_gamesSpineOperationsStructureStore();
     init_gamesSpineOperationsGamesStore();
     init_adminOperationsCardStore();
@@ -136634,23 +136709,23 @@ function useHomeOperationalPrioritization() {
   const leagues = useLiveGamesStore((s2) => s2.leagues);
   const bundle = useEditorialStore((s2) => s2.bundle);
   const selectedDate = useCommandBriefingStore((s2) => s2.selectedDate);
-  const allGames2 = (0, import_react225.useMemo)(() => {
+  const allGames2 = (0, import_react226.useMemo)(() => {
     const out = [];
     for (const key2 of getGamesColumnLeagueOrder()) {
       out.push(...leagues[key2] ?? []);
     }
     return out;
   }, [leagues]);
-  (0, import_react225.useEffect)(() => {
+  (0, import_react226.useEffect)(() => {
     const insight = buildHomeOperationalPrioritizationInsight(allGames2, bundle, selectedDate, mode);
     publishHomeOperationalPrioritizationInsight(insight);
   }, [allGames2, bundle, selectedDate, mode]);
 }
-var import_react225;
+var import_react226;
 var init_useHomeOperationalPrioritization = __esm({
   "../grarf/desktop/src/hooks/useHomeOperationalPrioritization.ts"() {
     init_define_import_meta_env();
-    import_react225 = __toESM(require_react(), 1);
+    import_react226 = __toESM(require_react(), 1);
     init_gamesColumnLeagues();
     init_homeOperationalPrioritization();
     init_commandBriefingStore();
@@ -136665,7 +136740,7 @@ function useCanonicalHeadlinesLeagueWorkspaceNavigation() {
   const centerPaneMode = useCenterPaneApplicationModeStore((s2) => s2.mode);
   const liveSubmenuId = useHomeLiveSubmenuStore((s2) => s2.activeId);
   const liveLeagueSubmenuId = useHomeLiveLeagueSubmenuStore((s2) => s2.activeId);
-  (0, import_react226.useEffect)(() => {
+  (0, import_react227.useEffect)(() => {
     if (!isGrarfWebRenderer2()) return;
     if (centerPaneMode !== "browser" || liveSubmenuId !== "livetrack") return;
     const hubId = resolveCanonicalHeadlinesLeagueWorkspaceHubId(liveLeagueSubmenuId);
@@ -136676,11 +136751,11 @@ function useCanonicalHeadlinesLeagueWorkspaceNavigation() {
     closeCanonicalPermanentLeagueWorkspaces();
   }, [centerPaneMode, liveSubmenuId, liveLeagueSubmenuId]);
 }
-var import_react226;
+var import_react227;
 var init_useCanonicalHeadlinesLeagueWorkspaceNavigation = __esm({
   "../grarf/desktop/src/hooks/useCanonicalHeadlinesLeagueWorkspaceNavigation.ts"() {
     init_define_import_meta_env();
-    import_react226 = __toESM(require_react(), 1);
+    import_react227 = __toESM(require_react(), 1);
     init_centerPaneApplicationModeStore();
     init_homeLiveLeagueSubmenuStore();
     init_homeLiveSubmenuStore();
@@ -136713,7 +136788,7 @@ var init_resolveGuidedAttentionActiveFocusPane = __esm({
 function useSyncGuidedAttentionWorkspaceFocus(isHomeOps, activeContentOverlayId) {
   const centerPaneSource = useCenterPaneApplicationModeStore((state3) => state3.source);
   const setActiveFocusPaneId = useGuidedAttentionStore((state3) => state3.setActiveFocusPaneId);
-  (0, import_react227.useEffect)(() => {
+  (0, import_react228.useEffect)(() => {
     setActiveFocusPaneId(
       resolveGuidedAttentionActiveFocusPaneId({
         isHomeOps,
@@ -136723,11 +136798,11 @@ function useSyncGuidedAttentionWorkspaceFocus(isHomeOps, activeContentOverlayId)
     );
   }, [isHomeOps, activeContentOverlayId, centerPaneSource, setActiveFocusPaneId]);
 }
-var import_react227;
+var import_react228;
 var init_useSyncGuidedAttentionWorkspaceFocus = __esm({
   "../grarf/desktop/src/hooks/useSyncGuidedAttentionWorkspaceFocus.ts"() {
     init_define_import_meta_env();
-    import_react227 = __toESM(require_react(), 1);
+    import_react228 = __toESM(require_react(), 1);
     init_resolveGuidedAttentionActiveFocusPane();
     init_centerPaneApplicationModeStore();
     init_guidedAttentionStore();
@@ -136737,15 +136812,15 @@ var init_useSyncGuidedAttentionWorkspaceFocus = __esm({
 // ../grarf/desktop/src/hooks/useOperationalAlertActionsRegistration.ts
 function useOperationalAlertActionsRegistration(actions) {
   const register = useOperationalAlertActionsStore((s2) => s2.register);
-  (0, import_react228.useEffect)(() => {
+  (0, import_react229.useEffect)(() => {
     return register(actions);
   }, [actions, register]);
 }
-var import_react228;
+var import_react229;
 var init_useOperationalAlertActionsRegistration = __esm({
   "../grarf/desktop/src/hooks/useOperationalAlertActionsRegistration.ts"() {
     init_define_import_meta_env();
-    import_react228 = __toESM(require_react(), 1);
+    import_react229 = __toESM(require_react(), 1);
     init_operationalAlertActionsStore();
   }
 });
@@ -137003,16 +137078,16 @@ var init_orchestrationExecutionStore = __esm({
 // ../grarf/desktop/src/hooks/useOrchestrationExecutionRegistration.ts
 function useOrchestrationExecutionRegistration(driver) {
   const register = useOrchestrationExecutionStore((s2) => s2.registerDriver);
-  (0, import_react229.useEffect)(() => {
+  (0, import_react230.useEffect)(() => {
     if (!driver) return;
     return register(driver);
   }, [driver, register]);
 }
-var import_react229;
+var import_react230;
 var init_useOrchestrationExecutionRegistration = __esm({
   "../grarf/desktop/src/hooks/useOrchestrationExecutionRegistration.ts"() {
     init_define_import_meta_env();
-    import_react229 = __toESM(require_react(), 1);
+    import_react230 = __toESM(require_react(), 1);
     init_orchestrationExecutionStore();
   }
 });
@@ -137020,15 +137095,15 @@ var init_useOrchestrationExecutionRegistration = __esm({
 // ../grarf/desktop/src/hooks/useWorkspaceUrlLauncher.ts
 function useWorkspaceUrlLauncher(openTab) {
   const { registerWorkspaceUrlLauncher } = useAppShell();
-  (0, import_react230.useEffect)(() => {
+  (0, import_react231.useEffect)(() => {
     return registerWorkspaceUrlLauncher(openTab);
   }, [openTab, registerWorkspaceUrlLauncher]);
 }
-var import_react230;
+var import_react231;
 var init_useWorkspaceUrlLauncher = __esm({
   "../grarf/desktop/src/hooks/useWorkspaceUrlLauncher.ts"() {
     init_define_import_meta_env();
-    import_react230 = __toESM(require_react(), 1);
+    import_react231 = __toESM(require_react(), 1);
     init_AppShellContext();
   }
 });
@@ -137358,13 +137433,13 @@ var init_grarfContentRealtimeStore = __esm({
 
 // ../grarf/desktop/src/hooks/useGrarfContentRealtimeIngress.ts
 function useGrarfContentRealtimeIngress(scope, items) {
-  const hydratedRef = (0, import_react231.useRef)(false);
-  const lastSignatureRef = (0, import_react231.useRef)("");
-  const signature = (0, import_react231.useMemo)(
+  const hydratedRef = (0, import_react232.useRef)(false);
+  const lastSignatureRef = (0, import_react232.useRef)("");
+  const signature = (0, import_react232.useMemo)(
     () => items.map((item) => item.id).join("\0"),
     [items]
   );
-  (0, import_react231.useEffect)(() => {
+  (0, import_react232.useEffect)(() => {
     if (signature === lastSignatureRef.current) return;
     lastSignatureRef.current = signature;
     const store = useGrarfContentRealtimeStore.getState();
@@ -137379,11 +137454,11 @@ function useGrarfContentRealtimeIngress(scope, items) {
     }
   }, [items, scope, signature]);
 }
-var import_react231;
+var import_react232;
 var init_useGrarfContentRealtimeIngress = __esm({
   "../grarf/desktop/src/hooks/useGrarfContentRealtimeIngress.ts"() {
     init_define_import_meta_env();
-    import_react231 = __toESM(require_react(), 1);
+    import_react232 = __toESM(require_react(), 1);
     init_grarfContentRealtimeStore();
   }
 });
@@ -137461,20 +137536,20 @@ var init_feedScrollAnchor = __esm({
 
 // ../grarf/desktop/src/hooks/useFeedScrollAnchor.ts
 function useFeedScrollAnchor(scrollContainerRef, itemIds, options) {
-  const anchorRef = (0, import_react232.useRef)(null);
-  const hydratedRef = (0, import_react232.useRef)(false);
-  const wasPausedRef = (0, import_react232.useRef)(false);
-  const previousIdsKeyRef = (0, import_react232.useRef)("");
-  const pinnedToTopRef = (0, import_react232.useRef)(Boolean(options.pinToTopUntilUserScroll));
+  const anchorRef = (0, import_react233.useRef)(null);
+  const hydratedRef = (0, import_react233.useRef)(false);
+  const wasPausedRef = (0, import_react233.useRef)(false);
+  const previousIdsKeyRef = (0, import_react233.useRef)("");
+  const pinnedToTopRef = (0, import_react233.useRef)(Boolean(options.pinToTopUntilUserScroll));
   const itemIdsKey = itemIds.join("\0");
-  (0, import_react232.useLayoutEffect)(() => {
+  (0, import_react233.useLayoutEffect)(() => {
     if (!options.pinToTopUntilUserScroll) return;
     const container = scrollContainerRef.current;
     if (!container) return;
     pinnedToTopRef.current = true;
     container.scrollTop = 0;
   }, [options.pinToTopUntilUserScroll, scrollContainerRef]);
-  (0, import_react232.useEffect)(() => {
+  (0, import_react233.useEffect)(() => {
     if (!options.pinToTopUntilUserScroll) return;
     const container = scrollContainerRef.current;
     if (!container) return;
@@ -137485,7 +137560,7 @@ function useFeedScrollAnchor(scrollContainerRef, itemIds, options) {
     container.addEventListener("scroll", syncPinnedToTop, { passive: true });
     return () => container.removeEventListener("scroll", syncPinnedToTop);
   }, [options.pinToTopUntilUserScroll, scrollContainerRef]);
-  (0, import_react232.useLayoutEffect)(() => {
+  (0, import_react233.useLayoutEffect)(() => {
     const container = scrollContainerRef.current;
     if (!container) return;
     const justUnpaused = wasPausedRef.current && !options.paused;
@@ -137519,11 +137594,11 @@ function useFeedScrollAnchor(scrollContainerRef, itemIds, options) {
     anchorRef.current = captureFeedScrollAnchor(container, options.itemSelector) ?? anchorRef.current;
   }, [scrollContainerRef, itemIdsKey, options.itemSelector, options.paused, options.pinToTopUntilUserScroll]);
 }
-var import_react232, PINNED_TO_TOP_MAX_SCROLL_PX2, MAX_FEED_ANCHOR_SCAN_ITEMS;
+var import_react233, PINNED_TO_TOP_MAX_SCROLL_PX2, MAX_FEED_ANCHOR_SCAN_ITEMS;
 var init_useFeedScrollAnchor = __esm({
   "../grarf/desktop/src/hooks/useFeedScrollAnchor.ts"() {
     init_define_import_meta_env();
-    import_react232 = __toESM(require_react(), 1);
+    import_react233 = __toESM(require_react(), 1);
     init_feedScrollAnchor();
     PINNED_TO_TOP_MAX_SCROLL_PX2 = 1;
     MAX_FEED_ANCHOR_SCAN_ITEMS = 80;
@@ -137697,7 +137772,7 @@ function useGrarfTerminalArrivalHighlight(contentId) {
     const until = state3.highlightUntilById[contentId];
     return until != null && until > Date.now();
   });
-  (0, import_react233.useEffect)(() => {
+  (0, import_react234.useEffect)(() => {
     if (!highlighted) return;
     const until = useGrarfContentRealtimeStore.getState().highlightUntilById[contentId];
     if (until == null) return;
@@ -137709,11 +137784,11 @@ function useGrarfTerminalArrivalHighlight(contentId) {
   }, [contentId, highlighted]);
   return highlighted;
 }
-var import_react233;
+var import_react234;
 var init_useGrarfTerminalArrivalHighlight = __esm({
   "../grarf/desktop/src/hooks/useGrarfTerminalArrivalHighlight.ts"() {
     init_define_import_meta_env();
-    import_react233 = __toESM(require_react(), 1);
+    import_react234 = __toESM(require_react(), 1);
     init_grarfContentRealtimeStore();
   }
 });
@@ -138152,22 +138227,22 @@ function HomeLiveTrackerLeagueFilterMenu({ posts }) {
   const toggleLeague = useLiveTrackerLeagueFilterStore((state3) => state3.toggleLeague);
   const isLeagueEnabled = useLiveTrackerLeagueFilterStore((state3) => state3.isLeagueEnabled);
   const leagues = useCanonicalLiveGameStore((state3) => state3.leagues);
-  const measureRef = (0, import_react234.useRef)(null);
-  const containerRef = (0, import_react234.useRef)(null);
-  const [minTileWidthPx, setMinTileWidthPx] = (0, import_react234.useState)(null);
-  const [uniformTileWidthPx, setUniformTileWidthPx] = (0, import_react234.useState)(null);
-  const liveLeagueKeys = (0, import_react234.useMemo)(
+  const measureRef = (0, import_react235.useRef)(null);
+  const containerRef = (0, import_react235.useRef)(null);
+  const [minTileWidthPx, setMinTileWidthPx] = (0, import_react235.useState)(null);
+  const [uniformTileWidthPx, setUniformTileWidthPx] = (0, import_react235.useState)(null);
+  const liveLeagueKeys = (0, import_react235.useMemo)(
     () => sortGrarfLeagueKeysByImportance(resolveCurrentlyLiveGamesSpineLeagueKeys(leagues)),
     [leagues]
   );
-  const logoUrlByLeague = (0, import_react234.useMemo)(() => {
+  const logoUrlByLeague = (0, import_react235.useMemo)(() => {
     const byLeague = /* @__PURE__ */ new Map();
     for (const league2 of liveLeagueKeys) {
       byLeague.set(league2, resolveLiveTrackerLeagueFilterLogoUrl(league2, posts));
     }
     return byLeague;
   }, [liveLeagueKeys, posts]);
-  (0, import_react234.useLayoutEffect)(() => {
+  (0, import_react235.useLayoutEffect)(() => {
     const container = measureRef.current;
     if (!container) return;
     const tiles = container.querySelectorAll(
@@ -138179,7 +138254,7 @@ function HomeLiveTrackerLeagueFilterMenu({ posts }) {
     }
     setMinTileWidthPx(maxWidth > 0 ? Math.ceil(maxWidth) : null);
   }, [liveLeagueKeys, logoUrlByLeague]);
-  (0, import_react234.useLayoutEffect)(() => {
+  (0, import_react235.useLayoutEffect)(() => {
     const container = containerRef.current;
     if (!container || minTileWidthPx == null) return;
     const updateTileWidth = () => {
@@ -138250,11 +138325,11 @@ function HomeLiveTrackerLeagueFilterMenu({ posts }) {
     )
   ] });
 }
-var import_react234, import_jsx_runtime204, LIVE_TRACKER_LEAGUE_FILTER_TILE_CLASS, LIVE_TRACKER_LEAGUE_FILTER_TILE_GAP_PX;
+var import_react235, import_jsx_runtime204, LIVE_TRACKER_LEAGUE_FILTER_TILE_CLASS, LIVE_TRACKER_LEAGUE_FILTER_TILE_GAP_PX;
 var init_HomeLiveTrackerLeagueFilterMenu = __esm({
   "../grarf/desktop/src/components/homeMvp/HomeLiveTrackerLeagueFilterMenu.tsx"() {
     init_define_import_meta_env();
-    import_react234 = __toESM(require_react(), 1);
+    import_react235 = __toESM(require_react(), 1);
     init_cn();
     init_gamesSpineLeagueLogoUrls();
     init_resolveLiveTrackerPostLeagueLogoUrl();
@@ -138335,7 +138410,7 @@ function liveTrackerScorePostCanWatchLive(spineGame) {
   return gameHasOperationalWatchLive(spineGame);
 }
 function HomeLiveTrackerLiveScorePlaceholder({ game }) {
-  const [watchPicker, setWatchPicker] = (0, import_react235.useState)(null);
+  const [watchPicker, setWatchPicker] = (0, import_react236.useState)(null);
   const spineGame = findGamesSpineGameForWatchLive(game.gameId);
   const leagueDisplayLabel = resolveLiveTrackerLeagueDisplayLabel(game.league, {
     tournamentTitle: spineGame?.awayTeam,
@@ -138351,7 +138426,7 @@ function HomeLiveTrackerLiveScorePlaceholder({ game }) {
   const channel = game.channel?.trim() ?? "";
   const timelineEnteredAt = new Date(game.lastUpdatedMs).toISOString();
   const feedClock = formatLiveTrackTerminalClock(timelineEnteredAt).slice(0, 5);
-  const onWatchLiveClick = (0, import_react235.useCallback)(
+  const onWatchLiveClick = (0, import_react236.useCallback)(
     (e2) => {
       e2.stopPropagation();
       if (!isGrarfWebRenderer2()) return;
@@ -138440,11 +138515,11 @@ function HomeLiveTrackerLiveScorePlaceholder({ game }) {
 function HomeLiveTrackerLiveScoreDevPlaceholder() {
   return /* @__PURE__ */ (0, import_jsx_runtime205.jsx)(HomeLiveTrackerLiveScorePlaceholder, { game: DEV_PLACEHOLDER_GAME });
 }
-var import_react235, import_jsx_runtime205, LIVE_TRACK_SPORT_BY_LEAGUE, LIVE_TRACKER_TIMESTAMP_CLASS, GAME_STATE_PILL_CLASS, WATCH_LIVE_TEXT_ACTION_CLASS, STRIP_HEIGHT2, SCORE_CELL_WIDTH2, TEAM_LOGO_CELL_WIDTH2, TEAM_STRIP_MIN_WIDTH2, DEV_PLACEHOLDER_GAME;
+var import_react236, import_jsx_runtime205, LIVE_TRACK_SPORT_BY_LEAGUE, LIVE_TRACKER_TIMESTAMP_CLASS, GAME_STATE_PILL_CLASS, WATCH_LIVE_TEXT_ACTION_CLASS, STRIP_HEIGHT2, SCORE_CELL_WIDTH2, TEAM_LOGO_CELL_WIDTH2, TEAM_STRIP_MIN_WIDTH2, DEV_PLACEHOLDER_GAME;
 var init_HomeLiveTrackerLiveScorePlaceholder = __esm({
   "../grarf/desktop/src/components/homeMvp/HomeLiveTrackerLiveScorePlaceholder.tsx"() {
     init_define_import_meta_env();
-    import_react235 = __toESM(require_react(), 1);
+    import_react236 = __toESM(require_react(), 1);
     init_cn();
     init_grarfLogoImgClassName();
     init_manualGamesSpineWatchLive();
@@ -138521,8 +138596,8 @@ function liveTrackerPostKey(post) {
   return resolveLiveTrackerPostContentId(post);
 }
 function HomeLiveTrackerSurface({ posts, allPosts, statusMessage }) {
-  const scrollRef = (0, import_react236.useRef)(null);
-  const postIds = (0, import_react236.useMemo)(
+  const scrollRef = (0, import_react237.useRef)(null);
+  const postIds = (0, import_react237.useMemo)(
     () => posts.map((post) => resolveLiveTrackerPostContentId(post)),
     [posts]
   );
@@ -138570,11 +138645,11 @@ function HomeLiveTrackerSurface({ posts, allPosts, statusMessage }) {
     )
   ] });
 }
-var import_react236, import_jsx_runtime207;
+var import_react237, import_jsx_runtime207;
 var init_HomeLiveTrackerSurface = __esm({
   "../grarf/desktop/src/components/homeMvp/HomeLiveTrackerSurface.tsx"() {
     init_define_import_meta_env();
-    import_react236 = __toESM(require_react(), 1);
+    import_react237 = __toESM(require_react(), 1);
     init_homeLiveTrackerSpacing();
     init_useFeedScrollAnchor();
     init_resolveLiveTrackerPostContentId();
@@ -138595,7 +138670,7 @@ function sameLeagueKeys(a2, b2) {
 function HomeLiveTrackerFoundationPane() {
   const posts = useHomeLiveTrackerPosts();
   const allPosts = useLiveTrackerPostsStore((state3) => state3.posts);
-  const realtimeRefs = (0, import_react237.useMemo)(
+  const realtimeRefs = (0, import_react238.useMemo)(
     () => posts.map((post, index) => ({
       id: resolveLiveTrackerPostContentId(post),
       source: "terminal-livetracker",
@@ -138609,29 +138684,29 @@ function HomeLiveTrackerFoundationPane() {
   const operationalSlateReady = useGamesSpineRenderStore((state3) => state3.operationalIngestComplete);
   const activeFeeds = useLiveTrackerActiveFeedsStore((state3) => state3.feeds);
   const fetchedAt = useLiveTrackerPostsStore((state3) => state3.fetchedAt);
-  const [loading, setLoading] = (0, import_react237.useState)(
+  const [loading, setLoading] = (0, import_react238.useState)(
     () => !operationalSlateReady || fetchedAt === null && posts.length === 0
   );
-  const activelyLiveLeagueKeys = (0, import_react237.useMemo)(() => {
+  const activelyLiveLeagueKeys = (0, import_react238.useMemo)(() => {
     const merged = mergeOperationalLeagueGames(leagues);
     return resolveCurrentlyLiveGamesSpineLeagueKeys(merged);
   }, [leagues]);
-  const contentLeagueKeys = (0, import_react237.useMemo)(
+  const contentLeagueKeys = (0, import_react238.useMemo)(
     () => deriveLiveTrackerContentLeagueKeys(allPosts ?? []),
     [allPosts]
   );
-  const allContentLeaguesDisabled = (0, import_react237.useMemo)(() => {
+  const allContentLeaguesDisabled = (0, import_react238.useMemo)(() => {
     if (contentLeagueKeys.length === 0) return false;
     return contentLeagueKeys.every((league2) => disabledLeagueKeys.includes(league2));
   }, [contentLeagueKeys, disabledLeagueKeys]);
-  (0, import_react237.useEffect)(() => {
+  (0, import_react238.useEffect)(() => {
     exposeLiveTrackerLeagueFilterForVerification();
   }, []);
-  (0, import_react237.useEffect)(() => {
+  (0, import_react238.useEffect)(() => {
     if (!operationalSlateReady) return;
     void refreshLiveTrackerPosts().then(() => setLoading(false));
   }, [operationalSlateReady]);
-  (0, import_react237.useEffect)(() => {
+  (0, import_react238.useEffect)(() => {
     let cancelled = false;
     const load = async () => {
       await refreshLiveTrackerPosts();
@@ -138649,7 +138724,7 @@ function HomeLiveTrackerFoundationPane() {
       cancelled = true;
     };
   }, []);
-  (0, import_react237.useEffect)(() => {
+  (0, import_react238.useEffect)(() => {
     let previousLeagueKeys = useLiveTrackerLiveLeaguesStore.getState().leagueKeys;
     return useLiveTrackerLiveLeaguesStore.subscribe((state3) => {
       if (sameLeagueKeys(state3.leagueKeys, previousLeagueKeys)) return;
@@ -138657,7 +138732,7 @@ function HomeLiveTrackerFoundationPane() {
       void refreshLiveTrackerPosts();
     });
   }, []);
-  const statusMessage = (0, import_react237.useMemo)(() => {
+  const statusMessage = (0, import_react238.useMemo)(() => {
     if (allContentLeaguesDisabled) {
       return LIVE_TRACKER_FILTER_EMPTY_COPY;
     }
@@ -138690,11 +138765,11 @@ function HomeLiveTrackerFoundationPane() {
   ]);
   return /* @__PURE__ */ (0, import_jsx_runtime208.jsx)(HomeLiveTrackerSurface, { posts, allPosts: allPosts ?? [], statusMessage });
 }
-var import_react237, import_jsx_runtime208, LIVE_TRACKER_FEED_POLL_MS, LIVE_TRACKER_IDLE_BANNER_COPY, LIVE_TRACKER_FILTER_EMPTY_COPY;
+var import_react238, import_jsx_runtime208, LIVE_TRACKER_FEED_POLL_MS, LIVE_TRACKER_IDLE_BANNER_COPY, LIVE_TRACKER_FILTER_EMPTY_COPY;
 var init_HomeLiveTrackerFoundationPane = __esm({
   "../grarf/desktop/src/components/homeMvp/HomeLiveTrackerFoundationPane.tsx"() {
     init_define_import_meta_env();
-    import_react237 = __toESM(require_react(), 1);
+    import_react238 = __toESM(require_react(), 1);
     init_liveTrackerLeagueFilter();
     init_useHomeLiveTrackerPosts();
     init_useGrarfContentRealtimeIngress();
@@ -138810,9 +138885,9 @@ function waitForLiveTrackAnimationIdle() {
 }
 function useNewswireStagedInsertion() {
   const initialized4 = useNewswireStagedQueueStore((state3) => state3.initialized);
-  const scheduleStartedRef = (0, import_react238.useRef)(false);
-  const timersRef = (0, import_react238.useRef)([]);
-  (0, import_react238.useEffect)(() => {
+  const scheduleStartedRef = (0, import_react239.useRef)(false);
+  const timersRef = (0, import_react239.useRef)([]);
+  (0, import_react239.useEffect)(() => {
     if (!initialized4 || scheduleStartedRef.current) return;
     const { heldStoryIds, releaseHeldStory } = getNewswireStagedQueueStore().getState();
     if (heldStoryIds.length === 0) return;
@@ -138850,11 +138925,11 @@ function useNewswireStagedInsertion() {
     };
   }, [initialized4]);
 }
-var import_react238;
+var import_react239;
 var init_useNewswireStagedInsertion = __esm({
   "../grarf/desktop/src/hooks/useNewswireStagedInsertion.ts"() {
     init_define_import_meta_env();
-    import_react238 = __toESM(require_react(), 1);
+    import_react239 = __toESM(require_react(), 1);
     init_buildNewswireStagedInsertionSchedule();
     init_newswireTypewriterEnabled();
     init_liveTrackAnimationStore();
@@ -138970,17 +139045,17 @@ function useHomeLiveTrackBlockTyping({
     useBroadcastChannel,
     includeInlineCtas
   };
-  const [typedLineIndex, setTypedLineIndex] = (0, import_react239.useState)(isTyping ? 0 : lines.length);
-  const [typedCharCount, setTypedCharCount] = (0, import_react239.useState)(() => {
+  const [typedLineIndex, setTypedLineIndex] = (0, import_react240.useState)(isTyping ? 0 : lines.length);
+  const [typedCharCount, setTypedCharCount] = (0, import_react240.useState)(() => {
     if (!isTyping) {
       const lastLine = lines[lines.length - 1] ?? "";
       return getLiveTrackTerminalLineRevealLength(lastLine, event, revealOptions);
     }
     return 0;
   });
-  const onTypingCompleteRef = (0, import_react239.useRef)(onTypingComplete);
+  const onTypingCompleteRef = (0, import_react240.useRef)(onTypingComplete);
   onTypingCompleteRef.current = onTypingComplete;
-  (0, import_react239.useEffect)(() => {
+  (0, import_react240.useEffect)(() => {
     if (!isTyping) {
       setTypedLineIndex(lines.length);
       const lastLine = lines[lines.length - 1] ?? "";
@@ -139050,11 +139125,11 @@ function useHomeLiveTrackBlockTyping({
     openWorkspaceLineLength: LIVE_TRACK_TERMINAL_OPEN_WORKSPACE_LINE.length
   };
 }
-var import_react239, TYPE_INTERVAL_MS, LINE_PAUSE_MS;
+var import_react240, TYPE_INTERVAL_MS, LINE_PAUSE_MS;
 var init_useHomeLiveTrackBlockTyping = __esm({
   "../grarf/desktop/src/hooks/useHomeLiveTrackBlockTyping.ts"() {
     init_define_import_meta_env();
-    import_react239 = __toESM(require_react(), 1);
+    import_react240 = __toESM(require_react(), 1);
     init_homeLiveTrackTerminalFormat();
     init_homeLiveTrackTerminalReveal();
     TYPE_INTERVAL_MS = 50;
@@ -139115,10 +139190,10 @@ var init_resolveNewswireSourceColor = __esm({
 
 // ../grarf/desktop/src/components/homeMvp/HomeNewswireWireLine.tsx
 function NewswireSourceMark({ source }) {
-  const logoUrl = (0, import_react240.useMemo)(() => resolveNewswireSourceLogoUrl(source), [source]);
-  const sourceColorClass = (0, import_react240.useMemo)(() => resolveNewswireSourceColorClass(source), [source]);
-  const [imageFailed, setImageFailed] = (0, import_react240.useState)(false);
-  (0, import_react240.useLayoutEffect)(() => {
+  const logoUrl = (0, import_react241.useMemo)(() => resolveNewswireSourceLogoUrl(source), [source]);
+  const sourceColorClass = (0, import_react241.useMemo)(() => resolveNewswireSourceColorClass(source), [source]);
+  const [imageFailed, setImageFailed] = (0, import_react241.useState)(false);
+  (0, import_react241.useLayoutEffect)(() => {
     setImageFailed(false);
   }, [logoUrl]);
   if (!logoUrl || imageFailed) {
@@ -139171,15 +139246,15 @@ function HomeNewswireWireLine({
   onHeadlineClick,
   active: active2 = false
 }) {
-  const headline = (0, import_react240.useMemo)(() => story.headline.trim(), [story.headline]);
-  const source = (0, import_react240.useMemo)(() => story.source.trim(), [story.source]);
-  const timestamp = (0, import_react240.useMemo)(() => formatNewswireWireTimestamp(story.timestamp), [story.timestamp]);
-  const typingLines = (0, import_react240.useMemo)(() => [headline], [headline]);
-  const typingEvent = (0, import_react240.useMemo)(
+  const headline = (0, import_react241.useMemo)(() => story.headline.trim(), [story.headline]);
+  const source = (0, import_react241.useMemo)(() => story.source.trim(), [story.source]);
+  const timestamp = (0, import_react241.useMemo)(() => formatNewswireWireTimestamp(story.timestamp), [story.timestamp]);
+  const typingLines = (0, import_react241.useMemo)(() => [headline], [headline]);
+  const typingEvent = (0, import_react241.useMemo)(
     () => newswireStoryToTypingEvent(story),
     [story.id, headline, source, story.url, story.timestamp]
   );
-  const articleUrl = (0, import_react240.useMemo)(() => normalizeNewswireStoryUrl(story.url), [story.url]);
+  const articleUrl = (0, import_react241.useMemo)(() => normalizeNewswireStoryUrl(story.url), [story.url]);
   const handleOpenStory = () => {
     if (!articleUrl) return;
     openNewswireStoryInBrowser(story);
@@ -139194,9 +139269,9 @@ function HomeNewswireWireLine({
     includeInlineCtas: false,
     onTypingComplete
   });
-  const onTypingProgressRef = (0, import_react240.useRef)(onTypingProgress);
+  const onTypingProgressRef = (0, import_react241.useRef)(onTypingProgress);
   onTypingProgressRef.current = onTypingProgress;
-  (0, import_react240.useLayoutEffect)(() => {
+  (0, import_react241.useLayoutEffect)(() => {
     if (!NEWSWIRE_TYPEWRITER_ENABLED && isTyping) {
       onTypingComplete?.();
       return;
@@ -139251,11 +139326,11 @@ function HomeNewswireWireLine({
     }
   );
 }
-var import_react240, import_jsx_runtime209, NEWSWIRE_ROW_INTERACTIVE_CLASS, NEWSWIRE_LINE_CLASS, NEWSWIRE_HEADLINE_TEXT_CLASS, NEWSWIRE_SEPARATOR_CLASS, NEWSWIRE_SOURCE_TEXT_CLASS, NEWSWIRE_SOURCE_LOGO_SLOT_CLASS, NEWSWIRE_TIMESTAMP_TEXT_CLASS;
+var import_react241, import_jsx_runtime209, NEWSWIRE_ROW_INTERACTIVE_CLASS, NEWSWIRE_LINE_CLASS, NEWSWIRE_HEADLINE_TEXT_CLASS, NEWSWIRE_SEPARATOR_CLASS, NEWSWIRE_SOURCE_TEXT_CLASS, NEWSWIRE_SOURCE_LOGO_SLOT_CLASS, NEWSWIRE_TIMESTAMP_TEXT_CLASS;
 var init_HomeNewswireWireLine = __esm({
   "../grarf/desktop/src/components/homeMvp/HomeNewswireWireLine.tsx"() {
     init_define_import_meta_env();
-    import_react240 = __toESM(require_react(), 1);
+    import_react241 = __toESM(require_react(), 1);
     init_useHomeLiveTrackBlockTyping();
     init_useGrarfTerminalArrivalHighlight();
     init_channelLogoSizing();
@@ -139289,7 +139364,7 @@ function HomeNewswireWireRow({
   const storeIsTyping = useLiveTrackAnimationStore((state3) => state3.isTyping(story.id));
   const isTyping = isTopStory && storeIsTyping;
   const markAnimationComplete = useLiveTrackAnimationStore((state3) => state3.markAnimationComplete);
-  const handleTypingComplete = (0, import_react241.useCallback)(() => {
+  const handleTypingComplete = (0, import_react242.useCallback)(() => {
     markAnimationComplete(story.id);
     followActiveReveal();
   }, [story.id, followActiveReveal, markAnimationComplete]);
@@ -139306,13 +139381,13 @@ function HomeNewswireWireRow({
 }
 function HomeNewswireSurface({ stories }) {
   const typingStoryId = useLiveTrackAnimationStore((state3) => state3.animatingId);
-  const scrollRef = (0, import_react241.useRef)(null);
-  const activeRevealAnchorRef = (0, import_react241.useRef)(null);
-  const storyIds = (0, import_react241.useMemo)(() => stories.map((story) => story.id), [stories]);
+  const scrollRef = (0, import_react242.useRef)(null);
+  const activeRevealAnchorRef = (0, import_react242.useRef)(null);
+  const storyIds = (0, import_react242.useMemo)(() => stories.map((story) => story.id), [stories]);
   useFeedScrollAnchor(scrollRef, storyIds, {
     itemSelector: "[data-terminal-item-id]"
   });
-  const followActiveReveal = (0, import_react241.useCallback)(() => {
+  const followActiveReveal = (0, import_react242.useCallback)(() => {
     const scrollEl = scrollRef.current;
     if (!scrollEl) return;
     const applyScroll = () => {
@@ -139331,11 +139406,11 @@ function HomeNewswireSurface({ stories }) {
       requestAnimationFrame(applyScroll);
     });
   }, []);
-  (0, import_react241.useLayoutEffect)(() => {
+  (0, import_react242.useLayoutEffect)(() => {
     if (!typingStoryId) return;
     followActiveReveal();
   }, [followActiveReveal, typingStoryId]);
-  (0, import_react241.useLayoutEffect)(() => {
+  (0, import_react242.useLayoutEffect)(() => {
     if (!NEWSWIRE_TYPEWRITER_ENABLED || stories.length === 0) return;
     const topStoryId = stories[0].id;
     const storyIds2 = new Set(stories.map((story) => story.id));
@@ -139343,7 +139418,7 @@ function HomeNewswireSurface({ stories }) {
     if (!animatingId || !storyIds2.has(animatingId) || animatingId === topStoryId) return;
     getLiveTrackAnimationStore().getState().markAnimationComplete(animatingId);
   }, [stories]);
-  (0, import_react241.useEffect)(() => {
+  (0, import_react242.useEffect)(() => {
     if (!typingStoryId) return;
     const scrollEl = scrollRef.current;
     const contentEl = scrollEl?.firstElementChild;
@@ -139390,11 +139465,11 @@ function HomeNewswireSurface({ stories }) {
     )
   ] });
 }
-var import_react241, import_jsx_runtime210;
+var import_react242, import_jsx_runtime210;
 var init_HomeNewswireSurface = __esm({
   "../grarf/desktop/src/components/homeMvp/HomeNewswireSurface.tsx"() {
     init_define_import_meta_env();
-    import_react241 = __toESM(require_react(), 1);
+    import_react242 = __toESM(require_react(), 1);
     init_homeLiveTrackCombinedScroll();
     init_newswireTypewriterEnabled();
     init_useFeedScrollAnchor();
@@ -139410,21 +139485,21 @@ function HomeNewswirePane() {
   const stories = useHomeNewswireWireEvents();
   const heldStoryIds = useNewswireStagedQueueStore((state3) => state3.heldStoryIds);
   const initializeFromStories = useNewswireStagedQueueStore((state3) => state3.initializeFromStories);
-  (0, import_react242.useLayoutEffect)(() => {
+  (0, import_react243.useLayoutEffect)(() => {
     initializeFromStories(stories);
   }, [stories, initializeFromStories]);
   useNewswireStagedInsertion();
-  const displayedStories = (0, import_react242.useMemo)(
+  const displayedStories = (0, import_react243.useMemo)(
     () => filterNewswireStoriesForDisplay(stories, heldStoryIds),
     [stories, heldStoryIds]
   );
   return /* @__PURE__ */ (0, import_jsx_runtime211.jsx)(HomeNewswireSurface, { stories: displayedStories });
 }
-var import_react242, import_jsx_runtime211;
+var import_react243, import_jsx_runtime211;
 var init_HomeNewswirePane = __esm({
   "../grarf/desktop/src/components/homeMvp/HomeNewswirePane.tsx"() {
     init_define_import_meta_env();
-    import_react242 = __toESM(require_react(), 1);
+    import_react243 = __toESM(require_react(), 1);
     init_useHomeNewswireWireEvents();
     init_useNewswireStagedInsertion();
     init_newswireStagedQueueStore();
@@ -139435,19 +139510,19 @@ var init_HomeNewswirePane = __esm({
 
 // ../grarf/desktop/src/components/homeMvp/HomeLiveTrackerSplitPane.tsx
 function HomeLiveTrackerSplitPane() {
-  const gridRef = (0, import_react243.useRef)(null);
-  const liveLeftRef = (0, import_react243.useRef)(0);
-  const draggingRef = (0, import_react243.useRef)(false);
-  const [leftWidth, setLeftWidth] = (0, import_react243.useState)(0);
-  const getMaxLeftWidth = (0, import_react243.useCallback)(() => {
+  const gridRef = (0, import_react244.useRef)(null);
+  const liveLeftRef = (0, import_react244.useRef)(0);
+  const draggingRef = (0, import_react244.useRef)(false);
+  const [leftWidth, setLeftWidth] = (0, import_react244.useState)(0);
+  const getMaxLeftWidth = (0, import_react244.useCallback)(() => {
     const available = gridRef.current?.clientWidth ?? 0;
     return Math.max(MIN_PANE_WIDTH_PX2, available - RESIZE_HANDLE_WIDTH_PX - MIN_PANE_WIDTH_PX2);
   }, []);
-  const clampLeftWidth = (0, import_react243.useCallback)(
+  const clampLeftWidth = (0, import_react244.useCallback)(
     (width) => Math.min(getMaxLeftWidth(), Math.max(MIN_PANE_WIDTH_PX2, Math.round(width))),
     [getMaxLeftWidth]
   );
-  const applyGrid = (0, import_react243.useCallback)(
+  const applyGrid = (0, import_react244.useCallback)(
     (leftPx) => {
       const el = gridRef.current;
       if (!el) return;
@@ -139458,7 +139533,7 @@ function HomeLiveTrackerSplitPane() {
     },
     [clampLeftWidth]
   );
-  (0, import_react243.useLayoutEffect)(() => {
+  (0, import_react244.useLayoutEffect)(() => {
     const el = gridRef.current;
     if (!el) return;
     const initial = clampLeftWidth(el.clientWidth * DEFAULT_LEFT_RATIO);
@@ -139466,7 +139541,7 @@ function HomeLiveTrackerSplitPane() {
     setLeftWidth(initial);
     applyGrid(initial);
   }, [applyGrid, clampLeftWidth]);
-  (0, import_react243.useEffect)(() => {
+  (0, import_react244.useEffect)(() => {
     const el = gridRef.current;
     if (!el) return;
     const observer = new ResizeObserver(() => {
@@ -139525,11 +139600,11 @@ function HomeLiveTrackerSplitPane() {
     }
   );
 }
-var import_react243, import_jsx_runtime212, RESIZE_HANDLE_WIDTH_PX, MIN_PANE_WIDTH_PX2, DEFAULT_LEFT_RATIO;
+var import_react244, import_jsx_runtime212, RESIZE_HANDLE_WIDTH_PX, MIN_PANE_WIDTH_PX2, DEFAULT_LEFT_RATIO;
 var init_HomeLiveTrackerSplitPane = __esm({
   "../grarf/desktop/src/components/homeMvp/HomeLiveTrackerSplitPane.tsx"() {
     init_define_import_meta_env();
-    import_react243 = __toESM(require_react(), 1);
+    import_react244 = __toESM(require_react(), 1);
     init_cn();
     init_usePaneDragResize();
     init_PaneResizeHandle();
@@ -139593,7 +139668,7 @@ function useDesktopWhipAroundFocalResult() {
   const manualGamesSpineRefreshMs = useManualGamesSpineLiveRefreshMs();
   const adminFeaturedPriorities = useAdminFeaturedPriorityStore((s2) => s2.priorities);
   const operationsFieldsByGameId = useAdminOperationsCardStore((s2) => s2.fieldsByGameId);
-  return (0, import_react244.useMemo)(() => {
+  return (0, import_react245.useMemo)(() => {
     const mergedLeagues = omitHiddenGamesSpineLeagueGames(mergeOperationalLeagueGames(leagues));
     const now = new Date(manualGamesSpineRefreshMs);
     const refreshedLeagues = refreshManualGamesSpineGamesInLeagues(mergedLeagues, now);
@@ -139737,7 +139812,7 @@ function HomeWhipAroundElectronPane() {
   const operationalVisible = useOperationalAlertStore((s2) => s2.visible);
   const alertActions = useOperationalAlertActionsStore((s2) => s2.actions);
   const streamingServices = useWhipAroundStreamingServicesStore((s2) => s2.streamingServices);
-  const [personalizedEmbedUrl, setPersonalizedEmbedUrl] = (0, import_react244.useState)(null);
+  const [personalizedEmbedUrl, setPersonalizedEmbedUrl] = (0, import_react245.useState)(null);
   const {
     onOpen,
     onWatchLive,
@@ -139751,14 +139826,14 @@ function HomeWhipAroundElectronPane() {
     watchSource: "home_scoreboard"
   });
   const userSelectedEspn = streamingServices.includes("espn");
-  const espnInGrarfUrl = (0, import_react244.useMemo)(() => {
+  const espnInGrarfUrl = (0, import_react245.useMemo)(() => {
     if (!game || !userSelectedEspn) return null;
     return resolveWhipAroundEspnInGrarfUrl(game);
   }, [game, userSelectedEspn]);
-  (0, import_react244.useEffect)(() => {
+  (0, import_react245.useEffect)(() => {
     setPersonalizedEmbedUrl(null);
   }, [game?.id]);
-  (0, import_react244.useEffect)(() => {
+  (0, import_react245.useEffect)(() => {
     if (!game || !alertActions?.watchDispatch) return;
     const dispatch = alertActions.watchDispatch;
     const result = handleWatchLiveClick(game, dispatch);
@@ -139769,7 +139844,7 @@ function HomeWhipAroundElectronPane() {
       }
     }
   }, [game?.id, alertActions?.watchDispatch]);
-  const onWhipAroundWatchLive = (0, import_react244.useCallback)(
+  const onWhipAroundWatchLive = (0, import_react245.useCallback)(
     (gameId) => {
       if (!game || gameId !== game.id) return;
       if (userSelectedEspn && espnInGrarfUrl) {
@@ -139841,11 +139916,11 @@ function HomeWhipAroundElectronPane() {
     ) : null
   ] });
 }
-var import_react244, import_jsx_runtime213;
+var import_react245, import_jsx_runtime213;
 var init_HomeWhipAroundElectronPane = __esm({
   "../grarf/desktop/src/components/homeMvp/HomeWhipAroundElectronPane.tsx"() {
     init_define_import_meta_env();
-    import_react244 = __toESM(require_react(), 1);
+    import_react245 = __toESM(require_react(), 1);
     init_GameRow();
     init_WatchOptionsModal();
     init_WorkspaceEmbedHost();
@@ -139899,12 +139974,12 @@ var init_liveWhipAround = __esm({
 
 // ../grarf/desktop/src/components/homeMvp/HomeWhipAroundWebPane.tsx
 function HomeWhipAroundWebPane() {
-  const [email, setEmail] = (0, import_react245.useState)("");
-  const [status, setStatus] = (0, import_react245.useState)("idle");
-  const [errorMessage, setErrorMessage] = (0, import_react245.useState)(null);
-  const videoRef = (0, import_react245.useRef)(null);
-  const [showControls, setShowControls] = (0, import_react245.useState)(false);
-  (0, import_react245.useEffect)(() => {
+  const [email, setEmail] = (0, import_react246.useState)("");
+  const [status, setStatus] = (0, import_react246.useState)("idle");
+  const [errorMessage, setErrorMessage] = (0, import_react246.useState)(null);
+  const videoRef = (0, import_react246.useRef)(null);
+  const [showControls, setShowControls] = (0, import_react246.useState)(false);
+  (0, import_react246.useEffect)(() => {
     const video = videoRef.current;
     if (!video) return;
     video.currentTime = 0;
@@ -139914,7 +139989,7 @@ function HomeWhipAroundWebPane() {
       setShowControls(true);
     });
   }, []);
-  const onSubmit = (0, import_react245.useCallback)(
+  const onSubmit = (0, import_react246.useCallback)(
     async (event) => {
       event.preventDefault();
       if (status === "loading" || status === "success") return;
@@ -140016,11 +140091,11 @@ function HomeWhipAroundWebPane() {
     ] })
   ] }) }) });
 }
-var import_react245, import_jsx_runtime214, WHIP_AROUND_PROMO_VIDEO_SRC;
+var import_react246, import_jsx_runtime214, WHIP_AROUND_PROMO_VIDEO_SRC;
 var init_HomeWhipAroundWebPane = __esm({
   "../grarf/desktop/src/components/homeMvp/HomeWhipAroundWebPane.tsx"() {
     init_define_import_meta_env();
-    import_react245 = __toESM(require_react(), 1);
+    import_react246 = __toESM(require_react(), 1);
     init_lucide_react();
     init_cn();
     init_liveWhipAround();
@@ -140284,14 +140359,14 @@ function HomeHighlightsTvProgrammingGuide({
 }) {
   const isWeb = isGrarfWebRenderer2();
   const programCardProps = isWeb ? { webTitleLayout: true } : {};
-  const scrollContainerRef = (0, import_react246.useRef)(null);
-  const suppressBrowsedReportRef = (0, import_react246.useRef)(false);
+  const scrollContainerRef = (0, import_react247.useRef)(null);
+  const suppressBrowsedReportRef = (0, import_react247.useRef)(false);
   const scrollToNewerHighlights = () => {
     const container = scrollContainerRef.current;
     if (!container) return;
     container.scrollLeft = 0;
   };
-  (0, import_react246.useEffect)(() => {
+  (0, import_react247.useEffect)(() => {
     if (!isWeb) return;
     const container = scrollContainerRef.current;
     if (!container) return;
@@ -140306,7 +140381,7 @@ function HomeHighlightsTvProgrammingGuide({
       suppressBrowsedReportRef.current = false;
     });
   }, [isWeb, guideAutoScrollKey, guideHasNewerVideos, currentIndex]);
-  (0, import_react246.useEffect)(() => {
+  (0, import_react247.useEffect)(() => {
     if (!isWeb || !onBrowsedLeagueKeyChange) return;
     const container = scrollContainerRef.current;
     if (!container) return;
@@ -140418,11 +140493,11 @@ function HomeHighlightsTvProgrammingGuide({
     }
   );
 }
-var import_react246, import_jsx_runtime217, PROGRAM_CARD_HEIGHT, PROGRAM_CARD_WIDTH, PROGRAM_LABEL_CLASS, PROGRAM_TITLE_BASE_CLASS;
+var import_react247, import_jsx_runtime217, PROGRAM_CARD_HEIGHT, PROGRAM_CARD_WIDTH, PROGRAM_LABEL_CLASS, PROGRAM_TITLE_BASE_CLASS;
 var init_HomeHighlightsTvProgrammingGuide = __esm({
   "../grarf/desktop/src/components/homeMvp/HomeHighlightsTvProgrammingGuide.tsx"() {
     init_define_import_meta_env();
-    import_react246 = __toESM(require_react(), 1);
+    import_react247 = __toESM(require_react(), 1);
     init_cn();
     init_isGrarfWebRenderer();
     import_jsx_runtime217 = __toESM(require_jsx_runtime(), 1);
@@ -140644,31 +140719,31 @@ function useHighlightsTvAmbientPlayback() {
   const liveLeagues = useLiveGamesStore((state3) => state3.leagues);
   const retainedById = useRecentFinalizedGamesStore((state3) => state3.byId);
   const scheduleByDate = useScheduleCacheStore((state3) => state3.byDate);
-  const [visibleLeagueKeys, setVisibleLeagueKeys] = (0, import_react247.useState)([]);
-  const [broadcastClips, setBroadcastClips] = (0, import_react247.useState)([]);
-  const [broadcastIndex, setBroadcastIndex] = (0, import_react247.useState)(0);
-  const [isManual, setIsManual] = (0, import_react247.useState)(false);
-  const [manualLeagueKey, setManualLeagueKey] = (0, import_react247.useState)(null);
-  const [manualClips, setManualClips] = (0, import_react247.useState)([]);
-  const [manualIndex, setManualIndex] = (0, import_react247.useState)(0);
-  const [playbackStartSec, setPlaybackStartSec] = (0, import_react247.useState)(void 0);
-  const [playbackRevision, setPlaybackRevision] = (0, import_react247.useState)(0);
-  const [guideAutoScrollKey, setGuideAutoScrollKey] = (0, import_react247.useState)(0);
-  const [loading, setLoading] = (0, import_react247.useState)(true);
-  const [loadError, setLoadError] = (0, import_react247.useState)(null);
-  const [catalogClipsByLeague, setCatalogClipsByLeague] = (0, import_react247.useState)({});
-  const ingestionRowsRef = (0, import_react247.useRef)(null);
-  const rawClipsByLeagueRef = (0, import_react247.useRef)(/* @__PURE__ */ new Map());
-  const bucketsRef = (0, import_react247.useRef)([]);
-  const joinedBroadcastRef = (0, import_react247.useRef)(false);
-  const isManualRef = (0, import_react247.useRef)(false);
-  const manualLeagueKeyRef = (0, import_react247.useRef)(null);
-  const manualIndexRef = (0, import_react247.useRef)(0);
-  const manualClipsRef = (0, import_react247.useRef)([]);
-  const broadcastIndexRef = (0, import_react247.useRef)(0);
-  const broadcastClipsRef = (0, import_react247.useRef)([]);
-  const currentVideoIdRef = (0, import_react247.useRef)(null);
-  (0, import_react247.useEffect)(() => {
+  const [visibleLeagueKeys, setVisibleLeagueKeys] = (0, import_react248.useState)([]);
+  const [broadcastClips, setBroadcastClips] = (0, import_react248.useState)([]);
+  const [broadcastIndex, setBroadcastIndex] = (0, import_react248.useState)(0);
+  const [isManual, setIsManual] = (0, import_react248.useState)(false);
+  const [manualLeagueKey, setManualLeagueKey] = (0, import_react248.useState)(null);
+  const [manualClips, setManualClips] = (0, import_react248.useState)([]);
+  const [manualIndex, setManualIndex] = (0, import_react248.useState)(0);
+  const [playbackStartSec, setPlaybackStartSec] = (0, import_react248.useState)(void 0);
+  const [playbackRevision, setPlaybackRevision] = (0, import_react248.useState)(0);
+  const [guideAutoScrollKey, setGuideAutoScrollKey] = (0, import_react248.useState)(0);
+  const [loading, setLoading] = (0, import_react248.useState)(true);
+  const [loadError, setLoadError] = (0, import_react248.useState)(null);
+  const [catalogClipsByLeague, setCatalogClipsByLeague] = (0, import_react248.useState)({});
+  const ingestionRowsRef = (0, import_react248.useRef)(null);
+  const rawClipsByLeagueRef = (0, import_react248.useRef)(/* @__PURE__ */ new Map());
+  const bucketsRef = (0, import_react248.useRef)([]);
+  const joinedBroadcastRef = (0, import_react248.useRef)(false);
+  const isManualRef = (0, import_react248.useRef)(false);
+  const manualLeagueKeyRef = (0, import_react248.useRef)(null);
+  const manualIndexRef = (0, import_react248.useRef)(0);
+  const manualClipsRef = (0, import_react248.useRef)([]);
+  const broadcastIndexRef = (0, import_react248.useRef)(0);
+  const broadcastClipsRef = (0, import_react248.useRef)([]);
+  const currentVideoIdRef = (0, import_react248.useRef)(null);
+  (0, import_react248.useEffect)(() => {
     isManualRef.current = isManual;
     manualLeagueKeyRef.current = manualLeagueKey;
     manualIndexRef.current = manualIndex;
@@ -140684,7 +140759,7 @@ function useHighlightsTvAmbientPlayback() {
     broadcastIndex,
     broadcastClips
   ]);
-  const resumeBroadcastPlayback = (0, import_react247.useCallback)(() => {
+  const resumeBroadcastPlayback = (0, import_react248.useCallback)(() => {
     const playlist = buildAmbientPlaylist(bucketsRef.current);
     setBroadcastClips(playlist);
     if (playlist.length === 0) {
@@ -140717,7 +140792,7 @@ function useHighlightsTvAmbientPlayback() {
       { scrollGuide: true, bumpRevision: true, preserveCurrentVideo: false }
     );
   }, []);
-  const applyBuckets = (0, import_react247.useCallback)((buckets, joinBroadcast) => {
+  const applyBuckets = (0, import_react248.useCallback)((buckets, joinBroadcast) => {
     bucketsRef.current = buckets;
     const playlist = buildAmbientPlaylist(buckets);
     setVisibleLeagueKeys(buckets.map((bucket) => bucket.channel.leagueKey));
@@ -140774,7 +140849,7 @@ function useHighlightsTvAmbientPlayback() {
       }
     );
   }, []);
-  const enterManual = (0, import_react247.useCallback)((leagueKey, startIndex) => {
+  const enterManual = (0, import_react248.useCallback)((leagueKey, startIndex) => {
     const raw = rawClipsByLeagueRef.current.get(leagueKey) ?? [];
     if (raw.length === 0) return;
     const labeled = labelLeagueClips(leagueKey, raw);
@@ -140791,7 +140866,7 @@ function useHighlightsTvAmbientPlayback() {
     setPlaybackRevision((revision) => revision + 1);
     setGuideAutoScrollKey((key2) => key2 + 1);
   }, []);
-  const loadAmbientCatalog = (0, import_react247.useCallback)(async (joinBroadcast) => {
+  const loadAmbientCatalog = (0, import_react248.useCallback)(async (joinBroadcast) => {
     setLoading(true);
     setLoadError(null);
     try {
@@ -140850,15 +140925,15 @@ function useHighlightsTvAmbientPlayback() {
       setLoading(false);
     }
   }, [applyBuckets]);
-  (0, import_react247.useEffect)(() => {
+  (0, import_react248.useEffect)(() => {
     void loadAmbientCatalog(true);
   }, [loadAmbientCatalog]);
-  (0, import_react247.useEffect)(() => {
+  (0, import_react248.useEffect)(() => {
     const rows = ingestionRowsRef.current;
     if (!rows) return;
     applyBuckets(buildAmbientBuckets(rows, rawClipsByLeagueRef.current), false);
   }, [applyBuckets, liveLeagues, retainedById, scheduleByDate]);
-  (0, import_react247.useEffect)(() => {
+  (0, import_react248.useEffect)(() => {
     const intervalId = window.setInterval(() => {
       const rows = ingestionRowsRef.current;
       if (!rows) return;
@@ -140866,7 +140941,7 @@ function useHighlightsTvAmbientPlayback() {
     }, 6e4);
     return () => window.clearInterval(intervalId);
   }, [applyBuckets]);
-  (0, import_react247.useEffect)(() => {
+  (0, import_react248.useEffect)(() => {
     const refreshAmbientCatalog = async () => {
       try {
         const rows = await loadHighlightsTvChannelIngestionRows();
@@ -140906,13 +140981,13 @@ function useHighlightsTvAmbientPlayback() {
     scheduleNextRefresh();
     return () => window.clearTimeout(timeoutId);
   }, [applyBuckets]);
-  const selectChannel = (0, import_react247.useCallback)(
+  const selectChannel = (0, import_react248.useCallback)(
     (leagueKey) => {
       enterManual(leagueKey, 0);
     },
     [enterManual]
   );
-  const selectClipIndex = (0, import_react247.useCallback)(
+  const selectClipIndex = (0, import_react248.useCallback)(
     (index) => {
       if (isManualRef.current) {
         if (index < 0 || index >= manualClipsRef.current.length) return;
@@ -140940,7 +141015,7 @@ function useHighlightsTvAmbientPlayback() {
     },
     [enterManual]
   );
-  const advancePlaylist = (0, import_react247.useCallback)(() => {
+  const advancePlaylist = (0, import_react248.useCallback)(() => {
     if (isManualRef.current) {
       const clips2 = manualClipsRef.current;
       const index = manualIndexRef.current;
@@ -140977,7 +141052,7 @@ function useHighlightsTvAmbientPlayback() {
   const guideIndex = isManual ? manualIndex : broadcastIndex;
   const currentClip = guideClips[guideIndex] ?? null;
   const activeLeagueKey = isManual ? manualLeagueKey ?? "" : broadcastClips[broadcastIndex]?.leagueKey ?? visibleLeagueKeys[0] ?? "";
-  return (0, import_react247.useMemo)(
+  return (0, import_react248.useMemo)(
     () => ({
       activeLeagueKey,
       visibleLeagueKeys,
@@ -141012,11 +141087,11 @@ function useHighlightsTvAmbientPlayback() {
     ]
   );
 }
-var import_react247, INITIAL_HIGHLIGHTS_TV_INGESTION_CHANNEL_COUNT;
+var import_react248, INITIAL_HIGHLIGHTS_TV_INGESTION_CHANNEL_COUNT;
 var init_useHighlightsTvAmbientPlayback = __esm({
   "../grarf/desktop/src/hooks/useHighlightsTvAmbientPlayback.ts"() {
     init_define_import_meta_env();
-    import_react247 = __toESM(require_react(), 1);
+    import_react248 = __toESM(require_react(), 1);
     init_highlightsTvChannelIngestionConfig();
     init_highlightsTvChannelOrder();
     init_collectHighlightsTvAmbientSpineGames();
@@ -141161,18 +141236,18 @@ async function refreshClipsFromConfig(leagueKey, leagueLabel, config) {
 }
 function useHighlightsTvChannelPlayback() {
   const defaultLeague = resolveDefaultLeague();
-  const [activeLeagueKey, setActiveLeagueKey] = (0, import_react248.useState)(defaultLeague.leagueKey);
-  const [clips, setClips] = (0, import_react248.useState)([]);
-  const [currentIndex, setCurrentIndex] = (0, import_react248.useState)(0);
-  const [loading, setLoading] = (0, import_react248.useState)(true);
-  const [loadError, setLoadError] = (0, import_react248.useState)(null);
-  const playlistCacheRef = (0, import_react248.useRef)({});
-  const ingestionConfigCacheRef = (0, import_react248.useRef)({});
-  const activeLeagueKeyRef = (0, import_react248.useRef)(activeLeagueKey);
-  (0, import_react248.useEffect)(() => {
+  const [activeLeagueKey, setActiveLeagueKey] = (0, import_react249.useState)(defaultLeague.leagueKey);
+  const [clips, setClips] = (0, import_react249.useState)([]);
+  const [currentIndex, setCurrentIndex] = (0, import_react249.useState)(0);
+  const [loading, setLoading] = (0, import_react249.useState)(true);
+  const [loadError, setLoadError] = (0, import_react249.useState)(null);
+  const playlistCacheRef = (0, import_react249.useRef)({});
+  const ingestionConfigCacheRef = (0, import_react249.useRef)({});
+  const activeLeagueKeyRef = (0, import_react249.useRef)(activeLeagueKey);
+  (0, import_react249.useEffect)(() => {
     activeLeagueKeyRef.current = activeLeagueKey;
   }, [activeLeagueKey]);
-  const loadChannel = (0, import_react248.useCallback)(async (leagueKey, startIndex = 0) => {
+  const loadChannel = (0, import_react249.useCallback)(async (leagueKey, startIndex = 0) => {
     const inChannelOrder = HIGHLIGHTS_TV_CHANNEL_ORDER.some((entry2) => entry2.leagueKey === leagueKey);
     if (!inChannelOrder) {
       setClips([]);
@@ -141211,10 +141286,10 @@ function useHighlightsTvChannelPlayback() {
       setLoading(false);
     }
   }, []);
-  (0, import_react248.useEffect)(() => {
+  (0, import_react249.useEffect)(() => {
     void loadChannel(defaultLeague.leagueKey, 0);
   }, [defaultLeague.leagueKey, loadChannel]);
-  (0, import_react248.useEffect)(() => {
+  (0, import_react249.useEffect)(() => {
     const refreshActiveChannel = async () => {
       const leagueKey = activeLeagueKeyRef.current;
       const config = ingestionConfigCacheRef.current[leagueKey];
@@ -141236,21 +141311,21 @@ function useHighlightsTvChannelPlayback() {
     }, HIGHLIGHTS_TV_CHANNEL_REFRESH_MS);
     return () => window.clearInterval(intervalId);
   }, []);
-  const selectChannel = (0, import_react248.useCallback)(
+  const selectChannel = (0, import_react249.useCallback)(
     (leagueKey) => {
       if (leagueKey === activeLeagueKey && clips.length > 0) return;
       void loadChannel(leagueKey, 0);
     },
     [activeLeagueKey, clips.length, loadChannel]
   );
-  const selectClipIndex = (0, import_react248.useCallback)(
+  const selectClipIndex = (0, import_react249.useCallback)(
     (index) => {
       if (index < 0 || index >= clips.length) return;
       setCurrentIndex(index);
     },
     [clips.length]
   );
-  const advancePlaylist = (0, import_react248.useCallback)(() => {
+  const advancePlaylist = (0, import_react249.useCallback)(() => {
     if (clips.length === 0) return;
     setCurrentIndex((index) => (index + 1) % clips.length);
   }, [clips.length]);
@@ -141267,11 +141342,11 @@ function useHighlightsTvChannelPlayback() {
     advancePlaylist
   };
 }
-var import_react248;
+var import_react249;
 var init_useHighlightsTvChannelPlayback = __esm({
   "../grarf/desktop/src/hooks/useHighlightsTvChannelPlayback.ts"() {
     init_define_import_meta_env();
-    import_react248 = __toESM(require_react(), 1);
+    import_react249 = __toESM(require_react(), 1);
     init_fetchHighlightsTvPlaylistClips();
     init_highlightsTvChannelRefreshInterval();
     init_ingestHighlightsTvChannelClips();
@@ -141354,7 +141429,7 @@ function HomeHighlightsTvPaneAmbient() {
     selectClipIndex,
     advancePlaylist
   } = useHighlightsTvAmbientPlayback();
-  const [browsedLeagueKey, setBrowsedLeagueKey] = (0, import_react249.useState)(null);
+  const [browsedLeagueKey, setBrowsedLeagueKey] = (0, import_react250.useState)(null);
   const displayedLeagueKey = browsedLeagueKey ?? activeLeagueKey;
   const guideNewerVideos = resolveHighlightsTvProgrammingGuideNewerVideos(
     displayedLeagueKey,
@@ -141447,11 +141522,11 @@ function HomeHighlightsTvPane() {
   if (isGrarfWebRenderer2()) return /* @__PURE__ */ (0, import_jsx_runtime218.jsx)(HomeHighlightsTvPaneAmbient, {});
   return /* @__PURE__ */ (0, import_jsx_runtime218.jsx)(HomeHighlightsTvPaneChannel, {});
 }
-var import_react249, import_jsx_runtime218;
+var import_react250, import_jsx_runtime218;
 var init_HomeHighlightsTvPane = __esm({
   "../grarf/desktop/src/components/homeMvp/HomeHighlightsTvPane.tsx"() {
     init_define_import_meta_env();
-    import_react249 = __toESM(require_react(), 1);
+    import_react250 = __toESM(require_react(), 1);
     init_HomeHighlightsTvChannelBar();
     init_HomeHighlightsTvPlayer();
     init_HomeHighlightsTvProgrammingGuide();
@@ -141638,7 +141713,7 @@ function useSyncBrowserUrlWithActiveWorkspace({
   leagueHubCategoryId,
   fallbackLeagueKey
 }) {
-  const canonicalUrl = (0, import_react250.useMemo)(
+  const canonicalUrl = (0, import_react251.useMemo)(
     () => resolveActiveWorkspaceCanonicalUrl({
       activeWorkspace,
       centerPaneMode,
@@ -141656,16 +141731,16 @@ function useSyncBrowserUrlWithActiveWorkspace({
       fallbackLeagueKey
     ]
   );
-  (0, import_react250.useEffect)(() => {
+  (0, import_react251.useEffect)(() => {
     if (isBrowserUrlSyncSuppressed()) return;
     syncBrowserUrlToCanonical(canonicalUrl);
   }, [canonicalUrl]);
 }
-var import_react250;
+var import_react251;
 var init_useSyncBrowserUrlWithActiveWorkspace = __esm({
   "../grarf/desktop/src/hooks/useSyncBrowserUrlWithActiveWorkspace.ts"() {
     init_define_import_meta_env();
-    import_react250 = __toESM(require_react(), 1);
+    import_react251 = __toESM(require_react(), 1);
     init_browserUrlSync();
     init_browserHistoryNavigationGuard();
   }
@@ -141920,9 +141995,9 @@ function useInitialUrlBootstrap({
   openIntelBriefing,
   onGameNotFound
 }) {
-  const handlersRef = (0, import_react251.useRef)({ openGame, openIntelBriefing, onGameNotFound });
+  const handlersRef = (0, import_react252.useRef)({ openGame, openIntelBriefing, onGameNotFound });
   handlersRef.current = { openGame, openIntelBriefing, onGameNotFound };
-  (0, import_react251.useEffect)(() => {
+  (0, import_react252.useEffect)(() => {
     if (!enabled) return;
     void runInitialUrlBootstrap({
       openGame: (gameId, game) => handlersRef.current.openGame(gameId, game),
@@ -141931,11 +142006,11 @@ function useInitialUrlBootstrap({
     });
   }, [enabled]);
 }
-var import_react251;
+var import_react252;
 var init_useInitialUrlBootstrap = __esm({
   "../grarf/desktop/src/hooks/useInitialUrlBootstrap.ts"() {
     init_define_import_meta_env();
-    import_react251 = __toESM(require_react(), 1);
+    import_react252 = __toESM(require_react(), 1);
     init_initialUrlBootstrap();
   }
 });
@@ -141980,9 +142055,9 @@ function useBrowserHistoryNavigation({
   openIntelBriefing,
   onGameNotFound
 }) {
-  const handlersRef = (0, import_react252.useRef)({ openGame, openIntelBriefing, onGameNotFound });
+  const handlersRef = (0, import_react253.useRef)({ openGame, openIntelBriefing, onGameNotFound });
   handlersRef.current = { openGame, openIntelBriefing, onGameNotFound };
-  (0, import_react252.useEffect)(() => {
+  (0, import_react253.useEffect)(() => {
     if (!enabled) return;
     const onPopState = () => {
       void runBrowserHistoryNavigation({
@@ -141995,11 +142070,11 @@ function useBrowserHistoryNavigation({
     return () => window.removeEventListener("popstate", onPopState);
   }, [enabled]);
 }
-var import_react252;
+var import_react253;
 var init_useBrowserHistoryNavigation = __esm({
   "../grarf/desktop/src/hooks/useBrowserHistoryNavigation.ts"() {
     init_define_import_meta_env();
-    import_react252 = __toESM(require_react(), 1);
+    import_react253 = __toESM(require_react(), 1);
     init_runBrowserHistoryNavigation();
   }
 });
@@ -142013,9 +142088,9 @@ function useGameWorkspacePathNavigation({
   onGameNotFound,
   onGameRouteCleared
 }) {
-  const handlersRef = (0, import_react253.useRef)({ openGame, openIntelBriefing, onGameNotFound });
+  const handlersRef = (0, import_react254.useRef)({ openGame, openIntelBriefing, onGameNotFound });
   handlersRef.current = { openGame, openIntelBriefing, onGameNotFound };
-  (0, import_react253.useEffect)(() => {
+  (0, import_react254.useEffect)(() => {
     if (!enabled) return;
     const result = resolveInitialUrlBootstrapIntent(pathname);
     if (result.intent.kind !== "game") {
@@ -142025,11 +142100,11 @@ function useGameWorkspacePathNavigation({
     void navigateToGameFromUrl(result.intent.gameId, handlersRef.current);
   }, [enabled, pathname, onGameRouteCleared]);
 }
-var import_react253;
+var import_react254;
 var init_useGameWorkspacePathNavigation = __esm({
   "../grarf/desktop/src/hooks/useGameWorkspacePathNavigation.ts"() {
     init_define_import_meta_env();
-    import_react253 = __toESM(require_react(), 1);
+    import_react254 = __toESM(require_react(), 1);
     init_navigateToGameFromUrl();
     init_resolveInitialUrlBootstrapIntent();
   }
@@ -142125,8 +142200,8 @@ function SportsBrowserPrototypeAddressBar({
   className
 }) {
   const safePaneCount = Math.max(1, paneCount);
-  const [omniboxValue, setOmniboxValue] = (0, import_react254.useState)("");
-  const onOmniboxKeyDown = (0, import_react254.useCallback)(
+  const [omniboxValue, setOmniboxValue] = (0, import_react255.useState)("");
+  const onOmniboxKeyDown = (0, import_react255.useCallback)(
     (event) => {
       if (event.key !== "Enter") return;
       event.preventDefault();
@@ -142232,11 +142307,11 @@ function SportsBrowserPrototypeAddressBar({
     }
   );
 }
-var import_react254, import_jsx_runtime221, workspaceControlClass;
+var import_react255, import_jsx_runtime221, workspaceControlClass;
 var init_SportsBrowserPrototypeAddressBar = __esm({
   "../grarf/desktop/src/components/homeMvp/SportsBrowserPrototypeAddressBar.tsx"() {
     init_define_import_meta_env();
-    import_react254 = __toESM(require_react(), 1);
+    import_react255 = __toESM(require_react(), 1);
     init_lucide_react();
     init_cn();
     init_grarf_logo_black();
@@ -142247,58 +142322,503 @@ var init_SportsBrowserPrototypeAddressBar = __esm({
 });
 
 // ../grarf/desktop/src/components/homeMvp/SportsBrowserPrototypeBottomRailGames.tsx
-function SportsBrowserPrototypeBottomRailGames({ className }) {
+function isSameTopRailGame2(game, gameId) {
+  const id = gameId.trim();
+  if (!id) return false;
+  return game.id === id || game.grarfGameId === id;
+}
+function findGameInLeagueMap2(gameId, leagues) {
+  for (const rows of Object.values(leagues)) {
+    if (!Array.isArray(rows)) continue;
+    const found = rows.find((game) => isSameTopRailGame2(game, gameId));
+    if (found) return found;
+  }
+  return void 0;
+}
+function resolveTopRailCanonicalGame2(gameId, bestGame, importantGames, leagues) {
+  if (!gameId) return void 0;
+  if (bestGame && isSameTopRailGame2(bestGame, gameId)) return bestGame;
+  const fromRail = importantGames.find((game) => isSameTopRailGame2(game, gameId));
+  if (fromRail) return fromRail;
+  return findGameInLeagueMap2(gameId, mergeOperationalLeagueGames(leagues)) ?? findOperationalGameRowById(gameId) ?? findGamesSpineGameById(gameId, "top_rail_game_update") ?? resolveTransientAlertPlaceholderGame(gameId);
+}
+function resolveTopRailAlertPlacement2(alertGameId, bestGame, importantGames) {
+  if (!alertGameId) return "none";
+  if (bestGame && isSameTopRailGame2(bestGame, alertGameId)) return "best-event";
+  if (importantGames.some((game) => isSameTopRailGame2(game, alertGameId))) return "promote";
+  return "transient";
+}
+function useTopRailGameUpdateLifecycle2(activeAlert, onExited) {
+  const [phase, setPhase] = (0, import_react256.useState)("hidden");
+  const [currentAlert, setCurrentAlert] = (0, import_react256.useState)(null);
+  const [slotExpanded, setSlotExpanded] = (0, import_react256.useState)(false);
+  const [cardVisible, setCardVisible] = (0, import_react256.useState)(false);
+  const onExitedRef = (0, import_react256.useRef)(onExited);
+  onExitedRef.current = onExited;
+  const currentAlertRef = (0, import_react256.useRef)(currentAlert);
+  currentAlertRef.current = currentAlert;
+  (0, import_react256.useEffect)(() => {
+    if (!activeAlert) return;
+    if (activeAlert.instanceId === currentAlert?.instanceId) return;
+    setCurrentAlert(activeAlert);
+    setPhase("entering");
+    setSlotExpanded(false);
+    setCardVisible(false);
+  }, [activeAlert, currentAlert?.instanceId]);
+  (0, import_react256.useEffect)(() => {
+    if (activeAlert) return;
+    if (!currentAlert) return;
+    if (phase === "exiting" || phase === "hidden" || phase === "unmounted") return;
+    setPhase("exiting");
+    setCardVisible(false);
+  }, [activeAlert, currentAlert, phase]);
+  (0, import_react256.useEffect)(() => {
+    if (phase !== "entering") return;
+    let cardVisibleTimer;
+    let frame2 = 0;
+    const frame1 = requestAnimationFrame(() => {
+      frame2 = requestAnimationFrame(() => {
+        setSlotExpanded(true);
+        cardVisibleTimer = setTimeout(() => {
+          setCardVisible(true);
+        }, 50);
+      });
+    });
+    const openAt = window.setTimeout(() => {
+      setPhase("open");
+    }, TOP_RAIL_ANIMATION_MS2);
+    return () => {
+      cancelAnimationFrame(frame1);
+      cancelAnimationFrame(frame2);
+      window.clearTimeout(openAt);
+      if (cardVisibleTimer) clearTimeout(cardVisibleTimer);
+    };
+  }, [phase]);
+  (0, import_react256.useEffect)(() => {
+    if (phase !== "open" || !currentAlert) return;
+    const visibleMs = resolveGamesSpineTransientAlertVisibleMs(currentAlert.type);
+    const exitAt = window.setTimeout(() => {
+      setPhase("exiting");
+      setCardVisible(false);
+    }, visibleMs);
+    return () => window.clearTimeout(exitAt);
+  }, [phase, currentAlert]);
+  (0, import_react256.useEffect)(() => {
+    if (phase !== "exiting") return;
+    const collapseAt = window.setTimeout(() => {
+      setSlotExpanded(false);
+    }, TOP_RAIL_ANIMATION_MS2 / 2);
+    const hiddenAt = window.setTimeout(() => {
+      setPhase("unmounted");
+    }, TOP_RAIL_ANIMATION_MS2);
+    return () => {
+      window.clearTimeout(collapseAt);
+      window.clearTimeout(hiddenAt);
+    };
+  }, [phase]);
+  (0, import_react256.useEffect)(() => {
+    if (phase !== "unmounted") return;
+    onExitedRef.current();
+    const nextActive = useGamesSpineTransientAlertStore.getState().active;
+    if (nextActive && nextActive.instanceId !== currentAlertRef.current?.instanceId) {
+      return;
+    }
+    setCurrentAlert(null);
+    setPhase("hidden");
+  }, [phase]);
+  return { phase, currentAlert, slotExpanded, cardVisible };
+}
+function useTopRailReorderFlip2(containerRef, orderKey) {
+  const positionsRef = (0, import_react256.useRef)(/* @__PURE__ */ new Map());
+  const prevOrderKeyRef = (0, import_react256.useRef)(null);
+  (0, import_react256.useLayoutEffect)(() => {
+    const container = containerRef.current;
+    if (!container) return;
+    const nodes = container.querySelectorAll("[data-top-rail-game-id]");
+    const next = /* @__PURE__ */ new Map();
+    nodes.forEach((node) => {
+      const id = node.dataset.topRailGameId;
+      if (!id) return;
+      next.set(id, node.getBoundingClientRect().left);
+    });
+    const prevOrderKey = prevOrderKeyRef.current;
+    prevOrderKeyRef.current = orderKey;
+    const prev = positionsRef.current;
+    positionsRef.current = next;
+    if (prevOrderKey == null || prevOrderKey === orderKey || prev.size === 0) {
+      return;
+    }
+    nodes.forEach((node) => {
+      const id = node.dataset.topRailGameId;
+      if (!id) return;
+      const previousLeft = prev.get(id);
+      const currentLeft = next.get(id);
+      if (previousLeft == null || currentLeft == null) return;
+      const delta = previousLeft - currentLeft;
+      if (Math.abs(delta) < 1) return;
+      node.style.transition = "none";
+      node.style.transform = `translateX(${delta}px)`;
+      requestAnimationFrame(() => {
+        node.style.transition = `transform ${TOP_RAIL_ANIMATION_MS2}ms cubic-bezier(0.4, 0, 0.2, 1)`;
+        node.style.transform = "translateX(0)";
+        const clear = () => {
+          node.style.transition = "";
+          node.style.transform = "";
+          node.removeEventListener("transitionend", clear);
+        };
+        node.addEventListener("transitionend", clear);
+      });
+    });
+  }, [orderKey, containerRef]);
+}
+function shouldShowBottomRailChannelLogo(game) {
+  if (game.status === "final" || isSpineFinalizedGame(game) || game.status === "postponed") {
+    return false;
+  }
+  if (game.status === "live") return true;
+  return game.status === "scheduled" || isGameCompetitionPaused(game);
+}
+function resolveBottomRailStatusTimeLabel(game) {
+  const compactLabel = resolveGamesSpineCompactStatusLabel(game);
+  if (compactLabel !== "LIVE") return compactLabel;
+  return resolveGamesSpineCardTimingLabel(game)?.trim() || game.displayClock?.trim() || game.statusLine?.trim() || "";
+}
+function BottomRailTeamRow({
+  game,
+  side,
+  name,
+  score: score2,
+  showScore,
+  row
+}) {
+  const logoUrl = resolveDarkThemeLogoUrl(game, side);
+  const rowClass = row === 1 ? "row-start-1" : "row-start-2";
+  return /* @__PURE__ */ (0, import_jsx_runtime222.jsxs)(import_jsx_runtime222.Fragment, { children: [
+    /* @__PURE__ */ (0, import_jsx_runtime222.jsx)("span", { className: cn2(TEAM_LOGO_CELL_CLASS, rowClass, "col-start-1"), children: logoUrl ? /* @__PURE__ */ (0, import_jsx_runtime222.jsx)(
+      "img",
+      {
+        src: logoUrl,
+        alt: "",
+        className: cn2(
+          TEAM_LOGO_IMG_CLASS,
+          resolveGamesSpineLeagueLogoImgClassName(game.league, logoUrl)
+        ),
+        loading: "lazy",
+        decoding: "async"
+      }
+    ) : null }),
+    /* @__PURE__ */ (0, import_jsx_runtime222.jsx)("span", { className: cn2(TEAM_NAME_CELL_CLASS, rowClass, "col-start-2"), children: name }),
+    /* @__PURE__ */ (0, import_jsx_runtime222.jsx)("span", { className: cn2(TEAM_SCORE_CELL_CLASS, rowClass, "col-start-3"), children: showScore ? score2 ?? "\u2013" : null })
+  ] });
+}
+function BottomRailGameCardBody({
+  game,
+  alertType,
+  alertLabel
+}) {
+  const model = resolveGamesSpineCompactMatchupModel(game);
+  const leagueLabel = resolveGamesSpineGameCardLeagueLabel(game);
+  const leagueLogoUrl = game.league ? resolveGamesSpineLeagueLogoUrl(game.league, { game }) : void 0;
+  const channel = resolveGameChannelPresentation(game);
+  const statusTimeLabel = resolveBottomRailStatusTimeLabel(game);
+  const showChannelLogo = shouldShowBottomRailChannelLogo(game);
+  return /* @__PURE__ */ (0, import_jsx_runtime222.jsxs)("div", { className: "flex min-w-0 flex-1 flex-col justify-center gap-px px-1.5 py-0.5", children: [
+    alertType && alertLabel ? /* @__PURE__ */ (0, import_jsx_runtime222.jsx)("div", { className: "min-w-0 truncate pb-px", children: /* @__PURE__ */ (0, import_jsx_runtime222.jsx)(
+      "span",
+      {
+        className: cn2(
+          "text-[7px] font-bold uppercase leading-none tracking-[0.12em]",
+          resolveGamesSpineTransientAlertHeaderLabelClass(alertType)
+        ),
+        children: alertLabel
+      }
+    ) }) : null,
+    /* @__PURE__ */ (0, import_jsx_runtime222.jsxs)("div", { className: "flex min-w-0 items-center justify-between gap-1", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime222.jsxs)("div", { className: "flex min-w-0 items-center gap-0.5", children: [
+        leagueLogoUrl ? /* @__PURE__ */ (0, import_jsx_runtime222.jsx)(
+          "img",
+          {
+            src: leagueLogoUrl,
+            alt: "",
+            className: cn2(
+              "h-2.5 w-2.5 shrink-0 object-contain",
+              resolveGamesSpineLeagueLogoImgClassName(game.league, leagueLogoUrl)
+            ),
+            loading: "lazy",
+            decoding: "async"
+          }
+        ) : /* @__PURE__ */ (0, import_jsx_runtime222.jsx)("span", { className: "inline-flex h-2.5 w-2.5 shrink-0", "aria-hidden": true }),
+        /* @__PURE__ */ (0, import_jsx_runtime222.jsx)("span", { className: "min-w-0 truncate text-[8px] font-semibold uppercase leading-none tracking-[0.04em] text-[#1a1a1a]", children: leagueLabel })
+      ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime222.jsx)("div", { className: "flex h-[0.7rem] w-[2.2rem] shrink-0 items-center justify-end", children: showChannelLogo && channel.logoUrl ? /* @__PURE__ */ (0, import_jsx_runtime222.jsx)(
+        BroadcastChannelLogo,
+        {
+          logoUrl: channel.logoUrl,
+          label: channel.label,
+          align: "right",
+          slotClassName: GAMES_SPINE_COMPACT_CHANNEL_LOGO_SLOT_CLASS,
+          imageClassName: gamesSpineCompactChannelLogoImageClass("right", {
+            logoUrl: channel.logoUrl,
+            label: channel.label
+          }),
+          fallbackClassName: "hidden"
+        }
+      ) : null })
+    ] }),
+    model.kind === "event" ? /* @__PURE__ */ (0, import_jsx_runtime222.jsxs)("div", { className: "grid min-h-0 flex-1 grid-cols-[minmax(0,1fr)_2.25rem] items-center gap-x-1", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime222.jsx)("span", { className: "min-w-0 truncate text-[9px] leading-none text-[#1a1a1a]", children: resolveGamesSpineCompactEventDisplayLine(model.event) }),
+      /* @__PURE__ */ (0, import_jsx_runtime222.jsx)("span", { className: "flex min-w-[2rem] items-center justify-center self-stretch text-center text-[9px] font-medium leading-none tabular-nums tracking-wide text-[#1a1a1a]", children: statusTimeLabel })
+    ] }) : /* @__PURE__ */ (0, import_jsx_runtime222.jsxs)("div", { className: BODY_GRID_CLASS, children: [
+      /* @__PURE__ */ (0, import_jsx_runtime222.jsx)(
+        BottomRailTeamRow,
+        {
+          game,
+          side: model.left.side,
+          name: (model.left.teamName || model.left.abbrev).trim(),
+          score: model.left.score,
+          showScore: model.showScores,
+          row: 1
+        }
+      ),
+      /* @__PURE__ */ (0, import_jsx_runtime222.jsx)(
+        BottomRailTeamRow,
+        {
+          game,
+          side: model.right.side,
+          name: (model.right.teamName || model.right.abbrev).trim(),
+          score: model.right.score,
+          showScore: model.showScores,
+          row: 2
+        }
+      ),
+      /* @__PURE__ */ (0, import_jsx_runtime222.jsx)("span", { className: STATUS_TIME_CELL_CLASS, children: statusTimeLabel })
+    ] })
+  ] });
+}
+function BottomRailGameCard({
+  game,
+  alertType,
+  alertLabel
+}) {
+  const canonicalGame = useCanonicalGamesSpineGame(game);
+  const displayGame = canonicalGame ?? game;
+  return /* @__PURE__ */ (0, import_jsx_runtime222.jsx)(
+    BottomRailGameCardBody,
+    {
+      game: displayGame,
+      alertType,
+      alertLabel
+    }
+  );
+}
+function BottomRailGameUpdateSlot({
+  game,
+  currentAlert,
+  slotExpanded,
+  cardVisible,
+  phase,
+  cardWidthPx
+}) {
+  if (phase === "unmounted" || phase === "hidden") {
+    return null;
+  }
+  const slotWidth = slotExpanded ? cardWidthPx : 0;
   return /* @__PURE__ */ (0, import_jsx_runtime222.jsx)(
     "div",
     {
+      className: "relative z-[1] flex h-full shrink-0 overflow-hidden border-r border-[#d5d0c6] bg-[#f3f0ea]",
+      style: {
+        width: slotWidth,
+        transition: `width ${TOP_RAIL_ANIMATION_MS2}ms cubic-bezier(0.4, 0, 0.2, 1)`
+      },
+      "data-bottom-rail-update-slot": true,
+      children: /* @__PURE__ */ (0, import_jsx_runtime222.jsx)(
+        "div",
+        {
+          className: "h-full min-w-0",
+          style: {
+            width: cardWidthPx,
+            transform: cardVisible ? "translateX(0)" : "translateX(-100%)",
+            opacity: cardVisible ? 1 : 0,
+            transition: `transform ${TOP_RAIL_ANIMATION_MS2}ms cubic-bezier(0.4, 0, 0.2, 1), opacity ${TOP_RAIL_ANIMATION_MS2}ms ease-out`
+          },
+          children: /* @__PURE__ */ (0, import_jsx_runtime222.jsx)(
+            BottomRailGameCard,
+            {
+              game,
+              alertType: currentAlert.type,
+              alertLabel: resolveGamesSpineTransientAlertHeaderLabel(currentAlert.type)
+            }
+          )
+        }
+      )
+    }
+  );
+}
+function SportsBrowserPrototypeBottomRailGames({ className }) {
+  const gamesRef = (0, import_react256.useRef)(null);
+  const cardWidthRef = (0, import_react256.useRef)(0);
+  const [cardWidthPx, setCardWidthPx] = (0, import_react256.useState)(0);
+  const { bestGameResult, importantGames } = useTopRailRankedGames(4);
+  const activeAlert = useGamesSpineTransientAlertStore((s2) => s2.active);
+  const completeActive = useGamesSpineTransientAlertStore((s2) => s2.completeActive);
+  const leagues = useLiveGamesStore((s2) => s2.leagues);
+  const bestGame = bestGameResult?.game ?? null;
+  const rankedGames = (0, import_react256.useMemo)(() => {
+    if (!bestGameResult) return [];
+    return [bestGameResult.game, ...importantGames];
+  }, [bestGameResult, importantGames]);
+  const onUpdateExited = (0, import_react256.useCallback)(() => {
+    completeActive();
+  }, [completeActive]);
+  const { phase, currentAlert, slotExpanded, cardVisible } = useTopRailGameUpdateLifecycle2(
+    activeAlert,
+    onUpdateExited
+  );
+  const lifecycleAlert = currentAlert && phase !== "hidden" && phase !== "unmounted" ? currentAlert : null;
+  const presentAlert = currentAlert && (phase === "entering" || phase === "open") ? currentAlert : null;
+  const resolvedAlertGame = resolveTopRailCanonicalGame2(
+    lifecycleAlert?.gameId ?? presentAlert?.gameId ?? null,
+    bestGame,
+    importantGames,
+    leagues
+  );
+  const presentPlacement = resolveTopRailAlertPlacement2(
+    presentAlert && resolvedAlertGame ? presentAlert.gameId : null,
+    bestGame,
+    importantGames
+  );
+  const slotPlacement = resolveTopRailAlertPlacement2(
+    lifecycleAlert && resolvedAlertGame ? lifecycleAlert.gameId : null,
+    bestGame,
+    importantGames
+  );
+  const displayGames = (0, import_react256.useMemo)(() => {
+    if (presentPlacement !== "promote" || !presentAlert || !bestGame) return rankedGames;
+    const promoted = rankedGames.find((game) => isSameTopRailGame2(game, presentAlert.gameId)) ?? (resolvedAlertGame && rankedGames.some((game) => game.id === resolvedAlertGame.id) ? resolvedAlertGame : void 0);
+    if (!promoted) return rankedGames;
+    return [
+      bestGame,
+      promoted,
+      ...rankedGames.slice(1).filter((game) => !isSameTopRailGame2(game, presentAlert.gameId))
+    ];
+  }, [presentPlacement, presentAlert, rankedGames, bestGame, resolvedAlertGame]);
+  const displayOrderKey = [
+    slotPlacement === "transient" && lifecycleAlert ? lifecycleAlert.instanceId : "",
+    displayGames.map((game) => game.id).join("|")
+  ].join("::");
+  useTopRailReorderFlip2(gamesRef, displayOrderKey);
+  (0, import_react256.useLayoutEffect)(() => {
+    const container = gamesRef.current;
+    if (!container) return;
+    const measure = () => {
+      const firstCard = container.querySelector("[data-bottom-rail-game-card]");
+      if (!firstCard) return;
+      const nextWidth = Math.round(firstCard.getBoundingClientRect().width);
+      if (nextWidth <= 0 || nextWidth === cardWidthRef.current) return;
+      cardWidthRef.current = nextWidth;
+      setCardWidthPx(nextWidth);
+    };
+    measure();
+    const observer = typeof ResizeObserver !== "undefined" ? new ResizeObserver(measure) : null;
+    if (observer) observer.observe(container);
+    return () => observer?.disconnect();
+  }, [rankedGames.length]);
+  const showTransientSlot = slotPlacement === "transient" && lifecycleAlert && resolvedAlertGame && cardWidthPx > 0 && phase !== "hidden" && phase !== "unmounted";
+  return /* @__PURE__ */ (0, import_jsx_runtime222.jsxs)(
+    "div",
+    {
       className: cn2(
-        "flex h-full min-w-0 items-stretch overflow-hidden font-sans",
+        "relative z-0 flex h-full min-w-0 items-stretch overflow-visible font-sans",
         MENU_SURFACE,
         className
       ),
       "data-sports-browser-prototype-top-games": true,
       "aria-label": "Top games",
-      children: TOP_GAMES_SAMPLE.map((game, index) => /* @__PURE__ */ (0, import_jsx_runtime222.jsxs)(
-        "div",
-        {
-          className: cn2(
-            "flex min-w-0 flex-1 items-center gap-1.5 px-2",
-            index > 0 && cn2("border-l", RULE)
-          ),
-          children: [
-            /* @__PURE__ */ (0, import_jsx_runtime222.jsx)("span", { className: "shrink-0 text-[9px] font-semibold uppercase tracking-[0.04em] text-[#1f8a45]", children: "Live" }),
-            /* @__PURE__ */ (0, import_jsx_runtime222.jsxs)("span", { className: "min-w-0 truncate text-[10px] leading-none text-[#1a1a1a]", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime222.jsx)("span", { className: "font-semibold", children: game.away }),
-              " ",
-              game.awayScore,
-              "\u2013",
-              game.homeScore,
-              " ",
-              /* @__PURE__ */ (0, import_jsx_runtime222.jsx)("span", { className: "font-semibold", children: game.home })
-            ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime222.jsx)("span", { className: "shrink-0 text-[9px] leading-none text-[#1f8a45]", children: game.status })
-          ]
-        },
-        game.id
-      ))
+      children: [
+        showTransientSlot ? /* @__PURE__ */ (0, import_jsx_runtime222.jsx)(
+          BottomRailGameUpdateSlot,
+          {
+            game: resolvedAlertGame,
+            currentAlert: lifecycleAlert,
+            slotExpanded,
+            cardVisible,
+            phase,
+            cardWidthPx
+          }
+        ) : null,
+        /* @__PURE__ */ (0, import_jsx_runtime222.jsx)(
+          "div",
+          {
+            ref: gamesRef,
+            className: cn2(
+              "flex min-w-0 flex-1 items-stretch overflow-visible",
+              slotExpanded && "transition-transform duration-[320ms] ease-[cubic-bezier(0.4,0,0.2,1)]"
+            ),
+            "data-bottom-rail-games-strip": true,
+            children: displayGames.map((game, index) => {
+              const isBestEventAlert = presentPlacement === "best-event" && presentAlert != null && isSameTopRailGame2(game, presentAlert.gameId);
+              const isPromoted = presentPlacement === "promote" && presentAlert != null && isSameTopRailGame2(game, presentAlert.gameId);
+              const alertType = isBestEventAlert || isPromoted ? presentAlert?.type : void 0;
+              const alertLabel = alertType && presentAlert ? resolveGamesSpineTransientAlertHeaderLabel(presentAlert.type) : void 0;
+              return /* @__PURE__ */ (0, import_jsx_runtime222.jsx)(
+                "div",
+                {
+                  "data-top-rail-game-id": game.id,
+                  "data-bottom-rail-game-card": true,
+                  className: cn2("flex min-w-0 flex-1", index > 0 && cn2("border-l", RULE)),
+                  children: /* @__PURE__ */ (0, import_jsx_runtime222.jsx)(
+                    BottomRailGameCard,
+                    {
+                      game,
+                      alertType,
+                      alertLabel
+                    }
+                  )
+                },
+                game.id
+              );
+            })
+          }
+        )
+      ]
     }
   );
 }
-var import_jsx_runtime222, MENU_SURFACE, RULE, TOP_GAMES_SAMPLE;
+var import_react256, import_jsx_runtime222, MENU_SURFACE, RULE, TOP_RAIL_ANIMATION_MS2, TEAM_LOGO_CELL_CLASS, TEAM_LOGO_IMG_CLASS, TEAM_NAME_CELL_CLASS, TEAM_SCORE_CELL_CLASS, STATUS_TIME_CELL_CLASS, BODY_GRID_CLASS;
 var init_SportsBrowserPrototypeBottomRailGames = __esm({
   "../grarf/desktop/src/components/homeMvp/SportsBrowserPrototypeBottomRailGames.tsx"() {
     init_define_import_meta_env();
+    import_react256 = __toESM(require_react(), 1);
     init_cn();
+    init_useTopRailRankedGames();
+    init_useCanonicalGamesSpineGame();
+    init_gamesSpineTransientAlertStore();
+    init_findLiveGame();
+    init_liveGamesStore();
+    init_operationalManualLeagueGames();
+    init_gamesSpineTransientAlertPlaceholderGames();
+    init_gamesSpineTransientAlertScheduler();
+    init_gamesSpineTransientAlertPresentation();
+    init_resolveGameChannelPresentation();
+    init_gamesSpineCompactGameRowContent();
+    init_gamesSpineLeagueLogoUrls();
+    init_isGameActivelyLive();
+    init_isSpineFinalizedGame();
+    init_resolveGamesSpineCardTimingLabel();
+    init_resolveGamesSpineGameCardLeagueLabel();
+    init_resolveTeamLogoUrl();
+    init_BroadcastChannelLogo();
     import_jsx_runtime222 = __toESM(require_jsx_runtime(), 1);
     MENU_SURFACE = "bg-[#f3f0ea] text-[#1a1a1a]";
     RULE = "border-[#d5d0c6]";
-    TOP_GAMES_SAMPLE = [
-      { id: "mlb-nyy-bos", away: "NYY", home: "BOS", awayScore: 4, homeScore: 3, status: "Top 8th" },
-      { id: "nba-lal-bos", away: "LAL", home: "BOS", awayScore: 98, homeScore: 95, status: "Q4 2:14" },
-      { id: "nfl-kc-buf", away: "KC", home: "BUF", awayScore: 21, homeScore: 17, status: "Q3 8:42" },
-      { id: "nhl-nyr-njd", away: "NYR", home: "NJD", awayScore: 2, homeScore: 2, status: "3rd 12:05" },
-      { id: "epl-mci-ars", away: "MCI", home: "ARS", awayScore: 1, homeScore: 1, status: "78'" }
-    ];
+    TOP_RAIL_ANIMATION_MS2 = GAMES_SPINE_TRANSIENT_ALERT_TRANSITION_MS;
+    TEAM_LOGO_CELL_CLASS = "inline-flex h-3 w-3 shrink-0 items-center justify-center";
+    TEAM_LOGO_IMG_CLASS = "h-2.5 w-2.5 shrink-0 object-contain";
+    TEAM_NAME_CELL_CLASS = "min-w-0 truncate text-[9px] leading-none normal-case text-[#1a1a1a]";
+    TEAM_SCORE_CELL_CLASS = "inline-flex w-[1.125rem] shrink-0 items-center justify-start tabular-nums text-[9px] leading-none text-[#1a1a1a]";
+    STATUS_TIME_CELL_CLASS = "col-start-4 row-start-1 row-span-2 flex min-w-[2rem] items-center justify-center self-stretch text-center text-[9px] font-medium leading-none tabular-nums tracking-wide text-[#1a1a1a]";
+    BODY_GRID_CLASS = "grid min-h-0 flex-1 grid-cols-[12px_minmax(0,1fr)_1.125rem_2.25rem] grid-rows-2 items-center gap-x-[0.35ch] gap-y-px";
   }
 });
 
@@ -142731,7 +143251,7 @@ function SportsBrowserPrototypeBrowserPane({
   className
 }) {
   const activeUrl = url?.trim() ?? "";
-  const partition = (0, import_react255.useMemo)(
+  const partition = (0, import_react257.useMemo)(
     () => sportsBrowserPrototypePanePartition(paneId ?? "primary"),
     [paneId]
   );
@@ -142746,12 +143266,12 @@ function SportsBrowserPrototypeBrowserPane({
   });
   const splitBrowsingEnabled = Boolean(articleFocusSessionKey);
   const split = Boolean(splitBrowsingEnabled && selectedArticleUrl);
-  const embedHostRef = (0, import_react255.useRef)(null);
-  const webviewRef = (0, import_react255.useRef)(null);
-  const wasActiveRef = (0, import_react255.useRef)(isActive);
-  const isActiveRef = (0, import_react255.useRef)(isActive);
+  const embedHostRef = (0, import_react257.useRef)(null);
+  const webviewRef = (0, import_react257.useRef)(null);
+  const wasActiveRef = (0, import_react257.useRef)(isActive);
+  const isActiveRef = (0, import_react257.useRef)(isActive);
   isActiveRef.current = isActive;
-  const onDestinationRoute = (0, import_react255.useCallback)(
+  const onDestinationRoute = (0, import_react257.useCallback)(
     (destinationUrl) => {
       if (!articleFocusSessionKey) return;
       const liveSourceUrl = readHomeSourceCardWebviewCurrentUrl(
@@ -142762,15 +143282,15 @@ function SportsBrowserPrototypeBrowserPane({
     },
     [articleFocusSessionKey, activeUrl]
   );
-  const onCloseArticlePane = (0, import_react255.useCallback)(() => {
+  const onCloseArticlePane = (0, import_react257.useCallback)(() => {
     if (!articleFocusSessionKey) return;
     useHomeSourceFocusStore.getState().clearSelectedArticle(articleFocusSessionKey);
   }, [articleFocusSessionKey]);
-  const activatePane = (0, import_react255.useCallback)(() => {
+  const activatePane = (0, import_react257.useCallback)(() => {
     onActivate?.();
   }, [onActivate]);
   const blockInactivePaneInteraction = showActiveTreatment && !isActive;
-  const onInactivePaneSelect = (0, import_react255.useCallback)(
+  const onInactivePaneSelect = (0, import_react257.useCallback)(
     (event) => {
       event.preventDefault();
       event.stopPropagation();
@@ -142783,10 +143303,10 @@ function SportsBrowserPrototypeBrowserPane({
     "relative h-full min-h-0 w-full overflow-hidden bg-black",
     className
   );
-  const setDeclarativeWebviewRef = (0, import_react255.useCallback)((element) => {
+  const setDeclarativeWebviewRef = (0, import_react257.useCallback)((element) => {
     webviewRef.current = element;
   }, []);
-  (0, import_react255.useLayoutEffect)(() => {
+  (0, import_react257.useLayoutEffect)(() => {
     const wasActive = wasActiveRef.current;
     wasActiveRef.current = isActive;
     if (!isActive || wasActive || !showActiveTreatment) return;
@@ -142800,16 +143320,16 @@ function SportsBrowserPrototypeBrowserPane({
     articleFocusSessionKey,
     usesImperativeSourceWebview
   ]);
-  (0, import_react255.useLayoutEffect)(() => {
+  (0, import_react257.useLayoutEffect)(() => {
     if (!activeUrl) return;
     void window.grarf?.workspaceEmbedClear?.("center");
     void window.grarf?.workspaceEmbedClear?.("centerChild");
   }, [activeUrl]);
-  (0, import_react255.useLayoutEffect)(() => {
+  (0, import_react257.useLayoutEffect)(() => {
     if (!articleFocusSessionKey) return;
     useHomeSourceFocusStore.getState().clearSelectedArticle(articleFocusSessionKey);
   }, [activeUrl, articleFocusSessionKey]);
-  (0, import_react255.useLayoutEffect)(() => {
+  (0, import_react257.useLayoutEffect)(() => {
     if (!usesImperativeSourceWebview || !articleFocusSessionKey || !activeUrl) return;
     const host = embedHostRef.current;
     if (!host) return;
@@ -142844,7 +143364,7 @@ function SportsBrowserPrototypeBrowserPane({
       registerHomeSourceCardHost(articleFocusSessionKey, null);
     };
   }, [usesImperativeSourceWebview, articleFocusSessionKey, activeUrl, partition, onDestinationRoute]);
-  (0, import_react255.useLayoutEffect)(() => {
+  (0, import_react257.useLayoutEffect)(() => {
     if (!articleFocusSessionKey) return;
     const wv = getHomeSourceCardWebview(articleFocusSessionKey) ?? webviewRef.current;
     void diagLogWebviewWithScroll("pane:split-transition", wv, {
@@ -142853,18 +143373,18 @@ function SportsBrowserPrototypeBrowserPane({
       selectedArticleUrl
     });
   }, [split, selectedArticleUrl, articleFocusSessionKey]);
-  (0, import_react255.useLayoutEffect)(() => {
+  (0, import_react257.useLayoutEffect)(() => {
     if (usesImperativeSourceWebview || !activeUrl) return;
     const webview = webviewRef.current;
     if (!webview) return;
     homeSourceWebviewGoHome(webview, activeUrl);
   }, [usesImperativeSourceWebview, activeUrl, partition]);
-  (0, import_react255.useLayoutEffect)(() => {
+  (0, import_react257.useLayoutEffect)(() => {
     if (!isActive || !registerActiveWebview) return;
     registerActiveWebview(resolveSourceWebview(articleFocusSessionKey, webviewRef));
     return () => registerActiveWebview(null);
   }, [isActive, registerActiveWebview, activeUrl, partition, articleFocusSessionKey, usesImperativeSourceWebview]);
-  (0, import_react255.useLayoutEffect)(() => {
+  (0, import_react257.useLayoutEffect)(() => {
     if (!isActive || !onNavStateChange) return;
     const webview = resolveSourceWebview(articleFocusSessionKey, webviewRef);
     if (!webview || !activeUrl) {
@@ -142893,7 +143413,7 @@ function SportsBrowserPrototypeBrowserPane({
     articleFocusSessionKey,
     usesImperativeSourceWebview
   ]);
-  (0, import_react255.useLayoutEffect)(() => {
+  (0, import_react257.useLayoutEffect)(() => {
     const unsubscribe = window.grarf?.webviewNavigateInPaneSubscribe?.((payload) => {
       if (!isActiveRef.current) return;
       const nextUrl = payload.url?.trim();
@@ -142904,7 +143424,7 @@ function SportsBrowserPrototypeBrowserPane({
     });
     return () => unsubscribe?.();
   }, [articleFocusSessionKey]);
-  (0, import_react255.useLayoutEffect)(() => {
+  (0, import_react257.useLayoutEffect)(() => {
     if (usesImperativeSourceWebview) return;
     const webview = webviewRef.current;
     if (!webview || !activeUrl) return;
@@ -143029,11 +143549,11 @@ function SportsBrowserPrototypeBrowserPane({
     }
   );
 }
-var import_react255, import_jsx_runtime224, WEBVIEW_WEB_PREFS2;
+var import_react257, import_jsx_runtime224, WEBVIEW_WEB_PREFS2;
 var init_SportsBrowserPrototypeBrowserPane = __esm({
   "../grarf/desktop/src/components/homeMvp/SportsBrowserPrototypeBrowserPane.tsx"() {
     init_define_import_meta_env();
-    import_react255 = __toESM(require_react(), 1);
+    import_react257 = __toESM(require_react(), 1);
     init_cn();
     init_homeSourceFocusSourceSession();
     init_homeSourceWebPartition();
@@ -143108,41 +143628,41 @@ function SportsBrowserPrototypeBrowserWorkspace({
 }) {
   const safePaneCount = Math.max(1, paneCount);
   const safeActivePaneIndex = Math.min(Math.max(0, activePaneIndex), safePaneCount - 1);
-  const previousPaneCountRef = (0, import_react256.useRef)(safePaneCount);
+  const previousPaneCountRef = (0, import_react258.useRef)(safePaneCount);
   const splitPaneMode = safePaneCount > 1;
-  const activeWebviewRef = (0, import_react256.useRef)(null);
-  const registerActiveWebview = (0, import_react256.useCallback)((webview) => {
+  const activeWebviewRef = (0, import_react258.useRef)(null);
+  const registerActiveWebview = (0, import_react258.useCallback)((webview) => {
     activeWebviewRef.current = webview;
   }, []);
-  const onNavStateChange = (0, import_react256.useCallback)(
+  const onNavStateChange = (0, import_react258.useCallback)(
     (state3) => {
       onBrowserNavStateChange?.(state3);
     },
     [onBrowserNavStateChange]
   );
-  const goBack = (0, import_react256.useCallback)(() => {
+  const goBack = (0, import_react258.useCallback)(() => {
     const webview = activeWebviewRef.current;
     if (!webview) return;
     homeSourceWebviewGoBack(webview);
   }, []);
-  const goForward = (0, import_react256.useCallback)(() => {
+  const goForward = (0, import_react258.useCallback)(() => {
     const webview = activeWebviewRef.current;
     if (!webview) return;
     homeSourceWebviewGoForward(webview);
   }, []);
-  (0, import_react256.useEffect)(() => {
+  (0, import_react258.useEffect)(() => {
     onBrowserNavigationReady?.({ goBack, goForward });
   }, [goBack, goForward, onBrowserNavigationReady]);
-  (0, import_react256.useEffect)(() => {
+  (0, import_react258.useEffect)(() => {
     onBrowserNavStateChange?.({ canGoBack: false, canGoForward: false });
   }, [safeActivePaneIndex, onBrowserNavStateChange]);
-  const activatePane = (0, import_react256.useCallback)(
+  const activatePane = (0, import_react258.useCallback)(
     (index) => {
       onActivePaneIndexChange?.(index);
     },
     [onActivePaneIndexChange]
   );
-  (0, import_react256.useEffect)(() => {
+  (0, import_react258.useEffect)(() => {
     let next = safeActivePaneIndex;
     if (safePaneCount > previousPaneCountRef.current) {
       next = safePaneCount - 1;
@@ -143239,11 +143759,11 @@ function SportsBrowserPrototypeBrowserWorkspace({
     }
   );
 }
-var import_react256, import_jsx_runtime226, browserContentMarginBgClass, browserContentMarginClass, browserContentSplitGapClass, splitPaneInactiveBorderClass, splitPaneActiveBorderClass;
+var import_react258, import_jsx_runtime226, browserContentMarginBgClass, browserContentMarginClass, browserContentSplitGapClass, splitPaneInactiveBorderClass, splitPaneActiveBorderClass;
 var init_SportsBrowserPrototypeBrowserWorkspace = __esm({
   "../grarf/desktop/src/components/homeMvp/SportsBrowserPrototypeBrowserWorkspace.tsx"() {
     init_define_import_meta_env();
-    import_react256 = __toESM(require_react(), 1);
+    import_react258 = __toESM(require_react(), 1);
     init_cn();
     init_sportsBrowserPrototypeLeagueWebsites();
     init_homeSourceWebviewNavigation();
@@ -143516,11 +144036,11 @@ function useSportsBrowserPrototypeTodayTemporalSlate() {
   const manualLeMansRefreshMs = useManualLeMans2026LiveRefreshMs();
   const manualTourDeFranceRefreshMs = useManualTourDeFranceLiveRefreshMs();
   const operationsFieldsByGameId = useAdminOperationsCardStore((s2) => s2.fieldsByGameId);
-  const mergedLeagues = (0, import_react257.useMemo)(
+  const mergedLeagues = (0, import_react259.useMemo)(
     () => resolveCanonicalOperationalMergedLeagues(liveLeagues),
     [liveLeagues]
   );
-  const spineLeagueOrder = (0, import_react257.useMemo)(() => {
+  const spineLeagueOrder = (0, import_react259.useMemo)(() => {
     const useOperationalOrder = activeLeagueId === "general-sports";
     if (!useOperationalOrder) {
       return resolveHomeActiveLeagueSpineOrder(activeLeagueId).filter(
@@ -143535,19 +144055,19 @@ function useSportsBrowserPrototypeTodayTemporalSlate() {
     );
     return withoutGamesSpineHiddenLeagues([...base, ...adjunctVisible]);
   }, [activeLeagueId, mergedLeagues]);
-  const manualSections = (0, import_react257.useMemo)(
+  const manualSections = (0, import_react259.useMemo)(
     () => convertManualGamesSpineDocument(manualDocument, new Date(manualRefreshMs)),
     [manualDocument, manualRefreshMs]
   );
-  const spineSections = (0, import_react257.useMemo)(
+  const spineSections = (0, import_react259.useMemo)(
     () => mergeGamesSpineSectionsByPriority(spineLeagueOrder, mergedLeagues, manualSections),
     [spineLeagueOrder, mergedLeagues, manualSections]
   );
-  const liveLeagueKeys = (0, import_react257.useMemo)(() => {
+  const liveLeagueKeys = (0, import_react259.useMemo)(() => {
     const snapshot = resolveCanonicalNowOperationalSnapshot(liveLeagues);
     return new Set(snapshot.liveLeagueKeys);
   }, [liveLeagues]);
-  const sharedOperationalInput = (0, import_react257.useMemo)(
+  const sharedOperationalInput = (0, import_react259.useMemo)(
     () => ({
       liveLeagues,
       mergedLeagues,
@@ -143573,7 +144093,7 @@ function useSportsBrowserPrototypeTodayTemporalSlate() {
       manualTourDeFranceRefreshMs
     ]
   );
-  const nowLeagues = (0, import_react257.useMemo)(
+  const nowLeagues = (0, import_react259.useMemo)(
     () => buildTemporalLeagueSlates(spineSections, mergedLeagues, "now", liveLeagueKeys, (section) => {
       if (section.kind === "operational") {
         return resolveOperationalLeagueVisibleGames(
@@ -143594,7 +144114,7 @@ function useSportsBrowserPrototypeTodayTemporalSlate() {
       operationsFieldsByGameId
     ]
   );
-  const upcomingLeagues = (0, import_react257.useMemo)(
+  const upcomingLeagues = (0, import_react259.useMemo)(
     () => buildTemporalLeagueSlates(spineSections, mergedLeagues, "upcoming", liveLeagueKeys, (section) => {
       if (section.kind === "operational") {
         return resolveOperationalLeagueVisibleGames(
@@ -143620,7 +144140,7 @@ function useSportsBrowserPrototypeTodayTemporalSlate() {
       operationsFieldsByGameId
     ]
   );
-  const catchUpLeagues = (0, import_react257.useMemo)(
+  const catchUpLeagues = (0, import_react259.useMemo)(
     () => buildTemporalLeagueSlates(spineSections, mergedLeagues, "catchUp", liveLeagueKeys, (section) => {
       if (section.kind === "operational") {
         return resolveOperationalLeagueCatchUpVisibleGames(section.leagueKey, sharedOperationalInput);
@@ -143642,11 +144162,11 @@ function useSportsBrowserPrototypeTodayTemporalSlate() {
   );
   return { catchUpLeagues, nowLeagues, upcomingLeagues };
 }
-var import_react257;
+var import_react259;
 var init_useSportsBrowserPrototypeTodayTemporalSlate = __esm({
   "../grarf/desktop/src/hooks/useSportsBrowserPrototypeTodayTemporalSlate.ts"() {
     init_define_import_meta_env();
-    import_react257 = __toESM(require_react(), 1);
+    import_react259 = __toESM(require_react(), 1);
     init_operationalSlateDate2();
     init_gamesColumnLeagues();
     init_HomeActiveLeagueContext();
@@ -143837,7 +144357,7 @@ function SidebarLeagueNavLogoMark({
   leagueKey,
   games
 }) {
-  const [failed, setFailed] = (0, import_react258.useState)(false);
+  const [failed, setFailed] = (0, import_react260.useState)(false);
   const logoUrl = resolveGamesSpineLeagueHeaderLogoUrl(leagueKey, games);
   if (!logoUrl || failed) return null;
   return /* @__PURE__ */ (0, import_jsx_runtime227.jsx)("span", { className: "inline-flex h-[12px] w-[12px] shrink-0 items-center justify-center", children: /* @__PURE__ */ (0, import_jsx_runtime227.jsx)(
@@ -144054,7 +144574,7 @@ function SidebarTemporalGamesBox({ children }) {
   );
 }
 function SidebarF1CatchUpMockLeagueBlock({ onOpenUrl }) {
-  const [open, setOpen] = (0, import_react258.useState)(false);
+  const [open, setOpen] = (0, import_react260.useState)(false);
   return /* @__PURE__ */ (0, import_jsx_runtime227.jsxs)(import_jsx_runtime227.Fragment, { children: [
     /* @__PURE__ */ (0, import_jsx_runtime227.jsxs)(
       "button",
@@ -144129,9 +144649,9 @@ function SidebarTemporalSectionLeagues({
   onLeagueSelect,
   onSelectGlobalWebsites
 }) {
-  const [leagueOpen, setLeagueOpen] = (0, import_react258.useState)({});
+  const [leagueOpen, setLeagueOpen] = (0, import_react260.useState)({});
   const allOpen = slates.length > 0 && slates.every((slate) => leagueOpen[slate.key] ?? false);
-  const toggleAll = (0, import_react258.useCallback)(() => {
+  const toggleAll = (0, import_react260.useCallback)(() => {
     if (allOpen) {
       setLeagueOpen({});
       return;
@@ -144139,7 +144659,7 @@ function SidebarTemporalSectionLeagues({
     setLeagueOpen(Object.fromEntries(slates.map((slate) => [slate.key, true])));
     onSelectGlobalWebsites?.();
   }, [allOpen, onSelectGlobalWebsites, slates]);
-  const toggleLeague = (0, import_react258.useCallback)(
+  const toggleLeague = (0, import_react260.useCallback)(
     (leagueKey) => {
       setLeagueOpen((prev) => {
         const nextOpen = !(prev[leagueKey] ?? false);
@@ -144182,7 +144702,7 @@ function SidebarTemporalLeagueBlockLegacy({
   resolveVariant,
   onLeagueSelect
 }) {
-  const [open, setOpen] = (0, import_react258.useState)(false);
+  const [open, setOpen] = (0, import_react260.useState)(false);
   return /* @__PURE__ */ (0, import_jsx_runtime227.jsx)(
     SidebarTemporalLeagueBlock,
     {
@@ -144233,22 +144753,22 @@ function SportsBrowserPrototypeLeftNav({
   onSelectGlobalWebsites
 }) {
   const { catchUpLeagues, nowLeagues, upcomingLeagues } = useSportsBrowserPrototypeTodayTemporalSlate();
-  const [yesterdayOpen, setYesterdayOpen] = (0, import_react258.useState)(false);
-  const [catchUpTodayActive, setCatchUpTodayActive] = (0, import_react258.useState)(false);
-  const [todayTab, setTodayTab] = (0, import_react258.useState)("today");
-  const hasUserSelectedTodayTab = (0, import_react258.useRef)(false);
-  (0, import_react258.useEffect)(() => {
+  const [yesterdayOpen, setYesterdayOpen] = (0, import_react260.useState)(false);
+  const [catchUpTodayActive, setCatchUpTodayActive] = (0, import_react260.useState)(false);
+  const [todayTab, setTodayTab] = (0, import_react260.useState)("today");
+  const hasUserSelectedTodayTab = (0, import_react260.useRef)(false);
+  (0, import_react260.useEffect)(() => {
     if (hasUserSelectedTodayTab.current) return;
     const hasLiveGamesToday = nowLeagues.some((slate) => slate.games.length > 0);
     if (hasLiveGamesToday) {
       setTodayTab("now");
     }
   }, [nowLeagues]);
-  const onTodayTabSelect = (0, import_react258.useCallback)((tab) => {
+  const onTodayTabSelect = (0, import_react260.useCallback)((tab) => {
     hasUserSelectedTodayTab.current = true;
     setTodayTab(tab);
   }, []);
-  const todayCompleteLeagues = (0, import_react258.useMemo)(
+  const todayCompleteLeagues = (0, import_react260.useMemo)(
     () => buildTodayCompleteLeagueSlates(nowLeagues, upcomingLeagues, catchUpLeagues),
     [nowLeagues, upcomingLeagues, catchUpLeagues]
   );
@@ -144264,13 +144784,13 @@ function SportsBrowserPrototypeLeftNav({
   const toggleYesterdayCatchUpFilter = () => {
     setYesterdayOpen((open) => !open);
   };
-  const [leaguesOpen, setLeaguesOpen] = (0, import_react258.useState)(false);
-  const [newsOpen, setNewsOpen] = (0, import_react258.useState)(false);
-  const [socialOpen, setSocialOpen] = (0, import_react258.useState)(false);
-  const [highlightsOpen, setHighlightsOpen] = (0, import_react258.useState)(false);
-  const [fantasyOpen, setFantasyOpen] = (0, import_react258.useState)(false);
-  const [podcastsOpen, setPodcastsOpen] = (0, import_react258.useState)(false);
-  const [tvOpen, setTvOpen] = (0, import_react258.useState)(false);
+  const [leaguesOpen, setLeaguesOpen] = (0, import_react260.useState)(false);
+  const [newsOpen, setNewsOpen] = (0, import_react260.useState)(false);
+  const [socialOpen, setSocialOpen] = (0, import_react260.useState)(false);
+  const [highlightsOpen, setHighlightsOpen] = (0, import_react260.useState)(false);
+  const [fantasyOpen, setFantasyOpen] = (0, import_react260.useState)(false);
+  const [podcastsOpen, setPodcastsOpen] = (0, import_react260.useState)(false);
+  const [tvOpen, setTvOpen] = (0, import_react260.useState)(false);
   return /* @__PURE__ */ (0, import_jsx_runtime227.jsx)(
     "nav",
     {
@@ -144427,11 +144947,11 @@ function SportsBrowserPrototypeLeftNav({
     }
   );
 }
-var import_react258, import_jsx_runtime227, MENU_SURFACE2, RULE2, F1_CATCH_UP_MOCK_HEADLINES, TODAY_EQUAL_TABS, SIDEBAR_GAME_ROW_CLASS, SIDEBAR_GAME_ROW_TWO_LINE_GRID_CLASS, SIDEBAR_GAME_ROW_SCORE_CLASS, SIDEBAR_GAME_ROW_STATUS_CLASS, SIDEBAR_GAME_ROW_BROADCAST_CLASS, SIDEBAR_F1_MOCK_HEADLINE_ROW_CLASS;
+var import_react260, import_jsx_runtime227, MENU_SURFACE2, RULE2, F1_CATCH_UP_MOCK_HEADLINES, TODAY_EQUAL_TABS, SIDEBAR_GAME_ROW_CLASS, SIDEBAR_GAME_ROW_TWO_LINE_GRID_CLASS, SIDEBAR_GAME_ROW_SCORE_CLASS, SIDEBAR_GAME_ROW_STATUS_CLASS, SIDEBAR_GAME_ROW_BROADCAST_CLASS, SIDEBAR_F1_MOCK_HEADLINE_ROW_CLASS;
 var init_SportsBrowserPrototypeLeftNav = __esm({
   "../grarf/desktop/src/components/homeMvp/SportsBrowserPrototypeLeftNav.tsx"() {
     init_define_import_meta_env();
-    import_react258 = __toESM(require_react(), 1);
+    import_react260 = __toESM(require_react(), 1);
     init_lucide_react();
     init_cn();
     init_dedupeSportsBrowserPrototypeNewsSidebarGames();
@@ -144553,7 +145073,7 @@ function TerminalFeedRow({
 }
 function SportsBrowserPrototypeTerminalFeed({ activeUrl, onOpenPost, className }) {
   const timelineItems = useCenterPaneTimelineItems();
-  const feedItems = (0, import_react259.useMemo)(
+  const feedItems = (0, import_react261.useMemo)(
     () => timelineItems.map((item) => {
       const itemUrl = resolveTimelineItemUrl(item);
       if (!itemUrl) return null;
@@ -144588,11 +145108,11 @@ function SportsBrowserPrototypeTerminalFeed({ activeUrl, onOpenPost, className }
     }
   );
 }
-var import_react259, import_jsx_runtime228;
+var import_react261, import_jsx_runtime228;
 var init_SportsBrowserPrototypeTerminalFeed = __esm({
   "../grarf/desktop/src/components/homeMvp/SportsBrowserPrototypeTerminalFeed.tsx"() {
     init_define_import_meta_env();
-    import_react259 = __toESM(require_react(), 1);
+    import_react261 = __toESM(require_react(), 1);
     init_cn();
     init_useCenterPaneTimelineItems();
     init_useGrarfTerminalArrivalHighlight();
@@ -144648,23 +145168,23 @@ function HomePage() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const { homeShellMode } = useAppShell();
-  const [clipsRailMode, setClipsRailMode] = (0, import_react260.useState)(
+  const [clipsRailMode, setClipsRailMode] = (0, import_react262.useState)(
     () => isGrarfWebRenderer2() ? "compact" : "minimized"
   );
-  const [socialRailTvPanelHeightPx, setSocialRailTvPanelHeightPx] = (0, import_react260.useState)(null);
-  const [lastClickedGameId, setLastClickedGameId] = (0, import_react260.useState)(null);
-  const [gameDeepLinkNotFoundId, setGameDeepLinkNotFoundId] = (0, import_react260.useState)(null);
-  const initialSportsBrowserTab = (0, import_react260.useMemo)(
+  const [socialRailTvPanelHeightPx, setSocialRailTvPanelHeightPx] = (0, import_react262.useState)(null);
+  const [lastClickedGameId, setLastClickedGameId] = (0, import_react262.useState)(null);
+  const [gameDeepLinkNotFoundId, setGameDeepLinkNotFoundId] = (0, import_react262.useState)(null);
+  const initialSportsBrowserTab = (0, import_react262.useMemo)(
     () => createInitialSportsBrowserPrototypeBrowserTabState(),
     []
   );
-  const [sportsBrowserTabs, setSportsBrowserTabs] = (0, import_react260.useState)(() => [initialSportsBrowserTab]);
-  const [activeSportsBrowserTabId, setActiveSportsBrowserTabId] = (0, import_react260.useState)(
+  const [sportsBrowserTabs, setSportsBrowserTabs] = (0, import_react262.useState)(() => [initialSportsBrowserTab]);
+  const [activeSportsBrowserTabId, setActiveSportsBrowserTabId] = (0, import_react262.useState)(
     initialSportsBrowserTab.id
   );
-  const activeSportsBrowserTabIdRef = (0, import_react260.useRef)(initialSportsBrowserTab.id);
-  const sportsBrowserActivePaneIndexRef = (0, import_react260.useRef)(0);
-  const updateActiveSportsBrowserTab = (0, import_react260.useCallback)(
+  const activeSportsBrowserTabIdRef = (0, import_react262.useRef)(initialSportsBrowserTab.id);
+  const sportsBrowserActivePaneIndexRef = (0, import_react262.useRef)(0);
+  const updateActiveSportsBrowserTab = (0, import_react262.useCallback)(
     (update) => {
       setSportsBrowserTabs(
         (tabs) => tabs.map(
@@ -144674,14 +145194,14 @@ function HomePage() {
     },
     []
   );
-  const onSportsBrowserActivePaneIndexChange = (0, import_react260.useCallback)(
+  const onSportsBrowserActivePaneIndexChange = (0, import_react262.useCallback)(
     (index) => {
       sportsBrowserActivePaneIndexRef.current = index;
       updateActiveSportsBrowserTab((tab) => ({ ...tab, activePaneIndex: index }));
     },
     [updateActiveSportsBrowserTab]
   );
-  const onSelectSportsBrowserTab = (0, import_react260.useCallback)((tabId) => {
+  const onSelectSportsBrowserTab = (0, import_react262.useCallback)((tabId) => {
     activeSportsBrowserTabIdRef.current = tabId;
     setActiveSportsBrowserTabId(tabId);
     setSportsBrowserTabs((tabs) => {
@@ -144692,38 +145212,38 @@ function HomePage() {
       return tabs;
     });
   }, []);
-  const onAddSportsBrowserTab = (0, import_react260.useCallback)(() => {
+  const onAddSportsBrowserTab = (0, import_react262.useCallback)(() => {
     const newTab = createFreshSportsBrowserPrototypeBrowserTabState();
     activeSportsBrowserTabIdRef.current = newTab.id;
     sportsBrowserActivePaneIndexRef.current = newTab.activePaneIndex;
     setSportsBrowserTabs((tabs) => [...tabs, newTab]);
     setActiveSportsBrowserTabId(newTab.id);
   }, []);
-  const [sportsBrowserTerminalFeedOpen, setSportsBrowserTerminalFeedOpen] = (0, import_react260.useState)(false);
-  const [sportsBrowserNavState, setSportsBrowserNavState] = (0, import_react260.useState)({
+  const [sportsBrowserTerminalFeedOpen, setSportsBrowserTerminalFeedOpen] = (0, import_react262.useState)(false);
+  const [sportsBrowserNavState, setSportsBrowserNavState] = (0, import_react262.useState)({
     canGoBack: false,
     canGoForward: false
   });
-  const sportsBrowserNavigationRef = (0, import_react260.useRef)({
+  const sportsBrowserNavigationRef = (0, import_react262.useRef)({
     goBack: () => {
     },
     goForward: () => {
     }
   });
-  const onSportsBrowserNavigationReady = (0, import_react260.useCallback)(
+  const onSportsBrowserNavigationReady = (0, import_react262.useCallback)(
     (navigation2) => {
       sportsBrowserNavigationRef.current = navigation2;
     },
     []
   );
-  const [gameWatchActive, setGameWatchActive] = (0, import_react260.useState)(false);
-  const [gcProviderId, setGcProviderId] = (0, import_react260.useState)(
+  const [gameWatchActive, setGameWatchActive] = (0, import_react262.useState)(false);
+  const [gcProviderId, setGcProviderId] = (0, import_react262.useState)(
     void 0
   );
-  const [gameUtilityTab, setGameUtilityTab] = (0, import_react260.useState)("signals");
-  const homeStartupResetDone = (0, import_react260.useRef)(false);
-  const focusSessionKeysRef = (0, import_react260.useRef)(/* @__PURE__ */ new Set());
-  const skipStartupResetForBootstrap = (0, import_react260.useMemo)(() => {
+  const [gameUtilityTab, setGameUtilityTab] = (0, import_react262.useState)("signals");
+  const homeStartupResetDone = (0, import_react262.useRef)(false);
+  const focusSessionKeysRef = (0, import_react262.useRef)(/* @__PURE__ */ new Set());
+  const skipStartupResetForBootstrap = (0, import_react262.useMemo)(() => {
     const intent = resolveInitialUrlBootstrapIntent(peekInitialBrowserPathname()).intent;
     return intent.kind === "league-hub" || intent.kind === "game" || intent.kind === "intel";
   }, []);
@@ -144740,44 +145260,44 @@ function HomePage() {
   const isAdminMode = useAdminModeStore((s2) => s2.isAdminMode);
   useHomeOperationalPrioritization();
   useCanonicalHeadlinesLeagueWorkspaceNavigation();
-  const [overlay, dispatchOverlay] = (0, import_react260.useReducer)(
+  const [overlay, dispatchOverlay] = (0, import_react262.useReducer)(
     overlayWorkspaceReducer,
     void 0,
     initialOverlayWorkspaceState
   );
-  const [wsState, dispatch] = (0, import_react260.useReducer)(
+  const [wsState, dispatch] = (0, import_react262.useReducer)(
     workspaceTabReducer,
     void 0,
     () => workspaceStateForShellMode("home")
   );
-  (0, import_react260.useEffect)(() => {
+  (0, import_react262.useEffect)(() => {
     if (!isHomeOps) {
       dispatch({ type: "reset", state: workspaceStateForShellMode(homeShellMode) });
     }
   }, [homeShellMode, isHomeOps]);
-  const contentOverlayTabs = (0, import_react260.useMemo)(
+  const contentOverlayTabs = (0, import_react262.useMemo)(
     () => overlay.tabs.filter((tab) => !isCenterPaneApplicationModeTab(tab)),
     [overlay.tabs]
   );
-  const activeContentOverlayId = (0, import_react260.useMemo)(() => {
+  const activeContentOverlayId = (0, import_react262.useMemo)(() => {
     if (!overlay.activeId) return null;
     const tab = overlay.tabs.find((t2) => t2.id === overlay.activeId);
     if (!tab || isCenterPaneApplicationModeTab(tab)) return null;
     return overlay.activeId;
   }, [overlay.activeId, overlay.tabs]);
   useSyncGuidedAttentionWorkspaceFocus(isHomeOps, activeContentOverlayId);
-  const activeContentOverlayWorkspace = (0, import_react260.useMemo)(() => {
+  const activeContentOverlayWorkspace = (0, import_react262.useMemo)(() => {
     if (!activeContentOverlayId) return null;
     return contentOverlayTabs.find((t2) => t2.id === activeContentOverlayId) ?? null;
   }, [contentOverlayTabs, activeContentOverlayId]);
-  const socialRailActiveGameId = (0, import_react260.useMemo)(() => {
+  const socialRailActiveGameId = (0, import_react262.useMemo)(() => {
     if (!isHomeOps || !activeContentOverlayId) return null;
     const gameId = overlayActiveGameId(overlay);
     if (!gameId) return null;
     const game = findLiveGameById(gameId);
     return resolveSocialRailActiveGame(game) ? gameId : null;
   }, [isHomeOps, activeContentOverlayId, overlay]);
-  const socialRailActiveGameWorkspace = (0, import_react260.useMemo)(() => {
+  const socialRailActiveGameWorkspace = (0, import_react262.useMemo)(() => {
     if (!isHomeOps || !activeContentOverlayId) return null;
     return activeContentOverlayWorkspace;
   }, [isHomeOps, activeContentOverlayId, activeContentOverlayWorkspace]);
@@ -144793,7 +145313,7 @@ function HomePage() {
   const showBrowserSubmenus = !activeContentOverlayId && centerPaneMode === "browser" && !isSportsBrowserPrototype && (isGrarfElectronRenderer() || centerPaneNowPresentationMode === "terminal");
   const showHomeBrowserSourceCardsCenter = showBrowserSubmenus && (liveSubmenuId === "livetrack" || liveSubmenuId === "fantasy" || liveSubmenuId === "betting");
   const activeGamePayload = activeContentOverlayWorkspace?.type === "game" ? activeContentOverlayWorkspace.gamePayload : null;
-  (0, import_react260.useEffect)(() => {
+  (0, import_react262.useEffect)(() => {
     if (!isHomeOps) return;
     return registerHomeLeagueHubOverlayBridge({
       openTab: (tab) => {
@@ -144808,7 +145328,7 @@ function HomePage() {
       }
     });
   }, [isHomeOps]);
-  (0, import_react260.useEffect)(() => {
+  (0, import_react262.useEffect)(() => {
     if (!isHomeOps) return;
     return registerMlbTeamHubOverlayBridge({
       openTab: (tab) => {
@@ -144821,7 +145341,7 @@ function HomePage() {
       }
     });
   }, [isHomeOps]);
-  (0, import_react260.useEffect)(() => {
+  (0, import_react262.useEffect)(() => {
     if (!isHomeOps) return;
     return registerTeamHubOverlayBridge({
       openTab: (tab) => {
@@ -144831,7 +145351,7 @@ function HomePage() {
       }
     });
   }, [isHomeOps]);
-  (0, import_react260.useEffect)(() => {
+  (0, import_react262.useEffect)(() => {
     if (!isHomeOps) return;
     return registerBrowserFantasyCenterPaneBridge({
       prepareCenterPane: () => {
@@ -144841,7 +145361,7 @@ function HomePage() {
       }
     });
   }, [isHomeOps]);
-  (0, import_react260.useEffect)(() => {
+  (0, import_react262.useEffect)(() => {
     if (!isHomeOps) return;
     const hubId = isHomeLeagueHubWorkspaceTab(activeContentOverlayWorkspace) ? activeContentOverlayWorkspace.leagueHubId : null;
     if (!hubId) return;
@@ -144850,7 +145370,7 @@ function HomePage() {
       useHomeLeagueWorkspaceStore.getState().setActiveId(hubId);
     }
   }, [isHomeOps, activeContentOverlayWorkspace]);
-  (0, import_react260.useEffect)(() => {
+  (0, import_react262.useEffect)(() => {
     if (!activeGamePayload) {
       setGameWatchActive(false);
       setGcProviderId(void 0);
@@ -144859,10 +145379,10 @@ function HomePage() {
     setGcProviderId(activeGamePayload.defaultGamecenterProvider);
     setGameWatchActive(!!activeGamePayload.startInWatchMode);
   }, [activeGamePayload?.gameId, activeGamePayload?.startInWatchMode]);
-  (0, import_react260.useEffect)(() => {
+  (0, import_react262.useEffect)(() => {
     setGameUtilityTab("signals");
   }, [activeGamePayload?.gameId]);
-  (0, import_react260.useEffect)(() => {
+  (0, import_react262.useEffect)(() => {
     if (!isHomeOps || centerPaneMode === "whiparound") return;
     const activeTab = overlay.tabs.find((tab) => tab.id === overlay.activeId);
     if (activeTab?.type === "game" && activeTab.gamePayload?.startInWatchMode && activeTab.closable) {
@@ -144870,7 +145390,7 @@ function HomePage() {
       dispatchOverlay({ type: "select", id: null });
     }
   }, [centerPaneMode, isHomeOps, overlay.activeId, overlay.tabs]);
-  const gameWatchCoordination = (0, import_react260.useMemo)(() => {
+  const gameWatchCoordination = (0, import_react262.useMemo)(() => {
     if (activeContentOverlayWorkspace?.type !== "game" || !activeGamePayload) return void 0;
     return {
       watchActive: gameWatchActive,
@@ -144879,7 +145399,7 @@ function HomePage() {
       onGamecenterProviderChange: setGcProviderId
     };
   }, [activeContentOverlayWorkspace?.type, activeGamePayload, gameWatchActive, gcProviderId]);
-  const onReturnToLeagueFromSocialRail = (0, import_react260.useCallback)(() => {
+  const onReturnToLeagueFromSocialRail = (0, import_react262.useCallback)(() => {
     if (activeContentOverlayWorkspace?.type !== "game") return;
     setGameWatchActive(false);
     clearCenterEmbedForSpineGameSelect();
@@ -144888,7 +145408,7 @@ function HomePage() {
     dispatchOverlay({ type: "select", id: null });
     setLastClickedGameId(null);
   }, [activeContentOverlayWorkspace]);
-  const activeHomeWorkspace = (0, import_react260.useMemo)(() => {
+  const activeHomeWorkspace = (0, import_react262.useMemo)(() => {
     if (isHomeOps) return activeContentOverlayWorkspace;
     if (wsState.tabs.length === 0) return null;
     return wsState.tabs.find((t2) => t2.id === wsState.activeId) ?? wsState.tabs[0] ?? null;
@@ -144903,11 +145423,11 @@ function HomePage() {
     liveSubmenuId: isHomeOps && !activeContentOverlayId ? liveSubmenuId : void 0,
     leagueHubCategoryId
   });
-  const homeStatusLabel = (0, import_react260.useMemo)(() => {
+  const homeStatusLabel = (0, import_react262.useMemo)(() => {
     if (activeContentOverlayWorkspace?.title) return activeContentOverlayWorkspace.title;
     return "Select a game from the spine";
   }, [activeContentOverlayWorkspace]);
-  const spineSelectedId = (0, import_react260.useMemo)(() => {
+  const spineSelectedId = (0, import_react262.useMemo)(() => {
     if (isHomeOps) {
       const fromTab = overlayActiveGameId(overlay);
       if (fromTab) return fromTab;
@@ -144915,7 +145435,7 @@ function HomePage() {
     }
     return lastClickedGameId;
   }, [isHomeOps, overlay, lastClickedGameId]);
-  (0, import_react260.useEffect)(() => {
+  (0, import_react262.useEffect)(() => {
     if (!isHomeOps) return;
     const current = new Set(
       overlay.tabs.map((tab) => resolveHomeSourceFocusSessionKey(tab)).filter((key2) => key2 != null)
@@ -144933,7 +145453,7 @@ function HomePage() {
     }
     focusSessionKeysRef.current = current;
   }, [isHomeOps, overlay.tabs]);
-  (0, import_react260.useEffect)(() => {
+  (0, import_react262.useEffect)(() => {
     if (!isHomeOps) return;
     if (!activeContentOverlayId) {
       setPerformanceContext({ detail: "home-idle" });
@@ -144950,34 +145470,34 @@ function HomePage() {
   const showLeagueMediaStrip = !isSportsBrowserPrototype && (isGrarfWebRenderer2() || shouldShowLeagueAmbientMediaStrip(activeHomeWorkspace));
   const clipsDeferredReady = useDeferredMount(1500, showLeagueMediaStrip && !isGrarfWebRenderer2());
   const clipsReady = isGrarfWebRenderer2() ? showLeagueMediaStrip : clipsDeferredReady;
-  (0, import_react260.useEffect)(() => {
+  (0, import_react262.useEffect)(() => {
     if (!showLeagueMediaStrip) setClipsRailMode("minimized");
   }, [showLeagueMediaStrip]);
-  (0, import_react260.useEffect)(() => {
+  (0, import_react262.useEffect)(() => {
     if (!isGrarfWebRenderer2()) return;
     if (activeHomeWorkspace?.type !== "game") return;
     setClipsRailMode("minimized");
   }, [activeHomeWorkspace?.id, activeHomeWorkspace?.type]);
-  const onMlbSportscapeInlineWorkspaceOpen = (0, import_react260.useCallback)(() => {
+  const onMlbSportscapeInlineWorkspaceOpen = (0, import_react262.useCallback)(() => {
     setClipsRailMode("minimized");
   }, []);
-  const toggleSportsBrowserTerminalFeed = (0, import_react260.useCallback)(() => {
+  const toggleSportsBrowserTerminalFeed = (0, import_react262.useCallback)(() => {
     setSportsBrowserTerminalFeedOpen((open) => !open);
   }, []);
-  (0, import_react260.useEffect)(() => {
+  (0, import_react262.useEffect)(() => {
     return () => {
       void window.grarf?.workspaceEmbedClear?.("center");
     };
   }, []);
-  (0, import_react260.useEffect)(() => {
+  (0, import_react262.useEffect)(() => {
     if (!isHomeOps) return;
     void window.grarf?.workspaceEmbedClear?.("center");
     void window.grarf?.workspaceEmbedClear?.("centerChild");
   }, [isHomeOps]);
-  const watchDispatch = (0, import_react260.useCallback)((action) => {
+  const watchDispatch = (0, import_react262.useCallback)((action) => {
     dispatchOverlay(action);
   }, []);
-  const onSelectGame = (0, import_react260.useCallback)(
+  const onSelectGame = (0, import_react262.useCallback)(
     (gameId, enrichedGame) => {
       setGameDeepLinkNotFoundId(null);
       setLastClickedGameId(gameId);
@@ -144993,7 +145513,7 @@ function HomePage() {
     },
     [isHomeOps]
   );
-  const operationalAlertActions = (0, import_react260.useMemo)(
+  const operationalAlertActions = (0, import_react262.useMemo)(
     () => ({
       openGame: (gameId) => {
         if (isHomeOps) {
@@ -145014,7 +145534,7 @@ function HomePage() {
     [isHomeOps, onSelectGame, dispatch]
   );
   useOperationalAlertActionsRegistration(operationalAlertActions);
-  const orchestrationExecutionDriver = (0, import_react260.useMemo)(
+  const orchestrationExecutionDriver = (0, import_react262.useMemo)(
     () => isHomeOps ? {
       hostId: "home",
       getCurrentPrimaryGameId: () => {
@@ -145035,10 +145555,10 @@ function HomePage() {
     [isHomeOps, activeContentOverlayWorkspace, overlay, lastClickedGameId, onSelectGame]
   );
   useOrchestrationExecutionRegistration(orchestrationExecutionDriver);
-  const onSocialRailTvPanelHeightChange = (0, import_react260.useCallback)((heightPx) => {
+  const onSocialRailTvPanelHeightChange = (0, import_react262.useCallback)((heightPx) => {
     setSocialRailTvPanelHeightPx(heightPx > 0 ? heightPx : null);
   }, []);
-  const onOpenIntelligence = (0, import_react260.useCallback)(
+  const onOpenIntelligence = (0, import_react262.useCallback)(
     (briefingId, title) => {
       const tab = buildIntelligenceWorkspaceTab(briefingId, title);
       if (isHomeOps) dispatchOverlay({ type: "open", tab });
@@ -145046,10 +145566,10 @@ function HomePage() {
     },
     [isHomeOps]
   );
-  const onGameDeepLinkNotFound = (0, import_react260.useCallback)((gameId) => {
+  const onGameDeepLinkNotFound = (0, import_react262.useCallback)((gameId) => {
     setGameDeepLinkNotFoundId(gameId);
   }, []);
-  const onGameDeepLinkRouteCleared = (0, import_react260.useCallback)(() => {
+  const onGameDeepLinkRouteCleared = (0, import_react262.useCallback)(() => {
     setGameDeepLinkNotFoundId(null);
   }, []);
   useInitialUrlBootstrap({
@@ -145072,7 +145592,7 @@ function HomePage() {
     onGameNotFound: onGameDeepLinkNotFound,
     onGameRouteCleared: onGameDeepLinkRouteCleared
   });
-  (0, import_react260.useEffect)(() => {
+  (0, import_react262.useEffect)(() => {
     if (!isHomeOps || homeStartupResetDone.current) return;
     homeStartupResetDone.current = true;
     if (skipStartupResetForBootstrap) return;
@@ -145081,7 +145601,7 @@ function HomePage() {
     dispatchOverlay({ type: "dismissWorkspaceTabs" });
     dispatchOverlay({ type: "select", id: null });
   }, [isHomeOps, skipStartupResetForBootstrap]);
-  const onOpenYoutubeWorkspace = (0, import_react260.useCallback)(
+  const onOpenYoutubeWorkspace = (0, import_react262.useCallback)(
     (title, videoId) => {
       void clearWorkspaceEmbedsForYoutubeLaunch();
       const tab = buildYoutubeWorkspaceTab(title, videoId, { idPrefix: "home-yt" });
@@ -145091,7 +145611,7 @@ function HomePage() {
     },
     [isHomeOps]
   );
-  const onTimelineClipOpen = (0, import_react260.useCallback)(
+  const onTimelineClipOpen = (0, import_react262.useCallback)(
     (clip) => {
       const videoId = youtubeVideoIdFromUrl(clip.videoUrl);
       if (!videoId) return;
@@ -145099,7 +145619,7 @@ function HomePage() {
     },
     [onOpenYoutubeWorkspace]
   );
-  const onOpenMlbAllGamesYoutubeWorkspace = (0, import_react260.useCallback)(
+  const onOpenMlbAllGamesYoutubeWorkspace = (0, import_react262.useCallback)(
     (title, videoId) => {
       void clearWorkspaceEmbedsForYoutubeLaunch();
       const tab = buildYoutubeWorkspaceTab(title, videoId, {
@@ -145113,7 +145633,7 @@ function HomePage() {
     },
     [isHomeOps]
   );
-  const openUrlWorkspaceTab = (0, import_react260.useCallback)(
+  const openUrlWorkspaceTab = (0, import_react262.useCallback)(
     (tab) => {
       if (isHomeOps) dispatchOverlay({ type: "open", tab });
       else dispatch({ type: "open", tab });
@@ -145121,13 +145641,13 @@ function HomePage() {
     [isHomeOps]
   );
   useWorkspaceUrlLauncher(openUrlWorkspaceTab);
-  (0, import_react260.useEffect)(() => {
+  (0, import_react262.useEffect)(() => {
     return registerNavigationWorkspaceDispatch((action) => {
       if (action.type !== "open") return;
       openUrlWorkspaceTab(action.tab);
     });
   }, [openUrlWorkspaceTab]);
-  const onOpenLiveShow = (0, import_react260.useCallback)(
+  const onOpenLiveShow = (0, import_react262.useCallback)(
     (req) => {
       if (isDemoDanLeBatardShowWatchRequest(req.channelId)) {
         const tab2 = buildDemoDanLeBatardUrlWorkspaceTab(req.title);
@@ -145148,7 +145668,7 @@ function HomePage() {
     },
     [isHomeOps]
   );
-  const onTickerNavigate = (0, import_react260.useCallback)(
+  const onTickerNavigate = (0, import_react262.useCallback)(
     (p2) => {
       if (p2.tickerTargetType === "article") {
         const url = p2.articleUrl ?? (p2.nav.kind === "article" ? p2.nav.url : null);
@@ -145175,7 +145695,7 @@ function HomePage() {
     },
     [isHomeOps, onSelectGame, navigate]
   );
-  const onHomeSourceArticleNavigate = (0, import_react260.useCallback)(
+  const onHomeSourceArticleNavigate = (0, import_react262.useCallback)(
     (sectionId, source, articleUrl) => {
       const sessionKey = `${sectionId}-${source.id}`;
       useHomeSourceFocusStore.getState().setSelectedArticle(sessionKey, articleUrl);
@@ -145184,7 +145704,7 @@ function HomePage() {
     },
     []
   );
-  const onHomeSourceFullscreen = (0, import_react260.useCallback)((sectionId, source) => {
+  const onHomeSourceFullscreen = (0, import_react262.useCallback)((sectionId, source) => {
     const sessionKey = `${sectionId}-${source.id}`;
     useHomeSourceFocusStore.getState().clearSelectedArticle(sessionKey);
     if (isCanonicalWebBrowserRenderer()) {
@@ -145195,17 +145715,17 @@ function HomePage() {
     clearCenterEmbedForSpineGameSelect();
     dispatchOverlay({ type: "open", tab: buildHomeSourceFocusTab(sectionId, source, entryUrl) });
   }, []);
-  const onSelectCenterPaneWorkspace = (0, import_react260.useCallback)(() => {
+  const onSelectCenterPaneWorkspace = (0, import_react262.useCallback)(() => {
     dispatchOverlay({ type: "select", id: null });
     dispatchOverlay({ type: "dismissWorkspaceTabs" });
   }, []);
-  const onOverlayTabSelect = (0, import_react260.useCallback)((id) => {
+  const onOverlayTabSelect = (0, import_react262.useCallback)((id) => {
     dispatchOverlay({ type: "select", id });
   }, []);
-  const onOverlayTabClose = (0, import_react260.useCallback)((id) => {
+  const onOverlayTabClose = (0, import_react262.useCallback)((id) => {
     dispatchOverlay({ type: "close", id });
   }, []);
-  const onSportsBrowserLeagueSelect = (0, import_react260.useCallback)((leagueKey) => {
+  const onSportsBrowserLeagueSelect = (0, import_react262.useCallback)((leagueKey) => {
     const websites = getSportsBrowserPrototypeLeagueWebsites(leagueKey);
     updateActiveSportsBrowserTab((tab) => {
       const next = tab.paneStates.slice();
@@ -145225,7 +145745,7 @@ function HomePage() {
       return { ...tab, paneStates: next };
     });
   }, [updateActiveSportsBrowserTab]);
-  const onSportsBrowserSelectGlobalWebsites = (0, import_react260.useCallback)(() => {
+  const onSportsBrowserSelectGlobalWebsites = (0, import_react262.useCallback)(() => {
     updateActiveSportsBrowserTab((tab) => {
       const next = tab.paneStates.slice();
       const paneIndex = Math.min(sportsBrowserActivePaneIndexRef.current, next.length - 1);
@@ -145238,7 +145758,7 @@ function HomePage() {
       return { ...tab, paneStates: next };
     });
   }, [updateActiveSportsBrowserTab]);
-  const onSportsBrowserWebsiteTabSelect = (0, import_react260.useCallback)((paneIndex, tabIndex) => {
+  const onSportsBrowserWebsiteTabSelect = (0, import_react262.useCallback)((paneIndex, tabIndex) => {
     updateActiveSportsBrowserTab((tab) => {
       const pane = tab.paneStates[paneIndex] ?? createDefaultSportsBrowserPrototypePaneState();
       const websites = getSportsBrowserPrototypeWebsitesForPane(pane);
@@ -145250,7 +145770,7 @@ function HomePage() {
       return { ...tab, paneStates: next };
     });
   }, [updateActiveSportsBrowserTab]);
-  const onSportsBrowserOpenUrl = (0, import_react260.useCallback)((url) => {
+  const onSportsBrowserOpenUrl = (0, import_react262.useCallback)((url) => {
     updateActiveSportsBrowserTab((tab) => {
       const next = tab.paneStates.slice();
       const paneIndex = Math.min(sportsBrowserActivePaneIndexRef.current, next.length - 1);
@@ -145259,7 +145779,7 @@ function HomePage() {
       return { ...tab, paneStates: next };
     });
   }, [updateActiveSportsBrowserTab]);
-  const onSportsBrowserOpenTerminalPost = (0, import_react260.useCallback)((url) => {
+  const onSportsBrowserOpenTerminalPost = (0, import_react262.useCallback)((url) => {
     updateActiveSportsBrowserTab((tab) => {
       const next = tab.paneStates.slice();
       const paneIndex = Math.min(sportsBrowserActivePaneIndexRef.current, next.length - 1);
@@ -145268,7 +145788,7 @@ function HomePage() {
       return { ...tab, paneStates: next };
     });
   }, [updateActiveSportsBrowserTab]);
-  const onSportsBrowserOmniboxNavigate = (0, import_react260.useCallback)(
+  const onSportsBrowserOmniboxNavigate = (0, import_react262.useCallback)(
     (input) => {
       const url = resolveOmniboxNavigationUrl(input);
       if (!url) return;
@@ -145282,14 +145802,14 @@ function HomePage() {
     },
     [updateActiveSportsBrowserTab]
   );
-  const onSportsBrowserAddSplitPane = (0, import_react260.useCallback)(() => {
+  const onSportsBrowserAddSplitPane = (0, import_react262.useCallback)(() => {
     updateActiveSportsBrowserTab((tab) => ({
       ...tab,
       splitPaneCount: tab.splitPaneCount + 1,
       paneStates: [...tab.paneStates, createEmptySportsBrowserPrototypePaneState()]
     }));
   }, [updateActiveSportsBrowserTab]);
-  const onSportsBrowserRemoveSplitPane = (0, import_react260.useCallback)(() => {
+  const onSportsBrowserRemoveSplitPane = (0, import_react262.useCallback)(() => {
     updateActiveSportsBrowserTab((tab) => ({
       ...tab,
       splitPaneCount: Math.max(1, tab.splitPaneCount - 1),
@@ -145540,8 +146060,8 @@ function HomePage() {
         onForward: () => sportsBrowserNavigationRef.current.goForward(),
         onNavigate: onSportsBrowserOmniboxNavigate,
         trailing: showSportsBrowserPrototypeTopFeed ? /* @__PURE__ */ (0, import_jsx_runtime229.jsxs)(import_jsx_runtime229.Fragment, { children: [
-          /* @__PURE__ */ (0, import_jsx_runtime229.jsx)(SportsBrowserPrototypeBottomRailGames, { className: "min-w-0 flex-[1.5] shrink border-l border-[#c8c4bc]/70" }),
-          /* @__PURE__ */ (0, import_jsx_runtime229.jsx)("div", { className: "flex h-full min-w-0 flex-1 shrink overflow-hidden border-l border-[#c8c4bc]/70 bg-[#f4b44b]", children: /* @__PURE__ */ (0, import_jsx_runtime229.jsx)(
+          /* @__PURE__ */ (0, import_jsx_runtime229.jsx)(SportsBrowserPrototypeBottomRailGames, { className: "relative z-0 min-w-0 flex-[1.5] shrink overflow-visible border-l border-[#c8c4bc]/70" }),
+          /* @__PURE__ */ (0, import_jsx_runtime229.jsx)("div", { className: "relative z-10 flex h-full min-w-0 flex-1 shrink overflow-hidden border-l border-[#c8c4bc]/70 bg-[#f4b44b]", children: /* @__PURE__ */ (0, import_jsx_runtime229.jsx)(
             GlobalHeaderNewsTicker,
             {
               appearance: "bottomStrip",
@@ -145637,11 +146157,11 @@ function HomePage() {
   ) });
   return /* @__PURE__ */ (0, import_jsx_runtime229.jsx)(HomeActiveLeagueProvider, { children: showCatchUpSportscapeLeagueIndexColumn ? /* @__PURE__ */ (0, import_jsx_runtime229.jsx)(SportscapeCatchUpLeagueNavProvider, { feedCards: sportscapeFeedCards, children: useHomeDesktopObjectsSpineMigration ? /* @__PURE__ */ (0, import_jsx_runtime229.jsx)(MainMenuLeagueSearchProvider, { children: homeLayout }) : homeLayout }) : useHomeDesktopObjectsSpineMigration ? /* @__PURE__ */ (0, import_jsx_runtime229.jsx)(MainMenuLeagueSearchProvider, { children: homeLayout }) : homeLayout });
 }
-var import_react260, import_jsx_runtime229, EMPTY_NAV, HOME_CENTER_LIVE_SPORTS_TICKER_ENABLED;
+var import_react262, import_jsx_runtime229, EMPTY_NAV, HOME_CENTER_LIVE_SPORTS_TICKER_ENABLED;
 var init_HomePage = __esm({
   "../grarf/desktop/src/pages/HomePage.tsx"() {
     init_define_import_meta_env();
-    import_react260 = __toESM(require_react(), 1);
+    import_react262 = __toESM(require_react(), 1);
     init_dist();
     init_HomeCenterPanePrimaryNav();
     init_HomeCenterPaneNowModeSelector();
@@ -145750,16 +146270,16 @@ var init_HomePage = __esm({
 
 // ../grarf/desktop/src/components/navigation/LeagueWorkspaceWebRouteGate.tsx
 function LeagueWorkspaceWebRouteGate({ hubId }) {
-  (0, import_react261.useEffect)(() => {
+  (0, import_react263.useEffect)(() => {
     openCanonicalLeagueWorkspaceFromMainMenu(hubId);
   }, [hubId]);
   return /* @__PURE__ */ (0, import_jsx_runtime230.jsx)(Navigate, { to: "/", replace: true });
 }
-var import_react261, import_jsx_runtime230;
+var import_react263, import_jsx_runtime230;
 var init_LeagueWorkspaceWebRouteGate = __esm({
   "../grarf/desktop/src/components/navigation/LeagueWorkspaceWebRouteGate.tsx"() {
     init_define_import_meta_env();
-    import_react261 = __toESM(require_react(), 1);
+    import_react263 = __toESM(require_react(), 1);
     init_dist();
     init_openGamesSpinePermanentLeagueWorkspace();
     import_jsx_runtime230 = __toESM(require_jsx_runtime(), 1);
@@ -145778,9 +146298,9 @@ function LeaguePageHeader({
   onSubNavSelect
 }) {
   const layout = useWorkspaceLayoutStore(selectPaneLayout(layoutId));
-  const [internalTab, setInternalTab] = (0, import_react262.useState)("home");
-  const [internalSubTab, setInternalSubTab] = (0, import_react262.useState)(null);
-  const [logoFailed, setLogoFailed] = (0, import_react262.useState)(false);
+  const [internalTab, setInternalTab] = (0, import_react264.useState)("home");
+  const [internalSubTab, setInternalSubTab] = (0, import_react264.useState)(null);
+  const [logoFailed, setLogoFailed] = (0, import_react264.useState)(false);
   const controlled = onPrimarySelect !== void 0;
   const activeTab = controlled ? activePrimaryId ?? "home" : internalTab;
   const activeSubTab = controlled ? activeSubNavId ?? null : internalSubTab;
@@ -145904,11 +146424,11 @@ function LeaguePageHeader({
     }
   );
 }
-var import_react262, import_jsx_runtime231, PRIMARY_NAV, DEFAULT_SUB_NAV;
+var import_react264, import_jsx_runtime231, PRIMARY_NAV, DEFAULT_SUB_NAV;
 var init_LeaguePageHeader = __esm({
   "../grarf/desktop/src/components/league/LeaguePageHeader.tsx"() {
     init_define_import_meta_env();
-    import_react262 = __toESM(require_react(), 1);
+    import_react264 = __toESM(require_react(), 1);
     init_cn();
     init_paneLayoutDefaults();
     init_gamesSpineLeagueLogoUrls();
@@ -146063,31 +146583,31 @@ var init_directoryLeagueWorkspace = __esm({
 // ../grarf/desktop/src/pages/DirectoryLeaguePage.tsx
 function DirectoryLeaguePage({ item }) {
   const navigate = useNavigate();
-  const [headerPrimaryTab, setHeaderPrimaryTab] = (0, import_react263.useState)("home");
+  const [headerPrimaryTab, setHeaderPrimaryTab] = (0, import_react265.useState)("home");
   const showHomeSurface = headerPrimaryTab === "home";
-  const [nav, setNav] = (0, import_react263.useState)(() => defaultDirectoryLeagueNavState(item.id));
-  const [overlay, dispatchOverlay] = (0, import_react263.useReducer)(
+  const [nav, setNav] = (0, import_react265.useState)(() => defaultDirectoryLeagueNavState(item.id));
+  const [overlay, dispatchOverlay] = (0, import_react265.useReducer)(
     overlayWorkspaceReducer,
     void 0,
     initialOverlayWorkspaceState
   );
-  const openUrlWorkspaceTab = (0, import_react263.useCallback)(
+  const openUrlWorkspaceTab = (0, import_react265.useCallback)(
     (tab) => {
       dispatchOverlay({ type: "open", tab });
     },
     [dispatchOverlay]
   );
   useWorkspaceUrlLauncher(openUrlWorkspaceTab);
-  (0, import_react263.useEffect)(() => {
+  (0, import_react265.useEffect)(() => {
     return () => {
       void window.grarf?.workspaceEmbedClear?.("center");
     };
   }, []);
-  const activeWorkspace = (0, import_react263.useMemo)(
+  const activeWorkspace = (0, import_react265.useMemo)(
     () => directoryLeagueBuiltinWorkspace(item.id, nav),
     [item.id, nav]
   );
-  const statusLabel = (0, import_react263.useMemo)(
+  const statusLabel = (0, import_react265.useMemo)(
     () => directoryLeagueWorkspaceStatusLabel(
       item.id,
       nav,
@@ -146095,14 +146615,14 @@ function DirectoryLeaguePage({ item }) {
     ),
     [item.id, nav, overlay.activeId, overlay.tabs]
   );
-  const subnavItems = (0, import_react263.useMemo)(
+  const subnavItems = (0, import_react265.useMemo)(
     () => directoryLeagueSubnavForCategory(item.id, nav.categoryId),
     [item.id, nav.categoryId]
   );
-  const clearOverlayToBuiltin = (0, import_react263.useCallback)(() => {
+  const clearOverlayToBuiltin = (0, import_react265.useCallback)(() => {
     dispatchOverlay({ type: "select", id: null });
   }, []);
-  const onCategorySelect = (0, import_react263.useCallback)(
+  const onCategorySelect = (0, import_react265.useCallback)(
     (id) => {
       if (!isDirectoryLeagueCategoryId(id)) return;
       setNav((prev) => ({
@@ -146113,14 +146633,14 @@ function DirectoryLeaguePage({ item }) {
     },
     [clearOverlayToBuiltin]
   );
-  const onSubnavSelect = (0, import_react263.useCallback)(
+  const onSubnavSelect = (0, import_react265.useCallback)(
     (id) => {
       setNav((prev) => ({ ...prev, categoryId: "news", newsSourceId: id }));
       clearOverlayToBuiltin();
     },
     [clearOverlayToBuiltin]
   );
-  const headerActivePrimaryId = (0, import_react263.useMemo)(() => {
+  const headerActivePrimaryId = (0, import_react265.useMemo)(() => {
     if (headerPrimaryTab === "home" && !overlay.activeId) return "home";
     if (headerPrimaryTab === "games") return "games";
     const MAP = {
@@ -146131,7 +146651,7 @@ function DirectoryLeaguePage({ item }) {
     return MAP[nav.categoryId] ?? headerPrimaryTab;
   }, [headerPrimaryTab, overlay.activeId, nav.categoryId]);
   const headerActiveSubNavId = showHomeSurface || nav.categoryId !== "news" ? null : nav.newsSourceId;
-  const onHeaderPrimarySelect = (0, import_react263.useCallback)(
+  const onHeaderPrimarySelect = (0, import_react265.useCallback)(
     (id) => {
       setHeaderPrimaryTab(id);
       if (id === "home") {
@@ -146152,14 +146672,14 @@ function DirectoryLeaguePage({ item }) {
     },
     [onCategorySelect, clearOverlayToBuiltin]
   );
-  const onHeaderSubNavSelect = (0, import_react263.useCallback)(
+  const onHeaderSubNavSelect = (0, import_react265.useCallback)(
     (id) => {
       setHeaderPrimaryTab("news");
       onSubnavSelect(id);
     },
     [onSubnavSelect]
   );
-  const onTickerNavigate = (0, import_react263.useCallback)(
+  const onTickerNavigate = (0, import_react265.useCallback)(
     (p2) => {
       if (p2.tickerTargetType === "article") {
         const url = p2.articleUrl ?? (p2.nav.kind === "article" ? p2.nav.url : null);
@@ -146235,11 +146755,11 @@ function DirectoryLeaguePage({ item }) {
     )
   ] });
 }
-var import_react263, import_jsx_runtime232;
+var import_react265, import_jsx_runtime232;
 var init_DirectoryLeaguePage = __esm({
   "../grarf/desktop/src/pages/DirectoryLeaguePage.tsx"() {
     init_define_import_meta_env();
-    import_react263 = __toESM(require_react(), 1);
+    import_react265 = __toESM(require_react(), 1);
     init_dist();
     init_LeaguePageHeader();
     init_LeagueHomePageLayout();
@@ -146392,7 +146912,7 @@ function useScheduleCacheForSelectedDate(selectedDate) {
   const setScheduleSlate = useScheduleCacheStore((s2) => s2.setScheduleSlate);
   const setLoading = useScheduleCacheStore((s2) => s2.setLoading);
   const setError = useScheduleCacheStore((s2) => s2.setError);
-  (0, import_react264.useEffect)(() => {
+  (0, import_react266.useEffect)(() => {
     const api = window.grarf?.gamesFetchScheduleSlate;
     if (!api) return;
     let cancelled = false;
@@ -146433,11 +146953,11 @@ function useScheduleCacheForSelectedDate(selectedDate) {
     setError
   ]);
 }
-var import_react264;
+var import_react266;
 var init_useScheduleCacheForSelectedDate = __esm({
   "../grarf/desktop/src/hooks/useScheduleCacheForSelectedDate.ts"() {
     init_define_import_meta_env();
-    import_react264 = __toESM(require_react(), 1);
+    import_react266 = __toESM(require_react(), 1);
     init_commandBriefingDates();
     init_scheduleCacheStore();
     init_operationalSlateDate2();
@@ -146653,7 +147173,7 @@ var init_DemoHomeCommandBriefingRow = __esm({
 // ../grarf/desktop/src/components/commandBriefing/DemoHomeCommandBriefingPanel.tsx
 function DemoHomeCommandBriefingPanel({ briefingDisplayMode = "expanded" }) {
   const items = DEMO_HOME_COMMAND_BRIEFING_CARDS;
-  const [compactExpanded, setCompactExpanded] = (0, import_react265.useState)(false);
+  const [compactExpanded, setCompactExpanded] = (0, import_react267.useState)(false);
   const isCompactMode = briefingDisplayMode === "compact";
   const showCompactList = isCompactMode && compactExpanded;
   const briefingCount = items.length;
@@ -146703,11 +147223,11 @@ function DemoHomeCommandBriefingPanel({ briefingDisplayMode = "expanded" }) {
     }
   );
 }
-var import_react265, import_jsx_runtime236;
+var import_react267, import_jsx_runtime236;
 var init_DemoHomeCommandBriefingPanel = __esm({
   "../grarf/desktop/src/components/commandBriefing/DemoHomeCommandBriefingPanel.tsx"() {
     init_define_import_meta_env();
-    import_react265 = __toESM(require_react(), 1);
+    import_react267 = __toESM(require_react(), 1);
     init_cn();
     init_gamesSpineCardLayout();
     init_demoHomeCommandBriefing();
@@ -146761,7 +147281,7 @@ function CommandBriefingItemRow({
     }
     navigate(`/game/${encodeURIComponent(gameId)}`);
   };
-  (0, import_react266.useEffect)(() => {
+  (0, import_react268.useEffect)(() => {
     logCommandBriefingLeagueLabel(leagueLabel);
     logCommandBriefingMetadataStyling();
     logCommandBriefingLayoutAligned();
@@ -146815,11 +147335,11 @@ function CommandBriefingItemRow({
     }
   );
 }
-var import_react266, import_jsx_runtime237;
+var import_react268, import_jsx_runtime237;
 var init_CommandBriefingItemRow = __esm({
   "../grarf/desktop/src/components/commandBriefing/CommandBriefingItemRow.tsx"() {
     init_define_import_meta_env();
-    import_react266 = __toESM(require_react(), 1);
+    import_react268 = __toESM(require_react(), 1);
     init_dist();
     init_cn();
     init_gamesSpineCardLayout();
@@ -146847,7 +147367,7 @@ function CommandBriefingExpandedList({
   bestGameRightNow,
   selectedId
 }) {
-  const briefingGameIds = (0, import_react267.useMemo)(() => ranked.map(({ game }) => game.id), [ranked]);
+  const briefingGameIds = (0, import_react269.useMemo)(() => ranked.map(({ game }) => game.id), [ranked]);
   const featuredBestGame = resolveBestGameRightNowFeaturedInBriefing(
     bestGameRightNow,
     briefingGameIds
@@ -146893,10 +147413,10 @@ function CommandBriefingModuleProduction({
   const liveLeagues = useLiveGamesStore((s2) => s2.leagues);
   const scheduleByDate = useScheduleCacheStore((s2) => s2.byDate);
   const persistedSnapshots = useBriefingPersistenceFallbackStore((s2) => s2.snapshots);
-  const [fallbacks, setFallbacks] = (0, import_react267.useState)({});
+  const [fallbacks, setFallbacks] = (0, import_react269.useState)({});
   useScheduleCacheForSelectedDate(selectedDate);
-  const dateOptions = (0, import_react267.useMemo)(() => getBriefingDateOptions(), []);
-  (0, import_react267.useEffect)(() => {
+  const dateOptions = (0, import_react269.useMemo)(() => getBriefingDateOptions(), []);
+  (0, import_react269.useEffect)(() => {
     const api = window.grarf?.commandBriefingGetPersistence;
     if (!api) {
       setFallbacks(persistedSnapshots);
@@ -146910,7 +147430,7 @@ function CommandBriefingModuleProduction({
       setFallbacks(persistedSnapshots);
     });
   }, [persistedSnapshots]);
-  const poolInput = (0, import_react267.useMemo)(
+  const poolInput = (0, import_react269.useMemo)(
     () => ({
       liveLeagues,
       scheduleByDate,
@@ -146920,11 +147440,11 @@ function CommandBriefingModuleProduction({
     }),
     [liveLeagues, scheduleByDate, selectedDate, league2]
   );
-  const briefingGamePool = (0, import_react267.useMemo)(
+  const briefingGamePool = (0, import_react269.useMemo)(
     () => buildCommandBriefingGamePool(poolInput),
     [poolInput]
   );
-  (0, import_react267.useEffect)(() => {
+  (0, import_react269.useEffect)(() => {
     const updates = {};
     for (const game of briefingGamePool) {
       const priority = resolveBriefingPriority(game, bundle, selectedDate);
@@ -146944,17 +147464,17 @@ function CommandBriefingModuleProduction({
       return changed ? next : prev;
     });
   }, [briefingGamePool, bundle, selectedDate]);
-  const mergedFallbacks = (0, import_react267.useMemo)(
+  const mergedFallbacks = (0, import_react269.useMemo)(
     () => ({ ...persistedSnapshots, ...fallbacks }),
     [persistedSnapshots, fallbacks]
   );
-  const scopedFallbacks = (0, import_react267.useMemo)(() => {
+  const scopedFallbacks = (0, import_react269.useMemo)(() => {
     if (!league2) return mergedFallbacks;
     return Object.fromEntries(
       Object.entries(mergedFallbacks).filter(([, snap]) => snap.league === league2)
     );
   }, [mergedFallbacks, league2]);
-  const ranked = (0, import_react267.useMemo)(
+  const ranked = (0, import_react269.useMemo)(
     () => selectBriefingGames(
       briefingGamePool,
       bundle,
@@ -146964,11 +147484,11 @@ function CommandBriefingModuleProduction({
     ),
     [briefingGamePool, bundle, selectedDate, scopedFallbacks, league2]
   );
-  const displayRanked = (0, import_react267.useMemo)(
+  const displayRanked = (0, import_react269.useMemo)(
     () => resolveCommandBriefingDisplayRankedGames(ranked, bestGameRightNow),
     [ranked, bestGameRightNow]
   );
-  (0, import_react267.useEffect)(() => {
+  (0, import_react269.useEffect)(() => {
     if (!onBestGameRightNowBriefingOverlapChange) return;
     if (!bestGameRightNow) {
       onBestGameRightNowBriefingOverlapChange(false);
@@ -146979,15 +147499,15 @@ function CommandBriefingModuleProduction({
     );
   }, [bestGameRightNow, ranked, onBestGameRightNowBriefingOverlapChange]);
   const selectedLabel = dateOptions.find((o2) => o2.key === selectedDate)?.label ?? "TODAY";
-  const [watchPicker, setWatchPicker] = (0, import_react267.useState)(
+  const [watchPicker, setWatchPicker] = (0, import_react269.useState)(
     null
   );
-  const [compactExpanded, setCompactExpanded] = (0, import_react267.useState)(false);
+  const [compactExpanded, setCompactExpanded] = (0, import_react269.useState)(false);
   const isCompactMode = briefingDisplayMode === "compact";
   const showCompactList = isCompactMode && compactExpanded;
   const briefingCount = ranked.length;
   const firstRankedGame = displayRanked[0]?.game;
-  const onWatchLive = (0, import_react267.useCallback)((gameId) => {
+  const onWatchLive = (0, import_react269.useCallback)((gameId) => {
     const game = findGamesSpineGameForWatchLive(gameId);
     if (!game || !gameHasHomeSpineWatchLive(game)) return;
     logWatchLiveLaunch(game);
@@ -147003,7 +147523,7 @@ function CommandBriefingModuleProduction({
       setWatchPicker({ game: result.game, options: result.options });
     }
   }, []);
-  const onWatchOptionChosen = (0, import_react267.useCallback)(
+  const onWatchOptionChosen = (0, import_react269.useCallback)(
     (opt) => {
       if (!watchPicker) return;
       executeWatchOption(watchPicker.game, opt, watchDispatch ?? (() => {
@@ -147012,7 +147532,7 @@ function CommandBriefingModuleProduction({
     },
     [watchPicker, watchDispatch]
   );
-  (0, import_react267.useEffect)(() => {
+  (0, import_react269.useEffect)(() => {
     const tick = () => {
       const resolved = resolveActiveBriefingDateKey(selectedDate);
       if (resolved !== selectedDate) setSelectedDate(resolved);
@@ -147117,11 +147637,11 @@ function CommandBriefingModuleProduction({
     }
   );
 }
-var import_react267, import_jsx_runtime238;
+var import_react269, import_jsx_runtime238;
 var init_CommandBriefingModule = __esm({
   "../grarf/desktop/src/components/commandBriefing/CommandBriefingModule.tsx"() {
     init_define_import_meta_env();
-    import_react267 = __toESM(require_react(), 1);
+    import_react269 = __toESM(require_react(), 1);
     init_commandBriefingDates();
     init_briefingPersistence();
     init_buildCommandBriefingGamePool();
@@ -147274,8 +147794,8 @@ var init_LeagueGamesContextColumn = __esm({
 
 // ../grarf/desktop/src/hooks/useGamesCatchUpAutoSelect.ts
 function useGamesCatchUpAutoSelect(isGamesCatchUp, leadingGameId, onSelectGame) {
-  const entryKeyRef = (0, import_react268.useRef)(null);
-  (0, import_react268.useEffect)(() => {
+  const entryKeyRef = (0, import_react270.useRef)(null);
+  (0, import_react270.useEffect)(() => {
     if (!isGamesCatchUp) {
       entryKeyRef.current = null;
       return;
@@ -147286,11 +147806,11 @@ function useGamesCatchUpAutoSelect(isGamesCatchUp, leadingGameId, onSelectGame) 
     onSelectGame(leadingGameId);
   }, [isGamesCatchUp, leadingGameId, onSelectGame]);
 }
-var import_react268, GAMES_CATCH_UP_ENTRY_KEY;
+var import_react270, GAMES_CATCH_UP_ENTRY_KEY;
 var init_useGamesCatchUpAutoSelect = __esm({
   "../grarf/desktop/src/hooks/useGamesCatchUpAutoSelect.ts"() {
     init_define_import_meta_env();
-    import_react268 = __toESM(require_react(), 1);
+    import_react270 = __toESM(require_react(), 1);
     GAMES_CATCH_UP_ENTRY_KEY = "games:CATCH_UP";
   }
 });
@@ -147300,7 +147820,7 @@ function useLeadingOperationalSpineGameId(league2) {
   const games = useLiveGamesStore((s2) => s2.leagues[league2]);
   const operationalMode = useOperationalModeStore((s2) => s2.mode);
   const retainedById = useRecentFinalizedGamesStore((s2) => s2.byId);
-  return (0, import_react269.useMemo)(() => {
+  return (0, import_react271.useMemo)(() => {
     const supplementalFinals = mergeCatchUpSupplementalFinals(
       useRecentFinalizedGamesStore.getState().getRetainedForLeague(league2)
     );
@@ -147310,11 +147830,11 @@ function useLeadingOperationalSpineGameId(league2) {
     return sorted[0]?.id ?? null;
   }, [games, operationalMode, retainedById, league2]);
 }
-var import_react269;
+var import_react271;
 var init_useLeadingOperationalSpineGameId = __esm({
   "../grarf/desktop/src/hooks/useLeadingOperationalSpineGameId.ts"() {
     init_define_import_meta_env();
-    import_react269 = __toESM(require_react(), 1);
+    import_react271 = __toESM(require_react(), 1);
     init_buildOperationalSpineSlate();
     init_mergeCatchUpSupplementalFinals();
     init_sortGamesSpineChronologically();
@@ -147330,46 +147850,46 @@ function LeagueBoardPage({ league: league2 }) {
   const navigate = useNavigate();
   const slug = SLUG_BY_LEAGUE[league2];
   const games = useLiveGamesStore((s2) => s2.leagues[league2]);
-  const liveCount = (0, import_react270.useMemo)(() => games.filter((g2) => g2.status === "live").length, [games]);
-  const [lastClickedGameId, setLastClickedGameId] = (0, import_react270.useState)(null);
-  const [watchPicker, setWatchPicker] = (0, import_react270.useState)(null);
-  const [headerPrimaryTab, setHeaderPrimaryTab] = (0, import_react270.useState)("home");
+  const liveCount = (0, import_react272.useMemo)(() => games.filter((g2) => g2.status === "live").length, [games]);
+  const [lastClickedGameId, setLastClickedGameId] = (0, import_react272.useState)(null);
+  const [watchPicker, setWatchPicker] = (0, import_react272.useState)(null);
+  const [headerPrimaryTab, setHeaderPrimaryTab] = (0, import_react272.useState)("home");
   const showHomeSurface = headerPrimaryTab === "home";
-  const [nav, setNav] = (0, import_react270.useState)(() => defaultLeagueWebNavState(slug));
-  const [overlay, dispatchOverlay] = (0, import_react270.useReducer)(
+  const [nav, setNav] = (0, import_react272.useState)(() => defaultLeagueWebNavState(slug));
+  const [overlay, dispatchOverlay] = (0, import_react272.useReducer)(
     overlayWorkspaceReducer,
     void 0,
     initialOverlayWorkspaceState
   );
-  const openUrlWorkspaceTab = (0, import_react270.useCallback)(
+  const openUrlWorkspaceTab = (0, import_react272.useCallback)(
     (tab) => {
       dispatchOverlay({ type: "open", tab });
     },
     [dispatchOverlay]
   );
   useWorkspaceUrlLauncher(openUrlWorkspaceTab);
-  const selectedId = (0, import_react270.useMemo)(() => {
+  const selectedId = (0, import_react272.useMemo)(() => {
     const fromTab = overlayActiveGameId(overlay);
     if (fromTab && games.some((g2) => g2.id === fromTab)) return fromTab;
     if (lastClickedGameId && games.some((g2) => g2.id === lastClickedGameId)) return lastClickedGameId;
     return null;
   }, [games, lastClickedGameId, overlay]);
-  (0, import_react270.useEffect)(() => {
+  (0, import_react272.useEffect)(() => {
     return () => {
       void window.grarf?.workspaceEmbedClear?.("center");
     };
   }, []);
-  const activeWorkspace = (0, import_react270.useMemo)(() => resolveLeagueWebActiveWorkspace(slug, nav, overlay), [slug, nav, overlay]);
+  const activeWorkspace = (0, import_react272.useMemo)(() => resolveLeagueWebActiveWorkspace(slug, nav, overlay), [slug, nav, overlay]);
   useSyncBrowserUrlWithActiveWorkspace({
     activeWorkspace,
     fallbackLeagueKey: league2
   });
-  const statusLabel = (0, import_react270.useMemo)(() => leagueWebWorkspaceStatusLabel(slug, nav, overlay), [slug, nav, overlay]);
-  const subnavItems = (0, import_react270.useMemo)(() => leagueWebSubnavForCategory(slug, nav.categoryId), [slug, nav.categoryId]);
-  const clearOverlayToBuiltin = (0, import_react270.useCallback)(() => {
+  const statusLabel = (0, import_react272.useMemo)(() => leagueWebWorkspaceStatusLabel(slug, nav, overlay), [slug, nav, overlay]);
+  const subnavItems = (0, import_react272.useMemo)(() => leagueWebSubnavForCategory(slug, nav.categoryId), [slug, nav.categoryId]);
+  const clearOverlayToBuiltin = (0, import_react272.useCallback)(() => {
     dispatchOverlay({ type: "select", id: null });
   }, []);
-  const onCategorySelect = (0, import_react270.useCallback)(
+  const onCategorySelect = (0, import_react272.useCallback)(
     (id) => {
       if (!isLeagueWebCategoryId(id)) return;
       setNav((prev) => ({
@@ -147380,7 +147900,7 @@ function LeagueBoardPage({ league: league2 }) {
     },
     [clearOverlayToBuiltin]
   );
-  const onSubnavSelect = (0, import_react270.useCallback)(
+  const onSubnavSelect = (0, import_react272.useCallback)(
     (id) => {
       setNav((prev) => ({ ...prev, categoryId: "news", newsSourceId: id }));
       clearOverlayToBuiltin();
@@ -147388,7 +147908,7 @@ function LeagueBoardPage({ league: league2 }) {
     [clearOverlayToBuiltin]
   );
   const operationalMode = useOperationalModeStore((s2) => s2.mode);
-  const headerActivePrimaryId = (0, import_react270.useMemo)(() => {
+  const headerActivePrimaryId = (0, import_react272.useMemo)(() => {
     if (headerPrimaryTab === "home" && !overlay.activeId) return "home";
     if (headerPrimaryTab === "games") return "games";
     const MAP = {
@@ -147399,7 +147919,7 @@ function LeagueBoardPage({ league: league2 }) {
     return MAP[nav.categoryId] ?? headerPrimaryTab;
   }, [headerPrimaryTab, overlay.activeId, nav.categoryId]);
   const headerActiveSubNavId = showHomeSurface || nav.categoryId !== "news" ? null : nav.newsSourceId;
-  const onHeaderPrimarySelect = (0, import_react270.useCallback)(
+  const onHeaderPrimarySelect = (0, import_react272.useCallback)(
     (id) => {
       setHeaderPrimaryTab(id);
       if (id === "home") {
@@ -147420,14 +147940,14 @@ function LeagueBoardPage({ league: league2 }) {
     },
     [onCategorySelect, clearOverlayToBuiltin]
   );
-  const onHeaderSubNavSelect = (0, import_react270.useCallback)(
+  const onHeaderSubNavSelect = (0, import_react272.useCallback)(
     (id) => {
       setHeaderPrimaryTab("news");
       onSubnavSelect(id);
     },
     [onSubnavSelect]
   );
-  const onSelectGame = (0, import_react270.useCallback)(
+  const onSelectGame = (0, import_react272.useCallback)(
     (gameId) => {
       setLastClickedGameId(gameId);
       if (isDemoWnbaWhipAroundGameId(gameId)) return;
@@ -147449,7 +147969,7 @@ function LeagueBoardPage({ league: league2 }) {
   const leadingSpineGameId = useLeadingOperationalSpineGameId(league2);
   const isGamesCatchUp = headerPrimaryTab === "games" && operationalMode === "CATCH_UP";
   useGamesCatchUpAutoSelect(isGamesCatchUp, leadingSpineGameId, onSelectGame);
-  const onWatchLive = (0, import_react270.useCallback)(
+  const onWatchLive = (0, import_react272.useCallback)(
     (gameId) => {
       setLastClickedGameId(gameId);
       if (isDemoNhlVegasCarolinaGameId(gameId)) {
@@ -147477,7 +147997,7 @@ function LeagueBoardPage({ league: league2 }) {
     },
     [games, league2, slug, dispatchOverlay]
   );
-  const operationalAlertActions = (0, import_react270.useMemo)(
+  const operationalAlertActions = (0, import_react272.useMemo)(
     () => ({
       openGame: onSelectGame,
       watchDispatch: dispatchOverlay
@@ -147485,7 +148005,7 @@ function LeagueBoardPage({ league: league2 }) {
     [onSelectGame, dispatchOverlay]
   );
   useOperationalAlertActionsRegistration(operationalAlertActions);
-  const onWatchOptionChosen = (0, import_react270.useCallback)(
+  const onWatchOptionChosen = (0, import_react272.useCallback)(
     (opt) => {
       if (!watchPicker) return;
       executeWatchOption(watchPicker.game, opt, dispatchOverlay);
@@ -147493,7 +148013,7 @@ function LeagueBoardPage({ league: league2 }) {
     },
     [watchPicker, dispatchOverlay]
   );
-  const onTickerNavigate = (0, import_react270.useCallback)(
+  const onTickerNavigate = (0, import_react272.useCallback)(
     (p2) => {
       if (p2.tickerTargetType === "article") {
         const url = p2.articleUrl ?? (p2.nav.kind === "article" ? p2.nav.url : null);
@@ -147587,11 +148107,11 @@ function LeagueBoardPage({ league: league2 }) {
     ) : null
   ] });
 }
-var import_react270, import_jsx_runtime241, SLUG_BY_LEAGUE;
+var import_react272, import_jsx_runtime241, SLUG_BY_LEAGUE;
 var init_LeagueBoardPage = __esm({
   "../grarf/desktop/src/pages/LeagueBoardPage.tsx"() {
     init_define_import_meta_env();
-    import_react270 = __toESM(require_react(), 1);
+    import_react272 = __toESM(require_react(), 1);
     init_dist();
     init_LeaguePageHeader();
     init_LeagueHomePageLayout();
@@ -147692,19 +148212,19 @@ function LeagueHomeWebPane({
   viewportAnchor,
   className
 }) {
-  const wvRef = (0, import_react271.useRef)(null);
-  const partition = (0, import_react271.useMemo)(() => {
+  const wvRef = (0, import_react273.useRef)(null);
+  const partition = (0, import_react273.useMemo)(() => {
     try {
       return `persist:grarf-home-${new URL(url).hostname.replace(/\./g, "-")}`;
     } catch {
       return "persist:grarf-home-generic";
     }
   }, [url]);
-  (0, import_react271.useEffect)(() => {
+  (0, import_react273.useEffect)(() => {
     void window.grarf?.workspaceEmbedClear?.("center");
     void window.grarf?.workspaceEmbedClear?.("centerChild");
   }, []);
-  (0, import_react271.useEffect)(() => {
+  (0, import_react273.useEffect)(() => {
     const wv = wvRef.current;
     if (!wv) return;
     const onLoad = () => {
@@ -147750,11 +148270,11 @@ function LeagueHomeWebPane({
     }
   );
 }
-var import_react271, import_jsx_runtime242, LOCK_CSS;
+var import_react273, import_jsx_runtime242, LOCK_CSS;
 var init_LeagueHomeWebPane = __esm({
   "../grarf/desktop/src/components/league/LeagueHomeWebPane.tsx"() {
     init_define_import_meta_env();
-    import_react271 = __toESM(require_react(), 1);
+    import_react273 = __toESM(require_react(), 1);
     init_cn();
     init_paneContainment();
     init_LeagueHomePanel();
@@ -147766,12 +148286,12 @@ var init_LeagueHomeWebPane = __esm({
 
 // ../grarf/desktop/src/components/mlb/MlbCatchUpStandingsPane.tsx
 function MlbCatchUpStandingsPane({ paneId, className }) {
-  const wvRef = (0, import_react272.useRef)(null);
-  const fallbackUsedRef = (0, import_react272.useRef)(false);
-  const activeSrcRef = (0, import_react272.useRef)(MLB_CATCH_UP_PRIMARY_STANDINGS_URL);
-  const [activeSrc, setActiveSrc] = (0, import_react272.useState)(MLB_CATCH_UP_PRIMARY_STANDINGS_URL);
+  const wvRef = (0, import_react274.useRef)(null);
+  const fallbackUsedRef = (0, import_react274.useRef)(false);
+  const activeSrcRef = (0, import_react274.useRef)(MLB_CATCH_UP_PRIMARY_STANDINGS_URL);
+  const [activeSrc, setActiveSrc] = (0, import_react274.useState)(MLB_CATCH_UP_PRIMARY_STANDINGS_URL);
   activeSrcRef.current = activeSrc;
-  const partition = (0, import_react272.useMemo)(() => {
+  const partition = (0, import_react274.useMemo)(() => {
     try {
       return `persist:grarf-home-${new URL(activeSrc).hostname.replace(/\./g, "-")}`;
     } catch {
@@ -147780,11 +148300,11 @@ function MlbCatchUpStandingsPane({ paneId, className }) {
   }, [activeSrc]);
   const isPrimarySrc = (src) => src === MLB_CATCH_UP_PRIMARY_STANDINGS_URL;
   const isFallbackSrc = (src) => src === MLB_CATCH_UP_FALLBACK_STANDINGS_URL;
-  (0, import_react272.useEffect)(() => {
+  (0, import_react274.useEffect)(() => {
     void window.grarf?.workspaceEmbedClear?.("center");
     void window.grarf?.workspaceEmbedClear?.("centerChild");
   }, []);
-  (0, import_react272.useEffect)(() => {
+  (0, import_react274.useEffect)(() => {
     const wv = wvRef.current;
     if (!wv) return;
     let loadTimeout = null;
@@ -147894,11 +148414,11 @@ function MlbCatchUpStandingsPane({ paneId, className }) {
     }
   );
 }
-var import_react272, import_jsx_runtime243, LOG51, MLB_CATCH_UP_PRIMARY_STANDINGS_URL, MLB_CATCH_UP_FALLBACK_STANDINGS_URL, LOAD_TIMEOUT_MS, CONTENT_PROBE_JS;
+var import_react274, import_jsx_runtime243, LOG51, MLB_CATCH_UP_PRIMARY_STANDINGS_URL, MLB_CATCH_UP_FALLBACK_STANDINGS_URL, LOAD_TIMEOUT_MS, CONTENT_PROBE_JS;
 var init_MlbCatchUpStandingsPane = __esm({
   "../grarf/desktop/src/components/mlb/MlbCatchUpStandingsPane.tsx"() {
     init_define_import_meta_env();
-    import_react272 = __toESM(require_react(), 1);
+    import_react274 = __toESM(require_react(), 1);
     init_cn();
     init_paneContainment();
     init_LeagueHomePanel();
@@ -148172,14 +148692,14 @@ function MlbHeadlinesFeedPane({
   const isGameSummaries = contentSource === "game-summaries";
   const mlbGames = useLiveGamesStore((s2) => s2.leagues.MLB);
   const bundle = useEditorialStore((s2) => s2.bundle);
-  const gameSummaryItems = (0, import_react273.useMemo)(
+  const gameSummaryItems = (0, import_react275.useMemo)(
     () => isGameSummaries ? buildGameSummaryWireItems(mlbGames, bundle, summaryKind) : [],
     [isGameSummaries, mlbGames, bundle, summaryKind]
   );
-  const [rssItems, setRssItems] = (0, import_react273.useState)([]);
-  const [rssLoading, setRssLoading] = (0, import_react273.useState)(true);
-  const [rssError, setRssError] = (0, import_react273.useState)(null);
-  (0, import_react273.useEffect)(() => {
+  const [rssItems, setRssItems] = (0, import_react275.useState)([]);
+  const [rssLoading, setRssLoading] = (0, import_react275.useState)(true);
+  const [rssError, setRssError] = (0, import_react275.useState)(null);
+  (0, import_react275.useEffect)(() => {
     if (isGameSummaries) return;
     let cancelled = false;
     async function loadWire() {
@@ -148288,12 +148808,12 @@ function MlbHeadlinesFeedPane({
     }
   );
 }
-var import_react273, import_jsx_runtime244, ESPN_MLB_RSS_URL;
+var import_react275, import_jsx_runtime244, ESPN_MLB_RSS_URL;
 var init_MlbHeadlinesFeedPane = __esm({
   "../grarf/desktop/src/components/mlb/MlbHeadlinesFeedPane.tsx"() {
     init_define_import_meta_env();
     init_lucide_react();
-    import_react273 = __toESM(require_react(), 1);
+    import_react275 = __toESM(require_react(), 1);
     init_commandBriefingDates();
     init_resolveGeneratedSummary();
     init_sortOperationalSpineGames();
@@ -148439,7 +148959,7 @@ var init_lookupMlbTeamPulseMark = __esm({
 // ../grarf/desktop/src/components/leagueOverview/LeaguePulseTeamMark.tsx
 function LeaguePulseTeamMark({ teamName }) {
   const mlbGames = useLiveGamesStore((s2) => s2.leagues.MLB);
-  const mark = (0, import_react274.useMemo)(
+  const mark = (0, import_react276.useMemo)(
     () => lookupMlbTeamPulseMark(mlbGames, teamName),
     [mlbGames, teamName]
   );
@@ -148452,11 +148972,11 @@ function LeaguePulseTeamMark({ teamName }) {
     }
   );
 }
-var import_react274, import_jsx_runtime246;
+var import_react276, import_jsx_runtime246;
 var init_LeaguePulseTeamMark = __esm({
   "../grarf/desktop/src/components/leagueOverview/LeaguePulseTeamMark.tsx"() {
     init_define_import_meta_env();
-    import_react274 = __toESM(require_react(), 1);
+    import_react276 = __toESM(require_react(), 1);
     init_GamesSpineTeamMark();
     init_lookupMlbTeamPulseMark();
     init_liveGamesStore();
@@ -148500,7 +149020,7 @@ function ClosestRaceBlock({
   ] }) : /* @__PURE__ */ (0, import_jsx_runtime247.jsx)(PulseMuted, { children: "\u2014" }) });
 }
 function LeaguePulsePlayerHeadshot({ src, alt }) {
-  const [failed, setFailed] = (0, import_react275.useState)(false);
+  const [failed, setFailed] = (0, import_react277.useState)(false);
   if (!src || failed) return null;
   return /* @__PURE__ */ (0, import_jsx_runtime247.jsx)(
     "img",
@@ -148518,7 +149038,7 @@ function StatLeaderBlock({
   leader
 }) {
   const mlbGames = useLiveGamesStore((s2) => s2.leagues.MLB);
-  const teamAbbrev2 = (0, import_react275.useMemo)(() => {
+  const teamAbbrev2 = (0, import_react277.useMemo)(() => {
     if (!leader?.teamName) return null;
     return lookupMlbTeamPulseMark(mlbGames, leader.teamName).label;
   }, [mlbGames, leader?.teamName]);
@@ -148567,14 +149087,14 @@ function buildLeaguePulseSlides(snapshot) {
   ];
 }
 function LeagueOverviewSnapshotContent({ snapshot }) {
-  const slides = (0, import_react275.useMemo)(() => buildLeaguePulseSlides(snapshot), [snapshot]);
-  const [activeIndex, setActiveIndex] = (0, import_react275.useState)(0);
-  const [fadeIn, setFadeIn] = (0, import_react275.useState)(true);
-  (0, import_react275.useEffect)(() => {
+  const slides = (0, import_react277.useMemo)(() => buildLeaguePulseSlides(snapshot), [snapshot]);
+  const [activeIndex, setActiveIndex] = (0, import_react277.useState)(0);
+  const [fadeIn, setFadeIn] = (0, import_react277.useState)(true);
+  (0, import_react277.useEffect)(() => {
     setActiveIndex(0);
     setFadeIn(true);
   }, [snapshot]);
-  (0, import_react275.useEffect)(() => {
+  (0, import_react277.useEffect)(() => {
     if (slides.length <= 1) return;
     const intervalId = window.setInterval(() => {
       setFadeIn(false);
@@ -148601,11 +149121,11 @@ function LeagueOverviewSnapshotContent({ snapshot }) {
     activeSlide?.id ?? "empty"
   ) });
 }
-var import_react275, import_jsx_runtime247, PULSE_ROTATION_MS, PULSE_FADE_MS;
+var import_react277, import_jsx_runtime247, PULSE_ROTATION_MS, PULSE_FADE_MS;
 var init_LeagueOverviewSnapshotContent = __esm({
   "../grarf/desktop/src/components/leagueOverview/LeagueOverviewSnapshotContent.tsx"() {
     init_define_import_meta_env();
-    import_react275 = __toESM(require_react(), 1);
+    import_react277 = __toESM(require_react(), 1);
     init_cn();
     init_lookupMlbTeamPulseMark();
     init_liveGamesStore();
@@ -148849,10 +149369,10 @@ var init_mapMlbStandingsToLeagueOverviewCard = __esm({
 
 // ../grarf/desktop/src/hooks/useMlbLeagueOverviewCard.ts
 function useMlbLeagueOverviewCard(enabled = true) {
-  const [model, setModel] = (0, import_react276.useState)(null);
-  const [loading, setLoading] = (0, import_react276.useState)(enabled);
-  const abortRef = (0, import_react276.useRef)(null);
-  const load = (0, import_react276.useCallback)(async () => {
+  const [model, setModel] = (0, import_react278.useState)(null);
+  const [loading, setLoading] = (0, import_react278.useState)(enabled);
+  const abortRef = (0, import_react278.useRef)(null);
+  const load = (0, import_react278.useCallback)(async () => {
     abortRef.current?.abort();
     const controller = new AbortController();
     abortRef.current = controller;
@@ -148869,7 +149389,7 @@ function useMlbLeagueOverviewCard(enabled = true) {
       if (!controller.signal.aborted) setLoading(false);
     }
   }, []);
-  (0, import_react276.useEffect)(() => {
+  (0, import_react278.useEffect)(() => {
     if (!enabled) {
       setLoading(false);
       return;
@@ -148885,11 +149405,11 @@ function useMlbLeagueOverviewCard(enabled = true) {
   }, [enabled, load]);
   return { model, loading };
 }
-var import_react276, REFRESH_MS4;
+var import_react278, REFRESH_MS4;
 var init_useMlbLeagueOverviewCard = __esm({
   "../grarf/desktop/src/hooks/useMlbLeagueOverviewCard.ts"() {
     init_define_import_meta_env();
-    import_react276 = __toESM(require_react(), 1);
+    import_react278 = __toESM(require_react(), 1);
     init_fetchMlbStatsApiStandings();
     init_fetchMlbStatsApiLeaders();
     init_mapMlbStandingsToLeagueOverviewCard();
@@ -148916,14 +149436,14 @@ function MlbCatchUpHomeSurface({
   gameWatchCoordination,
   onIntelligenceSelectGame
 }) {
-  const scrollRequestIdRef = (0, import_react277.useRef)(0);
-  const [scrollToPaneRequestId, setScrollToPaneRequestId] = (0, import_react277.useState)(0);
-  const prevSelectedGameIdRef = (0, import_react277.useRef)(null);
-  const requestGameWorkspaceScroll = (0, import_react277.useCallback)(() => {
+  const scrollRequestIdRef = (0, import_react279.useRef)(0);
+  const [scrollToPaneRequestId, setScrollToPaneRequestId] = (0, import_react279.useState)(0);
+  const prevSelectedGameIdRef = (0, import_react279.useRef)(null);
+  const requestGameWorkspaceScroll = (0, import_react279.useCallback)(() => {
     scrollRequestIdRef.current += 1;
     setScrollToPaneRequestId(scrollRequestIdRef.current);
   }, []);
-  const onGameSummaryHeadlineSelect = (0, import_react277.useCallback)(
+  const onGameSummaryHeadlineSelect = (0, import_react279.useCallback)(
     (gameId) => {
       prevSelectedGameIdRef.current = gameId;
       onSelectGame(gameId);
@@ -148933,7 +149453,7 @@ function MlbCatchUpHomeSurface({
   );
   const showGameWorkspace = activeWorkspace?.type === "game";
   const { model: leagueOverviewModel } = useMlbLeagueOverviewCard();
-  (0, import_react277.useEffect)(() => {
+  (0, import_react279.useEffect)(() => {
     if (!showGameWorkspace || !selectedGameId) return;
     if (prevSelectedGameIdRef.current === selectedGameId) return;
     prevSelectedGameIdRef.current = selectedGameId;
@@ -149041,11 +149561,11 @@ function MlbCatchUpHomeSurface({
     }
   );
 }
-var import_react277, import_jsx_runtime249, EMPTY_WORKSPACE_NAV, MLB_GAME_WORKSPACE_PANE_ID, CATCH_UP_GAME_WORKSPACE_PANE_RATIOS;
+var import_react279, import_jsx_runtime249, EMPTY_WORKSPACE_NAV, MLB_GAME_WORKSPACE_PANE_ID, CATCH_UP_GAME_WORKSPACE_PANE_RATIOS;
 var init_MlbCatchUpHomeSurface = __esm({
   "../grarf/desktop/src/components/mlb/MlbCatchUpHomeSurface.tsx"() {
     init_define_import_meta_env();
-    import_react277 = __toESM(require_react(), 1);
+    import_react279 = __toESM(require_react(), 1);
     init_LeagueHomePageLayout();
     init_LeagueHomePaneRail();
     init_LeagueHomeWebPane();
@@ -149080,14 +149600,14 @@ function MlbPreviewHomeSurface({
   gameWatchCoordination,
   onIntelligenceSelectGame
 }) {
-  const scrollRequestIdRef = (0, import_react278.useRef)(0);
-  const [scrollToPaneRequestId, setScrollToPaneRequestId] = (0, import_react278.useState)(0);
-  const prevSelectedGameIdRef = (0, import_react278.useRef)(null);
-  const requestGameWorkspaceScroll = (0, import_react278.useCallback)(() => {
+  const scrollRequestIdRef = (0, import_react280.useRef)(0);
+  const [scrollToPaneRequestId, setScrollToPaneRequestId] = (0, import_react280.useState)(0);
+  const prevSelectedGameIdRef = (0, import_react280.useRef)(null);
+  const requestGameWorkspaceScroll = (0, import_react280.useCallback)(() => {
     scrollRequestIdRef.current += 1;
     setScrollToPaneRequestId(scrollRequestIdRef.current);
   }, []);
-  const onGameSummaryHeadlineSelect = (0, import_react278.useCallback)(
+  const onGameSummaryHeadlineSelect = (0, import_react280.useCallback)(
     (gameId) => {
       prevSelectedGameIdRef.current = gameId;
       onSelectGame(gameId);
@@ -149097,7 +149617,7 @@ function MlbPreviewHomeSurface({
   );
   const showGameWorkspace = activeWorkspace?.type === "game";
   const { model: leagueOverviewModel } = useMlbLeagueOverviewCard();
-  (0, import_react278.useEffect)(() => {
+  (0, import_react280.useEffect)(() => {
     if (!showGameWorkspace || !selectedGameId) return;
     if (prevSelectedGameIdRef.current === selectedGameId) return;
     prevSelectedGameIdRef.current = selectedGameId;
@@ -149169,11 +149689,11 @@ function MlbPreviewHomeSurface({
     }
   );
 }
-var import_react278, import_jsx_runtime250, EMPTY_WORKSPACE_NAV2, MLB_GAME_WORKSPACE_PANE_ID2, PREVIEW_GAME_WORKSPACE_PANE_RATIOS, MLB_PREVIEW_PANES;
+var import_react280, import_jsx_runtime250, EMPTY_WORKSPACE_NAV2, MLB_GAME_WORKSPACE_PANE_ID2, PREVIEW_GAME_WORKSPACE_PANE_RATIOS, MLB_PREVIEW_PANES;
 var init_MlbPreviewHomeSurface = __esm({
   "../grarf/desktop/src/components/mlb/MlbPreviewHomeSurface.tsx"() {
     init_define_import_meta_env();
-    import_react278 = __toESM(require_react(), 1);
+    import_react280 = __toESM(require_react(), 1);
     init_LeagueHomePageLayout();
     init_LeagueHomePaneRail();
     init_LeagueHomeWebPane();
@@ -149721,23 +150241,23 @@ function writeCachedPreview(item) {
   }
 }
 function useMlbLineLabsPreview(enabled = true) {
-  const [authoritativePreview, setAuthoritativePreview] = (0, import_react279.useState)(
+  const [authoritativePreview, setAuthoritativePreview] = (0, import_react281.useState)(
     () => readCachedPreview()
   );
-  const [preview, setPreview] = (0, import_react279.useState)(() => readCachedPreview());
-  const [initialLoading, setInitialLoading] = (0, import_react279.useState)(() => readCachedPreview() == null);
-  const authRef = (0, import_react279.useRef)(authoritativePreview);
+  const [preview, setPreview] = (0, import_react281.useState)(() => readCachedPreview());
+  const [initialLoading, setInitialLoading] = (0, import_react281.useState)(() => readCachedPreview() == null);
+  const authRef = (0, import_react281.useRef)(authoritativePreview);
   authRef.current = authoritativePreview;
-  const loadPreview = (0, import_react279.useCallback)(async () => {
+  const loadPreview = (0, import_react281.useCallback)(async () => {
     const hadAuthoritative = authRef.current != null;
-    if (!hadAuthoritative) (0, import_react279.startTransition)(() => setInitialLoading(true));
+    if (!hadAuthoritative) (0, import_react281.startTransition)(() => setInitialLoading(true));
     try {
       const r3 = await fetchMlbLineLabsPreview();
       if (r3.ok) {
         const next = allGamesHighlightToCardItem(r3.video);
         if (isValidLineLabsPreview(next)) {
           writeCachedPreview(next);
-          (0, import_react279.startTransition)(() => {
+          (0, import_react281.startTransition)(() => {
             setAuthoritativePreview(next);
             setPreview(next);
             setInitialLoading(false);
@@ -149745,7 +150265,7 @@ function useMlbLineLabsPreview(enabled = true) {
           return;
         }
         if (authRef.current) {
-          (0, import_react279.startTransition)(() => {
+          (0, import_react281.startTransition)(() => {
             setPreview(authRef.current);
             setInitialLoading(false);
           });
@@ -149753,31 +150273,31 @@ function useMlbLineLabsPreview(enabled = true) {
         }
       }
       if (authRef.current) {
-        (0, import_react279.startTransition)(() => {
+        (0, import_react281.startTransition)(() => {
           setPreview(authRef.current);
           setInitialLoading(false);
         });
         return;
       }
-      (0, import_react279.startTransition)(() => {
+      (0, import_react281.startTransition)(() => {
         setPreview(null);
         setInitialLoading(false);
       });
     } catch {
       if (authRef.current) {
-        (0, import_react279.startTransition)(() => {
+        (0, import_react281.startTransition)(() => {
           setPreview(authRef.current);
           setInitialLoading(false);
         });
         return;
       }
-      (0, import_react279.startTransition)(() => {
+      (0, import_react281.startTransition)(() => {
         setPreview(null);
         setInitialLoading(false);
       });
     }
   }, []);
-  (0, import_react279.useEffect)(() => {
+  (0, import_react281.useEffect)(() => {
     if (!enabled) return;
     void loadPreview();
     const id = window.setInterval(() => {
@@ -149793,11 +150313,11 @@ function useMlbLineLabsPreview(enabled = true) {
   }, [enabled, loadPreview]);
   return { preview, authoritativePreview, initialLoading };
 }
-var import_react279, REFRESH_MS5, STORAGE_KEY12;
+var import_react281, REFRESH_MS5, STORAGE_KEY12;
 var init_useMlbLineLabsPreview = __esm({
   "../grarf/desktop/src/hooks/useMlbLineLabsPreview.ts"() {
     init_define_import_meta_env();
-    import_react279 = __toESM(require_react(), 1);
+    import_react281 = __toESM(require_react(), 1);
     init_youtubeAllGamesHighlight();
     init_operatorApi();
     init_youtubeLineLabsConfig();
@@ -150075,23 +150595,23 @@ var init_liveTrackMlbCatchUpIntent = __esm({
 function MLBPage() {
   const navigate = useNavigate();
   const mlbGames = useLiveGamesStore((s2) => s2.leagues.MLB);
-  const liveCount = (0, import_react280.useMemo)(() => mlbGames.filter((g2) => g2.status === "live").length, [mlbGames]);
-  const [lastClickedGameId, setLastClickedGameId] = (0, import_react280.useState)(null);
-  const [focusedCatchUpGameId, setFocusedCatchUpGameId] = (0, import_react280.useState)(null);
-  const [clipsRailMode, setClipsRailMode] = (0, import_react280.useState)("compact");
-  const [gameWatchActive, setGameWatchActive] = (0, import_react280.useState)(false);
-  const [gcProviderId, setGcProviderId] = (0, import_react280.useState)(void 0);
-  const [gameUtilityTab, setGameUtilityTab] = (0, import_react280.useState)("signals");
-  const [watchPicker, setWatchPicker] = (0, import_react280.useState)(null);
-  const [headerPrimaryTab, setHeaderPrimaryTab] = (0, import_react280.useState)("home");
+  const liveCount = (0, import_react282.useMemo)(() => mlbGames.filter((g2) => g2.status === "live").length, [mlbGames]);
+  const [lastClickedGameId, setLastClickedGameId] = (0, import_react282.useState)(null);
+  const [focusedCatchUpGameId, setFocusedCatchUpGameId] = (0, import_react282.useState)(null);
+  const [clipsRailMode, setClipsRailMode] = (0, import_react282.useState)("compact");
+  const [gameWatchActive, setGameWatchActive] = (0, import_react282.useState)(false);
+  const [gcProviderId, setGcProviderId] = (0, import_react282.useState)(void 0);
+  const [gameUtilityTab, setGameUtilityTab] = (0, import_react282.useState)("signals");
+  const [watchPicker, setWatchPicker] = (0, import_react282.useState)(null);
+  const [headerPrimaryTab, setHeaderPrimaryTab] = (0, import_react282.useState)("home");
   const showHomeSurface = headerPrimaryTab === "home";
-  const [nav, setNav] = (0, import_react280.useState)(() => defaultMlbNavState());
-  const [overlay, dispatchOverlay] = (0, import_react280.useReducer)(
+  const [nav, setNav] = (0, import_react282.useState)(() => defaultMlbNavState());
+  const [overlay, dispatchOverlay] = (0, import_react282.useReducer)(
     overlayWorkspaceReducer,
     void 0,
     initialOverlayWorkspaceState
   );
-  const selectedId = (0, import_react280.useMemo)(() => {
+  const selectedId = (0, import_react282.useMemo)(() => {
     if (focusedCatchUpGameId && mlbGames.some((g2) => g2.id === focusedCatchUpGameId)) {
       return focusedCatchUpGameId;
     }
@@ -150100,34 +150620,34 @@ function MLBPage() {
     if (lastClickedGameId && mlbGames.some((g2) => g2.id === lastClickedGameId)) return lastClickedGameId;
     return null;
   }, [mlbGames, focusedCatchUpGameId, lastClickedGameId, overlay]);
-  const openUrlWorkspaceTab = (0, import_react280.useCallback)(
+  const openUrlWorkspaceTab = (0, import_react282.useCallback)(
     (tab) => {
       dispatchOverlay({ type: "open", tab });
     },
     [dispatchOverlay]
   );
   useWorkspaceUrlLauncher(openUrlWorkspaceTab);
-  const activeWorkspace = (0, import_react280.useMemo)(() => resolveMlbActiveWorkspace(nav, overlay), [nav, overlay]);
+  const activeWorkspace = (0, import_react282.useMemo)(() => resolveMlbActiveWorkspace(nav, overlay), [nav, overlay]);
   const operationalMode = useOperationalModeStore((s2) => s2.mode);
   const showMlbCatchUpHome = showHomeSurface && operationalMode === "CATCH_UP";
   const showMlbPreviewHome = showHomeSurface && operationalMode === "PREPARE";
   const showMlbLeagueHomeSurface = showMlbCatchUpHome || showMlbPreviewHome;
-  (0, import_react280.useEffect)(() => {
+  (0, import_react282.useEffect)(() => {
     if (!showMlbLeagueHomeSurface) return;
     void window.grarf?.workspaceEmbedClear?.("center");
     void window.grarf?.workspaceEmbedClear?.("centerChild");
   }, [showMlbLeagueHomeSurface]);
-  (0, import_react280.useEffect)(() => {
+  (0, import_react282.useEffect)(() => {
     if (showMlbLeagueHomeSurface) return;
     setFocusedCatchUpGameId(null);
   }, [showMlbLeagueHomeSurface]);
-  const catchUpFocusedWorkspace = (0, import_react280.useMemo)(() => {
+  const catchUpFocusedWorkspace = (0, import_react282.useMemo)(() => {
     if (!focusedCatchUpGameId) return null;
     const game = resolveMlbGameRow(focusedCatchUpGameId, mlbGames);
     if (!game) return null;
     return buildMlbGameWorkspaceTab(game, { startInWatchMode: false });
   }, [focusedCatchUpGameId, mlbGames]);
-  const catchUpActiveWorkspace = (0, import_react280.useMemo)(() => {
+  const catchUpActiveWorkspace = (0, import_react282.useMemo)(() => {
     if (!showMlbLeagueHomeSurface) return null;
     if (overlay.activeId && activeWorkspace) return activeWorkspace;
     return catchUpFocusedWorkspace;
@@ -150137,17 +150657,17 @@ function MLBPage() {
     activeWorkspace: centerActiveWorkspace,
     fallbackLeagueKey: "MLB"
   });
-  const statusLabel = (0, import_react280.useMemo)(() => mlbWorkspaceStatusLabel(nav, overlay), [nav, overlay]);
-  const catchUpStatusLabel = (0, import_react280.useMemo)(() => {
+  const statusLabel = (0, import_react282.useMemo)(() => mlbWorkspaceStatusLabel(nav, overlay), [nav, overlay]);
+  const catchUpStatusLabel = (0, import_react282.useMemo)(() => {
     if (catchUpActiveWorkspace?.title) return catchUpActiveWorkspace.title;
     return "Select a game from the spine";
   }, [catchUpActiveWorkspace?.title]);
-  const mlbCatchUpFullOverlayWorkspace = (0, import_react280.useMemo)(() => {
+  const mlbCatchUpFullOverlayWorkspace = (0, import_react282.useMemo)(() => {
     if (!showMlbCatchUpHome || !overlay.activeId || !activeWorkspace) return null;
     if (activeWorkspace.type === "game") return null;
     return activeWorkspace;
   }, [showMlbCatchUpHome, overlay.activeId, activeWorkspace]);
-  const mlbCatchUpRailWorkspace = (0, import_react280.useMemo)(() => {
+  const mlbCatchUpRailWorkspace = (0, import_react282.useMemo)(() => {
     if (!showMlbCatchUpHome) return null;
     if (mlbCatchUpFullOverlayWorkspace) return catchUpFocusedWorkspace;
     return catchUpActiveWorkspace;
@@ -150157,7 +150677,7 @@ function MLBPage() {
     catchUpFocusedWorkspace,
     catchUpActiveWorkspace
   ]);
-  const mlbCatchUpOverlayStatusLabel = (0, import_react280.useMemo)(() => {
+  const mlbCatchUpOverlayStatusLabel = (0, import_react282.useMemo)(() => {
     if (mlbCatchUpFullOverlayWorkspace?.title) return mlbCatchUpFullOverlayWorkspace.title;
     return catchUpStatusLabel;
   }, [mlbCatchUpFullOverlayWorkspace, catchUpStatusLabel]);
@@ -150168,18 +150688,18 @@ function MLBPage() {
     "mlb_utility_rail"
   );
   const utilityLiveStateLabel = (canonicalActiveGame && buildCanonicalLiveStateLabel(canonicalActiveGame)) ?? activeGamePayload?.liveStateLabel;
-  const utilityRailActiveGame = (0, import_react280.useMemo)(
+  const utilityRailActiveGame = (0, import_react282.useMemo)(
     () => activeGamePayload?.gameId ? mlbGames.find((game) => game.id === activeGamePayload.gameId) ?? null : null,
     [activeGamePayload?.gameId, mlbGames]
   );
-  const webGameTeamLabels = (0, import_react280.useMemo)(() => {
+  const webGameTeamLabels = (0, import_react282.useMemo)(() => {
     if (!isGrarfWebRenderer2() || !utilityRailActiveGame) return void 0;
     return {
       away: utilityRailActiveGame.awayTeam.trim().toUpperCase() || "AWAY",
       home: utilityRailActiveGame.homeTeam.trim().toUpperCase() || "HOME"
     };
   }, [utilityRailActiveGame]);
-  (0, import_react280.useEffect)(() => {
+  (0, import_react282.useEffect)(() => {
     if (!activeGamePayload) {
       setGameWatchActive(false);
       setGcProviderId(void 0);
@@ -150188,7 +150708,7 @@ function MLBPage() {
     setGcProviderId(activeGamePayload.defaultGamecenterProvider);
     setGameWatchActive(!!activeGamePayload.startInWatchMode);
   }, [activeGamePayload?.gameId, activeGamePayload?.startInWatchMode]);
-  (0, import_react280.useEffect)(() => {
+  (0, import_react282.useEffect)(() => {
     if (centerActiveWorkspace?.type !== "game" || !activeGamePayload) return;
     const gc = activeGamePayload.gamecenterProviders.find(
       (p2) => p2.id === (gcProviderId ?? activeGamePayload.defaultGamecenterProvider)
@@ -150230,14 +150750,14 @@ function MLBPage() {
     selectedGamecenterProviderId: gcProviderId,
     onGamecenterProviderChange: setGcProviderId
   } : void 0;
-  const subnavItems = (0, import_react280.useMemo)(() => mlbSubnavForCategory(nav.categoryId), [nav.categoryId]);
-  const signalSuggestedScope = (0, import_react280.useMemo)(() => {
+  const subnavItems = (0, import_react282.useMemo)(() => mlbSubnavForCategory(nav.categoryId), [nav.categoryId]);
+  const signalSuggestedScope = (0, import_react282.useMemo)(() => {
     return centerActiveWorkspace?.type === "game" ? "game" : "league";
   }, [centerActiveWorkspace?.type]);
-  const gameSignalContextLabel = (0, import_react280.useMemo)(() => {
+  const gameSignalContextLabel = (0, import_react282.useMemo)(() => {
     return centerActiveWorkspace?.type === "game" ? centerActiveWorkspace.title : void 0;
   }, [centerActiveWorkspace]);
-  const gameStoryAction = (0, import_react280.useMemo)(() => {
+  const gameStoryAction = (0, import_react282.useMemo)(() => {
     const g2 = resolveMlbGameRow(selectedId ?? "", mlbGames);
     const story = g2?.content?.stories?.[0];
     if (!g2?.externalIds?.mlb || !story?.storyUrl) return null;
@@ -150262,21 +150782,21 @@ function MLBPage() {
       }
     };
   }, [mlbGames, selectedId]);
-  (0, import_react280.useEffect)(() => {
+  (0, import_react282.useEffect)(() => {
     setGameUtilityTab("signals");
   }, [activeGamePayload?.gameId]);
-  (0, import_react280.useEffect)(() => {
+  (0, import_react282.useEffect)(() => {
     if (!showLeagueMediaStrip) setClipsRailExpanded(false);
   }, [showLeagueMediaStrip]);
-  (0, import_react280.useEffect)(() => {
+  (0, import_react282.useEffect)(() => {
     return () => {
       void window.grarf?.workspaceEmbedClear?.("center");
     };
   }, []);
-  const clearOverlayToBuiltin = (0, import_react280.useCallback)(() => {
+  const clearOverlayToBuiltin = (0, import_react282.useCallback)(() => {
     dispatchOverlay({ type: "select", id: null });
   }, []);
-  const onCategorySelect = (0, import_react280.useCallback)(
+  const onCategorySelect = (0, import_react282.useCallback)(
     (id) => {
       if (!isMlbCategoryId(id)) return;
       setNav((prev) => ({
@@ -150287,14 +150807,14 @@ function MLBPage() {
     },
     [clearOverlayToBuiltin]
   );
-  const onSubnavSelect = (0, import_react280.useCallback)(
+  const onSubnavSelect = (0, import_react282.useCallback)(
     (id) => {
       setNav((prev) => ({ ...prev, categoryId: "news", newsSourceId: id }));
       clearOverlayToBuiltin();
     },
     [clearOverlayToBuiltin]
   );
-  const headerActivePrimaryId = (0, import_react280.useMemo)(() => {
+  const headerActivePrimaryId = (0, import_react282.useMemo)(() => {
     if (headerPrimaryTab === "home" && !overlay.activeId) return "home";
     if (headerPrimaryTab === "games") return "games";
     const MAP = {
@@ -150305,7 +150825,7 @@ function MLBPage() {
     return MAP[nav.categoryId] ?? headerPrimaryTab;
   }, [headerPrimaryTab, overlay.activeId, nav.categoryId]);
   const headerActiveSubNavId = showHomeSurface || nav.categoryId !== "news" ? null : nav.newsSourceId;
-  const onHeaderPrimarySelect = (0, import_react280.useCallback)(
+  const onHeaderPrimarySelect = (0, import_react282.useCallback)(
     (id) => {
       setHeaderPrimaryTab(id);
       if (id === "home") {
@@ -150326,14 +150846,14 @@ function MLBPage() {
     },
     [onCategorySelect, clearOverlayToBuiltin]
   );
-  const onHeaderSubNavSelect = (0, import_react280.useCallback)(
+  const onHeaderSubNavSelect = (0, import_react282.useCallback)(
     (id) => {
       setHeaderPrimaryTab("news");
       onSubnavSelect(id);
     },
     [onSubnavSelect]
   );
-  const onSelectGame = (0, import_react280.useCallback)(
+  const onSelectGame = (0, import_react282.useCallback)(
     (gameId) => {
       setLastClickedGameId(gameId);
       const game = resolveMlbGameRow(gameId, mlbGames);
@@ -150379,13 +150899,13 @@ function MLBPage() {
   const leadingSpineGameId = useLeadingOperationalSpineGameId("MLB");
   const isMlbGamesCatchUp = headerPrimaryTab === "games" && operationalMode === "CATCH_UP";
   useGamesCatchUpAutoSelect(isMlbGamesCatchUp, leadingSpineGameId, onSelectGame);
-  (0, import_react280.useEffect)(() => {
+  (0, import_react282.useEffect)(() => {
     const gameId = consumeLiveTrackMlbCatchUpGameIntent();
     if (!gameId) return;
     setHeaderPrimaryTab("home");
     onSelectGame(gameId);
   }, [onSelectGame]);
-  const onWatchLive = (0, import_react280.useCallback)(
+  const onWatchLive = (0, import_react282.useCallback)(
     (gameId) => {
       setLastClickedGameId(gameId);
       const game = resolveMlbGameRow(gameId, mlbGames);
@@ -150398,7 +150918,7 @@ function MLBPage() {
     },
     [mlbGames, dispatchOverlay]
   );
-  const operationalAlertActions = (0, import_react280.useMemo)(
+  const operationalAlertActions = (0, import_react282.useMemo)(
     () => ({
       openGame: onSelectGame,
       watchDispatch: dispatchOverlay
@@ -150406,7 +150926,7 @@ function MLBPage() {
     [onSelectGame, dispatchOverlay]
   );
   useOperationalAlertActionsRegistration(operationalAlertActions);
-  const onWatchOptionChosen = (0, import_react280.useCallback)(
+  const onWatchOptionChosen = (0, import_react282.useCallback)(
     (opt) => {
       if (!watchPicker) return;
       executeWatchOption(watchPicker.game, opt, dispatchOverlay);
@@ -150414,7 +150934,7 @@ function MLBPage() {
     },
     [watchPicker, dispatchOverlay]
   );
-  const onTickerNavigate = (0, import_react280.useCallback)(
+  const onTickerNavigate = (0, import_react282.useCallback)(
     (p2) => {
       if (p2.tickerTargetType === "article") {
         const url = p2.articleUrl ?? (p2.nav.kind === "article" ? p2.nav.url : null);
@@ -150445,7 +150965,7 @@ function MLBPage() {
     },
     [mlbGames, navigate, dispatchOverlay]
   );
-  const onOpenLiveShow = (0, import_react280.useCallback)((req) => {
+  const onOpenLiveShow = (0, import_react282.useCallback)((req) => {
     if (isDemoDanLeBatardShowWatchRequest(req.channelId)) {
       const tab = buildDemoDanLeBatardUrlWorkspaceTab(req.title);
       if (tab) openUrlWorkspaceTab(tab);
@@ -150464,7 +150984,7 @@ function MLBPage() {
       }
     });
   }, []);
-  const onOpenIntelligence = (0, import_react280.useCallback)((briefingId, title) => {
+  const onOpenIntelligence = (0, import_react282.useCallback)((briefingId, title) => {
     dispatchOverlay({
       type: "open",
       tab: buildIntelligenceWorkspaceTab(briefingId, title)
@@ -150475,13 +150995,13 @@ function MLBPage() {
     openGame: onSelectGame,
     openIntelBriefing: onOpenIntelligence
   });
-  const onOpenYoutubeWorkspace = (0, import_react280.useCallback)((title, videoId) => {
+  const onOpenYoutubeWorkspace = (0, import_react282.useCallback)((title, videoId) => {
     void clearWorkspaceEmbedsForYoutubeLaunch();
     const tab = buildYoutubeWorkspaceTab(title, videoId, { idPrefix: "mlb-yt" });
     if (!tab) return;
     dispatchOverlay({ type: "open", tab });
   }, []);
-  const onOpenMlbAllGamesYoutubeWorkspace = (0, import_react280.useCallback)((title, videoId) => {
+  const onOpenMlbAllGamesYoutubeWorkspace = (0, import_react282.useCallback)((title, videoId) => {
     void clearWorkspaceEmbedsForYoutubeLaunch();
     const tab = buildYoutubeWorkspaceTab(title, videoId, {
       idPrefix: "mlb-yt",
@@ -150491,7 +151011,7 @@ function MLBPage() {
     if (!tab) return;
     dispatchOverlay({ type: "open", tab });
   }, []);
-  const onIntelligenceSelectGame = (0, import_react280.useCallback)(
+  const onIntelligenceSelectGame = (0, import_react282.useCallback)(
     (gameId) => {
       const game = resolveMlbGameRow(gameId, mlbGames);
       if (!game) return;
@@ -150501,7 +151021,7 @@ function MLBPage() {
     },
     [mlbGames]
   );
-  const onOpenSpotifyWorkspace = (0, import_react280.useCallback)((payload) => {
+  const onOpenSpotifyWorkspace = (0, import_react282.useCallback)((payload) => {
     const tab = {
       id: `mlb-spotify-${Date.now()}`,
       type: "spotify",
@@ -150511,7 +151031,7 @@ function MLBPage() {
     };
     dispatchOverlay({ type: "open", tab });
   }, []);
-  const onReturnToLeagueFromSocialRail = (0, import_react280.useCallback)(() => {
+  const onReturnToLeagueFromSocialRail = (0, import_react282.useCallback)(() => {
     if (centerActiveWorkspace?.type !== "game") return;
     setGameWatchActive(false);
     clearCenterEmbedForSpineGameSelect();
@@ -150533,7 +151053,7 @@ function MLBPage() {
     overlay.activeId,
     overlay.tabs
   ]);
-  const socialRailHierarchyHeader = (0, import_react280.useMemo)(
+  const socialRailHierarchyHeader = (0, import_react282.useMemo)(
     () => /* @__PURE__ */ (0, import_jsx_runtime260.jsx)(
       SocialRailHierarchyHeader,
       {
@@ -150749,11 +151269,11 @@ function MLBPage() {
     ) : null
   ] });
 }
-var import_react280, import_jsx_runtime260, EMPTY_WORKSPACE_NAV3;
+var import_react282, import_jsx_runtime260, EMPTY_WORKSPACE_NAV3;
 var init_MLBPage = __esm({
   "../grarf/desktop/src/pages/MLBPage.tsx"() {
     init_define_import_meta_env();
-    import_react280 = __toESM(require_react(), 1);
+    import_react282 = __toESM(require_react(), 1);
     init_dist();
     init_LeaguePageHeader();
     init_LeagueHomePageLayout();
@@ -150859,20 +151379,20 @@ var init_WNBAPage = __esm({
 // ../grarf/desktop/src/pages/F1Page.tsx
 function F1Page() {
   const games = useLiveGamesStore((s2) => s2.leagues.F1 ?? []);
-  const liveCount = (0, import_react281.useMemo)(() => games.filter((g2) => g2.status === "live").length, [games]);
-  const [lastClickedGameId, setLastClickedGameId] = (0, import_react281.useState)(null);
-  const [watchPicker, setWatchPicker] = (0, import_react281.useState)(null);
-  const [, dispatchOverlay] = (0, import_react281.useReducer)(
+  const liveCount = (0, import_react283.useMemo)(() => games.filter((g2) => g2.status === "live").length, [games]);
+  const [lastClickedGameId, setLastClickedGameId] = (0, import_react283.useState)(null);
+  const [watchPicker, setWatchPicker] = (0, import_react283.useState)(null);
+  const [, dispatchOverlay] = (0, import_react283.useReducer)(
     overlayWorkspaceReducer,
     void 0,
     initialOverlayWorkspaceState
   );
-  const selectedId = (0, import_react281.useMemo)(() => {
+  const selectedId = (0, import_react283.useMemo)(() => {
     if (games.length === 0) return null;
     if (lastClickedGameId && games.some((g2) => g2.id === lastClickedGameId)) return lastClickedGameId;
     return games[0].id;
   }, [games, lastClickedGameId]);
-  const selectedGame = (0, import_react281.useMemo)(
+  const selectedGame = (0, import_react283.useMemo)(
     () => games.find((g2) => g2.id === selectedId) ?? null,
     [games, selectedId]
   );
@@ -150881,12 +151401,12 @@ function F1Page() {
     activeWorkspace: null,
     fallbackLeagueKey: "F1"
   });
-  (0, import_react281.useEffect)(() => {
+  (0, import_react283.useEffect)(() => {
     return () => {
       void window.grarf?.workspaceEmbedClear?.("center");
     };
   }, []);
-  const onSelectGame = (0, import_react281.useCallback)((gameId) => {
+  const onSelectGame = (0, import_react283.useCallback)((gameId) => {
     setLastClickedGameId(gameId);
   }, []);
   useBrowserHistoryNavigation({
@@ -150895,7 +151415,7 @@ function F1Page() {
     openIntelBriefing: (_briefingId, _title) => {
     }
   });
-  const onWatchLive = (0, import_react281.useCallback)(
+  const onWatchLive = (0, import_react283.useCallback)(
     (gameId) => {
       setLastClickedGameId(gameId);
       const game = games.find((g2) => g2.id === gameId);
@@ -150908,7 +151428,7 @@ function F1Page() {
     },
     [games, dispatchOverlay]
   );
-  const operationalAlertActions = (0, import_react281.useMemo)(
+  const operationalAlertActions = (0, import_react283.useMemo)(
     () => ({
       openGame: onSelectGame,
       watchDispatch: dispatchOverlay
@@ -150916,7 +151436,7 @@ function F1Page() {
     [onSelectGame, dispatchOverlay]
   );
   useOperationalAlertActionsRegistration(operationalAlertActions);
-  const onWatchOptionChosen = (0, import_react281.useCallback)(
+  const onWatchOptionChosen = (0, import_react283.useCallback)(
     (opt) => {
       if (!watchPicker) return;
       executeWatchOption(watchPicker.game, opt, dispatchOverlay);
@@ -150982,11 +151502,11 @@ function F1Page() {
     ) : null
   ] });
 }
-var import_react281, import_jsx_runtime265, F1_CHANNEL_URL, APPLE_TV_PARTITION;
+var import_react283, import_jsx_runtime265, F1_CHANNEL_URL, APPLE_TV_PARTITION;
 var init_F1Page = __esm({
   "../grarf/desktop/src/pages/F1Page.tsx"() {
     init_define_import_meta_env();
-    import_react281 = __toESM(require_react(), 1);
+    import_react283 = __toESM(require_react(), 1);
     init_LeaguePageHeader();
     init_useOperationalAlertActionsRegistration();
     init_LeagueGamesContextColumn();
@@ -151965,7 +152485,7 @@ function SavedLeaguesBrowser({
   onDraftChange,
   onDelete
 }) {
-  const leagues = (0, import_react282.useMemo)(() => {
+  const leagues = (0, import_react284.useMemo)(() => {
     const rows = listManualGamesSpineLeagues(document2);
     const sortedKeys = sortGrarfLeagueKeysByImportance(
       rows.map((row) => row.league)
@@ -151973,12 +152493,12 @@ function SavedLeaguesBrowser({
     const byKey = new Map(rows.map((row) => [row.league, row]));
     return sortedKeys.map((key2) => byKey.get(key2)).filter((row) => row != null);
   }, [document2]);
-  const [expandedByLeague, setExpandedByLeague] = (0, import_react282.useState)({});
-  (0, import_react282.useEffect)(() => {
+  const [expandedByLeague, setExpandedByLeague] = (0, import_react284.useState)({});
+  (0, import_react284.useEffect)(() => {
     if (!editingLeagueKey) return;
     setExpandedByLeague((prev) => ({ ...prev, [editingLeagueKey]: true }));
   }, [editingLeagueKey]);
-  const toggleExpanded = (0, import_react282.useCallback)(
+  const toggleExpanded = (0, import_react284.useCallback)(
     (leagueName) => {
       if (editingLeagueKey === leagueName) return;
       setExpandedByLeague((prev) => ({
@@ -152176,11 +152696,11 @@ function SavedLeaguesBrowser({
     }) })
   ] });
 }
-var import_react282, import_jsx_runtime268;
+var import_react284, import_jsx_runtime268;
 var init_SavedLeaguesBrowser = __esm({
   "../grarf/desktop/src/components/gamesSpineAdmin/SavedLeaguesBrowser.tsx"() {
     init_define_import_meta_env();
-    import_react282 = __toESM(require_react(), 1);
+    import_react284 = __toESM(require_react(), 1);
     init_cn();
     init_leaguePriority();
     init_gamesSpineManualLeagueDocument();
@@ -152196,47 +152716,47 @@ var init_SavedLeaguesBrowser = __esm({
 function GamesSpineAdminPanel() {
   const storedDocument = useGamesSpineManualStore((state3) => state3.document);
   const setDocument = useGamesSpineManualStore((state3) => state3.setDocument);
-  const importRef = (0, import_react283.useRef)(null);
-  const [savedDocument, setSavedDocument] = (0, import_react283.useState)(
+  const importRef = (0, import_react285.useRef)(null);
+  const [savedDocument, setSavedDocument] = (0, import_react285.useState)(
     storedDocument ?? { leagues: [] }
   );
-  const [importJsonText, setImportJsonText] = (0, import_react283.useState)("");
-  const [editingLeagueKey, setEditingLeagueKey] = (0, import_react283.useState)(null);
-  const [draftLeague, setDraftLeague] = (0, import_react283.useState)(null);
-  const [deletingLeague, setDeletingLeague] = (0, import_react283.useState)(null);
-  const [savingVisualLeague, setSavingVisualLeague] = (0, import_react283.useState)(false);
-  const [validationMessage, setValidationMessage] = (0, import_react283.useState)(null);
-  const [actionError, setActionError] = (0, import_react283.useState)(null);
-  const [busy, setBusy] = (0, import_react283.useState)(null);
-  const [savedAt, setSavedAt] = (0, import_react283.useState)(null);
-  const [pendingImport, setPendingImport] = (0, import_react283.useState)(null);
-  const parsedImportPreview = (0, import_react283.useMemo)(
+  const [importJsonText, setImportJsonText] = (0, import_react285.useState)("");
+  const [editingLeagueKey, setEditingLeagueKey] = (0, import_react285.useState)(null);
+  const [draftLeague, setDraftLeague] = (0, import_react285.useState)(null);
+  const [deletingLeague, setDeletingLeague] = (0, import_react285.useState)(null);
+  const [savingVisualLeague, setSavingVisualLeague] = (0, import_react285.useState)(false);
+  const [validationMessage, setValidationMessage] = (0, import_react285.useState)(null);
+  const [actionError, setActionError] = (0, import_react285.useState)(null);
+  const [busy, setBusy] = (0, import_react285.useState)(null);
+  const [savedAt, setSavedAt] = (0, import_react285.useState)(null);
+  const [pendingImport, setPendingImport] = (0, import_react285.useState)(null);
+  const parsedImportPreview = (0, import_react285.useMemo)(
     () => parseGamesSpineManualLeagueEditorJson(importJsonText),
     [importJsonText]
   );
-  const syncPersistedDocument = (0, import_react283.useCallback)(
+  const syncPersistedDocument = (0, import_react285.useCallback)(
     (document2) => {
       setSavedDocument(document2);
       setDocument(document2);
     },
     [setDocument]
   );
-  const refreshPersistedDocument = (0, import_react283.useCallback)(async () => {
+  const refreshPersistedDocument = (0, import_react285.useCallback)(async () => {
     const document2 = await loadManualGamesSpineDocument();
     syncPersistedDocument(document2);
     return document2;
   }, [syncPersistedDocument]);
-  (0, import_react283.useEffect)(() => {
+  (0, import_react285.useEffect)(() => {
     void refreshPersistedDocument().catch(() => {
     });
   }, [refreshPersistedDocument]);
-  const cancelVisualEdit = (0, import_react283.useCallback)(() => {
+  const cancelVisualEdit = (0, import_react285.useCallback)(() => {
     setEditingLeagueKey(null);
     setDraftLeague(null);
     setValidationMessage("Edit cancelled \u2014 no changes saved");
     setActionError(null);
   }, []);
-  const onValidateImport = (0, import_react283.useCallback)(() => {
+  const onValidateImport = (0, import_react285.useCallback)(() => {
     setBusy("validate");
     setActionError(null);
     setPendingImport(null);
@@ -152251,7 +152771,7 @@ function GamesSpineAdminPanel() {
     }
     setBusy(null);
   }, [importJsonText]);
-  const executeImport = (0, import_react283.useCallback)(
+  const executeImport = (0, import_react285.useCallback)(
     async (league2, mode) => {
       setBusy("save");
       setActionError(null);
@@ -152285,7 +152805,7 @@ function GamesSpineAdminPanel() {
     },
     [syncPersistedDocument]
   );
-  const onImportLeague = (0, import_react283.useCallback)(async () => {
+  const onImportLeague = (0, import_react285.useCallback)(async () => {
     setBusy("save");
     setActionError(null);
     setPendingImport(null);
@@ -152311,7 +152831,7 @@ function GamesSpineAdminPanel() {
     }
     await executeImport(result.league, "create");
   }, [importJsonText, savedDocument, executeImport]);
-  const onLoadCurrent = (0, import_react283.useCallback)(async () => {
+  const onLoadCurrent = (0, import_react285.useCallback)(async () => {
     if (editingLeagueKey) {
       setActionError("Cancel the current visual edit before reloading from storage");
       return;
@@ -152330,14 +152850,14 @@ function GamesSpineAdminPanel() {
       setBusy(null);
     }
   }, [refreshPersistedDocument, editingLeagueKey]);
-  const onClearImport = (0, import_react283.useCallback)(() => {
+  const onClearImport = (0, import_react285.useCallback)(() => {
     setImportJsonText("");
     setPendingImport(null);
     setValidationMessage("Import form cleared");
     setActionError(null);
     setSavedAt(null);
   }, []);
-  const onStartEdit = (0, import_react283.useCallback)(
+  const onStartEdit = (0, import_react285.useCallback)(
     (leagueName) => {
       const league2 = findManualGamesSpineLeague(savedDocument, leagueName);
       if (!league2) return;
@@ -152348,7 +152868,7 @@ function GamesSpineAdminPanel() {
     },
     [savedDocument]
   );
-  const onSaveVisualLeague = (0, import_react283.useCallback)(async () => {
+  const onSaveVisualLeague = (0, import_react285.useCallback)(async () => {
     if (!draftLeague || !editingLeagueKey) return;
     setSavingVisualLeague(true);
     setActionError(null);
@@ -152376,7 +152896,7 @@ function GamesSpineAdminPanel() {
       setSavingVisualLeague(false);
     }
   }, [draftLeague, editingLeagueKey, syncPersistedDocument]);
-  const onDeleteLeague = (0, import_react283.useCallback)(
+  const onDeleteLeague = (0, import_react285.useCallback)(
     async (leagueName) => {
       const existing = findManualGamesSpineLeague(savedDocument, leagueName);
       if (!existing) {
@@ -152549,11 +153069,11 @@ function GamesSpineAdminPanel() {
     )
   ] }) });
 }
-var import_react283, import_jsx_runtime269;
+var import_react285, import_jsx_runtime269;
 var init_GamesSpineAdminPanel = __esm({
   "../grarf/desktop/src/components/gamesSpineAdmin/GamesSpineAdminPanel.tsx"() {
     init_define_import_meta_env();
-    import_react283 = __toESM(require_react(), 1);
+    import_react285 = __toESM(require_react(), 1);
     init_gamesSpineManualAdminPersistence();
     init_gamesSpineManualLeagueDocument();
     init_validateGamesSpineManualDocument();
@@ -152602,18 +153122,18 @@ function SportscapeEditorialManualAiBriefEntry({
   onEntrySaved,
   onAiBriefSelectionChange
 }) {
-  const [leagueName, setLeagueName] = (0, import_react284.useState)("");
-  const [quickPick, setQuickPick] = (0, import_react284.useState)("");
-  const [headline, setHeadline] = (0, import_react284.useState)("");
-  const [articleUrl, setArticleUrl] = (0, import_react284.useState)("");
-  const [highlightUrl, setHighlightUrl] = (0, import_react284.useState)("");
-  const [highlightsVideoThumbnailUrl, setHighlightsVideoThumbnailUrl] = (0, import_react284.useState)("");
-  const [rank, setRank] = (0, import_react284.useState)(String(suggestedRank));
-  const [busy, setBusy] = (0, import_react284.useState)(false);
-  const [error, setError] = (0, import_react284.useState)(null);
-  const [lastEventId, setLastEventId] = (0, import_react284.useState)(null);
-  const [lastPublishMode, setLastPublishMode] = (0, import_react284.useState)(null);
-  const leagueSuggestions = (0, import_react284.useMemo)(() => {
+  const [leagueName, setLeagueName] = (0, import_react286.useState)("");
+  const [quickPick, setQuickPick] = (0, import_react286.useState)("");
+  const [headline, setHeadline] = (0, import_react286.useState)("");
+  const [articleUrl, setArticleUrl] = (0, import_react286.useState)("");
+  const [highlightUrl, setHighlightUrl] = (0, import_react286.useState)("");
+  const [highlightsVideoThumbnailUrl, setHighlightsVideoThumbnailUrl] = (0, import_react286.useState)("");
+  const [rank, setRank] = (0, import_react286.useState)(String(suggestedRank));
+  const [busy, setBusy] = (0, import_react286.useState)(false);
+  const [error, setError] = (0, import_react286.useState)(null);
+  const [lastEventId, setLastEventId] = (0, import_react286.useState)(null);
+  const [lastPublishMode, setLastPublishMode] = (0, import_react286.useState)(null);
+  const leagueSuggestions = (0, import_react286.useMemo)(() => {
     const seen = /* @__PURE__ */ new Set();
     const next = [];
     for (const label of SPORTSCAPE_EDITORIAL_MANUAL_LEAGUE_QUICK_PICKS) {
@@ -152628,7 +153148,7 @@ function SportscapeEditorialManualAiBriefEntry({
       return a2.localeCompare(b2);
     });
   }, []);
-  const quickPickOptions = (0, import_react284.useMemo)(() => {
+  const quickPickOptions = (0, import_react286.useMemo)(() => {
     const keys = Object.keys(
       SPORTSCAPE_EDITORIAL_SOURCE_LEAGUES
     );
@@ -152890,11 +153410,11 @@ function SportscapeEditorialManualAiBriefEntry({
     ] })
   ] });
 }
-var import_react284, import_jsx_runtime270, INPUT_CLASS, LABEL_CLASS, LEAGUE_NAME_DATALIST_ID;
+var import_react286, import_jsx_runtime270, INPUT_CLASS, LABEL_CLASS, LEAGUE_NAME_DATALIST_ID;
 var init_SportscapeEditorialManualAiBriefEntry = __esm({
   "../grarf/desktop/src/components/sportscapeEditorial/SportscapeEditorialManualAiBriefEntry.tsx"() {
     init_define_import_meta_env();
-    import_react284 = __toESM(require_react(), 1);
+    import_react286 = __toESM(require_react(), 1);
     init_cn();
     init_leaguePriority();
     init_sportscapeEditorialAiBriefSelectionUtils();
@@ -152917,7 +153437,7 @@ function SportscapeEditorialAiBriefSummary({
   clearBusy,
   error
 }) {
-  const [confirmClear, setConfirmClear] = (0, import_react285.useState)(false);
+  const [confirmClear, setConfirmClear] = (0, import_react287.useState)(false);
   const controlsDisabled = clearBusy || removingLineId !== null;
   const handleClearClick = () => {
     if (lines.length === 0) return;
@@ -152978,11 +153498,11 @@ function SportscapeEditorialAiBriefSummary({
     error ? /* @__PURE__ */ (0, import_jsx_runtime271.jsx)("p", { className: "mt-3 text-[11px] text-redsys", children: error }) : null
   ] });
 }
-var import_react285, import_jsx_runtime271;
+var import_react287, import_jsx_runtime271;
 var init_SportscapeEditorialAiBriefSummary = __esm({
   "../grarf/desktop/src/components/sportscapeEditorial/SportscapeEditorialAiBriefSummary.tsx"() {
     init_define_import_meta_env();
-    import_react285 = __toESM(require_react(), 1);
+    import_react287 = __toESM(require_react(), 1);
     init_lucide_react();
     init_cn();
     import_jsx_runtime271 = __toESM(require_jsx_runtime(), 1);
@@ -153211,23 +153731,23 @@ function SportscapeEditorialEventRow({
   onAiBriefSelectionChange
 }) {
   const defaults = event.sportscapeDefaults;
-  const [headline, setHeadline] = (0, import_react286.useState)(
+  const [headline, setHeadline] = (0, import_react288.useState)(
     existing?.headline ?? defaults?.headline ?? ""
   );
-  const [articleUrl, setArticleUrl] = (0, import_react286.useState)(
+  const [articleUrl, setArticleUrl] = (0, import_react288.useState)(
     existing?.articleUrl ?? defaults?.articleUrl ?? ""
   );
-  const [highlightUrl, setHighlightUrl] = (0, import_react286.useState)(
+  const [highlightUrl, setHighlightUrl] = (0, import_react288.useState)(
     existing?.highlightUrl ?? defaults?.highlightUrl ?? ""
   );
-  const [includeInAiBrief, setIncludeInAiBrief] = (0, import_react286.useState)(Boolean(aiBriefSelection));
-  const [rank, setRank] = (0, import_react286.useState)(String(aiBriefSelection?.rank ?? suggestedRank));
-  const [busy, setBusy] = (0, import_react286.useState)(false);
-  const [aiBriefBusy, setAiBriefBusy] = (0, import_react286.useState)(false);
-  const [error, setError] = (0, import_react286.useState)(null);
-  const [aiBriefError, setAiBriefError] = (0, import_react286.useState)(null);
-  const [savedAt, setSavedAt] = (0, import_react286.useState)(existing?.updatedAt ?? null);
-  (0, import_react286.useEffect)(() => {
+  const [includeInAiBrief, setIncludeInAiBrief] = (0, import_react288.useState)(Boolean(aiBriefSelection));
+  const [rank, setRank] = (0, import_react288.useState)(String(aiBriefSelection?.rank ?? suggestedRank));
+  const [busy, setBusy] = (0, import_react288.useState)(false);
+  const [aiBriefBusy, setAiBriefBusy] = (0, import_react288.useState)(false);
+  const [error, setError] = (0, import_react288.useState)(null);
+  const [aiBriefError, setAiBriefError] = (0, import_react288.useState)(null);
+  const [savedAt, setSavedAt] = (0, import_react288.useState)(existing?.updatedAt ?? null);
+  (0, import_react288.useEffect)(() => {
     setHeadline(existing?.headline ?? defaults?.headline ?? "");
     setArticleUrl(existing?.articleUrl ?? defaults?.articleUrl ?? "");
     setHighlightUrl(existing?.highlightUrl ?? defaults?.highlightUrl ?? "");
@@ -153242,11 +153762,11 @@ function SportscapeEditorialEventRow({
     defaults?.articleUrl,
     defaults?.highlightUrl
   ]);
-  (0, import_react286.useEffect)(() => {
+  (0, import_react288.useEffect)(() => {
     setIncludeInAiBrief(Boolean(aiBriefSelection));
     setRank(String(aiBriefSelection?.rank ?? suggestedRank));
   }, [aiBriefSelection?.id, aiBriefSelection?.rank, suggestedRank]);
-  const dirty = (0, import_react286.useMemo)(
+  const dirty = (0, import_react288.useMemo)(
     () => headline !== (existing?.headline ?? defaults?.headline ?? "") || articleUrl !== (existing?.articleUrl ?? defaults?.articleUrl ?? "") || highlightUrl !== (existing?.highlightUrl ?? defaults?.highlightUrl ?? ""),
     [headline, articleUrl, highlightUrl, existing, defaults]
   );
@@ -153431,11 +153951,11 @@ function SportscapeEditorialEventRow({
     )
   ] });
 }
-var import_react286, import_jsx_runtime272;
+var import_react288, import_jsx_runtime272;
 var init_SportscapeEditorialEventRow = __esm({
   "../grarf/desktop/src/components/sportscapeEditorial/SportscapeEditorialEventRow.tsx"() {
     init_define_import_meta_env();
-    import_react286 = __toESM(require_react(), 1);
+    import_react288 = __toESM(require_react(), 1);
     init_cn();
     init_sportscapeEditorialAiBriefSelectionUtils();
     init_sportscapeEditorialApi();
@@ -153453,13 +153973,13 @@ function SportscapeEditorialLeagueSection({
   onEntrySaved,
   onAiBriefSelectionChange
 }) {
-  const [expanded, setExpanded] = (0, import_react287.useState)(() => {
+  const [expanded, setExpanded] = (0, import_react289.useState)(() => {
     if (!isSportscapeEditorialLeagueKey(league2)) return true;
     return !SPORTSCAPE_EDITORIAL_LEAGUES_COLLAPSED_BY_DEFAULT.has(league2);
   });
   const highlightSource = isSportscapeEditorialLeagueKey(league2) ? getSportscapeEditorialHighlightSource(league2) : null;
   const label = resolveSportscapeEditorialLeagueDisplayLabel(league2);
-  const highlightLabel = (0, import_react287.useMemo)(() => {
+  const highlightLabel = (0, import_react289.useMemo)(() => {
     if (!highlightSource) return null;
     try {
       const host = new URL(highlightSource.highlightsUrl).hostname.replace(/^www\./, "");
@@ -153529,11 +154049,11 @@ function SportscapeEditorialLeagueSection({
     ] }) : null
   ] });
 }
-var import_react287, import_jsx_runtime273;
+var import_react289, import_jsx_runtime273;
 var init_SportscapeEditorialLeagueSection = __esm({
   "../grarf/desktop/src/components/sportscapeEditorial/SportscapeEditorialLeagueSection.tsx"() {
     init_define_import_meta_env();
-    import_react287 = __toESM(require_react(), 1);
+    import_react289 = __toESM(require_react(), 1);
     init_cn();
     init_canonical();
     init_collectSportscapeAdminEventsFromWebSportscape();
@@ -153546,15 +154066,15 @@ var init_SportscapeEditorialLeagueSection = __esm({
 
 // ../grarf/desktop/src/components/sportscapeEditorial/SportscapeEditorialPasswordGate.tsx
 function SportscapeEditorialPasswordGate({ children }) {
-  const [authed, setAuthed] = (0, import_react288.useState)(() => isSportscapeAdminAuthed());
+  const [authed, setAuthed] = (0, import_react290.useState)(() => isSportscapeAdminAuthed());
   if (authed) return /* @__PURE__ */ (0, import_jsx_runtime274.jsx)(import_jsx_runtime274.Fragment, { children });
   return /* @__PURE__ */ (0, import_jsx_runtime274.jsx)("div", { className: "flex min-h-screen items-center justify-center bg-[#020404] px-4", children: /* @__PURE__ */ (0, import_jsx_runtime274.jsx)("div", { className: "w-full max-w-sm border border-line/60 bg-panel2 p-6 shadow-lg", children: /* @__PURE__ */ (0, import_jsx_runtime274.jsx)(SportscapeEditorialPasswordForm, { onSuccess: () => setAuthed(true) }) }) });
 }
-var import_react288, import_jsx_runtime274;
+var import_react290, import_jsx_runtime274;
 var init_SportscapeEditorialPasswordGate = __esm({
   "../grarf/desktop/src/components/sportscapeEditorial/SportscapeEditorialPasswordGate.tsx"() {
     init_define_import_meta_env();
-    import_react288 = __toESM(require_react(), 1);
+    import_react290 = __toESM(require_react(), 1);
     init_sportscapeEditorialAdminAuth();
     init_SportscapeEditorialPasswordForm();
     import_jsx_runtime274 = __toESM(require_jsx_runtime(), 1);
@@ -153580,13 +154100,13 @@ function useSportscapeAdminEvents(options) {
   const worldCupGameScoresByEventId = useWorldCupSportscapeGameScores(liveLeagues);
   const mcwsSportscapeArticles = useMcwsSportscapeArticles();
   const mcwsGameScoresByEventId = useMcwsSportscapeGameScores();
-  const [feedsSettled, setFeedsSettled] = (0, import_react289.useState)(false);
-  (0, import_react289.useEffect)(() => {
+  const [feedsSettled, setFeedsSettled] = (0, import_react291.useState)(false);
+  (0, import_react291.useEffect)(() => {
     const timer = window.setTimeout(() => setFeedsSettled(true), 5e3);
     return () => window.clearTimeout(timer);
   }, []);
-  const gamesByEventId = (0, import_react289.useMemo)(() => buildEventIdGameIndex(liveLeagues), [liveLeagues]);
-  const mergedArticlesByLeague = (0, import_react289.useMemo)(() => {
+  const gamesByEventId = (0, import_react291.useMemo)(() => buildEventIdGameIndex(liveLeagues), [liveLeagues]);
+  const mergedArticlesByLeague = (0, import_react291.useMemo)(() => {
     return {
       MLB: mergeSportscapeArticlesWithEditorial({
         automatic: mlbSportscapeArticles,
@@ -153632,7 +154152,7 @@ function useSportscapeAdminEvents(options) {
     worldCupGameScoresByEventId,
     mcwsGameScoresByEventId
   ]);
-  const events = (0, import_react289.useMemo)(
+  const events = (0, import_react291.useMemo)(
     () => collectSportscapeAdminEventsFromWebSportscape({
       mergedArticlesByLeague,
       editorialEntries,
@@ -153640,7 +154160,7 @@ function useSportscapeAdminEvents(options) {
     }),
     [mergedArticlesByLeague, editorialEntries, gamesByEventId]
   );
-  const automatedArticleCount = (0, import_react289.useMemo)(
+  const automatedArticleCount = (0, import_react291.useMemo)(
     () => countAutomatedArticles(mergedArticlesByLeague),
     [mergedArticlesByLeague]
   );
@@ -153655,11 +154175,11 @@ function useSportscapeAdminEvents(options) {
     automatedArticleCount
   };
 }
-var import_react289;
+var import_react291;
 var init_useSportscapeAdminEvents = __esm({
   "../grarf/desktop/src/hooks/useSportscapeAdminEvents.ts"() {
     init_define_import_meta_env();
-    import_react289 = __toESM(require_react(), 1);
+    import_react291 = __toESM(require_react(), 1);
     init_useMcwsSportscapeArticles();
     init_useMcwsSportscapeGameScores();
     init_useMlbSportscapeArticles();
@@ -153721,15 +154241,15 @@ function buildAiBriefSelectionsByEventId(selections) {
 }
 function SportscapeEditorialAdminContent() {
   const updatedAt = useLiveGamesStore((state3) => state3.updatedAt);
-  const [entriesByEventId, setEntriesByEventId] = (0, import_react290.useState)(
+  const [entriesByEventId, setEntriesByEventId] = (0, import_react292.useState)(
     /* @__PURE__ */ new Map()
   );
-  const [aiBriefSelectionsByEventId, setAiBriefSelectionsByEventId] = (0, import_react290.useState)(/* @__PURE__ */ new Map());
-  const [loadError, setLoadError] = (0, import_react290.useState)(null);
-  const [aiBriefActionError, setAiBriefActionError] = (0, import_react290.useState)(null);
-  const [removingLineId, setRemovingLineId] = (0, import_react290.useState)(null);
-  const [clearBusy, setClearBusy] = (0, import_react290.useState)(false);
-  const editorialEntries = (0, import_react290.useMemo)(
+  const [aiBriefSelectionsByEventId, setAiBriefSelectionsByEventId] = (0, import_react292.useState)(/* @__PURE__ */ new Map());
+  const [loadError, setLoadError] = (0, import_react292.useState)(null);
+  const [aiBriefActionError, setAiBriefActionError] = (0, import_react292.useState)(null);
+  const [removingLineId, setRemovingLineId] = (0, import_react292.useState)(null);
+  const [clearBusy, setClearBusy] = (0, import_react292.useState)(false);
+  const editorialEntries = (0, import_react292.useMemo)(
     () => [...entriesByEventId.values()],
     [entriesByEventId]
   );
@@ -153740,7 +154260,7 @@ function SportscapeEditorialAdminContent() {
     operationalDateKey,
     automatedArticleCount
   } = useSportscapeAdminEvents({ editorialEntries });
-  (0, import_react290.useEffect)(() => {
+  (0, import_react292.useEffect)(() => {
     void fetchSportscapeEditorialDocument().then((document2) => {
       const nextEntries = /* @__PURE__ */ new Map();
       for (const entry2 of document2.entries) {
@@ -153752,20 +154272,20 @@ function SportscapeEditorialAdminContent() {
       setLoadError(err instanceof Error ? err.message : "Unable to load editorial data");
     });
   }, []);
-  const sortedEvents = (0, import_react290.useMemo)(() => sortSportscapeEditorialAdminEvents(events), [events]);
-  const grouped = (0, import_react290.useMemo)(
+  const sortedEvents = (0, import_react292.useMemo)(() => sortSportscapeEditorialAdminEvents(events), [events]);
+  const grouped = (0, import_react292.useMemo)(
     () => groupSportscapeEditorialEventsByLeague(sortedEvents),
     [sortedEvents]
   );
-  const leagueSections = (0, import_react290.useMemo)(
+  const leagueSections = (0, import_react292.useMemo)(
     () => listSportscapeEditorialAdminLeagueSections(grouped),
     [grouped]
   );
-  const suggestedRank = (0, import_react290.useMemo)(
+  const suggestedRank = (0, import_react292.useMemo)(
     () => suggestNextAiBriefRank(aiBriefSelectionsByEventId.values()),
     [aiBriefSelectionsByEventId]
   );
-  const headlineByEventId = (0, import_react290.useMemo)(() => {
+  const headlineByEventId = (0, import_react292.useMemo)(() => {
     const next = /* @__PURE__ */ new Map();
     for (const event of events) {
       const existing = resolveEditorialEntryForAdminEvent(event, entriesByEventId);
@@ -153780,11 +154300,11 @@ function SportscapeEditorialAdminContent() {
     }
     return next;
   }, [events, entriesByEventId]);
-  const existingEditorialEventIds = (0, import_react290.useMemo)(
+  const existingEditorialEventIds = (0, import_react292.useMemo)(
     () => [...entriesByEventId.keys()],
     [entriesByEventId]
   );
-  const aiBriefSummaryLines = (0, import_react290.useMemo)(
+  const aiBriefSummaryLines = (0, import_react292.useMemo)(
     () => buildAiBriefSummaryLines({
       selections: [...aiBriefSelectionsByEventId.values()],
       headlineByEventId
@@ -153895,15 +154415,15 @@ function SportscapeEditorialAdminContent() {
   ] });
 }
 function SportscapeEditorialAdminPage() {
-  const [activeTab, setActiveTab] = (0, import_react290.useState)("sportscape");
-  (0, import_react290.useEffect)(() => {
+  const [activeTab, setActiveTab] = (0, import_react292.useState)("sportscape");
+  (0, import_react292.useEffect)(() => {
     const previousTitle = document.title;
     document.title = "Admin GRARF";
     return () => {
       document.title = previousTitle;
     };
   }, []);
-  (0, import_react290.useEffect)(() => {
+  (0, import_react292.useEffect)(() => {
     const root = document.getElementById("grarf-web-root");
     if (!root) return;
     const previousClassName = root.className;
@@ -153918,11 +154438,11 @@ function SportscapeEditorialAdminPage() {
     activeTab === "sportscape" ? /* @__PURE__ */ (0, import_jsx_runtime275.jsx)(SportscapeEditorialAdminContent, {}) : /* @__PURE__ */ (0, import_jsx_runtime275.jsx)(GamesSpineAdminPlaceholder, {})
   ] });
 }
-var import_react290, import_jsx_runtime275;
+var import_react292, import_jsx_runtime275;
 var init_SportscapeEditorialAdminPage = __esm({
   "../grarf/desktop/src/pages/SportscapeEditorialAdminPage.tsx"() {
     init_define_import_meta_env();
-    import_react290 = __toESM(require_react(), 1);
+    import_react292 = __toESM(require_react(), 1);
     init_LiveGamesBridge();
     init_GamesSpineAdminPanel();
     init_SportscapeEditorialManualAiBriefEntry();
@@ -153943,24 +154463,24 @@ var init_SportscapeEditorialAdminPage = __esm({
 // ../grarf/desktop/src/components/adminMode/AdminModeOverlay.tsx
 function AdminModeOverlay() {
   const { isAdminMode, enterAdminMode, exitAdminMode } = useAdminModeStore();
-  const [passwordPromptOpen, setPasswordPromptOpen] = (0, import_react291.useState)(false);
-  const [isAuthed, setIsAuthed] = (0, import_react291.useState)(isGrarfAdmin);
-  const refreshAuthState = (0, import_react291.useCallback)(() => {
+  const [passwordPromptOpen, setPasswordPromptOpen] = (0, import_react293.useState)(false);
+  const [isAuthed, setIsAuthed] = (0, import_react293.useState)(isGrarfAdmin);
+  const refreshAuthState = (0, import_react293.useCallback)(() => {
     setIsAuthed(isGrarfAdmin());
   }, []);
-  const requestEnterAdminMode = (0, import_react291.useCallback)(() => {
+  const requestEnterAdminMode = (0, import_react293.useCallback)(() => {
     if (isGrarfAdmin()) {
       enterAdminMode();
       return;
     }
     setPasswordPromptOpen(true);
   }, [enterAdminMode]);
-  const onAdminAuthed = (0, import_react291.useCallback)(() => {
+  const onAdminAuthed = (0, import_react293.useCallback)(() => {
     setPasswordPromptOpen(false);
     refreshAuthState();
     enterAdminMode();
   }, [enterAdminMode, refreshAuthState]);
-  (0, import_react291.useEffect)(() => {
+  (0, import_react293.useEffect)(() => {
     function onKeyDown(e2) {
       if ((e2.metaKey || e2.ctrlKey) && e2.shiftKey && e2.key === "A") {
         e2.preventDefault();
@@ -153974,7 +154494,7 @@ function AdminModeOverlay() {
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [exitAdminMode, isAdminMode, requestEnterAdminMode]);
-  (0, import_react291.useEffect)(() => {
+  (0, import_react293.useEffect)(() => {
     refreshAuthState();
   }, [isAdminMode, passwordPromptOpen, refreshAuthState]);
   if (!isGrarfWebRenderer2()) return null;
@@ -154034,11 +154554,11 @@ function AdminModeOverlay() {
     ] }) })
   ] });
 }
-var import_react291, import_jsx_runtime276;
+var import_react293, import_jsx_runtime276;
 var init_AdminModeOverlay = __esm({
   "../grarf/desktop/src/components/adminMode/AdminModeOverlay.tsx"() {
     init_define_import_meta_env();
-    import_react291 = __toESM(require_react(), 1);
+    import_react293 = __toESM(require_react(), 1);
     init_grarfAdminFlag();
     init_isGrarfWebRenderer();
     init_adminModeStore();
@@ -154119,7 +154639,7 @@ function activateAdminEntry() {
   }
 }
 function AdminEntryPasswordGate({ children }) {
-  const [authed, setAuthed] = (0, import_react292.useState)(() => !isAdminHtmlEntry2() || isSportscapeAdminAuthed());
+  const [authed, setAuthed] = (0, import_react294.useState)(() => !isAdminHtmlEntry2() || isSportscapeAdminAuthed());
   if (!authed) {
     return /* @__PURE__ */ (0, import_jsx_runtime277.jsx)("div", { className: "flex min-h-screen items-center justify-center bg-[#020404] px-4", children: /* @__PURE__ */ (0, import_jsx_runtime277.jsx)("div", { className: "w-full max-w-sm border border-line/60 bg-panel2 p-6 shadow-lg", children: /* @__PURE__ */ (0, import_jsx_runtime277.jsx)(
       SportscapeEditorialPasswordForm,
@@ -154138,7 +154658,7 @@ function AdminEntryPasswordGate({ children }) {
   return /* @__PURE__ */ (0, import_jsx_runtime277.jsx)(import_jsx_runtime277.Fragment, { children });
 }
 function IntelligenceSyncBridge() {
-  (0, import_react292.useEffect)(() => bindIntelligenceStoreUpdates(), []);
+  (0, import_react294.useEffect)(() => bindIntelligenceStoreUpdates(), []);
   return null;
 }
 function WebHomeApp() {
@@ -154165,7 +154685,7 @@ function mountWebHome(container) {
     reactRoot = (0, import_client.createRoot)(container);
   }
   reactRoot.render(
-    /* @__PURE__ */ (0, import_jsx_runtime277.jsx)(import_react292.StrictMode, { children: /* @__PURE__ */ (0, import_jsx_runtime277.jsx)(BrowserRouter, { children: /* @__PURE__ */ (0, import_jsx_runtime277.jsx)(AdminEntryPasswordGate, { children: /* @__PURE__ */ (0, import_jsx_runtime277.jsx)(WebHomeApp, {}) }) }) })
+    /* @__PURE__ */ (0, import_jsx_runtime277.jsx)(import_react294.StrictMode, { children: /* @__PURE__ */ (0, import_jsx_runtime277.jsx)(BrowserRouter, { children: /* @__PURE__ */ (0, import_jsx_runtime277.jsx)(AdminEntryPasswordGate, { children: /* @__PURE__ */ (0, import_jsx_runtime277.jsx)(WebHomeApp, {}) }) }) })
   );
 }
 async function bootDesktopWebClient(container) {
@@ -154177,14 +154697,14 @@ async function bootDesktopWebClient(container) {
   }
   mountWebHome(container);
 }
-var import_react292, import_client, import_jsx_runtime277, reactRoot, appShellRouteElements, adminAppShellRouteElements;
+var import_react294, import_client, import_jsx_runtime277, reactRoot, appShellRouteElements, adminAppShellRouteElements;
 var init_desktop_bootstrap = __esm({
   "webapp/desktop-bootstrap.tsx"() {
     init_define_import_meta_env();
     init_gamesSpineBootstrap();
     init_grarf_web_shim();
     init_bootLiveTrack();
-    import_react292 = __toESM(require_react());
+    import_react294 = __toESM(require_react());
     import_client = __toESM(require_client());
     init_dist();
     init_AnalyticsProvider();
