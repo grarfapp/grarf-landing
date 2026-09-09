@@ -113642,6 +113642,9 @@ function attachArticleSelectionListeners(listenerKey, wv, onArticleRoute, initia
     window.removeEventListener("message", onEmbedNavigateMessage);
   });
 }
+function cardArticleListenerKey(sessionKey) {
+  return `${sessionKey}::card`;
+}
 function focusArticleRouteHandler(sessionKey) {
   return (articleUrl) => {
     useHomeSourceFocusStore.getState().setSelectedArticle(sessionKey, articleUrl);
@@ -113692,6 +113695,12 @@ function acquireHomeSourceCardWebview(sessionKey, host, embedSrc, partition) {
 function registerHomeSourceCardHost(sessionKey, host) {
   if (host) cardHosts.set(sessionKey, host);
   else cardHosts.delete(sessionKey);
+}
+function bindHomeSourceCardArticleNavigation(sessionKey, wv, onArticleNavigate) {
+  const listenerKey = cardArticleListenerKey(sessionKey);
+  detachArticleSelectionListeners(listenerKey);
+  if (!wv || !onArticleNavigate) return;
+  attachArticleSelectionListeners(listenerKey, wv, onArticleNavigate);
 }
 function resolveEntryUrl(sessionKey, fallbackUrl) {
   const card = cardWebviews.get(sessionKey);
@@ -141713,6 +141722,15 @@ var init_SportsBrowserPrototypeBottomRailGames = __esm({
   }
 });
 
+// ../grarf/desktop/src/lib/home/newsBrowserFocusSession.ts
+var NEWS_BROWSER_FOCUS_SESSION_KEY;
+var init_newsBrowserFocusSession = __esm({
+  "../grarf/desktop/src/lib/home/newsBrowserFocusSession.ts"() {
+    init_define_import_meta_env();
+    NEWS_BROWSER_FOCUS_SESSION_KEY = "news-main";
+  }
+});
+
 // ../grarf/desktop/src/components/homeMvp/SportsBrowserPrototypeBrowserHistoryControls.tsx
 function SportsBrowserPrototypeBrowserHistoryControls({
   canGoBack = false,
@@ -141777,6 +141795,7 @@ function SportsBrowserPrototypeBrowserPane({
   paneId,
   isActive = true,
   showActiveTreatment = false,
+  articleFocusSessionKey = null,
   onActivate,
   onNavStateChange,
   registerActiveWebview,
@@ -141784,10 +141803,25 @@ function SportsBrowserPrototypeBrowserPane({
 }) {
   const activeUrl = url?.trim() ?? "";
   const partition = (0, import_react254.useMemo)(
-    () => activeUrl ? homeSourceFocusArticlePartition(activeUrl) : "",
+    () => activeUrl ? homeSourceWebPartition(activeUrl) : "",
     [activeUrl]
   );
+  const selectedArticleUrl = useHomeSourceFocusStore(
+    (state3) => articleFocusSessionKey ? state3.selectedArticleUrlBySession[articleFocusSessionKey] ?? null : null
+  );
+  const split = Boolean(articleFocusSessionKey && selectedArticleUrl);
   const webviewRef = (0, import_react254.useRef)(null);
+  const onArticleRoute = (0, import_react254.useCallback)(
+    (articleUrl) => {
+      if (!articleFocusSessionKey) return;
+      useHomeSourceFocusStore.getState().setSelectedArticle(articleFocusSessionKey, articleUrl);
+    },
+    [articleFocusSessionKey]
+  );
+  const onCloseArticlePane = (0, import_react254.useCallback)(() => {
+    if (!articleFocusSessionKey) return;
+    useHomeSourceFocusStore.getState().clearSelectedArticle(articleFocusSessionKey);
+  }, [articleFocusSessionKey]);
   const activatePane = (0, import_react254.useCallback)(() => {
     onActivate?.();
   }, [onActivate]);
@@ -141811,6 +141845,26 @@ function SportsBrowserPrototypeBrowserPane({
     void window.grarf?.workspaceEmbedClear?.("center");
     void window.grarf?.workspaceEmbedClear?.("centerChild");
   }, [activeUrl]);
+  (0, import_react254.useLayoutEffect)(() => {
+    if (!articleFocusSessionKey) return;
+    useHomeSourceFocusStore.getState().clearSelectedArticle(articleFocusSessionKey);
+  }, [activeUrl, articleFocusSessionKey]);
+  (0, import_react254.useLayoutEffect)(() => {
+    if (!articleFocusSessionKey || !activeUrl) {
+      if (articleFocusSessionKey) {
+        bindHomeSourceCardArticleNavigation(articleFocusSessionKey, null);
+      }
+      return;
+    }
+    bindHomeSourceCardArticleNavigation(
+      articleFocusSessionKey,
+      webviewRef.current,
+      onArticleRoute
+    );
+    return () => {
+      bindHomeSourceCardArticleNavigation(articleFocusSessionKey, null);
+    };
+  }, [articleFocusSessionKey, activeUrl, partition, onArticleRoute]);
   (0, import_react254.useLayoutEffect)(() => {
     if (!activeUrl) return;
     const webview = webviewRef.current;
@@ -141861,6 +141915,7 @@ function SportsBrowserPrototypeBrowserPane({
     return () => webview.removeEventListener("focus", onFocus);
   }, [onActivate, activeUrl, partition]);
   (0, import_react254.useLayoutEffect)(() => {
+    if (articleFocusSessionKey) return;
     const webview = webviewRef.current;
     if (!webview || !activeUrl) return;
     const onNewWindow = (event) => {
@@ -141876,7 +141931,7 @@ function SportsBrowserPrototypeBrowserPane({
     };
     webview.addEventListener("new-window", onNewWindow);
     return () => webview.removeEventListener("new-window", onNewWindow);
-  }, [activeUrl, partition]);
+  }, [activeUrl, partition, articleFocusSessionKey]);
   if (!activeUrl || !hasWebviewTag5()) {
     return /* @__PURE__ */ (0, import_jsx_runtime223.jsx)(
       "div",
@@ -141895,19 +141950,54 @@ function SportsBrowserPrototypeBrowserPane({
       className: paneShellClass,
       "data-sports-browser-prototype-browser-pane": paneId,
       "data-sports-browser-prototype-browser-pane-active": isActive ? "true" : "false",
+      "data-sports-browser-prototype-article-split": split ? "true" : "false",
       onPointerDown: activatePane,
-      children: /* @__PURE__ */ (0, import_jsx_runtime223.jsx)("div", { className: cn2(PANE_EMBED_HOST, "h-full w-full bg-black"), children: /* @__PURE__ */ (0, import_jsx_runtime223.jsx)(
-        "webview",
+      children: /* @__PURE__ */ (0, import_jsx_runtime223.jsxs)(
+        "div",
         {
-          ref: setWebviewRef,
-          src: activeUrl,
-          partition,
-          webpreferences: WEBVIEW_WEB_PREFS2,
-          allowpopups: "true",
-          className: cn2(PANE_EMBED_ABSOLUTE_FILL, "border-0 bg-white")
-        },
-        `${paneId ?? "primary"}-${activeUrl}`
-      ) })
+          className: cn2(
+            PANE_CONTENT_CONTAIN,
+            "h-full min-h-0 w-full",
+            split ? "grid grid-cols-[35%_65%]" : ""
+          ),
+          children: [
+            /* @__PURE__ */ (0, import_jsx_runtime223.jsx)(
+              "div",
+              {
+                className: cn2(
+                  PANE_EMBED_HOST,
+                  "relative h-full min-h-0 w-full bg-black",
+                  split && "border-r border-[#c8c4bc]/70"
+                ),
+                children: /* @__PURE__ */ (0, import_jsx_runtime223.jsx)(
+                  "webview",
+                  {
+                    ref: setWebviewRef,
+                    src: activeUrl,
+                    partition,
+                    webpreferences: WEBVIEW_WEB_PREFS2,
+                    allowpopups: "true",
+                    className: cn2(PANE_EMBED_ABSOLUTE_FILL, "border-0 bg-white")
+                  },
+                  `${paneId ?? "primary"}-${activeUrl}`
+                )
+              }
+            ),
+            split && selectedArticleUrl ? /* @__PURE__ */ (0, import_jsx_runtime223.jsxs)("div", { className: "flex min-h-0 min-w-0 flex-col bg-black", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime223.jsx)("div", { className: "flex h-7 shrink-0 items-center justify-end border-b border-[#c8c4bc]/70 bg-[#050808] px-2", children: /* @__PURE__ */ (0, import_jsx_runtime223.jsx)(
+                "button",
+                {
+                  type: "button",
+                  onClick: onCloseArticlePane,
+                  className: "shrink-0 border border-[#c8c4bc]/80 px-2 py-0.5 font-mono text-[9px] tracking-[0.14em] text-[#a5b8b8] transition hover:border-cyansys/40 hover:text-cyansys",
+                  children: "CLOSE"
+                }
+              ) }),
+              /* @__PURE__ */ (0, import_jsx_runtime223.jsx)(HomeSourceFocusArticlePane, { url: selectedArticleUrl })
+            ] }) : null
+          ]
+        }
+      )
     }
   );
 }
@@ -141917,10 +142007,13 @@ var init_SportsBrowserPrototypeBrowserPane = __esm({
     init_define_import_meta_env();
     import_react254 = __toESM(require_react(), 1);
     init_cn();
+    init_homeSourceFocusSourceSession();
     init_homeSourceWebPartition();
     init_homeSourceWebviewNavigation();
     init_openExternal();
     init_paneContainment();
+    init_homeSourceFocusStore();
+    init_HomeSourceFocusArticlePane();
     init_CenterPanePlaceholderSurface();
     import_jsx_runtime223 = __toESM(require_jsx_runtime(), 1);
     WEBVIEW_WEB_PREFS2 = "contextIsolation=yes,nodeIntegration=no,javascript=yes";
@@ -142051,6 +142144,7 @@ function SportsBrowserPrototypeBrowserWorkspace({
                 url: paneUrls[index] ?? null,
                 isActive: activePaneIndex === index,
                 showActiveTreatment: splitPaneMode,
+                articleFocusSessionKey: index === 0 ? NEWS_BROWSER_FOCUS_SESSION_KEY : null,
                 onActivate: () => activatePane(index),
                 onNavStateChange: activePaneIndex === index ? onNavStateChange : void 0,
                 registerActiveWebview: activePaneIndex === index ? registerActiveWebview : void 0,
@@ -142071,6 +142165,7 @@ var init_SportsBrowserPrototypeBrowserWorkspace = __esm({
     import_react255 = __toESM(require_react(), 1);
     init_cn();
     init_homeSourceWebviewNavigation();
+    init_newsBrowserFocusSession();
     init_SportsBrowserPrototypeBrowserHistoryControls();
     init_SportsBrowserPrototypeBrowserPane();
     import_jsx_runtime224 = __toESM(require_jsx_runtime(), 1);
