@@ -15553,11 +15553,11 @@ var require_react_dom_client_production = __commonJS({
         }
     }
     var clz32 = Math.clz32 ? Math.clz32 : clz32Fallback;
-    var log = Math.log;
+    var log2 = Math.log;
     var LN2 = Math.LN2;
     function clz32Fallback(x2) {
       x2 >>>= 0;
-      return 0 === x2 ? 32 : 31 - (log(x2) / LN2 | 0) | 0;
+      return 0 === x2 ? 32 : 31 - (log2(x2) / LN2 | 0) | 0;
     }
     var nextTransitionUpdateLane = 256;
     var nextTransitionDeferredLane = 262144;
@@ -41593,7 +41593,7 @@ var init_tickerEventQueueStore = __esm({
 // ../grarf/desktop/src/lib/perf/perfDiagnostics.ts
 function initPerfDiagnostics() {
   if (!define_import_meta_env_default.DEV) return;
-  const log = () => {
+  const log2 = () => {
     const tickerSize = useTickerEventQueue.getState().events.length;
     const mem = typeof performance !== "undefined" && "memory" in performance ? performance.memory : void 0;
     const heapMb = mem ? Math.round(mem.usedJSHeapSize / 1024 / 1024) : null;
@@ -41605,8 +41605,8 @@ function initPerfDiagnostics() {
       heapMb
     });
   };
-  window.setInterval(log, 6e4);
-  log();
+  window.setInterval(log2, 6e4);
+  log2();
 }
 var renderCount;
 var init_perfDiagnostics = __esm({
@@ -76226,10 +76226,10 @@ var init_projectGameTimeline = __esm({
 
 // ../grarf/desktop/src/lib/timeline/timelineVerification.ts
 function logGameTimelineSnapshot(gameId) {
-  const timeline = projectGameTimeline(gameId);
-  console.log("[GameTimeline] gameId:", timeline.gameId);
-  console.log("[GameTimeline] entry count:", timeline.entries.length);
-  console.log("[GameTimeline] entries:", timeline.entries);
+  const timeline2 = projectGameTimeline(gameId);
+  console.log("[GameTimeline] gameId:", timeline2.gameId);
+  console.log("[GameTimeline] entry count:", timeline2.entries.length);
+  console.log("[GameTimeline] entries:", timeline2.entries);
 }
 function exposeTimelineForVerification() {
   if (typeof window === "undefined") return;
@@ -113508,6 +113508,226 @@ var init_homeSourceWebviewUrl = __esm({
   }
 });
 
+// ../grarf/desktop/src/lib/home/newsBrowser3565Diagnostics.ts
+function stamp() {
+  return (/* @__PURE__ */ new Date()).toISOString();
+}
+function log(event, payload = {}) {
+  const entry2 = { t: stamp(), event, ...payload };
+  timeline.push(entry2);
+  console.log(LOG_PREFIX2, event, payload);
+}
+function diagWebviewId(wv) {
+  if (!wv) return "webview:null";
+  let id = webviewDiagIds.get(wv);
+  if (!id) {
+    id = `wv-${nextDiagId++}`;
+    webviewDiagIds.set(wv, id);
+    try {
+      wv.setAttribute("data-grarf-diag-webview-id", id);
+    } catch {
+    }
+  }
+  return id;
+}
+function diagWebviewSnapshot(wv) {
+  if (!wv) return { id: "webview:null" };
+  let guestUrl = "";
+  let canGoBack = false;
+  let canGoForward = false;
+  try {
+    guestUrl = wv.getURL?.() ?? readHomeSourceWebviewUrl(wv);
+  } catch {
+    guestUrl = readHomeSourceWebviewUrl(wv);
+  }
+  try {
+    canGoBack = wv.canGoBack?.() ?? false;
+  } catch {
+  }
+  try {
+    canGoForward = wv.canGoForward?.() ?? false;
+  } catch {
+  }
+  return {
+    id: diagWebviewId(wv),
+    domConnected: wv.isConnected,
+    parentTag: wv.parentElement?.tagName ?? null,
+    srcAttr: wv.getAttribute("src"),
+    guestUrl,
+    canGoBack,
+    canGoForward
+  };
+}
+async function diagReadGuestScroll(wv) {
+  if (!wv?.executeJavaScript) return null;
+  try {
+    const raw = await wv.executeJavaScript(
+      `(function(){return{x:Math.round(window.scrollX||0),y:Math.round(window.scrollY||0)};})()`
+    );
+    if (!raw || typeof raw !== "object") return null;
+    const x2 = Number(raw.x);
+    const y2 = Number(raw.y);
+    if (!Number.isFinite(x2) || !Number.isFinite(y2)) return null;
+    return { x: x2, y: y2 };
+  } catch {
+    return null;
+  }
+}
+function diagLog(event, payload = {}) {
+  log(event, payload);
+}
+function diagLogWebview(event, wv, extra = {}) {
+  log(event, { ...diagWebviewSnapshot(wv), ...extra });
+}
+async function diagLogWebviewWithScroll(event, wv, extra = {}) {
+  const scroll = await diagReadGuestScroll(wv);
+  log(event, { ...diagWebviewSnapshot(wv), scroll, ...extra });
+}
+function diagAttachSourceWebviewProbe(wv, context2) {
+  diagListenerCleanups.get(wv)?.();
+  diagLogWebview("probe:attach", wv, { context: context2 });
+  const frameEvent = (name) => (event) => {
+    const e2 = event;
+    void diagLogWebviewWithScroll(`probe:${name}`, wv, {
+      context: context2,
+      eventUrl: e2.url ?? null,
+      isMainFrame: e2.isMainFrame ?? null
+    });
+  };
+  const onStartLoading = frameEvent("did-start-loading");
+  const onStopLoading = frameEvent("did-stop-loading");
+  const onWillNavigate = frameEvent("will-navigate");
+  const onDidNavigate = frameEvent("did-navigate");
+  const onDidNavigateInPage = frameEvent("did-navigate-in-page");
+  const onNewWindow = frameEvent("new-window");
+  const onDidFinishLoad = frameEvent("did-finish-load");
+  wv.addEventListener("did-start-loading", onStartLoading);
+  wv.addEventListener("did-stop-loading", onStopLoading);
+  wv.addEventListener("will-navigate", onWillNavigate);
+  wv.addEventListener("did-navigate", onDidNavigate);
+  wv.addEventListener("did-navigate-in-page", onDidNavigateInPage);
+  wv.addEventListener("new-window", onNewWindow);
+  wv.addEventListener("did-finish-load", onDidFinishLoad);
+  diagListenerCleanups.set(wv, () => {
+    wv.removeEventListener("did-start-loading", onStartLoading);
+    wv.removeEventListener("did-stop-loading", onStopLoading);
+    wv.removeEventListener("will-navigate", onWillNavigate);
+    wv.removeEventListener("did-navigate", onDidNavigate);
+    wv.removeEventListener("did-navigate-in-page", onDidNavigateInPage);
+    wv.removeEventListener("new-window", onNewWindow);
+    wv.removeEventListener("did-finish-load", onDidFinishLoad);
+    diagLogWebview("probe:detach", wv, { context: context2 });
+  });
+}
+function diagDumpTimeline() {
+  return timeline.slice();
+}
+var LOG_PREFIX2, nextDiagId, webviewDiagIds, timeline, diagListenerCleanups;
+var init_newsBrowser3565Diagnostics = __esm({
+  "../grarf/desktop/src/lib/home/newsBrowser3565Diagnostics.ts"() {
+    init_define_import_meta_env();
+    init_homeSourceWebviewUrl();
+    LOG_PREFIX2 = "[NEWS-3565-DIAG]";
+    nextDiagId = 1;
+    webviewDiagIds = /* @__PURE__ */ new WeakMap();
+    timeline = [];
+    diagListenerCleanups = /* @__PURE__ */ new WeakMap();
+    if (typeof window !== "undefined") {
+      window.__NEWS_3565_DIAG_DUMP__ = () => diagDumpTimeline();
+    }
+  }
+});
+
+// ../grarf/desktop/src/lib/home/homeSourceWebviewNavigation.ts
+function isWebShimWebview(wv) {
+  return wv.getAttribute?.("data-grarf-webview") != null;
+}
+function readHomeSourceWebviewNavState(wv) {
+  if (!wv) return { canGoBack: false, canGoForward: false };
+  try {
+    return {
+      canGoBack: wv.canGoBack?.() ?? false,
+      canGoForward: wv.canGoForward?.() ?? false
+    };
+  } catch {
+    return { canGoBack: false, canGoForward: false };
+  }
+}
+function homeSourceWebviewGoBack(wv) {
+  diagLog("homeSourceWebviewGoBack", {
+    webviewId: diagWebviewId(wv),
+    currentUrl: readHomeSourceWebviewUrl(wv)
+  });
+  try {
+    if (!isWebShimWebview(wv)) {
+      wv.goBack?.();
+      return;
+    }
+    wv.goBack?.();
+  } catch {
+  }
+}
+function homeSourceWebviewGoForward(wv) {
+  try {
+    wv.goForward?.();
+  } catch {
+  }
+}
+function homeSourceWebviewMatchesTarget(currentUrl, targetUrl) {
+  if (!currentUrl || !targetUrl) return false;
+  if (currentUrl === targetUrl) return true;
+  try {
+    const current = new URL(currentUrl);
+    const target = new URL(targetUrl);
+    return current.href === target.href;
+  } catch {
+    return false;
+  }
+}
+function homeSourceWebviewGoHome(wv, homeUrl) {
+  const url = homeUrl.trim();
+  if (!url) return;
+  const current = readHomeSourceWebviewUrl(wv);
+  if (current && homeSourceWebviewMatchesTarget(current, url)) {
+    diagLog("homeSourceWebviewGoHome:skip-same-url", {
+      webviewId: diagWebviewId(wv),
+      url,
+      current
+    });
+    return;
+  }
+  diagLog("homeSourceWebviewGoHome:navigate", {
+    webviewId: diagWebviewId(wv),
+    url,
+    current
+  });
+  try {
+    if (typeof wv.loadURL === "function") {
+      wv.loadURL(url);
+      return;
+    }
+  } catch {
+  }
+  try {
+    if (isWebShimWebview(wv)) {
+      wv.src = "about:blank";
+      queueMicrotask(() => {
+        wv.src = url;
+      });
+      return;
+    }
+    wv.src = url;
+  } catch {
+  }
+}
+var init_homeSourceWebviewNavigation = __esm({
+  "../grarf/desktop/src/lib/home/homeSourceWebviewNavigation.ts"() {
+    init_define_import_meta_env();
+    init_homeSourceWebviewUrl();
+    init_newsBrowser3565Diagnostics();
+  }
+});
+
 // ../grarf/desktop/src/lib/home/homeSourceFocusSourceSession.ts
 function detachArticleSelectionListeners(sessionKey) {
   articleListenerCleanups.get(sessionKey)?.();
@@ -113524,13 +113744,32 @@ function webviewOwnsEmbedNavigateMessage(wv, event) {
 function probeWebviewUrl(wv) {
   return probeHomeSourceWebviewUrl(wv);
 }
+function shouldSkipDuplicateArticleRoute(wv, articleUrl) {
+  const recent = recentArticleRoutes.get(wv);
+  if (!recent) return false;
+  return recent.url === articleUrl && Date.now() - recent.atMs < RECENT_ARTICLE_ROUTE_MS;
+}
+function markRecentArticleRoute(wv, articleUrl) {
+  recentArticleRoutes.set(wv, { url: articleUrl, atMs: Date.now() });
+}
 function restoreSourceSurface(wv, sourceLockUrl) {
   if (!sourceLockUrl) return;
   queueMicrotask(() => {
     const current = readWebviewUrl(wv);
+    diagLog("restoreSourceSurface:enter", {
+      webviewId: diagWebviewId(wv),
+      sourceLockUrl,
+      currentUrl: current,
+      sameDocument: isSameDocumentHomeSourceNavigation(sourceLockUrl, current)
+    });
     if (isSameDocumentHomeSourceNavigation(sourceLockUrl, current)) return;
     try {
       if (wv.canGoBack?.()) {
+        diagLog("restoreSourceSurface:goBack", {
+          webviewId: diagWebviewId(wv),
+          sourceLockUrl,
+          currentUrl: current
+        });
         wv.goBack?.();
         return;
       }
@@ -113538,9 +113777,18 @@ function restoreSourceSurface(wv, sourceLockUrl) {
     }
     try {
       if (readWebviewUrl(wv) !== sourceLockUrl) {
+        diagLog("restoreSourceSurface:set-src", {
+          webviewId: diagWebviewId(wv),
+          sourceLockUrl,
+          currentUrl: readWebviewUrl(wv)
+        });
         wv.src = sourceLockUrl;
       }
     } catch {
+      diagLog("restoreSourceSurface:set-src-fallback", {
+        webviewId: diagWebviewId(wv),
+        sourceLockUrl
+      });
       wv.src = sourceLockUrl;
     }
   });
@@ -113548,11 +113796,32 @@ function restoreSourceSurface(wv, sourceLockUrl) {
 function routeArticleFromSource(wv, sourceLockUrl, articleUrl, restoreSource, onArticleRoute) {
   if (!isHomeSourceArticleCandidateUrl(articleUrl)) return;
   if (isSameDocumentHomeSourceNavigation(sourceLockUrl, articleUrl)) return;
-  onArticleRoute(articleUrl);
-  if (restoreSource) restoreSourceSurface(wv, sourceLockUrl);
+  const isDuplicateRoute = shouldSkipDuplicateArticleRoute(wv, articleUrl);
+  diagLog("routeArticleFromSource", {
+    webviewId: diagWebviewId(wv),
+    sourceLockUrl,
+    articleUrl,
+    restoreSource,
+    isDuplicateRoute
+  });
+  if (!isDuplicateRoute) {
+    markRecentArticleRoute(wv, articleUrl);
+    onArticleRoute(articleUrl);
+  }
+  if (restoreSource) {
+    restoreSourceSurface(wv, sourceLockUrl);
+    return;
+  }
+  queueMicrotask(() => {
+    const current = readWebviewUrl(wv);
+    if (!sourceLockUrl || !current) return;
+    if (isSameDocumentHomeSourceNavigation(sourceLockUrl, current)) return;
+    restoreSourceSurface(wv, sourceLockUrl);
+  });
 }
 function attachArticleSelectionListeners(listenerKey, wv, onArticleRoute, initialSourceLockUrl) {
   detachArticleSelectionListeners(listenerKey);
+  diagLogWebview("attachArticleSelectionListeners", wv, { listenerKey, initialSourceLockUrl });
   const sourceLock = { url: "" };
   let allowMainFrameNavigation = true;
   const lockFromCaller = initialSourceLockUrl?.trim() ?? "";
@@ -113599,6 +113868,11 @@ function attachArticleSelectionListeners(listenerKey, wv, onArticleRoute, initia
     if (allowMainFrameNavigation) return;
     if (!sourceLock.url) return;
     if (isSameDocumentHomeSourceNavigation(sourceLock.url, nextUrl)) return;
+    diagLog("attachArticleSelectionListeners:will-navigate:prevent", {
+      webviewId: diagWebviewId(wv),
+      sourceLockUrl: sourceLock.url,
+      nextUrl
+    });
     event.preventDefault();
     routeArticleFromSource(wv, sourceLock.url, nextUrl, false, onArticleRoute);
   };
@@ -113683,13 +113957,26 @@ function acquireHomeSourceCardWebview(sessionKey, host, embedSrc, partition) {
     wv.className = WEBVIEW_CLASS;
     wv.src = embedSrc;
     cardWebviews.set(sessionKey, wv);
-  } else if (embedSrc && readWebviewUrl(wv) !== embedSrc) {
+    diagLogWebview("acquireHomeSourceCardWebview:created", wv, { sessionKey, embedSrc, partition });
+  } else if (embedSrc && !homeSourceWebviewMatchesTarget(readWebviewUrl(wv), embedSrc)) {
+    diagLogWebview("acquireHomeSourceCardWebview:set-src", wv, {
+      sessionKey,
+      embedSrc,
+      previousUrl: readWebviewUrl(wv)
+    });
     wv.src = embedSrc;
+  } else {
+    diagLogWebview("acquireHomeSourceCardWebview:reuse", wv, { sessionKey, embedSrc });
   }
   const borrowed = useHomeSourceFocusStore.getState().borrowedCardWebviewKeys[sessionKey];
   if (!borrowed && wv.parentElement !== host) {
+    diagLogWebview("acquireHomeSourceCardWebview:appendChild", wv, {
+      sessionKey,
+      hostConnected: host.isConnected
+    });
     host.appendChild(wv);
   }
+  diagAttachSourceWebviewProbe(wv, `acquire:${sessionKey}`);
   return wv;
 }
 function registerHomeSourceCardHost(sessionKey, host) {
@@ -113700,7 +113987,19 @@ function bindHomeSourceCardArticleNavigation(sessionKey, wv, onArticleNavigate) 
   const listenerKey = cardArticleListenerKey(sessionKey);
   detachArticleSelectionListeners(listenerKey);
   if (!wv || !onArticleNavigate) return;
-  attachArticleSelectionListeners(listenerKey, wv, onArticleNavigate);
+  diagLogWebview("bindHomeSourceCardArticleNavigation", wv, { sessionKey, listenerKey });
+  attachArticleSelectionListeners(listenerKey, wv, (articleUrl) => {
+    void diagLogWebviewWithScroll("onArticleRoute:before-setSelectedArticle", wv, {
+      sessionKey,
+      articleUrl
+    }).then(() => {
+      onArticleNavigate(articleUrl);
+      void diagLogWebviewWithScroll("onArticleRoute:after-setSelectedArticle", wv, {
+        sessionKey,
+        articleUrl
+      });
+    });
+  });
 }
 function resolveEntryUrl(sessionKey, fallbackUrl) {
   const card = cardWebviews.get(sessionKey);
@@ -113761,7 +114060,7 @@ function releaseHomeSourceFocusWebview(sessionKey) {
   }
   returnBorrowedCardWebview(sessionKey);
 }
-var cardWebviews, cardHosts, focusWebviews, dedicatedFocusWebviews, articleListenerCleanups, WEBVIEW_PREFS, WEBVIEW_CLASS;
+var RECENT_ARTICLE_ROUTE_MS, recentArticleRoutes, cardWebviews, cardHosts, focusWebviews, dedicatedFocusWebviews, articleListenerCleanups, WEBVIEW_PREFS, WEBVIEW_CLASS;
 var init_homeSourceFocusSourceSession = __esm({
   "../grarf/desktop/src/lib/home/homeSourceFocusSourceSession.ts"() {
     init_define_import_meta_env();
@@ -113769,8 +114068,12 @@ var init_homeSourceFocusSourceSession = __esm({
     init_homeSourceWebEmbedUrl();
     init_homeSourceFocusArticleNavigation();
     init_homeSourceWebviewUrl();
+    init_homeSourceWebviewNavigation();
+    init_newsBrowser3565Diagnostics();
     init_isGrarfWebRenderer();
     init_homeSourceFocusStore();
+    RECENT_ARTICLE_ROUTE_MS = 750;
+    recentArticleRoutes = /* @__PURE__ */ new WeakMap();
     cardWebviews = /* @__PURE__ */ new Map();
     cardHosts = /* @__PURE__ */ new Map();
     focusWebviews = /* @__PURE__ */ new Map();
@@ -113778,65 +114081,6 @@ var init_homeSourceFocusSourceSession = __esm({
     articleListenerCleanups = /* @__PURE__ */ new Map();
     WEBVIEW_PREFS = "contextIsolation=yes,nodeIntegration=no,javascript=yes";
     WEBVIEW_CLASS = "absolute inset-0 h-full w-full border-0 bg-white";
-  }
-});
-
-// ../grarf/desktop/src/lib/home/homeSourceWebviewNavigation.ts
-function isWebShimWebview(wv) {
-  return wv.getAttribute?.("data-grarf-webview") != null;
-}
-function readHomeSourceWebviewNavState(wv) {
-  if (!wv) return { canGoBack: false, canGoForward: false };
-  try {
-    return {
-      canGoBack: wv.canGoBack?.() ?? false,
-      canGoForward: wv.canGoForward?.() ?? false
-    };
-  } catch {
-    return { canGoBack: false, canGoForward: false };
-  }
-}
-function homeSourceWebviewGoBack(wv) {
-  try {
-    if (!isWebShimWebview(wv)) {
-      wv.goBack?.();
-      return;
-    }
-    wv.goBack?.();
-  } catch {
-  }
-}
-function homeSourceWebviewGoForward(wv) {
-  try {
-    wv.goForward?.();
-  } catch {
-  }
-}
-function homeSourceWebviewGoHome(wv, homeUrl) {
-  const url = homeUrl.trim();
-  if (!url) return;
-  try {
-    if (typeof wv.loadURL === "function") {
-      wv.loadURL(url);
-      return;
-    }
-  } catch {
-  }
-  try {
-    if (isWebShimWebview(wv)) {
-      wv.src = "about:blank";
-      queueMicrotask(() => {
-        wv.src = url;
-      });
-      return;
-    }
-    wv.src = url;
-  } catch {
-  }
-}
-var init_homeSourceWebviewNavigation = __esm({
-  "../grarf/desktop/src/lib/home/homeSourceWebviewNavigation.ts"() {
-    init_define_import_meta_env();
   }
 });
 
@@ -117428,7 +117672,7 @@ async function readResponseBody(response) {
   }
 }
 function logOperationsSpineSaveFailure(diagnostic) {
-  console.error(LOG_PREFIX2, {
+  console.error(LOG_PREFIX3, {
     requestUrl: diagnostic.requestUrl,
     method: diagnostic.method,
     httpStatus: diagnostic.httpStatus,
@@ -117460,12 +117704,12 @@ async function createOperationsSpineSaveError(params) {
   logOperationsSpineSaveFailure(diagnostic);
   return new OperationsSpineSaveError(reason, diagnostic);
 }
-var LOG_PREFIX2, OperationsSpineSaveError;
+var LOG_PREFIX3, OperationsSpineSaveError;
 var init_operationsSpineSaveError = __esm({
   "../grarf/desktop/src/lib/operationsSpine/operationsSpineSaveError.ts"() {
     init_define_import_meta_env();
     init_sportscapeEditorialConfig();
-    LOG_PREFIX2 = "[Operations Spine Save]";
+    LOG_PREFIX3 = "[Operations Spine Save]";
     OperationsSpineSaveError = class extends Error {
       constructor(reason, diagnostic) {
         super(reason);
@@ -141790,6 +142034,12 @@ var init_SportsBrowserPrototypeBrowserHistoryControls = __esm({
 function hasWebviewTag5() {
   return typeof customElements !== "undefined" && !!customElements.get("webview");
 }
+function resolveSourceWebview(articleFocusSessionKey, webviewRef) {
+  if (articleFocusSessionKey) {
+    return getHomeSourceCardWebview(articleFocusSessionKey) ?? webviewRef.current;
+  }
+  return webviewRef.current;
+}
 function SportsBrowserPrototypeBrowserPane({
   url,
   paneId,
@@ -141806,10 +142056,12 @@ function SportsBrowserPrototypeBrowserPane({
     () => activeUrl ? homeSourceWebPartition(activeUrl) : "",
     [activeUrl]
   );
+  const usesImperativeSourceWebview = Boolean(articleFocusSessionKey);
   const selectedArticleUrl = useHomeSourceFocusStore(
     (state3) => articleFocusSessionKey ? state3.selectedArticleUrlBySession[articleFocusSessionKey] ?? null : null
   );
   const split = Boolean(articleFocusSessionKey && selectedArticleUrl);
+  const embedHostRef = (0, import_react254.useRef)(null);
   const webviewRef = (0, import_react254.useRef)(null);
   const onArticleRoute = (0, import_react254.useCallback)(
     (articleUrl) => {
@@ -141831,15 +142083,9 @@ function SportsBrowserPrototypeBrowserPane({
     showActiveTreatment && isActive && "ring-2 ring-inset ring-[#c8c4bc]",
     className
   );
-  const setWebviewRef = (0, import_react254.useCallback)(
-    (element) => {
-      webviewRef.current = element;
-      if (element && activeUrl) {
-        homeSourceWebviewGoHome(element, activeUrl);
-      }
-    },
-    [activeUrl]
-  );
+  const setDeclarativeWebviewRef = (0, import_react254.useCallback)((element) => {
+    webviewRef.current = element;
+  }, []);
   (0, import_react254.useLayoutEffect)(() => {
     if (!activeUrl) return;
     void window.grarf?.workspaceEmbedClear?.("center");
@@ -141850,35 +142096,58 @@ function SportsBrowserPrototypeBrowserPane({
     useHomeSourceFocusStore.getState().clearSelectedArticle(articleFocusSessionKey);
   }, [activeUrl, articleFocusSessionKey]);
   (0, import_react254.useLayoutEffect)(() => {
-    if (!articleFocusSessionKey || !activeUrl) {
-      if (articleFocusSessionKey) {
-        bindHomeSourceCardArticleNavigation(articleFocusSessionKey, null);
-      }
-      return;
-    }
-    bindHomeSourceCardArticleNavigation(
+    if (!usesImperativeSourceWebview || !articleFocusSessionKey || !activeUrl) return;
+    const host = embedHostRef.current;
+    if (!host) return;
+    diagLog("pane:acquire-effect:start", {
+      sessionKey: articleFocusSessionKey,
+      activeUrl,
+      split
+    });
+    registerHomeSourceCardHost(articleFocusSessionKey, host);
+    const wv = acquireHomeSourceCardWebview(
       articleFocusSessionKey,
-      webviewRef.current,
-      onArticleRoute
+      host,
+      activeUrl,
+      partition
     );
+    webviewRef.current = wv;
+    bindHomeSourceCardArticleNavigation(articleFocusSessionKey, wv, onArticleRoute);
+    void diagLogWebviewWithScroll("pane:acquire-effect:ready", wv, {
+      sessionKey: articleFocusSessionKey,
+      split
+    });
     return () => {
+      diagLogWebview("pane:acquire-effect:cleanup", wv, {
+        sessionKey: articleFocusSessionKey
+      });
       bindHomeSourceCardArticleNavigation(articleFocusSessionKey, null);
+      registerHomeSourceCardHost(articleFocusSessionKey, null);
     };
-  }, [articleFocusSessionKey, activeUrl, partition, onArticleRoute]);
+  }, [usesImperativeSourceWebview, articleFocusSessionKey, activeUrl, partition, onArticleRoute]);
   (0, import_react254.useLayoutEffect)(() => {
-    if (!activeUrl) return;
+    if (!articleFocusSessionKey) return;
+    const wv = getHomeSourceCardWebview(articleFocusSessionKey) ?? webviewRef.current;
+    void diagLogWebviewWithScroll("pane:split-transition", wv, {
+      sessionKey: articleFocusSessionKey,
+      split,
+      selectedArticleUrl
+    });
+  }, [split, selectedArticleUrl, articleFocusSessionKey]);
+  (0, import_react254.useLayoutEffect)(() => {
+    if (usesImperativeSourceWebview || !activeUrl) return;
     const webview = webviewRef.current;
     if (!webview) return;
     homeSourceWebviewGoHome(webview, activeUrl);
-  }, [activeUrl, partition]);
+  }, [usesImperativeSourceWebview, activeUrl, partition]);
   (0, import_react254.useLayoutEffect)(() => {
     if (!isActive || !registerActiveWebview) return;
-    registerActiveWebview(webviewRef.current);
+    registerActiveWebview(resolveSourceWebview(articleFocusSessionKey, webviewRef));
     return () => registerActiveWebview(null);
-  }, [isActive, registerActiveWebview, activeUrl, partition]);
+  }, [isActive, registerActiveWebview, activeUrl, partition, articleFocusSessionKey, usesImperativeSourceWebview]);
   (0, import_react254.useLayoutEffect)(() => {
     if (!isActive || !onNavStateChange) return;
-    const webview = webviewRef.current;
+    const webview = resolveSourceWebview(articleFocusSessionKey, webviewRef);
     if (!webview || !activeUrl) {
       onNavStateChange({ canGoBack: false, canGoForward: false });
       return;
@@ -141897,25 +142166,33 @@ function SportsBrowserPrototypeBrowserPane({
       webview.removeEventListener("did-frame-navigate", syncNavState);
       webview.removeEventListener("did-stop-loading", syncNavState);
     };
-  }, [isActive, onNavStateChange, activeUrl, partition]);
+  }, [
+    isActive,
+    onNavStateChange,
+    activeUrl,
+    partition,
+    articleFocusSessionKey,
+    usesImperativeSourceWebview
+  ]);
   (0, import_react254.useLayoutEffect)(() => {
     const unsubscribe = window.grarf?.webviewNavigateInPaneSubscribe?.((payload) => {
-      const webview = webviewRef.current;
       const nextUrl = payload.url?.trim();
-      if (!webview || !nextUrl) return;
+      if (!nextUrl) return;
+      const webview = resolveSourceWebview(articleFocusSessionKey, webviewRef);
+      if (!webview) return;
       homeSourceWebviewGoHome(webview, nextUrl);
     });
     return () => unsubscribe?.();
-  }, []);
+  }, [articleFocusSessionKey]);
   (0, import_react254.useLayoutEffect)(() => {
-    const webview = webviewRef.current;
+    const webview = resolveSourceWebview(articleFocusSessionKey, webviewRef);
     if (!webview || !onActivate) return;
     const onFocus = () => onActivate();
     webview.addEventListener("focus", onFocus);
     return () => webview.removeEventListener("focus", onFocus);
-  }, [onActivate, activeUrl, partition]);
+  }, [onActivate, activeUrl, partition, articleFocusSessionKey, usesImperativeSourceWebview]);
   (0, import_react254.useLayoutEffect)(() => {
-    if (articleFocusSessionKey) return;
+    if (usesImperativeSourceWebview) return;
     const webview = webviewRef.current;
     if (!webview || !activeUrl) return;
     const onNewWindow = (event) => {
@@ -141931,7 +142208,7 @@ function SportsBrowserPrototypeBrowserPane({
     };
     webview.addEventListener("new-window", onNewWindow);
     return () => webview.removeEventListener("new-window", onNewWindow);
-  }, [activeUrl, partition, articleFocusSessionKey]);
+  }, [activeUrl, partition, usesImperativeSourceWebview]);
   if (!activeUrl || !hasWebviewTag5()) {
     return /* @__PURE__ */ (0, import_jsx_runtime223.jsx)(
       "div",
@@ -141969,10 +142246,10 @@ function SportsBrowserPrototypeBrowserPane({
                   "relative h-full min-h-0 w-full bg-black",
                   split && "border-r border-[#c8c4bc]/70"
                 ),
-                children: /* @__PURE__ */ (0, import_jsx_runtime223.jsx)(
+                children: usesImperativeSourceWebview ? /* @__PURE__ */ (0, import_jsx_runtime223.jsx)("div", { ref: embedHostRef, className: cn2(PANE_EMBED_HOST, "h-full w-full") }) : /* @__PURE__ */ (0, import_jsx_runtime223.jsx)(
                   "webview",
                   {
-                    ref: setWebviewRef,
+                    ref: setDeclarativeWebviewRef,
                     src: activeUrl,
                     partition,
                     webpreferences: WEBVIEW_WEB_PREFS2,
@@ -142015,6 +142292,7 @@ var init_SportsBrowserPrototypeBrowserPane = __esm({
     init_homeSourceFocusStore();
     init_HomeSourceFocusArticlePane();
     init_CenterPanePlaceholderSurface();
+    init_newsBrowser3565Diagnostics();
     import_jsx_runtime223 = __toESM(require_jsx_runtime(), 1);
     WEBVIEW_WEB_PREFS2 = "contextIsolation=yes,nodeIntegration=no,javascript=yes";
   }
