@@ -142522,7 +142522,7 @@ function SportsBrowserPrototypeLeagueWebsiteTabs({
             onClick: () => onSelectTab(index),
             className: cn2(
               "relative shrink-0 border-r border-[#c8c4bc]/60 px-3.5 text-[11px] font-medium tracking-[0.01em] transition-colors",
-              active2 ? "bg-[#f8f6f1] text-[#1a1a1a] after:absolute after:inset-x-0 after:bottom-0 after:h-[2px] after:bg-[#1a1a1a]" : "bg-transparent text-[#6f6a62] hover:bg-[#ece9e2] hover:text-[#1a1a1a]"
+              active2 ? "bg-[#1a1a1a] text-[#f8f6f1]" : "bg-transparent text-[#6f6a62] hover:bg-[#ece9e2] hover:text-[#1a1a1a]"
             ),
             children: website4.label
           },
