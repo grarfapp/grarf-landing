@@ -143175,7 +143175,19 @@ function SportsBrowserPrototypeBrowserWorkspace({
                       registerActiveWebview: isSelectedPane ? registerActiveWebview : void 0,
                       className: "min-h-0 flex-1"
                     }
-                  )
+                  ),
+                  splitPaneMode && !isSelectedPane ? /* @__PURE__ */ (0, import_jsx_runtime226.jsx)(
+                    "div",
+                    {
+                      className: "absolute inset-0 z-20 cursor-default",
+                      "aria-hidden": true,
+                      onPointerDown: (event) => {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        activatePane(index);
+                      }
+                    }
+                  ) : null
                 ]
               },
               `sports-browser-pane-column-${index}`
