@@ -142530,9 +142530,11 @@ var init_resolveNewsSportsBrowserTennisScorePresentation = __esm({
 
 // ../grarf/desktop/src/components/homeMvp/NewsSportsBrowserChannelLogo.tsx
 function resolveNewsSportsBrowserChannelLogoImageClass(logoUrl, label) {
+  const logo = { logoUrl, label };
   return cn2(
-    gamesSpineCompactChannelLogoImageClass("right", { logoUrl, label }),
-    NEWS_CHANNEL_LOGO_IMAGE_CLASS
+    gamesSpineCompactChannelLogoImageClass("right", logo),
+    "rounded-none bg-transparent object-right",
+    !isEspnPlusLogo(logo) && "mix-blend-screen"
   );
 }
 function NewsSportsBrowserChannelLogo({
@@ -142558,7 +142560,7 @@ function NewsSportsBrowserChannelLogo({
     resolvedLogoUrl
   ) });
 }
-var import_react256, import_jsx_runtime222, NEWS_CHANNEL_LOGO_SLOT_CLASS, NEWS_CHANNEL_LOGO_IMAGE_CLASS;
+var import_react256, import_jsx_runtime222, NEWS_CHANNEL_LOGO_SLOT_CLASS;
 var init_NewsSportsBrowserChannelLogo = __esm({
   "../grarf/desktop/src/components/homeMvp/NewsSportsBrowserChannelLogo.tsx"() {
     init_define_import_meta_env();
@@ -142566,9 +142568,9 @@ var init_NewsSportsBrowserChannelLogo = __esm({
     init_cn();
     init_resolveChannelLogoSrc();
     init_gamesSpineCompactGameRowContent();
+    init_grarfLogoImgClassName();
     import_jsx_runtime222 = __toESM(require_jsx_runtime(), 1);
     NEWS_CHANNEL_LOGO_SLOT_CLASS = "flex h-[0.7rem] w-full shrink-0 items-center justify-end bg-transparent";
-    NEWS_CHANNEL_LOGO_IMAGE_CLASS = "rounded-none bg-transparent mix-blend-screen object-right";
   }
 });
 
@@ -142868,7 +142870,8 @@ function BottomRailTeamRow({
   showScore,
   row,
   flashScore,
-  suppressScoreCell = false
+  suppressScoreCell = false,
+  suppressNameCell = false
 }) {
   const logoUrl = resolveDarkThemeLogoUrl(game, side);
   const rowClass = row === 1 ? "row-start-1" : "row-start-2";
@@ -142886,7 +142889,7 @@ function BottomRailTeamRow({
         decoding: "async"
       }
     ) : null }),
-    /* @__PURE__ */ (0, import_jsx_runtime223.jsx)("span", { className: cn2(TEAM_NAME_CELL_CLASS, rowClass, "col-start-2"), children: name }),
+    !suppressNameCell ? /* @__PURE__ */ (0, import_jsx_runtime223.jsx)("span", { className: cn2(TEAM_NAME_CELL_CLASS, rowClass, "col-start-2"), children: name }) : null,
     !suppressScoreCell ? /* @__PURE__ */ (0, import_jsx_runtime223.jsx)(
       BottomRailFlashValue,
       {
@@ -142897,53 +142900,59 @@ function BottomRailTeamRow({
     ) : null
   ] });
 }
-function BottomRailTennisSetScoreBlock({
+function BottomRailTennisMatchupScoreGrid({
   columns,
   topSide,
   bottomSide,
+  topName,
+  bottomName,
   topFlashCells,
   bottomFlashCells
 }) {
-  return /* @__PURE__ */ (0, import_jsx_runtime223.jsx)(
+  return /* @__PURE__ */ (0, import_jsx_runtime223.jsxs)(
     "div",
     {
-      className: "col-start-3 row-start-1 row-span-2 grid gap-y-px",
+      className: "col-start-2 row-start-1 row-span-2 grid w-full min-w-0 grid-rows-2 items-center gap-y-px",
       style: {
-        gridTemplateColumns: `repeat(${columns.length}, minmax(0.65rem, max-content))`,
-        gridTemplateRows: "auto auto"
+        gridTemplateColumns: `minmax(0,1fr) repeat(${columns.length}, minmax(0.65rem, max-content))`
       },
-      children: columns.map((column, index) => {
-        const topValue = topSide === "away" ? column.away : column.home;
-        const bottomValue = bottomSide === "away" ? column.away : column.home;
-        return /* @__PURE__ */ (0, import_jsx_runtime223.jsxs)(import_react257.Fragment, { children: [
-          /* @__PURE__ */ (0, import_jsx_runtime223.jsx)(
-            BottomRailFlashValue,
-            {
-              flash: topFlashCells?.[index],
-              className: cn2(
-                BOTTOM_RAIL_TENNIS_SCORE_CELL_CLASS,
-                "row-start-1",
-                column.isCurrentSet && "font-semibold"
-              ),
-              style: { gridColumnStart: index + 1 },
-              children: topValue ?? "\u2013"
-            }
-          ),
-          /* @__PURE__ */ (0, import_jsx_runtime223.jsx)(
-            BottomRailFlashValue,
-            {
-              flash: bottomFlashCells?.[index],
-              className: cn2(
-                BOTTOM_RAIL_TENNIS_SCORE_CELL_CLASS,
-                "row-start-2",
-                column.isCurrentSet && "font-semibold"
-              ),
-              style: { gridColumnStart: index + 1 },
-              children: bottomValue ?? "\u2013"
-            }
-          )
-        ] }, index);
-      })
+      children: [
+        /* @__PURE__ */ (0, import_jsx_runtime223.jsx)("span", { className: cn2(TEAM_NAME_CELL_CLASS, "col-start-1 row-start-1"), children: topName }),
+        /* @__PURE__ */ (0, import_jsx_runtime223.jsx)("span", { className: cn2(TEAM_NAME_CELL_CLASS, "col-start-1 row-start-2"), children: bottomName }),
+        columns.map((column, index) => {
+          const topValue = topSide === "away" ? column.away : column.home;
+          const bottomValue = bottomSide === "away" ? column.away : column.home;
+          const scoreColStart = 2 + index;
+          return /* @__PURE__ */ (0, import_jsx_runtime223.jsxs)(import_react257.Fragment, { children: [
+            /* @__PURE__ */ (0, import_jsx_runtime223.jsx)(
+              BottomRailFlashValue,
+              {
+                flash: topFlashCells?.[index],
+                className: cn2(
+                  BOTTOM_RAIL_TENNIS_SCORE_CELL_CLASS,
+                  "row-start-1",
+                  column.isCurrentSet && "font-semibold"
+                ),
+                style: { gridColumnStart: scoreColStart },
+                children: topValue ?? "\u2013"
+              }
+            ),
+            /* @__PURE__ */ (0, import_jsx_runtime223.jsx)(
+              BottomRailFlashValue,
+              {
+                flash: bottomFlashCells?.[index],
+                className: cn2(
+                  BOTTOM_RAIL_TENNIS_SCORE_CELL_CLASS,
+                  "row-start-2",
+                  column.isCurrentSet && "font-semibold"
+                ),
+                style: { gridColumnStart: scoreColStart },
+                children: bottomValue ?? "\u2013"
+              }
+            )
+          ] }, index);
+        })
+      ]
     }
   );
 }
@@ -142954,14 +142963,13 @@ function BottomRailGameCardBody({
   const model = resolveGamesSpineCompactMatchupModel(game);
   const tennisSetColumns = resolveNewsSportsBrowserTennisSetColumns(game);
   const showTennisSetScores = model.kind === "matchup" && tennisSetColumns.length > 0;
-  const tennisBodyGridStyle = showTennisSetScores ? { gridTemplateColumns: BOTTOM_RAIL_TENNIS_BODY_GRID_TEMPLATE } : void 0;
-  const statusTimeColStart = 4;
+  const statusTimeColStart = showTennisSetScores ? BOTTOM_RAIL_TENNIS_STATUS_COL_START : 4;
   const leagueLabel = resolveGamesSpineGameCardLeagueLabel(game);
   const leagueLogoUrl = game.league ? resolveGamesSpineLeagueLogoUrl(game.league, { game }) : void 0;
   const channel = resolveNewsSportsBrowserChannelPresentation(game);
   const statusTimeLabel = resolveBottomRailStatusTimeLabel(game);
   const showChannelLogo = shouldShowBottomRailChannelLogo(game);
-  return /* @__PURE__ */ (0, import_jsx_runtime223.jsxs)("div", { className: "flex min-w-0 flex-1 flex-col justify-center gap-px px-1.5 py-0.5", children: [
+  return /* @__PURE__ */ (0, import_jsx_runtime223.jsxs)("div", { className: "flex min-h-0 min-w-0 w-full flex-1 flex-col justify-center gap-px px-1.5 py-0.5", children: [
     /* @__PURE__ */ (0, import_jsx_runtime223.jsxs)("div", { className: "flex min-w-0 items-center justify-between gap-1", children: [
       /* @__PURE__ */ (0, import_jsx_runtime223.jsxs)("div", { className: "flex min-w-0 items-center gap-0.5", children: [
         leagueLogoUrl ? /* @__PURE__ */ (0, import_jsx_runtime223.jsx)(
@@ -142994,8 +143002,7 @@ function BottomRailGameCardBody({
     ] }) : /* @__PURE__ */ (0, import_jsx_runtime223.jsxs)(
       "div",
       {
-        className: showTennisSetScores ? "grid min-h-0 flex-1 grid-rows-2 items-center gap-x-[0.35ch] gap-y-px" : BODY_GRID_CLASS,
-        style: tennisBodyGridStyle,
+        className: showTennisSetScores ? BOTTOM_RAIL_TENNIS_BODY_GRID_CLASS : BODY_GRID_CLASS,
         children: [
           /* @__PURE__ */ (0, import_jsx_runtime223.jsx)(
             BottomRailTeamRow,
@@ -143007,7 +143014,8 @@ function BottomRailGameCardBody({
               showScore: model.showScores,
               row: 1,
               flashScore: flashSpec?.leftScore,
-              suppressScoreCell: showTennisSetScores
+              suppressScoreCell: showTennisSetScores,
+              suppressNameCell: showTennisSetScores
             }
           ),
           /* @__PURE__ */ (0, import_jsx_runtime223.jsx)(
@@ -143020,15 +143028,18 @@ function BottomRailGameCardBody({
               showScore: model.showScores,
               row: 2,
               flashScore: flashSpec?.rightScore,
-              suppressScoreCell: showTennisSetScores
+              suppressScoreCell: showTennisSetScores,
+              suppressNameCell: showTennisSetScores
             }
           ),
           showTennisSetScores ? /* @__PURE__ */ (0, import_jsx_runtime223.jsx)(
-            BottomRailTennisSetScoreBlock,
+            BottomRailTennisMatchupScoreGrid,
             {
               columns: tennisSetColumns,
               topSide: model.left.side,
               bottomSide: model.right.side,
+              topName: (model.left.teamName || model.left.abbrev).trim(),
+              bottomName: (model.right.teamName || model.right.abbrev).trim(),
               topFlashCells: flashSpec?.leftSetScoreCells,
               bottomFlashCells: flashSpec?.rightSetScoreCells
             }
@@ -143099,6 +143110,8 @@ function SportsBrowserPrototypeBottomRailGames({ className }) {
   const scrollViewportRef = (0, import_react257.useRef)(null);
   const cardWidthRef = (0, import_react257.useRef)(0);
   const stripWidthRef = (0, import_react257.useRef)(0);
+  const prevViewportWidthRef = (0, import_react257.useRef)(0);
+  const prevGameCountRef = (0, import_react257.useRef)(0);
   const [cardWidthPx, setCardWidthPx] = (0, import_react257.useState)(0);
   const [stripWidthPx, setStripWidthPx] = (0, import_react257.useState)(0);
   const { rememberFlashSpec, resolveFlashSpec } = useBottomRailAlertFlashSpecs();
@@ -143158,9 +143171,10 @@ function SportsBrowserPrototypeBottomRailGames({ className }) {
   useTopRailReorderFlip2(gamesRef, displayOrderKey);
   const showTransientSlot = slotPlacement === "transient" && lifecycleAlert && resolvedAlertGame && cardWidthPx > 0 && phase !== "hidden" && phase !== "unmounted";
   const gamesStripOffsetPx = showTransientSlot && slotExpanded ? cardWidthPx : 0;
-  const dimensionsLocked = cardWidthPx > 0 && stripWidthPx > 0;
-  const showHorizontalScroll = Boolean(showTransientSlot && slotExpanded && dimensionsLocked);
+  const dimensionsReady = cardWidthPx > 0 && stripWidthPx > 0;
+  const showHorizontalScroll = Boolean(showTransientSlot && slotExpanded && dimensionsReady);
   const scrollContentWidthPx = showHorizontalScroll ? cardWidthPx + stripWidthPx : void 0;
+  const gameCount = displayGames.length;
   (0, import_react257.useEffect)(() => {
     if (showHorizontalScroll) return;
     const viewport = scrollViewportRef.current;
@@ -143169,14 +143183,20 @@ function SportsBrowserPrototypeBottomRailGames({ className }) {
   }, [showHorizontalScroll]);
   (0, import_react257.useLayoutEffect)(() => {
     if (showTransientSlot) return;
-    const container = gamesRef.current;
-    if (!container) return;
+    const viewport = scrollViewportRef.current;
+    if (!viewport || gameCount <= 0) return;
     const measure = () => {
-      const firstCard = container.querySelector("[data-bottom-rail-game-card]");
-      if (!firstCard) return;
-      const nextCardWidth = Math.round(firstCard.getBoundingClientRect().width);
-      const nextStripWidth = Math.round(container.getBoundingClientRect().width);
-      if (nextCardWidth <= 0 || nextStripWidth <= 0) return;
+      const viewportWidth = Math.round(viewport.getBoundingClientRect().width);
+      if (viewportWidth <= 0) return;
+      const gameCountChanged = gameCount !== prevGameCountRef.current;
+      const viewportGrew = viewportWidth > prevViewportWidthRef.current;
+      let nextCardWidth = cardWidthRef.current;
+      if (gameCountChanged || viewportGrew || nextCardWidth <= 0) {
+        nextCardWidth = Math.max(1, Math.floor(viewportWidth / gameCount));
+      }
+      const nextStripWidth = nextCardWidth * gameCount;
+      prevViewportWidthRef.current = viewportWidth;
+      prevGameCountRef.current = gameCount;
       if (nextCardWidth === cardWidthRef.current && nextStripWidth === stripWidthRef.current) {
         return;
       }
@@ -143187,9 +143207,9 @@ function SportsBrowserPrototypeBottomRailGames({ className }) {
     };
     measure();
     const observer = typeof ResizeObserver !== "undefined" ? new ResizeObserver(measure) : null;
-    if (observer) observer.observe(container);
+    if (observer) observer.observe(viewport);
     return () => observer?.disconnect();
-  }, [rankedGames.length, showTransientSlot]);
+  }, [gameCount, showTransientSlot]);
   return /* @__PURE__ */ (0, import_jsx_runtime223.jsx)(
     "div",
     {
@@ -143205,8 +143225,7 @@ function SportsBrowserPrototypeBottomRailGames({ className }) {
         {
           ref: scrollViewportRef,
           className: cn2(
-            "relative h-full min-w-0 flex-1",
-            showHorizontalScroll ? "overflow-x-auto overflow-y-hidden overscroll-x-contain" : "overflow-x-hidden"
+            "relative h-full min-w-0 flex-1 overflow-x-auto overflow-y-hidden overscroll-x-contain"
           ),
           "data-bottom-rail-games-scroll-viewport": true,
           children: /* @__PURE__ */ (0, import_jsx_runtime223.jsxs)(
@@ -143214,7 +143233,7 @@ function SportsBrowserPrototypeBottomRailGames({ className }) {
             {
               className: "relative flex h-full shrink-0 items-stretch",
               style: {
-                width: scrollContentWidthPx ?? (dimensionsLocked ? stripWidthPx : void 0)
+                width: scrollContentWidthPx ?? (dimensionsReady ? stripWidthPx : void 0)
               },
               "data-bottom-rail-games-scroll-content": true,
               children: [
@@ -143235,7 +143254,7 @@ function SportsBrowserPrototypeBottomRailGames({ className }) {
                     ref: gamesRef,
                     className: "flex shrink-0 items-stretch overflow-visible",
                     style: {
-                      width: dimensionsLocked ? stripWidthPx : void 0,
+                      width: dimensionsReady ? stripWidthPx : void 0,
                       transform: gamesStripOffsetPx > 0 ? `translateX(${gamesStripOffsetPx}px)` : void 0,
                       transition: `transform ${TOP_RAIL_ANIMATION_MS2}ms cubic-bezier(0.4, 0, 0.2, 1)`
                     },
@@ -143249,11 +143268,15 @@ function SportsBrowserPrototypeBottomRailGames({ className }) {
                           "data-top-rail-game-id": game.id,
                           "data-bottom-rail-game-card": true,
                           className: cn2(
-                            "flex shrink-0",
-                            !dimensionsLocked && "min-w-0 flex-1",
+                            "flex min-w-0 shrink-0 overflow-hidden",
+                            cardWidthPx <= 0 && "flex-1",
                             index > 0 && cn2("border-l", RULE)
                           ),
-                          style: dimensionsLocked ? { width: cardWidthPx } : void 0,
+                          style: cardWidthPx > 0 ? {
+                            width: cardWidthPx,
+                            minWidth: cardWidthPx,
+                            maxWidth: cardWidthPx
+                          } : void 0,
                           children: /* @__PURE__ */ (0, import_jsx_runtime223.jsx)(
                             BottomRailGameCard,
                             {
@@ -143275,7 +143298,7 @@ function SportsBrowserPrototypeBottomRailGames({ className }) {
     }
   );
 }
-var import_react257, import_jsx_runtime223, MENU_SURFACE, RULE, TOP_RAIL_ANIMATION_MS2, BOTTOM_RAIL_VALUE_FLASH_CLASS, TEAM_LOGO_CELL_CLASS, TEAM_LOGO_IMG_CLASS, TEAM_NAME_CELL_CLASS, TEAM_SCORE_CELL_CLASS, BODY_GRID_CLASS, BOTTOM_RAIL_TENNIS_SCORE_CELL_CLASS, BOTTOM_RAIL_TENNIS_BODY_GRID_TEMPLATE, bottomRailFlashStyleInjected;
+var import_react257, import_jsx_runtime223, MENU_SURFACE, RULE, TOP_RAIL_ANIMATION_MS2, BOTTOM_RAIL_VALUE_FLASH_CLASS, TEAM_LOGO_CELL_CLASS, TEAM_LOGO_IMG_CLASS, TEAM_NAME_CELL_CLASS, TEAM_SCORE_CELL_CLASS, BODY_GRID_CLASS, BOTTOM_RAIL_TENNIS_SCORE_CELL_CLASS, BOTTOM_RAIL_TENNIS_BODY_GRID_CLASS, BOTTOM_RAIL_TENNIS_STATUS_COL_START, bottomRailFlashStyleInjected;
 var init_SportsBrowserPrototypeBottomRailGames = __esm({
   "../grarf/desktop/src/components/homeMvp/SportsBrowserPrototypeBottomRailGames.tsx"() {
     init_define_import_meta_env();
@@ -143308,11 +143331,12 @@ var init_SportsBrowserPrototypeBottomRailGames = __esm({
     BOTTOM_RAIL_VALUE_FLASH_CLASS = "bottom-rail-value-flash";
     TEAM_LOGO_CELL_CLASS = "inline-flex h-3 w-3 shrink-0 items-center justify-center";
     TEAM_LOGO_IMG_CLASS = "h-2.5 w-2.5 shrink-0 object-contain";
-    TEAM_NAME_CELL_CLASS = "min-w-0 truncate text-[9px] leading-none normal-case text-[#1a1a1a]";
+    TEAM_NAME_CELL_CLASS = "block min-w-0 w-full truncate text-[9px] leading-none normal-case text-[#1a1a1a]";
     TEAM_SCORE_CELL_CLASS = "inline-flex w-[1.125rem] shrink-0 items-center justify-start tabular-nums text-[9px] leading-none text-[#1a1a1a]";
-    BODY_GRID_CLASS = "grid min-h-0 flex-1 grid-cols-[12px_minmax(0,1fr)_1.125rem_2.25rem] grid-rows-2 items-center gap-x-[0.35ch] gap-y-px";
+    BODY_GRID_CLASS = "grid min-h-0 min-w-0 w-full flex-1 grid-cols-[12px_minmax(0,1fr)_1.125rem_2.25rem] grid-rows-2 items-center gap-x-[0.35ch] gap-y-px";
     BOTTOM_RAIL_TENNIS_SCORE_CELL_CLASS = "inline-flex min-w-[0.65rem] shrink-0 items-center justify-end tabular-nums text-[9px] leading-none text-[#1a1a1a]";
-    BOTTOM_RAIL_TENNIS_BODY_GRID_TEMPLATE = "12px minmax(0,1fr) max-content 2.25rem";
+    BOTTOM_RAIL_TENNIS_BODY_GRID_CLASS = "grid min-h-0 min-w-0 w-full flex-1 grid-cols-[12px_minmax(0,1fr)_2.25rem] grid-rows-2 items-center gap-x-[0.35ch] gap-y-px";
+    BOTTOM_RAIL_TENNIS_STATUS_COL_START = 3;
     bottomRailFlashStyleInjected = false;
   }
 });
@@ -143451,6 +143475,28 @@ var init_sportsBrowserPrototypeLeagueWebsites = __esm({
         {
           label: "BBC Sport",
           url: "https://www.bbc.com/sport/football/premier-league"
+        }
+      ],
+      UCL: [
+        {
+          label: "Extended Highlights",
+          url: "https://youtube.com/playlist?list=PLWvDauQBKnvI&si=reo3kM7kWQnXzI-M"
+        },
+        {
+          label: "Highlights",
+          url: "https://www.uefa.com/uefachampionsleague/fixtures-results/#/d/2026-09-08"
+        },
+        {
+          label: "Overview",
+          url: "https://www.fotmob.com/leagues/42/overview/champions-league"
+        },
+        {
+          label: "X",
+          url: "https://x.com/search?q=uefa%20champions%20league&src=typed_query"
+        },
+        {
+          label: "News",
+          url: "https://www.uefa.com/uefachampionsleague/"
         }
       ],
       US_OPEN_TENNIS: [
@@ -146729,7 +146775,7 @@ function HomePage() {
         onForward: () => sportsBrowserNavigationRef.current.goForward(),
         onNavigate: onSportsBrowserOmniboxNavigate,
         trailing: showSportsBrowserPrototypeTopFeed ? /* @__PURE__ */ (0, import_jsx_runtime231.jsxs)(import_jsx_runtime231.Fragment, { children: [
-          /* @__PURE__ */ (0, import_jsx_runtime231.jsx)(SportsBrowserPrototypeBottomRailGames, { className: "relative z-0 min-w-0 flex-[1.5] shrink overflow-visible border-l border-[#c8c4bc]/70" }),
+          /* @__PURE__ */ (0, import_jsx_runtime231.jsx)(SportsBrowserPrototypeBottomRailGames, { className: "relative z-0 min-w-0 flex-[1.5] overflow-hidden border-l border-[#c8c4bc]/70" }),
           /* @__PURE__ */ (0, import_jsx_runtime231.jsx)("div", { className: "relative z-10 flex h-full min-w-0 flex-1 shrink overflow-hidden border-l border-[#c8c4bc]/70 bg-[#f4b44b]", children: /* @__PURE__ */ (0, import_jsx_runtime231.jsx)(
             GlobalHeaderNewsTicker,
             {
