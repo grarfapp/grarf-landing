@@ -144404,6 +144404,15 @@ var init_SportsBrowserPrototypeBrowserPane = __esm({
   }
 });
 
+// ../grarf/desktop/src/components/homeMvp/sportsBrowserPrototypeContextNavChildSpacing.ts
+var SPORTS_BROWSER_PROTOTYPE_CONTEXT_NAV_CHILD_GAP_CLASS;
+var init_sportsBrowserPrototypeContextNavChildSpacing = __esm({
+  "../grarf/desktop/src/components/homeMvp/sportsBrowserPrototypeContextNavChildSpacing.ts"() {
+    init_define_import_meta_env();
+    SPORTS_BROWSER_PROTOTYPE_CONTEXT_NAV_CHILD_GAP_CLASS = "gap-x-[21px]";
+  }
+});
+
 // ../grarf/desktop/src/components/homeMvp/SportsBrowserPrototypeGameContextInlineTabs.tsx
 function SportsBrowserPrototypeGameContextInlineTabs({
   context: context2,
@@ -144447,7 +144456,7 @@ function SportsBrowserPrototypeGameContextInlineTabs({
             section.label
           );
         }) }),
-        activeWebsites.length > 0 ? /* @__PURE__ */ (0, import_jsx_runtime226.jsx)("span", { className: "flex shrink-0 items-center gap-x-1.5 pl-3 pr-2", children: activeWebsites.map((website4, websiteIndex) => {
+        activeWebsites.length > 0 ? /* @__PURE__ */ (0, import_jsx_runtime226.jsx)("span", { className: cn2("flex shrink-0 items-center pl-3 pr-2", SPORTS_BROWSER_PROTOTYPE_CONTEXT_NAV_CHILD_GAP_CLASS), children: activeWebsites.map((website4, websiteIndex) => {
           const websiteActive = websiteIndex === activeWebsiteIndex;
           return /* @__PURE__ */ (0, import_jsx_runtime226.jsx)(
             "button",
@@ -144475,6 +144484,7 @@ var init_SportsBrowserPrototypeGameContextInlineTabs = __esm({
     init_define_import_meta_env();
     init_cn();
     init_sportsBrowserPrototypeGameContextPane();
+    init_sportsBrowserPrototypeContextNavChildSpacing();
     import_jsx_runtime226 = __toESM(require_jsx_runtime(), 1);
     SECTION_BUTTON_BASE = "relative flex h-9 shrink-0 items-center whitespace-nowrap border px-3.5 text-[12px] font-semibold tracking-[0.01em] transition-colors";
     SECTION_ACTIVE_CLASS = "z-[1] border-[#1a1a1a] bg-[#1a1a1a] text-[#f8f6f1]";
@@ -144513,7 +144523,7 @@ function SportsBrowserPrototypeLeagueNewsInlineTabs({
             children: "NEWS"
           }
         ),
-        websites.length > 0 ? /* @__PURE__ */ (0, import_jsx_runtime227.jsx)("span", { className: "flex shrink-0 items-center gap-x-[11px] pl-3 pr-2", children: websites.map((website4, websiteIndex) => {
+        websites.length > 0 ? /* @__PURE__ */ (0, import_jsx_runtime227.jsx)("span", { className: cn2("flex shrink-0 items-center pl-3 pr-2", SPORTS_BROWSER_PROTOTYPE_CONTEXT_NAV_CHILD_GAP_CLASS), children: websites.map((website4, websiteIndex) => {
           const websiteActive = websiteIndex === activeIndex;
           return /* @__PURE__ */ (0, import_jsx_runtime227.jsx)(
             "button",
@@ -144540,12 +144550,13 @@ var init_SportsBrowserPrototypeLeagueNewsInlineTabs = __esm({
   "../grarf/desktop/src/components/homeMvp/SportsBrowserPrototypeLeagueNewsInlineTabs.tsx"() {
     init_define_import_meta_env();
     init_cn();
+    init_sportsBrowserPrototypeContextNavChildSpacing();
     import_jsx_runtime227 = __toESM(require_jsx_runtime(), 1);
     PARENT_BUTTON_BASE = "relative flex h-9 shrink-0 items-center whitespace-nowrap border px-3.5 text-[12px] font-semibold tracking-[0.01em] transition-colors";
     PARENT_ACTIVE_CLASS = "z-[1] border-[#1a1a1a] bg-[#1a1a1a] text-[#f8f6f1]";
     CHILD_BUTTON_BASE2 = "flex h-9 shrink-0 items-center whitespace-nowrap px-1 transition-colors";
-    CHILD_ACTIVE_CLASS2 = "text-[10px] font-medium text-[#1a1a1a] underline decoration-[#1a1a1a]/70 decoration-1 underline-offset-[3px]";
-    CHILD_INACTIVE_CLASS2 = "text-[10px] font-normal text-[#8a857d] hover:text-[#1a1a1a]";
+    CHILD_ACTIVE_CLASS2 = "text-[10px] font-semibold text-[#1a1a1a] underline decoration-[#1a1a1a]/70 decoration-1 underline-offset-[3px]";
+    CHILD_INACTIVE_CLASS2 = "text-[10px] font-normal text-[#1a1a1a]";
   }
 });
 
