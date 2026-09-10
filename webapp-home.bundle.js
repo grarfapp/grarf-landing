@@ -145447,7 +145447,10 @@ function SidebarTemporalGameRowContainer({
   return /* @__PURE__ */ (0, import_jsx_runtime229.jsx)(
     "div",
     {
-      className,
+      className: cn2(
+        className,
+        onSelect && "cursor-pointer transition-colors hover:bg-[#e9e4db]"
+      ),
       style,
       onClick: onSelect ? () => onSelect(game) : void 0,
       "data-sports-browser-prototype-game-row": onSelect ? "" : void 0,
