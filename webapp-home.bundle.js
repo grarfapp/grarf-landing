@@ -90142,12 +90142,27 @@ var init_resolveTimelineItemUrl = __esm({
 });
 
 // ../grarf/desktop/src/lib/home/homeSourceWebPartition.ts
+function normalizeGrarfWebHost(url) {
+  try {
+    return new URL(url).hostname.replace(/^www\./, "").toLowerCase();
+  } catch {
+    return null;
+  }
+}
+function isGrarfXComHost(url) {
+  const host = normalizeGrarfWebHost(url);
+  if (!host) return false;
+  return host === "x.com" || host === "twitter.com" || host.endsWith(".twitter.com");
+}
 function homeSourceWebPartition(url) {
   try {
     return `persist:grarf-home-${new URL(url).hostname.replace(/\./g, "-")}`;
   } catch {
     return "persist:grarf-home-generic";
   }
+}
+function resolveGrarfPersistentXComWebPartition(url) {
+  return homeSourceWebPartition(url);
 }
 function homeSourceFocusArticlePartition(url) {
   try {
@@ -90159,6 +90174,16 @@ function homeSourceFocusArticlePartition(url) {
 function sportsBrowserPrototypePanePartition(paneId) {
   const safeId = paneId.trim().replace(/[^a-z0-9-]/gi, "-") || "primary";
   return `persist:grarf-sports-browser-${safeId}`;
+}
+function resolveHomeFocusArticleWebPartition(url) {
+  return isGrarfXComHost(url) ? resolveGrarfPersistentXComWebPartition(url) : homeSourceFocusArticlePartition(url);
+}
+function resolveSportsBrowserPrototypeWebviewPartition(paneId, url) {
+  const trimmed = url?.trim();
+  if (trimmed && isGrarfXComHost(trimmed)) {
+    return resolveGrarfPersistentXComWebPartition(trimmed);
+  }
+  return sportsBrowserPrototypePanePartition(paneId);
 }
 var init_homeSourceWebPartition = __esm({
   "../grarf/desktop/src/lib/home/homeSourceWebPartition.ts"() {
@@ -90244,7 +90269,7 @@ function HomeCenterPaneTimelineArticleExpansionPane({
   const [showLoadingHint, setShowLoadingHint] = (0, import_react91.useState)(true);
   const [loadFailed, setLoadFailed] = (0, import_react91.useState)(false);
   const partition = (0, import_react91.useMemo)(
-    () => articleUrl ? homeSourceFocusArticlePartition(articleUrl) : "",
+    () => articleUrl ? resolveHomeFocusArticleWebPartition(articleUrl) : "",
     [articleUrl]
   );
   const canEmbed = Boolean(articleUrl) && hasWebviewTag();
@@ -110674,7 +110699,7 @@ function navigateWebview2(wv, url) {
 function DesktopPulse1XListWebpane({ className }) {
   const wvRef = (0, import_react163.useRef)(null);
   const partition = (0, import_react163.useMemo)(
-    () => homeSourceFocusArticlePartition(DESKTOP_PULSE_1_X_LIST_URL),
+    () => resolveGrarfPersistentXComWebPartition(DESKTOP_PULSE_1_X_LIST_URL),
     []
   );
   (0, import_react163.useLayoutEffect)(() => {
@@ -128735,7 +128760,7 @@ function hasElectronEmbedBridge() {
 }
 function TimelineXWebpane({ url }) {
   const wvRef = (0, import_react200.useRef)(null);
-  const partition = (0, import_react200.useMemo)(() => homeSourceFocusArticlePartition(url), [url]);
+  const partition = (0, import_react200.useMemo)(() => resolveGrarfPersistentXComWebPartition(url), [url]);
   (0, import_react200.useLayoutEffect)(() => {
     void window.grarf?.workspaceEmbedClear?.("center");
     void window.grarf?.workspaceEmbedClear?.("centerChild");
@@ -131596,7 +131621,7 @@ var init_buildHomeSourceFocusTab = __esm({
 
 // ../grarf/desktop/src/components/homeMvp/HomeSourceFocusArticlePane.tsx
 function HomeSourceFocusArticlePane({ url }) {
-  const partition = (0, import_react213.useMemo)(() => homeSourceFocusArticlePartition(url), [url]);
+  const partition = (0, import_react213.useMemo)(() => resolveHomeFocusArticleWebPartition(url), [url]);
   return /* @__PURE__ */ (0, import_jsx_runtime179.jsx)(
     "div",
     {
@@ -143862,8 +143887,8 @@ function SportsBrowserPrototypeBrowserPane({
 }) {
   const activeUrl = url?.trim() ?? "";
   const partition = (0, import_react258.useMemo)(
-    () => sportsBrowserPrototypePanePartition(paneId ?? "primary"),
-    [paneId]
+    () => resolveSportsBrowserPrototypeWebviewPartition(paneId ?? "primary", activeUrl),
+    [paneId, activeUrl]
   );
   const usesImperativeSourceWebview = Boolean(articleFocusSessionKey);
   const selectedArticleUrl = useHomeSourceFocusStore((state3) => {
@@ -144128,7 +144153,7 @@ function SportsBrowserPrototypeBrowserPane({
                       allowpopups: "true",
                       className: cn2(PANE_EMBED_ABSOLUTE_FILL, "border-0 bg-white")
                     },
-                    paneId ?? "primary"
+                    `${paneId ?? "primary"}-${partition}`
                   )
                 }
               ),
