@@ -143626,7 +143626,7 @@ var init_sportsBrowserPrototypeLeagueWebsites = __esm({
       NCAAF: [
         {
           label: "Yahoo!",
-          url: "https://sports.yahoo.com/"
+          url: "https://sports.yahoo.com/college-football/"
         },
         {
           label: "ESPN",
