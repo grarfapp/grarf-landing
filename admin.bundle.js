@@ -21546,16 +21546,10 @@ init_define_import_meta_env();
 init_define_import_meta_env();
 var PEACOCK_CHANNEL_LOGO_URL = "/league-logos/channel-peacock.png";
 var NBC_CHANNEL_LOGO_URL = "/league-logos/channel-nbc.png";
+var ESPN_CHANNEL_LOGO_URL = "/league-logos/channel-espn.png";
 var CHANNEL_LOGO_BY_LABEL = {
   ABC: "/league-logos/channel-abc.png",
   CBS: "/league-logos/channel-cbs.png",
-  ESPN: "/league-logos/channel-espn.png",
-  ESPN2: "/league-logos/channel-espn2.png",
-  "ESPN+": "/league-logos/channel-espn-plus.png",
-  "ESPN PLUS": "/league-logos/channel-espn-plus.png",
-  "ESPN UNLIMITED": "/league-logos/espn_unlimited.png",
-  "ESPN UNLMTD": "/league-logos/espn_unlimited.png",
-  ESPNU: "/league-logos/channel-espnu.png",
   USA: "/league-logos/channel-usa.png",
   "USA NETWORK": "/league-logos/channel-usa.png",
   "USA NET": "/league-logos/channel-usa.png",
@@ -21602,9 +21596,17 @@ function normalizeChannelLogoKey(label) {
 function isNbaTvBroadcastLabel2(label) {
   return /\bNBA[\s.-]*TV\b/i.test(label);
 }
+function isEspnFamilyBroadcastLabel(key) {
+  if (key === "ESPN" || key === "ESPN2" || key === "ESPNU") return true;
+  if (key === "ESPN DEPORTES" || key === "ESPNDEPORTES") return true;
+  if (/\bESPN\s*\+|\bESPN\s*PLUS\b/.test(key)) return true;
+  if (/\bESPN\s*UNLIMITED|\bESPN\s*UNLMTD\b/.test(key)) return true;
+  return false;
+}
 function resolveChannelLogoUrl2(channelLabel) {
   const key = normalizeChannelLogoKey(channelLabel);
   if (!key) return null;
+  if (isEspnFamilyBroadcastLabel(key)) return ESPN_CHANNEL_LOGO_URL;
   const direct = CHANNEL_LOGO_BY_LABEL[key];
   if (direct) return direct;
   if (/\bFS1\b/.test(key)) return CHANNEL_LOGO_BY_LABEL.FS1 ?? null;
@@ -23641,6 +23643,11 @@ function pickProbable(probables, teamId) {
   const stats = "";
   return { name: String(name), stats };
 }
+function pickEspnCuratedPollRank(competitor) {
+  const rank = Number(competitor?.curatedRank?.current);
+  if (!Number.isFinite(rank) || rank <= 0) return void 0;
+  return Math.trunc(rank);
+}
 function pushBroadcastLabel(seen, out, raw) {
   const label = typeof raw === "string" ? raw.trim() : typeof raw?.name === "string" ? raw.name.trim() : "";
   if (!label || label === "TV TBD") return;
@@ -23841,6 +23848,8 @@ function normalizeEspnEvent(event, leagueKey, slateDateKey) {
   const homeRecord = pickRecord(home.records);
   const awayScore = parseScore(away.score);
   const homeScore = parseScore(home.score);
+  const awayPollRank = leagueKey === "NCAAF" ? pickEspnCuratedPollRank(away) : void 0;
+  const homePollRank = leagueKey === "NCAAF" ? pickEspnCuratedPollRank(home) : void 0;
   const awayStandingsLine = safe8(away.standingsSummary) || void 0;
   const homeStandingsLine = safe8(home.standingsSummary) || void 0;
   const probables = comp.probables || [];
@@ -23914,11 +23923,13 @@ function normalizeEspnEvent(event, leagueKey, slateDateKey) {
     awayLogoUrl,
     awayRecord,
     awayStandingsLine,
+    ...awayPollRank != null ? { awayPollRank } : {},
     homeTeam,
     homeTeamAbbrev,
     homeLogoUrl,
     homeRecord,
     homeStandingsLine,
+    ...homePollRank != null ? { homePollRank } : {},
     awayScore,
     homeScore,
     awayCity,
