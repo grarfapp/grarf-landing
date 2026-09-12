@@ -57485,6 +57485,7 @@ function removeGameFromEnrichedSlate(enrichedLeagues, enrichedManualGames, gameI
 }
 function useTopRailRankedGames(importantGameCount) {
   const leagues = useLiveGamesStore((s2) => s2.leagues);
+  const updatedAt = useLiveGamesStore((s2) => s2.updatedAt);
   const manualDocument = useGamesSpineManualStore((s2) => s2.document);
   const manualLeMansRefreshMs = useManualLeMans2026LiveRefreshMs();
   const manualTourDeFranceRefreshMs = useManualTourDeFranceLiveRefreshMs();
@@ -57533,6 +57534,7 @@ function useTopRailRankedGames(importantGameCount) {
     };
   }, [
     leagues,
+    updatedAt,
     manualDocument,
     manualLeMansRefreshMs,
     manualTourDeFranceRefreshMs,
@@ -148571,71 +148573,41 @@ function SectionHeader({ label, open, onToggle, first = false }) {
     }
   );
 }
-function TemporalNavRow({ label, open, onToggle, first = false, children }) {
-  return /* @__PURE__ */ (0, import_jsx_runtime234.jsxs)(
-    "div",
-    {
-      className: cn2(
-        "flex w-full shrink-0 items-center border-t px-4 py-2 text-left",
-        RULE2,
-        "text-[11px] font-bold uppercase tracking-[0.06em] text-[#1a1a1a]",
-        first && "border-t-0"
-      ),
-      children: [
-        /* @__PURE__ */ (0, import_jsx_runtime234.jsxs)(
-          "button",
-          {
-            type: "button",
-            onClick: onToggle,
-            className: "flex min-w-0 flex-1 items-center justify-between gap-2 text-left transition-colors hover:text-[#4a4a4a]",
-            "aria-expanded": open,
-            children: [
-              /* @__PURE__ */ (0, import_jsx_runtime234.jsx)("span", { className: "min-w-0 truncate", children: label }),
-              open ? /* @__PURE__ */ (0, import_jsx_runtime234.jsx)("span", { className: "text-[13px] font-normal leading-none text-[#1a1a1a]", "aria-hidden": true, children: "\u2212" }) : /* @__PURE__ */ (0, import_jsx_runtime234.jsx)(
-                ChevronRight,
-                {
-                  size: 12,
-                  strokeWidth: 2,
-                  className: "shrink-0 text-[#1a1a1a]",
-                  "aria-hidden": true
-                }
-              )
-            ]
-          }
-        ),
-        /* @__PURE__ */ (0, import_jsx_runtime234.jsx)("div", { className: "ml-3 flex shrink-0 items-center gap-2", children })
-      ]
-    }
+function formatCompactPreviousCalendarDate(referenceDate = /* @__PURE__ */ new Date()) {
+  const yesterday = new Date(referenceDate);
+  yesterday.setDate(yesterday.getDate() - 1);
+  return `${yesterday.getMonth() + 1}/${yesterday.getDate()}`;
+}
+function resolveCompactTemporalActiveTabClass(view, activeView) {
+  if (view !== activeView) {
+    return "bg-transparent text-[#6f6a62] hover:bg-[#ece9e2] hover:text-[#1a1a1a]";
+  }
+  return cn2(
+    "bg-[#f8f6f1] text-[#1a1a1a] after:absolute after:inset-x-0 after:bottom-0 after:h-[2px]",
+    view === "now" ? "after:bg-redsys" : "after:bg-[#1a1a1a]"
   );
 }
-function TemporalNavFilterButton({ label, active: active2, onClick }) {
-  return /* @__PURE__ */ (0, import_jsx_runtime234.jsx)(
-    "button",
-    {
-      type: "button",
-      "aria-pressed": active2,
-      onClick,
-      className: cn2(
-        "text-[10px] font-bold uppercase tracking-[0.06em] text-[#1a1a1a] transition-colors hover:text-[#4a4a4a]",
-        active2 && "underline underline-offset-2"
-      ),
-      children: label
-    }
-  );
-}
-function TodayEqualTabRow({
-  activeTab,
+function CompactTemporalNavRow({
+  yesterdayLabel,
+  activeView,
   onSelect
 }) {
+  const items = [
+    { id: "yesterday", label: yesterdayLabel, compact: true },
+    { id: "today", label: "TODAY" },
+    { id: "final", label: "FINAL" },
+    { id: "now", label: "NOW" },
+    { id: "next", label: "NEXT" }
+  ];
   return /* @__PURE__ */ (0, import_jsx_runtime234.jsx)(
     "div",
     {
       className: "flex h-9 w-full shrink-0 overflow-hidden border-b border-[#c8c4bc]/70 bg-[#e8e4dc]",
       role: "tablist",
-      "aria-label": "Today slate",
-      "data-sports-browser-prototype-today-tabs": true,
-      children: TODAY_EQUAL_TABS.map(({ id, label }) => {
-        const active2 = activeTab === id;
+      "aria-label": "Temporal navigation",
+      "data-sports-browser-prototype-compact-temporal-nav": true,
+      children: items.map(({ id, label, compact }) => {
+        const active2 = activeView === id;
         return /* @__PURE__ */ (0, import_jsx_runtime234.jsx)(
           "button",
           {
@@ -148644,11 +148616,9 @@ function TodayEqualTabRow({
             "aria-selected": active2,
             onClick: () => onSelect(id),
             className: cn2(
-              "relative flex min-w-0 flex-1 items-center justify-center border-r border-[#c8c4bc]/60 px-3.5 text-[11px] font-medium tracking-[0.01em] transition-colors",
-              active2 ? cn2(
-                "bg-[#f8f6f1] text-[#1a1a1a] after:absolute after:inset-x-0 after:bottom-0 after:h-[2px]",
-                id === "now" ? "after:bg-redsys" : "after:bg-[#1a1a1a]"
-              ) : "bg-transparent text-[#6f6a62] hover:bg-[#ece9e2] hover:text-[#1a1a1a]"
+              "relative flex min-w-0 items-center justify-center border-r border-[#c8c4bc]/60 transition-colors last:border-r-0",
+              compact ? "w-[42px] shrink-0 px-1 text-[9px] font-medium tabular-nums tracking-[0.01em]" : "min-w-0 flex-1 px-1 text-[10px] font-medium tracking-[0.04em]",
+              resolveCompactTemporalActiveTabClass(id, activeView)
             ),
             children: label
           },
@@ -149326,34 +149296,56 @@ function SportsBrowserPrototypeLeftNav({
   const [yesterdayOpen, setYesterdayOpen] = (0, import_react263.useState)(false);
   const [catchUpTodayActive, setCatchUpTodayActive] = (0, import_react263.useState)(false);
   const [todayTab, setTodayTab] = (0, import_react263.useState)("today");
-  const hasUserSelectedTodayTab = (0, import_react263.useRef)(false);
-  (0, import_react263.useEffect)(() => {
-    if (hasUserSelectedTodayTab.current) return;
-    const hasLiveGamesToday = nowLeagues.some((slate) => slate.games.length > 0);
-    if (hasLiveGamesToday) {
-      setTodayTab("now");
-    }
-  }, [nowLeagues]);
-  const onTodayTabSelect = (0, import_react263.useCallback)((tab) => {
-    hasUserSelectedTodayTab.current = true;
-    setTodayTab(tab);
-  }, []);
+  const hasUserSelectedTemporalView = (0, import_react263.useRef)(false);
+  const yesterdayLabel = (0, import_react263.useMemo)(() => formatCompactPreviousCalendarDate(), []);
   const todayCompleteLeagues = (0, import_react263.useMemo)(
     () => buildTodayCompleteLeagueSlates(nowLeagues, upcomingLeagues, catchUpLeagues),
     [nowLeagues, upcomingLeagues, catchUpLeagues]
   );
-  const catchUpRowOpen = catchUpTodayActive || yesterdayOpen;
-  const toggleCatchUpRow = () => {
-    const nextOpen = !catchUpRowOpen;
-    setYesterdayOpen(false);
-    setCatchUpTodayActive(nextOpen);
-  };
-  const toggleTodayCatchUpFilter = () => {
-    setCatchUpTodayActive((open) => !open);
-  };
-  const toggleYesterdayCatchUpFilter = () => {
-    setYesterdayOpen((open) => !open);
-  };
+  (0, import_react263.useEffect)(() => {
+    if (hasUserSelectedTemporalView.current) return;
+    const hasLiveGamesToday = nowLeagues.some((slate) => slate.games.length > 0);
+    if (hasLiveGamesToday) {
+      setYesterdayOpen(false);
+      setCatchUpTodayActive(false);
+      setTodayTab("now");
+    }
+  }, [nowLeagues]);
+  const compactTemporalView = (0, import_react263.useMemo)(() => {
+    if (yesterdayOpen) return "yesterday";
+    if (catchUpTodayActive) return "final";
+    if (todayTab === "now") return "now";
+    if (todayTab === "upcoming") return "next";
+    return "today";
+  }, [catchUpTodayActive, todayTab, yesterdayOpen]);
+  const onCompactTemporalSelect = (0, import_react263.useCallback)((view) => {
+    hasUserSelectedTemporalView.current = true;
+    switch (view) {
+      case "yesterday":
+        setYesterdayOpen(true);
+        setCatchUpTodayActive(false);
+        return;
+      case "final":
+        setYesterdayOpen(false);
+        setCatchUpTodayActive(true);
+        return;
+      case "today":
+        setYesterdayOpen(false);
+        setCatchUpTodayActive(false);
+        setTodayTab("today");
+        return;
+      case "now":
+        setYesterdayOpen(false);
+        setCatchUpTodayActive(false);
+        setTodayTab("now");
+        return;
+      case "next":
+        setYesterdayOpen(false);
+        setCatchUpTodayActive(false);
+        setTodayTab("upcoming");
+        return;
+    }
+  }, []);
   const [leaguesOpen, setLeaguesOpen] = (0, import_react263.useState)(false);
   const [newsOpen, setNewsOpen] = (0, import_react263.useState)(false);
   const [socialOpen, setSocialOpen] = (0, import_react263.useState)(false);
@@ -149420,24 +149412,25 @@ function SportsBrowserPrototypeLeftNav({
                   ))
                 }
               ) : null,
-              /* @__PURE__ */ (0, import_jsx_runtime234.jsxs)(TemporalNavRow, { label: "CATCH UP", open: catchUpRowOpen, onToggle: toggleCatchUpRow, children: [
-                /* @__PURE__ */ (0, import_jsx_runtime234.jsx)(
-                  TemporalNavFilterButton,
-                  {
-                    label: "TODAY",
-                    active: catchUpTodayActive,
-                    onClick: toggleTodayCatchUpFilter
-                  }
-                ),
-                /* @__PURE__ */ (0, import_jsx_runtime234.jsx)(
-                  TemporalNavFilterButton,
-                  {
-                    label: "YESTERDAY",
-                    active: yesterdayOpen,
-                    onClick: toggleYesterdayCatchUpFilter
-                  }
-                )
-              ] }),
+              /* @__PURE__ */ (0, import_jsx_runtime234.jsx)(
+                "div",
+                {
+                  className: cn2(
+                    "border-t px-4 py-2 text-[11px] font-bold uppercase tracking-[0.06em] text-[#1a1a1a]",
+                    RULE2
+                  ),
+                  "data-sports-browser-prototype-temporal-navigation-section": true,
+                  children: "TEMPORAL NAVIGATION"
+                }
+              ),
+              /* @__PURE__ */ (0, import_jsx_runtime234.jsx)(
+                CompactTemporalNavRow,
+                {
+                  yesterdayLabel,
+                  activeView: compactTemporalView,
+                  onSelect: onCompactTemporalSelect
+                }
+              ),
               catchUpTodayActive ? /* @__PURE__ */ (0, import_jsx_runtime234.jsx)(import_jsx_runtime234.Fragment, { children: catchUpLeagues.map(
                 (slate) => slate.key === "F1" ? /* @__PURE__ */ (0, import_jsx_runtime234.jsx)(
                   SidebarF1CatchUpMockLeagueBlock,
@@ -149463,7 +149456,6 @@ function SportsBrowserPrototypeLeftNav({
                 /* @__PURE__ */ (0, import_jsx_runtime234.jsx)(NavRow, { label: "Now", indent: 1 }),
                 /* @__PURE__ */ (0, import_jsx_runtime234.jsx)(NavRow, { label: "Upcoming", indent: 1 })
               ] }) : null,
-              /* @__PURE__ */ (0, import_jsx_runtime234.jsx)(TodayEqualTabRow, { activeTab: todayTab, onSelect: onTodayTabSelect }),
               todayTab === "today" ? /* @__PURE__ */ (0, import_jsx_runtime234.jsx)(
                 SidebarTemporalSectionLeagues,
                 {
@@ -149593,7 +149585,7 @@ function SportsBrowserPrototypeLeftNav({
     }
   );
 }
-var import_react263, import_jsx_runtime234, MENU_SURFACE2, RULE2, F1_CATCH_UP_MOCK_HEADLINES, TODAY_EQUAL_TABS, SIDEBAR_GAME_ROW_CLASS, SIDEBAR_GAME_ROW_WATCH_LIVE_CLASS, SIDEBAR_GAME_ROW_TWO_LINE_GRID_CLASS, SIDEBAR_GAME_ROW_TENNIS_GRID_BASE_CLASS, SIDEBAR_GAME_ROW_SCORE_CLASS, SIDEBAR_GAME_ROW_TENNIS_SET_SCORE_CLASS, SIDEBAR_GAME_ROW_STATUS_BASE_CLASS, SIDEBAR_GAME_ROW_BROADCAST_BASE_CLASS, SIDEBAR_F1_MOCK_HEADLINE_ROW_CLASS;
+var import_react263, import_jsx_runtime234, MENU_SURFACE2, RULE2, F1_CATCH_UP_MOCK_HEADLINES, SIDEBAR_GAME_ROW_CLASS, SIDEBAR_GAME_ROW_WATCH_LIVE_CLASS, SIDEBAR_GAME_ROW_TWO_LINE_GRID_CLASS, SIDEBAR_GAME_ROW_TENNIS_GRID_BASE_CLASS, SIDEBAR_GAME_ROW_SCORE_CLASS, SIDEBAR_GAME_ROW_TENNIS_SET_SCORE_CLASS, SIDEBAR_GAME_ROW_STATUS_BASE_CLASS, SIDEBAR_GAME_ROW_BROADCAST_BASE_CLASS, SIDEBAR_F1_MOCK_HEADLINE_ROW_CLASS;
 var init_SportsBrowserPrototypeLeftNav = __esm({
   "../grarf/desktop/src/components/homeMvp/SportsBrowserPrototypeLeftNav.tsx"() {
     init_define_import_meta_env();
@@ -149631,11 +149623,6 @@ var init_SportsBrowserPrototypeLeftNav = __esm({
         label: "FP2: Russell beats Leclerc and Antonelli to the fastest time in Free Practice 2 ahead of Italian Grand Prix",
         url: "https://www.formula1.com/en/latest/article/fp2-russell-beats-leclerc-and-antonelli-to-the-fastest-time-in-free-practice-2-ahead-of-italian-grand-prix.4mVLF757oe0NuWE9Caw1wO"
       }
-    ];
-    TODAY_EQUAL_TABS = [
-      { id: "today", label: "TODAY" },
-      { id: "now", label: "NOW" },
-      { id: "upcoming", label: "UPCOMING" }
     ];
     SIDEBAR_GAME_ROW_CLASS = cn2(
       "border-t px-4 py-[5px] text-[10px] leading-snug first:border-t-0",
