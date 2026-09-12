@@ -147498,6 +147498,7 @@ function BottomRailTeamRow({
   game,
   side,
   name,
+  pollRank = null,
   score: score2,
   showScore,
   row,
@@ -147532,7 +147533,13 @@ function BottomRailTeamRow({
           "col-start-2",
           winnerBoldClass
         ),
-        children: name
+        children: pollRank != null ? /* @__PURE__ */ (0, import_jsx_runtime232.jsxs)(import_jsx_runtime232.Fragment, { children: [
+          /* @__PURE__ */ (0, import_jsx_runtime232.jsx)("span", { className: LEFT_NAV_NCAAF_POLL_RANK_TEXT_CLASS, children: pollRank }),
+          /* @__PURE__ */ (0, import_jsx_runtime232.jsxs)("span", { children: [
+            " ",
+            name
+          ] })
+        ] }) : name
       }
     ) : null,
     !suppressScoreCell ? /* @__PURE__ */ (0, import_jsx_runtime232.jsx)(
@@ -147647,6 +147654,8 @@ function BottomRailGameCardBody({
   const statusTimeLabel = resolveBottomRailStatusTimeLabel(game);
   const showChannelLogo = shouldShowBottomRailChannelLogo(game);
   const finalWinnerSide = model.kind === "matchup" ? resolveGamesSpineCompactMatchupFinalWinnerSide(game, model.left, model.right) : null;
+  const leftPresentation = model.kind === "matchup" ? resolveSportsBrowserLeftNavTeamNamePresentation(game, model.left) : null;
+  const rightPresentation = model.kind === "matchup" ? resolveSportsBrowserLeftNavTeamNamePresentation(game, model.right) : null;
   const showWatchLive = Boolean(onWatchLive && (canShowWatchLive ? canShowWatchLive(game) : true));
   return /* @__PURE__ */ (0, import_jsx_runtime232.jsxs)("div", { className: "flex min-h-0 min-w-0 w-full flex-1 flex-col justify-center gap-px px-1.5 py-0.5", children: [
     /* @__PURE__ */ (0, import_jsx_runtime232.jsxs)("div", { className: "flex min-w-0 items-center justify-between gap-1", children: [
@@ -147702,7 +147711,8 @@ function BottomRailGameCardBody({
             {
               game,
               side: model.left.side,
-              name: (model.left.teamName || model.left.abbrev).trim(),
+              name: leftPresentation.teamName,
+              pollRank: leftPresentation.pollRank,
               score: model.left.score,
               showScore: model.showScores,
               row: 1,
@@ -147717,7 +147727,8 @@ function BottomRailGameCardBody({
             {
               game,
               side: model.right.side,
-              name: (model.right.teamName || model.right.abbrev).trim(),
+              name: rightPresentation.teamName,
+              pollRank: rightPresentation.pollRank,
               score: model.right.score,
               showScore: model.showScores,
               row: 2,
@@ -148103,6 +148114,7 @@ var init_SportsBrowserPrototypeBottomRailGames = __esm({
     init_gamesSpineFinalResultNameEmphasis();
     init_resolveTeamLogoUrl();
     init_resolveGamesSpineMatchupSideOrder();
+    init_resolveSportsBrowserLeftNavTeamNamePresentation();
     init_NewsSportsBrowserChannelLogo();
     import_jsx_runtime232 = __toESM(require_jsx_runtime(), 1);
     MENU_SURFACE = "bg-[#f3f0ea] text-[#1a1a1a]";
@@ -149929,6 +149941,37 @@ var init_resolveCommandCenterUsOpenUpcomingBottomLeftPane = __esm({
   }
 });
 
+// ../grarf/desktop/src/lib/commandCenter/resolveCommandCenterEplGoalRushUrl.ts
+function countEplOperationalNowLiveGames(liveLeagues) {
+  const snapshot = resolveCanonicalNowOperationalSnapshot(liveLeagues);
+  const eplSlate = filterGamesSpineSlateForOperationalSportsDay(snapshot.mergedLeagues.EPL ?? []);
+  return eplSlate.filter(isGameActivelyLive).length;
+}
+function isEplBestGameRightNow(input) {
+  const result = resolveBestGameRightNowV1(input.enrichedLeagues, input.enrichedManualGames, {
+    adminFeaturedPriorities: input.adminFeaturedPriorities
+  });
+  return result?.kind === "best_live" && result.game.league === "EPL";
+}
+function resolveCommandCenterEplGoalRushQualifies(input) {
+  if (countEplOperationalNowLiveGames(input.liveLeagues) < 2) return false;
+  return isEplBestGameRightNow(input);
+}
+function resolveCommandCenterEplGoalRushUrl(input) {
+  return resolveCommandCenterEplGoalRushQualifies(input) ? COMMAND_CENTER_EPL_GOAL_RUSH_URL : null;
+}
+var COMMAND_CENTER_EPL_GOAL_RUSH_URL;
+var init_resolveCommandCenterEplGoalRushUrl = __esm({
+  "../grarf/desktop/src/lib/commandCenter/resolveCommandCenterEplGoalRushUrl.ts"() {
+    init_define_import_meta_env();
+    init_resolveBestGameRightNowV1();
+    init_gamesSpineOperationalDate();
+    init_isGameActivelyLive();
+    init_resolveCanonicalNowOperationalGames();
+    COMMAND_CENTER_EPL_GOAL_RUSH_URL = "https://www.peacocktv.com/watch/playback/event/PCKSLE:e535b7e7-f845-46a9-8273-23eeeda0434c:2fd7cba9-aee5-484b-9a7b-480949e58efb/e0f5e30e-97d9-3882-9d18-05866e31614e";
+  }
+});
+
 // ../grarf/desktop/src/lib/commandCenter/resolveCommandCenterUclLiveTopLeftUrl.ts
 function isUclOperationalNowLive(liveLeagues) {
   const snapshot = resolveCanonicalNowOperationalSnapshot(liveLeagues);
@@ -149965,6 +150008,7 @@ function resolveCommandCenterGameCardLabel(game) {
 }
 function resolveCommandCenterDestinationActionReason(id) {
   switch (id) {
+    case "epl-goal-rush":
     case "ucl-live":
     case "mlb-live":
       return "Watch live";
@@ -149973,6 +150017,16 @@ function resolveCommandCenterDestinationActionReason(id) {
     case "us-open-upcoming":
       return "Preview matchups";
   }
+}
+function resolveEplGoalRushDestination(input) {
+  const url = resolveCommandCenterEplGoalRushUrl(input);
+  if (!url) return null;
+  return {
+    id: "epl-goal-rush",
+    cardLabel: resolveGamesSpineLeagueDisplayLabel("EPL"),
+    cardDetail: "Watch Goal Rush",
+    presentation: { kind: "url", url }
+  };
 }
 function resolveUclLiveDestination(liveLeagues) {
   const url = resolveCommandCenterUclLiveTopLeftUrl(liveLeagues);
@@ -150029,6 +150083,7 @@ function compareCommandCenterDestinationsByPriority(left, right) {
 }
 function resolveCommandCenterCandidates(input) {
   return [
+    resolveEplGoalRushDestination(input),
     resolveUclLiveDestination(input.liveLeagues),
     resolveMlbLiveDestination(input),
     resolveNflUpcomingDestination(input),
@@ -150071,8 +150126,11 @@ var init_resolveCommandCenterLayout = __esm({
     init_resolveCommandCenterMlbLiveBottomRightUrl();
     init_resolveCommandCenterNflUpcomingTopRightPane();
     init_resolveCommandCenterUsOpenUpcomingBottomLeftPane();
+    init_resolveCommandCenterEplGoalRushUrl();
     init_resolveCommandCenterUclLiveTopLeftUrl();
+    init_resolveCommandCenterEplGoalRushUrl();
     COMMAND_CENTER_DESTINATION_PRIORITY = {
+      "epl-goal-rush": 0,
       "ucl-live": 1,
       "mlb-live": 2,
       "nfl-upcoming": 3,
