@@ -147409,16 +147409,6 @@ function orderSportsBrowserPrototypeNewsSidebarLeagueSlates(slates) {
   }
   return ordered;
 }
-function resolveNewsSidebarOperationalLeagueOrder(hasOperationalSportsDayGames) {
-  const ordered = [];
-  const seen = /* @__PURE__ */ new Set();
-  for (const key2 of getLeaguePriorityOrder()) {
-    if (!hasOperationalSportsDayGames(key2)) continue;
-    ordered.push(key2);
-    seen.add(key2);
-  }
-  return ordered;
-}
 var init_orderSportsBrowserPrototypeNewsSidebarLeagueSlates = __esm({
   "../grarf/desktop/src/lib/gamesSpine/orderSportsBrowserPrototypeNewsSidebarLeagueSlates.ts"() {
     init_define_import_meta_env();
@@ -148935,7 +148925,7 @@ function resolveManualSectionCatchUpVisibleGames(section, manualRefreshMs, opera
   );
   return filterTodayOperationalFinalGames(refreshed, now);
 }
-function buildTemporalLeagueSlates(spineSections, mergedLeagues, temporalMode, liveLeagueKeys, resolveVisibleGames) {
+function buildSportsBrowserPrototypeTodayTemporalLeagueSlates(spineSections, mergedLeagues, temporalMode, liveLeagueKeys, resolveVisibleGames) {
   const slates = [];
   for (const section of spineSections) {
     if (!sectionPassesTemporalFilter(section, mergedLeagues, temporalMode, liveLeagueKeys)) continue;
@@ -148962,8 +148952,18 @@ function buildTemporalLeagueSlates(spineSections, mergedLeagues, temporalMode, l
   }
   return slates;
 }
+function resolveSportsBrowserPrototypeTodayTemporalSpineLeagueOrder(mergedLeagues) {
+  const base = resolveGamesSpineOperationalLeagueOrder(mergedLeagues);
+  const adjunctVisible = OPERATIONAL_ADJUNCT_LEAGUE_KEYS.filter(
+    (key2) => filterGamesSpineSlateForOperationalSportsDay(mergedLeagues[key2] ?? []).length > 0
+  );
+  const seen = new Set(base);
+  return withoutGamesSpineHiddenLeagues([
+    ...base,
+    ...adjunctVisible.filter((key2) => !seen.has(key2))
+  ]);
+}
 function useSportsBrowserPrototypeTodayTemporalSlate() {
-  const { activeLeagueId } = useHomeActiveLeagueContextOptional();
   const liveLeagues = useLiveGamesStore((s2) => s2.leagues);
   const scheduleByDate = useScheduleCacheStore((s2) => s2.byDate);
   const selectedDate = useCommandBriefingStore((s2) => s2.selectedDate);
@@ -148979,21 +148979,10 @@ function useSportsBrowserPrototypeTodayTemporalSlate() {
     () => resolveCanonicalOperationalMergedLeagues(liveLeagues),
     [liveLeagues]
   );
-  const spineLeagueOrder = (0, import_react262.useMemo)(() => {
-    const useOperationalOrder = activeLeagueId === "general-sports";
-    if (!useOperationalOrder) {
-      return resolveHomeActiveLeagueSpineOrder(activeLeagueId).filter(
-        (key2) => filterGamesSpineSlateForOperationalSportsDay(mergedLeagues[key2] ?? []).length > 0
-      );
-    }
-    const hasOperationalSportsDayGames = (key2) => filterGamesSpineSlateForOperationalSportsDay(mergedLeagues[key2] ?? []).length > 0;
-    const base = resolveNewsSidebarOperationalLeagueOrder(hasOperationalSportsDayGames);
-    const seen = new Set(base);
-    const adjunctVisible = OPERATIONAL_ADJUNCT_LEAGUE_KEYS.filter(
-      (key2) => !seen.has(key2) && hasOperationalSportsDayGames(key2)
-    );
-    return withoutGamesSpineHiddenLeagues([...base, ...adjunctVisible]);
-  }, [activeLeagueId, mergedLeagues]);
+  const spineLeagueOrder = (0, import_react262.useMemo)(
+    () => resolveSportsBrowserPrototypeTodayTemporalSpineLeagueOrder(mergedLeagues),
+    [mergedLeagues]
+  );
   const manualSections = (0, import_react262.useMemo)(
     () => convertManualGamesSpineDocument(manualDocument, new Date(manualRefreshMs)),
     [manualDocument, manualRefreshMs]
@@ -149033,7 +149022,7 @@ function useSportsBrowserPrototypeTodayTemporalSlate() {
     ]
   );
   const nowLeagues = (0, import_react262.useMemo)(
-    () => buildTemporalLeagueSlates(spineSections, mergedLeagues, "now", liveLeagueKeys, (section) => {
+    () => buildSportsBrowserPrototypeTodayTemporalLeagueSlates(spineSections, mergedLeagues, "now", liveLeagueKeys, (section) => {
       if (section.kind === "operational") {
         return resolveOperationalLeagueVisibleGames(
           section.leagueKey,
@@ -149054,7 +149043,7 @@ function useSportsBrowserPrototypeTodayTemporalSlate() {
     ]
   );
   const upcomingLeagues = (0, import_react262.useMemo)(
-    () => buildTemporalLeagueSlates(spineSections, mergedLeagues, "upcoming", liveLeagueKeys, (section) => {
+    () => buildSportsBrowserPrototypeTodayTemporalLeagueSlates(spineSections, mergedLeagues, "upcoming", liveLeagueKeys, (section) => {
       if (section.kind === "operational") {
         return resolveOperationalLeagueVisibleGames(
           section.leagueKey,
@@ -149080,7 +149069,7 @@ function useSportsBrowserPrototypeTodayTemporalSlate() {
     ]
   );
   const catchUpLeagues = (0, import_react262.useMemo)(
-    () => buildTemporalLeagueSlates(spineSections, mergedLeagues, "catchUp", liveLeagueKeys, (section) => {
+    () => buildSportsBrowserPrototypeTodayTemporalLeagueSlates(spineSections, mergedLeagues, "catchUp", liveLeagueKeys, (section) => {
       if (section.kind === "operational") {
         return resolveOperationalLeagueCatchUpVisibleGames(section.leagueKey, sharedOperationalInput);
       }
@@ -149108,8 +149097,6 @@ var init_useSportsBrowserPrototypeTodayTemporalSlate = __esm({
     import_react262 = __toESM(require_react(), 1);
     init_operationalSlateDate2();
     init_gamesColumnLeagues();
-    init_HomeActiveLeagueContext();
-    init_resolveHomeActiveLeagueSync();
     init_applyCanonicalGamesSpineEnrichment();
     init_applyManualGameOverrides2();
     init_buildVisibleSpineGames();
@@ -149128,11 +149115,11 @@ var init_useSportsBrowserPrototypeTodayTemporalSlate = __esm({
     init_resolveCanonicalNowOperationalGames();
     init_resolveCanonicalOperationalMergedLeagues();
     init_resolveCanonicalWebHomeGamesSpineOperationalMode();
+    init_resolveGamesSpineOperationalLeagueOrder();
     init_resolveGrarfCompetitionActiveCalendarWindow();
     init_resolveViewLeagueGames();
     init_wimbledonGamesSpinePresentation();
     init_dedupeSportsBrowserPrototypeNewsSidebarGames();
-    init_orderSportsBrowserPrototypeNewsSidebarLeagueSlates();
     init_sortGamesSpineChronologically();
     init_gamesSpineTemporarilyHiddenLeagues();
     init_mergeCatchUpSupplementalFinals();
