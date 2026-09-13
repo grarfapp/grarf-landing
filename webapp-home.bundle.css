@@ -1,7 +1,7 @@
 @import "https://fonts.googleapis.com/css2?family=DM+Mono:wght@400&display=swap";
 @import "https://fonts.googleapis.com/css2?family=Datatype&display=swap";
 
-/* src/lib/gamesSpine/gamesSpineLeagueHeaderTypography.css */
+/* ../grarf/desktop/src/lib/gamesSpine/gamesSpineLeagueHeaderTypography.css */
 .games-spine-league-header-name {
   font-family:
     "Datatype",
@@ -9,7 +9,7 @@
     monospace;
 }
 
-/* src/lib/social/socialSignalBodyTypography.css */
+/* ../grarf/desktop/src/lib/social/socialSignalBodyTypography.css */
 .grarf-signal-body {
   font-family:
     "DM Mono",
@@ -18,7 +18,7 @@
   font-weight: 400;
 }
 
-/* src/lib/sportscape/sportscapeHeadlinesSourceSelectorTypography.css */
+/* ../grarf/desktop/src/lib/sportscape/sportscapeHeadlinesSourceSelectorTypography.css */
 .sportscape-headlines-source-selector-label {
   font-family:
     "Datatype",
