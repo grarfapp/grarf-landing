@@ -149388,7 +149388,7 @@ function SidebarCompetitorMark({
           }
         ) : null }),
         /* @__PURE__ */ (0, import_jsx_runtime234.jsx)("span", { className: cn2("min-w-0 break-words whitespace-normal normal-case", SIDEBAR_GAME_ROW_PRIMARY_TEXT_CLASS, winnerBoldClass), children: pollRank != null ? /* @__PURE__ */ (0, import_jsx_runtime234.jsxs)(import_jsx_runtime234.Fragment, { children: [
-          /* @__PURE__ */ (0, import_jsx_runtime234.jsx)("span", { className: cn2(LEFT_NAV_NCAAF_POLL_RANK_TEXT_CLASS, "group-aria-current:text-[#f3f0ea]/75"), children: pollRank }),
+          /* @__PURE__ */ (0, import_jsx_runtime234.jsx)("span", { className: cn2(LEFT_NAV_NCAAF_POLL_RANK_TEXT_CLASS), children: pollRank }),
           /* @__PURE__ */ (0, import_jsx_runtime234.jsxs)("span", { children: [
             " ",
             name
@@ -150256,7 +150256,7 @@ function SportsBrowserPrototypeLeftNav({
     }
   );
 }
-var import_react263, import_jsx_runtime234, MENU_SURFACE2, RULE2, F1_CATCH_UP_MOCK_HEADLINES, SIDEBAR_GAME_ROW_CLASS, SIDEBAR_GAME_ROW_SELECTED_SURFACE_CLASS, SIDEBAR_GAME_ROW_PRIMARY_TEXT_CLASS, SIDEBAR_GAME_ROW_LIVE_STATUS_CLASS, SIDEBAR_GAME_ROW_WATCH_LIVE_CLASS, SIDEBAR_GAME_ROW_TWO_LINE_GRID_CLASS, SIDEBAR_GAME_ROW_TENNIS_GRID_BASE_CLASS, SIDEBAR_GAME_ROW_SCORE_CLASS, SIDEBAR_GAME_ROW_TENNIS_SET_SCORE_CLASS, SIDEBAR_GAME_ROW_STATUS_BASE_CLASS, SIDEBAR_GAME_ROW_BROADCAST_BASE_CLASS, SIDEBAR_F1_MOCK_HEADLINE_ROW_CLASS;
+var import_react263, import_jsx_runtime234, MENU_SURFACE2, RULE2, F1_CATCH_UP_MOCK_HEADLINES, SIDEBAR_GAME_ROW_CLASS, SIDEBAR_GAME_ROW_HOVER_SURFACE_CLASS, SIDEBAR_GAME_ROW_SELECTED_SURFACE_CLASS, SIDEBAR_GAME_ROW_PRIMARY_TEXT_CLASS, SIDEBAR_GAME_ROW_LIVE_STATUS_CLASS, SIDEBAR_GAME_ROW_WATCH_LIVE_CLASS, SIDEBAR_GAME_ROW_TWO_LINE_GRID_CLASS, SIDEBAR_GAME_ROW_TENNIS_GRID_BASE_CLASS, SIDEBAR_GAME_ROW_SCORE_CLASS, SIDEBAR_GAME_ROW_TENNIS_SET_SCORE_CLASS, SIDEBAR_GAME_ROW_STATUS_BASE_CLASS, SIDEBAR_GAME_ROW_BROADCAST_BASE_CLASS, SIDEBAR_F1_MOCK_HEADLINE_ROW_CLASS;
 var init_SportsBrowserPrototypeLeftNav = __esm({
   "../grarf/desktop/src/components/homeMvp/SportsBrowserPrototypeLeftNav.tsx"() {
     init_define_import_meta_env();
@@ -150299,15 +150299,16 @@ var init_SportsBrowserPrototypeLeftNav = __esm({
       "border-t px-4 py-[5px] text-[10px] leading-snug first:border-t-0",
       RULE2
     );
-    SIDEBAR_GAME_ROW_SELECTED_SURFACE_CLASS = "bg-[#2f2c28] hover:bg-[#2f2c28]";
-    SIDEBAR_GAME_ROW_PRIMARY_TEXT_CLASS = "text-[#1a1a1a] group-aria-current:text-[#f3f0ea]";
-    SIDEBAR_GAME_ROW_LIVE_STATUS_CLASS = "font-medium text-[#b45309] group-aria-current:text-[#fbbf24]";
-    SIDEBAR_GAME_ROW_WATCH_LIVE_CLASS = "col-span-full row-start-3 justify-self-end border-0 bg-transparent p-0 font-mono text-[8px] leading-none tracking-[0.08em] text-[#1a1a1a]/80 transition-colors hover:text-[#1a1a1a] group-aria-current:text-[#f3f0ea]/85 group-aria-current:hover:text-[#f3f0ea]";
+    SIDEBAR_GAME_ROW_HOVER_SURFACE_CLASS = "bg-[#e9e4db]";
+    SIDEBAR_GAME_ROW_SELECTED_SURFACE_CLASS = SIDEBAR_GAME_ROW_HOVER_SURFACE_CLASS;
+    SIDEBAR_GAME_ROW_PRIMARY_TEXT_CLASS = "text-[#1a1a1a]";
+    SIDEBAR_GAME_ROW_LIVE_STATUS_CLASS = "font-medium text-[#b45309]";
+    SIDEBAR_GAME_ROW_WATCH_LIVE_CLASS = "col-span-full row-start-3 justify-self-end border-0 bg-transparent p-0 font-mono text-[8px] leading-none tracking-[0.08em] text-[#1a1a1a]/80 transition-colors hover:text-[#1a1a1a]";
     SIDEBAR_GAME_ROW_TWO_LINE_GRID_CLASS = "grid min-w-0 w-full grid-cols-[minmax(0,1fr)_1.125rem_minmax(1.75rem,max-content)_1.5rem] grid-rows-[auto_auto] items-center gap-x-[0.35ch] gap-y-[1px]";
     SIDEBAR_GAME_ROW_TENNIS_GRID_BASE_CLASS = "grid min-w-0 w-full grid-rows-[auto_auto] items-center gap-x-[0.35ch] gap-y-[1px]";
-    SIDEBAR_GAME_ROW_SCORE_CLASS = "inline-flex w-[1.125rem] shrink-0 items-center justify-start tabular-nums text-[#1a1a1a] group-aria-current:text-[#f3f0ea]";
-    SIDEBAR_GAME_ROW_TENNIS_SET_SCORE_CLASS = "inline-flex min-w-[0.65rem] shrink-0 items-center justify-start tabular-nums text-[#1a1a1a] group-aria-current:text-[#f3f0ea]";
-    SIDEBAR_GAME_ROW_STATUS_BASE_CLASS = "row-start-2 min-w-0 truncate text-right tabular-nums tracking-wide text-[#6a6a6a] group-aria-current:text-[#cfc9bd]";
+    SIDEBAR_GAME_ROW_SCORE_CLASS = "inline-flex w-[1.125rem] shrink-0 items-center justify-start tabular-nums text-[#1a1a1a]";
+    SIDEBAR_GAME_ROW_TENNIS_SET_SCORE_CLASS = "inline-flex min-w-[0.65rem] shrink-0 items-center justify-start tabular-nums text-[#1a1a1a]";
+    SIDEBAR_GAME_ROW_STATUS_BASE_CLASS = "row-start-2 min-w-0 truncate text-right tabular-nums tracking-wide text-[#6a6a6a]";
     SIDEBAR_GAME_ROW_BROADCAST_BASE_CLASS = "row-start-2 flex w-[1.5rem] shrink-0 items-center justify-end";
     SIDEBAR_F1_MOCK_HEADLINE_ROW_CLASS = cn2(
       "border-t py-[5px] pl-8 pr-4 text-[10px] leading-snug first:border-t-0 break-words whitespace-normal",
