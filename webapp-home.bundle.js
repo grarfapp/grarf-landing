@@ -139292,6 +139292,7 @@ function applySportsBrowserPrototypeActiveTabUpdate(tab, update) {
   if (next.splitPaneCount !== tab.splitPaneCount) return next;
   if (next.activePaneIndex !== tab.activePaneIndex) return next;
   if (next.splitPaneCount > 1) return next;
+  if (!isSportsBrowserPrototypeCommandCenterTabShowingPrimaryDestination(tab)) return next;
   return tab;
 }
 function resolveSportsBrowserPrototypeSidebarSelectionPaneIndex(tab) {
