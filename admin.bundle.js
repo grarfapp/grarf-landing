@@ -13973,6 +13973,7 @@ var LEAGUE_PRIORITY_SEED_ORDER = [
   "AFL",
   "CHAMPIONS",
   "ARG1",
+  "SCOTTISH_LEAGUE_CUP",
   "RUGBYTOP14",
   "nav.ausl",
   "nav.euroleague",
@@ -14134,6 +14135,7 @@ var GAMES_COLUMN_LEAGUE_LABEL = {
   CONCACAF_CAC: "Central American Cup",
   CAF_WNATIONS: "Women's AFCON",
   SPFL: "SPFL",
+  SCOTTISH_LEAGUE_CUP: "Scottish League Cup",
   SAUDI: "RSL",
   SUPERLIG: "Super Lig",
   USLCUP: "USL Cup",
@@ -14661,6 +14663,13 @@ var ESPN_OPERATIONAL_INGEST_LEAGUES = [
     "label": "Saudi Pro League",
     "slug": "ksa.1",
     "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/ksa.1/scoreboard"
+  },
+  {
+    "key": "SCOTTISH_LEAGUE_CUP",
+    "sport": "soccer",
+    "label": "Scottish League Cup",
+    "slug": "sco.cis",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/sco.cis/scoreboard"
   },
   {
     "key": "SERIEA",
@@ -21547,12 +21556,18 @@ init_define_import_meta_env();
 var PEACOCK_CHANNEL_LOGO_URL = "/league-logos/channel-peacock.png";
 var NBC_CHANNEL_LOGO_URL = "/league-logos/channel-nbc.png";
 var ESPN_CHANNEL_LOGO_URL = "/league-logos/channel-espn.png";
+var CBS_CHANNEL_LOGO_URL = "/league-logos/channel-cbs.png";
+var USA_CHANNEL_LOGO_URL = "/league-logos/channel-usa.svg";
 var CHANNEL_LOGO_BY_LABEL = {
   ABC: "/league-logos/channel-abc.png",
-  CBS: "/league-logos/channel-cbs.png",
-  USA: "/league-logos/channel-usa.png",
-  "USA NETWORK": "/league-logos/channel-usa.png",
-  "USA NET": "/league-logos/channel-usa.png",
+  CBS: CBS_CHANNEL_LOGO_URL,
+  "CBS SPORTS": CBS_CHANNEL_LOGO_URL,
+  "CBS SPORTS NETWORK": CBS_CHANNEL_LOGO_URL,
+  CBSSN: CBS_CHANNEL_LOGO_URL,
+  "CBS SPORTS NET": CBS_CHANNEL_LOGO_URL,
+  USA: USA_CHANNEL_LOGO_URL,
+  "USA NETWORK": USA_CHANNEL_LOGO_URL,
+  "USA NET": USA_CHANNEL_LOGO_URL,
   ION: "/league-logos/channel-ion.png",
   "NBA TV": "/league-logos/channel-nba-tv.png",
   NBATV: "/league-logos/channel-nba-tv.png",
@@ -21573,9 +21588,6 @@ var CHANNEL_LOGO_BY_LABEL = {
   FS1: "/league-logos/channel-fs1.png",
   FS2: "/league-logos/channel-fs2.png",
   "FOX SPORTS": "/league-logos/channel-fox.png",
-  "CBS SPORTS NETWORK": "/league-logos/channel-cbs-sports.png",
-  CBSSN: "/league-logos/channel-cbs-sports.png",
-  "CBS SPORTS NET": "/league-logos/channel-cbs-sports.png",
   "NWSL+": "/league-logos/channel-nwsl-plus.png",
   "NWSL PLUS": "/league-logos/channel-nwsl-plus.png",
   "APPLE TV MLB": "/league-logos/channel-apple-tv.png",
@@ -21623,6 +21635,7 @@ function resolveChannelLogoUrl2(channelLabel) {
   if (/\bNFL\s+NETWORK\b/.test(key) || key === "NFLN") {
     return CHANNEL_LOGO_BY_LABEL["NFL NETWORK"] ?? null;
   }
+  if (/\bCBS\b/.test(key)) return CBS_CHANNEL_LOGO_URL;
   return null;
 }
 
@@ -22252,7 +22265,7 @@ init_define_import_meta_env();
 
 // ../grarf/desktop/electron/espn/espnOperationalLeagueConstants.generated.js
 init_define_import_meta_env();
-var SOCCER_LEAGUE_KEYS = /* @__PURE__ */ new Set(["ARG1", "BEL1", "BRA1", "BUNDESLIGA", "CAF_WNATIONS", "CARABAO_CUP", "CHAMPIONSHIP", "CLUBFRIENDLY", "CLUBWC", "CONCACAF_CAC", "CONCACAF_CL", "CONCACAF_NG", "CONCACAF_WC", "COPA", "COPA_BRASIL", "COPPAITALIA", "EPL", "EREDIVISIE", "EURO", "GER_SUPER_CUP", "GOLDCUP", "INTFRIENDLY", "LALIGA", "LEAGUES_CUP", "LIBERTADORES", "LIGAMX", "LIGUE1", "MLS", "NATIONS", "NCAAMSOC", "NCAAWSOC", "NWSL", "POR1", "SAUDI", "SERIEA", "SPFL", "SUDAMERICANA", "SUPERLIG", "UCL", "UCLQ", "UECL", "UECLQ", "UEL", "UELQ", "USL1", "USLC", "USLCUP", "UWCQ", "WORLDCUP", "WWC"]);
+var SOCCER_LEAGUE_KEYS = /* @__PURE__ */ new Set(["ARG1", "BEL1", "BRA1", "BUNDESLIGA", "CAF_WNATIONS", "CARABAO_CUP", "CHAMPIONSHIP", "CLUBFRIENDLY", "CLUBWC", "CONCACAF_CAC", "CONCACAF_CL", "CONCACAF_NG", "CONCACAF_WC", "COPA", "COPA_BRASIL", "COPPAITALIA", "EPL", "EREDIVISIE", "EURO", "GER_SUPER_CUP", "GOLDCUP", "INTFRIENDLY", "LALIGA", "LEAGUES_CUP", "LIBERTADORES", "LIGAMX", "LIGUE1", "MLS", "NATIONS", "NCAAMSOC", "NCAAWSOC", "NWSL", "POR1", "SAUDI", "SCOTTISH_LEAGUE_CUP", "SERIEA", "SPFL", "SUDAMERICANA", "SUPERLIG", "UCL", "UCLQ", "UECL", "UECLQ", "UEL", "UELQ", "USL1", "USLC", "USLCUP", "UWCQ", "WORLDCUP", "WWC"]);
 var NATIONAL_TEAM_SOCCER_LEAGUE_KEYS = /* @__PURE__ */ new Set(["CONCACAF_NG", "CONCACAF_WC", "COPA", "EURO", "GOLDCUP", "INTFRIENDLY", "NATIONS", "UWCQ", "WORLDCUP", "WWC"]);
 
 // ../grarf/desktop/electron/espn/espnPlusStream.js
