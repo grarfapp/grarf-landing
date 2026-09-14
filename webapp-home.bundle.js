@@ -147541,69 +147541,81 @@ function SportsBrowserPrototypeGameContextInlineTabs({
     "div",
     {
       className: cn2(
-        "flex h-9 shrink-0 items-center overflow-x-auto border-b border-[#c8c4bc]/70 bg-[#e8e4dc] px-1",
+        "flex shrink-0 flex-col border-b border-[#c8c4bc]/70 bg-[#e8e4dc] px-1",
         className
       ),
       "data-sports-browser-prototype-game-context-inline-tabs": true,
       role: "tablist",
       "aria-label": "Game context",
       children: [
-        /* @__PURE__ */ (0, import_jsx_runtime226.jsx)("span", { className: "inline-flex shrink-0 items-center", children: sections.map((section, sectionIndex) => {
-          const sectionActive = sectionIndex === activeSectionIndex;
-          return /* @__PURE__ */ (0, import_jsx_runtime226.jsx)(
-            "button",
-            {
-              type: "button",
-              role: "tab",
-              "aria-selected": sectionActive,
-              onClick: () => onSectionSelect(sectionIndex),
-              className: cn2(
-                SECTION_BUTTON_BASE,
-                sectionIndex > 0 && "-ml-px",
-                sectionActive ? SECTION_ACTIVE_CLASS : SECTION_INACTIVE_CLASS
-              ),
-              children: section.label
-            },
-            section.label
-          );
-        }) }),
-        showTeamDestinationTabs ? /* @__PURE__ */ (0, import_jsx_runtime226.jsx)("span", { className: "inline-flex shrink-0 items-center pl-3", children: SPORTS_BROWSER_PROTOTYPE_LEAGUE_CONTEXT_SECTIONS.map((section, sectionIndex) => {
-          const sectionActive = (activeTeamSectionIndex >= 0 ? activeTeamSectionIndex : 0) === sectionIndex;
-          return /* @__PURE__ */ (0, import_jsx_runtime226.jsx)(
-            "button",
-            {
-              type: "button",
-              role: "tab",
-              "aria-selected": sectionActive,
-              onClick: () => onTeamContextSectionSelect?.(sectionIndex),
-              className: cn2(
-                SECTION_BUTTON_BASE,
-                sectionIndex > 0 && "-ml-px",
-                sectionActive ? SECTION_ACTIVE_CLASS : SECTION_INACTIVE_CLASS
-              ),
-              children: SPORTS_BROWSER_PROTOTYPE_LEAGUE_CONTEXT_SECTION_LABELS[section]
-            },
-            `team-${section}`
-          );
-        }) }) : null,
-        activeWebsites.length > 0 ? /* @__PURE__ */ (0, import_jsx_runtime226.jsx)("span", { className: cn2("flex shrink-0 items-center pl-3 pr-2", SPORTS_BROWSER_PROTOTYPE_CONTEXT_NAV_CHILD_GAP_CLASS), children: activeWebsites.map((website4, websiteIndex) => {
-          const websiteActive = websiteIndex === activeWebsiteIndex;
-          return /* @__PURE__ */ (0, import_jsx_runtime226.jsx)(
-            "button",
-            {
-              type: "button",
-              role: "tab",
-              "aria-selected": websiteActive,
-              onClick: () => onWebsiteTabSelect(websiteIndex),
-              className: cn2(
-                CHILD_BUTTON_BASE,
-                websiteActive ? CHILD_ACTIVE_CLASS : CHILD_INACTIVE_CLASS
-              ),
-              children: website4.label
-            },
-            `${activeSection}-${website4.url}`
-          );
-        }) }) : null
+        /* @__PURE__ */ (0, import_jsx_runtime226.jsxs)("div", { className: "flex h-9 shrink-0 items-center overflow-x-auto", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime226.jsx)("span", { className: "inline-flex shrink-0 items-center", children: sections.map((section, sectionIndex) => {
+            const sectionActive = sectionIndex === activeSectionIndex;
+            return /* @__PURE__ */ (0, import_jsx_runtime226.jsx)(
+              "button",
+              {
+                type: "button",
+                role: "tab",
+                "aria-selected": sectionActive,
+                onClick: () => onSectionSelect(sectionIndex),
+                className: cn2(
+                  SECTION_BUTTON_BASE,
+                  sectionIndex > 0 && "-ml-px",
+                  sectionActive ? SECTION_ACTIVE_CLASS : SECTION_INACTIVE_CLASS
+                ),
+                children: section.label
+              },
+              section.label
+            );
+          }) }),
+          showTeamDestinationTabs ? /* @__PURE__ */ (0, import_jsx_runtime226.jsx)("span", { className: "inline-flex shrink-0 items-center pl-3", children: SPORTS_BROWSER_PROTOTYPE_LEAGUE_CONTEXT_SECTIONS.map((section, sectionIndex) => {
+            const sectionActive = (activeTeamSectionIndex >= 0 ? activeTeamSectionIndex : 0) === sectionIndex;
+            return /* @__PURE__ */ (0, import_jsx_runtime226.jsx)(
+              "button",
+              {
+                type: "button",
+                role: "tab",
+                "aria-selected": sectionActive,
+                onClick: () => onTeamContextSectionSelect?.(sectionIndex),
+                className: cn2(
+                  SECTION_BUTTON_BASE,
+                  sectionIndex > 0 && "-ml-px",
+                  sectionActive ? SECTION_ACTIVE_CLASS : SECTION_INACTIVE_CLASS
+                ),
+                children: SPORTS_BROWSER_PROTOTYPE_LEAGUE_CONTEXT_SECTION_LABELS[section]
+              },
+              `team-${section}`
+            );
+          }) }) : null
+        ] }),
+        activeWebsites.length > 0 ? /* @__PURE__ */ (0, import_jsx_runtime226.jsx)(
+          "div",
+          {
+            className: cn2(
+              "flex h-9 shrink-0 items-center overflow-x-auto pl-3 pr-2",
+              SPORTS_BROWSER_PROTOTYPE_CONTEXT_NAV_CHILD_GAP_CLASS
+            ),
+            "data-sports-browser-prototype-game-context-inline-child-tabs": true,
+            children: activeWebsites.map((website4, websiteIndex) => {
+              const websiteActive = websiteIndex === activeWebsiteIndex;
+              return /* @__PURE__ */ (0, import_jsx_runtime226.jsx)(
+                "button",
+                {
+                  type: "button",
+                  role: "tab",
+                  "aria-selected": websiteActive,
+                  onClick: () => onWebsiteTabSelect(websiteIndex),
+                  className: cn2(
+                    CHILD_BUTTON_BASE,
+                    websiteActive ? CHILD_ACTIVE_CLASS : CHILD_INACTIVE_CLASS
+                  ),
+                  children: website4.label
+                },
+                `${activeSection}-${website4.url}`
+              );
+            })
+          }
+        ) : null
       ]
     }
   );
@@ -147645,14 +147657,14 @@ function SportsBrowserPrototypeLeagueNewsInlineTabs({
     "div",
     {
       className: cn2(
-        "flex h-9 shrink-0 items-center overflow-x-auto border-b border-[#c8c4bc]/70 bg-[#e8e4dc] pr-1",
+        "flex shrink-0 flex-col border-b border-[#c8c4bc]/70 bg-[#e8e4dc]",
         className
       ),
       "data-sports-browser-prototype-league-news-inline-tabs": true,
       role: "tablist",
       "aria-label": "League destinations",
       children: [
-        /* @__PURE__ */ (0, import_jsx_runtime227.jsx)("span", { className: "inline-flex shrink-0 items-center", children: SPORTS_BROWSER_PROTOTYPE_LEAGUE_CONTEXT_SECTIONS.map((section, sectionIndex) => {
+        /* @__PURE__ */ (0, import_jsx_runtime227.jsx)("div", { className: "flex h-9 shrink-0 items-center overflow-x-auto pr-1", children: /* @__PURE__ */ (0, import_jsx_runtime227.jsx)("span", { className: "inline-flex shrink-0 items-center", children: SPORTS_BROWSER_PROTOTYPE_LEAGUE_CONTEXT_SECTIONS.map((section, sectionIndex) => {
           const sectionActive = sectionIndex === activeSectionIndex;
           return /* @__PURE__ */ (0, import_jsx_runtime227.jsx)(
             "button",
@@ -147670,14 +147682,15 @@ function SportsBrowserPrototypeLeagueNewsInlineTabs({
             },
             section
           );
-        }) }),
+        }) }) }),
         activeWebsites.length > 0 ? /* @__PURE__ */ (0, import_jsx_runtime227.jsx)(
-          "span",
+          "div",
           {
             className: cn2(
-              "flex shrink-0 items-center pl-3 pr-2",
+              "flex h-9 shrink-0 items-center overflow-x-auto pl-3 pr-2",
               SPORTS_BROWSER_PROTOTYPE_CONTEXT_NAV_CHILD_GAP_CLASS
             ),
+            "data-sports-browser-prototype-league-news-inline-child-tabs": true,
             children: activeWebsites.map((website4, websiteIndex) => {
               const websiteActive = websiteIndex === activeWebsiteIndex;
               return /* @__PURE__ */ (0, import_jsx_runtime227.jsx)(
