@@ -81268,6 +81268,42 @@ var init_HomeCenterPaneNowModeSelector = __esm({
   }
 });
 
+// ../grarf/desktop/src/lib/home/homeCenterPaneTimelineNewsPresentation.ts
+var HOME_CENTER_PANE_TIMELINE_NEWS_MARGIN_BG_CLASS, HOME_CENTER_PANE_TIMELINE_NEWS_MARGIN_CLASS, HOME_CENTER_PANE_TIMELINE_NEWS_FRAME_CLASS, HOME_CENTER_PANE_TIMELINE_NEWS_FEED_CLASS, HOME_CENTER_PANE_TIMELINE_NEWS_SCROLL_CLASS, HOME_CENTER_PANE_TIMELINE_NEWS_EMPTY_CLASS, HOME_CENTER_PANE_TIMELINE_NEWS_ROW_CLASS, HOME_CENTER_PANE_TIMELINE_NEWS_TIMESTAMP_CLASS, HOME_CENTER_PANE_TIMELINE_NEWS_ROW_EXPANDED_HEADER_CLASS, HOME_CENTER_PANE_TIMELINE_NEWS_ITEM_SHELL_CLASS, HOME_CENTER_PANE_TIMELINE_NEWS_ITEM_SHELL_HOVER_CLASS, HOME_CENTER_PANE_TIMELINE_NEWS_ITEM_SHELL_ACTIVE_CLASS, HOME_CENTER_PANE_TIMELINE_NEWS_SOURCE_BAR_CLASS, HOME_CENTER_PANE_TIMELINE_NEWS_SOURCE_LABEL_CLASS, HOME_CENTER_PANE_TIMELINE_NEWS_SOURCE_ATTRIBUTION_CLASS, HOME_CENTER_PANE_TIMELINE_NEWS_PRIMARY_TEXT_CLASS, HOME_CENTER_PANE_TIMELINE_NEWS_METADATA_TEXT_CLASS, HOME_CENTER_PANE_TIMELINE_NEWS_THUMB_FRAME_CLASS, HOME_CENTER_PANE_TIMELINE_NEWS_MEDIA_CONTAINER_CLASS, HOME_CENTER_PANE_TIMELINE_NEWS_EXPANSION_HEADER_CLASS, HOME_CENTER_PANE_TIMELINE_NEWS_EXPANSION_TYPE_LABEL_CLASS, HOME_CENTER_PANE_TIMELINE_NEWS_EXPANSION_HINT_CLASS, HOME_CENTER_PANE_TIMELINE_NEWS_EXPANSION_BUTTON_CLASS, HOME_CENTER_PANE_TIMELINE_NEWS_EXPANSION_WEBVIEW_FRAME_CLASS, HOME_CENTER_PANE_TIMELINE_NEWS_EXPANSION_FAILURE_TEXT_CLASS, HOME_CENTER_PANE_TIMELINE_NEWS_EXPANSION_FAILURE_HEADLINE_CLASS, HOME_CENTER_PANE_TIMELINE_NEWS_EXPANSION_FAILURE_SOURCE_CLASS, HOME_CENTER_PANE_TIMELINE_NEWS_SOURCE_SEPARATOR_CLASS;
+var init_homeCenterPaneTimelineNewsPresentation = __esm({
+  "../grarf/desktop/src/lib/home/homeCenterPaneTimelineNewsPresentation.ts"() {
+    init_define_import_meta_env();
+    HOME_CENTER_PANE_TIMELINE_NEWS_MARGIN_BG_CLASS = "bg-[#e8e4dc]";
+    HOME_CENTER_PANE_TIMELINE_NEWS_MARGIN_CLASS = "p-1.5";
+    HOME_CENTER_PANE_TIMELINE_NEWS_FRAME_CLASS = "relative flex h-full min-h-0 min-w-0 flex-1 flex-col overflow-hidden border border-[#c8c4bc] bg-[#020404]";
+    HOME_CENTER_PANE_TIMELINE_NEWS_FEED_CLASS = "flex h-full min-h-0 min-w-0 flex-col bg-[#020404] font-sans text-[#d7eeee]";
+    HOME_CENTER_PANE_TIMELINE_NEWS_SCROLL_CLASS = "min-h-0 flex-1 overflow-y-auto overscroll-contain overflow-x-hidden [overflow-anchor:none]";
+    HOME_CENTER_PANE_TIMELINE_NEWS_EMPTY_CLASS = "px-3 py-2 font-sans text-[10px] text-[#6f8585]";
+    HOME_CENTER_PANE_TIMELINE_NEWS_ROW_CLASS = "border-b border-[#24363c]/45 px-3 py-1.5 [overflow-anchor:none]";
+    HOME_CENTER_PANE_TIMELINE_NEWS_TIMESTAMP_CLASS = "mb-1 block font-sans text-[9px] leading-none text-[#6f8585] tabular-nums";
+    HOME_CENTER_PANE_TIMELINE_NEWS_ROW_EXPANDED_HEADER_CLASS = "sticky top-0 z-20 border-b border-[#c8c4bc]/70 bg-[#f3f0ea] shadow-[inset_0_-1px_0_rgba(200,196,188,0.45)]";
+    HOME_CENTER_PANE_TIMELINE_NEWS_ITEM_SHELL_CLASS = "rounded-sm border border-[#c8c4bc] bg-[#f3f0ea] text-[#1a1a1a]";
+    HOME_CENTER_PANE_TIMELINE_NEWS_ITEM_SHELL_HOVER_CLASS = "transition-colors hover:border-[#1a1a1a]/35 hover:bg-[#ece9e2]";
+    HOME_CENTER_PANE_TIMELINE_NEWS_ITEM_SHELL_ACTIVE_CLASS = "ring-1 ring-inset ring-[#c8c4bc] bg-[#f8f6f1]";
+    HOME_CENTER_PANE_TIMELINE_NEWS_SOURCE_BAR_CLASS = "flex h-5 items-center gap-1.5 border-b border-[#c8c4bc]/70 bg-[#ece9e2] px-2";
+    HOME_CENTER_PANE_TIMELINE_NEWS_SOURCE_LABEL_CLASS = "font-sans text-[8px] font-medium tracking-[0.14em] uppercase text-[#6f6a62]";
+    HOME_CENTER_PANE_TIMELINE_NEWS_SOURCE_ATTRIBUTION_CLASS = "truncate font-sans text-[9px] tracking-[0.04em] text-[#6a6560]";
+    HOME_CENTER_PANE_TIMELINE_NEWS_PRIMARY_TEXT_CLASS = "font-sans text-[12px] leading-snug tracking-[0.01em] text-[#1a1a1a]";
+    HOME_CENTER_PANE_TIMELINE_NEWS_METADATA_TEXT_CLASS = "font-sans text-[9px] tracking-[0.04em] text-[#6f8585]";
+    HOME_CENTER_PANE_TIMELINE_NEWS_THUMB_FRAME_CLASS = "relative block h-12 w-12 shrink-0 overflow-hidden rounded-[2px] border border-[#c8c4bc]/80 bg-[#e8e4dc]";
+    HOME_CENTER_PANE_TIMELINE_NEWS_MEDIA_CONTAINER_CLASS = "relative mt-1.5 inline-block max-w-full overflow-hidden rounded-[2px] border border-[#c8c4bc]/70 bg-[#e8e4dc]";
+    HOME_CENTER_PANE_TIMELINE_NEWS_EXPANSION_HEADER_CLASS = "flex shrink-0 items-center justify-between gap-2 border-b border-[#c8c4bc]/70 bg-[#ece9e2] px-3 py-1.5";
+    HOME_CENTER_PANE_TIMELINE_NEWS_EXPANSION_TYPE_LABEL_CLASS = "font-sans text-[8px] font-medium tracking-[0.14em] uppercase text-[#6f6a62]";
+    HOME_CENTER_PANE_TIMELINE_NEWS_EXPANSION_HINT_CLASS = "font-sans text-[8px] tracking-[0.1em] text-[#6f8585]";
+    HOME_CENTER_PANE_TIMELINE_NEWS_EXPANSION_BUTTON_CLASS = "shrink-0 rounded border border-[#c8c4bc] bg-[#f8f6f1] px-2 py-0.5 font-sans text-[8px] font-medium tracking-[0.12em] uppercase text-[#6a6560] transition hover:bg-[#ece9e2] hover:text-[#1a1a1a]";
+    HOME_CENTER_PANE_TIMELINE_NEWS_EXPANSION_WEBVIEW_FRAME_CLASS = "mx-5 shrink-0 grow-0 overflow-hidden border border-[#c8c4bc]/70 bg-[#f8f6f1]";
+    HOME_CENTER_PANE_TIMELINE_NEWS_EXPANSION_FAILURE_TEXT_CLASS = "font-sans text-[10px] tracking-[0.06em] text-[#6f8585]";
+    HOME_CENTER_PANE_TIMELINE_NEWS_EXPANSION_FAILURE_HEADLINE_CLASS = "max-w-full truncate font-sans text-[11px] text-[#1a1a1a]";
+    HOME_CENTER_PANE_TIMELINE_NEWS_EXPANSION_FAILURE_SOURCE_CLASS = "font-sans text-[9px] tracking-[0.08em] text-[#6a6560]";
+    HOME_CENTER_PANE_TIMELINE_NEWS_SOURCE_SEPARATOR_CLASS = "text-[6px] text-[#6a6560]/45";
+  }
+});
+
 // ../grarf/desktop/node_modules/@tanstack/virtual-core/dist/esm/lazy-measurements.js
 function createLazyMeasurementsView(count, flat, getItemKey) {
   const cache3 = new Array(count);
@@ -90944,13 +90980,13 @@ function HomeCenterPaneTimelineArticleExpansionPane({
     void openExternalUrl2(articleUrl);
   };
   return /* @__PURE__ */ (0, import_jsx_runtime37.jsxs)("div", { className: "min-w-0 shrink-0 grow-0", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime37.jsxs)("div", { className: "flex shrink-0 items-center justify-between gap-2 border-b border-line/30 px-3 py-1.5", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime37.jsxs)("div", { className: HOME_CENTER_PANE_TIMELINE_NEWS_EXPANSION_HEADER_CLASS, children: [
       /* @__PURE__ */ (0, import_jsx_runtime37.jsxs)("div", { className: "flex min-w-0 items-center gap-2", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime37.jsx)("span", { className: "font-mono text-[8px] tracking-[0.14em] text-cyansys/80", children: typeLabel }),
+        /* @__PURE__ */ (0, import_jsx_runtime37.jsx)("span", { className: HOME_CENTER_PANE_TIMELINE_NEWS_EXPANSION_TYPE_LABEL_CLASS, children: typeLabel }),
         showLoadingHint && !showFailure ? /* @__PURE__ */ (0, import_jsx_runtime37.jsx)(
           "span",
           {
-            className: "font-mono text-[8px] tracking-[0.1em] text-textdim/55",
+            className: HOME_CENTER_PANE_TIMELINE_NEWS_EXPANSION_HINT_CLASS,
             "aria-live": "polite",
             children: "LOADING\u2026"
           }
@@ -90961,7 +90997,7 @@ function HomeCenterPaneTimelineArticleExpansionPane({
         {
           type: "button",
           onClick: onCollapse,
-          className: "shrink-0 rounded border border-line/50 px-2 py-0.5 font-mono text-[8px] tracking-[0.12em] text-textdim transition hover:border-cyansys/35 hover:text-cyansys/90",
+          className: HOME_CENTER_PANE_TIMELINE_NEWS_EXPANSION_BUTTON_CLASS,
           children: "MINIMIZE"
         }
       )
@@ -90969,7 +91005,7 @@ function HomeCenterPaneTimelineArticleExpansionPane({
     /* @__PURE__ */ (0, import_jsx_runtime37.jsx)(
       "div",
       {
-        className: `mx-5 shrink-0 grow-0 overflow-hidden border border-[#24363c]/55 ${PANE_WEB_SURFACE_CLASS}`,
+        className: HOME_CENTER_PANE_TIMELINE_NEWS_EXPANSION_WEBVIEW_FRAME_CLASS,
         style: webviewHostStyle,
         children: showFailure ? /* @__PURE__ */ (0, import_jsx_runtime37.jsxs)(
           "div",
@@ -90977,15 +91013,15 @@ function HomeCenterPaneTimelineArticleExpansionPane({
             className: "flex flex-col items-center justify-center gap-2 px-4 py-6 text-center",
             style: webviewHostStyle,
             children: [
-              /* @__PURE__ */ (0, import_jsx_runtime37.jsx)("p", { className: "font-mono text-[10px] tracking-[0.06em] text-textdim/90", children: "This article could not be displayed inside GRARF." }),
-              headline ? /* @__PURE__ */ (0, import_jsx_runtime37.jsx)("p", { className: "max-w-full truncate font-mono text-[11px] text-white/90", children: headline }) : null,
-              source ? /* @__PURE__ */ (0, import_jsx_runtime37.jsx)("p", { className: "font-mono text-[9px] tracking-[0.08em] text-textdim/70", children: source }) : null,
+              /* @__PURE__ */ (0, import_jsx_runtime37.jsx)("p", { className: HOME_CENTER_PANE_TIMELINE_NEWS_EXPANSION_FAILURE_TEXT_CLASS, children: "This article could not be displayed inside GRARF." }),
+              headline ? /* @__PURE__ */ (0, import_jsx_runtime37.jsx)("p", { className: HOME_CENTER_PANE_TIMELINE_NEWS_EXPANSION_FAILURE_HEADLINE_CLASS, children: headline }) : null,
+              source ? /* @__PURE__ */ (0, import_jsx_runtime37.jsx)("p", { className: HOME_CENTER_PANE_TIMELINE_NEWS_EXPANSION_FAILURE_SOURCE_CLASS, children: source }) : null,
               articleUrl ? /* @__PURE__ */ (0, import_jsx_runtime37.jsx)(
                 "button",
                 {
                   type: "button",
                   onClick: handleOpenExternal,
-                  className: "mt-1 rounded border border-line/50 px-2 py-0.5 font-mono text-[8px] tracking-[0.12em] text-textdim transition hover:border-cyansys/35 hover:text-cyansys/90",
+                  className: HOME_CENTER_PANE_TIMELINE_NEWS_EXPANSION_BUTTON_CLASS,
                   children: "OPEN IN BROWSER"
                 }
               ) : null
@@ -91014,6 +91050,7 @@ var init_HomeCenterPaneTimelineArticleExpansionPane = __esm({
     init_define_import_meta_env();
     import_react91 = __toESM(require_react(), 1);
     init_homeSourceWebPartition();
+    init_homeCenterPaneTimelineNewsPresentation();
     init_openExternal();
     init_paneContainment();
     import_jsx_runtime37 = __toESM(require_jsx_runtime(), 1);
@@ -91127,17 +91164,20 @@ var init_resolveLiveTrackMomentMedia = __esm({
 function timelineAccentBarClass(type) {
   return "w-[3px] shrink-0 rounded-none self-stretch";
 }
-var TIMELINE_ITEM_SHELL_CLASS, TIMELINE_SOURCE_BAR_CLASS, TIMELINE_SOURCE_LABEL_CLASS, TIMELINE_SOURCE_ATTRIBUTION_CLASS, TIMELINE_CONTENT_AREA_CLASS, TIMELINE_PRIMARY_TEXT_CLASS, TIMELINE_METADATA_TEXT_CLASS, TIMELINE_MEDIA_MAX_WIDTH_PX, TIMELINE_MEDIA_MAX_HEIGHT_PX, TIMELINE_SOCIAL_HORIZONTAL_SCALE, TIMELINE_SOCIAL_VERTICAL_SCALE, TIMELINE_SOCIAL_HORIZONTAL_MAX_WIDTH_PX, TIMELINE_SOCIAL_HORIZONTAL_MAX_HEIGHT_PX, TIMELINE_SOCIAL_VERTICAL_MAX_WIDTH_PX, TIMELINE_SOCIAL_VERTICAL_MAX_HEIGHT_PX, TIMELINE_MEDIA_CONTAINER_CLASS, TIMELINE_MEDIA_FRAME_CLASS, TIMELINE_THUMB_FRAME_CLASS, TIMELINE_PLAY_INDICATOR_CLASS, TIMELINE_PLAY_BUTTON_CLASS, TIMELINE_ACCENT_COLORS, TIMELINE_SOURCE_LABEL_COLORS, TIMELINE_TYPE_LABELS, TIMELINE_THUMB_ROW_CLASS, TIMELINE_THUMB_TEXT_COLUMN_CLASS;
+var TIMELINE_ITEM_SHELL_CLASS, TIMELINE_ITEM_SHELL_HOVER_CLASS, TIMELINE_ITEM_SHELL_ACTIVE_CLASS, TIMELINE_SOURCE_BAR_CLASS, TIMELINE_SOURCE_LABEL_CLASS, TIMELINE_SOURCE_ATTRIBUTION_CLASS, TIMELINE_CONTENT_AREA_CLASS, TIMELINE_PRIMARY_TEXT_CLASS, TIMELINE_METADATA_TEXT_CLASS, TIMELINE_MEDIA_MAX_WIDTH_PX, TIMELINE_MEDIA_MAX_HEIGHT_PX, TIMELINE_SOCIAL_HORIZONTAL_SCALE, TIMELINE_SOCIAL_VERTICAL_SCALE, TIMELINE_SOCIAL_HORIZONTAL_MAX_WIDTH_PX, TIMELINE_SOCIAL_HORIZONTAL_MAX_HEIGHT_PX, TIMELINE_SOCIAL_VERTICAL_MAX_WIDTH_PX, TIMELINE_SOCIAL_VERTICAL_MAX_HEIGHT_PX, TIMELINE_MEDIA_CONTAINER_CLASS, TIMELINE_MEDIA_FRAME_CLASS, TIMELINE_THUMB_FRAME_CLASS, TIMELINE_PLAY_INDICATOR_CLASS, TIMELINE_PLAY_BUTTON_CLASS, TIMELINE_ACCENT_COLORS, TIMELINE_SOURCE_LABEL_COLORS, TIMELINE_TYPE_LABELS, TIMELINE_THUMB_ROW_CLASS, TIMELINE_THUMB_TEXT_COLUMN_CLASS;
 var init_timelineItemLayout = __esm({
   "../grarf/desktop/src/lib/timeline/timelineItemLayout.ts"() {
     init_define_import_meta_env();
-    TIMELINE_ITEM_SHELL_CLASS = "rounded-[2px] border border-[#24363c]/50 bg-[#0a1214]/60";
-    TIMELINE_SOURCE_BAR_CLASS = "flex h-5 items-center gap-1.5 border-b border-[#24363c]/35 bg-[#020707]/80 px-2";
-    TIMELINE_SOURCE_LABEL_CLASS = "font-mono text-[8px] font-medium tracking-[0.14em] uppercase";
-    TIMELINE_SOURCE_ATTRIBUTION_CLASS = "truncate font-mono text-[9px] tracking-[0.04em] text-textdim/80";
+    init_homeCenterPaneTimelineNewsPresentation();
+    TIMELINE_ITEM_SHELL_CLASS = HOME_CENTER_PANE_TIMELINE_NEWS_ITEM_SHELL_CLASS;
+    TIMELINE_ITEM_SHELL_HOVER_CLASS = HOME_CENTER_PANE_TIMELINE_NEWS_ITEM_SHELL_HOVER_CLASS;
+    TIMELINE_ITEM_SHELL_ACTIVE_CLASS = HOME_CENTER_PANE_TIMELINE_NEWS_ITEM_SHELL_ACTIVE_CLASS;
+    TIMELINE_SOURCE_BAR_CLASS = HOME_CENTER_PANE_TIMELINE_NEWS_SOURCE_BAR_CLASS;
+    TIMELINE_SOURCE_LABEL_CLASS = HOME_CENTER_PANE_TIMELINE_NEWS_SOURCE_LABEL_CLASS;
+    TIMELINE_SOURCE_ATTRIBUTION_CLASS = HOME_CENTER_PANE_TIMELINE_NEWS_SOURCE_ATTRIBUTION_CLASS;
     TIMELINE_CONTENT_AREA_CLASS = "px-2 py-1.5";
-    TIMELINE_PRIMARY_TEXT_CLASS = "font-mono text-[12px] leading-snug tracking-[0.02em] text-[#c8d8d8]";
-    TIMELINE_METADATA_TEXT_CLASS = "font-mono text-[9px] tracking-[0.04em] text-textdim/70";
+    TIMELINE_PRIMARY_TEXT_CLASS = HOME_CENTER_PANE_TIMELINE_NEWS_PRIMARY_TEXT_CLASS;
+    TIMELINE_METADATA_TEXT_CLASS = HOME_CENTER_PANE_TIMELINE_NEWS_METADATA_TEXT_CLASS;
     TIMELINE_MEDIA_MAX_WIDTH_PX = 680;
     TIMELINE_MEDIA_MAX_HEIGHT_PX = 420;
     TIMELINE_SOCIAL_HORIZONTAL_SCALE = 0.6;
@@ -91146,32 +91186,26 @@ var init_timelineItemLayout = __esm({
     TIMELINE_SOCIAL_HORIZONTAL_MAX_HEIGHT_PX = Math.round(TIMELINE_MEDIA_MAX_HEIGHT_PX * TIMELINE_SOCIAL_HORIZONTAL_SCALE);
     TIMELINE_SOCIAL_VERTICAL_MAX_WIDTH_PX = Math.round(TIMELINE_MEDIA_MAX_WIDTH_PX * TIMELINE_SOCIAL_VERTICAL_SCALE);
     TIMELINE_SOCIAL_VERTICAL_MAX_HEIGHT_PX = Math.round(TIMELINE_MEDIA_MAX_HEIGHT_PX * TIMELINE_SOCIAL_VERTICAL_SCALE);
-    TIMELINE_MEDIA_CONTAINER_CLASS = "relative mt-1.5 inline-block max-w-full overflow-hidden rounded-[2px] border border-[#24363c]/40 bg-black/30";
+    TIMELINE_MEDIA_CONTAINER_CLASS = HOME_CENTER_PANE_TIMELINE_NEWS_MEDIA_CONTAINER_CLASS;
     TIMELINE_MEDIA_FRAME_CLASS = "block h-auto w-auto max-w-full object-contain";
-    TIMELINE_THUMB_FRAME_CLASS = "relative block h-[72px] w-[72px] shrink-0 overflow-hidden rounded-[2px] border border-[#24363c]/50 bg-black/40";
+    TIMELINE_THUMB_FRAME_CLASS = HOME_CENTER_PANE_TIMELINE_NEWS_THUMB_FRAME_CLASS;
     TIMELINE_PLAY_INDICATOR_CLASS = "pointer-events-none absolute inset-0 flex items-center justify-center bg-black/30";
-    TIMELINE_PLAY_BUTTON_CLASS = "flex h-6 w-6 items-center justify-center rounded-full border border-cyansys/50 bg-[#020707]/90 font-mono text-[8px] leading-none text-cyansys";
+    TIMELINE_PLAY_BUTTON_CLASS = "flex h-6 w-6 items-center justify-center rounded-full border border-[#c8c4bc] bg-[#f3f0ea] font-sans text-[8px] leading-none text-[#1a1a1a]";
     TIMELINE_ACCENT_COLORS = {
-      social: "#56a4cf",
-      // Blue — social/X posts
-      livetracker: "#e0b16b",
-      // Gold — LiveTracker RSS posts
-      newswire: "#8ac8c8",
-      // Teal — news articles
-      clip: "#cf5656",
-      // Red — video clips
-      game_card: "#56cf8a",
-      // Green — game recaps
-      game_update: "#37ff8b"
-      // Bright green — live score updates
+      social: "#6f6a62",
+      livetracker: "#b45309",
+      newswire: "#1a1a1a",
+      clip: "#b45309",
+      game_card: "#6f6a62",
+      game_update: "#b45309"
     };
     TIMELINE_SOURCE_LABEL_COLORS = {
-      social: "text-[#56a4cf]",
-      livetracker: "text-[#e0b16b]",
-      newswire: "text-cyansys/85",
-      clip: "text-[#cf5656]",
-      game_card: "text-[#56cf8a]",
-      game_update: "text-greensys"
+      social: "text-[#6f6a62]",
+      livetracker: "text-[#b45309]",
+      newswire: "text-[#6f6a62]",
+      clip: "text-[#b45309]",
+      game_card: "text-[#6f6a62]",
+      game_update: "text-[#b45309]"
     };
     TIMELINE_TYPE_LABELS = {
       social: "SOCIAL",
@@ -91224,7 +91258,7 @@ function TimelineItemShell({
         ) : null,
         /* @__PURE__ */ (0, import_jsx_runtime38.jsx)("span", { className: cn2(TIMELINE_SOURCE_LABEL_CLASS, labelColor), children: label }),
         source ? /* @__PURE__ */ (0, import_jsx_runtime38.jsxs)(import_jsx_runtime38.Fragment, { children: [
-          /* @__PURE__ */ (0, import_jsx_runtime38.jsx)("span", { className: "text-[6px] text-textdim/40", "aria-hidden": true, children: "\u2022" }),
+          /* @__PURE__ */ (0, import_jsx_runtime38.jsx)("span", { className: HOME_CENTER_PANE_TIMELINE_NEWS_SOURCE_SEPARATOR_CLASS, "aria-hidden": true, children: "\u2022" }),
           /* @__PURE__ */ (0, import_jsx_runtime38.jsx)("span", { className: TIMELINE_SOURCE_ATTRIBUTION_CLASS, children: source })
         ] }) : null
       ] }),
@@ -91234,7 +91268,7 @@ function TimelineItemShell({
   const shellClass = cn2(
     TIMELINE_ITEM_SHELL_CLASS,
     "flex min-w-0",
-    onClick || href ? "cursor-pointer transition-colors hover:bg-[#0e1a1d]/80 hover:border-[#24363c]/70" : "",
+    onClick || href ? cn2("cursor-pointer", TIMELINE_ITEM_SHELL_HOVER_CLASS) : "",
     className
   );
   if (href) {
@@ -91280,6 +91314,7 @@ var init_TimelineItemShell = __esm({
     init_resolveChannelLogoSrc();
     init_cn();
     init_timelineItemLayout();
+    init_homeCenterPaneTimelineNewsPresentation();
     import_jsx_runtime38 = __toESM(require_jsx_runtime(), 1);
   }
 });
@@ -91291,11 +91326,11 @@ function TeamStrip({ teamName, score: score2, sport }) {
   const logoUrl = resolveLiveTrackTeamLogoUrl(trimmed, sport);
   const tokenClass = resolveLiveTrackTeamTokenClass(trimmed, sport);
   const borderMatch = tokenClass.match(/\bborder-(?:\[[^\]]+\]|[\w-]+(?:\/[\d]+)?)/);
-  const borderToken = borderMatch?.[0] ?? "border-cyansys/35";
+  const borderToken = borderMatch?.[0] ?? "border-[#c8c4bc]/70";
   return /* @__PURE__ */ (0, import_jsx_runtime39.jsxs)("span", { className: cn2("flex min-w-0 flex-1 items-stretch overflow-hidden rounded-none border h-5", tokenClass), children: [
     logoUrl ? /* @__PURE__ */ (0, import_jsx_runtime39.jsx)("span", { className: cn2("inline-flex shrink-0 items-center justify-center w-5", borderToken.replace(/^border-/, "bg-")), children: /* @__PURE__ */ (0, import_jsx_runtime39.jsx)("img", { src: logoUrl, alt: "", className: "h-3 w-3 shrink-0 object-contain", loading: "lazy", decoding: "async" }) }) : null,
-    /* @__PURE__ */ (0, import_jsx_runtime39.jsx)("span", { className: "inline-flex min-w-0 flex-1 items-center px-1 font-mono text-[9px] leading-none tracking-[0.04em]", children: /* @__PURE__ */ (0, import_jsx_runtime39.jsx)("span", { className: "truncate", children: trimmed }) }),
-    /* @__PURE__ */ (0, import_jsx_runtime39.jsx)("span", { className: cn2("inline-flex shrink-0 items-center justify-center font-mono text-[10px] font-semibold leading-none tabular-nums text-[#eef6f6] w-5", borderToken.replace(/^border-/, "border-l border-")), children: score2 })
+    /* @__PURE__ */ (0, import_jsx_runtime39.jsx)("span", { className: "inline-flex min-w-0 flex-1 items-center px-1 font-sans text-[9px] leading-none tracking-[0.04em] text-[#6a6560]", children: /* @__PURE__ */ (0, import_jsx_runtime39.jsx)("span", { className: "truncate", children: trimmed }) }),
+    /* @__PURE__ */ (0, import_jsx_runtime39.jsx)("span", { className: cn2("inline-flex shrink-0 items-center justify-center font-sans text-[10px] font-semibold leading-none tabular-nums text-[#1a1a1a] w-5", borderToken.replace(/^border-/, "border-l border-")), children: score2 })
   ] });
 }
 function TimelineFinalScoreStrip({ post }) {
@@ -91313,8 +91348,8 @@ function TimelineFinalScoreStrip({ post }) {
   return /* @__PURE__ */ (0, import_jsx_runtime39.jsxs)("div", { className: cn2(TIMELINE_ITEM_SHELL_CLASS, "flex min-w-0"), children: [
     /* @__PURE__ */ (0, import_jsx_runtime39.jsx)("span", { className: timelineAccentBarClass("game_update"), style: { backgroundColor: accentColor }, "aria-hidden": true }),
     /* @__PURE__ */ (0, import_jsx_runtime39.jsx)("div", { className: "min-w-0 flex-1 px-2 py-1", children: /* @__PURE__ */ (0, import_jsx_runtime39.jsxs)("div", { className: "flex min-w-0 flex-wrap items-center gap-1", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime39.jsx)("span", { className: "inline-flex shrink-0 items-center justify-center rounded-[2px] border border-greensys/55 bg-[#031a1c] px-1.5 py-0.5 font-mono text-[9px] font-semibold tracking-[0.08em] text-greensys", children: "FINAL" }),
-      /* @__PURE__ */ (0, import_jsx_runtime39.jsxs)("span", { className: "inline-flex shrink-0 items-center gap-1 font-mono text-[10px] font-medium tracking-[0.06em] text-[#eef6f6]", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime39.jsx)("span", { className: cn2(TIMELINE_SOURCE_LABEL_CLASS, TIMELINE_SOURCE_LABEL_COLORS.game_update, "inline-flex shrink-0 items-center justify-center rounded-[2px] border border-[#c8c4bc] bg-[#ece9e2] px-1.5 py-0.5"), children: "FINAL" }),
+      /* @__PURE__ */ (0, import_jsx_runtime39.jsxs)("span", { className: cn2(TIMELINE_METADATA_TEXT_CLASS, "inline-flex shrink-0 items-center gap-1 font-medium"), children: [
         leagueLogoUrl ? /* @__PURE__ */ (0, import_jsx_runtime39.jsx)(
           "img",
           {
@@ -91554,9 +91589,7 @@ function TimelineNewswireStory({
       logoUrl,
       logoClassName,
       onClick: onExpand,
-      className: cn2(
-        active2 && "ring-1 ring-inset ring-cyansys/25 bg-cyansys/[0.04]"
-      ),
+      className: cn2(active2 && TIMELINE_ITEM_SHELL_ACTIVE_CLASS),
       children: [
         /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("p", { className: TIMELINE_PRIMARY_TEXT_CLASS, children: headline }),
         logoUrl ? /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
@@ -92128,17 +92161,17 @@ var init_TimelineClipCard = __esm({
 function TimelineGameScoreBlock({ lines }) {
   if (lines.length < 2) return null;
   const [away, home] = lines;
-  return /* @__PURE__ */ (0, import_jsx_runtime48.jsxs)("div", { className: "flex items-center gap-2 font-mono text-[10px] tracking-[0.04em]", children: [
+  return /* @__PURE__ */ (0, import_jsx_runtime48.jsxs)("div", { className: "flex items-center gap-2 font-sans text-[10px] tracking-[0.04em]", children: [
     /* @__PURE__ */ (0, import_jsx_runtime48.jsxs)("span", { className: "flex items-center gap-1", children: [
       away.logoUrl ? /* @__PURE__ */ (0, import_jsx_runtime48.jsx)("img", { src: away.logoUrl, alt: "", className: "h-3 w-3 shrink-0 object-contain", loading: "lazy" }) : null,
-      /* @__PURE__ */ (0, import_jsx_runtime48.jsx)("span", { className: "text-textdim/90", children: away.sideLabel }),
-      /* @__PURE__ */ (0, import_jsx_runtime48.jsx)("span", { className: "font-semibold text-white/90", children: away.score })
+      /* @__PURE__ */ (0, import_jsx_runtime48.jsx)("span", { className: TIMELINE_METADATA_TEXT_CLASS, children: away.sideLabel }),
+      /* @__PURE__ */ (0, import_jsx_runtime48.jsx)("span", { className: "font-semibold text-[#1a1a1a]", children: away.score })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime48.jsx)("span", { className: "text-textdim/50", children: "\u2013" }),
+    /* @__PURE__ */ (0, import_jsx_runtime48.jsx)("span", { className: "text-[#6a6560]/50", children: "\u2013" }),
     /* @__PURE__ */ (0, import_jsx_runtime48.jsxs)("span", { className: "flex items-center gap-1", children: [
       home.logoUrl ? /* @__PURE__ */ (0, import_jsx_runtime48.jsx)("img", { src: home.logoUrl, alt: "", className: "h-3 w-3 shrink-0 object-contain", loading: "lazy" }) : null,
-      /* @__PURE__ */ (0, import_jsx_runtime48.jsx)("span", { className: "text-textdim/90", children: home.sideLabel }),
-      /* @__PURE__ */ (0, import_jsx_runtime48.jsx)("span", { className: "font-semibold text-white/90", children: home.score })
+      /* @__PURE__ */ (0, import_jsx_runtime48.jsx)("span", { className: TIMELINE_METADATA_TEXT_CLASS, children: home.sideLabel }),
+      /* @__PURE__ */ (0, import_jsx_runtime48.jsx)("span", { className: "font-semibold text-[#1a1a1a]", children: home.score })
     ] })
   ] });
 }
@@ -92146,6 +92179,7 @@ var import_jsx_runtime48;
 var init_TimelineGameScoreBlock = __esm({
   "../grarf/desktop/src/components/timeline/TimelineGameScoreBlock.tsx"() {
     init_define_import_meta_env();
+    init_timelineItemLayout();
     import_jsx_runtime48 = __toESM(require_jsx_runtime(), 1);
   }
 });
@@ -92269,17 +92303,17 @@ function TimelineGameUpdate({ update, onExpand }) {
   const isClickable = Boolean(onExpand);
   const content = /* @__PURE__ */ (0, import_jsx_runtime50.jsxs)(import_jsx_runtime50.Fragment, { children: [
     /* @__PURE__ */ (0, import_jsx_runtime50.jsx)("span", { className: timelineAccentBarClass("game_update"), style: { backgroundColor: accentColor }, "aria-hidden": true }),
-    /* @__PURE__ */ (0, import_jsx_runtime50.jsx)("div", { className: "min-w-0 flex-1 px-2 py-1.5", children: /* @__PURE__ */ (0, import_jsx_runtime50.jsxs)("div", { className: "flex min-w-0 flex-wrap items-center gap-x-2 gap-y-0.5 font-mono text-[11px] leading-snug tracking-[0.04em]", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime50.jsx)("span", { className: "shrink-0 font-semibold text-greensys", children: update.source ?? "SCORE" }),
-      leagueLabel ? /* @__PURE__ */ (0, import_jsx_runtime50.jsx)("span", { className: "shrink-0 text-[9px] tracking-[0.1em] text-greensys/70", children: leagueLabel }) : null,
-      /* @__PURE__ */ (0, import_jsx_runtime50.jsx)("span", { className: "shrink-0 font-medium text-white/90", children: scoreLine3 }),
-      /* @__PURE__ */ (0, import_jsx_runtime50.jsx)("span", { className: "min-w-0 truncate text-[#b8cccc]", children: detail })
+    /* @__PURE__ */ (0, import_jsx_runtime50.jsx)("div", { className: "min-w-0 flex-1 px-2 py-1.5", children: /* @__PURE__ */ (0, import_jsx_runtime50.jsxs)("div", { className: "flex min-w-0 flex-wrap items-center gap-x-2 gap-y-0.5", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime50.jsx)("span", { className: cn2(TIMELINE_SOURCE_LABEL_CLASS, TIMELINE_SOURCE_LABEL_COLORS.game_update), children: update.source ?? "SCORE" }),
+      leagueLabel ? /* @__PURE__ */ (0, import_jsx_runtime50.jsx)("span", { className: cn2(TIMELINE_METADATA_TEXT_CLASS, "shrink-0 uppercase"), children: leagueLabel }) : null,
+      /* @__PURE__ */ (0, import_jsx_runtime50.jsx)("span", { className: cn2(TIMELINE_PRIMARY_TEXT_CLASS, "shrink-0 font-medium"), children: scoreLine3 }),
+      /* @__PURE__ */ (0, import_jsx_runtime50.jsx)("span", { className: cn2(TIMELINE_METADATA_TEXT_CLASS, "min-w-0 truncate"), children: detail })
     ] }) })
   ] });
   const shellClass = cn2(
     TIMELINE_ITEM_SHELL_CLASS,
     "flex min-w-0",
-    isClickable && "cursor-pointer transition-colors hover:bg-[#0e1a1d]/80 hover:border-[#24363c]/70"
+    isClickable && cn2("cursor-pointer", TIMELINE_ITEM_SHELL_HOVER_CLASS)
   );
   if (isClickable) {
     return /* @__PURE__ */ (0, import_jsx_runtime50.jsx)(
@@ -92410,7 +92444,7 @@ function HomeCenterPaneTimelineRowInner({
     "article",
     {
       ref: setRowRef,
-      className: "border-b border-[#24363c]/30 px-2 py-1.5 [overflow-anchor:none]",
+      className: HOME_CENTER_PANE_TIMELINE_NEWS_ROW_CLASS,
       "data-timeline-item-id": item.id,
       "data-timeline-expanded": isExpanded ? "true" : void 0,
       "data-timeline-source-kind": item.sourceKind,
@@ -92421,14 +92455,14 @@ function HomeCenterPaneTimelineRowInner({
           {
             ref: setHeaderRef,
             className: cn2(
-              isExpanded && "sticky top-0 z-20 border-b border-cyansys/35 bg-[#010303] shadow-[0_0_10px_rgba(86,247,255,0.14),inset_0_0_0_1px_rgba(86,247,255,0.1)]"
+              isExpanded && HOME_CENTER_PANE_TIMELINE_NEWS_ROW_EXPANDED_HEADER_CLASS
             ),
             children: [
               /* @__PURE__ */ (0, import_jsx_runtime51.jsx)(
                 "time",
                 {
                   dateTime: item.timestamp,
-                  className: "mb-1 block font-mono text-[9px] tracking-[0.12em] text-textdim/60",
+                  className: HOME_CENTER_PANE_TIMELINE_NEWS_TIMESTAMP_CLASS,
                   children: formatTimelineClock(item.timestamp)
                 }
               ),
@@ -92512,6 +92546,7 @@ var init_HomeCenterPaneTimelineRow = __esm({
     init_centerPaneTimelineScrollContext();
     init_useTimelineInlineWebpaneHeight();
     init_resolveTimelineItemUrl();
+    init_homeCenterPaneTimelineNewsPresentation();
     init_centerPaneTimelineExpansionStore();
     init_centerPaneTimelineInteractionStore();
     init_HomeCenterPaneTimelineArticleExpansionPane();
@@ -92657,14 +92692,15 @@ function HomeCenterPaneTimelineSurface({ onClipOpen }) {
     "div",
     {
       ref: workspaceRef,
-      className: "flex h-full min-h-0 min-w-0 flex-col bg-[#010303] font-mono",
+      className: HOME_CENTER_PANE_TIMELINE_NEWS_FEED_CLASS,
+      "data-home-center-pane-timeline-news-presentation": true,
       children: /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(
         "div",
         {
           ref: scrollContainerRef,
-          className: "min-h-0 flex-1 overflow-y-auto overscroll-contain overflow-x-hidden [overflow-anchor:none]",
+          className: HOME_CENTER_PANE_TIMELINE_NEWS_SCROLL_CLASS,
           "aria-label": "Timeline feed",
-          children: renderedItems.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("p", { className: "px-3 py-4 font-mono text-[10px] tracking-[0.04em] text-textdim/75", children: "No timeline events yet." }) : /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(
+          children: renderedItems.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("p", { className: HOME_CENTER_PANE_TIMELINE_NEWS_EMPTY_CLASS, children: "No timeline events yet." }) : /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(
             "div",
             {
               className: "relative w-full pointer-events-none",
@@ -92715,6 +92751,7 @@ var init_HomeCenterPaneTimelineSurface = __esm({
     init_useTimelineVirtualScrollAnchor();
     init_centerPaneTimelineExpansionStore();
     init_centerPaneTimelineInteractionStore();
+    init_homeCenterPaneTimelineNewsPresentation();
     init_HomeCenterPaneTimelineRow();
     import_jsx_runtime52 = __toESM(require_jsx_runtime(), 1);
   }
@@ -92728,12 +92765,17 @@ function HomeCenterPaneTimelineMount({ onClipOpen, className }) {
       paneId: "center",
       className: cn2("relative flex min-h-0 flex-1 flex-col overflow-hidden", className),
       "data-home-center-pane-timeline-mount": true,
+      "data-home-center-pane-timeline-news-presentation": true,
       children: /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(
         "div",
         {
-          className: "relative min-h-0 flex-1 overflow-hidden",
+          className: cn2(
+            "relative flex min-h-0 flex-1 flex-col overflow-hidden",
+            HOME_CENTER_PANE_TIMELINE_NEWS_MARGIN_BG_CLASS,
+            HOME_CENTER_PANE_TIMELINE_NEWS_MARGIN_CLASS
+          ),
           "data-center-pane-mode": "timeline",
-          children: /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("div", { className: cn2(PANE_CONTENT_CONTAIN, "h-full min-h-0"), children: /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(HomeCenterPaneTimelineSurface, { onClipOpen }) })
+          children: /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("div", { className: HOME_CENTER_PANE_TIMELINE_NEWS_FRAME_CLASS, children: /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("div", { className: cn2(PANE_CONTENT_CONTAIN, "h-full min-h-0"), children: /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(HomeCenterPaneTimelineSurface, { onClipOpen }) }) })
         }
       )
     }
@@ -92744,6 +92786,7 @@ var init_HomeCenterPaneTimelineMount = __esm({
   "../grarf/desktop/src/components/homeMvp/HomeCenterPaneTimelineMount.tsx"() {
     init_define_import_meta_env();
     init_cn();
+    init_homeCenterPaneTimelineNewsPresentation();
     init_paneContainment();
     init_GuidedAttentionPanel();
     init_HomeCenterPaneTimelineSurface();
