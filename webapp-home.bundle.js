@@ -139447,14 +139447,24 @@ var init_sportsBrowserPrototypeLeagueWebsites = __esm({
     SPORTS_BROWSER_PROTOTYPE_GLOBAL_WEBSITES = [
       { label: "ESPN", url: "https://www.espn.com/" },
       { label: "Yahoo!", url: "https://sports.yahoo.com/" },
-      { label: "The Athletic", url: "https://theathletic.com/" },
       { label: "CBS Sports", url: "https://www.cbssports.com/" },
-      { label: "FOX Sports", url: "https://www.foxsports.com/" },
-      { label: "NBC Sports", url: "https://www.nbcsports.com/" },
+      { label: "FOX", url: "https://www.foxsports.com/" },
+      { label: "NBC", url: "https://www.nbcsports.com/" },
+      { label: "SI", url: "https://www.si.com/" },
       { label: "Yardbarker", url: "https://www.yardbarker.com/" },
       { label: "The Score", url: "https://www.thescore.com/" },
+      { label: "USA Today", url: "https://www.usatoday.com/sports/" },
       { label: "Bleacher Report", url: "https://bleacherreport.com/" },
-      { label: "USA Today Sports", url: "https://sports.usatoday.com/" }
+      { label: "The Athletic", url: "https://www.nytimes.com/athletic/" },
+      { label: "The Sporting News", url: "https://www.sportingnews.com/us" },
+      { label: "Sky", url: "https://www.skysports.com/" },
+      { label: "BBC", url: "https://www.bbc.com/sport" },
+      { label: "Marca", url: "https://www.marca.com/en/" },
+      { label: "TNT", url: "https://www.tntsports.co.uk/" },
+      { label: "SB Nation", url: "http://sbnation.com" },
+      { label: "MSN", url: "https://www.msn.com/en-us/sports" },
+      { label: "AOL", url: "https://www.aol.com/news/sports/" },
+      { label: "Deadspin", url: "https://deadspin.com/" }
     ];
   }
 });
