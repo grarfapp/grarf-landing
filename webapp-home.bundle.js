@@ -138123,13 +138123,14 @@ function groupSportsBrowserPrototypeSidebarLeagueSlatesBySoccer(slates) {
     }))
   ];
 }
-var SOCCER_SIDEBAR_ARCH_LEAGUE_KEY, SOCCER_SIDEBAR_ARCH_LEAGUE_LABEL, SOCCER_SIDEBAR_INSERT_AFTER_LEAGUE_KEYS;
+var SOCCER_SIDEBAR_ARCH_LEAGUE_KEY, SOCCER_SIDEBAR_ARCH_LEAGUE_LABEL, SOCCER_SIDEBAR_ARCH_LEAGUE_LOGO_URL, SOCCER_SIDEBAR_INSERT_AFTER_LEAGUE_KEYS;
 var init_groupSportsBrowserPrototypeSidebarLeagueSlatesBySoccer = __esm({
   "../grarf/desktop/src/lib/gamesSpine/groupSportsBrowserPrototypeSidebarLeagueSlatesBySoccer.ts"() {
     init_define_import_meta_env();
     init_isSoccerLeague();
     SOCCER_SIDEBAR_ARCH_LEAGUE_KEY = "SOCCER";
     SOCCER_SIDEBAR_ARCH_LEAGUE_LABEL = "SOCCER";
+    SOCCER_SIDEBAR_ARCH_LEAGUE_LOGO_URL = "/league-logos/ball.png";
     SOCCER_SIDEBAR_INSERT_AFTER_LEAGUE_KEYS = [
       "NFL",
       "NBA",
@@ -139381,106 +139382,122 @@ var init_sportsBrowserPrototypeLeagueWebsites = __esm({
       podcasts: "PODCASTS"
     };
     SPORTS_BROWSER_PROTOTYPE_LEAGUE_WEBSITES = {
-      MLB: [
-        {
-          label: "MLB",
-          url: "https://www.mlb.com/"
-        },
-        {
-          label: "ESPN",
-          url: "https://espn.com/mlb"
-        },
-        {
-          label: "Baseball Savant",
-          url: "https://baseballsavant.mlb.com/"
-        },
-        {
-          label: "CBS",
-          url: "https://cbssports.com/mlb"
-        },
-        {
-          label: "FOX",
-          url: "https://foxsports.com/mlb"
-        },
-        {
-          label: "The Athletic",
-          url: "https://theathletic.com/mlb"
-        },
-        {
-          label: "Yahoo!",
-          url: "https://sports.yahoo.com/mlb"
-        },
-        {
-          label: "B/R",
-          url: "https://bleacherreport.com/mlb"
-        },
-        {
-          label: "SI",
-          url: "https://si.com/mlb"
-        },
-        {
-          label: "USA Today",
-          url: "https://usatoday.com/sports/mlb"
-        },
-        {
-          label: "Baseball-Reference",
-          url: "http://baseball-reference.com/"
-        },
-        {
-          label: "FanGraphs",
-          url: "http://fangraphs.com"
-        },
-        {
-          label: "Baseball Prospectus",
-          url: "https://www.baseballprospectus.com/"
-        },
-        {
-          label: "Baseball America",
-          url: "https://www.baseballamerica.com/"
-        }
+      WORLDCUP: [
+        { label: "FIFA", url: "https://www.fifa.com/en/tournaments/mens/worldcup/canadamexicousa2026" },
+        { label: "ESPN", url: "https://www.espn.com/soccer/league/_/name/fifa.world" },
+        { label: "BBC Sport", url: "https://www.bbc.com/sport/football/world-cup" },
+        { label: "Sky Sports", url: "https://www.skysports.com/fifa-world-cup" },
+        { label: "The Guardian", url: "https://www.theguardian.com/football/world-cup" }
+      ],
+      WWC: [
+        { label: "FIFA", url: "https://www.fifa.com/en/tournaments/womens/womensworldcup" },
+        { label: "ESPN", url: "https://www.espn.com/soccer/league/_/name/fifa.wwc" },
+        { label: "BBC Sport", url: "https://www.bbc.com/sport/football/womens-world-cup" },
+        { label: "Sky Sports", url: "https://www.skysports.com/womens-world-cup" },
+        { label: "The Guardian", url: "https://www.theguardian.com/football/womens-world-cup" }
+      ],
+      WIMBLEDON: [
+        { label: "Wimbledon", url: "https://www.wimbledon.com/en_GB/news/index.html" },
+        { label: "ESPN", url: "https://www.espn.com/tennis/tournament/_/name/wimbledon" },
+        { label: "BBC Sport", url: "https://www.bbc.com/sport/tennis/wimbledon" },
+        { label: "Sky Sports", url: "https://www.skysports.com/tennis/wimbledon" },
+        { label: "Tennis.com", url: "https://www.tennis.com/tournaments/wimbledon/" }
+      ],
+      WIMBLEDON_MEN: [
+        { label: "Wimbledon", url: "https://www.wimbledon.com/en_GB/news/index.html" },
+        { label: "ESPN", url: "https://www.espn.com/tennis/tournament/_/name/wimbledon" },
+        { label: "BBC Sport", url: "https://www.bbc.com/sport/tennis/wimbledon" },
+        { label: "Sky Sports", url: "https://www.skysports.com/tennis/wimbledon" },
+        { label: "Tennis.com", url: "https://www.tennis.com/tournaments/wimbledon/" }
+      ],
+      WIMBLEDON_WOMEN: [
+        { label: "Wimbledon", url: "https://www.wimbledon.com/en_GB/news/index.html" },
+        { label: "ESPN", url: "https://www.espn.com/tennis/tournament/_/name/wimbledon" },
+        { label: "BBC Sport", url: "https://www.bbc.com/sport/tennis/wimbledon" },
+        { label: "Sky Sports", url: "https://www.skysports.com/tennis/wimbledon" },
+        { label: "Tennis.com", url: "https://www.tennis.com/tournaments/wimbledon/" }
+      ],
+      "the-masters": [
+        { label: "Masters", url: "https://www.masters.com/en_US/news/index.html" },
+        { label: "ESPN", url: "https://www.espn.com/golf/masters/" },
+        { label: "CBS Sports", url: "https://www.cbssports.com/golf/masters/" },
+        { label: "Golf Channel", url: "https://www.golfchannel.com/tours/masters" },
+        { label: "Golf Digest", url: "https://www.golfdigest.com/topic/masters-tournament" }
+      ],
+      "the-open": [
+        { label: "The Open", url: "https://www.theopen.com/news" },
+        { label: "BBC Sport", url: "https://www.bbc.com/sport/golf/the-open" },
+        { label: "Sky Sports", url: "https://www.skysports.com/golf/the-open/news" },
+        { label: "ESPN", url: "https://www.espn.com/golf/theopen/" },
+        { label: "Golf Digest", url: "https://www.golfdigest.com/topic/the-open-championship" }
+      ],
+      EURO: [
+        { label: "UEFA", url: "https://www.uefa.com/euro/" },
+        { label: "ESPN", url: "https://www.espn.com/soccer/league/_/name/uefa.euro" },
+        { label: "BBC Sport", url: "https://www.bbc.com/sport/football/european-championship" },
+        { label: "Sky Sports", url: "https://www.skysports.com/euro-2024" },
+        { label: "The Guardian", url: "https://www.theguardian.com/football/european-championship" }
+      ],
+      NFL: [
+        { label: "NFL.com", url: "https://www.nfl.com/" },
+        { label: "ESPN", url: "https://www.espn.com/nfl/" },
+        { label: "CBS Sports", url: "https://www.cbssports.com/nfl/" },
+        { label: "FOX Sports", url: "https://www.foxsports.com/nfl" },
+        { label: "The Athletic", url: "https://www.nytimes.com/athletic/nfl/" },
+        { label: "The Score", url: "https://www.thescore.com/nfl" },
+        { label: "Bleacher Report", url: "https://bleacherreport.com/nfl" }
       ],
       EPL: [
+        { label: "Premier League", url: "https://www.premierleague.com/news" },
+        { label: "ESPN", url: "https://www.espn.com/soccer/league/_/name/eng.1" },
+        { label: "BBC Sport", url: "https://www.bbc.com/sport/football/premier-league" },
+        { label: "Sky Sports", url: "https://www.skysports.com/premier-league" },
+        { label: "The Athletic", url: "https://www.nytimes.com/athletic/football/premier-league/" },
+        { label: "The Guardian", url: "https://www.theguardian.com/football/premierleague" },
+        { label: "Yahoo! Sports", url: "https://sports.yahoo.com/soccer/premier-league/" },
+        { label: "OneFootball", url: "https://onefootball.com/en/competition/premier-league-9" },
+        { label: "FotMob", url: "https://www.fotmob.com/leagues/47/overview/premier-league" }
+      ],
+      LALIGA: [
         {
-          label: "Yahoo! Sports",
-          url: "https://sports.yahoo.com/soccer/premier-league/"
-        },
-        {
-          label: "OneFootball",
-          url: "https://onefootball.com/en/competition/premier-league-9"
+          label: "Yahoo!",
+          url: "https://sports.yahoo.com/soccer/la-liga/"
         },
         {
           label: "FotMob",
-          url: "https://www.fotmob.com/leagues/47/overview/premier-league"
+          url: "https://www.fotmob.com/leagues/87/overview/la-liga"
         },
         {
-          label: "Premier League",
-          url: "https://www.premierleague.com/en/"
+          label: "Soccerway",
+          url: "https://www.soccerway.com/news/laliga/"
         },
         {
-          label: "BBC Sport",
-          url: "https://www.bbc.com/sport/football/premier-league"
-        }
-      ],
-      UCL: [
-        {
-          label: "News",
-          url: "https://www.uefa.com/uefachampionsleague/"
+          label: "SI",
+          url: "https://www.si.com/soccer/la-liga"
         },
         {
-          label: "Overview",
-          url: "https://www.fotmob.com/leagues/42/overview/champions-league"
+          label: "AS",
+          url: "https://en.as.com/news/liga-espanola-de-futbol/"
         },
         {
-          label: "X",
-          url: "https://x.com/search?q=uefa%20champions%20league&src=typed_query"
+          label: "LaLiga",
+          url: "https://www.laliga.com"
         },
         {
-          label: "Highlights",
-          url: "https://www.uefa.com/uefachampionsleague/fixtures-results/#/d/2026-09-08"
+          label: "Goal",
+          url: "https://www.goal.com/en-us/laliga/34pl8szyvrbwcmfkuocjm3r6t"
         },
         {
-          label: "Extended Highlights",
-          url: "https://youtube.com/playlist?list=PLWvDauQBKnvI&si=reo3kM7kWQnXzI-M"
+          label: "ESPN",
+          url: "https://www.espn.com/soccer/league/_/name/esp.1"
+        },
+        {
+          label: "The Analyst",
+          url: "https://theanalyst.com/competition/la-liga"
+        },
+        {
+          label: "NewsNow",
+          url: "https://www.newsnow.com/us/Sports/Soccer/La+Liga"
         }
       ],
       US_OPEN_TENNIS: [
@@ -139510,62 +139527,940 @@ var init_sportsBrowserPrototypeLeagueWebsites = __esm({
         }
       ],
       NCAAF: [
-        {
-          label: "Yahoo!",
-          url: "https://sports.yahoo.com/college-football/"
-        },
-        {
-          label: "ESPN",
-          url: "https://www.espn.com/college-football/"
-        },
-        {
-          label: "B/R",
-          url: "https://bleacherreport.com/college-football"
-        },
-        {
-          label: "Reddit",
-          url: "https://www.reddit.com/r/CFB/"
-        },
-        {
-          label: "On3",
-          url: "https://www.on3.com/"
-        },
-        {
-          label: "CBS",
-          url: "https://www.cbssports.com/college-football/"
-        },
-        {
-          label: "247 Sports",
-          url: "https://247sports.com/"
-        },
-        {
-          label: "FOX",
-          url: "http://foxsports.com/college-football"
-        },
-        {
-          label: "The Athletic",
-          url: "https://theathletic.com/college-football"
-        },
-        {
-          label: "SI",
-          url: "https://si.com/college-football"
-        },
-        {
-          label: "USA Today",
-          url: "https://www.usatoday.com/sports/ncaaf/"
-        },
-        {
-          label: "SportSpyder",
-          url: "https://sportspyder.com/sports/cf/news"
-        },
-        {
-          label: "NewsNow",
-          url: "https://www.newsnow.com/us/Sports/NCAA+Football"
-        },
-        {
-          label: "Sports-Reference",
-          url: "https://www.sports-reference.com/cfb/"
-        }
+        { label: "NCAA", url: "https://www.ncaa.com/sports/football/fbs" },
+        { label: "ESPN", url: "https://www.espn.com/college-football/" },
+        { label: "CBS Sports", url: "https://www.cbssports.com/college-football/" },
+        { label: "FOX Sports", url: "https://www.foxsports.com/college-football" },
+        { label: "Yahoo! Sports", url: "https://sports.yahoo.com/college-football/" },
+        { label: "The Athletic", url: "https://www.nytimes.com/athletic/college-football/" },
+        { label: "On3", url: "https://www.on3.com/college-football/" },
+        { label: "247Sports", url: "https://247sports.com/college-football/" },
+        { label: "Bleacher Report", url: "https://bleacherreport.com/college-football" },
+        { label: "SportSpyder", url: "https://sportspyder.com/sports/cf/news" },
+        { label: "NewsNow", url: "https://www.newsnow.com/us/Sports/NCAA+Football" }
+      ],
+      "us-open-golf": [
+        { label: "USGA / U.S. Open", url: "https://www.usopen.com/" },
+        { label: "ESPN", url: "https://www.espn.com/golf/usopen/" },
+        { label: "Golf Channel", url: "https://www.golfchannel.com/tours/us-open" },
+        { label: "CBS Sports", url: "https://www.cbssports.com/golf/us-open/" },
+        { label: "Golf Digest", url: "https://www.golfdigest.com/topic/us-open" }
+      ],
+      "pga-championship": [
+        { label: "PGA Championship", url: "https://www.pgachampionship.com/news" },
+        { label: "PGA of America", url: "https://www.pga.com/championships/pga-championship" },
+        { label: "ESPN", url: "https://www.espn.com/golf/pga-championship/" },
+        { label: "CBS Sports", url: "https://www.cbssports.com/golf/pga-championship/" },
+        { label: "Golf Channel", url: "https://www.golfchannel.com/tours/pga-championship" }
+      ],
+      NBA: [
+        { label: "NBA", url: "https://www.nba.com/news" },
+        { label: "ESPN", url: "https://www.espn.com/nba/" },
+        { label: "CBS Sports", url: "https://www.cbssports.com/nba/" },
+        { label: "The Athletic", url: "https://www.nytimes.com/athletic/nba/" },
+        { label: "Yahoo! Sports", url: "https://sports.yahoo.com/nba/" },
+        { label: "The Score", url: "https://www.thescore.com/nba" },
+        { label: "Bleacher Report", url: "https://bleacherreport.com/nba" },
+        { label: "HoopsHype", url: "https://hoopshype.com/" }
+      ],
+      MLB: [
+        { label: "MLB", url: "https://www.mlb.com/news" },
+        { label: "ESPN", url: "https://www.espn.com/mlb/" },
+        { label: "CBS Sports", url: "https://www.cbssports.com/mlb/" },
+        { label: "FOX Sports", url: "https://www.foxsports.com/mlb" },
+        { label: "The Athletic", url: "https://www.nytimes.com/athletic/mlb/" },
+        { label: "Yahoo! Sports", url: "https://sports.yahoo.com/mlb/" },
+        { label: "Bleacher Report", url: "https://bleacherreport.com/mlb" },
+        { label: "SI", url: "https://www.si.com/mlb" },
+        { label: "USA Today", url: "https://www.usatoday.com/sports/mlb/" },
+        { label: "Baseball Savant", url: "https://baseballsavant.mlb.com/" },
+        { label: "Baseball-Reference", url: "https://www.baseball-reference.com/" },
+        { label: "FanGraphs", url: "https://www.fangraphs.com/" },
+        { label: "Baseball Prospectus", url: "https://www.baseballprospectus.com/" },
+        { label: "Baseball America", url: "https://www.baseballamerica.com/" }
+      ],
+      NHL: [
+        { label: "NHL.com", url: "https://www.nhl.com/news" },
+        { label: "ESPN", url: "https://www.espn.com/nhl/" },
+        { label: "CBS Sports", url: "https://www.cbssports.com/nhl/" },
+        { label: "The Athletic", url: "https://www.nytimes.com/athletic/nhl/" },
+        { label: "The Hockey Writers", url: "https://thehockeywriters.com/category/nhl-news/" },
+        { label: "The Hockey News", url: "https://thehockeynews.com/" },
+        { label: "The Score", url: "https://www.thescore.com/nhl" },
+        { label: "Bleacher Report", url: "https://bleacherreport.com/nhl" }
+      ],
+      UCL: [
+        { label: "UEFA", url: "https://www.uefa.com/uefachampionsleague/" },
+        { label: "ESPN", url: "https://www.espn.com/soccer/league/_/name/uefa.champions" },
+        { label: "CBS Sports", url: "https://www.cbssports.com/soccer/champions-league/" },
+        { label: "BBC Sport", url: "https://www.bbc.com/sport/football/champions-league" },
+        { label: "Sky Sports", url: "https://www.skysports.com/champions-league" },
+        { label: "The Athletic", url: "https://www.nytimes.com/athletic/football/champions-league/" },
+        { label: "FotMob", url: "https://www.fotmob.com/leagues/42/overview/champions-league" }
+      ],
+      UCLQ: [
+        { label: "UEFA", url: "https://www.uefa.com/uefachampionsleague/" },
+        { label: "ESPN", url: "https://www.espn.com/soccer/league/_/name/uefa.champions" },
+        { label: "BBC Sport", url: "https://www.bbc.com/sport/football/champions-league" },
+        { label: "Sky Sports", url: "https://www.skysports.com/champions-league" },
+        { label: "The Athletic", url: "https://www.nytimes.com/athletic/football/champions-league/" }
+      ],
+      F1: [
+        { label: "Formula 1", url: "https://www.formula1.com/en/latest" },
+        { label: "ESPN", url: "https://www.espn.com/f1/" },
+        { label: "Motorsport.com", url: "https://www.motorsport.com/f1/" },
+        { label: "Autosport", url: "https://www.autosport.com/f1/" },
+        { label: "Sky Sports F1", url: "https://www.skysports.com/f1" },
+        { label: "PlanetF1", url: "https://www.planetf1.com/" },
+        { label: "The Race", url: "https://www.the-race.com/category/formula-1/" },
+        { label: "RACER", url: "https://www.racer.com/category/formula-1/" }
+      ],
+      TDF: [
+        { label: "Tour de France", url: "https://www.letour.fr/en/news" },
+        { label: "Cyclingnews", url: "https://www.cyclingnews.com/tour-de-france/" },
+        { label: "Eurosport", url: "https://www.eurosport.com/cycling/tour-de-france/" },
+        { label: "BBC Sport", url: "https://www.bbc.com/sport/cycling/tour-de-france" },
+        { label: "Cycling Weekly", url: "https://www.cyclingweekly.com/racing/tour-de-france" }
+      ],
+      "french-open": [
+        { label: "Roland-Garros", url: "https://www.rolandgarros.com/en-us/" },
+        { label: "ESPN", url: "https://www.espn.com/tennis/tournament/_/name/french-open" },
+        { label: "BBC Sport", url: "https://www.bbc.com/sport/tennis/french-open" },
+        { label: "Tennis.com", url: "https://www.tennis.com/tournaments/french-open/" },
+        { label: "Eurosport", url: "https://www.eurosport.com/tennis/roland-garros/" },
+        { label: "Tennis365", url: "https://www.tennis365.com/" },
+        { label: "Tennis World USA", url: "https://www.tennisworldusa.org/" }
+      ],
+      "australian-open": [
+        { label: "Australian Open", url: "https://ausopen.com/articles/news" },
+        { label: "ESPN", url: "https://www.espn.com/tennis/tournament/_/name/australian-open" },
+        { label: "BBC Sport", url: "https://www.bbc.com/sport/tennis/australian-open" },
+        { label: "Tennis.com", url: "https://www.tennis.com/tournaments/australian-open/" },
+        { label: "Eurosport", url: "https://www.eurosport.com/tennis/australian-open/" },
+        { label: "Tennis365", url: "https://www.tennis365.com/" },
+        { label: "Tennis World USA", url: "https://www.tennisworldusa.org/" }
+      ],
+      MNCAAB: [
+        { label: "NCAA", url: "https://www.ncaa.com/sports/basketball-men/d1" },
+        { label: "ESPN", url: "https://www.espn.com/mens-college-basketball/" },
+        { label: "CBS Sports", url: "https://www.cbssports.com/college-basketball/" },
+        { label: "Yahoo! Sports", url: "https://sports.yahoo.com/college-basketball/" },
+        { label: "247Sports", url: "https://247sports.com/college-basketball/" },
+        { label: "On3", url: "https://www.on3.com/college-basketball/" }
+      ],
+      BUNDESLIGA: [
+        { label: "Bundesliga", url: "https://www.bundesliga.com/en/bundesliga/news" },
+        { label: "ESPN", url: "https://www.espn.com/soccer/league/_/name/ger.1" },
+        { label: "Sky Sports", url: "https://www.skysports.com/bundesliga" },
+        { label: "Kicker", url: "https://www.kicker.de/bundesliga" },
+        { label: "DW", url: "https://www.dw.com/en/bundesliga/s-10642" },
+        { label: "FotMob", url: "https://www.fotmob.com/leagues/54/overview/bundesliga" },
+        { label: "Soccerway", url: "https://www.soccerway.com/news/bundesliga/W6BOzpK2CdnS0XT8/" }
+      ],
+      GER_SUPER_CUP: [
+        { label: "Bundesliga", url: "https://www.bundesliga.com/en/bundesliga/news" },
+        { label: "Kicker", url: "https://www.kicker.de/bundesliga" },
+        { label: "ESPN", url: "https://www.espn.com/soccer/league/_/name/ger.supercup" },
+        { label: "Sky Sports", url: "https://www.skysports.com/bundesliga" }
+      ],
+      SERIEA: [
+        { label: "Serie A", url: "https://www.legaseriea.it/en" },
+        { label: "ESPN", url: "https://www.espn.com/soccer/league/_/name/ita.1" },
+        { label: "Sky Sports", url: "https://www.skysports.com/serie-a" },
+        { label: "Football Italia", url: "https://football-italia.net/" },
+        { label: "The Athletic", url: "https://www.nytimes.com/athletic/football/serie-a/" },
+        { label: "CBS Sports", url: "https://www.cbssports.com/soccer/serie-a/" },
+        { label: "FotMob", url: "https://www.fotmob.com/leagues/55/overview/serie" },
+        { label: "Soccerway", url: "https://www.soccerway.com/news/serie-a/COuk57CiCdnS0XT8/" }
+      ],
+      "fa-cup": [
+        { label: "The FA", url: "https://www.thefa.com/competitions/the-emirates-fa-cup" },
+        { label: "BBC Sport", url: "https://www.bbc.com/sport/football/fa-cup" },
+        { label: "ESPN", url: "https://www.espn.com/soccer/league/_/name/eng.fa" },
+        { label: "Sky Sports", url: "https://www.skysports.com/fa-cup" },
+        { label: "The Guardian", url: "https://www.theguardian.com/football/fa-cup" }
+      ],
+      BOXING: [
+        { label: "ESPN Boxing", url: "https://www.espn.com/boxing/" },
+        { label: "The Ring", url: "https://www.ringmagazine.com/" },
+        { label: "BoxingScene", url: "https://www.boxingscene.com/" },
+        { label: "DAZN Boxing", url: "https://www.dazn.com/en-US/news/boxing" },
+        { label: "BBC Sport", url: "https://www.bbc.com/sport/boxing" },
+        { label: "Sky Sports Boxing", url: "https://www.skysports.com/boxing" }
+      ],
+      UFC: [
+        { label: "UFC", url: "https://www.ufc.com/news" },
+        { label: "ESPN MMA", url: "https://www.espn.com/mma/" },
+        { label: "MMA Junkie", url: "https://mmajunkie.usatoday.com/" },
+        { label: "MMA Fighting", url: "https://www.mmafighting.com/" },
+        { label: "Sherdog", url: "https://www.sherdog.com/news" }
+      ],
+      MLS: [
+        { label: "MLS", url: "https://www.mlssoccer.com/news" },
+        { label: "ESPN", url: "https://www.espn.com/soccer/league/_/name/usa.1" },
+        { label: "The Athletic", url: "https://www.nytimes.com/athletic/mls/" },
+        { label: "CBS Sports", url: "https://www.cbssports.com/soccer/mls/" },
+        { label: "FOX Sports", url: "https://www.foxsports.com/soccer/mls" },
+        { label: "Yahoo Sports", url: "https://sports.yahoo.com/soccer/mls/" },
+        { label: "Soccer America", url: "https://www.socceramerica.com/" }
+      ],
+      UEL: [
+        { label: "UEFA", url: "https://www.uefa.com/uefaeuropaleague/" },
+        { label: "ESPN", url: "https://www.espn.com/soccer/league/_/name/uefa.europa" },
+        { label: "CBS Sports", url: "https://www.cbssports.com/soccer/europa-league/" },
+        { label: "BBC Sport", url: "https://www.bbc.com/sport/football/europa-league" },
+        { label: "Sky Sports", url: "https://www.skysports.com/europa-league" },
+        { label: "The Athletic", url: "https://www.nytimes.com/athletic/football/europa-league/" },
+        { label: "FotMob", url: "https://www.fotmob.com/leagues/73/overview/europa-league" }
+      ],
+      LIGUE1: [
+        { label: "Ligue 1", url: "https://www.ligue1.com/" },
+        { label: "ESPN", url: "https://www.espn.com/soccer/league/_/name/fra.1" },
+        { label: "BBC Sport", url: "https://www.bbc.com/sport/football/french-ligue-one" },
+        { label: "Sky Sports", url: "https://www.skysports.com/ligue-1" },
+        { label: "The Athletic", url: "https://www.nytimes.com/athletic/football/ligue-1/" },
+        { label: "Get French Football News", url: "https://www.getfootballnewsfrance.com/" },
+        { label: "L'\xC9quipe", url: "https://www.lequipe.fr/Football/" }
+      ],
+      PGA: [
+        { label: "PGA Tour", url: "https://www.pgatour.com/news" },
+        { label: "ESPN", url: "https://www.espn.com/golf/" },
+        { label: "CBS Sports", url: "https://www.cbssports.com/golf/" },
+        { label: "Golf Channel", url: "https://www.golfchannel.com/" },
+        { label: "Golf Digest", url: "https://www.golfdigest.com/golf" },
+        { label: "Sky Sports Golf", url: "https://www.skysports.com/golf" }
+      ],
+      WNBA: [
+        { label: "WNBA", url: "https://www.wnba.com/news" },
+        { label: "ESPN", url: "https://www.espn.com/wnba/" },
+        { label: "CBS Sports", url: "https://www.cbssports.com/wnba/" },
+        { label: "The Athletic", url: "https://www.nytimes.com/athletic/wnba/" },
+        { label: "Yahoo Sports", url: "https://sports.yahoo.com/wnba/" }
+      ],
+      LLBWS: [
+        { label: "Little League", url: "https://www.littleleague.org/news/" },
+        { label: "ESPN", url: "https://www.espn.com/little-league/" },
+        { label: "MLB", url: "https://www.mlb.com/little-league-classic" },
+        { label: "USA Today", url: "https://www.usatoday.com/sports/" },
+        { label: "CBS Sports", url: "https://www.cbssports.com/mlb/" }
+      ],
+      ATP: [
+        { label: "ATP Tour", url: "https://www.atptour.com/en/news" },
+        { label: "ESPN", url: "https://www.espn.com/tennis/" },
+        { label: "Tennis.com", url: "https://www.tennis.com/" },
+        { label: "BBC Sport", url: "https://www.bbc.com/sport/tennis" },
+        { label: "Eurosport", url: "https://www.eurosport.com/tennis/" },
+        { label: "Tennis365", url: "https://www.tennis365.com/" }
+      ],
+      WTA: [
+        { label: "WTA", url: "https://www.wtatennis.com/news" },
+        { label: "ESPN", url: "https://www.espn.com/tennis/" },
+        { label: "Tennis.com", url: "https://www.tennis.com/" },
+        { label: "BBC Sport", url: "https://www.bbc.com/sport/tennis" },
+        { label: "Eurosport", url: "https://www.eurosport.com/tennis/" },
+        { label: "Tennis365", url: "https://www.tennis365.com/" }
+      ],
+      COPA: [
+        { label: "CONMEBOL", url: "https://www.conmebol.com/copa-america/" },
+        { label: "ESPN", url: "https://www.espn.com/soccer/league/_/name/copa.america" },
+        { label: "BBC Sport", url: "https://www.bbc.com/sport/football/copa-america" },
+        { label: "The Guardian", url: "https://www.theguardian.com/football/copa-america" },
+        { label: "Sky Sports", url: "https://www.skysports.com/copa-america" },
+        { label: "CBS Sports", url: "https://www.cbssports.com/soccer/copa-america/" }
+      ],
+      CLUBWC: [
+        { label: "FIFA", url: "https://www.fifa.com/en/tournaments/mens/club-world-cup" },
+        { label: "ESPN", url: "https://www.espn.com/soccer/league/_/name/fifa.cwc" },
+        { label: "BBC Sport", url: "https://www.bbc.com/sport/football/club-world-cup" },
+        { label: "Sky Sports", url: "https://www.skysports.com/club-world-cup" },
+        { label: "The Guardian", url: "https://www.theguardian.com/football/club-world-cup" },
+        { label: "CBS Sports", url: "https://www.cbssports.com/soccer/club-world-cup/" }
+      ],
+      INTFRIENDLY: [
+        { label: "ESPN", url: "https://www.espn.com/soccer/" },
+        { label: "BBC Sport", url: "https://www.bbc.com/sport/football" },
+        { label: "Sky Sports", url: "https://www.skysports.com/football" },
+        { label: "The Guardian", url: "https://www.theguardian.com/football" },
+        { label: "FIFA", url: "https://www.fifa.com/" }
+      ],
+      CLUBFRIENDLY: [
+        { label: "ESPN", url: "https://www.espn.com/soccer/" },
+        { label: "Sky Sports", url: "https://www.skysports.com/football" },
+        { label: "BBC Sport", url: "https://www.bbc.com/sport/football" },
+        { label: "The Athletic", url: "https://www.nytimes.com/athletic/football/" },
+        { label: "The Guardian", url: "https://www.theguardian.com/football" }
+      ],
+      LEAGUES_CUP: [
+        { label: "Leagues Cup", url: "https://www.leaguescup.com/news/" },
+        { label: "CONCACAF", url: "https://www.concacaf.com/leagues-cup/" },
+        { label: "MLS", url: "https://www.mlssoccer.com/leagues-cup" },
+        { label: "Liga MX", url: "https://www.ligamx.net/" },
+        { label: "ESPN", url: "https://www.espn.com/soccer/league/_/name/leagues.cup" },
+        { label: "FOX Sports", url: "https://www.foxsports.com/soccer/leagues-cup" },
+        { label: "Apple Sports", url: "https://www.apple.com/apple-tv-app/" }
+      ],
+      UWCQ: [
+        { label: "FIFA", url: "https://www.fifa.com/" },
+        { label: "CONCACAF", url: "https://www.concacaf.com/" },
+        { label: "CONMEBOL", url: "https://www.conmebol.com/" },
+        { label: "UEFA", url: "https://www.uefa.com/" },
+        { label: "ESPN", url: "https://www.espn.com/soccer/" }
+      ],
+      INDYCAR: [
+        { label: "INDYCAR", url: "https://www.indycar.com/News" },
+        { label: "Motorsport.com", url: "https://www.motorsport.com/indycar/" },
+        { label: "Autosport", url: "https://www.autosport.com/indycar/" },
+        { label: "NBC Sports", url: "https://www.nbcsports.com/motors/indycar" },
+        { label: "RACER", url: "https://racer.com/indycar/" }
+      ],
+      NASCAR: [
+        { label: "NASCAR", url: "https://www.nascar.com/news-media/" },
+        { label: "FOX Sports", url: "https://www.foxsports.com/nascar" },
+        { label: "NBC Sports", url: "https://www.nbcsports.com/nascar" },
+        { label: "ESPN", url: "https://www.espn.com/racing/nascar/" },
+        { label: "Racing America", url: "https://www.racingamerica.com/" },
+        { label: "Motorsport.com", url: "https://www.motorsport.com/nascar-cup/" }
+      ],
+      CARABAO_CUP: [
+        { label: "EFL", url: "https://www.efl.com/news/" },
+        { label: "ESPN", url: "https://www.espn.com/soccer/league/_/name/eng.league_cup" },
+        { label: "BBC Sport", url: "https://www.bbc.com/sport/football/league-cup" },
+        { label: "Sky Sports", url: "https://www.skysports.com/carabao-cup" },
+        { label: "The Guardian", url: "https://www.theguardian.com/football/league-cup" }
+      ],
+      COPPAITALIA: [
+        { label: "Lega Serie A", url: "https://www.legaseriea.it/en/coppa-italia" },
+        { label: "ESPN", url: "https://www.espn.com/soccer/league/_/name/ita.coppa_italia" },
+        { label: "Sky Sports", url: "https://www.skysports.com/football/coppa-italia" },
+        { label: "Football Italia", url: "https://football-italia.net/" },
+        { label: "CBS Sports", url: "https://www.cbssports.com/soccer/" },
+        { label: "The Athletic", url: "https://www.nytimes.com/athletic/football/italy/" }
+      ],
+      WNCAAB: [
+        { label: "NCAA", url: "https://www.ncaa.com/sports/basketball-women/d1" },
+        { label: "ESPN", url: "https://www.espn.com/womens-college-basketball/" },
+        { label: "The Athletic", url: "https://www.nytimes.com/athletic/womens-college-basketball/" },
+        { label: "CBS Sports", url: "https://www.cbssports.com/womens-college-basketball/" },
+        { label: "Yahoo Sports", url: "https://sports.yahoo.com/ncaaw/" },
+        { label: "USA Today", url: "https://www.usatoday.com/sports/ncaaw/" }
+      ],
+      NWSL: [
+        { label: "NWSL", url: "https://www.nwslsoccer.com/news" },
+        { label: "ESPN", url: "https://www.espn.com/soccer/league/_/name/usa.nwsl" },
+        { label: "CBS Sports", url: "https://www.cbssports.com/soccer/nwsl/" },
+        { label: "The Athletic", url: "https://www.nytimes.com/athletic/football/nwsl/" },
+        { label: "Soccer America", url: "https://www.socceramerica.com/" },
+        { label: "Yahoo Sports", url: "https://sports.yahoo.com/soccer/nwsl/" }
+      ],
+      DP_WORLD: [
+        { label: "DP World Tour", url: "https://www.europeantour.com/dpworld-tour/news/" },
+        { label: "ESPN", url: "https://www.espn.com/golf/" },
+        { label: "Sky Sports Golf", url: "https://www.skysports.com/golf" },
+        { label: "Golf Channel", url: "https://www.golfchannel.com/" },
+        { label: "Golf Digest", url: "https://www.golfdigest.com/golf" },
+        { label: "BBC Sport", url: "https://www.bbc.com/sport/golf" }
+      ],
+      LPGA: [
+        { label: "LPGA", url: "https://www.lpga.com/news" },
+        { label: "ESPN", url: "https://www.espn.com/golf/" },
+        { label: "Golf Channel", url: "https://www.golfchannel.com/" },
+        { label: "Golf Digest", url: "https://www.golfdigest.com/golf" },
+        { label: "CBS Sports", url: "https://www.cbssports.com/golf/" },
+        { label: "Golfweek", url: "https://golfweek.usatoday.com/" }
+      ],
+      KORNFERRY: [
+        { label: "PGA Tour", url: "https://www.pgatour.com/korn-ferry-tour/news" },
+        { label: "Golf Channel", url: "https://www.golfchannel.com/korn-ferry-tour" },
+        { label: "ESPN", url: "https://www.espn.com/golf/" },
+        { label: "Golf Digest", url: "https://www.golfdigest.com/golf" },
+        { label: "Golfweek", url: "https://golfweek.usatoday.com/" }
+      ],
+      NCAABB: [
+        { label: "NCAA", url: "https://www.ncaa.com/sports/baseball/d1" },
+        { label: "ESPN", url: "https://www.espn.com/college-baseball/" },
+        { label: "D1Baseball", url: "https://www.d1baseball.com/" },
+        { label: "Baseball America", url: "https://www.baseballamerica.com/college/" },
+        { label: "CBS Sports", url: "https://www.cbssports.com/college-baseball/" },
+        { label: "Baseball-Reference", url: "https://www.baseball-reference.com/bullpen/College_Baseball" }
+      ],
+      UECL: [
+        { label: "UEFA", url: "https://www.uefa.com/uefaconferenceleague/" },
+        { label: "ESPN", url: "https://www.espn.com/soccer/league/_/name/uefa.europa.conference" },
+        { label: "CBS Sports", url: "https://www.cbssports.com/soccer/uefa-conference-league/" },
+        { label: "BBC Sport", url: "https://www.bbc.com/sport/football/conference-league" },
+        { label: "Sky Sports", url: "https://www.skysports.com/uefa-conference-league" },
+        { label: "The Athletic", url: "https://www.nytimes.com/athletic/football/europa-conference-league/" },
+        { label: "FotMob", url: "https://www.fotmob.com/leagues/108/overview/conference-league" }
+      ],
+      NASCAR_XFINITY: [
+        { label: "NASCAR", url: "https://www.nascar.com/news/nascar-xfinity-series/" },
+        { label: "FOX Sports", url: "https://www.foxsports.com/nascar/xfinity-series" },
+        { label: "NBC Sports", url: "https://www.nbcsports.com/nascar/xfinity" },
+        { label: "ESPN", url: "https://www.espn.com/racing/nascar/" },
+        { label: "Motorsport.com", url: "https://www.motorsport.com/nascar-xfinity/" },
+        { label: "Racing America", url: "https://www.racingamerica.com/series/national-series/nascar-xfinity-series" }
+      ],
+      NASCAR_TRUCK: [
+        { label: "NASCAR", url: "https://www.nascar.com/news/nascar-craftsman-truck-series/" },
+        { label: "FOX Sports", url: "https://www.foxsports.com/nascar/craftsman-truck-series" },
+        { label: "NBC Sports", url: "https://www.nbcsports.com/nascar" },
+        { label: "ESPN", url: "https://www.espn.com/racing/nascar/" },
+        { label: "Motorsport.com", url: "https://www.motorsport.com/nascar-truck/" },
+        { label: "Racing America", url: "https://www.racingamerica.com/series/national-series/nascar-truck-series-" }
+      ],
+      NATIONS: [
+        { label: "UEFA", url: "https://www.uefa.com/uefanationsleague/" },
+        { label: "ESPN", url: "https://www.espn.com/soccer/league/_/name/uefa.nations" },
+        { label: "BBC Sport", url: "https://www.bbc.com/sport/football/uefa-nations-league" },
+        { label: "Sky Sports", url: "https://www.skysports.com/uefa-nations-league" },
+        { label: "The Guardian", url: "https://www.theguardian.com/football/uefa-nations-league" },
+        { label: "The Athletic", url: "https://www.nytimes.com/athletic/football/uefa-nations-league/" }
+      ],
+      CONCACAF_WC: [
+        { label: "CONCACAF", url: "https://www.concacaf.com/world-cup-qualifying-men/" },
+        { label: "FIFA", url: "https://www.fifa.com/tournaments/mens/worldcup" },
+        { label: "ESPN", url: "https://www.espn.com/soccer/" },
+        { label: "FOX Sports", url: "https://www.foxsports.com/soccer" },
+        { label: "CBS Sports", url: "https://www.cbssports.com/soccer/" }
+      ],
+      CONCACAF_NG: [
+        { label: "CONCACAF", url: "https://www.concacaf.com/competitions/nations-league/news" },
+        { label: "FOX Sports", url: "https://www.foxsports.com/soccer/concacaf-nations-league" },
+        { label: "ESPN", url: "https://www.espn.com/soccer/" },
+        { label: "CBS Sports", url: "https://www.cbssports.com/soccer/" },
+        { label: "FIFA", url: "https://www.fifa.com/" }
+      ],
+      CONCACAF_CL: [
+        { label: "CONCACAF", url: "https://www.concacaf.com/competitions/champions-cup/news" },
+        { label: "CBS Sports", url: "https://www.cbssports.com/soccer/concacaf-champions-cup/" },
+        { label: "FOX Sports", url: "https://www.foxsports.com/soccer/concacaf-champions-cup" },
+        { label: "ESPN", url: "https://www.espn.com/soccer/" },
+        { label: "The Athletic", url: "https://www.nytimes.com/athletic/football/" }
+      ],
+      GOLDCUP: [
+        { label: "CONCACAF", url: "https://www.concacaf.com/competitions/gold-cup/news" },
+        { label: "FOX Sports", url: "https://www.foxsports.com/soccer/gold-cup" },
+        { label: "ESPN", url: "https://www.espn.com/soccer/" },
+        { label: "CBS Sports", url: "https://www.cbssports.com/soccer/" },
+        { label: "The Athletic", url: "https://www.nytimes.com/athletic/football/" }
+      ],
+      NCAASB: [
+        { label: "NCAA", url: "https://www.ncaa.com/sports/softball/d1" },
+        { label: "ESPN", url: "https://www.espn.com/college-sports/softball/" },
+        { label: "D1Softball", url: "https://www.d1softball.com/" },
+        { label: "Softball America", url: "https://www.softballamerica.com/" },
+        { label: "CBS Sports", url: "https://www.cbssports.com/college-softball/" },
+        { label: "USA Softball", url: "https://www.usasoftball.com/" }
+      ],
+      LIGAMX: [
+        { label: "Liga MX", url: "https://www.ligamx.net/" },
+        { label: "ESPN", url: "https://www.espn.com/soccer/league/_/name/mex.1" },
+        { label: "FOX Sports", url: "https://www.foxsports.com/soccer/liga-mx" },
+        { label: "CBS Sports", url: "https://www.cbssports.com/soccer/" },
+        { label: "The Athletic", url: "https://www.nytimes.com/athletic/football/mexico/" },
+        { label: "Soccer America", url: "https://www.socceramerica.com/" },
+        { label: "Yahoo Sports", url: "https://sports.yahoo.com/soccer/liga-mx/" }
+      ],
+      CHAMPIONSHIP: [
+        { label: "EFL", url: "https://www.efl.com/news/" },
+        { label: "ESPN", url: "https://www.espn.com/soccer/league/_/name/eng.2" },
+        { label: "BBC Sport", url: "https://www.bbc.com/sport/football/championship" },
+        { label: "Sky Sports", url: "https://www.skysports.com/championship" },
+        { label: "The Guardian", url: "https://www.theguardian.com/football/championship" },
+        { label: "The Athletic", url: "https://www.nytimes.com/athletic/football/championship/" }
+      ],
+      "womens-ucl": [
+        { label: "UEFA", url: "https://www.uefa.com/womenschampionsleague/" },
+        { label: "ESPN", url: "https://www.espn.com/soccer/league/_/name/uefa.wchampions" },
+        { label: "CBS Sports", url: "https://www.cbssports.com/soccer/uefa-womens-champions-league/" },
+        { label: "BBC Sport", url: "https://www.bbc.com/sport/football/womens-champions-league" },
+        { label: "Sky Sports", url: "https://www.skysports.com/womens-champions-league" },
+        { label: "The Athletic", url: "https://www.nytimes.com/athletic/football/womens-champions-league/" },
+        { label: "FotMob", url: "https://www.fotmob.com/" }
+      ],
+      LIBERTADORES: [
+        { label: "CONMEBOL", url: "https://www.conmebol.com/libertadores/" },
+        { label: "ESPN", url: "https://www.espn.com/soccer/league/_/name/conmebol.libertadores" },
+        { label: "CBS Sports", url: "https://www.cbssports.com/soccer/copa-libertadores/" },
+        { label: "beIN SPORTS", url: "https://www.beinsports.com/en-us/soccer/copa-libertadores" },
+        { label: "Globo", url: "https://ge.globo.com/futebol/libertadores/" },
+        { label: "The Guardian", url: "https://www.theguardian.com/football/copa-libertadores" }
+      ],
+      LIV: [
+        { label: "LIV Golf", url: "https://www.livgolf.com/news" },
+        { label: "FOX Sports", url: "https://www.foxsports.com/golf/liv" },
+        { label: "Golf Channel", url: "https://www.golfchannel.com/liv-golf" },
+        { label: "Sky Sports Golf", url: "https://www.skysports.com/liv-golf" },
+        { label: "Golf Digest", url: "https://www.golfdigest.com/topic/liv-golf" }
+      ],
+      EREDIVISIE: [
+        { label: "Eredivisie", url: "https://eredivisie.nl/" },
+        { label: "ESPN", url: "https://www.espn.com/soccer/league/_/name/ned.1" },
+        { label: "BBC Sport", url: "https://www.bbc.com/sport/football/dutch-eredivisie" },
+        { label: "Sky Sports", url: "https://www.skysports.com/football" },
+        { label: "The Athletic", url: "https://www.nytimes.com/athletic/football/" },
+        { label: "Soccerway", url: "https://int.soccerway.com/national/netherlands/eredivisie/" },
+        { label: "Voetbal International", url: "https://www.vi.nl/" }
+      ],
+      BEL1: [
+        { label: "Pro League", url: "https://www.proleague.be/" },
+        { label: "ESPN", url: "https://www.espn.com/soccer/" },
+        { label: "BBC Sport", url: "https://www.bbc.com/sport/football" },
+        { label: "Sky Sports", url: "https://www.skysports.com/football" },
+        { label: "The Athletic", url: "https://www.nytimes.com/athletic/football/" },
+        { label: "Soccerway", url: "https://int.soccerway.com/national/belgium/pro-league/" },
+        { label: "Voetbalkrant", url: "https://www.voetbalkrant.com/" }
+      ],
+      BRA1: [
+        { label: "Brasileir\xE3o", url: "https://www.cbf.com.br/futebol-brasileiro" },
+        { label: "ESPN", url: "https://www.espn.com/soccer/league/_/name/bra.1" },
+        { label: "Globo Esporte", url: "https://ge.globo.com/futebol/brasileirao-serie-a/" },
+        { label: "CBS Sports", url: "https://www.cbssports.com/soccer/" },
+        { label: "The Athletic", url: "https://www.nytimes.com/athletic/football/" },
+        { label: "Soccerway", url: "https://int.soccerway.com/national/brazil/serie-a/" }
+      ],
+      CRICKET_ICC: [
+        { label: "ICC", url: "https://www.icc-cricket.com/news" },
+        { label: "ESPNcricinfo", url: "https://www.espncricinfo.com/" },
+        { label: "Cricbuzz", url: "https://www.cricbuzz.com/" },
+        { label: "BBC Sport", url: "https://www.bbc.com/sport/cricket" },
+        { label: "Sky Sports Cricket", url: "https://www.skysports.com/cricket" },
+        { label: "The Guardian", url: "https://www.theguardian.com/sport/cricket" }
+      ],
+      RUGBYWC: [
+        { label: "World Rugby", url: "https://www.world.rugby/news" },
+        { label: "BBC Sport", url: "https://www.bbc.com/sport/rugby-union" },
+        { label: "ESPN", url: "https://www.espn.com/rugby/" },
+        { label: "Sky Sports Rugby", url: "https://www.skysports.com/rugby-union" },
+        { label: "RugbyPass", url: "https://www.rugbypass.com/" },
+        { label: "The Guardian", url: "https://www.theguardian.com/sport/rugby-union" }
+      ],
+      USATF: [
+        { label: "USA Track & Field", url: "https://www.usatf.org/news" },
+        { label: "NBC Sports", url: "https://www.nbcsports.com/olympics" },
+        { label: "ESPN", url: "https://www.espn.com/olympics/" },
+        { label: "World Athletics", url: "https://worldathletics.org/news" },
+        { label: "FloTrack", url: "https://www.flotrack.org/" },
+        { label: "Track & Field News", url: "https://trackandfieldnews.com/" }
+      ],
+      SPFL: [
+        { label: "SPFL", url: "https://spfl.co.uk/news" },
+        { label: "BBC Sport", url: "https://www.bbc.com/sport/football/scottish-premiership" },
+        { label: "Sky Sports", url: "https://www.skysports.com/scottish-premiership" },
+        { label: "ESPN", url: "https://www.espn.com/soccer/" },
+        { label: "The Guardian", url: "https://www.theguardian.com/football/scottish-premiership" },
+        { label: "The Athletic", url: "https://www.nytimes.com/athletic/football/scotland/" }
+      ],
+      SUPERLIG: [
+        { label: "TFF", url: "https://www.tff.org/" },
+        { label: "ESPN", url: "https://www.espn.com/soccer/league/_/name/tur.1" },
+        { label: "beIN SPORTS", url: "https://www.beinsports.com/en-us/soccer/turkish-super-lig" },
+        { label: "Sky Sports", url: "https://www.skysports.com/football" },
+        { label: "The Athletic", url: "https://www.nytimes.com/athletic/football/" },
+        { label: "Soccerway", url: "https://int.soccerway.com/national/turkey/super-lig/" }
+      ],
+      odi: [
+        { label: "ICC", url: "https://www.icc-cricket.com/news" },
+        { label: "ESPNcricinfo", url: "https://www.espncricinfo.com/" },
+        { label: "Cricbuzz", url: "https://www.cricbuzz.com/" },
+        { label: "BBC Sport", url: "https://www.bbc.com/sport/cricket" },
+        { label: "Sky Sports Cricket", url: "https://www.skysports.com/cricket" },
+        { label: "The Guardian", url: "https://www.theguardian.com/sport/cricket" }
+      ],
+      UELQ: [
+        { label: "UEFA", url: "https://www.uefa.com/uefaeuropaleague/" },
+        { label: "ESPN", url: "https://www.espn.com/soccer/league/_/name/uefa.europa" },
+        { label: "BBC Sport", url: "https://www.bbc.com/sport/football/europa-league" },
+        { label: "Sky Sports", url: "https://www.skysports.com/europa-league" },
+        { label: "The Athletic", url: "https://www.nytimes.com/athletic/football/europa-league/" },
+        { label: "FotMob", url: "https://www.fotmob.com/leagues/73/overview/europa-league" }
+      ],
+      UECLQ: [
+        { label: "UEFA", url: "https://www.uefa.com/uefaconferenceleague/" },
+        { label: "ESPN", url: "https://www.espn.com/soccer/league/_/name/uefa.europa.conference" },
+        { label: "BBC Sport", url: "https://www.bbc.com/sport/football/conference-league" },
+        { label: "Sky Sports", url: "https://www.skysports.com/uefa-conference-league" },
+        { label: "The Athletic", url: "https://www.nytimes.com/athletic/football/europa-conference-league/" },
+        { label: "FotMob", url: "https://www.fotmob.com/leagues/108/overview/conference-league" }
+      ],
+      AFL: [
+        { label: "AFL", url: "https://www.afl.com.au/news" },
+        { label: "ESPN", url: "https://www.espn.com/afl/" },
+        { label: "Fox Sports Australia", url: "https://www.foxsports.com.au/afl" },
+        { label: "The Age", url: "https://www.theage.com.au/sport/afl" },
+        { label: "SEN", url: "https://www.sen.com.au/afl" },
+        { label: "ABC Sport", url: "https://www.abc.net.au/sport/afl/" }
+      ],
+      "afc-elite": [
+        { label: "AFC", url: "https://www.the-afc.com/en/club/afc_champions_league_elite/home.html" },
+        { label: "ESPN", url: "https://www.espn.com/soccer/league/_/name/afc.champions" },
+        { label: "CBS Sports", url: "https://www.cbssports.com/soccer/" },
+        { label: "The Guardian", url: "https://www.theguardian.com/football/afc-champions-league" },
+        { label: "Saudi Pro League", url: "https://www.spl.com.sa/en/news" },
+        { label: "The-AFC.com", url: "https://www.the-afc.com/en/club/afc_champions_league_elite.html/news" }
+      ],
+      ARG1: [
+        { label: "Liga Profesional", url: "https://www.ligaprofesional.ar/" },
+        { label: "ESPN", url: "https://www.espn.com/soccer/league/_/name/arg.1" },
+        { label: "TyC Sports", url: "https://www.tycsports.com/" },
+        { label: "Ol\xE9", url: "https://www.ole.com.ar/" },
+        { label: "TNT Sports Argentina", url: "https://www.tntsports.com.ar/" },
+        { label: "La Naci\xF3n", url: "https://www.lanacion.com.ar/deportes/futbol/" }
+      ],
+      SCOTTISH_LEAGUE_CUP: [
+        { label: "SPFL", url: "https://spfl.co.uk/news/league/league-cup" },
+        { label: "BBC Sport", url: "https://www.bbc.com/sport/football/scottish-league-cup" },
+        { label: "Sky Sports", url: "https://www.skysports.com/scottish-league-cup" },
+        { label: "The Guardian", url: "https://www.theguardian.com/football/scottish-league-cup" },
+        { label: "The Scotsman", url: "https://www.scotsman.com/sport/football" },
+        { label: "Daily Record", url: "https://www.dailyrecord.co.uk/sport/football/" }
+      ],
+      RUGBYTOP14: [
+        { label: "LNR / Top 14", url: "https://top14.lnr.fr/actualites/en-direct" },
+        { label: "RugbyPass", url: "https://www.rugbypass.com/top-14/" },
+        { label: "ESPN", url: "https://www.espn.com/rugby/" },
+        { label: "BBC Sport", url: "https://www.bbc.com/sport/rugby-union" },
+        { label: "Sky Sports", url: "https://www.skysports.com/rugby-union" },
+        { label: "The Guardian", url: "https://www.theguardian.com/sport/rugby-union" }
+      ],
+      euroleague: [
+        { label: "EuroLeague", url: "https://www.euroleaguebasketball.net/euroleague/" },
+        { label: "ESPN", url: "https://www.espn.com/euroleague/" },
+        { label: "Eurohoops", url: "https://www.eurohoops.net/" },
+        { label: "BasketNews", url: "https://basketnews.com/" },
+        { label: "Basketball Sphere", url: "https://basketballsphere.com/" }
+      ],
+      POR1: [
+        { label: "Liga Portugal", url: "https://www.ligaportugal.pt/" },
+        { label: "ESPN", url: "https://www.espn.com/soccer/league/_/name/por.1" },
+        { label: "BBC Sport", url: "https://www.bbc.com/sport/football" },
+        { label: "Sky Sports", url: "https://www.skysports.com/football" },
+        { label: "A Bola", url: "https://www.abola.pt/" },
+        { label: "O Jogo", url: "https://www.ojogo.pt/" },
+        { label: "Record", url: "https://www.record.pt/" }
+      ],
+      SAUDI: [
+        { label: "Saudi Pro League", url: "https://www.spl.com.sa/en/news" },
+        { label: "ESPN", url: "https://www.espn.com/soccer/league/_/name/ksa.1" },
+        { label: "CBS Sports", url: "https://www.cbssports.com/soccer/" },
+        { label: "The Athletic", url: "https://www.nytimes.com/athletic/football/" },
+        { label: "Arab News", url: "https://www.arabnews.com/sports" },
+        { label: "Saudi Gazette", url: "https://saudigazette.com.sa/sports" }
+      ],
+      SUDAMERICANA: [
+        { label: "CONMEBOL", url: "https://gol.conmebol.com/sudamericana/en/news" },
+        { label: "ESPN", url: "https://www.espn.com/soccer/league/_/name/conmebol.sudamericana" },
+        { label: "CBS Sports", url: "https://www.cbssports.com/soccer/" },
+        { label: "beIN SPORTS", url: "https://www.beinsports.com/en-us/soccer" },
+        { label: "Globo Esporte", url: "https://ge.globo.com/futebol/copa-sul-americana/" },
+        { label: "The Guardian", url: "https://www.theguardian.com/football/copa-sudamericana" }
+      ],
+      FORMULA_E: [
+        { label: "Formula E", url: "https://www.fiaformulae.com/en/news" },
+        { label: "Motorsport.com", url: "https://www.motorsport.com/formula-e/" },
+        { label: "Autosport", url: "https://www.autosport.com/formula-e/" },
+        { label: "The Race", url: "https://www.the-race.com/formula-e/" },
+        { label: "RACER", url: "https://racer.com/formula-e/" },
+        { label: "BBC Sport", url: "https://www.bbc.com/sport/motorsport" }
+      ],
+      WEC: [
+        { label: "FIA WEC", url: "https://www.fiawec.com/en/news/" },
+        { label: "Motorsport.com", url: "https://www.motorsport.com/wec/" },
+        { label: "Autosport", url: "https://www.autosport.com/wec/" },
+        { label: "Sportscar365", url: "https://sportscar365.com/lemans/wec/" },
+        { label: "RACER", url: "https://racer.com/category/sports-cars/" },
+        { label: "The Race", url: "https://www.the-race.com/endurance/" }
+      ],
+      GT_WORLD_CHALLENGE: [
+        { label: "GT World Challenge", url: "https://www.gt-world-challenge.com/news" },
+        { label: "Sportscar365", url: "https://sportscar365.com/" },
+        { label: "Motorsport.com", url: "https://www.motorsport.com/" },
+        { label: "Autosport", url: "https://www.autosport.com/" },
+        { label: "RACER", url: "https://racer.com/" },
+        { label: "DailySportsCar", url: "https://www.dailysportscar.com/" }
+      ],
+      XFL: [
+        { label: "XFL", url: "https://www.xfl.com/" },
+        { label: "ESPN", url: "https://www.espn.com/xfl/" },
+        { label: "FOX Sports", url: "https://www.foxsports.com/" },
+        { label: "CBS Sports", url: "https://www.cbssports.com/" },
+        { label: "The Athletic", url: "https://www.nytimes.com/athletic/" }
+      ],
+      RUGBYULSTER: [
+        { label: "Ulster Rugby", url: "https://www.ulster.rugby/news" },
+        { label: "BBC Sport", url: "https://www.bbc.com/sport/rugby-union" },
+        { label: "RugbyPass", url: "https://www.rugbypass.com/" },
+        { label: "Irish Times", url: "https://www.irishtimes.com/sport/rugby/" },
+        { label: "Belfast Telegraph", url: "https://www.belfasttelegraph.co.uk/sport/rugby/" },
+        { label: "Rugby World", url: "https://www.rugbyworld.com/" }
+      ],
+      nhra: [
+        { label: "NHRA", url: "https://nhra.com/nhra/news" },
+        { label: "Drag Illustrated", url: "https://dragillustrated.com/" },
+        { label: "Competition Plus", url: "https://competitionplus.com/" },
+        { label: "Motorsport.com", url: "https://www.motorsport.com/nhra/" },
+        { label: "RACER", url: "https://racer.com/nhra/" },
+        { label: "Dragzine", url: "https://www.dragzine.com/" }
+      ],
+      imsa: [
+        { label: "IMSA", url: "https://www.imsa.com/news/" },
+        { label: "Sportscar365", url: "https://sportscar365.com/imsa/" },
+        { label: "RACER", url: "https://racer.com/category/sports-cars/" },
+        { label: "Motorsport.com", url: "https://www.motorsport.com/imsa/" },
+        { label: "Autosport", url: "https://www.autosport.com/imsa/" },
+        { label: "NBC Sports", url: "https://www.nbcsports.com/motors" }
+      ],
+      "rugby-union": [
+        { label: "World Rugby", url: "https://www.world.rugby/news" },
+        { label: "ESPN Rugby", url: "https://www.espn.com/rugby/" },
+        { label: "BBC Sport", url: "https://www.bbc.com/sport/rugby-union" },
+        { label: "Sky Sports Rugby", url: "https://www.skysports.com/rugby-union" },
+        { label: "RugbyPass", url: "https://www.rugbypass.com/" },
+        { label: "The Guardian", url: "https://www.theguardian.com/sport/rugby-union" }
+      ],
+      RUGBYPREM: [
+        { label: "Premiership Rugby", url: "https://www.premiershiprugby.com/news" },
+        { label: "BBC Sport", url: "https://www.bbc.com/sport/rugby-union" },
+        { label: "Sky Sports Rugby", url: "https://www.skysports.com/rugby-union" },
+        { label: "RugbyPass", url: "https://www.rugbypass.com/premiership/" },
+        { label: "The Guardian", url: "https://www.theguardian.com/sport/rugby-union" },
+        { label: "Rugby World", url: "https://www.rugbyworld.com/" }
+      ],
+      milb: [
+        { label: "MiLB", url: "https://www.milb.com/news" },
+        { label: "MLB", url: "https://www.mlb.com/news" },
+        { label: "Baseball America", url: "https://www.baseballamerica.com/" },
+        { label: "Baseball Prospectus", url: "https://www.baseballprospectus.com/" },
+        { label: "Baseball-Reference", url: "https://www.baseball-reference.com/" },
+        { label: "ESPN", url: "https://www.espn.com/mlb/" }
+      ],
+      USLC: [
+        { label: "USL Championship", url: "https://www.uslchampionship.com/news" },
+        { label: "ESPN", url: "https://www.espn.com/soccer/league/_/name/usa.usl" },
+        { label: "CBS Sports", url: "https://www.cbssports.com/soccer/" },
+        { label: "The Athletic", url: "https://www.nytimes.com/athletic/soccer/" },
+        { label: "Soccer America", url: "https://www.socceramerica.com/" },
+        { label: "Soccerway", url: "https://int.soccerway.com/national/united-states/usl-championship/" }
+      ],
+      USL1: [
+        { label: "USL League One", url: "https://www.uslleagueone.com/news" },
+        { label: "ESPN", url: "https://www.espn.com/soccer/" },
+        { label: "CBS Sports", url: "https://www.cbssports.com/soccer/" },
+        { label: "Soccer America", url: "https://www.socceramerica.com/" },
+        { label: "Soccerway", url: "https://int.soccerway.com/national/united-states/usl-league-one/" }
+      ],
+      F2: [
+        { label: "Formula 2", url: "https://www.fiaformula2.com/en/latest" },
+        { label: "FIA", url: "https://www.fia.com/fia-formula-2-championship" },
+        { label: "Motorsport.com", url: "https://www.motorsport.com/fia-f2/" },
+        { label: "Autosport", url: "https://www.autosport.com/f2/" },
+        { label: "The Race", url: "https://www.the-race.com/formula-2/" },
+        { label: "RACER", url: "https://racer.com/category/formula-2/" }
+      ],
+      F3: [
+        { label: "Formula 3", url: "https://www.fiaformula3.com/en/latest" },
+        { label: "FIA", url: "https://www.fia.com/fia-formula-3-championship" },
+        { label: "Motorsport.com", url: "https://www.motorsport.com/fia-f3/" },
+        { label: "Autosport", url: "https://www.autosport.com/f3/" },
+        { label: "The Race", url: "https://www.the-race.com/formula-3/" },
+        { label: "RACER", url: "https://racer.com/category/formula-3/" }
+      ],
+      "vuelta-a-espana": [
+        { label: "La Vuelta", url: "https://www.lavuelta.es/en/news" },
+        { label: "Cyclingnews", url: "https://www.cyclingnews.com/vuelta-a-espana/" },
+        { label: "Eurosport", url: "https://www.eurosport.com/cycling/vuelta-a-espana/" },
+        { label: "Cycling Weekly", url: "https://www.cyclingweekly.com/racing/vuelta-a-espana" },
+        { label: "Marca", url: "https://www.marca.com/ciclismo/vuelta-espana.html" },
+        { label: "AS", url: "https://as.com/ciclismo/vuelta_espana/" }
+      ],
+      "giro-d-italia": [
+        { label: "Giro d'Italia", url: "https://www.giroditalia.it/en/news-center/" },
+        { label: "Cyclingnews", url: "https://www.cyclingnews.com/giro-d-italia/" },
+        { label: "Eurosport", url: "https://www.eurosport.com/cycling/giro-d-italia/" },
+        { label: "Cycling Weekly", url: "https://www.cyclingweekly.com/racing/giro-ditalia" },
+        { label: "La Gazzetta dello Sport", url: "https://www.gazzetta.it/Ciclismo/" },
+        { label: "Tuttobiciweb", url: "https://www.tuttobiciweb.it/" }
+      ],
+      j1: [
+        { label: "J.League", url: "https://www.jleague.co/news/" },
+        { label: "ESPN", url: "https://www.espn.com/soccer/league/_/name/jpn.1" },
+        { label: "The Japan Times", url: "https://www.japantimes.co.jp/sports/soccer/j-league/" },
+        { label: "Soccerway", url: "https://int.soccerway.com/national/japan/j1-league/" },
+        { label: "Transfermarkt", url: "https://www.transfermarkt.us/j1-league/startseite/wettbewerb/JAP1" }
+      ],
+      kbo: [
+        { label: "KBO", url: "https://eng.koreabaseball.com/" },
+        { label: "ESPN", url: "https://www.espn.com/mlb/" },
+        { label: "Yonhap News", url: "https://en.yna.co.kr/sports" },
+        { label: "Korea JoongAng Daily", url: "https://koreajoongangdaily.joins.com/sports" },
+        { label: "Korea Times", url: "https://www.koreatimes.co.kr/www/sports/" }
+      ],
+      npb: [
+        { label: "NPB", url: "https://npb.jp/news/npb_all.html" },
+        { label: "Japan Times", url: "https://www.japantimes.co.jp/sports/baseball/" },
+        { label: "Kyodo News", url: "https://english.kyodonews.net/news/sports/" },
+        { label: "MLB", url: "https://www.mlb.com/" },
+        { label: "ESPN", url: "https://www.espn.com/mlb/" }
+      ],
+      "caf-champions": [
+        { label: "CAF", url: "https://www.cafonline.com/caf-champions-league/" },
+        { label: "ESPN", url: "https://www.espn.com/soccer/" },
+        { label: "beIN SPORTS", url: "https://www.beinsports.com/en-us/soccer" },
+        { label: "SuperSport", url: "https://supersport.com/football/caf-champions-league" },
+        { label: "BBC Sport", url: "https://www.bbc.com/sport/football" },
+        { label: "Africa.com", url: "https://www.africa.com/sports/" }
+      ],
+      lovb: [
+        { label: "LOVB", url: "https://www.lovb.com/news" },
+        { label: "ESPN", url: "https://www.espn.com/volleyball/" },
+        { label: "USA Volleyball", url: "https://usavolleyball.org/news/" },
+        { label: "Volleyball World", url: "https://en.volleyballworld.com/" },
+        { label: "VolleyballMag.com", url: "https://volleyballmag.com/" }
+      ],
+      avp: [
+        { label: "AVP", url: "https://avp.com/vbnews/news/" },
+        { label: "CBS Sports", url: "https://www.cbssports.com/" },
+        { label: "USA Volleyball", url: "https://usavolleyball.org/news/" },
+        { label: "VolleyballMag.com", url: "https://volleyballmag.com/" },
+        { label: "Volleyball World", url: "https://en.volleyballworld.com/" }
+      ],
+      pfl: [
+        { label: "PFL", url: "https://pflmma.com/news" },
+        { label: "ESPN", url: "https://www.espn.com/mma/" },
+        { label: "MMA Fighting", url: "https://www.mmafighting.com/pfl-news" },
+        { label: "MMA Junkie", url: "https://mmajunkie.usatoday.com/category/pfl" },
+        { label: "Sherdog", url: "https://www.sherdog.com/news/list/PFL-Articles" },
+        { label: "MMA Mania", url: "https://www.mmamania.com/professional-fighters-league-pfl" }
+      ],
+      "horse-racing": [
+        { label: "BloodHorse", url: "https://www.bloodhorse.com/ThoroughbredRacing" },
+        { label: "Racing Post", url: "https://www.racingpost.com/" },
+        { label: "Daily Racing Form", url: "https://www.drf.com/" },
+        { label: "Equibase", url: "https://www.equibase.com/" },
+        { label: "Thoroughbred Daily News", url: "https://www.thoroughbreddailynews.com/" },
+        { label: "Horse Racing Nation", url: "https://www.horseracingnation.com/" }
+      ],
+      lacrosse: [
+        { label: "Inside Lacrosse", url: "https://www.insidelacrosse.com/" },
+        { label: "USA Lacrosse", url: "https://www.usalacrosse.com/latest" },
+        { label: "ESPN", url: "https://www.espn.com/lacrosse/" },
+        { label: "NCAA", url: "https://www.ncaa.com/sports/lacrosse-men" },
+        { label: "Lacrosse All Stars", url: "https://laxallstars.com/" }
+      ],
+      ahl: [
+        { label: "AHL", url: "https://theahl.com/" },
+        { label: "NHL", url: "https://www.nhl.com/" },
+        { label: "FloHockey", url: "https://www.flohockey.tv/" },
+        { label: "The Hockey News", url: "https://thehockeynews.com/" },
+        { label: "ESPN", url: "https://www.espn.com/nhl/" }
+      ],
+      khl: [
+        { label: "KHL", url: "https://en.khl.ru/news/" },
+        { label: "IIHF", url: "https://www.iihf.com/en/news" },
+        { label: "The Hockey News", url: "https://thehockeynews.com/" },
+        { label: "TASS", url: "https://tass.com/sport" },
+        { label: "Reuters", url: "https://www.reuters.com/sports/" }
+      ],
+      NCAAH: [
+        { label: "NCAA", url: "https://www.ncaa.com/sports/icehockey-men" },
+        { label: "USCHO", url: "https://www.uscho.com/" },
+        { label: "College Hockey News", url: "https://www.collegehockeynews.com/" },
+        { label: "USA Hockey", url: "https://www.usahockey.com/college" },
+        { label: "ESPN", url: "https://www.espn.com/college-sports/hockey/" },
+        { label: "The Athletic", url: "https://www.nytimes.com/athletic/nhl/" }
+      ],
+      CWHOC: [
+        { label: "NCAA", url: "https://www.ncaa.com/sports/icehockey-women" },
+        { label: "USCHO", url: "https://www.uscho.com/" },
+        { label: "College Hockey News", url: "https://www.collegehockeynews.com/" },
+        { label: "USA Hockey", url: "https://www.usahockey.com/college" },
+        { label: "The Athletic", url: "https://www.nytimes.com/athletic/nhl/" },
+        { label: "ESPN", url: "https://www.espn.com/college-sports/hockey/" }
+      ],
+      NCAALAX: [
+        { label: "NCAA", url: "https://www.ncaa.com/sports/lacrosse-men/d1" },
+        { label: "Inside Lacrosse", url: "https://www.insidelacrosse.com/" },
+        { label: "USA Lacrosse", url: "https://www.usalacrosse.com/latest" },
+        { label: "ESPN", url: "https://www.espn.com/lacrosse/" },
+        { label: "The Athletic", url: "https://www.nytimes.com/athletic/lacrosse/" }
+      ],
+      NCAAFH: [
+        { label: "NCAA", url: "https://www.ncaa.com/sports/fieldhockey/d1" },
+        { label: "USA Field Hockey", url: "https://www.usafieldhockey.com/news" },
+        { label: "ESPN", url: "https://www.espn.com/college-sports/" },
+        { label: "The Athletic", url: "https://www.nytimes.com/athletic/" },
+        { label: "FloHockey", url: "https://www.flohockey.tv/" }
+      ],
+      NCAAVB_M: [
+        { label: "NCAA", url: "https://www.ncaa.com/sports/volleyball-men" },
+        { label: "USA Volleyball", url: "https://usavolleyball.org/news/" },
+        { label: "VolleyballMag.com", url: "https://volleyballmag.com/" },
+        { label: "ESPN", url: "https://www.espn.com/volleyball/" },
+        { label: "Volleyball World", url: "https://en.volleyballworld.com/" }
+      ],
+      NCAAWP: [
+        { label: "NCAA", url: "https://www.ncaa.com/sports/waterpolo-women" },
+        { label: "USA Water Polo", url: "https://www.usawaterpolo.org/news" },
+        { label: "ESPN", url: "https://www.espn.com/college-sports/" },
+        { label: "SwimSwam", url: "https://swimswam.com/" },
+        { label: "Water Polo Planet", url: "https://www.waterpoloplanet.com/" }
+      ],
+      swimming: [
+        { label: "World Aquatics", url: "https://www.worldaquatics.com/swimming" },
+        { label: "Swimming World", url: "https://www.swimmingworldmagazine.com/news/" },
+        { label: "SwimSwam", url: "https://swimswam.com/" },
+        { label: "USA Swimming", url: "https://www.usaswimming.org/news-landing" },
+        { label: "NBC Sports", url: "https://www.nbcsports.com/olympics" },
+        { label: "SwimVortex", url: "https://swimvortex.com/" }
+      ],
+      "winter-sports": [
+        { label: "FIS", url: "https://www.fis-ski.com/" },
+        { label: "International Biathlon Union", url: "https://www.biathlonworld.com/news" },
+        { label: "International Skating Union", url: "https://www.isu.org/news" },
+        { label: "IOC", url: "https://olympics.com/ioc/news" },
+        { label: "World Curling", url: "https://worldcurling.org/news/" },
+        { label: "Eurosport", url: "https://www.eurosport.com/" },
+        { label: "BBC Sport", url: "https://www.bbc.com/sport/winter-sports" }
+      ],
+      "world-rally": [
+        { label: "WRC", url: "https://www.wrc.com/en/news" },
+        { label: "Motorsport.com", url: "https://www.motorsport.com/wrc/" },
+        { label: "Autosport", url: "https://www.autosport.com/wrc/" },
+        { label: "DirtFish", url: "https://dirtfish.com/rally/wrc/" },
+        { label: "RACER", url: "https://racer.com/category/rally/" },
+        { label: "RallySport Magazine", url: "https://rallysportmag.com/" }
+      ],
+      MOTO2: [
+        { label: "MotoGP", url: "https://www.motogp.com/en/news" },
+        { label: "Motorsport.com", url: "https://www.motorsport.com/moto2/news/" },
+        { label: "Autosport", url: "https://www.autosport.com/moto2/" },
+        { label: "The Race", url: "https://www.the-race.com/motogp/" },
+        { label: "Crash.net", url: "https://www.crash.net/moto2" },
+        { label: "Motorcycle Sports", url: "https://motorcyclesports.net/moto2/" }
+      ],
+      MOTO3: [
+        { label: "MotoGP", url: "https://www.motogp.com/en/news" },
+        { label: "Motorsport.com", url: "https://www.motorsport.com/moto3/news/" },
+        { label: "Autosport", url: "https://www.autosport.com/moto3/" },
+        { label: "The Race", url: "https://www.the-race.com/motogp/" },
+        { label: "Crash.net", url: "https://www.crash.net/moto3" },
+        { label: "Motorcycle Sports", url: "https://motorcyclesports.net/moto3/" }
+      ],
+      NCAAMSOC: [
+        { label: "NCAA", url: "https://www.ncaa.com/sports/soccer-men/d1" },
+        { label: "United Soccer Coaches", url: "https://unitedsoccercoaches.org/news/" },
+        { label: "ESPN", url: "https://www.espn.com/college-sports/soccer/" },
+        { label: "TopDrawerSoccer", url: "https://www.topdrawersoccer.com/college-soccer/" },
+        { label: "Soccer America", url: "https://www.socceramerica.com/" },
+        { label: "The Athletic", url: "https://www.nytimes.com/athletic/college-sports/" }
+      ],
+      NCAAWSOC: [
+        { label: "NCAA", url: "https://www.ncaa.com/sports/soccer-women/d1" },
+        { label: "United Soccer Coaches", url: "https://unitedsoccercoaches.org/news/" },
+        { label: "ESPN", url: "https://www.espn.com/college-sports/soccer/" },
+        { label: "TopDrawerSoccer", url: "https://www.topdrawersoccer.com/college-soccer/" },
+        { label: "Soccer America", url: "https://www.socceramerica.com/" },
+        { label: "The Athletic", url: "https://www.nytimes.com/athletic/college-sports/" }
       ]
     };
     SPORTS_BROWSER_PROTOTYPE_SOCCER_ARCH_WEBSITES = [
@@ -139614,7 +140509,9 @@ var init_sportsBrowserPrototypeLeagueWebsites = __esm({
       { label: "SB Nation", url: "http://sbnation.com" },
       { label: "MSN", url: "https://www.msn.com/en-us/sports" },
       { label: "AOL", url: "https://www.aol.com/news/sports/" },
-      { label: "Deadspin", url: "https://deadspin.com/" }
+      { label: "Deadspin", url: "https://deadspin.com/" },
+      { label: "SportSpyder", url: "https://www.sportspyder.com" },
+      { label: "NewsNow", url: "https://www.newsnow.com/us/Sports" }
     ];
   }
 });
@@ -145306,6 +146203,7 @@ function SportsBrowserPrototypeBrowserTabStrip({
   onSelectTab,
   onCloseTab,
   onAddTab,
+  newsTicker,
   terminalToggle,
   embedded = false,
   className
@@ -145394,7 +146292,17 @@ function SportsBrowserPrototypeBrowserTabStrip({
             ]
           }
         ),
-        terminalToggle ? /* @__PURE__ */ (0, import_jsx_runtime222.jsx)("div", { className: "my-auto flex shrink-0 items-center pl-2", children: terminalToggle }) : null
+        newsTicker || terminalToggle ? /* @__PURE__ */ (0, import_jsx_runtime222.jsxs)(
+          "div",
+          {
+            className: "my-auto flex shrink-0 items-stretch",
+            "data-sports-browser-prototype-top-bar-ticker-terminal": true,
+            children: [
+              newsTicker,
+              terminalToggle
+            ]
+          }
+        ) : null
       ]
     }
   );
@@ -145429,6 +146337,7 @@ function SportsBrowserPrototypeAddressBar({
   onSelectTab,
   onCloseTab,
   onAddTab,
+  newsTicker,
   terminalToggle,
   className
 }) {
@@ -145542,6 +146451,7 @@ function SportsBrowserPrototypeAddressBar({
             onSelectTab,
             onCloseTab,
             onAddTab,
+            newsTicker,
             terminalToggle,
             embedded: true,
             className: "min-w-0 flex-1"
@@ -150542,12 +151452,11 @@ var init_useSportsBrowserPrototypeTodayTemporalSlate = __esm({
 });
 
 // ../grarf/desktop/src/data/sportsBrowserPrototypeLayout.ts
-var SPORTS_BROWSER_PROTOTYPE_LEFT_NAV_WIDTH_CLASS, SPORTS_BROWSER_PROTOTYPE_UNIFIED_BOTTOM_RAIL_HEIGHT_CLASS;
+var SPORTS_BROWSER_PROTOTYPE_LEFT_NAV_WIDTH_CLASS;
 var init_sportsBrowserPrototypeLayout = __esm({
   "../grarf/desktop/src/data/sportsBrowserPrototypeLayout.ts"() {
     init_define_import_meta_env();
     SPORTS_BROWSER_PROTOTYPE_LEFT_NAV_WIDTH_CLASS = "w-[292px] min-w-[292px] shrink-0";
-    SPORTS_BROWSER_PROTOTYPE_UNIFIED_BOTTOM_RAIL_HEIGHT_CLASS = "h-11 shrink-0";
   }
 });
 
@@ -150673,19 +151582,21 @@ function resolveSidebarGameVariant(game) {
 }
 function SidebarLeagueNavLogoMark({
   leagueKey,
-  games
+  games,
+  logoUrl: logoUrlOverride
 }) {
   const [failed, setFailed] = (0, import_react268.useState)(false);
-  const logoUrl = resolveGamesSpineLeagueHeaderLogoUrl(leagueKey, games);
+  const rawLogoUrl = logoUrlOverride ?? (leagueKey ? resolveGamesSpineLeagueHeaderLogoUrl(leagueKey, games) : null);
+  const logoUrl = rawLogoUrl ? logoUrlOverride ? publicAssetUrl(rawLogoUrl) : rawLogoUrl : null;
   if (!logoUrl || failed) return null;
-  return /* @__PURE__ */ (0, import_jsx_runtime236.jsx)("span", { className: "inline-flex h-[12px] w-[12px] shrink-0 items-center justify-center", children: /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
+  return /* @__PURE__ */ (0, import_jsx_runtime236.jsx)("span", { className: "inline-flex h-[1lh] w-[12px] shrink-0 items-center justify-center", children: /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
     "img",
     {
       src: logoUrl,
       alt: "",
       className: cn2(
         "h-2.5 w-2.5 shrink-0 object-contain",
-        resolveGamesSpineLeagueLogoImgClassName(leagueKey, logoUrl)
+        leagueKey ? resolveGamesSpineLeagueLogoImgClassName(leagueKey, logoUrl) : void 0
       ),
       loading: "lazy",
       decoding: "async",
@@ -150743,10 +151654,10 @@ function NavRow({
       "data-sports-browser-prototype-sidebar-soccer-arch-child-league": soccerArchChildLeague ? "" : void 0,
       children: [
         /* @__PURE__ */ (0, import_jsx_runtime236.jsxs)("span", { className: "flex min-w-0 flex-1 items-start gap-1", children: [
-          leagueKey ? /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(SidebarLeagueNavLogoMark, { leagueKey, games: leagueGames }) : null,
+          temporalAllSection ? /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(SidebarLeagueNavLogoMark, { logoUrl: SPORTS_BROWSER_PROTOTYPE_TEMPORAL_ALL_LOGO_URL }) : soccerArchLeague ? /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(SidebarLeagueNavLogoMark, { logoUrl: SOCCER_SIDEBAR_ARCH_LEAGUE_LOGO_URL }) : leagueKey ? /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(SidebarLeagueNavLogoMark, { leagueKey, games: leagueGames }) : null,
           /* @__PURE__ */ (0, import_jsx_runtime236.jsx)("span", { className: "min-w-0 flex-1 break-words whitespace-normal", children: label })
         ] }),
-        onClick ? expanded ? /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(ChevronDown, { size: 12, strokeWidth: 2, className: "shrink-0 rotate-180", "aria-hidden": true }) : /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(ChevronRight, { size: 12, strokeWidth: 2, className: "shrink-0 text-[#1a1a1a]", "aria-hidden": true }) : trailing === "expand" ? /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(ChevronDown, { size: 12, strokeWidth: 2, className: "shrink-0 rotate-180", "aria-hidden": true }) : null
+        onClick ? /* @__PURE__ */ (0, import_jsx_runtime236.jsx)("span", { className: "inline-flex h-[1lh] shrink-0 items-center", children: expanded ? /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(ChevronDown, { size: 12, strokeWidth: 2, className: "shrink-0 rotate-180", "aria-hidden": true }) : /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(ChevronRight, { size: 12, strokeWidth: 2, className: "shrink-0 text-[#1a1a1a]", "aria-hidden": true }) }) : trailing === "expand" ? /* @__PURE__ */ (0, import_jsx_runtime236.jsx)("span", { className: "inline-flex h-[1lh] shrink-0 items-center", children: /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(ChevronDown, { size: 12, strokeWidth: 2, className: "shrink-0 rotate-180", "aria-hidden": true }) }) : null
       ]
     }
   );
@@ -151510,7 +152421,6 @@ function SportsBrowserPrototypeLeftNav({
   commandCenterCards,
   onCommandCenterDestinationSelect,
   onCommandCenterBrowserTabSelect,
-  onNewsTickerNavigate,
   onNavigableGamesChange,
   selectedGameId = null,
   selectedLeagueKey = null,
@@ -151640,7 +152550,7 @@ function SportsBrowserPrototypeLeftNav({
     });
     return () => cancelAnimationFrame(frame);
   }, [selectedGameId]);
-  return /* @__PURE__ */ (0, import_jsx_runtime236.jsxs)(
+  return /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
     "nav",
     {
       className: cn2(
@@ -151652,279 +152562,259 @@ function SportsBrowserPrototypeLeftNav({
       ),
       "data-sports-browser-prototype-left-nav": true,
       "aria-label": "Sports browser menu",
-      children: [
-        /* @__PURE__ */ (0, import_jsx_runtime236.jsxs)("div", { className: "flex min-h-0 flex-1 flex-col overflow-hidden", children: [
+      children: /* @__PURE__ */ (0, import_jsx_runtime236.jsxs)("div", { className: "flex min-h-0 flex-1 flex-col overflow-hidden", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime236.jsxs)(
+          "div",
+          {
+            ref: sidebarScrollContainerRef,
+            className: "flex min-h-0 flex-1 flex-col overflow-y-auto overflow-x-hidden overscroll-contain",
+            "data-sports-browser-prototype-left-nav-scroll": true,
+            children: [
+              /* @__PURE__ */ (0, import_jsx_runtime236.jsxs)("div", { className: "shrink-0", children: [
+                onCommandCenterBrowserTabSelect ? /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
+                  "button",
+                  {
+                    type: "button",
+                    className: cn2(
+                      "w-full border-t px-4 py-2 text-left text-[11px] font-bold uppercase tracking-[0.06em] text-[#1a1a1a] transition-opacity hover:opacity-75",
+                      RULE2,
+                      "border-t-0"
+                    ),
+                    "data-sports-browser-prototype-command-center-section": true,
+                    onClick: onCommandCenterBrowserTabSelect,
+                    children: "COMMAND CENTER"
+                  }
+                ) : /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
+                  "div",
+                  {
+                    className: cn2(
+                      "border-t px-4 py-2 text-[11px] font-bold uppercase tracking-[0.06em] text-[#1a1a1a]",
+                      RULE2,
+                      "border-t-0"
+                    ),
+                    "data-sports-browser-prototype-command-center-section": true,
+                    children: "COMMAND CENTER"
+                  }
+                ),
+                /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
+                  SportsBrowserPrototypeBottomRailGames,
+                  {
+                    layout: "sidebar",
+                    onGameSelect,
+                    onWatchLive,
+                    canShowWatchLive
+                  }
+                ),
+                commandCenterCards ? /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
+                  "div",
+                  {
+                    className: "flex w-full flex-col",
+                    "data-sports-browser-prototype-command-center-destinations": true,
+                    children: commandCenterCards.map((destination, index) => /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
+                      "div",
+                      {
+                        className: cn2("flex h-11 w-full shrink-0 overflow-hidden", index > 0 && cn2("border-t", RULE2)),
+                        children: /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
+                          SportsBrowserPrototypeCommandCenterDestinationCard,
+                          {
+                            slot: index + 2,
+                            destination,
+                            onSelect: onCommandCenterDestinationSelect,
+                            className: "min-w-0 h-full w-full rounded-none border-0"
+                          }
+                        )
+                      },
+                      `command-center-card-${index + 2}`
+                    ))
+                  }
+                ) : null,
+                /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
+                  "div",
+                  {
+                    className: cn2(
+                      "border-t px-4 py-2 text-[11px] font-bold uppercase tracking-[0.06em] text-[#1a1a1a]",
+                      RULE2
+                    ),
+                    "data-sports-browser-prototype-temporal-navigation-section": true,
+                    children: "TEMPORAL NAVIGATION"
+                  }
+                ),
+                /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
+                  CompactTemporalNavRow,
+                  {
+                    yesterdayLabel,
+                    activeView: compactTemporalView,
+                    onSelect: onCompactTemporalSelect
+                  }
+                ),
+                compactTemporalView === "final" ? /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
+                  SidebarGroupedTemporalLeagueEntries,
+                  {
+                    entries: groupedCatchUpLeagues,
+                    sectionPrefix: "catch-up",
+                    variant: "catchUp",
+                    leagueOpen: catchUpLeagueOpen,
+                    onLeagueOpenChange: setCatchUpLeagueOpen,
+                    toggleLeague: toggleCatchUpLeague,
+                    allOpen: false,
+                    onSoccerArchLeagueSelect,
+                    selectedSidebarArchLeagueKey,
+                    onGameSelect,
+                    onWatchLive,
+                    canShowWatchLive,
+                    selectedGameId,
+                    selectedLeagueKey,
+                    onOpenUrl
+                  }
+                ) : null,
+                compactTemporalView === "yesterday" ? /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
+                  SidebarYesterdaySectionLeagues,
+                  {
+                    slates: yesterdayLeagues,
+                    leagueOpen: yesterdayLeagueOpen,
+                    onLeagueOpenChange: setYesterdayLeagueOpen,
+                    onLeagueSelect,
+                    onGameSelect,
+                    onOpenUrl,
+                    onSoccerArchLeagueSelect,
+                    onWatchLive,
+                    canShowWatchLive,
+                    selectedGameId,
+                    selectedLeagueKey,
+                    selectedSidebarArchLeagueKey
+                  }
+                ) : null,
+                compactTemporalView === "today" ? /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
+                  SidebarTemporalSectionLeagues,
+                  {
+                    sectionId: "today",
+                    slates: todayCompleteLeagues,
+                    resolveVariant: resolveSidebarGameVariant,
+                    leagueOpen: sectionLeagueOpen,
+                    onLeagueOpenChange: setSectionLeagueOpen,
+                    onLeagueSelect,
+                    onGameSelect,
+                    onSelectGlobalWebsites,
+                    onSoccerArchLeagueSelect,
+                    onWatchLive,
+                    canShowWatchLive,
+                    selectedGameId,
+                    selectedLeagueKey,
+                    selectedSidebarArchLeagueKey
+                  }
+                ) : null,
+                compactTemporalView === "now" ? /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
+                  SidebarTemporalSectionLeagues,
+                  {
+                    sectionId: "now",
+                    slates: nowLeagues,
+                    variant: "live",
+                    leagueOpen: sectionLeagueOpen,
+                    onLeagueOpenChange: setSectionLeagueOpen,
+                    onLeagueSelect,
+                    onGameSelect,
+                    onSelectGlobalWebsites,
+                    onSoccerArchLeagueSelect,
+                    onWatchLive,
+                    canShowWatchLive,
+                    selectedGameId,
+                    selectedLeagueKey,
+                    selectedSidebarArchLeagueKey
+                  }
+                ) : null,
+                compactTemporalView === "next" ? /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
+                  SidebarTemporalSectionLeagues,
+                  {
+                    sectionId: "upcoming",
+                    slates: upcomingLeagues,
+                    variant: "upcoming",
+                    leagueOpen: sectionLeagueOpen,
+                    onLeagueOpenChange: setSectionLeagueOpen,
+                    onLeagueSelect,
+                    onGameSelect,
+                    onSelectGlobalWebsites,
+                    onSoccerArchLeagueSelect,
+                    onWatchLive,
+                    canShowWatchLive,
+                    selectedGameId,
+                    selectedLeagueKey,
+                    selectedSidebarArchLeagueKey
+                  }
+                ) : null
+              ] }),
+              /* @__PURE__ */ (0, import_jsx_runtime236.jsx)("div", { className: "min-h-0 flex-1", "aria-hidden": true })
+            ]
+          }
+        ),
+        /* @__PURE__ */ (0, import_jsx_runtime236.jsxs)("div", { className: "mt-auto flex min-h-0 shrink-0 flex-col overflow-y-auto overscroll-contain", children: [
           /* @__PURE__ */ (0, import_jsx_runtime236.jsxs)(
-            "div",
+            BottomNavSection,
             {
-              ref: sidebarScrollContainerRef,
-              className: "flex min-h-0 flex-1 flex-col overflow-y-auto overflow-x-hidden overscroll-contain",
-              "data-sports-browser-prototype-left-nav-scroll": true,
+              label: "Leagues",
+              open: leaguesOpen,
+              onToggle: () => setLeaguesOpen((open) => !open),
               children: [
-                /* @__PURE__ */ (0, import_jsx_runtime236.jsxs)("div", { className: "shrink-0", children: [
-                  onCommandCenterBrowserTabSelect ? /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
-                    "button",
-                    {
-                      type: "button",
-                      className: cn2(
-                        "w-full border-t px-4 py-2 text-left text-[11px] font-bold uppercase tracking-[0.06em] text-[#1a1a1a] transition-opacity hover:opacity-75",
-                        RULE2,
-                        "border-t-0"
-                      ),
-                      "data-sports-browser-prototype-command-center-section": true,
-                      onClick: onCommandCenterBrowserTabSelect,
-                      children: "COMMAND CENTER"
-                    }
-                  ) : /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
-                    "div",
-                    {
-                      className: cn2(
-                        "border-t px-4 py-2 text-[11px] font-bold uppercase tracking-[0.06em] text-[#1a1a1a]",
-                        RULE2,
-                        "border-t-0"
-                      ),
-                      "data-sports-browser-prototype-command-center-section": true,
-                      children: "COMMAND CENTER"
-                    }
-                  ),
-                  /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
-                    SportsBrowserPrototypeBottomRailGames,
-                    {
-                      layout: "sidebar",
-                      onGameSelect,
-                      onWatchLive,
-                      canShowWatchLive
-                    }
-                  ),
-                  commandCenterCards ? /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
-                    "div",
-                    {
-                      className: "flex w-full flex-col",
-                      "data-sports-browser-prototype-command-center-destinations": true,
-                      children: commandCenterCards.map((destination, index) => /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
-                        "div",
-                        {
-                          className: cn2("flex h-11 w-full shrink-0 overflow-hidden", index > 0 && cn2("border-t", RULE2)),
-                          children: /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
-                            SportsBrowserPrototypeCommandCenterDestinationCard,
-                            {
-                              slot: index + 2,
-                              destination,
-                              onSelect: onCommandCenterDestinationSelect,
-                              className: "min-w-0 h-full w-full rounded-none border-0"
-                            }
-                          )
-                        },
-                        `command-center-card-${index + 2}`
-                      ))
-                    }
-                  ) : null,
-                  /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
-                    "div",
-                    {
-                      className: cn2(
-                        "border-t px-4 py-2 text-[11px] font-bold uppercase tracking-[0.06em] text-[#1a1a1a]",
-                        RULE2
-                      ),
-                      "data-sports-browser-prototype-temporal-navigation-section": true,
-                      children: "TEMPORAL NAVIGATION"
-                    }
-                  ),
-                  /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
-                    CompactTemporalNavRow,
-                    {
-                      yesterdayLabel,
-                      activeView: compactTemporalView,
-                      onSelect: onCompactTemporalSelect
-                    }
-                  ),
-                  compactTemporalView === "final" ? /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
-                    SidebarGroupedTemporalLeagueEntries,
-                    {
-                      entries: groupedCatchUpLeagues,
-                      sectionPrefix: "catch-up",
-                      variant: "catchUp",
-                      leagueOpen: catchUpLeagueOpen,
-                      onLeagueOpenChange: setCatchUpLeagueOpen,
-                      toggleLeague: toggleCatchUpLeague,
-                      allOpen: false,
-                      onSoccerArchLeagueSelect,
-                      selectedSidebarArchLeagueKey,
-                      onGameSelect,
-                      onWatchLive,
-                      canShowWatchLive,
-                      selectedGameId,
-                      selectedLeagueKey,
-                      onOpenUrl
-                    }
-                  ) : null,
-                  compactTemporalView === "yesterday" ? /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
-                    SidebarYesterdaySectionLeagues,
-                    {
-                      slates: yesterdayLeagues,
-                      leagueOpen: yesterdayLeagueOpen,
-                      onLeagueOpenChange: setYesterdayLeagueOpen,
-                      onLeagueSelect,
-                      onGameSelect,
-                      onOpenUrl,
-                      onSoccerArchLeagueSelect,
-                      onWatchLive,
-                      canShowWatchLive,
-                      selectedGameId,
-                      selectedLeagueKey,
-                      selectedSidebarArchLeagueKey
-                    }
-                  ) : null,
-                  compactTemporalView === "today" ? /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
-                    SidebarTemporalSectionLeagues,
-                    {
-                      sectionId: "today",
-                      slates: todayCompleteLeagues,
-                      resolveVariant: resolveSidebarGameVariant,
-                      leagueOpen: sectionLeagueOpen,
-                      onLeagueOpenChange: setSectionLeagueOpen,
-                      onLeagueSelect,
-                      onGameSelect,
-                      onSelectGlobalWebsites,
-                      onSoccerArchLeagueSelect,
-                      onWatchLive,
-                      canShowWatchLive,
-                      selectedGameId,
-                      selectedLeagueKey,
-                      selectedSidebarArchLeagueKey
-                    }
-                  ) : null,
-                  compactTemporalView === "now" ? /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
-                    SidebarTemporalSectionLeagues,
-                    {
-                      sectionId: "now",
-                      slates: nowLeagues,
-                      variant: "live",
-                      leagueOpen: sectionLeagueOpen,
-                      onLeagueOpenChange: setSectionLeagueOpen,
-                      onLeagueSelect,
-                      onGameSelect,
-                      onSelectGlobalWebsites,
-                      onSoccerArchLeagueSelect,
-                      onWatchLive,
-                      canShowWatchLive,
-                      selectedGameId,
-                      selectedLeagueKey,
-                      selectedSidebarArchLeagueKey
-                    }
-                  ) : null,
-                  compactTemporalView === "next" ? /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
-                    SidebarTemporalSectionLeagues,
-                    {
-                      sectionId: "upcoming",
-                      slates: upcomingLeagues,
-                      variant: "upcoming",
-                      leagueOpen: sectionLeagueOpen,
-                      onLeagueOpenChange: setSectionLeagueOpen,
-                      onLeagueSelect,
-                      onGameSelect,
-                      onSelectGlobalWebsites,
-                      onSoccerArchLeagueSelect,
-                      onWatchLive,
-                      canShowWatchLive,
-                      selectedGameId,
-                      selectedLeagueKey,
-                      selectedSidebarArchLeagueKey
-                    }
-                  ) : null
-                ] }),
-                /* @__PURE__ */ (0, import_jsx_runtime236.jsx)("div", { className: "min-h-0 flex-1", "aria-hidden": true })
+                /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(LeaguesFilterField, {}),
+                /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(NavRow, { label: "MLB", indent: 1 }),
+                /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(NavRow, { label: "NFL", indent: 1 }),
+                /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(NavRow, { label: "NBA", indent: 1 }),
+                /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(NavRow, { label: "NHL", indent: 1 }),
+                /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(NavRow, { label: "EPL", indent: 1 })
               ]
             }
           ),
-          /* @__PURE__ */ (0, import_jsx_runtime236.jsxs)("div", { className: "mt-auto flex min-h-0 shrink-0 flex-col overflow-y-auto overscroll-contain", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime236.jsxs)(
-              BottomNavSection,
-              {
-                label: "Leagues",
-                open: leaguesOpen,
-                onToggle: () => setLeaguesOpen((open) => !open),
-                children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(LeaguesFilterField, {}),
-                  /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(NavRow, { label: "MLB", indent: 1 }),
-                  /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(NavRow, { label: "NFL", indent: 1 }),
-                  /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(NavRow, { label: "NBA", indent: 1 }),
-                  /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(NavRow, { label: "NHL", indent: 1 }),
-                  /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(NavRow, { label: "EPL", indent: 1 })
-                ]
-              }
-            ),
-            /* @__PURE__ */ (0, import_jsx_runtime236.jsxs)(
-              BottomNavSection,
-              {
-                label: "News",
-                open: newsOpen,
-                onToggle: () => setNewsOpen((open) => !open),
-                children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(NavRow, { label: "ESPN", indent: 1 }),
-                  /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(NavRow, { label: "CBS", indent: 1 }),
-                  /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(NavRow, { label: "FOX", indent: 1 })
-                ]
-              }
-            ),
-            /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
-              BottomNavSection,
-              {
-                label: "Social",
-                open: socialOpen,
-                onToggle: () => setSocialOpen((open) => !open)
-              }
-            ),
-            /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
-              BottomNavSection,
-              {
-                label: "Highlights",
-                open: highlightsOpen,
-                onToggle: () => setHighlightsOpen((open) => !open)
-              }
-            ),
-            /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
-              BottomNavSection,
-              {
-                label: "Fantasy",
-                open: fantasyOpen,
-                onToggle: () => setFantasyOpen((open) => !open)
-              }
-            ),
-            /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
-              BottomNavSection,
-              {
-                label: "Podcasts",
-                open: podcastsOpen,
-                onToggle: () => setPodcastsOpen((open) => !open)
-              }
-            ),
-            /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(BottomNavSection, { label: "TV", open: tvOpen, onToggle: () => setTvOpen((open) => !open) })
-          ] })
-        ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
-          "div",
-          {
-            className: cn2(
-              "flex shrink-0 overflow-hidden border-t border-[#c8c4bc]/70 bg-[#f4b44b]",
-              SPORTS_BROWSER_PROTOTYPE_UNIFIED_BOTTOM_RAIL_HEIGHT_CLASS
-            ),
-            "data-sports-browser-prototype-left-nav-ticker": true,
-            children: /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
-              GlobalHeaderNewsTicker,
-              {
-                appearance: "bottomStrip",
-                className: "h-full min-w-0 flex-1",
-                onNavigateUrl: onNewsTickerNavigate
-              }
-            )
-          }
-        )
-      ]
+          /* @__PURE__ */ (0, import_jsx_runtime236.jsxs)(
+            BottomNavSection,
+            {
+              label: "News",
+              open: newsOpen,
+              onToggle: () => setNewsOpen((open) => !open),
+              children: [
+                /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(NavRow, { label: "ESPN", indent: 1 }),
+                /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(NavRow, { label: "CBS", indent: 1 }),
+                /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(NavRow, { label: "FOX", indent: 1 })
+              ]
+            }
+          ),
+          /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
+            BottomNavSection,
+            {
+              label: "Social",
+              open: socialOpen,
+              onToggle: () => setSocialOpen((open) => !open)
+            }
+          ),
+          /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
+            BottomNavSection,
+            {
+              label: "Highlights",
+              open: highlightsOpen,
+              onToggle: () => setHighlightsOpen((open) => !open)
+            }
+          ),
+          /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
+            BottomNavSection,
+            {
+              label: "Fantasy",
+              open: fantasyOpen,
+              onToggle: () => setFantasyOpen((open) => !open)
+            }
+          ),
+          /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
+            BottomNavSection,
+            {
+              label: "Podcasts",
+              open: podcastsOpen,
+              onToggle: () => setPodcastsOpen((open) => !open)
+            }
+          ),
+          /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(BottomNavSection, { label: "TV", open: tvOpen, onToggle: () => setTvOpen((open) => !open) })
+        ] })
+      ] })
     }
   );
 }
-var import_react268, import_jsx_runtime236, MENU_SURFACE2, RULE2, F1_CATCH_UP_MOCK_HEADLINES, COMPACT_TEMPORAL_TODAY_CHILDREN, SIDEBAR_GAME_ROW_CLASS, SIDEBAR_GAME_ROW_HOVER_SURFACE_CLASS, SIDEBAR_GAME_ROW_SELECTED_SURFACE_CLASS, SIDEBAR_GAME_ROW_PRIMARY_TEXT_CLASS, SIDEBAR_GAME_ROW_LIVE_STATUS_CLASS, SIDEBAR_GAME_ROW_WATCH_LIVE_CLASS, SIDEBAR_GAME_ROW_TWO_LINE_GRID_CLASS, SIDEBAR_GAME_ROW_TENNIS_GRID_BASE_CLASS, SIDEBAR_GAME_ROW_SCORE_CLASS, SIDEBAR_GAME_ROW_TENNIS_SET_SCORE_CLASS, SIDEBAR_GAME_ROW_STATUS_BASE_CLASS, SIDEBAR_GAME_ROW_BROADCAST_BASE_CLASS, SIDEBAR_F1_MOCK_HEADLINE_ROW_CLASS;
+var import_react268, import_jsx_runtime236, MENU_SURFACE2, RULE2, SPORTS_BROWSER_PROTOTYPE_TEMPORAL_ALL_LOGO_URL, F1_CATCH_UP_MOCK_HEADLINES, COMPACT_TEMPORAL_TODAY_CHILDREN, SIDEBAR_GAME_ROW_CLASS, SIDEBAR_GAME_ROW_HOVER_SURFACE_CLASS, SIDEBAR_GAME_ROW_SELECTED_SURFACE_CLASS, SIDEBAR_GAME_ROW_PRIMARY_TEXT_CLASS, SIDEBAR_GAME_ROW_LIVE_STATUS_CLASS, SIDEBAR_GAME_ROW_WATCH_LIVE_CLASS, SIDEBAR_GAME_ROW_TWO_LINE_GRID_CLASS, SIDEBAR_GAME_ROW_TENNIS_GRID_BASE_CLASS, SIDEBAR_GAME_ROW_SCORE_CLASS, SIDEBAR_GAME_ROW_TENNIS_SET_SCORE_CLASS, SIDEBAR_GAME_ROW_STATUS_BASE_CLASS, SIDEBAR_GAME_ROW_BROADCAST_BASE_CLASS, SIDEBAR_F1_MOCK_HEADLINE_ROW_CLASS;
 var init_SportsBrowserPrototypeLeftNav = __esm({
   "../grarf/desktop/src/components/homeMvp/SportsBrowserPrototypeLeftNav.tsx"() {
     init_define_import_meta_env();
@@ -151938,12 +152828,12 @@ var init_SportsBrowserPrototypeLeftNav = __esm({
     init_resolveNewsSportsBrowserGameStatusLabel();
     init_resolveNewsSportsBrowserChannelPresentation();
     init_scrollSportsBrowserPrototypeSidebarActiveGameIntoView();
+    init_publicAssetUrl();
     init_resolveNewsSportsBrowserTennisScorePresentation();
     init_NewsSportsBrowserTennisSetScoreCells();
     init_SportsBrowserPrototypeBottomRailGames();
     init_SportsBrowserPrototypeCommandCenterDestinationCard();
     init_BroadcastChannelLogo();
-    init_GlobalHeaderNewsTicker();
     init_isGameActivelyLive();
     init_isSpineFinalizedGame();
     init_gamesSpineFinalResultNameEmphasis();
@@ -151954,6 +152844,7 @@ var init_SportsBrowserPrototypeLeftNav = __esm({
     import_jsx_runtime236 = __toESM(require_jsx_runtime(), 1);
     MENU_SURFACE2 = "bg-[#f3f0ea] text-[#1a1a1a]";
     RULE2 = "border-[#d5d0c6]";
+    SPORTS_BROWSER_PROTOTYPE_TEMPORAL_ALL_LOGO_URL = "/league-logos/global.png";
     F1_CATCH_UP_MOCK_HEADLINES = [
       {
         label: "FP1: Leclerc leads Hamilton and Russell during first practice at the Italian Grand Prix",
@@ -153974,6 +154865,14 @@ function HomePage() {
           onSelectTab: onSelectSportsBrowserTab,
           onCloseTab: onCloseSportsBrowserTab,
           onAddTab: onAddSportsBrowserTab,
+          newsTicker: showSportsBrowserPrototypeTopFeed ? /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(
+            GlobalHeaderNewsTicker,
+            {
+              appearance: "bottomStrip",
+              className: "h-8 w-[292px] min-w-0 shrink-0",
+              onNavigateUrl: onSportsBrowserNewsTickerNavigate
+            }
+          ) : null,
           terminalToggle: showSportsBrowserPrototypeTopFeed ? /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(
             "button",
             {
@@ -154015,7 +154914,6 @@ function HomePage() {
             commandCenterCards: commandCenterLayout.cards,
             onCommandCenterDestinationSelect,
             onCommandCenterBrowserTabSelect: () => onSelectSportsBrowserTab(COMMAND_CENTER_SPORTS_BROWSER_TAB_ID),
-            onNewsTickerNavigate: onSportsBrowserNewsTickerNavigate,
             onNavigableGamesChange: onSportsBrowserSidebarNavigableGamesChange
           }
         ),
@@ -154255,6 +155153,7 @@ var init_HomePage = __esm({
     init_resolveInitialUrlBootstrapIntent();
     init_isCenterPaneNowActive();
     init_SportsBrowserPrototypeAddressBar();
+    init_GlobalHeaderNewsTicker();
     init_SportsBrowserPrototypeBrowserWorkspace();
     init_SportsBrowserPrototypeCommandCenterWorkspace();
     init_SportsBrowserPrototypeLeftNav();
