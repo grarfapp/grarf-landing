@@ -37,7 +37,7 @@ var __publicField = (obj, key2, value) => __defNormalProp(obj, typeof key2 !== "
 var define_import_meta_env_default;
 var init_define_import_meta_env = __esm({
   "<define:import.meta.env>"() {
-    define_import_meta_env_default = { DEV: false, PROD: true, MODE: "production", VITE_OPERATIONAL_INGEST_PROVIDER: "grarf_cloud", VITE_GRARF_OPERATIONAL_INGEST_URL: "https://grarf-operational-service.grarf.workers.dev", VITE_SPORTSCAPE_EDITORIAL_API_URL: "https://grarf-operational-service.grarf.workers.dev/sportscape-editorial", VITE_TRACE_FINAL_LIVE_FIELDS: "", VITE_ENABLE_ESPN_RESOLVER: "false", VITE_POSTHOG_KEY: "", VITE_POSTHOG_HOST: "" };
+    define_import_meta_env_default = { DEV: false, PROD: true, MODE: "production", VITE_OPERATIONAL_INGEST_PROVIDER: "grarf_cloud", VITE_GRARF_OPERATIONAL_INGEST_URL: "https://grarf-operational-service.grarf.workers.dev", VITE_SPORTSCAPE_EDITORIAL_API_URL: "https://grarf-operational-service.grarf.workers.dev/sportscape-editorial", VITE_TRACE_FINAL_LIVE_FIELDS: "", VITE_ENABLE_ESPN_RESOLVER: "false", VITE_POSTHOG_KEY: "phc_AGQGsddTcRefiXfaR634tAiCEvfkyWk5mtKR4qzQbcxP", VITE_POSTHOG_HOST: "https://us.i.posthog.com" };
   }
 });
 
@@ -114716,15 +114716,25 @@ var init_newsBrowser3565Diagnostics = __esm({
 function isWebShimWebview(wv) {
   return wv.getAttribute?.("data-grarf-webview") != null;
 }
+function readHomeSourceWebviewDocumentTitle(wv) {
+  if (!wv) return null;
+  try {
+    const title = wv.getTitle?.()?.trim() ?? "";
+    return title.length > 0 ? title : null;
+  } catch {
+    return null;
+  }
+}
 function readHomeSourceWebviewNavState(wv) {
-  if (!wv) return { canGoBack: false, canGoForward: false };
+  if (!wv) return { canGoBack: false, canGoForward: false, documentTitle: null };
   try {
     return {
       canGoBack: wv.canGoBack?.() ?? false,
-      canGoForward: wv.canGoForward?.() ?? false
+      canGoForward: wv.canGoForward?.() ?? false,
+      documentTitle: readHomeSourceWebviewDocumentTitle(wv)
     };
   } catch {
-    return { canGoBack: false, canGoForward: false };
+    return { canGoBack: false, canGoForward: false, documentTitle: null };
   }
 }
 function homeSourceWebviewGoBack(wv) {
@@ -139210,23 +139220,34 @@ function applySportsBrowserPrototypeLeagueContextSectionToPane(pane, section) {
     ...pane,
     leagueContextSection: section,
     activeTabIndex: 0,
+    documentTitle: null,
     ...websites.length > 0 ? { url: websites[0]?.url ?? null } : {}
   };
 }
 function applySportsBrowserPrototypeUrlToPane(pane, url) {
   const trimmed = url.trim();
-  if (!trimmed) return { ...pane, url: null };
+  if (!trimmed) return { ...pane, url: null, documentTitle: null };
   const websites = getSportsBrowserPrototypeWebsitesForPane(pane);
   const tabIndex = websites.findIndex((site) => homeSourceWebviewMatchesTarget(trimmed, site.url));
   if (tabIndex >= 0) {
-    return { ...pane, url: websites[tabIndex].url, activeTabIndex: tabIndex };
+    const nextUrl = websites[tabIndex].url;
+    return {
+      ...pane,
+      url: nextUrl,
+      activeTabIndex: tabIndex,
+      documentTitle: homeSourceWebviewMatchesTarget(pane.url ?? "", nextUrl) ? pane.documentTitle ?? null : null
+    };
   }
-  return { ...pane, url: trimmed };
+  return {
+    ...pane,
+    url: trimmed,
+    documentTitle: pane.url === trimmed ? pane.documentTitle ?? null : null
+  };
 }
 function applySportsBrowserPrototypeTerminalUrlToPane(pane, url) {
   const trimmed = url.trim();
   if (!trimmed) {
-    return { ...pane, url: null, leagueKey: null, gameId: null, gameContextSection: null, leagueContextSection: null, showWebsiteTabs: false };
+    return { ...pane, url: null, leagueKey: null, gameId: null, gameContextSection: null, leagueContextSection: null, showWebsiteTabs: false, documentTitle: null };
   }
   return {
     url: trimmed,
@@ -139235,7 +139256,8 @@ function applySportsBrowserPrototypeTerminalUrlToPane(pane, url) {
     gameId: null,
     gameContextSection: null,
     leagueContextSection: null,
-    showWebsiteTabs: false
+    showWebsiteTabs: false,
+    documentTitle: null
   };
 }
 var SPORTS_BROWSER_PROTOTYPE_LEAGUE_CONTEXT_SECTIONS, SPORTS_BROWSER_PROTOTYPE_LEAGUE_CONTEXT_SECTION_LABELS, SPORTS_BROWSER_PROTOTYPE_LEAGUE_WEBSITES, SPORTS_BROWSER_PROTOTYPE_GLOBAL_WEBSITES;
@@ -139822,7 +139844,8 @@ function cloneSportsBrowserPrototypePaneState(pane) {
     leagueContextSection: pane.leagueContextSection,
     gameContextTeamSection: pane.gameContextTeamSection,
     showWebsiteTabs: pane.showWebsiteTabs,
-    newsTimelineView: cloneNewsTimelineView(pane.newsTimelineView)
+    newsTimelineView: cloneNewsTimelineView(pane.newsTimelineView),
+    documentTitle: pane.documentTitle ?? null
   };
 }
 function snapshotSportsBrowserTabPresentation(tab, centerPaneNowPresentationMode) {
@@ -139839,7 +139862,7 @@ function paneStatesEqual(left, right) {
   return left.every((pane, index) => {
     const other = right[index];
     if (!other) return false;
-    return pane.url === other.url && pane.activeTabIndex === other.activeTabIndex && pane.leagueKey === other.leagueKey && pane.gameId === other.gameId && pane.gameContextSection === other.gameContextSection && pane.leagueContextSection === other.leagueContextSection && pane.gameContextTeamSection === other.gameContextTeamSection && pane.showWebsiteTabs === other.showWebsiteTabs && JSON.stringify(pane.newsTimelineView ?? null) === JSON.stringify(other.newsTimelineView ?? null);
+    return pane.url === other.url && pane.activeTabIndex === other.activeTabIndex && pane.leagueKey === other.leagueKey && pane.gameId === other.gameId && pane.gameContextSection === other.gameContextSection && pane.leagueContextSection === other.leagueContextSection && pane.gameContextTeamSection === other.gameContextTeamSection && pane.showWebsiteTabs === other.showWebsiteTabs && (pane.documentTitle ?? null) === (other.documentTitle ?? null) && JSON.stringify(pane.newsTimelineView ?? null) === JSON.stringify(other.newsTimelineView ?? null);
   });
 }
 function areSportsBrowserPaneHistorySnapshotsEqual(left, right) {
@@ -139954,10 +139977,31 @@ function useSportsBrowserPrototypePaneHistoryNavigation({
   }, [activePaneIndexRef, activeTabIdRef, presentationModeRef, setSportsBrowserNavState]);
   const onSportsBrowserWebviewNavStateChange = (0, import_react234.useCallback)(
     (state3) => {
-      webviewNavRef.current = state3;
+      webviewNavRef.current = {
+        canGoBack: state3.canGoBack,
+        canGoForward: state3.canGoForward
+      };
+      if (!Object.prototype.hasOwnProperty.call(state3, "documentTitle")) {
+        syncNavState();
+        return;
+      }
+      const tabId = activeTabIdRef.current;
+      const paneIndex = activePaneIndexRef.current;
+      const documentTitle = state3.documentTitle?.trim() || null;
+      setSportsBrowserTabs(
+        (tabs) => tabs.map((tab) => {
+          if (tab.id !== tabId) return tab;
+          const pane = tab.paneStates[paneIndex];
+          if (!pane) return tab;
+          if ((pane.documentTitle ?? null) === documentTitle) return tab;
+          const nextPaneStates = tab.paneStates.slice();
+          nextPaneStates[paneIndex] = { ...pane, documentTitle };
+          return { ...tab, paneStates: nextPaneStates };
+        })
+      );
       syncNavState();
     },
-    [syncNavState]
+    [activePaneIndexRef, activeTabIdRef, setSportsBrowserTabs, syncNavState]
   );
   const updateActiveTabWithPaneHistory = (0, import_react234.useCallback)(
     (update, paneIndex = activePaneIndexRef.current) => {
@@ -145072,76 +145116,14 @@ function resolveSportsBrowserPrototypeGameDisplayLabel(game) {
   if (away && home) return `${away} vs ${home}`;
   return resolveGamesSpineCompactMatchupLabel(game);
 }
-function resolveActivePaneWebsiteLabel(pane) {
-  if (!pane.url) return null;
-  const websites = getSportsBrowserPrototypeWebsitesForPane(pane);
-  if (websites.length === 0) return null;
-  const activeSite = websites[pane.activeTabIndex];
-  if (activeSite && homeSourceWebviewMatchesTarget(pane.url, activeSite.url)) {
-    return activeSite.label;
-  }
-  const matchedSite = websites.find((site) => homeSourceWebviewMatchesTarget(pane.url, site.url));
-  return matchedSite?.label ?? null;
-}
-function urlMatchesGameBrowsingTarget(url, game) {
-  const candidates = [
-    resolveGameWorkspaceEmbedUrl(game, game.id),
-    game.gameCardUrl?.trim() ?? null,
-    game.streamUrl?.trim() ?? null
-  ];
-  return candidates.some(
-    (candidate) => candidate && homeSourceWebviewMatchesTarget(url, candidate)
-  );
-}
-function findGamesSpineGameMatchingPaneUrl(url) {
-  const trimmed = url?.trim();
-  if (!trimmed) return void 0;
-  const leagues = useLiveGamesStore.getState().leagues;
-  for (const rows of Object.values(leagues ?? {})) {
-    if (!Array.isArray(rows)) continue;
-    for (const game of rows) {
-      if (urlMatchesGameBrowsingTarget(trimmed, game)) return game;
-    }
-  }
-  return void 0;
-}
-function resolveGameForSportsBrowserPane(gameId) {
-  return findGamesSpineGameById(gameId) ?? findOperationalGameRowById(gameId);
-}
-function resolveActivePaneGameLabel(pane) {
-  if (pane.gameId) {
-    const game = resolveGameForSportsBrowserPane(pane.gameId);
-    if (game) return resolveSportsBrowserPrototypeGameDisplayLabel(game);
-  }
-  const gameFromUrl = findGamesSpineGameMatchingPaneUrl(pane.url);
-  if (gameFromUrl) return resolveSportsBrowserPrototypeGameDisplayLabel(gameFromUrl);
-  return null;
-}
-function resolveSportsBrowserPrototypePaneContentLabel(pane) {
-  if (!pane?.url) return "New Tab";
-  const gameLabel2 = resolveActivePaneGameLabel(pane);
-  if (gameLabel2) return gameLabel2;
-  const websites = getSportsBrowserPrototypeWebsitesForPane(pane);
-  if (pane.leagueKey) {
-    const leagueLabel = resolveGamesSpineLeagueDisplayLabel(pane.leagueKey);
-    if (pane.activeTabIndex === 0) {
-      return leagueLabel;
-    }
-    const activeSiteLabel = websites[pane.activeTabIndex]?.label;
-    if (activeSiteLabel) {
-      return `${leagueLabel} > ${activeSiteLabel}`;
-    }
-    return leagueLabel;
-  }
-  const websiteLabel = resolveActivePaneWebsiteLabel(pane) ?? websites[pane.activeTabIndex]?.label ?? null;
-  return websiteLabel ?? "New Tab";
-}
 function resolveSportsBrowserPrototypeBrowserTabLabel(tab) {
-  if (isCommandCenterSportsBrowserPrototypeBrowserTab(tab)) {
+  const pane = tab.paneStates[tab.activePaneIndex];
+  const documentTitle = pane?.documentTitle?.trim();
+  if (documentTitle) return documentTitle;
+  if (isCommandCenterSportsBrowserPrototypeBrowserTab(tab) && isSportsBrowserPrototypeCommandCenterTabShowingPrimaryDestination(tab)) {
     return COMMAND_CENTER_SPORTS_BROWSER_TAB_LABEL;
   }
-  const pane = tab.paneStates[tab.activePaneIndex];
-  return resolveSportsBrowserPrototypePaneContentLabel(pane);
+  return "New Tab";
 }
 var init_resolveSportsBrowserPrototypeBrowserTabLabel = __esm({
   "../grarf/desktop/src/lib/home/resolveSportsBrowserPrototypeBrowserTabLabel.ts"() {
@@ -145155,6 +145137,7 @@ var init_resolveSportsBrowserPrototypeBrowserTabLabel = __esm({
     init_homeSourceWebviewNavigation();
     init_findLiveGame();
     init_liveGamesStore();
+    init_applySportsBrowserPrototypeActiveTabUpdate();
   }
 });
 
@@ -145209,6 +145192,7 @@ function SportsBrowserPrototypeBrowserTabStrip({
                     ),
                     "data-sports-browser-prototype-browser-tab": tab.id,
                     "data-sports-browser-prototype-browser-tab-active": active2 ? "true" : "false",
+                    "data-sports-browser-prototype-browser-tab-display-title": label,
                     children: [
                       /* @__PURE__ */ (0, import_jsx_runtime222.jsx)(
                         "button",
@@ -146809,7 +146793,8 @@ function applySportsBrowserPrototypeGameToPane(game) {
     gameContextSection: defaultSection,
     leagueContextSection: null,
     gameContextTeamSection: null,
-    showWebsiteTabs: true
+    showWebsiteTabs: true,
+    documentTitle: null
   };
 }
 function applySportsBrowserPrototypeGameContextSectionToPane(pane, _context, section) {
@@ -146854,7 +146839,8 @@ function applySportsBrowserPrototypeGameContextWebsiteTabToPane(pane, game, cont
   return {
     ...pane,
     activeTabIndex: tabIndex,
-    url
+    url,
+    documentTitle: null
   };
 }
 var init_sportsBrowserPrototypeGameContextPane = __esm({
@@ -147047,7 +147033,7 @@ function SportsBrowserPrototypeBrowserPane({
     if (!isActive || !onNavStateChange) return;
     const webview = resolveSourceWebview(articleFocusSessionKey, webviewRef);
     if (!webview || !activeUrl) {
-      onNavStateChange({ canGoBack: false, canGoForward: false });
+      onNavStateChange({ canGoBack: false, canGoForward: false, documentTitle: null });
       return;
     }
     const syncNavState = () => {
@@ -147058,11 +147044,13 @@ function SportsBrowserPrototypeBrowserPane({
     webview.addEventListener("did-navigate-in-page", syncNavState);
     webview.addEventListener("did-frame-navigate", syncNavState);
     webview.addEventListener("did-stop-loading", syncNavState);
+    webview.addEventListener("page-title-updated", syncNavState);
     return () => {
       webview.removeEventListener("did-navigate", syncNavState);
       webview.removeEventListener("did-navigate-in-page", syncNavState);
       webview.removeEventListener("did-frame-navigate", syncNavState);
       webview.removeEventListener("did-stop-loading", syncNavState);
+      webview.removeEventListener("page-title-updated", syncNavState);
     };
   }, [
     isActive,
@@ -149561,6 +149549,7 @@ function BottomRailGameUpdateSlot({
 }
 function SportsBrowserPrototypeBottomRailGames({
   className,
+  onGameSelect,
   onWatchLive,
   canShowWatchLive,
   layout = "bottomRail"
@@ -149704,8 +149693,12 @@ function SportsBrowserPrototypeBottomRailGames({
                 "data-bottom-rail-game-card": true,
                 className: cn2(
                   "flex h-11 w-full min-w-0 shrink-0 overflow-hidden",
-                  index > 0 && cn2("border-t", RULE)
+                  index > 0 && cn2("border-t", RULE),
+                  onGameSelect && "cursor-pointer transition-colors hover:bg-[#e9e4db]"
                 ),
+                onClick: onGameSelect ? () => onGameSelect(game) : void 0,
+                "data-sports-browser-prototype-command-center-game-row": onGameSelect ? "" : void 0,
+                "data-game-id": onGameSelect ? game.id : void 0,
                 children: /* @__PURE__ */ (0, import_jsx_runtime234.jsx)(
                   BottomRailGameCard,
                   {
@@ -151278,6 +151271,7 @@ function SportsBrowserPrototypeLeftNav({
                     SportsBrowserPrototypeBottomRailGames,
                     {
                       layout: "sidebar",
+                      onGameSelect,
                       onWatchLive,
                       canShowWatchLive
                     }
@@ -151571,7 +151565,7 @@ var init_SportsBrowserPrototypeLeftNav = __esm({
     COMPACT_TEMPORAL_TODAY_CHILDREN = [
       { id: "final", label: "FINAL" },
       { id: "now", label: "NOW" },
-      { id: "next", label: "UPCOMING" }
+      { id: "next", label: "NEXT" }
     ];
     SIDEBAR_GAME_ROW_CLASS = cn2(
       "border-t px-4 py-[5px] text-[10px] leading-snug first:border-t-0",
@@ -152304,6 +152298,7 @@ function useCommandCenterLayout() {
   }, []);
   return {
     layout,
+    candidates,
     promoteDestination
   };
 }
@@ -152321,6 +152316,45 @@ var init_useCommandCenterLayout = __esm({
     init_adminOperationsCardStore();
     init_liveGamesStore();
     init_gamesSpineManualStore();
+  }
+});
+
+// ../grarf/desktop/src/lib/commandCenter/applyCommandCenterPresentationToPane.ts
+function applyCommandCenterPresentationToPane(pane, presentation) {
+  switch (presentation.kind) {
+    case "url": {
+      const trimmed = presentation.url.trim();
+      if (!trimmed) return pane;
+      return applySportsBrowserPrototypeTerminalUrlToPane(pane, trimmed);
+    }
+    case "game-context":
+    case "league-context":
+      return { ...presentation.paneState, documentTitle: null };
+  }
+}
+var init_applyCommandCenterPresentationToPane = __esm({
+  "../grarf/desktop/src/lib/commandCenter/applyCommandCenterPresentationToPane.ts"() {
+    init_define_import_meta_env();
+    init_sportsBrowserPrototypeLeagueWebsites();
+  }
+});
+
+// ../grarf/desktop/src/lib/home/applyCommandCenterDestinationToActiveTab.ts
+function applyCommandCenterDestinationToActiveTab(tab, destination) {
+  const next = tab.paneStates.slice();
+  const paneIndex = resolveSportsBrowserPrototypeSidebarSelectionPaneIndex(tab);
+  next[paneIndex] = applyCommandCenterPresentationToPane(
+    next[paneIndex] ?? createDefaultSportsBrowserPrototypePaneState(),
+    destination.presentation
+  );
+  return { ...tab, paneStates: next, activePaneIndex: paneIndex };
+}
+var init_applyCommandCenterDestinationToActiveTab = __esm({
+  "../grarf/desktop/src/lib/home/applyCommandCenterDestinationToActiveTab.ts"() {
+    init_define_import_meta_env();
+    init_sportsBrowserPrototypeLeagueWebsites();
+    init_applyCommandCenterPresentationToPane();
+    init_applySportsBrowserPrototypeActiveTabUpdate();
   }
 });
 
@@ -153140,7 +153174,7 @@ function HomePage() {
         if (pane.activeTabIndex === tabIndex && pane.url === url) return tab;
         useHomeSourceFocusStore.getState().clearSelectedArticle(NEWS_BROWSER_FOCUS_SESSION_KEY);
         const next = tab.paneStates.slice();
-        next[paneIndex] = { ...pane, url, activeTabIndex: tabIndex };
+        next[paneIndex] = { ...pane, url, activeTabIndex: tabIndex, documentTitle: null };
         return { ...tab, paneStates: next };
       }, paneIndex);
     },
@@ -153283,7 +153317,29 @@ function HomePage() {
     onGameSelect: onSportsBrowserGameSelect,
     enabled: isSportsBrowserPrototype
   });
-  const { layout: commandCenterLayout, promoteDestination: promoteCommandCenterDestination } = useCommandCenterLayout();
+  const {
+    layout: commandCenterLayout,
+    candidates: commandCenterCandidates,
+    promoteDestination: promoteCommandCenterDestination
+  } = useCommandCenterLayout();
+  const onCommandCenterDestinationSelect = (0, import_react272.useCallback)(
+    (destinationId) => {
+      const destination = commandCenterCandidates.find(
+        (candidate) => candidate.id === destinationId
+      );
+      if (!destination) return;
+      promoteCommandCenterDestination(destinationId);
+      updateSportsBrowserTabForSidebarSelection((tab) => {
+        useHomeSourceFocusStore.getState().clearSelectedArticle(NEWS_BROWSER_FOCUS_SESSION_KEY);
+        return applyCommandCenterDestinationToActiveTab(tab, destination);
+      });
+    },
+    [
+      commandCenterCandidates,
+      promoteCommandCenterDestination,
+      updateSportsBrowserTabForSidebarSelection
+    ]
+  );
   const browserSubmenus = showBrowserSubmenus ? /* @__PURE__ */ (0, import_jsx_runtime239.jsxs)(import_jsx_runtime239.Fragment, { children: [
     /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(HomeLiveSubmenu, {}),
     /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(HomeLiveLeagueSubmenu, {}),
@@ -153532,7 +153588,7 @@ function HomePage() {
             onWatchLive: onSportsBrowserWatchLive,
             canShowWatchLive: canShowSportsBrowserWatchLive,
             commandCenterCards: commandCenterLayout.cards,
-            onCommandCenterDestinationSelect: promoteCommandCenterDestination,
+            onCommandCenterDestinationSelect,
             onNewsTickerNavigate: onSportsBrowserNewsTickerNavigate,
             onNavigableGamesChange: onSportsBrowserSidebarNavigableGamesChange
           }
@@ -153780,6 +153836,7 @@ var init_HomePage = __esm({
     init_useSportsBrowserPrototypeSidebarGameNavigation();
     init_SportsBrowserPrototypeTerminalFeed();
     init_useCommandCenterLayout();
+    init_applyCommandCenterDestinationToActiveTab();
     init_newsBrowserFocusSession();
     init_sportsBrowserPrototypeLeagueWebsites();
     init_sportsBrowserPrototypeGameContextPane();
