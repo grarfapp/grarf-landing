@@ -81482,7 +81482,7 @@ var init_homeCenterPaneTimelineNewsPresentation = __esm({
     HOME_CENTER_PANE_TIMELINE_NEWS_MARGIN_BG_CLASS = HOME_CENTER_PANE_TIMELINE_NEWS_CONTENT_SURFACE_BG_CLASS;
     HOME_CENTER_PANE_TIMELINE_NEWS_MARGIN_CLASS = "p-1.5";
     HOME_CENTER_PANE_TIMELINE_NEWS_FRAME_CLASS = "relative flex h-full min-h-0 min-w-0 flex-1 flex-col overflow-hidden border border-[#c8c4bc] bg-[#e8e4dc]";
-    HOME_CENTER_PANE_TIMELINE_NEWS_FEED_CLASS = "flex h-full min-h-0 min-w-0 flex-col bg-[#e8e4dc] font-sans";
+    HOME_CENTER_PANE_TIMELINE_NEWS_FEED_CLASS = "flex h-full min-h-0 min-w-0 flex-col overflow-hidden bg-[#e8e4dc] font-sans";
     HOME_CENTER_PANE_TIMELINE_NEWS_SCROLL_CLASS = "min-h-0 flex-1 overflow-y-auto overscroll-contain overflow-x-hidden [overflow-anchor:none]";
     HOME_CENTER_PANE_TIMELINE_NEWS_EMPTY_CLASS = "px-3 py-2 font-sans text-[10px] text-[#6f8585]";
     HOME_CENTER_PANE_TIMELINE_NEWS_ROW_CLASS = "border-b border-[#24363c]/45 px-3 py-1.5 [overflow-anchor:none]";
@@ -92768,24 +92768,57 @@ function HomeCenterPaneTimelineSurface({ onClipOpen }) {
   });
   const virtualizerRef = (0, import_react100.useRef)(virtualizer);
   virtualizerRef.current = virtualizer;
+  const loadMoreFrameRef = (0, import_react100.useRef)(null);
+  const maybeLoadMore = (0, import_react100.useCallback)(() => {
+    if (interactionLocked) return;
+    const scrollContainer = scrollContainerRef.current;
+    if (!scrollContainer) return;
+    setRenderedCount((current) => {
+      if (current >= items.length) return current;
+      const nearBottom = scrollContainer.scrollTop + scrollContainer.clientHeight >= scrollContainer.scrollHeight - CENTER_PANE_TIMELINE_LOAD_MORE_THRESHOLD_PX;
+      if (!nearBottom) return current;
+      return Math.min(current + CENTER_PANE_TIMELINE_LOAD_MORE_BATCH, items.length);
+    });
+  }, [interactionLocked, items.length]);
+  const scheduleLoadMore = (0, import_react100.useCallback)(() => {
+    if (loadMoreFrameRef.current != null) return;
+    loadMoreFrameRef.current = requestAnimationFrame(() => {
+      loadMoreFrameRef.current = null;
+      maybeLoadMore();
+    });
+  }, [maybeLoadMore]);
   useTimelineVirtualScrollAnchor(scrollContainerRef, itemIdsKey, {
     paused: interactionLocked
   });
   (0, import_react100.useEffect)(() => {
     const scrollContainer = scrollContainerRef.current;
     if (!scrollContainer) return;
-    const maybeLoadMore = () => {
-      if (interactionLocked) return;
-      setRenderedCount((current) => {
-        if (current >= items.length) return current;
-        const nearBottom = scrollContainer.scrollTop + scrollContainer.clientHeight >= scrollContainer.scrollHeight - CENTER_PANE_TIMELINE_LOAD_MORE_THRESHOLD_PX;
-        if (!nearBottom) return current;
-        return Math.min(current + CENTER_PANE_TIMELINE_LOAD_MORE_BATCH, items.length);
-      });
-    };
-    scrollContainer.addEventListener("scroll", maybeLoadMore, { passive: true });
-    return () => scrollContainer.removeEventListener("scroll", maybeLoadMore);
-  }, [interactionLocked, items.length]);
+    scrollContainer.addEventListener("scroll", scheduleLoadMore, { passive: true });
+    return () => scrollContainer.removeEventListener("scroll", scheduleLoadMore);
+  }, [scheduleLoadMore]);
+  (0, import_react100.useLayoutEffect)(() => {
+    scheduleLoadMore();
+  }, [items.length, interactionLocked, scheduleLoadMore]);
+  (0, import_react100.useLayoutEffect)(() => {
+    const scrollContainer = scrollContainerRef.current;
+    if (!scrollContainer || interactionLocked) return;
+    if (renderedCount >= items.length) return;
+    const canScroll = scrollContainer.scrollHeight > scrollContainer.clientHeight + 1;
+    if (canScroll) return;
+    setRenderedCount((current) => {
+      if (current >= items.length) return current;
+      return Math.min(current + CENTER_PANE_TIMELINE_LOAD_MORE_BATCH, items.length);
+    });
+  }, [renderedCount, items.length, interactionLocked]);
+  (0, import_react100.useEffect)(() => {
+    const scrollContainer = scrollContainerRef.current;
+    if (!scrollContainer) return;
+    const observer = new ResizeObserver(() => {
+      scheduleLoadMore();
+    });
+    observer.observe(scrollContainer);
+    return () => observer.disconnect();
+  }, [scheduleLoadMore]);
   (0, import_react100.useEffect)(() => {
     return () => {
       useCenterPaneTimelineExpansionStore.getState().collapse();
@@ -149146,7 +149179,7 @@ function SportsBrowserPrototypeBrowserWorkspace({
             {
               className: "flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden bg-[#e8e4dc]",
               "data-sports-browser-side-pane-timeline": true,
-              children: /* @__PURE__ */ (0, import_jsx_runtime228.jsx)(HomeCenterPaneTimelineSurface, { onClipOpen })
+              children: /* @__PURE__ */ (0, import_jsx_runtime228.jsx)("div", { className: HOME_CENTER_PANE_TIMELINE_NEWS_FRAME_CLASS, children: /* @__PURE__ */ (0, import_jsx_runtime228.jsx)("div", { className: cn2(PANE_CONTENT_CONTAIN, "h-full min-h-0"), children: /* @__PURE__ */ (0, import_jsx_runtime228.jsx)(HomeCenterPaneTimelineSurface, { onClipOpen }) }) })
             }
           ) : paneState?.newsTimelineView && paneState.url ? /* @__PURE__ */ (0, import_jsx_runtime228.jsx)(
             SportsBrowserPrototypeNewsTimelinePaneShell,
@@ -149270,6 +149303,7 @@ var init_SportsBrowserPrototypeBrowserWorkspace = __esm({
     init_newsBrowserFocusSession();
     init_usePaneDragResize();
     init_paneContainment();
+    init_homeCenterPaneTimelineNewsPresentation();
     init_PaneResizeHandle();
     init_HomeCenterPaneTimelineSurface();
     init_SportsBrowserPrototypeBrowserPane();
