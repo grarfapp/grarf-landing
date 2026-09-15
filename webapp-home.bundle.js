@@ -138067,6 +138067,78 @@ var init_overlayActiveGameId = __esm({
   }
 });
 
+// ../grarf/desktop/src/lib/gamesSpine/groupSportsBrowserPrototypeSidebarLeagueSlatesBySoccer.ts
+function isSoccerSidebarLeagueSlate(slate) {
+  return isSoccerLeague2(slate.key);
+}
+function partitionNonSoccerSlatesForSoccerGrouping(nonSoccerSlates) {
+  const byKey = new Map(nonSoccerSlates.map((slate) => [slate.key, slate]));
+  const prefixSlates = [];
+  const seen = /* @__PURE__ */ new Set();
+  for (const key2 of SOCCER_SIDEBAR_INSERT_AFTER_LEAGUE_KEYS) {
+    const slate = byKey.get(key2);
+    if (!slate) continue;
+    prefixSlates.push(slate);
+    seen.add(key2);
+  }
+  const restSlates = nonSoccerSlates.filter((slate) => !seen.has(slate.key));
+  return { prefixSlates, restSlates };
+}
+function flattenSportsBrowserPrototypeSidebarLeagueEntries(entries) {
+  const flat = [];
+  for (const entry2 of entries) {
+    if (entry2.kind === "league") {
+      flat.push(entry2.slate);
+      continue;
+    }
+    flat.push(...entry2.children);
+  }
+  return flat;
+}
+function groupSportsBrowserPrototypeSidebarLeagueSlatesBySoccer(slates) {
+  const soccerSlates = [];
+  const nonSoccerSlates = [];
+  for (const slate of slates) {
+    if (isSoccerSidebarLeagueSlate(slate)) {
+      soccerSlates.push(slate);
+    } else {
+      nonSoccerSlates.push(slate);
+    }
+  }
+  const { prefixSlates, restSlates } = partitionNonSoccerSlatesForSoccerGrouping(nonSoccerSlates);
+  const soccerEntry = {
+    kind: "soccer",
+    label: SOCCER_SIDEBAR_ARCH_LEAGUE_LABEL,
+    children: [...soccerSlates]
+  };
+  return [
+    ...prefixSlates.map((slate) => ({
+      kind: "league",
+      slate
+    })),
+    soccerEntry,
+    ...restSlates.map((slate) => ({
+      kind: "league",
+      slate
+    }))
+  ];
+}
+var SOCCER_SIDEBAR_ARCH_LEAGUE_KEY, SOCCER_SIDEBAR_ARCH_LEAGUE_LABEL, SOCCER_SIDEBAR_INSERT_AFTER_LEAGUE_KEYS;
+var init_groupSportsBrowserPrototypeSidebarLeagueSlatesBySoccer = __esm({
+  "../grarf/desktop/src/lib/gamesSpine/groupSportsBrowserPrototypeSidebarLeagueSlatesBySoccer.ts"() {
+    init_define_import_meta_env();
+    init_isSoccerLeague();
+    SOCCER_SIDEBAR_ARCH_LEAGUE_KEY = "SOCCER";
+    SOCCER_SIDEBAR_ARCH_LEAGUE_LABEL = "SOCCER";
+    SOCCER_SIDEBAR_INSERT_AFTER_LEAGUE_KEYS = [
+      "NFL",
+      "NBA",
+      "MLB",
+      "NHL"
+    ];
+  }
+});
+
 // ../grarf/desktop/src/data/sportsBrowserPrototypeLeaguePodcastWebsites.ts
 function resolveSportsBrowserPrototypeLeaguePodcastWebsite(leagueKey) {
   if (!leagueKey?.trim()) return null;
@@ -139161,13 +139233,28 @@ var init_sportsBrowserPrototypeLeagueYoutubeWebsites = __esm({
 function getSportsBrowserPrototypeGlobalWebsites() {
   return SPORTS_BROWSER_PROTOTYPE_GLOBAL_WEBSITES;
 }
+function getSportsBrowserPrototypeSoccerArchWebsites() {
+  return SPORTS_BROWSER_PROTOTYPE_SOCCER_ARCH_WEBSITES;
+}
 function createDefaultSportsBrowserPrototypePaneState() {
   const websites = getSportsBrowserPrototypeGlobalWebsites();
   return {
     url: websites[0]?.url ?? null,
     activeTabIndex: 0,
     leagueKey: null,
+    sidebarArchLeagueKey: null,
     leagueContextSection: "news"
+  };
+}
+function createSportsBrowserPrototypeSoccerArchPaneState() {
+  const websites = getSportsBrowserPrototypeSoccerArchWebsites();
+  return {
+    url: websites[0]?.url ?? null,
+    activeTabIndex: 0,
+    leagueKey: null,
+    sidebarArchLeagueKey: SOCCER_SIDEBAR_ARCH_LEAGUE_KEY,
+    leagueContextSection: "news",
+    showWebsiteTabs: true
   };
 }
 function createEmptySportsBrowserPrototypePaneState() {
@@ -139180,8 +139267,11 @@ function getSportsBrowserPrototypeWebsitesForPane(pane) {
   if (pane.gameId?.trim()) {
     return [];
   }
-  if (!pane.url && !pane.leagueKey) {
+  if (!pane.url && !pane.leagueKey && !pane.sidebarArchLeagueKey) {
     return [];
+  }
+  if (pane.sidebarArchLeagueKey === SOCCER_SIDEBAR_ARCH_LEAGUE_KEY) {
+    return getSportsBrowserPrototypeSoccerArchWebsites();
   }
   if (pane.leagueKey) {
     return getSportsBrowserPrototypeLeagueWebsites(pane.leagueKey) ?? getSportsBrowserPrototypeGlobalWebsites();
@@ -139247,12 +139337,23 @@ function applySportsBrowserPrototypeUrlToPane(pane, url) {
 function applySportsBrowserPrototypeTerminalUrlToPane(pane, url) {
   const trimmed = url.trim();
   if (!trimmed) {
-    return { ...pane, url: null, leagueKey: null, gameId: null, gameContextSection: null, leagueContextSection: null, showWebsiteTabs: false, documentTitle: null };
+    return {
+      ...pane,
+      url: null,
+      leagueKey: null,
+      sidebarArchLeagueKey: null,
+      gameId: null,
+      gameContextSection: null,
+      leagueContextSection: null,
+      showWebsiteTabs: false,
+      documentTitle: null
+    };
   }
   return {
     url: trimmed,
     activeTabIndex: 0,
     leagueKey: null,
+    sidebarArchLeagueKey: null,
     gameId: null,
     gameContextSection: null,
     leagueContextSection: null,
@@ -139260,10 +139361,11 @@ function applySportsBrowserPrototypeTerminalUrlToPane(pane, url) {
     documentTitle: null
   };
 }
-var SPORTS_BROWSER_PROTOTYPE_LEAGUE_CONTEXT_SECTIONS, SPORTS_BROWSER_PROTOTYPE_LEAGUE_CONTEXT_SECTION_LABELS, SPORTS_BROWSER_PROTOTYPE_LEAGUE_WEBSITES, SPORTS_BROWSER_PROTOTYPE_GLOBAL_WEBSITES;
+var SPORTS_BROWSER_PROTOTYPE_LEAGUE_CONTEXT_SECTIONS, SPORTS_BROWSER_PROTOTYPE_LEAGUE_CONTEXT_SECTION_LABELS, SPORTS_BROWSER_PROTOTYPE_LEAGUE_WEBSITES, SPORTS_BROWSER_PROTOTYPE_SOCCER_ARCH_WEBSITES, SPORTS_BROWSER_PROTOTYPE_GLOBAL_WEBSITES;
 var init_sportsBrowserPrototypeLeagueWebsites = __esm({
   "../grarf/desktop/src/data/sportsBrowserPrototypeLeagueWebsites.ts"() {
     init_define_import_meta_env();
+    init_groupSportsBrowserPrototypeSidebarLeagueSlatesBySoccer();
     init_homeSourceWebviewNavigation();
     init_sportsBrowserPrototypeLeaguePodcastWebsites();
     init_sportsBrowserPrototypeLeagueYoutubeWebsites();
@@ -139466,6 +139568,32 @@ var init_sportsBrowserPrototypeLeagueWebsites = __esm({
         }
       ]
     };
+    SPORTS_BROWSER_PROTOTYPE_SOCCER_ARCH_WEBSITES = [
+      { label: "FotMob", url: "https://www.fotmob.com/news" },
+      { label: "Yahoo!", url: "https://sports.yahoo.com/soccer/" },
+      { label: "Soccerway", url: "https://www.soccerway.com/news/" },
+      { label: "ESPN", url: "https://www.espn.com/soccer/" },
+      { label: "SI", url: "https://www.si.com/soccer" },
+      { label: "TNT Sports", url: "https://www.tntsports.co.uk/football/" },
+      { label: "Sky Sports", url: "https://www.skysports.com/football" },
+      { label: "BBC", url: "https://www.bbc.com/sport/football" },
+      { label: "The Guardian", url: "https://www.theguardian.com/football" },
+      { label: "AOL", url: "https://www.aol.com/news/sports/soccer/" },
+      { label: "Football 365", url: "https://www.football365.com/" },
+      { label: "Sofascore", url: "https://www.sofascore.com/news?category=football" },
+      { label: "Transfermarkt", url: "https://www.transfermarkt.com/" },
+      { label: "NBC Sports", url: "https://www.nbcsports.com/soccer" },
+      { label: "Bleacher Report", url: "https://bleacherreport.com/world-football" },
+      { label: "BeSoccer", url: "https://www.besoccer.com/news" },
+      { label: "365 Scores", url: "http://365scores.com" },
+      { label: "Goal", url: "https://www.goal.com/en-us/news" },
+      { label: "USA Today", url: "https://www.usatoday.com/sports/soccer/" },
+      { label: "Yardbarker", url: "https://www.yardbarker.com/soccer" },
+      { label: "MSN", url: "https://www.msn.com/en-ca/sports/soccer" },
+      { label: "The Athletic", url: "https://www.nytimes.com/athletic/football/" },
+      { label: "CBS Sports", url: "https://www.cbssports.com/soccer" },
+      { label: "FBRef", url: "https://fbref.com/en/" }
+    ];
     SPORTS_BROWSER_PROTOTYPE_GLOBAL_WEBSITES = [
       { label: "ESPN", url: "https://www.espn.com/" },
       { label: "Yahoo!", url: "https://sports.yahoo.com/" },
@@ -139640,10 +139768,21 @@ function resolveSportsBrowserPrototypeSidebarSelectionFromPane(pane) {
   if (!pane) return EMPTY_SPORTS_BROWSER_PROTOTYPE_SIDEBAR_SELECTION;
   const gameId = pane.gameId?.trim();
   if (gameId) {
-    return { selectedGameId: gameId, selectedLeagueKey: null };
+    return { selectedGameId: gameId, selectedLeagueKey: null, selectedSidebarArchLeagueKey: null };
   }
   if (pane.leagueKey) {
-    return { selectedGameId: null, selectedLeagueKey: pane.leagueKey };
+    return {
+      selectedGameId: null,
+      selectedLeagueKey: pane.leagueKey,
+      selectedSidebarArchLeagueKey: null
+    };
+  }
+  if (pane.sidebarArchLeagueKey) {
+    return {
+      selectedGameId: null,
+      selectedLeagueKey: null,
+      selectedSidebarArchLeagueKey: pane.sidebarArchLeagueKey
+    };
   }
   return EMPTY_SPORTS_BROWSER_PROTOTYPE_SIDEBAR_SELECTION;
 }
@@ -139661,7 +139800,8 @@ var init_resolveSportsBrowserPrototypeSidebarSelection = __esm({
     init_applySportsBrowserPrototypeActiveTabUpdate();
     EMPTY_SPORTS_BROWSER_PROTOTYPE_SIDEBAR_SELECTION = {
       selectedGameId: null,
-      selectedLeagueKey: null
+      selectedLeagueKey: null,
+      selectedSidebarArchLeagueKey: null
     };
   }
 });
@@ -150553,6 +150693,18 @@ function SidebarLeagueNavLogoMark({
     }
   ) });
 }
+function resolveNavRowIndentClass(indent, soccerArchChildLeague = false) {
+  if (soccerArchChildLeague) {
+    if (indent === 0) return "pl-[31px] pr-4";
+    if (indent === 1) return "pl-[39px] pr-4";
+    if (indent === 2) return "pl-[55px] pr-4";
+    return "pl-[71px] pr-4";
+  }
+  if (indent === 0) return "px-4";
+  if (indent === 1) return "pl-6 pr-4";
+  if (indent === 2) return "pl-10 pr-4";
+  return "pl-14 pr-4";
+}
 function NavRow({
   label,
   indent = 1,
@@ -150564,9 +150716,11 @@ function NavRow({
   leagueKey,
   leagueGames,
   temporalAllSection,
-  isSelected = false
+  isSelected = false,
+  soccerArchLeague = false,
+  soccerArchChildLeague = false
 }) {
-  const indentClass = indent === 0 ? "px-4" : indent === 1 ? "pl-6 pr-4" : indent === 2 ? "pl-10 pr-4" : "pl-14 pr-4";
+  const indentClass = resolveNavRowIndentClass(indent, soccerArchChildLeague);
   return /* @__PURE__ */ (0, import_jsx_runtime236.jsxs)(
     "button",
     {
@@ -150585,6 +150739,8 @@ function NavRow({
       "data-sports-browser-prototype-sidebar-league-row": leagueKey ? "" : void 0,
       "data-sports-browser-prototype-sidebar-league-row-selected": isSelected && leagueKey ? "" : void 0,
       "data-sports-browser-prototype-sidebar-league-key": leagueKey,
+      "data-sports-browser-prototype-sidebar-soccer-arch-league": soccerArchLeague ? "" : void 0,
+      "data-sports-browser-prototype-sidebar-soccer-arch-child-league": soccerArchChildLeague ? "" : void 0,
       children: [
         /* @__PURE__ */ (0, import_jsx_runtime236.jsxs)("span", { className: "flex min-w-0 flex-1 items-start gap-1", children: [
           leagueKey ? /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(SidebarLeagueNavLogoMark, { leagueKey, games: leagueGames }) : null,
@@ -151021,7 +151177,8 @@ function SidebarTemporalLeagueBlock({
   canShowWatchLive,
   selectedGameId,
   selectedLeagueKey,
-  indent = 0
+  indent = 0,
+  soccerArchChildLeague = false
 }) {
   const isLeagueSelected = selectedLeagueKey === slate.key;
   return /* @__PURE__ */ (0, import_jsx_runtime236.jsxs)(import_jsx_runtime236.Fragment, { children: [
@@ -151030,6 +151187,7 @@ function SidebarTemporalLeagueBlock({
       {
         label: slate.label,
         indent,
+        soccerArchChildLeague,
         expanded,
         leagueKey: slate.key,
         leagueGames: slate.games,
@@ -151051,6 +151209,113 @@ function SidebarTemporalLeagueBlock({
     )) }) : null
   ] });
 }
+function areSoccerSidebarChildLeaguesExpanded(children, leagueOpen) {
+  return children.length > 0 && children.every((slate) => leagueOpen[slate.key] ?? false);
+}
+function SidebarGroupedTemporalLeagueEntries({
+  entries,
+  sectionPrefix,
+  variant,
+  resolveVariant,
+  leagueOpen,
+  onLeagueOpenChange,
+  toggleLeague,
+  allOpen,
+  onSoccerArchLeagueSelect,
+  selectedSidebarArchLeagueKey,
+  onGameSelect,
+  onWatchLive,
+  canShowWatchLive,
+  selectedGameId,
+  selectedLeagueKey,
+  onOpenUrl
+}) {
+  const toggleSoccerArchLeague = (0, import_react268.useCallback)(
+    (children) => {
+      const childKeys = children.map((slate) => slate.key);
+      const soccerGamesOpen = areSoccerSidebarChildLeaguesExpanded(children, leagueOpen);
+      if (soccerGamesOpen) {
+        onLeagueOpenChange((prev) => {
+          const next = { ...prev };
+          for (const key2 of childKeys) {
+            delete next[key2];
+          }
+          return next;
+        });
+        return;
+      }
+      onLeagueOpenChange((prev) => ({
+        ...prev,
+        ...Object.fromEntries(childKeys.map((key2) => [key2, true]))
+      }));
+      onSoccerArchLeagueSelect?.();
+    },
+    [leagueOpen, onLeagueOpenChange, onSoccerArchLeagueSelect]
+  );
+  return /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(import_jsx_runtime236.Fragment, { children: entries.map((entry2) => {
+    if (entry2.kind === "soccer") {
+      const soccerGamesOpen = areSoccerSidebarChildLeaguesExpanded(entry2.children, leagueOpen);
+      return /* @__PURE__ */ (0, import_jsx_runtime236.jsxs)(import_react268.Fragment, { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
+          NavRow,
+          {
+            label: entry2.label,
+            indent: allOpen ? 1 : 0,
+            bold: true,
+            soccerArchLeague: true,
+            expanded: soccerGamesOpen,
+            onClick: () => toggleSoccerArchLeague(entry2.children),
+            isSelected: selectedSidebarArchLeagueKey === SOCCER_SIDEBAR_ARCH_LEAGUE_KEY
+          }
+        ),
+        entry2.children.map((slate) => /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
+          SidebarTemporalLeagueBlock,
+          {
+            slate,
+            variant,
+            resolveVariant,
+            expanded: leagueOpen[slate.key] ?? false,
+            onToggle: () => toggleLeague(slate.key),
+            onGameSelect,
+            onWatchLive,
+            canShowWatchLive,
+            selectedGameId,
+            selectedLeagueKey,
+            indent: allOpen ? 1 : 0,
+            soccerArchChildLeague: true
+          },
+          `${sectionPrefix}-${slate.key}`
+        ))
+      ] }, `${sectionPrefix}-soccer-arch`);
+    }
+    if (entry2.slate.key === "F1" && onOpenUrl) {
+      return /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
+        SidebarF1CatchUpMockLeagueBlock,
+        {
+          onOpenUrl
+        },
+        `${sectionPrefix}-${entry2.slate.key}`
+      );
+    }
+    return /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
+      SidebarTemporalLeagueBlock,
+      {
+        slate: entry2.slate,
+        variant,
+        resolveVariant,
+        expanded: leagueOpen[entry2.slate.key] ?? false,
+        onToggle: () => toggleLeague(entry2.slate.key),
+        onGameSelect,
+        onWatchLive,
+        canShowWatchLive,
+        selectedGameId,
+        selectedLeagueKey,
+        indent: allOpen ? 1 : 0
+      },
+      `${sectionPrefix}-${entry2.slate.key}`
+    );
+  }) });
+}
 function SidebarTemporalSectionLeagues({
   sectionId,
   slates,
@@ -151061,20 +151326,30 @@ function SidebarTemporalSectionLeagues({
   onLeagueSelect,
   onGameSelect,
   onSelectGlobalWebsites,
+  onSoccerArchLeagueSelect,
   onWatchLive,
   canShowWatchLive,
   selectedGameId,
-  selectedLeagueKey
+  selectedLeagueKey,
+  selectedSidebarArchLeagueKey
 }) {
-  const allOpen = slates.length > 0 && slates.every((slate) => leagueOpen[slate.key] ?? false);
+  const groupedEntries = (0, import_react268.useMemo)(
+    () => groupSportsBrowserPrototypeSidebarLeagueSlatesBySoccer(slates),
+    [slates]
+  );
+  const leafSlates = (0, import_react268.useMemo)(
+    () => flattenSportsBrowserPrototypeSidebarLeagueEntries(groupedEntries),
+    [groupedEntries]
+  );
+  const allOpen = leafSlates.length > 0 && leafSlates.every((slate) => leagueOpen[slate.key] ?? false);
   const toggleAll = (0, import_react268.useCallback)(() => {
     if (allOpen) {
       onLeagueOpenChange({});
       return;
     }
-    onLeagueOpenChange(Object.fromEntries(slates.map((slate) => [slate.key, true])));
+    onLeagueOpenChange(Object.fromEntries(leafSlates.map((slate) => [slate.key, true])));
     onSelectGlobalWebsites?.();
-  }, [allOpen, onLeagueOpenChange, onSelectGlobalWebsites, slates]);
+  }, [allOpen, leafSlates, onLeagueOpenChange, onSelectGlobalWebsites]);
   const toggleLeague = (0, import_react268.useCallback)(
     (leagueKey) => {
       onLeagueOpenChange((prev) => {
@@ -151098,23 +151373,26 @@ function SidebarTemporalSectionLeagues({
         temporalAllSection: sectionId
       }
     ),
-    slates.map((slate) => /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
-      SidebarTemporalLeagueBlock,
+    /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
+      SidebarGroupedTemporalLeagueEntries,
       {
-        slate,
+        entries: groupedEntries,
+        sectionPrefix: sectionId,
         variant,
         resolveVariant,
-        expanded: leagueOpen[slate.key] ?? false,
-        onToggle: () => toggleLeague(slate.key),
+        leagueOpen,
+        onLeagueOpenChange,
+        toggleLeague,
+        allOpen,
+        onSoccerArchLeagueSelect,
+        selectedSidebarArchLeagueKey,
         onGameSelect,
         onWatchLive,
         canShowWatchLive,
         selectedGameId,
-        selectedLeagueKey,
-        indent: allOpen ? 1 : 0
-      },
-      `${sectionId}-${slate.key}`
-    ))
+        selectedLeagueKey
+      }
+    )
   ] });
 }
 function SidebarYesterdaySectionLeagues({
@@ -151124,12 +151402,22 @@ function SidebarYesterdaySectionLeagues({
   onLeagueSelect,
   onGameSelect,
   onOpenUrl,
+  onSoccerArchLeagueSelect,
   onWatchLive,
   canShowWatchLive,
   selectedGameId,
-  selectedLeagueKey
+  selectedLeagueKey,
+  selectedSidebarArchLeagueKey
 }) {
-  const expandableSlates = slates.filter((slate) => slate.key !== "F1");
+  const groupedEntries = (0, import_react268.useMemo)(
+    () => groupSportsBrowserPrototypeSidebarLeagueSlatesBySoccer(slates),
+    [slates]
+  );
+  const leafSlates = (0, import_react268.useMemo)(
+    () => flattenSportsBrowserPrototypeSidebarLeagueEntries(groupedEntries),
+    [groupedEntries]
+  );
+  const expandableSlates = leafSlates.filter((slate) => slate.key !== "F1");
   const allOpen = expandableSlates.length > 0 && expandableSlates.every((slate) => leagueOpen[slate.key] ?? false);
   const toggleAll = (0, import_react268.useCallback)(() => {
     if (allOpen) {
@@ -151161,53 +151449,27 @@ function SidebarYesterdaySectionLeagues({
         temporalAllSection: "yesterday"
       }
     ),
-    slates.map(
-      (slate) => slate.key === "F1" ? /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(SidebarF1CatchUpMockLeagueBlock, { onOpenUrl }, `yesterday-${slate.key}`) : /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
-        SidebarTemporalLeagueBlock,
-        {
-          slate,
-          variant: "catchUp",
-          expanded: leagueOpen[slate.key] ?? false,
-          onToggle: () => toggleLeague(slate.key),
-          onGameSelect,
-          onWatchLive,
-          canShowWatchLive,
-          selectedGameId,
-          selectedLeagueKey,
-          indent: allOpen ? 1 : 0
-        },
-        `yesterday-${slate.key}`
-      )
+    /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
+      SidebarGroupedTemporalLeagueEntries,
+      {
+        entries: groupedEntries,
+        sectionPrefix: "yesterday",
+        variant: "catchUp",
+        leagueOpen,
+        onLeagueOpenChange,
+        toggleLeague,
+        allOpen,
+        onSoccerArchLeagueSelect,
+        selectedSidebarArchLeagueKey,
+        onGameSelect,
+        onWatchLive,
+        canShowWatchLive,
+        selectedGameId,
+        selectedLeagueKey,
+        onOpenUrl
+      }
     )
   ] });
-}
-function SidebarTemporalLeagueBlockLegacy({
-  slate,
-  variant,
-  resolveVariant,
-  expanded,
-  onToggle,
-  onGameSelect,
-  onWatchLive,
-  canShowWatchLive,
-  selectedGameId,
-  selectedLeagueKey
-}) {
-  return /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
-    SidebarTemporalLeagueBlock,
-    {
-      slate,
-      variant,
-      resolveVariant,
-      expanded,
-      onGameSelect,
-      onWatchLive,
-      canShowWatchLive,
-      selectedGameId,
-      selectedLeagueKey,
-      onToggle
-    }
-  );
 }
 function LeaguesFilterField() {
   return /* @__PURE__ */ (0, import_jsx_runtime236.jsxs)("div", { className: "flex items-center gap-1.5 px-6 py-1", children: [
@@ -151242,6 +151504,7 @@ function SportsBrowserPrototypeLeftNav({
   onLeagueSelect,
   onGameSelect,
   onSelectGlobalWebsites,
+  onSoccerArchLeagueSelect,
   onWatchLive,
   canShowWatchLive,
   commandCenterCards,
@@ -151250,7 +151513,8 @@ function SportsBrowserPrototypeLeftNav({
   onNewsTickerNavigate,
   onNavigableGamesChange,
   selectedGameId = null,
-  selectedLeagueKey = null
+  selectedLeagueKey = null,
+  selectedSidebarArchLeagueKey = null
 }) {
   const { catchUpLeagues, yesterdayLeagues, nowLeagues, upcomingLeagues } = useSportsBrowserPrototypeTodayTemporalSlate();
   const [yesterdayOpen, setYesterdayOpen] = (0, import_react268.useState)(false);
@@ -151264,6 +151528,22 @@ function SportsBrowserPrototypeLeftNav({
   const todayCompleteLeagues = (0, import_react268.useMemo)(
     () => buildSportsBrowserPrototypeTodayCompleteLeagueSlates(nowLeagues, upcomingLeagues, catchUpLeagues),
     [nowLeagues, upcomingLeagues, catchUpLeagues]
+  );
+  const groupedCatchUpLeagues = (0, import_react268.useMemo)(
+    () => groupSportsBrowserPrototypeSidebarLeagueSlatesBySoccer(catchUpLeagues),
+    [catchUpLeagues]
+  );
+  const toggleCatchUpLeague = (0, import_react268.useCallback)(
+    (leagueKey) => {
+      setCatchUpLeagueOpen((prev) => {
+        const nextOpen = !(prev[leagueKey] ?? false);
+        if (nextOpen) {
+          onLeagueSelect?.(leagueKey);
+        }
+        return { ...prev, [leagueKey]: nextOpen };
+      });
+    },
+    [onLeagueSelect]
   );
   const navigableGames = (0, import_react268.useMemo)(
     () => resolveSportsBrowserPrototypeSidebarNavigableGames({
@@ -151458,36 +151738,25 @@ function SportsBrowserPrototypeLeftNav({
                       onSelect: onCompactTemporalSelect
                     }
                   ),
-                  compactTemporalView === "final" ? catchUpLeagues.map(
-                    (slate) => slate.key === "F1" ? /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
-                      SidebarF1CatchUpMockLeagueBlock,
-                      {
-                        onOpenUrl
-                      },
-                      `catch-up-${slate.key}`
-                    ) : /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
-                      SidebarTemporalLeagueBlockLegacy,
-                      {
-                        slate,
-                        variant: "catchUp",
-                        expanded: catchUpLeagueOpen[slate.key] ?? false,
-                        onToggle: () => {
-                          setCatchUpLeagueOpen((prev) => {
-                            const nextOpen = !(prev[slate.key] ?? false);
-                            if (nextOpen) {
-                              onLeagueSelect?.(slate.key);
-                            }
-                            return { ...prev, [slate.key]: nextOpen };
-                          });
-                        },
-                        onGameSelect,
-                        onWatchLive,
-                        canShowWatchLive,
-                        selectedGameId,
-                        selectedLeagueKey
-                      },
-                      `catch-up-${slate.key}`
-                    )
+                  compactTemporalView === "final" ? /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
+                    SidebarGroupedTemporalLeagueEntries,
+                    {
+                      entries: groupedCatchUpLeagues,
+                      sectionPrefix: "catch-up",
+                      variant: "catchUp",
+                      leagueOpen: catchUpLeagueOpen,
+                      onLeagueOpenChange: setCatchUpLeagueOpen,
+                      toggleLeague: toggleCatchUpLeague,
+                      allOpen: false,
+                      onSoccerArchLeagueSelect,
+                      selectedSidebarArchLeagueKey,
+                      onGameSelect,
+                      onWatchLive,
+                      canShowWatchLive,
+                      selectedGameId,
+                      selectedLeagueKey,
+                      onOpenUrl
+                    }
                   ) : null,
                   compactTemporalView === "yesterday" ? /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
                     SidebarYesterdaySectionLeagues,
@@ -151498,10 +151767,12 @@ function SportsBrowserPrototypeLeftNav({
                       onLeagueSelect,
                       onGameSelect,
                       onOpenUrl,
+                      onSoccerArchLeagueSelect,
                       onWatchLive,
                       canShowWatchLive,
                       selectedGameId,
-                      selectedLeagueKey
+                      selectedLeagueKey,
+                      selectedSidebarArchLeagueKey
                     }
                   ) : null,
                   compactTemporalView === "today" ? /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
@@ -151515,10 +151786,12 @@ function SportsBrowserPrototypeLeftNav({
                       onLeagueSelect,
                       onGameSelect,
                       onSelectGlobalWebsites,
+                      onSoccerArchLeagueSelect,
                       onWatchLive,
                       canShowWatchLive,
                       selectedGameId,
-                      selectedLeagueKey
+                      selectedLeagueKey,
+                      selectedSidebarArchLeagueKey
                     }
                   ) : null,
                   compactTemporalView === "now" ? /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
@@ -151532,10 +151805,12 @@ function SportsBrowserPrototypeLeftNav({
                       onLeagueSelect,
                       onGameSelect,
                       onSelectGlobalWebsites,
+                      onSoccerArchLeagueSelect,
                       onWatchLive,
                       canShowWatchLive,
                       selectedGameId,
-                      selectedLeagueKey
+                      selectedLeagueKey,
+                      selectedSidebarArchLeagueKey
                     }
                   ) : null,
                   compactTemporalView === "next" ? /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
@@ -151549,10 +151824,12 @@ function SportsBrowserPrototypeLeftNav({
                       onLeagueSelect,
                       onGameSelect,
                       onSelectGlobalWebsites,
+                      onSoccerArchLeagueSelect,
                       onWatchLive,
                       canShowWatchLive,
                       selectedGameId,
-                      selectedLeagueKey
+                      selectedLeagueKey,
+                      selectedSidebarArchLeagueKey
                     }
                   ) : null
                 ] }),
@@ -151654,6 +151931,7 @@ var init_SportsBrowserPrototypeLeftNav = __esm({
     import_react268 = __toESM(require_react(), 1);
     init_lucide_react();
     init_cn();
+    init_groupSportsBrowserPrototypeSidebarLeagueSlatesBySoccer();
     init_resolveSportsBrowserPrototypeSidebarNavigableGames();
     init_gamesSpineCompactGameRowContent();
     init_resolveSportsBrowserLeftNavTeamNamePresentation();
@@ -153165,6 +153443,7 @@ function HomePage() {
           url: url2,
           activeTabIndex: 0,
           leagueKey: null,
+          sidebarArchLeagueKey: null,
           gameId: null,
           gameContextSection: null,
           leagueContextSection: "news",
@@ -153177,6 +153456,7 @@ function HomePage() {
         url,
         activeTabIndex: 0,
         leagueKey,
+        sidebarArchLeagueKey: null,
         gameId: null,
         gameContextSection: null,
         leagueContextSection: "news",
@@ -153271,6 +153551,19 @@ function HomePage() {
         return tab;
       }
       next[paneIndex] = defaultState;
+      return { ...tab, paneStates: next, activePaneIndex: paneIndex };
+    });
+  }, [updateSportsBrowserTabForSidebarSelection]);
+  const onSportsBrowserSelectSoccerArchWebsites = (0, import_react272.useCallback)(() => {
+    updateSportsBrowserTabForSidebarSelection((tab) => {
+      const next = tab.paneStates.slice();
+      const paneIndex = resolveSportsBrowserPrototypeSidebarSelectionPaneIndex(tab);
+      const current = next[paneIndex] ?? createDefaultSportsBrowserPrototypePaneState();
+      const soccerState = createSportsBrowserPrototypeSoccerArchPaneState();
+      if (current.sidebarArchLeagueKey === soccerState.sidebarArchLeagueKey && current.activeTabIndex === soccerState.activeTabIndex && current.url === soccerState.url && current.leagueKey === soccerState.leagueKey && current.leagueContextSection === soccerState.leagueContextSection) {
+        return tab;
+      }
+      next[paneIndex] = soccerState;
       return { ...tab, paneStates: next, activePaneIndex: paneIndex };
     });
   }, [updateSportsBrowserTabForSidebarSelection]);
@@ -153431,6 +153724,7 @@ function HomePage() {
   );
   const sportsBrowserSelectedGameId = sportsBrowserSidebarSelection.selectedGameId;
   const sportsBrowserSelectedLeagueKey = sportsBrowserSidebarSelection.selectedLeagueKey;
+  const sportsBrowserSelectedSidebarArchLeagueKey = sportsBrowserSidebarSelection.selectedSidebarArchLeagueKey;
   const [sportsBrowserSidebarNavigableGames, setSportsBrowserSidebarNavigableGames] = (0, import_react272.useState)([]);
   const onSportsBrowserSidebarNavigableGamesChange = (0, import_react272.useCallback)((games) => {
     setSportsBrowserSidebarNavigableGames(games);
@@ -153712,8 +154006,10 @@ function HomePage() {
             onLeagueSelect: onSportsBrowserLeagueSelect,
             onGameSelect: onSportsBrowserGameSelect,
             onSelectGlobalWebsites: onSportsBrowserSelectGlobalWebsites,
+            onSoccerArchLeagueSelect: onSportsBrowserSelectSoccerArchWebsites,
             selectedGameId: sportsBrowserSelectedGameId,
             selectedLeagueKey: sportsBrowserSelectedLeagueKey,
+            selectedSidebarArchLeagueKey: sportsBrowserSelectedSidebarArchLeagueKey,
             onWatchLive: onSportsBrowserWatchLive,
             canShowWatchLive: canShowSportsBrowserWatchLive,
             commandCenterCards: commandCenterLayout.cards,
