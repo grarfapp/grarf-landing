@@ -148597,7 +148597,7 @@ function collectExpandedLeagueBlockGames(slates, leagueOpen) {
 function resolveSportsBrowserPrototypeSidebarNavigableGames(input) {
   const { view } = input;
   if (view.yesterdayOpen) {
-    return collectExpandedLeagueBlockGames(input.yesterdayLeagues, input.catchUpLeagueOpen);
+    return collectExpandedLeagueBlockGames(input.yesterdayLeagues, input.yesterdayLeagueOpen);
   }
   if (view.catchUpTodayActive) {
     return collectExpandedLeagueBlockGames(input.catchUpLeagues, input.catchUpLeagueOpen);
@@ -149912,36 +149912,74 @@ function filterYesterdayFinalGames(games, now) {
     )
   );
 }
+function filterYesterdayScheduleCacheFinalGames(games) {
+  return games.filter((game) => game.status === "final");
+}
+function resolveYesterdayOperationalLeagueKeys(input) {
+  const keys = /* @__PURE__ */ new Set();
+  for (const section of input.spineSections) {
+    if (section.kind === "operational") {
+      keys.add(section.leagueKey);
+    }
+  }
+  for (const league2 of Object.keys(input.scheduleByDate[input.yesterdayKey] ?? {})) {
+    keys.add(league2);
+  }
+  for (const league2 of Object.keys(input.retainedFinalsByLeague)) {
+    keys.add(league2);
+  }
+  return [...keys];
+}
+function buildYesterdayOperationalLeagueSlate(league2, input) {
+  const scheduleGames = input.scheduleByDate[input.yesterdayKey]?.[league2] ?? [];
+  const retainedGames = input.retainedFinalsByLeague[league2] ?? [];
+  const games = sortGamesSpineChronologically2(
+    dedupeSportsBrowserPrototypeNewsSidebarGames(
+      mergeCatchUpSupplementalFinals(
+        filterYesterdayScheduleCacheFinalGames(scheduleGames),
+        filterYesterdayFinalGames(retainedGames, input.now)
+      )
+    )
+  );
+  if (games.length === 0) return null;
+  return {
+    key: league2,
+    label: resolveGamesSpineLeagueSectionHeaderLabel(league2, input.mergedLeagues[league2]),
+    games
+  };
+}
 function buildSportsBrowserPrototypeYesterdayTemporalLeagueSlates(input) {
   const now = input.now ?? /* @__PURE__ */ new Date();
   const yesterdayKey2 = getOperationalSportsDayYesterdayDateKey(now);
-  const slates = [];
-  for (const section of input.spineSections) {
-    if (section.kind === "operational") {
-      const league2 = section.leagueKey;
-      const scheduleGames = input.scheduleByDate[yesterdayKey2]?.[league2] ?? [];
-      const retainedGames = input.retainedFinalsByLeague[league2] ?? [];
-      const games2 = filterYesterdayFinalGames(
-        mergeCatchUpSupplementalFinals(scheduleGames, retainedGames),
+  const operationalSlates = orderSportsBrowserPrototypeNewsSidebarLeagueSlates(
+    resolveYesterdayOperationalLeagueKeys({
+      spineSections: input.spineSections,
+      scheduleByDate: input.scheduleByDate,
+      retainedFinalsByLeague: input.retainedFinalsByLeague,
+      yesterdayKey: yesterdayKey2
+    }).flatMap((league2) => {
+      const slate = buildYesterdayOperationalLeagueSlate(league2, {
+        mergedLeagues: input.mergedLeagues,
+        scheduleByDate: input.scheduleByDate,
+        retainedFinalsByLeague: input.retainedFinalsByLeague,
+        yesterdayKey: yesterdayKey2,
         now
-      );
-      if (games2.length === 0) continue;
-      slates.push({
-        key: league2,
-        label: resolveGamesSpineLeagueSectionHeaderLabel(league2, input.mergedLeagues[league2]),
-        games: games2
       });
-      continue;
-    }
+      return slate ? [slate] : [];
+    })
+  );
+  const manualSlates = [];
+  for (const section of input.spineSections) {
+    if (section.kind !== "manual") continue;
     const games = filterYesterdayFinalGames(section.section.games, now);
     if (games.length === 0) continue;
-    slates.push({
+    manualSlates.push({
       key: gamesSpineManualCollapseKey(section.slug),
       label: section.section.leagueLabel,
       games
     });
   }
-  return slates;
+  return [...operationalSlates, ...manualSlates];
 }
 var init_buildSportsBrowserPrototypeYesterdayTemporalLeagueSlates = __esm({
   "../grarf/desktop/src/lib/home/buildSportsBrowserPrototypeYesterdayTemporalLeagueSlates.ts"() {
@@ -149950,6 +149988,7 @@ var init_buildSportsBrowserPrototypeYesterdayTemporalLeagueSlates = __esm({
     init_dedupeSportsBrowserPrototypeNewsSidebarGames();
     init_gamesSpineOperationalDate();
     init_gamesSpineLeagueDisplayLabel();
+    init_orderSportsBrowserPrototypeNewsSidebarLeagueSlates();
     init_sortGamesSpineChronologically();
     init_mergeCatchUpSupplementalFinals();
     init_mergeGamesSpineSectionsByPriority();
@@ -150926,6 +150965,8 @@ function SidebarF1CatchUpMockLeagueBlock({ onOpenUrl }) {
           "transition-colors hover:bg-[#e9e4db] font-normal"
         ),
         "aria-expanded": open,
+        "data-sports-browser-prototype-sidebar-league-row": "",
+        "data-sports-browser-prototype-sidebar-league-key": "F1",
         children: [
           /* @__PURE__ */ (0, import_jsx_runtime236.jsxs)("span", { className: "flex min-w-0 flex-1 items-start gap-1", children: [
             /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(SidebarLeagueNavLogoMark, { leagueKey: "F1" }),
@@ -151058,6 +151099,70 @@ function SidebarTemporalSectionLeagues({
     ))
   ] });
 }
+function SidebarYesterdaySectionLeagues({
+  slates,
+  leagueOpen,
+  onLeagueOpenChange,
+  onLeagueSelect,
+  onGameSelect,
+  onOpenUrl,
+  onWatchLive,
+  canShowWatchLive,
+  selectedGameId,
+  selectedLeagueKey
+}) {
+  const expandableSlates = slates.filter((slate) => slate.key !== "F1");
+  const allOpen = expandableSlates.length > 0 && expandableSlates.every((slate) => leagueOpen[slate.key] ?? false);
+  const toggleAll = (0, import_react268.useCallback)(() => {
+    if (allOpen) {
+      onLeagueOpenChange({});
+      return;
+    }
+    onLeagueOpenChange(Object.fromEntries(expandableSlates.map((slate) => [slate.key, true])));
+  }, [allOpen, expandableSlates, onLeagueOpenChange]);
+  const toggleLeague = (0, import_react268.useCallback)(
+    (leagueKey) => {
+      onLeagueOpenChange((prev) => {
+        const nextOpen = !(prev[leagueKey] ?? false);
+        if (nextOpen) {
+          onLeagueSelect?.(leagueKey);
+        }
+        return { ...prev, [leagueKey]: nextOpen };
+      });
+    },
+    [onLeagueOpenChange, onLeagueSelect]
+  );
+  return /* @__PURE__ */ (0, import_jsx_runtime236.jsxs)(import_jsx_runtime236.Fragment, { children: [
+    /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
+      NavRow,
+      {
+        label: "ALL",
+        indent: 0,
+        expanded: allOpen,
+        onClick: toggleAll,
+        temporalAllSection: "yesterday"
+      }
+    ),
+    slates.map(
+      (slate) => slate.key === "F1" ? /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(SidebarF1CatchUpMockLeagueBlock, { onOpenUrl }, `yesterday-${slate.key}`) : /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
+        SidebarTemporalLeagueBlock,
+        {
+          slate,
+          variant: "catchUp",
+          expanded: leagueOpen[slate.key] ?? false,
+          onToggle: () => toggleLeague(slate.key),
+          onGameSelect,
+          onWatchLive,
+          canShowWatchLive,
+          selectedGameId,
+          selectedLeagueKey,
+          indent: allOpen ? 1 : 0
+        },
+        `yesterday-${slate.key}`
+      )
+    )
+  ] });
+}
 function SidebarTemporalLeagueBlockLegacy({
   slate,
   variant,
@@ -151134,6 +151239,7 @@ function SportsBrowserPrototypeLeftNav({
   const [todayTab, setTodayTab] = (0, import_react268.useState)("today");
   const [sectionLeagueOpen, setSectionLeagueOpen] = (0, import_react268.useState)({});
   const [catchUpLeagueOpen, setCatchUpLeagueOpen] = (0, import_react268.useState)({});
+  const [yesterdayLeagueOpen, setYesterdayLeagueOpen] = (0, import_react268.useState)({});
   const hasUserSelectedTemporalView = (0, import_react268.useRef)(false);
   const yesterdayLabel = (0, import_react268.useMemo)(() => formatCompactPreviousCalendarDate(), []);
   const todayCompleteLeagues = (0, import_react268.useMemo)(
@@ -151153,7 +151259,8 @@ function SportsBrowserPrototypeLeftNav({
       upcomingLeagues,
       todayCompleteLeagues,
       sectionLeagueOpen,
-      catchUpLeagueOpen
+      catchUpLeagueOpen,
+      yesterdayLeagueOpen
     }),
     [
       catchUpLeagueOpen,
@@ -151165,6 +151272,7 @@ function SportsBrowserPrototypeLeftNav({
       todayCompleteLeagues,
       todayTab,
       upcomingLeagues,
+      yesterdayLeagueOpen,
       yesterdayOpen
     ]
   );
@@ -151318,7 +151426,7 @@ function SportsBrowserPrototypeLeftNav({
                       onSelect: onCompactTemporalSelect
                     }
                   ),
-                  catchUpTodayActive ? catchUpLeagues.map(
+                  compactTemporalView === "final" ? catchUpLeagues.map(
                     (slate) => slate.key === "F1" ? /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
                       SidebarF1CatchUpMockLeagueBlock,
                       {
@@ -151349,38 +151457,22 @@ function SportsBrowserPrototypeLeftNav({
                       `catch-up-${slate.key}`
                     )
                   ) : null,
-                  yesterdayOpen ? yesterdayLeagues.map(
-                    (slate) => slate.key === "F1" ? /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
-                      SidebarF1CatchUpMockLeagueBlock,
-                      {
-                        onOpenUrl
-                      },
-                      `yesterday-${slate.key}`
-                    ) : /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
-                      SidebarTemporalLeagueBlockLegacy,
-                      {
-                        slate,
-                        variant: "catchUp",
-                        expanded: catchUpLeagueOpen[slate.key] ?? false,
-                        onToggle: () => {
-                          setCatchUpLeagueOpen((prev) => {
-                            const nextOpen = !(prev[slate.key] ?? false);
-                            if (nextOpen) {
-                              onLeagueSelect?.(slate.key);
-                            }
-                            return { ...prev, [slate.key]: nextOpen };
-                          });
-                        },
-                        onGameSelect,
-                        onWatchLive,
-                        canShowWatchLive,
-                        selectedGameId,
-                        selectedLeagueKey
-                      },
-                      `yesterday-${slate.key}`
-                    )
+                  compactTemporalView === "yesterday" ? /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
+                    SidebarYesterdaySectionLeagues,
+                    {
+                      slates: yesterdayLeagues,
+                      leagueOpen: yesterdayLeagueOpen,
+                      onLeagueOpenChange: setYesterdayLeagueOpen,
+                      onLeagueSelect,
+                      onGameSelect,
+                      onOpenUrl,
+                      onWatchLive,
+                      canShowWatchLive,
+                      selectedGameId,
+                      selectedLeagueKey
+                    }
                   ) : null,
-                  todayTab === "today" ? /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
+                  compactTemporalView === "today" ? /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
                     SidebarTemporalSectionLeagues,
                     {
                       sectionId: "today",
@@ -151397,7 +151489,7 @@ function SportsBrowserPrototypeLeftNav({
                       selectedLeagueKey
                     }
                   ) : null,
-                  todayTab === "now" ? /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
+                  compactTemporalView === "now" ? /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
                     SidebarTemporalSectionLeagues,
                     {
                       sectionId: "now",
@@ -151414,7 +151506,7 @@ function SportsBrowserPrototypeLeftNav({
                       selectedLeagueKey
                     }
                   ) : null,
-                  todayTab === "upcoming" ? /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
+                  compactTemporalView === "next" ? /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
                     SidebarTemporalSectionLeagues,
                     {
                       sectionId: "upcoming",
@@ -152381,7 +152473,7 @@ function HomePage() {
     () => createInitialSportsBrowserPrototypeBrowserTabs(),
     []
   );
-  const initialSportsBrowserWorkspaceTab = initialSportsBrowserTabs[0] ?? initialSportsBrowserTabs[1];
+  const initialSportsBrowserWorkspaceTab = initialSportsBrowserTabs.find((tab) => tab.kind === "workspace") ?? initialSportsBrowserTabs[1] ?? initialSportsBrowserTabs[0];
   const [sportsBrowserTabs, setSportsBrowserTabs] = (0, import_react272.useState)(() => initialSportsBrowserTabs);
   const [activeSportsBrowserTabId, setActiveSportsBrowserTabId] = (0, import_react272.useState)(
     initialSportsBrowserWorkspaceTab.id
