@@ -139498,7 +139498,7 @@ function isCommandCenterSportsBrowserPrototypeBrowserTab(tab) {
 function createSportsBrowserPrototypeBrowserTabId() {
   return `sports-browser-tab-${nextSportsBrowserTabId++}`;
 }
-function createCommandCenterSportsBrowserPrototypeBrowserTabState(id = "sports-browser-command-center") {
+function createCommandCenterSportsBrowserPrototypeBrowserTabState(id = COMMAND_CENTER_SPORTS_BROWSER_TAB_ID) {
   return {
     id,
     label: COMMAND_CENTER_SPORTS_BROWSER_TAB_LABEL,
@@ -139537,17 +139537,35 @@ function createSportsBrowserPrototypeBrowserTabStateForOmniboxUrl(url, id = crea
   return { ...tab, paneStates: [pane] };
 }
 function createInitialSportsBrowserPrototypeBrowserTabs() {
-  return [
-    createCommandCenterSportsBrowserPrototypeBrowserTabState(),
-    createInitialSportsBrowserPrototypeBrowserTabState()
-  ];
+  return [createInitialSportsBrowserPrototypeBrowserTabState()];
 }
-var COMMAND_CENTER_SPORTS_BROWSER_TAB_LABEL, nextSportsBrowserTabId;
+function findCommandCenterSportsBrowserPrototypeBrowserTab(tabs) {
+  return tabs.find(isCommandCenterSportsBrowserPrototypeBrowserTab);
+}
+function ensureCommandCenterSportsBrowserPrototypeBrowserTab(tabs) {
+  const existing = findCommandCenterSportsBrowserPrototypeBrowserTab(tabs);
+  if (existing) {
+    return { tabs, commandCenterTabId: existing.id, inserted: false };
+  }
+  const commandCenterTab = createCommandCenterSportsBrowserPrototypeBrowserTabState();
+  return {
+    tabs: [commandCenterTab, ...tabs],
+    commandCenterTabId: commandCenterTab.id,
+    inserted: true
+  };
+}
+function resolveActiveSportsBrowserPrototypeBrowserTab(tabs, activeTabId) {
+  const activeTab = tabs.find((tab) => tab.id === activeTabId);
+  if (activeTab) return activeTab;
+  return tabs.find((tab) => tab.kind === "workspace") ?? findCommandCenterSportsBrowserPrototypeBrowserTab(tabs) ?? tabs[0];
+}
+var COMMAND_CENTER_SPORTS_BROWSER_TAB_LABEL, COMMAND_CENTER_SPORTS_BROWSER_TAB_ID, nextSportsBrowserTabId;
 var init_sportsBrowserPrototypeBrowserTabs = __esm({
   "../grarf/desktop/src/data/sportsBrowserPrototypeBrowserTabs.ts"() {
     init_define_import_meta_env();
     init_sportsBrowserPrototypeLeagueWebsites();
     COMMAND_CENTER_SPORTS_BROWSER_TAB_LABEL = "COMMAND CENTER";
+    COMMAND_CENTER_SPORTS_BROWSER_TAB_ID = "sports-browser-command-center";
     nextSportsBrowserTabId = 1;
   }
 });
@@ -151228,6 +151246,7 @@ function SportsBrowserPrototypeLeftNav({
   canShowWatchLive,
   commandCenterCards,
   onCommandCenterDestinationSelect,
+  onCommandCenterBrowserTabSelect,
   onNewsTickerNavigate,
   onNavigableGamesChange,
   selectedGameId = null,
@@ -151363,7 +151382,20 @@ function SportsBrowserPrototypeLeftNav({
               "data-sports-browser-prototype-left-nav-scroll": true,
               children: [
                 /* @__PURE__ */ (0, import_jsx_runtime236.jsxs)("div", { className: "shrink-0", children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
+                  onCommandCenterBrowserTabSelect ? /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
+                    "button",
+                    {
+                      type: "button",
+                      className: cn2(
+                        "w-full border-t px-4 py-2 text-left text-[11px] font-bold uppercase tracking-[0.06em] text-[#1a1a1a] transition-opacity hover:opacity-75",
+                        RULE2,
+                        "border-t-0"
+                      ),
+                      "data-sports-browser-prototype-command-center-section": true,
+                      onClick: onCommandCenterBrowserTabSelect,
+                      children: "COMMAND CENTER"
+                    }
+                  ) : /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
                     "div",
                     {
                       className: cn2(
@@ -152473,7 +152505,7 @@ function HomePage() {
     () => createInitialSportsBrowserPrototypeBrowserTabs(),
     []
   );
-  const initialSportsBrowserWorkspaceTab = initialSportsBrowserTabs.find((tab) => tab.kind === "workspace") ?? initialSportsBrowserTabs[1] ?? initialSportsBrowserTabs[0];
+  const initialSportsBrowserWorkspaceTab = initialSportsBrowserTabs[0];
   const [sportsBrowserTabs, setSportsBrowserTabs] = (0, import_react272.useState)(() => initialSportsBrowserTabs);
   const [activeSportsBrowserTabId, setActiveSportsBrowserTabId] = (0, import_react272.useState)(
     initialSportsBrowserWorkspaceTab.id
@@ -152583,15 +152615,17 @@ function HomePage() {
   );
   const onSelectSportsBrowserTab = (0, import_react272.useCallback)(
     (tabId) => {
-      activeSportsBrowserTabIdRef.current = tabId;
-      setActiveSportsBrowserTabId(tabId);
+      const resolvedTabId = tabId === COMMAND_CENTER_SPORTS_BROWSER_TAB_ID ? COMMAND_CENTER_SPORTS_BROWSER_TAB_ID : tabId;
       setSportsBrowserTabs((tabs) => {
-        const tab = tabs.find((t2) => t2.id === tabId);
+        const nextTabs = tabId === COMMAND_CENTER_SPORTS_BROWSER_TAB_ID ? ensureCommandCenterSportsBrowserPrototypeBrowserTab(tabs).tabs : tabs;
+        const tab = nextTabs.find((t2) => t2.id === resolvedTabId);
         if (tab) {
           sportsBrowserActivePaneIndexRef.current = tab.activePaneIndex;
         }
-        return tabs;
+        return nextTabs;
       });
+      activeSportsBrowserTabIdRef.current = resolvedTabId;
+      setActiveSportsBrowserTabId(resolvedTabId);
       syncNavState();
     },
     [syncNavState]
@@ -153379,7 +153413,10 @@ function HomePage() {
       splitPaneLeftWidthRatio: void 0
     }));
   }, [updateActiveTabWithPaneHistory]);
-  const activeSportsBrowserTab = sportsBrowserTabs.find((tab) => tab.id === activeSportsBrowserTabId) ?? sportsBrowserTabs[0];
+  const activeSportsBrowserTab = resolveActiveSportsBrowserPrototypeBrowserTab(
+    sportsBrowserTabs,
+    activeSportsBrowserTabId
+  );
   const sportsBrowserMainContentRenderBranch = resolveSportsBrowserPrototypeMainContentRenderBranch(activeSportsBrowserTab);
   const showSportsBrowserMainTimelineContent = isSportsBrowserPrototype && centerPaneNowPresentationMode === "timeline";
   const showSportsBrowserPrototypeCommandCenterWorkspace = !showSportsBrowserMainTimelineContent && sportsBrowserMainContentRenderBranch === "commandCenter";
@@ -153681,6 +153718,7 @@ function HomePage() {
             canShowWatchLive: canShowSportsBrowserWatchLive,
             commandCenterCards: commandCenterLayout.cards,
             onCommandCenterDestinationSelect,
+            onCommandCenterBrowserTabSelect: () => onSelectSportsBrowserTab(COMMAND_CENTER_SPORTS_BROWSER_TAB_ID),
             onNewsTickerNavigate: onSportsBrowserNewsTickerNavigate,
             onNavigableGamesChange: onSportsBrowserSidebarNavigableGamesChange
           }
