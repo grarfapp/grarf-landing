@@ -39035,19 +39035,6 @@ function resolveWorldCupWorkspaceEmbedUrl(game) {
   if (fixtureOverride) return fixtureOverride;
   return resolveFotmobMatchUrl(game);
 }
-function resolveFotmobCenterPaneEmbedUrl(game) {
-  const isWorldCup = isWorldCupGameRow(game);
-  const fotmobUrl = isWorldCup ? resolveWorldCupWorkspaceEmbedUrl(game) : resolveFotmobMatchUrl(game);
-  if (!fotmobUrl) return null;
-  if (game.status === "scheduled") {
-    if (isWorldCup) {
-      if (isGrarfWebRenderer2()) return null;
-      return fotmobUrl;
-    }
-    return null;
-  }
-  return fotmobUrl;
-}
 function openFotmobGamesSpineRow(game, dispatch) {
   const isWorldCup = isWorldCupGameRow(game);
   const fotmobUrl = isWorldCup ? resolveWorldCupWorkspaceEmbedUrl(game) : resolveFotmobMatchUrl(game);
@@ -135270,8 +135257,13 @@ function resolveSpineRowWorkspaceEmbedUrl(game) {
   if (isTennisLeagueGame(game)) {
     return resolveTennisGameCardEmbedUrl(game);
   }
-  const fotmobUrl = resolveFotmobCenterPaneEmbedUrl(game);
-  if (fotmobUrl) return fotmobUrl;
+  if (isWorldCupGameRow(game)) {
+    const worldCupFotmobUrl = resolveWorldCupWorkspaceEmbedUrl(game);
+    if (worldCupFotmobUrl) return worldCupFotmobUrl;
+  } else {
+    const fotmobMatchUrl = resolveFotmobMatchUrl(game);
+    if (fotmobMatchUrl) return fotmobMatchUrl;
+  }
   const flashscoreUrl = resolveFlashscoreMatchUrl(game);
   if (flashscoreUrl) return flashscoreUrl;
   if (isGrarfWebRenderer2()) {
@@ -135401,6 +135393,7 @@ var init_openGameWorkspaceTab = __esm({
     init_golfWatchUrls2();
     init_espnGameUrls();
     init_resolveWorldCupWorkspaceEmbedUrl();
+    init_buildFotmobMatchUrl();
     init_resolveWimbledonWorkspaceEmbedUrl();
     init_resolveWnbaGameCenterUrl();
     init_openAflGameRowInBrowser();
@@ -139490,7 +139483,10 @@ var init_sportsBrowserPrototypeLeagueWebsites = __esm({
         { label: "FOX Sports", url: "https://www.foxsports.com/nfl" },
         { label: "The Athletic", url: "https://www.nytimes.com/athletic/nfl/" },
         { label: "The Score", url: "https://www.thescore.com/nfl" },
-        { label: "Bleacher Report", url: "https://bleacherreport.com/nfl" }
+        { label: "Bleacher Report", url: "https://bleacherreport.com/nfl" },
+        { label: "NBC Sports", url: "https://www.nbcsports.com/nfl" },
+        { label: "SportSpyder", url: "https://sportspyder.com/sports/nfl/news" },
+        { label: "NewsNow", url: "https://www.newsnow.com/us/Sports/NFL" }
       ],
       EPL: [
         { label: "Premier League", url: "https://www.premierleague.com/news" },
