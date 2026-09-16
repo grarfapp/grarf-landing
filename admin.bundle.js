@@ -13872,6 +13872,7 @@ var LEAGUE_PRIORITY_MANUAL_AFTER = {
   "GT WORLD": "WEC",
   "GT-WORLD-CHALLENGE": "WEC"
 };
+var LEAGUE_PRIORITY_ALWAYS_LAST = ["CLUBFRIENDLY"];
 
 // ../grarf/desktop/src/lib/leaguePriority/leaguePrioritySeed.ts
 init_define_import_meta_env();
@@ -13921,7 +13922,6 @@ var LEAGUE_PRIORITY_SEED_ORDER = [
   "COPA",
   "CLUBWC",
   "INTFRIENDLY",
-  "CLUBFRIENDLY",
   "LEAGUES_CUP",
   "UWCQ",
   "INDYCAR",
@@ -14026,7 +14026,8 @@ var LEAGUE_PRIORITY_SEED_ORDER = [
   "MOTO2",
   "MOTO3",
   "NCAAMSOC",
-  "NCAAWSOC"
+  "NCAAWSOC",
+  "CLUBFRIENDLY"
 ];
 function getLeaguePrioritySeedOrder() {
   return LEAGUE_PRIORITY_SEED_ORDER;
@@ -14045,6 +14046,7 @@ function buildScoreByLeagueKey(order) {
   return new Map(order.map((key, index) => [key, order.length - index]));
 }
 var scoreByLeagueKey = buildScoreByLeagueKey(getLeaguePrioritySeedOrder2());
+var alwaysLastLeagueKeys = new Set(LEAGUE_PRIORITY_ALWAYS_LAST);
 function resolveManualEditorialLeagueImportanceScore(raw) {
   const anchor = LEAGUE_PRIORITY_MANUAL_AFTER[normalizeLeagueLabel(raw)];
   if (!anchor) return null;
@@ -14072,11 +14074,15 @@ function resolveLeagueImportanceScore(raw) {
   return scoreByLeagueKey.get(key) ?? 0;
 }
 function sortGrarfLeagueKeysByImportance(keys) {
-  return [...keys].sort((a, b) => {
+  const alwaysLast = keys.filter((key) => alwaysLastLeagueKeys.has(key));
+  const rest = keys.filter((key) => !alwaysLastLeagueKeys.has(key));
+  const sortedRest = [...rest].sort((a, b) => {
     const importanceDelta = resolveLeagueImportanceScore(b) - resolveLeagueImportanceScore(a);
     if (importanceDelta !== 0) return importanceDelta;
     return a.localeCompare(b);
   });
+  const sortedAlwaysLast = [...alwaysLast].sort((a, b) => a.localeCompare(b));
+  return [...sortedRest, ...sortedAlwaysLast];
 }
 
 // ../grarf/desktop/src/lib/leaguePriority/leaguePriorityConsumers.ts
@@ -16724,10 +16730,10 @@ function preferOperationalLeagueIdentityRow(current, candidate) {
   const candidateTourAligned = isTennisTourLeagueAligned(candidate);
   if (candidateTourAligned && !currentTourAligned) return candidate;
   if (currentTourAligned && !candidateTourAligned) return current;
-  const currentLeague = String(current.league ?? "");
+  const currentLeague2 = String(current.league ?? "");
   const candidateLeague = String(candidate.league ?? "");
-  if (candidateLeague !== currentLeague) {
-    return candidateLeague.localeCompare(currentLeague) < 0 ? candidate : current;
+  if (candidateLeague !== currentLeague2) {
+    return candidateLeague.localeCompare(currentLeague2) < 0 ? candidate : current;
   }
   return current;
 }
@@ -18399,10 +18405,6 @@ init_define_import_meta_env();
 
 // ../grarf/desktop/src/lib/fotmob/buildFotmobMatchUrl.ts
 init_define_import_meta_env();
-function buildFotmobMatchUrl(matchId) {
-  const id = String(matchId).trim();
-  return `https://www.fotmob.com/match/${encodeURIComponent(id)}`;
-}
 
 // ../grarf/desktop/src/lib/foxWorldCup/teamSlugUtils.ts
 init_define_import_meta_env();
@@ -26687,20 +26689,872 @@ init_define_import_meta_env();
 // ../grarf/desktop/src/lib/fotmob/enrichOperationalSnapshotFotmob.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/fotmob/enrichWorldCupGamesWithFotmobUrls.ts
+// ../grarf/grarf-operational-service/src/watch/fotmob/enrichOperationalSnapshotFotmob.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/fotmob/fetchFotmobWorldCupCatalog.ts
+// ../grarf/grarf-operational-service/src/config/espnOperationalLeagueConstants.generated.ts
+init_define_import_meta_env();
+var SOCCER_LEAGUE_KEYS2 = /* @__PURE__ */ new Set(["ARG1", "BEL1", "BRA1", "BUNDESLIGA", "CAF_WNATIONS", "CARABAO_CUP", "CHAMPIONSHIP", "CLUBFRIENDLY", "CLUBWC", "CONCACAF_CAC", "CONCACAF_CL", "CONCACAF_NG", "CONCACAF_WC", "COPA", "COPA_BRASIL", "COPPAITALIA", "EPL", "EREDIVISIE", "EURO", "GER_SUPER_CUP", "GOLDCUP", "INTFRIENDLY", "LALIGA", "LEAGUES_CUP", "LIBERTADORES", "LIGAMX", "LIGUE1", "MLS", "NATIONS", "NCAAMSOC", "NCAAWSOC", "NWSL", "POR1", "SAUDI", "SCOTTISH_LEAGUE_CUP", "SERIEA", "SPFL", "SUDAMERICANA", "SUPERLIG", "UCL", "UCLQ", "UECL", "UECLQ", "UEL", "UELQ", "US_OPEN_CUP", "USL1", "USLC", "USLCUP", "UWCQ", "WORLDCUP", "WWC"]);
+
+// ../grarf/grarf-operational-service/src/watch/fotmob/enrichSoccerGamesWithFotmobUrls.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/fotmob/fetchFotmobMatchesByDate.ts
+// ../grarf/grarf-operational-service/src/watch/fotmob/buildFotmobMatchUrl.ts
 init_define_import_meta_env();
-var FOTMOB_MATCHES_API = "https://www.fotmob.com/api/data/matches";
-var LOG14 = "[FotMob]";
-function isWorldCupBucket(bucket) {
+function buildFotmobMatchUrl(matchId) {
+  const id = String(matchId).trim();
+  return `https://www.fotmob.com/match/${encodeURIComponent(id)}`;
+}
+
+// ../grarf/grarf-operational-service/src/watch/fotmob/fetchFotmobSoccerCatalog.ts
+init_define_import_meta_env();
+
+// ../grarf/grarf-operational-service/src/watch/fotmob/fetchFotmobMatchesByDate.ts
+init_define_import_meta_env();
+
+// ../grarf/grarf-operational-service/src/config/operationalConfig.ts
+init_define_import_meta_env();
+
+// ../grarf/grarf-operational-service/src/config/espnOperationalLeagueRegistry.generated.ts
+init_define_import_meta_env();
+var ESPN_OPERATIONAL_INGEST_LEAGUES2 = [
+  {
+    "key": "AFL",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/australian-football/afl/scoreboard",
+    "label": "AFL",
+    "sport": "australian-football",
+    "slug": "afl",
+    "active": true
+  },
+  {
+    "key": "ARG1",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/arg.1/scoreboard",
+    "label": "Argentine Primera",
+    "sport": "soccer",
+    "slug": "arg.1",
+    "active": true
+  },
+  {
+    "key": "ATP",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/tennis/atp/scoreboard",
+    "label": "ATP Tour",
+    "sport": "tennis",
+    "slug": "atp",
+    "active": true
+  },
+  {
+    "key": "BEL1",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/bel.1/scoreboard",
+    "label": "Belgian Pro League",
+    "sport": "soccer",
+    "slug": "bel.1",
+    "active": true
+  },
+  {
+    "key": "BRA1",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/bra.1/scoreboard",
+    "label": "Brasileir\xE3o",
+    "sport": "soccer",
+    "slug": "bra.1",
+    "active": true
+  },
+  {
+    "key": "BUNDESLIGA",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/ger.1/scoreboard",
+    "label": "Bundesliga",
+    "sport": "soccer",
+    "slug": "ger.1",
+    "active": true
+  },
+  {
+    "key": "CAF_WNATIONS",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/caf.w.nations/scoreboard",
+    "label": "Women's AFCON",
+    "sport": "soccer",
+    "slug": "caf.w.nations",
+    "active": true
+  },
+  {
+    "key": "CARABAO_CUP",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/eng.league_cup/scoreboard",
+    "label": "Carabao Cup",
+    "sport": "soccer",
+    "slug": "eng.league_cup",
+    "active": true
+  },
+  {
+    "key": "CFL",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/football/cfl/scoreboard",
+    "label": "CFL",
+    "sport": "football",
+    "slug": "cfl",
+    "active": true
+  },
+  {
+    "key": "CHAMPIONS",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/golf/champions-tour/scoreboard",
+    "label": "PGA Tour Champions",
+    "sport": "golf",
+    "slug": "champions-tour",
+    "active": true
+  },
+  {
+    "key": "CHAMPIONSHIP",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/eng.2/scoreboard",
+    "label": "Championship",
+    "sport": "soccer",
+    "slug": "eng.2",
+    "active": true
+  },
+  {
+    "key": "CLUBFRIENDLY",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/club.friendly/scoreboard",
+    "label": "Club Friendly",
+    "sport": "soccer",
+    "slug": "club.friendly",
+    "active": true
+  },
+  {
+    "key": "CLUBWC",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.cwc/scoreboard",
+    "label": "Club World Cup",
+    "sport": "soccer",
+    "slug": "fifa.cwc",
+    "active": true
+  },
+  {
+    "key": "CONCACAF_CAC",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/concacaf.central.american.cup/scoreboard",
+    "label": "Central American Cup",
+    "sport": "soccer",
+    "slug": "concacaf.central.american.cup",
+    "active": true
+  },
+  {
+    "key": "CONCACAF_CL",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/concacaf.champions/scoreboard",
+    "label": "CONCACAF Champions Cup",
+    "sport": "soccer",
+    "slug": "concacaf.champions",
+    "active": true
+  },
+  {
+    "key": "CONCACAF_NG",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/concacaf.nations.league/scoreboard",
+    "label": "CONCACAF Nations League",
+    "sport": "soccer",
+    "slug": "concacaf.nations.league",
+    "active": true
+  },
+  {
+    "key": "CONCACAF_WC",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.worldq.concacaf/scoreboard",
+    "label": "CONCACAF World Cup Qual",
+    "sport": "soccer",
+    "slug": "fifa.worldq.concacaf",
+    "active": true
+  },
+  {
+    "key": "COPA",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/conmebol.america/scoreboard",
+    "label": "Copa America",
+    "sport": "soccer",
+    "slug": "conmebol.america",
+    "active": true
+  },
+  {
+    "key": "COPA_BRASIL",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/bra.copa_do_brazil/scoreboard",
+    "label": "Copa do Brasil",
+    "sport": "soccer",
+    "slug": "bra.copa_do_brazil",
+    "active": true
+  },
+  {
+    "key": "COPPAITALIA",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/ita.coppa_italia/scoreboard",
+    "label": "Coppa Italia",
+    "sport": "soccer",
+    "slug": "ita.coppa_italia",
+    "active": true
+  },
+  {
+    "key": "CRICKET_BBL",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/cricket/24136/scoreboard",
+    "label": "Big Bash League",
+    "sport": "cricket",
+    "slug": "24136",
+    "active": true
+  },
+  {
+    "key": "CRICKET_ICC",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/cricket/24597/scoreboard",
+    "label": "ICC Cricket",
+    "sport": "cricket",
+    "slug": "24597",
+    "active": true
+  },
+  {
+    "key": "DP_WORLD",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/golf/eur/scoreboard",
+    "label": "DP World Tour",
+    "sport": "golf",
+    "slug": "eur",
+    "active": true
+  },
+  {
+    "key": "EPL",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/eng.1/scoreboard",
+    "label": "Premier League",
+    "sport": "soccer",
+    "slug": "eng.1",
+    "active": true
+  },
+  {
+    "key": "EREDIVISIE",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/ned.1/scoreboard",
+    "label": "Eredivisie",
+    "sport": "soccer",
+    "slug": "ned.1",
+    "active": true
+  },
+  {
+    "key": "EURO",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/uefa.euro/scoreboard",
+    "label": "UEFA Euro",
+    "sport": "soccer",
+    "slug": "uefa.euro",
+    "active": true
+  },
+  {
+    "key": "F1",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/racing/f1/scoreboard",
+    "label": "Formula 1",
+    "sport": "racing",
+    "slug": "f1",
+    "active": true
+  },
+  {
+    "key": "GER_SUPER_CUP",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/ger.super_cup/scoreboard",
+    "label": "German Supercup",
+    "sport": "soccer",
+    "slug": "ger.super_cup",
+    "active": true
+  },
+  {
+    "key": "GOLDCUP",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/concacaf.gold/scoreboard",
+    "label": "Gold Cup",
+    "sport": "soccer",
+    "slug": "concacaf.gold",
+    "active": true
+  },
+  {
+    "key": "INDYCAR",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/racing/irl/scoreboard",
+    "label": "IndyCar Series",
+    "sport": "racing",
+    "slug": "irl",
+    "active": true
+  },
+  {
+    "key": "INTFRIENDLY",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.friendly/scoreboard",
+    "label": "International Friendlies",
+    "sport": "soccer",
+    "slug": "fifa.friendly",
+    "active": true
+  },
+  {
+    "key": "KORNFERRY",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/golf/ntw/scoreboard",
+    "label": "Korn Ferry Tour",
+    "sport": "golf",
+    "slug": "ntw",
+    "active": true
+  },
+  {
+    "key": "LALIGA",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/esp.1/scoreboard",
+    "label": "La Liga",
+    "sport": "soccer",
+    "slug": "esp.1",
+    "active": true
+  },
+  {
+    "key": "LEAGUES_CUP",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/concacaf.leagues.cup/scoreboard",
+    "label": "Leagues Cup",
+    "sport": "soccer",
+    "slug": "concacaf.leagues.cup",
+    "active": true
+  },
+  {
+    "key": "LIBERTADORES",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/conmebol.libertadores/scoreboard",
+    "label": "Copa Libertadores",
+    "sport": "soccer",
+    "slug": "conmebol.libertadores",
+    "active": true
+  },
+  {
+    "key": "LIGAMX",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/mex.1/scoreboard",
+    "label": "Liga MX",
+    "sport": "soccer",
+    "slug": "mex.1",
+    "active": true
+  },
+  {
+    "key": "LIGUE1",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/fra.1/scoreboard",
+    "label": "Ligue 1",
+    "sport": "soccer",
+    "slug": "fra.1",
+    "active": true
+  },
+  {
+    "key": "LIV",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/golf/liv/scoreboard",
+    "label": "LIV Golf",
+    "sport": "golf",
+    "slug": "liv",
+    "active": true
+  },
+  {
+    "key": "LLBWS",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/baseball/llb/scoreboard",
+    "label": "LLBWS",
+    "sport": "baseball",
+    "slug": "llb",
+    "active": true
+  },
+  {
+    "key": "LPGA",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/golf/lpga/scoreboard",
+    "label": "LPGA Tour",
+    "sport": "golf",
+    "slug": "lpga",
+    "active": true
+  },
+  {
+    "key": "MLB",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/scoreboard",
+    "label": "MLB",
+    "sport": "baseball",
+    "slug": "mlb",
+    "active": true
+  },
+  {
+    "key": "MLS",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/usa.1/scoreboard",
+    "label": "MLS",
+    "sport": "soccer",
+    "slug": "usa.1",
+    "active": true
+  },
+  {
+    "key": "MNCAAB",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/basketball/mens-college-basketball/scoreboard",
+    "label": "NCAA Men's Basketball",
+    "sport": "basketball",
+    "slug": "mens-college-basketball",
+    "active": true
+  },
+  {
+    "key": "NASCAR",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/racing/nascar-premier/scoreboard",
+    "label": "NASCAR Cup Series",
+    "sport": "racing",
+    "slug": "nascar-premier",
+    "active": true
+  },
+  {
+    "key": "NASCAR_TRUCK",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/racing/nascar-truck/scoreboard",
+    "label": "NASCAR Truck Series",
+    "sport": "racing",
+    "slug": "nascar-truck",
+    "active": true
+  },
+  {
+    "key": "NASCAR_XFINITY",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/racing/nascar-secondary/scoreboard",
+    "label": "NASCAR O'Reilly Auto Parts",
+    "sport": "racing",
+    "slug": "nascar-secondary",
+    "active": true
+  },
+  {
+    "key": "NATIONS",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/uefa.nations/scoreboard",
+    "label": "UEFA Nations League",
+    "sport": "soccer",
+    "slug": "uefa.nations",
+    "active": true
+  },
+  {
+    "key": "NBA",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard",
+    "label": "NBA",
+    "sport": "basketball",
+    "slug": "nba",
+    "active": true
+  },
+  {
+    "key": "NBA2K",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/basketball/nba-development/scoreboard",
+    "label": "NBA G League",
+    "sport": "basketball",
+    "slug": "nba-development",
+    "active": true
+  },
+  {
+    "key": "NBASUMMER",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/basketball/nba-summer/scoreboard",
+    "label": "NBA Summer League",
+    "sport": "basketball",
+    "slug": "nba-summer",
+    "active": true
+  },
+  {
+    "key": "NCAABB",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/baseball/college-baseball/scoreboard",
+    "label": "NCAA Baseball",
+    "sport": "baseball",
+    "slug": "college-baseball",
+    "active": true
+  },
+  {
+    "key": "NCAAF",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/football/college-football/scoreboard",
+    "label": "College Football",
+    "sport": "football",
+    "slug": "college-football",
+    "active": true
+  },
+  {
+    "key": "NCAAFH",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/field-hockey/womens-college-field-hockey/scoreboard",
+    "label": "NCAA Field Hockey",
+    "sport": "field-hockey",
+    "slug": "womens-college-field-hockey",
+    "active": true
+  },
+  {
+    "key": "NCAALAX",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/lacrosse/mens-college-lacrosse/scoreboard",
+    "label": "NCAA Lacrosse",
+    "sport": "lacrosse",
+    "slug": "mens-college-lacrosse",
+    "active": true
+  },
+  {
+    "key": "NCAAMSOC",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/usa.ncaa.m.1/scoreboard",
+    "label": "NCAA Men's Soccer",
+    "sport": "soccer",
+    "slug": "usa.ncaa.m.1",
+    "active": true
+  },
+  {
+    "key": "NCAAVB",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/volleyball/womens-college-volleyball/scoreboard",
+    "label": "NCAA Women's Volleyball",
+    "sport": "volleyball",
+    "slug": "womens-college-volleyball",
+    "active": true
+  },
+  {
+    "key": "NCAAVB_M",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/volleyball/mens-college-volleyball/scoreboard",
+    "label": "NCAA Men's Volleyball",
+    "sport": "volleyball",
+    "slug": "mens-college-volleyball",
+    "active": true
+  },
+  {
+    "key": "NCAAWP",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/water-polo/mens-college-water-polo/scoreboard",
+    "label": "NCAA Water Polo",
+    "sport": "water-polo",
+    "slug": "mens-college-water-polo",
+    "active": true
+  },
+  {
+    "key": "NCAAWSOC",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/usa.ncaa.w.1/scoreboard",
+    "label": "NCAA Women's Soccer",
+    "sport": "soccer",
+    "slug": "usa.ncaa.w.1",
+    "active": true
+  },
+  {
+    "key": "NFL",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard",
+    "label": "NFL",
+    "sport": "football",
+    "slug": "nfl",
+    "active": true
+  },
+  {
+    "key": "NHL",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/hockey/nhl/scoreboard",
+    "label": "NHL",
+    "sport": "hockey",
+    "slug": "nhl",
+    "active": true
+  },
+  {
+    "key": "NWSL",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/usa.nwsl/scoreboard",
+    "label": "NWSL",
+    "sport": "soccer",
+    "slug": "usa.nwsl",
+    "active": true
+  },
+  {
+    "key": "PGA",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/golf/pga/scoreboard",
+    "label": "PGA Tour",
+    "sport": "golf",
+    "slug": "pga",
+    "active": true
+  },
+  {
+    "key": "PLL",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/lacrosse/pll/scoreboard",
+    "label": "Premier Lacrosse League",
+    "sport": "lacrosse",
+    "slug": "pll",
+    "active": true
+  },
+  {
+    "key": "POR1",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/por.1/scoreboard",
+    "label": "Primeira Liga",
+    "sport": "soccer",
+    "slug": "por.1",
+    "active": true
+  },
+  {
+    "key": "RUGBYPREM",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/rugby/267979/scoreboard",
+    "label": "Gallagher Premiership",
+    "sport": "rugby",
+    "slug": "267979",
+    "active": true
+  },
+  {
+    "key": "RUGBYTOP14",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/rugby/270559/scoreboard",
+    "label": "French Top 14",
+    "sport": "rugby",
+    "slug": "270559",
+    "active": true
+  },
+  {
+    "key": "RUGBYULSTER",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/rugby/270557/scoreboard",
+    "label": "United Rugby Championship",
+    "sport": "rugby",
+    "slug": "270557",
+    "active": true
+  },
+  {
+    "key": "RUGBYWC",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/rugby/164205/scoreboard",
+    "label": "Rugby World Cup",
+    "sport": "rugby",
+    "slug": "164205",
+    "active": true
+  },
+  {
+    "key": "SAUDI",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/ksa.1/scoreboard",
+    "label": "Saudi Pro League",
+    "sport": "soccer",
+    "slug": "ksa.1",
+    "active": true
+  },
+  {
+    "key": "SCOTTISH_LEAGUE_CUP",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/sco.cis/scoreboard",
+    "label": "Scottish League Cup",
+    "sport": "soccer",
+    "slug": "sco.cis",
+    "active": true
+  },
+  {
+    "key": "SERIEA",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/ita.1/scoreboard",
+    "label": "Serie A",
+    "sport": "soccer",
+    "slug": "ita.1",
+    "active": true
+  },
+  {
+    "key": "SPFL",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/sco.1/scoreboard",
+    "label": "Scottish Premiership",
+    "sport": "soccer",
+    "slug": "sco.1",
+    "active": true
+  },
+  {
+    "key": "SUDAMERICANA",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/conmebol.sudamericana/scoreboard",
+    "label": "Copa Sudamericana",
+    "sport": "soccer",
+    "slug": "conmebol.sudamericana",
+    "active": true
+  },
+  {
+    "key": "SUPERLIG",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/tur.1/scoreboard",
+    "label": "Turkish Super Lig",
+    "sport": "soccer",
+    "slug": "tur.1",
+    "active": true
+  },
+  {
+    "key": "UCL",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/uefa.champions/scoreboard",
+    "label": "Champions League",
+    "sport": "soccer",
+    "slug": "uefa.champions",
+    "active": true
+  },
+  {
+    "key": "UCLQ",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/uefa.champions_qual/scoreboard",
+    "label": "UEFA Champions League Qualifying",
+    "sport": "soccer",
+    "slug": "uefa.champions_qual",
+    "active": true
+  },
+  {
+    "key": "UECL",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/uefa.europa.conf/scoreboard",
+    "label": "UEFA Conference League",
+    "sport": "soccer",
+    "slug": "uefa.europa.conf",
+    "active": true
+  },
+  {
+    "key": "UECLQ",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/uefa.europa.conf_qual/scoreboard",
+    "label": "UEFA Conference League Qualifying",
+    "sport": "soccer",
+    "slug": "uefa.europa.conf_qual",
+    "active": true
+  },
+  {
+    "key": "UEL",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/uefa.europa/scoreboard",
+    "label": "Europa League",
+    "sport": "soccer",
+    "slug": "uefa.europa",
+    "active": true
+  },
+  {
+    "key": "UELQ",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/uefa.europa_qual/scoreboard",
+    "label": "UEFA Europa League Qualifying",
+    "sport": "soccer",
+    "slug": "uefa.europa_qual",
+    "active": true
+  },
+  {
+    "key": "UFC",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/mma/ufc/scoreboard",
+    "label": "UFC",
+    "sport": "mma",
+    "slug": "ufc",
+    "active": true
+  },
+  {
+    "key": "US_OPEN_CUP",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/usa.open/scoreboard",
+    "label": "U.S. Open Cup",
+    "sport": "soccer",
+    "slug": "usa.open",
+    "active": true
+  },
+  {
+    "key": "USL1",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/usa.usl.l1/scoreboard",
+    "label": "USL League One",
+    "sport": "soccer",
+    "slug": "usa.usl.l1",
+    "active": true
+  },
+  {
+    "key": "USLC",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/usa.usl.1/scoreboard",
+    "label": "USL Championship",
+    "sport": "soccer",
+    "slug": "usa.usl.1",
+    "active": true
+  },
+  {
+    "key": "USLCUP",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/usa.usl.l1.cup/scoreboard",
+    "label": "USL Championship Cup",
+    "sport": "soccer",
+    "slug": "usa.usl.l1.cup",
+    "active": true
+  },
+  {
+    "key": "UWCQ",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/uefa.euroq/scoreboard",
+    "label": "UEFA Euro Qualifying",
+    "sport": "soccer",
+    "slug": "uefa.euroq",
+    "active": true
+  },
+  {
+    "key": "WNBA",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/basketball/wnba/scoreboard",
+    "label": "WNBA",
+    "sport": "basketball",
+    "slug": "wnba",
+    "active": true
+  },
+  {
+    "key": "WNCAAB",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/basketball/womens-college-basketball/scoreboard",
+    "label": "NCAA Women's Basketball",
+    "sport": "basketball",
+    "slug": "womens-college-basketball",
+    "active": true
+  },
+  {
+    "key": "WORLDCUP",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard",
+    "label": "FIFA World Cup",
+    "sport": "soccer",
+    "slug": "fifa.world",
+    "active": true
+  },
+  {
+    "key": "WTA",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/tennis/wta/scoreboard",
+    "label": "WTA Tour",
+    "sport": "tennis",
+    "slug": "wta",
+    "active": true
+  },
+  {
+    "key": "WWC",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.wwc/scoreboard",
+    "label": "Women's World Cup",
+    "sport": "soccer",
+    "slug": "fifa.wwc",
+    "active": true
+  },
+  {
+    "key": "XFL",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/football/ufl/scoreboard",
+    "label": "United Football League",
+    "sport": "football",
+    "slug": "ufl",
+    "active": true
+  }
+];
+var ESPN_OPERATIONAL_INGEST_LEAGUE_KEYS2 = ESPN_OPERATIONAL_INGEST_LEAGUES2.map((l) => l.key);
+
+// ../grarf/grarf-operational-service/src/config/operationalConfig.ts
+var ESPN_LEAGUES = ESPN_OPERATIONAL_INGEST_LEAGUES2.map((l) => ({
+  key: l.key,
+  endpoint: l.endpoint,
+  label: l.label,
+  active: isEspnOperationalIngestLeagueDisabled(l.key) ? false : l.active
+}));
+var ESPN_LEAGUE_KEYS = ESPN_LEAGUES.map((l) => l.key);
+var CHROME_UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36";
+
+// ../grarf/grarf-operational-service/src/instrumentation/operationalSubrequestTrace.ts
+init_define_import_meta_env();
+var traceEnabled = false;
+var cycleActive = false;
+var currentLeague = null;
+var currentStage = "other";
+var currentFunctionName = "unknown";
+var subrequestRecords = [];
+function normalizeUrlForDedup(url) {
+  try {
+    const parsed = new URL(url);
+    const params = [...parsed.searchParams.entries()].sort(([a], [b]) => a.localeCompare(b));
+    const search = params.length ? `?${params.map(([k, v]) => `${k}=${v}`).join("&")}` : "";
+    return `${parsed.origin}${parsed.pathname}${search}`;
+  } catch {
+    return url;
+  }
+}
+function recordSubrequest(record) {
+  if (!traceEnabled || !cycleActive) return;
+  subrequestRecords.push(record);
+}
+async function traceOperationalFetch(url, init, meta) {
+  if (!traceEnabled || !cycleActive) {
+    return fetch(url, init);
+  }
+  const stage = meta?.stage ?? currentStage;
+  const league2 = meta?.league ?? currentLeague;
+  const functionName = meta?.functionName ?? currentFunctionName;
+  const startedAtMs = Date.now();
+  try {
+    const res = await fetch(url, init);
+    recordSubrequest({
+      url,
+      normalizedUrl: normalizeUrlForDedup(url),
+      stage,
+      league: league2,
+      functionName,
+      durationMs: Date.now() - startedAtMs,
+      ok: res.ok,
+      error: res.ok ? null : `HTTP ${res.status}`
+    });
+    return res;
+  } catch (e) {
+    recordSubrequest({
+      url,
+      normalizedUrl: normalizeUrlForDedup(url),
+      stage,
+      league: league2,
+      functionName,
+      durationMs: Date.now() - startedAtMs,
+      ok: false,
+      error: e instanceof Error ? e.message : String(e)
+    });
+    throw e;
+  }
+}
+
+// ../grarf/grarf-operational-service/src/watch/fotmob/fotmobBucketMatching.ts
+init_define_import_meta_env();
+function isWorldCupFotmobBucket(bucket) {
   if (bucket.parentLeagueName === "World Cup") return true;
   return /^world cup/i.test(bucket.name ?? "");
 }
+function fotmobBucketMatchesRegistryEntry(bucket, entry2) {
+  if (entry2.useWorldCupBucketMatcher) {
+    return isWorldCupFotmobBucket(bucket);
+  }
+  const ids = entry2.fotmobPrimaryLeagueIds;
+  if (!ids?.length) return false;
+  const bucketIds = [bucket.primaryId, bucket.parentLeagueId, bucket.id].filter(
+    (value) => typeof value === "number"
+  );
+  if (!ids.some((id) => bucketIds.includes(id))) return false;
+  if (entry2.fotmobCountryCode && bucket.ccode !== entry2.fotmobCountryCode) return false;
+  return true;
+}
+
+// ../grarf/grarf-operational-service/src/watch/fotmob/fetchFotmobMatchesByDate.ts
+var FOTMOB_MATCHES_API = "https://www.fotmob.com/api/data/matches";
 function fotmobDateKeyFromMs(ms) {
   if (!Number.isFinite(ms)) return null;
   const d = new Date(ms);
@@ -26714,36 +27568,77 @@ function fotmobDateKeyFromScheduledDateKey(key) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) return null;
   return trimmed.replace(/-/g, "");
 }
-async function fetchFotmobWorldCupMatchesByDate(dateKey) {
+async function fetchFotmobLeagueBucketsByDate(dateKey) {
   const normalized = dateKey.trim();
   if (!/^\d{8}$/.test(normalized)) return [];
   try {
-    const res = await fetch(`${FOTMOB_MATCHES_API}?date=${encodeURIComponent(normalized)}`, {
-      headers: { Accept: "application/json" },
-      cache: "no-store"
-    });
+    const res = await traceOperationalFetch(
+      `${FOTMOB_MATCHES_API}?date=${encodeURIComponent(normalized)}`,
+      {
+        headers: {
+          "User-Agent": CHROME_UA,
+          Accept: "application/json",
+          Referer: "https://www.fotmob.com/"
+        },
+        signal: AbortSignal.timeout(12e3)
+      },
+      { functionName: "fetchFotmobLeagueBucketsByDate", stage: "other" }
+    );
     if (!res.ok) return [];
     const payload = await res.json();
-    const leagues = payload.leagues ?? [];
-    const matches = [];
-    for (const bucket of leagues) {
-      if (!isWorldCupBucket(bucket)) continue;
-      for (const match of bucket.matches ?? []) {
-        if (typeof match?.id === "number" && match.home?.name && match.away?.name) {
-          matches.push(match);
-        }
-      }
-    }
-    return matches;
-  } catch (error) {
-    if (define_import_meta_env_default.DEV) {
-      console.warn(`${LOG14} matches fetch failed for ${normalized}`, error);
-    }
+    return payload.leagues ?? [];
+  } catch {
     return [];
   }
 }
 
-// ../grarf/desktop/src/lib/fotmob/fetchFotmobWorldCupCatalog.ts
+// ../grarf/grarf-operational-service/src/watch/fotmob/fotmobLeagueRegistry.ts
+init_define_import_meta_env();
+var FOTMOB_SOCCER_LEAGUE_REGISTRY = {
+  ARG1: { fotmobPrimaryLeagueIds: [112], fotmobCountryCode: "ARG" },
+  BEL1: { fotmobPrimaryLeagueIds: [40], fotmobCountryCode: "BEL" },
+  BRA1: { fotmobPrimaryLeagueIds: [268], fotmobCountryCode: "BRA" },
+  BUNDESLIGA: { fotmobPrimaryLeagueIds: [54], fotmobCountryCode: "GER" },
+  CARABAO_CUP: { fotmobPrimaryLeagueIds: [133], fotmobCountryCode: "ENG" },
+  CLUBWC: { fotmobPrimaryLeagueIds: [78] },
+  CLUBFRIENDLY: { fotmobPrimaryLeagueIds: [489] },
+  CONCACAF_CL: { fotmobPrimaryLeagueIds: [297] },
+  CONCACAF_NG: { fotmobPrimaryLeagueIds: [9821] },
+  CONCACAF_WC: { fotmobPrimaryLeagueIds: [10198] },
+  COPA: { fotmobPrimaryLeagueIds: [44] },
+  EPL: { fotmobPrimaryLeagueIds: [47], fotmobCountryCode: "ENG" },
+  EREDIVISIE: { fotmobPrimaryLeagueIds: [57], fotmobCountryCode: "NED" },
+  EURO: { fotmobPrimaryLeagueIds: [50] },
+  GOLDCUP: { fotmobPrimaryLeagueIds: [298] },
+  INTFRIENDLY: { fotmobPrimaryLeagueIds: [114] },
+  LALIGA: { fotmobPrimaryLeagueIds: [87], fotmobCountryCode: "ESP" },
+  LIBERTADORES: { fotmobPrimaryLeagueIds: [45] },
+  LIGAMX: { fotmobPrimaryLeagueIds: [230], fotmobCountryCode: "MEX" },
+  LIGUE1: { fotmobPrimaryLeagueIds: [53], fotmobCountryCode: "FRA" },
+  MLS: { fotmobPrimaryLeagueIds: [130], fotmobCountryCode: "USA" },
+  NATIONS: { fotmobPrimaryLeagueIds: [9806, 9807, 9808, 9809] },
+  NWSL: { fotmobPrimaryLeagueIds: [9134], fotmobCountryCode: "USA" },
+  POR1: { fotmobPrimaryLeagueIds: [61], fotmobCountryCode: "POR" },
+  SAUDI: { fotmobPrimaryLeagueIds: [536], fotmobCountryCode: "KSA" },
+  SERIEA: { fotmobPrimaryLeagueIds: [55], fotmobCountryCode: "ITA" },
+  SPFL: { fotmobPrimaryLeagueIds: [64], fotmobCountryCode: "SCO" },
+  SUDAMERICANA: { fotmobPrimaryLeagueIds: [299] },
+  SUPERLIG: { fotmobPrimaryLeagueIds: [71], fotmobCountryCode: "TUR" },
+  UCL: { fotmobPrimaryLeagueIds: [42] },
+  UECL: { fotmobPrimaryLeagueIds: [10216] },
+  UEL: { fotmobPrimaryLeagueIds: [73] },
+  USL1: { fotmobPrimaryLeagueIds: [9296], fotmobCountryCode: "USA" },
+  USLC: { fotmobPrimaryLeagueIds: [8972], fotmobCountryCode: "USA" },
+  USLCUP: { fotmobPrimaryLeagueIds: [10654], fotmobCountryCode: "USA" },
+  UWCQ: { fotmobPrimaryLeagueIds: [10198] },
+  WORLDCUP: { useWorldCupBucketMatcher: true },
+  WWC: { fotmobPrimaryLeagueIds: [76] }
+};
+function getFotmobLeagueRegistryEntry(leagueKey) {
+  return FOTMOB_SOCCER_LEAGUE_REGISTRY[leagueKey] ?? null;
+}
+
+// ../grarf/grarf-operational-service/src/watch/fotmob/fetchFotmobSoccerCatalog.ts
 function dateKeysForGame(game) {
   const keys = /* @__PURE__ */ new Set();
   const fromMs = game.startTimeMs != null ? fotmobDateKeyFromMs(game.startTimeMs) : null;
@@ -26759,10 +27654,25 @@ function dateKeysForGame(game) {
   }
   return [...keys];
 }
-async function fetchFotmobWorldCupCatalog(games) {
+function extractMatchesForLeague(buckets, leagueKey) {
+  const entry2 = getFotmobLeagueRegistryEntry(leagueKey);
+  if (!entry2) return [];
+  const byId = /* @__PURE__ */ new Map();
+  for (const bucket of buckets) {
+    if (!fotmobBucketMatchesRegistryEntry(bucket, entry2)) continue;
+    for (const match of bucket.matches ?? []) {
+      if (typeof match?.id === "number" && match.home?.name && match.away?.name) {
+        byId.set(match.id, match);
+      }
+    }
+  }
+  return [...byId.values()];
+}
+async function fetchFotmobSoccerCatalogForLeague(games, leagueKey) {
+  if (!getFotmobLeagueRegistryEntry(leagueKey)) return [];
   const dateKeys = /* @__PURE__ */ new Set();
   for (const game of games) {
-    if (game.league !== "WORLDCUP") continue;
+    if (game.league !== leagueKey) continue;
     for (const key of dateKeysForGame(game)) {
       dateKeys.add(key);
     }
@@ -26771,40 +27681,289 @@ async function fetchFotmobWorldCupCatalog(games) {
   const byId = /* @__PURE__ */ new Map();
   await Promise.all(
     [...dateKeys].map(async (dateKey) => {
-      const matches = await fetchFotmobWorldCupMatchesByDate(dateKey);
-      for (const match of matches) {
+      const buckets = await fetchFotmobLeagueBucketsByDate(dateKey);
+      for (const match of extractMatchesForLeague(buckets, leagueKey)) {
         byId.set(match.id, match);
       }
     })
   );
   return [...byId.values()];
 }
+async function fetchFotmobSoccerCatalogsByLeague(games) {
+  const gamesByLeague = /* @__PURE__ */ new Map();
+  for (const game of games) {
+    const league2 = game.league;
+    if (!league2 || !getFotmobLeagueRegistryEntry(league2)) continue;
+    const rows = gamesByLeague.get(league2) ?? [];
+    rows.push(game);
+    gamesByLeague.set(league2, rows);
+  }
+  const catalogs = {};
+  await Promise.all(
+    [...gamesByLeague.entries()].map(async ([leagueKey, leagueGames]) => {
+      catalogs[leagueKey] = await fetchFotmobSoccerCatalogForLeague(leagueGames, leagueKey);
+    })
+  );
+  return catalogs;
+}
 
-// ../grarf/desktop/src/lib/fotmob/matchFotmobWorldCupMatch.ts
+// ../grarf/grarf-operational-service/src/watch/fotmob/matchFotmobSoccerMatch.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/tennisChannelPlus/nameUtils.ts
+// ../grarf/grarf-operational-service/src/soccer/teamNormalization/index.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/fotmob/matchFotmobWorldCupMatch.ts
+// ../grarf/shared/domain/soccer/teamNormalization/index.ts
+init_define_import_meta_env();
+
+// ../grarf/shared/domain/soccer/teamNormalization/createProviderAliasNormalizer.ts
+init_define_import_meta_env();
+function createProviderAliasNormalizer(aliases) {
+  return (provider, teamName) => {
+    const trimmed = teamName.trim();
+    if (!trimmed) return "";
+    const table = aliases[provider];
+    if (!table) return trimmed;
+    return table[trimmed] ?? trimmed;
+  };
+}
+
+// ../grarf/shared/domain/soccer/teamNormalization/normalizeSoccerTeamName.ts
+init_define_import_meta_env();
+
+// ../grarf/shared/domain/soccer/teamNormalization/registry.ts
+init_define_import_meta_env();
+
+// ../grarf/shared/domain/soccer/teamNormalization/leagues/bra1.ts
+init_define_import_meta_env();
+var normalizeBra1SoccerTeamName = createProviderAliasNormalizer({
+  espn: {
+    Palmeiras: "Palmeiras",
+    Flamengo: "Flamengo",
+    Fluminense: "Fluminense",
+    "Athletico Paranaense": "Athletico Paranaense",
+    "Red Bull Bragantino": "Red Bull Bragantino",
+    Bahia: "Bahia",
+    Coritiba: "Coritiba",
+    "S\xE3o Paulo": "S\xE3o Paulo",
+    "Atl\xE9tico-MG": "Atl\xE9tico Mineiro",
+    Corinthians: "Corinthians",
+    Cruzeiro: "Cruzeiro",
+    Botafogo: "Botafogo",
+    Vit\u00F3ria: "Vit\xF3ria",
+    Internacional: "Internacional",
+    Santos: "Santos",
+    Gr\u00EAmio: "Gr\xEAmio",
+    "Vasco da Gama": "Vasco da Gama",
+    Remo: "Remo",
+    Mirassol: "Mirassol",
+    Chapecoense: "Chapecoense"
+  },
+  fotmob: {
+    Palmeiras: "Palmeiras",
+    Flamengo: "Flamengo",
+    Fluminense: "Fluminense",
+    "Athletico Paranaense": "Athletico Paranaense",
+    "Red Bull Bragantino": "Red Bull Bragantino",
+    Bahia: "Bahia",
+    Coritiba: "Coritiba",
+    "Sao Paulo": "S\xE3o Paulo",
+    "Atletico MG": "Atl\xE9tico Mineiro",
+    Corinthians: "Corinthians",
+    Cruzeiro: "Cruzeiro",
+    "Botafogo RJ": "Botafogo",
+    Vitoria: "Vit\xF3ria",
+    Internacional: "Internacional",
+    "Santos FC": "Santos",
+    Gremio: "Gr\xEAmio",
+    "Vasco da Gama": "Vasco da Gama",
+    Remo: "Remo",
+    Mirassol: "Mirassol",
+    "Chapecoense AF": "Chapecoense"
+  }
+});
+
+// ../grarf/shared/domain/soccer/teamNormalization/leagues/mls.ts
+init_define_import_meta_env();
+var normalizeMlsSoccerTeamName = createProviderAliasNormalizer({
+  espn: {
+    "Nashville SC": "Nashville SC",
+    "Inter Miami CF": "Inter Miami CF",
+    "Chicago Fire FC": "Chicago Fire FC",
+    "New England Revolution": "New England Revolution",
+    "Red Bull New York": "Red Bull New York",
+    "Charlotte FC": "Charlotte FC",
+    "FC Cincinnati": "FC Cincinnati",
+    "New York City FC": "New York City FC",
+    "D.C. United": "D.C. United",
+    "Columbus Crew": "Columbus Crew",
+    "CF Montr\xE9al": "CF Montr\xE9al",
+    "Orlando City SC": "Orlando City SC",
+    "Toronto FC": "Toronto FC",
+    "Atlanta United FC": "Atlanta United FC",
+    "Philadelphia Union": "Philadelphia Union",
+    "Vancouver Whitecaps": "Vancouver Whitecaps",
+    "San Jose Earthquakes": "San Jose Earthquakes",
+    "Real Salt Lake": "Real Salt Lake",
+    "FC Dallas": "FC Dallas",
+    LAFC: "Los Angeles FC",
+    "Seattle Sounders FC": "Seattle Sounders FC",
+    "Houston Dynamo FC": "Houston Dynamo FC",
+    "Minnesota United FC": "Minnesota United FC",
+    "LA Galaxy": "LA Galaxy",
+    "San Diego FC": "San Diego FC",
+    "Colorado Rapids": "Colorado Rapids",
+    "St. Louis CITY SC": "St. Louis CITY SC",
+    "Portland Timbers": "Portland Timbers",
+    "Austin FC": "Austin FC",
+    "Sporting Kansas City": "Sporting Kansas City",
+    // ESPN scoreboard `shortDisplayName` labels (used before `displayName` in operational rows).
+    Atlanta: "Atlanta United FC",
+    Austin: "Austin FC",
+    Charlotte: "Charlotte FC",
+    Chicago: "Chicago Fire FC",
+    Cincinnati: "FC Cincinnati",
+    Colorado: "Colorado Rapids",
+    Columbus: "Columbus Crew",
+    Dallas: "FC Dallas",
+    Houston: "Houston Dynamo FC",
+    Miami: "Inter Miami CF",
+    Minnesota: "Minnesota United FC",
+    Nashville: "Nashville SC",
+    "New England": "New England Revolution",
+    NYCFC: "New York City FC",
+    Orlando: "Orlando City SC",
+    Philadelphia: "Philadelphia Union",
+    Portland: "Portland Timbers",
+    "Salt Lake": "Real Salt Lake",
+    "Red Bull NY": "Red Bull New York",
+    "San Diego": "San Diego FC",
+    "San Jose": "San Jose Earthquakes",
+    Seattle: "Seattle Sounders FC",
+    "Kansas City": "Sporting Kansas City",
+    "St. Louis": "St. Louis CITY SC",
+    Toronto: "Toronto FC",
+    Vancouver: "Vancouver Whitecaps"
+  },
+  fotmob: {
+    "Nashville SC": "Nashville SC",
+    "Inter Miami CF": "Inter Miami CF",
+    "Chicago Fire FC": "Chicago Fire FC",
+    "New England Revolution": "New England Revolution",
+    "Red Bull New York": "Red Bull New York",
+    "Charlotte FC": "Charlotte FC",
+    "FC Cincinnati": "FC Cincinnati",
+    "New York City FC": "New York City FC",
+    "DC United": "D.C. United",
+    "Columbus Crew": "Columbus Crew",
+    "CF Montreal": "CF Montr\xE9al",
+    "Orlando City": "Orlando City SC",
+    "Toronto FC": "Toronto FC",
+    "Atlanta United": "Atlanta United FC",
+    "Philadelphia Union": "Philadelphia Union",
+    "Vancouver Whitecaps": "Vancouver Whitecaps",
+    "San Jose Earthquakes": "San Jose Earthquakes",
+    "Real Salt Lake": "Real Salt Lake",
+    "FC Dallas": "FC Dallas",
+    "Los Angeles FC": "Los Angeles FC",
+    "Seattle Sounders FC": "Seattle Sounders FC",
+    "Houston Dynamo FC": "Houston Dynamo FC",
+    "Minnesota United": "Minnesota United FC",
+    "LA Galaxy": "LA Galaxy",
+    "San Diego FC": "San Diego FC",
+    "Colorado Rapids": "Colorado Rapids",
+    "St. Louis City": "St. Louis CITY SC",
+    "Portland Timbers": "Portland Timbers",
+    "Austin FC": "Austin FC",
+    "Sporting Kansas City": "Sporting Kansas City",
+    // FotMob daily feed `name` labels (short forms; pair with ESPN aliases above).
+    Atlanta: "Atlanta United FC",
+    Austin: "Austin FC",
+    Charlotte: "Charlotte FC",
+    Chicago: "Chicago Fire FC",
+    Cincinnati: "FC Cincinnati",
+    Colorado: "Colorado Rapids",
+    Columbus: "Columbus Crew",
+    Dallas: "FC Dallas",
+    Houston: "Houston Dynamo FC",
+    Miami: "Inter Miami CF",
+    Minnesota: "Minnesota United FC",
+    Nashville: "Nashville SC",
+    "New England": "New England Revolution",
+    NYCFC: "New York City FC",
+    Orlando: "Orlando City SC",
+    Philadelphia: "Philadelphia Union",
+    Portland: "Portland Timbers",
+    "Salt Lake": "Real Salt Lake",
+    "Red Bull NY": "Red Bull New York",
+    "San Diego": "San Diego FC",
+    "San Jose": "San Jose Earthquakes",
+    Seattle: "Seattle Sounders FC",
+    "Seattle Sounders": "Seattle Sounders FC",
+    "Sporting KC": "Sporting Kansas City",
+    Toronto: "Toronto FC",
+    Vancouver: "Vancouver Whitecaps",
+    Montreal: "CF Montr\xE9al",
+    LAFC: "Los Angeles FC"
+  }
+});
+
+// ../grarf/shared/domain/soccer/teamNormalization/registry.ts
+var SOCCER_TEAM_NORMALIZATION_REGISTRY = {
+  BRA1: normalizeBra1SoccerTeamName,
+  MLS: normalizeMlsSoccerTeamName
+};
+function getSoccerTeamNameNormalizer(league2) {
+  return SOCCER_TEAM_NORMALIZATION_REGISTRY[league2] ?? null;
+}
+
+// ../grarf/shared/domain/soccer/teamNormalization/normalizeSoccerTeamName.ts
+function normalizeSoccerTeamName(input) {
+  const trimmed = input.teamName.trim();
+  if (!trimmed) return "";
+  const normalizer = getSoccerTeamNameNormalizer(input.league);
+  if (!normalizer) return trimmed;
+  return normalizer(input.provider, input.teamName);
+}
+
+// ../grarf/grarf-operational-service/src/watch/tennisChannelPlus/nameUtils.ts
+init_define_import_meta_env();
+
+// ../grarf/grarf-operational-service/src/watch/fotmob/matchFotmobSoccerMatch.ts
 var MIN_TEAM_SCORE = 0.55;
 var MIN_TOTAL_SCORE = 0.62;
 var MAX_KICKOFF_DELTA_MS = 18 * 60 * 60 * 1e3;
-function isWorldCupGame(game) {
-  return game.league === "WORLDCUP";
-}
 function kickoffScore(game, match) {
-  const gameMs = game.startTimeMs;
+  const gameMs = game.startTimeMs ?? NaN;
   const matchMs = Date.parse(match.status?.utcTime ?? "");
   if (!Number.isFinite(gameMs) || !Number.isFinite(matchMs)) return 1;
   const delta = Math.abs(gameMs - matchMs);
   if (delta > MAX_KICKOFF_DELTA_MS) return 0;
   return 1 - Math.min(delta / (6 * 60 * 60 * 1e3), 1) * 0.25;
 }
+function normalizedSoccerTeamTokenSet(league2, provider, teamName) {
+  const raw = teamName.trim();
+  if (!raw) return /* @__PURE__ */ new Set();
+  const canonical = league2 != null ? normalizeSoccerTeamName({ provider, league: league2, teamName: raw }) : raw;
+  return tokenSetFromLabel(canonical);
+}
+function espnSoccerTeamLabelForMatch(game, side) {
+  if (side === "away") {
+    return game.metadata?.officialAwayName?.trim() || game.awayCity?.trim() || game.awayTeam?.trim() || "";
+  }
+  return game.metadata?.officialHomeName?.trim() || game.homeCity?.trim() || game.homeTeam?.trim() || "";
+}
+function gameTeamTokenSetsForSoccerMatch(game) {
+  const league2 = game.league;
+  const away = normalizedSoccerTeamTokenSet(league2, "espn", espnSoccerTeamLabelForMatch(game, "away"));
+  const home = normalizedSoccerTeamTokenSet(league2, "espn", espnSoccerTeamLabelForMatch(game, "home"));
+  return [away, home];
+}
 function teamScore(game, match) {
-  const [gameAway, gameHome] = gameTeamTokenSets(game);
-  const matchAway = tokenSetFromLabel(match.away.name);
-  const matchHome = tokenSetFromLabel(match.home.name);
+  const [gameAway, gameHome] = gameTeamTokenSetsForSoccerMatch(game);
+  const league2 = game.league;
+  const matchAway = normalizedSoccerTeamTokenSet(league2, "fotmob", match.away.name);
+  const matchHome = normalizedSoccerTeamTokenSet(league2, "fotmob", match.home.name);
   const direct = tokenOverlapScore(gameAway, matchAway) + tokenOverlapScore(gameHome, matchHome);
   const swapped = tokenOverlapScore(gameAway, matchHome) + tokenOverlapScore(gameHome, matchAway);
   return Math.max(direct, swapped) / 2;
@@ -26816,8 +27975,7 @@ function scoreFotmobMatch(game, match) {
   if (kickoff <= 0) return 0;
   return teams * kickoff;
 }
-function matchFotmobWorldCupMatch(game, catalog) {
-  if (!isWorldCupGame(game)) return null;
+function matchFotmobSoccerMatch(game, catalog) {
   if (catalog.length === 0) return null;
   let best = null;
   let bestScore = 0;
@@ -26832,62 +27990,73 @@ function matchFotmobWorldCupMatch(game, catalog) {
   return best;
 }
 
-// ../grarf/desktop/src/lib/fotmob/enrichWorldCupGamesWithFotmobUrls.ts
-var LOG15 = "[FotMob]";
-function isWorldCupRow(game) {
-  return game.league === "WORLDCUP";
+// ../grarf/grarf-operational-service/src/watch/fotmob/enrichSoccerGamesWithFotmobUrls.ts
+function isSoccerRow(game) {
+  return Boolean(game.league && SOCCER_LEAGUE_KEYS2.has(game.league));
 }
-async function enrichWorldCupGamesWithFotmobUrls(games) {
-  const worldCupRows = games.filter(isWorldCupRow);
-  if (worldCupRows.length === 0) return games;
-  let catalog;
-  try {
-    catalog = await fetchFotmobWorldCupCatalog(worldCupRows);
-  } catch (error) {
-    if (define_import_meta_env_default.DEV) {
-      console.warn(`${LOG15} catalog fetch failed`, error);
+function hasFotmobRoutingMetadata(game) {
+  if (game.metadata?.fotmobMatchUrl?.trim()) return true;
+  return Boolean(game.externalIds?.fotmob?.trim());
+}
+function attachFotmobMatch(game, matchId) {
+  return {
+    ...game,
+    externalIds: {
+      ...game.externalIds,
+      fotmob: matchId
+    },
+    metadata: {
+      ...game.metadata,
+      fotmobMatchUrl: buildFotmobMatchUrl(matchId)
     }
+  };
+}
+async function enrichSoccerGamesWithFotmobUrls(games) {
+  const pending = games.filter(
+    (game) => isSoccerRow(game) && getFotmobLeagueRegistryEntry(game.league) && !hasFotmobRoutingMetadata(game)
+  );
+  if (pending.length === 0) return games;
+  let catalogs;
+  try {
+    catalogs = await fetchFotmobSoccerCatalogsByLeague(pending);
+  } catch {
     return games;
   }
-  if (catalog.length === 0) return games;
-  let matched = 0;
-  const out = games.map((game) => {
-    if (!isWorldCupRow(game)) return game;
-    const fotmobMatch = matchFotmobWorldCupMatch(game, catalog);
+  return games.map((game) => {
+    if (!isSoccerRow(game) || hasFotmobRoutingMetadata(game)) return game;
+    const catalog = catalogs[game.league];
+    if (!catalog?.length) return game;
+    const fotmobMatch = matchFotmobSoccerMatch(game, catalog);
     if (!fotmobMatch) return game;
-    matched += 1;
-    const matchId = String(fotmobMatch.id);
-    return {
-      ...game,
-      externalIds: {
-        ...game.externalIds,
-        fotmob: matchId
-      },
-      metadata: {
-        ...game.metadata,
-        fotmobMatchUrl: buildFotmobMatchUrl(matchId)
-      }
-    };
+    return attachFotmobMatch(game, String(fotmobMatch.id));
   });
-  if (define_import_meta_env_default.DEV && matched > 0) {
-    console.log(`${LOG15} matched ${matched} World Cup row(s)`, { catalogSize: catalog.length });
-  }
-  return out;
 }
 
-// ../grarf/desktop/src/lib/fotmob/enrichOperationalSnapshotFotmob.ts
-async function enrichOperationalSnapshotFotmob(transport) {
-  const rows = transport.leagues.WORLDCUP;
-  if (!Array.isArray(rows) || rows.length === 0) return transport;
-  const enriched = await enrichWorldCupGamesWithFotmobUrls(rows);
-  if (!enriched.some((row, index) => row !== rows[index])) return transport;
+// ../grarf/grarf-operational-service/src/watch/fotmob/enrichOperationalSnapshotFotmob.ts
+function replaceLeagueRows(transport, leagueKey, rows, previousRows) {
+  if (!previousRows || !rows.some((row, index) => row !== previousRows[index])) {
+    return transport;
+  }
   return {
     ...transport,
     leagues: {
       ...transport.leagues,
-      WORLDCUP: enriched
+      [leagueKey]: rows
     }
   };
+}
+async function enrichOperationalSnapshotFotmob(transport) {
+  let snapshot = transport;
+  let changed = false;
+  for (const leagueKey of SOCCER_LEAGUE_KEYS2) {
+    const rows = snapshot.leagues[leagueKey];
+    if (!Array.isArray(rows) || rows.length === 0) continue;
+    const enriched = await enrichSoccerGamesWithFotmobUrls(rows);
+    if (!enriched.some((row, index) => row !== rows[index])) continue;
+    snapshot = replaceLeagueRows(snapshot, leagueKey, enriched, rows);
+    changed = true;
+  }
+  return changed ? snapshot : transport;
 }
 
 // ../grarf/desktop/src/lib/foxWorldCup/enrichOperationalSnapshotFoxWorldCup.ts
@@ -27221,7 +28390,7 @@ function gameHasFoxOrFs1Broadcast(game) {
 init_define_import_meta_env();
 var MIN_TEAM_SCORE2 = 0.55;
 var MIN_TOTAL_SCORE2 = 0.62;
-function isWorldCupGame2(game) {
+function isWorldCupGame(game) {
   return game.league === "WORLDCUP";
 }
 function scoreEventMatch(game, event) {
@@ -27236,7 +28405,7 @@ function scoreEventMatch(game, event) {
   return teams;
 }
 function matchFoxWorldCupStream(game, catalog) {
-  if (!isWorldCupGame2(game)) return null;
+  if (!isWorldCupGame(game)) return null;
   if (game.status !== "live" && game.status !== "scheduled") return null;
   if (catalog.length === 0) return null;
   let best = null;
@@ -27294,13 +28463,13 @@ function lookupFoxWorldCupStreamForGame(game, catalog) {
 }
 
 // ../grarf/desktop/src/lib/foxWorldCup/enrichWorldCupGamesWithFoxStreams.ts
-var LOG16 = "[FoxWorldCup]";
-function isWorldCupRow2(game) {
+var LOG14 = "[FoxWorldCup]";
+function isWorldCupRow(game) {
   return game.league === "WORLDCUP";
 }
 async function enrichWorldCupGamesWithFoxStreams(games) {
   const needsFox = games.some(
-    (game) => isWorldCupRow2(game) && (game.status === "live" || game.status === "scheduled")
+    (game) => isWorldCupRow(game) && (game.status === "live" || game.status === "scheduled")
   );
   if (!needsFox) return games;
   let catalog = [];
@@ -27308,12 +28477,12 @@ async function enrichWorldCupGamesWithFoxStreams(games) {
     catalog = await fetchFoxWorldCupEventCatalog();
   } catch (error) {
     if (define_import_meta_env_default.DEV) {
-      console.warn(`${LOG16} catalog fetch failed \u2014 using deterministic FOX hub URLs`, error);
+      console.warn(`${LOG14} catalog fetch failed \u2014 using deterministic FOX hub URLs`, error);
     }
   }
   let matched = 0;
   const out = games.map((game) => {
-    if (!isWorldCupRow2(game)) return game;
+    if (!isWorldCupRow(game)) return game;
     if (game.status !== "live" && game.status !== "scheduled") return game;
     if (game.streamUrl?.trim()) return game;
     const stream = lookupFoxWorldCupStreamForGame(game, catalog);
@@ -27326,7 +28495,7 @@ async function enrichWorldCupGamesWithFoxStreams(games) {
     };
   });
   if (define_import_meta_env_default.DEV && matched > 0) {
-    console.log(`${LOG16} matched ${matched} World Cup row(s)`, { catalogSize: catalog.length });
+    console.log(`${LOG14} matched ${matched} World Cup row(s)`, { catalogSize: catalog.length });
   }
   return out;
 }
@@ -27844,6 +29013,11 @@ init_define_import_meta_env();
 
 // ../grarf/desktop/src/lib/watch/enrichWimbledonEspnWatchStreams.ts
 init_define_import_meta_env();
+
+// ../grarf/desktop/src/lib/tennisChannelPlus/nameUtils.ts
+init_define_import_meta_env();
+
+// ../grarf/desktop/src/lib/watch/enrichWimbledonEspnWatchStreams.ts
 var ESPN_FETCH_UA2 = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36";
 var WIMBLEDON_ESPN_WATCH_CATALOG_ID = "6929e7a4-2c40-3f82-a710-42baae9472c6";
 var WIMBLEDON_ESPN_WATCH_CATALOG_URL = `https://watch.product.api.espn.com/api/product/v3/watchespn/web/catalog/${WIMBLEDON_ESPN_WATCH_CATALOG_ID}?tz=America%2FChicago&lang=en&countryCode=US&deviceType=desktop`;
@@ -28348,7 +29522,7 @@ function matchWimbledonSlamTrackerGame(game, catalog) {
 }
 
 // ../grarf/desktop/src/lib/wimbledon/enrichWimbledonSlamTrackerMatches.ts
-var LOG17 = "[WimbledonSlamTracker]";
+var LOG15 = "[WimbledonSlamTracker]";
 function attachSlamTrackerResolution(game, matchId, url) {
   game.externalIds = {
     ...game.externalIds,
@@ -28400,7 +29574,7 @@ async function enrichWimbledonSlamTrackerMatches(games) {
     attachSlamTrackerResolution(game, resolution.matchId, resolution.url);
   }
   if (define_import_meta_env_default?.DEV && matched > 0) {
-    console.log(`${LOG17} matched ${matched} Wimbledon row(s)`, { targets: targets.length });
+    console.log(`${LOG15} matched ${matched} Wimbledon row(s)`, { targets: targets.length });
   }
 }
 
@@ -28710,7 +29884,7 @@ function matchTennisChannelPlusStream(game, catalog) {
 }
 
 // ../grarf/desktop/src/lib/tennisChannelPlus/enrichTennisGamesWithTennisChannelPlus.ts
-var LOG18 = "[TennisChannelPlus]";
+var LOG16 = "[TennisChannelPlus]";
 function isTennisLeague3(game) {
   return game.league === "ATP" || game.league === "WTA";
 }
@@ -28732,7 +29906,7 @@ async function enrichTennisGamesWithTennisChannelPlus(games) {
     catalog = await fetchTennisChannelPlusLiveCatalog();
   } catch (error) {
     if (define_import_meta_env_default.DEV) {
-      console.warn(`${LOG18} catalog fetch failed`, error);
+      console.warn(`${LOG16} catalog fetch failed`, error);
     }
     return games;
   }
@@ -28751,7 +29925,7 @@ async function enrichTennisGamesWithTennisChannelPlus(games) {
     };
   });
   if (define_import_meta_env_default.DEV && matched > 0) {
-    console.log(`${LOG18} matched ${matched} tennis row(s)`, { catalogSize: catalog.length });
+    console.log(`${LOG16} matched ${matched} tennis row(s)`, { catalogSize: catalog.length });
   }
   return out;
 }
@@ -28848,7 +30022,7 @@ function resolveWimbledonFeedSeedsForGame(game, match) {
 }
 
 // ../grarf/desktop/src/lib/playerRank/enrichTennisGamesWithPlayerRanks.ts
-var LOG19 = "[PlayerRankEnrich:Tennis]";
+var LOG17 = "[PlayerRankEnrich:Tennis]";
 function resolveTennisSideRank(game, side, wimbledonSeeds) {
   const leagueKey = game.league;
   if (leagueKey !== "ATP" && leagueKey !== "WTA") return void 0;
@@ -28899,13 +30073,13 @@ async function enrichTennisGamesWithPlayerRanks(games, catalogByYear) {
     return next;
   });
   if (define_import_meta_env_default.DEV && attached > 0) {
-    console.log(`${LOG19} Attached player ranks`, { games: games.length, attached });
+    console.log(`${LOG17} Attached player ranks`, { games: games.length, attached });
   }
   return enriched;
 }
 
 // ../grarf/desktop/src/lib/playerRank/enrichOperationalSnapshotPlayerRanks.ts
-var LOG20 = "[PlayerRankEnrich]";
+var LOG18 = "[PlayerRankEnrich]";
 var TENNIS_PLAYER_RANK_LEAGUES = ["ATP", "WTA"];
 async function buildWimbledonCatalogByYear(transport) {
   const years = /* @__PURE__ */ new Set();
@@ -28944,7 +30118,7 @@ async function enrichOperationalSnapshotPlayerRanks(transport) {
         changed = true;
       }
     } catch (error) {
-      console.warn(`${LOG20} ${leagueKey} player rank enrich failed`, error);
+      console.warn(`${LOG18} ${leagueKey} player rank enrich failed`, error);
     }
   }
   if (!changed) return transport;
@@ -29082,7 +30256,7 @@ async function supplementOperationalSnapshotFromLocalIpc(transport) {
 }
 
 // ../grarf/desktop/src/services/operationalIngest/enrichOperationalTransport.ts
-var LOG21 = "[OperationalIngest]";
+var LOG19 = "[OperationalIngest]";
 function cloudRowMissingMlbPk2(row) {
   if (typeof row.gamePk === "number" && row.gamePk > 0) return false;
   const mlb = row.externalIds?.mlb?.trim();
@@ -29109,7 +30283,7 @@ async function enrichOperationalSnapshotWatchStreamsLocal(transport) {
   try {
     next = enrichOperationalSnapshotEspnWatchStreams(next);
   } catch (e) {
-    console.warn(`${LOG21} ESPN Watch stream enrich failed`, e);
+    console.warn(`${LOG19} ESPN Watch stream enrich failed`, e);
   }
   try {
     for (const key of ["ATP", "WTA"]) {
@@ -29118,42 +30292,42 @@ async function enrichOperationalSnapshotWatchStreamsLocal(transport) {
       await enrichWimbledonEspnWatchStreams(rows);
     }
   } catch (e) {
-    console.warn(`${LOG21} Wimbledon ESPN Watch enrich failed`, e);
+    console.warn(`${LOG19} Wimbledon ESPN Watch enrich failed`, e);
   }
   try {
     next = await enrichOperationalSnapshotWimbledonSlamTracker(next);
   } catch (e) {
-    console.warn(`${LOG21} Wimbledon SlamTracker enrich failed`, e);
+    console.warn(`${LOG19} Wimbledon SlamTracker enrich failed`, e);
   }
   try {
     next = await enrichOperationalSnapshotEspnWatchPickerStreams(next);
   } catch (e) {
-    console.warn(`${LOG21} ESPN Watch picker enrich failed`, e);
+    console.warn(`${LOG19} ESPN Watch picker enrich failed`, e);
   }
   try {
     next = enrichOperationalSnapshotUsaNetworkStreams(next);
   } catch (e) {
-    console.warn(`${LOG21} USA Network stream enrich failed`, e);
+    console.warn(`${LOG19} USA Network stream enrich failed`, e);
   }
   try {
     next = await enrichOperationalSnapshotTennisChannel(next);
   } catch (e) {
-    console.warn(`${LOG21} Tennis Channel Plus enrich failed`, e);
+    console.warn(`${LOG19} Tennis Channel Plus enrich failed`, e);
   }
   try {
     next = await enrichOperationalSnapshotFoxWorldCup(next);
   } catch (e) {
-    console.warn(`${LOG21} FOX World Cup enrich failed`, e);
+    console.warn(`${LOG19} FOX World Cup enrich failed`, e);
   }
   try {
     next = await enrichOperationalSnapshotWnbaStreams(next);
   } catch (e) {
-    console.warn(`${LOG21} WNBA Prime Video enrich failed`, e);
+    console.warn(`${LOG19} WNBA Prime Video enrich failed`, e);
   }
   try {
     next = await enrichOperationalSnapshotFotmob(next);
   } catch (e) {
-    console.warn(`${LOG21} FotMob World Cup enrich failed`, e);
+    console.warn(`${LOG19} FotMob World Cup enrich failed`, e);
   }
   return next;
 }
@@ -29162,52 +30336,52 @@ async function enrichOperationalTransport(rawTransport) {
   try {
     transport = await supplementOperationalSnapshotFromLocalIpc(transport);
   } catch (e) {
-    console.warn(`${LOG21} local IPC supplement failed`, e);
+    console.warn(`${LOG19} local IPC supplement failed`, e);
   }
   try {
     transport = await enrichOperationalSnapshotPllGameCardRouting(transport);
   } catch (e) {
-    console.warn(`${LOG21} PLL game card enrich failed`, e);
+    console.warn(`${LOG19} PLL game card enrich failed`, e);
   }
   try {
     transport = sanitizeOperationalSnapshotWatchStreams(transport);
   } catch (e) {
-    console.warn(`${LOG21} watch stream sanitize failed`, e);
+    console.warn(`${LOG19} watch stream sanitize failed`, e);
   }
   try {
     transport = enrichOperationalSnapshotManualGameOverrides(transport);
   } catch (e) {
-    console.warn(`${LOG21} manual game override enrich failed`, e);
+    console.warn(`${LOG19} manual game override enrich failed`, e);
   }
   try {
     if (!isGrarfWebRenderer()) {
       transport = await enrichOperationalSnapshotTeamStandings(transport, { leagueKeys: ["MLB"] });
     }
   } catch (e) {
-    console.warn(`${LOG21} MLB team standings enrich failed`, e);
+    console.warn(`${LOG19} MLB team standings enrich failed`, e);
   }
   if (isGrarfWebRenderer()) {
     try {
       transport = await enrichOperationalSnapshotTeamStandings(transport, { leagueKeys: ["WNBA"] });
     } catch (e) {
-      console.warn(`${LOG21} WNBA team standings enrich failed`, e);
+      console.warn(`${LOG19} WNBA team standings enrich failed`, e);
     }
     try {
       transport = await enrichOperationalSnapshotPlayerRanks(transport);
     } catch (e) {
-      console.warn(`${LOG21} player rank enrich failed`, e);
+      console.warn(`${LOG19} player rank enrich failed`, e);
     }
   }
   if (!isGrarfWebRenderer()) {
     try {
       transport = await enrichOperationalSnapshotWatchStreamsLocal(transport);
     } catch (e) {
-      console.warn(`${LOG21} watch/stream enrich failed`, e);
+      console.warn(`${LOG19} watch/stream enrich failed`, e);
     }
     try {
       transport = await joinMissingMlbProviderIds(transport);
     } catch (e) {
-      console.warn(`${LOG21} MLB provider join failed`, e);
+      console.warn(`${LOG19} MLB provider join failed`, e);
     }
   }
   return transport;
