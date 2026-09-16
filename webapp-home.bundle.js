@@ -154767,6 +154767,9 @@ function HomePage() {
     preserveTimelineStoryContextInSidePane,
     updateActiveTabWithPaneHistory
   ]);
+  const onOpenPreNewsElectronHome = (0, import_react272.useCallback)(() => {
+    applyDesktopPrimaryNavTab("now", navigate, pathname);
+  }, [navigate, pathname]);
   const onSportsBrowserOpenTerminalPost = (0, import_react272.useCallback)(
     (url) => {
       updateActiveTabWithPaneHistory((tab) => {
@@ -155243,6 +155246,17 @@ function HomePage() {
             onClose: closeSportsBrowserWatchPicker,
             onSelect: onSportsBrowserWatchOptionChosen
           }
+        ) : null,
+        isGrarfElectronRenderer() ? /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(
+          "button",
+          {
+            type: "button",
+            onClick: onOpenPreNewsElectronHome,
+            "aria-label": "Open GRARF home",
+            className: "absolute bottom-3 right-3 z-20 border border-[#c8c4bc]/80 bg-[#ece9e2]/95 px-2 py-1 font-sans text-[10px] font-medium tracking-[0.08em] text-[#1a1a1a] shadow-sm transition hover:bg-[#f8f6f1]",
+            "data-sports-browser-prototype-home-access": true,
+            children: "HOME"
+          }
         ) : null
       ]
     }
@@ -155401,6 +155415,7 @@ var init_HomePage = __esm({
     init_useSyncBrowserUrlWithActiveWorkspace();
     init_useInitialUrlBootstrap();
     init_useBrowserHistoryNavigation();
+    init_applyDesktopPrimaryNavigationSelection();
     init_useGameWorkspacePathNavigation();
     init_captureInitialBrowserPathname();
     init_resolveInitialUrlBootstrapIntent();
