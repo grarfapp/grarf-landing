@@ -5134,6 +5134,13 @@ var init_espnOperationalLeagueRegistry_generated = __esm({
         "endpoint": "https://site.api.espn.com/apis/site/v2/sports/mma/ufc/scoreboard"
       },
       {
+        "key": "US_OPEN_CUP",
+        "sport": "soccer",
+        "label": "U.S. Open Cup",
+        "slug": "usa.open",
+        "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/usa.open/scoreboard"
+      },
+      {
         "key": "USL1",
         "sport": "soccer",
         "label": "USL League One",
@@ -5310,6 +5317,7 @@ var init_leaguePrioritySeed_data = __esm({
       "COPPAITALIA",
       "WNCAAB",
       "NWSL",
+      "US_OPEN_CUP",
       "DP_WORLD",
       "LPGA",
       "KORNFERRY",
@@ -10244,7 +10252,7 @@ var SOCCER_LEAGUE_KEYS, NATIONAL_TEAM_SOCCER_LEAGUE_KEYS;
 var init_espnOperationalLeagueConstants_generated = __esm({
   "../grarf/desktop/electron/espn/espnOperationalLeagueConstants.generated.js"() {
     init_define_import_meta_env();
-    SOCCER_LEAGUE_KEYS = /* @__PURE__ */ new Set(["ARG1", "BEL1", "BRA1", "BUNDESLIGA", "CAF_WNATIONS", "CARABAO_CUP", "CHAMPIONSHIP", "CLUBFRIENDLY", "CLUBWC", "CONCACAF_CAC", "CONCACAF_CL", "CONCACAF_NG", "CONCACAF_WC", "COPA", "COPA_BRASIL", "COPPAITALIA", "EPL", "EREDIVISIE", "EURO", "GER_SUPER_CUP", "GOLDCUP", "INTFRIENDLY", "LALIGA", "LEAGUES_CUP", "LIBERTADORES", "LIGAMX", "LIGUE1", "MLS", "NATIONS", "NCAAMSOC", "NCAAWSOC", "NWSL", "POR1", "SAUDI", "SCOTTISH_LEAGUE_CUP", "SERIEA", "SPFL", "SUDAMERICANA", "SUPERLIG", "UCL", "UCLQ", "UECL", "UECLQ", "UEL", "UELQ", "USL1", "USLC", "USLCUP", "UWCQ", "WORLDCUP", "WWC"]);
+    SOCCER_LEAGUE_KEYS = /* @__PURE__ */ new Set(["ARG1", "BEL1", "BRA1", "BUNDESLIGA", "CAF_WNATIONS", "CARABAO_CUP", "CHAMPIONSHIP", "CLUBFRIENDLY", "CLUBWC", "CONCACAF_CAC", "CONCACAF_CL", "CONCACAF_NG", "CONCACAF_WC", "COPA", "COPA_BRASIL", "COPPAITALIA", "EPL", "EREDIVISIE", "EURO", "GER_SUPER_CUP", "GOLDCUP", "INTFRIENDLY", "LALIGA", "LEAGUES_CUP", "LIBERTADORES", "LIGAMX", "LIGUE1", "MLS", "NATIONS", "NCAAMSOC", "NCAAWSOC", "NWSL", "POR1", "SAUDI", "SCOTTISH_LEAGUE_CUP", "SERIEA", "SPFL", "SUDAMERICANA", "SUPERLIG", "UCL", "UCLQ", "UECL", "UECLQ", "UEL", "UELQ", "US_OPEN_CUP", "USL1", "USLC", "USLCUP", "UWCQ", "WORLDCUP", "WWC"]);
     NATIONAL_TEAM_SOCCER_LEAGUE_KEYS = /* @__PURE__ */ new Set(["CONCACAF_NG", "CONCACAF_WC", "COPA", "EURO", "GOLDCUP", "INTFRIENDLY", "NATIONS", "UWCQ", "WORLDCUP", "WWC"]);
   }
 });
@@ -48158,6 +48166,7 @@ var init_resolveLeagueDirectoryNavItemLogo = __esm({
       PLL: "pll",
       RUGB_289262: "mlr",
       USLCUP: "usl-cup",
+      US_OPEN_CUP: "us-open-cup",
       CARABAO_CUP: "carabao-cup",
       SCOTTISH_LEAGUE_CUP: "scottish-league-cup",
       CHAMPIONSHIP: "efl-championship",
@@ -49450,6 +49459,7 @@ var init_gamesSpineLeagueLogoUrls = __esm({
       PLL: "/league-logos/pll.png",
       RUGB_289262: "/league-logos/nav/mlr.png",
       USLCUP: "/league-logos/usl-cup.png",
+      US_OPEN_CUP: "/league-logos/us-open-cup.png",
       CARABAO_CUP: "/league-logos/carabao-cup.png",
       SCOTTISH_LEAGUE_CUP: SCOTTISH_LEAGUE_CUP_LEAGUE_LOGO_URL,
       CHAMPIONSHIP: "/league-logos/efl-championship.png",
@@ -80125,6 +80135,7 @@ var init_espnOperationalLeagues_generated = __esm({
       UEL: { sport: "soccer", league: "uefa.europa", endpoint: "https://site.api.espn.com/apis/site/v2/sports/soccer/uefa.europa/scoreboard", pollIntervalMs: 6e4, label: "Europa League" },
       UELQ: { sport: "soccer", league: "uefa.europa_qual", endpoint: "https://site.api.espn.com/apis/site/v2/sports/soccer/uefa.europa_qual/scoreboard", pollIntervalMs: 6e4, label: "UEFA Europa League Qualifying" },
       UFC: { sport: "mma", league: "ufc", endpoint: "https://site.api.espn.com/apis/site/v2/sports/mma/ufc/scoreboard", pollIntervalMs: 6e4, label: "UFC" },
+      US_OPEN_CUP: { sport: "soccer", league: "usa.open", endpoint: "https://site.api.espn.com/apis/site/v2/sports/soccer/usa.open/scoreboard", pollIntervalMs: 6e4, label: "U.S. Open Cup" },
       USL1: { sport: "soccer", league: "usa.usl.l1", endpoint: "https://site.api.espn.com/apis/site/v2/sports/soccer/usa.usl.l1/scoreboard", pollIntervalMs: 6e4, label: "USL League One" },
       USLC: { sport: "soccer", league: "usa.usl.1", endpoint: "https://site.api.espn.com/apis/site/v2/sports/soccer/usa.usl.1/scoreboard", pollIntervalMs: 6e4, label: "USL Championship" },
       USLCUP: { sport: "soccer", league: "usa.usl.l1.cup", endpoint: "https://site.api.espn.com/apis/site/v2/sports/soccer/usa.usl.l1.cup/scoreboard", pollIntervalMs: 6e4, label: "USL Championship Cup" },
@@ -138139,17 +138150,18 @@ function groupSportsBrowserPrototypeSidebarLeagueSlatesBySoccer(slates) {
     }
   }
   const { prefixSlates, restSlates } = partitionNonSoccerSlatesForSoccerGrouping(nonSoccerSlates);
-  const soccerEntry = {
-    kind: "soccer",
-    label: SOCCER_SIDEBAR_ARCH_LEAGUE_LABEL,
-    children: [...soccerSlates]
-  };
   return [
     ...prefixSlates.map((slate) => ({
       kind: "league",
       slate
     })),
-    soccerEntry,
+    ...soccerSlates.length > 0 ? [
+      {
+        kind: "soccer",
+        label: SOCCER_SIDEBAR_ARCH_LEAGUE_LABEL,
+        children: [...soccerSlates]
+      }
+    ] : [],
     ...restSlates.map((slate) => ({
       kind: "league",
       slate
@@ -149716,7 +149728,9 @@ function orderSportsBrowserPrototypeNewsSidebarLeagueSlates(slates) {
   const extraKeys = slates.filter((slate) => !seen.has(slate.key)).map((slate) => slate.key);
   for (const key2 of sortGrarfLeagueKeysByImportance(extraKeys)) {
     const slate = byKey.get(key2);
-    if (slate) ordered.push(slate);
+    if (!slate) continue;
+    ordered.push(slate);
+    seen.add(key2);
   }
   for (const slate of slates) {
     if (seen.has(slate.key)) continue;
@@ -152863,11 +152877,17 @@ function SportsBrowserPrototypeLeftNav({
               onToggle: () => setLeaguesOpen((open) => !open),
               children: [
                 /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(LeaguesFilterField, {}),
-                /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(NavRow, { label: "MLB", indent: 1 }),
-                /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(NavRow, { label: "NFL", indent: 1 }),
-                /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(NavRow, { label: "NBA", indent: 1 }),
-                /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(NavRow, { label: "NHL", indent: 1 }),
-                /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(NavRow, { label: "EPL", indent: 1 })
+                SPORTS_BROWSER_PROTOTYPE_SIDEBAR_LEAGUES_SECTION_KEYS.map((leagueKey) => /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
+                  NavRow,
+                  {
+                    label: leagueKey,
+                    indent: 1,
+                    leagueKey,
+                    onClick: () => onLeagueSelect?.(leagueKey),
+                    isSelected: selectedLeagueKey === leagueKey
+                  },
+                  leagueKey
+                ))
               ]
             }
           ),
@@ -152922,7 +152942,7 @@ function SportsBrowserPrototypeLeftNav({
     }
   );
 }
-var import_react268, import_jsx_runtime236, MENU_SURFACE2, RULE2, SPORTS_BROWSER_PROTOTYPE_TEMPORAL_ALL_LOGO_URL, F1_CATCH_UP_MOCK_HEADLINES, COMPACT_TEMPORAL_TODAY_CHILDREN, SIDEBAR_GAME_ROW_CLASS, SIDEBAR_GAME_ROW_HOVER_SURFACE_CLASS, SIDEBAR_GAME_ROW_SELECTED_SURFACE_CLASS, SIDEBAR_GAME_ROW_PRIMARY_TEXT_CLASS, SIDEBAR_GAME_ROW_LIVE_STATUS_CLASS, SIDEBAR_GAME_ROW_WATCH_LIVE_CLASS, SIDEBAR_GAME_ROW_TWO_LINE_GRID_CLASS, SIDEBAR_GAME_ROW_TENNIS_GRID_BASE_CLASS, SIDEBAR_GAME_ROW_SCORE_CLASS, SIDEBAR_GAME_ROW_TENNIS_SET_SCORE_CLASS, SIDEBAR_GAME_ROW_STATUS_BASE_CLASS, SIDEBAR_GAME_ROW_BROADCAST_BASE_CLASS, SIDEBAR_F1_MOCK_HEADLINE_ROW_CLASS;
+var import_react268, import_jsx_runtime236, MENU_SURFACE2, RULE2, SPORTS_BROWSER_PROTOTYPE_TEMPORAL_ALL_LOGO_URL, F1_CATCH_UP_MOCK_HEADLINES, COMPACT_TEMPORAL_TODAY_CHILDREN, SIDEBAR_GAME_ROW_CLASS, SIDEBAR_GAME_ROW_HOVER_SURFACE_CLASS, SIDEBAR_GAME_ROW_SELECTED_SURFACE_CLASS, SIDEBAR_GAME_ROW_PRIMARY_TEXT_CLASS, SIDEBAR_GAME_ROW_LIVE_STATUS_CLASS, SIDEBAR_GAME_ROW_WATCH_LIVE_CLASS, SIDEBAR_GAME_ROW_TWO_LINE_GRID_CLASS, SIDEBAR_GAME_ROW_TENNIS_GRID_BASE_CLASS, SIDEBAR_GAME_ROW_SCORE_CLASS, SIDEBAR_GAME_ROW_TENNIS_SET_SCORE_CLASS, SIDEBAR_GAME_ROW_STATUS_BASE_CLASS, SIDEBAR_GAME_ROW_BROADCAST_BASE_CLASS, SIDEBAR_F1_MOCK_HEADLINE_ROW_CLASS, SPORTS_BROWSER_PROTOTYPE_SIDEBAR_LEAGUES_SECTION_KEYS;
 var init_SportsBrowserPrototypeLeftNav = __esm({
   "../grarf/desktop/src/components/homeMvp/SportsBrowserPrototypeLeftNav.tsx"() {
     init_define_import_meta_env();
@@ -152987,6 +153007,13 @@ var init_SportsBrowserPrototypeLeftNav = __esm({
       "border-t py-[5px] pl-8 pr-4 text-[10px] leading-snug first:border-t-0 break-words whitespace-normal",
       RULE2
     );
+    SPORTS_BROWSER_PROTOTYPE_SIDEBAR_LEAGUES_SECTION_KEYS = [
+      "MLB",
+      "NFL",
+      "NBA",
+      "NHL",
+      "EPL"
+    ];
   }
 });
 
@@ -154262,6 +154289,7 @@ function HomePage() {
       const game = enrichedGame ?? findGamesSpineGameById(gameId);
       if (!game) return;
       if (isHomeOps) {
+        selectCenterPaneTerminalPresentation();
         clearCenterEmbedForSpineGameSelect();
         dispatchOverlay({ type: "dismissWatchSessions" });
         openGamesSpineRowInWorkspace(game, dispatchOverlay);
@@ -154921,7 +154949,57 @@ function HomePage() {
     !activeContentOverlayId ? browserSubmenus : null,
     /* @__PURE__ */ (0, import_jsx_runtime239.jsxs)("div", { className: "relative flex min-h-0 flex-1 flex-col overflow-hidden", children: [
       showCenterPaneNowModeSelector ? /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(HomeCenterPaneNowModeSelector, {}) : null,
-      showCenterPaneTimelineSurface ? /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(HomeCenterPaneTimelineMount, { onClipOpen: onTimelineClipOpen }) : showLiveTrackerSplitPane ? /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(
+      activeContentOverlayId && !showWhipAroundCenterPane ? /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(
+        GuidedAttentionPanel,
+        {
+          paneId: "center",
+          className: "relative flex min-h-0 flex-1 flex-col overflow-hidden",
+          children: /* @__PURE__ */ (0, import_jsx_runtime239.jsx)("div", { className: "flex h-full min-h-0 min-w-0 flex-col overflow-hidden", children: shouldPresentElectronBrowserFocusWorkspace(activeContentOverlayWorkspace) && activeContentOverlayWorkspace ? /* @__PURE__ */ (0, import_jsx_runtime239.jsxs)(import_jsx_runtime239.Fragment, { children: [
+            /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(
+              HomeSourceFocusBackHeader,
+              {
+                title: activeContentOverlayWorkspace.title,
+                onBack: () => {
+                  const sessionKey = resolveHomeSourceFocusSessionKey(activeContentOverlayWorkspace);
+                  if (sessionKey) {
+                    if (isCanonicalWebBrowserRenderer()) {
+                      useHomeSourceFocusStore.getState().clearWebFullscreenSessionKey();
+                    } else {
+                      releaseHomeSourceFocusWebview(sessionKey);
+                    }
+                  }
+                  dispatchOverlay({ type: "close", id: activeContentOverlayWorkspace.id });
+                }
+              }
+            ),
+            /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(HomeSourceFocusWorkspace, { workspace: activeContentOverlayWorkspace })
+          ] }) : /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(
+            CommandWorkspaceColumn,
+            {
+              gameContextOnly: true,
+              suppressOverlayTabs: true,
+              categories: EMPTY_NAV,
+              activeCategoryId: "",
+              onCategorySelect: () => {
+              },
+              subnavItems: null,
+              activeSubnavId: null,
+              onSubnavSelect: () => {
+              },
+              overlayTabs: contentOverlayTabs,
+              overlayActiveId: activeContentOverlayId,
+              onOverlaySelect: onOverlayTabSelect,
+              onOverlayClose: onOverlayTabClose,
+              activeWorkspace: activeContentOverlayWorkspace,
+              statusLabel: homeStatusLabel,
+              gameWatchCoordination,
+              onIntelligenceSelectGame: onSelectGame,
+              onLeagueHubSourceArticleNavigate: onHomeSourceArticleNavigate,
+              onLeagueHubSourceFullscreen: onHomeSourceFullscreen
+            }
+          ) })
+        }
+      ) : showCenterPaneTimelineSurface ? /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(HomeCenterPaneTimelineMount, { onClipOpen: onTimelineClipOpen }) : showLiveTrackerSplitPane ? /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(
         "div",
         {
           className: "relative min-h-0 flex-1 overflow-hidden",
@@ -154938,7 +155016,7 @@ function HomePage() {
             {
               className: "relative min-h-0 flex-1 overflow-hidden",
               "data-center-pane-mode": centerPaneMode,
-              children: !activeContentOverlayId || showWhipAroundCenterPane ? gameDeepLinkNotFoundId ? /* @__PURE__ */ (0, import_jsx_runtime239.jsx)("div", { className: cn2(PANE_CONTENT_CONTAIN, "flex h-full min-h-0 flex-col"), children: /* @__PURE__ */ (0, import_jsx_runtime239.jsx)("div", { className: "flex flex-1 items-center justify-center p-8 text-center text-sm text-textdim", children: /* @__PURE__ */ (0, import_jsx_runtime239.jsxs)("div", { className: "max-w-md border border-dashed border-line bg-panel2/50 px-6 py-8", children: [
+              children: gameDeepLinkNotFoundId ? /* @__PURE__ */ (0, import_jsx_runtime239.jsx)("div", { className: cn2(PANE_CONTENT_CONTAIN, "flex h-full min-h-0 flex-col"), children: /* @__PURE__ */ (0, import_jsx_runtime239.jsx)("div", { className: "flex flex-1 items-center justify-center p-8 text-center text-sm text-textdim", children: /* @__PURE__ */ (0, import_jsx_runtime239.jsxs)("div", { className: "max-w-md border border-dashed border-line bg-panel2/50 px-6 py-8", children: [
                 /* @__PURE__ */ (0, import_jsx_runtime239.jsx)("p", { className: "text-white/90", children: "Game not found" }),
                 /* @__PURE__ */ (0, import_jsx_runtime239.jsxs)("p", { className: "mt-2 text-[11px] leading-relaxed", children: [
                   "No game matches",
@@ -154946,50 +155024,7 @@ function HomePage() {
                   /* @__PURE__ */ (0, import_jsx_runtime239.jsx)("span", { className: "text-white/80", children: gameDeepLinkNotFoundId }),
                   " in today's schedule."
                 ] })
-              ] }) }) }) : /* @__PURE__ */ (0, import_jsx_runtime239.jsx)("div", { className: cn2(PANE_CONTENT_CONTAIN, "h-full min-h-0"), children: centerPaneApplicationSurface }) : /* @__PURE__ */ (0, import_jsx_runtime239.jsx)("div", { className: "flex h-full min-h-0 min-w-0 flex-col overflow-hidden", children: shouldPresentElectronBrowserFocusWorkspace(activeContentOverlayWorkspace) && activeContentOverlayWorkspace ? /* @__PURE__ */ (0, import_jsx_runtime239.jsxs)(import_jsx_runtime239.Fragment, { children: [
-                /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(
-                  HomeSourceFocusBackHeader,
-                  {
-                    title: activeContentOverlayWorkspace.title,
-                    onBack: () => {
-                      const sessionKey = resolveHomeSourceFocusSessionKey(activeContentOverlayWorkspace);
-                      if (sessionKey) {
-                        if (isCanonicalWebBrowserRenderer()) {
-                          useHomeSourceFocusStore.getState().clearWebFullscreenSessionKey();
-                        } else {
-                          releaseHomeSourceFocusWebview(sessionKey);
-                        }
-                      }
-                      dispatchOverlay({ type: "close", id: activeContentOverlayWorkspace.id });
-                    }
-                  }
-                ),
-                /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(HomeSourceFocusWorkspace, { workspace: activeContentOverlayWorkspace })
-              ] }) : /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(
-                CommandWorkspaceColumn,
-                {
-                  gameContextOnly: true,
-                  suppressOverlayTabs: true,
-                  categories: EMPTY_NAV,
-                  activeCategoryId: "",
-                  onCategorySelect: () => {
-                  },
-                  subnavItems: null,
-                  activeSubnavId: null,
-                  onSubnavSelect: () => {
-                  },
-                  overlayTabs: contentOverlayTabs,
-                  overlayActiveId: activeContentOverlayId,
-                  onOverlaySelect: onOverlayTabSelect,
-                  onOverlayClose: onOverlayTabClose,
-                  activeWorkspace: activeContentOverlayWorkspace,
-                  statusLabel: homeStatusLabel,
-                  gameWatchCoordination,
-                  onIntelligenceSelectGame: onSelectGame,
-                  onLeagueHubSourceArticleNavigate: onHomeSourceArticleNavigate,
-                  onLeagueHubSourceFullscreen: onHomeSourceFullscreen
-                }
-              ) })
+              ] }) }) }) : /* @__PURE__ */ (0, import_jsx_runtime239.jsx)("div", { className: cn2(PANE_CONTENT_CONTAIN, "h-full min-h-0"), children: centerPaneApplicationSurface })
             }
           )
         }
