@@ -151406,6 +151406,372 @@ var init_scrollSportsBrowserPrototypeSidebarActiveGameIntoView = __esm({
   }
 });
 
+// ../grarf/desktop/src/services/attentionPhilosophy/defaultConfig.ts
+var FIFTEEN_MIN_MS, DEFAULT_OPERATIONAL_ATTENTION_PHILOSOPHY;
+var init_defaultConfig = __esm({
+  "../grarf/desktop/src/services/attentionPhilosophy/defaultConfig.ts"() {
+    init_define_import_meta_env();
+    FIFTEEN_MIN_MS = 15 * 60 * 1e3;
+    DEFAULT_OPERATIONAL_ATTENTION_PHILOSOPHY = {
+      version: "1.0.0",
+      id: "grarf-default-attention-philosophy",
+      leagueGravity: {
+        defaultTier: 3,
+        defaultGravity: 0.45,
+        tiers: [
+          {
+            tier: 1,
+            label: "Tier 1 \u2014 global anchor leagues",
+            gravity: 1,
+            leagues: [
+              "NFL",
+              "MLB",
+              "NBA",
+              "NCAAF",
+              "NCAAM",
+              "Olympics",
+              "Premier League",
+              "EPL",
+              "UEFA Champions League",
+              "UCL",
+              "FIFA World Cup",
+              "WORLDCUP",
+              "World Cup",
+              "UEFA Euro",
+              "EURO",
+              "Copa America",
+              "COPA",
+              "Women's World Cup",
+              "WWC",
+              "UFC",
+              "Boxing"
+            ]
+          },
+          {
+            tier: 2,
+            label: "Tier 2 \u2014 major league depth",
+            gravity: 0.78,
+            leagues: ["NHL", "WNBA", "MLS", "F1", "La Liga", "LALIGA", "Serie A", "SERIEA", "Bundesliga", "BUNDESLIGA", "Europa League", "UEL", "Club World Cup", "CLUBWC", "NCAABB", "NCAA Baseball"]
+          },
+          {
+            tier: 3,
+            label: "Tier 3 \u2014 regional / secondary",
+            gravity: 0.58,
+            leagues: [
+              "LIGUE1",
+              "LIGAMX",
+              "NWSL",
+              "EREDIVISIE",
+              "SPFL",
+              "SAUDI",
+              "SUPERLIG",
+              "USLCUP"
+            ]
+          },
+          {
+            tier: 4,
+            label: "Tier 4 \u2014 long-tail / emerging",
+            gravity: 0.38,
+            leagues: []
+          }
+        ]
+      },
+      playoffAmplification: {
+        withinTierDominance: true,
+        maxCrossTierPlayoffLift: 0.12,
+        stageMultipliers: {
+          regular_season: 1,
+          playoffs: 1.12,
+          elimination: 1.22,
+          finals_championship: 1.35
+        }
+      },
+      rarityOverride: {
+        enabled: true,
+        signals: [
+          {
+            id: "perfect_game",
+            label: "Perfect game",
+            matchReasons: ["perfect_game"],
+            matchKeywords: ["perfect game"],
+            minRarityScore: 0.85,
+            gravityBoost: 0.35,
+            canOverrideLeagueHierarchy: true
+          },
+          {
+            id: "no_hitter_late",
+            label: "No-hitter late",
+            matchReasons: ["no_hitter"],
+            matchKeywords: ["no hitter", "no-hitter"],
+            minRarityScore: 0.75,
+            gravityBoost: 0.28,
+            canOverrideLeagueHierarchy: true
+          },
+          {
+            id: "historic_record_pace",
+            label: "Historic record pace",
+            matchReasons: ["record_pace", "historic"],
+            matchKeywords: ["record", "historic", "milestone"],
+            minRarityScore: 0.7,
+            gravityBoost: 0.22,
+            canOverrideLeagueHierarchy: true
+          },
+          {
+            id: "unprecedented_comeback",
+            label: "Unprecedented comeback",
+            matchReasons: ["comeback"],
+            matchKeywords: ["unprecedented", "largest comeback", "historic comeback"],
+            minRarityScore: 0.72,
+            gravityBoost: 0.2,
+            canOverrideLeagueHierarchy: true
+          }
+        ]
+      },
+      scarcityWeighting: {
+        defaultMultiplier: 1,
+        modifiers: [
+          { league: "NFL", frequencyMultiplier: 1.35, label: "NFL weekly scarcity" },
+          { league: "UFC", frequencyMultiplier: 1.25, label: "UFC card scarcity" },
+          { league: "Boxing", frequencyMultiplier: 1.2, label: "Boxing event scarcity" },
+          { league: "MLB", frequencyMultiplier: 0.82, label: "MLB daily abundance" },
+          { league: "NBA", frequencyMultiplier: 0.9, label: "NBA high frequency" },
+          { league: "NHL", frequencyMultiplier: 0.88, label: "NHL high frequency" },
+          { league: "MLS", frequencyMultiplier: 0.92, label: "MLS weekly rhythm" }
+        ]
+      },
+      interruptionWorthiness: {
+        hierarchy: [
+          {
+            rank: 1,
+            id: "overtime_playoff",
+            label: "Overtime playoff game",
+            gravityBoost: 0.42,
+            matchCandidateTypes: ["overtime"],
+            matchReasons: ["overtime", "playoff"],
+            matchKeywords: ["overtime", "extra innings", "shootout"]
+          },
+          {
+            rank: 2,
+            id: "no_hitter_perfect_late",
+            label: "No-hitter / perfect game late",
+            gravityBoost: 0.4,
+            matchCandidateTypes: [],
+            matchReasons: ["no_hitter"],
+            matchKeywords: ["no hitter", "no-hitter", "perfect game"]
+          },
+          {
+            rank: 3,
+            id: "elimination_late",
+            label: "Elimination game late",
+            gravityBoost: 0.38,
+            matchCandidateTypes: ["playoff_implication", "late_game_high_leverage"],
+            matchReasons: ["elimination", "late_game"],
+            matchKeywords: ["elimination", "must win"]
+          },
+          {
+            rank: 4,
+            id: "penalty_shootout",
+            label: "Penalty shootout",
+            gravityBoost: 0.36,
+            matchCandidateTypes: ["overtime"],
+            matchReasons: ["shootout"],
+            matchKeywords: ["penalty shootout", "shootout"]
+          },
+          {
+            rank: 5,
+            id: "game_winning_drive",
+            label: "Game-winning drive",
+            gravityBoost: 0.34,
+            matchCandidateTypes: [],
+            matchReasons: ["game_winner_keyword"],
+            matchKeywords: ["game-winning drive", "two-minute drill"]
+          },
+          {
+            rank: 6,
+            id: "walkoff_threat",
+            label: "Walkoff threat",
+            gravityBoost: 0.32,
+            matchCandidateTypes: ["walkoff_threat"],
+            matchReasons: ["walkoff_keyword", "bases_loaded"],
+            matchKeywords: ["walk off", "walkoff", "bases loaded"]
+          },
+          {
+            rank: 7,
+            id: "boxing_knockdown",
+            label: "Boxing knockdown",
+            gravityBoost: 0.3,
+            matchCandidateTypes: [],
+            matchReasons: [],
+            matchKeywords: ["knockdown", "kd"]
+          },
+          {
+            rank: 8,
+            id: "ufc_finish_danger",
+            label: "UFC finish danger",
+            gravityBoost: 0.28,
+            matchCandidateTypes: [],
+            matchReasons: [],
+            matchKeywords: ["submission", "tko", "ko", "finish"]
+          }
+        ]
+      },
+      modeImportanceWeighting: {
+        LIVE: {
+          urgency: 0.28,
+          emotionalIntensity: 0.18,
+          structuralImportance: 0.12,
+          socialMomentum: 0.08,
+          rarity: 0.1,
+          visualImpact: 0.14,
+          narrativeWeight: 0.1
+        },
+        CATCH_UP: {
+          urgency: 0.08,
+          emotionalIntensity: 0.16,
+          structuralImportance: 0.1,
+          socialMomentum: 0.14,
+          rarity: 0.14,
+          visualImpact: 0.22,
+          narrativeWeight: 0.16
+        },
+        PREPARE: {
+          urgency: 0.06,
+          emotionalIntensity: 0.1,
+          structuralImportance: 0.22,
+          socialMomentum: 0.08,
+          rarity: 0.1,
+          visualImpact: 0.12,
+          narrativeWeight: 0.32
+        }
+      },
+      primaryEventBehavior: {
+        enabled: true,
+        returnBehavior: "return_to_primary_after_interruption",
+        persistentOperationalAnchor: true,
+        userPinningSupported: true,
+        residualGravity: {
+          defaultDurationMs: FIFTEEN_MIN_MS,
+          decayCurve: "exponential",
+          floorGravity: 0.15
+        }
+      },
+      multiViewAttentionBehavior: {
+        defaultMode: "single_view_auto",
+        modes: [
+          {
+            id: "single_view_auto",
+            label: "Single view \u2014 auto",
+            description: "One primary operational target; system may recommend focus shifts (not executed here).",
+            maxSimultaneousTargets: 1,
+            autoSwitchAllowed: true,
+            userPinningAllowed: false
+          },
+          {
+            id: "single_view_manual_alert",
+            label: "Single view \u2014 manual / alert-assisted",
+            description: "One primary target; transitions surfaced as recommendations only.",
+            maxSimultaneousTargets: 1,
+            autoSwitchAllowed: false,
+            userPinningAllowed: true
+          },
+          {
+            id: "auto_multiview",
+            label: "Auto multiview",
+            description: "Multiple targets may share attention budget under policy caps.",
+            maxSimultaneousTargets: 4,
+            autoSwitchAllowed: true,
+            userPinningAllowed: false
+          },
+          {
+            id: "pinned_multiview_hybrid",
+            label: "Pinned multiview hybrid",
+            description: "Pinned anchors plus fluid secondary slots.",
+            maxSimultaneousTargets: 4,
+            autoSwitchAllowed: true,
+            userPinningAllowed: true
+          }
+        ]
+      }
+    };
+  }
+});
+
+// ../grarf/desktop/src/services/attentionPhilosophy/resolvers.ts
+function normalizeLeagueKey2(league2) {
+  return league2.trim().toUpperCase();
+}
+function resolveLeagueTier(config, league2) {
+  const key2 = normalizeLeagueKey2(league2);
+  for (const tier of config.leagueGravity.tiers) {
+    if (tier.leagues.some((l2) => normalizeLeagueKey2(l2) === key2)) {
+      return tier;
+    }
+  }
+  const fallback = config.leagueGravity.tiers.find(
+    (t2) => t2.tier === config.leagueGravity.defaultTier
+  );
+  return fallback ?? {
+    tier: config.leagueGravity.defaultTier,
+    label: "Default tier",
+    gravity: config.leagueGravity.defaultGravity,
+    leagues: []
+  };
+}
+var init_resolvers = __esm({
+  "../grarf/desktop/src/services/attentionPhilosophy/resolvers.ts"() {
+    init_define_import_meta_env();
+  }
+});
+
+// ../grarf/desktop/src/lib/home/resolveSportsBrowserPrototypeDefaultTemporalTab.ts
+function resolveLiveLeagueTierPoints(leagueKey) {
+  const tier = resolveLeagueTier(DEFAULT_OPERATIONAL_ATTENTION_PHILOSOPHY, leagueKey).tier;
+  if (tier === 1) return { tier, points: 3 };
+  if (tier === 2) return { tier, points: 2 };
+  if (tier === 3) return { tier, points: 1 };
+  return { tier, points: 0 };
+}
+function resolveLiveTemporalImportanceBreakdown(nowLeagues) {
+  const liveLeagueKeys = [];
+  let tier1Count = 0;
+  let tier2Count = 0;
+  let tier3Count = 0;
+  let totalScore = 0;
+  for (const slate of nowLeagues) {
+    if (slate.games.length === 0) continue;
+    liveLeagueKeys.push(slate.key);
+    const { tier, points } = resolveLiveLeagueTierPoints(slate.key);
+    if (tier === 1) tier1Count += 1;
+    else if (tier === 2) tier2Count += 1;
+    else if (tier === 3) tier3Count += 1;
+    totalScore += points;
+  }
+  return {
+    liveLeagueKeys,
+    tier1Count,
+    tier2Count,
+    tier3Count,
+    totalScore
+  };
+}
+function shouldDefaultSportsBrowserPrototypeTemporalTabToNow(nowLeagues) {
+  const { tier1Count, tier2Count, totalScore } = resolveLiveTemporalImportanceBreakdown(nowLeagues);
+  if (tier1Count >= 2) return true;
+  if (tier1Count + tier2Count >= 3) return true;
+  if (totalScore >= 6) return true;
+  return false;
+}
+function resolveSportsBrowserPrototypeDefaultTemporalTab(nowLeagues) {
+  return shouldDefaultSportsBrowserPrototypeTemporalTabToNow(nowLeagues) ? "now" : "today";
+}
+var init_resolveSportsBrowserPrototypeDefaultTemporalTab = __esm({
+  "../grarf/desktop/src/lib/home/resolveSportsBrowserPrototypeDefaultTemporalTab.ts"() {
+    init_define_import_meta_env();
+    init_defaultConfig();
+    init_resolvers();
+  }
+});
+
 // ../grarf/desktop/src/lib/home/resolveNewsSportsBrowserTennisScorePresentation.ts
 function mapLinescores2(lines) {
   if (!Array.isArray(lines)) return [];
@@ -154194,6 +154560,8 @@ function SportsBrowserPrototypeLeftNav({
   const [catchUpLeagueOpen, setCatchUpLeagueOpen] = (0, import_react268.useState)({});
   const [yesterdayLeagueOpen, setYesterdayLeagueOpen] = (0, import_react268.useState)({});
   const hasUserSelectedTemporalView = (0, import_react268.useRef)(false);
+  const hasAppliedInitialTemporalDefault = (0, import_react268.useRef)(false);
+  const liveGamesUpdatedAt = useLiveGamesStore((s2) => s2.updatedAt);
   const yesterdayLabel = (0, import_react268.useMemo)(() => formatCompactPreviousCalendarDate(), []);
   const todayCompleteLeagues = (0, import_react268.useMemo)(
     () => buildSportsBrowserPrototypeTodayCompleteLeagueSlates(nowLeagues, upcomingLeagues, catchUpLeagues),
@@ -154250,13 +154618,14 @@ function SportsBrowserPrototypeLeftNav({
   }, [navigableGames, onNavigableGamesChange]);
   (0, import_react268.useEffect)(() => {
     if (hasUserSelectedTemporalView.current) return;
-    const hasLiveGamesToday = nowLeagues.some((slate) => slate.games.length > 0);
-    if (hasLiveGamesToday) {
-      setYesterdayOpen(false);
-      setCatchUpTodayActive(false);
-      setTodayTab("now");
-    }
-  }, [nowLeagues]);
+    if (hasAppliedInitialTemporalDefault.current) return;
+    if (!liveGamesUpdatedAt) return;
+    hasAppliedInitialTemporalDefault.current = true;
+    if (resolveSportsBrowserPrototypeDefaultTemporalTab(nowLeagues) !== "now") return;
+    setYesterdayOpen(false);
+    setCatchUpTodayActive(false);
+    setTodayTab("now");
+  }, [liveGamesUpdatedAt, nowLeagues]);
   const compactTemporalView = (0, import_react268.useMemo)(() => {
     if (yesterdayOpen) return "yesterday";
     if (catchUpTodayActive) return "final";
@@ -154600,6 +154969,7 @@ var init_SportsBrowserPrototypeLeftNav = __esm({
     init_resolveNewsSportsBrowserGameStatusLabel();
     init_resolveNewsSportsBrowserChannelPresentation();
     init_scrollSportsBrowserPrototypeSidebarActiveGameIntoView();
+    init_resolveSportsBrowserPrototypeDefaultTemporalTab();
     init_openGamesSpineTeamWorkspace();
     init_publicAssetUrl();
     init_resolveNewsSportsBrowserTennisScorePresentation();
@@ -154613,6 +154983,7 @@ var init_SportsBrowserPrototypeLeftNav = __esm({
     init_gamesSpineLeagueLogoUrls();
     init_resolveTeamLogoUrl();
     init_useSportsBrowserPrototypeTodayTemporalSlate();
+    init_liveGamesStore();
     init_sportsBrowserPrototypeLayout();
     import_jsx_runtime236 = __toESM(require_jsx_runtime(), 1);
     MENU_SURFACE2 = "bg-[#f3f0ea] text-[#1a1a1a]";
