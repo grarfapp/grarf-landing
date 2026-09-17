@@ -151890,11 +151890,113 @@ function BottomRailTeamRow({
   flashScore,
   suppressScoreCell = false,
   suppressNameCell = false,
-  finalWinnerSide = null
+  finalWinnerSide = null,
+  onTeamClick
 }) {
   const logoUrl = resolveDarkThemeLogoUrl(game, side);
   const rowClass = row === 1 ? "row-start-1" : "row-start-2";
   const winnerBoldClass = resolveGamesSpineFinalWinnerBoldClass(side, finalWinnerSide);
+  const nameContent = pollRank != null ? /* @__PURE__ */ (0, import_jsx_runtime234.jsxs)(import_jsx_runtime234.Fragment, { children: [
+    /* @__PURE__ */ (0, import_jsx_runtime234.jsx)("span", { className: LEFT_NAV_NCAAF_POLL_RANK_TEXT_CLASS, children: pollRank }),
+    /* @__PURE__ */ (0, import_jsx_runtime234.jsxs)("span", { children: [
+      " ",
+      name
+    ] })
+  ] }) : name;
+  if (onTeamClick && suppressNameCell) {
+    return /* @__PURE__ */ (0, import_jsx_runtime234.jsxs)(import_jsx_runtime234.Fragment, { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime234.jsx)(
+        "span",
+        {
+          className: cn2(
+            TEAM_LOGO_CELL_CLASS,
+            rowClass,
+            "col-start-1",
+            BOTTOM_RAIL_TEAM_CLICKABLE_CLASS
+          ),
+          "data-sports-browser-prototype-sidebar-team-name-clickable": "",
+          onClick: (event) => {
+            event.stopPropagation();
+            onTeamClick();
+          },
+          children: logoUrl ? /* @__PURE__ */ (0, import_jsx_runtime234.jsx)(
+            "img",
+            {
+              src: logoUrl,
+              alt: "",
+              className: cn2(
+                TEAM_LOGO_IMG_CLASS,
+                resolveGamesSpineLeagueLogoImgClassName(game.league, logoUrl)
+              ),
+              loading: "lazy",
+              decoding: "async"
+            }
+          ) : null
+        }
+      ),
+      !suppressScoreCell ? /* @__PURE__ */ (0, import_jsx_runtime234.jsx)(
+        BottomRailFlashValue,
+        {
+          flash: flashScore,
+          className: cn2(
+            TEAM_SCORE_CELL_CLASS,
+            rowClass,
+            "col-start-3",
+            winnerBoldClass
+          ),
+          children: showScore ? score2 ?? "\u2013" : null
+        }
+      ) : null
+    ] });
+  }
+  if (onTeamClick && !suppressNameCell) {
+    return /* @__PURE__ */ (0, import_jsx_runtime234.jsxs)(import_jsx_runtime234.Fragment, { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime234.jsxs)(
+        "span",
+        {
+          className: cn2(
+            "col-start-1 col-span-2 grid min-w-0 grid-cols-[12px_minmax(0,1fr)] items-center gap-x-[0.35ch]",
+            rowClass,
+            BOTTOM_RAIL_TEAM_CLICKABLE_CLASS
+          ),
+          "data-sports-browser-prototype-sidebar-team-name-clickable": "",
+          onClick: (event) => {
+            event.stopPropagation();
+            onTeamClick();
+          },
+          children: [
+            /* @__PURE__ */ (0, import_jsx_runtime234.jsx)("span", { className: TEAM_LOGO_CELL_CLASS, children: logoUrl ? /* @__PURE__ */ (0, import_jsx_runtime234.jsx)(
+              "img",
+              {
+                src: logoUrl,
+                alt: "",
+                className: cn2(
+                  TEAM_LOGO_IMG_CLASS,
+                  resolveGamesSpineLeagueLogoImgClassName(game.league, logoUrl)
+                ),
+                loading: "lazy",
+                decoding: "async"
+              }
+            ) : null }),
+            /* @__PURE__ */ (0, import_jsx_runtime234.jsx)("span", { className: cn2(TEAM_NAME_CELL_CLASS, winnerBoldClass), children: nameContent })
+          ]
+        }
+      ),
+      !suppressScoreCell ? /* @__PURE__ */ (0, import_jsx_runtime234.jsx)(
+        BottomRailFlashValue,
+        {
+          flash: flashScore,
+          className: cn2(
+            TEAM_SCORE_CELL_CLASS,
+            rowClass,
+            "col-start-3",
+            winnerBoldClass
+          ),
+          children: showScore ? score2 ?? "\u2013" : null
+        }
+      ) : null
+    ] });
+  }
   return /* @__PURE__ */ (0, import_jsx_runtime234.jsxs)(import_jsx_runtime234.Fragment, { children: [
     /* @__PURE__ */ (0, import_jsx_runtime234.jsx)("span", { className: cn2(TEAM_LOGO_CELL_CLASS, rowClass, "col-start-1"), children: logoUrl ? /* @__PURE__ */ (0, import_jsx_runtime234.jsx)(
       "img",
@@ -151950,7 +152052,9 @@ function BottomRailTennisMatchupScoreGrid({
   bottomName,
   topFlashCells,
   bottomFlashCells,
-  finalWinnerSide = null
+  finalWinnerSide = null,
+  onTopTeamClick,
+  onBottomTeamClick
 }) {
   const topWinnerBoldClass = resolveGamesSpineFinalWinnerBoldClass(topSide, finalWinnerSide);
   const bottomWinnerBoldClass = resolveGamesSpineFinalWinnerBoldClass(bottomSide, finalWinnerSide);
@@ -151968,8 +152072,14 @@ function BottomRailTennisMatchupScoreGrid({
             className: cn2(
               TEAM_NAME_CELL_CLASS,
               "col-start-1 row-start-1",
-              topWinnerBoldClass
+              topWinnerBoldClass,
+              onTopTeamClick && BOTTOM_RAIL_TEAM_CLICKABLE_CLASS
             ),
+            "data-sports-browser-prototype-sidebar-team-name-clickable": onTopTeamClick ? "" : void 0,
+            onClick: onTopTeamClick ? (event) => {
+              event.stopPropagation();
+              onTopTeamClick();
+            } : void 0,
             children: topName
           }
         ),
@@ -151979,8 +152089,14 @@ function BottomRailTennisMatchupScoreGrid({
             className: cn2(
               TEAM_NAME_CELL_CLASS,
               "col-start-1 row-start-2",
-              bottomWinnerBoldClass
+              bottomWinnerBoldClass,
+              onBottomTeamClick && BOTTOM_RAIL_TEAM_CLICKABLE_CLASS
             ),
+            "data-sports-browser-prototype-sidebar-team-name-clickable": onBottomTeamClick ? "" : void 0,
+            onClick: onBottomTeamClick ? (event) => {
+              event.stopPropagation();
+              onBottomTeamClick();
+            } : void 0,
             children: bottomName
           }
         ),
@@ -152027,9 +152143,15 @@ function BottomRailGameCardBody({
   game,
   flashSpec,
   onWatchLive,
-  canShowWatchLive
+  canShowWatchLive,
+  onGameTeamSelect
 }) {
   const model = resolveGamesSpineCompactMatchupModel(game);
+  const teamWorkspaceEnabled = isGamesSpineTeamWorkspaceGame(game);
+  const handleTeamSideClick = (side) => {
+    if (!teamWorkspaceEnabled || !onGameTeamSelect) return;
+    onGameTeamSelect(game, side);
+  };
   const tennisSetColumns = resolveNewsSportsBrowserTennisSetColumns(game);
   const showTennisSetScores = model.kind === "matchup" && tennisSetColumns.length > 0;
   const statusTimeColStart = showTennisSetScores ? BOTTOM_RAIL_TENNIS_STATUS_COL_START : 4;
@@ -152104,7 +152226,8 @@ function BottomRailGameCardBody({
               flashScore: flashSpec?.leftScore,
               suppressScoreCell: showTennisSetScores,
               suppressNameCell: showTennisSetScores,
-              finalWinnerSide
+              finalWinnerSide,
+              onTeamClick: teamWorkspaceEnabled && onGameTeamSelect ? () => handleTeamSideClick(model.left.side) : void 0
             }
           ),
           /* @__PURE__ */ (0, import_jsx_runtime234.jsx)(
@@ -152120,7 +152243,8 @@ function BottomRailGameCardBody({
               flashScore: flashSpec?.rightScore,
               suppressScoreCell: showTennisSetScores,
               suppressNameCell: showTennisSetScores,
-              finalWinnerSide
+              finalWinnerSide,
+              onTeamClick: teamWorkspaceEnabled && onGameTeamSelect ? () => handleTeamSideClick(model.right.side) : void 0
             }
           ),
           showTennisSetScores ? /* @__PURE__ */ (0, import_jsx_runtime234.jsx)(
@@ -152133,7 +152257,9 @@ function BottomRailGameCardBody({
               bottomName: (model.right.teamName || model.right.abbrev).trim(),
               topFlashCells: flashSpec?.leftSetScoreCells,
               bottomFlashCells: flashSpec?.rightSetScoreCells,
-              finalWinnerSide
+              finalWinnerSide,
+              onTopTeamClick: teamWorkspaceEnabled && onGameTeamSelect ? () => handleTeamSideClick(model.left.side) : void 0,
+              onBottomTeamClick: teamWorkspaceEnabled && onGameTeamSelect ? () => handleTeamSideClick(model.right.side) : void 0
             }
           ) : null,
           /* @__PURE__ */ (0, import_jsx_runtime234.jsx)(
@@ -152156,7 +152282,8 @@ function BottomRailGameCard({
   game,
   flashSpec,
   onWatchLive,
-  canShowWatchLive
+  canShowWatchLive,
+  onGameTeamSelect
 }) {
   const canonicalGame = useCanonicalGamesSpineGame(game);
   const displayGame = canonicalGame ?? game;
@@ -152166,7 +152293,8 @@ function BottomRailGameCard({
       game: displayGame,
       flashSpec,
       onWatchLive,
-      canShowWatchLive
+      canShowWatchLive,
+      onGameTeamSelect
     }
   );
 }
@@ -152220,6 +152348,7 @@ function BottomRailGameUpdateSlot({
 function SportsBrowserPrototypeBottomRailGames({
   className,
   onGameSelect,
+  onGameTeamSelect,
   onWatchLive,
   canShowWatchLive,
   layout = "bottomRail"
@@ -152348,7 +152477,8 @@ function SportsBrowserPrototypeBottomRailGames({
                   game: resolvedAlertGame,
                   flashSpec: activeFlashSpec,
                   onWatchLive,
-                  canShowWatchLive
+                  canShowWatchLive,
+                  onGameTeamSelect
                 }
               )
             }
@@ -152375,7 +152505,8 @@ function SportsBrowserPrototypeBottomRailGames({
                     game,
                     flashSpec: showFlash ? activeFlashSpec : void 0,
                     onWatchLive,
-                    canShowWatchLive
+                    canShowWatchLive,
+                    onGameTeamSelect
                   }
                 )
               },
@@ -152478,7 +152609,7 @@ function SportsBrowserPrototypeBottomRailGames({
     }
   );
 }
-var import_react266, import_jsx_runtime234, MENU_SURFACE, RULE, TOP_RAIL_ANIMATION_MS2, BOTTOM_RAIL_VALUE_FLASH_CLASS, TEAM_LOGO_CELL_CLASS, TEAM_LOGO_IMG_CLASS, TEAM_NAME_CELL_CLASS, TEAM_SCORE_CELL_CLASS, BODY_GRID_CLASS, BOTTOM_RAIL_TENNIS_SCORE_CELL_CLASS, BOTTOM_RAIL_TENNIS_BODY_GRID_CLASS, BOTTOM_RAIL_TENNIS_STATUS_COL_START, BOTTOM_RAIL_WATCH_LIVE_CLASS, bottomRailFlashStyleInjected;
+var import_react266, import_jsx_runtime234, MENU_SURFACE, RULE, TOP_RAIL_ANIMATION_MS2, BOTTOM_RAIL_VALUE_FLASH_CLASS, TEAM_LOGO_CELL_CLASS, TEAM_LOGO_IMG_CLASS, TEAM_NAME_CELL_CLASS, TEAM_SCORE_CELL_CLASS, BODY_GRID_CLASS, BOTTOM_RAIL_TENNIS_SCORE_CELL_CLASS, BOTTOM_RAIL_TENNIS_BODY_GRID_CLASS, BOTTOM_RAIL_TENNIS_STATUS_COL_START, BOTTOM_RAIL_WATCH_LIVE_CLASS, BOTTOM_RAIL_TEAM_CLICKABLE_CLASS, bottomRailFlashStyleInjected;
 var init_SportsBrowserPrototypeBottomRailGames = __esm({
   "../grarf/desktop/src/components/homeMvp/SportsBrowserPrototypeBottomRailGames.tsx"() {
     init_define_import_meta_env();
@@ -152503,6 +152634,7 @@ var init_SportsBrowserPrototypeBottomRailGames = __esm({
     init_resolveGamesSpineGameCardLeagueLabel();
     init_gamesSpineFinalResultNameEmphasis();
     init_resolveTeamLogoUrl();
+    init_openGamesSpineTeamWorkspace();
     init_resolveGamesSpineMatchupSideOrder();
     init_resolveSportsBrowserLeftNavTeamNamePresentation();
     init_NewsSportsBrowserChannelLogo();
@@ -152520,6 +152652,9 @@ var init_SportsBrowserPrototypeBottomRailGames = __esm({
     BOTTOM_RAIL_TENNIS_BODY_GRID_CLASS = "grid min-h-0 min-w-0 w-full flex-1 grid-cols-[12px_minmax(0,1fr)_2.25rem] grid-rows-2 items-center gap-x-[0.35ch] gap-y-px";
     BOTTOM_RAIL_TENNIS_STATUS_COL_START = 3;
     BOTTOM_RAIL_WATCH_LIVE_CLASS = "shrink-0 border-0 bg-transparent p-0 font-mono text-[7px] leading-none tracking-[0.08em] text-[#1a1a1a]/80 transition-colors hover:text-[#1a1a1a]";
+    BOTTOM_RAIL_TEAM_CLICKABLE_CLASS = cn2(
+      "cursor-pointer rounded-[2px] px-[2px] -mx-[2px] transition-colors hover:bg-[#d5d0c6]"
+    );
     bottomRailFlashStyleInjected = false;
   }
 });
@@ -154226,6 +154361,7 @@ function SportsBrowserPrototypeLeftNav({
                   {
                     layout: "sidebar",
                     onGameSelect,
+                    onGameTeamSelect,
                     onWatchLive,
                     canShowWatchLive
                   }
