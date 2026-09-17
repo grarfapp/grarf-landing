@@ -28,6 +28,18 @@ import { useAdminModeStore } from "../../grarf/desktop/src/store/adminModeStore"
 import { resolveCenterPaneApplicationModeFromPath } from "../../grarf/desktop/src/lib/home/resolveCenterPaneApplicationModeFromPath";
 import { hydrateOperationalGameOverridesFromPersistence } from "../../grarf/desktop/src/lib/operationsSpine/hydrateOperationalGameOverrides";
 import { hydrateOperationalLiveWorkspaceFromPersistence } from "../../grarf/desktop/src/lib/operationsSpine/hydrateOperationalLiveWorkspace";
+import { getOperationalIngestConfig } from "../../grarf/desktop/src/config/operationalIngestConfig";
+import { hasElectronGamesIpc } from "../../grarf/desktop/src/services/operationalIngest/fetchOperationalSnapshot";
+import {
+  ensureElectronOperationalGamesReady,
+  resetElectronOperationalStartupForNavigation,
+} from "../../grarf/desktop/src/services/operationalIngest/electronGrarfCloudOperationalStartup";
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}
 
 let reactRoot: Root | null = null;
 
@@ -155,11 +167,28 @@ export function mountWebHome(container: HTMLElement): void {
 }
 
 export async function bootDesktopWebClient(container: HTMLElement): Promise<void> {
-  exposeGrarfDeveloperModeOnWindow();
-  void hydrateOperationalGameOverridesFromPersistence();
-  void hydrateOperationalLiveWorkspaceFromPersistence();
-  if (isAdminHtmlEntry() && isSportscapeAdminAuthed()) {
-    activateAdminEntry();
+  try {
+    exposeGrarfDeveloperModeOnWindow();
+    void hydrateOperationalGameOverridesFromPersistence();
+    void hydrateOperationalLiveWorkspaceFromPersistence();
+    if (isAdminHtmlEntry() && isSportscapeAdminAuthed()) {
+      activateAdminEntry();
+    }
+
+    const config = getOperationalIngestConfig();
+    if (hasElectronGamesIpc() && config.provider === "grarf_cloud") {
+      const navigationEntry = performance.getEntriesByType("navigation")[0] as
+        | PerformanceNavigationTiming
+        | undefined;
+      if (navigationEntry?.type === "reload") {
+        resetElectronOperationalStartupForNavigation();
+      }
+      const startupReady = ensureElectronOperationalGamesReady();
+      await Promise.race([startupReady, sleep(1_500)]);
+    }
+  } catch (error) {
+    console.error("[bootDesktopWebClient] operational startup failed", error);
+  } finally {
+    mountWebHome(container);
   }
-  mountWebHome(container);
 }

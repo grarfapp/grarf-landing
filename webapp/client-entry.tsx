@@ -2,6 +2,7 @@ import "../../grarf/desktop/src/lib/gamesSpine/gamesSpineBootstrap";
 import { bootGrarfMobileWebClient } from "../../grarf/desktop/src/lib/platform/bootGrarfMobileWebClient";
 import { shouldRenderGrarfMobileWebClient } from "../../grarf/desktop/src/lib/platform/shouldRenderGrarfMobileWebClient";
 import { exposeGrarfDeveloperModeOnWindow } from "../../grarf/desktop/src/intelligence/exposeGrarfDeveloperModeOnWindow";
+import { bootDesktopWebClient } from "./desktop-bootstrap";
 
 exposeGrarfDeveloperModeOnWindow();
 
@@ -14,7 +15,6 @@ if (autoRoot) {
       return;
     }
 
-    const { bootDesktopWebClient } = await import("./desktop-bootstrap");
     await bootDesktopWebClient(autoRoot);
   })();
 }

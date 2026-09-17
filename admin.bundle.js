@@ -16096,11 +16096,22 @@ function touchConsumer(record, consumerId) {
     }
   };
 }
+function snapshotMateriallyUpgradesCanonical(snap, prev) {
+  for (const rows of Object.values(snap.leagues ?? {})) {
+    if (!Array.isArray(rows)) continue;
+    for (const game of rows) {
+      const previous = prev.gamesById[game.id]?.game;
+      if (!previous) return true;
+      if (!gameRowMateriallyEqual(game, previous)) return true;
+    }
+  }
+  return false;
+}
 function shouldRejectIncomingCanonicalSnapshot(snap, prev, meta) {
   const incomingAt = meta?.transportGeneratedAt ?? snap.updatedAt;
   const incomingMs = parseOperationalTransportGeneratedAtMs(incomingAt);
   const canonicalMs = parseOperationalTransportGeneratedAtMs(prev.updatedAt);
-  if (incomingMs !== Number.NEGATIVE_INFINITY && canonicalMs !== Number.NEGATIVE_INFINITY && incomingMs < canonicalMs) {
+  if (incomingMs !== Number.NEGATIVE_INFINITY && canonicalMs !== Number.NEGATIVE_INFINITY && incomingMs < canonicalMs && !(meta?.ingestSource === "grarf_cloud" && snapshotMateriallyUpgradesCanonical(snap, prev))) {
     return "rejected_older_snapshot";
   }
   for (const rows of Object.values(snap.leagues ?? {})) {
@@ -25061,6 +25072,26 @@ function countPopulatedOperationalLeagues(leagues) {
     (rows) => Array.isArray(rows) && rows.length > 0
   ).length;
 }
+function countOperationalGames2(leagues) {
+  return Object.values(leagues ?? {}).reduce(
+    (total, rows) => total + (Array.isArray(rows) ? rows.length : 0),
+    0
+  );
+}
+function shouldRejectEmptyCloudHydrateOnElectron(incomingLeagues) {
+  if (!hasElectronGamesIpc()) return false;
+  return countOperationalGames2(incomingLeagues) === 0;
+}
+function shouldRejectCloudHydrateThatClearsValidPopulation(incomingLeagues, previousLeagues, options) {
+  const previousCount = countOperationalGames2(previousLeagues);
+  if (previousCount === 0) return false;
+  const incomingCount = countOperationalGames2(incomingLeagues);
+  if (incomingCount === 0) return true;
+  if (options?.providerPoll?.allLeaguesFailed && incomingCount < previousCount) {
+    return true;
+  }
+  return false;
+}
 function isOperationalStartupSnapshotReady(transport, completeness) {
   const flag = completeness?.initialIngestComplete ?? transport.initialIngestComplete;
   if (flag !== false) return true;
@@ -25238,6 +25269,37 @@ var useLiveGamesStore = create((set, get) => ({
       return;
     }
     const prevCanonical = useCanonicalLiveGameStore.getState();
+    if (ingestSource === "grarf_cloud" && shouldRejectEmptyCloudHydrateOnElectron(snap.leagues)) {
+      logOperationalHydrateDecision({
+        stage: "hydrate_exit",
+        outcome: "skipped_cloud_local_authority",
+        source: ingestSource,
+        transportGeneratedAt: completeness?.transportGeneratedAt ?? null,
+        snapshotUpdatedAt: snap.updatedAt ?? null,
+        gameCount: 0,
+        liveGames: summarizeLiveGamesForDiagnostic(snap.leagues)
+      });
+      return;
+    }
+    if (ingestSource === "grarf_cloud" && shouldRejectCloudHydrateThatClearsValidPopulation(
+      snap.leagues,
+      prevCanonical.leagues,
+      { providerPoll: completeness?.providerPoll }
+    )) {
+      logOperationalHydrateDecision({
+        stage: "hydrate_exit",
+        outcome: "rejected_cloud_would_clear_valid_population",
+        source: ingestSource,
+        transportGeneratedAt: completeness?.transportGeneratedAt ?? null,
+        snapshotUpdatedAt: snap.updatedAt ?? null,
+        gameCount: Object.values(snap.leagues ?? {}).reduce(
+          (count, rows) => count + (Array.isArray(rows) ? rows.length : 0),
+          0
+        ),
+        liveGames: summarizeLiveGamesForDiagnostic(snap.leagues)
+      });
+      return;
+    }
     const renderState = useGamesSpineRenderStore.getState();
     if (shouldRejectRegressiveOperationalSnapshot(
       snap.leagues,
