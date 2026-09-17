@@ -11825,15 +11825,15 @@ var require_react_dom_client_production = __commonJS({
     function getHydratableHoistableCache(type, keyAttribute, ownerDocument) {
       if (null === tagCaches) {
         var cache2 = /* @__PURE__ */ new Map();
-        var caches = tagCaches = /* @__PURE__ */ new Map();
-        caches.set(ownerDocument, cache2);
+        var caches2 = tagCaches = /* @__PURE__ */ new Map();
+        caches2.set(ownerDocument, cache2);
       } else
-        caches = tagCaches, cache2 = caches.get(ownerDocument), cache2 || (cache2 = /* @__PURE__ */ new Map(), caches.set(ownerDocument, cache2));
+        caches2 = tagCaches, cache2 = caches2.get(ownerDocument), cache2 || (cache2 = /* @__PURE__ */ new Map(), caches2.set(ownerDocument, cache2));
       if (cache2.has(type)) return cache2;
       cache2.set(type, null);
       ownerDocument = ownerDocument.getElementsByTagName(type);
-      for (caches = 0; caches < ownerDocument.length; caches++) {
-        var node = ownerDocument[caches];
+      for (caches2 = 0; caches2 < ownerDocument.length; caches2++) {
+        var node = ownerDocument[caches2];
         if (!(node[internalHoistableMarker] || node[internalInstanceKey] || "link" === type && "stylesheet" === node.getAttribute("rel")) && "http://www.w3.org/2000/svg" !== node.namespaceURI) {
           var nodeKey = node.getAttribute(keyAttribute) || "";
           nodeKey = type + nodeKey;
@@ -24178,12 +24178,15 @@ async function fetchWebEspnOperationalSnapshot(leagueKeys = filterEspnOperationa
 
 // ../grarf/desktop/src/services/operationalIngest/fetchOperationalSnapshot.ts
 var LOG13 = "[OperationalIngest]";
-var CLOUD_STALE_THRESHOLD_MS = 9e4;
 var CLOUD_FETCH_TIMEOUT_MS = 2e4;
 var WEB_CLOUD_BOOTSTRAP_TIMEOUT_MS = 2500;
 var CLOUD_FETCH_MAX_ATTEMPTS = 3;
 var CLOUD_FETCH_RETRY_MS = 1500;
 var webCloudSnapshotPrefetch = null;
+var grarfCloudSnapshotFetchInFlight = null;
+function shouldUseWebBootstrapCloudPrefetch() {
+  return isGrarfWebRenderer() && !hasElectronGamesIpc();
+}
 function prefetchWebOperationalCloudSnapshot() {
   const config = getOperationalIngestConfig();
   if (!config.cloudBaseUrl) return Promise.resolve(null);
@@ -24191,14 +24194,28 @@ function prefetchWebOperationalCloudSnapshot() {
     return Promise.resolve(null);
   }
   if (!webCloudSnapshotPrefetch) {
-    webCloudSnapshotPrefetch = fetchViaGrarfCloudService({ webBootstrap: true }).then((snap) => countOperationalGames(snap) > 0 ? snap : null).catch((e) => {
-      if (define_import_meta_env_default.DEV) {
-        console.warn(`${LOG13} web cloud prefetch failed`, e);
-      }
+    webCloudSnapshotPrefetch = fetchViaGrarfCloudService(
+      shouldUseWebBootstrapCloudPrefetch() ? { webBootstrap: true } : void 0
+    ).then((snap) => countOperationalGames(snap) > 0 ? snap : null).catch((e) => {
+      console.warn(`${LOG13} web cloud prefetch failed`, e);
       return null;
     });
   }
   return webCloudSnapshotPrefetch;
+}
+async function fetchGrarfCloudOperationalSnapshot() {
+  if (!grarfCloudSnapshotFetchInFlight) {
+    grarfCloudSnapshotFetchInFlight = (async () => {
+      const prefetched = await prefetchWebOperationalCloudSnapshot();
+      if (prefetched && countOperationalGames(prefetched) > 0) {
+        return prefetched;
+      }
+      return fetchViaGrarfCloudService();
+    })().finally(() => {
+      grarfCloudSnapshotFetchInFlight = null;
+    });
+  }
+  return grarfCloudSnapshotFetchInFlight;
 }
 function countOperationalGames(snap) {
   return Object.values(snap.leagues ?? {}).reduce(
@@ -24321,18 +24338,28 @@ function mergeEspnOperationalFieldsFromSupplement(cloud, espn) {
 function hasElectronGamesIpc() {
   return Boolean(typeof window !== "undefined" && window.grarf?.gamesGetSnapshot);
 }
+function isLocalWebappOperationalSnapshotProxyOrigin() {
+  if (typeof window === "undefined") return false;
+  try {
+    const { hostname, protocol } = window.location;
+    if (protocol !== "http:" && protocol !== "https:") return false;
+    return hostname === "127.0.0.1" || hostname === "localhost";
+  } catch {
+    return false;
+  }
+}
+function resolveGrarfCloudOperationalSnapshotUrl(cloudBaseUrl) {
+  if (isLocalWebappOperationalSnapshotProxyOrigin()) {
+    return `${window.location.origin}/operational/snapshot`;
+  }
+  return `${cloudBaseUrl.replace(/\/$/, "")}/operational/snapshot`;
+}
 function emptyOperationalSnapshot() {
   return {
     generatedAt: (/* @__PURE__ */ new Date()).toISOString(),
     source: "espn_local_adapter",
     leagues: {}
   };
-}
-function snapshotAgeMs(generatedAt) {
-  if (!generatedAt?.trim()) return Number.POSITIVE_INFINITY;
-  const ms = Date.parse(generatedAt);
-  if (!Number.isFinite(ms)) return Number.POSITIVE_INFINITY;
-  return Math.max(0, Date.now() - ms);
 }
 function ipcSnapshotToOperationalResponse(snap, source = "espn_local_adapter") {
   const leagues = {};
@@ -24364,7 +24391,7 @@ async function fetchViaGrarfCloudService(options) {
   if (!cloudBaseUrl) {
     throw new Error("[OperationalIngest] grarf_cloud provider requires VITE_GRARF_OPERATIONAL_INGEST_URL");
   }
-  const url = `${cloudBaseUrl.replace(/\/$/, "")}/operational/snapshot`;
+  const url = resolveGrarfCloudOperationalSnapshotUrl(cloudBaseUrl);
   const maxAttempts = options?.webBootstrap ? 1 : CLOUD_FETCH_MAX_ATTEMPTS;
   let lastError;
   for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
@@ -24419,7 +24446,7 @@ async function fetchViaWebOperationalIngest() {
     }
   }
   if (cloud && countOperationalGames(cloud) > 0) {
-    return joinWebMlbProviderIds(cloud);
+    return cloud;
   }
   if (define_import_meta_env_default.DEV) {
     try {
@@ -24436,7 +24463,7 @@ async function fetchViaWebOperationalIngest() {
     }
   }
   if (cloud) {
-    return joinWebMlbProviderIds(cloud);
+    return cloud;
   }
   throw new Error(cloudError ?? "[OperationalIngest] grarf_cloud unavailable in browser");
 }
@@ -24454,91 +24481,13 @@ async function joinWebMlbProviderIds(transport) {
     return transport;
   }
 }
-function countLiveOperationalGames(snap) {
-  let live = 0;
-  for (const rows of Object.values(snap.leagues ?? {})) {
-    if (!Array.isArray(rows)) continue;
-    for (const game of rows) {
-      if (game?.status === "live") live += 1;
-    }
-  }
-  return live;
-}
-async function fetchViaGrarfCloudWithLocalFallback() {
-  let cloud = null;
-  let cloudError = null;
-  try {
-    cloud = await fetchViaGrarfCloudService();
-  } catch (e) {
-    cloudError = e instanceof Error ? e.message : String(e);
-  }
-  const cloudAgeMs = cloud ? snapshotAgeMs(cloud.generatedAt) : Number.POSITIVE_INFINITY;
-  const cloudFresh = cloud != null && cloudAgeMs <= CLOUD_STALE_THRESHOLD_MS;
-  const electronIpc = hasElectronGamesIpc();
-  if (electronIpc) {
-    const local2 = await fetchViaEspnLocalIpcAdapter();
-    const localAgeMs2 = snapshotAgeMs(local2.generatedAt);
-    const localGames = countOperationalGames(local2);
-    const cloudGames = cloud ? countOperationalGames(cloud) : 0;
-    const localLive = countLiveOperationalGames(local2);
-    const cloudLive = cloud ? countLiveOperationalGames(cloud) : 0;
-    if (localGames > 0) {
-      const localFresher = !cloud || !cloudFresh || localAgeMs2 + 3e4 < cloudAgeMs || localLive > cloudLive || localGames > cloudGames;
-      if (localFresher) {
-        if (define_import_meta_env_default.DEV && cloud && !cloudFresh) {
-          console.warn(`${LOG13} using local IPC (cloud stale or failed)`, {
-            cloudError,
-            cloudAgeMs,
-            localAgeMs: localAgeMs2
-          });
-        }
-        return { ...local2, source: "espn_local_adapter" };
-      }
-    }
-  }
-  if (cloudFresh && cloud) {
-    return cloud;
-  }
-  if (!electronIpc) {
-    if (cloud) {
-      if (define_import_meta_env_default.DEV && !cloudFresh) {
-        console.warn(`${LOG13} browser/web using cloud snapshot (stale but authoritative)`, {
-          cloudAgeMs,
-          cloudError
-        });
-      }
-      return cloud;
-    }
-    if (isGrarfWebRenderer()) {
-      throw new Error(cloudError ?? "[OperationalIngest] grarf_cloud unavailable in browser");
-    }
-    throw new Error(cloudError ?? "[OperationalIngest] grarf_cloud unavailable in browser");
-  }
-  const local = await fetchViaEspnLocalIpcAdapter();
-  const localAgeMs = snapshotAgeMs(local.generatedAt);
-  if (cloud && cloudAgeMs <= localAgeMs) {
-    return cloud;
-  }
-  if (define_import_meta_env_default.DEV && (cloudError || cloud && !cloudFresh)) {
-    console.warn(`${LOG13} using local IPC fallback (cloud stale or failed)`, {
-      cloudError,
-      cloudAgeMs: cloud ? cloudAgeMs : null,
-      localAgeMs,
-      localGeneratedAt: local.generatedAt
-    });
-  }
-  return {
-    ...local,
-    source: "espn_local_adapter"
-  };
-}
 async function fetchOperationalSnapshot() {
   const config = getOperationalIngestConfig();
   if (isGrarfWebRenderer() && !hasElectronGamesIpc()) {
     return fetchViaWebOperationalIngest();
   }
   if (config.provider === "grarf_cloud") {
-    return hasElectronGamesIpc() ? fetchViaGrarfCloudWithLocalFallback() : fetchViaGrarfCloudService();
+    return fetchGrarfCloudOperationalSnapshot();
   }
   return fetchViaEspnLocalIpcAdapter();
 }
@@ -25267,9 +25216,6 @@ var useLiveGamesStore = create((set, get) => ({
   updatedAt: useCanonicalLiveGameStore.getState().updatedAt,
   hydrate: (snap, completeness) => {
     const ingestSource = completeness?.source;
-    if (hasElectronGamesIpc() && ingestSource === "grarf_cloud") {
-      return;
-    }
     if (hasElectronGamesIpc() && (ingestSource === "espn_local_adapter" || ingestSource === "espn_scoreboard_ipc") && !isOperationalStartupSnapshotReady(
       {
         initialIngestComplete: completeness?.initialIngestComplete,
@@ -27475,6 +27421,159 @@ var ESPN_LEAGUES = ESPN_OPERATIONAL_INGEST_LEAGUES2.map((l) => ({
 var ESPN_LEAGUE_KEYS = ESPN_LEAGUES.map((l) => l.key);
 var CHROME_UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36";
 
+// ../grarf/grarf-operational-service/src/cache/operationalEnrichmentProviderCache.ts
+init_define_import_meta_env();
+
+// ../grarf/grarf-operational-service/src/instrumentation/operationalCycleMetrics.ts
+init_define_import_meta_env();
+var activeCycle = null;
+function recordOperationalNetworkRequest(provider) {
+  if (!activeCycle) return;
+  activeCycle.providerCounts.set(
+    provider,
+    (activeCycle.providerCounts.get(provider) ?? 0) + 1
+  );
+}
+function recordOperationalCacheOperation(storage, operation) {
+  if (!activeCycle) return;
+  activeCycle[storage][operation] += 1;
+}
+
+// ../grarf/grarf-operational-service/src/cache/operationalEnrichmentProviderCache.ts
+var CACHE_NAME = "grarf-operational-enrichment-v1";
+var configuredPollIntervalMs = 6e4;
+var durableCache;
+var cycleStats = emptyStats();
+function emptyStats() {
+  return {
+    hits: 0,
+    edgeHits: 0,
+    durableHits: 0,
+    misses: 0,
+    writes: 0,
+    readErrors: 0,
+    writeErrors: 0,
+    invalidEntries: 0
+  };
+}
+function buildOperationalEnrichmentProviderCacheKey(provider, requestIdentity) {
+  return `https://grarf-operational-service.internal/enrichment/${encodeURIComponent(
+    provider
+  )}/${encodeURIComponent(requestIdentity)}`;
+}
+async function readOperationalEnrichmentProviderCache(cacheKey2, validate, ttlMs) {
+  try {
+    const cache2 = await caches.open(CACHE_NAME);
+    recordOperationalCacheOperation("cacheApi", "read");
+    const res = await cache2.match(cacheKey2);
+    if (!res?.ok) {
+      if (durableCache && ttlMs > configuredPollIntervalMs) {
+        recordOperationalCacheOperation("kv", "read");
+        const durable = await durableCache.get(`operational-enrichment:v1:${cacheKey2}`, "json");
+        if (durable && durable.expiresAt > Date.now() && validate(durable.value)) {
+          cycleStats.hits += 1;
+          cycleStats.durableHits += 1;
+          const remainingTtlSec = Math.max(
+            1,
+            Math.floor((durable.expiresAt - Date.now()) / 1e3)
+          );
+          recordOperationalCacheOperation("cacheApi", "write");
+          await cache2.put(
+            cacheKey2,
+            new Response(JSON.stringify(durable.value), {
+              headers: {
+                "Content-Type": "application/json",
+                "Cache-Control": `public, max-age=${remainingTtlSec}`
+              }
+            })
+          );
+          return durable.value;
+        }
+      }
+      cycleStats.misses += 1;
+      return null;
+    }
+    const json = await res.json();
+    if (!validate(json)) {
+      cycleStats.invalidEntries += 1;
+      cycleStats.misses += 1;
+      return null;
+    }
+    cycleStats.hits += 1;
+    cycleStats.edgeHits += 1;
+    return json;
+  } catch {
+    cycleStats.readErrors += 1;
+    cycleStats.misses += 1;
+    return null;
+  }
+}
+async function writeOperationalEnrichmentProviderCache(cacheKey2, value, ttlMs) {
+  try {
+    const ttlSec = Math.max(1, Math.floor(ttlMs / 1e3));
+    const cache2 = await caches.open(CACHE_NAME);
+    recordOperationalCacheOperation("cacheApi", "write");
+    await cache2.put(
+      cacheKey2,
+      new Response(JSON.stringify(value), {
+        headers: {
+          "Content-Type": "application/json",
+          "Cache-Control": `public, max-age=${ttlSec}`
+        }
+      })
+    );
+    if (durableCache && ttlMs > configuredPollIntervalMs) {
+      recordOperationalCacheOperation("kv", "write");
+      await durableCache.put(
+        `operational-enrichment:v1:${cacheKey2}`,
+        JSON.stringify({ expiresAt: Date.now() + ttlMs, value }),
+        { expirationTtl: Math.max(60, ttlSec) }
+      );
+    }
+    cycleStats.writes += 1;
+  } catch {
+    cycleStats.writeErrors += 1;
+  }
+}
+function resolveOperationalEnrichmentLiveCatalogTtlMs() {
+  return configuredPollIntervalMs;
+}
+function resolveOperationalEnrichmentScheduledCatalogTtlMs() {
+  return 5 * 60 * 1e3;
+}
+function resolveOperationalEnrichmentHistoricalCatalogTtlMs() {
+  return 24 * 60 * 60 * 1e3;
+}
+function resolveOperationalEnrichmentDateKeyTtlMs(dateKey, now = /* @__PURE__ */ new Date()) {
+  const normalized = dateKey.trim();
+  if (!/^\d{8}$/.test(normalized)) return resolveOperationalEnrichmentLiveCatalogTtlMs();
+  const y = now.getUTCFullYear();
+  const m = String(now.getUTCMonth() + 1).padStart(2, "0");
+  const d = String(now.getUTCDate()).padStart(2, "0");
+  const todayKey = `${y}${m}${d}`;
+  if (normalized === todayKey) return resolveOperationalEnrichmentLiveCatalogTtlMs();
+  if (normalized < todayKey) return resolveOperationalEnrichmentHistoricalCatalogTtlMs();
+  return resolveOperationalEnrichmentScheduledCatalogTtlMs();
+}
+
+// ../grarf/grarf-operational-service/src/cache/withOperationalEnrichmentProviderCache.ts
+init_define_import_meta_env();
+async function withOperationalEnrichmentProviderCache(input) {
+  const cacheKey2 = buildOperationalEnrichmentProviderCacheKey(
+    input.provider,
+    input.requestIdentity
+  );
+  const cached = await readOperationalEnrichmentProviderCache(
+    cacheKey2,
+    input.validate,
+    input.ttlMs
+  );
+  if (cached != null) return cached;
+  const value = await input.fetch();
+  await writeOperationalEnrichmentProviderCache(cacheKey2, value, input.ttlMs);
+  return value;
+}
+
 // ../grarf/grarf-operational-service/src/instrumentation/operationalSubrequestTrace.ts
 init_define_import_meta_env();
 var traceEnabled = false;
@@ -27498,6 +27597,9 @@ function recordSubrequest(record) {
   subrequestRecords.push(record);
 }
 async function traceOperationalFetch(url, init, meta) {
+  if (meta?.provider) {
+    recordOperationalNetworkRequest(meta.provider);
+  }
   if (!traceEnabled || !cycleActive) {
     return fetch(url, init);
   }
@@ -27555,6 +27657,35 @@ function fotmobBucketMatchesRegistryEntry(bucket, entry2) {
 
 // ../grarf/grarf-operational-service/src/watch/fotmob/fetchFotmobMatchesByDate.ts
 var FOTMOB_MATCHES_API = "https://www.fotmob.com/api/data/matches";
+var fotmobInFlightByDateKey = /* @__PURE__ */ new Map();
+function isValidFotmobLeagueBuckets(value) {
+  return Array.isArray(value);
+}
+async function fetchFotmobLeagueBucketsByDateUncached(dateKey) {
+  try {
+    const res = await traceOperationalFetch(
+      `${FOTMOB_MATCHES_API}?date=${encodeURIComponent(dateKey)}`,
+      {
+        headers: {
+          "User-Agent": CHROME_UA,
+          Accept: "application/json",
+          Referer: "https://www.fotmob.com/"
+        },
+        signal: AbortSignal.timeout(12e3)
+      },
+      {
+        functionName: "fetchFotmobLeagueBucketsByDate",
+        stage: "other",
+        provider: "fotmob"
+      }
+    );
+    if (!res.ok) return [];
+    const payload = await res.json();
+    return payload.leagues ?? [];
+  } catch {
+    return [];
+  }
+}
 function fotmobDateKeyFromMs(ms) {
   if (!Number.isFinite(ms)) return null;
   const d = new Date(ms);
@@ -27571,25 +27702,19 @@ function fotmobDateKeyFromScheduledDateKey(key) {
 async function fetchFotmobLeagueBucketsByDate(dateKey) {
   const normalized = dateKey.trim();
   if (!/^\d{8}$/.test(normalized)) return [];
-  try {
-    const res = await traceOperationalFetch(
-      `${FOTMOB_MATCHES_API}?date=${encodeURIComponent(normalized)}`,
-      {
-        headers: {
-          "User-Agent": CHROME_UA,
-          Accept: "application/json",
-          Referer: "https://www.fotmob.com/"
-        },
-        signal: AbortSignal.timeout(12e3)
-      },
-      { functionName: "fetchFotmobLeagueBucketsByDate", stage: "other" }
-    );
-    if (!res.ok) return [];
-    const payload = await res.json();
-    return payload.leagues ?? [];
-  } catch {
-    return [];
-  }
+  const inFlight2 = fotmobInFlightByDateKey.get(normalized);
+  if (inFlight2) return inFlight2;
+  const promise = withOperationalEnrichmentProviderCache({
+    provider: "fotmob",
+    requestIdentity: `matches:${normalized}`,
+    ttlMs: resolveOperationalEnrichmentDateKeyTtlMs(normalized),
+    validate: isValidFotmobLeagueBuckets,
+    fetch: () => fetchFotmobLeagueBucketsByDateUncached(normalized)
+  }).finally(() => {
+    fotmobInFlightByDateKey.delete(normalized);
+  });
+  fotmobInFlightByDateKey.set(normalized, promise);
+  return promise;
 }
 
 // ../grarf/grarf-operational-service/src/watch/fotmob/fotmobLeagueRegistry.ts
@@ -30332,6 +30457,9 @@ async function enrichOperationalSnapshotWatchStreamsLocal(transport) {
   return next;
 }
 async function enrichOperationalTransport(rawTransport) {
+  if (rawTransport.source === "grarf_operational_service") {
+    return rawTransport;
+  }
   let transport = rawTransport;
   try {
     transport = await supplementOperationalSnapshotFromLocalIpc(transport);
