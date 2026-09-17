@@ -140936,6 +140936,100 @@ function resolveNewsSportsBrowserChannelPresentation(game) {
   return resolveGameChannelPresentation(game);
 }
 
+// ../grarf/desktop/src/lib/home/groupSportsBrowserSidebarTennisGamesByTournament.ts
+init_define_import_meta_env();
+function shouldGroupSportsBrowserSidebarLeagueByTournament(leagueKey) {
+  return leagueKey === "ATP" || leagueKey === "WTA";
+}
+function resolveSportsBrowserSidebarTennisTournamentName(game) {
+  const contextLine = game.metadata?.tennis?.contextLine?.trim();
+  if (contextLine) {
+    const first = contextLine.split("\xB7")[0]?.trim();
+    if (first) return first;
+  }
+  const statusLine = game.statusLine?.trim();
+  if (statusLine) {
+    const first = statusLine.split("\xB7")[0]?.trim();
+    if (first) return first;
+  }
+  return isTennisLeague(game.league) ? game.league : "Tennis";
+}
+function resolveSportsBrowserSidebarTennisTournamentGroupKey(game) {
+  return resolveSportsBrowserSidebarTennisTournamentName(game);
+}
+function resolveSportsBrowserSidebarTennisTournamentExpansionKey(leagueKey, tournamentKey) {
+  return `${leagueKey}::${tournamentKey}`;
+}
+function groupSportsBrowserSidebarTennisGamesByTournament(games) {
+  const groups = [];
+  const indexByKey = /* @__PURE__ */ new Map();
+  for (const game of games) {
+    const key2 = resolveSportsBrowserSidebarTennisTournamentGroupKey(game);
+    const label = resolveSportsBrowserSidebarTennisTournamentName(game);
+    const existingIndex = indexByKey.get(key2);
+    if (existingIndex == null) {
+      indexByKey.set(key2, groups.length);
+      groups.push({ key: key2, label, games: [game] });
+      continue;
+    }
+    groups[existingIndex].games.push(game);
+  }
+  return groups;
+}
+function resolveSportsBrowserSidebarTennisMatchDetailLabel(game) {
+  const contextLine = game.metadata?.tennis?.contextLine?.trim();
+  if (contextLine) {
+    const parts = contextLine.split("\xB7").map((part) => part.trim()).filter(Boolean);
+    if (parts.length > 1) {
+      return parts.slice(1).join(" \xB7 ");
+    }
+  }
+  const statusLine = game.statusLine?.trim();
+  if (statusLine) {
+    const tournamentName = resolveSportsBrowserSidebarTennisTournamentName(game);
+    const normalizedTournament = tournamentName.trim().toLowerCase();
+    const parts = statusLine.split("\xB7").map((part) => part.trim()).filter(Boolean);
+    if (parts.length > 1 && parts[0]?.trim().toLowerCase() === normalizedTournament) {
+      return parts.slice(1).join(" \xB7 ");
+    }
+  }
+  return "";
+}
+
+// ../grarf/desktop/src/lib/home/resolveSportsBrowserSidebarTennisMatchCardStatusLabel.ts
+init_define_import_meta_env();
+function normalizeStatusToken(value) {
+  return value.trim().toLowerCase().replace(/\s+/g, " ");
+}
+function resolveSportsBrowserSidebarTennisMatchCardStatusLabel(game) {
+  const tournamentName = resolveSportsBrowserSidebarTennisTournamentName(game);
+  const base = resolveNewsSportsBrowserCompactStatusLabel(game);
+  const normalizedBase = normalizeStatusToken(base);
+  const normalizedTournament = normalizeStatusToken(tournamentName);
+  const contextLine = game.metadata?.tennis?.contextLine?.trim() ?? "";
+  const normalizedContext = normalizeStatusToken(contextLine);
+  if (contextLine && normalizedBase === normalizedContext) {
+    return resolveSportsBrowserSidebarTennisMatchDetailLabel(game);
+  }
+  if (normalizedBase.startsWith(normalizedTournament)) {
+    const remainder = base.slice(tournamentName.length).replace(/^[·\s]+/, "").trim();
+    if (remainder) return remainder;
+  }
+  const statusLine = game.statusLine?.trim();
+  if (statusLine && normalizeStatusToken(statusLine) === normalizedBase) {
+    const detail2 = resolveSportsBrowserSidebarTennisMatchDetailLabel(game);
+    if (detail2) return detail2;
+  }
+  if (base) return base;
+  if (game.status === "live") {
+    const clock = game.displayClock?.trim();
+    if (clock) return clock;
+  }
+  const detail = resolveSportsBrowserSidebarTennisMatchDetailLabel(game);
+  if (detail) return detail;
+  return base;
+}
+
 // ../grarf/desktop/src/lib/home/scrollSportsBrowserPrototypeSidebarActiveGameIntoView.ts
 init_define_import_meta_env();
 function resolveSportsBrowserPrototypeSidebarActiveGameRow(scrollContainer, selectedGameId) {
@@ -143175,7 +143269,9 @@ function NavRow({
   isSelected = false,
   soccerArchLeague = false,
   soccerArchChildLeague = false,
-  leagueActivityStatuses
+  leagueActivityStatuses,
+  tennisTournamentKey,
+  tennisTournamentLeagueKey
 }) {
   const indentClass = resolveNavRowIndentClass(indent, soccerArchChildLeague);
   return /* @__PURE__ */ (0, import_jsx_runtime236.jsxs)(
@@ -143198,6 +143294,9 @@ function NavRow({
       "data-sports-browser-prototype-sidebar-league-key": leagueKey,
       "data-sports-browser-prototype-sidebar-soccer-arch-league": soccerArchLeague ? "" : void 0,
       "data-sports-browser-prototype-sidebar-soccer-arch-child-league": soccerArchChildLeague ? "" : void 0,
+      "data-sports-browser-prototype-sidebar-tennis-tournament-row": tennisTournamentKey ? "" : void 0,
+      "data-sports-browser-prototype-sidebar-tennis-tournament-key": tennisTournamentKey,
+      "data-sports-browser-prototype-sidebar-tennis-tournament-league": tennisTournamentLeagueKey,
       children: [
         /* @__PURE__ */ (0, import_jsx_runtime236.jsxs)("span", { className: "flex min-w-0 flex-1 items-start gap-1", children: [
           temporalAllSection ? /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(SidebarLeagueNavLogoMark, { logoUrl: SPORTS_BROWSER_PROTOTYPE_TEMPORAL_ALL_LOGO_URL }) : soccerArchLeague ? /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(SidebarLeagueNavLogoMark, { logoUrl: SOCCER_SIDEBAR_ARCH_LEAGUE_LOGO_URL }) : leagueKey ? /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(SidebarLeagueNavLogoMark, { leagueKey, games: leagueGames }) : null,
@@ -143365,9 +143464,10 @@ function SidebarGameRowScore({
 function SidebarGameRowStatus({
   game,
   variant,
-  colStart = 3
+  colStart = 3,
+  statusLabelOverride
 }) {
-  const statusLabel = resolveNewsSportsBrowserCompactStatusLabel(game);
+  const statusLabel = statusLabelOverride ?? resolveNewsSportsBrowserCompactStatusLabel(game);
   const isLive = game.status === "live" && variant === "live";
   return /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
     "span",
@@ -143403,9 +143503,11 @@ function SidebarTemporalGameRow({
   onGameTeamSelect,
   onWatchLive,
   canShowWatchLive,
-  isSelected = false
+  isSelected = false,
+  sidebarTennisTournamentGrouped = false
 }) {
   const model = resolveGamesSpineCompactMatchupModel(game);
+  const tennisMatchCardStatusLabel = sidebarTennisTournamentGrouped ? resolveSportsBrowserSidebarTennisMatchCardStatusLabel(game) : void 0;
   const teamWorkspaceEnabled = isGamesSpineTeamWorkspaceGame(game);
   const handleTeamSideClick = (side) => {
     if (!teamWorkspaceEnabled || !onGameTeamSelect) return;
@@ -143450,7 +143552,14 @@ function SidebarTemporalGameRow({
             }
           ),
           hasDetail ? /* @__PURE__ */ (0, import_jsx_runtime236.jsx)("span", { className: cn2("col-span-2 row-start-2 min-w-0 break-words whitespace-normal normal-case pl-[calc(12px+0.35ch)]", SIDEBAR_GAME_ROW_PRIMARY_TEXT_CLASS), children: eventDetail }) : null,
-          /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(SidebarGameRowStatus, { game, variant }),
+          /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
+            SidebarGameRowStatus,
+            {
+              game,
+              variant,
+              statusLabelOverride: tennisMatchCardStatusLabel
+            }
+          ),
           /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(SidebarGameRowBroadcast, { game }),
           /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
             SidebarGameRowWatchLive,
@@ -143517,7 +143626,15 @@ function SidebarTemporalGameRow({
               )
             }
           ) : /* @__PURE__ */ (0, import_jsx_runtime236.jsx)("span", { className: "col-start-2 row-start-1", "aria-hidden": true }),
-          /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(SidebarGameRowStatus, { game, variant, colStart: statusColStart }),
+          /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
+            SidebarGameRowStatus,
+            {
+              game,
+              variant,
+              colStart: statusColStart,
+              statusLabelOverride: tennisMatchCardStatusLabel
+            }
+          ),
           /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(SidebarGameRowBroadcast, { game, colStart: broadcastColStart }),
           /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
             SidebarGameRowWatchLive,
@@ -143606,7 +143723,15 @@ function SidebarTemporalGameRow({
             winnerBoldClass: resolveGamesSpineFinalWinnerBoldClass(secondLine.side, finalWinnerSide)
           }
         ),
-        /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(SidebarGameRowStatus, { game, variant, colStart: statusColStart }),
+        /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
+          SidebarGameRowStatus,
+          {
+            game,
+            variant,
+            colStart: statusColStart,
+            statusLabelOverride: tennisMatchCardStatusLabel
+          }
+        ),
         /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(SidebarGameRowBroadcast, { game, colStart: broadcastColStart }),
         /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
           SidebarGameRowWatchLive,
@@ -143684,9 +143809,17 @@ function SidebarTemporalLeagueBlock({
   selectedLeagueKey,
   indent = 0,
   soccerArchChildLeague = false,
-  leagueActivityStatuses
+  leagueActivityStatuses,
+  leagueOpen,
+  onToggleExpansionKey
 }) {
   const isLeagueSelected = selectedLeagueKey === slate.key;
+  const usesTennisTournamentGrouping = shouldGroupSportsBrowserSidebarLeagueByTournament(slate.key);
+  const tournamentGroups = (0, import_react268.useMemo)(
+    () => usesTennisTournamentGrouping ? groupSportsBrowserSidebarTennisGamesByTournament(slate.games) : [],
+    [usesTennisTournamentGrouping, slate.games]
+  );
+  const tournamentIndent = Math.min(indent + 1, 3);
   return /* @__PURE__ */ (0, import_jsx_runtime236.jsxs)(import_jsx_runtime236.Fragment, { children: [
     /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
       NavRow,
@@ -143702,7 +143835,41 @@ function SidebarTemporalLeagueBlock({
         leagueActivityStatuses
       }
     ),
-    expanded ? /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(SidebarTemporalGamesBox, { children: slate.games.map((game) => /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
+    expanded ? /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(SidebarTemporalGamesBox, { children: usesTennisTournamentGrouping && leagueOpen && onToggleExpansionKey ? tournamentGroups.map((group) => {
+      const tournamentExpansionKey = resolveSportsBrowserSidebarTennisTournamentExpansionKey(
+        slate.key,
+        group.key
+      );
+      const tournamentExpanded = leagueOpen[tournamentExpansionKey] ?? false;
+      return /* @__PURE__ */ (0, import_jsx_runtime236.jsxs)(import_react268.Fragment, { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
+          NavRow,
+          {
+            label: group.label,
+            indent: tournamentIndent,
+            expanded: tournamentExpanded,
+            onClick: () => onToggleExpansionKey(tournamentExpansionKey),
+            tennisTournamentKey: group.key,
+            tennisTournamentLeagueKey: slate.key,
+            className: "normal-case"
+          }
+        ),
+        tournamentExpanded ? group.games.map((game) => /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
+          SidebarTemporalGameRow,
+          {
+            game,
+            variant: resolveVariant ? resolveVariant(game) : variant ?? "upcoming",
+            onSelect: onGameSelect,
+            onGameTeamSelect,
+            onWatchLive,
+            canShowWatchLive,
+            isSelected: selectedGameId === game.id,
+            sidebarTennisTournamentGrouped: true
+          },
+          game.id
+        )) : null
+      ] }, `${slate.key}-${group.key}`);
+    }) : slate.games.map((game) => /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
       SidebarTemporalGameRow,
       {
         game,
@@ -143794,7 +143961,9 @@ function SidebarGroupedTemporalLeagueEntries({
             selectedLeagueKey,
             indent: allOpen ? 1 : 0,
             soccerArchChildLeague: true,
-            leagueActivityStatuses: todayLeagueActivityByKey?.get(slate.key)
+            leagueActivityStatuses: todayLeagueActivityByKey?.get(slate.key),
+            leagueOpen,
+            onToggleExpansionKey: toggleLeague
           },
           `${sectionPrefix}-${slate.key}`
         ))
@@ -143824,7 +143993,9 @@ function SidebarGroupedTemporalLeagueEntries({
         selectedGameId,
         selectedLeagueKey,
         indent: allOpen ? 1 : 0,
-        leagueActivityStatuses: todayLeagueActivityByKey?.get(entry2.slate.key)
+        leagueActivityStatuses: todayLeagueActivityByKey?.get(entry2.slate.key),
+        leagueOpen,
+        onToggleExpansionKey: toggleLeague
       },
       `${sectionPrefix}-${entry2.slate.key}`
     );
