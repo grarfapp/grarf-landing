@@ -153723,7 +153723,8 @@ function NavRow({
   temporalAllSection,
   isSelected = false,
   soccerArchLeague = false,
-  soccerArchChildLeague = false
+  soccerArchChildLeague = false,
+  showLiveNowIndicator = false
 }) {
   const indentClass = resolveNavRowIndentClass(indent, soccerArchChildLeague);
   return /* @__PURE__ */ (0, import_jsx_runtime236.jsxs)(
@@ -153751,7 +153752,17 @@ function NavRow({
           temporalAllSection ? /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(SidebarLeagueNavLogoMark, { logoUrl: SPORTS_BROWSER_PROTOTYPE_TEMPORAL_ALL_LOGO_URL }) : soccerArchLeague ? /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(SidebarLeagueNavLogoMark, { logoUrl: SOCCER_SIDEBAR_ARCH_LEAGUE_LOGO_URL }) : leagueKey ? /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(SidebarLeagueNavLogoMark, { leagueKey, games: leagueGames }) : null,
           /* @__PURE__ */ (0, import_jsx_runtime236.jsx)("span", { className: "min-w-0 flex-1 break-words whitespace-normal", children: label })
         ] }),
-        onClick ? /* @__PURE__ */ (0, import_jsx_runtime236.jsx)("span", { className: "inline-flex h-[1lh] shrink-0 items-center", children: expanded ? /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(ChevronDown, { size: 12, strokeWidth: 2, className: "shrink-0 rotate-180", "aria-hidden": true }) : /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(ChevronRight, { size: 12, strokeWidth: 2, className: "shrink-0 text-[#1a1a1a]", "aria-hidden": true }) }) : trailing === "expand" ? /* @__PURE__ */ (0, import_jsx_runtime236.jsx)("span", { className: "inline-flex h-[1lh] shrink-0 items-center", children: /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(ChevronDown, { size: 12, strokeWidth: 2, className: "shrink-0 rotate-180", "aria-hidden": true }) }) : null
+        onClick ? /* @__PURE__ */ (0, import_jsx_runtime236.jsxs)("span", { className: "inline-flex h-[1lh] shrink-0 items-center gap-1", children: [
+          showLiveNowIndicator ? /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
+            "span",
+            {
+              className: "h-[5px] w-[5px] shrink-0 rounded-full bg-red-500",
+              "aria-hidden": true,
+              "data-sports-browser-prototype-temporal-league-live-indicator": ""
+            }
+          ) : null,
+          expanded ? /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(ChevronDown, { size: 12, strokeWidth: 2, className: "shrink-0 rotate-180", "aria-hidden": true }) : /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(ChevronRight, { size: 12, strokeWidth: 2, className: "shrink-0 text-[#1a1a1a]", "aria-hidden": true })
+        ] }) : trailing === "expand" ? /* @__PURE__ */ (0, import_jsx_runtime236.jsx)("span", { className: "inline-flex h-[1lh] shrink-0 items-center", children: /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(ChevronDown, { size: 12, strokeWidth: 2, className: "shrink-0 rotate-180", "aria-hidden": true }) }) : null
       ]
     }
   );
@@ -154206,9 +154217,11 @@ function SidebarTemporalLeagueBlock({
   selectedGameId,
   selectedLeagueKey,
   indent = 0,
-  soccerArchChildLeague = false
+  soccerArchChildLeague = false,
+  showTodayLiveLeagueIndicator = false
 }) {
   const isLeagueSelected = selectedLeagueKey === slate.key;
+  const showLiveNowIndicator = showTodayLiveLeagueIndicator && slate.games.some(isGameActivelyLive);
   return /* @__PURE__ */ (0, import_jsx_runtime236.jsxs)(import_jsx_runtime236.Fragment, { children: [
     /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
       NavRow,
@@ -154220,7 +154233,8 @@ function SidebarTemporalLeagueBlock({
         leagueKey: slate.key,
         leagueGames: slate.games,
         onClick: onToggle,
-        isSelected: isLeagueSelected
+        isSelected: isLeagueSelected,
+        showLiveNowIndicator
       }
     ),
     expanded ? /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(SidebarTemporalGamesBox, { children: slate.games.map((game) => /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
@@ -154258,7 +154272,8 @@ function SidebarGroupedTemporalLeagueEntries({
   canShowWatchLive,
   selectedGameId,
   selectedLeagueKey,
-  onOpenUrl
+  onOpenUrl,
+  showTodayLiveLeagueIndicator = false
 }) {
   const toggleSoccerArchLeague = (0, import_react268.useCallback)(
     (children) => {
@@ -154313,7 +154328,8 @@ function SidebarGroupedTemporalLeagueEntries({
             selectedGameId,
             selectedLeagueKey,
             indent: allOpen ? 1 : 0,
-            soccerArchChildLeague: true
+            soccerArchChildLeague: true,
+            showTodayLiveLeagueIndicator
           },
           `${sectionPrefix}-${slate.key}`
         ))
@@ -154342,7 +154358,8 @@ function SidebarGroupedTemporalLeagueEntries({
         canShowWatchLive,
         selectedGameId,
         selectedLeagueKey,
-        indent: allOpen ? 1 : 0
+        indent: allOpen ? 1 : 0,
+        showTodayLiveLeagueIndicator
       },
       `${sectionPrefix}-${entry2.slate.key}`
     );
@@ -154424,7 +154441,8 @@ function SidebarTemporalSectionLeagues({
         onWatchLive,
         canShowWatchLive,
         selectedGameId,
-        selectedLeagueKey
+        selectedLeagueKey,
+        showTodayLiveLeagueIndicator: sectionId === "today"
       }
     )
   ] });
