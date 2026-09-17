@@ -153339,8 +153339,14 @@ function SidebarCompetitorMark({
     {
       className: cn2(
         "col-start-1 grid min-w-0 grid-cols-[12px_minmax(0,1fr)] items-center gap-x-[0.35ch]",
-        row === 1 ? "row-start-1" : "row-start-2"
+        row === 1 ? "row-start-1" : "row-start-2",
+        onTeamClick && SIDEBAR_GAME_ROW_TEAM_NAME_CLICKABLE_CLASS
       ),
+      "data-sports-browser-prototype-sidebar-team-name-clickable": onTeamClick ? "" : void 0,
+      onClick: onTeamClick ? (event) => {
+        event.stopPropagation();
+        onTeamClick();
+      } : void 0,
       children: [
         /* @__PURE__ */ (0, import_jsx_runtime236.jsx)("span", { className: "inline-flex h-[12px] w-[12px] shrink-0 items-center justify-center", children: logoUrl ? /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
           "img",
@@ -153355,18 +153361,7 @@ function SidebarCompetitorMark({
             decoding: "async"
           }
         ) : null }),
-        onTeamClick ? /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
-          "span",
-          {
-            className: cn2(nameClassName, SIDEBAR_GAME_ROW_TEAM_NAME_CLICKABLE_CLASS),
-            "data-sports-browser-prototype-sidebar-team-name-clickable": "",
-            onClick: (event) => {
-              event.stopPropagation();
-              onTeamClick();
-            },
-            children: nameContent
-          }
-        ) : /* @__PURE__ */ (0, import_jsx_runtime236.jsx)("span", { className: nameClassName, children: nameContent })
+        /* @__PURE__ */ (0, import_jsx_runtime236.jsx)("span", { className: nameClassName, children: nameContent })
       ]
     }
   );
