@@ -154570,6 +154570,9 @@ function SportsBrowserPrototypeLeftNav({
   selectedLeagueKey = null,
   selectedSidebarArchLeagueKey = null
 }) {
+  void commandCenterCards;
+  void onCommandCenterDestinationSelect;
+  void SportsBrowserPrototypeCommandCenterDestinationCard;
   const { catchUpLeagues, yesterdayLeagues, nowLeagues, upcomingLeagues } = useSportsBrowserPrototypeTodayTemporalSlate();
   const [yesterdayOpen, setYesterdayOpen] = (0, import_react268.useState)(false);
   const [catchUpTodayActive, setCatchUpTodayActive] = (0, import_react268.useState)(false);
@@ -154753,29 +154756,6 @@ function SportsBrowserPrototypeLeftNav({
                     canShowWatchLive
                   }
                 ),
-                commandCenterCards ? /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
-                  "div",
-                  {
-                    className: "flex w-full flex-col",
-                    "data-sports-browser-prototype-command-center-destinations": true,
-                    children: commandCenterCards.map((destination, index) => /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
-                      "div",
-                      {
-                        className: cn2("flex h-11 w-full shrink-0 overflow-hidden", index > 0 && cn2("border-t", RULE2)),
-                        children: /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
-                          SportsBrowserPrototypeCommandCenterDestinationCard,
-                          {
-                            slot: index + 2,
-                            destination,
-                            onSelect: onCommandCenterDestinationSelect,
-                            className: "min-w-0 h-full w-full rounded-none border-0"
-                          }
-                        )
-                      },
-                      `command-center-card-${index + 2}`
-                    ))
-                  }
-                ) : null,
                 /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
                   "div",
                   {
