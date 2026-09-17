@@ -149414,6 +149414,29 @@ function applySportsBrowserPrototypeGameToPane(game) {
     documentTitle: null
   };
 }
+function applySportsBrowserPrototypeGameTeamSideToPane(game, side) {
+  const context2 = resolveGameBrowserContext(game);
+  const contextSection = side === "away" ? "awayTeam" : "homeTeam";
+  const pane = applySportsBrowserPrototypeGameContextSectionToPane(
+    applySportsBrowserPrototypeGameToPane(game),
+    context2,
+    contextSection
+  );
+  const websites = resolveSportsBrowserPrototypeGameContextNavSectionWebsites(
+    game,
+    { ...pane, gameContextTeamSection: "news" },
+    context2,
+    contextSection
+  );
+  const url = websites[0]?.url?.trim() ?? null;
+  return {
+    ...pane,
+    gameContextTeamSection: "news",
+    activeTabIndex: 0,
+    url,
+    documentTitle: null
+  };
+}
 function applySportsBrowserPrototypeGameContextSectionToPane(pane, context2, section) {
   const enteringTeamSection = section === "awayTeam" || section === "homeTeam";
   const leavingTeamSection = pane.gameContextSection === "awayTeam" || pane.gameContextSection === "homeTeam";
@@ -153295,9 +153318,22 @@ function SidebarCompetitorMark({
   name,
   pollRank,
   row,
-  winnerBoldClass
+  winnerBoldClass,
+  onTeamClick
 }) {
   const logoUrl = resolveDarkThemeLogoUrl(game, side);
+  const nameClassName = cn2(
+    "min-w-0 break-words whitespace-normal normal-case",
+    SIDEBAR_GAME_ROW_PRIMARY_TEXT_CLASS,
+    winnerBoldClass
+  );
+  const nameContent = pollRank != null ? /* @__PURE__ */ (0, import_jsx_runtime236.jsxs)(import_jsx_runtime236.Fragment, { children: [
+    /* @__PURE__ */ (0, import_jsx_runtime236.jsx)("span", { className: cn2(LEFT_NAV_NCAAF_POLL_RANK_TEXT_CLASS), children: pollRank }),
+    /* @__PURE__ */ (0, import_jsx_runtime236.jsxs)("span", { children: [
+      " ",
+      name
+    ] })
+  ] }) : name;
   return /* @__PURE__ */ (0, import_jsx_runtime236.jsxs)(
     "span",
     {
@@ -153319,13 +153355,18 @@ function SidebarCompetitorMark({
             decoding: "async"
           }
         ) : null }),
-        /* @__PURE__ */ (0, import_jsx_runtime236.jsx)("span", { className: cn2("min-w-0 break-words whitespace-normal normal-case", SIDEBAR_GAME_ROW_PRIMARY_TEXT_CLASS, winnerBoldClass), children: pollRank != null ? /* @__PURE__ */ (0, import_jsx_runtime236.jsxs)(import_jsx_runtime236.Fragment, { children: [
-          /* @__PURE__ */ (0, import_jsx_runtime236.jsx)("span", { className: cn2(LEFT_NAV_NCAAF_POLL_RANK_TEXT_CLASS), children: pollRank }),
-          /* @__PURE__ */ (0, import_jsx_runtime236.jsxs)("span", { children: [
-            " ",
-            name
-          ] })
-        ] }) : name })
+        onTeamClick ? /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
+          "span",
+          {
+            className: cn2(nameClassName, SIDEBAR_GAME_ROW_TEAM_NAME_CLICKABLE_CLASS),
+            "data-sports-browser-prototype-sidebar-team-name-clickable": "",
+            onClick: (event) => {
+              event.stopPropagation();
+              onTeamClick();
+            },
+            children: nameContent
+          }
+        ) : /* @__PURE__ */ (0, import_jsx_runtime236.jsx)("span", { className: nameClassName, children: nameContent })
       ]
     }
   );
@@ -153386,11 +153427,17 @@ function SidebarTemporalGameRow({
   game,
   variant,
   onSelect,
+  onGameTeamSelect,
   onWatchLive,
   canShowWatchLive,
   isSelected = false
 }) {
   const model = resolveGamesSpineCompactMatchupModel(game);
+  const teamWorkspaceEnabled = isGamesSpineTeamWorkspaceGame(game);
+  const handleTeamSideClick = (side) => {
+    if (!teamWorkspaceEnabled || !onGameTeamSelect) return;
+    onGameTeamSelect(game, side);
+  };
   if (model.kind === "event") {
     const logoUrl = resolveDarkThemeLogoUrl(game, "away") ?? (game.league ? resolveGamesSpineLeagueLogoUrl(game.league, { game }) : void 0);
     const eventName = model.event.eventName.trim();
@@ -153480,7 +153527,8 @@ function SidebarTemporalGameRow({
               name: firstPresentation.teamName,
               pollRank: firstPresentation.pollRank,
               row: 1,
-              winnerBoldClass: resolveGamesSpineFinalWinnerBoldClass(firstLine.side, finalWinnerSide)
+              winnerBoldClass: resolveGamesSpineFinalWinnerBoldClass(firstLine.side, finalWinnerSide),
+              onTeamClick: teamWorkspaceEnabled && onGameTeamSelect ? () => handleTeamSideClick(firstLine.side) : void 0
             }
           ),
           showTennisSetScores ? /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
@@ -153527,7 +153575,8 @@ function SidebarTemporalGameRow({
             name: firstPresentation.teamName,
             pollRank: firstPresentation.pollRank,
             row: 1,
-            winnerBoldClass: resolveGamesSpineFinalWinnerBoldClass(firstLine.side, finalWinnerSide)
+            winnerBoldClass: resolveGamesSpineFinalWinnerBoldClass(firstLine.side, finalWinnerSide),
+            onTeamClick: teamWorkspaceEnabled && onGameTeamSelect ? () => handleTeamSideClick(firstLine.side) : void 0
           }
         ),
         showTennisSetScores ? /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
@@ -153559,7 +153608,8 @@ function SidebarTemporalGameRow({
             name: secondPresentation.teamName,
             pollRank: secondPresentation.pollRank,
             row: 2,
-            winnerBoldClass: resolveGamesSpineFinalWinnerBoldClass(secondLine.side, finalWinnerSide)
+            winnerBoldClass: resolveGamesSpineFinalWinnerBoldClass(secondLine.side, finalWinnerSide),
+            onTeamClick: teamWorkspaceEnabled && onGameTeamSelect ? () => handleTeamSideClick(secondLine.side) : void 0
           }
         ),
         showTennisSetScores ? /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
@@ -153654,6 +153704,7 @@ function SidebarTemporalLeagueBlock({
   expanded,
   onToggle,
   onGameSelect,
+  onGameTeamSelect,
   onWatchLive,
   canShowWatchLive,
   selectedGameId,
@@ -153682,6 +153733,7 @@ function SidebarTemporalLeagueBlock({
         game,
         variant: resolveVariant ? resolveVariant(game) : variant ?? "upcoming",
         onSelect: onGameSelect,
+        onGameTeamSelect,
         onWatchLive,
         canShowWatchLive,
         isSelected: selectedGameId === game.id
@@ -153705,6 +153757,7 @@ function SidebarGroupedTemporalLeagueEntries({
   onSoccerArchLeagueSelect,
   selectedSidebarArchLeagueKey,
   onGameSelect,
+  onGameTeamSelect,
   onWatchLive,
   canShowWatchLive,
   selectedGameId,
@@ -153758,6 +153811,7 @@ function SidebarGroupedTemporalLeagueEntries({
             expanded: leagueOpen[slate.key] ?? false,
             onToggle: () => toggleLeague(slate.key),
             onGameSelect,
+            onGameTeamSelect,
             onWatchLive,
             canShowWatchLive,
             selectedGameId,
@@ -153787,6 +153841,7 @@ function SidebarGroupedTemporalLeagueEntries({
         expanded: leagueOpen[entry2.slate.key] ?? false,
         onToggle: () => toggleLeague(entry2.slate.key),
         onGameSelect,
+        onGameTeamSelect,
         onWatchLive,
         canShowWatchLive,
         selectedGameId,
@@ -153806,6 +153861,7 @@ function SidebarTemporalSectionLeagues({
   onLeagueOpenChange,
   onLeagueSelect,
   onGameSelect,
+  onGameTeamSelect,
   onSelectGlobalWebsites,
   onSoccerArchLeagueSelect,
   onWatchLive,
@@ -153868,6 +153924,7 @@ function SidebarTemporalSectionLeagues({
         onSoccerArchLeagueSelect,
         selectedSidebarArchLeagueKey,
         onGameSelect,
+        onGameTeamSelect,
         onWatchLive,
         canShowWatchLive,
         selectedGameId,
@@ -153882,6 +153939,7 @@ function SidebarYesterdaySectionLeagues({
   onLeagueOpenChange,
   onLeagueSelect,
   onGameSelect,
+  onGameTeamSelect,
   onOpenUrl,
   onSoccerArchLeagueSelect,
   onWatchLive,
@@ -153943,6 +154001,7 @@ function SidebarYesterdaySectionLeagues({
         onSoccerArchLeagueSelect,
         selectedSidebarArchLeagueKey,
         onGameSelect,
+        onGameTeamSelect,
         onWatchLive,
         canShowWatchLive,
         selectedGameId,
@@ -153984,6 +154043,7 @@ function SportsBrowserPrototypeLeftNav({
   onOpenUrl,
   onLeagueSelect,
   onGameSelect,
+  onGameTeamSelect,
   onSelectGlobalWebsites,
   onSoccerArchLeagueSelect,
   onWatchLive,
@@ -154230,6 +154290,7 @@ function SportsBrowserPrototypeLeftNav({
                     onSoccerArchLeagueSelect,
                     selectedSidebarArchLeagueKey,
                     onGameSelect,
+                    onGameTeamSelect,
                     onWatchLive,
                     canShowWatchLive,
                     selectedGameId,
@@ -154245,6 +154306,7 @@ function SportsBrowserPrototypeLeftNav({
                     onLeagueOpenChange: setYesterdayLeagueOpen,
                     onLeagueSelect,
                     onGameSelect,
+                    onGameTeamSelect,
                     onOpenUrl,
                     onSoccerArchLeagueSelect,
                     onWatchLive,
@@ -154264,6 +154326,7 @@ function SportsBrowserPrototypeLeftNav({
                     onLeagueOpenChange: setSectionLeagueOpen,
                     onLeagueSelect,
                     onGameSelect,
+                    onGameTeamSelect,
                     onSelectGlobalWebsites,
                     onSoccerArchLeagueSelect,
                     onWatchLive,
@@ -154283,6 +154346,7 @@ function SportsBrowserPrototypeLeftNav({
                     onLeagueOpenChange: setSectionLeagueOpen,
                     onLeagueSelect,
                     onGameSelect,
+                    onGameTeamSelect,
                     onSelectGlobalWebsites,
                     onSoccerArchLeagueSelect,
                     onWatchLive,
@@ -154302,6 +154366,7 @@ function SportsBrowserPrototypeLeftNav({
                     onLeagueOpenChange: setSectionLeagueOpen,
                     onLeagueSelect,
                     onGameSelect,
+                    onGameTeamSelect,
                     onSelectGlobalWebsites,
                     onSoccerArchLeagueSelect,
                     onWatchLive,
@@ -154390,7 +154455,7 @@ function SportsBrowserPrototypeLeftNav({
     }
   );
 }
-var import_react268, import_jsx_runtime236, MENU_SURFACE2, RULE2, SPORTS_BROWSER_PROTOTYPE_TEMPORAL_ALL_LOGO_URL, F1_CATCH_UP_MOCK_HEADLINES, COMPACT_TEMPORAL_TODAY_CHILDREN, SIDEBAR_GAME_ROW_CLASS, SIDEBAR_GAME_ROW_HOVER_SURFACE_CLASS, SIDEBAR_GAME_ROW_SELECTED_SURFACE_CLASS, SIDEBAR_GAME_ROW_PRIMARY_TEXT_CLASS, SIDEBAR_GAME_ROW_LIVE_STATUS_CLASS, SIDEBAR_GAME_ROW_WATCH_LIVE_CLASS, SIDEBAR_GAME_ROW_TWO_LINE_GRID_CLASS, SIDEBAR_GAME_ROW_TENNIS_GRID_BASE_CLASS, SIDEBAR_GAME_ROW_SCORE_CLASS, SIDEBAR_GAME_ROW_TENNIS_SET_SCORE_CLASS, SIDEBAR_GAME_ROW_STATUS_BASE_CLASS, SIDEBAR_GAME_ROW_BROADCAST_BASE_CLASS, SIDEBAR_F1_MOCK_HEADLINE_ROW_CLASS, SPORTS_BROWSER_PROTOTYPE_SIDEBAR_LEAGUES_SECTION_KEYS;
+var import_react268, import_jsx_runtime236, MENU_SURFACE2, RULE2, SPORTS_BROWSER_PROTOTYPE_TEMPORAL_ALL_LOGO_URL, F1_CATCH_UP_MOCK_HEADLINES, COMPACT_TEMPORAL_TODAY_CHILDREN, SIDEBAR_GAME_ROW_CLASS, SIDEBAR_GAME_ROW_HOVER_SURFACE_CLASS, SIDEBAR_GAME_ROW_SELECTED_SURFACE_CLASS, SIDEBAR_GAME_ROW_PRIMARY_TEXT_CLASS, SIDEBAR_GAME_ROW_LIVE_STATUS_CLASS, SIDEBAR_GAME_ROW_WATCH_LIVE_CLASS, SIDEBAR_GAME_ROW_TEAM_NAME_CLICKABLE_CLASS, SIDEBAR_GAME_ROW_TWO_LINE_GRID_CLASS, SIDEBAR_GAME_ROW_TENNIS_GRID_BASE_CLASS, SIDEBAR_GAME_ROW_SCORE_CLASS, SIDEBAR_GAME_ROW_TENNIS_SET_SCORE_CLASS, SIDEBAR_GAME_ROW_STATUS_BASE_CLASS, SIDEBAR_GAME_ROW_BROADCAST_BASE_CLASS, SIDEBAR_F1_MOCK_HEADLINE_ROW_CLASS, SPORTS_BROWSER_PROTOTYPE_SIDEBAR_LEAGUES_SECTION_KEYS;
 var init_SportsBrowserPrototypeLeftNav = __esm({
   "../grarf/desktop/src/components/homeMvp/SportsBrowserPrototypeLeftNav.tsx"() {
     init_define_import_meta_env();
@@ -154404,6 +154469,7 @@ var init_SportsBrowserPrototypeLeftNav = __esm({
     init_resolveNewsSportsBrowserGameStatusLabel();
     init_resolveNewsSportsBrowserChannelPresentation();
     init_scrollSportsBrowserPrototypeSidebarActiveGameIntoView();
+    init_openGamesSpineTeamWorkspace();
     init_publicAssetUrl();
     init_resolveNewsSportsBrowserTennisScorePresentation();
     init_NewsSportsBrowserTennisSetScoreCells();
@@ -154445,6 +154511,9 @@ var init_SportsBrowserPrototypeLeftNav = __esm({
     SIDEBAR_GAME_ROW_PRIMARY_TEXT_CLASS = "text-[#1a1a1a]";
     SIDEBAR_GAME_ROW_LIVE_STATUS_CLASS = "font-medium text-[#b45309]";
     SIDEBAR_GAME_ROW_WATCH_LIVE_CLASS = "col-span-full row-start-3 justify-self-end border-0 bg-transparent p-0 font-mono text-[8px] leading-none tracking-[0.08em] text-[#1a1a1a]/80 transition-colors hover:text-[#1a1a1a]";
+    SIDEBAR_GAME_ROW_TEAM_NAME_CLICKABLE_CLASS = cn2(
+      "cursor-pointer rounded-[2px] px-[2px] -mx-[2px] transition-colors hover:bg-[#d5d0c6]"
+    );
     SIDEBAR_GAME_ROW_TWO_LINE_GRID_CLASS = "grid min-w-0 w-full grid-cols-[minmax(0,1fr)_1.125rem_minmax(1.75rem,max-content)_1.5rem] grid-rows-[auto_auto] items-center gap-x-[0.35ch] gap-y-[1px]";
     SIDEBAR_GAME_ROW_TENNIS_GRID_BASE_CLASS = "grid min-w-0 w-full grid-rows-[auto_auto] items-center gap-x-[0.35ch] gap-y-[1px]";
     SIDEBAR_GAME_ROW_SCORE_CLASS = "inline-flex w-[1.125rem] shrink-0 items-center justify-start tabular-nums text-[#1a1a1a]";
@@ -156006,6 +156075,19 @@ function HomePage() {
     },
     [updateSportsBrowserTabForSidebarSelection]
   );
+  const onSportsBrowserGameTeamSelect = (0, import_react272.useCallback)(
+    (game, side) => {
+      const resolvedGame = resolveSportsBrowserPrototypeSidebarSelectedGame(game);
+      updateSportsBrowserTabForSidebarSelection((tab) => {
+        const next = tab.paneStates.slice();
+        const paneIndex = resolveSportsBrowserPrototypeSidebarSelectionPaneIndex(tab);
+        useHomeSourceFocusStore.getState().clearSelectedArticle(NEWS_BROWSER_FOCUS_SESSION_KEY);
+        next[paneIndex] = applySportsBrowserPrototypeGameTeamSideToPane(resolvedGame, side);
+        return { ...tab, paneStates: next, activePaneIndex: paneIndex };
+      });
+    },
+    [updateSportsBrowserTabForSidebarSelection]
+  );
   const onSportsBrowserGameContextSectionSelect = (0, import_react272.useCallback)(
     (paneIndex, sectionIndex) => {
       updateActiveTabWithPaneHistory((tab) => {
@@ -156640,6 +156722,7 @@ function HomePage() {
                 onOpenUrl: onSportsBrowserOpenUrl,
                 onLeagueSelect: onSportsBrowserLeagueSelect,
                 onGameSelect: onSportsBrowserGameSelect,
+                onGameTeamSelect: onSportsBrowserGameTeamSelect,
                 onSelectGlobalWebsites: onSportsBrowserSelectGlobalWebsites,
                 onSoccerArchLeagueSelect: onSportsBrowserSelectSoccerArchWebsites,
                 selectedGameId: sportsBrowserSelectedGameId,
