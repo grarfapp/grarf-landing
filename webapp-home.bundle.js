@@ -154514,11 +154514,6 @@ async function hydrateOperationalGameOverridesFromPersistence() {
 // webapp/desktop-bootstrap.tsx
 init_operationalIngestConfig();
 var import_jsx_runtime287 = __toESM(require_jsx_runtime());
-function sleep2(ms2) {
-  return new Promise((resolve) => {
-    setTimeout(resolve, ms2);
-  });
-}
 var reactRoot = null;
 function isAdminHtmlEntry2() {
   return Boolean(window.__GRARF_ADMIN_ENTRY);
@@ -154597,6 +154592,7 @@ function mountWebHome(container) {
   );
 }
 async function bootDesktopWebClient(container) {
+  mountWebHome(container);
   try {
     exposeGrarfDeveloperModeOnWindow();
     void hydrateOperationalGameOverridesFromPersistence();
@@ -154610,13 +154606,10 @@ async function bootDesktopWebClient(container) {
       if (navigationEntry?.type === "reload") {
         resetElectronOperationalStartupForNavigation();
       }
-      const startupReady = ensureElectronOperationalGamesReady();
-      await Promise.race([startupReady, sleep2(1500)]);
+      void ensureElectronOperationalGamesReady();
     }
   } catch (error) {
     console.error("[bootDesktopWebClient] operational startup failed", error);
-  } finally {
-    mountWebHome(container);
   }
 }
 

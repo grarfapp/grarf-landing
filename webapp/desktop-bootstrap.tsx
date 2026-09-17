@@ -35,12 +35,6 @@ import {
   resetElectronOperationalStartupForNavigation,
 } from "../../grarf/desktop/src/services/operationalIngest/electronGrarfCloudOperationalStartup";
 
-function sleep(ms: number): Promise<void> {
-  return new Promise((resolve) => {
-    setTimeout(resolve, ms);
-  });
-}
-
 let reactRoot: Root | null = null;
 
 function isAdminHtmlEntry(): boolean {
@@ -167,6 +161,8 @@ export function mountWebHome(container: HTMLElement): void {
 }
 
 export async function bootDesktopWebClient(container: HTMLElement): Promise<void> {
+  mountWebHome(container);
+
   try {
     exposeGrarfDeveloperModeOnWindow();
     void hydrateOperationalGameOverridesFromPersistence();
@@ -183,12 +179,9 @@ export async function bootDesktopWebClient(container: HTMLElement): Promise<void
       if (navigationEntry?.type === "reload") {
         resetElectronOperationalStartupForNavigation();
       }
-      const startupReady = ensureElectronOperationalGamesReady();
-      await Promise.race([startupReady, sleep(1_500)]);
+      void ensureElectronOperationalGamesReady();
     }
   } catch (error) {
     console.error("[bootDesktopWebClient] operational startup failed", error);
-  } finally {
-    mountWebHome(container);
   }
 }
