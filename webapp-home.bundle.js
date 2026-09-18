@@ -140911,6 +140911,37 @@ function resolveSportsBrowserPrototypeSidebarNavigableGames(input) {
 // ../grarf/desktop/src/lib/home/resolveNewsSportsBrowserGameCardCompetitorContext.ts
 init_define_import_meta_env();
 init_isGrarfWebRenderer();
+function parseStandingsPlacementAndGroup(standings) {
+  const trimmed = standings.trim();
+  if (!trimmed) return null;
+  const bulletParts = trimmed.split(/\s•\s/);
+  if (bulletParts.length === 2) {
+    return { placement: bulletParts[0].trim(), group: bulletParts[1].trim() };
+  }
+  const inMatch = trimmed.match(/^(\d+(?:st|nd|rd|th))\s+in\s+(.+)$/i);
+  if (inMatch) {
+    return { placement: inMatch[1], group: inMatch[2].trim() };
+  }
+  const spaceMatch = trimmed.match(/^(\d+(?:st|nd|rd|th))\s+(.+)$/i);
+  if (spaceMatch) {
+    return { placement: spaceMatch[1], group: spaceMatch[2].trim() };
+  }
+  return null;
+}
+function formatMlbWnbaStandingsSubLine(context2) {
+  const record = context2.record;
+  const standings = context2.standingsLabel || context2.standingsLine;
+  if (!standings && !record) return null;
+  const parsed = standings ? parseStandingsPlacementAndGroup(standings) : null;
+  if (parsed) {
+    const base = `${parsed.placement}, ${parsed.group}`;
+    return record ? `${base} (${record})` : base;
+  }
+  if (record) {
+    return `(${record})`;
+  }
+  return standings;
+}
 function resolveCanonicalPlayerRankNewsLabel(playerRank) {
   if (!playerRank) return null;
   const label = playerRank.displayLabel?.trim();
@@ -140945,6 +140976,7 @@ function resolveNewsSportsBrowserGameCardCompetitorContext(game, side, pill, opt
   const presentation = resolveTennisMatchPresentation(game);
   const isTennisServer = presentation?.serverSide === side;
   return {
+    league: game.league,
     standingsLabel,
     record,
     standingsLine,
@@ -140952,8 +140984,27 @@ function resolveNewsSportsBrowserGameCardCompetitorContext(game, side, pill, opt
     isTennisServer
   };
 }
+function formatNewsSportsBrowserGameCardCompetitorSubLine(context2) {
+  if (context2.league === "MLB" || context2.league === "WNBA") {
+    return formatMlbWnbaStandingsSubLine(context2);
+  }
+  const record = context2.record;
+  const standingsLine = context2.standingsLine;
+  const standingsLabel = context2.standingsLabel;
+  const standings = standingsLine || standingsLabel;
+  if (record && standings) {
+    return `(${record}) ${standings}`;
+  }
+  if (record) {
+    return `(${record})`;
+  }
+  if (standings) {
+    return standings;
+  }
+  return null;
+}
 function newsSportsBrowserGameCardHasCompetitorSubLines(context2) {
-  return Boolean(context2.standingsLabel || context2.record || context2.standingsLine);
+  return formatNewsSportsBrowserGameCardCompetitorSubLine(context2) != null;
 }
 
 // ../grarf/desktop/src/lib/home/resolveNewsSportsBrowserGameStatusLabel.ts
@@ -141195,9 +141246,7 @@ function resolveSportsBrowserSidebarTennisMatchCardStatusLabel(game) {
 // ../grarf/desktop/src/components/homeMvp/NewsSportsBrowserCompetitorNameStack.tsx
 init_define_import_meta_env();
 var import_jsx_runtime232 = __toESM(require_jsx_runtime(), 1);
-var NEWS_COMPETITOR_STANDINGS_LABEL_CLASS = "truncate text-[10px] leading-tight text-[#6a6a6a]/80";
-var NEWS_COMPETITOR_RECORD_CLASS = "truncate text-[10px] leading-tight tabular-nums text-[#6a6a6a]/80";
-var NEWS_COMPETITOR_STANDINGS_LINE_CLASS = "truncate whitespace-nowrap text-[10px] leading-tight tabular-nums text-[#6a6a6a]/80";
+var NEWS_COMPETITOR_SUBLINE_CLASS = "truncate whitespace-nowrap text-[10px] leading-tight tabular-nums text-[#6a6a6a]/80";
 var NEWS_TENNIS_SEED_TEXT_CLASS = "shrink-0 text-[10px] tabular-nums text-[#1a1a1a]/65";
 var NEWS_TENNIS_SERVER_INDICATOR_CLASS = "shrink-0 text-[10px] leading-none text-[#b45309]";
 function NewsSportsBrowserCompetitorNameStack({
@@ -141209,6 +141258,7 @@ function NewsSportsBrowserCompetitorNameStack({
   pollRankClassName = LEFT_NAV_NCAAF_POLL_RANK_TEXT_CLASS
 }) {
   const hasSubLines = newsSportsBrowserGameCardHasCompetitorSubLines(context2);
+  const subLine = formatNewsSportsBrowserGameCardCompetitorSubLine(context2);
   const nameRow = /* @__PURE__ */ (0, import_jsx_runtime232.jsxs)("span", { className: cn2("flex min-w-0 items-center gap-0.5", winnerBoldClass), children: [
     pollRank != null ? /* @__PURE__ */ (0, import_jsx_runtime232.jsxs)(import_jsx_runtime232.Fragment, { children: [
       /* @__PURE__ */ (0, import_jsx_runtime232.jsx)("span", { className: pollRankClassName, children: pollRank }),
@@ -141227,9 +141277,7 @@ function NewsSportsBrowserCompetitorNameStack({
   }
   return /* @__PURE__ */ (0, import_jsx_runtime232.jsxs)("span", { className: cn2(nameClassName, "flex min-w-0 flex-col gap-px"), children: [
     nameRow,
-    context2.standingsLabel ? /* @__PURE__ */ (0, import_jsx_runtime232.jsx)("span", { className: NEWS_COMPETITOR_STANDINGS_LABEL_CLASS, children: context2.standingsLabel }) : null,
-    context2.record ? /* @__PURE__ */ (0, import_jsx_runtime232.jsx)("span", { className: NEWS_COMPETITOR_RECORD_CLASS, children: context2.record }) : null,
-    context2.standingsLine ? /* @__PURE__ */ (0, import_jsx_runtime232.jsx)("span", { className: NEWS_COMPETITOR_STANDINGS_LINE_CLASS, children: context2.standingsLine }) : null
+    subLine ? /* @__PURE__ */ (0, import_jsx_runtime232.jsx)("span", { className: NEWS_COMPETITOR_SUBLINE_CLASS, children: subLine }) : null
   ] });
 }
 function NewsSportsBrowserGameCardViewerMessage({ message }) {
