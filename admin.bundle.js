@@ -16599,7 +16599,7 @@ var useGamesSpineRenderStore = create((set, get) => ({
       lastTransportGeneratedAt: meta.transportGeneratedAt ?? (complete ? (/* @__PURE__ */ new Date()).toISOString() : state.lastTransportGeneratedAt),
       lastTransportSource: meta.source,
       lastTransportGameCount: gameCount,
-      operationalProviderPoll: meta.source === "grarf_cloud" ? meta.providerPoll ?? null : state.operationalProviderPoll
+      operationalProviderPoll: meta.source === "grarf_cloud" ? meta.providerPoll ?? state.operationalProviderPoll : state.operationalProviderPoll
     }));
   },
   markManualLoaded: () => {
@@ -16631,7 +16631,8 @@ function getOperationalLiveAuthorityState() {
   const state = useGamesSpineRenderStore.getState();
   return {
     operationalProviderPoll: state.operationalProviderPoll,
-    lastTransportSource: state.lastTransportSource
+    lastTransportSource: state.lastTransportSource,
+    lastTransportGeneratedAt: state.lastTransportGeneratedAt
   };
 }
 function parseGameLastUpdatedMs(lastUpdated) {
@@ -16660,30 +16661,62 @@ function isProviderPollHydrationFresh(game, providerPollCompletedAt) {
   const ageBehindCompletionMs = completedMs - lastUpdatedMs;
   return ageBehindCompletionMs > OPERATIONAL_PROVIDER_CONFIRMED_LIVE_SLACK_MS && ageBehindCompletionMs <= OPERATIONAL_PROVIDER_CONFIRMED_LIVE_SLACK_MS + PROVIDER_POLL_HYDRATION_LEGACY_SLACK_MS;
 }
-function shouldApplyProviderPollLiveGate(lastTransportSource) {
-  return lastTransportSource === "grarf_cloud";
+function shouldApplyProviderPollLiveGate(state) {
+  if (state.lastTransportSource === "grarf_cloud") return true;
+  return Boolean(state.operationalProviderPoll?.providerPollCompletedAt?.trim());
+}
+function isRecentTransportLiveRow(game, transportGeneratedAt, nowMs = Date.now()) {
+  if (game.status !== "live") return false;
+  if (!transportGeneratedAt?.trim()) return false;
+  const transportMs = Date.parse(transportGeneratedAt);
+  if (!Number.isFinite(transportMs)) return false;
+  return nowMs - transportMs <= LEGACY_CLOUD_LIVE_MAX_STALE_UPDATE_MS;
+}
+function isConfirmedLiveBySuccessfulLeaguePoll(game, poll) {
+  if (game.status !== "live") return false;
+  const league2 = game.league;
+  if (!league2) return false;
+  const entry2 = poll.leaguePolls?.[league2];
+  if (!entry2 || entry2.outcome !== "success") return false;
+  return entry2.reason === "live";
+}
+function isProviderLeaguePollConfirmedLive(game, authorityState) {
+  if (game.status !== "live") return false;
+  const state = authorityState ?? getOperationalLiveAuthorityState();
+  if (!shouldApplyProviderPollLiveGate(state)) return false;
+  if (!state.operationalProviderPoll) return false;
+  return isConfirmedLiveBySuccessfulLeaguePoll(game, state.operationalProviderPoll);
 }
 function isProviderConfirmedLive(game, authorityState) {
   if (game.status !== "live") return false;
   if (game.metadata?.manualGamesSpine) return true;
   const state = authorityState ?? getOperationalLiveAuthorityState();
-  const { operationalProviderPoll, lastTransportSource } = state;
-  if (!shouldApplyProviderPollLiveGate(lastTransportSource)) {
-    return isLegacyCloudLiveRowFresh(game);
+  const { operationalProviderPoll, lastTransportGeneratedAt } = state;
+  if (!shouldApplyProviderPollLiveGate(state)) {
+    if (isLegacyCloudLiveRowFresh(game)) return true;
+    return isRecentTransportLiveRow(game, lastTransportGeneratedAt);
   }
   if (!operationalProviderPoll) {
-    return isLegacyCloudLiveRowFresh(game);
+    if (isLegacyCloudLiveRowFresh(game)) return true;
+    return isRecentTransportLiveRow(game, lastTransportGeneratedAt);
   }
   if (operationalProviderPoll.allLeaguesFailed) return false;
   const providerPollCompletedAt = operationalProviderPoll.providerPollCompletedAt;
-  if (!providerPollCompletedAt?.trim()) return false;
+  if (!providerPollCompletedAt?.trim()) {
+    if (isLegacyCloudLiveRowFresh(game)) return true;
+    return isRecentTransportLiveRow(game, lastTransportGeneratedAt);
+  }
   if (isGameLastUpdatedProviderConfirmed(game, providerPollCompletedAt)) {
     return true;
   }
   if (isProviderPollHydrationFresh(game, providerPollCompletedAt)) {
     return true;
   }
-  return isLegacyCloudLiveRowFresh(game);
+  if (isConfirmedLiveBySuccessfulLeaguePoll(game, operationalProviderPoll)) {
+    return true;
+  }
+  if (isLegacyCloudLiveRowFresh(game)) return true;
+  return isRecentTransportLiveRow(game, lastTransportGeneratedAt);
 }
 
 // ../grarf/desktop/src/lib/gamesSpine/reconcileOperationalGamesByEspnEventId.ts
@@ -16950,8 +16983,8 @@ function resolveAuthoritativeEventEndedAtMs(game) {
   if (fromRow != null) return fromRow;
   return readPersistedEventEndedAtMs(game.id) ?? null;
 }
-function hasRetainedCanonicalFinalRow(gameId, nowMs = Date.now()) {
-  const entry2 = useRecentFinalizedGamesStore.getState().byId[gameId];
+function hasRetainedCanonicalFinalRow(game, nowMs = Date.now()) {
+  const entry2 = useRecentFinalizedGamesStore.getState().byId[game.id];
   if (!entry2 || entry2.expiresAt <= nowMs) return false;
   const retained = entry2.game;
   if (retained.status === "final" || isSpineFinalizedGame(retained)) {
@@ -16960,12 +16993,16 @@ function hasRetainedCanonicalFinalRow(gameId, nowMs = Date.now()) {
     if (isGolfTournamentLeagueKey(retained.league ?? void 0) && isGolfRoundPlayCompleteStatusLine(retained.statusLine) && endKey && endKey >= sportsDayKey) {
       return false;
     }
+    if (game.status === "live" && isProviderLeaguePollConfirmedLive(game)) {
+      return false;
+    }
     return true;
   }
   return false;
 }
 function isSupersededByAuthoritativeEspnEventRow(game) {
   if (game.status !== "live") return false;
+  if (isProviderLeaguePollConfirmedLive(game)) return false;
   const eventId = readEspnCompetitionEventId(game);
   if (!eventId) return false;
   for (const record of Object.values(useCanonicalLiveGameStore.getState().gamesById)) {
@@ -16981,7 +17018,7 @@ function isSupersededByAuthoritativeEspnEventRow(game) {
 }
 function hasAuthoritativeOperationalGameEnded(game, nowMs = Date.now()) {
   if (game.status === "final" || isSpineFinalizedGame(game)) return true;
-  if (hasRetainedCanonicalFinalRow(game.id, nowMs)) return true;
+  if (hasRetainedCanonicalFinalRow(game, nowMs)) return true;
   if (isSupersededByAuthoritativeEspnEventRow(game)) return true;
   const endedAtMs = resolveAuthoritativeEventEndedAtMs(game);
   return endedAtMs != null && endedAtMs <= nowMs;
@@ -24700,12 +24737,13 @@ function mergeSupplementalRetainedFinals(snap, retained) {
 // ../grarf/desktop/src/lib/finalizedGameRetention/applyOperationalIngestRetention.ts
 function applyOperationalIngestRetention(snap, options) {
   const ipcAuthoritative = isElectronIpcAuthoritativeOperationalIngest(options.ingestSource);
-  const withPreservedMissing = ipcAuthoritative ? snap : preserveMissingOperationalIngestGames(snap, options.previousGames);
+  const skipIpcFallbackCarryForward = ipcAuthoritative || options.cloudSupersedesIpcFallback === true;
+  const withPreservedMissing = skipIpcFallbackCarryForward ? snap : preserveMissingOperationalIngestGames(snap, options.previousGames);
   const withWimbledonSlamTracker = preserveWimbledonSlamTrackerOnOperationalIngest(
     withPreservedMissing,
     options.previousGames
   );
-  const withRetainedFinals = ipcAuthoritative ? withWimbledonSlamTracker : mergeSupplementalRetainedFinals(
+  const withRetainedFinals = skipIpcFallbackCarryForward ? withWimbledonSlamTracker : mergeSupplementalRetainedFinals(
     withWimbledonSlamTracker,
     filterContradictorySupplementalFinals(
       options.supplementalRetainedFinals,
@@ -24713,7 +24751,7 @@ function applyOperationalIngestRetention(snap, options) {
     )
   );
   const withStableLive = preserveLiveStatusOnIngest(withRetainedFinals);
-  return ipcAuthoritative ? withStableLive : applyGamesSpineSnapshotStability(withStableLive, options.previousLeagues);
+  return skipIpcFallbackCarryForward ? withStableLive : applyGamesSpineSnapshotStability(withStableLive, options.previousLeagues);
 }
 
 // ../grarf/desktop/src/lib/finalizedGameRetention/transitionCoverageDiagnostics.ts
@@ -25382,7 +25420,7 @@ var useLiveGamesStore = create((set, get) => ({
     }
     if (gamesSnapshotMateriallyMatchesCanonical(snap, { ingestSource })) {
       const ipcTransportSource = ingestSource === "espn_local_adapter" || ingestSource === "espn_scoreboard_ipc";
-      if (hasElectronGamesIpc() && ipcTransportSource) {
+      if (ingestSource === "grarf_cloud" || hasElectronGamesIpc() && ipcTransportSource) {
         useGamesSpineRenderStore.getState().markOperationalIngest(snap.leagues, {
           source: ingestSource ?? "espn_scoreboard_ipc",
           transportGeneratedAt: transportGeneratedAt ?? snap.updatedAt ?? void 0,
@@ -25443,11 +25481,14 @@ var useLiveGamesStore = create((set, get) => ({
     const previousGames = Object.values(prevCanonical.gamesById).map((r) => r.game);
     const previousLeagues = prevCanonical.leagues;
     const nextIngestCycle = prevCanonical.ingestSequence + 1;
+    const prevTransportSource = useGamesSpineRenderStore.getState().lastTransportSource;
+    const cloudSupersedesIpcFallback = ingestSource === "grarf_cloud" && (prevTransportSource === "espn_scoreboard_ipc" || prevTransportSource === "espn_local_adapter");
     const withStableLeagues = applyOperationalIngestRetention(snap, {
       ingestSource,
       previousGames,
       previousLeagues,
-      supplementalRetainedFinals: retention.getAllRetained()
+      supplementalRetainedFinals: retention.getAllRetained(),
+      cloudSupersedesIpcFallback
     });
     recordTransitionCoverageCycle({
       ingestCycle: nextIngestCycle,
