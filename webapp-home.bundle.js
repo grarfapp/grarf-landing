@@ -63993,8 +63993,6 @@ function darkCdn(sport, abbrev) {
 var MLB = {
   nyy: darkCdn("mlb", "nyy"),
   // Yankees — navy NY → white NY mark
-  kc: darkCdn("mlb", "kc"),
-  // Royals  — blue KC mark
   sd: darkCdn("mlb", "sd"),
   // Padres  — brown/gold mark
   cws: darkCdn("mlb", "cws"),
@@ -64039,6 +64037,9 @@ var MLB_ESPN_SCOREBOARD_SLUG = {
   az: "ari",
   ari: "ari"
 };
+var MLB_LOCAL_TEAM_LOGO_BY_ABBREV = {
+  kc: "/league-logos/mlb-team-kc.png"
+};
 function resolveMlbEspnScoreboardLogoSlug(abbrev) {
   const trimmed = abbrev?.trim();
   if (!trimmed) return void 0;
@@ -64046,6 +64047,10 @@ function resolveMlbEspnScoreboardLogoSlug(abbrev) {
   return MLB_ESPN_SCOREBOARD_SLUG[key2] ?? key2;
 }
 function buildMlbEspnScoreboardLogoUrl(abbrev) {
+  const trimmed = abbrev?.trim().toLowerCase();
+  if (trimmed && MLB_LOCAL_TEAM_LOGO_BY_ABBREV[trimmed]) {
+    return MLB_LOCAL_TEAM_LOGO_BY_ABBREV[trimmed];
+  }
   const slug = resolveMlbEspnScoreboardLogoSlug(abbrev);
   if (!slug) return void 0;
   return `https://a.espncdn.com/i/teamlogos/mlb/500/scoreboard/${slug}.png`;
@@ -64188,6 +64193,13 @@ function resolveDarkThemeLogoUrl(game, side) {
   const override = getDarkThemeLogoUrl(league2, abbrev);
   if (override) return override;
   return resolveTeamLogoUrl(game, side);
+}
+function resolveNewsSportsBrowserTeamLogoUrl(game, side) {
+  const abbrev = side === "away" ? game.awayTeamAbbrev : game.homeTeamAbbrev;
+  if (game.league === "MLB" && abbrev?.trim().toLowerCase() === "nyy") {
+    return resolveTeamLogoUrl(game, side);
+  }
+  return resolveDarkThemeLogoUrl(game, side);
 }
 function resolveTeamLogoUrl(game, side) {
   const participantImage = resolveGamesSpineParticipantImageUrl(game, side);
@@ -142176,7 +142188,7 @@ function BottomRailTeamRow({
   finalWinnerSide = null,
   onTeamClick
 }) {
-  const logoUrl = resolveDarkThemeLogoUrl(game, side);
+  const logoUrl = resolveNewsSportsBrowserTeamLogoUrl(game, side);
   const rowClass = row === 1 ? "row-start-1" : "row-start-2";
   const winnerBoldClass = resolveGamesSpineFinalWinnerBoldClass(side, finalWinnerSide);
   const competitorContext = resolveNewsSportsBrowserGameCardCompetitorContext(game, side, pill, {
@@ -143751,7 +143763,7 @@ function SidebarCompetitorMark({
   winnerBoldClass,
   onTeamClick
 }) {
-  const logoUrl = resolveDarkThemeLogoUrl(game, side);
+  const logoUrl = resolveNewsSportsBrowserTeamLogoUrl(game, side);
   const competitorContext = resolveNewsSportsBrowserGameCardCompetitorContext(game, side, pill, {
     showScores
   });
