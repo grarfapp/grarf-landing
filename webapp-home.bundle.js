@@ -141611,7 +141611,7 @@ function NewsSportsBrowserTennisSetScoreCells({
 }
 function resolveNewsSportsBrowserTennisGridTemplateColumns(setCount, prefix, suffix) {
   if (setCount <= 0) return void 0;
-  const setColumns = Array.from({ length: setCount }, () => "minmax(0.65rem,max-content)").join(" ");
+  const setColumns = Array.from({ length: setCount }, () => "minmax(0.8rem,max-content)").join(" ");
   return `${prefix} ${setColumns} ${suffix}`;
 }
 
@@ -141667,7 +141667,7 @@ function SportsBrowserTennisGameCardMetaHeader({
   dividerClassName = "h-[0.7rem]",
   className
 }) {
-  return /* @__PURE__ */ (0, import_jsx_runtime234.jsxs)("div", { className: cn2("flex min-w-0 items-center gap-0.5", className), children: [
+  return /* @__PURE__ */ (0, import_jsx_runtime234.jsxs)("div", { className: cn2("flex min-w-0 items-center gap-1", className), children: [
     /* @__PURE__ */ (0, import_jsx_runtime234.jsx)("span", { className: cn2("shrink-0 font-semibold uppercase", textClassName), children: labels.leagueLabel }),
     /* @__PURE__ */ (0, import_jsx_runtime234.jsx)("span", { className: cn2("mx-px shrink-0 border-l", META_RULE, dividerClassName), "aria-hidden": true }),
     /* @__PURE__ */ (0, import_jsx_runtime234.jsx)("span", { className: cn2("min-w-0 truncate font-normal normal-case", textClassName), children: labels.tournamentName }),
@@ -141687,10 +141687,10 @@ var BOTTOM_RAIL_VALUE_FLASH_CLASS = "bottom-rail-value-flash";
 var TEAM_LOGO_CELL_CLASS = "inline-flex h-3 w-3 shrink-0 items-center justify-center";
 var TEAM_LOGO_IMG_CLASS = "h-2.5 w-2.5 shrink-0 object-contain";
 var TEAM_NAME_CELL_CLASS = "block min-w-0 w-full truncate text-[9px] leading-none normal-case text-[#1a1a1a]";
-var TEAM_SCORE_CELL_CLASS = "inline-flex w-[1.125rem] shrink-0 items-center justify-start tabular-nums text-[9px] leading-none text-[#1a1a1a]";
-var BODY_GRID_CLASS = "grid min-h-0 min-w-0 w-full flex-1 grid-cols-[12px_minmax(0,1fr)_1.125rem_2.25rem] grid-rows-2 items-center gap-x-[0.35ch] gap-y-px";
-var BOTTOM_RAIL_TENNIS_SCORE_CELL_CLASS = "inline-flex min-w-[0.65rem] shrink-0 items-center justify-end tabular-nums text-[9px] leading-none text-[#1a1a1a]";
-var BOTTOM_RAIL_TENNIS_BODY_GRID_CLASS = "grid min-h-0 min-w-0 w-full flex-1 grid-cols-[12px_minmax(0,1fr)_2.25rem] grid-rows-2 items-center gap-x-[0.35ch] gap-y-px";
+var TEAM_SCORE_CELL_CLASS = "inline-flex w-[1.25rem] shrink-0 items-center justify-start tabular-nums text-[9px] leading-none text-[#1a1a1a]";
+var BODY_GRID_CLASS = "grid min-h-0 min-w-0 w-full flex-1 grid-cols-[12px_minmax(0,1fr)_1.25rem_minmax(2.25rem,max-content)] grid-rows-2 items-center gap-x-[0.7ch] gap-y-0.5";
+var BOTTOM_RAIL_TENNIS_SCORE_CELL_CLASS = "inline-flex min-w-[0.8rem] shrink-0 items-center justify-end tabular-nums text-[9px] leading-none text-[#1a1a1a]";
+var BOTTOM_RAIL_TENNIS_BODY_GRID_CLASS = "grid min-h-0 min-w-0 w-full flex-1 grid-cols-[12px_minmax(0,1fr)_minmax(2.25rem,max-content)] grid-rows-2 items-center gap-x-[0.7ch] gap-y-0.5";
 var BOTTOM_RAIL_TENNIS_STATUS_COL_START = 3;
 var BOTTOM_RAIL_WATCH_LIVE_CLASS = "shrink-0 border-0 bg-transparent p-0 font-mono text-[7px] leading-none tracking-[0.08em] text-[#1a1a1a]/80 transition-colors hover:text-[#1a1a1a]";
 var BOTTOM_RAIL_TEAM_CLICKABLE_CLASS = cn2(
@@ -142063,7 +142063,7 @@ function BottomRailTeamRow({
         "span",
         {
           className: cn2(
-            "col-start-1 col-span-2 grid min-w-0 grid-cols-[12px_minmax(0,1fr)] items-center gap-x-[0.35ch]",
+            "col-start-1 col-span-2 grid min-w-0 grid-cols-[12px_minmax(0,1fr)] items-center gap-x-[0.6ch]",
             rowClass,
             BOTTOM_RAIL_TEAM_CLICKABLE_CLASS
           ),
@@ -142169,9 +142169,9 @@ function BottomRailTennisMatchupScoreGrid({
   return /* @__PURE__ */ (0, import_jsx_runtime235.jsxs)(
     "div",
     {
-      className: "col-start-2 row-start-1 row-span-2 grid w-full min-w-0 grid-rows-2 items-center gap-y-px",
+      className: "col-start-2 row-start-1 row-span-2 grid w-full min-w-0 grid-rows-2 items-center gap-x-[0.7ch] gap-y-0.5",
       style: {
-        gridTemplateColumns: `minmax(0,1fr) repeat(${columns.length}, minmax(0.65rem, max-content))`
+        gridTemplateColumns: `minmax(0,1fr) repeat(${columns.length}, minmax(0.8rem, max-content))`
       },
       children: [
         /* @__PURE__ */ (0, import_jsx_runtime235.jsx)(
@@ -142273,8 +142273,8 @@ function BottomRailGameCardBody({
   const leftPresentation = model.kind === "matchup" ? resolveSportsBrowserLeftNavTeamNamePresentation(game, model.left) : null;
   const rightPresentation = model.kind === "matchup" ? resolveSportsBrowserLeftNavTeamNamePresentation(game, model.right) : null;
   const showWatchLive = Boolean(onWatchLive && (canShowWatchLive ? canShowWatchLive(game) : true));
-  return /* @__PURE__ */ (0, import_jsx_runtime235.jsxs)("div", { className: "flex min-h-0 min-w-0 w-full flex-1 flex-col justify-center gap-px px-1.5 py-0.5", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime235.jsxs)("div", { className: "flex min-w-0 items-center justify-between gap-1", children: [
+  return /* @__PURE__ */ (0, import_jsx_runtime235.jsxs)("div", { className: "flex min-h-0 min-w-0 w-full flex-1 flex-col justify-center gap-0.5 px-1.5 py-0.5", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime235.jsxs)("div", { className: "flex min-w-0 items-center justify-between gap-1.5", children: [
       /* @__PURE__ */ (0, import_jsx_runtime235.jsxs)("div", { className: "flex min-w-0 items-center gap-0.5", children: [
         leagueLogoUrl ? /* @__PURE__ */ (0, import_jsx_runtime235.jsx)(
           "img",
@@ -142291,7 +142291,7 @@ function BottomRailGameCardBody({
         ) : /* @__PURE__ */ (0, import_jsx_runtime235.jsx)("span", { className: "inline-flex h-2.5 w-2.5 shrink-0", "aria-hidden": true }),
         tennisMetaHeader ? /* @__PURE__ */ (0, import_jsx_runtime235.jsx)(SportsBrowserTennisGameCardMetaHeader, { labels: tennisMetaHeader }) : /* @__PURE__ */ (0, import_jsx_runtime235.jsx)("span", { className: "min-w-0 truncate text-[8px] font-semibold uppercase leading-none tracking-[0.04em] text-[#1a1a1a]", children: leagueLabel })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime235.jsxs)("div", { className: "isolate flex h-[0.7rem] shrink-0 items-center justify-end gap-1 bg-transparent", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime235.jsxs)("div", { className: "isolate flex h-[0.7rem] shrink-0 items-center justify-end gap-1.5 bg-transparent", children: [
         showWatchLive ? /* @__PURE__ */ (0, import_jsx_runtime235.jsx)(
           "button",
           {
@@ -142376,7 +142376,7 @@ function BottomRailGameCardBody({
             {
               flash: flashSpec?.statusTime,
               className: cn2(
-                "row-start-1 row-span-2 flex min-w-[2rem] items-center justify-center self-stretch text-center text-[9px] font-medium leading-none tabular-nums tracking-wide text-[#1a1a1a]"
+                "row-start-1 row-span-2 flex min-w-[2.25rem] items-center justify-center self-stretch px-1 text-center text-[9px] font-medium leading-none tabular-nums tracking-wide text-[#1a1a1a]"
               ),
               style: { gridColumnStart: statusTimeColStart },
               children: statusTimeLabel
@@ -143421,7 +143421,7 @@ function NavRow({
   );
 }
 var SIDEBAR_GAME_ROW_CLASS = cn2(
-  "border-t px-4 py-[5px] text-[10px] leading-snug first:border-t-0",
+  "border-t px-4 py-[6px] text-[10px] leading-snug first:border-t-0",
   RULE2
 );
 var SIDEBAR_GAME_ROW_HOVER_SURFACE_CLASS = "bg-[#e9e4db]";
@@ -143482,12 +143482,12 @@ function SidebarTemporalGameRowContainer({
     }
   );
 }
-var SIDEBAR_GAME_ROW_TWO_LINE_GRID_CLASS = "grid min-w-0 w-full grid-cols-[minmax(0,1fr)_1.125rem_minmax(1.75rem,max-content)_1.5rem] grid-rows-[auto_auto] items-center gap-x-[0.35ch] gap-y-[1px]";
-var SIDEBAR_GAME_ROW_TENNIS_GRID_BASE_CLASS = "grid min-w-0 w-full grid-rows-[auto_auto] items-center gap-x-[0.35ch] gap-y-[1px]";
-var SIDEBAR_GAME_ROW_SCORE_CLASS = "inline-flex w-[1.125rem] shrink-0 items-center justify-start tabular-nums text-[#1a1a1a]";
-var SIDEBAR_GAME_ROW_TENNIS_SET_SCORE_CLASS = "inline-flex min-w-[0.65rem] shrink-0 items-center justify-start tabular-nums text-[#1a1a1a]";
-var SIDEBAR_GAME_ROW_STATUS_BASE_CLASS = "row-start-2 min-w-0 truncate text-right tabular-nums tracking-wide text-[#6a6a6a]";
-var SIDEBAR_GAME_ROW_BROADCAST_BASE_CLASS = "row-start-2 flex w-[1.5rem] shrink-0 items-center justify-end";
+var SIDEBAR_GAME_ROW_TWO_LINE_GRID_CLASS = "grid min-w-0 w-full grid-cols-[minmax(0,1fr)_1.25rem_minmax(2.25rem,max-content)_1.75rem] grid-rows-[auto_auto] items-center gap-x-[0.7ch] gap-y-0.5";
+var SIDEBAR_GAME_ROW_TENNIS_GRID_BASE_CLASS = "grid min-w-0 w-full grid-rows-[auto_auto] items-center gap-x-[0.7ch] gap-y-0.5";
+var SIDEBAR_GAME_ROW_SCORE_CLASS = "inline-flex w-[1.25rem] shrink-0 items-center justify-start tabular-nums text-[#1a1a1a]";
+var SIDEBAR_GAME_ROW_TENNIS_SET_SCORE_CLASS = "inline-flex min-w-[0.8rem] shrink-0 items-center justify-start tabular-nums text-[#1a1a1a]";
+var SIDEBAR_GAME_ROW_STATUS_BASE_CLASS = "row-start-2 min-w-0 truncate pr-1 text-right tabular-nums tracking-wide text-[#6a6a6a]";
+var SIDEBAR_GAME_ROW_BROADCAST_BASE_CLASS = "row-start-2 flex w-[1.75rem] shrink-0 items-center justify-end pl-0.5";
 function shouldShowSidebarGameRowChannelLogo(game) {
   if (game.status === "final" || isSpineFinalizedGame(game) || game.status === "postponed") {
     return false;
@@ -143525,7 +143525,7 @@ function SidebarCompetitorMark({
     "span",
     {
       className: cn2(
-        "col-start-1 grid min-w-0 grid-cols-[12px_minmax(0,1fr)] items-center gap-x-[0.35ch]",
+        "col-start-1 grid min-w-0 grid-cols-[12px_minmax(0,1fr)] items-center gap-x-[0.6ch]",
         row === 1 ? "row-start-1" : "row-start-2",
         onTeamClick && SIDEBAR_GAME_ROW_TEAM_NAME_CLICKABLE_CLASS
       ),
@@ -143615,7 +143615,7 @@ function SidebarTemporalGameRowTennisMetaHeader({ game }) {
       labels,
       textClassName: "text-[9px] leading-none tracking-[0.04em] text-[#1a1a1a]",
       dividerClassName: "h-[0.75rem]",
-      className: "mb-px"
+      className: "mb-0.5"
     }
   );
 }
@@ -143655,7 +143655,7 @@ function SidebarTemporalGameRow({
               "span",
               {
                 className: cn2(
-                  "col-span-2 grid min-w-0 grid-cols-[12px_minmax(0,1fr)] items-center gap-x-[0.35ch]",
+                  "col-span-2 grid min-w-0 grid-cols-[12px_minmax(0,1fr)] items-center gap-x-[0.6ch]",
                   hasDetail ? "row-start-1" : "row-span-2 row-start-1"
                 ),
                 children: [
@@ -143676,7 +143676,7 @@ function SidebarTemporalGameRow({
                 ]
               }
             ),
-            hasDetail ? /* @__PURE__ */ (0, import_jsx_runtime237.jsx)("span", { className: cn2("col-span-2 row-start-2 min-w-0 break-words whitespace-normal normal-case pl-[calc(12px+0.35ch)]", SIDEBAR_GAME_ROW_PRIMARY_TEXT_CLASS), children: eventDetail }) : null,
+            hasDetail ? /* @__PURE__ */ (0, import_jsx_runtime237.jsx)("span", { className: cn2("col-span-2 row-start-2 min-w-0 break-words whitespace-normal normal-case pl-[calc(12px+0.6ch)]", SIDEBAR_GAME_ROW_PRIMARY_TEXT_CLASS), children: eventDetail }) : null,
             /* @__PURE__ */ (0, import_jsx_runtime237.jsx)(
               SidebarGameRowStatus,
               {
@@ -143713,7 +143713,7 @@ function SidebarTemporalGameRow({
     gridTemplateColumns: resolveNewsSportsBrowserTennisGridTemplateColumns(
       tennisSetColumns.length,
       "minmax(0,1fr)",
-      "minmax(1.75rem,max-content) 1.5rem"
+      "minmax(2.25rem,max-content) 1.75rem"
     )
   } : void 0;
   const finalWinnerSide = variant === "catchUp" ? resolveGamesSpineCompactMatchupFinalWinnerSide(game, firstLine, secondLine) : null;
