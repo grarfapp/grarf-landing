@@ -17497,6 +17497,9 @@ function readGolfTournamentStartDateKey(iso, formatDayKey) {
 function readGolfTournamentEndDateKey(iso, formatDayKey) {
   return readGolfTournamentStartDateKey(iso, formatDayKey);
 }
+function isGolfRoundPlayCompleteStatusLine(statusLine) {
+  return typeof statusLine === "string" && /round\s+\d+\s+-\s+play complete/i.test(statusLine.trim());
+}
 function formatGolfScheduledDayLabel(dateKey) {
   const trimmed = dateKey.trim();
   if (!trimmed) return "\u2014";
@@ -20883,16 +20886,20 @@ function isGameOnGamesSpineOperationalDateWithContext(game, ctx, now = /* @__PUR
   }
   return false;
 }
+function resolveActiveGolfTournamentOperationalSportsDayKey(game, now = /* @__PURE__ */ new Date()) {
+  const endKey = game.metadata?.tournamentEndDateKey?.trim();
+  if (!endKey) return null;
+  const today = getOperationalSportsDayDateKey(now);
+  if (endKey < today) return null;
+  const startTimeKey = game.startTimeMs != null && game.startTimeMs > 0 ? formatOperationalDateKeyFromMs(game.startTimeMs, gamesSpineOperationalTimeZone()) ?? null : null;
+  if (startTimeKey && startTimeKey <= today) return today;
+  return null;
+}
 function readGolfFinalOperationalDateKey(game) {
   const endKey = game.metadata?.tournamentEndDateKey?.trim();
   const scheduledKey = game.scheduledDateKey?.trim();
-  if (endKey) {
-    const today = getOperationalSportsDayDateKey();
-    if (endKey >= today) {
-      const startTimeKey = game.startTimeMs != null && game.startTimeMs > 0 ? formatOperationalDateKeyFromMs(game.startTimeMs, gamesSpineOperationalTimeZone()) ?? null : null;
-      if (startTimeKey && startTimeKey <= today) return today;
-    }
-  }
+  const activeSportsDayKey = resolveActiveGolfTournamentOperationalSportsDayKey(game);
+  if (activeSportsDayKey) return activeSportsDayKey;
   if (endKey && scheduledKey && /round\s+\d+\s+-\s+play complete/i.test(game.statusLine ?? "")) {
     return scheduledKey;
   }
@@ -20902,6 +20909,10 @@ function readGolfFinalOperationalDateKey(game) {
 function resolveGameOperationalDateKey(game) {
   if (game.status === "scheduled" || game.status === "live") {
     if (isGolfLeagueKey(game.league)) {
+      if (game.status === "live") {
+        const activeSportsDayKey = resolveActiveGolfTournamentOperationalSportsDayKey(game);
+        if (activeSportsDayKey) return activeSportsDayKey;
+      }
       const key2 = game.scheduledDateKey?.trim();
       if (key2) return key2;
       return formatOperationalDateKeyFromMs(game.startTimeMs, gamesSpineOperationalTimeZone()) ?? null;
@@ -21981,7 +21992,12 @@ function readEspnCompetitionEventId(game) {
   return trimmed || null;
 }
 function isAuthoritativeFinalOperationalRow(game) {
-  if (game.status === "final") return true;
+  if (game.status === "final") {
+    if (isGolfTournamentLeagueKey(game.league ?? void 0) && isGolfRoundPlayCompleteStatusLine(game.statusLine)) {
+      return false;
+    }
+    return true;
+  }
   const line = game.statusLine?.trim();
   return line != null && /^final$/i.test(line);
 }
@@ -22138,7 +22154,15 @@ function hasRetainedCanonicalFinalRow(gameId, nowMs = Date.now()) {
   const entry2 = useRecentFinalizedGamesStore.getState().byId[gameId];
   if (!entry2 || entry2.expiresAt <= nowMs) return false;
   const retained = entry2.game;
-  return retained.status === "final" || isSpineFinalizedGame(retained);
+  if (retained.status === "final" || isSpineFinalizedGame(retained)) {
+    const sportsDayKey = getOperationalSportsDayDateKey(new Date(nowMs));
+    const endKey = retained.metadata?.tournamentEndDateKey?.trim();
+    if (isGolfTournamentLeagueKey(retained.league ?? void 0) && isGolfRoundPlayCompleteStatusLine(retained.statusLine) && endKey && endKey >= sportsDayKey) {
+      return false;
+    }
+    return true;
+  }
+  return false;
 }
 function isSupersededByAuthoritativeEspnEventRow(game) {
   if (game.status !== "live") return false;
@@ -24314,7 +24338,12 @@ function findPrimaryMatchupGame(primary, matchupKey) {
   return null;
 }
 function isAuthoritativeFinalOperationalRow2(game) {
-  if (game?.status === "final") return true;
+  if (game?.status === "final") {
+    if (typeof game?.league === "string" && ["PGA", "LPGA", "DP_WORLD", "KORNFERRY", "LIV", "CHAMPIONS"].includes(game.league) && typeof game?.statusLine === "string" && /round\s+\d+\s+-\s+play complete/i.test(game.statusLine.trim())) {
+      return false;
+    }
+    return true;
+  }
   const line = typeof game?.statusLine === "string" ? game.statusLine.trim() : "";
   return line.length > 0 && /^final$/i.test(line);
 }
@@ -26016,7 +26045,7 @@ function safe7(v2) {
   return typeof v2 === "string" && v2.trim() ? v2.trim() : "";
 }
 function isRoundPlayCompleteStatus(statusLine) {
-  return /round\s+\d+\s+-\s+play complete/i.test(statusLine);
+  return typeof statusLine === "string" && /round\s+\d+\s+-\s+play complete/i.test(statusLine.trim());
 }
 function formatTimeEt6(iso) {
   try {
@@ -26049,13 +26078,16 @@ function normalizeGolfEvent(event, leagueKey, slateDateKey) {
     formatOperationalDateKeyFromMs
   );
   const pastTournamentEnd = tournamentEndKey != null && operationalTodayKey > tournamentEndKey;
+  const tournamentStillActive = tournamentEndKey != null && operationalTodayKey <= tournamentEndKey;
   const tournamentStartKey = readGolfTournamentStartDateKey(
     isoStart,
     formatOperationalDateKeyFromMs
   );
+  const finalizedStatusLine = safe7(statusType?.shortDetail) || safe7(statusType?.description) || safe7(statusType?.detail) || "Final";
+  const espnExplicitFinal = completed || pastTournamentEnd || /^final$/i.test(finalizedStatusLine) && !isRoundPlayCompleteStatus(finalizedStatusLine);
   const paused = isEspnPausedCompetitionStatus(statusType);
-  const live = !completed && !pastTournamentEnd && !paused && state3 === "in";
-  const final = !live && (completed || pastTournamentEnd || state3 === "post" && !paused);
+  const live = !completed && !pastTournamentEnd && !paused && (state3 === "in" || state3 === "post" && tournamentStillActive && !espnExplicitFinal);
+  const final = !live && (completed || pastTournamentEnd || espnExplicitFinal && !paused);
   const scheduled = !completed && !pastTournamentEnd && (state3 === "pre" || paused);
   let cardStatus = "scheduled";
   if (live) cardStatus = "live";
@@ -26073,7 +26105,6 @@ function normalizeGolfEvent(event, leagueKey, slateDateKey) {
       scheduledDateKey = tournamentStartKey;
     }
   }
-  const finalizedStatusLine = safe7(statusType?.shortDetail) || safe7(statusType?.description) || safe7(statusType?.detail) || "Final";
   if (final && tournamentEndKey && !isRoundPlayCompleteStatus(finalizedStatusLine)) {
     scheduledDateKey = tournamentEndKey;
   }
