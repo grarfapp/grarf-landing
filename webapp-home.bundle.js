@@ -139635,6 +139635,16 @@ var GAME_CONTENT_SOURCE_LABELS = {
   espn: "ESPN",
   yahoo: "YAHOO"
 };
+var NCAAF_GAME_CONTENT_SOURCE_IDS = [
+  "yahoo",
+  "espn"
+];
+function gameContentSourceIdsForGame(game) {
+  if (game.league === "NCAAF" || game.id.startsWith("espn-NCAAF-")) {
+    return NCAAF_GAME_CONTENT_SOURCE_IDS;
+  }
+  return SPORTS_BROWSER_PROTOTYPE_GAME_CONTENT_SOURCE_IDS;
+}
 function resolveEspnContentSourceUrlFromContext(context2) {
   for (const website4 of context2.gameCenter) {
     const label = website4.label.trim().toUpperCase();
@@ -139665,7 +139675,7 @@ function resolveContentSourceUrl(sourceId, game, context2, _section) {
 }
 function resolveSportsBrowserPrototypeGameContextContentSources(game, context2, section) {
   const sources = [];
-  for (const sourceId of SPORTS_BROWSER_PROTOTYPE_GAME_CONTENT_SOURCE_IDS) {
+  for (const sourceId of gameContentSourceIdsForGame(game)) {
     const url = resolveContentSourceUrl(sourceId, game, context2, section);
     if (!url) continue;
     sources.push({
