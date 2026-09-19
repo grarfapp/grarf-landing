@@ -23252,6 +23252,35 @@ function extractEspnScoreboardEventEndedAtMs(event, competition, cardStatus) {
   return null;
 }
 
+// ../grarf/desktop/shared/domain/operational/resolveEspnEventGameCenterUrl.js
+init_define_import_meta_env();
+
+// ../grarf/shared/domain/operational/resolveEspnEventGameCenterUrl.js
+init_define_import_meta_env();
+function isEspnHref(href) {
+  try {
+    const url = new URL(href);
+    return url.protocol === "https:" && url.hostname === "www.espn.com";
+  } catch {
+    return false;
+  }
+}
+function linkRelMatchesGameCenter(rel) {
+  if (!Array.isArray(rel)) return false;
+  return rel.some((entry2) => entry2 === "summary" || entry2 === "desktop" || entry2 === "event");
+}
+function resolveEspnEventGameCenterUrl(event) {
+  const links = event.links;
+  if (!Array.isArray(links)) return null;
+  for (const raw of links) {
+    if (!raw || typeof raw !== "object") continue;
+    const href = typeof raw.href === "string" ? raw.href.trim() : "";
+    if (!href || !isEspnHref(href)) continue;
+    if (linkRelMatchesGameCenter(raw.rel)) return href;
+  }
+  return null;
+}
+
 // ../grarf/desktop/electron/espn/normalize.js
 function safe8(v) {
   return typeof v === "string" && v.trim() ? v.trim() : "";
@@ -23534,7 +23563,22 @@ function normalizeEspnEvent(event, leagueKey, slateDateKey) {
     officialHomeName: String(home.team.displayName || home.team.name || homeTeam)
   } : leagueKey === "NCAABB" ? {
     espnSeasonSlug: safe8(event?.season?.slug) || void 0
-  } : leagueKey === "WORLDCUP" || NATIONAL_TEAM_SOCCER_LEAGUE_KEYS.has(leagueKey) ? {
+  } : leagueKey === "NCAAF" ? (() => {
+    const espnGameCenterUrl = resolveEspnEventGameCenterUrl(event);
+    const awayMascot = safe8(away.team.name);
+    const homeMascot = safe8(home.team.name);
+    const payload = {};
+    if (espnGameCenterUrl) payload.espnGameCenterUrl = espnGameCenterUrl;
+    if (awayMascot) payload.ncaafAwayEspnTeamName = awayMascot;
+    if (homeMascot) payload.ncaafHomeEspnTeamName = homeMascot;
+    payload.officialAwayName = String(
+      away.team.displayName || away.team.name || awayTeam
+    );
+    payload.officialHomeName = String(
+      home.team.displayName || home.team.name || homeTeam
+    );
+    return Object.keys(payload).length > 0 ? payload : void 0;
+  })() : leagueKey === "WORLDCUP" || NATIONAL_TEAM_SOCCER_LEAGUE_KEYS.has(leagueKey) ? {
     officialAwayName: String(away.team.displayName || away.team.name || awayTeam),
     officialHomeName: String(home.team.displayName || home.team.name || homeTeam),
     ...leagueKey === "WORLDCUP" && altGameNote ? { worldCupGroupNotes: altGameNote } : {}

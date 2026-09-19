@@ -26567,6 +26567,35 @@ function extractEspnScoreboardEventEndedAtMs(event, competition, cardStatus) {
   return null;
 }
 
+// ../grarf/desktop/shared/domain/operational/resolveEspnEventGameCenterUrl.js
+init_define_import_meta_env();
+
+// ../grarf/shared/domain/operational/resolveEspnEventGameCenterUrl.js
+init_define_import_meta_env();
+function isEspnHref(href) {
+  try {
+    const url = new URL(href);
+    return url.protocol === "https:" && url.hostname === "www.espn.com";
+  } catch {
+    return false;
+  }
+}
+function linkRelMatchesGameCenter(rel) {
+  if (!Array.isArray(rel)) return false;
+  return rel.some((entry2) => entry2 === "summary" || entry2 === "desktop" || entry2 === "event");
+}
+function resolveEspnEventGameCenterUrl(event) {
+  const links = event.links;
+  if (!Array.isArray(links)) return null;
+  for (const raw of links) {
+    if (!raw || typeof raw !== "object") continue;
+    const href = typeof raw.href === "string" ? raw.href.trim() : "";
+    if (!href || !isEspnHref(href)) continue;
+    if (linkRelMatchesGameCenter(raw.rel)) return href;
+  }
+  return null;
+}
+
 // ../grarf/desktop/electron/espn/normalize.js
 function safe8(v2) {
   return typeof v2 === "string" && v2.trim() ? v2.trim() : "";
@@ -26849,7 +26878,22 @@ function normalizeEspnEvent(event, leagueKey, slateDateKey) {
     officialHomeName: String(home.team.displayName || home.team.name || homeTeam)
   } : leagueKey === "NCAABB" ? {
     espnSeasonSlug: safe8(event?.season?.slug) || void 0
-  } : leagueKey === "WORLDCUP" || NATIONAL_TEAM_SOCCER_LEAGUE_KEYS.has(leagueKey) ? {
+  } : leagueKey === "NCAAF" ? (() => {
+    const espnGameCenterUrl = resolveEspnEventGameCenterUrl(event);
+    const awayMascot = safe8(away.team.name);
+    const homeMascot = safe8(home.team.name);
+    const payload = {};
+    if (espnGameCenterUrl) payload.espnGameCenterUrl = espnGameCenterUrl;
+    if (awayMascot) payload.ncaafAwayEspnTeamName = awayMascot;
+    if (homeMascot) payload.ncaafHomeEspnTeamName = homeMascot;
+    payload.officialAwayName = String(
+      away.team.displayName || away.team.name || awayTeam
+    );
+    payload.officialHomeName = String(
+      home.team.displayName || home.team.name || homeTeam
+    );
+    return Object.keys(payload).length > 0 ? payload : void 0;
+  })() : leagueKey === "WORLDCUP" || NATIONAL_TEAM_SOCCER_LEAGUE_KEYS.has(leagueKey) ? {
     officialAwayName: String(away.team.displayName || away.team.name || awayTeam),
     officialHomeName: String(home.team.displayName || home.team.name || homeTeam),
     ...leagueKey === "WORLDCUP" && altGameNote ? { worldCupGroupNotes: altGameNote } : {}
@@ -35736,11 +35780,32 @@ function buildEspnGamecastUrl(league2, eventId, options) {
   if (league2 === "NCAABB") {
     return `https://www.espn.com/college-baseball/game/_/gameId/${eventId}`;
   }
+  if (league2 === "NCAAF") {
+    return `https://www.espn.com/college-football/game/_/gameId/${eventId}`;
+  }
   if (league2 === "AFL") {
     return `https://www.espn.com/afl/game?gameId=${eventId}`;
   }
   const slug = league2 === "WNBA" ? "wnba" : league2 === "NBASUMMER" ? "nba-summer-league" : league2.toLowerCase();
   return `https://www.espn.com/${slug}/game/_/gameId/${eventId}`;
+}
+function resolveEspnGameCenterUrlForGame(game) {
+  const fromMetadata = game.metadata?.espnGameCenterUrl?.trim();
+  if (fromMetadata) return fromMetadata;
+  const parsed = parseEspnGameIdFromRowId(game.id);
+  if (parsed) {
+    return buildEspnGamecastUrl(parsed.league, parsed.eventId, {
+      ufcCardEventId: game.metadata?.ufcCardEventId
+    });
+  }
+  const eventId = parseEspnEventIdFromGame(game);
+  const league2 = game.league ?? leagueKeyFromEspnGameId(game.id);
+  if (eventId && league2) {
+    return buildEspnGamecastUrl(league2, eventId, {
+      ufcCardEventId: game.metadata?.ufcCardEventId
+    });
+  }
+  return null;
 }
 function parseEspnEventIdFromGame(game) {
   const ext = game.externalIds?.espn?.trim();
@@ -35811,6 +35876,13 @@ function resolveGameWorkspaceEmbedUrl(game, gameId) {
         gameId: game.id
       });
       return game.streamUrl.trim();
+    }
+  }
+  if (game) {
+    const espnCenter = resolveEspnGameCenterUrlForGame(game);
+    if (espnCenter) {
+      console.log("[Resolver] Using ESPN game center URL", { league: game.league, gameId: game.id });
+      return espnCenter;
     }
   }
   const parsed = parseEspnGameIdFromRowId(gameId);
@@ -37764,6 +37836,47 @@ async function enrichOperationalTransport(rawTransport) {
   return transport;
 }
 
+// ../grarf/desktop/src/lib/ncaaf/enrichOperationalSnapshotNcaafYahooSports.ts
+init_define_import_meta_env();
+var NCAAF_YAHOO_SPORTS_ENRICH_PROXY_PATH = "/operational/enrich-ncaaf-yahoo-sports";
+function ncaafRowsNeedYahooSportsUrlEnrich(transport) {
+  const rows = transport.leagues?.NCAAF;
+  if (!Array.isArray(rows) || rows.length === 0) return false;
+  return rows.some((game) => {
+    if (game.league !== "NCAAF" && !game.id.startsWith("espn-NCAAF-")) return false;
+    return !game.metadata?.yahooSportsGameUrl?.trim();
+  });
+}
+async function enrichViaWebappHostProxy(transport) {
+  if (typeof window === "undefined" || !window.location?.origin) return null;
+  try {
+    const res = await fetch(`${window.location.origin}${NCAAF_YAHOO_SPORTS_ENRICH_PROXY_PATH}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Accept: "application/json" },
+      body: JSON.stringify({ transport })
+    });
+    if (!res.ok) return null;
+    const payload = await res.json();
+    if (payload?.ok && payload.transport) return payload.transport;
+  } catch {
+  }
+  return null;
+}
+async function enrichOperationalSnapshotNcaafYahooSports(transport) {
+  if (!ncaafRowsNeedYahooSportsUrlEnrich(transport)) {
+    return transport;
+  }
+  const ipc = typeof window !== "undefined" ? window.grarf?.gamesEnrichNcaafYahooSportsTransport : void 0;
+  if (ipc) {
+    const result = await ipc(transport);
+    if (result.ok && result.transport) {
+      return result.transport;
+    }
+  }
+  const proxied = await enrichViaWebappHostProxy(transport);
+  return proxied ?? transport;
+}
+
 // ../grarf/desktop/src/services/operationalIngest/normalizeOperationalSnapshot.ts
 init_define_import_meta_env();
 
@@ -38053,6 +38166,11 @@ async function hydrateOperationalSnapshotFromTransport(rawTransport, hydrate, co
     return;
   }
   let transportForHydrate = rawTransport;
+  try {
+    transportForHydrate = await enrichOperationalSnapshotNcaafYahooSports(transportForHydrate);
+  } catch (e2) {
+    console.warn(`${LOG23} NCAAF Yahoo Sports enrich failed`, e2);
+  }
   if (!context2.startupSeed && !isCentralizedSnapshot && isElectronIpcAuthoritativeOperationalIngest(completeness.source)) {
     try {
       transportForHydrate = await enrichOperationalSnapshotFotmob(transportForHydrate);
@@ -86529,12 +86647,8 @@ function resolveGameEmbedUrl(game) {
   if (game.gameCardUrl?.trim()) {
     return game.gameCardUrl.trim();
   }
-  const parsed = parseEspnGameIdFromRowId(game.id);
-  if (parsed) {
-    return buildEspnGamecastUrl(parsed.league, parsed.eventId, {
-      ufcCardEventId: game.metadata?.ufcCardEventId
-    });
-  }
+  const fromResolver = resolveEspnGameCenterUrlForGame(game);
+  if (fromResolver) return fromResolver;
   return null;
 }
 function resolveGameUpdateWorkspaceUrl(update) {
@@ -127730,6 +127844,8 @@ function resolveSpineRowWorkspaceEmbedUrl(game) {
     const wimbledonUrl = resolveWimbledonCenterPaneEmbedUrl(game);
     if (wimbledonUrl) return wimbledonUrl;
   }
+  const espnGameCenterUrl = resolveEspnGameCenterUrlForGame(game);
+  if (espnGameCenterUrl) return espnGameCenterUrl;
   const parsed = parseEspnGameIdFromRowId(game.id);
   if (parsed) {
     return buildEspnGamecastUrl(parsed.league, parsed.eventId, {
@@ -139485,6 +139601,94 @@ function resolveGameBrowserContext(game) {
   };
 }
 
+// ../grarf/desktop/src/lib/gamesSpine/resolveSportsBrowserPrototypeGameContextContentSources.ts
+init_define_import_meta_env();
+
+// ../grarf/shared/domain/ncaaf/resolveNcaafYahooSportsGameUrlFromGame.ts
+init_define_import_meta_env();
+
+// ../grarf/shared/domain/ncaaf/ncaafYahooSportsTeamSlug.ts
+init_define_import_meta_env();
+
+// ../grarf/shared/domain/ncaaf/resolveNcaafYahooSportsGameUrlFromGame.ts
+function resolveNcaafYahooSportsGameUrlFromGame(game) {
+  if (game.league !== "NCAAF" && !game.id.startsWith("espn-NCAAF-")) {
+    return null;
+  }
+  const fromMetadata = game.metadata?.yahooSportsGameUrl?.trim();
+  if (fromMetadata) {
+    try {
+      const url = new URL(fromMetadata);
+      if (url.protocol === "https:" && url.hostname === "sports.yahoo.com") {
+        return fromMetadata;
+      }
+    } catch {
+      return null;
+    }
+  }
+  return null;
+}
+
+// ../grarf/desktop/src/lib/gamesSpine/resolveSportsBrowserPrototypeGameContextContentSources.ts
+var SPORTS_BROWSER_PROTOTYPE_GAME_CONTENT_SOURCE_IDS = ["espn", "yahoo"];
+var GAME_CONTENT_SOURCE_LABELS = {
+  espn: "ESPN",
+  yahoo: "YAHOO"
+};
+function resolveEspnContentSourceUrlFromContext(context2) {
+  for (const website4 of context2.gameCenter) {
+    const label = website4.label.trim().toUpperCase();
+    const url = website4.url.trim();
+    if (!url) continue;
+    if (label === "ESPN") return url;
+  }
+  for (const website4 of context2.gameCenter) {
+    const url = website4.url.trim();
+    if (!url) continue;
+    try {
+      if (new URL(url).hostname === "www.espn.com") return url;
+    } catch {
+      continue;
+    }
+  }
+  return null;
+}
+function resolveContentSourceUrl(sourceId, game, context2, _section) {
+  switch (sourceId) {
+    case "espn":
+      return resolveEspnContentSourceUrlFromContext(context2);
+    case "yahoo":
+      return resolveNcaafYahooSportsGameUrlFromGame(game);
+    default:
+      return null;
+  }
+}
+function resolveSportsBrowserPrototypeGameContextContentSources(game, context2, section) {
+  const sources = [];
+  for (const sourceId of SPORTS_BROWSER_PROTOTYPE_GAME_CONTENT_SOURCE_IDS) {
+    const url = resolveContentSourceUrl(sourceId, game, context2, section);
+    if (!url) continue;
+    sources.push({
+      id: sourceId,
+      label: GAME_CONTENT_SOURCE_LABELS[sourceId],
+      url
+    });
+  }
+  return sources;
+}
+function resolveSportsBrowserPrototypeGameContextContentSourceWebsites(game, context2, section) {
+  return resolveSportsBrowserPrototypeGameContextContentSources(game, context2, section).map(
+    (source) => ({ label: source.label, url: source.url })
+  );
+}
+function isSportsBrowserPrototypeGameContentParentSection(section) {
+  return section === "preview" || section === "recap";
+}
+function readSportsBrowserPrototypeGameContextContentSourceIndex(pane, section) {
+  const stored = section === "preview" ? pane.gameContextPreviewSourceIndex : pane.gameContextRecapSourceIndex;
+  return typeof stored === "number" && stored >= 0 ? stored : 0;
+}
+
 // ../grarf/desktop/src/lib/gamesSpine/sportsBrowserPrototypeGameContextPane.ts
 function resolveSportsBrowserPrototypeGameContextPrimarySection(game, nowMs2 = Date.now()) {
   if (isOperationalGameCompleted(game, nowMs2)) return "recap";
@@ -139505,10 +139709,12 @@ function resolveSportsBrowserPrototypeGameContextSectionsForGame(game, nowMs2 = 
 function isSportsBrowserPrototypeGameContextPane(pane) {
   return Boolean(pane.gameId?.trim());
 }
-function getSportsBrowserPrototypeGameContextSectionWebsites(context2, section) {
+function getSportsBrowserPrototypeGameContextSectionWebsites(game, context2, section) {
   switch (section) {
     case "preview":
+      return resolveSportsBrowserPrototypeGameContextContentSourceWebsites(game, context2, "preview");
     case "recap":
+      return resolveSportsBrowserPrototypeGameContextContentSourceWebsites(game, context2, "recap");
     case "betting":
       return [];
     case "gameCenter":
@@ -139561,16 +139767,32 @@ function resolveSportsBrowserPrototypeGameContextSectionIndex(pane, game, nowMs2
 function applySportsBrowserPrototypeGameToPane(game) {
   const context2 = resolveGameBrowserContext(game);
   const defaultSection = resolveSportsBrowserPrototypeGameContextDefaultSection(game);
-  const gameCenterUrl = getSportsBrowserPrototypeGameContextSectionWebsites(context2, "gameCenter")[0]?.url?.trim() || null;
+  const gameCenterUrl = getSportsBrowserPrototypeGameContextSectionWebsites(game, context2, "gameCenter")[0]?.url?.trim() || null;
   const fotmobMatchUrl = resolveFotmobMatchUrl(game);
+  const previewSourceIndex = defaultSection === "preview" ? readSportsBrowserPrototypeGameContextContentSourceIndex({}, "preview") : 0;
+  const recapSourceIndex = defaultSection === "recap" ? readSportsBrowserPrototypeGameContextContentSourceIndex({}, "recap") : 0;
+  const previewSources = resolveSportsBrowserPrototypeGameContextContentSourceWebsites(
+    game,
+    context2,
+    "preview"
+  );
+  const recapSources = resolveSportsBrowserPrototypeGameContextContentSourceWebsites(
+    game,
+    context2,
+    "recap"
+  );
+  const initialPreviewUrl = defaultSection === "preview" ? previewSources[previewSourceIndex]?.url?.trim() ?? previewSources[0]?.url?.trim() ?? null : null;
+  const initialRecapUrl = defaultSection === "recap" ? recapSources[recapSourceIndex]?.url?.trim() ?? recapSources[0]?.url?.trim() ?? null : null;
   return {
-    url: fotmobMatchUrl ?? gameCenterUrl,
-    activeTabIndex: 0,
+    url: fotmobMatchUrl ?? initialPreviewUrl ?? initialRecapUrl ?? gameCenterUrl,
+    activeTabIndex: defaultSection === "preview" ? previewSourceIndex : defaultSection === "recap" ? recapSourceIndex : 0,
     leagueKey: null,
     gameId: game.id,
     gameContextSection: defaultSection,
     leagueContextSection: null,
     gameContextTeamSection: null,
+    gameContextPreviewSourceIndex: previewSourceIndex,
+    gameContextRecapSourceIndex: recapSourceIndex,
     showWebsiteTabs: true,
     documentTitle: null
   };
@@ -139580,6 +139802,7 @@ function applySportsBrowserPrototypeGameTeamSideToPane(game, side) {
   const contextSection = side === "away" ? "awayTeam" : "homeTeam";
   const pane = applySportsBrowserPrototypeGameContextSectionToPane(
     applySportsBrowserPrototypeGameToPane(game),
+    game,
     context2,
     contextSection
   );
@@ -139598,15 +139821,19 @@ function applySportsBrowserPrototypeGameTeamSideToPane(game, side) {
     documentTitle: null
   };
 }
-function applySportsBrowserPrototypeGameContextSectionToPane(pane, context2, section) {
+function applySportsBrowserPrototypeGameContextSectionToPane(pane, game, context2, section) {
   const enteringTeamSection = section === "awayTeam" || section === "homeTeam";
   const leavingTeamSection = pane.gameContextSection === "awayTeam" || pane.gameContextSection === "homeTeam";
-  const sectionUrl = section === "gameCenter" ? getSportsBrowserPrototypeGameContextSectionWebsites(context2, section)[0]?.url?.trim() || null : null;
+  const contentSources = isSportsBrowserPrototypeGameContentParentSection(section) ? getSportsBrowserPrototypeGameContextSectionWebsites(game, context2, section) : null;
+  const contentSourceIndex = isSportsBrowserPrototypeGameContentParentSection(section) ? readSportsBrowserPrototypeGameContextContentSourceIndex(pane, section) : 0;
+  const safeContentSourceIndex = contentSources && contentSources.length > 0 ? Math.min(contentSourceIndex, contentSources.length - 1) : 0;
+  const sectionUrl = section === "gameCenter" ? getSportsBrowserPrototypeGameContextSectionWebsites(game, context2, section)[0]?.url?.trim() || null : contentSources && contentSources.length > 0 ? contentSources[safeContentSourceIndex]?.url?.trim() || null : null;
   return {
     ...pane,
     gameContextSection: section,
-    activeTabIndex: 0,
+    activeTabIndex: isSportsBrowserPrototypeGameContentParentSection(section) ? safeContentSourceIndex : 0,
     ...sectionUrl ? { url: sectionUrl } : {},
+    ...section === "preview" ? { gameContextPreviewSourceIndex: safeContentSourceIndex } : section === "recap" ? { gameContextRecapSourceIndex: safeContentSourceIndex } : {},
     gameContextTeamSection: enteringTeamSection ? pane.gameContextTeamSection ?? "news" : leavingTeamSection ? null : pane.gameContextTeamSection ?? null
   };
 }
@@ -139634,7 +139861,7 @@ function applySportsBrowserPrototypeGameTeamContextSectionToPane(pane, game, con
 }
 function applySportsBrowserPrototypeGameContextWebsiteTabToPane(pane, game, context2, tabIndex) {
   const section = pane.gameContextSection ?? "gameCenter";
-  const websites = section === "awayTeam" || section === "homeTeam" ? resolveSportsBrowserPrototypeGameContextNavSectionWebsites(game, pane, context2, section) : getSportsBrowserPrototypeGameContextSectionWebsites(context2, section);
+  const websites = section === "awayTeam" || section === "homeTeam" ? resolveSportsBrowserPrototypeGameContextNavSectionWebsites(game, pane, context2, section) : getSportsBrowserPrototypeGameContextSectionWebsites(game, context2, section);
   const url = websites[tabIndex]?.url?.trim() ?? null;
   if (pane.activeTabIndex === tabIndex && pane.url === url) {
     return pane;
@@ -139643,7 +139870,8 @@ function applySportsBrowserPrototypeGameContextWebsiteTabToPane(pane, game, cont
     ...pane,
     activeTabIndex: tabIndex,
     url,
-    documentTitle: null
+    documentTitle: null,
+    ...section === "preview" ? { gameContextPreviewSourceIndex: tabIndex } : section === "recap" ? { gameContextRecapSourceIndex: tabIndex } : {}
   };
 }
 
@@ -140282,12 +140510,12 @@ function SportsBrowserPrototypeGameContextInlineTabs({
   const activeTeamSectionIndex = SPORTS_BROWSER_PROTOTYPE_LEAGUE_CONTEXT_SECTIONS.indexOf(
     paneState.gameContextTeamSection ?? "news"
   );
-  const activeWebsites = resolveSportsBrowserPrototypeGameContextNavSectionWebsites(
+  const activeWebsites = activeSection === "awayTeam" || activeSection === "homeTeam" ? resolveSportsBrowserPrototypeGameContextNavSectionWebsites(
     game,
     paneState,
     context2,
     activeSection
-  );
+  ) : isSportsBrowserPrototypeGameContentParentSection(activeSection) ? getSportsBrowserPrototypeGameContextSectionWebsites(game, context2, activeSection) : [];
   const activeWebsiteIndex = paneState.activeTabIndex ?? 0;
   const measureRef = (0, import_react260.useRef)(null);
   const [parentTabWidthPx, setParentTabWidthPx] = (0, import_react260.useState)(null);
@@ -140909,6 +141137,7 @@ function SportsBrowserPrototypeCommandCenterContextPane({
       if (!paneState || !game || !gameContext) return;
       const nextPane = applySportsBrowserPrototypeGameContextSectionToPane(
         paneState,
+        game,
         gameContext,
         resolveSportsBrowserPrototypeGameContextSectionsForGame(game)[sectionIndex] ?? resolveSportsBrowserPrototypeGameContextDefaultSection(game)
       );
@@ -146919,6 +147148,7 @@ function HomePage() {
         }
         const nextPane = applySportsBrowserPrototypeGameContextSectionToPane(
           pane,
+          game,
           context2,
           section
         );
