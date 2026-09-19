@@ -16009,6 +16009,9 @@ function parseOperationalTransportGeneratedAtMs(generatedAt) {
   const ms = Date.parse(generatedAt);
   return Number.isFinite(ms) ? ms : Number.NEGATIVE_INFINITY;
 }
+function getLastAppliedOperationalTransportGeneratedAt() {
+  return lastAppliedOperationalTransportGeneratedAt;
+}
 function shouldAcceptOperationalTransportHydrate(transportGeneratedAt, ingestSource) {
   const incomingMs = parseOperationalTransportGeneratedAtMs(transportGeneratedAt);
   if (incomingMs === Number.NEGATIVE_INFINITY) return true;
@@ -24966,27 +24969,52 @@ var useLiveGamesStore = create((set, get) => ({
     }
     const transportGeneratedAt = completeness?.transportGeneratedAt?.trim();
     if (transportGeneratedAt) {
-      if (!shouldAcceptOperationalTransportHydrate(transportGeneratedAt, ingestSource)) {
-        logOperationalHydrateDecision({
-          stage: "hydrate_exit",
-          outcome: "rejected_stale_transport",
-          source: ingestSource,
-          transportGeneratedAt,
-          snapshotUpdatedAt: snap.updatedAt ?? null,
-          gameCount: Object.values(snap.leagues ?? {}).reduce(
-            (count, rows) => count + (Array.isArray(rows) ? rows.length : 0),
-            0
-          ),
-          liveGames: summarizeLiveGamesForDiagnostic(snap.leagues)
-        });
-        if (define_import_meta_env_default.DEV) {
-          broadcastDebug(
-            `[CanonicalLive] Skip stale operational hydrate ${transportGeneratedAt}`
-          );
+      const acceptByFreshness = shouldAcceptOperationalTransportHydrate(
+        transportGeneratedAt,
+        ingestSource
+      );
+      const materiallyDiffers = !gamesSnapshotMateriallyMatchesCanonical(snap, { ingestSource });
+      if (!acceptByFreshness) {
+        if (!materiallyDiffers) {
+          logOperationalHydrateDecision({
+            stage: "hydrate_exit",
+            outcome: "rejected_stale_transport",
+            source: ingestSource,
+            transportGeneratedAt,
+            snapshotUpdatedAt: snap.updatedAt ?? null,
+            gameCount: Object.values(snap.leagues ?? {}).reduce(
+              (count, rows) => count + (Array.isArray(rows) ? rows.length : 0),
+              0
+            ),
+            liveGames: summarizeLiveGamesForDiagnostic(snap.leagues)
+          });
+          if (define_import_meta_env_default.DEV) {
+            broadcastDebug(
+              `[CanonicalLive] Skip stale operational hydrate ${transportGeneratedAt}`
+            );
+          }
+          return;
         }
-        return;
+        const incomingMs = parseOperationalTransportGeneratedAtMs(transportGeneratedAt);
+        const lastAppliedMs = parseOperationalTransportGeneratedAtMs(
+          getLastAppliedOperationalTransportGeneratedAt()
+        );
+        if (incomingMs < lastAppliedMs) {
+          logOperationalHydrateDecision({
+            stage: "hydrate_exit",
+            outcome: "rejected_stale_transport",
+            source: ingestSource,
+            transportGeneratedAt,
+            snapshotUpdatedAt: snap.updatedAt ?? null,
+            gameCount: Object.values(snap.leagues ?? {}).reduce(
+              (count, rows) => count + (Array.isArray(rows) ? rows.length : 0),
+              0
+            ),
+            liveGames: summarizeLiveGamesForDiagnostic(snap.leagues)
+          });
+          return;
+        }
       }
-      recordAppliedOperationalTransportGeneratedAt(transportGeneratedAt, ingestSource);
     }
     if (gamesSnapshotMateriallyMatchesCanonical(snap, { ingestSource })) {
       const ipcTransportSource = ingestSource === "espn_local_adapter" || ingestSource === "espn_scoreboard_ipc";
@@ -25098,6 +25126,9 @@ var useLiveGamesStore = create((set, get) => ({
       providerPoll: completeness?.providerPoll,
       initialIngestComplete: completeness?.initialIngestComplete
     });
+    if (transportGeneratedAt) {
+      recordAppliedOperationalTransportGeneratedAt(transportGeneratedAt, ingestSource);
+    }
     const finalizeOperationalHydrate = () => {
       retention.pruneExpired();
       syncTransitionCoverageRetention(useRecentFinalizedGamesStore.getState().byId);
