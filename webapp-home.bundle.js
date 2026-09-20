@@ -106554,10 +106554,38 @@ function buildMlbGameSocialSearchQueries(game, nowMs2 = Date.now()) {
 
 // ../grarf/shared/domain/gameSocial/resolveXGameSearchUrlFromGame.ts
 init_define_import_meta_env();
+var PLACEHOLDER_COMPETITOR_NAMES = /* @__PURE__ */ new Set(["away", "home", "tbd", "\u2014", "-"]);
+function readCompetitorDisplayName(game, side) {
+  return (side === "away" ? game.awayTeam : game.homeTeam)?.trim() ?? "";
+}
+function isMeaningfulCompetitorDisplayName(name) {
+  if (!name) return false;
+  return !PLACEHOLDER_COMPETITOR_NAMES.has(name.toLowerCase());
+}
+function isManualEventOnlyGame(game) {
+  const manual = game.metadata?.manualEvent;
+  if (!manual) return false;
+  if (manual.layout === "event-only") return true;
+  if (manual.layout === "event-card") return false;
+  if (manual.layout === "head-to-head") return false;
+  if (manual.eventName?.trim()) return true;
+  return !game.homeTeam?.trim() && Boolean(game.awayTeam?.trim());
+}
+function isXGameSearchHeadToHeadGame(game) {
+  if (isManualEventOnlyGame(game)) return false;
+  const league2 = game.league;
+  if (league2 && isGolfLeagueKey(league2)) return false;
+  if (league2 && isMotorsportLeagueKey(league2)) return false;
+  if (league2 === "WEC") return false;
+  return true;
+}
 function resolveXGameSearchUrlFromGame(game) {
-  const away = game.awayTeam?.trim();
-  const home = game.homeTeam?.trim();
-  if (!away || !home) return null;
+  if (!isXGameSearchHeadToHeadGame(game)) return null;
+  const away = readCompetitorDisplayName(game, "away");
+  const home = readCompetitorDisplayName(game, "home");
+  if (!isMeaningfulCompetitorDisplayName(away) || !isMeaningfulCompetitorDisplayName(home)) {
+    return null;
+  }
   const q2 = `${encodeURIComponent(away)}%20${encodeURIComponent(home)}`;
   return `https://x.com/search?q=${q2}&src=typed_query`;
 }
