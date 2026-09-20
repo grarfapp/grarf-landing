@@ -106552,6 +106552,16 @@ function buildMlbGameSocialSearchQueries(game, nowMs2 = Date.now()) {
   return queries;
 }
 
+// ../grarf/shared/domain/gameSocial/resolveXGameSearchUrlFromGame.ts
+init_define_import_meta_env();
+function resolveXGameSearchUrlFromGame(game) {
+  const away = game.awayTeam?.trim();
+  const home = game.homeTeam?.trim();
+  if (!away || !home) return null;
+  const q2 = `${encodeURIComponent(away)}%20${encodeURIComponent(home)}`;
+  return `https://x.com/search?q=${q2}&src=typed_query`;
+}
+
 // ../grarf/shared/domain/gameSocial/correlateSocialPostToMlbGame.ts
 init_define_import_meta_env();
 function escapeRegExp(value) {
@@ -133676,6 +133686,1632 @@ function applySportsBrowserNewsTickerNavigation(tab, request, _activePaneIndex) 
   };
 }
 
+// ../grarf/desktop/src/lib/home/applySportsBrowserPrototypeSidebarLiveGameSelection.ts
+init_define_import_meta_env();
+
+// ../grarf/desktop/src/lib/gamesSpine/sportsBrowserPrototypeGameContextPane.ts
+init_define_import_meta_env();
+
+// ../grarf/desktop/src/data/sportsBrowserPrototypeGameTeamContextWebsites.ts
+init_define_import_meta_env();
+
+// ../grarf/desktop/src/data/sportsBrowserPrototypeMajorLeagueTeamPodcastWebsites.ts
+init_define_import_meta_env();
+var SPORTS_BROWSER_PROTOTYPE_MLB_TEAM_PODCAST_WEBSITES = {
+  "Arizona Diamondbacks": {
+    label: "Arizona Diamondbacks",
+    url: "https://open.spotify.com/search/Arizona%20Diamondbacks/podcastAndEpisodes"
+  },
+  "Athletics": {
+    label: "Athletics",
+    url: "https://open.spotify.com/search/Athletics/podcastAndEpisodes"
+  },
+  "Atlanta Braves": {
+    label: "Atlanta Braves",
+    url: "https://open.spotify.com/search/Atlanta%20Braves/podcastAndEpisodes"
+  },
+  "Baltimore Orioles": {
+    label: "Baltimore Orioles",
+    url: "https://open.spotify.com/search/Baltimore%20Orioles/podcastAndEpisodes"
+  },
+  "Boston Red Sox": {
+    label: "Boston Red Sox",
+    url: "https://open.spotify.com/search/Boston%20Red%20Sox/podcastAndEpisodes"
+  },
+  "Chicago Cubs": {
+    label: "Chicago Cubs",
+    url: "https://open.spotify.com/search/Chicago%20Cubs/podcastAndEpisodes"
+  },
+  "Chicago White Sox": {
+    label: "Chicago White Sox",
+    url: "https://open.spotify.com/search/Chicago%20White%20Sox/podcastAndEpisodes"
+  },
+  "Cincinnati Reds": {
+    label: "Cincinnati Reds",
+    url: "https://open.spotify.com/search/Cincinnati%20Reds/podcastAndEpisodes"
+  },
+  "Cleveland Guardians": {
+    label: "Cleveland Guardians",
+    url: "https://open.spotify.com/search/Cleveland%20Guardians/podcastAndEpisodes"
+  },
+  "Colorado Rockies": {
+    label: "Colorado Rockies",
+    url: "https://open.spotify.com/search/Colorado%20Rockies/podcastAndEpisodes"
+  },
+  "Detroit Tigers": {
+    label: "Detroit Tigers",
+    url: "https://open.spotify.com/search/Detroit%20Tigers/podcastAndEpisodes"
+  },
+  "Houston Astros": {
+    label: "Houston Astros",
+    url: "https://open.spotify.com/search/Houston%20Astros/podcastAndEpisodes"
+  },
+  "Kansas City Royals": {
+    label: "Kansas City Royals",
+    url: "https://open.spotify.com/search/Kansas%20City%20Royals/podcastAndEpisodes"
+  },
+  "Los Angeles Angels": {
+    label: "Los Angeles Angels",
+    url: "https://open.spotify.com/search/Los%20Angeles%20Angels/podcastAndEpisodes"
+  },
+  "Los Angeles Dodgers": {
+    label: "Los Angeles Dodgers",
+    url: "https://open.spotify.com/search/Los%20Angeles%20Dodgers/podcastAndEpisodes"
+  },
+  "Miami Marlins": {
+    label: "Miami Marlins",
+    url: "https://open.spotify.com/search/Miami%20Marlins/podcastAndEpisodes"
+  },
+  "Milwaukee Brewers": {
+    label: "Milwaukee Brewers",
+    url: "https://open.spotify.com/search/Milwaukee%20Brewers/podcastAndEpisodes"
+  },
+  "Minnesota Twins": {
+    label: "Minnesota Twins",
+    url: "https://open.spotify.com/search/Minnesota%20Twins/podcastAndEpisodes"
+  },
+  "New York Mets": {
+    label: "New York Mets",
+    url: "https://open.spotify.com/search/New%20York%20Mets/podcastAndEpisodes"
+  },
+  "New York Yankees": {
+    label: "New York Yankees",
+    url: "https://open.spotify.com/search/New%20York%20Yankees/podcastAndEpisodes"
+  },
+  "Philadelphia Phillies": {
+    label: "Philadelphia Phillies",
+    url: "https://open.spotify.com/search/Philadelphia%20Phillies/podcastAndEpisodes"
+  },
+  "Pittsburgh Pirates": {
+    label: "Pittsburgh Pirates",
+    url: "https://open.spotify.com/search/Pittsburgh%20Pirates/podcastAndEpisodes"
+  },
+  "San Diego Padres": {
+    label: "San Diego Padres",
+    url: "https://open.spotify.com/search/San%20Diego%20Padres/podcastAndEpisodes"
+  },
+  "San Francisco Giants": {
+    label: "San Francisco Giants",
+    url: "https://open.spotify.com/search/San%20Francisco%20Giants/podcastAndEpisodes"
+  },
+  "Seattle Mariners": {
+    label: "Seattle Mariners",
+    url: "https://open.spotify.com/search/Seattle%20Mariners/podcastAndEpisodes"
+  },
+  "St. Louis Cardinals": {
+    label: "St. Louis Cardinals",
+    url: "https://open.spotify.com/search/St.%20Louis%20Cardinals/podcastAndEpisodes"
+  },
+  "Tampa Bay Rays": {
+    label: "Tampa Bay Rays",
+    url: "https://open.spotify.com/search/Tampa%20Bay%20Rays/podcastAndEpisodes"
+  },
+  "Texas Rangers": {
+    label: "Texas Rangers",
+    url: "https://open.spotify.com/search/Texas%20Rangers/podcastAndEpisodes"
+  },
+  "Toronto Blue Jays": {
+    label: "Toronto Blue Jays",
+    url: "https://open.spotify.com/search/Toronto%20Blue%20Jays/podcastAndEpisodes"
+  },
+  "Washington Nationals": {
+    label: "Washington Nationals",
+    url: "https://open.spotify.com/search/Washington%20Nationals/podcastAndEpisodes"
+  }
+};
+var SPORTS_BROWSER_PROTOTYPE_NBA_TEAM_PODCAST_WEBSITES = {
+  "Atlanta Hawks": {
+    label: "Atlanta Hawks",
+    url: "https://open.spotify.com/search/Atlanta%20Hawks/podcastAndEpisodes"
+  },
+  "Boston Celtics": {
+    label: "Boston Celtics",
+    url: "https://open.spotify.com/search/Boston%20Celtics/podcastAndEpisodes"
+  },
+  "Brooklyn Nets": {
+    label: "Brooklyn Nets",
+    url: "https://open.spotify.com/search/Brooklyn%20Nets/podcastAndEpisodes"
+  },
+  "Charlotte Hornets": {
+    label: "Charlotte Hornets",
+    url: "https://open.spotify.com/search/Charlotte%20Hornets/podcastAndEpisodes"
+  },
+  "Chicago Bulls": {
+    label: "Chicago Bulls",
+    url: "https://open.spotify.com/search/Chicago%20Bulls/podcastAndEpisodes"
+  },
+  "Cleveland Cavaliers": {
+    label: "Cleveland Cavaliers",
+    url: "https://open.spotify.com/search/Cleveland%20Cavaliers/podcastAndEpisodes"
+  },
+  "Dallas Mavericks": {
+    label: "Dallas Mavericks",
+    url: "https://open.spotify.com/search/Dallas%20Mavericks/podcastAndEpisodes"
+  },
+  "Denver Nuggets": {
+    label: "Denver Nuggets",
+    url: "https://open.spotify.com/search/Denver%20Nuggets/podcastAndEpisodes"
+  },
+  "Detroit Pistons": {
+    label: "Detroit Pistons",
+    url: "https://open.spotify.com/search/Detroit%20Pistons/podcastAndEpisodes"
+  },
+  "Golden State Warriors": {
+    label: "Golden State Warriors",
+    url: "https://open.spotify.com/search/Golden%20State%20Warriors/podcastAndEpisodes"
+  },
+  "Houston Rockets": {
+    label: "Houston Rockets",
+    url: "https://open.spotify.com/search/Houston%20Rockets/podcastAndEpisodes"
+  },
+  "Indiana Pacers": {
+    label: "Indiana Pacers",
+    url: "https://open.spotify.com/search/Indiana%20Pacers/podcastAndEpisodes"
+  },
+  "Los Angeles Clippers": {
+    label: "Los Angeles Clippers",
+    url: "https://open.spotify.com/search/LA%20Clippers/podcastAndEpisodes"
+  },
+  "Los Angeles Lakers": {
+    label: "Los Angeles Lakers",
+    url: "https://open.spotify.com/search/Los%20Angeles%20Lakers/podcastAndEpisodes"
+  },
+  "Memphis Grizzlies": {
+    label: "Memphis Grizzlies",
+    url: "https://open.spotify.com/search/Memphis%20Grizzlies/podcastAndEpisodes"
+  },
+  "Miami Heat": {
+    label: "Miami Heat",
+    url: "https://open.spotify.com/search/Miami%20Heat/podcastAndEpisodes"
+  },
+  "Milwaukee Bucks": {
+    label: "Milwaukee Bucks",
+    url: "https://open.spotify.com/search/Milwaukee%20Bucks/podcastAndEpisodes"
+  },
+  "Minnesota Timberwolves": {
+    label: "Minnesota Timberwolves",
+    url: "https://open.spotify.com/search/Minnesota%20Timberwolves/podcastAndEpisodes"
+  },
+  "New Orleans Pelicans": {
+    label: "New Orleans Pelicans",
+    url: "https://open.spotify.com/search/New%20Orleans%20Pelicans/podcastAndEpisodes"
+  },
+  "New York Knicks": {
+    label: "New York Knicks",
+    url: "https://open.spotify.com/search/New%20York%20Knicks/podcastAndEpisodes"
+  },
+  "Oklahoma City Thunder": {
+    label: "Oklahoma City Thunder",
+    url: "https://open.spotify.com/search/Oklahoma%20City%20Thunder/podcastAndEpisodes"
+  },
+  "Orlando Magic": {
+    label: "Orlando Magic",
+    url: "https://open.spotify.com/search/Orlando%20Magic/podcastAndEpisodes"
+  },
+  "Philadelphia 76ers": {
+    label: "Philadelphia 76ers",
+    url: "https://open.spotify.com/search/Philadelphia%2076ers/podcastAndEpisodes"
+  },
+  "Phoenix Suns": {
+    label: "Phoenix Suns",
+    url: "https://open.spotify.com/search/Phoenix%20Suns/podcastAndEpisodes"
+  },
+  "Portland Trail Blazers": {
+    label: "Portland Trail Blazers",
+    url: "https://open.spotify.com/search/Portland%20Trail%20Blazers/podcastAndEpisodes"
+  },
+  "Sacramento Kings": {
+    label: "Sacramento Kings",
+    url: "https://open.spotify.com/search/Sacramento%20Kings/podcastAndEpisodes"
+  },
+  "San Antonio Spurs": {
+    label: "San Antonio Spurs",
+    url: "https://open.spotify.com/search/San%20Antonio%20Spurs/podcastAndEpisodes"
+  },
+  "Toronto Raptors": {
+    label: "Toronto Raptors",
+    url: "https://open.spotify.com/search/Toronto%20Raptors/podcastAndEpisodes"
+  },
+  "Utah Jazz": {
+    label: "Utah Jazz",
+    url: "https://open.spotify.com/search/Utah%20Jazz/podcastAndEpisodes"
+  },
+  "Washington Wizards": {
+    label: "Washington Wizards",
+    url: "https://open.spotify.com/search/Washington%20Wizards/podcastAndEpisodes"
+  }
+};
+var SPORTS_BROWSER_PROTOTYPE_NHL_TEAM_PODCAST_WEBSITES = {
+  "Anaheim Ducks": {
+    label: "Anaheim Ducks",
+    url: "https://open.spotify.com/search/Anaheim%20Ducks/podcastAndEpisodes"
+  },
+  "Boston Bruins": {
+    label: "Boston Bruins",
+    url: "https://open.spotify.com/search/Boston%20Bruins/podcastAndEpisodes"
+  },
+  "Buffalo Sabres": {
+    label: "Buffalo Sabres",
+    url: "https://open.spotify.com/search/Buffalo%20Sabres/podcastAndEpisodes"
+  },
+  "Calgary Flames": {
+    label: "Calgary Flames",
+    url: "https://open.spotify.com/search/Calgary%20Flames/podcastAndEpisodes"
+  },
+  "Carolina Hurricanes": {
+    label: "Carolina Hurricanes",
+    url: "https://open.spotify.com/search/Carolina%20Hurricanes/podcastAndEpisodes"
+  },
+  "Chicago Blackhawks": {
+    label: "Chicago Blackhawks",
+    url: "https://open.spotify.com/search/Chicago%20Blackhawks/podcastAndEpisodes"
+  },
+  "Colorado Avalanche": {
+    label: "Colorado Avalanche",
+    url: "https://open.spotify.com/search/Colorado%20Avalanche/podcastAndEpisodes"
+  },
+  "Columbus Blue Jackets": {
+    label: "Columbus Blue Jackets",
+    url: "https://open.spotify.com/search/Columbus%20Blue%20Jackets/podcastAndEpisodes"
+  },
+  "Dallas Stars": {
+    label: "Dallas Stars",
+    url: "https://open.spotify.com/search/Dallas%20Stars/podcastAndEpisodes"
+  },
+  "Detroit Red Wings": {
+    label: "Detroit Red Wings",
+    url: "https://open.spotify.com/search/Detroit%20Red%20Wings/podcastAndEpisodes"
+  },
+  "Edmonton Oilers": {
+    label: "Edmonton Oilers",
+    url: "https://open.spotify.com/search/Edmonton%20Oilers/podcastAndEpisodes"
+  },
+  "Florida Panthers": {
+    label: "Florida Panthers",
+    url: "https://open.spotify.com/search/Florida%20Panthers/podcastAndEpisodes"
+  },
+  "Los Angeles Kings": {
+    label: "Los Angeles Kings",
+    url: "https://open.spotify.com/search/Los%20Angeles%20Kings/podcastAndEpisodes"
+  },
+  "Minnesota Wild": {
+    label: "Minnesota Wild",
+    url: "https://open.spotify.com/search/Minnesota%20Wild/podcastAndEpisodes"
+  },
+  "Montreal Canadiens": {
+    label: "Montreal Canadiens",
+    url: "https://open.spotify.com/search/Montreal%20Canadiens/podcastAndEpisodes"
+  },
+  "Nashville Predators": {
+    label: "Nashville Predators",
+    url: "https://open.spotify.com/search/Nashville%20Predators/podcastAndEpisodes"
+  },
+  "New Jersey Devils": {
+    label: "New Jersey Devils",
+    url: "https://open.spotify.com/search/New%20Jersey%20Devils/podcastAndEpisodes"
+  },
+  "New York Islanders": {
+    label: "New York Islanders",
+    url: "https://open.spotify.com/search/New%20York%20Islanders/podcastAndEpisodes"
+  },
+  "New York Rangers": {
+    label: "New York Rangers",
+    url: "https://open.spotify.com/search/New%20York%20Rangers/podcastAndEpisodes"
+  },
+  "Ottawa Senators": {
+    label: "Ottawa Senators",
+    url: "https://open.spotify.com/search/Ottawa%20Senators/podcastAndEpisodes"
+  },
+  "Philadelphia Flyers": {
+    label: "Philadelphia Flyers",
+    url: "https://open.spotify.com/search/Philadelphia%20Flyers/podcastAndEpisodes"
+  },
+  "Pittsburgh Penguins": {
+    label: "Pittsburgh Penguins",
+    url: "https://open.spotify.com/search/Pittsburgh%20Penguins/podcastAndEpisodes"
+  },
+  "San Jose Sharks": {
+    label: "San Jose Sharks",
+    url: "https://open.spotify.com/search/San%20Jose%20Sharks/podcastAndEpisodes"
+  },
+  "Seattle Kraken": {
+    label: "Seattle Kraken",
+    url: "https://open.spotify.com/search/Seattle%20Kraken/podcastAndEpisodes"
+  },
+  "St. Louis Blues": {
+    label: "St. Louis Blues",
+    url: "https://open.spotify.com/search/St.%20Louis%20Blues/podcastAndEpisodes"
+  },
+  "Tampa Bay Lightning": {
+    label: "Tampa Bay Lightning",
+    url: "https://open.spotify.com/search/Tampa%20Bay%20Lightning/podcastAndEpisodes"
+  },
+  "Toronto Maple Leafs": {
+    label: "Toronto Maple Leafs",
+    url: "https://open.spotify.com/search/Toronto%20Maple%20Leafs/podcastAndEpisodes"
+  },
+  "Utah Mammoth": {
+    label: "Utah Mammoth",
+    url: "https://open.spotify.com/search/Utah%20Mammoth/podcastAndEpisodes"
+  },
+  "Vancouver Canucks": {
+    label: "Vancouver Canucks",
+    url: "https://open.spotify.com/search/Vancouver%20Canucks/podcastAndEpisodes"
+  },
+  "Vegas Golden Knights": {
+    label: "Vegas Golden Knights",
+    url: "https://open.spotify.com/search/Vegas%20Golden%20Knights/podcastAndEpisodes"
+  },
+  "Washington Capitals": {
+    label: "Washington Capitals",
+    url: "https://open.spotify.com/search/Washington%20Capitals/podcastAndEpisodes"
+  },
+  "Winnipeg Jets": {
+    label: "Winnipeg Jets",
+    url: "https://open.spotify.com/search/Winnipeg%20Jets/podcastAndEpisodes"
+  }
+};
+var SPORTS_BROWSER_PROTOTYPE_EPL_TEAM_PODCAST_WEBSITES = {
+  "AFC Bournemouth": {
+    label: "AFC Bournemouth",
+    url: "https://open.spotify.com/search/AFC%20Bournemouth/podcastAndEpisodes"
+  },
+  "Arsenal": {
+    label: "Arsenal",
+    url: "https://open.spotify.com/search/Arsenal/podcastAndEpisodes"
+  },
+  "Aston Villa": {
+    label: "Aston Villa",
+    url: "https://open.spotify.com/search/Aston%20Villa/podcastAndEpisodes"
+  },
+  "Brentford": {
+    label: "Brentford",
+    url: "https://open.spotify.com/search/Brentford/podcastAndEpisodes"
+  },
+  "Brighton & Hove Albion": {
+    label: "Brighton & Hove Albion",
+    url: "https://open.spotify.com/search/Brighton%20%26%20Hove%20Albion/podcastAndEpisodes"
+  },
+  "Chelsea": {
+    label: "Chelsea",
+    url: "https://open.spotify.com/search/Chelsea/podcastAndEpisodes"
+  },
+  "Coventry City": {
+    label: "Coventry City",
+    url: "https://open.spotify.com/search/Coventry%20City/podcastAndEpisodes"
+  },
+  "Crystal Palace": {
+    label: "Crystal Palace",
+    url: "https://open.spotify.com/search/Crystal%20Palace/podcastAndEpisodes"
+  },
+  "Everton": {
+    label: "Everton",
+    url: "https://open.spotify.com/search/Everton/podcastAndEpisodes"
+  },
+  "Fulham": {
+    label: "Fulham",
+    url: "https://open.spotify.com/search/Fulham/podcastAndEpisodes"
+  },
+  "Hull City": {
+    label: "Hull City",
+    url: "https://open.spotify.com/search/Hull%20City/podcastAndEpisodes"
+  },
+  "Ipswich Town": {
+    label: "Ipswich Town",
+    url: "https://open.spotify.com/search/Ipswich%20Town/podcastAndEpisodes"
+  },
+  "Leeds United": {
+    label: "Leeds United",
+    url: "https://open.spotify.com/search/Leeds%20United/podcastAndEpisodes"
+  },
+  "Liverpool": {
+    label: "Liverpool",
+    url: "https://open.spotify.com/search/Liverpool/podcastAndEpisodes"
+  },
+  "Manchester City": {
+    label: "Manchester City",
+    url: "https://open.spotify.com/search/Manchester%20City/podcastAndEpisodes"
+  },
+  "Manchester United": {
+    label: "Manchester United",
+    url: "https://open.spotify.com/search/Manchester%20United/podcastAndEpisodes"
+  },
+  "Newcastle United": {
+    label: "Newcastle United",
+    url: "https://open.spotify.com/search/Newcastle%20United/podcastAndEpisodes"
+  },
+  "Nottingham Forest": {
+    label: "Nottingham Forest",
+    url: "https://open.spotify.com/search/Nottingham%20Forest/podcastAndEpisodes"
+  },
+  "Sunderland": {
+    label: "Sunderland",
+    url: "https://open.spotify.com/search/Sunderland/podcastAndEpisodes"
+  },
+  "Tottenham Hotspur": {
+    label: "Tottenham Hotspur",
+    url: "https://open.spotify.com/search/Tottenham%20Hotspur/podcastAndEpisodes"
+  }
+};
+var SPORTS_BROWSER_PROTOTYPE_MLS_TEAM_PODCAST_WEBSITES = {
+  "Atlanta United": {
+    label: "Atlanta United",
+    url: "https://open.spotify.com/search/Atlanta%20United/podcastAndEpisodes"
+  },
+  "Austin FC": {
+    label: "Austin FC",
+    url: "https://open.spotify.com/search/Austin%20FC/podcastAndEpisodes"
+  },
+  "Charlotte FC": {
+    label: "Charlotte FC",
+    url: "https://open.spotify.com/search/Charlotte%20FC/podcastAndEpisodes"
+  },
+  "Chicago Fire FC": {
+    label: "Chicago Fire FC",
+    url: "https://open.spotify.com/search/Chicago%20Fire%20FC/podcastAndEpisodes"
+  },
+  "FC Cincinnati": {
+    label: "FC Cincinnati",
+    url: "https://open.spotify.com/search/FC%20Cincinnati/podcastAndEpisodes"
+  },
+  "Colorado Rapids": {
+    label: "Colorado Rapids",
+    url: "https://open.spotify.com/search/Colorado%20Rapids/podcastAndEpisodes"
+  },
+  "Columbus Crew": {
+    label: "Columbus Crew",
+    url: "https://open.spotify.com/search/Columbus%20Crew/podcastAndEpisodes"
+  },
+  "D.C. United": {
+    label: "D.C. United",
+    url: "https://open.spotify.com/search/D.C.%20United/podcastAndEpisodes"
+  },
+  "FC Dallas": {
+    label: "FC Dallas",
+    url: "https://open.spotify.com/search/FC%20Dallas/podcastAndEpisodes"
+  },
+  "Houston Dynamo FC": {
+    label: "Houston Dynamo FC",
+    url: "https://open.spotify.com/search/Houston%20Dynamo%20FC/podcastAndEpisodes"
+  },
+  "Inter Miami CF": {
+    label: "Inter Miami CF",
+    url: "https://open.spotify.com/search/Inter%20Miami%20CF/podcastAndEpisodes"
+  },
+  "LA Galaxy": {
+    label: "LA Galaxy",
+    url: "https://open.spotify.com/search/LA%20Galaxy/podcastAndEpisodes"
+  },
+  "Los Angeles Football Club": {
+    label: "Los Angeles Football Club",
+    url: "https://open.spotify.com/search/Los%20Angeles%20Football%20Club/podcastAndEpisodes"
+  },
+  "Minnesota United FC": {
+    label: "Minnesota United FC",
+    url: "https://open.spotify.com/search/Minnesota%20United%20FC/podcastAndEpisodes"
+  },
+  "CF Montr\xE9al": {
+    label: "CF Montr\xE9al",
+    url: "https://open.spotify.com/search/CF%20Montr%C3%A9al/podcastAndEpisodes"
+  },
+  "Nashville SC": {
+    label: "Nashville SC",
+    url: "https://open.spotify.com/search/Nashville%20SC/podcastAndEpisodes"
+  },
+  "New England Revolution": {
+    label: "New England Revolution",
+    url: "https://open.spotify.com/search/New%20England%20Revolution/podcastAndEpisodes"
+  },
+  "New York City FC": {
+    label: "New York City FC",
+    url: "https://open.spotify.com/search/New%20York%20City%20FC/podcastAndEpisodes"
+  },
+  "Red Bull New York": {
+    label: "Red Bull New York",
+    url: "https://open.spotify.com/search/Red%20Bull%20New%20York/podcastAndEpisodes"
+  },
+  "Orlando City SC": {
+    label: "Orlando City SC",
+    url: "https://open.spotify.com/search/Orlando%20City%20SC/podcastAndEpisodes"
+  },
+  "Philadelphia Union": {
+    label: "Philadelphia Union",
+    url: "https://open.spotify.com/search/Philadelphia%20Union/podcastAndEpisodes"
+  },
+  "Portland Timbers": {
+    label: "Portland Timbers",
+    url: "https://open.spotify.com/search/Portland%20Timbers/podcastAndEpisodes"
+  },
+  "Real Salt Lake": {
+    label: "Real Salt Lake",
+    url: "https://open.spotify.com/search/Real%20Salt%20Lake/podcastAndEpisodes"
+  },
+  "San Diego FC": {
+    label: "San Diego FC",
+    url: "https://open.spotify.com/search/San%20Diego%20FC/podcastAndEpisodes"
+  },
+  "San Jose Earthquakes": {
+    label: "San Jose Earthquakes",
+    url: "https://open.spotify.com/search/San%20Jose%20Earthquakes/podcastAndEpisodes"
+  },
+  "Seattle Sounders FC": {
+    label: "Seattle Sounders FC",
+    url: "https://open.spotify.com/search/Seattle%20Sounders%20FC/podcastAndEpisodes"
+  },
+  "Sporting Kansas City": {
+    label: "Sporting Kansas City",
+    url: "https://open.spotify.com/search/Sporting%20Kansas%20City/podcastAndEpisodes"
+  },
+  "St. Louis CITY SC": {
+    label: "St. Louis CITY SC",
+    url: "https://open.spotify.com/search/St.%20Louis%20CITY%20SC/podcastAndEpisodes"
+  },
+  "Toronto FC": {
+    label: "Toronto FC",
+    url: "https://open.spotify.com/search/Toronto%20FC/podcastAndEpisodes"
+  },
+  "Vancouver Whitecaps FC": {
+    label: "Vancouver Whitecaps FC",
+    url: "https://open.spotify.com/search/Vancouver%20Whitecaps%20FC/podcastAndEpisodes"
+  }
+};
+var SPORTS_BROWSER_PROTOTYPE_WNBA_TEAM_PODCAST_WEBSITES = {
+  "Atlanta Dream": {
+    label: "Atlanta Dream",
+    url: "https://open.spotify.com/search/Atlanta%20Dream/podcastAndEpisodes"
+  },
+  "Chicago Sky": {
+    label: "Chicago Sky",
+    url: "https://open.spotify.com/search/Chicago%20Sky/podcastAndEpisodes"
+  },
+  "Connecticut Sun": {
+    label: "Connecticut Sun",
+    url: "https://open.spotify.com/search/Connecticut%20Sun/podcastAndEpisodes"
+  },
+  "Dallas Wings": {
+    label: "Dallas Wings",
+    url: "https://open.spotify.com/search/Dallas%20Wings/podcastAndEpisodes"
+  },
+  "Golden State Valkyries": {
+    label: "Golden State Valkyries",
+    url: "https://open.spotify.com/search/Golden%20State%20Valkyries/podcastAndEpisodes"
+  },
+  "Indiana Fever": {
+    label: "Indiana Fever",
+    url: "https://open.spotify.com/search/Indiana%20Fever/podcastAndEpisodes"
+  },
+  "Las Vegas Aces": {
+    label: "Las Vegas Aces",
+    url: "https://open.spotify.com/search/Las%20Vegas%20Aces/podcastAndEpisodes"
+  },
+  "Los Angeles Sparks": {
+    label: "Los Angeles Sparks",
+    url: "https://open.spotify.com/search/Los%20Angeles%20Sparks/podcastAndEpisodes"
+  },
+  "Minnesota Lynx": {
+    label: "Minnesota Lynx",
+    url: "https://open.spotify.com/search/Minnesota%20Lynx/podcastAndEpisodes"
+  },
+  "New York Liberty": {
+    label: "New York Liberty",
+    url: "https://open.spotify.com/search/New%20York%20Liberty/podcastAndEpisodes"
+  },
+  "Phoenix Mercury": {
+    label: "Phoenix Mercury",
+    url: "https://open.spotify.com/search/Phoenix%20Mercury/podcastAndEpisodes"
+  },
+  "Portland Fire": {
+    label: "Portland Fire",
+    url: "https://open.spotify.com/search/Portland%20Fire/podcastAndEpisodes"
+  },
+  "Seattle Storm": {
+    label: "Seattle Storm",
+    url: "https://open.spotify.com/search/Seattle%20Storm/podcastAndEpisodes"
+  },
+  "Toronto Tempo": {
+    label: "Toronto Tempo",
+    url: "https://open.spotify.com/search/Toronto%20Tempo/podcastAndEpisodes"
+  },
+  "Washington Mystics": {
+    label: "Washington Mystics",
+    url: "https://open.spotify.com/search/Washington%20Mystics/podcastAndEpisodes"
+  }
+};
+var SPORTS_BROWSER_PROTOTYPE_NWSL_TEAM_PODCAST_WEBSITES = {
+  "Angel City FC": {
+    label: "Angel City FC",
+    url: "https://open.spotify.com/search/Angel%20City%20FC/podcastAndEpisodes"
+  },
+  "Bay FC": {
+    label: "Bay FC",
+    url: "https://open.spotify.com/search/Bay%20FC/podcastAndEpisodes"
+  },
+  "Boston Legacy FC": {
+    label: "Boston Legacy FC",
+    url: "https://open.spotify.com/search/Boston%20Legacy%20FC/podcastAndEpisodes"
+  },
+  "Chicago Stars FC": {
+    label: "Chicago Stars FC",
+    url: "https://open.spotify.com/search/Chicago%20Stars%20FC/podcastAndEpisodes"
+  },
+  "Denver Summit FC": {
+    label: "Denver Summit FC",
+    url: "https://open.spotify.com/search/Denver%20Summit%20FC/podcastAndEpisodes"
+  },
+  "Gotham FC": {
+    label: "Gotham FC",
+    url: "https://open.spotify.com/search/Gotham%20FC/podcastAndEpisodes"
+  },
+  "Houston Dash": {
+    label: "Houston Dash",
+    url: "https://open.spotify.com/search/Houston%20Dash/podcastAndEpisodes"
+  },
+  "Kansas City Current": {
+    label: "Kansas City Current",
+    url: "https://open.spotify.com/search/Kansas%20City%20Current/podcastAndEpisodes"
+  },
+  "North Carolina Courage": {
+    label: "North Carolina Courage",
+    url: "https://open.spotify.com/search/North%20Carolina%20Courage/podcastAndEpisodes"
+  },
+  "Orlando Pride": {
+    label: "Orlando Pride",
+    url: "https://open.spotify.com/search/Orlando%20Pride/podcastAndEpisodes"
+  },
+  "Portland Thorns FC": {
+    label: "Portland Thorns FC",
+    url: "https://open.spotify.com/search/Portland%20Thorns%20FC/podcastAndEpisodes"
+  },
+  "Racing Louisville FC": {
+    label: "Racing Louisville FC",
+    url: "https://open.spotify.com/search/Racing%20Louisville%20FC/podcastAndEpisodes"
+  },
+  "San Diego Wave FC": {
+    label: "San Diego Wave FC",
+    url: "https://open.spotify.com/search/San%20Diego%20Wave%20FC/podcastAndEpisodes"
+  },
+  "Seattle Reign FC": {
+    label: "Seattle Reign FC",
+    url: "https://open.spotify.com/search/Seattle%20Reign%20FC/podcastAndEpisodes"
+  },
+  "Utah Royals FC": {
+    label: "Utah Royals FC",
+    url: "https://open.spotify.com/search/Utah%20Royals%20FC/podcastAndEpisodes"
+  },
+  "Washington Spirit": {
+    label: "Washington Spirit",
+    url: "https://open.spotify.com/search/Washington%20Spirit/podcastAndEpisodes"
+  }
+};
+var SPORTS_BROWSER_PROTOTYPE_LALIGA_TEAM_PODCAST_WEBSITES = {
+  "Athletic Club": {
+    label: "Athletic Club",
+    url: "https://open.spotify.com/search/Athletic%20Club/podcastAndEpisodes"
+  },
+  "Atl\xE9tico de Madrid": {
+    label: "Atl\xE9tico de Madrid",
+    url: "https://open.spotify.com/search/Atl%C3%A9tico%20de%20Madrid/podcastAndEpisodes"
+  },
+  "CA Osasuna": {
+    label: "CA Osasuna",
+    url: "https://open.spotify.com/search/CA%20Osasuna/podcastAndEpisodes"
+  },
+  "Celta": {
+    label: "Celta",
+    url: "https://open.spotify.com/search/Celta/podcastAndEpisodes"
+  },
+  "Deportivo Alav\xE9s": {
+    label: "Deportivo Alav\xE9s",
+    url: "https://open.spotify.com/search/Deportivo%20Alav%C3%A9s/podcastAndEpisodes"
+  },
+  "Elche CF": {
+    label: "Elche CF",
+    url: "https://open.spotify.com/search/Elche%20CF/podcastAndEpisodes"
+  },
+  "FC Barcelona": {
+    label: "FC Barcelona",
+    url: "https://open.spotify.com/search/FC%20Barcelona/podcastAndEpisodes"
+  },
+  "Getafe CF": {
+    label: "Getafe CF",
+    url: "https://open.spotify.com/search/Getafe%20CF/podcastAndEpisodes"
+  },
+  "Levante UD": {
+    label: "Levante UD",
+    url: "https://open.spotify.com/search/Levante%20UD/podcastAndEpisodes"
+  },
+  "M\xE1laga CF": {
+    label: "M\xE1laga CF",
+    url: "https://open.spotify.com/search/M%C3%A1laga%20CF/podcastAndEpisodes"
+  },
+  "R. Racing Club": {
+    label: "R. Racing Club",
+    url: "https://open.spotify.com/search/R.%20Racing%20Club/podcastAndEpisodes"
+  },
+  "Rayo Vallecano": {
+    label: "Rayo Vallecano",
+    url: "https://open.spotify.com/search/Rayo%20Vallecano/podcastAndEpisodes"
+  },
+  "RC Deportivo": {
+    label: "RC Deportivo",
+    url: "https://open.spotify.com/search/RC%20Deportivo/podcastAndEpisodes"
+  },
+  "RCD Espanyol de Barcelona": {
+    label: "RCD Espanyol de Barcelona",
+    url: "https://open.spotify.com/search/RCD%20Espanyol%20de%20Barcelona/podcastAndEpisodes"
+  },
+  "Real Betis": {
+    label: "Real Betis",
+    url: "https://open.spotify.com/search/Real%20Betis/podcastAndEpisodes"
+  },
+  "Real Madrid": {
+    label: "Real Madrid",
+    url: "https://open.spotify.com/search/Real%20Madrid/podcastAndEpisodes"
+  },
+  "Real Sociedad": {
+    label: "Real Sociedad",
+    url: "https://open.spotify.com/search/Real%20Sociedad/podcastAndEpisodes"
+  },
+  "Sevilla FC": {
+    label: "Sevilla FC",
+    url: "https://open.spotify.com/search/Sevilla%20FC/podcastAndEpisodes"
+  },
+  "Valencia CF": {
+    label: "Valencia CF",
+    url: "https://open.spotify.com/search/Valencia%20CF/podcastAndEpisodes"
+  },
+  "Villarreal CF": {
+    label: "Villarreal CF",
+    url: "https://open.spotify.com/search/Villarreal%20CF/podcastAndEpisodes"
+  }
+};
+var SPORTS_BROWSER_PROTOTYPE_BUNDESLIGA_TEAM_PODCAST_WEBSITES = {
+  "FC Augsburg": {
+    label: "FC Augsburg",
+    url: "https://open.spotify.com/search/FC%20Augsburg/podcastAndEpisodes"
+  },
+  "1. FC Union Berlin": {
+    label: "1. FC Union Berlin",
+    url: "https://open.spotify.com/search/1.%20FC%20Union%20Berlin/podcastAndEpisodes"
+  },
+  "SV Werder Bremen": {
+    label: "SV Werder Bremen",
+    url: "https://open.spotify.com/search/SV%20Werder%20Bremen/podcastAndEpisodes"
+  },
+  "Borussia Dortmund": {
+    label: "Borussia Dortmund",
+    url: "https://open.spotify.com/search/Borussia%20Dortmund/podcastAndEpisodes"
+  },
+  "SV Elversberg": {
+    label: "SV Elversberg",
+    url: "https://open.spotify.com/search/SV%20Elversberg/podcastAndEpisodes"
+  },
+  "Eintracht Frankfurt": {
+    label: "Eintracht Frankfurt",
+    url: "https://open.spotify.com/search/Eintracht%20Frankfurt/podcastAndEpisodes"
+  },
+  "Sport-Club Freiburg": {
+    label: "Sport-Club Freiburg",
+    url: "https://open.spotify.com/search/Sport-Club%20Freiburg/podcastAndEpisodes"
+  },
+  "Hamburger SV": {
+    label: "Hamburger SV",
+    url: "https://open.spotify.com/search/Hamburger%20SV/podcastAndEpisodes"
+  },
+  "TSG Hoffenheim": {
+    label: "TSG Hoffenheim",
+    url: "https://open.spotify.com/search/TSG%20Hoffenheim/podcastAndEpisodes"
+  },
+  "1. FC K\xF6ln": {
+    label: "1. FC K\xF6ln",
+    url: "https://open.spotify.com/search/1.%20FC%20K%C3%B6ln/podcastAndEpisodes"
+  },
+  "RB Leipzig": {
+    label: "RB Leipzig",
+    url: "https://open.spotify.com/search/RB%20Leipzig/podcastAndEpisodes"
+  },
+  "Bayer 04 Leverkusen": {
+    label: "Bayer 04 Leverkusen",
+    url: "https://open.spotify.com/search/Bayer%2004%20Leverkusen/podcastAndEpisodes"
+  },
+  "1. FSV Mainz 05": {
+    label: "1. FSV Mainz 05",
+    url: "https://open.spotify.com/search/1.%20FSV%20Mainz%2005/podcastAndEpisodes"
+  },
+  "Borussia M\xF6nchengladbach": {
+    label: "Borussia M\xF6nchengladbach",
+    url: "https://open.spotify.com/search/Borussia%20M%C3%B6nchengladbach/podcastAndEpisodes"
+  },
+  "FC Bayern M\xFCnchen": {
+    label: "FC Bayern M\xFCnchen",
+    url: "https://open.spotify.com/search/FC%20Bayern%20M%C3%BCnchen/podcastAndEpisodes"
+  },
+  "SC Paderborn 07": {
+    label: "SC Paderborn 07",
+    url: "https://open.spotify.com/search/SC%20Paderborn%2007/podcastAndEpisodes"
+  },
+  "FC Schalke 04": {
+    label: "FC Schalke 04",
+    url: "https://open.spotify.com/search/FC%20Schalke%2004/podcastAndEpisodes"
+  },
+  "VfB Stuttgart": {
+    label: "VfB Stuttgart",
+    url: "https://open.spotify.com/search/VfB%20Stuttgart/podcastAndEpisodes"
+  }
+};
+var SPORTS_BROWSER_PROTOTYPE_SERIEA_TEAM_PODCAST_WEBSITES = {
+  "AC Milan": {
+    label: "AC Milan",
+    url: "https://open.spotify.com/search/AC%20Milan/podcastAndEpisodes"
+  },
+  "Atalanta": {
+    label: "Atalanta",
+    url: "https://open.spotify.com/search/Atalanta/podcastAndEpisodes"
+  },
+  "Bologna": {
+    label: "Bologna",
+    url: "https://open.spotify.com/search/Bologna/podcastAndEpisodes"
+  },
+  "Cagliari": {
+    label: "Cagliari",
+    url: "https://open.spotify.com/search/Cagliari/podcastAndEpisodes"
+  },
+  "Como": {
+    label: "Como",
+    url: "https://open.spotify.com/search/Como/podcastAndEpisodes"
+  },
+  "Fiorentina": {
+    label: "Fiorentina",
+    url: "https://open.spotify.com/search/Fiorentina/podcastAndEpisodes"
+  },
+  "Frosinone": {
+    label: "Frosinone",
+    url: "https://open.spotify.com/search/Frosinone/podcastAndEpisodes"
+  },
+  "Genoa": {
+    label: "Genoa",
+    url: "https://open.spotify.com/search/Genoa/podcastAndEpisodes"
+  },
+  "Inter": {
+    label: "Inter",
+    url: "https://open.spotify.com/search/Inter/podcastAndEpisodes"
+  },
+  "Juventus": {
+    label: "Juventus",
+    url: "https://open.spotify.com/search/Juventus/podcastAndEpisodes"
+  },
+  "Lazio": {
+    label: "Lazio",
+    url: "https://open.spotify.com/search/Lazio/podcastAndEpisodes"
+  },
+  "Lecce": {
+    label: "Lecce",
+    url: "https://open.spotify.com/search/Lecce/podcastAndEpisodes"
+  },
+  "Monza": {
+    label: "Monza",
+    url: "https://open.spotify.com/search/Monza/podcastAndEpisodes"
+  },
+  "Napoli": {
+    label: "Napoli",
+    url: "https://open.spotify.com/search/Napoli/podcastAndEpisodes"
+  },
+  "Parma": {
+    label: "Parma",
+    url: "https://open.spotify.com/search/Parma/podcastAndEpisodes"
+  },
+  "Roma": {
+    label: "Roma",
+    url: "https://open.spotify.com/search/Roma/podcastAndEpisodes"
+  },
+  "Sassuolo": {
+    label: "Sassuolo",
+    url: "https://open.spotify.com/search/Sassuolo/podcastAndEpisodes"
+  },
+  "Torino": {
+    label: "Torino",
+    url: "https://open.spotify.com/search/Torino/podcastAndEpisodes"
+  },
+  "Udinese": {
+    label: "Udinese",
+    url: "https://open.spotify.com/search/Udinese/podcastAndEpisodes"
+  },
+  "Venezia": {
+    label: "Venezia",
+    url: "https://open.spotify.com/search/Venezia/podcastAndEpisodes"
+  }
+};
+var SPORTS_BROWSER_PROTOTYPE_MAJOR_LEAGUE_TEAM_PODCAST_LEAGUE_KEYS = [
+  "MLB",
+  "NBA",
+  "NHL",
+  "EPL",
+  "MLS",
+  "WNBA",
+  "NWSL",
+  "LALIGA",
+  "BUNDESLIGA",
+  "SERIEA"
+];
+var TEAM_PODCAST_WEBSITES_BY_LEAGUE = {
+  MLB: SPORTS_BROWSER_PROTOTYPE_MLB_TEAM_PODCAST_WEBSITES,
+  NBA: SPORTS_BROWSER_PROTOTYPE_NBA_TEAM_PODCAST_WEBSITES,
+  NHL: SPORTS_BROWSER_PROTOTYPE_NHL_TEAM_PODCAST_WEBSITES,
+  EPL: SPORTS_BROWSER_PROTOTYPE_EPL_TEAM_PODCAST_WEBSITES,
+  MLS: SPORTS_BROWSER_PROTOTYPE_MLS_TEAM_PODCAST_WEBSITES,
+  WNBA: SPORTS_BROWSER_PROTOTYPE_WNBA_TEAM_PODCAST_WEBSITES,
+  NWSL: SPORTS_BROWSER_PROTOTYPE_NWSL_TEAM_PODCAST_WEBSITES,
+  LALIGA: SPORTS_BROWSER_PROTOTYPE_LALIGA_TEAM_PODCAST_WEBSITES,
+  BUNDESLIGA: SPORTS_BROWSER_PROTOTYPE_BUNDESLIGA_TEAM_PODCAST_WEBSITES,
+  SERIEA: SPORTS_BROWSER_PROTOTYPE_SERIEA_TEAM_PODCAST_WEBSITES
+};
+function resolveTeamPodcastLeagueKeyFromGame(game) {
+  for (const leagueKey of SPORTS_BROWSER_PROTOTYPE_MAJOR_LEAGUE_TEAM_PODCAST_LEAGUE_KEYS) {
+    if (game.league === leagueKey || game.id.startsWith(`espn-${leagueKey}-`)) {
+      return leagueKey;
+    }
+  }
+  return null;
+}
+function isSportsBrowserPrototypeTeamPodcastLeagueGame(game) {
+  return game.league === "NFL" || game.id.startsWith("espn-NFL-") || resolveTeamPodcastLeagueKeyFromGame(game) != null;
+}
+function resolveSportsBrowserPrototypeMajorLeagueTeamPodcastWebsite(leagueKey, teamDisplayName2) {
+  const trimmed = teamDisplayName2.trim();
+  if (!trimmed) return null;
+  return TEAM_PODCAST_WEBSITES_BY_LEAGUE[leagueKey][trimmed] ?? null;
+}
+
+// ../grarf/desktop/src/data/sportsBrowserPrototypeNflTeamPodcastWebsites.ts
+init_define_import_meta_env();
+var SPORTS_BROWSER_PROTOTYPE_NFL_TEAM_PODCAST_WEBSITES = {
+  "Arizona Cardinals": {
+    label: "Arizona Cardinals",
+    url: "https://open.spotify.com/search/Arizona%20Cardinals/podcastAndEpisodes"
+  },
+  "Atlanta Falcons": {
+    label: "Atlanta Falcons",
+    url: "https://open.spotify.com/search/Atlanta%20Falcons/podcastAndEpisodes"
+  },
+  "Baltimore Ravens": {
+    label: "Baltimore Ravens",
+    url: "https://open.spotify.com/search/Baltimore%20Ravens/podcastAndEpisodes"
+  },
+  "Buffalo Bills": {
+    label: "Buffalo Bills",
+    url: "https://open.spotify.com/search/Buffalo%20Bills/podcastAndEpisodes"
+  },
+  "Carolina Panthers": {
+    label: "Carolina Panthers",
+    url: "https://open.spotify.com/search/Carolina%20Panthers/podcastAndEpisodes"
+  },
+  "Chicago Bears": {
+    label: "Chicago Bears",
+    url: "https://open.spotify.com/search/Chicago%20Bears/podcastAndEpisodes"
+  },
+  "Cincinnati Bengals": {
+    label: "Cincinnati Bengals",
+    url: "https://open.spotify.com/search/Cincinnati%20Bengals/podcastAndEpisodes"
+  },
+  "Cleveland Browns": {
+    label: "Cleveland Browns",
+    url: "https://open.spotify.com/search/Cleveland%20Browns/podcastAndEpisodes"
+  },
+  "Dallas Cowboys": {
+    label: "Dallas Cowboys",
+    url: "https://open.spotify.com/search/Dallas%20Cowboys/podcastAndEpisodes"
+  },
+  "Denver Broncos": {
+    label: "Denver Broncos",
+    url: "https://open.spotify.com/search/Denver%20Broncos/podcastAndEpisodes"
+  },
+  "Detroit Lions": {
+    label: "Detroit Lions",
+    url: "https://open.spotify.com/search/Detroit%20Lions/podcastAndEpisodes"
+  },
+  "Green Bay Packers": {
+    label: "Green Bay Packers",
+    url: "https://open.spotify.com/search/Green%20Bay%20Packers/podcastAndEpisodes"
+  },
+  "Houston Texans": {
+    label: "Houston Texans",
+    url: "https://open.spotify.com/search/Houston%20Texans/podcastAndEpisodes"
+  },
+  "Indianapolis Colts": {
+    label: "Indianapolis Colts",
+    url: "https://open.spotify.com/search/Indianapolis%20Colts/podcastAndEpisodes"
+  },
+  "Jacksonville Jaguars": {
+    label: "Jacksonville Jaguars",
+    url: "https://open.spotify.com/search/Jacksonville%20Jaguars/podcastAndEpisodes"
+  },
+  "Kansas City Chiefs": {
+    label: "Kansas City Chiefs",
+    url: "https://open.spotify.com/search/Kansas%20City%20Chiefs/podcastAndEpisodes"
+  },
+  "Las Vegas Raiders": {
+    label: "Las Vegas Raiders",
+    url: "https://open.spotify.com/search/Las%20Vegas%20Raiders/podcastAndEpisodes"
+  },
+  "Los Angeles Chargers": {
+    label: "Los Angeles Chargers",
+    url: "https://open.spotify.com/search/Los%20Angeles%20Chargers/podcastAndEpisodes"
+  },
+  "Los Angeles Rams": {
+    label: "Los Angeles Rams",
+    url: "https://open.spotify.com/search/Los%20Angeles%20Rams/podcastAndEpisodes"
+  },
+  "Miami Dolphins": {
+    label: "Miami Dolphins",
+    url: "https://open.spotify.com/search/Miami%20Dolphins/podcastAndEpisodes"
+  },
+  "Minnesota Vikings": {
+    label: "Minnesota Vikings",
+    url: "https://open.spotify.com/search/Minnesota%20Vikings/podcastAndEpisodes"
+  },
+  "New England Patriots": {
+    label: "New England Patriots",
+    url: "https://open.spotify.com/search/New%20England%20Patriots/podcastAndEpisodes"
+  },
+  "New Orleans Saints": {
+    label: "New Orleans Saints",
+    url: "https://open.spotify.com/search/New%20Orleans%20Saints/podcastAndEpisodes"
+  },
+  "New York Giants": {
+    label: "New York Giants",
+    url: "https://open.spotify.com/search/New%20York%20Giants/podcastAndEpisodes"
+  },
+  "New York Jets": {
+    label: "New York Jets",
+    url: "https://open.spotify.com/search/New%20York%20Jets/podcastAndEpisodes"
+  },
+  "Philadelphia Eagles": {
+    label: "Philadelphia Eagles",
+    url: "https://open.spotify.com/search/Philadelphia%20Eagles/podcastAndEpisodes"
+  },
+  "Pittsburgh Steelers": {
+    label: "Pittsburgh Steelers",
+    url: "https://open.spotify.com/search/Pittsburgh%20Steelers/podcastAndEpisodes"
+  },
+  "San Francisco 49ers": {
+    label: "San Francisco 49ers",
+    url: "https://open.spotify.com/search/San%20Francisco%2049ers/podcastAndEpisodes"
+  },
+  "Seattle Seahawks": {
+    label: "Seattle Seahawks",
+    url: "https://open.spotify.com/search/Seattle%20Seahawks/podcastAndEpisodes"
+  },
+  "Tampa Bay Buccaneers": {
+    label: "Tampa Bay Buccaneers",
+    url: "https://open.spotify.com/search/Tampa%20Bay%20Buccaneers/podcastAndEpisodes"
+  },
+  "Tennessee Titans": {
+    label: "Tennessee Titans",
+    url: "https://open.spotify.com/search/Tennessee%20Titans/podcastAndEpisodes"
+  },
+  "Washington Commanders": {
+    label: "Washington Commanders",
+    url: "https://open.spotify.com/search/Washington%20Commanders/podcastAndEpisodes"
+  }
+};
+function resolveSportsBrowserPrototypeNflTeamPodcastWebsite(teamDisplayName2) {
+  const trimmed = teamDisplayName2.trim();
+  if (!trimmed) return null;
+  return SPORTS_BROWSER_PROTOTYPE_NFL_TEAM_PODCAST_WEBSITES[trimmed] ?? null;
+}
+
+// ../grarf/desktop/src/data/sportsBrowserPrototypeGameTeamContextWebsites.ts
+function isNflGame(game) {
+  return game.league === "NFL" || game.id.startsWith("espn-NFL-");
+}
+function resolveSportsBrowserPrototypeGameTeamContextSectionWebsites(game, context2, gameContextSection, teamSection) {
+  if (!isSportsBrowserPrototypeTeamPodcastLeagueGame(game)) {
+    return [];
+  }
+  const team = gameContextSection === "awayTeam" ? context2.awayTeam : context2.homeTeam;
+  if (teamSection === "news") {
+    return team.websites;
+  }
+  if (teamSection !== "podcasts") {
+    return [];
+  }
+  if (isNflGame(game)) {
+    const podcast2 = resolveSportsBrowserPrototypeNflTeamPodcastWebsite(team.label);
+    return podcast2 ? [podcast2] : [];
+  }
+  const leagueKey = resolveTeamPodcastLeagueKeyFromGame(game);
+  if (!leagueKey) {
+    return [];
+  }
+  const podcast = resolveSportsBrowserPrototypeMajorLeagueTeamPodcastWebsite(leagueKey, team.label);
+  return podcast ? [podcast] : [];
+}
+
+// ../grarf/desktop/src/lib/gamesSpine/resolveGameBrowserContext.ts
+init_define_import_meta_env();
+var TEAM_HUB_LEAGUES = ["NFL", "NHL", "NBA", "WNBA"];
+function isMlbGameRow2(game) {
+  return game.league === "MLB" || game.id.startsWith("espn-MLB-");
+}
+function resolveMlbGameForGameCenter(game) {
+  const mlbRows = useCanonicalLiveGameStore.getState().leagues.MLB ?? [];
+  const resolved = resolveMlbGameRow(game.id, mlbRows) ?? game;
+  return { ...resolved, league: "MLB" };
+}
+function resolveTeamHubLeagueFromGame(game) {
+  const league2 = game.league;
+  if (league2 && TEAM_HUB_LEAGUES.includes(league2)) {
+    return league2;
+  }
+  for (const candidate of TEAM_HUB_LEAGUES) {
+    if (game.id.startsWith(`espn-${candidate}-`)) return candidate;
+  }
+  return null;
+}
+function dedupeGameBrowserWebsitesByUrl(websites) {
+  const seen = /* @__PURE__ */ new Set();
+  const deduped = [];
+  for (const website4 of websites) {
+    const url = website4.url.trim();
+    if (!url || seen.has(url)) continue;
+    seen.add(url);
+    deduped.push({ label: website4.label, url });
+  }
+  return deduped;
+}
+function mapHomeSourcesToWebsites(sources) {
+  return filterEmbeddableHomeSources(sources).map(({ label, url }) => ({ label, url }));
+}
+function inferGameCenterLabel(game, url) {
+  const normalized = url.trim().toLowerCase();
+  if (game.league === "PLL" || normalized.includes("premierlacrosseleague.com")) {
+    return "PLL";
+  }
+  if (normalized.includes("wnba.com")) return "WNBA";
+  if (normalized.includes("fotmob.com")) return "FotMob";
+  if (normalized.includes("flashscore")) return "Flashscore";
+  if (normalized.includes("mlb.com/gameday")) return "MLB Gameday";
+  if (normalized.includes("espn.com")) return "ESPN";
+  if (normalized.includes("pgatour.com") || normalized.includes("lpga.com")) {
+    return "Leaderboard";
+  }
+  return "Game Center";
+}
+function resolveGameCenterWebsites(game) {
+  if (isMlbGameRow2(game)) {
+    const tab = buildMlbGameWorkspaceTab(resolveMlbGameForGameCenter(game));
+    const providers = tab.gamePayload?.gamecenterProviders ?? [];
+    return dedupeGameBrowserWebsitesByUrl(
+      providers.map((provider) => ({ label: provider.name, url: provider.url }))
+    );
+  }
+  const embedUrl = resolveSpineRowWorkspaceEmbedUrl(game);
+  if (!embedUrl) return [];
+  return dedupeGameBrowserWebsitesByUrl([
+    { label: inferGameCenterLabel(game, embedUrl), url: embedUrl }
+  ]);
+}
+function resolveTeamWebsitesForSide(game, side) {
+  const teamName = (side === "away" ? game.awayTeam : game.homeTeam).trim();
+  const teamAbbrev2 = (side === "away" ? game.awayTeamAbbrev : game.homeTeamAbbrev)?.trim();
+  if (!teamName && !teamAbbrev2) return [];
+  if (isMlbGameRow2(game)) {
+    const sources2 = teamAbbrev2 ? resolveMlbTeamNewsSourcesForTeamAbbrev(teamAbbrev2) : resolveMlbTeamNewsSourcesForTeam(teamName);
+    return dedupeGameBrowserWebsitesByUrl(
+      mapHomeSourcesToWebsites(mapMlbTeamNewsSourcesToHomeSourceConfig([...sources2]))
+    );
+  }
+  const league2 = resolveTeamHubLeagueFromGame(game);
+  if (!league2) return [];
+  if (teamAbbrev2) {
+    const byAbbrev = resolveNonMlbTeamNewsSourcesForTeamAbbrev(league2, teamAbbrev2);
+    if (byAbbrev.length > 0) {
+      return dedupeGameBrowserWebsitesByUrl(
+        mapHomeSourcesToWebsites(mapNonMlbTeamNewsSourcesToHomeSourceConfig([...byAbbrev]))
+      );
+    }
+  }
+  const sources = resolveNonMlbTeamNewsSourcesForTeam(
+    teamName,
+    league2.toLowerCase(),
+    teamAbbrev2 || void 0
+  );
+  return dedupeGameBrowserWebsitesByUrl(
+    mapHomeSourcesToWebsites(mapNonMlbTeamNewsSourcesToHomeSourceConfig([...sources]))
+  );
+}
+function resolveTeamLabel(game, side) {
+  const raw = (side === "away" ? game.awayTeam : game.homeTeam).trim();
+  return formatNcaafTeamMatchupDisplayName(game, side, raw);
+}
+function resolveSocialWebsites(_game) {
+  return [];
+}
+function resolveGameBrowserContext(game) {
+  return {
+    gameCenter: resolveGameCenterWebsites(game),
+    social: resolveSocialWebsites(game),
+    awayTeam: {
+      label: resolveTeamLabel(game, "away"),
+      websites: resolveTeamWebsitesForSide(game, "away")
+    },
+    homeTeam: {
+      label: resolveTeamLabel(game, "home"),
+      websites: resolveTeamWebsitesForSide(game, "home")
+    }
+  };
+}
+
+// ../grarf/desktop/src/lib/gamesSpine/resolveSportsBrowserPrototypeGameContextContentSources.ts
+init_define_import_meta_env();
+var SPORTS_BROWSER_PROTOTYPE_GAME_CONTENT_SOURCE_IDS = ["espn", "yahoo"];
+var GAME_CONTENT_SOURCE_LABELS = {
+  espn: "ESPN",
+  yahoo: "YAHOO"
+};
+var NCAAF_GAME_CONTENT_SOURCE_IDS = [
+  "yahoo",
+  "espn"
+];
+function gameContentSourceIdsForGame(game) {
+  if (game.league === "NCAAF" || game.id.startsWith("espn-NCAAF-")) {
+    return NCAAF_GAME_CONTENT_SOURCE_IDS;
+  }
+  return SPORTS_BROWSER_PROTOTYPE_GAME_CONTENT_SOURCE_IDS;
+}
+function resolveEspnContentSourceUrlFromContext(context2) {
+  for (const website4 of context2.gameCenter) {
+    const label = website4.label.trim().toUpperCase();
+    const url = website4.url.trim();
+    if (!url) continue;
+    if (label === "ESPN") return url;
+  }
+  for (const website4 of context2.gameCenter) {
+    const url = website4.url.trim();
+    if (!url) continue;
+    try {
+      if (new URL(url).hostname === "www.espn.com") return url;
+    } catch {
+      continue;
+    }
+  }
+  return null;
+}
+function resolveContentSourceUrl(sourceId, game, context2, _section) {
+  switch (sourceId) {
+    case "espn":
+      return resolveEspnContentSourceUrlFromContext(context2);
+    case "yahoo":
+      return resolveNcaafYahooSportsGameUrlFromGame(game);
+    default:
+      return null;
+  }
+}
+function resolveSportsBrowserPrototypeGameContextContentSources(game, context2, section) {
+  const sources = [];
+  for (const sourceId of gameContentSourceIdsForGame(game)) {
+    const url = resolveContentSourceUrl(sourceId, game, context2, section);
+    if (!url) continue;
+    sources.push({
+      id: sourceId,
+      label: GAME_CONTENT_SOURCE_LABELS[sourceId],
+      url
+    });
+  }
+  return sources;
+}
+function resolveSportsBrowserPrototypeGameContextContentSourceWebsites(game, context2, section) {
+  return resolveSportsBrowserPrototypeGameContextContentSources(game, context2, section).map(
+    (source) => ({ label: source.label, url: source.url })
+  );
+}
+function isSportsBrowserPrototypeGameContentParentSection(section) {
+  return section === "preview" || section === "recap";
+}
+function isSportsBrowserPrototypeNcaafGame(game) {
+  return game.league === "NCAAF" || game.id.startsWith("espn-NCAAF-");
+}
+function isSportsBrowserPrototypeGameContextSectionWithContentSourceChildren(game, section) {
+  if (isSportsBrowserPrototypeGameContentParentSection(section)) return true;
+  return section === "gameCenter" && isSportsBrowserPrototypeNcaafGame(game);
+}
+function readSportsBrowserPrototypeGameContextContentSourceIndex(pane, section) {
+  const stored = section === "preview" ? pane.gameContextPreviewSourceIndex : pane.gameContextRecapSourceIndex;
+  return typeof stored === "number" && stored >= 0 ? stored : 0;
+}
+
+// ../grarf/desktop/src/lib/gamesSpine/sportsBrowserPrototypeGameContextPane.ts
+function resolveSportsBrowserPrototypeGameContextPrimarySection(game, nowMs2 = Date.now()) {
+  if (isOperationalGameCompleted(game, nowMs2)) return "recap";
+  if (isOperationalGameNow(game, nowMs2)) return "gameCenter";
+  return "preview";
+}
+function resolveSportsBrowserPrototypeGameContextDefaultSection(game, nowMs2 = Date.now()) {
+  return resolveSportsBrowserPrototypeGameContextPrimarySection(game, nowMs2);
+}
+function resolveSportsBrowserPrototypeGameContextSectionsForGame(game, nowMs2 = Date.now()) {
+  return [
+    resolveSportsBrowserPrototypeGameContextPrimarySection(game, nowMs2),
+    "betting",
+    "awayTeam",
+    "homeTeam"
+  ];
+}
+function isSportsBrowserPrototypeGameContextPane(pane) {
+  return Boolean(pane.gameId?.trim());
+}
+function getSportsBrowserPrototypeGameContextSectionWebsites(game, context2, section) {
+  switch (section) {
+    case "preview":
+      return resolveSportsBrowserPrototypeGameContextContentSourceWebsites(game, context2, "preview");
+    case "recap":
+      return resolveSportsBrowserPrototypeGameContextContentSourceWebsites(game, context2, "recap");
+    case "betting":
+      return [];
+    case "gameCenter":
+      if (game.league === "NCAAF" || game.id.startsWith("espn-NCAAF-")) {
+        return resolveSportsBrowserPrototypeGameContextContentSourceWebsites(
+          game,
+          context2,
+          "preview"
+        );
+      }
+      return context2.gameCenter;
+    case "awayTeam":
+      return context2.awayTeam.websites;
+    case "homeTeam":
+      return context2.homeTeam.websites;
+  }
+}
+function resolveSportsBrowserPrototypeGameContextNavSectionWebsites(game, pane, context2, section) {
+  if (section !== "awayTeam" && section !== "homeTeam") {
+    return [];
+  }
+  const teamSection = pane.gameContextTeamSection ?? "news";
+  if (!teamSection) {
+    return [];
+  }
+  return resolveSportsBrowserPrototypeGameTeamContextSectionWebsites(
+    game,
+    context2,
+    section,
+    teamSection
+  );
+}
+function getSportsBrowserPrototypeGameContextSectionTabs(game, context2, nowMs2 = Date.now()) {
+  return resolveSportsBrowserPrototypeGameContextSectionsForGame(game, nowMs2).map((section) => {
+    switch (section) {
+      case "preview":
+        return { label: "PREVIEW", url: "" };
+      case "gameCenter":
+        return { label: "GAMECENTER", url: "" };
+      case "recap":
+        return { label: "RECAP", url: "" };
+      case "betting":
+        return { label: "BETTING", url: "" };
+      case "awayTeam":
+        return { label: context2.awayTeam.label, url: "" };
+      case "homeTeam":
+        return { label: context2.homeTeam.label, url: "" };
+    }
+  });
+}
+function resolveSportsBrowserPrototypeGameContextSectionIndex(pane, game, nowMs2 = Date.now()) {
+  const section = pane.gameContextSection ?? resolveSportsBrowserPrototypeGameContextDefaultSection(game, nowMs2);
+  const sections = resolveSportsBrowserPrototypeGameContextSectionsForGame(game, nowMs2);
+  const index = sections.indexOf(section);
+  return index >= 0 ? index : 0;
+}
+function applySportsBrowserPrototypeGameToPane(game) {
+  const context2 = resolveGameBrowserContext(game);
+  const defaultSection = resolveSportsBrowserPrototypeGameContextDefaultSection(game);
+  const gameCenterUrl = getSportsBrowserPrototypeGameContextSectionWebsites(game, context2, "gameCenter")[0]?.url?.trim() || null;
+  const fotmobMatchUrl = resolveFotmobMatchUrl(game);
+  const previewSourceIndex = defaultSection === "preview" ? readSportsBrowserPrototypeGameContextContentSourceIndex({}, "preview") : 0;
+  const recapSourceIndex = defaultSection === "recap" ? readSportsBrowserPrototypeGameContextContentSourceIndex({}, "recap") : 0;
+  const previewSources = resolveSportsBrowserPrototypeGameContextContentSourceWebsites(
+    game,
+    context2,
+    "preview"
+  );
+  const recapSources = resolveSportsBrowserPrototypeGameContextContentSourceWebsites(
+    game,
+    context2,
+    "recap"
+  );
+  const initialPreviewUrl = defaultSection === "preview" ? previewSources[previewSourceIndex]?.url?.trim() ?? previewSources[0]?.url?.trim() ?? null : null;
+  const initialRecapUrl = defaultSection === "recap" ? recapSources[recapSourceIndex]?.url?.trim() ?? recapSources[0]?.url?.trim() ?? null : null;
+  return {
+    url: fotmobMatchUrl ?? initialPreviewUrl ?? initialRecapUrl ?? gameCenterUrl,
+    activeTabIndex: defaultSection === "preview" ? previewSourceIndex : defaultSection === "recap" ? recapSourceIndex : 0,
+    leagueKey: null,
+    gameId: game.id,
+    gameContextSection: defaultSection,
+    leagueContextSection: null,
+    gameContextTeamSection: null,
+    gameContextPreviewSourceIndex: previewSourceIndex,
+    gameContextRecapSourceIndex: recapSourceIndex,
+    showWebsiteTabs: true,
+    documentTitle: null
+  };
+}
+function applySportsBrowserPrototypeGameTeamSideToPane(game, side) {
+  const context2 = resolveGameBrowserContext(game);
+  const contextSection = side === "away" ? "awayTeam" : "homeTeam";
+  const pane = applySportsBrowserPrototypeGameContextSectionToPane(
+    applySportsBrowserPrototypeGameToPane(game),
+    game,
+    context2,
+    contextSection
+  );
+  const websites = resolveSportsBrowserPrototypeGameContextNavSectionWebsites(
+    game,
+    { ...pane, gameContextTeamSection: "news" },
+    context2,
+    contextSection
+  );
+  const url = websites[0]?.url?.trim() ?? null;
+  return {
+    ...pane,
+    gameContextTeamSection: "news",
+    activeTabIndex: 0,
+    url,
+    documentTitle: null
+  };
+}
+function resolveGameContextSectionContentSourceWebsites(game, context2, section) {
+  if (!isSportsBrowserPrototypeGameContextSectionWithContentSourceChildren(game, section)) {
+    return null;
+  }
+  if (section === "gameCenter") {
+    const websites2 = getSportsBrowserPrototypeGameContextSectionWebsites(game, context2, "gameCenter");
+    return websites2.length > 0 ? websites2 : null;
+  }
+  const websites = getSportsBrowserPrototypeGameContextSectionWebsites(game, context2, section);
+  return websites.length > 0 ? websites : null;
+}
+function applySportsBrowserPrototypeGameContextSectionToPane(pane, game, context2, section) {
+  const enteringTeamSection = section === "awayTeam" || section === "homeTeam";
+  const leavingTeamSection = pane.gameContextSection === "awayTeam" || pane.gameContextSection === "homeTeam";
+  const contentSources = resolveGameContextSectionContentSourceWebsites(game, context2, section);
+  const contentSourceIndex = isSportsBrowserPrototypeGameContentParentSection(section) ? readSportsBrowserPrototypeGameContextContentSourceIndex(pane, section) : section === "gameCenter" ? pane.activeTabIndex ?? 0 : 0;
+  const safeContentSourceIndex = contentSources && contentSources.length > 0 ? Math.min(contentSourceIndex, contentSources.length - 1) : 0;
+  const sectionUrl = section === "gameCenter" ? getSportsBrowserPrototypeGameContextSectionWebsites(game, context2, section)[0]?.url?.trim() || null : contentSources && contentSources.length > 0 ? contentSources[safeContentSourceIndex]?.url?.trim() || null : null;
+  return {
+    ...pane,
+    gameContextSection: section,
+    activeTabIndex: isSportsBrowserPrototypeGameContextSectionWithContentSourceChildren(game, section) ? safeContentSourceIndex : 0,
+    ...sectionUrl ? { url: sectionUrl } : {},
+    ...section === "preview" ? { gameContextPreviewSourceIndex: safeContentSourceIndex } : section === "recap" ? { gameContextRecapSourceIndex: safeContentSourceIndex } : {},
+    gameContextTeamSection: enteringTeamSection ? pane.gameContextTeamSection ?? "news" : leavingTeamSection ? null : pane.gameContextTeamSection ?? null
+  };
+}
+function applySportsBrowserPrototypeGameTeamContextSectionToPane(pane, game, context2, teamSection) {
+  const gameContextSection = pane.gameContextSection;
+  if (gameContextSection !== "awayTeam" && gameContextSection !== "homeTeam") {
+    return pane;
+  }
+  const resolvedSection = teamSection ?? "news";
+  if ((pane.gameContextTeamSection ?? "news") === resolvedSection) {
+    return pane;
+  }
+  const websites = resolveSportsBrowserPrototypeGameContextNavSectionWebsites(
+    game,
+    { ...pane, gameContextTeamSection: resolvedSection },
+    context2,
+    gameContextSection
+  );
+  return {
+    ...pane,
+    gameContextTeamSection: resolvedSection,
+    activeTabIndex: 0,
+    ...websites.length > 0 ? { url: websites[0]?.url ?? null } : {}
+  };
+}
+function applySportsBrowserPrototypeGameContextWebsiteTabToPane(pane, game, context2, tabIndex) {
+  const section = pane.gameContextSection ?? "gameCenter";
+  const websites = section === "awayTeam" || section === "homeTeam" ? resolveSportsBrowserPrototypeGameContextNavSectionWebsites(game, pane, context2, section) : getSportsBrowserPrototypeGameContextSectionWebsites(game, context2, section);
+  const url = websites[tabIndex]?.url?.trim() ?? null;
+  if (pane.activeTabIndex === tabIndex && pane.url === url) {
+    return pane;
+  }
+  return {
+    ...pane,
+    activeTabIndex: tabIndex,
+    url,
+    documentTitle: null,
+    ...section === "preview" ? { gameContextPreviewSourceIndex: tabIndex } : section === "recap" ? { gameContextRecapSourceIndex: tabIndex } : {}
+  };
+}
+
+// ../grarf/desktop/src/lib/home/applySportsBrowserPrototypeSidebarLiveGameSelection.ts
+var LIVE_GAME_X_SEARCH_PRIMARY_PANE_INDEX = 0;
+var LIVE_GAME_X_SEARCH_SECONDARY_PANE_INDEX = 1;
+function isSportsBrowserPrototypeLiveGameXSearchSecondaryPane(pane) {
+  return Boolean(pane?.liveGameXSearchPresentation);
+}
+function ensureLiveGameXSearchSplitPaneStates(paneStates) {
+  const next = paneStates.slice();
+  while (next.length < 2) {
+    next.push(createEmptySportsBrowserPrototypePaneState());
+  }
+  return next.slice(0, 2);
+}
+function buildLiveGameXSearchSecondaryPane(game, xUrl) {
+  return {
+    ...applySportsBrowserPrototypeUrlToPane(createEmptySportsBrowserPrototypePaneState(), xUrl),
+    leagueKey: null,
+    gameId: null,
+    gameContextSection: null,
+    leagueContextSection: null,
+    showWebsiteTabs: false,
+    newsTimelineView: void 0,
+    sidePaneTimelinePresentation: false,
+    liveGameXSearchPresentation: true,
+    liveGameXSearchGameId: game.id
+  };
+}
+function collapseLiveGameXSearchSplit(tab, primaryPane) {
+  const secondary = tab.paneStates[LIVE_GAME_X_SEARCH_SECONDARY_PANE_INDEX];
+  if (!isSportsBrowserPrototypeLiveGameXSearchSecondaryPane(secondary)) {
+    return tab;
+  }
+  return {
+    ...tab,
+    splitPaneCount: 1,
+    paneStates: [primaryPane],
+    activePaneIndex: 0,
+    splitPaneLeftWidthRatio: void 0
+  };
+}
+function collapseSportsBrowserLiveGameXSearchSplit(tab, primaryPane) {
+  return collapseLiveGameXSearchSplit(tab, primaryPane);
+}
+function applySportsBrowserPrototypeSidebarLiveGameSelection(tab, game) {
+  const paneIndex = resolveSportsBrowserPrototypeSidebarSelectionPaneIndex(tab);
+  const gamePane = applySportsBrowserPrototypeGameToPane(game);
+  const xUrl = game.status === "live" ? resolveXGameSearchUrlFromGame(game) : null;
+  if (!xUrl) {
+    const nextPaneStates2 = tab.paneStates.slice();
+    nextPaneStates2[paneIndex] = gamePane;
+    const withGame = { ...tab, paneStates: nextPaneStates2, activePaneIndex: paneIndex };
+    return collapseLiveGameXSearchSplit(withGame, gamePane);
+  }
+  const nextPaneStates = ensureLiveGameXSearchSplitPaneStates(tab.paneStates);
+  nextPaneStates[LIVE_GAME_X_SEARCH_PRIMARY_PANE_INDEX] = gamePane;
+  nextPaneStates[LIVE_GAME_X_SEARCH_SECONDARY_PANE_INDEX] = buildLiveGameXSearchSecondaryPane(
+    game,
+    xUrl
+  );
+  return {
+    ...tab,
+    splitPaneCount: 2,
+    paneStates: nextPaneStates,
+    activePaneIndex: LIVE_GAME_X_SEARCH_PRIMARY_PANE_INDEX,
+    splitPaneLeftWidthRatio: tab.splitPaneLeftWidthRatio ?? SPORTS_BROWSER_NEWS_TICKER_CONTEXT_PANE_WIDTH_RATIO
+  };
+}
+
 // ../grarf/desktop/src/lib/home/applySportsBrowserOpenTimelineInSidePane.ts
 init_define_import_meta_env();
 var SPORTS_BROWSER_SIDE_PANE_TIMELINE_PRIMARY_PANE_INDEX = 0;
@@ -133765,6 +135401,8 @@ function cloneSportsBrowserPrototypePaneState(pane) {
     showWebsiteTabs: pane.showWebsiteTabs,
     newsTimelineView: cloneNewsTimelineView(pane.newsTimelineView),
     sidePaneTimelinePresentation: pane.sidePaneTimelinePresentation,
+    liveGameXSearchPresentation: pane.liveGameXSearchPresentation,
+    liveGameXSearchGameId: pane.liveGameXSearchGameId,
     documentTitle: pane.documentTitle ?? null
   };
 }
@@ -133782,7 +135420,7 @@ function paneStatesEqual(left, right) {
   return left.every((pane, index) => {
     const other = right[index];
     if (!other) return false;
-    return pane.url === other.url && pane.activeTabIndex === other.activeTabIndex && pane.leagueKey === other.leagueKey && pane.gameId === other.gameId && pane.gameContextSection === other.gameContextSection && pane.leagueContextSection === other.leagueContextSection && pane.gameContextTeamSection === other.gameContextTeamSection && pane.showWebsiteTabs === other.showWebsiteTabs && pane.sidePaneTimelinePresentation === other.sidePaneTimelinePresentation && (pane.documentTitle ?? null) === (other.documentTitle ?? null) && JSON.stringify(pane.newsTimelineView ?? null) === JSON.stringify(other.newsTimelineView ?? null);
+    return pane.url === other.url && pane.activeTabIndex === other.activeTabIndex && pane.leagueKey === other.leagueKey && pane.gameId === other.gameId && pane.gameContextSection === other.gameContextSection && pane.leagueContextSection === other.leagueContextSection && pane.gameContextTeamSection === other.gameContextTeamSection && pane.showWebsiteTabs === other.showWebsiteTabs && pane.sidePaneTimelinePresentation === other.sidePaneTimelinePresentation && pane.liveGameXSearchPresentation === other.liveGameXSearchPresentation && (pane.liveGameXSearchGameId ?? null) === (other.liveGameXSearchGameId ?? null) && (pane.documentTitle ?? null) === (other.documentTitle ?? null) && JSON.stringify(pane.newsTimelineView ?? null) === JSON.stringify(other.newsTimelineView ?? null);
   });
 }
 function areSportsBrowserPaneHistorySnapshotsEqual(left, right) {
@@ -138799,1561 +140437,6 @@ function resolveSportsBrowserPrototypeNewsTickerArticlePaneLeftPx(shellWidthPx) 
 init_define_import_meta_env();
 var import_react262 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/lib/gamesSpine/sportsBrowserPrototypeGameContextPane.ts
-init_define_import_meta_env();
-
-// ../grarf/desktop/src/data/sportsBrowserPrototypeGameTeamContextWebsites.ts
-init_define_import_meta_env();
-
-// ../grarf/desktop/src/data/sportsBrowserPrototypeMajorLeagueTeamPodcastWebsites.ts
-init_define_import_meta_env();
-var SPORTS_BROWSER_PROTOTYPE_MLB_TEAM_PODCAST_WEBSITES = {
-  "Arizona Diamondbacks": {
-    label: "Arizona Diamondbacks",
-    url: "https://open.spotify.com/search/Arizona%20Diamondbacks/podcastAndEpisodes"
-  },
-  "Athletics": {
-    label: "Athletics",
-    url: "https://open.spotify.com/search/Athletics/podcastAndEpisodes"
-  },
-  "Atlanta Braves": {
-    label: "Atlanta Braves",
-    url: "https://open.spotify.com/search/Atlanta%20Braves/podcastAndEpisodes"
-  },
-  "Baltimore Orioles": {
-    label: "Baltimore Orioles",
-    url: "https://open.spotify.com/search/Baltimore%20Orioles/podcastAndEpisodes"
-  },
-  "Boston Red Sox": {
-    label: "Boston Red Sox",
-    url: "https://open.spotify.com/search/Boston%20Red%20Sox/podcastAndEpisodes"
-  },
-  "Chicago Cubs": {
-    label: "Chicago Cubs",
-    url: "https://open.spotify.com/search/Chicago%20Cubs/podcastAndEpisodes"
-  },
-  "Chicago White Sox": {
-    label: "Chicago White Sox",
-    url: "https://open.spotify.com/search/Chicago%20White%20Sox/podcastAndEpisodes"
-  },
-  "Cincinnati Reds": {
-    label: "Cincinnati Reds",
-    url: "https://open.spotify.com/search/Cincinnati%20Reds/podcastAndEpisodes"
-  },
-  "Cleveland Guardians": {
-    label: "Cleveland Guardians",
-    url: "https://open.spotify.com/search/Cleveland%20Guardians/podcastAndEpisodes"
-  },
-  "Colorado Rockies": {
-    label: "Colorado Rockies",
-    url: "https://open.spotify.com/search/Colorado%20Rockies/podcastAndEpisodes"
-  },
-  "Detroit Tigers": {
-    label: "Detroit Tigers",
-    url: "https://open.spotify.com/search/Detroit%20Tigers/podcastAndEpisodes"
-  },
-  "Houston Astros": {
-    label: "Houston Astros",
-    url: "https://open.spotify.com/search/Houston%20Astros/podcastAndEpisodes"
-  },
-  "Kansas City Royals": {
-    label: "Kansas City Royals",
-    url: "https://open.spotify.com/search/Kansas%20City%20Royals/podcastAndEpisodes"
-  },
-  "Los Angeles Angels": {
-    label: "Los Angeles Angels",
-    url: "https://open.spotify.com/search/Los%20Angeles%20Angels/podcastAndEpisodes"
-  },
-  "Los Angeles Dodgers": {
-    label: "Los Angeles Dodgers",
-    url: "https://open.spotify.com/search/Los%20Angeles%20Dodgers/podcastAndEpisodes"
-  },
-  "Miami Marlins": {
-    label: "Miami Marlins",
-    url: "https://open.spotify.com/search/Miami%20Marlins/podcastAndEpisodes"
-  },
-  "Milwaukee Brewers": {
-    label: "Milwaukee Brewers",
-    url: "https://open.spotify.com/search/Milwaukee%20Brewers/podcastAndEpisodes"
-  },
-  "Minnesota Twins": {
-    label: "Minnesota Twins",
-    url: "https://open.spotify.com/search/Minnesota%20Twins/podcastAndEpisodes"
-  },
-  "New York Mets": {
-    label: "New York Mets",
-    url: "https://open.spotify.com/search/New%20York%20Mets/podcastAndEpisodes"
-  },
-  "New York Yankees": {
-    label: "New York Yankees",
-    url: "https://open.spotify.com/search/New%20York%20Yankees/podcastAndEpisodes"
-  },
-  "Philadelphia Phillies": {
-    label: "Philadelphia Phillies",
-    url: "https://open.spotify.com/search/Philadelphia%20Phillies/podcastAndEpisodes"
-  },
-  "Pittsburgh Pirates": {
-    label: "Pittsburgh Pirates",
-    url: "https://open.spotify.com/search/Pittsburgh%20Pirates/podcastAndEpisodes"
-  },
-  "San Diego Padres": {
-    label: "San Diego Padres",
-    url: "https://open.spotify.com/search/San%20Diego%20Padres/podcastAndEpisodes"
-  },
-  "San Francisco Giants": {
-    label: "San Francisco Giants",
-    url: "https://open.spotify.com/search/San%20Francisco%20Giants/podcastAndEpisodes"
-  },
-  "Seattle Mariners": {
-    label: "Seattle Mariners",
-    url: "https://open.spotify.com/search/Seattle%20Mariners/podcastAndEpisodes"
-  },
-  "St. Louis Cardinals": {
-    label: "St. Louis Cardinals",
-    url: "https://open.spotify.com/search/St.%20Louis%20Cardinals/podcastAndEpisodes"
-  },
-  "Tampa Bay Rays": {
-    label: "Tampa Bay Rays",
-    url: "https://open.spotify.com/search/Tampa%20Bay%20Rays/podcastAndEpisodes"
-  },
-  "Texas Rangers": {
-    label: "Texas Rangers",
-    url: "https://open.spotify.com/search/Texas%20Rangers/podcastAndEpisodes"
-  },
-  "Toronto Blue Jays": {
-    label: "Toronto Blue Jays",
-    url: "https://open.spotify.com/search/Toronto%20Blue%20Jays/podcastAndEpisodes"
-  },
-  "Washington Nationals": {
-    label: "Washington Nationals",
-    url: "https://open.spotify.com/search/Washington%20Nationals/podcastAndEpisodes"
-  }
-};
-var SPORTS_BROWSER_PROTOTYPE_NBA_TEAM_PODCAST_WEBSITES = {
-  "Atlanta Hawks": {
-    label: "Atlanta Hawks",
-    url: "https://open.spotify.com/search/Atlanta%20Hawks/podcastAndEpisodes"
-  },
-  "Boston Celtics": {
-    label: "Boston Celtics",
-    url: "https://open.spotify.com/search/Boston%20Celtics/podcastAndEpisodes"
-  },
-  "Brooklyn Nets": {
-    label: "Brooklyn Nets",
-    url: "https://open.spotify.com/search/Brooklyn%20Nets/podcastAndEpisodes"
-  },
-  "Charlotte Hornets": {
-    label: "Charlotte Hornets",
-    url: "https://open.spotify.com/search/Charlotte%20Hornets/podcastAndEpisodes"
-  },
-  "Chicago Bulls": {
-    label: "Chicago Bulls",
-    url: "https://open.spotify.com/search/Chicago%20Bulls/podcastAndEpisodes"
-  },
-  "Cleveland Cavaliers": {
-    label: "Cleveland Cavaliers",
-    url: "https://open.spotify.com/search/Cleveland%20Cavaliers/podcastAndEpisodes"
-  },
-  "Dallas Mavericks": {
-    label: "Dallas Mavericks",
-    url: "https://open.spotify.com/search/Dallas%20Mavericks/podcastAndEpisodes"
-  },
-  "Denver Nuggets": {
-    label: "Denver Nuggets",
-    url: "https://open.spotify.com/search/Denver%20Nuggets/podcastAndEpisodes"
-  },
-  "Detroit Pistons": {
-    label: "Detroit Pistons",
-    url: "https://open.spotify.com/search/Detroit%20Pistons/podcastAndEpisodes"
-  },
-  "Golden State Warriors": {
-    label: "Golden State Warriors",
-    url: "https://open.spotify.com/search/Golden%20State%20Warriors/podcastAndEpisodes"
-  },
-  "Houston Rockets": {
-    label: "Houston Rockets",
-    url: "https://open.spotify.com/search/Houston%20Rockets/podcastAndEpisodes"
-  },
-  "Indiana Pacers": {
-    label: "Indiana Pacers",
-    url: "https://open.spotify.com/search/Indiana%20Pacers/podcastAndEpisodes"
-  },
-  "Los Angeles Clippers": {
-    label: "Los Angeles Clippers",
-    url: "https://open.spotify.com/search/LA%20Clippers/podcastAndEpisodes"
-  },
-  "Los Angeles Lakers": {
-    label: "Los Angeles Lakers",
-    url: "https://open.spotify.com/search/Los%20Angeles%20Lakers/podcastAndEpisodes"
-  },
-  "Memphis Grizzlies": {
-    label: "Memphis Grizzlies",
-    url: "https://open.spotify.com/search/Memphis%20Grizzlies/podcastAndEpisodes"
-  },
-  "Miami Heat": {
-    label: "Miami Heat",
-    url: "https://open.spotify.com/search/Miami%20Heat/podcastAndEpisodes"
-  },
-  "Milwaukee Bucks": {
-    label: "Milwaukee Bucks",
-    url: "https://open.spotify.com/search/Milwaukee%20Bucks/podcastAndEpisodes"
-  },
-  "Minnesota Timberwolves": {
-    label: "Minnesota Timberwolves",
-    url: "https://open.spotify.com/search/Minnesota%20Timberwolves/podcastAndEpisodes"
-  },
-  "New Orleans Pelicans": {
-    label: "New Orleans Pelicans",
-    url: "https://open.spotify.com/search/New%20Orleans%20Pelicans/podcastAndEpisodes"
-  },
-  "New York Knicks": {
-    label: "New York Knicks",
-    url: "https://open.spotify.com/search/New%20York%20Knicks/podcastAndEpisodes"
-  },
-  "Oklahoma City Thunder": {
-    label: "Oklahoma City Thunder",
-    url: "https://open.spotify.com/search/Oklahoma%20City%20Thunder/podcastAndEpisodes"
-  },
-  "Orlando Magic": {
-    label: "Orlando Magic",
-    url: "https://open.spotify.com/search/Orlando%20Magic/podcastAndEpisodes"
-  },
-  "Philadelphia 76ers": {
-    label: "Philadelphia 76ers",
-    url: "https://open.spotify.com/search/Philadelphia%2076ers/podcastAndEpisodes"
-  },
-  "Phoenix Suns": {
-    label: "Phoenix Suns",
-    url: "https://open.spotify.com/search/Phoenix%20Suns/podcastAndEpisodes"
-  },
-  "Portland Trail Blazers": {
-    label: "Portland Trail Blazers",
-    url: "https://open.spotify.com/search/Portland%20Trail%20Blazers/podcastAndEpisodes"
-  },
-  "Sacramento Kings": {
-    label: "Sacramento Kings",
-    url: "https://open.spotify.com/search/Sacramento%20Kings/podcastAndEpisodes"
-  },
-  "San Antonio Spurs": {
-    label: "San Antonio Spurs",
-    url: "https://open.spotify.com/search/San%20Antonio%20Spurs/podcastAndEpisodes"
-  },
-  "Toronto Raptors": {
-    label: "Toronto Raptors",
-    url: "https://open.spotify.com/search/Toronto%20Raptors/podcastAndEpisodes"
-  },
-  "Utah Jazz": {
-    label: "Utah Jazz",
-    url: "https://open.spotify.com/search/Utah%20Jazz/podcastAndEpisodes"
-  },
-  "Washington Wizards": {
-    label: "Washington Wizards",
-    url: "https://open.spotify.com/search/Washington%20Wizards/podcastAndEpisodes"
-  }
-};
-var SPORTS_BROWSER_PROTOTYPE_NHL_TEAM_PODCAST_WEBSITES = {
-  "Anaheim Ducks": {
-    label: "Anaheim Ducks",
-    url: "https://open.spotify.com/search/Anaheim%20Ducks/podcastAndEpisodes"
-  },
-  "Boston Bruins": {
-    label: "Boston Bruins",
-    url: "https://open.spotify.com/search/Boston%20Bruins/podcastAndEpisodes"
-  },
-  "Buffalo Sabres": {
-    label: "Buffalo Sabres",
-    url: "https://open.spotify.com/search/Buffalo%20Sabres/podcastAndEpisodes"
-  },
-  "Calgary Flames": {
-    label: "Calgary Flames",
-    url: "https://open.spotify.com/search/Calgary%20Flames/podcastAndEpisodes"
-  },
-  "Carolina Hurricanes": {
-    label: "Carolina Hurricanes",
-    url: "https://open.spotify.com/search/Carolina%20Hurricanes/podcastAndEpisodes"
-  },
-  "Chicago Blackhawks": {
-    label: "Chicago Blackhawks",
-    url: "https://open.spotify.com/search/Chicago%20Blackhawks/podcastAndEpisodes"
-  },
-  "Colorado Avalanche": {
-    label: "Colorado Avalanche",
-    url: "https://open.spotify.com/search/Colorado%20Avalanche/podcastAndEpisodes"
-  },
-  "Columbus Blue Jackets": {
-    label: "Columbus Blue Jackets",
-    url: "https://open.spotify.com/search/Columbus%20Blue%20Jackets/podcastAndEpisodes"
-  },
-  "Dallas Stars": {
-    label: "Dallas Stars",
-    url: "https://open.spotify.com/search/Dallas%20Stars/podcastAndEpisodes"
-  },
-  "Detroit Red Wings": {
-    label: "Detroit Red Wings",
-    url: "https://open.spotify.com/search/Detroit%20Red%20Wings/podcastAndEpisodes"
-  },
-  "Edmonton Oilers": {
-    label: "Edmonton Oilers",
-    url: "https://open.spotify.com/search/Edmonton%20Oilers/podcastAndEpisodes"
-  },
-  "Florida Panthers": {
-    label: "Florida Panthers",
-    url: "https://open.spotify.com/search/Florida%20Panthers/podcastAndEpisodes"
-  },
-  "Los Angeles Kings": {
-    label: "Los Angeles Kings",
-    url: "https://open.spotify.com/search/Los%20Angeles%20Kings/podcastAndEpisodes"
-  },
-  "Minnesota Wild": {
-    label: "Minnesota Wild",
-    url: "https://open.spotify.com/search/Minnesota%20Wild/podcastAndEpisodes"
-  },
-  "Montreal Canadiens": {
-    label: "Montreal Canadiens",
-    url: "https://open.spotify.com/search/Montreal%20Canadiens/podcastAndEpisodes"
-  },
-  "Nashville Predators": {
-    label: "Nashville Predators",
-    url: "https://open.spotify.com/search/Nashville%20Predators/podcastAndEpisodes"
-  },
-  "New Jersey Devils": {
-    label: "New Jersey Devils",
-    url: "https://open.spotify.com/search/New%20Jersey%20Devils/podcastAndEpisodes"
-  },
-  "New York Islanders": {
-    label: "New York Islanders",
-    url: "https://open.spotify.com/search/New%20York%20Islanders/podcastAndEpisodes"
-  },
-  "New York Rangers": {
-    label: "New York Rangers",
-    url: "https://open.spotify.com/search/New%20York%20Rangers/podcastAndEpisodes"
-  },
-  "Ottawa Senators": {
-    label: "Ottawa Senators",
-    url: "https://open.spotify.com/search/Ottawa%20Senators/podcastAndEpisodes"
-  },
-  "Philadelphia Flyers": {
-    label: "Philadelphia Flyers",
-    url: "https://open.spotify.com/search/Philadelphia%20Flyers/podcastAndEpisodes"
-  },
-  "Pittsburgh Penguins": {
-    label: "Pittsburgh Penguins",
-    url: "https://open.spotify.com/search/Pittsburgh%20Penguins/podcastAndEpisodes"
-  },
-  "San Jose Sharks": {
-    label: "San Jose Sharks",
-    url: "https://open.spotify.com/search/San%20Jose%20Sharks/podcastAndEpisodes"
-  },
-  "Seattle Kraken": {
-    label: "Seattle Kraken",
-    url: "https://open.spotify.com/search/Seattle%20Kraken/podcastAndEpisodes"
-  },
-  "St. Louis Blues": {
-    label: "St. Louis Blues",
-    url: "https://open.spotify.com/search/St.%20Louis%20Blues/podcastAndEpisodes"
-  },
-  "Tampa Bay Lightning": {
-    label: "Tampa Bay Lightning",
-    url: "https://open.spotify.com/search/Tampa%20Bay%20Lightning/podcastAndEpisodes"
-  },
-  "Toronto Maple Leafs": {
-    label: "Toronto Maple Leafs",
-    url: "https://open.spotify.com/search/Toronto%20Maple%20Leafs/podcastAndEpisodes"
-  },
-  "Utah Mammoth": {
-    label: "Utah Mammoth",
-    url: "https://open.spotify.com/search/Utah%20Mammoth/podcastAndEpisodes"
-  },
-  "Vancouver Canucks": {
-    label: "Vancouver Canucks",
-    url: "https://open.spotify.com/search/Vancouver%20Canucks/podcastAndEpisodes"
-  },
-  "Vegas Golden Knights": {
-    label: "Vegas Golden Knights",
-    url: "https://open.spotify.com/search/Vegas%20Golden%20Knights/podcastAndEpisodes"
-  },
-  "Washington Capitals": {
-    label: "Washington Capitals",
-    url: "https://open.spotify.com/search/Washington%20Capitals/podcastAndEpisodes"
-  },
-  "Winnipeg Jets": {
-    label: "Winnipeg Jets",
-    url: "https://open.spotify.com/search/Winnipeg%20Jets/podcastAndEpisodes"
-  }
-};
-var SPORTS_BROWSER_PROTOTYPE_EPL_TEAM_PODCAST_WEBSITES = {
-  "AFC Bournemouth": {
-    label: "AFC Bournemouth",
-    url: "https://open.spotify.com/search/AFC%20Bournemouth/podcastAndEpisodes"
-  },
-  "Arsenal": {
-    label: "Arsenal",
-    url: "https://open.spotify.com/search/Arsenal/podcastAndEpisodes"
-  },
-  "Aston Villa": {
-    label: "Aston Villa",
-    url: "https://open.spotify.com/search/Aston%20Villa/podcastAndEpisodes"
-  },
-  "Brentford": {
-    label: "Brentford",
-    url: "https://open.spotify.com/search/Brentford/podcastAndEpisodes"
-  },
-  "Brighton & Hove Albion": {
-    label: "Brighton & Hove Albion",
-    url: "https://open.spotify.com/search/Brighton%20%26%20Hove%20Albion/podcastAndEpisodes"
-  },
-  "Chelsea": {
-    label: "Chelsea",
-    url: "https://open.spotify.com/search/Chelsea/podcastAndEpisodes"
-  },
-  "Coventry City": {
-    label: "Coventry City",
-    url: "https://open.spotify.com/search/Coventry%20City/podcastAndEpisodes"
-  },
-  "Crystal Palace": {
-    label: "Crystal Palace",
-    url: "https://open.spotify.com/search/Crystal%20Palace/podcastAndEpisodes"
-  },
-  "Everton": {
-    label: "Everton",
-    url: "https://open.spotify.com/search/Everton/podcastAndEpisodes"
-  },
-  "Fulham": {
-    label: "Fulham",
-    url: "https://open.spotify.com/search/Fulham/podcastAndEpisodes"
-  },
-  "Hull City": {
-    label: "Hull City",
-    url: "https://open.spotify.com/search/Hull%20City/podcastAndEpisodes"
-  },
-  "Ipswich Town": {
-    label: "Ipswich Town",
-    url: "https://open.spotify.com/search/Ipswich%20Town/podcastAndEpisodes"
-  },
-  "Leeds United": {
-    label: "Leeds United",
-    url: "https://open.spotify.com/search/Leeds%20United/podcastAndEpisodes"
-  },
-  "Liverpool": {
-    label: "Liverpool",
-    url: "https://open.spotify.com/search/Liverpool/podcastAndEpisodes"
-  },
-  "Manchester City": {
-    label: "Manchester City",
-    url: "https://open.spotify.com/search/Manchester%20City/podcastAndEpisodes"
-  },
-  "Manchester United": {
-    label: "Manchester United",
-    url: "https://open.spotify.com/search/Manchester%20United/podcastAndEpisodes"
-  },
-  "Newcastle United": {
-    label: "Newcastle United",
-    url: "https://open.spotify.com/search/Newcastle%20United/podcastAndEpisodes"
-  },
-  "Nottingham Forest": {
-    label: "Nottingham Forest",
-    url: "https://open.spotify.com/search/Nottingham%20Forest/podcastAndEpisodes"
-  },
-  "Sunderland": {
-    label: "Sunderland",
-    url: "https://open.spotify.com/search/Sunderland/podcastAndEpisodes"
-  },
-  "Tottenham Hotspur": {
-    label: "Tottenham Hotspur",
-    url: "https://open.spotify.com/search/Tottenham%20Hotspur/podcastAndEpisodes"
-  }
-};
-var SPORTS_BROWSER_PROTOTYPE_MLS_TEAM_PODCAST_WEBSITES = {
-  "Atlanta United": {
-    label: "Atlanta United",
-    url: "https://open.spotify.com/search/Atlanta%20United/podcastAndEpisodes"
-  },
-  "Austin FC": {
-    label: "Austin FC",
-    url: "https://open.spotify.com/search/Austin%20FC/podcastAndEpisodes"
-  },
-  "Charlotte FC": {
-    label: "Charlotte FC",
-    url: "https://open.spotify.com/search/Charlotte%20FC/podcastAndEpisodes"
-  },
-  "Chicago Fire FC": {
-    label: "Chicago Fire FC",
-    url: "https://open.spotify.com/search/Chicago%20Fire%20FC/podcastAndEpisodes"
-  },
-  "FC Cincinnati": {
-    label: "FC Cincinnati",
-    url: "https://open.spotify.com/search/FC%20Cincinnati/podcastAndEpisodes"
-  },
-  "Colorado Rapids": {
-    label: "Colorado Rapids",
-    url: "https://open.spotify.com/search/Colorado%20Rapids/podcastAndEpisodes"
-  },
-  "Columbus Crew": {
-    label: "Columbus Crew",
-    url: "https://open.spotify.com/search/Columbus%20Crew/podcastAndEpisodes"
-  },
-  "D.C. United": {
-    label: "D.C. United",
-    url: "https://open.spotify.com/search/D.C.%20United/podcastAndEpisodes"
-  },
-  "FC Dallas": {
-    label: "FC Dallas",
-    url: "https://open.spotify.com/search/FC%20Dallas/podcastAndEpisodes"
-  },
-  "Houston Dynamo FC": {
-    label: "Houston Dynamo FC",
-    url: "https://open.spotify.com/search/Houston%20Dynamo%20FC/podcastAndEpisodes"
-  },
-  "Inter Miami CF": {
-    label: "Inter Miami CF",
-    url: "https://open.spotify.com/search/Inter%20Miami%20CF/podcastAndEpisodes"
-  },
-  "LA Galaxy": {
-    label: "LA Galaxy",
-    url: "https://open.spotify.com/search/LA%20Galaxy/podcastAndEpisodes"
-  },
-  "Los Angeles Football Club": {
-    label: "Los Angeles Football Club",
-    url: "https://open.spotify.com/search/Los%20Angeles%20Football%20Club/podcastAndEpisodes"
-  },
-  "Minnesota United FC": {
-    label: "Minnesota United FC",
-    url: "https://open.spotify.com/search/Minnesota%20United%20FC/podcastAndEpisodes"
-  },
-  "CF Montr\xE9al": {
-    label: "CF Montr\xE9al",
-    url: "https://open.spotify.com/search/CF%20Montr%C3%A9al/podcastAndEpisodes"
-  },
-  "Nashville SC": {
-    label: "Nashville SC",
-    url: "https://open.spotify.com/search/Nashville%20SC/podcastAndEpisodes"
-  },
-  "New England Revolution": {
-    label: "New England Revolution",
-    url: "https://open.spotify.com/search/New%20England%20Revolution/podcastAndEpisodes"
-  },
-  "New York City FC": {
-    label: "New York City FC",
-    url: "https://open.spotify.com/search/New%20York%20City%20FC/podcastAndEpisodes"
-  },
-  "Red Bull New York": {
-    label: "Red Bull New York",
-    url: "https://open.spotify.com/search/Red%20Bull%20New%20York/podcastAndEpisodes"
-  },
-  "Orlando City SC": {
-    label: "Orlando City SC",
-    url: "https://open.spotify.com/search/Orlando%20City%20SC/podcastAndEpisodes"
-  },
-  "Philadelphia Union": {
-    label: "Philadelphia Union",
-    url: "https://open.spotify.com/search/Philadelphia%20Union/podcastAndEpisodes"
-  },
-  "Portland Timbers": {
-    label: "Portland Timbers",
-    url: "https://open.spotify.com/search/Portland%20Timbers/podcastAndEpisodes"
-  },
-  "Real Salt Lake": {
-    label: "Real Salt Lake",
-    url: "https://open.spotify.com/search/Real%20Salt%20Lake/podcastAndEpisodes"
-  },
-  "San Diego FC": {
-    label: "San Diego FC",
-    url: "https://open.spotify.com/search/San%20Diego%20FC/podcastAndEpisodes"
-  },
-  "San Jose Earthquakes": {
-    label: "San Jose Earthquakes",
-    url: "https://open.spotify.com/search/San%20Jose%20Earthquakes/podcastAndEpisodes"
-  },
-  "Seattle Sounders FC": {
-    label: "Seattle Sounders FC",
-    url: "https://open.spotify.com/search/Seattle%20Sounders%20FC/podcastAndEpisodes"
-  },
-  "Sporting Kansas City": {
-    label: "Sporting Kansas City",
-    url: "https://open.spotify.com/search/Sporting%20Kansas%20City/podcastAndEpisodes"
-  },
-  "St. Louis CITY SC": {
-    label: "St. Louis CITY SC",
-    url: "https://open.spotify.com/search/St.%20Louis%20CITY%20SC/podcastAndEpisodes"
-  },
-  "Toronto FC": {
-    label: "Toronto FC",
-    url: "https://open.spotify.com/search/Toronto%20FC/podcastAndEpisodes"
-  },
-  "Vancouver Whitecaps FC": {
-    label: "Vancouver Whitecaps FC",
-    url: "https://open.spotify.com/search/Vancouver%20Whitecaps%20FC/podcastAndEpisodes"
-  }
-};
-var SPORTS_BROWSER_PROTOTYPE_WNBA_TEAM_PODCAST_WEBSITES = {
-  "Atlanta Dream": {
-    label: "Atlanta Dream",
-    url: "https://open.spotify.com/search/Atlanta%20Dream/podcastAndEpisodes"
-  },
-  "Chicago Sky": {
-    label: "Chicago Sky",
-    url: "https://open.spotify.com/search/Chicago%20Sky/podcastAndEpisodes"
-  },
-  "Connecticut Sun": {
-    label: "Connecticut Sun",
-    url: "https://open.spotify.com/search/Connecticut%20Sun/podcastAndEpisodes"
-  },
-  "Dallas Wings": {
-    label: "Dallas Wings",
-    url: "https://open.spotify.com/search/Dallas%20Wings/podcastAndEpisodes"
-  },
-  "Golden State Valkyries": {
-    label: "Golden State Valkyries",
-    url: "https://open.spotify.com/search/Golden%20State%20Valkyries/podcastAndEpisodes"
-  },
-  "Indiana Fever": {
-    label: "Indiana Fever",
-    url: "https://open.spotify.com/search/Indiana%20Fever/podcastAndEpisodes"
-  },
-  "Las Vegas Aces": {
-    label: "Las Vegas Aces",
-    url: "https://open.spotify.com/search/Las%20Vegas%20Aces/podcastAndEpisodes"
-  },
-  "Los Angeles Sparks": {
-    label: "Los Angeles Sparks",
-    url: "https://open.spotify.com/search/Los%20Angeles%20Sparks/podcastAndEpisodes"
-  },
-  "Minnesota Lynx": {
-    label: "Minnesota Lynx",
-    url: "https://open.spotify.com/search/Minnesota%20Lynx/podcastAndEpisodes"
-  },
-  "New York Liberty": {
-    label: "New York Liberty",
-    url: "https://open.spotify.com/search/New%20York%20Liberty/podcastAndEpisodes"
-  },
-  "Phoenix Mercury": {
-    label: "Phoenix Mercury",
-    url: "https://open.spotify.com/search/Phoenix%20Mercury/podcastAndEpisodes"
-  },
-  "Portland Fire": {
-    label: "Portland Fire",
-    url: "https://open.spotify.com/search/Portland%20Fire/podcastAndEpisodes"
-  },
-  "Seattle Storm": {
-    label: "Seattle Storm",
-    url: "https://open.spotify.com/search/Seattle%20Storm/podcastAndEpisodes"
-  },
-  "Toronto Tempo": {
-    label: "Toronto Tempo",
-    url: "https://open.spotify.com/search/Toronto%20Tempo/podcastAndEpisodes"
-  },
-  "Washington Mystics": {
-    label: "Washington Mystics",
-    url: "https://open.spotify.com/search/Washington%20Mystics/podcastAndEpisodes"
-  }
-};
-var SPORTS_BROWSER_PROTOTYPE_NWSL_TEAM_PODCAST_WEBSITES = {
-  "Angel City FC": {
-    label: "Angel City FC",
-    url: "https://open.spotify.com/search/Angel%20City%20FC/podcastAndEpisodes"
-  },
-  "Bay FC": {
-    label: "Bay FC",
-    url: "https://open.spotify.com/search/Bay%20FC/podcastAndEpisodes"
-  },
-  "Boston Legacy FC": {
-    label: "Boston Legacy FC",
-    url: "https://open.spotify.com/search/Boston%20Legacy%20FC/podcastAndEpisodes"
-  },
-  "Chicago Stars FC": {
-    label: "Chicago Stars FC",
-    url: "https://open.spotify.com/search/Chicago%20Stars%20FC/podcastAndEpisodes"
-  },
-  "Denver Summit FC": {
-    label: "Denver Summit FC",
-    url: "https://open.spotify.com/search/Denver%20Summit%20FC/podcastAndEpisodes"
-  },
-  "Gotham FC": {
-    label: "Gotham FC",
-    url: "https://open.spotify.com/search/Gotham%20FC/podcastAndEpisodes"
-  },
-  "Houston Dash": {
-    label: "Houston Dash",
-    url: "https://open.spotify.com/search/Houston%20Dash/podcastAndEpisodes"
-  },
-  "Kansas City Current": {
-    label: "Kansas City Current",
-    url: "https://open.spotify.com/search/Kansas%20City%20Current/podcastAndEpisodes"
-  },
-  "North Carolina Courage": {
-    label: "North Carolina Courage",
-    url: "https://open.spotify.com/search/North%20Carolina%20Courage/podcastAndEpisodes"
-  },
-  "Orlando Pride": {
-    label: "Orlando Pride",
-    url: "https://open.spotify.com/search/Orlando%20Pride/podcastAndEpisodes"
-  },
-  "Portland Thorns FC": {
-    label: "Portland Thorns FC",
-    url: "https://open.spotify.com/search/Portland%20Thorns%20FC/podcastAndEpisodes"
-  },
-  "Racing Louisville FC": {
-    label: "Racing Louisville FC",
-    url: "https://open.spotify.com/search/Racing%20Louisville%20FC/podcastAndEpisodes"
-  },
-  "San Diego Wave FC": {
-    label: "San Diego Wave FC",
-    url: "https://open.spotify.com/search/San%20Diego%20Wave%20FC/podcastAndEpisodes"
-  },
-  "Seattle Reign FC": {
-    label: "Seattle Reign FC",
-    url: "https://open.spotify.com/search/Seattle%20Reign%20FC/podcastAndEpisodes"
-  },
-  "Utah Royals FC": {
-    label: "Utah Royals FC",
-    url: "https://open.spotify.com/search/Utah%20Royals%20FC/podcastAndEpisodes"
-  },
-  "Washington Spirit": {
-    label: "Washington Spirit",
-    url: "https://open.spotify.com/search/Washington%20Spirit/podcastAndEpisodes"
-  }
-};
-var SPORTS_BROWSER_PROTOTYPE_LALIGA_TEAM_PODCAST_WEBSITES = {
-  "Athletic Club": {
-    label: "Athletic Club",
-    url: "https://open.spotify.com/search/Athletic%20Club/podcastAndEpisodes"
-  },
-  "Atl\xE9tico de Madrid": {
-    label: "Atl\xE9tico de Madrid",
-    url: "https://open.spotify.com/search/Atl%C3%A9tico%20de%20Madrid/podcastAndEpisodes"
-  },
-  "CA Osasuna": {
-    label: "CA Osasuna",
-    url: "https://open.spotify.com/search/CA%20Osasuna/podcastAndEpisodes"
-  },
-  "Celta": {
-    label: "Celta",
-    url: "https://open.spotify.com/search/Celta/podcastAndEpisodes"
-  },
-  "Deportivo Alav\xE9s": {
-    label: "Deportivo Alav\xE9s",
-    url: "https://open.spotify.com/search/Deportivo%20Alav%C3%A9s/podcastAndEpisodes"
-  },
-  "Elche CF": {
-    label: "Elche CF",
-    url: "https://open.spotify.com/search/Elche%20CF/podcastAndEpisodes"
-  },
-  "FC Barcelona": {
-    label: "FC Barcelona",
-    url: "https://open.spotify.com/search/FC%20Barcelona/podcastAndEpisodes"
-  },
-  "Getafe CF": {
-    label: "Getafe CF",
-    url: "https://open.spotify.com/search/Getafe%20CF/podcastAndEpisodes"
-  },
-  "Levante UD": {
-    label: "Levante UD",
-    url: "https://open.spotify.com/search/Levante%20UD/podcastAndEpisodes"
-  },
-  "M\xE1laga CF": {
-    label: "M\xE1laga CF",
-    url: "https://open.spotify.com/search/M%C3%A1laga%20CF/podcastAndEpisodes"
-  },
-  "R. Racing Club": {
-    label: "R. Racing Club",
-    url: "https://open.spotify.com/search/R.%20Racing%20Club/podcastAndEpisodes"
-  },
-  "Rayo Vallecano": {
-    label: "Rayo Vallecano",
-    url: "https://open.spotify.com/search/Rayo%20Vallecano/podcastAndEpisodes"
-  },
-  "RC Deportivo": {
-    label: "RC Deportivo",
-    url: "https://open.spotify.com/search/RC%20Deportivo/podcastAndEpisodes"
-  },
-  "RCD Espanyol de Barcelona": {
-    label: "RCD Espanyol de Barcelona",
-    url: "https://open.spotify.com/search/RCD%20Espanyol%20de%20Barcelona/podcastAndEpisodes"
-  },
-  "Real Betis": {
-    label: "Real Betis",
-    url: "https://open.spotify.com/search/Real%20Betis/podcastAndEpisodes"
-  },
-  "Real Madrid": {
-    label: "Real Madrid",
-    url: "https://open.spotify.com/search/Real%20Madrid/podcastAndEpisodes"
-  },
-  "Real Sociedad": {
-    label: "Real Sociedad",
-    url: "https://open.spotify.com/search/Real%20Sociedad/podcastAndEpisodes"
-  },
-  "Sevilla FC": {
-    label: "Sevilla FC",
-    url: "https://open.spotify.com/search/Sevilla%20FC/podcastAndEpisodes"
-  },
-  "Valencia CF": {
-    label: "Valencia CF",
-    url: "https://open.spotify.com/search/Valencia%20CF/podcastAndEpisodes"
-  },
-  "Villarreal CF": {
-    label: "Villarreal CF",
-    url: "https://open.spotify.com/search/Villarreal%20CF/podcastAndEpisodes"
-  }
-};
-var SPORTS_BROWSER_PROTOTYPE_BUNDESLIGA_TEAM_PODCAST_WEBSITES = {
-  "FC Augsburg": {
-    label: "FC Augsburg",
-    url: "https://open.spotify.com/search/FC%20Augsburg/podcastAndEpisodes"
-  },
-  "1. FC Union Berlin": {
-    label: "1. FC Union Berlin",
-    url: "https://open.spotify.com/search/1.%20FC%20Union%20Berlin/podcastAndEpisodes"
-  },
-  "SV Werder Bremen": {
-    label: "SV Werder Bremen",
-    url: "https://open.spotify.com/search/SV%20Werder%20Bremen/podcastAndEpisodes"
-  },
-  "Borussia Dortmund": {
-    label: "Borussia Dortmund",
-    url: "https://open.spotify.com/search/Borussia%20Dortmund/podcastAndEpisodes"
-  },
-  "SV Elversberg": {
-    label: "SV Elversberg",
-    url: "https://open.spotify.com/search/SV%20Elversberg/podcastAndEpisodes"
-  },
-  "Eintracht Frankfurt": {
-    label: "Eintracht Frankfurt",
-    url: "https://open.spotify.com/search/Eintracht%20Frankfurt/podcastAndEpisodes"
-  },
-  "Sport-Club Freiburg": {
-    label: "Sport-Club Freiburg",
-    url: "https://open.spotify.com/search/Sport-Club%20Freiburg/podcastAndEpisodes"
-  },
-  "Hamburger SV": {
-    label: "Hamburger SV",
-    url: "https://open.spotify.com/search/Hamburger%20SV/podcastAndEpisodes"
-  },
-  "TSG Hoffenheim": {
-    label: "TSG Hoffenheim",
-    url: "https://open.spotify.com/search/TSG%20Hoffenheim/podcastAndEpisodes"
-  },
-  "1. FC K\xF6ln": {
-    label: "1. FC K\xF6ln",
-    url: "https://open.spotify.com/search/1.%20FC%20K%C3%B6ln/podcastAndEpisodes"
-  },
-  "RB Leipzig": {
-    label: "RB Leipzig",
-    url: "https://open.spotify.com/search/RB%20Leipzig/podcastAndEpisodes"
-  },
-  "Bayer 04 Leverkusen": {
-    label: "Bayer 04 Leverkusen",
-    url: "https://open.spotify.com/search/Bayer%2004%20Leverkusen/podcastAndEpisodes"
-  },
-  "1. FSV Mainz 05": {
-    label: "1. FSV Mainz 05",
-    url: "https://open.spotify.com/search/1.%20FSV%20Mainz%2005/podcastAndEpisodes"
-  },
-  "Borussia M\xF6nchengladbach": {
-    label: "Borussia M\xF6nchengladbach",
-    url: "https://open.spotify.com/search/Borussia%20M%C3%B6nchengladbach/podcastAndEpisodes"
-  },
-  "FC Bayern M\xFCnchen": {
-    label: "FC Bayern M\xFCnchen",
-    url: "https://open.spotify.com/search/FC%20Bayern%20M%C3%BCnchen/podcastAndEpisodes"
-  },
-  "SC Paderborn 07": {
-    label: "SC Paderborn 07",
-    url: "https://open.spotify.com/search/SC%20Paderborn%2007/podcastAndEpisodes"
-  },
-  "FC Schalke 04": {
-    label: "FC Schalke 04",
-    url: "https://open.spotify.com/search/FC%20Schalke%2004/podcastAndEpisodes"
-  },
-  "VfB Stuttgart": {
-    label: "VfB Stuttgart",
-    url: "https://open.spotify.com/search/VfB%20Stuttgart/podcastAndEpisodes"
-  }
-};
-var SPORTS_BROWSER_PROTOTYPE_SERIEA_TEAM_PODCAST_WEBSITES = {
-  "AC Milan": {
-    label: "AC Milan",
-    url: "https://open.spotify.com/search/AC%20Milan/podcastAndEpisodes"
-  },
-  "Atalanta": {
-    label: "Atalanta",
-    url: "https://open.spotify.com/search/Atalanta/podcastAndEpisodes"
-  },
-  "Bologna": {
-    label: "Bologna",
-    url: "https://open.spotify.com/search/Bologna/podcastAndEpisodes"
-  },
-  "Cagliari": {
-    label: "Cagliari",
-    url: "https://open.spotify.com/search/Cagliari/podcastAndEpisodes"
-  },
-  "Como": {
-    label: "Como",
-    url: "https://open.spotify.com/search/Como/podcastAndEpisodes"
-  },
-  "Fiorentina": {
-    label: "Fiorentina",
-    url: "https://open.spotify.com/search/Fiorentina/podcastAndEpisodes"
-  },
-  "Frosinone": {
-    label: "Frosinone",
-    url: "https://open.spotify.com/search/Frosinone/podcastAndEpisodes"
-  },
-  "Genoa": {
-    label: "Genoa",
-    url: "https://open.spotify.com/search/Genoa/podcastAndEpisodes"
-  },
-  "Inter": {
-    label: "Inter",
-    url: "https://open.spotify.com/search/Inter/podcastAndEpisodes"
-  },
-  "Juventus": {
-    label: "Juventus",
-    url: "https://open.spotify.com/search/Juventus/podcastAndEpisodes"
-  },
-  "Lazio": {
-    label: "Lazio",
-    url: "https://open.spotify.com/search/Lazio/podcastAndEpisodes"
-  },
-  "Lecce": {
-    label: "Lecce",
-    url: "https://open.spotify.com/search/Lecce/podcastAndEpisodes"
-  },
-  "Monza": {
-    label: "Monza",
-    url: "https://open.spotify.com/search/Monza/podcastAndEpisodes"
-  },
-  "Napoli": {
-    label: "Napoli",
-    url: "https://open.spotify.com/search/Napoli/podcastAndEpisodes"
-  },
-  "Parma": {
-    label: "Parma",
-    url: "https://open.spotify.com/search/Parma/podcastAndEpisodes"
-  },
-  "Roma": {
-    label: "Roma",
-    url: "https://open.spotify.com/search/Roma/podcastAndEpisodes"
-  },
-  "Sassuolo": {
-    label: "Sassuolo",
-    url: "https://open.spotify.com/search/Sassuolo/podcastAndEpisodes"
-  },
-  "Torino": {
-    label: "Torino",
-    url: "https://open.spotify.com/search/Torino/podcastAndEpisodes"
-  },
-  "Udinese": {
-    label: "Udinese",
-    url: "https://open.spotify.com/search/Udinese/podcastAndEpisodes"
-  },
-  "Venezia": {
-    label: "Venezia",
-    url: "https://open.spotify.com/search/Venezia/podcastAndEpisodes"
-  }
-};
-var SPORTS_BROWSER_PROTOTYPE_MAJOR_LEAGUE_TEAM_PODCAST_LEAGUE_KEYS = [
-  "MLB",
-  "NBA",
-  "NHL",
-  "EPL",
-  "MLS",
-  "WNBA",
-  "NWSL",
-  "LALIGA",
-  "BUNDESLIGA",
-  "SERIEA"
-];
-var TEAM_PODCAST_WEBSITES_BY_LEAGUE = {
-  MLB: SPORTS_BROWSER_PROTOTYPE_MLB_TEAM_PODCAST_WEBSITES,
-  NBA: SPORTS_BROWSER_PROTOTYPE_NBA_TEAM_PODCAST_WEBSITES,
-  NHL: SPORTS_BROWSER_PROTOTYPE_NHL_TEAM_PODCAST_WEBSITES,
-  EPL: SPORTS_BROWSER_PROTOTYPE_EPL_TEAM_PODCAST_WEBSITES,
-  MLS: SPORTS_BROWSER_PROTOTYPE_MLS_TEAM_PODCAST_WEBSITES,
-  WNBA: SPORTS_BROWSER_PROTOTYPE_WNBA_TEAM_PODCAST_WEBSITES,
-  NWSL: SPORTS_BROWSER_PROTOTYPE_NWSL_TEAM_PODCAST_WEBSITES,
-  LALIGA: SPORTS_BROWSER_PROTOTYPE_LALIGA_TEAM_PODCAST_WEBSITES,
-  BUNDESLIGA: SPORTS_BROWSER_PROTOTYPE_BUNDESLIGA_TEAM_PODCAST_WEBSITES,
-  SERIEA: SPORTS_BROWSER_PROTOTYPE_SERIEA_TEAM_PODCAST_WEBSITES
-};
-function resolveTeamPodcastLeagueKeyFromGame(game) {
-  for (const leagueKey of SPORTS_BROWSER_PROTOTYPE_MAJOR_LEAGUE_TEAM_PODCAST_LEAGUE_KEYS) {
-    if (game.league === leagueKey || game.id.startsWith(`espn-${leagueKey}-`)) {
-      return leagueKey;
-    }
-  }
-  return null;
-}
-function isSportsBrowserPrototypeTeamPodcastLeagueGame(game) {
-  return game.league === "NFL" || game.id.startsWith("espn-NFL-") || resolveTeamPodcastLeagueKeyFromGame(game) != null;
-}
-function resolveSportsBrowserPrototypeMajorLeagueTeamPodcastWebsite(leagueKey, teamDisplayName2) {
-  const trimmed = teamDisplayName2.trim();
-  if (!trimmed) return null;
-  return TEAM_PODCAST_WEBSITES_BY_LEAGUE[leagueKey][trimmed] ?? null;
-}
-
-// ../grarf/desktop/src/data/sportsBrowserPrototypeNflTeamPodcastWebsites.ts
-init_define_import_meta_env();
-var SPORTS_BROWSER_PROTOTYPE_NFL_TEAM_PODCAST_WEBSITES = {
-  "Arizona Cardinals": {
-    label: "Arizona Cardinals",
-    url: "https://open.spotify.com/search/Arizona%20Cardinals/podcastAndEpisodes"
-  },
-  "Atlanta Falcons": {
-    label: "Atlanta Falcons",
-    url: "https://open.spotify.com/search/Atlanta%20Falcons/podcastAndEpisodes"
-  },
-  "Baltimore Ravens": {
-    label: "Baltimore Ravens",
-    url: "https://open.spotify.com/search/Baltimore%20Ravens/podcastAndEpisodes"
-  },
-  "Buffalo Bills": {
-    label: "Buffalo Bills",
-    url: "https://open.spotify.com/search/Buffalo%20Bills/podcastAndEpisodes"
-  },
-  "Carolina Panthers": {
-    label: "Carolina Panthers",
-    url: "https://open.spotify.com/search/Carolina%20Panthers/podcastAndEpisodes"
-  },
-  "Chicago Bears": {
-    label: "Chicago Bears",
-    url: "https://open.spotify.com/search/Chicago%20Bears/podcastAndEpisodes"
-  },
-  "Cincinnati Bengals": {
-    label: "Cincinnati Bengals",
-    url: "https://open.spotify.com/search/Cincinnati%20Bengals/podcastAndEpisodes"
-  },
-  "Cleveland Browns": {
-    label: "Cleveland Browns",
-    url: "https://open.spotify.com/search/Cleveland%20Browns/podcastAndEpisodes"
-  },
-  "Dallas Cowboys": {
-    label: "Dallas Cowboys",
-    url: "https://open.spotify.com/search/Dallas%20Cowboys/podcastAndEpisodes"
-  },
-  "Denver Broncos": {
-    label: "Denver Broncos",
-    url: "https://open.spotify.com/search/Denver%20Broncos/podcastAndEpisodes"
-  },
-  "Detroit Lions": {
-    label: "Detroit Lions",
-    url: "https://open.spotify.com/search/Detroit%20Lions/podcastAndEpisodes"
-  },
-  "Green Bay Packers": {
-    label: "Green Bay Packers",
-    url: "https://open.spotify.com/search/Green%20Bay%20Packers/podcastAndEpisodes"
-  },
-  "Houston Texans": {
-    label: "Houston Texans",
-    url: "https://open.spotify.com/search/Houston%20Texans/podcastAndEpisodes"
-  },
-  "Indianapolis Colts": {
-    label: "Indianapolis Colts",
-    url: "https://open.spotify.com/search/Indianapolis%20Colts/podcastAndEpisodes"
-  },
-  "Jacksonville Jaguars": {
-    label: "Jacksonville Jaguars",
-    url: "https://open.spotify.com/search/Jacksonville%20Jaguars/podcastAndEpisodes"
-  },
-  "Kansas City Chiefs": {
-    label: "Kansas City Chiefs",
-    url: "https://open.spotify.com/search/Kansas%20City%20Chiefs/podcastAndEpisodes"
-  },
-  "Las Vegas Raiders": {
-    label: "Las Vegas Raiders",
-    url: "https://open.spotify.com/search/Las%20Vegas%20Raiders/podcastAndEpisodes"
-  },
-  "Los Angeles Chargers": {
-    label: "Los Angeles Chargers",
-    url: "https://open.spotify.com/search/Los%20Angeles%20Chargers/podcastAndEpisodes"
-  },
-  "Los Angeles Rams": {
-    label: "Los Angeles Rams",
-    url: "https://open.spotify.com/search/Los%20Angeles%20Rams/podcastAndEpisodes"
-  },
-  "Miami Dolphins": {
-    label: "Miami Dolphins",
-    url: "https://open.spotify.com/search/Miami%20Dolphins/podcastAndEpisodes"
-  },
-  "Minnesota Vikings": {
-    label: "Minnesota Vikings",
-    url: "https://open.spotify.com/search/Minnesota%20Vikings/podcastAndEpisodes"
-  },
-  "New England Patriots": {
-    label: "New England Patriots",
-    url: "https://open.spotify.com/search/New%20England%20Patriots/podcastAndEpisodes"
-  },
-  "New Orleans Saints": {
-    label: "New Orleans Saints",
-    url: "https://open.spotify.com/search/New%20Orleans%20Saints/podcastAndEpisodes"
-  },
-  "New York Giants": {
-    label: "New York Giants",
-    url: "https://open.spotify.com/search/New%20York%20Giants/podcastAndEpisodes"
-  },
-  "New York Jets": {
-    label: "New York Jets",
-    url: "https://open.spotify.com/search/New%20York%20Jets/podcastAndEpisodes"
-  },
-  "Philadelphia Eagles": {
-    label: "Philadelphia Eagles",
-    url: "https://open.spotify.com/search/Philadelphia%20Eagles/podcastAndEpisodes"
-  },
-  "Pittsburgh Steelers": {
-    label: "Pittsburgh Steelers",
-    url: "https://open.spotify.com/search/Pittsburgh%20Steelers/podcastAndEpisodes"
-  },
-  "San Francisco 49ers": {
-    label: "San Francisco 49ers",
-    url: "https://open.spotify.com/search/San%20Francisco%2049ers/podcastAndEpisodes"
-  },
-  "Seattle Seahawks": {
-    label: "Seattle Seahawks",
-    url: "https://open.spotify.com/search/Seattle%20Seahawks/podcastAndEpisodes"
-  },
-  "Tampa Bay Buccaneers": {
-    label: "Tampa Bay Buccaneers",
-    url: "https://open.spotify.com/search/Tampa%20Bay%20Buccaneers/podcastAndEpisodes"
-  },
-  "Tennessee Titans": {
-    label: "Tennessee Titans",
-    url: "https://open.spotify.com/search/Tennessee%20Titans/podcastAndEpisodes"
-  },
-  "Washington Commanders": {
-    label: "Washington Commanders",
-    url: "https://open.spotify.com/search/Washington%20Commanders/podcastAndEpisodes"
-  }
-};
-function resolveSportsBrowserPrototypeNflTeamPodcastWebsite(teamDisplayName2) {
-  const trimmed = teamDisplayName2.trim();
-  if (!trimmed) return null;
-  return SPORTS_BROWSER_PROTOTYPE_NFL_TEAM_PODCAST_WEBSITES[trimmed] ?? null;
-}
-
-// ../grarf/desktop/src/data/sportsBrowserPrototypeGameTeamContextWebsites.ts
-function isNflGame(game) {
-  return game.league === "NFL" || game.id.startsWith("espn-NFL-");
-}
-function resolveSportsBrowserPrototypeGameTeamContextSectionWebsites(game, context2, gameContextSection, teamSection) {
-  if (!isSportsBrowserPrototypeTeamPodcastLeagueGame(game)) {
-    return [];
-  }
-  const team = gameContextSection === "awayTeam" ? context2.awayTeam : context2.homeTeam;
-  if (teamSection === "news") {
-    return team.websites;
-  }
-  if (teamSection !== "podcasts") {
-    return [];
-  }
-  if (isNflGame(game)) {
-    const podcast2 = resolveSportsBrowserPrototypeNflTeamPodcastWebsite(team.label);
-    return podcast2 ? [podcast2] : [];
-  }
-  const leagueKey = resolveTeamPodcastLeagueKeyFromGame(game);
-  if (!leagueKey) {
-    return [];
-  }
-  const podcast = resolveSportsBrowserPrototypeMajorLeagueTeamPodcastWebsite(leagueKey, team.label);
-  return podcast ? [podcast] : [];
-}
-
-// ../grarf/desktop/src/lib/gamesSpine/resolveGameBrowserContext.ts
-init_define_import_meta_env();
-var TEAM_HUB_LEAGUES = ["NFL", "NHL", "NBA", "WNBA"];
-function isMlbGameRow2(game) {
-  return game.league === "MLB" || game.id.startsWith("espn-MLB-");
-}
-function resolveMlbGameForGameCenter(game) {
-  const mlbRows = useCanonicalLiveGameStore.getState().leagues.MLB ?? [];
-  const resolved = resolveMlbGameRow(game.id, mlbRows) ?? game;
-  return { ...resolved, league: "MLB" };
-}
-function resolveTeamHubLeagueFromGame(game) {
-  const league2 = game.league;
-  if (league2 && TEAM_HUB_LEAGUES.includes(league2)) {
-    return league2;
-  }
-  for (const candidate of TEAM_HUB_LEAGUES) {
-    if (game.id.startsWith(`espn-${candidate}-`)) return candidate;
-  }
-  return null;
-}
-function dedupeGameBrowserWebsitesByUrl(websites) {
-  const seen = /* @__PURE__ */ new Set();
-  const deduped = [];
-  for (const website4 of websites) {
-    const url = website4.url.trim();
-    if (!url || seen.has(url)) continue;
-    seen.add(url);
-    deduped.push({ label: website4.label, url });
-  }
-  return deduped;
-}
-function mapHomeSourcesToWebsites(sources) {
-  return filterEmbeddableHomeSources(sources).map(({ label, url }) => ({ label, url }));
-}
-function inferGameCenterLabel(game, url) {
-  const normalized = url.trim().toLowerCase();
-  if (game.league === "PLL" || normalized.includes("premierlacrosseleague.com")) {
-    return "PLL";
-  }
-  if (normalized.includes("wnba.com")) return "WNBA";
-  if (normalized.includes("fotmob.com")) return "FotMob";
-  if (normalized.includes("flashscore")) return "Flashscore";
-  if (normalized.includes("mlb.com/gameday")) return "MLB Gameday";
-  if (normalized.includes("espn.com")) return "ESPN";
-  if (normalized.includes("pgatour.com") || normalized.includes("lpga.com")) {
-    return "Leaderboard";
-  }
-  return "Game Center";
-}
-function resolveGameCenterWebsites(game) {
-  if (isMlbGameRow2(game)) {
-    const tab = buildMlbGameWorkspaceTab(resolveMlbGameForGameCenter(game));
-    const providers = tab.gamePayload?.gamecenterProviders ?? [];
-    return dedupeGameBrowserWebsitesByUrl(
-      providers.map((provider) => ({ label: provider.name, url: provider.url }))
-    );
-  }
-  const embedUrl = resolveSpineRowWorkspaceEmbedUrl(game);
-  if (!embedUrl) return [];
-  return dedupeGameBrowserWebsitesByUrl([
-    { label: inferGameCenterLabel(game, embedUrl), url: embedUrl }
-  ]);
-}
-function resolveTeamWebsitesForSide(game, side) {
-  const teamName = (side === "away" ? game.awayTeam : game.homeTeam).trim();
-  const teamAbbrev2 = (side === "away" ? game.awayTeamAbbrev : game.homeTeamAbbrev)?.trim();
-  if (!teamName && !teamAbbrev2) return [];
-  if (isMlbGameRow2(game)) {
-    const sources2 = teamAbbrev2 ? resolveMlbTeamNewsSourcesForTeamAbbrev(teamAbbrev2) : resolveMlbTeamNewsSourcesForTeam(teamName);
-    return dedupeGameBrowserWebsitesByUrl(
-      mapHomeSourcesToWebsites(mapMlbTeamNewsSourcesToHomeSourceConfig([...sources2]))
-    );
-  }
-  const league2 = resolveTeamHubLeagueFromGame(game);
-  if (!league2) return [];
-  if (teamAbbrev2) {
-    const byAbbrev = resolveNonMlbTeamNewsSourcesForTeamAbbrev(league2, teamAbbrev2);
-    if (byAbbrev.length > 0) {
-      return dedupeGameBrowserWebsitesByUrl(
-        mapHomeSourcesToWebsites(mapNonMlbTeamNewsSourcesToHomeSourceConfig([...byAbbrev]))
-      );
-    }
-  }
-  const sources = resolveNonMlbTeamNewsSourcesForTeam(
-    teamName,
-    league2.toLowerCase(),
-    teamAbbrev2 || void 0
-  );
-  return dedupeGameBrowserWebsitesByUrl(
-    mapHomeSourcesToWebsites(mapNonMlbTeamNewsSourcesToHomeSourceConfig([...sources]))
-  );
-}
-function resolveTeamLabel(game, side) {
-  const raw = (side === "away" ? game.awayTeam : game.homeTeam).trim();
-  return formatNcaafTeamMatchupDisplayName(game, side, raw);
-}
-function resolveSocialWebsites(_game) {
-  return [];
-}
-function resolveGameBrowserContext(game) {
-  return {
-    gameCenter: resolveGameCenterWebsites(game),
-    social: resolveSocialWebsites(game),
-    awayTeam: {
-      label: resolveTeamLabel(game, "away"),
-      websites: resolveTeamWebsitesForSide(game, "away")
-    },
-    homeTeam: {
-      label: resolveTeamLabel(game, "home"),
-      websites: resolveTeamWebsitesForSide(game, "home")
-    }
-  };
-}
-
-// ../grarf/desktop/src/lib/gamesSpine/resolveSportsBrowserPrototypeGameContextContentSources.ts
-init_define_import_meta_env();
-var SPORTS_BROWSER_PROTOTYPE_GAME_CONTENT_SOURCE_IDS = ["espn", "yahoo"];
-var GAME_CONTENT_SOURCE_LABELS = {
-  espn: "ESPN",
-  yahoo: "YAHOO"
-};
-var NCAAF_GAME_CONTENT_SOURCE_IDS = [
-  "yahoo",
-  "espn"
-];
-function gameContentSourceIdsForGame(game) {
-  if (game.league === "NCAAF" || game.id.startsWith("espn-NCAAF-")) {
-    return NCAAF_GAME_CONTENT_SOURCE_IDS;
-  }
-  return SPORTS_BROWSER_PROTOTYPE_GAME_CONTENT_SOURCE_IDS;
-}
-function resolveEspnContentSourceUrlFromContext(context2) {
-  for (const website4 of context2.gameCenter) {
-    const label = website4.label.trim().toUpperCase();
-    const url = website4.url.trim();
-    if (!url) continue;
-    if (label === "ESPN") return url;
-  }
-  for (const website4 of context2.gameCenter) {
-    const url = website4.url.trim();
-    if (!url) continue;
-    try {
-      if (new URL(url).hostname === "www.espn.com") return url;
-    } catch {
-      continue;
-    }
-  }
-  return null;
-}
-function resolveContentSourceUrl(sourceId, game, context2, _section) {
-  switch (sourceId) {
-    case "espn":
-      return resolveEspnContentSourceUrlFromContext(context2);
-    case "yahoo":
-      return resolveNcaafYahooSportsGameUrlFromGame(game);
-    default:
-      return null;
-  }
-}
-function resolveSportsBrowserPrototypeGameContextContentSources(game, context2, section) {
-  const sources = [];
-  for (const sourceId of gameContentSourceIdsForGame(game)) {
-    const url = resolveContentSourceUrl(sourceId, game, context2, section);
-    if (!url) continue;
-    sources.push({
-      id: sourceId,
-      label: GAME_CONTENT_SOURCE_LABELS[sourceId],
-      url
-    });
-  }
-  return sources;
-}
-function resolveSportsBrowserPrototypeGameContextContentSourceWebsites(game, context2, section) {
-  return resolveSportsBrowserPrototypeGameContextContentSources(game, context2, section).map(
-    (source) => ({ label: source.label, url: source.url })
-  );
-}
-function isSportsBrowserPrototypeGameContentParentSection(section) {
-  return section === "preview" || section === "recap";
-}
-function isSportsBrowserPrototypeNcaafGame(game) {
-  return game.league === "NCAAF" || game.id.startsWith("espn-NCAAF-");
-}
-function isSportsBrowserPrototypeGameContextSectionWithContentSourceChildren(game, section) {
-  if (isSportsBrowserPrototypeGameContentParentSection(section)) return true;
-  return section === "gameCenter" && isSportsBrowserPrototypeNcaafGame(game);
-}
-function readSportsBrowserPrototypeGameContextContentSourceIndex(pane, section) {
-  const stored = section === "preview" ? pane.gameContextPreviewSourceIndex : pane.gameContextRecapSourceIndex;
-  return typeof stored === "number" && stored >= 0 ? stored : 0;
-}
-
-// ../grarf/desktop/src/lib/gamesSpine/sportsBrowserPrototypeGameContextPane.ts
-function resolveSportsBrowserPrototypeGameContextPrimarySection(game, nowMs2 = Date.now()) {
-  if (isOperationalGameCompleted(game, nowMs2)) return "recap";
-  if (isOperationalGameNow(game, nowMs2)) return "gameCenter";
-  return "preview";
-}
-function resolveSportsBrowserPrototypeGameContextDefaultSection(game, nowMs2 = Date.now()) {
-  return resolveSportsBrowserPrototypeGameContextPrimarySection(game, nowMs2);
-}
-function resolveSportsBrowserPrototypeGameContextSectionsForGame(game, nowMs2 = Date.now()) {
-  return [
-    resolveSportsBrowserPrototypeGameContextPrimarySection(game, nowMs2),
-    "betting",
-    "awayTeam",
-    "homeTeam"
-  ];
-}
-function isSportsBrowserPrototypeGameContextPane(pane) {
-  return Boolean(pane.gameId?.trim());
-}
-function getSportsBrowserPrototypeGameContextSectionWebsites(game, context2, section) {
-  switch (section) {
-    case "preview":
-      return resolveSportsBrowserPrototypeGameContextContentSourceWebsites(game, context2, "preview");
-    case "recap":
-      return resolveSportsBrowserPrototypeGameContextContentSourceWebsites(game, context2, "recap");
-    case "betting":
-      return [];
-    case "gameCenter":
-      if (game.league === "NCAAF" || game.id.startsWith("espn-NCAAF-")) {
-        return resolveSportsBrowserPrototypeGameContextContentSourceWebsites(
-          game,
-          context2,
-          "preview"
-        );
-      }
-      return context2.gameCenter;
-    case "awayTeam":
-      return context2.awayTeam.websites;
-    case "homeTeam":
-      return context2.homeTeam.websites;
-  }
-}
-function resolveSportsBrowserPrototypeGameContextNavSectionWebsites(game, pane, context2, section) {
-  if (section !== "awayTeam" && section !== "homeTeam") {
-    return [];
-  }
-  const teamSection = pane.gameContextTeamSection ?? "news";
-  if (!teamSection) {
-    return [];
-  }
-  return resolveSportsBrowserPrototypeGameTeamContextSectionWebsites(
-    game,
-    context2,
-    section,
-    teamSection
-  );
-}
-function getSportsBrowserPrototypeGameContextSectionTabs(game, context2, nowMs2 = Date.now()) {
-  return resolveSportsBrowserPrototypeGameContextSectionsForGame(game, nowMs2).map((section) => {
-    switch (section) {
-      case "preview":
-        return { label: "PREVIEW", url: "" };
-      case "gameCenter":
-        return { label: "GAMECENTER", url: "" };
-      case "recap":
-        return { label: "RECAP", url: "" };
-      case "betting":
-        return { label: "BETTING", url: "" };
-      case "awayTeam":
-        return { label: context2.awayTeam.label, url: "" };
-      case "homeTeam":
-        return { label: context2.homeTeam.label, url: "" };
-    }
-  });
-}
-function resolveSportsBrowserPrototypeGameContextSectionIndex(pane, game, nowMs2 = Date.now()) {
-  const section = pane.gameContextSection ?? resolveSportsBrowserPrototypeGameContextDefaultSection(game, nowMs2);
-  const sections = resolveSportsBrowserPrototypeGameContextSectionsForGame(game, nowMs2);
-  const index = sections.indexOf(section);
-  return index >= 0 ? index : 0;
-}
-function applySportsBrowserPrototypeGameToPane(game) {
-  const context2 = resolveGameBrowserContext(game);
-  const defaultSection = resolveSportsBrowserPrototypeGameContextDefaultSection(game);
-  const gameCenterUrl = getSportsBrowserPrototypeGameContextSectionWebsites(game, context2, "gameCenter")[0]?.url?.trim() || null;
-  const fotmobMatchUrl = resolveFotmobMatchUrl(game);
-  const previewSourceIndex = defaultSection === "preview" ? readSportsBrowserPrototypeGameContextContentSourceIndex({}, "preview") : 0;
-  const recapSourceIndex = defaultSection === "recap" ? readSportsBrowserPrototypeGameContextContentSourceIndex({}, "recap") : 0;
-  const previewSources = resolveSportsBrowserPrototypeGameContextContentSourceWebsites(
-    game,
-    context2,
-    "preview"
-  );
-  const recapSources = resolveSportsBrowserPrototypeGameContextContentSourceWebsites(
-    game,
-    context2,
-    "recap"
-  );
-  const initialPreviewUrl = defaultSection === "preview" ? previewSources[previewSourceIndex]?.url?.trim() ?? previewSources[0]?.url?.trim() ?? null : null;
-  const initialRecapUrl = defaultSection === "recap" ? recapSources[recapSourceIndex]?.url?.trim() ?? recapSources[0]?.url?.trim() ?? null : null;
-  return {
-    url: fotmobMatchUrl ?? initialPreviewUrl ?? initialRecapUrl ?? gameCenterUrl,
-    activeTabIndex: defaultSection === "preview" ? previewSourceIndex : defaultSection === "recap" ? recapSourceIndex : 0,
-    leagueKey: null,
-    gameId: game.id,
-    gameContextSection: defaultSection,
-    leagueContextSection: null,
-    gameContextTeamSection: null,
-    gameContextPreviewSourceIndex: previewSourceIndex,
-    gameContextRecapSourceIndex: recapSourceIndex,
-    showWebsiteTabs: true,
-    documentTitle: null
-  };
-}
-function applySportsBrowserPrototypeGameTeamSideToPane(game, side) {
-  const context2 = resolveGameBrowserContext(game);
-  const contextSection = side === "away" ? "awayTeam" : "homeTeam";
-  const pane = applySportsBrowserPrototypeGameContextSectionToPane(
-    applySportsBrowserPrototypeGameToPane(game),
-    game,
-    context2,
-    contextSection
-  );
-  const websites = resolveSportsBrowserPrototypeGameContextNavSectionWebsites(
-    game,
-    { ...pane, gameContextTeamSection: "news" },
-    context2,
-    contextSection
-  );
-  const url = websites[0]?.url?.trim() ?? null;
-  return {
-    ...pane,
-    gameContextTeamSection: "news",
-    activeTabIndex: 0,
-    url,
-    documentTitle: null
-  };
-}
-function resolveGameContextSectionContentSourceWebsites(game, context2, section) {
-  if (!isSportsBrowserPrototypeGameContextSectionWithContentSourceChildren(game, section)) {
-    return null;
-  }
-  if (section === "gameCenter") {
-    const websites2 = getSportsBrowserPrototypeGameContextSectionWebsites(game, context2, "gameCenter");
-    return websites2.length > 0 ? websites2 : null;
-  }
-  const websites = getSportsBrowserPrototypeGameContextSectionWebsites(game, context2, section);
-  return websites.length > 0 ? websites : null;
-}
-function applySportsBrowserPrototypeGameContextSectionToPane(pane, game, context2, section) {
-  const enteringTeamSection = section === "awayTeam" || section === "homeTeam";
-  const leavingTeamSection = pane.gameContextSection === "awayTeam" || pane.gameContextSection === "homeTeam";
-  const contentSources = resolveGameContextSectionContentSourceWebsites(game, context2, section);
-  const contentSourceIndex = isSportsBrowserPrototypeGameContentParentSection(section) ? readSportsBrowserPrototypeGameContextContentSourceIndex(pane, section) : section === "gameCenter" ? pane.activeTabIndex ?? 0 : 0;
-  const safeContentSourceIndex = contentSources && contentSources.length > 0 ? Math.min(contentSourceIndex, contentSources.length - 1) : 0;
-  const sectionUrl = section === "gameCenter" ? getSportsBrowserPrototypeGameContextSectionWebsites(game, context2, section)[0]?.url?.trim() || null : contentSources && contentSources.length > 0 ? contentSources[safeContentSourceIndex]?.url?.trim() || null : null;
-  return {
-    ...pane,
-    gameContextSection: section,
-    activeTabIndex: isSportsBrowserPrototypeGameContextSectionWithContentSourceChildren(game, section) ? safeContentSourceIndex : 0,
-    ...sectionUrl ? { url: sectionUrl } : {},
-    ...section === "preview" ? { gameContextPreviewSourceIndex: safeContentSourceIndex } : section === "recap" ? { gameContextRecapSourceIndex: safeContentSourceIndex } : {},
-    gameContextTeamSection: enteringTeamSection ? pane.gameContextTeamSection ?? "news" : leavingTeamSection ? null : pane.gameContextTeamSection ?? null
-  };
-}
-function applySportsBrowserPrototypeGameTeamContextSectionToPane(pane, game, context2, teamSection) {
-  const gameContextSection = pane.gameContextSection;
-  if (gameContextSection !== "awayTeam" && gameContextSection !== "homeTeam") {
-    return pane;
-  }
-  const resolvedSection = teamSection ?? "news";
-  if ((pane.gameContextTeamSection ?? "news") === resolvedSection) {
-    return pane;
-  }
-  const websites = resolveSportsBrowserPrototypeGameContextNavSectionWebsites(
-    game,
-    { ...pane, gameContextTeamSection: resolvedSection },
-    context2,
-    gameContextSection
-  );
-  return {
-    ...pane,
-    gameContextTeamSection: resolvedSection,
-    activeTabIndex: 0,
-    ...websites.length > 0 ? { url: websites[0]?.url ?? null } : {}
-  };
-}
-function applySportsBrowserPrototypeGameContextWebsiteTabToPane(pane, game, context2, tabIndex) {
-  const section = pane.gameContextSection ?? "gameCenter";
-  const websites = section === "awayTeam" || section === "homeTeam" ? resolveSportsBrowserPrototypeGameContextNavSectionWebsites(game, pane, context2, section) : getSportsBrowserPrototypeGameContextSectionWebsites(game, context2, section);
-  const url = websites[tabIndex]?.url?.trim() ?? null;
-  if (pane.activeTabIndex === tabIndex && pane.url === url) {
-    return pane;
-  }
-  return {
-    ...pane,
-    activeTabIndex: tabIndex,
-    url,
-    documentTitle: null,
-    ...section === "preview" ? { gameContextPreviewSourceIndex: tabIndex } : section === "recap" ? { gameContextRecapSourceIndex: tabIndex } : {}
-  };
-}
-
 // ../grarf/desktop/src/lib/home/newsBrowserFocusSession.ts
 init_define_import_meta_env();
 var NEWS_BROWSER_FOCUS_SESSION_KEY = "news-main";
@@ -141487,7 +141570,7 @@ function SportsBrowserPrototypeBrowserWorkspace({
                 {
                   paneId: `sports-browser-pane-${index}`,
                   url: paneState.url,
-                  contentIdentityKey: paneState.gameId ?? paneState.leagueKey ?? null,
+                  contentIdentityKey: paneState.gameId ?? paneState.liveGameXSearchGameId ?? paneState.leagueKey ?? null,
                   isActive: isSelectedPane,
                   showActiveTreatment: splitPaneMode,
                   articleFocusSessionKey: index === 0 && NEWS_BROWSER_3565_ENABLED ? NEWS_BROWSER_FOCUS_SESSION_KEY : null,
@@ -141503,7 +141586,7 @@ function SportsBrowserPrototypeBrowserWorkspace({
             {
               paneId: `sports-browser-pane-${index}`,
               url: paneState?.url ?? null,
-              contentIdentityKey: paneState?.gameId ?? paneState?.leagueKey ?? null,
+              contentIdentityKey: paneState?.gameId ?? paneState?.liveGameXSearchGameId ?? paneState?.leagueKey ?? null,
               isActive: isSelectedPane,
               showActiveTreatment: splitPaneMode,
               articleFocusSessionKey: index === 0 && NEWS_BROWSER_3565_ENABLED ? NEWS_BROWSER_FOCUS_SESSION_KEY : null,
@@ -148129,7 +148212,10 @@ function HomePage() {
           leagueContextSection: "news",
           showWebsiteTabs: true
         };
-        return { ...tab, paneStates: next, activePaneIndex: paneIndex };
+        return collapseSportsBrowserLiveGameXSearchSplit(
+          { ...tab, paneStates: next, activePaneIndex: paneIndex },
+          next[paneIndex]
+        );
       }
       const url = websites[0]?.url ?? null;
       next[paneIndex] = {
@@ -148142,18 +148228,18 @@ function HomePage() {
         leagueContextSection: "news",
         showWebsiteTabs: true
       };
-      return { ...tab, paneStates: next, activePaneIndex: paneIndex };
+      return collapseSportsBrowserLiveGameXSearchSplit(
+        { ...tab, paneStates: next, activePaneIndex: paneIndex },
+        next[paneIndex]
+      );
     });
   }, [updateSportsBrowserTabForSidebarSelection]);
   const onSportsBrowserGameSelect = (0, import_react272.useCallback)(
     (game) => {
       const resolvedGame = resolveSportsBrowserPrototypeSidebarSelectedGame(game);
       updateSportsBrowserTabForSidebarSelection((tab) => {
-        const next = tab.paneStates.slice();
-        const paneIndex = resolveSportsBrowserPrototypeSidebarSelectionPaneIndex(tab);
         useHomeSourceFocusStore.getState().clearSelectedArticle(NEWS_BROWSER_FOCUS_SESSION_KEY);
-        next[paneIndex] = applySportsBrowserPrototypeGameToPane(resolvedGame);
-        return { ...tab, paneStates: next, activePaneIndex: paneIndex };
+        return applySportsBrowserPrototypeSidebarLiveGameSelection(tab, resolvedGame);
       });
     },
     [updateSportsBrowserTabForSidebarSelection]
