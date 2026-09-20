@@ -15603,6 +15603,12 @@ function isOperationalLiveRowAuthoritativelyFresh(game, nowMs = Date.now()) {
   if (lastUpdatedMs == null) return false;
   return nowMs - lastUpdatedMs <= OPERATIONAL_LIVE_MAX_STALE_UPDATE_MS;
 }
+function isOperationalProviderPollAuthoritativelyFresh(providerPollCompletedAt, nowMs = Date.now()) {
+  if (providerPollCompletedAt == null || !String(providerPollCompletedAt).trim()) return false;
+  const completedMs = Date.parse(String(providerPollCompletedAt));
+  if (!Number.isFinite(completedMs)) return false;
+  return nowMs - completedMs <= OPERATIONAL_LIVE_MAX_STALE_UPDATE_MS;
+}
 
 // ../grarf/desktop/src/lib/updateEngine/updateEngineCadences.ts
 init_define_import_meta_env();
@@ -16009,8 +16015,14 @@ function parseOperationalTransportGeneratedAtMs(generatedAt) {
   const ms = Date.parse(generatedAt);
   return Number.isFinite(ms) ? ms : Number.NEGATIVE_INFINITY;
 }
-function getLastAppliedOperationalTransportGeneratedAt() {
-  return lastAppliedOperationalTransportGeneratedAt;
+function getLastAppliedOperationalTransportGeneratedAtMs() {
+  return lastAppliedOperationalTransportGeneratedAtMs;
+}
+function getLastAppliedCloudTransportGeneratedAtMs() {
+  return lastAppliedCloudTransportGeneratedAtMs;
+}
+function getLastAppliedEspnLocalTransportGeneratedAtMs() {
+  return lastAppliedEspnLocalTransportGeneratedAtMs;
 }
 function shouldAcceptOperationalTransportHydrate(transportGeneratedAt, ingestSource) {
   const incomingMs = parseOperationalTransportGeneratedAtMs(transportGeneratedAt);
@@ -16038,6 +16050,157 @@ function recordAppliedOperationalTransportGeneratedAt(transportGeneratedAt, inge
   if (incomingMs <= lastAppliedOperationalTransportGeneratedAtMs) return;
   lastAppliedOperationalTransportGeneratedAtMs = incomingMs;
   lastAppliedOperationalTransportGeneratedAt = transportGeneratedAt ?? null;
+}
+
+// ../grarf/desktop/src/services/operationalIngest/grarfLiveGameUpdateTrace.ts
+init_define_import_meta_env();
+var TRACE_PREFIX = "[GRARF-LIVE-TRACE]";
+var traceEvents = [];
+var pollCycle = 0;
+var prevCycleByStage = {};
+var currentCycleSnapshots = {};
+function isGrarfLiveGameTraceEnabled() {
+  return Boolean(resolveGrarfLiveTraceGameId());
+}
+function resolveGrarfLiveTraceGameId() {
+  const raw = define_import_meta_env_default.VITE_GRARF_LIVE_TRACE_GAME_ID?.trim();
+  return raw || null;
+}
+function gameMatchesTraceId(game, traceId) {
+  if (!game?.id) return false;
+  if (game.id === traceId) return true;
+  if (game.id.endsWith(`-${traceId}`)) return true;
+  if (traceId.includes("-") && game.id === traceId) return true;
+  return game.id.includes(traceId);
+}
+function findTracedGameInLeagues(leagues) {
+  const traceId = resolveGrarfLiveTraceGameId();
+  if (!traceId || !leagues) return { game: null, league: null };
+  for (const [key, rows] of Object.entries(leagues)) {
+    if (!Array.isArray(rows)) continue;
+    const game = rows.find((row) => gameMatchesTraceId(row, traceId));
+    if (game) return { game, league: key };
+  }
+  return { game: null, league: null };
+}
+function snapshotFromGame(game, generatedAt) {
+  if (!game) {
+    return {
+      exists: false,
+      score: null,
+      clock: null,
+      status: null,
+      lastUpdated: null,
+      generatedAt: generatedAt ?? null,
+      league: null
+    };
+  }
+  return {
+    exists: true,
+    score: formatTraceScore(game),
+    clock: formatTraceClock(game),
+    status: game.status ?? null,
+    lastUpdated: game.lastUpdated ?? null,
+    generatedAt: generatedAt ?? null,
+    league: game.league ?? null
+  };
+}
+function snapshotFromTransport(transport) {
+  const { game } = findTracedGameInLeagues(transport.leagues);
+  return snapshotFromGame(game, transport.generatedAt ?? null);
+}
+function formatTraceScore(game) {
+  const away = game.awayScore ?? "?";
+  const home = game.homeScore ?? "?";
+  return `${away}-${home}`;
+}
+function formatTraceClock(game) {
+  const clock = game.displayClock?.trim();
+  if (clock) return clock;
+  const line = game.statusLine?.trim();
+  if (line) return line;
+  if (game.period != null && Number.isFinite(game.period)) return `P${game.period}`;
+  return game.status ?? "?";
+}
+function compareToPreviousCycle(stage, snap) {
+  const prev = prevCycleByStage[stage];
+  if (!prev) {
+    return { result: snap.exists ? "NEW" : "MISSING", dropReason: snap.exists ? void 0 : "game_absent_first_cycle" };
+  }
+  if (!snap.exists) {
+    return { result: "MISSING", dropReason: prev.exists ? "game_dropped_since_prior_cycle" : "game_still_absent" };
+  }
+  if (!prev.exists) {
+    return { result: "NEW" };
+  }
+  const same = prev.score === snap.score && prev.clock === snap.clock && prev.status === snap.status && prev.lastUpdated === snap.lastUpdated && prev.generatedAt === snap.generatedAt;
+  return { result: same ? "UNCHANGED" : "NEW" };
+}
+function logGrarfLiveGameTrace(stage, fields, gameSnapshot) {
+  if (!isGrarfLiveGameTraceEnabled()) return;
+  const gameId = resolveGrarfLiveTraceGameId();
+  const cycle = pollCycle;
+  const snap = gameSnapshot;
+  const lines = [`cycle=${cycle}`, `stage=${stage}`, `game=${gameId}`];
+  for (const [key, value] of Object.entries(fields)) {
+    if (value === void 0) continue;
+    lines.push(`${key}=${value}`);
+  }
+  if (snap) {
+    currentCycleSnapshots[stage] = snap;
+    lines.push(`exists=${snap.exists}`);
+    if (snap.generatedAt) lines.push(`generatedAt=${snap.generatedAt}`);
+    if (snap.score) lines.push(`score=${snap.score}`);
+    if (snap.clock) lines.push(`clock=${snap.clock}`);
+    if (snap.status) lines.push(`status=${snap.status}`);
+    if (snap.lastUpdated) lines.push(`lastUpdated=${snap.lastUpdated}`);
+    if (snap.league) lines.push(`league=${snap.league}`);
+    const { result, dropReason } = compareToPreviousCycle(stage, snap);
+    lines.push(`result=${result}`);
+    if (dropReason) lines.push(`dropReason=${dropReason}`);
+  }
+  const message = `${TRACE_PREFIX}
+${lines.join("\n")}`;
+  console.log(message);
+  traceEvents.push(message);
+}
+function logGrarfLiveGameTraceFromLeagues(stage, leagues, extra, generatedAt) {
+  const { game } = findTracedGameInLeagues(leagues);
+  const snap = snapshotFromGame(game, generatedAt ?? null);
+  logGrarfLiveGameTrace(stage, extra ?? {}, snap);
+  return snap;
+}
+function logGrarfLiveGameTraceFromTransport(stage, transport, extra) {
+  const snap = snapshotFromTransport(transport);
+  logGrarfLiveGameTrace(
+    stage,
+    {
+      ...extra,
+      generatedAt: transport.generatedAt ?? null,
+      source: transport.source ?? null
+    },
+    snap
+  );
+  return snap;
+}
+function traceGrarfLiveGameLiveStoreHydrateRejected(rejectReason, incomingLeagues) {
+  if (!isGrarfLiveGameTraceEnabled()) return;
+  const canonical = useCanonicalLiveGameStore.getState();
+  const incoming = findTracedGameInLeagues(incomingLeagues);
+  logGrarfLiveGameTraceFromLeagues(
+    "CANONICAL_LIVE_STORE",
+    canonical.leagues,
+    {
+      ingested: false,
+      rejectReason,
+      incomingHadTracedGame: Boolean(incoming.game)
+    },
+    canonical.updatedAt
+  );
+}
+function traceGrarfLiveGameCanonicalIngest(leagues, fields, watermark) {
+  if (!isGrarfLiveGameTraceEnabled()) return;
+  logGrarfLiveGameTraceFromLeagues("CANONICAL_LIVE_STORE", leagues, fields, watermark ?? null);
 }
 
 // ../grarf/desktop/src/store/canonicalLiveGameStore.ts
@@ -16158,6 +16321,10 @@ var useCanonicalLiveGameStore = create((set, get) => ({
         snap,
         note: "canonical boundary rejected incoming snapshot"
       });
+      traceGrarfLiveGameCanonicalIngest(prev.leagues, {
+        ingested: false,
+        rejectReason: rejection
+      }, prev.updatedAt);
       return;
     }
     const normalizedVersion = prev.normalizedVersion + 1;
@@ -16208,6 +16375,10 @@ var useCanonicalLiveGameStore = create((set, get) => ({
         previousUpdatedAt: prev.updatedAt,
         snap
       });
+      traceGrarfLiveGameCanonicalIngest(prev.leagues, {
+        ingested: false,
+        rejectReason: "rejected_no_op"
+      }, prev.updatedAt);
       return;
     }
     logOperationalCanonicalIngestDecision({
@@ -16226,6 +16397,12 @@ var useCanonicalLiveGameStore = create((set, get) => ({
       ingestSequence,
       sourceProvider
     });
+    traceGrarfLiveGameCanonicalIngest(leagues, {
+      ingested: true,
+      rejectReason: null,
+      transportGeneratedAt: meta?.transportGeneratedAt ?? null,
+      watermark: updatedAt
+    }, updatedAt);
   },
   patchGameRows: (patches) => {
     if (patches.length === 0) return;
@@ -16686,6 +16863,11 @@ function isGameEligibleForCurrentOperationalLivePoll(game, nowMs = Date.now()) {
 }
 function isConfirmedLiveBySuccessfulLeaguePoll(game, poll, nowMs = Date.now()) {
   if (game.status !== "live") return false;
+  if (!isOperationalLiveRowAuthoritativelyFresh(game, nowMs)) return false;
+  const pollCompletedAt = poll.providerPollCompletedAt;
+  if (!pollCompletedAt?.trim() || !isOperationalProviderPollAuthoritativelyFresh(pollCompletedAt, nowMs)) {
+    return false;
+  }
   const league2 = game.league;
   if (!league2) return false;
   const entry2 = poll.leaguePolls?.[league2];
@@ -16705,11 +16887,19 @@ function isProviderConfirmedLive(game, authorityState, nowMs = Date.now()) {
   if (game.metadata?.manualGamesSpine) return true;
   const state = authorityState ?? getOperationalLiveAuthorityState();
   const { operationalProviderPoll, lastTransportGeneratedAt } = state;
-  if (!shouldApplyProviderPollLiveGate(state)) {
+  const onCloudGate = shouldApplyProviderPollLiveGate(state);
+  const rowFresh = isOperationalLiveRowAuthoritativelyFresh(game, nowMs);
+  const transportFresh = isRecentTransportLiveRow(game, lastTransportGeneratedAt, nowMs);
+  if (onCloudGate) {
+    if (!rowFresh) return false;
+  } else if (!rowFresh && !transportFresh && !isLegacyCloudLiveRowFresh(game, nowMs)) {
+    return false;
+  }
+  if (!onCloudGate) {
     if (isLegacyCloudLiveRowFresh(game, nowMs)) {
       return isGameEligibleForCurrentOperationalLivePoll(game, nowMs);
     }
-    if (isRecentTransportLiveRow(game, lastTransportGeneratedAt, nowMs)) {
+    if (transportFresh) {
       return isGameEligibleForCurrentOperationalLivePoll(game, nowMs);
     }
     return false;
@@ -16718,7 +16908,7 @@ function isProviderConfirmedLive(game, authorityState, nowMs = Date.now()) {
     if (isLegacyCloudLiveRowFresh(game, nowMs)) {
       return isGameEligibleForCurrentOperationalLivePoll(game, nowMs);
     }
-    if (isRecentTransportLiveRow(game, lastTransportGeneratedAt, nowMs)) {
+    if (transportFresh) {
       return isGameEligibleForCurrentOperationalLivePoll(game, nowMs);
     }
     return false;
@@ -16729,9 +16919,12 @@ function isProviderConfirmedLive(game, authorityState, nowMs = Date.now()) {
     if (isLegacyCloudLiveRowFresh(game, nowMs)) {
       return isGameEligibleForCurrentOperationalLivePoll(game, nowMs);
     }
-    if (isRecentTransportLiveRow(game, lastTransportGeneratedAt, nowMs)) {
+    if (transportFresh) {
       return isGameEligibleForCurrentOperationalLivePoll(game, nowMs);
     }
+    return false;
+  }
+  if (!isOperationalProviderPollAuthoritativelyFresh(providerPollCompletedAt, nowMs)) {
     return false;
   }
   if (isGameLastUpdatedProviderConfirmed(game, providerPollCompletedAt)) {
@@ -16744,9 +16937,6 @@ function isProviderConfirmedLive(game, authorityState, nowMs = Date.now()) {
     return true;
   }
   if (isLegacyCloudLiveRowFresh(game, nowMs)) {
-    return isGameEligibleForCurrentOperationalLivePoll(game, nowMs);
-  }
-  if (isRecentTransportLiveRow(game, lastTransportGeneratedAt, nowMs)) {
     return isGameEligibleForCurrentOperationalLivePoll(game, nowMs);
   }
   return false;
@@ -17049,7 +17239,19 @@ function isSupersededByAuthoritativeEspnEventRow(game) {
   }
   return false;
 }
+function isStaleOperationalIngestLiveRow(game, nowMs) {
+  if (game.status !== "live" || game.metadata?.manualGamesSpine) return false;
+  if (!isOperationalLiveRowAuthoritativelyFresh(game, nowMs)) return true;
+  const authority = getOperationalLiveAuthorityState();
+  if (authority.lastTransportSource !== "grarf_cloud" && !authority.operationalProviderPoll) {
+    return false;
+  }
+  const pollCompletedAt = authority.operationalProviderPoll?.providerPollCompletedAt?.trim() || authority.lastTransportGeneratedAt?.trim() || "";
+  if (!pollCompletedAt) return true;
+  return !isOperationalProviderPollAuthoritativelyFresh(pollCompletedAt, nowMs);
+}
 function hasAuthoritativeOperationalGameEnded(game, nowMs = Date.now()) {
+  if (isStaleOperationalIngestLiveRow(game, nowMs)) return true;
   if (game.status === "final" || isSpineFinalizedGame(game)) return true;
   if (hasRetainedCanonicalFinalRow(game, nowMs)) return true;
   if (isSupersededByAuthoritativeEspnEventRow(game)) return true;
@@ -23847,7 +24049,7 @@ function prefetchWebOperationalCloudSnapshot() {
   }
   if (!webCloudSnapshotPrefetch) {
     webCloudSnapshotPrefetch = fetchViaGrarfCloudService(
-      shouldUseWebBootstrapCloudPrefetch() ? { webBootstrap: true } : void 0
+      shouldUseWebBootstrapCloudPrefetch() ? { webBootstrap: true, traceFetchKind: "prefetch" } : { traceFetchKind: "prefetch" }
     ).then((snap) => countOperationalGames(snap) > 0 ? snap : null).catch((e) => {
       console.warn(`${LOG9} web cloud prefetch failed`, e);
       return null;
@@ -23856,15 +24058,16 @@ function prefetchWebOperationalCloudSnapshot() {
   return webCloudSnapshotPrefetch;
 }
 async function fetchGrarfCloudOperationalSnapshot() {
+  const joinedExistingInFlight = Boolean(grarfCloudSnapshotFetchInFlight);
   if (!grarfCloudSnapshotFetchInFlight) {
-    grarfCloudSnapshotFetchInFlight = (async () => {
-      const prefetched = await prefetchWebOperationalCloudSnapshot();
-      if (prefetched && countOperationalGames(prefetched) > 0) {
-        return prefetched;
-      }
-      return fetchViaGrarfCloudService();
-    })().finally(() => {
+    grarfCloudSnapshotFetchInFlight = fetchViaGrarfCloudService({ traceFetchKind: "recurring_network" }).finally(() => {
       grarfCloudSnapshotFetchInFlight = null;
+    });
+  } else if (isGrarfLiveGameTraceEnabled()) {
+    logGrarfLiveGameTrace("CLOUD_FETCH", {
+      subphase: "coalesce",
+      transportKind: "joined_in_flight",
+      note: "fetchGrarfCloudOperationalSnapshot reused in-flight promise"
     });
   }
   return grarfCloudSnapshotFetchInFlight;
@@ -24043,13 +24246,25 @@ async function fetchViaGrarfCloudService(options) {
   if (!cloudBaseUrl) {
     throw new Error("[OperationalIngest] grarf_cloud provider requires VITE_GRARF_OPERATIONAL_INGEST_URL");
   }
-  const url = resolveGrarfCloudOperationalSnapshotUrl(cloudBaseUrl);
+  const urlBase = resolveGrarfCloudOperationalSnapshotUrl(cloudBaseUrl);
+  const url = `${urlBase}${urlBase.includes("?") ? "&" : "?"}clientMs=${Date.now()}`;
   const maxAttempts = options?.webBootstrap ? 1 : CLOUD_FETCH_MAX_ATTEMPTS;
   let lastError;
   for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
     try {
+      const requestAt = (/* @__PURE__ */ new Date()).toISOString();
+      if (isGrarfLiveGameTraceEnabled()) {
+        logGrarfLiveGameTrace("CLOUD_FETCH", {
+          subphase: "request",
+          requestAt,
+          url,
+          attempt,
+          transportKind: options?.traceFetchKind ?? "network"
+        });
+      }
       const res = await fetch(url, {
         headers: { Accept: "application/json" },
+        cache: "no-store",
         signal: AbortSignal.timeout(
           options?.webBootstrap ? WEB_CLOUD_BOOTSTRAP_TIMEOUT_MS : CLOUD_FETCH_TIMEOUT_MS
         )
@@ -24069,8 +24284,21 @@ async function fetchViaGrarfCloudService(options) {
       const transport = {
         generatedAt: json.generatedAt ?? (/* @__PURE__ */ new Date()).toISOString(),
         source: json.source ?? "grarf_operational_service",
-        leagues: json.leagues ?? {}
+        leagues: json.leagues ?? {},
+        providerPoll: json.providerPoll,
+        initialIngestComplete: json.initialIngestComplete
       };
+      if (isGrarfLiveGameTraceEnabled()) {
+        logGrarfLiveGameTraceFromTransport("CLOUD_FETCH", transport, {
+          subphase: "response",
+          responseAt: (/* @__PURE__ */ new Date()).toISOString(),
+          requestAt,
+          httpStatus: res.status,
+          url,
+          transportKind: options?.traceFetchKind ?? "network",
+          cachedResponse: false
+        });
+      }
       return transport;
     } catch (e) {
       lastError = e instanceof Error ? e.message : String(e);
@@ -24135,13 +24363,20 @@ async function joinWebMlbProviderIds(transport) {
 }
 async function fetchOperationalSnapshot() {
   const config = getOperationalIngestConfig();
+  let transport;
   if (isGrarfWebRenderer() && !hasElectronGamesIpc()) {
-    return fetchViaWebOperationalIngest();
+    transport = await fetchViaWebOperationalIngest();
+  } else if (config.provider === "grarf_cloud") {
+    transport = await fetchGrarfCloudOperationalSnapshot();
+  } else {
+    transport = await fetchViaEspnLocalIpcAdapter();
   }
-  if (config.provider === "grarf_cloud") {
-    return fetchGrarfCloudOperationalSnapshot();
+  if (isGrarfLiveGameTraceEnabled()) {
+    logGrarfLiveGameTraceFromTransport("FETCH_RESULT", transport, {
+      transportSource: transport.source ?? null
+    });
   }
-  return fetchViaEspnLocalIpcAdapter();
+  return transport;
 }
 
 // ../grarf/desktop/src/services/operationalIngest/electronIpcOperationalAuthority.ts
@@ -24244,7 +24479,7 @@ function preserveMissingOperationalIngestGames(incoming, previousGames) {
       incomingIds.add(prev.id);
       continue;
     }
-    if (prev.status === "postponed") {
+    if (prev.status === "postponed" || prev.status === "delayed" || prev.status === "suspended" || prev.status === "scheduled" && isGameOnGamesSpineOperationalDate(prev, sportsDayKey)) {
       preserved.push({ ...prev });
       incomingIds.add(prev.id);
       continue;
@@ -24273,6 +24508,24 @@ function filterContradictorySupplementalFinals(games, previousGames) {
   );
   if (protectedIds.size === 0) return games;
   return games.filter((g) => g.status !== "final" || !protectedIds.has(g.id));
+}
+function mergeFinalRowsWithoutContradictingProtectedGames(primary, extraLeagues, previousGames) {
+  const protectedIds = new Set(
+    previousGames.filter((g) => g.status === "live" || g.status === "postponed").map((g) => g.id)
+  );
+  const leagues = { ...primary.leagues };
+  let changed = false;
+  for (const key of getGamesColumnLeagueOrder()) {
+    const rows = leagues[key] ?? [];
+    const ids = new Set(rows.map((g) => g.id));
+    const extras = (extraLeagues[key] ?? []).filter(
+      (g) => g.status === "final" && !ids.has(g.id) && !protectedIds.has(g.id)
+    );
+    if (extras.length === 0) continue;
+    leagues[key] = [...rows, ...extras];
+    changed = true;
+  }
+  return changed ? { ...primary, leagues } : primary;
 }
 
 // ../grarf/desktop/src/lib/finalizedGameRetention/mergeCatchUpIngestSnapshot.ts
@@ -24758,6 +25011,76 @@ function resolveOperationalStartupGateState(input) {
   };
 }
 
+// ../grarf/desktop/src/services/operationalIngest/mergeGrarfCloudOperationalSnapshot.ts
+init_define_import_meta_env();
+function mergeGrarfCloudOperationalGameOverPrevious(cloudGame, previousGame) {
+  if (!previousGame) return cloudGame;
+  const prevYahoo = previousGame.metadata?.yahooSportsGameUrl?.trim();
+  if (!prevYahoo || cloudGame.metadata?.yahooSportsGameUrl?.trim()) {
+    return cloudGame;
+  }
+  return {
+    ...cloudGame,
+    metadata: {
+      ...cloudGame.metadata,
+      yahooSportsGameUrl: prevYahoo
+    }
+  };
+}
+function mergeGrarfCloudOperationalLeaguesOverPrevious(cloudLeagues, previousLeagues) {
+  const merged = { ...previousLeagues };
+  for (const [key, cloudRows] of Object.entries(cloudLeagues)) {
+    if (!Array.isArray(cloudRows) || cloudRows.length === 0) continue;
+    const leagueKey = key;
+    const previousRows = merged[leagueKey];
+    if (!Array.isArray(previousRows) || previousRows.length === 0) {
+      merged[leagueKey] = cloudRows;
+      continue;
+    }
+    const byId = new Map(previousRows.map((game) => [game.id, game]));
+    for (const cloudGame of cloudRows) {
+      byId.set(
+        cloudGame.id,
+        mergeGrarfCloudOperationalGameOverPrevious(cloudGame, byId.get(cloudGame.id))
+      );
+    }
+    merged[leagueKey] = Array.from(byId.values());
+  }
+  return merged;
+}
+function parseUpdatedAtMs(updatedAt) {
+  if (!updatedAt?.trim()) return 0;
+  const ms = Date.parse(updatedAt);
+  return Number.isFinite(ms) ? ms : 0;
+}
+function mergeGrarfCloudTransportIntoOperationalSnapshot(input) {
+  const previousCount = countOperationalGames2(input.previousLeagues);
+  const mergedLeagues = previousCount === 0 ? input.incoming.leagues ?? {} : mergeGrarfCloudOperationalLeaguesOverPrevious(
+    input.incoming.leagues ?? {},
+    input.previousLeagues
+  );
+  let merged = preserveMissingOperationalIngestGames(
+    {
+      ...input.incoming,
+      leagues: mergedLeagues
+    },
+    input.previousGames
+  );
+  if (previousCount > 0) {
+    merged = mergeFinalRowsWithoutContradictingProtectedGames(
+      merged,
+      input.previousLeagues,
+      input.previousGames
+    );
+  }
+  const incomingMs = parseUpdatedAtMs(input.incoming.updatedAt);
+  const previousMs = parseUpdatedAtMs(input.previousUpdatedAt);
+  if (incomingMs > 0 && (previousMs === 0 || incomingMs >= previousMs)) {
+    merged = { ...merged, updatedAt: input.incoming.updatedAt ?? merged.updatedAt };
+  }
+  return merged;
+}
+
 // ../grarf/desktop/src/store/liveGamesStore.ts
 function gameRowsMateriallyEqual(a, b) {
   if (a === b) return true;
@@ -24801,6 +25124,15 @@ function leaguesMateriallyEqual(next, prev) {
 }
 function liveGamesMirrorMateriallyEqual(next, prev) {
   return next.updatedAt === prev.updatedAt && leaguesMateriallyEqual(next.leagues, prev.leagues);
+}
+function resolveLastAppliedOperationalTransportMs(ingestSource) {
+  if (ingestSource === "grarf_cloud") {
+    return getLastAppliedCloudTransportGeneratedAtMs();
+  }
+  if (ingestSource === "espn_local_adapter" || ingestSource === "espn_scoreboard_ipc") {
+    return getLastAppliedEspnLocalTransportGeneratedAtMs();
+  }
+  return getLastAppliedOperationalTransportGeneratedAtMs();
 }
 var CANONICAL_CARRY_FORWARD_GAME_FIELDS = /* @__PURE__ */ new Set([
   "finalizedAtMs",
@@ -24889,6 +25221,23 @@ var useLiveGamesStore = create((set, get) => ({
   updatedAt: useCanonicalLiveGameStore.getState().updatedAt,
   hydrate: (snap, completeness) => {
     const ingestSource = completeness?.source;
+    const prevCanonical = useCanonicalLiveGameStore.getState();
+    let effectiveSnap = snap;
+    if (ingestSource === "grarf_cloud") {
+      effectiveSnap = mergeGrarfCloudTransportIntoOperationalSnapshot({
+        incoming: snap,
+        previousLeagues: prevCanonical.leagues,
+        previousGames: Object.values(prevCanonical.gamesById).map((row) => row.game),
+        previousUpdatedAt: prevCanonical.updatedAt
+      });
+    }
+    const traceLiveStoreReject = (rejectReason) => {
+      traceGrarfLiveGameLiveStoreHydrateRejected(rejectReason, effectiveSnap.leagues);
+    };
+    if (hasElectronGamesIpc() && getOperationalIngestConfig().provider === "grarf_cloud" && (ingestSource === "espn_local_adapter" || ingestSource === "espn_scoreboard_ipc") && countOperationalGames2(prevCanonical.leagues) > 0 && useGamesSpineRenderStore.getState().lastTransportSource === "grarf_cloud") {
+      traceLiveStoreReject("rejected_ipc_overwrite_after_cloud_authority");
+      return;
+    }
     if (hasElectronGamesIpc() && (ingestSource === "espn_local_adapter" || ingestSource === "espn_scoreboard_ipc") && !isOperationalStartupSnapshotReady(
       {
         initialIngestComplete: completeness?.initialIngestComplete,
@@ -24908,9 +25257,9 @@ var useLiveGamesStore = create((set, get) => ({
         ),
         liveGames: summarizeLiveGamesForDiagnostic(snap.leagues)
       });
+      traceLiveStoreReject("rejected_incomplete_startup_snapshot");
       return;
     }
-    const prevCanonical = useCanonicalLiveGameStore.getState();
     if (ingestSource === "grarf_cloud" && shouldRejectEmptyCloudHydrateOnElectron(snap.leagues)) {
       logOperationalHydrateDecision({
         stage: "hydrate_exit",
@@ -24921,10 +25270,11 @@ var useLiveGamesStore = create((set, get) => ({
         gameCount: 0,
         liveGames: summarizeLiveGamesForDiagnostic(snap.leagues)
       });
+      traceLiveStoreReject("skipped_cloud_local_authority");
       return;
     }
     if (ingestSource === "grarf_cloud" && shouldRejectCloudHydrateThatClearsValidPopulation(
-      snap.leagues,
+      effectiveSnap.leagues,
       prevCanonical.leagues,
       { providerPoll: completeness?.providerPoll }
     )) {
@@ -24933,19 +25283,20 @@ var useLiveGamesStore = create((set, get) => ({
         outcome: "rejected_cloud_would_clear_valid_population",
         source: ingestSource,
         transportGeneratedAt: completeness?.transportGeneratedAt ?? null,
-        snapshotUpdatedAt: snap.updatedAt ?? null,
-        gameCount: Object.values(snap.leagues ?? {}).reduce(
+        snapshotUpdatedAt: effectiveSnap.updatedAt ?? null,
+        gameCount: Object.values(effectiveSnap.leagues ?? {}).reduce(
           (count, rows) => count + (Array.isArray(rows) ? rows.length : 0),
           0
         ),
-        liveGames: summarizeLiveGamesForDiagnostic(snap.leagues)
+        liveGames: summarizeLiveGamesForDiagnostic(effectiveSnap.leagues)
       });
+      traceLiveStoreReject("rejected_cloud_would_clear_valid_population");
       return;
     }
     const renderState = useGamesSpineRenderStore.getState();
     if (shouldRejectRegressiveOperationalSnapshot(
-      snap.leagues,
-      snap.updatedAt,
+      effectiveSnap.leagues,
+      effectiveSnap.updatedAt,
       completeness?.transportGeneratedAt ?? null,
       resolveOperationalStartupGateState({
         hasPromotedInitialSnapshot: renderState.hasPromotedInitialSnapshot,
@@ -24958,13 +25309,14 @@ var useLiveGamesStore = create((set, get) => ({
         outcome: "rejected_regressive_snapshot",
         source: ingestSource,
         transportGeneratedAt: completeness?.transportGeneratedAt ?? null,
-        snapshotUpdatedAt: snap.updatedAt ?? null,
-        gameCount: Object.values(snap.leagues ?? {}).reduce(
+        snapshotUpdatedAt: effectiveSnap.updatedAt ?? null,
+        gameCount: Object.values(effectiveSnap.leagues ?? {}).reduce(
           (count, rows) => count + (Array.isArray(rows) ? rows.length : 0),
           0
         ),
-        liveGames: summarizeLiveGamesForDiagnostic(snap.leagues)
+        liveGames: summarizeLiveGamesForDiagnostic(effectiveSnap.leagues)
       });
+      traceLiveStoreReject("rejected_regressive_snapshot");
       return;
     }
     const transportGeneratedAt = completeness?.transportGeneratedAt?.trim();
@@ -24973,7 +25325,9 @@ var useLiveGamesStore = create((set, get) => ({
         transportGeneratedAt,
         ingestSource
       );
-      const materiallyDiffers = !gamesSnapshotMateriallyMatchesCanonical(snap, { ingestSource });
+      const materiallyDiffers = !gamesSnapshotMateriallyMatchesCanonical(effectiveSnap, {
+        ingestSource
+      });
       if (!acceptByFreshness) {
         if (!materiallyDiffers) {
           logOperationalHydrateDecision({
@@ -24981,47 +25335,49 @@ var useLiveGamesStore = create((set, get) => ({
             outcome: "rejected_stale_transport",
             source: ingestSource,
             transportGeneratedAt,
-            snapshotUpdatedAt: snap.updatedAt ?? null,
-            gameCount: Object.values(snap.leagues ?? {}).reduce(
+            snapshotUpdatedAt: effectiveSnap.updatedAt ?? null,
+            gameCount: Object.values(effectiveSnap.leagues ?? {}).reduce(
               (count, rows) => count + (Array.isArray(rows) ? rows.length : 0),
               0
             ),
-            liveGames: summarizeLiveGamesForDiagnostic(snap.leagues)
+            liveGames: summarizeLiveGamesForDiagnostic(effectiveSnap.leagues)
           });
           if (define_import_meta_env_default.DEV) {
             broadcastDebug(
               `[CanonicalLive] Skip stale operational hydrate ${transportGeneratedAt}`
             );
           }
+          traceLiveStoreReject("rejected_stale_transport_no_material_diff");
           return;
         }
         const incomingMs = parseOperationalTransportGeneratedAtMs(transportGeneratedAt);
-        const lastAppliedMs = parseOperationalTransportGeneratedAtMs(
-          getLastAppliedOperationalTransportGeneratedAt()
-        );
+        const lastAppliedMs = resolveLastAppliedOperationalTransportMs(ingestSource);
         if (incomingMs < lastAppliedMs) {
           logOperationalHydrateDecision({
             stage: "hydrate_exit",
             outcome: "rejected_stale_transport",
             source: ingestSource,
             transportGeneratedAt,
-            snapshotUpdatedAt: snap.updatedAt ?? null,
-            gameCount: Object.values(snap.leagues ?? {}).reduce(
+            snapshotUpdatedAt: effectiveSnap.updatedAt ?? null,
+            gameCount: Object.values(effectiveSnap.leagues ?? {}).reduce(
               (count, rows) => count + (Array.isArray(rows) ? rows.length : 0),
               0
             ),
-            liveGames: summarizeLiveGamesForDiagnostic(snap.leagues)
+            liveGames: summarizeLiveGamesForDiagnostic(effectiveSnap.leagues)
           });
+          traceLiveStoreReject("rejected_stale_transport_incoming_older_than_last_applied");
           return;
         }
+      } else {
+        recordAppliedOperationalTransportGeneratedAt(transportGeneratedAt, ingestSource);
       }
     }
-    if (gamesSnapshotMateriallyMatchesCanonical(snap, { ingestSource })) {
+    if (gamesSnapshotMateriallyMatchesCanonical(effectiveSnap, { ingestSource })) {
       const ipcTransportSource = ingestSource === "espn_local_adapter" || ingestSource === "espn_scoreboard_ipc";
       if (ingestSource === "grarf_cloud" || hasElectronGamesIpc() && ipcTransportSource) {
-        useGamesSpineRenderStore.getState().markOperationalIngest(snap.leagues, {
+        useGamesSpineRenderStore.getState().markOperationalIngest(effectiveSnap.leagues, {
           source: ingestSource ?? "espn_scoreboard_ipc",
-          transportGeneratedAt: transportGeneratedAt ?? snap.updatedAt ?? void 0,
+          transportGeneratedAt: transportGeneratedAt ?? effectiveSnap.updatedAt ?? void 0,
           providerPoll: completeness?.providerPoll,
           initialIngestComplete: completeness?.initialIngestComplete
         });
@@ -25031,12 +25387,13 @@ var useLiveGamesStore = create((set, get) => ({
         outcome: "skipped_no_op_hydrate",
         source: ingestSource,
         transportGeneratedAt: transportGeneratedAt ?? null,
-        snapshotUpdatedAt: snap.updatedAt ?? null,
-        liveGames: summarizeLiveGamesForDiagnostic(snap.leagues)
+        snapshotUpdatedAt: effectiveSnap.updatedAt ?? null,
+        liveGames: summarizeLiveGamesForDiagnostic(effectiveSnap.leagues)
       });
       if (define_import_meta_env_default.DEV) {
-        broadcastDebug(`[CanonicalLive] Skip no-op hydrate ${snap.updatedAt ?? "?"}`);
+        broadcastDebug(`[CanonicalLive] Skip no-op hydrate ${effectiveSnap.updatedAt ?? "?"}`);
       }
+      traceLiveStoreReject("skipped_no_op_hydrate");
       return;
     }
     logOperationalHydrateDecision({
@@ -25044,15 +25401,15 @@ var useLiveGamesStore = create((set, get) => ({
       outcome: "accepted",
       source: ingestSource,
       transportGeneratedAt: transportGeneratedAt ?? null,
-      snapshotUpdatedAt: snap.updatedAt ?? null,
-      liveGames: summarizeLiveGamesForDiagnostic(snap.leagues)
+      snapshotUpdatedAt: effectiveSnap.updatedAt ?? null,
+      liveGames: summarizeLiveGamesForDiagnostic(effectiveSnap.leagues)
     });
     if (define_import_meta_env_default.DEV) {
-      broadcastDebug(`[CanonicalLive] Ingest ${snap.updatedAt ?? "?"}`);
+      broadcastDebug(`[CanonicalLive] Ingest ${effectiveSnap.updatedAt ?? "?"}`);
     }
     if (define_import_meta_env_default.DEV && define_import_meta_env_default.VITE_TRACE_FINAL_LIVE_FIELDS === "1") {
       try {
-        for (const [league2, rows] of Object.entries(snap.leagues ?? {})) {
+        for (const [league2, rows] of Object.entries(effectiveSnap.leagues ?? {})) {
           if (!Array.isArray(rows)) continue;
           const candidate = rows.find(
             (g) => g?.status === "final" && (g.displayClock || g.period != null && Number.isFinite(g.period) && g.period > 0 || g.situation)
@@ -25061,13 +25418,13 @@ var useLiveGamesStore = create((set, get) => ({
             console.log("[TRACE][final-live-fields][renderer:hydrate:snap]", {
               league: league2,
               gameId: candidate.id,
-              updatedAt: snap.updatedAt ?? null,
+              updatedAt: effectiveSnap.updatedAt ?? null,
               status: candidate.status,
               statusLine: candidate.statusLine ?? null,
               period: candidate.period ?? null,
               displayClock: candidate.displayClock ?? null,
               situation: candidate.situation ?? null,
-              sourceProvider: snap.sourceProvider ?? null
+              sourceProvider: effectiveSnap.sourceProvider ?? null
             });
             break;
           }
@@ -25081,7 +25438,7 @@ var useLiveGamesStore = create((set, get) => ({
     const nextIngestCycle = prevCanonical.ingestSequence + 1;
     const prevTransportSource = useGamesSpineRenderStore.getState().lastTransportSource;
     const cloudSupersedesIpcFallback = ingestSource === "grarf_cloud" && (prevTransportSource === "espn_scoreboard_ipc" || prevTransportSource === "espn_local_adapter");
-    const withStableLeagues = applyOperationalIngestRetention(snap, {
+    const withStableLeagues = applyOperationalIngestRetention(effectiveSnap, {
       ingestSource,
       previousGames,
       previousLeagues,
@@ -25109,7 +25466,7 @@ var useLiveGamesStore = create((set, get) => ({
     const withReconciledEspnState = reconcileCanonicalLiveGamesSnapshot(withFinalizedAtMs2);
     const ingestMeta = {
       ingestSource,
-      transportGeneratedAt: transportGeneratedAt ?? snap.updatedAt ?? null
+      transportGeneratedAt: transportGeneratedAt ?? effectiveSnap.updatedAt ?? null
     };
     useCanonicalLiveGameStore.getState().ingestSnapshot(
       {
@@ -25122,13 +25479,10 @@ var useLiveGamesStore = create((set, get) => ({
     useGamesSpineRenderStore.getState().markOperationalIngest(withReconciledEspnState.leagues, {
       source: completeness?.source ?? "espn_scoreboard_ipc",
       requestedLeagueCount: completeness?.requestedLeagueCount,
-      transportGeneratedAt: completeness?.transportGeneratedAt ?? snap.updatedAt ?? void 0,
+      transportGeneratedAt: completeness?.transportGeneratedAt ?? effectiveSnap.updatedAt ?? void 0,
       providerPoll: completeness?.providerPoll,
       initialIngestComplete: completeness?.initialIngestComplete
     });
-    if (transportGeneratedAt) {
-      recordAppliedOperationalTransportGeneratedAt(transportGeneratedAt, ingestSource);
-    }
     const finalizeOperationalHydrate = () => {
       retention.pruneExpired();
       syncTransitionCoverageRetention(useRecentFinalizedGamesStore.getState().byId);
@@ -25175,6 +25529,12 @@ useCanonicalLiveGameStore.subscribe((canonical, previousCanonical) => {
 });
 
 // ../grarf/desktop/src/store/findLiveGame.ts
+init_define_import_meta_env();
+
+// ../grarf/shared/domain/ncaaf/resolveNcaafYahooSportsGameUrlFromGame.ts
+init_define_import_meta_env();
+
+// ../grarf/shared/domain/ncaaf/ncaafYahooSportsTeamSlug.ts
 init_define_import_meta_env();
 
 // ../grarf/desktop/src/lib/gamesSpine/applyCanonicalGamesSpineEnrichment.ts
