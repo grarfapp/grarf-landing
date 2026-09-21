@@ -143137,6 +143137,10 @@ var COMMAND_CENTER_SCORE_IN_STACK_CLASS = "min-w-[1.25rem] text-center tabular-n
 var COMMAND_CENTER_ACTION_CELL_CLASS = "col-start-3 flex w-full flex-col items-center justify-center";
 var COMMAND_CENTER_WATCH_BUTTON_CLASS = "w-full border border-[#1a1a1a]/75 bg-transparent px-0.5 py-px font-mono text-[7px] leading-none tracking-[0.06em] text-[#1a1a1a] transition-colors hover:bg-[#e9e4db]";
 var COMMAND_CENTER_FOLLOW_BUTTON_CLASS = "w-full border border-[#1a1a1a]/25 bg-transparent px-0.5 py-px font-mono text-[7px] leading-none tracking-[0.06em] text-[#1a1a1a]/45";
+var COMMAND_CENTER_TEMPORAL_TENNIS_GRID_BASE_CLASS = "grid min-w-0 w-full grid-rows-[auto_auto] items-center gap-x-[0.7ch] gap-y-0.5";
+var COMMAND_CENTER_TEMPORAL_TENNIS_SET_SCORE_CLASS = "inline-flex min-w-[0.8rem] shrink-0 items-center justify-start tabular-nums text-[#1a1a1a]";
+var COMMAND_CENTER_TEMPORAL_TENNIS_STATUS_CLASS = "row-start-2 min-w-0 truncate pr-1 text-right tabular-nums tracking-wide text-[#6a6a6a]";
+var COMMAND_CENTER_TEMPORAL_TENNIS_LIVE_STATUS_CLASS = "font-medium text-[#b45309]";
 var MENU_SURFACE = "bg-[#f3f0ea] text-[#1a1a1a]";
 var RULE = "border-[#d5d0c6]";
 var TOP_RAIL_ANIMATION_MS2 = GAMES_SPINE_TRANSIENT_ALERT_TRANSITION_MS;
@@ -143631,6 +143635,75 @@ function CommandCenterMatchupCenterStack({
     )
   ] });
 }
+function CommandCenterTemporalTennisCompetitorMark({
+  game,
+  side,
+  name,
+  pollRank,
+  pill,
+  showScores,
+  row,
+  winnerBoldClass,
+  onTeamClick
+}) {
+  const logoUrl = resolveNewsSportsBrowserTeamLogoUrl(game, side);
+  const competitorContext = resolveNewsSportsBrowserGameCardCompetitorContext(game, side, pill, {
+    showScores
+  });
+  const hasSubLines = Boolean(
+    competitorContext.standingsLabel || competitorContext.record || competitorContext.standingsLine
+  );
+  return /* @__PURE__ */ (0, import_jsx_runtime236.jsxs)(
+    "span",
+    {
+      className: cn2(
+        "col-start-1 grid min-w-0 grid-cols-[12px_minmax(0,1fr)] gap-x-[0.6ch]",
+        hasSubLines ? "items-start" : "items-center",
+        row === 1 ? "row-start-1" : "row-start-2",
+        onTeamClick && BOTTOM_RAIL_TEAM_CLICKABLE_CLASS
+      ),
+      "data-sports-browser-prototype-sidebar-team-name-clickable": onTeamClick ? "" : void 0,
+      onClick: onTeamClick ? (event) => {
+        event.stopPropagation();
+        onTeamClick();
+      } : void 0,
+      children: [
+        /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
+          "span",
+          {
+            className: cn2(
+              "inline-flex h-[12px] w-[12px] shrink-0 items-center justify-center",
+              hasSubLines && "mt-0.5"
+            ),
+            children: logoUrl ? /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
+              "img",
+              {
+                src: logoUrl,
+                alt: "",
+                className: cn2(
+                  "h-2.5 w-2.5 shrink-0 object-contain",
+                  resolveGamesSpineLeagueLogoImgClassName(game.league, logoUrl)
+                ),
+                loading: "lazy",
+                decoding: "async"
+              }
+            ) : null
+          }
+        ),
+        /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
+          NewsSportsBrowserCompetitorNameStack,
+          {
+            name,
+            pollRank,
+            context: competitorContext,
+            nameClassName: "min-w-0 break-words whitespace-normal normal-case text-[#1a1a1a]",
+            winnerBoldClass
+          }
+        )
+      ]
+    }
+  );
+}
 function CommandCenterMatchupGameCard({
   game,
   flashSpec,
@@ -143654,13 +143727,29 @@ function CommandCenterMatchupGameCard({
     if (!teamWorkspaceEnabled || !onGameTeamSelect) return;
     onGameTeamSelect(game, side);
   };
+  const tennisSetColumns = resolveNewsSportsBrowserTennisSetColumns(game);
+  const showCommandCenterTennisLayout = shouldShowNewsSportsBrowserTennisScoreboard(game);
+  const tennisVariant = showCommandCenterTennisLayout ? resolveSportsBrowserPrototypeSidebarGameVariant(game) : null;
+  const tennisStatusLabel = showCommandCenterTennisLayout ? resolveSportsBrowserSidebarTennisMatchCardStatusLabel(game) || (tennisVariant === "catchUp" ? "FINAL" : resolveNewsSportsBrowserCompactStatusLabel(game)) : null;
+  const tennisStatusColStart = tennisSetColumns.length > 0 ? 2 + tennisSetColumns.length : 3;
+  const tennisRowGridStyle = showCommandCenterTennisLayout ? {
+    gridTemplateColumns: tennisSetColumns.length > 0 ? resolveNewsSportsBrowserTennisGridTemplateColumns(
+      tennisSetColumns.length,
+      "minmax(0,1fr)",
+      "minmax(2.25rem,max-content)"
+    ) : "minmax(0,1fr) 1.25rem minmax(2.25rem,max-content)"
+  } : void 0;
+  const secondIsTbd = !rightPresentation.teamName || rightPresentation.teamName.toLowerCase() === "tbd";
+  const tennisIsLive = game.status === "live" && tennisVariant === "live";
+  const firstWinnerClass = resolveGamesSpineFinalWinnerBoldClass(model.left.side, finalWinnerSide);
+  const secondWinnerClass = resolveGamesSpineFinalWinnerBoldClass(model.right.side, finalWinnerSide);
   return /* @__PURE__ */ (0, import_jsx_runtime236.jsxs)(
     "div",
     {
       className: COMMAND_CENTER_CARD_GRID_CLASS,
       "data-sports-browser-prototype-command-center-game-card": "",
       children: [
-        /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
+        !showCommandCenterTennisLayout ? /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
           CommandCenterMatchupCenterStack,
           {
             timingLabel: statusTimeLabel,
@@ -143670,10 +143759,10 @@ function CommandCenterMatchupGameCard({
             bottomScore: model.right.score,
             bottomScoreFlash: flashSpec?.rightScore,
             showScores: model.showScores,
-            topWinnerClass: resolveGamesSpineFinalWinnerBoldClass(model.left.side, finalWinnerSide),
-            bottomWinnerClass: resolveGamesSpineFinalWinnerBoldClass(model.right.side, finalWinnerSide)
+            topWinnerClass: firstWinnerClass,
+            bottomWinnerClass: secondWinnerClass
           }
-        ),
+        ) : null,
         /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
           CommandCenterLeagueHeader,
           {
@@ -143693,34 +143782,136 @@ function CommandCenterMatchupGameCard({
             onWatchLive
           }
         ),
-        /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
-          CommandCenterTeamIdentityRow,
+        showCommandCenterTennisLayout ? /* @__PURE__ */ (0, import_jsx_runtime236.jsxs)(
+          "div",
           {
-            game,
-            side: model.left.side,
-            name: leftPresentation.teamName,
-            pollRank: leftPresentation.pollRank,
-            pill: model.left,
-            showScores: model.showScores,
-            gridRow: 2,
-            finalWinnerSide,
-            onTeamClick: teamWorkspaceEnabled && onGameTeamSelect ? () => handleTeamSideClick(model.left.side) : void 0
+            className: cn2(
+              COMMAND_CENTER_TEMPORAL_TENNIS_GRID_BASE_CLASS,
+              "col-start-1 col-span-2 row-start-2 row-span-2 min-w-0 self-center text-[10px] leading-snug"
+            ),
+            style: tennisRowGridStyle,
+            children: [
+              /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
+                CommandCenterTemporalTennisCompetitorMark,
+                {
+                  game,
+                  side: model.left.side,
+                  name: leftPresentation.teamName,
+                  pollRank: leftPresentation.pollRank,
+                  pill: model.left,
+                  showScores: model.showScores,
+                  row: 1,
+                  winnerBoldClass: firstWinnerClass,
+                  onTeamClick: teamWorkspaceEnabled && onGameTeamSelect ? () => handleTeamSideClick(model.left.side) : void 0
+                }
+              ),
+              /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
+                NewsSportsBrowserTennisSetScoreCells,
+                {
+                  columns: tennisSetColumns,
+                  side: model.left.side,
+                  row: 1,
+                  scoreColStart: 2,
+                  cellClassName: cn2(COMMAND_CENTER_TEMPORAL_TENNIS_SET_SCORE_CLASS, firstWinnerClass),
+                  flashCells: flashSpec?.leftSetScoreCells,
+                  FlashWrapper: BottomRailFlashValue
+                }
+              ),
+              tennisSetColumns.length === 0 && model.showScores ? /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
+                BottomRailFlashValue,
+                {
+                  flash: flashSpec?.leftScore,
+                  className: cn2(
+                    COMMAND_CENTER_TEMPORAL_TENNIS_SET_SCORE_CLASS,
+                    "col-start-2 row-start-1 w-[1.25rem] justify-start",
+                    firstWinnerClass
+                  ),
+                  children: model.left.score ?? "\u2013"
+                }
+              ) : null,
+              !secondIsTbd ? /* @__PURE__ */ (0, import_jsx_runtime236.jsxs)(import_jsx_runtime236.Fragment, { children: [
+                /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
+                  CommandCenterTemporalTennisCompetitorMark,
+                  {
+                    game,
+                    side: model.right.side,
+                    name: rightPresentation.teamName,
+                    pollRank: rightPresentation.pollRank,
+                    pill: model.right,
+                    showScores: model.showScores,
+                    row: 2,
+                    winnerBoldClass: secondWinnerClass,
+                    onTeamClick: teamWorkspaceEnabled && onGameTeamSelect ? () => handleTeamSideClick(model.right.side) : void 0
+                  }
+                ),
+                /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
+                  NewsSportsBrowserTennisSetScoreCells,
+                  {
+                    columns: tennisSetColumns,
+                    side: model.right.side,
+                    row: 2,
+                    scoreColStart: 2,
+                    cellClassName: cn2(COMMAND_CENTER_TEMPORAL_TENNIS_SET_SCORE_CLASS, secondWinnerClass),
+                    flashCells: flashSpec?.rightSetScoreCells,
+                    FlashWrapper: BottomRailFlashValue
+                  }
+                ),
+                tennisSetColumns.length === 0 && model.showScores ? /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
+                  BottomRailFlashValue,
+                  {
+                    flash: flashSpec?.rightScore,
+                    className: cn2(
+                      COMMAND_CENTER_TEMPORAL_TENNIS_SET_SCORE_CLASS,
+                      "col-start-2 row-start-2 w-[1.25rem] justify-start",
+                      secondWinnerClass
+                    ),
+                    children: model.right.score ?? "\u2013"
+                  }
+                ) : null
+              ] }) : null,
+              /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
+                "span",
+                {
+                  className: cn2(
+                    COMMAND_CENTER_TEMPORAL_TENNIS_STATUS_CLASS,
+                    tennisIsLive && COMMAND_CENTER_TEMPORAL_TENNIS_LIVE_STATUS_CLASS
+                  ),
+                  style: { gridColumnStart: tennisStatusColStart },
+                  children: tennisStatusLabel
+                }
+              )
+            ]
           }
-        ),
-        /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
-          CommandCenterTeamIdentityRow,
-          {
-            game,
-            side: model.right.side,
-            name: rightPresentation.teamName,
-            pollRank: rightPresentation.pollRank,
-            pill: model.right,
-            showScores: model.showScores,
-            gridRow: 3,
-            finalWinnerSide,
-            onTeamClick: teamWorkspaceEnabled && onGameTeamSelect ? () => handleTeamSideClick(model.right.side) : void 0
-          }
-        )
+        ) : /* @__PURE__ */ (0, import_jsx_runtime236.jsxs)(import_jsx_runtime236.Fragment, { children: [
+          /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
+            CommandCenterTeamIdentityRow,
+            {
+              game,
+              side: model.left.side,
+              name: leftPresentation.teamName,
+              pollRank: leftPresentation.pollRank,
+              pill: model.left,
+              showScores: model.showScores,
+              gridRow: 2,
+              finalWinnerSide,
+              onTeamClick: teamWorkspaceEnabled && onGameTeamSelect ? () => handleTeamSideClick(model.left.side) : void 0
+            }
+          ),
+          /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
+            CommandCenterTeamIdentityRow,
+            {
+              game,
+              side: model.right.side,
+              name: rightPresentation.teamName,
+              pollRank: rightPresentation.pollRank,
+              pill: model.right,
+              showScores: model.showScores,
+              gridRow: 3,
+              finalWinnerSide,
+              onTeamClick: teamWorkspaceEnabled && onGameTeamSelect ? () => handleTeamSideClick(model.right.side) : void 0
+            }
+          )
+        ] })
       ]
     }
   );
