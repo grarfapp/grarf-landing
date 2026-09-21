@@ -15440,7 +15440,7 @@ function resolveOperationalGameEventEndedAtMs(game) {
   return null;
 }
 
-// ../grarf/desktop/shared/espnPausedCompetitionStatus.js
+// ../grarf/shared/domain/operational/espnAuthoritativeOperationalGameState.ts
 init_define_import_meta_env();
 
 // ../grarf/shared/utils/espnPausedCompetitionStatus.js
@@ -15517,6 +15517,41 @@ function resolveTennisEspnCardStatus(statusType, options = {}) {
   return "scheduled";
 }
 
+// ../grarf/shared/domain/operational/espnAuthoritativeOperationalGameState.ts
+function pausedFromStatusLine(statusLine) {
+  const line = statusLine?.trim();
+  if (!line) return false;
+  return isEspnPausedCompetitionStatus({
+    shortDetail: line,
+    detail: line,
+    description: line
+  });
+}
+function halftimeFromStatusLine(statusLine) {
+  const line = statusLine?.trim();
+  if (!line) return false;
+  return isEspnHalftimeOrIntermissionStatus({
+    shortDetail: line,
+    detail: line,
+    description: line
+  });
+}
+function isEspnOperationalCompetitionPaused(game) {
+  if (halftimeFromStatusLine(game.statusLine)) return false;
+  if (halftimeFromStatusLine(game.displayClock)) return false;
+  if (game.status === "delayed" || game.status === "suspended") return true;
+  if (game.status === "postponed") return true;
+  return pausedFromStatusLine(game.statusLine);
+}
+function isEspnNormalizedOperationalLive(game) {
+  if (game.status !== "live") return false;
+  if (game.metadata?.manualGamesSpine) return true;
+  return !isEspnOperationalCompetitionPaused(game);
+}
+function isEspnNormalizedOperationalScheduled(game) {
+  return game.status === "scheduled";
+}
+
 // ../grarf/desktop/shared/golfTournamentDate.js
 init_define_import_meta_env();
 
@@ -15585,38 +15620,7 @@ function persistEventEndedAtMsIfAbsent(gameId, eventEndedAtMs) {
   writeStorage(EVENT_ENDED_AT_STORAGE_KEY, byId, eventEndedAtMemoryRef);
 }
 
-// ../grarf/desktop/src/lib/operational/operationalLiveAuthority.ts
-init_define_import_meta_env();
-
-// ../grarf/shared/domain/operational/operationalLiveFreshness.js
-init_define_import_meta_env();
-var OPERATIONAL_LIVE_MAX_STALE_UPDATE_MS = 45 * 60 * 1e3;
-function parseOperationalGameLastUpdatedMs(lastUpdated) {
-  if (lastUpdated == null || !String(lastUpdated).trim()) return null;
-  const ms = Date.parse(String(lastUpdated));
-  return Number.isFinite(ms) ? ms : null;
-}
-function isOperationalLiveRowAuthoritativelyFresh(game, nowMs = Date.now()) {
-  if (!game || game.status !== "live") return true;
-  if (game.metadata?.manualGamesSpine) return true;
-  const lastUpdatedMs = parseOperationalGameLastUpdatedMs(game.lastUpdated);
-  if (lastUpdatedMs == null) return false;
-  return nowMs - lastUpdatedMs <= OPERATIONAL_LIVE_MAX_STALE_UPDATE_MS;
-}
-function isOperationalProviderPollAuthoritativelyFresh(providerPollCompletedAt, nowMs = Date.now()) {
-  if (providerPollCompletedAt == null || !String(providerPollCompletedAt).trim()) return false;
-  const completedMs = Date.parse(String(providerPollCompletedAt));
-  if (!Number.isFinite(completedMs)) return false;
-  return nowMs - completedMs <= OPERATIONAL_LIVE_MAX_STALE_UPDATE_MS;
-}
-
-// ../grarf/desktop/src/lib/updateEngine/updateEngineCadences.ts
-init_define_import_meta_env();
-var WEB_UPDATE_ENGINE_LIVE_GAMES_POLL_MS = 15e3;
-var WEB_UPDATE_ENGINE_BROWSER_POLL_MS = 2 * 6e4;
-var WEB_UPDATE_ENGINE_HIGHLIGHTS_TV_POLL_MS = 5 * 6e4;
-
-// ../grarf/desktop/src/store/gamesSpineRenderStore.ts
+// ../grarf/desktop/src/store/canonicalLiveGameStore.ts
 init_define_import_meta_env();
 
 // ../grarf/desktop/node_modules/zustand/esm/vanilla.mjs
@@ -15664,121 +15668,6 @@ var createImpl = (createState) => {
   return useBoundStore;
 };
 var create = ((createState) => createState ? createImpl(createState) : createImpl);
-
-// ../grarf/desktop/src/lib/gamesSpine/preserveMissingOperationalLeagueSections.ts
-init_define_import_meta_env();
-
-// ../grarf/desktop/src/lib/gamesSpine/operationalGameFreshness.ts
-init_define_import_meta_env();
-
-// ../grarf/desktop/src/lib/finalizedGameRetention/liveRecency.ts
-init_define_import_meta_env();
-
-// ../grarf/desktop/src/lib/finalizedGameRetention/constants.ts
-init_define_import_meta_env();
-var FINALIZED_RETENTION_TTL_MS = 24 * 60 * 60 * 1e3;
-var LIVE_RECENCY_MAX_INGEST_CYCLES = 32;
-var LIVE_RECENCY_MAX_MS = 8 * 60 * 60 * 1e3;
-
-// ../grarf/desktop/src/lib/finalizedGameRetention/retentionUtils.ts
-init_define_import_meta_env();
-function copyFinalizedGame(game) {
-  return { ...game };
-}
-function resolveFinalizedRetentionExpiry(game, retainedAt) {
-  const finalizedMs = game.lastUpdated?.trim() ? Date.parse(game.lastUpdated.trim()) : NaN;
-  const anchor = Number.isFinite(finalizedMs) && finalizedMs > 0 ? Math.min(finalizedMs, retainedAt) : retainedAt;
-  return anchor + FINALIZED_RETENTION_TTL_MS;
-}
-function pruneRetainedFinals(byId, now = Date.now()) {
-  const next = {};
-  for (const [id, entry2] of Object.entries(byId)) {
-    if (!entry2?.game || entry2.game.status !== "final") continue;
-    if (typeof entry2.expiresAt !== "number" || entry2.expiresAt <= now) continue;
-    next[id] = entry2;
-  }
-  return next;
-}
-function collectAllGamesFromLeaguesForHarvest(leagues) {
-  const out = [];
-  const seen = /* @__PURE__ */ new Set();
-  if (!leagues) return out;
-  for (const rows of Object.values(leagues)) {
-    if (!rows?.length) continue;
-    for (const game of rows) {
-      if (seen.has(game.id)) continue;
-      seen.add(game.id);
-      out.push(game);
-    }
-  }
-  return out;
-}
-function collectFinalGamesFromLeagues(leagues) {
-  const out = [];
-  for (const rows of Object.values(leagues)) {
-    if (!rows?.length) continue;
-    for (const game of rows) {
-      if (game.status === "final") out.push(game);
-    }
-  }
-  return out;
-}
-
-// ../grarf/desktop/src/lib/finalizedGameRetention/liveRecency.ts
-function recordLiveObservations(byId, games, ingestCycle, now = Date.now()) {
-  const next = { ...byId };
-  for (const raw of games) {
-    if (raw.status !== "live") continue;
-    next[raw.id] = {
-      game: copyFinalizedGame(raw),
-      lastLiveIngestCycle: ingestCycle,
-      lastLiveAtMs: now
-    };
-  }
-  return next;
-}
-function pruneLiveRecency(byId, ingestCycle, now = Date.now()) {
-  const next = {};
-  for (const [id, entry2] of Object.entries(byId)) {
-    if (ingestCycle - entry2.lastLiveIngestCycle > LIVE_RECENCY_MAX_INGEST_CYCLES) continue;
-    if (now - entry2.lastLiveAtMs > LIVE_RECENCY_MAX_MS) continue;
-    next[id] = entry2;
-  }
-  return next;
-}
-function isRecentlyLive(entry2, ingestCycle, now = Date.now()) {
-  if (!entry2) return false;
-  if (ingestCycle - entry2.lastLiveIngestCycle > LIVE_RECENCY_MAX_INGEST_CYCLES) return false;
-  if (now - entry2.lastLiveAtMs > LIVE_RECENCY_MAX_MS) return false;
-  return true;
-}
-
-// ../grarf/desktop/src/lib/gamesSpine/operationalGameFreshness.ts
-var OPERATIONAL_SCHEDULED_OVERDUE_GRACE_MS = 20 * 60 * 1e3;
-function isOperationalScheduledGameOverdue(game, nowMs = Date.now()) {
-  if (game.status !== "scheduled") return false;
-  const startMs = game.startTimeMs;
-  if (startMs == null || !Number.isFinite(startMs) || startMs <= 0) return false;
-  return startMs + OPERATIONAL_SCHEDULED_OVERDUE_GRACE_MS < nowMs;
-}
-function shouldPreserveMissingOperationalLiveGame(game, ingestCycle, liveRecencyById) {
-  if (!isOperationalLiveRowAuthoritativelyFresh(game)) return false;
-  return isRecentlyLive(liveRecencyById[game.id], ingestCycle);
-}
-function isOperationalSpineContinuityCandidate(game, ingestCycle, liveRecencyById, now = /* @__PURE__ */ new Date()) {
-  if (game.status === "postponed") return true;
-  if (game.status === "final") return false;
-  if (game.status === "live") {
-    return shouldPreserveMissingOperationalLiveGame(game, ingestCycle, liveRecencyById);
-  }
-  if (game.status === "scheduled") {
-    return !isOperationalScheduledGameOverdue(game, now.getTime());
-  }
-  return true;
-}
-
-// ../grarf/desktop/src/store/canonicalLiveGameStore.ts
-init_define_import_meta_env();
 
 // ../grarf/desktop/src/services/canonicalLiveGame/normalize.ts
 init_define_import_meta_env();
@@ -16450,6 +16339,60 @@ init_define_import_meta_env();
 
 // ../grarf/desktop/src/lib/finalizedGameRetention/harvestFinalizedOnIngestTransition.ts
 init_define_import_meta_env();
+
+// ../grarf/desktop/src/lib/finalizedGameRetention/retentionUtils.ts
+init_define_import_meta_env();
+
+// ../grarf/desktop/src/lib/finalizedGameRetention/constants.ts
+init_define_import_meta_env();
+var FINALIZED_RETENTION_TTL_MS = 24 * 60 * 60 * 1e3;
+var LIVE_RECENCY_MAX_INGEST_CYCLES = 32;
+var LIVE_RECENCY_MAX_MS = 8 * 60 * 60 * 1e3;
+
+// ../grarf/desktop/src/lib/finalizedGameRetention/retentionUtils.ts
+function copyFinalizedGame(game) {
+  return { ...game };
+}
+function resolveFinalizedRetentionExpiry(game, retainedAt) {
+  const finalizedMs = game.lastUpdated?.trim() ? Date.parse(game.lastUpdated.trim()) : NaN;
+  const anchor = Number.isFinite(finalizedMs) && finalizedMs > 0 ? Math.min(finalizedMs, retainedAt) : retainedAt;
+  return anchor + FINALIZED_RETENTION_TTL_MS;
+}
+function pruneRetainedFinals(byId, now = Date.now()) {
+  const next = {};
+  for (const [id, entry2] of Object.entries(byId)) {
+    if (!entry2?.game || entry2.game.status !== "final") continue;
+    if (typeof entry2.expiresAt !== "number" || entry2.expiresAt <= now) continue;
+    next[id] = entry2;
+  }
+  return next;
+}
+function collectAllGamesFromLeaguesForHarvest(leagues) {
+  const out = [];
+  const seen = /* @__PURE__ */ new Set();
+  if (!leagues) return out;
+  for (const rows of Object.values(leagues)) {
+    if (!rows?.length) continue;
+    for (const game of rows) {
+      if (seen.has(game.id)) continue;
+      seen.add(game.id);
+      out.push(game);
+    }
+  }
+  return out;
+}
+function collectFinalGamesFromLeagues(leagues) {
+  const out = [];
+  for (const rows of Object.values(leagues)) {
+    if (!rows?.length) continue;
+    for (const game of rows) {
+      if (game.status === "final") out.push(game);
+    }
+  }
+  return out;
+}
+
+// ../grarf/desktop/src/lib/finalizedGameRetention/harvestFinalizedOnIngestTransition.ts
 function collectAllGamesFromLeagues(leagues) {
   const out = [];
   const seen = /* @__PURE__ */ new Set();
@@ -16508,6 +16451,36 @@ function collectFinalizedHarvestFromIngestTransition(input) {
     alreadyRetainedIds: input.alreadyRetainedIds
   });
   return candidates.map((c) => c.game);
+}
+
+// ../grarf/desktop/src/lib/finalizedGameRetention/liveRecency.ts
+init_define_import_meta_env();
+function recordLiveObservations(byId, games, ingestCycle, now = Date.now()) {
+  const next = { ...byId };
+  for (const raw of games) {
+    if (raw.status !== "live") continue;
+    next[raw.id] = {
+      game: copyFinalizedGame(raw),
+      lastLiveIngestCycle: ingestCycle,
+      lastLiveAtMs: now
+    };
+  }
+  return next;
+}
+function pruneLiveRecency(byId, ingestCycle, now = Date.now()) {
+  const next = {};
+  for (const [id, entry2] of Object.entries(byId)) {
+    if (ingestCycle - entry2.lastLiveIngestCycle > LIVE_RECENCY_MAX_INGEST_CYCLES) continue;
+    if (now - entry2.lastLiveAtMs > LIVE_RECENCY_MAX_MS) continue;
+    next[id] = entry2;
+  }
+  return next;
+}
+function isRecentlyLive(entry2, ingestCycle, now = Date.now()) {
+  if (!entry2) return false;
+  if (ingestCycle - entry2.lastLiveIngestCycle > LIVE_RECENCY_MAX_INGEST_CYCLES) return false;
+  if (now - entry2.lastLiveAtMs > LIVE_RECENCY_MAX_MS) return false;
+  return true;
 }
 
 // ../grarf/desktop/src/store/recentFinalizedGamesStore.ts
@@ -16622,324 +16595,6 @@ if (typeof window !== "undefined") {
     }
     return { count: entries.length, byLeague, entries };
   };
-}
-
-// ../grarf/desktop/src/lib/gamesSpine/preserveMissingOperationalLeagueSections.ts
-var LOG2 = "[GamesSpine]";
-function countLeaguesWithTodaySlate(leagues, now = /* @__PURE__ */ new Date()) {
-  let count = 0;
-  for (const key of getGamesColumnLeagueOrder()) {
-    if (filterGamesSpineSlateForOperationalSportsDay(leagues[key] ?? [], now).length > 0) count += 1;
-  }
-  return count;
-}
-function countOperationalSportsDayGames(leagues, now = /* @__PURE__ */ new Date()) {
-  let count = 0;
-  for (const key of getGamesColumnLeagueOrder()) {
-    count += filterGamesSpineSlateForOperationalSportsDay(leagues[key] ?? [], now).length;
-  }
-  return count;
-}
-function validateOperationalSlateReplacement(incoming, previousLeagues, now = /* @__PURE__ */ new Date()) {
-  const previousLeagueCount = countLeaguesWithTodaySlate(previousLeagues, now);
-  const incomingLeagueCount = countLeaguesWithTodaySlate(incoming.leagues ?? {}, now);
-  if (previousLeagueCount === 0) {
-    return { accepted: true };
-  }
-  if (incomingLeagueCount === 0) {
-    return { accepted: false, reason: "incoming_zero_leagues" };
-  }
-  if (incomingLeagueCount + 2 < previousLeagueCount) {
-    return { accepted: false, reason: "incoming_league_count_regression" };
-  }
-  if (previousLeagueCount >= 3 && incomingLeagueCount <= 1) {
-    return { accepted: false, reason: "incoming_near_single_league_slate" };
-  }
-  const previousGameCount = countOperationalSportsDayGames(previousLeagues, now);
-  const incomingGameCount = countOperationalSportsDayGames(incoming.leagues ?? {}, now);
-  if (previousGameCount >= 6 && incomingGameCount < Math.ceil(previousGameCount * 0.4)) {
-    return { accepted: false, reason: "incoming_game_count_regression" };
-  }
-  return { accepted: true };
-}
-function filterOperationalSpineContinuityCandidates(games, now) {
-  const ingestCycle = useCanonicalLiveGameStore.getState().ingestSequence;
-  const liveRecencyById = useRecentFinalizedGamesStore.getState().liveRecencyById;
-  return games.filter(
-    (game) => isOperationalSpineContinuityCandidate(game, ingestCycle, liveRecencyById, now)
-  );
-}
-function mergeLeagueSlateContinuity(previousGames, incomingGames, now) {
-  const prevToday = filterGamesSpineSlateForOperationalSportsDay(previousGames, now);
-  const incomingToday = filterGamesSpineSlateForOperationalSportsDay(incomingGames, now);
-  if (prevToday.length === 0) return [...incomingGames];
-  if (incomingToday.length === 0) return [...incomingGames];
-  const incomingIds = new Set(incomingToday.map((game) => game.id));
-  const missingFromIncoming = filterOperationalSpineContinuityCandidates(
-    prevToday.filter((game) => !incomingIds.has(game.id)),
-    now
-  );
-  if (missingFromIncoming.length === 0) return [...incomingGames];
-  const merged = [...incomingGames];
-  const mergedIds = new Set(merged.map((game) => game.id));
-  for (const game of missingFromIncoming) {
-    if (mergedIds.has(game.id)) continue;
-    merged.push({ ...game });
-    mergedIds.add(game.id);
-  }
-  return merged;
-}
-function preserveMissingOperationalLeagueSections(incoming, previousLeagues, now = /* @__PURE__ */ new Date()) {
-  const leagues = { ...incoming.leagues };
-  let changed = false;
-  for (const key of getGamesColumnLeagueOrder()) {
-    const previousRows = previousLeagues[key] ?? [];
-    const prevTodayCount = filterGamesSpineSlateForOperationalSportsDay(previousRows, now).length;
-    const incomingRows = leagues[key] ?? [];
-    const incomingTodayCount = filterGamesSpineSlateForOperationalSportsDay(incomingRows, now).length;
-    if (prevTodayCount === 0) {
-      continue;
-    }
-    if (incomingTodayCount > 0) {
-      const mergedRows = mergeLeagueSlateContinuity(previousRows, incomingRows, now);
-      if (mergedRows.length !== incomingRows.length) {
-        leagues[key] = mergedRows;
-        changed = true;
-      }
-      continue;
-    }
-    const continuityRows = filterOperationalSpineContinuityCandidates(previousRows, now);
-    if (continuityRows.length === 0) continue;
-    leagues[key] = continuityRows.map((game) => ({ ...game }));
-    changed = true;
-  }
-  if (!changed) return incoming;
-  return { ...incoming, leagues };
-}
-function rejectInvalidOperationalSlateReplacement(incoming, previousLeagues, now = /* @__PURE__ */ new Date()) {
-  const validation = validateOperationalSlateReplacement(incoming, previousLeagues, now);
-  if (validation.accepted) return null;
-  if (define_import_meta_env_default.DEV) {
-    console.warn(`${LOG2} Rejected invalid operational slate replacement`, {
-      reason: validation.reason,
-      previousLeagues: countLeaguesWithTodaySlate(previousLeagues, now),
-      incomingLeagues: countLeaguesWithTodaySlate(incoming.leagues ?? {}, now),
-      previousGames: countOperationalSportsDayGames(previousLeagues, now),
-      incomingGames: countOperationalSportsDayGames(incoming.leagues ?? {}, now)
-    });
-  }
-  return {
-    ...incoming,
-    leagues: { ...previousLeagues }
-  };
-}
-function applyGamesSpineSnapshotStability(incoming, previousLeagues, now = /* @__PURE__ */ new Date()) {
-  const rejected = rejectInvalidOperationalSlateReplacement(incoming, previousLeagues, now);
-  if (rejected) return rejected;
-  return preserveMissingOperationalLeagueSections(incoming, previousLeagues, now);
-}
-
-// ../grarf/desktop/src/store/gamesSpineRenderStore.ts
-function isCompleteOperationalSnapshot(leagues, meta) {
-  const hasAnyGames = Object.values(leagues).some(
-    (rows) => Array.isArray(rows) && rows.length > 0
-  );
-  if (!hasAnyGames) return false;
-  if (meta.source === "grarf_cloud") return true;
-  const requested = meta.requestedLeagueCount;
-  if (requested != null && Number.isFinite(requested) && requested > 0 && requested < ESPN_OPERATIONAL_INGEST_LEAGUE_KEYS.length) {
-    return false;
-  }
-  if (meta.source === "espn_local_adapter" || meta.source === "espn_scoreboard_ipc") {
-    if (meta.initialIngestComplete === false) return hasAnyGames;
-    return true;
-  }
-  return countLeaguesWithTodaySlate(leagues) > 0;
-}
-var useGamesSpineRenderStore = create((set, get) => ({
-  operationalReady: true,
-  operationalIngestComplete: false,
-  /** Manual KV overrides load async — never block the operational spine on them. */
-  manualReady: true,
-  hasPromotedInitialSnapshot: false,
-  lastTransportGeneratedAt: null,
-  lastTransportSource: null,
-  lastTransportGameCount: 0,
-  operationalProviderPoll: null,
-  markOperationalIngest: (leagues, meta) => {
-    const complete = isCompleteOperationalSnapshot(leagues, meta);
-    const gameCount = Object.values(leagues).reduce(
-      (total, rows) => total + (Array.isArray(rows) ? rows.length : 0),
-      0
-    );
-    set((state) => ({
-      operationalReady: true,
-      operationalIngestComplete: state.operationalIngestComplete || complete,
-      hasPromotedInitialSnapshot: state.hasPromotedInitialSnapshot || complete,
-      lastTransportGeneratedAt: meta.transportGeneratedAt ?? (complete ? (/* @__PURE__ */ new Date()).toISOString() : state.lastTransportGeneratedAt),
-      lastTransportSource: meta.source,
-      lastTransportGameCount: gameCount,
-      operationalProviderPoll: meta.source === "grarf_cloud" ? meta.providerPoll ?? state.operationalProviderPoll : state.operationalProviderPoll
-    }));
-  },
-  markManualLoaded: () => {
-    set({ manualReady: true });
-  },
-  isRenderReady: () => {
-    const state = get();
-    return state.operationalReady && state.manualReady;
-  },
-  resetForTests: () => {
-    set({
-      operationalReady: true,
-      operationalIngestComplete: false,
-      manualReady: true,
-      hasPromotedInitialSnapshot: false,
-      lastTransportGeneratedAt: null,
-      lastTransportSource: null,
-      lastTransportGameCount: 0,
-      operationalProviderPoll: null
-    });
-  }
-}));
-
-// ../grarf/desktop/src/lib/operational/operationalLiveAuthority.ts
-var OPERATIONAL_PROVIDER_CONFIRMED_LIVE_SLACK_MS = WEB_UPDATE_ENGINE_LIVE_GAMES_POLL_MS * 3;
-var LEGACY_CLOUD_LIVE_MAX_STALE_UPDATE_MS = OPERATIONAL_LIVE_MAX_STALE_UPDATE_MS;
-var PROVIDER_POLL_HYDRATION_LEGACY_SLACK_MS = 60 * 1e3;
-function getOperationalLiveAuthorityState() {
-  const state = useGamesSpineRenderStore.getState();
-  return {
-    operationalProviderPoll: state.operationalProviderPoll,
-    lastTransportSource: state.lastTransportSource,
-    lastTransportGeneratedAt: state.lastTransportGeneratedAt
-  };
-}
-function parseGameLastUpdatedMs(lastUpdated) {
-  if (!lastUpdated?.trim()) return null;
-  const ms = Date.parse(lastUpdated);
-  return Number.isFinite(ms) ? ms : null;
-}
-function isGameLastUpdatedProviderConfirmed(game, providerPollCompletedAt, slackMs = OPERATIONAL_PROVIDER_CONFIRMED_LIVE_SLACK_MS) {
-  const completedMs = Date.parse(providerPollCompletedAt);
-  const lastUpdatedMs = parseGameLastUpdatedMs(game.lastUpdated);
-  if (!Number.isFinite(completedMs) || lastUpdatedMs == null) return false;
-  const ageBehindCompletionMs = completedMs - lastUpdatedMs;
-  if (ageBehindCompletionMs > slackMs) return false;
-  const ageAheadCompletionMs = lastUpdatedMs - completedMs;
-  return ageAheadCompletionMs <= slackMs;
-}
-function isLegacyCloudLiveRowFresh(game, nowMs = Date.now()) {
-  const lastUpdatedMs = parseGameLastUpdatedMs(game.lastUpdated);
-  if (lastUpdatedMs == null) return false;
-  return nowMs - lastUpdatedMs <= LEGACY_CLOUD_LIVE_MAX_STALE_UPDATE_MS;
-}
-function isProviderPollHydrationFresh(game, providerPollCompletedAt) {
-  const completedMs = Date.parse(providerPollCompletedAt);
-  const lastUpdatedMs = parseGameLastUpdatedMs(game.lastUpdated);
-  if (!Number.isFinite(completedMs) || lastUpdatedMs == null) return false;
-  const ageBehindCompletionMs = completedMs - lastUpdatedMs;
-  return ageBehindCompletionMs > OPERATIONAL_PROVIDER_CONFIRMED_LIVE_SLACK_MS && ageBehindCompletionMs <= OPERATIONAL_PROVIDER_CONFIRMED_LIVE_SLACK_MS + PROVIDER_POLL_HYDRATION_LEGACY_SLACK_MS;
-}
-function shouldApplyProviderPollLiveGate(state) {
-  if (state.lastTransportSource === "grarf_cloud") return true;
-  return Boolean(state.operationalProviderPoll?.providerPollCompletedAt?.trim());
-}
-function isRecentTransportLiveRow(game, transportGeneratedAt, nowMs = Date.now()) {
-  if (game.status !== "live") return false;
-  if (!transportGeneratedAt?.trim()) return false;
-  const transportMs = Date.parse(transportGeneratedAt);
-  if (!Number.isFinite(transportMs)) return false;
-  return nowMs - transportMs <= LEGACY_CLOUD_LIVE_MAX_STALE_UPDATE_MS;
-}
-function isGameEligibleForCurrentOperationalLivePoll(game, nowMs = Date.now()) {
-  const now = new Date(nowMs);
-  const sportsDayKey = getOperationalSportsDayDateKey(now);
-  if (isGameOnGamesSpineOperationalDate(game, sportsDayKey, now)) {
-    return true;
-  }
-  const yesterdayKey = getOperationalSportsDayYesterdayDateKey(now);
-  return isGameOnGamesSpineOperationalDate(game, yesterdayKey, now);
-}
-function isConfirmedLiveBySuccessfulLeaguePoll(game, poll, nowMs = Date.now()) {
-  if (game.status !== "live") return false;
-  if (!isOperationalLiveRowAuthoritativelyFresh(game, nowMs)) return false;
-  const pollCompletedAt = poll.providerPollCompletedAt;
-  if (!pollCompletedAt?.trim() || !isOperationalProviderPollAuthoritativelyFresh(pollCompletedAt, nowMs)) {
-    return false;
-  }
-  const league2 = game.league;
-  if (!league2) return false;
-  const entry2 = poll.leaguePolls?.[league2];
-  if (!entry2 || entry2.outcome !== "success") return false;
-  if (entry2.reason !== "live") return false;
-  return isGameEligibleForCurrentOperationalLivePoll(game, nowMs);
-}
-function isProviderLeaguePollConfirmedLive(game, authorityState) {
-  if (game.status !== "live") return false;
-  const state = authorityState ?? getOperationalLiveAuthorityState();
-  if (!shouldApplyProviderPollLiveGate(state)) return false;
-  if (!state.operationalProviderPoll) return false;
-  return isConfirmedLiveBySuccessfulLeaguePoll(game, state.operationalProviderPoll);
-}
-function isProviderConfirmedLive(game, authorityState, nowMs = Date.now()) {
-  if (game.status !== "live") return false;
-  if (game.metadata?.manualGamesSpine) return true;
-  const state = authorityState ?? getOperationalLiveAuthorityState();
-  const { operationalProviderPoll, lastTransportGeneratedAt } = state;
-  const onCloudGate = shouldApplyProviderPollLiveGate(state);
-  const rowFresh = isOperationalLiveRowAuthoritativelyFresh(game, nowMs);
-  const transportFresh = isRecentTransportLiveRow(game, lastTransportGeneratedAt, nowMs);
-  if (onCloudGate) {
-    if (!rowFresh) return false;
-  } else if (!rowFresh && !transportFresh && !isLegacyCloudLiveRowFresh(game, nowMs)) {
-    return false;
-  }
-  if (!onCloudGate) {
-    if (isLegacyCloudLiveRowFresh(game, nowMs)) {
-      return isGameEligibleForCurrentOperationalLivePoll(game, nowMs);
-    }
-    if (transportFresh) {
-      return isGameEligibleForCurrentOperationalLivePoll(game, nowMs);
-    }
-    return false;
-  }
-  if (!operationalProviderPoll) {
-    if (isLegacyCloudLiveRowFresh(game, nowMs)) {
-      return isGameEligibleForCurrentOperationalLivePoll(game, nowMs);
-    }
-    if (transportFresh) {
-      return isGameEligibleForCurrentOperationalLivePoll(game, nowMs);
-    }
-    return false;
-  }
-  if (operationalProviderPoll.allLeaguesFailed) return false;
-  const providerPollCompletedAt = operationalProviderPoll.providerPollCompletedAt;
-  if (!providerPollCompletedAt?.trim()) {
-    if (isLegacyCloudLiveRowFresh(game, nowMs)) {
-      return isGameEligibleForCurrentOperationalLivePoll(game, nowMs);
-    }
-    if (transportFresh) {
-      return isGameEligibleForCurrentOperationalLivePoll(game, nowMs);
-    }
-    return false;
-  }
-  if (!isOperationalProviderPollAuthoritativelyFresh(providerPollCompletedAt, nowMs)) {
-    return false;
-  }
-  if (isGameLastUpdatedProviderConfirmed(game, providerPollCompletedAt)) {
-    return isGameEligibleForCurrentOperationalLivePoll(game, nowMs);
-  }
-  if (isProviderPollHydrationFresh(game, providerPollCompletedAt)) {
-    return isGameEligibleForCurrentOperationalLivePoll(game, nowMs);
-  }
-  if (isConfirmedLiveBySuccessfulLeaguePoll(game, operationalProviderPoll, nowMs)) {
-    return true;
-  }
-  if (isLegacyCloudLiveRowFresh(game, nowMs)) {
-    return isGameEligibleForCurrentOperationalLivePoll(game, nowMs);
-  }
-  return false;
 }
 
 // ../grarf/desktop/src/lib/gamesSpine/reconcileOperationalGamesByEspnEventId.ts
@@ -17179,34 +16834,13 @@ function isSpineFinalizedGame(game) {
 }
 
 // ../grarf/desktop/src/lib/gamesSpine/classifyOperationalGameTemporalBucket.ts
-function pausedFromStatusLine(statusLine) {
-  const line = statusLine?.trim();
-  if (!line) return false;
-  return isEspnPausedCompetitionStatus({
-    shortDetail: line,
-    detail: line,
-    description: line
-  });
-}
-function halftimeFromStatusLine(statusLine) {
-  const line = statusLine?.trim();
-  if (!line) return false;
-  return isEspnHalftimeOrIntermissionStatus({
-    shortDetail: line,
-    detail: line,
-    description: line
-  });
-}
-function gameHasHalftimeOrIntermissionSignal(game) {
-  if (halftimeFromStatusLine(game.statusLine)) return true;
-  return halftimeFromStatusLine(game.displayClock);
-}
 function resolveAuthoritativeEventEndedAtMs(game) {
   const fromRow = resolveOperationalGameEventEndedAtMs(game);
   if (fromRow != null) return fromRow;
   return readPersistedEventEndedAtMs(game.id) ?? null;
 }
 function hasRetainedCanonicalFinalRow(game, nowMs = Date.now()) {
+  if (game.status === "live") return false;
   const entry2 = useRecentFinalizedGamesStore.getState().byId[game.id];
   if (!entry2 || entry2.expiresAt <= nowMs) return false;
   const retained = entry2.game;
@@ -17216,16 +16850,12 @@ function hasRetainedCanonicalFinalRow(game, nowMs = Date.now()) {
     if (isGolfTournamentLeagueKey(retained.league ?? void 0) && isGolfRoundPlayCompleteStatusLine(retained.statusLine) && endKey && endKey >= sportsDayKey) {
       return false;
     }
-    if (game.status === "live" && isProviderLeaguePollConfirmedLive(game)) {
-      return false;
-    }
     return true;
   }
   return false;
 }
 function isSupersededByAuthoritativeEspnEventRow(game) {
   if (game.status !== "live") return false;
-  if (isProviderLeaguePollConfirmedLive(game)) return false;
   const eventId = readEspnCompetitionEventId(game);
   if (!eventId) return false;
   for (const record of Object.values(useCanonicalLiveGameStore.getState().gamesById)) {
@@ -17239,45 +16869,18 @@ function isSupersededByAuthoritativeEspnEventRow(game) {
   }
   return false;
 }
-function isStaleOperationalIngestLiveRow(game, nowMs) {
-  if (game.status !== "live" || game.metadata?.manualGamesSpine) return false;
-  if (!isOperationalLiveRowAuthoritativelyFresh(game, nowMs)) return true;
-  const authority = getOperationalLiveAuthorityState();
-  if (authority.lastTransportSource !== "grarf_cloud" && !authority.operationalProviderPoll) {
-    return false;
-  }
-  const pollCompletedAt = authority.operationalProviderPoll?.providerPollCompletedAt?.trim() || authority.lastTransportGeneratedAt?.trim() || "";
-  if (!pollCompletedAt) return true;
-  return !isOperationalProviderPollAuthoritativelyFresh(pollCompletedAt, nowMs);
-}
 function hasAuthoritativeOperationalGameEnded(game, nowMs = Date.now()) {
-  if (isStaleOperationalIngestLiveRow(game, nowMs)) return true;
   if (game.status === "final" || isSpineFinalizedGame(game)) return true;
   if (hasRetainedCanonicalFinalRow(game, nowMs)) return true;
   if (isSupersededByAuthoritativeEspnEventRow(game)) return true;
   const endedAtMs = resolveAuthoritativeEventEndedAtMs(game);
   if (endedAtMs != null && endedAtMs <= nowMs) return true;
-  if (game.status === "live" && !game.metadata?.manualGamesSpine && !isGameEligibleForCurrentOperationalLivePoll(game, nowMs)) {
-    return true;
-  }
   return false;
-}
-function isGameCompetitionPaused(game) {
-  if (gameHasHalftimeOrIntermissionSignal(game)) return false;
-  if (game.status === "delayed" || game.status === "suspended") return true;
-  if (game.status === "postponed") return true;
-  return pausedFromStatusLine(game.statusLine);
-}
-function isProviderAuthoritativeNow(game, nowMs) {
-  if (hasAuthoritativeOperationalGameEnded(game, nowMs)) return false;
-  if (game.status !== "live") return false;
-  if (isGameCompetitionPaused(game)) return false;
-  return isProviderConfirmedLive(game, void 0, nowMs);
 }
 function classifyOperationalGameTemporalBucket(game, nowMs = Date.now()) {
   if (hasAuthoritativeOperationalGameEnded(game, nowMs)) return "completed";
-  if (isProviderAuthoritativeNow(game, nowMs)) return "now";
-  if (game.status === "scheduled") return "upcoming";
+  if (isEspnNormalizedOperationalLive(game)) return "now";
+  if (isEspnNormalizedOperationalScheduled(game)) return "upcoming";
   return "other";
 }
 function isOperationalGameNow(game, nowMs = Date.now()) {
@@ -19290,13 +18893,13 @@ init_define_import_meta_env();
 
 // ../grarf/desktop/src/lib/broadcast/broadcastDebug.ts
 init_define_import_meta_env();
-var LOG3 = "[Broadcasts]";
+var LOG2 = "[Broadcasts]";
 function broadcastDebug(message, extra) {
   if (!define_import_meta_env_default.DEV) return;
   if (extra && Object.keys(extra).length > 0) {
-    console.log(`${LOG3} ${message}`, extra);
+    console.log(`${LOG2} ${message}`, extra);
   } else {
-    console.log(`${LOG3} ${message}`);
+    console.log(`${LOG2} ${message}`);
   }
 }
 
@@ -19578,7 +19181,7 @@ init_define_import_meta_env();
 var MLB_STATS_API_GRARF_STANDINGS_URL = "https://statsapi.mlb.com/api/v1/standings?leagueId=103,104&standingsTypes=regularSeason&hydrate=division,league,team";
 
 // ../grarf/desktop/src/lib/standings/mlb/buildMlbEspnStandingsIndex.ts
-var LOG4 = "[StandingsEnrich:MLB]";
+var LOG3 = "[StandingsEnrich:MLB]";
 async function buildMlbEspnStandingsIndex() {
   const res = await fetch(MLB_STATS_API_GRARF_STANDINGS_URL);
   if (!res.ok) {
@@ -19587,7 +19190,7 @@ async function buildMlbEspnStandingsIndex() {
   const payload = await res.json();
   const index = buildMlbTeamStandingsIndexFromStatsApiResponse(payload);
   if (define_import_meta_env_default?.DEV) {
-    console.log(`${LOG4} Built MLB standings index from MLB Stats API`, {
+    console.log(`${LOG3} Built MLB standings index from MLB Stats API`, {
       teams: index.byEspnTeamId.size
     });
   }
@@ -20928,7 +20531,7 @@ var TENNIS_ENDPOINTS = [
   { key: "ATP", endpoint: `${TENNIS_BASE}/atp/scoreboard` },
   { key: "WTA", endpoint: `${TENNIS_BASE}/wta/scoreboard` }
 ];
-var LOG5 = "[OperationalIngest][tennis]";
+var LOG4 = "[OperationalIngest][tennis]";
 var ESPN_WEB_FETCH_TIMEOUT_MS = 12e3;
 async function fetchUsOpenTennisWebScoreboardJson(url) {
   const res = await fetch(url, {
@@ -20955,7 +20558,7 @@ async function fetchTennisOperationalLeagues() {
       } catch (e) {
         const msg = e instanceof Error ? e.message : String(e);
         if (define_import_meta_env_default.DEV) {
-          console.warn(`${LOG5} ${key} fetch failed`, msg);
+          console.warn(`${LOG4} ${key} fetch failed`, msg);
         }
         return { key, games: [], error: msg };
       }
@@ -20975,11 +20578,11 @@ async function fetchTennisOperationalLeagues() {
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
     if (define_import_meta_env_default.DEV) {
-      console.warn(`${LOG5} US Open tournament fetch failed`, msg);
+      console.warn(`${LOG4} US Open tournament fetch failed`, msg);
     }
   }
   if (define_import_meta_env_default.DEV) {
-    console.log(`${LOG5} slate`, {
+    console.log(`${LOG4} slate`, {
       atp: leagueGames.ATP?.length ?? 0,
       wta: leagueGames.WTA?.length ?? 0,
       usOpen: leagueGames.US_OPEN_TENNIS?.length ?? 0
@@ -20989,7 +20592,7 @@ async function fetchTennisOperationalLeagues() {
 }
 
 // ../grarf/desktop/src/services/operationalIngest/supplementOperationalSnapshotWithTennis.ts
-var LOG6 = "[OperationalIngest]";
+var LOG5 = "[OperationalIngest]";
 async function supplementOperationalSnapshotWithTennis(snap) {
   const tennis = await fetchTennisOperationalLeagues();
   const atpIncoming = tennis.ATP ?? [];
@@ -21012,7 +20615,7 @@ async function supplementOperationalSnapshotWithTennis(snap) {
     );
   }
   if (define_import_meta_env_default.DEV) {
-    console.log(`${LOG6} tennis supplement`, {
+    console.log(`${LOG5} tennis supplement`, {
       atp: leagues.ATP?.length ?? 0,
       wta: leagues.WTA?.length ?? 0,
       usOpen: leagues.US_OPEN_TENNIS?.length ?? 0
@@ -22088,7 +21691,7 @@ var NATIONAL_TEAM_SOCCER_LEAGUE_KEYS = /* @__PURE__ */ new Set(["CONCACAF_NG", "
 
 // ../grarf/desktop/electron/espn/espnPlusStream.js
 init_define_import_meta_env();
-var LOG7 = "[ESPN]";
+var LOG6 = "[ESPN]";
 var PLAY_LOCATION2 = "where-to-watch%3Aguide";
 function buildEspnPlusWatchUrlByEventCalendarId(eventCalendarId) {
   const id = String(eventCalendarId).trim();
@@ -22102,16 +21705,16 @@ function resolveEspnPlusStreamFromEvent(event, broadcastLabels, leagueKey) {
   }
   const eventCalendarId = String(event?.id ?? "").trim();
   if (!/^\d+$/.test(eventCalendarId)) {
-    console.warn(`${LOG7} ESPN watch broadcast present but missing event id`, { leagueKey });
+    console.warn(`${LOG6} ESPN watch broadcast present but missing event id`, { leagueKey });
     return null;
   }
   const streamUrl = buildEspnPlusWatchUrlByEventCalendarId(eventCalendarId);
   if (!streamUrl) return null;
   const linearNhl = leagueKey === "NHL" && !gameHasEspnPlusBroadcast(broadcastLabels) && gameHasEspnWatchBroadcast(broadcastLabels, leagueKey);
-  console.log(`${LOG7} Found watch eventCalendarId: ${eventCalendarId}`);
-  console.log(`${LOG7} Current generated URL: ${streamUrl}`);
+  console.log(`${LOG6} Found watch eventCalendarId: ${eventCalendarId}`);
+  console.log(`${LOG6} Current generated URL: ${streamUrl}`);
   console.log(
-    `${LOG7} Resolved direct ESPN watch URL (legacy calendar id${linearNhl ? ", NHL linear ESPN" : ""})`
+    `${LOG6} Resolved direct ESPN watch URL (legacy calendar id${linearNhl ? ", NHL linear ESPN" : ""})`
   );
   return { streamUrl, streamProvider: "ESPN+", eventCalendarId };
 }
@@ -22120,16 +21723,16 @@ function resolveEspnWatchStreamFromCompetition2(competition, broadcastLabels, le
   if (!gameHasEspnWatchBroadcast(broadcastLabels, leagueKey)) return null;
   const eventCalendarId = String(competition?.id ?? "").trim();
   if (!/^\d+$/.test(eventCalendarId)) {
-    console.warn(`${LOG7} ESPN watch broadcast present but missing competition id`, { leagueKey });
+    console.warn(`${LOG6} ESPN watch broadcast present but missing competition id`, { leagueKey });
     return null;
   }
   const streamUrl = buildEspnPlusWatchUrlByEventCalendarId(eventCalendarId);
   if (!streamUrl) return null;
   const linearOnly = !gameHasEspnPlusBroadcast(broadcastLabels) && gameHasEspnWatchBroadcast(broadcastLabels, leagueKey);
-  console.log(`${LOG7} Found watch eventCalendarId: ${eventCalendarId}`);
-  console.log(`${LOG7} Current generated URL: ${streamUrl}`);
+  console.log(`${LOG6} Found watch eventCalendarId: ${eventCalendarId}`);
+  console.log(`${LOG6} Current generated URL: ${streamUrl}`);
   console.log(
-    `${LOG7} Resolved direct ESPN watch URL (${linearOnly ? "linear ESPN" : "ESPN+"}, ${leagueKey})`
+    `${LOG6} Resolved direct ESPN watch URL (${linearOnly ? "linear ESPN" : "ESPN+"}, ${leagueKey})`
   );
   return { streamUrl, streamProvider: "ESPN+", eventCalendarId };
 }
@@ -22153,12 +21756,15 @@ function attachEspnPlusStreamToGame2(game, stream) {
       ...stream.playerId ? { playerId: stream.playerId } : {}
     }
   ];
-  console.log(`${LOG7} Attached streamUrl to game object`, {
+  console.log(`${LOG6} Attached streamUrl to game object`, {
     id: game.id,
     eventCalendarId: stream.eventCalendarId,
     playerId: stream.playerId ?? null
   });
 }
+
+// ../grarf/desktop/shared/espnPausedCompetitionStatus.js
+init_define_import_meta_env();
 
 // ../grarf/desktop/electron/espn/normalizeRacing.js
 init_define_import_meta_env();
@@ -23887,7 +23493,7 @@ function normalizeDatedOperationalScoreboardPair(todayJson, tomorrowJson, league
 }
 
 // ../grarf/desktop/src/services/operationalIngest/web/fetchWebEspnOperationalSnapshot.ts
-var LOG8 = "[OperationalIngest]";
+var LOG7 = "[OperationalIngest]";
 var ESPN_FETCH_TIMEOUT_MS2 = 12e3;
 var LEAGUE_FETCH_CONCURRENCY = 8;
 async function fetchEspnScoreboardJson(url) {
@@ -23977,7 +23583,7 @@ async function fetchLeagueGames(key) {
     return games;
   } catch (e) {
     if (define_import_meta_env_default.DEV) {
-      console.warn(`${LOG8} web ESPN fetch failed`, key, e);
+      console.warn(`${LOG7} web ESPN fetch failed`, key, e);
     }
     return [];
   }
@@ -24017,7 +23623,7 @@ async function fetchWebEspnOperationalSnapshot(leagueKeys = filterEspnOperationa
     if (games?.length) mergedTotal += games.length;
   }
   if (define_import_meta_env_default.DEV) {
-    console.log(`${LOG8} web ESPN fallback snapshot`, {
+    console.log(`${LOG7} web ESPN fallback snapshot`, {
       total: mergedTotal,
       leagues: Object.keys(mergedLeagues).length
     });
@@ -24031,7 +23637,7 @@ async function fetchWebEspnOperationalSnapshot(leagueKeys = filterEspnOperationa
 }
 
 // ../grarf/desktop/src/services/operationalIngest/fetchOperationalSnapshot.ts
-var LOG9 = "[OperationalIngest]";
+var LOG8 = "[OperationalIngest]";
 var CLOUD_FETCH_TIMEOUT_MS = 2e4;
 var WEB_CLOUD_BOOTSTRAP_TIMEOUT_MS = 2500;
 var CLOUD_FETCH_MAX_ATTEMPTS = 3;
@@ -24051,7 +23657,7 @@ function prefetchWebOperationalCloudSnapshot() {
     webCloudSnapshotPrefetch = fetchViaGrarfCloudService(
       shouldUseWebBootstrapCloudPrefetch() ? { webBootstrap: true, traceFetchKind: "prefetch" } : { traceFetchKind: "prefetch" }
     ).then((snap) => countOperationalGames(snap) > 0 ? snap : null).catch((e) => {
-      console.warn(`${LOG9} web cloud prefetch failed`, e);
+      console.warn(`${LOG8} web cloud prefetch failed`, e);
       return null;
     });
   }
@@ -24234,7 +23840,7 @@ async function fetchViaEspnLocalIpcAdapter() {
   const api = window.grarf?.gamesGetSnapshot;
   if (!api) {
     if (define_import_meta_env_default.DEV) {
-      console.warn(`${LOG9} source=espn_local_adapter unavailable (no Electron IPC)`);
+      console.warn(`${LOG8} source=espn_local_adapter unavailable (no Electron IPC)`);
     }
     return emptyOperationalSnapshot();
   }
@@ -24322,7 +23928,7 @@ async function fetchViaWebOperationalIngest() {
   } catch (e) {
     cloudError = e instanceof Error ? e.message : String(e);
     if (define_import_meta_env_default.DEV) {
-      console.warn(`${LOG9} web cloud snapshot unavailable`, e);
+      console.warn(`${LOG8} web cloud snapshot unavailable`, e);
     }
   }
   if (cloud && countOperationalGames(cloud) > 0) {
@@ -24338,7 +23944,7 @@ async function fetchViaWebOperationalIngest() {
       }
     } catch (e) {
       if (define_import_meta_env_default.DEV) {
-        console.warn(`${LOG9} dev ESPN fallback unavailable`, e);
+        console.warn(`${LOG8} dev ESPN fallback unavailable`, e);
       }
     }
   }
@@ -24356,7 +23962,7 @@ async function joinWebMlbProviderIds(transport) {
     return { ...transport, leagues: { ...transport.leagues, MLB: joined } };
   } catch (e) {
     if (define_import_meta_env_default.DEV) {
-      console.warn(`${LOG9} web MLB provider id join failed`, e);
+      console.warn(`${LOG8} web MLB provider id join failed`, e);
     }
     return transport;
   }
@@ -24382,6 +23988,167 @@ async function fetchOperationalSnapshot() {
 // ../grarf/desktop/src/services/operationalIngest/electronIpcOperationalAuthority.ts
 function isElectronIpcAuthoritativeOperationalIngest(source) {
   return hasElectronGamesIpc() && (source === "espn_scoreboard_ipc" || source === "espn_local_adapter");
+}
+
+// ../grarf/desktop/src/lib/gamesSpine/preserveMissingOperationalLeagueSections.ts
+init_define_import_meta_env();
+
+// ../grarf/desktop/src/lib/gamesSpine/operationalGameFreshness.ts
+init_define_import_meta_env();
+
+// ../grarf/shared/domain/operational/operationalLiveFreshness.js
+init_define_import_meta_env();
+var OPERATIONAL_LIVE_MAX_STALE_UPDATE_MS = 45 * 60 * 1e3;
+function parseOperationalGameLastUpdatedMs(lastUpdated) {
+  if (lastUpdated == null || !String(lastUpdated).trim()) return null;
+  const ms = Date.parse(String(lastUpdated));
+  return Number.isFinite(ms) ? ms : null;
+}
+function isOperationalLiveRowAuthoritativelyFresh(game, nowMs = Date.now()) {
+  if (!game || game.status !== "live") return true;
+  if (game.metadata?.manualGamesSpine) return true;
+  const lastUpdatedMs = parseOperationalGameLastUpdatedMs(game.lastUpdated);
+  if (lastUpdatedMs == null) return false;
+  return nowMs - lastUpdatedMs <= OPERATIONAL_LIVE_MAX_STALE_UPDATE_MS;
+}
+
+// ../grarf/desktop/src/lib/gamesSpine/operationalGameFreshness.ts
+var OPERATIONAL_SCHEDULED_OVERDUE_GRACE_MS = 20 * 60 * 1e3;
+function isOperationalScheduledGameOverdue(game, nowMs = Date.now()) {
+  if (game.status !== "scheduled") return false;
+  const startMs = game.startTimeMs;
+  if (startMs == null || !Number.isFinite(startMs) || startMs <= 0) return false;
+  return startMs + OPERATIONAL_SCHEDULED_OVERDUE_GRACE_MS < nowMs;
+}
+function shouldPreserveMissingOperationalLiveGame(game, ingestCycle, liveRecencyById) {
+  if (!isOperationalLiveRowAuthoritativelyFresh(game)) return false;
+  return isRecentlyLive(liveRecencyById[game.id], ingestCycle);
+}
+function isOperationalSpineContinuityCandidate(game, ingestCycle, liveRecencyById, now = /* @__PURE__ */ new Date()) {
+  if (game.status === "postponed") return true;
+  if (game.status === "final") return false;
+  if (game.status === "live") {
+    return shouldPreserveMissingOperationalLiveGame(game, ingestCycle, liveRecencyById);
+  }
+  if (game.status === "scheduled") {
+    return !isOperationalScheduledGameOverdue(game, now.getTime());
+  }
+  return true;
+}
+
+// ../grarf/desktop/src/lib/gamesSpine/preserveMissingOperationalLeagueSections.ts
+var LOG9 = "[GamesSpine]";
+function countLeaguesWithTodaySlate(leagues, now = /* @__PURE__ */ new Date()) {
+  let count = 0;
+  for (const key of getGamesColumnLeagueOrder()) {
+    if (filterGamesSpineSlateForOperationalSportsDay(leagues[key] ?? [], now).length > 0) count += 1;
+  }
+  return count;
+}
+function countOperationalSportsDayGames(leagues, now = /* @__PURE__ */ new Date()) {
+  let count = 0;
+  for (const key of getGamesColumnLeagueOrder()) {
+    count += filterGamesSpineSlateForOperationalSportsDay(leagues[key] ?? [], now).length;
+  }
+  return count;
+}
+function validateOperationalSlateReplacement(incoming, previousLeagues, now = /* @__PURE__ */ new Date()) {
+  const previousLeagueCount = countLeaguesWithTodaySlate(previousLeagues, now);
+  const incomingLeagueCount = countLeaguesWithTodaySlate(incoming.leagues ?? {}, now);
+  if (previousLeagueCount === 0) {
+    return { accepted: true };
+  }
+  if (incomingLeagueCount === 0) {
+    return { accepted: false, reason: "incoming_zero_leagues" };
+  }
+  if (incomingLeagueCount + 2 < previousLeagueCount) {
+    return { accepted: false, reason: "incoming_league_count_regression" };
+  }
+  if (previousLeagueCount >= 3 && incomingLeagueCount <= 1) {
+    return { accepted: false, reason: "incoming_near_single_league_slate" };
+  }
+  const previousGameCount = countOperationalSportsDayGames(previousLeagues, now);
+  const incomingGameCount = countOperationalSportsDayGames(incoming.leagues ?? {}, now);
+  if (previousGameCount >= 6 && incomingGameCount < Math.ceil(previousGameCount * 0.4)) {
+    return { accepted: false, reason: "incoming_game_count_regression" };
+  }
+  return { accepted: true };
+}
+function filterOperationalSpineContinuityCandidates(games, now) {
+  const ingestCycle = useCanonicalLiveGameStore.getState().ingestSequence;
+  const liveRecencyById = useRecentFinalizedGamesStore.getState().liveRecencyById;
+  return games.filter(
+    (game) => isOperationalSpineContinuityCandidate(game, ingestCycle, liveRecencyById, now)
+  );
+}
+function mergeLeagueSlateContinuity(previousGames, incomingGames, now) {
+  const prevToday = filterGamesSpineSlateForOperationalSportsDay(previousGames, now);
+  const incomingToday = filterGamesSpineSlateForOperationalSportsDay(incomingGames, now);
+  if (prevToday.length === 0) return [...incomingGames];
+  if (incomingToday.length === 0) return [...incomingGames];
+  const incomingIds = new Set(incomingToday.map((game) => game.id));
+  const missingFromIncoming = filterOperationalSpineContinuityCandidates(
+    prevToday.filter((game) => !incomingIds.has(game.id)),
+    now
+  );
+  if (missingFromIncoming.length === 0) return [...incomingGames];
+  const merged = [...incomingGames];
+  const mergedIds = new Set(merged.map((game) => game.id));
+  for (const game of missingFromIncoming) {
+    if (mergedIds.has(game.id)) continue;
+    merged.push({ ...game });
+    mergedIds.add(game.id);
+  }
+  return merged;
+}
+function preserveMissingOperationalLeagueSections(incoming, previousLeagues, now = /* @__PURE__ */ new Date()) {
+  const leagues = { ...incoming.leagues };
+  let changed = false;
+  for (const key of getGamesColumnLeagueOrder()) {
+    const previousRows = previousLeagues[key] ?? [];
+    const prevTodayCount = filterGamesSpineSlateForOperationalSportsDay(previousRows, now).length;
+    const incomingRows = leagues[key] ?? [];
+    const incomingTodayCount = filterGamesSpineSlateForOperationalSportsDay(incomingRows, now).length;
+    if (prevTodayCount === 0) {
+      continue;
+    }
+    if (incomingTodayCount > 0) {
+      const mergedRows = mergeLeagueSlateContinuity(previousRows, incomingRows, now);
+      if (mergedRows.length !== incomingRows.length) {
+        leagues[key] = mergedRows;
+        changed = true;
+      }
+      continue;
+    }
+    const continuityRows = filterOperationalSpineContinuityCandidates(previousRows, now);
+    if (continuityRows.length === 0) continue;
+    leagues[key] = continuityRows.map((game) => ({ ...game }));
+    changed = true;
+  }
+  if (!changed) return incoming;
+  return { ...incoming, leagues };
+}
+function rejectInvalidOperationalSlateReplacement(incoming, previousLeagues, now = /* @__PURE__ */ new Date()) {
+  const validation = validateOperationalSlateReplacement(incoming, previousLeagues, now);
+  if (validation.accepted) return null;
+  if (define_import_meta_env_default.DEV) {
+    console.warn(`${LOG9} Rejected invalid operational slate replacement`, {
+      reason: validation.reason,
+      previousLeagues: countLeaguesWithTodaySlate(previousLeagues, now),
+      incomingLeagues: countLeaguesWithTodaySlate(incoming.leagues ?? {}, now),
+      previousGames: countOperationalSportsDayGames(previousLeagues, now),
+      incomingGames: countOperationalSportsDayGames(incoming.leagues ?? {}, now)
+    });
+  }
+  return {
+    ...incoming,
+    leagues: { ...previousLeagues }
+  };
+}
+function applyGamesSpineSnapshotStability(incoming, previousLeagues, now = /* @__PURE__ */ new Date()) {
+  const rejected = rejectInvalidOperationalSlateReplacement(incoming, previousLeagues, now);
+  if (rejected) return rejected;
+  return preserveMissingOperationalLeagueSections(incoming, previousLeagues, now);
 }
 
 // ../grarf/desktop/src/lib/gamesSpine/preserveLiveStatusOnIngest.ts
@@ -24445,6 +24212,27 @@ function preserveWimbledonSlamTrackerOnOperationalIngest(incoming, previousGames
 
 // ../grarf/desktop/src/lib/finalizedGameRetention/preserveMissingOperationalIngestGames.ts
 init_define_import_meta_env();
+
+// ../grarf/shared/domain/operational/authoritativeEspnScoreboardReconciliation.ts
+init_define_import_meta_env();
+function resolveAuthoritativeEspnReconciledLeagueKeysFromProviderPoll(providerPoll) {
+  const keys = /* @__PURE__ */ new Set();
+  const leaguePolls = providerPoll?.leaguePolls;
+  if (!leaguePolls) return keys;
+  for (const [key, row] of Object.entries(leaguePolls)) {
+    if (row?.outcome === "success") {
+      keys.add(key);
+    }
+  }
+  return keys;
+}
+function isAuthoritativeEspnReconciledOperationalLeague(leagueKey, authoritativeLeagueKeys) {
+  if (!authoritativeLeagueKeys || authoritativeLeagueKeys.size === 0) return false;
+  const key = leagueKey ?? "MLB";
+  return authoritativeLeagueKeys.has(key);
+}
+
+// ../grarf/desktop/src/lib/finalizedGameRetention/preserveMissingOperationalIngestGames.ts
 function collectIncomingGames(incoming) {
   const out = [];
   for (const rows of Object.values(incoming.leagues ?? {})) {
@@ -24452,8 +24240,9 @@ function collectIncomingGames(incoming) {
   }
   return out;
 }
-function preserveMissingOperationalIngestGames(incoming, previousGames) {
+function preserveMissingOperationalIngestGames(incoming, previousGames, options) {
   if (previousGames.length === 0) return incoming;
+  const authoritativeEspnReconciledLeagueKeys = options?.authoritativeEspnReconciledLeagueKeys ?? resolveAuthoritativeEspnReconciledLeagueKeysFromProviderPoll(options?.providerPoll);
   const incomingIds = /* @__PURE__ */ new Set();
   for (const rows of Object.values(incoming.leagues ?? {})) {
     if (!Array.isArray(rows)) continue;
@@ -24467,6 +24256,12 @@ function preserveMissingOperationalIngestGames(incoming, previousGames) {
   for (const prev of previousGames) {
     if (!prev?.id || incomingIds.has(prev.id)) continue;
     if (isEspnOperationalIngestLeagueDisabled(prev.league)) continue;
+    if (isAuthoritativeEspnReconciledOperationalLeague(
+      prev.league,
+      authoritativeEspnReconciledLeagueKeys
+    )) {
+      continue;
+    }
     if (prev.status === "live") {
       const eventId = readEspnCompetitionEventId(prev);
       if (eventId && incomingHasAuthoritativeFinalForEspnEvent(incomingGames, eventId)) {
@@ -24509,13 +24304,14 @@ function filterContradictorySupplementalFinals(games, previousGames) {
   if (protectedIds.size === 0) return games;
   return games.filter((g) => g.status !== "final" || !protectedIds.has(g.id));
 }
-function mergeFinalRowsWithoutContradictingProtectedGames(primary, extraLeagues, previousGames) {
+function mergeFinalRowsWithoutContradictingProtectedGames(primary, extraLeagues, previousGames, authoritativeEspnReconciledLeagueKeys) {
   const protectedIds = new Set(
     previousGames.filter((g) => g.status === "live" || g.status === "postponed").map((g) => g.id)
   );
   const leagues = { ...primary.leagues };
   let changed = false;
   for (const key of getGamesColumnLeagueOrder()) {
+    if (authoritativeEspnReconciledLeagueKeys?.has(key)) continue;
     const rows = leagues[key] ?? [];
     const ids = new Set(rows.map((g) => g.id));
     const extras = (extraLeagues[key] ?? []).filter(
@@ -25027,11 +24823,20 @@ function mergeGrarfCloudOperationalGameOverPrevious(cloudGame, previousGame) {
     }
   };
 }
-function mergeGrarfCloudOperationalLeaguesOverPrevious(cloudLeagues, previousLeagues) {
+function mergeGrarfCloudOperationalLeaguesOverPrevious(cloudLeagues, previousLeagues, authoritativeEspnReconciledLeagueKeys) {
   const merged = { ...previousLeagues };
   for (const [key, cloudRows] of Object.entries(cloudLeagues)) {
-    if (!Array.isArray(cloudRows) || cloudRows.length === 0) continue;
     const leagueKey = key;
+    if (!Array.isArray(cloudRows)) continue;
+    if (authoritativeEspnReconciledLeagueKeys?.has(leagueKey)) {
+      const previousRows2 = merged[leagueKey] ?? [];
+      const byId2 = new Map(previousRows2.map((game) => [game.id, game]));
+      merged[leagueKey] = cloudRows.map(
+        (cloudGame) => mergeGrarfCloudOperationalGameOverPrevious(cloudGame, byId2.get(cloudGame.id))
+      );
+      continue;
+    }
+    if (cloudRows.length === 0) continue;
     const previousRows = merged[leagueKey];
     if (!Array.isArray(previousRows) || previousRows.length === 0) {
       merged[leagueKey] = cloudRows;
@@ -25046,6 +24851,12 @@ function mergeGrarfCloudOperationalLeaguesOverPrevious(cloudLeagues, previousLea
     }
     merged[leagueKey] = Array.from(byId.values());
   }
+  if (authoritativeEspnReconciledLeagueKeys) {
+    for (const leagueKey of authoritativeEspnReconciledLeagueKeys) {
+      if (Object.prototype.hasOwnProperty.call(cloudLeagues, leagueKey)) continue;
+      merged[leagueKey] = [];
+    }
+  }
   return merged;
 }
 function parseUpdatedAtMs(updatedAt) {
@@ -25054,23 +24865,30 @@ function parseUpdatedAtMs(updatedAt) {
   return Number.isFinite(ms) ? ms : 0;
 }
 function mergeGrarfCloudTransportIntoOperationalSnapshot(input) {
+  const authoritativeEspnReconciledLeagueKeys = resolveAuthoritativeEspnReconciledLeagueKeysFromProviderPoll(input.providerPoll);
   const previousCount = countOperationalGames2(input.previousLeagues);
   const mergedLeagues = previousCount === 0 ? input.incoming.leagues ?? {} : mergeGrarfCloudOperationalLeaguesOverPrevious(
     input.incoming.leagues ?? {},
-    input.previousLeagues
+    input.previousLeagues,
+    authoritativeEspnReconciledLeagueKeys
   );
   let merged = preserveMissingOperationalIngestGames(
     {
       ...input.incoming,
       leagues: mergedLeagues
     },
-    input.previousGames
+    input.previousGames,
+    {
+      authoritativeEspnReconciledLeagueKeys,
+      providerPoll: input.providerPoll
+    }
   );
   if (previousCount > 0) {
     merged = mergeFinalRowsWithoutContradictingProtectedGames(
       merged,
       input.previousLeagues,
-      input.previousGames
+      input.previousGames,
+      authoritativeEspnReconciledLeagueKeys
     );
   }
   const incomingMs = parseUpdatedAtMs(input.incoming.updatedAt);
@@ -25080,6 +24898,71 @@ function mergeGrarfCloudTransportIntoOperationalSnapshot(input) {
   }
   return merged;
 }
+
+// ../grarf/desktop/src/store/gamesSpineRenderStore.ts
+init_define_import_meta_env();
+function isCompleteOperationalSnapshot(leagues, meta) {
+  const hasAnyGames = Object.values(leagues).some(
+    (rows) => Array.isArray(rows) && rows.length > 0
+  );
+  if (!hasAnyGames) return false;
+  if (meta.source === "grarf_cloud") return true;
+  const requested = meta.requestedLeagueCount;
+  if (requested != null && Number.isFinite(requested) && requested > 0 && requested < ESPN_OPERATIONAL_INGEST_LEAGUE_KEYS.length) {
+    return false;
+  }
+  if (meta.source === "espn_local_adapter" || meta.source === "espn_scoreboard_ipc") {
+    if (meta.initialIngestComplete === false) return hasAnyGames;
+    return true;
+  }
+  return countLeaguesWithTodaySlate(leagues) > 0;
+}
+var useGamesSpineRenderStore = create((set, get) => ({
+  operationalReady: true,
+  operationalIngestComplete: false,
+  /** Manual KV overrides load async — never block the operational spine on them. */
+  manualReady: true,
+  hasPromotedInitialSnapshot: false,
+  lastTransportGeneratedAt: null,
+  lastTransportSource: null,
+  lastTransportGameCount: 0,
+  operationalProviderPoll: null,
+  markOperationalIngest: (leagues, meta) => {
+    const complete = isCompleteOperationalSnapshot(leagues, meta);
+    const gameCount = Object.values(leagues).reduce(
+      (total, rows) => total + (Array.isArray(rows) ? rows.length : 0),
+      0
+    );
+    set((state) => ({
+      operationalReady: true,
+      operationalIngestComplete: state.operationalIngestComplete || complete,
+      hasPromotedInitialSnapshot: state.hasPromotedInitialSnapshot || complete,
+      lastTransportGeneratedAt: meta.transportGeneratedAt ?? (complete ? (/* @__PURE__ */ new Date()).toISOString() : state.lastTransportGeneratedAt),
+      lastTransportSource: meta.source,
+      lastTransportGameCount: gameCount,
+      operationalProviderPoll: meta.source === "grarf_cloud" ? meta.providerPoll ?? state.operationalProviderPoll : state.operationalProviderPoll
+    }));
+  },
+  markManualLoaded: () => {
+    set({ manualReady: true });
+  },
+  isRenderReady: () => {
+    const state = get();
+    return state.operationalReady && state.manualReady;
+  },
+  resetForTests: () => {
+    set({
+      operationalReady: true,
+      operationalIngestComplete: false,
+      manualReady: true,
+      hasPromotedInitialSnapshot: false,
+      lastTransportGeneratedAt: null,
+      lastTransportSource: null,
+      lastTransportGameCount: 0,
+      operationalProviderPoll: null
+    });
+  }
+}));
 
 // ../grarf/desktop/src/store/liveGamesStore.ts
 function gameRowsMateriallyEqual(a, b) {

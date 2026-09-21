@@ -19584,7 +19584,7 @@ function resolveOperationalGameEventEndedAtMs(game) {
   return null;
 }
 
-// ../grarf/desktop/shared/espnPausedCompetitionStatus.js
+// ../grarf/shared/domain/operational/espnAuthoritativeOperationalGameState.ts
 init_define_import_meta_env();
 
 // ../grarf/shared/utils/espnPausedCompetitionStatus.js
@@ -19661,6 +19661,41 @@ function resolveTennisEspnCardStatus(statusType, options = {}) {
   return "scheduled";
 }
 
+// ../grarf/shared/domain/operational/espnAuthoritativeOperationalGameState.ts
+function pausedFromStatusLine(statusLine) {
+  const line = statusLine?.trim();
+  if (!line) return false;
+  return isEspnPausedCompetitionStatus({
+    shortDetail: line,
+    detail: line,
+    description: line
+  });
+}
+function halftimeFromStatusLine(statusLine) {
+  const line = statusLine?.trim();
+  if (!line) return false;
+  return isEspnHalftimeOrIntermissionStatus({
+    shortDetail: line,
+    detail: line,
+    description: line
+  });
+}
+function isEspnOperationalCompetitionPaused(game) {
+  if (halftimeFromStatusLine(game.statusLine)) return false;
+  if (halftimeFromStatusLine(game.displayClock)) return false;
+  if (game.status === "delayed" || game.status === "suspended") return true;
+  if (game.status === "postponed") return true;
+  return pausedFromStatusLine(game.statusLine);
+}
+function isEspnNormalizedOperationalLive(game) {
+  if (game.status !== "live") return false;
+  if (game.metadata?.manualGamesSpine) return true;
+  return !isEspnOperationalCompetitionPaused(game);
+}
+function isEspnNormalizedOperationalScheduled(game) {
+  return game.status === "scheduled";
+}
+
 // ../grarf/desktop/src/lib/finalizedGameRetention/gameFinalizationTimestampPersistence.ts
 init_define_import_meta_env();
 var FINALIZED_AT_STORAGE_KEY = "grarf-game-finalization-timestamps-v1";
@@ -19724,1494 +19759,6 @@ function persistEventEndedAtMsIfAbsent(gameId, eventEndedAtMs) {
   if (byId[trimmed] != null) return;
   byId[trimmed] = eventEndedAtMs;
   writeStorage(EVENT_ENDED_AT_STORAGE_KEY, byId, eventEndedAtMemoryRef);
-}
-
-// ../grarf/desktop/src/lib/operational/operationalLiveAuthority.ts
-init_define_import_meta_env();
-
-// ../grarf/shared/domain/operational/operationalLiveFreshness.js
-init_define_import_meta_env();
-var OPERATIONAL_LIVE_MAX_STALE_UPDATE_MS = 45 * 60 * 1e3;
-function parseOperationalGameLastUpdatedMs(lastUpdated) {
-  if (lastUpdated == null || !String(lastUpdated).trim()) return null;
-  const ms2 = Date.parse(String(lastUpdated));
-  return Number.isFinite(ms2) ? ms2 : null;
-}
-function isOperationalLiveRowAuthoritativelyFresh(game, nowMs2 = Date.now()) {
-  if (!game || game.status !== "live") return true;
-  if (game.metadata?.manualGamesSpine) return true;
-  const lastUpdatedMs = parseOperationalGameLastUpdatedMs(game.lastUpdated);
-  if (lastUpdatedMs == null) return false;
-  return nowMs2 - lastUpdatedMs <= OPERATIONAL_LIVE_MAX_STALE_UPDATE_MS;
-}
-function isOperationalProviderPollAuthoritativelyFresh(providerPollCompletedAt, nowMs2 = Date.now()) {
-  if (providerPollCompletedAt == null || !String(providerPollCompletedAt).trim()) return false;
-  const completedMs = Date.parse(String(providerPollCompletedAt));
-  if (!Number.isFinite(completedMs)) return false;
-  return nowMs2 - completedMs <= OPERATIONAL_LIVE_MAX_STALE_UPDATE_MS;
-}
-
-// ../grarf/desktop/src/lib/gamesSpine/gamesSpineOperationalDate.ts
-init_define_import_meta_env();
-
-// ../grarf/desktop/src/data/grarfSportHierarchy.ts
-init_define_import_meta_env();
-
-// ../grarf/desktop/shared/grarfSportHierarchy.js
-init_define_import_meta_env();
-
-// ../grarf/shared/config/grarfSportHierarchy.js
-init_define_import_meta_env();
-var GRARF_SPORT_HIERARCHY = {
-  soccer: {
-    title: "SOCCER",
-    directorySectionId: "soccer",
-    leagueKeys: [
-      "MLS",
-      "NWSL",
-      "NCAAMSOC",
-      "NCAAWSOC",
-      "LALIGA",
-      "BUNDESLIGA",
-      "SERIEA",
-      "UCL",
-      "UCLQ",
-      "LIGUE1",
-      "LIGAMX",
-      "EREDIVISIE",
-      "SPFL",
-      "SAUDI",
-      "SUPERLIG",
-      "UEL",
-      "UELQ",
-      "UECL",
-      "UECLQ",
-      "WWC",
-      "EURO",
-      "COPA",
-      "GOLDCUP",
-      "NATIONS",
-      "CLUBWC",
-      "USLCUP",
-      "WORLDCUP"
-    ]
-  },
-  golf: {
-    title: "GOLF",
-    directorySectionId: "golf",
-    leagueKeys: ["PGA", "LPGA", "DP_WORLD", "KORNFERRY", "LIV", "CHAMPIONS"]
-  },
-  tennis: {
-    title: "TENNIS",
-    directorySectionId: "tennis",
-    leagueKeys: ["US_OPEN_TENNIS", "ATP", "WTA"]
-  },
-  basketball: {
-    title: "BASKETBALL",
-    directorySectionId: "basketball",
-    leagueKeys: ["WNBA"]
-  },
-  motorsports: {
-    title: "MOTORSPORTS",
-    directorySectionId: "motorsports",
-    leagueKeys: ["F1", "F2", "F3", "FORMULA_E", "NASCAR", "NASCAR_XFINITY", "NASCAR_TRUCK", "INDYCAR", "MOTOGP", "MOTO2", "MOTO3", "WEC"]
-  },
-  combat: {
-    title: "COMBAT",
-    directorySectionId: "combat",
-    leagueKeys: ["UFC", "BOXING"]
-  },
-  football: {
-    title: "FOOTBALL",
-    directorySectionId: "football",
-    leagueKeys: []
-  }
-};
-var GOLF_LEAGUE_KEYS2 = GRARF_SPORT_HIERARCHY.golf.leagueKeys;
-var GOLF_LEAGUE_KEY_SET = new Set(GOLF_LEAGUE_KEYS2);
-function isGolfLeagueKey(leagueKey) {
-  return typeof leagueKey === "string" && GOLF_LEAGUE_KEY_SET.has(leagueKey);
-}
-function resolveSportKeyForLeague(leagueKey) {
-  if (typeof leagueKey !== "string" || !leagueKey.trim()) return void 0;
-  const key2 = leagueKey.trim();
-  for (const [sportKey, def] of Object.entries(GRARF_SPORT_HIERARCHY)) {
-    if (def.leagueKeys.includes(key2)) return (
-      /** @type {GrarfSportKey} */
-      sportKey
-    );
-  }
-  return void 0;
-}
-function sportLeagueKeys(sportKey) {
-  return GRARF_SPORT_HIERARCHY[sportKey]?.leagueKeys ?? [];
-}
-
-// ../grarf/desktop/src/data/grarfSportHierarchy.ts
-var GOLF_TOUR_LEAGUE_ORDER = sportLeagueKeys("golf");
-
-// ../grarf/desktop/shared/motorsportLeagues.js
-init_define_import_meta_env();
-
-// ../grarf/shared/config/motorsportLeagues.js
-init_define_import_meta_env();
-var MOTORSPORT_SESSION_LEAGUES = /* @__PURE__ */ new Set(["F1", "F2", "F3", "FORMULA_E"]);
-var MOTORSPORT_STANDALONE_LEAGUES = /* @__PURE__ */ new Set([
-  "NASCAR",
-  "NASCAR_XFINITY",
-  "NASCAR_TRUCK",
-  "INDYCAR",
-  "MOTOGP",
-  "MOTO2",
-  "MOTO3"
-]);
-var MOTORSPORT_LEAGUE_KEYS = /* @__PURE__ */ new Set([
-  ...MOTORSPORT_SESSION_LEAGUES,
-  ...MOTORSPORT_STANDALONE_LEAGUES
-]);
-function isMotorsportLeagueKey(leagueKey) {
-  return typeof leagueKey === "string" && MOTORSPORT_LEAGUE_KEYS.has(leagueKey);
-}
-function isMotorsportSessionLeagueKey(leagueKey) {
-  return typeof leagueKey === "string" && MOTORSPORT_SESSION_LEAGUES.has(leagueKey);
-}
-function isMotorsportStandaloneLeagueKey(leagueKey) {
-  return typeof leagueKey === "string" && MOTORSPORT_STANDALONE_LEAGUES.has(leagueKey);
-}
-
-// ../grarf/desktop/src/lib/gamesSpine/gamesSpineOperationalDate.ts
-init_isGrarfWebRenderer();
-function gamesSpineOperationalTimeZone() {
-  return resolveOperationalSlateTimeZone();
-}
-function formatUtcDateKeyFromMs(ms2) {
-  if (ms2 == null || !Number.isFinite(ms2) || ms2 <= 0) return null;
-  const d2 = new Date(ms2);
-  const y2 = d2.getUTCFullYear();
-  const m2 = String(d2.getUTCMonth() + 1).padStart(2, "0");
-  const day = String(d2.getUTCDate()).padStart(2, "0");
-  return `${y2}-${m2}-${day}`;
-}
-function buildOperationalSlateDateDiagnostics(game) {
-  const startTimeMs = game.startTimeMs != null && Number.isFinite(game.startTimeMs) && game.startTimeMs > 0 ? game.startTimeMs : null;
-  return {
-    scheduledDateKeyFromPayload: game.scheduledDateKey?.trim() ?? null,
-    localOperationalDateKey: formatOperationalDateKeyFromMs(startTimeMs, gamesSpineOperationalTimeZone()) ?? null,
-    utcDateKeyFromStart: formatUtcDateKeyFromMs(startTimeMs),
-    startTimeMs,
-    startTimeLocalFormatted: startTimeMs != null ? new Date(startTimeMs).toLocaleString("en-US", {
-      timeZone: gamesSpineOperationalTimeZone()
-    }) : null
-  };
-}
-function formatLocalDateKeyFromMs(ms2) {
-  return formatOperationalDateKeyFromMs(ms2 ?? void 0, gamesSpineOperationalTimeZone()) ?? null;
-}
-function isScheduledOnOperationalEveningSlate2(game, operationalDateKey, now = /* @__PURE__ */ new Date()) {
-  return isScheduledOnOperationalEveningSlate(
-    game,
-    operationalDateKey,
-    now,
-    gamesSpineOperationalTimeZone()
-  );
-}
-function buildGamesSpineOperationalDateContext(operationalDateKey, now) {
-  return {
-    operationalDateKey,
-    sportsDayKey: getOperationalSportsDayDateKey(now),
-    yesterdayKey: getOperationalSportsDayYesterdayDateKey(now)
-  };
-}
-function usesAuthoritativeScheduledDateKeyForSpineFilter(game) {
-  if (isGolfLeagueKey(game.league)) return true;
-  if (game.league === "AFL") return true;
-  if (isMotorsportSessionLeagueKey(game.league)) return true;
-  return false;
-}
-function isGameOnGamesSpineOperationalDateWithContext(game, ctx, now = /* @__PURE__ */ new Date()) {
-  const payloadKey = game.scheduledDateKey?.trim();
-  const startKey = formatOperationalDateKeyFromMs(
-    game.startTimeMs,
-    gamesSpineOperationalTimeZone()
-  );
-  if (game.status === "scheduled" && usesAuthoritativeScheduledDateKeyForSpineFilter(game)) {
-    return payloadKey ? payloadKey === ctx.operationalDateKey : false;
-  }
-  if (ctx.operationalDateKey === ctx.sportsDayKey) {
-    if (payloadKey === ctx.sportsDayKey || startKey === ctx.sportsDayKey) {
-      return true;
-    }
-  }
-  if (game.status === "scheduled") {
-    return isScheduledOnOperationalEveningSlate2(
-      game,
-      ctx.operationalDateKey,
-      now,
-      gamesSpineOperationalTimeZone()
-    );
-  }
-  if (game.status === "live") {
-    if (isGolfLeagueKey(game.league)) {
-      const gameDateKey2 = resolveGameOperationalDateKey(game);
-      if (!gameDateKey2) return ctx.operationalDateKey === ctx.sportsDayKey;
-      if (gameDateKey2 === ctx.operationalDateKey) return true;
-      if (gameDateKey2 === ctx.yesterdayKey) return true;
-      return false;
-    }
-  }
-  if (isScheduledOnOperationalEveningSlate2(game, ctx.operationalDateKey, now)) {
-    return true;
-  }
-  if (startKey === ctx.operationalDateKey) {
-    return true;
-  }
-  const gameDateKey = resolveGameOperationalDateKey(game);
-  if (!gameDateKey) return false;
-  if (gameDateKey === ctx.operationalDateKey) return true;
-  if (game.status === "live" && gameDateKey === ctx.yesterdayKey) {
-    return true;
-  }
-  return false;
-}
-function resolveActiveGolfTournamentOperationalSportsDayKey(game, now = /* @__PURE__ */ new Date()) {
-  const endKey = game.metadata?.tournamentEndDateKey?.trim();
-  if (!endKey) return null;
-  const today = getOperationalSportsDayDateKey(now);
-  if (endKey < today) return null;
-  const startTimeKey = game.startTimeMs != null && game.startTimeMs > 0 ? formatOperationalDateKeyFromMs(game.startTimeMs, gamesSpineOperationalTimeZone()) ?? null : null;
-  if (startTimeKey && startTimeKey <= today) return today;
-  return null;
-}
-function readGolfFinalOperationalDateKey(game) {
-  const endKey = game.metadata?.tournamentEndDateKey?.trim();
-  const scheduledKey = game.scheduledDateKey?.trim();
-  const activeSportsDayKey = resolveActiveGolfTournamentOperationalSportsDayKey(game);
-  if (activeSportsDayKey) return activeSportsDayKey;
-  if (endKey && scheduledKey && /round\s+\d+\s+-\s+play complete/i.test(game.statusLine ?? "")) {
-    return scheduledKey;
-  }
-  if (endKey) return endKey;
-  return scheduledKey || null;
-}
-function resolveGameOperationalDateKey(game) {
-  if (game.status === "scheduled" || game.status === "live") {
-    if (isGolfLeagueKey(game.league)) {
-      if (game.status === "live") {
-        const activeSportsDayKey = resolveActiveGolfTournamentOperationalSportsDayKey(game);
-        if (activeSportsDayKey) return activeSportsDayKey;
-      }
-      const key2 = game.scheduledDateKey?.trim();
-      if (key2) return key2;
-      return formatOperationalDateKeyFromMs(game.startTimeMs, gamesSpineOperationalTimeZone()) ?? null;
-    }
-    const fromStart2 = formatOperationalDateKeyFromMs(game.startTimeMs, gamesSpineOperationalTimeZone());
-    if (fromStart2) return fromStart2;
-    if (game.scheduledDateKey?.trim()) return game.scheduledDateKey.trim();
-    return null;
-  }
-  if (game.status === "final" && isGolfLeagueKey(game.league)) {
-    const golfFinalKey = readGolfFinalOperationalDateKey(game);
-    if (golfFinalKey) return golfFinalKey;
-  }
-  const fromStart = formatOperationalDateKeyFromMs(game.startTimeMs, gamesSpineOperationalTimeZone());
-  if (fromStart) return fromStart;
-  if (game.scheduledDateKey?.trim()) {
-    return game.scheduledDateKey.trim();
-  }
-  return null;
-}
-function isGamesSpineYesterdayFinalGame(game, now = /* @__PURE__ */ new Date()) {
-  if (game.status !== "final") return false;
-  const gameDateKey = resolveGameOperationalDateKey(game);
-  if (!gameDateKey) return false;
-  return gameDateKey === getOperationalSportsDayYesterdayDateKey(now);
-}
-function isCatchUpSpineFinalGame(game, now = /* @__PURE__ */ new Date()) {
-  if (game.status !== "final") return false;
-  const sportsDayKey = getOperationalSportsDayDateKey(now);
-  const yesterdayKey2 = getOperationalSportsDayYesterdayDateKey(now);
-  const gameDateKey = resolveGameOperationalDateKey(game);
-  if (!gameDateKey) return false;
-  if (gameDateKey === sportsDayKey) return false;
-  if (gameDateKey === yesterdayKey2) return true;
-  return gameDateKey < sportsDayKey;
-}
-function explainOperationalDateRemoval(game, operationalDateKey = getOperationalSportsDayDateKey(), now = /* @__PURE__ */ new Date()) {
-  if (isGameOnGamesSpineOperationalDate(game, operationalDateKey, now)) {
-    return "kept";
-  }
-  const diag = buildOperationalSlateDateDiagnostics(game);
-  const payloadKey = diag.scheduledDateKeyFromPayload;
-  const localKey = diag.localOperationalDateKey;
-  if (game.status === "scheduled") {
-    if (payloadKey != null && payloadKey !== operationalDateKey && localKey === operationalDateKey) {
-      return "scheduled_payload_utc_mismatch_local_start_on_operational_day";
-    }
-    if (payloadKey != null && payloadKey !== operationalDateKey) {
-      return "scheduled_date_mismatch";
-    }
-    return "operational_date_mismatch";
-  }
-  if (payloadKey != null && payloadKey !== operationalDateKey) {
-    return "scheduled_date_mismatch";
-  }
-  return "operational_date_mismatch";
-}
-function isGameOnGamesSpineOperationalDate(game, operationalDateKey = getOperationalSportsDayDateKey(), now = /* @__PURE__ */ new Date()) {
-  return isGameOnGamesSpineOperationalDateWithContext(
-    game,
-    buildGamesSpineOperationalDateContext(operationalDateKey, now),
-    now
-  );
-}
-function filterGamesSpineSlateForOperationalDate(games, operationalDateKey = getOperationalSportsDayDateKey(), now = /* @__PURE__ */ new Date()) {
-  if (games.length === 0) return games;
-  const ctx = buildGamesSpineOperationalDateContext(operationalDateKey, now);
-  return games.filter((g2) => isGameOnGamesSpineOperationalDateWithContext(g2, ctx, now));
-}
-function filterGamesSpineSlateForOperationalSportsDay(games, now = /* @__PURE__ */ new Date()) {
-  return filterGamesSpineSlateForOperationalDate(games, getOperationalSportsDayDateKey(now), now);
-}
-function filterGamesSpineSlateForTodayUpcoming(games, now = /* @__PURE__ */ new Date()) {
-  if (games.length === 0) return [];
-  const todayKey = getOperationalSportsDayDateKey(now);
-  return games.filter(
-    (g2) => isOperationalGameUpcoming(g2, now.getTime()) && isGameOnGamesSpineOperationalDate(g2, todayKey, now)
-  );
-}
-function filterGamesSpineSlateForUpcoming(games, now = /* @__PURE__ */ new Date()) {
-  if (!isGrarfWebRenderer2()) return [];
-  return filterGamesSpineSlateForTodayUpcoming(games, now);
-}
-
-// ../grarf/desktop/src/lib/updateEngine/updateEngineCadences.ts
-init_define_import_meta_env();
-var WEB_UPDATE_ENGINE_LIVE_GAMES_POLL_MS = 15e3;
-var WEB_UPDATE_ENGINE_SIGNALS_POLL_MS = 3e4;
-var WEB_UPDATE_ENGINE_BROWSER_POLL_MS = 2 * 6e4;
-var WEB_UPDATE_ENGINE_HIGHLIGHTS_TV_POLL_MS = 5 * 6e4;
-
-// ../grarf/desktop/src/store/gamesSpineRenderStore.ts
-init_define_import_meta_env();
-var import_zustand3 = __toESM(require_zustand(), 1);
-
-// ../grarf/desktop/src/data/espnOperationalLeagueEndpoints.ts
-init_define_import_meta_env();
-
-// ../grarf/desktop/src/data/espnOperationalLeagueRegistry.generated.ts
-init_define_import_meta_env();
-var ESPN_OPERATIONAL_INGEST_LEAGUES = [
-  {
-    "key": "AFL",
-    "sport": "australian-football",
-    "label": "AFL",
-    "slug": "afl",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/australian-football/afl/scoreboard"
-  },
-  {
-    "key": "ARG1",
-    "sport": "soccer",
-    "label": "Argentine Primera",
-    "slug": "arg.1",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/arg.1/scoreboard"
-  },
-  {
-    "key": "ATP",
-    "sport": "tennis",
-    "label": "ATP Tour",
-    "slug": "atp",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/tennis/atp/scoreboard"
-  },
-  {
-    "key": "BEL1",
-    "sport": "soccer",
-    "label": "Belgian Pro League",
-    "slug": "bel.1",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/bel.1/scoreboard"
-  },
-  {
-    "key": "BRA1",
-    "sport": "soccer",
-    "label": "Brasileir\xE3o",
-    "slug": "bra.1",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/bra.1/scoreboard"
-  },
-  {
-    "key": "BUNDESLIGA",
-    "sport": "soccer",
-    "label": "Bundesliga",
-    "slug": "ger.1",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/ger.1/scoreboard"
-  },
-  {
-    "key": "CAF_WNATIONS",
-    "sport": "soccer",
-    "label": "Women's AFCON",
-    "slug": "caf.w.nations",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/caf.w.nations/scoreboard"
-  },
-  {
-    "key": "CARABAO_CUP",
-    "sport": "soccer",
-    "label": "Carabao Cup",
-    "slug": "eng.league_cup",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/eng.league_cup/scoreboard"
-  },
-  {
-    "key": "CFL",
-    "sport": "football",
-    "label": "CFL",
-    "slug": "cfl",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/football/cfl/scoreboard"
-  },
-  {
-    "key": "CHAMPIONS",
-    "sport": "golf",
-    "label": "PGA Tour Champions",
-    "slug": "champions-tour",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/golf/champions-tour/scoreboard"
-  },
-  {
-    "key": "CHAMPIONSHIP",
-    "sport": "soccer",
-    "label": "Championship",
-    "slug": "eng.2",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/eng.2/scoreboard"
-  },
-  {
-    "key": "CLUBFRIENDLY",
-    "sport": "soccer",
-    "label": "Club Friendly",
-    "slug": "club.friendly",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/club.friendly/scoreboard"
-  },
-  {
-    "key": "CLUBWC",
-    "sport": "soccer",
-    "label": "Club World Cup",
-    "slug": "fifa.cwc",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.cwc/scoreboard"
-  },
-  {
-    "key": "CONCACAF_CAC",
-    "sport": "soccer",
-    "label": "Central American Cup",
-    "slug": "concacaf.central.american.cup",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/concacaf.central.american.cup/scoreboard"
-  },
-  {
-    "key": "CONCACAF_CL",
-    "sport": "soccer",
-    "label": "CONCACAF Champions Cup",
-    "slug": "concacaf.champions",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/concacaf.champions/scoreboard"
-  },
-  {
-    "key": "CONCACAF_NG",
-    "sport": "soccer",
-    "label": "CONCACAF Nations League",
-    "slug": "concacaf.nations.league",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/concacaf.nations.league/scoreboard"
-  },
-  {
-    "key": "CONCACAF_WC",
-    "sport": "soccer",
-    "label": "CONCACAF World Cup Qual",
-    "slug": "fifa.worldq.concacaf",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.worldq.concacaf/scoreboard"
-  },
-  {
-    "key": "COPA",
-    "sport": "soccer",
-    "label": "Copa America",
-    "slug": "conmebol.america",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/conmebol.america/scoreboard"
-  },
-  {
-    "key": "COPA_BRASIL",
-    "sport": "soccer",
-    "label": "Copa do Brasil",
-    "slug": "bra.copa_do_brazil",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/bra.copa_do_brazil/scoreboard"
-  },
-  {
-    "key": "COPPAITALIA",
-    "sport": "soccer",
-    "label": "Coppa Italia",
-    "slug": "ita.coppa_italia",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/ita.coppa_italia/scoreboard"
-  },
-  {
-    "key": "CRICKET_BBL",
-    "sport": "cricket",
-    "label": "Big Bash League",
-    "slug": "24136",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/cricket/24136/scoreboard"
-  },
-  {
-    "key": "CRICKET_ICC",
-    "sport": "cricket",
-    "label": "ICC Cricket",
-    "slug": "24597",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/cricket/24597/scoreboard"
-  },
-  {
-    "key": "DP_WORLD",
-    "sport": "golf",
-    "label": "DP World Tour",
-    "slug": "eur",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/golf/eur/scoreboard"
-  },
-  {
-    "key": "EPL",
-    "sport": "soccer",
-    "label": "Premier League",
-    "slug": "eng.1",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/eng.1/scoreboard"
-  },
-  {
-    "key": "EREDIVISIE",
-    "sport": "soccer",
-    "label": "Eredivisie",
-    "slug": "ned.1",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/ned.1/scoreboard"
-  },
-  {
-    "key": "EURO",
-    "sport": "soccer",
-    "label": "UEFA Euro",
-    "slug": "uefa.euro",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/uefa.euro/scoreboard"
-  },
-  {
-    "key": "F1",
-    "sport": "racing",
-    "label": "Formula 1",
-    "slug": "f1",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/racing/f1/scoreboard"
-  },
-  {
-    "key": "GER_SUPER_CUP",
-    "sport": "soccer",
-    "label": "German Supercup",
-    "slug": "ger.super_cup",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/ger.super_cup/scoreboard"
-  },
-  {
-    "key": "GOLDCUP",
-    "sport": "soccer",
-    "label": "Gold Cup",
-    "slug": "concacaf.gold",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/concacaf.gold/scoreboard"
-  },
-  {
-    "key": "INDYCAR",
-    "sport": "racing",
-    "label": "IndyCar Series",
-    "slug": "irl",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/racing/irl/scoreboard"
-  },
-  {
-    "key": "INTFRIENDLY",
-    "sport": "soccer",
-    "label": "International Friendlies",
-    "slug": "fifa.friendly",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.friendly/scoreboard"
-  },
-  {
-    "key": "KORNFERRY",
-    "sport": "golf",
-    "label": "Korn Ferry Tour",
-    "slug": "ntw",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/golf/ntw/scoreboard"
-  },
-  {
-    "key": "LALIGA",
-    "sport": "soccer",
-    "label": "La Liga",
-    "slug": "esp.1",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/esp.1/scoreboard"
-  },
-  {
-    "key": "LEAGUES_CUP",
-    "sport": "soccer",
-    "label": "Leagues Cup",
-    "slug": "concacaf.leagues.cup",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/concacaf.leagues.cup/scoreboard"
-  },
-  {
-    "key": "LIBERTADORES",
-    "sport": "soccer",
-    "label": "Copa Libertadores",
-    "slug": "conmebol.libertadores",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/conmebol.libertadores/scoreboard"
-  },
-  {
-    "key": "LIGAMX",
-    "sport": "soccer",
-    "label": "Liga MX",
-    "slug": "mex.1",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/mex.1/scoreboard"
-  },
-  {
-    "key": "LIGUE1",
-    "sport": "soccer",
-    "label": "Ligue 1",
-    "slug": "fra.1",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/fra.1/scoreboard"
-  },
-  {
-    "key": "LIV",
-    "sport": "golf",
-    "label": "LIV Golf",
-    "slug": "liv",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/golf/liv/scoreboard"
-  },
-  {
-    "key": "LLBWS",
-    "sport": "baseball",
-    "label": "LLBWS",
-    "slug": "llb",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/baseball/llb/scoreboard"
-  },
-  {
-    "key": "LPGA",
-    "sport": "golf",
-    "label": "LPGA Tour",
-    "slug": "lpga",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/golf/lpga/scoreboard"
-  },
-  {
-    "key": "MLB",
-    "sport": "baseball",
-    "label": "MLB",
-    "slug": "mlb",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/scoreboard"
-  },
-  {
-    "key": "MLS",
-    "sport": "soccer",
-    "label": "MLS",
-    "slug": "usa.1",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/usa.1/scoreboard"
-  },
-  {
-    "key": "MNCAAB",
-    "sport": "basketball",
-    "label": "NCAA Men's Basketball",
-    "slug": "mens-college-basketball",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/basketball/mens-college-basketball/scoreboard"
-  },
-  {
-    "key": "NASCAR",
-    "sport": "racing",
-    "label": "NASCAR Cup Series",
-    "slug": "nascar-premier",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/racing/nascar-premier/scoreboard"
-  },
-  {
-    "key": "NASCAR_TRUCK",
-    "sport": "racing",
-    "label": "NASCAR Truck Series",
-    "slug": "nascar-truck",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/racing/nascar-truck/scoreboard"
-  },
-  {
-    "key": "NASCAR_XFINITY",
-    "sport": "racing",
-    "label": "NASCAR O'Reilly Auto Parts",
-    "slug": "nascar-secondary",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/racing/nascar-secondary/scoreboard"
-  },
-  {
-    "key": "NATIONS",
-    "sport": "soccer",
-    "label": "UEFA Nations League",
-    "slug": "uefa.nations",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/uefa.nations/scoreboard"
-  },
-  {
-    "key": "NBA",
-    "sport": "basketball",
-    "label": "NBA",
-    "slug": "nba",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard"
-  },
-  {
-    "key": "NBA2K",
-    "sport": "basketball",
-    "label": "NBA G League",
-    "slug": "nba-development",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/basketball/nba-development/scoreboard"
-  },
-  {
-    "key": "NBASUMMER",
-    "sport": "basketball",
-    "label": "NBA Summer League",
-    "slug": "nba-summer",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/basketball/nba-summer/scoreboard"
-  },
-  {
-    "key": "NCAABB",
-    "sport": "baseball",
-    "label": "NCAA Baseball",
-    "slug": "college-baseball",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/baseball/college-baseball/scoreboard"
-  },
-  {
-    "key": "NCAAF",
-    "sport": "football",
-    "label": "College Football",
-    "slug": "college-football",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/football/college-football/scoreboard"
-  },
-  {
-    "key": "NCAAFH",
-    "sport": "field-hockey",
-    "label": "NCAA Field Hockey",
-    "slug": "womens-college-field-hockey",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/field-hockey/womens-college-field-hockey/scoreboard"
-  },
-  {
-    "key": "NCAALAX",
-    "sport": "lacrosse",
-    "label": "NCAA Lacrosse",
-    "slug": "mens-college-lacrosse",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/lacrosse/mens-college-lacrosse/scoreboard"
-  },
-  {
-    "key": "NCAAMSOC",
-    "sport": "soccer",
-    "label": "NCAA Men's Soccer",
-    "slug": "usa.ncaa.m.1",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/usa.ncaa.m.1/scoreboard"
-  },
-  {
-    "key": "NCAAVB",
-    "sport": "volleyball",
-    "label": "NCAA Women's Volleyball",
-    "slug": "womens-college-volleyball",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/volleyball/womens-college-volleyball/scoreboard"
-  },
-  {
-    "key": "NCAAVB_M",
-    "sport": "volleyball",
-    "label": "NCAA Men's Volleyball",
-    "slug": "mens-college-volleyball",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/volleyball/mens-college-volleyball/scoreboard"
-  },
-  {
-    "key": "NCAAWP",
-    "sport": "water-polo",
-    "label": "NCAA Water Polo",
-    "slug": "mens-college-water-polo",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/water-polo/mens-college-water-polo/scoreboard"
-  },
-  {
-    "key": "NCAAWSOC",
-    "sport": "soccer",
-    "label": "NCAA Women's Soccer",
-    "slug": "usa.ncaa.w.1",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/usa.ncaa.w.1/scoreboard"
-  },
-  {
-    "key": "NFL",
-    "sport": "football",
-    "label": "NFL",
-    "slug": "nfl",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard"
-  },
-  {
-    "key": "NHL",
-    "sport": "hockey",
-    "label": "NHL",
-    "slug": "nhl",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/hockey/nhl/scoreboard"
-  },
-  {
-    "key": "NWSL",
-    "sport": "soccer",
-    "label": "NWSL",
-    "slug": "usa.nwsl",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/usa.nwsl/scoreboard"
-  },
-  {
-    "key": "PGA",
-    "sport": "golf",
-    "label": "PGA Tour",
-    "slug": "pga",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/golf/pga/scoreboard"
-  },
-  {
-    "key": "PLL",
-    "sport": "lacrosse",
-    "label": "Premier Lacrosse League",
-    "slug": "pll",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/lacrosse/pll/scoreboard"
-  },
-  {
-    "key": "POR1",
-    "sport": "soccer",
-    "label": "Primeira Liga",
-    "slug": "por.1",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/por.1/scoreboard"
-  },
-  {
-    "key": "RUGBYPREM",
-    "sport": "rugby",
-    "label": "Gallagher Premiership",
-    "slug": "267979",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/rugby/267979/scoreboard"
-  },
-  {
-    "key": "RUGBYTOP14",
-    "sport": "rugby",
-    "label": "French Top 14",
-    "slug": "270559",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/rugby/270559/scoreboard"
-  },
-  {
-    "key": "RUGBYULSTER",
-    "sport": "rugby",
-    "label": "United Rugby Championship",
-    "slug": "270557",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/rugby/270557/scoreboard"
-  },
-  {
-    "key": "RUGBYWC",
-    "sport": "rugby",
-    "label": "Rugby World Cup",
-    "slug": "164205",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/rugby/164205/scoreboard"
-  },
-  {
-    "key": "SAUDI",
-    "sport": "soccer",
-    "label": "Saudi Pro League",
-    "slug": "ksa.1",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/ksa.1/scoreboard"
-  },
-  {
-    "key": "SCOTTISH_LEAGUE_CUP",
-    "sport": "soccer",
-    "label": "Scottish League Cup",
-    "slug": "sco.cis",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/sco.cis/scoreboard"
-  },
-  {
-    "key": "SERIEA",
-    "sport": "soccer",
-    "label": "Serie A",
-    "slug": "ita.1",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/ita.1/scoreboard"
-  },
-  {
-    "key": "SPFL",
-    "sport": "soccer",
-    "label": "Scottish Premiership",
-    "slug": "sco.1",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/sco.1/scoreboard"
-  },
-  {
-    "key": "SUDAMERICANA",
-    "sport": "soccer",
-    "label": "Copa Sudamericana",
-    "slug": "conmebol.sudamericana",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/conmebol.sudamericana/scoreboard"
-  },
-  {
-    "key": "SUPERLIG",
-    "sport": "soccer",
-    "label": "Turkish Super Lig",
-    "slug": "tur.1",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/tur.1/scoreboard"
-  },
-  {
-    "key": "UCL",
-    "sport": "soccer",
-    "label": "Champions League",
-    "slug": "uefa.champions",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/uefa.champions/scoreboard"
-  },
-  {
-    "key": "UCLQ",
-    "sport": "soccer",
-    "label": "UEFA Champions League Qualifying",
-    "slug": "uefa.champions_qual",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/uefa.champions_qual/scoreboard"
-  },
-  {
-    "key": "UECL",
-    "sport": "soccer",
-    "label": "UEFA Conference League",
-    "slug": "uefa.europa.conf",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/uefa.europa.conf/scoreboard"
-  },
-  {
-    "key": "UECLQ",
-    "sport": "soccer",
-    "label": "UEFA Conference League Qualifying",
-    "slug": "uefa.europa.conf_qual",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/uefa.europa.conf_qual/scoreboard"
-  },
-  {
-    "key": "UEL",
-    "sport": "soccer",
-    "label": "Europa League",
-    "slug": "uefa.europa",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/uefa.europa/scoreboard"
-  },
-  {
-    "key": "UELQ",
-    "sport": "soccer",
-    "label": "UEFA Europa League Qualifying",
-    "slug": "uefa.europa_qual",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/uefa.europa_qual/scoreboard"
-  },
-  {
-    "key": "UFC",
-    "sport": "mma",
-    "label": "UFC",
-    "slug": "ufc",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/mma/ufc/scoreboard"
-  },
-  {
-    "key": "US_OPEN_CUP",
-    "sport": "soccer",
-    "label": "U.S. Open Cup",
-    "slug": "usa.open",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/usa.open/scoreboard"
-  },
-  {
-    "key": "USL1",
-    "sport": "soccer",
-    "label": "USL League One",
-    "slug": "usa.usl.l1",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/usa.usl.l1/scoreboard"
-  },
-  {
-    "key": "USLC",
-    "sport": "soccer",
-    "label": "USL Championship",
-    "slug": "usa.usl.1",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/usa.usl.1/scoreboard"
-  },
-  {
-    "key": "USLCUP",
-    "sport": "soccer",
-    "label": "USL Championship Cup",
-    "slug": "usa.usl.l1.cup",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/usa.usl.l1.cup/scoreboard"
-  },
-  {
-    "key": "UWCQ",
-    "sport": "soccer",
-    "label": "UEFA Euro Qualifying",
-    "slug": "uefa.euroq",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/uefa.euroq/scoreboard"
-  },
-  {
-    "key": "WNBA",
-    "sport": "basketball",
-    "label": "WNBA",
-    "slug": "wnba",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/basketball/wnba/scoreboard"
-  },
-  {
-    "key": "WNCAAB",
-    "sport": "basketball",
-    "label": "NCAA Women's Basketball",
-    "slug": "womens-college-basketball",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/basketball/womens-college-basketball/scoreboard"
-  },
-  {
-    "key": "WORLDCUP",
-    "sport": "soccer",
-    "label": "FIFA World Cup",
-    "slug": "fifa.world",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard"
-  },
-  {
-    "key": "WTA",
-    "sport": "tennis",
-    "label": "WTA Tour",
-    "slug": "wta",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/tennis/wta/scoreboard"
-  },
-  {
-    "key": "WWC",
-    "sport": "soccer",
-    "label": "Women's World Cup",
-    "slug": "fifa.wwc",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.wwc/scoreboard"
-  },
-  {
-    "key": "XFL",
-    "sport": "football",
-    "label": "United Football League",
-    "slug": "ufl",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/football/ufl/scoreboard"
-  }
-];
-var ESPN_OPERATIONAL_INGEST_LEAGUE_KEYS = ESPN_OPERATIONAL_INGEST_LEAGUES.map((l2) => l2.key);
-var ESPN_OPERATIONAL_LEAGUE_ENDPOINTS = Object.fromEntries(ESPN_OPERATIONAL_INGEST_LEAGUES.map((l2) => [l2.key, l2.endpoint]));
-var ESPN_OPERATIONAL_LEAGUE_LABELS = Object.fromEntries(ESPN_OPERATIONAL_INGEST_LEAGUES.map((l2) => [l2.key, l2.label]));
-function resolveEspnOperationalLeagueLabel(leagueKey) {
-  return ESPN_OPERATIONAL_LEAGUE_LABELS[leagueKey] ?? leagueKey;
-}
-var ESPN_SOCCER_OPERATIONAL_LEAGUE_KEYS = new Set(
-  ESPN_OPERATIONAL_INGEST_LEAGUES.filter((l2) => l2.sport === "soccer").map((l2) => l2.key)
-);
-
-// ../grarf/desktop/src/lib/gamesSpine/preserveMissingOperationalLeagueSections.ts
-init_define_import_meta_env();
-
-// ../grarf/desktop/src/data/gamesColumnLeagues.ts
-init_define_import_meta_env();
-
-// ../grarf/desktop/src/lib/leaguePriority/index.ts
-init_define_import_meta_env();
-
-// ../grarf/desktop/src/lib/leaguePriority/leaguePriorityService.ts
-init_define_import_meta_env();
-
-// ../grarf/desktop/src/lib/leaguePriority/leaguePriorityAliases.ts
-init_define_import_meta_env();
-var LEAGUE_PRIORITY_ALIASES = {
-  MCWS: "NCAABB",
-  "NCAA BASEBALL": "NCAABB",
-  "WORLD CUP": "WORLDCUP",
-  "FIFA WORLD CUP": "WORLDCUP",
-  "TOUR DE FRANCE": "TDF",
-  "TOUR-DE-FRANCE": "TDF",
-  GTWORLD: "GT_WORLD_CHALLENGE",
-  "FORMULA 1": "F1",
-  "FORMULA ONE": "F1",
-  "NASCAR CUP SERIES": "NASCAR",
-  "NASCAR OREILLY AUTO PARTS SERIES": "NASCAR",
-  "NBA SUMMER LEAGUE": "NBASUMMER",
-  "NAV.US-OPEN-TENNIS": "US_OPEN_TENNIS",
-  "U.S. OPEN TENNIS": "US_OPEN_TENNIS",
-  "US OPEN TENNIS": "US_OPEN_TENNIS"
-};
-var LEAGUE_PRIORITY_MANUAL_AFTER = {
-  "GT WORLD": "WEC",
-  "GT-WORLD-CHALLENGE": "WEC"
-};
-var LEAGUE_PRIORITY_ALWAYS_LAST = ["CLUBFRIENDLY"];
-
-// ../grarf/desktop/src/lib/leaguePriority/leaguePrioritySeed.ts
-init_define_import_meta_env();
-
-// ../grarf/desktop/src/lib/leaguePriority/leaguePrioritySeed.data.js
-init_define_import_meta_env();
-var LEAGUE_PRIORITY_SEED_ORDER = [
-  "WORLDCUP",
-  "WWC",
-  "WIMBLEDON",
-  "WIMBLEDON_MEN",
-  "WIMBLEDON_WOMEN",
-  "nav.the-masters",
-  "nav.the-open",
-  "EURO",
-  "NFL",
-  "NCAAF",
-  "EPL",
-  "nav.us-open-golf",
-  "nav.pga-championship",
-  "NBA",
-  "US_OPEN_TENNIS",
-  "MLB",
-  "NHL",
-  "UCL",
-  "UCLQ",
-  "F1",
-  "TDF",
-  "nav.french-open",
-  "nav.australian-open",
-  "MNCAAB",
-  "LALIGA",
-  "BUNDESLIGA",
-  "GER_SUPER_CUP",
-  "SERIEA",
-  "nav.fa-cup",
-  "BOXING",
-  "UFC",
-  "MLS",
-  "UEL",
-  "LIGUE1",
-  "PGA",
-  "WNBA",
-  "LLBWS",
-  "ATP",
-  "WTA",
-  "COPA",
-  "CLUBWC",
-  "INTFRIENDLY",
-  "LEAGUES_CUP",
-  "UWCQ",
-  "INDYCAR",
-  "NASCAR",
-  "CARABAO_CUP",
-  "COPPAITALIA",
-  "WNCAAB",
-  "NWSL",
-  "US_OPEN_CUP",
-  "DP_WORLD",
-  "LPGA",
-  "KORNFERRY",
-  "NCAABB",
-  "UECL",
-  "NASCAR_XFINITY",
-  "NASCAR_TRUCK",
-  "NATIONS",
-  "CONCACAF_WC",
-  "CONCACAF_NG",
-  "CONCACAF_CL",
-  "GOLDCUP",
-  "NCAASB",
-  "LIGAMX",
-  "CHAMPIONSHIP",
-  "nav.womens-champions-league",
-  "LIBERTADORES",
-  "LIV",
-  "EREDIVISIE",
-  "BEL1",
-  "BRA1",
-  "CRICKET_ICC",
-  "RUGBYWC",
-  "USATF",
-  "SPFL",
-  "SUPERLIG",
-  "nav.odi-cricket",
-  "nav.ipl",
-  "nav.t20-womens-world-cup",
-  "CRICKET_BBL",
-  "MOTOGP",
-  "NBASUMMER",
-  "PLL",
-  "nav.pwhl",
-  "NCAAVB",
-  "nav.pfl",
-  "nav.big3",
-  "CFL",
-  "UELQ",
-  "UECLQ",
-  "AFL",
-  "CHAMPIONS",
-  "ARG1",
-  "SCOTTISH_LEAGUE_CUP",
-  "RUGBYTOP14",
-  "nav.ausl",
-  "nav.euroleague",
-  "POR1",
-  "SAUDI",
-  "SUDAMERICANA",
-  "FORMULA_E",
-  "WEC",
-  "GT_WORLD_CHALLENGE",
-  "XFL",
-  "RUGBYULSTER",
-  "nav.nhra",
-  "nav.imsa",
-  "nav.rugby-union",
-  "RUGBYPREM",
-  "RUGB_289262",
-  "nav.milb",
-  "NBA2K",
-  "USLCUP",
-  "USLC",
-  "USL1",
-  "F2",
-  "F3",
-  "nav.vuelta-a-espana",
-  "nav.giro-d-italia",
-  "nav.j1-league",
-  "nav.kbo",
-  "nav.npb",
-  "nav.afc-elite",
-  "nav.caf-champions",
-  "nav.lovb",
-  "nav.avp",
-  "nav.pfv",
-  "nav.horse-racing",
-  "nav.lacrosse",
-  "nav.ahl",
-  "nav.khl",
-  "NCAAH",
-  "CWHOC",
-  "CBWS",
-  "nav.liga-mexicana",
-  "NCAALAX",
-  "NCAAFH",
-  "NCAAVB_M",
-  "NCAAWP",
-  "nav.swimming",
-  "nav.winter-sports",
-  "nav.world-rally",
-  "MOTO2",
-  "MOTO3",
-  "NCAAMSOC",
-  "NCAAWSOC",
-  "CLUBFRIENDLY"
-];
-function getLeaguePrioritySeedOrder() {
-  return LEAGUE_PRIORITY_SEED_ORDER;
-}
-
-// ../grarf/desktop/src/lib/leaguePriority/leaguePrioritySeed.ts
-function getLeaguePrioritySeedOrder2() {
-  return getLeaguePrioritySeedOrder();
-}
-
-// ../grarf/desktop/src/lib/leaguePriority/leaguePriorityService.ts
-function normalizeLeagueLabel(value) {
-  return value.trim().toUpperCase().replace(/['']/g, "'");
-}
-function buildScoreByLeagueKey(order) {
-  return new Map(order.map((key2, index) => [key2, order.length - index]));
-}
-var scoreByLeagueKey = buildScoreByLeagueKey(getLeaguePrioritySeedOrder2());
-var alwaysLastLeagueKeys = new Set(LEAGUE_PRIORITY_ALWAYS_LAST);
-function resolveManualEditorialLeagueImportanceScore(raw) {
-  const anchor = LEAGUE_PRIORITY_MANUAL_AFTER[normalizeLeagueLabel(raw)];
-  if (!anchor) return null;
-  const anchorScore = scoreByLeagueKey.get(anchor) ?? 0;
-  return anchorScore > 0 ? anchorScore - 0.5 : null;
-}
-function getLeaguePriorityOrder() {
-  return getLeaguePrioritySeedOrder2();
-}
-function resolveCanonicalLeagueImportanceKey(raw) {
-  if (!raw) return null;
-  const normalized = normalizeLeagueLabel(raw);
-  if (scoreByLeagueKey.has(normalized)) {
-    return normalized;
-  }
-  const alias = LEAGUE_PRIORITY_ALIASES[normalized];
-  return alias ?? null;
-}
-function resolveLeagueImportanceScore(raw) {
-  if (!raw) return 0;
-  const manualScore = resolveManualEditorialLeagueImportanceScore(raw);
-  if (manualScore != null) return manualScore;
-  const key2 = resolveCanonicalLeagueImportanceKey(raw);
-  if (!key2) return 0;
-  return scoreByLeagueKey.get(key2) ?? 0;
-}
-function sortGrarfLeagueKeysByImportance(keys) {
-  const alwaysLast = keys.filter((key2) => alwaysLastLeagueKeys.has(key2));
-  const rest = keys.filter((key2) => !alwaysLastLeagueKeys.has(key2));
-  const sortedRest = [...rest].sort((a2, b2) => {
-    const importanceDelta = resolveLeagueImportanceScore(b2) - resolveLeagueImportanceScore(a2);
-    if (importanceDelta !== 0) return importanceDelta;
-    return a2.localeCompare(b2);
-  });
-  const sortedAlwaysLast = [...alwaysLast].sort((a2, b2) => a2.localeCompare(b2));
-  return [...sortedRest, ...sortedAlwaysLast];
-}
-
-// ../grarf/desktop/src/lib/leaguePriority/leaguePriorityConsumers.ts
-init_define_import_meta_env();
-var GAMES_COLUMN_PRESENTATION_ONLY_LEAGUE_KEYS = /* @__PURE__ */ new Set([
-  "WIMBLEDON_MEN",
-  "WIMBLEDON_WOMEN",
-  "US_OPEN_TENNIS"
-]);
-var OPERATIONAL_ADJUNCT_LEAGUE_KEYS = [];
-function getGamesColumnLeagueOrder() {
-  return getLeaguePriorityOrder().filter(
-    (key2) => !GAMES_COLUMN_PRESENTATION_ONLY_LEAGUE_KEYS.has(key2)
-  );
-}
-function getOperationalSlateLeagueOrder() {
-  const order = getGamesColumnLeagueOrder();
-  const seen = new Set(order);
-  const adjunct = OPERATIONAL_ADJUNCT_LEAGUE_KEYS.filter((key2) => !seen.has(key2));
-  return adjunct.length > 0 ? [...order, ...adjunct] : order;
-}
-
-// ../grarf/desktop/src/data/gamesColumnLeagues.ts
-var GAMES_COLUMN_LEAGUE_LABEL = {
-  MLB: "MLB",
-  NCAABB: "NCAA Baseball",
-  NBA: "NBA",
-  NBA2K: "NBA G League",
-  NBASUMMER: "NBA Summer League",
-  WNBA: "WNBA",
-  NHL: "NHL",
-  NCAAH: "NCAA Men's Hockey",
-  CWHOC: "NCAA Women's Hockey",
-  CBWS: "Caribbean Series",
-  LLBWS: "LLBWS",
-  AFL: "AFL",
-  MLS: "MLS",
-  EPL: "EPL",
-  LALIGA: "LaLiga",
-  NWSL: "NWSL",
-  NCAAMSOC: "NCAA Men's Soccer",
-  NCAAWSOC: "NCAA Women's Soccer",
-  LIGAMX: "Liga MX",
-  SERIEA: "Serie A",
-  LIGUE1: "Ligue 1",
-  EREDIVISIE: "Eredivisie",
-  BUNDESLIGA: "Bundesliga",
-  GER_SUPER_CUP: "German Supercup",
-  CHAMPIONSHIP: "Championship",
-  COPPAITALIA: "Coppa Italia",
-  UCL: "Champions League",
-  UCLQ: "UCL Qualifying",
-  UEL: "Europa League",
-  UELQ: "Europa League Qualifying",
-  UECL: "Conference League",
-  UECLQ: "Conference League Qualifying",
-  WWC: "Women's World Cup",
-  EURO: "UEFA Euro",
-  COPA: "Copa America",
-  GOLDCUP: "Gold Cup",
-  NATIONS: "Nations League",
-  CLUBWC: "Club World Cup",
-  CLUBFRIENDLY: "Club Friendly",
-  CONCACAF_CAC: "Central American Cup",
-  CAF_WNATIONS: "Women's AFCON",
-  SPFL: "SPFL",
-  SCOTTISH_LEAGUE_CUP: "Scottish League Cup",
-  SAUDI: "RSL",
-  SUPERLIG: "Super Lig",
-  USLCUP: "USL Cup",
-  WORLDCUP: "FIFA World Cup",
-  ATP: "ATP",
-  WTA: "WTA",
-  US_OPEN_TENNIS: "U.S. Open",
-  TDF: "Tour de France",
-  UFC: "UFC",
-  BOXING: "Boxing",
-  USATF: "Track & Field",
-  XFL: "United Football League",
-  CRICKET_BBL: "Big Bash League",
-  NCAAVB: "NCAA Women's Volleyball",
-  NCAAVB_M: "NCAA Men's Volleyball",
-  PLL: "Premier Lacrosse League",
-  RUGB_289262: "Major League Rugby",
-  F1: "Formula 1",
-  NASCAR: "NASCAR",
-  INDYCAR: "IndyCar",
-  WEC: "WEC",
-  PGA: "PGA Tour",
-  LPGA: "LPGA Tour",
-  DP_WORLD: "DP World Tour",
-  KORNFERRY: "Korn Ferry Tour",
-  LIV: "LIV Golf",
-  CHAMPIONS: "PGA Champions"
-};
-
-// ../grarf/desktop/src/lib/gamesSpine/operationalGameFreshness.ts
-init_define_import_meta_env();
-
-// ../grarf/desktop/src/lib/finalizedGameRetention/liveRecency.ts
-init_define_import_meta_env();
-
-// ../grarf/desktop/src/lib/finalizedGameRetention/constants.ts
-init_define_import_meta_env();
-var FINALIZED_RETENTION_TTL_MS = 24 * 60 * 60 * 1e3;
-var LIVE_RECENCY_MAX_INGEST_CYCLES = 32;
-var LIVE_RECENCY_MAX_MS = 8 * 60 * 60 * 1e3;
-
-// ../grarf/desktop/src/lib/finalizedGameRetention/retentionUtils.ts
-init_define_import_meta_env();
-function copyFinalizedGame(game) {
-  return { ...game };
-}
-function resolveFinalizedRetentionExpiry(game, retainedAt) {
-  const finalizedMs = game.lastUpdated?.trim() ? Date.parse(game.lastUpdated.trim()) : NaN;
-  const anchor = Number.isFinite(finalizedMs) && finalizedMs > 0 ? Math.min(finalizedMs, retainedAt) : retainedAt;
-  return anchor + FINALIZED_RETENTION_TTL_MS;
-}
-function pruneRetainedFinals(byId, now = Date.now()) {
-  const next = {};
-  for (const [id, entry2] of Object.entries(byId)) {
-    if (!entry2?.game || entry2.game.status !== "final") continue;
-    if (typeof entry2.expiresAt !== "number" || entry2.expiresAt <= now) continue;
-    next[id] = entry2;
-  }
-  return next;
-}
-function collectAllGamesFromLeaguesForHarvest(leagues) {
-  const out = [];
-  const seen = /* @__PURE__ */ new Set();
-  if (!leagues) return out;
-  for (const rows of Object.values(leagues)) {
-    if (!rows?.length) continue;
-    for (const game of rows) {
-      if (seen.has(game.id)) continue;
-      seen.add(game.id);
-      out.push(game);
-    }
-  }
-  return out;
-}
-function collectFinalGamesFromLeagues(leagues) {
-  const out = [];
-  for (const rows of Object.values(leagues)) {
-    if (!rows?.length) continue;
-    for (const game of rows) {
-      if (game.status === "final") out.push(game);
-    }
-  }
-  return out;
-}
-
-// ../grarf/desktop/src/lib/finalizedGameRetention/liveRecency.ts
-function recordLiveObservations(byId, games, ingestCycle, now = Date.now()) {
-  const next = { ...byId };
-  for (const raw of games) {
-    if (raw.status !== "live") continue;
-    next[raw.id] = {
-      game: copyFinalizedGame(raw),
-      lastLiveIngestCycle: ingestCycle,
-      lastLiveAtMs: now
-    };
-  }
-  return next;
-}
-function pruneLiveRecency(byId, ingestCycle, now = Date.now()) {
-  const next = {};
-  for (const [id, entry2] of Object.entries(byId)) {
-    if (ingestCycle - entry2.lastLiveIngestCycle > LIVE_RECENCY_MAX_INGEST_CYCLES) continue;
-    if (now - entry2.lastLiveAtMs > LIVE_RECENCY_MAX_MS) continue;
-    next[id] = entry2;
-  }
-  return next;
-}
-function isRecentlyLive(entry2, ingestCycle, now = Date.now()) {
-  if (!entry2) return false;
-  if (ingestCycle - entry2.lastLiveIngestCycle > LIVE_RECENCY_MAX_INGEST_CYCLES) return false;
-  if (now - entry2.lastLiveAtMs > LIVE_RECENCY_MAX_MS) return false;
-  return true;
-}
-
-// ../grarf/desktop/src/lib/gamesSpine/operationalGameFreshness.ts
-var OPERATIONAL_SCHEDULED_OVERDUE_GRACE_MS = 20 * 60 * 1e3;
-function isOperationalScheduledGameOverdue(game, nowMs2 = Date.now()) {
-  if (game.status !== "scheduled") return false;
-  const startMs = game.startTimeMs;
-  if (startMs == null || !Number.isFinite(startMs) || startMs <= 0) return false;
-  return startMs + OPERATIONAL_SCHEDULED_OVERDUE_GRACE_MS < nowMs2;
-}
-function shouldPreserveMissingOperationalLiveGame(game, ingestCycle, liveRecencyById) {
-  if (!isOperationalLiveRowAuthoritativelyFresh(game)) return false;
-  return isRecentlyLive(liveRecencyById[game.id], ingestCycle);
-}
-function isOperationalSpineContinuityCandidate(game, ingestCycle, liveRecencyById, now = /* @__PURE__ */ new Date()) {
-  if (game.status === "postponed") return true;
-  if (game.status === "final") return false;
-  if (game.status === "live") {
-    return shouldPreserveMissingOperationalLiveGame(game, ingestCycle, liveRecencyById);
-  }
-  if (game.status === "scheduled") {
-    return !isOperationalScheduledGameOverdue(game, now.getTime());
-  }
-  return true;
 }
 
 // ../grarf/desktop/src/store/canonicalLiveGameStore.ts
@@ -21773,8 +20320,401 @@ function getCanonicalLiveGameRow(gameId, consumerId) {
 init_define_import_meta_env();
 var import_zustand2 = __toESM(require_zustand(), 1);
 
+// ../grarf/desktop/src/data/gamesColumnLeagues.ts
+init_define_import_meta_env();
+
+// ../grarf/desktop/src/lib/leaguePriority/index.ts
+init_define_import_meta_env();
+
+// ../grarf/desktop/src/lib/leaguePriority/leaguePriorityService.ts
+init_define_import_meta_env();
+
+// ../grarf/desktop/src/lib/leaguePriority/leaguePriorityAliases.ts
+init_define_import_meta_env();
+var LEAGUE_PRIORITY_ALIASES = {
+  MCWS: "NCAABB",
+  "NCAA BASEBALL": "NCAABB",
+  "WORLD CUP": "WORLDCUP",
+  "FIFA WORLD CUP": "WORLDCUP",
+  "TOUR DE FRANCE": "TDF",
+  "TOUR-DE-FRANCE": "TDF",
+  GTWORLD: "GT_WORLD_CHALLENGE",
+  "FORMULA 1": "F1",
+  "FORMULA ONE": "F1",
+  "NASCAR CUP SERIES": "NASCAR",
+  "NASCAR OREILLY AUTO PARTS SERIES": "NASCAR",
+  "NBA SUMMER LEAGUE": "NBASUMMER",
+  "NAV.US-OPEN-TENNIS": "US_OPEN_TENNIS",
+  "U.S. OPEN TENNIS": "US_OPEN_TENNIS",
+  "US OPEN TENNIS": "US_OPEN_TENNIS"
+};
+var LEAGUE_PRIORITY_MANUAL_AFTER = {
+  "GT WORLD": "WEC",
+  "GT-WORLD-CHALLENGE": "WEC"
+};
+var LEAGUE_PRIORITY_ALWAYS_LAST = ["CLUBFRIENDLY"];
+
+// ../grarf/desktop/src/lib/leaguePriority/leaguePrioritySeed.ts
+init_define_import_meta_env();
+
+// ../grarf/desktop/src/lib/leaguePriority/leaguePrioritySeed.data.js
+init_define_import_meta_env();
+var LEAGUE_PRIORITY_SEED_ORDER = [
+  "WORLDCUP",
+  "WWC",
+  "WIMBLEDON",
+  "WIMBLEDON_MEN",
+  "WIMBLEDON_WOMEN",
+  "nav.the-masters",
+  "nav.the-open",
+  "EURO",
+  "NFL",
+  "NCAAF",
+  "EPL",
+  "nav.us-open-golf",
+  "nav.pga-championship",
+  "NBA",
+  "US_OPEN_TENNIS",
+  "MLB",
+  "NHL",
+  "UCL",
+  "UCLQ",
+  "F1",
+  "TDF",
+  "nav.french-open",
+  "nav.australian-open",
+  "MNCAAB",
+  "LALIGA",
+  "BUNDESLIGA",
+  "GER_SUPER_CUP",
+  "SERIEA",
+  "nav.fa-cup",
+  "BOXING",
+  "UFC",
+  "MLS",
+  "UEL",
+  "LIGUE1",
+  "PGA",
+  "WNBA",
+  "LLBWS",
+  "ATP",
+  "WTA",
+  "COPA",
+  "CLUBWC",
+  "INTFRIENDLY",
+  "LEAGUES_CUP",
+  "UWCQ",
+  "INDYCAR",
+  "NASCAR",
+  "CARABAO_CUP",
+  "COPPAITALIA",
+  "WNCAAB",
+  "NWSL",
+  "US_OPEN_CUP",
+  "DP_WORLD",
+  "LPGA",
+  "KORNFERRY",
+  "NCAABB",
+  "UECL",
+  "NASCAR_XFINITY",
+  "NASCAR_TRUCK",
+  "NATIONS",
+  "CONCACAF_WC",
+  "CONCACAF_NG",
+  "CONCACAF_CL",
+  "GOLDCUP",
+  "NCAASB",
+  "LIGAMX",
+  "CHAMPIONSHIP",
+  "nav.womens-champions-league",
+  "LIBERTADORES",
+  "LIV",
+  "EREDIVISIE",
+  "BEL1",
+  "BRA1",
+  "CRICKET_ICC",
+  "RUGBYWC",
+  "USATF",
+  "SPFL",
+  "SUPERLIG",
+  "nav.odi-cricket",
+  "nav.ipl",
+  "nav.t20-womens-world-cup",
+  "CRICKET_BBL",
+  "MOTOGP",
+  "NBASUMMER",
+  "PLL",
+  "nav.pwhl",
+  "NCAAVB",
+  "nav.pfl",
+  "nav.big3",
+  "CFL",
+  "UELQ",
+  "UECLQ",
+  "AFL",
+  "CHAMPIONS",
+  "ARG1",
+  "SCOTTISH_LEAGUE_CUP",
+  "RUGBYTOP14",
+  "nav.ausl",
+  "nav.euroleague",
+  "POR1",
+  "SAUDI",
+  "SUDAMERICANA",
+  "FORMULA_E",
+  "WEC",
+  "GT_WORLD_CHALLENGE",
+  "XFL",
+  "RUGBYULSTER",
+  "nav.nhra",
+  "nav.imsa",
+  "nav.rugby-union",
+  "RUGBYPREM",
+  "RUGB_289262",
+  "nav.milb",
+  "NBA2K",
+  "USLCUP",
+  "USLC",
+  "USL1",
+  "F2",
+  "F3",
+  "nav.vuelta-a-espana",
+  "nav.giro-d-italia",
+  "nav.j1-league",
+  "nav.kbo",
+  "nav.npb",
+  "nav.afc-elite",
+  "nav.caf-champions",
+  "nav.lovb",
+  "nav.avp",
+  "nav.pfv",
+  "nav.horse-racing",
+  "nav.lacrosse",
+  "nav.ahl",
+  "nav.khl",
+  "NCAAH",
+  "CWHOC",
+  "CBWS",
+  "nav.liga-mexicana",
+  "NCAALAX",
+  "NCAAFH",
+  "NCAAVB_M",
+  "NCAAWP",
+  "nav.swimming",
+  "nav.winter-sports",
+  "nav.world-rally",
+  "MOTO2",
+  "MOTO3",
+  "NCAAMSOC",
+  "NCAAWSOC",
+  "CLUBFRIENDLY"
+];
+function getLeaguePrioritySeedOrder() {
+  return LEAGUE_PRIORITY_SEED_ORDER;
+}
+
+// ../grarf/desktop/src/lib/leaguePriority/leaguePrioritySeed.ts
+function getLeaguePrioritySeedOrder2() {
+  return getLeaguePrioritySeedOrder();
+}
+
+// ../grarf/desktop/src/lib/leaguePriority/leaguePriorityService.ts
+function normalizeLeagueLabel(value) {
+  return value.trim().toUpperCase().replace(/['']/g, "'");
+}
+function buildScoreByLeagueKey(order) {
+  return new Map(order.map((key2, index) => [key2, order.length - index]));
+}
+var scoreByLeagueKey = buildScoreByLeagueKey(getLeaguePrioritySeedOrder2());
+var alwaysLastLeagueKeys = new Set(LEAGUE_PRIORITY_ALWAYS_LAST);
+function resolveManualEditorialLeagueImportanceScore(raw) {
+  const anchor = LEAGUE_PRIORITY_MANUAL_AFTER[normalizeLeagueLabel(raw)];
+  if (!anchor) return null;
+  const anchorScore = scoreByLeagueKey.get(anchor) ?? 0;
+  return anchorScore > 0 ? anchorScore - 0.5 : null;
+}
+function getLeaguePriorityOrder() {
+  return getLeaguePrioritySeedOrder2();
+}
+function resolveCanonicalLeagueImportanceKey(raw) {
+  if (!raw) return null;
+  const normalized = normalizeLeagueLabel(raw);
+  if (scoreByLeagueKey.has(normalized)) {
+    return normalized;
+  }
+  const alias = LEAGUE_PRIORITY_ALIASES[normalized];
+  return alias ?? null;
+}
+function resolveLeagueImportanceScore(raw) {
+  if (!raw) return 0;
+  const manualScore = resolveManualEditorialLeagueImportanceScore(raw);
+  if (manualScore != null) return manualScore;
+  const key2 = resolveCanonicalLeagueImportanceKey(raw);
+  if (!key2) return 0;
+  return scoreByLeagueKey.get(key2) ?? 0;
+}
+function sortGrarfLeagueKeysByImportance(keys) {
+  const alwaysLast = keys.filter((key2) => alwaysLastLeagueKeys.has(key2));
+  const rest = keys.filter((key2) => !alwaysLastLeagueKeys.has(key2));
+  const sortedRest = [...rest].sort((a2, b2) => {
+    const importanceDelta = resolveLeagueImportanceScore(b2) - resolveLeagueImportanceScore(a2);
+    if (importanceDelta !== 0) return importanceDelta;
+    return a2.localeCompare(b2);
+  });
+  const sortedAlwaysLast = [...alwaysLast].sort((a2, b2) => a2.localeCompare(b2));
+  return [...sortedRest, ...sortedAlwaysLast];
+}
+
+// ../grarf/desktop/src/lib/leaguePriority/leaguePriorityConsumers.ts
+init_define_import_meta_env();
+var GAMES_COLUMN_PRESENTATION_ONLY_LEAGUE_KEYS = /* @__PURE__ */ new Set([
+  "WIMBLEDON_MEN",
+  "WIMBLEDON_WOMEN",
+  "US_OPEN_TENNIS"
+]);
+var OPERATIONAL_ADJUNCT_LEAGUE_KEYS = [];
+function getGamesColumnLeagueOrder() {
+  return getLeaguePriorityOrder().filter(
+    (key2) => !GAMES_COLUMN_PRESENTATION_ONLY_LEAGUE_KEYS.has(key2)
+  );
+}
+function getOperationalSlateLeagueOrder() {
+  const order = getGamesColumnLeagueOrder();
+  const seen = new Set(order);
+  const adjunct = OPERATIONAL_ADJUNCT_LEAGUE_KEYS.filter((key2) => !seen.has(key2));
+  return adjunct.length > 0 ? [...order, ...adjunct] : order;
+}
+
+// ../grarf/desktop/src/data/gamesColumnLeagues.ts
+var GAMES_COLUMN_LEAGUE_LABEL = {
+  MLB: "MLB",
+  NCAABB: "NCAA Baseball",
+  NBA: "NBA",
+  NBA2K: "NBA G League",
+  NBASUMMER: "NBA Summer League",
+  WNBA: "WNBA",
+  NHL: "NHL",
+  NCAAH: "NCAA Men's Hockey",
+  CWHOC: "NCAA Women's Hockey",
+  CBWS: "Caribbean Series",
+  LLBWS: "LLBWS",
+  AFL: "AFL",
+  MLS: "MLS",
+  EPL: "EPL",
+  LALIGA: "LaLiga",
+  NWSL: "NWSL",
+  NCAAMSOC: "NCAA Men's Soccer",
+  NCAAWSOC: "NCAA Women's Soccer",
+  LIGAMX: "Liga MX",
+  SERIEA: "Serie A",
+  LIGUE1: "Ligue 1",
+  EREDIVISIE: "Eredivisie",
+  BUNDESLIGA: "Bundesliga",
+  GER_SUPER_CUP: "German Supercup",
+  CHAMPIONSHIP: "Championship",
+  COPPAITALIA: "Coppa Italia",
+  UCL: "Champions League",
+  UCLQ: "UCL Qualifying",
+  UEL: "Europa League",
+  UELQ: "Europa League Qualifying",
+  UECL: "Conference League",
+  UECLQ: "Conference League Qualifying",
+  WWC: "Women's World Cup",
+  EURO: "UEFA Euro",
+  COPA: "Copa America",
+  GOLDCUP: "Gold Cup",
+  NATIONS: "Nations League",
+  CLUBWC: "Club World Cup",
+  CLUBFRIENDLY: "Club Friendly",
+  CONCACAF_CAC: "Central American Cup",
+  CAF_WNATIONS: "Women's AFCON",
+  SPFL: "SPFL",
+  SCOTTISH_LEAGUE_CUP: "Scottish League Cup",
+  SAUDI: "RSL",
+  SUPERLIG: "Super Lig",
+  USLCUP: "USL Cup",
+  WORLDCUP: "FIFA World Cup",
+  ATP: "ATP",
+  WTA: "WTA",
+  US_OPEN_TENNIS: "U.S. Open",
+  TDF: "Tour de France",
+  UFC: "UFC",
+  BOXING: "Boxing",
+  USATF: "Track & Field",
+  XFL: "United Football League",
+  CRICKET_BBL: "Big Bash League",
+  NCAAVB: "NCAA Women's Volleyball",
+  NCAAVB_M: "NCAA Men's Volleyball",
+  PLL: "Premier Lacrosse League",
+  RUGB_289262: "Major League Rugby",
+  F1: "Formula 1",
+  NASCAR: "NASCAR",
+  INDYCAR: "IndyCar",
+  WEC: "WEC",
+  PGA: "PGA Tour",
+  LPGA: "LPGA Tour",
+  DP_WORLD: "DP World Tour",
+  KORNFERRY: "Korn Ferry Tour",
+  LIV: "LIV Golf",
+  CHAMPIONS: "PGA Champions"
+};
+
 // ../grarf/desktop/src/lib/finalizedGameRetention/harvestFinalizedOnIngestTransition.ts
 init_define_import_meta_env();
+
+// ../grarf/desktop/src/lib/finalizedGameRetention/retentionUtils.ts
+init_define_import_meta_env();
+
+// ../grarf/desktop/src/lib/finalizedGameRetention/constants.ts
+init_define_import_meta_env();
+var FINALIZED_RETENTION_TTL_MS = 24 * 60 * 60 * 1e3;
+var LIVE_RECENCY_MAX_INGEST_CYCLES = 32;
+var LIVE_RECENCY_MAX_MS = 8 * 60 * 60 * 1e3;
+
+// ../grarf/desktop/src/lib/finalizedGameRetention/retentionUtils.ts
+function copyFinalizedGame(game) {
+  return { ...game };
+}
+function resolveFinalizedRetentionExpiry(game, retainedAt) {
+  const finalizedMs = game.lastUpdated?.trim() ? Date.parse(game.lastUpdated.trim()) : NaN;
+  const anchor = Number.isFinite(finalizedMs) && finalizedMs > 0 ? Math.min(finalizedMs, retainedAt) : retainedAt;
+  return anchor + FINALIZED_RETENTION_TTL_MS;
+}
+function pruneRetainedFinals(byId, now = Date.now()) {
+  const next = {};
+  for (const [id, entry2] of Object.entries(byId)) {
+    if (!entry2?.game || entry2.game.status !== "final") continue;
+    if (typeof entry2.expiresAt !== "number" || entry2.expiresAt <= now) continue;
+    next[id] = entry2;
+  }
+  return next;
+}
+function collectAllGamesFromLeaguesForHarvest(leagues) {
+  const out = [];
+  const seen = /* @__PURE__ */ new Set();
+  if (!leagues) return out;
+  for (const rows of Object.values(leagues)) {
+    if (!rows?.length) continue;
+    for (const game of rows) {
+      if (seen.has(game.id)) continue;
+      seen.add(game.id);
+      out.push(game);
+    }
+  }
+  return out;
+}
+function collectFinalGamesFromLeagues(leagues) {
+  const out = [];
+  for (const rows of Object.values(leagues)) {
+    if (!rows?.length) continue;
+    for (const game of rows) {
+      if (game.status === "final") out.push(game);
+    }
+  }
+  return out;
+}
+
+// ../grarf/desktop/src/lib/finalizedGameRetention/harvestFinalizedOnIngestTransition.ts
 function collectAllGamesFromLeagues(leagues) {
   const out = [];
   const seen = /* @__PURE__ */ new Set();
@@ -21833,6 +20773,36 @@ function collectFinalizedHarvestFromIngestTransition(input) {
     alreadyRetainedIds: input.alreadyRetainedIds
   });
   return candidates.map((c2) => c2.game);
+}
+
+// ../grarf/desktop/src/lib/finalizedGameRetention/liveRecency.ts
+init_define_import_meta_env();
+function recordLiveObservations(byId, games, ingestCycle, now = Date.now()) {
+  const next = { ...byId };
+  for (const raw of games) {
+    if (raw.status !== "live") continue;
+    next[raw.id] = {
+      game: copyFinalizedGame(raw),
+      lastLiveIngestCycle: ingestCycle,
+      lastLiveAtMs: now
+    };
+  }
+  return next;
+}
+function pruneLiveRecency(byId, ingestCycle, now = Date.now()) {
+  const next = {};
+  for (const [id, entry2] of Object.entries(byId)) {
+    if (ingestCycle - entry2.lastLiveIngestCycle > LIVE_RECENCY_MAX_INGEST_CYCLES) continue;
+    if (now - entry2.lastLiveAtMs > LIVE_RECENCY_MAX_MS) continue;
+    next[id] = entry2;
+  }
+  return next;
+}
+function isRecentlyLive(entry2, ingestCycle, now = Date.now()) {
+  if (!entry2) return false;
+  if (ingestCycle - entry2.lastLiveIngestCycle > LIVE_RECENCY_MAX_INGEST_CYCLES) return false;
+  if (now - entry2.lastLiveAtMs > LIVE_RECENCY_MAX_MS) return false;
+  return true;
 }
 
 // ../grarf/desktop/src/store/recentFinalizedGamesStore.ts
@@ -21947,324 +20917,6 @@ if (typeof window !== "undefined") {
     }
     return { count: entries.length, byLeague, entries };
   };
-}
-
-// ../grarf/desktop/src/lib/gamesSpine/preserveMissingOperationalLeagueSections.ts
-var LOG3 = "[GamesSpine]";
-function countLeaguesWithTodaySlate(leagues, now = /* @__PURE__ */ new Date()) {
-  let count = 0;
-  for (const key2 of getGamesColumnLeagueOrder()) {
-    if (filterGamesSpineSlateForOperationalSportsDay(leagues[key2] ?? [], now).length > 0) count += 1;
-  }
-  return count;
-}
-function countOperationalSportsDayGames(leagues, now = /* @__PURE__ */ new Date()) {
-  let count = 0;
-  for (const key2 of getGamesColumnLeagueOrder()) {
-    count += filterGamesSpineSlateForOperationalSportsDay(leagues[key2] ?? [], now).length;
-  }
-  return count;
-}
-function validateOperationalSlateReplacement(incoming, previousLeagues, now = /* @__PURE__ */ new Date()) {
-  const previousLeagueCount = countLeaguesWithTodaySlate(previousLeagues, now);
-  const incomingLeagueCount = countLeaguesWithTodaySlate(incoming.leagues ?? {}, now);
-  if (previousLeagueCount === 0) {
-    return { accepted: true };
-  }
-  if (incomingLeagueCount === 0) {
-    return { accepted: false, reason: "incoming_zero_leagues" };
-  }
-  if (incomingLeagueCount + 2 < previousLeagueCount) {
-    return { accepted: false, reason: "incoming_league_count_regression" };
-  }
-  if (previousLeagueCount >= 3 && incomingLeagueCount <= 1) {
-    return { accepted: false, reason: "incoming_near_single_league_slate" };
-  }
-  const previousGameCount = countOperationalSportsDayGames(previousLeagues, now);
-  const incomingGameCount = countOperationalSportsDayGames(incoming.leagues ?? {}, now);
-  if (previousGameCount >= 6 && incomingGameCount < Math.ceil(previousGameCount * 0.4)) {
-    return { accepted: false, reason: "incoming_game_count_regression" };
-  }
-  return { accepted: true };
-}
-function filterOperationalSpineContinuityCandidates(games, now) {
-  const ingestCycle = useCanonicalLiveGameStore.getState().ingestSequence;
-  const liveRecencyById = useRecentFinalizedGamesStore.getState().liveRecencyById;
-  return games.filter(
-    (game) => isOperationalSpineContinuityCandidate(game, ingestCycle, liveRecencyById, now)
-  );
-}
-function mergeLeagueSlateContinuity(previousGames, incomingGames, now) {
-  const prevToday = filterGamesSpineSlateForOperationalSportsDay(previousGames, now);
-  const incomingToday = filterGamesSpineSlateForOperationalSportsDay(incomingGames, now);
-  if (prevToday.length === 0) return [...incomingGames];
-  if (incomingToday.length === 0) return [...incomingGames];
-  const incomingIds = new Set(incomingToday.map((game) => game.id));
-  const missingFromIncoming = filterOperationalSpineContinuityCandidates(
-    prevToday.filter((game) => !incomingIds.has(game.id)),
-    now
-  );
-  if (missingFromIncoming.length === 0) return [...incomingGames];
-  const merged = [...incomingGames];
-  const mergedIds = new Set(merged.map((game) => game.id));
-  for (const game of missingFromIncoming) {
-    if (mergedIds.has(game.id)) continue;
-    merged.push({ ...game });
-    mergedIds.add(game.id);
-  }
-  return merged;
-}
-function preserveMissingOperationalLeagueSections(incoming, previousLeagues, now = /* @__PURE__ */ new Date()) {
-  const leagues = { ...incoming.leagues };
-  let changed = false;
-  for (const key2 of getGamesColumnLeagueOrder()) {
-    const previousRows = previousLeagues[key2] ?? [];
-    const prevTodayCount = filterGamesSpineSlateForOperationalSportsDay(previousRows, now).length;
-    const incomingRows = leagues[key2] ?? [];
-    const incomingTodayCount = filterGamesSpineSlateForOperationalSportsDay(incomingRows, now).length;
-    if (prevTodayCount === 0) {
-      continue;
-    }
-    if (incomingTodayCount > 0) {
-      const mergedRows = mergeLeagueSlateContinuity(previousRows, incomingRows, now);
-      if (mergedRows.length !== incomingRows.length) {
-        leagues[key2] = mergedRows;
-        changed = true;
-      }
-      continue;
-    }
-    const continuityRows = filterOperationalSpineContinuityCandidates(previousRows, now);
-    if (continuityRows.length === 0) continue;
-    leagues[key2] = continuityRows.map((game) => ({ ...game }));
-    changed = true;
-  }
-  if (!changed) return incoming;
-  return { ...incoming, leagues };
-}
-function rejectInvalidOperationalSlateReplacement(incoming, previousLeagues, now = /* @__PURE__ */ new Date()) {
-  const validation = validateOperationalSlateReplacement(incoming, previousLeagues, now);
-  if (validation.accepted) return null;
-  if (define_import_meta_env_default.DEV) {
-    console.warn(`${LOG3} Rejected invalid operational slate replacement`, {
-      reason: validation.reason,
-      previousLeagues: countLeaguesWithTodaySlate(previousLeagues, now),
-      incomingLeagues: countLeaguesWithTodaySlate(incoming.leagues ?? {}, now),
-      previousGames: countOperationalSportsDayGames(previousLeagues, now),
-      incomingGames: countOperationalSportsDayGames(incoming.leagues ?? {}, now)
-    });
-  }
-  return {
-    ...incoming,
-    leagues: { ...previousLeagues }
-  };
-}
-function applyGamesSpineSnapshotStability(incoming, previousLeagues, now = /* @__PURE__ */ new Date()) {
-  const rejected = rejectInvalidOperationalSlateReplacement(incoming, previousLeagues, now);
-  if (rejected) return rejected;
-  return preserveMissingOperationalLeagueSections(incoming, previousLeagues, now);
-}
-
-// ../grarf/desktop/src/store/gamesSpineRenderStore.ts
-function isCompleteOperationalSnapshot(leagues, meta) {
-  const hasAnyGames = Object.values(leagues).some(
-    (rows) => Array.isArray(rows) && rows.length > 0
-  );
-  if (!hasAnyGames) return false;
-  if (meta.source === "grarf_cloud") return true;
-  const requested = meta.requestedLeagueCount;
-  if (requested != null && Number.isFinite(requested) && requested > 0 && requested < ESPN_OPERATIONAL_INGEST_LEAGUE_KEYS.length) {
-    return false;
-  }
-  if (meta.source === "espn_local_adapter" || meta.source === "espn_scoreboard_ipc") {
-    if (meta.initialIngestComplete === false) return hasAnyGames;
-    return true;
-  }
-  return countLeaguesWithTodaySlate(leagues) > 0;
-}
-var useGamesSpineRenderStore = (0, import_zustand3.create)((set, get) => ({
-  operationalReady: true,
-  operationalIngestComplete: false,
-  /** Manual KV overrides load async — never block the operational spine on them. */
-  manualReady: true,
-  hasPromotedInitialSnapshot: false,
-  lastTransportGeneratedAt: null,
-  lastTransportSource: null,
-  lastTransportGameCount: 0,
-  operationalProviderPoll: null,
-  markOperationalIngest: (leagues, meta) => {
-    const complete = isCompleteOperationalSnapshot(leagues, meta);
-    const gameCount = Object.values(leagues).reduce(
-      (total, rows) => total + (Array.isArray(rows) ? rows.length : 0),
-      0
-    );
-    set((state3) => ({
-      operationalReady: true,
-      operationalIngestComplete: state3.operationalIngestComplete || complete,
-      hasPromotedInitialSnapshot: state3.hasPromotedInitialSnapshot || complete,
-      lastTransportGeneratedAt: meta.transportGeneratedAt ?? (complete ? (/* @__PURE__ */ new Date()).toISOString() : state3.lastTransportGeneratedAt),
-      lastTransportSource: meta.source,
-      lastTransportGameCount: gameCount,
-      operationalProviderPoll: meta.source === "grarf_cloud" ? meta.providerPoll ?? state3.operationalProviderPoll : state3.operationalProviderPoll
-    }));
-  },
-  markManualLoaded: () => {
-    set({ manualReady: true });
-  },
-  isRenderReady: () => {
-    const state3 = get();
-    return state3.operationalReady && state3.manualReady;
-  },
-  resetForTests: () => {
-    set({
-      operationalReady: true,
-      operationalIngestComplete: false,
-      manualReady: true,
-      hasPromotedInitialSnapshot: false,
-      lastTransportGeneratedAt: null,
-      lastTransportSource: null,
-      lastTransportGameCount: 0,
-      operationalProviderPoll: null
-    });
-  }
-}));
-
-// ../grarf/desktop/src/lib/operational/operationalLiveAuthority.ts
-var OPERATIONAL_PROVIDER_CONFIRMED_LIVE_SLACK_MS = WEB_UPDATE_ENGINE_LIVE_GAMES_POLL_MS * 3;
-var LEGACY_CLOUD_LIVE_MAX_STALE_UPDATE_MS = OPERATIONAL_LIVE_MAX_STALE_UPDATE_MS;
-var PROVIDER_POLL_HYDRATION_LEGACY_SLACK_MS = 60 * 1e3;
-function getOperationalLiveAuthorityState() {
-  const state3 = useGamesSpineRenderStore.getState();
-  return {
-    operationalProviderPoll: state3.operationalProviderPoll,
-    lastTransportSource: state3.lastTransportSource,
-    lastTransportGeneratedAt: state3.lastTransportGeneratedAt
-  };
-}
-function parseGameLastUpdatedMs(lastUpdated) {
-  if (!lastUpdated?.trim()) return null;
-  const ms2 = Date.parse(lastUpdated);
-  return Number.isFinite(ms2) ? ms2 : null;
-}
-function isGameLastUpdatedProviderConfirmed(game, providerPollCompletedAt, slackMs = OPERATIONAL_PROVIDER_CONFIRMED_LIVE_SLACK_MS) {
-  const completedMs = Date.parse(providerPollCompletedAt);
-  const lastUpdatedMs = parseGameLastUpdatedMs(game.lastUpdated);
-  if (!Number.isFinite(completedMs) || lastUpdatedMs == null) return false;
-  const ageBehindCompletionMs = completedMs - lastUpdatedMs;
-  if (ageBehindCompletionMs > slackMs) return false;
-  const ageAheadCompletionMs = lastUpdatedMs - completedMs;
-  return ageAheadCompletionMs <= slackMs;
-}
-function isLegacyCloudLiveRowFresh(game, nowMs2 = Date.now()) {
-  const lastUpdatedMs = parseGameLastUpdatedMs(game.lastUpdated);
-  if (lastUpdatedMs == null) return false;
-  return nowMs2 - lastUpdatedMs <= LEGACY_CLOUD_LIVE_MAX_STALE_UPDATE_MS;
-}
-function isProviderPollHydrationFresh(game, providerPollCompletedAt) {
-  const completedMs = Date.parse(providerPollCompletedAt);
-  const lastUpdatedMs = parseGameLastUpdatedMs(game.lastUpdated);
-  if (!Number.isFinite(completedMs) || lastUpdatedMs == null) return false;
-  const ageBehindCompletionMs = completedMs - lastUpdatedMs;
-  return ageBehindCompletionMs > OPERATIONAL_PROVIDER_CONFIRMED_LIVE_SLACK_MS && ageBehindCompletionMs <= OPERATIONAL_PROVIDER_CONFIRMED_LIVE_SLACK_MS + PROVIDER_POLL_HYDRATION_LEGACY_SLACK_MS;
-}
-function shouldApplyProviderPollLiveGate(state3) {
-  if (state3.lastTransportSource === "grarf_cloud") return true;
-  return Boolean(state3.operationalProviderPoll?.providerPollCompletedAt?.trim());
-}
-function isRecentTransportLiveRow(game, transportGeneratedAt, nowMs2 = Date.now()) {
-  if (game.status !== "live") return false;
-  if (!transportGeneratedAt?.trim()) return false;
-  const transportMs = Date.parse(transportGeneratedAt);
-  if (!Number.isFinite(transportMs)) return false;
-  return nowMs2 - transportMs <= LEGACY_CLOUD_LIVE_MAX_STALE_UPDATE_MS;
-}
-function isGameEligibleForCurrentOperationalLivePoll(game, nowMs2 = Date.now()) {
-  const now = new Date(nowMs2);
-  const sportsDayKey = getOperationalSportsDayDateKey(now);
-  if (isGameOnGamesSpineOperationalDate(game, sportsDayKey, now)) {
-    return true;
-  }
-  const yesterdayKey2 = getOperationalSportsDayYesterdayDateKey(now);
-  return isGameOnGamesSpineOperationalDate(game, yesterdayKey2, now);
-}
-function isConfirmedLiveBySuccessfulLeaguePoll(game, poll, nowMs2 = Date.now()) {
-  if (game.status !== "live") return false;
-  if (!isOperationalLiveRowAuthoritativelyFresh(game, nowMs2)) return false;
-  const pollCompletedAt = poll.providerPollCompletedAt;
-  if (!pollCompletedAt?.trim() || !isOperationalProviderPollAuthoritativelyFresh(pollCompletedAt, nowMs2)) {
-    return false;
-  }
-  const league2 = game.league;
-  if (!league2) return false;
-  const entry2 = poll.leaguePolls?.[league2];
-  if (!entry2 || entry2.outcome !== "success") return false;
-  if (entry2.reason !== "live") return false;
-  return isGameEligibleForCurrentOperationalLivePoll(game, nowMs2);
-}
-function isProviderLeaguePollConfirmedLive(game, authorityState) {
-  if (game.status !== "live") return false;
-  const state3 = authorityState ?? getOperationalLiveAuthorityState();
-  if (!shouldApplyProviderPollLiveGate(state3)) return false;
-  if (!state3.operationalProviderPoll) return false;
-  return isConfirmedLiveBySuccessfulLeaguePoll(game, state3.operationalProviderPoll);
-}
-function isProviderConfirmedLive(game, authorityState, nowMs2 = Date.now()) {
-  if (game.status !== "live") return false;
-  if (game.metadata?.manualGamesSpine) return true;
-  const state3 = authorityState ?? getOperationalLiveAuthorityState();
-  const { operationalProviderPoll, lastTransportGeneratedAt } = state3;
-  const onCloudGate = shouldApplyProviderPollLiveGate(state3);
-  const rowFresh = isOperationalLiveRowAuthoritativelyFresh(game, nowMs2);
-  const transportFresh = isRecentTransportLiveRow(game, lastTransportGeneratedAt, nowMs2);
-  if (onCloudGate) {
-    if (!rowFresh) return false;
-  } else if (!rowFresh && !transportFresh && !isLegacyCloudLiveRowFresh(game, nowMs2)) {
-    return false;
-  }
-  if (!onCloudGate) {
-    if (isLegacyCloudLiveRowFresh(game, nowMs2)) {
-      return isGameEligibleForCurrentOperationalLivePoll(game, nowMs2);
-    }
-    if (transportFresh) {
-      return isGameEligibleForCurrentOperationalLivePoll(game, nowMs2);
-    }
-    return false;
-  }
-  if (!operationalProviderPoll) {
-    if (isLegacyCloudLiveRowFresh(game, nowMs2)) {
-      return isGameEligibleForCurrentOperationalLivePoll(game, nowMs2);
-    }
-    if (transportFresh) {
-      return isGameEligibleForCurrentOperationalLivePoll(game, nowMs2);
-    }
-    return false;
-  }
-  if (operationalProviderPoll.allLeaguesFailed) return false;
-  const providerPollCompletedAt = operationalProviderPoll.providerPollCompletedAt;
-  if (!providerPollCompletedAt?.trim()) {
-    if (isLegacyCloudLiveRowFresh(game, nowMs2)) {
-      return isGameEligibleForCurrentOperationalLivePoll(game, nowMs2);
-    }
-    if (transportFresh) {
-      return isGameEligibleForCurrentOperationalLivePoll(game, nowMs2);
-    }
-    return false;
-  }
-  if (!isOperationalProviderPollAuthoritativelyFresh(providerPollCompletedAt, nowMs2)) {
-    return false;
-  }
-  if (isGameLastUpdatedProviderConfirmed(game, providerPollCompletedAt)) {
-    return isGameEligibleForCurrentOperationalLivePoll(game, nowMs2);
-  }
-  if (isProviderPollHydrationFresh(game, providerPollCompletedAt)) {
-    return isGameEligibleForCurrentOperationalLivePoll(game, nowMs2);
-  }
-  if (isConfirmedLiveBySuccessfulLeaguePoll(game, operationalProviderPoll, nowMs2)) {
-    return true;
-  }
-  if (isLegacyCloudLiveRowFresh(game, nowMs2)) {
-    return isGameEligibleForCurrentOperationalLivePoll(game, nowMs2);
-  }
-  return false;
 }
 
 // ../grarf/desktop/src/lib/gamesSpine/reconcileOperationalGamesByEspnEventId.ts
@@ -22505,34 +21157,13 @@ function isSpineFinalizedGame(game) {
 }
 
 // ../grarf/desktop/src/lib/gamesSpine/classifyOperationalGameTemporalBucket.ts
-function pausedFromStatusLine(statusLine) {
-  const line = statusLine?.trim();
-  if (!line) return false;
-  return isEspnPausedCompetitionStatus({
-    shortDetail: line,
-    detail: line,
-    description: line
-  });
-}
-function halftimeFromStatusLine(statusLine) {
-  const line = statusLine?.trim();
-  if (!line) return false;
-  return isEspnHalftimeOrIntermissionStatus({
-    shortDetail: line,
-    detail: line,
-    description: line
-  });
-}
-function gameHasHalftimeOrIntermissionSignal(game) {
-  if (halftimeFromStatusLine(game.statusLine)) return true;
-  return halftimeFromStatusLine(game.displayClock);
-}
 function resolveAuthoritativeEventEndedAtMs(game) {
   const fromRow = resolveOperationalGameEventEndedAtMs(game);
   if (fromRow != null) return fromRow;
   return readPersistedEventEndedAtMs(game.id) ?? null;
 }
 function hasRetainedCanonicalFinalRow(game, nowMs2 = Date.now()) {
+  if (game.status === "live") return false;
   const entry2 = useRecentFinalizedGamesStore.getState().byId[game.id];
   if (!entry2 || entry2.expiresAt <= nowMs2) return false;
   const retained = entry2.game;
@@ -22542,16 +21173,12 @@ function hasRetainedCanonicalFinalRow(game, nowMs2 = Date.now()) {
     if (isGolfTournamentLeagueKey(retained.league ?? void 0) && isGolfRoundPlayCompleteStatusLine(retained.statusLine) && endKey && endKey >= sportsDayKey) {
       return false;
     }
-    if (game.status === "live" && isProviderLeaguePollConfirmedLive(game)) {
-      return false;
-    }
     return true;
   }
   return false;
 }
 function isSupersededByAuthoritativeEspnEventRow(game) {
   if (game.status !== "live") return false;
-  if (isProviderLeaguePollConfirmedLive(game)) return false;
   const eventId = readEspnCompetitionEventId(game);
   if (!eventId) return false;
   for (const record of Object.values(useCanonicalLiveGameStore.getState().gamesById)) {
@@ -22565,45 +21192,21 @@ function isSupersededByAuthoritativeEspnEventRow(game) {
   }
   return false;
 }
-function isStaleOperationalIngestLiveRow(game, nowMs2) {
-  if (game.status !== "live" || game.metadata?.manualGamesSpine) return false;
-  if (!isOperationalLiveRowAuthoritativelyFresh(game, nowMs2)) return true;
-  const authority = getOperationalLiveAuthorityState();
-  if (authority.lastTransportSource !== "grarf_cloud" && !authority.operationalProviderPoll) {
-    return false;
-  }
-  const pollCompletedAt = authority.operationalProviderPoll?.providerPollCompletedAt?.trim() || authority.lastTransportGeneratedAt?.trim() || "";
-  if (!pollCompletedAt) return true;
-  return !isOperationalProviderPollAuthoritativelyFresh(pollCompletedAt, nowMs2);
-}
 function hasAuthoritativeOperationalGameEnded(game, nowMs2 = Date.now()) {
-  if (isStaleOperationalIngestLiveRow(game, nowMs2)) return true;
   if (game.status === "final" || isSpineFinalizedGame(game)) return true;
   if (hasRetainedCanonicalFinalRow(game, nowMs2)) return true;
   if (isSupersededByAuthoritativeEspnEventRow(game)) return true;
   const endedAtMs = resolveAuthoritativeEventEndedAtMs(game);
   if (endedAtMs != null && endedAtMs <= nowMs2) return true;
-  if (game.status === "live" && !game.metadata?.manualGamesSpine && !isGameEligibleForCurrentOperationalLivePoll(game, nowMs2)) {
-    return true;
-  }
   return false;
 }
 function isGameCompetitionPaused(game) {
-  if (gameHasHalftimeOrIntermissionSignal(game)) return false;
-  if (game.status === "delayed" || game.status === "suspended") return true;
-  if (game.status === "postponed") return true;
-  return pausedFromStatusLine(game.statusLine);
-}
-function isProviderAuthoritativeNow(game, nowMs2) {
-  if (hasAuthoritativeOperationalGameEnded(game, nowMs2)) return false;
-  if (game.status !== "live") return false;
-  if (isGameCompetitionPaused(game)) return false;
-  return isProviderConfirmedLive(game, void 0, nowMs2);
+  return isEspnOperationalCompetitionPaused(game);
 }
 function classifyOperationalGameTemporalBucket(game, nowMs2 = Date.now()) {
   if (hasAuthoritativeOperationalGameEnded(game, nowMs2)) return "completed";
-  if (isProviderAuthoritativeNow(game, nowMs2)) return "now";
-  if (game.status === "scheduled") return "upcoming";
+  if (isEspnNormalizedOperationalLive(game)) return "now";
+  if (isEspnNormalizedOperationalScheduled(game)) return "upcoming";
   return "other";
 }
 function isOperationalGameNow(game, nowMs2 = Date.now()) {
@@ -22623,6 +21226,37 @@ function isGameActivelyLive(game) {
 
 // ../grarf/desktop/src/lib/gamesSpine/motorsportSpinePresentation.ts
 init_define_import_meta_env();
+
+// ../grarf/desktop/shared/motorsportLeagues.js
+init_define_import_meta_env();
+
+// ../grarf/shared/config/motorsportLeagues.js
+init_define_import_meta_env();
+var MOTORSPORT_SESSION_LEAGUES = /* @__PURE__ */ new Set(["F1", "F2", "F3", "FORMULA_E"]);
+var MOTORSPORT_STANDALONE_LEAGUES = /* @__PURE__ */ new Set([
+  "NASCAR",
+  "NASCAR_XFINITY",
+  "NASCAR_TRUCK",
+  "INDYCAR",
+  "MOTOGP",
+  "MOTO2",
+  "MOTO3"
+]);
+var MOTORSPORT_LEAGUE_KEYS = /* @__PURE__ */ new Set([
+  ...MOTORSPORT_SESSION_LEAGUES,
+  ...MOTORSPORT_STANDALONE_LEAGUES
+]);
+function isMotorsportLeagueKey(leagueKey) {
+  return typeof leagueKey === "string" && MOTORSPORT_LEAGUE_KEYS.has(leagueKey);
+}
+function isMotorsportSessionLeagueKey(leagueKey) {
+  return typeof leagueKey === "string" && MOTORSPORT_SESSION_LEAGUES.has(leagueKey);
+}
+function isMotorsportStandaloneLeagueKey(leagueKey) {
+  return typeof leagueKey === "string" && MOTORSPORT_STANDALONE_LEAGUES.has(leagueKey);
+}
+
+// ../grarf/desktop/src/lib/gamesSpine/motorsportSpinePresentation.ts
 function isMotorsportGame(game) {
   return isMotorsportLeagueKey(game.league);
 }
@@ -23582,6 +22216,674 @@ init_isGrarfWebRenderer();
 
 // ../grarf/desktop/src/services/operationalIngest/web/fetchWebEspnOperationalSnapshot.ts
 init_define_import_meta_env();
+
+// ../grarf/desktop/src/data/espnOperationalLeagueEndpoints.ts
+init_define_import_meta_env();
+
+// ../grarf/desktop/src/data/espnOperationalLeagueRegistry.generated.ts
+init_define_import_meta_env();
+var ESPN_OPERATIONAL_INGEST_LEAGUES = [
+  {
+    "key": "AFL",
+    "sport": "australian-football",
+    "label": "AFL",
+    "slug": "afl",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/australian-football/afl/scoreboard"
+  },
+  {
+    "key": "ARG1",
+    "sport": "soccer",
+    "label": "Argentine Primera",
+    "slug": "arg.1",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/arg.1/scoreboard"
+  },
+  {
+    "key": "ATP",
+    "sport": "tennis",
+    "label": "ATP Tour",
+    "slug": "atp",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/tennis/atp/scoreboard"
+  },
+  {
+    "key": "BEL1",
+    "sport": "soccer",
+    "label": "Belgian Pro League",
+    "slug": "bel.1",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/bel.1/scoreboard"
+  },
+  {
+    "key": "BRA1",
+    "sport": "soccer",
+    "label": "Brasileir\xE3o",
+    "slug": "bra.1",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/bra.1/scoreboard"
+  },
+  {
+    "key": "BUNDESLIGA",
+    "sport": "soccer",
+    "label": "Bundesliga",
+    "slug": "ger.1",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/ger.1/scoreboard"
+  },
+  {
+    "key": "CAF_WNATIONS",
+    "sport": "soccer",
+    "label": "Women's AFCON",
+    "slug": "caf.w.nations",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/caf.w.nations/scoreboard"
+  },
+  {
+    "key": "CARABAO_CUP",
+    "sport": "soccer",
+    "label": "Carabao Cup",
+    "slug": "eng.league_cup",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/eng.league_cup/scoreboard"
+  },
+  {
+    "key": "CFL",
+    "sport": "football",
+    "label": "CFL",
+    "slug": "cfl",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/football/cfl/scoreboard"
+  },
+  {
+    "key": "CHAMPIONS",
+    "sport": "golf",
+    "label": "PGA Tour Champions",
+    "slug": "champions-tour",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/golf/champions-tour/scoreboard"
+  },
+  {
+    "key": "CHAMPIONSHIP",
+    "sport": "soccer",
+    "label": "Championship",
+    "slug": "eng.2",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/eng.2/scoreboard"
+  },
+  {
+    "key": "CLUBFRIENDLY",
+    "sport": "soccer",
+    "label": "Club Friendly",
+    "slug": "club.friendly",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/club.friendly/scoreboard"
+  },
+  {
+    "key": "CLUBWC",
+    "sport": "soccer",
+    "label": "Club World Cup",
+    "slug": "fifa.cwc",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.cwc/scoreboard"
+  },
+  {
+    "key": "CONCACAF_CAC",
+    "sport": "soccer",
+    "label": "Central American Cup",
+    "slug": "concacaf.central.american.cup",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/concacaf.central.american.cup/scoreboard"
+  },
+  {
+    "key": "CONCACAF_CL",
+    "sport": "soccer",
+    "label": "CONCACAF Champions Cup",
+    "slug": "concacaf.champions",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/concacaf.champions/scoreboard"
+  },
+  {
+    "key": "CONCACAF_NG",
+    "sport": "soccer",
+    "label": "CONCACAF Nations League",
+    "slug": "concacaf.nations.league",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/concacaf.nations.league/scoreboard"
+  },
+  {
+    "key": "CONCACAF_WC",
+    "sport": "soccer",
+    "label": "CONCACAF World Cup Qual",
+    "slug": "fifa.worldq.concacaf",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.worldq.concacaf/scoreboard"
+  },
+  {
+    "key": "COPA",
+    "sport": "soccer",
+    "label": "Copa America",
+    "slug": "conmebol.america",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/conmebol.america/scoreboard"
+  },
+  {
+    "key": "COPA_BRASIL",
+    "sport": "soccer",
+    "label": "Copa do Brasil",
+    "slug": "bra.copa_do_brazil",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/bra.copa_do_brazil/scoreboard"
+  },
+  {
+    "key": "COPPAITALIA",
+    "sport": "soccer",
+    "label": "Coppa Italia",
+    "slug": "ita.coppa_italia",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/ita.coppa_italia/scoreboard"
+  },
+  {
+    "key": "CRICKET_BBL",
+    "sport": "cricket",
+    "label": "Big Bash League",
+    "slug": "24136",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/cricket/24136/scoreboard"
+  },
+  {
+    "key": "CRICKET_ICC",
+    "sport": "cricket",
+    "label": "ICC Cricket",
+    "slug": "24597",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/cricket/24597/scoreboard"
+  },
+  {
+    "key": "DP_WORLD",
+    "sport": "golf",
+    "label": "DP World Tour",
+    "slug": "eur",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/golf/eur/scoreboard"
+  },
+  {
+    "key": "EPL",
+    "sport": "soccer",
+    "label": "Premier League",
+    "slug": "eng.1",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/eng.1/scoreboard"
+  },
+  {
+    "key": "EREDIVISIE",
+    "sport": "soccer",
+    "label": "Eredivisie",
+    "slug": "ned.1",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/ned.1/scoreboard"
+  },
+  {
+    "key": "EURO",
+    "sport": "soccer",
+    "label": "UEFA Euro",
+    "slug": "uefa.euro",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/uefa.euro/scoreboard"
+  },
+  {
+    "key": "F1",
+    "sport": "racing",
+    "label": "Formula 1",
+    "slug": "f1",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/racing/f1/scoreboard"
+  },
+  {
+    "key": "GER_SUPER_CUP",
+    "sport": "soccer",
+    "label": "German Supercup",
+    "slug": "ger.super_cup",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/ger.super_cup/scoreboard"
+  },
+  {
+    "key": "GOLDCUP",
+    "sport": "soccer",
+    "label": "Gold Cup",
+    "slug": "concacaf.gold",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/concacaf.gold/scoreboard"
+  },
+  {
+    "key": "INDYCAR",
+    "sport": "racing",
+    "label": "IndyCar Series",
+    "slug": "irl",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/racing/irl/scoreboard"
+  },
+  {
+    "key": "INTFRIENDLY",
+    "sport": "soccer",
+    "label": "International Friendlies",
+    "slug": "fifa.friendly",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.friendly/scoreboard"
+  },
+  {
+    "key": "KORNFERRY",
+    "sport": "golf",
+    "label": "Korn Ferry Tour",
+    "slug": "ntw",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/golf/ntw/scoreboard"
+  },
+  {
+    "key": "LALIGA",
+    "sport": "soccer",
+    "label": "La Liga",
+    "slug": "esp.1",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/esp.1/scoreboard"
+  },
+  {
+    "key": "LEAGUES_CUP",
+    "sport": "soccer",
+    "label": "Leagues Cup",
+    "slug": "concacaf.leagues.cup",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/concacaf.leagues.cup/scoreboard"
+  },
+  {
+    "key": "LIBERTADORES",
+    "sport": "soccer",
+    "label": "Copa Libertadores",
+    "slug": "conmebol.libertadores",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/conmebol.libertadores/scoreboard"
+  },
+  {
+    "key": "LIGAMX",
+    "sport": "soccer",
+    "label": "Liga MX",
+    "slug": "mex.1",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/mex.1/scoreboard"
+  },
+  {
+    "key": "LIGUE1",
+    "sport": "soccer",
+    "label": "Ligue 1",
+    "slug": "fra.1",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/fra.1/scoreboard"
+  },
+  {
+    "key": "LIV",
+    "sport": "golf",
+    "label": "LIV Golf",
+    "slug": "liv",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/golf/liv/scoreboard"
+  },
+  {
+    "key": "LLBWS",
+    "sport": "baseball",
+    "label": "LLBWS",
+    "slug": "llb",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/baseball/llb/scoreboard"
+  },
+  {
+    "key": "LPGA",
+    "sport": "golf",
+    "label": "LPGA Tour",
+    "slug": "lpga",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/golf/lpga/scoreboard"
+  },
+  {
+    "key": "MLB",
+    "sport": "baseball",
+    "label": "MLB",
+    "slug": "mlb",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/scoreboard"
+  },
+  {
+    "key": "MLS",
+    "sport": "soccer",
+    "label": "MLS",
+    "slug": "usa.1",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/usa.1/scoreboard"
+  },
+  {
+    "key": "MNCAAB",
+    "sport": "basketball",
+    "label": "NCAA Men's Basketball",
+    "slug": "mens-college-basketball",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/basketball/mens-college-basketball/scoreboard"
+  },
+  {
+    "key": "NASCAR",
+    "sport": "racing",
+    "label": "NASCAR Cup Series",
+    "slug": "nascar-premier",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/racing/nascar-premier/scoreboard"
+  },
+  {
+    "key": "NASCAR_TRUCK",
+    "sport": "racing",
+    "label": "NASCAR Truck Series",
+    "slug": "nascar-truck",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/racing/nascar-truck/scoreboard"
+  },
+  {
+    "key": "NASCAR_XFINITY",
+    "sport": "racing",
+    "label": "NASCAR O'Reilly Auto Parts",
+    "slug": "nascar-secondary",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/racing/nascar-secondary/scoreboard"
+  },
+  {
+    "key": "NATIONS",
+    "sport": "soccer",
+    "label": "UEFA Nations League",
+    "slug": "uefa.nations",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/uefa.nations/scoreboard"
+  },
+  {
+    "key": "NBA",
+    "sport": "basketball",
+    "label": "NBA",
+    "slug": "nba",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard"
+  },
+  {
+    "key": "NBA2K",
+    "sport": "basketball",
+    "label": "NBA G League",
+    "slug": "nba-development",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/basketball/nba-development/scoreboard"
+  },
+  {
+    "key": "NBASUMMER",
+    "sport": "basketball",
+    "label": "NBA Summer League",
+    "slug": "nba-summer",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/basketball/nba-summer/scoreboard"
+  },
+  {
+    "key": "NCAABB",
+    "sport": "baseball",
+    "label": "NCAA Baseball",
+    "slug": "college-baseball",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/baseball/college-baseball/scoreboard"
+  },
+  {
+    "key": "NCAAF",
+    "sport": "football",
+    "label": "College Football",
+    "slug": "college-football",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/football/college-football/scoreboard"
+  },
+  {
+    "key": "NCAAFH",
+    "sport": "field-hockey",
+    "label": "NCAA Field Hockey",
+    "slug": "womens-college-field-hockey",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/field-hockey/womens-college-field-hockey/scoreboard"
+  },
+  {
+    "key": "NCAALAX",
+    "sport": "lacrosse",
+    "label": "NCAA Lacrosse",
+    "slug": "mens-college-lacrosse",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/lacrosse/mens-college-lacrosse/scoreboard"
+  },
+  {
+    "key": "NCAAMSOC",
+    "sport": "soccer",
+    "label": "NCAA Men's Soccer",
+    "slug": "usa.ncaa.m.1",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/usa.ncaa.m.1/scoreboard"
+  },
+  {
+    "key": "NCAAVB",
+    "sport": "volleyball",
+    "label": "NCAA Women's Volleyball",
+    "slug": "womens-college-volleyball",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/volleyball/womens-college-volleyball/scoreboard"
+  },
+  {
+    "key": "NCAAVB_M",
+    "sport": "volleyball",
+    "label": "NCAA Men's Volleyball",
+    "slug": "mens-college-volleyball",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/volleyball/mens-college-volleyball/scoreboard"
+  },
+  {
+    "key": "NCAAWP",
+    "sport": "water-polo",
+    "label": "NCAA Water Polo",
+    "slug": "mens-college-water-polo",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/water-polo/mens-college-water-polo/scoreboard"
+  },
+  {
+    "key": "NCAAWSOC",
+    "sport": "soccer",
+    "label": "NCAA Women's Soccer",
+    "slug": "usa.ncaa.w.1",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/usa.ncaa.w.1/scoreboard"
+  },
+  {
+    "key": "NFL",
+    "sport": "football",
+    "label": "NFL",
+    "slug": "nfl",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard"
+  },
+  {
+    "key": "NHL",
+    "sport": "hockey",
+    "label": "NHL",
+    "slug": "nhl",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/hockey/nhl/scoreboard"
+  },
+  {
+    "key": "NWSL",
+    "sport": "soccer",
+    "label": "NWSL",
+    "slug": "usa.nwsl",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/usa.nwsl/scoreboard"
+  },
+  {
+    "key": "PGA",
+    "sport": "golf",
+    "label": "PGA Tour",
+    "slug": "pga",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/golf/pga/scoreboard"
+  },
+  {
+    "key": "PLL",
+    "sport": "lacrosse",
+    "label": "Premier Lacrosse League",
+    "slug": "pll",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/lacrosse/pll/scoreboard"
+  },
+  {
+    "key": "POR1",
+    "sport": "soccer",
+    "label": "Primeira Liga",
+    "slug": "por.1",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/por.1/scoreboard"
+  },
+  {
+    "key": "RUGBYPREM",
+    "sport": "rugby",
+    "label": "Gallagher Premiership",
+    "slug": "267979",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/rugby/267979/scoreboard"
+  },
+  {
+    "key": "RUGBYTOP14",
+    "sport": "rugby",
+    "label": "French Top 14",
+    "slug": "270559",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/rugby/270559/scoreboard"
+  },
+  {
+    "key": "RUGBYULSTER",
+    "sport": "rugby",
+    "label": "United Rugby Championship",
+    "slug": "270557",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/rugby/270557/scoreboard"
+  },
+  {
+    "key": "RUGBYWC",
+    "sport": "rugby",
+    "label": "Rugby World Cup",
+    "slug": "164205",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/rugby/164205/scoreboard"
+  },
+  {
+    "key": "SAUDI",
+    "sport": "soccer",
+    "label": "Saudi Pro League",
+    "slug": "ksa.1",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/ksa.1/scoreboard"
+  },
+  {
+    "key": "SCOTTISH_LEAGUE_CUP",
+    "sport": "soccer",
+    "label": "Scottish League Cup",
+    "slug": "sco.cis",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/sco.cis/scoreboard"
+  },
+  {
+    "key": "SERIEA",
+    "sport": "soccer",
+    "label": "Serie A",
+    "slug": "ita.1",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/ita.1/scoreboard"
+  },
+  {
+    "key": "SPFL",
+    "sport": "soccer",
+    "label": "Scottish Premiership",
+    "slug": "sco.1",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/sco.1/scoreboard"
+  },
+  {
+    "key": "SUDAMERICANA",
+    "sport": "soccer",
+    "label": "Copa Sudamericana",
+    "slug": "conmebol.sudamericana",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/conmebol.sudamericana/scoreboard"
+  },
+  {
+    "key": "SUPERLIG",
+    "sport": "soccer",
+    "label": "Turkish Super Lig",
+    "slug": "tur.1",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/tur.1/scoreboard"
+  },
+  {
+    "key": "UCL",
+    "sport": "soccer",
+    "label": "Champions League",
+    "slug": "uefa.champions",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/uefa.champions/scoreboard"
+  },
+  {
+    "key": "UCLQ",
+    "sport": "soccer",
+    "label": "UEFA Champions League Qualifying",
+    "slug": "uefa.champions_qual",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/uefa.champions_qual/scoreboard"
+  },
+  {
+    "key": "UECL",
+    "sport": "soccer",
+    "label": "UEFA Conference League",
+    "slug": "uefa.europa.conf",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/uefa.europa.conf/scoreboard"
+  },
+  {
+    "key": "UECLQ",
+    "sport": "soccer",
+    "label": "UEFA Conference League Qualifying",
+    "slug": "uefa.europa.conf_qual",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/uefa.europa.conf_qual/scoreboard"
+  },
+  {
+    "key": "UEL",
+    "sport": "soccer",
+    "label": "Europa League",
+    "slug": "uefa.europa",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/uefa.europa/scoreboard"
+  },
+  {
+    "key": "UELQ",
+    "sport": "soccer",
+    "label": "UEFA Europa League Qualifying",
+    "slug": "uefa.europa_qual",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/uefa.europa_qual/scoreboard"
+  },
+  {
+    "key": "UFC",
+    "sport": "mma",
+    "label": "UFC",
+    "slug": "ufc",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/mma/ufc/scoreboard"
+  },
+  {
+    "key": "US_OPEN_CUP",
+    "sport": "soccer",
+    "label": "U.S. Open Cup",
+    "slug": "usa.open",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/usa.open/scoreboard"
+  },
+  {
+    "key": "USL1",
+    "sport": "soccer",
+    "label": "USL League One",
+    "slug": "usa.usl.l1",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/usa.usl.l1/scoreboard"
+  },
+  {
+    "key": "USLC",
+    "sport": "soccer",
+    "label": "USL Championship",
+    "slug": "usa.usl.1",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/usa.usl.1/scoreboard"
+  },
+  {
+    "key": "USLCUP",
+    "sport": "soccer",
+    "label": "USL Championship Cup",
+    "slug": "usa.usl.l1.cup",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/usa.usl.l1.cup/scoreboard"
+  },
+  {
+    "key": "UWCQ",
+    "sport": "soccer",
+    "label": "UEFA Euro Qualifying",
+    "slug": "uefa.euroq",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/uefa.euroq/scoreboard"
+  },
+  {
+    "key": "WNBA",
+    "sport": "basketball",
+    "label": "WNBA",
+    "slug": "wnba",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/basketball/wnba/scoreboard"
+  },
+  {
+    "key": "WNCAAB",
+    "sport": "basketball",
+    "label": "NCAA Women's Basketball",
+    "slug": "womens-college-basketball",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/basketball/womens-college-basketball/scoreboard"
+  },
+  {
+    "key": "WORLDCUP",
+    "sport": "soccer",
+    "label": "FIFA World Cup",
+    "slug": "fifa.world",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard"
+  },
+  {
+    "key": "WTA",
+    "sport": "tennis",
+    "label": "WTA Tour",
+    "slug": "wta",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/tennis/wta/scoreboard"
+  },
+  {
+    "key": "WWC",
+    "sport": "soccer",
+    "label": "Women's World Cup",
+    "slug": "fifa.wwc",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.wwc/scoreboard"
+  },
+  {
+    "key": "XFL",
+    "sport": "football",
+    "label": "United Football League",
+    "slug": "ufl",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/football/ufl/scoreboard"
+  }
+];
+var ESPN_OPERATIONAL_INGEST_LEAGUE_KEYS = ESPN_OPERATIONAL_INGEST_LEAGUES.map((l2) => l2.key);
+var ESPN_OPERATIONAL_LEAGUE_ENDPOINTS = Object.fromEntries(ESPN_OPERATIONAL_INGEST_LEAGUES.map((l2) => [l2.key, l2.endpoint]));
+var ESPN_OPERATIONAL_LEAGUE_LABELS = Object.fromEntries(ESPN_OPERATIONAL_INGEST_LEAGUES.map((l2) => [l2.key, l2.label]));
+function resolveEspnOperationalLeagueLabel(leagueKey) {
+  return ESPN_OPERATIONAL_LEAGUE_LABELS[leagueKey] ?? leagueKey;
+}
+var ESPN_SOCCER_OPERATIONAL_LEAGUE_KEYS = new Set(
+  ESPN_OPERATIONAL_INGEST_LEAGUES.filter((l2) => l2.sport === "soccer").map((l2) => l2.key)
+);
 
 // ../grarf/desktop/shared/espnOperationalIngestDisabledLeagues.js
 init_define_import_meta_env();
@@ -24601,7 +23903,7 @@ var TENNIS_ENDPOINTS = [
   { key: "ATP", endpoint: `${TENNIS_BASE}/atp/scoreboard` },
   { key: "WTA", endpoint: `${TENNIS_BASE}/wta/scoreboard` }
 ];
-var LOG4 = "[OperationalIngest][tennis]";
+var LOG3 = "[OperationalIngest][tennis]";
 var ESPN_WEB_FETCH_TIMEOUT_MS = 12e3;
 async function fetchUsOpenTennisWebScoreboardJson(url) {
   const res = await fetch(url, {
@@ -24628,7 +23930,7 @@ async function fetchTennisOperationalLeagues() {
       } catch (e2) {
         const msg = e2 instanceof Error ? e2.message : String(e2);
         if (define_import_meta_env_default.DEV) {
-          console.warn(`${LOG4} ${key2} fetch failed`, msg);
+          console.warn(`${LOG3} ${key2} fetch failed`, msg);
         }
         return { key: key2, games: [], error: msg };
       }
@@ -24648,11 +23950,11 @@ async function fetchTennisOperationalLeagues() {
   } catch (e2) {
     const msg = e2 instanceof Error ? e2.message : String(e2);
     if (define_import_meta_env_default.DEV) {
-      console.warn(`${LOG4} US Open tournament fetch failed`, msg);
+      console.warn(`${LOG3} US Open tournament fetch failed`, msg);
     }
   }
   if (define_import_meta_env_default.DEV) {
-    console.log(`${LOG4} slate`, {
+    console.log(`${LOG3} slate`, {
       atp: leagueGames.ATP?.length ?? 0,
       wta: leagueGames.WTA?.length ?? 0,
       usOpen: leagueGames.US_OPEN_TENNIS?.length ?? 0
@@ -24662,7 +23964,7 @@ async function fetchTennisOperationalLeagues() {
 }
 
 // ../grarf/desktop/src/services/operationalIngest/supplementOperationalSnapshotWithTennis.ts
-var LOG5 = "[OperationalIngest]";
+var LOG4 = "[OperationalIngest]";
 async function supplementOperationalSnapshotWithTennis(snap) {
   const tennis = await fetchTennisOperationalLeagues();
   const atpIncoming = tennis.ATP ?? [];
@@ -24685,7 +23987,7 @@ async function supplementOperationalSnapshotWithTennis(snap) {
     );
   }
   if (define_import_meta_env_default.DEV) {
-    console.log(`${LOG5} tennis supplement`, {
+    console.log(`${LOG4} tennis supplement`, {
       atp: leagues.ATP?.length ?? 0,
       wta: leagues.WTA?.length ?? 0,
       usOpen: leagues.US_OPEN_TENNIS?.length ?? 0
@@ -25412,7 +24714,7 @@ var NATIONAL_TEAM_SOCCER_LEAGUE_KEYS = /* @__PURE__ */ new Set(["CONCACAF_NG", "
 
 // ../grarf/desktop/electron/espn/espnPlusStream.js
 init_define_import_meta_env();
-var LOG6 = "[ESPN]";
+var LOG5 = "[ESPN]";
 var PLAY_LOCATION2 = "where-to-watch%3Aguide";
 function buildEspnPlusWatchUrlByEventCalendarId(eventCalendarId) {
   const id = String(eventCalendarId).trim();
@@ -25426,16 +24728,16 @@ function resolveEspnPlusStreamFromEvent(event, broadcastLabels, leagueKey) {
   }
   const eventCalendarId = String(event?.id ?? "").trim();
   if (!/^\d+$/.test(eventCalendarId)) {
-    console.warn(`${LOG6} ESPN watch broadcast present but missing event id`, { leagueKey });
+    console.warn(`${LOG5} ESPN watch broadcast present but missing event id`, { leagueKey });
     return null;
   }
   const streamUrl = buildEspnPlusWatchUrlByEventCalendarId(eventCalendarId);
   if (!streamUrl) return null;
   const linearNhl = leagueKey === "NHL" && !gameHasEspnPlusBroadcast(broadcastLabels) && gameHasEspnWatchBroadcast(broadcastLabels, leagueKey);
-  console.log(`${LOG6} Found watch eventCalendarId: ${eventCalendarId}`);
-  console.log(`${LOG6} Current generated URL: ${streamUrl}`);
+  console.log(`${LOG5} Found watch eventCalendarId: ${eventCalendarId}`);
+  console.log(`${LOG5} Current generated URL: ${streamUrl}`);
   console.log(
-    `${LOG6} Resolved direct ESPN watch URL (legacy calendar id${linearNhl ? ", NHL linear ESPN" : ""})`
+    `${LOG5} Resolved direct ESPN watch URL (legacy calendar id${linearNhl ? ", NHL linear ESPN" : ""})`
   );
   return { streamUrl, streamProvider: "ESPN+", eventCalendarId };
 }
@@ -25444,16 +24746,16 @@ function resolveEspnWatchStreamFromCompetition2(competition, broadcastLabels, le
   if (!gameHasEspnWatchBroadcast(broadcastLabels, leagueKey)) return null;
   const eventCalendarId = String(competition?.id ?? "").trim();
   if (!/^\d+$/.test(eventCalendarId)) {
-    console.warn(`${LOG6} ESPN watch broadcast present but missing competition id`, { leagueKey });
+    console.warn(`${LOG5} ESPN watch broadcast present but missing competition id`, { leagueKey });
     return null;
   }
   const streamUrl = buildEspnPlusWatchUrlByEventCalendarId(eventCalendarId);
   if (!streamUrl) return null;
   const linearOnly = !gameHasEspnPlusBroadcast(broadcastLabels) && gameHasEspnWatchBroadcast(broadcastLabels, leagueKey);
-  console.log(`${LOG6} Found watch eventCalendarId: ${eventCalendarId}`);
-  console.log(`${LOG6} Current generated URL: ${streamUrl}`);
+  console.log(`${LOG5} Found watch eventCalendarId: ${eventCalendarId}`);
+  console.log(`${LOG5} Current generated URL: ${streamUrl}`);
   console.log(
-    `${LOG6} Resolved direct ESPN watch URL (${linearOnly ? "linear ESPN" : "ESPN+"}, ${leagueKey})`
+    `${LOG5} Resolved direct ESPN watch URL (${linearOnly ? "linear ESPN" : "ESPN+"}, ${leagueKey})`
   );
   return { streamUrl, streamProvider: "ESPN+", eventCalendarId };
 }
@@ -25477,12 +24779,15 @@ function attachEspnPlusStreamToGame2(game, stream) {
       ...stream.playerId ? { playerId: stream.playerId } : {}
     }
   ];
-  console.log(`${LOG6} Attached streamUrl to game object`, {
+  console.log(`${LOG5} Attached streamUrl to game object`, {
     id: game.id,
     eventCalendarId: stream.eventCalendarId,
     playerId: stream.playerId ?? null
   });
 }
+
+// ../grarf/desktop/shared/espnPausedCompetitionStatus.js
+init_define_import_meta_env();
 
 // ../grarf/desktop/electron/espn/normalizeRacing.js
 init_define_import_meta_env();
@@ -26385,6 +25690,96 @@ function normalizeTennisScoreboard3(scoreboardJson, leagueKey, usedFallback = fa
 // ../grarf/desktop/electron/espn/normalizeGolf.js
 init_define_import_meta_env();
 
+// ../grarf/desktop/shared/grarfSportHierarchy.js
+init_define_import_meta_env();
+
+// ../grarf/shared/config/grarfSportHierarchy.js
+init_define_import_meta_env();
+var GRARF_SPORT_HIERARCHY = {
+  soccer: {
+    title: "SOCCER",
+    directorySectionId: "soccer",
+    leagueKeys: [
+      "MLS",
+      "NWSL",
+      "NCAAMSOC",
+      "NCAAWSOC",
+      "LALIGA",
+      "BUNDESLIGA",
+      "SERIEA",
+      "UCL",
+      "UCLQ",
+      "LIGUE1",
+      "LIGAMX",
+      "EREDIVISIE",
+      "SPFL",
+      "SAUDI",
+      "SUPERLIG",
+      "UEL",
+      "UELQ",
+      "UECL",
+      "UECLQ",
+      "WWC",
+      "EURO",
+      "COPA",
+      "GOLDCUP",
+      "NATIONS",
+      "CLUBWC",
+      "USLCUP",
+      "WORLDCUP"
+    ]
+  },
+  golf: {
+    title: "GOLF",
+    directorySectionId: "golf",
+    leagueKeys: ["PGA", "LPGA", "DP_WORLD", "KORNFERRY", "LIV", "CHAMPIONS"]
+  },
+  tennis: {
+    title: "TENNIS",
+    directorySectionId: "tennis",
+    leagueKeys: ["US_OPEN_TENNIS", "ATP", "WTA"]
+  },
+  basketball: {
+    title: "BASKETBALL",
+    directorySectionId: "basketball",
+    leagueKeys: ["WNBA"]
+  },
+  motorsports: {
+    title: "MOTORSPORTS",
+    directorySectionId: "motorsports",
+    leagueKeys: ["F1", "F2", "F3", "FORMULA_E", "NASCAR", "NASCAR_XFINITY", "NASCAR_TRUCK", "INDYCAR", "MOTOGP", "MOTO2", "MOTO3", "WEC"]
+  },
+  combat: {
+    title: "COMBAT",
+    directorySectionId: "combat",
+    leagueKeys: ["UFC", "BOXING"]
+  },
+  football: {
+    title: "FOOTBALL",
+    directorySectionId: "football",
+    leagueKeys: []
+  }
+};
+var GOLF_LEAGUE_KEYS2 = GRARF_SPORT_HIERARCHY.golf.leagueKeys;
+var GOLF_LEAGUE_KEY_SET = new Set(GOLF_LEAGUE_KEYS2);
+function isGolfLeagueKey(leagueKey) {
+  return typeof leagueKey === "string" && GOLF_LEAGUE_KEY_SET.has(leagueKey);
+}
+function resolveSportKeyForLeague(leagueKey) {
+  if (typeof leagueKey !== "string" || !leagueKey.trim()) return void 0;
+  const key2 = leagueKey.trim();
+  for (const [sportKey, def] of Object.entries(GRARF_SPORT_HIERARCHY)) {
+    if (def.leagueKeys.includes(key2)) return (
+      /** @type {GrarfSportKey} */
+      sportKey
+    );
+  }
+  return void 0;
+}
+function sportLeagueKeys(sportKey) {
+  return GRARF_SPORT_HIERARCHY[sportKey]?.leagueKeys ?? [];
+}
+
 // ../grarf/desktop/shared/golfWatchUrls.js
 init_define_import_meta_env();
 
@@ -27227,7 +26622,7 @@ function normalizeDatedOperationalScoreboardPair(todayJson, tomorrowJson, league
 }
 
 // ../grarf/desktop/src/services/operationalIngest/web/fetchWebEspnOperationalSnapshot.ts
-var LOG7 = "[OperationalIngest]";
+var LOG6 = "[OperationalIngest]";
 var ESPN_FETCH_TIMEOUT_MS2 = 12e3;
 var LEAGUE_FETCH_CONCURRENCY = 8;
 async function fetchEspnScoreboardJson(url) {
@@ -27317,7 +26712,7 @@ async function fetchLeagueGames(key2) {
     return games;
   } catch (e2) {
     if (define_import_meta_env_default.DEV) {
-      console.warn(`${LOG7} web ESPN fetch failed`, key2, e2);
+      console.warn(`${LOG6} web ESPN fetch failed`, key2, e2);
     }
     return [];
   }
@@ -27357,7 +26752,7 @@ async function fetchWebEspnOperationalSnapshot(leagueKeys = filterEspnOperationa
     if (games?.length) mergedTotal += games.length;
   }
   if (define_import_meta_env_default.DEV) {
-    console.log(`${LOG7} web ESPN fallback snapshot`, {
+    console.log(`${LOG6} web ESPN fallback snapshot`, {
       total: mergedTotal,
       leagues: Object.keys(mergedLeagues).length
     });
@@ -27371,7 +26766,7 @@ async function fetchWebEspnOperationalSnapshot(leagueKeys = filterEspnOperationa
 }
 
 // ../grarf/desktop/src/services/operationalIngest/fetchOperationalSnapshot.ts
-var LOG8 = "[OperationalIngest]";
+var LOG7 = "[OperationalIngest]";
 var CLOUD_FETCH_TIMEOUT_MS = 2e4;
 var WEB_CLOUD_BOOTSTRAP_TIMEOUT_MS = 2500;
 var CLOUD_FETCH_MAX_ATTEMPTS = 3;
@@ -27391,7 +26786,7 @@ function prefetchWebOperationalCloudSnapshot() {
     webCloudSnapshotPrefetch = fetchViaGrarfCloudService(
       shouldUseWebBootstrapCloudPrefetch() ? { webBootstrap: true, traceFetchKind: "prefetch" } : { traceFetchKind: "prefetch" }
     ).then((snap) => countOperationalGames(snap) > 0 ? snap : null).catch((e2) => {
-      console.warn(`${LOG8} web cloud prefetch failed`, e2);
+      console.warn(`${LOG7} web cloud prefetch failed`, e2);
       return null;
     });
   }
@@ -27577,7 +26972,7 @@ async function fetchViaEspnLocalIpcAdapter() {
   const api = window.grarf?.gamesGetSnapshot;
   if (!api) {
     if (define_import_meta_env_default.DEV) {
-      console.warn(`${LOG8} source=espn_local_adapter unavailable (no Electron IPC)`);
+      console.warn(`${LOG7} source=espn_local_adapter unavailable (no Electron IPC)`);
     }
     return emptyOperationalSnapshot();
   }
@@ -27665,7 +27060,7 @@ async function fetchViaWebOperationalIngest() {
   } catch (e2) {
     cloudError = e2 instanceof Error ? e2.message : String(e2);
     if (define_import_meta_env_default.DEV) {
-      console.warn(`${LOG8} web cloud snapshot unavailable`, e2);
+      console.warn(`${LOG7} web cloud snapshot unavailable`, e2);
     }
   }
   if (cloud && countOperationalGames(cloud) > 0) {
@@ -27681,7 +27076,7 @@ async function fetchViaWebOperationalIngest() {
       }
     } catch (e2) {
       if (define_import_meta_env_default.DEV) {
-        console.warn(`${LOG8} dev ESPN fallback unavailable`, e2);
+        console.warn(`${LOG7} dev ESPN fallback unavailable`, e2);
       }
     }
   }
@@ -27699,7 +27094,7 @@ async function joinWebMlbProviderIds(transport) {
     return { ...transport, leagues: { ...transport.leagues, MLB: joined } };
   } catch (e2) {
     if (define_import_meta_env_default.DEV) {
-      console.warn(`${LOG8} web MLB provider id join failed`, e2);
+      console.warn(`${LOG7} web MLB provider id join failed`, e2);
     }
     return transport;
   }
@@ -27783,7 +27178,7 @@ function resolveOperationalStartupGateState(input) {
 // ../grarf/desktop/src/services/operationalIngest/startOperationalSnapshotPolling.ts
 init_define_import_meta_env();
 init_operationalIngestConfig();
-var LOG9 = "[OperationalIngest]";
+var LOG8 = "[OperationalIngest]";
 var DEFAULT_POLL_INTERVAL_MS = 6e4;
 var RETRY_MS = 15e3;
 function startOperationalSnapshotPolling(onTransport, options) {
@@ -27798,7 +27193,7 @@ function startOperationalSnapshotPolling(onTransport, options) {
   let retryTimer = null;
   let intervalId = null;
   if (define_import_meta_env_default.DEV) {
-    console.log(`${LOG9} provider=grarf_cloud polling centralized snapshot`);
+    console.log(`${LOG8} provider=grarf_cloud polling centralized snapshot`);
   }
   const clearRetry = () => {
     if (retryTimer != null) {
@@ -27826,7 +27221,7 @@ function startOperationalSnapshotPolling(onTransport, options) {
         }
       } catch (e2) {
         const msg = e2 instanceof Error ? e2.message : String(e2);
-        console.warn(`${LOG9} poll failed`, msg);
+        console.warn(`${LOG8} poll failed`, msg);
         if (!stopped && retryTimer == null) {
           retryTimer = setTimeout(() => {
             retryTimer = null;
@@ -27862,6 +27257,220 @@ init_operationalIngestConfig();
 
 // ../grarf/desktop/src/lib/finalizedGameRetention/buildOperationalSpineSlate.ts
 init_define_import_meta_env();
+
+// ../grarf/desktop/src/lib/gamesSpine/gamesSpineOperationalDate.ts
+init_define_import_meta_env();
+
+// ../grarf/desktop/src/data/grarfSportHierarchy.ts
+init_define_import_meta_env();
+var GOLF_TOUR_LEAGUE_ORDER = sportLeagueKeys("golf");
+
+// ../grarf/desktop/src/lib/gamesSpine/gamesSpineOperationalDate.ts
+init_isGrarfWebRenderer();
+function gamesSpineOperationalTimeZone() {
+  return resolveOperationalSlateTimeZone();
+}
+function formatUtcDateKeyFromMs(ms2) {
+  if (ms2 == null || !Number.isFinite(ms2) || ms2 <= 0) return null;
+  const d2 = new Date(ms2);
+  const y2 = d2.getUTCFullYear();
+  const m2 = String(d2.getUTCMonth() + 1).padStart(2, "0");
+  const day = String(d2.getUTCDate()).padStart(2, "0");
+  return `${y2}-${m2}-${day}`;
+}
+function buildOperationalSlateDateDiagnostics(game) {
+  const startTimeMs = game.startTimeMs != null && Number.isFinite(game.startTimeMs) && game.startTimeMs > 0 ? game.startTimeMs : null;
+  return {
+    scheduledDateKeyFromPayload: game.scheduledDateKey?.trim() ?? null,
+    localOperationalDateKey: formatOperationalDateKeyFromMs(startTimeMs, gamesSpineOperationalTimeZone()) ?? null,
+    utcDateKeyFromStart: formatUtcDateKeyFromMs(startTimeMs),
+    startTimeMs,
+    startTimeLocalFormatted: startTimeMs != null ? new Date(startTimeMs).toLocaleString("en-US", {
+      timeZone: gamesSpineOperationalTimeZone()
+    }) : null
+  };
+}
+function formatLocalDateKeyFromMs2(ms2) {
+  return formatOperationalDateKeyFromMs(ms2 ?? void 0, gamesSpineOperationalTimeZone()) ?? null;
+}
+function isScheduledOnOperationalEveningSlate2(game, operationalDateKey, now = /* @__PURE__ */ new Date()) {
+  return isScheduledOnOperationalEveningSlate(
+    game,
+    operationalDateKey,
+    now,
+    gamesSpineOperationalTimeZone()
+  );
+}
+function buildGamesSpineOperationalDateContext(operationalDateKey, now) {
+  return {
+    operationalDateKey,
+    sportsDayKey: getOperationalSportsDayDateKey(now),
+    yesterdayKey: getOperationalSportsDayYesterdayDateKey(now)
+  };
+}
+function usesAuthoritativeScheduledDateKeyForSpineFilter(game) {
+  if (isGolfLeagueKey(game.league)) return true;
+  if (game.league === "AFL") return true;
+  if (isMotorsportSessionLeagueKey(game.league)) return true;
+  return false;
+}
+function isGameOnGamesSpineOperationalDateWithContext(game, ctx, now = /* @__PURE__ */ new Date()) {
+  const payloadKey = game.scheduledDateKey?.trim();
+  const startKey = formatOperationalDateKeyFromMs(
+    game.startTimeMs,
+    gamesSpineOperationalTimeZone()
+  );
+  if (game.status === "scheduled" && usesAuthoritativeScheduledDateKeyForSpineFilter(game)) {
+    return payloadKey ? payloadKey === ctx.operationalDateKey : false;
+  }
+  if (ctx.operationalDateKey === ctx.sportsDayKey) {
+    if (payloadKey === ctx.sportsDayKey || startKey === ctx.sportsDayKey) {
+      return true;
+    }
+  }
+  if (game.status === "scheduled") {
+    return isScheduledOnOperationalEveningSlate2(
+      game,
+      ctx.operationalDateKey,
+      now,
+      gamesSpineOperationalTimeZone()
+    );
+  }
+  if (game.status === "live") {
+    if (isGolfLeagueKey(game.league)) {
+      const gameDateKey2 = resolveGameOperationalDateKey(game);
+      if (!gameDateKey2) return ctx.operationalDateKey === ctx.sportsDayKey;
+      if (gameDateKey2 === ctx.operationalDateKey) return true;
+      if (gameDateKey2 === ctx.yesterdayKey) return true;
+      return false;
+    }
+  }
+  if (isScheduledOnOperationalEveningSlate2(game, ctx.operationalDateKey, now)) {
+    return true;
+  }
+  if (startKey === ctx.operationalDateKey) {
+    return true;
+  }
+  const gameDateKey = resolveGameOperationalDateKey(game);
+  if (!gameDateKey) return false;
+  if (gameDateKey === ctx.operationalDateKey) return true;
+  if (game.status === "live" && gameDateKey === ctx.yesterdayKey) {
+    return true;
+  }
+  return false;
+}
+function resolveActiveGolfTournamentOperationalSportsDayKey(game, now = /* @__PURE__ */ new Date()) {
+  const endKey = game.metadata?.tournamentEndDateKey?.trim();
+  if (!endKey) return null;
+  const today = getOperationalSportsDayDateKey(now);
+  if (endKey < today) return null;
+  const startTimeKey = game.startTimeMs != null && game.startTimeMs > 0 ? formatOperationalDateKeyFromMs(game.startTimeMs, gamesSpineOperationalTimeZone()) ?? null : null;
+  if (startTimeKey && startTimeKey <= today) return today;
+  return null;
+}
+function readGolfFinalOperationalDateKey(game) {
+  const endKey = game.metadata?.tournamentEndDateKey?.trim();
+  const scheduledKey = game.scheduledDateKey?.trim();
+  const activeSportsDayKey = resolveActiveGolfTournamentOperationalSportsDayKey(game);
+  if (activeSportsDayKey) return activeSportsDayKey;
+  if (endKey && scheduledKey && /round\s+\d+\s+-\s+play complete/i.test(game.statusLine ?? "")) {
+    return scheduledKey;
+  }
+  if (endKey) return endKey;
+  return scheduledKey || null;
+}
+function resolveGameOperationalDateKey(game) {
+  if (game.status === "scheduled" || game.status === "live") {
+    if (isGolfLeagueKey(game.league)) {
+      if (game.status === "live") {
+        const activeSportsDayKey = resolveActiveGolfTournamentOperationalSportsDayKey(game);
+        if (activeSportsDayKey) return activeSportsDayKey;
+      }
+      const key2 = game.scheduledDateKey?.trim();
+      if (key2) return key2;
+      return formatOperationalDateKeyFromMs(game.startTimeMs, gamesSpineOperationalTimeZone()) ?? null;
+    }
+    const fromStart2 = formatOperationalDateKeyFromMs(game.startTimeMs, gamesSpineOperationalTimeZone());
+    if (fromStart2) return fromStart2;
+    if (game.scheduledDateKey?.trim()) return game.scheduledDateKey.trim();
+    return null;
+  }
+  if (game.status === "final" && isGolfLeagueKey(game.league)) {
+    const golfFinalKey = readGolfFinalOperationalDateKey(game);
+    if (golfFinalKey) return golfFinalKey;
+  }
+  const fromStart = formatOperationalDateKeyFromMs(game.startTimeMs, gamesSpineOperationalTimeZone());
+  if (fromStart) return fromStart;
+  if (game.scheduledDateKey?.trim()) {
+    return game.scheduledDateKey.trim();
+  }
+  return null;
+}
+function isGamesSpineYesterdayFinalGame(game, now = /* @__PURE__ */ new Date()) {
+  if (game.status !== "final") return false;
+  const gameDateKey = resolveGameOperationalDateKey(game);
+  if (!gameDateKey) return false;
+  return gameDateKey === getOperationalSportsDayYesterdayDateKey(now);
+}
+function isCatchUpSpineFinalGame(game, now = /* @__PURE__ */ new Date()) {
+  if (game.status !== "final") return false;
+  const sportsDayKey = getOperationalSportsDayDateKey(now);
+  const yesterdayKey2 = getOperationalSportsDayYesterdayDateKey(now);
+  const gameDateKey = resolveGameOperationalDateKey(game);
+  if (!gameDateKey) return false;
+  if (gameDateKey === sportsDayKey) return false;
+  if (gameDateKey === yesterdayKey2) return true;
+  return gameDateKey < sportsDayKey;
+}
+function explainOperationalDateRemoval(game, operationalDateKey = getOperationalSportsDayDateKey(), now = /* @__PURE__ */ new Date()) {
+  if (isGameOnGamesSpineOperationalDate(game, operationalDateKey, now)) {
+    return "kept";
+  }
+  const diag = buildOperationalSlateDateDiagnostics(game);
+  const payloadKey = diag.scheduledDateKeyFromPayload;
+  const localKey = diag.localOperationalDateKey;
+  if (game.status === "scheduled") {
+    if (payloadKey != null && payloadKey !== operationalDateKey && localKey === operationalDateKey) {
+      return "scheduled_payload_utc_mismatch_local_start_on_operational_day";
+    }
+    if (payloadKey != null && payloadKey !== operationalDateKey) {
+      return "scheduled_date_mismatch";
+    }
+    return "operational_date_mismatch";
+  }
+  if (payloadKey != null && payloadKey !== operationalDateKey) {
+    return "scheduled_date_mismatch";
+  }
+  return "operational_date_mismatch";
+}
+function isGameOnGamesSpineOperationalDate(game, operationalDateKey = getOperationalSportsDayDateKey(), now = /* @__PURE__ */ new Date()) {
+  return isGameOnGamesSpineOperationalDateWithContext(
+    game,
+    buildGamesSpineOperationalDateContext(operationalDateKey, now),
+    now
+  );
+}
+function filterGamesSpineSlateForOperationalDate(games, operationalDateKey = getOperationalSportsDayDateKey(), now = /* @__PURE__ */ new Date()) {
+  if (games.length === 0) return games;
+  const ctx = buildGamesSpineOperationalDateContext(operationalDateKey, now);
+  return games.filter((g2) => isGameOnGamesSpineOperationalDateWithContext(g2, ctx, now));
+}
+function filterGamesSpineSlateForOperationalSportsDay(games, now = /* @__PURE__ */ new Date()) {
+  return filterGamesSpineSlateForOperationalDate(games, getOperationalSportsDayDateKey(now), now);
+}
+function filterGamesSpineSlateForTodayUpcoming(games, now = /* @__PURE__ */ new Date()) {
+  if (games.length === 0) return [];
+  const todayKey = getOperationalSportsDayDateKey(now);
+  return games.filter(
+    (g2) => isOperationalGameUpcoming(g2, now.getTime()) && isGameOnGamesSpineOperationalDate(g2, todayKey, now)
+  );
+}
+function filterGamesSpineSlateForUpcoming(games, now = /* @__PURE__ */ new Date()) {
+  if (!isGrarfWebRenderer2()) return [];
+  return filterGamesSpineSlateForTodayUpcoming(games, now);
+}
+
+// ../grarf/desktop/src/lib/finalizedGameRetention/buildOperationalSpineSlate.ts
 function mergeRetainedFinalsIntoSpineSlate(slate, leagueGames, retainedFinals) {
   const seen = new Set(slate.map((g2) => g2.id));
   const merged = [...slate];
@@ -28112,7 +27721,7 @@ function matchOperationalModeSpineFilter(game, mode) {
 
 // ../grarf/desktop/src/store/editorialStore.ts
 init_define_import_meta_env();
-var import_zustand4 = __toESM(require_zustand(), 1);
+var import_zustand3 = __toESM(require_zustand(), 1);
 
 // ../grarf/desktop/src/lib/editorial/buildFeaturedGamesFromConfig.ts
 init_define_import_meta_env();
@@ -28139,7 +27748,7 @@ function buildFeaturedGamesFromConfig2(operationalDateKey = getOperationalSports
 }
 
 // ../grarf/desktop/src/store/editorialStore.ts
-var LOG10 = "[Editorial]";
+var LOG9 = "[Editorial]";
 var EDIT_MODE_KEY = "grarf-editorial-edit-mode-v1";
 var AUTOSAVE_MS = 1e3;
 var emptyBundle = () => ({
@@ -28227,7 +27836,7 @@ function debounced(key2, fn2) {
     }, AUTOSAVE_MS)
   );
 }
-var useEditorialStore = (0, import_zustand4.create)((set, get) => ({
+var useEditorialStore = (0, import_zustand3.create)((set, get) => ({
   bundle: emptyBundle(),
   generationState: {},
   loaded: false,
@@ -28245,7 +27854,7 @@ var useEditorialStore = (0, import_zustand4.create)((set, get) => ({
     if (!isGrarfAdmin()) return;
     writeEditMode(on2);
     set({ editMode: on2 });
-    console.log(`${LOG10} Edit mode ${on2 ? "enabled" : "disabled"}`);
+    console.log(`${LOG9} Edit mode ${on2 ? "enabled" : "disabled"}`);
   },
   setManualNarrativeLocal: (gameKey, text2) => {
     set((s2) => {
@@ -28288,7 +27897,7 @@ var useEditorialStore = (0, import_zustand4.create)((set, get) => ({
   saveManualNarrative: (gameKey, text2) => {
     const trimmed = text2.trim();
     if (trimmed) {
-      console.log(`${LOG10} Narrative updated: "${trimmed}"`);
+      console.log(`${LOG9} Narrative updated: "${trimmed}"`);
     }
     get().setManualNarrativeLocal(gameKey, text2);
     debounced(`narrative:${gameKey}`, () => {
@@ -28364,13 +27973,13 @@ var import_zustand5 = __toESM(require_zustand(), 1);
 
 // ../grarf/desktop/src/lib/broadcast/broadcastDebug.ts
 init_define_import_meta_env();
-var LOG11 = "[Broadcasts]";
+var LOG10 = "[Broadcasts]";
 function broadcastDebug2(message, extra) {
   if (!define_import_meta_env_default.DEV) return;
   if (extra && Object.keys(extra).length > 0) {
-    console.log(`${LOG11} ${message}`, extra);
+    console.log(`${LOG10} ${message}`, extra);
   } else {
-    console.log(`${LOG11} ${message}`);
+    console.log(`${LOG10} ${message}`);
   }
 }
 
@@ -28381,6 +27990,167 @@ init_define_import_meta_env();
 init_define_import_meta_env();
 function isElectronIpcAuthoritativeOperationalIngest(source) {
   return hasElectronGamesIpc() && (source === "espn_scoreboard_ipc" || source === "espn_local_adapter");
+}
+
+// ../grarf/desktop/src/lib/gamesSpine/preserveMissingOperationalLeagueSections.ts
+init_define_import_meta_env();
+
+// ../grarf/desktop/src/lib/gamesSpine/operationalGameFreshness.ts
+init_define_import_meta_env();
+
+// ../grarf/shared/domain/operational/operationalLiveFreshness.js
+init_define_import_meta_env();
+var OPERATIONAL_LIVE_MAX_STALE_UPDATE_MS = 45 * 60 * 1e3;
+function parseOperationalGameLastUpdatedMs(lastUpdated) {
+  if (lastUpdated == null || !String(lastUpdated).trim()) return null;
+  const ms2 = Date.parse(String(lastUpdated));
+  return Number.isFinite(ms2) ? ms2 : null;
+}
+function isOperationalLiveRowAuthoritativelyFresh(game, nowMs2 = Date.now()) {
+  if (!game || game.status !== "live") return true;
+  if (game.metadata?.manualGamesSpine) return true;
+  const lastUpdatedMs = parseOperationalGameLastUpdatedMs(game.lastUpdated);
+  if (lastUpdatedMs == null) return false;
+  return nowMs2 - lastUpdatedMs <= OPERATIONAL_LIVE_MAX_STALE_UPDATE_MS;
+}
+
+// ../grarf/desktop/src/lib/gamesSpine/operationalGameFreshness.ts
+var OPERATIONAL_SCHEDULED_OVERDUE_GRACE_MS = 20 * 60 * 1e3;
+function isOperationalScheduledGameOverdue(game, nowMs2 = Date.now()) {
+  if (game.status !== "scheduled") return false;
+  const startMs = game.startTimeMs;
+  if (startMs == null || !Number.isFinite(startMs) || startMs <= 0) return false;
+  return startMs + OPERATIONAL_SCHEDULED_OVERDUE_GRACE_MS < nowMs2;
+}
+function shouldPreserveMissingOperationalLiveGame(game, ingestCycle, liveRecencyById) {
+  if (!isOperationalLiveRowAuthoritativelyFresh(game)) return false;
+  return isRecentlyLive(liveRecencyById[game.id], ingestCycle);
+}
+function isOperationalSpineContinuityCandidate(game, ingestCycle, liveRecencyById, now = /* @__PURE__ */ new Date()) {
+  if (game.status === "postponed") return true;
+  if (game.status === "final") return false;
+  if (game.status === "live") {
+    return shouldPreserveMissingOperationalLiveGame(game, ingestCycle, liveRecencyById);
+  }
+  if (game.status === "scheduled") {
+    return !isOperationalScheduledGameOverdue(game, now.getTime());
+  }
+  return true;
+}
+
+// ../grarf/desktop/src/lib/gamesSpine/preserveMissingOperationalLeagueSections.ts
+var LOG11 = "[GamesSpine]";
+function countLeaguesWithTodaySlate(leagues, now = /* @__PURE__ */ new Date()) {
+  let count = 0;
+  for (const key2 of getGamesColumnLeagueOrder()) {
+    if (filterGamesSpineSlateForOperationalSportsDay(leagues[key2] ?? [], now).length > 0) count += 1;
+  }
+  return count;
+}
+function countOperationalSportsDayGames(leagues, now = /* @__PURE__ */ new Date()) {
+  let count = 0;
+  for (const key2 of getGamesColumnLeagueOrder()) {
+    count += filterGamesSpineSlateForOperationalSportsDay(leagues[key2] ?? [], now).length;
+  }
+  return count;
+}
+function validateOperationalSlateReplacement(incoming, previousLeagues, now = /* @__PURE__ */ new Date()) {
+  const previousLeagueCount = countLeaguesWithTodaySlate(previousLeagues, now);
+  const incomingLeagueCount = countLeaguesWithTodaySlate(incoming.leagues ?? {}, now);
+  if (previousLeagueCount === 0) {
+    return { accepted: true };
+  }
+  if (incomingLeagueCount === 0) {
+    return { accepted: false, reason: "incoming_zero_leagues" };
+  }
+  if (incomingLeagueCount + 2 < previousLeagueCount) {
+    return { accepted: false, reason: "incoming_league_count_regression" };
+  }
+  if (previousLeagueCount >= 3 && incomingLeagueCount <= 1) {
+    return { accepted: false, reason: "incoming_near_single_league_slate" };
+  }
+  const previousGameCount = countOperationalSportsDayGames(previousLeagues, now);
+  const incomingGameCount = countOperationalSportsDayGames(incoming.leagues ?? {}, now);
+  if (previousGameCount >= 6 && incomingGameCount < Math.ceil(previousGameCount * 0.4)) {
+    return { accepted: false, reason: "incoming_game_count_regression" };
+  }
+  return { accepted: true };
+}
+function filterOperationalSpineContinuityCandidates(games, now) {
+  const ingestCycle = useCanonicalLiveGameStore.getState().ingestSequence;
+  const liveRecencyById = useRecentFinalizedGamesStore.getState().liveRecencyById;
+  return games.filter(
+    (game) => isOperationalSpineContinuityCandidate(game, ingestCycle, liveRecencyById, now)
+  );
+}
+function mergeLeagueSlateContinuity(previousGames, incomingGames, now) {
+  const prevToday = filterGamesSpineSlateForOperationalSportsDay(previousGames, now);
+  const incomingToday = filterGamesSpineSlateForOperationalSportsDay(incomingGames, now);
+  if (prevToday.length === 0) return [...incomingGames];
+  if (incomingToday.length === 0) return [...incomingGames];
+  const incomingIds = new Set(incomingToday.map((game) => game.id));
+  const missingFromIncoming = filterOperationalSpineContinuityCandidates(
+    prevToday.filter((game) => !incomingIds.has(game.id)),
+    now
+  );
+  if (missingFromIncoming.length === 0) return [...incomingGames];
+  const merged = [...incomingGames];
+  const mergedIds = new Set(merged.map((game) => game.id));
+  for (const game of missingFromIncoming) {
+    if (mergedIds.has(game.id)) continue;
+    merged.push({ ...game });
+    mergedIds.add(game.id);
+  }
+  return merged;
+}
+function preserveMissingOperationalLeagueSections(incoming, previousLeagues, now = /* @__PURE__ */ new Date()) {
+  const leagues = { ...incoming.leagues };
+  let changed = false;
+  for (const key2 of getGamesColumnLeagueOrder()) {
+    const previousRows = previousLeagues[key2] ?? [];
+    const prevTodayCount = filterGamesSpineSlateForOperationalSportsDay(previousRows, now).length;
+    const incomingRows = leagues[key2] ?? [];
+    const incomingTodayCount = filterGamesSpineSlateForOperationalSportsDay(incomingRows, now).length;
+    if (prevTodayCount === 0) {
+      continue;
+    }
+    if (incomingTodayCount > 0) {
+      const mergedRows = mergeLeagueSlateContinuity(previousRows, incomingRows, now);
+      if (mergedRows.length !== incomingRows.length) {
+        leagues[key2] = mergedRows;
+        changed = true;
+      }
+      continue;
+    }
+    const continuityRows = filterOperationalSpineContinuityCandidates(previousRows, now);
+    if (continuityRows.length === 0) continue;
+    leagues[key2] = continuityRows.map((game) => ({ ...game }));
+    changed = true;
+  }
+  if (!changed) return incoming;
+  return { ...incoming, leagues };
+}
+function rejectInvalidOperationalSlateReplacement(incoming, previousLeagues, now = /* @__PURE__ */ new Date()) {
+  const validation = validateOperationalSlateReplacement(incoming, previousLeagues, now);
+  if (validation.accepted) return null;
+  if (define_import_meta_env_default.DEV) {
+    console.warn(`${LOG11} Rejected invalid operational slate replacement`, {
+      reason: validation.reason,
+      previousLeagues: countLeaguesWithTodaySlate(previousLeagues, now),
+      incomingLeagues: countLeaguesWithTodaySlate(incoming.leagues ?? {}, now),
+      previousGames: countOperationalSportsDayGames(previousLeagues, now),
+      incomingGames: countOperationalSportsDayGames(incoming.leagues ?? {}, now)
+    });
+  }
+  return {
+    ...incoming,
+    leagues: { ...previousLeagues }
+  };
+}
+function applyGamesSpineSnapshotStability(incoming, previousLeagues, now = /* @__PURE__ */ new Date()) {
+  const rejected = rejectInvalidOperationalSlateReplacement(incoming, previousLeagues, now);
+  if (rejected) return rejected;
+  return preserveMissingOperationalLeagueSections(incoming, previousLeagues, now);
 }
 
 // ../grarf/desktop/src/lib/gamesSpine/preserveLiveStatusOnIngest.ts
@@ -28444,6 +28214,27 @@ function preserveWimbledonSlamTrackerOnOperationalIngest(incoming, previousGames
 
 // ../grarf/desktop/src/lib/finalizedGameRetention/preserveMissingOperationalIngestGames.ts
 init_define_import_meta_env();
+
+// ../grarf/shared/domain/operational/authoritativeEspnScoreboardReconciliation.ts
+init_define_import_meta_env();
+function resolveAuthoritativeEspnReconciledLeagueKeysFromProviderPoll(providerPoll) {
+  const keys = /* @__PURE__ */ new Set();
+  const leaguePolls = providerPoll?.leaguePolls;
+  if (!leaguePolls) return keys;
+  for (const [key2, row] of Object.entries(leaguePolls)) {
+    if (row?.outcome === "success") {
+      keys.add(key2);
+    }
+  }
+  return keys;
+}
+function isAuthoritativeEspnReconciledOperationalLeague(leagueKey, authoritativeLeagueKeys) {
+  if (!authoritativeLeagueKeys || authoritativeLeagueKeys.size === 0) return false;
+  const key2 = leagueKey ?? "MLB";
+  return authoritativeLeagueKeys.has(key2);
+}
+
+// ../grarf/desktop/src/lib/finalizedGameRetention/preserveMissingOperationalIngestGames.ts
 function collectIncomingGames(incoming) {
   const out = [];
   for (const rows of Object.values(incoming.leagues ?? {})) {
@@ -28451,8 +28242,9 @@ function collectIncomingGames(incoming) {
   }
   return out;
 }
-function preserveMissingOperationalIngestGames(incoming, previousGames) {
+function preserveMissingOperationalIngestGames(incoming, previousGames, options) {
   if (previousGames.length === 0) return incoming;
+  const authoritativeEspnReconciledLeagueKeys = options?.authoritativeEspnReconciledLeagueKeys ?? resolveAuthoritativeEspnReconciledLeagueKeysFromProviderPoll(options?.providerPoll);
   const incomingIds = /* @__PURE__ */ new Set();
   for (const rows of Object.values(incoming.leagues ?? {})) {
     if (!Array.isArray(rows)) continue;
@@ -28466,6 +28258,12 @@ function preserveMissingOperationalIngestGames(incoming, previousGames) {
   for (const prev of previousGames) {
     if (!prev?.id || incomingIds.has(prev.id)) continue;
     if (isEspnOperationalIngestLeagueDisabled(prev.league)) continue;
+    if (isAuthoritativeEspnReconciledOperationalLeague(
+      prev.league,
+      authoritativeEspnReconciledLeagueKeys
+    )) {
+      continue;
+    }
     if (prev.status === "live") {
       const eventId = readEspnCompetitionEventId(prev);
       if (eventId && incomingHasAuthoritativeFinalForEspnEvent(incomingGames, eventId)) {
@@ -28508,13 +28306,14 @@ function filterContradictorySupplementalFinals(games, previousGames) {
   if (protectedIds.size === 0) return games;
   return games.filter((g2) => g2.status !== "final" || !protectedIds.has(g2.id));
 }
-function mergeFinalRowsWithoutContradictingProtectedGames(primary, extraLeagues, previousGames) {
+function mergeFinalRowsWithoutContradictingProtectedGames(primary, extraLeagues, previousGames, authoritativeEspnReconciledLeagueKeys) {
   const protectedIds = new Set(
     previousGames.filter((g2) => g2.status === "live" || g2.status === "postponed").map((g2) => g2.id)
   );
   const leagues = { ...primary.leagues };
   let changed = false;
   for (const key2 of getGamesColumnLeagueOrder()) {
+    if (authoritativeEspnReconciledLeagueKeys?.has(key2)) continue;
     const rows = leagues[key2] ?? [];
     const ids = new Set(rows.map((g2) => g2.id));
     const extras = (extraLeagues[key2] ?? []).filter(
@@ -28988,11 +28787,20 @@ function mergeGrarfCloudOperationalGameOverPrevious(cloudGame, previousGame) {
     }
   };
 }
-function mergeGrarfCloudOperationalLeaguesOverPrevious(cloudLeagues, previousLeagues) {
+function mergeGrarfCloudOperationalLeaguesOverPrevious(cloudLeagues, previousLeagues, authoritativeEspnReconciledLeagueKeys) {
   const merged = { ...previousLeagues };
   for (const [key2, cloudRows] of Object.entries(cloudLeagues)) {
-    if (!Array.isArray(cloudRows) || cloudRows.length === 0) continue;
     const leagueKey = key2;
+    if (!Array.isArray(cloudRows)) continue;
+    if (authoritativeEspnReconciledLeagueKeys?.has(leagueKey)) {
+      const previousRows2 = merged[leagueKey] ?? [];
+      const byId2 = new Map(previousRows2.map((game) => [game.id, game]));
+      merged[leagueKey] = cloudRows.map(
+        (cloudGame) => mergeGrarfCloudOperationalGameOverPrevious(cloudGame, byId2.get(cloudGame.id))
+      );
+      continue;
+    }
+    if (cloudRows.length === 0) continue;
     const previousRows = merged[leagueKey];
     if (!Array.isArray(previousRows) || previousRows.length === 0) {
       merged[leagueKey] = cloudRows;
@@ -29007,6 +28815,12 @@ function mergeGrarfCloudOperationalLeaguesOverPrevious(cloudLeagues, previousLea
     }
     merged[leagueKey] = Array.from(byId.values());
   }
+  if (authoritativeEspnReconciledLeagueKeys) {
+    for (const leagueKey of authoritativeEspnReconciledLeagueKeys) {
+      if (Object.prototype.hasOwnProperty.call(cloudLeagues, leagueKey)) continue;
+      merged[leagueKey] = [];
+    }
+  }
   return merged;
 }
 function parseUpdatedAtMs(updatedAt) {
@@ -29015,23 +28829,30 @@ function parseUpdatedAtMs(updatedAt) {
   return Number.isFinite(ms2) ? ms2 : 0;
 }
 function mergeGrarfCloudTransportIntoOperationalSnapshot(input) {
+  const authoritativeEspnReconciledLeagueKeys = resolveAuthoritativeEspnReconciledLeagueKeysFromProviderPoll(input.providerPoll);
   const previousCount = countOperationalGames2(input.previousLeagues);
   const mergedLeagues = previousCount === 0 ? input.incoming.leagues ?? {} : mergeGrarfCloudOperationalLeaguesOverPrevious(
     input.incoming.leagues ?? {},
-    input.previousLeagues
+    input.previousLeagues,
+    authoritativeEspnReconciledLeagueKeys
   );
   let merged = preserveMissingOperationalIngestGames(
     {
       ...input.incoming,
       leagues: mergedLeagues
     },
-    input.previousGames
+    input.previousGames,
+    {
+      authoritativeEspnReconciledLeagueKeys,
+      providerPoll: input.providerPoll
+    }
   );
   if (previousCount > 0) {
     merged = mergeFinalRowsWithoutContradictingProtectedGames(
       merged,
       input.previousLeagues,
-      input.previousGames
+      input.previousGames,
+      authoritativeEspnReconciledLeagueKeys
     );
   }
   const incomingMs = parseUpdatedAtMs(input.incoming.updatedAt);
@@ -29041,6 +28862,72 @@ function mergeGrarfCloudTransportIntoOperationalSnapshot(input) {
   }
   return merged;
 }
+
+// ../grarf/desktop/src/store/gamesSpineRenderStore.ts
+init_define_import_meta_env();
+var import_zustand4 = __toESM(require_zustand(), 1);
+function isCompleteOperationalSnapshot(leagues, meta) {
+  const hasAnyGames = Object.values(leagues).some(
+    (rows) => Array.isArray(rows) && rows.length > 0
+  );
+  if (!hasAnyGames) return false;
+  if (meta.source === "grarf_cloud") return true;
+  const requested = meta.requestedLeagueCount;
+  if (requested != null && Number.isFinite(requested) && requested > 0 && requested < ESPN_OPERATIONAL_INGEST_LEAGUE_KEYS.length) {
+    return false;
+  }
+  if (meta.source === "espn_local_adapter" || meta.source === "espn_scoreboard_ipc") {
+    if (meta.initialIngestComplete === false) return hasAnyGames;
+    return true;
+  }
+  return countLeaguesWithTodaySlate(leagues) > 0;
+}
+var useGamesSpineRenderStore = (0, import_zustand4.create)((set, get) => ({
+  operationalReady: true,
+  operationalIngestComplete: false,
+  /** Manual KV overrides load async — never block the operational spine on them. */
+  manualReady: true,
+  hasPromotedInitialSnapshot: false,
+  lastTransportGeneratedAt: null,
+  lastTransportSource: null,
+  lastTransportGameCount: 0,
+  operationalProviderPoll: null,
+  markOperationalIngest: (leagues, meta) => {
+    const complete = isCompleteOperationalSnapshot(leagues, meta);
+    const gameCount = Object.values(leagues).reduce(
+      (total, rows) => total + (Array.isArray(rows) ? rows.length : 0),
+      0
+    );
+    set((state3) => ({
+      operationalReady: true,
+      operationalIngestComplete: state3.operationalIngestComplete || complete,
+      hasPromotedInitialSnapshot: state3.hasPromotedInitialSnapshot || complete,
+      lastTransportGeneratedAt: meta.transportGeneratedAt ?? (complete ? (/* @__PURE__ */ new Date()).toISOString() : state3.lastTransportGeneratedAt),
+      lastTransportSource: meta.source,
+      lastTransportGameCount: gameCount,
+      operationalProviderPoll: meta.source === "grarf_cloud" ? meta.providerPoll ?? state3.operationalProviderPoll : state3.operationalProviderPoll
+    }));
+  },
+  markManualLoaded: () => {
+    set({ manualReady: true });
+  },
+  isRenderReady: () => {
+    const state3 = get();
+    return state3.operationalReady && state3.manualReady;
+  },
+  resetForTests: () => {
+    set({
+      operationalReady: true,
+      operationalIngestComplete: false,
+      manualReady: true,
+      hasPromotedInitialSnapshot: false,
+      lastTransportGeneratedAt: null,
+      lastTransportSource: null,
+      lastTransportGameCount: 0,
+      operationalProviderPoll: null
+    });
+  }
+}));
 
 // ../grarf/desktop/src/store/liveGamesStore.ts
 function gameRowsMateriallyEqual(a2, b2) {
@@ -29668,7 +29555,7 @@ function resolveRemoval(input) {
   }
   if (!input.seenAfterTodaySlateFilter) {
     const detail = explainOperationalDateRemoval(input.game, input.todayKey);
-    const localFromStart = formatLocalDateKeyFromMs(input.game.startTimeMs);
+    const localFromStart = formatLocalDateKeyFromMs2(input.game.startTimeMs);
     const removalReason = scheduledKey != null && scheduledKey !== input.todayKey && localFromStart === input.todayKey ? "scheduled_date_mismatch" : detail.includes("scheduled_date_mismatch") ? "scheduled_date_mismatch" : "operational_date_mismatch";
     return { removedAt: "operational_date_filter", removalReason };
   }
@@ -38460,7 +38347,8 @@ async function buildGamesSnapshotForHydrate(transport, context2, completeness) {
       incoming: canonical2,
       previousLeagues: prev.leagues,
       previousGames,
-      previousUpdatedAt: prev.updatedAt
+      previousUpdatedAt: prev.updatedAt,
+      providerPoll: transport.providerPoll
     });
     merged = carryForwardMlbTeamStandingsFromEnrichedRows(
       merged,
@@ -62032,7 +61920,7 @@ function resolveLeagueGameImportanceBoostForBestGame(game) {
 
 // ../grarf/desktop/src/lib/bestGameRightNow/resolveBestGameRightNowV1.ts
 var BEST_EVENT_MAX_STALE_LIVE_UPDATE_MS = 45 * 60 * 1e3;
-function parseGameLastUpdatedMs2(lastUpdated) {
+function parseGameLastUpdatedMs(lastUpdated) {
   if (!lastUpdated?.trim()) return null;
   const ms2 = Date.parse(lastUpdated);
   return Number.isFinite(ms2) ? ms2 : null;
@@ -62044,12 +61932,12 @@ function isGenuinelyActiveLiveForBestEvent(game, now = /* @__PURE__ */ new Date(
   const gameDateKey = resolveGameOperationalDateKey(game);
   if (!gameDateKey || gameDateKey === sportsDayKey) {
     if (game.status !== "live") return true;
-    const lastUpdatedMs2 = parseGameLastUpdatedMs2(game.lastUpdated);
+    const lastUpdatedMs2 = parseGameLastUpdatedMs(game.lastUpdated);
     if (lastUpdatedMs2 == null) return false;
     return now.getTime() - lastUpdatedMs2 <= BEST_EVENT_MAX_STALE_LIVE_UPDATE_MS;
   }
   if (gameDateKey < sportsDayKey && gameDateKey !== yesterdayKey2) return false;
-  const lastUpdatedMs = parseGameLastUpdatedMs2(game.lastUpdated);
+  const lastUpdatedMs = parseGameLastUpdatedMs(game.lastUpdated);
   if (lastUpdatedMs == null) return false;
   return now.getTime() - lastUpdatedMs <= BEST_EVENT_MAX_STALE_LIVE_UPDATE_MS;
 }
@@ -66197,6 +66085,15 @@ init_isGrarfWebRenderer();
 
 // ../grarf/desktop/src/lib/updateEngine/liveGamesPollRegistry.ts
 init_define_import_meta_env();
+
+// ../grarf/desktop/src/lib/updateEngine/updateEngineCadences.ts
+init_define_import_meta_env();
+var WEB_UPDATE_ENGINE_LIVE_GAMES_POLL_MS = 15e3;
+var WEB_UPDATE_ENGINE_SIGNALS_POLL_MS = 3e4;
+var WEB_UPDATE_ENGINE_BROWSER_POLL_MS = 2 * 6e4;
+var WEB_UPDATE_ENGINE_HIGHLIGHTS_TV_POLL_MS = 5 * 6e4;
+
+// ../grarf/desktop/src/lib/updateEngine/liveGamesPollRegistry.ts
 var onTransportFn = null;
 var stopPoll = null;
 function isWebLiveGamesHydrateRegistered() {
