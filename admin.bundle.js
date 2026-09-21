@@ -24226,6 +24226,17 @@ function resolveAuthoritativeEspnReconciledLeagueKeysFromProviderPoll(providerPo
   }
   return keys;
 }
+function resolveStaleFallbackOperationalLeagueKeysFromProviderPoll(providerPoll) {
+  const keys = /* @__PURE__ */ new Set();
+  const leaguePolls = providerPoll?.leaguePolls;
+  if (!leaguePolls) return keys;
+  for (const [key, row] of Object.entries(leaguePolls)) {
+    if (row?.outcome === "failure" && row.staleFallback === true) {
+      keys.add(key);
+    }
+  }
+  return keys;
+}
 function isAuthoritativeEspnReconciledOperationalLeague(leagueKey, authoritativeLeagueKeys) {
   if (!authoritativeLeagueKeys || authoritativeLeagueKeys.size === 0) return false;
   const key = leagueKey ?? "MLB";
@@ -24823,11 +24834,14 @@ function mergeGrarfCloudOperationalGameOverPrevious(cloudGame, previousGame) {
     }
   };
 }
-function mergeGrarfCloudOperationalLeaguesOverPrevious(cloudLeagues, previousLeagues, authoritativeEspnReconciledLeagueKeys) {
+function mergeGrarfCloudOperationalLeaguesOverPrevious(cloudLeagues, previousLeagues, authoritativeEspnReconciledLeagueKeys, staleFallbackOperationalLeagueKeys) {
   const merged = { ...previousLeagues };
   for (const [key, cloudRows] of Object.entries(cloudLeagues)) {
     const leagueKey = key;
     if (!Array.isArray(cloudRows)) continue;
+    if (staleFallbackOperationalLeagueKeys?.has(leagueKey)) {
+      continue;
+    }
     if (authoritativeEspnReconciledLeagueKeys?.has(leagueKey)) {
       const previousRows2 = merged[leagueKey] ?? [];
       const byId2 = new Map(previousRows2.map((game) => [game.id, game]));
@@ -24866,11 +24880,13 @@ function parseUpdatedAtMs(updatedAt) {
 }
 function mergeGrarfCloudTransportIntoOperationalSnapshot(input) {
   const authoritativeEspnReconciledLeagueKeys = resolveAuthoritativeEspnReconciledLeagueKeysFromProviderPoll(input.providerPoll);
+  const staleFallbackOperationalLeagueKeys = resolveStaleFallbackOperationalLeagueKeysFromProviderPoll(input.providerPoll);
   const previousCount = countOperationalGames2(input.previousLeagues);
   const mergedLeagues = previousCount === 0 ? input.incoming.leagues ?? {} : mergeGrarfCloudOperationalLeaguesOverPrevious(
     input.incoming.leagues ?? {},
     input.previousLeagues,
-    authoritativeEspnReconciledLeagueKeys
+    authoritativeEspnReconciledLeagueKeys,
+    staleFallbackOperationalLeagueKeys
   );
   let merged = preserveMissingOperationalIngestGames(
     {
