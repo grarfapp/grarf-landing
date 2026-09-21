@@ -142029,68 +142029,59 @@ function buildSportsBrowserPrototypeTodayCompleteLeagueSlates(nowLeagues, upcomi
     })
   );
 }
-function collectExpandedLeagueBlockGames(slates, leagueOpen) {
+function collectSidebarNavigableGamesInRenderOrder(slates) {
+  const leafSlates = flattenSportsBrowserPrototypeSidebarLeagueEntries(
+    groupSportsBrowserPrototypeSidebarLeagueSlatesBySoccer(slates)
+  );
   const games = [];
-  for (const slate of slates) {
-    if (!(leagueOpen[slate.key] ?? false)) continue;
+  for (const slate of leafSlates) {
     for (const game of slate.games) {
       games.push(game);
     }
   }
   return games;
 }
-function collectExpandedSidebarNavigableLeagueKeys(slates, leagueOpen) {
+function collectSidebarNavigableLeagueKeysInRenderOrder(slates) {
   const leafSlates = flattenSportsBrowserPrototypeSidebarLeagueEntries(
     groupSportsBrowserPrototypeSidebarLeagueSlatesBySoccer(slates)
   );
-  const keys = [];
-  for (const slate of leafSlates) {
-    if (!(leagueOpen[slate.key] ?? false)) continue;
-    keys.push(slate.key);
-  }
-  return keys;
+  return leafSlates.map((slate) => slate.key);
 }
 function resolveSportsBrowserPrototypeSidebarNavigableGames(input) {
   const { view } = input;
   if (view.yesterdayOpen) {
-    return collectExpandedLeagueBlockGames(input.yesterdayLeagues, input.yesterdayLeagueOpen);
+    return collectSidebarNavigableGamesInRenderOrder(input.yesterdayLeagues);
   }
   if (view.catchUpTodayActive) {
-    return collectExpandedLeagueBlockGames(input.catchUpLeagues, input.catchUpLeagueOpen);
+    return collectSidebarNavigableGamesInRenderOrder(input.catchUpLeagues);
   }
   if (view.todayTab === "today") {
-    return collectExpandedLeagueBlockGames(input.todayCompleteLeagues, input.sectionLeagueOpen);
+    return collectSidebarNavigableGamesInRenderOrder(input.todayCompleteLeagues);
   }
   if (view.todayTab === "now") {
-    return collectExpandedLeagueBlockGames(input.nowLeagues, input.sectionLeagueOpen);
+    return collectSidebarNavigableGamesInRenderOrder(input.nowLeagues);
   }
   if (view.todayTab === "upcoming") {
-    return collectExpandedLeagueBlockGames(input.upcomingLeagues, input.sectionLeagueOpen);
+    return collectSidebarNavigableGamesInRenderOrder(input.upcomingLeagues);
   }
   return [];
 }
 function resolveSportsBrowserPrototypeSidebarNavigableLeagueKeys(input) {
   const { view } = input;
   if (view.yesterdayOpen) {
-    return collectExpandedSidebarNavigableLeagueKeys(
-      input.yesterdayLeagues,
-      input.yesterdayLeagueOpen
-    );
+    return collectSidebarNavigableLeagueKeysInRenderOrder(input.yesterdayLeagues);
   }
   if (view.catchUpTodayActive) {
-    return collectExpandedSidebarNavigableLeagueKeys(input.catchUpLeagues, input.catchUpLeagueOpen);
+    return collectSidebarNavigableLeagueKeysInRenderOrder(input.catchUpLeagues);
   }
   if (view.todayTab === "today") {
-    return collectExpandedSidebarNavigableLeagueKeys(
-      input.todayCompleteLeagues,
-      input.sectionLeagueOpen
-    );
+    return collectSidebarNavigableLeagueKeysInRenderOrder(input.todayCompleteLeagues);
   }
   if (view.todayTab === "now") {
-    return collectExpandedSidebarNavigableLeagueKeys(input.nowLeagues, input.sectionLeagueOpen);
+    return collectSidebarNavigableLeagueKeysInRenderOrder(input.nowLeagues);
   }
   if (view.todayTab === "upcoming") {
-    return collectExpandedSidebarNavigableLeagueKeys(input.upcomingLeagues, input.sectionLeagueOpen);
+    return collectSidebarNavigableLeagueKeysInRenderOrder(input.upcomingLeagues);
   }
   return [];
 }
@@ -143049,6 +143040,18 @@ function resolveNewsSportsBrowserTennisGridTemplateColumns(setCount, prefix, suf
 // ../grarf/desktop/src/components/homeMvp/SportsBrowserPrototypeBottomRailGames.tsx
 init_define_import_meta_env();
 var import_react266 = __toESM(require_react(), 1);
+
+// ../grarf/desktop/src/lib/commandCenter/resolveCommandCenterGameCardLeagueLabel.ts
+init_define_import_meta_env();
+function resolveCommandCenterGameCardLeagueLabel(game) {
+  const manualLeagueLabel = game.metadata?.manualEvent?.leagueDisplayName?.trim();
+  if (manualLeagueLabel) return manualLeagueLabel;
+  const key2 = game.league ?? leagueKeyFromGameId(game.id) ?? null;
+  if (key2 === "ARG1") {
+    return resolveGamesSpineLeagueSectionHeaderLabel("ARG1", [game]);
+  }
+  return resolveGamesSpineGameCardLeagueLabel(game);
+}
 
 // ../grarf/desktop/src/components/homeMvp/NewsSportsBrowserChannelLogo.tsx
 init_define_import_meta_env();
@@ -144142,7 +144145,7 @@ function BottomRailGameCardBody({
   };
   const tennisSetColumns = resolveNewsSportsBrowserTennisSetColumns(game);
   const showTennisSetScores = model.kind === "matchup" && tennisSetColumns.length > 0;
-  const leagueLabel = resolveGamesSpineGameCardLeagueLabel(game);
+  const leagueLabel = isCommandCenter ? resolveCommandCenterGameCardLeagueLabel(game) : resolveGamesSpineGameCardLeagueLabel(game);
   const tennisMetaHeader = resolveSportsBrowserTennisGameCardMetaHeaderLabels(game);
   const leagueLogoUrl = game.league ? resolveGamesSpineLeagueLogoUrl(game.league, { game }) : void 0;
   const channel = resolveNewsSportsBrowserChannelPresentation(game);
@@ -145965,7 +145968,7 @@ function SidebarTemporalLeagueBlock({
   leagueOpen,
   onToggleExpansionKey
 }) {
-  const isLeagueSelected = selectedLeagueKey === slate.key;
+  const isLeagueSelected = selectedLeagueKey === slate.key || selectedGameId != null && slate.games.some((game) => game.id === selectedGameId);
   const usesTennisTournamentGrouping = shouldGroupSportsBrowserSidebarLeagueByTournament(slate.key);
   const tournamentGroups = (0, import_react268.useMemo)(
     () => usesTennisTournamentGrouping ? groupSportsBrowserSidebarTennisGamesByTournament(slate.games) : [],
@@ -147394,15 +147397,26 @@ function resolveSportsBrowserPrototypeSidebarLeagueNavigationIndex(navigableLeag
   if (!trimmedKey) return -1;
   return navigableLeagueKeys.indexOf(trimmedKey);
 }
+function resolveSportsBrowserPrototypeSidebarCircularNavigationIndex(currentIndex, direction, length) {
+  if (length <= 0) return null;
+  if (currentIndex < 0) {
+    return direction === "down" ? 0 : length - 1;
+  }
+  if (direction === "up") {
+    return (currentIndex - 1 + length) % length;
+  }
+  return (currentIndex + 1) % length;
+}
 function resolveSportsBrowserPrototypeSidebarGameNavigationBounds(navigableGames, currentGameId) {
   const currentIndex = resolveSportsBrowserPrototypeSidebarGameNavigationIndex(
     navigableGames,
     currentGameId
   );
+  const canNavigate = navigableGames.length > 0;
   return {
     currentIndex,
-    canNavigateUp: currentIndex > 0,
-    canNavigateDown: currentIndex >= 0 ? currentIndex < navigableGames.length - 1 : navigableGames.length > 0
+    canNavigateUp: canNavigate,
+    canNavigateDown: canNavigate
   };
 }
 function resolveSportsBrowserPrototypeSidebarLeagueNavigationBounds(navigableLeagueKeys, currentLeagueKey) {
@@ -147410,41 +147424,38 @@ function resolveSportsBrowserPrototypeSidebarLeagueNavigationBounds(navigableLea
     navigableLeagueKeys,
     currentLeagueKey
   );
+  const canNavigate = navigableLeagueKeys.length > 0;
   return {
     currentIndex,
-    canNavigateUp: currentIndex > 0,
-    canNavigateDown: currentIndex >= 0 ? currentIndex < navigableLeagueKeys.length - 1 : navigableLeagueKeys.length > 0
+    canNavigateUp: canNavigate,
+    canNavigateDown: canNavigate
   };
 }
 function resolveSportsBrowserPrototypeSidebarGameNavigationTarget(direction, navigableGames, currentGameId) {
-  const { currentIndex } = resolveSportsBrowserPrototypeSidebarGameNavigationBounds(
+  const currentIndex = resolveSportsBrowserPrototypeSidebarGameNavigationIndex(
     navigableGames,
     currentGameId
   );
-  if (direction === "up") {
-    if (currentIndex <= 0) return null;
-    return navigableGames[currentIndex - 1] ?? null;
-  }
-  if (currentIndex >= 0) {
-    if (currentIndex >= navigableGames.length - 1) return null;
-    return navigableGames[currentIndex + 1] ?? null;
-  }
-  return navigableGames[0] ?? null;
+  const targetIndex = resolveSportsBrowserPrototypeSidebarCircularNavigationIndex(
+    currentIndex,
+    direction,
+    navigableGames.length
+  );
+  if (targetIndex == null) return null;
+  return navigableGames[targetIndex] ?? null;
 }
 function resolveSportsBrowserPrototypeSidebarLeagueNavigationTarget(direction, navigableLeagueKeys, currentLeagueKey) {
-  const { currentIndex } = resolveSportsBrowserPrototypeSidebarLeagueNavigationBounds(
+  const currentIndex = resolveSportsBrowserPrototypeSidebarLeagueNavigationIndex(
     navigableLeagueKeys,
     currentLeagueKey
   );
-  if (direction === "up") {
-    if (currentIndex <= 0) return null;
-    return navigableLeagueKeys[currentIndex - 1] ?? null;
-  }
-  if (currentIndex >= 0) {
-    if (currentIndex >= navigableLeagueKeys.length - 1) return null;
-    return navigableLeagueKeys[currentIndex + 1] ?? null;
-  }
-  return navigableLeagueKeys[0] ?? null;
+  const targetIndex = resolveSportsBrowserPrototypeSidebarCircularNavigationIndex(
+    currentIndex,
+    direction,
+    navigableLeagueKeys.length
+  );
+  if (targetIndex == null) return null;
+  return navigableLeagueKeys[targetIndex] ?? null;
 }
 function resolveSportsBrowserPrototypeSidebarUpDownNavCurrentLeagueKey(input) {
   const trimmedGameId = input.currentGameId?.trim();
@@ -149222,20 +149233,9 @@ function HomePage() {
   );
   const onSportsBrowserSidebarLeagueNavigate = (0, import_react272.useCallback)(
     (leagueKey) => {
-      const firstGameInLeague = sportsBrowserSidebarNavigableGames.find(
-        (game) => game.league === leagueKey
-      );
-      if (firstGameInLeague) {
-        onSportsBrowserGameSelect(firstGameInLeague);
-        return;
-      }
       onSportsBrowserLeagueSelect(leagueKey);
     },
-    [
-      onSportsBrowserGameSelect,
-      onSportsBrowserLeagueSelect,
-      sportsBrowserSidebarNavigableGames
-    ]
+    [onSportsBrowserLeagueSelect]
   );
   const {
     canNavigateUp: canNavigateSportsBrowserSidebarGameUp,
