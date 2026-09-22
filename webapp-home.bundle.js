@@ -132025,6 +132025,84 @@ function resolveSportsBrowserPrototypeLeagueYoutubeWebsite(leagueKey) {
   return SPORTS_BROWSER_PROTOTYPE_LEAGUE_YOUTUBE_WEBSITES[leagueKey] ?? null;
 }
 
+// ../grarf/desktop/src/lib/gamesSpine/sportsBrowserPrototypeTemporalHorseRacingWebsites.ts
+init_define_import_meta_env();
+
+// ../grarf/desktop/src/lib/gamesSpine/sportsBrowserPrototypeTemporalHorseRacingSlate.ts
+init_define_import_meta_env();
+
+// ../grarf/desktop/src/lib/gamesSpine/orderSportsBrowserPrototypeNewsSidebarLeagueSlates.ts
+init_define_import_meta_env();
+function orderSportsBrowserPrototypeNewsSidebarLeagueSlates(slates) {
+  if (slates.length <= 1) return [...slates];
+  const byKey = new Map(slates.map((slate) => [slate.key, slate]));
+  const seen = /* @__PURE__ */ new Set();
+  const ordered = [];
+  for (const key2 of getLeaguePriorityOrder()) {
+    const slate = byKey.get(key2);
+    if (!slate) continue;
+    ordered.push(slate);
+    seen.add(key2);
+  }
+  const extraKeys = slates.filter((slate) => !seen.has(slate.key)).map((slate) => slate.key);
+  for (const key2 of sortGrarfLeagueKeysByImportance(extraKeys)) {
+    const slate = byKey.get(key2);
+    if (!slate) continue;
+    ordered.push(slate);
+    seen.add(key2);
+  }
+  for (const slate of slates) {
+    if (seen.has(slate.key)) continue;
+    ordered.push(slate);
+    seen.add(slate.key);
+  }
+  return ordered;
+}
+
+// ../grarf/desktop/src/lib/gamesSpine/sportsBrowserPrototypeTemporalHorseRacingSlate.ts
+var SPORTS_BROWSER_PROTOTYPE_TEMPORAL_HORSE_RACING_LEAGUE_KEY = "horse-racing";
+var SPORTS_BROWSER_PROTOTYPE_TEMPORAL_HORSE_RACING_LABEL = "Horse Racing";
+var SPORTS_BROWSER_PROTOTYPE_HORSE_RACING_LEAGUE_LOGO_PATH = "/speed.png";
+function resolveSportsBrowserPrototypeHorseRacingLeagueLogoPath(leagueKey) {
+  return leagueKey === SPORTS_BROWSER_PROTOTYPE_TEMPORAL_HORSE_RACING_LEAGUE_KEY ? SPORTS_BROWSER_PROTOTYPE_HORSE_RACING_LEAGUE_LOGO_PATH : null;
+}
+var SPORTS_BROWSER_PROTOTYPE_TEMPORAL_HORSE_RACING_SLATE = {
+  key: SPORTS_BROWSER_PROTOTYPE_TEMPORAL_HORSE_RACING_LEAGUE_KEY,
+  label: SPORTS_BROWSER_PROTOTYPE_TEMPORAL_HORSE_RACING_LABEL,
+  games: []
+};
+function ensureSportsBrowserPrototypeTemporalHorseRacingSlate(slates) {
+  if (slates.some((slate) => slate.key === SPORTS_BROWSER_PROTOTYPE_TEMPORAL_HORSE_RACING_LEAGUE_KEY)) {
+    return orderSportsBrowserPrototypeNewsSidebarLeagueSlates([...slates]);
+  }
+  return orderSportsBrowserPrototypeNewsSidebarLeagueSlates([
+    ...slates,
+    SPORTS_BROWSER_PROTOTYPE_TEMPORAL_HORSE_RACING_SLATE
+  ]);
+}
+
+// ../grarf/desktop/src/lib/gamesSpine/sportsBrowserPrototypeTemporalHorseRacingWebsites.ts
+var SPORTS_BROWSER_PROTOTYPE_TEMPORAL_HORSE_RACING_WEBSITES = {
+  yesterday: [
+    { label: "Equibase", url: "https://www.equibase.com/static/chart/pdf/index.html" },
+    { label: "OffTrackBetting Results", url: "https://www.offtrackbetting.com/results/" }
+  ],
+  today: [{ label: "FanDuel Racing Tracks", url: "https://racing.fanduel.com/tracks" }],
+  final: [
+    { label: "FanDuel Racing Results", url: "https://racing.fanduel.com/tracks/results" },
+    { label: "OffTrackBetting Results", url: "https://www.offtrackbetting.com/results/" },
+    { label: "Racing and Sports Results", url: "https://www.racingandsports.com.au/horse-racing-results" }
+  ],
+  now: [{ label: "FanDuel Racing", url: "https://racing.fanduel.com/" }],
+  next: [{ label: "FanDuel Racing Tracks", url: "https://racing.fanduel.com/tracks" }]
+};
+function resolveSportsBrowserPrototypeTemporalHorseRacingWebsites(temporalView) {
+  return SPORTS_BROWSER_PROTOTYPE_TEMPORAL_HORSE_RACING_WEBSITES[temporalView];
+}
+function isSportsBrowserPrototypeTemporalHorseRacingLeagueKey(leagueKey) {
+  return leagueKey === SPORTS_BROWSER_PROTOTYPE_TEMPORAL_HORSE_RACING_LEAGUE_KEY;
+}
+
 // ../grarf/desktop/src/data/sportsBrowserPrototypeLeagueWebsites.ts
 var SPORTS_BROWSER_PROTOTYPE_LEAGUE_CONTEXT_SECTIONS = ["news", "social", "standings", "stats", "highlights", "fantasy", "betting", "podcasts"];
 var SPORTS_BROWSER_PROTOTYPE_LEAGUE_CONTEXT_SECTION_LABELS = {
@@ -133237,6 +133315,11 @@ function getSportsBrowserPrototypeWebsitesForPane(pane) {
     return getSportsBrowserPrototypeSoccerArchWebsites();
   }
   if (pane.leagueKey) {
+    if (isSportsBrowserPrototypeTemporalHorseRacingLeagueKey(pane.leagueKey) && pane.sportsBrowserPrototypeSidebarTemporalView) {
+      return resolveSportsBrowserPrototypeTemporalHorseRacingWebsites(
+        pane.sportsBrowserPrototypeSidebarTemporalView
+      );
+    }
     return getSportsBrowserPrototypeLeagueWebsites(pane.leagueKey) ?? getSportsBrowserPrototypeGlobalWebsites();
   }
   return getSportsBrowserPrototypeGlobalWebsites();
@@ -141962,34 +142045,6 @@ function dedupeSportsBrowserPrototypeNewsSidebarGames(games) {
   return reconcileOperationalGamesByEspnEventId2([...byId.values()]);
 }
 
-// ../grarf/desktop/src/lib/gamesSpine/orderSportsBrowserPrototypeNewsSidebarLeagueSlates.ts
-init_define_import_meta_env();
-function orderSportsBrowserPrototypeNewsSidebarLeagueSlates(slates) {
-  if (slates.length <= 1) return [...slates];
-  const byKey = new Map(slates.map((slate) => [slate.key, slate]));
-  const seen = /* @__PURE__ */ new Set();
-  const ordered = [];
-  for (const key2 of getLeaguePriorityOrder()) {
-    const slate = byKey.get(key2);
-    if (!slate) continue;
-    ordered.push(slate);
-    seen.add(key2);
-  }
-  const extraKeys = slates.filter((slate) => !seen.has(slate.key)).map((slate) => slate.key);
-  for (const key2 of sortGrarfLeagueKeysByImportance(extraKeys)) {
-    const slate = byKey.get(key2);
-    if (!slate) continue;
-    ordered.push(slate);
-    seen.add(key2);
-  }
-  for (const slate of slates) {
-    if (seen.has(slate.key)) continue;
-    ordered.push(slate);
-    seen.add(slate.key);
-  }
-  return ordered;
-}
-
 // ../grarf/desktop/src/lib/gamesSpine/resolveSportsBrowserPrototypeSidebarNavigableGames.ts
 function resolveSportsBrowserPrototypeSidebarGameVariant(game) {
   if (game.status === "live" || isGameActivelyLive(game)) return "live";
@@ -145305,17 +145360,19 @@ function useSportsBrowserPrototypeTodayTemporalSlate() {
     ]
   );
   const nowLeagues = (0, import_react268.useMemo)(
-    () => buildSportsBrowserPrototypeTodayTemporalLeagueSlates(spineSections, mergedLeagues, "now", liveLeagueKeys, (section) => {
-      if (section.kind === "operational") {
-        return resolveOperationalLeagueVisibleGames(
-          section.leagueKey,
-          "live",
-          false,
-          sharedOperationalInput
-        );
-      }
-      return resolveManualSectionVisibleGames(section, "live", manualRefreshMs, operationsFieldsByGameId);
-    }),
+    () => ensureSportsBrowserPrototypeTemporalHorseRacingSlate(
+      buildSportsBrowserPrototypeTodayTemporalLeagueSlates(spineSections, mergedLeagues, "now", liveLeagueKeys, (section) => {
+        if (section.kind === "operational") {
+          return resolveOperationalLeagueVisibleGames(
+            section.leagueKey,
+            "live",
+            false,
+            sharedOperationalInput
+          );
+        }
+        return resolveManualSectionVisibleGames(section, "live", manualRefreshMs, operationsFieldsByGameId);
+      })
+    ),
     [
       spineSections,
       mergedLeagues,
@@ -145326,22 +145383,24 @@ function useSportsBrowserPrototypeTodayTemporalSlate() {
     ]
   );
   const upcomingLeagues = (0, import_react268.useMemo)(
-    () => buildSportsBrowserPrototypeTodayTemporalLeagueSlates(spineSections, mergedLeagues, "upcoming", liveLeagueKeys, (section) => {
-      if (section.kind === "operational") {
-        return resolveOperationalLeagueVisibleGames(
-          section.leagueKey,
+    () => ensureSportsBrowserPrototypeTemporalHorseRacingSlate(
+      buildSportsBrowserPrototypeTodayTemporalLeagueSlates(spineSections, mergedLeagues, "upcoming", liveLeagueKeys, (section) => {
+        if (section.kind === "operational") {
+          return resolveOperationalLeagueVisibleGames(
+            section.leagueKey,
+            "upcoming",
+            true,
+            sharedOperationalInput
+          );
+        }
+        return resolveManualSectionVisibleGames(
+          section,
           "upcoming",
-          true,
-          sharedOperationalInput
+          manualRefreshMs,
+          operationsFieldsByGameId
         );
-      }
-      return resolveManualSectionVisibleGames(
-        section,
-        "upcoming",
-        manualRefreshMs,
-        operationsFieldsByGameId
-      );
-    }),
+      })
+    ),
     [
       spineSections,
       mergedLeagues,
@@ -145352,16 +145411,18 @@ function useSportsBrowserPrototypeTodayTemporalSlate() {
     ]
   );
   const catchUpLeagues = (0, import_react268.useMemo)(
-    () => buildSportsBrowserPrototypeTodayTemporalLeagueSlates(spineSections, mergedLeagues, "catchUp", liveLeagueKeys, (section) => {
-      if (section.kind === "operational") {
-        return resolveOperationalLeagueCatchUpVisibleGames(section.leagueKey, sharedOperationalInput);
-      }
-      return resolveManualSectionCatchUpVisibleGames(
-        section,
-        manualRefreshMs,
-        operationsFieldsByGameId
-      );
-    }),
+    () => ensureSportsBrowserPrototypeTemporalHorseRacingSlate(
+      buildSportsBrowserPrototypeTodayTemporalLeagueSlates(spineSections, mergedLeagues, "catchUp", liveLeagueKeys, (section) => {
+        if (section.kind === "operational") {
+          return resolveOperationalLeagueCatchUpVisibleGames(section.leagueKey, sharedOperationalInput);
+        }
+        return resolveManualSectionCatchUpVisibleGames(
+          section,
+          manualRefreshMs,
+          operationsFieldsByGameId
+        );
+      })
+    ),
     [
       spineSections,
       mergedLeagues,
@@ -145372,12 +145433,14 @@ function useSportsBrowserPrototypeTodayTemporalSlate() {
     ]
   );
   const yesterdayLeagues = (0, import_react268.useMemo)(
-    () => buildSportsBrowserPrototypeYesterdayTemporalLeagueSlates({
-      spineSections,
-      mergedLeagues,
-      scheduleByDate,
-      retainedFinalsByLeague
-    }),
+    () => ensureSportsBrowserPrototypeTemporalHorseRacingSlate(
+      buildSportsBrowserPrototypeYesterdayTemporalLeagueSlates({
+        spineSections,
+        mergedLeagues,
+        scheduleByDate,
+        retainedFinalsByLeague
+      })
+    ),
     [spineSections, mergedLeagues, scheduleByDate, retainedFinalsByLeague]
   );
   (0, import_react268.useEffect)(() => {
@@ -145601,8 +145664,8 @@ function SidebarLeagueNavLogoMark({
   logoUrl: logoUrlOverride
 }) {
   const [failed, setFailed] = (0, import_react269.useState)(false);
-  const rawLogoUrl = logoUrlOverride ?? (leagueKey ? resolveGamesSpineLeagueHeaderLogoUrl(leagueKey, games) : null);
-  const logoUrl = rawLogoUrl ? logoUrlOverride ? publicAssetUrl(rawLogoUrl) : rawLogoUrl : null;
+  const rawLogoUrl = logoUrlOverride ?? resolveSportsBrowserPrototypeHorseRacingLeagueLogoPath(leagueKey) ?? (leagueKey ? resolveGamesSpineLeagueHeaderLogoUrl(leagueKey, games) : null);
+  const logoUrl = rawLogoUrl ? logoUrlOverride || resolveSportsBrowserPrototypeHorseRacingLeagueLogoPath(leagueKey) ? publicAssetUrl(rawLogoUrl) : rawLogoUrl : null;
   if (!logoUrl || failed) return null;
   return /* @__PURE__ */ (0, import_jsx_runtime238.jsx)("span", { className: "inline-flex h-[1lh] w-[12px] shrink-0 items-center justify-center", children: /* @__PURE__ */ (0, import_jsx_runtime238.jsx)(
     "img",
@@ -146756,24 +146819,14 @@ function SportsBrowserPrototypeLeftNav({
   const liveGamesUpdatedAt = useLiveGamesStore((s2) => s2.updatedAt);
   const yesterdayLabel = (0, import_react269.useMemo)(() => formatCompactPreviousCalendarDate(), []);
   const todayCompleteLeagues = (0, import_react269.useMemo)(
-    () => buildSportsBrowserPrototypeTodayCompleteLeagueSlates(nowLeagues, upcomingLeagues, catchUpLeagues),
+    () => ensureSportsBrowserPrototypeTemporalHorseRacingSlate(
+      buildSportsBrowserPrototypeTodayCompleteLeagueSlates(nowLeagues, upcomingLeagues, catchUpLeagues)
+    ),
     [nowLeagues, upcomingLeagues, catchUpLeagues]
   );
   const groupedCatchUpLeagues = (0, import_react269.useMemo)(
     () => groupSportsBrowserPrototypeSidebarLeagueSlatesBySoccer(catchUpLeagues),
     [catchUpLeagues]
-  );
-  const toggleCatchUpLeague = (0, import_react269.useCallback)(
-    (leagueKey) => {
-      setCatchUpLeagueOpen((prev) => {
-        const nextOpen = !(prev[leagueKey] ?? false);
-        if (nextOpen) {
-          onLeagueSelect?.(leagueKey);
-        }
-        return { ...prev, [leagueKey]: nextOpen };
-      });
-    },
-    [onLeagueSelect]
   );
   const navigableGames = (0, import_react269.useMemo)(
     () => resolveSportsBrowserPrototypeSidebarNavigableGames({
@@ -146859,6 +146912,24 @@ function SportsBrowserPrototypeLeftNav({
     if (todayTab === "upcoming") return "next";
     return "today";
   }, [catchUpTodayActive, todayTab, yesterdayOpen]);
+  const onTemporalLeagueSelect = (0, import_react269.useCallback)(
+    (leagueKey) => {
+      onLeagueSelect?.(leagueKey, { temporalView: compactTemporalView });
+    },
+    [compactTemporalView, onLeagueSelect]
+  );
+  const toggleCatchUpLeague = (0, import_react269.useCallback)(
+    (leagueKey) => {
+      setCatchUpLeagueOpen((prev) => {
+        const nextOpen = !(prev[leagueKey] ?? false);
+        if (nextOpen) {
+          onTemporalLeagueSelect(leagueKey);
+        }
+        return { ...prev, [leagueKey]: nextOpen };
+      });
+    },
+    [onTemporalLeagueSelect]
+  );
   const onCompactTemporalSelect = (0, import_react269.useCallback)((view) => {
     hasUserSelectedTemporalView.current = true;
     switch (view) {
@@ -147007,7 +147078,7 @@ function SportsBrowserPrototypeLeftNav({
                     slates: yesterdayLeagues,
                     leagueOpen: yesterdayLeagueOpen,
                     onLeagueOpenChange: setYesterdayLeagueOpen,
-                    onLeagueSelect,
+                    onLeagueSelect: onTemporalLeagueSelect,
                     onGameSelect,
                     onGameTeamSelect,
                     onOpenUrl,
@@ -147027,7 +147098,7 @@ function SportsBrowserPrototypeLeftNav({
                     resolveVariant: resolveSidebarGameVariant,
                     leagueOpen: sectionLeagueOpen,
                     onLeagueOpenChange: setSectionLeagueOpen,
-                    onLeagueSelect,
+                    onLeagueSelect: onTemporalLeagueSelect,
                     onGameSelect,
                     onGameTeamSelect,
                     onSelectGlobalWebsites,
@@ -147048,7 +147119,7 @@ function SportsBrowserPrototypeLeftNav({
                     variant: "live",
                     leagueOpen: sectionLeagueOpen,
                     onLeagueOpenChange: setSectionLeagueOpen,
-                    onLeagueSelect,
+                    onLeagueSelect: onTemporalLeagueSelect,
                     onGameSelect,
                     onGameTeamSelect,
                     onSelectGlobalWebsites,
@@ -147069,7 +147140,7 @@ function SportsBrowserPrototypeLeftNav({
                     variant: "upcoming",
                     leagueOpen: sectionLeagueOpen,
                     onLeagueOpenChange: setSectionLeagueOpen,
-                    onLeagueSelect,
+                    onLeagueSelect: onTemporalLeagueSelect,
                     onGameSelect,
                     onGameTeamSelect,
                     onSelectGlobalWebsites,
@@ -147410,7 +147481,8 @@ function SportsBrowserPrototypeUpDownNavMinimizedLeagueCard({
 }) {
   const grarfLeagueKey = leagueKey;
   const leagueLabel = resolveGamesSpineLeagueDisplayLabel(grarfLeagueKey, [...sampleGames]);
-  const leagueLogoUrl = resolveGamesSpineLeagueHeaderLogoUrl(grarfLeagueKey, sampleGames);
+  const horseRacingLogoPath = resolveSportsBrowserPrototypeHorseRacingLeagueLogoPath(leagueKey);
+  const leagueLogoUrl = horseRacingLogoPath != null ? publicAssetUrl(horseRacingLogoPath) : resolveGamesSpineLeagueHeaderLogoUrl(grarfLeagueKey, sampleGames);
   return /* @__PURE__ */ (0, import_jsx_runtime240.jsxs)(
     "div",
     {
@@ -149120,46 +149192,52 @@ function HomePage() {
   const onOverlayTabClose = (0, import_react273.useCallback)((id) => {
     dispatchOverlay({ type: "close", id });
   }, []);
-  const onSportsBrowserLeagueSelect = (0, import_react273.useCallback)((leagueKey) => {
-    const websites = getSportsBrowserPrototypeLeagueWebsites(leagueKey);
-    updateSportsBrowserTabForSidebarSelection((tab) => {
-      const next = tab.paneStates.slice();
-      const paneIndex = resolveSportsBrowserPrototypeSidebarSelectionPaneIndex(tab);
-      if (!websites || websites.length === 0) {
-        const globalWebsites = getSportsBrowserPrototypeGlobalWebsites();
-        const url2 = globalWebsites[0]?.url ?? null;
+  const onSportsBrowserLeagueSelect = (0, import_react273.useCallback)(
+    (leagueKey, context2) => {
+      const temporalHorseRacingWebsites = isSportsBrowserPrototypeTemporalHorseRacingLeagueKey(leagueKey) && context2?.temporalView ? resolveSportsBrowserPrototypeTemporalHorseRacingWebsites(context2.temporalView) : null;
+      const websites = temporalHorseRacingWebsites ?? getSportsBrowserPrototypeLeagueWebsites(leagueKey);
+      updateSportsBrowserTabForSidebarSelection((tab) => {
+        const next = tab.paneStates.slice();
+        const paneIndex = resolveSportsBrowserPrototypeSidebarSelectionPaneIndex(tab);
+        if (!websites || websites.length === 0) {
+          const globalWebsites = getSportsBrowserPrototypeGlobalWebsites();
+          const url2 = globalWebsites[0]?.url ?? null;
+          next[paneIndex] = {
+            url: url2,
+            activeTabIndex: 0,
+            leagueKey: null,
+            sidebarArchLeagueKey: null,
+            gameId: null,
+            gameContextSection: null,
+            leagueContextSection: "news",
+            showWebsiteTabs: true,
+            sportsBrowserPrototypeSidebarTemporalView: null
+          };
+          return collapseSportsBrowserLiveGameXSearchSplit(
+            { ...tab, paneStates: next, activePaneIndex: paneIndex },
+            next[paneIndex]
+          );
+        }
+        const url = websites[0]?.url ?? null;
         next[paneIndex] = {
-          url: url2,
+          url,
           activeTabIndex: 0,
-          leagueKey: null,
+          leagueKey,
           sidebarArchLeagueKey: null,
           gameId: null,
           gameContextSection: null,
           leagueContextSection: "news",
-          showWebsiteTabs: true
+          showWebsiteTabs: true,
+          sportsBrowserPrototypeSidebarTemporalView: temporalHorseRacingWebsites ? context2?.temporalView ?? null : null
         };
         return collapseSportsBrowserLiveGameXSearchSplit(
           { ...tab, paneStates: next, activePaneIndex: paneIndex },
           next[paneIndex]
         );
-      }
-      const url = websites[0]?.url ?? null;
-      next[paneIndex] = {
-        url,
-        activeTabIndex: 0,
-        leagueKey,
-        sidebarArchLeagueKey: null,
-        gameId: null,
-        gameContextSection: null,
-        leagueContextSection: "news",
-        showWebsiteTabs: true
-      };
-      return collapseSportsBrowserLiveGameXSearchSplit(
-        { ...tab, paneStates: next, activePaneIndex: paneIndex },
-        next[paneIndex]
-      );
-    });
-  }, [updateSportsBrowserTabForSidebarSelection]);
+      });
+    },
+    [updateSportsBrowserTabForSidebarSelection]
+  );
   const onSportsBrowserGameSelect = (0, import_react273.useCallback)(
     (game) => {
       const resolvedGame = resolveSportsBrowserPrototypeSidebarSelectedGame(game);
