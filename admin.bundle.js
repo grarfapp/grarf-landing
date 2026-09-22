@@ -24820,8 +24820,7 @@ function resolveOperationalStartupGateState(input) {
 
 // ../grarf/desktop/src/services/operationalIngest/mergeGrarfCloudOperationalSnapshot.ts
 init_define_import_meta_env();
-function mergeGrarfCloudOperationalGameOverPrevious(cloudGame, previousGame) {
-  if (!previousGame) return cloudGame;
+function mergeGrarfCloudNcaafYahooSportsUrlOverPrevious(cloudGame, previousGame) {
   const prevYahoo = previousGame.metadata?.yahooSportsGameUrl?.trim();
   if (!prevYahoo || cloudGame.metadata?.yahooSportsGameUrl?.trim()) {
     return cloudGame;
@@ -24833,6 +24832,22 @@ function mergeGrarfCloudOperationalGameOverPrevious(cloudGame, previousGame) {
       yahooSportsGameUrl: prevYahoo
     }
   };
+}
+function mergeGrarfCloudOperationalGameOverPrevious(cloudGame, previousGame) {
+  if (!previousGame) return cloudGame;
+  let merged = cloudGame;
+  merged = mergeGrarfCloudNcaafYahooSportsUrlOverPrevious(merged, previousGame);
+  const prevCbs = previousGame.metadata?.cbsSportsPreviewUrl?.trim();
+  if (prevCbs && !merged.metadata?.cbsSportsPreviewUrl?.trim()) {
+    merged = {
+      ...merged,
+      metadata: {
+        ...merged.metadata,
+        cbsSportsPreviewUrl: prevCbs
+      }
+    };
+  }
+  return merged;
 }
 function mergeGrarfCloudOperationalLeaguesOverPrevious(cloudLeagues, previousLeagues, authoritativeEspnReconciledLeagueKeys, staleFallbackOperationalLeagueKeys) {
   const merged = { ...previousLeagues };
@@ -26632,6 +26647,428 @@ init_define_import_meta_env();
 
 // ../grarf/desktop/src/services/operationalIngest/enrichOperationalTransport.ts
 init_define_import_meta_env();
+
+// ../grarf/desktop/src/lib/cbs/enrichOperationalSnapshotCbsMlbPreviewUrls.ts
+init_define_import_meta_env();
+
+// ../grarf/shared/domain/cbs/enrichMlbGamesWithCbsSportsPreviewUrls.ts
+init_define_import_meta_env();
+
+// ../grarf/shared/domain/cbs/buildCbsMlbPreviewUrl.ts
+init_define_import_meta_env();
+var CBS_MLB_PREVIEW_BASE_URL = "https://www.cbssports.com/mlb/gametracker/preview";
+var ESPN_TO_CBS_MLB_TEAM_ABBREV = {
+  AZ: "ARI",
+  OAK: "ATH",
+  WSH: "WAS"
+};
+function resolveScheduledDateYmd(game) {
+  const fromKey = game.scheduledDateKey?.trim();
+  if (fromKey && /^\d{4}-\d{2}-\d{2}$/.test(fromKey)) {
+    return fromKey.replace(/-/g, "");
+  }
+  if (typeof game.startTimeMs === "number" && Number.isFinite(game.startTimeMs)) {
+    return new Date(game.startTimeMs).toISOString().slice(0, 10).replace(/-/g, "");
+  }
+  throw new Error("buildCbsMlbPreviewUrl: missing scheduledDateKey or startTimeMs");
+}
+function toCbsMlbTeamAbbrev(abbrev, side) {
+  const normalized = abbrev?.trim().toUpperCase() ?? "";
+  if (!normalized) {
+    throw new Error(`buildCbsMlbPreviewUrl: missing ${side} team abbreviation`);
+  }
+  return ESPN_TO_CBS_MLB_TEAM_ABBREV[normalized] ?? normalized;
+}
+function buildCbsMlbPreviewUrl(game) {
+  const dateYmd = resolveScheduledDateYmd(game);
+  const awayAbbrev = toCbsMlbTeamAbbrev(game.awayTeamAbbrev, "away");
+  const homeAbbrev = toCbsMlbTeamAbbrev(game.homeTeamAbbrev, "home");
+  return `${CBS_MLB_PREVIEW_BASE_URL}/MLB_${dateYmd}_${awayAbbrev}@${homeAbbrev}/`;
+}
+
+// ../grarf/shared/domain/cbs/probeCbsMlbPreviewReady.ts
+init_define_import_meta_env();
+
+// ../grarf/shared/domain/cbs/fetchHtml.ts
+init_define_import_meta_env();
+var FetchHtmlError = class extends Error {
+  constructor(message, status, statusText, requestedUrl, finalUrl) {
+    super(message);
+    __publicField(this, "status");
+    __publicField(this, "statusText");
+    __publicField(this, "requestedUrl");
+    __publicField(this, "finalUrl");
+    this.name = "FetchHtmlError";
+    this.status = status;
+    this.statusText = statusText;
+    this.requestedUrl = requestedUrl;
+    this.finalUrl = finalUrl;
+  }
+};
+async function fetchHtmlResponse(url) {
+  const requestedUrl = url.trim();
+  if (!requestedUrl) {
+    throw new FetchHtmlError("fetchHtml: URL is required", 0, "", "", "");
+  }
+  let res;
+  try {
+    res = await fetch(requestedUrl, {
+      method: "GET",
+      redirect: "follow",
+      headers: {
+        Accept: "text/html,application/xhtml+xml",
+        "User-Agent": "grarf-fetch-html"
+      },
+      signal: AbortSignal.timeout(2e4)
+    });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    throw new FetchHtmlError(
+      `fetchHtml request failed for ${requestedUrl}: ${message}`,
+      0,
+      "",
+      requestedUrl,
+      requestedUrl
+    );
+  }
+  const html = await res.text();
+  if (!res.ok) {
+    throw new FetchHtmlError(
+      `fetchHtml received ${res.status} ${res.statusText} for ${requestedUrl}`,
+      res.status,
+      res.statusText,
+      requestedUrl,
+      res.url
+    );
+  }
+  return {
+    html,
+    status: res.status,
+    statusText: res.statusText,
+    requestedUrl,
+    finalUrl: res.url
+  };
+}
+async function fetchHtmlWithResponse(url) {
+  return fetchHtmlResponse(url);
+}
+
+// ../grarf/shared/domain/cbs/isCbsMlbPreviewArticleReady.ts
+init_define_import_meta_env();
+
+// ../grarf/shared/domain/cbs/extractCbsPreviewArticle.ts
+init_define_import_meta_env();
+var ARTICLE_BODY_CONTENT_OPEN_RE = /class=["']Article-bodyContent["'][^>]*>/i;
+var BOILERPLATE_PARAGRAPH_RE = /^---$/;
+var AP_MLB_FOOTER_RE = /^AP MLB:/i;
+var COPYRIGHT_PARAGRAPH_RE = /^Copyright \d{4} STATS LLC/i;
+var JSON_LD_SCRIPT_RE = /<script[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi;
+var META_TAG_RE = /<meta\b[^>]*>/gi;
+function extractArticleBodyContentHtml(html) {
+  const openMatch = html.match(ARTICLE_BODY_CONTENT_OPEN_RE);
+  if (!openMatch || openMatch.index == null) {
+    throw new Error("extractCbsPreviewArticle: Article-bodyContent not found");
+  }
+  const openTagEnd = openMatch.index + openMatch[0].length;
+  let depth = 1;
+  let index = openTagEnd;
+  while (index < html.length && depth > 0) {
+    const nextOpen = html.indexOf("<div", index);
+    const nextClose = html.indexOf("</div>", index);
+    if (nextClose === -1) {
+      break;
+    }
+    if (nextOpen !== -1 && nextOpen < nextClose) {
+      depth += 1;
+      index = nextOpen + 4;
+      continue;
+    }
+    depth -= 1;
+    index = nextClose + "</div>".length;
+  }
+  if (depth !== 0) {
+    throw new Error("extractCbsPreviewArticle: Article-bodyContent is malformed");
+  }
+  return html.slice(openTagEnd, index - "</div>".length);
+}
+function stripHtmlTags(value) {
+  return value.replace(/<[^>]+>/g, "");
+}
+function decodeHtmlEntities(value) {
+  return value.replace(/&nbsp;/gi, " ").replace(/&amp;/gi, "&").replace(/&lt;/gi, "<").replace(/&gt;/gi, ">").replace(/&quot;/gi, '"').replace(/&#39;/g, "'").replace(/&apos;/gi, "'").replace(
+    /&#(\d+);/g,
+    (_match, code) => String.fromCodePoint(Number.parseInt(code, 10))
+  ).replace(
+    /&#x([0-9a-f]+);/gi,
+    (_match, code) => String.fromCodePoint(Number.parseInt(code, 16))
+  );
+}
+function normalizeParagraphText(value) {
+  return decodeHtmlEntities(stripHtmlTags(value)).replace(/\s+/g, " ").trim();
+}
+function normalizeMetadataText(value) {
+  const trimmed = value?.trim();
+  return trimmed ? trimmed : null;
+}
+function isBoilerplateParagraph(attributes, text) {
+  if (/StatsincCopyright/i.test(attributes)) {
+    return true;
+  }
+  if (BOILERPLATE_PARAGRAPH_RE.test(text)) {
+    return true;
+  }
+  if (AP_MLB_FOOTER_RE.test(text)) {
+    return true;
+  }
+  if (COPYRIGHT_PARAGRAPH_RE.test(text)) {
+    return true;
+  }
+  return false;
+}
+function extractCbsPreviewArticleBodyText(html) {
+  const bodyHtml = extractArticleBodyContentHtml(html);
+  const paragraphs = [];
+  for (const match of bodyHtml.matchAll(/<p([^>]*)>([\s\S]*?)<\/p>/gi)) {
+    const attributes = match[1] ?? "";
+    const innerHtml = match[2] ?? "";
+    const text = normalizeParagraphText(innerHtml);
+    if (!text || isBoilerplateParagraph(attributes, text)) {
+      continue;
+    }
+    paragraphs.push(text);
+  }
+  if (paragraphs.length === 0) {
+    throw new Error("extractCbsPreviewArticle: no article paragraphs found");
+  }
+  return paragraphs.join("\n\n");
+}
+function readMetaTagAttribute(tag, attribute) {
+  const match = tag.match(new RegExp(`\\b${attribute}=["']([^"']+)["']`, "i"));
+  return match?.[1] ?? null;
+}
+function readMetaTagContent(tag) {
+  const match = tag.match(/\bcontent=["']([^"']*)["']/i);
+  return match?.[1] ?? null;
+}
+function readMetaContent(html, keys, attribute = "property") {
+  for (const tag of html.match(META_TAG_RE) ?? []) {
+    const key = readMetaTagAttribute(tag, attribute);
+    if (!key || !keys.includes(key)) {
+      continue;
+    }
+    const content = normalizeMetadataText(readMetaTagContent(tag));
+    if (content) {
+      return content;
+    }
+  }
+  return null;
+}
+function readLinkHref(html, rel) {
+  const match = html.match(
+    new RegExp(`<link[^>]+rel=["']${rel}["'][^>]+href=["']([^"']+)["']`, "i")
+  );
+  if (match?.[1]) {
+    return normalizeMetadataText(decodeHtmlEntities(match[1]));
+  }
+  const reversed = html.match(
+    new RegExp(`<link[^>]+href=["']([^"']+)["'][^>]+rel=["']${rel}["']`, "i")
+  );
+  if (reversed?.[1]) {
+    return normalizeMetadataText(decodeHtmlEntities(reversed[1]));
+  }
+  return null;
+}
+function readFirstTagText(html, pattern) {
+  const match = html.match(pattern);
+  if (!match?.[1]) {
+    return null;
+  }
+  return normalizeMetadataText(normalizeParagraphText(match[1]));
+}
+function parseJsonLdBlocks(html) {
+  const nodes = [];
+  for (const match of html.matchAll(JSON_LD_SCRIPT_RE)) {
+    const raw = match[1]?.trim();
+    if (!raw) {
+      continue;
+    }
+    try {
+      const parsed = JSON.parse(raw);
+      collectJsonLdNodes(parsed, nodes);
+    } catch {
+      continue;
+    }
+  }
+  return nodes;
+}
+function collectJsonLdNodes(value, nodes) {
+  if (Array.isArray(value)) {
+    for (const entry2 of value) {
+      collectJsonLdNodes(entry2, nodes);
+    }
+    return;
+  }
+  if (!value || typeof value !== "object") {
+    return;
+  }
+  const node = value;
+  nodes.push(node);
+  if (Array.isArray(node["@graph"])) {
+    collectJsonLdNodes(node["@graph"], nodes);
+  }
+}
+function isArticleJsonLdType(typeValue) {
+  const values = Array.isArray(typeValue) ? typeValue : [typeValue];
+  return values.some((type) => {
+    if (typeof type !== "string") {
+      return false;
+    }
+    return /NewsArticle|Article|ReportageNewsArticle/i.test(type);
+  });
+}
+function findArticleJsonLdNodes(nodes) {
+  return nodes.filter((node) => isArticleJsonLdType(node["@type"]));
+}
+function readJsonLdAuthor(node) {
+  const author = node.author;
+  if (typeof author === "string") {
+    return normalizeMetadataText(author);
+  }
+  if (Array.isArray(author)) {
+    for (const entry2 of author) {
+      const resolved = readJsonLdAuthor({ author: entry2 });
+      if (resolved) {
+        return resolved;
+      }
+    }
+    return null;
+  }
+  if (author && typeof author === "object") {
+    const name = author.name;
+    return typeof name === "string" ? normalizeMetadataText(name) : null;
+  }
+  return null;
+}
+function extractCbsPreviewArticleMetadata(html) {
+  const articleNodes = findArticleJsonLdNodes(parseJsonLdBlocks(html));
+  const articleNode = articleNodes[0];
+  const headline = normalizeMetadataText(
+    typeof articleNode?.headline === "string" ? articleNode.headline : void 0
+  ) ?? readMetaContent(html, ["headline"], "itemprop") ?? readFirstTagText(html, /<h1[^>]*class=["'][^"']*gametracker-article__title-text[^"']*["'][^>]*>([\s\S]*?)<\/h1>/i) ?? readFirstTagText(html, /<h1[^>]*class=["'][^"']*Article-headline[^"']*["'][^>]*>([\s\S]*?)<\/h1>/i);
+  const subheadline = normalizeMetadataText(
+    typeof articleNode?.alternativeHeadline === "string" ? articleNode.alternativeHeadline : void 0
+  ) ?? readFirstTagText(
+    html,
+    /<(?:p|div|h2)[^>]*class=["'][^"']*(?:Article-deck|gametracker-article__deck|subheadline)[^"']*["'][^>]*>([\s\S]*?)<\/(?:p|div|h2)>/i
+  );
+  const author = readJsonLdAuthor(articleNode ?? {}) ?? readMetaContent(html, ["article:author", "author"], "name") ?? readFirstTagText(
+    html,
+    /<span[^>]*class=["'][^"']*gametracker-article__author-name[^"']*["'][^>]*>([\s\S]*?)<\/span>/i
+  );
+  const publishedAt = normalizeMetadataText(
+    typeof articleNode?.datePublished === "string" ? articleNode.datePublished : void 0
+  ) ?? readMetaContent(html, ["article:published_time", "article:published-time"], "property") ?? readMetaContent(html, ["datePublished"], "itemprop");
+  const updatedAt = normalizeMetadataText(
+    typeof articleNode?.dateModified === "string" ? articleNode.dateModified : void 0
+  ) ?? readMetaContent(html, ["article:modified_time", "article:modified-time"], "property") ?? readMetaContent(html, ["dateModified"], "itemprop");
+  const sourceUrl = readLinkHref(html, "canonical") ?? readMetaContent(html, ["og:url"], "property") ?? null;
+  return {
+    headline,
+    subheadline,
+    author,
+    publishedAt,
+    updatedAt,
+    sourceUrl
+  };
+}
+function extractCbsPreviewArticle(html) {
+  const articleText = extractCbsPreviewArticleBodyText(html);
+  const metadata = extractCbsPreviewArticleMetadata(html);
+  return {
+    ...metadata,
+    articleText
+  };
+}
+
+// ../grarf/shared/domain/cbs/isCbsMlbPreviewArticleReady.ts
+function isCbsMlbPreviewArticleReady(html) {
+  try {
+    const article = extractCbsPreviewArticle(html);
+    return Boolean(article.articleText?.trim());
+  } catch {
+    return false;
+  }
+}
+
+// ../grarf/shared/domain/cbs/probeCbsMlbPreviewReady.ts
+async function probeCbsMlbPreviewReady(previewUrl) {
+  const url = previewUrl.trim();
+  if (!url) return false;
+  try {
+    const response = await fetchHtmlWithResponse(url);
+    return isCbsMlbPreviewArticleReady(response.html);
+  } catch {
+    return false;
+  }
+}
+
+// ../grarf/shared/domain/cbs/enrichMlbGamesWithCbsSportsPreviewUrls.ts
+function isMlbGameRow(game) {
+  return game.league === "MLB" || game.id.startsWith("espn-MLB-");
+}
+async function enrichMlbGameRow(game, probeReady) {
+  if (!isMlbGameRow(game)) return game;
+  const existing = game.metadata?.cbsSportsPreviewUrl?.trim();
+  if (existing) return game;
+  let candidateUrl;
+  try {
+    candidateUrl = buildCbsMlbPreviewUrl(game);
+  } catch {
+    return game;
+  }
+  if (!await probeReady(candidateUrl)) return game;
+  return {
+    ...game,
+    metadata: {
+      ...game.metadata,
+      cbsSportsPreviewUrl: candidateUrl
+    }
+  };
+}
+async function enrichMlbGamesWithCbsSportsPreviewUrls(games, options) {
+  if (!Array.isArray(games) || games.length === 0) return games;
+  const probeReady = options?.probeReady ?? probeCbsMlbPreviewReady;
+  return Promise.all(games.map((game) => enrichMlbGameRow(game, probeReady)));
+}
+
+// ../grarf/desktop/src/lib/cbs/enrichOperationalSnapshotCbsMlbPreviewUrls.ts
+async function enrichViaElectronMainIpc(transport) {
+  const ipc = typeof window !== "undefined" ? window.grarf?.gamesEnrichCbsMlbPreviewTransport : void 0;
+  if (!ipc) return null;
+  try {
+    const result = await ipc(transport);
+    if (result.ok && result.transport) return result.transport;
+  } catch {
+  }
+  return null;
+}
+async function enrichOperationalSnapshotCbsMlbPreviewUrls(transport) {
+  const rows = transport.leagues?.MLB;
+  if (!Array.isArray(rows) || rows.length === 0) return transport;
+  const ipcEnriched = await enrichViaElectronMainIpc(transport);
+  if (ipcEnriched) return ipcEnriched;
+  const enriched = await enrichMlbGamesWithCbsSportsPreviewUrls(rows);
+  if (!enriched.some((row, index) => row !== rows[index])) {
+    return transport;
+  }
+  return {
+    ...transport,
+    leagues: {
+      ...transport.leagues,
+      MLB: enriched
+    }
+  };
+}
 
 // ../grarf/desktop/src/lib/fotmob/enrichOperationalSnapshotFotmob.ts
 init_define_import_meta_env();
@@ -30834,10 +31271,15 @@ async function enrichOperationalSnapshotWatchStreamsLocal(transport) {
   return next;
 }
 async function enrichOperationalTransport(rawTransport) {
-  if (rawTransport.source === "grarf_operational_service") {
-    return rawTransport;
-  }
   let transport = rawTransport;
+  try {
+    transport = await enrichOperationalSnapshotCbsMlbPreviewUrls(transport);
+  } catch (e) {
+    console.warn(`${LOG19} CBS MLB preview URL enrich failed`, e);
+  }
+  if (rawTransport.source === "grarf_operational_service") {
+    return transport;
+  }
   try {
     transport = await supplementOperationalSnapshotFromLocalIpc(transport);
   } catch (e) {
