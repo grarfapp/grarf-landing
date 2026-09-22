@@ -145585,6 +145585,54 @@ function resolveSportsBrowserPrototypeSidebarLeaguesGroupedSections() {
     };
   }).filter((group) => group != null);
 }
+function resolveSportsBrowserPrototypeSidebarLeaguesAlphabeticalSections() {
+  const leagues = collectSidebarLeaguesUniverseKeys().map((leagueKey) => ({
+    leagueKey,
+    label: resolveSidebarLeaguesDisplayLabel(leagueKey)
+  }));
+  leagues.sort(compareSidebarLeagueRows);
+  return [
+    {
+      sectionId: "alpha",
+      title: null,
+      hideHeader: true,
+      leagues
+    }
+  ];
+}
+function resolveSportsBrowserPrototypeSidebarLeaguesImportanceSections(mergedLeagues) {
+  const leagueKeys = sortGrarfLeagueKeysByNavImportance(
+    collectSidebarLeaguesUniverseKeys(),
+    mergedLeagues
+  );
+  const leagues = leagueKeys.map((leagueKey) => ({
+    leagueKey,
+    label: resolveSidebarLeaguesDisplayLabel(leagueKey)
+  }));
+  return [
+    {
+      sectionId: "rank",
+      title: null,
+      hideHeader: true,
+      leagues
+    }
+  ];
+}
+function sportsBrowserPrototypeSidebarLeagueRowMatchesSearch(label, searchQuery) {
+  const query = searchQuery.trim();
+  if (!query) return true;
+  return label.toLowerCase().includes(query.toLowerCase());
+}
+function filterSportsBrowserPrototypeSidebarLeaguesGroupedSections(sections, searchQuery) {
+  const query = searchQuery.trim();
+  if (!query) return [...sections];
+  return sections.map((group) => ({
+    ...group,
+    leagues: group.leagues.filter(
+      (row) => sportsBrowserPrototypeSidebarLeagueRowMatchesSearch(row.label, query)
+    )
+  })).filter((group) => group.leagues.length > 0);
+}
 
 // ../grarf/desktop/src/components/homeMvp/SportsBrowserPrototypeLeftNav.tsx
 var import_jsx_runtime238 = __toESM(require_jsx_runtime(), 1);
@@ -146889,7 +146937,10 @@ function resolveSidebarLeaguesSortControlClass(mode, activeMode) {
   }
   return "text-[10px] font-medium text-[#1a1a1a] underline decoration-[#1a1a1a]/70 decoration-1 underline-offset-[3px]";
 }
-function LeaguesFilterField() {
+function LeaguesFilterField({
+  value,
+  onChange
+}) {
   return /* @__PURE__ */ (0, import_jsx_runtime238.jsxs)("div", { className: "flex items-center gap-1.5 px-6 py-1", children: [
     /* @__PURE__ */ (0, import_jsx_runtime238.jsx)(Search, { size: 11, strokeWidth: 2, className: "shrink-0 text-[#8a847c]", "aria-hidden": true }),
     /* @__PURE__ */ (0, import_jsx_runtime238.jsx)(
@@ -146900,6 +146951,8 @@ function LeaguesFilterField() {
         autoComplete: "off",
         spellCheck: false,
         placeholder: "Filter leagues",
+        value,
+        onChange: (event) => onChange(event.target.value),
         className: cn2(
           "min-w-0 flex-1 border-0 border-b bg-transparent pb-0.5 font-sans text-[10px] font-normal normal-case leading-none tracking-normal text-[#1a1a1a]",
           RULE2,
@@ -146943,18 +146996,51 @@ function LeaguesSortControls({
   );
 }
 function SidebarLeaguesSectionBody({
+  todayCompleteLeagues,
   selectedLeagueKey,
   onLeagueSelect
 }) {
   const [leaguesSortMode, setLeaguesSortMode] = (0, import_react269.useState)("on-today");
-  const groupedLeagueSections = (0, import_react269.useMemo)(
-    () => resolveSportsBrowserPrototypeSidebarLeaguesGroupedSections(),
-    []
+  const [leaguesSearchQuery, setLeaguesSearchQuery] = (0, import_react269.useState)("");
+  const mergedOperationalLeagues = useLiveGamesStore((s2) => s2.leagues);
+  const displayedLeagueSections = (0, import_react269.useMemo)(() => {
+    if (leaguesSortMode === "alpha") {
+      return resolveSportsBrowserPrototypeSidebarLeaguesAlphabeticalSections();
+    }
+    if (leaguesSortMode === "rank") {
+      return resolveSportsBrowserPrototypeSidebarLeaguesImportanceSections(mergedOperationalLeagues);
+    }
+    if (leaguesSortMode === "on-today") {
+      const leagues = todayCompleteLeagues.map((slate) => ({
+        leagueKey: slate.key,
+        label: slate.label
+      }));
+      if (leagues.length === 0) return [];
+      return [
+        {
+          sectionId: "on-today",
+          title: null,
+          hideHeader: true,
+          leagues
+        }
+      ];
+    }
+    if (leaguesSortMode === "group") {
+      return resolveSportsBrowserPrototypeSidebarLeaguesGroupedSections();
+    }
+    return [];
+  }, [leaguesSortMode, mergedOperationalLeagues, todayCompleteLeagues]);
+  const visibleLeagueSections = (0, import_react269.useMemo)(
+    () => filterSportsBrowserPrototypeSidebarLeaguesGroupedSections(
+      displayedLeagueSections,
+      leaguesSearchQuery
+    ),
+    [displayedLeagueSections, leaguesSearchQuery]
   );
   return /* @__PURE__ */ (0, import_jsx_runtime238.jsxs)(import_jsx_runtime238.Fragment, { children: [
-    /* @__PURE__ */ (0, import_jsx_runtime238.jsx)(LeaguesFilterField, {}),
+    /* @__PURE__ */ (0, import_jsx_runtime238.jsx)(LeaguesFilterField, { value: leaguesSearchQuery, onChange: setLeaguesSearchQuery }),
     /* @__PURE__ */ (0, import_jsx_runtime238.jsx)(LeaguesSortControls, { activeMode: leaguesSortMode, onModeChange: setLeaguesSortMode }),
-    groupedLeagueSections.map((group) => /* @__PURE__ */ (0, import_jsx_runtime238.jsxs)(import_react269.Fragment, { children: [
+    visibleLeagueSections.map((group) => /* @__PURE__ */ (0, import_jsx_runtime238.jsxs)(import_react269.Fragment, { children: [
       /* @__PURE__ */ (0, import_jsx_runtime238.jsx)(
         SidebarLeaguesSportGroupHeader,
         {
@@ -147350,6 +147436,7 @@ function SportsBrowserPrototypeLeftNav({
               ] }) : /* @__PURE__ */ (0, import_jsx_runtime238.jsx)("div", { className: cn2(MENU_SURFACE2, "shrink-0"), "data-sports-browser-prototype-sidebar-leagues-mode": "", children: /* @__PURE__ */ (0, import_jsx_runtime238.jsx)(
                 SidebarLeaguesSectionBody,
                 {
+                  todayCompleteLeagues,
                   selectedLeagueKey,
                   onLeagueSelect
                 }
