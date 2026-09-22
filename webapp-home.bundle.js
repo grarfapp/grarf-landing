@@ -140352,6 +140352,10 @@ function SportsBrowserPrototypeAddressBar({
   );
 }
 
+// ../grarf/desktop/src/components/homeMvp/SportsBrowserPrototypeBrowserWorkspace.tsx
+init_define_import_meta_env();
+var import_react262 = __toESM(require_react(), 1);
+
 // ../grarf/desktop/src/data/sportsBrowserPrototypeLayout.ts
 init_define_import_meta_env();
 var SPORTS_BROWSER_PROTOTYPE_LEFT_NAV_WIDTH_PX = 292;
@@ -140362,8 +140366,6 @@ var SPORTS_BROWSER_PROTOTYPE_SPLIT_PANE_RESIZE_HANDLE_WIDTH_PX = 4;
 var SPORTS_BROWSER_PROTOTYPE_BROWSER_WORKSPACE_OUTER_HORIZONTAL_PADDING_PX = SPORTS_BROWSER_PROTOTYPE_BROWSER_WORKSPACE_MARGIN_PX * 2;
 var SPORTS_BROWSER_PROTOTYPE_BROWSER_WORKSPACE_SPLIT_ORIGIN_OFFSET_PX = SPORTS_BROWSER_PROTOTYPE_LEFT_NAV_WIDTH_PX + SPORTS_BROWSER_PROTOTYPE_BROWSER_WORKSPACE_MARGIN_PX + SPORTS_BROWSER_PROTOTYPE_BROWSER_WORKSPACE_BORDER_PX + SPORTS_BROWSER_PROTOTYPE_BROWSER_WORKSPACE_MARGIN_PX;
 var SPORTS_BROWSER_PROTOTYPE_NEWS_TICKER_ARTICLE_PANE_WIDTH_RATIO = SPORTS_BROWSER_NEWS_TICKER_CONTEXT_PANE_WIDTH_RATIO;
-var SPORTS_BROWSER_PROTOTYPE_TERMINAL_TOGGLE_RESERVED_WIDTH_PX = 60;
-var SPORTS_BROWSER_PROTOTYPE_TOP_BAR_TICKER_RIGHT_OFFSET_PX = SPORTS_BROWSER_PROTOTYPE_TERMINAL_TOGGLE_RESERVED_WIDTH_PX;
 var SPORTS_BROWSER_PROTOTYPE_ARTICLE_PANE_LEFT_CSS_VAR = "--sports-browser-article-pane-left";
 var SPORTS_BROWSER_PROTOTYPE_NEWS_TICKER_ARTICLE_PANE_SPLIT_GRID_CLIENT_OFFSET_PX = SPORTS_BROWSER_PROTOTYPE_LEFT_NAV_WIDTH_PX + SPORTS_BROWSER_PROTOTYPE_BROWSER_WORKSPACE_OUTER_HORIZONTAL_PADDING_PX;
 var SPORTS_BROWSER_PROTOTYPE_NEWS_TICKER_ARTICLE_PANE_LEFT_BASE_PX = SPORTS_BROWSER_PROTOTYPE_BROWSER_WORKSPACE_SPLIT_ORIGIN_OFFSET_PX + SPORTS_BROWSER_PROTOTYPE_SPLIT_PANE_RESIZE_HANDLE_WIDTH_PX;
@@ -140373,10 +140375,6 @@ function resolveSportsBrowserPrototypeNewsTickerArticlePaneLeftPx(shellWidthPx) 
   const splitGridClientWidthPx = workspaceWidthPx - SPORTS_BROWSER_PROTOTYPE_BROWSER_WORKSPACE_OUTER_HORIZONTAL_PADDING_PX;
   return SPORTS_BROWSER_PROTOTYPE_BROWSER_WORKSPACE_SPLIT_ORIGIN_OFFSET_PX + splitGridClientWidthPx * SPORTS_BROWSER_PROTOTYPE_NEWS_TICKER_ARTICLE_PANE_WIDTH_RATIO + SPORTS_BROWSER_PROTOTYPE_SPLIT_PANE_RESIZE_HANDLE_WIDTH_PX;
 }
-
-// ../grarf/desktop/src/components/homeMvp/SportsBrowserPrototypeBrowserWorkspace.tsx
-init_define_import_meta_env();
-var import_react262 = __toESM(require_react(), 1);
 
 // ../grarf/desktop/src/lib/home/newsBrowserFocusSession.ts
 init_define_import_meta_env();
@@ -145453,6 +145451,8 @@ var SIDEBAR_TOP_LEVEL_MODE_NAV_ITEMS = [
   { id: "podcasts", label: "PODCASTS" }
 ];
 var SIDEBAR_TOP_LEVEL_MODE_NAV_WIRED_IDS = ["games", "leagues"];
+var SIDEBAR_TOP_LEVEL_MODE_NAV_ACTIVE_TAB_CLASS = "z-20 -mb-px border-[#c8c4bc] border-b-0 bg-[#f3f0ea] pb-2 pt-1.5 text-[#1a1a1a] shadow-[0_1px_0_0_#f3f0ea]";
+var SIDEBAR_TOP_LEVEL_MODE_NAV_INACTIVE_TAB_CLASS = "z-10 border-[#c8c4bc]/75 bg-[#ece9e2] pb-1 pt-1 text-[#6f6a62]";
 function CompactSidebarTopLevelModeNavGrid({
   activeId,
   onSelect
@@ -145460,7 +145460,7 @@ function CompactSidebarTopLevelModeNavGrid({
   return /* @__PURE__ */ (0, import_jsx_runtime238.jsx)(
     "div",
     {
-      className: "w-full shrink-0 border-b border-[#c8c4bc]/70 bg-[#e8e4dc]",
+      className: "w-full shrink-0 bg-[#e8e4dc]",
       "data-sports-browser-prototype-sidebar-mode-nav": "",
       role: "tablist",
       "aria-label": "Sidebar sections",
@@ -145476,9 +145476,9 @@ function CompactSidebarTopLevelModeNavGrid({
             const active2 = id === activeId;
             const tabClassName = cn2(
               SIDEBAR_TOP_LEVEL_MODE_NAV_FOLDER_TAB_CLIP,
-              "relative shrink-0 whitespace-nowrap border border-b-0 px-2.5 pr-3.5 text-[10px] font-semibold uppercase leading-none tracking-[0.04em]",
+              "relative shrink-0 whitespace-nowrap border px-2.5 pr-3.5 text-[10px] font-semibold uppercase leading-none tracking-[0.04em]",
               index > 0 && "-ml-[6px]",
-              active2 ? "z-20 -mb-px border-[#c8c4bc] bg-[#f3f0ea] pb-2 pt-1.5 text-[#1a1a1a]" : "z-10 border-[#c8c4bc]/75 bg-[#ece9e2] pb-1 pt-1 text-[#6f6a62]"
+              active2 ? SIDEBAR_TOP_LEVEL_MODE_NAV_ACTIVE_TAB_CLASS : SIDEBAR_TOP_LEVEL_MODE_NAV_INACTIVE_TAB_CLASS
             );
             const tabStyle = { zIndex: active2 ? 20 : Math.max(1, 9 - index) };
             if (SIDEBAR_TOP_LEVEL_MODE_NAV_WIRED_IDS.includes(id)) {
@@ -146738,7 +146738,8 @@ function SportsBrowserPrototypeLeftNav({
   onNavigableLeagueKeysChange,
   selectedGameId = null,
   selectedLeagueKey = null,
-  selectedSidebarArchLeagueKey = null
+  selectedSidebarArchLeagueKey = null,
+  sidebarBottomNewsFeed
 }) {
   void commandCenterCards;
   void onCommandCenterDestinationSelect;
@@ -146913,183 +146914,186 @@ function SportsBrowserPrototypeLeftNav({
       ),
       "data-sports-browser-prototype-left-nav": true,
       "aria-label": "Sports browser menu",
-      children: /* @__PURE__ */ (0, import_jsx_runtime238.jsx)("div", { className: "flex min-h-0 flex-1 flex-col overflow-hidden", children: /* @__PURE__ */ (0, import_jsx_runtime238.jsx)(
-        "div",
-        {
-          ref: sidebarScrollContainerRef,
-          className: "flex min-h-0 flex-1 flex-col overflow-y-auto overflow-x-hidden overscroll-contain",
-          "data-sports-browser-prototype-left-nav-scroll": true,
-          children: /* @__PURE__ */ (0, import_jsx_runtime238.jsxs)("div", { className: "shrink-0", children: [
-            onCommandCenterBrowserTabSelect ? /* @__PURE__ */ (0, import_jsx_runtime238.jsx)(
-              "button",
-              {
-                type: "button",
-                className: cn2(
-                  "w-full border-t px-4 py-2 text-left text-[11px] font-bold uppercase tracking-[0.06em] text-[#1a1a1a] transition-opacity hover:opacity-75",
-                  RULE2,
-                  "border-t-0"
-                ),
-                "data-sports-browser-prototype-command-center-section": true,
-                onClick: onCommandCenterBrowserTabSelect,
-                children: "COMMAND CENTER"
-              }
-            ) : /* @__PURE__ */ (0, import_jsx_runtime238.jsx)(
-              "div",
-              {
-                className: cn2(
-                  "border-t px-4 py-2 text-[11px] font-bold uppercase tracking-[0.06em] text-[#1a1a1a]",
-                  RULE2,
-                  "border-t-0"
-                ),
-                "data-sports-browser-prototype-command-center-section": true,
-                children: "COMMAND CENTER"
-              }
-            ),
-            /* @__PURE__ */ (0, import_jsx_runtime238.jsx)(
-              SportsBrowserPrototypeBottomRailGames,
-              {
-                layout: "sidebar",
-                onGameSelect,
-                onGameTeamSelect,
-                onWatchLive,
-                canShowWatchLive
-              }
-            ),
-            /* @__PURE__ */ (0, import_jsx_runtime238.jsx)(
-              "div",
-              {
-                className: cn2("border-t", RULE2),
-                "data-sports-browser-prototype-temporal-navigation-section": true,
-                children: /* @__PURE__ */ (0, import_jsx_runtime238.jsx)(
-                  CompactSidebarTopLevelModeNavGrid,
-                  {
-                    activeId: sidebarTopLevelMode,
-                    onSelect: onSidebarTopLevelModeSelect
-                  }
-                )
-              }
-            ),
-            sidebarTopLevelMode === "games" ? /* @__PURE__ */ (0, import_jsx_runtime238.jsxs)(import_jsx_runtime238.Fragment, { children: [
-              /* @__PURE__ */ (0, import_jsx_runtime238.jsx)(
-                CompactTemporalNavRow,
+      children: /* @__PURE__ */ (0, import_jsx_runtime238.jsxs)("div", { className: "flex min-h-0 flex-1 flex-col overflow-hidden", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime238.jsx)(
+          "div",
+          {
+            ref: sidebarScrollContainerRef,
+            className: "flex min-h-0 flex-1 flex-col overflow-y-auto overflow-x-hidden overscroll-contain",
+            "data-sports-browser-prototype-left-nav-scroll": true,
+            children: /* @__PURE__ */ (0, import_jsx_runtime238.jsxs)("div", { className: "shrink-0", children: [
+              onCommandCenterBrowserTabSelect ? /* @__PURE__ */ (0, import_jsx_runtime238.jsx)(
+                "button",
                 {
-                  yesterdayLabel,
-                  activeView: compactTemporalView,
-                  onSelect: onCompactTemporalSelect
+                  type: "button",
+                  className: cn2(
+                    "w-full border-t px-4 py-2 text-left text-[11px] font-bold uppercase tracking-[0.06em] text-[#1a1a1a] transition-opacity hover:opacity-75",
+                    RULE2,
+                    "border-t-0"
+                  ),
+                  "data-sports-browser-prototype-command-center-section": true,
+                  onClick: onCommandCenterBrowserTabSelect,
+                  children: "COMMAND CENTER"
+                }
+              ) : /* @__PURE__ */ (0, import_jsx_runtime238.jsx)(
+                "div",
+                {
+                  className: cn2(
+                    "border-t px-4 py-2 text-[11px] font-bold uppercase tracking-[0.06em] text-[#1a1a1a]",
+                    RULE2,
+                    "border-t-0"
+                  ),
+                  "data-sports-browser-prototype-command-center-section": true,
+                  children: "COMMAND CENTER"
                 }
               ),
-              compactTemporalView === "final" ? /* @__PURE__ */ (0, import_jsx_runtime238.jsx)(
-                SidebarGroupedTemporalLeagueEntries,
+              /* @__PURE__ */ (0, import_jsx_runtime238.jsx)(
+                SportsBrowserPrototypeBottomRailGames,
                 {
-                  entries: groupedCatchUpLeagues,
-                  sectionPrefix: "catch-up",
-                  variant: "catchUp",
-                  leagueOpen: catchUpLeagueOpen,
-                  onLeagueOpenChange: setCatchUpLeagueOpen,
-                  toggleLeague: toggleCatchUpLeague,
-                  allOpen: false,
-                  onSoccerArchLeagueSelect,
-                  selectedSidebarArchLeagueKey,
+                  layout: "sidebar",
                   onGameSelect,
                   onGameTeamSelect,
                   onWatchLive,
-                  canShowWatchLive,
-                  selectedGameId,
-                  selectedLeagueKey,
-                  onOpenUrl
+                  canShowWatchLive
                 }
-              ) : null,
-              compactTemporalView === "yesterday" ? /* @__PURE__ */ (0, import_jsx_runtime238.jsx)(
-                SidebarYesterdaySectionLeagues,
+              ),
+              /* @__PURE__ */ (0, import_jsx_runtime238.jsx)(
+                "div",
                 {
-                  slates: yesterdayLeagues,
-                  leagueOpen: yesterdayLeagueOpen,
-                  onLeagueOpenChange: setYesterdayLeagueOpen,
-                  onLeagueSelect,
-                  onGameSelect,
-                  onGameTeamSelect,
-                  onOpenUrl,
-                  onSoccerArchLeagueSelect,
-                  onWatchLive,
-                  canShowWatchLive,
-                  selectedGameId,
-                  selectedLeagueKey,
-                  selectedSidebarArchLeagueKey
+                  className: cn2("border-t", RULE2),
+                  "data-sports-browser-prototype-temporal-navigation-section": true,
+                  children: /* @__PURE__ */ (0, import_jsx_runtime238.jsx)(
+                    CompactSidebarTopLevelModeNavGrid,
+                    {
+                      activeId: sidebarTopLevelMode,
+                      onSelect: onSidebarTopLevelModeSelect
+                    }
+                  )
                 }
-              ) : null,
-              compactTemporalView === "today" ? /* @__PURE__ */ (0, import_jsx_runtime238.jsx)(
-                SidebarTemporalSectionLeagues,
+              ),
+              sidebarTopLevelMode === "games" ? /* @__PURE__ */ (0, import_jsx_runtime238.jsxs)(import_jsx_runtime238.Fragment, { children: [
+                /* @__PURE__ */ (0, import_jsx_runtime238.jsx)(
+                  CompactTemporalNavRow,
+                  {
+                    yesterdayLabel,
+                    activeView: compactTemporalView,
+                    onSelect: onCompactTemporalSelect
+                  }
+                ),
+                compactTemporalView === "final" ? /* @__PURE__ */ (0, import_jsx_runtime238.jsx)(
+                  SidebarGroupedTemporalLeagueEntries,
+                  {
+                    entries: groupedCatchUpLeagues,
+                    sectionPrefix: "catch-up",
+                    variant: "catchUp",
+                    leagueOpen: catchUpLeagueOpen,
+                    onLeagueOpenChange: setCatchUpLeagueOpen,
+                    toggleLeague: toggleCatchUpLeague,
+                    allOpen: false,
+                    onSoccerArchLeagueSelect,
+                    selectedSidebarArchLeagueKey,
+                    onGameSelect,
+                    onGameTeamSelect,
+                    onWatchLive,
+                    canShowWatchLive,
+                    selectedGameId,
+                    selectedLeagueKey,
+                    onOpenUrl
+                  }
+                ) : null,
+                compactTemporalView === "yesterday" ? /* @__PURE__ */ (0, import_jsx_runtime238.jsx)(
+                  SidebarYesterdaySectionLeagues,
+                  {
+                    slates: yesterdayLeagues,
+                    leagueOpen: yesterdayLeagueOpen,
+                    onLeagueOpenChange: setYesterdayLeagueOpen,
+                    onLeagueSelect,
+                    onGameSelect,
+                    onGameTeamSelect,
+                    onOpenUrl,
+                    onSoccerArchLeagueSelect,
+                    onWatchLive,
+                    canShowWatchLive,
+                    selectedGameId,
+                    selectedLeagueKey,
+                    selectedSidebarArchLeagueKey
+                  }
+                ) : null,
+                compactTemporalView === "today" ? /* @__PURE__ */ (0, import_jsx_runtime238.jsx)(
+                  SidebarTemporalSectionLeagues,
+                  {
+                    sectionId: "today",
+                    slates: todayCompleteLeagues,
+                    resolveVariant: resolveSidebarGameVariant,
+                    leagueOpen: sectionLeagueOpen,
+                    onLeagueOpenChange: setSectionLeagueOpen,
+                    onLeagueSelect,
+                    onGameSelect,
+                    onGameTeamSelect,
+                    onSelectGlobalWebsites,
+                    onSoccerArchLeagueSelect,
+                    onWatchLive,
+                    canShowWatchLive,
+                    selectedGameId,
+                    selectedLeagueKey,
+                    selectedSidebarArchLeagueKey,
+                    onOpenUrl
+                  }
+                ) : null,
+                compactTemporalView === "now" ? /* @__PURE__ */ (0, import_jsx_runtime238.jsx)(
+                  SidebarTemporalSectionLeagues,
+                  {
+                    sectionId: "now",
+                    slates: nowLeagues,
+                    variant: "live",
+                    leagueOpen: sectionLeagueOpen,
+                    onLeagueOpenChange: setSectionLeagueOpen,
+                    onLeagueSelect,
+                    onGameSelect,
+                    onGameTeamSelect,
+                    onSelectGlobalWebsites,
+                    onSoccerArchLeagueSelect,
+                    onWatchLive,
+                    canShowWatchLive,
+                    selectedGameId,
+                    selectedLeagueKey,
+                    selectedSidebarArchLeagueKey,
+                    onOpenUrl
+                  }
+                ) : null,
+                compactTemporalView === "next" ? /* @__PURE__ */ (0, import_jsx_runtime238.jsx)(
+                  SidebarTemporalSectionLeagues,
+                  {
+                    sectionId: "upcoming",
+                    slates: upcomingLeagues,
+                    variant: "upcoming",
+                    leagueOpen: sectionLeagueOpen,
+                    onLeagueOpenChange: setSectionLeagueOpen,
+                    onLeagueSelect,
+                    onGameSelect,
+                    onGameTeamSelect,
+                    onSelectGlobalWebsites,
+                    onSoccerArchLeagueSelect,
+                    onWatchLive,
+                    canShowWatchLive,
+                    selectedGameId,
+                    selectedLeagueKey,
+                    selectedSidebarArchLeagueKey,
+                    onOpenUrl
+                  }
+                ) : null
+              ] }) : /* @__PURE__ */ (0, import_jsx_runtime238.jsx)("div", { className: cn2(MENU_SURFACE2, "shrink-0"), "data-sports-browser-prototype-sidebar-leagues-mode": "", children: /* @__PURE__ */ (0, import_jsx_runtime238.jsx)(
+                SidebarLeaguesSectionBody,
                 {
-                  sectionId: "today",
-                  slates: todayCompleteLeagues,
-                  resolveVariant: resolveSidebarGameVariant,
-                  leagueOpen: sectionLeagueOpen,
-                  onLeagueOpenChange: setSectionLeagueOpen,
-                  onLeagueSelect,
-                  onGameSelect,
-                  onGameTeamSelect,
-                  onSelectGlobalWebsites,
-                  onSoccerArchLeagueSelect,
-                  onWatchLive,
-                  canShowWatchLive,
-                  selectedGameId,
                   selectedLeagueKey,
-                  selectedSidebarArchLeagueKey,
-                  onOpenUrl
+                  onLeagueSelect
                 }
-              ) : null,
-              compactTemporalView === "now" ? /* @__PURE__ */ (0, import_jsx_runtime238.jsx)(
-                SidebarTemporalSectionLeagues,
-                {
-                  sectionId: "now",
-                  slates: nowLeagues,
-                  variant: "live",
-                  leagueOpen: sectionLeagueOpen,
-                  onLeagueOpenChange: setSectionLeagueOpen,
-                  onLeagueSelect,
-                  onGameSelect,
-                  onGameTeamSelect,
-                  onSelectGlobalWebsites,
-                  onSoccerArchLeagueSelect,
-                  onWatchLive,
-                  canShowWatchLive,
-                  selectedGameId,
-                  selectedLeagueKey,
-                  selectedSidebarArchLeagueKey,
-                  onOpenUrl
-                }
-              ) : null,
-              compactTemporalView === "next" ? /* @__PURE__ */ (0, import_jsx_runtime238.jsx)(
-                SidebarTemporalSectionLeagues,
-                {
-                  sectionId: "upcoming",
-                  slates: upcomingLeagues,
-                  variant: "upcoming",
-                  leagueOpen: sectionLeagueOpen,
-                  onLeagueOpenChange: setSectionLeagueOpen,
-                  onLeagueSelect,
-                  onGameSelect,
-                  onGameTeamSelect,
-                  onSelectGlobalWebsites,
-                  onSoccerArchLeagueSelect,
-                  onWatchLive,
-                  canShowWatchLive,
-                  selectedGameId,
-                  selectedLeagueKey,
-                  selectedSidebarArchLeagueKey,
-                  onOpenUrl
-                }
-              ) : null
-            ] }) : /* @__PURE__ */ (0, import_jsx_runtime238.jsx)("div", { className: "shrink-0", "data-sports-browser-prototype-sidebar-leagues-mode": "", children: /* @__PURE__ */ (0, import_jsx_runtime238.jsx)(
-              SidebarLeaguesSectionBody,
-              {
-                selectedLeagueKey,
-                onLeagueSelect
-              }
-            ) })
-          ] })
-        }
-      ) })
+              ) })
+            ] })
+          }
+        ),
+        sidebarBottomNewsFeed
+      ] })
     }
   );
 }
@@ -149758,6 +149762,66 @@ function HomePage() {
     HOME_CENTER_LIVE_SPORTS_TICKER_ENABLED ? /* @__PURE__ */ (0, import_jsx_runtime243.jsx)(LiveSportsTicker, { onNavigate: onTickerNavigate }) : null
   ] });
   const showSportsBrowserPrototypeTopFeed = isSportsBrowserPrototype && isGrarfElectronRenderer();
+  const sportsBrowserSidebarBottomNewsFeed = showSportsBrowserPrototypeTopFeed ? /* @__PURE__ */ (0, import_jsx_runtime243.jsxs)(
+    "div",
+    {
+      className: "flex h-11 w-full shrink-0 items-stretch border-t border-[#d5d0c6]",
+      "data-sports-browser-prototype-left-nav-bottom-feed": true,
+      children: [
+        /* @__PURE__ */ (0, import_jsx_runtime243.jsx)("div", { className: "min-h-0 min-w-0 flex-1", "data-sports-browser-prototype-left-nav-ticker": true, children: /* @__PURE__ */ (0, import_jsx_runtime243.jsx)(
+          GlobalHeaderNewsTicker,
+          {
+            appearance: "bottomStrip",
+            className: "h-full min-w-0 w-full",
+            onNavigateUrl: onSportsBrowserNewsTickerNavigate
+          }
+        ) }),
+        /* @__PURE__ */ (0, import_jsx_runtime243.jsxs)(
+          "div",
+          {
+            className: "flex h-11 shrink-0 items-stretch border-l border-[#0a1010]/20 bg-[#ece9e2]",
+            "data-sports-browser-prototype-top-bar-ticker-controls": true,
+            children: [
+              /* @__PURE__ */ (0, import_jsx_runtime243.jsx)(
+                "button",
+                {
+                  type: "button",
+                  onClick: onSportsBrowserOpenTimelineInSidePane,
+                  "aria-label": "Open Timeline",
+                  "aria-pressed": isSportsBrowserSidePaneTimelineActive,
+                  title: "Open Timeline",
+                  className: cn2(
+                    topBarNewsTickerControlClass,
+                    isSportsBrowserSidePaneTimelineActive && topBarNewsTickerControlActiveClass
+                  ),
+                  "data-sports-browser-prototype-top-bar-timeline-side-pane": true,
+                  "data-sports-browser-prototype-top-bar-timeline-side-pane-active": isSportsBrowserSidePaneTimelineActive ? "true" : "false",
+                  children: /* @__PURE__ */ (0, import_jsx_runtime243.jsx)(SportsBrowserTopBarSidePaneTimelineIcon, {})
+                }
+              ),
+              /* @__PURE__ */ (0, import_jsx_runtime243.jsx)(
+                "button",
+                {
+                  type: "button",
+                  onClick: onSportsBrowserOpenTimelineInMainBrowserContent,
+                  "aria-label": "Open Timeline Full Screen",
+                  "aria-pressed": isSportsBrowserFullScreenTimelineActive,
+                  title: "Open Timeline Full Screen",
+                  className: cn2(
+                    topBarNewsTickerControlClass,
+                    isSportsBrowserFullScreenTimelineActive && topBarNewsTickerControlActiveClass
+                  ),
+                  "data-sports-browser-prototype-top-bar-timeline-full-screen": true,
+                  "data-sports-browser-prototype-top-bar-timeline-full-screen-active": isSportsBrowserFullScreenTimelineActive ? "true" : "false",
+                  children: /* @__PURE__ */ (0, import_jsx_runtime243.jsx)(SportsBrowserTopBarFullScreenTimelineIcon, {})
+                }
+              )
+            ]
+          }
+        )
+      ]
+    }
+  ) : null;
   const homeLayout = /* @__PURE__ */ (0, import_jsx_runtime243.jsx)("div", { className: "relative flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden bg-[#020404] text-[#d7eeee]", children: isSportsBrowserPrototype ? /* @__PURE__ */ (0, import_jsx_runtime243.jsxs)(
     "div",
     {
@@ -149792,71 +149856,9 @@ function HomePage() {
               activeTabId: activeSportsBrowserTabId,
               onSelectTab: onSelectSportsBrowserTab,
               onCloseTab: onCloseSportsBrowserTab,
-              onAddTab: onAddSportsBrowserTab,
-              terminalToggle: showSportsBrowserPrototypeTopFeed ? /* @__PURE__ */ (0, import_jsx_runtime243.jsxs)(
-                "div",
-                {
-                  className: "flex h-11 shrink-0 items-stretch border-l border-[#0a1010]/20 bg-[#ece9e2]",
-                  "data-sports-browser-prototype-top-bar-ticker-controls": true,
-                  children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime243.jsx)(
-                      "button",
-                      {
-                        type: "button",
-                        onClick: onSportsBrowserOpenTimelineInSidePane,
-                        "aria-label": "Open Timeline",
-                        "aria-pressed": isSportsBrowserSidePaneTimelineActive,
-                        title: "Open Timeline",
-                        className: cn2(
-                          topBarNewsTickerControlClass,
-                          isSportsBrowserSidePaneTimelineActive && topBarNewsTickerControlActiveClass
-                        ),
-                        "data-sports-browser-prototype-top-bar-timeline-side-pane": true,
-                        "data-sports-browser-prototype-top-bar-timeline-side-pane-active": isSportsBrowserSidePaneTimelineActive ? "true" : "false",
-                        children: /* @__PURE__ */ (0, import_jsx_runtime243.jsx)(SportsBrowserTopBarSidePaneTimelineIcon, {})
-                      }
-                    ),
-                    /* @__PURE__ */ (0, import_jsx_runtime243.jsx)(
-                      "button",
-                      {
-                        type: "button",
-                        onClick: onSportsBrowserOpenTimelineInMainBrowserContent,
-                        "aria-label": "Open Timeline Full Screen",
-                        "aria-pressed": isSportsBrowserFullScreenTimelineActive,
-                        title: "Open Timeline Full Screen",
-                        className: cn2(
-                          topBarNewsTickerControlClass,
-                          isSportsBrowserFullScreenTimelineActive && topBarNewsTickerControlActiveClass
-                        ),
-                        "data-sports-browser-prototype-top-bar-timeline-full-screen": true,
-                        "data-sports-browser-prototype-top-bar-timeline-full-screen-active": isSportsBrowserFullScreenTimelineActive ? "true" : "false",
-                        children: /* @__PURE__ */ (0, import_jsx_runtime243.jsx)(SportsBrowserTopBarFullScreenTimelineIcon, {})
-                      }
-                    )
-                  ]
-                }
-              ) : null
+              onAddTab: onAddSportsBrowserTab
             }
           ),
-          showSportsBrowserPrototypeTopFeed ? /* @__PURE__ */ (0, import_jsx_runtime243.jsx)(
-            "div",
-            {
-              className: "pointer-events-none absolute top-0 z-[1] flex h-11 items-stretch",
-              style: {
-                left: `var(${SPORTS_BROWSER_PROTOTYPE_ARTICLE_PANE_LEFT_CSS_VAR}, ${SPORTS_BROWSER_PROTOTYPE_NEWS_TICKER_ARTICLE_PANE_LEFT_CSS})`,
-                right: SPORTS_BROWSER_PROTOTYPE_TOP_BAR_TICKER_RIGHT_OFFSET_PX
-              },
-              "data-sports-browser-prototype-top-bar-ticker": true,
-              children: /* @__PURE__ */ (0, import_jsx_runtime243.jsx)("div", { className: "pointer-events-auto h-full min-w-0 w-full", children: /* @__PURE__ */ (0, import_jsx_runtime243.jsx)(
-                GlobalHeaderNewsTicker,
-                {
-                  appearance: "bottomStrip",
-                  className: "h-full min-w-0 w-full",
-                  onNavigateUrl: onSportsBrowserNewsTickerNavigate
-                }
-              ) })
-            }
-          ) : null,
           /* @__PURE__ */ (0, import_jsx_runtime243.jsxs)("div", { className: "flex min-h-0 min-w-0 flex-1 overflow-hidden", children: [
             /* @__PURE__ */ (0, import_jsx_runtime243.jsx)(
               SportsBrowserPrototypeLeftNav,
@@ -149876,7 +149878,8 @@ function HomePage() {
                 onCommandCenterDestinationSelect,
                 onCommandCenterBrowserTabSelect: () => onSelectSportsBrowserTab(COMMAND_CENTER_SPORTS_BROWSER_TAB_ID),
                 onNavigableGamesChange: onSportsBrowserSidebarNavigableGamesChange,
-                onNavigableLeagueKeysChange: onSportsBrowserSidebarNavigableLeagueKeysChange
+                onNavigableLeagueKeysChange: onSportsBrowserSidebarNavigableLeagueKeysChange,
+                sidebarBottomNewsFeed: sportsBrowserSidebarBottomNewsFeed
               }
             ),
             /* @__PURE__ */ (0, import_jsx_runtime243.jsxs)("div", { className: "relative flex min-h-0 min-w-0 flex-1 overflow-hidden", children: [
