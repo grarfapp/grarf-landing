@@ -55001,6 +55001,7 @@ var GAMES_SPINE_LEAGUE_LOGO_URL = {
   CRICKET_BBL: "/league-logos/nav/big-bash-league.png",
   NCAAVB: "/league-logos/nav/volleyball-ncaaw.png",
   NCAAVB_M: "/league-logos/nav/volleyball-ncaam.png",
+  NCAAFH: "/league-logos/nav/ncaa-field-hockey.png",
   F1: "https://a.espncdn.com/i/teamlogos/leagues/500/f1.png",
   NASCAR: "/league-logos/nav/nascar-cup-series.png",
   INDYCAR: "/league-logos/nav/indycar.png",
@@ -133497,9 +133498,18 @@ function resolveSportsBrowserPrototypeSidebarSelectionPaneIndex(tab) {
   if (paneCount === 0) return 0;
   return Math.min(Math.max(0, tab.activePaneIndex ?? 0), paneCount - 1);
 }
+function resolveSportsBrowserPrototypeCommandCenterPrimaryBrowserPane(tab) {
+  if (tab.splitPaneCount > 1) {
+    const leftPane = tab.paneStates[0];
+    if (leftPane?.newsTimelineView || leftPane?.sidePaneTimelinePresentation) {
+      return tab.paneStates[1];
+    }
+  }
+  return tab.paneStates[0];
+}
 function isSportsBrowserPrototypeCommandCenterTabShowingPrimaryDestination(tab) {
   if (!isCommandCenterSportsBrowserPrototypeBrowserTab(tab)) return false;
-  const pane = tab.paneStates[0];
+  const pane = resolveSportsBrowserPrototypeCommandCenterPrimaryBrowserPane(tab);
   if (!pane) return true;
   if (pane.gameId?.trim()) return false;
   if (pane.leagueKey) return false;
@@ -133664,8 +133674,9 @@ function applySportsBrowserNewsTimelinePaneNavigation(viewState, items, directio
 
 // ../grarf/desktop/src/lib/home/applySportsBrowserNewsTickerNavigation.ts
 var SPORTS_BROWSER_NEWS_TICKER_CONTEXT_PANE_WIDTH_RATIO = 0.7;
-var SPORTS_BROWSER_NEWS_TICKER_PRIMARY_PANE_INDEX = 0;
-var SPORTS_BROWSER_NEWS_TICKER_SECONDARY_PANE_INDEX = 1;
+var SPORTS_BROWSER_NEWS_TICKER_ARTICLE_PANE_INDEX = 0;
+var SPORTS_BROWSER_NEWS_TICKER_BROWSER_PANE_INDEX = 1;
+var SPORTS_BROWSER_NEWS_TICKER_ARTICLE_PANE_LEFT_WIDTH_RATIO = 1 - SPORTS_BROWSER_NEWS_TICKER_CONTEXT_PANE_WIDTH_RATIO;
 function ensureNewsTickerSplitPaneStates(paneStates) {
   const next = paneStates.slice();
   while (next.length < 2) {
@@ -133695,18 +133706,19 @@ function applySportsBrowserNewsTickerNavigation(tab, request, _activePaneIndex) 
   const trimmedUrl = request.url.trim();
   if (!trimmedUrl) return tab;
   const nextPaneStates = ensureNewsTickerSplitPaneStates(tab.paneStates);
-  const priorPrimaryPane = nextPaneStates[SPORTS_BROWSER_NEWS_TICKER_PRIMARY_PANE_INDEX];
-  nextPaneStates[SPORTS_BROWSER_NEWS_TICKER_SECONDARY_PANE_INDEX] = applySportsBrowserNewsTickerUrlToPane(
+  const leftAuxiliaryPane = nextPaneStates[0]?.newsTimelineView || nextPaneStates[0]?.sidePaneTimelinePresentation;
+  const priorBrowserPane = leftAuxiliaryPane && nextPaneStates[1] ? nextPaneStates[1] : nextPaneStates[0] ?? createEmptySportsBrowserPrototypePaneState();
+  nextPaneStates[SPORTS_BROWSER_NEWS_TICKER_ARTICLE_PANE_INDEX] = applySportsBrowserNewsTickerUrlToPane(
     createEmptySportsBrowserPrototypePaneState(),
     request
   );
-  nextPaneStates[SPORTS_BROWSER_NEWS_TICKER_PRIMARY_PANE_INDEX] = priorPrimaryPane;
+  nextPaneStates[SPORTS_BROWSER_NEWS_TICKER_BROWSER_PANE_INDEX] = priorBrowserPane;
   return {
     ...tab,
     splitPaneCount: 2,
     paneStates: nextPaneStates,
-    activePaneIndex: SPORTS_BROWSER_NEWS_TICKER_SECONDARY_PANE_INDEX,
-    splitPaneLeftWidthRatio: SPORTS_BROWSER_NEWS_TICKER_CONTEXT_PANE_WIDTH_RATIO
+    activePaneIndex: SPORTS_BROWSER_NEWS_TICKER_ARTICLE_PANE_INDEX,
+    splitPaneLeftWidthRatio: SPORTS_BROWSER_NEWS_TICKER_ARTICLE_PANE_LEFT_WIDTH_RATIO
   };
 }
 
@@ -135338,8 +135350,9 @@ function applySportsBrowserPrototypeSidebarLiveGameSelection(tab, game) {
 
 // ../grarf/desktop/src/lib/home/applySportsBrowserOpenTimelineInSidePane.ts
 init_define_import_meta_env();
-var SPORTS_BROWSER_SIDE_PANE_TIMELINE_PRIMARY_PANE_INDEX = 0;
-var SPORTS_BROWSER_SIDE_PANE_TIMELINE_SECONDARY_PANE_INDEX = 1;
+var SPORTS_BROWSER_SIDE_PANE_TIMELINE_PANE_INDEX = 0;
+var SPORTS_BROWSER_SIDE_PANE_BROWSER_PANE_INDEX = 1;
+var SPORTS_BROWSER_SIDE_PANE_TIMELINE_LEFT_WIDTH_RATIO = 1 - SPORTS_BROWSER_NEWS_TICKER_CONTEXT_PANE_WIDTH_RATIO;
 function ensureSidePaneTimelineSplitPaneStates(paneStates) {
   const next = paneStates.slice();
   while (next.length < 2) {
@@ -135349,8 +135362,8 @@ function ensureSidePaneTimelineSplitPaneStates(paneStates) {
 }
 function applySportsBrowserOpenTimelineInSidePane(tab) {
   const nextPaneStates = ensureSidePaneTimelineSplitPaneStates(tab.paneStates);
-  const priorPrimaryPane = nextPaneStates[SPORTS_BROWSER_SIDE_PANE_TIMELINE_PRIMARY_PANE_INDEX];
-  nextPaneStates[SPORTS_BROWSER_SIDE_PANE_TIMELINE_SECONDARY_PANE_INDEX] = {
+  const priorBrowserPane = nextPaneStates[0] ?? createEmptySportsBrowserPrototypePaneState();
+  nextPaneStates[SPORTS_BROWSER_SIDE_PANE_TIMELINE_PANE_INDEX] = {
     ...createEmptySportsBrowserPrototypePaneState(),
     url: null,
     leagueKey: null,
@@ -135360,23 +135373,23 @@ function applySportsBrowserOpenTimelineInSidePane(tab) {
     showWebsiteTabs: false,
     sidePaneTimelinePresentation: true
   };
-  nextPaneStates[SPORTS_BROWSER_SIDE_PANE_TIMELINE_PRIMARY_PANE_INDEX] = priorPrimaryPane;
+  nextPaneStates[SPORTS_BROWSER_SIDE_PANE_BROWSER_PANE_INDEX] = priorBrowserPane;
   return {
     ...tab,
     splitPaneCount: 2,
     paneStates: nextPaneStates,
-    activePaneIndex: SPORTS_BROWSER_SIDE_PANE_TIMELINE_SECONDARY_PANE_INDEX,
-    splitPaneLeftWidthRatio: SPORTS_BROWSER_NEWS_TICKER_CONTEXT_PANE_WIDTH_RATIO
+    activePaneIndex: SPORTS_BROWSER_SIDE_PANE_TIMELINE_PANE_INDEX,
+    splitPaneLeftWidthRatio: SPORTS_BROWSER_SIDE_PANE_TIMELINE_LEFT_WIDTH_RATIO
   };
 }
 function applySportsBrowserCloseTimelineInSidePane(tab) {
-  if (!tab.paneStates[1]?.sidePaneTimelinePresentation) return tab;
+  if (!tab.paneStates[0]?.sidePaneTimelinePresentation) return tab;
   return {
     ...tab,
     splitPaneCount: 1,
     activePaneIndex: 0,
     splitPaneLeftWidthRatio: void 0,
-    paneStates: [tab.paneStates[0] ?? createEmptySportsBrowserPrototypePaneState()]
+    paneStates: [tab.paneStates[1] ?? createEmptySportsBrowserPrototypePaneState()]
   };
 }
 
@@ -140448,15 +140461,13 @@ var SPORTS_BROWSER_PROTOTYPE_BROWSER_WORKSPACE_BORDER_PX = 1;
 var SPORTS_BROWSER_PROTOTYPE_SPLIT_PANE_RESIZE_HANDLE_WIDTH_PX = 4;
 var SPORTS_BROWSER_PROTOTYPE_BROWSER_WORKSPACE_OUTER_HORIZONTAL_PADDING_PX = SPORTS_BROWSER_PROTOTYPE_BROWSER_WORKSPACE_MARGIN_PX * 2;
 var SPORTS_BROWSER_PROTOTYPE_BROWSER_WORKSPACE_SPLIT_ORIGIN_OFFSET_PX = SPORTS_BROWSER_PROTOTYPE_LEFT_NAV_WIDTH_PX + SPORTS_BROWSER_PROTOTYPE_BROWSER_WORKSPACE_MARGIN_PX + SPORTS_BROWSER_PROTOTYPE_BROWSER_WORKSPACE_BORDER_PX + SPORTS_BROWSER_PROTOTYPE_BROWSER_WORKSPACE_MARGIN_PX;
-var SPORTS_BROWSER_PROTOTYPE_NEWS_TICKER_ARTICLE_PANE_WIDTH_RATIO = SPORTS_BROWSER_NEWS_TICKER_CONTEXT_PANE_WIDTH_RATIO;
+var SPORTS_BROWSER_PROTOTYPE_NEWS_TICKER_ARTICLE_PANE_WIDTH_RATIO = 1 - SPORTS_BROWSER_NEWS_TICKER_CONTEXT_PANE_WIDTH_RATIO;
 var SPORTS_BROWSER_PROTOTYPE_ARTICLE_PANE_LEFT_CSS_VAR = "--sports-browser-article-pane-left";
 var SPORTS_BROWSER_PROTOTYPE_NEWS_TICKER_ARTICLE_PANE_SPLIT_GRID_CLIENT_OFFSET_PX = SPORTS_BROWSER_PROTOTYPE_LEFT_NAV_WIDTH_PX + SPORTS_BROWSER_PROTOTYPE_BROWSER_WORKSPACE_OUTER_HORIZONTAL_PADDING_PX;
 var SPORTS_BROWSER_PROTOTYPE_NEWS_TICKER_ARTICLE_PANE_LEFT_BASE_PX = SPORTS_BROWSER_PROTOTYPE_BROWSER_WORKSPACE_SPLIT_ORIGIN_OFFSET_PX + SPORTS_BROWSER_PROTOTYPE_SPLIT_PANE_RESIZE_HANDLE_WIDTH_PX;
-var SPORTS_BROWSER_PROTOTYPE_NEWS_TICKER_ARTICLE_PANE_LEFT_CSS = `calc(${SPORTS_BROWSER_PROTOTYPE_NEWS_TICKER_ARTICLE_PANE_LEFT_BASE_PX}px + (100% - ${SPORTS_BROWSER_PROTOTYPE_NEWS_TICKER_ARTICLE_PANE_SPLIT_GRID_CLIENT_OFFSET_PX}px) * ${SPORTS_BROWSER_PROTOTYPE_NEWS_TICKER_ARTICLE_PANE_WIDTH_RATIO})`;
-function resolveSportsBrowserPrototypeNewsTickerArticlePaneLeftPx(shellWidthPx) {
-  const workspaceWidthPx = shellWidthPx - SPORTS_BROWSER_PROTOTYPE_LEFT_NAV_WIDTH_PX;
-  const splitGridClientWidthPx = workspaceWidthPx - SPORTS_BROWSER_PROTOTYPE_BROWSER_WORKSPACE_OUTER_HORIZONTAL_PADDING_PX;
-  return SPORTS_BROWSER_PROTOTYPE_BROWSER_WORKSPACE_SPLIT_ORIGIN_OFFSET_PX + splitGridClientWidthPx * SPORTS_BROWSER_PROTOTYPE_NEWS_TICKER_ARTICLE_PANE_WIDTH_RATIO + SPORTS_BROWSER_PROTOTYPE_SPLIT_PANE_RESIZE_HANDLE_WIDTH_PX;
+var SPORTS_BROWSER_PROTOTYPE_NEWS_TICKER_ARTICLE_PANE_LEFT_CSS = `calc(${SPORTS_BROWSER_PROTOTYPE_BROWSER_WORKSPACE_SPLIT_ORIGIN_OFFSET_PX}px)`;
+function resolveSportsBrowserPrototypeNewsTickerArticlePaneLeftPx(_shellWidthPx) {
+  return SPORTS_BROWSER_PROTOTYPE_BROWSER_WORKSPACE_SPLIT_ORIGIN_OFFSET_PX;
 }
 
 // ../grarf/desktop/src/lib/home/newsBrowserFocusSession.ts
@@ -141494,8 +141505,10 @@ function SportsBrowserPrototypeBrowserWorkspace({
     const shell = grid?.closest("[data-sports-browser-prototype-shell]");
     if (!grid || !shell) return;
     const publishArticlePaneLeft = () => {
+      const leftDockedAuxiliaryPane = paneStates[0]?.newsTimelineView || paneStates[0]?.sidePaneTimelinePresentation;
+      const articlePaneColumnIndex = leftDockedAuxiliaryPane ? 0 : 1;
       const articlePaneColumn = grid.querySelector(
-        '[data-sports-browser-prototype-browser-pane-column="1"]'
+        `[data-sports-browser-prototype-browser-pane-column="${articlePaneColumnIndex}"]`
       );
       if (resizableTwoPaneMode && articlePaneColumn) {
         const shellRect = shell.getBoundingClientRect();
@@ -141516,7 +141529,7 @@ function SportsBrowserPrototypeBrowserWorkspace({
     observer.observe(shell);
     observer.observe(grid);
     return () => observer.disconnect();
-  }, [resizableTwoPaneMode, splitLeftWidthPx, splitLeftRatio]);
+  }, [resizableTwoPaneMode, splitLeftWidthPx, splitLeftRatio, paneStates]);
   const activatePane = (0, import_react262.useCallback)(
     (index) => {
       onActivePaneIndexChange?.(index);
@@ -149453,7 +149466,7 @@ function HomePage() {
       return;
     }
     updateActiveTabWithPaneHistory((tab) => {
-      const next = tab.paneStates[1]?.sidePaneTimelinePresentation ? applySportsBrowserCloseTimelineInSidePane(tab) : tab;
+      const next = tab.paneStates[0]?.sidePaneTimelinePresentation ? applySportsBrowserCloseTimelineInSidePane(tab) : tab;
       sportsBrowserActivePaneIndexRef.current = next.activePaneIndex;
       return next;
     }, 1);
@@ -149471,19 +149484,19 @@ function HomePage() {
     let contextUrl = null;
     let openedSidePaneTimeline = false;
     updateActiveTabWithPaneHistory((tab) => {
-      if (tab.paneStates[1]?.sidePaneTimelinePresentation) {
+      if (tab.paneStates[0]?.sidePaneTimelinePresentation) {
         const next2 = applySportsBrowserCloseTimelineInSidePane(tab);
         sportsBrowserActivePaneIndexRef.current = next2.activePaneIndex;
         return next2;
       }
-      const secondaryPane = tab.paneStates[1];
-      if (secondaryPane?.newsTimelineView) {
+      const browserPane = tab.paneStates[0];
+      if (browserPane?.newsTimelineView) {
         contextUrl = resolveNewsTimelinePaneUrl(
-          secondaryPane.newsTimelineView,
+          browserPane.newsTimelineView,
           centerPaneTimelineItems
         );
-      } else if (secondaryPane?.url) {
-        contextUrl = secondaryPane.url;
+      } else if (browserPane?.url) {
+        contextUrl = browserPane.url;
       }
       openedSidePaneTimeline = true;
       const next = applySportsBrowserOpenTimelineInSidePane(tab);
@@ -149551,7 +149564,7 @@ function HomePage() {
   const showSportsBrowserMainTimelineContent = isSportsBrowserPrototype && centerPaneNowPresentationMode === "timeline";
   const showSportsBrowserPrototypeCommandCenterWorkspace = !showSportsBrowserMainTimelineContent && sportsBrowserMainContentRenderBranch === "commandCenter";
   const sportsBrowserPaneStates = activeSportsBrowserTab?.paneStates ?? [];
-  const isSportsBrowserSidePaneTimelineActive = isSportsBrowserPrototype && !showSportsBrowserMainTimelineContent && Boolean(sportsBrowserPaneStates[1]?.sidePaneTimelinePresentation);
+  const isSportsBrowserSidePaneTimelineActive = isSportsBrowserPrototype && !showSportsBrowserMainTimelineContent && Boolean(sportsBrowserPaneStates[0]?.sidePaneTimelinePresentation);
   const isSportsBrowserFullScreenTimelineActive = showSportsBrowserMainTimelineContent;
   const sportsBrowserSplitPaneCount = activeSportsBrowserTab?.splitPaneCount ?? 1;
   const sportsBrowserActivePaneIndex = activeSportsBrowserTab?.activePaneIndex ?? 0;
