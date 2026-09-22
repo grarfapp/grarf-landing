@@ -25779,6 +25779,9 @@ function resolveSportKeyForLeague(leagueKey) {
 function sportLeagueKeys(sportKey) {
   return GRARF_SPORT_HIERARCHY[sportKey]?.leagueKeys ?? [];
 }
+function resolveSportDirectorySectionId(sportKey) {
+  return GRARF_SPORT_HIERARCHY[sportKey]?.directorySectionId;
+}
 
 // ../grarf/desktop/shared/golfWatchUrls.js
 init_define_import_meta_env();
@@ -145478,6 +145481,111 @@ function useSportsBrowserPrototypeTodayTemporalSlate() {
   return { catchUpLeagues, yesterdayLeagues, nowLeagues, upcomingLeagues };
 }
 
+// ../grarf/desktop/src/lib/gamesSpine/resolveSportsBrowserPrototypeSidebarLeaguesGroupedSections.ts
+init_define_import_meta_env();
+var ESPN_SPORT_TO_DIRECTORY_SECTION_ID = {
+  football: "football",
+  basketball: "basketball",
+  baseball: "baseball",
+  soccer: "soccer",
+  hockey: "hockey",
+  golf: "golf",
+  tennis: "tennis",
+  cricket: "cricket",
+  volleyball: "volleyball",
+  rugby: "rugby",
+  racing: "motorsports",
+  mma: "combat",
+  "australian-football": "rugby",
+  lacrosse: "ungrouped",
+  "field-hockey": "ungrouped",
+  "water-polo": "ungrouped"
+};
+var ESPN_LABEL_BY_KEY = new Map(
+  ESPN_OPERATIONAL_INGEST_LEAGUES.map((row) => [row.key, row.label])
+);
+function collectSidebarLeaguesUniverseKeys() {
+  const keys = /* @__PURE__ */ new Set();
+  for (const row of ESPN_OPERATIONAL_INGEST_LEAGUES) {
+    keys.add(row.key);
+  }
+  for (const key2 of Object.keys(SPORTS_BROWSER_PROTOTYPE_LEAGUE_WEBSITES)) {
+    keys.add(key2);
+  }
+  for (const item of flattenLeagueDirectorySectionItems(getLeagueDirectoryV1ForNav())) {
+    if (item.grarfLeagueKey) {
+      keys.add(item.grarfLeagueKey);
+    }
+  }
+  return [...keys];
+}
+function buildDirectoryLeagueSectionIdMap() {
+  const out = /* @__PURE__ */ new Map();
+  for (const section of getLeagueDirectoryV1ForNav()) {
+    if (section.id === "on-today") continue;
+    for (const item of [...section.items, ...section.expansionItems ?? []]) {
+      if (item.grarfLeagueKey) {
+        out.set(item.grarfLeagueKey, section.id);
+      }
+    }
+  }
+  return out;
+}
+function resolveSidebarLeaguesDisplayLabel(leagueKey) {
+  const directoryItem = resolveLeagueDirectoryItemByGrarfLeagueKey(leagueKey);
+  if (directoryItem) {
+    return resolveMainMenuLeagueDirectoryLabel(directoryItem);
+  }
+  return ESPN_LABEL_BY_KEY.get(leagueKey) ?? leagueKey;
+}
+function resolveSidebarLeaguesSectionId(leagueKey, directorySectionByKey) {
+  const fromDirectory = directorySectionByKey.get(leagueKey);
+  if (fromDirectory) return fromDirectory;
+  const sportKey = resolveSportKeyForLeague(leagueKey);
+  if (sportKey) {
+    return resolveSportDirectorySectionId(sportKey) ?? "ungrouped";
+  }
+  const espnSport = ESPN_OPERATIONAL_INGEST_LEAGUES.find((row) => row.key === leagueKey)?.sport;
+  if (espnSport && ESPN_SPORT_TO_DIRECTORY_SECTION_ID[espnSport]) {
+    return ESPN_SPORT_TO_DIRECTORY_SECTION_ID[espnSport];
+  }
+  return "ungrouped";
+}
+function compareSidebarLeagueRows(a2, b2) {
+  const byLabel = a2.label.localeCompare(b2.label, void 0, { sensitivity: "base" });
+  if (byLabel !== 0) return byLabel;
+  return a2.leagueKey.localeCompare(b2.leagueKey);
+}
+function resolveSportsBrowserPrototypeSidebarLeaguesGroupedSections() {
+  const directorySectionByKey = buildDirectoryLeagueSectionIdMap();
+  const leaguesBySection = /* @__PURE__ */ new Map();
+  for (const leagueKey of collectSidebarLeaguesUniverseKeys()) {
+    const sectionId = resolveSidebarLeaguesSectionId(leagueKey, directorySectionByKey);
+    const row = {
+      leagueKey,
+      label: resolveSidebarLeaguesDisplayLabel(leagueKey)
+    };
+    const bucket = leaguesBySection.get(sectionId);
+    if (bucket) bucket.push(row);
+    else leaguesBySection.set(sectionId, [row]);
+  }
+  for (const rows of leaguesBySection.values()) {
+    rows.sort(compareSidebarLeagueRows);
+  }
+  const sections = getLeagueDirectoryV1ForNav().filter((section) => section.id !== "on-today");
+  return sections.map((section) => {
+    const leagues = leaguesBySection.get(section.id) ?? [];
+    if (leagues.length === 0) return null;
+    return {
+      sectionId: section.id,
+      title: leagueDirectorySectionTitleLabel(section),
+      hideHeader: section.hideHeader === true,
+      navGroupBreakBefore: section.navGroupBreakBefore,
+      leagues
+    };
+  }).filter((group) => group != null);
+}
+
 // ../grarf/desktop/src/components/homeMvp/SportsBrowserPrototypeLeftNav.tsx
 var import_jsx_runtime238 = __toESM(require_jsx_runtime(), 1);
 var MENU_SURFACE2 = "bg-[#f3f0ea] text-[#1a1a1a]";
@@ -146750,13 +146858,37 @@ function SidebarYesterdaySectionLeagues({
     )
   ] });
 }
-var SPORTS_BROWSER_PROTOTYPE_SIDEBAR_LEAGUES_SECTION_KEYS = [
-  "MLB",
-  "NFL",
-  "NBA",
-  "NHL",
-  "EPL"
+function SidebarLeaguesSportGroupHeader({
+  sectionId,
+  title,
+  hideHeader,
+  navGroupBreakBefore
+}) {
+  if (hideHeader && navGroupBreakBefore) {
+    return /* @__PURE__ */ (0, import_jsx_runtime238.jsx)("div", { className: "h-1 shrink-0", "aria-hidden": true, "data-sports-browser-prototype-sidebar-leagues-sport-group": sectionId });
+  }
+  if (!title) return null;
+  return /* @__PURE__ */ (0, import_jsx_runtime238.jsx)(
+    "div",
+    {
+      className: "px-6 py-[4px] text-[11px] font-semibold uppercase tracking-[0.04em] text-[#8a847c]",
+      "data-sports-browser-prototype-sidebar-leagues-sport-group": sectionId,
+      children: title
+    }
+  );
+}
+var SIDEBAR_LEAGUES_SORT_CONTROLS = [
+  { id: "on-today", label: "ON TODAY" },
+  { id: "group", label: "GROUP" },
+  { id: "rank", label: "123" },
+  { id: "alpha", label: "A-Z" }
 ];
+function resolveSidebarLeaguesSortControlClass(mode, activeMode) {
+  if (mode !== activeMode) {
+    return "text-[10px] font-normal text-[#8a857d] hover:text-[#1a1a1a]";
+  }
+  return "text-[10px] font-medium text-[#1a1a1a] underline decoration-[#1a1a1a]/70 decoration-1 underline-offset-[3px]";
+}
 function LeaguesFilterField() {
   return /* @__PURE__ */ (0, import_jsx_runtime238.jsxs)("div", { className: "flex items-center gap-1.5 px-6 py-1", children: [
     /* @__PURE__ */ (0, import_jsx_runtime238.jsx)(Search, { size: 11, strokeWidth: 2, className: "shrink-0 text-[#8a847c]", "aria-hidden": true }),
@@ -146778,23 +146910,72 @@ function LeaguesFilterField() {
     )
   ] });
 }
+function LeaguesSortControls({
+  activeMode,
+  onModeChange
+}) {
+  return /* @__PURE__ */ (0, import_jsx_runtime238.jsx)(
+    "div",
+    {
+      className: cn2(
+        "flex shrink-0 items-center gap-3 px-6 pb-1 pt-0.5",
+        SPORTS_BROWSER_PROTOTYPE_CONTEXT_NAV_CHILD_GAP_CLASS
+      ),
+      role: "group",
+      "aria-label": "League list sort",
+      "data-sports-browser-prototype-sidebar-leagues-sort-controls": "",
+      children: SIDEBAR_LEAGUES_SORT_CONTROLS.map(({ id, label }) => /* @__PURE__ */ (0, import_jsx_runtime238.jsx)(
+        "button",
+        {
+          type: "button",
+          onClick: () => onModeChange(id),
+          "aria-pressed": activeMode === id,
+          className: cn2(
+            "shrink-0 whitespace-nowrap uppercase tracking-[0.04em] transition-colors",
+            resolveSidebarLeaguesSortControlClass(id, activeMode)
+          ),
+          "data-sports-browser-prototype-sidebar-leagues-sort-mode": id,
+          children: label
+        },
+        id
+      ))
+    }
+  );
+}
 function SidebarLeaguesSectionBody({
   selectedLeagueKey,
   onLeagueSelect
 }) {
+  const [leaguesSortMode, setLeaguesSortMode] = (0, import_react269.useState)("on-today");
+  const groupedLeagueSections = (0, import_react269.useMemo)(
+    () => resolveSportsBrowserPrototypeSidebarLeaguesGroupedSections(),
+    []
+  );
   return /* @__PURE__ */ (0, import_jsx_runtime238.jsxs)(import_jsx_runtime238.Fragment, { children: [
     /* @__PURE__ */ (0, import_jsx_runtime238.jsx)(LeaguesFilterField, {}),
-    SPORTS_BROWSER_PROTOTYPE_SIDEBAR_LEAGUES_SECTION_KEYS.map((leagueKey) => /* @__PURE__ */ (0, import_jsx_runtime238.jsx)(
-      NavRow,
-      {
-        label: leagueKey,
-        indent: 1,
-        leagueKey,
-        onClick: () => onLeagueSelect?.(leagueKey),
-        isSelected: selectedLeagueKey === leagueKey
-      },
-      leagueKey
-    ))
+    /* @__PURE__ */ (0, import_jsx_runtime238.jsx)(LeaguesSortControls, { activeMode: leaguesSortMode, onModeChange: setLeaguesSortMode }),
+    groupedLeagueSections.map((group) => /* @__PURE__ */ (0, import_jsx_runtime238.jsxs)(import_react269.Fragment, { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime238.jsx)(
+        SidebarLeaguesSportGroupHeader,
+        {
+          sectionId: group.sectionId,
+          title: group.title,
+          hideHeader: group.hideHeader,
+          navGroupBreakBefore: group.navGroupBreakBefore
+        }
+      ),
+      group.leagues.map(({ leagueKey, label }) => /* @__PURE__ */ (0, import_jsx_runtime238.jsx)(
+        NavRow,
+        {
+          label,
+          indent: 1,
+          leagueKey,
+          onClick: () => onLeagueSelect?.(leagueKey),
+          isSelected: selectedLeagueKey === leagueKey
+        },
+        leagueKey
+      ))
+    ] }, group.sectionId))
   ] });
 }
 function SportsBrowserPrototypeLeftNav({
