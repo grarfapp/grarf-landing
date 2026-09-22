@@ -135790,6 +135790,45 @@ var MLB_UPCOMING_GAME_WORKSPACE_CHILD_SECTION_LABELS = {
   social: "SOCIAL",
   picks: "PICKS"
 };
+var MLB_UPCOMING_GAME_CENTER_SOURCE_LABELS = {
+  espn: "ESPN",
+  mlb: "MLB.com"
+};
+function resolveMlbUpcomingGameWorkspaceGameCenterWebsites(context2) {
+  const fromContext = context2.gameCenter;
+  const espnSite = fromContext.find((website4) => website4.label.trim().toUpperCase().includes("ESPN")) ?? fromContext.find((website4) => {
+    const url = website4.url.trim();
+    if (!url) return false;
+    try {
+      return new URL(url).hostname === "www.espn.com";
+    } catch {
+      return false;
+    }
+  });
+  const mlbSite = fromContext.find((website4) => /mlb gameday/i.test(website4.label.trim())) ?? fromContext.find((website4) => {
+    const url = website4.url.trim();
+    if (!url) return false;
+    try {
+      return new URL(url).hostname === "www.mlb.com";
+    } catch {
+      return false;
+    }
+  });
+  const websites = [];
+  if (espnSite?.url?.trim()) {
+    websites.push({
+      label: MLB_UPCOMING_GAME_CENTER_SOURCE_LABELS.espn,
+      url: espnSite.url.trim()
+    });
+  }
+  if (mlbSite?.url?.trim()) {
+    websites.push({
+      label: MLB_UPCOMING_GAME_CENTER_SOURCE_LABELS.mlb,
+      url: mlbSite.url.trim()
+    });
+  }
+  return websites;
+}
 function isMlbUpcomingGameWorkspace(game, nowMs2 = Date.now()) {
   return game.league === "MLB" && !isOperationalGameNow(game, nowMs2) && !isOperationalGameCompleted(game, nowMs2);
 }
@@ -135818,7 +135857,7 @@ function resolveMlbUpcomingGameWorkspaceChildSectionUrl(game, context2, section,
       return websites[safeIndex]?.url?.trim() ?? websites[0]?.url?.trim() ?? null;
     }
     case "gameCenter": {
-      const websites = context2.gameCenter;
+      const websites = resolveMlbUpcomingGameWorkspaceGameCenterWebsites(context2);
       const safeIndex = websites.length > 0 ? Math.min(Math.max(0, sourceIndex), websites.length - 1) : 0;
       return websites[safeIndex]?.url?.trim() ?? websites[0]?.url?.trim() ?? null;
     }
@@ -135838,7 +135877,7 @@ function resolveMlbUpcomingGameWorkspaceChildSourceWebsites(game, context2, sect
     case "preview":
       return resolveSportsBrowserPrototypeGameContextContentSourceWebsites(game, context2, "preview");
     case "gameCenter":
-      return context2.gameCenter;
+      return resolveMlbUpcomingGameWorkspaceGameCenterWebsites(context2);
     case "social":
       return context2.social;
     case "story":
@@ -135942,7 +135981,7 @@ function applyMlbUpcomingGameWorkspaceChildSectionToPane(pane, game, context2, s
   }
   const currentSection = resolveMlbUpcomingGameWorkspaceChildSection(pane);
   if (currentSection === section) return pane;
-  const sourceIndex = section === "preview" ? pane.gameContextPreviewSourceIndex ?? 0 : 0;
+  const sourceIndex = section === "preview" ? pane.gameContextPreviewSourceIndex ?? 0 : section === "gameCenter" ? 0 : pane.activeTabIndex ?? 0;
   const url = resolveMlbUpcomingGameWorkspaceChildSectionUrl(
     game,
     context2,
@@ -142033,8 +142072,16 @@ function MlbUpcomingGameWorkspaceBrowserNav({
     [awayTeamLabel, homeTeamLabel]
   );
   const measureRef = (0, import_react260.useRef)(null);
+  const gameCenterControlRef = (0, import_react260.useRef)(null);
   const [parentTabWidthPx, setParentTabWidthPx] = (0, import_react260.useState)(null);
+  const [gameCenterMenuOpen, setGameCenterMenuOpen] = (0, import_react260.useState)(false);
+  const [gameCenterMenuPosition, setGameCenterMenuPosition] = (0, import_react260.useState)(null);
   const parentMeasureKey = (0, import_react260.useMemo)(() => parentLabels.join("\0"), [parentLabels]);
+  const gameCenterWebsites = (0, import_react260.useMemo)(
+    () => resolveMlbUpcomingGameWorkspaceGameCenterWebsites(context2),
+    [context2]
+  );
+  const activeWebsiteIndex = paneState.activeTabIndex ?? 0;
   (0, import_react260.useLayoutEffect)(() => {
     const measureRoot = measureRef.current;
     if (!measureRoot) return;
@@ -142044,10 +142091,35 @@ function MlbUpcomingGameWorkspaceBrowserNav({
     });
     setParentTabWidthPx(maxWidth > 0 ? maxWidth : null);
   }, [parentMeasureKey]);
+  (0, import_react260.useLayoutEffect)(() => {
+    if (childSection !== "gameCenter") {
+      setGameCenterMenuOpen(false);
+    }
+  }, [childSection]);
+  (0, import_react260.useLayoutEffect)(() => {
+    if (!gameCenterMenuOpen) {
+      setGameCenterMenuPosition(null);
+      return;
+    }
+    const control = gameCenterControlRef.current;
+    if (!control) return;
+    const rect = control.getBoundingClientRect();
+    setGameCenterMenuPosition({ top: rect.bottom, left: rect.left });
+  }, [gameCenterMenuOpen, childSection, activeWebsiteIndex]);
+  (0, import_react260.useEffect)(() => {
+    if (!gameCenterMenuOpen) return;
+    const onPointerDown = (event) => {
+      const control = gameCenterControlRef.current;
+      if (!control || control.contains(event.target)) return;
+      setGameCenterMenuOpen(false);
+    };
+    document.addEventListener("pointerdown", onPointerDown);
+    return () => document.removeEventListener("pointerdown", onPointerDown);
+  }, [gameCenterMenuOpen]);
   const parentTabStyle = parentTabWidthPx ? { width: parentTabWidthPx, minWidth: parentTabWidthPx, maxWidth: parentTabWidthPx } : void 0;
-  const gameChildWebsites = parentTab === "game" ? resolveMlbUpcomingGameWorkspaceChildSourceWebsites(game, context2, childSection) : [];
-  const activeWebsiteIndex = paneState.activeTabIndex ?? 0;
+  const previewChildWebsites = parentTab === "game" && childSection === "preview" ? resolveMlbUpcomingGameWorkspaceChildSourceWebsites(game, context2, "preview") : [];
   const activeTeamSectionIndex = resolveMlbUpcomingGameWorkspaceTeamContextSectionIndex(paneState);
+  const selectedGameCenterLabel = childSection === "gameCenter" ? gameCenterWebsites[activeWebsiteIndex]?.label ?? gameCenterWebsites[0]?.label ?? null : null;
   return /* @__PURE__ */ (0, import_jsx_runtime226.jsxs)(
     "div",
     {
@@ -142112,8 +142184,106 @@ function MlbUpcomingGameWorkspaceBrowserNav({
               MLB_UPCOMING_GAME_WORKSPACE_CHILD_SECTIONS.map((section) => {
                 const label = MLB_UPCOMING_GAME_WORKSPACE_CHILD_SECTION_LABELS[section];
                 const childActive = childSection === section;
-                const showChevron = section === "gameCenter";
-                return /* @__PURE__ */ (0, import_jsx_runtime226.jsxs)(
+                if (section === "gameCenter") {
+                  return /* @__PURE__ */ (0, import_jsx_runtime226.jsxs)(
+                    "div",
+                    {
+                      ref: gameCenterControlRef,
+                      className: "relative inline-flex shrink-0 items-center",
+                      "data-mlb-upcoming-game-workspace-game-center-dropdown": true,
+                      children: [
+                        /* @__PURE__ */ (0, import_jsx_runtime226.jsxs)(
+                          "button",
+                          {
+                            type: "button",
+                            role: "tab",
+                            "aria-selected": childActive,
+                            onClick: () => {
+                              if (!childActive) {
+                                onChildSectionSelect(section);
+                              }
+                              setGameCenterMenuOpen(false);
+                            },
+                            className: cn2(
+                              CHILD_BUTTON_BASE,
+                              "gap-1",
+                              childActive ? CHILD_ACTIVE_CLASS : CHILD_INACTIVE_CLASS
+                            ),
+                            children: [
+                              /* @__PURE__ */ (0, import_jsx_runtime226.jsx)("span", { children: label }),
+                              selectedGameCenterLabel ? /* @__PURE__ */ (0, import_jsx_runtime226.jsx)("span", { className: "font-normal opacity-80", children: selectedGameCenterLabel }) : null
+                            ]
+                          }
+                        ),
+                        /* @__PURE__ */ (0, import_jsx_runtime226.jsx)(
+                          "button",
+                          {
+                            type: "button",
+                            "aria-label": "Open game center sources",
+                            "aria-expanded": gameCenterMenuOpen,
+                            "aria-haspopup": "menu",
+                            onClick: (event) => {
+                              event.stopPropagation();
+                              if (!childActive) {
+                                onChildSectionSelect("gameCenter");
+                              }
+                              setGameCenterMenuOpen((open) => !open);
+                            },
+                            className: cn2(
+                              CHILD_BUTTON_BASE,
+                              "px-0",
+                              childActive ? CHILD_ACTIVE_CLASS : CHILD_INACTIVE_CLASS
+                            ),
+                            children: /* @__PURE__ */ (0, import_jsx_runtime226.jsx)(
+                              ChevronDown,
+                              {
+                                size: 12,
+                                strokeWidth: 2,
+                                className: "shrink-0 opacity-80",
+                                "aria-hidden": true
+                              }
+                            )
+                          }
+                        ),
+                        gameCenterMenuOpen && gameCenterMenuPosition && gameCenterWebsites.length > 0 ? /* @__PURE__ */ (0, import_jsx_runtime226.jsx)(
+                          "div",
+                          {
+                            role: "menu",
+                            className: "fixed z-[200] min-w-[7.5rem] border border-[#c8c4bc]/70 bg-[#f8f6f1] py-0.5 shadow-sm",
+                            style: {
+                              top: gameCenterMenuPosition.top,
+                              left: gameCenterMenuPosition.left
+                            },
+                            children: gameCenterWebsites.map((website4, websiteIndex) => {
+                              const websiteActive = websiteIndex === activeWebsiteIndex;
+                              return /* @__PURE__ */ (0, import_jsx_runtime226.jsx)(
+                                "button",
+                                {
+                                  type: "button",
+                                  role: "menuitemradio",
+                                  "aria-checked": websiteActive,
+                                  onClick: () => {
+                                    onChildSectionSelect("gameCenter");
+                                    onWebsiteTabSelect(websiteIndex);
+                                    setGameCenterMenuOpen(false);
+                                  },
+                                  className: cn2(
+                                    "flex w-full px-2 py-1 text-left text-[10px] transition-colors",
+                                    websiteActive ? "font-medium text-[#1a1a1a] bg-[#ece9e2]" : "font-normal text-[#6f6a62] hover:bg-[#ece9e2] hover:text-[#1a1a1a]"
+                                  ),
+                                  children: website4.label
+                                },
+                                website4.url
+                              );
+                            })
+                          }
+                        ) : null
+                      ]
+                    },
+                    section
+                  );
+                }
+                return /* @__PURE__ */ (0, import_jsx_runtime226.jsx)(
                   "button",
                   {
                     type: "button",
@@ -142122,26 +142292,14 @@ function MlbUpcomingGameWorkspaceBrowserNav({
                     onClick: () => onChildSectionSelect(section),
                     className: cn2(
                       CHILD_BUTTON_BASE,
-                      "gap-0.5",
                       childActive ? CHILD_ACTIVE_CLASS : CHILD_INACTIVE_CLASS
                     ),
-                    children: [
-                      /* @__PURE__ */ (0, import_jsx_runtime226.jsx)("span", { children: label }),
-                      showChevron ? /* @__PURE__ */ (0, import_jsx_runtime226.jsx)(
-                        ChevronDown,
-                        {
-                          size: 12,
-                          strokeWidth: 2,
-                          className: "shrink-0 opacity-80",
-                          "aria-hidden": true
-                        }
-                      ) : null
-                    ]
+                    children: label
                   },
                   section
                 );
               }),
-              gameChildWebsites.map((website4, websiteIndex) => {
+              previewChildWebsites.map((website4, websiteIndex) => {
                 const websiteActive = websiteIndex === activeWebsiteIndex;
                 return /* @__PURE__ */ (0, import_jsx_runtime226.jsx)(
                   "button",
@@ -142156,7 +142314,7 @@ function MlbUpcomingGameWorkspaceBrowserNav({
                     ),
                     children: website4.label
                   },
-                  `${childSection}-${website4.url}`
+                  `preview-${website4.url}`
                 );
               })
             ] }) : SPORTS_BROWSER_PROTOTYPE_LEAGUE_CONTEXT_SECTIONS.map((section, sectionIndex) => {
