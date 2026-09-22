@@ -142117,9 +142117,7 @@ function MlbUpcomingGameWorkspaceBrowserNav({
     return () => document.removeEventListener("pointerdown", onPointerDown);
   }, [gameCenterMenuOpen]);
   const parentTabStyle = parentTabWidthPx ? { width: parentTabWidthPx, minWidth: parentTabWidthPx, maxWidth: parentTabWidthPx } : void 0;
-  const previewChildWebsites = parentTab === "game" && childSection === "preview" ? resolveMlbUpcomingGameWorkspaceChildSourceWebsites(game, context2, "preview") : [];
   const activeTeamSectionIndex = resolveMlbUpcomingGameWorkspaceTeamContextSectionIndex(paneState);
-  const selectedGameCenterLabel = childSection === "gameCenter" ? gameCenterWebsites[activeWebsiteIndex]?.label ?? gameCenterWebsites[0]?.label ?? null : null;
   return /* @__PURE__ */ (0, import_jsx_runtime226.jsxs)(
     "div",
     {
@@ -142180,144 +142178,115 @@ function MlbUpcomingGameWorkspaceBrowserNav({
             ),
             "data-sports-browser-prototype-game-context-inline-child-tabs": true,
             "data-mlb-upcoming-game-workspace-child-tabs": true,
-            children: parentTab === "game" ? /* @__PURE__ */ (0, import_jsx_runtime226.jsxs)(import_jsx_runtime226.Fragment, { children: [
-              MLB_UPCOMING_GAME_WORKSPACE_CHILD_SECTIONS.map((section) => {
-                const label = MLB_UPCOMING_GAME_WORKSPACE_CHILD_SECTION_LABELS[section];
-                const childActive = childSection === section;
-                if (section === "gameCenter") {
-                  return /* @__PURE__ */ (0, import_jsx_runtime226.jsxs)(
-                    "div",
-                    {
-                      ref: gameCenterControlRef,
-                      className: "relative inline-flex shrink-0 items-center",
-                      "data-mlb-upcoming-game-workspace-game-center-dropdown": true,
-                      children: [
-                        /* @__PURE__ */ (0, import_jsx_runtime226.jsxs)(
-                          "button",
-                          {
-                            type: "button",
-                            role: "tab",
-                            "aria-selected": childActive,
-                            onClick: () => {
-                              if (!childActive) {
-                                onChildSectionSelect(section);
+            children: parentTab === "game" ? /* @__PURE__ */ (0, import_jsx_runtime226.jsx)(import_jsx_runtime226.Fragment, { children: MLB_UPCOMING_GAME_WORKSPACE_CHILD_SECTIONS.map((section) => {
+              const label = MLB_UPCOMING_GAME_WORKSPACE_CHILD_SECTION_LABELS[section];
+              const childActive = childSection === section;
+              if (section === "gameCenter") {
+                return /* @__PURE__ */ (0, import_jsx_runtime226.jsxs)(
+                  "div",
+                  {
+                    ref: gameCenterControlRef,
+                    className: "relative inline-flex shrink-0 items-center",
+                    "data-mlb-upcoming-game-workspace-game-center-dropdown": true,
+                    children: [
+                      /* @__PURE__ */ (0, import_jsx_runtime226.jsxs)(
+                        "button",
+                        {
+                          type: "button",
+                          role: "tab",
+                          "aria-selected": childActive,
+                          "aria-expanded": gameCenterMenuOpen,
+                          "aria-haspopup": "menu",
+                          onClick: (event) => {
+                            const chevronClicked = event.target.closest(
+                              "[data-mlb-upcoming-game-workspace-game-center-chevron]"
+                            );
+                            if (!childActive) {
+                              onChildSectionSelect(section);
+                              if (chevronClicked) {
+                                setGameCenterMenuOpen(true);
                               }
-                              setGameCenterMenuOpen(false);
-                            },
-                            className: cn2(
-                              CHILD_BUTTON_BASE,
-                              "gap-1",
-                              childActive ? CHILD_ACTIVE_CLASS : CHILD_INACTIVE_CLASS
-                            ),
-                            children: [
-                              /* @__PURE__ */ (0, import_jsx_runtime226.jsx)("span", { children: label }),
-                              selectedGameCenterLabel ? /* @__PURE__ */ (0, import_jsx_runtime226.jsx)("span", { className: "font-normal opacity-80", children: selectedGameCenterLabel }) : null
-                            ]
-                          }
-                        ),
-                        /* @__PURE__ */ (0, import_jsx_runtime226.jsx)(
-                          "button",
-                          {
-                            type: "button",
-                            "aria-label": "Open game center sources",
-                            "aria-expanded": gameCenterMenuOpen,
-                            "aria-haspopup": "menu",
-                            onClick: (event) => {
-                              event.stopPropagation();
-                              if (!childActive) {
-                                onChildSectionSelect("gameCenter");
-                              }
+                              return;
+                            }
+                            if (chevronClicked) {
                               setGameCenterMenuOpen((open) => !open);
-                            },
-                            className: cn2(
-                              CHILD_BUTTON_BASE,
-                              "px-0",
-                              childActive ? CHILD_ACTIVE_CLASS : CHILD_INACTIVE_CLASS
-                            ),
-                            children: /* @__PURE__ */ (0, import_jsx_runtime226.jsx)(
-                              ChevronDown,
+                              return;
+                            }
+                            setGameCenterMenuOpen(false);
+                          },
+                          className: cn2(
+                            CHILD_BUTTON_BASE,
+                            "gap-0.5",
+                            childActive ? CHILD_ACTIVE_CLASS : CHILD_INACTIVE_CLASS
+                          ),
+                          children: [
+                            /* @__PURE__ */ (0, import_jsx_runtime226.jsx)("span", { children: label }),
+                            /* @__PURE__ */ (0, import_jsx_runtime226.jsx)(
+                              "span",
                               {
-                                size: 12,
-                                strokeWidth: 2,
-                                className: "shrink-0 opacity-80",
-                                "aria-hidden": true
+                                "data-mlb-upcoming-game-workspace-game-center-chevron": true,
+                                className: "inline-flex shrink-0",
+                                "aria-hidden": true,
+                                children: /* @__PURE__ */ (0, import_jsx_runtime226.jsx)(ChevronDown, { size: 12, strokeWidth: 2, className: "opacity-80" })
                               }
                             )
-                          }
-                        ),
-                        gameCenterMenuOpen && gameCenterMenuPosition && gameCenterWebsites.length > 0 ? /* @__PURE__ */ (0, import_jsx_runtime226.jsx)(
-                          "div",
-                          {
-                            role: "menu",
-                            className: "fixed z-[200] min-w-[7.5rem] border border-[#c8c4bc]/70 bg-[#f8f6f1] py-0.5 shadow-sm",
-                            style: {
-                              top: gameCenterMenuPosition.top,
-                              left: gameCenterMenuPosition.left
-                            },
-                            children: gameCenterWebsites.map((website4, websiteIndex) => {
-                              const websiteActive = websiteIndex === activeWebsiteIndex;
-                              return /* @__PURE__ */ (0, import_jsx_runtime226.jsx)(
-                                "button",
-                                {
-                                  type: "button",
-                                  role: "menuitemradio",
-                                  "aria-checked": websiteActive,
-                                  onClick: () => {
-                                    onChildSectionSelect("gameCenter");
-                                    onWebsiteTabSelect(websiteIndex);
-                                    setGameCenterMenuOpen(false);
-                                  },
-                                  className: cn2(
-                                    "flex w-full px-2 py-1 text-left text-[10px] transition-colors",
-                                    websiteActive ? "font-medium text-[#1a1a1a] bg-[#ece9e2]" : "font-normal text-[#6f6a62] hover:bg-[#ece9e2] hover:text-[#1a1a1a]"
-                                  ),
-                                  children: website4.label
+                          ]
+                        }
+                      ),
+                      gameCenterMenuOpen && gameCenterMenuPosition && gameCenterWebsites.length > 0 ? /* @__PURE__ */ (0, import_jsx_runtime226.jsx)(
+                        "div",
+                        {
+                          role: "menu",
+                          className: "fixed z-[200] min-w-[7.5rem] border border-[#c8c4bc]/70 bg-[#f8f6f1] py-0.5 shadow-sm",
+                          style: {
+                            top: gameCenterMenuPosition.top,
+                            left: gameCenterMenuPosition.left
+                          },
+                          children: gameCenterWebsites.map((website4, websiteIndex) => {
+                            const websiteActive = websiteIndex === activeWebsiteIndex;
+                            return /* @__PURE__ */ (0, import_jsx_runtime226.jsx)(
+                              "button",
+                              {
+                                type: "button",
+                                role: "menuitemradio",
+                                "aria-checked": websiteActive,
+                                onClick: () => {
+                                  onChildSectionSelect("gameCenter");
+                                  onWebsiteTabSelect(websiteIndex);
+                                  setGameCenterMenuOpen(false);
                                 },
-                                website4.url
-                              );
-                            })
-                          }
-                        ) : null
-                      ]
-                    },
-                    section
-                  );
-                }
-                return /* @__PURE__ */ (0, import_jsx_runtime226.jsx)(
-                  "button",
-                  {
-                    type: "button",
-                    role: "tab",
-                    "aria-selected": childActive,
-                    onClick: () => onChildSectionSelect(section),
-                    className: cn2(
-                      CHILD_BUTTON_BASE,
-                      childActive ? CHILD_ACTIVE_CLASS : CHILD_INACTIVE_CLASS
-                    ),
-                    children: label
+                                className: cn2(
+                                  "flex w-full px-2 py-1 text-left text-[10px] transition-colors",
+                                  websiteActive ? "font-medium text-[#1a1a1a] bg-[#ece9e2]" : "font-normal text-[#6f6a62] hover:bg-[#ece9e2] hover:text-[#1a1a1a]"
+                                ),
+                                children: website4.label
+                              },
+                              website4.url
+                            );
+                          })
+                        }
+                      ) : null
+                    ]
                   },
                   section
                 );
-              }),
-              previewChildWebsites.map((website4, websiteIndex) => {
-                const websiteActive = websiteIndex === activeWebsiteIndex;
-                return /* @__PURE__ */ (0, import_jsx_runtime226.jsx)(
-                  "button",
-                  {
-                    type: "button",
-                    role: "tab",
-                    "aria-selected": websiteActive,
-                    onClick: () => onWebsiteTabSelect(websiteIndex),
-                    className: cn2(
-                      CHILD_BUTTON_BASE,
-                      websiteActive ? CHILD_ACTIVE_CLASS : CHILD_INACTIVE_CLASS
-                    ),
-                    children: website4.label
-                  },
-                  `preview-${website4.url}`
-                );
-              })
-            ] }) : SPORTS_BROWSER_PROTOTYPE_LEAGUE_CONTEXT_SECTIONS.map((section, sectionIndex) => {
+              }
+              return /* @__PURE__ */ (0, import_jsx_runtime226.jsx)(
+                "button",
+                {
+                  type: "button",
+                  role: "tab",
+                  "aria-selected": childActive,
+                  onClick: () => onChildSectionSelect(section),
+                  className: cn2(
+                    CHILD_BUTTON_BASE,
+                    childActive ? CHILD_ACTIVE_CLASS : CHILD_INACTIVE_CLASS
+                  ),
+                  children: label
+                },
+                section
+              );
+            }) }) : SPORTS_BROWSER_PROTOTYPE_LEAGUE_CONTEXT_SECTIONS.map((section, sectionIndex) => {
               const sectionActive = (activeTeamSectionIndex >= 0 ? activeTeamSectionIndex : 0) === sectionIndex;
               return /* @__PURE__ */ (0, import_jsx_runtime226.jsx)(
                 "button",
