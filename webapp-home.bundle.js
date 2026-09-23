@@ -150227,6 +150227,7 @@ function SportsBrowserPrototypeLeftNav({
   onCommandCenterBrowserTabSelect,
   onNavigableGamesChange,
   onNavigableLeagueKeysChange,
+  onSidebarTopLevelModeChange,
   selectedGameId = null,
   selectedLeagueKey = null,
   selectedSidebarArchLeagueKey = null,
@@ -150316,13 +150317,27 @@ function SportsBrowserPrototypeLeftNav({
       yesterdayOpen
     ]
   );
+  const [sidebarTopLevelMode, setSidebarTopLevelMode] = (0, import_react270.useState)("games");
+  const onSidebarTopLevelModeSelect = (0, import_react270.useCallback)((id) => {
+    setSidebarTopLevelMode(id);
+  }, []);
+  (0, import_react270.useEffect)(() => {
+    onSidebarTopLevelModeChange?.(sidebarTopLevelMode);
+  }, [onSidebarTopLevelModeChange, sidebarTopLevelMode]);
   (0, import_react270.useEffect)(() => {
     onNavigableGamesChange?.(navigableGames);
     traceGrarfLiveSidebarNavigableGames(navigableGames);
   }, [navigableGames, onNavigableGamesChange]);
   (0, import_react270.useEffect)(() => {
-    onNavigableLeagueKeysChange?.(navigableLeagueKeys);
-  }, [navigableLeagueKeys, onNavigableLeagueKeysChange]);
+    onNavigableLeagueKeysChange?.(
+      sidebarTopLevelMode === "leagues" ? todayCompleteLeagues.map((slate) => slate.key) : navigableLeagueKeys
+    );
+  }, [
+    navigableLeagueKeys,
+    onNavigableLeagueKeysChange,
+    sidebarTopLevelMode,
+    todayCompleteLeagues
+  ]);
   (0, import_react270.useEffect)(() => {
     if (hasUserSelectedTemporalView.current) return;
     if (hasAppliedInitialTemporalDefault.current) return;
@@ -150385,10 +150400,6 @@ function SportsBrowserPrototypeLeftNav({
         setTodayTab("upcoming");
         return;
     }
-  }, []);
-  const [sidebarTopLevelMode, setSidebarTopLevelMode] = (0, import_react270.useState)("games");
-  const onSidebarTopLevelModeSelect = (0, import_react270.useCallback)((id) => {
-    setSidebarTopLevelMode(id);
   }, []);
   const sidebarScrollContainerRef = (0, import_react270.useRef)(null);
   (0, import_react270.useLayoutEffect)(() => {
@@ -150974,10 +150985,12 @@ function SportsBrowserPrototypeUpDownNavControl({
   leaguePreviewSampleGames = [],
   previewLeagueWidths,
   onWatchLive,
-  canShowWatchLive
+  canShowWatchLive,
+  hideNavigationModeSelector = false
 }) {
-  const showGamePreviews = navigationMode === "games";
-  const showLeaguePreviews = navigationMode === "leagues";
+  const navigationModeForUi = hideNavigationModeSelector ? "leagues" : navigationMode;
+  const showGamePreviews = navigationModeForUi === "games";
+  const showLeaguePreviews = navigationModeForUi === "leagues";
   const previousGamePreview = showGamePreviews ? previousPreviewGame : null;
   const nextGamePreview = showGamePreviews ? nextPreviewGame : null;
   const previousLeaguePreviewKey = showLeaguePreviews ? previousPreviewLeagueKey : null;
@@ -150989,8 +151002,8 @@ function SportsBrowserPrototypeUpDownNavControl({
     SIDEBAR_SURFACE,
     SIDEBAR_RULE2
   );
-  const upAriaLabel = navigationMode === "leagues" ? "Previous league" : "Previous game";
-  const downAriaLabel = navigationMode === "leagues" ? "Next league" : "Next game";
+  const upAriaLabel = navigationModeForUi === "leagues" ? "Previous league" : "Previous game";
+  const downAriaLabel = navigationModeForUi === "leagues" ? "Next league" : "Next game";
   return /* @__PURE__ */ (0, import_jsx_runtime242.jsx)(
     "div",
     {
@@ -151003,10 +151016,10 @@ function SportsBrowserPrototypeUpDownNavControl({
         {
           className: cn2(
             "flex flex-col items-center pointer-events-auto",
-            UP_DOWN_NAV_MODE_SELECTOR_ARROW_GAP_CLASS
+            !hideNavigationModeSelector && UP_DOWN_NAV_MODE_SELECTOR_ARROW_GAP_CLASS
           ),
           children: [
-            /* @__PURE__ */ (0, import_jsx_runtime242.jsxs)(
+            hideNavigationModeSelector ? null : /* @__PURE__ */ (0, import_jsx_runtime242.jsxs)(
               "div",
               {
                 className: cn2(
@@ -151052,7 +151065,7 @@ function SportsBrowserPrototypeUpDownNavControl({
               {
                 className: "relative flex",
                 "data-sports-browser-prototype-up-down-nav": true,
-                "aria-label": "Game navigation",
+                "aria-label": navigationModeForUi === "leagues" ? "League navigation" : "Game navigation",
                 children: [
                   previousGamePreview ? /* @__PURE__ */ (0, import_jsx_runtime242.jsx)("div", { className: "absolute right-full top-0 flex h-9", children: /* @__PURE__ */ (0, import_jsx_runtime242.jsx)(
                     SportsBrowserPrototypeUpDownNavMinimizedGameCard,
@@ -153134,6 +153147,11 @@ function HomePage() {
   const [sportsBrowserSidebarNavigableGames, setSportsBrowserSidebarNavigableGames] = (0, import_react274.useState)([]);
   const [sportsBrowserSidebarNavigableLeagueKeys, setSportsBrowserSidebarNavigableLeagueKeys] = (0, import_react274.useState)([]);
   const [sportsBrowserUpDownNavMode, setSportsBrowserUpDownNavMode] = (0, import_react274.useState)("games");
+  const [sportsBrowserSidebarTopLevelMode, setSportsBrowserSidebarTopLevelMode] = (0, import_react274.useState)("games");
+  const onSportsBrowserSidebarTopLevelModeChange = (0, import_react274.useCallback)((mode) => {
+    setSportsBrowserSidebarTopLevelMode(mode);
+  }, []);
+  const sportsBrowserUpDownNavEffectiveMode = sportsBrowserSidebarTopLevelMode === "leagues" ? "leagues" : sportsBrowserUpDownNavMode;
   const onSportsBrowserSidebarNavigableGamesChange = (0, import_react274.useCallback)((games) => {
     setSportsBrowserSidebarNavigableGames(games);
   }, []);
@@ -153173,7 +153191,7 @@ function HomePage() {
     previousPreviewLeagueKey: sportsBrowserSidebarPreviousPreviewLeagueKey,
     nextPreviewLeagueKey: sportsBrowserSidebarNextPreviewLeagueKey
   } = useSportsBrowserPrototypeSidebarGameNavigation({
-    navigationMode: sportsBrowserUpDownNavMode,
+    navigationMode: sportsBrowserUpDownNavEffectiveMode,
     navigableGames: sportsBrowserSidebarNavigableGames,
     navigableLeagueKeys: sportsBrowserSidebarNavigableLeagueKeys,
     currentGameId: sportsBrowserSelectedGameId,
@@ -153525,6 +153543,7 @@ function HomePage() {
                 onCommandCenterBrowserTabSelect: () => onSelectSportsBrowserTab(COMMAND_CENTER_SPORTS_BROWSER_TAB_ID),
                 onNavigableGamesChange: onSportsBrowserSidebarNavigableGamesChange,
                 onNavigableLeagueKeysChange: onSportsBrowserSidebarNavigableLeagueKeysChange,
+                onSidebarTopLevelModeChange: onSportsBrowserSidebarTopLevelModeChange,
                 sidebarBottomNewsFeed: sportsBrowserSidebarBottomNewsFeed
               }
             ),
@@ -153598,6 +153617,7 @@ function HomePage() {
                 {
                   navigationMode: sportsBrowserUpDownNavMode,
                   onNavigationModeChange: setSportsBrowserUpDownNavMode,
+                  hideNavigationModeSelector: sportsBrowserSidebarTopLevelMode === "leagues",
                   canNavigateUp: canNavigateSportsBrowserSidebarGameUp,
                   canNavigateDown: canNavigateSportsBrowserSidebarGameDown,
                   onNavigateUp: navigateSportsBrowserSidebarGameUp,
