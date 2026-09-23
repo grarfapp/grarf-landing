@@ -14127,6 +14127,7 @@ var GAMES_COLUMN_LEAGUE_LABEL = {
   CHAMPIONSHIP: "Championship",
   COPPAITALIA: "Coppa Italia",
   UCL: "Champions League",
+  WOMENS_UCL: "Women's UCL",
   UCLQ: "UCL Qualifying",
   UEL: "Europa League",
   UELQ: "Europa League Qualifying",
@@ -14805,6 +14806,13 @@ var ESPN_OPERATIONAL_INGEST_LEAGUES = [
     "endpoint": "https://site.api.espn.com/apis/site/v2/sports/basketball/womens-college-basketball/scoreboard"
   },
   {
+    "key": "WOMENS_UCL",
+    "sport": "soccer",
+    "label": "Women's UCL",
+    "slug": "uefa.wchampions",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/uefa.wchampions/scoreboard"
+  },
+  {
     "key": "WORLDCUP",
     "sport": "soccer",
     "label": "FIFA World Cup",
@@ -14848,6 +14856,7 @@ var GAMES_SPINE_LEAGUE_DISPLAY_LABEL = {
   EPL: "EPL",
   NCAABB: "MCWS",
   NASCAR: "NASCAR Cup Series",
+  WOMENS_UCL: "Women's UCL",
   WORLDCUP: "World Cup",
   PLL: "PLL",
   WIMBLEDON_MEN: "Wimbledon (Men's)",
@@ -21686,7 +21695,7 @@ init_define_import_meta_env();
 
 // ../grarf/desktop/electron/espn/espnOperationalLeagueConstants.generated.js
 init_define_import_meta_env();
-var SOCCER_LEAGUE_KEYS = /* @__PURE__ */ new Set(["ARG1", "BEL1", "BRA1", "BUNDESLIGA", "CAF_WNATIONS", "CARABAO_CUP", "CHAMPIONSHIP", "CLUBFRIENDLY", "CLUBWC", "CONCACAF_CAC", "CONCACAF_CL", "CONCACAF_NG", "CONCACAF_WC", "COPA", "COPA_BRASIL", "COPPAITALIA", "EPL", "EREDIVISIE", "EURO", "GER_SUPER_CUP", "GOLDCUP", "INTFRIENDLY", "LALIGA", "LEAGUES_CUP", "LIBERTADORES", "LIGAMX", "LIGUE1", "MLS", "NATIONS", "NCAAMSOC", "NCAAWSOC", "NWSL", "POR1", "SAUDI", "SCOTTISH_LEAGUE_CUP", "SERIEA", "SPFL", "SUDAMERICANA", "SUPERLIG", "UCL", "UCLQ", "UECL", "UECLQ", "UEL", "UELQ", "US_OPEN_CUP", "USL1", "USLC", "USLCUP", "UWCQ", "WORLDCUP", "WWC"]);
+var SOCCER_LEAGUE_KEYS = /* @__PURE__ */ new Set(["ARG1", "BEL1", "BRA1", "BUNDESLIGA", "CAF_WNATIONS", "CARABAO_CUP", "CHAMPIONSHIP", "CLUBFRIENDLY", "CLUBWC", "CONCACAF_CAC", "CONCACAF_CL", "CONCACAF_NG", "CONCACAF_WC", "COPA", "COPA_BRASIL", "COPPAITALIA", "EPL", "EREDIVISIE", "EURO", "GER_SUPER_CUP", "GOLDCUP", "INTFRIENDLY", "LALIGA", "LEAGUES_CUP", "LIBERTADORES", "LIGAMX", "LIGUE1", "MLS", "NATIONS", "NCAAMSOC", "NCAAWSOC", "NWSL", "POR1", "SAUDI", "SCOTTISH_LEAGUE_CUP", "SERIEA", "SPFL", "SUDAMERICANA", "SUPERLIG", "UCL", "UCLQ", "UECL", "UECLQ", "UEL", "UELQ", "US_OPEN_CUP", "USL1", "USLC", "USLCUP", "UWCQ", "WOMENS_UCL", "WORLDCUP", "WWC"]);
 var NATIONAL_TEAM_SOCCER_LEAGUE_KEYS = /* @__PURE__ */ new Set(["CONCACAF_NG", "CONCACAF_WC", "COPA", "EURO", "GOLDCUP", "INTFRIENDLY", "NATIONS", "UWCQ", "WORLDCUP", "WWC"]);
 
 // ../grarf/desktop/electron/espn/espnPlusStream.js
@@ -28147,7 +28156,7 @@ init_define_import_meta_env();
 
 // ../grarf/grarf-operational-service/src/config/espnOperationalLeagueConstants.generated.ts
 init_define_import_meta_env();
-var SOCCER_LEAGUE_KEYS2 = /* @__PURE__ */ new Set(["ARG1", "BEL1", "BRA1", "BUNDESLIGA", "CAF_WNATIONS", "CARABAO_CUP", "CHAMPIONSHIP", "CLUBFRIENDLY", "CLUBWC", "CONCACAF_CAC", "CONCACAF_CL", "CONCACAF_NG", "CONCACAF_WC", "COPA", "COPA_BRASIL", "COPPAITALIA", "EPL", "EREDIVISIE", "EURO", "GER_SUPER_CUP", "GOLDCUP", "INTFRIENDLY", "LALIGA", "LEAGUES_CUP", "LIBERTADORES", "LIGAMX", "LIGUE1", "MLS", "NATIONS", "NCAAMSOC", "NCAAWSOC", "NWSL", "POR1", "SAUDI", "SCOTTISH_LEAGUE_CUP", "SERIEA", "SPFL", "SUDAMERICANA", "SUPERLIG", "UCL", "UCLQ", "UECL", "UECLQ", "UEL", "UELQ", "US_OPEN_CUP", "USL1", "USLC", "USLCUP", "UWCQ", "WORLDCUP", "WWC"]);
+var SOCCER_LEAGUE_KEYS2 = /* @__PURE__ */ new Set(["ARG1", "BEL1", "BRA1", "BUNDESLIGA", "CAF_WNATIONS", "CARABAO_CUP", "CHAMPIONSHIP", "CLUBFRIENDLY", "CLUBWC", "CONCACAF_CAC", "CONCACAF_CL", "CONCACAF_NG", "CONCACAF_WC", "COPA", "COPA_BRASIL", "COPPAITALIA", "EPL", "EREDIVISIE", "EURO", "GER_SUPER_CUP", "GOLDCUP", "INTFRIENDLY", "LALIGA", "LEAGUES_CUP", "LIBERTADORES", "LIGAMX", "LIGUE1", "MLS", "NATIONS", "NCAAMSOC", "NCAAWSOC", "NWSL", "POR1", "SAUDI", "SCOTTISH_LEAGUE_CUP", "SERIEA", "SPFL", "SUDAMERICANA", "SUPERLIG", "UCL", "UCLQ", "UECL", "UECLQ", "UEL", "UELQ", "US_OPEN_CUP", "USL1", "USLC", "USLCUP", "UWCQ", "WOMENS_UCL", "WORLDCUP", "WWC"]);
 
 // ../grarf/grarf-operational-service/src/watch/fotmob/enrichSoccerGamesWithFotmobUrls.ts
 init_define_import_meta_env();
@@ -28881,6 +28890,14 @@ var ESPN_OPERATIONAL_INGEST_LEAGUES2 = [
     "label": "NCAA Women's Basketball",
     "sport": "basketball",
     "slug": "womens-college-basketball",
+    "active": true
+  },
+  {
+    "key": "WOMENS_UCL",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/uefa.wchampions/scoreboard",
+    "label": "Women's UCL",
+    "sport": "soccer",
+    "slug": "uefa.wchampions",
     "active": true
   },
   {

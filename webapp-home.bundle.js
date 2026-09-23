@@ -20614,6 +20614,7 @@ var GAMES_COLUMN_LEAGUE_LABEL = {
   CHAMPIONSHIP: "Championship",
   COPPAITALIA: "Coppa Italia",
   UCL: "Champions League",
+  WOMENS_UCL: "Women's UCL",
   UCLQ: "UCL Qualifying",
   UEL: "Europa League",
   UELQ: "Europa League Qualifying",
@@ -22847,6 +22848,13 @@ var ESPN_OPERATIONAL_INGEST_LEAGUES = [
     "endpoint": "https://site.api.espn.com/apis/site/v2/sports/basketball/womens-college-basketball/scoreboard"
   },
   {
+    "key": "WOMENS_UCL",
+    "sport": "soccer",
+    "label": "Women's UCL",
+    "slug": "uefa.wchampions",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/uefa.wchampions/scoreboard"
+  },
+  {
     "key": "WORLDCUP",
     "sport": "soccer",
     "label": "FIFA World Cup",
@@ -24709,7 +24717,7 @@ init_define_import_meta_env();
 
 // ../grarf/desktop/electron/espn/espnOperationalLeagueConstants.generated.js
 init_define_import_meta_env();
-var SOCCER_LEAGUE_KEYS = /* @__PURE__ */ new Set(["ARG1", "BEL1", "BRA1", "BUNDESLIGA", "CAF_WNATIONS", "CARABAO_CUP", "CHAMPIONSHIP", "CLUBFRIENDLY", "CLUBWC", "CONCACAF_CAC", "CONCACAF_CL", "CONCACAF_NG", "CONCACAF_WC", "COPA", "COPA_BRASIL", "COPPAITALIA", "EPL", "EREDIVISIE", "EURO", "GER_SUPER_CUP", "GOLDCUP", "INTFRIENDLY", "LALIGA", "LEAGUES_CUP", "LIBERTADORES", "LIGAMX", "LIGUE1", "MLS", "NATIONS", "NCAAMSOC", "NCAAWSOC", "NWSL", "POR1", "SAUDI", "SCOTTISH_LEAGUE_CUP", "SERIEA", "SPFL", "SUDAMERICANA", "SUPERLIG", "UCL", "UCLQ", "UECL", "UECLQ", "UEL", "UELQ", "US_OPEN_CUP", "USL1", "USLC", "USLCUP", "UWCQ", "WORLDCUP", "WWC"]);
+var SOCCER_LEAGUE_KEYS = /* @__PURE__ */ new Set(["ARG1", "BEL1", "BRA1", "BUNDESLIGA", "CAF_WNATIONS", "CARABAO_CUP", "CHAMPIONSHIP", "CLUBFRIENDLY", "CLUBWC", "CONCACAF_CAC", "CONCACAF_CL", "CONCACAF_NG", "CONCACAF_WC", "COPA", "COPA_BRASIL", "COPPAITALIA", "EPL", "EREDIVISIE", "EURO", "GER_SUPER_CUP", "GOLDCUP", "INTFRIENDLY", "LALIGA", "LEAGUES_CUP", "LIBERTADORES", "LIGAMX", "LIGUE1", "MLS", "NATIONS", "NCAAMSOC", "NCAAWSOC", "NWSL", "POR1", "SAUDI", "SCOTTISH_LEAGUE_CUP", "SERIEA", "SPFL", "SUDAMERICANA", "SUPERLIG", "UCL", "UCLQ", "UECL", "UECLQ", "UEL", "UELQ", "US_OPEN_CUP", "USL1", "USLC", "USLCUP", "UWCQ", "WOMENS_UCL", "WORLDCUP", "WWC"]);
 var NATIONAL_TEAM_SOCCER_LEAGUE_KEYS = /* @__PURE__ */ new Set(["CONCACAF_NG", "CONCACAF_WC", "COPA", "EURO", "GOLDCUP", "INTFRIENDLY", "NATIONS", "UWCQ", "WORLDCUP", "WWC"]);
 
 // ../grarf/desktop/electron/espn/espnPlusStream.js
@@ -31776,7 +31784,7 @@ init_define_import_meta_env();
 
 // ../grarf/grarf-operational-service/src/config/espnOperationalLeagueConstants.generated.ts
 init_define_import_meta_env();
-var SOCCER_LEAGUE_KEYS2 = /* @__PURE__ */ new Set(["ARG1", "BEL1", "BRA1", "BUNDESLIGA", "CAF_WNATIONS", "CARABAO_CUP", "CHAMPIONSHIP", "CLUBFRIENDLY", "CLUBWC", "CONCACAF_CAC", "CONCACAF_CL", "CONCACAF_NG", "CONCACAF_WC", "COPA", "COPA_BRASIL", "COPPAITALIA", "EPL", "EREDIVISIE", "EURO", "GER_SUPER_CUP", "GOLDCUP", "INTFRIENDLY", "LALIGA", "LEAGUES_CUP", "LIBERTADORES", "LIGAMX", "LIGUE1", "MLS", "NATIONS", "NCAAMSOC", "NCAAWSOC", "NWSL", "POR1", "SAUDI", "SCOTTISH_LEAGUE_CUP", "SERIEA", "SPFL", "SUDAMERICANA", "SUPERLIG", "UCL", "UCLQ", "UECL", "UECLQ", "UEL", "UELQ", "US_OPEN_CUP", "USL1", "USLC", "USLCUP", "UWCQ", "WORLDCUP", "WWC"]);
+var SOCCER_LEAGUE_KEYS2 = /* @__PURE__ */ new Set(["ARG1", "BEL1", "BRA1", "BUNDESLIGA", "CAF_WNATIONS", "CARABAO_CUP", "CHAMPIONSHIP", "CLUBFRIENDLY", "CLUBWC", "CONCACAF_CAC", "CONCACAF_CL", "CONCACAF_NG", "CONCACAF_WC", "COPA", "COPA_BRASIL", "COPPAITALIA", "EPL", "EREDIVISIE", "EURO", "GER_SUPER_CUP", "GOLDCUP", "INTFRIENDLY", "LALIGA", "LEAGUES_CUP", "LIBERTADORES", "LIGAMX", "LIGUE1", "MLS", "NATIONS", "NCAAMSOC", "NCAAWSOC", "NWSL", "POR1", "SAUDI", "SCOTTISH_LEAGUE_CUP", "SERIEA", "SPFL", "SUDAMERICANA", "SUPERLIG", "UCL", "UCLQ", "UECL", "UECLQ", "UEL", "UELQ", "US_OPEN_CUP", "USL1", "USLC", "USLCUP", "UWCQ", "WOMENS_UCL", "WORLDCUP", "WWC"]);
 
 // ../grarf/grarf-operational-service/src/watch/fotmob/enrichSoccerGamesWithFotmobUrls.ts
 init_define_import_meta_env();
@@ -32510,6 +32518,14 @@ var ESPN_OPERATIONAL_INGEST_LEAGUES2 = [
     "label": "NCAA Women's Basketball",
     "sport": "basketball",
     "slug": "womens-college-basketball",
+    "active": true
+  },
+  {
+    "key": "WOMENS_UCL",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/soccer/uefa.wchampions/scoreboard",
+    "label": "Women's UCL",
+    "sport": "soccer",
+    "slug": "uefa.wchampions",
     "active": true
   },
   {
@@ -55377,6 +55393,7 @@ var GRARF_LEAGUE_ROUTE_PATHS = {
   EPL: "/premier-league",
   BUNDESLIGA: "/bundesliga",
   UCL: "/ucl",
+  WOMENS_UCL: "/womens-ucl",
   LALIGA: "/laliga",
   NWSL: "/nwsl",
   LIGAMX: "/liga-mx",
@@ -55433,6 +55450,7 @@ var GRARF_LEAGUE_KEY_NAV_ITEM_ID = {
   LIBERTADORES: "copa-libertadores",
   SUDAMERICANA: "copa-sudamericana",
   UCL: "ucl",
+  WOMENS_UCL: "womens-ucl",
   UEL: "uel",
   WORLDCUP: "fifa-world-cup",
   NCAABB: "ncaa-baseball",
@@ -56298,6 +56316,7 @@ var GAMES_SPINE_LEAGUE_DISPLAY_LABEL = {
   EPL: "EPL",
   NCAABB: "MCWS",
   NASCAR: "NASCAR Cup Series",
+  WOMENS_UCL: "Women's UCL",
   WORLDCUP: "World Cup",
   PLL: "PLL",
   WIMBLEDON_MEN: "Wimbledon (Men's)",
@@ -56561,6 +56580,7 @@ var GAMES_SPINE_LEAGUE_LOGO_URL = {
   SUDAMERICANA: COPA_SUDAMERICANA_LEAGUE_LOGO_URL,
   UCL: UCL_LEAGUE_LOGO_URL,
   UCLQ: UCL_LEAGUE_LOGO_URL,
+  WOMENS_UCL: "/league-logos/nav/womens-ucl.png",
   UEL: "https://a.espncdn.com/i/leaguelogos/soccer/500/2310.png",
   UELQ: "https://a.espncdn.com/i/leaguelogos/soccer/500/2310.png",
   UECL: "https://a.espncdn.com/i/leaguelogos/soccer/500/20296.png",
@@ -56583,7 +56603,7 @@ var GAMES_SPINE_LEAGUE_LOGO_URL = {
   WIMBLEDON_WOMEN: "/league-logos/wimbledon.png",
   US_OPEN_TENNIS: US_OPEN_TENNIS_LEAGUE_LOGO_URL,
   UFC: "https://a.espncdn.com/i/teamlogos/leagues/500/ufc.png",
-  BOXING: "/league-logos/placeholder-boxing.png",
+  BOXING: "/league-logos/boxing.png",
   XFL: "/league-logos/nav/ufl.png",
   CRICKET_BBL: "/league-logos/nav/big-bash-league.png",
   NCAAVB: "/league-logos/nav/volleyball-ncaaw.png",
@@ -56601,7 +56621,7 @@ var GAMES_SPINE_LEAGUE_LOGO_URL = {
   LPGA: LPGA_LEAGUE_LOGO_URL,
   DP_WORLD: DP_WORLD_TOUR_LEAGUE_LOGO_URL,
   KORNFERRY: KORN_FERRY_TOUR_LEAGUE_LOGO_URL,
-  LIV: "https://a.espncdn.com/combiner/i?img=/i/teamlogos/leagues/500/livgolf.png",
+  LIV: "/league-logos/liv-golf.png",
   CHAMPIONS: "https://a.espncdn.com/combiner/i?img=/i/espn/teamlogos/500/pga_champions_tour.png",
   NASCAR_TRUCK: "/league-logos/nascar-trucks.png",
   NASCAR_XFINITY: "/league-logos/nascar-oreilly.png",
@@ -56620,7 +56640,12 @@ var GAMES_SPINE_LEAGUE_LOGO_URL = {
   USATF: "https://upload.wikimedia.org/wikipedia/en/b/be/USA_Track_and_Field.svg"
 };
 var SIDEBAR_LEAGUE_SLUG_LOGO_URL = {
-  "base-lls": LITTLE_LEAGUE_SOFTBALL_LEAGUE_LOGO_URL
+  "base-lls": LITTLE_LEAGUE_SOFTBALL_LEAGUE_LOGO_URL,
+  CRICKET_ICC: "/league-logos/cricket.png",
+  "rugby-union": "/league-logos/nav/rugby-union.png",
+  lacrosse: "/league-logos/nav/lacrosse.png",
+  swimming: "/league-logos/nav/swimming.png",
+  "winter-sports": "/league-logos/nav/winter-sports.png"
 };
 function resolveGamesSpineLeagueHeaderLogoUrl(league2, games) {
   const gameWithManualLogo = games?.find(
@@ -56641,7 +56666,7 @@ function resolveGamesSpineLeagueLogoUrl(league2, options) {
   if (options?.game && isUsOpenTennisGame(options.game)) {
     return US_OPEN_TENNIS_LEAGUE_LOGO_URL;
   }
-  return GAMES_SPINE_LEAGUE_LOGO_URL[league2] ?? SIDEBAR_LEAGUE_SLUG_LOGO_URL[league2] ?? resolveCanonicalLeagueLogoUrl({ grarfLeagueKey: league2 });
+  return GAMES_SPINE_LEAGUE_LOGO_URL[league2] ?? SIDEBAR_LEAGUE_SLUG_LOGO_URL[league2] ?? resolveCanonicalLeagueLogoUrl({ grarfLeagueKey: league2 }) ?? resolveCanonicalLeagueLogoUrl({ hubId: league2 });
 }
 function resolveGamesSpineLeagueLogoImgClassName(_league, _logoUrl) {
   return grarfLogoImgClassName();
@@ -79567,6 +79592,7 @@ var ESPN_OPERATIONAL_LEAGUES = {
   UWCQ: { sport: "soccer", league: "uefa.euroq", endpoint: "https://site.api.espn.com/apis/site/v2/sports/soccer/uefa.euroq/scoreboard", pollIntervalMs: 6e4, label: "UEFA Euro Qualifying" },
   WNBA: { sport: "basketball", league: "wnba", endpoint: "https://site.api.espn.com/apis/site/v2/sports/basketball/wnba/scoreboard", pollIntervalMs: 6e4, label: "WNBA" },
   WNCAAB: { sport: "basketball", league: "womens-college-basketball", endpoint: "https://site.api.espn.com/apis/site/v2/sports/basketball/womens-college-basketball/scoreboard", pollIntervalMs: 6e4, label: "NCAA Women's Basketball" },
+  WOMENS_UCL: { sport: "soccer", league: "uefa.wchampions", endpoint: "https://site.api.espn.com/apis/site/v2/sports/soccer/uefa.wchampions/scoreboard", pollIntervalMs: 6e4, label: "Women's UCL" },
   WORLDCUP: { sport: "soccer", league: "fifa.world", endpoint: "https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard", pollIntervalMs: 6e4, label: "FIFA World Cup" },
   WTA: { sport: "tennis", league: "wta", endpoint: "https://site.api.espn.com/apis/site/v2/sports/tennis/wta/scoreboard", pollIntervalMs: 6e4, label: "WTA Tour" },
   WWC: { sport: "soccer", league: "fifa.wwc", endpoint: "https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.wwc/scoreboard", pollIntervalMs: 6e4, label: "Women's World Cup" },
@@ -133078,7 +133104,8 @@ var SPORTS_BROWSER_PROTOTYPE_LEAGUE_PODCAST_LEAGUE_KEYS = Object.keys(
 );
 function resolveSportsBrowserPrototypeLeaguePodcastWebsite(leagueKey) {
   if (!leagueKey?.trim()) return null;
-  return SPORTS_BROWSER_PROTOTYPE_LEAGUE_PODCAST_WEBSITES[leagueKey] ?? null;
+  const navWebsiteKey = leagueKey === "WOMENS_UCL" ? "womens-ucl" : leagueKey;
+  return SPORTS_BROWSER_PROTOTYPE_LEAGUE_PODCAST_WEBSITES[navWebsiteKey] ?? null;
 }
 
 // ../grarf/desktop/src/data/sportsBrowserPrototypeLeagueYoutubeWebsites.ts
@@ -133618,7 +133645,8 @@ var SPORTS_BROWSER_PROTOTYPE_LEAGUE_YOUTUBE_LEAGUE_KEYS = Object.keys(
 );
 function resolveSportsBrowserPrototypeLeagueYoutubeWebsite(leagueKey) {
   if (!leagueKey?.trim()) return null;
-  return SPORTS_BROWSER_PROTOTYPE_LEAGUE_YOUTUBE_WEBSITES[leagueKey] ?? null;
+  const navWebsiteKey = leagueKey === "WOMENS_UCL" ? "womens-ucl" : leagueKey;
+  return SPORTS_BROWSER_PROTOTYPE_LEAGUE_YOUTUBE_WEBSITES[navWebsiteKey] ?? null;
 }
 
 // ../grarf/desktop/src/lib/gamesSpine/sportsBrowserPrototypeTemporalHorseRacingWebsites.ts
@@ -134921,7 +134949,8 @@ function getSportsBrowserPrototypeWebsitesForPane(pane) {
   return getSportsBrowserPrototypeGlobalWebsites();
 }
 function getSportsBrowserPrototypeLeagueWebsites(leagueKey) {
-  const websites = SPORTS_BROWSER_PROTOTYPE_LEAGUE_WEBSITES[leagueKey];
+  const navWebsiteKey = leagueKey === "WOMENS_UCL" ? "womens-ucl" : leagueKey;
+  const websites = SPORTS_BROWSER_PROTOTYPE_LEAGUE_WEBSITES[navWebsiteKey];
   return websites && websites.length > 0 ? websites : null;
 }
 function isSportsBrowserPrototypeNewsParentLeagueContext(pane) {
@@ -148641,6 +148670,1367 @@ function useSportsBrowserPrototypeTodayTemporalSlate() {
   return { catchUpLeagues, yesterdayLeagues, nowLeagues, upcomingLeagues };
 }
 
+// ../grarf/desktop/src/data/mlbTeamPopulation.ts
+init_define_import_meta_env();
+function mlbTeam(abbrev, label) {
+  return {
+    teamKey: `mlb-${abbrev.toLowerCase()}`,
+    teamAbbrev: abbrev,
+    label
+  };
+}
+var MLB_TEAM_POPULATION_BY_DIVISION = [
+  {
+    divisionLabel: "AL CENTRAL",
+    teams: [
+      mlbTeam("CWS", "Chicago White Sox"),
+      mlbTeam("CLE", "Cleveland Guardians"),
+      mlbTeam("DET", "Detroit Tigers"),
+      mlbTeam("KC", "Kansas City Royals"),
+      mlbTeam("MIN", "Minnesota Twins")
+    ]
+  },
+  {
+    divisionLabel: "AL EAST",
+    teams: [
+      mlbTeam("BAL", "Baltimore Orioles"),
+      mlbTeam("BOS", "Boston Red Sox"),
+      mlbTeam("NYY", "New York Yankees"),
+      mlbTeam("TB", "Tampa Bay Rays"),
+      mlbTeam("TOR", "Toronto Blue Jays")
+    ]
+  },
+  {
+    divisionLabel: "AL WEST",
+    teams: [
+      mlbTeam("ATH", "Athletics"),
+      mlbTeam("HOU", "Houston Astros"),
+      mlbTeam("LAA", "Los Angeles Angels"),
+      mlbTeam("SEA", "Seattle Mariners"),
+      mlbTeam("TEX", "Texas Rangers")
+    ]
+  },
+  {
+    divisionLabel: "NL CENTRAL",
+    teams: [
+      mlbTeam("CHC", "Chicago Cubs"),
+      mlbTeam("CIN", "Cincinnati Reds"),
+      mlbTeam("MIL", "Milwaukee Brewers"),
+      mlbTeam("PIT", "Pittsburgh Pirates"),
+      mlbTeam("STL", "St. Louis Cardinals")
+    ]
+  },
+  {
+    divisionLabel: "NL EAST",
+    teams: [
+      mlbTeam("ATL", "Atlanta Braves"),
+      mlbTeam("MIA", "Miami Marlins"),
+      mlbTeam("NYM", "New York Mets"),
+      mlbTeam("PHI", "Philadelphia Phillies"),
+      mlbTeam("WSH", "Washington Nationals")
+    ]
+  },
+  {
+    divisionLabel: "NL WEST",
+    teams: [
+      mlbTeam("ARI", "Arizona Diamondbacks"),
+      mlbTeam("COL", "Colorado Rockies"),
+      mlbTeam("LAD", "Los Angeles Dodgers"),
+      mlbTeam("SD", "San Diego Padres"),
+      mlbTeam("SF", "San Francisco Giants")
+    ]
+  }
+];
+var MLB_LEAGUES_TAB_TEAM_LIST_DISPLAY_LABEL_BY_ABBREV = {
+  CWS: "White Sox",
+  CLE: "Guardians",
+  DET: "Tigers",
+  KC: "Royals",
+  MIN: "Twins",
+  BAL: "Orioles",
+  BOS: "Red Sox",
+  NYY: "Yankees",
+  TB: "Rays",
+  TOR: "Blue Jays",
+  ATH: "Athletics",
+  HOU: "Astros",
+  LAA: "Angels",
+  SEA: "Mariners",
+  TEX: "Rangers",
+  CHC: "Cubs",
+  CIN: "Reds",
+  MIL: "Brewers",
+  PIT: "Pirates",
+  STL: "Cardinals",
+  ATL: "Braves",
+  MIA: "Marlins",
+  NYM: "Mets",
+  PHI: "Phillies",
+  WSH: "Nationals",
+  ARI: "Diamondbacks",
+  COL: "Rockies",
+  LAD: "Dodgers",
+  SD: "Padres",
+  SF: "Giants"
+};
+function resolveMlbLeaguesTabTeamListDisplayLabel(teamAbbrev2) {
+  const normalized = teamAbbrev2.trim().toUpperCase();
+  return MLB_LEAGUES_TAB_TEAM_LIST_DISPLAY_LABEL_BY_ABBREV[normalized] ?? normalized;
+}
+function collectMlbTeamPopulationEntries() {
+  return MLB_TEAM_POPULATION_BY_DIVISION.flatMap((division) => [...division.teams]);
+}
+var MLB_TEAM_POPULATION_BY_ABBREV = new Map(
+  collectMlbTeamPopulationEntries().map((entry2) => [entry2.teamAbbrev, entry2])
+);
+var MLB_TEAM_POPULATION_BY_KEY = new Map(
+  collectMlbTeamPopulationEntries().map((entry2) => [entry2.teamKey, entry2])
+);
+
+// ../grarf/desktop/src/data/ncaafTeamPopulation.ts
+init_define_import_meta_env();
+function ncaafTeamSlug(label) {
+  return label.trim().toLowerCase().replace(/['’]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+}
+function ncaafTeam(label) {
+  return {
+    teamKey: `ncaaf-${ncaafTeamSlug(label)}`,
+    label
+  };
+}
+var NCAAF_TEAM_POPULATION_BY_CONFERENCE = [
+  {
+    conferenceLabel: "ACC",
+    teams: [
+      ncaafTeam("Boston College"),
+      ncaafTeam("California"),
+      ncaafTeam("Clemson"),
+      ncaafTeam("Duke"),
+      ncaafTeam("Florida State"),
+      ncaafTeam("Georgia Tech"),
+      ncaafTeam("Louisville"),
+      ncaafTeam("Miami"),
+      ncaafTeam("NC State"),
+      ncaafTeam("North Carolina"),
+      ncaafTeam("Pittsburgh"),
+      ncaafTeam("SMU"),
+      ncaafTeam("Stanford"),
+      ncaafTeam("Syracuse"),
+      ncaafTeam("Virginia"),
+      ncaafTeam("Virginia Tech"),
+      ncaafTeam("Wake Forest")
+    ]
+  },
+  {
+    conferenceLabel: "American",
+    teams: [
+      ncaafTeam("Army"),
+      ncaafTeam("Charlotte"),
+      ncaafTeam("East Carolina"),
+      ncaafTeam("Florida Atlantic"),
+      ncaafTeam("Memphis"),
+      ncaafTeam("Navy"),
+      ncaafTeam("North Texas"),
+      ncaafTeam("Rice"),
+      ncaafTeam("South Florida"),
+      ncaafTeam("Temple"),
+      ncaafTeam("Tulane"),
+      ncaafTeam("Tulsa"),
+      ncaafTeam("UAB"),
+      ncaafTeam("UTSA")
+    ]
+  },
+  {
+    conferenceLabel: "Big 12",
+    teams: [
+      ncaafTeam("Arizona State"),
+      ncaafTeam("Arizona"),
+      ncaafTeam("BYU"),
+      ncaafTeam("Baylor"),
+      ncaafTeam("Cincinnati"),
+      ncaafTeam("Colorado"),
+      ncaafTeam("Houston"),
+      ncaafTeam("Iowa State"),
+      ncaafTeam("Kansas"),
+      ncaafTeam("Kansas State"),
+      ncaafTeam("Oklahoma State"),
+      ncaafTeam("TCU"),
+      ncaafTeam("Texas Tech"),
+      ncaafTeam("UCF"),
+      ncaafTeam("Utah"),
+      ncaafTeam("West Virginia")
+    ]
+  },
+  {
+    conferenceLabel: "Big Ten",
+    teams: [
+      ncaafTeam("Illinois"),
+      ncaafTeam("Indiana"),
+      ncaafTeam("Iowa"),
+      ncaafTeam("Maryland"),
+      ncaafTeam("Michigan State"),
+      ncaafTeam("Michigan"),
+      ncaafTeam("Minnesota"),
+      ncaafTeam("Nebraska"),
+      ncaafTeam("Northwestern"),
+      ncaafTeam("Ohio State"),
+      ncaafTeam("Oregon"),
+      ncaafTeam("Penn State"),
+      ncaafTeam("Purdue"),
+      ncaafTeam("Rutgers"),
+      ncaafTeam("UCLA"),
+      ncaafTeam("USC"),
+      ncaafTeam("Washington"),
+      ncaafTeam("Wisconsin")
+    ]
+  },
+  {
+    conferenceLabel: "Conference USA",
+    teams: [
+      ncaafTeam("Delaware"),
+      ncaafTeam("Florida International"),
+      ncaafTeam("Jacksonville State"),
+      ncaafTeam("Kennesaw State"),
+      ncaafTeam("Liberty"),
+      ncaafTeam("Middle Tennessee"),
+      ncaafTeam("Missouri State"),
+      ncaafTeam("New Mexico State"),
+      ncaafTeam("Sam Houston"),
+      ncaafTeam("Western Kentucky")
+    ]
+  },
+  {
+    conferenceLabel: "FBS Independents",
+    teams: [ncaafTeam("Notre Dame"), ncaafTeam("UConn")]
+  },
+  {
+    conferenceLabel: "Mid-American",
+    teams: [
+      ncaafTeam("Akron"),
+      ncaafTeam("Ball State"),
+      ncaafTeam("Bowling Green"),
+      ncaafTeam("Buffalo"),
+      ncaafTeam("Central Michigan"),
+      ncaafTeam("Eastern Michigan"),
+      ncaafTeam("Kent State"),
+      ncaafTeam("Massachusetts"),
+      ncaafTeam("Miami (OH)"),
+      ncaafTeam("Ohio"),
+      ncaafTeam("Sacramento State"),
+      ncaafTeam("Toledo"),
+      ncaafTeam("Western Michigan")
+    ]
+  },
+  {
+    conferenceLabel: "Mountain West",
+    teams: [
+      ncaafTeam("Air Force"),
+      ncaafTeam("Hawai'i"),
+      ncaafTeam("Nevada"),
+      ncaafTeam("New Mexico"),
+      ncaafTeam("North Dakota State"),
+      ncaafTeam("Northern Illinois"),
+      ncaafTeam("San Jos\xE9 State"),
+      ncaafTeam("UNLV"),
+      ncaafTeam("UTEP"),
+      ncaafTeam("Wyoming")
+    ]
+  },
+  {
+    conferenceLabel: "Pac-12",
+    teams: [
+      ncaafTeam("Boise State"),
+      ncaafTeam("Colorado State"),
+      ncaafTeam("Fresno State"),
+      ncaafTeam("Oregon State"),
+      ncaafTeam("San Diego State"),
+      ncaafTeam("Texas State"),
+      ncaafTeam("Utah State"),
+      ncaafTeam("Washington State")
+    ]
+  },
+  {
+    conferenceLabel: "SEC",
+    teams: [
+      ncaafTeam("Alabama"),
+      ncaafTeam("Arkansas"),
+      ncaafTeam("Auburn"),
+      ncaafTeam("Florida"),
+      ncaafTeam("Georgia"),
+      ncaafTeam("Kentucky"),
+      ncaafTeam("LSU"),
+      ncaafTeam("Mississippi State"),
+      ncaafTeam("Missouri"),
+      ncaafTeam("Oklahoma"),
+      ncaafTeam("Ole Miss"),
+      ncaafTeam("South Carolina"),
+      ncaafTeam("Tennessee"),
+      ncaafTeam("Texas A&M"),
+      ncaafTeam("Texas"),
+      ncaafTeam("Vanderbilt")
+    ]
+  },
+  {
+    conferenceLabel: "Sun Belt",
+    teams: [
+      ncaafTeam("App State"),
+      ncaafTeam("Arkansas State"),
+      ncaafTeam("Coastal Carolina"),
+      ncaafTeam("Georgia Southern"),
+      ncaafTeam("Georgia State"),
+      ncaafTeam("James Madison"),
+      ncaafTeam("Louisiana"),
+      ncaafTeam("Louisiana Tech"),
+      ncaafTeam("Marshall"),
+      ncaafTeam("Old Dominion"),
+      ncaafTeam("South Alabama"),
+      ncaafTeam("Southern Miss"),
+      ncaafTeam("Troy"),
+      ncaafTeam("UL Monroe")
+    ]
+  }
+];
+
+// ../grarf/desktop/src/data/mncaabTeamPopulation.ts
+init_define_import_meta_env();
+var MNCAAB_TEAM_POPULATION_BY_CONFERENCE = [
+  {
+    conferenceLabel: "ACC",
+    teams: [
+      { teamKey: "mncaab-103", teamEspnId: "103", label: "Boston College Eagles", leaguesTabListLabel: "Eagles" },
+      { teamKey: "mncaab-25", teamEspnId: "25", label: "California Golden Bears", leaguesTabListLabel: "Golden Bears" },
+      { teamKey: "mncaab-228", teamEspnId: "228", label: "Clemson Tigers", leaguesTabListLabel: "Tigers" },
+      { teamKey: "mncaab-150", teamEspnId: "150", label: "Duke Blue Devils", leaguesTabListLabel: "Blue Devils" },
+      { teamKey: "mncaab-52", teamEspnId: "52", label: "Florida State Seminoles", leaguesTabListLabel: "Seminoles" },
+      { teamKey: "mncaab-59", teamEspnId: "59", label: "Georgia Tech Yellow Jackets", leaguesTabListLabel: "Yellow Jackets" },
+      { teamKey: "mncaab-97", teamEspnId: "97", label: "Louisville Cardinals", leaguesTabListLabel: "Cardinals" },
+      { teamKey: "mncaab-2390", teamEspnId: "2390", label: "Miami Hurricanes", leaguesTabListLabel: "Hurricanes" },
+      { teamKey: "mncaab-152", teamEspnId: "152", label: "NC State Wolfpack", leaguesTabListLabel: "Wolfpack" },
+      { teamKey: "mncaab-153", teamEspnId: "153", label: "North Carolina Tar Heels", leaguesTabListLabel: "Tar Heels" },
+      { teamKey: "mncaab-87", teamEspnId: "87", label: "Notre Dame Fighting Irish", leaguesTabListLabel: "Fighting Irish" },
+      { teamKey: "mncaab-221", teamEspnId: "221", label: "Pittsburgh Panthers", leaguesTabListLabel: "Panthers" },
+      { teamKey: "mncaab-2567", teamEspnId: "2567", label: "SMU Mustangs", leaguesTabListLabel: "Mustangs" },
+      { teamKey: "mncaab-24", teamEspnId: "24", label: "Stanford Cardinal", leaguesTabListLabel: "Cardinal" },
+      { teamKey: "mncaab-183", teamEspnId: "183", label: "Syracuse Orange", leaguesTabListLabel: "Orange" },
+      { teamKey: "mncaab-258", teamEspnId: "258", label: "Virginia Cavaliers", leaguesTabListLabel: "Cavaliers" },
+      { teamKey: "mncaab-259", teamEspnId: "259", label: "Virginia Tech Hokies", leaguesTabListLabel: "Hokies" },
+      { teamKey: "mncaab-154", teamEspnId: "154", label: "Wake Forest Demon Deacons", leaguesTabListLabel: "Demon Deacons" }
+    ]
+  },
+  {
+    conferenceLabel: "America East",
+    teams: [
+      { teamKey: "mncaab-2066", teamEspnId: "2066", label: "Binghamton Bearcats", leaguesTabListLabel: "Bearcats" },
+      { teamKey: "mncaab-2803", teamEspnId: "2803", label: "Bryant Bulldogs", leaguesTabListLabel: "Bulldogs" },
+      { teamKey: "mncaab-311", teamEspnId: "311", label: "Maine Black Bears", leaguesTabListLabel: "Black Bears" },
+      { teamKey: "mncaab-2885", teamEspnId: "2885", label: "NJIT Highlanders", leaguesTabListLabel: "Highlanders" },
+      { teamKey: "mncaab-160", teamEspnId: "160", label: "New Hampshire Wildcats", leaguesTabListLabel: "Wildcats" },
+      { teamKey: "mncaab-399", teamEspnId: "399", label: "UAlbany Great Danes", leaguesTabListLabel: "Great Danes" },
+      { teamKey: "mncaab-2378", teamEspnId: "2378", label: "UMBC Retrievers", leaguesTabListLabel: "Retrievers" },
+      { teamKey: "mncaab-2349", teamEspnId: "2349", label: "UMass Lowell River Hawks", leaguesTabListLabel: "River Hawks" },
+      { teamKey: "mncaab-261", teamEspnId: "261", label: "Vermont Catamounts", leaguesTabListLabel: "Catamounts" }
+    ]
+  },
+  {
+    conferenceLabel: "American",
+    teams: [
+      { teamKey: "mncaab-2429", teamEspnId: "2429", label: "Charlotte 49ers", leaguesTabListLabel: "49ers" },
+      { teamKey: "mncaab-151", teamEspnId: "151", label: "East Carolina Pirates", leaguesTabListLabel: "Pirates" },
+      { teamKey: "mncaab-242", teamEspnId: "242", label: "Rice Owls", leaguesTabListLabel: "Owls" },
+      { teamKey: "mncaab-235", teamEspnId: "235", label: "Memphis Tigers", leaguesTabListLabel: "Tigers" },
+      { teamKey: "mncaab-249", teamEspnId: "249", label: "North Texas Mean Green", leaguesTabListLabel: "Mean Green" },
+      { teamKey: "mncaab-218", teamEspnId: "218", label: "Temple Owls", leaguesTabListLabel: "Owls" },
+      { teamKey: "mncaab-58", teamEspnId: "58", label: "South Florida Bulls", leaguesTabListLabel: "Bulls" },
+      { teamKey: "mncaab-2226", teamEspnId: "2226", label: "Florida Atlantic Owls", leaguesTabListLabel: "Owls" },
+      { teamKey: "mncaab-2655", teamEspnId: "2655", label: "Tulane Green Wave", leaguesTabListLabel: "Green Wave" },
+      { teamKey: "mncaab-202", teamEspnId: "202", label: "Tulsa Golden Hurricane", leaguesTabListLabel: "Golden Hurricane" },
+      { teamKey: "mncaab-5", teamEspnId: "5", label: "UAB Blazers", leaguesTabListLabel: "Blazers" },
+      { teamKey: "mncaab-2636", teamEspnId: "2636", label: "UTSA Roadrunners", leaguesTabListLabel: "Roadrunners" },
+      { teamKey: "mncaab-2724", teamEspnId: "2724", label: "Wichita State Shockers", leaguesTabListLabel: "Shockers" }
+    ]
+  },
+  {
+    conferenceLabel: "Atlantic 10",
+    teams: [
+      { teamKey: "mncaab-2166", teamEspnId: "2166", label: "Davidson Wildcats", leaguesTabListLabel: "Wildcats" },
+      { teamKey: "mncaab-2168", teamEspnId: "2168", label: "Dayton Flyers", leaguesTabListLabel: "Flyers" },
+      { teamKey: "mncaab-2184", teamEspnId: "2184", label: "Duquesne Dukes", leaguesTabListLabel: "Dukes" },
+      { teamKey: "mncaab-227", teamEspnId: "227", label: "Rhode Island Rams", leaguesTabListLabel: "Rams" },
+      { teamKey: "mncaab-2244", teamEspnId: "2244", label: "George Mason Patriots", leaguesTabListLabel: "Patriots" },
+      { teamKey: "mncaab-45", teamEspnId: "45", label: "George Washington Revolutionaries", leaguesTabListLabel: "Revolutionaries" },
+      { teamKey: "mncaab-2325", teamEspnId: "2325", label: "La Salle Explorers", leaguesTabListLabel: "Explorers" },
+      { teamKey: "mncaab-2350", teamEspnId: "2350", label: "Loyola Chicago Ramblers", leaguesTabListLabel: "Ramblers" },
+      { teamKey: "mncaab-2230", teamEspnId: "2230", label: "Fordham Rams", leaguesTabListLabel: "Rams" },
+      { teamKey: "mncaab-257", teamEspnId: "257", label: "Richmond Spiders", leaguesTabListLabel: "Spiders" },
+      { teamKey: "mncaab-2603", teamEspnId: "2603", label: "Saint Joseph's Hawks", leaguesTabListLabel: "Hawks" },
+      { teamKey: "mncaab-139", teamEspnId: "139", label: "Saint Louis Billikens", leaguesTabListLabel: "Billikens" },
+      { teamKey: "mncaab-179", teamEspnId: "179", label: "St. Bonaventure Bonnies", leaguesTabListLabel: "Bonnies" },
+      { teamKey: "mncaab-2670", teamEspnId: "2670", label: "VCU Rams", leaguesTabListLabel: "Rams" }
+    ]
+  },
+  {
+    conferenceLabel: "Atlantic Sun",
+    teams: [
+      { teamKey: "mncaab-91", teamEspnId: "91", label: "Bellarmine Knights", leaguesTabListLabel: "Knights" },
+      { teamKey: "mncaab-526", teamEspnId: "526", label: "Florida Gulf Coast Eagles", leaguesTabListLabel: "Eagles" },
+      { teamKey: "mncaab-294", teamEspnId: "294", label: "Jacksonville Dolphins", leaguesTabListLabel: "Dolphins" },
+      { teamKey: "mncaab-288", teamEspnId: "288", label: "Lipscomb Bisons", leaguesTabListLabel: "Bisons" },
+      { teamKey: "mncaab-2454", teamEspnId: "2454", label: "North Florida Ospreys", leaguesTabListLabel: "Ospreys" },
+      { teamKey: "mncaab-2511", teamEspnId: "2511", label: "Queens University Royals", leaguesTabListLabel: "Royals" },
+      { teamKey: "mncaab-56", teamEspnId: "56", label: "Stetson Hatters", leaguesTabListLabel: "Hatters" },
+      { teamKey: "mncaab-2697", teamEspnId: "2697", label: "West Florida Argonauts", leaguesTabListLabel: "Argonauts" }
+    ]
+  },
+  {
+    conferenceLabel: "Big 12",
+    teams: [
+      { teamKey: "mncaab-9", teamEspnId: "9", label: "Arizona State Sun Devils", leaguesTabListLabel: "Sun Devils" },
+      { teamKey: "mncaab-2306", teamEspnId: "2306", label: "Kansas State Wildcats", leaguesTabListLabel: "Wildcats" },
+      { teamKey: "mncaab-252", teamEspnId: "252", label: "BYU Cougars", leaguesTabListLabel: "Cougars" },
+      { teamKey: "mncaab-239", teamEspnId: "239", label: "Baylor Bears", leaguesTabListLabel: "Bears" },
+      { teamKey: "mncaab-2132", teamEspnId: "2132", label: "Cincinnati Bearcats", leaguesTabListLabel: "Bearcats" },
+      { teamKey: "mncaab-38", teamEspnId: "38", label: "Colorado Buffaloes", leaguesTabListLabel: "Buffaloes" },
+      { teamKey: "mncaab-248", teamEspnId: "248", label: "Houston Cougars", leaguesTabListLabel: "Cougars" },
+      { teamKey: "mncaab-66", teamEspnId: "66", label: "Iowa State Cyclones", leaguesTabListLabel: "Cyclones" },
+      { teamKey: "mncaab-2305", teamEspnId: "2305", label: "Kansas Jayhawks", leaguesTabListLabel: "Jayhawks" },
+      { teamKey: "mncaab-12", teamEspnId: "12", label: "Arizona Wildcats", leaguesTabListLabel: "Wildcats" },
+      { teamKey: "mncaab-197", teamEspnId: "197", label: "Oklahoma State Cowboys", leaguesTabListLabel: "Cowboys" },
+      { teamKey: "mncaab-2628", teamEspnId: "2628", label: "TCU Horned Frogs", leaguesTabListLabel: "Horned Frogs" },
+      { teamKey: "mncaab-2641", teamEspnId: "2641", label: "Texas Tech Red Raiders", leaguesTabListLabel: "Red Raiders" },
+      { teamKey: "mncaab-2116", teamEspnId: "2116", label: "UCF Knights", leaguesTabListLabel: "Knights" },
+      { teamKey: "mncaab-254", teamEspnId: "254", label: "Utah Utes", leaguesTabListLabel: "Utes" },
+      { teamKey: "mncaab-277", teamEspnId: "277", label: "West Virginia Mountaineers", leaguesTabListLabel: "Mountaineers" }
+    ]
+  },
+  {
+    conferenceLabel: "Big East",
+    teams: [
+      { teamKey: "mncaab-2086", teamEspnId: "2086", label: "Butler Bulldogs", leaguesTabListLabel: "Bulldogs" },
+      { teamKey: "mncaab-156", teamEspnId: "156", label: "Creighton Bluejays", leaguesTabListLabel: "Bluejays" },
+      { teamKey: "mncaab-305", teamEspnId: "305", label: "DePaul Blue Demons", leaguesTabListLabel: "Blue Demons" },
+      { teamKey: "mncaab-46", teamEspnId: "46", label: "Georgetown Hoyas", leaguesTabListLabel: "Hoyas" },
+      { teamKey: "mncaab-269", teamEspnId: "269", label: "Marquette Golden Eagles", leaguesTabListLabel: "Golden Eagles" },
+      { teamKey: "mncaab-2507", teamEspnId: "2507", label: "Providence Friars", leaguesTabListLabel: "Friars" },
+      { teamKey: "mncaab-2550", teamEspnId: "2550", label: "Seton Hall Pirates", leaguesTabListLabel: "Pirates" },
+      { teamKey: "mncaab-2599", teamEspnId: "2599", label: "St. John's Red Storm", leaguesTabListLabel: "Red Storm" },
+      { teamKey: "mncaab-41", teamEspnId: "41", label: "UConn Huskies", leaguesTabListLabel: "Huskies" },
+      { teamKey: "mncaab-222", teamEspnId: "222", label: "Villanova Wildcats", leaguesTabListLabel: "Wildcats" },
+      { teamKey: "mncaab-2752", teamEspnId: "2752", label: "Xavier Musketeers", leaguesTabListLabel: "Musketeers" }
+    ]
+  },
+  {
+    conferenceLabel: "Big Sky",
+    teams: [
+      { teamKey: "mncaab-331", teamEspnId: "331", label: "Eastern Washington Eagles", leaguesTabListLabel: "Eagles" },
+      { teamKey: "mncaab-304", teamEspnId: "304", label: "Idaho State Bengals", leaguesTabListLabel: "Bengals" },
+      { teamKey: "mncaab-70", teamEspnId: "70", label: "Idaho Vandals", leaguesTabListLabel: "Vandals" },
+      { teamKey: "mncaab-149", teamEspnId: "149", label: "Montana Grizzlies", leaguesTabListLabel: "Grizzlies" },
+      { teamKey: "mncaab-147", teamEspnId: "147", label: "Montana State Bobcats", leaguesTabListLabel: "Bobcats" },
+      { teamKey: "mncaab-2464", teamEspnId: "2464", label: "Northern Arizona Lumberjacks", leaguesTabListLabel: "Lumberjacks" },
+      { teamKey: "mncaab-2458", teamEspnId: "2458", label: "Northern Colorado Bears", leaguesTabListLabel: "Bears" },
+      { teamKey: "mncaab-2502", teamEspnId: "2502", label: "Portland State Vikings", leaguesTabListLabel: "Vikings" },
+      { teamKey: "mncaab-253", teamEspnId: "253", label: "Southern Utah Thunderbirds", leaguesTabListLabel: "Thunderbirds" },
+      { teamKey: "mncaab-3101", teamEspnId: "3101", label: "Utah Tech Trailblazers", leaguesTabListLabel: "Trailblazers" },
+      { teamKey: "mncaab-2692", teamEspnId: "2692", label: "Weber State Wildcats", leaguesTabListLabel: "Wildcats" }
+    ]
+  },
+  {
+    conferenceLabel: "Big South",
+    teams: [
+      { teamKey: "mncaab-2127", teamEspnId: "2127", label: "Charleston Southern Buccaneers", leaguesTabListLabel: "Buccaneers" },
+      { teamKey: "mncaab-2241", teamEspnId: "2241", label: "Gardner-Webb Runnin' Bulldogs", leaguesTabListLabel: "Runnin' Bulldogs" },
+      { teamKey: "mncaab-2272", teamEspnId: "2272", label: "High Point Panthers", leaguesTabListLabel: "Panthers" },
+      { teamKey: "mncaab-2344", teamEspnId: "2344", label: "Longwood Lancers", leaguesTabListLabel: "Lancers" },
+      { teamKey: "mncaab-2506", teamEspnId: "2506", label: "Presbyterian Blue Hose", leaguesTabListLabel: "Blue Hose" },
+      { teamKey: "mncaab-2515", teamEspnId: "2515", label: "Radford Highlanders", leaguesTabListLabel: "Highlanders" },
+      { teamKey: "mncaab-2908", teamEspnId: "2908", label: "South Carolina Upstate Spartans", leaguesTabListLabel: "Spartans" },
+      { teamKey: "mncaab-2427", teamEspnId: "2427", label: "UNC Asheville Bulldogs", leaguesTabListLabel: "Bulldogs" },
+      { teamKey: "mncaab-2737", teamEspnId: "2737", label: "Winthrop Eagles", leaguesTabListLabel: "Eagles" }
+    ]
+  },
+  {
+    conferenceLabel: "Big Ten",
+    teams: [
+      { teamKey: "mncaab-356", teamEspnId: "356", label: "Illinois Fighting Illini", leaguesTabListLabel: "Fighting Illini" },
+      { teamKey: "mncaab-84", teamEspnId: "84", label: "Indiana Hoosiers", leaguesTabListLabel: "Hoosiers" },
+      { teamKey: "mncaab-2294", teamEspnId: "2294", label: "Iowa Hawkeyes", leaguesTabListLabel: "Hawkeyes" },
+      { teamKey: "mncaab-120", teamEspnId: "120", label: "Maryland Terrapins", leaguesTabListLabel: "Terrapins" },
+      { teamKey: "mncaab-127", teamEspnId: "127", label: "Michigan State Spartans", leaguesTabListLabel: "Spartans" },
+      { teamKey: "mncaab-130", teamEspnId: "130", label: "Michigan Wolverines", leaguesTabListLabel: "Wolverines" },
+      { teamKey: "mncaab-135", teamEspnId: "135", label: "Minnesota Golden Gophers", leaguesTabListLabel: "Golden Gophers" },
+      { teamKey: "mncaab-158", teamEspnId: "158", label: "Nebraska Cornhuskers", leaguesTabListLabel: "Cornhuskers" },
+      { teamKey: "mncaab-77", teamEspnId: "77", label: "Northwestern Wildcats", leaguesTabListLabel: "Wildcats" },
+      { teamKey: "mncaab-194", teamEspnId: "194", label: "Ohio State Buckeyes", leaguesTabListLabel: "Buckeyes" },
+      { teamKey: "mncaab-2483", teamEspnId: "2483", label: "Oregon Ducks", leaguesTabListLabel: "Ducks" },
+      { teamKey: "mncaab-213", teamEspnId: "213", label: "Penn State Nittany Lions", leaguesTabListLabel: "Nittany Lions" },
+      { teamKey: "mncaab-2509", teamEspnId: "2509", label: "Purdue Boilermakers", leaguesTabListLabel: "Boilermakers" },
+      { teamKey: "mncaab-164", teamEspnId: "164", label: "Rutgers Scarlet Knights", leaguesTabListLabel: "Scarlet Knights" },
+      { teamKey: "mncaab-26", teamEspnId: "26", label: "UCLA Bruins", leaguesTabListLabel: "Bruins" },
+      { teamKey: "mncaab-30", teamEspnId: "30", label: "USC Trojans", leaguesTabListLabel: "Trojans" },
+      { teamKey: "mncaab-264", teamEspnId: "264", label: "Washington Huskies", leaguesTabListLabel: "Huskies" },
+      { teamKey: "mncaab-275", teamEspnId: "275", label: "Wisconsin Badgers", leaguesTabListLabel: "Badgers" }
+    ]
+  },
+  {
+    conferenceLabel: "Big West",
+    teams: [
+      { teamKey: "mncaab-13", teamEspnId: "13", label: "Cal Poly Mustangs", leaguesTabListLabel: "Mustangs" },
+      { teamKey: "mncaab-2934", teamEspnId: "2934", label: "Cal State Bakersfield Roadrunners", leaguesTabListLabel: "Roadrunners" },
+      { teamKey: "mncaab-2239", teamEspnId: "2239", label: "Cal State Fullerton Titans", leaguesTabListLabel: "Titans" },
+      { teamKey: "mncaab-2463", teamEspnId: "2463", label: "Cal State Northridge Matadors", leaguesTabListLabel: "Matadors" },
+      { teamKey: "mncaab-2856", teamEspnId: "2856", label: "California Baptist Lancers", leaguesTabListLabel: "Lancers" },
+      { teamKey: "mncaab-299", teamEspnId: "299", label: "Long Beach State Beach", leaguesTabListLabel: "Beach" },
+      { teamKey: "mncaab-16", teamEspnId: "16", label: "Sacramento State Hornets", leaguesTabListLabel: "Hornets" },
+      { teamKey: "mncaab-300", teamEspnId: "300", label: "UC Irvine Anteaters", leaguesTabListLabel: "Anteaters" },
+      { teamKey: "mncaab-27", teamEspnId: "27", label: "UC Riverside Highlanders", leaguesTabListLabel: "Highlanders" },
+      { teamKey: "mncaab-28", teamEspnId: "28", label: "UC San Diego Tritons", leaguesTabListLabel: "Tritons" },
+      { teamKey: "mncaab-2540", teamEspnId: "2540", label: "UC Santa Barbara Gauchos", leaguesTabListLabel: "Gauchos" },
+      { teamKey: "mncaab-3084", teamEspnId: "3084", label: "Utah Valley Wolverines", leaguesTabListLabel: "Wolverines" }
+    ]
+  },
+  {
+    conferenceLabel: "Coastal",
+    teams: [
+      { teamKey: "mncaab-2097", teamEspnId: "2097", label: "Campbell Fighting Camels", leaguesTabListLabel: "Fighting Camels" },
+      { teamKey: "mncaab-232", teamEspnId: "232", label: "Charleston Cougars", leaguesTabListLabel: "Cougars" },
+      { teamKey: "mncaab-2182", teamEspnId: "2182", label: "Drexel Dragons", leaguesTabListLabel: "Dragons" },
+      { teamKey: "mncaab-2210", teamEspnId: "2210", label: "Elon Phoenix", leaguesTabListLabel: "Phoenix" },
+      { teamKey: "mncaab-2261", teamEspnId: "2261", label: "Hampton Pirates", leaguesTabListLabel: "Pirates" },
+      { teamKey: "mncaab-2275", teamEspnId: "2275", label: "Hofstra Pride", leaguesTabListLabel: "Pride" },
+      { teamKey: "mncaab-2405", teamEspnId: "2405", label: "Monmouth Hawks", leaguesTabListLabel: "Hawks" },
+      { teamKey: "mncaab-2448", teamEspnId: "2448", label: "North Carolina A&T Aggies", leaguesTabListLabel: "Aggies" },
+      { teamKey: "mncaab-111", teamEspnId: "111", label: "Northeastern Huskies", leaguesTabListLabel: "Huskies" },
+      { teamKey: "mncaab-2619", teamEspnId: "2619", label: "Stony Brook Seawolves", leaguesTabListLabel: "Seawolves" },
+      { teamKey: "mncaab-119", teamEspnId: "119", label: "Towson Tigers", leaguesTabListLabel: "Tigers" },
+      { teamKey: "mncaab-350", teamEspnId: "350", label: "UNC Wilmington Seahawks", leaguesTabListLabel: "Seahawks" },
+      { teamKey: "mncaab-2729", teamEspnId: "2729", label: "William & Mary Tribe", leaguesTabListLabel: "Tribe" }
+    ]
+  },
+  {
+    conferenceLabel: "Conference USA",
+    teams: [
+      { teamKey: "mncaab-48", teamEspnId: "48", label: "Delaware Blue Hens", leaguesTabListLabel: "Blue Hens" },
+      { teamKey: "mncaab-2229", teamEspnId: "2229", label: "Florida International Panthers", leaguesTabListLabel: "Panthers" },
+      { teamKey: "mncaab-55", teamEspnId: "55", label: "Jacksonville State Gamecocks", leaguesTabListLabel: "Gamecocks" },
+      { teamKey: "mncaab-338", teamEspnId: "338", label: "Kennesaw State Owls", leaguesTabListLabel: "Owls" },
+      { teamKey: "mncaab-2335", teamEspnId: "2335", label: "Liberty Flames", leaguesTabListLabel: "Flames" },
+      { teamKey: "mncaab-2348", teamEspnId: "2348", label: "Louisiana Tech Bulldogs", leaguesTabListLabel: "Bulldogs" },
+      { teamKey: "mncaab-2393", teamEspnId: "2393", label: "Middle Tennessee Blue Raiders", leaguesTabListLabel: "Blue Raiders" },
+      { teamKey: "mncaab-2623", teamEspnId: "2623", label: "Missouri State Bears", leaguesTabListLabel: "Bears" },
+      { teamKey: "mncaab-166", teamEspnId: "166", label: "New Mexico State Aggies", leaguesTabListLabel: "Aggies" },
+      { teamKey: "mncaab-2534", teamEspnId: "2534", label: "Sam Houston Bearkats", leaguesTabListLabel: "Bearkats" },
+      { teamKey: "mncaab-98", teamEspnId: "98", label: "Western Kentucky Hilltoppers", leaguesTabListLabel: "Hilltoppers" }
+    ]
+  },
+  {
+    conferenceLabel: "Horizon",
+    teams: [
+      { teamKey: "mncaab-325", teamEspnId: "325", label: "Cleveland State Vikings", leaguesTabListLabel: "Vikings" },
+      { teamKey: "mncaab-2174", teamEspnId: "2174", label: "Detroit Mercy Titans", leaguesTabListLabel: "Titans" },
+      { teamKey: "mncaab-2739", teamEspnId: "2739", label: "Green Bay Phoenix", leaguesTabListLabel: "Phoenix" },
+      { teamKey: "mncaab-85", teamEspnId: "85", label: "IU Indianapolis Jaguars", leaguesTabListLabel: "Jaguars" },
+      { teamKey: "mncaab-270", teamEspnId: "270", label: "Milwaukee Panthers", leaguesTabListLabel: "Panthers" },
+      { teamKey: "mncaab-2459", teamEspnId: "2459", label: "Northern Illinois Huskies", leaguesTabListLabel: "Huskies" },
+      { teamKey: "mncaab-94", teamEspnId: "94", label: "Northern Kentucky Norse", leaguesTabListLabel: "Norse" },
+      { teamKey: "mncaab-2473", teamEspnId: "2473", label: "Oakland Golden Grizzlies", leaguesTabListLabel: "Golden Grizzlies" },
+      { teamKey: "mncaab-2870", teamEspnId: "2870", label: "Purdue Fort Wayne Mastodons", leaguesTabListLabel: "Mastodons" },
+      { teamKey: "mncaab-2523", teamEspnId: "2523", label: "Robert Morris Colonials", leaguesTabListLabel: "Colonials" },
+      { teamKey: "mncaab-2750", teamEspnId: "2750", label: "Wright State Raiders", leaguesTabListLabel: "Raiders" },
+      { teamKey: "mncaab-2754", teamEspnId: "2754", label: "Youngstown State Penguins", leaguesTabListLabel: "Penguins" }
+    ]
+  },
+  {
+    conferenceLabel: "Ivy",
+    teams: [
+      { teamKey: "mncaab-225", teamEspnId: "225", label: "Brown Bears", leaguesTabListLabel: "Bears" },
+      { teamKey: "mncaab-171", teamEspnId: "171", label: "Columbia Lions", leaguesTabListLabel: "Lions" },
+      { teamKey: "mncaab-172", teamEspnId: "172", label: "Cornell Big Red", leaguesTabListLabel: "Big Red" },
+      { teamKey: "mncaab-159", teamEspnId: "159", label: "Dartmouth Big Green", leaguesTabListLabel: "Big Green" },
+      { teamKey: "mncaab-108", teamEspnId: "108", label: "Harvard Crimson", leaguesTabListLabel: "Crimson" },
+      { teamKey: "mncaab-219", teamEspnId: "219", label: "Pennsylvania Quakers", leaguesTabListLabel: "Quakers" },
+      { teamKey: "mncaab-163", teamEspnId: "163", label: "Princeton Tigers", leaguesTabListLabel: "Tigers" },
+      { teamKey: "mncaab-43", teamEspnId: "43", label: "Yale Bulldogs", leaguesTabListLabel: "Bulldogs" }
+    ]
+  },
+  {
+    conferenceLabel: "MEAC",
+    teams: [
+      { teamKey: "mncaab-2154", teamEspnId: "2154", label: "Coppin State Eagles", leaguesTabListLabel: "Eagles" },
+      { teamKey: "mncaab-2169", teamEspnId: "2169", label: "Delaware State Hornets", leaguesTabListLabel: "Hornets" },
+      { teamKey: "mncaab-47", teamEspnId: "47", label: "Howard Bison", leaguesTabListLabel: "Bison" },
+      { teamKey: "mncaab-2379", teamEspnId: "2379", label: "Maryland Eastern Shore Hawks", leaguesTabListLabel: "Hawks" },
+      { teamKey: "mncaab-2415", teamEspnId: "2415", label: "Morgan State Bears", leaguesTabListLabel: "Bears" },
+      { teamKey: "mncaab-2450", teamEspnId: "2450", label: "Norfolk State Spartans", leaguesTabListLabel: "Spartans" },
+      { teamKey: "mncaab-2428", teamEspnId: "2428", label: "North Carolina Central Eagles", leaguesTabListLabel: "Eagles" },
+      { teamKey: "mncaab-2569", teamEspnId: "2569", label: "South Carolina State Bulldogs", leaguesTabListLabel: "Bulldogs" }
+    ]
+  },
+  {
+    conferenceLabel: "Metro",
+    teams: [
+      { teamKey: "mncaab-2099", teamEspnId: "2099", label: "Canisius Golden Griffins", leaguesTabListLabel: "Golden Griffins" },
+      { teamKey: "mncaab-2217", teamEspnId: "2217", label: "Fairfield Stags", leaguesTabListLabel: "Stags" },
+      { teamKey: "mncaab-314", teamEspnId: "314", label: "Iona Gaels", leaguesTabListLabel: "Gaels" },
+      { teamKey: "mncaab-2363", teamEspnId: "2363", label: "Manhattan Jaspers", leaguesTabListLabel: "Jaspers" },
+      { teamKey: "mncaab-2368", teamEspnId: "2368", label: "Marist Red Foxes", leaguesTabListLabel: "Red Foxes" },
+      { teamKey: "mncaab-2771", teamEspnId: "2771", label: "Merrimack Warriors", leaguesTabListLabel: "Warriors" },
+      { teamKey: "mncaab-116", teamEspnId: "116", label: "Mount St. Mary's Mountaineers", leaguesTabListLabel: "Mountaineers" },
+      { teamKey: "mncaab-315", teamEspnId: "315", label: "Niagara Purple Eagles", leaguesTabListLabel: "Purple Eagles" },
+      { teamKey: "mncaab-2514", teamEspnId: "2514", label: "Quinnipiac Bobcats", leaguesTabListLabel: "Bobcats" },
+      { teamKey: "mncaab-2520", teamEspnId: "2520", label: "Rider Broncs", leaguesTabListLabel: "Broncs" },
+      { teamKey: "mncaab-2529", teamEspnId: "2529", label: "Sacred Heart Pioneers", leaguesTabListLabel: "Pioneers" },
+      { teamKey: "mncaab-2612", teamEspnId: "2612", label: "Saint Peter's Peacocks", leaguesTabListLabel: "Peacocks" },
+      { teamKey: "mncaab-2561", teamEspnId: "2561", label: "Siena Saints", leaguesTabListLabel: "Saints" }
+    ]
+  },
+  {
+    conferenceLabel: "Mid-American",
+    teams: [
+      { teamKey: "mncaab-2006", teamEspnId: "2006", label: "Akron Zips", leaguesTabListLabel: "Zips" },
+      { teamKey: "mncaab-2050", teamEspnId: "2050", label: "Ball State Cardinals", leaguesTabListLabel: "Cardinals" },
+      { teamKey: "mncaab-189", teamEspnId: "189", label: "Bowling Green Falcons", leaguesTabListLabel: "Falcons" },
+      { teamKey: "mncaab-2084", teamEspnId: "2084", label: "Buffalo Bulls", leaguesTabListLabel: "Bulls" },
+      { teamKey: "mncaab-2117", teamEspnId: "2117", label: "Central Michigan Chippewas", leaguesTabListLabel: "Chippewas" },
+      { teamKey: "mncaab-2199", teamEspnId: "2199", label: "Eastern Michigan Eagles", leaguesTabListLabel: "Eagles" },
+      { teamKey: "mncaab-2309", teamEspnId: "2309", label: "Kent State Golden Flashes", leaguesTabListLabel: "Golden Flashes" },
+      { teamKey: "mncaab-113", teamEspnId: "113", label: "Massachusetts Minutemen", leaguesTabListLabel: "Minutemen" },
+      { teamKey: "mncaab-193", teamEspnId: "193", label: "Miami (OH) RedHawks", leaguesTabListLabel: "RedHawks" },
+      { teamKey: "mncaab-195", teamEspnId: "195", label: "Ohio Bobcats", leaguesTabListLabel: "Bobcats" },
+      { teamKey: "mncaab-2649", teamEspnId: "2649", label: "Toledo Rockets", leaguesTabListLabel: "Rockets" },
+      { teamKey: "mncaab-2711", teamEspnId: "2711", label: "Western Michigan Broncos", leaguesTabListLabel: "Broncos" }
+    ]
+  },
+  {
+    conferenceLabel: "Missouri Valley",
+    teams: [
+      { teamKey: "mncaab-2057", teamEspnId: "2057", label: "Belmont Bruins", leaguesTabListLabel: "Bruins" },
+      { teamKey: "mncaab-71", teamEspnId: "71", label: "Bradley Braves", leaguesTabListLabel: "Braves" },
+      { teamKey: "mncaab-2181", teamEspnId: "2181", label: "Drake Bulldogs", leaguesTabListLabel: "Bulldogs" },
+      { teamKey: "mncaab-339", teamEspnId: "339", label: "Evansville Purple Aces", leaguesTabListLabel: "Purple Aces" },
+      { teamKey: "mncaab-2287", teamEspnId: "2287", label: "Illinois State Redbirds", leaguesTabListLabel: "Redbirds" },
+      { teamKey: "mncaab-282", teamEspnId: "282", label: "Indiana State Sycamores", leaguesTabListLabel: "Sycamores" },
+      { teamKey: "mncaab-93", teamEspnId: "93", label: "Murray State Racers", leaguesTabListLabel: "Racers" },
+      { teamKey: "mncaab-2460", teamEspnId: "2460", label: "Northern Iowa Panthers", leaguesTabListLabel: "Panthers" },
+      { teamKey: "mncaab-79", teamEspnId: "79", label: "Southern Illinois Salukis", leaguesTabListLabel: "Salukis" },
+      { teamKey: "mncaab-82", teamEspnId: "82", label: "UIC Flames", leaguesTabListLabel: "Flames" },
+      { teamKey: "mncaab-2674", teamEspnId: "2674", label: "Valparaiso Beacons", leaguesTabListLabel: "Beacons" }
+    ]
+  },
+  {
+    conferenceLabel: "Mountain West",
+    teams: [
+      { teamKey: "mncaab-2005", teamEspnId: "2005", label: "Air Force Falcons", leaguesTabListLabel: "Falcons" },
+      { teamKey: "mncaab-2253", teamEspnId: "2253", label: "Grand Canyon Lopes", leaguesTabListLabel: "Lopes" },
+      { teamKey: "mncaab-62", teamEspnId: "62", label: "Hawai'i Rainbow Warriors", leaguesTabListLabel: "Rainbow Warriors" },
+      { teamKey: "mncaab-2440", teamEspnId: "2440", label: "Nevada Wolf Pack", leaguesTabListLabel: "Wolf Pack" },
+      { teamKey: "mncaab-167", teamEspnId: "167", label: "New Mexico Lobos", leaguesTabListLabel: "Lobos" },
+      { teamKey: "mncaab-23", teamEspnId: "23", label: "San Jos\xE9 State Spartans", leaguesTabListLabel: "Spartans" },
+      { teamKey: "mncaab-328", teamEspnId: "328", label: "Utah State Aggies", leaguesTabListLabel: "Aggies" },
+      { teamKey: "mncaab-2439", teamEspnId: "2439", label: "UNLV Rebels", leaguesTabListLabel: "Rebels" },
+      { teamKey: "mncaab-2638", teamEspnId: "2638", label: "UTEP Miners", leaguesTabListLabel: "Miners" },
+      { teamKey: "mncaab-2751", teamEspnId: "2751", label: "Wyoming Cowboys", leaguesTabListLabel: "Cowboys" }
+    ]
+  },
+  {
+    conferenceLabel: "Northeast",
+    teams: [
+      { teamKey: "mncaab-2115", teamEspnId: "2115", label: "Central Connecticut Blue Devils", leaguesTabListLabel: "Blue Devils" },
+      { teamKey: "mncaab-2130", teamEspnId: "2130", label: "Chicago State Cougars", leaguesTabListLabel: "Cougars" },
+      { teamKey: "mncaab-161", teamEspnId: "161", label: "Fairleigh Dickinson Knights", leaguesTabListLabel: "Knights" },
+      { teamKey: "mncaab-2330", teamEspnId: "2330", label: "Le Moyne Dolphins", leaguesTabListLabel: "Dolphins" },
+      { teamKey: "mncaab-112358", teamEspnId: "112358", label: "Long Island University Sharks", leaguesTabListLabel: "Sharks" },
+      { teamKey: "mncaab-2385", teamEspnId: "2385", label: "Mercyhurst Lakers", leaguesTabListLabel: "Lakers" },
+      { teamKey: "mncaab-2441", teamEspnId: "2441", label: "New Haven Chargers", leaguesTabListLabel: "Chargers" },
+      { teamKey: "mncaab-284", teamEspnId: "284", label: "Stonehill Skyhawks", leaguesTabListLabel: "Skyhawks" },
+      { teamKey: "mncaab-2681", teamEspnId: "2681", label: "Wagner Seahawks", leaguesTabListLabel: "Seahawks" }
+    ]
+  },
+  {
+    conferenceLabel: "Ohio Valley",
+    teams: [
+      { teamKey: "mncaab-2197", teamEspnId: "2197", label: "Eastern Illinois Panthers", leaguesTabListLabel: "Panthers" },
+      { teamKey: "mncaab-2815", teamEspnId: "2815", label: "Lindenwood Lions", leaguesTabListLabel: "Lions" },
+      { teamKey: "mncaab-2413", teamEspnId: "2413", label: "Morehead State Eagles", leaguesTabListLabel: "Eagles" },
+      { teamKey: "mncaab-2565", teamEspnId: "2565", label: "SIU Edwardsville Cougars", leaguesTabListLabel: "Cougars" },
+      { teamKey: "mncaab-2546", teamEspnId: "2546", label: "Southeast Missouri State Redhawks", leaguesTabListLabel: "Redhawks" },
+      { teamKey: "mncaab-88", teamEspnId: "88", label: "Southern Indiana Screaming Eagles", leaguesTabListLabel: "Screaming Eagles" },
+      { teamKey: "mncaab-2634", teamEspnId: "2634", label: "Tennessee State Tigers", leaguesTabListLabel: "Tigers" },
+      { teamKey: "mncaab-2630", teamEspnId: "2630", label: "UT Martin Skyhawks", leaguesTabListLabel: "Skyhawks" },
+      { teamKey: "mncaab-2710", teamEspnId: "2710", label: "Western Illinois Leathernecks", leaguesTabListLabel: "Leathernecks" }
+    ]
+  },
+  {
+    conferenceLabel: "Pac-12",
+    teams: [
+      { teamKey: "mncaab-68", teamEspnId: "68", label: "Boise State Broncos", leaguesTabListLabel: "Broncos" },
+      { teamKey: "mncaab-36", teamEspnId: "36", label: "Colorado State Rams", leaguesTabListLabel: "Rams" },
+      { teamKey: "mncaab-278", teamEspnId: "278", label: "Fresno State Bulldogs", leaguesTabListLabel: "Bulldogs" },
+      { teamKey: "mncaab-2250", teamEspnId: "2250", label: "Gonzaga Bulldogs", leaguesTabListLabel: "Bulldogs" },
+      { teamKey: "mncaab-204", teamEspnId: "204", label: "Oregon State Beavers", leaguesTabListLabel: "Beavers" },
+      { teamKey: "mncaab-21", teamEspnId: "21", label: "San Diego State Aztecs", leaguesTabListLabel: "Aztecs" },
+      { teamKey: "mncaab-326", teamEspnId: "326", label: "Texas State Bobcats", leaguesTabListLabel: "Bobcats" },
+      { teamKey: "mncaab-302", teamEspnId: "302", label: "UC Davis Aggies", leaguesTabListLabel: "Aggies" },
+      { teamKey: "mncaab-265", teamEspnId: "265", label: "Washington State Cougars", leaguesTabListLabel: "Cougars" }
+    ]
+  },
+  {
+    conferenceLabel: "Patriot League",
+    teams: [
+      { teamKey: "mncaab-44", teamEspnId: "44", label: "American University Eagles", leaguesTabListLabel: "Eagles" },
+      { teamKey: "mncaab-349", teamEspnId: "349", label: "Army Black Knights", leaguesTabListLabel: "Black Knights" },
+      { teamKey: "mncaab-104", teamEspnId: "104", label: "Boston University Terriers", leaguesTabListLabel: "Terriers" },
+      { teamKey: "mncaab-2083", teamEspnId: "2083", label: "Bucknell Bison", leaguesTabListLabel: "Bison" },
+      { teamKey: "mncaab-2142", teamEspnId: "2142", label: "Colgate Raiders", leaguesTabListLabel: "Raiders" },
+      { teamKey: "mncaab-107", teamEspnId: "107", label: "Holy Cross Crusaders", leaguesTabListLabel: "Crusaders" },
+      { teamKey: "mncaab-322", teamEspnId: "322", label: "Lafayette Leopards", leaguesTabListLabel: "Leopards" },
+      { teamKey: "mncaab-2329", teamEspnId: "2329", label: "Lehigh Mountain Hawks", leaguesTabListLabel: "Mountain Hawks" },
+      { teamKey: "mncaab-2352", teamEspnId: "2352", label: "Loyola Maryland Greyhounds", leaguesTabListLabel: "Greyhounds" },
+      { teamKey: "mncaab-2426", teamEspnId: "2426", label: "Navy Midshipmen", leaguesTabListLabel: "Midshipmen" }
+    ]
+  },
+  {
+    conferenceLabel: "SEC",
+    teams: [
+      { teamKey: "mncaab-333", teamEspnId: "333", label: "Alabama Crimson Tide", leaguesTabListLabel: "Crimson Tide" },
+      { teamKey: "mncaab-8", teamEspnId: "8", label: "Arkansas Razorbacks", leaguesTabListLabel: "Razorbacks" },
+      { teamKey: "mncaab-99", teamEspnId: "99", label: "LSU Tigers", leaguesTabListLabel: "Tigers" },
+      { teamKey: "mncaab-57", teamEspnId: "57", label: "Florida Gators", leaguesTabListLabel: "Gators" },
+      { teamKey: "mncaab-344", teamEspnId: "344", label: "Mississippi State Bulldogs", leaguesTabListLabel: "Bulldogs" },
+      { teamKey: "mncaab-96", teamEspnId: "96", label: "Kentucky Wildcats", leaguesTabListLabel: "Wildcats" },
+      { teamKey: "mncaab-2", teamEspnId: "2", label: "Auburn Tigers", leaguesTabListLabel: "Tigers" },
+      { teamKey: "mncaab-61", teamEspnId: "61", label: "Georgia Bulldogs", leaguesTabListLabel: "Bulldogs" },
+      { teamKey: "mncaab-142", teamEspnId: "142", label: "Missouri Tigers", leaguesTabListLabel: "Tigers" },
+      { teamKey: "mncaab-201", teamEspnId: "201", label: "Oklahoma Sooners", leaguesTabListLabel: "Sooners" },
+      { teamKey: "mncaab-145", teamEspnId: "145", label: "Ole Miss Rebels", leaguesTabListLabel: "Rebels" },
+      { teamKey: "mncaab-2579", teamEspnId: "2579", label: "South Carolina Gamecocks", leaguesTabListLabel: "Gamecocks" },
+      { teamKey: "mncaab-2633", teamEspnId: "2633", label: "Tennessee Volunteers", leaguesTabListLabel: "Volunteers" },
+      { teamKey: "mncaab-245", teamEspnId: "245", label: "Texas A&M Aggies", leaguesTabListLabel: "Aggies" },
+      { teamKey: "mncaab-251", teamEspnId: "251", label: "Texas Longhorns", leaguesTabListLabel: "Longhorns" },
+      { teamKey: "mncaab-238", teamEspnId: "238", label: "Vanderbilt Commodores", leaguesTabListLabel: "Commodores" }
+    ]
+  },
+  {
+    conferenceLabel: "SWAC",
+    teams: [
+      { teamKey: "mncaab-2010", teamEspnId: "2010", label: "Alabama A&M Bulldogs", leaguesTabListLabel: "Bulldogs" },
+      { teamKey: "mncaab-2011", teamEspnId: "2011", label: "Alabama State Hornets", leaguesTabListLabel: "Hornets" },
+      { teamKey: "mncaab-2016", teamEspnId: "2016", label: "Alcorn State Braves", leaguesTabListLabel: "Braves" },
+      { teamKey: "mncaab-2029", teamEspnId: "2029", label: "Arkansas-Pine Bluff Golden Lions", leaguesTabListLabel: "Golden Lions" },
+      { teamKey: "mncaab-2065", teamEspnId: "2065", label: "Bethune-Cookman Wildcats", leaguesTabListLabel: "Wildcats" },
+      { teamKey: "mncaab-50", teamEspnId: "50", label: "Florida A&M Rattlers", leaguesTabListLabel: "Rattlers" },
+      { teamKey: "mncaab-2755", teamEspnId: "2755", label: "Grambling Tigers", leaguesTabListLabel: "Tigers" },
+      { teamKey: "mncaab-2640", teamEspnId: "2640", label: "Texas Southern Tigers", leaguesTabListLabel: "Tigers" },
+      { teamKey: "mncaab-2400", teamEspnId: "2400", label: "Mississippi Valley State Delta Devils", leaguesTabListLabel: "Delta Devils" },
+      { teamKey: "mncaab-2504", teamEspnId: "2504", label: "Prairie View A&M Panthers", leaguesTabListLabel: "Panthers" },
+      { teamKey: "mncaab-2582", teamEspnId: "2582", label: "Southern Jaguars", leaguesTabListLabel: "Jaguars" },
+      { teamKey: "mncaab-2296", teamEspnId: "2296", label: "Jackson State Tigers", leaguesTabListLabel: "Tigers" }
+    ]
+  },
+  {
+    conferenceLabel: "Southern",
+    teams: [
+      { teamKey: "mncaab-236", teamEspnId: "236", label: "Chattanooga Mocs", leaguesTabListLabel: "Mocs" },
+      { teamKey: "mncaab-2193", teamEspnId: "2193", label: "East Tennessee State Buccaneers", leaguesTabListLabel: "Buccaneers" },
+      { teamKey: "mncaab-231", teamEspnId: "231", label: "Furman Paladins", leaguesTabListLabel: "Paladins" },
+      { teamKey: "mncaab-2382", teamEspnId: "2382", label: "Mercer Bears", leaguesTabListLabel: "Bears" },
+      { teamKey: "mncaab-2535", teamEspnId: "2535", label: "Samford Bulldogs", leaguesTabListLabel: "Bulldogs" },
+      { teamKey: "mncaab-2635", teamEspnId: "2635", label: "Tennessee Tech Golden Eagles", leaguesTabListLabel: "Golden Eagles" },
+      { teamKey: "mncaab-2643", teamEspnId: "2643", label: "The Citadel Bulldogs", leaguesTabListLabel: "Bulldogs" },
+      { teamKey: "mncaab-2430", teamEspnId: "2430", label: "UNC Greensboro Spartans", leaguesTabListLabel: "Spartans" },
+      { teamKey: "mncaab-2678", teamEspnId: "2678", label: "VMI Keydets", leaguesTabListLabel: "Keydets" },
+      { teamKey: "mncaab-2717", teamEspnId: "2717", label: "Western Carolina Catamounts", leaguesTabListLabel: "Catamounts" },
+      { teamKey: "mncaab-2747", teamEspnId: "2747", label: "Wofford Terriers", leaguesTabListLabel: "Terriers" }
+    ]
+  },
+  {
+    conferenceLabel: "Southland",
+    teams: [
+      { teamKey: "mncaab-2837", teamEspnId: "2837", label: "East Texas A&M Lions", leaguesTabListLabel: "Lions" },
+      { teamKey: "mncaab-2277", teamEspnId: "2277", label: "Houston Christian Huskies", leaguesTabListLabel: "Huskies" },
+      { teamKey: "mncaab-2916", teamEspnId: "2916", label: "Incarnate Word Cardinals", leaguesTabListLabel: "Cardinals" },
+      { teamKey: "mncaab-2443", teamEspnId: "2443", label: "LSU New Orleans Privateers", leaguesTabListLabel: "Privateers" },
+      { teamKey: "mncaab-2320", teamEspnId: "2320", label: "Lamar Cardinals", leaguesTabListLabel: "Cardinals" },
+      { teamKey: "mncaab-2377", teamEspnId: "2377", label: "McNeese Cowboys", leaguesTabListLabel: "Cowboys" },
+      { teamKey: "mncaab-2447", teamEspnId: "2447", label: "Nicholls Colonels", leaguesTabListLabel: "Colonels" },
+      { teamKey: "mncaab-2466", teamEspnId: "2466", label: "Northwestern State Demons", leaguesTabListLabel: "Demons" },
+      { teamKey: "mncaab-2545", teamEspnId: "2545", label: "SE Louisiana Lions", leaguesTabListLabel: "Lions" },
+      { teamKey: "mncaab-2617", teamEspnId: "2617", label: "Stephen F. Austin Lumberjacks", leaguesTabListLabel: "Lumberjacks" },
+      { teamKey: "mncaab-357", teamEspnId: "357", label: "Texas A&M-Corpus Christi Islanders", leaguesTabListLabel: "Islanders" },
+      { teamKey: "mncaab-292", teamEspnId: "292", label: "UT Rio Grande Valley Vaqueros", leaguesTabListLabel: "Vaqueros" }
+    ]
+  },
+  {
+    conferenceLabel: "Summit League",
+    teams: [
+      { teamKey: "mncaab-140", teamEspnId: "140", label: "Kansas City Roos", leaguesTabListLabel: "Roos" },
+      { teamKey: "mncaab-155", teamEspnId: "155", label: "North Dakota Fighting Hawks", leaguesTabListLabel: "Fighting Hawks" },
+      { teamKey: "mncaab-2449", teamEspnId: "2449", label: "North Dakota State Bison", leaguesTabListLabel: "Bison" },
+      { teamKey: "mncaab-2437", teamEspnId: "2437", label: "Omaha Mavericks", leaguesTabListLabel: "Mavericks" },
+      { teamKey: "mncaab-198", teamEspnId: "198", label: "Oral Roberts Golden Eagles", leaguesTabListLabel: "Golden Eagles" },
+      { teamKey: "mncaab-233", teamEspnId: "233", label: "South Dakota Coyotes", leaguesTabListLabel: "Coyotes" },
+      { teamKey: "mncaab-2571", teamEspnId: "2571", label: "South Dakota State Jackrabbits", leaguesTabListLabel: "Jackrabbits" },
+      { teamKey: "mncaab-2900", teamEspnId: "2900", label: "St. Thomas Tommies", leaguesTabListLabel: "Tommies" }
+    ]
+  },
+  {
+    conferenceLabel: "Sun Belt",
+    teams: [
+      { teamKey: "mncaab-2026", teamEspnId: "2026", label: "App State Mountaineers", leaguesTabListLabel: "Mountaineers" },
+      { teamKey: "mncaab-2032", teamEspnId: "2032", label: "Arkansas State Red Wolves", leaguesTabListLabel: "Red Wolves" },
+      { teamKey: "mncaab-324", teamEspnId: "324", label: "Coastal Carolina Chanticleers", leaguesTabListLabel: "Chanticleers" },
+      { teamKey: "mncaab-290", teamEspnId: "290", label: "Georgia Southern Eagles", leaguesTabListLabel: "Eagles" },
+      { teamKey: "mncaab-2247", teamEspnId: "2247", label: "Georgia State Panthers", leaguesTabListLabel: "Panthers" },
+      { teamKey: "mncaab-256", teamEspnId: "256", label: "James Madison Dukes", leaguesTabListLabel: "Dukes" },
+      { teamKey: "mncaab-309", teamEspnId: "309", label: "Louisiana Ragin' Cajuns", leaguesTabListLabel: "Ragin' Cajuns" },
+      { teamKey: "mncaab-276", teamEspnId: "276", label: "Marshall Thundering Herd", leaguesTabListLabel: "Thundering Herd" },
+      { teamKey: "mncaab-295", teamEspnId: "295", label: "Old Dominion Monarchs", leaguesTabListLabel: "Monarchs" },
+      { teamKey: "mncaab-6", teamEspnId: "6", label: "South Alabama Jaguars", leaguesTabListLabel: "Jaguars" },
+      { teamKey: "mncaab-2572", teamEspnId: "2572", label: "Southern Miss Golden Eagles", leaguesTabListLabel: "Golden Eagles" },
+      { teamKey: "mncaab-2653", teamEspnId: "2653", label: "Troy Trojans", leaguesTabListLabel: "Trojans" },
+      { teamKey: "mncaab-2433", teamEspnId: "2433", label: "UL Monroe Warhawks", leaguesTabListLabel: "Warhawks" }
+    ]
+  },
+  {
+    conferenceLabel: "UAC",
+    teams: [
+      { teamKey: "mncaab-2000", teamEspnId: "2000", label: "Abilene Christian Wildcats", leaguesTabListLabel: "Wildcats" },
+      { teamKey: "mncaab-2046", teamEspnId: "2046", label: "Austin Peay Governors", leaguesTabListLabel: "Governors" },
+      { teamKey: "mncaab-2110", teamEspnId: "2110", label: "Central Arkansas Bears", leaguesTabListLabel: "Bears" },
+      { teamKey: "mncaab-2198", teamEspnId: "2198", label: "Eastern Kentucky Colonels", leaguesTabListLabel: "Colonels" },
+      { teamKey: "mncaab-2031", teamEspnId: "2031", label: "Little Rock Trojans", leaguesTabListLabel: "Trojans" },
+      { teamKey: "mncaab-2453", teamEspnId: "2453", label: "North Alabama Lions", leaguesTabListLabel: "Lions" },
+      { teamKey: "mncaab-2627", teamEspnId: "2627", label: "Tarleton State Texans", leaguesTabListLabel: "Texans" },
+      { teamKey: "mncaab-250", teamEspnId: "250", label: "UT Arlington Mavericks", leaguesTabListLabel: "Mavericks" },
+      { teamKey: "mncaab-2698", teamEspnId: "2698", label: "West Georgia Wolves", leaguesTabListLabel: "Wolves" }
+    ]
+  },
+  {
+    conferenceLabel: "West Coast",
+    teams: [
+      { teamKey: "mncaab-2172", teamEspnId: "2172", label: "Denver Pioneers", leaguesTabListLabel: "Pioneers" },
+      { teamKey: "mncaab-2351", teamEspnId: "2351", label: "Loyola Marymount Lions", leaguesTabListLabel: "Lions" },
+      { teamKey: "mncaab-279", teamEspnId: "279", label: "Pacific Tigers", leaguesTabListLabel: "Tigers" },
+      { teamKey: "mncaab-2492", teamEspnId: "2492", label: "Pepperdine Waves", leaguesTabListLabel: "Waves" },
+      { teamKey: "mncaab-2501", teamEspnId: "2501", label: "Portland Pilots", leaguesTabListLabel: "Pilots" },
+      { teamKey: "mncaab-2608", teamEspnId: "2608", label: "Saint Mary's Gaels", leaguesTabListLabel: "Gaels" },
+      { teamKey: "mncaab-301", teamEspnId: "301", label: "San Diego Toreros", leaguesTabListLabel: "Toreros" },
+      { teamKey: "mncaab-2539", teamEspnId: "2539", label: "San Francisco Dons", leaguesTabListLabel: "Dons" },
+      { teamKey: "mncaab-2541", teamEspnId: "2541", label: "Santa Clara Broncos", leaguesTabListLabel: "Broncos" },
+      { teamKey: "mncaab-2547", teamEspnId: "2547", label: "Seattle U Redhawks", leaguesTabListLabel: "Redhawks" }
+    ]
+  }
+];
+
+// ../grarf/desktop/src/data/nflTeamPopulation.ts
+init_define_import_meta_env();
+function nflTeam(abbrev, leaguesTabListLabel, label) {
+  return {
+    teamKey: `nfl-${abbrev.toLowerCase()}`,
+    teamAbbrev: abbrev,
+    label,
+    leaguesTabListLabel
+  };
+}
+var NFL_TEAM_POPULATION_BY_DIVISION = [
+  {
+    divisionLabel: "AFC EAST",
+    teams: [
+      nflTeam("BUF", "Bills", "Buffalo Bills"),
+      nflTeam("MIA", "Dolphins", "Miami Dolphins"),
+      nflTeam("NE", "Patriots", "New England Patriots"),
+      nflTeam("NYJ", "Jets", "New York Jets")
+    ]
+  },
+  {
+    divisionLabel: "AFC NORTH",
+    teams: [
+      nflTeam("BAL", "Ravens", "Baltimore Ravens"),
+      nflTeam("CIN", "Bengals", "Cincinnati Bengals"),
+      nflTeam("CLE", "Browns", "Cleveland Browns"),
+      nflTeam("PIT", "Steelers", "Pittsburgh Steelers")
+    ]
+  },
+  {
+    divisionLabel: "AFC SOUTH",
+    teams: [
+      nflTeam("HOU", "Texans", "Houston Texans"),
+      nflTeam("IND", "Colts", "Indianapolis Colts"),
+      nflTeam("JAX", "Jaguars", "Jacksonville Jaguars"),
+      nflTeam("TEN", "Titans", "Tennessee Titans")
+    ]
+  },
+  {
+    divisionLabel: "AFC WEST",
+    teams: [
+      nflTeam("DEN", "Broncos", "Denver Broncos"),
+      nflTeam("KC", "Chiefs", "Kansas City Chiefs"),
+      nflTeam("LV", "Raiders", "Las Vegas Raiders"),
+      nflTeam("LAC", "Chargers", "Los Angeles Chargers")
+    ]
+  },
+  {
+    divisionLabel: "NFC EAST",
+    teams: [
+      nflTeam("DAL", "Cowboys", "Dallas Cowboys"),
+      nflTeam("NYG", "Giants", "New York Giants"),
+      nflTeam("PHI", "Eagles", "Philadelphia Eagles"),
+      nflTeam("WSH", "Commanders", "Washington Commanders")
+    ]
+  },
+  {
+    divisionLabel: "NFC NORTH",
+    teams: [
+      nflTeam("CHI", "Bears", "Chicago Bears"),
+      nflTeam("DET", "Lions", "Detroit Lions"),
+      nflTeam("GB", "Packers", "Green Bay Packers"),
+      nflTeam("MIN", "Vikings", "Minnesota Vikings")
+    ]
+  },
+  {
+    divisionLabel: "NFC SOUTH",
+    teams: [
+      nflTeam("ATL", "Falcons", "Atlanta Falcons"),
+      nflTeam("CAR", "Panthers", "Carolina Panthers"),
+      nflTeam("NO", "Saints", "New Orleans Saints"),
+      nflTeam("TB", "Buccaneers", "Tampa Bay Buccaneers")
+    ]
+  },
+  {
+    divisionLabel: "NFC WEST",
+    teams: [
+      nflTeam("ARI", "Cardinals", "Arizona Cardinals"),
+      nflTeam("LAR", "Rams", "Los Angeles Rams"),
+      nflTeam("SF", "49ers", "San Francisco 49ers"),
+      nflTeam("SEA", "Seahawks", "Seattle Seahawks")
+    ]
+  }
+];
+
+// ../grarf/desktop/src/data/nbaTeamPopulation.ts
+init_define_import_meta_env();
+function nbaTeam(abbrev, leaguesTabListLabel, label) {
+  return {
+    teamKey: `nba-${abbrev.toLowerCase()}`,
+    teamAbbrev: abbrev,
+    label,
+    leaguesTabListLabel
+  };
+}
+var NBA_TEAM_POPULATION_BY_DIVISION = [
+  {
+    divisionLabel: "ATLANTIC",
+    teams: [
+      nbaTeam("BOS", "Celtics", "Boston Celtics"),
+      nbaTeam("BKN", "Nets", "Brooklyn Nets"),
+      nbaTeam("NYK", "Knicks", "New York Knicks"),
+      nbaTeam("PHI", "76ers", "Philadelphia 76ers"),
+      nbaTeam("TOR", "Raptors", "Toronto Raptors")
+    ]
+  },
+  {
+    divisionLabel: "CENTRAL",
+    teams: [
+      nbaTeam("CHI", "Bulls", "Chicago Bulls"),
+      nbaTeam("CLE", "Cavaliers", "Cleveland Cavaliers"),
+      nbaTeam("DET", "Pistons", "Detroit Pistons"),
+      nbaTeam("IND", "Pacers", "Indiana Pacers"),
+      nbaTeam("MIL", "Bucks", "Milwaukee Bucks")
+    ]
+  },
+  {
+    divisionLabel: "NORTHWEST",
+    teams: [
+      nbaTeam("DEN", "Nuggets", "Denver Nuggets"),
+      nbaTeam("MIN", "Timberwolves", "Minnesota Timberwolves"),
+      nbaTeam("OKC", "Thunder", "Oklahoma City Thunder"),
+      nbaTeam("POR", "Trail Blazers", "Portland Trail Blazers"),
+      nbaTeam("UTA", "Jazz", "Utah Jazz")
+    ]
+  },
+  {
+    divisionLabel: "PACIFIC",
+    teams: [
+      nbaTeam("GSW", "Warriors", "Golden State Warriors"),
+      nbaTeam("LAC", "Clippers", "Los Angeles Clippers"),
+      nbaTeam("LAL", "Lakers", "Los Angeles Lakers"),
+      nbaTeam("PHX", "Suns", "Phoenix Suns"),
+      nbaTeam("SAC", "Kings", "Sacramento Kings")
+    ]
+  },
+  {
+    divisionLabel: "SOUTHEAST",
+    teams: [
+      nbaTeam("ATL", "Hawks", "Atlanta Hawks"),
+      nbaTeam("CHA", "Hornets", "Charlotte Hornets"),
+      nbaTeam("MIA", "Heat", "Miami Heat"),
+      nbaTeam("ORL", "Magic", "Orlando Magic"),
+      nbaTeam("WSH", "Wizards", "Washington Wizards")
+    ]
+  },
+  {
+    divisionLabel: "SOUTHWEST",
+    teams: [
+      nbaTeam("DAL", "Mavericks", "Dallas Mavericks"),
+      nbaTeam("HOU", "Rockets", "Houston Rockets"),
+      nbaTeam("MEM", "Grizzlies", "Memphis Grizzlies"),
+      nbaTeam("NOP", "Pelicans", "New Orleans Pelicans"),
+      nbaTeam("SAS", "Spurs", "San Antonio Spurs")
+    ]
+  }
+];
+
+// ../grarf/desktop/src/data/nhlTeamPopulation.ts
+init_define_import_meta_env();
+function nhlTeam(abbrev, leaguesTabListLabel, label) {
+  return {
+    teamKey: `nhl-${abbrev.toLowerCase()}`,
+    teamAbbrev: abbrev,
+    label,
+    leaguesTabListLabel
+  };
+}
+var NHL_TEAM_POPULATION_BY_DIVISION = [
+  {
+    divisionLabel: "ATLANTIC DIVISION",
+    teams: [
+      nhlTeam("BOS", "Bruins", "Boston Bruins"),
+      nhlTeam("BUF", "Sabres", "Buffalo Sabres"),
+      nhlTeam("DET", "Red Wings", "Detroit Red Wings"),
+      nhlTeam("FLA", "Panthers", "Florida Panthers"),
+      nhlTeam("MTL", "Canadiens", "Montr\xE9al Canadiens"),
+      nhlTeam("OTT", "Senators", "Ottawa Senators"),
+      nhlTeam("TBL", "Lightning", "Tampa Bay Lightning"),
+      nhlTeam("TOR", "Maple Leafs", "Toronto Maple Leafs")
+    ]
+  },
+  {
+    divisionLabel: "CENTRAL DIVISION",
+    teams: [
+      nhlTeam("CHI", "Blackhawks", "Chicago Blackhawks"),
+      nhlTeam("COL", "Avalanche", "Colorado Avalanche"),
+      nhlTeam("DAL", "Stars", "Dallas Stars"),
+      nhlTeam("MIN", "Wild", "Minnesota Wild"),
+      nhlTeam("NSH", "Predators", "Nashville Predators"),
+      nhlTeam("STL", "Blues", "St. Louis Blues"),
+      nhlTeam("UTA", "Mammoth", "Utah Mammoth"),
+      nhlTeam("WPG", "Jets", "Winnipeg Jets")
+    ]
+  },
+  {
+    divisionLabel: "METROPOLITAN DIVISION",
+    teams: [
+      nhlTeam("CAR", "Hurricanes", "Carolina Hurricanes"),
+      nhlTeam("CBJ", "Blue Jackets", "Columbus Blue Jackets"),
+      nhlTeam("NJD", "Devils", "New Jersey Devils"),
+      nhlTeam("NYI", "Islanders", "New York Islanders"),
+      nhlTeam("NYR", "Rangers", "New York Rangers"),
+      nhlTeam("PHI", "Flyers", "Philadelphia Flyers"),
+      nhlTeam("PIT", "Penguins", "Pittsburgh Penguins"),
+      nhlTeam("WSH", "Capitals", "Washington Capitals")
+    ]
+  },
+  {
+    divisionLabel: "PACIFIC DIVISION",
+    teams: [
+      nhlTeam("ANA", "Ducks", "Anaheim Ducks"),
+      nhlTeam("CGY", "Flames", "Calgary Flames"),
+      nhlTeam("EDM", "Oilers", "Edmonton Oilers"),
+      nhlTeam("LAK", "Kings", "Los Angeles Kings"),
+      nhlTeam("SJS", "Sharks", "San Jose Sharks"),
+      nhlTeam("SEA", "Kraken", "Seattle Kraken"),
+      nhlTeam("VAN", "Canucks", "Vancouver Canucks"),
+      nhlTeam("VGK", "Golden Knights", "Vegas Golden Knights")
+    ]
+  }
+];
+
+// ../grarf/desktop/src/data/wnbaTeamPopulation.ts
+init_define_import_meta_env();
+function wnbaTeam2(abbrev, leaguesTabListLabel, label) {
+  return {
+    teamKey: `wnba-${abbrev.toLowerCase()}`,
+    teamAbbrev: abbrev,
+    label,
+    leaguesTabListLabel
+  };
+}
+var WNBA_TEAM_POPULATION_BY_CONFERENCE = [
+  {
+    conferenceLabel: "EASTERN CONFERENCE",
+    teams: [
+      wnbaTeam2("ATL", "Dream", "Atlanta Dream"),
+      wnbaTeam2("CHI", "Sky", "Chicago Sky"),
+      wnbaTeam2("CON", "Sun", "Connecticut Sun"),
+      wnbaTeam2("IND", "Fever", "Indiana Fever"),
+      wnbaTeam2("NY", "Liberty", "New York Liberty"),
+      wnbaTeam2("TOR", "Tempo", "Toronto Tempo"),
+      wnbaTeam2("WSH", "Mystics", "Washington Mystics")
+    ]
+  },
+  {
+    conferenceLabel: "WESTERN CONFERENCE",
+    teams: [
+      wnbaTeam2("DAL", "Wings", "Dallas Wings"),
+      wnbaTeam2("GS", "Valkyries", "Golden State Valkyries"),
+      wnbaTeam2("LV", "Aces", "Las Vegas Aces"),
+      wnbaTeam2("LA", "Sparks", "Los Angeles Sparks"),
+      wnbaTeam2("MIN", "Lynx", "Minnesota Lynx"),
+      wnbaTeam2("PHX", "Mercury", "Phoenix Mercury"),
+      wnbaTeam2("POR", "Fire", "Portland Fire"),
+      wnbaTeam2("SEA", "Storm", "Seattle Storm")
+    ]
+  }
+];
+
+// ../grarf/desktop/src/data/mlsTeamPopulation.ts
+init_define_import_meta_env();
+function mlsTeam(abbrev, teamEspnId, leaguesTabListLabel, label) {
+  return {
+    teamKey: `mls-${abbrev.toLowerCase()}`,
+    teamAbbrev: abbrev,
+    teamEspnId,
+    label,
+    leaguesTabListLabel
+  };
+}
+var MLS_TEAM_POPULATION_BY_CONFERENCE = [
+  {
+    conferenceLabel: "EASTERN CONFERENCE",
+    teams: [
+      mlsTeam("NSH", "18986", "Nashville", "Nashville SC"),
+      mlsTeam("NE", "189", "New England", "New England Revolution"),
+      mlsTeam("MIA", "20232", "Inter Miami", "Inter Miami CF"),
+      mlsTeam("CLT", "21300", "Charlotte", "Charlotte FC"),
+      mlsTeam("CHI", "182", "Chicago", "Chicago Fire FC"),
+      mlsTeam("PHI", "10739", "Philadelphia", "Philadelphia Union"),
+      mlsTeam("ORL", "12011", "Orlando City", "Orlando City SC"),
+      mlsTeam("RBNY", "190", "RBNY", "Red Bull New York"),
+      mlsTeam("CIN", "18267", "Cincinnati", "FC Cincinnati"),
+      mlsTeam("NYC", "17606", "New York City", "New York City FC"),
+      mlsTeam("DC", "193", "D.C. United", "D.C. United"),
+      mlsTeam("TOR", "7318", "Toronto", "Toronto FC"),
+      mlsTeam("CLB", "183", "Columbus", "Columbus Crew"),
+      mlsTeam("ATL", "18418", "Atlanta United", "Atlanta United FC"),
+      mlsTeam("MTL", "9720", "Montr\xE9al", "CF Montr\xE9al")
+    ]
+  },
+  {
+    conferenceLabel: "WESTERN CONFERENCE",
+    teams: [
+      mlsTeam("VAN", "9727", "Vancouver", "Vancouver Whitecaps"),
+      mlsTeam("HOU", "6077", "Houston Dynamo", "Houston Dynamo FC"),
+      mlsTeam("STL", "21812", "St. Louis", "St. Louis CITY SC"),
+      mlsTeam("DAL", "185", "Dallas", "FC Dallas"),
+      mlsTeam("SJ", "191", "San Jose", "San Jose Earthquakes"),
+      mlsTeam("LAFC", "18966", "LAFC", "LAFC"),
+      mlsTeam("COL", "184", "Colorado", "Colorado Rapids"),
+      mlsTeam("LA", "187", "LA Galaxy", "LA Galaxy"),
+      mlsTeam("POR", "9723", "Portland", "Portland Timbers"),
+      mlsTeam("SD", "22529", "San Diego", "San Diego FC"),
+      mlsTeam("ATX", "20906", "Austin", "Austin FC"),
+      mlsTeam("RSL", "4771", "Salt Lake", "Real Salt Lake"),
+      mlsTeam("SEA", "9726", "Seattle Sounders", "Seattle Sounders FC"),
+      mlsTeam("MIN", "17362", "Minnesota", "Minnesota United FC"),
+      mlsTeam("SKC", "186", "Sporting KC", "Sporting Kansas City")
+    ]
+  }
+];
+
+// ../grarf/desktop/src/data/eplTeamPopulation.ts
+init_define_import_meta_env();
+function eplTeam(abbrev, teamEspnId, leaguesTabListLabel, label) {
+  return {
+    teamKey: `epl-${abbrev.toLowerCase()}`,
+    teamAbbrev: abbrev,
+    teamEspnId,
+    label,
+    leaguesTabListLabel
+  };
+}
+var EPL_TEAM_POPULATION = [
+  eplTeam("BOU", "349", "AFC Bournemouth", "AFC Bournemouth"),
+  eplTeam("ARS", "359", "Arsenal", "Arsenal"),
+  eplTeam("AVL", "362", "Aston Villa", "Aston Villa"),
+  eplTeam("BHA", "331", "Brighton & Hove Albion", "Brighton & Hove Albion"),
+  eplTeam("BRE", "337", "Brentford", "Brentford"),
+  eplTeam("CHE", "363", "Chelsea", "Chelsea"),
+  eplTeam("COV", "388", "Coventry City", "Coventry City"),
+  eplTeam("CRY", "384", "Crystal Palace", "Crystal Palace"),
+  eplTeam("EVE", "368", "Everton", "Everton"),
+  eplTeam("FUL", "370", "Fulham", "Fulham"),
+  eplTeam("HUL", "306", "Hull City", "Hull City"),
+  eplTeam("IPS", "373", "Ipswich Town", "Ipswich Town"),
+  eplTeam("LEE", "357", "Leeds United", "Leeds United"),
+  eplTeam("LIV", "364", "Liverpool", "Liverpool"),
+  eplTeam("MNC", "382", "Manchester City", "Manchester City"),
+  eplTeam("MAN", "360", "Manchester United", "Manchester United"),
+  eplTeam("NEW", "361", "Newcastle United", "Newcastle United"),
+  eplTeam("NFO", "393", "Nottingham Forest", "Nottingham Forest"),
+  eplTeam("SUN", "366", "Sunderland", "Sunderland"),
+  eplTeam("TOT", "367", "Tottenham Hotspur", "Tottenham Hotspur")
+];
+
+// ../grarf/desktop/src/data/laligaTeamPopulation.ts
+init_define_import_meta_env();
+function laligaTeam(abbrev, teamEspnId, leaguesTabListLabel, label) {
+  return {
+    teamKey: `laliga-${abbrev.toLowerCase()}`,
+    teamAbbrev: abbrev,
+    teamEspnId,
+    label,
+    leaguesTabListLabel
+  };
+}
+var LALIGA_TEAM_POPULATION = [
+  laligaTeam("ATH", "93", "Athletic Club", "Athletic Club"),
+  laligaTeam("ATM", "1068", "Atl\xE9tico Madrid", "Atl\xE9tico Madrid"),
+  laligaTeam("BAR", "83", "Barcelona", "Barcelona"),
+  laligaTeam("CEL", "85", "Celta Vigo", "Celta Vigo"),
+  laligaTeam("DEP", "90", "Deportivo A Coru\xF1a", "Deportivo"),
+  laligaTeam("ALA", "96", "Deportivo Alav\xE9s", "Alav\xE9s"),
+  laligaTeam("ELC", "3751", "Elche", "Elche"),
+  laligaTeam("ESP", "88", "Espanyol", "Espanyol"),
+  laligaTeam("GET", "2922", "Getafe", "Getafe"),
+  laligaTeam("LEV", "1538", "Levante", "Levante"),
+  laligaTeam("MCF", "99", "M\xE1laga", "M\xE1laga"),
+  laligaTeam("OSA", "97", "Osasuna", "Osasuna"),
+  laligaTeam("RAY", "101", "Rayo Vallecano", "Rayo Vallecano"),
+  laligaTeam("RAC", "87", "Racing Santander", "Racing Santander"),
+  laligaTeam("BET", "244", "Real Betis", "Real Betis"),
+  laligaTeam("RMA", "86", "Real Madrid", "Real Madrid"),
+  laligaTeam("RSO", "89", "Real Sociedad", "Real Sociedad"),
+  laligaTeam("SEV", "243", "Sevilla", "Sevilla"),
+  laligaTeam("VAL", "94", "Valencia", "Valencia"),
+  laligaTeam("VIL", "102", "Villarreal", "Villarreal")
+];
+
+// ../grarf/desktop/src/data/bundesligaTeamPopulation.ts
+init_define_import_meta_env();
+function bundesligaTeam(abbrev, teamEspnId, leaguesTabListLabel, label) {
+  return {
+    teamKey: `bundesliga-${abbrev.toLowerCase()}`,
+    teamAbbrev: abbrev,
+    teamEspnId,
+    label,
+    leaguesTabListLabel
+  };
+}
+var BUNDESLIGA_TEAM_POPULATION = [
+  bundesligaTeam("KOE", "122", "1. FC K\xF6ln", "FC Cologne"),
+  bundesligaTeam("FCA", "3841", "Augsburg", "FC Augsburg"),
+  bundesligaTeam("B04", "131", "Bayer Leverkusen", "Bayer Leverkusen"),
+  bundesligaTeam("MUN", "132", "Bayern M\xFCnchen", "Bayern Munich"),
+  bundesligaTeam("DOR", "124", "Borussia Dortmund", "Borussia Dortmund"),
+  bundesligaTeam("BMG", "268", "Borussia M\xF6nchengladbach", "Borussia M\xF6nchengladbach"),
+  bundesligaTeam("SGE", "125", "Eintracht Frankfurt", "Eintracht Frankfurt"),
+  bundesligaTeam("ELV", "10388", "Elversberg", "SV Elversberg"),
+  bundesligaTeam("SCF", "126", "Freiburg", "SC Freiburg"),
+  bundesligaTeam("HSV", "127", "Hamburger SV", "Hamburg SV"),
+  bundesligaTeam("TSG", "7911", "Hoffenheim", "TSG Hoffenheim"),
+  bundesligaTeam("M05", "2950", "Mainz 05", "Mainz"),
+  bundesligaTeam("SCP", "3307", "Paderborn", "SC Paderborn 07"),
+  bundesligaTeam("RBL", "11420", "RB Leipzig", "RB Leipzig"),
+  bundesligaTeam("S04", "133", "Schalke 04", "Schalke 04"),
+  bundesligaTeam("FCU", "598", "Union Berlin", "1. FC Union Berlin"),
+  bundesligaTeam("VFB", "134", "VfB Stuttgart", "VfB Stuttgart"),
+  bundesligaTeam("SVW", "137", "Werder Bremen", "Werder Bremen")
+];
+
+// ../grarf/desktop/src/data/serieaTeamPopulation.ts
+init_define_import_meta_env();
+function serieaTeam(abbrev, teamEspnId, leaguesTabListLabel, label) {
+  return {
+    teamKey: `seriea-${abbrev.toLowerCase()}`,
+    teamAbbrev: abbrev,
+    teamEspnId,
+    label,
+    leaguesTabListLabel
+  };
+}
+var SERIEA_TEAM_POPULATION = [
+  serieaTeam("ATA", "105", "Atalanta", "Atalanta"),
+  serieaTeam("BOL", "107", "Bologna", "Bologna"),
+  serieaTeam("CAG", "2925", "Cagliari", "Cagliari"),
+  serieaTeam("COMO", "2572", "Como", "Como"),
+  serieaTeam("FIO", "109", "Fiorentina", "Fiorentina"),
+  serieaTeam("FRO", "4057", "Frosinone", "Frosinone"),
+  serieaTeam("GEN", "3263", "Genoa", "Genoa"),
+  serieaTeam("INT", "110", "Inter", "Internazionale"),
+  serieaTeam("JUV", "111", "Juventus", "Juventus"),
+  serieaTeam("LAZ", "112", "Lazio", "Lazio"),
+  serieaTeam("LEC", "113", "Lecce", "Lecce"),
+  serieaTeam("MIL", "103", "Milan", "AC Milan"),
+  serieaTeam("MON", "4007", "Monza", "Monza"),
+  serieaTeam("NAP", "114", "Napoli", "Napoli"),
+  serieaTeam("PAR", "115", "Parma", "Parma"),
+  serieaTeam("ROMA", "104", "Roma", "AS Roma"),
+  serieaTeam("SAS", "3997", "Sassuolo", "Sassuolo"),
+  serieaTeam("TOR", "239", "Torino", "Torino"),
+  serieaTeam("UDI", "118", "Udinese", "Udinese"),
+  serieaTeam("VEN", "17530", "Venezia", "Venezia")
+];
+
+// ../grarf/desktop/src/data/ligue1TeamPopulation.ts
+init_define_import_meta_env();
+function ligue1Team(abbrev, teamEspnId, leaguesTabListLabel, label) {
+  return {
+    teamKey: `ligue1-${abbrev.toLowerCase()}`,
+    teamAbbrev: abbrev,
+    teamEspnId,
+    label,
+    leaguesTabListLabel
+  };
+}
+var LIGUE1_TEAM_POPULATION = [
+  ligue1Team("ANG", "7868", "Angers", "Angers"),
+  ligue1Team("AUX", "172", "Auxerre", "AJ Auxerre"),
+  ligue1Team("BRE", "6997", "Brest", "Brest"),
+  ligue1Team("HAC", "3236", "Le Havre", "Le Havre AC"),
+  ligue1Team("MNS", "2697", "Le Mans", "Le Mans"),
+  ligue1Team("RCL", "175", "Lens", "Lens"),
+  ligue1Team("LILL", "166", "Lille", "Lille"),
+  ligue1Team("LYON", "167", "Lyon", "Lyon"),
+  ligue1Team("LOR", "273", "Lorient", "Lorient"),
+  ligue1Team("OLM", "176", "Marseille", "Marseille"),
+  ligue1Team("MON", "174", "Monaco", "AS Monaco"),
+  ligue1Team("NICE", "2502", "Nice", "Nice"),
+  ligue1Team("PAR", "6851", "Paris FC", "Paris FC"),
+  ligue1Team("PSG", "160", "Paris Saint-Germain", "Paris Saint-Germain"),
+  ligue1Team("REN", "169", "Rennes", "Stade Rennais"),
+  ligue1Team("STR", "180", "Strasbourg", "Strasbourg"),
+  ligue1Team("TOU", "179", "Toulouse", "Toulouse"),
+  ligue1Team("TRY", "170", "Troyes", "Troyes")
+];
+
+// ../grarf/desktop/src/lib/gamesSpine/leaguesTabProTeamLogoUrl.ts
+init_define_import_meta_env();
+var NHL_ESPN_SCOREBOARD_SLUG = {
+  LAK: "la",
+  NJD: "nj",
+  SJS: "sj",
+  TBL: "tb"
+};
+function buildLeaguesTabMlsTeamLogoUrl(teamEspnId) {
+  const id = teamEspnId?.trim();
+  if (!id) return void 0;
+  return `https://a.espncdn.com/i/teamlogos/soccer/500/${id}.png`;
+}
+function buildLeaguesTabProTeamLogoUrl(league2, teamAbbrev2) {
+  const normalized = teamAbbrev2?.trim().toUpperCase();
+  if (!normalized) return void 0;
+  if (league2 === "WNBA") {
+    return buildWnbaEspnLogoUrl(teamAbbrev2);
+  }
+  if (league2 === "NBA") {
+    return `https://a.espncdn.com/i/teamlogos/nba/500/scoreboard/${normalized.toLowerCase()}.png`;
+  }
+  if (league2 === "NFL") {
+    return `https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/${normalized.toLowerCase()}.png`;
+  }
+  const slug = NHL_ESPN_SCOREBOARD_SLUG[normalized] ?? normalized.toLowerCase();
+  return `https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/${slug}.png`;
+}
+
 // ../grarf/desktop/src/lib/gamesSpine/resolveSportsBrowserPrototypeSidebarLeaguesGroupedSections.ts
 init_define_import_meta_env();
 
@@ -148711,8 +150101,8 @@ var SPORTS_BROWSER_PROTOTYPE_SIDEBAR_LEAGUES_ACTIVE_POPULATION = [
   { key: "RUGB_289262", label: "MAJOR LEAGUE RUGBY" },
   { key: "MLS", label: "MLS" },
   { key: "MOTOGP", label: "MOTOGP" },
-  { key: "MOTO2", label: "MOTO2" },
-  { key: "MOTO3", label: "MOTO3" },
+  // { key: "MOTO2", label: "MOTO2" },
+  // { key: "MOTO3", label: "MOTO3" },
   { key: "NASCAR", label: "NASCAR CUP SERIES" },
   { key: "NASCAR_XFINITY", label: "NASCAR O'REILLY" },
   { key: "NASCAR_TRUCK", label: "NASCAR TRUCKS" },
@@ -148723,7 +150113,7 @@ var SPORTS_BROWSER_PROTOTYPE_SIDEBAR_LEAGUES_ACTIVE_POPULATION = [
   { key: "MNCAAB", label: "NCAA MEN'S BASKETBALL" },
   { key: "NCAAVB_M", label: "NCAA MEN'S VOLLEYBALL" },
   { key: "NCAAMSOC", label: "NCAA MEN'S SOCCER" },
-  { key: "NCAAWP", label: "NCAA WATER POLO" },
+  // { key: "NCAAWP", label: "NCAA WATER POLO" },
   { key: "NCAAVB", label: "NCAA WOMEN'S VOLLEYBALL" },
   { key: "WNCAAB", label: "NCAA WOMEN'S BASKETBALL" },
   { key: "NCAAWSOC", label: "NCAA WOMEN'S SOCCER" },
@@ -148761,7 +150151,7 @@ var SPORTS_BROWSER_PROTOTYPE_SIDEBAR_LEAGUES_ACTIVE_POPULATION = [
   { key: "winter-sports", label: "WINTER SPORTS" },
   { key: "WNBA", label: "WNBA" },
   { key: "CAF_WNATIONS", label: "WOMEN'S AFCON" },
-  { key: "womens-ucl", label: "WOMEN'S UCL" },
+  { key: "WOMENS_UCL", label: "WOMEN'S UCL" },
   { key: "world-rally", label: "WORLD RALLY" },
   { key: "WTA", label: "WTA" }
 ];
@@ -149127,6 +150517,21 @@ var LEAGUES_TAB_TEAMS_ICON_LEAGUE_KEYS = /* @__PURE__ */ new Set([
   "WNCAAB",
   "NCAAF"
 ]);
+var LEAGUES_TAB_POPULATED_TEAM_LIST_LEAGUE_KEYS = /* @__PURE__ */ new Set([
+  "MLB",
+  "MNCAAB",
+  "NCAAF",
+  "NFL",
+  "NBA",
+  "NHL",
+  "WNBA",
+  "MLS",
+  "EPL",
+  "LALIGA",
+  "BUNDESLIGA",
+  "SERIEA",
+  "LIGUE1"
+]);
 function SidebarLeaguesTabTeamsIconMark() {
   const innerLeft = 1;
   const innerRight = 11;
@@ -149192,7 +150597,7 @@ function SidebarLeagueNavLogoMark({
 }) {
   const [failed, setFailed] = (0, import_react270.useState)(false);
   const rawLogoUrl = logoUrlOverride ?? resolveSportsBrowserPrototypeHorseRacingLeagueLogoPath(leagueKey) ?? (leagueKey ? resolveGamesSpineLeagueHeaderLogoUrl(leagueKey, games) : null);
-  const logoUrl = rawLogoUrl ? logoUrlOverride || resolveSportsBrowserPrototypeHorseRacingLeagueLogoPath(leagueKey) ? publicAssetUrl(rawLogoUrl) : rawLogoUrl : null;
+  const logoUrl = rawLogoUrl ? publicAssetUrl(rawLogoUrl) : null;
   if (!logoUrl || failed) return null;
   return /* @__PURE__ */ (0, import_jsx_runtime239.jsx)("span", { className: "inline-flex h-[1lh] w-[12px] shrink-0 items-center justify-center", children: /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(
     "img",
@@ -149239,7 +150644,10 @@ function NavRow({
   leagueNowLiveCount,
   tennisTournamentKey,
   tennisTournamentLeagueKey,
-  leaguesTabTeamsIcon = false
+  leaguesTabTeamsIcon = false,
+  onLeaguesTabTeamsIconClick,
+  leaguesTabTeamsListExpanded = false,
+  leaguesTabLeagueRow = false
 }) {
   const indentClass = resolveNavRowIndentClass(indent, soccerArchChildLeague);
   const trailingChevron = expanded ? /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(ChevronDown, { size: 12, strokeWidth: 2, className: "shrink-0 rotate-180", "aria-hidden": true }) : /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(ChevronRight, { size: 12, strokeWidth: 2, className: "shrink-0 text-[#1a1a1a]", "aria-hidden": true });
@@ -149301,9 +150709,30 @@ function NavRow({
         ) : /* @__PURE__ */ (0, import_jsx_runtime239.jsxs)("span", { className: "inline-flex h-[1lh] min-w-0 max-w-[5.5rem] shrink items-center justify-end gap-1 overflow-hidden", children: [
           leagueActivityStatuses && leagueActivityStatuses.length > 0 ? /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(LeagueNavActivityTallyMarks, { statuses: [...leagueActivityStatuses], clipOverflow: true }) : null,
           leaguesTabTeamsIcon ? /* @__PURE__ */ (0, import_jsx_runtime239.jsxs)("span", { className: "inline-flex shrink-0 items-center gap-2", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(SidebarLeaguesTabTeamsIconMark, {}),
-            trailingChevron
-          ] }) : trailingChevron
+            onLeaguesTabTeamsIconClick ? /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(
+              "span",
+              {
+                role: "button",
+                tabIndex: 0,
+                className: "inline-flex shrink-0 cursor-pointer items-center",
+                "aria-expanded": leaguesTabTeamsListExpanded,
+                "aria-label": leaguesTabTeamsListExpanded ? "Collapse teams" : "Expand teams",
+                "data-sports-browser-prototype-sidebar-leagues-teams-icon-toggle": "",
+                onClick: (event) => {
+                  event.stopPropagation();
+                  onLeaguesTabTeamsIconClick();
+                },
+                onKeyDown: (event) => {
+                  if (event.key !== "Enter" && event.key !== " ") return;
+                  event.preventDefault();
+                  event.stopPropagation();
+                  onLeaguesTabTeamsIconClick();
+                },
+                children: /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(SidebarLeaguesTabTeamsIconMark, {})
+              }
+            ) : /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(SidebarLeaguesTabTeamsIconMark, {}),
+            !leaguesTabLeagueRow ? trailingChevron : null
+          ] }) : leaguesTabLeagueRow ? null : trailingChevron
         ] }) : trailing === "expand" ? /* @__PURE__ */ (0, import_jsx_runtime239.jsx)("span", { className: "inline-flex h-[1lh] shrink-0 items-center", children: /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(ChevronDown, { size: 12, strokeWidth: 2, className: "shrink-0 rotate-180", "aria-hidden": true }) }) : null
       ]
     }
@@ -150358,6 +151787,343 @@ function LeaguesSortControls({
     }
   );
 }
+function SidebarLeaguesTabPlainTeamListRow({
+  teamKey,
+  label
+}) {
+  return /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(
+    "div",
+    {
+      className: "py-0 pl-2 text-[11px] font-normal normal-case leading-none tracking-[0.04em] text-[#1a1a1a]",
+      "data-sports-browser-prototype-sidebar-leagues-team-row": "",
+      "data-sports-browser-prototype-sidebar-leagues-team-key": teamKey,
+      children: label
+    }
+  );
+}
+function SidebarLeaguesTabProTeamListRow({
+  league: league2,
+  teamKey,
+  teamAbbrev: teamAbbrev2,
+  label
+}) {
+  const [logoFailed, setLogoFailed] = (0, import_react270.useState)(false);
+  const rawLogoUrl = buildLeaguesTabProTeamLogoUrl(league2, teamAbbrev2);
+  const logoUrl = rawLogoUrl ? rawLogoUrl.startsWith("/") ? publicAssetUrl(rawLogoUrl) : rawLogoUrl : null;
+  return /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(
+    "div",
+    {
+      className: "py-0 pl-2 text-[11px] font-normal normal-case leading-none tracking-[0.04em] text-[#1a1a1a]",
+      "data-sports-browser-prototype-sidebar-leagues-team-row": "",
+      "data-sports-browser-prototype-sidebar-leagues-team-key": teamKey,
+      "data-sports-browser-prototype-sidebar-leagues-team-abbrev": teamAbbrev2,
+      children: /* @__PURE__ */ (0, import_jsx_runtime239.jsxs)("span", { className: "inline-flex min-w-0 items-center gap-[0.6ch]", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime239.jsx)("span", { className: "inline-flex h-[12px] w-[12px] shrink-0 items-center justify-center", children: logoUrl && !logoFailed ? /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(
+          "img",
+          {
+            src: logoUrl,
+            alt: "",
+            className: "h-2.5 w-2.5 shrink-0 object-contain",
+            loading: "lazy",
+            decoding: "async",
+            onError: () => setLogoFailed(true)
+          }
+        ) : null }),
+        /* @__PURE__ */ (0, import_jsx_runtime239.jsx)("span", { className: "min-w-0 break-words whitespace-normal", children: label })
+      ] })
+    }
+  );
+}
+function SidebarLeaguesTabMlsTeamListRow({
+  teamKey,
+  teamAbbrev: teamAbbrev2,
+  teamEspnId,
+  label
+}) {
+  const [logoFailed, setLogoFailed] = (0, import_react270.useState)(false);
+  const rawLogoUrl = buildLeaguesTabMlsTeamLogoUrl(teamEspnId);
+  const logoUrl = rawLogoUrl ? rawLogoUrl.startsWith("/") ? publicAssetUrl(rawLogoUrl) : rawLogoUrl : null;
+  return /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(
+    "div",
+    {
+      className: "py-0 pl-2 text-[11px] font-normal normal-case leading-none tracking-[0.04em] text-[#1a1a1a]",
+      "data-sports-browser-prototype-sidebar-leagues-team-row": "",
+      "data-sports-browser-prototype-sidebar-leagues-team-key": teamKey,
+      "data-sports-browser-prototype-sidebar-leagues-team-abbrev": teamAbbrev2,
+      children: /* @__PURE__ */ (0, import_jsx_runtime239.jsxs)("span", { className: "inline-flex min-w-0 items-center gap-[0.6ch]", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime239.jsx)("span", { className: "inline-flex h-[12px] w-[12px] shrink-0 items-center justify-center", children: logoUrl && !logoFailed ? /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(
+          "img",
+          {
+            src: logoUrl,
+            alt: "",
+            className: "h-2.5 w-2.5 shrink-0 object-contain",
+            loading: "lazy",
+            decoding: "async",
+            onError: () => setLogoFailed(true)
+          }
+        ) : null }),
+        /* @__PURE__ */ (0, import_jsx_runtime239.jsx)("span", { className: "min-w-0 break-words whitespace-normal", children: label })
+      ] })
+    }
+  );
+}
+function SidebarLeaguesTabMlbTeamListRow({
+  teamKey,
+  teamAbbrev: teamAbbrev2,
+  label
+}) {
+  const [logoFailed, setLogoFailed] = (0, import_react270.useState)(false);
+  const rawLogoUrl = buildMlbEspnScoreboardLogoUrl(teamAbbrev2);
+  const logoUrl = rawLogoUrl ? rawLogoUrl.startsWith("/") ? publicAssetUrl(rawLogoUrl) : rawLogoUrl : null;
+  return /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(
+    "div",
+    {
+      className: "py-0 pl-2 text-[11px] font-normal normal-case leading-none tracking-[0.04em] text-[#1a1a1a]",
+      "data-sports-browser-prototype-sidebar-leagues-team-row": "",
+      "data-sports-browser-prototype-sidebar-leagues-team-key": teamKey,
+      "data-sports-browser-prototype-sidebar-leagues-team-abbrev": teamAbbrev2,
+      children: /* @__PURE__ */ (0, import_jsx_runtime239.jsxs)("span", { className: "inline-flex min-w-0 items-center gap-[0.6ch]", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime239.jsx)("span", { className: "inline-flex h-[12px] w-[12px] shrink-0 items-center justify-center", children: logoUrl && !logoFailed ? /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(
+          "img",
+          {
+            src: logoUrl,
+            alt: "",
+            className: "h-2.5 w-2.5 shrink-0 object-contain",
+            loading: "lazy",
+            decoding: "async",
+            onError: () => setLogoFailed(true)
+          }
+        ) : null }),
+        /* @__PURE__ */ (0, import_jsx_runtime239.jsx)("span", { className: "min-w-0 break-words whitespace-normal", children: label })
+      ] })
+    }
+  );
+}
+function SidebarLeaguesTabTeamListPanel({ leagueKey }) {
+  return /* @__PURE__ */ (0, import_jsx_runtime239.jsxs)(
+    "div",
+    {
+      className: "pl-10 pr-4",
+      "data-sports-browser-prototype-sidebar-leagues-team-list": "",
+      "data-sports-browser-prototype-sidebar-leagues-team-list-league": leagueKey,
+      children: [
+        leagueKey === "MLB" ? MLB_TEAM_POPULATION_BY_DIVISION.map((division) => /* @__PURE__ */ (0, import_jsx_runtime239.jsxs)(import_react270.Fragment, { children: [
+          /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(
+            "div",
+            {
+              className: "py-[4px] text-[11px] font-semibold uppercase tracking-[0.04em] text-[#8a847c]",
+              "data-sports-browser-prototype-sidebar-leagues-team-division": "",
+              "data-sports-browser-prototype-sidebar-leagues-team-division-label": division.divisionLabel,
+              children: division.divisionLabel
+            }
+          ),
+          division.teams.map((team) => /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(
+            SidebarLeaguesTabMlbTeamListRow,
+            {
+              teamKey: team.teamKey,
+              teamAbbrev: team.teamAbbrev,
+              label: resolveMlbLeaguesTabTeamListDisplayLabel(team.teamAbbrev)
+            },
+            team.teamKey
+          ))
+        ] }, division.divisionLabel)) : null,
+        leagueKey === "NCAAF" ? NCAAF_TEAM_POPULATION_BY_CONFERENCE.map((conference) => /* @__PURE__ */ (0, import_jsx_runtime239.jsxs)(import_react270.Fragment, { children: [
+          /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(
+            "div",
+            {
+              className: "py-[4px] text-[11px] font-semibold normal-case tracking-[0.04em] text-[#8a847c]",
+              "data-sports-browser-prototype-sidebar-leagues-team-division": "",
+              "data-sports-browser-prototype-sidebar-leagues-team-division-label": conference.conferenceLabel,
+              children: conference.conferenceLabel
+            }
+          ),
+          conference.teams.map((team) => /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(
+            SidebarLeaguesTabPlainTeamListRow,
+            {
+              teamKey: team.teamKey,
+              label: team.label
+            },
+            team.teamKey
+          ))
+        ] }, conference.conferenceLabel)) : null,
+        leagueKey === "MNCAAB" ? MNCAAB_TEAM_POPULATION_BY_CONFERENCE.map((conference) => /* @__PURE__ */ (0, import_jsx_runtime239.jsxs)(import_react270.Fragment, { children: [
+          /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(
+            "div",
+            {
+              className: "py-[4px] text-[11px] font-semibold normal-case tracking-[0.04em] text-[#8a847c]",
+              "data-sports-browser-prototype-sidebar-leagues-team-division": "",
+              "data-sports-browser-prototype-sidebar-leagues-team-division-label": conference.conferenceLabel,
+              children: conference.conferenceLabel
+            }
+          ),
+          conference.teams.map((team) => /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(
+            SidebarLeaguesTabPlainTeamListRow,
+            {
+              teamKey: team.teamKey,
+              label: team.leaguesTabListLabel
+            },
+            team.teamKey
+          ))
+        ] }, conference.conferenceLabel)) : null,
+        leagueKey === "NFL" ? NFL_TEAM_POPULATION_BY_DIVISION.map((division) => /* @__PURE__ */ (0, import_jsx_runtime239.jsxs)(import_react270.Fragment, { children: [
+          /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(
+            "div",
+            {
+              className: "py-[4px] text-[11px] font-semibold uppercase tracking-[0.04em] text-[#8a847c]",
+              "data-sports-browser-prototype-sidebar-leagues-team-division": "",
+              "data-sports-browser-prototype-sidebar-leagues-team-division-label": division.divisionLabel,
+              children: division.divisionLabel
+            }
+          ),
+          division.teams.map((team) => /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(
+            SidebarLeaguesTabProTeamListRow,
+            {
+              league: "NFL",
+              teamKey: team.teamKey,
+              teamAbbrev: team.teamAbbrev,
+              label: team.leaguesTabListLabel
+            },
+            team.teamKey
+          ))
+        ] }, division.divisionLabel)) : null,
+        leagueKey === "NBA" ? NBA_TEAM_POPULATION_BY_DIVISION.map((division) => /* @__PURE__ */ (0, import_jsx_runtime239.jsxs)(import_react270.Fragment, { children: [
+          /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(
+            "div",
+            {
+              className: "py-[4px] text-[11px] font-semibold uppercase tracking-[0.04em] text-[#8a847c]",
+              "data-sports-browser-prototype-sidebar-leagues-team-division": "",
+              "data-sports-browser-prototype-sidebar-leagues-team-division-label": division.divisionLabel,
+              children: division.divisionLabel
+            }
+          ),
+          division.teams.map((team) => /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(
+            SidebarLeaguesTabProTeamListRow,
+            {
+              league: "NBA",
+              teamKey: team.teamKey,
+              teamAbbrev: team.teamAbbrev,
+              label: team.leaguesTabListLabel
+            },
+            team.teamKey
+          ))
+        ] }, division.divisionLabel)) : null,
+        leagueKey === "NHL" ? NHL_TEAM_POPULATION_BY_DIVISION.map((division) => /* @__PURE__ */ (0, import_jsx_runtime239.jsxs)(import_react270.Fragment, { children: [
+          /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(
+            "div",
+            {
+              className: "py-[4px] text-[11px] font-semibold uppercase tracking-[0.04em] text-[#8a847c]",
+              "data-sports-browser-prototype-sidebar-leagues-team-division": "",
+              "data-sports-browser-prototype-sidebar-leagues-team-division-label": division.divisionLabel,
+              children: division.divisionLabel
+            }
+          ),
+          division.teams.map((team) => /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(
+            SidebarLeaguesTabProTeamListRow,
+            {
+              league: "NHL",
+              teamKey: team.teamKey,
+              teamAbbrev: team.teamAbbrev,
+              label: team.leaguesTabListLabel
+            },
+            team.teamKey
+          ))
+        ] }, division.divisionLabel)) : null,
+        leagueKey === "WNBA" ? WNBA_TEAM_POPULATION_BY_CONFERENCE.map((conference) => /* @__PURE__ */ (0, import_jsx_runtime239.jsxs)(import_react270.Fragment, { children: [
+          /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(
+            "div",
+            {
+              className: "py-[4px] text-[11px] font-semibold uppercase tracking-[0.04em] text-[#8a847c]",
+              "data-sports-browser-prototype-sidebar-leagues-team-division": "",
+              "data-sports-browser-prototype-sidebar-leagues-team-division-label": conference.conferenceLabel,
+              children: conference.conferenceLabel
+            }
+          ),
+          conference.teams.map((team) => /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(
+            SidebarLeaguesTabProTeamListRow,
+            {
+              league: "WNBA",
+              teamKey: team.teamKey,
+              teamAbbrev: team.teamAbbrev,
+              label: team.leaguesTabListLabel
+            },
+            team.teamKey
+          ))
+        ] }, conference.conferenceLabel)) : null,
+        leagueKey === "MLS" ? MLS_TEAM_POPULATION_BY_CONFERENCE.map((conference) => /* @__PURE__ */ (0, import_jsx_runtime239.jsxs)(import_react270.Fragment, { children: [
+          /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(
+            "div",
+            {
+              className: "py-[4px] text-[11px] font-semibold uppercase tracking-[0.04em] text-[#8a847c]",
+              "data-sports-browser-prototype-sidebar-leagues-team-division": "",
+              "data-sports-browser-prototype-sidebar-leagues-team-division-label": conference.conferenceLabel,
+              children: conference.conferenceLabel
+            }
+          ),
+          conference.teams.map((team) => /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(
+            SidebarLeaguesTabMlsTeamListRow,
+            {
+              teamKey: team.teamKey,
+              teamAbbrev: team.teamAbbrev,
+              teamEspnId: team.teamEspnId,
+              label: team.leaguesTabListLabel
+            },
+            team.teamKey
+          ))
+        ] }, conference.conferenceLabel)) : null,
+        leagueKey === "EPL" ? EPL_TEAM_POPULATION.map((team) => /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(
+          SidebarLeaguesTabMlsTeamListRow,
+          {
+            teamKey: team.teamKey,
+            teamAbbrev: team.teamAbbrev,
+            teamEspnId: team.teamEspnId,
+            label: team.leaguesTabListLabel
+          },
+          team.teamKey
+        )) : null,
+        leagueKey === "LALIGA" ? LALIGA_TEAM_POPULATION.map((team) => /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(
+          SidebarLeaguesTabMlsTeamListRow,
+          {
+            teamKey: team.teamKey,
+            teamAbbrev: team.teamAbbrev,
+            teamEspnId: team.teamEspnId,
+            label: team.leaguesTabListLabel
+          },
+          team.teamKey
+        )) : null,
+        leagueKey === "BUNDESLIGA" ? BUNDESLIGA_TEAM_POPULATION.map((team) => /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(
+          SidebarLeaguesTabMlsTeamListRow,
+          {
+            teamKey: team.teamKey,
+            teamAbbrev: team.teamAbbrev,
+            teamEspnId: team.teamEspnId,
+            label: team.leaguesTabListLabel
+          },
+          team.teamKey
+        )) : null,
+        leagueKey === "SERIEA" ? SERIEA_TEAM_POPULATION.map((team) => /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(
+          SidebarLeaguesTabMlsTeamListRow,
+          {
+            teamKey: team.teamKey,
+            teamAbbrev: team.teamAbbrev,
+            teamEspnId: team.teamEspnId,
+            label: team.leaguesTabListLabel
+          },
+          team.teamKey
+        )) : null,
+        leagueKey === "LIGUE1" ? LIGUE1_TEAM_POPULATION.map((team) => /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(
+          SidebarLeaguesTabMlsTeamListRow,
+          {
+            teamKey: team.teamKey,
+            teamAbbrev: team.teamAbbrev,
+            teamEspnId: team.teamEspnId,
+            label: team.leaguesTabListLabel
+          },
+          team.teamKey
+        )) : null
+      ]
+    }
+  );
+}
 function SidebarLeaguesSectionBody({
   todayCompleteLeagues,
   selectedLeagueKey,
@@ -150365,7 +152131,14 @@ function SidebarLeaguesSectionBody({
 }) {
   const [leaguesSortMode, setLeaguesSortMode] = (0, import_react270.useState)("on-today");
   const [leaguesSearchQuery, setLeaguesSearchQuery] = (0, import_react270.useState)("");
+  const [leaguesTabTeamsExpanded, setLeaguesTabTeamsExpanded] = (0, import_react270.useState)({});
   const mergedOperationalLeagues = useLiveGamesStore((s2) => s2.leagues);
+  const toggleLeaguesTabTeamsList = (0, import_react270.useCallback)((leagueKey) => {
+    setLeaguesTabTeamsExpanded((prev) => ({
+      ...prev,
+      [leagueKey]: !(prev[leagueKey] ?? false)
+    }));
+  }, []);
   const displayedLeagueSections = (0, import_react270.useMemo)(() => {
     if (leaguesSortMode === "alpha") {
       return resolveSportsBrowserPrototypeSidebarLeaguesAlphabeticalSections();
@@ -150413,18 +152186,28 @@ function SidebarLeaguesSectionBody({
           navGroupBreakBefore: group.navGroupBreakBefore
         }
       ),
-      group.leagues.map(({ leagueKey, label }) => /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(
-        NavRow,
-        {
-          label,
-          indent: 1,
-          leagueKey,
-          onClick: () => onLeagueSelect?.(leagueKey),
-          isSelected: selectedLeagueKey === leagueKey,
-          leaguesTabTeamsIcon: LEAGUES_TAB_TEAMS_ICON_LEAGUE_KEYS.has(leagueKey)
-        },
-        leagueKey
-      ))
+      group.leagues.map(({ leagueKey, label }) => {
+        const showLeaguesTabTeamsIcon = LEAGUES_TAB_TEAMS_ICON_LEAGUE_KEYS.has(leagueKey);
+        const leaguesTabTeamsListInteractive = LEAGUES_TAB_POPULATED_TEAM_LIST_LEAGUE_KEYS.has(leagueKey);
+        const leaguesTabTeamsListExpanded = leaguesTabTeamsExpanded[leagueKey] ?? false;
+        return /* @__PURE__ */ (0, import_jsx_runtime239.jsxs)(import_react270.Fragment, { children: [
+          /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(
+            NavRow,
+            {
+              label,
+              indent: 1,
+              leagueKey,
+              onClick: () => onLeagueSelect?.(leagueKey),
+              isSelected: selectedLeagueKey === leagueKey,
+              leaguesTabTeamsIcon: showLeaguesTabTeamsIcon,
+              onLeaguesTabTeamsIconClick: leaguesTabTeamsListInteractive ? () => toggleLeaguesTabTeamsList(leagueKey) : void 0,
+              leaguesTabTeamsListExpanded,
+              leaguesTabLeagueRow: true
+            }
+          ),
+          leaguesTabTeamsListInteractive && leaguesTabTeamsListExpanded ? /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(SidebarLeaguesTabTeamListPanel, { leagueKey }) : null
+        ] }, leagueKey);
+      })
     ] }, group.sectionId))
   ] });
 }
