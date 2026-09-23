@@ -18864,10 +18864,10 @@ function parseEspnEventIdFromGame(game) {
 // ../grarf/desktop/src/streaming/mlbTvUrls.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/gameWorkspace/mlbRaysRedSoxJul172026WorkspaceOverride.ts
+// ../grarf/desktop/src/gameWorkspace/mlbGamedayUrl.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/gameWorkspace/mlbGamedayUrl.ts
+// ../grarf/desktop/src/gameWorkspace/mlbRaysRedSoxJul172026WorkspaceOverride.ts
 init_define_import_meta_env();
 
 // ../grarf/desktop/src/gameWorkspace/resolveTeamSignalFeeds.ts
