@@ -56377,6 +56377,10 @@ var WORLD_CUP_LEAGUE_LOGO_URL = "/league-logos/fifa-world-cup-2026.png";
 init_define_import_meta_env();
 var THE_OPEN_LEAGUE_LOGO_URL = "/league-logos/the-open.png";
 
+// ../grarf/desktop/src/lib/gamesSpine/littleLeagueSoftballLeagueLogoUrl.ts
+init_define_import_meta_env();
+var LITTLE_LEAGUE_SOFTBALL_LEAGUE_LOGO_URL = "/league-logos/little-league-softball.png";
+
 // ../grarf/desktop/src/lib/logo/grarfLogoImgClassName.ts
 init_define_import_meta_env();
 var GRARF_LOGO_IMG_BORDER_RADIUS_CLASS = "rounded-[3px]";
@@ -56569,6 +56573,7 @@ var GAMES_SPINE_LEAGUE_LOGO_URL = {
   CLUBWC: "https://a.espncdn.com/i/leaguelogos/soccer/500/1932.png",
   CLUBFRIENDLY: "/league-logos/club-friendly.png",
   CONCACAF_CAC: "/league-logos/central-american-cup.png",
+  CONCACAF_NG: "/league-logos/concacaf-nations-league.png",
   CAF_WNATIONS: "/league-logos/womens-afcon.png",
   COPA_BRASIL: "/league-logos/copa-do-brasil.png",
   WORLDCUP: WORLD_CUP_LEAGUE_LOGO_URL,
@@ -56585,6 +56590,9 @@ var GAMES_SPINE_LEAGUE_LOGO_URL = {
   NCAAVB_M: "/league-logos/nav/volleyball-ncaam.png",
   NCAAFH: "/league-logos/nav/ncaa-field-hockey.png",
   F1: "https://a.espncdn.com/i/teamlogos/leagues/500/f1.png",
+  F2: "/league-logos/formula-2.png",
+  F3: "/league-logos/formula-3.png",
+  GT_WORLD_CHALLENGE: "/league-logos/gt-world-challenge.png",
   NASCAR: "/league-logos/nav/nascar-cup-series.png",
   INDYCAR: "/league-logos/nav/indycar.png",
   TDF: "/league-logos/nav/tour-de-france.png",
@@ -56599,6 +56607,8 @@ var GAMES_SPINE_LEAGUE_LOGO_URL = {
   NASCAR_XFINITY: "/league-logos/nascar-oreilly.png",
   PLL: "/league-logos/pll.png",
   RUGB_289262: "/league-logos/nav/mlr.png",
+  RUGBYTOP14: "/league-logos/french-top-14.png",
+  RUGBYULSTER: "/league-logos/united-rugby-championship.png",
   USLCUP: "/league-logos/usl-cup.png",
   US_OPEN_CUP: "/league-logos/us-open-cup.png",
   CARABAO_CUP: "/league-logos/carabao-cup.png",
@@ -56608,6 +56618,9 @@ var GAMES_SPINE_LEAGUE_LOGO_URL = {
   GER_SUPER_CUP: "/league-logos/german-supercup.png",
   LEAGUES_CUP: "/league-logos/leagues-cup.png",
   USATF: "https://upload.wikimedia.org/wikipedia/en/b/be/USA_Track_and_Field.svg"
+};
+var SIDEBAR_LEAGUE_SLUG_LOGO_URL = {
+  "base-lls": LITTLE_LEAGUE_SOFTBALL_LEAGUE_LOGO_URL
 };
 function resolveGamesSpineLeagueHeaderLogoUrl(league2, games) {
   const gameWithManualLogo = games?.find(
@@ -56628,7 +56641,7 @@ function resolveGamesSpineLeagueLogoUrl(league2, options) {
   if (options?.game && isUsOpenTennisGame(options.game)) {
     return US_OPEN_TENNIS_LEAGUE_LOGO_URL;
   }
-  return GAMES_SPINE_LEAGUE_LOGO_URL[league2] ?? resolveCanonicalLeagueLogoUrl({ grarfLeagueKey: league2 });
+  return GAMES_SPINE_LEAGUE_LOGO_URL[league2] ?? SIDEBAR_LEAGUE_SLUG_LOGO_URL[league2] ?? resolveCanonicalLeagueLogoUrl({ grarfLeagueKey: league2 });
 }
 function resolveGamesSpineLeagueLogoImgClassName(_league, _logoUrl) {
   return grarfLogoImgClassName();
@@ -149097,6 +149110,81 @@ function CompactTemporalNavRow({
 function resolveSidebarGameVariant(game) {
   return resolveSportsBrowserPrototypeSidebarGameVariant(game);
 }
+var LEAGUES_TAB_TEAMS_ICON_LEAGUE_KEYS = /* @__PURE__ */ new Set([
+  "UCL",
+  "NFL",
+  "NBA",
+  "MLB",
+  "NHL",
+  "WNBA",
+  "MLS",
+  "EPL",
+  "LALIGA",
+  "SERIEA",
+  "BUNDESLIGA",
+  "LIGUE1",
+  "MNCAAB",
+  "WNCAAB",
+  "NCAAF"
+]);
+function SidebarLeaguesTabTeamsIconMark() {
+  const innerLeft = 1;
+  const innerRight = 11;
+  const innerTop = 1;
+  const innerBottom = 11;
+  const innerHeight = innerBottom - innerTop;
+  const dividerY1 = innerTop + innerHeight / 3;
+  const dividerY2 = innerTop + 2 * innerHeight / 3;
+  const strokeProps = { strokeWidth: 1, vectorEffect: "nonScalingStroke" };
+  return /* @__PURE__ */ (0, import_jsx_runtime239.jsxs)(
+    "svg",
+    {
+      width: 10,
+      height: 10,
+      viewBox: "0 0 12 12",
+      className: "block h-[10px] w-[10px] shrink-0 flex-none text-[#1a1a1a]",
+      "aria-hidden": true,
+      "data-sports-browser-prototype-sidebar-leagues-teams-icon": "",
+      children: [
+        /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(
+          "rect",
+          {
+            x: "0.5",
+            y: "0.5",
+            width: "11",
+            height: "11",
+            rx: "0.75",
+            fill: "none",
+            stroke: "currentColor",
+            ...strokeProps
+          }
+        ),
+        /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(
+          "line",
+          {
+            x1: innerLeft,
+            y1: dividerY1,
+            x2: innerRight,
+            y2: dividerY1,
+            stroke: "currentColor",
+            ...strokeProps
+          }
+        ),
+        /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(
+          "line",
+          {
+            x1: innerLeft,
+            y1: dividerY2,
+            x2: innerRight,
+            y2: dividerY2,
+            stroke: "currentColor",
+            ...strokeProps
+          }
+        )
+      ]
+    }
+  );
+}
 function SidebarLeagueNavLogoMark({
   leagueKey,
   games,
@@ -149150,9 +149238,11 @@ function NavRow({
   leagueActivityStatuses,
   leagueNowLiveCount,
   tennisTournamentKey,
-  tennisTournamentLeagueKey
+  tennisTournamentLeagueKey,
+  leaguesTabTeamsIcon = false
 }) {
   const indentClass = resolveNavRowIndentClass(indent, soccerArchChildLeague);
+  const trailingChevron = expanded ? /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(ChevronDown, { size: 12, strokeWidth: 2, className: "shrink-0 rotate-180", "aria-hidden": true }) : /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(ChevronRight, { size: 12, strokeWidth: 2, className: "shrink-0 text-[#1a1a1a]", "aria-hidden": true });
   return /* @__PURE__ */ (0, import_jsx_runtime239.jsxs)(
     "button",
     {
@@ -149210,7 +149300,10 @@ function NavRow({
           }
         ) : /* @__PURE__ */ (0, import_jsx_runtime239.jsxs)("span", { className: "inline-flex h-[1lh] min-w-0 max-w-[5.5rem] shrink items-center justify-end gap-1 overflow-hidden", children: [
           leagueActivityStatuses && leagueActivityStatuses.length > 0 ? /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(LeagueNavActivityTallyMarks, { statuses: [...leagueActivityStatuses], clipOverflow: true }) : null,
-          expanded ? /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(ChevronDown, { size: 12, strokeWidth: 2, className: "shrink-0 rotate-180", "aria-hidden": true }) : /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(ChevronRight, { size: 12, strokeWidth: 2, className: "shrink-0 text-[#1a1a1a]", "aria-hidden": true })
+          leaguesTabTeamsIcon ? /* @__PURE__ */ (0, import_jsx_runtime239.jsxs)("span", { className: "inline-flex shrink-0 items-center gap-2", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(SidebarLeaguesTabTeamsIconMark, {}),
+            trailingChevron
+          ] }) : trailingChevron
         ] }) : trailing === "expand" ? /* @__PURE__ */ (0, import_jsx_runtime239.jsx)("span", { className: "inline-flex h-[1lh] shrink-0 items-center", children: /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(ChevronDown, { size: 12, strokeWidth: 2, className: "shrink-0 rotate-180", "aria-hidden": true }) }) : null
       ]
     }
@@ -150327,7 +150420,8 @@ function SidebarLeaguesSectionBody({
           indent: 1,
           leagueKey,
           onClick: () => onLeagueSelect?.(leagueKey),
-          isSelected: selectedLeagueKey === leagueKey
+          isSelected: selectedLeagueKey === leagueKey,
+          leaguesTabTeamsIcon: LEAGUES_TAB_TEAMS_ICON_LEAGUE_KEYS.has(leagueKey)
         },
         leagueKey
       ))
