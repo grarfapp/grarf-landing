@@ -31353,8 +31353,49 @@ function matchPolymarketMlbGameEventForGame(event, game) {
   return polymarketMlbTeamSlugMatchesGrarfAbbrev(parsed.awayTeamSlug, game.awayTeamAbbrev) && polymarketMlbTeamSlugMatchesGrarfAbbrev(parsed.homeTeamSlug, game.homeTeamAbbrev);
 }
 
-// ../grarf/shared/domain/polymarket/enrichMlbGamesWithPolymarketMarketUrls.ts
+// ../grarf/shared/domain/polymarket/resolvePolymarketMlbMarketUrlFromGame.ts
+init_define_import_meta_env();
 function isMlbGameRow8(game) {
+  return game.league === "MLB" || game.id.startsWith("espn-MLB-");
+}
+var POLYMARKET_MLB_ROW_SLUG_SPORT_CONFIG = {
+  sportSlug: "mlb",
+  primaryTagId: 0,
+  teamOrdering: "away"
+};
+function resolvePolymarketMlbMarketUrlFromGameRowSlug(game) {
+  if (!isMlbGameRow8(game)) return null;
+  const slugCandidates = buildPolymarketMlbGameEventSlugCandidates(
+    game,
+    POLYMARKET_MLB_ROW_SLUG_SPORT_CONFIG
+  );
+  const eventSlug = slugCandidates[0]?.trim();
+  if (!eventSlug) return null;
+  try {
+    return buildPolymarketMlbGameMarketUrl({
+      sportSlug: POLYMARKET_MLB_ROW_SLUG_SPORT_CONFIG.sportSlug,
+      eventSlug
+    });
+  } catch {
+    return null;
+  }
+}
+function resolvePolymarketMlbMarketUrlFromGame(game) {
+  if (!isMlbGameRow8(game)) return null;
+  const slugBuilt = resolvePolymarketMlbMarketUrlFromGameRowSlug(game);
+  const fromMetadata = game.metadata?.polymarketMlbMarketUrl?.trim();
+  if (fromMetadata && isValidPolymarketMlbGameMarketUrl(fromMetadata)) {
+    const normalized = normalizePolymarketMlbGameMarketUrl(fromMetadata);
+    if (slugBuilt && normalized !== slugBuilt) {
+      return slugBuilt;
+    }
+    return normalized;
+  }
+  return slugBuilt;
+}
+
+// ../grarf/shared/domain/polymarket/enrichMlbGamesWithPolymarketMarketUrls.ts
+function isMlbGameRow9(game) {
   return game.league === "MLB" || game.id.startsWith("espn-MLB-");
 }
 async function resolvePolymarketMlbMarketForGame(game, sportConfig, options) {
@@ -31391,10 +31432,25 @@ async function resolvePolymarketMlbMarketForGame(game, sportConfig, options) {
   }
   return null;
 }
-async function enrichMlbGameRow4(game, sportConfig, options) {
-  if (!isMlbGameRow8(game)) return game;
+function polymarketMlbRowNeedsEnrichment(game) {
+  if (!isMlbGameRow9(game)) return false;
   const existing = game.metadata?.polymarketMlbMarketUrl?.trim();
-  if (existing) return game;
+  if (!existing) return true;
+  if (!isValidPolymarketMlbGameMarketUrl(existing)) return true;
+  const slugBuilt = resolvePolymarketMlbMarketUrlFromGameRowSlug(game);
+  if (!slugBuilt) return false;
+  return normalizePolymarketMlbGameMarketUrl(existing) !== slugBuilt;
+}
+async function enrichMlbGameRow4(game, sportConfig, options) {
+  if (!isMlbGameRow9(game)) return game;
+  const existing = game.metadata?.polymarketMlbMarketUrl?.trim();
+  if (existing && isValidPolymarketMlbGameMarketUrl(existing)) {
+    const slugBuilt = resolvePolymarketMlbMarketUrlFromGameRowSlug(game);
+    const normalized = normalizePolymarketMlbGameMarketUrl(existing);
+    if (!slugBuilt || normalized === slugBuilt) {
+      return game;
+    }
+  }
   const resolved = await resolvePolymarketMlbMarketForGame(game, sportConfig, options);
   if (!resolved) return game;
   return {
@@ -31407,9 +31463,7 @@ async function enrichMlbGameRow4(game, sportConfig, options) {
 }
 async function enrichMlbGamesWithPolymarketMarketUrls(games, options) {
   if (!Array.isArray(games) || games.length === 0) return games;
-  const needsEnrich = games.some(
-    (game) => isMlbGameRow8(game) && !game.metadata?.polymarketMlbMarketUrl?.trim()
-  );
+  const needsEnrich = games.some((game) => polymarketMlbRowNeedsEnrichment(game));
   if (!needsEnrich) return games;
   let sportConfig = options?.sportConfig;
   if (!sportConfig) {
@@ -31549,7 +31603,7 @@ function novigMlbTeamSymbolMatchesGrarfAbbrev(teamSymbol, grarfAbbrev) {
 }
 
 // ../grarf/shared/domain/novig/matchNovigMlbEventForGame.ts
-function isMlbGameRow9(game) {
+function isMlbGameRow10(game) {
   return game.league === "MLB" || game.id.startsWith("espn-MLB-");
 }
 function parseNovigMlbGameEventIndexEntry(row) {
@@ -31578,7 +31632,7 @@ function parseNovigMlbGameEventsIndex(events2) {
   return index;
 }
 function matchNovigMlbEventForGame(game, index) {
-  if (!isMlbGameRow9(game)) return null;
+  if (!isMlbGameRow10(game)) return null;
   const scheduledDateKey = game.scheduledDateKey?.trim();
   if (!scheduledDateKey) return null;
   const matched = index.filter(
@@ -31649,11 +31703,11 @@ async function fetchNovigMlbGameEventsIndex(options) {
 }
 
 // ../grarf/shared/domain/novig/enrichMlbGamesWithNovigMarketUrls.ts
-function isMlbGameRow10(game) {
+function isMlbGameRow11(game) {
   return game.league === "MLB" || game.id.startsWith("espn-MLB-");
 }
 async function enrichMlbGameRow5(game, novigIndex) {
-  if (!isMlbGameRow10(game)) return game;
+  if (!isMlbGameRow11(game)) return game;
   const existing = game.metadata?.novigMlbEventMarketUrl?.trim();
   if (existing) return game;
   const matched = matchNovigMlbEventForGame(game, novigIndex.entries);
@@ -31675,14 +31729,14 @@ async function enrichMlbGameRow5(game, novigIndex) {
 async function enrichMlbGamesWithNovigMarketUrls(games, options) {
   if (!Array.isArray(games) || games.length === 0) return games;
   const needsEnrich = games.some(
-    (game) => isMlbGameRow10(game) && !game.metadata?.novigMlbEventMarketUrl?.trim()
+    (game) => isMlbGameRow11(game) && !game.metadata?.novigMlbEventMarketUrl?.trim()
   );
   if (!needsEnrich) return games;
   let novigIndex = options?.novigIndex;
   if (!novigIndex) {
     try {
       const gamesNeedingMatch = games.filter(
-        (game) => isMlbGameRow10(game) && !game.metadata?.novigMlbEventMarketUrl?.trim()
+        (game) => isMlbGameRow11(game) && !game.metadata?.novigMlbEventMarketUrl?.trim()
       );
       novigIndex = await fetchNovigMlbGameEventsIndex({
         fetchImpl: options?.fetchImpl,
@@ -34720,11 +34774,11 @@ function resolveScheduledDateKey2(game) {
     day: "2-digit"
   }).format(new Date(game.startTimeMs));
 }
-function isMlbGameRow11(game) {
+function isMlbGameRow12(game) {
   return game.league === "MLB" || /^espn-MLB-/i.test(game.id ?? "");
 }
 function isRaysRedSoxJul172026WorkspaceOverrideGame(game) {
-  if (!isMlbGameRow11(game)) return false;
+  if (!isMlbGameRow12(game)) return false;
   if (normalizeTeamName(game.awayTeam) !== "rays") return false;
   if (normalizeTeamName(game.homeTeam) !== "red sox") return false;
   return resolveScheduledDateKey2(game) === OVERRIDE_SCHEDULED_DATE_KEY;
@@ -136414,7 +136468,7 @@ function resolveSportsBrowserPrototypeGameTeamContextSectionWebsites(game, conte
 // ../grarf/desktop/src/lib/gamesSpine/resolveGameBrowserContext.ts
 init_define_import_meta_env();
 var TEAM_HUB_LEAGUES = ["NFL", "NHL", "NBA", "WNBA"];
-function isMlbGameRow12(game) {
+function isMlbGameRow13(game) {
   return game.league === "MLB" || game.id.startsWith("espn-MLB-");
 }
 function resolveMlbGameForGameCenter(game) {
@@ -136462,7 +136516,7 @@ function inferGameCenterLabel(game, url) {
   return "Game Center";
 }
 function resolveGameCenterWebsites(game) {
-  if (isMlbGameRow12(game)) {
+  if (isMlbGameRow13(game)) {
     const tab = buildMlbGameWorkspaceTab(resolveMlbGameForGameCenter(game));
     const providers = tab.gamePayload?.gamecenterProviders ?? [];
     return dedupeGameBrowserWebsitesByUrl(
@@ -136479,7 +136533,7 @@ function resolveTeamWebsitesForSide(game, side) {
   const teamName = (side === "away" ? game.awayTeam : game.homeTeam).trim();
   const teamAbbrev2 = (side === "away" ? game.awayTeamAbbrev : game.homeTeamAbbrev)?.trim();
   if (!teamName && !teamAbbrev2) return [];
-  if (isMlbGameRow12(game)) {
+  if (isMlbGameRow13(game)) {
     const sources2 = teamAbbrev2 ? resolveMlbTeamNewsSourcesForTeamAbbrev(teamAbbrev2) : resolveMlbTeamNewsSourcesForTeam(teamName);
     return dedupeGameBrowserWebsitesByUrl(
       mapHomeSourcesToWebsites(mapMlbTeamNewsSourcesToHomeSourceConfig([...sources2]))
@@ -136532,7 +136586,7 @@ init_define_import_meta_env();
 // ../grarf/shared/domain/cbs/resolveCbsMlbPreviewUrlFromGame.ts
 init_define_import_meta_env();
 var CBS_MLB_PREVIEW_PATH_PREFIX = "/mlb/gametracker/preview/";
-function isMlbGameRow13(game) {
+function isMlbGameRow14(game) {
   return game.league === "MLB" || game.id.startsWith("espn-MLB-");
 }
 function isValidCbsMlbPreviewUrl(url) {
@@ -136544,7 +136598,7 @@ function isValidCbsMlbPreviewUrl(url) {
   }
 }
 function resolveCbsMlbPreviewUrlFromGame(game) {
-  if (!isMlbGameRow13(game)) return null;
+  if (!isMlbGameRow14(game)) return null;
   const fromMetadata = game.metadata?.cbsSportsPreviewUrl?.trim();
   if (!fromMetadata) return null;
   return isValidCbsMlbPreviewUrl(fromMetadata) ? fromMetadata : null;
@@ -136650,14 +136704,14 @@ init_define_import_meta_env();
 // ../grarf/shared/domain/covers/resolveCoversMlbPicksUrlFromGame.ts
 init_define_import_meta_env();
 var COVERS_MLB_PICKS_PATH_RE = /^https:\/\/www\.covers\.com\/sport\/baseball\/mlb\/matchup\/(\d+)\/picks\/?$/;
-function isMlbGameRow14(game) {
+function isMlbGameRow15(game) {
   return game.league === "MLB" || game.id.startsWith("espn-MLB-");
 }
 function isValidCoversMlbPicksUrl(url) {
   return COVERS_MLB_PICKS_PATH_RE.test(url.trim());
 }
 function resolveCoversMlbPicksUrlFromGame(game) {
-  if (!isMlbGameRow14(game)) return null;
+  if (!isMlbGameRow15(game)) return null;
   const fromMetadata = game.metadata?.coversMlbPicksUrl?.trim();
   if (!fromMetadata) return null;
   return isValidCoversMlbPicksUrl(fromMetadata) ? fromMetadata : null;
@@ -136668,11 +136722,11 @@ init_define_import_meta_env();
 
 // ../grarf/shared/domain/kalshi/resolveKalshiMlbMarketUrlFromGame.ts
 init_define_import_meta_env();
-function isMlbGameRow15(game) {
+function isMlbGameRow16(game) {
   return game.league === "MLB" || game.id.startsWith("espn-MLB-");
 }
 function resolveKalshiMlbMarketUrlFromGame(game) {
-  if (!isMlbGameRow15(game)) return null;
+  if (!isMlbGameRow16(game)) return null;
   const fromMetadata = game.metadata?.kalshiMlbMarketUrl?.trim();
   if (!fromMetadata) return null;
   return isValidKalshiMlbGameMarketUrl(fromMetadata) ? fromMetadata : null;
@@ -136680,26 +136734,14 @@ function resolveKalshiMlbMarketUrlFromGame(game) {
 
 // ../grarf/shared/domain/novig/resolveNovigMlbEventMarketUrlFromGame.ts
 init_define_import_meta_env();
-function isMlbGameRow16(game) {
-  return game.league === "MLB" || game.id.startsWith("espn-MLB-");
-}
-function resolveNovigMlbEventMarketUrlFromGame(game) {
-  if (!isMlbGameRow16(game)) return null;
-  const fromMetadata = game.metadata?.novigMlbEventMarketUrl?.trim();
-  if (!fromMetadata) return null;
-  return isValidNovigMlbEventMarketUrl(fromMetadata) ? fromMetadata : null;
-}
-
-// ../grarf/shared/domain/polymarket/resolvePolymarketMlbMarketUrlFromGame.ts
-init_define_import_meta_env();
 function isMlbGameRow17(game) {
   return game.league === "MLB" || game.id.startsWith("espn-MLB-");
 }
-function resolvePolymarketMlbMarketUrlFromGame(game) {
+function resolveNovigMlbEventMarketUrlFromGame(game) {
   if (!isMlbGameRow17(game)) return null;
-  const fromMetadata = game.metadata?.polymarketMlbMarketUrl?.trim();
+  const fromMetadata = game.metadata?.novigMlbEventMarketUrl?.trim();
   if (!fromMetadata) return null;
-  return isValidPolymarketMlbGameMarketUrl(fromMetadata) ? normalizePolymarketMlbGameMarketUrl(fromMetadata) : null;
+  return isValidNovigMlbEventMarketUrl(fromMetadata) ? fromMetadata : null;
 }
 
 // ../grarf/desktop/src/lib/gamesSpine/mlbGameWorkspacePredictionsBrowser.ts

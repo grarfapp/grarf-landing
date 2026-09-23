@@ -27589,6 +27589,10 @@ function isPolymarketMlbGameWinnerEventSlug(slug) {
 }
 
 // ../grarf/shared/domain/polymarket/buildPolymarketMlbGameMarketUrl.ts
+var POLYMARKET_MLB_GAME_MARKET_URL_RE = /^https:\/\/polymarket\.us\/sports\/mlb\/mlb-[a-z]+-[a-z]+-\d{4}-\d{2}-\d{2}$/;
+function normalizePolymarketMlbGameMarketUrl(url) {
+  return url.trim().replace(/^https:\/\/polymarket\.com\//i, "https://polymarket.us/");
+}
 function buildPolymarketMlbGameMarketUrl(input) {
   const sportSlug = input.sportSlug.trim().toLowerCase();
   const eventSlug = input.eventSlug.trim();
@@ -27599,6 +27603,9 @@ function buildPolymarketMlbGameMarketUrl(input) {
     throw new Error("buildPolymarketMlbGameMarketUrl: invalid MLB game event slug");
   }
   return `https://polymarket.us/sports/${sportSlug}/${eventSlug}`;
+}
+function isValidPolymarketMlbGameMarketUrl(url) {
+  return POLYMARKET_MLB_GAME_MARKET_URL_RE.test(normalizePolymarketMlbGameMarketUrl(url));
 }
 
 // ../grarf/shared/domain/polymarket/buildPolymarketMlbGameEventSlugCandidates.ts
@@ -27734,8 +27741,36 @@ function matchPolymarketMlbGameEventForGame(event, game) {
   return polymarketMlbTeamSlugMatchesGrarfAbbrev(parsed.awayTeamSlug, game.awayTeamAbbrev) && polymarketMlbTeamSlugMatchesGrarfAbbrev(parsed.homeTeamSlug, game.homeTeamAbbrev);
 }
 
-// ../grarf/shared/domain/polymarket/enrichMlbGamesWithPolymarketMarketUrls.ts
+// ../grarf/shared/domain/polymarket/resolvePolymarketMlbMarketUrlFromGame.ts
+init_define_import_meta_env();
 function isMlbGameRow8(game) {
+  return game.league === "MLB" || game.id.startsWith("espn-MLB-");
+}
+var POLYMARKET_MLB_ROW_SLUG_SPORT_CONFIG = {
+  sportSlug: "mlb",
+  primaryTagId: 0,
+  teamOrdering: "away"
+};
+function resolvePolymarketMlbMarketUrlFromGameRowSlug(game) {
+  if (!isMlbGameRow8(game)) return null;
+  const slugCandidates = buildPolymarketMlbGameEventSlugCandidates(
+    game,
+    POLYMARKET_MLB_ROW_SLUG_SPORT_CONFIG
+  );
+  const eventSlug = slugCandidates[0]?.trim();
+  if (!eventSlug) return null;
+  try {
+    return buildPolymarketMlbGameMarketUrl({
+      sportSlug: POLYMARKET_MLB_ROW_SLUG_SPORT_CONFIG.sportSlug,
+      eventSlug
+    });
+  } catch {
+    return null;
+  }
+}
+
+// ../grarf/shared/domain/polymarket/enrichMlbGamesWithPolymarketMarketUrls.ts
+function isMlbGameRow9(game) {
   return game.league === "MLB" || game.id.startsWith("espn-MLB-");
 }
 async function resolvePolymarketMlbMarketForGame(game, sportConfig, options) {
@@ -27772,10 +27807,25 @@ async function resolvePolymarketMlbMarketForGame(game, sportConfig, options) {
   }
   return null;
 }
-async function enrichMlbGameRow4(game, sportConfig, options) {
-  if (!isMlbGameRow8(game)) return game;
+function polymarketMlbRowNeedsEnrichment(game) {
+  if (!isMlbGameRow9(game)) return false;
   const existing = game.metadata?.polymarketMlbMarketUrl?.trim();
-  if (existing) return game;
+  if (!existing) return true;
+  if (!isValidPolymarketMlbGameMarketUrl(existing)) return true;
+  const slugBuilt = resolvePolymarketMlbMarketUrlFromGameRowSlug(game);
+  if (!slugBuilt) return false;
+  return normalizePolymarketMlbGameMarketUrl(existing) !== slugBuilt;
+}
+async function enrichMlbGameRow4(game, sportConfig, options) {
+  if (!isMlbGameRow9(game)) return game;
+  const existing = game.metadata?.polymarketMlbMarketUrl?.trim();
+  if (existing && isValidPolymarketMlbGameMarketUrl(existing)) {
+    const slugBuilt = resolvePolymarketMlbMarketUrlFromGameRowSlug(game);
+    const normalized = normalizePolymarketMlbGameMarketUrl(existing);
+    if (!slugBuilt || normalized === slugBuilt) {
+      return game;
+    }
+  }
   const resolved = await resolvePolymarketMlbMarketForGame(game, sportConfig, options);
   if (!resolved) return game;
   return {
@@ -27788,9 +27838,7 @@ async function enrichMlbGameRow4(game, sportConfig, options) {
 }
 async function enrichMlbGamesWithPolymarketMarketUrls(games, options) {
   if (!Array.isArray(games) || games.length === 0) return games;
-  const needsEnrich = games.some(
-    (game) => isMlbGameRow8(game) && !game.metadata?.polymarketMlbMarketUrl?.trim()
-  );
+  const needsEnrich = games.some((game) => polymarketMlbRowNeedsEnrichment(game));
   if (!needsEnrich) return games;
   let sportConfig = options?.sportConfig;
   if (!sportConfig) {
@@ -27926,7 +27974,7 @@ function novigMlbTeamSymbolMatchesGrarfAbbrev(teamSymbol, grarfAbbrev) {
 }
 
 // ../grarf/shared/domain/novig/matchNovigMlbEventForGame.ts
-function isMlbGameRow9(game) {
+function isMlbGameRow10(game) {
   return game.league === "MLB" || game.id.startsWith("espn-MLB-");
 }
 function parseNovigMlbGameEventIndexEntry(row) {
@@ -27955,7 +28003,7 @@ function parseNovigMlbGameEventsIndex(events) {
   return index;
 }
 function matchNovigMlbEventForGame(game, index) {
-  if (!isMlbGameRow9(game)) return null;
+  if (!isMlbGameRow10(game)) return null;
   const scheduledDateKey = game.scheduledDateKey?.trim();
   if (!scheduledDateKey) return null;
   const matched = index.filter(
@@ -28026,11 +28074,11 @@ async function fetchNovigMlbGameEventsIndex(options) {
 }
 
 // ../grarf/shared/domain/novig/enrichMlbGamesWithNovigMarketUrls.ts
-function isMlbGameRow10(game) {
+function isMlbGameRow11(game) {
   return game.league === "MLB" || game.id.startsWith("espn-MLB-");
 }
 async function enrichMlbGameRow5(game, novigIndex) {
-  if (!isMlbGameRow10(game)) return game;
+  if (!isMlbGameRow11(game)) return game;
   const existing = game.metadata?.novigMlbEventMarketUrl?.trim();
   if (existing) return game;
   const matched = matchNovigMlbEventForGame(game, novigIndex.entries);
@@ -28052,14 +28100,14 @@ async function enrichMlbGameRow5(game, novigIndex) {
 async function enrichMlbGamesWithNovigMarketUrls(games, options) {
   if (!Array.isArray(games) || games.length === 0) return games;
   const needsEnrich = games.some(
-    (game) => isMlbGameRow10(game) && !game.metadata?.novigMlbEventMarketUrl?.trim()
+    (game) => isMlbGameRow11(game) && !game.metadata?.novigMlbEventMarketUrl?.trim()
   );
   if (!needsEnrich) return games;
   let novigIndex = options?.novigIndex;
   if (!novigIndex) {
     try {
       const gamesNeedingMatch = games.filter(
-        (game) => isMlbGameRow10(game) && !game.metadata?.novigMlbEventMarketUrl?.trim()
+        (game) => isMlbGameRow11(game) && !game.metadata?.novigMlbEventMarketUrl?.trim()
       );
       novigIndex = await fetchNovigMlbGameEventsIndex({
         fetchImpl: options?.fetchImpl,
