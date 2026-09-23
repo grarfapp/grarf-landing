@@ -148630,6 +148630,137 @@ function useSportsBrowserPrototypeTodayTemporalSlate() {
 
 // ../grarf/desktop/src/lib/gamesSpine/resolveSportsBrowserPrototypeSidebarLeaguesGroupedSections.ts
 init_define_import_meta_env();
+
+// ../grarf/desktop/src/lib/gamesSpine/sportsBrowserPrototypeSidebarLeaguesPopulation.ts
+init_define_import_meta_env();
+var SPORTS_BROWSER_PROTOTYPE_SIDEBAR_LEAGUES_ACTIVE_POPULATION = [
+  { key: "afc-elite", label: "AFC ELITE" },
+  { key: "AFL", label: "AFL" },
+  { key: "ahl", label: "AHL" },
+  { key: "ATP", label: "ATP" },
+  { key: "avp", label: "AVP" },
+  { key: "BEL1", label: "BELGIAN PRO LEAGUE" },
+  { key: "CRICKET_BBL", label: "BIG BASH LEAGUE" },
+  { key: "BOXING", label: "BOXING" },
+  { key: "BRA1", label: "BRASILEIR\xC3O" },
+  { key: "BUNDESLIGA", label: "BUNDESLIGA" },
+  { key: "caf-champions", label: "CAF CHAMPIONS LEAGUE" },
+  { key: "CARABAO_CUP", label: "CARABAO CUP" },
+  { key: "CBWS", label: "CARIBBEAN SERIES" },
+  { key: "CONCACAF_CAC", label: "CENTRAL AMERICAN CUP" },
+  { key: "CFL", label: "CFL" },
+  { key: "CHAMPIONSHIP", label: "EFL CHAMPIONSHIP" },
+  { key: "CLUBWC", label: "FIFA CLUB WORLD CUP" },
+  { key: "CONCACAF_CL", label: "CONCACAF CHAMPIONS CUP" },
+  { key: "CONCACAF_NG", label: "CONCACAF NATIONS LEAGUE" },
+  { key: "COPA", label: "COPA AMERICA" },
+  { key: "COPA_BRASIL", label: "COPA DO BRASIL" },
+  { key: "LIBERTADORES", label: "COPA LIBERTADORES" },
+  { key: "SUDAMERICANA", label: "COPA SUDAMERICANA" },
+  { key: "COPPAITALIA", label: "COPPA ITALIA" },
+  { key: "DP_WORLD", label: "DP WORLD TOUR" },
+  { key: "EPL", label: "ENGLISH PREMIER LEAGUE" },
+  { key: "EREDIVISIE", label: "EREDIVISIE" },
+  { key: "euroleague", label: "EUROLEAGUE" },
+  // UEL — list includes both EUROPA LEAGUE and UEFA EUROPA LEAGUE (single underlying league).
+  { key: "UEL", label: "UEFA EUROPA LEAGUE" },
+  { key: "F1", label: "FORMULA 1" },
+  { key: "F2", label: "FORMULA 2" },
+  { key: "F3", label: "FORMULA 3" },
+  { key: "FORMULA_E", label: "FORMULA E" },
+  { key: "fa-cup", label: "FA CUP" },
+  { key: "RUGBYTOP14", label: "FRENCH TOP 14" },
+  { key: "NBA2K", label: "NBA G LEAGUE" },
+  { key: "RUGBYPREM", label: "GALLAGHER PREMIERSHIP" },
+  { key: "GOLDCUP", label: "GOLD CUP" },
+  { key: "GT_WORLD_CHALLENGE", label: "GT WORLD CHALLENGE" },
+  { key: "horse-racing", label: "HORSE-RACING" },
+  { key: "CRICKET_ICC", label: "CRICKET" },
+  { key: "imsa", label: "IMSA" },
+  { key: "INDYCAR", label: "INDYCAR" },
+  { key: "j1", label: "J1" },
+  { key: "kbo", label: "KBO" },
+  { key: "khl", label: "KHL" },
+  { key: "KORNFERRY", label: "KORN FERRY TOUR" },
+  { key: "lacrosse", label: "LACROSSE" },
+  { key: "LALIGA", label: "LALIGA" },
+  { key: "LEAGUES_CUP", label: "LEAGUES CUP" },
+  { key: "LIGAMX", label: "LIGA MX" },
+  { key: "LIGUE1", label: "LIGUE 1" },
+  { key: "LIV", label: "LIV GOLF" },
+  { key: "LLBWS", label: "LITTLE LEAGUE BASEBALL" },
+  { key: "base-lls", label: "LITTLE LEAGUE SOFTBALL" },
+  { key: "lovb", label: "LOVB" },
+  { key: "ARG1", label: "ARGENTINE PRIMERA" },
+  { key: "LPGA", label: "LPGA" },
+  { key: "milb", label: "MiLB" },
+  { key: "MLB", label: "MLB" },
+  { key: "RUGB_289262", label: "MAJOR LEAGUE RUGBY" },
+  { key: "MLS", label: "MLS" },
+  { key: "MOTOGP", label: "MOTOGP" },
+  { key: "MOTO2", label: "MOTO2" },
+  { key: "MOTO3", label: "MOTO3" },
+  { key: "NASCAR", label: "NASCAR CUP SERIES" },
+  { key: "NASCAR_XFINITY", label: "NASCAR O'REILLY" },
+  { key: "NASCAR_TRUCK", label: "NASCAR TRUCKS" },
+  { key: "NBA", label: "NBA" },
+  { key: "NCAAFH", label: "NCAA FIELD HOCKEY" },
+  { key: "NCAABB", label: "NCAA BASEBALL" },
+  { key: "NCAALAX", label: "NCAA LACROSSE" },
+  { key: "MNCAAB", label: "NCAA MEN'S BASKETBALL" },
+  { key: "NCAAVB_M", label: "NCAA MEN'S VOLLEYBALL" },
+  { key: "NCAAMSOC", label: "NCAA MEN'S SOCCER" },
+  { key: "NCAAWP", label: "NCAA WATER POLO" },
+  { key: "NCAAVB", label: "NCAA WOMEN'S VOLLEYBALL" },
+  { key: "WNCAAB", label: "NCAA WOMEN'S BASKETBALL" },
+  { key: "NCAAWSOC", label: "NCAA WOMEN'S SOCCER" },
+  { key: "NCAAF", label: "NCAAF" },
+  { key: "NCAASB", label: "NCAA SOFTBALL" },
+  { key: "NFL", label: "NFL" },
+  { key: "NHL", label: "NHL" },
+  { key: "nhra", label: "NHRA" },
+  { key: "npb", label: "NPB" },
+  { key: "NWSL", label: "NWSL" },
+  { key: "pfl", label: "PFL" },
+  { key: "PGA", label: "PGA" },
+  { key: "PLL", label: "PLL" },
+  { key: "POR1", label: "PRIMEIRA LIGA" },
+  { key: "SAUDI", label: "RSL" },
+  { key: "rugby-union", label: "RUGBY" },
+  { key: "SCOTTISH_LEAGUE_CUP", label: "SCOTTISH LEAGUE CUP" },
+  { key: "SERIEA", label: "SERIE A" },
+  { key: "SPFL", label: "SPFL" },
+  { key: "SUPERLIG", label: "S\xDCPER LIG" },
+  { key: "swimming", label: "SWIMMING" },
+  { key: "USATF", label: "TRACK & FIELD" },
+  { key: "US_OPEN_CUP", label: "U.S. OPEN CUP" },
+  { key: "UCL", label: "UEFA CHAMPIONS LEAGUE" },
+  { key: "UECL", label: "UEFA CONFERENCE LEAGUE" },
+  { key: "EURO", label: "UEFA EURO" },
+  { key: "NATIONS", label: "UEFA NATIONS LEAGUE" },
+  { key: "UFC", label: "UFC" },
+  { key: "XFL", label: "UFL" },
+  { key: "RUGBYULSTER", label: "UNITED RUGBY CHAMPIONSHIP" },
+  { key: "USLC", label: "USL CHAMPIONSHIP" },
+  { key: "USLCUP", label: "USL CHAMPIONSHIP CUP" },
+  { key: "USL1", label: "USL LEAGUE ONE" },
+  { key: "WEC", label: "WEC" },
+  { key: "winter-sports", label: "WINTER SPORTS" },
+  { key: "WNBA", label: "WNBA" },
+  { key: "CAF_WNATIONS", label: "WOMEN'S AFCON" },
+  { key: "womens-ucl", label: "WOMEN'S UCL" },
+  { key: "world-rally", label: "WORLD RALLY" },
+  { key: "WTA", label: "WTA" }
+];
+var SIDEBAR_LEAGUES_LABEL_BY_KEY = new Map(SPORTS_BROWSER_PROTOTYPE_SIDEBAR_LEAGUES_ACTIVE_POPULATION.map((entry2) => [entry2.key, entry2.label]));
+function collectSportsBrowserPrototypeSidebarLeaguesPopulationKeys() {
+  return SPORTS_BROWSER_PROTOTYPE_SIDEBAR_LEAGUES_ACTIVE_POPULATION.map((entry2) => entry2.key);
+}
+function resolveSportsBrowserPrototypeSidebarLeaguesPopulationLabel(leagueKey) {
+  return SIDEBAR_LEAGUES_LABEL_BY_KEY.get(leagueKey);
+}
+
+// ../grarf/desktop/src/lib/gamesSpine/resolveSportsBrowserPrototypeSidebarLeaguesGroupedSections.ts
 var ESPN_SPORT_TO_DIRECTORY_SECTION_ID = {
   football: "football",
   basketball: "basketball",
@@ -148652,19 +148783,7 @@ var ESPN_LABEL_BY_KEY = new Map(
   ESPN_OPERATIONAL_INGEST_LEAGUES.map((row) => [row.key, row.label])
 );
 function collectSidebarLeaguesUniverseKeys() {
-  const keys = /* @__PURE__ */ new Set();
-  for (const row of ESPN_OPERATIONAL_INGEST_LEAGUES) {
-    keys.add(row.key);
-  }
-  for (const key2 of Object.keys(SPORTS_BROWSER_PROTOTYPE_LEAGUE_WEBSITES)) {
-    keys.add(key2);
-  }
-  for (const item of flattenLeagueDirectorySectionItems(getLeagueDirectoryV1ForNav())) {
-    if (item.grarfLeagueKey) {
-      keys.add(item.grarfLeagueKey);
-    }
-  }
-  return [...keys];
+  return collectSportsBrowserPrototypeSidebarLeaguesPopulationKeys();
 }
 function buildDirectoryLeagueSectionIdMap() {
   const out = /* @__PURE__ */ new Map();
@@ -148679,6 +148798,10 @@ function buildDirectoryLeagueSectionIdMap() {
   return out;
 }
 function resolveSidebarLeaguesDisplayLabel(leagueKey) {
+  const populationLabel = resolveSportsBrowserPrototypeSidebarLeaguesPopulationLabel(
+    leagueKey
+  );
+  if (populationLabel) return populationLabel;
   const directoryItem = resolveLeagueDirectoryItemByGrarfLeagueKey(leagueKey);
   if (directoryItem) {
     return resolveMainMenuLeagueDirectoryLabel(directoryItem);
