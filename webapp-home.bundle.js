@@ -28824,6 +28824,36 @@ function mergeGrarfCloudOperationalGameOverPrevious(cloudGame, previousGame) {
       }
     };
   }
+  const prevKalshi = previousGame.metadata?.kalshiMlbMarketUrl?.trim();
+  if (prevKalshi && !merged.metadata?.kalshiMlbMarketUrl?.trim()) {
+    merged = {
+      ...merged,
+      metadata: {
+        ...merged.metadata,
+        kalshiMlbMarketUrl: prevKalshi
+      }
+    };
+  }
+  const prevPolymarket = previousGame.metadata?.polymarketMlbMarketUrl?.trim();
+  if (prevPolymarket && !merged.metadata?.polymarketMlbMarketUrl?.trim()) {
+    merged = {
+      ...merged,
+      metadata: {
+        ...merged.metadata,
+        polymarketMlbMarketUrl: prevPolymarket
+      }
+    };
+  }
+  const prevNovig = previousGame.metadata?.novigMlbEventMarketUrl?.trim();
+  if (prevNovig && !merged.metadata?.novigMlbEventMarketUrl?.trim()) {
+    merged = {
+      ...merged,
+      metadata: {
+        ...merged.metadata,
+        novigMlbEventMarketUrl: prevNovig
+      }
+    };
+  }
   return merged;
 }
 function mergeGrarfCloudOperationalLeaguesOverPrevious(cloudLeagues, previousLeagues, authoritativeEspnReconciledLeagueKeys, staleFallbackOperationalLeagueKeys) {
@@ -30846,6 +30876,832 @@ async function enrichOperationalSnapshotCoversMlbPicksUrls(transport) {
   const ipcEnriched = await enrichViaElectronMainIpc2(transport);
   if (ipcEnriched) return ipcEnriched;
   const enriched = await enrichMlbGamesWithCoversPicksUrls(rows);
+  if (!enriched.some((row, index) => row !== rows[index])) {
+    return transport;
+  }
+  return {
+    ...transport,
+    leagues: {
+      ...transport.leagues,
+      MLB: enriched
+    }
+  };
+}
+
+// ../grarf/desktop/src/lib/kalshi/enrichOperationalSnapshotKalshiMlbMarketUrls.ts
+init_define_import_meta_env();
+
+// ../grarf/shared/domain/kalshi/enrichMlbGamesWithKalshiMarketUrls.ts
+init_define_import_meta_env();
+
+// ../grarf/shared/domain/kalshi/buildKalshiMlbGameMarketUrl.ts
+init_define_import_meta_env();
+var KALSHI_MLB_GAME_MARKET_URL_RE = /^https:\/\/kalshi\.com\/markets\/[a-z0-9-]+\/[a-z0-9-]+\/[a-z0-9-]+$/;
+function slugifyKalshiSeriesTitle(title) {
+  return title.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+}
+function buildKalshiMlbGameMarketUrl(input) {
+  const seriesTicker = input.seriesTicker.trim();
+  const seriesTitle = input.seriesTitle.trim();
+  const eventTicker = input.eventTicker.trim();
+  if (!seriesTicker || !seriesTitle || !eventTicker) {
+    throw new Error("buildKalshiMlbGameMarketUrl: missing series or event ticker");
+  }
+  const seriesSlug = slugifyKalshiSeriesTitle(seriesTitle);
+  if (!seriesSlug) {
+    throw new Error("buildKalshiMlbGameMarketUrl: invalid series title");
+  }
+  return `https://kalshi.com/markets/${seriesTicker.toLowerCase()}/${seriesSlug}/${eventTicker.toLowerCase()}`;
+}
+function isValidKalshiMlbGameMarketUrl(url) {
+  return KALSHI_MLB_GAME_MARKET_URL_RE.test(url.trim());
+}
+
+// ../grarf/shared/domain/kalshi/fetchKalshiMlbGameEventsIndex.ts
+init_define_import_meta_env();
+
+// ../grarf/shared/domain/kalshi/kalshiTradeApi.ts
+init_define_import_meta_env();
+var KALSHI_TRADE_API_BASE_URL = "https://api.elections.kalshi.com/trade-api/v2";
+async function fetchKalshiTradeApiJson(path, options) {
+  const fetchImpl = options?.fetchImpl ?? fetch;
+  const url = `${KALSHI_TRADE_API_BASE_URL}${path.startsWith("/") ? path : `/${path}`}`;
+  const res = await fetchImpl(url, {
+    method: "GET",
+    headers: { Accept: "application/json" },
+    signal: options?.signal ?? AbortSignal.timeout(2e4)
+  });
+  if (!res.ok) {
+    throw new Error(`fetchKalshiTradeApiJson: ${res.status} ${res.statusText} (${path})`);
+  }
+  return await res.json();
+}
+
+// ../grarf/shared/domain/kalshi/parseKalshiMlbEventsIndex.ts
+init_define_import_meta_env();
+
+// ../grarf/shared/domain/kalshi/parseKalshiMlbEventSubTitle.ts
+init_define_import_meta_env();
+var KALSHI_MLB_EVENT_SUB_TITLE_RE = /^([A-Z0-9]+)\s+vs\s+([A-Z0-9]+)\s+\(([A-Za-z]{3})\s+(\d{1,2})\)$/;
+var MONTH_ABBREV_TO_NUMBER = {
+  Jan: 1,
+  Feb: 2,
+  Mar: 3,
+  Apr: 4,
+  May: 5,
+  Jun: 6,
+  Jul: 7,
+  Aug: 8,
+  Sep: 9,
+  Oct: 10,
+  Nov: 11,
+  Dec: 12
+};
+function parseKalshiMlbEventSubTitle(subTitle) {
+  const trimmed = subTitle?.trim();
+  if (!trimmed) return null;
+  const match = trimmed.match(KALSHI_MLB_EVENT_SUB_TITLE_RE);
+  if (!match) return null;
+  const awayTeamAbbrev = match[1]?.trim();
+  const homeTeamAbbrev = match[2]?.trim();
+  const monthAbbrev = match[3]?.trim();
+  const dayRaw = match[4]?.trim();
+  if (!awayTeamAbbrev || !homeTeamAbbrev || !monthAbbrev || !dayRaw) return null;
+  const scheduledMonth = MONTH_ABBREV_TO_NUMBER[monthAbbrev];
+  const scheduledDay = Number.parseInt(dayRaw, 10);
+  if (!scheduledMonth || !Number.isFinite(scheduledDay) || scheduledDay < 1 || scheduledDay > 31) {
+    return null;
+  }
+  return { awayTeamAbbrev, homeTeamAbbrev, scheduledMonth, scheduledDay };
+}
+
+// ../grarf/shared/domain/kalshi/parseKalshiMlbEventsIndex.ts
+function isKalshiProfessionalBaseballGameEventRow(row) {
+  return row.product_metadata?.competition_scope === "Game";
+}
+function parseKalshiMlbEventsIndex(events2) {
+  const index = [];
+  for (const row of events2) {
+    if (!isKalshiProfessionalBaseballGameEventRow(row)) continue;
+    const eventTicker = row.event_ticker?.trim();
+    const seriesTicker = row.series_ticker?.trim();
+    if (!eventTicker || !seriesTicker) continue;
+    const parsed = parseKalshiMlbEventSubTitle(row.sub_title);
+    if (!parsed) continue;
+    index.push({
+      eventTicker,
+      seriesTicker,
+      awayTeamAbbrev: parsed.awayTeamAbbrev,
+      homeTeamAbbrev: parsed.homeTeamAbbrev,
+      scheduledMonth: parsed.scheduledMonth,
+      scheduledDay: parsed.scheduledDay
+    });
+  }
+  return index;
+}
+
+// ../grarf/shared/domain/kalshi/fetchKalshiMlbGameEventsIndex.ts
+async function fetchKalshiMlbGameEventsIndex(series, options) {
+  const entries = [];
+  let cursor;
+  const seriesTicker = series.seriesTicker.trim();
+  const maxPages = options?.maxPages ?? 12;
+  for (let page = 0; page < maxPages; page += 1) {
+    const path = cursor ? `/events?series_ticker=${encodeURIComponent(seriesTicker)}&limit=200&cursor=${encodeURIComponent(cursor)}` : `/events?series_ticker=${encodeURIComponent(seriesTicker)}&limit=200`;
+    let body;
+    try {
+      body = await fetchKalshiTradeApiJson(path, options);
+    } catch (error) {
+      if (entries.length > 0) break;
+      throw error;
+    }
+    entries.push(...parseKalshiMlbEventsIndex(body.events ?? []));
+    if (options?.stopWhenIndexSatisfies?.(entries)) break;
+    const next = body.cursor?.trim();
+    if (!next || next === cursor) break;
+    cursor = next;
+  }
+  return {
+    seriesTicker,
+    seriesTitle: series.seriesTitle.trim(),
+    entries
+  };
+}
+
+// ../grarf/shared/domain/kalshi/fetchKalshiProfessionalBaseballGameSeries.ts
+init_define_import_meta_env();
+
+// ../grarf/shared/domain/kalshi/isKalshiProfessionalBaseballGameSeries.ts
+init_define_import_meta_env();
+function isKalshiProfessionalBaseballGameSeries(series) {
+  return series.title?.trim() === "Professional Baseball Game" && Array.isArray(series.tags) && series.tags.includes("Baseball") && Boolean(series.ticker?.trim());
+}
+
+// ../grarf/shared/domain/kalshi/fetchKalshiProfessionalBaseballGameSeries.ts
+async function fetchKalshiProfessionalBaseballGameSeries(options) {
+  let cursor;
+  for (let page = 0; page < 10; page += 1) {
+    const path = cursor ? `/series?tags=Baseball&limit=200&cursor=${encodeURIComponent(cursor)}` : "/series?tags=Baseball&limit=200";
+    const body = await fetchKalshiTradeApiJson(path, options);
+    const seriesList = body.series ?? [];
+    for (const series of seriesList) {
+      if (!isKalshiProfessionalBaseballGameSeries(series)) continue;
+      const seriesTicker = series.ticker?.trim();
+      const seriesTitle = series.title?.trim();
+      if (seriesTicker && seriesTitle) {
+        return { seriesTicker, seriesTitle };
+      }
+    }
+    const next = body.cursor?.trim();
+    if (!next || next === cursor) break;
+    cursor = next;
+  }
+  return null;
+}
+
+// ../grarf/shared/domain/kalshi/matchKalshiMlbEventForGame.ts
+init_define_import_meta_env();
+
+// ../grarf/shared/domain/kalshi/toKalshiMlbTeamAbbrevForMatching.ts
+init_define_import_meta_env();
+function toKalshiMlbTeamAbbrevForMatching(teamAbbrev2) {
+  const stats = mlbStatsApiAbbrevFromGrarf(teamAbbrev2);
+  if (!stats) return null;
+  if (stats === "OAK") return "ATH";
+  return stats;
+}
+
+// ../grarf/shared/domain/kalshi/matchKalshiMlbEventForGame.ts
+function isMlbGameRow4(game) {
+  return game.league === "MLB" || game.id.startsWith("espn-MLB-");
+}
+function parseScheduledDateKey(dateKey) {
+  const trimmed = dateKey?.trim();
+  if (!trimmed) return null;
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(trimmed);
+  if (!match) return null;
+  const scheduledMonth = Number.parseInt(match[2] ?? "", 10);
+  const scheduledDay = Number.parseInt(match[3] ?? "", 10);
+  if (!Number.isFinite(scheduledMonth) || scheduledMonth < 1 || scheduledMonth > 12 || !Number.isFinite(scheduledDay) || scheduledDay < 1 || scheduledDay > 31) {
+    return null;
+  }
+  return { scheduledMonth, scheduledDay };
+}
+function matchKalshiMlbEventForGame(game, index) {
+  if (!isMlbGameRow4(game)) return null;
+  const awayAbbrev = toKalshiMlbTeamAbbrevForMatching(game.awayTeamAbbrev);
+  const homeAbbrev = toKalshiMlbTeamAbbrevForMatching(game.homeTeamAbbrev);
+  const scheduled = parseScheduledDateKey(game.scheduledDateKey);
+  if (!awayAbbrev || !homeAbbrev || !scheduled) return null;
+  const matched = index.filter(
+    (entry2) => entry2.awayTeamAbbrev === awayAbbrev && entry2.homeTeamAbbrev === homeAbbrev && entry2.scheduledMonth === scheduled.scheduledMonth && entry2.scheduledDay === scheduled.scheduledDay
+  );
+  if (matched.length !== 1) return null;
+  return matched[0] ?? null;
+}
+
+// ../grarf/shared/domain/kalshi/enrichMlbGamesWithKalshiMarketUrls.ts
+function isMlbGameRow5(game) {
+  return game.league === "MLB" || game.id.startsWith("espn-MLB-");
+}
+async function enrichMlbGameRow3(game, kalshiIndex) {
+  if (!isMlbGameRow5(game)) return game;
+  const existing = game.metadata?.kalshiMlbMarketUrl?.trim();
+  if (existing) return game;
+  const matched = matchKalshiMlbEventForGame(game, kalshiIndex.entries);
+  if (!matched) return game;
+  let marketUrl;
+  try {
+    marketUrl = buildKalshiMlbGameMarketUrl({
+      seriesTicker: kalshiIndex.seriesTicker,
+      seriesTitle: kalshiIndex.seriesTitle,
+      eventTicker: matched.eventTicker
+    });
+  } catch {
+    return game;
+  }
+  return {
+    ...game,
+    metadata: {
+      ...game.metadata,
+      kalshiMlbMarketUrl: marketUrl
+    }
+  };
+}
+async function enrichMlbGamesWithKalshiMarketUrls(games, options) {
+  if (!Array.isArray(games) || games.length === 0) return games;
+  const needsEnrich = games.some(
+    (game) => isMlbGameRow5(game) && !game.metadata?.kalshiMlbMarketUrl?.trim()
+  );
+  if (!needsEnrich) return games;
+  let kalshiIndex = options?.kalshiIndex;
+  if (!kalshiIndex) {
+    try {
+      const series = await fetchKalshiProfessionalBaseballGameSeries({
+        fetchImpl: options?.fetchImpl
+      });
+      if (!series) return games;
+      const gamesNeedingMatch = games.filter(
+        (game) => isMlbGameRow5(game) && !game.metadata?.kalshiMlbMarketUrl?.trim()
+      );
+      kalshiIndex = await fetchKalshiMlbGameEventsIndex(series, {
+        fetchImpl: options?.fetchImpl,
+        stopWhenIndexSatisfies: (entries) => gamesNeedingMatch.length > 0 && gamesNeedingMatch.every((game) => matchKalshiMlbEventForGame(game, entries) !== null)
+      });
+    } catch {
+      return games;
+    }
+  }
+  if (kalshiIndex.entries.length === 0) return games;
+  return Promise.all(games.map((game) => enrichMlbGameRow3(game, kalshiIndex)));
+}
+
+// ../grarf/desktop/src/lib/kalshi/enrichOperationalSnapshotKalshiMlbMarketUrls.ts
+async function enrichOperationalSnapshotKalshiMlbMarketUrls(transport) {
+  const rows = transport.leagues?.MLB;
+  if (!Array.isArray(rows) || rows.length === 0) return transport;
+  const enriched = await enrichMlbGamesWithKalshiMarketUrls(rows);
+  if (!enriched.some((row, index) => row !== rows[index])) {
+    return transport;
+  }
+  return {
+    ...transport,
+    leagues: {
+      ...transport.leagues,
+      MLB: enriched
+    }
+  };
+}
+
+// ../grarf/desktop/src/lib/polymarket/enrichOperationalSnapshotPolymarketMlbMarketUrls.ts
+init_define_import_meta_env();
+
+// ../grarf/shared/domain/polymarket/enrichMlbGamesWithPolymarketMarketUrls.ts
+init_define_import_meta_env();
+
+// ../grarf/shared/domain/polymarket/buildPolymarketMlbGameMarketUrl.ts
+init_define_import_meta_env();
+
+// ../grarf/shared/domain/polymarket/parsePolymarketMlbGameEventSlug.ts
+init_define_import_meta_env();
+var POLYMARKET_MLB_GAME_EVENT_SLUG_RE = /^mlb-([a-z]+)-([a-z]+)-(\d{4}-\d{2}-\d{2})$/;
+function parsePolymarketMlbGameEventSlug(slug) {
+  const trimmed = slug?.trim();
+  if (!trimmed) return null;
+  const match = trimmed.match(POLYMARKET_MLB_GAME_EVENT_SLUG_RE);
+  if (!match) return null;
+  const awayTeamSlug = match[1]?.trim();
+  const homeTeamSlug = match[2]?.trim();
+  const scheduledDateKey = match[3]?.trim();
+  if (!awayTeamSlug || !homeTeamSlug || !scheduledDateKey) return null;
+  return { awayTeamSlug, homeTeamSlug, scheduledDateKey };
+}
+function isPolymarketMlbGameWinnerEventSlug(slug) {
+  return parsePolymarketMlbGameEventSlug(slug) !== null;
+}
+
+// ../grarf/shared/domain/polymarket/buildPolymarketMlbGameMarketUrl.ts
+var POLYMARKET_MLB_GAME_MARKET_URL_RE = /^https:\/\/polymarket\.us\/sports\/mlb\/mlb-[a-z]+-[a-z]+-\d{4}-\d{2}-\d{2}$/;
+function normalizePolymarketMlbGameMarketUrl(url) {
+  return url.trim().replace(/^https:\/\/polymarket\.com\//i, "https://polymarket.us/");
+}
+function buildPolymarketMlbGameMarketUrl(input) {
+  const sportSlug = input.sportSlug.trim().toLowerCase();
+  const eventSlug = input.eventSlug.trim();
+  if (!sportSlug || !eventSlug) {
+    throw new Error("buildPolymarketMlbGameMarketUrl: missing sport or event slug");
+  }
+  if (!isPolymarketMlbGameWinnerEventSlug(eventSlug)) {
+    throw new Error("buildPolymarketMlbGameMarketUrl: invalid MLB game event slug");
+  }
+  return `https://polymarket.us/sports/${sportSlug}/${eventSlug}`;
+}
+function isValidPolymarketMlbGameMarketUrl(url) {
+  return POLYMARKET_MLB_GAME_MARKET_URL_RE.test(normalizePolymarketMlbGameMarketUrl(url));
+}
+
+// ../grarf/shared/domain/polymarket/buildPolymarketMlbGameEventSlugCandidates.ts
+init_define_import_meta_env();
+
+// ../grarf/shared/domain/polymarket/toPolymarketMlbTeamSlugFromGrarfAbbrev.ts
+init_define_import_meta_env();
+function polymarketMlbTeamSlugCandidatesFromGrarfAbbrev(teamAbbrev2) {
+  const grarf = teamAbbrev2?.trim().toUpperCase() ?? "";
+  if (!grarf) return [];
+  const stats = mlbStatsApiAbbrevFromGrarf(grarf);
+  const candidates = /* @__PURE__ */ new Set([grarf.toLowerCase()]);
+  if (stats) {
+    candidates.add(stats.toLowerCase());
+  }
+  if (stats === "AZ" || grarf === "ARI") {
+    candidates.add("ari");
+  }
+  if (grarf === "OAK" || stats === "OAK") {
+    candidates.add("ath");
+  }
+  return [...candidates].filter((value) => value.length > 0);
+}
+function toPolymarketMlbTeamSlugFromGrarfAbbrev(teamAbbrev2) {
+  const grarf = teamAbbrev2?.trim().toUpperCase() ?? "";
+  if (!grarf) return null;
+  const stats = mlbStatsApiAbbrevFromGrarf(grarf);
+  if (grarf === "OAK" || stats === "OAK") return "ath";
+  if (stats === "AZ") return "ari";
+  if (!stats) return null;
+  return stats.toLowerCase();
+}
+
+// ../grarf/shared/domain/polymarket/buildPolymarketMlbGameEventSlugCandidates.ts
+function isMlbGameRow6(game) {
+  return game.league === "MLB" || game.id.startsWith("espn-MLB-");
+}
+function buildPolymarketMlbGameEventSlugCandidates(game, sportConfig) {
+  if (!isMlbGameRow6(game)) return [];
+  const scheduledDateKey = game.scheduledDateKey?.trim();
+  if (!scheduledDateKey || !/^\d{4}-\d{2}-\d{2}$/.test(scheduledDateKey)) return [];
+  const awayCandidates = polymarketMlbTeamSlugCandidatesFromGrarfAbbrev(game.awayTeamAbbrev);
+  const homeCandidates = polymarketMlbTeamSlugCandidatesFromGrarfAbbrev(game.homeTeamAbbrev);
+  if (awayCandidates.length === 0 || homeCandidates.length === 0) return [];
+  const awayFirst = sportConfig.teamOrdering === "away" ? awayCandidates : homeCandidates;
+  const homeSecond = sportConfig.teamOrdering === "away" ? homeCandidates : awayCandidates;
+  const slugs = [];
+  const pushSlug = (away, home) => {
+    const slug = `mlb-${away}-${home}-${scheduledDateKey}`;
+    if (!slugs.includes(slug)) slugs.push(slug);
+  };
+  const primaryAway = toPolymarketMlbTeamSlugFromGrarfAbbrev(game.awayTeamAbbrev);
+  const primaryHome = toPolymarketMlbTeamSlugFromGrarfAbbrev(game.homeTeamAbbrev);
+  if (primaryAway && primaryHome) {
+    pushSlug(
+      sportConfig.teamOrdering === "away" ? primaryAway : primaryHome,
+      sportConfig.teamOrdering === "away" ? primaryHome : primaryAway
+    );
+  }
+  for (const away of awayFirst) {
+    for (const home of homeSecond) {
+      pushSlug(away, home);
+    }
+  }
+  return slugs;
+}
+
+// ../grarf/shared/domain/polymarket/fetchPolymarketMlbSportConfig.ts
+init_define_import_meta_env();
+
+// ../grarf/shared/domain/polymarket/polymarketGammaApi.ts
+init_define_import_meta_env();
+var POLYMARKET_GAMMA_API_BASE_URL = "https://gamma-api.polymarket.com";
+async function fetchPolymarketGammaApiJson(path, options) {
+  const fetchImpl = options?.fetchImpl ?? fetch;
+  const url = `${POLYMARKET_GAMMA_API_BASE_URL}${path.startsWith("/") ? path : `/${path}`}`;
+  const res = await fetchImpl(url, {
+    method: "GET",
+    headers: { Accept: "application/json" },
+    signal: options?.signal ?? AbortSignal.timeout(2e4)
+  });
+  if (!res.ok) {
+    throw new Error(`fetchPolymarketGammaApiJson: ${res.status} ${res.statusText} (${path})`);
+  }
+  return await res.json();
+}
+
+// ../grarf/shared/domain/polymarket/fetchPolymarketMlbSportConfig.ts
+async function fetchPolymarketMlbSportConfig(options) {
+  const rows = await fetchPolymarketGammaApiJson("/sports", options);
+  const mlb2 = rows.find((row) => row.sport?.trim().toLowerCase() === "mlb");
+  const sportSlug = mlb2?.sport?.trim().toLowerCase();
+  const primaryTagId = mlb2?.primaryTagId;
+  const ordering = mlb2?.ordering?.trim().toLowerCase();
+  if (!sportSlug || !primaryTagId || ordering !== "away" && ordering !== "home") {
+    return null;
+  }
+  return {
+    sportSlug,
+    primaryTagId,
+    teamOrdering: ordering
+  };
+}
+
+// ../grarf/shared/domain/polymarket/fetchPolymarketGammaEventsBySlug.ts
+init_define_import_meta_env();
+async function fetchPolymarketGammaEventsBySlug(slug, options) {
+  const trimmed = slug.trim();
+  if (!trimmed) return [];
+  const rows = await fetchPolymarketGammaApiJson(
+    `/events?slug=${encodeURIComponent(trimmed)}`,
+    options
+  );
+  return Array.isArray(rows) ? rows : [];
+}
+
+// ../grarf/shared/domain/polymarket/matchPolymarketMlbGameEventForGame.ts
+init_define_import_meta_env();
+function isMlbGameRow7(game) {
+  return game.league === "MLB" || game.id.startsWith("espn-MLB-");
+}
+function polymarketMlbTeamSlugMatchesGrarfAbbrev(teamSlug, grarfAbbrev) {
+  const candidates = polymarketMlbTeamSlugCandidatesFromGrarfAbbrev(grarfAbbrev);
+  return candidates.includes(teamSlug.trim().toLowerCase());
+}
+function matchPolymarketMlbGameEventForGame(event, game) {
+  if (!isMlbGameRow7(game)) return false;
+  const parsed = parsePolymarketMlbGameEventSlug(event.slug);
+  if (!parsed) return false;
+  const scheduledDateKey = game.scheduledDateKey?.trim();
+  if (!scheduledDateKey || parsed.scheduledDateKey !== scheduledDateKey) return false;
+  if (!Array.isArray(event.markets) || event.markets.length === 0) return false;
+  return polymarketMlbTeamSlugMatchesGrarfAbbrev(parsed.awayTeamSlug, game.awayTeamAbbrev) && polymarketMlbTeamSlugMatchesGrarfAbbrev(parsed.homeTeamSlug, game.homeTeamAbbrev);
+}
+
+// ../grarf/shared/domain/polymarket/enrichMlbGamesWithPolymarketMarketUrls.ts
+function isMlbGameRow8(game) {
+  return game.league === "MLB" || game.id.startsWith("espn-MLB-");
+}
+async function resolvePolymarketMlbMarketForGame(game, sportConfig, options) {
+  const slugCandidates = buildPolymarketMlbGameEventSlugCandidates(game, sportConfig);
+  if (slugCandidates.length === 0) return null;
+  for (const slug of slugCandidates) {
+    let events2 = options?.slugEventCache?.get(slug);
+    if (events2 === void 0) {
+      try {
+        events2 = await fetchPolymarketGammaEventsBySlug(slug, {
+          fetchImpl: options?.fetchImpl
+        });
+      } catch {
+        events2 = null;
+      }
+      options?.slugEventCache?.set(slug, events2);
+    }
+    if (!events2 || events2.length === 0) continue;
+    const matchedEvents = events2.filter((event) => matchPolymarketMlbGameEventForGame(event, game));
+    if (matchedEvents.length !== 1) continue;
+    const eventSlug = matchedEvents[0]?.slug?.trim();
+    if (!eventSlug) continue;
+    try {
+      return {
+        eventSlug,
+        marketUrl: buildPolymarketMlbGameMarketUrl({
+          sportSlug: sportConfig.sportSlug,
+          eventSlug
+        })
+      };
+    } catch {
+      continue;
+    }
+  }
+  return null;
+}
+async function enrichMlbGameRow4(game, sportConfig, options) {
+  if (!isMlbGameRow8(game)) return game;
+  const existing = game.metadata?.polymarketMlbMarketUrl?.trim();
+  if (existing) return game;
+  const resolved = await resolvePolymarketMlbMarketForGame(game, sportConfig, options);
+  if (!resolved) return game;
+  return {
+    ...game,
+    metadata: {
+      ...game.metadata,
+      polymarketMlbMarketUrl: resolved.marketUrl
+    }
+  };
+}
+async function enrichMlbGamesWithPolymarketMarketUrls(games, options) {
+  if (!Array.isArray(games) || games.length === 0) return games;
+  const needsEnrich = games.some(
+    (game) => isMlbGameRow8(game) && !game.metadata?.polymarketMlbMarketUrl?.trim()
+  );
+  if (!needsEnrich) return games;
+  let sportConfig = options?.sportConfig;
+  if (!sportConfig) {
+    try {
+      sportConfig = await fetchPolymarketMlbSportConfig({
+        fetchImpl: options?.fetchImpl
+      }) ?? void 0;
+    } catch {
+      return games;
+    }
+  }
+  if (!sportConfig) return games;
+  const slugEventCache = options?.slugEventCache ?? /* @__PURE__ */ new Map();
+  return Promise.all(
+    games.map((game) => enrichMlbGameRow4(game, sportConfig, { ...options, slugEventCache }))
+  );
+}
+
+// ../grarf/desktop/src/lib/polymarket/enrichOperationalSnapshotPolymarketMlbMarketUrls.ts
+async function enrichOperationalSnapshotPolymarketMlbMarketUrls(transport) {
+  const rows = transport.leagues?.MLB;
+  if (!Array.isArray(rows) || rows.length === 0) return transport;
+  const enriched = await enrichMlbGamesWithPolymarketMarketUrls(rows);
+  if (!enriched.some((row, index) => row !== rows[index])) {
+    return transport;
+  }
+  return {
+    ...transport,
+    leagues: {
+      ...transport.leagues,
+      MLB: enriched
+    }
+  };
+}
+
+// ../grarf/desktop/src/lib/novig/enrichOperationalSnapshotNovigMlbMarketUrls.ts
+init_define_import_meta_env();
+
+// ../grarf/shared/domain/novig/enrichMlbGamesWithNovigMarketUrls.ts
+init_define_import_meta_env();
+
+// ../grarf/shared/domain/novig/buildNovigMlbEventMarketUrl.ts
+init_define_import_meta_env();
+var NOVIG_MLB_EVENT_MARKET_URL_RE = /^https:\/\/novig\.com\/event-markets\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+var NOVIG_EVENT_ID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+function buildNovigMlbEventMarketUrl(eventId) {
+  const trimmed = eventId.trim();
+  if (!NOVIG_EVENT_ID_RE.test(trimmed)) {
+    throw new Error("buildNovigMlbEventMarketUrl: invalid event id");
+  }
+  return `https://novig.com/event-markets/${trimmed.toLowerCase()}`;
+}
+function isValidNovigMlbEventMarketUrl(url) {
+  return NOVIG_MLB_EVENT_MARKET_URL_RE.test(url.trim());
+}
+
+// ../grarf/shared/domain/novig/fetchNovigMlbGameEventsIndex.ts
+init_define_import_meta_env();
+
+// ../grarf/shared/domain/novig/novigGraphqlApi.ts
+init_define_import_meta_env();
+var NOVIG_GRAPHQL_API_URLS = [
+  "https://gql.novig.us/v1/graphql",
+  "https://gql.novig.com/v1/graphql"
+];
+var NOVIG_GRAPHQL_API_URL = NOVIG_GRAPHQL_API_URLS[0];
+async function fetchNovigGraphql(query, variables, options) {
+  const fetchImpl = options?.fetchImpl ?? fetch;
+  const urls = options?.graphqlUrl ? [options.graphqlUrl] : [...NOVIG_GRAPHQL_API_URLS];
+  let lastError;
+  for (const url of urls) {
+    try {
+      const res = await fetchImpl(url, {
+        method: "POST",
+        headers: { Accept: "application/json", "Content-Type": "application/json" },
+        body: JSON.stringify({ query, variables }),
+        signal: options?.signal ?? AbortSignal.timeout(2e4)
+      });
+      if (!res.ok) {
+        throw new Error(`fetchNovigGraphql: ${res.status} ${res.statusText}`);
+      }
+      const body = await res.json();
+      if (body.errors?.length) {
+        throw new Error(`fetchNovigGraphql: ${body.errors[0]?.message ?? "GraphQL error"}`);
+      }
+      if (!body.data) {
+        throw new Error("fetchNovigGraphql: missing data");
+      }
+      return body.data;
+    } catch (error) {
+      lastError = error;
+    }
+  }
+  throw lastError instanceof Error ? lastError : new Error("fetchNovigGraphql: request failed");
+}
+
+// ../grarf/shared/domain/novig/matchNovigMlbEventForGame.ts
+init_define_import_meta_env();
+
+// ../grarf/shared/domain/novig/novigScheduledDateKeyFromIsoStart.ts
+init_define_import_meta_env();
+function novigScheduledDateKeyFromIsoStart(isoStart) {
+  const trimmed = isoStart?.trim();
+  if (!trimmed) return null;
+  const ms2 = Date.parse(trimmed);
+  if (!Number.isFinite(ms2)) return null;
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "America/New_York",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit"
+  }).format(new Date(ms2));
+}
+
+// ../grarf/shared/domain/novig/toNovigMlbTeamSymbolForMatching.ts
+init_define_import_meta_env();
+function novigMlbTeamSymbolCandidatesFromGrarfAbbrev(teamAbbrev2) {
+  const grarf = teamAbbrev2?.trim().toUpperCase() ?? "";
+  if (!grarf) return [];
+  const stats = mlbStatsApiAbbrevFromGrarf(grarf);
+  const candidates = /* @__PURE__ */ new Set([grarf]);
+  if (stats) {
+    candidates.add(stats);
+  }
+  if (stats === "AZ" || grarf === "ARI") {
+    candidates.add("ARI");
+  }
+  if (stats === "CWS" || grarf === "CHW") {
+    candidates.add("CWS");
+  }
+  return [...candidates].filter((value) => value.length > 0);
+}
+function novigMlbTeamSymbolMatchesGrarfAbbrev(teamSymbol, grarfAbbrev) {
+  const normalized = teamSymbol?.trim().toUpperCase() ?? "";
+  if (!normalized) return false;
+  return novigMlbTeamSymbolCandidatesFromGrarfAbbrev(grarfAbbrev).includes(normalized);
+}
+
+// ../grarf/shared/domain/novig/matchNovigMlbEventForGame.ts
+function isMlbGameRow9(game) {
+  return game.league === "MLB" || game.id.startsWith("espn-MLB-");
+}
+function parseNovigMlbGameEventIndexEntry(row) {
+  const eventId = row.id?.trim();
+  const eventType = row.type?.trim();
+  const game = row.game;
+  if (!eventId || !eventType || eventType !== "Game" || !game) return null;
+  const awayTeamSymbol = game.awayTeam?.symbol?.trim().toUpperCase();
+  const homeTeamSymbol = game.homeTeam?.symbol?.trim().toUpperCase();
+  const scheduledDateKey = novigScheduledDateKeyFromIsoStart(game.scheduled_start);
+  if (!awayTeamSymbol || !homeTeamSymbol || !scheduledDateKey) return null;
+  return {
+    eventId,
+    eventType,
+    awayTeamSymbol,
+    homeTeamSymbol,
+    scheduledDateKey
+  };
+}
+function parseNovigMlbGameEventsIndex(events2) {
+  const index = [];
+  for (const row of events2) {
+    const parsed = parseNovigMlbGameEventIndexEntry(row);
+    if (parsed) index.push(parsed);
+  }
+  return index;
+}
+function matchNovigMlbEventForGame(game, index) {
+  if (!isMlbGameRow9(game)) return null;
+  const scheduledDateKey = game.scheduledDateKey?.trim();
+  if (!scheduledDateKey) return null;
+  const matched = index.filter(
+    (entry2) => entry2.scheduledDateKey === scheduledDateKey && novigMlbTeamSymbolMatchesGrarfAbbrev(entry2.awayTeamSymbol, game.awayTeamAbbrev) && novigMlbTeamSymbolMatchesGrarfAbbrev(entry2.homeTeamSymbol, game.homeTeamAbbrev)
+  );
+  if (matched.length !== 1) return null;
+  return matched[0] ?? null;
+}
+
+// ../grarf/shared/domain/novig/fetchNovigMlbGameEventsIndex.ts
+var NOVIG_MLB_GAME_EVENTS_QUERY = `
+query NovigMlbGameEvents($limit: Int!, $offset: Int!) {
+  event(
+    where: {
+      _and: [
+        { type: { _eq: "Game" } }
+        {
+          status: {
+            _in: ["OPEN_PREGAME", "CLOSED_PREGAME", "OPEN_INGAME", "FINAL", "DELAYED"]
+          }
+        }
+        { game: { league: { _eq: "MLB" } } }
+      ]
+    }
+    limit: $limit
+    offset: $offset
+    order_by: { game: { scheduled_start: asc } }
+  ) {
+    id
+    type
+    game {
+      scheduled_start
+      awayTeam {
+        symbol
+        name
+      }
+      homeTeam {
+        symbol
+        name
+      }
+    }
+  }
+}
+`;
+async function fetchNovigMlbGameEventsIndex(options) {
+  const pageSize = options?.pageSize ?? 100;
+  const maxPages = options?.maxPages ?? 20;
+  const entries = [];
+  for (let page = 0; page < maxPages; page += 1) {
+    const offset = page * pageSize;
+    let data2;
+    try {
+      data2 = await fetchNovigGraphql(
+        NOVIG_MLB_GAME_EVENTS_QUERY,
+        { limit: pageSize, offset },
+        options
+      );
+    } catch (error) {
+      if (entries.length > 0) break;
+      throw error;
+    }
+    const rows = data2.event ?? [];
+    entries.push(...parseNovigMlbGameEventsIndex(rows));
+    if (options?.stopWhenIndexSatisfies?.(entries)) break;
+    if (rows.length < pageSize) break;
+  }
+  return { entries };
+}
+
+// ../grarf/shared/domain/novig/enrichMlbGamesWithNovigMarketUrls.ts
+function isMlbGameRow10(game) {
+  return game.league === "MLB" || game.id.startsWith("espn-MLB-");
+}
+async function enrichMlbGameRow5(game, novigIndex) {
+  if (!isMlbGameRow10(game)) return game;
+  const existing = game.metadata?.novigMlbEventMarketUrl?.trim();
+  if (existing) return game;
+  const matched = matchNovigMlbEventForGame(game, novigIndex.entries);
+  if (!matched) return game;
+  let eventMarketUrl;
+  try {
+    eventMarketUrl = buildNovigMlbEventMarketUrl(matched.eventId);
+  } catch {
+    return game;
+  }
+  return {
+    ...game,
+    metadata: {
+      ...game.metadata,
+      novigMlbEventMarketUrl: eventMarketUrl
+    }
+  };
+}
+async function enrichMlbGamesWithNovigMarketUrls(games, options) {
+  if (!Array.isArray(games) || games.length === 0) return games;
+  const needsEnrich = games.some(
+    (game) => isMlbGameRow10(game) && !game.metadata?.novigMlbEventMarketUrl?.trim()
+  );
+  if (!needsEnrich) return games;
+  let novigIndex = options?.novigIndex;
+  if (!novigIndex) {
+    try {
+      const gamesNeedingMatch = games.filter(
+        (game) => isMlbGameRow10(game) && !game.metadata?.novigMlbEventMarketUrl?.trim()
+      );
+      novigIndex = await fetchNovigMlbGameEventsIndex({
+        fetchImpl: options?.fetchImpl,
+        graphqlUrl: options?.graphqlUrl,
+        stopWhenIndexSatisfies: (entries) => gamesNeedingMatch.length > 0 && gamesNeedingMatch.every((game) => matchNovigMlbEventForGame(game, entries) !== null)
+      });
+    } catch {
+      return games;
+    }
+  }
+  if (novigIndex.entries.length === 0) return games;
+  return Promise.all(games.map((game) => enrichMlbGameRow5(game, novigIndex)));
+}
+
+// ../grarf/desktop/src/lib/novig/enrichOperationalSnapshotNovigMlbMarketUrls.ts
+async function enrichOperationalSnapshotNovigMlbMarketUrls(transport) {
+  const rows = transport.leagues?.MLB;
+  if (!Array.isArray(rows) || rows.length === 0) return transport;
+  const enriched = await enrichMlbGamesWithNovigMarketUrls(rows);
   if (!enriched.some((row, index) => row !== rows[index])) {
     return transport;
   }
@@ -33864,11 +34720,11 @@ function resolveScheduledDateKey2(game) {
     day: "2-digit"
   }).format(new Date(game.startTimeMs));
 }
-function isMlbGameRow4(game) {
+function isMlbGameRow11(game) {
   return game.league === "MLB" || /^espn-MLB-/i.test(game.id ?? "");
 }
 function isRaysRedSoxJul172026WorkspaceOverrideGame(game) {
-  if (!isMlbGameRow4(game)) return false;
+  if (!isMlbGameRow11(game)) return false;
   if (normalizeTeamName(game.awayTeam) !== "rays") return false;
   if (normalizeTeamName(game.homeTeam) !== "red sox") return false;
   return resolveScheduledDateKey2(game) === OVERRIDE_SCHEDULED_DATE_KEY;
@@ -38751,6 +39607,21 @@ async function enrichOperationalTransport(rawTransport) {
   } catch (e2) {
     console.warn(`${LOG22} Covers MLB picks URL enrich failed`, e2);
   }
+  try {
+    transport = await enrichOperationalSnapshotKalshiMlbMarketUrls(transport);
+  } catch (e2) {
+    console.warn(`${LOG22} Kalshi MLB market URL enrich failed`, e2);
+  }
+  try {
+    transport = await enrichOperationalSnapshotPolymarketMlbMarketUrls(transport);
+  } catch (e2) {
+    console.warn(`${LOG22} Polymarket MLB market URL enrich failed`, e2);
+  }
+  try {
+    transport = await enrichOperationalSnapshotNovigMlbMarketUrls(transport);
+  } catch (e2) {
+    console.warn(`${LOG22} Novig MLB event-market URL enrich failed`, e2);
+  }
   if (rawTransport.source === "grarf_operational_service") {
     return transport;
   }
@@ -39137,6 +40008,21 @@ async function hydrateOperationalSnapshotFromTransport(rawTransport, hydrate, co
     transportForHydrate = await enrichOperationalSnapshotCoversMlbPicksUrls(transportForHydrate);
   } catch (e2) {
     console.warn(`${LOG23} Covers MLB picks URL enrich failed`, e2);
+  }
+  try {
+    transportForHydrate = await enrichOperationalSnapshotKalshiMlbMarketUrls(transportForHydrate);
+  } catch (e2) {
+    console.warn(`${LOG23} Kalshi MLB market URL enrich failed`, e2);
+  }
+  try {
+    transportForHydrate = await enrichOperationalSnapshotPolymarketMlbMarketUrls(transportForHydrate);
+  } catch (e2) {
+    console.warn(`${LOG23} Polymarket MLB market URL enrich failed`, e2);
+  }
+  try {
+    transportForHydrate = await enrichOperationalSnapshotNovigMlbMarketUrls(transportForHydrate);
+  } catch (e2) {
+    console.warn(`${LOG23} Novig MLB event-market URL enrich failed`, e2);
   }
   if (!context2.startupSeed && !isCentralizedSnapshot && isElectronIpcAuthoritativeOperationalIngest(completeness.source)) {
     try {
@@ -135528,7 +136414,7 @@ function resolveSportsBrowserPrototypeGameTeamContextSectionWebsites(game, conte
 // ../grarf/desktop/src/lib/gamesSpine/resolveGameBrowserContext.ts
 init_define_import_meta_env();
 var TEAM_HUB_LEAGUES = ["NFL", "NHL", "NBA", "WNBA"];
-function isMlbGameRow5(game) {
+function isMlbGameRow12(game) {
   return game.league === "MLB" || game.id.startsWith("espn-MLB-");
 }
 function resolveMlbGameForGameCenter(game) {
@@ -135576,7 +136462,7 @@ function inferGameCenterLabel(game, url) {
   return "Game Center";
 }
 function resolveGameCenterWebsites(game) {
-  if (isMlbGameRow5(game)) {
+  if (isMlbGameRow12(game)) {
     const tab = buildMlbGameWorkspaceTab(resolveMlbGameForGameCenter(game));
     const providers = tab.gamePayload?.gamecenterProviders ?? [];
     return dedupeGameBrowserWebsitesByUrl(
@@ -135593,7 +136479,7 @@ function resolveTeamWebsitesForSide(game, side) {
   const teamName = (side === "away" ? game.awayTeam : game.homeTeam).trim();
   const teamAbbrev2 = (side === "away" ? game.awayTeamAbbrev : game.homeTeamAbbrev)?.trim();
   if (!teamName && !teamAbbrev2) return [];
-  if (isMlbGameRow5(game)) {
+  if (isMlbGameRow12(game)) {
     const sources2 = teamAbbrev2 ? resolveMlbTeamNewsSourcesForTeamAbbrev(teamAbbrev2) : resolveMlbTeamNewsSourcesForTeam(teamName);
     return dedupeGameBrowserWebsitesByUrl(
       mapHomeSourcesToWebsites(mapMlbTeamNewsSourcesToHomeSourceConfig([...sources2]))
@@ -135646,7 +136532,7 @@ init_define_import_meta_env();
 // ../grarf/shared/domain/cbs/resolveCbsMlbPreviewUrlFromGame.ts
 init_define_import_meta_env();
 var CBS_MLB_PREVIEW_PATH_PREFIX = "/mlb/gametracker/preview/";
-function isMlbGameRow6(game) {
+function isMlbGameRow13(game) {
   return game.league === "MLB" || game.id.startsWith("espn-MLB-");
 }
 function isValidCbsMlbPreviewUrl(url) {
@@ -135658,7 +136544,7 @@ function isValidCbsMlbPreviewUrl(url) {
   }
 }
 function resolveCbsMlbPreviewUrlFromGame(game) {
-  if (!isMlbGameRow6(game)) return null;
+  if (!isMlbGameRow13(game)) return null;
   const fromMetadata = game.metadata?.cbsSportsPreviewUrl?.trim();
   if (!fromMetadata) return null;
   return isValidCbsMlbPreviewUrl(fromMetadata) ? fromMetadata : null;
@@ -135764,17 +136650,69 @@ init_define_import_meta_env();
 // ../grarf/shared/domain/covers/resolveCoversMlbPicksUrlFromGame.ts
 init_define_import_meta_env();
 var COVERS_MLB_PICKS_PATH_RE = /^https:\/\/www\.covers\.com\/sport\/baseball\/mlb\/matchup\/(\d+)\/picks\/?$/;
-function isMlbGameRow7(game) {
+function isMlbGameRow14(game) {
   return game.league === "MLB" || game.id.startsWith("espn-MLB-");
 }
 function isValidCoversMlbPicksUrl(url) {
   return COVERS_MLB_PICKS_PATH_RE.test(url.trim());
 }
 function resolveCoversMlbPicksUrlFromGame(game) {
-  if (!isMlbGameRow7(game)) return null;
+  if (!isMlbGameRow14(game)) return null;
   const fromMetadata = game.metadata?.coversMlbPicksUrl?.trim();
   if (!fromMetadata) return null;
   return isValidCoversMlbPicksUrl(fromMetadata) ? fromMetadata : null;
+}
+
+// ../grarf/desktop/src/lib/gamesSpine/mlbGameWorkspacePredictionsBrowser.ts
+init_define_import_meta_env();
+
+// ../grarf/shared/domain/kalshi/resolveKalshiMlbMarketUrlFromGame.ts
+init_define_import_meta_env();
+function isMlbGameRow15(game) {
+  return game.league === "MLB" || game.id.startsWith("espn-MLB-");
+}
+function resolveKalshiMlbMarketUrlFromGame(game) {
+  if (!isMlbGameRow15(game)) return null;
+  const fromMetadata = game.metadata?.kalshiMlbMarketUrl?.trim();
+  if (!fromMetadata) return null;
+  return isValidKalshiMlbGameMarketUrl(fromMetadata) ? fromMetadata : null;
+}
+
+// ../grarf/shared/domain/novig/resolveNovigMlbEventMarketUrlFromGame.ts
+init_define_import_meta_env();
+function isMlbGameRow16(game) {
+  return game.league === "MLB" || game.id.startsWith("espn-MLB-");
+}
+function resolveNovigMlbEventMarketUrlFromGame(game) {
+  if (!isMlbGameRow16(game)) return null;
+  const fromMetadata = game.metadata?.novigMlbEventMarketUrl?.trim();
+  if (!fromMetadata) return null;
+  return isValidNovigMlbEventMarketUrl(fromMetadata) ? fromMetadata : null;
+}
+
+// ../grarf/shared/domain/polymarket/resolvePolymarketMlbMarketUrlFromGame.ts
+init_define_import_meta_env();
+function isMlbGameRow17(game) {
+  return game.league === "MLB" || game.id.startsWith("espn-MLB-");
+}
+function resolvePolymarketMlbMarketUrlFromGame(game) {
+  if (!isMlbGameRow17(game)) return null;
+  const fromMetadata = game.metadata?.polymarketMlbMarketUrl?.trim();
+  if (!fromMetadata) return null;
+  return isValidPolymarketMlbGameMarketUrl(fromMetadata) ? normalizePolymarketMlbGameMarketUrl(fromMetadata) : null;
+}
+
+// ../grarf/desktop/src/lib/gamesSpine/mlbGameWorkspacePredictionsBrowser.ts
+var MLB_GAME_WORKSPACE_PREDICTIONS_UI_SOURCE_INDEX = 1;
+var MLB_GAME_WORKSPACE_PREDICTIONS_RESOLVERS = [
+  resolveKalshiMlbMarketUrlFromGame,
+  resolvePolymarketMlbMarketUrlFromGame,
+  resolveNovigMlbEventMarketUrlFromGame
+];
+function resolveMlbGameWorkspacePredictionsMarketUrl(game, sourceIndex) {
+  const resolve = MLB_GAME_WORKSPACE_PREDICTIONS_RESOLVERS[sourceIndex];
+  if (!resolve) return null;
+  return resolve(game);
 }
 
 // ../grarf/desktop/src/lib/gamesSpine/mlbUpcomingGameWorkspaceBrowser.ts
@@ -135835,7 +136773,7 @@ function isMlbUpcomingGameWorkspace(game, nowMs2 = Date.now()) {
   return game.league === "MLB" && !isOperationalGameNow(game, nowMs2) && !isOperationalGameCompleted(game, nowMs2);
 }
 function isMlbUpcomingChildContextSection(section) {
-  return section === "preview" || section === "gameCenter" || section === "story" || section === "social" || section === "picks";
+  return section === "preview" || section === "gameCenter" || section === "story" || section === "social" || section === "picks" || section === "predictions";
 }
 function resolveMlbUpcomingGameWorkspaceParentTab(pane) {
   const stored = pane.gameContextMlbUpcomingParentTab;
@@ -135877,6 +136815,8 @@ function resolveMlbUpcomingGameWorkspaceChildSectionUrl(game, context2, section,
     }
     case "picks":
       return resolveCoversMlbPicksUrlFromGame(game);
+    case "predictions":
+      return resolveMlbGameWorkspacePredictionsMarketUrl(game, sourceIndex);
   }
 }
 function resolveMlbUpcomingGameWorkspaceChildSourceWebsites(game, context2, section) {
@@ -135889,6 +136829,7 @@ function resolveMlbUpcomingGameWorkspaceChildSourceWebsites(game, context2, sect
       return context2.social;
     case "story":
     case "picks":
+    case "predictions":
       return [];
   }
 }
@@ -135989,7 +136930,7 @@ function applyMlbUpcomingGameWorkspaceChildSectionToPane(pane, game, context2, s
   }
   const currentSection = resolveMlbUpcomingGameWorkspaceChildSection(pane);
   if (currentSection === section) return pane;
-  const sourceIndex = section === "preview" ? pane.gameContextPreviewSourceIndex ?? 0 : section === "gameCenter" ? 0 : pane.activeTabIndex ?? 0;
+  const sourceIndex = section === "preview" ? pane.gameContextPreviewSourceIndex ?? 0 : section === "gameCenter" ? 0 : section === "predictions" ? MLB_GAME_WORKSPACE_PREDICTIONS_UI_SOURCE_INDEX : pane.activeTabIndex ?? 0;
   const url = resolveMlbUpcomingGameWorkspaceChildSectionUrl(
     game,
     context2,
@@ -136013,6 +136954,17 @@ function applyMlbUpcomingGameWorkspaceWebsiteTabToPane(pane, game, context2, tab
   }
   const section = resolveMlbUpcomingGameWorkspaceChildSection(pane);
   const websites = resolveMlbUpcomingGameWorkspaceChildSourceWebsites(game, context2, section);
+  if (section === "predictions") {
+    const safeIndex2 = MLB_GAME_WORKSPACE_PREDICTIONS_UI_SOURCE_INDEX;
+    const url2 = resolveMlbGameWorkspacePredictionsMarketUrl(game, safeIndex2);
+    if (pane.activeTabIndex === safeIndex2 && pane.url === url2) return pane;
+    return {
+      ...pane,
+      activeTabIndex: safeIndex2,
+      url: url2,
+      documentTitle: null
+    };
+  }
   if (websites.length === 0) return pane;
   const safeIndex = Math.min(Math.max(0, tabIndex), websites.length - 1);
   const url = websites[safeIndex]?.url?.trim() ?? null;
@@ -136063,8 +137015,13 @@ function resolveMlbLiveGameWorkspaceParentMenuTeamSide(parent) {
   if (parent === "homeTeam") return "home";
   return void 0;
 }
+function resolveMlbLiveGameWorkspaceDefaultGameCenterIndex(context2) {
+  const websites = resolveMlbUpcomingGameWorkspaceGameCenterWebsites(context2);
+  const mlbIndex = websites.findIndex((website4) => website4.label === "MLB.com");
+  return mlbIndex >= 0 ? mlbIndex : 0;
+}
 function isMlbLiveChildContextSection(section) {
-  return section === "watch" || section === "gameCenter" || section === "social" || section === "story";
+  return section === "watch" || section === "gameCenter" || section === "social" || section === "story" || section === "predictions";
 }
 function resolveMlbLiveGameWorkspaceParentTab(pane) {
   const stored = pane.gameContextMlbUpcomingParentTab;
@@ -136104,6 +137061,8 @@ function resolveMlbLiveGameWorkspaceChildSectionUrl(game, context2, section, sou
       return resolveMlbLiveGameWorkspaceStoryUrl(game, options);
     case "social":
       return resolveMlbLiveGameWorkspaceSocialUrl(game);
+    case "predictions":
+      return resolveMlbGameWorkspacePredictionsMarketUrl(game, sourceIndex);
   }
 }
 function resolveMlbLiveGameWorkspacePaneDisplayUrl(game, context2, pane, options) {
@@ -136130,10 +137089,11 @@ function resolveMlbLiveGameWorkspacePaneDisplayUrl(game, context2, pane, options
 }
 function buildMlbLiveGameWorkspacePaneFromGame(game, context2) {
   const section = "gameCenter";
-  const url = resolveMlbLiveGameWorkspaceChildSectionUrl(game, context2, section, 0);
+  const gameCenterIndex = resolveMlbLiveGameWorkspaceDefaultGameCenterIndex(context2);
+  const url = resolveMlbLiveGameWorkspaceChildSectionUrl(game, context2, section, gameCenterIndex);
   return {
     url,
-    activeTabIndex: 0,
+    activeTabIndex: gameCenterIndex,
     leagueKey: null,
     gameId: game.id,
     gameContextMlbUpcomingParentTab: "game",
@@ -136229,7 +137189,7 @@ function applyMlbLiveGameWorkspaceChildSectionToPane(pane, game, context2, secti
   }
   const currentSection = resolveMlbLiveGameWorkspaceChildSection(pane);
   if (currentSection === section) return pane;
-  const sourceIndex = section === "gameCenter" ? pane.activeTabIndex ?? 0 : 0;
+  const sourceIndex = section === "gameCenter" ? currentSection === "gameCenter" ? pane.activeTabIndex ?? 0 : resolveMlbLiveGameWorkspaceDefaultGameCenterIndex(context2) : section === "predictions" ? MLB_GAME_WORKSPACE_PREDICTIONS_UI_SOURCE_INDEX : 0;
   const url = resolveMlbLiveGameWorkspaceChildSectionUrl(
     game,
     context2,
@@ -136252,6 +137212,17 @@ function applyMlbLiveGameWorkspaceWebsiteTabToPane(pane, game, context2, tabInde
     return pane;
   }
   const section = resolveMlbLiveGameWorkspaceChildSection(pane);
+  if (section === "predictions") {
+    const safeIndex2 = MLB_GAME_WORKSPACE_PREDICTIONS_UI_SOURCE_INDEX;
+    const url2 = resolveMlbGameWorkspacePredictionsMarketUrl(game, safeIndex2);
+    if (pane.activeTabIndex === safeIndex2 && pane.url === url2) return pane;
+    return {
+      ...pane,
+      activeTabIndex: safeIndex2,
+      url: url2,
+      documentTitle: null
+    };
+  }
   if (section !== "gameCenter" && section !== "social") {
     return pane;
   }
@@ -136266,6 +137237,54 @@ function applyMlbLiveGameWorkspaceWebsiteTabToPane(pane, game, context2, tabInde
     url,
     documentTitle: null
   };
+}
+
+// ../grarf/desktop/src/lib/gamesSpine/mlbFinalGameWorkspaceBrowser.ts
+init_define_import_meta_env();
+function isMlbFinalGameWorkspace(game, nowMs2 = Date.now()) {
+  return game.league === "MLB" && isOperationalGameCompleted(game, nowMs2);
+}
+var MLB_FINAL_GAME_WORKSPACE_GAME_CHILD_SECTIONS = [
+  "gameCenter",
+  "social",
+  "story"
+];
+var MLB_FINAL_GAME_WORKSPACE_GAME_CHILD_LABELS = [
+  "GAME CENTER",
+  "SOCIAL",
+  "STORY"
+];
+var MLB_FINAL_GAME_WORKSPACE_PARENT_TABS = MLB_LIVE_GAME_WORKSPACE_PARENT_TABS;
+function resolveMlbFinalGameWorkspaceParentTab(pane) {
+  return resolveMlbLiveGameWorkspaceParentTab(pane);
+}
+function resolveMlbFinalGameWorkspaceChildSection(pane) {
+  const section = pane.gameContextSection;
+  if (section === "gameCenter" || section === "social" || section === "story" || section === "predictions") {
+    return section;
+  }
+  return "gameCenter";
+}
+function resolveMlbFinalGameWorkspacePaneDisplayUrl(game, context2, pane, options) {
+  return resolveMlbLiveGameWorkspacePaneDisplayUrl(game, context2, pane, options);
+}
+function buildMlbFinalGameWorkspacePaneFromGame(game, context2) {
+  return buildMlbLiveGameWorkspacePaneFromGame(game, context2);
+}
+function applyMlbFinalGameWorkspaceParentTabToPane(pane, game, context2, parent, options) {
+  return applyMlbLiveGameWorkspaceParentTabToPane(pane, game, context2, parent, options);
+}
+function applyMlbFinalGameWorkspaceChildSectionToPane(pane, game, context2, section, options) {
+  return applyMlbLiveGameWorkspaceChildSectionToPane(
+    pane,
+    game,
+    context2,
+    section,
+    options
+  );
+}
+function applyMlbFinalGameWorkspaceWebsiteTabToPane(pane, game, context2, tabIndex) {
+  return applyMlbLiveGameWorkspaceWebsiteTabToPane(pane, game, context2, tabIndex);
 }
 
 // ../grarf/desktop/src/lib/gamesSpine/sportsBrowserPrototypeGameContextPane.ts
@@ -136313,6 +137332,7 @@ function getSportsBrowserPrototypeGameContextSectionWebsites(game, context2, sec
     case "story":
     case "social":
     case "picks":
+    case "predictions":
       return [];
   }
 }
@@ -136349,6 +137369,7 @@ function getSportsBrowserPrototypeGameContextSectionTabs(game, context2, nowMs2 
       case "story":
       case "social":
       case "picks":
+      case "predictions":
       case "watch":
         return { label: section.toUpperCase(), url: "" };
     }
@@ -136367,6 +137388,9 @@ function applySportsBrowserPrototypeGameToPane(game) {
   }
   if (isMlbLiveGameWorkspace(game)) {
     return buildMlbLiveGameWorkspacePaneFromGame(game, context2);
+  }
+  if (isMlbFinalGameWorkspace(game)) {
+    return buildMlbFinalGameWorkspacePaneFromGame(game, context2);
   }
   const defaultSection = resolveSportsBrowserPrototypeGameContextDefaultSection(game);
   const gameCenterUrl = getSportsBrowserPrototypeGameContextSectionWebsites(game, context2, "gameCenter")[0]?.url?.trim() || null;
@@ -141715,6 +142739,14 @@ function useSportsBrowserPrototypeGameContextPaneDisplayUrl(game, gameContext, p
         storyOptions
       ) ?? paneState.url;
     }
+    if (isMlbFinalGameWorkspace(game) && gameContext) {
+      return resolveMlbFinalGameWorkspacePaneDisplayUrl(
+        game,
+        gameContext,
+        paneState,
+        storyOptions
+      ) ?? paneState.url;
+    }
     if (game.league === "MLB" && paneState.gameContextSection === "story") {
       return resolveMlbWorkspaceStoryPanel(game, storyOptions)?.storyUrl ?? paneState.url ?? null;
     }
@@ -142399,6 +143431,41 @@ var SECTION_INACTIVE_CLASS = "border-[#c8c4bc]/70 bg-[#f8f6f1] text-[#6f6a62] ho
 var CHILD_BUTTON_BASE = "flex h-9 shrink-0 items-center whitespace-nowrap px-1 transition-colors";
 var CHILD_ACTIVE_CLASS = "text-[10px] font-medium text-[#1a1a1a] underline decoration-[#1a1a1a]/70 decoration-1 underline-offset-[3px]";
 var CHILD_INACTIVE_CLASS = "text-[10px] font-normal text-[#8a857d] hover:text-[#1a1a1a]";
+function MlbGameWorkspacePredictionsTab({
+  game,
+  paneChildSection,
+  onPredictionsSelect
+}) {
+  const predictionsActive = paneChildSection === "predictions";
+  const polymarketUrl = (0, import_react261.useMemo)(
+    () => resolveMlbGameWorkspacePredictionsMarketUrl(
+      game,
+      MLB_GAME_WORKSPACE_PREDICTIONS_UI_SOURCE_INDEX
+    )?.trim(),
+    [game]
+  );
+  const polymarketAvailable = Boolean(polymarketUrl);
+  return /* @__PURE__ */ (0, import_jsx_runtime227.jsx)(
+    "button",
+    {
+      type: "button",
+      role: "tab",
+      "aria-selected": predictionsActive,
+      "aria-disabled": !polymarketAvailable,
+      disabled: !polymarketAvailable,
+      onClick: () => {
+        if (!polymarketAvailable) return;
+        onPredictionsSelect();
+      },
+      className: cn2(
+        CHILD_BUTTON_BASE,
+        predictionsActive ? CHILD_ACTIVE_CLASS : CHILD_INACTIVE_CLASS,
+        !polymarketAvailable && "cursor-not-allowed text-[#b0aca4] hover:text-[#b0aca4]"
+      ),
+      children: "PREDICTIONS"
+    }
+  );
+}
 var MLB_UPCOMING_PARENT_TABS = [
   "game",
   "awayTeam",
@@ -142639,21 +143706,33 @@ function MlbUpcomingGameWorkspaceBrowserNav({
                   section
                 );
               }
-              return /* @__PURE__ */ (0, import_jsx_runtime227.jsx)(
-                "button",
-                {
-                  type: "button",
-                  role: "tab",
-                  "aria-selected": childActive,
-                  onClick: () => onChildSectionSelect(section),
-                  className: cn2(
-                    CHILD_BUTTON_BASE,
-                    childActive ? CHILD_ACTIVE_CLASS : CHILD_INACTIVE_CLASS
-                  ),
-                  children: label
-                },
-                section
-              );
+              return /* @__PURE__ */ (0, import_jsx_runtime227.jsxs)(import_react261.Fragment, { children: [
+                /* @__PURE__ */ (0, import_jsx_runtime227.jsx)(
+                  "button",
+                  {
+                    type: "button",
+                    role: "tab",
+                    "aria-selected": childActive,
+                    onClick: () => onChildSectionSelect(section),
+                    className: cn2(
+                      CHILD_BUTTON_BASE,
+                      childActive ? CHILD_ACTIVE_CLASS : CHILD_INACTIVE_CLASS
+                    ),
+                    children: label
+                  }
+                ),
+                section === "story" ? /* @__PURE__ */ (0, import_jsx_runtime227.jsx)(
+                  MlbGameWorkspacePredictionsTab,
+                  {
+                    game,
+                    paneChildSection: childSection,
+                    onPredictionsSelect: () => {
+                      onChildSectionSelect("predictions");
+                      onWebsiteTabSelect(MLB_GAME_WORKSPACE_PREDICTIONS_UI_SOURCE_INDEX);
+                    }
+                  }
+                ) : null
+              ] }, section);
             }) }) : SPORTS_BROWSER_PROTOTYPE_LEAGUE_CONTEXT_SECTIONS.map((section, sectionIndex) => {
               const sectionActive = (activeTeamSectionIndex >= 0 ? activeTeamSectionIndex : 0) === sectionIndex;
               return /* @__PURE__ */ (0, import_jsx_runtime227.jsx)(
@@ -142680,32 +143759,88 @@ function MlbUpcomingGameWorkspaceBrowserNav({
 }
 function MlbLiveGameWorkspaceBrowserNav({
   game,
+  context: context2,
   paneState,
   awayTeamLabel,
   homeTeamLabel,
   onParentTabSelect,
   onChildSectionSelect,
-  className
+  onWebsiteTabSelect,
+  className,
+  workspaceVariant = "live"
 }) {
-  const parentTab = resolveMlbLiveGameWorkspaceParentTab(paneState);
-  const childSection = resolveMlbLiveGameWorkspaceChildSection(paneState);
+  const isFinalWorkspace = workspaceVariant === "final";
+  const parentTab = isFinalWorkspace ? resolveMlbFinalGameWorkspaceParentTab(paneState) : resolveMlbLiveGameWorkspaceParentTab(paneState);
+  const childSection = isFinalWorkspace ? resolveMlbFinalGameWorkspaceChildSection(paneState) : resolveMlbLiveGameWorkspaceChildSection(paneState);
+  const parentTabs = isFinalWorkspace ? MLB_FINAL_GAME_WORKSPACE_PARENT_TABS : MLB_LIVE_GAME_WORKSPACE_PARENT_TABS;
+  const gameChildSections = isFinalWorkspace ? MLB_FINAL_GAME_WORKSPACE_GAME_CHILD_SECTIONS : MLB_LIVE_GAME_WORKSPACE_GAME_CHILD_SECTIONS;
+  const gameChildLabels = isFinalWorkspace ? MLB_FINAL_GAME_WORKSPACE_GAME_CHILD_LABELS : MLB_LIVE_GAME_WORKSPACE_GAME_CHILD_LABELS;
+  const childTabsDataAttribute = isFinalWorkspace ? "data-mlb-final-game-workspace-child-tabs" : "data-mlb-live-game-workspace-child-tabs";
+  const parentTabMeasureAttribute = isFinalWorkspace ? "data-mlb-final-game-workspace-parent-tab-measure" : "data-mlb-live-game-workspace-parent-tab-measure";
+  const gameCenterDropdownAttribute = isFinalWorkspace ? "data-mlb-final-game-workspace-game-center-dropdown" : "data-mlb-live-game-workspace-game-center-dropdown";
+  const gameCenterChevronAttribute = isFinalWorkspace ? "data-mlb-final-game-workspace-game-center-chevron" : "data-mlb-live-game-workspace-game-center-chevron";
   const [teamChildIndex, setTeamChildIndex] = (0, import_react261.useState)(0);
   const parentLabels = (0, import_react261.useMemo)(
     () => ["GAME", awayTeamLabel, homeTeamLabel],
     [awayTeamLabel, homeTeamLabel]
   );
   const measureRef = (0, import_react261.useRef)(null);
+  const gameCenterControlRef = (0, import_react261.useRef)(null);
   const [parentTabWidthPx, setParentTabWidthPx] = (0, import_react261.useState)(null);
+  const [gameCenterMenuOpen, setGameCenterMenuOpen] = (0, import_react261.useState)(false);
+  const [gameCenterMenuPosition, setGameCenterMenuPosition] = (0, import_react261.useState)(null);
   const parentMeasureKey = (0, import_react261.useMemo)(() => parentLabels.join("\0"), [parentLabels]);
+  const gameCenterWebsites = (0, import_react261.useMemo)(
+    () => resolveMlbUpcomingGameWorkspaceGameCenterWebsites(context2),
+    [context2]
+  );
+  const gameCenterMenuWebsites = (0, import_react261.useMemo)(() => {
+    const mlb2 = gameCenterWebsites.find((website4) => website4.label === "MLB.com");
+    const espn = gameCenterWebsites.find((website4) => website4.label === "ESPN");
+    const ordered = [];
+    if (mlb2) ordered.push(mlb2);
+    if (espn) ordered.push(espn);
+    return ordered.length > 0 ? ordered : gameCenterWebsites;
+  }, [gameCenterWebsites]);
+  const activeWebsiteIndex = paneState.activeTabIndex ?? 0;
+  const defaultLiveGameCenterIndex = (0, import_react261.useMemo)(() => {
+    const mlbIndex = gameCenterWebsites.findIndex((website4) => website4.label === "MLB.com");
+    return mlbIndex >= 0 ? mlbIndex : 0;
+  }, [gameCenterWebsites]);
   (0, import_react261.useLayoutEffect)(() => {
     const measureRoot = measureRef.current;
     if (!measureRoot) return;
     let maxWidth = 0;
-    measureRoot.querySelectorAll("[data-mlb-live-game-workspace-parent-tab-measure]").forEach((node) => {
+    measureRoot.querySelectorAll(`[${parentTabMeasureAttribute}]`).forEach((node) => {
       maxWidth = Math.max(maxWidth, node.offsetWidth);
     });
     setParentTabWidthPx(maxWidth > 0 ? maxWidth : null);
   }, [parentMeasureKey]);
+  (0, import_react261.useLayoutEffect)(() => {
+    if (childSection !== "gameCenter") {
+      setGameCenterMenuOpen(false);
+    }
+  }, [childSection]);
+  (0, import_react261.useLayoutEffect)(() => {
+    if (!gameCenterMenuOpen) {
+      setGameCenterMenuPosition(null);
+      return;
+    }
+    const control = gameCenterControlRef.current;
+    if (!control) return;
+    const rect = control.getBoundingClientRect();
+    setGameCenterMenuPosition({ top: rect.bottom, left: rect.left });
+  }, [gameCenterMenuOpen, childSection, activeWebsiteIndex]);
+  (0, import_react261.useEffect)(() => {
+    if (!gameCenterMenuOpen) return;
+    const onPointerDown = (event) => {
+      const control = gameCenterControlRef.current;
+      if (!control || control.contains(event.target)) return;
+      setGameCenterMenuOpen(false);
+    };
+    document.addEventListener("pointerdown", onPointerDown);
+    return () => document.removeEventListener("pointerdown", onPointerDown);
+  }, [gameCenterMenuOpen]);
   const parentTabStyle = parentTabWidthPx ? { width: parentTabWidthPx, minWidth: parentTabWidthPx, maxWidth: parentTabWidthPx } : void 0;
   return /* @__PURE__ */ (0, import_jsx_runtime227.jsxs)(
     "div",
@@ -142714,10 +143849,10 @@ function MlbLiveGameWorkspaceBrowserNav({
         "relative flex shrink-0 flex-col border-b border-[#c8c4bc]/70 bg-[#e8e4dc] px-1",
         className
       ),
-      "data-mlb-live-game-workspace-browser-nav": true,
       "data-sports-browser-prototype-game-context-inline-tabs": true,
       role: "tablist",
-      "aria-label": "MLB live game workspace",
+      "aria-label": isFinalWorkspace ? "MLB final game workspace" : "MLB live game workspace",
+      ...isFinalWorkspace ? { "data-mlb-final-game-workspace-browser-nav": true } : { "data-mlb-live-game-workspace-browser-nav": true },
       children: [
         /* @__PURE__ */ (0, import_jsx_runtime227.jsx)(
           "div",
@@ -142726,11 +143861,11 @@ function MlbLiveGameWorkspaceBrowserNav({
             "aria-hidden": true,
             className: "pointer-events-none invisible absolute left-0 top-0 h-0 overflow-hidden",
             children: parentLabels.map((label, index) => {
-              const parent = MLB_LIVE_GAME_WORKSPACE_PARENT_TABS[index] ?? "game";
+              const parent = parentTabs[index] ?? "game";
               return /* @__PURE__ */ (0, import_jsx_runtime227.jsx)(
                 "span",
                 {
-                  "data-mlb-live-game-workspace-parent-tab-measure": true,
+                  ...{ [parentTabMeasureAttribute]: true },
                   className: cn2("inline-block", SECTION_BUTTON_BASE),
                   children: /* @__PURE__ */ (0, import_jsx_runtime227.jsx)(
                     GameContextParentMenuTabLabel,
@@ -142746,7 +143881,7 @@ function MlbLiveGameWorkspaceBrowserNav({
             })
           }
         ),
-        /* @__PURE__ */ (0, import_jsx_runtime227.jsx)("div", { className: "flex h-9 shrink-0 items-center overflow-x-auto overflow-y-hidden", children: /* @__PURE__ */ (0, import_jsx_runtime227.jsx)("span", { className: "inline-flex shrink-0 items-center", children: MLB_LIVE_GAME_WORKSPACE_PARENT_TABS.map((parent, sectionIndex) => {
+        /* @__PURE__ */ (0, import_jsx_runtime227.jsx)("div", { className: "flex h-9 shrink-0 items-center overflow-x-auto overflow-y-hidden", children: /* @__PURE__ */ (0, import_jsx_runtime227.jsx)("span", { className: "inline-flex shrink-0 items-center", children: parentTabs.map((parent, sectionIndex) => {
           const sectionActive = parentTab === parent;
           const label = parentLabels[sectionIndex] ?? parent;
           return /* @__PURE__ */ (0, import_jsx_runtime227.jsx)(
@@ -142783,25 +143918,129 @@ function MlbLiveGameWorkspaceBrowserNav({
               SPORTS_BROWSER_PROTOTYPE_CONTEXT_NAV_CHILD_GAP_CLASS
             ),
             "data-sports-browser-prototype-game-context-inline-child-tabs": true,
-            "data-mlb-live-game-workspace-child-tabs": true,
-            children: parentTab === "game" ? MLB_LIVE_GAME_WORKSPACE_GAME_CHILD_SECTIONS.map((section, index) => {
-              const label = MLB_LIVE_GAME_WORKSPACE_GAME_CHILD_LABELS[index] ?? section;
+            ...{ [childTabsDataAttribute]: true },
+            children: parentTab === "game" ? gameChildSections.map((section, index) => {
+              const label = gameChildLabels[index] ?? section;
               const childActive = childSection === section;
-              return /* @__PURE__ */ (0, import_jsx_runtime227.jsx)(
-                "button",
-                {
-                  type: "button",
-                  role: "tab",
-                  "aria-selected": childActive,
-                  onClick: () => onChildSectionSelect(section),
-                  className: cn2(
-                    CHILD_BUTTON_BASE,
-                    childActive ? CHILD_ACTIVE_CLASS : CHILD_INACTIVE_CLASS
-                  ),
-                  children: label
-                },
-                section
-              );
+              if (section === "gameCenter") {
+                return /* @__PURE__ */ (0, import_jsx_runtime227.jsxs)(
+                  "div",
+                  {
+                    ref: gameCenterControlRef,
+                    className: "relative inline-flex shrink-0 items-center",
+                    ...{ [gameCenterDropdownAttribute]: true },
+                    children: [
+                      /* @__PURE__ */ (0, import_jsx_runtime227.jsxs)(
+                        "button",
+                        {
+                          type: "button",
+                          role: "tab",
+                          "aria-selected": childActive,
+                          "aria-expanded": gameCenterMenuOpen,
+                          "aria-haspopup": "menu",
+                          onClick: (event) => {
+                            const chevronClicked = event.target.closest(
+                              `[${gameCenterChevronAttribute}]`
+                            );
+                            if (!childActive) {
+                              onChildSectionSelect(section);
+                              onWebsiteTabSelect(defaultLiveGameCenterIndex);
+                              if (chevronClicked) {
+                                setGameCenterMenuOpen(true);
+                              }
+                              return;
+                            }
+                            if (chevronClicked) {
+                              setGameCenterMenuOpen((open) => !open);
+                              return;
+                            }
+                            setGameCenterMenuOpen(false);
+                          },
+                          className: cn2(
+                            CHILD_BUTTON_BASE,
+                            "gap-0.5",
+                            childActive ? CHILD_ACTIVE_CLASS : CHILD_INACTIVE_CLASS
+                          ),
+                          children: [
+                            /* @__PURE__ */ (0, import_jsx_runtime227.jsx)("span", { children: label }),
+                            /* @__PURE__ */ (0, import_jsx_runtime227.jsx)(
+                              "span",
+                              {
+                                ...{ [gameCenterChevronAttribute]: true },
+                                className: "inline-flex shrink-0",
+                                "aria-hidden": true,
+                                children: /* @__PURE__ */ (0, import_jsx_runtime227.jsx)(ChevronDown, { size: 12, strokeWidth: 2, className: "opacity-80" })
+                              }
+                            )
+                          ]
+                        }
+                      ),
+                      gameCenterMenuOpen && gameCenterMenuPosition && gameCenterMenuWebsites.length > 0 ? /* @__PURE__ */ (0, import_jsx_runtime227.jsx)(
+                        "div",
+                        {
+                          role: "menu",
+                          className: "fixed z-[200] min-w-[7.5rem] border border-[#c8c4bc]/70 bg-[#f8f6f1] py-0.5 shadow-sm",
+                          style: {
+                            top: gameCenterMenuPosition.top,
+                            left: gameCenterMenuPosition.left
+                          },
+                          children: gameCenterMenuWebsites.map((website4) => {
+                            const websiteIndex = gameCenterWebsites.indexOf(website4);
+                            const websiteActive = websiteIndex === activeWebsiteIndex;
+                            return /* @__PURE__ */ (0, import_jsx_runtime227.jsx)(
+                              "button",
+                              {
+                                type: "button",
+                                role: "menuitemradio",
+                                "aria-checked": websiteActive,
+                                onClick: () => {
+                                  onChildSectionSelect("gameCenter");
+                                  onWebsiteTabSelect(websiteIndex);
+                                  setGameCenterMenuOpen(false);
+                                },
+                                className: cn2(
+                                  "flex w-full px-2 py-1 text-left text-[10px] transition-colors",
+                                  websiteActive ? "font-medium text-[#1a1a1a] bg-[#ece9e2]" : "font-normal text-[#6f6a62] hover:bg-[#ece9e2] hover:text-[#1a1a1a]"
+                                ),
+                                children: website4.label
+                              },
+                              website4.url
+                            );
+                          })
+                        }
+                      ) : null
+                    ]
+                  },
+                  section
+                );
+              }
+              return /* @__PURE__ */ (0, import_jsx_runtime227.jsxs)(import_react261.Fragment, { children: [
+                /* @__PURE__ */ (0, import_jsx_runtime227.jsx)(
+                  "button",
+                  {
+                    type: "button",
+                    role: "tab",
+                    "aria-selected": childActive,
+                    onClick: () => onChildSectionSelect(section),
+                    className: cn2(
+                      CHILD_BUTTON_BASE,
+                      childActive ? CHILD_ACTIVE_CLASS : CHILD_INACTIVE_CLASS
+                    ),
+                    children: label
+                  }
+                ),
+                section === "story" ? /* @__PURE__ */ (0, import_jsx_runtime227.jsx)(
+                  MlbGameWorkspacePredictionsTab,
+                  {
+                    game,
+                    paneChildSection: childSection,
+                    onPredictionsSelect: () => {
+                      onChildSectionSelect("predictions");
+                      onWebsiteTabSelect(MLB_GAME_WORKSPACE_PREDICTIONS_UI_SOURCE_INDEX);
+                    }
+                  }
+                ) : null
+              ] }, section);
             }) : MLB_LIVE_GAME_WORKSPACE_TEAM_CHILD_LABELS.map((label, index) => {
               const childActive = teamChildIndex === index;
               return /* @__PURE__ */ (0, import_jsx_runtime227.jsx)(
@@ -142861,11 +144100,30 @@ function SportsBrowserPrototypeGameContextInlineTabs({
       MlbLiveGameWorkspaceBrowserNav,
       {
         game,
+        context: context2,
         paneState,
         awayTeamLabel: context2.awayTeam.label,
         homeTeamLabel: context2.homeTeam.label,
         onParentTabSelect: (parent) => onMlbLiveParentTabSelect?.(parent),
         onChildSectionSelect: (section) => onMlbLiveChildSectionSelect?.(section),
+        onWebsiteTabSelect,
+        className
+      }
+    );
+  }
+  if (isMlbFinalGameWorkspace(game)) {
+    return /* @__PURE__ */ (0, import_jsx_runtime227.jsx)(
+      MlbLiveGameWorkspaceBrowserNav,
+      {
+        workspaceVariant: "final",
+        game,
+        context: context2,
+        paneState,
+        awayTeamLabel: context2.awayTeam.label,
+        homeTeamLabel: context2.homeTeam.label,
+        onParentTabSelect: (parent) => onMlbLiveParentTabSelect?.(parent),
+        onChildSectionSelect: (section) => onMlbLiveChildSectionSelect?.(section),
+        onWebsiteTabSelect,
         className
       }
     );
@@ -150242,7 +151500,7 @@ init_define_import_meta_env();
 
 // ../grarf/desktop/src/lib/commandCenter/resolveCommandCenterMlbLiveBottomRightUrl.ts
 init_define_import_meta_env();
-function isMlbGameRow8(game) {
+function isMlbGameRow18(game) {
   return game.league === "MLB" || game.id.startsWith("espn-MLB-");
 }
 function isMlbOperationalNowLive(liveLeagues) {
@@ -150254,7 +151512,7 @@ function resolveCommandCenterMlbGameLiveStreamOrWorkspaceUrl(game) {
   if (watchTarget?.streamUrl?.trim()) {
     return watchTarget.streamUrl.trim();
   }
-  if (isMlbGameRow8(game)) {
+  if (isMlbGameRow18(game)) {
     const mlbTab = buildMlbGameWorkspaceTab(game, { startInWatchMode: true });
     const streamUrl = mlbTab.gamePayload?.stream.url?.trim();
     if (streamUrl) return streamUrl;
@@ -150266,13 +151524,13 @@ function resolveCommandCenterMlbGameLiveStreamOrWorkspaceUrl(game) {
 function resolveCommandCenterMlbLiveBottomRightGame(input) {
   if (!isMlbOperationalNowLive(input.liveLeagues)) return null;
   const mlbLeagueRows = input.enrichedLeagues.MLB ?? input.liveLeagues.MLB ?? [];
-  const mlbManualGames = (input.enrichedManualGames ?? []).filter(isMlbGameRow8);
+  const mlbManualGames = (input.enrichedManualGames ?? []).filter(isMlbGameRow18);
   const result = resolveBestGameRightNowV1(
     mlbLeagueRows.length > 0 || mlbManualGames.length > 0 ? { MLB: mlbLeagueRows } : {},
     mlbManualGames,
     { adminFeaturedPriorities: input.adminFeaturedPriorities }
   );
-  if (!result || result.kind !== "best_live" || !isMlbGameRow8(result.game)) {
+  if (!result || result.kind !== "best_live" || !isMlbGameRow18(result.game)) {
     return null;
   }
   const mlbRows = input.liveLeagues.MLB ?? input.enrichedLeagues.MLB ?? [];
@@ -151494,9 +152752,9 @@ function HomePage() {
         const pane = tab.paneStates[paneIndex] ?? createDefaultSportsBrowserPrototypePaneState();
         if (!isSportsBrowserPrototypeGameContextPane(pane)) return tab;
         const game = findGamesSpineGameById(pane.gameId, "sports_browser_mlb_live_parent");
-        if (!game || !isMlbLiveGameWorkspace(game)) return tab;
+        if (!game || !isMlbLiveGameWorkspace(game) && !isMlbFinalGameWorkspace(game)) return tab;
         const context2 = resolveGameBrowserContext(game);
-        const nextPane = applyMlbLiveGameWorkspaceParentTabToPane(pane, game, context2, parent);
+        const nextPane = isMlbFinalGameWorkspace(game) ? applyMlbFinalGameWorkspaceParentTabToPane(pane, game, context2, parent) : applyMlbLiveGameWorkspaceParentTabToPane(pane, game, context2, parent);
         if (nextPane === pane) return tab;
         useHomeSourceFocusStore.getState().clearSelectedArticle(NEWS_BROWSER_FOCUS_SESSION_KEY);
         const next = tab.paneStates.slice();
@@ -151512,9 +152770,9 @@ function HomePage() {
         const pane = tab.paneStates[paneIndex] ?? createDefaultSportsBrowserPrototypePaneState();
         if (!isSportsBrowserPrototypeGameContextPane(pane)) return tab;
         const game = findGamesSpineGameById(pane.gameId, "sports_browser_mlb_live_child");
-        if (!game || !isMlbLiveGameWorkspace(game)) return tab;
+        if (!game || !isMlbLiveGameWorkspace(game) && !isMlbFinalGameWorkspace(game)) return tab;
         const context2 = resolveGameBrowserContext(game);
-        const nextPane = applyMlbLiveGameWorkspaceChildSectionToPane(pane, game, context2, section);
+        const nextPane = isMlbFinalGameWorkspace(game) ? applyMlbFinalGameWorkspaceChildSectionToPane(pane, game, context2, section) : applyMlbLiveGameWorkspaceChildSectionToPane(pane, game, context2, section);
         if (nextPane === pane) return tab;
         useHomeSourceFocusStore.getState().clearSelectedArticle(NEWS_BROWSER_FOCUS_SESSION_KEY);
         const next = tab.paneStates.slice();
@@ -151572,7 +152830,7 @@ function HomePage() {
           const game = findGamesSpineGameById(pane.gameId, "sports_browser_game_context_tab");
           if (!game) return tab;
           const context2 = resolveGameBrowserContext(game);
-          const nextPane = isMlbUpcomingGameWorkspace(game) ? applyMlbUpcomingGameWorkspaceWebsiteTabToPane(pane, game, context2, tabIndex) : isMlbLiveGameWorkspace(game) ? applyMlbLiveGameWorkspaceWebsiteTabToPane(pane, game, context2, tabIndex) : applySportsBrowserPrototypeGameContextWebsiteTabToPane(
+          const nextPane = isMlbUpcomingGameWorkspace(game) ? applyMlbUpcomingGameWorkspaceWebsiteTabToPane(pane, game, context2, tabIndex) : isMlbFinalGameWorkspace(game) ? applyMlbFinalGameWorkspaceWebsiteTabToPane(pane, game, context2, tabIndex) : isMlbLiveGameWorkspace(game) ? applyMlbLiveGameWorkspaceWebsiteTabToPane(pane, game, context2, tabIndex) : applySportsBrowserPrototypeGameContextWebsiteTabToPane(
             pane,
             game,
             context2,
