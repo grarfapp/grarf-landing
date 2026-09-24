@@ -34485,8 +34485,8 @@ var IMPORTANT_LEAGUES = [
   { label: "NASCAR Craftsman Truck Series", key: "NASCAR_TRUCK" },
   { label: "WEC", key: "WEC" },
   { label: "Formula E", key: "FORMULA_E" },
-  { label: "PGA", key: "PGA" },
-  { label: "LPGA", key: "LPGA" },
+  { label: "PGA Tour", key: "PGA" },
+  { label: "LPGA Tour", key: "LPGA" },
   { label: "ATP", key: "ATP" },
   { label: "WTA", key: "WTA" },
   { label: "UFC", key: "UFC" },
@@ -55469,6 +55469,7 @@ var GRARF_LEAGUE_KEY_NAV_ITEM_ID = {
   NCAAVB_M: "volleyball-ncaam",
   F1: "f1",
   FORMULA_E: "formula-e",
+  MOTOGP: "motogp",
   NASCAR: "nascar-cup-series",
   INDYCAR: "indycar",
   PGA: "pga-tour",
@@ -55764,10 +55765,10 @@ function buildLeagueDirectoryNavSections(logos) {
       [
         [
           "pga-tour",
-          "PGA",
+          "PGA Tour",
           { route: "/pga-tour", grarfLeagueKey: "PGA", collapsedLabel: "PGA" }
         ],
-        ["lpga", "LPGA", { route: "/lpga", grarfLeagueKey: "LPGA", collapsedLabel: "LPGA" }]
+        ["lpga", "LPGA Tour", { route: "/lpga", grarfLeagueKey: "LPGA", collapsedLabel: "LPGA" }]
       ],
       [
         ["dp-world-tour", "DP World"]
@@ -64120,8 +64121,8 @@ var HIGHLIGHTS_TV_CHANNEL_ORDER = [
   { channelNumber: 15, leagueKey: "SERIEA", label: "SERIEA", sportGroup: "SOCCER" },
   { channelNumber: 16, leagueKey: "LIGUE1", label: "LIGUE1", sportGroup: "SOCCER" },
   { channelNumber: 17, leagueKey: "UEL", label: "UEL", sportGroup: "SOCCER" },
-  { channelNumber: 18, leagueKey: "LPGA", label: "LPGA", sportGroup: "GOLF" },
-  { channelNumber: 19, leagueKey: "PGA", label: "PGA", sportGroup: "GOLF" },
+  { channelNumber: 18, leagueKey: "LPGA", label: "LPGA Tour", sportGroup: "GOLF" },
+  { channelNumber: 19, leagueKey: "PGA", label: "PGA Tour", sportGroup: "GOLF" },
   { channelNumber: 20, leagueKey: "ATP", label: "ATP", sportGroup: "TENNIS" },
   { channelNumber: 21, leagueKey: "WTA", label: "WTA", sportGroup: "TENNIS" },
   { channelNumber: 22, leagueKey: "INDYCAR", label: "INDYCAR", sportGroup: "AUTO" },
@@ -68488,7 +68489,7 @@ var LIVE_TRACKER_FEED_REGISTRY = [
     league: "LPGA",
     feedUrl: "https://rss.app/feeds/k44KVdVjc2ESKRIz.xml",
     feedId: "live-tracker-lpga",
-    label: "LPGA"
+    label: "LPGA Tour"
   },
   {
     league: "PGA",
@@ -106001,7 +106002,7 @@ var HOME_LEAGUE_WORKSPACE_SOCIAL_RAIL_FEEDS = [
     workspaceId: "lpga",
     feedId: "league-workspace-lpga",
     feedUrl: "https://rss.app/feeds/TQWM2VIsYizjluyn.xml",
-    sourceLabel: "LPGA",
+    sourceLabel: "LPGA Tour",
     teamKey: "lpga"
   },
   {
@@ -132964,11 +132965,11 @@ var SPORTS_BROWSER_PROTOTYPE_LEAGUE_PODCAST_WEBSITES = {
     url: "https://open.spotify.com/search/Tour%20de%20France%20podcasts/podcastAndEpisodes"
   },
   "PGA": {
-    label: "PGA",
+    label: "PGA Tour",
     url: "https://open.spotify.com/search/PGA%20podcasts/podcastAndEpisodes"
   },
   "LPGA": {
-    label: "LPGA",
+    label: "LPGA Tour",
     url: "https://open.spotify.com/search/LPGA%20podcasts/podcastAndEpisodes"
   },
   "DP_WORLD": {
@@ -133505,11 +133506,11 @@ var SPORTS_BROWSER_PROTOTYPE_LEAGUE_YOUTUBE_WEBSITES = {
     url: "https://www.youtube.com/@LeTourDeFrance/videos"
   },
   "PGA": {
-    label: "PGA",
+    label: "PGA Tour",
     url: "https://www.youtube.com/@PGATOUR/videos"
   },
   "LPGA": {
-    label: "LPGA",
+    label: "LPGA Tour",
     url: "https://www.youtube.com/@LPGA/videos"
   },
   "DP_WORLD": {
@@ -144788,9 +144789,67 @@ function SportsBrowserPrototypeNewsTimelinePaneShell({
 init_define_import_meta_env();
 var import_react261 = __toESM(require_react(), 1);
 
+// ../grarf/desktop/src/components/homeMvp/sportsBrowserPrototypeManilaFolderTabChrome.ts
+init_define_import_meta_env();
+var SPORTS_BROWSER_PROTOTYPE_MANILA_FOLDER_TAB_CLIP = "[clip-path:polygon(0_0,calc(100%-7px)_0,100%_100%,0_100%)]";
+var SPORTS_BROWSER_PROTOTYPE_MANILA_FOLDER_TAB_ACTIVE_CLASS = "z-20 -mb-px border-[#c8c4bc] border-b-0 bg-[#f3f0ea] pb-2 pt-1.5 text-[#1a1a1a] shadow-[0_1px_0_0_#f3f0ea]";
+var SPORTS_BROWSER_PROTOTYPE_MANILA_FOLDER_TAB_INACTIVE_CLASS = "z-10 border-[#c8c4bc]/75 bg-[#ece9e2] pb-1 pt-1 text-[#6f6a62] hover:bg-[#ece9e2] hover:text-[#1a1a1a]";
+var SPORTS_BROWSER_PROTOTYPE_MANILA_FOLDER_PARENT_TAB_BASE = "relative shrink-0 whitespace-nowrap border px-2.5 pr-3.5 text-[12px] font-semibold uppercase leading-none tracking-[0.04em] transition-colors";
+var SPORTS_BROWSER_PROTOTYPE_MANILA_FOLDER_TAB_TRACK_CLASS = "flex items-end overflow-x-auto overflow-y-hidden px-1 pt-1";
+function resolveSportsBrowserPrototypeManilaFolderTabZIndex(active2, index) {
+  return active2 ? 20 : Math.max(1, 9 - index);
+}
+function resolveSportsBrowserPrototypeManilaFolderTabStateClass(active2) {
+  return active2 ? SPORTS_BROWSER_PROTOTYPE_MANILA_FOLDER_TAB_ACTIVE_CLASS : SPORTS_BROWSER_PROTOTYPE_MANILA_FOLDER_TAB_INACTIVE_CLASS;
+}
+function resolveSportsBrowserPrototypeManilaFolderTabZIndexStyle(active2, index) {
+  return { zIndex: resolveSportsBrowserPrototypeManilaFolderTabZIndex(active2, index) };
+}
+function sportsBrowserPrototypeManilaFolderParentTabClassName(active2, index, extra) {
+  return cn2(
+    SPORTS_BROWSER_PROTOTYPE_MANILA_FOLDER_TAB_CLIP,
+    SPORTS_BROWSER_PROTOTYPE_MANILA_FOLDER_PARENT_TAB_BASE,
+    "inline-flex items-center justify-center",
+    index > 0 && "-ml-[6px]",
+    resolveSportsBrowserPrototypeManilaFolderTabStateClass(active2),
+    extra
+  );
+}
+function sportsBrowserPrototypeManilaFolderParentTabMeasureClassName(extra) {
+  return cn2(
+    SPORTS_BROWSER_PROTOTYPE_MANILA_FOLDER_TAB_CLIP,
+    SPORTS_BROWSER_PROTOTYPE_MANILA_FOLDER_PARENT_TAB_BASE,
+    "inline-block",
+    extra
+  );
+}
+
 // ../grarf/desktop/src/components/homeMvp/sportsBrowserPrototypeContextNavChildSpacing.ts
 init_define_import_meta_env();
 var SPORTS_BROWSER_PROTOTYPE_CONTEXT_NAV_CHILD_GAP_CLASS = "gap-x-[21px]";
+
+// ../grarf/desktop/src/components/homeMvp/sportsBrowserPrototypeBrowserInlineChildTabChrome.ts
+init_define_import_meta_env();
+var SPORTS_BROWSER_PROTOTYPE_BROWSER_INLINE_CHILD_TAB_TRACK_CLASS = "relative z-[1] flex h-9 shrink-0 items-center overflow-x-auto pl-3 pr-2";
+var SPORTS_BROWSER_PROTOTYPE_BROWSER_INLINE_CHILD_BUTTON_BASE = "flex h-9 shrink-0 items-center whitespace-nowrap px-1 transition-colors";
+var SPORTS_BROWSER_PROTOTYPE_BROWSER_INLINE_LEAGUE_CHILD_TAB_ACTIVE_CLASS = "text-[10px] font-semibold text-[#1a1a1a] underline decoration-[#1a1a1a]/70 decoration-1 underline-offset-[3px]";
+var SPORTS_BROWSER_PROTOTYPE_BROWSER_INLINE_LEAGUE_CHILD_TAB_INACTIVE_CLASS = "text-[10px] font-normal text-[#1a1a1a]";
+var SPORTS_BROWSER_PROTOTYPE_BROWSER_INLINE_GAME_CHILD_TAB_ACTIVE_CLASS = "text-[10px] font-medium text-[#1a1a1a] underline decoration-[#1a1a1a]/70 decoration-1 underline-offset-[3px]";
+var SPORTS_BROWSER_PROTOTYPE_BROWSER_INLINE_GAME_CHILD_TAB_INACTIVE_CLASS = "text-[10px] font-normal text-[#8a857d] hover:text-[#1a1a1a]";
+function sportsBrowserPrototypeBrowserInlineLeagueChildTabClassName(active2, extra) {
+  return cn2(
+    SPORTS_BROWSER_PROTOTYPE_BROWSER_INLINE_CHILD_BUTTON_BASE,
+    active2 ? SPORTS_BROWSER_PROTOTYPE_BROWSER_INLINE_LEAGUE_CHILD_TAB_ACTIVE_CLASS : SPORTS_BROWSER_PROTOTYPE_BROWSER_INLINE_LEAGUE_CHILD_TAB_INACTIVE_CLASS,
+    extra
+  );
+}
+function sportsBrowserPrototypeBrowserInlineGameChildTabClassName(active2, extra) {
+  return cn2(
+    SPORTS_BROWSER_PROTOTYPE_BROWSER_INLINE_CHILD_BUTTON_BASE,
+    active2 ? SPORTS_BROWSER_PROTOTYPE_BROWSER_INLINE_GAME_CHILD_TAB_ACTIVE_CLASS : SPORTS_BROWSER_PROTOTYPE_BROWSER_INLINE_GAME_CHILD_TAB_INACTIVE_CLASS,
+    extra
+  );
+}
 
 // ../grarf/desktop/src/components/homeMvp/SportsBrowserPrototypeGameContextInlineTabs.tsx
 var import_jsx_runtime227 = __toESM(require_jsx_runtime(), 1);
@@ -144840,12 +144899,6 @@ function resolveMlbUpcomingParentMenuTeamSide(parent) {
 function isGameTeamContextSection(section) {
   return section === "awayTeam" || section === "homeTeam";
 }
-var SECTION_BUTTON_BASE = "relative flex h-9 shrink-0 items-center whitespace-nowrap border px-3.5 text-[12px] font-semibold tracking-[0.01em] transition-colors";
-var SECTION_ACTIVE_CLASS = "z-[1] border-[#1a1a1a] bg-[#1a1a1a] text-[#f8f6f1]";
-var SECTION_INACTIVE_CLASS = "border-[#c8c4bc]/70 bg-[#f8f6f1] text-[#6f6a62] hover:bg-[#ece9e2] hover:text-[#1a1a1a]";
-var CHILD_BUTTON_BASE = "flex h-9 shrink-0 items-center whitespace-nowrap px-1 transition-colors";
-var CHILD_ACTIVE_CLASS = "text-[10px] font-medium text-[#1a1a1a] underline decoration-[#1a1a1a]/70 decoration-1 underline-offset-[3px]";
-var CHILD_INACTIVE_CLASS = "text-[10px] font-normal text-[#8a857d] hover:text-[#1a1a1a]";
 function MlbGameWorkspacePredictionsTab({
   game,
   paneChildSection,
@@ -144873,8 +144926,7 @@ function MlbGameWorkspacePredictionsTab({
         onPredictionsSelect();
       },
       className: cn2(
-        CHILD_BUTTON_BASE,
-        predictionsActive ? CHILD_ACTIVE_CLASS : CHILD_INACTIVE_CLASS,
+        sportsBrowserPrototypeBrowserInlineGameChildTabClassName(predictionsActive),
         !polymarketAvailable && "cursor-not-allowed text-[#b0aca4] hover:text-[#b0aca4]"
       ),
       children: "PREDICTIONS"
@@ -144975,7 +145027,7 @@ function MlbUpcomingGameWorkspaceBrowserNav({
                 "span",
                 {
                   "data-mlb-upcoming-game-workspace-parent-tab-measure": true,
-                  className: cn2("inline-block", SECTION_BUTTON_BASE),
+                  className: sportsBrowserPrototypeManilaFolderParentTabMeasureClassName(),
                   children: /* @__PURE__ */ (0, import_jsx_runtime227.jsx)(
                     GameContextParentMenuTabLabel,
                     {
@@ -144990,7 +145042,7 @@ function MlbUpcomingGameWorkspaceBrowserNav({
             })
           }
         ),
-        /* @__PURE__ */ (0, import_jsx_runtime227.jsx)("div", { className: "flex h-9 shrink-0 items-center overflow-x-auto overflow-y-hidden", children: /* @__PURE__ */ (0, import_jsx_runtime227.jsx)("span", { className: "inline-flex shrink-0 items-center", children: MLB_UPCOMING_PARENT_TABS.map((parent, sectionIndex) => {
+        /* @__PURE__ */ (0, import_jsx_runtime227.jsx)("div", { className: SPORTS_BROWSER_PROTOTYPE_MANILA_FOLDER_TAB_TRACK_CLASS, children: /* @__PURE__ */ (0, import_jsx_runtime227.jsx)("span", { className: "inline-flex shrink-0 items-end", children: MLB_UPCOMING_PARENT_TABS.map((parent, sectionIndex) => {
           const sectionActive = parentTab === parent;
           const label = parentLabels[sectionIndex] ?? parent;
           return /* @__PURE__ */ (0, import_jsx_runtime227.jsx)(
@@ -145000,12 +145052,16 @@ function MlbUpcomingGameWorkspaceBrowserNav({
               role: "tab",
               "aria-selected": sectionActive,
               onClick: () => onParentTabSelect(parent),
-              style: parentTabStyle,
-              className: cn2(
-                SECTION_BUTTON_BASE,
-                "justify-center",
-                sectionIndex > 0 && "-ml-px",
-                sectionActive ? SECTION_ACTIVE_CLASS : SECTION_INACTIVE_CLASS
+              style: {
+                ...resolveSportsBrowserPrototypeManilaFolderTabZIndexStyle(
+                  sectionActive,
+                  sectionIndex
+                ),
+                ...parentTabStyle
+              },
+              className: sportsBrowserPrototypeManilaFolderParentTabClassName(
+                sectionActive,
+                sectionIndex
               ),
               children: /* @__PURE__ */ (0, import_jsx_runtime227.jsx)(
                 GameContextParentMenuTabLabel,
@@ -145023,12 +145079,12 @@ function MlbUpcomingGameWorkspaceBrowserNav({
           "div",
           {
             className: cn2(
-              "relative z-[1] flex h-9 shrink-0 items-center overflow-x-auto pl-3 pr-2",
+              SPORTS_BROWSER_PROTOTYPE_BROWSER_INLINE_CHILD_TAB_TRACK_CLASS,
               SPORTS_BROWSER_PROTOTYPE_CONTEXT_NAV_CHILD_GAP_CLASS
             ),
             "data-sports-browser-prototype-game-context-inline-child-tabs": true,
             "data-mlb-upcoming-game-workspace-child-tabs": true,
-            children: parentTab === "game" ? /* @__PURE__ */ (0, import_jsx_runtime227.jsx)(import_jsx_runtime227.Fragment, { children: MLB_UPCOMING_GAME_WORKSPACE_CHILD_SECTIONS.map((section) => {
+            children: parentTab === "game" ? /* @__PURE__ */ (0, import_jsx_runtime227.jsx)(import_jsx_runtime227.Fragment, { children: MLB_UPCOMING_GAME_WORKSPACE_CHILD_SECTIONS.map((section, childTabIndex) => {
               const label = MLB_UPCOMING_GAME_WORKSPACE_CHILD_SECTION_LABELS[section];
               const childActive = childSection === section;
               if (section === "gameCenter") {
@@ -145064,10 +145120,9 @@ function MlbUpcomingGameWorkspaceBrowserNav({
                             }
                             setGameCenterMenuOpen(false);
                           },
-                          className: cn2(
-                            CHILD_BUTTON_BASE,
-                            "gap-0.5",
-                            childActive ? CHILD_ACTIVE_CLASS : CHILD_INACTIVE_CLASS
+                          className: sportsBrowserPrototypeBrowserInlineGameChildTabClassName(
+                            childActive,
+                            "gap-0.5"
                           ),
                           children: [
                             /* @__PURE__ */ (0, import_jsx_runtime227.jsx)("span", { children: label }),
@@ -145129,10 +145184,7 @@ function MlbUpcomingGameWorkspaceBrowserNav({
                     role: "tab",
                     "aria-selected": childActive,
                     onClick: () => onChildSectionSelect(section),
-                    className: cn2(
-                      CHILD_BUTTON_BASE,
-                      childActive ? CHILD_ACTIVE_CLASS : CHILD_INACTIVE_CLASS
-                    ),
+                    className: sportsBrowserPrototypeBrowserInlineGameChildTabClassName(childActive),
                     children: label
                   }
                 ),
@@ -145157,10 +145209,7 @@ function MlbUpcomingGameWorkspaceBrowserNav({
                   role: "tab",
                   "aria-selected": sectionActive,
                   onClick: () => onTeamContextSectionSelect(sectionIndex),
-                  className: cn2(
-                    CHILD_BUTTON_BASE,
-                    sectionActive ? CHILD_ACTIVE_CLASS : CHILD_INACTIVE_CLASS
-                  ),
+                  className: sportsBrowserPrototypeBrowserInlineGameChildTabClassName(sectionActive),
                   children: SPORTS_BROWSER_PROTOTYPE_LEAGUE_CONTEXT_SECTION_LABELS[section]
                 },
                 `team-${section}`
@@ -145281,7 +145330,7 @@ function MlbLiveGameWorkspaceBrowserNav({
                 "span",
                 {
                   ...{ [parentTabMeasureAttribute]: true },
-                  className: cn2("inline-block", SECTION_BUTTON_BASE),
+                  className: sportsBrowserPrototypeManilaFolderParentTabMeasureClassName(),
                   children: /* @__PURE__ */ (0, import_jsx_runtime227.jsx)(
                     GameContextParentMenuTabLabel,
                     {
@@ -145296,7 +145345,7 @@ function MlbLiveGameWorkspaceBrowserNav({
             })
           }
         ),
-        /* @__PURE__ */ (0, import_jsx_runtime227.jsx)("div", { className: "flex h-9 shrink-0 items-center overflow-x-auto overflow-y-hidden", children: /* @__PURE__ */ (0, import_jsx_runtime227.jsx)("span", { className: "inline-flex shrink-0 items-center", children: parentTabs.map((parent, sectionIndex) => {
+        /* @__PURE__ */ (0, import_jsx_runtime227.jsx)("div", { className: SPORTS_BROWSER_PROTOTYPE_MANILA_FOLDER_TAB_TRACK_CLASS, children: /* @__PURE__ */ (0, import_jsx_runtime227.jsx)("span", { className: "inline-flex shrink-0 items-end", children: parentTabs.map((parent, sectionIndex) => {
           const sectionActive = parentTab === parent;
           const label = parentLabels[sectionIndex] ?? parent;
           return /* @__PURE__ */ (0, import_jsx_runtime227.jsx)(
@@ -145306,12 +145355,16 @@ function MlbLiveGameWorkspaceBrowserNav({
               role: "tab",
               "aria-selected": sectionActive,
               onClick: () => onParentTabSelect(parent),
-              style: parentTabStyle,
-              className: cn2(
-                SECTION_BUTTON_BASE,
-                "justify-center",
-                sectionIndex > 0 && "-ml-px",
-                sectionActive ? SECTION_ACTIVE_CLASS : SECTION_INACTIVE_CLASS
+              style: {
+                ...resolveSportsBrowserPrototypeManilaFolderTabZIndexStyle(
+                  sectionActive,
+                  sectionIndex
+                ),
+                ...parentTabStyle
+              },
+              className: sportsBrowserPrototypeManilaFolderParentTabClassName(
+                sectionActive,
+                sectionIndex
               ),
               children: /* @__PURE__ */ (0, import_jsx_runtime227.jsx)(
                 GameContextParentMenuTabLabel,
@@ -145329,13 +145382,13 @@ function MlbLiveGameWorkspaceBrowserNav({
           "div",
           {
             className: cn2(
-              "relative z-[1] flex h-9 shrink-0 items-center overflow-x-auto pl-3 pr-2",
+              SPORTS_BROWSER_PROTOTYPE_BROWSER_INLINE_CHILD_TAB_TRACK_CLASS,
               SPORTS_BROWSER_PROTOTYPE_CONTEXT_NAV_CHILD_GAP_CLASS
             ),
             "data-sports-browser-prototype-game-context-inline-child-tabs": true,
             ...{ [childTabsDataAttribute]: true },
-            children: parentTab === "game" ? gameChildSections.map((section, index) => {
-              const label = gameChildLabels[index] ?? section;
+            children: parentTab === "game" ? gameChildSections.map((section, childTabIndex) => {
+              const label = gameChildLabels[childTabIndex] ?? section;
               const childActive = childSection === section;
               if (section === "gameCenter") {
                 return /* @__PURE__ */ (0, import_jsx_runtime227.jsxs)(
@@ -145371,10 +145424,9 @@ function MlbLiveGameWorkspaceBrowserNav({
                             }
                             setGameCenterMenuOpen(false);
                           },
-                          className: cn2(
-                            CHILD_BUTTON_BASE,
-                            "gap-0.5",
-                            childActive ? CHILD_ACTIVE_CLASS : CHILD_INACTIVE_CLASS
+                          className: sportsBrowserPrototypeBrowserInlineGameChildTabClassName(
+                            childActive,
+                            "gap-0.5"
                           ),
                           children: [
                             /* @__PURE__ */ (0, import_jsx_runtime227.jsx)("span", { children: label }),
@@ -145437,10 +145489,7 @@ function MlbLiveGameWorkspaceBrowserNav({
                     role: "tab",
                     "aria-selected": childActive,
                     onClick: () => onChildSectionSelect(section),
-                    className: cn2(
-                      CHILD_BUTTON_BASE,
-                      childActive ? CHILD_ACTIVE_CLASS : CHILD_INACTIVE_CLASS
-                    ),
+                    className: sportsBrowserPrototypeBrowserInlineGameChildTabClassName(childActive),
                     children: label
                   }
                 ),
@@ -145465,10 +145514,7 @@ function MlbLiveGameWorkspaceBrowserNav({
                   role: "tab",
                   "aria-selected": childActive,
                   onClick: () => setTeamChildIndex(index),
-                  className: cn2(
-                    CHILD_BUTTON_BASE,
-                    childActive ? CHILD_ACTIVE_CLASS : CHILD_INACTIVE_CLASS
-                  ),
+                  className: sportsBrowserPrototypeBrowserInlineGameChildTabClassName(childActive),
                   children: label
                 },
                 label
@@ -145606,7 +145652,7 @@ function SportsBrowserPrototypeGameContextInlineTabs({
                 "span",
                 {
                   "data-sports-browser-prototype-game-context-inline-parent-tab-measure": true,
-                  className: cn2("inline-block", SECTION_BUTTON_BASE),
+                  className: sportsBrowserPrototypeManilaFolderParentTabMeasureClassName(),
                   children: /* @__PURE__ */ (0, import_jsx_runtime227.jsx)(GameContextParentMenuTabLabel, { game, label, teamSide })
                 },
                 `${label}-${index}`
@@ -145614,8 +145660,8 @@ function SportsBrowserPrototypeGameContextInlineTabs({
             })
           }
         ),
-        /* @__PURE__ */ (0, import_jsx_runtime227.jsxs)("div", { className: "flex h-9 shrink-0 items-center overflow-x-auto overflow-y-hidden", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime227.jsx)("span", { className: "inline-flex shrink-0 items-center", children: sections.map((section, sectionIndex) => {
+        /* @__PURE__ */ (0, import_jsx_runtime227.jsxs)("div", { className: SPORTS_BROWSER_PROTOTYPE_MANILA_FOLDER_TAB_TRACK_CLASS, children: [
+          /* @__PURE__ */ (0, import_jsx_runtime227.jsx)("span", { className: "inline-flex shrink-0 items-end", children: sections.map((section, sectionIndex) => {
             const sectionActive = sectionIndex === activeSectionIndex;
             const teamSide = resolveGameContextParentMenuTeamSide(
               contextSections[sectionIndex] ?? ""
@@ -145627,12 +145673,16 @@ function SportsBrowserPrototypeGameContextInlineTabs({
                 role: "tab",
                 "aria-selected": sectionActive,
                 onClick: () => onSectionSelect(sectionIndex),
-                style: parentTabStyle,
-                className: cn2(
-                  SECTION_BUTTON_BASE,
-                  "justify-center",
-                  sectionIndex > 0 && "-ml-px",
-                  sectionActive ? SECTION_ACTIVE_CLASS : SECTION_INACTIVE_CLASS
+                style: {
+                  ...resolveSportsBrowserPrototypeManilaFolderTabZIndexStyle(
+                    sectionActive,
+                    sectionIndex
+                  ),
+                  ...parentTabStyle
+                },
+                className: sportsBrowserPrototypeManilaFolderParentTabClassName(
+                  sectionActive,
+                  sectionIndex
                 ),
                 children: /* @__PURE__ */ (0, import_jsx_runtime227.jsx)(
                   GameContextParentMenuTabLabel,
@@ -145646,8 +145696,9 @@ function SportsBrowserPrototypeGameContextInlineTabs({
               section.label
             );
           }) }),
-          showTeamDestinationTabs ? /* @__PURE__ */ (0, import_jsx_runtime227.jsx)("span", { className: "inline-flex shrink-0 items-center pl-3", children: SPORTS_BROWSER_PROTOTYPE_LEAGUE_CONTEXT_SECTIONS.map((section, sectionIndex) => {
+          showTeamDestinationTabs ? /* @__PURE__ */ (0, import_jsx_runtime227.jsx)("span", { className: "inline-flex shrink-0 items-end pl-3", children: SPORTS_BROWSER_PROTOTYPE_LEAGUE_CONTEXT_SECTIONS.map((section, sectionIndex) => {
             const sectionActive = (activeTeamSectionIndex >= 0 ? activeTeamSectionIndex : 0) === sectionIndex;
+            const teamTabIndex = sections.length + sectionIndex;
             return /* @__PURE__ */ (0, import_jsx_runtime227.jsx)(
               "button",
               {
@@ -145655,12 +145706,16 @@ function SportsBrowserPrototypeGameContextInlineTabs({
                 role: "tab",
                 "aria-selected": sectionActive,
                 onClick: () => onTeamContextSectionSelect?.(sectionIndex),
-                style: parentTabStyle,
-                className: cn2(
-                  SECTION_BUTTON_BASE,
-                  "justify-center",
-                  sectionIndex > 0 && "-ml-px",
-                  sectionActive ? SECTION_ACTIVE_CLASS : SECTION_INACTIVE_CLASS
+                style: {
+                  ...resolveSportsBrowserPrototypeManilaFolderTabZIndexStyle(
+                    sectionActive,
+                    teamTabIndex
+                  ),
+                  ...parentTabStyle
+                },
+                className: sportsBrowserPrototypeManilaFolderParentTabClassName(
+                  sectionActive,
+                  teamTabIndex
                 ),
                 children: SPORTS_BROWSER_PROTOTYPE_LEAGUE_CONTEXT_SECTION_LABELS[section]
               },
@@ -145672,7 +145727,7 @@ function SportsBrowserPrototypeGameContextInlineTabs({
           "div",
           {
             className: cn2(
-              "relative z-[1] flex h-9 shrink-0 items-center overflow-x-auto pl-3 pr-2",
+              SPORTS_BROWSER_PROTOTYPE_BROWSER_INLINE_CHILD_TAB_TRACK_CLASS,
               SPORTS_BROWSER_PROTOTYPE_CONTEXT_NAV_CHILD_GAP_CLASS
             ),
             "data-sports-browser-prototype-game-context-inline-child-tabs": true,
@@ -145685,10 +145740,7 @@ function SportsBrowserPrototypeGameContextInlineTabs({
                   role: "tab",
                   "aria-selected": websiteActive,
                   onClick: () => onWebsiteTabSelect(websiteIndex),
-                  className: cn2(
-                    CHILD_BUTTON_BASE,
-                    websiteActive ? CHILD_ACTIVE_CLASS : CHILD_INACTIVE_CLASS
-                  ),
+                  className: sportsBrowserPrototypeBrowserInlineGameChildTabClassName(websiteActive),
                   children: website4.label
                 },
                 `${activeSection}-${website4.url}`
@@ -145705,12 +145757,6 @@ function SportsBrowserPrototypeGameContextInlineTabs({
 init_define_import_meta_env();
 var import_react262 = __toESM(require_react(), 1);
 var import_jsx_runtime228 = __toESM(require_jsx_runtime(), 1);
-var PARENT_BUTTON_BASE = "relative flex h-9 shrink-0 items-center whitespace-nowrap border px-3.5 text-[12px] font-semibold tracking-[0.01em] transition-colors";
-var PARENT_ACTIVE_CLASS = "z-[1] border-[#1a1a1a] bg-[#1a1a1a] text-[#f8f6f1]";
-var PARENT_INACTIVE_CLASS = "border-[#c8c4bc]/70 bg-[#f8f6f1] text-[#6f6a62] hover:bg-[#ece9e2] hover:text-[#1a1a1a]";
-var CHILD_BUTTON_BASE2 = "flex h-9 shrink-0 items-center whitespace-nowrap px-1 transition-colors";
-var CHILD_ACTIVE_CLASS2 = "text-[10px] font-semibold text-[#1a1a1a] underline decoration-[#1a1a1a]/70 decoration-1 underline-offset-[3px]";
-var CHILD_INACTIVE_CLASS2 = "text-[10px] font-normal text-[#1a1a1a]";
 function SportsBrowserPrototypeLeagueNewsInlineTabs({
   paneState,
   onSectionSelect,
@@ -145762,14 +145808,14 @@ function SportsBrowserPrototypeLeagueNewsInlineTabs({
               "span",
               {
                 "data-sports-browser-prototype-league-news-inline-parent-tab-measure": true,
-                className: cn2("inline-block", PARENT_BUTTON_BASE),
+                className: sportsBrowserPrototypeManilaFolderParentTabMeasureClassName(),
                 children: SPORTS_BROWSER_PROTOTYPE_LEAGUE_CONTEXT_SECTION_LABELS[section]
               },
               section
             ))
           }
         ),
-        /* @__PURE__ */ (0, import_jsx_runtime228.jsx)("div", { className: "flex h-9 shrink-0 items-center overflow-x-auto overflow-y-hidden pr-1", children: /* @__PURE__ */ (0, import_jsx_runtime228.jsx)("span", { className: "inline-flex shrink-0 items-center", children: SPORTS_BROWSER_PROTOTYPE_LEAGUE_CONTEXT_SECTIONS.map((section, sectionIndex) => {
+        /* @__PURE__ */ (0, import_jsx_runtime228.jsx)("div", { className: cn2(SPORTS_BROWSER_PROTOTYPE_MANILA_FOLDER_TAB_TRACK_CLASS, "pr-1"), children: /* @__PURE__ */ (0, import_jsx_runtime228.jsx)("span", { className: "inline-flex shrink-0 items-end", children: SPORTS_BROWSER_PROTOTYPE_LEAGUE_CONTEXT_SECTIONS.map((section, sectionIndex) => {
           const sectionActive = sectionIndex === activeSectionIndex;
           return /* @__PURE__ */ (0, import_jsx_runtime228.jsx)(
             "button",
@@ -145778,16 +145824,20 @@ function SportsBrowserPrototypeLeagueNewsInlineTabs({
               role: "tab",
               "aria-selected": sectionActive,
               onClick: () => onSectionSelect(sectionIndex),
-              style: parentTabWidthPx ? {
-                width: parentTabWidthPx,
-                minWidth: parentTabWidthPx,
-                maxWidth: parentTabWidthPx
-              } : void 0,
-              className: cn2(
-                PARENT_BUTTON_BASE,
-                "justify-center",
-                sectionIndex > 0 && "-ml-px",
-                sectionActive ? PARENT_ACTIVE_CLASS : PARENT_INACTIVE_CLASS
+              style: {
+                ...resolveSportsBrowserPrototypeManilaFolderTabZIndexStyle(
+                  sectionActive,
+                  sectionIndex
+                ),
+                ...parentTabWidthPx ? {
+                  width: parentTabWidthPx,
+                  minWidth: parentTabWidthPx,
+                  maxWidth: parentTabWidthPx
+                } : {}
+              },
+              className: sportsBrowserPrototypeManilaFolderParentTabClassName(
+                sectionActive,
+                sectionIndex
               ),
               children: SPORTS_BROWSER_PROTOTYPE_LEAGUE_CONTEXT_SECTION_LABELS[section]
             },
@@ -145798,7 +145848,7 @@ function SportsBrowserPrototypeLeagueNewsInlineTabs({
           "div",
           {
             className: cn2(
-              "relative z-[1] flex h-9 shrink-0 items-center overflow-x-auto pl-3 pr-2",
+              SPORTS_BROWSER_PROTOTYPE_BROWSER_INLINE_CHILD_TAB_TRACK_CLASS,
               SPORTS_BROWSER_PROTOTYPE_CONTEXT_NAV_CHILD_GAP_CLASS
             ),
             "data-sports-browser-prototype-league-news-inline-child-tabs": true,
@@ -145811,9 +145861,8 @@ function SportsBrowserPrototypeLeagueNewsInlineTabs({
                   role: "tab",
                   "aria-selected": websiteActive,
                   onClick: () => onWebsiteTabSelect(websiteIndex),
-                  className: cn2(
-                    CHILD_BUTTON_BASE2,
-                    websiteActive ? CHILD_ACTIVE_CLASS2 : CHILD_INACTIVE_CLASS2
+                  className: sportsBrowserPrototypeBrowserInlineLeagueChildTabClassName(
+                    websiteActive
                   ),
                   children: website4.label
                 },
@@ -150301,7 +150350,7 @@ var SPORTS_BROWSER_PROTOTYPE_SIDEBAR_LEAGUES_ACTIVE_POPULATION = [
   { key: "base-lls", label: "LITTLE LEAGUE SOFTBALL" },
   { key: "lovb", label: "LOVB" },
   { key: "ARG1", label: "ARGENTINE PRIMERA" },
-  { key: "LPGA", label: "LPGA" },
+  { key: "LPGA", label: "LPGA Tour" },
   { key: "milb", label: "MiLB" },
   { key: "MLB", label: "MLB" },
   { key: "RUGB_289262", label: "MAJOR LEAGUE RUGBY" },
@@ -150331,7 +150380,7 @@ var SPORTS_BROWSER_PROTOTYPE_SIDEBAR_LEAGUES_ACTIVE_POPULATION = [
   { key: "npb", label: "NPB" },
   { key: "NWSL", label: "NWSL" },
   { key: "pfl", label: "PFL" },
-  { key: "PGA", label: "PGA" },
+  { key: "PGA", label: "PGA Tour" },
   { key: "PLL", label: "PLL" },
   { key: "POR1", label: "PRIMEIRA LIGA" },
   { key: "SAUDI", label: "RSL" },
