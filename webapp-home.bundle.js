@@ -150583,16 +150583,6 @@ var MENU_SURFACE2 = "bg-[#f3f0ea] text-[#1a1a1a]";
 var SIDEBAR_NAV_SECONDARY_TEXT_CLASS = "text-[12px]";
 var RULE2 = "border-[#d5d0c6]";
 var SPORTS_BROWSER_PROTOTYPE_TEMPORAL_ALL_LOGO_URL = "/league-logos/global.png";
-var F1_CATCH_UP_MOCK_HEADLINES = [
-  {
-    label: "FP1: Leclerc leads Hamilton and Russell during first practice at the Italian Grand Prix",
-    url: "https://www.formula1.com/en/latest/article/fp1-leclerc-leads-hamilton-and-russell-during-first-practice-at-the-italian-grand-prix.7DUTqVtZlb4zvqNfBsyl1t"
-  },
-  {
-    label: "FP2: Russell beats Leclerc and Antonelli to the fastest time in Free Practice 2 ahead of Italian Grand Prix",
-    url: "https://www.formula1.com/en/latest/article/fp2-russell-beats-leclerc-and-antonelli-to-the-fastest-time-in-free-practice-2-ahead-of-italian-grand-prix.4mVLF757oe0NuWE9Caw1wO"
-  }
-];
 var SOCCER_SIDEBAR_MORE_LABEL = "MORE";
 var SOCCER_SIDEBAR_MORE_URL = "https://www.livesoccertv.com";
 function formatCompactPreviousCalendarDate(referenceDate = /* @__PURE__ */ new Date()) {
@@ -151089,10 +151079,6 @@ function shouldShowSidebarGameRowChannelLogo(game) {
   if (game.status === "live") return true;
   return game.status === "scheduled" || isGameCompetitionPaused(game);
 }
-var SIDEBAR_F1_MOCK_HEADLINE_ROW_CLASS = cn2(
-  "border-t py-[5px] pl-8 pr-4 text-[13px] leading-snug first:border-t-0 break-words whitespace-normal",
-  RULE2
-);
 function SidebarCompetitorMark({
   game,
   side,
@@ -151507,46 +151493,6 @@ function SidebarTemporalGamesBox({ children }) {
     }
   );
 }
-function SidebarF1CatchUpMockLeagueBlock({ onOpenUrl }) {
-  const [open, setOpen] = (0, import_react270.useState)(false);
-  return /* @__PURE__ */ (0, import_jsx_runtime239.jsxs)(import_jsx_runtime239.Fragment, { children: [
-    /* @__PURE__ */ (0, import_jsx_runtime239.jsxs)(
-      "button",
-      {
-        type: "button",
-        onClick: () => setOpen((expanded) => !expanded),
-        className: cn2(
-          "flex w-full min-w-0 items-start justify-between gap-2 px-4 py-[4px] text-left text-[13px] uppercase tracking-[0.04em] text-[#1a1a1a]",
-          "transition-colors hover:bg-[#e9e4db] font-normal"
-        ),
-        "aria-expanded": open,
-        "data-sports-browser-prototype-sidebar-league-row": "",
-        "data-sports-browser-prototype-sidebar-league-key": "F1",
-        children: [
-          /* @__PURE__ */ (0, import_jsx_runtime239.jsxs)("span", { className: "flex min-w-0 flex-1 items-start gap-1", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(SidebarLeagueNavLogoMark, { leagueKey: "F1" }),
-            /* @__PURE__ */ (0, import_jsx_runtime239.jsx)("span", { className: "min-w-0 flex-1 break-words whitespace-normal", children: "Formula 1" })
-          ] }),
-          open ? /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(ChevronDown, { size: 12, strokeWidth: 2, className: "shrink-0 rotate-180", "aria-hidden": true }) : /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(ChevronRight, { size: 12, strokeWidth: 2, className: "shrink-0 text-[#1a1a1a]", "aria-hidden": true })
-        ]
-      }
-    ),
-    open ? /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(SidebarTemporalGamesBox, { children: F1_CATCH_UP_MOCK_HEADLINES.map((headline) => /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(
-      "button",
-      {
-        type: "button",
-        onClick: () => onOpenUrl?.(headline.url),
-        className: cn2(
-          "block w-full min-w-0 text-left normal-case text-[#1a1a1a]",
-          SIDEBAR_F1_MOCK_HEADLINE_ROW_CLASS,
-          "transition-colors hover:bg-[#e9e4db]"
-        ),
-        children: /* @__PURE__ */ (0, import_jsx_runtime239.jsx)("span", { className: "block min-w-0 break-words whitespace-normal", children: headline.label })
-      },
-      headline.url
-    )) }) : null
-  ] });
-}
 function SidebarSoccerMoreNavRow({
   indent,
   onOpenUrl
@@ -151759,15 +151705,6 @@ function SidebarGroupedTemporalLeagueEntries({
         onOpenUrl ? /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(SidebarSoccerMoreNavRow, { indent: allOpen ? 1 : 0, onOpenUrl }) : null
       ] }, `${sectionPrefix}-soccer-arch`);
     }
-    if (entry2.slate.key === "F1" && onOpenUrl) {
-      return /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(
-        SidebarF1CatchUpMockLeagueBlock,
-        {
-          onOpenUrl
-        },
-        `${sectionPrefix}-${entry2.slate.key}`
-      );
-    }
     return /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(
       SidebarTemporalLeagueBlock,
       {
@@ -151919,7 +151856,7 @@ function SidebarYesterdaySectionLeagues({
     () => flattenSportsBrowserPrototypeSidebarLeagueEntries(groupedEntries),
     [groupedEntries]
   );
-  const expandableSlates = leafSlates.filter((slate) => slate.key !== "F1");
+  const expandableSlates = leafSlates;
   const allOpen = expandableSlates.length > 0 && expandableSlates.every((slate) => leagueOpen[slate.key] ?? false);
   const toggleAll = (0, import_react270.useCallback)(() => {
     if (allOpen) {
