@@ -55436,6 +55436,9 @@ var GRARF_LEAGUE_KEY_NAV_ITEM_ID = {
   NBA: "nba",
   NBA2K: "g-league",
   WNBA: "wnba",
+  MNCAAB: "ncaam",
+  WNCAAB: "ncaaw",
+  NCAASB: "softball-ncaa",
   NFL: "nfl",
   MLS: "mls",
   EPL: "premier-league",
@@ -55465,6 +55468,7 @@ var GRARF_LEAGUE_KEY_NAV_ITEM_ID = {
   NCAAVB: "volleyball-ncaaw",
   NCAAVB_M: "volleyball-ncaam",
   F1: "f1",
+  FORMULA_E: "formula-e",
   NASCAR: "nascar-cup-series",
   INDYCAR: "indycar",
   PGA: "pga-tour",
@@ -56592,6 +56596,7 @@ var GAMES_SPINE_LEAGUE_LOGO_URL = {
   NATIONS: "https://a.espncdn.com/i/leaguelogos/soccer/500/2395.png",
   CLUBWC: "https://a.espncdn.com/i/leaguelogos/soccer/500/1932.png",
   CLUBFRIENDLY: "/league-logos/club-friendly.png",
+  INTFRIENDLY: "/league-logos/friendly1.png",
   CONCACAF_CAC: "/league-logos/central-american-cup.png",
   CONCACAF_NG: "/league-logos/concacaf-nations-league.png",
   CAF_WNATIONS: "/league-logos/womens-afcon.png",
@@ -150296,6 +150301,18 @@ function sportsBrowserPrototypeSidebarLeagueRowMatchesSearch(label, searchQuery)
   if (!query) return true;
   return label.toLowerCase().includes(query.toLowerCase());
 }
+function resolveSportsBrowserPrototypeSidebarLeaguesSectionsWhenSearching(sortMode, mergedOperationalLeagues) {
+  switch (sortMode) {
+    case "alpha":
+      return resolveSportsBrowserPrototypeSidebarLeaguesAlphabeticalSections();
+    case "rank":
+      return resolveSportsBrowserPrototypeSidebarLeaguesImportanceSections(mergedOperationalLeagues);
+    case "group":
+      return resolveSportsBrowserPrototypeSidebarLeaguesGroupedSections();
+    case "on-today":
+      return resolveSportsBrowserPrototypeSidebarLeaguesAlphabeticalSections();
+  }
+}
 function filterSportsBrowserPrototypeSidebarLeaguesGroupedSections(sections, searchQuery) {
   const query = searchQuery.trim();
   if (!query) return [...sections];
@@ -150609,6 +150626,7 @@ function SidebarLeagueNavLogoMark({
       alt: "",
       className: cn2(
         "h-2.5 w-2.5 shrink-0 object-contain",
+        leagueKey === "RUGBYTOP14" && "rounded-[2px]",
         leagueKey ? resolveGamesSpineLeagueLogoImgClassName(leagueKey, logoUrl) : void 0
       ),
       loading: "lazy",
@@ -151761,7 +151779,8 @@ function LeaguesFilterField({
 }
 function LeaguesSortControls({
   activeMode,
-  onModeChange
+  onModeChange,
+  filterVisuallyInactive = false
 }) {
   return /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(
     "div",
@@ -151778,10 +151797,10 @@ function LeaguesSortControls({
         {
           type: "button",
           onClick: () => onModeChange(id),
-          "aria-pressed": activeMode === id,
+          "aria-pressed": !filterVisuallyInactive && activeMode === id,
           className: cn2(
             "shrink-0 whitespace-nowrap uppercase tracking-[0.04em] transition-colors",
-            resolveSidebarLeaguesSortControlClass(id, activeMode)
+            filterVisuallyInactive ? `${SIDEBAR_NAV_SECONDARY_TEXT_CLASS} font-normal text-[#8a857d] hover:text-[#1a1a1a]` : resolveSidebarLeaguesSortControlClass(id, activeMode)
           ),
           "data-sports-browser-prototype-sidebar-leagues-sort-mode": id,
           children: label
@@ -151791,17 +151810,50 @@ function LeaguesSortControls({
     }
   );
 }
+function SidebarLeaguesTabClickableTeamName({
+  label,
+  onTeamSelect
+}) {
+  if (!onTeamSelect) {
+    return /* @__PURE__ */ (0, import_jsx_runtime239.jsx)("span", { className: "min-w-0 break-words whitespace-normal", children: label });
+  }
+  return /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(
+    "span",
+    {
+      className: cn2(
+        "min-w-0 break-words whitespace-normal",
+        SIDEBAR_GAME_ROW_TEAM_NAME_CLICKABLE_CLASS
+      ),
+      "data-sports-browser-prototype-sidebar-leagues-team-name-clickable": "",
+      role: "link",
+      tabIndex: 0,
+      onClick: (event) => {
+        event.stopPropagation();
+        onTeamSelect();
+      },
+      onKeyDown: (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          event.stopPropagation();
+          onTeamSelect();
+        }
+      },
+      children: label
+    }
+  );
+}
 function SidebarLeaguesTabPlainTeamListRow({
   teamKey,
-  label
+  label,
+  onTeamSelect
 }) {
   return /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(
     "div",
     {
-      className: "py-0 pl-2 text-[13px] font-normal normal-case leading-none tracking-[0.04em] text-[#1a1a1a]",
+      className: "py-0 pl-2 text-[13px] font-normal normal-case leading-normal tracking-[0.04em] text-[#1a1a1a]",
       "data-sports-browser-prototype-sidebar-leagues-team-row": "",
       "data-sports-browser-prototype-sidebar-leagues-team-key": teamKey,
-      children: label
+      children: /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(SidebarLeaguesTabClickableTeamName, { label, onTeamSelect })
     }
   );
 }
@@ -151809,7 +151861,8 @@ function SidebarLeaguesTabProTeamListRow({
   league: league2,
   teamKey,
   teamAbbrev: teamAbbrev2,
-  label
+  label,
+  onTeamSelect
 }) {
   const [logoFailed, setLogoFailed] = (0, import_react270.useState)(false);
   const rawLogoUrl = buildLeaguesTabProTeamLogoUrl(league2, teamAbbrev2);
@@ -151817,7 +151870,7 @@ function SidebarLeaguesTabProTeamListRow({
   return /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(
     "div",
     {
-      className: "py-0 pl-2 text-[13px] font-normal normal-case leading-none tracking-[0.04em] text-[#1a1a1a]",
+      className: "py-0 pl-2 text-[13px] font-normal normal-case leading-normal tracking-[0.04em] text-[#1a1a1a]",
       "data-sports-browser-prototype-sidebar-leagues-team-row": "",
       "data-sports-browser-prototype-sidebar-leagues-team-key": teamKey,
       "data-sports-browser-prototype-sidebar-leagues-team-abbrev": teamAbbrev2,
@@ -151833,7 +151886,7 @@ function SidebarLeaguesTabProTeamListRow({
             onError: () => setLogoFailed(true)
           }
         ) : null }),
-        /* @__PURE__ */ (0, import_jsx_runtime239.jsx)("span", { className: "min-w-0 break-words whitespace-normal", children: label })
+        /* @__PURE__ */ (0, import_jsx_runtime239.jsx)("span", { className: "min-w-0 break-words whitespace-normal", children: /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(SidebarLeaguesTabClickableTeamName, { label, onTeamSelect }) })
       ] })
     }
   );
@@ -151842,7 +151895,8 @@ function SidebarLeaguesTabMlsTeamListRow({
   teamKey,
   teamAbbrev: teamAbbrev2,
   teamEspnId,
-  label
+  label,
+  onTeamSelect
 }) {
   const [logoFailed, setLogoFailed] = (0, import_react270.useState)(false);
   const rawLogoUrl = buildLeaguesTabMlsTeamLogoUrl(teamEspnId);
@@ -151850,7 +151904,7 @@ function SidebarLeaguesTabMlsTeamListRow({
   return /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(
     "div",
     {
-      className: "py-0 pl-2 text-[13px] font-normal normal-case leading-none tracking-[0.04em] text-[#1a1a1a]",
+      className: "py-0 pl-2 text-[13px] font-normal normal-case leading-normal tracking-[0.04em] text-[#1a1a1a]",
       "data-sports-browser-prototype-sidebar-leagues-team-row": "",
       "data-sports-browser-prototype-sidebar-leagues-team-key": teamKey,
       "data-sports-browser-prototype-sidebar-leagues-team-abbrev": teamAbbrev2,
@@ -151866,7 +151920,7 @@ function SidebarLeaguesTabMlsTeamListRow({
             onError: () => setLogoFailed(true)
           }
         ) : null }),
-        /* @__PURE__ */ (0, import_jsx_runtime239.jsx)("span", { className: "min-w-0 break-words whitespace-normal", children: label })
+        /* @__PURE__ */ (0, import_jsx_runtime239.jsx)("span", { className: "min-w-0 break-words whitespace-normal", children: /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(SidebarLeaguesTabClickableTeamName, { label, onTeamSelect }) })
       ] })
     }
   );
@@ -151874,7 +151928,8 @@ function SidebarLeaguesTabMlsTeamListRow({
 function SidebarLeaguesTabMlbTeamListRow({
   teamKey,
   teamAbbrev: teamAbbrev2,
-  label
+  label,
+  onTeamSelect
 }) {
   const [logoFailed, setLogoFailed] = (0, import_react270.useState)(false);
   const rawLogoUrl = buildMlbEspnScoreboardLogoUrl(teamAbbrev2);
@@ -151882,7 +151937,7 @@ function SidebarLeaguesTabMlbTeamListRow({
   return /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(
     "div",
     {
-      className: "py-0 pl-2 text-[13px] font-normal normal-case leading-none tracking-[0.04em] text-[#1a1a1a]",
+      className: "py-0 pl-2 text-[13px] font-normal normal-case leading-normal tracking-[0.04em] text-[#1a1a1a]",
       "data-sports-browser-prototype-sidebar-leagues-team-row": "",
       "data-sports-browser-prototype-sidebar-leagues-team-key": teamKey,
       "data-sports-browser-prototype-sidebar-leagues-team-abbrev": teamAbbrev2,
@@ -151898,12 +151953,18 @@ function SidebarLeaguesTabMlbTeamListRow({
             onError: () => setLogoFailed(true)
           }
         ) : null }),
-        /* @__PURE__ */ (0, import_jsx_runtime239.jsx)("span", { className: "min-w-0 break-words whitespace-normal", children: label })
+        /* @__PURE__ */ (0, import_jsx_runtime239.jsx)("span", { className: "min-w-0 break-words whitespace-normal", children: /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(SidebarLeaguesTabClickableTeamName, { label, onTeamSelect }) })
       ] })
     }
   );
 }
-function SidebarLeaguesTabTeamListPanel({ leagueKey }) {
+function SidebarLeaguesTabTeamListPanel({
+  leagueKey,
+  onLeaguesTabTeamSelect
+}) {
+  const openTeamWorkspace = (input) => {
+    onLeaguesTabTeamSelect?.({ leagueKey, ...input });
+  };
   return /* @__PURE__ */ (0, import_jsx_runtime239.jsxs)(
     "div",
     {
@@ -151926,7 +151987,12 @@ function SidebarLeaguesTabTeamListPanel({ leagueKey }) {
             {
               teamKey: team.teamKey,
               teamAbbrev: team.teamAbbrev,
-              label: resolveMlbLeaguesTabTeamListDisplayLabel(team.teamAbbrev)
+              label: resolveMlbLeaguesTabTeamListDisplayLabel(team.teamAbbrev),
+              onTeamSelect: onLeaguesTabTeamSelect ? () => openTeamWorkspace({
+                teamKey: team.teamKey,
+                teamDisplayName: team.label,
+                teamAbbrev: team.teamAbbrev
+              }) : void 0
             },
             team.teamKey
           ))
@@ -151945,7 +152011,11 @@ function SidebarLeaguesTabTeamListPanel({ leagueKey }) {
             SidebarLeaguesTabPlainTeamListRow,
             {
               teamKey: team.teamKey,
-              label: team.label
+              label: team.label,
+              onTeamSelect: onLeaguesTabTeamSelect ? () => openTeamWorkspace({
+                teamKey: team.teamKey,
+                teamDisplayName: team.label
+              }) : void 0
             },
             team.teamKey
           ))
@@ -151964,7 +152034,11 @@ function SidebarLeaguesTabTeamListPanel({ leagueKey }) {
             SidebarLeaguesTabPlainTeamListRow,
             {
               teamKey: team.teamKey,
-              label: team.leaguesTabListLabel
+              label: team.leaguesTabListLabel,
+              onTeamSelect: onLeaguesTabTeamSelect ? () => openTeamWorkspace({
+                teamKey: team.teamKey,
+                teamDisplayName: team.label
+              }) : void 0
             },
             team.teamKey
           ))
@@ -151985,7 +152059,12 @@ function SidebarLeaguesTabTeamListPanel({ leagueKey }) {
               league: "NFL",
               teamKey: team.teamKey,
               teamAbbrev: team.teamAbbrev,
-              label: team.leaguesTabListLabel
+              label: team.leaguesTabListLabel,
+              onTeamSelect: onLeaguesTabTeamSelect ? () => openTeamWorkspace({
+                teamKey: team.teamKey,
+                teamDisplayName: team.label,
+                teamAbbrev: team.teamAbbrev
+              }) : void 0
             },
             team.teamKey
           ))
@@ -152006,7 +152085,12 @@ function SidebarLeaguesTabTeamListPanel({ leagueKey }) {
               league: "NBA",
               teamKey: team.teamKey,
               teamAbbrev: team.teamAbbrev,
-              label: team.leaguesTabListLabel
+              label: team.leaguesTabListLabel,
+              onTeamSelect: onLeaguesTabTeamSelect ? () => openTeamWorkspace({
+                teamKey: team.teamKey,
+                teamDisplayName: team.label,
+                teamAbbrev: team.teamAbbrev
+              }) : void 0
             },
             team.teamKey
           ))
@@ -152027,7 +152111,12 @@ function SidebarLeaguesTabTeamListPanel({ leagueKey }) {
               league: "NHL",
               teamKey: team.teamKey,
               teamAbbrev: team.teamAbbrev,
-              label: team.leaguesTabListLabel
+              label: team.leaguesTabListLabel,
+              onTeamSelect: onLeaguesTabTeamSelect ? () => openTeamWorkspace({
+                teamKey: team.teamKey,
+                teamDisplayName: team.label,
+                teamAbbrev: team.teamAbbrev
+              }) : void 0
             },
             team.teamKey
           ))
@@ -152048,7 +152137,12 @@ function SidebarLeaguesTabTeamListPanel({ leagueKey }) {
               league: "WNBA",
               teamKey: team.teamKey,
               teamAbbrev: team.teamAbbrev,
-              label: team.leaguesTabListLabel
+              label: team.leaguesTabListLabel,
+              onTeamSelect: onLeaguesTabTeamSelect ? () => openTeamWorkspace({
+                teamKey: team.teamKey,
+                teamDisplayName: team.label,
+                teamAbbrev: team.teamAbbrev
+              }) : void 0
             },
             team.teamKey
           ))
@@ -152069,7 +152163,12 @@ function SidebarLeaguesTabTeamListPanel({ leagueKey }) {
               teamKey: team.teamKey,
               teamAbbrev: team.teamAbbrev,
               teamEspnId: team.teamEspnId,
-              label: team.leaguesTabListLabel
+              label: team.leaguesTabListLabel,
+              onTeamSelect: onLeaguesTabTeamSelect ? () => openTeamWorkspace({
+                teamKey: team.teamKey,
+                teamDisplayName: team.label,
+                teamAbbrev: team.teamAbbrev
+              }) : void 0
             },
             team.teamKey
           ))
@@ -152080,7 +152179,12 @@ function SidebarLeaguesTabTeamListPanel({ leagueKey }) {
             teamKey: team.teamKey,
             teamAbbrev: team.teamAbbrev,
             teamEspnId: team.teamEspnId,
-            label: team.leaguesTabListLabel
+            label: team.leaguesTabListLabel,
+            onTeamSelect: onLeaguesTabTeamSelect ? () => openTeamWorkspace({
+              teamKey: team.teamKey,
+              teamDisplayName: team.label,
+              teamAbbrev: team.teamAbbrev
+            }) : void 0
           },
           team.teamKey
         )) : null,
@@ -152090,7 +152194,12 @@ function SidebarLeaguesTabTeamListPanel({ leagueKey }) {
             teamKey: team.teamKey,
             teamAbbrev: team.teamAbbrev,
             teamEspnId: team.teamEspnId,
-            label: team.leaguesTabListLabel
+            label: team.leaguesTabListLabel,
+            onTeamSelect: onLeaguesTabTeamSelect ? () => openTeamWorkspace({
+              teamKey: team.teamKey,
+              teamDisplayName: team.label,
+              teamAbbrev: team.teamAbbrev
+            }) : void 0
           },
           team.teamKey
         )) : null,
@@ -152100,7 +152209,12 @@ function SidebarLeaguesTabTeamListPanel({ leagueKey }) {
             teamKey: team.teamKey,
             teamAbbrev: team.teamAbbrev,
             teamEspnId: team.teamEspnId,
-            label: team.leaguesTabListLabel
+            label: team.leaguesTabListLabel,
+            onTeamSelect: onLeaguesTabTeamSelect ? () => openTeamWorkspace({
+              teamKey: team.teamKey,
+              teamDisplayName: team.label,
+              teamAbbrev: team.teamAbbrev
+            }) : void 0
           },
           team.teamKey
         )) : null,
@@ -152110,7 +152224,12 @@ function SidebarLeaguesTabTeamListPanel({ leagueKey }) {
             teamKey: team.teamKey,
             teamAbbrev: team.teamAbbrev,
             teamEspnId: team.teamEspnId,
-            label: team.leaguesTabListLabel
+            label: team.leaguesTabListLabel,
+            onTeamSelect: onLeaguesTabTeamSelect ? () => openTeamWorkspace({
+              teamKey: team.teamKey,
+              teamDisplayName: team.label,
+              teamAbbrev: team.teamAbbrev
+            }) : void 0
           },
           team.teamKey
         )) : null,
@@ -152120,7 +152239,12 @@ function SidebarLeaguesTabTeamListPanel({ leagueKey }) {
             teamKey: team.teamKey,
             teamAbbrev: team.teamAbbrev,
             teamEspnId: team.teamEspnId,
-            label: team.leaguesTabListLabel
+            label: team.leaguesTabListLabel,
+            onTeamSelect: onLeaguesTabTeamSelect ? () => openTeamWorkspace({
+              teamKey: team.teamKey,
+              teamDisplayName: team.label,
+              teamAbbrev: team.teamAbbrev
+            }) : void 0
           },
           team.teamKey
         )) : null
@@ -152131,12 +152255,33 @@ function SidebarLeaguesTabTeamListPanel({ leagueKey }) {
 function SidebarLeaguesSectionBody({
   todayCompleteLeagues,
   selectedLeagueKey,
-  onLeagueSelect
+  onLeagueSelect,
+  onLeaguesTabTeamSelect
 }) {
   const [leaguesSortMode, setLeaguesSortMode] = (0, import_react270.useState)("on-today");
   const [leaguesSearchQuery, setLeaguesSearchQuery] = (0, import_react270.useState)("");
+  const leaguesSortModeBeforeSearchRef = (0, import_react270.useRef)(null);
   const [leaguesTabTeamsExpanded, setLeaguesTabTeamsExpanded] = (0, import_react270.useState)({});
   const mergedOperationalLeagues = useLiveGamesStore((s2) => s2.leagues);
+  const leaguesSearchActive = leaguesSearchQuery.trim().length > 0;
+  const handleLeaguesSearchQueryChange = (0, import_react270.useCallback)(
+    (value) => {
+      const wasSearching = leaguesSearchQuery.trim().length > 0;
+      const willSearch = value.trim().length > 0;
+      if (!wasSearching && willSearch) {
+        leaguesSortModeBeforeSearchRef.current = leaguesSortMode;
+      }
+      setLeaguesSearchQuery(value);
+      if (wasSearching && !willSearch) {
+        const restoreMode = leaguesSortModeBeforeSearchRef.current;
+        leaguesSortModeBeforeSearchRef.current = null;
+        if (restoreMode != null) {
+          setLeaguesSortMode(restoreMode);
+        }
+      }
+    },
+    [leaguesSearchQuery, leaguesSortMode]
+  );
   const toggleLeaguesTabTeamsList = (0, import_react270.useCallback)((leagueKey) => {
     setLeaguesTabTeamsExpanded((prev) => ({
       ...prev,
@@ -152170,16 +152315,29 @@ function SidebarLeaguesSectionBody({
     }
     return [];
   }, [leaguesSortMode, mergedOperationalLeagues, todayCompleteLeagues]);
-  const visibleLeagueSections = (0, import_react270.useMemo)(
-    () => filterSportsBrowserPrototypeSidebarLeaguesGroupedSections(
-      displayedLeagueSections,
-      leaguesSearchQuery
-    ),
-    [displayedLeagueSections, leaguesSearchQuery]
-  );
+  const visibleLeagueSections = (0, import_react270.useMemo)(() => {
+    const query = leaguesSearchQuery.trim();
+    const sectionsBase = query ? resolveSportsBrowserPrototypeSidebarLeaguesSectionsWhenSearching(
+      leaguesSortMode,
+      mergedOperationalLeagues
+    ) : displayedLeagueSections;
+    return filterSportsBrowserPrototypeSidebarLeaguesGroupedSections(sectionsBase, leaguesSearchQuery);
+  }, [
+    displayedLeagueSections,
+    leaguesSearchQuery,
+    leaguesSortMode,
+    mergedOperationalLeagues
+  ]);
   return /* @__PURE__ */ (0, import_jsx_runtime239.jsxs)(import_jsx_runtime239.Fragment, { children: [
-    /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(LeaguesFilterField, { value: leaguesSearchQuery, onChange: setLeaguesSearchQuery }),
-    /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(LeaguesSortControls, { activeMode: leaguesSortMode, onModeChange: setLeaguesSortMode }),
+    /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(LeaguesFilterField, { value: leaguesSearchQuery, onChange: handleLeaguesSearchQueryChange }),
+    /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(
+      LeaguesSortControls,
+      {
+        activeMode: leaguesSortMode,
+        onModeChange: setLeaguesSortMode,
+        filterVisuallyInactive: leaguesSearchActive
+      }
+    ),
     visibleLeagueSections.map((group) => /* @__PURE__ */ (0, import_jsx_runtime239.jsxs)(import_react270.Fragment, { children: [
       /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(
         SidebarLeaguesSportGroupHeader,
@@ -152209,7 +152367,13 @@ function SidebarLeaguesSectionBody({
               leaguesTabLeagueRow: true
             }
           ),
-          leaguesTabTeamsListInteractive && leaguesTabTeamsListExpanded ? /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(SidebarLeaguesTabTeamListPanel, { leagueKey }) : null
+          leaguesTabTeamsListInteractive && leaguesTabTeamsListExpanded ? /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(
+            SidebarLeaguesTabTeamListPanel,
+            {
+              leagueKey,
+              onLeaguesTabTeamSelect
+            }
+          ) : null
         ] }, leagueKey);
       })
     ] }, group.sectionId))
@@ -152221,6 +152385,7 @@ function SportsBrowserPrototypeLeftNav({
   onLeagueSelect,
   onGameSelect,
   onGameTeamSelect,
+  onLeaguesTabTeamSelect,
   onSelectGlobalWebsites,
   onSoccerArchLeagueSelect,
   onWatchLive,
@@ -152602,7 +152767,8 @@ function SportsBrowserPrototypeLeftNav({
                 {
                   todayCompleteLeagues,
                   selectedLeagueKey,
-                  onLeagueSelect
+                  onLeagueSelect,
+                  onLeaguesTabTeamSelect
                 }
               ) })
             ] })
@@ -153908,6 +154074,29 @@ function applyCommandCenterDestinationToActiveTab(tab, destination) {
   return { ...tab, paneStates: next, activePaneIndex: paneIndex };
 }
 
+// ../grarf/desktop/src/lib/gamesSpine/sportsBrowserPrototypeLeaguesTabTeamNavigation.ts
+init_define_import_meta_env();
+var LEAGUES_TAB_TEAM_CONTEXT_PLACEHOLDER_OPPONENT = "GRARF Leagues Tab Placeholder";
+function buildSportsBrowserPrototypeLeaguesTabTeamContextGame(input) {
+  const leagueKey = input.leagueKey.trim();
+  const teamKey = input.teamKey.trim();
+  const teamDisplayName2 = input.teamDisplayName.trim();
+  const teamAbbrev2 = input.teamAbbrev?.trim().toUpperCase();
+  return {
+    id: `sports-browser-leagues-tab-${leagueKey}-${teamKey}`,
+    league: leagueKey,
+    awayTeam: teamDisplayName2,
+    homeTeam: LEAGUES_TAB_TEAM_CONTEXT_PLACEHOLDER_OPPONENT,
+    awayTeamAbbrev: teamAbbrev2,
+    homeTeamAbbrev: "OPP",
+    status: "scheduled"
+  };
+}
+function applySportsBrowserPrototypeLeaguesTabTeamToPane(input) {
+  const game = buildSportsBrowserPrototypeLeaguesTabTeamContextGame(input);
+  return applySportsBrowserPrototypeGameTeamSideToPane(game, "away");
+}
+
 // ../grarf/desktop/src/pages/HomePage.tsx
 var import_jsx_runtime244 = __toESM(require_jsx_runtime(), 1);
 var topBarNewsTickerControlClass = "flex h-full shrink-0 items-center justify-center px-2 text-black transition hover:bg-black/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-black/40";
@@ -154703,6 +154892,18 @@ function HomePage() {
         const paneIndex = resolveSportsBrowserPrototypeSidebarSelectionPaneIndex(tab);
         useHomeSourceFocusStore.getState().clearSelectedArticle(NEWS_BROWSER_FOCUS_SESSION_KEY);
         next[paneIndex] = applySportsBrowserPrototypeGameTeamSideToPane(resolvedGame, side);
+        return { ...tab, paneStates: next, activePaneIndex: paneIndex };
+      });
+    },
+    [updateSportsBrowserTabForSidebarSelection]
+  );
+  const onSportsBrowserLeaguesTabTeamSelect = (0, import_react274.useCallback)(
+    (input) => {
+      updateSportsBrowserTabForSidebarSelection((tab) => {
+        const next = tab.paneStates.slice();
+        const paneIndex = resolveSportsBrowserPrototypeSidebarSelectionPaneIndex(tab);
+        useHomeSourceFocusStore.getState().clearSelectedArticle(NEWS_BROWSER_FOCUS_SESSION_KEY);
+        next[paneIndex] = applySportsBrowserPrototypeLeaguesTabTeamToPane(input);
         return { ...tab, paneStates: next, activePaneIndex: paneIndex };
       });
     },
@@ -155534,6 +155735,7 @@ function HomePage() {
                 onLeagueSelect: onSportsBrowserLeagueSelect,
                 onGameSelect: onSportsBrowserGameSelect,
                 onGameTeamSelect: onSportsBrowserGameTeamSelect,
+                onLeaguesTabTeamSelect: onSportsBrowserLeaguesTabTeamSelect,
                 onSelectGlobalWebsites: onSportsBrowserSelectGlobalWebsites,
                 onSoccerArchLeagueSelect: onSportsBrowserSelectSoccerArchWebsites,
                 selectedGameId: sportsBrowserSelectedGameId,
