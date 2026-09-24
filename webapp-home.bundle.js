@@ -45,6 +45,9 @@ var init_define_import_meta_env = __esm({
 function isGrarfElectronRenderer() {
   return typeof window !== "undefined" && window.GRARF_ELECTRON === true;
 }
+function isGrarfExtensionRenderer() {
+  return typeof window !== "undefined" && window.GRARF_EXTENSION === true;
+}
 function isGrarfWebRenderer2() {
   return typeof window !== "undefined" && window.GRARF_WEB_CONFIG != null;
 }
@@ -155879,7 +155882,7 @@ function HomePage() {
     ),
     HOME_CENTER_LIVE_SPORTS_TICKER_ENABLED ? /* @__PURE__ */ (0, import_jsx_runtime244.jsx)(LiveSportsTicker, { onNavigate: onTickerNavigate }) : null
   ] });
-  const showSportsBrowserPrototypeTopFeed = isSportsBrowserPrototype && isGrarfElectronRenderer();
+  const showSportsBrowserPrototypeTopFeed = isSportsBrowserPrototype && (isGrarfElectronRenderer() || isGrarfExtensionRenderer());
   const sportsBrowserSidebarBottomNewsFeed = showSportsBrowserPrototypeTopFeed ? /* @__PURE__ */ (0, import_jsx_runtime244.jsxs)(
     "div",
     {
