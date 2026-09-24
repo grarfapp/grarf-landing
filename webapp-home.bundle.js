@@ -135785,10 +135785,15 @@ function resolveGrarfExtensionHostExternalDestinationUrl(pane) {
 }
 
 // ../grarf/desktop/src/extensionHost/openGrarfExtensionHostExternalDestination.ts
-function openChromeBrowserTab(url) {
+function navigateActiveChromeBrowserTab(url) {
   const chromeTabs = globalThis.chrome?.tabs;
-  if (chromeTabs?.create) {
-    void chromeTabs.create({ url, active: true });
+  if (chromeTabs?.query && chromeTabs?.update) {
+    void chromeTabs.query({ active: true, lastFocusedWindow: true }).then((tabs) => {
+      const activeTabId = tabs[0]?.id;
+      if (activeTabId == null) return;
+      return chromeTabs.update(activeTabId, { url });
+    }).catch(() => {
+    });
     return;
   }
   window.open(url, "_blank", "noopener,noreferrer");
@@ -135797,7 +135802,7 @@ function maybeDelegateGrarfExtensionHostExternalDestination(url) {
   if (!isGrarfExtensionRenderer()) return;
   const trimmed = url?.trim();
   if (!trimmed) return;
-  openChromeBrowserTab(trimmed);
+  navigateActiveChromeBrowserTab(trimmed);
 }
 
 // ../grarf/desktop/src/pages/HomePage.tsx
