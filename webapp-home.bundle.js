@@ -150238,12 +150238,14 @@ function resolveMlbChildSectionWebsites(game, context2, pane, section) {
     if (section === "gameCenter") {
       return resolveMlbUpcomingGameWorkspaceGameCenterWebsites(context2);
     }
-    const websites = getSportsBrowserPrototypeGameContextSectionWebsites(
-      game,
-      context2,
-      section
-    );
-    return websites;
+    if (MLB_UPCOMING_GAME_WORKSPACE_CHILD_SECTIONS.includes(section) || section === "predictions") {
+      return resolveMlbUpcomingGameWorkspaceChildSourceWebsites(
+        game,
+        context2,
+        section
+      );
+    }
+    return getSportsBrowserPrototypeGameContextSectionWebsites(game, context2, section);
   }
   if (isMlbLiveGameWorkspace(game) || isMlbFinalGameWorkspace(game)) {
     if (section === "gameCenter") {
@@ -150252,6 +150254,34 @@ function resolveMlbChildSectionWebsites(game, context2, pane, section) {
     return getSportsBrowserPrototypeGameContextSectionWebsites(game, context2, section);
   }
   return [];
+}
+function resolveMlbUpcomingGameParentChildSections(game, context2, pane) {
+  const predictionsUrl = resolveMlbGameWorkspacePredictionsMarketUrl(
+    game,
+    MLB_GAME_WORKSPACE_PREDICTIONS_UI_SOURCE_INDEX
+  )?.trim();
+  const rows = [];
+  for (const section of MLB_UPCOMING_GAME_WORKSPACE_CHILD_SECTIONS) {
+    const childPane = {
+      ...pane,
+      gameContextMlbUpcomingParentTab: "game",
+      gameContextSection: section
+    };
+    const websites = resolveMlbChildSectionWebsites(game, context2, childPane, section);
+    rows.push({
+      section,
+      label: MLB_UPCOMING_GAME_WORKSPACE_CHILD_SECTION_LABELS[section],
+      websites: mapWebsiteRows(websites)
+    });
+    if (section === "story" && predictionsUrl) {
+      rows.push({
+        section: "predictions",
+        label: "PREDICTIONS",
+        websites: []
+      });
+    }
+  }
+  return rows;
 }
 function resolveMlbTeamParentChildSections(game, context2, pane, parent, workspace) {
   if (workspace === "upcoming") {
@@ -150311,19 +150341,7 @@ function resolveSportsBrowserPrototypeTemporaryNavGameInlineHierarchy(game, pane
         kind: "mlbParent",
         label: "GAME",
         parent: "game",
-        childSections: MLB_UPCOMING_GAME_WORKSPACE_CHILD_SECTIONS.map((section) => {
-          const childPane = {
-            ...pane,
-            gameContextMlbUpcomingParentTab: "game",
-            gameContextSection: section
-          };
-          const websites = resolveMlbChildSectionWebsites(game, context2, childPane, section);
-          return {
-            section,
-            label: MLB_UPCOMING_GAME_WORKSPACE_CHILD_SECTION_LABELS[section],
-            websites: mapWebsiteRows(websites)
-          };
-        })
+        childSections: resolveMlbUpcomingGameParentChildSections(game, context2, pane)
       },
       {
         kind: "mlbParent",
@@ -150346,13 +150364,31 @@ function resolveSportsBrowserPrototypeTemporaryNavGameInlineHierarchy(game, pane
         kind: "mlbParent",
         label: "GAME",
         parent: "game",
-        childSections: MLB_LIVE_GAME_WORKSPACE_GAME_CHILD_SECTIONS.map((section, index) => {
+        childSections: MLB_LIVE_GAME_WORKSPACE_GAME_CHILD_SECTIONS.flatMap((section, index) => {
           const websites = resolveMlbChildSectionWebsites(game, context2, pane, section);
-          return {
+          const row = {
             section,
             label: MLB_LIVE_GAME_WORKSPACE_GAME_CHILD_LABELS[index] ?? section,
             websites: mapWebsiteRows(websites)
           };
+          if (section !== "story") {
+            return [row];
+          }
+          const predictionsUrl = resolveMlbGameWorkspacePredictionsMarketUrl(
+            game,
+            MLB_GAME_WORKSPACE_PREDICTIONS_UI_SOURCE_INDEX
+          )?.trim();
+          if (!predictionsUrl) {
+            return [row];
+          }
+          return [
+            row,
+            {
+              section: "predictions",
+              label: "PREDICTIONS",
+              websites: []
+            }
+          ];
         })
       },
       {
@@ -151615,6 +151651,22 @@ function SportsBrowserPrototypeTemporaryNavSingleGameInlineMenu({
   );
   const [expandedChildKeys, setExpandedChildKeys] = (0, import_react273.useState)(() => /* @__PURE__ */ new Set());
   if (!onGameInlineNavigate) return null;
+  const expandParentKey = (parentKey) => {
+    setExpandedParentKeys((previous) => {
+      if (previous.has(parentKey)) return previous;
+      const next = new Set(previous);
+      next.add(parentKey);
+      return next;
+    });
+  };
+  const expandChildKey = (childKey) => {
+    setExpandedChildKeys((previous) => {
+      if (previous.has(childKey)) return previous;
+      const next = new Set(previous);
+      next.add(childKey);
+      return next;
+    });
+  };
   return /* @__PURE__ */ (0, import_jsx_runtime242.jsx)(
     "div",
     {
@@ -151640,10 +151692,15 @@ function SportsBrowserPrototypeTemporaryNavSingleGameInlineMenu({
                     {
                       type: "button",
                       className: "min-w-0 flex-1 truncate text-left",
-                      onClick: () => onGameInlineNavigate(game, {
-                        kind: "mlbParent",
-                        parent: parent.parent
-                      }),
+                      onClick: () => {
+                        onGameInlineNavigate(game, {
+                          kind: "mlbParent",
+                          parent: parent.parent
+                        });
+                        if (parent.childSections.length > 0) {
+                          expandParentKey(parentKey2);
+                        }
+                      },
                       children: parent.label
                     }
                   ),
@@ -151682,10 +151739,15 @@ function SportsBrowserPrototypeTemporaryNavSingleGameInlineMenu({
                         {
                           type: "button",
                           className: "min-w-0 flex-1 truncate text-left",
-                          onClick: () => onGameInlineNavigate(
-                            game,
-                            resolveTemporaryNavMlbChildNavigateAction2(parent.parent, child)
-                          ),
+                          onClick: () => {
+                            onGameInlineNavigate(
+                              game,
+                              resolveTemporaryNavMlbChildNavigateAction2(parent.parent, child)
+                            );
+                            if (child.websites.length > 0) {
+                              expandChildKey(childKey);
+                            }
+                          },
                           children: child.label
                         }
                       ),
@@ -151757,10 +151819,15 @@ function SportsBrowserPrototypeTemporaryNavSingleGameInlineMenu({
                   {
                     type: "button",
                     className: "min-w-0 flex-1 truncate text-left normal-case",
-                    onClick: () => onGameInlineNavigate(game, {
-                      kind: "standardSection",
-                      sectionIndex: parent.sectionIndex
-                    }),
+                    onClick: () => {
+                      onGameInlineNavigate(game, {
+                        kind: "standardSection",
+                        sectionIndex: parent.sectionIndex
+                      });
+                      if (parent.websites.length > 0 || teamSections.length > 0) {
+                        expandParentKey(parentKey);
+                      }
+                    },
                     children: parent.label
                   }
                 ),
@@ -151799,11 +151866,16 @@ function SportsBrowserPrototypeTemporaryNavSingleGameInlineMenu({
                       {
                         type: "button",
                         className: "min-w-0 flex-1 truncate text-left",
-                        onClick: () => onGameInlineNavigate(game, {
-                          kind: "standardTeamSection",
-                          sectionIndex: parent.sectionIndex,
-                          teamSectionIndex: teamSection.sectionIndex
-                        }),
+                        onClick: () => {
+                          onGameInlineNavigate(game, {
+                            kind: "standardTeamSection",
+                            sectionIndex: parent.sectionIndex,
+                            teamSectionIndex: teamSection.sectionIndex
+                          });
+                          if (teamSection.websites.length > 0) {
+                            expandChildKey(teamKey);
+                          }
+                        },
                         children: teamSection.label
                       }
                     ),
