@@ -149954,6 +149954,21 @@ function resolveSportsBrowserPrototypeSidebarDisplayedLeagueSections(leaguesSort
 
 // ../grarf/desktop/src/components/homeMvp/SportsBrowserPrototypeTemporaryNavLeaguesInlineTree.tsx
 var import_jsx_runtime238 = __toESM(require_jsx_runtime(), 1);
+var LEAGUES_INLINE_POPULATED_TEAM_LIST_LEAGUE_KEYS = /* @__PURE__ */ new Set([
+  "MLB",
+  "MNCAAB",
+  "NCAAF",
+  "NFL",
+  "NBA",
+  "NHL",
+  "WNBA",
+  "MLS",
+  "EPL",
+  "LALIGA",
+  "BUNDESLIGA",
+  "SERIEA",
+  "LIGUE1"
+]);
 var INLINE_ROW_BASE = "flex w-full min-w-0 items-center justify-between gap-2 py-[4px] text-left text-[13px] uppercase tracking-[0.04em] text-[#1a1a1a] transition-colors hover:bg-[#e9e4db]";
 function resolveInlineIndentClass(depth) {
   if (depth === 0) return "pl-4 pr-3";
@@ -150015,7 +150030,9 @@ function SportsBrowserPrototypeTemporaryNavLeaguesInlineTree({
   selectedLeagueKey = null,
   onLeagueSelect,
   onLeagueDestinationSelect,
-  onGlobalDestinationSelect
+  onGlobalDestinationSelect,
+  renderTeamListPanel,
+  onLeaguesTabTeamSelect
 }) {
   const mergedOperationalLeagues = useLiveGamesStore((s2) => s2.leagues);
   const [allExpanded, setAllExpanded] = (0, import_react269.useState)(false);
@@ -150149,6 +150166,7 @@ function SportsBrowserPrototypeTemporaryNavLeaguesInlineTree({
       group.leagues.map(({ leagueKey, label }) => {
         const leagueExpanded = expandedLeagueKeys.has(leagueKey);
         const leagueSelected = selectedLeagueKey === leagueKey;
+        const showPopulatedTeamList = LEAGUES_INLINE_POPULATED_TEAM_LIST_LEAGUE_KEYS.has(leagueKey) && renderTeamListPanel != null && onLeaguesTabTeamSelect != null;
         return /* @__PURE__ */ (0, import_jsx_runtime238.jsxs)("div", { children: [
           /* @__PURE__ */ (0, import_jsx_runtime238.jsxs)(
             "div",
@@ -150189,13 +150207,16 @@ function SportsBrowserPrototypeTemporaryNavLeaguesInlineTree({
               ]
             }
           ),
-          leagueExpanded ? renderSectionHierarchy(
-            leagueKey,
-            1,
-            leagueKey,
-            (section) => onLeagueDestinationSelect?.(leagueKey, section),
-            (section, websiteIndex) => onLeagueDestinationSelect?.(leagueKey, section, websiteIndex)
-          ) : null
+          leagueExpanded ? /* @__PURE__ */ (0, import_jsx_runtime238.jsxs)(import_jsx_runtime238.Fragment, { children: [
+            showPopulatedTeamList ? renderTeamListPanel(leagueKey, onLeaguesTabTeamSelect) : null,
+            renderSectionHierarchy(
+              leagueKey,
+              1,
+              leagueKey,
+              (section) => onLeagueDestinationSelect?.(leagueKey, section),
+              (section, websiteIndex) => onLeagueDestinationSelect?.(leagueKey, section, websiteIndex)
+            )
+          ] }) : null
         ] }, leagueKey);
       })
     ] }, group.sectionId))
@@ -151299,6 +151320,7 @@ function SportsBrowserPrototypeTemporaryNavPrototype({
   onGameSelect,
   onGameInlineNavigate,
   renderContentTeamListPanel,
+  onLeaguesTabTeamSelect,
   onTopLevelChange
 } = {}) {
   const rootRef = (0, import_react272.useRef)(null);
@@ -151543,7 +151565,9 @@ function SportsBrowserPrototypeTemporaryNavPrototype({
                 selectedLeagueKey,
                 onLeagueSelect,
                 onLeagueDestinationSelect,
-                onGlobalDestinationSelect
+                onGlobalDestinationSelect,
+                renderTeamListPanel: renderContentTeamListPanel,
+                onLeaguesTabTeamSelect
               }
             )
           },
@@ -154577,6 +154601,7 @@ function SportsBrowserPrototypeLeftNav({
                       onLeaguesTabTeamSelect: onTeamSelect
                     }
                   ),
+                  onLeaguesTabTeamSelect,
                   onTopLevelChange: handleTemporaryNavTopLevelChange
                 }
               ),
