@@ -27252,10 +27252,21 @@ function startOperationalSnapshotPolling(onTransport, options) {
   intervalId = setInterval(() => {
     void runPoll();
   }, intervalMs2);
+  const resumePollIfVisible = () => {
+    if (typeof document === "undefined") return;
+    if (document.visibilityState !== "visible") return;
+    void runPoll();
+  };
+  document.addEventListener("visibilitychange", resumePollIfVisible);
+  window.addEventListener("pageshow", resumePollIfVisible);
+  window.addEventListener("focus", resumePollIfVisible);
   return () => {
     stopped = true;
     if (intervalId != null) clearInterval(intervalId);
     clearRetry();
+    document.removeEventListener("visibilitychange", resumePollIfVisible);
+    window.removeEventListener("pageshow", resumePollIfVisible);
+    window.removeEventListener("focus", resumePollIfVisible);
   };
 }
 
@@ -68367,6 +68378,10 @@ function LiveGamesBridge() {
       }
       if (hasElectronGamesIpc()) {
         stopCloudPoll = startElectronGrarfCloudOperationalPolling(hydrate);
+      } else if (isGrarfExtensionRenderer()) {
+        stopCloudPoll = startOperationalSnapshotPolling(onCloudTransport, {
+          intervalMs: config.pollIntervalMs
+        });
       } else if (isCanonicalWebBrowserRenderer()) {
         stopCloudPoll = registerWebLiveGamesHydrate(onCloudTransport);
       }
@@ -68442,6 +68457,7 @@ init_isGrarfWebRenderer();
 
 // ../grarf/desktop/src/lib/updateEngine/webUpdateEngine.ts
 init_define_import_meta_env();
+init_isGrarfWebRenderer();
 
 // ../grarf/desktop/src/store/liveTrackerPostsStore.ts
 init_define_import_meta_env();
@@ -70515,6 +70531,7 @@ function startInterval(fn2, intervalMs2) {
 function startWebUpdateEngine() {
   const stops = [];
   const tryStartLiveGamesPoller = () => {
+    if (isGrarfExtensionRenderer()) return true;
     if (!isWebLiveGamesHydrateRegistered()) return false;
     stops.push(startWebLiveGamesPoller());
     return true;
