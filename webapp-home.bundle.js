@@ -155155,84 +155155,6 @@ function SportsBrowserPrototypeLeftNav({
 
 // ../grarf/desktop/src/components/homeMvp/SportsBrowserPrototypeExtensionSidebarGameNavStrip.tsx
 init_define_import_meta_env();
-var import_jsx_runtime246 = __toESM(require_jsx_runtime(), 1);
-var SIDEBAR_SURFACE = "bg-[#f3f0ea] text-[#1a1a1a]";
-var ARROW_CELL_CLASS = "flex h-9 w-9 shrink-0 items-center justify-center text-[13px] font-bold leading-none text-[#1a1a1a]";
-var ARROW_CELL_DISABLED_CLASS = "cursor-not-allowed opacity-40";
-function SportsBrowserPrototypeExtensionSidebarGameNavStrip({
-  navigationMode = "games",
-  canNavigateUp = false,
-  canNavigateDown = false,
-  onNavigateUp,
-  onNavigateDown
-}) {
-  const previousLabel = navigationMode === "leagues" ? "Previous league" : "Previous game";
-  const nextLabel = navigationMode === "leagues" ? "Next league" : "Next game";
-  return /* @__PURE__ */ (0, import_jsx_runtime246.jsxs)(
-    "div",
-    {
-      className: cn2(
-        "flex w-full shrink-0 items-center justify-center gap-[3px] border-t border-[#d5d0c6] font-sans",
-        SIDEBAR_SURFACE
-      ),
-      "data-sports-browser-prototype-extension-sidebar-game-nav": true,
-      "aria-label": navigationMode === "leagues" ? "League navigation" : "Game navigation",
-      children: [
-        /* @__PURE__ */ (0, import_jsx_runtime246.jsx)(
-          "button",
-          {
-            type: "button",
-            onClick: onNavigateUp,
-            disabled: !canNavigateUp,
-            "aria-label": previousLabel,
-            className: cn2(ARROW_CELL_CLASS, !canNavigateUp && ARROW_CELL_DISABLED_CLASS),
-            "data-sports-browser-prototype-extension-sidebar-game-nav-previous": true,
-            children: "\u2039"
-          }
-        ),
-        /* @__PURE__ */ (0, import_jsx_runtime246.jsx)(
-          "button",
-          {
-            type: "button",
-            onClick: onNavigateUp,
-            disabled: !canNavigateUp,
-            "aria-label": previousLabel,
-            className: cn2(ARROW_CELL_CLASS, !canNavigateUp && ARROW_CELL_DISABLED_CLASS),
-            "data-sports-browser-prototype-up-down-nav-up": true,
-            children: "\u2191"
-          }
-        ),
-        /* @__PURE__ */ (0, import_jsx_runtime246.jsx)(
-          "button",
-          {
-            type: "button",
-            onClick: onNavigateDown,
-            disabled: !canNavigateDown,
-            "aria-label": nextLabel,
-            className: cn2(ARROW_CELL_CLASS, !canNavigateDown && ARROW_CELL_DISABLED_CLASS),
-            "data-sports-browser-prototype-up-down-nav-down": true,
-            children: "\u2193"
-          }
-        ),
-        /* @__PURE__ */ (0, import_jsx_runtime246.jsx)(
-          "button",
-          {
-            type: "button",
-            onClick: onNavigateDown,
-            disabled: !canNavigateDown,
-            "aria-label": nextLabel,
-            className: cn2(ARROW_CELL_CLASS, !canNavigateDown && ARROW_CELL_DISABLED_CLASS),
-            "data-sports-browser-prototype-extension-sidebar-game-nav-next": true,
-            children: "\u203A"
-          }
-        )
-      ]
-    }
-  );
-}
-
-// ../grarf/desktop/src/components/homeMvp/SportsBrowserPrototypeUpDownNavControl.tsx
-init_define_import_meta_env();
 
 // ../grarf/desktop/src/lib/homeMvp/resolveSportsBrowserUpDownNavMinimizedGameCardLayout.ts
 init_define_import_meta_env();
@@ -155372,7 +155294,7 @@ function resolveSportsBrowserUpDownNavMinimizedGameCardWidthForGame(game, league
 
 // ../grarf/desktop/src/components/homeMvp/SportsBrowserPrototypeUpDownNavMinimizedGameCard.tsx
 init_define_import_meta_env();
-var import_jsx_runtime247 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime246 = __toESM(require_jsx_runtime(), 1);
 var SIDEBAR_RULE = "border-[#d5d0c6]";
 var PRIMARY = "text-[#1a1a1a]";
 var MUTED = "text-[#6a6a6a]";
@@ -155383,8 +155305,8 @@ var PREVIEW_ACTION_BUTTON_CLASS = "shrink-0 border-0 bg-transparent p-0 font-mon
 var TEAM_PAIR_GAP_CLASS = "ml-[0.85ch]";
 function TeamMark({ game, side, name }) {
   const logoUrl = resolveNewsSportsBrowserTeamLogoUrl(game, side);
-  return /* @__PURE__ */ (0, import_jsx_runtime247.jsxs)("span", { className: "inline-flex shrink-0 items-center gap-x-[0.25ch]", children: [
-    logoUrl ? /* @__PURE__ */ (0, import_jsx_runtime247.jsx)(
+  return /* @__PURE__ */ (0, import_jsx_runtime246.jsxs)("span", { className: "inline-flex shrink-0 items-center gap-x-[0.25ch]", children: [
+    logoUrl ? /* @__PURE__ */ (0, import_jsx_runtime246.jsx)(
       "img",
       {
         src: logoUrl,
@@ -155394,7 +155316,7 @@ function TeamMark({ game, side, name }) {
         decoding: "async"
       }
     ) : null,
-    /* @__PURE__ */ (0, import_jsx_runtime247.jsx)("span", { className: cn2("shrink-0", PRIMARY), children: name })
+    /* @__PURE__ */ (0, import_jsx_runtime246.jsx)("span", { className: cn2("shrink-0", PRIMARY), children: name })
   ] });
 }
 function resolvePreviewContentAlignClass(contentAlign) {
@@ -155416,7 +155338,7 @@ function SportsBrowserPrototypeUpDownNavMinimizedGameCard({
   const model = resolveGamesSpineCompactMatchupModel(game);
   const widthStyle = widthPx != null && widthPx > 0 ? { width: `${widthPx}px` } : void 0;
   if (model.kind === "event") {
-    return /* @__PURE__ */ (0, import_jsx_runtime247.jsxs)(
+    return /* @__PURE__ */ (0, import_jsx_runtime246.jsxs)(
       "div",
       {
         className: cn2(
@@ -155428,7 +155350,7 @@ function SportsBrowserPrototypeUpDownNavMinimizedGameCard({
         "data-sports-browser-prototype-up-down-nav-preview": true,
         "aria-hidden": true,
         children: [
-          leagueLogoUrl ? /* @__PURE__ */ (0, import_jsx_runtime247.jsx)(
+          leagueLogoUrl ? /* @__PURE__ */ (0, import_jsx_runtime246.jsx)(
             "img",
             {
               src: leagueLogoUrl,
@@ -155441,9 +155363,9 @@ function SportsBrowserPrototypeUpDownNavMinimizedGameCard({
               decoding: "async"
             }
           ) : null,
-          /* @__PURE__ */ (0, import_jsx_runtime247.jsx)("span", { className: cn2("shrink-0", PRIMARY), children: leagueLabel }),
-          /* @__PURE__ */ (0, import_jsx_runtime247.jsx)("span", { className: MUTED, children: "|" }),
-          /* @__PURE__ */ (0, import_jsx_runtime247.jsx)("span", { className: cn2("shrink-0", PRIMARY), children: resolveGamesSpineCompactEventDisplayLine(model.event) })
+          /* @__PURE__ */ (0, import_jsx_runtime246.jsx)("span", { className: cn2("shrink-0", PRIMARY), children: leagueLabel }),
+          /* @__PURE__ */ (0, import_jsx_runtime246.jsx)("span", { className: MUTED, children: "|" }),
+          /* @__PURE__ */ (0, import_jsx_runtime246.jsx)("span", { className: cn2("shrink-0", PRIMARY), children: resolveGamesSpineCompactEventDisplayLine(model.event) })
         ]
       }
     );
@@ -155455,7 +155377,7 @@ function SportsBrowserPrototypeUpDownNavMinimizedGameCard({
     onWatchLive,
     canShowWatchLive
   });
-  return /* @__PURE__ */ (0, import_jsx_runtime247.jsxs)(
+  return /* @__PURE__ */ (0, import_jsx_runtime246.jsxs)(
     "div",
     {
       className: cn2(
@@ -155467,7 +155389,7 @@ function SportsBrowserPrototypeUpDownNavMinimizedGameCard({
       "data-sports-browser-prototype-up-down-nav-preview": true,
       "aria-hidden": true,
       children: [
-        leagueLogoUrl ? /* @__PURE__ */ (0, import_jsx_runtime247.jsx)(
+        leagueLogoUrl ? /* @__PURE__ */ (0, import_jsx_runtime246.jsx)(
           "img",
           {
             src: leagueLogoUrl,
@@ -155480,15 +155402,15 @@ function SportsBrowserPrototypeUpDownNavMinimizedGameCard({
             decoding: "async"
           }
         ) : null,
-        /* @__PURE__ */ (0, import_jsx_runtime247.jsx)("span", { className: cn2("shrink-0", PRIMARY), children: leagueLabel }),
-        /* @__PURE__ */ (0, import_jsx_runtime247.jsx)("span", { className: MUTED, children: "|" }),
-        /* @__PURE__ */ (0, import_jsx_runtime247.jsx)(TeamMark, { game, side: model.left.side, name: leftPresentation.teamName }),
-        variant !== "upcoming" && model.showScores ? /* @__PURE__ */ (0, import_jsx_runtime247.jsx)("span", { className: cn2("ml-[0.35ch] shrink-0 tabular-nums", PRIMARY), children: model.left.score ?? "\u2013" }) : null,
-        /* @__PURE__ */ (0, import_jsx_runtime247.jsx)("span", { className: TEAM_PAIR_GAP_CLASS, children: /* @__PURE__ */ (0, import_jsx_runtime247.jsx)(TeamMark, { game, side: model.right.side, name: rightPresentation.teamName }) }),
-        variant !== "upcoming" && model.showScores ? /* @__PURE__ */ (0, import_jsx_runtime247.jsx)("span", { className: cn2("ml-[0.35ch] shrink-0 tabular-nums", PRIMARY), children: model.right.score ?? "\u2013" }) : null,
-        variant === "upcoming" ? /* @__PURE__ */ (0, import_jsx_runtime247.jsx)("span", { className: cn2("shrink-0 tabular-nums", MUTED), children: formatGameDisplayTimeLocal(game) }) : null,
-        variant === "final" ? /* @__PURE__ */ (0, import_jsx_runtime247.jsx)("span", { className: cn2("shrink-0 tracking-wide", MUTED), children: "F" }) : null,
-        showChannelLogo && channel.logoUrl ? /* @__PURE__ */ (0, import_jsx_runtime247.jsx)("span", { className: "flex h-[0.7rem] w-[2.2rem] shrink-0 items-center justify-center", children: /* @__PURE__ */ (0, import_jsx_runtime247.jsx)(
+        /* @__PURE__ */ (0, import_jsx_runtime246.jsx)("span", { className: cn2("shrink-0", PRIMARY), children: leagueLabel }),
+        /* @__PURE__ */ (0, import_jsx_runtime246.jsx)("span", { className: MUTED, children: "|" }),
+        /* @__PURE__ */ (0, import_jsx_runtime246.jsx)(TeamMark, { game, side: model.left.side, name: leftPresentation.teamName }),
+        variant !== "upcoming" && model.showScores ? /* @__PURE__ */ (0, import_jsx_runtime246.jsx)("span", { className: cn2("ml-[0.35ch] shrink-0 tabular-nums", PRIMARY), children: model.left.score ?? "\u2013" }) : null,
+        /* @__PURE__ */ (0, import_jsx_runtime246.jsx)("span", { className: TEAM_PAIR_GAP_CLASS, children: /* @__PURE__ */ (0, import_jsx_runtime246.jsx)(TeamMark, { game, side: model.right.side, name: rightPresentation.teamName }) }),
+        variant !== "upcoming" && model.showScores ? /* @__PURE__ */ (0, import_jsx_runtime246.jsx)("span", { className: cn2("ml-[0.35ch] shrink-0 tabular-nums", PRIMARY), children: model.right.score ?? "\u2013" }) : null,
+        variant === "upcoming" ? /* @__PURE__ */ (0, import_jsx_runtime246.jsx)("span", { className: cn2("shrink-0 tabular-nums", MUTED), children: formatGameDisplayTimeLocal(game) }) : null,
+        variant === "final" ? /* @__PURE__ */ (0, import_jsx_runtime246.jsx)("span", { className: cn2("shrink-0 tracking-wide", MUTED), children: "F" }) : null,
+        showChannelLogo && channel.logoUrl ? /* @__PURE__ */ (0, import_jsx_runtime246.jsx)("span", { className: "flex h-[0.7rem] w-[2.2rem] shrink-0 items-center justify-center", children: /* @__PURE__ */ (0, import_jsx_runtime246.jsx)(
           NewsSportsBrowserChannelLogo,
           {
             logoUrl: channel.logoUrl,
@@ -155501,7 +155423,7 @@ function SportsBrowserPrototypeUpDownNavMinimizedGameCard({
             slotClassName: GAMES_SPINE_COMPACT_CHANNEL_LOGO_SLOT_CLASS
           }
         ) }) : null,
-        variant === "live" && showWatch && onWatchLive ? /* @__PURE__ */ (0, import_jsx_runtime247.jsx)(
+        variant === "live" && showWatch && onWatchLive ? /* @__PURE__ */ (0, import_jsx_runtime246.jsx)(
           "button",
           {
             type: "button",
@@ -155513,7 +155435,7 @@ function SportsBrowserPrototypeUpDownNavMinimizedGameCard({
             children: "WATCH"
           }
         ) : null,
-        variant === "live" ? /* @__PURE__ */ (0, import_jsx_runtime247.jsx)(
+        variant === "live" ? /* @__PURE__ */ (0, import_jsx_runtime246.jsx)(
           "button",
           {
             type: "button",
@@ -155531,7 +155453,7 @@ function SportsBrowserPrototypeUpDownNavMinimizedGameCard({
 
 // ../grarf/desktop/src/components/homeMvp/SportsBrowserPrototypeUpDownNavMinimizedLeagueCard.tsx
 init_define_import_meta_env();
-var import_jsx_runtime248 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime247 = __toESM(require_jsx_runtime(), 1);
 var PRIMARY2 = "text-[#1a1a1a]";
 var PREVIEW_CELL_CLASS2 = "flex h-9 shrink-0 items-center gap-x-[0.35ch] whitespace-nowrap px-1.5 text-[9px] leading-none";
 var LEAGUE_LOGO_CLASS2 = "h-2.5 w-2.5 shrink-0 object-contain";
@@ -155545,7 +155467,7 @@ function SportsBrowserPrototypeUpDownNavMinimizedLeagueCard({
   const leagueLabel = resolveGamesSpineLeagueDisplayLabel(grarfLeagueKey, [...sampleGames]);
   const horseRacingLogoPath = resolveSportsBrowserPrototypeHorseRacingLeagueLogoPath(leagueKey);
   const leagueLogoUrl = horseRacingLogoPath != null ? publicAssetUrl(horseRacingLogoPath) : resolveGamesSpineLeagueHeaderLogoUrl(grarfLeagueKey, sampleGames);
-  return /* @__PURE__ */ (0, import_jsx_runtime248.jsxs)(
+  return /* @__PURE__ */ (0, import_jsx_runtime247.jsxs)(
     "div",
     {
       className: cn2(
@@ -155557,7 +155479,7 @@ function SportsBrowserPrototypeUpDownNavMinimizedLeagueCard({
       "data-sports-browser-prototype-up-down-nav-league-key": leagueKey,
       "aria-hidden": true,
       children: [
-        leagueLogoUrl ? /* @__PURE__ */ (0, import_jsx_runtime248.jsx)(
+        leagueLogoUrl ? /* @__PURE__ */ (0, import_jsx_runtime247.jsx)(
           "img",
           {
             src: leagueLogoUrl,
@@ -155570,13 +155492,144 @@ function SportsBrowserPrototypeUpDownNavMinimizedLeagueCard({
             decoding: "async"
           }
         ) : null,
-        /* @__PURE__ */ (0, import_jsx_runtime248.jsx)("span", { className: cn2("shrink-0", PRIMARY2), children: leagueLabel })
+        /* @__PURE__ */ (0, import_jsx_runtime247.jsx)("span", { className: cn2("shrink-0", PRIMARY2), children: leagueLabel })
+      ]
+    }
+  );
+}
+
+// ../grarf/desktop/src/components/homeMvp/SportsBrowserPrototypeExtensionSidebarGameNavStrip.tsx
+var import_jsx_runtime248 = __toESM(require_jsx_runtime(), 1);
+var SIDEBAR_SURFACE = "bg-[#f3f0ea] text-[#1a1a1a]";
+var ARROW_CELL_CLASS = "flex h-9 w-9 shrink-0 items-center justify-center text-[13px] font-bold leading-none text-[#1a1a1a]";
+var ARROW_CELL_DISABLED_CLASS = "cursor-not-allowed opacity-40";
+function SportsBrowserPrototypeExtensionSidebarGameNavStrip({
+  navigationMode = "games",
+  hideNavigationModeSelector = false,
+  canNavigateUp = false,
+  canNavigateDown = false,
+  onNavigateUp,
+  onNavigateDown,
+  previousPreviewGame = null,
+  nextPreviewGame = null,
+  previousPreviewLeagueKey = null,
+  nextPreviewLeagueKey = null,
+  leaguePreviewSampleGames = [],
+  previewLeagueWidths,
+  onWatchLive,
+  canShowWatchLive
+}) {
+  const navigationModeForUi = hideNavigationModeSelector ? "leagues" : navigationMode;
+  const showGamePreviews = navigationModeForUi === "games";
+  const showLeaguePreviews = navigationModeForUi === "leagues";
+  const previousGamePreview = showGamePreviews ? previousPreviewGame : null;
+  const nextGamePreview = showGamePreviews ? nextPreviewGame : null;
+  const previousLeaguePreviewKey = showLeaguePreviews ? previousPreviewLeagueKey : null;
+  const nextLeaguePreviewKey = showLeaguePreviews ? nextPreviewLeagueKey : null;
+  const upAriaLabel = navigationModeForUi === "leagues" ? "Previous league" : "Previous game";
+  const downAriaLabel = navigationModeForUi === "leagues" ? "Next league" : "Next game";
+  const previewSurfaceClass = cn2(SIDEBAR_SURFACE);
+  return /* @__PURE__ */ (0, import_jsx_runtime248.jsxs)(
+    "div",
+    {
+      className: cn2(
+        "flex h-9 w-full shrink-0 items-stretch border-t border-[#d5d0c6] font-sans",
+        SIDEBAR_SURFACE
+      ),
+      "data-sports-browser-prototype-extension-sidebar-game-nav": true,
+      "aria-label": navigationModeForUi === "leagues" ? "League navigation" : "Game navigation",
+      children: [
+        /* @__PURE__ */ (0, import_jsx_runtime248.jsx)(
+          "div",
+          {
+            className: "flex min-w-0 flex-1 items-stretch justify-end overflow-hidden",
+            "data-sports-browser-prototype-extension-sidebar-game-nav-previous": true,
+            children: previousGamePreview ? /* @__PURE__ */ (0, import_jsx_runtime248.jsx)(
+              SportsBrowserPrototypeUpDownNavMinimizedGameCard,
+              {
+                game: previousGamePreview,
+                widthPx: resolveSportsBrowserUpDownNavMinimizedGameCardWidthForGame(
+                  previousGamePreview,
+                  previewLeagueWidths
+                ),
+                contentAlign: "end",
+                onWatchLive,
+                canShowWatchLive,
+                className: previewSurfaceClass
+              }
+            ) : previousLeaguePreviewKey ? /* @__PURE__ */ (0, import_jsx_runtime248.jsx)(
+              SportsBrowserPrototypeUpDownNavMinimizedLeagueCard,
+              {
+                leagueKey: previousLeaguePreviewKey,
+                sampleGames: leaguePreviewSampleGames,
+                contentAlign: "end",
+                className: previewSurfaceClass
+              }
+            ) : null
+          }
+        ),
+        /* @__PURE__ */ (0, import_jsx_runtime248.jsxs)("div", { className: "flex shrink-0 items-stretch gap-[3px]", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime248.jsx)(
+            "button",
+            {
+              type: "button",
+              onClick: onNavigateUp,
+              disabled: !canNavigateUp,
+              "aria-label": upAriaLabel,
+              className: cn2(ARROW_CELL_CLASS, !canNavigateUp && ARROW_CELL_DISABLED_CLASS),
+              "data-sports-browser-prototype-up-down-nav-up": true,
+              children: "\u2191"
+            }
+          ),
+          /* @__PURE__ */ (0, import_jsx_runtime248.jsx)(
+            "button",
+            {
+              type: "button",
+              onClick: onNavigateDown,
+              disabled: !canNavigateDown,
+              "aria-label": downAriaLabel,
+              className: cn2(ARROW_CELL_CLASS, !canNavigateDown && ARROW_CELL_DISABLED_CLASS),
+              "data-sports-browser-prototype-up-down-nav-down": true,
+              children: "\u2193"
+            }
+          )
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime248.jsx)(
+          "div",
+          {
+            className: "flex min-w-0 flex-1 items-stretch justify-start overflow-hidden",
+            "data-sports-browser-prototype-extension-sidebar-game-nav-next": true,
+            children: nextGamePreview ? /* @__PURE__ */ (0, import_jsx_runtime248.jsx)(
+              SportsBrowserPrototypeUpDownNavMinimizedGameCard,
+              {
+                game: nextGamePreview,
+                widthPx: resolveSportsBrowserUpDownNavMinimizedGameCardWidthForGame(
+                  nextGamePreview,
+                  previewLeagueWidths
+                ),
+                contentAlign: "start",
+                onWatchLive,
+                canShowWatchLive,
+                className: previewSurfaceClass
+              }
+            ) : nextLeaguePreviewKey ? /* @__PURE__ */ (0, import_jsx_runtime248.jsx)(
+              SportsBrowserPrototypeUpDownNavMinimizedLeagueCard,
+              {
+                leagueKey: nextLeaguePreviewKey,
+                sampleGames: leaguePreviewSampleGames,
+                contentAlign: "start",
+                className: previewSurfaceClass
+              }
+            ) : null
+          }
+        )
       ]
     }
   );
 }
 
 // ../grarf/desktop/src/components/homeMvp/SportsBrowserPrototypeUpDownNavControl.tsx
+init_define_import_meta_env();
 var import_jsx_runtime249 = __toESM(require_jsx_runtime(), 1);
 var SIDEBAR_SURFACE2 = "bg-[#f3f0ea] text-[#1a1a1a]";
 var SIDEBAR_RULE2 = "border-[#d5d0c6]";
@@ -158413,7 +158466,6 @@ function HomePage() {
   });
   const sportsBrowserUpDownNavPreviewLeagueWidths = (0, import_react280.useMemo)(
     () => {
-      if (isGrarfExtensionRenderer()) return {};
       return resolveSportsBrowserUpDownNavMinimizedGameCardLeagueWidths(
         sportsBrowserSidebarNavigableGames,
         {
@@ -158705,10 +158757,19 @@ function HomePage() {
       SportsBrowserPrototypeExtensionSidebarGameNavStrip,
       {
         navigationMode: sportsBrowserUpDownNavEffectiveMode,
+        hideNavigationModeSelector: sportsBrowserSidebarTopLevelMode === "leagues",
         canNavigateUp: canNavigateSportsBrowserSidebarGameUp,
         canNavigateDown: canNavigateSportsBrowserSidebarGameDown,
         onNavigateUp: navigateSportsBrowserSidebarGameUp,
-        onNavigateDown: navigateSportsBrowserSidebarGameDown
+        onNavigateDown: navigateSportsBrowserSidebarGameDown,
+        previousPreviewGame: sportsBrowserSidebarPreviousPreviewGame,
+        nextPreviewGame: sportsBrowserSidebarNextPreviewGame,
+        previousPreviewLeagueKey: sportsBrowserSidebarPreviousPreviewLeagueKey,
+        nextPreviewLeagueKey: sportsBrowserSidebarNextPreviewLeagueKey,
+        leaguePreviewSampleGames: sportsBrowserSidebarNavigableGames,
+        previewLeagueWidths: sportsBrowserUpDownNavPreviewLeagueWidths,
+        onWatchLive: onSportsBrowserWatchLive,
+        canShowWatchLive: canShowSportsBrowserWatchLive
       }
     ) : null,
     sportsBrowserSidebarBottomNewsFeedInner
