@@ -155386,6 +155386,7 @@ function resolveSportsBrowserUpDownNavMinimizedGameCardWidthForGame(game, league
 
 // ../grarf/desktop/src/components/homeMvp/SportsBrowserPrototypeUpDownNavMinimizedGameCard.tsx
 init_define_import_meta_env();
+init_isGrarfWebRenderer();
 var import_jsx_runtime246 = __toESM(require_jsx_runtime(), 1);
 var SIDEBAR_RULE = "border-[#d5d0c6]";
 var PRIMARY = "text-[#1a1a1a]";
@@ -155429,6 +155430,7 @@ function SportsBrowserPrototypeUpDownNavMinimizedGameCard({
   const showChannelLogo = shouldShowSportsBrowserUpDownNavMinimizedGameCardChannelLogo(game);
   const model = resolveGamesSpineCompactMatchupModel(game);
   const widthStyle = widthPx != null && widthPx > 0 ? { width: `${widthPx}px` } : void 0;
+  const extensionWindframePreviewState = isGrarfExtensionRenderer() ? variant : void 0;
   if (model.kind === "event") {
     return /* @__PURE__ */ (0, import_jsx_runtime246.jsxs)(
       "div",
@@ -155440,6 +155442,7 @@ function SportsBrowserPrototypeUpDownNavMinimizedGameCard({
         ),
         style: widthStyle,
         "data-sports-browser-prototype-up-down-nav-preview": true,
+        "data-grarf-extension-windframe-card-state": extensionWindframePreviewState,
         "aria-hidden": true,
         children: [
           leagueLogoUrl ? /* @__PURE__ */ (0, import_jsx_runtime246.jsx)(
@@ -155479,6 +155482,7 @@ function SportsBrowserPrototypeUpDownNavMinimizedGameCard({
       ),
       style: widthStyle,
       "data-sports-browser-prototype-up-down-nav-preview": true,
+      "data-grarf-extension-windframe-card-state": extensionWindframePreviewState,
       "aria-hidden": true,
       children: [
         leagueLogoUrl ? /* @__PURE__ */ (0, import_jsx_runtime246.jsx)(
@@ -155545,6 +155549,7 @@ function SportsBrowserPrototypeUpDownNavMinimizedGameCard({
 
 // ../grarf/desktop/src/components/homeMvp/SportsBrowserPrototypeUpDownNavMinimizedLeagueCard.tsx
 init_define_import_meta_env();
+init_isGrarfWebRenderer();
 var import_jsx_runtime247 = __toESM(require_jsx_runtime(), 1);
 var PRIMARY2 = "text-[#1a1a1a]";
 var PREVIEW_CELL_CLASS2 = "flex h-9 shrink-0 items-center gap-x-[0.35ch] whitespace-nowrap px-1.5 text-[9px] leading-none";
@@ -155569,6 +155574,7 @@ function SportsBrowserPrototypeUpDownNavMinimizedLeagueCard({
       ),
       "data-sports-browser-prototype-up-down-nav-league-preview": true,
       "data-sports-browser-prototype-up-down-nav-league-key": leagueKey,
+      "data-grarf-extension-windframe-nav-preview": isGrarfExtensionRenderer() ? "" : void 0,
       "aria-hidden": true,
       children: [
         leagueLogoUrl ? /* @__PURE__ */ (0, import_jsx_runtime247.jsx)(
