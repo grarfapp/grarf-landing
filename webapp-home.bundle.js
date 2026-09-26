@@ -107481,6 +107481,17 @@ function TimelineGameUpdate({ update, onExpand }) {
 
 // ../grarf/desktop/src/components/homeMvp/HomeCenterPaneTimelineRow.tsx
 var import_jsx_runtime51 = __toESM(require_jsx_runtime(), 1);
+function resolveExtensionWindframeTimelineRowState(sourceKind) {
+  switch (sourceKind) {
+    case "livetracker":
+    case "game_update":
+      return "live";
+    case "clip":
+      return "upcoming";
+    default:
+      return "final";
+  }
+}
 function formatTimelineClock(iso) {
   return formatLiveTrackTerminalClock(iso).slice(0, 5);
 }
@@ -107527,8 +107538,10 @@ function HomeCenterPaneTimelineRowInner({
   expandedSourceKind,
   onClipOpen,
   registerItemRef,
-  registerScrollTargetRef
+  registerScrollTargetRef,
+  extensionSidebarWindframePresentation = false
 }) {
+  const useExtensionWindframeRowPresentation = extensionSidebarWindframePresentation && isGrarfExtensionRenderer();
   const [isSocialPlaying, setIsSocialPlaying] = (0, import_react99.useState)(false);
   const headerRef = (0, import_react99.useRef)(null);
   const scrollContainerRef = useCenterPaneTimelineScrollContainer();
@@ -107586,25 +107599,29 @@ function HomeCenterPaneTimelineRowInner({
     "article",
     {
       ref: setRowRef,
-      className: HOME_CENTER_PANE_TIMELINE_NEWS_ROW_CLASS,
+      className: useExtensionWindframeRowPresentation ? "border-0 px-0 py-0 [overflow-anchor:none]" : HOME_CENTER_PANE_TIMELINE_NEWS_ROW_CLASS,
       "data-timeline-item-id": item.id,
       "data-timeline-expanded": isExpanded ? "true" : void 0,
       "data-timeline-source-kind": item.sourceKind,
       "data-timeline-has-url": hasUrl ? "true" : void 0,
+      ...useExtensionWindframeRowPresentation ? {
+        "data-grarf-extension-windframe-timeline-row": "",
+        "data-grarf-extension-windframe-list-game-state": resolveExtensionWindframeTimelineRowState(item.sourceKind)
+      } : {},
       children: [
         /* @__PURE__ */ (0, import_jsx_runtime51.jsxs)(
           "div",
           {
             ref: setHeaderRef,
             className: cn2(
-              isExpanded && HOME_CENTER_PANE_TIMELINE_NEWS_ROW_EXPANDED_HEADER_CLASS
+              !useExtensionWindframeRowPresentation && isExpanded && HOME_CENTER_PANE_TIMELINE_NEWS_ROW_EXPANDED_HEADER_CLASS
             ),
             children: [
               /* @__PURE__ */ (0, import_jsx_runtime51.jsx)(
                 "time",
                 {
                   dateTime: item.timestamp,
-                  className: HOME_CENTER_PANE_TIMELINE_NEWS_TIMESTAMP_CLASS,
+                  className: useExtensionWindframeRowPresentation ? "mb-0 block font-sans text-[8px] font-semibold leading-none tabular-nums tracking-wide" : HOME_CENTER_PANE_TIMELINE_NEWS_TIMESTAMP_CLASS,
                   children: formatTimelineClock(item.timestamp)
                 }
               ),
@@ -107678,12 +107695,15 @@ function HomeCenterPaneTimelineRowInner({
   );
 }
 var HomeCenterPaneTimelineRow = (0, import_react99.memo)(HomeCenterPaneTimelineRowInner, (prev, next) => {
-  return prev.item.id === next.item.id && prev.item.timestampMs === next.item.timestampMs && prev.isExpanded === next.isExpanded && prev.expandedArticleUrl === next.expandedArticleUrl && prev.expandedSourceKind === next.expandedSourceKind && prev.onClipOpen === next.onClipOpen && prev.registerItemRef === next.registerItemRef && prev.registerScrollTargetRef === next.registerScrollTargetRef;
+  return prev.item.id === next.item.id && prev.item.timestampMs === next.item.timestampMs && prev.isExpanded === next.isExpanded && prev.expandedArticleUrl === next.expandedArticleUrl && prev.expandedSourceKind === next.expandedSourceKind && prev.onClipOpen === next.onClipOpen && prev.registerItemRef === next.registerItemRef && prev.registerScrollTargetRef === next.registerScrollTargetRef && prev.extensionSidebarWindframePresentation === next.extensionSidebarWindframePresentation;
 });
 
 // ../grarf/desktop/src/components/homeMvp/HomeCenterPaneTimelineSurface.tsx
 var import_jsx_runtime52 = __toESM(require_jsx_runtime(), 1);
-function HomeCenterPaneTimelineSurface({ onClipOpen }) {
+function HomeCenterPaneTimelineSurface({
+  onClipOpen,
+  extensionSidebarWindframePresentation = false
+}) {
   const liveItems = useCenterPaneTimelineItems();
   const expandedItemId = useCenterPaneTimelineExpansionStore((state3) => state3.expandedItemId);
   const expandedArticleUrl = useCenterPaneTimelineExpansionStore((state3) => state3.expandedArticleUrl);
@@ -107844,8 +107864,9 @@ function HomeCenterPaneTimelineSurface({ onClipOpen }) {
     "div",
     {
       ref: workspaceRef,
-      className: HOME_CENTER_PANE_TIMELINE_NEWS_FEED_CLASS,
-      "data-home-center-pane-timeline-news-presentation": true,
+      className: extensionSidebarWindframePresentation ? "flex h-full min-h-0 min-w-0 flex-col overflow-hidden" : HOME_CENTER_PANE_TIMELINE_NEWS_FEED_CLASS,
+      "data-home-center-pane-timeline-news-presentation": extensionSidebarWindframePresentation ? void 0 : true,
+      ...extensionSidebarWindframePresentation ? { "data-grarf-extension-windframe-timeline-feed": "" } : {},
       children: /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(
         "div",
         {
@@ -107876,7 +107897,8 @@ function HomeCenterPaneTimelineSurface({ onClipOpen }) {
                         expandedSourceKind: expandedItemId === item.id ? expandedSourceKind : null,
                         onClipOpen,
                         registerItemRef,
-                        registerScrollTargetRef
+                        registerScrollTargetRef,
+                        extensionSidebarWindframePresentation
                       }
                     )
                   },
@@ -107893,15 +107915,34 @@ function HomeCenterPaneTimelineSurface({ onClipOpen }) {
 
 // ../grarf/desktop/src/components/homeMvp/HomeCenterPaneTimelineMount.tsx
 var import_jsx_runtime53 = __toESM(require_jsx_runtime(), 1);
-function HomeCenterPaneTimelineMount({ onClipOpen, className }) {
+function HomeCenterPaneTimelineMount({
+  onClipOpen,
+  className,
+  extensionSidebarWindframePresentation = false
+}) {
+  const useExtensionWindframePresentation = extensionSidebarWindframePresentation;
   return /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(
     GuidedAttentionPanel,
     {
       paneId: "center",
       className: cn2("relative flex min-h-0 flex-1 flex-col overflow-hidden", className),
       "data-home-center-pane-timeline-mount": true,
-      "data-home-center-pane-timeline-news-presentation": true,
-      children: /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(
+      "data-home-center-pane-timeline-news-presentation": useExtensionWindframePresentation ? void 0 : true,
+      ...useExtensionWindframePresentation ? { "data-grarf-extension-windframe-timeline-mount": "" } : {},
+      children: useExtensionWindframePresentation ? /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(
+        "div",
+        {
+          className: "relative flex min-h-0 flex-1 flex-col overflow-hidden",
+          "data-center-pane-mode": "timeline",
+          children: /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("div", { className: cn2(PANE_CONTENT_CONTAIN, "h-full min-h-0"), children: /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(
+            HomeCenterPaneTimelineSurface,
+            {
+              onClipOpen,
+              extensionSidebarWindframePresentation: true
+            }
+          ) })
+        }
+      ) : /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(
         "div",
         {
           className: cn2(
@@ -155736,10 +155777,7 @@ function SportsBrowserPrototypeExtensionSidebarTimelineOverlay({
   return /* @__PURE__ */ (0, import_jsx_runtime249.jsxs)(
     "div",
     {
-      className: cn2(
-        "absolute inset-0 z-30 flex min-h-0 min-w-0 flex-col overflow-hidden",
-        HOME_CENTER_PANE_TIMELINE_NEWS_MARGIN_BG_CLASS
-      ),
+      className: "absolute inset-0 z-30 flex min-h-0 min-w-0 flex-col overflow-hidden",
       "data-grarf-extension-sidebar-timeline-overlay": true,
       "data-sports-browser-side-pane-timeline": true,
       role: "region",
@@ -155748,21 +155786,22 @@ function SportsBrowserPrototypeExtensionSidebarTimelineOverlay({
         /* @__PURE__ */ (0, import_jsx_runtime249.jsxs)(
           "div",
           {
-            className: cn2(
-              HOME_CENTER_PANE_TIMELINE_NEWS_EXPANSION_HEADER_CLASS,
-              "relative z-10 shrink-0"
-            ),
+            className: "relative z-10 shrink-0",
+            "data-grarf-extension-windframe-timeline-header": true,
             children: [
-              /* @__PURE__ */ (0, import_jsx_runtime249.jsx)("span", { className: HOME_CENTER_PANE_TIMELINE_NEWS_EXPANSION_TYPE_LABEL_CLASS, children: "Timeline" }),
+              /* @__PURE__ */ (0, import_jsx_runtime249.jsx)("span", { "data-grarf-extension-windframe-timeline-title": true, children: "Timeline" }),
               /* @__PURE__ */ (0, import_jsx_runtime249.jsx)(
                 "button",
                 {
                   type: "button",
                   onClick: onMinimize,
-                  className: HOME_CENTER_PANE_TIMELINE_NEWS_EXPANSION_BUTTON_CLASS,
+                  className: cn2(
+                    "inline-flex shrink-0 items-center justify-center uppercase",
+                    "focus-visible:outline-none"
+                  ),
                   "data-grarf-extension-sidebar-timeline-minimize": true,
                   "aria-label": "Minimize Timeline",
-                  children: "MINIMIZE"
+                  children: "Minimize"
                 }
               )
             ]
@@ -155772,7 +155811,8 @@ function SportsBrowserPrototypeExtensionSidebarTimelineOverlay({
           HomeCenterPaneTimelineMount,
           {
             onClipOpen,
-            className: "min-h-0 min-w-0 flex-1"
+            className: "min-h-0 min-w-0 flex-1",
+            extensionSidebarWindframePresentation: true
           }
         )
       ]
