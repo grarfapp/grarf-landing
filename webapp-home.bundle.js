@@ -147901,7 +147901,14 @@ function SportsBrowserTennisGameCardMetaHeader({
 }
 
 // ../grarf/desktop/src/components/homeMvp/SportsBrowserPrototypeBottomRailGames.tsx
+init_isGrarfWebRenderer();
 var import_jsx_runtime237 = __toESM(require_jsx_runtime(), 1);
+function resolveExtensionWindframeFeaturedCardState(game) {
+  const variant = resolveSportsBrowserPrototypeSidebarGameVariant(game);
+  if (variant === "live") return "live";
+  if (variant === "upcoming") return "upcoming";
+  return "final";
+}
 var COMMAND_CENTER_CARD_GRID_CLASS = "relative grid min-h-0 min-w-0 w-full flex-1 grid-cols-[minmax(0,1fr)_1.25rem_1.75rem] grid-rows-[auto_auto_auto_auto] items-center gap-x-[0.7ch] gap-y-0.5";
 var COMMAND_CENTER_CENTER_STACK_OVERLAY_CLASS = "pointer-events-none absolute inset-0 z-[1] grid grid-rows-[auto_auto_auto] items-center justify-items-center gap-y-0.5 px-[calc(1.75rem+0.7ch)]";
 var COMMAND_CENTER_TIMING_IN_STACK_CLASS = "text-center text-[9px] font-medium leading-none tabular-nums tracking-wide text-[#1a1a1a]";
@@ -149531,6 +149538,7 @@ function SportsBrowserPrototypeBottomRailGames({
       {
         className: cn2("relative z-0 flex w-full flex-col font-sans", MENU_SURFACE, className),
         "data-sports-browser-prototype-command-center-games": true,
+        "data-grarf-extension-command-center-live-count": isGrarfExtensionRenderer() ? liveEligibleCount : void 0,
         "aria-label": "Command Center games",
         children: [
           showCommandCenterSidebarAlertRow && lifecycleAlert ? /* @__PURE__ */ (0, import_jsx_runtime237.jsxs)(
@@ -149572,6 +149580,7 @@ function SportsBrowserPrototypeBottomRailGames({
                 ),
                 onClick: onGameSelect ? () => onGameSelect(game) : void 0,
                 "data-sports-browser-prototype-command-center-game-row": onGameSelect ? "" : void 0,
+                "data-grarf-extension-windframe-card-state": isGrarfExtensionRenderer() ? resolveExtensionWindframeFeaturedCardState(game) : void 0,
                 "data-game-id": onGameSelect ? game.id : void 0,
                 children: /* @__PURE__ */ (0, import_jsx_runtime237.jsx)(
                   BottomRailGameCard,
@@ -154974,42 +154983,60 @@ function SportsBrowserPrototypeLeftNav({
                   className: "flex min-h-0 flex-1 flex-col overflow-y-auto overflow-x-hidden overscroll-contain",
                   "data-sports-browser-prototype-left-nav-scroll": true,
                   children: /* @__PURE__ */ (0, import_jsx_runtime245.jsxs)("div", { className: "shrink-0", children: [
-                    onCommandCenterBrowserTabSelect ? /* @__PURE__ */ (0, import_jsx_runtime245.jsx)(
-                      "button",
-                      {
-                        type: "button",
-                        className: cn2(
-                          "w-full border-t px-4 py-2 text-left text-[13px] font-bold uppercase tracking-[0.06em] text-[#1a1a1a] transition-opacity hover:opacity-75",
-                          RULE3,
-                          "border-t-0"
-                        ),
-                        "data-sports-browser-prototype-command-center-section": true,
-                        onClick: onCommandCenterBrowserTabSelect,
-                        children: "COMMAND CENTER"
-                      }
-                    ) : /* @__PURE__ */ (0, import_jsx_runtime245.jsx)(
-                      "div",
-                      {
-                        className: cn2(
-                          "border-t px-4 py-2 text-[13px] font-bold uppercase tracking-[0.06em] text-[#1a1a1a]",
-                          RULE3,
-                          "border-t-0"
-                        ),
-                        "data-sports-browser-prototype-command-center-section": true,
-                        children: "COMMAND CENTER"
-                      }
-                    ),
-                    /* @__PURE__ */ (0, import_jsx_runtime245.jsx)(
-                      SportsBrowserPrototypeBottomRailGames,
-                      {
-                        layout: "sidebar",
-                        onGameSelect,
-                        onGameTeamSelect,
-                        onWatchLive,
-                        canShowWatchLive,
-                        onSocialLive
-                      }
-                    ),
+                    isGrarfExtensionRenderer() ? /* @__PURE__ */ (0, import_jsx_runtime245.jsxs)("div", { className: "shrink-0", "data-grarf-extension-windframe-featured": true, children: [
+                      /* @__PURE__ */ (0, import_jsx_runtime245.jsxs)("div", { "data-grarf-extension-windframe-featured-header": true, children: [
+                        /* @__PURE__ */ (0, import_jsx_runtime245.jsx)("span", { "data-grarf-extension-windframe-featured-title": true, children: "COMMAND CENTER" }),
+                        /* @__PURE__ */ (0, import_jsx_runtime245.jsx)("span", { "data-grarf-extension-windframe-live-now": true, "aria-live": "polite", children: "Live now" })
+                      ] }),
+                      /* @__PURE__ */ (0, import_jsx_runtime245.jsx)(
+                        SportsBrowserPrototypeBottomRailGames,
+                        {
+                          layout: "sidebar",
+                          onGameSelect,
+                          onGameTeamSelect,
+                          onWatchLive,
+                          canShowWatchLive,
+                          onSocialLive
+                        }
+                      )
+                    ] }) : /* @__PURE__ */ (0, import_jsx_runtime245.jsxs)(import_jsx_runtime245.Fragment, { children: [
+                      onCommandCenterBrowserTabSelect ? /* @__PURE__ */ (0, import_jsx_runtime245.jsx)(
+                        "button",
+                        {
+                          type: "button",
+                          className: cn2(
+                            "w-full border-t px-4 py-2 text-left text-[13px] font-bold uppercase tracking-[0.06em] text-[#1a1a1a] transition-opacity hover:opacity-75",
+                            RULE3,
+                            "border-t-0"
+                          ),
+                          "data-sports-browser-prototype-command-center-section": true,
+                          onClick: onCommandCenterBrowserTabSelect,
+                          children: "COMMAND CENTER"
+                        }
+                      ) : /* @__PURE__ */ (0, import_jsx_runtime245.jsx)(
+                        "div",
+                        {
+                          className: cn2(
+                            "border-t px-4 py-2 text-[13px] font-bold uppercase tracking-[0.06em] text-[#1a1a1a]",
+                            RULE3,
+                            "border-t-0"
+                          ),
+                          "data-sports-browser-prototype-command-center-section": true,
+                          children: "COMMAND CENTER"
+                        }
+                      ),
+                      /* @__PURE__ */ (0, import_jsx_runtime245.jsx)(
+                        SportsBrowserPrototypeBottomRailGames,
+                        {
+                          layout: "sidebar",
+                          onGameSelect,
+                          onGameTeamSelect,
+                          onWatchLive,
+                          canShowWatchLive,
+                          onSocialLive
+                        }
+                      )
+                    ] }),
                     /* @__PURE__ */ (0, import_jsx_runtime245.jsx)(
                       SportsBrowserPrototypeTemporaryNavPrototype,
                       {
