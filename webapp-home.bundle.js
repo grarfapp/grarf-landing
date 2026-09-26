@@ -153009,6 +153009,11 @@ function formatCompactPreviousCalendarDate(referenceDate = /* @__PURE__ */ new D
 function resolveSidebarGameVariant(game) {
   return resolveSportsBrowserPrototypeSidebarGameVariant(game);
 }
+function resolveExtensionWindframeListGameState(variant) {
+  if (variant === "live") return "live";
+  if (variant === "upcoming") return "upcoming";
+  return "final";
+}
 function SidebarLeaguesTabTeamsIconMark() {
   const innerLeft = 1;
   const innerRight = 11;
@@ -153257,7 +153262,8 @@ function SidebarTemporalGameRowContainer({
   className,
   style,
   children,
-  isSelected = false
+  isSelected = false,
+  windframeListGameState
 }) {
   return /* @__PURE__ */ (0, import_jsx_runtime245.jsx)(
     "div",
@@ -153274,6 +153280,7 @@ function SidebarTemporalGameRowContainer({
       "data-game-id": onSelect ? game.id : void 0,
       "aria-current": isSelected ? "true" : void 0,
       "data-sports-browser-prototype-sidebar-game-row-selected": isSelected ? "" : void 0,
+      "data-grarf-extension-windframe-list-game-state": windframeListGameState,
       children
     }
   );
@@ -153447,6 +153454,7 @@ function SidebarTemporalGameRow({
     if (!teamWorkspaceEnabled || !onGameTeamSelect) return;
     onGameTeamSelect(game, side);
   };
+  const extensionWindframeListGameState = isGrarfExtensionRenderer() ? resolveExtensionWindframeListGameState(variant) : void 0;
   if (model.kind === "event") {
     const logoUrl = resolveDarkThemeLogoUrl(game, "away") ?? (game.league ? resolveGamesSpineLeagueLogoUrl(game.league, { game }) : void 0);
     const eventName = model.event.eventName.trim();
@@ -153458,6 +153466,7 @@ function SidebarTemporalGameRow({
         onSelect,
         game,
         isSelected,
+        windframeListGameState: extensionWindframeListGameState,
         className: SIDEBAR_GAME_ROW_CLASS,
         children: [
           /* @__PURE__ */ (0, import_jsx_runtime245.jsx)(SidebarTemporalGameRowTennisMetaHeader, { game }),
@@ -153536,6 +153545,7 @@ function SidebarTemporalGameRow({
         onSelect,
         game,
         isSelected,
+        windframeListGameState: extensionWindframeListGameState,
         className: SIDEBAR_GAME_ROW_CLASS,
         children: [
           /* @__PURE__ */ (0, import_jsx_runtime245.jsx)(SidebarTemporalGameRowTennisMetaHeader, { game }),
@@ -153597,6 +153607,7 @@ function SidebarTemporalGameRow({
       onSelect,
       game,
       isSelected,
+      windframeListGameState: extensionWindframeListGameState,
       className: SIDEBAR_GAME_ROW_CLASS,
       children: [
         /* @__PURE__ */ (0, import_jsx_runtime245.jsx)(SidebarTemporalGameRowTennisMetaHeader, { game }),
