@@ -150390,7 +150390,7 @@ function resolveSportsBrowserPrototypeTemporaryNavGameInlineHierarchy(game, pane
 
 // ../grarf/desktop/src/components/homeMvp/SportsBrowserPrototypeTemporaryNavTeamContentInlineRows.tsx
 var import_jsx_runtime238 = __toESM(require_jsx_runtime(), 1);
-var INLINE_ROW_BASE = "flex w-full min-w-0 items-center justify-between gap-2 py-[4px] text-left text-[13px] uppercase tracking-[0.04em] text-[#1a1a1a] transition-colors hover:bg-[#e9e4db]";
+var INLINE_ROW_BASE = "grarf-temporary-nav-inline-row flex w-full min-w-0 items-center justify-between gap-2 py-[4px] text-left text-[13px] uppercase tracking-[0.04em] text-[#1a1a1a] transition-colors hover:bg-[#e9e4db]";
 function resolveInlineIndentClass(depth) {
   if (depth === 2) return "pl-10 pr-3";
   if (depth === 3) return "pl-14 pr-3";
@@ -150485,7 +150485,7 @@ var LEAGUES_INLINE_POPULATED_TEAM_LIST_LEAGUE_KEYS = /* @__PURE__ */ new Set([
   "SERIEA",
   "LIGUE1"
 ]);
-var INLINE_ROW_BASE2 = "flex w-full min-w-0 items-center justify-between gap-2 py-[4px] text-left text-[13px] uppercase tracking-[0.04em] text-[#1a1a1a] transition-colors hover:bg-[#e9e4db]";
+var INLINE_ROW_BASE2 = "grarf-temporary-nav-inline-row flex w-full min-w-0 items-center justify-between gap-2 py-[4px] text-left text-[13px] uppercase tracking-[0.04em] text-[#1a1a1a] transition-colors hover:bg-[#e9e4db]";
 function resolveInlineIndentClass2(depth) {
   if (depth === 0) return "pl-4 pr-3";
   if (depth === 1) return "pl-6 pr-3";
@@ -150736,6 +150736,9 @@ function SportsBrowserPrototypeTemporaryNavLeaguesInlineTree({
                 resolveInlineIndentClass2(0),
                 leagueSelected ? "font-semibold" : "font-normal"
               ),
+              "data-sports-browser-prototype-sidebar-league-row": "",
+              "data-sports-browser-prototype-sidebar-league-key": leagueKey,
+              "data-sports-browser-prototype-sidebar-league-row-selected": leagueSelected ? "" : void 0,
               children: [
                 /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(
                   "button",
@@ -150824,7 +150827,7 @@ function resolveTemporaryNavMlbChildNavigateAction(gameParent, child, websiteInd
     ...websiteIndex !== void 0 ? { websiteIndex } : {}
   };
 }
-var INLINE_ROW_BASE3 = "flex w-full min-w-0 items-center justify-between gap-2 py-[4px] text-left text-[13px] uppercase tracking-[0.04em] text-[#1a1a1a] transition-colors hover:bg-[#e9e4db]";
+var INLINE_ROW_BASE3 = "grarf-temporary-nav-inline-row flex w-full min-w-0 items-center justify-between gap-2 py-[4px] text-left text-[13px] uppercase tracking-[0.04em] text-[#1a1a1a] transition-colors hover:bg-[#e9e4db]";
 function resolveInlineIndentClass3(depth) {
   if (depth === 0) return "pl-4 pr-3";
   if (depth === 1) return "pl-6 pr-3";
@@ -150930,22 +150933,37 @@ function SportsBrowserPrototypeTemporaryNavGamesInlineTree({
     [onGameSelect]
   );
   return /* @__PURE__ */ (0, import_jsx_runtime240.jsx)(import_jsx_runtime240.Fragment, { children: visibleLeagueSections.map((group) => /* @__PURE__ */ (0, import_jsx_runtime240.jsxs)(import_react271.Fragment, { children: [
-    group.title ? /* @__PURE__ */ (0, import_jsx_runtime240.jsx)("div", { className: "px-6 py-[4px] text-[13px] font-semibold uppercase tracking-[0.04em] text-[#8a847c]", children: group.title }) : null,
+    group.title ? /* @__PURE__ */ (0, import_jsx_runtime240.jsx)(
+      "div",
+      {
+        className: "px-6 py-[4px] text-[13px] font-semibold uppercase tracking-[0.04em] text-[#8a847c]",
+        "data-sports-browser-prototype-sidebar-leagues-sport-group": group.sectionId,
+        children: group.title
+      }
+    ) : null,
     group.leagues.map(({ leagueKey, label, games }) => {
       const leagueExpanded = expandedLeagueKeys.has(leagueKey);
       return /* @__PURE__ */ (0, import_jsx_runtime240.jsxs)("div", { children: [
-        /* @__PURE__ */ (0, import_jsx_runtime240.jsxs)("div", { className: cn2(INLINE_ROW_BASE3, resolveInlineIndentClass3(0), "font-normal"), children: [
-          /* @__PURE__ */ (0, import_jsx_runtime240.jsx)(
-            "button",
-            {
-              type: "button",
-              className: "min-w-0 flex-1 truncate text-left",
-              onClick: () => toggleLeague(leagueKey),
-              children: label
-            }
-          ),
-          /* @__PURE__ */ (0, import_jsx_runtime240.jsx)("button", { type: "button", className: "inline-flex shrink-0", onClick: () => toggleLeague(leagueKey), children: leagueExpanded ? /* @__PURE__ */ (0, import_jsx_runtime240.jsx)(ChevronDown, { size: 12, strokeWidth: 2, className: "rotate-180", "aria-hidden": true }) : /* @__PURE__ */ (0, import_jsx_runtime240.jsx)(ChevronRight, { size: 12, strokeWidth: 2, "aria-hidden": true }) })
-        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime240.jsxs)(
+          "div",
+          {
+            className: cn2(INLINE_ROW_BASE3, resolveInlineIndentClass3(0), "font-normal"),
+            "data-sports-browser-prototype-sidebar-league-row": "",
+            "data-sports-browser-prototype-sidebar-league-key": leagueKey,
+            children: [
+              /* @__PURE__ */ (0, import_jsx_runtime240.jsx)(
+                "button",
+                {
+                  type: "button",
+                  className: "min-w-0 flex-1 truncate text-left",
+                  onClick: () => toggleLeague(leagueKey),
+                  children: label
+                }
+              ),
+              /* @__PURE__ */ (0, import_jsx_runtime240.jsx)("button", { type: "button", className: "inline-flex shrink-0", onClick: () => toggleLeague(leagueKey), children: leagueExpanded ? /* @__PURE__ */ (0, import_jsx_runtime240.jsx)(ChevronDown, { size: 12, strokeWidth: 2, className: "rotate-180", "aria-hidden": true }) : /* @__PURE__ */ (0, import_jsx_runtime240.jsx)(ChevronRight, { size: 12, strokeWidth: 2, "aria-hidden": true }) })
+            ]
+          }
+        ),
         leagueExpanded ? games.map((game) => {
           const gameExpanded = expandedGameIds.has(game.id);
           const hierarchy = gameExpanded ? resolveSportsBrowserPrototypeTemporaryNavGameInlineHierarchy(game) : null;
@@ -151272,7 +151290,7 @@ var TEMPORARY_NAV_TEAMS_INLINE_LEAGUE_KEYS = /* @__PURE__ */ new Set([
   "SERIEA",
   "LIGUE1"
 ]);
-var INLINE_ROW_BASE4 = "flex w-full min-w-0 items-center justify-between gap-2 py-[4px] text-left text-[13px] uppercase tracking-[0.04em] text-[#1a1a1a] transition-colors hover:bg-[#e9e4db]";
+var INLINE_ROW_BASE4 = "grarf-temporary-nav-inline-row flex w-full min-w-0 items-center justify-between gap-2 py-[4px] text-left text-[13px] uppercase tracking-[0.04em] text-[#1a1a1a] transition-colors hover:bg-[#e9e4db]";
 function resolveInlineIndentClass4(depth) {
   if (depth === 0) return "pl-4 pr-3";
   if (depth === 1) return "pl-6 pr-3";
@@ -151346,27 +151364,35 @@ function SportsBrowserPrototypeTemporaryNavTeamsInlineTree({
       }
       const leagueExpanded = expandedLeagueKeys.has(leagueKey);
       return /* @__PURE__ */ (0, import_jsx_runtime241.jsxs)("div", { children: [
-        /* @__PURE__ */ (0, import_jsx_runtime241.jsxs)("div", { className: cn2(INLINE_ROW_BASE4, resolveInlineIndentClass4(0), "font-normal"), children: [
-          /* @__PURE__ */ (0, import_jsx_runtime241.jsx)(
-            "button",
-            {
-              type: "button",
-              className: "min-w-0 flex-1 truncate text-left",
-              onClick: () => toggleLeague(leagueKey),
-              children: label
-            }
-          ),
-          /* @__PURE__ */ (0, import_jsx_runtime241.jsx)(
-            "button",
-            {
-              type: "button",
-              className: "inline-flex shrink-0 items-center",
-              "aria-expanded": leagueExpanded,
-              onClick: () => toggleLeague(leagueKey),
-              children: leagueExpanded ? /* @__PURE__ */ (0, import_jsx_runtime241.jsx)(ChevronDown, { size: 12, strokeWidth: 2, className: "rotate-180", "aria-hidden": true }) : /* @__PURE__ */ (0, import_jsx_runtime241.jsx)(ChevronRight, { size: 12, strokeWidth: 2, "aria-hidden": true })
-            }
-          )
-        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime241.jsxs)(
+          "div",
+          {
+            className: cn2(INLINE_ROW_BASE4, resolveInlineIndentClass4(0), "font-normal"),
+            "data-sports-browser-prototype-sidebar-league-row": "",
+            "data-sports-browser-prototype-sidebar-league-key": leagueKey,
+            children: [
+              /* @__PURE__ */ (0, import_jsx_runtime241.jsx)(
+                "button",
+                {
+                  type: "button",
+                  className: "min-w-0 flex-1 truncate text-left",
+                  onClick: () => toggleLeague(leagueKey),
+                  children: label
+                }
+              ),
+              /* @__PURE__ */ (0, import_jsx_runtime241.jsx)(
+                "button",
+                {
+                  type: "button",
+                  className: "inline-flex shrink-0 items-center",
+                  "aria-expanded": leagueExpanded,
+                  onClick: () => toggleLeague(leagueKey),
+                  children: leagueExpanded ? /* @__PURE__ */ (0, import_jsx_runtime241.jsx)(ChevronDown, { size: 12, strokeWidth: 2, className: "rotate-180", "aria-hidden": true }) : /* @__PURE__ */ (0, import_jsx_runtime241.jsx)(ChevronRight, { size: 12, strokeWidth: 2, "aria-hidden": true })
+                }
+              )
+            ]
+          }
+        ),
         leagueExpanded ? /* @__PURE__ */ (0, import_jsx_runtime241.jsxs)(import_jsx_runtime241.Fragment, { children: [
           renderTeamListPanel(leagueKey, handleTeamSelect),
           selectedTeam?.leagueKey === leagueKey ? /* @__PURE__ */ (0, import_jsx_runtime241.jsx)(
@@ -151918,7 +151944,7 @@ function SportsBrowserPrototypeTemporaryNavPrototype({
 init_define_import_meta_env();
 var import_react274 = __toESM(require_react(), 1);
 var import_jsx_runtime243 = __toESM(require_jsx_runtime(), 1);
-var INLINE_ROW_BASE5 = "flex w-full min-w-0 items-center justify-between gap-2 py-[4px] text-left text-[13px] uppercase tracking-[0.04em] text-[#1a1a1a] transition-colors hover:bg-[#e9e4db]";
+var INLINE_ROW_BASE5 = "grarf-temporary-nav-inline-row flex w-full min-w-0 items-center justify-between gap-2 py-[4px] text-left text-[13px] uppercase tracking-[0.04em] text-[#1a1a1a] transition-colors hover:bg-[#e9e4db]";
 function resolveInlineIndentClass5(depth, depthBase = 0) {
   const total = depth + depthBase;
   if (total <= 0) return "pl-4 pr-3";
