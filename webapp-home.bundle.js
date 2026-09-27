@@ -150446,6 +150446,22 @@ function SportsBrowserPrototypeTemporaryNavTeamContentInlineRows({
   const [expandedSectionKeys, setExpandedSectionKeys] = (0, import_react269.useState)(
     () => /* @__PURE__ */ new Set()
   );
+  const expandSectionKey = (sectionKey) => {
+    setExpandedSectionKeys((previous) => {
+      if (previous.has(sectionKey)) return previous;
+      const next = new Set(previous);
+      next.add(sectionKey);
+      return next;
+    });
+  };
+  const toggleSectionKey = (sectionKey) => {
+    setExpandedSectionKeys((previous) => {
+      const next = new Set(previous);
+      if (next.has(sectionKey)) next.delete(sectionKey);
+      else next.add(sectionKey);
+      return next;
+    });
+  };
   const contentSections = (0, import_react269.useMemo)(() => {
     const game = buildSportsBrowserPrototypeLeaguesTabTeamContextGame(teamInput);
     const context2 = resolveGameBrowserContext(game);
@@ -151224,11 +151240,21 @@ function SportsBrowserPrototypeTemporaryNavGamesInlineTree({
                             {
                               type: "button",
                               className: "min-w-0 flex-1 truncate text-left",
-                              onClick: () => onGameInlineNavigate?.(game, {
-                                kind: "standardTeamSection",
-                                sectionIndex: parent.sectionIndex,
-                                teamSectionIndex: teamSection.sectionIndex
-                              }),
+                              onClick: () => {
+                                onGameInlineNavigate?.(game, {
+                                  kind: "standardTeamSection",
+                                  sectionIndex: parent.sectionIndex,
+                                  teamSectionIndex: teamSection.sectionIndex
+                                });
+                                if (teamSection.websites.length > 0) {
+                                  setExpandedTeamSectionKeys((previous) => {
+                                    if (previous.has(teamKey)) return previous;
+                                    const next = new Set(previous);
+                                    next.add(teamKey);
+                                    return next;
+                                  });
+                                }
+                              },
                               children: teamSection.label
                             }
                           ),
@@ -152055,6 +152081,14 @@ function SportsBrowserPrototypeTemporaryNavSingleGameInlineMenu({
       return next;
     });
   };
+  const expandTeamSectionKey = (teamKey) => {
+    setExpandedTeamSectionKeys((previous) => {
+      if (previous.has(teamKey)) return previous;
+      const next = new Set(previous);
+      next.add(teamKey);
+      return next;
+    });
+  };
   return /* @__PURE__ */ (0, import_jsx_runtime243.jsx)(
     "div",
     {
@@ -152261,7 +152295,7 @@ function SportsBrowserPrototypeTemporaryNavSingleGameInlineMenu({
                             teamSectionIndex: teamSection.sectionIndex
                           });
                           if (teamSection.websites.length > 0) {
-                            expandChildKey(teamKey);
+                            expandTeamSectionKey(teamKey);
                           }
                         },
                         children: teamSection.label
