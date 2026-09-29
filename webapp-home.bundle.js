@@ -162224,7 +162224,7 @@ function SportsBrowserPrototypeLeftNav({
                   "data-sports-browser-prototype-left-nav-scroll": true,
                   children: /* @__PURE__ */ (0, import_jsx_runtime262.jsxs)("div", { className: "shrink-0", children: [
                     isGrarfExtensionRenderer() ? /* @__PURE__ */ (0, import_jsx_runtime262.jsxs)("div", { className: "shrink-0", "data-grarf-extension-shadcn-featured": true, children: [
-                      /* @__PURE__ */ (0, import_jsx_runtime262.jsxs)("div", { className: "flex items-center justify-between gap-2 px-1 pb-2", children: [
+                      /* @__PURE__ */ (0, import_jsx_runtime262.jsxs)("div", { className: "flex items-center justify-between gap-2 px-3 pb-2", children: [
                         /* @__PURE__ */ (0, import_jsx_runtime262.jsx)("h2", { className: "text-base font-semibold tracking-tight", children: "Command Center" }),
                         /* @__PURE__ */ (0, import_jsx_runtime262.jsx)(
                           Badge,
