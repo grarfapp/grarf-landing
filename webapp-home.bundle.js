@@ -148027,44 +148027,41 @@ function resolveMlbUpcomingGameParentChildSections(game, context2, pane) {
 function resolveMlbTeamParentChildSections(game, context2, pane, parent, workspace) {
   if (workspace === "upcoming") {
     return SPORTS_BROWSER_PROTOTYPE_LEAGUE_CONTEXT_SECTIONS.map((teamSection, teamSectionIndex) => {
-      const childPane2 = {
+      const childPane = {
         ...pane,
         gameContextMlbUpcomingParentTab: parent,
         gameContextSection: parent,
         gameContextTeamSection: teamSection
       };
-      const websites2 = resolveSportsBrowserPrototypeGameContextNavSectionWebsites(
+      const websites = resolveSportsBrowserPrototypeGameContextNavSectionWebsites(
         game,
-        childPane2,
+        childPane,
         context2,
         parent
       );
       return {
         section: teamSection,
         label: SPORTS_BROWSER_PROTOTYPE_LEAGUE_CONTEXT_SECTION_LABELS[teamSection],
-        websites: mapWebsiteRows(websites2),
+        websites: mapWebsiteRows(websites),
         teamLeagueSectionIndex: teamSectionIndex
       };
     });
   }
-  const childPane = {
-    ...pane,
-    gameContextMlbUpcomingParentTab: parent,
-    gameContextSection: parent,
-    gameContextTeamSection: "news"
-  };
-  const websites = resolveSportsBrowserPrototypeGameContextNavSectionWebsites(
-    game,
-    childPane,
-    context2,
-    parent
-  );
-  return MLB_LIVE_GAME_WORKSPACE_TEAM_CHILD_LABELS.map((label, index2) => ({
-    section: `mlb-live-team-${index2}`,
-    label,
-    websites: websites[index2] ? [{ label: websites[index2].label, websiteIndex: index2 }] : [],
-    mlbLiveTeamWebsiteIndex: index2
-  }));
+  return MLB_LIVE_GAME_WORKSPACE_TEAM_CHILD_LABELS.map((label, index2) => {
+    const sectionIndex = index2;
+    const teamWebsites = resolveSportsBrowserPrototypeTemporaryNavTeamContentSectionWebsites(
+      game,
+      context2,
+      parent,
+      sectionIndex
+    );
+    return {
+      section: `mlb-live-team-${index2}`,
+      label,
+      websites: mapWebsiteRows(teamWebsites),
+      mlbLiveTeamWebsiteIndex: index2
+    };
+  });
 }
 function resolveSportsBrowserPrototypeTemporaryNavGameInlineHierarchy(game, paneSeed) {
   const context2 = resolveGameBrowserContext(game);
@@ -149422,7 +149419,7 @@ function GrarfExtensionCommandCenterWatchAction({
         event.stopPropagation();
         onWatchLive(gameId);
       },
-      children: "Watch Live"
+      children: "Watch"
     }
   );
 }
@@ -149446,7 +149443,7 @@ function GrarfExtensionCommandCenterFollowAction({
         onPress();
       },
       children: [
-        "Follow Live",
+        "Follow",
         expanded ? " ^" : ""
       ]
     }
@@ -150955,7 +150952,7 @@ function SportsBrowserPrototypeBottomRailGames({
   }, [gameCount, layout, showTransientSlot]);
   if (layout === "sidebar") {
     const extensionCommandCenter = isGrarfExtensionRenderer();
-    return /* @__PURE__ */ (0, import_jsx_runtime239.jsxs)(
+    return /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(
       "div",
       {
         className: cn2(
@@ -150966,39 +150963,101 @@ function SportsBrowserPrototypeBottomRailGames({
         "data-sports-browser-prototype-command-center-games": true,
         "data-grarf-extension-command-center-live-count": isGrarfExtensionRenderer() ? liveEligibleCount : void 0,
         "aria-label": "Command Center games",
-        children: [
-          showCommandCenterSidebarAlertRow && lifecycleAlert ? /* @__PURE__ */ (0, import_jsx_runtime239.jsxs)(
-            "div",
-            {
-              className: cn2(
-                "flex w-full shrink-0 flex-col overflow-hidden border-b",
-                extensionCommandCenter ? "border-border bg-muted/40" : RULE
-              ),
-              "data-bottom-rail-update-slot": true,
-              "data-sports-browser-prototype-command-center-alert-row": "",
-              children: [
-                /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(
+        children: /* @__PURE__ */ (0, import_jsx_runtime239.jsxs)(
+          "div",
+          {
+            ref: gamesRef,
+            className: "flex w-full flex-col gap-[10px]",
+            "data-bottom-rail-games-strip": true,
+            children: [
+              showCommandCenterSidebarAlertRow && lifecycleAlert && resolvedAlertGame ? /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(
+                "div",
+                {
+                  className: "w-full shrink-0 overflow-hidden",
+                  "data-bottom-rail-update-slot": true,
+                  style: {
+                    maxHeight: slotExpanded ? 1200 : 0,
+                    transition: `max-height ${TOP_RAIL_ANIMATION_MS2}ms cubic-bezier(0.4, 0, 0.2, 1)`
+                  },
+                  children: /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(
+                    "div",
+                    {
+                      style: {
+                        transform: cardVisible ? "translateY(0)" : "translateY(-100%)",
+                        opacity: cardVisible ? 1 : 0,
+                        transition: `transform ${TOP_RAIL_ANIMATION_MS2}ms cubic-bezier(0.4, 0, 0.2, 1), opacity ${TOP_RAIL_ANIMATION_MS2}ms ease-out`
+                      },
+                      children: /* @__PURE__ */ (0, import_jsx_runtime239.jsxs)(
+                        "div",
+                        {
+                          className: cn2(
+                            "flex w-full shrink-0 flex-col overflow-hidden border-b",
+                            extensionCommandCenter ? "border-border bg-muted/40" : RULE
+                          ),
+                          "data-sports-browser-prototype-command-center-alert-row": "",
+                          children: [
+                            /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(
+                              "div",
+                              {
+                                className: cn2(
+                                  "shrink-0 border-b px-4 py-1 text-[10px] font-medium uppercase leading-none tracking-wide",
+                                  extensionCommandCenter ? "border-border text-muted-foreground" : "border-[#d5d0c6]/80 py-0.5 text-[8px] font-semibold tracking-[0.12em] text-[#6a6a6a]"
+                                ),
+                                children: resolveGamesSpineTransientAlertHeaderLabel(lifecycleAlert.type)
+                              }
+                            ),
+                            /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(
+                              "div",
+                              {
+                                className: cn2(
+                                  "flex w-full shrink-0",
+                                  extensionCommandCenter ? "min-h-0 overflow-visible" : "min-h-11 overflow-hidden"
+                                ),
+                                children: /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(
+                                  BottomRailGameCard,
+                                  {
+                                    game: resolvedAlertGame,
+                                    flashSpec: activeFlashSpec,
+                                    onWatchLive,
+                                    canShowWatchLive,
+                                    onGameSelect,
+                                    onGameTeamSelect,
+                                    onSocialLive,
+                                    presentation: "commandCenter",
+                                    ...commandCenterCardContext
+                                  }
+                                )
+                              }
+                            )
+                          ]
+                        }
+                      )
+                    }
+                  )
+                }
+              ) : null,
+              displayGames.map((game) => {
+                const isAlertTarget = presentAlert != null && isSameTopRailGame2(game, presentAlert.gameId);
+                const showFlash = isAlertTarget && (presentPlacement === "best-event" || presentPlacement === "promote");
+                return /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(
                   "div",
                   {
+                    "data-top-rail-game-id": game.id,
+                    "data-bottom-rail-game-card": true,
                     className: cn2(
-                      "shrink-0 border-b px-4 py-1 text-[10px] font-medium uppercase leading-none tracking-wide",
-                      extensionCommandCenter ? "border-border text-muted-foreground" : "border-[#d5d0c6]/80 py-0.5 text-[8px] font-semibold tracking-[0.12em] text-[#6a6a6a]"
+                      "flex min-w-0 shrink-0",
+                      extensionCommandCenter ? "h-auto min-h-0 w-full max-w-none shrink-0 overflow-visible" : "min-h-11 w-full overflow-hidden",
+                      onGameSelect && (extensionCommandCenter ? "cursor-pointer transition-colors hover:bg-accent/80" : "cursor-pointer transition-colors hover:bg-[#e9e4db]")
                     ),
-                    children: resolveGamesSpineTransientAlertHeaderLabel(lifecycleAlert.type)
-                  }
-                ),
-                /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(
-                  "div",
-                  {
-                    className: cn2(
-                      "flex w-full shrink-0",
-                      extensionCommandCenter ? "min-h-0 overflow-visible" : "min-h-11 overflow-hidden"
-                    ),
+                    onClick: onGameSelect ? () => onGameSelect(game) : void 0,
+                    "data-sports-browser-prototype-command-center-game-row": onGameSelect ? "" : void 0,
+                    "data-grarf-extension-windframe-card-state": isGrarfExtensionRenderer() ? resolveExtensionWindframeFeaturedCardState(game) : void 0,
+                    "data-game-id": onGameSelect ? game.id : void 0,
                     children: /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(
                       BottomRailGameCard,
                       {
-                        game: resolvedAlertGame,
-                        flashSpec: activeFlashSpec,
+                        game,
+                        flashSpec: showFlash ? activeFlashSpec : void 0,
                         onWatchLive,
                         canShowWatchLive,
                         onGameSelect,
@@ -151008,48 +151067,13 @@ function SportsBrowserPrototypeBottomRailGames({
                         ...commandCenterCardContext
                       }
                     )
-                  }
-                )
-              ]
-            }
-          ) : null,
-          /* @__PURE__ */ (0, import_jsx_runtime239.jsx)("div", { ref: gamesRef, className: "flex w-full flex-col", "data-bottom-rail-games-strip": true, children: displayGames.map((game, index2) => {
-            const isAlertTarget = presentAlert != null && isSameTopRailGame2(game, presentAlert.gameId);
-            const showFlash = isAlertTarget && (presentPlacement === "best-event" || presentPlacement === "promote");
-            return /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(
-              "div",
-              {
-                "data-top-rail-game-id": game.id,
-                "data-bottom-rail-game-card": true,
-                className: cn2(
-                  "flex min-w-0 shrink-0",
-                  extensionCommandCenter ? "h-auto min-h-0 w-full max-w-none shrink-0 overflow-visible" : "min-h-11 w-full overflow-hidden",
-                  index2 > 0 && cn2("border-t", extensionCommandCenter ? "border-border" : RULE),
-                  onGameSelect && (extensionCommandCenter ? "cursor-pointer transition-colors hover:bg-accent/80" : "cursor-pointer transition-colors hover:bg-[#e9e4db]")
-                ),
-                onClick: onGameSelect ? () => onGameSelect(game) : void 0,
-                "data-sports-browser-prototype-command-center-game-row": onGameSelect ? "" : void 0,
-                "data-grarf-extension-windframe-card-state": isGrarfExtensionRenderer() ? resolveExtensionWindframeFeaturedCardState(game) : void 0,
-                "data-game-id": onGameSelect ? game.id : void 0,
-                children: /* @__PURE__ */ (0, import_jsx_runtime239.jsx)(
-                  BottomRailGameCard,
-                  {
-                    game,
-                    flashSpec: showFlash ? activeFlashSpec : void 0,
-                    onWatchLive,
-                    canShowWatchLive,
-                    onGameSelect,
-                    onGameTeamSelect,
-                    onSocialLive,
-                    presentation: "commandCenter",
-                    ...commandCenterCardContext
-                  }
-                )
-              },
-              game.id
-            );
-          }) })
-        ]
+                  },
+                  game.id
+                );
+              })
+            ]
+          }
+        )
       }
     );
   }
@@ -158771,7 +158795,7 @@ function SportsBrowserPrototypeTemporaryNavGamesInlineTree({
                           "data-grarf-extension-command-center-follow-live-expanded": gameExpanded ? "true" : "false",
                           onClick: () => toggleGameFollowLive(game),
                           children: [
-                            "Follow Live",
+                            "Follow",
                             gameExpanded ? " ^" : ""
                           ]
                         }
@@ -160810,7 +160834,7 @@ function SidebarGameRowFollowLive({
         onToggle();
       },
       children: [
-        "Follow Live",
+        "Follow",
         expanded ? " ^" : ""
       ]
     }
@@ -160831,7 +160855,7 @@ function SidebarGameRowWatchLive({
         event.stopPropagation();
         onWatchLive(game.id);
       },
-      children: "[ WATCH LIVE ]"
+      children: "[ WATCH ]"
     }
   );
 }
