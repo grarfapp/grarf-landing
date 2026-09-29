@@ -147204,13 +147204,14 @@ function stripTennisCombinedScoreFromCardStatus(status) {
   const segments = trimmed.split("\xB7").map((part) => part.trim()).filter(Boolean).filter((segment) => !isTennisCombinedSetScoreLabel(segment));
   return segments.join(" \xB7 ").trim();
 }
-function resolveTennisLiveSetNameFallback(game) {
-  const periodNum = game.period != null ? Number(game.period) : NaN;
-  if (Number.isFinite(periodNum) && periodNum > 0) {
-    const suffix = periodNum === 1 ? "st" : periodNum === 2 ? "nd" : periodNum === 3 ? "rd" : "th";
-    return `${periodNum}${suffix} Set`;
-  }
-  return "LIVE";
+function stripTennisSetTimingLabel(label) {
+  const trimmed = label.trim();
+  if (!trimmed) return "";
+  if (isNewsTennisSetNameLabel(trimmed)) return "";
+  return trimmed;
+}
+function resolveTennisLiveSetNameFallback(_game) {
+  return "";
 }
 function resolveSportsBrowserSidebarTennisMatchCardStatusLabelRaw(game) {
   const tournamentName = resolveSportsBrowserSidebarTennisTournamentName(game);
@@ -147234,7 +147235,11 @@ function resolveSportsBrowserSidebarTennisMatchCardStatusLabelRaw(game) {
   if (base) return base;
   if (game.status === "live") {
     const clock = game.displayClock?.trim();
-    if (clock) return clock;
+    if (clock) {
+      return stripTennisSetTimingLabel(
+        isTennisCombinedSetScoreLabel(clock) ? "" : clock
+      );
+    }
   }
   const detail = resolveSportsBrowserSidebarTennisMatchDetailLabel(game);
   if (detail) return detail;
@@ -147244,7 +147249,7 @@ function resolveSportsBrowserSidebarTennisMatchCardStatusWithoutRound(game) {
   if (game.status === "live") {
     const clock = game.displayClock?.trim();
     if (clock && !isTennisCombinedSetScoreLabel(clock)) {
-      return clock;
+      return stripTennisSetTimingLabel(clock);
     }
     return resolveTennisLiveSetNameFallback(game);
   }
@@ -147279,7 +147284,7 @@ function resolveSportsBrowserSidebarTennisMatchCardStatusLabel(game) {
   if (roundLabel && normalizeStatusToken(status) === normalizeStatusToken(roundLabel)) {
     return resolveSportsBrowserSidebarTennisMatchCardStatusWithoutRound(game);
   }
-  return status;
+  return stripTennisSetTimingLabel(status);
 }
 
 // ../grarf/desktop/src/components/homeMvp/NewsSportsBrowserCompetitorNameStack.tsx
@@ -148315,22 +148320,40 @@ function resolveCommandCenterTopRowTimingLabel(game) {
   }
   return base;
 }
+function sanitizeCommandCenterTimingLabelForTennis(game, label) {
+  const trimmed = label.trim();
+  if (!trimmed || !shouldShowNewsSportsBrowserTennisScoreboard(game)) {
+    return trimmed;
+  }
+  if (isNewsTennisSetNameLabel(trimmed)) {
+    return "";
+  }
+  return trimmed;
+}
 function resolveGrarfExtensionCommandCenterDisplayedTimingLabel(game, statusTimeLabel) {
   const fromCommandCenter = statusTimeLabel.trim();
-  if (fromCommandCenter) return fromCommandCenter;
-  return resolveGrarfExtensionCommandCenterTimingLabel(game);
+  const resolved = fromCommandCenter || resolveGrarfExtensionCommandCenterTimingLabel(game);
+  return sanitizeCommandCenterTimingLabelForTennis(game, resolved);
 }
 function resolveGrarfExtensionCommandCenterTimingLabel(game) {
-  const primary = resolveCommandCenterTopRowTimingLabel(game).trim();
+  const primary = sanitizeCommandCenterTimingLabelForTennis(
+    game,
+    resolveCommandCenterTopRowTimingLabel(game)
+  );
   if (primary) return primary;
   const cardTiming = resolveGamesSpineCardTimingLabel(game)?.trim();
   if (cardTiming) {
-    return isCommandCenterFootballTimingGame(game) ? formatCommandCenterFootballTimingLabel(cardTiming) : cardTiming;
+    const formatted = isCommandCenterFootballTimingGame(game) ? formatCommandCenterFootballTimingLabel(cardTiming) : cardTiming;
+    return sanitizeCommandCenterTimingLabelForTennis(game, formatted);
   }
   const clock = game.displayClock?.trim();
-  if (clock) return clock;
+  if (clock) {
+    return sanitizeCommandCenterTimingLabelForTennis(game, clock);
+  }
   const statusLine = game.statusLine?.trim();
-  if (statusLine) return statusLine;
+  if (statusLine) {
+    return sanitizeCommandCenterTimingLabelForTennis(game, statusLine);
+  }
   if (game.status === "final" || isSpineFinalizedGame(game)) return "Final";
   if (game.status === "live") return "Live";
   if (game.status === "postponed") return "Postponed";
@@ -148756,6 +148779,7 @@ function GrarfExtensionCommandCenterFourLineMatchupCard({
   )?.trim() : void 0;
   const firstWinnerClass = resolveGamesSpineFinalWinnerBoldClass(model.left.side, finalWinnerSide);
   const secondWinnerClass = resolveGamesSpineFinalWinnerBoldClass(model.right.side, finalWinnerSide);
+  const showCommandCenterTimingRow = timingLabel.trim().length > 0 || showChannelLogo && Boolean(channel.logoUrl);
   return /* @__PURE__ */ (0, import_jsx_runtime237.jsxs)(
     "div",
     {
@@ -148779,7 +148803,7 @@ function GrarfExtensionCommandCenterFourLineMatchupCard({
           ) : /* @__PURE__ */ (0, import_jsx_runtime237.jsx)("span", { className: "inline-flex h-[15px] w-[15px] shrink-0", "aria-hidden": true }),
           tennisMetaHeader ? /* @__PURE__ */ (0, import_jsx_runtime237.jsx)(SportsBrowserTennisGameCardMetaHeader, { labels: tennisMetaHeader }) : /* @__PURE__ */ (0, import_jsx_runtime237.jsx)("span", { className: GRARF_EXTENSION_COMMAND_CENTER_LEAGUE_NAME_CLASS, children: leagueLabel })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime237.jsxs)(
+        showCommandCenterTimingRow ? /* @__PURE__ */ (0, import_jsx_runtime237.jsxs)(
           "div",
           {
             className: GRARF_EXTENSION_COMMAND_CENTER_TIMING_ROW_CLASS,
@@ -148796,7 +148820,7 @@ function GrarfExtensionCommandCenterFourLineMatchupCard({
               showChannelLogo && channel.logoUrl ? /* @__PURE__ */ (0, import_jsx_runtime237.jsx)("span", { className: cn2(GRARF_EXTENSION_COMMAND_CENTER_CHANNEL_SLOT_CLASS, "col-start-2"), children: /* @__PURE__ */ (0, import_jsx_runtime237.jsx)(NewsSportsBrowserChannelLogo, { logoUrl: channel.logoUrl, label: channel.label, slotAlign: "end" }) }) : /* @__PURE__ */ (0, import_jsx_runtime237.jsx)("span", { className: "col-start-2 inline-flex h-[14px] w-9 shrink-0", "aria-hidden": true })
             ]
           }
-        ),
+        ) : null,
         showTennisSetScores ? /* @__PURE__ */ (0, import_jsx_runtime237.jsxs)(
           "div",
           {
@@ -149137,7 +149161,7 @@ function CommandCenterMatchupGameCard({
                   }
                 ) : null
               ] }) : null,
-              /* @__PURE__ */ (0, import_jsx_runtime237.jsx)(
+              tennisStatusLabel?.trim() ? /* @__PURE__ */ (0, import_jsx_runtime237.jsx)(
                 "span",
                 {
                   className: cn2(
@@ -149147,7 +149171,7 @@ function CommandCenterMatchupGameCard({
                   style: { gridColumnStart: tennisStatusColStart },
                   children: tennisStatusLabel
                 }
-              )
+              ) : null
             ]
           }
         ) : /* @__PURE__ */ (0, import_jsx_runtime237.jsxs)(import_jsx_runtime237.Fragment, { children: [
@@ -160628,12 +160652,16 @@ function SidebarGameRowStatus({
   const statusLabel = statusLabelOverride ?? resolveNewsSportsBrowserCompactStatusLabel(game);
   const isLive = game.status === "live" && variant === "live";
   const rowUi = sidebarGameRowPresentation();
+  const displayLabel = statusLabel || (variant === "catchUp" ? "FINAL" : "");
+  if (!displayLabel) {
+    return null;
+  }
   return /* @__PURE__ */ (0, import_jsx_runtime262.jsx)(
     "span",
     {
       className: cn2(rowUi.statusBaseClass, isLive && rowUi.liveStatusClass),
       style: { gridColumnStart: colStart },
-      children: statusLabel || (variant === "catchUp" ? "FINAL" : null)
+      children: displayLabel
     }
   );
 }
