@@ -148591,7 +148591,7 @@ function CommandCenterTemporalTennisCompetitorMark({
     }
   );
 }
-var GRARF_EXTENSION_COMMAND_CENTER_FOUR_LINE_CARD_CLASS = "grid min-h-0 min-w-0 w-full flex-1 auto-rows-min gap-y-1";
+var GRARF_EXTENSION_COMMAND_CENTER_FOUR_LINE_CARD_CLASS = "grid min-h-0 min-w-0 w-full auto-rows-min gap-y-1";
 var GRARF_EXTENSION_COMMAND_CENTER_LEAGUE_ROW_CLASS = "flex min-w-0 items-center gap-1.5";
 var GRARF_EXTENSION_COMMAND_CENTER_LEAGUE_LOGO_CLASS = "h-[15px] w-[15px] shrink-0 object-contain";
 var GRARF_EXTENSION_COMMAND_CENTER_LEAGUE_NAME_CLASS = "min-w-0 truncate text-[11px] font-bold uppercase leading-tight tracking-wide text-foreground";
@@ -149639,8 +149639,9 @@ function BottomRailGameCardBody({
   const matchupBodyGridClass = showTennisSetScores ? BOTTOM_RAIL_TENNIS_BODY_GRID_CLASS : BODY_GRID_CLASS;
   const statusTimeColStart = showTennisSetScores ? BOTTOM_RAIL_TENNIS_STATUS_COL_START : 4;
   const cardShellClassName = cn2(
-    "flex min-h-0 min-w-0 w-full flex-1 flex-col justify-center gap-0.5 px-1.5 py-0.5",
-    isCommandCenter && isGrarfExtensionRenderer() && "text-foreground"
+    "flex min-h-0 min-w-0 w-full flex-col gap-0.5 px-1.5 py-0.5",
+    isCommandCenter && !isGrarfExtensionRenderer() && "flex-1 justify-center",
+    isCommandCenter && isGrarfExtensionRenderer() && "shrink-0 text-foreground"
   );
   if (isCommandCenter) {
     const commandCenterShared = {
@@ -150058,7 +150059,7 @@ function SportsBrowserPrototypeBottomRailGames({
                   {
                     className: cn2(
                       "flex w-full shrink-0",
-                      extensionCommandCenter ? "min-h-[132px] overflow-visible" : "min-h-11 overflow-hidden"
+                      extensionCommandCenter ? "min-h-0 overflow-visible" : "min-h-11 overflow-hidden"
                     ),
                     children: /* @__PURE__ */ (0, import_jsx_runtime237.jsx)(
                       BottomRailGameCard,
@@ -150088,7 +150089,7 @@ function SportsBrowserPrototypeBottomRailGames({
                 "data-bottom-rail-game-card": true,
                 className: cn2(
                   "flex min-w-0 shrink-0",
-                  extensionCommandCenter ? "h-auto min-h-[132px] w-full max-w-none overflow-visible" : "min-h-11 w-full overflow-hidden",
+                  extensionCommandCenter ? "h-auto min-h-0 w-full max-w-none shrink-0 overflow-visible" : "min-h-11 w-full overflow-hidden",
                   index2 > 0 && cn2("border-t", extensionCommandCenter ? "border-border" : RULE),
                   onGameSelect && (extensionCommandCenter ? "cursor-pointer transition-colors hover:bg-accent/80" : "cursor-pointer transition-colors hover:bg-[#e9e4db]")
                 ),
