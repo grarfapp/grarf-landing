@@ -148615,26 +148615,39 @@ function CommandCenterTemporalTennisCompetitorMark({
   );
 }
 var GRARF_EXTENSION_COMMAND_CENTER_FOUR_LINE_CARD_CLASS = "grid min-h-0 min-w-0 w-full auto-rows-min gap-y-1";
-var GRARF_EXTENSION_COMMAND_CENTER_LEAGUE_ROW_CLASS = "flex min-w-0 items-center gap-1.5";
+var GRARF_EXTENSION_COMMAND_CENTER_LEAGUE_ROW_CLASS = "col-span-full flex min-w-0 items-center gap-1.5";
+var GRARF_EXTENSION_COMMAND_CENTER_BODY_GRID_CLASS = "grid min-w-0 w-full grid-cols-[minmax(0,1fr)_auto_auto_minmax(3.75rem,max-content)] items-center gap-x-2 gap-y-1";
+var GRARF_EXTENSION_COMMAND_CENTER_TEAM_CELL_ROW_1_CLASS = "col-start-1 row-start-1 min-w-0";
+var GRARF_EXTENSION_COMMAND_CENTER_TEAM_CELL_ROW_2_CLASS = "col-start-1 row-start-2 min-w-0";
+var GRARF_EXTENSION_COMMAND_CENTER_SCORE_CELL_ROW_1_CLASS = "col-start-2 row-start-1 flex min-w-0 shrink-0 items-center justify-end";
+var GRARF_EXTENSION_COMMAND_CENTER_SCORE_CELL_ROW_2_CLASS = "col-start-2 row-start-2 flex min-w-0 shrink-0 items-center justify-end";
+var GRARF_EXTENSION_COMMAND_CENTER_META_CELL_ROW_1_CLASS = "col-start-3 row-start-1 flex h-[14px] min-w-0 shrink-0 items-center justify-end";
+var GRARF_EXTENSION_COMMAND_CENTER_META_CELL_ROW_2_CLASS = "col-start-3 row-start-2 flex h-[14px] min-w-0 shrink-0 items-center justify-end";
+var GRARF_EXTENSION_COMMAND_CENTER_ACTION_COLUMN_CLASS = "col-start-4 row-start-1 flex min-h-[1.25rem] w-full min-w-0 items-center justify-end self-center";
+var GRARF_EXTENSION_COMMAND_CENTER_FOLLOW_ACTION_COLUMN_CLASS = "col-start-4 row-start-2 flex min-h-[1.25rem] w-full min-w-0 items-center justify-end self-center";
+var GRARF_EXTENSION_COMMAND_CENTER_FOLLOW_ACTION_CLASS = "border-0 bg-transparent p-0 text-right font-mono text-[10px] font-semibold uppercase leading-none tracking-[0.06em] text-[#1a1a1a]/70 transition-colors hover:text-[#1a1a1a]";
+var GRARF_EXTENSION_COMMAND_CENTER_FOLLOW_ACTION_EXPANDED_CLASS = "text-[#1a1a1a]";
+var GRARF_EXTENSION_COMMAND_CENTER_WATCH_ACTION_CLASS = "border-0 bg-transparent p-0 text-right font-mono text-[10px] font-semibold uppercase leading-none tracking-[0.06em] text-[#1a1a1a] transition-colors hover:text-[#1a1a1a]";
+var GRARF_EXTENSION_COMMAND_CENTER_FOLLOW_LIVE_EXPANDED_PANEL_CLASS = "col-span-full min-w-0 rounded-md border border-border/50 bg-muted/15 px-2 py-1.5";
+var GRARF_EXTENSION_COMMAND_CENTER_FOLLOW_LIVE_ROW_CLASS = "flex w-full min-w-0 items-center justify-between gap-2 py-1.5 text-left text-[12px] leading-tight transition-colors";
+var GRARF_EXTENSION_COMMAND_CENTER_FOLLOW_LIVE_ROW_ENABLED_CLASS = "cursor-pointer text-foreground hover:bg-accent/40 rounded-sm px-1 -mx-1";
+var GRARF_EXTENSION_COMMAND_CENTER_FOLLOW_LIVE_ROW_DISABLED_CLASS = "cursor-default text-muted-foreground/45";
 var GRARF_EXTENSION_COMMAND_CENTER_LEAGUE_LOGO_CLASS = "h-[15px] w-[15px] shrink-0 object-contain";
 var GRARF_EXTENSION_COMMAND_CENTER_LEAGUE_NAME_CLASS = "min-w-0 truncate text-[11px] font-bold uppercase leading-tight tracking-wide text-foreground";
-var GRARF_EXTENSION_COMMAND_CENTER_CHANNEL_SLOT_CLASS = "flex h-[14px] w-9 shrink-0 items-center justify-end [&>span]:w-auto [&>span]:max-w-full [&>span]:shrink-0";
-var GRARF_EXTENSION_COMMAND_CENTER_TIMING_ROW_CLASS = "grid min-h-[14px] min-w-0 grid-cols-[minmax(0,1fr)_2.25rem] items-center gap-x-2";
-var GRARF_EXTENSION_COMMAND_CENTER_TIMING_CLASS = "col-start-1 min-w-0 truncate text-[12px] font-medium leading-tight tabular-nums tracking-wide text-[#1a1a1a]";
+var GRARF_EXTENSION_COMMAND_CENTER_CHANNEL_SLOT_CLASS = "flex h-[14px] w-full shrink-0 items-center justify-end [&>span]:w-auto [&>span]:max-w-full [&>span]:shrink-0";
+var GRARF_EXTENSION_COMMAND_CENTER_TIMING_CLASS = "min-w-0 truncate text-right text-[12px] font-medium leading-tight tabular-nums tracking-wide text-[#1a1a1a]";
 var GRARF_EXTENSION_COMMAND_CENTER_TEAM_ROW_CLASS = "flex min-w-0 items-center gap-1.5";
 var GRARF_EXTENSION_COMMAND_CENTER_TEAM_LOGO_SLOT_CLASS = "inline-flex h-[17px] w-[17px] shrink-0 items-center justify-center";
 var GRARF_EXTENSION_COMMAND_CENTER_TEAM_LOGO_CLASS = "h-[17px] w-[17px] shrink-0 object-contain";
 var GRARF_EXTENSION_COMMAND_CENTER_TEAM_NAME_CLASS = "block min-w-0 flex-1 truncate text-[13px] font-semibold leading-tight normal-case text-foreground";
 var GRARF_EXTENSION_COMMAND_CENTER_SCORE_CLASS = "w-9 shrink-0 text-right text-[15px] font-bold leading-none tabular-nums text-foreground";
-function GrarfExtensionCommandCenterTeamLine({
+function GrarfExtensionCommandCenterTeamIdentity({
   game,
   side,
   name,
   pollRank,
   pill,
   showScores,
-  score: score2,
-  scoreFlash,
   finalWinnerSide,
   onTeamClick
 }) {
@@ -148678,73 +148691,170 @@ function GrarfExtensionCommandCenterTeamLine({
             nameClassName: GRARF_EXTENSION_COMMAND_CENTER_TEAM_NAME_CLASS,
             winnerBoldClass
           }
-        ),
-        /* @__PURE__ */ (0, import_jsx_runtime237.jsx)(
-          BottomRailFlashValue,
-          {
-            flash: scoreFlash,
-            className: cn2(GRARF_EXTENSION_COMMAND_CENTER_SCORE_CLASS, winnerBoldClass),
-            children: showScores ? score2 ?? "\u2013" : null
-          }
         )
       ]
     }
   );
 }
-function GrarfExtensionCommandCenterTeamGridNameCell({
-  game,
+function GrarfExtensionCommandCenterTennisScoreCluster({
+  columns,
   side,
-  name,
-  pollRank,
-  pill,
-  showScores,
-  row,
-  finalWinnerSide,
-  onTeamClick
+  cellClassName,
+  flashCells,
+  winnerBoldClass
 }) {
-  const logoUrl = resolveNewsSportsBrowserTeamLogoUrl(game, side);
-  const winnerBoldClass = resolveGamesSpineFinalWinnerBoldClass(side, finalWinnerSide);
-  const competitorContext = resolveNewsSportsBrowserGameCardCompetitorContext(game, side, pill, {
-    showScores
-  });
-  return /* @__PURE__ */ (0, import_jsx_runtime237.jsxs)(
-    "span",
+  return /* @__PURE__ */ (0, import_jsx_runtime237.jsx)("div", { className: "inline-flex min-w-0 max-w-full items-center gap-x-[0.7ch]", children: columns.map((column, index2) => {
+    const value = side === "away" ? column.away : column.home;
+    return /* @__PURE__ */ (0, import_jsx_runtime237.jsx)(
+      BottomRailFlashValue,
+      {
+        flash: flashCells?.[index2],
+        className: cn2(cellClassName, column.isCurrentSet && "font-semibold", winnerBoldClass),
+        children: value ?? "\u2013"
+      },
+      index2
+    );
+  }) });
+}
+function GrarfExtensionCommandCenterWatchAction({
+  gameId,
+  showWatchLive,
+  onWatchLive
+}) {
+  if (!showWatchLive || !onWatchLive) return null;
+  return /* @__PURE__ */ (0, import_jsx_runtime237.jsx)(
+    "button",
     {
-      className: cn2(
-        "col-start-1 grid min-w-0 grid-cols-[17px_minmax(0,1fr)] items-center gap-x-1.5",
-        row === 1 ? "row-start-1" : "row-start-2",
-        onTeamClick && BOTTOM_RAIL_TEAM_CLICKABLE_CLASS
-      ),
-      "data-sports-browser-prototype-sidebar-team-name-clickable": onTeamClick ? "" : void 0,
-      onClick: onTeamClick ? (event) => {
+      type: "button",
+      className: GRARF_EXTENSION_COMMAND_CENTER_WATCH_ACTION_CLASS,
+      onClick: (event) => {
         event.stopPropagation();
-        onTeamClick();
-      } : void 0,
+        onWatchLive(gameId);
+      },
+      children: "Watch Live"
+    }
+  );
+}
+function GrarfExtensionCommandCenterFollowAction({
+  expanded,
+  onPress
+}) {
+  return /* @__PURE__ */ (0, import_jsx_runtime237.jsxs)(
+    "button",
+    {
+      type: "button",
+      className: cn2(
+        GRARF_EXTENSION_COMMAND_CENTER_FOLLOW_ACTION_CLASS,
+        expanded && GRARF_EXTENSION_COMMAND_CENTER_FOLLOW_ACTION_EXPANDED_CLASS
+      ),
+      "aria-expanded": expanded,
+      "data-grarf-extension-command-center-follow-live": "",
+      "data-grarf-extension-command-center-follow-live-expanded": expanded ? "true" : "false",
+      onClick: (event) => {
+        event.stopPropagation();
+        onPress();
+      },
       children: [
-        /* @__PURE__ */ (0, import_jsx_runtime237.jsx)("span", { className: GRARF_EXTENSION_COMMAND_CENTER_TEAM_LOGO_SLOT_CLASS, children: logoUrl ? /* @__PURE__ */ (0, import_jsx_runtime237.jsx)(
-          "img",
-          {
-            src: logoUrl,
-            alt: "",
-            className: cn2(
-              GRARF_EXTENSION_COMMAND_CENTER_TEAM_LOGO_CLASS,
-              resolveGamesSpineLeagueLogoImgClassName(game.league, logoUrl)
-            ),
-            loading: "lazy",
-            decoding: "async"
-          }
-        ) : null }),
-        /* @__PURE__ */ (0, import_jsx_runtime237.jsx)(
-          NewsSportsBrowserCompetitorNameStack,
-          {
-            name,
-            pollRank,
-            context: competitorContext,
-            nameClassName: GRARF_EXTENSION_COMMAND_CENTER_TEAM_NAME_CLASS,
-            winnerBoldClass
-          }
-        )
+        "Follow Live",
+        expanded ? " ^" : ""
       ]
+    }
+  );
+}
+function resolveGrarfExtensionCommandCenterFollowLiveRows(game, context2, onSectionSelect, onWebsiteTabSelect, onMlbLiveChildSectionSelect, onMlbUpcomingChildSectionSelect) {
+  const rowLabels = ["Game Center", "Live commentary", "Game stats"];
+  if (isMlbLiveGameWorkspace(game)) {
+    const sections = ["gameCenter", "social", "story"];
+    return rowLabels.map((label, index2) => {
+      const section = sections[index2];
+      return {
+        label,
+        enabled: Boolean(onMlbLiveChildSectionSelect),
+        onPress: () => onMlbLiveChildSectionSelect?.(section)
+      };
+    });
+  }
+  if (isMlbUpcomingGameWorkspace(game)) {
+    const sections = ["gameCenter", "social", "story"];
+    return rowLabels.map((label, index2) => {
+      const section = sections[index2];
+      return {
+        label,
+        enabled: Boolean(onMlbUpcomingChildSectionSelect),
+        onPress: () => onMlbUpcomingChildSectionSelect?.(section)
+      };
+    });
+  }
+  const contextSections = resolveSportsBrowserPrototypeGameContextSectionsForGame(game);
+  const gameCenterSectionIndex = contextSections.indexOf("gameCenter");
+  const sectionIndex = gameCenterSectionIndex >= 0 ? gameCenterSectionIndex : 0;
+  const gameCenterWebsites = getSportsBrowserPrototypeGameContextSectionWebsites(
+    game,
+    context2,
+    "gameCenter"
+  );
+  return rowLabels.map((label, websiteIndex) => {
+    const enabled = websiteIndex === 0 ? Boolean(onSectionSelect) : Boolean(onSectionSelect && gameCenterWebsites[websiteIndex]?.url?.trim());
+    return {
+      label,
+      enabled,
+      onPress: () => {
+        if (!onSectionSelect) return;
+        onSectionSelect(sectionIndex);
+        if (websiteIndex > 0) {
+          onWebsiteTabSelect?.(websiteIndex);
+        } else if (gameCenterWebsites.length > 0) {
+          onWebsiteTabSelect?.(0);
+        }
+      }
+    };
+  });
+}
+function GrarfExtensionCommandCenterFollowLiveExpansion({
+  game,
+  paneState,
+  onSectionSelect,
+  onWebsiteTabSelect,
+  onMlbLiveChildSectionSelect,
+  onMlbUpcomingChildSectionSelect
+}) {
+  if (!isSportsBrowserPrototypeGameContextPane(paneState)) return null;
+  const context2 = resolveGameBrowserContext(game);
+  const rows = resolveGrarfExtensionCommandCenterFollowLiveRows(
+    game,
+    context2,
+    onSectionSelect,
+    onWebsiteTabSelect,
+    onMlbLiveChildSectionSelect,
+    onMlbUpcomingChildSectionSelect
+  );
+  return /* @__PURE__ */ (0, import_jsx_runtime237.jsx)(
+    "div",
+    {
+      className: GRARF_EXTENSION_COMMAND_CENTER_FOLLOW_LIVE_EXPANDED_PANEL_CLASS,
+      "data-grarf-extension-command-center-follow-live-panel": "",
+      onClick: (event) => event.stopPropagation(),
+      children: /* @__PURE__ */ (0, import_jsx_runtime237.jsx)("div", { className: "divide-y divide-border/40", children: rows.map((row) => /* @__PURE__ */ (0, import_jsx_runtime237.jsxs)(
+        "button",
+        {
+          type: "button",
+          disabled: !row.enabled,
+          className: cn2(
+            GRARF_EXTENSION_COMMAND_CENTER_FOLLOW_LIVE_ROW_CLASS,
+            row.enabled ? GRARF_EXTENSION_COMMAND_CENTER_FOLLOW_LIVE_ROW_ENABLED_CLASS : GRARF_EXTENSION_COMMAND_CENTER_FOLLOW_LIVE_ROW_DISABLED_CLASS
+          ),
+          onClick: (event) => {
+            event.stopPropagation();
+            if (!row.enabled) return;
+            row.onPress();
+          },
+          children: [
+            /* @__PURE__ */ (0, import_jsx_runtime237.jsx)("span", { children: row.label }),
+            /* @__PURE__ */ (0, import_jsx_runtime237.jsx)(ChevronRight, { className: "h-3.5 w-3.5 shrink-0 text-muted-foreground", "aria-hidden": true })
+          ]
+        },
+        row.label
+      )) })
     }
   );
 }
@@ -148758,7 +148868,18 @@ function GrarfExtensionCommandCenterFourLineMatchupCard({
   leagueLabel,
   tennisMetaHeader,
   onGameTeamSelect,
-  teamWorkspaceEnabled
+  teamWorkspaceEnabled,
+  showWatchLive,
+  onWatchLive,
+  onGameSelect,
+  onCommandCenterFollowLiveToggle,
+  selectedGameId,
+  commandCenterGameContextPane,
+  onCommandCenterGameContextSectionSelect,
+  onCommandCenterGameTeamContextSectionSelect,
+  onCommandCenterGameContextWebsiteTabSelect,
+  onCommandCenterMlbLiveChildSectionSelect,
+  onCommandCenterMlbUpcomingChildSectionSelect
 }) {
   const model = resolveGamesSpineCompactMatchupModel(game);
   if (model.kind !== "matchup") return null;
@@ -148772,169 +148893,50 @@ function GrarfExtensionCommandCenterFourLineMatchupCard({
   const timingLabel = resolveGrarfExtensionCommandCenterDisplayedTimingLabel(game, statusTimeLabel);
   const tennisSetColumns = resolveNewsSportsBrowserTennisSetColumns(game);
   const showTennisSetScores = tennisSetColumns.length > 0;
-  const tennisGridTemplateColumns = showTennisSetScores ? resolveNewsSportsBrowserTennisGridTemplateColumns(
-    tennisSetColumns.length,
-    "minmax(0,1fr)",
-    ""
-  )?.trim() : void 0;
   const firstWinnerClass = resolveGamesSpineFinalWinnerBoldClass(model.left.side, finalWinnerSide);
   const secondWinnerClass = resolveGamesSpineFinalWinnerBoldClass(model.right.side, finalWinnerSide);
-  const showCommandCenterTimingRow = timingLabel.trim().length > 0 || showChannelLogo && Boolean(channel.logoUrl);
-  return /* @__PURE__ */ (0, import_jsx_runtime237.jsxs)(
-    "div",
-    {
-      className: GRARF_EXTENSION_COMMAND_CENTER_FOUR_LINE_CARD_CLASS,
-      "data-sports-browser-prototype-command-center-game-card": "",
-      "data-grarf-extension-command-center-four-line-scorecard": "",
-      children: [
-        /* @__PURE__ */ (0, import_jsx_runtime237.jsxs)("div", { className: GRARF_EXTENSION_COMMAND_CENTER_LEAGUE_ROW_CLASS, children: [
-          leagueLogoUrl ? /* @__PURE__ */ (0, import_jsx_runtime237.jsx)(
-            "img",
-            {
-              src: leagueLogoUrl,
-              alt: "",
-              className: cn2(
-                GRARF_EXTENSION_COMMAND_CENTER_LEAGUE_LOGO_CLASS,
-                resolveGamesSpineLeagueLogoImgClassName(game.league, leagueLogoUrl)
-              ),
-              loading: "lazy",
-              decoding: "async"
-            }
-          ) : /* @__PURE__ */ (0, import_jsx_runtime237.jsx)("span", { className: "inline-flex h-[15px] w-[15px] shrink-0", "aria-hidden": true }),
-          tennisMetaHeader ? /* @__PURE__ */ (0, import_jsx_runtime237.jsx)(SportsBrowserTennisGameCardMetaHeader, { labels: tennisMetaHeader }) : /* @__PURE__ */ (0, import_jsx_runtime237.jsx)("span", { className: GRARF_EXTENSION_COMMAND_CENTER_LEAGUE_NAME_CLASS, children: leagueLabel })
-        ] }),
-        showCommandCenterTimingRow ? /* @__PURE__ */ (0, import_jsx_runtime237.jsxs)(
-          "div",
-          {
-            className: GRARF_EXTENSION_COMMAND_CENTER_TIMING_ROW_CLASS,
-            "data-grarf-extension-command-center-timing-row": "",
-            children: [
-              /* @__PURE__ */ (0, import_jsx_runtime237.jsx)(
-                BottomRailFlashValue,
-                {
-                  flash: flashSpec?.statusTime,
-                  className: GRARF_EXTENSION_COMMAND_CENTER_TIMING_CLASS,
-                  children: timingLabel
-                }
-              ),
-              showChannelLogo && channel.logoUrl ? /* @__PURE__ */ (0, import_jsx_runtime237.jsx)("span", { className: cn2(GRARF_EXTENSION_COMMAND_CENTER_CHANNEL_SLOT_CLASS, "col-start-2"), children: /* @__PURE__ */ (0, import_jsx_runtime237.jsx)(NewsSportsBrowserChannelLogo, { logoUrl: channel.logoUrl, label: channel.label, slotAlign: "end" }) }) : /* @__PURE__ */ (0, import_jsx_runtime237.jsx)("span", { className: "col-start-2 inline-flex h-[14px] w-9 shrink-0", "aria-hidden": true })
-            ]
-          }
-        ) : null,
-        showTennisSetScores ? /* @__PURE__ */ (0, import_jsx_runtime237.jsxs)(
-          "div",
-          {
-            className: cn2(COMMAND_CENTER_TEMPORAL_TENNIS_GRID_BASE_CLASS, "min-w-0"),
-            style: tennisGridTemplateColumns ? { gridTemplateColumns: tennisGridTemplateColumns } : void 0,
-            children: [
-              /* @__PURE__ */ (0, import_jsx_runtime237.jsx)(
-                GrarfExtensionCommandCenterTeamGridNameCell,
-                {
-                  game,
-                  side: model.left.side,
-                  name: leftPresentation.teamName,
-                  pollRank: leftPresentation.pollRank,
-                  pill: model.left,
-                  showScores: model.showScores,
-                  row: 1,
-                  finalWinnerSide,
-                  onTeamClick: teamWorkspaceEnabled && onGameTeamSelect ? () => handleTeamSideClick(model.left.side) : void 0
-                }
-              ),
-              /* @__PURE__ */ (0, import_jsx_runtime237.jsx)(
-                NewsSportsBrowserTennisSetScoreCells,
-                {
-                  columns: tennisSetColumns,
-                  side: model.left.side,
-                  row: 1,
-                  scoreColStart: 2,
-                  cellClassName: cn2(COMMAND_CENTER_TEMPORAL_TENNIS_SET_SCORE_CLASS, firstWinnerClass),
-                  flashCells: flashSpec?.leftSetScoreCells,
-                  FlashWrapper: BottomRailFlashValue
-                }
-              ),
-              /* @__PURE__ */ (0, import_jsx_runtime237.jsx)(
-                GrarfExtensionCommandCenterTeamGridNameCell,
-                {
-                  game,
-                  side: model.right.side,
-                  name: rightPresentation.teamName,
-                  pollRank: rightPresentation.pollRank,
-                  pill: model.right,
-                  showScores: model.showScores,
-                  row: 2,
-                  finalWinnerSide,
-                  onTeamClick: teamWorkspaceEnabled && onGameTeamSelect ? () => handleTeamSideClick(model.right.side) : void 0
-                }
-              ),
-              /* @__PURE__ */ (0, import_jsx_runtime237.jsx)(
-                NewsSportsBrowserTennisSetScoreCells,
-                {
-                  columns: tennisSetColumns,
-                  side: model.right.side,
-                  row: 2,
-                  scoreColStart: 2,
-                  cellClassName: cn2(COMMAND_CENTER_TEMPORAL_TENNIS_SET_SCORE_CLASS, secondWinnerClass),
-                  flashCells: flashSpec?.rightSetScoreCells,
-                  FlashWrapper: BottomRailFlashValue
-                }
-              )
-            ]
-          }
-        ) : /* @__PURE__ */ (0, import_jsx_runtime237.jsxs)(import_jsx_runtime237.Fragment, { children: [
-          /* @__PURE__ */ (0, import_jsx_runtime237.jsx)(
-            GrarfExtensionCommandCenterTeamLine,
-            {
-              game,
-              side: model.left.side,
-              name: leftPresentation.teamName,
-              pollRank: leftPresentation.pollRank,
-              pill: model.left,
-              showScores: model.showScores,
-              score: model.left.score,
-              scoreFlash: flashSpec?.leftScore,
-              finalWinnerSide,
-              onTeamClick: teamWorkspaceEnabled && onGameTeamSelect ? () => handleTeamSideClick(model.left.side) : void 0
-            }
-          ),
-          /* @__PURE__ */ (0, import_jsx_runtime237.jsx)(
-            GrarfExtensionCommandCenterTeamLine,
-            {
-              game,
-              side: model.right.side,
-              name: rightPresentation.teamName,
-              pollRank: rightPresentation.pollRank,
-              pill: model.right,
-              showScores: model.showScores,
-              score: model.right.score,
-              scoreFlash: flashSpec?.rightScore,
-              finalWinnerSide,
-              onTeamClick: teamWorkspaceEnabled && onGameTeamSelect ? () => handleTeamSideClick(model.right.side) : void 0
-            }
-          )
-        ] })
-      ]
-    }
+  const secondIsTbd = !rightPresentation.teamName || rightPresentation.teamName.toLowerCase() === "tbd";
+  const followLiveExpanded = Boolean(
+    selectedGameId === game.id && commandCenterGameContextPane && commandCenterGameContextPane.gameId === game.id && isSportsBrowserPrototypeGameContextPane(commandCenterGameContextPane)
   );
-}
-function GrarfExtensionCommandCenterFourLineEventCard({
-  game,
-  flashSpec,
-  eventLine,
-  statusTimeLabel,
-  showChannelLogo,
-  channel,
-  leagueLogoUrl,
-  leagueLabel,
-  tennisMetaHeader
-}) {
-  const timingLabel = resolveGrarfExtensionCommandCenterDisplayedTimingLabel(game, statusTimeLabel);
+  const handleFollowLivePress = () => {
+    if (onCommandCenterFollowLiveToggle) {
+      onCommandCenterFollowLiveToggle(game);
+      return;
+    }
+    if (onGameSelect) {
+      onGameSelect(game);
+    }
+  };
+  const renderScoreCell = (side, score2, scoreFlash, winnerClass) => {
+    if (showTennisSetScores) {
+      return /* @__PURE__ */ (0, import_jsx_runtime237.jsx)(
+        GrarfExtensionCommandCenterTennisScoreCluster,
+        {
+          columns: tennisSetColumns,
+          side,
+          cellClassName: COMMAND_CENTER_TEMPORAL_TENNIS_SET_SCORE_CLASS,
+          flashCells: side === model.left.side ? flashSpec?.leftSetScoreCells : flashSpec?.rightSetScoreCells,
+          winnerBoldClass: winnerClass
+        }
+      );
+    }
+    return /* @__PURE__ */ (0, import_jsx_runtime237.jsx)(
+      BottomRailFlashValue,
+      {
+        flash: scoreFlash,
+        className: cn2(GRARF_EXTENSION_COMMAND_CENTER_SCORE_CLASS, winnerClass),
+        children: model.showScores ? score2 ?? "\u2013" : null
+      }
+    );
+  };
   return /* @__PURE__ */ (0, import_jsx_runtime237.jsxs)(
     "div",
     {
       className: GRARF_EXTENSION_COMMAND_CENTER_FOUR_LINE_CARD_CLASS,
       "data-sports-browser-prototype-command-center-game-card": "",
       "data-grarf-extension-command-center-four-line-scorecard": "",
+      "data-grarf-extension-command-center-table-scorecard": "",
       children: [
         /* @__PURE__ */ (0, import_jsx_runtime237.jsxs)("div", { className: GRARF_EXTENSION_COMMAND_CENTER_LEAGUE_ROW_CLASS, children: [
           leagueLogoUrl ? /* @__PURE__ */ (0, import_jsx_runtime237.jsx)(
@@ -148955,22 +148957,225 @@ function GrarfExtensionCommandCenterFourLineEventCard({
         /* @__PURE__ */ (0, import_jsx_runtime237.jsxs)(
           "div",
           {
-            className: GRARF_EXTENSION_COMMAND_CENTER_TIMING_ROW_CLASS,
-            "data-grarf-extension-command-center-timing-row": "",
+            className: GRARF_EXTENSION_COMMAND_CENTER_BODY_GRID_CLASS,
+            "data-grarf-extension-command-center-body": "",
             children: [
-              /* @__PURE__ */ (0, import_jsx_runtime237.jsx)(
+              /* @__PURE__ */ (0, import_jsx_runtime237.jsx)("div", { className: GRARF_EXTENSION_COMMAND_CENTER_TEAM_CELL_ROW_1_CLASS, children: /* @__PURE__ */ (0, import_jsx_runtime237.jsx)(
+                GrarfExtensionCommandCenterTeamIdentity,
+                {
+                  game,
+                  side: model.left.side,
+                  name: leftPresentation.teamName,
+                  pollRank: leftPresentation.pollRank,
+                  pill: model.left,
+                  showScores: model.showScores,
+                  finalWinnerSide,
+                  onTeamClick: teamWorkspaceEnabled && onGameTeamSelect ? () => handleTeamSideClick(model.left.side) : void 0
+                }
+              ) }),
+              /* @__PURE__ */ (0, import_jsx_runtime237.jsx)("div", { className: GRARF_EXTENSION_COMMAND_CENTER_SCORE_CELL_ROW_1_CLASS, children: renderScoreCell(model.left.side, model.left.score, flashSpec?.leftScore, firstWinnerClass) }),
+              /* @__PURE__ */ (0, import_jsx_runtime237.jsx)("div", { className: GRARF_EXTENSION_COMMAND_CENTER_META_CELL_ROW_1_CLASS, children: timingLabel.trim() ? /* @__PURE__ */ (0, import_jsx_runtime237.jsx)(
                 BottomRailFlashValue,
                 {
                   flash: flashSpec?.statusTime,
                   className: GRARF_EXTENSION_COMMAND_CENTER_TIMING_CLASS,
                   children: timingLabel
                 }
-              ),
-              showChannelLogo && channel.logoUrl ? /* @__PURE__ */ (0, import_jsx_runtime237.jsx)("span", { className: cn2(GRARF_EXTENSION_COMMAND_CENTER_CHANNEL_SLOT_CLASS, "col-start-2"), children: /* @__PURE__ */ (0, import_jsx_runtime237.jsx)(NewsSportsBrowserChannelLogo, { logoUrl: channel.logoUrl, label: channel.label, slotAlign: "end" }) }) : /* @__PURE__ */ (0, import_jsx_runtime237.jsx)("span", { className: "col-start-2 inline-flex h-[14px] w-9 shrink-0", "aria-hidden": true })
+              ) : null }),
+              /* @__PURE__ */ (0, import_jsx_runtime237.jsx)("div", { className: GRARF_EXTENSION_COMMAND_CENTER_ACTION_COLUMN_CLASS, children: /* @__PURE__ */ (0, import_jsx_runtime237.jsx)(
+                GrarfExtensionCommandCenterWatchAction,
+                {
+                  gameId: game.id,
+                  showWatchLive,
+                  onWatchLive
+                }
+              ) }),
+              !secondIsTbd ? /* @__PURE__ */ (0, import_jsx_runtime237.jsxs)(import_jsx_runtime237.Fragment, { children: [
+                /* @__PURE__ */ (0, import_jsx_runtime237.jsx)("div", { className: GRARF_EXTENSION_COMMAND_CENTER_TEAM_CELL_ROW_2_CLASS, children: /* @__PURE__ */ (0, import_jsx_runtime237.jsx)(
+                  GrarfExtensionCommandCenterTeamIdentity,
+                  {
+                    game,
+                    side: model.right.side,
+                    name: rightPresentation.teamName,
+                    pollRank: rightPresentation.pollRank,
+                    pill: model.right,
+                    showScores: model.showScores,
+                    finalWinnerSide,
+                    onTeamClick: teamWorkspaceEnabled && onGameTeamSelect ? () => handleTeamSideClick(model.right.side) : void 0
+                  }
+                ) }),
+                /* @__PURE__ */ (0, import_jsx_runtime237.jsx)("div", { className: GRARF_EXTENSION_COMMAND_CENTER_SCORE_CELL_ROW_2_CLASS, children: renderScoreCell(
+                  model.right.side,
+                  model.right.score,
+                  flashSpec?.rightScore,
+                  secondWinnerClass
+                ) }),
+                /* @__PURE__ */ (0, import_jsx_runtime237.jsx)("div", { className: GRARF_EXTENSION_COMMAND_CENTER_META_CELL_ROW_2_CLASS, children: showChannelLogo && channel.logoUrl ? /* @__PURE__ */ (0, import_jsx_runtime237.jsx)("span", { className: GRARF_EXTENSION_COMMAND_CENTER_CHANNEL_SLOT_CLASS, children: /* @__PURE__ */ (0, import_jsx_runtime237.jsx)(
+                  NewsSportsBrowserChannelLogo,
+                  {
+                    logoUrl: channel.logoUrl,
+                    label: channel.label,
+                    slotAlign: "end"
+                  }
+                ) }) : null }),
+                /* @__PURE__ */ (0, import_jsx_runtime237.jsx)("div", { className: GRARF_EXTENSION_COMMAND_CENTER_FOLLOW_ACTION_COLUMN_CLASS, children: /* @__PURE__ */ (0, import_jsx_runtime237.jsx)(
+                  GrarfExtensionCommandCenterFollowAction,
+                  {
+                    expanded: followLiveExpanded,
+                    onPress: handleFollowLivePress
+                  }
+                ) })
+              ] }) : /* @__PURE__ */ (0, import_jsx_runtime237.jsx)("div", { className: GRARF_EXTENSION_COMMAND_CENTER_FOLLOW_ACTION_COLUMN_CLASS, children: /* @__PURE__ */ (0, import_jsx_runtime237.jsx)(
+                GrarfExtensionCommandCenterFollowAction,
+                {
+                  expanded: followLiveExpanded,
+                  onPress: handleFollowLivePress
+                }
+              ) })
             ]
           }
         ),
-        /* @__PURE__ */ (0, import_jsx_runtime237.jsx)("span", { className: "min-w-0 truncate text-[13px] font-semibold leading-tight text-foreground", children: eventLine })
+        followLiveExpanded && commandCenterGameContextPane ? /* @__PURE__ */ (0, import_jsx_runtime237.jsx)(
+          GrarfExtensionCommandCenterFollowLiveExpansion,
+          {
+            game,
+            paneState: commandCenterGameContextPane,
+            onSectionSelect: onCommandCenterGameContextSectionSelect,
+            onWebsiteTabSelect: onCommandCenterGameContextWebsiteTabSelect,
+            onMlbLiveChildSectionSelect: onCommandCenterMlbLiveChildSectionSelect,
+            onMlbUpcomingChildSectionSelect: onCommandCenterMlbUpcomingChildSectionSelect
+          }
+        ) : null
+      ]
+    }
+  );
+}
+function GrarfExtensionCommandCenterFourLineEventCard({
+  game,
+  flashSpec,
+  eventLine,
+  statusTimeLabel,
+  showChannelLogo,
+  channel,
+  leagueLogoUrl,
+  leagueLabel,
+  tennisMetaHeader,
+  showWatchLive,
+  onWatchLive,
+  onGameSelect,
+  onCommandCenterFollowLiveToggle,
+  selectedGameId,
+  commandCenterGameContextPane,
+  onCommandCenterGameContextSectionSelect,
+  onCommandCenterGameTeamContextSectionSelect,
+  onCommandCenterGameContextWebsiteTabSelect,
+  onCommandCenterMlbLiveChildSectionSelect,
+  onCommandCenterMlbUpcomingChildSectionSelect
+}) {
+  const timingLabel = resolveGrarfExtensionCommandCenterDisplayedTimingLabel(game, statusTimeLabel);
+  const followLiveExpanded = Boolean(
+    selectedGameId === game.id && commandCenterGameContextPane && commandCenterGameContextPane.gameId === game.id && isSportsBrowserPrototypeGameContextPane(commandCenterGameContextPane)
+  );
+  const handleFollowLivePress = () => {
+    if (onCommandCenterFollowLiveToggle) {
+      onCommandCenterFollowLiveToggle(game);
+      return;
+    }
+    if (onGameSelect) {
+      onGameSelect(game);
+    }
+  };
+  const showChannelRow = showChannelLogo && Boolean(channel.logoUrl);
+  return /* @__PURE__ */ (0, import_jsx_runtime237.jsxs)(
+    "div",
+    {
+      className: GRARF_EXTENSION_COMMAND_CENTER_FOUR_LINE_CARD_CLASS,
+      "data-sports-browser-prototype-command-center-game-card": "",
+      "data-grarf-extension-command-center-four-line-scorecard": "",
+      "data-grarf-extension-command-center-table-scorecard": "",
+      children: [
+        /* @__PURE__ */ (0, import_jsx_runtime237.jsxs)("div", { className: GRARF_EXTENSION_COMMAND_CENTER_LEAGUE_ROW_CLASS, children: [
+          leagueLogoUrl ? /* @__PURE__ */ (0, import_jsx_runtime237.jsx)(
+            "img",
+            {
+              src: leagueLogoUrl,
+              alt: "",
+              className: cn2(
+                GRARF_EXTENSION_COMMAND_CENTER_LEAGUE_LOGO_CLASS,
+                resolveGamesSpineLeagueLogoImgClassName(game.league, leagueLogoUrl)
+              ),
+              loading: "lazy",
+              decoding: "async"
+            }
+          ) : /* @__PURE__ */ (0, import_jsx_runtime237.jsx)("span", { className: "inline-flex h-[15px] w-[15px] shrink-0", "aria-hidden": true }),
+          tennisMetaHeader ? /* @__PURE__ */ (0, import_jsx_runtime237.jsx)(SportsBrowserTennisGameCardMetaHeader, { labels: tennisMetaHeader }) : /* @__PURE__ */ (0, import_jsx_runtime237.jsx)("span", { className: GRARF_EXTENSION_COMMAND_CENTER_LEAGUE_NAME_CLASS, children: leagueLabel })
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime237.jsxs)(
+          "div",
+          {
+            className: GRARF_EXTENSION_COMMAND_CENTER_BODY_GRID_CLASS,
+            "data-grarf-extension-command-center-body": "",
+            children: [
+              /* @__PURE__ */ (0, import_jsx_runtime237.jsx)(
+                "span",
+                {
+                  className: cn2(
+                    GRARF_EXTENSION_COMMAND_CENTER_TEAM_CELL_ROW_1_CLASS,
+                    "truncate text-[13px] font-semibold leading-tight text-foreground"
+                  ),
+                  children: eventLine
+                }
+              ),
+              /* @__PURE__ */ (0, import_jsx_runtime237.jsx)("span", { className: GRARF_EXTENSION_COMMAND_CENTER_SCORE_CELL_ROW_1_CLASS, "aria-hidden": true }),
+              /* @__PURE__ */ (0, import_jsx_runtime237.jsx)("div", { className: GRARF_EXTENSION_COMMAND_CENTER_META_CELL_ROW_1_CLASS, children: timingLabel.trim() ? /* @__PURE__ */ (0, import_jsx_runtime237.jsx)(
+                BottomRailFlashValue,
+                {
+                  flash: flashSpec?.statusTime,
+                  className: GRARF_EXTENSION_COMMAND_CENTER_TIMING_CLASS,
+                  children: timingLabel
+                }
+              ) : null }),
+              /* @__PURE__ */ (0, import_jsx_runtime237.jsx)("div", { className: GRARF_EXTENSION_COMMAND_CENTER_ACTION_COLUMN_CLASS, children: /* @__PURE__ */ (0, import_jsx_runtime237.jsx)(
+                GrarfExtensionCommandCenterWatchAction,
+                {
+                  gameId: game.id,
+                  showWatchLive,
+                  onWatchLive
+                }
+              ) }),
+              showChannelRow ? /* @__PURE__ */ (0, import_jsx_runtime237.jsxs)(import_jsx_runtime237.Fragment, { children: [
+                /* @__PURE__ */ (0, import_jsx_runtime237.jsx)("span", { className: GRARF_EXTENSION_COMMAND_CENTER_TEAM_CELL_ROW_2_CLASS, "aria-hidden": true }),
+                /* @__PURE__ */ (0, import_jsx_runtime237.jsx)("span", { className: GRARF_EXTENSION_COMMAND_CENTER_SCORE_CELL_ROW_2_CLASS, "aria-hidden": true }),
+                /* @__PURE__ */ (0, import_jsx_runtime237.jsx)("div", { className: GRARF_EXTENSION_COMMAND_CENTER_META_CELL_ROW_2_CLASS, children: /* @__PURE__ */ (0, import_jsx_runtime237.jsx)("span", { className: GRARF_EXTENSION_COMMAND_CENTER_CHANNEL_SLOT_CLASS, children: /* @__PURE__ */ (0, import_jsx_runtime237.jsx)(
+                  NewsSportsBrowserChannelLogo,
+                  {
+                    logoUrl: channel.logoUrl,
+                    label: channel.label,
+                    slotAlign: "end"
+                  }
+                ) }) })
+              ] }) : null,
+              /* @__PURE__ */ (0, import_jsx_runtime237.jsx)("div", { className: GRARF_EXTENSION_COMMAND_CENTER_FOLLOW_ACTION_COLUMN_CLASS, children: /* @__PURE__ */ (0, import_jsx_runtime237.jsx)(
+                GrarfExtensionCommandCenterFollowAction,
+                {
+                  expanded: followLiveExpanded,
+                  onPress: handleFollowLivePress
+                }
+              ) })
+            ]
+          }
+        ),
+        followLiveExpanded && commandCenterGameContextPane ? /* @__PURE__ */ (0, import_jsx_runtime237.jsx)(
+          GrarfExtensionCommandCenterFollowLiveExpansion,
+          {
+            game,
+            paneState: commandCenterGameContextPane,
+            onSectionSelect: onCommandCenterGameContextSectionSelect,
+            onWebsiteTabSelect: onCommandCenterGameContextWebsiteTabSelect,
+            onMlbLiveChildSectionSelect: onCommandCenterMlbLiveChildSectionSelect,
+            onMlbUpcomingChildSectionSelect: onCommandCenterMlbUpcomingChildSectionSelect
+          }
+        ) : null
       ]
     }
   );
@@ -148989,7 +149194,15 @@ function CommandCenterMatchupGameCard({
   channel,
   leagueLogoUrl,
   leagueLabel,
-  tennisMetaHeader
+  tennisMetaHeader,
+  selectedGameId,
+  commandCenterGameContextPane,
+  onCommandCenterFollowLiveToggle,
+  onCommandCenterGameContextSectionSelect,
+  onCommandCenterGameTeamContextSectionSelect,
+  onCommandCenterGameContextWebsiteTabSelect,
+  onCommandCenterMlbLiveChildSectionSelect,
+  onCommandCenterMlbUpcomingChildSectionSelect
 }) {
   const model = resolveGamesSpineCompactMatchupModel(game);
   if (model.kind !== "matchup") return null;
@@ -149029,7 +149242,18 @@ function CommandCenterMatchupGameCard({
         leagueLabel,
         tennisMetaHeader,
         onGameTeamSelect,
-        teamWorkspaceEnabled
+        teamWorkspaceEnabled,
+        showWatchLive,
+        onWatchLive,
+        onGameSelect,
+        selectedGameId,
+        commandCenterGameContextPane,
+        onCommandCenterFollowLiveToggle,
+        onCommandCenterGameContextSectionSelect,
+        onCommandCenterGameTeamContextSectionSelect,
+        onCommandCenterGameContextWebsiteTabSelect,
+        onCommandCenterMlbLiveChildSectionSelect,
+        onCommandCenterMlbUpcomingChildSectionSelect
       }
     );
   }
@@ -149221,7 +149445,15 @@ function CommandCenterEventGameCard({
   channel,
   leagueLogoUrl,
   leagueLabel,
-  tennisMetaHeader
+  tennisMetaHeader,
+  selectedGameId,
+  commandCenterGameContextPane,
+  onCommandCenterFollowLiveToggle,
+  onCommandCenterGameContextSectionSelect,
+  onCommandCenterGameTeamContextSectionSelect,
+  onCommandCenterGameContextWebsiteTabSelect,
+  onCommandCenterMlbLiveChildSectionSelect,
+  onCommandCenterMlbUpcomingChildSectionSelect
 }) {
   if (isGrarfExtensionRenderer()) {
     return /* @__PURE__ */ (0, import_jsx_runtime237.jsx)(
@@ -149235,7 +149467,18 @@ function CommandCenterEventGameCard({
         channel,
         leagueLogoUrl,
         leagueLabel,
-        tennisMetaHeader
+        tennisMetaHeader,
+        showWatchLive,
+        onWatchLive,
+        onGameSelect,
+        selectedGameId,
+        commandCenterGameContextPane,
+        onCommandCenterFollowLiveToggle,
+        onCommandCenterGameContextSectionSelect,
+        onCommandCenterGameTeamContextSectionSelect,
+        onCommandCenterGameContextWebsiteTabSelect,
+        onCommandCenterMlbLiveChildSectionSelect,
+        onCommandCenterMlbUpcomingChildSectionSelect
       }
     );
   }
@@ -149639,7 +149882,15 @@ function BottomRailGameCardBody({
   onGameSelect,
   onSocialLive,
   onGameTeamSelect,
-  presentation = "bottomRail"
+  presentation = "bottomRail",
+  selectedGameId,
+  commandCenterGameContextPane,
+  onCommandCenterFollowLiveToggle,
+  onCommandCenterGameContextSectionSelect,
+  onCommandCenterGameTeamContextSectionSelect,
+  onCommandCenterGameContextWebsiteTabSelect,
+  onCommandCenterMlbLiveChildSectionSelect,
+  onCommandCenterMlbUpcomingChildSectionSelect
 }) {
   const isCommandCenter = presentation === "commandCenter";
   const model = resolveGamesSpineCompactMatchupModel(game);
@@ -149680,7 +149931,15 @@ function BottomRailGameCardBody({
       channel,
       leagueLogoUrl,
       leagueLabel,
-      tennisMetaHeader
+      tennisMetaHeader,
+      selectedGameId,
+      commandCenterGameContextPane,
+      onCommandCenterFollowLiveToggle,
+      onCommandCenterGameContextSectionSelect,
+      onCommandCenterGameTeamContextSectionSelect,
+      onCommandCenterGameContextWebsiteTabSelect,
+      onCommandCenterMlbLiveChildSectionSelect,
+      onCommandCenterMlbUpcomingChildSectionSelect
     };
     return /* @__PURE__ */ (0, import_jsx_runtime237.jsxs)("div", { className: cardShellClassName, children: [
       model.kind === "event" ? /* @__PURE__ */ (0, import_jsx_runtime237.jsx)(
@@ -149827,7 +150086,15 @@ function BottomRailGameCard({
   onGameSelect,
   onSocialLive,
   onGameTeamSelect,
-  presentation = "bottomRail"
+  presentation = "bottomRail",
+  selectedGameId,
+  commandCenterGameContextPane,
+  onCommandCenterFollowLiveToggle,
+  onCommandCenterGameContextSectionSelect,
+  onCommandCenterGameTeamContextSectionSelect,
+  onCommandCenterGameContextWebsiteTabSelect,
+  onCommandCenterMlbLiveChildSectionSelect,
+  onCommandCenterMlbUpcomingChildSectionSelect
 }) {
   const canonicalGame = useCanonicalGamesSpineGame(game);
   const displayGame = canonicalGame ?? game;
@@ -149841,7 +150108,15 @@ function BottomRailGameCard({
       onGameSelect,
       onSocialLive,
       onGameTeamSelect,
-      presentation
+      presentation,
+      selectedGameId,
+      commandCenterGameContextPane,
+      onCommandCenterFollowLiveToggle,
+      onCommandCenterGameContextSectionSelect,
+      onCommandCenterGameTeamContextSectionSelect,
+      onCommandCenterGameContextWebsiteTabSelect,
+      onCommandCenterMlbLiveChildSectionSelect,
+      onCommandCenterMlbUpcomingChildSectionSelect
     }
   );
 }
@@ -149899,8 +150174,26 @@ function SportsBrowserPrototypeBottomRailGames({
   onWatchLive,
   canShowWatchLive,
   onSocialLive,
-  layout = "bottomRail"
+  layout = "bottomRail",
+  selectedGameId,
+  commandCenterGameContextPane,
+  onCommandCenterFollowLiveToggle,
+  onCommandCenterGameContextSectionSelect,
+  onCommandCenterGameTeamContextSectionSelect,
+  onCommandCenterGameContextWebsiteTabSelect,
+  onCommandCenterMlbLiveChildSectionSelect,
+  onCommandCenterMlbUpcomingChildSectionSelect
 }) {
+  const commandCenterCardContext = {
+    selectedGameId,
+    commandCenterGameContextPane,
+    onCommandCenterFollowLiveToggle,
+    onCommandCenterGameContextSectionSelect,
+    onCommandCenterGameTeamContextSectionSelect,
+    onCommandCenterGameContextWebsiteTabSelect,
+    onCommandCenterMlbLiveChildSectionSelect,
+    onCommandCenterMlbUpcomingChildSectionSelect
+  };
   const gamesRef = (0, import_react268.useRef)(null);
   const scrollViewportRef = (0, import_react268.useRef)(null);
   const cardWidthRef = (0, import_react268.useRef)(0);
@@ -150095,7 +150388,8 @@ function SportsBrowserPrototypeBottomRailGames({
                         onGameSelect,
                         onGameTeamSelect,
                         onSocialLive,
-                        presentation: "commandCenter"
+                        presentation: "commandCenter",
+                        ...commandCenterCardContext
                       }
                     )
                   }
@@ -150131,7 +150425,8 @@ function SportsBrowserPrototypeBottomRailGames({
                     onGameSelect,
                     onGameTeamSelect,
                     onSocialLive,
-                    presentation: "commandCenter"
+                    presentation: "commandCenter",
+                    ...commandCenterCardContext
                   }
                 )
               },
@@ -161967,6 +162262,13 @@ function SportsBrowserPrototypeLeftNav({
   selectedGameId = null,
   selectedLeagueKey = null,
   selectedSidebarArchLeagueKey = null,
+  commandCenterGameContextPane = null,
+  onCommandCenterFollowLiveToggle,
+  onCommandCenterGameContextSectionSelect,
+  onCommandCenterGameTeamContextSectionSelect,
+  onCommandCenterGameContextWebsiteTabSelect,
+  onCommandCenterMlbLiveChildSectionSelect,
+  onCommandCenterMlbUpcomingChildSectionSelect,
   sidebarBottomNewsFeed,
   extensionSidebarTimelineExpanded = false,
   extensionSidebarTimelineOverlay,
@@ -162274,7 +162576,15 @@ function SportsBrowserPrototypeLeftNav({
                           onGameTeamSelect,
                           onWatchLive,
                           canShowWatchLive,
-                          onSocialLive
+                          onSocialLive,
+                          selectedGameId,
+                          commandCenterGameContextPane,
+                          onCommandCenterFollowLiveToggle,
+                          onCommandCenterGameContextSectionSelect,
+                          onCommandCenterGameTeamContextSectionSelect,
+                          onCommandCenterGameContextWebsiteTabSelect,
+                          onCommandCenterMlbLiveChildSectionSelect,
+                          onCommandCenterMlbUpcomingChildSectionSelect
                         }
                       )
                     ] }) : /* @__PURE__ */ (0, import_jsx_runtime262.jsxs)(import_jsx_runtime262.Fragment, { children: [
@@ -162311,7 +162621,15 @@ function SportsBrowserPrototypeLeftNav({
                           onGameTeamSelect,
                           onWatchLive,
                           canShowWatchLive,
-                          onSocialLive
+                          onSocialLive,
+                          selectedGameId,
+                          commandCenterGameContextPane,
+                          onCommandCenterFollowLiveToggle,
+                          onCommandCenterGameContextSectionSelect,
+                          onCommandCenterGameTeamContextSectionSelect,
+                          onCommandCenterGameContextWebsiteTabSelect,
+                          onCommandCenterMlbLiveChildSectionSelect,
+                          onCommandCenterMlbUpcomingChildSectionSelect
                         }
                       )
                     ] }),
@@ -163941,73 +164259,33 @@ function useCommandCenterLayout() {
   };
 }
 
-// ../grarf/desktop/src/lib/home/applySportsBrowserPrototypeSidebarLeagueDestinationSelection.ts
+// ../grarf/desktop/src/lib/home/applyCommandCenterDestinationToActiveTab.ts
 init_define_import_meta_env();
-function applySportsBrowserPrototypeSidebarGlobalDestinationSelection(pane, section, websiteIndex = 0) {
-  let next = {
-    url: null,
-    activeTabIndex: 0,
-    leagueKey: null,
-    sidebarArchLeagueKey: null,
-    gameId: null,
-    gameContextSection: null,
-    showWebsiteTabs: true,
-    sportsBrowserPrototypeSidebarTemporalView: null,
-    documentTitle: null
-  };
-  next = applySportsBrowserPrototypeLeagueContextSectionToPane(next, section);
-  const sectionWebsites = resolveSportsBrowserPrototypeLeagueContextSectionWebsites(next, section);
-  if (sectionWebsites.length === 0) {
-    return next;
+
+// ../grarf/desktop/src/lib/commandCenter/applyCommandCenterPresentationToPane.ts
+init_define_import_meta_env();
+function applyCommandCenterPresentationToPane(pane, presentation) {
+  switch (presentation.kind) {
+    case "url": {
+      const trimmed = presentation.url.trim();
+      if (!trimmed) return pane;
+      return applySportsBrowserPrototypeTerminalUrlToPane(pane, trimmed);
+    }
+    case "game-context":
+    case "league-context":
+      return { ...presentation.paneState, documentTitle: null };
   }
-  const clampedIndex = Math.max(0, Math.min(websiteIndex, sectionWebsites.length - 1));
-  return {
-    ...next,
-    activeTabIndex: clampedIndex,
-    url: sectionWebsites[clampedIndex]?.url ?? next.url,
-    documentTitle: null
-  };
 }
-function applySportsBrowserPrototypeSidebarLeagueDestinationSelection(pane, leagueKey, section, websiteIndex = 0) {
-  const websites = getSportsBrowserPrototypeLeagueWebsites(leagueKey);
-  if (!websites || websites.length === 0) {
-    const globalWebsites = getSportsBrowserPrototypeGlobalWebsites();
-    const url = globalWebsites[0]?.url ?? null;
-    return {
-      url,
-      activeTabIndex: 0,
-      leagueKey: null,
-      sidebarArchLeagueKey: null,
-      gameId: null,
-      gameContextSection: null,
-      leagueContextSection: "news",
-      showWebsiteTabs: true,
-      sportsBrowserPrototypeSidebarTemporalView: null,
-      documentTitle: null
-    };
-  }
-  let next = {
-    ...pane,
-    leagueKey,
-    sidebarArchLeagueKey: null,
-    gameId: null,
-    gameContextSection: null,
-    showWebsiteTabs: true,
-    sportsBrowserPrototypeSidebarTemporalView: null,
-    documentTitle: null
-  };
-  next = applySportsBrowserPrototypeLeagueContextSectionToPane(next, section);
-  const sectionWebsites = resolveSportsBrowserPrototypeLeagueContextSectionWebsites(next, section);
-  if (sectionWebsites.length === 0) {
-    return next;
-  }
-  const clampedIndex = Math.max(0, Math.min(websiteIndex, sectionWebsites.length - 1));
-  return {
-    ...next,
-    activeTabIndex: clampedIndex,
-    url: sectionWebsites[clampedIndex]?.url ?? next.url,
-    documentTitle: null
-  };
+
+// ../grarf/desktop/src/lib/home/applyCommandCenterDestinationToActiveTab.ts
+function applyCommandCenterDestinationToActiveTab(tab, destination) {
+  const next = tab.paneStates.slice();
+  const paneIndex = resolveSportsBrowserPrototypeSidebarSelectionPaneIndex(tab);
+  next[paneIndex] = applyCommandCenterPresentationToPane(
+    next[paneIndex] ?? createDefaultSportsBrowserPrototypePaneState(),
+    destination.presentation
+  );
+  return { ...tab, paneStates: next, activePaneIndex: paneIndex };
 }
 
 // ../grarf/desktop/src/lib/home/applySportsBrowserPrototypeTemporaryNavContentDestination.ts
@@ -164214,6 +164492,50 @@ function applySportsBrowserPrototypeTemporaryNavGameInlineActionToPane(pane, gam
   return base;
 }
 
+// ../grarf/desktop/src/lib/home/applySportsBrowserPrototypeSidebarLeagueDestinationSelection.ts
+init_define_import_meta_env();
+function applySportsBrowserPrototypeSidebarLeagueDestinationSelection2(pane, leagueKey, section, websiteIndex = 0) {
+  const websites = getSportsBrowserPrototypeLeagueWebsites(leagueKey);
+  if (!websites || websites.length === 0) {
+    const globalWebsites = getSportsBrowserPrototypeGlobalWebsites();
+    const url = globalWebsites[0]?.url ?? null;
+    return {
+      url,
+      activeTabIndex: 0,
+      leagueKey: null,
+      sidebarArchLeagueKey: null,
+      gameId: null,
+      gameContextSection: null,
+      leagueContextSection: "news",
+      showWebsiteTabs: true,
+      sportsBrowserPrototypeSidebarTemporalView: null,
+      documentTitle: null
+    };
+  }
+  let next = {
+    ...pane,
+    leagueKey,
+    sidebarArchLeagueKey: null,
+    gameId: null,
+    gameContextSection: null,
+    showWebsiteTabs: true,
+    sportsBrowserPrototypeSidebarTemporalView: null,
+    documentTitle: null
+  };
+  next = applySportsBrowserPrototypeLeagueContextSectionToPane(next, section);
+  const sectionWebsites = resolveSportsBrowserPrototypeLeagueContextSectionWebsites(next, section);
+  if (sectionWebsites.length === 0) {
+    return next;
+  }
+  const clampedIndex = Math.max(0, Math.min(websiteIndex, sectionWebsites.length - 1));
+  return {
+    ...next,
+    activeTabIndex: clampedIndex,
+    url: sectionWebsites[clampedIndex]?.url ?? next.url,
+    documentTitle: null
+  };
+}
+
 // ../grarf/desktop/src/lib/home/applySportsBrowserPrototypeTemporaryNavContentDestination.ts
 function applySportsBrowserPrototypeTemporaryNavTeamContentDestinationSelection(input, teamContentSectionIndex, websiteIndex = 0) {
   const game = applySportsBrowserPrototypeLeaguesTabTeamToPane(input);
@@ -164275,7 +164597,7 @@ function applySportsBrowserPrototypeTemporaryNavGameDestinationToPane(pane, game
     return applySportsBrowserPrototypeGameContextSectionToPane(base, game, context2, section);
   }
   if (pane.leagueKey && !pane.gameId) {
-    return applySportsBrowserPrototypeSidebarLeagueDestinationSelection(
+    return applySportsBrowserPrototypeSidebarLeagueDestinationSelection2(
       pane,
       pane.leagueKey,
       contentSection
@@ -165930,6 +166252,84 @@ function HomePage() {
       updateSportsBrowserTabForSidebarSelection
     ]
   );
+  const sportsBrowserCommandCenterSelectionPaneIndex = (0, import_react282.useMemo)(
+    () => activeSportsBrowserTab ? resolveSportsBrowserPrototypeSidebarSelectionPaneIndex(activeSportsBrowserTab) : 0,
+    [activeSportsBrowserTab]
+  );
+  const sportsBrowserCommandCenterGameContextPane = (0, import_react282.useMemo)(() => {
+    if (!activeSportsBrowserTab) return null;
+    const pane = activeSportsBrowserTab.paneStates[sportsBrowserCommandCenterSelectionPaneIndex] ?? null;
+    if (!pane || !isSportsBrowserPrototypeGameContextPane(pane)) return null;
+    if (pane.gameId !== sportsBrowserSelectedGameId) return null;
+    return pane;
+  }, [
+    activeSportsBrowserTab,
+    sportsBrowserCommandCenterSelectionPaneIndex,
+    sportsBrowserSelectedGameId
+  ]);
+  const onSportsBrowserCommandCenterFollowLiveToggle = (0, import_react282.useCallback)(
+    (game) => {
+      if (sportsBrowserSelectedGameId === game.id) {
+        updateSportsBrowserTabForSidebarSelection((tab) => {
+          useHomeSourceFocusStore.getState().clearSelectedArticle(NEWS_BROWSER_FOCUS_SESSION_KEY);
+          if (commandCenterLayout.primary) {
+            return applyCommandCenterDestinationToActiveTab(tab, commandCenterLayout.primary);
+          }
+          return tab;
+        });
+        return;
+      }
+      onSportsBrowserGameSelect(game);
+    },
+    [
+      sportsBrowserSelectedGameId,
+      updateSportsBrowserTabForSidebarSelection,
+      commandCenterLayout.primary,
+      onSportsBrowserGameSelect
+    ]
+  );
+  const onSportsBrowserCommandCenterGameContextSectionSelect = (0, import_react282.useCallback)(
+    (sectionIndex) => {
+      onSportsBrowserGameContextSectionSelect(
+        sportsBrowserCommandCenterSelectionPaneIndex,
+        sectionIndex
+      );
+    },
+    [onSportsBrowserGameContextSectionSelect, sportsBrowserCommandCenterSelectionPaneIndex]
+  );
+  const onSportsBrowserCommandCenterGameTeamContextSectionSelect = (0, import_react282.useCallback)(
+    (sectionIndex) => {
+      onSportsBrowserGameTeamContextSectionSelect(
+        sportsBrowserCommandCenterSelectionPaneIndex,
+        sectionIndex
+      );
+    },
+    [onSportsBrowserGameTeamContextSectionSelect, sportsBrowserCommandCenterSelectionPaneIndex]
+  );
+  const onSportsBrowserCommandCenterGameContextWebsiteTabSelect = (0, import_react282.useCallback)(
+    (tabIndex) => {
+      onSportsBrowserWebsiteTabSelect(sportsBrowserCommandCenterSelectionPaneIndex, tabIndex);
+    },
+    [onSportsBrowserWebsiteTabSelect, sportsBrowserCommandCenterSelectionPaneIndex]
+  );
+  const onSportsBrowserCommandCenterMlbLiveChildSectionSelect = (0, import_react282.useCallback)(
+    (section) => {
+      onSportsBrowserMlbLiveChildSectionSelect(
+        sportsBrowserCommandCenterSelectionPaneIndex,
+        section
+      );
+    },
+    [onSportsBrowserMlbLiveChildSectionSelect, sportsBrowserCommandCenterSelectionPaneIndex]
+  );
+  const onSportsBrowserCommandCenterMlbUpcomingChildSectionSelect = (0, import_react282.useCallback)(
+    (section) => {
+      onSportsBrowserMlbUpcomingChildSectionSelect(
+        sportsBrowserCommandCenterSelectionPaneIndex,
+        section
+      );
+    },
+    [onSportsBrowserMlbUpcomingChildSectionSelect, sportsBrowserCommandCenterSelectionPaneIndex]
+  );
   const browserSubmenus = showBrowserSubmenus ? /* @__PURE__ */ (0, import_jsx_runtime269.jsxs)(import_jsx_runtime269.Fragment, { children: [
     /* @__PURE__ */ (0, import_jsx_runtime269.jsx)(HomeLiveSubmenu, {}),
     /* @__PURE__ */ (0, import_jsx_runtime269.jsx)(HomeLiveLeagueSubmenu, {}),
@@ -166278,6 +166678,13 @@ function HomePage() {
                 selectedGameId: sportsBrowserSelectedGameId,
                 selectedLeagueKey: sportsBrowserSelectedLeagueKey,
                 selectedSidebarArchLeagueKey: sportsBrowserSelectedSidebarArchLeagueKey,
+                commandCenterGameContextPane: sportsBrowserCommandCenterGameContextPane,
+                onCommandCenterFollowLiveToggle: onSportsBrowserCommandCenterFollowLiveToggle,
+                onCommandCenterGameContextSectionSelect: onSportsBrowserCommandCenterGameContextSectionSelect,
+                onCommandCenterGameTeamContextSectionSelect: onSportsBrowserCommandCenterGameTeamContextSectionSelect,
+                onCommandCenterGameContextWebsiteTabSelect: onSportsBrowserCommandCenterGameContextWebsiteTabSelect,
+                onCommandCenterMlbLiveChildSectionSelect: onSportsBrowserCommandCenterMlbLiveChildSectionSelect,
+                onCommandCenterMlbUpcomingChildSectionSelect: onSportsBrowserCommandCenterMlbUpcomingChildSectionSelect,
                 onWatchLive: onSportsBrowserWatchLive,
                 canShowWatchLive: canShowSportsBrowserWatchLive,
                 onSocialLive: onSportsBrowserSocialLive,
