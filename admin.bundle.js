@@ -24235,17 +24235,6 @@ function resolveAuthoritativeEspnReconciledLeagueKeysFromProviderPoll(providerPo
   }
   return keys;
 }
-function resolveStaleFallbackOperationalLeagueKeysFromProviderPoll(providerPoll) {
-  const keys = /* @__PURE__ */ new Set();
-  const leaguePolls = providerPoll?.leaguePolls;
-  if (!leaguePolls) return keys;
-  for (const [key, row] of Object.entries(leaguePolls)) {
-    if (row?.outcome === "failure" && row.staleFallback === true) {
-      keys.add(key);
-    }
-  }
-  return keys;
-}
 function isAuthoritativeEspnReconciledOperationalLeague(leagueKey, authoritativeLeagueKeys) {
   if (!authoritativeLeagueKeys || authoritativeLeagueKeys.size === 0) return false;
   const key = leagueKey ?? "MLB";
@@ -24323,25 +24312,6 @@ function filterContradictorySupplementalFinals(games, previousGames) {
   );
   if (protectedIds.size === 0) return games;
   return games.filter((g) => g.status !== "final" || !protectedIds.has(g.id));
-}
-function mergeFinalRowsWithoutContradictingProtectedGames(primary, extraLeagues, previousGames, authoritativeEspnReconciledLeagueKeys) {
-  const protectedIds = new Set(
-    previousGames.filter((g) => g.status === "live" || g.status === "postponed").map((g) => g.id)
-  );
-  const leagues = { ...primary.leagues };
-  let changed = false;
-  for (const key of getGamesColumnLeagueOrder()) {
-    if (authoritativeEspnReconciledLeagueKeys?.has(key)) continue;
-    const rows = leagues[key] ?? [];
-    const ids = new Set(rows.map((g) => g.id));
-    const extras = (extraLeagues[key] ?? []).filter(
-      (g) => g.status === "final" && !ids.has(g.id) && !protectedIds.has(g.id)
-    );
-    if (extras.length === 0) continue;
-    leagues[key] = [...rows, ...extras];
-    changed = true;
-  }
-  return changed ? { ...primary, leagues } : primary;
 }
 
 // ../grarf/desktop/src/lib/finalizedGameRetention/mergeCatchUpIngestSnapshot.ts
@@ -24827,158 +24797,6 @@ function resolveOperationalStartupGateState(input) {
   };
 }
 
-// ../grarf/desktop/src/services/operationalIngest/mergeGrarfCloudOperationalSnapshot.ts
-init_define_import_meta_env();
-function mergeGrarfCloudNcaafYahooSportsUrlOverPrevious(cloudGame, previousGame) {
-  const prevYahoo = previousGame.metadata?.yahooSportsGameUrl?.trim();
-  if (!prevYahoo || cloudGame.metadata?.yahooSportsGameUrl?.trim()) {
-    return cloudGame;
-  }
-  return {
-    ...cloudGame,
-    metadata: {
-      ...cloudGame.metadata,
-      yahooSportsGameUrl: prevYahoo
-    }
-  };
-}
-function mergeGrarfCloudOperationalGameOverPrevious(cloudGame, previousGame) {
-  if (!previousGame) return cloudGame;
-  let merged = cloudGame;
-  merged = mergeGrarfCloudNcaafYahooSportsUrlOverPrevious(merged, previousGame);
-  const prevCbs = previousGame.metadata?.cbsSportsPreviewUrl?.trim();
-  if (prevCbs && !merged.metadata?.cbsSportsPreviewUrl?.trim()) {
-    merged = {
-      ...merged,
-      metadata: {
-        ...merged.metadata,
-        cbsSportsPreviewUrl: prevCbs
-      }
-    };
-  }
-  const prevCovers = previousGame.metadata?.coversMlbPicksUrl?.trim();
-  if (prevCovers && !merged.metadata?.coversMlbPicksUrl?.trim()) {
-    merged = {
-      ...merged,
-      metadata: {
-        ...merged.metadata,
-        coversMlbPicksUrl: prevCovers
-      }
-    };
-  }
-  const prevKalshi = previousGame.metadata?.kalshiMlbMarketUrl?.trim();
-  if (prevKalshi && !merged.metadata?.kalshiMlbMarketUrl?.trim()) {
-    merged = {
-      ...merged,
-      metadata: {
-        ...merged.metadata,
-        kalshiMlbMarketUrl: prevKalshi
-      }
-    };
-  }
-  const prevPolymarket = previousGame.metadata?.polymarketMlbMarketUrl?.trim();
-  if (prevPolymarket && !merged.metadata?.polymarketMlbMarketUrl?.trim()) {
-    merged = {
-      ...merged,
-      metadata: {
-        ...merged.metadata,
-        polymarketMlbMarketUrl: prevPolymarket
-      }
-    };
-  }
-  const prevNovig = previousGame.metadata?.novigMlbEventMarketUrl?.trim();
-  if (prevNovig && !merged.metadata?.novigMlbEventMarketUrl?.trim()) {
-    merged = {
-      ...merged,
-      metadata: {
-        ...merged.metadata,
-        novigMlbEventMarketUrl: prevNovig
-      }
-    };
-  }
-  return merged;
-}
-function mergeGrarfCloudOperationalLeaguesOverPrevious(cloudLeagues, previousLeagues, authoritativeEspnReconciledLeagueKeys, staleFallbackOperationalLeagueKeys) {
-  const merged = { ...previousLeagues };
-  for (const [key, cloudRows] of Object.entries(cloudLeagues)) {
-    const leagueKey = key;
-    if (!Array.isArray(cloudRows)) continue;
-    if (staleFallbackOperationalLeagueKeys?.has(leagueKey)) {
-      continue;
-    }
-    if (authoritativeEspnReconciledLeagueKeys?.has(leagueKey)) {
-      const previousRows2 = merged[leagueKey] ?? [];
-      const byId2 = new Map(previousRows2.map((game) => [game.id, game]));
-      merged[leagueKey] = cloudRows.map(
-        (cloudGame) => mergeGrarfCloudOperationalGameOverPrevious(cloudGame, byId2.get(cloudGame.id))
-      );
-      continue;
-    }
-    if (cloudRows.length === 0) continue;
-    const previousRows = merged[leagueKey];
-    if (!Array.isArray(previousRows) || previousRows.length === 0) {
-      merged[leagueKey] = cloudRows;
-      continue;
-    }
-    const byId = new Map(previousRows.map((game) => [game.id, game]));
-    for (const cloudGame of cloudRows) {
-      byId.set(
-        cloudGame.id,
-        mergeGrarfCloudOperationalGameOverPrevious(cloudGame, byId.get(cloudGame.id))
-      );
-    }
-    merged[leagueKey] = Array.from(byId.values());
-  }
-  if (authoritativeEspnReconciledLeagueKeys) {
-    for (const leagueKey of authoritativeEspnReconciledLeagueKeys) {
-      if (Object.prototype.hasOwnProperty.call(cloudLeagues, leagueKey)) continue;
-      merged[leagueKey] = [];
-    }
-  }
-  return merged;
-}
-function parseUpdatedAtMs(updatedAt) {
-  if (!updatedAt?.trim()) return 0;
-  const ms = Date.parse(updatedAt);
-  return Number.isFinite(ms) ? ms : 0;
-}
-function mergeGrarfCloudTransportIntoOperationalSnapshot(input) {
-  const authoritativeEspnReconciledLeagueKeys = resolveAuthoritativeEspnReconciledLeagueKeysFromProviderPoll(input.providerPoll);
-  const staleFallbackOperationalLeagueKeys = resolveStaleFallbackOperationalLeagueKeysFromProviderPoll(input.providerPoll);
-  const previousCount = countOperationalGames2(input.previousLeagues);
-  const mergedLeagues = previousCount === 0 ? input.incoming.leagues ?? {} : mergeGrarfCloudOperationalLeaguesOverPrevious(
-    input.incoming.leagues ?? {},
-    input.previousLeagues,
-    authoritativeEspnReconciledLeagueKeys,
-    staleFallbackOperationalLeagueKeys
-  );
-  let merged = preserveMissingOperationalIngestGames(
-    {
-      ...input.incoming,
-      leagues: mergedLeagues
-    },
-    input.previousGames,
-    {
-      authoritativeEspnReconciledLeagueKeys,
-      providerPoll: input.providerPoll
-    }
-  );
-  if (previousCount > 0) {
-    merged = mergeFinalRowsWithoutContradictingProtectedGames(
-      merged,
-      input.previousLeagues,
-      input.previousGames,
-      authoritativeEspnReconciledLeagueKeys
-    );
-  }
-  const incomingMs = parseUpdatedAtMs(input.incoming.updatedAt);
-  const previousMs = parseUpdatedAtMs(input.previousUpdatedAt);
-  if (incomingMs > 0 && (previousMs === 0 || incomingMs >= previousMs)) {
-    merged = { ...merged, updatedAt: input.incoming.updatedAt ?? merged.updatedAt };
-  }
-  return merged;
-}
-
 // ../grarf/desktop/src/store/gamesSpineRenderStore.ts
 init_define_import_meta_env();
 function isCompleteOperationalSnapshot(leagues, meta) {
@@ -25146,7 +24964,10 @@ function gamesSnapshotMateriallyMatchesCanonical(snap, options) {
   if (Object.keys(prevCanonical.gamesById).length === 0) return false;
   const previousGames = Object.values(prevCanonical.gamesById).map((row) => row.game);
   const ipcAuthoritative = isElectronIpcAuthoritativeOperationalIngest(options?.ingestSource);
-  const preparedSnap = ipcAuthoritative ? snap : preserveMissingOperationalIngestGames(snap, previousGames);
+  const grarfCloudAuthoritative = options?.ingestSource === "grarf_cloud";
+  const preparedSnap = ipcAuthoritative || grarfCloudAuthoritative ? snap : preserveMissingOperationalIngestGames(snap, previousGames, {
+    providerPoll: options?.providerPoll
+  });
   if (!ipcAuthoritative && supplementalRetainedFinalsWouldChangeCanonical(
     preparedSnap,
     previousGames,
@@ -25186,14 +25007,6 @@ var useLiveGamesStore = create((set, get) => ({
     const ingestSource = completeness?.source;
     const prevCanonical = useCanonicalLiveGameStore.getState();
     let effectiveSnap = snap;
-    if (ingestSource === "grarf_cloud") {
-      effectiveSnap = mergeGrarfCloudTransportIntoOperationalSnapshot({
-        incoming: snap,
-        previousLeagues: prevCanonical.leagues,
-        previousGames: Object.values(prevCanonical.gamesById).map((row) => row.game),
-        previousUpdatedAt: prevCanonical.updatedAt
-      });
-    }
     const traceLiveStoreReject = (rejectReason) => {
       traceGrarfLiveGameLiveStoreHydrateRejected(rejectReason, effectiveSnap.leagues);
     };
@@ -25289,7 +25102,8 @@ var useLiveGamesStore = create((set, get) => ({
         ingestSource
       );
       const materiallyDiffers = !gamesSnapshotMateriallyMatchesCanonical(effectiveSnap, {
-        ingestSource
+        ingestSource,
+        providerPoll: completeness?.providerPoll
       });
       if (!acceptByFreshness) {
         if (!materiallyDiffers) {
@@ -25335,7 +25149,10 @@ var useLiveGamesStore = create((set, get) => ({
         recordAppliedOperationalTransportGeneratedAt(transportGeneratedAt, ingestSource);
       }
     }
-    if (gamesSnapshotMateriallyMatchesCanonical(effectiveSnap, { ingestSource })) {
+    if (gamesSnapshotMateriallyMatchesCanonical(effectiveSnap, {
+      ingestSource,
+      providerPoll: completeness?.providerPoll
+    })) {
       const ipcTransportSource = ingestSource === "espn_local_adapter" || ingestSource === "espn_scoreboard_ipc";
       if (ingestSource === "grarf_cloud" || hasElectronGamesIpc() && ipcTransportSource) {
         useGamesSpineRenderStore.getState().markOperationalIngest(effectiveSnap.leagues, {
