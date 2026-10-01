@@ -67918,9 +67918,11 @@ init_define_import_meta_env();
 var import_zustand31 = __toESM(require_zustand(), 1);
 var useGrarfExtensionSidePanelSectionStore = (0, import_zustand31.create)((set) => ({
   activeSection: "home",
+  pinCommandCenterAtTop: false,
   scrollNonce: 0,
-  selectSection: (activeSection) => set((state3) => ({
+  selectSection: (activeSection, options = {}) => set((state3) => ({
     activeSection,
+    pinCommandCenterAtTop: options.pinCommandCenterAtTop ?? true,
     scrollNonce: state3.scrollNonce + 1
   }))
 }));
@@ -160809,29 +160811,45 @@ function resolveScrollOffsetWithinContainer(element, scrollContainer) {
 }
 function scrollGrarfExtensionSidePanelToSection(scrollContainer, section, options = {}) {
   const behavior = options.behavior ?? "smooth";
+  const pinCommandCenterAtTop = options.pinCommandCenterAtTop ?? true;
   if (section === "home") {
     scrollContainer.scrollTo({ top: 0, behavior });
     return;
   }
   const commandCenter = scrollContainer.querySelector(COMMAND_CENTER_SELECTOR);
-  if (!commandCenter) return;
   if (section === "browse") {
     const temporalNav = scrollContainer.querySelector(TEMPORAL_NAV_SELECTOR);
     if (temporalNav) {
-      const commandCenterHeight2 = commandCenter.getBoundingClientRect().height;
-      const temporalTop = resolveScrollOffsetWithinContainer(temporalNav, scrollContainer);
-      scrollContainer.scrollTo({
-        top: Math.max(0, temporalTop - commandCenterHeight2),
-        behavior
-      });
+      if (!pinCommandCenterAtTop) {
+        temporalNav.scrollIntoView({ behavior, block: "start" });
+        return;
+      }
+      if (commandCenter) {
+        const commandCenterHeight2 = commandCenter.getBoundingClientRect().height;
+        const temporalTop = resolveScrollOffsetWithinContainer(temporalNav, scrollContainer);
+        scrollContainer.scrollTo({
+          top: Math.max(0, temporalTop - commandCenterHeight2),
+          behavior
+        });
+        return;
+      }
+      temporalNav.scrollIntoView({ behavior, block: "start" });
       return;
     }
-    commandCenter.scrollIntoView({ behavior, block: "start" });
+    commandCenter?.scrollIntoView({ behavior, block: "start" });
     return;
   }
   const timelineSection = scrollContainer.querySelector(TIMELINE_SECTION_SELECTOR);
   if (!timelineSection) {
-    commandCenter.scrollIntoView({ behavior, block: "start" });
+    commandCenter?.scrollIntoView({ behavior, block: "start" });
+    return;
+  }
+  if (!pinCommandCenterAtTop) {
+    timelineSection.scrollIntoView({ behavior, block: "start" });
+    return;
+  }
+  if (!commandCenter) {
+    timelineSection.scrollIntoView({ behavior, block: "start" });
     return;
   }
   const commandCenterHeight = commandCenter.getBoundingClientRect().height;
@@ -160841,22 +160859,28 @@ function scrollGrarfExtensionSidePanelToSection(scrollContainer, section, option
     behavior
   });
 }
-function syncGrarfExtensionSidePanelSectionDataset(section) {
+function syncGrarfExtensionSidePanelSectionDataset(section, pinCommandCenterAtTop) {
   if (typeof document === "undefined") return;
   document.documentElement.dataset.grarfExtensionSidePanelSection = section;
+  document.documentElement.dataset.grarfExtensionSidePanelPinCommandCenter = pinCommandCenterAtTop ? "true" : "false";
 }
 
 // ../grarf/desktop/src/extensionHost/useGrarfExtensionSidePanelSectionScroll.ts
 function useGrarfExtensionSidePanelSectionScroll(scrollContainerRef) {
   const activeSection = useGrarfExtensionSidePanelSectionStore((state3) => state3.activeSection);
+  const pinCommandCenterAtTop = useGrarfExtensionSidePanelSectionStore(
+    (state3) => state3.pinCommandCenterAtTop
+  );
   const scrollNonce = useGrarfExtensionSidePanelSectionStore((state3) => state3.scrollNonce);
   (0, import_react280.useEffect)(() => {
     if (!isGrarfExtensionRenderer()) return;
-    syncGrarfExtensionSidePanelSectionDataset(activeSection);
+    syncGrarfExtensionSidePanelSectionDataset(activeSection, pinCommandCenterAtTop);
     const scrollContainer = scrollContainerRef.current;
     if (!scrollContainer) return;
-    scrollGrarfExtensionSidePanelToSection(scrollContainer, activeSection);
-  }, [activeSection, scrollContainerRef, scrollNonce]);
+    scrollGrarfExtensionSidePanelToSection(scrollContainer, activeSection, {
+      pinCommandCenterAtTop
+    });
+  }, [activeSection, pinCommandCenterAtTop, scrollContainerRef, scrollNonce]);
 }
 
 // ../grarf/desktop/src/extensionHost/GrarfExtensionAiSearchHomeSection.tsx
@@ -160865,6 +160889,38 @@ var import_react281 = __toESM(require_react(), 1);
 
 // ../grarf/desktop/src/extensionHost/grarfExtensionAiSearchHome.ts
 init_define_import_meta_env();
+function resolveCatchUpTemporalView(day) {
+  return day === "yesterday" ? "yesterday" : "final";
+}
+function resolveGrarfExtensionAiSearchCatchUpAction(day) {
+  return {
+    kind: "temporal",
+    view: resolveCatchUpTemporalView(day),
+    temporaryNavTopLevel: "GAMES"
+  };
+}
+function resolveGrarfExtensionAiSearchGamesWhenAction(when) {
+  const view = when === "live now" ? "now" : when === "upcoming" ? "next" : "today";
+  return { kind: "temporal", view, temporaryNavTopLevel: "GAMES" };
+}
+var LEAGUE_CONTENT_TOP_LEVEL = {
+  news: "NEWS",
+  social: "SOCIAL",
+  highlights: "HIGHLIGHTS",
+  fantasy: "FANTASY",
+  betting: "BETTING"
+};
+function resolveGrarfExtensionAiSearchLeagueContentAction(kind) {
+  return {
+    kind: "content",
+    temporaryNavTopLevel: LEAGUE_CONTENT_TOP_LEVEL[kind],
+    section: kind,
+    scope: "leagues"
+  };
+}
+function resolveGrarfExtensionAiSearchTimelineAction() {
+  return { kind: "timeline" };
+}
 function normalizeSearchQuery(raw) {
   return raw.trim().toLowerCase().replace(/\s+/g, " ");
 }
@@ -160900,7 +160956,11 @@ var SEARCH_PHRASE_ACTIONS = [
   },
   {
     patterns: [/today'?s?\s+games?/, /^today$/, /all\s+today/],
-    action: { kind: "temporal", view: "today", temporaryNavTopLevel: "GAMES" }
+    action: resolveGrarfExtensionAiSearchGamesWhenAction("today")
+  },
+  {
+    patterns: [/upcoming/, /next\s+games?/],
+    action: resolveGrarfExtensionAiSearchGamesWhenAction("upcoming")
   },
   {
     patterns: [/best\s+game/, /watch/, /what\s+to\s+watch/],
@@ -160922,30 +160982,19 @@ var SEARCH_PHRASE_ACTIONS = [
   },
   {
     patterns: [/follow\s+(your\s+)?teams?/, /^teams?$/, /social/],
-    action: {
-      kind: "content",
-      temporaryNavTopLevel: "SOCIAL",
-      section: "social",
-      scope: "teams"
-    }
+    action: resolveGrarfExtensionAiSearchLeagueContentAction("social")
   },
   {
     patterns: [/highlights?/, /clips?/],
-    action: {
-      kind: "content",
-      temporaryNavTopLevel: "HIGHLIGHTS",
-      section: "highlights",
-      scope: "leagues"
-    }
+    action: resolveGrarfExtensionAiSearchLeagueContentAction("highlights")
   },
   {
     patterns: [/betting/, /odds/, /lines?/],
-    action: {
-      kind: "content",
-      temporaryNavTopLevel: "BETTING",
-      section: "betting",
-      scope: "leagues"
-    }
+    action: resolveGrarfExtensionAiSearchLeagueContentAction("betting")
+  },
+  {
+    patterns: [/real\s*time/, /everything\s+happening/],
+    action: resolveGrarfExtensionAiSearchTimelineAction()
   }
 ];
 function resolveGrarfExtensionAiSearchQueryAction(input) {
@@ -160987,6 +161036,7 @@ function InlineSelector({
         type: "button",
         className: "grarf-extension-ai-search-home__inline-selector",
         "aria-label": ariaLabel,
+        onClick: (event) => event.stopPropagation(),
         children: [
           value,
           /* @__PURE__ */ (0, import_jsx_runtime271.jsx)(ChevronDown, { className: "h-3 w-3 opacity-80", "aria-hidden": true })
@@ -160998,22 +161048,34 @@ function InlineSelector({
 }
 function SuggestionRow({
   icon: Icon2,
-  label
+  label,
+  onActivate,
+  presentational = false
 }) {
-  return /* @__PURE__ */ (0, import_jsx_runtime271.jsx)("li", { children: /* @__PURE__ */ (0, import_jsx_runtime271.jsxs)("div", { className: "grarf-extension-ai-search-home__suggestion-row", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime271.jsxs)("div", { className: "grarf-extension-ai-search-home__suggestion-main", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime271.jsx)(Icon2, { className: "grarf-extension-ai-search-home__suggestion-icon", strokeWidth: 1.5, "aria-hidden": true }),
-      /* @__PURE__ */ (0, import_jsx_runtime271.jsx)("span", { className: "grarf-extension-ai-search-home__suggestion-label", children: label })
-    ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime271.jsx)(
-      "span",
-      {
-        className: "grarf-extension-ai-search-home__suggestion-chevron grarf-extension-ai-search-home__suggestion-chevron--presentational",
-        "aria-hidden": true,
-        children: /* @__PURE__ */ (0, import_jsx_runtime271.jsx)(ChevronRight, { className: "h-4 w-4", strokeWidth: 1.75 })
-      }
-    )
-  ] }) });
+  return /* @__PURE__ */ (0, import_jsx_runtime271.jsx)("li", { children: /* @__PURE__ */ (0, import_jsx_runtime271.jsxs)(
+    "button",
+    {
+      type: "button",
+      className: "grarf-extension-ai-search-home__suggestion-row",
+      onClick: onActivate,
+      disabled: presentational || !onActivate,
+      "data-grarf-extension-ai-search-suggestion": presentational ? "disabled" : "active",
+      children: [
+        /* @__PURE__ */ (0, import_jsx_runtime271.jsxs)("span", { className: "grarf-extension-ai-search-home__suggestion-main", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime271.jsx)(Icon2, { className: "grarf-extension-ai-search-home__suggestion-icon", strokeWidth: 1.5, "aria-hidden": true }),
+          /* @__PURE__ */ (0, import_jsx_runtime271.jsx)("span", { className: "grarf-extension-ai-search-home__suggestion-label", children: label })
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime271.jsx)(
+          "span",
+          {
+            className: "grarf-extension-ai-search-home__suggestion-chevron grarf-extension-ai-search-home__suggestion-chevron--presentational",
+            "aria-hidden": true,
+            children: /* @__PURE__ */ (0, import_jsx_runtime271.jsx)(ChevronRight, { className: "h-4 w-4", strokeWidth: 1.75 })
+          }
+        )
+      ]
+    }
+  ) });
 }
 function GrarfExtensionAiSearchHomeSection({
   className,
@@ -161111,6 +161173,7 @@ function GrarfExtensionAiSearchHomeSection({
             SuggestionRow,
             {
               icon: RotateCcw,
+              onActivate: () => onExecuteAction(resolveGrarfExtensionAiSearchCatchUpAction(catchUpDay)),
               label: /* @__PURE__ */ (0, import_jsx_runtime271.jsxs)(import_jsx_runtime271.Fragment, { children: [
                 "Catch up on",
                 " ",
@@ -161131,6 +161194,7 @@ function GrarfExtensionAiSearchHomeSection({
             SuggestionRow,
             {
               icon: Radio,
+              onActivate: () => onExecuteAction(resolveGrarfExtensionAiSearchGamesWhenAction(gamesWhen)),
               label: /* @__PURE__ */ (0, import_jsx_runtime271.jsxs)(import_jsx_runtime271.Fragment, { children: [
                 "See all games",
                 " ",
@@ -161150,6 +161214,7 @@ function GrarfExtensionAiSearchHomeSection({
             SuggestionRow,
             {
               icon: Newspaper,
+              presentational: true,
               label: "Scan all major sports news outlets"
             }
           ),
@@ -161157,6 +161222,7 @@ function GrarfExtensionAiSearchHomeSection({
             SuggestionRow,
             {
               icon: Activity,
+              onActivate: () => onExecuteAction(resolveGrarfExtensionAiSearchTimelineAction()),
               label: "Know everything happening in real time"
             }
           ),
@@ -161164,6 +161230,7 @@ function GrarfExtensionAiSearchHomeSection({
             SuggestionRow,
             {
               icon: Trophy,
+              onActivate: () => onExecuteAction(resolveGrarfExtensionAiSearchLeagueContentAction(leagueContentKind)),
               label: /* @__PURE__ */ (0, import_jsx_runtime271.jsxs)(import_jsx_runtime271.Fragment, { children: [
                 "Check",
                 " ",
@@ -163938,11 +164005,15 @@ function SportsBrowserPrototypeLeftNav({
     }
   }, []);
   const [aiSearchTemporaryNavRequest, setAiSearchTemporaryNavRequest] = (0, import_react283.useState)(null);
-  const scrollExtensionSidebarToTemporalNav = (0, import_react283.useCallback)(() => {
-    const scrollContainer = sidebarScrollContainerRef.current;
-    if (!scrollContainer) return;
-    scrollContainer.querySelector("[data-sports-browser-prototype-temporary-nav-prototype]")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  const scrollExtensionSidebarToBrowse = (0, import_react283.useCallback)((pinCommandCenterAtTop = true) => {
+    useGrarfExtensionSidePanelSectionStore.getState().selectSection("browse", { pinCommandCenterAtTop });
   }, []);
+  const scrollExtensionSidebarToBrowseFromAiSearch = (0, import_react283.useCallback)(() => {
+    scrollExtensionSidebarToBrowse(false);
+  }, [scrollExtensionSidebarToBrowse]);
+  const scrollExtensionSidebarToTemporalNav = (0, import_react283.useCallback)(() => {
+    scrollExtensionSidebarToBrowseFromAiSearch();
+  }, [scrollExtensionSidebarToBrowseFromAiSearch]);
   const requestTemporaryNavTopLevel = (0, import_react283.useCallback)(
     (topLevel) => {
       setAiSearchTemporaryNavRequest({ topLevel, nonce: Date.now() });
@@ -163973,7 +164044,7 @@ function SportsBrowserPrototypeLeftNav({
           requestTemporaryNavTopLevel(action.temporaryNavTopLevel);
           handleTemporaryNavTopLevelChange(action.temporaryNavTopLevel);
           onCompactTemporalSelect(action.view);
-          scrollExtensionSidebarToTemporalNav();
+          scrollExtensionSidebarToBrowseFromAiSearch();
           return;
         case "content":
           requestTemporaryNavTopLevel(action.temporaryNavTopLevel);
@@ -163986,20 +164057,20 @@ function SportsBrowserPrototypeLeftNav({
           if (action.globalWebsiteIndex != null) {
             onTemporaryNavGlobalDestinationSelect?.(action.section, action.globalWebsiteIndex);
           }
-          scrollExtensionSidebarToTemporalNav();
+          scrollExtensionSidebarToBrowseFromAiSearch();
           return;
         case "explore-leagues":
           requestTemporaryNavTopLevel("LEAGUES");
           handleTemporaryNavTopLevelChange("LEAGUES");
           setSidebarTopLevelMode("leagues");
-          scrollExtensionSidebarToTemporalNav();
+          scrollExtensionSidebarToBrowseFromAiSearch();
           return;
         case "leagues-filter":
           requestTemporaryNavTopLevel("LEAGUES");
           handleTemporaryNavTopLevelChange("LEAGUES");
           setSidebarTopLevelMode("leagues");
           setLeaguesSearchQuery(action.query);
-          scrollExtensionSidebarToTemporalNav();
+          scrollExtensionSidebarToBrowseFromAiSearch();
           return;
         case "select-game": {
           if (action.temporalView) {
@@ -164011,9 +164082,12 @@ function SportsBrowserPrototypeLeftNav({
           if (game) {
             onGameSelect?.(game);
           }
-          scrollExtensionSidebarToTemporalNav();
+          scrollExtensionSidebarToBrowseFromAiSearch();
           return;
         }
+        case "timeline":
+          useGrarfExtensionSidePanelSectionStore.getState().selectSection("timeline", { pinCommandCenterAtTop: false });
+          return;
         default: {
           const _exhaustive = action;
           return _exhaustive;
@@ -164028,6 +164102,8 @@ function SportsBrowserPrototypeLeftNav({
       onGameSelect,
       onTemporaryNavGlobalDestinationSelect,
       requestTemporaryNavTopLevel,
+      scrollExtensionSidebarToBrowse,
+      scrollExtensionSidebarToBrowseFromAiSearch,
       scrollExtensionSidebarToTemporalNav
     ]
   );
