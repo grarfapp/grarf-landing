@@ -106602,6 +106602,35 @@ function GrarfExtensionTimelineNewsCard({ story, timestampIso, itemUrl, onOpen }
 init_define_import_meta_env();
 var import_react95 = __toESM(require_react(), 1);
 
+// ../grarf/desktop/src/lib/social/formatSocialWirePostMeta.ts
+init_define_import_meta_env();
+function formatSocialWireClock(iso) {
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return "";
+  return date.toLocaleTimeString(void 0, {
+    hour: "numeric",
+    minute: "2-digit"
+  });
+}
+function formatSocialWireHandle(event) {
+  const label = event.sourceLabel?.trim();
+  if (label) return label.startsWith("@") ? label : `@${label}`;
+  try {
+    const handle = new URL(event.embed.tweetUrl).pathname.split("/").filter(Boolean)[0]?.trim();
+    return handle ? `@${handle}` : "";
+  } catch {
+    return "";
+  }
+}
+function formatSocialWireMeta(event) {
+  const league2 = formatLiveTrackLeagueDisplayName(event.league ?? event.sport);
+  const clock = formatSocialWireClock(event.timestamp);
+  return clock ? `${league2} \u2022 ${clock}` : league2;
+}
+
+// ../grarf/desktop/src/components/social/SocialRssAppMediaPreview.tsx
+init_define_import_meta_env();
+
 // ../grarf/desktop/src/lib/livetrack/resolveLiveTrackMomentMedia.ts
 init_define_import_meta_env();
 
@@ -106644,35 +106673,6 @@ function isLiveTrackVideoPost(event) {
 function resolveLiveTrackPostUrl(event) {
   return event.embed.tweetUrl?.trim() ?? "";
 }
-
-// ../grarf/desktop/src/lib/social/formatSocialWirePostMeta.ts
-init_define_import_meta_env();
-function formatSocialWireClock(iso) {
-  const date = new Date(iso);
-  if (Number.isNaN(date.getTime())) return "";
-  return date.toLocaleTimeString(void 0, {
-    hour: "numeric",
-    minute: "2-digit"
-  });
-}
-function formatSocialWireHandle(event) {
-  const label = event.sourceLabel?.trim();
-  if (label) return label.startsWith("@") ? label : `@${label}`;
-  try {
-    const handle = new URL(event.embed.tweetUrl).pathname.split("/").filter(Boolean)[0]?.trim();
-    return handle ? `@${handle}` : "";
-  } catch {
-    return "";
-  }
-}
-function formatSocialWireMeta(event) {
-  const league2 = formatLiveTrackLeagueDisplayName(event.league ?? event.sport);
-  const clock = formatSocialWireClock(event.timestamp);
-  return clock ? `${league2} \u2022 ${clock}` : league2;
-}
-
-// ../grarf/desktop/src/components/social/SocialRssAppMediaPreview.tsx
-init_define_import_meta_env();
 
 // ../grarf/desktop/src/components/homeMvp/HomeLiveTrackTwitterEmbedMedia.tsx
 init_define_import_meta_env();
@@ -106722,7 +106722,7 @@ var import_jsx_runtime42 = __toESM(require_jsx_runtime(), 1);
 function stopRowActivation(event) {
   event.stopPropagation();
 }
-function SocialRssAppMediaPreview({ event, isPlaying = false, onPlay }) {
+function SocialRssAppMediaPreview({ event, isPlaying = false, onPlay, onVideoEnded }) {
   const previewImageUrl = resolveLiveTrackPreviewImageUrl(event).trim();
   const videoSrc = resolveLiveTrackVideoSrc(event).trim();
   const postUrl = resolveLiveTrackPostUrl(event);
@@ -106738,6 +106738,7 @@ function SocialRssAppMediaPreview({ event, isPlaying = false, onPlay }) {
             controls: true,
             autoPlay: true,
             playsInline: true,
+            onEnded: onVideoEnded,
             className: RSSAPP_FEED_VIDEO_IMAGE_CLASS
           },
           videoSrc
@@ -106831,9 +106832,6 @@ function GrarfExtensionTimelineSocialCard({
   const handle = formatSocialWireHandle(event);
   const displayName = resolveSocialDisplayName(event, handle);
   const body = event.embed.headline.trim();
-  const previewImageUrl = resolveLiveTrackPreviewImageUrl(event).trim();
-  const videoSrc = resolveLiveTrackVideoSrc(event).trim();
-  const isVideo = isLiveTrackVideoPost(event);
   const showMedia = hasSocialRssAppMedia(event);
   const avatarUrl = (0, import_react95.useMemo)(() => {
     const candidates = [
@@ -106875,52 +106873,22 @@ function GrarfExtensionTimelineSocialCard({
           ] })
         ] }),
         body ? /* @__PURE__ */ (0, import_jsx_runtime43.jsx)("div", { className: "grarf-extension-timeline-social__copy", children: renderSocialBodyParagraphs(body) }) : null,
-        showMedia ? /* @__PURE__ */ (0, import_jsx_runtime43.jsx)("div", { className: "grarf-extension-timeline-social__media", children: isVideo && videoSrc ? isPlaying ? /* @__PURE__ */ (0, import_jsx_runtime43.jsx)(
-          "video",
+        showMedia ? /* @__PURE__ */ (0, import_jsx_runtime43.jsx)(
+          "div",
           {
-            src: videoSrc,
-            controls: true,
-            autoPlay: true,
-            playsInline: true,
-            onEnded: onVideoEnded,
-            className: "grarf-extension-timeline-social__media-img",
-            onClick: (event2) => event2.stopPropagation()
-          },
-          videoSrc
-        ) : /* @__PURE__ */ (0, import_jsx_runtime43.jsxs)(
-          "button",
-          {
-            type: "button",
-            className: "grarf-extension-timeline-social__video-poster",
-            onClick: (event2) => {
-              event2.stopPropagation();
-              onPlayVideo?.();
-            },
-            "aria-label": "Play video",
-            children: [
-              /* @__PURE__ */ (0, import_jsx_runtime43.jsx)(
-                "img",
-                {
-                  src: previewImageUrl || videoSrc,
-                  alt: "",
-                  className: "grarf-extension-timeline-social__media-img",
-                  loading: "lazy",
-                  decoding: "async"
-                }
-              ),
-              /* @__PURE__ */ (0, import_jsx_runtime43.jsx)("span", { className: "grarf-extension-timeline-clip__play", "aria-hidden": true, children: /* @__PURE__ */ (0, import_jsx_runtime43.jsx)("span", { className: "grarf-extension-timeline-clip__play-icon", children: "\u25B6" }) })
-            ]
+            className: "grarf-extension-timeline-social__media",
+            onClick: (clickEvent) => clickEvent.stopPropagation(),
+            children: /* @__PURE__ */ (0, import_jsx_runtime43.jsx)(
+              SocialRssAppMediaPreview,
+              {
+                event,
+                isPlaying,
+                onPlay: onPlayVideo,
+                onVideoEnded
+              }
+            )
           }
-        ) : previewImageUrl ? /* @__PURE__ */ (0, import_jsx_runtime43.jsx)(
-          "img",
-          {
-            src: previewImageUrl,
-            alt: "",
-            className: "grarf-extension-timeline-social__media-img",
-            loading: "lazy",
-            decoding: "async"
-          }
-        ) : null }) : null
+        ) : null
       ] })
     }
   );
