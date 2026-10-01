@@ -161044,17 +161044,7 @@ function InlineSelector({
         ]
       }
     ) }),
-    /* @__PURE__ */ (0, import_jsx_runtime271.jsx)(DropdownMenuContent3, { align: "start", className: "min-w-[8rem]", children: options.map((option) => /* @__PURE__ */ (0, import_jsx_runtime271.jsx)(
-      DropdownMenuItem3,
-      {
-        onSelect: (event) => {
-          event.preventDefault();
-          onSelect(option);
-        },
-        children: option
-      },
-      option
-    )) })
+    /* @__PURE__ */ (0, import_jsx_runtime271.jsx)(DropdownMenuContent3, { align: "start", className: "min-w-[8rem]", children: options.map((option) => /* @__PURE__ */ (0, import_jsx_runtime271.jsx)(DropdownMenuItem3, { onSelect: () => onSelect(option), children: option }, option)) })
   ] });
 }
 function SuggestionRow({
