@@ -161037,13 +161037,24 @@ function InlineSelector({
         className: "grarf-extension-ai-search-home__inline-selector",
         "aria-label": ariaLabel,
         onClick: (event) => event.stopPropagation(),
+        onPointerDown: (event) => event.stopPropagation(),
         children: [
           value,
           /* @__PURE__ */ (0, import_jsx_runtime271.jsx)(ChevronDown, { className: "h-3 w-3 opacity-80", "aria-hidden": true })
         ]
       }
     ) }),
-    /* @__PURE__ */ (0, import_jsx_runtime271.jsx)(DropdownMenuContent3, { align: "start", className: "min-w-[8rem]", children: options.map((option) => /* @__PURE__ */ (0, import_jsx_runtime271.jsx)(DropdownMenuItem3, { onSelect: () => onSelect(option), children: option }, option)) })
+    /* @__PURE__ */ (0, import_jsx_runtime271.jsx)(DropdownMenuContent3, { align: "start", className: "min-w-[8rem]", children: options.map((option) => /* @__PURE__ */ (0, import_jsx_runtime271.jsx)(
+      DropdownMenuItem3,
+      {
+        onSelect: (event) => {
+          event.preventDefault();
+          onSelect(option);
+        },
+        children: option
+      },
+      option
+    )) })
   ] });
 }
 function SuggestionRow({
@@ -161052,25 +161063,29 @@ function SuggestionRow({
   onActivate,
   presentational = false
 }) {
+  const canNavigate = Boolean(onActivate) && !presentational;
   return /* @__PURE__ */ (0, import_jsx_runtime271.jsx)("li", { children: /* @__PURE__ */ (0, import_jsx_runtime271.jsxs)(
-    "button",
+    "div",
     {
-      type: "button",
       className: "grarf-extension-ai-search-home__suggestion-row",
-      onClick: onActivate,
-      disabled: presentational || !onActivate,
       "data-grarf-extension-ai-search-suggestion": presentational ? "disabled" : "active",
       children: [
-        /* @__PURE__ */ (0, import_jsx_runtime271.jsxs)("span", { className: "grarf-extension-ai-search-home__suggestion-main", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime271.jsxs)("div", { className: "grarf-extension-ai-search-home__suggestion-main", children: [
           /* @__PURE__ */ (0, import_jsx_runtime271.jsx)(Icon2, { className: "grarf-extension-ai-search-home__suggestion-icon", strokeWidth: 1.5, "aria-hidden": true }),
           /* @__PURE__ */ (0, import_jsx_runtime271.jsx)("span", { className: "grarf-extension-ai-search-home__suggestion-label", children: label })
         ] }),
         /* @__PURE__ */ (0, import_jsx_runtime271.jsx)(
-          "span",
+          "button",
           {
-            className: "grarf-extension-ai-search-home__suggestion-chevron grarf-extension-ai-search-home__suggestion-chevron--presentational",
-            "aria-hidden": true,
-            children: /* @__PURE__ */ (0, import_jsx_runtime271.jsx)(ChevronRight, { className: "h-4 w-4", strokeWidth: 1.75 })
+            type: "button",
+            className: cn2(
+              "grarf-extension-ai-search-home__suggestion-chevron",
+              !canNavigate && "grarf-extension-ai-search-home__suggestion-chevron--disabled"
+            ),
+            "aria-label": canNavigate ? "Go to suggested destination" : void 0,
+            disabled: !canNavigate,
+            onClick: canNavigate ? onActivate : void 0,
+            children: /* @__PURE__ */ (0, import_jsx_runtime271.jsx)(ChevronRight, { className: "h-4 w-4", strokeWidth: 1.75, "aria-hidden": true })
           }
         )
       ]
