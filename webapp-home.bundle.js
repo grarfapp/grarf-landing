@@ -88505,7 +88505,7 @@ function useTimelineVirtualScrollAnchor(scrollContainerRef, itemIdsKey, options)
     syncPinnedToTop();
     container.addEventListener("scroll", syncPinnedToTop, { passive: true });
     return () => container.removeEventListener("scroll", syncPinnedToTop);
-  }, [scrollContainerRef]);
+  }, [scrollContainerRef, options?.scrollElementSyncKey]);
   (0, import_react91.useLayoutEffect)(() => {
     if (options?.paused) return;
     const container = scrollContainerRef.current;
@@ -88516,7 +88516,7 @@ function useTimelineVirtualScrollAnchor(scrollContainerRef, itemIdsKey, options)
     if (!pinnedToTopRef.current) return;
     if (container.scrollTop === 0) return;
     container.scrollTop = 0;
-  }, [itemIdsKey, options?.paused, scrollContainerRef]);
+  }, [itemIdsKey, options?.paused, options?.scrollElementSyncKey, scrollContainerRef]);
 }
 
 // ../grarf/desktop/src/store/centerPaneTimelineExpansionStore.ts
@@ -108404,9 +108404,16 @@ var HomeCenterPaneTimelineRow = (0, import_react102.memo)(HomeCenterPaneTimeline
 
 // ../grarf/desktop/src/components/homeMvp/HomeCenterPaneTimelineSurface.tsx
 var import_jsx_runtime58 = __toESM(require_jsx_runtime(), 1);
+function resolveExtensionSidePanelScrollElement(workspace) {
+  return workspace?.closest("[data-sports-browser-prototype-left-nav-scroll]") ?? null;
+}
+function measureExtensionSidePanelTimelineScrollMargin(scrollEl, listEl) {
+  return listEl.getBoundingClientRect().top - scrollEl.getBoundingClientRect().top + scrollEl.scrollTop;
+}
 function HomeCenterPaneTimelineSurface({
   onClipOpen,
-  extensionSidebarWindframePresentation = false
+  extensionSidebarWindframePresentation = false,
+  extensionSidebarUsesSidePanelScroll = false
 }) {
   const liveItems = useCenterPaneTimelineItems();
   const expandedItemId = useCenterPaneTimelineExpansionStore((state3) => state3.expandedItemId);
@@ -108440,19 +108447,93 @@ function HomeCenterPaneTimelineSurface({
   );
   const workspaceRef = (0, import_react103.useRef)(null);
   const scrollContainerRef = (0, import_react103.useRef)(null);
+  const sidePanelScrollRef = (0, import_react103.useRef)(null);
+  const [sidePanelScrollSync, setSidePanelScrollSync] = (0, import_react103.useState)(0);
+  const [sidePanelScrollMargin, setSidePanelScrollMargin] = (0, import_react103.useState)(0);
+  const resolveActiveScrollElement = (0, import_react103.useCallback)(() => {
+    if (extensionSidebarUsesSidePanelScroll) {
+      return sidePanelScrollRef.current ?? resolveExtensionSidePanelScrollElement(workspaceRef.current);
+    }
+    return scrollContainerRef.current;
+  }, [extensionSidebarUsesSidePanelScroll]);
+  (0, import_react103.useLayoutEffect)(() => {
+    if (!extensionSidebarUsesSidePanelScroll) {
+      sidePanelScrollRef.current = null;
+      return;
+    }
+    const next = resolveExtensionSidePanelScrollElement(workspaceRef.current);
+    if (sidePanelScrollRef.current === next) return;
+    sidePanelScrollRef.current = next;
+    setSidePanelScrollSync((value) => value + 1);
+  }, [extensionSidebarUsesSidePanelScroll, itemIdsKey]);
+  const measureSidePanelScrollMargin = (0, import_react103.useCallback)(() => {
+    if (!extensionSidebarUsesSidePanelScroll) return 0;
+    const scrollEl = resolveActiveScrollElement();
+    const listEl = scrollContainerRef.current;
+    if (!scrollEl || !listEl) return 0;
+    return measureExtensionSidePanelTimelineScrollMargin(scrollEl, listEl);
+  }, [extensionSidebarUsesSidePanelScroll, resolveActiveScrollElement]);
+  (0, import_react103.useLayoutEffect)(() => {
+    if (!extensionSidebarUsesSidePanelScroll) {
+      setSidePanelScrollMargin(0);
+      return;
+    }
+    const next = measureSidePanelScrollMargin();
+    setSidePanelScrollMargin((prev) => prev === next ? prev : next);
+  }, [
+    extensionSidebarUsesSidePanelScroll,
+    measureSidePanelScrollMargin,
+    sidePanelScrollSync,
+    itemIdsKey,
+    renderedCount,
+    expandedItemId
+  ]);
+  (0, import_react103.useEffect)(() => {
+    if (!extensionSidebarUsesSidePanelScroll) return;
+    const scrollEl = resolveActiveScrollElement();
+    if (!scrollEl) return;
+    const syncScrollMargin = () => {
+      const next = measureSidePanelScrollMargin();
+      setSidePanelScrollMargin((prev) => prev === next ? prev : next);
+    };
+    syncScrollMargin();
+    scrollEl.addEventListener("scroll", syncScrollMargin, { passive: true });
+    const observer = new ResizeObserver(syncScrollMargin);
+    observer.observe(scrollEl);
+    if (scrollContainerRef.current) {
+      observer.observe(scrollContainerRef.current);
+    }
+    return () => {
+      scrollEl.removeEventListener("scroll", syncScrollMargin);
+      observer.disconnect();
+    };
+  }, [
+    extensionSidebarUsesSidePanelScroll,
+    measureSidePanelScrollMargin,
+    resolveActiveScrollElement,
+    sidePanelScrollSync
+  ]);
+  const activeScrollRef = (0, import_react103.useRef)(null);
+  (0, import_react103.useLayoutEffect)(() => {
+    activeScrollRef.current = resolveActiveScrollElement();
+  });
+  const layoutRefs = (0, import_react103.useMemo)(
+    () => ({
+      scrollContainerRef: activeScrollRef,
+      workspaceRef
+    }),
+    []
+  );
   const itemRefs = (0, import_react103.useRef)(/* @__PURE__ */ new Map());
   const scrollTargetRefs = (0, import_react103.useRef)(/* @__PURE__ */ new Map());
-  const layoutRefs = (0, import_react103.useMemo)(
-    () => ({ scrollContainerRef, workspaceRef }),
-    [scrollContainerRef, workspaceRef]
-  );
   const renderedItemsRef = (0, import_react103.useRef)(renderedItems);
   renderedItemsRef.current = renderedItems;
   const expandedItemIdRef = (0, import_react103.useRef)(expandedItemId);
   expandedItemIdRef.current = expandedItemId;
   const virtualizer = useVirtualizer({
     count: renderedItems.length,
-    getScrollElement: () => scrollContainerRef.current,
+    getScrollElement: () => resolveActiveScrollElement(),
+    scrollMargin: extensionSidebarUsesSidePanelScroll ? sidePanelScrollMargin : 0,
     estimateSize: (index2) => {
       const item = renderedItemsRef.current[index2];
       if (item && expandedItemIdRef.current === item.id) {
@@ -108468,7 +108549,7 @@ function HomeCenterPaneTimelineSurface({
   const loadMoreFrameRef = (0, import_react103.useRef)(null);
   const maybeLoadMore = (0, import_react103.useCallback)(() => {
     if (interactionLocked) return;
-    const scrollContainer = scrollContainerRef.current;
+    const scrollContainer = resolveActiveScrollElement();
     if (!scrollContainer) return;
     setRenderedCount((current) => {
       if (current >= items.length) return current;
@@ -108476,7 +108557,7 @@ function HomeCenterPaneTimelineSurface({
       if (!nearBottom) return current;
       return Math.min(current + CENTER_PANE_TIMELINE_LOAD_MORE_BATCH, items.length);
     });
-  }, [interactionLocked, items.length]);
+  }, [interactionLocked, items.length, resolveActiveScrollElement]);
   const scheduleLoadMore = (0, import_react103.useCallback)(() => {
     if (loadMoreFrameRef.current != null) return;
     loadMoreFrameRef.current = requestAnimationFrame(() => {
@@ -108484,20 +108565,21 @@ function HomeCenterPaneTimelineSurface({
       maybeLoadMore();
     });
   }, [maybeLoadMore]);
-  useTimelineVirtualScrollAnchor(scrollContainerRef, itemIdsKey, {
-    paused: interactionLocked
+  useTimelineVirtualScrollAnchor(activeScrollRef, itemIdsKey, {
+    paused: interactionLocked,
+    scrollElementSyncKey: sidePanelScrollSync
   });
   (0, import_react103.useEffect)(() => {
-    const scrollContainer = scrollContainerRef.current;
+    const scrollContainer = resolveActiveScrollElement();
     if (!scrollContainer) return;
     scrollContainer.addEventListener("scroll", scheduleLoadMore, { passive: true });
     return () => scrollContainer.removeEventListener("scroll", scheduleLoadMore);
-  }, [scheduleLoadMore]);
+  }, [resolveActiveScrollElement, scheduleLoadMore, sidePanelScrollSync]);
   (0, import_react103.useLayoutEffect)(() => {
     scheduleLoadMore();
   }, [items.length, interactionLocked, scheduleLoadMore]);
   (0, import_react103.useLayoutEffect)(() => {
-    const scrollContainer = scrollContainerRef.current;
+    const scrollContainer = resolveActiveScrollElement();
     if (!scrollContainer || interactionLocked) return;
     if (renderedCount >= items.length) return;
     const canScroll = scrollContainer.scrollHeight > scrollContainer.clientHeight + 1;
@@ -108506,16 +108588,24 @@ function HomeCenterPaneTimelineSurface({
       if (current >= items.length) return current;
       return Math.min(current + CENTER_PANE_TIMELINE_LOAD_MORE_BATCH, items.length);
     });
-  }, [renderedCount, items.length, interactionLocked]);
+  }, [renderedCount, items.length, interactionLocked, resolveActiveScrollElement, sidePanelScrollSync]);
   (0, import_react103.useEffect)(() => {
-    const scrollContainer = scrollContainerRef.current;
+    const scrollContainer = resolveActiveScrollElement();
     if (!scrollContainer) return;
     const observer = new ResizeObserver(() => {
       scheduleLoadMore();
     });
     observer.observe(scrollContainer);
+    if (extensionSidebarUsesSidePanelScroll && workspaceRef.current) {
+      observer.observe(workspaceRef.current);
+    }
     return () => observer.disconnect();
-  }, [scheduleLoadMore]);
+  }, [
+    extensionSidebarUsesSidePanelScroll,
+    resolveActiveScrollElement,
+    scheduleLoadMore,
+    sidePanelScrollSync
+  ]);
   (0, import_react103.useEffect)(() => {
     return () => {
       useCenterPaneTimelineExpansionStore.getState().collapse();
@@ -108543,7 +108633,7 @@ function HomeCenterPaneTimelineSurface({
       return;
     }
     if (lastScrolledExpandedIdRef.current === expandedItemId) return;
-    const scrollContainer = scrollContainerRef.current;
+    const scrollContainer = resolveActiveScrollElement();
     if (!scrollContainer) return;
     const applyScroll = () => {
       const scrollTarget = scrollTargetRefs.current.get(expandedItemId) ?? itemRefs.current.get(expandedItemId);
@@ -108562,20 +108652,21 @@ function HomeCenterPaneTimelineSurface({
         applyScroll();
       });
     });
-  }, [expandedItemId]);
+  }, [expandedItemId, resolveActiveScrollElement, sidePanelScrollSync]);
+  const useExtensionSidePanelScroll = extensionSidebarWindframePresentation && extensionSidebarUsesSidePanelScroll;
   const virtualRows = virtualizer.getVirtualItems();
   return /* @__PURE__ */ (0, import_jsx_runtime58.jsx)(CenterPaneTimelineLayoutContext.Provider, { value: layoutRefs, children: /* @__PURE__ */ (0, import_jsx_runtime58.jsx)(
     "div",
     {
       ref: workspaceRef,
-      className: extensionSidebarWindframePresentation ? "flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden" : HOME_CENTER_PANE_TIMELINE_NEWS_FEED_CLASS,
+      className: useExtensionSidePanelScroll ? "flex min-w-0 shrink-0 flex-col" : extensionSidebarWindframePresentation ? "flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden" : HOME_CENTER_PANE_TIMELINE_NEWS_FEED_CLASS,
       "data-home-center-pane-timeline-news-presentation": extensionSidebarWindframePresentation ? void 0 : true,
       ...extensionSidebarWindframePresentation ? { "data-grarf-extension-windframe-timeline-feed": "" } : {},
       children: /* @__PURE__ */ (0, import_jsx_runtime58.jsx)(
         "div",
         {
           ref: scrollContainerRef,
-          className: HOME_CENTER_PANE_TIMELINE_NEWS_SCROLL_CLASS,
+          className: useExtensionSidePanelScroll ? "relative w-full overflow-visible [overflow-anchor:none]" : HOME_CENTER_PANE_TIMELINE_NEWS_SCROLL_CLASS,
           "aria-label": "Timeline feed",
           children: renderedItems.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime58.jsx)("p", { className: HOME_CENTER_PANE_TIMELINE_NEWS_EMPTY_CLASS, children: "No timeline events yet." }) : /* @__PURE__ */ (0, import_jsx_runtime58.jsx)(
             "div",
@@ -108622,29 +108713,48 @@ var import_jsx_runtime59 = __toESM(require_jsx_runtime(), 1);
 function HomeCenterPaneTimelineMount({
   onClipOpen,
   className,
-  extensionSidebarWindframePresentation = false
+  extensionSidebarWindframePresentation = false,
+  extensionSidebarUsesSidePanelScroll = false
 }) {
   const useExtensionWindframePresentation = extensionSidebarWindframePresentation;
+  const useExtensionSidePanelScroll = useExtensionWindframePresentation && extensionSidebarUsesSidePanelScroll;
   return /* @__PURE__ */ (0, import_jsx_runtime59.jsx)(
     GuidedAttentionPanel,
     {
       paneId: "center",
-      className: cn2("relative flex min-h-0 flex-1 flex-col overflow-hidden", className),
+      className: cn2(
+        useExtensionSidePanelScroll ? "relative flex shrink-0 flex-col" : "relative flex min-h-0 flex-1 flex-col overflow-hidden",
+        className
+      ),
       "data-home-center-pane-timeline-mount": true,
       "data-home-center-pane-timeline-news-presentation": useExtensionWindframePresentation ? void 0 : true,
       ...useExtensionWindframePresentation ? { "data-grarf-extension-windframe-timeline-mount": "" } : {},
+      ...useExtensionSidePanelScroll ? { "data-grarf-extension-windframe-timeline-side-panel-scroll": "" } : {},
       children: useExtensionWindframePresentation ? /* @__PURE__ */ (0, import_jsx_runtime59.jsx)(
         "div",
         {
-          className: "relative flex min-h-0 flex-1 flex-col overflow-hidden",
+          className: cn2(
+            "relative flex min-w-0 flex-col",
+            useExtensionSidePanelScroll ? "shrink-0" : "min-h-0 flex-1 overflow-hidden"
+          ),
           "data-center-pane-mode": "timeline",
-          children: /* @__PURE__ */ (0, import_jsx_runtime59.jsx)("div", { className: cn2(PANE_CONTENT_CONTAIN, "flex min-h-0 flex-1 flex-col"), children: /* @__PURE__ */ (0, import_jsx_runtime59.jsx)(
-            HomeCenterPaneTimelineSurface,
+          children: /* @__PURE__ */ (0, import_jsx_runtime59.jsx)(
+            "div",
             {
-              onClipOpen,
-              extensionSidebarWindframePresentation: true
+              className: cn2(
+                PANE_CONTENT_CONTAIN,
+                useExtensionSidePanelScroll ? "flex flex-col" : "flex min-h-0 flex-1 flex-col"
+              ),
+              children: /* @__PURE__ */ (0, import_jsx_runtime59.jsx)(
+                HomeCenterPaneTimelineSurface,
+                {
+                  onClipOpen,
+                  extensionSidebarWindframePresentation: true,
+                  extensionSidebarUsesSidePanelScroll: useExtensionSidePanelScroll
+                }
+              )
             }
-          ) })
+          )
         }
       ) : /* @__PURE__ */ (0, import_jsx_runtime59.jsx)(
         "div",
@@ -164644,20 +164754,34 @@ function SportsBrowserPrototypeExtensionSidebarTimelineSection({ onClipOpen }) {
   return /* @__PURE__ */ (0, import_jsx_runtime278.jsxs)(
     "section",
     {
-      className: "flex min-h-[min(70vh,640px)] shrink-0 flex-col border-t border-border bg-background",
+      className: "flex shrink-0 flex-col border-t border-border bg-background",
       "data-grarf-extension-sidebar-timeline-section": true,
       "data-sports-browser-side-pane-timeline": true,
       "aria-label": "Timeline",
       children: [
-        /* @__PURE__ */ (0, import_jsx_runtime278.jsx)("div", { className: "flex shrink-0 items-center border-b border-border px-3 py-2", children: /* @__PURE__ */ (0, import_jsx_runtime278.jsx)("h2", { className: "text-base font-semibold tracking-tight", children: "Timeline" }) }),
-        /* @__PURE__ */ (0, import_jsx_runtime278.jsx)("div", { className: "flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden", children: /* @__PURE__ */ (0, import_jsx_runtime278.jsx)(
-          HomeCenterPaneTimelineMount,
+        /* @__PURE__ */ (0, import_jsx_runtime278.jsx)(
+          "div",
           {
-            onClipOpen,
-            className: "min-h-0 min-w-0 flex-1",
-            extensionSidebarWindframePresentation: true
+            className: "flex shrink-0 items-center justify-between gap-2 border-b border-border px-3 py-2",
+            "data-grarf-extension-sidebar-timeline-header": "",
+            children: /* @__PURE__ */ (0, import_jsx_runtime278.jsx)("h2", { className: "text-base font-semibold tracking-tight", children: "Timeline" })
           }
-        ) })
+        ),
+        /* @__PURE__ */ (0, import_jsx_runtime278.jsx)(
+          "div",
+          {
+            className: "flex min-h-0 min-w-0 flex-col overflow-hidden",
+            "data-grarf-extension-sidebar-timeline-section-feed": "",
+            children: /* @__PURE__ */ (0, import_jsx_runtime278.jsx)(
+              HomeCenterPaneTimelineMount,
+              {
+                onClipOpen,
+                className: "min-h-0 min-w-0 flex-1",
+                extensionSidebarWindframePresentation: true
+              }
+            )
+          }
+        )
       ]
     }
   );
