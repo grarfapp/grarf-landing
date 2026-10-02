@@ -164061,22 +164061,39 @@ function SidebarYesterdaySectionLeagues({
     [groupedEntries]
   );
   const expandableSlates = leafSlates;
+  const extensionGamesYesterdayHighlightsAccordionLeagues = isGrarfExtensionRenderer() && isGrarfExtensionGamesYesterdayHighlightsNavSnapshotActive();
   const allOpen = expandableSlates.length > 0 && expandableSlates.every((slate) => leagueOpen[slate.key] ?? false);
   const toggleAll = (0, import_react285.useCallback)(() => {
     if (allOpen) {
       onLeagueOpenChange({});
       return;
     }
+    if (extensionGamesYesterdayHighlightsAccordionLeagues) {
+      const first = expandableSlates[0];
+      onLeagueOpenChange(first ? { [first.key]: true } : {});
+      return;
+    }
     onLeagueOpenChange(Object.fromEntries(expandableSlates.map((slate) => [slate.key, true])));
-  }, [allOpen, expandableSlates, onLeagueOpenChange]);
+  }, [
+    allOpen,
+    expandableSlates,
+    extensionGamesYesterdayHighlightsAccordionLeagues,
+    onLeagueOpenChange
+  ]);
   const toggleLeague = (0, import_react285.useCallback)(
     (leagueKey) => {
       onLeagueOpenChange((prev) => {
         const nextOpen = !(prev[leagueKey] ?? false);
+        if (extensionGamesYesterdayHighlightsAccordionLeagues) {
+          if (!nextOpen) {
+            return { ...prev, [leagueKey]: false };
+          }
+          return { [leagueKey]: true };
+        }
         return { ...prev, [leagueKey]: nextOpen };
       });
     },
-    [onLeagueOpenChange, onLeagueSelect]
+    [extensionGamesYesterdayHighlightsAccordionLeagues, onLeagueOpenChange]
   );
   return /* @__PURE__ */ (0, import_jsx_runtime277.jsxs)(import_jsx_runtime277.Fragment, { children: [
     /* @__PURE__ */ (0, import_jsx_runtime277.jsx)(
