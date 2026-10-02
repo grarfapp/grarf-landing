@@ -382,20 +382,20 @@ var require_vanilla = __commonJS({
     init_define_import_meta_env();
     var createStoreImpl = (createState) => {
       let state3;
-      const listeners = /* @__PURE__ */ new Set();
+      const listeners2 = /* @__PURE__ */ new Set();
       const setState = (partial, replace2) => {
         const nextState = typeof partial === "function" ? partial(state3) : partial;
         if (!Object.is(nextState, state3)) {
           const previousState = state3;
           state3 = (replace2 != null ? replace2 : typeof nextState !== "object" || nextState === null) ? nextState : Object.assign({}, state3, nextState);
-          listeners.forEach((listener) => listener(state3, previousState));
+          listeners2.forEach((listener) => listener(state3, previousState));
         }
       };
       const getState = () => state3;
       const getInitialState = () => initialState2;
       const subscribe2 = (listener) => {
-        listeners.add(listener);
-        return () => listeners.delete(listener);
+        listeners2.add(listener);
+        return () => listeners2.delete(listener);
       };
       const api = { setState, getState, getInitialState, subscribe: subscribe2 };
       const initialState2 = state3 = createState(setState, getState, api);
@@ -3819,15 +3819,15 @@ var require_react_dom_client_production = __commonJS({
       return value;
     }
     var AbortControllerLocal = "undefined" !== typeof AbortController ? AbortController : function() {
-      var listeners = [], signal = this.signal = {
+      var listeners2 = [], signal = this.signal = {
         aborted: false,
         addEventListener: function(type, listener) {
-          listeners.push(listener);
+          listeners2.push(listener);
         }
       };
       this.abort = function() {
         signal.aborted = true;
-        listeners.forEach(function(listener) {
+        listeners2.forEach(function(listener) {
           return listener();
         });
       };
@@ -3879,33 +3879,33 @@ var require_react_dom_client_production = __commonJS({
     function pingEngtangledActionScope() {
       if (0 === --currentEntangledPendingCount && null !== currentEntangledListeners) {
         null !== currentEntangledActionThenable && (currentEntangledActionThenable.status = "fulfilled");
-        var listeners = currentEntangledListeners;
+        var listeners2 = currentEntangledListeners;
         currentEntangledListeners = null;
         currentEntangledLane = 0;
         currentEntangledActionThenable = null;
-        for (var i2 = 0; i2 < listeners.length; i2++) (0, listeners[i2])();
+        for (var i2 = 0; i2 < listeners2.length; i2++) (0, listeners2[i2])();
       }
     }
     function chainThenableValue(thenable, result) {
-      var listeners = [], thenableWithOverride = {
+      var listeners2 = [], thenableWithOverride = {
         status: "pending",
         value: null,
         reason: null,
         then: function(resolve) {
-          listeners.push(resolve);
+          listeners2.push(resolve);
         }
       };
       thenable.then(
         function() {
           thenableWithOverride.status = "fulfilled";
           thenableWithOverride.value = result;
-          for (var i2 = 0; i2 < listeners.length; i2++) (0, listeners[i2])(result);
+          for (var i2 = 0; i2 < listeners2.length; i2++) (0, listeners2[i2])(result);
         },
         function(error) {
           thenableWithOverride.status = "rejected";
           thenableWithOverride.reason = error;
-          for (error = 0; error < listeners.length; error++)
-            (0, listeners[error])(void 0);
+          for (error = 0; error < listeners2.length; error++)
+            (0, listeners2[error])(void 0);
         }
       );
       return thenableWithOverride;
@@ -10916,15 +10916,15 @@ var require_react_dom_client_production = __commonJS({
       };
     }
     function accumulateTwoPhaseListeners(targetFiber, reactName) {
-      for (var captureName = reactName + "Capture", listeners = []; null !== targetFiber; ) {
+      for (var captureName = reactName + "Capture", listeners2 = []; null !== targetFiber; ) {
         var _instance2 = targetFiber, stateNode = _instance2.stateNode;
         _instance2 = _instance2.tag;
-        5 !== _instance2 && 26 !== _instance2 && 27 !== _instance2 || null === stateNode || (_instance2 = getListener(targetFiber, captureName), null != _instance2 && listeners.unshift(
+        5 !== _instance2 && 26 !== _instance2 && 27 !== _instance2 || null === stateNode || (_instance2 = getListener(targetFiber, captureName), null != _instance2 && listeners2.unshift(
           createDispatchListener(targetFiber, _instance2, stateNode)
-        ), _instance2 = getListener(targetFiber, reactName), null != _instance2 && listeners.push(
+        ), _instance2 = getListener(targetFiber, reactName), null != _instance2 && listeners2.push(
           createDispatchListener(targetFiber, _instance2, stateNode)
         ));
-        if (3 === targetFiber.tag) return listeners;
+        if (3 === targetFiber.tag) return listeners2;
         targetFiber = targetFiber.return;
       }
       return [];
@@ -10937,18 +10937,18 @@ var require_react_dom_client_production = __commonJS({
       return inst ? inst : null;
     }
     function accumulateEnterLeaveListenersForEvent(dispatchQueue, event, target, common, inCapturePhase) {
-      for (var registrationName = event._reactName, listeners = []; null !== target && target !== common; ) {
+      for (var registrationName = event._reactName, listeners2 = []; null !== target && target !== common; ) {
         var _instance3 = target, alternate = _instance3.alternate, stateNode = _instance3.stateNode;
         _instance3 = _instance3.tag;
         if (null !== alternate && alternate === common) break;
-        5 !== _instance3 && 26 !== _instance3 && 27 !== _instance3 || null === stateNode || (alternate = stateNode, inCapturePhase ? (stateNode = getListener(target, registrationName), null != stateNode && listeners.unshift(
+        5 !== _instance3 && 26 !== _instance3 && 27 !== _instance3 || null === stateNode || (alternate = stateNode, inCapturePhase ? (stateNode = getListener(target, registrationName), null != stateNode && listeners2.unshift(
           createDispatchListener(target, stateNode, alternate)
-        )) : inCapturePhase || (stateNode = getListener(target, registrationName), null != stateNode && listeners.push(
+        )) : inCapturePhase || (stateNode = getListener(target, registrationName), null != stateNode && listeners2.push(
           createDispatchListener(target, stateNode, alternate)
         )));
         target = target.return;
       }
-      0 !== listeners.length && dispatchQueue.push({ event, listeners });
+      0 !== listeners2.length && dispatchQueue.push({ event, listeners: listeners2 });
     }
     var NORMALIZE_NEWLINES_REGEX = /\r\n?/g;
     var NORMALIZE_NULL_AND_REPLACEMENT_REGEX = /\u0000|\uFFFD/g;
@@ -127492,7 +127492,7 @@ function useDeferredMount(delayMs = 900, enabled = true) {
 // ../grarf/desktop/src/components/homeMvp/HomeRightRail.tsx
 var import_jsx_runtime147 = __toESM(require_jsx_runtime(), 1);
 function HomeRightRail({
-  activeGameId,
+  activeGameId: activeGameId2,
   activeGameWorkspace,
   gameWatchActive = false,
   gcProviderId,
@@ -127514,8 +127514,8 @@ function HomeRightRail({
   const { activeLeagueId } = useHomeActiveLeagueContextOptional();
   const leagueWorkspaceId = isHomeLeagueHubWorkspaceTab(activeGameWorkspace) ? activeGameWorkspace.leagueHubId : null;
   const activeGame = (0, import_react181.useMemo)(
-    () => activeGameId ? findLiveGameById(activeGameId) : void 0,
-    [activeGameId]
+    () => activeGameId2 ? findLiveGameById(activeGameId2) : void 0,
+    [activeGameId2]
   );
   const activeGamePayload = activeGameWorkspace?.type === "game" ? activeGameWorkspace.gamePayload : null;
   const isMlbGameWorkspace = activeGamePayload?.sport === "mlb";
@@ -127528,7 +127528,7 @@ function HomeRightRail({
     () => resolveWnbaSocialRailFeedFromActiveCenterWorkspace(activeGameWorkspace),
     [activeGameWorkspace]
   );
-  const webLeagueFeedGameScope = isGrarfWebRenderer2() && !gameWatchActive && (!!activeGameId && !!activeGame && leagueSocialSignalsConfig?.tabMode === "league-feed" || Boolean(wnbaCenterSocialRailResolution));
+  const webLeagueFeedGameScope = isGrarfWebRenderer2() && !gameWatchActive && (!!activeGameId2 && !!activeGame && leagueSocialSignalsConfig?.tabMode === "league-feed" || Boolean(wnbaCenterSocialRailResolution));
   const useGameUtilityRail = isGameWorkspace && (isGrarfWebRenderer2() || isMlbGameWorkspace) || webLeagueFeedGameScope;
   const utilityRailWorkspaceTitle = activeGameWorkspace?.title ?? (activeGame ? `${activeGame.awayTeam} @ ${activeGame.homeTeam}` : "Game");
   const canonicalActiveGame = useCanonicalLiveGameRow(
@@ -127611,9 +127611,9 @@ function HomeRightRail({
         watchLiveActive: gameWatchActive,
         analyticsContext: {
           league: activeGame?.league ?? activeGamePayload?.sport?.toUpperCase() ?? "unknown",
-          gameId: activeGamePayload?.gameId ?? activeGameId ?? "unknown"
+          gameId: activeGamePayload?.gameId ?? activeGameId2 ?? "unknown"
         },
-        gameId: activeGamePayload?.gameId ?? activeGameId ?? void 0,
+        gameId: activeGamePayload?.gameId ?? activeGameId2 ?? void 0,
         catchupContextGame: activeGamePayload?.catchupContextGame,
         hierarchyHeader,
         awayTeamLabel: webGameTeamLabels?.away,
@@ -127622,7 +127622,7 @@ function HomeRightRail({
         socialRailResolution: wnbaCenterSocialRailResolution,
         className: "h-full min-h-0 w-full min-w-0 border-l-0"
       },
-      activeGamePayload?.gameId ?? activeGameId ?? activeGameWorkspace?.id ?? "utility-rail"
+      activeGamePayload?.gameId ?? activeGameId2 ?? activeGameWorkspace?.id ?? "utility-rail"
     ) : /* @__PURE__ */ (0, import_jsx_runtime147.jsx)(
       ActivityRail,
       {
@@ -158904,6 +158904,30 @@ function GrarfExtensionShadcnSelectorColumn({ columnId, valueLabel, options, onS
 
 // ../grarf/desktop/src/extensionHost/grarfExtensionGamesYesterdayHighlightsNavSnapshot.ts
 init_define_import_meta_env();
+
+// ../grarf/desktop/src/extensionHost/grarfExtensionGamesYesterdayHighlightsActiveGame.ts
+init_define_import_meta_env();
+var activeGameId = null;
+var listeners = /* @__PURE__ */ new Set();
+function getGrarfExtensionGamesYesterdayHighlightsActiveGameId() {
+  return activeGameId;
+}
+function setGrarfExtensionGamesYesterdayHighlightsActiveGameId(gameId) {
+  const next = gameId?.trim() || null;
+  if (activeGameId === next) return;
+  activeGameId = next;
+  for (const listener of listeners) {
+    listener();
+  }
+}
+function subscribeGrarfExtensionGamesYesterdayHighlightsActiveGameId(listener) {
+  listeners.add(listener);
+  return () => {
+    listeners.delete(listener);
+  };
+}
+
+// ../grarf/desktop/src/extensionHost/grarfExtensionGamesYesterdayHighlightsNavSnapshot.ts
 var snapshot = {
   temporaryNavTopLevel: "GAMES",
   gamesSelector2Label: "TODAY",
@@ -158912,6 +158936,9 @@ var snapshot = {
 };
 function setGrarfExtensionGamesYesterdayHighlightsNavSnapshot(next) {
   snapshot = next;
+  if (snapshot.temporaryNavTopLevel !== "GAMES" || snapshot.gamesSelector2Label !== "YESTERDAY" || snapshot.gamesYesterdaySelector3Label !== "HIGHLIGHTS") {
+    setGrarfExtensionGamesYesterdayHighlightsActiveGameId(null);
+  }
 }
 function getGrarfExtensionGamesYesterdayHighlightsNavigationContextFromSnapshot() {
   return {
@@ -161361,6 +161388,7 @@ async function navigateGrarfExtensionGameYesterdayHighlights(game, context2) {
       const watchUrl = await resolveGrarfExtensionPlaylistYoutubeHighlightWatchUrl(game);
       if (watchUrl) {
         navigateGrarfExtensionHostExternalUrl(watchUrl);
+        setGrarfExtensionGamesYesterdayHighlightsActiveGameId(game.id);
         return true;
       }
     } catch {
@@ -161372,6 +161400,7 @@ async function navigateGrarfExtensionGameYesterdayHighlights(game, context2) {
     const searchUrl = buildGrarfExtensionGameYoutubeHighlightsSearchUrl(game);
     if (!searchUrl) return false;
     navigateGrarfExtensionHostExternalUrl(searchUrl);
+    setGrarfExtensionGamesYesterdayHighlightsActiveGameId(game.id);
     return true;
   }
   return false;
@@ -163638,6 +163667,11 @@ function SidebarTemporalLeagueBlock({
     () => /* @__PURE__ */ new Set()
   );
   const extensionGamesYesterdayHighlightsDirectNavigation = isGrarfExtensionRenderer() && isGrarfExtensionGamesYesterdayHighlightsNavSnapshotActive();
+  const extensionYesterdayHighlightsActiveGameId = (0, import_react285.useSyncExternalStore)(
+    subscribeGrarfExtensionGamesYesterdayHighlightsActiveGameId,
+    getGrarfExtensionGamesYesterdayHighlightsActiveGameId,
+    () => null
+  );
   (0, import_react285.useEffect)(() => {
     if (!extensionGamesYesterdayHighlightsDirectNavigation) return;
     setGameExploreExpandedIds(/* @__PURE__ */ new Set());
@@ -163685,7 +163719,7 @@ function SidebarTemporalLeagueBlock({
         onGameTeamSelect,
         onWatchLive,
         canShowWatchLive,
-        isSelected: selectedGameId === game.id,
+        isSelected: extensionGamesYesterdayHighlightsDirectNavigation ? extensionYesterdayHighlightsActiveGameId === game.id : selectedGameId === game.id,
         sidebarTennisTournamentGrouped: rowOptions?.sidebarTennisTournamentGrouped,
         showFollowLive: showGameInlineMenuUnderCards,
         exploreExpanded: gameExploreExpandedIds.has(game.id),
