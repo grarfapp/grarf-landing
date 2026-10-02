@@ -163719,47 +163719,57 @@ function SidebarTemporalLeagueBlock({
       )
     ] }) : null
   ] }, game.id);
-  return /* @__PURE__ */ (0, import_jsx_runtime277.jsxs)("div", { "data-grarf-temporary-nav-nested-league": "", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime277.jsx)(
-      NavRow,
-      {
-        label: slate.label,
-        indent,
-        soccerArchChildLeague,
-        expanded,
-        leagueKey: slate.key,
-        leagueGames: slate.games,
-        onClick: onToggle,
-        isSelected: isLeagueSelected,
-        leagueActivityStatuses,
-        leagueNowLiveCount
-      }
-    ),
-    expanded ? /* @__PURE__ */ (0, import_jsx_runtime277.jsx)("div", { className: "min-w-0", "data-grarf-temporary-nav-nested-league-children": "", children: /* @__PURE__ */ (0, import_jsx_runtime277.jsx)(SidebarTemporalGamesBox, { children: usesTennisTournamentGrouping && leagueOpen && onToggleExpansionKey ? tournamentGroups.map((group) => {
-      const tournamentExpansionKey = resolveSportsBrowserSidebarTennisTournamentExpansionKey(
-        slate.key,
-        group.key
-      );
-      const tournamentExpanded = leagueOpen[tournamentExpansionKey] ?? false;
-      return /* @__PURE__ */ (0, import_jsx_runtime277.jsxs)(import_react285.Fragment, { children: [
+  return /* @__PURE__ */ (0, import_jsx_runtime277.jsxs)(
+    "div",
+    {
+      "data-grarf-temporary-nav-nested-league": "",
+      ...extensionGamesYesterdayHighlightsDirectNavigation ? {
+        "data-grarf-extension-yesterday-highlights-nested-league": "",
+        ...expanded ? { "data-grarf-extension-yesterday-highlights-league-expanded": "" } : {}
+      } : {},
+      children: [
         /* @__PURE__ */ (0, import_jsx_runtime277.jsx)(
           NavRow,
           {
-            label: group.label,
-            indent: tournamentIndent,
-            expanded: tournamentExpanded,
-            onClick: () => onToggleExpansionKey(tournamentExpansionKey),
-            tennisTournamentKey: group.key,
-            tennisTournamentLeagueKey: slate.key,
-            className: "normal-case"
+            label: slate.label,
+            indent,
+            soccerArchChildLeague,
+            expanded,
+            leagueKey: slate.key,
+            leagueGames: slate.games,
+            onClick: onToggle,
+            isSelected: isLeagueSelected,
+            leagueActivityStatuses,
+            leagueNowLiveCount
           }
         ),
-        tournamentExpanded ? group.games.map(
-          (game) => renderGameRow(game, { sidebarTennisTournamentGrouped: true })
-        ) : null
-      ] }, `${slate.key}-${group.key}`);
-    }) : slate.games.map((game) => renderGameRow(game)) }) }) : null
-  ] });
+        expanded ? /* @__PURE__ */ (0, import_jsx_runtime277.jsx)("div", { className: "min-w-0", "data-grarf-temporary-nav-nested-league-children": "", children: /* @__PURE__ */ (0, import_jsx_runtime277.jsx)(SidebarTemporalGamesBox, { children: usesTennisTournamentGrouping && leagueOpen && onToggleExpansionKey ? tournamentGroups.map((group) => {
+          const tournamentExpansionKey = resolveSportsBrowserSidebarTennisTournamentExpansionKey(
+            slate.key,
+            group.key
+          );
+          const tournamentExpanded = leagueOpen[tournamentExpansionKey] ?? false;
+          return /* @__PURE__ */ (0, import_jsx_runtime277.jsxs)(import_react285.Fragment, { children: [
+            /* @__PURE__ */ (0, import_jsx_runtime277.jsx)(
+              NavRow,
+              {
+                label: group.label,
+                indent: tournamentIndent,
+                expanded: tournamentExpanded,
+                onClick: () => onToggleExpansionKey(tournamentExpansionKey),
+                tennisTournamentKey: group.key,
+                tennisTournamentLeagueKey: slate.key,
+                className: "normal-case"
+              }
+            ),
+            tournamentExpanded ? group.games.map(
+              (game) => renderGameRow(game, { sidebarTennisTournamentGrouped: true })
+            ) : null
+          ] }, `${slate.key}-${group.key}`);
+        }) : slate.games.map((game) => renderGameRow(game)) }) }) : null
+      ]
+    }
+  );
 }
 function areSoccerSidebarChildLeaguesExpanded(children, leagueOpen) {
   return children.length > 0 && children.every((slate) => leagueOpen[slate.key] ?? false);
