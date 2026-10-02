@@ -161252,12 +161252,14 @@ function resolveGrarfExtensionAiSearchCatchUpAction(day) {
   };
 }
 function resolveGrarfExtensionAiSearchCatchUpContentAction(kind) {
-  if (kind !== "scores") {
-    return null;
-  }
+  const gamesSelector3Label = {
+    recaps: "RECAPS",
+    highlights: "HIGHLIGHTS",
+    scores: "SCORES"
+  };
   return {
     ...resolveGrarfExtensionAiSearchCatchUpAction("yesterday"),
-    gamesSelector3Label: "SCORES"
+    gamesSelector3Label: gamesSelector3Label[kind]
   };
 }
 function resolveGrarfExtensionAiSearchGamesWhenAction(when) {
