@@ -160563,6 +160563,7 @@ var LEAGUES_LENS_DEFAULT = TEMPORARY_NAV_LEAGUES_LENS_DEFAULT;
 var LEAGUES_LENS_OPTIONS = TEMPORARY_NAV_LEAGUES_LENS_OPTIONS;
 var GAMES_SELECTOR_2 = ["TODAY", "YESTERDAY"];
 var GAMES_TODAY_SELECTOR_3 = ["ALL", "NOW", "NEXT", "FINAL"];
+var GAMES_YESTERDAY_SELECTOR_3 = ["RECAPS", "HIGHLIGHTS", "SCORES"];
 var NEWS_SELECTOR_2 = ["LEAGUES", "TEAMS", "OUTLETS"];
 var SOCIAL_SELECTOR_2 = ["LEAGUES", "TEAMS"];
 var HIGHLIGHTS_SELECTOR_2 = ["LEAGUES", "TEAMS", "GAMES"];
@@ -160593,7 +160594,7 @@ function resolveTemporaryNavSelector2Options(topLevel) {
 }
 function resolveTemporaryNavShowsSelector3(topLevel, selector2Label) {
   if (topLevel === "GAMES") {
-    return selector2Label === "TODAY";
+    return selector2Label === "TODAY" || selector2Label === "YESTERDAY";
   }
   if (topLevel === "LEAGUES") {
     return true;
@@ -160605,7 +160606,13 @@ function resolveTemporaryNavSelector3Options(topLevel, selector2Label) {
     return null;
   }
   if (topLevel === "GAMES") {
-    return GAMES_TODAY_SELECTOR_3;
+    if (selector2Label === "YESTERDAY") {
+      return GAMES_YESTERDAY_SELECTOR_3;
+    }
+    if (selector2Label === "TODAY") {
+      return GAMES_TODAY_SELECTOR_3;
+    }
+    return null;
   }
   if (topLevel === "LEAGUES") {
     return LEAGUES_LENS_OPTIONS;
@@ -160623,6 +160630,23 @@ function resolveTemporaryNavDefaultSelector3(topLevel, selector2Label) {
     return LEAGUES_LENS_DEFAULT;
   }
   return options[0] ?? null;
+}
+function resolveTemporaryNavGamesSelector3LabelForView(gamesCompactTemporalView, selector3Label, gamesSelector3LabelOverride) {
+  const fromView = resolveTemporaryNavGamesSelector3FromCompactTemporalView(gamesCompactTemporalView);
+  if (fromView != null) {
+    return fromView;
+  }
+  if (gamesCompactTemporalView === "yesterday") {
+    const yesterdayOptions = GAMES_YESTERDAY_SELECTOR_3;
+    if (gamesSelector3LabelOverride != null && yesterdayOptions.includes(gamesSelector3LabelOverride)) {
+      return gamesSelector3LabelOverride;
+    }
+    if (selector3Label != null && yesterdayOptions.includes(selector3Label)) {
+      return selector3Label;
+    }
+    return resolveTemporaryNavDefaultSelector3("GAMES", "YESTERDAY");
+  }
+  return selector3Label;
 }
 function PrototypeSelectorColumn({
   columnId,
@@ -160753,7 +160777,7 @@ function SportsBrowserPrototypeTemporaryNavPrototype({
   ]);
   const effectiveSelector3Label = (0, import_react281.useMemo)(() => {
     if (gamesSelectorsWired && gamesCompactTemporalView) {
-      return resolveTemporaryNavGamesSelector3FromCompactTemporalView(gamesCompactTemporalView);
+      return resolveTemporaryNavGamesSelector3LabelForView(gamesCompactTemporalView, selector3Label);
     }
     if (leaguesSelectorsWired) {
       return resolveTemporaryNavLeaguesLensLabelFromSection(leaguesLensSection);
@@ -160788,7 +160812,7 @@ function SportsBrowserPrototypeTemporaryNavPrototype({
           resolveTemporaryNavGamesSelector2FromCompactTemporalView(gamesCompactTemporalView)
         );
         setSelector3Label(
-          resolveTemporaryNavGamesSelector3FromCompactTemporalView(gamesCompactTemporalView)
+          resolveTemporaryNavGamesSelector3LabelForView(gamesCompactTemporalView, selector3Label)
         );
         return;
       }
@@ -160829,6 +160853,8 @@ function SportsBrowserPrototypeTemporaryNavPrototype({
         if (view) {
           onGamesCompactTemporalSelect(view);
         }
+        setSelector2Label(label);
+        setSelector3Label(resolveTemporaryNavDefaultSelector3("GAMES", label));
         return;
       }
       if (topLevel === "LEAGUES" && onLeaguesSortModeChange) {
@@ -160866,6 +160892,11 @@ function SportsBrowserPrototypeTemporaryNavPrototype({
         );
         if (view) {
           onGamesCompactTemporalSelect(view);
+          return;
+        }
+        if (effectiveSelector2Label === "YESTERDAY") {
+          setSelector3Label(label);
+          return;
         }
         return;
       }
@@ -160890,6 +160921,19 @@ function SportsBrowserPrototypeTemporaryNavPrototype({
       if (!request.skipPaneSync) {
         onContentNavChange?.(request.contentSection, request.contentScope);
       }
+      return;
+    }
+    const gamesView = request.gamesCompactTemporalView ?? gamesCompactTemporalView;
+    if (request.topLevel === "GAMES" && gamesView != null && onGamesCompactTemporalSelect != null) {
+      setTopLevel("GAMES");
+      setSelector2Label(resolveTemporaryNavGamesSelector2FromCompactTemporalView(gamesView));
+      setSelector3Label(
+        resolveTemporaryNavGamesSelector3LabelForView(
+          gamesView,
+          selector3Label,
+          request.gamesSelector3Label
+        )
+      );
       return;
     }
     handleTopLevelSelect(request.topLevel);
@@ -161207,6 +161251,15 @@ function resolveGrarfExtensionAiSearchCatchUpAction(day) {
     temporaryNavTopLevel: "GAMES"
   };
 }
+function resolveGrarfExtensionAiSearchCatchUpContentAction(kind) {
+  if (kind !== "scores") {
+    return null;
+  }
+  return {
+    ...resolveGrarfExtensionAiSearchCatchUpAction("yesterday"),
+    gamesSelector3Label: "SCORES"
+  };
+}
 function resolveGrarfExtensionAiSearchGamesWhenAction(when) {
   const view = when === "live now" ? "now" : when === "upcoming" ? "next" : "today";
   return { kind: "temporal", view, temporaryNavTopLevel: "GAMES" };
@@ -161275,7 +161328,12 @@ function gameHaystack2(game) {
 }
 var SEARCH_PHRASE_ACTIONS = [
   {
-    patterns: [/yesterday'?s?\s+results?/, /^yesterday$/, /catch\s*up.*yesterday/],
+    patterns: [
+      /yesterday'?s?\s+scores?/,
+      /yesterday'?s?\s+results?/,
+      /^yesterday$/,
+      /catch\s*up.*yesterday/
+    ],
     action: {
       kind: "temporal",
       view: "yesterday",
@@ -161430,9 +161488,13 @@ function GrarfExtensionAiSearchHomeSection({
   onSettingsClick
 }) {
   const [searchQuery, setSearchQuery] = (0, import_react283.useState)("");
-  const [catchUpContentKind, setCatchUpContentKind] = (0, import_react283.useState)("game recaps");
+  const [catchUpContentKind, setCatchUpContentKind] = (0, import_react283.useState)("recaps");
   const [gamesWhen, setGamesWhen] = (0, import_react283.useState)("live now");
   const [leagueContentKind, setLeagueContentKind] = (0, import_react283.useState)("news");
+  const catchUpContentAction = (0, import_react283.useMemo)(
+    () => resolveGrarfExtensionAiSearchCatchUpContentAction(catchUpContentKind),
+    [catchUpContentKind]
+  );
   const onSearchSubmit = (0, import_react283.useCallback)(
     (event) => {
       event.preventDefault();
@@ -161517,7 +161579,8 @@ function GrarfExtensionAiSearchHomeSection({
             SuggestionRow,
             {
               icon: RotateCcw,
-              onActivate: () => onExecuteAction(resolveGrarfExtensionAiSearchCatchUpAction("yesterday")),
+              presentational: catchUpContentAction == null,
+              onActivate: catchUpContentAction ? () => onExecuteAction(catchUpContentAction) : void 0,
               label: /* @__PURE__ */ (0, import_jsx_runtime272.jsxs)(import_jsx_runtime272.Fragment, { children: [
                 "Catch up on yesterday's",
                 " ",
@@ -161525,7 +161588,7 @@ function GrarfExtensionAiSearchHomeSection({
                   InlineSelector,
                   {
                     value: catchUpContentKind,
-                    options: ["game recaps", "highlights", "scores"],
+                    options: ["recaps", "highlights", "scores"],
                     onSelect: (next) => setCatchUpContentKind(next),
                     ariaLabel: "Catch up content type"
                   }
@@ -164365,7 +164428,9 @@ function SportsBrowserPrototypeLeftNav({
         nonce: Date.now(),
         contentSection: content?.section,
         contentScope: content?.scope,
-        skipPaneSync: content?.skipPaneSync
+        skipPaneSync: content?.skipPaneSync,
+        gamesCompactTemporalView: content?.gamesCompactTemporalView,
+        gamesSelector3Label: content?.gamesSelector3Label
       });
     },
     []
@@ -164391,9 +164456,12 @@ function SportsBrowserPrototypeLeftNav({
     (action) => {
       switch (action.kind) {
         case "temporal":
-          requestTemporaryNavTopLevel(action.temporaryNavTopLevel);
-          handleTemporaryNavTopLevelChange(action.temporaryNavTopLevel);
           onCompactTemporalSelect(action.view);
+          requestTemporaryNavTopLevel(action.temporaryNavTopLevel, {
+            gamesCompactTemporalView: action.view,
+            gamesSelector3Label: action.gamesSelector3Label
+          });
+          handleTemporaryNavTopLevelChange(action.temporaryNavTopLevel);
           scrollExtensionSidebarToBrowseFromAiSearch();
           return;
         case "content":
