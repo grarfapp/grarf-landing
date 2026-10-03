@@ -61479,7 +61479,7 @@ function ObjectsSpinePermanentLeagueWorkspaceNavRows({
 }
 function ObjectsSpineTemporalLeagueNavList({
   sections,
-  activeLeagueKey,
+  activeLeagueKey: activeLeagueKey2,
   connectedActiveLeagueKey = null,
   displayedLeagueKeys,
   onSelectLeague,
@@ -61505,7 +61505,7 @@ function ObjectsSpineTemporalLeagueNavList({
           ObjectsSpineLeagueIndexRow,
           {
             item,
-            active: Boolean(item.grarfLeagueKey && activeLeagueKey === item.grarfLeagueKey),
+            active: Boolean(item.grarfLeagueKey && activeLeagueKey2 === item.grarfLeagueKey),
             groupConnected: Boolean(
               item.grarfLeagueKey && connectedActiveLeagueKey === item.grarfLeagueKey
             ),
@@ -61528,7 +61528,7 @@ function ObjectsSpineTemporalLeagueNavList({
           ObjectsSpineLeagueIndexRow,
           {
             item,
-            active: Boolean(item.grarfLeagueKey && activeLeagueKey === item.grarfLeagueKey),
+            active: Boolean(item.grarfLeagueKey && activeLeagueKey2 === item.grarfLeagueKey),
             groupConnected: Boolean(
               item.grarfLeagueKey && connectedActiveLeagueKey === item.grarfLeagueKey
             ),
@@ -115854,7 +115854,7 @@ function HomeObjectsSpineNowPresentation({
     const expanded = temporalSections.filter((entry2) => !isCollapsed(entry2.collapseKey));
     return expanded.length === 1 ? expanded[0]?.collapseKey ?? null : expanded[0]?.collapseKey ?? null;
   }, [allLeaguesCollapsed, allLeaguesExpanded, temporalSections, isCollapsed]);
-  const activeLeagueKey = (0, import_react135.useMemo)(() => {
+  const activeLeagueKey2 = (0, import_react135.useMemo)(() => {
     if (!focusedCollapseKey) return null;
     const entry2 = temporalSections.find((item) => item.collapseKey === focusedCollapseKey);
     return entry2?.leagueKey ?? null;
@@ -115953,12 +115953,12 @@ function HomeObjectsSpineNowPresentation({
   const listOnly = allLeaguesCollapsed;
   const expandAll = allLeaguesExpanded;
   const singleFocus = !listOnly && !expandAll;
-  const connectedActiveLeagueKey = singleFocus && activeLeagueKey ? activeLeagueKey : null;
+  const connectedActiveLeagueKey = singleFocus && activeLeagueKey2 ? activeLeagueKey2 : null;
   const mainMenuLeagueNav = /* @__PURE__ */ (0, import_jsx_runtime100.jsx)(
     ObjectsSpineTemporalLeagueNavList,
     {
       sections: temporalNavSections,
-      activeLeagueKey: singleFocus ? activeLeagueKey : null,
+      activeLeagueKey: singleFocus ? activeLeagueKey2 : null,
       connectedActiveLeagueKey,
       displayedLeagueKeys,
       onSelectLeague: handleNavSelectLeague,
@@ -143149,7 +143149,7 @@ var TAB_ACTIVE_CLASS = "z-30 -mt-px -mb-px border-ambersys/40 bg-[#010303] pt-2.
 var TAB_IDLE_CLASS = "z-10 border-line/55 bg-[#020506] pt-1.5 pb-1.5 text-[#b8cccc] shadow-[inset_0_1px_0_rgba(255,255,255,0.03)] hover:border-line/75 hover:text-[#eef6f6]";
 var TAB_BROWSING_CLASS = "z-20 -mt-px -mb-px border-cyansys/25 bg-[#030808] pt-2 pb-1.5 text-cyansys/75 shadow-[inset_0_0_0_1px_rgba(34,211,238,0.12)]";
 function HomeHighlightsTvChannelBar({
-  activeLeagueKey,
+  activeLeagueKey: activeLeagueKey2,
   onSelectChannel,
   visibleLeagueKeys,
   browsedLeagueKey,
@@ -143165,8 +143165,8 @@ function HomeHighlightsTvChannelBar({
       role: "tablist",
       "aria-label": "Highlight channels",
       children: /* @__PURE__ */ (0, import_jsx_runtime223.jsx)("div", { className: "flex min-w-0 items-end overflow-x-auto overscroll-x-contain px-3 pb-0 pt-0", children: channels.map((channel, index2) => {
-        const active2 = channel.leagueKey === activeLeagueKey;
-        const browsing = Boolean(browsedLeagueKey) && browsedLeagueKey !== activeLeagueKey && channel.leagueKey === browsedLeagueKey;
+        const active2 = channel.leagueKey === activeLeagueKey2;
+        const browsing = Boolean(browsedLeagueKey) && browsedLeagueKey !== activeLeagueKey2 && channel.leagueKey === browsedLeagueKey;
         return /* @__PURE__ */ (0, import_jsx_runtime223.jsxs)(
           "button",
           {
@@ -144050,10 +144050,10 @@ function useHighlightsTvAmbientPlayback() {
   const guideClips = isManual ? manualClips : broadcastClips;
   const guideIndex = isManual ? manualIndex : broadcastIndex;
   const currentClip = guideClips[guideIndex] ?? null;
-  const activeLeagueKey = isManual ? manualLeagueKey ?? "" : broadcastClips[broadcastIndex]?.leagueKey ?? visibleLeagueKeys[0] ?? "";
+  const activeLeagueKey2 = isManual ? manualLeagueKey ?? "" : broadcastClips[broadcastIndex]?.leagueKey ?? visibleLeagueKeys[0] ?? "";
   return (0, import_react255.useMemo)(
     () => ({
-      activeLeagueKey,
+      activeLeagueKey: activeLeagueKey2,
       visibleLeagueKeys,
       clips: guideClips,
       currentIndex: guideIndex,
@@ -144069,7 +144069,7 @@ function useHighlightsTvAmbientPlayback() {
       advancePlaylist
     }),
     [
-      activeLeagueKey,
+      activeLeagueKey2,
       visibleLeagueKeys,
       guideClips,
       guideIndex,
@@ -144206,17 +144206,17 @@ async function refreshClipsFromConfig(leagueKey, leagueLabel, config) {
 }
 function useHighlightsTvChannelPlayback() {
   const defaultLeague = resolveDefaultLeague();
-  const [activeLeagueKey, setActiveLeagueKey] = (0, import_react256.useState)(defaultLeague.leagueKey);
+  const [activeLeagueKey2, setActiveLeagueKey] = (0, import_react256.useState)(defaultLeague.leagueKey);
   const [clips, setClips] = (0, import_react256.useState)([]);
   const [currentIndex, setCurrentIndex] = (0, import_react256.useState)(0);
   const [loading, setLoading] = (0, import_react256.useState)(true);
   const [loadError, setLoadError] = (0, import_react256.useState)(null);
   const playlistCacheRef = (0, import_react256.useRef)({});
   const ingestionConfigCacheRef = (0, import_react256.useRef)({});
-  const activeLeagueKeyRef = (0, import_react256.useRef)(activeLeagueKey);
+  const activeLeagueKeyRef = (0, import_react256.useRef)(activeLeagueKey2);
   (0, import_react256.useEffect)(() => {
-    activeLeagueKeyRef.current = activeLeagueKey;
-  }, [activeLeagueKey]);
+    activeLeagueKeyRef.current = activeLeagueKey2;
+  }, [activeLeagueKey2]);
   const loadChannel = (0, import_react256.useCallback)(async (leagueKey, startIndex = 0) => {
     const inChannelOrder = HIGHLIGHTS_TV_CHANNEL_ORDER.some((entry2) => entry2.leagueKey === leagueKey);
     if (!inChannelOrder) {
@@ -144283,10 +144283,10 @@ function useHighlightsTvChannelPlayback() {
   }, []);
   const selectChannel = (0, import_react256.useCallback)(
     (leagueKey) => {
-      if (leagueKey === activeLeagueKey && clips.length > 0) return;
+      if (leagueKey === activeLeagueKey2 && clips.length > 0) return;
       void loadChannel(leagueKey, 0);
     },
-    [activeLeagueKey, clips.length, loadChannel]
+    [activeLeagueKey2, clips.length, loadChannel]
   );
   const selectClipIndex = (0, import_react256.useCallback)(
     (index2) => {
@@ -144301,7 +144301,7 @@ function useHighlightsTvChannelPlayback() {
   }, [clips.length]);
   const currentClip = clips[currentIndex] ?? null;
   return {
-    activeLeagueKey,
+    activeLeagueKey: activeLeagueKey2,
     clips,
     currentIndex,
     currentClip,
@@ -144370,7 +144370,7 @@ init_isGrarfWebRenderer();
 var import_jsx_runtime226 = __toESM(require_jsx_runtime(), 1);
 function HomeHighlightsTvPaneAmbient() {
   const {
-    activeLeagueKey,
+    activeLeagueKey: activeLeagueKey2,
     visibleLeagueKeys,
     clips,
     currentIndex,
@@ -144386,7 +144386,7 @@ function HomeHighlightsTvPaneAmbient() {
     advancePlaylist
   } = useHighlightsTvAmbientPlayback();
   const [browsedLeagueKey, setBrowsedLeagueKey] = (0, import_react257.useState)(null);
-  const displayedLeagueKey = browsedLeagueKey ?? activeLeagueKey;
+  const displayedLeagueKey = browsedLeagueKey ?? activeLeagueKey2;
   const guideNewerVideos = resolveHighlightsTvProgrammingGuideNewerVideos(
     displayedLeagueKey,
     catalogClipsByLeague[displayedLeagueKey] ?? [],
@@ -144399,7 +144399,7 @@ function HomeHighlightsTvPaneAmbient() {
       HomeHighlightsTvPlayer,
       {
         clip: currentClip,
-        channelLeagueKey: activeLeagueKey,
+        channelLeagueKey: activeLeagueKey2,
         className: "w-full max-w-full",
         mute: true,
         startSec: playbackStartSec,
@@ -144410,7 +144410,7 @@ function HomeHighlightsTvPaneAmbient() {
     /* @__PURE__ */ (0, import_jsx_runtime226.jsx)(
       HomeHighlightsTvChannelBar,
       {
-        activeLeagueKey,
+        activeLeagueKey: activeLeagueKey2,
         visibleLeagueKeys,
         browsedLeagueKey,
         onSelectChannel: selectChannel
@@ -144434,7 +144434,7 @@ function HomeHighlightsTvPaneAmbient() {
 }
 function HomeHighlightsTvPaneChannel() {
   const {
-    activeLeagueKey,
+    activeLeagueKey: activeLeagueKey2,
     clips,
     currentIndex,
     currentClip,
@@ -144449,7 +144449,7 @@ function HomeHighlightsTvPaneChannel() {
       HomeHighlightsTvPlayer,
       {
         clip: currentClip,
-        channelLeagueKey: activeLeagueKey,
+        channelLeagueKey: activeLeagueKey2,
         className: "w-full max-w-full",
         mute: true,
         onEnded: advancePlaylist
@@ -144458,7 +144458,7 @@ function HomeHighlightsTvPaneChannel() {
     /* @__PURE__ */ (0, import_jsx_runtime226.jsx)(
       HomeHighlightsTvChannelBar,
       {
-        activeLeagueKey,
+        activeLeagueKey: activeLeagueKey2,
         onSelectChannel: selectChannel
       }
     ),
@@ -158932,23 +158932,59 @@ init_define_import_meta_env();
 // ../grarf/desktop/src/extensionHost/grarfExtensionGamesYesterdayHighlightsActiveGame.ts
 init_define_import_meta_env();
 var activeGameId = null;
+var activeLeagueKey = null;
 var listeners = /* @__PURE__ */ new Set();
-function getGrarfExtensionGamesYesterdayHighlightsActiveGameId() {
-  return activeGameId;
-}
-function setGrarfExtensionGamesYesterdayHighlightsActiveGameId(gameId) {
-  const next = gameId?.trim() || null;
-  if (activeGameId === next) return;
-  activeGameId = next;
+function notifyActiveHighlightSelectionListeners() {
   for (const listener of listeners) {
     listener();
   }
+}
+function getGrarfExtensionGamesYesterdayHighlightsActiveGameId() {
+  return activeGameId;
+}
+function getGrarfExtensionGamesYesterdayHighlightsActiveLeagueKey() {
+  return activeLeagueKey;
+}
+function setGrarfExtensionGamesYesterdayHighlightsActiveGameId(gameId) {
+  const next = gameId?.trim() || null;
+  if (next === null) {
+    if (activeGameId === null) return;
+    activeGameId = null;
+    notifyActiveHighlightSelectionListeners();
+    return;
+  }
+  if (activeGameId === next && activeLeagueKey === null) return;
+  activeGameId = next;
+  activeLeagueKey = null;
+  notifyActiveHighlightSelectionListeners();
+}
+function setGrarfExtensionGamesYesterdayHighlightsActiveLeagueKey(leagueKey) {
+  const next = leagueKey?.trim().toUpperCase() || null;
+  if (next === null) {
+    if (activeLeagueKey === null) return;
+    activeLeagueKey = null;
+    notifyActiveHighlightSelectionListeners();
+    return;
+  }
+  if (activeLeagueKey === next && activeGameId === null) return;
+  activeLeagueKey = next;
+  activeGameId = null;
+  notifyActiveHighlightSelectionListeners();
+}
+function clearGrarfExtensionGamesYesterdayHighlightsActiveSelection() {
+  if (activeGameId === null && activeLeagueKey === null) return;
+  activeGameId = null;
+  activeLeagueKey = null;
+  notifyActiveHighlightSelectionListeners();
 }
 function subscribeGrarfExtensionGamesYesterdayHighlightsActiveGameId(listener) {
   listeners.add(listener);
   return () => {
     listeners.delete(listener);
   };
+}
+function subscribeGrarfExtensionGamesYesterdayHighlightsActiveLeagueKey(listener) {
+  return subscribeGrarfExtensionGamesYesterdayHighlightsActiveGameId(listener);
 }
 
 // ../grarf/desktop/src/extensionHost/grarfExtensionGamesYesterdayHighlightsNavSnapshot.ts
@@ -158971,7 +159007,7 @@ function setGrarfExtensionGamesYesterdayHighlightsNavSnapshot(next) {
     listener();
   }
   if (snapshot.temporaryNavTopLevel !== "GAMES" || snapshot.gamesSelector2Label !== "YESTERDAY" || snapshot.gamesYesterdaySelector3Label !== "HIGHLIGHTS") {
-    setGrarfExtensionGamesYesterdayHighlightsActiveGameId(null);
+    clearGrarfExtensionGamesYesterdayHighlightsActiveSelection();
   }
 }
 function getGrarfExtensionGamesYesterdayHighlightsNavigationContextFromSnapshot() {
@@ -162843,6 +162879,7 @@ function navigateGrarfExtensionGamesYesterdayLeagueLevelHighlights(leagueKey) {
   const url = resolveGrarfExtensionGamesYesterdayLeagueLevelHighlightsExternalUrl(leagueKey);
   if (!url) return false;
   navigateGrarfExtensionHostExternalUrl(url);
+  setGrarfExtensionGamesYesterdayHighlightsActiveLeagueKey(leagueKey);
   return true;
 }
 
@@ -164704,7 +164741,6 @@ function SidebarTemporalLeagueBlock({
   onCommandCenterFollowLiveToggle,
   extensionGamesYesterdayHighlightsNavigation = null
 }) {
-  const isLeagueSelected = selectedLeagueKey === slate.key || expanded || selectedGameId != null && slate.games.some((game) => game.id === selectedGameId);
   const usesTennisTournamentGrouping = shouldGroupSportsBrowserSidebarLeagueByTournament(slate.key);
   const tournamentGroups = (0, import_react286.useMemo)(
     () => usesTennisTournamentGrouping ? groupSportsBrowserSidebarTennisGamesByTournament(slate.games) : [],
@@ -164726,6 +164762,12 @@ function SidebarTemporalLeagueBlock({
     getGrarfExtensionGamesYesterdayHighlightsActiveGameId,
     () => null
   );
+  const extensionYesterdayHighlightsActiveLeagueKey = (0, import_react286.useSyncExternalStore)(
+    subscribeGrarfExtensionGamesYesterdayHighlightsActiveLeagueKey,
+    getGrarfExtensionGamesYesterdayHighlightsActiveLeagueKey,
+    () => null
+  );
+  const isLeagueSelected = extensionGamesYesterdayLeagueLevelHighlights ? extensionYesterdayHighlightsActiveLeagueKey === slate.key.trim().toUpperCase() : selectedLeagueKey === slate.key || expanded || selectedGameId != null && slate.games.some((game) => game.id === selectedGameId);
   (0, import_react286.useEffect)(() => {
     if (!extensionGamesYesterdayHighlightsDirectNavigation) return;
     setGameExploreExpandedIds(/* @__PURE__ */ new Set());
@@ -165176,6 +165218,7 @@ function SidebarYesterdaySectionLeagues({
           if (!nextOpen) {
             return { ...prev, [leagueKey]: false };
           }
+          setGrarfExtensionGamesYesterdayHighlightsActiveLeagueKey(null);
           return { [leagueKey]: true };
         }
         return { ...prev, [leagueKey]: nextOpen };
