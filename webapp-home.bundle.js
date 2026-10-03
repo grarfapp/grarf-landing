@@ -161668,6 +161668,169 @@ async function resolveGrarfExtensionPlaylistYoutubeHighlightWatchUrl(game) {
   return resolvePlaylistYoutubeHighlightsForGame(leagueKey, resolverGame, entities);
 }
 
+// ../grarf/desktop/src/extensionHost/grarfExtensionUefaNationsLeagueHighlightsResolver.ts
+init_define_import_meta_env();
+init_operationalIngestConfig();
+
+// ../grarf/desktop/src/extensionHost/grarfExtensionUefaNationsLeagueHighlightMatching.ts
+init_define_import_meta_env();
+var UEFA_NATIONS_TEAM_SLUG_ALIAS_GROUPS = [
+  ["bosnia and herzegovina", "bosnia-and-herzegovina", "bosnia"],
+  ["czechia", "czech republic", "czech-republic"],
+  ["faroe islands", "faroe-islands"],
+  ["north macedonia", "north-macedonia", "macedonia"],
+  ["northern ireland", "northern-ireland"],
+  ["republic of ireland", "republic-of-ireland", "ireland"],
+  ["turkiye", "turkey"],
+  ["wales"]
+];
+function slugifyUefaTeamLabel(label) {
+  return normalizeTeamToken(label).replace(/\s+/g, "-");
+}
+function resolveUefaNationsTeamSlugKey(raw) {
+  const normalized = normalizeTeamToken(raw);
+  if (!normalized) return null;
+  let best = null;
+  for (const group of UEFA_NATIONS_TEAM_SLUG_ALIAS_GROUPS) {
+    const canonicalSlug = slugifyUefaTeamLabel(group[0] ?? "");
+    if (!canonicalSlug) continue;
+    for (const alias of group) {
+      const aliasNorm = normalizeTeamToken(alias);
+      const aliasSlug = slugifyUefaTeamLabel(alias);
+      if (!aliasNorm || aliasNorm.length < 3) continue;
+      const matches = normalized === aliasNorm || slugifyUefaTeamLabel(raw) === aliasSlug || normalized.includes(aliasNorm) || aliasNorm.includes(normalized);
+      if (!matches) continue;
+      const aliasLength = Math.max(aliasNorm.length, aliasSlug.length);
+      if (!best || aliasLength > best.aliasLength) {
+        best = { key: canonicalSlug, aliasLength };
+      }
+    }
+  }
+  if (best) return best.key;
+  const direct = slugifyUefaTeamLabel(raw);
+  return direct.length >= 3 ? direct : null;
+}
+function resolveGameTeamSlugKeys(game) {
+  const away = resolveUefaNationsTeamSlugKey(
+    game.officialAwayName || game.awayTeam || game.awayCity || ""
+  );
+  const home = resolveUefaNationsTeamSlugKey(
+    game.officialHomeName || game.homeTeam || game.homeCity || ""
+  );
+  if (!away || !home) return null;
+  return { away, home };
+}
+function bilateralSlugMatch(gameSlugs, item) {
+  const forward = gameSlugs.home === item.homeTeamSlug && gameSlugs.away === item.awayTeamSlug;
+  const reverse = gameSlugs.home === item.awayTeamSlug && gameSlugs.away === item.homeTeamSlug;
+  return forward || reverse;
+}
+function scoreMatchesGame(game, item, gameSlugs) {
+  const awayScore = game.awayScore;
+  const homeScore = game.homeScore;
+  if (awayScore == null || homeScore == null) return true;
+  if (!Number.isFinite(awayScore) || !Number.isFinite(homeScore)) return true;
+  const homeFirst = gameSlugs.home === item.homeTeamSlug && gameSlugs.away === item.awayTeamSlug;
+  if (homeFirst) {
+    return item.homeGoals === homeScore && item.awayGoals === awayScore;
+  }
+  return item.homeGoals === awayScore && item.awayGoals === homeScore;
+}
+function uefaNationsLeagueHighlightItemMatchesGame(item, game) {
+  const gameSlugs = resolveGameTeamSlugKeys(game);
+  if (!gameSlugs) return false;
+  if (!bilateralSlugMatch(gameSlugs, item)) return false;
+  return scoreMatchesGame(game, item, gameSlugs);
+}
+function resolveUefaNationsLeagueHighlightGameAnchorMs(game) {
+  if (game.startTimeMs != null && Number.isFinite(game.startTimeMs) && game.startTimeMs > 0) {
+    return game.startTimeMs;
+  }
+  const dayKey = game.scheduledDateKey?.trim();
+  if (!dayKey) return null;
+  const parsed = Date.parse(`${dayKey}T20:00:00.000Z`);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
+}
+
+// ../grarf/desktop/src/extensionHost/grarfExtensionUefaNationsLeagueHighlightsResolver.ts
+var INDEX_CACHE_TTL_MS = 5 * 60 * 1e3;
+var HIGHLIGHT_INDEX_PATH = "/clips/uefa-nations-league-highlights";
+var MAX_PUBLISH_DELTA_MS = 14 * 24 * 60 * 60 * 1e3;
+var indexCache = null;
+async function fetchUefaNationsLeagueHighlightIndex() {
+  if (indexCache && Date.now() - indexCache.at < INDEX_CACHE_TTL_MS) {
+    return indexCache.items;
+  }
+  const cloudBase = getOperationalIngestConfig().cloudBaseUrl?.replace(/\/$/, "");
+  if (!cloudBase) {
+    throw new Error("operational_ingest_url_unconfigured");
+  }
+  const url = `${cloudBase}${HIGHLIGHT_INDEX_PATH}`;
+  const res = await fetch(url, {
+    headers: { Accept: "application/json" },
+    cache: "no-store"
+  });
+  if (!res.ok) {
+    throw new Error(`uefa_nations_highlight_index_${res.status || "fetch_failed"}`);
+  }
+  const data2 = await res.json();
+  const items = (data2.items ?? []).filter((item) => {
+    return typeof item?.url === "string" && item.url.length > 0;
+  });
+  indexCache = { at: Date.now(), items };
+  return items;
+}
+function resolveHighlightResolverGame(game) {
+  const payload = resolveLeagueHighlightGamePayload(game);
+  const operationalDateKey = resolveGameOperationalDateKey(game);
+  const awayScore = game.awayScore;
+  const homeScore = game.homeScore;
+  return {
+    ...payload,
+    scheduledDateKey: operationalDateKey ?? payload.scheduledDateKey,
+    awayScore: typeof awayScore === "number" ? awayScore : void 0,
+    homeScore: typeof homeScore === "number" ? homeScore : void 0
+  };
+}
+async function resolveGrarfExtensionUefaNationsLeagueHighlightUrl(game) {
+  const leagueKey = game.league?.trim().toUpperCase() ?? "";
+  if (leagueKey !== "NATIONS") {
+    return null;
+  }
+  const resolverGame = resolveHighlightResolverGame(game);
+  const gameAnchorMs = resolveUefaNationsLeagueHighlightGameAnchorMs(resolverGame);
+  if (gameAnchorMs == null) {
+    return null;
+  }
+  const items = await fetchUefaNationsLeagueHighlightIndex();
+  if (items.length === 0) {
+    return null;
+  }
+  let best = null;
+  for (const item of items) {
+    if (!uefaNationsLeagueHighlightItemMatchesGame(item, resolverGame)) {
+      continue;
+    }
+    const publishedMs = Date.parse(item.publishedAt || "");
+    if (!Number.isFinite(publishedMs) || publishedMs <= 0) {
+      continue;
+    }
+    const publishDeltaMs = Math.abs(publishedMs - gameAnchorMs);
+    if (publishDeltaMs > MAX_PUBLISH_DELTA_MS) {
+      continue;
+    }
+    const url = item.url?.trim();
+    if (!url) continue;
+    if (!best || publishDeltaMs < best.publishDeltaMs || publishDeltaMs === best.publishDeltaMs && publishedMs > best.publishedMs) {
+      best = { url, publishDeltaMs, publishedMs };
+    }
+  }
+  return best?.url ?? null;
+}
+function grarfExtensionLeagueUsesUefaNationsLeagueHighlights(leagueKey) {
+  return leagueKey.trim().toUpperCase() === "NATIONS";
+}
+
 // ../grarf/desktop/src/extensionHost/grarfExtensionGameYesterdayHighlightsNavigation.ts
 async function navigateGrarfExtensionGameYesterdayHighlights(game, context2) {
   if (!isGrarfExtensionGamesYesterdayHighlightsNavSnapshotActive() && !resolveGrarfExtensionGamesYesterdayHighlightsNavigationActive(context2)) {
@@ -161690,6 +161853,19 @@ async function navigateGrarfExtensionGameYesterdayHighlights(game, context2) {
   if (grarfExtensionLeagueUsesYoutubePlaylistHighlights(leagueKey)) {
     try {
       const watchUrl = await resolveGrarfExtensionPlaylistYoutubeHighlightWatchUrl(game);
+      if (watchUrl) {
+        navigateGrarfExtensionHostExternalUrl(watchUrl);
+        setGrarfExtensionGamesYesterdayHighlightsActiveGameId(game.id);
+        return true;
+      }
+    } catch {
+      return false;
+    }
+    return false;
+  }
+  if (grarfExtensionLeagueUsesUefaNationsLeagueHighlights(leagueKey)) {
+    try {
+      const watchUrl = await resolveGrarfExtensionUefaNationsLeagueHighlightUrl(game);
       if (watchUrl) {
         navigateGrarfExtensionHostExternalUrl(watchUrl);
         setGrarfExtensionGamesYesterdayHighlightsActiveGameId(game.id);
