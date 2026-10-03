@@ -64670,6 +64670,7 @@ var F1_SESSION_PATTERNS = [
   { key: "fp1", pattern: /\bpractice\s+(?:1|one|first)\b/i },
   { key: "fp2", pattern: /\bpractice\s+(?:2|two|second)\b/i },
   { key: "fp3", pattern: /\bpractice\s+(?:3|three|third)\b/i },
+  { key: "qualifying", pattern: /\bqual\b/i },
   { key: "qualifying", pattern: /\bqualifying\b/i },
   { key: "sprint", pattern: /\bsprint\b/i },
   { key: "race", pattern: /\brace\b/i }
@@ -64730,10 +64731,16 @@ function resolveF1SessionKey(text2) {
   }
   return null;
 }
+function normalizeF1GameSessionLabel(label) {
+  const trimmed = label.trim();
+  if (/^qual$/i.test(trimmed)) return "Qualifying";
+  return trimmed;
+}
 function readF1SessionLabelFromGame(game) {
   const awayTeam = game.awayTeam?.trim() ?? "";
   const sessionFromTitle = awayTeam.includes("\xB7") ? awayTeam.split("\xB7").pop()?.trim() ?? "" : "";
-  return game.metadata?.racingSessionLabel?.trim() || sessionFromTitle || awayTeam;
+  const raw = game.metadata?.racingSessionLabel?.trim() || sessionFromTitle || awayTeam;
+  return normalizeF1GameSessionLabel(raw);
 }
 function resolveF1GrandPrixLabelFromGame(game) {
   const awayTeam = game.awayTeam?.trim() ?? "";
@@ -161508,9 +161515,17 @@ var GRARF_EXTENSION_YOUTUBE_HIGHLIGHTS_PLAYLIST_BY_LEAGUE = {
   MLB: MLB_HIGHLIGHTS_PLAYLIST_ID,
   NHL: "PLXgxFhEvLHE0",
   MLS: "PLcj4z4KsbIoXrLpj2pOVr_maRaxhW902-",
+  LEAGUES_CUP: "PLaqZDrMi2AhY",
   WOMENS_UCL: "PLOBs606VBt50",
   CONCACAF_NG: "PLTUkUUqDV3B4",
-  EPL: "PLR1b-6EyIaTs"
+  EPL: "PLR1b-6EyIaTs",
+  UCL: "PLWvDauQBKnvI",
+  UEL: "PLJrSgXxwLS0s",
+  "FA-CUP": "PLdBljId7entg",
+  CARABAO_CUP: "PLJupd9Dz01NM",
+  CHAMPIONSHIP: "PLfsa9MRGOEDM",
+  SPFL: "PLdGKoQKwJWZQ",
+  WNBA: "PLIHqPSYoErfw"
 };
 var GRARF_EXTENSION_NWSL_YOUTUBE_CHANNEL_ID = "UCL4xu08EDu0ZFZsBJUB0chw";
 function resolveGrarfExtensionNwslYoutubeChannelUploadsPlaylistId() {
@@ -161592,6 +161607,28 @@ function resolveNwslGameAnchorMs(game) {
   const parsed = Date.parse(`${dayKey}T20:00:00.000Z`);
   return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
 }
+function resolveWnbaPlaylistYoutubeHighlightWatchUrl(game, entities) {
+  const gameDateYmd = resolveGameDayKey(game);
+  if (!gameDateYmd) {
+    return null;
+  }
+  const entries = entities.map((entity) => {
+    const videoId = youtubeVideoIdFromCanonical(entity)?.trim() ?? "";
+    const title = entity.title?.trim() ?? "";
+    if (!videoId || !title) return null;
+    return {
+      videoId,
+      title,
+      published: entity.publishedAt?.trim() ?? ""
+    };
+  }).filter((entry2) => entry2 != null);
+  const match = matchWnbaYoutubePlaylistHighlight(entries, {
+    awayTeam: game.awayTeam,
+    homeTeam: game.homeTeam,
+    gameDateYmd
+  });
+  return match?.youtubeUrl?.trim() || null;
+}
 function resolveEplPlaylistYoutubeHighlightWatchUrl(game, entities) {
   const gameDateYmd = resolveGameDayKey(game);
   if (!gameDateYmd) {
@@ -161651,6 +161688,9 @@ function resolvePlaylistYoutubeHighlightsForGame(leagueKey, game, entities) {
   }
   if (leagueKey === "EPL") {
     return resolveEplPlaylistYoutubeHighlightWatchUrl(game, entities);
+  }
+  if (leagueKey === "WNBA") {
+    return resolveWnbaPlaylistYoutubeHighlightWatchUrl(game, entities);
   }
   const titlePatterns = resolveExtensionPlaylistHighlightTitlePatterns(leagueKey);
   const minDateProximityScore = 6;
@@ -162127,6 +162167,37 @@ function GrarfExtensionSidebarTemporalCollapsedGameCard({
 
 // ../grarf/desktop/src/extensionHost/GrarfExtensionYesterdayHighlightsMinimizedGameCard.tsx
 init_define_import_meta_env();
+
+// ../grarf/desktop/src/extensionHost/grarfExtensionF1YesterdayHighlightsPresentation.ts
+init_define_import_meta_env();
+function formatGrarfExtensionF1SessionDisplayLabel(sessionLabel) {
+  const trimmed = sessionLabel.trim();
+  if (!trimmed) return trimmed;
+  if (/^qual$/i.test(trimmed)) return "Qualifying";
+  return trimmed;
+}
+function readF1GrandPrixTitle(game) {
+  const awayTeam = game.awayTeam?.trim() ?? "";
+  if (awayTeam.includes("\xB7")) {
+    return awayTeam.split("\xB7")[0]?.trim() ?? awayTeam;
+  }
+  return awayTeam;
+}
+function readF1SessionLabel(game) {
+  const awayTeam = game.awayTeam?.trim() ?? "";
+  const sessionFromTitle = awayTeam.includes("\xB7") ? awayTeam.split("\xB7").pop()?.trim() ?? "" : "";
+  return game.metadata?.racingSessionLabel?.trim() || sessionFromTitle || "";
+}
+function resolveGrarfExtensionF1YesterdayHighlightsEventDisplayLine(game) {
+  const grandPrix = readF1GrandPrixTitle(game);
+  const session = formatGrarfExtensionF1SessionDisplayLabel(readF1SessionLabel(game));
+  if (session && grandPrix) {
+    return `${session}, ${grandPrix}`;
+  }
+  return session || grandPrix;
+}
+
+// ../grarf/desktop/src/extensionHost/GrarfExtensionYesterdayHighlightsMinimizedGameCard.tsx
 init_isGrarfWebRenderer();
 var import_jsx_runtime272 = __toESM(require_jsx_runtime(), 1);
 function TeamSegment({
@@ -162182,7 +162253,7 @@ function GrarfExtensionYesterdayHighlightsMinimizedGameCard({
       "aria-current": isSelected ? "true" : void 0,
       onClick: handleClick,
       children: [
-        /* @__PURE__ */ (0, import_jsx_runtime272.jsx)("span", { className: "grarf-extension-yesterday-highlights-minimized-matchup", children: model.kind === "event" ? /* @__PURE__ */ (0, import_jsx_runtime272.jsx)("span", { className: "grarf-extension-yesterday-highlights-minimized-event-line", children: resolveGamesSpineCompactEventDisplayLine(model.event) }) : /* @__PURE__ */ (0, import_jsx_runtime272.jsxs)(import_jsx_runtime272.Fragment, { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime272.jsx)("span", { className: "grarf-extension-yesterday-highlights-minimized-matchup", children: model.kind === "event" ? /* @__PURE__ */ (0, import_jsx_runtime272.jsx)("span", { className: "grarf-extension-yesterday-highlights-minimized-event-line", children: game.league?.trim().toUpperCase() === "F1" ? resolveGrarfExtensionF1YesterdayHighlightsEventDisplayLine(game) : resolveGamesSpineCompactEventDisplayLine(model.event) }) : /* @__PURE__ */ (0, import_jsx_runtime272.jsxs)(import_jsx_runtime272.Fragment, { children: [
           /* @__PURE__ */ (0, import_jsx_runtime272.jsx)(
             TeamSegment,
             {
@@ -162725,6 +162796,54 @@ function GrarfExtensionAiSearchHomeSection({
       ]
     }
   );
+}
+
+// ../grarf/desktop/src/extensionHost/grarfExtensionGamesYesterdayLeagueLevelHighlights.ts
+init_define_import_meta_env();
+var GRARF_EXTENSION_GAMES_YESTERDAY_LEAGUE_LEVEL_HIGHLIGHTS_EXTERNAL_URL_BY_LEAGUE = {
+  ATP: "https://www.youtube.com/@ATPTour/videos",
+  WTA: "https://www.youtube.com/@WTA/videos",
+  PGA: "https://www.youtube.com/@PGATour/videos",
+  DP_WORLD: "https://www.youtube.com/@DPWorldTour/videos",
+  LPGA: "https://www.youtube.com/@LPGA/videos"
+};
+function grarfExtensionLeagueUsesGamesYesterdayLeagueLevelHighlights(leagueKey) {
+  const key2 = leagueKey.trim().toUpperCase();
+  return Boolean(
+    GRARF_EXTENSION_GAMES_YESTERDAY_LEAGUE_LEVEL_HIGHLIGHTS_EXTERNAL_URL_BY_LEAGUE[key2]
+  );
+}
+function resolveGrarfExtensionGamesYesterdayLeagueLevelHighlightsExternalUrl(leagueKey) {
+  const key2 = leagueKey.trim().toUpperCase();
+  const url = GRARF_EXTENSION_GAMES_YESTERDAY_LEAGUE_LEVEL_HIGHLIGHTS_EXTERNAL_URL_BY_LEAGUE[key2];
+  return url?.trim() || null;
+}
+function applyGrarfExtensionGamesYesterdayLeagueLevelHighlightSlates(slates) {
+  const keysPresent = new Set(slates.map((slate) => slate.key));
+  const next = slates.map((slate) => {
+    if (!grarfExtensionLeagueUsesGamesYesterdayLeagueLevelHighlights(slate.key)) {
+      return slate;
+    }
+    return { ...slate, games: [] };
+  });
+  for (const leagueKey of Object.keys(
+    GRARF_EXTENSION_GAMES_YESTERDAY_LEAGUE_LEVEL_HIGHLIGHTS_EXTERNAL_URL_BY_LEAGUE
+  )) {
+    if (keysPresent.has(leagueKey)) continue;
+    const label = GAMES_COLUMN_LEAGUE_LABEL[leagueKey] ?? leagueKey;
+    next.push({
+      key: leagueKey,
+      label,
+      games: []
+    });
+  }
+  return orderSportsBrowserPrototypeNewsSidebarLeagueSlates(next);
+}
+function navigateGrarfExtensionGamesYesterdayLeagueLevelHighlights(leagueKey) {
+  const url = resolveGrarfExtensionGamesYesterdayLeagueLevelHighlightsExternalUrl(leagueKey);
+  if (!url) return false;
+  navigateGrarfExtensionHostExternalUrl(url);
+  return true;
 }
 
 // ../grarf/desktop/src/extensionHost/grarfExtensionGamesYesterdayHighlightsUpDownNavigation.ts
@@ -163902,7 +164021,8 @@ function NavRow({
   leaguesTabTeamsIcon = false,
   onLeaguesTabTeamsIconClick,
   leaguesTabTeamsListExpanded = false,
-  leaguesTabLeagueRow = false
+  leaguesTabLeagueRow = false,
+  hideTrailingChevron = false
 }) {
   const indentClass = resolveNavRowIndentClass(indent, soccerArchChildLeague);
   const trailingChevron = expanded ? /* @__PURE__ */ (0, import_jsx_runtime277.jsx)(ChevronDown, { size: 12, strokeWidth: 2, className: "shrink-0 rotate-180", "aria-hidden": true }) : /* @__PURE__ */ (0, import_jsx_runtime277.jsx)(ChevronRight, { size: 12, strokeWidth: 2, className: "shrink-0 text-foreground", "aria-hidden": true });
@@ -163987,8 +164107,8 @@ function NavRow({
                 children: /* @__PURE__ */ (0, import_jsx_runtime277.jsx)(SidebarLeaguesTabTeamsIconMark, {})
               }
             ) : /* @__PURE__ */ (0, import_jsx_runtime277.jsx)(SidebarLeaguesTabTeamsIconMark, {}),
-            !leaguesTabLeagueRow ? trailingChevron : null
-          ] }) : leaguesTabLeagueRow ? null : trailingChevron
+            !leaguesTabLeagueRow && !hideTrailingChevron ? trailingChevron : null
+          ] }) : leaguesTabLeagueRow || hideTrailingChevron ? null : trailingChevron
         ] }) : trailing === "expand" ? /* @__PURE__ */ (0, import_jsx_runtime277.jsx)("span", { className: "inline-flex h-[1lh] shrink-0 items-center", children: /* @__PURE__ */ (0, import_jsx_runtime277.jsx)(ChevronDown, { size: 12, strokeWidth: 2, className: "shrink-0 rotate-180", "aria-hidden": true }) }) : null
       ]
     }
@@ -164600,6 +164720,7 @@ function SidebarTemporalLeagueBlock({
     () => false
   );
   const extensionGamesYesterdayHighlightsDirectNavigation = isGrarfExtensionRenderer() && extensionGamesYesterdayHighlightsNavActive;
+  const extensionGamesYesterdayLeagueLevelHighlights = extensionGamesYesterdayHighlightsDirectNavigation && grarfExtensionLeagueUsesGamesYesterdayLeagueLevelHighlights(slate.key);
   const extensionYesterdayHighlightsActiveGameId = (0, import_react286.useSyncExternalStore)(
     subscribeGrarfExtensionGamesYesterdayHighlightsActiveGameId,
     getGrarfExtensionGamesYesterdayHighlightsActiveGameId,
@@ -164690,10 +164811,11 @@ function SidebarTemporalLeagueBlock({
     "div",
     {
       "data-grarf-temporary-nav-nested-league": "",
-      ...extensionGamesYesterdayHighlightsDirectNavigation ? {
+      ...extensionGamesYesterdayHighlightsDirectNavigation && !extensionGamesYesterdayLeagueLevelHighlights ? {
         "data-grarf-extension-yesterday-highlights-nested-league": "",
         ...expanded ? { "data-grarf-extension-yesterday-highlights-league-expanded": "" } : {}
       } : {},
+      ...extensionGamesYesterdayLeagueLevelHighlights ? { "data-grarf-extension-yesterday-highlights-league-level": "" } : {},
       children: [
         /* @__PURE__ */ (0, import_jsx_runtime277.jsx)(
           NavRow,
@@ -164701,16 +164823,17 @@ function SidebarTemporalLeagueBlock({
             label: slate.label,
             indent,
             soccerArchChildLeague,
-            expanded,
+            expanded: extensionGamesYesterdayLeagueLevelHighlights ? false : expanded,
             leagueKey: slate.key,
             leagueGames: slate.games,
-            onClick: onToggle,
+            onClick: extensionGamesYesterdayLeagueLevelHighlights ? () => navigateGrarfExtensionGamesYesterdayLeagueLevelHighlights(slate.key) : onToggle,
+            hideTrailingChevron: extensionGamesYesterdayLeagueLevelHighlights,
             isSelected: isLeagueSelected,
             leagueActivityStatuses,
             leagueNowLiveCount
           }
         ),
-        expanded ? /* @__PURE__ */ (0, import_jsx_runtime277.jsxs)("div", { className: "min-w-0", "data-grarf-temporary-nav-nested-league-children": "", children: [
+        expanded && !extensionGamesYesterdayLeagueLevelHighlights ? /* @__PURE__ */ (0, import_jsx_runtime277.jsxs)("div", { className: "min-w-0", "data-grarf-temporary-nav-nested-league-children": "", children: [
           extensionGamesYesterdayHighlightsDirectNavigation ? /* @__PURE__ */ (0, import_jsx_runtime277.jsx)(
             "div",
             {
@@ -164995,21 +165118,34 @@ function SidebarYesterdaySectionLeagues({
   onGameInlineNavigate,
   extensionGamesYesterdayHighlightsNavigation = null
 }) {
-  const groupedEntries = (0, import_react286.useMemo)(
-    () => groupSportsBrowserPrototypeSidebarLeagueSlatesBySoccer(slates),
-    [slates]
-  );
-  const leafSlates = (0, import_react286.useMemo)(
-    () => flattenSportsBrowserPrototypeSidebarLeagueEntries(groupedEntries),
-    [groupedEntries]
-  );
-  const expandableSlates = leafSlates;
   const extensionGamesYesterdayHighlightsNavActive = (0, import_react286.useSyncExternalStore)(
     subscribeGrarfExtensionGamesYesterdayHighlightsNavSnapshot,
     isGrarfExtensionGamesYesterdayHighlightsNavSnapshotActive,
     () => false
   );
   const extensionGamesYesterdayHighlightsAccordionLeagues = isGrarfExtensionRenderer() && extensionGamesYesterdayHighlightsNavActive;
+  const displaySlates = (0, import_react286.useMemo)(() => {
+    if (!extensionGamesYesterdayHighlightsAccordionLeagues) {
+      return slates;
+    }
+    return applyGrarfExtensionGamesYesterdayLeagueLevelHighlightSlates(slates);
+  }, [extensionGamesYesterdayHighlightsAccordionLeagues, slates]);
+  const groupedEntries = (0, import_react286.useMemo)(
+    () => groupSportsBrowserPrototypeSidebarLeagueSlatesBySoccer(displaySlates),
+    [displaySlates]
+  );
+  const leafSlates = (0, import_react286.useMemo)(
+    () => flattenSportsBrowserPrototypeSidebarLeagueEntries(groupedEntries),
+    [groupedEntries]
+  );
+  const expandableSlates = (0, import_react286.useMemo)(() => {
+    if (!extensionGamesYesterdayHighlightsAccordionLeagues) {
+      return leafSlates;
+    }
+    return leafSlates.filter(
+      (slate) => !grarfExtensionLeagueUsesGamesYesterdayLeagueLevelHighlights(slate.key)
+    );
+  }, [extensionGamesYesterdayHighlightsAccordionLeagues, leafSlates]);
   const allOpen = expandableSlates.length > 0 && expandableSlates.every((slate) => leagueOpen[slate.key] ?? false);
   const toggleAll = (0, import_react286.useCallback)(() => {
     if (allOpen) {
@@ -165030,6 +165166,10 @@ function SidebarYesterdaySectionLeagues({
   ]);
   const toggleLeague = (0, import_react286.useCallback)(
     (leagueKey) => {
+      if (extensionGamesYesterdayHighlightsAccordionLeagues && grarfExtensionLeagueUsesGamesYesterdayLeagueLevelHighlights(leagueKey)) {
+        navigateGrarfExtensionGamesYesterdayLeagueLevelHighlights(leagueKey);
+        return;
+      }
       onLeagueOpenChange((prev) => {
         const nextOpen = !(prev[leagueKey] ?? false);
         if (extensionGamesYesterdayHighlightsAccordionLeagues) {
