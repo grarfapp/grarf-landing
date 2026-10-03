@@ -20635,7 +20635,7 @@ var GAMES_COLUMN_LEAGUE_LABEL = {
   EURO: "UEFA Euro",
   COPA: "Copa America",
   GOLDCUP: "Gold Cup",
-  NATIONS: "Nations League",
+  NATIONS: "UEFA Nations League",
   CLUBWC: "Club World Cup",
   CLUBFRIENDLY: "Club Friendly",
   CONCACAF_CAC: "Central American Cup",
@@ -64280,7 +64280,7 @@ var HIGHLIGHTS_TV_CHANNEL_ORDER = [
   { channelNumber: 21, leagueKey: "WTA", label: "WTA", sportGroup: "TENNIS" },
   { channelNumber: 22, leagueKey: "INDYCAR", label: "INDYCAR", sportGroup: "AUTO" },
   { channelNumber: 23, leagueKey: "NASCAR", label: "NASCAR", sportGroup: "AUTO" },
-  { channelNumber: 24, leagueKey: "NATIONS", label: "NATIONS", sportGroup: "SOCCER" },
+  { channelNumber: 24, leagueKey: "NATIONS", label: "UEFA Nations League", sportGroup: "SOCCER" },
   { channelNumber: 25, leagueKey: "GOLDCUP", label: "GOLDCUP", sportGroup: "SOCCER" },
   { channelNumber: 26, leagueKey: "WNBA", label: "WNBA", sportGroup: "BASKETBALL" },
   { channelNumber: 27, leagueKey: "NWSL", label: "NWSL", sportGroup: "SOCCER" },
@@ -75626,7 +75626,7 @@ var SOCCER_LIVETRACK_LEAGUES = [
   soccerConfig("EURO", "uefa.euro", "UEFA Euro"),
   soccerConfig("COPA", "conmebol.america", "Copa America"),
   soccerConfig("GOLDCUP", "concacaf.gold", "Gold Cup"),
-  soccerConfig("NATIONS", "uefa.nations", "Nations League"),
+  soccerConfig("NATIONS", "uefa.nations", "UEFA Nations League"),
   soccerConfig("CLUBWC", "fifa.cwc", "Club World Cup"),
   soccerConfig("SPFL", "sco.1", "SPFL"),
   soccerConfig("SAUDI", "ksa.1", "Saudi Pro League"),
@@ -89605,7 +89605,7 @@ var SPORTS_BROWSER_PROTOTYPE_LEAGUE_PODCAST_WEBSITES = {
     url: "https://open.spotify.com/search/Gold%20Cup%20podcasts/podcastAndEpisodes"
   },
   "NATIONS": {
-    label: "Nations League",
+    label: "UEFA Nations League",
     url: "https://open.spotify.com/search/Nations%20League%20podcasts/podcastAndEpisodes"
   },
   "CLUBWC": {
@@ -90146,7 +90146,7 @@ var SPORTS_BROWSER_PROTOTYPE_LEAGUE_YOUTUBE_WEBSITES = {
     url: "https://www.youtube.com/@Concacaf/videos"
   },
   "NATIONS": {
-    label: "Nations League",
+    label: "UEFA Nations League",
     url: "https://www.youtube.com/@UEFA/videos"
   },
   "CLUBWC": {
@@ -164534,30 +164534,40 @@ function SidebarTemporalLeagueBlock({
             leagueNowLiveCount
           }
         ),
-        expanded ? /* @__PURE__ */ (0, import_jsx_runtime277.jsx)("div", { className: "min-w-0", "data-grarf-temporary-nav-nested-league-children": "", children: /* @__PURE__ */ (0, import_jsx_runtime277.jsx)(SidebarTemporalGamesBox, { children: usesTennisTournamentGrouping && leagueOpen && onToggleExpansionKey ? tournamentGroups.map((group) => {
-          const tournamentExpansionKey = resolveSportsBrowserSidebarTennisTournamentExpansionKey(
-            slate.key,
-            group.key
-          );
-          const tournamentExpanded = leagueOpen[tournamentExpansionKey] ?? false;
-          return /* @__PURE__ */ (0, import_jsx_runtime277.jsxs)(import_react286.Fragment, { children: [
-            /* @__PURE__ */ (0, import_jsx_runtime277.jsx)(
-              NavRow,
-              {
-                label: group.label,
-                indent: tournamentIndent,
-                expanded: tournamentExpanded,
-                onClick: () => onToggleExpansionKey(tournamentExpansionKey),
-                tennisTournamentKey: group.key,
-                tennisTournamentLeagueKey: slate.key,
-                className: "normal-case"
-              }
-            ),
-            tournamentExpanded ? group.games.map(
-              (game) => renderGameRow(game, { sidebarTennisTournamentGrouped: true })
-            ) : null
-          ] }, `${slate.key}-${group.key}`);
-        }) : slate.games.map((game) => renderGameRow(game)) }) }) : null
+        expanded ? /* @__PURE__ */ (0, import_jsx_runtime277.jsxs)("div", { className: "min-w-0", "data-grarf-temporary-nav-nested-league-children": "", children: [
+          extensionGamesYesterdayHighlightsDirectNavigation ? /* @__PURE__ */ (0, import_jsx_runtime277.jsx)(
+            "div",
+            {
+              className: "grarf-extension-yesterday-highlights-league-section-label",
+              "data-grarf-extension-yesterday-highlights-section-label": "",
+              children: "HIGHLIGHTS"
+            }
+          ) : null,
+          /* @__PURE__ */ (0, import_jsx_runtime277.jsx)(SidebarTemporalGamesBox, { children: usesTennisTournamentGrouping && leagueOpen && onToggleExpansionKey ? tournamentGroups.map((group) => {
+            const tournamentExpansionKey = resolveSportsBrowserSidebarTennisTournamentExpansionKey(
+              slate.key,
+              group.key
+            );
+            const tournamentExpanded = leagueOpen[tournamentExpansionKey] ?? false;
+            return /* @__PURE__ */ (0, import_jsx_runtime277.jsxs)(import_react286.Fragment, { children: [
+              /* @__PURE__ */ (0, import_jsx_runtime277.jsx)(
+                NavRow,
+                {
+                  label: group.label,
+                  indent: tournamentIndent,
+                  expanded: tournamentExpanded,
+                  onClick: () => onToggleExpansionKey(tournamentExpansionKey),
+                  tennisTournamentKey: group.key,
+                  tennisTournamentLeagueKey: slate.key,
+                  className: "normal-case"
+                }
+              ),
+              tournamentExpanded ? group.games.map(
+                (game) => renderGameRow(game, { sidebarTennisTournamentGrouped: true })
+              ) : null
+            ] }, `${slate.key}-${group.key}`);
+          }) : slate.games.map((game) => renderGameRow(game)) })
+        ] }) : null
       ]
     }
   );

@@ -14138,7 +14138,7 @@ var GAMES_COLUMN_LEAGUE_LABEL = {
   EURO: "UEFA Euro",
   COPA: "Copa America",
   GOLDCUP: "Gold Cup",
-  NATIONS: "Nations League",
+  NATIONS: "UEFA Nations League",
   CLUBWC: "Club World Cup",
   CLUBFRIENDLY: "Club Friendly",
   CONCACAF_CAC: "Central American Cup",
