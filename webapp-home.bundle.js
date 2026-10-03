@@ -64412,7 +64412,24 @@ function buildTeamAliasTerms(game, side) {
 }
 var HIGHLIGHT_TITLE_TEAM_ALIAS_GROUPS = [
   ["vienna", "austria wien"],
-  ["inter milan", "inter", "internazionale"]
+  ["inter milan", "inter", "internazionale"],
+  // CONCACAF Nations League — GRARF / ESPN short names vs official YouTube titles
+  ["us virgin isl", "us virgin islands"],
+  ["br virgin isl", "br virgin isles", "british virgin islands"],
+  ["st martin", "saint martin"],
+  ["sint maarten", "st maarten"],
+  ["st kitts", "saint kitts", "st kitts nevis", "st kitts and nevis", "saint kitts and nevis"],
+  ["st lucia", "saint lucia"],
+  ["st vincent", "saint vincent", "st vincent and the grenadines"],
+  ["turks and caicos", "turks caicos islands", "turks and caicos islands"],
+  ["antigua barbuda", "antigua and barbuda"],
+  ["antigua", "antigua and barbuda"],
+  ["trin tob", "trinidad and tobago"],
+  ["trinidad", "trinidad and tobago"],
+  ["cayman isl", "cayman islands"],
+  ["curacao", "cura ao"],
+  ["dominican rep", "dominican republic"],
+  ["usa", "united states"]
 ];
 function expandHighlightTitleAliasTerms(terms) {
   const expanded = new Set(terms);
@@ -106268,7 +106285,7 @@ function navigateActiveChromeBrowserTab(url) {
   const chromeRuntime = globalThis.chrome?.runtime;
   if (chromeRuntime?.sendMessage) {
     void chromeRuntime.sendMessage({ type: GRARF_NAVIGATE_HOST_TAB_MESSAGE, url }).then((response) => {
-      if (response?.ok !== false) return;
+      if (response?.ok === true) return;
       navigateActiveChromeBrowserTabDirect(url);
     }).catch(() => {
       navigateActiveChromeBrowserTabDirect(url);
@@ -158934,8 +158951,18 @@ var snapshot = {
   gamesYesterdaySelector3Label: null,
   gamesCompactTemporalView: "today"
 };
+var snapshotListeners = /* @__PURE__ */ new Set();
+function subscribeGrarfExtensionGamesYesterdayHighlightsNavSnapshot(listener) {
+  snapshotListeners.add(listener);
+  return () => {
+    snapshotListeners.delete(listener);
+  };
+}
 function setGrarfExtensionGamesYesterdayHighlightsNavSnapshot(next) {
   snapshot = next;
+  for (const listener of snapshotListeners) {
+    listener();
+  }
   if (snapshot.temporaryNavTopLevel !== "GAMES" || snapshot.gamesSelector2Label !== "YESTERDAY" || snapshot.gamesYesterdaySelector3Label !== "HIGHLIGHTS") {
     setGrarfExtensionGamesYesterdayHighlightsActiveGameId(null);
   }
@@ -160873,16 +160900,23 @@ function SportsBrowserPrototypeTemporaryNavPrototype({
   ]);
   (0, import_react281.useLayoutEffect)(() => {
     if (!isGrarfExtensionRenderer()) return;
+    const navigationContext = {
+      temporaryNavTopLevel: topLevel,
+      gamesYesterdaySelector3Label: effectiveSelector3Label,
+      gamesCompactTemporalView: gamesCompactTemporalView ?? null
+    };
     setGrarfExtensionGamesYesterdayHighlightsNavSnapshot({
       temporaryNavTopLevel: topLevel,
       gamesSelector2Label: effectiveSelector2Label,
       gamesYesterdaySelector3Label: effectiveSelector3Label,
       gamesCompactTemporalView: gamesCompactTemporalView ?? null
     });
+    onExtensionGamesYesterdayHighlightsNavigationContextChange?.(navigationContext);
   }, [
     effectiveSelector2Label,
     effectiveSelector3Label,
     gamesCompactTemporalView,
+    onExtensionGamesYesterdayHighlightsNavigationContextChange,
     topLevel
   ]);
   const selector2Options = (0, import_react281.useMemo)(
@@ -161285,8 +161319,17 @@ var GRARF_EXTENSION_YOUTUBE_HIGHLIGHTS_PLAYLIST_BY_LEAGUE = {
   NHL: "PLXgxFhEvLHE0",
   MLS: "PLcj4z4KsbIoXrLpj2pOVr_maRaxhW902-",
   WOMENS_UCL: "PLOBs606VBt50",
-  NWSL: "PLaDzpntrLeOo"
+  NWSL: "PLaDzpntrLeOo",
+  CONCACAF_NG: "PLTUkUUqDV3B4"
 };
+var EXTENSION_PLAYLIST_HIGHLIGHT_TITLE_PATTERNS_BY_LEAGUE = {
+  CONCACAF_NG: ["concacaf", "nations league", "group stage"]
+};
+function resolveExtensionPlaylistHighlightTitlePatterns(leagueKey) {
+  const patterns = EXTENSION_PLAYLIST_HIGHLIGHT_TITLE_PATTERNS_BY_LEAGUE[leagueKey];
+  if (patterns?.length) return [...patterns];
+  return ["highlight", "highlights"];
+}
 var playlistEntitiesCache = /* @__PURE__ */ new Map();
 async function fetchHighlightPlaylistEntities(leagueKey, playlistId) {
   const cacheKey3 = `${leagueKey}:${playlistId}`;
@@ -161334,7 +161377,7 @@ function titleMatchesGameDay(leagueKey, title, game) {
   return false;
 }
 function resolvePlaylistYoutubeHighlightsForGame(leagueKey, game, entities) {
-  const titlePatterns = ["highlight", "highlights"];
+  const titlePatterns = resolveExtensionPlaylistHighlightTitlePatterns(leagueKey);
   const scored = [];
   for (const entity of entities) {
     if (entity.league !== leagueKey || entity.source !== "youtube" || entity.type !== "highlight") {
@@ -163938,7 +163981,12 @@ function SidebarTemporalLeagueBlock({
   const [gameExploreExpandedIds, setGameExploreExpandedIds] = (0, import_react286.useState)(
     () => /* @__PURE__ */ new Set()
   );
-  const extensionGamesYesterdayHighlightsDirectNavigation = isGrarfExtensionRenderer() && isGrarfExtensionGamesYesterdayHighlightsNavSnapshotActive();
+  const extensionGamesYesterdayHighlightsNavActive = (0, import_react286.useSyncExternalStore)(
+    subscribeGrarfExtensionGamesYesterdayHighlightsNavSnapshot,
+    isGrarfExtensionGamesYesterdayHighlightsNavSnapshotActive,
+    () => false
+  );
+  const extensionGamesYesterdayHighlightsDirectNavigation = isGrarfExtensionRenderer() && extensionGamesYesterdayHighlightsNavActive;
   const extensionYesterdayHighlightsActiveGameId = (0, import_react286.useSyncExternalStore)(
     subscribeGrarfExtensionGamesYesterdayHighlightsActiveGameId,
     getGrarfExtensionGamesYesterdayHighlightsActiveGameId,
@@ -164333,7 +164381,12 @@ function SidebarYesterdaySectionLeagues({
     [groupedEntries]
   );
   const expandableSlates = leafSlates;
-  const extensionGamesYesterdayHighlightsAccordionLeagues = isGrarfExtensionRenderer() && isGrarfExtensionGamesYesterdayHighlightsNavSnapshotActive();
+  const extensionGamesYesterdayHighlightsNavActive = (0, import_react286.useSyncExternalStore)(
+    subscribeGrarfExtensionGamesYesterdayHighlightsNavSnapshot,
+    isGrarfExtensionGamesYesterdayHighlightsNavSnapshotActive,
+    () => false
+  );
+  const extensionGamesYesterdayHighlightsAccordionLeagues = isGrarfExtensionRenderer() && extensionGamesYesterdayHighlightsNavActive;
   const allOpen = expandableSlates.length > 0 && expandableSlates.every((slate) => leagueOpen[slate.key] ?? false);
   const toggleAll = (0, import_react286.useCallback)(() => {
     if (allOpen) {
@@ -168768,7 +168821,12 @@ function HomePage() {
     getGrarfExtensionGamesYesterdayHighlightsActiveGameId,
     () => null
   );
-  const extensionGamesYesterdayHighlightsUpDownNavigation = isGrarfExtensionRenderer() && isGrarfExtensionGamesYesterdayHighlightsNavSnapshotActive();
+  const extensionGamesYesterdayHighlightsNavActive = (0, import_react289.useSyncExternalStore)(
+    subscribeGrarfExtensionGamesYesterdayHighlightsNavSnapshot,
+    isGrarfExtensionGamesYesterdayHighlightsNavSnapshotActive,
+    () => false
+  );
+  const extensionGamesYesterdayHighlightsUpDownNavigation = isGrarfExtensionRenderer() && extensionGamesYesterdayHighlightsNavActive;
   const sportsBrowserSidebarUpDownCurrentGameId = extensionGamesYesterdayHighlightsUpDownNavigation ? extensionGamesYesterdayHighlightsActiveGameId : sportsBrowserSelectedGameId;
   const {
     canNavigateUp: canNavigateSportsBrowserSidebarGameUp,
