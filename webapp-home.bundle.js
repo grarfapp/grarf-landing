@@ -159594,6 +159594,7 @@ function GrarfExtensionNewsLeaguesSourceCard({
       type: "button",
       className: "grarf-extension-yesterday-highlights-minimized-game-card grarf-extension-news-leagues-source-card",
       "data-grarf-extension-news-leagues-source-card": "",
+      "data-grarf-extension-news-leagues-source-selected": isSelected ? "" : void 0,
       "aria-current": isSelected ? "true" : void 0,
       onClick,
       children: /* @__PURE__ */ (0, import_jsx_runtime265.jsxs)("span", { className: "grarf-extension-news-leagues-source-card-content", children: [
@@ -159664,22 +159665,6 @@ function resolveLeagueInlineSectionWebsites(leagueKey, section) {
   }
   return sectionWebsites;
 }
-function isExtensionNewsLeaguesSourceSelected(destinationSelection, leagueKey, newsWebsites, websiteIndex) {
-  if (!destinationSelection || destinationSelection.leagueKey !== leagueKey) {
-    return false;
-  }
-  if (destinationSelection.leagueContextSection === "news" && isSportsBrowserPrototypeTemporaryNavLeagueWebsiteActive(
-    destinationSelection,
-    leagueKey,
-    "news",
-    websiteIndex
-  )) {
-    return true;
-  }
-  const destinationUrl = destinationSelection.url?.trim();
-  const sourceUrl = newsWebsites[websiteIndex]?.url.trim();
-  return Boolean(destinationUrl && sourceUrl && destinationUrl === sourceUrl);
-}
 function SidebarLeaguesSportGroupHeader({
   sectionId,
   title,
@@ -159723,6 +159708,7 @@ function SportsBrowserPrototypeTemporaryNavLeaguesInlineTree({
   const [expandedLeagueKeys, setExpandedLeagueKeys] = (0, import_react277.useState)(() => /* @__PURE__ */ new Set());
   const [expandedSectionKeys, setExpandedSectionKeys] = (0, import_react277.useState)(() => /* @__PURE__ */ new Set());
   const [expandedInlineTeam, setExpandedInlineTeam] = (0, import_react277.useState)(null);
+  const [extensionNewsLeaguesActiveSource, setExtensionNewsLeaguesActiveSource] = (0, import_react277.useState)(null);
   const leagueSections = (0, import_react277.useMemo)(
     () => resolveSportsBrowserPrototypeSidebarDisplayedLeagueSections(
       leaguesSortMode,
@@ -159907,14 +159893,7 @@ function SportsBrowserPrototypeTemporaryNavLeaguesInlineTree({
         const leagueExpanded = expandedLeagueKeys.has(leagueKey);
         const leagueSelected = selectedLeagueKey === leagueKey;
         const newsWebsitesForLeague = extensionNewsLeaguesExpandUi ? resolveLeagueInlineSectionWebsites(leagueKey, "news") : null;
-        const selectedNewsSourceIndex = extensionNewsLeaguesExpandUi && newsWebsitesForLeague ? newsWebsitesForLeague.findIndex(
-          (_website, websiteIndex) => isExtensionNewsLeaguesSourceSelected(
-            destinationSelection,
-            leagueKey,
-            newsWebsitesForLeague,
-            websiteIndex
-          )
-        ) : -1;
+        const selectedNewsSourceIndex = extensionNewsLeaguesExpandUi && extensionNewsLeaguesActiveSource?.leagueKey === leagueKey ? extensionNewsLeaguesActiveSource.websiteIndex : -1;
         const leagueActive = extensionNewsLeaguesExpandUi ? leagueExpanded && selectedNewsSourceIndex < 0 : leagueSelected || leagueExpanded;
         const showPopulatedTeamList = LEAGUES_INLINE_POPULATED_TEAM_LIST_LEAGUE_KEYS.has(leagueKey) && renderTeamListPanel != null && (onLeaguesTabTeamSelect != null || onTeamContentDestinationSelect != null);
         const leagueRow = /* @__PURE__ */ (0, import_jsx_runtime266.jsxs)(
@@ -159971,12 +159950,7 @@ function SportsBrowserPrototypeTemporaryNavLeaguesInlineTree({
               children: [
                 leagueRow,
                 leagueExpanded ? /* @__PURE__ */ (0, import_jsx_runtime266.jsx)("div", { className: "min-w-0", "data-grarf-temporary-nav-nested-league-children": "", children: /* @__PURE__ */ (0, import_jsx_runtime266.jsx)("div", { "data-sports-browser-prototype-games-box": "", children: newsWebsites.map((website4, websiteIndex) => {
-                  const isSelected = isExtensionNewsLeaguesSourceSelected(
-                    destinationSelection,
-                    leagueKey,
-                    newsWebsites,
-                    websiteIndex
-                  );
+                  const isSelected = extensionNewsLeaguesActiveSource?.leagueKey === leagueKey && extensionNewsLeaguesActiveSource?.websiteIndex === websiteIndex;
                   return /* @__PURE__ */ (0, import_jsx_runtime266.jsx)(
                     GrarfExtensionNewsLeaguesSourceCard,
                     {
@@ -159984,6 +159958,10 @@ function SportsBrowserPrototypeTemporaryNavLeaguesInlineTree({
                       url: website4.url,
                       isSelected,
                       onClick: () => {
+                        setExtensionNewsLeaguesActiveSource({
+                          leagueKey,
+                          websiteIndex
+                        });
                         navigateGrarfExtensionHostExternalUrl(website4.url);
                         onLeagueDestinationSelect?.(leagueKey, "news", websiteIndex);
                       }
