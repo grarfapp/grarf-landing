@@ -161273,6 +161273,100 @@ function resolveGrarfExtensionGamesYesterdayHighlightsNavigationActive(context2)
   return context2.gamesYesterdaySelector3Label === "HIGHLIGHTS";
 }
 
+// ../grarf/desktop/src/extensionHost/grarfExtensionF1YoutubeHighlightsResolver.ts
+init_define_import_meta_env();
+init_operationalIngestConfig();
+var PLAYLIST_CACHE_TTL_MS = 5 * 60 * 1e3;
+var PLAYLIST_DATA_PATH = "/clips/youtube-playlist-data";
+var GRARF_EXTENSION_F1_YOUTUBE_CHANNEL_ID = "UCB_qr75-ydFVKSF9Dmo6izg";
+var f1UploadsCache = /* @__PURE__ */ new Map();
+function resolveGrarfExtensionF1YoutubeChannelUploadsPlaylistId(channelId = GRARF_EXTENSION_F1_YOUTUBE_CHANNEL_ID) {
+  if (!channelId.startsWith("UC") || channelId.length !== 24) {
+    throw new Error(`invalid_f1_youtube_channel_id:${channelId}`);
+  }
+  return `UU${channelId.slice(2)}`;
+}
+async function fetchF1ChannelUploadItems() {
+  const playlistId = resolveGrarfExtensionF1YoutubeChannelUploadsPlaylistId();
+  const cached = f1UploadsCache.get(playlistId);
+  if (cached && Date.now() - cached.at < PLAYLIST_CACHE_TTL_MS) {
+    return cached.items;
+  }
+  const cloudBase = getOperationalIngestConfig().cloudBaseUrl?.replace(/\/$/, "");
+  if (!cloudBase) {
+    throw new Error("operational_ingest_url_unconfigured");
+  }
+  const url = `${cloudBase}${PLAYLIST_DATA_PATH}/${encodeURIComponent(playlistId)}`;
+  const res = await fetch(url, {
+    headers: { Accept: "application/json" },
+    cache: "no-store"
+  });
+  if (!res.ok) {
+    throw new Error(`youtube_playlist_data_${res.status || "fetch_failed"}`);
+  }
+  const data2 = await res.json();
+  const items = (data2.items ?? []).filter((item) => {
+    return typeof item.videoId === "string" && item.videoId.length > 0;
+  }).map((item) => ({
+    videoId: item.videoId,
+    title: typeof item.title === "string" ? item.title : "",
+    publishedAt: typeof item.publishedAt === "string" ? item.publishedAt : ""
+  }));
+  f1UploadsCache.set(playlistId, { at: Date.now(), items });
+  return items;
+}
+function resolveF1HighlightResolverGame(game) {
+  const payload = resolveLeagueHighlightGamePayload(game);
+  const operationalDateKey = resolveGameOperationalDateKey(game);
+  return operationalDateKey ? { ...payload, scheduledDateKey: operationalDateKey } : payload;
+}
+function scoreF1ChannelVideoAgainstGame(item, game) {
+  const title = item.title?.trim() ?? "";
+  if (!title || !f1HighlightTitleMatchesGame(title, game)) {
+    return null;
+  }
+  let score2 = 12;
+  if (/\bhighlights?\b/i.test(title)) {
+    score2 += 4;
+  }
+  const proximity = scoreDateProximity(game, item.publishedAt);
+  score2 += proximity.score;
+  const publishedMs = Date.parse(item.publishedAt || "");
+  if (!Number.isFinite(publishedMs) || publishedMs <= 0) {
+    return score2;
+  }
+  return score2;
+}
+async function resolveGrarfExtensionF1YoutubeHighlightWatchUrl(game) {
+  const leagueKey = game.league?.trim().toUpperCase() ?? "";
+  if (leagueKey !== "F1") {
+    return null;
+  }
+  const items = await fetchF1ChannelUploadItems();
+  if (items.length === 0) {
+    return null;
+  }
+  const resolverGame = resolveF1HighlightResolverGame(game);
+  const scored = [];
+  for (const item of items) {
+    const score2 = scoreF1ChannelVideoAgainstGame(item, resolverGame);
+    if (score2 == null) continue;
+    const publishedMs = Date.parse(item.publishedAt || "");
+    scored.push({
+      videoId: item.videoId,
+      score: score2,
+      publishedMs: Number.isFinite(publishedMs) ? publishedMs : 0
+    });
+  }
+  if (scored.length === 0) {
+    return null;
+  }
+  scored.sort((a2, b2) => b2.score - a2.score || b2.publishedMs - a2.publishedMs);
+  const videoId = scored[0]?.videoId?.trim();
+  if (!videoId) return null;
+  return `https://www.youtube.com/watch?v=${encodeURIComponent(videoId)}`;
+}
+
 // ../grarf/desktop/src/extensionHost/grarfExtensionPlaylistYoutubeHighlightsResolver.ts
 init_define_import_meta_env();
 init_operationalIngestConfig();
@@ -161311,17 +161405,113 @@ function normalizeYoutubeHighlights(league2, items) {
   return out;
 }
 
+// ../grarf/desktop/src/extensionHost/grarfExtensionNwslYoutubeHighlightMatching.ts
+init_define_import_meta_env();
+var NWSL_YOUTUBE_TEAM_ALIAS_GROUPS = [
+  ["houston dash", "houston"],
+  ["utah royals fc", "utah royals", "utah"],
+  ["denver summit fc", "denver summit", "denver"],
+  ["bay fc", "bay"],
+  ["angel city fc", "angel city"],
+  ["seattle reign fc", "seattle reign", "seattle"],
+  ["san diego wave fc", "san diego wave", "san diego"],
+  ["kansas city current", "kansas city"],
+  ["portland thorns fc", "portland thorns", "portland"],
+  ["orlando pride", "orlando"],
+  ["gotham fc", "gotham"],
+  ["north carolina courage", "nc courage", "north carolina"],
+  ["chicago stars fc", "chicago stars", "chicago"],
+  ["washington spirit", "washington"],
+  ["racing louisville fc", "racing louisville", "louisville"],
+  ["boston legacy fc", "boston legacy", "boston"]
+];
+var NWSL_FULL_HIGHLIGHTS_PREFIX_RE = /^FULL HIGHLIGHTS\s*[|:]\s*/i;
+function parseNwslFullHighlightsMatchupTitle(title) {
+  const trimmed = title.trim();
+  if (!NWSL_FULL_HIGHLIGHTS_PREFIX_RE.test(trimmed)) {
+    return null;
+  }
+  const matchup = trimmed.replace(NWSL_FULL_HIGHLIGHTS_PREFIX_RE, "").trim();
+  const vsSplit = matchup.split(/\s+vs\.?\s+/i);
+  if (vsSplit.length !== 2) {
+    return null;
+  }
+  const left = vsSplit[0]?.trim() ?? "";
+  const right = vsSplit[1]?.trim() ?? "";
+  if (!left || !right) {
+    return null;
+  }
+  return { left, right };
+}
+function resolveNwslYoutubeTeamKey(rawTeamName) {
+  const normalized = normalizeTeamToken(rawTeamName);
+  if (!normalized) return null;
+  let best = null;
+  for (const group of NWSL_YOUTUBE_TEAM_ALIAS_GROUPS) {
+    const canonicalKey = normalizeTeamToken(group[0] ?? "");
+    if (!canonicalKey) continue;
+    for (const alias of group) {
+      const aliasKey = normalizeTeamToken(alias);
+      if (aliasKey.length < 3) continue;
+      const matches = normalized === aliasKey || normalized.length >= aliasKey.length && normalized.includes(aliasKey) || aliasKey.length >= normalized.length && aliasKey.includes(normalized);
+      if (!matches) continue;
+      if (!best || aliasKey.length > best.aliasLength) {
+        best = { key: canonicalKey, aliasLength: aliasKey.length };
+      }
+    }
+  }
+  return best?.key ?? null;
+}
+function resolveNwslGameTeamKey(game, side) {
+  const team = side === "away" ? game.awayTeam : game.homeTeam;
+  const city = side === "away" ? game.awayCity : game.homeCity;
+  const official = side === "away" ? game.officialAwayName : game.officialHomeName;
+  for (const raw of [team, official, city]) {
+    const key2 = resolveNwslYoutubeTeamKey(String(raw ?? ""));
+    if (key2) return key2;
+  }
+  return null;
+}
+function nwslMatchupSidesMatchGame(left, right, game) {
+  const awayKey = resolveNwslGameTeamKey(game, "away");
+  const homeKey = resolveNwslGameTeamKey(game, "home");
+  const leftKey = resolveNwslYoutubeTeamKey(left);
+  const rightKey = resolveNwslYoutubeTeamKey(right);
+  if (!awayKey || !homeKey || !leftKey || !rightKey) {
+    return false;
+  }
+  return leftKey === awayKey && rightKey === homeKey || leftKey === homeKey && rightKey === awayKey;
+}
+function nwslFullHighlightsTitleMatchesGame(title, game) {
+  const parsed = parseNwslFullHighlightsMatchupTitle(title);
+  if (!parsed) {
+    return false;
+  }
+  if (!/\bhighlights?\b/i.test(title)) {
+    return false;
+  }
+  return nwslMatchupSidesMatchGame(parsed.left, parsed.right, game);
+}
+
 // ../grarf/desktop/src/extensionHost/grarfExtensionPlaylistYoutubeHighlightsResolver.ts
-var PLAYLIST_CACHE_TTL_MS = 5 * 60 * 1e3;
-var PLAYLIST_DATA_PATH = "/clips/youtube-playlist-data";
+var PLAYLIST_CACHE_TTL_MS2 = 5 * 60 * 1e3;
+var PLAYLIST_DATA_PATH2 = "/clips/youtube-playlist-data";
 var GRARF_EXTENSION_YOUTUBE_HIGHLIGHTS_PLAYLIST_BY_LEAGUE = {
   MLB: MLB_HIGHLIGHTS_PLAYLIST_ID,
   NHL: "PLXgxFhEvLHE0",
   MLS: "PLcj4z4KsbIoXrLpj2pOVr_maRaxhW902-",
   WOMENS_UCL: "PLOBs606VBt50",
-  NWSL: "PLaDzpntrLeOo",
   CONCACAF_NG: "PLTUkUUqDV3B4"
 };
+var GRARF_EXTENSION_NWSL_YOUTUBE_CHANNEL_ID = "UCL4xu08EDu0ZFZsBJUB0chw";
+function resolveGrarfExtensionNwslYoutubeChannelUploadsPlaylistId() {
+  const channelId = GRARF_EXTENSION_NWSL_YOUTUBE_CHANNEL_ID;
+  return `UU${channelId.slice(2)}`;
+}
+function grarfExtensionLeagueUsesYoutubePlaylistHighlights(leagueKey) {
+  const key2 = leagueKey.trim().toUpperCase();
+  return key2 === "NWSL" || Boolean(GRARF_EXTENSION_YOUTUBE_HIGHLIGHTS_PLAYLIST_BY_LEAGUE[key2]);
+}
 var EXTENSION_PLAYLIST_HIGHLIGHT_TITLE_PATTERNS_BY_LEAGUE = {
   CONCACAF_NG: ["concacaf", "nations league", "group stage"]
 };
@@ -161334,14 +161524,14 @@ var playlistEntitiesCache = /* @__PURE__ */ new Map();
 async function fetchHighlightPlaylistEntities(leagueKey, playlistId) {
   const cacheKey3 = `${leagueKey}:${playlistId}`;
   const cached = playlistEntitiesCache.get(cacheKey3);
-  if (cached && Date.now() - cached.at < PLAYLIST_CACHE_TTL_MS) {
+  if (cached && Date.now() - cached.at < PLAYLIST_CACHE_TTL_MS2) {
     return cached.entities;
   }
   const cloudBase = getOperationalIngestConfig().cloudBaseUrl?.replace(/\/$/, "");
   if (!cloudBase) {
     throw new Error("operational_ingest_url_unconfigured");
   }
-  const url = `${cloudBase}${PLAYLIST_DATA_PATH}/${encodeURIComponent(playlistId)}`;
+  const url = `${cloudBase}${PLAYLIST_DATA_PATH2}/${encodeURIComponent(playlistId)}`;
   const res = await fetch(url, {
     headers: { Accept: "application/json" },
     cache: "no-store"
@@ -161376,39 +161566,97 @@ function titleMatchesGameDay(leagueKey, title, game) {
   if (parsed != null && parsed === gameDayKey) return true;
   return false;
 }
+function extensionPlaylistTitleMatchesGame(leagueKey, title, game, titlePatterns) {
+  if (leagueKey === "NWSL") {
+    return nwslFullHighlightsTitleMatchesGame(title, game);
+  }
+  const titleScore = scoreTitleAgainstGame(title, game, titlePatterns);
+  return titleScore.teamMatch && titleScore.highlightKeyword;
+}
+var NWSL_HIGHLIGHT_MAX_PUBLISH_DELTA_MS = 14 * 24 * 60 * 60 * 1e3;
+function resolveNwslGameAnchorMs(game) {
+  if (game.startTimeMs != null && Number.isFinite(game.startTimeMs) && game.startTimeMs > 0) {
+    return game.startTimeMs;
+  }
+  const dayKey = resolveGameDayKey(game);
+  if (!dayKey) return null;
+  const parsed = Date.parse(`${dayKey}T20:00:00.000Z`);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
+}
+function resolveNwslPlaylistYoutubeHighlightWatchUrl(game, entities) {
+  const gameAnchorMs = resolveNwslGameAnchorMs(game);
+  if (gameAnchorMs == null) {
+    return null;
+  }
+  let best = null;
+  for (let playlistIndex = 0; playlistIndex < entities.length; playlistIndex++) {
+    const entity = entities[playlistIndex];
+    if (entity.league !== "NWSL" || entity.source !== "youtube" || entity.type !== "highlight") {
+      continue;
+    }
+    const title = entity.title?.trim() ?? "";
+    if (!title || !nwslFullHighlightsTitleMatchesGame(title, game)) {
+      continue;
+    }
+    const publishedMs = Date.parse(entity.publishedAt || "");
+    if (!Number.isFinite(publishedMs) || publishedMs <= 0) {
+      continue;
+    }
+    const publishDeltaMs = Math.abs(publishedMs - gameAnchorMs);
+    if (publishDeltaMs > NWSL_HIGHLIGHT_MAX_PUBLISH_DELTA_MS) {
+      continue;
+    }
+    const url = entity.url?.trim();
+    if (!url) continue;
+    if (!best || publishDeltaMs < best.publishDeltaMs || publishDeltaMs === best.publishDeltaMs && publishedMs > best.publishedMs) {
+      best = { url, publishDeltaMs, publishedMs, playlistIndex };
+    }
+  }
+  return best?.url ?? null;
+}
 function resolvePlaylistYoutubeHighlightsForGame(leagueKey, game, entities) {
+  if (leagueKey === "NWSL") {
+    return resolveNwslPlaylistYoutubeHighlightWatchUrl(game, entities);
+  }
   const titlePatterns = resolveExtensionPlaylistHighlightTitlePatterns(leagueKey);
+  const minDateProximityScore = 6;
   const scored = [];
-  for (const entity of entities) {
+  for (let playlistIndex = 0; playlistIndex < entities.length; playlistIndex++) {
+    const entity = entities[playlistIndex];
     if (entity.league !== leagueKey || entity.source !== "youtube" || entity.type !== "highlight") {
       continue;
     }
     const title = entity.title?.trim() ?? "";
     if (!title) continue;
-    const titleScore = scoreTitleAgainstGame(title, game, titlePatterns);
-    if (!titleScore.teamMatch || !titleScore.highlightKeyword) continue;
-    if (!titleMatchesGameDay(leagueKey, title, game)) {
-      const proximity = scoreDateProximity(game, entity.publishedAt);
-      if (proximity.score < 6) continue;
+    if (!extensionPlaylistTitleMatchesGame(leagueKey, title, game, titlePatterns)) {
+      continue;
+    }
+    const proximity = scoreDateProximity(game, entity.publishedAt);
+    if (!titleMatchesGameDay(leagueKey, title, game) && proximity.score < minDateProximityScore) {
+      continue;
     }
     const publishedMs = Date.parse(entity.publishedAt || "");
-    if (!Number.isFinite(publishedMs) || publishedMs <= 0) continue;
-    const rawScore = MIN_STRONG_MATCH_SCORE + (titleScore.highlightKeyword ? 2 : 0) + scoreDateProximity(game, entity.publishedAt).score;
+    const publishedMsValid = Number.isFinite(publishedMs) && publishedMs > 0;
+    if (!publishedMsValid) {
+      continue;
+    }
+    const rawScore = MIN_STRONG_MATCH_SCORE + 2 + proximity.score;
     scored.push({
       entity,
       rawScore,
       confidence: confidenceFromRawScore(rawScore),
-      publishedMs
+      publishedMs: publishedMsValid ? publishedMs : 0,
+      playlistIndex
     });
   }
   scored.sort(
-    (a2, b2) => b2.publishedMs - a2.publishedMs || b2.rawScore - a2.rawScore || b2.confidence - a2.confidence
+    (a2, b2) => b2.publishedMs - a2.publishedMs || b2.rawScore - a2.rawScore || b2.confidence - a2.confidence || b2.playlistIndex - a2.playlistIndex
   );
   return scored[0]?.entity?.url?.trim() || null;
 }
 async function resolveGrarfExtensionPlaylistYoutubeHighlightWatchUrl(game) {
   const leagueKey = game.league?.trim().toUpperCase() ?? "";
-  const playlistId = GRARF_EXTENSION_YOUTUBE_HIGHLIGHTS_PLAYLIST_BY_LEAGUE[leagueKey];
+  const playlistId = leagueKey === "NWSL" ? resolveGrarfExtensionNwslYoutubeChannelUploadsPlaylistId() : GRARF_EXTENSION_YOUTUBE_HIGHLIGHTS_PLAYLIST_BY_LEAGUE[leagueKey];
   if (!playlistId) {
     return null;
   }
@@ -161426,7 +161674,20 @@ async function navigateGrarfExtensionGameYesterdayHighlights(game, context2) {
     return false;
   }
   const leagueKey = game.league?.trim().toUpperCase() ?? "";
-  if (GRARF_EXTENSION_YOUTUBE_HIGHLIGHTS_PLAYLIST_BY_LEAGUE[leagueKey]) {
+  if (leagueKey === "F1") {
+    try {
+      const watchUrl = await resolveGrarfExtensionF1YoutubeHighlightWatchUrl(game);
+      if (watchUrl) {
+        navigateGrarfExtensionHostExternalUrl(watchUrl);
+        setGrarfExtensionGamesYesterdayHighlightsActiveGameId(game.id);
+        return true;
+      }
+    } catch {
+      return false;
+    }
+    return false;
+  }
+  if (grarfExtensionLeagueUsesYoutubePlaylistHighlights(leagueKey)) {
     try {
       const watchUrl = await resolveGrarfExtensionPlaylistYoutubeHighlightWatchUrl(game);
       if (watchUrl) {
