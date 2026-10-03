@@ -158956,12 +158956,73 @@ init_define_import_meta_env();
 
 // ../grarf/desktop/src/extensionHost/grarfExtensionGamesYesterdayHighlightsActiveGame.ts
 init_define_import_meta_env();
+
+// ../grarf/desktop/src/extensionHost/grarfExtensionSidebarExclusiveLeagueExpansion.ts
+init_define_import_meta_env();
+var exclusiveExpandedLeagueKey = null;
+var listeners = /* @__PURE__ */ new Set();
+function normalizeLeagueKey3(leagueKey) {
+  return leagueKey.trim().toUpperCase();
+}
+function notifyExclusiveExpandedLeagueKeyListeners() {
+  for (const listener of listeners) {
+    listener();
+  }
+}
+function getGrarfExtensionSidebarExclusiveExpandedLeagueKey() {
+  return exclusiveExpandedLeagueKey;
+}
+function subscribeGrarfExtensionSidebarExclusiveExpandedLeagueKey(listener) {
+  listeners.add(listener);
+  return () => {
+    listeners.delete(listener);
+  };
+}
+function isGrarfExtensionSidebarExclusiveLeagueExpanded(leagueKey) {
+  if (!exclusiveExpandedLeagueKey) return false;
+  return exclusiveExpandedLeagueKey === normalizeLeagueKey3(leagueKey);
+}
+function setGrarfExtensionSidebarExclusiveExpandedLeagueKey(leagueKey) {
+  const next = leagueKey ? normalizeLeagueKey3(leagueKey) : null;
+  if (exclusiveExpandedLeagueKey === next) return;
+  if (next !== null) {
+    setGrarfExtensionGamesYesterdayHighlightsActiveLeagueKey(null);
+    setGrarfExtensionGamesYesterdayHighlightsActiveBoxingPromotionId(null);
+  }
+  exclusiveExpandedLeagueKey = next;
+  notifyExclusiveExpandedLeagueKeyListeners();
+}
+function toggleGrarfExtensionSidebarExclusiveExpandedLeagueKey(leagueKey) {
+  const normalized = normalizeLeagueKey3(leagueKey);
+  if (exclusiveExpandedLeagueKey === normalized) {
+    setGrarfExtensionSidebarExclusiveExpandedLeagueKey(null);
+    return;
+  }
+  setGrarfExtensionSidebarExclusiveExpandedLeagueKey(normalized);
+}
+function buildGrarfExtensionSidebarExclusiveLeagueOpenRecord(leagueKey = exclusiveExpandedLeagueKey) {
+  if (!leagueKey) return {};
+  return { [normalizeLeagueKey3(leagueKey)]: true };
+}
+function dispatchGrarfExtensionSidebarExclusiveLeagueOpenChange(action) {
+  const prev = buildGrarfExtensionSidebarExclusiveLeagueOpenRecord();
+  const nextRecord = typeof action === "function" ? action(prev) : action;
+  const openKeys = Object.keys(nextRecord).filter((key2) => nextRecord[key2]);
+  if (openKeys.length === 0) {
+    setGrarfExtensionSidebarExclusiveExpandedLeagueKey(null);
+    return;
+  }
+  const newlyOpened = openKeys.find((key2) => !prev[key2]);
+  setGrarfExtensionSidebarExclusiveExpandedLeagueKey(newlyOpened ?? openKeys[openKeys.length - 1]);
+}
+
+// ../grarf/desktop/src/extensionHost/grarfExtensionGamesYesterdayHighlightsActiveGame.ts
 var activeGameId = null;
 var activeLeagueKey = null;
 var activeBoxingPromotionId = null;
-var listeners = /* @__PURE__ */ new Set();
+var listeners2 = /* @__PURE__ */ new Set();
 function notifyActiveHighlightSelectionListeners() {
-  for (const listener of listeners) {
+  for (const listener of listeners2) {
     listener();
   }
 }
@@ -158998,6 +159059,7 @@ function setGrarfExtensionGamesYesterdayHighlightsActiveLeagueKey(leagueKey) {
     notifyActiveHighlightSelectionListeners();
     return;
   }
+  setGrarfExtensionSidebarExclusiveExpandedLeagueKey(null);
   if (activeLeagueKey === next && activeGameId === null && activeBoxingPromotionId === null) {
     return;
   }
@@ -159032,9 +159094,9 @@ function clearGrarfExtensionGamesYesterdayHighlightsActiveSelection() {
   notifyActiveHighlightSelectionListeners();
 }
 function subscribeGrarfExtensionGamesYesterdayHighlightsActiveGameId(listener) {
-  listeners.add(listener);
+  listeners2.add(listener);
   return () => {
-    listeners.delete(listener);
+    listeners2.delete(listener);
   };
 }
 function subscribeGrarfExtensionGamesYesterdayHighlightsActiveLeagueKey(listener) {
@@ -159673,61 +159735,6 @@ function GrarfExtensionNewsLeaguesSourceCard({
       ] })
     }
   );
-}
-
-// ../grarf/desktop/src/extensionHost/grarfExtensionSidebarExclusiveLeagueExpansion.ts
-init_define_import_meta_env();
-var exclusiveExpandedLeagueKey = null;
-var listeners2 = /* @__PURE__ */ new Set();
-function normalizeLeagueKey3(leagueKey) {
-  return leagueKey.trim().toUpperCase();
-}
-function notifyExclusiveExpandedLeagueKeyListeners() {
-  for (const listener of listeners2) {
-    listener();
-  }
-}
-function getGrarfExtensionSidebarExclusiveExpandedLeagueKey() {
-  return exclusiveExpandedLeagueKey;
-}
-function subscribeGrarfExtensionSidebarExclusiveExpandedLeagueKey(listener) {
-  listeners2.add(listener);
-  return () => {
-    listeners2.delete(listener);
-  };
-}
-function isGrarfExtensionSidebarExclusiveLeagueExpanded(leagueKey) {
-  if (!exclusiveExpandedLeagueKey) return false;
-  return exclusiveExpandedLeagueKey === normalizeLeagueKey3(leagueKey);
-}
-function setGrarfExtensionSidebarExclusiveExpandedLeagueKey(leagueKey) {
-  const next = leagueKey ? normalizeLeagueKey3(leagueKey) : null;
-  if (exclusiveExpandedLeagueKey === next) return;
-  exclusiveExpandedLeagueKey = next;
-  notifyExclusiveExpandedLeagueKeyListeners();
-}
-function toggleGrarfExtensionSidebarExclusiveExpandedLeagueKey(leagueKey) {
-  const normalized = normalizeLeagueKey3(leagueKey);
-  if (exclusiveExpandedLeagueKey === normalized) {
-    setGrarfExtensionSidebarExclusiveExpandedLeagueKey(null);
-    return;
-  }
-  setGrarfExtensionSidebarExclusiveExpandedLeagueKey(normalized);
-}
-function buildGrarfExtensionSidebarExclusiveLeagueOpenRecord(leagueKey = exclusiveExpandedLeagueKey) {
-  if (!leagueKey) return {};
-  return { [normalizeLeagueKey3(leagueKey)]: true };
-}
-function dispatchGrarfExtensionSidebarExclusiveLeagueOpenChange(action) {
-  const prev = buildGrarfExtensionSidebarExclusiveLeagueOpenRecord();
-  const nextRecord = typeof action === "function" ? action(prev) : action;
-  const openKeys = Object.keys(nextRecord).filter((key2) => nextRecord[key2]);
-  if (openKeys.length === 0) {
-    setGrarfExtensionSidebarExclusiveExpandedLeagueKey(null);
-    return;
-  }
-  const newlyOpened = openKeys.find((key2) => !prev[key2]);
-  setGrarfExtensionSidebarExclusiveExpandedLeagueKey(newlyOpened ?? openKeys[openKeys.length - 1]);
 }
 
 // ../grarf/desktop/src/components/homeMvp/SportsBrowserPrototypeTemporaryNavLeaguesInlineTree.tsx
