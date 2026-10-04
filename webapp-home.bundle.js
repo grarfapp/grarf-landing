@@ -158935,12 +158935,12 @@ function GrarfExtensionShadcnSelectorColumn({ columnId, valueLabel, options, onS
             type: "button",
             variant: "ghost",
             className: cn2(
-              "h-9 w-full justify-between gap-2 px-3 font-normal",
+              "h-9 w-full justify-between gap-2 px-4 text-xs font-medium uppercase tracking-wide",
               "rounded-none border-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0"
             ),
             children: [
               /* @__PURE__ */ (0, import_jsx_runtime263.jsx)("span", { className: "min-w-0 truncate", children: valueLabel }),
-              /* @__PURE__ */ (0, import_jsx_runtime263.jsx)(ChevronDown, { className: "size-4 shrink-0 opacity-50", "aria-hidden": true })
+              /* @__PURE__ */ (0, import_jsx_runtime263.jsx)(ChevronDown, { className: "size-3.5 shrink-0", strokeWidth: 1.75, "aria-hidden": true })
             ]
           }
         ) }),
