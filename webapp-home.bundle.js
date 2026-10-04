@@ -158966,51 +158966,49 @@ init_define_import_meta_env();
 
 // ../grarf/desktop/src/extensionHost/grarfExtensionSidebarExclusiveLeagueExpansion.ts
 init_define_import_meta_env();
-
-// ../grarf/desktop/src/extensionHost/grarfExtensionSidebarScrollportHeight.ts
-init_define_import_meta_env();
-var GRARF_EXTENSION_SIDEBAR_SCROLLPORT_HEIGHT_VAR = "--grarf-extension-sidebar-scrollport-height";
-function applyGrarfExtensionSidebarScrollportHeight(scrollRoot) {
-  scrollRoot.style.setProperty(
-    GRARF_EXTENSION_SIDEBAR_SCROLLPORT_HEIGHT_VAR,
-    `${scrollRoot.clientHeight}px`
-  );
-}
-function clearGrarfExtensionSidebarScrollportHeight(scrollRoot) {
-  scrollRoot.style.removeProperty(GRARF_EXTENSION_SIDEBAR_SCROLLPORT_HEIGHT_VAR);
-}
-function observeGrarfExtensionSidebarScrollportHeight(scrollRoot) {
-  if (!scrollRoot) return () => {
-  };
-  const sync = () => {
-    applyGrarfExtensionSidebarScrollportHeight(scrollRoot);
-  };
-  sync();
-  const resizeObserver = new ResizeObserver(sync);
-  resizeObserver.observe(scrollRoot);
-  window.addEventListener("resize", sync);
-  return () => {
-    resizeObserver.disconnect();
-    window.removeEventListener("resize", sync);
-    clearGrarfExtensionSidebarScrollportHeight(scrollRoot);
-  };
-}
-function scrollGrarfExtensionExpandedNestedLeagueHeaderIntoView(leagueKey) {
-  const normalized = leagueKey.trim().toUpperCase();
-  if (!normalized) return;
-  const leagueRow = document.querySelector(
-    `[data-grarf-extension-yesterday-highlights-nested-league][data-grarf-extension-yesterday-highlights-league-expanded] [data-sports-browser-prototype-sidebar-league-key="${normalized}"]`
-  );
-  if (!(leagueRow instanceof HTMLElement)) return;
-  const header = leagueRow.closest("[data-sports-browser-prototype-sidebar-league-row]") ?? leagueRow;
-  header.scrollIntoView({ block: "start", inline: "nearest" });
-}
-
-// ../grarf/desktop/src/extensionHost/grarfExtensionSidebarExclusiveLeagueExpansion.ts
 var exclusiveExpandedLeagueKey = null;
 var listeners = /* @__PURE__ */ new Set();
 function normalizeLeagueKey3(leagueKey) {
   return leagueKey.trim().toUpperCase();
+}
+var pendingLeagueHeaderAnchor = null;
+function leagueHeaderSelector(leagueKey) {
+  const escaped = typeof CSS !== "undefined" && typeof CSS.escape === "function" ? CSS.escape(leagueKey) : leagueKey.replaceAll('"', "");
+  return `[data-sports-browser-prototype-sidebar-league-key="${escaped}"]`;
+}
+function resolveScrollTopKeepingLeagueHeaderVisible(scrollTop, headerTopBefore, headerTopAfter) {
+  return scrollTop + (headerTopAfter - headerTopBefore);
+}
+function holdGrarfExtensionLeagueHeaderAnchor(leagueKey) {
+  pendingLeagueHeaderAnchor = null;
+  if (!leagueKey || typeof document === "undefined") return;
+  const scrollRoot = document.querySelector(
+    "[data-sports-browser-prototype-left-nav-scroll]"
+  );
+  const header = scrollRoot?.querySelector(leagueHeaderSelector(leagueKey));
+  if (!scrollRoot || !header) return;
+  pendingLeagueHeaderAnchor = {
+    leagueKey,
+    headerTop: header.getBoundingClientRect().top,
+    scrollRoot
+  };
+}
+function restoreGrarfExtensionLeagueHeaderAnchor() {
+  const pending = pendingLeagueHeaderAnchor;
+  pendingLeagueHeaderAnchor = null;
+  if (!pending) return;
+  const header = pending.scrollRoot.querySelector(
+    leagueHeaderSelector(pending.leagueKey)
+  );
+  if (!header) return;
+  const nextScrollTop = resolveScrollTopKeepingLeagueHeaderVisible(
+    pending.scrollRoot.scrollTop,
+    pending.headerTop,
+    header.getBoundingClientRect().top
+  );
+  if (nextScrollTop !== pending.scrollRoot.scrollTop) {
+    pending.scrollRoot.scrollTop = nextScrollTop;
+  }
 }
 function notifyExclusiveExpandedLeagueKeyListeners() {
   for (const listener of listeners) {
@@ -159037,15 +159035,9 @@ function setGrarfExtensionSidebarExclusiveExpandedLeagueKey(leagueKey) {
     setGrarfExtensionGamesYesterdayHighlightsActiveLeagueKey(null);
     setGrarfExtensionGamesYesterdayHighlightsActiveBoxingPromotionId(null);
   }
+  holdGrarfExtensionLeagueHeaderAnchor(next ?? exclusiveExpandedLeagueKey);
   exclusiveExpandedLeagueKey = next;
   notifyExclusiveExpandedLeagueKeyListeners();
-  if (next) {
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        scrollGrarfExtensionExpandedNestedLeagueHeaderIntoView(next);
-      });
-    });
-  }
 }
 function toggleGrarfExtensionSidebarExclusiveExpandedLeagueKey(leagueKey) {
   const normalized = normalizeLeagueKey3(leagueKey);
@@ -159785,6 +159777,9 @@ function GrarfExtensionNewsLeaguesLeagueHeader({
         "flex w-full min-w-0 items-start justify-between gap-2 px-4 py-2 text-left text-sm font-medium normal-case tracking-normal text-foreground transition-colors hover:bg-accent hover:text-accent-foreground",
         isSelected && leagueKey && "bg-accent text-accent-foreground"
       ),
+      onMouseDown: (event) => {
+        event.preventDefault();
+      },
       children: [
         /* @__PURE__ */ (0, import_jsx_runtime265.jsxs)("span", { className: "flex min-w-0 flex-1 items-start gap-1", children: [
           /* @__PURE__ */ (0, import_jsx_runtime265.jsx)(LeagueNavLogoMark, { leagueKey, games: leagueGames }),
@@ -160276,9 +160271,6 @@ function openGrarfExtensionNewsLeaguesFirstSourceForLeagueKey(leagueKey) {
   });
   navigateGrarfExtensionHostExternalUrl(first.url);
   destinationHandler?.(normalized, "news", 0);
-  requestAnimationFrame(() => {
-    scrollGrarfExtensionExpandedNestedLeagueHeaderIntoView(normalized);
-  });
   return true;
 }
 function openGrarfExtensionNewsLeaguesFirstSourceForCurrentLeague() {
@@ -163596,11 +163588,111 @@ function useGrarfExtensionSidePanelSectionScroll(scrollContainerRef) {
 init_define_import_meta_env();
 var import_react286 = __toESM(require_react(), 1);
 init_isGrarfWebRenderer();
+
+// ../grarf/desktop/src/extensionHost/grarfExtensionSidebarScrollportHeight.ts
+init_define_import_meta_env();
+var GRARF_EXTENSION_SIDEBAR_SCROLLPORT_HEIGHT_VAR = "--grarf-extension-sidebar-scrollport-height";
+function applyGrarfExtensionSidebarScrollportHeight(scrollRoot) {
+  scrollRoot.style.setProperty(
+    GRARF_EXTENSION_SIDEBAR_SCROLLPORT_HEIGHT_VAR,
+    `${scrollRoot.clientHeight}px`
+  );
+}
+function clearGrarfExtensionSidebarScrollportHeight(scrollRoot) {
+  scrollRoot.style.removeProperty(GRARF_EXTENSION_SIDEBAR_SCROLLPORT_HEIGHT_VAR);
+}
+function observeGrarfExtensionSidebarScrollportHeight(scrollRoot) {
+  if (!scrollRoot) return () => {
+  };
+  const sync = () => {
+    applyGrarfExtensionSidebarScrollportHeight(scrollRoot);
+  };
+  const syncScrollport = () => {
+    sync();
+    syncGrarfExtensionExpandedLeagueHeaderSticky();
+  };
+  syncScrollport();
+  const resizeObserver = new ResizeObserver(syncScrollport);
+  resizeObserver.observe(scrollRoot);
+  window.addEventListener("resize", syncScrollport);
+  return () => {
+    resizeObserver.disconnect();
+    window.removeEventListener("resize", syncScrollport);
+    clearGrarfExtensionSidebarScrollportHeight(scrollRoot);
+    disconnectGrarfExtensionExpandedLeagueHeaderStickyObserver();
+  };
+}
+var GRARF_EXTENSION_EXPANDED_LEAGUE_HEADER_STICKY_ATTR = "data-grarf-extension-expanded-league-header-sticky";
+var EXPANDED_NESTED_LEAGUE_SELECTOR = "[data-grarf-extension-yesterday-highlights-nested-league][data-grarf-extension-yesterday-highlights-league-expanded]";
+function shouldStickGrarfExtensionExpandedLeagueHeader(leagueShellHeight, scrollportHeight) {
+  return scrollportHeight > 0 && leagueShellHeight > scrollportHeight;
+}
+var trackedExpandedLeague = null;
+var expandedLeagueResizeObserver = null;
+function trackExpandedLeagueForHeaderSticky(expanded) {
+  if (typeof ResizeObserver === "undefined") return;
+  if (!expandedLeagueResizeObserver) {
+    expandedLeagueResizeObserver = new ResizeObserver(() => {
+      syncGrarfExtensionExpandedLeagueHeaderSticky();
+    });
+  }
+  if (trackedExpandedLeague && trackedExpandedLeague !== expanded) {
+    expandedLeagueResizeObserver.unobserve(trackedExpandedLeague);
+    trackedExpandedLeague = null;
+  }
+  if (expanded && trackedExpandedLeague !== expanded) {
+    expandedLeagueResizeObserver.observe(expanded);
+    trackedExpandedLeague = expanded;
+  }
+}
+function disconnectGrarfExtensionExpandedLeagueHeaderStickyObserver() {
+  expandedLeagueResizeObserver?.disconnect();
+  expandedLeagueResizeObserver = null;
+  trackedExpandedLeague = null;
+}
+function syncGrarfExtensionExpandedLeagueHeaderSticky() {
+  if (typeof document === "undefined") return;
+  const scrollRoot = document.querySelector(
+    "[data-sports-browser-prototype-left-nav-scroll]"
+  );
+  const expanded = scrollRoot?.querySelector(EXPANDED_NESTED_LEAGUE_SELECTOR) ?? null;
+  for (const node of document.querySelectorAll(
+    `[${GRARF_EXTENSION_EXPANDED_LEAGUE_HEADER_STICKY_ATTR}]`
+  )) {
+    if (node !== expanded) node.removeAttribute(GRARF_EXTENSION_EXPANDED_LEAGUE_HEADER_STICKY_ATTR);
+  }
+  trackExpandedLeagueForHeaderSticky(expanded);
+  if (!expanded || !scrollRoot) return;
+  const shouldStick = shouldStickGrarfExtensionExpandedLeagueHeader(
+    expanded.offsetHeight,
+    scrollRoot.clientHeight
+  );
+  const isSticky = expanded.hasAttribute(GRARF_EXTENSION_EXPANDED_LEAGUE_HEADER_STICKY_ATTR);
+  if (shouldStick && !isSticky) {
+    expanded.setAttribute(GRARF_EXTENSION_EXPANDED_LEAGUE_HEADER_STICKY_ATTR, "");
+  } else if (!shouldStick && isSticky) {
+    expanded.removeAttribute(GRARF_EXTENSION_EXPANDED_LEAGUE_HEADER_STICKY_ATTR);
+  }
+}
+
+// ../grarf/desktop/src/extensionHost/useGrarfExtensionSidebarScrollportHeight.ts
 function useGrarfExtensionSidebarScrollportHeight(scrollContainerRef) {
   (0, import_react286.useEffect)(() => {
     if (!isGrarfExtensionRenderer()) return;
     return observeGrarfExtensionSidebarScrollportHeight(scrollContainerRef.current);
   }, [scrollContainerRef]);
+}
+function useGrarfExtensionSidebarLeagueExpandScrollHold() {
+  const expandedLeagueKey = (0, import_react286.useSyncExternalStore)(
+    subscribeGrarfExtensionSidebarExclusiveExpandedLeagueKey,
+    getGrarfExtensionSidebarExclusiveExpandedLeagueKey,
+    () => null
+  );
+  (0, import_react286.useLayoutEffect)(() => {
+    if (!isGrarfExtensionRenderer()) return;
+    restoreGrarfExtensionLeagueHeaderAnchor();
+    syncGrarfExtensionExpandedLeagueHeaderSticky();
+  }, [expandedLeagueKey]);
 }
 
 // ../grarf/desktop/src/extensionHost/GrarfExtensionAiSearchHomeSection.tsx
@@ -163964,7 +164056,7 @@ function GrarfExtensionAiSearchHomeSection({
               icon: RotateCcw,
               onActivate: () => onExecuteAction(catchUpContentAction),
               label: /* @__PURE__ */ (0, import_jsx_runtime276.jsxs)(import_jsx_runtime276.Fragment, { children: [
-                "Catch up on",
+                "Get",
                 " ",
                 /* @__PURE__ */ (0, import_jsx_runtime276.jsx)(
                   InlineSelector,
@@ -165210,6 +165302,9 @@ function NavRow({
         extensionNavRow && isSelected && leagueKey && "bg-accent text-accent-foreground",
         className
       ),
+      onMouseDown: extensionNavRow && leagueKey ? (event) => {
+        event.preventDefault();
+      } : void 0,
       "aria-expanded": onClick ? expanded : void 0,
       "aria-current": isSelected ? "true" : void 0,
       "data-sports-browser-prototype-sidebar-league-row": leagueKey ? "" : void 0,
@@ -167494,6 +167589,7 @@ function SportsBrowserPrototypeLeftNav({
   const sidebarScrollContainerRef = (0, import_react289.useRef)(null);
   useGrarfExtensionSidePanelSectionScroll(sidebarScrollContainerRef);
   useGrarfExtensionSidebarScrollportHeight(sidebarScrollContainerRef);
+  useGrarfExtensionSidebarLeagueExpandScrollHold();
   const sidebarMinimizeSupported = !isGrarfExtensionRenderer();
   const [sidebarMinimized, setSidebarMinimized] = (0, import_react289.useState)(false);
   const sidebarCollapsed = sidebarMinimizeSupported && sidebarMinimized;
