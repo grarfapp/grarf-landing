@@ -147799,7 +147799,7 @@ function resolveSportsBrowserPrototypeSidebarGameVariant(game) {
   if (game.status === "final" || isSpineFinalizedGame(game)) return "catchUp";
   return "upcoming";
 }
-function orderTodayLeagueGames(games) {
+function groupSportsBrowserPrototypeSidebarTodayGamesByStatus(games) {
   const live = [];
   const upcoming = [];
   const final = [];
@@ -147809,6 +147809,10 @@ function orderTodayLeagueGames(games) {
     else if (variant === "catchUp") final.push(game);
     else upcoming.push(game);
   }
+  return { live, upcoming, final };
+}
+function orderTodayLeagueGames(games) {
+  const { live, upcoming, final } = groupSportsBrowserPrototypeSidebarTodayGamesByStatus(games);
   return [...live, ...upcoming, ...final];
 }
 function buildSportsBrowserPrototypeTodayCompleteLeagueSlates(nowLeagues, upcomingLeagues, catchUpLeagues) {
@@ -165271,7 +165275,8 @@ function SidebarTemporalLeagueBlock({
   showGameInlineMenuUnderCards = false,
   onGameInlineNavigate,
   onCommandCenterFollowLiveToggle,
-  extensionGamesYesterdayHighlightsNavigation = null
+  extensionGamesYesterdayHighlightsNavigation = null,
+  temporalSectionPrefix
 }) {
   const usesTennisTournamentGrouping = shouldGroupSportsBrowserSidebarLeagueByTournament(slate.key);
   const tournamentGroups = (0, import_react287.useMemo)(
@@ -165390,6 +165395,31 @@ function SidebarTemporalLeagueBlock({
       )
     ] }) : null
   ] }, game.id);
+  const extensionTodayGameStatusSections = isGrarfExtensionRenderer() && temporalSectionPrefix === "today" && Boolean(resolveVariant) && !extensionGamesYesterdayHighlightsDirectNavigation;
+  const renderTodayGameStatusSectionedGames = () => {
+    const { live, upcoming, final: finalGames } = groupSportsBrowserPrototypeSidebarTodayGamesByStatus(slate.games);
+    const sections = [];
+    if (live.length > 0) {
+      sections.push({ id: "live", label: `LIVE (${live.length})`, games: live });
+    }
+    if (upcoming.length > 0) {
+      sections.push({ id: "upcoming", label: `UPCOMING (${upcoming.length})`, games: upcoming });
+    }
+    if (finalGames.length > 0) {
+      sections.push({ id: "final", label: `FINAL (${finalGames.length})`, games: finalGames });
+    }
+    return sections.map((section) => /* @__PURE__ */ (0, import_jsx_runtime280.jsxs)(import_react287.Fragment, { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime280.jsx)(
+        "div",
+        {
+          className: "grarf-extension-yesterday-highlights-league-section-label",
+          "data-grarf-extension-yesterday-highlights-section-label": "",
+          children: section.label
+        }
+      ),
+      /* @__PURE__ */ (0, import_jsx_runtime280.jsx)(SidebarTemporalGamesBox, { children: section.games.map((game) => renderGameRow(game)) })
+    ] }, section.id));
+  };
   return /* @__PURE__ */ (0, import_jsx_runtime280.jsxs)(
     "div",
     {
@@ -165426,7 +165456,7 @@ function SidebarTemporalLeagueBlock({
               children: "HIGHLIGHTS"
             }
           ) : null,
-          /* @__PURE__ */ (0, import_jsx_runtime280.jsx)(SidebarTemporalGamesBox, { children: extensionGamesYesterdayBoxingHighlights ? GRARF_EXTENSION_GAMES_YESTERDAY_BOXING_HIGHLIGHT_PROMOTIONS.map((promotion) => /* @__PURE__ */ (0, import_jsx_runtime280.jsx)(
+          extensionTodayGameStatusSections && !extensionGamesYesterdayBoxingHighlights && !usesTennisTournamentGrouping ? renderTodayGameStatusSectionedGames() : /* @__PURE__ */ (0, import_jsx_runtime280.jsx)(SidebarTemporalGamesBox, { children: extensionGamesYesterdayBoxingHighlights ? GRARF_EXTENSION_GAMES_YESTERDAY_BOXING_HIGHLIGHT_PROMOTIONS.map((promotion) => /* @__PURE__ */ (0, import_jsx_runtime280.jsx)(
             "div",
             {
               className: "min-w-0",
@@ -165574,7 +165604,8 @@ function SidebarGroupedTemporalLeagueEntries({
             onToggleExpansionKey: toggleLeague,
             showGameInlineMenuUnderCards,
             onGameInlineNavigate,
-            onCommandCenterFollowLiveToggle
+            onCommandCenterFollowLiveToggle,
+            temporalSectionPrefix: sectionPrefix
           },
           `${sectionPrefix}-${slate.key}`
         )),
@@ -165602,7 +165633,8 @@ function SidebarGroupedTemporalLeagueEntries({
         onToggleExpansionKey: toggleLeague,
         showGameInlineMenuUnderCards,
         onGameInlineNavigate,
-        onCommandCenterFollowLiveToggle
+        onCommandCenterFollowLiveToggle,
+        temporalSectionPrefix: sectionPrefix
       },
       `${sectionPrefix}-${entry2.slate.key}`
     );
