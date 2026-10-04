@@ -160101,9 +160101,7 @@ function SportsBrowserPrototypeTemporaryNavLeaguesInlineTree({
                     expanded: leagueExpanded,
                     leagueGames: leagueGamesForLogo,
                     onToggle: () => {
-                      const willExpand = !leagueExpanded;
                       toggleLeague(leagueKey);
-                      if (willExpand) onLeagueSelect?.(leagueKey);
                     }
                   }
                 ),
@@ -165395,6 +165393,7 @@ function SidebarTemporalLeagueBlock({
       )
     ] }) : null
   ] }, game.id);
+  const extensionTemporalNestedLeagueShell = isGrarfExtensionRenderer() && !extensionGamesYesterdayDirectLeagueRowHighlights && !extensionGamesYesterdayHighlightsUnsupported;
   const extensionTodayGameStatusSections = isGrarfExtensionRenderer() && temporalSectionPrefix === "today" && Boolean(resolveVariant) && !extensionGamesYesterdayHighlightsDirectNavigation;
   const renderTodayGameStatusSectionedGames = () => {
     const { live, upcoming, final: finalGames } = groupSportsBrowserPrototypeSidebarTodayGamesByStatus(slate.games);
@@ -165414,6 +165413,7 @@ function SidebarTemporalLeagueBlock({
         {
           className: "grarf-extension-yesterday-highlights-league-section-label",
           "data-grarf-extension-yesterday-highlights-section-label": "",
+          "data-grarf-extension-today-game-status-section-label": "",
           children: section.label
         }
       ),
@@ -165424,7 +165424,7 @@ function SidebarTemporalLeagueBlock({
     "div",
     {
       "data-grarf-temporary-nav-nested-league": "",
-      ...extensionGamesYesterdayHighlightsDirectNavigation && !extensionGamesYesterdayDirectLeagueRowHighlights && !extensionGamesYesterdayBoxingHighlights ? {
+      ...extensionTemporalNestedLeagueShell ? {
         "data-grarf-extension-yesterday-highlights-nested-league": "",
         ...expanded ? { "data-grarf-extension-yesterday-highlights-league-expanded": "" } : {}
       } : {},
