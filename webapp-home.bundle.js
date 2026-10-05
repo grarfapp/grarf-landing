@@ -149479,9 +149479,19 @@ function setGrarfExtensionGamesYesterdayHighlightsNavSnapshot(next) {
   for (const listener of snapshotListeners) {
     listener();
   }
-  if (snapshot.temporaryNavTopLevel !== "GAMES" || snapshot.gamesSelector2Label !== "YESTERDAY" || snapshot.gamesYesterdaySelector3Label !== "HIGHLIGHTS") {
+  if (!isGrarfExtensionGamesYesterdayCatchUpMinimizedNavActive()) {
     clearGrarfExtensionGamesYesterdayHighlightsActiveSelection();
   }
+}
+function isGrarfExtensionGamesYesterdayRecapsNavSnapshotActive() {
+  if (snapshot.temporaryNavTopLevel !== "GAMES") return false;
+  if (snapshot.gamesCatchUpContentAxis) {
+    return snapshot.gamesCatchUpContentAxis.content === "RECAPS" && snapshot.gamesCatchUpContentAxis.date === "YESTERDAY";
+  }
+  return snapshot.gamesSelector2Label === "YESTERDAY" && snapshot.gamesYesterdaySelector3Label === "RECAPS";
+}
+function isGrarfExtensionGamesYesterdayCatchUpMinimizedNavActive() {
+  return isGrarfExtensionGamesYesterdayHighlightsNavSnapshotActive() || isGrarfExtensionGamesYesterdayRecapsNavSnapshotActive();
 }
 function getGrarfExtensionGamesYesterdayHighlightsNavSnapshot() {
   return snapshot;
@@ -149494,7 +149504,11 @@ function getGrarfExtensionGamesYesterdayHighlightsNavigationContextFromSnapshot(
   };
 }
 function isGrarfExtensionGamesYesterdayHighlightsNavSnapshotActive() {
-  return snapshot.temporaryNavTopLevel === "GAMES" && snapshot.gamesSelector2Label === "YESTERDAY" && snapshot.gamesYesterdaySelector3Label === "HIGHLIGHTS";
+  if (snapshot.temporaryNavTopLevel !== "GAMES") return false;
+  if (snapshot.gamesCatchUpContentAxis) {
+    return snapshot.gamesCatchUpContentAxis.content === "HIGHLIGHTS" && snapshot.gamesCatchUpContentAxis.date === "YESTERDAY";
+  }
+  return snapshot.gamesSelector2Label === "YESTERDAY" && snapshot.gamesYesterdaySelector3Label === "HIGHLIGHTS";
 }
 
 // ../grarf/desktop/src/extensionHost/grarfExtensionGameYesterdayHighlightsNavigation.ts
@@ -150361,6 +150375,29 @@ async function navigateGrarfExtensionGameYesterdayHighlights(game, context2) {
   return false;
 }
 
+// ../grarf/desktop/src/extensionHost/grarfExtensionGameYesterdayRecapsNavigation.ts
+init_define_import_meta_env();
+function navigateGrarfExtensionGameYesterdayRecap(game) {
+  if (!isGrarfExtensionGamesYesterdayRecapsNavSnapshotActive()) {
+    return false;
+  }
+  const context2 = resolveGameBrowserContext(game);
+  const recapPane = applySportsBrowserPrototypeGameContextSectionToPane(
+    applySportsBrowserPrototypeGameToPane(game),
+    game,
+    context2,
+    "recap"
+  );
+  const recapUrl = resolveGrarfExtensionHostExternalDestinationUrl(recapPane);
+  const url = recapUrl ?? resolveGrarfExtensionHostExternalDestinationUrl(applySportsBrowserPrototypeGameToPane(game));
+  if (!url) {
+    return false;
+  }
+  navigateGrarfExtensionHostExternalUrl(url);
+  setGrarfExtensionGamesYesterdayHighlightsActiveGameId(game.id);
+  return true;
+}
+
 // ../grarf/desktop/src/extensionHost/grarfExtensionF1YesterdayHighlightsPresentation.ts
 init_define_import_meta_env();
 function formatGrarfExtensionF1SessionDisplayLabel(sessionLabel) {
@@ -150430,6 +150467,10 @@ function GrarfExtensionYesterdayHighlightsMinimizedGameCard({
   const state3 = resolveGrarfExtensionCommandCenterScorecardState(game);
   const handleClick = () => {
     if (disabled) return;
+    if (!bypassYesterdayHighlightsNavigation && isGrarfExtensionRenderer() && isGrarfExtensionGamesYesterdayRecapsNavSnapshotActive()) {
+      navigateGrarfExtensionGameYesterdayRecap(game);
+      return;
+    }
     if (!bypassYesterdayHighlightsNavigation && isGrarfExtensionRenderer() && isGrarfExtensionGamesYesterdayHighlightsNavSnapshotActive()) {
       void navigateGrarfExtensionGameYesterdayHighlights(
         game,
@@ -164141,6 +164182,10 @@ function gameHaystack2(game) {
 }
 var SEARCH_PHRASE_ACTIONS = [
   {
+    patterns: [/yesterday'?s?\s+recaps?/],
+    action: resolveGrarfExtensionAiSearchCatchUpContentAction("yesterday", "recaps")
+  },
+  {
     patterns: [
       /yesterday'?s?\s+scores?/,
       /yesterday'?s?\s+results?/,
@@ -164426,6 +164471,16 @@ function GrarfExtensionAiSearchHomeSection({
                   }
                 )
               ] })
+            }
+          ),
+          /* @__PURE__ */ (0, import_jsx_runtime277.jsx)(
+            SuggestionRow,
+            {
+              icon: RotateCcw,
+              onActivate: () => onExecuteAction(
+                resolveGrarfExtensionAiSearchCatchUpContentAction("yesterday", "recaps")
+              ),
+              label: "Get yesterday's recaps"
             }
           ),
           /* @__PURE__ */ (0, import_jsx_runtime277.jsx)(
@@ -164723,6 +164778,203 @@ function buildGrarfExtensionGamesYesterdayHighlightsGroupedEntries(slates) {
     ...groupSportsBrowserPrototypeSidebarLeagueEntriesInSlateOrder(supported),
     ...buildGrarfExtensionGamesYesterdayHighlightsUnsupportedLeagueEntries(unsupported)
   ]);
+}
+
+// ../grarf/desktop/src/extensionHost/applyGrarfExtensionSidebarSequentialNavEntry.ts
+init_define_import_meta_env();
+async function applyGrarfExtensionSidebarSequentialNavEntry(entry2, context2) {
+  switch (entry2.kind) {
+    case "league": {
+      setGrarfExtensionSidebarExclusiveExpandedLeagueKey(entry2.leagueKey);
+      if (context2.yesterdayHighlightsMode) {
+        if (!grarfExtensionLeagueHasGamesYesterdayHighlightsSupport(entry2.leagueKey)) {
+          return;
+        }
+        clearGrarfExtensionGamesYesterdayHighlightsActiveSelection();
+        if (grarfExtensionLeagueUsesGamesYesterdayDirectLeagueRowHighlights(entry2.leagueKey)) {
+          navigateGrarfExtensionGamesYesterdayDirectLeagueRowHighlights(entry2.leagueKey);
+        }
+        return;
+      }
+      clearGrarfExtensionGamesYesterdayHighlightsActiveSelection();
+      setGrarfExtensionGamesYesterdayHighlightsActiveGameId(null);
+      context2.onTemporalLeagueSelect?.(entry2.leagueKey);
+      return;
+    }
+    case "game": {
+      setGrarfExtensionSidebarExclusiveExpandedLeagueKey(entry2.leagueKey);
+      if (context2.yesterdayRecapsMode) {
+        navigateGrarfExtensionGameYesterdayRecap(entry2.game);
+        return;
+      }
+      if (context2.yesterdayHighlightsMode) {
+        const navigationContext = context2.highlightsNavigationContext ?? getGrarfExtensionGamesYesterdayHighlightsNavigationContextFromSnapshot();
+        await navigateGrarfExtensionGameYesterdayHighlights(entry2.game, navigationContext);
+        return;
+      }
+      clearGrarfExtensionGamesYesterdayHighlightsActiveSelection();
+      context2.onGameSelect?.(entry2.game);
+      return;
+    }
+    case "boxingPromotion": {
+      setGrarfExtensionSidebarExclusiveExpandedLeagueKey(entry2.leagueKey);
+      navigateGrarfExtensionGamesYesterdayBoxingHighlightPromotion(entry2.promotionId);
+      return;
+    }
+    case "newsSource": {
+      setGrarfExtensionSidebarExclusiveExpandedLeagueKey(entry2.leagueKey);
+      setGrarfExtensionNewsLeaguesActiveSource({
+        leagueKey: entry2.leagueKey,
+        websiteIndex: entry2.websiteIndex
+      });
+      navigateGrarfExtensionHostExternalUrl(entry2.url);
+      context2.onLeagueDestinationSelect?.(entry2.leagueKey, "news", entry2.websiteIndex);
+      return;
+    }
+  }
+}
+
+// ../grarf/desktop/src/extensionHost/buildGrarfExtensionSidebarSequentialNavEntries.ts
+init_define_import_meta_env();
+function orderGamesForTodayStatusSections(games) {
+  const { live, upcoming, final: finalGames } = groupSportsBrowserPrototypeSidebarTodayGamesByStatus(games);
+  return [...live, ...upcoming, ...finalGames];
+}
+function appendSlateSequentialEntries(entries, slate, leagueOpen, input) {
+  const leagueKey = slate.key;
+  entries.push({ kind: "league", leagueKey });
+  if (!leagueOpen[leagueKey]) return;
+  if (input.yesterdayHighlightsMode) {
+    if (!grarfExtensionLeagueHasGamesYesterdayHighlightsSupport(leagueKey)) {
+      return;
+    }
+    if (grarfExtensionLeagueUsesGamesYesterdayDirectLeagueRowHighlights(leagueKey)) {
+      return;
+    }
+    if (grarfExtensionLeagueUsesGamesYesterdayBoxingHighlights(leagueKey)) {
+      for (const promotion of GRARF_EXTENSION_GAMES_YESTERDAY_BOXING_HIGHLIGHT_PROMOTIONS) {
+        entries.push({
+          kind: "boxingPromotion",
+          leagueKey,
+          promotionId: promotion.id
+        });
+      }
+      return;
+    }
+  }
+  const games = input.todayStatusSectionGameOrder ? orderGamesForTodayStatusSections(slate.games) : slate.games;
+  for (const game of games) {
+    entries.push({ kind: "game", leagueKey, game });
+  }
+}
+function appendGroupedLeagueEntrySequentialEntries(entries, groupedEntry, leagueOpen, input) {
+  if (groupedEntry.kind === "soccer") {
+    for (const child of groupedEntry.children) {
+      appendSlateSequentialEntries(entries, child, leagueOpen, input);
+    }
+    return;
+  }
+  appendSlateSequentialEntries(entries, groupedEntry.slate, leagueOpen, input);
+}
+function resolveGrarfExtensionSidebarSequentialNavDisplaySlates(slates, yesterdayHighlightsMode) {
+  if (!yesterdayHighlightsMode) return [...slates];
+  return applyGrarfExtensionGamesYesterdayBoxingHighlightSlates(
+    applyGrarfExtensionGamesYesterdayDateResolverHighlightSlates(
+      applyGrarfExtensionGamesYesterdayLeagueLevelHighlightSlates(slates)
+    )
+  );
+}
+function buildGrarfExtensionSidebarSequentialNavEntries(input) {
+  const displaySlates = resolveGrarfExtensionSidebarSequentialNavDisplaySlates(
+    input.slates,
+    input.yesterdayHighlightsMode
+  );
+  const groupedEntries = input.yesterdayHighlightsMode || input.yesterdayRecapsMode ? buildGrarfExtensionGamesYesterdayHighlightsGroupedEntries(
+    input.yesterdayRecapsMode ? input.slates : displaySlates
+  ) : groupSportsBrowserPrototypeSidebarLeagueEntriesInSlateOrder(displaySlates);
+  const entries = [];
+  for (const groupedEntry of groupedEntries) {
+    appendGroupedLeagueEntrySequentialEntries(entries, groupedEntry, input.leagueOpen, input);
+  }
+  return entries;
+}
+
+// ../grarf/desktop/src/extensionHost/resolveGrarfExtensionSidebarSequentialNavCurrentIndex.ts
+init_define_import_meta_env();
+function resolveGrarfExtensionSidebarSequentialNavCurrentIndex(input) {
+  const { entries } = input;
+  if (input.yesterdayRecapsMode) {
+    const recapsGameId = getGrarfExtensionGamesYesterdayHighlightsActiveGameId();
+    if (recapsGameId) {
+      const gameIndex = entries.findIndex(
+        (entry2) => entry2.kind === "game" && entry2.game.id === recapsGameId
+      );
+      if (gameIndex >= 0) return gameIndex;
+    }
+  }
+  if (input.yesterdayHighlightsMode) {
+    const boxingId = getGrarfExtensionGamesYesterdayHighlightsActiveBoxingPromotionId();
+    if (boxingId) {
+      const boxingIndex = entries.findIndex(
+        (entry2) => entry2.kind === "boxingPromotion" && entry2.promotionId === boxingId
+      );
+      if (boxingIndex >= 0) return boxingIndex;
+    }
+    const highlightsLeagueKey = getGrarfExtensionGamesYesterdayHighlightsActiveLeagueKey();
+    if (highlightsLeagueKey) {
+      const leagueIndex = entries.findIndex(
+        (entry2) => entry2.kind === "league" && entry2.leagueKey === highlightsLeagueKey
+      );
+      if (leagueIndex >= 0) return leagueIndex;
+    }
+    const highlightsGameId = getGrarfExtensionGamesYesterdayHighlightsActiveGameId();
+    if (highlightsGameId) {
+      const gameIndex = entries.findIndex(
+        (entry2) => entry2.kind === "game" && entry2.game.id === highlightsGameId
+      );
+      if (gameIndex >= 0) return gameIndex;
+    }
+  }
+  if (input.newsLeaguesMode) {
+    const activeSource2 = getGrarfExtensionNewsLeaguesActiveSource();
+    if (activeSource2) {
+      const sourceIndex = entries.findIndex(
+        (entry2) => entry2.kind === "newsSource" && entry2.leagueKey === activeSource2.leagueKey && entry2.websiteIndex === activeSource2.websiteIndex
+      );
+      if (sourceIndex >= 0) return sourceIndex;
+    }
+  }
+  const trimmedGameId = input.selectedGameId?.trim();
+  if (trimmedGameId) {
+    const gameIndex = entries.findIndex(
+      (entry2) => entry2.kind === "game" && entry2.game.id === trimmedGameId
+    );
+    if (gameIndex >= 0) return gameIndex;
+  }
+  const trimmedLeagueKey = input.selectedLeagueKey?.trim();
+  if (trimmedLeagueKey) {
+    const leagueIndex = entries.findIndex(
+      (entry2) => entry2.kind === "league" && entry2.leagueKey === trimmedLeagueKey
+    );
+    if (leagueIndex >= 0) return leagueIndex;
+  }
+  const exclusiveExpanded = getGrarfExtensionSidebarExclusiveExpandedLeagueKey();
+  if (exclusiveExpanded) {
+    const expandedLeagueIndex = entries.findIndex(
+      (entry2) => entry2.kind === "league" && entry2.leagueKey === exclusiveExpanded
+    );
+    if (expandedLeagueIndex >= 0) return expandedLeagueIndex;
+  }
+  return -1;
+}
+function resolveGrarfExtensionSidebarSequentialNavStepTarget(direction, entries, currentIndex) {
+  const targetIndex = resolveSportsBrowserPrototypeSidebarCircularNavigationIndex(
+    currentIndex,
+    direction,
+    entries.length
+  );
+  if (targetIndex == null) return null;
+  return entries[targetIndex] ?? null;
 }
 
 // ../grarf/desktop/src/components/homeMvp/SportsBrowserPrototypeCommandCenterDestinationCard.tsx
@@ -166340,7 +166592,13 @@ function SidebarTemporalLeagueBlock({
     isGrarfExtensionGamesYesterdayHighlightsNavSnapshotActive,
     () => false
   );
+  const extensionGamesYesterdayRecapsNavActive = (0, import_react289.useSyncExternalStore)(
+    subscribeGrarfExtensionGamesYesterdayHighlightsNavSnapshot,
+    isGrarfExtensionGamesYesterdayRecapsNavSnapshotActive,
+    () => false
+  );
   const extensionGamesYesterdayHighlightsDirectNavigation = isGrarfExtensionRenderer() && extensionGamesYesterdayHighlightsNavActive;
+  const extensionGamesYesterdayCatchUpMinimizedCard = isGrarfExtensionRenderer() && (extensionGamesYesterdayHighlightsDirectNavigation || extensionGamesYesterdayRecapsNavActive);
   const extensionGamesYesterdayDirectLeagueRowHighlights = extensionGamesYesterdayHighlightsDirectNavigation && grarfExtensionLeagueUsesGamesYesterdayDirectLeagueRowHighlights(slate.key);
   const extensionGamesYesterdayBoxingHighlights = extensionGamesYesterdayHighlightsDirectNavigation && grarfExtensionLeagueUsesGamesYesterdayBoxingHighlights(slate.key);
   const extensionGamesYesterdayHighlightsUnsupported = extensionGamesYesterdayHighlightsDirectNavigation && !grarfExtensionLeagueHasGamesYesterdayHighlightsSupport(slate.key);
@@ -166375,6 +166633,10 @@ function SidebarTemporalLeagueBlock({
   }, []);
   const handleGameExploreToggle = (0, import_react289.useCallback)(
     (game) => {
+      if (isGrarfExtensionRenderer() && isGrarfExtensionGamesYesterdayRecapsNavSnapshotActive()) {
+        navigateGrarfExtensionGameYesterdayRecap(game);
+        return;
+      }
       if (isGrarfExtensionRenderer() && isGrarfExtensionGamesYesterdayHighlightsNavSnapshotActive()) {
         void navigateGrarfExtensionGameYesterdayHighlights(
           game,
@@ -166408,13 +166670,13 @@ function SidebarTemporalLeagueBlock({
         onGameTeamSelect,
         onWatchLive,
         canShowWatchLive,
-        isSelected: extensionGamesYesterdayHighlightsDirectNavigation ? extensionYesterdayHighlightsActiveGameId === game.id : selectedGameId === game.id,
+        isSelected: extensionGamesYesterdayCatchUpMinimizedCard ? extensionYesterdayHighlightsActiveGameId === game.id : selectedGameId === game.id,
         sidebarTennisTournamentGrouped: rowOptions?.sidebarTennisTournamentGrouped,
         showFollowLive: showGameInlineMenuUnderCards,
         exploreExpanded: gameExploreExpandedIds.has(game.id),
         onExploreToggle: showGameInlineMenuUnderCards ? handleGameExploreToggle : void 0,
-        hideExploreChevron: extensionGamesYesterdayHighlightsDirectNavigation,
-        extensionYesterdayHighlightsMinimizedCard: extensionGamesYesterdayHighlightsDirectNavigation,
+        hideExploreChevron: extensionGamesYesterdayCatchUpMinimizedCard,
+        extensionYesterdayHighlightsMinimizedCard: extensionGamesYesterdayCatchUpMinimizedCard,
         extensionYesterdayHighlightsDisabled: extensionGamesYesterdayHighlightsUnsupported,
         onSelect: showGameInlineMenuUnderCards ? void 0 : onGameSelect,
         onFollowLiveAction: onCommandCenterFollowLiveToggle ? () => onCommandCenterFollowLiveToggle(game) : onGameSelect ? () => onGameSelect(game) : void 0
@@ -166443,7 +166705,7 @@ function SidebarTemporalLeagueBlock({
       )
     ] }) : null
   ] }, game.id);
-  const extensionTemporalNestedLeagueShell = isGrarfExtensionRenderer() && !extensionGamesYesterdayDirectLeagueRowHighlights && !extensionGamesYesterdayHighlightsUnsupported;
+  const extensionTemporalNestedLeagueShell = isGrarfExtensionRenderer() && (extensionGamesYesterdayRecapsNavActive || !extensionGamesYesterdayDirectLeagueRowHighlights && !extensionGamesYesterdayHighlightsUnsupported);
   const extensionTodayGameStatusSections = isGrarfExtensionRenderer() && temporalSectionPrefix === "today" && Boolean(resolveVariant) && !extensionGamesYesterdayHighlightsDirectNavigation;
   const renderTodayGameStatusSectionedGames = () => {
     const { live, upcoming, final: finalGames } = groupSportsBrowserPrototypeSidebarTodayGamesByStatus(slate.games);
@@ -166582,7 +166844,12 @@ function SidebarGroupedTemporalLeagueEntries({
     isGrarfExtensionGamesYesterdayHighlightsNavSnapshotActive,
     () => false
   );
-  const extensionGamesYesterdayHighlightsSoccerSectionLabel = isGrarfExtensionRenderer() && extensionGamesYesterdayHighlightsNavActive && sectionPrefix === "yesterday";
+  const extensionGamesYesterdayRecapsNavActive = (0, import_react289.useSyncExternalStore)(
+    subscribeGrarfExtensionGamesYesterdayHighlightsNavSnapshot,
+    isGrarfExtensionGamesYesterdayRecapsNavSnapshotActive,
+    () => false
+  );
+  const extensionGamesYesterdayHighlightsSoccerSectionLabel = isGrarfExtensionRenderer() && (extensionGamesYesterdayHighlightsNavActive || extensionGamesYesterdayRecapsNavActive) && sectionPrefix === "yesterday";
   const toggleSoccerArchLeague = (0, import_react289.useCallback)(
     (children) => {
       const childKeys = children.map((slate) => slate.key);
@@ -166843,9 +167110,18 @@ function SidebarYesterdaySectionLeagues({
     isGrarfExtensionGamesYesterdayHighlightsNavSnapshotActive,
     () => false
   );
-  const extensionGamesYesterdayHighlightsAccordionLeagues = isGrarfExtensionRenderer() && extensionGamesYesterdayHighlightsNavActive;
+  const extensionGamesYesterdayRecapsNavActive = (0, import_react289.useSyncExternalStore)(
+    subscribeGrarfExtensionGamesYesterdayHighlightsNavSnapshot,
+    isGrarfExtensionGamesYesterdayRecapsNavSnapshotActive,
+    () => false
+  );
+  const extensionGamesYesterdayCatchUpMinimizedNavActive = extensionGamesYesterdayHighlightsNavActive || extensionGamesYesterdayRecapsNavActive;
+  const extensionGamesYesterdayHighlightsAccordionLeagues = isGrarfExtensionRenderer() && extensionGamesYesterdayCatchUpMinimizedNavActive;
   const displaySlates = (0, import_react289.useMemo)(() => {
     if (!extensionGamesYesterdayHighlightsAccordionLeagues) {
+      return slates;
+    }
+    if (extensionGamesYesterdayRecapsNavActive) {
       return slates;
     }
     return applyGrarfExtensionGamesYesterdayBoxingHighlightSlates(
@@ -166853,7 +167129,11 @@ function SidebarYesterdaySectionLeagues({
         applyGrarfExtensionGamesYesterdayLeagueLevelHighlightSlates(slates)
       )
     );
-  }, [extensionGamesYesterdayHighlightsAccordionLeagues, slates]);
+  }, [
+    extensionGamesYesterdayHighlightsAccordionLeagues,
+    extensionGamesYesterdayRecapsNavActive,
+    slates
+  ]);
   const groupedEntries = (0, import_react289.useMemo)(() => {
     if (extensionGamesYesterdayHighlightsAccordionLeagues) {
       return buildGrarfExtensionGamesYesterdayHighlightsGroupedEntries(displaySlates);
@@ -166868,10 +167148,17 @@ function SidebarYesterdaySectionLeagues({
     if (!extensionGamesYesterdayHighlightsAccordionLeagues) {
       return leafSlates;
     }
+    if (extensionGamesYesterdayRecapsNavActive) {
+      return leafSlates.filter((slate) => slate.games.length > 0);
+    }
     return leafSlates.filter(
       (slate) => grarfExtensionLeagueHasGamesYesterdayHighlightsSupport(slate.key) && !grarfExtensionLeagueUsesGamesYesterdayDirectLeagueRowHighlights(slate.key)
     );
-  }, [extensionGamesYesterdayHighlightsAccordionLeagues, leafSlates]);
+  }, [
+    extensionGamesYesterdayHighlightsAccordionLeagues,
+    extensionGamesYesterdayRecapsNavActive,
+    leafSlates
+  ]);
   const allOpen = expandableSlates.length > 0 && expandableSlates.every((slate) => leagueOpen[slate.key] ?? false);
   const extensionSidebarExclusiveLeagueExpansion = isGrarfExtensionRenderer();
   const toggleAll = (0, import_react289.useCallback)(() => {
@@ -166902,10 +167189,10 @@ function SidebarYesterdaySectionLeagues({
   ]);
   const toggleLeague = (0, import_react289.useCallback)(
     (leagueKey) => {
-      if (extensionGamesYesterdayHighlightsAccordionLeagues && !grarfExtensionLeagueHasGamesYesterdayHighlightsSupport(leagueKey)) {
+      if (extensionGamesYesterdayHighlightsAccordionLeagues && extensionGamesYesterdayHighlightsNavActive && !grarfExtensionLeagueHasGamesYesterdayHighlightsSupport(leagueKey)) {
         return;
       }
-      if (extensionGamesYesterdayHighlightsAccordionLeagues && grarfExtensionLeagueUsesGamesYesterdayDirectLeagueRowHighlights(leagueKey)) {
+      if (extensionGamesYesterdayHighlightsAccordionLeagues && extensionGamesYesterdayHighlightsNavActive && grarfExtensionLeagueUsesGamesYesterdayDirectLeagueRowHighlights(leagueKey)) {
         navigateGrarfExtensionGamesYesterdayDirectLeagueRowHighlights(leagueKey);
         return;
       }
@@ -166937,6 +167224,7 @@ function SidebarYesterdaySectionLeagues({
     },
     [
       extensionGamesYesterdayHighlightsAccordionLeagues,
+      extensionGamesYesterdayHighlightsNavActive,
       extensionSidebarExclusiveLeagueExpansion,
       onLeagueOpenChange
     ]
@@ -167738,6 +168026,11 @@ function SportsBrowserPrototypeLeftNav({
     isGrarfExtensionGamesYesterdayHighlightsNavSnapshotActive,
     () => false
   );
+  const extensionYesterdayRecapsNavActive = (0, import_react289.useSyncExternalStore)(
+    subscribeGrarfExtensionGamesYesterdayHighlightsNavSnapshot,
+    isGrarfExtensionGamesYesterdayRecapsNavSnapshotActive,
+    () => false
+  );
   const onTemporalLeagueSelect = (0, import_react289.useCallback)(
     (leagueKey) => {
       onLeagueSelect?.(leagueKey, { temporalView: compactTemporalView });
@@ -167748,6 +168041,49 @@ function SportsBrowserPrototypeLeftNav({
     if (!extensionGamesSequentialNavScopeId) {
       return;
     }
+    if (extensionGamesSequentialNavScopeId === "games-yesterday-RECAPS" && extensionYesterdayRecapsNavActive) {
+      setGrarfExtensionSidebarSequentialUpDownHandlerForScope(
+        extensionGamesSequentialNavScopeId,
+        {
+          step: async (direction) => {
+            const entries = buildGrarfExtensionSidebarSequentialNavEntries({
+              slates: yesterdayLeagues,
+              leagueOpen: resolvedYesterdayLeagueOpen,
+              yesterdayHighlightsMode: false,
+              yesterdayRecapsMode: true,
+              todayStatusSectionGameOrder: false
+            });
+            const currentIndex = resolveGrarfExtensionSidebarSequentialNavCurrentIndex({
+              entries,
+              selectedGameId,
+              selectedLeagueKey,
+              yesterdayHighlightsMode: false,
+              yesterdayRecapsMode: true,
+              newsLeaguesMode: false
+            });
+            const target = resolveGrarfExtensionSidebarSequentialNavStepTarget(
+              direction,
+              entries,
+              currentIndex
+            );
+            if (!target) return;
+            await applyGrarfExtensionSidebarSequentialNavEntry(target, {
+              yesterdayHighlightsMode: false,
+              yesterdayRecapsMode: true,
+              highlightsNavigationContext: extensionGamesYesterdayHighlightsNavigation,
+              onGameSelect,
+              onTemporalLeagueSelect
+            });
+          }
+        }
+      );
+      return () => {
+        setGrarfExtensionSidebarSequentialUpDownHandlerForScope(
+          extensionGamesSequentialNavScopeId,
+          null
+        );
+      };
+    }
     registerGrarfExtensionSidebarSequentialNavClickHandlerForScope(
       extensionGamesSequentialNavScopeId
     );
@@ -167757,7 +168093,17 @@ function SportsBrowserPrototypeLeftNav({
         null
       );
     };
-  }, [extensionGamesSequentialNavScopeId]);
+  }, [
+    extensionGamesSequentialNavScopeId,
+    extensionGamesYesterdayHighlightsNavigation,
+    extensionYesterdayRecapsNavActive,
+    onGameSelect,
+    onTemporalLeagueSelect,
+    resolvedYesterdayLeagueOpen,
+    selectedGameId,
+    selectedLeagueKey,
+    yesterdayLeagues
+  ]);
   const toggleCatchUpLeague = (0, import_react289.useCallback)(
     (leagueKey) => {
       if (extensionSidebarExclusiveLeagueExpansion) {
