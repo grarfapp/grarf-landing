@@ -165971,7 +165971,8 @@ function GrarfExtensionAiSearchHomeSection({
   const entitySubject = selectedEntity ? resolveGrarfExtensionAiSearchEntitySubjectLabel(selectedEntity) : null;
   const catchUpDayLabel = CATCH_UP_DAY_OPTIONS.find((option) => option.day === catchUpDay)?.label ?? "today's";
   const effectiveExploreScope = resolveGrarfExtensionAiSearchEntityExploreScope(selectedEntity);
-  const exploreScopeLabel = EXPLORE_SCOPE_OPTIONS.find((option) => option.scope === effectiveExploreScope)?.label ?? "all sports";
+  const displayedExploreScope = selectedEntity ? effectiveExploreScope : exploreScope;
+  const exploreScopeLabel = EXPLORE_SCOPE_OPTIONS.find((option) => option.scope === displayedExploreScope)?.label ?? "all sports";
   const catchUpContentAction = (0, import_react288.useMemo)(() => {
     if (selectedEntity) {
       return resolveGrarfExtensionAiSearchEntityCatchUpAction(
