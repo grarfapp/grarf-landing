@@ -105377,6 +105377,210 @@ var NBA_TEAM_POPULATION_BY_DIVISION = [
   }
 ];
 
+// ../grarf/desktop/src/data/ncaafTeamPopulation.ts
+init_define_import_meta_env();
+function ncaafTeamSlug(label) {
+  return label.trim().toLowerCase().replace(/['’]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+}
+function ncaafTeam(label) {
+  return {
+    teamKey: `ncaaf-${ncaafTeamSlug(label)}`,
+    label
+  };
+}
+var NCAAF_TEAM_POPULATION_BY_CONFERENCE = [
+  {
+    conferenceLabel: "ACC",
+    teams: [
+      ncaafTeam("Boston College"),
+      ncaafTeam("California"),
+      ncaafTeam("Clemson"),
+      ncaafTeam("Duke"),
+      ncaafTeam("Florida State"),
+      ncaafTeam("Georgia Tech"),
+      ncaafTeam("Louisville"),
+      ncaafTeam("Miami"),
+      ncaafTeam("NC State"),
+      ncaafTeam("North Carolina"),
+      ncaafTeam("Pittsburgh"),
+      ncaafTeam("SMU"),
+      ncaafTeam("Stanford"),
+      ncaafTeam("Syracuse"),
+      ncaafTeam("Virginia"),
+      ncaafTeam("Virginia Tech"),
+      ncaafTeam("Wake Forest")
+    ]
+  },
+  {
+    conferenceLabel: "American",
+    teams: [
+      ncaafTeam("Army"),
+      ncaafTeam("Charlotte"),
+      ncaafTeam("East Carolina"),
+      ncaafTeam("Florida Atlantic"),
+      ncaafTeam("Memphis"),
+      ncaafTeam("Navy"),
+      ncaafTeam("North Texas"),
+      ncaafTeam("Rice"),
+      ncaafTeam("South Florida"),
+      ncaafTeam("Temple"),
+      ncaafTeam("Tulane"),
+      ncaafTeam("Tulsa"),
+      ncaafTeam("UAB"),
+      ncaafTeam("UTSA")
+    ]
+  },
+  {
+    conferenceLabel: "Big 12",
+    teams: [
+      ncaafTeam("Arizona State"),
+      ncaafTeam("Arizona"),
+      ncaafTeam("BYU"),
+      ncaafTeam("Baylor"),
+      ncaafTeam("Cincinnati"),
+      ncaafTeam("Colorado"),
+      ncaafTeam("Houston"),
+      ncaafTeam("Iowa State"),
+      ncaafTeam("Kansas"),
+      ncaafTeam("Kansas State"),
+      ncaafTeam("Oklahoma State"),
+      ncaafTeam("TCU"),
+      ncaafTeam("Texas Tech"),
+      ncaafTeam("UCF"),
+      ncaafTeam("Utah"),
+      ncaafTeam("West Virginia")
+    ]
+  },
+  {
+    conferenceLabel: "Big Ten",
+    teams: [
+      ncaafTeam("Illinois"),
+      ncaafTeam("Indiana"),
+      ncaafTeam("Iowa"),
+      ncaafTeam("Maryland"),
+      ncaafTeam("Michigan State"),
+      ncaafTeam("Michigan"),
+      ncaafTeam("Minnesota"),
+      ncaafTeam("Nebraska"),
+      ncaafTeam("Northwestern"),
+      ncaafTeam("Ohio State"),
+      ncaafTeam("Oregon"),
+      ncaafTeam("Penn State"),
+      ncaafTeam("Purdue"),
+      ncaafTeam("Rutgers"),
+      ncaafTeam("UCLA"),
+      ncaafTeam("USC"),
+      ncaafTeam("Washington"),
+      ncaafTeam("Wisconsin")
+    ]
+  },
+  {
+    conferenceLabel: "Conference USA",
+    teams: [
+      ncaafTeam("Delaware"),
+      ncaafTeam("Florida International"),
+      ncaafTeam("Jacksonville State"),
+      ncaafTeam("Kennesaw State"),
+      ncaafTeam("Liberty"),
+      ncaafTeam("Middle Tennessee"),
+      ncaafTeam("Missouri State"),
+      ncaafTeam("New Mexico State"),
+      ncaafTeam("Sam Houston"),
+      ncaafTeam("Western Kentucky")
+    ]
+  },
+  {
+    conferenceLabel: "FBS Independents",
+    teams: [ncaafTeam("Notre Dame"), ncaafTeam("UConn")]
+  },
+  {
+    conferenceLabel: "Mid-American",
+    teams: [
+      ncaafTeam("Akron"),
+      ncaafTeam("Ball State"),
+      ncaafTeam("Bowling Green"),
+      ncaafTeam("Buffalo"),
+      ncaafTeam("Central Michigan"),
+      ncaafTeam("Eastern Michigan"),
+      ncaafTeam("Kent State"),
+      ncaafTeam("Massachusetts"),
+      ncaafTeam("Miami (OH)"),
+      ncaafTeam("Ohio"),
+      ncaafTeam("Sacramento State"),
+      ncaafTeam("Toledo"),
+      ncaafTeam("Western Michigan")
+    ]
+  },
+  {
+    conferenceLabel: "Mountain West",
+    teams: [
+      ncaafTeam("Air Force"),
+      ncaafTeam("Hawai'i"),
+      ncaafTeam("Nevada"),
+      ncaafTeam("New Mexico"),
+      ncaafTeam("North Dakota State"),
+      ncaafTeam("Northern Illinois"),
+      ncaafTeam("San Jos\xE9 State"),
+      ncaafTeam("UNLV"),
+      ncaafTeam("UTEP"),
+      ncaafTeam("Wyoming")
+    ]
+  },
+  {
+    conferenceLabel: "Pac-12",
+    teams: [
+      ncaafTeam("Boise State"),
+      ncaafTeam("Colorado State"),
+      ncaafTeam("Fresno State"),
+      ncaafTeam("Oregon State"),
+      ncaafTeam("San Diego State"),
+      ncaafTeam("Texas State"),
+      ncaafTeam("Utah State"),
+      ncaafTeam("Washington State")
+    ]
+  },
+  {
+    conferenceLabel: "SEC",
+    teams: [
+      ncaafTeam("Alabama"),
+      ncaafTeam("Arkansas"),
+      ncaafTeam("Auburn"),
+      ncaafTeam("Florida"),
+      ncaafTeam("Georgia"),
+      ncaafTeam("Kentucky"),
+      ncaafTeam("LSU"),
+      ncaafTeam("Mississippi State"),
+      ncaafTeam("Missouri"),
+      ncaafTeam("Oklahoma"),
+      ncaafTeam("Ole Miss"),
+      ncaafTeam("South Carolina"),
+      ncaafTeam("Tennessee"),
+      ncaafTeam("Texas A&M"),
+      ncaafTeam("Texas"),
+      ncaafTeam("Vanderbilt")
+    ]
+  },
+  {
+    conferenceLabel: "Sun Belt",
+    teams: [
+      ncaafTeam("App State"),
+      ncaafTeam("Arkansas State"),
+      ncaafTeam("Coastal Carolina"),
+      ncaafTeam("Georgia Southern"),
+      ncaafTeam("Georgia State"),
+      ncaafTeam("James Madison"),
+      ncaafTeam("Louisiana"),
+      ncaafTeam("Louisiana Tech"),
+      ncaafTeam("Marshall"),
+      ncaafTeam("Old Dominion"),
+      ncaafTeam("South Alabama"),
+      ncaafTeam("Southern Miss"),
+      ncaafTeam("Troy"),
+      ncaafTeam("UL Monroe")
+    ]
+  }
+];
+
 // ../grarf/desktop/src/data/nflTeamPopulation.ts
 init_define_import_meta_env();
 function nflTeam(abbrev, leaguesTabListLabel, label) {
@@ -105604,6 +105808,138 @@ var SPORTS_BROWSER_PROTOTYPE_LEAGUES_TAB_TEAM_CONTEXT_GAME_ID_PREFIX = "sports-b
 var LEAGUES_TAB_TEAM_CONTEXT_PLACEHOLDER_OPPONENT = "GRARF Leagues Tab Placeholder";
 function isSportsBrowserPrototypeLeaguesTabTeamContextGameId(gameId) {
   return gameId.trim().startsWith(SPORTS_BROWSER_PROTOTYPE_LEAGUES_TAB_TEAM_CONTEXT_GAME_ID_PREFIX);
+}
+function normalizeLeaguesTabTeamSearchLabel(value) {
+  return value.trim().toLowerCase();
+}
+function leaguesTabTeamSearchScore(candidateLabel, query) {
+  const normalizedCandidate = normalizeLeaguesTabTeamSearchLabel(candidateLabel);
+  if (!normalizedCandidate || !query) return 0;
+  if (normalizedCandidate === query) return 100;
+  if (normalizedCandidate.startsWith(query)) return 80;
+  if (normalizedCandidate.includes(query)) return 60;
+  if (query.includes(normalizedCandidate)) return 50;
+  return 0;
+}
+function resolveLeaguesTabTeamSelectInputFromPopulationEntry(leagueKey, entry2) {
+  return {
+    leagueKey,
+    teamKey: entry2.teamKey,
+    teamDisplayName: entry2.label,
+    teamAbbrev: entry2.teamAbbrev
+  };
+}
+function resolveSportsBrowserPrototypeLeaguesTabTeamSelectInputFromSearch(leagueKey, teamSearchLabel) {
+  const normalizedLeagueKey = leagueKey.trim().toUpperCase();
+  const query = normalizeLeaguesTabTeamSearchLabel(teamSearchLabel);
+  if (!normalizedLeagueKey || !query) return null;
+  let best = null;
+  let bestScore = 0;
+  const consider = (entry2) => {
+    const score2 = Math.max(
+      leaguesTabTeamSearchScore(entry2.label, query),
+      entry2.teamAbbrev ? leaguesTabTeamSearchScore(entry2.teamAbbrev, query) : 0
+    );
+    if (score2 <= 0 || score2 < bestScore) return;
+    bestScore = score2;
+    best = resolveLeaguesTabTeamSelectInputFromPopulationEntry(normalizedLeagueKey, entry2);
+  };
+  switch (normalizedLeagueKey) {
+    case "MLB":
+      for (const division of MLB_TEAM_POPULATION_BY_DIVISION) {
+        for (const team of division.teams) consider(team);
+      }
+      break;
+    case "NFL":
+      for (const division of NFL_TEAM_POPULATION_BY_DIVISION) {
+        for (const team of division.teams) consider(team);
+      }
+      break;
+    case "NBA":
+      for (const division of NBA_TEAM_POPULATION_BY_DIVISION) {
+        for (const team of division.teams) consider(team);
+      }
+      break;
+    case "NHL":
+      for (const division of NHL_TEAM_POPULATION_BY_DIVISION) {
+        for (const team of division.teams) consider(team);
+      }
+      break;
+    case "WNBA":
+      for (const conference of WNBA_TEAM_POPULATION_BY_CONFERENCE) {
+        for (const team of conference.teams) consider(team);
+      }
+      break;
+    case "MLS":
+      for (const conference of MLS_TEAM_POPULATION_BY_CONFERENCE) {
+        for (const team of conference.teams) consider(team);
+      }
+      break;
+    case "NCAAF":
+      for (const conference of NCAAF_TEAM_POPULATION_BY_CONFERENCE) {
+        for (const team of conference.teams) consider(team);
+      }
+      break;
+    case "MNCAAB":
+      for (const conference of MNCAAB_TEAM_POPULATION_BY_CONFERENCE) {
+        for (const team of conference.teams) consider(team);
+      }
+      break;
+    case "EPL":
+      for (const team of EPL_TEAM_POPULATION) consider(team);
+      break;
+    case "LALIGA":
+      for (const team of LALIGA_TEAM_POPULATION) consider(team);
+      break;
+    case "BUNDESLIGA":
+      for (const team of BUNDESLIGA_TEAM_POPULATION) consider(team);
+      break;
+    case "SERIEA":
+      for (const team of SERIEA_TEAM_POPULATION) consider(team);
+      break;
+    case "LIGUE1":
+      for (const team of LIGUE1_TEAM_POPULATION) consider(team);
+      break;
+    default:
+      return null;
+  }
+  return best;
+}
+function normalizeOperationalTeamMatchValue(value) {
+  return value?.trim().toLowerCase() ?? "";
+}
+function operationalGameMatchesSportsBrowserPrototypeLeaguesTabTeam(game, input) {
+  const leagueKey = input.leagueKey.trim().toUpperCase();
+  if ((game.league ?? "").trim().toUpperCase() !== leagueKey) return false;
+  const displayName = normalizeOperationalTeamMatchValue(input.teamDisplayName);
+  const abbrev = input.teamAbbrev?.trim().toUpperCase();
+  const sides2 = [
+    {
+      team: game.awayTeam,
+      city: game.awayCity,
+      abbrev: game.awayTeamAbbrev,
+      official: game.metadata?.officialAwayName
+    },
+    {
+      team: game.homeTeam,
+      city: game.homeCity,
+      abbrev: game.homeTeamAbbrev,
+      official: game.metadata?.officialHomeName
+    }
+  ];
+  for (const side of sides2) {
+    if (abbrev && side.abbrev?.trim().toUpperCase() === abbrev) return true;
+    const values = [side.team, side.city, side.official].map(normalizeOperationalTeamMatchValue).filter(Boolean);
+    for (const value of values) {
+      if (value === displayName || value.includes(displayName) || displayName.includes(value)) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+function filterOperationalGamesForSportsBrowserPrototypeLeaguesTabTeam(games, input) {
+  return games.filter((game) => operationalGameMatchesSportsBrowserPrototypeLeaguesTabTeam(game, input));
 }
 function parseSportsBrowserPrototypeLeaguesTabTeamContextGameId(gameId) {
   const trimmed = gameId.trim();
@@ -148277,6 +148613,335 @@ function resolveSportsBrowserPrototypeSidebarNavigableLeagueKeys(input) {
   return [];
 }
 
+// ../grarf/desktop/src/extensionHost/applyGrarfExtensionAiSearchNavigationScope.ts
+init_define_import_meta_env();
+init_isGrarfWebRenderer();
+
+// ../grarf/desktop/src/extensionHost/grarfExtensionNewsLeaguesActiveSource.ts
+init_define_import_meta_env();
+var activeSource = null;
+var listeners = /* @__PURE__ */ new Set();
+function notify() {
+  for (const listener of listeners) {
+    listener();
+  }
+}
+function getGrarfExtensionNewsLeaguesActiveSource() {
+  return activeSource;
+}
+function setGrarfExtensionNewsLeaguesActiveSource(next) {
+  if (next == null) {
+    if (activeSource === null) return;
+    activeSource = null;
+    notify();
+    return;
+  }
+  const leagueKey = next.leagueKey.trim().toUpperCase();
+  if (!leagueKey) return;
+  if (activeSource?.leagueKey === leagueKey && activeSource?.websiteIndex === next.websiteIndex) {
+    return;
+  }
+  activeSource = { leagueKey, websiteIndex: next.websiteIndex };
+  notify();
+}
+function subscribeGrarfExtensionNewsLeaguesActiveSource(listener) {
+  listeners.add(listener);
+  return () => {
+    listeners.delete(listener);
+  };
+}
+
+// ../grarf/desktop/src/extensionHost/grarfExtensionSidebarExclusiveLeagueExpansion.ts
+init_define_import_meta_env();
+
+// ../grarf/desktop/src/extensionHost/grarfExtensionGamesYesterdayHighlightsActiveGame.ts
+init_define_import_meta_env();
+var activeGameId = null;
+var activeLeagueKey = null;
+var activeBoxingPromotionId = null;
+var listeners2 = /* @__PURE__ */ new Set();
+function notifyActiveHighlightSelectionListeners() {
+  for (const listener of listeners2) {
+    listener();
+  }
+}
+function getGrarfExtensionGamesYesterdayHighlightsActiveGameId() {
+  return activeGameId;
+}
+function getGrarfExtensionGamesYesterdayHighlightsActiveLeagueKey() {
+  return activeLeagueKey;
+}
+function getGrarfExtensionGamesYesterdayHighlightsActiveBoxingPromotionId() {
+  return activeBoxingPromotionId;
+}
+function setGrarfExtensionGamesYesterdayHighlightsActiveGameId(gameId) {
+  const next = gameId?.trim() || null;
+  if (next === null) {
+    if (activeGameId === null) return;
+    activeGameId = null;
+    notifyActiveHighlightSelectionListeners();
+    return;
+  }
+  if (activeGameId === next && activeLeagueKey === null && activeBoxingPromotionId === null) {
+    return;
+  }
+  activeGameId = next;
+  activeLeagueKey = null;
+  activeBoxingPromotionId = null;
+  notifyActiveHighlightSelectionListeners();
+}
+function setGrarfExtensionGamesYesterdayHighlightsActiveLeagueKey(leagueKey) {
+  const next = leagueKey?.trim().toUpperCase() || null;
+  if (next === null) {
+    if (activeLeagueKey === null) return;
+    activeLeagueKey = null;
+    notifyActiveHighlightSelectionListeners();
+    return;
+  }
+  setGrarfExtensionSidebarExclusiveExpandedLeagueKey(null);
+  if (activeLeagueKey === next && activeGameId === null && activeBoxingPromotionId === null) {
+    return;
+  }
+  activeLeagueKey = next;
+  activeGameId = null;
+  activeBoxingPromotionId = null;
+  notifyActiveHighlightSelectionListeners();
+}
+function setGrarfExtensionGamesYesterdayHighlightsActiveBoxingPromotionId(promotionId) {
+  const next = promotionId?.trim() || null;
+  if (next === null) {
+    if (activeBoxingPromotionId === null) return;
+    activeBoxingPromotionId = null;
+    notifyActiveHighlightSelectionListeners();
+    return;
+  }
+  if (activeBoxingPromotionId === next && activeGameId === null && activeLeagueKey === null) {
+    return;
+  }
+  activeBoxingPromotionId = next;
+  activeGameId = null;
+  activeLeagueKey = null;
+  notifyActiveHighlightSelectionListeners();
+}
+function clearGrarfExtensionGamesYesterdayHighlightsActiveSelection() {
+  if (activeGameId === null && activeLeagueKey === null && activeBoxingPromotionId === null) {
+    return;
+  }
+  activeGameId = null;
+  activeLeagueKey = null;
+  activeBoxingPromotionId = null;
+  notifyActiveHighlightSelectionListeners();
+}
+function subscribeGrarfExtensionGamesYesterdayHighlightsActiveGameId(listener) {
+  listeners2.add(listener);
+  return () => {
+    listeners2.delete(listener);
+  };
+}
+function subscribeGrarfExtensionGamesYesterdayHighlightsActiveLeagueKey(listener) {
+  return subscribeGrarfExtensionGamesYesterdayHighlightsActiveGameId(listener);
+}
+function subscribeGrarfExtensionGamesYesterdayHighlightsActiveBoxingPromotionId(listener) {
+  return subscribeGrarfExtensionGamesYesterdayHighlightsActiveGameId(listener);
+}
+
+// ../grarf/desktop/src/extensionHost/grarfExtensionSidebarExclusiveLeagueExpansion.ts
+var exclusiveExpandedLeagueKey = null;
+var listeners3 = /* @__PURE__ */ new Set();
+function normalizeLeagueKey2(leagueKey) {
+  return leagueKey.trim().toUpperCase();
+}
+var pendingLeagueHeaderAnchor = null;
+function leagueHeaderSelector(leagueKey) {
+  const escaped = typeof CSS !== "undefined" && typeof CSS.escape === "function" ? CSS.escape(leagueKey) : leagueKey.replaceAll('"', "");
+  return `[data-sports-browser-prototype-sidebar-league-key="${escaped}"]`;
+}
+function resolveScrollTopKeepingLeagueHeaderVisible(scrollTop, headerTopBefore, headerTopAfter) {
+  return scrollTop + (headerTopAfter - headerTopBefore);
+}
+function holdGrarfExtensionLeagueHeaderAnchor(leagueKey) {
+  pendingLeagueHeaderAnchor = null;
+  if (!leagueKey || typeof document === "undefined") return;
+  const scrollRoot = document.querySelector(
+    "[data-sports-browser-prototype-left-nav-scroll]"
+  );
+  const header = scrollRoot?.querySelector(leagueHeaderSelector(leagueKey));
+  if (!scrollRoot || !header) return;
+  pendingLeagueHeaderAnchor = {
+    leagueKey,
+    headerTop: header.getBoundingClientRect().top,
+    scrollRoot
+  };
+}
+function restoreGrarfExtensionLeagueHeaderAnchor() {
+  const pending = pendingLeagueHeaderAnchor;
+  pendingLeagueHeaderAnchor = null;
+  if (!pending) return;
+  const header = pending.scrollRoot.querySelector(
+    leagueHeaderSelector(pending.leagueKey)
+  );
+  if (!header) return;
+  const nextScrollTop = resolveScrollTopKeepingLeagueHeaderVisible(
+    pending.scrollRoot.scrollTop,
+    pending.headerTop,
+    header.getBoundingClientRect().top
+  );
+  if (nextScrollTop !== pending.scrollRoot.scrollTop) {
+    pending.scrollRoot.scrollTop = nextScrollTop;
+  }
+}
+function notifyExclusiveExpandedLeagueKeyListeners() {
+  for (const listener of listeners3) {
+    listener();
+  }
+}
+function getGrarfExtensionSidebarExclusiveExpandedLeagueKey() {
+  return exclusiveExpandedLeagueKey;
+}
+function subscribeGrarfExtensionSidebarExclusiveExpandedLeagueKey(listener) {
+  listeners3.add(listener);
+  return () => {
+    listeners3.delete(listener);
+  };
+}
+function isGrarfExtensionSidebarExclusiveLeagueExpanded(leagueKey) {
+  if (!exclusiveExpandedLeagueKey) return false;
+  return exclusiveExpandedLeagueKey === normalizeLeagueKey2(leagueKey);
+}
+function setGrarfExtensionSidebarExclusiveExpandedLeagueKey(leagueKey) {
+  const next = leagueKey ? normalizeLeagueKey2(leagueKey) : null;
+  if (exclusiveExpandedLeagueKey === next) return;
+  if (next !== null) {
+    setGrarfExtensionGamesYesterdayHighlightsActiveLeagueKey(null);
+    setGrarfExtensionGamesYesterdayHighlightsActiveBoxingPromotionId(null);
+  }
+  holdGrarfExtensionLeagueHeaderAnchor(next ?? exclusiveExpandedLeagueKey);
+  exclusiveExpandedLeagueKey = next;
+  notifyExclusiveExpandedLeagueKeyListeners();
+}
+function toggleGrarfExtensionSidebarExclusiveExpandedLeagueKey(leagueKey) {
+  const normalized = normalizeLeagueKey2(leagueKey);
+  if (exclusiveExpandedLeagueKey === normalized) {
+    setGrarfExtensionSidebarExclusiveExpandedLeagueKey(null);
+    return;
+  }
+  setGrarfExtensionSidebarExclusiveExpandedLeagueKey(normalized);
+}
+function buildGrarfExtensionSidebarExclusiveLeagueOpenRecord(leagueKey = exclusiveExpandedLeagueKey) {
+  if (!leagueKey) return {};
+  return { [normalizeLeagueKey2(leagueKey)]: true };
+}
+function dispatchGrarfExtensionSidebarExclusiveLeagueOpenChange(action) {
+  const prev = buildGrarfExtensionSidebarExclusiveLeagueOpenRecord();
+  const nextRecord = typeof action === "function" ? action(prev) : action;
+  const openKeys = Object.keys(nextRecord).filter((key2) => nextRecord[key2]);
+  if (openKeys.length === 0) {
+    setGrarfExtensionSidebarExclusiveExpandedLeagueKey(null);
+    return;
+  }
+  const newlyOpened = openKeys.find((key2) => !prev[key2]);
+  setGrarfExtensionSidebarExclusiveExpandedLeagueKey(newlyOpened ?? openKeys[openKeys.length - 1]);
+}
+
+// ../grarf/desktop/src/extensionHost/applyGrarfExtensionAiSearchNavigationScope.ts
+function applyExtensionLeagueExpansion(leagueKey) {
+  const normalized = leagueKey?.trim().toUpperCase();
+  if (!normalized || !isGrarfExtensionRenderer()) return;
+  setGrarfExtensionSidebarExclusiveExpandedLeagueKey(normalized);
+}
+function applyTeamScope(teamInput, onGameSelect) {
+  applyExtensionLeagueExpansion(teamInput.leagueKey);
+  onGameSelect?.(buildSportsBrowserPrototypeLeaguesTabTeamContextGame(teamInput));
+}
+function applyGrarfExtensionAiSearchNavigationScope(input) {
+  const { action } = input;
+  switch (action.kind) {
+    case "temporal": {
+      if (action.focusTeamSelectInput) {
+        applyTeamScope(action.focusTeamSelectInput, input.onGameSelect);
+        return;
+      }
+      if (action.focusLeagueKey) {
+        applyExtensionLeagueExpansion(action.focusLeagueKey);
+        input.onTemporalLeagueSelect?.(action.focusLeagueKey);
+      }
+      return;
+    }
+    case "select-game": {
+      const resolvedGame = input.resolveGameById?.(action.gameId);
+      const leagueKey = action.focusLeagueKey ?? resolvedGame?.league?.trim();
+      if (leagueKey) {
+        applyExtensionLeagueExpansion(leagueKey);
+        input.onTemporalLeagueSelect?.(leagueKey);
+      }
+      if (action.focusTeamSelectInput) {
+        applyTeamScope(action.focusTeamSelectInput, input.onGameSelect);
+      } else if (resolvedGame) {
+        input.onGameSelect?.(resolvedGame);
+      }
+      return;
+    }
+    case "timeline": {
+      if (action.focusTeamSelectInput) {
+        applyTeamScope(action.focusTeamSelectInput, input.onGameSelect);
+        return;
+      }
+      if (action.focusLeagueKey) {
+        applyExtensionLeagueExpansion(action.focusLeagueKey);
+        input.onTemporalLeagueSelect?.(action.focusLeagueKey);
+      }
+      if (action.gameId) {
+        const game = input.resolveGameById?.(action.gameId);
+        if (game) {
+          applyExtensionLeagueExpansion(game.league);
+          input.onGameSelect?.(game);
+        }
+      }
+      return;
+    }
+    case "content": {
+      if (action.focusTeamSelectInput) {
+        input.onTemporaryNavContentTeamDestinationSelect?.(
+          action.focusTeamSelectInput,
+          action.section,
+          action.globalWebsiteIndex ?? 0
+        );
+        return;
+      }
+      if (action.focusContentGameId) {
+        const game = input.resolveGameById?.(action.focusContentGameId);
+        if (game) {
+          applyExtensionLeagueExpansion(game.league);
+          input.onTemporaryNavContentGameDestinationSelect?.(game, action.section);
+        }
+        return;
+      }
+      if (action.focusLeagueKey && action.scope === "leagues") {
+        applyExtensionLeagueExpansion(action.focusLeagueKey);
+        if (isGrarfExtensionRenderer() && action.section === "news") {
+          setGrarfExtensionNewsLeaguesActiveSource({
+            leagueKey: action.focusLeagueKey.trim().toUpperCase(),
+            websiteIndex: action.globalWebsiteIndex ?? 0
+          });
+        }
+        input.onLeaguesNavDestinationSelect?.(
+          action.focusLeagueKey,
+          action.section,
+          action.globalWebsiteIndex ?? 0
+        );
+        return;
+      }
+      if (action.focusLeagueKey) {
+        applyExtensionLeagueExpansion(action.focusLeagueKey);
+        input.onTemporalLeagueSelect?.(action.focusLeagueKey);
+      }
+      return;
+    }
+    default:
+      return;
+  }
+}
+
 // ../grarf/desktop/src/lib/gamesSpine/grarfLiveGameTemporalNavTrace.ts
 init_define_import_meta_env();
 function findInSlates(slates, traceId) {
@@ -149089,13 +149754,13 @@ var DEFAULT_OPERATIONAL_ATTENTION_PHILOSOPHY = {
 
 // ../grarf/desktop/src/services/attentionPhilosophy/resolvers.ts
 init_define_import_meta_env();
-function normalizeLeagueKey2(league2) {
+function normalizeLeagueKey3(league2) {
   return league2.trim().toUpperCase();
 }
 function resolveLeagueTier(config, league2) {
-  const key2 = normalizeLeagueKey2(league2);
+  const key2 = normalizeLeagueKey3(league2);
   for (const tier of config.leagueGravity.tiers) {
-    if (tier.leagues.some((l2) => normalizeLeagueKey2(l2) === key2)) {
+    if (tier.leagues.some((l2) => normalizeLeagueKey3(l2) === key2)) {
       return tier;
     }
   }
@@ -149603,200 +150268,6 @@ init_define_import_meta_env();
 
 // ../grarf/desktop/src/extensionHost/grarfExtensionGamesYesterdayHighlightsNavSnapshot.ts
 init_define_import_meta_env();
-
-// ../grarf/desktop/src/extensionHost/grarfExtensionGamesYesterdayHighlightsActiveGame.ts
-init_define_import_meta_env();
-
-// ../grarf/desktop/src/extensionHost/grarfExtensionSidebarExclusiveLeagueExpansion.ts
-init_define_import_meta_env();
-var exclusiveExpandedLeagueKey = null;
-var listeners = /* @__PURE__ */ new Set();
-function normalizeLeagueKey3(leagueKey) {
-  return leagueKey.trim().toUpperCase();
-}
-var pendingLeagueHeaderAnchor = null;
-function leagueHeaderSelector(leagueKey) {
-  const escaped = typeof CSS !== "undefined" && typeof CSS.escape === "function" ? CSS.escape(leagueKey) : leagueKey.replaceAll('"', "");
-  return `[data-sports-browser-prototype-sidebar-league-key="${escaped}"]`;
-}
-function resolveScrollTopKeepingLeagueHeaderVisible(scrollTop, headerTopBefore, headerTopAfter) {
-  return scrollTop + (headerTopAfter - headerTopBefore);
-}
-function holdGrarfExtensionLeagueHeaderAnchor(leagueKey) {
-  pendingLeagueHeaderAnchor = null;
-  if (!leagueKey || typeof document === "undefined") return;
-  const scrollRoot = document.querySelector(
-    "[data-sports-browser-prototype-left-nav-scroll]"
-  );
-  const header = scrollRoot?.querySelector(leagueHeaderSelector(leagueKey));
-  if (!scrollRoot || !header) return;
-  pendingLeagueHeaderAnchor = {
-    leagueKey,
-    headerTop: header.getBoundingClientRect().top,
-    scrollRoot
-  };
-}
-function restoreGrarfExtensionLeagueHeaderAnchor() {
-  const pending = pendingLeagueHeaderAnchor;
-  pendingLeagueHeaderAnchor = null;
-  if (!pending) return;
-  const header = pending.scrollRoot.querySelector(
-    leagueHeaderSelector(pending.leagueKey)
-  );
-  if (!header) return;
-  const nextScrollTop = resolveScrollTopKeepingLeagueHeaderVisible(
-    pending.scrollRoot.scrollTop,
-    pending.headerTop,
-    header.getBoundingClientRect().top
-  );
-  if (nextScrollTop !== pending.scrollRoot.scrollTop) {
-    pending.scrollRoot.scrollTop = nextScrollTop;
-  }
-}
-function notifyExclusiveExpandedLeagueKeyListeners() {
-  for (const listener of listeners) {
-    listener();
-  }
-}
-function getGrarfExtensionSidebarExclusiveExpandedLeagueKey() {
-  return exclusiveExpandedLeagueKey;
-}
-function subscribeGrarfExtensionSidebarExclusiveExpandedLeagueKey(listener) {
-  listeners.add(listener);
-  return () => {
-    listeners.delete(listener);
-  };
-}
-function isGrarfExtensionSidebarExclusiveLeagueExpanded(leagueKey) {
-  if (!exclusiveExpandedLeagueKey) return false;
-  return exclusiveExpandedLeagueKey === normalizeLeagueKey3(leagueKey);
-}
-function setGrarfExtensionSidebarExclusiveExpandedLeagueKey(leagueKey) {
-  const next = leagueKey ? normalizeLeagueKey3(leagueKey) : null;
-  if (exclusiveExpandedLeagueKey === next) return;
-  if (next !== null) {
-    setGrarfExtensionGamesYesterdayHighlightsActiveLeagueKey(null);
-    setGrarfExtensionGamesYesterdayHighlightsActiveBoxingPromotionId(null);
-  }
-  holdGrarfExtensionLeagueHeaderAnchor(next ?? exclusiveExpandedLeagueKey);
-  exclusiveExpandedLeagueKey = next;
-  notifyExclusiveExpandedLeagueKeyListeners();
-}
-function toggleGrarfExtensionSidebarExclusiveExpandedLeagueKey(leagueKey) {
-  const normalized = normalizeLeagueKey3(leagueKey);
-  if (exclusiveExpandedLeagueKey === normalized) {
-    setGrarfExtensionSidebarExclusiveExpandedLeagueKey(null);
-    return;
-  }
-  setGrarfExtensionSidebarExclusiveExpandedLeagueKey(normalized);
-}
-function buildGrarfExtensionSidebarExclusiveLeagueOpenRecord(leagueKey = exclusiveExpandedLeagueKey) {
-  if (!leagueKey) return {};
-  return { [normalizeLeagueKey3(leagueKey)]: true };
-}
-function dispatchGrarfExtensionSidebarExclusiveLeagueOpenChange(action) {
-  const prev = buildGrarfExtensionSidebarExclusiveLeagueOpenRecord();
-  const nextRecord = typeof action === "function" ? action(prev) : action;
-  const openKeys = Object.keys(nextRecord).filter((key2) => nextRecord[key2]);
-  if (openKeys.length === 0) {
-    setGrarfExtensionSidebarExclusiveExpandedLeagueKey(null);
-    return;
-  }
-  const newlyOpened = openKeys.find((key2) => !prev[key2]);
-  setGrarfExtensionSidebarExclusiveExpandedLeagueKey(newlyOpened ?? openKeys[openKeys.length - 1]);
-}
-
-// ../grarf/desktop/src/extensionHost/grarfExtensionGamesYesterdayHighlightsActiveGame.ts
-var activeGameId = null;
-var activeLeagueKey = null;
-var activeBoxingPromotionId = null;
-var listeners2 = /* @__PURE__ */ new Set();
-function notifyActiveHighlightSelectionListeners() {
-  for (const listener of listeners2) {
-    listener();
-  }
-}
-function getGrarfExtensionGamesYesterdayHighlightsActiveGameId() {
-  return activeGameId;
-}
-function getGrarfExtensionGamesYesterdayHighlightsActiveLeagueKey() {
-  return activeLeagueKey;
-}
-function getGrarfExtensionGamesYesterdayHighlightsActiveBoxingPromotionId() {
-  return activeBoxingPromotionId;
-}
-function setGrarfExtensionGamesYesterdayHighlightsActiveGameId(gameId) {
-  const next = gameId?.trim() || null;
-  if (next === null) {
-    if (activeGameId === null) return;
-    activeGameId = null;
-    notifyActiveHighlightSelectionListeners();
-    return;
-  }
-  if (activeGameId === next && activeLeagueKey === null && activeBoxingPromotionId === null) {
-    return;
-  }
-  activeGameId = next;
-  activeLeagueKey = null;
-  activeBoxingPromotionId = null;
-  notifyActiveHighlightSelectionListeners();
-}
-function setGrarfExtensionGamesYesterdayHighlightsActiveLeagueKey(leagueKey) {
-  const next = leagueKey?.trim().toUpperCase() || null;
-  if (next === null) {
-    if (activeLeagueKey === null) return;
-    activeLeagueKey = null;
-    notifyActiveHighlightSelectionListeners();
-    return;
-  }
-  setGrarfExtensionSidebarExclusiveExpandedLeagueKey(null);
-  if (activeLeagueKey === next && activeGameId === null && activeBoxingPromotionId === null) {
-    return;
-  }
-  activeLeagueKey = next;
-  activeGameId = null;
-  activeBoxingPromotionId = null;
-  notifyActiveHighlightSelectionListeners();
-}
-function setGrarfExtensionGamesYesterdayHighlightsActiveBoxingPromotionId(promotionId) {
-  const next = promotionId?.trim() || null;
-  if (next === null) {
-    if (activeBoxingPromotionId === null) return;
-    activeBoxingPromotionId = null;
-    notifyActiveHighlightSelectionListeners();
-    return;
-  }
-  if (activeBoxingPromotionId === next && activeGameId === null && activeLeagueKey === null) {
-    return;
-  }
-  activeBoxingPromotionId = next;
-  activeGameId = null;
-  activeLeagueKey = null;
-  notifyActiveHighlightSelectionListeners();
-}
-function clearGrarfExtensionGamesYesterdayHighlightsActiveSelection() {
-  if (activeGameId === null && activeLeagueKey === null && activeBoxingPromotionId === null) {
-    return;
-  }
-  activeGameId = null;
-  activeLeagueKey = null;
-  activeBoxingPromotionId = null;
-  notifyActiveHighlightSelectionListeners();
-}
-function subscribeGrarfExtensionGamesYesterdayHighlightsActiveGameId(listener) {
-  listeners2.add(listener);
-  return () => {
-    listeners2.delete(listener);
-  };
-}
-function subscribeGrarfExtensionGamesYesterdayHighlightsActiveLeagueKey(listener) {
-  return subscribeGrarfExtensionGamesYesterdayHighlightsActiveGameId(listener);
-}
-function subscribeGrarfExtensionGamesYesterdayHighlightsActiveBoxingPromotionId(listener) {
-  return subscribeGrarfExtensionGamesYesterdayHighlightsActiveGameId(listener);
-}
-
-// ../grarf/desktop/src/extensionHost/grarfExtensionGamesYesterdayHighlightsNavSnapshot.ts
 var snapshot = {
   temporaryNavTopLevel: "GAMES",
   gamesSelector2Label: "TODAY",
@@ -161699,9 +162170,9 @@ var import_react279 = __toESM(require_react(), 1);
 // ../grarf/desktop/src/extensionHost/grarfExtensionNewsLeaguesBrowseByMode.ts
 init_define_import_meta_env();
 var browseByMode = "sources";
-var listeners3 = /* @__PURE__ */ new Set();
-function notify() {
-  for (const listener of listeners3) {
+var listeners4 = /* @__PURE__ */ new Set();
+function notify2() {
+  for (const listener of listeners4) {
     listener();
   }
 }
@@ -161709,16 +162180,16 @@ function getGrarfExtensionNewsLeaguesBrowseByMode() {
   return browseByMode;
 }
 function subscribeGrarfExtensionNewsLeaguesBrowseByMode(listener) {
-  listeners3.add(listener);
+  listeners4.add(listener);
   return () => {
-    listeners3.delete(listener);
+    listeners4.delete(listener);
   };
 }
 function setGrarfExtensionNewsLeaguesBrowseByMode(next) {
   if (next !== "sources" && next !== "leagues") return;
   if (browseByMode === next) return;
   browseByMode = next;
-  notify();
+  notify2();
 }
 
 // ../grarf/desktop/src/extensionHost/grarfExtensionNewsLeaguesSequentialNav.ts
@@ -161960,40 +162431,6 @@ function useSportsBrowserPrototypeSidebarGameNavigation({
     nextPreviewGame,
     previousPreviewLeagueKey,
     nextPreviewLeagueKey
-  };
-}
-
-// ../grarf/desktop/src/extensionHost/grarfExtensionNewsLeaguesActiveSource.ts
-init_define_import_meta_env();
-var activeSource = null;
-var listeners4 = /* @__PURE__ */ new Set();
-function notify2() {
-  for (const listener of listeners4) {
-    listener();
-  }
-}
-function getGrarfExtensionNewsLeaguesActiveSource() {
-  return activeSource;
-}
-function setGrarfExtensionNewsLeaguesActiveSource(next) {
-  if (next == null) {
-    if (activeSource === null) return;
-    activeSource = null;
-    notify2();
-    return;
-  }
-  const leagueKey = next.leagueKey.trim().toUpperCase();
-  if (!leagueKey) return;
-  if (activeSource?.leagueKey === leagueKey && activeSource?.websiteIndex === next.websiteIndex) {
-    return;
-  }
-  activeSource = { leagueKey, websiteIndex: next.websiteIndex };
-  notify2();
-}
-function subscribeGrarfExtensionNewsLeaguesActiveSource(listener) {
-  listeners4.add(listener);
-  return () => {
-    listeners4.delete(listener);
   };
 }
 
@@ -164882,6 +165319,11 @@ function searchGrarfExtensionAiSearchEntities(input) {
       if (teamKeys.has(teamKey)) continue;
       const score2 = scoreSubstringMatch(teamLabel, query);
       if (score2 <= 0) continue;
+      const teamSelectInput = resolveSportsBrowserPrototypeLeaguesTabTeamSelectInputFromSearch(
+        leagueKey,
+        teamLabel
+      );
+      if (!teamSelectInput) continue;
       teamKeys.add(teamKey);
       const id = `team:${teamKey}`;
       if (seen.has(id)) continue;
@@ -164892,7 +165334,8 @@ function searchGrarfExtensionAiSearchEntities(input) {
         kind: "team",
         leagueKey,
         teamLabel,
-        label: teamLabel,
+        teamSelectInput,
+        label: teamSelectInput.teamDisplayName,
         typeLabel: "Team"
       });
     }
@@ -164936,17 +165379,45 @@ function resolveGrarfExtensionAiSearchEntitySubjectLabel(entity) {
 function resolveGrarfExtensionAiSearchEntityExploreScope(entity) {
   return entity ? "league" : "all-sports";
 }
-function withEntityLeagueFocus(action, entity) {
+function withEntityScope(action, entity) {
+  if (!entity) return action;
+  if (entity.kind === "team") {
+    if (action.kind === "content") {
+      return {
+        ...action,
+        focusTeamSelectInput: entity.teamSelectInput,
+        focusLeagueKey: entity.leagueKey
+      };
+    }
+    if (action.kind === "timeline") {
+      return {
+        ...action,
+        focusTeamSelectInput: entity.teamSelectInput,
+        focusLeagueKey: entity.leagueKey
+      };
+    }
+    if (action.kind === "temporal" || action.kind === "select-game") {
+      return {
+        ...action,
+        focusTeamSelectInput: entity.teamSelectInput,
+        focusLeagueKey: entity.leagueKey
+      };
+    }
+    return action;
+  }
   const focusLeagueKey = resolveGrarfExtensionAiSearchEntityFocusLeagueKey(entity);
   if (!focusLeagueKey) return action;
   if (action.kind === "temporal") {
     return { ...action, focusLeagueKey };
   }
   if (action.kind === "content") {
-    return { ...action, focusLeagueKey };
+    return entity.kind === "game" ? { ...action, focusContentGameId: entity.gameId, focusLeagueKey } : { ...action, focusLeagueKey };
   }
   if (action.kind === "select-game") {
     return { ...action, focusLeagueKey: action.focusLeagueKey ?? focusLeagueKey };
+  }
+  if (action.kind === "timeline") {
+    return { ...action, focusLeagueKey };
   }
   return action;
 }
@@ -164962,7 +165433,7 @@ function resolveGrarfExtensionAiSearchEntityWatchAction(entity) {
       focusLeagueKey: entity.leagueKey
     };
   }
-  return withEntityLeagueFocus(resolveGrarfExtensionAiSearchWatchLiveNowAction(), entity);
+  return withEntityScope(resolveGrarfExtensionAiSearchWatchLiveNowAction(), entity);
 }
 function resolveGrarfExtensionAiSearchEntityCatchUpAction(entity, day, kind) {
   const focusLeagueKey = resolveGrarfExtensionAiSearchEntityFocusLeagueKey(entity);
@@ -164978,7 +165449,8 @@ function resolveGrarfExtensionAiSearchEntityCatchUpAction(entity, day, kind) {
       focusLeagueKey: entity.leagueKey ?? focusLeagueKey
     };
   }
-  return resolveGrarfExtensionAiSearchCatchUpContentAction(day, kind, { focusLeagueKey });
+  const base = resolveGrarfExtensionAiSearchCatchUpContentAction(day, kind, { focusLeagueKey });
+  return withEntityScope(base, entity);
 }
 function resolveGrarfExtensionAiSearchEntityPrepareAction(entity, when) {
   if (entity?.kind === "game") {
@@ -164990,7 +165462,7 @@ function resolveGrarfExtensionAiSearchEntityPrepareAction(entity, when) {
       focusLeagueKey: entity.leagueKey
     };
   }
-  return withEntityLeagueFocus(resolveGrarfExtensionAiSearchPrepareGamesAction(when), entity);
+  return withEntityScope(resolveGrarfExtensionAiSearchPrepareGamesAction(when), entity);
 }
 function resolveGrarfExtensionAiSearchEntityFollowAction(entity) {
   const focusLeagueKey = resolveGrarfExtensionAiSearchEntityFocusLeagueKey(entity);
@@ -165001,20 +165473,18 @@ function resolveGrarfExtensionAiSearchEntityFollowAction(entity) {
       focusLeagueKey
     };
   }
-  if (focusLeagueKey) {
-    return {
-      kind: "timeline",
-      focusLeagueKey
-    };
+  if (entity) {
+    return withEntityScope(resolveGrarfExtensionAiSearchTimelineAction(), entity);
   }
   return resolveGrarfExtensionAiSearchTimelineAction();
 }
 function resolveGrarfExtensionAiSearchEntityExploreAction(entity, kind, scope) {
   const effectiveScope = entity ? "league" : scope;
   const focusLeagueKey = resolveGrarfExtensionAiSearchEntityFocusLeagueKey(entity);
-  return resolveGrarfExtensionAiSearchExploreContentAction(kind, effectiveScope, {
+  const base = resolveGrarfExtensionAiSearchExploreContentAction(kind, effectiveScope, {
     focusLeagueKey
   });
+  return withEntityScope(base, entity);
 }
 
 // ../grarf/desktop/src/extensionHost/GrarfExtensionAiSearchHomeSection.tsx
@@ -166626,210 +167096,6 @@ var Input = React47.forwardRef(({ className, type, ...props }, ref) => {
 });
 Input.displayName = "Input";
 
-// ../grarf/desktop/src/data/ncaafTeamPopulation.ts
-init_define_import_meta_env();
-function ncaafTeamSlug(label) {
-  return label.trim().toLowerCase().replace(/['’]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
-}
-function ncaafTeam(label) {
-  return {
-    teamKey: `ncaaf-${ncaafTeamSlug(label)}`,
-    label
-  };
-}
-var NCAAF_TEAM_POPULATION_BY_CONFERENCE = [
-  {
-    conferenceLabel: "ACC",
-    teams: [
-      ncaafTeam("Boston College"),
-      ncaafTeam("California"),
-      ncaafTeam("Clemson"),
-      ncaafTeam("Duke"),
-      ncaafTeam("Florida State"),
-      ncaafTeam("Georgia Tech"),
-      ncaafTeam("Louisville"),
-      ncaafTeam("Miami"),
-      ncaafTeam("NC State"),
-      ncaafTeam("North Carolina"),
-      ncaafTeam("Pittsburgh"),
-      ncaafTeam("SMU"),
-      ncaafTeam("Stanford"),
-      ncaafTeam("Syracuse"),
-      ncaafTeam("Virginia"),
-      ncaafTeam("Virginia Tech"),
-      ncaafTeam("Wake Forest")
-    ]
-  },
-  {
-    conferenceLabel: "American",
-    teams: [
-      ncaafTeam("Army"),
-      ncaafTeam("Charlotte"),
-      ncaafTeam("East Carolina"),
-      ncaafTeam("Florida Atlantic"),
-      ncaafTeam("Memphis"),
-      ncaafTeam("Navy"),
-      ncaafTeam("North Texas"),
-      ncaafTeam("Rice"),
-      ncaafTeam("South Florida"),
-      ncaafTeam("Temple"),
-      ncaafTeam("Tulane"),
-      ncaafTeam("Tulsa"),
-      ncaafTeam("UAB"),
-      ncaafTeam("UTSA")
-    ]
-  },
-  {
-    conferenceLabel: "Big 12",
-    teams: [
-      ncaafTeam("Arizona State"),
-      ncaafTeam("Arizona"),
-      ncaafTeam("BYU"),
-      ncaafTeam("Baylor"),
-      ncaafTeam("Cincinnati"),
-      ncaafTeam("Colorado"),
-      ncaafTeam("Houston"),
-      ncaafTeam("Iowa State"),
-      ncaafTeam("Kansas"),
-      ncaafTeam("Kansas State"),
-      ncaafTeam("Oklahoma State"),
-      ncaafTeam("TCU"),
-      ncaafTeam("Texas Tech"),
-      ncaafTeam("UCF"),
-      ncaafTeam("Utah"),
-      ncaafTeam("West Virginia")
-    ]
-  },
-  {
-    conferenceLabel: "Big Ten",
-    teams: [
-      ncaafTeam("Illinois"),
-      ncaafTeam("Indiana"),
-      ncaafTeam("Iowa"),
-      ncaafTeam("Maryland"),
-      ncaafTeam("Michigan State"),
-      ncaafTeam("Michigan"),
-      ncaafTeam("Minnesota"),
-      ncaafTeam("Nebraska"),
-      ncaafTeam("Northwestern"),
-      ncaafTeam("Ohio State"),
-      ncaafTeam("Oregon"),
-      ncaafTeam("Penn State"),
-      ncaafTeam("Purdue"),
-      ncaafTeam("Rutgers"),
-      ncaafTeam("UCLA"),
-      ncaafTeam("USC"),
-      ncaafTeam("Washington"),
-      ncaafTeam("Wisconsin")
-    ]
-  },
-  {
-    conferenceLabel: "Conference USA",
-    teams: [
-      ncaafTeam("Delaware"),
-      ncaafTeam("Florida International"),
-      ncaafTeam("Jacksonville State"),
-      ncaafTeam("Kennesaw State"),
-      ncaafTeam("Liberty"),
-      ncaafTeam("Middle Tennessee"),
-      ncaafTeam("Missouri State"),
-      ncaafTeam("New Mexico State"),
-      ncaafTeam("Sam Houston"),
-      ncaafTeam("Western Kentucky")
-    ]
-  },
-  {
-    conferenceLabel: "FBS Independents",
-    teams: [ncaafTeam("Notre Dame"), ncaafTeam("UConn")]
-  },
-  {
-    conferenceLabel: "Mid-American",
-    teams: [
-      ncaafTeam("Akron"),
-      ncaafTeam("Ball State"),
-      ncaafTeam("Bowling Green"),
-      ncaafTeam("Buffalo"),
-      ncaafTeam("Central Michigan"),
-      ncaafTeam("Eastern Michigan"),
-      ncaafTeam("Kent State"),
-      ncaafTeam("Massachusetts"),
-      ncaafTeam("Miami (OH)"),
-      ncaafTeam("Ohio"),
-      ncaafTeam("Sacramento State"),
-      ncaafTeam("Toledo"),
-      ncaafTeam("Western Michigan")
-    ]
-  },
-  {
-    conferenceLabel: "Mountain West",
-    teams: [
-      ncaafTeam("Air Force"),
-      ncaafTeam("Hawai'i"),
-      ncaafTeam("Nevada"),
-      ncaafTeam("New Mexico"),
-      ncaafTeam("North Dakota State"),
-      ncaafTeam("Northern Illinois"),
-      ncaafTeam("San Jos\xE9 State"),
-      ncaafTeam("UNLV"),
-      ncaafTeam("UTEP"),
-      ncaafTeam("Wyoming")
-    ]
-  },
-  {
-    conferenceLabel: "Pac-12",
-    teams: [
-      ncaafTeam("Boise State"),
-      ncaafTeam("Colorado State"),
-      ncaafTeam("Fresno State"),
-      ncaafTeam("Oregon State"),
-      ncaafTeam("San Diego State"),
-      ncaafTeam("Texas State"),
-      ncaafTeam("Utah State"),
-      ncaafTeam("Washington State")
-    ]
-  },
-  {
-    conferenceLabel: "SEC",
-    teams: [
-      ncaafTeam("Alabama"),
-      ncaafTeam("Arkansas"),
-      ncaafTeam("Auburn"),
-      ncaafTeam("Florida"),
-      ncaafTeam("Georgia"),
-      ncaafTeam("Kentucky"),
-      ncaafTeam("LSU"),
-      ncaafTeam("Mississippi State"),
-      ncaafTeam("Missouri"),
-      ncaafTeam("Oklahoma"),
-      ncaafTeam("Ole Miss"),
-      ncaafTeam("South Carolina"),
-      ncaafTeam("Tennessee"),
-      ncaafTeam("Texas A&M"),
-      ncaafTeam("Texas"),
-      ncaafTeam("Vanderbilt")
-    ]
-  },
-  {
-    conferenceLabel: "Sun Belt",
-    teams: [
-      ncaafTeam("App State"),
-      ncaafTeam("Arkansas State"),
-      ncaafTeam("Coastal Carolina"),
-      ncaafTeam("Georgia Southern"),
-      ncaafTeam("Georgia State"),
-      ncaafTeam("James Madison"),
-      ncaafTeam("Louisiana"),
-      ncaafTeam("Louisiana Tech"),
-      ncaafTeam("Marshall"),
-      ncaafTeam("Old Dominion"),
-      ncaafTeam("South Alabama"),
-      ncaafTeam("Southern Miss"),
-      ncaafTeam("Troy"),
-      ncaafTeam("UL Monroe")
-    ]
-  }
-];
-
 // ../grarf/desktop/src/lib/gamesSpine/leaguesTabProTeamLogoUrl.ts
 init_define_import_meta_env();
 var NHL_ESPN_SCOREBOARD_SLUG = {
@@ -167694,10 +167960,19 @@ function SidebarTemporalLeagueBlock({
   extensionGamesYesterdayHighlightsNavigation = null,
   temporalSectionPrefix
 }) {
+  const teamScopeInput = (0, import_react289.useMemo)(
+    () => selectedGameId ? resolveSportsBrowserPrototypeLeaguesTabTeamSelectInputFromGameId(selectedGameId) : null,
+    [selectedGameId]
+  );
+  const scopedGames = (0, import_react289.useMemo)(
+    () => teamScopeInput ? filterOperationalGamesForSportsBrowserPrototypeLeaguesTabTeam(slate.games, teamScopeInput) : slate.games,
+    [slate.games, teamScopeInput]
+  );
+  const hideForTeamScope = teamScopeInput != null && teamScopeInput.leagueKey.trim().toUpperCase() !== slate.key.trim().toUpperCase();
   const usesTennisTournamentGrouping = shouldGroupSportsBrowserSidebarLeagueByTournament(slate.key);
   const tournamentGroups = (0, import_react289.useMemo)(
-    () => usesTennisTournamentGrouping ? groupSportsBrowserSidebarTennisGamesByTournament(slate.games) : [],
-    [usesTennisTournamentGrouping, slate.games]
+    () => usesTennisTournamentGrouping ? groupSportsBrowserSidebarTennisGamesByTournament(scopedGames) : [],
+    [scopedGames, usesTennisTournamentGrouping]
   );
   const tournamentIndent = Math.min(indent + 1, 3);
   const [gameExploreExpandedIds, setGameExploreExpandedIds] = (0, import_react289.useState)(
@@ -167826,7 +168101,7 @@ function SidebarTemporalLeagueBlock({
   const extensionTemporalNestedLeagueShell = isGrarfExtensionRenderer() && (extensionGamesYesterdayRecapsNavActive || !extensionGamesYesterdayDirectLeagueRowCatchUp && !extensionGamesYesterdayHighlightsUnsupported);
   const extensionTodayGameStatusSections = isGrarfExtensionRenderer() && temporalSectionPrefix === "today" && Boolean(resolveVariant) && !extensionGamesYesterdayHighlightsDirectNavigation;
   const renderTodayGameStatusSectionedGames = () => {
-    const { live, upcoming, final: finalGames } = groupSportsBrowserPrototypeSidebarTodayGamesByStatus(slate.games);
+    const { live, upcoming, final: finalGames } = groupSportsBrowserPrototypeSidebarTodayGamesByStatus(scopedGames);
     const sections = [];
     if (live.length > 0) {
       sections.push({ id: "live", label: `LIVE (${live.length})`, games: live });
@@ -167850,6 +168125,9 @@ function SidebarTemporalLeagueBlock({
       /* @__PURE__ */ (0, import_jsx_runtime282.jsx)(SidebarTemporalGamesBox, { children: section.games.map((game) => renderGameRow(game)) })
     ] }, section.id));
   };
+  if (hideForTeamScope) {
+    return null;
+  }
   return /* @__PURE__ */ (0, import_jsx_runtime282.jsxs)(
     "div",
     {
@@ -167869,7 +168147,7 @@ function SidebarTemporalLeagueBlock({
             soccerArchChildLeague,
             expanded: extensionGamesYesterdayDirectLeagueRowCatchUp || extensionGamesYesterdayHighlightsUnsupported ? false : expanded,
             leagueKey: slate.key,
-            leagueGames: slate.games,
+            leagueGames: scopedGames,
             onClick: extensionGamesYesterdayHighlightsUnsupported ? void 0 : extensionGamesYesterdayDirectLeagueRowRecaps ? () => navigateGrarfExtensionGamesYesterdayDirectLeagueRowRecaps(slate.key) : extensionGamesYesterdayDirectLeagueRowHighlights ? () => navigateGrarfExtensionGamesYesterdayDirectLeagueRowHighlights(slate.key) : onToggle,
             hideTrailingChevron: extensionGamesYesterdayDirectLeagueRowCatchUp || extensionGamesYesterdayHighlightsUnsupported,
             isSelected: isLeagueSelected,
@@ -167931,7 +168209,7 @@ function SidebarTemporalLeagueBlock({
                 (game) => renderGameRow(game, { sidebarTennisTournamentGrouped: true })
               ) : null
             ] }, `${slate.key}-${group.key}`);
-          }) : slate.games.map((game) => renderGameRow(game)) })
+          }) : scopedGames.map((game) => renderGameRow(game)) })
         ] }) : null
       ]
     }
@@ -169322,8 +169600,23 @@ function SportsBrowserPrototypeLeftNav({
     () => todayCompleteLeagues.map((slate) => ({ key: slate.key, label: slate.label })),
     [todayCompleteLeagues]
   );
+  const resolveAiSearchGameById = (0, import_react289.useCallback)(
+    (gameId) => aiSearchGamesCorpus.find((candidate) => candidate.id === gameId),
+    [aiSearchGamesCorpus]
+  );
   const executeGrarfExtensionAiSearchAction = (0, import_react289.useCallback)(
     (action) => {
+      const applyEntityScope = () => {
+        applyGrarfExtensionAiSearchNavigationScope({
+          action,
+          onTemporalLeagueSelect,
+          onGameSelect,
+          onLeaguesNavDestinationSelect,
+          onTemporaryNavContentTeamDestinationSelect,
+          onTemporaryNavContentGameDestinationSelect,
+          resolveGameById: resolveAiSearchGameById
+        });
+      };
       switch (action.kind) {
         case "temporal":
           onCompactTemporalSelect(action.view);
@@ -169333,9 +169626,7 @@ function SportsBrowserPrototypeLeftNav({
             gamesCatchUpContentAxis: action.gamesCatchUpContentAxis
           });
           handleTemporaryNavTopLevelChange(action.temporaryNavTopLevel);
-          if (action.focusLeagueKey) {
-            onTemporalLeagueSelect(action.focusLeagueKey);
-          }
+          applyEntityScope();
           scrollExtensionSidebarToBrowseFromAiSearch();
           return;
         case "content":
@@ -169360,9 +169651,7 @@ function SportsBrowserPrototypeLeftNav({
           if (action.globalWebsiteIndex != null) {
             onTemporaryNavGlobalDestinationSelect?.(action.section, action.globalWebsiteIndex);
           }
-          if (action.focusLeagueKey) {
-            onTemporalLeagueSelect(action.focusLeagueKey);
-          }
+          applyEntityScope();
           scrollExtensionSidebarToBrowseFromAiSearch();
           return;
         case "explore-leagues":
@@ -169388,26 +169677,12 @@ function SportsBrowserPrototypeLeftNav({
           if (action.temporalView) {
             onCompactTemporalSelect(action.temporalView);
           }
-          if (action.focusLeagueKey) {
-            onTemporalLeagueSelect(action.focusLeagueKey);
-          }
-          const game = aiSearchGamesCorpus.find((candidate) => candidate.id === action.gameId);
-          if (game) {
-            onGameSelect?.(game);
-          }
+          applyEntityScope();
           scrollExtensionSidebarToBrowseFromAiSearch();
           return;
         }
         case "timeline": {
-          if (action.focusLeagueKey) {
-            onTemporalLeagueSelect(action.focusLeagueKey);
-          }
-          if (action.gameId) {
-            const game = aiSearchGamesCorpus.find((candidate) => candidate.id === action.gameId);
-            if (game) {
-              onGameSelect?.(game);
-            }
-          }
+          applyEntityScope();
           useGrarfExtensionSidePanelSectionStore.getState().selectSection("timeline", { pinCommandCenterAtTop: false });
           return;
         }
@@ -169418,18 +169693,19 @@ function SportsBrowserPrototypeLeftNav({
       }
     },
     [
-      aiSearchGamesCorpus,
       handleTemporaryNavContentNavChange,
       handleTemporaryNavTopLevelChange,
       onCompactTemporalSelect,
       onGameSelect,
+      onLeaguesNavDestinationSelect,
+      onTemporaryNavContentGameDestinationSelect,
       onTemporaryNavContentNavChange,
       onTemporalLeagueSelect,
+      onTemporaryNavContentTeamDestinationSelect,
       onTemporaryNavGlobalDestinationSelect,
       requestTemporaryNavTopLevel,
-      scrollExtensionSidebarToBrowse,
+      resolveAiSearchGameById,
       scrollExtensionSidebarToBrowseFromAiSearch,
-      scrollExtensionSidebarToTemporalNav,
       setLeaguesSortMode
     ]
   );
