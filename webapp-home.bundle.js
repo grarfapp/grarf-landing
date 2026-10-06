@@ -19008,6 +19008,43 @@ function formatBroadcastsSubtitle(game, max2 = 6, sep = " \u2022 ") {
 // ../grarf/desktop/src/lib/broadcast/resolveChannelLogoUrl.ts
 init_define_import_meta_env();
 
+// ../grarf/desktop/src/lib/branding/grarfExtensionFoxBrandLogo.ts
+init_define_import_meta_env();
+init_isGrarfWebRenderer();
+var GRARF_EXTENSION_FOX_BRAND_LOGO_URL = "/league-logos/source-fox-wordmark.png";
+function normalizeFoxBrandKey(value) {
+  return value.trim().replace(/\s+/g, " ").toUpperCase();
+}
+function isGrarfExtensionFoxSportsPublisherUrl(url) {
+  const trimmed = url.trim();
+  if (!trimmed) return false;
+  try {
+    const host = new URL(trimmed).hostname.toLowerCase();
+    return host === "foxsports.com" || host.endsWith(".foxsports.com");
+  } catch {
+    return false;
+  }
+}
+function isGrarfExtensionFoxOrFoxSportsBrandLabel(label) {
+  const key2 = normalizeFoxBrandKey(label);
+  if (!key2) return false;
+  if (key2 === "FOX" || key2 === "FOX SPORTS") return true;
+  if (/\bFS1\b/.test(key2) || /\bFS2\b/.test(key2)) return false;
+  return /\bFOX\b/.test(key2);
+}
+function resolveGrarfExtensionFoxBrandLogoUrl(options) {
+  if (!isGrarfExtensionRenderer()) return void 0;
+  const sourceId = options.sourceId?.trim().toLowerCase();
+  if (sourceId === "fox") return GRARF_EXTENSION_FOX_BRAND_LOGO_URL;
+  if (options.url && isGrarfExtensionFoxSportsPublisherUrl(options.url)) {
+    return GRARF_EXTENSION_FOX_BRAND_LOGO_URL;
+  }
+  if (options.label && isGrarfExtensionFoxOrFoxSportsBrandLabel(options.label)) {
+    return GRARF_EXTENSION_FOX_BRAND_LOGO_URL;
+  }
+  return void 0;
+}
+
 // ../grarf/desktop/src/lib/broadcast/nbaTvBroadcast.ts
 init_define_import_meta_env();
 
@@ -19080,6 +19117,8 @@ function isEspnFamilyBroadcastLabel(channelLabel) {
   return false;
 }
 function resolveChannelLogoUrl(channelLabel) {
+  const extensionFox = resolveGrarfExtensionFoxBrandLogoUrl({ label: channelLabel });
+  if (extensionFox) return extensionFox;
   const key2 = normalizeChannelLogoKey(channelLabel);
   if (!key2) return null;
   if (isEspnFamilyBroadcastLabel(key2)) return ESPN_CHANNEL_LOGO_URL;
@@ -56944,7 +56983,8 @@ var FOX_CHANNEL_LOGO_PATH = "/league-logos/channel-fox.png";
 var ION_CHANNEL_LOGO_PATH = "/league-logos/channel-ion.png";
 var ABC_CHANNEL_LOGO_PATH = "/league-logos/channel-abc.png";
 function logoUrlIsFoxAsset(logoUrl) {
-  return logoUrl.trim().toLowerCase().includes("channel-fox");
+  const lower = logoUrl.trim().toLowerCase();
+  return lower.includes("channel-fox") || lower.includes("source-fox-wordmark");
 }
 function logoUrlIsEspnAsset(logoUrl) {
   const lower = logoUrl.trim().toLowerCase();
@@ -58593,6 +58633,11 @@ function buildHomeLeagueWorkspaceFantasyCategory(sources) {
 
 // ../grarf/desktop/src/lib/home/websitePaneBranding.ts
 init_define_import_meta_env();
+function resolveWebsitePaneSiteIconUrl(url) {
+  const extensionFox = resolveGrarfExtensionFoxBrandLogoUrl({ url });
+  if (extensionFox) return extensionFox;
+  return resolveWebsiteFaviconUrl(url);
+}
 function resolveWebsiteFaviconUrl(url) {
   const trimmed = url.trim();
   if (!trimmed) return null;
@@ -68312,7 +68357,7 @@ var import_jsx_runtime28 = __toESM(require_jsx_runtime(), 1);
 var NAV_ITEMS = [
   { id: "home", label: "Home", icon: House },
   { id: "browse", label: "Explore", icon: Compass },
-  { id: "timeline", label: "Timeline", icon: ScrollText }
+  { id: "timeline", label: "Feed", icon: ScrollText }
 ];
 function GrarfExtensionSidePanelBottomNav({
   activeItemId = "home",
@@ -89236,17 +89281,20 @@ function useHomeSportscapeHeadlinesRss() {
 // ../grarf/desktop/src/lib/sportscape/resolveSportscapeHeadlinesSourceLogoUrl.ts
 init_define_import_meta_env();
 var LOCAL_SOURCE_LOGOS = {
-  cbs: CBS_CHANNEL_LOGO_URL,
   fox: "/league-logos/channel-fox.png",
   athletic: "/league-logos/source-the-athletic.png"
 };
 var FAVICON_PUBLISHER_URL_BY_SOURCE = {
+  espn: "https://www.espn.com/",
+  cbs: "https://www.cbssports.com/",
   yahoo: "https://sports.yahoo.com/",
   si: "https://www.si.com/",
   nbc: "https://www.nbcsports.com/",
   yardbarker: "https://www.yardbarker.com/"
 };
 function resolveSportscapeHeadlinesSourceLogoUrl(sourceId) {
+  const extensionFox = resolveGrarfExtensionFoxBrandLogoUrl({ sourceId });
+  if (extensionFox) return extensionFox;
   const local = LOCAL_SOURCE_LOGOS[sourceId];
   if (local) return local;
   const publisherUrl = FAVICON_PUBLISHER_URL_BY_SOURCE[sourceId];
@@ -107729,6 +107777,8 @@ function normalizeNewswireSourceLogoKey(source) {
 function resolveNewswireSourceLogoUrl(source) {
   const key2 = normalizeNewswireSourceLogoKey(source);
   if (!key2) return null;
+  const extensionFox = resolveGrarfExtensionFoxBrandLogoUrl({ label: source, sourceId: key2.toLowerCase() });
+  if (extensionFox) return extensionFox;
   const local = LOCAL_NEWSWIRE_SOURCE_LOGOS[key2];
   if (local) return local;
   const fromChannel = resolveChannelLogoUrl(source);
@@ -129192,7 +129242,7 @@ init_define_import_meta_env();
 var import_react186 = __toESM(require_react(), 1);
 var import_jsx_runtime151 = __toESM(require_jsx_runtime(), 1);
 function WebsitePaneSiteIcon({ url, className }) {
-  const faviconUrl = (0, import_react186.useMemo)(() => resolveWebsiteFaviconUrl(url), [url]);
+  const faviconUrl = (0, import_react186.useMemo)(() => resolveWebsitePaneSiteIconUrl(url), [url]);
   const [failed, setFailed] = (0, import_react186.useState)(false);
   if (!faviconUrl || failed) {
     return /* @__PURE__ */ (0, import_jsx_runtime151.jsx)("span", { className: cn2("h-1 w-1 shrink-0 rounded-full bg-textdim/55", className), "aria-hidden": true });
@@ -165830,7 +165880,7 @@ var EXPLORE_CONTENT_OPTIONS = [
 ];
 var EXPLORE_SCOPE_OPTIONS = [
   { label: "all sports", scope: "all-sports" },
-  { label: "a league", scope: "league" }
+  { label: "every league", scope: "league" }
 ];
 function InlineSelector({
   value,
@@ -170603,7 +170653,7 @@ function SportsBrowserPrototypeExtensionSidebarTimelineSection({ onClipOpen }) {
       className: "flex shrink-0 flex-col border-t border-border bg-background",
       "data-grarf-extension-sidebar-timeline-section": true,
       "data-sports-browser-side-pane-timeline": true,
-      "aria-label": "Timeline",
+      "aria-label": "Feed",
       children: [
         /* @__PURE__ */ (0, import_jsx_runtime286.jsxs)(
           "div",
@@ -170611,7 +170661,7 @@ function SportsBrowserPrototypeExtensionSidebarTimelineSection({ onClipOpen }) {
             className: "flex shrink-0 items-start justify-between gap-2 border-b border-border px-3 py-2",
             "data-grarf-extension-sidebar-timeline-header": "",
             children: [
-              /* @__PURE__ */ (0, import_jsx_runtime286.jsx)("h2", { className: "shrink-0 text-base font-semibold tracking-tight", children: "Timeline" }),
+              /* @__PURE__ */ (0, import_jsx_runtime286.jsx)("h2", { className: "shrink-0 text-base font-semibold tracking-tight", children: "Feed" }),
               /* @__PURE__ */ (0, import_jsx_runtime286.jsx)(
                 GrarfExtensionTimelineFeedFilterControls,
                 {
