@@ -29629,13 +29629,19 @@ function parseFlashscoreSoccerFeed(raw) {
 
 // ../grarf/grarf-operational-service/src/watch/soccerway/soccerwayLeagueRegistry.ts
 init_define_import_meta_env();
+function soccerwayCatalogPages(path) {
+  const base = `https://us.soccerway.com/${path.replace(/^\/+|\/+$/g, "")}`;
+  return [`${base}/fixtures/`, `${base}/results/`];
+}
 var SOCCERWAY_SOCCER_LEAGUE_REGISTRY = {
-  LALIGA: {
-    catalogPageUrls: [
-      "https://us.soccerway.com/spain/laliga/fixtures/",
-      "https://us.soccerway.com/spain/laliga/results/"
-    ]
-  }
+  BUNDESLIGA: { catalogPageUrls: soccerwayCatalogPages("germany/bundesliga") },
+  EPL: { catalogPageUrls: soccerwayCatalogPages("england/premier-league") },
+  LALIGA: { catalogPageUrls: soccerwayCatalogPages("spain/laliga") },
+  LIGUE1: { catalogPageUrls: soccerwayCatalogPages("france/ligue-1") },
+  NATIONS: { catalogPageUrls: soccerwayCatalogPages("europe/uefa-nations-league") },
+  SERIEA: { catalogPageUrls: soccerwayCatalogPages("italy/serie-a") },
+  UCL: { catalogPageUrls: soccerwayCatalogPages("europe/champions-league") },
+  UEL: { catalogPageUrls: soccerwayCatalogPages("europe/europa-league") }
 };
 function getSoccerwayLeagueRegistryEntry(leagueKey) {
   return SOCCERWAY_SOCCER_LEAGUE_REGISTRY[leagueKey] ?? null;

@@ -33385,13 +33385,19 @@ function parseFlashscoreSoccerFeed(raw) {
 
 // ../grarf/grarf-operational-service/src/watch/soccerway/soccerwayLeagueRegistry.ts
 init_define_import_meta_env();
+function soccerwayCatalogPages(path) {
+  const base = `https://us.soccerway.com/${path.replace(/^\/+|\/+$/g, "")}`;
+  return [`${base}/fixtures/`, `${base}/results/`];
+}
 var SOCCERWAY_SOCCER_LEAGUE_REGISTRY = {
-  LALIGA: {
-    catalogPageUrls: [
-      "https://us.soccerway.com/spain/laliga/fixtures/",
-      "https://us.soccerway.com/spain/laliga/results/"
-    ]
-  }
+  BUNDESLIGA: { catalogPageUrls: soccerwayCatalogPages("germany/bundesliga") },
+  EPL: { catalogPageUrls: soccerwayCatalogPages("england/premier-league") },
+  LALIGA: { catalogPageUrls: soccerwayCatalogPages("spain/laliga") },
+  LIGUE1: { catalogPageUrls: soccerwayCatalogPages("france/ligue-1") },
+  NATIONS: { catalogPageUrls: soccerwayCatalogPages("europe/uefa-nations-league") },
+  SERIEA: { catalogPageUrls: soccerwayCatalogPages("italy/serie-a") },
+  UCL: { catalogPageUrls: soccerwayCatalogPages("europe/champions-league") },
+  UEL: { catalogPageUrls: soccerwayCatalogPages("europe/europa-league") }
 };
 function getSoccerwayLeagueRegistryEntry(leagueKey) {
   return SOCCERWAY_SOCCER_LEAGUE_REGISTRY[leagueKey] ?? null;
@@ -150720,7 +150726,14 @@ async function resolveFotmobHighlightYoutubeUrl(game) {
 }
 
 // ../grarf/desktop/src/extensionHost/grarfExtensionGameFotmobYoutubeHighlightsUrl.ts
-var GRARF_EXTENSION_FOTMOB_YOUTUBE_HIGHLIGHTS_LEAGUE_KEYS = /* @__PURE__ */ new Set(["LALIGA"]);
+var GRARF_EXTENSION_FOTMOB_YOUTUBE_HIGHLIGHTS_LEAGUE_KEYS = /* @__PURE__ */ new Set([
+  "BUNDESLIGA",
+  "EPL",
+  "LALIGA",
+  "LIGUE1",
+  "SERIEA",
+  "UCL"
+]);
 function grarfExtensionLeagueUsesGamesYesterdayFotmobYoutubeHighlights(leagueKey) {
   return GRARF_EXTENSION_FOTMOB_YOUTUBE_HIGHLIGHTS_LEAGUE_KEYS.has(leagueKey.trim().toUpperCase());
 }
@@ -150856,7 +150869,16 @@ function resolveSoccerwayMatchReportUrl(game) {
 }
 
 // ../grarf/desktop/src/extensionHost/grarfExtensionGameSoccerwayRecapsUrl.ts
-var GRARF_EXTENSION_SOCCERWAY_RECAPS_LEAGUE_KEYS = /* @__PURE__ */ new Set(["LALIGA"]);
+var GRARF_EXTENSION_SOCCERWAY_RECAPS_LEAGUE_KEYS = /* @__PURE__ */ new Set([
+  "BUNDESLIGA",
+  "EPL",
+  "LALIGA",
+  "LIGUE1",
+  "NATIONS",
+  "SERIEA",
+  "UCL",
+  "UEL"
+]);
 function buildGrarfExtensionGameSoccerwayRecapsUrl(game) {
   const leagueKey = game.league?.trim().toUpperCase() ?? "";
   if (!GRARF_EXTENSION_SOCCERWAY_RECAPS_LEAGUE_KEYS.has(leagueKey)) {
