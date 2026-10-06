@@ -382,20 +382,20 @@ var require_vanilla = __commonJS({
     init_define_import_meta_env();
     var createStoreImpl = (createState) => {
       let state3;
-      const listeners5 = /* @__PURE__ */ new Set();
+      const listeners6 = /* @__PURE__ */ new Set();
       const setState = (partial, replace2) => {
         const nextState = typeof partial === "function" ? partial(state3) : partial;
         if (!Object.is(nextState, state3)) {
           const previousState = state3;
           state3 = (replace2 != null ? replace2 : typeof nextState !== "object" || nextState === null) ? nextState : Object.assign({}, state3, nextState);
-          listeners5.forEach((listener) => listener(state3, previousState));
+          listeners6.forEach((listener) => listener(state3, previousState));
         }
       };
       const getState = () => state3;
       const getInitialState = () => initialState2;
       const subscribe2 = (listener) => {
-        listeners5.add(listener);
-        return () => listeners5.delete(listener);
+        listeners6.add(listener);
+        return () => listeners6.delete(listener);
       };
       const api = { setState, getState, getInitialState, subscribe: subscribe2 };
       const initialState2 = state3 = createState(setState, getState, api);
@@ -3819,15 +3819,15 @@ var require_react_dom_client_production = __commonJS({
       return value;
     }
     var AbortControllerLocal = "undefined" !== typeof AbortController ? AbortController : function() {
-      var listeners5 = [], signal = this.signal = {
+      var listeners6 = [], signal = this.signal = {
         aborted: false,
         addEventListener: function(type, listener) {
-          listeners5.push(listener);
+          listeners6.push(listener);
         }
       };
       this.abort = function() {
         signal.aborted = true;
-        listeners5.forEach(function(listener) {
+        listeners6.forEach(function(listener) {
           return listener();
         });
       };
@@ -3879,33 +3879,33 @@ var require_react_dom_client_production = __commonJS({
     function pingEngtangledActionScope() {
       if (0 === --currentEntangledPendingCount && null !== currentEntangledListeners) {
         null !== currentEntangledActionThenable && (currentEntangledActionThenable.status = "fulfilled");
-        var listeners5 = currentEntangledListeners;
+        var listeners6 = currentEntangledListeners;
         currentEntangledListeners = null;
         currentEntangledLane = 0;
         currentEntangledActionThenable = null;
-        for (var i2 = 0; i2 < listeners5.length; i2++) (0, listeners5[i2])();
+        for (var i2 = 0; i2 < listeners6.length; i2++) (0, listeners6[i2])();
       }
     }
     function chainThenableValue(thenable, result) {
-      var listeners5 = [], thenableWithOverride = {
+      var listeners6 = [], thenableWithOverride = {
         status: "pending",
         value: null,
         reason: null,
         then: function(resolve) {
-          listeners5.push(resolve);
+          listeners6.push(resolve);
         }
       };
       thenable.then(
         function() {
           thenableWithOverride.status = "fulfilled";
           thenableWithOverride.value = result;
-          for (var i2 = 0; i2 < listeners5.length; i2++) (0, listeners5[i2])(result);
+          for (var i2 = 0; i2 < listeners6.length; i2++) (0, listeners6[i2])(result);
         },
         function(error) {
           thenableWithOverride.status = "rejected";
           thenableWithOverride.reason = error;
-          for (error = 0; error < listeners5.length; error++)
-            (0, listeners5[error])(void 0);
+          for (error = 0; error < listeners6.length; error++)
+            (0, listeners6[error])(void 0);
         }
       );
       return thenableWithOverride;
@@ -10916,15 +10916,15 @@ var require_react_dom_client_production = __commonJS({
       };
     }
     function accumulateTwoPhaseListeners(targetFiber, reactName) {
-      for (var captureName = reactName + "Capture", listeners5 = []; null !== targetFiber; ) {
+      for (var captureName = reactName + "Capture", listeners6 = []; null !== targetFiber; ) {
         var _instance2 = targetFiber, stateNode = _instance2.stateNode;
         _instance2 = _instance2.tag;
-        5 !== _instance2 && 26 !== _instance2 && 27 !== _instance2 || null === stateNode || (_instance2 = getListener(targetFiber, captureName), null != _instance2 && listeners5.unshift(
+        5 !== _instance2 && 26 !== _instance2 && 27 !== _instance2 || null === stateNode || (_instance2 = getListener(targetFiber, captureName), null != _instance2 && listeners6.unshift(
           createDispatchListener(targetFiber, _instance2, stateNode)
-        ), _instance2 = getListener(targetFiber, reactName), null != _instance2 && listeners5.push(
+        ), _instance2 = getListener(targetFiber, reactName), null != _instance2 && listeners6.push(
           createDispatchListener(targetFiber, _instance2, stateNode)
         ));
-        if (3 === targetFiber.tag) return listeners5;
+        if (3 === targetFiber.tag) return listeners6;
         targetFiber = targetFiber.return;
       }
       return [];
@@ -10937,18 +10937,18 @@ var require_react_dom_client_production = __commonJS({
       return inst ? inst : null;
     }
     function accumulateEnterLeaveListenersForEvent(dispatchQueue, event, target, common, inCapturePhase) {
-      for (var registrationName = event._reactName, listeners5 = []; null !== target && target !== common; ) {
+      for (var registrationName = event._reactName, listeners6 = []; null !== target && target !== common; ) {
         var _instance3 = target, alternate = _instance3.alternate, stateNode = _instance3.stateNode;
         _instance3 = _instance3.tag;
         if (null !== alternate && alternate === common) break;
-        5 !== _instance3 && 26 !== _instance3 && 27 !== _instance3 || null === stateNode || (alternate = stateNode, inCapturePhase ? (stateNode = getListener(target, registrationName), null != stateNode && listeners5.unshift(
+        5 !== _instance3 && 26 !== _instance3 && 27 !== _instance3 || null === stateNode || (alternate = stateNode, inCapturePhase ? (stateNode = getListener(target, registrationName), null != stateNode && listeners6.unshift(
           createDispatchListener(target, stateNode, alternate)
-        )) : inCapturePhase || (stateNode = getListener(target, registrationName), null != stateNode && listeners5.push(
+        )) : inCapturePhase || (stateNode = getListener(target, registrationName), null != stateNode && listeners6.push(
           createDispatchListener(target, stateNode, alternate)
         )));
         target = target.return;
       }
-      0 !== listeners5.length && dispatchQueue.push({ event, listeners: listeners5 });
+      0 !== listeners6.length && dispatchQueue.push({ event, listeners: listeners6 });
     }
     var NORMALIZE_NEWLINES_REGEX = /\r\n?/g;
     var NORMALIZE_NULL_AND_REPLACEMENT_REGEX = /\u0000|\uFFFD/g;
@@ -147250,7 +147250,7 @@ function MlbUpcomingGameWorkspaceBrowserNav({
     () => resolveMlbUpcomingGameWorkspaceGameCenterWebsites(context2),
     [context2]
   );
-  const activeWebsiteIndex = paneState.activeTabIndex ?? 0;
+  const activeWebsiteIndex2 = paneState.activeTabIndex ?? 0;
   (0, import_react266.useLayoutEffect)(() => {
     const measureRoot = measureRef.current;
     if (!measureRoot) return;
@@ -147274,7 +147274,7 @@ function MlbUpcomingGameWorkspaceBrowserNav({
     if (!control) return;
     const rect = control.getBoundingClientRect();
     setGameCenterMenuPosition({ top: rect.bottom, left: rect.left });
-  }, [gameCenterMenuOpen, childSection, activeWebsiteIndex]);
+  }, [gameCenterMenuOpen, childSection, activeWebsiteIndex2]);
   (0, import_react266.useEffect)(() => {
     if (!gameCenterMenuOpen) return;
     const onPointerDown = (event) => {
@@ -147432,7 +147432,7 @@ function MlbUpcomingGameWorkspaceBrowserNav({
                             left: gameCenterMenuPosition.left
                           },
                           children: gameCenterWebsites.map((website4, websiteIndex) => {
-                            const websiteActive = websiteIndex === activeWebsiteIndex;
+                            const websiteActive = websiteIndex === activeWebsiteIndex2;
                             return /* @__PURE__ */ (0, import_jsx_runtime235.jsx)(
                               "button",
                               {
@@ -147550,7 +147550,7 @@ function MlbLiveGameWorkspaceBrowserNav({
     if (espn) ordered.push(espn);
     return ordered.length > 0 ? ordered : gameCenterWebsites;
   }, [gameCenterWebsites]);
-  const activeWebsiteIndex = paneState.activeTabIndex ?? 0;
+  const activeWebsiteIndex2 = paneState.activeTabIndex ?? 0;
   const defaultLiveGameCenterIndex = (0, import_react266.useMemo)(() => {
     const mlbIndex = gameCenterWebsites.findIndex((website4) => website4.label === "MLB.com");
     return mlbIndex >= 0 ? mlbIndex : 0;
@@ -147578,7 +147578,7 @@ function MlbLiveGameWorkspaceBrowserNav({
     if (!control) return;
     const rect = control.getBoundingClientRect();
     setGameCenterMenuPosition({ top: rect.bottom, left: rect.left });
-  }, [gameCenterMenuOpen, childSection, activeWebsiteIndex]);
+  }, [gameCenterMenuOpen, childSection, activeWebsiteIndex2]);
   (0, import_react266.useEffect)(() => {
     if (!gameCenterMenuOpen) return;
     const onPointerDown = (event) => {
@@ -147737,7 +147737,7 @@ function MlbLiveGameWorkspaceBrowserNav({
                           },
                           children: gameCenterMenuWebsites.map((website4) => {
                             const websiteIndex = gameCenterWebsites.indexOf(website4);
-                            const websiteActive = websiteIndex === activeWebsiteIndex;
+                            const websiteActive = websiteIndex === activeWebsiteIndex2;
                             return /* @__PURE__ */ (0, import_jsx_runtime235.jsx)(
                               "button",
                               {
@@ -147887,7 +147887,7 @@ function SportsBrowserPrototypeGameContextInlineTabs({
     context2,
     activeSection
   ) : isSportsBrowserPrototypeGameContextSectionWithContentSourceChildren(game, activeSection) ? getSportsBrowserPrototypeGameContextSectionWebsites(game, context2, activeSection) : [];
-  const activeWebsiteIndex = paneState.activeTabIndex ?? 0;
+  const activeWebsiteIndex2 = paneState.activeTabIndex ?? 0;
   const measureRef = (0, import_react266.useRef)(null);
   const [parentTabWidthPx, setParentTabWidthPx] = (0, import_react266.useState)(null);
   const parentMeasureLabels = (0, import_react266.useMemo)(() => {
@@ -148016,7 +148016,7 @@ function SportsBrowserPrototypeGameContextInlineTabs({
             ),
             "data-sports-browser-prototype-game-context-inline-child-tabs": true,
             children: activeWebsites.map((website4, websiteIndex) => {
-              const websiteActive = websiteIndex === activeWebsiteIndex;
+              const websiteActive = websiteIndex === activeWebsiteIndex2;
               return /* @__PURE__ */ (0, import_jsx_runtime235.jsx)(
                 "button",
                 {
@@ -148053,7 +148053,7 @@ function SportsBrowserPrototypeLeagueNewsInlineTabs({
     paneState,
     activeSection
   );
-  const activeWebsiteIndex = paneState.activeTabIndex ?? 0;
+  const activeWebsiteIndex2 = paneState.activeTabIndex ?? 0;
   const measureRef = (0, import_react267.useRef)(null);
   const [parentTabWidthPx, setParentTabWidthPx] = (0, import_react267.useState)(null);
   const parentMeasureKey = (0, import_react267.useMemo)(
@@ -148137,7 +148137,7 @@ function SportsBrowserPrototypeLeagueNewsInlineTabs({
             ),
             "data-sports-browser-prototype-league-news-inline-child-tabs": true,
             children: activeWebsites.map((website4, websiteIndex) => {
-              const websiteActive = websiteIndex === activeWebsiteIndex;
+              const websiteActive = websiteIndex === activeWebsiteIndex2;
               return /* @__PURE__ */ (0, import_jsx_runtime236.jsx)(
                 "button",
                 {
@@ -149137,7 +149137,7 @@ function resolveSportsBrowserPrototypeTemporaryNavDestinationSelection(pane) {
     leagueKey: pane.leagueKey,
     sidebarArchLeagueKey: pane.sidebarArchLeagueKey ?? null,
     leagueContextSection: pane.leagueContextSection ?? null,
-    websiteIndex: pane.showWebsiteTabs === false ? null : pane.activeTabIndex,
+    websiteIndex: pane.showWebsiteTabs === false || pane.activeTabIndex < 0 ? null : pane.activeTabIndex,
     url: pane.url
   };
 }
@@ -150274,7 +150274,8 @@ var snapshot = {
   gamesYesterdaySelector3Label: null,
   gamesCompactTemporalView: "today",
   leaguesLensSection: null,
-  gamesCatchUpContentAxis: null
+  gamesCatchUpContentAxis: null,
+  temporaryNavContentScope: null
 };
 var snapshotListeners = /* @__PURE__ */ new Set();
 function subscribeGrarfExtensionGamesYesterdayHighlightsNavSnapshot(listener) {
@@ -162463,6 +162464,9 @@ var GRARF_EXTENSION_SEQUENTIAL_NAV_SCOPE_ATTR = "data-grarf-extension-sequential
 var GRARF_EXTENSION_SEQUENTIAL_NAV_TARGET_ATTR = "data-grarf-extension-sequential-nav-target";
 var GRARF_EXTENSION_SEQUENTIAL_NAV_CURRENT_ATTR = "data-grarf-extension-sequential-nav-current";
 function resolveGrarfExtensionSidebarSequentialNavScopeId(snapshot2) {
+  if (snapshot2.temporaryNavTopLevel === "NEWS" && (snapshot2.temporaryNavContentScope === "outlets" || snapshot2.gamesSelector2Label.trim().toUpperCase() === "OUTLETS")) {
+    return "news-outlets";
+  }
   if (snapshot2.leaguesLensSection === "news") {
     return "leagues-news";
   }
@@ -162486,11 +162490,24 @@ function resolveGrarfExtensionSidebarSequentialNavScopeId(snapshot2) {
 // ../grarf/desktop/src/extensionHost/grarfExtensionSidebarSequentialNavClick.ts
 var GRARF_EXTENSION_NEWS_LEAGUES_SOURCE_CARD_ATTR = "data-grarf-extension-news-leagues-source-card";
 var GRARF_EXTENSION_NEWS_LEAGUES_SOURCE_SELECTED_ATTR = "data-grarf-extension-news-leagues-source-selected";
+var SPORTS_BROWSER_PROTOTYPE_TEMPORARY_NAV_OUTLETS_WEBSITE_ATTR = "data-sports-browser-prototype-temporary-nav-outlets-website";
 function querySequentialNavTargets(scopeId) {
   const scopeRoot = document.querySelector(
     `[${GRARF_EXTENSION_SEQUENTIAL_NAV_SCOPE_ATTR}="${scopeId}"]`
   );
   if (!scopeRoot) return [];
+  if (scopeId === "news-outlets") {
+    return [
+      ...scopeRoot.querySelectorAll(`[${SPORTS_BROWSER_PROTOTYPE_TEMPORARY_NAV_OUTLETS_WEBSITE_ATTR}]`)
+    ].filter(
+      (node) => {
+        if (!(node instanceof HTMLElement)) return false;
+        if (node.hasAttribute("disabled")) return false;
+        if (node.getAttribute("aria-disabled") === "true") return false;
+        return true;
+      }
+    );
+  }
   return [...scopeRoot.querySelectorAll(`[${GRARF_EXTENSION_SEQUENTIAL_NAV_TARGET_ATTR}]`)].filter(
     (node) => {
       if (!(node instanceof HTMLElement)) return false;
@@ -163253,7 +163270,68 @@ function SportsBrowserPrototypeTemporaryNavLeaguesInlineTree({
 init_define_import_meta_env();
 var import_react281 = __toESM(require_react(), 1);
 init_isGrarfWebRenderer();
+
+// ../grarf/desktop/src/extensionHost/grarfExtensionNewsOutletsActiveSource.ts
+init_define_import_meta_env();
+var activeWebsiteIndex = null;
+var listeners5 = /* @__PURE__ */ new Set();
+function notify3() {
+  for (const listener of listeners5) {
+    listener();
+  }
+}
+function subscribeGrarfExtensionNewsOutletsActiveWebsiteIndex(listener) {
+  listeners5.add(listener);
+  return () => {
+    listeners5.delete(listener);
+  };
+}
+function getGrarfExtensionNewsOutletsActiveWebsiteIndex() {
+  return activeWebsiteIndex;
+}
+function setGrarfExtensionNewsOutletsActiveWebsiteIndex(index2) {
+  activeWebsiteIndex = index2;
+  notify3();
+}
+function clearGrarfExtensionNewsOutletsActiveWebsiteIndex() {
+  if (activeWebsiteIndex == null) return;
+  activeWebsiteIndex = null;
+  notify3();
+}
+
+// ../grarf/desktop/src/extensionHost/grarfExtensionNewsOutletsSequentialNav.ts
+init_define_import_meta_env();
+var destinationHandler2 = null;
+function setGrarfExtensionNewsOutletsSequentialNavDestinationHandler(next) {
+  destinationHandler2 = next;
+}
+function openGrarfExtensionNewsOutletAtIndex(section, websiteIndex) {
+  const websites = getSportsBrowserPrototypeGlobalWebsites();
+  if (websites.length === 0) return false;
+  const clamped = Math.max(0, Math.min(websiteIndex, websites.length - 1));
+  const website4 = websites[clamped];
+  if (!website4?.url?.trim()) return false;
+  setGrarfExtensionNewsOutletsActiveWebsiteIndex(clamped);
+  navigateGrarfExtensionHostExternalUrl(website4.url);
+  destinationHandler2?.(section, clamped);
+  return true;
+}
+function stepGrarfExtensionNewsOutletsSequentialNav(section, direction) {
+  const websites = getSportsBrowserPrototypeGlobalWebsites();
+  if (websites.length === 0) return false;
+  const currentIndex = getGrarfExtensionNewsOutletsActiveWebsiteIndex() ?? -1;
+  const targetIndex = resolveSportsBrowserPrototypeSidebarCircularNavigationIndex(
+    currentIndex,
+    direction,
+    websites.length
+  );
+  if (targetIndex == null) return false;
+  return openGrarfExtensionNewsOutletAtIndex(section, targetIndex);
+}
+
+// ../grarf/desktop/src/components/homeMvp/SportsBrowserPrototypeTemporaryNavOutletsInlineTree.tsx
 var import_jsx_runtime271 = __toESM(require_jsx_runtime(), 1);
+var NEWS_OUTLETS_SEQUENTIAL_NAV_SCOPE = "news-outlets";
 var INLINE_ROW_LEGACY5 = "grarf-temporary-nav-inline-row flex w-full min-w-0 items-center justify-between gap-2 py-[4px] text-left text-[13px] uppercase tracking-[0.04em] text-[#1a1a1a] transition-colors hover:bg-[#e9e4db]";
 var INLINE_ROW_BASE4 = grarfExtensionTemporaryNavInlineRowClass(INLINE_ROW_LEGACY5);
 var EXTENSION_OUTLET_ROW_CLASS = cn2(
@@ -163281,13 +163359,50 @@ function SportsBrowserPrototypeTemporaryNavOutletsInlineTree({
     [contentSection]
   );
   const extensionHost = isGrarfExtensionRenderer();
+  const extensionNewsOutletsSequentialNav = extensionHost && contentSection === "news";
+  const extensionActiveOutletIndex = (0, import_react281.useSyncExternalStore)(
+    subscribeGrarfExtensionNewsOutletsActiveWebsiteIndex,
+    getGrarfExtensionNewsOutletsActiveWebsiteIndex,
+    () => null
+  );
+  const onGlobalDestinationSelectRef = (0, import_react281.useRef)(onGlobalDestinationSelect);
+  onGlobalDestinationSelectRef.current = onGlobalDestinationSelect;
+  (0, import_react281.useEffect)(() => {
+    if (!extensionNewsOutletsSequentialNav) return;
+    clearGrarfExtensionNewsOutletsActiveWebsiteIndex();
+  }, [extensionNewsOutletsSequentialNav]);
+  (0, import_react281.useEffect)(() => {
+    if (!extensionNewsOutletsSequentialNav) {
+      return;
+    }
+    setGrarfExtensionNewsOutletsSequentialNavDestinationHandler((section, websiteIndex) => {
+      onGlobalDestinationSelectRef.current?.(section, websiteIndex);
+    });
+    setGrarfExtensionSidebarSequentialUpDownHandlerForScope(NEWS_OUTLETS_SEQUENTIAL_NAV_SCOPE, {
+      step: (direction) => {
+        stepGrarfExtensionNewsOutletsSequentialNav(contentSection, direction);
+      }
+    });
+    return () => {
+      setGrarfExtensionNewsOutletsSequentialNavDestinationHandler(null);
+      setGrarfExtensionSidebarSequentialUpDownHandlerForScope(NEWS_OUTLETS_SEQUENTIAL_NAV_SCOPE, null);
+    };
+  }, [contentSection, extensionNewsOutletsSequentialNav]);
+  (0, import_react281.useEffect)(() => {
+    if (!extensionNewsOutletsSequentialNav) return;
+    const fromPane = destinationSelection?.websiteIndex;
+    if (fromPane == null || fromPane < 0) return;
+    if (getGrarfExtensionNewsOutletsActiveWebsiteIndex() === fromPane) return;
+    setGrarfExtensionNewsOutletsActiveWebsiteIndex(fromPane);
+  }, [destinationSelection?.websiteIndex, extensionNewsOutletsSequentialNav]);
   return /* @__PURE__ */ (0, import_jsx_runtime271.jsx)(
     "div",
     {
       "data-sports-browser-prototype-temporary-nav-outlets-inline-tree": "",
       className: extensionHost ? "flex w-full min-w-0 flex-col gap-[10px]" : void 0,
+      ...extensionNewsOutletsSequentialNav ? { [GRARF_EXTENSION_SEQUENTIAL_NAV_SCOPE_ATTR]: NEWS_OUTLETS_SEQUENTIAL_NAV_SCOPE } : {},
       children: websites.map((website4, websiteIndex) => {
-        const isSelected = destinationSelection != null && isSportsBrowserPrototypeTemporaryNavGlobalWebsiteActive(
+        const isSelected = extensionNewsOutletsSequentialNav ? extensionActiveOutletIndex === websiteIndex : destinationSelection != null && isSportsBrowserPrototypeTemporaryNavGlobalWebsiteActive(
           destinationSelection,
           contentSection,
           websiteIndex
@@ -163300,9 +163415,15 @@ function SportsBrowserPrototypeTemporaryNavOutletsInlineTree({
             "data-sports-browser-prototype-sidebar-league-row": "",
             "data-sports-browser-prototype-sidebar-league-row-selected": isSelected ? "" : void 0,
             "aria-current": isSelected ? "true" : void 0,
+            "data-grarf-extension-news-outlet-selected": isSelected ? "" : void 0,
             "data-sports-browser-prototype-temporary-nav-outlets-website": "",
+            ...extensionNewsOutletsSequentialNav ? { [GRARF_EXTENSION_SEQUENTIAL_NAV_TARGET_ATTR]: "" } : {},
             "data-grarf-extension-outlet-url": website4.url,
             onClick: () => {
+              if (extensionNewsOutletsSequentialNav) {
+                openGrarfExtensionNewsOutletAtIndex(contentSection, websiteIndex);
+                return;
+              }
               if (extensionHost) {
                 navigateGrarfExtensionHostExternalUrl(website4.url);
                 onGlobalDestinationSelect?.(contentSection, websiteIndex);
@@ -164416,7 +164537,8 @@ function SportsBrowserPrototypeTemporaryNavPrototype({
       gamesYesterdaySelector3Label: snapshotSelector3,
       gamesCompactTemporalView: gamesCompactTemporalView ?? null,
       leaguesLensSection: extensionSnapshotLeaguesLensSection,
-      gamesCatchUpContentAxis: extensionCatchUpContentAxisActive ? gamesCatchUpContentAxis : null
+      gamesCatchUpContentAxis: extensionCatchUpContentAxisActive ? gamesCatchUpContentAxis : null,
+      temporaryNavContentScope: contentSelectorsWired ? contentNavScope : null
     });
     onExtensionGamesYesterdayHighlightsNavigationContextChange?.(navigationContext);
   }, [
@@ -164427,6 +164549,8 @@ function SportsBrowserPrototypeTemporaryNavPrototype({
     gamesCatchUpContentAxis,
     gamesCompactTemporalView,
     onExtensionGamesYesterdayHighlightsNavigationContextChange,
+    contentNavScope,
+    contentSelectorsWired,
     topLevel
   ]);
   const selector2Options = (0, import_react284.useMemo)(
@@ -164504,7 +164628,8 @@ function SportsBrowserPrototypeTemporaryNavPrototype({
             gamesYesterdaySelector3Label: nextSelector3,
             gamesCompactTemporalView: view ?? gamesCompactTemporalView ?? null,
             leaguesLensSection: null,
-            gamesCatchUpContentAxis: null
+            gamesCatchUpContentAxis: null,
+            temporaryNavContentScope: null
           });
         }
         return;
@@ -164547,7 +164672,8 @@ function SportsBrowserPrototypeTemporaryNavPrototype({
               gamesYesterdaySelector3Label: label,
               gamesCompactTemporalView: gamesCompactTemporalView ?? null,
               leaguesLensSection: null,
-              gamesCatchUpContentAxis: null
+              gamesCatchUpContentAxis: null,
+              temporaryNavContentScope: null
             });
           }
           return;
@@ -164584,7 +164710,7 @@ function SportsBrowserPrototypeTemporaryNavPrototype({
       setTopLevel(request.topLevel);
       setSelector2Label(resolveTemporaryNavContentScopeLabel(request.contentScope));
       setSelector3Label(null);
-      if (!request.skipPaneSync) {
+      if (!request.skipPaneSync || request.contentScope === "outlets") {
         onContentNavChange?.(request.contentSection, request.contentScope);
       }
       return;
@@ -169645,7 +169771,7 @@ function SportsBrowserPrototypeLeftNav({
           }
           setTemporaryNavContentSection(action.section);
           setTemporaryNavContentScope(action.scope);
-          if (action.syncMainPane !== false) {
+          if (action.syncMainPane !== false || action.scope === "outlets") {
             onTemporaryNavContentNavChange?.(action.section, action.scope);
           }
           if (action.globalWebsiteIndex != null) {
@@ -171590,9 +171716,6 @@ function applySportsBrowserPrototypeTemporaryNavContentSelectionToPane(pane, con
     );
   }
   if (scope === "outlets") {
-    if (pane.gameId?.trim()) {
-      return pane;
-    }
     let next = {
       ...pane,
       leagueKey: null,
@@ -171604,7 +171727,11 @@ function applySportsBrowserPrototypeTemporaryNavContentSelectionToPane(pane, con
       documentTitle: null
     };
     next = applySportsBrowserPrototypeLeagueContextSectionToPane(next, contentSection);
-    return next;
+    return {
+      ...next,
+      url: null,
+      activeTabIndex: -1
+    };
   }
   if (scope === "games") {
     if (!pane.gameId?.trim()) {
@@ -173137,7 +173264,13 @@ function HomePage() {
     getGrarfExtensionGamesYesterdayHighlightsActiveGameId,
     () => null
   );
-  const extensionSidebarSequentialUpDownNavigation = isGrarfExtensionRenderer() && isGrarfExtensionSidebarSequentialUpDownNavigationActive();
+  const extensionTemporalNavSnapshot = (0, import_react292.useSyncExternalStore)(
+    subscribeGrarfExtensionGamesYesterdayHighlightsNavSnapshot,
+    getGrarfExtensionGamesYesterdayHighlightsNavSnapshot,
+    getGrarfExtensionGamesYesterdayHighlightsNavSnapshot
+  );
+  const extensionNewsOutletsSequentialNavActive = isGrarfExtensionRenderer() && resolveGrarfExtensionSidebarSequentialNavScopeId(extensionTemporalNavSnapshot) === "news-outlets";
+  const extensionSidebarSequentialUpDownNavigation = isGrarfExtensionRenderer() && (isGrarfExtensionSidebarSequentialUpDownNavigationActive() || extensionNewsOutletsSequentialNavActive);
   const extensionGamesYesterdayHighlightsNavActive = (0, import_react292.useSyncExternalStore)(
     subscribeGrarfExtensionGamesYesterdayHighlightsNavSnapshot,
     isGrarfExtensionGamesYesterdayHighlightsNavSnapshotActive,
@@ -173165,19 +173298,27 @@ function HomePage() {
     enabled: isSportsBrowserPrototype
   });
   const navigateSportsBrowserSidebarGameUpForUi = (0, import_react292.useCallback)(() => {
+    if (extensionNewsOutletsSequentialNavActive) {
+      stepGrarfExtensionNewsOutletsSequentialNav("news", "up");
+      return;
+    }
     if (isGrarfExtensionSidebarSequentialUpDownNavigationActive()) {
       void stepGrarfExtensionSidebarSequentialNav("up");
       return;
     }
     navigateSportsBrowserSidebarGameUp();
-  }, [navigateSportsBrowserSidebarGameUp]);
+  }, [extensionNewsOutletsSequentialNavActive, navigateSportsBrowserSidebarGameUp]);
   const navigateSportsBrowserSidebarGameDownForUi = (0, import_react292.useCallback)(() => {
+    if (extensionNewsOutletsSequentialNavActive) {
+      stepGrarfExtensionNewsOutletsSequentialNav("news", "down");
+      return;
+    }
     if (isGrarfExtensionSidebarSequentialUpDownNavigationActive()) {
       void stepGrarfExtensionSidebarSequentialNav("down");
       return;
     }
     navigateSportsBrowserSidebarGameDown();
-  }, [navigateSportsBrowserSidebarGameDown]);
+  }, [extensionNewsOutletsSequentialNavActive, navigateSportsBrowserSidebarGameDown]);
   const sportsBrowserSidebarUpDownCanNavigateUp = extensionSidebarSequentialUpDownNavigation ? true : canNavigateSportsBrowserSidebarGameUp;
   const sportsBrowserSidebarUpDownCanNavigateDown = extensionSidebarSequentialUpDownNavigation ? true : canNavigateSportsBrowserSidebarGameDown;
   const sportsBrowserSidebarPreviousPreviewGame = hookPreviousPreviewGame;
