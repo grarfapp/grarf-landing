@@ -169969,6 +169969,9 @@ function SportsBrowserPrototypeLeftNav({
     (section, scope) => {
       setTemporaryNavContentSection(section);
       setTemporaryNavContentScope(scope);
+      if (isGrarfExtensionRenderer()) {
+        return;
+      }
       onTemporaryNavContentNavChange?.(section, scope);
     },
     [onTemporaryNavContentNavChange]
