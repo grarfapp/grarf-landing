@@ -25837,9 +25837,6 @@ function resolveSportKeyForLeague(leagueKey) {
 function sportLeagueKeys(sportKey) {
   return GRARF_SPORT_HIERARCHY[sportKey]?.leagueKeys ?? [];
 }
-function resolveSportDirectorySectionId(sportKey) {
-  return GRARF_SPORT_HIERARCHY[sportKey]?.directorySectionId;
-}
 
 // ../grarf/desktop/shared/golfWatchUrls.js
 init_define_import_meta_env();
@@ -52108,27 +52105,39 @@ var __iconNode42 = [
 ];
 var Video = createLucideIcon("video", __iconNode42);
 
-// ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/wifi.mjs
+// ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/volleyball.mjs
 init_define_import_meta_env();
 var __iconNode43 = [
+  ["path", { d: "M11.1 7.1a16.55 16.55 0 0 1 10.9 4", key: "2880wi" }],
+  ["path", { d: "M12 12a12.6 12.6 0 0 1-8.7 5", key: "113sja" }],
+  ["path", { d: "M16.8 13.6a16.55 16.55 0 0 1-9 7.5", key: "1qmsgl" }],
+  ["path", { d: "M20.7 17a12.8 12.8 0 0 0-8.7-5 13.3 13.3 0 0 1 0-10", key: "1bmeqp" }],
+  ["path", { d: "M6.3 3.8a16.55 16.55 0 0 0 1.9 11.5", key: "iekzv9" }],
+  ["circle", { cx: "12", cy: "12", r: "10", key: "1mglay" }]
+];
+var Volleyball = createLucideIcon("volleyball", __iconNode43);
+
+// ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/wifi.mjs
+init_define_import_meta_env();
+var __iconNode44 = [
   ["path", { d: "M12 20h.01", key: "zekei9" }],
   ["path", { d: "M2 8.82a15 15 0 0 1 20 0", key: "dnpr2z" }],
   ["path", { d: "M5 12.859a10 10 0 0 1 14 0", key: "1x1e6c" }],
   ["path", { d: "M8.5 16.429a5 5 0 0 1 7 0", key: "1bycff" }]
 ];
-var Wifi = createLucideIcon("wifi", __iconNode43);
+var Wifi = createLucideIcon("wifi", __iconNode44);
 
 // ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/x.mjs
 init_define_import_meta_env();
-var __iconNode44 = [
+var __iconNode45 = [
   ["path", { d: "M18 6 6 18", key: "1bl5f8" }],
   ["path", { d: "m6 6 12 12", key: "d8bk6v" }]
 ];
-var X2 = createLucideIcon("x", __iconNode44);
+var X2 = createLucideIcon("x", __iconNode45);
 
 // ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/zap.mjs
 init_define_import_meta_env();
-var __iconNode45 = [
+var __iconNode46 = [
   [
     "path",
     {
@@ -52137,7 +52146,7 @@ var __iconNode45 = [
     }
   ]
 ];
-var Zap = createLucideIcon("zap", __iconNode45);
+var Zap = createLucideIcon("zap", __iconNode46);
 
 // ../grarf/desktop/src/lib/cn.ts
 init_define_import_meta_env();
@@ -162582,6 +162591,173 @@ var import_react283 = __toESM(require_react(), 1);
 // ../grarf/desktop/src/lib/gamesSpine/resolveSportsBrowserPrototypeSidebarLeaguesGroupedSections.ts
 init_define_import_meta_env();
 
+// ../grarf/desktop/src/lib/gamesSpine/sportsBrowserPrototypeSidebarLeaguesGroupOrder.ts
+init_define_import_meta_env();
+var SPORTS_BROWSER_PROTOTYPE_SIDEBAR_LEAGUES_GROUP_ORDER = [
+  {
+    sectionId: "football",
+    title: "FOOTBALL",
+    leagueKeys: ["NFL", "NCAAF", "XFL", "CFL"]
+  },
+  {
+    sectionId: "basketball",
+    title: "BASKETBALL",
+    leagueKeys: ["NBA", "WNBA", "MNCAAB", "WNCAAB", "NBA2K", "euroleague"]
+  },
+  {
+    sectionId: "baseball",
+    title: "BASEBALL",
+    leagueKeys: ["MLB", "NCAABB", "milb", "LLBWS", "CBWS", "npb", "kbo"]
+  },
+  {
+    sectionId: "soccer",
+    title: "SOCCER",
+    leagueKeys: [
+      "ARG1",
+      "BEL1",
+      "BRA1",
+      "BUNDESLIGA",
+      "CARABAO_CUP",
+      "CONCACAF_CAC",
+      "CONCACAF_CL",
+      "CONCACAF_NG",
+      "COPA",
+      "COPA_BRASIL",
+      "LIBERTADORES",
+      "SUDAMERICANA",
+      "COPPAITALIA",
+      "CHAMPIONSHIP",
+      "EPL",
+      "EREDIVISIE",
+      "CLUBWC",
+      "GOLDCUP",
+      "LALIGA",
+      "LEAGUES_CUP",
+      "LIGAMX",
+      "LIGUE1",
+      "MLS",
+      "NCAAMSOC",
+      "NCAAWSOC",
+      "NWSL",
+      "POR1",
+      "SAUDI",
+      "SCOTTISH_LEAGUE_CUP",
+      "SERIEA",
+      "SPFL",
+      "SUPERLIG",
+      "US_OPEN_CUP",
+      "UCL",
+      "UECL",
+      "EURO",
+      "UEL",
+      "NATIONS",
+      "USLC",
+      "USLCUP",
+      "USL1",
+      "CAF_WNATIONS",
+      "WOMENS_UCL",
+      "afc-elite",
+      "caf-champions",
+      "fa-cup",
+      "j1"
+    ]
+  },
+  {
+    sectionId: "hockey",
+    title: "HOCKEY",
+    leagueKeys: ["NHL", "ahl", "khl"]
+  },
+  {
+    sectionId: "motorsports",
+    title: "MOTORSPORTS",
+    leagueKeys: [
+      "F1",
+      "NASCAR",
+      "INDYCAR",
+      "MOTOGP",
+      "NASCAR_XFINITY",
+      "NASCAR_TRUCK",
+      "nhra",
+      "F2",
+      "F3",
+      "FORMULA_E",
+      "WEC",
+      "world-rally",
+      "GT_WORLD_CHALLENGE",
+      "imsa"
+    ]
+  },
+  {
+    sectionId: "golf",
+    title: "GOLF",
+    leagueKeys: ["PGA", "LPGA", "LIV", "DP_WORLD", "KORNFERRY"]
+  },
+  {
+    sectionId: "tennis",
+    title: "TENNIS",
+    leagueKeys: ["ATP", "WTA"]
+  },
+  {
+    sectionId: "combat",
+    title: "COMBAT",
+    leagueKeys: ["BOXING", "UFC", "pfl"]
+  },
+  {
+    sectionId: "rugby",
+    title: "RUGBY",
+    leagueKeys: ["rugby-union", "AFL", "RUGBYTOP14", "RUGBYPREM", "RUGB_289262", "RUGBYULSTER"]
+  },
+  {
+    sectionId: "volleyball",
+    title: "VOLLEYBALL",
+    leagueKeys: ["NCAAVB", "avp", "lovb", "NCAAVB_M"]
+  },
+  {
+    sectionId: "cricket",
+    title: "CRICKET",
+    leagueKeys: ["CRICKET_ICC", "CRICKET_BBL"]
+  },
+  {
+    sectionId: "lacrosse",
+    title: "LACROSSE",
+    leagueKeys: ["lacrosse", "PLL", "NCAALAX"]
+  },
+  {
+    sectionId: "softball",
+    title: "SOFTBALL",
+    leagueKeys: ["NCAASB", "base-lls"]
+  },
+  {
+    sectionId: "college-sports",
+    title: "COLLEGE SPORTS",
+    leagueKeys: ["NCAAFH"]
+  },
+  {
+    sectionId: "swimming",
+    title: "SWIMMING",
+    leagueKeys: ["swimming"],
+    sportLevelOnly: true
+  },
+  {
+    sectionId: "track-and-field",
+    title: "TRACK & FIELD",
+    leagueKeys: ["USATF"],
+    sportLevelOnly: true
+  },
+  {
+    sectionId: "winter-sports",
+    title: "WINTER SPORTS",
+    leagueKeys: ["winter-sports"],
+    sportLevelOnly: true
+  },
+  {
+    sectionId: "horse-racing",
+    title: "HORSE-RACING",
+    leagueKeys: ["horse-racing"],
+    sportLevelOnly: true
+  }
+];
+
 // ../grarf/desktop/src/lib/gamesSpine/sportsBrowserPrototypeSidebarLeaguesPopulation.ts
 init_define_import_meta_env();
 var SPORTS_BROWSER_PROTOTYPE_SIDEBAR_LEAGUES_ACTIVE_POPULATION = [
@@ -162712,41 +162888,11 @@ function resolveSportsBrowserPrototypeSidebarLeaguesPopulationLabel(leagueKey) {
 }
 
 // ../grarf/desktop/src/lib/gamesSpine/resolveSportsBrowserPrototypeSidebarLeaguesGroupedSections.ts
-var ESPN_SPORT_TO_DIRECTORY_SECTION_ID = {
-  football: "football",
-  basketball: "basketball",
-  baseball: "baseball",
-  soccer: "soccer",
-  hockey: "hockey",
-  golf: "golf",
-  tennis: "tennis",
-  cricket: "cricket",
-  volleyball: "volleyball",
-  rugby: "rugby",
-  racing: "motorsports",
-  mma: "combat",
-  "australian-football": "rugby",
-  lacrosse: "ungrouped",
-  "field-hockey": "ungrouped",
-  "water-polo": "ungrouped"
-};
 var ESPN_LABEL_BY_KEY = new Map(
   ESPN_OPERATIONAL_INGEST_LEAGUES.map((row) => [row.key, row.label])
 );
 function collectSidebarLeaguesUniverseKeys() {
   return collectSportsBrowserPrototypeSidebarLeaguesPopulationKeys();
-}
-function buildDirectoryLeagueSectionIdMap() {
-  const out = /* @__PURE__ */ new Map();
-  for (const section of getLeagueDirectoryV1ForNav()) {
-    if (section.id === "on-today") continue;
-    for (const item of [...section.items, ...section.expansionItems ?? []]) {
-      if (item.grarfLeagueKey) {
-        out.set(item.grarfLeagueKey, section.id);
-      }
-    }
-  }
-  return out;
 }
 function resolveSidebarLeaguesDisplayLabel(leagueKey) {
   const populationLabel = resolveSportsBrowserPrototypeSidebarLeaguesPopulationLabel(
@@ -162759,52 +162905,33 @@ function resolveSidebarLeaguesDisplayLabel(leagueKey) {
   }
   return ESPN_LABEL_BY_KEY.get(leagueKey) ?? leagueKey;
 }
-function resolveSidebarLeaguesSectionId(leagueKey, directorySectionByKey) {
-  const fromDirectory = directorySectionByKey.get(leagueKey);
-  if (fromDirectory) return fromDirectory;
-  const sportKey = resolveSportKeyForLeague(leagueKey);
-  if (sportKey) {
-    return resolveSportDirectorySectionId(sportKey) ?? "ungrouped";
-  }
-  const espnSport = ESPN_OPERATIONAL_INGEST_LEAGUES.find((row) => row.key === leagueKey)?.sport;
-  if (espnSport && ESPN_SPORT_TO_DIRECTORY_SECTION_ID[espnSport]) {
-    return ESPN_SPORT_TO_DIRECTORY_SECTION_ID[espnSport];
-  }
-  return "ungrouped";
-}
 function compareSidebarLeagueRows(a2, b2) {
   const byLabel = a2.label.localeCompare(b2.label, void 0, { sensitivity: "base" });
   if (byLabel !== 0) return byLabel;
   return a2.leagueKey.localeCompare(b2.leagueKey);
 }
-function resolveSportsBrowserPrototypeSidebarLeaguesGroupedSections() {
-  const directorySectionByKey = buildDirectoryLeagueSectionIdMap();
-  const leaguesBySection = /* @__PURE__ */ new Map();
+function buildSidebarLeaguesRowByKeyMap() {
+  const rows = /* @__PURE__ */ new Map();
   for (const leagueKey of collectSidebarLeaguesUniverseKeys()) {
-    const sectionId = resolveSidebarLeaguesSectionId(leagueKey, directorySectionByKey);
-    const row = {
+    rows.set(leagueKey, {
       leagueKey,
       label: resolveSidebarLeaguesDisplayLabel(leagueKey)
-    };
-    const bucket = leaguesBySection.get(sectionId);
-    if (bucket) bucket.push(row);
-    else leaguesBySection.set(sectionId, [row]);
+    });
   }
-  for (const rows of leaguesBySection.values()) {
-    rows.sort(compareSidebarLeagueRows);
-  }
-  const sections = getLeagueDirectoryV1ForNav().filter((section) => section.id !== "on-today");
-  return sections.map((section) => {
-    const leagues = leaguesBySection.get(section.id) ?? [];
-    if (leagues.length === 0) return null;
+  return rows;
+}
+function resolveSportsBrowserPrototypeSidebarLeaguesGroupedSections() {
+  const rowByKey = buildSidebarLeaguesRowByKeyMap();
+  return SPORTS_BROWSER_PROTOTYPE_SIDEBAR_LEAGUES_GROUP_ORDER.map((spec) => {
+    const leagues = spec.leagueKeys.map((leagueKey) => rowByKey.get(leagueKey)).filter((row) => row != null);
     return {
-      sectionId: section.id,
-      title: leagueDirectorySectionTitleLabel(section),
-      hideHeader: section.hideHeader === true,
-      navGroupBreakBefore: section.navGroupBreakBefore,
+      sectionId: spec.sectionId,
+      title: spec.title,
+      hideHeader: false,
+      sportLevelOnly: spec.sportLevelOnly === true,
       leagues
     };
-  }).filter((group) => group != null);
+  }).filter((group) => group.leagues.length > 0);
 }
 function resolveSportsBrowserPrototypeSidebarLeaguesAlphabeticalSections() {
   const leagues = collectSidebarLeaguesUniverseKeys().map((leagueKey) => ({
@@ -163235,44 +163362,49 @@ var import_react281 = __toESM(require_react(), 1);
 
 // ../grarf/desktop/src/extensionHost/resolveGrarfExtensionSidebarLeaguesSportGroupLogoUrl.ts
 init_define_import_meta_env();
-var LEAGUE_DIRECTORY_SECTION_SPORT_LOGO_URL = {
-  football: "https://a.espncdn.com/i/teamlogos/leagues/500/nfl.png",
-  basketball: "https://a.espncdn.com/redesign/assets/img/icons/ESPN-icon-basketball.png",
-  baseball: "https://a.espncdn.com/i/teamlogos/leagues/500/mlb.png",
-  soccer: "https://a.espncdn.com/i/leaguelogos/soccer/500/19.png",
-  hockey: "https://a.espncdn.com/i/teamlogos/leagues/500/nhl.png",
-  motorsports: "https://a.espncdn.com/i/teamlogos/leagues/500/f1.png",
-  cycling: "/league-logos/nav/tour-de-france.png",
-  golf: "https://a.espncdn.com/combiner/i?img=/i/teamlogos/leagues/500/pgatour.png",
-  tennis: "/league-logos/atp.png",
-  combat: "https://a.espncdn.com/i/teamlogos/leagues/500/ufc.png",
-  rugby: "/league-logos/nav/rugby-union.png",
-  volleyball: "/league-logos/nav/volleyball-ncaaw.png",
-  cricket: "/league-logos/nav/t20-womens-world-cup.png",
-  softball: "/league-logos/nav/wcws.png",
+var ESPN_SPORT_ICON = (slug) => `https://a.espncdn.com/redesign/assets/img/icons/ESPN-icon-${slug}.png`;
+var LEAGUE_DIRECTORY_SECTION_SPORT_ICON_URL = {
+  football: ESPN_SPORT_ICON("football"),
+  basketball: ESPN_SPORT_ICON("basketball"),
+  baseball: ESPN_SPORT_ICON("baseball"),
+  soccer: ESPN_SPORT_ICON("soccer"),
+  hockey: ESPN_SPORT_ICON("hockey"),
+  tennis: ESPN_SPORT_ICON("tennis"),
+  golf: ESPN_SPORT_ICON("golf"),
+  rugby: ESPN_SPORT_ICON("rugby"),
+  cricket: ESPN_SPORT_ICON("cricket"),
+  softball: ESPN_SPORT_ICON("softball"),
+  motorsports: ESPN_SPORT_ICON("nascar"),
+  combat: ESPN_SPORT_ICON("mma"),
+  cycling: ESPN_SPORT_ICON("cycling"),
+  lacrosse: ESPN_SPORT_ICON("lacrosse"),
+  softball: ESPN_SPORT_ICON("softball"),
+  "college-sports": ESPN_SPORT_ICON("field-hockey"),
+  swimming: ESPN_SPORT_ICON("swimming"),
+  "track-and-field": "/league-logos/nav/track-and-field.png",
+  "winter-sports": "/league-logos/nav/winter-sports.png",
+  "horse-racing": "/league-logos/nav/horse-racing.png",
   ungrouped: "/league-logos/globe.png"
 };
+function resolveGrarfExtensionSidebarLeaguesSportGroupUsesLucideIcon(sectionId) {
+  return sectionId === "volleyball";
+}
 function resolveGrarfExtensionSidebarLeaguesSportGroupLogoUrl(sectionId) {
-  const mapped = LEAGUE_DIRECTORY_SECTION_SPORT_LOGO_URL[sectionId];
-  if (mapped) {
-    return publicAssetUrl(mapped);
-  }
-  const section = getLeagueDirectoryV1ForNav().find((row) => row.id === sectionId);
-  const firstItem = section?.items[0];
-  if (!firstItem) {
+  if (resolveGrarfExtensionSidebarLeaguesSportGroupUsesLucideIcon(sectionId)) {
     return null;
   }
-  if (firstItem.logoUrl) {
-    return publicAssetUrl(firstItem.logoUrl);
-  }
-  return publicAssetUrl(resolveLeagueDirectoryNavItemLogo(firstItem.id));
+  const mapped = LEAGUE_DIRECTORY_SECTION_SPORT_ICON_URL[sectionId] ?? LEAGUE_DIRECTORY_SECTION_SPORT_ICON_URL.ungrouped;
+  return mapped ? publicAssetUrl(mapped) : null;
 }
 
 // ../grarf/desktop/src/extensionHost/GrarfExtensionSidebarLeaguesSportGroupHeader.tsx
 var import_jsx_runtime273 = __toESM(require_jsx_runtime(), 1);
-function SportGroupLogoMark({ sectionId }) {
+function SportGroupIconMark({ sectionId }) {
   const [failed, setFailed] = (0, import_react281.useState)(false);
   const logoUrl = resolveGrarfExtensionSidebarLeaguesSportGroupLogoUrl(sectionId);
+  if (resolveGrarfExtensionSidebarLeaguesSportGroupUsesLucideIcon(sectionId)) {
+    return /* @__PURE__ */ (0, import_jsx_runtime273.jsx)("span", { className: "inline-flex h-[1lh] w-[12px] shrink-0 items-center justify-center", "aria-hidden": true, children: /* @__PURE__ */ (0, import_jsx_runtime273.jsx)(Volleyball, { size: 10, strokeWidth: 2, className: "shrink-0 text-foreground" }) });
+  }
   if (!logoUrl || failed) {
     return null;
   }
@@ -163314,7 +163446,7 @@ function GrarfExtensionSidebarLeaguesSportGroupHeader({
       },
       children: [
         /* @__PURE__ */ (0, import_jsx_runtime273.jsxs)("span", { className: "flex min-w-0 flex-1 items-start gap-1", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime273.jsx)(SportGroupLogoMark, { sectionId }),
+          /* @__PURE__ */ (0, import_jsx_runtime273.jsx)(SportGroupIconMark, { sectionId }),
           /* @__PURE__ */ (0, import_jsx_runtime273.jsx)("span", { className: "min-w-0 flex-1 break-words whitespace-normal", children: title })
         ] }),
         /* @__PURE__ */ (0, import_jsx_runtime273.jsx)("span", { className: "inline-flex h-[1lh] shrink-0 items-center", children: expanded ? /* @__PURE__ */ (0, import_jsx_runtime273.jsx)(ChevronDown, { size: 12, strokeWidth: 2, className: "shrink-0 rotate-180", "aria-hidden": true }) : /* @__PURE__ */ (0, import_jsx_runtime273.jsx)(ChevronRight, { size: 12, strokeWidth: 2, className: "shrink-0 text-foreground", "aria-hidden": true }) })
@@ -163947,6 +164079,9 @@ function SportsBrowserPrototypeTemporaryNavLeaguesInlineTree({
                 ] }) : null
               ] }, leagueKey);
             });
+            if (sportGroupExpansion.collapsible && group.sportLevelOnly) {
+              return /* @__PURE__ */ (0, import_jsx_runtime275.jsx)(import_react283.Fragment, { children: leagueRows }, group.sectionId);
+            }
             if (sportGroupExpansion.collapsible) {
               return /* @__PURE__ */ (0, import_jsx_runtime275.jsx)(
                 GrarfExtensionSidebarLeaguesSportGroupSection,
@@ -164868,6 +165003,9 @@ function SportsBrowserPrototypeTemporaryNavTeamsInlineTree({
         ] }) : null
       ] }, leagueKey);
     });
+    if (sportGroupExpansion.collapsible && group.sportLevelOnly) {
+      return /* @__PURE__ */ (0, import_jsx_runtime279.jsx)(import_react286.Fragment, { children: leagueRows }, group.sectionId);
+    }
     if (sportGroupExpansion.collapsible) {
       return /* @__PURE__ */ (0, import_jsx_runtime279.jsx)(
         GrarfExtensionSidebarLeaguesSportGroupSection,
@@ -165000,7 +165138,6 @@ var TOP_LEVEL_OPTIONS = [
   // "TEAMS", // Temporarily hidden from col-1 selector; re-enable when TEAMS top-level ships.
 ];
 var LEAGUES_SORT_OPTIONS = ["ON TODAY", "GROUP", "123", "A-Z"];
-var LEAGUES_LENS_DEFAULT = TEMPORARY_NAV_LEAGUES_LENS_DEFAULT;
 var LEAGUES_LENS_OPTIONS = TEMPORARY_NAV_LEAGUES_LENS_OPTIONS;
 var GAMES_SELECTOR_2 = ["TODAY", "YESTERDAY"];
 var GAMES_TODAY_SELECTOR_3 = ["ALL", "NOW", "NEXT", "FINAL"];
@@ -165026,7 +165163,7 @@ function resolveTemporaryNavSelector2Options(topLevel) {
     case "GAMES":
       return GAMES_SELECTOR_2;
     case "LEAGUES":
-      return LEAGUES_SORT_OPTIONS;
+      return LEAGUES_LENS_OPTIONS;
     case "NEWS":
       return NEWS_SELECTOR_2;
     case "SOCIAL":
@@ -165074,7 +165211,7 @@ function resolveTemporaryNavSelector3Options(topLevel, selector2Label) {
     return null;
   }
   if (topLevel === "LEAGUES") {
-    return LEAGUES_LENS_OPTIONS;
+    return LEAGUES_SORT_OPTIONS;
   }
   return null;
 }
@@ -165086,7 +165223,7 @@ function resolveTemporaryNavDefaultSelector3(topLevel, selector2Label) {
   const options = resolveTemporaryNavSelector3Options(topLevel, selector2Label);
   if (!options) return null;
   if (topLevel === "LEAGUES") {
-    return LEAGUES_LENS_DEFAULT;
+    return LEAGUES_SORT_OPTIONS[0] ?? null;
   }
   return options[0] ?? null;
 }
@@ -165219,8 +165356,8 @@ function SportsBrowserPrototypeTemporaryNavPrototype({
     if (gamesSelectorsWired && gamesCompactTemporalView) {
       return resolveTemporaryNavGamesSelector2FromCompactTemporalView(gamesCompactTemporalView);
     }
-    if (leaguesSelectorsWired && leaguesSortMode) {
-      return resolveTemporaryNavLeaguesSortLabelFromMode(leaguesSortMode);
+    if (leaguesSelectorsWired) {
+      return resolveTemporaryNavLeaguesLensLabelFromSection(leaguesLensSection);
     }
     if (teamsSelectorsWired && leaguesSortMode) {
       return resolveTemporaryNavTeamsByLeaguesSortLabelFromMode(leaguesSortMode);
@@ -165238,6 +165375,7 @@ function SportsBrowserPrototypeTemporaryNavPrototype({
     effectiveContentNavScope,
     gamesCompactTemporalView,
     gamesSelectorsWired,
+    leaguesLensSection,
     leaguesSelectorsWired,
     leaguesSortMode,
     teamsSelectorsWired,
@@ -165247,15 +165385,15 @@ function SportsBrowserPrototypeTemporaryNavPrototype({
     if (gamesSelectorsWired && gamesCompactTemporalView) {
       return resolveTemporaryNavGamesSelector3LabelForView(gamesCompactTemporalView, selector3Label);
     }
-    if (leaguesSelectorsWired) {
-      return resolveTemporaryNavLeaguesLensLabelFromSection(leaguesLensSection);
+    if (leaguesSelectorsWired && leaguesSortMode) {
+      return resolveTemporaryNavLeaguesSortLabelFromMode(leaguesSortMode);
     }
     return selector3Label;
   }, [
     gamesCompactTemporalView,
     gamesSelectorsWired,
-    leaguesLensSection,
     leaguesSelectorsWired,
+    leaguesSortMode,
     selector3Label
   ]);
   const extensionSnapshotLeaguesLensSection = (0, import_react287.useMemo)(() => {
@@ -165358,8 +165496,8 @@ function SportsBrowserPrototypeTemporaryNavPrototype({
       }
       if (next === "LEAGUES" && leaguesSortMode != null && onLeaguesSortModeChange != null) {
         setTopLevel(next);
-        setSelector2Label(resolveTemporaryNavLeaguesSortLabelFromMode(leaguesSortMode));
-        setSelector3Label(TEMPORARY_NAV_LEAGUES_LENS_DEFAULT);
+        setSelector2Label(TEMPORARY_NAV_LEAGUES_LENS_DEFAULT);
+        setSelector3Label(resolveTemporaryNavLeaguesSortLabelFromMode(leaguesSortMode));
         onLeaguesLensSectionChange?.(
           resolveLeaguesLensSectionFromTemporaryNavLabel(TEMPORARY_NAV_LEAGUES_LENS_DEFAULT)
         );
@@ -165422,11 +165560,8 @@ function SportsBrowserPrototypeTemporaryNavPrototype({
         }
         return;
       }
-      if (topLevel === "LEAGUES" && onLeaguesSortModeChange) {
-        const mode = resolveLeaguesSortModeFromTemporaryNavLabel(label);
-        if (mode) {
-          onLeaguesSortModeChange(mode);
-        }
+      if (topLevel === "LEAGUES" && onLeaguesLensSectionChange) {
+        onLeaguesLensSectionChange(resolveLeaguesLensSectionFromTemporaryNavLabel(label));
         return;
       }
       if (topLevel === "TEAMS" && onLeaguesSortModeChange) {
@@ -165460,6 +165595,7 @@ function SportsBrowserPrototypeTemporaryNavPrototype({
       contentTopLevel,
       onContentNavChange,
       onGamesCompactTemporalSelect,
+      onLeaguesLensSectionChange,
       onLeaguesSortModeChange,
       topLevel
     ]
@@ -165492,13 +165628,16 @@ function SportsBrowserPrototypeTemporaryNavPrototype({
         }
         return;
       }
-      if (topLevel === "LEAGUES" && onLeaguesLensSectionChange) {
-        onLeaguesLensSectionChange(resolveLeaguesLensSectionFromTemporaryNavLabel(label));
+      if (topLevel === "LEAGUES" && onLeaguesSortModeChange) {
+        const mode = resolveLeaguesSortModeFromTemporaryNavLabel(label);
+        if (mode) {
+          onLeaguesSortModeChange(mode);
+        }
         return;
       }
       setSelector3Label(label);
     },
-    [effectiveSelector2Label, onGamesCompactTemporalSelect, onLeaguesLensSectionChange, topLevel]
+    [effectiveSelector2Label, onGamesCompactTemporalSelect, onLeaguesSortModeChange, topLevel]
   );
   (0, import_react287.useEffect)(() => {
     onTopLevelChange?.(topLevel);
@@ -165659,8 +165798,8 @@ function SportsBrowserPrototypeTemporaryNavPrototype({
               className: "mt-1.5 min-w-0",
               "data-sports-browser-prototype-temporary-nav-prototype-inline-tree": "",
               "data-sports-browser-prototype-sidebar-temporal-content": isGrarfExtensionRenderer() ? "" : void 0,
-              "data-sports-browser-prototype-temporary-nav-leagues-sort": effectiveSelector2Label,
-              "data-sports-browser-prototype-temporary-nav-leagues-lens": effectiveSelector3Label,
+              "data-sports-browser-prototype-temporary-nav-leagues-lens": effectiveSelector2Label,
+              "data-sports-browser-prototype-temporary-nav-leagues-sort": effectiveSelector3Label,
               children: /* @__PURE__ */ (0, import_jsx_runtime280.jsx)(
                 SportsBrowserPrototypeTemporaryNavLeaguesInlineTree,
                 {
@@ -182960,6 +183099,7 @@ lucide-react/dist/esm/icons/triangle-alert.mjs:
 lucide-react/dist/esm/icons/trophy.mjs:
 lucide-react/dist/esm/icons/users.mjs:
 lucide-react/dist/esm/icons/video.mjs:
+lucide-react/dist/esm/icons/volleyball.mjs:
 lucide-react/dist/esm/icons/wifi.mjs:
 lucide-react/dist/esm/icons/x.mjs:
 lucide-react/dist/esm/icons/zap.mjs:
