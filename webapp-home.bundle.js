@@ -149056,6 +149056,9 @@ function leagueHeaderSelector(leagueKey) {
 function resolveScrollTopKeepingLeagueHeaderVisible(scrollTop, headerTopBefore, headerTopAfter) {
   return scrollTop + (headerTopAfter - headerTopBefore);
 }
+function resolveScrollTopAligningElementBelowAnchor(scrollTop, elementTop, anchorBottom) {
+  return scrollTop + (elementTop - anchorBottom);
+}
 function holdGrarfExtensionLeagueHeaderAnchor(leagueKey) {
   pendingLeagueHeaderAnchor = null;
   if (!leagueKey || typeof document === "undefined") return;
@@ -149087,6 +149090,50 @@ function restoreGrarfExtensionLeagueHeaderAnchor() {
     pending.scrollRoot.scrollTop = nextScrollTop;
   }
 }
+function resolveGrarfExtensionExpandedLeagueContentScrollTarget(scrollRoot, leagueKey) {
+  const header = scrollRoot.querySelector(leagueHeaderSelector(leagueKey));
+  if (!header) return null;
+  const expandedShell = header.closest(
+    "[data-grarf-extension-yesterday-highlights-nested-league][data-grarf-extension-yesterday-highlights-league-expanded]"
+  ) ?? header.closest("[data-grarf-temporary-nav-nested-league]");
+  const children = expandedShell?.querySelector(
+    "[data-grarf-temporary-nav-nested-league-children]"
+  );
+  if (children) return children;
+  const sectionLabel = expandedShell?.querySelector(
+    "[data-grarf-extension-yesterday-highlights-section-label]"
+  );
+  if (sectionLabel) return sectionLabel;
+  return header;
+}
+function resolveGrarfExtensionExpandedLeagueContentListStart(contentContainer) {
+  return contentContainer.querySelector(
+    "[data-grarf-extension-yesterday-highlights-section-label]"
+  ) ?? contentContainer.querySelector("[data-sports-browser-prototype-games-box]") ?? contentContainer.querySelector("[data-grarf-extension-sequential-nav-target]") ?? contentContainer;
+}
+function scrollGrarfExtensionExpandedLeagueContentToTop(leagueKey) {
+  if (typeof document === "undefined") return;
+  const scrollRoot = document.querySelector(
+    "[data-sports-browser-prototype-left-nav-scroll]"
+  );
+  if (!scrollRoot) return;
+  const header = scrollRoot.querySelector(leagueHeaderSelector(leagueKey));
+  const contentContainer = resolveGrarfExtensionExpandedLeagueContentScrollTarget(
+    scrollRoot,
+    leagueKey
+  );
+  if (!contentContainer) return;
+  const listStart = resolveGrarfExtensionExpandedLeagueContentListStart(contentContainer);
+  const anchorBottom = header ? header.getBoundingClientRect().bottom : scrollRoot.getBoundingClientRect().top;
+  const nextScrollTop = resolveScrollTopAligningElementBelowAnchor(
+    scrollRoot.scrollTop,
+    listStart.getBoundingClientRect().top,
+    anchorBottom
+  );
+  if (nextScrollTop !== scrollRoot.scrollTop) {
+    scrollRoot.scrollTop = nextScrollTop;
+  }
+}
 function notifyExclusiveExpandedLeagueKeyListeners() {
   for (const listener of listeners3) {
     listener();
@@ -149112,7 +149159,11 @@ function setGrarfExtensionSidebarExclusiveExpandedLeagueKey(leagueKey) {
     setGrarfExtensionGamesYesterdayHighlightsActiveLeagueKey(null);
     setGrarfExtensionGamesYesterdayHighlightsActiveBoxingPromotionId(null);
   }
-  holdGrarfExtensionLeagueHeaderAnchor(next ?? exclusiveExpandedLeagueKey);
+  if (next === null) {
+    holdGrarfExtensionLeagueHeaderAnchor(exclusiveExpandedLeagueKey);
+  } else {
+    pendingLeagueHeaderAnchor = null;
+  }
   exclusiveExpandedLeagueKey = next;
   notifyExclusiveExpandedLeagueKeyListeners();
 }
@@ -164878,7 +164929,7 @@ function GrarfExtensionNewsLeaguesLeagueHeader({
       ...sequentialNavCurrent ? { "data-grarf-extension-sequential-nav-current": "" } : {},
       className: cn2(
         "flex w-full min-w-0 items-start justify-between gap-2 px-4 py-2 text-left text-sm font-medium normal-case tracking-normal text-foreground transition-colors hover:bg-accent hover:text-accent-foreground",
-        isSelected && leagueKey && "bg-accent text-accent-foreground"
+        isSelected && leagueKey && "text-accent-foreground"
       ),
       onMouseDown: (event) => {
         event.preventDefault();
@@ -165309,6 +165360,8 @@ function SportsBrowserPrototypeTemporaryNavLeaguesInlineTree({
     return SPORTS_BROWSER_PROTOTYPE_LEAGUE_CONTEXT_SECTIONS;
   }, [leaguesLensSection]);
   const extensionNewsLeaguesExpandUi = isGrarfExtensionRenderer() && (leaguesLensSection === "news" || extensionTemporalLeaguesTopLevel && leaguesLensSection == null);
+  const extensionTemporalLeagueCardListUi = isGrarfExtensionRenderer() && leaguesLensSection != null && (leaguesLensSection === "social" || leaguesLensSection === "highlights" || leaguesLensSection === "fantasy" || leaguesLensSection === "betting" || leaguesLensSection === "podcasts");
+  const extensionTemporalLeagueSequentialNavScopeId = extensionNewsLeaguesExpandUi ? "leagues-news" : extensionTemporalLeagueCardListUi && leaguesLensSection ? `leagues-${leaguesLensSection}` : null;
   const showTemporalNewsLeaguesAllSportsRow = extensionNewsLeaguesExpandUi && leaguesLensSection === "news" && !extensionTemporalLeaguesTopLevel;
   const extensionExclusiveLeagueAccordion = isGrarfExtensionRenderer();
   const allSportsNewsWebsites = (0, import_react283.useMemo)(
@@ -165499,7 +165552,7 @@ function SportsBrowserPrototypeTemporaryNavLeaguesInlineTree({
     /* @__PURE__ */ (0, import_jsx_runtime275.jsxs)(
       "div",
       {
-        ...extensionNewsLeaguesExpandUi ? { [GRARF_EXTENSION_SEQUENTIAL_NAV_SCOPE_ATTR]: "leagues-news" } : {},
+        ...extensionTemporalLeagueSequentialNavScopeId ? { [GRARF_EXTENSION_SEQUENTIAL_NAV_SCOPE_ATTR]: extensionTemporalLeagueSequentialNavScopeId } : {},
         children: [
           extensionNewsLeaguesExpandUi && !suppressNewsLeaguesBrowseBy ? /* @__PURE__ */ (0, import_jsx_runtime275.jsx)(GrarfExtensionNewsLeaguesBrowseByControl, {}) : null,
           showTemporalNewsLeaguesAllSportsRow ? /* @__PURE__ */ (0, import_jsx_runtime275.jsxs)(
@@ -165618,7 +165671,7 @@ function SportsBrowserPrototypeTemporaryNavLeaguesInlineTree({
                 }
               );
               const extensionSportLevelGroupedLeagueRow = isGrarfExtensionRenderer() && group.sportLevelOnly && sportGroupSectionId != null;
-              if (extensionNewsLeaguesExpandUi || extensionSportLevelGroupedLeagueRow) {
+              if (extensionNewsLeaguesExpandUi || extensionSportLevelGroupedLeagueRow || extensionTemporalLeagueCardListUi) {
                 const newsWebsites = newsWebsitesForLeague ?? [];
                 return /* @__PURE__ */ (0, import_jsx_runtime275.jsxs)(
                   "div",
@@ -167351,177 +167404,221 @@ function SportsBrowserPrototypeTemporaryNavPrototype({
       }
     );
   }
-  const visibleSelectorColumnCount = 1 + (showsSelector2Column ? 1 : 0) + (selector3Column != null ? 1 : 0);
+  const extensionTemporalNavChrome = isGrarfExtensionRenderer() && onLeaguesSearchQueryChange != null && leaguesSortMode != null;
+  if (extensionTemporalNavChrome && selector3Column == null) {
+    selector3Column = /* @__PURE__ */ (0, import_jsx_runtime280.jsx)(
+      "div",
+      {
+        className: "min-w-0 flex-1",
+        "data-sports-browser-prototype-temporary-nav-selector": "col-3-blank",
+        "aria-hidden": true
+      }
+    );
+  }
+  const visibleSelectorColumnCount = extensionTemporalNavChrome ? 3 : 1 + (showsSelector2Column ? 1 : 0) + (showsSelector3Column ? 1 : 0);
+  const selectorRow = /* @__PURE__ */ (0, import_jsx_runtime280.jsxs)(
+    "div",
+    {
+      className: cn2("flex min-w-0", !isGrarfExtensionRenderer() && "gap-1"),
+      "data-sports-browser-prototype-temporary-nav-prototype-selectors": "",
+      ...isGrarfExtensionRenderer() ? {
+        "data-grarf-extension-temporal-nav-connected-selectors": "",
+        "data-grarf-extension-temporal-nav-visible-selector-count": String(
+          visibleSelectorColumnCount
+        )
+      } : {},
+      children: [
+        /* @__PURE__ */ (0, import_jsx_runtime280.jsx)(
+          PrototypeSelectorColumn,
+          {
+            columnId: "col-1",
+            valueLabel: topLevel,
+            options: TOP_LEVEL_OPTIONS,
+            openColumnId,
+            onOpenColumnIdChange: setOpenColumnId,
+            onSelect: handleTopLevelSelect
+          }
+        ),
+        showsSelector2Column ? /* @__PURE__ */ (0, import_jsx_runtime280.jsx)(
+          PrototypeSelectorColumn,
+          {
+            columnId: "col-2",
+            valueLabel: effectiveSelector2Label,
+            options: selector2Options,
+            openColumnId,
+            onOpenColumnIdChange: setOpenColumnId,
+            onSelect: handleSelector2Select
+          }
+        ) : extensionTemporalNavChrome ? /* @__PURE__ */ (0, import_jsx_runtime280.jsx)(
+          "div",
+          {
+            className: "min-w-0 flex-1",
+            "data-sports-browser-prototype-temporary-nav-selector": "col-2-blank",
+            "aria-hidden": true
+          }
+        ) : null,
+        selector3Column
+      ]
+    }
+  );
+  const leaguesFilterField = onLeaguesSearchQueryChange != null && leaguesSortMode != null ? /* @__PURE__ */ (0, import_jsx_runtime280.jsx)(
+    SportsBrowserPrototypeLeaguesFilterField,
+    {
+      value: leaguesSearchQuery,
+      onChange: handleTemporaryNavLeaguesSearchQueryChange
+    }
+  ) : null;
+  const leaguesTopLevelBrowseBy = topLevel === "LEAGUES" && leaguesSelectorsWired && (leaguesLensSection === "news" || leaguesLensSection == null) ? /* @__PURE__ */ (0, import_jsx_runtime280.jsx)(GrarfExtensionNewsLeaguesBrowseByControl, {}) : null;
+  const extensionContentLeaguesBrowseBy = extensionTemporalNavChrome && contentSelectorsWired && contentNavSection && effectiveContentNavScope === "leagues" && topLevel !== "LEAGUES" && topLevel !== "TEAMS" ? /* @__PURE__ */ (0, import_jsx_runtime280.jsx)(GrarfExtensionNewsLeaguesBrowseByControl, {}) : null;
+  const extensionInlineTemporalContentAttr = extensionTemporalNavChrome ? void 0 : isGrarfExtensionRenderer() ? "" : void 0;
+  const inlineTrees = /* @__PURE__ */ (0, import_jsx_runtime280.jsxs)(import_jsx_runtime280.Fragment, { children: [
+    topLevel === "LEAGUES" && leaguesSelectorsWired ? /* @__PURE__ */ (0, import_jsx_runtime280.jsxs)(import_jsx_runtime280.Fragment, { children: [
+      !extensionTemporalNavChrome && (leaguesLensSection === "news" || leaguesLensSection == null) ? /* @__PURE__ */ (0, import_jsx_runtime280.jsx)(GrarfExtensionNewsLeaguesBrowseByControl, {}) : null,
+      /* @__PURE__ */ (0, import_jsx_runtime280.jsx)(
+        "div",
+        {
+          className: cn2("min-w-0", !extensionTemporalNavChrome && "mt-1.5"),
+          ...extensionTemporalNavChrome ? {} : { "data-sports-browser-prototype-temporary-nav-prototype-inline-tree": "" },
+          "data-sports-browser-prototype-sidebar-temporal-content": extensionInlineTemporalContentAttr,
+          "data-sports-browser-prototype-temporary-nav-leagues-lens": effectiveSelector2Label,
+          "data-sports-browser-prototype-temporary-nav-leagues-sort": effectiveSelector3Label,
+          children: /* @__PURE__ */ (0, import_jsx_runtime280.jsx)(
+            SportsBrowserPrototypeTemporaryNavLeaguesInlineTree,
+            {
+              leaguesSortMode,
+              leaguesLensSection,
+              leaguesFilterQuery: leaguesSearchQuery,
+              extensionTemporalLeaguesTopLevel: true,
+              suppressNewsLeaguesBrowseBy: isGrarfExtensionRenderer() && (leaguesLensSection === "news" || leaguesLensSection == null),
+              todayCompleteLeagues,
+              selectedLeagueKey,
+              destinationSelection,
+              onLeagueSelect,
+              onLeagueDestinationSelect,
+              onGlobalDestinationSelect,
+              renderTeamListPanel: renderContentTeamListPanel,
+              onLeaguesTabTeamSelect,
+              onTeamContentDestinationSelect
+            }
+          )
+        },
+        `leagues-inline-${effectiveSelector2Label}-${effectiveSelector3Label ?? "none"}`
+      )
+    ] }) : null,
+    topLevel === "TEAMS" && teamsSelectorsWired && renderContentTeamListPanel ? /* @__PURE__ */ (0, import_jsx_runtime280.jsx)(
+      "div",
+      {
+        className: cn2("min-w-0", !extensionTemporalNavChrome && "mt-1.5"),
+        ...extensionTemporalNavChrome ? {} : { "data-sports-browser-prototype-temporary-nav-prototype-inline-tree": "" },
+        "data-sports-browser-prototype-sidebar-temporal-content": extensionInlineTemporalContentAttr,
+        "data-sports-browser-prototype-temporary-nav-teams-sort": effectiveSelector2Label,
+        children: /* @__PURE__ */ (0, import_jsx_runtime280.jsx)(
+          SportsBrowserPrototypeTemporaryNavTeamsInlineTree,
+          {
+            contentSection: "news",
+            leaguesSortMode,
+            leaguesFilterQuery: isGrarfExtensionRenderer() ? leaguesSearchQuery : void 0,
+            todayCompleteLeagues,
+            renderTeamListPanel: renderContentTeamListPanel,
+            onTeamContentDestinationSelect
+          }
+        )
+      },
+      `teams-inline-${effectiveSelector2Label}`
+    ) : null,
+    contentSelectorsWired && contentNavSection && effectiveContentNavScope ? /* @__PURE__ */ (0, import_jsx_runtime280.jsxs)(
+      "div",
+      {
+        className: cn2("min-w-0", !extensionTemporalNavChrome && "mt-1.5"),
+        ...extensionTemporalNavChrome ? {} : { "data-sports-browser-prototype-temporary-nav-prototype-inline-tree": "" },
+        "data-sports-browser-prototype-sidebar-temporal-content": extensionInlineTemporalContentAttr,
+        "data-sports-browser-prototype-temporary-nav-content-section": contentNavSection,
+        "data-sports-browser-prototype-temporary-nav-content-scope": effectiveContentNavScope,
+        children: [
+          effectiveContentNavScope === "leagues" ? /* @__PURE__ */ (0, import_jsx_runtime280.jsx)(
+            SportsBrowserPrototypeTemporaryNavLeaguesInlineTree,
+            {
+              leaguesSortMode,
+              leaguesLensSection: contentNavSection,
+              leaguesFilterQuery: isGrarfExtensionRenderer() ? leaguesSearchQuery : void 0,
+              suppressNewsLeaguesBrowseBy: Boolean(extensionContentLeaguesBrowseBy),
+              todayCompleteLeagues,
+              selectedLeagueKey,
+              destinationSelection,
+              onLeagueSelect,
+              onLeagueDestinationSelect,
+              onGlobalDestinationSelect
+            }
+          ) : null,
+          effectiveContentNavScope === "teams" && renderContentTeamListPanel ? /* @__PURE__ */ (0, import_jsx_runtime280.jsx)(
+            SportsBrowserPrototypeTemporaryNavTeamsInlineTree,
+            {
+              contentSection: contentNavSection,
+              leaguesSortMode,
+              leaguesFilterQuery: isGrarfExtensionRenderer() ? leaguesSearchQuery : void 0,
+              todayCompleteLeagues,
+              renderTeamListPanel: renderContentTeamListPanel,
+              onTeamContentDestinationSelect
+            }
+          ) : null,
+          effectiveContentNavScope === "games" ? /* @__PURE__ */ (0, import_jsx_runtime280.jsx)(
+            SportsBrowserPrototypeTemporaryNavGamesInlineTree,
+            {
+              contentSection: contentNavSection,
+              leaguesSortMode,
+              leaguesFilterQuery: isGrarfExtensionRenderer() ? leaguesSearchQuery : void 0,
+              todayCompleteLeagues,
+              nowLeagues,
+              upcomingLeagues,
+              selectedGameId,
+              selectedLeagueKey,
+              onGameSelect,
+              onGameInlineNavigate
+            }
+          ) : null,
+          effectiveContentNavScope === "outlets" ? /* @__PURE__ */ (0, import_jsx_runtime280.jsx)(
+            SportsBrowserPrototypeTemporaryNavOutletsInlineTree,
+            {
+              contentSection: contentNavSection,
+              destinationSelection,
+              onGlobalDestinationSelect
+            }
+          ) : null
+        ]
+      },
+      `content-inline-${topLevel}-${effectiveContentNavScope}`
+    ) : null
+  ] });
+  const extensionHasInlineTemporalContent = topLevel === "LEAGUES" && leaguesSelectorsWired || topLevel === "TEAMS" && teamsSelectorsWired && renderContentTeamListPanel || contentSelectorsWired && contentNavSection && effectiveContentNavScope;
+  if (extensionTemporalNavChrome) {
+    return /* @__PURE__ */ (0, import_jsx_runtime280.jsxs)(import_jsx_runtime280.Fragment, { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime280.jsxs)("div", { ref: rootRef, className: "min-w-0 px-2 pt-2", "data-grarf-extension-temporal-nav-chrome": "", children: [
+        selectorRow,
+        leaguesFilterField,
+        leaguesTopLevelBrowseBy,
+        extensionContentLeaguesBrowseBy
+      ] }),
+      extensionHasInlineTemporalContent ? /* @__PURE__ */ (0, import_jsx_runtime280.jsx)(
+        "div",
+        {
+          className: "min-w-0",
+          "data-sports-browser-prototype-sidebar-temporal-content": "",
+          "data-sports-browser-prototype-temporary-nav-prototype-inline-tree": "",
+          children: inlineTrees
+        }
+      ) : null
+    ] });
+  }
   return /* @__PURE__ */ (0, import_jsx_runtime280.jsxs)(
     "div",
     {
       ref: rootRef,
-      className: cn2(
-        "shrink-0 px-2 py-2",
-        isGrarfExtensionRenderer() ? "" : cn2("border-t", RULE3)
-      ),
+      className: cn2("shrink-0 px-2 py-2", "border-t", RULE3),
       "data-sports-browser-prototype-temporary-nav-prototype": "",
       children: [
-        /* @__PURE__ */ (0, import_jsx_runtime280.jsxs)(
-          "div",
-          {
-            className: cn2("flex min-w-0", !isGrarfExtensionRenderer() && "gap-1"),
-            "data-sports-browser-prototype-temporary-nav-prototype-selectors": "",
-            ...isGrarfExtensionRenderer() ? {
-              "data-grarf-extension-temporal-nav-connected-selectors": "",
-              "data-grarf-extension-temporal-nav-visible-selector-count": String(
-                visibleSelectorColumnCount
-              )
-            } : {},
-            children: [
-              /* @__PURE__ */ (0, import_jsx_runtime280.jsx)(
-                PrototypeSelectorColumn,
-                {
-                  columnId: "col-1",
-                  valueLabel: topLevel,
-                  options: TOP_LEVEL_OPTIONS,
-                  openColumnId,
-                  onOpenColumnIdChange: setOpenColumnId,
-                  onSelect: handleTopLevelSelect
-                }
-              ),
-              showsSelector2Column ? /* @__PURE__ */ (0, import_jsx_runtime280.jsx)(
-                PrototypeSelectorColumn,
-                {
-                  columnId: "col-2",
-                  valueLabel: effectiveSelector2Label,
-                  options: selector2Options,
-                  openColumnId,
-                  onOpenColumnIdChange: setOpenColumnId,
-                  onSelect: handleSelector2Select
-                }
-              ) : null,
-              selector3Column
-            ]
-          }
-        ),
-        isGrarfExtensionRenderer() && onLeaguesSearchQueryChange != null && leaguesSortMode != null ? /* @__PURE__ */ (0, import_jsx_runtime280.jsx)(
-          SportsBrowserPrototypeLeaguesFilterField,
-          {
-            value: leaguesSearchQuery,
-            onChange: handleTemporaryNavLeaguesSearchQueryChange
-          }
-        ) : null,
-        topLevel === "LEAGUES" && leaguesSelectorsWired ? /* @__PURE__ */ (0, import_jsx_runtime280.jsxs)(import_jsx_runtime280.Fragment, { children: [
-          isGrarfExtensionRenderer() && (leaguesLensSection === "news" || leaguesLensSection == null) ? /* @__PURE__ */ (0, import_jsx_runtime280.jsx)(GrarfExtensionNewsLeaguesBrowseByControl, {}) : null,
-          /* @__PURE__ */ (0, import_jsx_runtime280.jsx)(
-            "div",
-            {
-              className: "mt-1.5 min-w-0",
-              "data-sports-browser-prototype-temporary-nav-prototype-inline-tree": "",
-              "data-sports-browser-prototype-sidebar-temporal-content": isGrarfExtensionRenderer() ? "" : void 0,
-              "data-sports-browser-prototype-temporary-nav-leagues-lens": effectiveSelector2Label,
-              "data-sports-browser-prototype-temporary-nav-leagues-sort": effectiveSelector3Label,
-              children: /* @__PURE__ */ (0, import_jsx_runtime280.jsx)(
-                SportsBrowserPrototypeTemporaryNavLeaguesInlineTree,
-                {
-                  leaguesSortMode,
-                  leaguesLensSection,
-                  leaguesFilterQuery: leaguesSearchQuery,
-                  extensionTemporalLeaguesTopLevel: true,
-                  suppressNewsLeaguesBrowseBy: isGrarfExtensionRenderer() && (leaguesLensSection === "news" || leaguesLensSection == null),
-                  todayCompleteLeagues,
-                  selectedLeagueKey,
-                  destinationSelection,
-                  onLeagueSelect,
-                  onLeagueDestinationSelect,
-                  onGlobalDestinationSelect,
-                  renderTeamListPanel: renderContentTeamListPanel,
-                  onLeaguesTabTeamSelect,
-                  onTeamContentDestinationSelect
-                }
-              )
-            },
-            `leagues-inline-${effectiveSelector2Label}-${effectiveSelector3Label ?? "none"}`
-          )
-        ] }) : null,
-        topLevel === "TEAMS" && teamsSelectorsWired && renderContentTeamListPanel ? /* @__PURE__ */ (0, import_jsx_runtime280.jsx)(
-          "div",
-          {
-            className: "mt-1.5 min-w-0",
-            "data-sports-browser-prototype-temporary-nav-prototype-inline-tree": "",
-            "data-sports-browser-prototype-sidebar-temporal-content": isGrarfExtensionRenderer() ? "" : void 0,
-            "data-sports-browser-prototype-temporary-nav-teams-sort": effectiveSelector2Label,
-            children: /* @__PURE__ */ (0, import_jsx_runtime280.jsx)(
-              SportsBrowserPrototypeTemporaryNavTeamsInlineTree,
-              {
-                contentSection: "news",
-                leaguesSortMode,
-                leaguesFilterQuery: isGrarfExtensionRenderer() ? leaguesSearchQuery : void 0,
-                todayCompleteLeagues,
-                renderTeamListPanel: renderContentTeamListPanel,
-                onTeamContentDestinationSelect
-              }
-            )
-          },
-          `teams-inline-${effectiveSelector2Label}`
-        ) : null,
-        contentSelectorsWired && contentNavSection && effectiveContentNavScope ? /* @__PURE__ */ (0, import_jsx_runtime280.jsxs)(
-          "div",
-          {
-            className: "mt-1.5 min-w-0",
-            "data-sports-browser-prototype-temporary-nav-prototype-inline-tree": "",
-            "data-sports-browser-prototype-sidebar-temporal-content": isGrarfExtensionRenderer() ? "" : void 0,
-            "data-sports-browser-prototype-temporary-nav-content-section": contentNavSection,
-            "data-sports-browser-prototype-temporary-nav-content-scope": effectiveContentNavScope,
-            children: [
-              effectiveContentNavScope === "leagues" ? /* @__PURE__ */ (0, import_jsx_runtime280.jsx)(
-                SportsBrowserPrototypeTemporaryNavLeaguesInlineTree,
-                {
-                  leaguesSortMode,
-                  leaguesLensSection: contentNavSection,
-                  leaguesFilterQuery: isGrarfExtensionRenderer() ? leaguesSearchQuery : void 0,
-                  todayCompleteLeagues,
-                  selectedLeagueKey,
-                  destinationSelection,
-                  onLeagueSelect,
-                  onLeagueDestinationSelect,
-                  onGlobalDestinationSelect
-                }
-              ) : null,
-              effectiveContentNavScope === "teams" && renderContentTeamListPanel ? /* @__PURE__ */ (0, import_jsx_runtime280.jsx)(
-                SportsBrowserPrototypeTemporaryNavTeamsInlineTree,
-                {
-                  contentSection: contentNavSection,
-                  leaguesSortMode,
-                  leaguesFilterQuery: isGrarfExtensionRenderer() ? leaguesSearchQuery : void 0,
-                  todayCompleteLeagues,
-                  renderTeamListPanel: renderContentTeamListPanel,
-                  onTeamContentDestinationSelect
-                }
-              ) : null,
-              effectiveContentNavScope === "games" ? /* @__PURE__ */ (0, import_jsx_runtime280.jsx)(
-                SportsBrowserPrototypeTemporaryNavGamesInlineTree,
-                {
-                  contentSection: contentNavSection,
-                  leaguesSortMode,
-                  leaguesFilterQuery: isGrarfExtensionRenderer() ? leaguesSearchQuery : void 0,
-                  todayCompleteLeagues,
-                  nowLeagues,
-                  upcomingLeagues,
-                  selectedGameId,
-                  selectedLeagueKey,
-                  onGameSelect,
-                  onGameInlineNavigate
-                }
-              ) : null,
-              effectiveContentNavScope === "outlets" ? /* @__PURE__ */ (0, import_jsx_runtime280.jsx)(
-                SportsBrowserPrototypeTemporaryNavOutletsInlineTree,
-                {
-                  contentSection: contentNavSection,
-                  destinationSelection,
-                  onGlobalDestinationSelect
-                }
-              ) : null
-            ]
-          },
-          `content-inline-${topLevel}-${effectiveContentNavScope}`
-        ) : null
+        selectorRow,
+        leaguesFilterField,
+        inlineTrees
       ]
     }
   );
@@ -167654,6 +167751,18 @@ init_isGrarfWebRenderer();
 // ../grarf/desktop/src/extensionHost/grarfExtensionSidebarScrollportHeight.ts
 init_define_import_meta_env();
 var GRARF_EXTENSION_SIDEBAR_SCROLLPORT_HEIGHT_VAR = "--grarf-extension-sidebar-scrollport-height";
+var GRARF_EXTENSION_TEMPORAL_NAV_CHROME_HEIGHT_VAR = "--grarf-extension-temporal-nav-chrome-height";
+function syncGrarfExtensionTemporalNavChromeMetrics(scrollRoot) {
+  const chrome = scrollRoot.querySelector("[data-grarf-extension-temporal-nav-chrome]");
+  if (!chrome) {
+    scrollRoot.style.removeProperty(GRARF_EXTENSION_TEMPORAL_NAV_CHROME_HEIGHT_VAR);
+    return;
+  }
+  scrollRoot.style.setProperty(
+    GRARF_EXTENSION_TEMPORAL_NAV_CHROME_HEIGHT_VAR,
+    `${chrome.offsetHeight}px`
+  );
+}
 function applyGrarfExtensionSidebarScrollportHeight(scrollRoot) {
   scrollRoot.style.setProperty(
     GRARF_EXTENSION_SIDEBAR_SCROLLPORT_HEIGHT_VAR,
@@ -167671,16 +167780,24 @@ function observeGrarfExtensionSidebarScrollportHeight(scrollRoot) {
   };
   const syncScrollport = () => {
     sync();
+    syncGrarfExtensionTemporalNavChromeMetrics(scrollRoot);
     syncGrarfExtensionExpandedLeagueHeaderSticky();
   };
   syncScrollport();
   const resizeObserver = new ResizeObserver(syncScrollport);
   resizeObserver.observe(scrollRoot);
+  const temporalNavChrome = scrollRoot.querySelector(
+    "[data-grarf-extension-temporal-nav-chrome]"
+  );
+  if (temporalNavChrome) {
+    resizeObserver.observe(temporalNavChrome);
+  }
   window.addEventListener("resize", syncScrollport);
   return () => {
     resizeObserver.disconnect();
     window.removeEventListener("resize", syncScrollport);
     clearGrarfExtensionSidebarScrollportHeight(scrollRoot);
+    scrollRoot.style.removeProperty(GRARF_EXTENSION_TEMPORAL_NAV_CHROME_HEIGHT_VAR);
     disconnectGrarfExtensionExpandedLeagueHeaderStickyObserver();
   };
 }
@@ -167717,6 +167834,9 @@ function syncGrarfExtensionExpandedLeagueHeaderSticky() {
   const scrollRoot = document.querySelector(
     "[data-sports-browser-prototype-left-nav-scroll]"
   );
+  if (scrollRoot) {
+    syncGrarfExtensionTemporalNavChromeMetrics(scrollRoot);
+  }
   const expanded = scrollRoot?.querySelector(EXPANDED_NESTED_LEAGUE_SELECTOR) ?? null;
   for (const node of document.querySelectorAll(
     `[${GRARF_EXTENSION_EXPANDED_LEAGUE_HEADER_STICKY_ATTR}]`
@@ -167752,8 +167872,19 @@ function useGrarfExtensionSidebarLeagueExpandScrollHold() {
   );
   (0, import_react290.useLayoutEffect)(() => {
     if (!isGrarfExtensionRenderer()) return;
-    restoreGrarfExtensionLeagueHeaderAnchor();
-    syncGrarfExtensionExpandedLeagueHeaderSticky();
+    if (!expandedLeagueKey) {
+      restoreGrarfExtensionLeagueHeaderAnchor();
+      syncGrarfExtensionExpandedLeagueHeaderSticky();
+      return;
+    }
+    const syncExpandedLeagueScroll = () => {
+      scrollGrarfExtensionExpandedLeagueContentToTop(expandedLeagueKey);
+      syncGrarfExtensionExpandedLeagueHeaderSticky();
+    };
+    syncExpandedLeagueScroll();
+    requestAnimationFrame(() => {
+      syncExpandedLeagueScroll();
+    });
   }, [expandedLeagueKey]);
 }
 
@@ -170818,11 +170949,12 @@ function SidebarTemporalLeagueBlock({
   return /* @__PURE__ */ (0, import_jsx_runtime286.jsxs)(
     "div",
     {
-      "data-grarf-temporary-nav-nested-league": "",
       ...extensionTemporalNestedLeagueShell ? {
         "data-grarf-extension-yesterday-highlights-nested-league": "",
         ...expanded ? { "data-grarf-extension-yesterday-highlights-league-expanded": "" } : {}
-      } : {},
+      } : {
+        "data-grarf-temporary-nav-nested-league": ""
+      },
       ...extensionGamesYesterdayDirectLeagueRowCatchUp ? { "data-grarf-extension-yesterday-highlights-league-level": "" } : {},
       ...extensionGamesYesterdayHighlightsUnsupported ? { "data-grarf-extension-yesterday-highlights-unsupported-league": "" } : {},
       children: [
@@ -171885,6 +172017,15 @@ function SidebarLeaguesTabTeamListPanel({
     }
   );
 }
+function GrarfExtensionTemporalBrowseRegion({
+  enabled,
+  children
+}) {
+  if (!enabled) {
+    return /* @__PURE__ */ (0, import_jsx_runtime286.jsx)(import_jsx_runtime286.Fragment, { children });
+  }
+  return /* @__PURE__ */ (0, import_jsx_runtime286.jsx)("div", { className: "min-w-0", "data-grarf-extension-temporal-browse-region": "", children });
+}
 function SportsBrowserPrototypeLeftNav({
   className,
   onOpenUrl,
@@ -172599,176 +172740,178 @@ function SportsBrowserPrototypeLeftNav({
                           }
                         )
                       ] }),
-                      /* @__PURE__ */ (0, import_jsx_runtime286.jsx)(
-                        SportsBrowserPrototypeTemporaryNavPrototype,
-                        {
-                          gamesCompactTemporalView: compactTemporalView,
-                          onGamesCompactTemporalSelect: onCompactTemporalSelect,
-                          leaguesSortMode,
-                          onLeaguesSortModeChange: setLeaguesSortMode,
-                          leaguesLensSection,
-                          onLeaguesLensSectionChange: setLeaguesLensSection,
-                          todayCompleteLeagues,
-                          nowLeagues,
-                          upcomingLeagues,
-                          selectedLeagueKey,
-                          selectedGameId,
-                          destinationSelection: temporaryNavDestinationSelection,
-                          onLeagueSelect: (leagueKey) => onLeagueSelect?.(leagueKey),
-                          onLeagueDestinationSelect: onLeaguesNavDestinationSelect,
-                          onGlobalDestinationSelect: onTemporaryNavGlobalDestinationSelect,
-                          contentNavSection: temporaryNavContentSection,
-                          contentNavScope: temporaryNavContentScope,
-                          onContentNavChange: handleTemporaryNavContentNavChange,
-                          onContentTeamDestinationSelect: onTemporaryNavContentTeamDestinationSelect,
-                          onTeamContentDestinationSelect: onTemporaryNavTeamContentDestinationSelect,
-                          onContentGameDestinationSelect: onTemporaryNavContentGameDestinationSelect,
-                          onGameSelect,
-                          onGameInlineNavigate: onTemporaryNavGameInlineNavigate,
-                          renderContentTeamListPanel: (leagueKey, onTeamSelect, inlineExpansion) => /* @__PURE__ */ (0, import_jsx_runtime286.jsx)(
-                            SidebarLeaguesTabTeamListPanel,
-                            {
-                              leagueKey,
-                              onLeaguesTabTeamSelect: onTeamSelect,
-                              inlineExpansion
-                            }
-                          ),
-                          onLeaguesTabTeamSelect,
-                          onTopLevelChange: handleTemporaryNavTopLevelChange,
-                          externalTopLevelRequest: aiSearchTemporaryNavRequest,
-                          onExtensionGamesYesterdayHighlightsNavigationContextChange: isGrarfExtensionRenderer() ? setExtensionGamesYesterdayHighlightsNavigation : void 0,
-                          leaguesSearchQuery: temporaryNavLeaguesSearchQuery,
-                          onLeaguesSearchQueryChange: setTemporaryNavLeaguesSearchQuery
-                        }
-                      ),
-                      sidebarTopLevelMode === "games" && (temporaryNavTopLevel === "GAMES" || temporaryNavTopLevel === "RECAPS") ? /* @__PURE__ */ (0, import_jsx_runtime286.jsxs)(
-                        "div",
-                        {
-                          className: cn2(!isGrarfExtensionRenderer() && "border-t", RULE4),
-                          "data-sports-browser-prototype-sidebar-temporal-content": "",
-                          ...extensionGamesSequentialNavScopeId ? { [GRARF_EXTENSION_SEQUENTIAL_NAV_SCOPE_ATTR]: extensionGamesSequentialNavScopeId } : {},
-                          children: [
-                            compactTemporalView === "final" ? /* @__PURE__ */ (0, import_jsx_runtime286.jsx)(
-                              SidebarGroupedTemporalLeagueEntries,
+                      /* @__PURE__ */ (0, import_jsx_runtime286.jsxs)(GrarfExtensionTemporalBrowseRegion, { enabled: isGrarfExtensionRenderer(), children: [
+                        /* @__PURE__ */ (0, import_jsx_runtime286.jsx)(
+                          SportsBrowserPrototypeTemporaryNavPrototype,
+                          {
+                            gamesCompactTemporalView: compactTemporalView,
+                            onGamesCompactTemporalSelect: onCompactTemporalSelect,
+                            leaguesSortMode,
+                            onLeaguesSortModeChange: setLeaguesSortMode,
+                            leaguesLensSection,
+                            onLeaguesLensSectionChange: setLeaguesLensSection,
+                            todayCompleteLeagues,
+                            nowLeagues,
+                            upcomingLeagues,
+                            selectedLeagueKey,
+                            selectedGameId,
+                            destinationSelection: temporaryNavDestinationSelection,
+                            onLeagueSelect: (leagueKey) => onLeagueSelect?.(leagueKey),
+                            onLeagueDestinationSelect: onLeaguesNavDestinationSelect,
+                            onGlobalDestinationSelect: onTemporaryNavGlobalDestinationSelect,
+                            contentNavSection: temporaryNavContentSection,
+                            contentNavScope: temporaryNavContentScope,
+                            onContentNavChange: handleTemporaryNavContentNavChange,
+                            onContentTeamDestinationSelect: onTemporaryNavContentTeamDestinationSelect,
+                            onTeamContentDestinationSelect: onTemporaryNavTeamContentDestinationSelect,
+                            onContentGameDestinationSelect: onTemporaryNavContentGameDestinationSelect,
+                            onGameSelect,
+                            onGameInlineNavigate: onTemporaryNavGameInlineNavigate,
+                            renderContentTeamListPanel: (leagueKey, onTeamSelect, inlineExpansion) => /* @__PURE__ */ (0, import_jsx_runtime286.jsx)(
+                              SidebarLeaguesTabTeamListPanel,
                               {
-                                entries: isGrarfExtensionRenderer() ? extensionGroupedCatchUpLeagues : groupedCatchUpLeagues,
-                                sectionPrefix: "catch-up",
-                                variant: "catchUp",
-                                leagueOpen: resolvedCatchUpLeagueOpen,
-                                onLeagueOpenChange: extensionSidebarExclusiveLeagueExpansion ? onExtensionExclusiveLeagueOpenChange : setCatchUpLeagueOpen,
-                                toggleLeague: toggleCatchUpLeague,
-                                allOpen: false,
-                                onSoccerArchLeagueSelect,
-                                selectedSidebarArchLeagueKey,
-                                onGameSelect,
-                                onGameTeamSelect,
-                                onWatchLive,
-                                canShowWatchLive,
-                                selectedGameId,
-                                selectedLeagueKey,
-                                onOpenUrl,
-                                showGameInlineMenuUnderCards: true,
-                                onGameInlineNavigate: onTemporaryNavGameInlineNavigate,
-                                onCommandCenterFollowLiveToggle
+                                leagueKey,
+                                onLeaguesTabTeamSelect: onTeamSelect,
+                                inlineExpansion
                               }
-                            ) : null,
-                            compactTemporalView === "yesterday" ? /* @__PURE__ */ (0, import_jsx_runtime286.jsx)(
-                              SidebarYesterdaySectionLeagues,
-                              {
-                                slates: filterExtensionTemporalLeagueSlates(yesterdayLeagues),
-                                leagueOpen: resolvedYesterdayLeagueOpen,
-                                onLeagueOpenChange: extensionSidebarExclusiveLeagueExpansion ? onExtensionExclusiveLeagueOpenChange : setYesterdayLeagueOpen,
-                                onLeagueSelect: onTemporalLeagueSelect,
-                                onGameSelect,
-                                onGameTeamSelect,
-                                onOpenUrl,
-                                onSoccerArchLeagueSelect,
-                                onWatchLive,
-                                canShowWatchLive,
-                                selectedGameId,
-                                selectedLeagueKey,
-                                selectedSidebarArchLeagueKey,
-                                showGameInlineMenuUnderCards: true,
-                                onGameInlineNavigate: onTemporaryNavGameInlineNavigate,
-                                onCommandCenterFollowLiveToggle,
-                                extensionGamesYesterdayHighlightsNavigation
-                              }
-                            ) : null,
-                            compactTemporalView === "today" ? /* @__PURE__ */ (0, import_jsx_runtime286.jsx)(
-                              SidebarTemporalSectionLeagues,
-                              {
-                                sectionId: "today",
-                                slates: filterExtensionTemporalLeagueSlates(todayCompleteLeagues),
-                                resolveVariant: resolveSidebarGameVariant,
-                                leagueOpen: resolvedSectionLeagueOpen,
-                                onLeagueOpenChange: extensionSidebarExclusiveLeagueExpansion ? onExtensionExclusiveLeagueOpenChange : setSectionLeagueOpen,
-                                onLeagueSelect: onTemporalLeagueSelect,
-                                onGameSelect,
-                                onGameTeamSelect,
-                                onSelectGlobalWebsites,
-                                onSoccerArchLeagueSelect,
-                                onWatchLive,
-                                canShowWatchLive,
-                                selectedGameId,
-                                selectedLeagueKey,
-                                selectedSidebarArchLeagueKey,
-                                onOpenUrl,
-                                showGameInlineMenuUnderCards: true,
-                                onGameInlineNavigate: onTemporaryNavGameInlineNavigate,
-                                onCommandCenterFollowLiveToggle
-                              }
-                            ) : null,
-                            compactTemporalView === "now" ? /* @__PURE__ */ (0, import_jsx_runtime286.jsx)(
-                              SidebarTemporalSectionLeagues,
-                              {
-                                sectionId: "now",
-                                slates: filterExtensionTemporalLeagueSlates(nowLeagues),
-                                variant: "live",
-                                leagueOpen: resolvedSectionLeagueOpen,
-                                onLeagueOpenChange: extensionSidebarExclusiveLeagueExpansion ? onExtensionExclusiveLeagueOpenChange : setSectionLeagueOpen,
-                                onLeagueSelect: onTemporalLeagueSelect,
-                                onGameSelect,
-                                onGameTeamSelect,
-                                onSelectGlobalWebsites,
-                                onSoccerArchLeagueSelect,
-                                onWatchLive,
-                                canShowWatchLive,
-                                selectedGameId,
-                                selectedLeagueKey,
-                                selectedSidebarArchLeagueKey,
-                                onOpenUrl,
-                                showGameInlineMenuUnderCards: true,
-                                onGameInlineNavigate: onTemporaryNavGameInlineNavigate,
-                                onCommandCenterFollowLiveToggle
-                              }
-                            ) : null,
-                            compactTemporalView === "next" ? /* @__PURE__ */ (0, import_jsx_runtime286.jsx)(
-                              SidebarTemporalSectionLeagues,
-                              {
-                                sectionId: "upcoming",
-                                slates: filterExtensionTemporalLeagueSlates(upcomingLeagues),
-                                variant: "upcoming",
-                                leagueOpen: resolvedSectionLeagueOpen,
-                                onLeagueOpenChange: extensionSidebarExclusiveLeagueExpansion ? onExtensionExclusiveLeagueOpenChange : setSectionLeagueOpen,
-                                onLeagueSelect: onTemporalLeagueSelect,
-                                onGameSelect,
-                                onGameTeamSelect,
-                                onSelectGlobalWebsites,
-                                onSoccerArchLeagueSelect,
-                                onWatchLive,
-                                canShowWatchLive,
-                                selectedGameId,
-                                selectedLeagueKey,
-                                selectedSidebarArchLeagueKey,
-                                onOpenUrl,
-                                showGameInlineMenuUnderCards: true,
-                                onGameInlineNavigate: onTemporaryNavGameInlineNavigate,
-                                onCommandCenterFollowLiveToggle
-                              }
-                            ) : null
-                          ]
-                        }
-                      ) : null
+                            ),
+                            onLeaguesTabTeamSelect,
+                            onTopLevelChange: handleTemporaryNavTopLevelChange,
+                            externalTopLevelRequest: aiSearchTemporaryNavRequest,
+                            onExtensionGamesYesterdayHighlightsNavigationContextChange: isGrarfExtensionRenderer() ? setExtensionGamesYesterdayHighlightsNavigation : void 0,
+                            leaguesSearchQuery: temporaryNavLeaguesSearchQuery,
+                            onLeaguesSearchQueryChange: setTemporaryNavLeaguesSearchQuery
+                          }
+                        ),
+                        sidebarTopLevelMode === "games" && (temporaryNavTopLevel === "GAMES" || temporaryNavTopLevel === "RECAPS") ? /* @__PURE__ */ (0, import_jsx_runtime286.jsxs)(
+                          "div",
+                          {
+                            className: cn2(!isGrarfExtensionRenderer() && "border-t", RULE4),
+                            "data-sports-browser-prototype-sidebar-temporal-content": "",
+                            ...extensionGamesSequentialNavScopeId ? { [GRARF_EXTENSION_SEQUENTIAL_NAV_SCOPE_ATTR]: extensionGamesSequentialNavScopeId } : {},
+                            children: [
+                              compactTemporalView === "final" ? /* @__PURE__ */ (0, import_jsx_runtime286.jsx)(
+                                SidebarGroupedTemporalLeagueEntries,
+                                {
+                                  entries: isGrarfExtensionRenderer() ? extensionGroupedCatchUpLeagues : groupedCatchUpLeagues,
+                                  sectionPrefix: "catch-up",
+                                  variant: "catchUp",
+                                  leagueOpen: resolvedCatchUpLeagueOpen,
+                                  onLeagueOpenChange: extensionSidebarExclusiveLeagueExpansion ? onExtensionExclusiveLeagueOpenChange : setCatchUpLeagueOpen,
+                                  toggleLeague: toggleCatchUpLeague,
+                                  allOpen: false,
+                                  onSoccerArchLeagueSelect,
+                                  selectedSidebarArchLeagueKey,
+                                  onGameSelect,
+                                  onGameTeamSelect,
+                                  onWatchLive,
+                                  canShowWatchLive,
+                                  selectedGameId,
+                                  selectedLeagueKey,
+                                  onOpenUrl,
+                                  showGameInlineMenuUnderCards: true,
+                                  onGameInlineNavigate: onTemporaryNavGameInlineNavigate,
+                                  onCommandCenterFollowLiveToggle
+                                }
+                              ) : null,
+                              compactTemporalView === "yesterday" ? /* @__PURE__ */ (0, import_jsx_runtime286.jsx)(
+                                SidebarYesterdaySectionLeagues,
+                                {
+                                  slates: filterExtensionTemporalLeagueSlates(yesterdayLeagues),
+                                  leagueOpen: resolvedYesterdayLeagueOpen,
+                                  onLeagueOpenChange: extensionSidebarExclusiveLeagueExpansion ? onExtensionExclusiveLeagueOpenChange : setYesterdayLeagueOpen,
+                                  onLeagueSelect: onTemporalLeagueSelect,
+                                  onGameSelect,
+                                  onGameTeamSelect,
+                                  onOpenUrl,
+                                  onSoccerArchLeagueSelect,
+                                  onWatchLive,
+                                  canShowWatchLive,
+                                  selectedGameId,
+                                  selectedLeagueKey,
+                                  selectedSidebarArchLeagueKey,
+                                  showGameInlineMenuUnderCards: true,
+                                  onGameInlineNavigate: onTemporaryNavGameInlineNavigate,
+                                  onCommandCenterFollowLiveToggle,
+                                  extensionGamesYesterdayHighlightsNavigation
+                                }
+                              ) : null,
+                              compactTemporalView === "today" ? /* @__PURE__ */ (0, import_jsx_runtime286.jsx)(
+                                SidebarTemporalSectionLeagues,
+                                {
+                                  sectionId: "today",
+                                  slates: filterExtensionTemporalLeagueSlates(todayCompleteLeagues),
+                                  resolveVariant: resolveSidebarGameVariant,
+                                  leagueOpen: resolvedSectionLeagueOpen,
+                                  onLeagueOpenChange: extensionSidebarExclusiveLeagueExpansion ? onExtensionExclusiveLeagueOpenChange : setSectionLeagueOpen,
+                                  onLeagueSelect: onTemporalLeagueSelect,
+                                  onGameSelect,
+                                  onGameTeamSelect,
+                                  onSelectGlobalWebsites,
+                                  onSoccerArchLeagueSelect,
+                                  onWatchLive,
+                                  canShowWatchLive,
+                                  selectedGameId,
+                                  selectedLeagueKey,
+                                  selectedSidebarArchLeagueKey,
+                                  onOpenUrl,
+                                  showGameInlineMenuUnderCards: true,
+                                  onGameInlineNavigate: onTemporaryNavGameInlineNavigate,
+                                  onCommandCenterFollowLiveToggle
+                                }
+                              ) : null,
+                              compactTemporalView === "now" ? /* @__PURE__ */ (0, import_jsx_runtime286.jsx)(
+                                SidebarTemporalSectionLeagues,
+                                {
+                                  sectionId: "now",
+                                  slates: filterExtensionTemporalLeagueSlates(nowLeagues),
+                                  variant: "live",
+                                  leagueOpen: resolvedSectionLeagueOpen,
+                                  onLeagueOpenChange: extensionSidebarExclusiveLeagueExpansion ? onExtensionExclusiveLeagueOpenChange : setSectionLeagueOpen,
+                                  onLeagueSelect: onTemporalLeagueSelect,
+                                  onGameSelect,
+                                  onGameTeamSelect,
+                                  onSelectGlobalWebsites,
+                                  onSoccerArchLeagueSelect,
+                                  onWatchLive,
+                                  canShowWatchLive,
+                                  selectedGameId,
+                                  selectedLeagueKey,
+                                  selectedSidebarArchLeagueKey,
+                                  onOpenUrl,
+                                  showGameInlineMenuUnderCards: true,
+                                  onGameInlineNavigate: onTemporaryNavGameInlineNavigate,
+                                  onCommandCenterFollowLiveToggle
+                                }
+                              ) : null,
+                              compactTemporalView === "next" ? /* @__PURE__ */ (0, import_jsx_runtime286.jsx)(
+                                SidebarTemporalSectionLeagues,
+                                {
+                                  sectionId: "upcoming",
+                                  slates: filterExtensionTemporalLeagueSlates(upcomingLeagues),
+                                  variant: "upcoming",
+                                  leagueOpen: resolvedSectionLeagueOpen,
+                                  onLeagueOpenChange: extensionSidebarExclusiveLeagueExpansion ? onExtensionExclusiveLeagueOpenChange : setSectionLeagueOpen,
+                                  onLeagueSelect: onTemporalLeagueSelect,
+                                  onGameSelect,
+                                  onGameTeamSelect,
+                                  onSelectGlobalWebsites,
+                                  onSoccerArchLeagueSelect,
+                                  onWatchLive,
+                                  canShowWatchLive,
+                                  selectedGameId,
+                                  selectedLeagueKey,
+                                  selectedSidebarArchLeagueKey,
+                                  onOpenUrl,
+                                  showGameInlineMenuUnderCards: true,
+                                  onGameInlineNavigate: onTemporaryNavGameInlineNavigate,
+                                  onCommandCenterFollowLiveToggle
+                                }
+                              ) : null
+                            ]
+                          }
+                        ) : null
+                      ] })
                     ] }),
                     extensionSidebarTimelineSection
                   ]
