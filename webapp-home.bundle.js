@@ -51937,18 +51937,9 @@ init_define_import_meta_env();
 var __iconNode27 = [["path", { d: "M21 12a9 9 0 1 1-6.219-8.56", key: "13zald" }]];
 var LoaderCircle = createLucideIcon("loader-circle", __iconNode27);
 
-// ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/mic.mjs
-init_define_import_meta_env();
-var __iconNode28 = [
-  ["path", { d: "M12 19v3", key: "npa21l" }],
-  ["path", { d: "M19 10v2a7 7 0 0 1-14 0v-2", key: "1vc78b" }],
-  ["rect", { x: "9", y: "2", width: "6", height: "13", rx: "3", key: "s6n7sd" }]
-];
-var Mic = createLucideIcon("mic", __iconNode28);
-
 // ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/newspaper.mjs
 init_define_import_meta_env();
-var __iconNode29 = [
+var __iconNode28 = [
   ["path", { d: "M15 18h-5", key: "95g1m2" }],
   ["path", { d: "M18 14h-8", key: "sponae" }],
   [
@@ -51960,29 +51951,29 @@ var __iconNode29 = [
   ],
   ["rect", { width: "8", height: "4", x: "10", y: "6", rx: "1", key: "aywv1n" }]
 ];
-var Newspaper = createLucideIcon("newspaper", __iconNode29);
+var Newspaper = createLucideIcon("newspaper", __iconNode28);
 
 // ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/panel-left-close.mjs
 init_define_import_meta_env();
-var __iconNode30 = [
+var __iconNode29 = [
   ["rect", { width: "18", height: "18", x: "3", y: "3", rx: "2", key: "afitv7" }],
   ["path", { d: "M9 3v18", key: "fh3hqa" }],
   ["path", { d: "m16 15-3-3 3-3", key: "14y99z" }]
 ];
-var PanelLeftClose = createLucideIcon("panel-left-close", __iconNode30);
+var PanelLeftClose = createLucideIcon("panel-left-close", __iconNode29);
 
 // ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/panel-right-open.mjs
 init_define_import_meta_env();
-var __iconNode31 = [
+var __iconNode30 = [
   ["rect", { width: "18", height: "18", x: "3", y: "3", rx: "2", key: "afitv7" }],
   ["path", { d: "M15 3v18", key: "14nvp0" }],
   ["path", { d: "m10 15-3-3 3-3", key: "1pgupc" }]
 ];
-var PanelRightOpen = createLucideIcon("panel-right-open", __iconNode31);
+var PanelRightOpen = createLucideIcon("panel-right-open", __iconNode30);
 
 // ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/play.mjs
 init_define_import_meta_env();
-var __iconNode32 = [
+var __iconNode31 = [
   [
     "path",
     {
@@ -51991,38 +51982,38 @@ var __iconNode32 = [
     }
   ]
 ];
-var Play = createLucideIcon("play", __iconNode32);
+var Play = createLucideIcon("play", __iconNode31);
 
 // ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/plus.mjs
 init_define_import_meta_env();
-var __iconNode33 = [
+var __iconNode32 = [
   ["path", { d: "M5 12h14", key: "1ays0h" }],
   ["path", { d: "M12 5v14", key: "s699le" }]
 ];
-var Plus = createLucideIcon("plus", __iconNode33);
+var Plus = createLucideIcon("plus", __iconNode32);
 
 // ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/radio.mjs
 init_define_import_meta_env();
-var __iconNode34 = [
+var __iconNode33 = [
   ["path", { d: "M16.247 7.761a6 6 0 0 1 0 8.478", key: "1fwjs5" }],
   ["path", { d: "M19.075 4.933a10 10 0 0 1 0 14.134", key: "ehdyv1" }],
   ["path", { d: "M4.925 19.067a10 10 0 0 1 0-14.134", key: "1q22gi" }],
   ["path", { d: "M7.753 16.239a6 6 0 0 1 0-8.478", key: "r2q7qm" }],
   ["circle", { cx: "12", cy: "12", r: "2", key: "1c9p78" }]
 ];
-var Radio = createLucideIcon("radio", __iconNode34);
+var Radio = createLucideIcon("radio", __iconNode33);
 
 // ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/rotate-ccw.mjs
 init_define_import_meta_env();
-var __iconNode35 = [
+var __iconNode34 = [
   ["path", { d: "M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8", key: "1357e3" }],
   ["path", { d: "M3 3v5h5", key: "1xhq8a" }]
 ];
-var RotateCcw = createLucideIcon("rotate-ccw", __iconNode35);
+var RotateCcw = createLucideIcon("rotate-ccw", __iconNode34);
 
 // ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/scroll-text.mjs
 init_define_import_meta_env();
-var __iconNode36 = [
+var __iconNode35 = [
   ["path", { d: "M15 12h-5", key: "r7krc0" }],
   ["path", { d: "M15 8h-5", key: "1khuty" }],
   ["path", { d: "M19 17V5a2 2 0 0 0-2-2H4", key: "zz82l3" }],
@@ -52034,19 +52025,19 @@ var __iconNode36 = [
     }
   ]
 ];
-var ScrollText = createLucideIcon("scroll-text", __iconNode36);
+var ScrollText = createLucideIcon("scroll-text", __iconNode35);
 
 // ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/search.mjs
 init_define_import_meta_env();
-var __iconNode37 = [
+var __iconNode36 = [
   ["path", { d: "m21 21-4.34-4.34", key: "14j7rj" }],
   ["circle", { cx: "11", cy: "11", r: "8", key: "4ej97u" }]
 ];
-var Search = createLucideIcon("search", __iconNode37);
+var Search = createLucideIcon("search", __iconNode36);
 
 // ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/settings.mjs
 init_define_import_meta_env();
-var __iconNode38 = [
+var __iconNode37 = [
   [
     "path",
     {
@@ -52056,11 +52047,11 @@ var __iconNode38 = [
   ],
   ["circle", { cx: "12", cy: "12", r: "3", key: "1v7zrd" }]
 ];
-var Settings = createLucideIcon("settings", __iconNode38);
+var Settings = createLucideIcon("settings", __iconNode37);
 
 // ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/sliders-horizontal.mjs
 init_define_import_meta_env();
-var __iconNode39 = [
+var __iconNode38 = [
   ["path", { d: "M10 5H3", key: "1qgfaw" }],
   ["path", { d: "M12 19H3", key: "yhmn1j" }],
   ["path", { d: "M14 3v4", key: "1sua03" }],
@@ -52071,20 +52062,20 @@ var __iconNode39 = [
   ["path", { d: "M8 10v4", key: "tgpxqk" }],
   ["path", { d: "M8 12H3", key: "a7s4jb" }]
 ];
-var SlidersHorizontal = createLucideIcon("sliders-horizontal", __iconNode39);
+var SlidersHorizontal = createLucideIcon("sliders-horizontal", __iconNode38);
 
 // ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/square-arrow-out-up-right.mjs
 init_define_import_meta_env();
-var __iconNode40 = [
+var __iconNode39 = [
   ["path", { d: "M21 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h6", key: "y09zxi" }],
   ["path", { d: "m21 3-9 9", key: "mpx6sq" }],
   ["path", { d: "M15 3h6v6", key: "1q9fwt" }]
 ];
-var SquareArrowOutUpRight = createLucideIcon("square-arrow-out-up-right", __iconNode40);
+var SquareArrowOutUpRight = createLucideIcon("square-arrow-out-up-right", __iconNode39);
 
 // ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/triangle-alert.mjs
 init_define_import_meta_env();
-var __iconNode41 = [
+var __iconNode40 = [
   [
     "path",
     {
@@ -52095,11 +52086,11 @@ var __iconNode41 = [
   ["path", { d: "M12 9v4", key: "juzpu7" }],
   ["path", { d: "M12 17h.01", key: "p32p05" }]
 ];
-var TriangleAlert = createLucideIcon("triangle-alert", __iconNode41);
+var TriangleAlert = createLucideIcon("triangle-alert", __iconNode40);
 
 // ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/trophy.mjs
 init_define_import_meta_env();
-var __iconNode42 = [
+var __iconNode41 = [
   ["path", { d: "M10 14.66v1.626a2 2 0 0 1-.976 1.696A5 5 0 0 0 7 21.978", key: "1n3hpd" }],
   ["path", { d: "M14 14.66v1.626a2 2 0 0 0 .976 1.696A5 5 0 0 1 17 21.978", key: "rfe1zi" }],
   ["path", { d: "M18 9h1.5a1 1 0 0 0 0-5H18", key: "7xy6bh" }],
@@ -52107,21 +52098,21 @@ var __iconNode42 = [
   ["path", { d: "M6 9a6 6 0 0 0 12 0V3a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1z", key: "1mhfuq" }],
   ["path", { d: "M6 9H4.5a1 1 0 0 1 0-5H6", key: "tex48p" }]
 ];
-var Trophy = createLucideIcon("trophy", __iconNode42);
+var Trophy = createLucideIcon("trophy", __iconNode41);
 
 // ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/users.mjs
 init_define_import_meta_env();
-var __iconNode43 = [
+var __iconNode42 = [
   ["path", { d: "M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2", key: "1yyitq" }],
   ["path", { d: "M16 3.128a4 4 0 0 1 0 7.744", key: "16gr8j" }],
   ["path", { d: "M22 21v-2a4 4 0 0 0-3-3.87", key: "kshegd" }],
   ["circle", { cx: "9", cy: "7", r: "4", key: "nufk8" }]
 ];
-var Users = createLucideIcon("users", __iconNode43);
+var Users = createLucideIcon("users", __iconNode42);
 
 // ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/video.mjs
 init_define_import_meta_env();
-var __iconNode44 = [
+var __iconNode43 = [
   [
     "path",
     {
@@ -52131,11 +52122,11 @@ var __iconNode44 = [
   ],
   ["rect", { x: "2", y: "6", width: "14", height: "12", rx: "2", key: "158x01" }]
 ];
-var Video = createLucideIcon("video", __iconNode44);
+var Video = createLucideIcon("video", __iconNode43);
 
 // ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/volleyball.mjs
 init_define_import_meta_env();
-var __iconNode45 = [
+var __iconNode44 = [
   ["path", { d: "M11.1 7.1a16.55 16.55 0 0 1 10.9 4", key: "2880wi" }],
   ["path", { d: "M12 12a12.6 12.6 0 0 1-8.7 5", key: "113sja" }],
   ["path", { d: "M16.8 13.6a16.55 16.55 0 0 1-9 7.5", key: "1qmsgl" }],
@@ -52143,29 +52134,29 @@ var __iconNode45 = [
   ["path", { d: "M6.3 3.8a16.55 16.55 0 0 0 1.9 11.5", key: "iekzv9" }],
   ["circle", { cx: "12", cy: "12", r: "10", key: "1mglay" }]
 ];
-var Volleyball = createLucideIcon("volleyball", __iconNode45);
+var Volleyball = createLucideIcon("volleyball", __iconNode44);
 
 // ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/wifi.mjs
 init_define_import_meta_env();
-var __iconNode46 = [
+var __iconNode45 = [
   ["path", { d: "M12 20h.01", key: "zekei9" }],
   ["path", { d: "M2 8.82a15 15 0 0 1 20 0", key: "dnpr2z" }],
   ["path", { d: "M5 12.859a10 10 0 0 1 14 0", key: "1x1e6c" }],
   ["path", { d: "M8.5 16.429a5 5 0 0 1 7 0", key: "1bycff" }]
 ];
-var Wifi = createLucideIcon("wifi", __iconNode46);
+var Wifi = createLucideIcon("wifi", __iconNode45);
 
 // ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/x.mjs
 init_define_import_meta_env();
-var __iconNode47 = [
+var __iconNode46 = [
   ["path", { d: "M18 6 6 18", key: "1bl5f8" }],
   ["path", { d: "m6 6 12 12", key: "d8bk6v" }]
 ];
-var X2 = createLucideIcon("x", __iconNode47);
+var X2 = createLucideIcon("x", __iconNode46);
 
 // ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/zap.mjs
 init_define_import_meta_env();
-var __iconNode48 = [
+var __iconNode47 = [
   [
     "path",
     {
@@ -52174,7 +52165,7 @@ var __iconNode48 = [
     }
   ]
 ];
-var Zap = createLucideIcon("zap", __iconNode48);
+var Zap = createLucideIcon("zap", __iconNode47);
 
 // ../grarf/desktop/src/lib/cn.ts
 init_define_import_meta_env();
@@ -68538,12 +68529,9 @@ var import_zustand32 = __toESM(require_zustand(), 1);
 var useGrarfExtensionSidePanelSectionStore = (0, import_zustand32.create)((set) => ({
   activeSection: "home",
   pinCommandCenterAtTop: false,
-  scrollNonce: 0,
-  selectSection: (activeSection, options = {}) => set((state3) => ({
-    activeSection,
-    pinCommandCenterAtTop: options.pinCommandCenterAtTop ?? true,
-    scrollNonce: state3.scrollNonce + 1
-  }))
+  syncActiveSectionFromScroll: (activeSection) => set(
+    (state3) => state3.activeSection === activeSection ? state3 : { ...state3, activeSection }
+  )
 }));
 
 // ../grarf/desktop/src/layouts/AppShellLayout.tsx
@@ -81197,9 +81185,6 @@ function AppShellLayout() {
   const extensionSidePanelSection = useGrarfExtensionSidePanelSectionStore(
     (state3) => state3.activeSection
   );
-  const selectExtensionSidePanelSection = useGrarfExtensionSidePanelSectionStore(
-    (state3) => state3.selectSection
-  );
   const showShellLeagueNav = !isExtensionSidePanelHost && !isSportsBrowserPrototype && (!hideShellMainMenu || isGrarfElectronRenderer() && allScopePanelOpen);
   const [operatorEnabled, setOperatorEnabled] = (0, import_react70.useState)(false);
   const [operatorOpen, setOperatorOpen] = (0, import_react70.useState)(false);
@@ -81280,13 +81265,7 @@ function AppShellLayout() {
               isGrarfElectronRenderer() ? /* @__PURE__ */ (0, import_jsx_runtime34.jsx)(DesktopTopRail, {}) : null,
               isExtensionSidePanelHost ? /* @__PURE__ */ (0, import_jsx_runtime34.jsxs)("div", { className: "flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden", children: [
                 /* @__PURE__ */ (0, import_jsx_runtime34.jsx)("div", { className: "flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden", children: /* @__PURE__ */ (0, import_jsx_runtime34.jsx)(Outlet, {}) }),
-                /* @__PURE__ */ (0, import_jsx_runtime34.jsx)(
-                  GrarfExtensionSidePanelBottomNav,
-                  {
-                    activeItemId: extensionSidePanelSection,
-                    onSelect: selectExtensionSidePanelSection
-                  }
-                )
+                /* @__PURE__ */ (0, import_jsx_runtime34.jsx)(GrarfExtensionSidePanelBottomNav, { activeItemId: extensionSidePanelSection })
               ] }) : /* @__PURE__ */ (0, import_jsx_runtime34.jsx)("div", { className: "flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden", children: /* @__PURE__ */ (0, import_jsx_runtime34.jsx)(Outlet, {}) })
             ] })
           ] })
@@ -107058,7 +107037,7 @@ function HeadlineList({
   return /* @__PURE__ */ (0, import_jsx_runtime38.jsx)(
     "ul",
     {
-      className: "max-h-52 overflow-y-auto overscroll-y-contain border-t border-border/60 py-1",
+      className: "max-h-[500px] overflow-y-auto overscroll-y-contain border-t border-border/60 py-1",
       role: "list",
       "data-grarf-extension-timeline-news-by-source-headlines": "",
       children: headlines.map((headline, index2) => /* @__PURE__ */ (0, import_jsx_runtime38.jsx)("li", { className: "border-b border-border/40 last:border-b-0", children: /* @__PURE__ */ (0, import_jsx_runtime38.jsxs)(
@@ -107087,13 +107066,10 @@ function GrarfExtensionTimelineNewsBySourceFeed() {
   }, [headlinesBySourceId, refresh]);
   const toggleSource = (0, import_react94.useCallback)((sourceId) => {
     setExpandedSourceIds((previous) => {
-      const next = new Set(previous);
-      if (next.has(sourceId)) {
-        next.delete(sourceId);
-      } else {
-        next.add(sourceId);
+      if (previous.has(sourceId)) {
+        return /* @__PURE__ */ new Set();
       }
-      return next;
+      return /* @__PURE__ */ new Set([sourceId]);
     });
   }, []);
   return /* @__PURE__ */ (0, import_jsx_runtime38.jsx)(
@@ -107116,7 +107092,10 @@ function GrarfExtensionTimelineNewsBySourceFeed() {
                 "button",
                 {
                   type: "button",
-                  className: "flex w-full items-center gap-2 px-3 py-2 text-left hover:bg-accent/30",
+                  className: cn2(
+                    "flex w-full items-center gap-2 px-3 py-2 text-left transition-colors hover:bg-accent/30",
+                    expanded && "bg-accent text-accent-foreground hover:bg-accent"
+                  ),
                   "aria-expanded": expanded,
                   onClick: () => toggleSource(feed.id),
                   children: [
@@ -151720,6 +151699,36 @@ function resolveGrarfExtensionCommandCenterTeamAccentCssProperties(game, side, t
 
 // ../grarf/desktop/src/extensionHost/GrarfExtensionCommandCenterScorecard.tsx
 var import_jsx_runtime244 = __toESM(require_jsx_runtime(), 1);
+function GrarfExtensionCommandCenterScorecardLeagueSlot({
+  game,
+  leagueLabel,
+  leagueLogoUrl,
+  leagueHeader
+}) {
+  const logo = leagueLogoUrl ? /* @__PURE__ */ (0, import_jsx_runtime244.jsx)(
+    "img",
+    {
+      src: leagueLogoUrl,
+      alt: "",
+      className: cn2(
+        "grarf-extension-command-center-league-logo",
+        resolveGamesSpineLeagueLogoImgClassName(game.league, leagueLogoUrl)
+      ),
+      loading: "lazy",
+      decoding: "async"
+    }
+  ) : null;
+  if (leagueHeader) {
+    return /* @__PURE__ */ (0, import_jsx_runtime244.jsxs)("div", { className: "grarf-extension-command-center-scorecard-league-identity", children: [
+      logo,
+      /* @__PURE__ */ (0, import_jsx_runtime244.jsx)("div", { className: "grarf-extension-command-center-scorecard-league-identity-meta min-w-0", children: leagueHeader })
+    ] });
+  }
+  return /* @__PURE__ */ (0, import_jsx_runtime244.jsxs)("div", { className: "grarf-extension-command-center-scorecard-league-identity", children: [
+    logo,
+    /* @__PURE__ */ (0, import_jsx_runtime244.jsx)("span", { className: "grarf-extension-command-center-league-label", children: leagueLabel })
+  ] });
+}
 function GrarfExtensionCommandCenterStatusPill({
   state: state3,
   finalLabel
@@ -151846,6 +151855,7 @@ function GrarfExtensionCommandCenterScorecardChevron({
 function GrarfExtensionCommandCenterScorecardShell({
   game,
   leagueLabel,
+  leagueLogoUrl,
   leagueHeader,
   timingLabel,
   showChannelLogo,
@@ -151878,7 +151888,15 @@ function GrarfExtensionCommandCenterScorecardShell({
       children: [
         /* @__PURE__ */ (0, import_jsx_runtime244.jsxs)("div", { className: "grarf-extension-command-center-scorecard-row", children: [
           /* @__PURE__ */ (0, import_jsx_runtime244.jsxs)("div", { className: "grarf-extension-command-center-scorecard-main", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime244.jsx)("div", { className: "grarf-extension-command-center-scorecard-league-slot", children: leagueHeader ? leagueHeader : /* @__PURE__ */ (0, import_jsx_runtime244.jsx)("span", { className: "grarf-extension-command-center-league-label", children: leagueLabel }) }),
+            /* @__PURE__ */ (0, import_jsx_runtime244.jsx)("div", { className: "grarf-extension-command-center-scorecard-league-slot", children: /* @__PURE__ */ (0, import_jsx_runtime244.jsx)(
+              GrarfExtensionCommandCenterScorecardLeagueSlot,
+              {
+                game,
+                leagueLabel,
+                leagueLogoUrl,
+                leagueHeader
+              }
+            ) }),
             /* @__PURE__ */ (0, import_jsx_runtime244.jsx)(
               "div",
               {
@@ -154837,8 +154855,7 @@ function CommandCenterTemporalTennisCompetitorMark({
 }
 var GRARF_EXTENSION_COMMAND_CENTER_FOUR_LINE_CARD_CLASS = "grid min-h-0 min-w-0 w-full auto-rows-min gap-y-1";
 function useGrarfExtensionCommandCenterMinimizedCards() {
-  const section = useGrarfExtensionSidePanelSectionStore((state3) => state3.activeSection);
-  return isGrarfExtensionRenderer() && (section === "browse" || section === "timeline");
+  return false;
 }
 var GRARF_EXTENSION_COMMAND_CENTER_TEAM_CELL_ROW_1_CLASS = "col-start-1 row-start-1 min-w-0";
 var GRARF_EXTENSION_COMMAND_CENTER_TEAM_CELL_ROW_2_CLASS = "col-start-1 row-start-2 min-w-0";
@@ -155063,6 +155080,7 @@ function GrarfExtensionCommandCenterFourLineMatchupCard({
       {
         game,
         leagueLabel,
+        leagueLogoUrl,
         timingLabel,
         showChannelLogo,
         channel,
@@ -155196,6 +155214,7 @@ function GrarfExtensionCommandCenterFourLineEventCard({
       {
         game,
         leagueLabel,
+        leagueLogoUrl,
         timingLabel,
         showChannelLogo,
         channel,
@@ -156361,6 +156380,9 @@ function SportsBrowserPrototypeBottomRailGames({
     }
     const alertActive = lifecycleAlert && resolvedAlertGame && phase !== "hidden" && phase !== "unmounted";
     if (!alertActive) return base;
+    if (isGrarfExtensionRenderer()) {
+      return base;
+    }
     const withoutAlertGame = base.filter(
       (game) => !isSameTopRailGame2(game, lifecycleAlert.gameId)
     );
@@ -156467,7 +156489,8 @@ function SportsBrowserPrototypeBottomRailGames({
                 {
                   className: "w-full shrink-0 overflow-hidden",
                   "data-bottom-rail-update-slot": true,
-                  style: {
+                  "data-grarf-extension-command-center-alert-slot": extensionCommandCenter ? "" : void 0,
+                  style: extensionCommandCenter ? void 0 : {
                     maxHeight: slotExpanded ? 1200 : 0,
                     transition: `max-height ${TOP_RAIL_ANIMATION_MS2}ms cubic-bezier(0.4, 0, 0.2, 1)`
                   },
@@ -164069,22 +164092,22 @@ init_define_import_meta_env();
 var SPORTS_BROWSER_PROTOTYPE_SIDEBAR_LEAGUES_GROUP_ORDER = [
   {
     sectionId: "football",
-    title: "FOOTBALL",
+    title: "Football",
     leagueKeys: ["NFL", "NCAAF", "XFL", "CFL"]
   },
   {
     sectionId: "basketball",
-    title: "BASKETBALL",
+    title: "Basketball",
     leagueKeys: ["NBA", "WNBA", "MNCAAB", "WNCAAB", "NBA2K", "euroleague"]
   },
   {
     sectionId: "baseball",
-    title: "BASEBALL",
+    title: "Baseball",
     leagueKeys: ["MLB", "NCAABB", "milb", "LLBWS", "CBWS", "npb", "kbo"]
   },
   {
     sectionId: "soccer",
-    title: "SOCCER",
+    title: "Soccer",
     leagueKeys: [
       "ARG1",
       "BEL1",
@@ -164137,12 +164160,12 @@ var SPORTS_BROWSER_PROTOTYPE_SIDEBAR_LEAGUES_GROUP_ORDER = [
   },
   {
     sectionId: "hockey",
-    title: "HOCKEY",
+    title: "Hockey",
     leagueKeys: ["NHL", "ahl", "khl"]
   },
   {
     sectionId: "motorsports",
-    title: "MOTORSPORTS",
+    title: "Motorsports",
     leagueKeys: [
       "F1",
       "NASCAR",
@@ -164162,70 +164185,70 @@ var SPORTS_BROWSER_PROTOTYPE_SIDEBAR_LEAGUES_GROUP_ORDER = [
   },
   {
     sectionId: "golf",
-    title: "GOLF",
+    title: "Golf",
     leagueKeys: ["PGA", "LPGA", "LIV", "DP_WORLD", "KORNFERRY"]
   },
   {
     sectionId: "tennis",
-    title: "TENNIS",
+    title: "Tennis",
     leagueKeys: ["ATP", "WTA"]
   },
   {
     sectionId: "combat",
-    title: "COMBAT",
+    title: "Combat",
     leagueKeys: ["BOXING", "UFC", "pfl"]
   },
   {
     sectionId: "rugby",
-    title: "RUGBY",
+    title: "Rugby",
     leagueKeys: ["rugby-union", "AFL", "RUGBYTOP14", "RUGBYPREM", "RUGB_289262", "RUGBYULSTER"]
   },
   {
     sectionId: "volleyball",
-    title: "VOLLEYBALL",
+    title: "Volleyball",
     leagueKeys: ["NCAAVB", "avp", "lovb", "NCAAVB_M"]
   },
   {
     sectionId: "cricket",
-    title: "CRICKET",
+    title: "Cricket",
     leagueKeys: ["CRICKET_ICC", "CRICKET_BBL"]
   },
   {
     sectionId: "lacrosse",
-    title: "LACROSSE",
+    title: "Lacrosse",
     leagueKeys: ["lacrosse", "PLL", "NCAALAX"]
   },
   {
     sectionId: "softball",
-    title: "SOFTBALL",
+    title: "Softball",
     leagueKeys: ["NCAASB", "base-lls"]
   },
   {
     sectionId: "college-sports",
-    title: "COLLEGE SPORTS",
+    title: "College Sports",
     leagueKeys: ["NCAAFH"]
   },
   {
     sectionId: "swimming",
-    title: "SWIMMING",
+    title: "Swimming",
     leagueKeys: ["swimming"],
     sportLevelOnly: true
   },
   {
     sectionId: "track-and-field",
-    title: "TRACK & FIELD",
+    title: "Track & Field",
     leagueKeys: ["USATF"],
     sportLevelOnly: true
   },
   {
     sectionId: "winter-sports",
-    title: "WINTER SPORTS",
+    title: "Winter Sports",
     leagueKeys: ["winter-sports"],
     sportLevelOnly: true
   },
   {
     sectionId: "horse-racing",
-    title: "HORSE-RACING",
+    title: "Horse Racing",
     leagueKeys: ["horse-racing"],
     sportLevelOnly: true
   }
@@ -164274,7 +164297,7 @@ var SPORTS_BROWSER_PROTOTYPE_SIDEBAR_LEAGUES_ACTIVE_POPULATION = [
   { key: "RUGBYPREM", label: "GALLAGHER PREMIERSHIP" },
   { key: "GOLDCUP", label: "GOLD CUP" },
   { key: "GT_WORLD_CHALLENGE", label: "GT WORLD CHALLENGE" },
-  { key: "horse-racing", label: "HORSE-RACING" },
+  { key: "horse-racing", label: "Horse Racing" },
   { key: "CRICKET_ICC", label: "CRICKET" },
   { key: "imsa", label: "IMSA" },
   { key: "INDYCAR", label: "INDYCAR" },
@@ -164331,8 +164354,8 @@ var SPORTS_BROWSER_PROTOTYPE_SIDEBAR_LEAGUES_ACTIVE_POPULATION = [
   { key: "SERIEA", label: "SERIE A" },
   { key: "SPFL", label: "SPFL" },
   { key: "SUPERLIG", label: "S\xDCPER LIG" },
-  { key: "swimming", label: "SWIMMING" },
-  { key: "USATF", label: "TRACK & FIELD" },
+  { key: "swimming", label: "Swimming" },
+  { key: "USATF", label: "Track & Field" },
   { key: "US_OPEN_CUP", label: "U.S. OPEN CUP" },
   { key: "UCL", label: "UEFA CHAMPIONS LEAGUE" },
   { key: "UECL", label: "UEFA CONFERENCE LEAGUE" },
@@ -164345,7 +164368,7 @@ var SPORTS_BROWSER_PROTOTYPE_SIDEBAR_LEAGUES_ACTIVE_POPULATION = [
   { key: "USLCUP", label: "USL CHAMPIONSHIP CUP" },
   { key: "USL1", label: "USL LEAGUE ONE" },
   { key: "WEC", label: "WEC" },
-  { key: "winter-sports", label: "WINTER SPORTS" },
+  { key: "winter-sports", label: "Winter Sports" },
   { key: "WNBA", label: "WNBA" },
   { key: "CAF_WNATIONS", label: "WOMEN'S AFCON" },
   { key: "WOMENS_UCL", label: "WOMEN'S UCL" },
@@ -164673,13 +164696,53 @@ function GrarfExtensionNewsLeaguesAllSportsLeagueHeader({
 // ../grarf/desktop/src/extensionHost/GrarfExtensionNewsLeaguesLeagueHeader.tsx
 init_define_import_meta_env();
 var import_react280 = __toESM(require_react(), 1);
+
+// ../grarf/desktop/src/extensionHost/resolveGrarfExtensionSidebarLeaguesSportGroupLogoUrl.ts
+init_define_import_meta_env();
+var ESPN_SPORT_ICON = (slug) => `https://a.espncdn.com/redesign/assets/img/icons/ESPN-icon-${slug}.png`;
+var LEAGUE_DIRECTORY_SECTION_SPORT_ICON_URL = {
+  football: ESPN_SPORT_ICON("football"),
+  basketball: ESPN_SPORT_ICON("basketball"),
+  baseball: ESPN_SPORT_ICON("baseball"),
+  soccer: ESPN_SPORT_ICON("soccer"),
+  hockey: ESPN_SPORT_ICON("hockey"),
+  tennis: ESPN_SPORT_ICON("tennis"),
+  golf: ESPN_SPORT_ICON("golf"),
+  rugby: ESPN_SPORT_ICON("rugby"),
+  cricket: ESPN_SPORT_ICON("cricket"),
+  softball: ESPN_SPORT_ICON("softball"),
+  motorsports: ESPN_SPORT_ICON("nascar"),
+  combat: ESPN_SPORT_ICON("mma"),
+  cycling: ESPN_SPORT_ICON("cycling"),
+  lacrosse: ESPN_SPORT_ICON("lacrosse"),
+  "college-sports": ESPN_SPORT_ICON("field-hockey"),
+  swimming: "/league-logos/pictograms/swimming.png",
+  "track-and-field": "/league-logos/pictograms/track-and-field.png",
+  "winter-sports": "/league-logos/pictograms/winter-sports.png",
+  "horse-racing": "/league-logos/nav/horse-racing.png",
+  ungrouped: "/league-logos/globe.png"
+};
+function resolveGrarfExtensionSidebarLeaguesSportGroupUsesLucideIcon(sectionId) {
+  return sectionId === "volleyball";
+}
+function resolveGrarfExtensionSidebarLeaguesSportGroupLogoUrl(sectionId) {
+  if (resolveGrarfExtensionSidebarLeaguesSportGroupUsesLucideIcon(sectionId)) {
+    return null;
+  }
+  const mapped = LEAGUE_DIRECTORY_SECTION_SPORT_ICON_URL[sectionId] ?? LEAGUE_DIRECTORY_SECTION_SPORT_ICON_URL.ungrouped;
+  return mapped ? publicAssetUrl(mapped) : null;
+}
+
+// ../grarf/desktop/src/extensionHost/GrarfExtensionNewsLeaguesLeagueHeader.tsx
 var import_jsx_runtime271 = __toESM(require_jsx_runtime(), 1);
 function LeagueNavLogoMark({
   leagueKey,
-  games
+  games,
+  sportGroupSectionId
 }) {
   const [failed, setFailed] = (0, import_react280.useState)(false);
-  const rawLogoUrl = resolveSportsBrowserPrototypeHorseRacingLeagueLogoPath(leagueKey) ?? resolveGamesSpineLeagueHeaderLogoUrl(leagueKey, games);
+  const sportGroupLogoUrl = sportGroupSectionId ? resolveGrarfExtensionSidebarLeaguesSportGroupLogoUrl(sportGroupSectionId) : null;
+  const rawLogoUrl = sportGroupLogoUrl ?? resolveSportsBrowserPrototypeHorseRacingLeagueLogoPath(leagueKey) ?? resolveGamesSpineLeagueHeaderLogoUrl(leagueKey, games);
   const logoUrl = rawLogoUrl ? publicAssetUrl(rawLogoUrl) : null;
   if (!logoUrl || failed) return null;
   return /* @__PURE__ */ (0, import_jsx_runtime271.jsx)("span", { className: "inline-flex h-[1lh] w-[12px] shrink-0 items-center justify-center", children: /* @__PURE__ */ (0, import_jsx_runtime271.jsx)(
@@ -164690,7 +164753,8 @@ function LeagueNavLogoMark({
       className: cn2(
         "h-2.5 w-2.5 shrink-0 object-contain",
         leagueKey === "RUGBYTOP14" && "rounded-[2px]",
-        leagueKey === SPORTS_BROWSER_PROTOTYPE_TEMPORAL_HORSE_RACING_LEAGUE_KEY && "grarf-sidebar-horse-racing-league-logo",
+        (leagueKey === SPORTS_BROWSER_PROTOTYPE_TEMPORAL_HORSE_RACING_LEAGUE_KEY || sportGroupSectionId === "horse-racing") && "grarf-sidebar-horse-racing-league-logo",
+        (sportGroupSectionId === "swimming" || sportGroupSectionId === "winter-sports") && "grarf-extension-sidebar-sport-group-pictogram-logo",
         resolveGamesSpineLeagueLogoImgClassName(leagueKey, logoUrl)
       ),
       loading: "lazy",
@@ -164702,6 +164766,7 @@ function LeagueNavLogoMark({
 function GrarfExtensionNewsLeaguesLeagueHeader({
   leagueKey,
   label,
+  sportGroupSectionId = null,
   expanded,
   sequentialNavCurrent = expanded,
   leagueGames,
@@ -164729,7 +164794,14 @@ function GrarfExtensionNewsLeaguesLeagueHeader({
       },
       children: [
         /* @__PURE__ */ (0, import_jsx_runtime271.jsxs)("span", { className: "flex min-w-0 flex-1 items-start gap-1", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime271.jsx)(LeagueNavLogoMark, { leagueKey, games: leagueGames }),
+          /* @__PURE__ */ (0, import_jsx_runtime271.jsx)(
+            LeagueNavLogoMark,
+            {
+              leagueKey,
+              games: leagueGames,
+              sportGroupSectionId
+            }
+          ),
           /* @__PURE__ */ (0, import_jsx_runtime271.jsx)("span", { className: "min-w-0 flex-1 break-words whitespace-normal", children: label })
         ] }),
         /* @__PURE__ */ (0, import_jsx_runtime271.jsx)("span", { className: "inline-flex h-[1lh] shrink-0 items-center", children: expanded ? /* @__PURE__ */ (0, import_jsx_runtime271.jsx)(ChevronDown, { size: 12, strokeWidth: 2, className: "shrink-0 rotate-180", "aria-hidden": true }) : /* @__PURE__ */ (0, import_jsx_runtime271.jsx)(ChevronRight, { size: 12, strokeWidth: 2, className: "shrink-0 text-foreground", "aria-hidden": true }) })
@@ -164832,44 +164904,6 @@ init_define_import_meta_env();
 // ../grarf/desktop/src/extensionHost/GrarfExtensionSidebarLeaguesSportGroupHeader.tsx
 init_define_import_meta_env();
 var import_react281 = __toESM(require_react(), 1);
-
-// ../grarf/desktop/src/extensionHost/resolveGrarfExtensionSidebarLeaguesSportGroupLogoUrl.ts
-init_define_import_meta_env();
-var ESPN_SPORT_ICON = (slug) => `https://a.espncdn.com/redesign/assets/img/icons/ESPN-icon-${slug}.png`;
-var LEAGUE_DIRECTORY_SECTION_SPORT_ICON_URL = {
-  football: ESPN_SPORT_ICON("football"),
-  basketball: ESPN_SPORT_ICON("basketball"),
-  baseball: ESPN_SPORT_ICON("baseball"),
-  soccer: ESPN_SPORT_ICON("soccer"),
-  hockey: ESPN_SPORT_ICON("hockey"),
-  tennis: ESPN_SPORT_ICON("tennis"),
-  golf: ESPN_SPORT_ICON("golf"),
-  rugby: ESPN_SPORT_ICON("rugby"),
-  cricket: ESPN_SPORT_ICON("cricket"),
-  softball: ESPN_SPORT_ICON("softball"),
-  motorsports: ESPN_SPORT_ICON("nascar"),
-  combat: ESPN_SPORT_ICON("mma"),
-  cycling: ESPN_SPORT_ICON("cycling"),
-  lacrosse: ESPN_SPORT_ICON("lacrosse"),
-  "college-sports": ESPN_SPORT_ICON("field-hockey"),
-  swimming: ESPN_SPORT_ICON("swimming"),
-  "track-and-field": "/league-logos/nav/track-and-field.png",
-  "winter-sports": "/league-logos/nav/winter-sports.png",
-  "horse-racing": "/league-logos/nav/horse-racing.png",
-  ungrouped: "/league-logos/globe.png"
-};
-function resolveGrarfExtensionSidebarLeaguesSportGroupUsesLucideIcon(sectionId) {
-  return sectionId === "volleyball";
-}
-function resolveGrarfExtensionSidebarLeaguesSportGroupLogoUrl(sectionId) {
-  if (resolveGrarfExtensionSidebarLeaguesSportGroupUsesLucideIcon(sectionId)) {
-    return null;
-  }
-  const mapped = LEAGUE_DIRECTORY_SECTION_SPORT_ICON_URL[sectionId] ?? LEAGUE_DIRECTORY_SECTION_SPORT_ICON_URL.ungrouped;
-  return mapped ? publicAssetUrl(mapped) : null;
-}
-
-// ../grarf/desktop/src/extensionHost/GrarfExtensionSidebarLeaguesSportGroupHeader.tsx
 var import_jsx_runtime273 = __toESM(require_jsx_runtime(), 1);
 function SportGroupIconMark({ sectionId }) {
   const [failed, setFailed] = (0, import_react281.useState)(false);
@@ -164943,7 +164977,7 @@ function StaticSportGroupLabel({ sectionId, title }) {
   return /* @__PURE__ */ (0, import_jsx_runtime274.jsx)(
     "div",
     {
-      className: "px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground",
+      className: "px-3 py-1.5 text-xs font-semibold normal-case tracking-normal text-muted-foreground",
       "data-sports-browser-prototype-sidebar-leagues-sport-group": sectionId,
       children: title
     }
@@ -165035,6 +165069,18 @@ function useGrarfExtensionSidebarLeaguesSportGroupExpansion(leaguesSortMode, lea
     });
   }, []);
   return { collapsible, isSportGroupExpanded, toggleSportGroup };
+}
+
+// ../grarf/desktop/src/extensionHost/resolveGrarfExtensionSidebarLeaguesSportLevelGroupSectionId.ts
+init_define_import_meta_env();
+var SPORT_LEVEL_LEAGUE_KEY_TO_SECTION_ID = {
+  "horse-racing": "horse-racing",
+  swimming: "swimming",
+  USATF: "track-and-field",
+  "winter-sports": "winter-sports"
+};
+function resolveGrarfExtensionSidebarLeaguesSportLevelGroupSectionId(leagueKey) {
+  return SPORT_LEVEL_LEAGUE_KEY_TO_SECTION_ID[leagueKey] ?? null;
 }
 
 // ../grarf/desktop/src/components/homeMvp/SportsBrowserPrototypeTemporaryNavLeaguesInlineTree.tsx
@@ -165421,6 +165467,10 @@ function SportsBrowserPrototypeTemporaryNavLeaguesInlineTree({
           ) : null,
           leagueSections.map((group) => {
             const leagueRows = group.leagues.map(({ leagueKey, label }) => {
+              const sportGroupSectionId = group.sportLevelOnly && isGrarfExtensionRenderer() ? resolveGrarfExtensionSidebarLeaguesSportLevelGroupSectionId(
+                leagueKey
+              ) ?? group.sectionId : null;
+              const displayLabel = group.sportLevelOnly && group.title ? group.title : label;
               const leagueExpanded = extensionExclusiveLeagueAccordion ? isGrarfExtensionSidebarExclusiveLeagueExpanded(leagueKey) : expandedLeagueKeys.has(leagueKey);
               const leagueSelected = selectedLeagueKey === leagueKey;
               const newsWebsitesForLeague = extensionNewsLeaguesExpandUi ? resolveLeagueInlineSectionWebsites(leagueKey, "news") : null;
@@ -165460,7 +165510,7 @@ function SportsBrowserPrototypeTemporaryNavLeaguesInlineTree({
                             });
                           }
                         },
-                        children: label
+                        children: displayLabel
                       }
                     ),
                     /* @__PURE__ */ (0, import_jsx_runtime275.jsx)(
@@ -165488,7 +165538,8 @@ function SportsBrowserPrototypeTemporaryNavLeaguesInlineTree({
                         GrarfExtensionNewsLeaguesLeagueHeader,
                         {
                           leagueKey,
-                          label,
+                          label: displayLabel,
+                          sportGroupSectionId,
                           expanded: leagueExpanded,
                           sequentialNavCurrent: leagueExpanded && !(extensionNewsLeaguesActiveSource?.leagueKey === leagueKey && extensionNewsLeaguesActiveSource != null),
                           leagueGames: leagueGamesForLogo,
@@ -165837,6 +165888,7 @@ function resolveInlineIndentClass4(depth) {
 function SportsBrowserPrototypeTemporaryNavGamesInlineTree({
   contentSection,
   leaguesSortMode,
+  leaguesFilterQuery = "",
   todayCompleteLeagues,
   nowLeagues,
   upcomingLeagues,
@@ -165889,22 +165941,27 @@ function SportsBrowserPrototypeTemporaryNavGamesInlineTree({
       })).filter((entry2) => entry2.games.length > 0)
     })).filter((group) => group.leagues.length > 0);
   }, [leaguesSortMode, mergedOperationalLeagues, nowLeagues, todayCompleteLeagues, upcomingLeagues]);
+  const filteredLeagueSections = (0, import_react285.useMemo)(() => {
+    const query = leaguesFilterQuery.trim();
+    if (!query) return leagueSections;
+    return filterSportsBrowserPrototypeSidebarLeaguesGroupedSections(leagueSections, query);
+  }, [leagueSections, leaguesFilterQuery]);
   const visibleLeagueSections = (0, import_react285.useMemo)(() => {
     if (!selectedGameNavigationOnly || !selectedGameId?.trim()) {
       if (selectedGameNavigationOnly) {
         return [];
       }
-      return leagueSections;
+      return filteredLeagueSections;
     }
     const trimmedId = selectedGameId.trim();
-    return leagueSections.map((group) => ({
+    return filteredLeagueSections.map((group) => ({
       ...group,
       leagues: group.leagues.map((entry2) => ({
         ...entry2,
         games: entry2.games.filter((game) => game.id === trimmedId)
       })).filter((entry2) => entry2.games.length > 0)
     })).filter((group) => group.leagues.length > 0);
-  }, [leagueSections, selectedGameId, selectedGameNavigationOnly]);
+  }, [filteredLeagueSections, selectedGameId, selectedGameNavigationOnly]);
   (0, import_react285.useEffect)(() => {
     if (!selectedGameNavigationOnly || !selectedGameId?.trim()) return;
     const trimmedId = selectedGameId.trim();
@@ -166380,6 +166437,7 @@ function SidebarLeaguesSportGroupHeader2({
 function SportsBrowserPrototypeTemporaryNavTeamsInlineTree({
   contentSection,
   leaguesSortMode,
+  leaguesFilterQuery = "",
   todayCompleteLeagues,
   renderTeamListPanel,
   onTeamContentDestinationSelect
@@ -166397,14 +166455,16 @@ function SportsBrowserPrototypeTemporaryNavTeamsInlineTree({
   );
   const [selectedTeam, setSelectedTeam] = (0, import_react286.useState)(null);
   const sportGroupExpansion = useGrarfExtensionSidebarLeaguesSportGroupExpansion(leaguesSortMode, "");
-  const leagueSections = (0, import_react286.useMemo)(
-    () => resolveSportsBrowserPrototypeSidebarDisplayedLeagueSections(
+  const leagueSections = (0, import_react286.useMemo)(() => {
+    const sections = resolveSportsBrowserPrototypeSidebarDisplayedLeagueSections(
       leaguesSortMode,
       todayCompleteLeagues,
       mergedOperationalLeagues
-    ),
-    [leaguesSortMode, mergedOperationalLeagues, todayCompleteLeagues]
-  );
+    );
+    const query = leaguesFilterQuery.trim();
+    if (!query) return sections;
+    return filterSportsBrowserPrototypeSidebarLeaguesGroupedSections(sections, query);
+  }, [leaguesFilterQuery, leaguesSortMode, mergedOperationalLeagues, todayCompleteLeagues]);
   const toggleLeague = (0, import_react286.useCallback)(
     (leagueKey) => {
       if (extensionExclusiveLeagueAccordion) {
@@ -167255,14 +167315,14 @@ function SportsBrowserPrototypeTemporaryNavPrototype({
             ]
           }
         ),
+        isGrarfExtensionRenderer() && onLeaguesSearchQueryChange != null && leaguesSortMode != null ? /* @__PURE__ */ (0, import_jsx_runtime280.jsx)(
+          SportsBrowserPrototypeLeaguesFilterField,
+          {
+            value: leaguesSearchQuery,
+            onChange: handleTemporaryNavLeaguesSearchQueryChange
+          }
+        ) : null,
         topLevel === "LEAGUES" && leaguesSelectorsWired ? /* @__PURE__ */ (0, import_jsx_runtime280.jsxs)(import_jsx_runtime280.Fragment, { children: [
-          /* @__PURE__ */ (0, import_jsx_runtime280.jsx)(
-            SportsBrowserPrototypeLeaguesFilterField,
-            {
-              value: leaguesSearchQuery,
-              onChange: handleTemporaryNavLeaguesSearchQueryChange
-            }
-          ),
           isGrarfExtensionRenderer() && (leaguesLensSection === "news" || leaguesLensSection == null) ? /* @__PURE__ */ (0, import_jsx_runtime280.jsx)(GrarfExtensionNewsLeaguesBrowseByControl, {}) : null,
           /* @__PURE__ */ (0, import_jsx_runtime280.jsx)(
             "div",
@@ -167307,6 +167367,7 @@ function SportsBrowserPrototypeTemporaryNavPrototype({
               {
                 contentSection: "news",
                 leaguesSortMode,
+                leaguesFilterQuery: isGrarfExtensionRenderer() ? leaguesSearchQuery : void 0,
                 todayCompleteLeagues,
                 renderTeamListPanel: renderContentTeamListPanel,
                 onTeamContentDestinationSelect
@@ -167329,6 +167390,7 @@ function SportsBrowserPrototypeTemporaryNavPrototype({
                 {
                   leaguesSortMode,
                   leaguesLensSection: contentNavSection,
+                  leaguesFilterQuery: isGrarfExtensionRenderer() ? leaguesSearchQuery : void 0,
                   todayCompleteLeagues,
                   selectedLeagueKey,
                   destinationSelection,
@@ -167342,6 +167404,7 @@ function SportsBrowserPrototypeTemporaryNavPrototype({
                 {
                   contentSection: contentNavSection,
                   leaguesSortMode,
+                  leaguesFilterQuery: isGrarfExtensionRenderer() ? leaguesSearchQuery : void 0,
                   todayCompleteLeagues,
                   renderTeamListPanel: renderContentTeamListPanel,
                   onTeamContentDestinationSelect
@@ -167352,6 +167415,7 @@ function SportsBrowserPrototypeTemporaryNavPrototype({
                 {
                   contentSection: contentNavSection,
                   leaguesSortMode,
+                  leaguesFilterQuery: isGrarfExtensionRenderer() ? leaguesSearchQuery : void 0,
                   todayCompleteLeagues,
                   nowLeagues,
                   upcomingLeagues,
@@ -167449,7 +167513,6 @@ init_isGrarfWebRenderer();
 
 // ../grarf/desktop/src/extensionHost/scrollGrarfExtensionSidePanelToSection.ts
 init_define_import_meta_env();
-var COMMAND_CENTER_SELECTOR = "[data-grarf-extension-shadcn-featured]";
 var TEMPORAL_NAV_SELECTOR = "[data-sports-browser-prototype-temporary-nav-prototype]";
 var TIMELINE_SECTION_SELECTOR = "[data-grarf-extension-sidebar-timeline-section]";
 function resolveScrollOffsetWithinContainer(element, scrollContainer) {
@@ -167457,78 +167520,40 @@ function resolveScrollOffsetWithinContainer(element, scrollContainer) {
   const elementRect = element.getBoundingClientRect();
   return elementRect.top - containerRect.top + scrollContainer.scrollTop;
 }
-function scrollGrarfExtensionSidePanelToSection(scrollContainer, section, options = {}) {
-  const behavior = options.behavior ?? "smooth";
-  const pinCommandCenterAtTop = options.pinCommandCenterAtTop ?? true;
-  if (section === "home") {
-    scrollContainer.scrollTo({ top: 0, behavior });
-    return;
-  }
-  const commandCenter = scrollContainer.querySelector(COMMAND_CENTER_SELECTOR);
-  if (section === "browse") {
-    const temporalNav = scrollContainer.querySelector(TEMPORAL_NAV_SELECTOR);
-    if (temporalNav) {
-      if (!pinCommandCenterAtTop) {
-        temporalNav.scrollIntoView({ behavior, block: "start" });
-        return;
-      }
-      if (commandCenter) {
-        const commandCenterHeight2 = commandCenter.getBoundingClientRect().height;
-        const temporalTop = resolveScrollOffsetWithinContainer(temporalNav, scrollContainer);
-        scrollContainer.scrollTo({
-          top: Math.max(0, temporalTop - commandCenterHeight2),
-          behavior
-        });
-        return;
-      }
-      temporalNav.scrollIntoView({ behavior, block: "start" });
-      return;
-    }
-    commandCenter?.scrollIntoView({ behavior, block: "start" });
-    return;
-  }
+function resolveGrarfExtensionSidePanelSectionFromScroll(scrollContainer) {
+  const scrollTop = scrollContainer.scrollTop;
+  const edgeEpsilon = 4;
+  const activationScrollTop = scrollTop + scrollContainer.clientHeight * 0.4;
+  const temporalNav = scrollContainer.querySelector(TEMPORAL_NAV_SELECTOR);
   const timelineSection = scrollContainer.querySelector(TIMELINE_SECTION_SELECTOR);
-  if (!timelineSection) {
-    commandCenter?.scrollIntoView({ behavior, block: "start" });
-    return;
+  const temporalTop = temporalNav ? resolveScrollOffsetWithinContainer(temporalNav, scrollContainer) : Number.POSITIVE_INFINITY;
+  const timelineTop = timelineSection ? resolveScrollOffsetWithinContainer(timelineSection, scrollContainer) : Number.POSITIVE_INFINITY;
+  if (timelineSection && activationScrollTop + edgeEpsilon >= timelineTop) {
+    return "timeline";
   }
-  if (!pinCommandCenterAtTop) {
-    timelineSection.scrollIntoView({ behavior, block: "start" });
-    return;
+  if (temporalNav && activationScrollTop + edgeEpsilon >= temporalTop) {
+    return "browse";
   }
-  if (!commandCenter) {
-    timelineSection.scrollIntoView({ behavior, block: "start" });
-    return;
-  }
-  const commandCenterHeight = commandCenter.getBoundingClientRect().height;
-  const timelineTop = resolveScrollOffsetWithinContainer(timelineSection, scrollContainer);
-  scrollContainer.scrollTo({
-    top: Math.max(0, timelineTop - commandCenterHeight),
-    behavior
-  });
-}
-function syncGrarfExtensionSidePanelSectionDataset(section, pinCommandCenterAtTop) {
-  if (typeof document === "undefined") return;
-  document.documentElement.dataset.grarfExtensionSidePanelSection = section;
-  document.documentElement.dataset.grarfExtensionSidePanelPinCommandCenter = pinCommandCenterAtTop ? "true" : "false";
+  return "home";
 }
 
 // ../grarf/desktop/src/extensionHost/useGrarfExtensionSidePanelSectionScroll.ts
 function useGrarfExtensionSidePanelSectionScroll(scrollContainerRef) {
-  const activeSection = useGrarfExtensionSidePanelSectionStore((state3) => state3.activeSection);
-  const pinCommandCenterAtTop = useGrarfExtensionSidePanelSectionStore(
-    (state3) => state3.pinCommandCenterAtTop
+  const syncActiveSectionFromScroll = useGrarfExtensionSidePanelSectionStore(
+    (state3) => state3.syncActiveSectionFromScroll
   );
-  const scrollNonce = useGrarfExtensionSidePanelSectionStore((state3) => state3.scrollNonce);
   (0, import_react288.useEffect)(() => {
     if (!isGrarfExtensionRenderer()) return;
-    syncGrarfExtensionSidePanelSectionDataset(activeSection, pinCommandCenterAtTop);
     const scrollContainer = scrollContainerRef.current;
     if (!scrollContainer) return;
-    scrollGrarfExtensionSidePanelToSection(scrollContainer, activeSection, {
-      pinCommandCenterAtTop
-    });
-  }, [activeSection, pinCommandCenterAtTop, scrollContainerRef, scrollNonce]);
+    const onScroll = () => {
+      const section = resolveGrarfExtensionSidePanelSectionFromScroll(scrollContainer);
+      syncActiveSectionFromScroll(section);
+    };
+    scrollContainer.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+    return () => scrollContainer.removeEventListener("scroll", onScroll);
+  }, [scrollContainerRef, syncActiveSectionFromScroll]);
 }
 
 // ../grarf/desktop/src/extensionHost/useGrarfExtensionSidebarScrollportHeight.ts
@@ -168291,17 +168316,6 @@ function GrarfExtensionAiSearchHomeSection({
               "aria-label": "Search GRARF",
               "aria-expanded": entitySuggestions.length > 0,
               "aria-controls": entitySuggestions.length > 0 ? "grarf-extension-ai-search-entity-suggestions" : void 0
-            }
-          ),
-          /* @__PURE__ */ (0, import_jsx_runtime282.jsx)("span", { className: "grarf-extension-ai-search-home__search-divider", "aria-hidden": true }),
-          /* @__PURE__ */ (0, import_jsx_runtime282.jsx)(
-            "button",
-            {
-              type: "button",
-              className: "grarf-extension-ai-search-home__mic-button",
-              "aria-label": "Voice search (coming soon)",
-              tabIndex: -1,
-              children: /* @__PURE__ */ (0, import_jsx_runtime282.jsx)(Mic, { className: "h-[18px] w-[18px]", strokeWidth: 1.5, "aria-hidden": true })
             }
           )
         ] }),
@@ -171950,6 +171964,23 @@ function SportsBrowserPrototypeLeftNav({
   }, []);
   const [temporaryNavTopLevel, setTemporaryNavTopLevel] = (0, import_react292.useState)("GAMES");
   const [temporaryNavLeaguesSearchQuery, setTemporaryNavLeaguesSearchQuery] = (0, import_react292.useState)("");
+  const filterExtensionTemporalLeagueSlates = (0, import_react292.useCallback)(
+    (slates) => {
+      if (!isGrarfExtensionRenderer()) return slates;
+      const query = temporaryNavLeaguesSearchQuery.trim();
+      if (!query) return slates;
+      return slates.filter(
+        (slate) => sportsBrowserPrototypeSidebarLeagueRowMatchesSearch(slate.label, query)
+      );
+    },
+    [temporaryNavLeaguesSearchQuery]
+  );
+  const extensionGroupedCatchUpLeagues = (0, import_react292.useMemo)(
+    () => groupSportsBrowserPrototypeSidebarLeagueSlatesBySoccer(
+      filterExtensionTemporalLeagueSlates(catchUpLeagues)
+    ),
+    [catchUpLeagues, filterExtensionTemporalLeagueSlates]
+  );
   const [extensionGamesYesterdayHighlightsNavigation, setExtensionGamesYesterdayHighlightsNavigation] = (0, import_react292.useState)(null);
   const handleTemporaryNavTopLevelChange = (0, import_react292.useCallback)(
     (topLevel) => {
@@ -172133,15 +172164,10 @@ function SportsBrowserPrototypeLeftNav({
     }
   }, []);
   const [aiSearchTemporaryNavRequest, setAiSearchTemporaryNavRequest] = (0, import_react292.useState)(null);
-  const scrollExtensionSidebarToBrowse = (0, import_react292.useCallback)((pinCommandCenterAtTop = true) => {
-    useGrarfExtensionSidePanelSectionStore.getState().selectSection("browse", { pinCommandCenterAtTop });
-  }, []);
   const scrollExtensionSidebarToBrowseFromAiSearch = (0, import_react292.useCallback)(() => {
-    scrollExtensionSidebarToBrowse(false);
-  }, [scrollExtensionSidebarToBrowse]);
+  }, []);
   const scrollExtensionSidebarToTemporalNav = (0, import_react292.useCallback)(() => {
-    scrollExtensionSidebarToBrowseFromAiSearch();
-  }, [scrollExtensionSidebarToBrowseFromAiSearch]);
+  }, []);
   const requestTemporaryNavTopLevel = (0, import_react292.useCallback)(
     (topLevel, content) => {
       setAiSearchTemporaryNavRequest({
@@ -172261,7 +172287,6 @@ function SportsBrowserPrototypeLeftNav({
         }
         case "timeline": {
           applyEntityScope();
-          useGrarfExtensionSidePanelSectionStore.getState().selectSection("timeline", { pinCommandCenterAtTop: false });
           return;
         }
         default: {
@@ -172520,7 +172545,7 @@ function SportsBrowserPrototypeLeftNav({
                             compactTemporalView === "final" ? /* @__PURE__ */ (0, import_jsx_runtime286.jsx)(
                               SidebarGroupedTemporalLeagueEntries,
                               {
-                                entries: groupedCatchUpLeagues,
+                                entries: isGrarfExtensionRenderer() ? extensionGroupedCatchUpLeagues : groupedCatchUpLeagues,
                                 sectionPrefix: "catch-up",
                                 variant: "catchUp",
                                 leagueOpen: resolvedCatchUpLeagueOpen,
@@ -172544,7 +172569,7 @@ function SportsBrowserPrototypeLeftNav({
                             compactTemporalView === "yesterday" ? /* @__PURE__ */ (0, import_jsx_runtime286.jsx)(
                               SidebarYesterdaySectionLeagues,
                               {
-                                slates: yesterdayLeagues,
+                                slates: filterExtensionTemporalLeagueSlates(yesterdayLeagues),
                                 leagueOpen: resolvedYesterdayLeagueOpen,
                                 onLeagueOpenChange: extensionSidebarExclusiveLeagueExpansion ? onExtensionExclusiveLeagueOpenChange : setYesterdayLeagueOpen,
                                 onLeagueSelect: onTemporalLeagueSelect,
@@ -172567,7 +172592,7 @@ function SportsBrowserPrototypeLeftNav({
                               SidebarTemporalSectionLeagues,
                               {
                                 sectionId: "today",
-                                slates: todayCompleteLeagues,
+                                slates: filterExtensionTemporalLeagueSlates(todayCompleteLeagues),
                                 resolveVariant: resolveSidebarGameVariant,
                                 leagueOpen: resolvedSectionLeagueOpen,
                                 onLeagueOpenChange: extensionSidebarExclusiveLeagueExpansion ? onExtensionExclusiveLeagueOpenChange : setSectionLeagueOpen,
@@ -172591,7 +172616,7 @@ function SportsBrowserPrototypeLeftNav({
                               SidebarTemporalSectionLeagues,
                               {
                                 sectionId: "now",
-                                slates: nowLeagues,
+                                slates: filterExtensionTemporalLeagueSlates(nowLeagues),
                                 variant: "live",
                                 leagueOpen: resolvedSectionLeagueOpen,
                                 onLeagueOpenChange: extensionSidebarExclusiveLeagueExpansion ? onExtensionExclusiveLeagueOpenChange : setSectionLeagueOpen,
@@ -172615,7 +172640,7 @@ function SportsBrowserPrototypeLeftNav({
                               SidebarTemporalSectionLeagues,
                               {
                                 sectionId: "upcoming",
-                                slates: upcomingLeagues,
+                                slates: filterExtensionTemporalLeagueSlates(upcomingLeagues),
                                 variant: "upcoming",
                                 leagueOpen: resolvedSectionLeagueOpen,
                                 onLeagueOpenChange: extensionSidebarExclusiveLeagueExpansion ? onExtensionExclusiveLeagueOpenChange : setSectionLeagueOpen,
@@ -184556,7 +184581,6 @@ lucide-react/dist/esm/icons/layout-list.mjs:
 lucide-react/dist/esm/icons/lightbulb-off.mjs:
 lucide-react/dist/esm/icons/lightbulb.mjs:
 lucide-react/dist/esm/icons/loader-circle.mjs:
-lucide-react/dist/esm/icons/mic.mjs:
 lucide-react/dist/esm/icons/newspaper.mjs:
 lucide-react/dist/esm/icons/panel-left-close.mjs:
 lucide-react/dist/esm/icons/panel-right-open.mjs:
