@@ -57029,9 +57029,6 @@ function logoUrlIsEspnUnlimitedAsset(logoUrl) {
 function logoUrlIsAbcAsset(logoUrl) {
   return logoUrl.trim().toLowerCase().includes("channel-abc");
 }
-function logoUrlIsPeacockAsset(logoUrl) {
-  return logoUrl.trim().toLowerCase().includes("channel-peacock");
-}
 function logoUrlIsNbcAsset(logoUrl) {
   return /channel-nbc\.png/i.test(logoUrl.trim());
 }
@@ -57107,15 +57104,6 @@ function isNbcLogo(options) {
   if (label && resolveChannelLogoUrl(label) === NBC_CHANNEL_LOGO_URL) return true;
   return false;
 }
-function isPeacockLogo(options) {
-  const logoUrl = options?.logoUrl?.trim();
-  if (logoUrl && logoUrlIsPeacockAsset(logoUrl)) return true;
-  const label = options?.label?.trim();
-  if (!label) return false;
-  if (/\bpeacock\b/i.test(label)) return true;
-  if (resolveChannelLogoUrl(label) === PEACOCK_CHANNEL_LOGO_URL) return true;
-  return false;
-}
 function isCbssnLogo(options) {
   const logoUrl = options?.logoUrl?.trim();
   if (logoUrl && logoUrlIsCbssnAsset(logoUrl)) return true;
@@ -57125,7 +57113,7 @@ function isCbssnLogo(options) {
   return false;
 }
 function grarfLogoImgBorderRadiusClass(options) {
-  if (isFoxLogo(options) || isEspnLogo(options) || isIonLogo(options) || isAbcLogo(options) || isNbcLogo(options) || isPeacockLogo(options) || isEspnUnlimitedLogo(options) || isEspnPlusLogo(options) || isParamountLogo(options) || isNwslPlusLogo(options) || isCbssnLogo(options)) {
+  if (isFoxLogo(options) || isEspnLogo(options) || isIonLogo(options) || isAbcLogo(options) || isNbcLogo(options) || isEspnUnlimitedLogo(options) || isEspnPlusLogo(options) || isParamountLogo(options) || isNwslPlusLogo(options) || isCbssnLogo(options)) {
     return "rounded-none";
   }
   return GRARF_LOGO_IMG_BORDER_RADIUS_CLASS;
@@ -84307,6 +84295,95 @@ var WNBA_TEAMS = [
   wnbaTeam("SPO", "TEAM SPOON", ["Team Spoon"])
 ];
 
+// ../grarf/desktop/src/lib/livetrack/liveTrackNbaNflBrandTokens.ts
+init_define_import_meta_env();
+var LIVE_TRACK_NBA_BRAND_TOKEN_BY_ABBREV = {
+  ATL: "border-red-600/40 bg-red-600/[0.1] text-red-200",
+  BOS: "border-green-600/40 bg-green-600/[0.1] text-green-200",
+  BKN: "border-slate-400/35 bg-slate-400/[0.08] text-slate-200",
+  CHA: "border-teal-500/35 bg-teal-500/[0.08] text-teal-200",
+  CHI: "border-red-600/40 bg-red-600/[0.1] text-red-200",
+  CLE: "border-red-800/40 bg-red-800/[0.12] text-red-200",
+  DAL: "border-blue-600/40 bg-blue-600/[0.1] text-blue-200",
+  DEN: "border-blue-500/40 bg-blue-500/[0.1] text-blue-200",
+  DET: "border-red-600/40 bg-red-600/[0.1] text-red-200",
+  GSW: "border-[#FFC72C]/40 bg-[#FFC72C]/[0.1] text-[#FFC72C]",
+  HOU: "border-red-600/40 bg-red-600/[0.1] text-red-200",
+  IND: "border-yellow-400/35 bg-yellow-400/[0.08] text-yellow-200",
+  LAC: "border-red-600/40 bg-red-600/[0.1] text-red-200",
+  LAL: "border-purple-600/40 bg-purple-600/[0.1] text-purple-200",
+  MEM: "border-sky-500/35 bg-sky-500/[0.08] text-sky-200",
+  MIA: "border-red-600/40 bg-red-600/[0.1] text-red-200",
+  MIL: "border-green-600/40 bg-green-600/[0.1] text-green-200",
+  MIN: "border-blue-600/40 bg-blue-600/[0.1] text-blue-200",
+  NOP: "border-blue-800/40 bg-blue-800/[0.12] text-blue-200",
+  NYK: "border-orange-500/45 bg-orange-500/[0.12] text-orange-300",
+  OKC: "border-blue-600/40 bg-blue-600/[0.1] text-blue-200",
+  ORL: "border-blue-600/40 bg-blue-600/[0.1] text-blue-200",
+  PHI: "border-blue-600/40 bg-blue-600/[0.1] text-blue-200",
+  PHX: "border-orange-500/45 bg-orange-500/[0.12] text-orange-300",
+  POR: "border-red-600/40 bg-red-600/[0.1] text-red-200",
+  SAC: "border-purple-600/40 bg-purple-600/[0.1] text-purple-200",
+  SAS: "border-slate-300/30 bg-slate-300/[0.08] text-slate-200",
+  TOR: "border-red-600/40 bg-red-600/[0.1] text-red-200",
+  UTA: "border-purple-600/40 bg-purple-600/[0.1] text-purple-200",
+  WAS: "border-red-600/40 bg-red-600/[0.1] text-red-200",
+  WSH: "border-red-600/40 bg-red-600/[0.1] text-red-200"
+};
+var LIVE_TRACK_NFL_BRAND_TOKEN_BY_ABBREV = {
+  ARI: "border-red-600/40 bg-red-600/[0.1] text-red-200",
+  ATL: "border-red-600/40 bg-red-600/[0.1] text-red-200",
+  BAL: "border-purple-600/40 bg-purple-600/[0.1] text-purple-200",
+  BUF: "border-blue-600/40 bg-blue-600/[0.1] text-blue-200",
+  CAR: "border-sky-500/35 bg-sky-500/[0.08] text-sky-200",
+  CHI: "border-orange-500/45 bg-orange-500/[0.12] text-orange-300",
+  CIN: "border-orange-500/45 bg-orange-500/[0.12] text-orange-300",
+  CLE: "border-orange-500/45 bg-orange-500/[0.12] text-orange-300",
+  DAL: "border-blue-600/40 bg-blue-600/[0.1] text-blue-200",
+  DEN: "border-orange-500/45 bg-orange-500/[0.12] text-orange-300",
+  DET: "border-blue-600/40 bg-blue-600/[0.1] text-blue-200",
+  GB: "border-green-600/40 bg-green-600/[0.1] text-green-200",
+  HOU: "border-red-600/40 bg-red-600/[0.1] text-red-200",
+  IND: "border-blue-600/40 bg-blue-600/[0.1] text-blue-200",
+  JAX: "border-teal-500/35 bg-teal-500/[0.08] text-teal-200",
+  KC: "border-red-600/40 bg-red-600/[0.1] text-red-200",
+  LV: "border-slate-400/35 bg-slate-400/[0.08] text-slate-200",
+  LAC: "border-blue-600/40 bg-blue-600/[0.1] text-blue-200",
+  LAR: "border-yellow-400/35 bg-yellow-400/[0.08] text-yellow-200",
+  LA: "border-yellow-400/35 bg-yellow-400/[0.08] text-yellow-200",
+  MIA: "border-teal-500/35 bg-teal-500/[0.08] text-teal-200",
+  MIN: "border-purple-600/40 bg-purple-600/[0.1] text-purple-200",
+  NE: "border-blue-800/40 bg-blue-800/[0.12] text-blue-200",
+  NO: "border-yellow-400/35 bg-yellow-400/[0.08] text-yellow-200",
+  NYG: "border-blue-600/40 bg-blue-600/[0.1] text-blue-200",
+  NYJ: "border-green-600/40 bg-green-600/[0.1] text-green-200",
+  PHI: "border-green-600/40 bg-green-600/[0.1] text-green-200",
+  PIT: "border-yellow-400/35 bg-yellow-400/[0.08] text-yellow-200",
+  SEA: "border-green-600/40 bg-green-600/[0.1] text-green-200",
+  SF: "border-red-600/40 bg-red-600/[0.1] text-red-200",
+  TB: "border-red-600/40 bg-red-600/[0.1] text-red-200",
+  TEN: "border-sky-500/35 bg-sky-500/[0.08] text-sky-200",
+  WSH: "border-red-800/40 bg-red-800/[0.12] text-red-200",
+  WAS: "border-red-800/40 bg-red-800/[0.12] text-red-200"
+};
+var LIVE_TRACK_WNBA_BRAND_TOKEN_BY_ABBREV = {
+  ATL: "border-red-600/40 bg-red-600/[0.1] text-red-200",
+  CHI: "border-blue-500/40 bg-blue-500/[0.1] text-blue-200",
+  CON: "border-orange-500/45 bg-orange-500/[0.12] text-orange-300",
+  DAL: "border-blue-800/40 bg-blue-800/[0.12] text-blue-200",
+  GS: "border-purple-600/40 bg-purple-600/[0.1] text-purple-200",
+  IND: "border-blue-800/40 bg-blue-800/[0.12] text-blue-200",
+  LA: "border-purple-600/40 bg-purple-600/[0.1] text-purple-200",
+  LV: "border-slate-400/35 bg-slate-400/[0.08] text-slate-200",
+  MIN: "border-blue-800/40 bg-blue-800/[0.12] text-blue-200",
+  NY: "border-emerald-400/35 bg-emerald-400/[0.08] text-emerald-200",
+  PHX: "border-purple-600/40 bg-purple-600/[0.1] text-purple-200",
+  POR: "border-red-600/40 bg-red-600/[0.1] text-red-200",
+  SEA: "border-green-600/40 bg-green-600/[0.1] text-green-200",
+  TOR: "border-red-600/40 bg-red-600/[0.1] text-red-200",
+  WSH: "border-red-600/40 bg-red-600/[0.1] text-red-200"
+};
+
 // ../grarf/desktop/src/lib/livetrack/liveTrackTeamMetadata.ts
 var DEFAULT_TEAM_TOKEN_CLASS = "border-cyansys/35 bg-cyansys/[0.08] text-cyansys";
 var LIVE_TRACK_BRAND_TOKEN_BY_BUCKET = {
@@ -84377,7 +84454,9 @@ var LIVE_TRACK_BRAND_TOKEN_BY_BUCKET = {
     WSH: "border-red-600/40 bg-red-600/[0.1] text-red-200",
     WPG: "border-sky-400/35 bg-sky-400/[0.08] text-sky-200"
   },
-  wnba: {},
+  wnba: LIVE_TRACK_WNBA_BRAND_TOKEN_BY_ABBREV,
+  nba: LIVE_TRACK_NBA_BRAND_TOKEN_BY_ABBREV,
+  nfl: LIVE_TRACK_NFL_BRAND_TOKEN_BY_ABBREV,
   ncaa: {
     USC: "border-red-500/40 bg-red-500/[0.1] text-red-200",
     UNC: "border-sky-400/35 bg-sky-400/[0.08] text-sky-200",
@@ -84514,6 +84593,8 @@ var LOOKUP_BY_BUCKET = {
   mlb: /* @__PURE__ */ new Map(),
   nhl: /* @__PURE__ */ new Map(),
   wnba: /* @__PURE__ */ new Map(),
+  nba: /* @__PURE__ */ new Map(),
+  nfl: /* @__PURE__ */ new Map(),
   ncaa: /* @__PURE__ */ new Map(),
   soccer: /* @__PURE__ */ new Map(),
   legacy: /* @__PURE__ */ new Map()
@@ -84540,7 +84621,9 @@ function resolveSportBucket(sport) {
   if (normalized === "mlb") return "mlb";
   if (normalized === "nhl") return "nhl";
   if (normalized === "wnba") return "wnba";
-  if (normalized === "ncaa" || normalized === "ncaa baseball" || normalized === "college baseball") {
+  if (normalized === "nba") return "nba";
+  if (normalized === "nfl") return "nfl";
+  if (normalized === "ncaa" || normalized === "ncaa baseball" || normalized === "college baseball" || normalized === "ncaab" || normalized === "ncaam" || normalized === "ncaamb" || normalized === "ncaaf" || normalized === "ncaa football" || normalized === "college football" || normalized === "college basketball") {
     return "ncaa";
   }
   if (normalized === "soccer" || normalized === "football" || normalized.startsWith("fifa")) {
@@ -84604,14 +84687,23 @@ function resolveLiveTrackTeamLogoUrlFromMeta(teamName, sport) {
   if (!meta) return null;
   return resolveLogoUrlForMeta(meta, sport);
 }
-function resolveLiveTrackTeamTokenClass(teamName, sport) {
+function resolveLiveTrackTeamAccentTokenClass(teamName, sport, teamAbbrev2) {
   const meta = resolveLiveTrackTeamMetaForSport(teamName, sport);
   if (meta) return resolveBrandTokenClass(meta, sport);
   const countryAbbrev = resolveSoccerCountryAbbrev(teamName);
   if (countryAbbrev) {
     return LIVE_TRACK_NATIONAL_TEAM_TOKEN_BY_ABBREV[countryAbbrev] ?? DEFAULT_TEAM_TOKEN_CLASS;
   }
+  const abbrev = teamAbbrev2?.trim().toUpperCase();
+  if (abbrev && sport) {
+    const bucket = resolveSportBucket(sport);
+    const brand = LIVE_TRACK_BRAND_TOKEN_BY_BUCKET[bucket]?.[abbrev];
+    if (brand) return brand;
+  }
   return DEFAULT_TEAM_TOKEN_CLASS;
+}
+function resolveLiveTrackTeamTokenClass(teamName, sport) {
+  return resolveLiveTrackTeamAccentTokenClass(teamName, sport);
 }
 var LIVE_TRACK_MLB_TEAM_COUNT = MLB_TEAMS.length;
 var LIVE_TRACK_NHL_TEAM_COUNT = NHL_TEAMS.length;
@@ -104300,6 +104392,9 @@ var BUNDESLIGA_TEAM_POPULATION = [
   bundesligaTeam("VFB", "134", "VfB Stuttgart", "VfB Stuttgart"),
   bundesligaTeam("SVW", "137", "Werder Bremen", "Werder Bremen")
 ];
+function collectBundesligaTeamPopulationEntries() {
+  return [...BUNDESLIGA_TEAM_POPULATION];
+}
 
 // ../grarf/desktop/src/data/eplTeamPopulation.ts
 init_define_import_meta_env();
@@ -104334,6 +104429,9 @@ var EPL_TEAM_POPULATION = [
   eplTeam("SUN", "366", "Sunderland", "Sunderland"),
   eplTeam("TOT", "367", "Tottenham Hotspur", "Tottenham Hotspur")
 ];
+function collectEplTeamPopulationEntries() {
+  return [...EPL_TEAM_POPULATION];
+}
 
 // ../grarf/desktop/src/data/laligaTeamPopulation.ts
 init_define_import_meta_env();
@@ -104368,6 +104466,9 @@ var LALIGA_TEAM_POPULATION = [
   laligaTeam("VAL", "94", "Valencia", "Valencia"),
   laligaTeam("VIL", "102", "Villarreal", "Villarreal")
 ];
+function collectLaligaTeamPopulationEntries() {
+  return [...LALIGA_TEAM_POPULATION];
+}
 
 // ../grarf/desktop/src/data/ligue1TeamPopulation.ts
 init_define_import_meta_env();
@@ -104400,6 +104501,9 @@ var LIGUE1_TEAM_POPULATION = [
   ligue1Team("TOU", "179", "Toulouse", "Toulouse"),
   ligue1Team("TRY", "170", "Troyes", "Troyes")
 ];
+function collectLigue1TeamPopulationEntries() {
+  return [...LIGUE1_TEAM_POPULATION];
+}
 
 // ../grarf/desktop/src/data/mlbTeamPopulation.ts
 init_define_import_meta_env();
@@ -104574,6 +104678,9 @@ var MLS_TEAM_POPULATION_BY_CONFERENCE = [
     ]
   }
 ];
+function collectMlsTeamPopulationEntries() {
+  return MLS_TEAM_POPULATION_BY_CONFERENCE.flatMap((conference) => [...conference.teams]);
+}
 
 // ../grarf/desktop/src/data/mncaabTeamPopulation.ts
 init_define_import_meta_env();
@@ -105177,6 +105284,9 @@ var NBA_TEAM_POPULATION_BY_DIVISION = [
     ]
   }
 ];
+function collectNbaTeamPopulationEntries() {
+  return NBA_TEAM_POPULATION_BY_DIVISION.flatMap((division) => [...division.teams]);
+}
 
 // ../grarf/desktop/src/data/ncaafTeamPopulation.ts
 init_define_import_meta_env();
@@ -105466,6 +105576,9 @@ var NFL_TEAM_POPULATION_BY_DIVISION = [
     ]
   }
 ];
+function collectNflTeamPopulationEntries() {
+  return NFL_TEAM_POPULATION_BY_DIVISION.flatMap((division) => [...division.teams]);
+}
 
 // ../grarf/desktop/src/data/nhlTeamPopulation.ts
 init_define_import_meta_env();
@@ -105531,6 +105644,9 @@ var NHL_TEAM_POPULATION_BY_DIVISION = [
     ]
   }
 ];
+function collectNhlTeamPopulationEntries() {
+  return NHL_TEAM_POPULATION_BY_DIVISION.flatMap((division) => [...division.teams]);
+}
 
 // ../grarf/desktop/src/data/serieaTeamPopulation.ts
 init_define_import_meta_env();
@@ -105565,6 +105681,9 @@ var SERIEA_TEAM_POPULATION = [
   serieaTeam("UDI", "118", "Udinese", "Udinese"),
   serieaTeam("VEN", "17530", "Venezia", "Venezia")
 ];
+function collectSerieaTeamPopulationEntries() {
+  return [...SERIEA_TEAM_POPULATION];
+}
 
 // ../grarf/desktop/src/data/wnbaTeamPopulation.ts
 init_define_import_meta_env();
@@ -105603,6 +105722,9 @@ var WNBA_TEAM_POPULATION_BY_CONFERENCE = [
     ]
   }
 ];
+function collectWnbaTeamPopulationEntries() {
+  return WNBA_TEAM_POPULATION_BY_CONFERENCE.flatMap((conference) => [...conference.teams]);
+}
 
 // ../grarf/desktop/src/lib/gamesSpine/sportsBrowserPrototypeLeaguesTabTeamNavigation.ts
 var SPORTS_BROWSER_PROTOTYPE_LEAGUES_TAB_TEAM_CONTEXT_GAME_ID_PREFIX = "sports-browser-leagues-tab-";
@@ -150218,7 +150340,7 @@ function resolveNewsSportsBrowserChannelLogoImageClass(logoUrl, label, slotAlign
   const logo = { logoUrl, label };
   return cn2(
     gamesSpineCompactChannelLogoImageClass(slotAlign === "center" ? "left" : "right", logo),
-    "rounded-none bg-transparent",
+    "bg-transparent",
     slotAlign === "center" ? "object-center" : "object-right",
     isFoxLogo(logo) && "mix-blend-screen"
   );
@@ -150265,6 +150387,715 @@ function NewsSportsBrowserChannelLogo({
 
 // ../grarf/desktop/src/extensionHost/grarfExtensionCommandCenterScorecardPresentation.ts
 init_define_import_meta_env();
+
+// ../grarf/desktop/src/lib/branding/grarfTeamBrandAccentHex.ts
+init_define_import_meta_env();
+function normalizeBrandAccentHex(hex) {
+  const trimmed = hex.trim();
+  if (!trimmed) return trimmed;
+  const withHash = trimmed.startsWith("#") ? trimmed : `#${trimmed}`;
+  return withHash.toUpperCase();
+}
+function abbrevHexMap(entries) {
+  const out = {};
+  for (const [abbrev, hex] of Object.entries(entries)) {
+    out[abbrev.toUpperCase()] = normalizeBrandAccentHex(hex);
+  }
+  return out;
+}
+var NBA2 = abbrevHexMap({
+  ATL: "E03A3E",
+  BOS: "007A33",
+  BKN: "000000",
+  CHA: "1D1160",
+  CHI: "CE1141",
+  CLE: "860038",
+  DAL: "00538C",
+  DEN: "0E2240",
+  DET: "C8102E",
+  GSW: "1D428A",
+  HOU: "CE1141",
+  IND: "002D62",
+  LAC: "C8102E",
+  LAL: "552583",
+  MEM: "5D76A9",
+  MIA: "98002E",
+  MIL: "00471B",
+  MIN: "0C2340",
+  NOP: "0C2340",
+  NYK: "006BB6",
+  OKC: "007AC1",
+  ORL: "0077C0",
+  PHI: "006BB6",
+  PHX: "1D1160",
+  POR: "E03A3E",
+  SAC: "5A2D81",
+  SAS: "C4CED4",
+  TOR: "CE1141",
+  UTA: "002B5C",
+  WAS: "002B5C",
+  WSH: "002B5C"
+});
+var NFL = abbrevHexMap({
+  ARI: "97233F",
+  ATL: "A71930",
+  BAL: "241773",
+  BUF: "00338D",
+  CAR: "0085CA",
+  CHI: "0B162A",
+  CIN: "FB4F14",
+  CLE: "311D00",
+  DAL: "003594",
+  DEN: "FB4F14",
+  DET: "0076B6",
+  GB: "203731",
+  HOU: "03202F",
+  IND: "002C5F",
+  JAX: "101820",
+  KC: "E31837",
+  LV: "000000",
+  LAC: "0080C6",
+  LAR: "003594",
+  LA: "003594",
+  MIA: "008E97",
+  MIN: "4F2683",
+  NE: "002244",
+  NO: "D3BC8D",
+  NYG: "0B2265",
+  NYJ: "125740",
+  PHI: "004C54",
+  PIT: "FFB612",
+  SEA: "002244",
+  SF: "AA0000",
+  TB: "D50A0A",
+  TEN: "0C2340",
+  WSH: "5A1414",
+  WAS: "5A1414"
+});
+var NHL2 = abbrevHexMap({
+  ANA: "F47A38",
+  BOS: "FFB81C",
+  BUF: "002654",
+  CGY: "C8102E",
+  CAR: "CC0000",
+  CHI: "CF0A2C",
+  COL: "6F263D",
+  CBJ: "002654",
+  DAL: "006847",
+  DET: "CE1126",
+  EDM: "041E42",
+  FLA: "041E42",
+  LAK: "111111",
+  MIN: "154734",
+  MTL: "AF1E2D",
+  NSH: "FFB81C",
+  NJD: "CE1126",
+  NYI: "00539B",
+  NYR: "0038A8",
+  OTT: "C52032",
+  PHI: "F74902",
+  PIT: "FCB514",
+  SJS: "006D75",
+  SEA: "001628",
+  STL: "002F87",
+  TBL: "002868",
+  TOR: "00205B",
+  UTA: "010101",
+  VAN: "00205B",
+  VGK: "B4975A",
+  WSH: "041E42",
+  WPG: "041E42"
+});
+var MLB2 = abbrevHexMap({
+  ARI: "A71930",
+  AZ: "A71930",
+  ATH: "003831",
+  OAK: "003831",
+  ATL: "13274F",
+  BAL: "DF4601",
+  BOS: "BD3039",
+  CHC: "0E3386",
+  CWS: "27251F",
+  CIN: "C6011F",
+  CLE: "00385D",
+  COL: "33006F",
+  DET: "0C2340",
+  HOU: "002D62",
+  KC: "004687",
+  LAA: "003263",
+  LAD: "005A9C",
+  MIA: "00A3E0",
+  MIL: "12284B",
+  MIN: "002B5C",
+  NYM: "002D72",
+  NYY: "0C2340",
+  PHI: "E81828",
+  PIT: "27251F",
+  SD: "2F241D",
+  SF: "FD5A1E",
+  SEA: "0C2C56",
+  STL: "C41E3A",
+  TB: "092C5C",
+  TEX: "003278",
+  TOR: "134A8E",
+  WSH: "AB0003"
+});
+var WNBA2 = abbrevHexMap({
+  ATL: "E3173E",
+  CHI: "418FDE",
+  CON: "FC4C02",
+  DAL: "002B5C",
+  GS: "AD96DC",
+  IND: "0C2340",
+  LA: "702F8A",
+  LV: "010101",
+  MIN: "0C2340",
+  NY: "6ECEB2",
+  PHX: "3C286E",
+  POR: "C8102E",
+  SEA: "2C5235",
+  TOR: "612C51",
+  WSH: "C8102E"
+});
+var MLS = abbrevHexMap({
+  ATL: "80000B",
+  ATX: "00B140",
+  MTL: "0033A1",
+  CLT: "1A85C8",
+  CHI: "FF0000",
+  COL: "960A2C",
+  CLB: "FEDD00",
+  DC: "EF3E42",
+  CIN: "F05323",
+  DAL: "E81F3E",
+  HOU: "FF6B00",
+  MIA: "F7B5CD",
+  LA: "00245D",
+  LAFC: "000000",
+  MIN: "8CD2F4",
+  NSH: "ECE83A",
+  NE: "CE0E2D",
+  NYC: "6CACE4",
+  RBNY: "ED1E36",
+  ORL: "633492",
+  PHI: "071B2C",
+  POR: "004812",
+  RSL: "B30838",
+  SD: "00B2E3",
+  SJ: "0067B1",
+  SEA: "5D9741",
+  SKC: "91B0D5",
+  STL: "DF243B",
+  TOR: "B81137",
+  VAN: "04265C"
+});
+var EPL = abbrevHexMap({
+  BOU: "DA291C",
+  ARS: "EF0107",
+  AVL: "670E36",
+  BRE: "E30613",
+  BHA: "0057B8",
+  BUR: "6C1D45",
+  CHE: "034694",
+  CRY: "1B458F",
+  EVE: "003399",
+  FUL: "FFFFFF",
+  LEE: "FFFFFF",
+  LIV: "C8102E",
+  MNC: "6CABDD",
+  MAN: "DA291C",
+  NEW: "241F20",
+  NFO: "DD0000",
+  SUN: "EB172B",
+  TOT: "132257",
+  WHU: "7A263A",
+  WOL: "FDB913"
+});
+var LALIGA = abbrevHexMap({
+  ATH: "EE2523",
+  ATM: "CB3524",
+  OSA: "D91A21",
+  CEL: "8AC3EE",
+  ALA: "0761AF",
+  ELC: "00834E",
+  BAR: "A50044",
+  GET: "005999",
+  GIR: "CD2534",
+  LEV: "005CA9",
+  RAY: "FFFFFF",
+  ESP: "007FC8",
+  MLL: "E20613",
+  BET: "00954C",
+  RMA: "FFFFFF",
+  RSO: "0067B1",
+  SEV: "FFFFFF",
+  LPA: "FFE400",
+  VAL: "FFFFFF",
+  VIL: "FFE667"
+});
+var SERIEA = abbrevHexMap({
+  MIL: "FB090B",
+  MON: "EE0E36",
+  FIO: "482E92",
+  ROMA: "8E1F2F",
+  ATA: "1E71B8",
+  BOL: "9F1F33",
+  CAG: "B01028",
+  COMO: "003057",
+  FRO: "FFD500",
+  GEN: "AD1919",
+  INT: "010E80",
+  JUV: "000000",
+  PAR: "FFFFFF",
+  LAZ: "87D8F7",
+  NAP: "12A0D7",
+  TOR: "881F19",
+  UDI: "000000",
+  LEC: "F5BE00",
+  SAS: "00A752",
+  VEN: "000000"
+});
+var BUNDESLIGA = abbrevHexMap({
+  FCH: "E30613",
+  KOE: "ED1C24",
+  FCU: "EB1923",
+  M05: "ED1C24",
+  B04: "E32221",
+  DOR: "FDE100",
+  BMG: "FFFFFF",
+  SGE: "E1000F",
+  FCA: "BA3733",
+  MUN: "DC052D",
+  S04: "004D9D",
+  HSV: "0F3F93",
+  RBL: "DD0741",
+  SCF: "DE0000",
+  SVW: "1D9053",
+  TSG: "1961B5",
+  VFB: "FFFFFF",
+  WOB: "65B32E"
+});
+var LIGUE1 = abbrevHexMap({
+  AUX: "003D7C",
+  ANG: "000000",
+  MON: "E63312",
+  LOR: "F36F21",
+  MET: "6F263D",
+  NAN: "FCD405",
+  HAC: "005DA4",
+  RCL: "FCD116",
+  LILL: "E01E13",
+  NICE: "CC0000",
+  OLM: "2FAEE0",
+  LYON: "FFFFFF",
+  PAR: "003A70",
+  PSG: "004170",
+  STR: "009FE3",
+  BRE: "E30613",
+  REN: "E13327",
+  TOU: "6247AA"
+});
+var GRARF_TEAM_BRAND_ACCENT_HEX_BY_LEAGUE = {
+  NBA: NBA2,
+  NBASUMMER: NBA2,
+  NFL,
+  NHL: NHL2,
+  NCAAH: NHL2,
+  CWHOC: NHL2,
+  MLB: MLB2,
+  NCAABB: MLB2,
+  NCAASB: MLB2,
+  WNBA: WNBA2,
+  MLS,
+  EPL,
+  LALIGA,
+  SERIEA,
+  BUNDESLIGA,
+  LIGUE1
+};
+var GRARF_TEAM_BRAND_ACCENT_LEAGUE_ALIASES = {
+  NBASUMMER: "NBA",
+  NCAAH: "NHL",
+  CWHOC: "NHL",
+  NCAABB: "MLB",
+  NCAASB: "MLB"
+};
+var NBA_BRAND_ACCENT_ABBREV_ALIASES = {
+  GS: "GSW"
+};
+var MLB_BRAND_ACCENT_ABBREV_ALIASES = {
+  SDP: "SD",
+  AZ: "ARI"
+};
+function normalizeTeamDisplayNameKey(name) {
+  return name.trim().toLowerCase().replace(/\s+/g, " ");
+}
+function registerPopulationDisplayNameKey(out, displayName, abbrev) {
+  if (!displayName?.trim()) return;
+  out[normalizeTeamDisplayNameKey(displayName)] = abbrev;
+}
+function registerCityPrefixFromLabelAndNickname(out, label, nickname, abbrev) {
+  const trimmedLabel = label.trim();
+  const trimmedNick = nickname.trim();
+  if (!trimmedLabel || !trimmedNick) return;
+  if (!trimmedLabel.toLowerCase().endsWith(trimmedNick.toLowerCase())) return;
+  const city = trimmedLabel.slice(0, trimmedLabel.length - trimmedNick.length).trim();
+  registerPopulationDisplayNameKey(out, city, abbrev);
+}
+function buildPopulationNameToAbbrevMap(entries) {
+  const out = {};
+  for (const entry2 of entries) {
+    const abbrev = entry2.teamAbbrev.trim().toUpperCase();
+    const keys = [entry2.label, entry2.leaguesTabListLabel, entry2.teamAbbrev].filter(
+      Boolean
+    );
+    for (const key2 of keys) {
+      registerPopulationDisplayNameKey(out, key2, abbrev);
+    }
+    if (entry2.leaguesTabListLabel) {
+      registerCityPrefixFromLabelAndNickname(
+        out,
+        entry2.label,
+        entry2.leaguesTabListLabel,
+        abbrev
+      );
+    }
+  }
+  return out;
+}
+function buildMlbPopulationNameToAbbrevMap() {
+  const out = {};
+  for (const entry2 of collectMlbTeamPopulationEntries()) {
+    const abbrev = entry2.teamAbbrev.trim().toUpperCase();
+    registerPopulationDisplayNameKey(out, entry2.label, abbrev);
+    registerPopulationDisplayNameKey(out, entry2.teamAbbrev, abbrev);
+    const leaguesTabNickname = resolveMlbLeaguesTabTeamListDisplayLabel(entry2.teamAbbrev);
+    registerPopulationDisplayNameKey(out, leaguesTabNickname, abbrev);
+    registerCityPrefixFromLabelAndNickname(out, entry2.label, leaguesTabNickname, abbrev);
+  }
+  return out;
+}
+var POPULATION_NAME_TO_ABBREV_BY_LEAGUE = {
+  NBA: buildPopulationNameToAbbrevMap(collectNbaTeamPopulationEntries()),
+  NFL: buildPopulationNameToAbbrevMap(collectNflTeamPopulationEntries()),
+  NHL: buildPopulationNameToAbbrevMap(collectNhlTeamPopulationEntries()),
+  MLB: buildMlbPopulationNameToAbbrevMap(),
+  WNBA: buildPopulationNameToAbbrevMap(collectWnbaTeamPopulationEntries()),
+  MLS: buildPopulationNameToAbbrevMap(collectMlsTeamPopulationEntries()),
+  EPL: buildPopulationNameToAbbrevMap(collectEplTeamPopulationEntries()),
+  LALIGA: buildPopulationNameToAbbrevMap(collectLaligaTeamPopulationEntries()),
+  SERIEA: buildPopulationNameToAbbrevMap(collectSerieaTeamPopulationEntries()),
+  BUNDESLIGA: buildPopulationNameToAbbrevMap(collectBundesligaTeamPopulationEntries()),
+  LIGUE1: buildPopulationNameToAbbrevMap(collectLigue1TeamPopulationEntries())
+};
+function resolveCanonicalBrandAccentLeagueKey(league2) {
+  const leagueKey = league2.trim().toUpperCase();
+  return GRARF_TEAM_BRAND_ACCENT_LEAGUE_ALIASES[leagueKey] ?? leagueKey;
+}
+function resolveGrarfTeamBrandAccentLeagueForGame(game) {
+  const fromField = game.league?.trim();
+  if (fromField) return resolveCanonicalBrandAccentLeagueKey(fromField);
+  const fromId = leagueKeyFromEspnGameId(game.id);
+  return fromId ? resolveCanonicalBrandAccentLeagueKey(fromId) : null;
+}
+function normalizeBrandAccentAbbrevForLeague(league2, abbrev) {
+  const abbrevKey = abbrev.trim().toUpperCase();
+  if (!abbrevKey || !league2?.trim()) return abbrevKey;
+  const canonicalLeague = resolveCanonicalBrandAccentLeagueKey(league2);
+  if (canonicalLeague === "NBA") {
+    return NBA_BRAND_ACCENT_ABBREV_ALIASES[abbrevKey] ?? abbrevKey;
+  }
+  if (canonicalLeague === "MLB") {
+    return MLB_BRAND_ACCENT_ABBREV_ALIASES[abbrevKey] ?? abbrevKey;
+  }
+  return abbrevKey;
+}
+function resolveTeamAbbrevFromPopulation(league2, teamDisplayName2) {
+  if (!league2?.trim() || !teamDisplayName2?.trim()) return null;
+  const canonicalLeague = resolveCanonicalBrandAccentLeagueKey(league2);
+  const map = POPULATION_NAME_TO_ABBREV_BY_LEAGUE[canonicalLeague];
+  if (!map) return null;
+  return map[normalizeTeamDisplayNameKey(teamDisplayName2)] ?? null;
+}
+function collectTeamBrandAccentAbbrevCandidates(league2, ingestAbbrev, canonicalDisplayName, ingestTeamName) {
+  const seen = /* @__PURE__ */ new Set();
+  const ordered = [];
+  const push2 = (abbrev) => {
+    const key2 = abbrev?.trim().toUpperCase();
+    if (!key2 || seen.has(key2)) return;
+    seen.add(key2);
+    ordered.push(key2);
+  };
+  push2(ingestAbbrev);
+  push2(resolveTeamAbbrevFromPopulation(league2, canonicalDisplayName));
+  push2(resolveTeamAbbrevFromPopulation(league2, ingestTeamName));
+  push2(resolveLiveTrackTeamAbbrev(canonicalDisplayName, league2 ?? void 0));
+  push2(resolveLiveTrackTeamAbbrev(ingestTeamName, league2 ?? void 0));
+  return ordered;
+}
+function resolveGrarfTeamBrandAccentHex(league2, abbrev) {
+  const leagueKey = league2?.trim().toUpperCase();
+  const abbrevKey = abbrev?.trim().toUpperCase();
+  if (!leagueKey || !abbrevKey) return null;
+  const canonicalLeague = resolveCanonicalBrandAccentLeagueKey(leagueKey);
+  const normalizedAbbrev = normalizeBrandAccentAbbrevForLeague(canonicalLeague, abbrevKey);
+  return GRARF_TEAM_BRAND_ACCENT_HEX_BY_LEAGUE[canonicalLeague]?.[normalizedAbbrev] ?? null;
+}
+function resolveGrarfTeamBrandAccentHexForGame(game, side, teamDisplayName2) {
+  const ingestAbbrev = side === "away" ? game.awayTeamAbbrev : game.homeTeamAbbrev;
+  const ingestTeamName = (side === "away" ? game.awayTeam : game.homeTeam)?.trim() || "";
+  const canonicalName = teamDisplayName2?.trim() || ingestTeamName;
+  const league2 = resolveGrarfTeamBrandAccentLeagueForGame(game);
+  const abbrevCandidates = collectTeamBrandAccentAbbrevCandidates(
+    league2,
+    ingestAbbrev,
+    canonicalName,
+    ingestTeamName
+  );
+  for (const abbrev of abbrevCandidates) {
+    const hex = resolveGrarfTeamBrandAccentHex(league2, abbrev);
+    if (hex) return hex;
+  }
+  return null;
+}
+
+// ../grarf/desktop/src/lib/livetrack/liveTrackTeamAccentHex.ts
+init_define_import_meta_env();
+var TAILWIND_ACCENT_HEX = {
+  "red-200": "#fecaca",
+  "red-400": "#f87171",
+  "red-500": "#ef4444",
+  "red-600": "#dc2626",
+  "red-800": "#991b1b",
+  "orange-200": "#fed7aa",
+  "orange-300": "#fdba74",
+  "orange-400": "#fb923c",
+  "orange-500": "#f97316",
+  "amber-200": "#fde68a",
+  "amber-500": "#f59e0b",
+  "yellow-200": "#fef08a",
+  "yellow-400": "#facc15",
+  "green-200": "#bbf7d0",
+  "green-500": "#22c55e",
+  "green-600": "#16a34a",
+  "emerald-200": "#a7f3d0",
+  "emerald-400": "#34d399",
+  "emerald-500": "#10b981",
+  "teal-400": "#2dd4bf",
+  "teal-500": "#14b8a6",
+  "cyan-200": "#a5f3fc",
+  "cyan-400": "#22d3ee",
+  "sky-200": "#bae6fd",
+  "sky-400": "#38bdf8",
+  "sky-500": "#0ea5e9",
+  "blue-200": "#bfdbfe",
+  "blue-400": "#60a5fa",
+  "blue-500": "#3b82f6",
+  "blue-600": "#2563eb",
+  "blue-800": "#1e40af",
+  "purple-200": "#e9d5ff",
+  "purple-400": "#c084fc",
+  "purple-500": "#a855f7",
+  "purple-600": "#9333ea",
+  "fuchsia-400": "#e879f9",
+  "slate-200": "#e2e8f0",
+  "slate-300": "#cbd5e1",
+  "slate-400": "#94a3b8"
+};
+function scoreTokenMatch(kind, shade) {
+  const kindScore = kind === "border" ? 30 : kind === "bg" ? 20 : 5;
+  const shadeScore = shade >= 700 ? 8 : shade >= 600 ? 7 : shade === 500 ? 6 : shade === 400 ? 4 : 2;
+  return kindScore + shadeScore;
+}
+function resolveLiveTrackAccentHexFromTokenClass(tokenClass) {
+  const hexLiteral = tokenClass.match(/#[0-9a-fA-F]{3,8}/)?.[0];
+  if (hexLiteral) return hexLiteral;
+  let bestHex = null;
+  let bestScore = -1;
+  const tokenPattern = /(border|bg|text)-([a-z]+)-(\d{3})/g;
+  for (const match of tokenClass.matchAll(tokenPattern)) {
+    const kind = match[1];
+    const key2 = `${match[2]}-${match[3]}`;
+    const hex = TAILWIND_ACCENT_HEX[key2];
+    if (!hex) continue;
+    const score2 = scoreTokenMatch(kind, Number(match[3]));
+    if (score2 > bestScore) {
+      bestScore = score2;
+      bestHex = hex;
+    }
+  }
+  if (bestHex) return bestHex;
+  if (tokenClass.includes("cyansys")) return "#22d3ee";
+  return "#6b7280";
+}
+
+// ../grarf/desktop/src/extensionHost/grarfExtensionCommandCenterScorecardPresentation.ts
+function grarfCommandCenterTeamAccentStyle(hex) {
+  return { "--grarf-cc-team-accent": hex };
+}
+var COMMAND_CENTER_SOCCER_LEAGUES = /* @__PURE__ */ new Set([
+  "EPL",
+  "LALIGA",
+  "MLS",
+  "NWSL",
+  "NCAAMSOC",
+  "NCAAWSOC",
+  "LIGAMX",
+  "SERIEA",
+  "LIGUE1",
+  "EREDIVISIE",
+  "BUNDESLIGA",
+  "UCL",
+  "UEL",
+  "UELQ",
+  "UECL",
+  "UECLQ",
+  "WWC",
+  "EURO",
+  "COPA",
+  "GOLDCUP",
+  "NATIONS",
+  "CLUBWC",
+  "SPFL",
+  "SAUDI",
+  "SUPERLIG",
+  "USLCUP",
+  "WORLDCUP"
+]);
+function isCommandCenterMlbFamilyGame(game) {
+  const league2 = game.league;
+  return league2 === "MLB" || league2 === "NCAABB" || league2 === "NCAASB" || /^espn-MLB-/i.test(game.id) || /^espn-NCAABB-/i.test(game.id) || /^espn-NCAASB-/i.test(game.id);
+}
+function isCommandCenterSoccerGame(game) {
+  return game.league != null && COMMAND_CENTER_SOCCER_LEAGUES.has(game.league);
+}
+function resolveCommandCenterEffectiveTimingLabel(game, state3, timingLabel) {
+  const trimmed = timingLabel.trim();
+  if (trimmed) return trimmed;
+  if (state3 !== "live") return trimmed;
+  return resolveGamesSpineCardTimingLabel(game)?.trim() ?? game.statusLine?.trim() ?? game.displayClock?.trim() ?? "";
+}
+function resolveCommandCenterBaseballMetaTimingParts(game, timingLabel) {
+  if (game.status !== "live" || !isCommandCenterMlbFamilyGame(game)) return null;
+  const candidates = [timingLabel, game.statusLine?.trim() ?? "", resolveGamesSpineCardTimingLabel(game) ?? ""];
+  for (const candidate of candidates) {
+    if (!candidate.trim()) continue;
+    const inningPart = candidate.split("\xB7")[0]?.trim() ?? candidate.trim();
+    const formatted = formatMlbWebGameCardInningLabel(inningPart) ?? formatMlbWebGameCardInningLabel(candidate);
+    if (formatted) {
+      const parts = formatted.match(/^(TOP|BOT|MID|END)\s+(\d+)$/i);
+      if (parts) {
+        return { period: parts[1].toUpperCase(), clock: parts[2] };
+      }
+    }
+    const direct = inningPart.match(/^(Top|Bot(?:tom)?|Mid(?:dle)?|End)\s+(\d+)/i);
+    if (direct) {
+      const half = direct[1].toLowerCase();
+      const inning = direct[2];
+      const period = half.startsWith("top") ? "TOP" : half.startsWith("bot") ? "BOT" : half.startsWith("mid") ? "MID" : "END";
+      return { period, clock: inning };
+    }
+  }
+  return null;
+}
+function resolveCommandCenterTennisMetaTimingParts(game, timingLabel) {
+  if (game.status !== "live" || !isTennisGame(game)) return null;
+  const tennis = resolveTennisMatchPresentation(game);
+  const rawLiveLabel = tennis?.liveSetLabel?.trim() || "";
+  let setLabel = null;
+  if (game.period != null && Number.isFinite(game.period) && game.period > 0) {
+    const periodNum = game.period;
+    const suffix = periodNum === 1 ? "st" : periodNum === 2 ? "nd" : periodNum === 3 ? "rd" : "th";
+    setLabel = `${periodNum}${suffix} Set`;
+  } else if (rawLiveLabel && /set$/i.test(rawLiveLabel)) {
+    setLabel = rawLiveLabel;
+  }
+  const gamesLabel = timingLabel.trim() || game.displayClock?.trim() || (rawLiveLabel && /^\d+-\d+/.test(rawLiveLabel) ? rawLiveLabel : "");
+  if (setLabel && gamesLabel) {
+    return { period: setLabel, clock: gamesLabel };
+  }
+  if (gamesLabel) return { period: null, clock: gamesLabel };
+  if (setLabel) return { period: null, clock: setLabel };
+  return null;
+}
+function resolveCommandCenterSoccerMetaTimingParts(game, timingLabel) {
+  if (game.status !== "live" || !isCommandCenterSoccerGame(game)) return null;
+  const label = timingLabel.trim() || game.displayClock?.trim() || resolveGamesSpineCardTimingLabel(game)?.trim() || game.statusLine?.trim() || "";
+  if (!label) return null;
+  if (/^HT$/i.test(label) || /\bhalftime\b/i.test(label)) {
+    return { period: "HT", clock: "\u2014" };
+  }
+  return { period: null, clock: label };
+}
+function isCommandCenterHockeyLeague(league2) {
+  return league2 === "NHL" || league2 === "NCAAH" || league2 === "CWHOC";
+}
+function formatCommandCenterHockeyPeriodLabel(periodNum) {
+  if (periodNum === 1) return "1st";
+  if (periodNum === 2) return "2nd";
+  if (periodNum === 3) return "3rd";
+  if (periodNum === 4) return "4th";
+  if (periodNum === 5) return "OT";
+  if (periodNum > 5) return `${periodNum - 4}OT`;
+  return `${periodNum}`;
+}
+function parseCommandCenterHockeyPeriodLabel(text2) {
+  const trimmed = text2.trim();
+  if (!trimmed) return null;
+  const ordinal3 = trimmed.match(/\b(\d+)(?:st|nd|rd|th)\b/i);
+  if (ordinal3) {
+    const periodNum = Number(ordinal3[1]);
+    if (Number.isFinite(periodNum) && periodNum > 0) {
+      return formatCommandCenterHockeyPeriodLabel(periodNum);
+    }
+  }
+  if (/\bOT\b/i.test(trimmed)) return "OT";
+  const periodCode = trimmed.match(/\bP\s*(\d+)\b/i);
+  if (periodCode) {
+    const periodNum = Number(periodCode[1]);
+    if (Number.isFinite(periodNum) && periodNum > 0) {
+      return formatCommandCenterHockeyPeriodLabel(periodNum);
+    }
+  }
+  return null;
+}
+function resolveCommandCenterHockeyMetaTimingParts(game, timingLabel) {
+  if (game.status !== "live" || !isCommandCenterHockeyLeague(game.league)) return null;
+  const candidates = [
+    timingLabel,
+    game.statusLine?.trim() ?? "",
+    resolveGamesSpineCardTimingLabel(game) ?? ""
+  ];
+  for (const candidate of candidates) {
+    if (!candidate.trim()) continue;
+    const combined = candidate.match(
+      /(\d+(?:st|nd|rd|th)|OT)\s*(?:Period)?\s*[-|·]\s*(\d{1,2}:\d{2})/i
+    );
+    if (combined) {
+      const period = parseCommandCenterHockeyPeriodLabel(combined[1]) ?? combined[1].toUpperCase();
+      return { period, clock: combined[2] };
+    }
+  }
+  const clock = game.displayClock?.trim() || timingLabel.match(/\b(\d{1,2}:\d{2})\b/)?.[1] || candidates.map((c2) => c2.match(/\b(\d{1,2}:\d{2})\b/)?.[1]).find(Boolean) || "";
+  if (!clock) return null;
+  const periodLabel = (game.period != null && Number.isFinite(game.period) && game.period > 0 ? formatCommandCenterHockeyPeriodLabel(game.period) : null) ?? parseCommandCenterHockeyPeriodLabel(timingLabel) ?? parseCommandCenterHockeyPeriodLabel(game.statusLine ?? "");
+  if (periodLabel) return { period: periodLabel, clock };
+  return null;
+}
+function formatGrarfExtensionCommandCenterMetaTimingLine(parts) {
+  const period = parts.period?.trim() || null;
+  const clock = parts.clock.trim();
+  if (!period) return clock || "\u2014";
+  if (!clock || clock === "\u2014") return period;
+  if (/^(TOP|BOT|MID|END)$/i.test(period)) return `${period} ${clock}`;
+  return `${period} | ${clock}`;
+}
+function finalizeGrarfExtensionCommandCenterMetaTimingParts(parts) {
+  return {
+    ...parts,
+    line: formatGrarfExtensionCommandCenterMetaTimingLine(parts)
+  };
+}
 function resolveGrarfExtensionCommandCenterScorecardState(game) {
   const variant = resolveSportsBrowserPrototypeSidebarGameVariant(game);
   if (variant === "live") return "live";
@@ -150289,25 +151120,104 @@ function resolveGrarfExtensionCommandCenterScheduleDayLabel(game) {
   if (scheduledKey === tomorrowKey) return "Tomorrow";
   return null;
 }
-function resolveGrarfExtensionCommandCenterMetaPrimaryLabel(game, state3, timingLabel) {
+function resolveGrarfExtensionCommandCenterMetaTimingParts(game, state3, timingLabel) {
   if (state3 === "final" || game.status === "final" || isSpineFinalizedGame(game)) {
-    return "F";
+    return finalizeGrarfExtensionCommandCenterMetaTimingParts({ period: null, clock: "F" });
   }
-  const trimmed = timingLabel.trim();
   if (state3 === "upcoming") {
     const localStart = formatGameDisplayTimeLocal(game).trim();
-    if (localStart && localStart !== "\u2014") return localStart;
+    const clock = localStart && localStart !== "\u2014" ? localStart : timingLabel.trim() || "\u2014";
+    return finalizeGrarfExtensionCommandCenterMetaTimingParts({ period: null, clock });
   }
-  if (trimmed) return trimmed;
-  if (state3 === "live") return "Live";
-  if (state3 === "upcoming") {
-    const localStart = formatGameDisplayTimeLocal(game).trim();
-    return localStart || "\u2014";
+  const trimmed = resolveCommandCenterEffectiveTimingLabel(game, state3, timingLabel);
+  const baseballParts = resolveCommandCenterBaseballMetaTimingParts(game, trimmed);
+  if (baseballParts) return finalizeGrarfExtensionCommandCenterMetaTimingParts(baseballParts);
+  const tennisParts = resolveCommandCenterTennisMetaTimingParts(game, trimmed);
+  if (tennisParts) return finalizeGrarfExtensionCommandCenterMetaTimingParts(tennisParts);
+  const soccerParts = resolveCommandCenterSoccerMetaTimingParts(game, trimmed);
+  if (soccerParts) return finalizeGrarfExtensionCommandCenterMetaTimingParts(soccerParts);
+  const hockeyParts = resolveCommandCenterHockeyMetaTimingParts(game, trimmed);
+  if (hockeyParts) return finalizeGrarfExtensionCommandCenterMetaTimingParts(hockeyParts);
+  const clockMatch = trimmed.match(/\b(\d{1,2}:\d{2})\b/);
+  const clockFromLabel = clockMatch?.[1] ?? null;
+  const quarterMatch = trimmed.match(/\bQ(\d)\b/i);
+  const quarterLabel = quarterMatch ? `Q${quarterMatch[1]}` : null;
+  const pipeParts = trimmed.split("|").map((part) => part.trim()).filter(Boolean);
+  if (pipeParts.length === 2) {
+    const pipeClock = pipeParts[1].match(/\b(\d{1,2}:\d{2})\b/)?.[1];
+    if (pipeClock) {
+      return finalizeGrarfExtensionCommandCenterMetaTimingParts({
+        period: pipeParts[0],
+        clock: pipeClock
+      });
+    }
   }
-  return "\u2014";
+  if (quarterLabel && clockFromLabel) {
+    return finalizeGrarfExtensionCommandCenterMetaTimingParts({
+      period: quarterLabel,
+      clock: clockFromLabel
+    });
+  }
+  const displayClock = game.displayClock?.trim();
+  if (displayClock) {
+    let period = quarterLabel ?? (trimmed && trimmed !== displayClock ? trimmed.replace(displayClock, "").replace(clockFromLabel ?? "", "").trim() || null : null);
+    if (period) {
+      period = period.replace(/\s*[-–]\s*$/, "").trim() || period;
+    }
+    return finalizeGrarfExtensionCommandCenterMetaTimingParts({
+      period: period || null,
+      clock: displayClock
+    });
+  }
+  if (clockFromLabel) {
+    const strippedPeriod = trimmed.replace(clockFromLabel, "").replace(/\s+/g, " ").trim().replace(/\s*[-–]\s*$/, "").trim();
+    const period = quarterLabel ?? (strippedPeriod || null);
+    return finalizeGrarfExtensionCommandCenterMetaTimingParts({
+      period: period || null,
+      clock: clockFromLabel
+    });
+  }
+  return finalizeGrarfExtensionCommandCenterMetaTimingParts({
+    period: null,
+    clock: trimmed || "\u2014"
+  });
 }
-function resolveGrarfExtensionCommandCenterMetaPrimaryIsFinalLetter(state3) {
-  return state3 === "final";
+function resolveGrarfExtensionCommandCenterTeamSideSelected(game, side, commandCenterGameContextPane) {
+  if (!commandCenterGameContextPane || commandCenterGameContextPane.gameId !== game.id) {
+    return false;
+  }
+  const section = commandCenterGameContextPane.gameContextSection;
+  if (side === "away") return section === "awayTeam";
+  return section === "homeTeam";
+}
+function resolveGrarfExtensionCommandCenterTeamAccentCssProperties(game, side, teamDisplayName2) {
+  const teamName = side === "away" ? game.awayTeam : game.homeTeam;
+  const displayName = teamDisplayName2?.trim() || teamName?.trim() || "";
+  const gameAbbrev = side === "away" ? game.awayTeamAbbrev : game.homeTeamAbbrev;
+  const league2 = resolveGrarfTeamBrandAccentLeagueForGame(game);
+  const brandHex = resolveGrarfTeamBrandAccentHexForGame(
+    game,
+    side,
+    displayName
+  );
+  if (brandHex) {
+    return grarfCommandCenterTeamAccentStyle(brandHex);
+  }
+  const inferredAbbrev = resolveLiveTrackTeamAbbrev(displayName, league2 ?? game.league ?? void 0) ?? resolveLiveTrackTeamAbbrev(teamName, league2 ?? game.league ?? void 0) ?? gameAbbrev?.trim() ?? null;
+  const brandFromInferredAbbrev = resolveGrarfTeamBrandAccentHex(
+    league2 ?? game.league,
+    inferredAbbrev
+  );
+  if (brandFromInferredAbbrev) {
+    return grarfCommandCenterTeamAccentStyle(brandFromInferredAbbrev);
+  }
+  const tokenClass = resolveLiveTrackTeamAccentTokenClass(
+    displayName || teamName,
+    league2 ?? game.league,
+    inferredAbbrev
+  );
+  const accent = resolveLiveTrackAccentHexFromTokenClass(tokenClass);
+  return grarfCommandCenterTeamAccentStyle(accent);
 }
 
 // ../grarf/desktop/src/extensionHost/GrarfExtensionCommandCenterScorecard.tsx
@@ -150333,26 +151243,25 @@ function GrarfExtensionCommandCenterScorecardMetaColumn({
   showChannelLogo,
   channel
 }) {
-  const primary = resolveGrarfExtensionCommandCenterMetaPrimaryLabel(game, state3, timingLabel);
   const dayLabel = resolveGrarfExtensionCommandCenterScheduleDayLabel(game);
-  const isFinalLetter = resolveGrarfExtensionCommandCenterMetaPrimaryIsFinalLetter(state3);
+  const timingParts = resolveGrarfExtensionCommandCenterMetaTimingParts(game, state3, timingLabel);
+  const showStatusPill = state3 === "live" || state3 === "upcoming" || state3 === "final";
   return /* @__PURE__ */ (0, import_jsx_runtime244.jsxs)(
     "div",
     {
       className: "grarf-extension-command-center-meta-column",
       "data-grarf-extension-command-center-meta": "",
+      "data-grarf-extension-command-center-meta-state": state3,
       children: [
+        showStatusPill ? /* @__PURE__ */ (0, import_jsx_runtime244.jsx)(GrarfExtensionCommandCenterStatusPill, { state: state3 }) : null,
         /* @__PURE__ */ (0, import_jsx_runtime244.jsx)(
           "span",
           {
             className: cn2(
-              "grarf-extension-command-center-meta-primary",
-              state3 === "live" && "grarf-extension-command-center-meta-live",
-              state3 === "upcoming" && "grarf-extension-command-center-meta-upcoming",
-              isFinalLetter && "grarf-extension-command-center-meta-final"
+              "grarf-extension-command-center-meta-timing-line",
+              state3 === "final" && "grarf-extension-command-center-meta-timing-line-final"
             ),
-            "data-grarf-extension-command-center-meta-primary": state3,
-            children: primary
+            children: timingParts.line
           }
         ),
         dayLabel ? /* @__PURE__ */ (0, import_jsx_runtime244.jsx)("span", { className: "grarf-extension-command-center-meta-day", children: dayLabel }) : null,
@@ -150397,7 +151306,7 @@ function GrarfExtensionCommandCenterScorecardShell({
   tableScorecardAttrs = true
 }) {
   const state3 = resolveGrarfExtensionCommandCenterScorecardState(game);
-  return /* @__PURE__ */ (0, import_jsx_runtime244.jsxs)(
+  return /* @__PURE__ */ (0, import_jsx_runtime244.jsx)(
     "div",
     {
       className: cn2(
@@ -150407,6 +151316,7 @@ function GrarfExtensionCommandCenterScorecardShell({
       "data-sports-browser-prototype-command-center-game-card": "",
       "data-grarf-extension-command-center-four-line-scorecard": "",
       "data-grarf-extension-command-center-scorecard-v2": "",
+      "data-grarf-extension-command-center-scorecard-minimal-vertical": "",
       "data-grarf-extension-command-center-card-state": state3,
       ...tableScorecardAttrs ? { "data-grarf-extension-command-center-table-scorecard": "" } : {},
       "aria-expanded": onExploreToggle ? exploreExpanded : void 0,
@@ -150414,34 +151324,31 @@ function GrarfExtensionCommandCenterScorecardShell({
         event.stopPropagation();
         onExploreToggle(game);
       } : void 0,
-      children: [
-        /* @__PURE__ */ (0, import_jsx_runtime244.jsxs)("div", { className: "grarf-extension-command-center-scorecard-header", children: [
-          leagueHeader ? leagueHeader : /* @__PURE__ */ (0, import_jsx_runtime244.jsx)("span", { className: "grarf-extension-command-center-league-label", children: leagueLabel }),
-          /* @__PURE__ */ (0, import_jsx_runtime244.jsx)(GrarfExtensionCommandCenterStatusPill, { state: state3 })
-        ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime244.jsxs)("div", { className: "grarf-extension-command-center-scorecard-row", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime244.jsx)("div", { className: "grarf-extension-command-center-scorecard-main", children: /* @__PURE__ */ (0, import_jsx_runtime244.jsx)(
+      children: /* @__PURE__ */ (0, import_jsx_runtime244.jsxs)("div", { className: "grarf-extension-command-center-scorecard-row", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime244.jsxs)("div", { className: "grarf-extension-command-center-scorecard-main", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime244.jsx)("div", { className: "grarf-extension-command-center-scorecard-league-slot", children: leagueHeader ? leagueHeader : /* @__PURE__ */ (0, import_jsx_runtime244.jsx)("span", { className: "grarf-extension-command-center-league-label", children: leagueLabel }) }),
+          /* @__PURE__ */ (0, import_jsx_runtime244.jsx)(
             "div",
             {
               className: "grarf-extension-command-center-matchup-body",
               "data-grarf-extension-command-center-body": "",
               children: matchupBody
             }
-          ) }),
-          /* @__PURE__ */ (0, import_jsx_runtime244.jsx)("div", { className: "grarf-extension-command-center-scorecard-divider", "aria-hidden": true }),
-          /* @__PURE__ */ (0, import_jsx_runtime244.jsx)(
-            GrarfExtensionCommandCenterScorecardMetaColumn,
-            {
-              game,
-              state: state3,
-              timingLabel,
-              showChannelLogo,
-              channel
-            }
-          ),
-          showExploreChevron ? /* @__PURE__ */ (0, import_jsx_runtime244.jsx)(GrarfExtensionCommandCenterScorecardChevron, { expanded: exploreExpanded }) : null
-        ] })
-      ]
+          )
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime244.jsx)("div", { className: "grarf-extension-command-center-scorecard-divider", "aria-hidden": true }),
+        /* @__PURE__ */ (0, import_jsx_runtime244.jsx)(
+          GrarfExtensionCommandCenterScorecardMetaColumn,
+          {
+            game,
+            state: state3,
+            timingLabel,
+            showChannelLogo,
+            channel
+          }
+        ),
+        showExploreChevron ? /* @__PURE__ */ (0, import_jsx_runtime244.jsx)(GrarfExtensionCommandCenterScorecardChevron, { expanded: exploreExpanded }) : null
+      ] })
     }
   );
 }
@@ -153396,7 +154303,8 @@ function GrarfExtensionCommandCenterTeamIdentity({
   pill,
   showScores,
   finalWinnerSide,
-  onTeamClick
+  onTeamClick,
+  teamSelected = false
 }) {
   const logoUrl = resolveNewsSportsBrowserTeamLogoUrl(game, side);
   const winnerBoldClass = resolveGamesSpineFinalWinnerBoldClass(side, finalWinnerSide);
@@ -153410,7 +154318,9 @@ function GrarfExtensionCommandCenterTeamIdentity({
         GRARF_EXTENSION_COMMAND_CENTER_TEAM_ROW_CLASS,
         onTeamClick && BOTTOM_RAIL_TEAM_CLICKABLE_CLASS
       ),
+      style: resolveGrarfExtensionCommandCenterTeamAccentCssProperties(game, side, name),
       "data-grarf-extension-command-center-team-row": "",
+      "data-grarf-extension-command-center-team-selected": teamSelected ? "" : void 0,
       "data-sports-browser-prototype-sidebar-team-name-clickable": onTeamClick ? "" : void 0,
       onClick: onTeamClick ? (event) => {
         event.stopPropagation();
@@ -153617,6 +154527,11 @@ function GrarfExtensionCommandCenterFourLineMatchupCard({
               pill: model.left,
               showScores: model.showScores,
               finalWinnerSide,
+              teamSelected: resolveGrarfExtensionCommandCenterTeamSideSelected(
+                game,
+                model.left.side,
+                commandCenterGameContextPane
+              ),
               onTeamClick: teamWorkspaceEnabled && onGameTeamSelect ? () => handleTeamSideClick(model.left.side) : void 0
             }
           ) }),
@@ -153632,10 +154547,12 @@ function GrarfExtensionCommandCenterFourLineMatchupCard({
                 pill: model.right,
                 showScores: model.showScores,
                 finalWinnerSide,
-                onTeamClick: teamWorkspaceEnabled && onGameTeamSelect ? (event) => {
-                  event.stopPropagation();
-                  handleTeamSideClick(model.right.side);
-                } : void 0
+                teamSelected: resolveGrarfExtensionCommandCenterTeamSideSelected(
+                  game,
+                  model.right.side,
+                  commandCenterGameContextPane
+                ),
+                onTeamClick: teamWorkspaceEnabled && onGameTeamSelect ? () => handleTeamSideClick(model.right.side) : void 0
               }
             ) }),
             /* @__PURE__ */ (0, import_jsx_runtime250.jsx)("div", { className: GRARF_EXTENSION_COMMAND_CENTER_SCORE_CELL_ROW_2_CLASS, children: renderScoreCell(
