@@ -51980,36 +51980,49 @@ var __iconNode31 = [
 ];
 var PanelRightOpen = createLucideIcon("panel-right-open", __iconNode31);
 
-// ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/plus.mjs
+// ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/play.mjs
 init_define_import_meta_env();
 var __iconNode32 = [
+  [
+    "path",
+    {
+      d: "M5 5a2 2 0 0 1 3.008-1.728l11.997 6.998a2 2 0 0 1 .003 3.458l-12 7A2 2 0 0 1 5 19z",
+      key: "10ikf1"
+    }
+  ]
+];
+var Play = createLucideIcon("play", __iconNode32);
+
+// ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/plus.mjs
+init_define_import_meta_env();
+var __iconNode33 = [
   ["path", { d: "M5 12h14", key: "1ays0h" }],
   ["path", { d: "M12 5v14", key: "s699le" }]
 ];
-var Plus = createLucideIcon("plus", __iconNode32);
+var Plus = createLucideIcon("plus", __iconNode33);
 
 // ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/radio.mjs
 init_define_import_meta_env();
-var __iconNode33 = [
+var __iconNode34 = [
   ["path", { d: "M16.247 7.761a6 6 0 0 1 0 8.478", key: "1fwjs5" }],
   ["path", { d: "M19.075 4.933a10 10 0 0 1 0 14.134", key: "ehdyv1" }],
   ["path", { d: "M4.925 19.067a10 10 0 0 1 0-14.134", key: "1q22gi" }],
   ["path", { d: "M7.753 16.239a6 6 0 0 1 0-8.478", key: "r2q7qm" }],
   ["circle", { cx: "12", cy: "12", r: "2", key: "1c9p78" }]
 ];
-var Radio = createLucideIcon("radio", __iconNode33);
+var Radio = createLucideIcon("radio", __iconNode34);
 
 // ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/rotate-ccw.mjs
 init_define_import_meta_env();
-var __iconNode34 = [
+var __iconNode35 = [
   ["path", { d: "M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8", key: "1357e3" }],
   ["path", { d: "M3 3v5h5", key: "1xhq8a" }]
 ];
-var RotateCcw = createLucideIcon("rotate-ccw", __iconNode34);
+var RotateCcw = createLucideIcon("rotate-ccw", __iconNode35);
 
 // ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/scroll-text.mjs
 init_define_import_meta_env();
-var __iconNode35 = [
+var __iconNode36 = [
   ["path", { d: "M15 12h-5", key: "r7krc0" }],
   ["path", { d: "M15 8h-5", key: "1khuty" }],
   ["path", { d: "M19 17V5a2 2 0 0 0-2-2H4", key: "zz82l3" }],
@@ -52021,19 +52034,19 @@ var __iconNode35 = [
     }
   ]
 ];
-var ScrollText = createLucideIcon("scroll-text", __iconNode35);
+var ScrollText = createLucideIcon("scroll-text", __iconNode36);
 
 // ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/search.mjs
 init_define_import_meta_env();
-var __iconNode36 = [
+var __iconNode37 = [
   ["path", { d: "m21 21-4.34-4.34", key: "14j7rj" }],
   ["circle", { cx: "11", cy: "11", r: "8", key: "4ej97u" }]
 ];
-var Search = createLucideIcon("search", __iconNode36);
+var Search = createLucideIcon("search", __iconNode37);
 
 // ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/settings.mjs
 init_define_import_meta_env();
-var __iconNode37 = [
+var __iconNode38 = [
   [
     "path",
     {
@@ -52043,20 +52056,35 @@ var __iconNode37 = [
   ],
   ["circle", { cx: "12", cy: "12", r: "3", key: "1v7zrd" }]
 ];
-var Settings = createLucideIcon("settings", __iconNode37);
+var Settings = createLucideIcon("settings", __iconNode38);
+
+// ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/sliders-horizontal.mjs
+init_define_import_meta_env();
+var __iconNode39 = [
+  ["path", { d: "M10 5H3", key: "1qgfaw" }],
+  ["path", { d: "M12 19H3", key: "yhmn1j" }],
+  ["path", { d: "M14 3v4", key: "1sua03" }],
+  ["path", { d: "M16 17v4", key: "1q0r14" }],
+  ["path", { d: "M21 12h-9", key: "1o4lsq" }],
+  ["path", { d: "M21 19h-5", key: "1rlt1p" }],
+  ["path", { d: "M21 5h-7", key: "1oszz2" }],
+  ["path", { d: "M8 10v4", key: "tgpxqk" }],
+  ["path", { d: "M8 12H3", key: "a7s4jb" }]
+];
+var SlidersHorizontal = createLucideIcon("sliders-horizontal", __iconNode39);
 
 // ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/square-arrow-out-up-right.mjs
 init_define_import_meta_env();
-var __iconNode38 = [
+var __iconNode40 = [
   ["path", { d: "M21 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h6", key: "y09zxi" }],
   ["path", { d: "m21 3-9 9", key: "mpx6sq" }],
   ["path", { d: "M15 3h6v6", key: "1q9fwt" }]
 ];
-var SquareArrowOutUpRight = createLucideIcon("square-arrow-out-up-right", __iconNode38);
+var SquareArrowOutUpRight = createLucideIcon("square-arrow-out-up-right", __iconNode40);
 
 // ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/triangle-alert.mjs
 init_define_import_meta_env();
-var __iconNode39 = [
+var __iconNode41 = [
   [
     "path",
     {
@@ -52067,11 +52095,11 @@ var __iconNode39 = [
   ["path", { d: "M12 9v4", key: "juzpu7" }],
   ["path", { d: "M12 17h.01", key: "p32p05" }]
 ];
-var TriangleAlert = createLucideIcon("triangle-alert", __iconNode39);
+var TriangleAlert = createLucideIcon("triangle-alert", __iconNode41);
 
 // ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/trophy.mjs
 init_define_import_meta_env();
-var __iconNode40 = [
+var __iconNode42 = [
   ["path", { d: "M10 14.66v1.626a2 2 0 0 1-.976 1.696A5 5 0 0 0 7 21.978", key: "1n3hpd" }],
   ["path", { d: "M14 14.66v1.626a2 2 0 0 0 .976 1.696A5 5 0 0 1 17 21.978", key: "rfe1zi" }],
   ["path", { d: "M18 9h1.5a1 1 0 0 0 0-5H18", key: "7xy6bh" }],
@@ -52079,21 +52107,21 @@ var __iconNode40 = [
   ["path", { d: "M6 9a6 6 0 0 0 12 0V3a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1z", key: "1mhfuq" }],
   ["path", { d: "M6 9H4.5a1 1 0 0 1 0-5H6", key: "tex48p" }]
 ];
-var Trophy = createLucideIcon("trophy", __iconNode40);
+var Trophy = createLucideIcon("trophy", __iconNode42);
 
 // ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/users.mjs
 init_define_import_meta_env();
-var __iconNode41 = [
+var __iconNode43 = [
   ["path", { d: "M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2", key: "1yyitq" }],
   ["path", { d: "M16 3.128a4 4 0 0 1 0 7.744", key: "16gr8j" }],
   ["path", { d: "M22 21v-2a4 4 0 0 0-3-3.87", key: "kshegd" }],
   ["circle", { cx: "9", cy: "7", r: "4", key: "nufk8" }]
 ];
-var Users = createLucideIcon("users", __iconNode41);
+var Users = createLucideIcon("users", __iconNode43);
 
 // ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/video.mjs
 init_define_import_meta_env();
-var __iconNode42 = [
+var __iconNode44 = [
   [
     "path",
     {
@@ -52103,11 +52131,11 @@ var __iconNode42 = [
   ],
   ["rect", { x: "2", y: "6", width: "14", height: "12", rx: "2", key: "158x01" }]
 ];
-var Video = createLucideIcon("video", __iconNode42);
+var Video = createLucideIcon("video", __iconNode44);
 
 // ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/volleyball.mjs
 init_define_import_meta_env();
-var __iconNode43 = [
+var __iconNode45 = [
   ["path", { d: "M11.1 7.1a16.55 16.55 0 0 1 10.9 4", key: "2880wi" }],
   ["path", { d: "M12 12a12.6 12.6 0 0 1-8.7 5", key: "113sja" }],
   ["path", { d: "M16.8 13.6a16.55 16.55 0 0 1-9 7.5", key: "1qmsgl" }],
@@ -52115,29 +52143,29 @@ var __iconNode43 = [
   ["path", { d: "M6.3 3.8a16.55 16.55 0 0 0 1.9 11.5", key: "iekzv9" }],
   ["circle", { cx: "12", cy: "12", r: "10", key: "1mglay" }]
 ];
-var Volleyball = createLucideIcon("volleyball", __iconNode43);
+var Volleyball = createLucideIcon("volleyball", __iconNode45);
 
 // ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/wifi.mjs
 init_define_import_meta_env();
-var __iconNode44 = [
+var __iconNode46 = [
   ["path", { d: "M12 20h.01", key: "zekei9" }],
   ["path", { d: "M2 8.82a15 15 0 0 1 20 0", key: "dnpr2z" }],
   ["path", { d: "M5 12.859a10 10 0 0 1 14 0", key: "1x1e6c" }],
   ["path", { d: "M8.5 16.429a5 5 0 0 1 7 0", key: "1bycff" }]
 ];
-var Wifi = createLucideIcon("wifi", __iconNode44);
+var Wifi = createLucideIcon("wifi", __iconNode46);
 
 // ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/x.mjs
 init_define_import_meta_env();
-var __iconNode45 = [
+var __iconNode47 = [
   ["path", { d: "M18 6 6 18", key: "1bl5f8" }],
   ["path", { d: "m6 6 12 12", key: "d8bk6v" }]
 ];
-var X2 = createLucideIcon("x", __iconNode45);
+var X2 = createLucideIcon("x", __iconNode47);
 
 // ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/zap.mjs
 init_define_import_meta_env();
-var __iconNode46 = [
+var __iconNode48 = [
   [
     "path",
     {
@@ -52146,7 +52174,7 @@ var __iconNode46 = [
     }
   ]
 ];
-var Zap = createLucideIcon("zap", __iconNode46);
+var Zap = createLucideIcon("zap", __iconNode48);
 
 // ../grarf/desktop/src/lib/cn.ts
 init_define_import_meta_env();
@@ -150390,6 +150418,470 @@ init_define_import_meta_env();
 
 // ../grarf/desktop/src/lib/branding/grarfTeamBrandAccentHex.ts
 init_define_import_meta_env();
+
+// ../grarf/desktop/src/lib/branding/grarfFlagCompetitorBrandAccentHex.ts
+init_define_import_meta_env();
+
+// ../grarf/desktop/src/lib/branding/grarfCountryFlagPrimaryAccentHex.ts
+init_define_import_meta_env();
+
+// ../grarf/desktop/src/lib/branding/grarfCountryFlagPrimaryAccentHex.generated.ts
+init_define_import_meta_env();
+var GRARF_COUNTRY_FLAG_PRIMARY_ACCENT_HEX_BY_KEY = {
+  "afghanistan": "#007A36",
+  "albania": "#E41E20",
+  "algeria": "#006233",
+  "andorra": "#10069F",
+  "angola": "#CE1126",
+  "antigua and barbuda": "#CE1126",
+  "argentina": "#74ACDF",
+  "armenia": "#D90012",
+  "australia": "#012169",
+  "austria": "#C8102E",
+  "azerbaijan": "#00B5E2",
+  "bahamas": "#00778B",
+  "bahrain": "#CE1126",
+  "bangladesh": "#006A4E",
+  "barbados": "#00267F",
+  "belarus": "#C8313E",
+  "belgium": "#FFCD00",
+  "belize": "#171796",
+  "benin": "#008751",
+  "bhutan": "#FFCC00",
+  "bolivia": "#D52B1E",
+  "bosnia and herzegovina": "#002395",
+  "botswana": "#75AADB",
+  "brazil": "#009739",
+  "brunei": "#F7E017",
+  "bulgaria": "#00966E",
+  "burkina faso": "#009E49",
+  "burundi": "#CE1126",
+  "cabo verde": "#003893",
+  "cambodia": "#032EA1",
+  "cameroon": "#007A5E",
+  "canada": "#D80621",
+  "central african republic": "#003082",
+  "chad": "#002664",
+  "chile": "#D52B1E",
+  "china": "#EE1C25",
+  "colombia": "#FCD116",
+  "comoros": "#3A9D23",
+  "congo, democratic republic": "#007FFF",
+  "congo, republic": "#009543",
+  "costa rica": "#002B7F",
+  "cote d'ivoire": "#F77F00",
+  "croatia": "#FF0000",
+  "cuba": "#002A8F",
+  "cyprus": "#D57800",
+  "czechia": "#11457E",
+  "denmark": "#C8102E",
+  "djibouti": "#6AB2E7",
+  "dominica": "#006B3F",
+  "dominican republic": "#002D62",
+  "ecuador": "#FFD100",
+  "egypt": "#CE1126",
+  "el salvador": "#0047AB",
+  "equatorial guinea": "#009E49",
+  "eritrea": "#12AD2B",
+  "estonia": "#0072CE",
+  "eswatini": "#3E5EB9",
+  "ethiopia": "#009A44",
+  "fiji": "#69B3E7",
+  "finland": "#003580",
+  "france": "#000091",
+  "gabon": "#009E60",
+  "gambia": "#CE1126",
+  "georgia": "#FF0000",
+  "germany": "#FFCC00",
+  "ghana": "#CE1126",
+  "greece": "#0D5EAF",
+  "grenada": "#CE1126",
+  "guatemala": "#4997D0",
+  "guinea": "#CE1126",
+  "guinea-bissau": "#FCD116",
+  "guyana": "#009E49",
+  "haiti": "#00209F",
+  "honduras": "#0073CF",
+  "hungary": "#CE2939",
+  "iceland": "#02529C",
+  "india": "#FF671F",
+  "indonesia": "#FF0000",
+  "iran": "#239F40",
+  "iraq": "#CE1126",
+  "ireland": "#169B62",
+  "israel": "#0038B8",
+  "italy": "#008C45",
+  "jamaica": "#009B3A",
+  "japan": "#BC002D",
+  "jordan": "#CE1126",
+  "kazakhstan": "#00AFCA",
+  "kenya": "#000000",
+  "kiribati": "#CE1126",
+  "kuwait": "#007A3D",
+  "kyrgyzstan": "#E4002B",
+  "laos": "#CE1126",
+  "latvia": "#9E3039",
+  "lebanon": "#ED1C24",
+  "lesotho": "#00209F",
+  "liberia": "#002868",
+  "libya": "#E70013",
+  "liechtenstein": "#002B7F",
+  "lithuania": "#FDB913",
+  "luxembourg": "#EF3340",
+  "madagascar": "#007E3A",
+  "malawi": "#000000",
+  "malaysia": "#010066",
+  "maldives": "#D21034",
+  "mali": "#14B53A",
+  "malta": "#CF142B",
+  "marshall islands": "#003893",
+  "mauritania": "#006233",
+  "mauritius": "#EA2839",
+  "mexico": "#006341",
+  "micronesia": "#75B2DD",
+  "moldova": "#0046AE",
+  "monaco": "#CE1126",
+  "mongolia": "#DA2032",
+  "montenegro": "#C40308",
+  "morocco": "#C1272D",
+  "mozambique": "#007168",
+  "myanmar": "#FECB00",
+  "namibia": "#001489",
+  "nauru": "#002B7F",
+  "nepal": "#DC143C",
+  "netherlands": "#AE1C28",
+  "new zealand": "#00247D",
+  "nicaragua": "#0067C6",
+  "niger": "#E05206",
+  "nigeria": "#008751",
+  "north korea": "#ED1C27",
+  "north macedonia": "#D20000",
+  "norway": "#BA0C2F",
+  "oman": "#DB161B",
+  "pakistan": "#01411C",
+  "palau": "#4AADD6",
+  "palestine": "#CE1126",
+  "panama": "#DA121A",
+  "papua new guinea": "#CE1126",
+  "paraguay": "#D52B1E",
+  "peru": "#D91023",
+  "philippines": "#0038A8",
+  "poland": "#DC143C",
+  "portugal": "#046A38",
+  "qatar": "#8A1538",
+  "romania": "#002B7F",
+  "russia": "#0039A6",
+  "rwanda": "#00A1DE",
+  "saint kitts and nevis": "#009E49",
+  "saint lucia": "#66CCFF",
+  "saint vincent and the grenadines": "#0072C6",
+  "samoa": "#CE1126",
+  "san marino": "#5BC2E7",
+  "sao tome and principe": "#12AD2B",
+  "saudi arabia": "#006C35",
+  "senegal": "#00853F",
+  "serbia": "#C6363C",
+  "seychelles": "#003F87",
+  "sierra leone": "#1EB53A",
+  "singapore": "#EF3340",
+  "slovakia": "#0B4EA2",
+  "slovenia": "#005DA4",
+  "solomon islands": "#0051BA",
+  "somalia": "#4189DD",
+  "south africa": "#007A4D",
+  "south korea": "#0047A0",
+  "south sudan": "#0F47AF",
+  "spain": "#AA151B",
+  "sri lanka": "#8D153A",
+  "sudan": "#D21034",
+  "suriname": "#377E3F",
+  "sweden": "#006AA7",
+  "switzerland": "#FF0000",
+  "syria": "#CE1126",
+  "tajikistan": "#C8102E",
+  "tanzania": "#1EB53A",
+  "thailand": "#A51931",
+  "timor-leste": "#D4122A",
+  "togo": "#006A4E",
+  "tonga": "#C8102E",
+  "trinidad and tobago": "#CE1126",
+  "tunisia": "#E70013",
+  "turkiye": "#E30A17",
+  "turkmenistan": "#00843D",
+  "tuvalu": "#5B97B1",
+  "uganda": "#000000",
+  "ukraine": "#0057B7",
+  "united arab emirates": "#C8102E",
+  "united kingdom": "#012169",
+  "united states": "#B31942",
+  "uruguay": "#0038A8",
+  "uzbekistan": "#1EB53A",
+  "vanuatu": "#D21034",
+  "vatican city": "#FFCC00",
+  "venezuela": "#FFCC00",
+  "vietnam": "#DA251D",
+  "yemen": "#CE1126",
+  "zambia": "#198A00",
+  "zimbabwe": "#319208",
+  "turkey": "#E30A17",
+  "ivory coast": "#F77F00",
+  "cote divoire": "#F77F00",
+  "usa": "#B31942",
+  "united states of america": "#B31942",
+  "england": "#012169",
+  "scotland": "#012169",
+  "wales": "#012169",
+  "northern ireland": "#012169",
+  "czech republic": "#11457E",
+  "dr congo": "#007FFF",
+  "democratic republic of congo": "#007FFF",
+  "republic of congo": "#009543",
+  "cape verde": "#003893",
+  "korea": "#0047A0",
+  "uae": "#C8102E"
+};
+
+// ../grarf/desktop/src/lib/branding/grarfCountryFlagPrimaryAccentHex.ts
+function normalizeGrarfCountryFlagAccentLookupKey(name) {
+  return name.trim().toLowerCase().normalize("NFD").replace(/\p{M}/gu, "").replace(/\s+/g, " ");
+}
+var ESPN_COUNTRY_CODE_TO_LOOKUP_KEY = buildEspnCountryCodeToLookupKey();
+function buildEspnCountryCodeToLookupKey() {
+  const out = {};
+  for (const [countryKey, abbrev] of Object.entries(SOCCER_COUNTRY_ABBREV_BY_NAME)) {
+    out[abbrev.toUpperCase()] = countryKey;
+  }
+  const extras = {
+    GBR: "united kingdom",
+    ENG: "united kingdom",
+    SCO: "united kingdom",
+    WAL: "united kingdom",
+    NIR: "united kingdom",
+    KOR: "south korea",
+    SKO: "south korea",
+    PRK: "north korea",
+    RSA: "south africa",
+    IRN: "iran",
+    IRI: "iran",
+    GRE: "greece",
+    SUI: "switzerland",
+    CIV: "cote d'ivoire",
+    CPV: "cabo verde",
+    MAS: "malaysia",
+    INA: "indonesia",
+    PHI: "philippines",
+    KSA: "saudi arabia",
+    UAE: "united arab emirates",
+    ROU: "romania",
+    CRO: "croatia",
+    SRB: "serbia",
+    MKD: "north macedonia",
+    BIH: "bosnia and herzegovina",
+    MNE: "montenegro",
+    BLR: "belarus",
+    GEO: "georgia",
+    ARM: "armenia",
+    AZE: "azerbaijan",
+    KAZ: "kazakhstan",
+    UZB: "uzbekistan",
+    TJK: "tajikistan",
+    KGZ: "kyrgyzstan",
+    TKM: "turkmenistan",
+    MDA: "moldova",
+    LTU: "lithuania",
+    LVA: "latvia",
+    EST: "estonia",
+    ISL: "iceland",
+    NOR: "norway",
+    SWE: "sweden",
+    DEN: "denmark",
+    FIN: "finland",
+    AUT: "austria",
+    HUN: "hungary",
+    SVK: "slovakia",
+    SVN: "slovenia",
+    BUL: "bulgaria",
+    TUR: "turkiye",
+    ISR: "israel",
+    JOR: "jordan",
+    LBN: "lebanon",
+    SYR: "syria",
+    IRQ: "iraq",
+    KWT: "kuwait",
+    QAT: "qatar",
+    OMN: "oman",
+    YEM: "yemen",
+    PAK: "pakistan",
+    IND: "india",
+    BAN: "bangladesh",
+    NEP: "nepal",
+    SRI: "sri lanka",
+    THA: "thailand",
+    VIE: "vietnam",
+    MNG: "mongolia",
+    JPN: "japan",
+    CHN: "china",
+    HKG: "china",
+    TPE: "china",
+    TWN: "china",
+    AUS: "australia",
+    NZL: "new zealand",
+    FIJ: "fiji",
+    SAM: "samoa",
+    PNG: "papua new guinea",
+    MEX: "mexico",
+    GUA: "guatemala",
+    HON: "honduras",
+    SLV: "el salvador",
+    CRC: "costa rica",
+    PAN: "panama",
+    CUB: "cuba",
+    JAM: "jamaica",
+    HAI: "haiti",
+    DOM: "dominican republic",
+    PUR: "united states",
+    ARG: "argentina",
+    BRA: "brazil",
+    CHI: "chile",
+    URU: "uruguay",
+    PAR: "paraguay",
+    COL: "colombia",
+    ECU: "ecuador",
+    PER: "peru",
+    BOL: "bolivia",
+    VEN: "venezuela",
+    GUY: "guyana",
+    SUR: "suriname",
+    EGY: "egypt",
+    MAR: "morocco",
+    ALG: "algeria",
+    TUN: "tunisia",
+    LBY: "libya",
+    SEN: "senegal",
+    GHA: "ghana",
+    NGA: "nigeria",
+    CMR: "cameroon",
+    KEN: "kenya",
+    UGA: "uganda",
+    TAN: "tanzania",
+    ZAM: "zambia",
+    ZIM: "zimbabwe",
+    MOZ: "mozambique",
+    ANG: "angola",
+    NAM: "namibia",
+    BOT: "botswana",
+    ETH: "ethiopia",
+    RWA: "rwanda",
+    COD: "congo, democratic republic",
+    COG: "congo, republic",
+    USA: "united states",
+    CAN: "canada",
+    ESP: "spain",
+    FRA: "france",
+    GER: "germany",
+    ITA: "italy",
+    NED: "netherlands",
+    BEL: "belgium",
+    POR: "portugal",
+    POL: "poland",
+    UKR: "ukraine",
+    RUS: "russia"
+  };
+  for (const [code, key2] of Object.entries(extras)) {
+    out[code] = key2;
+  }
+  return out;
+}
+function lookupHexForCountryKey(key2) {
+  const normalized = normalizeGrarfCountryFlagAccentLookupKey(key2);
+  if (!normalized) return null;
+  return GRARF_COUNTRY_FLAG_PRIMARY_ACCENT_HEX_BY_KEY[normalized] ?? null;
+}
+function resolveGrarfCountryFlagPrimaryAccentHex(countryName) {
+  if (!countryName?.trim()) return null;
+  const direct = lookupHexForCountryKey(countryName);
+  if (direct) return direct;
+  const normalized = normalizeGrarfCountryFlagAccentLookupKey(countryName);
+  for (const [countryKey, hex] of Object.entries(GRARF_COUNTRY_FLAG_PRIMARY_ACCENT_HEX_BY_KEY)) {
+    if (normalized.includes(countryKey) || countryKey.includes(normalized)) {
+      return hex;
+    }
+  }
+  return null;
+}
+function resolveGrarfCountryFlagPrimaryAccentHexFromEspnCountryCode(code) {
+  const abbrev = code?.trim().toUpperCase();
+  if (!abbrev) return null;
+  const countryKey = ESPN_COUNTRY_CODE_TO_LOOKUP_KEY[abbrev];
+  if (!countryKey) return null;
+  return GRARF_COUNTRY_FLAG_PRIMARY_ACCENT_HEX_BY_KEY[countryKey] ?? null;
+}
+function parseEspnCountryCodeFromFlagLogoUrl(logoUrl) {
+  if (!logoUrl?.trim()) return null;
+  const match = /teamlogos\/countries\/500\/([a-z]{3})\.png/i.exec(logoUrl.trim());
+  return match ? match[1].toUpperCase() : null;
+}
+
+// ../grarf/desktop/src/lib/branding/grarfFlagCompetitorBrandAccentHex.ts
+function resolveFlagCompetitorLeagueForGame(game) {
+  const fromField = game.league?.trim();
+  if (fromField) return fromField.toUpperCase();
+  return leagueKeyFromEspnGameId(game.id);
+}
+var NATIONAL_TEAM_SOCCER_LEAGUES2 = /* @__PURE__ */ new Set([
+  "WORLDCUP",
+  "WWC",
+  "EURO",
+  "COPA",
+  "GOLDCUP",
+  "NATIONS"
+]);
+function resolveSideStoredLogoUrl(game, side) {
+  const direct = side === "away" ? game.awayLogoUrl : game.homeLogoUrl;
+  if (direct?.trim()) return direct.trim();
+  const participant = side === "away" ? game.awayParticipantImageUrl : game.homeParticipantImageUrl;
+  if (participant?.trim()) return participant.trim();
+  return resolveNewsSportsBrowserTeamLogoUrl(game, side);
+}
+function isFlagCompetitorBrandAccentLeague(league2) {
+  if (!league2) return false;
+  if (isTennisLeague(league2)) return true;
+  if (league2 === "US_OPEN_TENNIS") return true;
+  return NATIONAL_TEAM_SOCCER_LEAGUES2.has(league2);
+}
+function sideUsesEspnCountryFlagLogo(game, side) {
+  const logoUrl = resolveSideStoredLogoUrl(game, side);
+  return Boolean(parseEspnCountryCodeFromFlagLogoUrl(logoUrl));
+}
+function resolveCountryCodeForFlagCompetitor(game, side, teamDisplayName2) {
+  const logoUrl = resolveSideStoredLogoUrl(game, side);
+  const fromLogo = parseEspnCountryCodeFromFlagLogoUrl(logoUrl);
+  if (fromLogo) return fromLogo;
+  const ingestAbbrev = (side === "away" ? game.awayTeamAbbrev : game.homeTeamAbbrev)?.trim();
+  if (ingestAbbrev && /^[A-Za-z]{3}$/.test(ingestAbbrev)) {
+    return ingestAbbrev.toUpperCase();
+  }
+  const teamName = (side === "away" ? game.awayTeam : game.homeTeam)?.trim() || "";
+  const soccerFromName = resolveSoccerCountryAbbrev(teamDisplayName2) ?? resolveSoccerCountryAbbrev(teamName);
+  if (soccerFromName) return soccerFromName;
+  return null;
+}
+function resolveGrarfFlagCompetitorBrandAccentHexForGame(game, side, teamDisplayName2) {
+  const league2 = resolveFlagCompetitorLeagueForGame(game);
+  const displayName = teamDisplayName2?.trim() || (side === "away" ? game.awayTeam : game.homeTeam) || "";
+  const flagLeague = isFlagCompetitorBrandAccentLeague(league2);
+  const flagLogo = sideUsesEspnCountryFlagLogo(game, side);
+  if (!flagLeague && !flagLogo) return null;
+  const countryCode = resolveCountryCodeForFlagCompetitor(game, side, displayName);
+  if (countryCode) {
+    const fromCode = resolveGrarfCountryFlagPrimaryAccentHexFromEspnCountryCode(countryCode);
+    if (fromCode) return fromCode;
+  }
+  const teamName = (side === "away" ? game.awayTeam : game.homeTeam)?.trim() || "";
+  return resolveGrarfCountryFlagPrimaryAccentHex(displayName) ?? resolveGrarfCountryFlagPrimaryAccentHex(teamName);
+}
+
+// ../grarf/desktop/src/lib/branding/grarfTeamBrandAccentHex.ts
 function normalizeBrandAccentHex(hex) {
   const trimmed = hex.trim();
   if (!trimmed) return trimmed;
@@ -150856,6 +151348,12 @@ function resolveGrarfTeamBrandAccentHexForGame(game, side, teamDisplayName2) {
     const hex = resolveGrarfTeamBrandAccentHex(league2, abbrev);
     if (hex) return hex;
   }
+  const flagHex = resolveGrarfFlagCompetitorBrandAccentHexForGame(
+    game,
+    side,
+    teamDisplayName2
+  );
+  if (flagHex) return flagHex;
   return null;
 }
 
@@ -151277,6 +151775,59 @@ function GrarfExtensionCommandCenterScorecardMetaColumn({
     }
   );
 }
+function GrarfExtensionCommandCenterScorecardInlineActionBar() {
+  return /* @__PURE__ */ (0, import_jsx_runtime244.jsxs)(
+    "div",
+    {
+      className: "grarf-extension-command-center-inline-action-bar",
+      "data-grarf-extension-command-center-inline-action-bar": "",
+      "aria-hidden": true,
+      children: [
+        /* @__PURE__ */ (0, import_jsx_runtime244.jsx)(
+          "div",
+          {
+            className: "grarf-extension-command-center-inline-action-bar-segment grarf-extension-command-center-inline-action-bar-chevron",
+            "data-grarf-extension-command-center-inline-action-chevron": "",
+            children: /* @__PURE__ */ (0, import_jsx_runtime244.jsx)(ChevronDown, { size: 14, strokeWidth: 2, "aria-hidden": true })
+          }
+        ),
+        /* @__PURE__ */ (0, import_jsx_runtime244.jsxs)(
+          "div",
+          {
+            className: "grarf-extension-command-center-inline-action-bar-segment grarf-extension-command-center-inline-action-bar-action",
+            "data-grarf-extension-command-center-inline-action-gamecenter": "",
+            children: [
+              /* @__PURE__ */ (0, import_jsx_runtime244.jsx)(SlidersHorizontal, { size: 12, strokeWidth: 2, "aria-hidden": true }),
+              /* @__PURE__ */ (0, import_jsx_runtime244.jsx)("span", { children: "Gamecenter" })
+            ]
+          }
+        ),
+        /* @__PURE__ */ (0, import_jsx_runtime244.jsxs)(
+          "div",
+          {
+            className: "grarf-extension-command-center-inline-action-bar-segment grarf-extension-command-center-inline-action-bar-action",
+            "data-grarf-extension-command-center-inline-action-social": "",
+            children: [
+              /* @__PURE__ */ (0, import_jsx_runtime244.jsx)(Users, { size: 12, strokeWidth: 2, "aria-hidden": true }),
+              /* @__PURE__ */ (0, import_jsx_runtime244.jsx)("span", { children: "Social" })
+            ]
+          }
+        ),
+        /* @__PURE__ */ (0, import_jsx_runtime244.jsxs)(
+          "div",
+          {
+            className: "grarf-extension-command-center-inline-action-bar-segment grarf-extension-command-center-inline-action-bar-action",
+            "data-grarf-extension-command-center-inline-action-watch": "",
+            children: [
+              /* @__PURE__ */ (0, import_jsx_runtime244.jsx)(Play, { size: 12, strokeWidth: 2, "aria-hidden": true }),
+              /* @__PURE__ */ (0, import_jsx_runtime244.jsx)("span", { children: "Watch" })
+            ]
+          }
+        )
+      ]
+    }
+  );
+}
 function GrarfExtensionCommandCenterScorecardChevron({
   expanded = false
 }) {
@@ -151306,7 +151857,7 @@ function GrarfExtensionCommandCenterScorecardShell({
   tableScorecardAttrs = true
 }) {
   const state3 = resolveGrarfExtensionCommandCenterScorecardState(game);
-  return /* @__PURE__ */ (0, import_jsx_runtime244.jsx)(
+  return /* @__PURE__ */ (0, import_jsx_runtime244.jsxs)(
     "div",
     {
       className: cn2(
@@ -151324,31 +151875,34 @@ function GrarfExtensionCommandCenterScorecardShell({
         event.stopPropagation();
         onExploreToggle(game);
       } : void 0,
-      children: /* @__PURE__ */ (0, import_jsx_runtime244.jsxs)("div", { className: "grarf-extension-command-center-scorecard-row", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime244.jsxs)("div", { className: "grarf-extension-command-center-scorecard-main", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime244.jsx)("div", { className: "grarf-extension-command-center-scorecard-league-slot", children: leagueHeader ? leagueHeader : /* @__PURE__ */ (0, import_jsx_runtime244.jsx)("span", { className: "grarf-extension-command-center-league-label", children: leagueLabel }) }),
+      children: [
+        /* @__PURE__ */ (0, import_jsx_runtime244.jsxs)("div", { className: "grarf-extension-command-center-scorecard-row", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime244.jsxs)("div", { className: "grarf-extension-command-center-scorecard-main", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime244.jsx)("div", { className: "grarf-extension-command-center-scorecard-league-slot", children: leagueHeader ? leagueHeader : /* @__PURE__ */ (0, import_jsx_runtime244.jsx)("span", { className: "grarf-extension-command-center-league-label", children: leagueLabel }) }),
+            /* @__PURE__ */ (0, import_jsx_runtime244.jsx)(
+              "div",
+              {
+                className: "grarf-extension-command-center-matchup-body",
+                "data-grarf-extension-command-center-body": "",
+                children: matchupBody
+              }
+            )
+          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime244.jsx)("div", { className: "grarf-extension-command-center-scorecard-divider", "aria-hidden": true }),
           /* @__PURE__ */ (0, import_jsx_runtime244.jsx)(
-            "div",
+            GrarfExtensionCommandCenterScorecardMetaColumn,
             {
-              className: "grarf-extension-command-center-matchup-body",
-              "data-grarf-extension-command-center-body": "",
-              children: matchupBody
+              game,
+              state: state3,
+              timingLabel,
+              showChannelLogo,
+              channel
             }
-          )
+          ),
+          showExploreChevron ? /* @__PURE__ */ (0, import_jsx_runtime244.jsx)(GrarfExtensionCommandCenterScorecardChevron, { expanded: exploreExpanded }) : null
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime244.jsx)("div", { className: "grarf-extension-command-center-scorecard-divider", "aria-hidden": true }),
-        /* @__PURE__ */ (0, import_jsx_runtime244.jsx)(
-          GrarfExtensionCommandCenterScorecardMetaColumn,
-          {
-            game,
-            state: state3,
-            timingLabel,
-            showChannelLogo,
-            channel
-          }
-        ),
-        showExploreChevron ? /* @__PURE__ */ (0, import_jsx_runtime244.jsx)(GrarfExtensionCommandCenterScorecardChevron, { expanded: exploreExpanded }) : null
-      ] })
+        /* @__PURE__ */ (0, import_jsx_runtime244.jsx)(GrarfExtensionCommandCenterScorecardInlineActionBar, {})
+      ]
     }
   );
 }
@@ -164297,7 +164851,6 @@ var LEAGUE_DIRECTORY_SECTION_SPORT_ICON_URL = {
   combat: ESPN_SPORT_ICON("mma"),
   cycling: ESPN_SPORT_ICON("cycling"),
   lacrosse: ESPN_SPORT_ICON("lacrosse"),
-  softball: ESPN_SPORT_ICON("softball"),
   "college-sports": ESPN_SPORT_ICON("field-hockey"),
   swimming: ESPN_SPORT_ICON("swimming"),
   "track-and-field": "/league-logos/nav/track-and-field.png",
@@ -184007,12 +184560,14 @@ lucide-react/dist/esm/icons/mic.mjs:
 lucide-react/dist/esm/icons/newspaper.mjs:
 lucide-react/dist/esm/icons/panel-left-close.mjs:
 lucide-react/dist/esm/icons/panel-right-open.mjs:
+lucide-react/dist/esm/icons/play.mjs:
 lucide-react/dist/esm/icons/plus.mjs:
 lucide-react/dist/esm/icons/radio.mjs:
 lucide-react/dist/esm/icons/rotate-ccw.mjs:
 lucide-react/dist/esm/icons/scroll-text.mjs:
 lucide-react/dist/esm/icons/search.mjs:
 lucide-react/dist/esm/icons/settings.mjs:
+lucide-react/dist/esm/icons/sliders-horizontal.mjs:
 lucide-react/dist/esm/icons/square-arrow-out-up-right.mjs:
 lucide-react/dist/esm/icons/triangle-alert.mjs:
 lucide-react/dist/esm/icons/trophy.mjs:
