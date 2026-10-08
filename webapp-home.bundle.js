@@ -149467,6 +149467,48 @@ init_isGrarfWebRenderer();
 // ../grarf/desktop/src/extensionHost/grarfExtensionSidebarExclusiveLeagueExpansion.ts
 init_define_import_meta_env();
 
+// ../grarf/desktop/src/extensionHost/grarfExtensionSidebarActiveScrollRoot.ts
+init_define_import_meta_env();
+var LEFT_NAV_SCROLL_SELECTOR = "[data-sports-browser-prototype-left-nav-scroll]";
+var TEMPORAL_NAV_SELECTOR = "[data-sports-browser-prototype-temporary-nav-prototype]";
+var TEMPORAL_CONTENT_SELECTOR = "[data-sports-browser-prototype-sidebar-temporal-content], [data-sports-browser-prototype-temporary-nav-prototype-inline-tree]";
+function resolveScrollOffsetWithinContainer(element, scrollContainer) {
+  const containerRect = scrollContainer.getBoundingClientRect();
+  const elementRect = element.getBoundingClientRect();
+  return elementRect.top - containerRect.top + scrollContainer.scrollTop;
+}
+function resolveGrarfExtensionSidebarActiveScrollRoot() {
+  if (typeof document === "undefined") return null;
+  const candidates = document.querySelectorAll(LEFT_NAV_SCROLL_SELECTOR);
+  for (const candidate of candidates) {
+    if (candidate.closest("[hidden]") != null) continue;
+    return candidate;
+  }
+  return candidates[0] ?? null;
+}
+function scrollGrarfExtensionSidebarTemporalListToTop(scrollRoot, options = {}) {
+  const container = scrollRoot ?? resolveGrarfExtensionSidebarActiveScrollRoot();
+  if (!container) return;
+  const behavior = options.behavior ?? "auto";
+  if (container.getAttribute("data-grarf-extension-side-panel-page") === "browse") {
+    container.scrollTo({ top: 0, behavior });
+    return;
+  }
+  const temporalContent = container.querySelector(TEMPORAL_CONTENT_SELECTOR);
+  if (temporalContent) {
+    const contentTop = resolveScrollOffsetWithinContainer(temporalContent, container);
+    container.scrollTo({ top: Math.max(0, contentTop), behavior });
+    return;
+  }
+  const temporalNav = container.querySelector(TEMPORAL_NAV_SELECTOR);
+  if (temporalNav) {
+    const navTop = resolveScrollOffsetWithinContainer(temporalNav, container);
+    container.scrollTo({ top: Math.max(0, navTop), behavior });
+    return;
+  }
+  container.scrollTo({ top: 0, behavior });
+}
+
 // ../grarf/desktop/src/extensionHost/grarfExtensionGamesYesterdayHighlightsActiveGame.ts
 init_define_import_meta_env();
 var activeGameId = null;
@@ -149578,9 +149620,7 @@ function resolveScrollTopAligningElementBelowAnchor(scrollTop, elementTop, ancho
 function holdGrarfExtensionLeagueHeaderAnchor(leagueKey) {
   pendingLeagueHeaderAnchor = null;
   if (!leagueKey || typeof document === "undefined") return;
-  const scrollRoot = document.querySelector(
-    "[data-sports-browser-prototype-left-nav-scroll]"
-  );
+  const scrollRoot = resolveGrarfExtensionSidebarActiveScrollRoot();
   const header = scrollRoot?.querySelector(leagueHeaderSelector(leagueKey));
   if (!scrollRoot || !header) return;
   pendingLeagueHeaderAnchor = {
@@ -149629,9 +149669,7 @@ function resolveGrarfExtensionExpandedLeagueContentListStart(contentContainer) {
 }
 function scrollGrarfExtensionExpandedLeagueContentToTop(leagueKey) {
   if (typeof document === "undefined") return;
-  const scrollRoot = document.querySelector(
-    "[data-sports-browser-prototype-left-nav-scroll]"
-  );
+  const scrollRoot = resolveGrarfExtensionSidebarActiveScrollRoot();
   if (!scrollRoot) return;
   const header = scrollRoot.querySelector(leagueHeaderSelector(leagueKey));
   const contentContainer = resolveGrarfExtensionExpandedLeagueContentScrollTarget(
@@ -149806,15 +149844,22 @@ function applyGrarfExtensionAiSearchNavigationScope(input) {
   }
 }
 
+// ../grarf/desktop/src/extensionHost/grarfExtensionSidePanelPageNavigation.ts
+init_define_import_meta_env();
+init_isGrarfWebRenderer();
+function isGrarfExtensionSidePanelPageNavigation() {
+  return isGrarfExtensionRenderer();
+}
+
 // ../grarf/desktop/src/extensionHost/scrollGrarfExtensionSidePanelToTemporalNav.ts
 init_define_import_meta_env();
 
 // ../grarf/desktop/src/extensionHost/scrollGrarfExtensionSidePanelToSection.ts
 init_define_import_meta_env();
 var COMMAND_CENTER_SELECTOR = "[data-grarf-extension-shadcn-featured]";
-var TEMPORAL_NAV_SELECTOR = "[data-sports-browser-prototype-temporary-nav-prototype]";
+var TEMPORAL_NAV_SELECTOR2 = "[data-sports-browser-prototype-temporary-nav-prototype]";
 var TIMELINE_SECTION_SELECTOR = "[data-grarf-extension-sidebar-timeline-section]";
-function resolveScrollOffsetWithinContainer(element, scrollContainer) {
+function resolveScrollOffsetWithinContainer2(element, scrollContainer) {
   const containerRect = scrollContainer.getBoundingClientRect();
   const elementRect = element.getBoundingClientRect();
   return elementRect.top - containerRect.top + scrollContainer.scrollTop;
@@ -149828,16 +149873,16 @@ function scrollGrarfExtensionSidePanelToSection(scrollContainer, section, option
   }
   const commandCenter = scrollContainer.querySelector(COMMAND_CENTER_SELECTOR);
   if (section === "browse") {
-    const temporalNav = scrollContainer.querySelector(TEMPORAL_NAV_SELECTOR);
+    const temporalNav = scrollContainer.querySelector(TEMPORAL_NAV_SELECTOR2);
     if (temporalNav) {
       if (!pinCommandCenterAtTop) {
-        const temporalTop = resolveScrollOffsetWithinContainer(temporalNav, scrollContainer);
+        const temporalTop = resolveScrollOffsetWithinContainer2(temporalNav, scrollContainer);
         scrollContainer.scrollTo({ top: Math.max(0, temporalTop), behavior });
         return;
       }
       if (commandCenter) {
         const commandCenterHeight2 = commandCenter.getBoundingClientRect().height;
-        const temporalTop = resolveScrollOffsetWithinContainer(temporalNav, scrollContainer);
+        const temporalTop = resolveScrollOffsetWithinContainer2(temporalNav, scrollContainer);
         scrollContainer.scrollTo({
           top: Math.max(0, temporalTop - commandCenterHeight2),
           behavior
@@ -149856,7 +149901,7 @@ function scrollGrarfExtensionSidePanelToSection(scrollContainer, section, option
     return;
   }
   if (!pinCommandCenterAtTop) {
-    const timelineTop2 = resolveScrollOffsetWithinContainer(timelineSection, scrollContainer);
+    const timelineTop2 = resolveScrollOffsetWithinContainer2(timelineSection, scrollContainer);
     scrollContainer.scrollTo({ top: Math.max(0, timelineTop2), behavior });
     return;
   }
@@ -149865,7 +149910,7 @@ function scrollGrarfExtensionSidePanelToSection(scrollContainer, section, option
     return;
   }
   const commandCenterHeight = commandCenter.getBoundingClientRect().height;
-  const timelineTop = resolveScrollOffsetWithinContainer(timelineSection, scrollContainer);
+  const timelineTop = resolveScrollOffsetWithinContainer2(timelineSection, scrollContainer);
   scrollContainer.scrollTo({
     top: Math.max(0, timelineTop - commandCenterHeight),
     behavior
@@ -149875,10 +149920,10 @@ function resolveGrarfExtensionSidePanelSectionFromScroll(scrollContainer) {
   const scrollTop = scrollContainer.scrollTop;
   const edgeEpsilon = 4;
   const activationScrollTop = scrollTop + scrollContainer.clientHeight * 0.4;
-  const temporalNav = scrollContainer.querySelector(TEMPORAL_NAV_SELECTOR);
+  const temporalNav = scrollContainer.querySelector(TEMPORAL_NAV_SELECTOR2);
   const timelineSection = scrollContainer.querySelector(TIMELINE_SECTION_SELECTOR);
-  const temporalTop = temporalNav ? resolveScrollOffsetWithinContainer(temporalNav, scrollContainer) : Number.POSITIVE_INFINITY;
-  const timelineTop = timelineSection ? resolveScrollOffsetWithinContainer(timelineSection, scrollContainer) : Number.POSITIVE_INFINITY;
+  const temporalTop = temporalNav ? resolveScrollOffsetWithinContainer2(temporalNav, scrollContainer) : Number.POSITIVE_INFINITY;
+  const timelineTop = timelineSection ? resolveScrollOffsetWithinContainer2(timelineSection, scrollContainer) : Number.POSITIVE_INFINITY;
   if (timelineSection && activationScrollTop + edgeEpsilon >= timelineTop) {
     return "timeline";
   }
@@ -149886,6 +149931,35 @@ function resolveGrarfExtensionSidePanelSectionFromScroll(scrollContainer) {
     return "browse";
   }
   return "home";
+}
+
+// ../grarf/desktop/src/extensionHost/grarfExtensionSidebarFeedHeaderPin.ts
+init_define_import_meta_env();
+var FEED_HEADER_SELECTOR = "[data-grarf-extension-sidebar-timeline-header]";
+var GRARF_EXTENSION_SIDEBAR_FEED_SCROLL_TOP_GAP_PX = 15;
+var GRARF_EXTENSION_SIDEBAR_FEED_AT_TOP_ATTR = "data-grarf-extension-sidebar-feed-at-top";
+function resolveScrollOffsetWithinSidebarScrollContainer(element, scrollContainer) {
+  const containerRect = scrollContainer.getBoundingClientRect();
+  const elementRect = element.getBoundingClientRect();
+  return elementRect.top - containerRect.top + scrollContainer.scrollTop;
+}
+function resolveGrarfExtensionSidebarFeedScrollTop(scrollContainer) {
+  const header = scrollContainer.querySelector(FEED_HEADER_SELECTOR);
+  if (!header) return null;
+  const headerScrollTop = resolveScrollOffsetWithinSidebarScrollContainer(header, scrollContainer);
+  return Math.max(0, headerScrollTop - GRARF_EXTENSION_SIDEBAR_FEED_SCROLL_TOP_GAP_PX);
+}
+function isGrarfExtensionSidebarFeedAtTop(scrollContainer) {
+  const feedScrollTop = resolveGrarfExtensionSidebarFeedScrollTop(scrollContainer);
+  if (feedScrollTop == null) return false;
+  return scrollContainer.scrollTop + 0.5 >= feedScrollTop;
+}
+function syncGrarfExtensionSidebarFeedAtTop(scrollContainer) {
+  if (isGrarfExtensionSidebarFeedAtTop(scrollContainer)) {
+    scrollContainer.setAttribute(GRARF_EXTENSION_SIDEBAR_FEED_AT_TOP_ATTR, "");
+    return;
+  }
+  scrollContainer.removeAttribute(GRARF_EXTENSION_SIDEBAR_FEED_AT_TOP_ATTR);
 }
 
 // ../grarf/desktop/src/extensionHost/scrollGrarfExtensionSidePanelToTemporalNav.ts
@@ -149896,10 +149970,9 @@ function scrollGrarfExtensionSidePanelToTemporalNav(scrollContainer, options = {
   });
 }
 function scrollGrarfExtensionSidePanelToFeed(scrollContainer, options = {}) {
-  scrollGrarfExtensionSidePanelToSection(scrollContainer, "timeline", {
-    behavior: options.behavior ?? "smooth",
-    pinCommandCenterAtTop: false
-  });
+  const top = resolveGrarfExtensionSidebarFeedScrollTop(scrollContainer);
+  if (top == null) return;
+  scrollContainer.scrollTo({ top, behavior: options.behavior ?? "smooth" });
 }
 function scrollGrarfExtensionSidePanelToHome(scrollContainer, options = {}) {
   scrollContainer.scrollTo({ top: 0, behavior: options.behavior ?? "smooth" });
@@ -167169,9 +167242,11 @@ function SportsBrowserPrototypeTemporaryNavPrototype({
   externalTopLevelRequest = null,
   onExtensionGamesYesterdayHighlightsNavigationContextChange,
   leaguesSearchQuery = "",
-  onLeaguesSearchQueryChange
+  onLeaguesSearchQueryChange,
+  onExtensionTemporalNavViewChange
 } = {}) {
   const rootRef = (0, import_react287.useRef)(null);
+  const extensionTemporalNavViewScrollPrimedRef = (0, import_react287.useRef)(false);
   const leaguesSortModeBeforeSearchRef = (0, import_react287.useRef)(
     null
   );
@@ -167464,6 +167539,24 @@ function SportsBrowserPrototypeTemporaryNavPrototype({
   (0, import_react287.useEffect)(() => {
     onTopLevelChange?.(topLevel);
   }, [onTopLevelChange, topLevel]);
+  (0, import_react287.useLayoutEffect)(() => {
+    if (!isGrarfExtensionRenderer() || !onExtensionTemporalNavViewChange) return;
+    if (!extensionTemporalNavViewScrollPrimedRef.current) {
+      extensionTemporalNavViewScrollPrimedRef.current = true;
+      return;
+    }
+    onExtensionTemporalNavViewChange();
+  }, [
+    contentNavScope,
+    contentNavSection,
+    gamesCompactTemporalView,
+    leaguesLensSection,
+    leaguesSortMode,
+    onExtensionTemporalNavViewChange,
+    selector2Label,
+    selector3Label,
+    topLevel
+  ]);
   (0, import_react287.useEffect)(() => {
     if (!externalTopLevelRequest) return;
     const request = externalTopLevelRequest;
@@ -167844,6 +167937,7 @@ function useGrarfExtensionSidePanelExplicitNavigation(scrollContainerRef) {
   );
   (0, import_react288.useEffect)(() => {
     if (!isGrarfExtensionRenderer()) return;
+    if (isGrarfExtensionSidePanelPageNavigation()) return;
     if (navigationRequestNonce === 0) return;
     const scrollContainer = scrollContainerRef.current;
     if (!scrollContainer) return;
@@ -167852,17 +167946,23 @@ function useGrarfExtensionSidePanelExplicitNavigation(scrollContainerRef) {
       switch (section) {
         case "home":
           scrollGrarfExtensionSidePanelToHome(scrollContainer);
+          scrollContainer.setAttribute("data-grarf-extension-side-panel-section-active", "home");
           return;
         case "browse":
           scrollGrarfExtensionSidePanelToTemporalNav(scrollContainer);
+          scrollContainer.setAttribute("data-grarf-extension-side-panel-section-active", "browse");
           return;
         case "timeline":
           scrollGrarfExtensionSidePanelToFeed(scrollContainer);
+          scrollContainer.setAttribute("data-grarf-extension-side-panel-section-active", "timeline");
           return;
       }
     };
     requestAnimationFrame(() => {
-      requestAnimationFrame(run);
+      requestAnimationFrame(() => {
+        run();
+        syncGrarfExtensionSidebarFeedAtTop(scrollContainer);
+      });
     });
   }, [navigationRequestNonce, scrollContainerRef]);
 }
@@ -167877,6 +167977,7 @@ function useGrarfExtensionSidePanelSectionScroll(scrollContainerRef) {
   );
   (0, import_react289.useEffect)(() => {
     if (!isGrarfExtensionRenderer()) return;
+    if (isGrarfExtensionSidePanelPageNavigation()) return;
     const scrollContainer = scrollContainerRef.current;
     if (!scrollContainer) return;
     const onScroll = () => {
@@ -167977,9 +168078,7 @@ function disconnectGrarfExtensionExpandedLeagueHeaderStickyObserver() {
 }
 function syncGrarfExtensionExpandedLeagueHeaderSticky() {
   if (typeof document === "undefined") return;
-  const scrollRoot = document.querySelector(
-    "[data-sports-browser-prototype-left-nav-scroll]"
-  );
+  const scrollRoot = resolveGrarfExtensionSidebarActiveScrollRoot();
   if (scrollRoot) {
     syncGrarfExtensionTemporalNavChromeMetrics(scrollRoot);
   }
@@ -168004,11 +168103,12 @@ function syncGrarfExtensionExpandedLeagueHeaderSticky() {
 }
 
 // ../grarf/desktop/src/extensionHost/useGrarfExtensionSidebarScrollportHeight.ts
-function useGrarfExtensionSidebarScrollportHeight(scrollContainerRef) {
+function useGrarfExtensionSidebarScrollportHeight(scrollContainerRef, options) {
   (0, import_react290.useEffect)(() => {
     if (!isGrarfExtensionRenderer()) return;
+    if (options?.skip) return;
     return observeGrarfExtensionSidebarScrollportHeight(scrollContainerRef.current);
-  }, [scrollContainerRef]);
+  }, [scrollContainerRef, options?.skip]);
 }
 function useGrarfExtensionSidebarLeagueExpandScrollHold() {
   const expandedLeagueKey = (0, import_react290.useSyncExternalStore)(
@@ -168799,7 +168899,7 @@ function GrarfExtensionAiSearchHomeSection({
               ] })
             }
           ),
-          hasUpcomingGames || selectedEntity?.kind === "game" ? /* @__PURE__ */ (0, import_jsx_runtime282.jsx)(
+          /* @__PURE__ */ (0, import_jsx_runtime282.jsx)(
             SuggestionSection,
             {
               icon: Calendar,
@@ -168812,7 +168912,7 @@ function GrarfExtensionAiSearchHomeSection({
                 entitySubject
               ] }) : /* @__PURE__ */ (0, import_jsx_runtime282.jsx)(import_jsx_runtime282.Fragment, { children: "Preview all upcoming games today" })
             }
-          ) : null,
+          ),
           /* @__PURE__ */ (0, import_jsx_runtime282.jsx)(
             SuggestionSection,
             {
@@ -172320,16 +172420,21 @@ function SportsBrowserPrototypeLeftNav({
   const [leaguesLensSection, setLeaguesLensSection] = (0, import_react293.useState)(null);
   const [temporaryNavContentSection, setTemporaryNavContentSection] = (0, import_react293.useState)(null);
   const [temporaryNavContentScope, setTemporaryNavContentScope] = (0, import_react293.useState)(null);
+  const scrollExtensionBrowseTemporalListToTop = (0, import_react293.useCallback)(() => {
+    if (!isGrarfExtensionRenderer()) return;
+    scrollGrarfExtensionSidebarTemporalListToTop();
+  }, []);
   const handleTemporaryNavContentNavChange = (0, import_react293.useCallback)(
     (section, scope) => {
       setTemporaryNavContentSection(section);
       setTemporaryNavContentScope(scope);
       if (isGrarfExtensionRenderer()) {
+        scrollExtensionBrowseTemporalListToTop();
         return;
       }
       onTemporaryNavContentNavChange?.(section, scope);
     },
-    [onTemporaryNavContentNavChange]
+    [onTemporaryNavContentNavChange, scrollExtensionBrowseTemporalListToTop]
   );
   const onSidebarTopLevelModeSelect = (0, import_react293.useCallback)((id) => {
     setSidebarTopLevelMode(id);
@@ -172365,8 +172470,11 @@ function SportsBrowserPrototypeLeftNav({
       } else {
         setLeaguesLensSection(null);
       }
+      if (isGrarfExtensionRenderer()) {
+        scrollExtensionBrowseTemporalListToTop();
+      }
     },
-    []
+    [scrollExtensionBrowseTemporalListToTop]
   );
   (0, import_react293.useEffect)(() => {
     onSidebarTopLevelModeChange?.(sidebarTopLevelMode);
@@ -172509,6 +172617,20 @@ function SportsBrowserPrototypeLeftNav({
     },
     [extensionSidebarExclusiveLeagueExpansion, onTemporalLeagueSelect]
   );
+  const onExtensionLeaguesNavDestinationSelect = (0, import_react293.useCallback)(
+    (...args) => {
+      scrollExtensionBrowseTemporalListToTop();
+      onLeaguesNavDestinationSelect?.(...args);
+    },
+    [onLeaguesNavDestinationSelect, scrollExtensionBrowseTemporalListToTop]
+  );
+  const onExtensionTemporaryNavContentGameDestinationSelect = (0, import_react293.useCallback)(
+    (...args) => {
+      scrollExtensionBrowseTemporalListToTop();
+      onTemporaryNavContentGameDestinationSelect?.(...args);
+    },
+    [onTemporaryNavContentGameDestinationSelect, scrollExtensionBrowseTemporalListToTop]
+  );
   const onCompactTemporalSelect = (0, import_react293.useCallback)((view) => {
     hasUserSelectedTemporalView.current = true;
     switch (view) {
@@ -172536,11 +172658,26 @@ function SportsBrowserPrototypeLeftNav({
         setTodayTab("upcoming");
         return;
     }
-  }, []);
+    if (isGrarfExtensionRenderer()) {
+      scrollExtensionBrowseTemporalListToTop();
+    }
+  }, [scrollExtensionBrowseTemporalListToTop]);
   const [aiSearchTemporaryNavRequest, setAiSearchTemporaryNavRequest] = (0, import_react293.useState)(null);
   const sidebarScrollContainerRef = (0, import_react293.useRef)(null);
+  const extensionHomeScrollRef = (0, import_react293.useRef)(null);
+  const extensionBrowseScrollRef = (0, import_react293.useRef)(null);
+  const extensionTimelinePageRef = (0, import_react293.useRef)(null);
+  const extensionSidePanelPageNavigation = isGrarfExtensionSidePanelPageNavigation();
+  const extensionSidePanelActiveSection = useGrarfExtensionSidePanelSectionStore(
+    (state3) => state3.activeSection
+  );
+  const extensionCommandCenterDeferredReady = useDeferredMount(0, isGrarfExtensionRenderer());
   const scrollExtensionSidebarToTemporalNav = (0, import_react293.useCallback)(() => {
     if (!isGrarfExtensionRenderer()) return;
+    if (extensionSidePanelPageNavigation) {
+      useGrarfExtensionSidePanelSectionStore.getState().navigateToSection("browse");
+      return;
+    }
     const scrollContainer = sidebarScrollContainerRef.current;
     if (!scrollContainer) return;
     const scrollToTemporalNav = () => {
@@ -172550,7 +172687,7 @@ function SportsBrowserPrototypeLeftNav({
     requestAnimationFrame(() => {
       requestAnimationFrame(scrollToTemporalNav);
     });
-  }, []);
+  }, [extensionSidePanelPageNavigation]);
   const scrollExtensionSidebarToBrowseFromAiSearch = scrollExtensionSidebarToTemporalNav;
   const requestTemporaryNavTopLevel = (0, import_react293.useCallback)(
     (topLevel, content) => {
@@ -172706,7 +172843,9 @@ function SportsBrowserPrototypeLeftNav({
   );
   useGrarfExtensionSidePanelSectionScroll(sidebarScrollContainerRef);
   useGrarfExtensionSidePanelExplicitNavigation(sidebarScrollContainerRef);
-  useGrarfExtensionSidebarScrollportHeight(sidebarScrollContainerRef);
+  useGrarfExtensionSidebarScrollportHeight(
+    extensionSidePanelPageNavigation ? extensionBrowseScrollRef : sidebarScrollContainerRef
+  );
   useGrarfExtensionSidebarLeagueExpandScrollHold();
   const sidebarMinimizeSupported = !isGrarfExtensionRenderer();
   const [sidebarMinimized, setSidebarMinimized] = (0, import_react293.useState)(false);
@@ -172783,13 +172922,272 @@ function SportsBrowserPrototypeLeftNav({
                   )
                 }
               ) : null,
-              /* @__PURE__ */ (0, import_jsx_runtime286.jsx)("div", { className: "flex min-h-0 flex-1 flex-col overflow-hidden", children: /* @__PURE__ */ (0, import_jsx_runtime286.jsxs)(
+              /* @__PURE__ */ (0, import_jsx_runtime286.jsx)("div", { className: "flex min-h-0 flex-1 flex-col overflow-hidden", children: /* @__PURE__ */ (0, import_jsx_runtime286.jsx)(
                 "div",
                 {
-                  ref: sidebarScrollContainerRef,
-                  className: "flex min-h-0 flex-1 flex-col overflow-y-auto overflow-x-hidden overscroll-contain",
-                  "data-sports-browser-prototype-left-nav-scroll": true,
-                  children: [
+                  ref: extensionSidePanelPageNavigation ? void 0 : sidebarScrollContainerRef,
+                  className: cn2(
+                    "flex min-h-0 flex-1 flex-col overflow-x-hidden overscroll-contain",
+                    extensionSidePanelPageNavigation ? "overflow-hidden" : "overflow-y-auto"
+                  ),
+                  "data-sports-browser-prototype-left-nav-scroll": extensionSidePanelPageNavigation ? void 0 : "",
+                  "data-grarf-extension-side-panel-pages": extensionSidePanelPageNavigation ? "" : void 0,
+                  children: extensionSidePanelPageNavigation ? /* @__PURE__ */ (0, import_jsx_runtime286.jsxs)(import_jsx_runtime286.Fragment, { children: [
+                    /* @__PURE__ */ (0, import_jsx_runtime286.jsxs)(
+                      "div",
+                      {
+                        ref: extensionHomeScrollRef,
+                        hidden: extensionSidePanelActiveSection !== "home",
+                        "data-grarf-extension-side-panel-page": "home",
+                        "data-sports-browser-prototype-left-nav-scroll": "",
+                        children: [
+                          /* @__PURE__ */ (0, import_jsx_runtime286.jsx)(
+                            GrarfExtensionAiSearchHomeSection,
+                            {
+                              games: aiSearchGamesCorpus,
+                              leagueLabels: aiSearchLeagueLabels,
+                              leagueOptions: aiSearchLeagueOptions,
+                              selectedLeagueKey,
+                              hasUpcomingGames: aiSearchHasUpcomingGames,
+                              onExecuteAction: executeGrarfExtensionAiSearchAction,
+                              onHistoryClick: scrollExtensionSidebarToTemporalNav
+                            }
+                          ),
+                          extensionCommandCenterDeferredReady ? /* @__PURE__ */ (0, import_jsx_runtime286.jsxs)("div", { className: "shrink-0", "data-grarf-extension-shadcn-featured": true, children: [
+                            /* @__PURE__ */ (0, import_jsx_runtime286.jsxs)("div", { className: "flex items-center justify-between gap-2 px-3 pb-2", children: [
+                              /* @__PURE__ */ (0, import_jsx_runtime286.jsx)("h2", { className: "text-base font-semibold tracking-tight", children: "Command Center" }),
+                              /* @__PURE__ */ (0, import_jsx_runtime286.jsx)(
+                                Badge,
+                                {
+                                  variant: "outline",
+                                  className: "border-[hsl(var(--grarf-extension-live))] text-[hsl(var(--grarf-extension-live))]",
+                                  "data-grarf-extension-shadcn-live-now": true,
+                                  "aria-live": "polite",
+                                  children: "Live now"
+                                }
+                              )
+                            ] }),
+                            /* @__PURE__ */ (0, import_jsx_runtime286.jsx)(
+                              SportsBrowserPrototypeBottomRailGames,
+                              {
+                                layout: "sidebar",
+                                onGameSelect,
+                                onGameTeamSelect,
+                                onWatchLive,
+                                canShowWatchLive,
+                                onSocialLive,
+                                selectedGameId,
+                                commandCenterGameContextPane,
+                                onCommandCenterFollowLiveToggle,
+                                onCommandCenterGameInlineNavigate,
+                                onCommandCenterGameContextSectionSelect,
+                                onCommandCenterGameTeamContextSectionSelect,
+                                onCommandCenterGameContextWebsiteTabSelect,
+                                onCommandCenterMlbLiveChildSectionSelect,
+                                onCommandCenterMlbUpcomingChildSectionSelect
+                              }
+                            )
+                          ] }) : null
+                        ]
+                      }
+                    ),
+                    /* @__PURE__ */ (0, import_jsx_runtime286.jsx)(
+                      "div",
+                      {
+                        ref: extensionBrowseScrollRef,
+                        hidden: extensionSidePanelActiveSection !== "browse",
+                        "data-grarf-extension-side-panel-page": "browse",
+                        "data-sports-browser-prototype-left-nav-scroll": "",
+                        "data-grarf-extension-side-panel-section-active": extensionSidePanelActiveSection === "browse" ? "browse" : void 0,
+                        children: /* @__PURE__ */ (0, import_jsx_runtime286.jsxs)(GrarfExtensionTemporalBrowseRegion, { enabled: true, children: [
+                          /* @__PURE__ */ (0, import_jsx_runtime286.jsx)(
+                            SportsBrowserPrototypeTemporaryNavPrototype,
+                            {
+                              gamesCompactTemporalView: compactTemporalView,
+                              onGamesCompactTemporalSelect: onCompactTemporalSelect,
+                              leaguesSortMode,
+                              onLeaguesSortModeChange: setLeaguesSortMode,
+                              leaguesLensSection,
+                              onLeaguesLensSectionChange: setLeaguesLensSection,
+                              todayCompleteLeagues,
+                              nowLeagues,
+                              upcomingLeagues,
+                              selectedLeagueKey,
+                              selectedGameId,
+                              destinationSelection: temporaryNavDestinationSelection,
+                              onLeagueSelect: (leagueKey) => onLeagueSelect?.(leagueKey),
+                              onLeagueDestinationSelect: onExtensionLeaguesNavDestinationSelect,
+                              onGlobalDestinationSelect: onTemporaryNavGlobalDestinationSelect,
+                              contentNavSection: temporaryNavContentSection,
+                              contentNavScope: temporaryNavContentScope,
+                              onContentNavChange: handleTemporaryNavContentNavChange,
+                              onContentTeamDestinationSelect: onTemporaryNavContentTeamDestinationSelect,
+                              onTeamContentDestinationSelect: onTemporaryNavTeamContentDestinationSelect,
+                              onContentGameDestinationSelect: onExtensionTemporaryNavContentGameDestinationSelect,
+                              onGameSelect,
+                              onGameInlineNavigate: onTemporaryNavGameInlineNavigate,
+                              renderContentTeamListPanel: (leagueKey, onTeamSelect, inlineExpansion) => /* @__PURE__ */ (0, import_jsx_runtime286.jsx)(
+                                SidebarLeaguesTabTeamListPanel,
+                                {
+                                  leagueKey,
+                                  onLeaguesTabTeamSelect: onTeamSelect,
+                                  inlineExpansion
+                                }
+                              ),
+                              onLeaguesTabTeamSelect,
+                              onTopLevelChange: handleTemporaryNavTopLevelChange,
+                              externalTopLevelRequest: aiSearchTemporaryNavRequest,
+                              onExtensionGamesYesterdayHighlightsNavigationContextChange: setExtensionGamesYesterdayHighlightsNavigation,
+                              leaguesSearchQuery: temporaryNavLeaguesSearchQuery,
+                              onLeaguesSearchQueryChange: setTemporaryNavLeaguesSearchQuery,
+                              onExtensionTemporalNavViewChange: scrollExtensionBrowseTemporalListToTop
+                            }
+                          ),
+                          sidebarTopLevelMode === "games" && (temporaryNavTopLevel === "GAMES" || temporaryNavTopLevel === "RECAPS") ? /* @__PURE__ */ (0, import_jsx_runtime286.jsxs)(
+                            "div",
+                            {
+                              className: "border-t border-border",
+                              "data-sports-browser-prototype-sidebar-temporal-content": "",
+                              ...extensionGamesSequentialNavScopeId ? {
+                                [GRARF_EXTENSION_SEQUENTIAL_NAV_SCOPE_ATTR]: extensionGamesSequentialNavScopeId
+                              } : {},
+                              children: [
+                                compactTemporalView === "final" ? /* @__PURE__ */ (0, import_jsx_runtime286.jsx)(
+                                  SidebarGroupedTemporalLeagueEntries,
+                                  {
+                                    entries: isGrarfExtensionRenderer() ? extensionGroupedCatchUpLeagues : groupedCatchUpLeagues,
+                                    sectionPrefix: "catch-up",
+                                    variant: "catchUp",
+                                    leagueOpen: resolvedCatchUpLeagueOpen,
+                                    onLeagueOpenChange: extensionSidebarExclusiveLeagueExpansion ? onExtensionExclusiveLeagueOpenChange : setCatchUpLeagueOpen,
+                                    toggleLeague: toggleCatchUpLeague,
+                                    allOpen: false,
+                                    onSoccerArchLeagueSelect,
+                                    selectedSidebarArchLeagueKey,
+                                    onGameSelect,
+                                    onGameTeamSelect,
+                                    onWatchLive,
+                                    canShowWatchLive,
+                                    selectedGameId,
+                                    selectedLeagueKey,
+                                    onOpenUrl,
+                                    showGameInlineMenuUnderCards: true,
+                                    onGameInlineNavigate: onTemporaryNavGameInlineNavigate,
+                                    onCommandCenterFollowLiveToggle
+                                  }
+                                ) : null,
+                                compactTemporalView === "yesterday" ? /* @__PURE__ */ (0, import_jsx_runtime286.jsx)(
+                                  SidebarYesterdaySectionLeagues,
+                                  {
+                                    slates: filterExtensionTemporalLeagueSlates(yesterdayLeagues),
+                                    leagueOpen: resolvedYesterdayLeagueOpen,
+                                    onLeagueOpenChange: extensionSidebarExclusiveLeagueExpansion ? onExtensionExclusiveLeagueOpenChange : setYesterdayLeagueOpen,
+                                    onLeagueSelect: onTemporalLeagueSelect,
+                                    onGameSelect,
+                                    onGameTeamSelect,
+                                    onOpenUrl,
+                                    onSoccerArchLeagueSelect,
+                                    onWatchLive,
+                                    canShowWatchLive,
+                                    selectedGameId,
+                                    selectedLeagueKey,
+                                    selectedSidebarArchLeagueKey,
+                                    showGameInlineMenuUnderCards: true,
+                                    onGameInlineNavigate: onTemporaryNavGameInlineNavigate,
+                                    onCommandCenterFollowLiveToggle,
+                                    extensionGamesYesterdayHighlightsNavigation
+                                  }
+                                ) : null,
+                                compactTemporalView === "today" ? /* @__PURE__ */ (0, import_jsx_runtime286.jsx)(
+                                  SidebarTemporalSectionLeagues,
+                                  {
+                                    sectionId: "today",
+                                    slates: filterExtensionTemporalLeagueSlates(todayCompleteLeagues),
+                                    resolveVariant: resolveSidebarGameVariant,
+                                    leagueOpen: resolvedSectionLeagueOpen,
+                                    onLeagueOpenChange: extensionSidebarExclusiveLeagueExpansion ? onExtensionExclusiveLeagueOpenChange : setSectionLeagueOpen,
+                                    onLeagueSelect: onTemporalLeagueSelect,
+                                    onGameSelect,
+                                    onGameTeamSelect,
+                                    onSelectGlobalWebsites,
+                                    onSoccerArchLeagueSelect,
+                                    onWatchLive,
+                                    canShowWatchLive,
+                                    selectedGameId,
+                                    selectedLeagueKey,
+                                    selectedSidebarArchLeagueKey,
+                                    onOpenUrl,
+                                    showGameInlineMenuUnderCards: true,
+                                    onGameInlineNavigate: onTemporaryNavGameInlineNavigate,
+                                    onCommandCenterFollowLiveToggle
+                                  }
+                                ) : null,
+                                compactTemporalView === "now" ? /* @__PURE__ */ (0, import_jsx_runtime286.jsx)(
+                                  SidebarTemporalSectionLeagues,
+                                  {
+                                    sectionId: "now",
+                                    slates: filterExtensionTemporalLeagueSlates(nowLeagues),
+                                    variant: "live",
+                                    leagueOpen: resolvedSectionLeagueOpen,
+                                    onLeagueOpenChange: extensionSidebarExclusiveLeagueExpansion ? onExtensionExclusiveLeagueOpenChange : setSectionLeagueOpen,
+                                    onLeagueSelect: onTemporalLeagueSelect,
+                                    onGameSelect,
+                                    onGameTeamSelect,
+                                    onSelectGlobalWebsites,
+                                    onSoccerArchLeagueSelect,
+                                    onWatchLive,
+                                    canShowWatchLive,
+                                    selectedGameId,
+                                    selectedLeagueKey,
+                                    selectedSidebarArchLeagueKey,
+                                    onOpenUrl,
+                                    showGameInlineMenuUnderCards: true,
+                                    onGameInlineNavigate: onTemporaryNavGameInlineNavigate,
+                                    onCommandCenterFollowLiveToggle
+                                  }
+                                ) : null,
+                                compactTemporalView === "next" ? /* @__PURE__ */ (0, import_jsx_runtime286.jsx)(
+                                  SidebarTemporalSectionLeagues,
+                                  {
+                                    sectionId: "upcoming",
+                                    slates: filterExtensionTemporalLeagueSlates(upcomingLeagues),
+                                    variant: "upcoming",
+                                    leagueOpen: resolvedSectionLeagueOpen,
+                                    onLeagueOpenChange: extensionSidebarExclusiveLeagueExpansion ? onExtensionExclusiveLeagueOpenChange : setSectionLeagueOpen,
+                                    onLeagueSelect: onTemporalLeagueSelect,
+                                    onGameSelect,
+                                    onGameTeamSelect,
+                                    onSelectGlobalWebsites,
+                                    onSoccerArchLeagueSelect,
+                                    onWatchLive,
+                                    canShowWatchLive,
+                                    selectedGameId,
+                                    selectedLeagueKey,
+                                    selectedSidebarArchLeagueKey,
+                                    onOpenUrl,
+                                    showGameInlineMenuUnderCards: true,
+                                    onGameInlineNavigate: onTemporaryNavGameInlineNavigate,
+                                    onCommandCenterFollowLiveToggle
+                                  }
+                                ) : null
+                              ]
+                            }
+                          ) : null
+                        ] })
+                      }
+                    ),
+                    /* @__PURE__ */ (0, import_jsx_runtime286.jsx)(
+                      "div",
+                      {
+                        ref: extensionTimelinePageRef,
+                        hidden: extensionSidePanelActiveSection !== "timeline",
+                        className: "flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden",
+                        "data-grarf-extension-side-panel-page": "timeline",
+                        "data-grarf-extension-side-panel-section-active": "timeline",
+                        children: extensionSidebarTimelineSection
+                      }
+                    )
+                  ] }) : /* @__PURE__ */ (0, import_jsx_runtime286.jsxs)(import_jsx_runtime286.Fragment, { children: [
                     /* @__PURE__ */ (0, import_jsx_runtime286.jsxs)("div", { className: "shrink-0", children: [
                       isGrarfExtensionRenderer() ? /* @__PURE__ */ (0, import_jsx_runtime286.jsxs)(import_jsx_runtime286.Fragment, { children: [
                         /* @__PURE__ */ (0, import_jsx_runtime286.jsx)(
@@ -172804,7 +173202,7 @@ function SportsBrowserPrototypeLeftNav({
                             onHistoryClick: scrollExtensionSidebarToTemporalNav
                           }
                         ),
-                        /* @__PURE__ */ (0, import_jsx_runtime286.jsxs)("div", { className: "shrink-0", "data-grarf-extension-shadcn-featured": true, children: [
+                        extensionCommandCenterDeferredReady ? /* @__PURE__ */ (0, import_jsx_runtime286.jsxs)("div", { className: "shrink-0", "data-grarf-extension-shadcn-featured": true, children: [
                           /* @__PURE__ */ (0, import_jsx_runtime286.jsxs)("div", { className: "flex items-center justify-between gap-2 px-3 pb-2", children: [
                             /* @__PURE__ */ (0, import_jsx_runtime286.jsx)("h2", { className: "text-base font-semibold tracking-tight", children: "Command Center" }),
                             /* @__PURE__ */ (0, import_jsx_runtime286.jsx)(
@@ -172838,7 +173236,7 @@ function SportsBrowserPrototypeLeftNav({
                               onCommandCenterMlbUpcomingChildSectionSelect
                             }
                           )
-                        ] })
+                        ] }) : null
                       ] }) : /* @__PURE__ */ (0, import_jsx_runtime286.jsxs)(import_jsx_runtime286.Fragment, { children: [
                         onCommandCenterBrowserTabSelect ? /* @__PURE__ */ (0, import_jsx_runtime286.jsx)(
                           "button",
@@ -172903,14 +173301,14 @@ function SportsBrowserPrototypeLeftNav({
                             selectedGameId,
                             destinationSelection: temporaryNavDestinationSelection,
                             onLeagueSelect: (leagueKey) => onLeagueSelect?.(leagueKey),
-                            onLeagueDestinationSelect: onLeaguesNavDestinationSelect,
+                            onLeagueDestinationSelect: onExtensionLeaguesNavDestinationSelect,
                             onGlobalDestinationSelect: onTemporaryNavGlobalDestinationSelect,
                             contentNavSection: temporaryNavContentSection,
                             contentNavScope: temporaryNavContentScope,
                             onContentNavChange: handleTemporaryNavContentNavChange,
                             onContentTeamDestinationSelect: onTemporaryNavContentTeamDestinationSelect,
                             onTeamContentDestinationSelect: onTemporaryNavTeamContentDestinationSelect,
-                            onContentGameDestinationSelect: onTemporaryNavContentGameDestinationSelect,
+                            onContentGameDestinationSelect: onExtensionTemporaryNavContentGameDestinationSelect,
                             onGameSelect,
                             onGameInlineNavigate: onTemporaryNavGameInlineNavigate,
                             renderContentTeamListPanel: (leagueKey, onTeamSelect, inlineExpansion) => /* @__PURE__ */ (0, import_jsx_runtime286.jsx)(
@@ -172926,7 +173324,8 @@ function SportsBrowserPrototypeLeftNav({
                             externalTopLevelRequest: aiSearchTemporaryNavRequest,
                             onExtensionGamesYesterdayHighlightsNavigationContextChange: isGrarfExtensionRenderer() ? setExtensionGamesYesterdayHighlightsNavigation : void 0,
                             leaguesSearchQuery: temporaryNavLeaguesSearchQuery,
-                            onLeaguesSearchQueryChange: setTemporaryNavLeaguesSearchQuery
+                            onLeaguesSearchQueryChange: setTemporaryNavLeaguesSearchQuery,
+                            onExtensionTemporalNavViewChange: scrollExtensionBrowseTemporalListToTop
                           }
                         ),
                         sidebarTopLevelMode === "games" && (temporaryNavTopLevel === "GAMES" || temporaryNavTopLevel === "RECAPS") ? /* @__PURE__ */ (0, import_jsx_runtime286.jsxs)(
@@ -173059,8 +173458,8 @@ function SportsBrowserPrototypeLeftNav({
                         ) : null
                       ] })
                     ] }),
-                    extensionSidebarTimelineSection
-                  ]
+                    !extensionSidePanelPageNavigation ? extensionSidebarTimelineSection : null
+                  ] })
                 }
               ) }),
               sidebarBottomNewsFeed
@@ -176337,6 +176736,9 @@ function HomePage() {
     onLeagueNavigate: onSportsBrowserSidebarLeagueNavigate,
     enabled: isSportsBrowserPrototype
   });
+  const extensionSidePanelActiveSection = useGrarfExtensionSidePanelSectionStore(
+    (state3) => state3.activeSection
+  );
   const navigateSportsBrowserSidebarGameUpForUi = (0, import_react298.useCallback)(() => {
     if (extensionNewsOutletsSequentialNavActive) {
       stepGrarfExtensionNewsOutletsSequentialNav("news", "up");
@@ -176740,7 +177142,7 @@ function HomePage() {
   ) : null;
   const grarfExtensionSidePanelOnlyHost = isGrarfExtensionRenderer();
   const sportsBrowserSidebarBottomNewsFeed = sportsBrowserSidebarBottomNewsFeedInner == null ? null : /* @__PURE__ */ (0, import_jsx_runtime294.jsxs)(import_jsx_runtime294.Fragment, { children: [
-    grarfExtensionSidePanelOnlyHost ? /* @__PURE__ */ (0, import_jsx_runtime294.jsx)(
+    grarfExtensionSidePanelOnlyHost && extensionSidePanelActiveSection !== "home" ? /* @__PURE__ */ (0, import_jsx_runtime294.jsx)(
       SportsBrowserPrototypeExtensionSidebarGameNavStrip,
       {
         navigationMode: sportsBrowserUpDownNavEffectiveMode,
