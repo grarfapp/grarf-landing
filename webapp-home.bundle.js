@@ -165617,7 +165617,8 @@ function SportsBrowserPrototypeTemporaryNavLeaguesInlineTree({
                   ]
                 }
               );
-              if (extensionNewsLeaguesExpandUi) {
+              const extensionSportLevelGroupedLeagueRow = isGrarfExtensionRenderer() && group.sportLevelOnly && sportGroupSectionId != null;
+              if (extensionNewsLeaguesExpandUi || extensionSportLevelGroupedLeagueRow) {
                 const newsWebsites = newsWebsitesForLeague ?? [];
                 return /* @__PURE__ */ (0, import_jsx_runtime275.jsxs)(
                   "div",
@@ -165639,7 +165640,7 @@ function SportsBrowserPrototypeTemporaryNavLeaguesInlineTree({
                           }
                         }
                       ),
-                      leagueExpanded ? /* @__PURE__ */ (0, import_jsx_runtime275.jsxs)("div", { className: "min-w-0", "data-grarf-temporary-nav-nested-league-children": "", children: [
+                      leagueExpanded ? extensionNewsLeaguesExpandUi ? /* @__PURE__ */ (0, import_jsx_runtime275.jsxs)("div", { className: "min-w-0", "data-grarf-temporary-nav-nested-league-children": "", children: [
                         /* @__PURE__ */ (0, import_jsx_runtime275.jsx)(
                           "div",
                           {
@@ -165668,6 +165669,20 @@ function SportsBrowserPrototypeTemporaryNavLeaguesInlineTree({
                             `${leagueKey}:news:${website4.label}:${websiteIndex}`
                           );
                         }) })
+                      ] }) : /* @__PURE__ */ (0, import_jsx_runtime275.jsxs)(import_jsx_runtime275.Fragment, { children: [
+                        showPopulatedTeamList ? renderTeamListPanel(
+                          leagueKey,
+                          onLeaguesTabTeamSelect ?? (() => {
+                          }),
+                          buildLeagueTeamListInlineExpansion(leagueKey)
+                        ) : null,
+                        renderSectionHierarchy(
+                          leagueKey,
+                          1,
+                          leagueKey,
+                          (section) => onLeagueDestinationSelect?.(leagueKey, section),
+                          (section, websiteIndex) => onLeagueDestinationSelect?.(leagueKey, section, websiteIndex)
+                        )
                       ] }) : null
                     ]
                   },
@@ -166668,7 +166683,6 @@ var TEMPORARY_NAV_CONTENT_TOP_LEVELS = [
   "PODCASTS"
 ];
 var TEMPORARY_NAV_LEAGUES_ONLY_CONTENT_TOP_LEVELS = [
-  "SOCIAL",
   "FANTASY",
   "BETTING",
   "PODCASTS"
@@ -166767,11 +166781,16 @@ var GAMES_SELECTOR_2 = ["TODAY", "YESTERDAY"];
 var GAMES_TODAY_SELECTOR_3 = ["ALL", "NOW", "NEXT", "FINAL"];
 var GAMES_YESTERDAY_SELECTOR_3 = ["RECAPS", "HIGHLIGHTS", "SCORES"];
 var NEWS_SELECTOR_2 = TEMPORARY_NAV_NEWS_LEAGUES_SORT_OPTIONS;
-var SOCIAL_SELECTOR_2 = [
-  "LEAGUES"
-  // "TEAMS",
-];
+var SOCIAL_SELECTOR_2 = TEMPORARY_NAV_NEWS_LEAGUES_SORT_OPTIONS;
 var HIGHLIGHTS_SELECTOR_2 = TEMPORARY_NAV_NEWS_LEAGUES_SORT_OPTIONS;
+var CONTENT_TOP_LEVELS_WITH_LEAGUES_SORT_SELECTOR_2 = /* @__PURE__ */ new Set([
+  "NEWS",
+  "SOCIAL",
+  "HIGHLIGHTS"
+]);
+function isTemporaryNavLeaguesSortContentTopLevel(topLevel) {
+  return topLevel != null && CONTENT_TOP_LEVELS_WITH_LEAGUES_SORT_SELECTOR_2.has(topLevel);
+}
 var FANTASY_SELECTOR_2 = ["LEAGUES"];
 var BETTING_SELECTOR_2 = ["LEAGUES", "GAMES"];
 var PODCASTS_SELECTOR_2 = [
@@ -166982,7 +167001,7 @@ function SportsBrowserPrototypeTemporaryNavPrototype({
     if (teamsSelectorsWired && leaguesSortMode) {
       return resolveTemporaryNavTeamsByLeaguesSortLabelFromMode(leaguesSortMode);
     }
-    if (contentSelectorsWired && (contentTopLevel === "NEWS" || contentTopLevel === "HIGHLIGHTS") && leaguesSortMode) {
+    if (contentSelectorsWired && isTemporaryNavLeaguesSortContentTopLevel(contentTopLevel) && leaguesSortMode) {
       return resolveTemporaryNavNewsLeaguesSortLabelFromMode(leaguesSortMode);
     }
     if (contentSelectorsWired && effectiveContentNavScope) {
@@ -167114,7 +167133,7 @@ function SportsBrowserPrototypeTemporaryNavPrototype({
         const scope = resolveTemporaryNavDefaultContentScope(next);
         setTopLevel(next);
         setSelector2Label(
-          (next === "NEWS" || next === "HIGHLIGHTS") && leaguesSortMode != null ? resolveTemporaryNavNewsLeaguesSortLabelFromMode(leaguesSortMode) : next === "NEWS" || next === "HIGHLIGHTS" ? resolveTemporaryNavDefaultSelector2(next) : resolveTemporaryNavContentScopeLabel(scope)
+          isTemporaryNavLeaguesSortContentTopLevel(next) && leaguesSortMode != null ? resolveTemporaryNavNewsLeaguesSortLabelFromMode(leaguesSortMode) : isTemporaryNavLeaguesSortContentTopLevel(next) ? resolveTemporaryNavDefaultSelector2(next) : resolveTemporaryNavContentScopeLabel(scope)
         );
         setSelector3Label(null);
         onContentNavChange(section, scope);
@@ -167177,7 +167196,7 @@ function SportsBrowserPrototypeTemporaryNavPrototype({
         setSelector3Label(null);
         return;
       }
-      if ((contentTopLevel === "NEWS" || contentTopLevel === "HIGHLIGHTS") && onLeaguesSortModeChange) {
+      if (isTemporaryNavLeaguesSortContentTopLevel(contentTopLevel) && onLeaguesSortModeChange) {
         const mode = resolveLeaguesSortModeFromTemporaryNavNewsLeaguesLabel(label);
         if (mode) {
           onLeaguesSortModeChange(mode);
@@ -167261,7 +167280,7 @@ function SportsBrowserPrototypeTemporaryNavPrototype({
     if (isTemporaryNavContentTopLevel(request.topLevel) && request.contentSection != null && request.contentScope != null) {
       setTopLevel(request.topLevel);
       setSelector2Label(
-        (request.topLevel === "NEWS" || request.topLevel === "HIGHLIGHTS") && leaguesSortMode != null ? resolveTemporaryNavNewsLeaguesSortLabelFromMode(leaguesSortMode) : request.topLevel === "NEWS" || request.topLevel === "HIGHLIGHTS" ? resolveTemporaryNavDefaultSelector2(request.topLevel) : resolveTemporaryNavContentScopeLabel(request.contentScope)
+        isTemporaryNavLeaguesSortContentTopLevel(request.topLevel) && leaguesSortMode != null ? resolveTemporaryNavNewsLeaguesSortLabelFromMode(leaguesSortMode) : isTemporaryNavLeaguesSortContentTopLevel(request.topLevel) ? resolveTemporaryNavDefaultSelector2(request.topLevel) : resolveTemporaryNavContentScopeLabel(request.contentScope)
       );
       setSelector3Label(null);
       if (!request.skipPaneSync || request.contentScope === "outlets") {
@@ -167795,8 +167814,13 @@ function resolveGrarfExtensionAiSearchGamesWhenAction(when) {
   const view = when === "live now" ? "now" : when === "upcoming" ? "next" : "today";
   return { kind: "temporal", view, temporaryNavTopLevel: "GAMES" };
 }
-function resolveGrarfExtensionAiSearchPrepareGamesAction(when) {
-  return resolveGrarfExtensionAiSearchGamesWhenAction(when === "upcoming" ? "upcoming" : "today");
+function resolveGrarfExtensionAiSearchPrepareGamesAction() {
+  return {
+    kind: "temporal",
+    view: "next",
+    temporaryNavTopLevel: "GAMES",
+    gamesSelector3Label: TEMPORARY_NAV_GAMES_SELECTOR_3_NEXT
+  };
 }
 function resolveGrarfExtensionAiSearchWatchLiveNowAction() {
   return resolveGrarfExtensionAiSearchGamesWhenAction("live now");
@@ -168168,17 +168192,18 @@ function resolveGrarfExtensionAiSearchEntityCatchUpAction(entity, day, kind) {
   const base = resolveGrarfExtensionAiSearchCatchUpContentAction(day, kind, { focusLeagueKey });
   return withEntityScope(base, entity);
 }
-function resolveGrarfExtensionAiSearchEntityPrepareAction(entity, when) {
+function resolveGrarfExtensionAiSearchEntityPrepareAction(entity) {
   if (entity?.kind === "game") {
-    const temporalView = when === "upcoming" ? "next" : "today";
     return {
       kind: "select-game",
       gameId: entity.gameId,
-      temporalView,
+      temporalView: "next",
+      temporaryNavTopLevel: "GAMES",
+      gamesSelector3Label: "NEXT",
       focusLeagueKey: entity.leagueKey
     };
   }
-  return withEntityScope(resolveGrarfExtensionAiSearchPrepareGamesAction(when), entity);
+  return withEntityScope(resolveGrarfExtensionAiSearchPrepareGamesAction(), entity);
 }
 function resolveGrarfExtensionAiSearchEntityFollowAction(entity) {
   const focusLeagueKey = resolveGrarfExtensionAiSearchEntityFocusLeagueKey(entity);
@@ -168213,10 +168238,6 @@ var CATCH_UP_CONTENT_OPTIONS = [
   "recaps",
   "highlights",
   "scores"
-];
-var PREPARE_GAMES_WHEN_OPTIONS = [
-  "today",
-  "upcoming"
 ];
 var EXPLORE_CONTENT_OPTIONS = [
   "news",
@@ -168298,13 +168319,13 @@ function GrarfExtensionAiSearchHomeSection({
   leagueLabels,
   leagueOptions,
   selectedLeagueKey = null,
+  hasUpcomingGames = false,
   onExecuteAction
 }) {
   const [searchQuery, setSearchQuery] = (0, import_react291.useState)("");
   const [selectedEntity, setSelectedEntity] = (0, import_react291.useState)(null);
   const [catchUpDay, setCatchUpDay] = (0, import_react291.useState)("today");
   const [catchUpContentKind, setCatchUpContentKind] = (0, import_react291.useState)("recaps");
-  const [prepareGamesWhen, setPrepareGamesWhen] = (0, import_react291.useState)("today");
   const [exploreContentKind, setExploreContentKind] = (0, import_react291.useState)("news");
   const [exploreScope, setExploreScope] = (0, import_react291.useState)("all-sports");
   const entitySuggestions = (0, import_react291.useMemo)(
@@ -168501,46 +168522,20 @@ function GrarfExtensionAiSearchHomeSection({
               ] })
             }
           ),
-          /* @__PURE__ */ (0, import_jsx_runtime282.jsx)(
+          hasUpcomingGames || selectedEntity?.kind === "game" ? /* @__PURE__ */ (0, import_jsx_runtime282.jsx)(
             SuggestionSection,
             {
               icon: Calendar,
               category: "PREPARE",
               onActivate: () => onExecuteAction(
-                selectedEntity ? resolveGrarfExtensionAiSearchEntityPrepareAction(selectedEntity, prepareGamesWhen) : resolveGrarfExtensionAiSearchPrepareGamesAction(prepareGamesWhen)
+                selectedEntity ? resolveGrarfExtensionAiSearchEntityPrepareAction(selectedEntity) : resolveGrarfExtensionAiSearchPrepareGamesAction()
               ),
               children: selectedEntity?.kind === "game" ? /* @__PURE__ */ (0, import_jsx_runtime282.jsxs)(import_jsx_runtime282.Fragment, { children: [
                 "Get preview for ",
                 entitySubject
-              ] }) : selectedEntity ? /* @__PURE__ */ (0, import_jsx_runtime282.jsxs)(import_jsx_runtime282.Fragment, { children: [
-                "All ",
-                entitySubject,
-                " games",
-                " ",
-                /* @__PURE__ */ (0, import_jsx_runtime282.jsx)(
-                  InlineSelector,
-                  {
-                    value: prepareGamesWhen,
-                    options: PREPARE_GAMES_WHEN_OPTIONS,
-                    onSelect: (next) => setPrepareGamesWhen(next),
-                    ariaLabel: "Prepare games time period"
-                  }
-                )
-              ] }) : /* @__PURE__ */ (0, import_jsx_runtime282.jsxs)(import_jsx_runtime282.Fragment, { children: [
-                "All games",
-                " ",
-                /* @__PURE__ */ (0, import_jsx_runtime282.jsx)(
-                  InlineSelector,
-                  {
-                    value: prepareGamesWhen,
-                    options: PREPARE_GAMES_WHEN_OPTIONS,
-                    onSelect: (next) => setPrepareGamesWhen(next),
-                    ariaLabel: "Prepare games time period"
-                  }
-                )
-              ] })
+              ] }) : /* @__PURE__ */ (0, import_jsx_runtime282.jsx)(import_jsx_runtime282.Fragment, { children: "Preview all upcoming games today" })
             }
-          ),
+          ) : null,
           /* @__PURE__ */ (0, import_jsx_runtime282.jsx)(
             SuggestionSection,
             {
@@ -172306,6 +172301,10 @@ function SportsBrowserPrototypeLeftNav({
     () => todayCompleteLeagues.map((slate) => ({ key: slate.key, label: slate.label })),
     [todayCompleteLeagues]
   );
+  const aiSearchHasUpcomingGames = (0, import_react293.useMemo)(
+    () => upcomingLeagues.some((slate) => slate.games.length > 0),
+    [upcomingLeagues]
+  );
   const resolveAiSearchGameById = (0, import_react293.useCallback)(
     (gameId) => aiSearchGamesCorpus.find((candidate) => candidate.id === gameId),
     [aiSearchGamesCorpus]
@@ -172513,6 +172512,7 @@ function SportsBrowserPrototypeLeftNav({
                             leagueLabels: aiSearchLeagueLabels,
                             leagueOptions: aiSearchLeagueOptions,
                             selectedLeagueKey,
+                            hasUpcomingGames: aiSearchHasUpcomingGames,
                             onExecuteAction: executeGrarfExtensionAiSearchAction,
                             onHistoryClick: scrollExtensionSidebarToTemporalNav
                           }
