@@ -52566,18 +52566,32 @@ var __iconNode18 = [
 ];
 var ExternalLink = createLucideIcon("external-link", __iconNode18);
 
-// ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/globe.mjs
+// ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/eye.mjs
 init_define_import_meta_env();
 var __iconNode19 = [
+  [
+    "path",
+    {
+      d: "M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0",
+      key: "1nclc0"
+    }
+  ],
+  ["circle", { cx: "12", cy: "12", r: "3", key: "1v7zrd" }]
+];
+var Eye = createLucideIcon("eye", __iconNode19);
+
+// ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/globe.mjs
+init_define_import_meta_env();
+var __iconNode20 = [
   ["circle", { cx: "12", cy: "12", r: "10", key: "1mglay" }],
   ["path", { d: "M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20", key: "13o1zl" }],
   ["path", { d: "M2 12h20", key: "9i4pu4" }]
 ];
-var Globe = createLucideIcon("globe", __iconNode19);
+var Globe = createLucideIcon("globe", __iconNode20);
 
 // ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/headphones.mjs
 init_define_import_meta_env();
-var __iconNode20 = [
+var __iconNode21 = [
   [
     "path",
     {
@@ -52586,20 +52600,20 @@ var __iconNode20 = [
     }
   ]
 ];
-var Headphones = createLucideIcon("headphones", __iconNode20);
+var Headphones = createLucideIcon("headphones", __iconNode21);
 
 // ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/history.mjs
 init_define_import_meta_env();
-var __iconNode21 = [
+var __iconNode22 = [
   ["path", { d: "M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8", key: "1357e3" }],
   ["path", { d: "M3 3v5h5", key: "1xhq8a" }],
   ["path", { d: "M12 7v5l4 2", key: "1fdv2h" }]
 ];
-var History = createLucideIcon("history", __iconNode21);
+var History = createLucideIcon("history", __iconNode22);
 
 // ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/house.mjs
 init_define_import_meta_env();
-var __iconNode22 = [
+var __iconNode23 = [
   ["path", { d: "M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8", key: "5wwlr5" }],
   [
     "path",
@@ -52609,21 +52623,21 @@ var __iconNode22 = [
     }
   ]
 ];
-var House = createLucideIcon("house", __iconNode22);
+var House = createLucideIcon("house", __iconNode23);
 
 // ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/layout-grid.mjs
 init_define_import_meta_env();
-var __iconNode23 = [
+var __iconNode24 = [
   ["rect", { width: "7", height: "7", x: "3", y: "3", rx: "1", key: "1g98yp" }],
   ["rect", { width: "7", height: "7", x: "14", y: "3", rx: "1", key: "6d4xhi" }],
   ["rect", { width: "7", height: "7", x: "14", y: "14", rx: "1", key: "nxv5o0" }],
   ["rect", { width: "7", height: "7", x: "3", y: "14", rx: "1", key: "1bb6yr" }]
 ];
-var LayoutGrid = createLucideIcon("layout-grid", __iconNode23);
+var LayoutGrid = createLucideIcon("layout-grid", __iconNode24);
 
 // ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/layout-list.mjs
 init_define_import_meta_env();
-var __iconNode24 = [
+var __iconNode25 = [
   ["rect", { width: "7", height: "7", x: "3", y: "3", rx: "1", key: "1g98yp" }],
   ["rect", { width: "7", height: "7", x: "3", y: "14", rx: "1", key: "1bb6yr" }],
   ["path", { d: "M14 4h7", key: "3xa0d5" }],
@@ -52631,31 +52645,31 @@ var __iconNode24 = [
   ["path", { d: "M14 15h7", key: "1mj8o2" }],
   ["path", { d: "M14 20h7", key: "11slyb" }]
 ];
-var LayoutList = createLucideIcon("layout-list", __iconNode24);
+var LayoutList = createLucideIcon("layout-list", __iconNode25);
 
 // ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/layout-panel-top.mjs
 init_define_import_meta_env();
-var __iconNode25 = [
+var __iconNode26 = [
   ["rect", { width: "18", height: "7", x: "3", y: "3", rx: "1", key: "f1a2em" }],
   ["rect", { width: "7", height: "7", x: "3", y: "14", rx: "1", key: "1bb6yr" }],
   ["rect", { width: "7", height: "7", x: "14", y: "14", rx: "1", key: "nxv5o0" }]
 ];
-var LayoutPanelTop = createLucideIcon("layout-panel-top", __iconNode25);
+var LayoutPanelTop = createLucideIcon("layout-panel-top", __iconNode26);
 
 // ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/lightbulb-off.mjs
 init_define_import_meta_env();
-var __iconNode26 = [
+var __iconNode27 = [
   ["path", { d: "M16.8 11.2c.8-.9 1.2-2 1.2-3.2a6 6 0 0 0-9.3-5", key: "1fkcox" }],
   ["path", { d: "m2 2 20 20", key: "1ooewy" }],
   ["path", { d: "M6.3 6.3a4.67 4.67 0 0 0 1.2 5.2c.7.7 1.3 1.5 1.5 2.5", key: "10m8kw" }],
   ["path", { d: "M9 18h6", key: "x1upvd" }],
   ["path", { d: "M10 22h4", key: "ceow96" }]
 ];
-var LightbulbOff = createLucideIcon("lightbulb-off", __iconNode26);
+var LightbulbOff = createLucideIcon("lightbulb-off", __iconNode27);
 
 // ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/lightbulb.mjs
 init_define_import_meta_env();
-var __iconNode27 = [
+var __iconNode28 = [
   [
     "path",
     {
@@ -52666,16 +52680,16 @@ var __iconNode27 = [
   ["path", { d: "M9 18h6", key: "x1upvd" }],
   ["path", { d: "M10 22h4", key: "ceow96" }]
 ];
-var Lightbulb = createLucideIcon("lightbulb", __iconNode27);
+var Lightbulb = createLucideIcon("lightbulb", __iconNode28);
 
 // ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/loader-circle.mjs
 init_define_import_meta_env();
-var __iconNode28 = [["path", { d: "M21 12a9 9 0 1 1-6.219-8.56", key: "13zald" }]];
-var LoaderCircle = createLucideIcon("loader-circle", __iconNode28);
+var __iconNode29 = [["path", { d: "M21 12a9 9 0 1 1-6.219-8.56", key: "13zald" }]];
+var LoaderCircle = createLucideIcon("loader-circle", __iconNode29);
 
 // ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/newspaper.mjs
 init_define_import_meta_env();
-var __iconNode29 = [
+var __iconNode30 = [
   ["path", { d: "M15 18h-5", key: "95g1m2" }],
   ["path", { d: "M18 14h-8", key: "sponae" }],
   [
@@ -52687,29 +52701,29 @@ var __iconNode29 = [
   ],
   ["rect", { width: "8", height: "4", x: "10", y: "6", rx: "1", key: "aywv1n" }]
 ];
-var Newspaper = createLucideIcon("newspaper", __iconNode29);
+var Newspaper = createLucideIcon("newspaper", __iconNode30);
 
 // ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/panel-left-close.mjs
 init_define_import_meta_env();
-var __iconNode30 = [
+var __iconNode31 = [
   ["rect", { width: "18", height: "18", x: "3", y: "3", rx: "2", key: "afitv7" }],
   ["path", { d: "M9 3v18", key: "fh3hqa" }],
   ["path", { d: "m16 15-3-3 3-3", key: "14y99z" }]
 ];
-var PanelLeftClose = createLucideIcon("panel-left-close", __iconNode30);
+var PanelLeftClose = createLucideIcon("panel-left-close", __iconNode31);
 
 // ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/panel-right-open.mjs
 init_define_import_meta_env();
-var __iconNode31 = [
+var __iconNode32 = [
   ["rect", { width: "18", height: "18", x: "3", y: "3", rx: "2", key: "afitv7" }],
   ["path", { d: "M15 3v18", key: "14nvp0" }],
   ["path", { d: "m10 15-3-3 3-3", key: "1pgupc" }]
 ];
-var PanelRightOpen = createLucideIcon("panel-right-open", __iconNode31);
+var PanelRightOpen = createLucideIcon("panel-right-open", __iconNode32);
 
 // ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/play.mjs
 init_define_import_meta_env();
-var __iconNode32 = [
+var __iconNode33 = [
   [
     "path",
     {
@@ -52718,38 +52732,38 @@ var __iconNode32 = [
     }
   ]
 ];
-var Play = createLucideIcon("play", __iconNode32);
+var Play = createLucideIcon("play", __iconNode33);
 
 // ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/plus.mjs
 init_define_import_meta_env();
-var __iconNode33 = [
+var __iconNode34 = [
   ["path", { d: "M5 12h14", key: "1ays0h" }],
   ["path", { d: "M12 5v14", key: "s699le" }]
 ];
-var Plus = createLucideIcon("plus", __iconNode33);
+var Plus = createLucideIcon("plus", __iconNode34);
 
 // ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/radio.mjs
 init_define_import_meta_env();
-var __iconNode34 = [
+var __iconNode35 = [
   ["path", { d: "M16.247 7.761a6 6 0 0 1 0 8.478", key: "1fwjs5" }],
   ["path", { d: "M19.075 4.933a10 10 0 0 1 0 14.134", key: "ehdyv1" }],
   ["path", { d: "M4.925 19.067a10 10 0 0 1 0-14.134", key: "1q22gi" }],
   ["path", { d: "M7.753 16.239a6 6 0 0 1 0-8.478", key: "r2q7qm" }],
   ["circle", { cx: "12", cy: "12", r: "2", key: "1c9p78" }]
 ];
-var Radio = createLucideIcon("radio", __iconNode34);
+var Radio = createLucideIcon("radio", __iconNode35);
 
 // ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/rotate-ccw.mjs
 init_define_import_meta_env();
-var __iconNode35 = [
+var __iconNode36 = [
   ["path", { d: "M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8", key: "1357e3" }],
   ["path", { d: "M3 3v5h5", key: "1xhq8a" }]
 ];
-var RotateCcw = createLucideIcon("rotate-ccw", __iconNode35);
+var RotateCcw = createLucideIcon("rotate-ccw", __iconNode36);
 
 // ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/scroll-text.mjs
 init_define_import_meta_env();
-var __iconNode36 = [
+var __iconNode37 = [
   ["path", { d: "M15 12h-5", key: "r7krc0" }],
   ["path", { d: "M15 8h-5", key: "1khuty" }],
   ["path", { d: "M19 17V5a2 2 0 0 0-2-2H4", key: "zz82l3" }],
@@ -52761,19 +52775,19 @@ var __iconNode36 = [
     }
   ]
 ];
-var ScrollText = createLucideIcon("scroll-text", __iconNode36);
+var ScrollText = createLucideIcon("scroll-text", __iconNode37);
 
 // ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/search.mjs
 init_define_import_meta_env();
-var __iconNode37 = [
+var __iconNode38 = [
   ["path", { d: "m21 21-4.34-4.34", key: "14j7rj" }],
   ["circle", { cx: "11", cy: "11", r: "8", key: "4ej97u" }]
 ];
-var Search = createLucideIcon("search", __iconNode37);
+var Search = createLucideIcon("search", __iconNode38);
 
 // ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/settings.mjs
 init_define_import_meta_env();
-var __iconNode38 = [
+var __iconNode39 = [
   [
     "path",
     {
@@ -52783,11 +52797,11 @@ var __iconNode38 = [
   ],
   ["circle", { cx: "12", cy: "12", r: "3", key: "1v7zrd" }]
 ];
-var Settings = createLucideIcon("settings", __iconNode38);
+var Settings = createLucideIcon("settings", __iconNode39);
 
 // ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/sliders-horizontal.mjs
 init_define_import_meta_env();
-var __iconNode39 = [
+var __iconNode40 = [
   ["path", { d: "M10 5H3", key: "1qgfaw" }],
   ["path", { d: "M12 19H3", key: "yhmn1j" }],
   ["path", { d: "M14 3v4", key: "1sua03" }],
@@ -52798,20 +52812,20 @@ var __iconNode39 = [
   ["path", { d: "M8 10v4", key: "tgpxqk" }],
   ["path", { d: "M8 12H3", key: "a7s4jb" }]
 ];
-var SlidersHorizontal = createLucideIcon("sliders-horizontal", __iconNode39);
+var SlidersHorizontal = createLucideIcon("sliders-horizontal", __iconNode40);
 
 // ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/square-arrow-out-up-right.mjs
 init_define_import_meta_env();
-var __iconNode40 = [
+var __iconNode41 = [
   ["path", { d: "M21 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h6", key: "y09zxi" }],
   ["path", { d: "m21 3-9 9", key: "mpx6sq" }],
   ["path", { d: "M15 3h6v6", key: "1q9fwt" }]
 ];
-var SquareArrowOutUpRight = createLucideIcon("square-arrow-out-up-right", __iconNode40);
+var SquareArrowOutUpRight = createLucideIcon("square-arrow-out-up-right", __iconNode41);
 
 // ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/triangle-alert.mjs
 init_define_import_meta_env();
-var __iconNode41 = [
+var __iconNode42 = [
   [
     "path",
     {
@@ -52822,11 +52836,11 @@ var __iconNode41 = [
   ["path", { d: "M12 9v4", key: "juzpu7" }],
   ["path", { d: "M12 17h.01", key: "p32p05" }]
 ];
-var TriangleAlert = createLucideIcon("triangle-alert", __iconNode41);
+var TriangleAlert = createLucideIcon("triangle-alert", __iconNode42);
 
 // ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/trophy.mjs
 init_define_import_meta_env();
-var __iconNode42 = [
+var __iconNode43 = [
   ["path", { d: "M10 14.66v1.626a2 2 0 0 1-.976 1.696A5 5 0 0 0 7 21.978", key: "1n3hpd" }],
   ["path", { d: "M14 14.66v1.626a2 2 0 0 0 .976 1.696A5 5 0 0 1 17 21.978", key: "rfe1zi" }],
   ["path", { d: "M18 9h1.5a1 1 0 0 0 0-5H18", key: "7xy6bh" }],
@@ -52834,21 +52848,21 @@ var __iconNode42 = [
   ["path", { d: "M6 9a6 6 0 0 0 12 0V3a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1z", key: "1mhfuq" }],
   ["path", { d: "M6 9H4.5a1 1 0 0 1 0-5H6", key: "tex48p" }]
 ];
-var Trophy = createLucideIcon("trophy", __iconNode42);
+var Trophy = createLucideIcon("trophy", __iconNode43);
 
 // ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/users.mjs
 init_define_import_meta_env();
-var __iconNode43 = [
+var __iconNode44 = [
   ["path", { d: "M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2", key: "1yyitq" }],
   ["path", { d: "M16 3.128a4 4 0 0 1 0 7.744", key: "16gr8j" }],
   ["path", { d: "M22 21v-2a4 4 0 0 0-3-3.87", key: "kshegd" }],
   ["circle", { cx: "9", cy: "7", r: "4", key: "nufk8" }]
 ];
-var Users = createLucideIcon("users", __iconNode43);
+var Users = createLucideIcon("users", __iconNode44);
 
 // ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/video.mjs
 init_define_import_meta_env();
-var __iconNode44 = [
+var __iconNode45 = [
   [
     "path",
     {
@@ -52858,11 +52872,11 @@ var __iconNode44 = [
   ],
   ["rect", { x: "2", y: "6", width: "14", height: "12", rx: "2", key: "158x01" }]
 ];
-var Video = createLucideIcon("video", __iconNode44);
+var Video = createLucideIcon("video", __iconNode45);
 
 // ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/volleyball.mjs
 init_define_import_meta_env();
-var __iconNode45 = [
+var __iconNode46 = [
   ["path", { d: "M11.1 7.1a16.55 16.55 0 0 1 10.9 4", key: "2880wi" }],
   ["path", { d: "M12 12a12.6 12.6 0 0 1-8.7 5", key: "113sja" }],
   ["path", { d: "M16.8 13.6a16.55 16.55 0 0 1-9 7.5", key: "1qmsgl" }],
@@ -52870,29 +52884,29 @@ var __iconNode45 = [
   ["path", { d: "M6.3 3.8a16.55 16.55 0 0 0 1.9 11.5", key: "iekzv9" }],
   ["circle", { cx: "12", cy: "12", r: "10", key: "1mglay" }]
 ];
-var Volleyball = createLucideIcon("volleyball", __iconNode45);
+var Volleyball = createLucideIcon("volleyball", __iconNode46);
 
 // ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/wifi.mjs
 init_define_import_meta_env();
-var __iconNode46 = [
+var __iconNode47 = [
   ["path", { d: "M12 20h.01", key: "zekei9" }],
   ["path", { d: "M2 8.82a15 15 0 0 1 20 0", key: "dnpr2z" }],
   ["path", { d: "M5 12.859a10 10 0 0 1 14 0", key: "1x1e6c" }],
   ["path", { d: "M8.5 16.429a5 5 0 0 1 7 0", key: "1bycff" }]
 ];
-var Wifi = createLucideIcon("wifi", __iconNode46);
+var Wifi = createLucideIcon("wifi", __iconNode47);
 
 // ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/x.mjs
 init_define_import_meta_env();
-var __iconNode47 = [
+var __iconNode48 = [
   ["path", { d: "M18 6 6 18", key: "1bl5f8" }],
   ["path", { d: "m6 6 12 12", key: "d8bk6v" }]
 ];
-var X2 = createLucideIcon("x", __iconNode47);
+var X2 = createLucideIcon("x", __iconNode48);
 
 // ../grarf/desktop/node_modules/lucide-react/dist/esm/icons/zap.mjs
 init_define_import_meta_env();
-var __iconNode48 = [
+var __iconNode49 = [
   [
     "path",
     {
@@ -52901,7 +52915,7 @@ var __iconNode48 = [
     }
   ]
 ];
-var Zap = createLucideIcon("zap", __iconNode48);
+var Zap = createLucideIcon("zap", __iconNode49);
 
 // ../grarf/desktop/src/lib/cn.ts
 init_define_import_meta_env();
@@ -155449,11 +155463,146 @@ async function resolveNflGametimeChatUrlForGame(game) {
   return resolveXGameSearchUrlFromGame(game);
 }
 
+// ../grarf/desktop/src/extensionHost/grarfExtensionNhlRecapNavigationUrl.ts
+init_define_import_meta_env();
+
+// ../grarf/shared/domain/nhl/resolveEspnNhlRecapUrlFromGame.ts
+init_define_import_meta_env();
+function resolveEspnNhlRecapUrlFromGame(game) {
+  if (game.league !== "NHL" && !game.id.startsWith("espn-NHL-")) return null;
+  const eventId = parseEspnNhlEventId(game);
+  if (!eventId) return null;
+  return `https://www.espn.com/nhl/recap?gameId=${encodeURIComponent(eventId)}`;
+}
+function parseEspnNhlEventId(game) {
+  const fromField = game.espnEventId?.trim();
+  if (fromField) return fromField;
+  const match = /^espn-NHL-(\d+)/i.exec(game.id.trim());
+  return match?.[1] ?? null;
+}
+
+// ../grarf/shared/domain/nhl/resolveNhlComGamecenterRecapUrlFromGame.ts
+init_define_import_meta_env();
+function resolveNhlComGamecenterRecapUrlFromGame(game) {
+  if (game.league !== "NHL" && !game.id.startsWith("espn-NHL-")) return null;
+  const fromMetadata = game.metadata?.nhlGameCenterUrl?.trim();
+  if (fromMetadata) {
+    try {
+      const url = new URL(fromMetadata);
+      if (url.hostname === "www.nhl.com" || url.hostname === "nhl.com") {
+        return url.toString();
+      }
+    } catch {
+      if (fromMetadata.startsWith("/gamecenter/")) {
+        return `https://www.nhl.com${fromMetadata}`;
+      }
+    }
+  }
+  return null;
+}
+
+// ../grarf/desktop/src/extensionHost/grarfExtensionNhlRecapNavigationUrl.ts
+function resolveGrarfExtensionNhlRecapNavigationUrl(game, source) {
+  if (source === "nhl") {
+    return resolveNhlComGamecenterRecapUrlFromGame(game);
+  }
+  return resolveEspnNhlRecapUrlFromGame(game);
+}
+async function resolveGrarfExtensionNhlRecapNavigationUrlFromGame(game, source) {
+  const immediate = resolveGrarfExtensionNhlRecapNavigationUrl(game, source);
+  if (immediate || source !== "nhl") {
+    return immediate;
+  }
+  try {
+    const [enriched] = await enrichNhlGamesWithNhlComGamecenterLinks([game]);
+    return resolveNhlComGamecenterRecapUrlFromGame(enriched ?? game);
+  } catch {
+    return null;
+  }
+}
+
+// ../grarf/desktop/src/extensionHost/grarfExtensionNhlRecapsSourceStore.ts
+init_define_import_meta_env();
+var activeSource2 = "nhl";
+var listeners4 = /* @__PURE__ */ new Set();
+function notify2() {
+  for (const listener of listeners4) {
+    listener();
+  }
+}
+function getGrarfExtensionNhlRecapsSource() {
+  return activeSource2;
+}
+function setGrarfExtensionNhlRecapsSource(next) {
+  if (next === activeSource2) return;
+  activeSource2 = next;
+  notify2();
+}
+function subscribeGrarfExtensionNhlRecapsSource(listener) {
+  listeners4.add(listener);
+  return () => listeners4.delete(listener);
+}
+
 // ../grarf/desktop/src/extensionHost/grarfExtensionCommandCenterScorecardExternalActions.ts
+function firstResolvedWebsiteUrl(websites) {
+  for (const website4 of websites) {
+    const url = website4.url?.trim();
+    if (url) return url;
+  }
+  return null;
+}
 function resolveGrarfExtensionCommandCenterScorecardWatchUrl(game) {
   const enriched = resolveLiveGameWatchTarget(game)?.streamUrl?.trim();
   if (enriched) return enriched;
   return resolveMlbLiveGameWorkspaceWatchUrl(game);
+}
+function resolveGrarfExtensionCommandCenterScorecardPreviewUrl(game) {
+  const context2 = resolveGameBrowserContext(game);
+  const websites = resolveSportsBrowserPrototypeGameContextContentSourceWebsites(
+    game,
+    context2,
+    "preview"
+  );
+  return firstResolvedWebsiteUrl(websites);
+}
+function resolveGrarfExtensionCommandCenterScorecardRecapUrl(game) {
+  const context2 = resolveGameBrowserContext(game);
+  const websites = resolveSportsBrowserPrototypeGameContextContentSourceWebsites(
+    game,
+    context2,
+    "recap"
+  );
+  const fromContentSources = firstResolvedWebsiteUrl(websites);
+  if (fromContentSources) return fromContentSources;
+  if (game.league === "NHL" || game.id.startsWith("espn-NHL-")) {
+    return resolveGrarfExtensionNhlRecapNavigationUrl(game, getGrarfExtensionNhlRecapsSource());
+  }
+  return null;
+}
+function resolveGrarfExtensionCommandCenterScorecardMediaAction(game) {
+  const state3 = resolveGrarfExtensionCommandCenterScorecardState(game);
+  if (state3 === "upcoming") {
+    return {
+      kind: "preview",
+      label: "Preview",
+      url: resolveGrarfExtensionCommandCenterScorecardPreviewUrl(game),
+      ariaLabel: "Open game preview in browser"
+    };
+  }
+  if (state3 === "final") {
+    return {
+      kind: "recap",
+      label: "Recap",
+      url: resolveGrarfExtensionCommandCenterScorecardRecapUrl(game),
+      ariaLabel: "Open game recap in browser"
+    };
+  }
+  return {
+    kind: "watch",
+    label: "Watch",
+    url: resolveGrarfExtensionCommandCenterScorecardWatchUrl(game),
+    ariaLabel: "Open live stream in browser"
+  };
 }
 function resolveGrarfExtensionCommandCenterScorecardGamecenterUrl(game) {
   const { gameCenter } = resolveGameBrowserContext(game);
@@ -155561,9 +155710,10 @@ function GrarfExtensionCommandCenterScorecardMetaColumn({
   );
 }
 function GrarfExtensionCommandCenterScorecardInlineActionBar({ game }) {
-  const watchUrl = resolveGrarfExtensionCommandCenterScorecardWatchUrl(game);
+  const mediaAction = resolveGrarfExtensionCommandCenterScorecardMediaAction(game);
   const gamecenterUrl = resolveGrarfExtensionCommandCenterScorecardGamecenterUrl(game);
   const socialUrl = resolveGrarfExtensionCommandCenterScorecardSocialUrl(game);
+  const MediaIcon = mediaAction.kind === "preview" ? Eye : mediaAction.kind === "recap" ? Newspaper : Play;
   return /* @__PURE__ */ (0, import_jsx_runtime244.jsxs)(
     "div",
     {
@@ -155622,16 +155772,18 @@ function GrarfExtensionCommandCenterScorecardInlineActionBar({ game }) {
           {
             type: "button",
             className: "grarf-extension-command-center-inline-action-bar-segment grarf-extension-command-center-inline-action-bar-action",
-            "data-grarf-extension-command-center-inline-action-watch": "",
-            disabled: !watchUrl,
-            "aria-label": "Open live stream in browser",
+            "data-grarf-extension-command-center-inline-action-watch": mediaAction.kind === "watch" ? "" : void 0,
+            "data-grarf-extension-command-center-inline-action-preview": mediaAction.kind === "preview" ? "" : void 0,
+            "data-grarf-extension-command-center-inline-action-recap": mediaAction.kind === "recap" ? "" : void 0,
+            disabled: !mediaAction.url,
+            "aria-label": mediaAction.ariaLabel,
             onClick: (event) => {
               event.stopPropagation();
-              openGrarfExtensionCommandCenterScorecardExternalUrl(watchUrl);
+              openGrarfExtensionCommandCenterScorecardExternalUrl(mediaAction.url);
             },
             children: [
-              /* @__PURE__ */ (0, import_jsx_runtime244.jsx)(Play, { size: 12, strokeWidth: 2, "aria-hidden": true }),
-              /* @__PURE__ */ (0, import_jsx_runtime244.jsx)("span", { children: "Watch" })
+              /* @__PURE__ */ (0, import_jsx_runtime244.jsx)(MediaIcon, { size: 12, strokeWidth: 2, "aria-hidden": true }),
+              /* @__PURE__ */ (0, import_jsx_runtime244.jsx)("span", { children: mediaAction.label })
             ]
           }
         )
@@ -156816,86 +156968,6 @@ function buildGrarfExtensionGameSoccerwayRecapsUrl(game) {
     return null;
   }
   return resolveSoccerwayMatchReportUrl(game);
-}
-
-// ../grarf/desktop/src/extensionHost/grarfExtensionNhlRecapsSourceStore.ts
-init_define_import_meta_env();
-var activeSource2 = "nhl";
-var listeners4 = /* @__PURE__ */ new Set();
-function notify2() {
-  for (const listener of listeners4) {
-    listener();
-  }
-}
-function getGrarfExtensionNhlRecapsSource() {
-  return activeSource2;
-}
-function setGrarfExtensionNhlRecapsSource(next) {
-  if (next === activeSource2) return;
-  activeSource2 = next;
-  notify2();
-}
-function subscribeGrarfExtensionNhlRecapsSource(listener) {
-  listeners4.add(listener);
-  return () => listeners4.delete(listener);
-}
-
-// ../grarf/desktop/src/extensionHost/grarfExtensionNhlRecapNavigationUrl.ts
-init_define_import_meta_env();
-
-// ../grarf/shared/domain/nhl/resolveEspnNhlRecapUrlFromGame.ts
-init_define_import_meta_env();
-function resolveEspnNhlRecapUrlFromGame(game) {
-  if (game.league !== "NHL" && !game.id.startsWith("espn-NHL-")) return null;
-  const eventId = parseEspnNhlEventId(game);
-  if (!eventId) return null;
-  return `https://www.espn.com/nhl/recap?gameId=${encodeURIComponent(eventId)}`;
-}
-function parseEspnNhlEventId(game) {
-  const fromField = game.espnEventId?.trim();
-  if (fromField) return fromField;
-  const match = /^espn-NHL-(\d+)/i.exec(game.id.trim());
-  return match?.[1] ?? null;
-}
-
-// ../grarf/shared/domain/nhl/resolveNhlComGamecenterRecapUrlFromGame.ts
-init_define_import_meta_env();
-function resolveNhlComGamecenterRecapUrlFromGame(game) {
-  if (game.league !== "NHL" && !game.id.startsWith("espn-NHL-")) return null;
-  const fromMetadata = game.metadata?.nhlGameCenterUrl?.trim();
-  if (fromMetadata) {
-    try {
-      const url = new URL(fromMetadata);
-      if (url.hostname === "www.nhl.com" || url.hostname === "nhl.com") {
-        return url.toString();
-      }
-    } catch {
-      if (fromMetadata.startsWith("/gamecenter/")) {
-        return `https://www.nhl.com${fromMetadata}`;
-      }
-    }
-  }
-  return null;
-}
-
-// ../grarf/desktop/src/extensionHost/grarfExtensionNhlRecapNavigationUrl.ts
-function resolveGrarfExtensionNhlRecapNavigationUrl(game, source) {
-  if (source === "nhl") {
-    return resolveNhlComGamecenterRecapUrlFromGame(game);
-  }
-  return resolveEspnNhlRecapUrlFromGame(game);
-}
-async function resolveGrarfExtensionNhlRecapNavigationUrlFromGame(game, source) {
-  const immediate = resolveGrarfExtensionNhlRecapNavigationUrl(game, source);
-  if (immediate || source !== "nhl") {
-    return immediate;
-  }
-  try {
-    const [enriched] = await enrichNhlGamesWithNhlComGamecenterLinks([game]);
-    return resolveNhlComGamecenterRecapUrlFromGame(enriched ?? game);
-  } catch {
-    return null;
-  }
 }
 
 // ../grarf/desktop/src/extensionHost/grarfExtensionGameYesterdayRecapsNavigation.ts
@@ -189335,6 +189407,7 @@ lucide-react/dist/esm/icons/compass.mjs:
 lucide-react/dist/esm/icons/crosshair.mjs:
 lucide-react/dist/esm/icons/ellipsis.mjs:
 lucide-react/dist/esm/icons/external-link.mjs:
+lucide-react/dist/esm/icons/eye.mjs:
 lucide-react/dist/esm/icons/globe.mjs:
 lucide-react/dist/esm/icons/headphones.mjs:
 lucide-react/dist/esm/icons/history.mjs:
