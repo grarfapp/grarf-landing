@@ -14266,7 +14266,7 @@ var GAMES_COLUMN_LEAGUE_LABEL = {
   CAF_WNATIONS: "Women's AFCON",
   SPFL: "SPFL",
   SCOTTISH_LEAGUE_CUP: "Scottish League Cup",
-  SAUDI: "RSL",
+  SAUDI: "Saudi Pro League",
   SUPERLIG: "Super Lig",
   USLCUP: "USL Cup",
   WORLDCUP: "FIFA World Cup",
@@ -14973,11 +14973,222 @@ var ESPN_SOCCER_OPERATIONAL_LEAGUE_KEYS = new Set(
   ESPN_OPERATIONAL_INGEST_LEAGUES.filter((l) => l.sport === "soccer").map((l) => l.key)
 );
 
+// ../grarf/desktop/src/lib/gamesSpine/sportsBrowserPrototypeSidebarLeaguesPopulation.ts
+init_define_import_meta_env();
+var SPORTS_BROWSER_PROTOTYPE_SIDEBAR_LEAGUES_ACTIVE_POPULATION = [
+  { key: "afc-elite", label: "AFC ELITE" },
+  { key: "AFL", label: "AFL" },
+  { key: "ahl", label: "AHL" },
+  { key: "ATP", label: "ATP" },
+  { key: "avp", label: "AVP" },
+  { key: "BEL1", label: "BELGIAN PRO LEAGUE" },
+  { key: "CRICKET_BBL", label: "BIG BASH LEAGUE" },
+  { key: "BOXING", label: "BOXING" },
+  { key: "BRA1", label: "BRASILEIR\xC3O" },
+  { key: "BUNDESLIGA", label: "BUNDESLIGA" },
+  { key: "caf-champions", label: "CAF CHAMPIONS LEAGUE" },
+  { key: "CARABAO_CUP", label: "CARABAO CUP" },
+  { key: "CBWS", label: "CARIBBEAN SERIES" },
+  { key: "CONCACAF_CAC", label: "CENTRAL AMERICAN CUP" },
+  { key: "CFL", label: "CFL" },
+  { key: "CHAMPIONSHIP", label: "EFL CHAMPIONSHIP" },
+  { key: "CLUBWC", label: "FIFA CLUB WORLD CUP" },
+  { key: "CONCACAF_CL", label: "CONCACAF CHAMPIONS CUP" },
+  { key: "CONCACAF_NG", label: "CONCACAF NATIONS LEAGUE" },
+  { key: "COPA", label: "COPA AMERICA" },
+  { key: "COPA_BRASIL", label: "COPA DO BRASIL" },
+  { key: "LIBERTADORES", label: "COPA LIBERTADORES" },
+  { key: "SUDAMERICANA", label: "COPA SUDAMERICANA" },
+  { key: "COPPAITALIA", label: "COPPA ITALIA" },
+  { key: "DP_WORLD", label: "DP WORLD TOUR" },
+  { key: "EPL", label: "ENGLISH PREMIER LEAGUE" },
+  { key: "EREDIVISIE", label: "EREDIVISIE" },
+  { key: "euroleague", label: "EUROLEAGUE" },
+  // UEL — list includes both EUROPA LEAGUE and UEFA EUROPA LEAGUE (single underlying league).
+  { key: "UEL", label: "UEFA EUROPA LEAGUE" },
+  { key: "F1", label: "FORMULA 1" },
+  { key: "F2", label: "FORMULA 2" },
+  { key: "F3", label: "FORMULA 3" },
+  { key: "FORMULA_E", label: "FORMULA E" },
+  { key: "fa-cup", label: "FA CUP" },
+  { key: "RUGBYTOP14", label: "FRENCH TOP 14" },
+  { key: "NBA2K", label: "NBA G LEAGUE" },
+  { key: "RUGBYPREM", label: "GALLAGHER PREMIERSHIP" },
+  { key: "GOLDCUP", label: "GOLD CUP" },
+  { key: "GT_WORLD_CHALLENGE", label: "GT WORLD CHALLENGE" },
+  { key: "horse-racing", label: "Horse Racing" },
+  { key: "CRICKET_ICC", label: "CRICKET" },
+  { key: "imsa", label: "IMSA" },
+  { key: "INDYCAR", label: "INDYCAR" },
+  { key: "j1", label: "J1" },
+  { key: "kbo", label: "KBO" },
+  { key: "khl", label: "KHL" },
+  { key: "KORNFERRY", label: "KORN FERRY TOUR" },
+  { key: "lacrosse", label: "LACROSSE" },
+  { key: "LALIGA", label: "LALIGA" },
+  { key: "LEAGUES_CUP", label: "LEAGUES CUP" },
+  { key: "LIGAMX", label: "LIGA MX" },
+  { key: "LIGUE1", label: "LIGUE 1" },
+  { key: "LIV", label: "LIV GOLF" },
+  { key: "LLBWS", label: "LITTLE LEAGUE BASEBALL" },
+  { key: "base-lls", label: "LITTLE LEAGUE SOFTBALL" },
+  { key: "lovb", label: "LOVB" },
+  { key: "ARG1", label: "ARGENTINE PRIMERA" },
+  { key: "LPGA", label: "LPGA Tour" },
+  { key: "milb", label: "MiLB" },
+  { key: "MLB", label: "MLB" },
+  { key: "RUGB_289262", label: "MAJOR LEAGUE RUGBY" },
+  { key: "MLS", label: "MLS" },
+  { key: "MOTOGP", label: "MOTOGP" },
+  // { key: "MOTO2", label: "MOTO2" },
+  // { key: "MOTO3", label: "MOTO3" },
+  { key: "NASCAR", label: "NASCAR CUP SERIES" },
+  { key: "NASCAR_XFINITY", label: "NASCAR O'REILLY" },
+  { key: "NASCAR_TRUCK", label: "NASCAR TRUCKS" },
+  { key: "NBA", label: "NBA" },
+  { key: "NCAAFH", label: "NCAA FIELD HOCKEY" },
+  { key: "NCAABB", label: "NCAA BASEBALL" },
+  { key: "NCAALAX", label: "NCAA LACROSSE" },
+  { key: "MNCAAB", label: "NCAA MEN'S BASKETBALL" },
+  { key: "NCAAVB_M", label: "NCAA MEN'S VOLLEYBALL" },
+  { key: "NCAAMSOC", label: "NCAA MEN'S SOCCER" },
+  // { key: "NCAAWP", label: "NCAA WATER POLO" },
+  { key: "NCAAVB", label: "NCAA WOMEN'S VOLLEYBALL" },
+  { key: "WNCAAB", label: "NCAA WOMEN'S BASKETBALL" },
+  { key: "NCAAWSOC", label: "NCAA WOMEN'S SOCCER" },
+  { key: "NCAAF", label: "NCAAF" },
+  { key: "NCAASB", label: "NCAA SOFTBALL" },
+  { key: "NFL", label: "NFL" },
+  { key: "NHL", label: "NHL" },
+  { key: "nhra", label: "NHRA" },
+  { key: "npb", label: "NPB" },
+  { key: "NWSL", label: "NWSL" },
+  { key: "pfl", label: "PFL" },
+  { key: "PGA", label: "PGA Tour" },
+  { key: "PLL", label: "PLL" },
+  { key: "POR1", label: "PRIMEIRA LIGA" },
+  { key: "SAUDI", label: "Saudi Pro League" },
+  { key: "rugby-union", label: "RUGBY" },
+  { key: "SCOTTISH_LEAGUE_CUP", label: "SCOTTISH LEAGUE CUP" },
+  { key: "SERIEA", label: "SERIE A" },
+  { key: "SPFL", label: "SPFL" },
+  { key: "SUPERLIG", label: "S\xDCPER LIG" },
+  { key: "swimming", label: "Swimming" },
+  { key: "USATF", label: "Track & Field" },
+  { key: "US_OPEN_CUP", label: "U.S. OPEN CUP" },
+  { key: "UCL", label: "UEFA CHAMPIONS LEAGUE" },
+  { key: "UECL", label: "UEFA CONFERENCE LEAGUE" },
+  { key: "EURO", label: "UEFA EURO" },
+  { key: "NATIONS", label: "UEFA NATIONS LEAGUE" },
+  { key: "UFC", label: "UFC" },
+  { key: "XFL", label: "UFL" },
+  { key: "RUGBYULSTER", label: "UNITED RUGBY CHAMPIONSHIP" },
+  { key: "USLC", label: "USL CHAMPIONSHIP" },
+  { key: "USLCUP", label: "USL CHAMPIONSHIP CUP" },
+  { key: "USL1", label: "USL LEAGUE ONE" },
+  { key: "WEC", label: "WEC" },
+  { key: "winter-sports", label: "Winter Sports" },
+  { key: "WNBA", label: "WNBA" },
+  { key: "CAF_WNATIONS", label: "WOMEN'S AFCON" },
+  { key: "WOMENS_UCL", label: "WOMEN'S UCL" },
+  { key: "world-rally", label: "WORLD RALLY" },
+  { key: "WTA", label: "WTA" }
+];
+var SIDEBAR_LEAGUES_LABEL_BY_KEY = new Map(SPORTS_BROWSER_PROTOTYPE_SIDEBAR_LEAGUES_ACTIVE_POPULATION.map((entry2) => [entry2.key, entry2.label]));
+var SIDEBAR_LEAGUES_KEY_DISPLAY_OVERRIDES = {
+  SAUDI: "Saudi Pro League",
+  NASCAR: "NASCAR Cup Series",
+  NASCAR_XFINITY: "NASCAR Xfinity Series",
+  NASCAR_TRUCK: "NASCAR Trucks"
+};
+var SIDEBAR_LEAGUES_DISPLAY_LABEL_OVERRIDES = {
+  EUROLEAGUE: "EuroLeague",
+  "CAF CHAMPIONS LEAGUE": "CAF Champions League",
+  "FA CUP": "FA Cup",
+  J1: "J1 League",
+  "HORSE RACING": "Horse Racing",
+  RSL: "Saudi Pro League"
+};
+function formatSportsBrowserPrototypeSidebarLeaguesDisplayLabel(rawLabel) {
+  const trimmed = rawLabel.trim();
+  if (!trimmed) return trimmed;
+  const override = SIDEBAR_LEAGUES_DISPLAY_LABEL_OVERRIDES[trimmed.toUpperCase()];
+  if (override) return override;
+  const ACRONYM = /* @__PURE__ */ new Set([
+    "AFL",
+    "AHL",
+    "AVP",
+    "CAF",
+    "CFL",
+    "DP",
+    "EFL",
+    "FA",
+    "FIFA",
+    "F1",
+    "F2",
+    "F3",
+    "IMSA",
+    "J1",
+    "KBO",
+    "KHL",
+    "LOVB",
+    "LPGA",
+    "MLB",
+    "MLS",
+    "NBA",
+    "NCAA",
+    "NCAAF",
+    "NFL",
+    "NHL",
+    "NASCAR",
+    "NWSL",
+    "PGA",
+    "PLL",
+    "UCL",
+    "UEL",
+    "UEFA",
+    "USL",
+    "WEC",
+    "WNBA",
+    "WTA",
+    "ATP",
+    "XFL"
+  ]);
+  return trimmed.split(/\s+/).map((word) => {
+    const upper = word.toUpperCase();
+    if (ACRONYM.has(upper)) return upper;
+    if (upper.startsWith("NCAA")) return upper;
+    if (upper === "LEAGUE" && trimmed.toUpperCase().includes("J1")) return "League";
+    if (upper.includes("'")) {
+      return word.split("'").map(
+        (part, index) => index === 0 ? part.charAt(0).toUpperCase() + part.slice(1).toLowerCase() : part.toLowerCase()
+      ).join("'");
+    }
+    return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+  }).join(" ");
+}
+function resolveSportsBrowserPrototypeSidebarLeaguesActiveDisplayLabel(leagueKey) {
+  const normalized = leagueKey.trim().toLowerCase();
+  const entry2 = SPORTS_BROWSER_PROTOTYPE_SIDEBAR_LEAGUES_ACTIVE_POPULATION.find(
+    (row) => String(row.key).toLowerCase() === normalized
+  );
+  if (!entry2) return void 0;
+  const keyOverride = SIDEBAR_LEAGUES_KEY_DISPLAY_OVERRIDES[String(entry2.key).toUpperCase()];
+  if (keyOverride) return keyOverride;
+  return formatSportsBrowserPrototypeSidebarLeaguesDisplayLabel(entry2.label);
+}
+
 // ../grarf/desktop/src/lib/gamesSpine/gamesSpineLeagueDisplayLabel.ts
 var GAMES_SPINE_LEAGUE_DISPLAY_LABEL = {
-  EPL: "EPL",
   NCAABB: "MCWS",
+  NCAAF: "NCAAF",
+  MNCAAB: "NCAA Men's Basketball",
+  WNCAAB: "NCAA Women's Basketball",
   NASCAR: "NASCAR Cup Series",
+  NASCAR_XFINITY: "NASCAR Xfinity Series",
+  NASCAR_TRUCK: "NASCAR Trucks",
+  PGA: "PGA Tour",
+  SAUDI: "Saudi Pro League",
   WOMENS_UCL: "Women's UCL",
   WORLDCUP: "World Cup",
   PLL: "PLL",
@@ -14993,10 +15204,28 @@ function resolveManualGamesSpineLeagueDisplayName(games) {
   }
   return null;
 }
+function resolveSlugStyleLeagueKeyDisplayLabel(leagueKey) {
+  const trimmed = leagueKey.trim();
+  if (!trimmed.includes("-")) return null;
+  return formatSportsBrowserPrototypeSidebarLeaguesDisplayLabel(trimmed.replace(/-/g, " "));
+}
 function resolveGamesSpineLeagueDisplayLabel(league2, games) {
   const manualName = resolveManualGamesSpineLeagueDisplayName(games);
   if (manualName) return manualName;
-  return GAMES_SPINE_LEAGUE_DISPLAY_LABEL[league2] ?? GAMES_COLUMN_LEAGUE_LABEL[league2] ?? resolveEspnOperationalLeagueLabel(league2) ?? league2;
+  const spineOverride = GAMES_SPINE_LEAGUE_DISPLAY_LABEL[league2];
+  if (spineOverride) return spineOverride;
+  const sidebarPopulationLabel = resolveSportsBrowserPrototypeSidebarLeaguesActiveDisplayLabel(league2);
+  if (sidebarPopulationLabel) return sidebarPopulationLabel;
+  const columnLabel = GAMES_COLUMN_LEAGUE_LABEL[league2];
+  if (columnLabel) return columnLabel;
+  const espnLabel = resolveEspnOperationalLeagueLabel(league2);
+  if (espnLabel && espnLabel !== league2) {
+    if (league2 === "NCAAF") return "NCAAF";
+    return espnLabel;
+  }
+  const slugLabel = resolveSlugStyleLeagueKeyDisplayLabel(league2);
+  if (slugLabel) return slugLabel;
+  return league2;
 }
 
 // ../grarf/desktop/src/lib/gamesSpine/manual/convertManualGamesSpineDocument.ts
@@ -32725,6 +32954,235 @@ async function enrichOperationalSnapshotTeamStandings(transport, options) {
   return { ...transport, leagues: nextLeagues };
 }
 
+// ../grarf/desktop/src/lib/nhl/enrichOperationalSnapshotNhlGamecenterUrls.ts
+init_define_import_meta_env();
+
+// ../grarf/shared/domain/nhl/enrichNhlGamesWithNhlComGamecenterLinks.ts
+init_define_import_meta_env();
+
+// ../grarf/shared/domain/nhl/normalizeNhlApiTeamAbbrev.ts
+init_define_import_meta_env();
+var NHL_OPERATIONAL_TO_API_ABBREV = {
+  SJ: "SJS",
+  TB: "TBL",
+  LA: "LAK",
+  NJ: "NJD",
+  WSH: "WSH",
+  UTAH: "UTA"
+};
+function normalizeNhlApiTeamAbbrev(abbrev) {
+  const upper = abbrev?.trim().toUpperCase() ?? "";
+  if (!upper) return "";
+  return NHL_OPERATIONAL_TO_API_ABBREV[upper] ?? upper;
+}
+
+// ../grarf/shared/domain/nhl/resolveNhlOperationalTeamAbbrev.ts
+init_define_import_meta_env();
+var NHL_DISPLAY_NAME_TO_ABBREV = {
+  "anaheim ducks": "ANA",
+  ducks: "ANA",
+  "boston bruins": "BOS",
+  bruins: "BOS",
+  "buffalo sabres": "BUF",
+  sabres: "BUF",
+  "calgary flames": "CGY",
+  flames: "CGY",
+  "carolina hurricanes": "CAR",
+  hurricanes: "CAR",
+  "chicago blackhawks": "CHI",
+  blackhawks: "CHI",
+  "colorado avalanche": "COL",
+  avalanche: "COL",
+  "columbus blue jackets": "CBJ",
+  "blue jackets": "CBJ",
+  "dallas stars": "DAL",
+  stars: "DAL",
+  "detroit red wings": "DET",
+  "red wings": "DET",
+  "edmonton oilers": "EDM",
+  oilers: "EDM",
+  "florida panthers": "FLA",
+  panthers: "FLA",
+  "los angeles kings": "LAK",
+  kings: "LAK",
+  "minnesota wild": "MIN",
+  wild: "MIN",
+  "montr\xE9al canadiens": "MTL",
+  "montreal canadiens": "MTL",
+  canadiens: "MTL",
+  "nashville predators": "NSH",
+  predators: "NSH",
+  "new jersey devils": "NJD",
+  devils: "NJD",
+  "new york islanders": "NYI",
+  islanders: "NYI",
+  "new york rangers": "NYR",
+  rangers: "NYR",
+  "ottawa senators": "OTT",
+  senators: "OTT",
+  "philadelphia flyers": "PHI",
+  flyers: "PHI",
+  "pittsburgh penguins": "PIT",
+  penguins: "PIT",
+  "san jose sharks": "SJS",
+  sharks: "SJS",
+  "seattle kraken": "SEA",
+  kraken: "SEA",
+  "st. louis blues": "STL",
+  "st louis blues": "STL",
+  blues: "STL",
+  "tampa bay lightning": "TBL",
+  lightning: "TBL",
+  "toronto maple leafs": "TOR",
+  "maple leafs": "TOR",
+  "utah mammoth": "UTA",
+  mammoth: "UTA",
+  utah: "UTA",
+  "vancouver canucks": "VAN",
+  canucks: "VAN",
+  "vegas golden knights": "VGK",
+  "golden knights": "VGK",
+  "washington capitals": "WSH",
+  capitals: "WSH",
+  "winnipeg jets": "WPG",
+  jets: "WPG"
+};
+function normalizeDisplayName(value) {
+  return value?.trim().replace(/\s+/g, " ").toLowerCase() ?? "";
+}
+function resolveNhlOperationalTeamAbbrevFromLabel(label) {
+  const key = normalizeDisplayName(label);
+  if (!key) return "";
+  return NHL_DISPLAY_NAME_TO_ABBREV[key] ?? "";
+}
+function resolveNhlOperationalTeamAbbrevFromGame(game, side) {
+  const fromAbbrev = normalizeNhlApiTeamAbbrev(
+    side === "away" ? game.awayTeamAbbrev : game.homeTeamAbbrev
+  );
+  if (fromAbbrev) return fromAbbrev;
+  const fromName = side === "away" ? game.awayTeam : game.homeTeam;
+  return normalizeNhlApiTeamAbbrev(resolveNhlOperationalTeamAbbrevFromLabel(fromName));
+}
+
+// ../grarf/shared/domain/nhl/enrichNhlGamesWithNhlComGamecenterLinks.ts
+function isNhlOperationalGame(game) {
+  return game.league === "NHL" || game.id.startsWith("espn-NHL-");
+}
+function normalizeAbbrev2(value) {
+  return value?.trim().toUpperCase() ?? "";
+}
+function resolveOperationalGameDateKey(game) {
+  const fromField = game.scheduledDateKey?.trim();
+  if (fromField && /^\d{4}-\d{2}-\d{2}$/.test(fromField)) return fromField;
+  if (typeof game.startTimeMs === "number" && Number.isFinite(game.startTimeMs)) {
+    return new Date(game.startTimeMs).toISOString().slice(0, 10);
+  }
+  return null;
+}
+function matchNhlApiGameToOperationalGame(game, candidate) {
+  const away = normalizeAbbrev2(resolveNhlOperationalTeamAbbrevFromGame(game, "away"));
+  const home = normalizeAbbrev2(resolveNhlOperationalTeamAbbrevFromGame(game, "home"));
+  const apiAway = normalizeAbbrev2(normalizeNhlApiTeamAbbrev(candidate.awayTeam?.abbrev));
+  const apiHome = normalizeAbbrev2(normalizeNhlApiTeamAbbrev(candidate.homeTeam?.abbrev));
+  if (!away || !home || !apiAway || !apiHome) return false;
+  const apiAwayFromName = normalizeAbbrev2(
+    resolveNhlOperationalTeamAbbrevFromLabel(candidate.awayTeam?.name?.default)
+  );
+  const apiHomeFromName = normalizeAbbrev2(
+    resolveNhlOperationalTeamAbbrevFromLabel(candidate.homeTeam?.name?.default)
+  );
+  const awayMatches = away === apiAway || apiAwayFromName.length > 0 && away === apiAwayFromName;
+  const homeMatches = home === apiHome || apiHomeFromName.length > 0 && home === apiHomeFromName;
+  return awayMatches && homeMatches;
+}
+function buildNhlComGamecenterUrl(gameCenterLink) {
+  const trimmed = gameCenterLink.trim();
+  if (!trimmed) return "";
+  if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) return trimmed;
+  return `https://www.nhl.com${trimmed.startsWith("/") ? trimmed : `/${trimmed}`}`;
+}
+async function fetchNhlApiScoreboardGamesForDate(dateKey, fetchImpl = fetch) {
+  const res = await fetchImpl(`https://api-web.nhle.com/v1/score/${dateKey}`);
+  if (!res.ok) {
+    throw new Error(`NHL scoreboard fetch failed: ${res.status} (${dateKey})`);
+  }
+  const payload = await res.json();
+  return Array.isArray(payload.games) ? payload.games : [];
+}
+async function enrichNhlGamesWithNhlComGamecenterLinks(games, options) {
+  const fetchImpl = options?.fetchImpl ?? fetch;
+  const nhlGames = games.filter(isNhlOperationalGame);
+  if (nhlGames.length === 0) return [...games];
+  const dateKeys = [
+    ...new Set(
+      nhlGames.map(resolveOperationalGameDateKey).filter((value) => Boolean(value))
+    )
+  ];
+  const scoreboardByDate = /* @__PURE__ */ new Map();
+  for (const dateKey of dateKeys) {
+    if (options?.scoreboardGamesByDate?.[dateKey]) {
+      scoreboardByDate.set(dateKey, [...options.scoreboardGamesByDate[dateKey]]);
+      continue;
+    }
+    try {
+      scoreboardByDate.set(dateKey, await fetchNhlApiScoreboardGamesForDate(dateKey, fetchImpl));
+    } catch {
+      scoreboardByDate.set(dateKey, []);
+    }
+  }
+  const enrichedById = /* @__PURE__ */ new Map();
+  for (const game of nhlGames) {
+    if (game.metadata?.nhlGameCenterUrl?.trim()) continue;
+    const dateKey = resolveOperationalGameDateKey(game);
+    if (!dateKey) continue;
+    const apiGames = scoreboardByDate.get(dateKey) ?? [];
+    const match = apiGames.find((candidate) => matchNhlApiGameToOperationalGame(game, candidate));
+    const link = match?.gameCenterLink?.trim();
+    if (!link) continue;
+    const nhlGameCenterUrl = buildNhlComGamecenterUrl(link);
+    if (!nhlGameCenterUrl) continue;
+    enrichedById.set(game.id, {
+      ...game,
+      metadata: {
+        ...game.metadata,
+        nhlGameCenterUrl
+      }
+    });
+  }
+  if (enrichedById.size === 0) return [...games];
+  return games.map((game) => enrichedById.get(game.id) ?? game);
+}
+
+// ../grarf/desktop/src/lib/nhl/enrichOperationalSnapshotNhlGamecenterUrls.ts
+function isNhlRow(row) {
+  return row.league === "NHL" || row.id.startsWith("espn-NHL-");
+}
+function nhlRowsNeedGamecenterEnrich(rows) {
+  return rows.some((row) => isNhlRow(row) && !row.metadata?.nhlGameCenterUrl?.trim());
+}
+async function enrichOperationalSnapshotNhlGamecenterUrls(transport) {
+  const rows = transport.leagues.NHL;
+  if (!Array.isArray(rows) || rows.length === 0 || !nhlRowsNeedGamecenterEnrich(rows)) {
+    return transport;
+  }
+  let enriched;
+  try {
+    enriched = await enrichNhlGamesWithNhlComGamecenterLinks(rows);
+  } catch {
+    return transport;
+  }
+  if (!enriched.some((row, index) => row !== rows[index])) {
+    return transport;
+  }
+  return {
+    ...transport,
+    leagues: {
+      ...transport.leagues,
+      NHL: enriched
+    }
+  };
+}
+
 // ../grarf/desktop/src/services/operationalIngest/supplementOperationalSnapshotFromLocalIpc.ts
 init_define_import_meta_env();
 function cloudRowMissingMlbPk(row) {
@@ -32993,6 +33451,11 @@ async function enrichOperationalTransport(rawTransport) {
     console.warn(`${LOG19} NFL X Gametime chat supplement failed`, e);
   }
   if (rawTransport.source === "grarf_operational_service") {
+    try {
+      transport = await enrichOperationalSnapshotNhlGamecenterUrls(transport);
+    } catch (e) {
+      console.warn(`${LOG19} NHL gamecenter URL supplement failed`, e);
+    }
     return transport;
   }
   try {
