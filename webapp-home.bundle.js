@@ -171198,6 +171198,196 @@ function resolveGrarfExtensionAiSearchEntityExploreAction(entity, kind, scope) {
   return withEntityScope(base, entity);
 }
 
+// ../grarf/desktop/src/extensionHost/grarfExtensionAiSearchEntityCapabilities.ts
+init_define_import_meta_env();
+var SOCCER_FANTASY_EXPLORE_LEAGUES = new Set(
+  [
+    "EPL",
+    "LALIGA",
+    "BUNDESLIGA",
+    "SERIEA",
+    "LIGUE1",
+    "MLS",
+    "UCL",
+    "UEL",
+    "UWCL",
+    "WOMENS_UCL",
+    "FA_CUP",
+    "EFL_CUP",
+    "COPPAITALIA",
+    "DFB_POKAL",
+    "COUPE_DE_FRANCE",
+    "LIGUE1"
+  ].map((key2) => key2.toUpperCase())
+);
+var EXPLICIT_FANTASY_EXPLORE_LEAGUES = new Set(
+  [
+    "MLB",
+    "NFL",
+    "NBA",
+    "NHL",
+    "WNBA",
+    "NCAAF",
+    "MNCAAB",
+    "PGA",
+    "PGATOUR",
+    "KORNFERRY",
+    "LIV",
+    "DP_WORLD",
+    "ATP",
+    "WTA",
+    "UFC",
+    "F1",
+    "NASCAR"
+  ].map((key2) => key2.toUpperCase())
+);
+function normalizeLeagueKey4(leagueKey) {
+  return leagueKey?.trim().toUpperCase() ?? "";
+}
+function isLiveGame(game) {
+  return game.status === "live" || isGameActivelyLive(game);
+}
+function filterGamesForLeague(games, leagueKey) {
+  const normalized = normalizeLeagueKey4(leagueKey);
+  return games.filter((game) => normalizeLeagueKey4(game.league) === normalized);
+}
+function filterGamesForEntity(games, entity) {
+  if (entity.kind === "game") {
+    return games.filter((game) => game.id === entity.gameId);
+  }
+  if (entity.kind === "team") {
+    return filterOperationalGamesForSportsBrowserPrototypeLeaguesTabTeam(
+      games,
+      entity.teamSelectInput
+    );
+  }
+  return filterGamesForLeague(games, entity.leagueKey);
+}
+function listIncludesGameId(games, gameId) {
+  return games.some((game) => game.id === gameId);
+}
+function buildCatchUpAvailability(input) {
+  const yesterdayKinds = [];
+  if (input.yesterdayGames.length > 0) {
+    yesterdayKinds.push("recaps", "highlights", "scores");
+  }
+  const todayKinds = [];
+  if (input.catchUpTodayGames.length > 0) {
+    todayKinds.push("recaps", "scores");
+  }
+  if (input.catchUpTodayGames.length > 0 || input.liveGames.length > 0) {
+    todayKinds.push("highlights");
+  }
+  return {
+    yesterday: yesterdayKinds,
+    today: todayKinds
+  };
+}
+function leagueSupportsFantasyExplore(leagueKey) {
+  const normalized = normalizeLeagueKey4(leagueKey);
+  if (!normalized) return false;
+  if (EXPLICIT_FANTASY_EXPLORE_LEAGUES.has(normalized)) return true;
+  if (SOCCER_FANTASY_EXPLORE_LEAGUES.has(normalized)) return true;
+  if (isGolfLeagueKey(normalized)) return true;
+  const sport = resolveSportKeyForLeague(normalized);
+  return sport === "tennis" || sport === "mma" || sport === "motorsports";
+}
+function leagueSupportsBettingExplore(leagueKey) {
+  const normalized = normalizeLeagueKey4(leagueKey);
+  if (!normalized) return false;
+  const sport = resolveSportKeyForLeague(normalized);
+  if (!sport) return false;
+  return sport !== "golf" && sport !== "tennis";
+}
+function resolveExploreContentKindsForLeague(leagueKey, todayAnyGames) {
+  const normalized = normalizeLeagueKey4(leagueKey);
+  if (!normalized) return [];
+  const kinds = [];
+  if (resolveGrarfExtensionNewsWebsitesForLeagueKey(normalized).length > 0) {
+    kinds.push("news");
+  }
+  if (resolveLeagueSocialRailFeedResolution(normalized)) {
+    kinds.push("social");
+  }
+  const pane = {
+    ...createDefaultSportsBrowserPrototypePaneState(),
+    leagueKey: normalized,
+    leagueContextSection: "highlights",
+    showWebsiteTabs: true
+  };
+  if (todayAnyGames.length > 0 || resolveSportsBrowserPrototypeLeagueYoutubeWebsite(normalized) || resolveSportsBrowserPrototypeLeagueContextSectionWebsites(pane, "highlights").length > 0) {
+    kinds.push("highlights");
+  }
+  if (leagueSupportsFantasyExplore(normalized)) {
+    kinds.push("fantasy");
+  }
+  if (leagueSupportsBettingExplore(normalized)) {
+    kinds.push("betting");
+  }
+  return kinds;
+}
+function resolveExploreContentKindsForTeam(teamSelectInput, todayAnyGames) {
+  return resolveExploreContentKindsForLeague(teamSelectInput.leagueKey, todayAnyGames);
+}
+function resolveGrarfExtensionAiSearchEntitySuggestionAvailability(entity, temporal) {
+  const live = filterGamesForEntity(temporal.liveGames, entity);
+  const upcomingToday = filterGamesForEntity(temporal.upcomingTodayGames, entity);
+  const catchUpToday = filterGamesForEntity(temporal.catchUpTodayGames, entity);
+  const yesterday = filterGamesForEntity(temporal.yesterdayGames, entity);
+  const todayAny = [...live, ...upcomingToday, ...catchUpToday];
+  const catchUpContentOptionsByDay = buildCatchUpAvailability({
+    yesterdayGames: yesterday,
+    catchUpTodayGames: catchUpToday,
+    liveGames: live
+  });
+  const catchUpDayOptions = ["yesterday", "today"].filter((day) => catchUpContentOptionsByDay[day].length > 0);
+  const focusLeagueKey = resolveGrarfExtensionAiSearchEntityFocusLeagueKey(entity) ?? "";
+  let exploreContentKinds = [];
+  if (entity.kind === "team") {
+    exploreContentKinds = resolveExploreContentKindsForTeam(entity.teamSelectInput, todayAny);
+  } else if (entity.kind === "league") {
+    exploreContentKinds = resolveExploreContentKindsForLeague(entity.leagueKey, todayAny);
+  } else {
+    exploreContentKinds = focusLeagueKey ? resolveExploreContentKindsForLeague(focusLeagueKey, todayAny) : [];
+  }
+  if (entity.kind === "game") {
+    const gameUpcoming = upcomingToday.length > 0 && listIncludesGameId(upcomingToday, entity.gameId);
+    const gameYesterday = yesterday.length > 0 && listIncludesGameId(yesterday, entity.gameId);
+    const gameCatchUpToday = catchUpToday.length > 0 && listIncludesGameId(catchUpToday, entity.gameId);
+    const gameLive = live.length > 0 && listIncludesGameId(live, entity.gameId);
+    const gameCatchUpByDay = {
+      yesterday: gameYesterday ? ["recaps", "highlights", "scores"] : [],
+      today: [
+        ...gameCatchUpToday ? ["recaps", "scores"] : [],
+        ...gameCatchUpToday || gameLive ? ["highlights"] : []
+      ]
+    };
+    const gameCatchUpDays = ["yesterday", "today"].filter(
+      (day) => gameCatchUpByDay[day].length > 0
+    );
+    return {
+      showWatch: gameLive,
+      showPrepare: gameUpcoming,
+      showCatchUp: gameCatchUpDays.length > 0,
+      showFollow: true,
+      showExplore: exploreContentKinds.length > 0,
+      catchUpDayOptions: gameCatchUpDays,
+      catchUpContentOptionsByDay: gameCatchUpByDay,
+      exploreContentKinds
+    };
+  }
+  return {
+    showWatch: live.some(isLiveGame),
+    showPrepare: upcomingToday.length > 0,
+    showCatchUp: catchUpDayOptions.length > 0,
+    showFollow: false,
+    showExplore: exploreContentKinds.length > 0,
+    catchUpDayOptions,
+    catchUpContentOptionsByDay,
+    exploreContentKinds
+  };
+}
+
 // ../grarf/desktop/src/extensionHost/GrarfExtensionAiSearchHomeSection.tsx
 var import_jsx_runtime282 = __toESM(require_jsx_runtime(), 1);
 var CATCH_UP_DAY_OPTIONS = [
@@ -171290,6 +171480,7 @@ function GrarfExtensionAiSearchHomeSection({
   leagueOptions,
   selectedLeagueKey = null,
   hasUpcomingGames = false,
+  temporalGameContext,
   onExecuteAction
 }) {
   const [searchQuery, setSearchQuery] = (0, import_react291.useState)("");
@@ -171307,6 +171498,49 @@ function GrarfExtensionAiSearchHomeSection({
     [games, leagueOptions, searchQuery, selectedEntity]
   );
   const entitySubject = selectedEntity ? resolveGrarfExtensionAiSearchEntitySubjectLabel(selectedEntity) : null;
+  const entitySuggestionAvailability = (0, import_react291.useMemo)(() => {
+    if (!selectedEntity) return null;
+    return resolveGrarfExtensionAiSearchEntitySuggestionAvailability(
+      selectedEntity,
+      temporalGameContext
+    );
+  }, [selectedEntity, temporalGameContext]);
+  const showWatch = !selectedEntity || entitySuggestionAvailability?.showWatch;
+  const showCatchUp = !selectedEntity || entitySuggestionAvailability?.showCatchUp;
+  const showPrepare = !selectedEntity || entitySuggestionAvailability?.showPrepare;
+  const showFollow = !selectedEntity || entitySuggestionAvailability?.showFollow;
+  const showExplore = !selectedEntity || entitySuggestionAvailability?.showExplore;
+  const catchUpDayOptionsForUi = (0, import_react291.useMemo)(() => {
+    if (!selectedEntity || !entitySuggestionAvailability) return CATCH_UP_DAY_OPTIONS;
+    return CATCH_UP_DAY_OPTIONS.filter(
+      (option) => entitySuggestionAvailability.catchUpDayOptions.includes(option.day)
+    );
+  }, [entitySuggestionAvailability, selectedEntity]);
+  const catchUpContentOptionsForUi = (0, import_react291.useMemo)(() => {
+    if (!selectedEntity || !entitySuggestionAvailability) return CATCH_UP_CONTENT_OPTIONS;
+    return entitySuggestionAvailability.catchUpContentOptionsByDay[catchUpDay] ?? [];
+  }, [catchUpDay, entitySuggestionAvailability, selectedEntity]);
+  const exploreContentOptionsForUi = (0, import_react291.useMemo)(() => {
+    if (!selectedEntity || !entitySuggestionAvailability) return EXPLORE_CONTENT_OPTIONS;
+    return entitySuggestionAvailability.exploreContentKinds;
+  }, [entitySuggestionAvailability, selectedEntity]);
+  (0, import_react291.useEffect)(() => {
+    if (!selectedEntity || !entitySuggestionAvailability) return;
+    if (!entitySuggestionAvailability.catchUpDayOptions.includes(catchUpDay)) {
+      const nextDay = entitySuggestionAvailability.catchUpDayOptions[0];
+      if (nextDay) setCatchUpDay(nextDay);
+    }
+    const kinds = entitySuggestionAvailability.catchUpContentOptionsByDay[catchUpDay] ?? [];
+    if (kinds.length > 0 && !kinds.includes(catchUpContentKind)) {
+      setCatchUpContentKind(kinds[0]);
+    }
+  }, [catchUpContentKind, catchUpDay, entitySuggestionAvailability, selectedEntity]);
+  (0, import_react291.useEffect)(() => {
+    if (!selectedEntity || !entitySuggestionAvailability) return;
+    if (entitySuggestionAvailability.exploreContentKinds.length > 0 && !entitySuggestionAvailability.exploreContentKinds.includes(exploreContentKind)) {
+      setExploreContentKind(entitySuggestionAvailability.exploreContentKinds[0]);
+    }
+  }, [entitySuggestionAvailability, exploreContentKind, selectedEntity]);
   const catchUpDayLabel = CATCH_UP_DAY_OPTIONS.find((option) => option.day === catchUpDay)?.label ?? "today's";
   const effectiveExploreScope = resolveGrarfExtensionAiSearchEntityExploreScope(selectedEntity);
   const displayedExploreScope = selectedEntity ? effectiveExploreScope : exploreScope;
@@ -171443,7 +171677,7 @@ function GrarfExtensionAiSearchHomeSection({
           }
         ) : null,
         /* @__PURE__ */ (0, import_jsx_runtime282.jsxs)("ul", { className: "grarf-extension-ai-search-home__suggestions", "aria-label": "Suggested searches", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime282.jsx)(
+          showWatch ? /* @__PURE__ */ (0, import_jsx_runtime282.jsx)(
             SuggestionSection,
             {
               icon: CirclePlay,
@@ -171453,8 +171687,8 @@ function GrarfExtensionAiSearchHomeSection({
               ),
               children: selectedEntity?.kind === "game" ? `Watch ${entitySubject} live` : selectedEntity ? `See all ${entitySubject} games live now` : "See all games live now"
             }
-          ),
-          /* @__PURE__ */ (0, import_jsx_runtime282.jsx)(
+          ) : null,
+          showCatchUp && catchUpContentOptionsForUi.length > 0 ? /* @__PURE__ */ (0, import_jsx_runtime282.jsx)(
             SuggestionSection,
             {
               icon: RotateCcw,
@@ -171467,9 +171701,9 @@ function GrarfExtensionAiSearchHomeSection({
                   InlineSelector,
                   {
                     value: catchUpDayLabel,
-                    options: CATCH_UP_DAY_OPTIONS.map((option) => option.label),
+                    options: catchUpDayOptionsForUi.map((option) => option.label),
                     onSelect: (next) => {
-                      const match = CATCH_UP_DAY_OPTIONS.find((option) => option.label === next);
+                      const match = catchUpDayOptionsForUi.find((option) => option.label === next);
                       if (match) setCatchUpDay(match.day);
                     },
                     ariaLabel: "Catch up day"
@@ -171480,7 +171714,7 @@ function GrarfExtensionAiSearchHomeSection({
                   InlineSelector,
                   {
                     value: catchUpContentKind,
-                    options: CATCH_UP_CONTENT_OPTIONS,
+                    options: catchUpContentOptionsForUi,
                     onSelect: (next) => setCatchUpContentKind(next),
                     ariaLabel: "Catch up content type"
                   }
@@ -171491,8 +171725,8 @@ function GrarfExtensionAiSearchHomeSection({
                 ] }) : null
               ] })
             }
-          ),
-          /* @__PURE__ */ (0, import_jsx_runtime282.jsx)(
+          ) : null,
+          showPrepare ? /* @__PURE__ */ (0, import_jsx_runtime282.jsx)(
             SuggestionSection,
             {
               icon: Calendar,
@@ -171503,10 +171737,14 @@ function GrarfExtensionAiSearchHomeSection({
               children: selectedEntity?.kind === "game" ? /* @__PURE__ */ (0, import_jsx_runtime282.jsxs)(import_jsx_runtime282.Fragment, { children: [
                 "Get preview for ",
                 entitySubject
+              ] }) : selectedEntity ? /* @__PURE__ */ (0, import_jsx_runtime282.jsxs)(import_jsx_runtime282.Fragment, { children: [
+                "Preview ",
+                entitySubject,
+                " upcoming games today"
               ] }) : /* @__PURE__ */ (0, import_jsx_runtime282.jsx)(import_jsx_runtime282.Fragment, { children: "Preview all upcoming games today" })
             }
-          ),
-          /* @__PURE__ */ (0, import_jsx_runtime282.jsx)(
+          ) : null,
+          showFollow ? /* @__PURE__ */ (0, import_jsx_runtime282.jsx)(
             SuggestionSection,
             {
               icon: Activity,
@@ -171516,8 +171754,8 @@ function GrarfExtensionAiSearchHomeSection({
               ),
               children: selectedEntity ? `Track ${entitySubject} in real time` : "Track everything in real time"
             }
-          ),
-          /* @__PURE__ */ (0, import_jsx_runtime282.jsx)(
+          ) : null,
+          showExplore && exploreContentOptionsForUi.length > 0 ? /* @__PURE__ */ (0, import_jsx_runtime282.jsx)(
             SuggestionSection,
             {
               icon: Compass,
@@ -171530,7 +171768,7 @@ function GrarfExtensionAiSearchHomeSection({
                   InlineSelector,
                   {
                     value: exploreContentKind,
-                    options: EXPLORE_CONTENT_OPTIONS,
+                    options: exploreContentOptionsForUi,
                     onSelect: (next) => setExploreContentKind(next),
                     ariaLabel: "Explore content type"
                   }
@@ -171557,7 +171795,7 @@ function GrarfExtensionAiSearchHomeSection({
                 ] })
               ] })
             }
-          )
+          ) : null
         ] })
       ]
     }
@@ -171860,6 +172098,32 @@ function buildGrarfExtensionAiSearchLeagueOptions() {
 }
 function buildGrarfExtensionAiSearchLeagueLabels() {
   return SPORTS_BROWSER_PROTOTYPE_SIDEBAR_LEAGUES_ACTIVE_POPULATION.map((entry3) => entry3.label);
+}
+function buildGrarfExtensionAiSearchTemporalGameContext(input) {
+  const liveGames = [];
+  const upcomingTodayGames = [];
+  const catchUpTodayGames = [];
+  const yesterdayGames = [];
+  for (const game of collectSlateGames(input.nowLeagues)) {
+    if (isLiveGameSearchEligible(game)) liveGames.push(game);
+  }
+  for (const game of collectSlateGames(input.upcomingLeagues)) {
+    if (resolveSportsBrowserPrototypeSidebarGameVariant(game) === "upcoming") {
+      upcomingTodayGames.push(game);
+    }
+  }
+  for (const game of collectSlateGames(input.catchUpLeagues)) {
+    if (isFinalGameSearchEligible(game)) catchUpTodayGames.push(game);
+  }
+  for (const game of collectSlateGames(input.yesterdayLeagues)) {
+    if (isFinalGameSearchEligible(game)) yesterdayGames.push(game);
+  }
+  return {
+    liveGames: dedupeSportsBrowserPrototypeNewsSidebarGames(liveGames),
+    upcomingTodayGames: dedupeSportsBrowserPrototypeNewsSidebarGames(upcomingTodayGames),
+    catchUpTodayGames: dedupeSportsBrowserPrototypeNewsSidebarGames(catchUpTodayGames),
+    yesterdayGames: dedupeSportsBrowserPrototypeNewsSidebarGames(yesterdayGames)
+  };
 }
 
 // ../grarf/desktop/src/extensionHost/grarfExtensionGamesYesterdayBoxingHighlights.ts
@@ -175707,6 +175971,15 @@ function SportsBrowserPrototypeLeftNav({
     }),
     [catchUpLeagues, nowLeagues, upcomingLeagues, yesterdayLeagues]
   );
+  const aiSearchTemporalGameContext = (0, import_react295.useMemo)(
+    () => buildGrarfExtensionAiSearchTemporalGameContext({
+      nowLeagues,
+      upcomingLeagues,
+      catchUpLeagues,
+      yesterdayLeagues
+    }),
+    [catchUpLeagues, nowLeagues, upcomingLeagues, yesterdayLeagues]
+  );
   const aiSearchLeagueLabels = (0, import_react295.useMemo)(() => buildGrarfExtensionAiSearchLeagueLabels(), []);
   const aiSearchLeagueOptions = (0, import_react295.useMemo)(() => buildGrarfExtensionAiSearchLeagueOptions(), []);
   const aiSearchHasUpcomingGames = (0, import_react295.useMemo)(
@@ -175933,6 +176206,7 @@ function SportsBrowserPrototypeLeftNav({
                               leagueOptions: aiSearchLeagueOptions,
                               selectedLeagueKey,
                               hasUpcomingGames: aiSearchHasUpcomingGames,
+                              temporalGameContext: aiSearchTemporalGameContext,
                               onExecuteAction: executeGrarfExtensionAiSearchAction,
                               onHistoryClick: scrollExtensionSidebarToTemporalNav
                             }
@@ -176209,6 +176483,7 @@ function SportsBrowserPrototypeLeftNav({
                             leagueOptions: aiSearchLeagueOptions,
                             selectedLeagueKey,
                             hasUpcomingGames: aiSearchHasUpcomingGames,
+                            temporalGameContext: aiSearchTemporalGameContext,
                             onExecuteAction: executeGrarfExtensionAiSearchAction,
                             onHistoryClick: scrollExtensionSidebarToTemporalNav
                           }
