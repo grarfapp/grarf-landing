@@ -155543,6 +155543,142 @@ function subscribeGrarfExtensionNhlRecapsSource(listener) {
   return () => listeners4.delete(listener);
 }
 
+// ../grarf/desktop/src/extensionHost/grarfExtensionGameTeamNamesSearchFallbackUrls.ts
+init_define_import_meta_env();
+
+// ../grarf/desktop/src/extensionHost/grarfExtensionNwslYoutubeHighlightMatching.ts
+init_define_import_meta_env();
+var NWSL_YOUTUBE_TEAM_ALIAS_GROUPS = [
+  ["houston dash", "houston"],
+  ["utah royals fc", "utah royals", "utah"],
+  ["denver summit fc", "denver summit", "denver"],
+  ["bay fc", "bay"],
+  ["angel city fc", "angel city"],
+  ["seattle reign fc", "seattle reign", "seattle"],
+  ["san diego wave fc", "san diego wave", "san diego"],
+  ["kansas city current", "kansas city"],
+  ["portland thorns fc", "portland thorns", "portland"],
+  ["orlando pride", "orlando"],
+  ["gotham fc", "gotham"],
+  ["north carolina courage", "nc courage", "north carolina"],
+  ["chicago stars fc", "chicago stars", "chicago"],
+  ["washington spirit", "washington"],
+  ["racing louisville fc", "racing louisville", "louisville"],
+  ["boston legacy fc", "boston legacy", "boston"]
+];
+var NWSL_FULL_HIGHLIGHTS_PREFIX_RE = /^FULL HIGHLIGHTS\s*[|:]\s*/i;
+function parseNwslFullHighlightsMatchupTitle(title) {
+  const trimmed = title.trim();
+  if (!NWSL_FULL_HIGHLIGHTS_PREFIX_RE.test(trimmed)) {
+    return null;
+  }
+  const matchup = trimmed.replace(NWSL_FULL_HIGHLIGHTS_PREFIX_RE, "").trim();
+  const vsSplit = matchup.split(/\s+vs\.?\s+/i);
+  if (vsSplit.length !== 2) {
+    return null;
+  }
+  const left = vsSplit[0]?.trim() ?? "";
+  const right = vsSplit[1]?.trim() ?? "";
+  if (!left || !right) {
+    return null;
+  }
+  return { left, right };
+}
+function resolveNwslYoutubeTeamKey(rawTeamName) {
+  const normalized = normalizeTeamToken(rawTeamName);
+  if (!normalized) return null;
+  let best = null;
+  for (const group of NWSL_YOUTUBE_TEAM_ALIAS_GROUPS) {
+    const canonicalKey = normalizeTeamToken(group[0] ?? "");
+    if (!canonicalKey) continue;
+    for (const alias of group) {
+      const aliasKey = normalizeTeamToken(alias);
+      if (aliasKey.length < 3) continue;
+      const matches = normalized === aliasKey || normalized.length >= aliasKey.length && normalized.includes(aliasKey) || aliasKey.length >= normalized.length && aliasKey.includes(normalized);
+      if (!matches) continue;
+      if (!best || aliasKey.length > best.aliasLength) {
+        best = { key: canonicalKey, aliasLength: aliasKey.length };
+      }
+    }
+  }
+  return best?.key ?? null;
+}
+function formatNwslCanonicalClubNameForGoogleRecapsSearch(canonicalKey) {
+  const withoutFc = canonicalKey.replace(/\s+fc$/i, "").trim();
+  return withoutFc.split(/\s+/).filter(Boolean).map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(" ");
+}
+function resolveNwslGoogleRecapsTeamSearchLabel(game, side) {
+  const key2 = resolveNwslGameTeamKey(game, side);
+  if (!key2) return null;
+  return formatNwslCanonicalClubNameForGoogleRecapsSearch(key2);
+}
+function resolveNwslGameTeamKey(game, side) {
+  const team = side === "away" ? game.awayTeam : game.homeTeam;
+  const city = side === "away" ? game.awayCity : game.homeCity;
+  const official = side === "away" ? game.officialAwayName : game.officialHomeName;
+  for (const raw of [team, official, city]) {
+    const key2 = resolveNwslYoutubeTeamKey(String(raw ?? ""));
+    if (key2) return key2;
+  }
+  return null;
+}
+function nwslMatchupSidesMatchGame(left, right, game) {
+  const awayKey = resolveNwslGameTeamKey(game, "away");
+  const homeKey = resolveNwslGameTeamKey(game, "home");
+  const leftKey = resolveNwslYoutubeTeamKey(left);
+  const rightKey = resolveNwslYoutubeTeamKey(right);
+  if (!awayKey || !homeKey || !leftKey || !rightKey) {
+    return false;
+  }
+  return leftKey === awayKey && rightKey === homeKey || leftKey === homeKey && rightKey === awayKey;
+}
+function nwslFullHighlightsTitleMatchesGame(title, game) {
+  const parsed = parseNwslFullHighlightsMatchupTitle(title);
+  if (!parsed) {
+    return false;
+  }
+  if (!/\bhighlights?\b/i.test(title)) {
+    return false;
+  }
+  return nwslMatchupSidesMatchGame(parsed.left, parsed.right, game);
+}
+
+// ../grarf/desktop/src/extensionHost/grarfExtensionGameTeamNamesSearchFallbackUrls.ts
+var YOUTUBE_HIGHLIGHTS_SEARCH_QUERY_SUFFIX_BY_LEAGUE = {
+  NFL: "Highlights",
+  INTFRIENDLY: "highlights"
+};
+function resolveGrarfExtensionTeamNamesSearchLabel(game, side) {
+  const leagueKey = game.league?.trim().toUpperCase() ?? "";
+  if (leagueKey === "NWSL") {
+    return resolveNwslGoogleRecapsTeamSearchLabel(game, side)?.trim() ?? "";
+  }
+  return (side === "away" ? game.awayTeam : game.homeTeam)?.trim() ?? "";
+}
+function buildGrarfExtensionGameTeamNamesGoogleSearchUrl(game) {
+  const [leftSide, rightSide] = resolveGamesSpineMatchupSideOrder(game);
+  const leftTeam = resolveGrarfExtensionTeamNamesSearchLabel(game, leftSide);
+  const rightTeam = resolveGrarfExtensionTeamNamesSearchLabel(game, rightSide);
+  if (!leftTeam || !rightTeam) {
+    return null;
+  }
+  const query = `${leftTeam} ${rightTeam}`.toLowerCase();
+  const searchQuery = encodeURIComponent(query).replace(/%20/g, "+");
+  return `https://www.google.com/search?q=${searchQuery}`;
+}
+function buildGrarfExtensionGameTeamNamesYoutubeHighlightsSearchUrl(game) {
+  const awayTeam = game.awayTeam?.trim() ?? "";
+  const homeTeam = game.homeTeam?.trim() ?? "";
+  if (!awayTeam || !homeTeam) {
+    return null;
+  }
+  const leagueKey = game.league?.trim().toUpperCase() ?? "";
+  const suffix = YOUTUBE_HIGHLIGHTS_SEARCH_QUERY_SUFFIX_BY_LEAGUE[leagueKey] ?? "highlights";
+  const query = `${awayTeam} ${homeTeam} ${suffix}`;
+  const searchQuery = encodeURIComponent(query).replace(/%20/g, "+");
+  return `https://www.youtube.com/results?search_query=${searchQuery}`;
+}
+
 // ../grarf/desktop/src/extensionHost/grarfExtensionCommandCenterScorecardExternalActions.ts
 function firstResolvedWebsiteUrl(websites) {
   for (const website4 of websites) {
@@ -155563,7 +155699,7 @@ function resolveGrarfExtensionCommandCenterScorecardPreviewUrl(game) {
     context2,
     "preview"
   );
-  return firstResolvedWebsiteUrl(websites);
+  return firstResolvedWebsiteUrl(websites) ?? buildGrarfExtensionGameTeamNamesGoogleSearchUrl(game);
 }
 function resolveGrarfExtensionCommandCenterScorecardRecapUrl(game) {
   const context2 = resolveGameBrowserContext(game);
@@ -155575,9 +155711,13 @@ function resolveGrarfExtensionCommandCenterScorecardRecapUrl(game) {
   const fromContentSources = firstResolvedWebsiteUrl(websites);
   if (fromContentSources) return fromContentSources;
   if (game.league === "NHL" || game.id.startsWith("espn-NHL-")) {
-    return resolveGrarfExtensionNhlRecapNavigationUrl(game, getGrarfExtensionNhlRecapsSource());
+    const nhlRecapUrl = resolveGrarfExtensionNhlRecapNavigationUrl(
+      game,
+      getGrarfExtensionNhlRecapsSource()
+    );
+    if (nhlRecapUrl) return nhlRecapUrl;
   }
-  return null;
+  return buildGrarfExtensionGameTeamNamesGoogleSearchUrl(game);
 }
 function resolveGrarfExtensionCommandCenterScorecardMediaAction(game) {
   const state3 = resolveGrarfExtensionCommandCenterScorecardState(game);
@@ -155944,30 +156084,12 @@ init_isGrarfWebRenderer();
 var GRARF_EXTENSION_YOUTUBE_HIGHLIGHTS_SEARCH_LEAGUE_KEYS = /* @__PURE__ */ new Set([
   "NFL",
   "INTFRIENDLY"
-  // "CLUBFRIENDLY",
 ]);
-var YOUTUBE_HIGHLIGHTS_SEARCH_QUERY_SUFFIX_BY_LEAGUE = {
-  NFL: "Highlights",
-  INTFRIENDLY: "highlights"
-  // CLUBFRIENDLY: "highlights",
-};
 function grarfExtensionLeagueUsesGamesYesterdayYoutubeSearchHighlights(leagueKey) {
   return GRARF_EXTENSION_YOUTUBE_HIGHLIGHTS_SEARCH_LEAGUE_KEYS.has(leagueKey.trim().toUpperCase());
 }
 function buildGrarfExtensionGameYoutubeHighlightsSearchUrl(game) {
-  const leagueKey = game.league?.trim().toUpperCase() ?? "";
-  if (!GRARF_EXTENSION_YOUTUBE_HIGHLIGHTS_SEARCH_LEAGUE_KEYS.has(leagueKey)) {
-    return null;
-  }
-  const awayTeam = game.awayTeam?.trim() ?? "";
-  const homeTeam = game.homeTeam?.trim() ?? "";
-  if (!awayTeam || !homeTeam) {
-    return null;
-  }
-  const suffix = YOUTUBE_HIGHLIGHTS_SEARCH_QUERY_SUFFIX_BY_LEAGUE[leagueKey] ?? "highlights";
-  const query = `${awayTeam} ${homeTeam} ${suffix}`;
-  const searchQuery = encodeURIComponent(query).replace(/%20/g, "+");
-  return `https://www.youtube.com/results?search_query=${searchQuery}`;
+  return buildGrarfExtensionGameTeamNamesYoutubeHighlightsSearchUrl(game);
 }
 function resolveGrarfExtensionGamesYesterdayHighlightsNavigationActive(context2) {
   if (context2.temporaryNavTopLevel !== "GAMES") return false;
@@ -156115,103 +156237,6 @@ function youtubeVideoIdFromCanonical(entity) {
   }
   const m2 = entity.url.match(/[?&]v=([^&]+)/);
   return m2?.[1] ?? null;
-}
-
-// ../grarf/desktop/src/extensionHost/grarfExtensionNwslYoutubeHighlightMatching.ts
-init_define_import_meta_env();
-var NWSL_YOUTUBE_TEAM_ALIAS_GROUPS = [
-  ["houston dash", "houston"],
-  ["utah royals fc", "utah royals", "utah"],
-  ["denver summit fc", "denver summit", "denver"],
-  ["bay fc", "bay"],
-  ["angel city fc", "angel city"],
-  ["seattle reign fc", "seattle reign", "seattle"],
-  ["san diego wave fc", "san diego wave", "san diego"],
-  ["kansas city current", "kansas city"],
-  ["portland thorns fc", "portland thorns", "portland"],
-  ["orlando pride", "orlando"],
-  ["gotham fc", "gotham"],
-  ["north carolina courage", "nc courage", "north carolina"],
-  ["chicago stars fc", "chicago stars", "chicago"],
-  ["washington spirit", "washington"],
-  ["racing louisville fc", "racing louisville", "louisville"],
-  ["boston legacy fc", "boston legacy", "boston"]
-];
-var NWSL_FULL_HIGHLIGHTS_PREFIX_RE = /^FULL HIGHLIGHTS\s*[|:]\s*/i;
-function parseNwslFullHighlightsMatchupTitle(title) {
-  const trimmed = title.trim();
-  if (!NWSL_FULL_HIGHLIGHTS_PREFIX_RE.test(trimmed)) {
-    return null;
-  }
-  const matchup = trimmed.replace(NWSL_FULL_HIGHLIGHTS_PREFIX_RE, "").trim();
-  const vsSplit = matchup.split(/\s+vs\.?\s+/i);
-  if (vsSplit.length !== 2) {
-    return null;
-  }
-  const left = vsSplit[0]?.trim() ?? "";
-  const right = vsSplit[1]?.trim() ?? "";
-  if (!left || !right) {
-    return null;
-  }
-  return { left, right };
-}
-function resolveNwslYoutubeTeamKey(rawTeamName) {
-  const normalized = normalizeTeamToken(rawTeamName);
-  if (!normalized) return null;
-  let best = null;
-  for (const group of NWSL_YOUTUBE_TEAM_ALIAS_GROUPS) {
-    const canonicalKey = normalizeTeamToken(group[0] ?? "");
-    if (!canonicalKey) continue;
-    for (const alias of group) {
-      const aliasKey = normalizeTeamToken(alias);
-      if (aliasKey.length < 3) continue;
-      const matches = normalized === aliasKey || normalized.length >= aliasKey.length && normalized.includes(aliasKey) || aliasKey.length >= normalized.length && aliasKey.includes(normalized);
-      if (!matches) continue;
-      if (!best || aliasKey.length > best.aliasLength) {
-        best = { key: canonicalKey, aliasLength: aliasKey.length };
-      }
-    }
-  }
-  return best?.key ?? null;
-}
-function formatNwslCanonicalClubNameForGoogleRecapsSearch(canonicalKey) {
-  const withoutFc = canonicalKey.replace(/\s+fc$/i, "").trim();
-  return withoutFc.split(/\s+/).filter(Boolean).map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(" ");
-}
-function resolveNwslGoogleRecapsTeamSearchLabel(game, side) {
-  const key2 = resolveNwslGameTeamKey(game, side);
-  if (!key2) return null;
-  return formatNwslCanonicalClubNameForGoogleRecapsSearch(key2);
-}
-function resolveNwslGameTeamKey(game, side) {
-  const team = side === "away" ? game.awayTeam : game.homeTeam;
-  const city = side === "away" ? game.awayCity : game.homeCity;
-  const official = side === "away" ? game.officialAwayName : game.officialHomeName;
-  for (const raw of [team, official, city]) {
-    const key2 = resolveNwslYoutubeTeamKey(String(raw ?? ""));
-    if (key2) return key2;
-  }
-  return null;
-}
-function nwslMatchupSidesMatchGame(left, right, game) {
-  const awayKey = resolveNwslGameTeamKey(game, "away");
-  const homeKey = resolveNwslGameTeamKey(game, "home");
-  const leftKey = resolveNwslYoutubeTeamKey(left);
-  const rightKey = resolveNwslYoutubeTeamKey(right);
-  if (!awayKey || !homeKey || !leftKey || !rightKey) {
-    return false;
-  }
-  return leftKey === awayKey && rightKey === homeKey || leftKey === homeKey && rightKey === awayKey;
-}
-function nwslFullHighlightsTitleMatchesGame(title, game) {
-  const parsed = parseNwslFullHighlightsMatchupTitle(title);
-  if (!parsed) {
-    return false;
-  }
-  if (!/\bhighlights?\b/i.test(title)) {
-    return false;
-  }
-  return nwslMatchupSidesMatchGame(parsed.left, parsed.right, game);
 }
 
 // ../grarf/desktop/src/extensionHost/grarfExtensionPlaylistYoutubeHighlightsResolver.ts
@@ -156834,78 +156859,50 @@ async function navigateGrarfExtensionGameYesterdayHighlights(game, context2) {
     return false;
   }
   const leagueKey = game.league?.trim().toUpperCase() ?? "";
+  const openHighlightsUrl = (url) => {
+    const trimmed = url?.trim();
+    if (!trimmed) return false;
+    navigateGrarfExtensionHostExternalUrl(trimmed);
+    setGrarfExtensionGamesYesterdayHighlightsActiveGameId(game.id);
+    return true;
+  };
   if (grarfExtensionLeagueUsesGamesYesterdayFotmobYoutubeHighlights(leagueKey)) {
     try {
       const fotmobHighlightUrl = await resolveGrarfExtensionFotmobYoutubeHighlightWatchUrl(game);
-      if (fotmobHighlightUrl) {
-        navigateGrarfExtensionHostExternalUrl(fotmobHighlightUrl);
-        setGrarfExtensionGamesYesterdayHighlightsActiveGameId(game.id);
-        return true;
-      }
+      if (openHighlightsUrl(fotmobHighlightUrl)) return true;
     } catch {
-      return false;
     }
-    return false;
   }
   if (leagueKey === "F1") {
     try {
       const watchUrl = await resolveGrarfExtensionF1YoutubeHighlightWatchUrl(game);
-      if (watchUrl) {
-        navigateGrarfExtensionHostExternalUrl(watchUrl);
-        setGrarfExtensionGamesYesterdayHighlightsActiveGameId(game.id);
-        return true;
-      }
+      if (openHighlightsUrl(watchUrl)) return true;
     } catch {
-      return false;
     }
-    return false;
   }
   if (grarfExtensionLeagueUsesNcaafYoutubePlaylistHighlights(leagueKey)) {
     try {
       const watchUrl = await resolveGrarfExtensionNcaafYoutubeHighlightWatchUrl(game);
-      if (watchUrl) {
-        navigateGrarfExtensionHostExternalUrl(watchUrl);
-        setGrarfExtensionGamesYesterdayHighlightsActiveGameId(game.id);
-        return true;
-      }
+      if (openHighlightsUrl(watchUrl)) return true;
     } catch {
-      return false;
     }
-    return false;
   }
   if (grarfExtensionLeagueUsesYoutubePlaylistHighlights(leagueKey)) {
     try {
       const watchUrl = await resolveGrarfExtensionPlaylistYoutubeHighlightWatchUrl(game);
-      if (watchUrl) {
-        navigateGrarfExtensionHostExternalUrl(watchUrl);
-        setGrarfExtensionGamesYesterdayHighlightsActiveGameId(game.id);
-        return true;
-      }
+      if (openHighlightsUrl(watchUrl)) return true;
     } catch {
-      return false;
     }
-    return false;
   }
   if (grarfExtensionLeagueUsesUefaNationsLeagueHighlights(leagueKey)) {
     try {
       const watchUrl = await resolveGrarfExtensionUefaNationsLeagueHighlightUrl(game);
-      if (watchUrl) {
-        navigateGrarfExtensionHostExternalUrl(watchUrl);
-        setGrarfExtensionGamesYesterdayHighlightsActiveGameId(game.id);
-        return true;
-      }
+      if (openHighlightsUrl(watchUrl)) return true;
     } catch {
-      return false;
     }
-    return false;
   }
   const youtubeSearchUrl = buildGrarfExtensionGameYoutubeHighlightsSearchUrl(game);
-  if (youtubeSearchUrl) {
-    navigateGrarfExtensionHostExternalUrl(youtubeSearchUrl);
-    setGrarfExtensionGamesYesterdayHighlightsActiveGameId(game.id);
-    return true;
-  }
-  return false;
+  return openHighlightsUrl(youtubeSearchUrl);
 }
 
 // ../grarf/desktop/src/extensionHost/grarfExtensionGameYesterdayRecapsNavigation.ts
@@ -156913,31 +156910,8 @@ init_define_import_meta_env();
 
 // ../grarf/desktop/src/extensionHost/grarfExtensionGameGoogleRecapsSearchUrl.ts
 init_define_import_meta_env();
-var GRARF_EXTENSION_GOOGLE_RECAPS_SEARCH_LEAGUE_KEYS = /* @__PURE__ */ new Set([
-  "INTFRIENDLY",
-  "NWSL"
-]);
 function buildGrarfExtensionGameGoogleRecapsSearchUrl(game) {
-  const leagueKey = game.league?.trim().toUpperCase() ?? "";
-  if (!GRARF_EXTENSION_GOOGLE_RECAPS_SEARCH_LEAGUE_KEYS.has(leagueKey)) {
-    return null;
-  }
-  const [leftSide, rightSide] = resolveGamesSpineMatchupSideOrder(game);
-  const leftTeam = resolveGrarfExtensionGoogleRecapsSearchTeamLabel(game, leftSide);
-  const rightTeam = resolveGrarfExtensionGoogleRecapsSearchTeamLabel(game, rightSide);
-  if (!leftTeam || !rightTeam) {
-    return null;
-  }
-  const query = `${leftTeam} ${rightTeam}`.toLowerCase();
-  const searchQuery = encodeURIComponent(query).replace(/%20/g, "+");
-  return `https://www.google.com/search?q=${searchQuery}`;
-}
-function resolveGrarfExtensionGoogleRecapsSearchTeamLabel(game, side) {
-  const leagueKey = game.league?.trim().toUpperCase() ?? "";
-  if (leagueKey === "NWSL") {
-    return resolveNwslGoogleRecapsTeamSearchLabel(game, side)?.trim() ?? "";
-  }
-  return (side === "away" ? game.awayTeam : game.homeTeam)?.trim() ?? "";
+  return buildGrarfExtensionGameTeamNamesGoogleSearchUrl(game);
 }
 
 // ../grarf/desktop/src/extensionHost/grarfExtensionGameSoccerwayRecapsUrl.ts
@@ -156984,12 +156958,6 @@ async function navigateGrarfExtensionGameYesterdayRecap(game) {
     setGrarfExtensionGamesYesterdayHighlightsActiveGameId(game.id);
     return true;
   }
-  const googleRecapsSearchUrl = buildGrarfExtensionGameGoogleRecapsSearchUrl(game);
-  if (googleRecapsSearchUrl) {
-    navigateGrarfExtensionHostExternalUrl(googleRecapsSearchUrl);
-    setGrarfExtensionGamesYesterdayHighlightsActiveGameId(game.id);
-    return true;
-  }
   if (isNhlRecapGame(game)) {
     const nhlRecapUrl = await resolveGrarfExtensionNhlRecapNavigationUrlFromGame(
       game,
@@ -157009,7 +156977,7 @@ async function navigateGrarfExtensionGameYesterdayRecap(game) {
     "recap"
   );
   const recapUrl = resolveGrarfExtensionHostExternalDestinationUrl(recapPane);
-  const url = recapUrl ?? resolveGrarfExtensionHostExternalDestinationUrl(applySportsBrowserPrototypeGameToPane(game));
+  const url = recapUrl ?? resolveGrarfExtensionHostExternalDestinationUrl(applySportsBrowserPrototypeGameToPane(game)) ?? buildGrarfExtensionGameGoogleRecapsSearchUrl(game);
   if (!url) {
     return false;
   }
@@ -173242,7 +173210,7 @@ function grarfExtensionLeagueHasGamesYesterdayHighlightsSupport(leagueKey) {
   if (grarfExtensionLeagueUsesUefaNationsLeagueHighlights(key2)) return true;
   if (grarfExtensionLeagueUsesGamesYesterdayYoutubeSearchHighlights(key2)) return true;
   if (grarfExtensionLeagueUsesGamesYesterdayFotmobYoutubeHighlights(key2)) return true;
-  return false;
+  return true;
 }
 function partitionGrarfExtensionGamesYesterdayHighlightsSlates(slates) {
   const supported = [];
