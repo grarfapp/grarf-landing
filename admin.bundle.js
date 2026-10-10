@@ -31317,7 +31317,8 @@ var ESPN_WATCH_PICKER_LEAGUES = /* @__PURE__ */ new Set(["ATP", "WTA", "USLC", "
 var ESPN_FETCH_UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36";
 var pickerPlayerCache = /* @__PURE__ */ new Map();
 function enrichGameRow4(game) {
-  if (game.streamUrl?.trim()) return game;
+  const existingStreamUrl = game.streamUrl?.trim();
+  if (existingStreamUrl && isWatchStreamUrl(existingStreamUrl)) return game;
   if (!ESPN_WATCH_CALENDAR_LEAGUES.has(game.league)) return game;
   if (!gameHasEspnWatchBroadcast2(game)) return game;
   const eventId = parseEspnEventIdFromGame(game);
@@ -31481,6 +31482,229 @@ async function enrichOperationalSnapshotEspnWatchPickerStreams(transport) {
   return transport;
 }
 
+// ../grarf/desktop/src/lib/watch/enrichOperationalSnapshotEspnWatchHomeStreams.ts
+init_define_import_meta_env();
+
+// ../grarf/shared/domain/watch/enrichGamesWithEspnWatchHomeStreams.ts
+init_define_import_meta_env();
+
+// ../grarf/shared/domain/watch/espnWatchHome.ts
+init_define_import_meta_env();
+var ESPN_WATCH_PLAYER_ID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+function parseEspnWatchHomeStream(raw) {
+  if (!raw || typeof raw !== "object") return null;
+  const stream = raw;
+  const links = stream.links;
+  const webUrl = links?.web?.trim();
+  if (!webUrl || !parseEspnWatchPlayerIdFromWebUrl(webUrl)) return null;
+  const id = String(stream.id ?? "").trim();
+  if (!id) return null;
+  const source = stream.source;
+  return {
+    id,
+    webUrl,
+    sourceName: String(source?.name ?? "").trim(),
+    sourceType: String(source?.type ?? "").trim(),
+    lang: String(source?.lang ?? "en").trim(),
+    tier: String(stream.tier ?? "").trim(),
+    status: String(stream.status ?? "").trim()
+  };
+}
+function parseEspnWatchHomeListing(content) {
+  const eventId = String(content.eventId ?? "").trim();
+  if (!/^\d+$/.test(eventId)) return null;
+  const streamsRaw = content.streams;
+  if (!Array.isArray(streamsRaw)) return null;
+  const streams = streamsRaw.map(parseEspnWatchHomeStream).filter((stream) => stream != null);
+  if (streams.length === 0) return null;
+  return {
+    eventId,
+    name: String(content.name ?? "").trim(),
+    subtitle: String(content.subtitle ?? "").trim(),
+    streams
+  };
+}
+function parseEspnWatchHomeListings(json) {
+  const buckets = json?.page?.buckets;
+  if (!Array.isArray(buckets)) return [];
+  const listings = [];
+  for (const bucket of buckets) {
+    if (!bucket || typeof bucket !== "object") continue;
+    const contents = bucket.contents;
+    if (!Array.isArray(contents)) continue;
+    for (const raw of contents) {
+      if (!raw || typeof raw !== "object") continue;
+      const listing = parseEspnWatchHomeListing(raw);
+      if (listing) listings.push(listing);
+    }
+  }
+  return listings;
+}
+function indexEspnWatchHomeListingsByEventId(listings) {
+  const map = /* @__PURE__ */ new Map();
+  for (const listing of listings) {
+    map.set(listing.eventId, listing);
+  }
+  return map;
+}
+function parseEspnWatchPlayerIdFromWebUrl(url) {
+  const trimmed = url.trim();
+  if (!trimmed) return null;
+  try {
+    const parsed = new URL(trimmed);
+    const queryId = parsed.searchParams.get("id")?.trim();
+    if (queryId && ESPN_WATCH_PLAYER_ID_RE.test(queryId)) return queryId;
+    const pathMatch = parsed.pathname.match(/\/id\/([0-9a-f-]{36})/i);
+    if (pathMatch?.[1] && ESPN_WATCH_PLAYER_ID_RE.test(pathMatch[1])) return pathMatch[1];
+  } catch {
+    return null;
+  }
+  return null;
+}
+function normalizeNetworkLabel(label) {
+  return label.trim().toLowerCase().replace(/\s+/g, "");
+}
+function broadcastMatchesSource(label, sourceName) {
+  const broadcast = normalizeNetworkLabel(label);
+  const source = normalizeNetworkLabel(sourceName);
+  if (!broadcast || !source) return false;
+  if (broadcast === source) return true;
+  if (broadcast === "espn2" && source === "espn2") return true;
+  if (broadcast === "espnu" && source === "espnu") return true;
+  if (broadcast === "abc" && source === "abc") return true;
+  if (broadcast === "espn" && source === "espn") return true;
+  return false;
+}
+function pickEspnWatchHomeStream(listing, broadcastLabels = []) {
+  const streams = listing.streams.filter((stream) => parseEspnWatchPlayerIdFromWebUrl(stream.webUrl));
+  if (streams.length === 0) return null;
+  const linearEnglish = streams.filter(
+    (stream) => stream.sourceType === "linear" && stream.lang.toLowerCase() === "en"
+  );
+  const english = streams.filter((stream) => stream.lang.toLowerCase() === "en");
+  const pool = linearEnglish.length > 0 ? linearEnglish : english.length > 0 ? english : streams;
+  for (const label of broadcastLabels) {
+    const match = pool.find((stream) => broadcastMatchesSource(label, stream.sourceName));
+    if (match) return match;
+  }
+  const primaryLinear = pool.find((stream) => stream.tier === "primary" && stream.sourceType === "linear");
+  if (primaryLinear) return primaryLinear;
+  const linear = pool.find((stream) => stream.sourceType === "linear");
+  if (linear) return linear;
+  return pool[0] ?? null;
+}
+
+// ../grarf/shared/domain/watch/gameHasEspnFamilyBroadcast.ts
+init_define_import_meta_env();
+
+// ../grarf/shared/domain/watch/espnPlusStream.ts
+init_define_import_meta_env();
+function resolveEspnWatchLeagueKey2(game) {
+  if (game.league) return game.league;
+  if (game.id.startsWith("espn-NHL-")) return "NHL";
+  if (game.id.startsWith("espn-NCAABB-")) return "NCAABB";
+  if (game.id.startsWith("espn-ATP-")) return "ATP";
+  if (game.id.startsWith("espn-WTA-")) return "WTA";
+  return void 0;
+}
+function gameHasEspnWatchBroadcast3(game) {
+  const hints = [...game.broadcasts ?? [], ...game.channels ?? []];
+  return gameHasEspnWatchBroadcast(hints, resolveEspnWatchLeagueKey2(game));
+}
+var ESPN_GAME_ID_RE2 = /^espn-([A-Z0-9]+)-(\d+)$/i;
+function parseEspnEventIdFromGame2(game) {
+  const ext = game.externalIds?.espn?.trim();
+  if (ext && /^\d+$/.test(ext)) return ext;
+  if (game.espnEventId?.trim() && /^\d+$/.test(game.espnEventId)) return game.espnEventId.trim();
+  const match = game.id.trim().match(ESPN_GAME_ID_RE2);
+  return match?.[2] ?? null;
+}
+
+// ../grarf/shared/domain/watch/gameHasEspnFamilyBroadcast.ts
+function gameHasEspnFamilyBroadcast(game) {
+  if (gameHasEspnWatchBroadcast3(game)) return true;
+  const hints = [...game.broadcasts ?? [], ...game.channels ?? []];
+  return hints.some((label) => {
+    const t = String(label ?? "").trim();
+    if (!t) return false;
+    if (/espn/i.test(t)) return true;
+    if (/^abc$/i.test(t)) return true;
+    return false;
+  });
+}
+
+// ../grarf/shared/domain/watch/enrichGamesWithEspnWatchHomeStreams.ts
+function broadcastHints(game) {
+  return [...game.broadcasts ?? [], ...game.channels ?? []];
+}
+function gameHasPublishedEspnWatchPlayerUrl(game) {
+  const streamUrl = game.streamUrl?.trim();
+  return Boolean(streamUrl && parseEspnWatchPlayerIdFromWebUrl(streamUrl));
+}
+function attachEspnWatchHomeStreamToGame(game, streamUrl, eventId, playerId) {
+  game.streamUrl = streamUrl;
+  game.streamProvider = "ESPN+";
+  game.espnPlusPlayerId = playerId;
+  game.espnWatchEventId = eventId;
+}
+function enrichGamesWithEspnWatchHomeStreams(games, listings) {
+  if (listings.length === 0) return 0;
+  const listingsByEventId = indexEspnWatchHomeListingsByEventId([...listings]);
+  let enrichedCount = 0;
+  for (const game of games) {
+    if (gameHasPublishedEspnWatchPlayerUrl(game)) continue;
+    if (!gameHasEspnFamilyBroadcast(game)) continue;
+    const eventId = parseEspnEventIdFromGame2(game);
+    if (!eventId) continue;
+    const listing = listingsByEventId.get(eventId);
+    if (!listing) continue;
+    const stream = pickEspnWatchHomeStream(listing, broadcastHints(game));
+    if (!stream) continue;
+    const playerId = parseEspnWatchPlayerIdFromWebUrl(stream.webUrl);
+    if (!playerId) continue;
+    attachEspnWatchHomeStreamToGame(game, stream.webUrl, eventId, playerId);
+    enrichedCount += 1;
+  }
+  return enrichedCount;
+}
+
+// ../grarf/desktop/src/lib/watch/enrichOperationalSnapshotEspnWatchHomeStreams.ts
+var ESPN_WATCH_HOME_URL = "https://watch.product.api.espn.com/api/product/v3/watchespn/web/home?tz=America%2FChicago&lang=en&countryCode=US&deviceType=desktop";
+var ESPN_FETCH_UA2 = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36";
+var watchHomeCache = null;
+var WATCH_HOME_CACHE_TTL_MS = 3e4;
+async function fetchEspnWatchHomeListings() {
+  const now = Date.now();
+  if (watchHomeCache && now - watchHomeCache.fetchedAt < WATCH_HOME_CACHE_TTL_MS) {
+    return watchHomeCache.listings;
+  }
+  try {
+    const res = await fetch(ESPN_WATCH_HOME_URL, {
+      headers: { "User-Agent": ESPN_FETCH_UA2, Accept: "application/json" },
+      cache: "no-store"
+    });
+    if (!res.ok) return watchHomeCache?.listings ?? [];
+    const json = await res.json();
+    const listings = parseEspnWatchHomeListings(json);
+    watchHomeCache = { fetchedAt: now, listings };
+    return listings;
+  } catch {
+    return watchHomeCache?.listings ?? [];
+  }
+}
+async function enrichOperationalSnapshotEspnWatchHomeStreams(transport) {
+  const listings = await fetchEspnWatchHomeListings();
+  if (listings.length === 0) return transport;
+  const leagues = { ...transport.leagues };
+  let changed = false;
+  for (const [key, rows] of Object.entries(leagues)) {
+    if (!Array.isArray(rows) || rows.length === 0) continue;
+    const enriched = enrichGamesWithEspnWatchHomeStreams(rows, listings);
+    if (enriched > 0) changed = true;
+  }
+  return changed ? { ...transport, leagues } : transport;
+}
+
 // ../grarf/desktop/src/lib/wimbledon/enrichOperationalSnapshotWimbledonSlamTracker.ts
 init_define_import_meta_env();
 
@@ -31494,7 +31718,7 @@ init_define_import_meta_env();
 init_define_import_meta_env();
 
 // ../grarf/desktop/src/lib/watch/enrichWimbledonEspnWatchStreams.ts
-var ESPN_FETCH_UA2 = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36";
+var ESPN_FETCH_UA3 = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36";
 var WIMBLEDON_ESPN_WATCH_CATALOG_ID = "6929e7a4-2c40-3f82-a710-42baae9472c6";
 var WIMBLEDON_ESPN_WATCH_CATALOG_URL = `https://watch.product.api.espn.com/api/product/v3/watchespn/web/catalog/${WIMBLEDON_ESPN_WATCH_CATALOG_ID}?tz=America%2FChicago&lang=en&countryCode=US&deviceType=desktop`;
 var MIN_PLAYER_SCORE = 0.55;
@@ -31586,7 +31810,7 @@ async function fetchWimbledonEspnWatchCatalog() {
   }
   try {
     const res = await fetch(WIMBLEDON_ESPN_WATCH_CATALOG_URL, {
-      headers: { "User-Agent": ESPN_FETCH_UA2, Accept: "application/json" }
+      headers: { "User-Agent": ESPN_FETCH_UA3, Accept: "application/json" }
     });
     if (!res.ok) return catalogCache?.listings ?? [];
     const json = await res.json();
@@ -33478,6 +33702,23 @@ async function enrichOperationalTransport(rawTransport) {
       transport = await enrichOperationalSnapshotNhlGamecenterUrls(transport);
     } catch (e) {
       console.warn(`${LOG19} NHL gamecenter URL supplement failed`, e);
+    }
+    if (isGrarfWebRenderer()) {
+      try {
+        transport = enrichOperationalSnapshotEspnWatchStreams(transport);
+      } catch (e) {
+        console.warn(`${LOG19} ESPN Watch stream enrich failed (web)`, e);
+      }
+      try {
+        transport = await enrichOperationalSnapshotEspnWatchHomeStreams(transport);
+      } catch (e) {
+        console.warn(`${LOG19} ESPN Watch Home enrich failed (web)`, e);
+      }
+      try {
+        transport = await enrichOperationalSnapshotEspnWatchPickerStreams(transport);
+      } catch (e) {
+        console.warn(`${LOG19} ESPN Watch picker enrich failed (web)`, e);
+      }
     }
     return transport;
   }
