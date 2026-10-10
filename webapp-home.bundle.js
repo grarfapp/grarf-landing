@@ -156550,19 +156550,88 @@ init_define_import_meta_env();
 
 // ../grarf/shared/domain/soccer/matchBbcSportFootballPremierLeagueRecapForGame.ts
 init_define_import_meta_env();
-var BBC_SPORT_PREMIER_LEAGUE_TOURNAMENT_URN = "urn:bbc:sportsdata:football:tournament:premier-league";
-function normalizeBbcSportFootballTeamLookupKey(teamName) {
-  return teamName.trim().toLowerCase().normalize("NFD").replace(/\p{M}/gu, "").replace(/&/g, " and ").replace(/\bfc\b/g, "").replace(/[^a-z0-9]+/g, " ").replace(/\s+/g, " ").trim();
+
+// ../grarf/shared/domain/soccer/eplRecapTeamMatching.ts
+init_define_import_meta_env();
+var EPL_RECAP_TEAM_ALIAS_GROUPS = [
+  ["Arsenal"],
+  ["Aston Villa"],
+  ["AFC Bournemouth", "Bournemouth"],
+  ["Brentford"],
+  ["Brighton & Hove Albion", "Brighton and Hove Albion", "Brighton", "Brighton Hove Albion"],
+  ["Chelsea"],
+  ["Crystal Palace", "C Palace"],
+  ["Everton"],
+  ["Fulham"],
+  ["Ipswich Town", "Ipswich"],
+  ["Leeds United", "Leeds"],
+  ["Liverpool"],
+  ["Manchester City", "Man City"],
+  ["Manchester United", "Man United", "Man Utd", "Manchester Utd"],
+  ["Newcastle United", "Newcastle"],
+  ["Nottingham Forest", "Nottm Forest", "Nottingham"],
+  ["Sunderland", "AFC Sunderland"],
+  ["Tottenham Hotspur", "Tottenham", "Spurs"],
+  ["West Ham United", "West Ham"],
+  ["Wolverhampton Wanderers", "Wolves", "Wolverhampton"]
+];
+var EPL_RECAP_ALIAS_LOOKUP = /* @__PURE__ */ new Map();
+function normalizeEplRecapAliasKey(label) {
+  return label.trim().toLowerCase().normalize("NFD").replace(/\p{M}/gu, "").replace(/&/g, " and ").replace(/\bfc\b/g, "").replace(/[^a-z0-9]+/g, " ").replace(/\s+/g, " ").trim();
 }
+function registerEplRecapAliasGroup(aliases) {
+  const tokenUnion = /* @__PURE__ */ new Set();
+  for (const alias of aliases) {
+    for (const token of tokenSetFromLabel(alias)) {
+      tokenUnion.add(token);
+    }
+  }
+  for (const alias of aliases) {
+    const key2 = normalizeEplRecapAliasKey(alias);
+    if (!key2) continue;
+    const existing = EPL_RECAP_ALIAS_LOOKUP.get(key2) ?? /* @__PURE__ */ new Set();
+    for (const token of tokenUnion) {
+      existing.add(token);
+    }
+    EPL_RECAP_ALIAS_LOOKUP.set(key2, existing);
+  }
+}
+for (const group of EPL_RECAP_TEAM_ALIAS_GROUPS) {
+  registerEplRecapAliasGroup(group);
+}
+function buildEplRecapTeamTokenSet(teamName) {
+  const trimmed = teamName.trim();
+  if (!trimmed) return /* @__PURE__ */ new Set();
+  const tokens = new Set(tokenSetFromLabel(trimmed));
+  const aliasTokens = EPL_RECAP_ALIAS_LOOKUP.get(normalizeEplRecapAliasKey(trimmed));
+  if (aliasTokens) {
+    for (const token of aliasTokens) {
+      tokens.add(token);
+    }
+  }
+  return tokens;
+}
+var EPL_RECAP_MIN_TEAM_PAIR_SCORE = 0.55;
+function scoreEplRecapTeamPair(homeA, awayA, homeB, awayB) {
+  const homeSetA = buildEplRecapTeamTokenSet(homeA);
+  const awaySetA = buildEplRecapTeamTokenSet(awayA);
+  const homeSetB = buildEplRecapTeamTokenSet(homeB);
+  const awaySetB = buildEplRecapTeamTokenSet(awayB);
+  if (homeSetA.size === 0 || awaySetA.size === 0 || homeSetB.size === 0 || awaySetB.size === 0) {
+    return 0;
+  }
+  const direct = (tokenOverlapScore(homeSetA, homeSetB) + tokenOverlapScore(awaySetA, awaySetB)) / 2;
+  const swapped = (tokenOverlapScore(homeSetA, awaySetB) + tokenOverlapScore(awaySetA, homeSetB)) / 2;
+  return Math.max(direct, swapped);
+}
+function eplRecapTeamsMatch(homeA, awayA, homeB, awayB, minScore = EPL_RECAP_MIN_TEAM_PAIR_SCORE) {
+  return scoreEplRecapTeamPair(homeA, awayA, homeB, awayB) >= minScore;
+}
+
+// ../grarf/shared/domain/soccer/matchBbcSportFootballPremierLeagueRecapForGame.ts
+var BBC_SPORT_PREMIER_LEAGUE_TOURNAMENT_URN = "urn:bbc:sportsdata:football:tournament:premier-league";
 function teamsAlign(catalogHome, catalogAway, homeTeam, awayTeam) {
-  const catalogHomeKey = normalizeBbcSportFootballTeamLookupKey(catalogHome);
-  const catalogAwayKey = normalizeBbcSportFootballTeamLookupKey(catalogAway);
-  const homeKey = normalizeBbcSportFootballTeamLookupKey(homeTeam);
-  const awayKey = normalizeBbcSportFootballTeamLookupKey(awayTeam);
-  if (!catalogHomeKey || !catalogAwayKey || !homeKey || !awayKey) return false;
-  const direct = catalogHomeKey === homeKey && catalogAwayKey === awayKey;
-  const swapped = catalogHomeKey === awayKey && catalogAwayKey === homeKey;
-  return direct || swapped;
+  return eplRecapTeamsMatch(catalogHome, catalogAway, homeTeam, awayTeam);
 }
 function scoreString(value) {
   if (value == null) return null;
@@ -156748,6 +156817,15 @@ function parseBbcSportFootballScoresFixturesHtml(html) {
   return results;
 }
 
+// ../grarf/desktop/src/lib/epl/resolveEplRecapTeamLabelFromGame.ts
+init_define_import_meta_env();
+function resolveEplRecapHomeTeamLabelFromGame(game) {
+  return game.metadata?.officialHomeName?.trim() || game.homeCity?.trim() || game.homeTeam?.trim() || "";
+}
+function resolveEplRecapAwayTeamLabelFromGame(game) {
+  return game.metadata?.officialAwayName?.trim() || game.awayCity?.trim() || game.awayTeam?.trim() || "";
+}
+
 // ../grarf/desktop/src/extensionHost/grarfExtensionBbcSportEplRecapUrl.ts
 var GRARF_EXTENSION_BBC_SPORT_EPL_SCORES_FIXTURES_BASE_URL = "https://www.bbc.com/sport/football/scores-fixtures";
 var FIXTURES_PAGE_CACHE_TTL_MS = 5 * 60 * 1e3;
@@ -156778,8 +156856,8 @@ async function resolveGrarfExtensionBbcSportEplRecapUrlFromGame(game) {
   if (!grarfExtensionLeagueUsesBbcSportEplRecaps(game.league ?? "")) {
     return null;
   }
-  const homeTeam = game.homeTeam?.trim() ?? "";
-  const awayTeam = game.awayTeam?.trim() ?? "";
+  const homeTeam = resolveEplRecapHomeTeamLabelFromGame(game);
+  const awayTeam = resolveEplRecapAwayTeamLabelFromGame(game);
   if (!homeTeam || !awayTeam) {
     return null;
   }
@@ -156828,15 +156906,194 @@ function subscribeGrarfExtensionEplRecapsSource(listener) {
 
 // ../grarf/desktop/src/extensionHost/grarfExtensionEplRecapNavigationUrl.ts
 init_define_import_meta_env();
+
+// ../grarf/desktop/src/extensionHost/grarfExtensionFotmobEplRecapUrl.ts
+init_define_import_meta_env();
+
+// ../grarf/desktop/src/lib/fotmob/fetchFotmobMatchesByDate.ts
+init_define_import_meta_env();
+function fotmobDateKeyFromMs2(ms2) {
+  if (!Number.isFinite(ms2)) return null;
+  const d2 = new Date(ms2);
+  const y2 = d2.getUTCFullYear();
+  const m2 = String(d2.getUTCMonth() + 1).padStart(2, "0");
+  const day = String(d2.getUTCDate()).padStart(2, "0");
+  return `${y2}${m2}${day}`;
+}
+function fotmobDateKeyFromScheduledDateKey2(key2) {
+  const trimmed = key2?.trim() ?? "";
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) return null;
+  return trimmed.replace(/-/g, "");
+}
+
+// ../grarf/desktop/src/lib/fotmob/matchFotmobRecapForMlbGame.ts
+init_define_import_meta_env();
+var MIN_TEAM_PAIR_SCORE = 0.55;
+var MIN_TOTAL_SCORE7 = 0.62;
+var MAX_KICKOFF_DELTA_MS4 = 18 * 60 * 60 * 1e3;
+function kickoffScore4(game, match) {
+  const gameMs = game.startTimeMs ?? NaN;
+  const matchMs = Date.parse(match.status?.utcTime ?? "");
+  if (!Number.isFinite(gameMs) || !Number.isFinite(matchMs)) return 1;
+  const delta = Math.abs(gameMs - matchMs);
+  if (delta > MAX_KICKOFF_DELTA_MS4) return 0;
+  return 1 - Math.min(delta / (6 * 60 * 60 * 1e3), 1) * 0.25;
+}
+function scoreFotmobRecapMatch(game, match) {
+  const home = resolveEplRecapHomeTeamLabelFromGame(game);
+  const away = resolveEplRecapAwayTeamLabelFromGame(game);
+  const teams = scoreEplRecapTeamPair(home, away, match.home.name, match.away.name);
+  if (teams < MIN_TEAM_PAIR_SCORE) return 0;
+  const kickoff = kickoffScore4(game, match);
+  if (kickoff <= 0) return 0;
+  return teams * kickoff;
+}
+function matchFotmobRecapForMlbGame(game, catalog) {
+  if (catalog.length === 0) return null;
+  let best = null;
+  let bestScore = 0;
+  for (const candidate of catalog) {
+    const score2 = scoreFotmobRecapMatch(game, candidate);
+    if (score2 > bestScore) {
+      bestScore = score2;
+      best = candidate;
+    }
+  }
+  if (!best || bestScore < MIN_TOTAL_SCORE7) return null;
+  return best;
+}
+
+// ../grarf/desktop/src/extensionHost/grarfExtensionFotmobEplRecapUrl.ts
+var CATALOG_CACHE_TTL_MS6 = 5 * 60 * 1e3;
+var catalogCache2 = /* @__PURE__ */ new Map();
+function resolveFotmobDateKeysForGame(game) {
+  const keys = /* @__PURE__ */ new Set();
+  const fromOperational = resolveGameOperationalDateKey(game);
+  if (fromOperational) {
+    const fromScheduled = fotmobDateKeyFromScheduledDateKey2(fromOperational);
+    if (fromScheduled) keys.add(fromScheduled);
+  }
+  const fromMs = game.startTimeMs != null ? fotmobDateKeyFromMs2(game.startTimeMs) : null;
+  if (fromMs) keys.add(fromMs);
+  const scheduled = fotmobDateKeyFromScheduledDateKey2(game.scheduledDateKey);
+  if (scheduled) keys.add(scheduled);
+  return [...keys];
+}
+async function fetchEplFotmobCatalogForGame(game) {
+  const dateKeys = resolveFotmobDateKeysForGame(game);
+  const cacheKey3 = dateKeys.join("|") || "none";
+  const cached = catalogCache2.get(cacheKey3);
+  if (cached && Date.now() - cached.at < CATALOG_CACHE_TTL_MS6) {
+    return cached.matches;
+  }
+  for (const dateKey of dateKeys) {
+    const matches = await fetchFotmobLeagueMatchesByDate("EPL", dateKey);
+    if (matches.length > 0) {
+      catalogCache2.set(cacheKey3, { at: Date.now(), matches });
+      return matches;
+    }
+  }
+  catalogCache2.set(cacheKey3, { at: Date.now(), matches: [] });
+  return [];
+}
+async function resolveGrarfExtensionFotmobEplRecapUrlFromGame(game) {
+  if (!grarfExtensionLeagueUsesBbcSportEplRecaps(game.league ?? "")) {
+    return null;
+  }
+  const fromMetadata = resolveFotmobMatchUrl(game);
+  if (fromMetadata) return fromMetadata;
+  try {
+    const catalog = await fetchEplFotmobCatalogForGame(game);
+    const match = matchFotmobRecapForMlbGame(game, catalog);
+    return match ? buildFotmobMatchUrl2(match.id) : null;
+  } catch {
+    return null;
+  }
+}
+
+// ../grarf/desktop/src/extensionHost/grarfExtensionSoccerwayEplRecapUrl.ts
+init_define_import_meta_env();
+
+// ../grarf/desktop/src/lib/soccerway/matchSoccerwayRecapForMlbGame.ts
+init_define_import_meta_env();
+var MIN_TEAM_PAIR_SCORE2 = 0.55;
+var MIN_TOTAL_SCORE8 = 0.62;
+var MAX_KICKOFF_DELTA_MS5 = 18 * 60 * 60 * 1e3;
+function kickoffScore5(game, match) {
+  const gameMs = game.startTimeMs ?? NaN;
+  const matchMs = match.startTimeMs ?? NaN;
+  if (!Number.isFinite(gameMs) || !Number.isFinite(matchMs)) return 1;
+  const delta = Math.abs(gameMs - matchMs);
+  if (delta > MAX_KICKOFF_DELTA_MS5) return 0;
+  return 1 - Math.min(delta / (6 * 60 * 60 * 1e3), 1) * 0.25;
+}
+function scoreSoccerwayRecapMatch(game, match) {
+  const home = resolveEplRecapHomeTeamLabelFromGame(game);
+  const away = resolveEplRecapAwayTeamLabelFromGame(game);
+  const teams = scoreEplRecapTeamPair(home, away, match.home.name, match.away.name);
+  if (teams < MIN_TEAM_PAIR_SCORE2) return 0;
+  const kickoff = kickoffScore5(game, match);
+  if (kickoff <= 0) return 0;
+  return teams * kickoff;
+}
+function matchSoccerwayRecapForMlbGame(game, catalog) {
+  if (catalog.length === 0) return null;
+  let best = null;
+  let bestScore = 0;
+  for (const candidate of catalog) {
+    const score2 = scoreSoccerwayRecapMatch(game, candidate);
+    if (score2 > bestScore) {
+      bestScore = score2;
+      best = candidate;
+    }
+  }
+  if (!best || bestScore < MIN_TOTAL_SCORE8) return null;
+  return best;
+}
+
+// ../grarf/desktop/src/extensionHost/grarfExtensionSoccerwayEplRecapUrl.ts
+var CATALOG_CACHE_TTL_MS7 = 5 * 60 * 1e3;
+var catalogCache3 = null;
+async function fetchEplSoccerwayCatalog() {
+  if (catalogCache3 && Date.now() - catalogCache3.at < CATALOG_CACHE_TTL_MS7) {
+    return catalogCache3.matches;
+  }
+  const matches = await fetchSoccerwaySoccerCatalogForLeague("EPL");
+  catalogCache3 = { at: Date.now(), matches };
+  return matches;
+}
+async function resolveGrarfExtensionSoccerwayEplRecapUrlFromGame(game) {
+  if (!grarfExtensionLeagueUsesBbcSportEplRecaps(game.league ?? "")) {
+    return null;
+  }
+  const fromMetadata = buildGrarfExtensionGameSoccerwayRecapsUrl(game);
+  if (fromMetadata) return fromMetadata;
+  try {
+    const catalog = await fetchEplSoccerwayCatalog();
+    const match = matchSoccerwayRecapForMlbGame(game, catalog);
+    if (!match) return null;
+    return buildSoccerwayMatchReportUrl(match.away, match.home, match.matchId);
+  } catch {
+    return null;
+  }
+}
+
+// ../grarf/desktop/src/extensionHost/grarfExtensionEplRecapNavigationUrl.ts
 function resolveGrarfExtensionEplRecapNavigationUrl(game, source) {
   if (source === "soccerway") {
     return buildGrarfExtensionGameSoccerwayRecapsUrl(game);
+  }
+  if (source === "fotmob") {
+    return resolveFotmobMatchUrl(game);
   }
   return null;
 }
 async function resolveGrarfExtensionEplRecapNavigationUrlFromGame(game, source) {
   if (source === "soccerway") {
-    return buildGrarfExtensionGameSoccerwayRecapsUrl(game);
+    return resolveGrarfExtensionSoccerwayEplRecapUrlFromGame(game);
+  }
+  if (source === "fotmob") {
+    return resolveGrarfExtensionFotmobEplRecapUrlFromGame(game);
   }
   return resolveGrarfExtensionBbcSportEplRecapUrlFromGame(game);
 }
@@ -156898,7 +157155,8 @@ function resolveGrarfExtensionCommandCenterScorecardRecapUrl(game) {
 function resolveGrarfExtensionCommandCenterScorecardMediaActionEnabled(game, mediaAction) {
   if (mediaAction.url) return true;
   if (mediaAction.kind === "recap" && isGrarfExtensionRenderer() && grarfExtensionLeagueUsesBbcSportEplRecaps(game.league ?? "") && resolveGrarfExtensionCommandCenterScorecardState(game) === "final") {
-    if (getGrarfExtensionEplRecapsSource() === "soccerway") {
+    const source = getGrarfExtensionEplRecapsSource();
+    if (source === "soccerway") {
       return Boolean(buildGrarfExtensionGameSoccerwayRecapsUrl(game));
     }
     return true;
@@ -174607,6 +174865,11 @@ var import_react299 = __toESM(require_react(), 1);
 // ../grarf/desktop/src/extensionHost/GrarfExtensionEplRecapsSourcePills.tsx
 init_define_import_meta_env();
 var import_react297 = __toESM(require_react(), 1);
+
+// ../grarf/desktop/public/league-logos/source-bbc-sport.png?url
+var source_bbc_sport_default = "./source-bbc-sport-UHHSALNR.png?url";
+
+// ../grarf/desktop/src/extensionHost/GrarfExtensionEplRecapsSourcePills.tsx
 var import_jsx_runtime288 = __toESM(require_jsx_runtime(), 1);
 function RecapSourcePill({
   source,
@@ -174637,8 +174900,8 @@ function GrarfExtensionEplRecapsSourcePills({ className, onSourceChange }) {
     getGrarfExtensionEplRecapsSource,
     () => "bbc"
   );
-  const bbcLogo = resolveWebsiteFaviconUrl(GRARF_EXTENSION_BBC_SPORT_EPL_SCORES_FIXTURES_BASE_URL);
   const soccerwayLogo = resolveWebsiteFaviconUrl("https://us.soccerway.com/");
+  const fotmobLogo = resolveWebsiteFaviconUrl("https://www.fotmob.com/");
   const onSelect = (source) => {
     setGrarfExtensionEplRecapsSource(source);
     onSourceChange?.(source);
@@ -174651,7 +174914,14 @@ function GrarfExtensionEplRecapsSourcePills({ className, onSourceChange }) {
         active: activeSource4 === "bbc",
         onSelect,
         ariaLabel: "BBC Sport recaps",
-        children: bbcLogo ? /* @__PURE__ */ (0, import_jsx_runtime288.jsx)("img", { src: bbcLogo, alt: "", className: "grarf-extension-nhl-recaps-source-pill__logo" }) : "BBC"
+        children: /* @__PURE__ */ (0, import_jsx_runtime288.jsx)(
+          "img",
+          {
+            src: source_bbc_sport_default,
+            alt: "",
+            className: "grarf-extension-nhl-recaps-source-pill__logo grarf-extension-nhl-recaps-source-pill__logo--rounded"
+          }
+        )
       }
     ),
     /* @__PURE__ */ (0, import_jsx_runtime288.jsx)(
@@ -174662,6 +174932,23 @@ function GrarfExtensionEplRecapsSourcePills({ className, onSourceChange }) {
         onSelect,
         ariaLabel: "Soccerway recaps",
         children: soccerwayLogo ? /* @__PURE__ */ (0, import_jsx_runtime288.jsx)("img", { src: soccerwayLogo, alt: "", className: "grarf-extension-nhl-recaps-source-pill__logo" }) : "SW"
+      }
+    ),
+    /* @__PURE__ */ (0, import_jsx_runtime288.jsx)(
+      RecapSourcePill,
+      {
+        source: "fotmob",
+        active: activeSource4 === "fotmob",
+        onSelect,
+        ariaLabel: "FotMob recaps",
+        children: fotmobLogo ? /* @__PURE__ */ (0, import_jsx_runtime288.jsx)(
+          "img",
+          {
+            src: fotmobLogo,
+            alt: "",
+            className: "grarf-extension-nhl-recaps-source-pill__logo grarf-extension-nhl-recaps-source-pill__logo--rounded"
+          }
+        ) : "FM"
       }
     )
   ] });
@@ -178703,18 +178990,22 @@ function SportsBrowserPrototypeLeftNav({
     if (!extensionGamesSequentialNavScopeId) {
       return;
     }
-    const extensionYesterdayCatchUpSequentialNavActive = extensionGamesSequentialNavScopeId === "games-yesterday-RECAPS" && extensionYesterdayRecapsNavActive || extensionGamesSequentialNavScopeId === "games-yesterday-HIGHLIGHTS" && extensionYesterdayHighlightsNavActive;
+    const extensionCatchUpRecapsSequentialNavActive = extensionYesterdayRecapsNavActive && (extensionGamesSequentialNavScopeId === "games-yesterday-RECAPS" || extensionGamesSequentialNavScopeId === "games-final");
+    const extensionYesterdayCatchUpSequentialNavActive = extensionCatchUpRecapsSequentialNavActive || extensionGamesSequentialNavScopeId === "games-yesterday-HIGHLIGHTS" && extensionYesterdayHighlightsNavActive;
     if (extensionYesterdayCatchUpSequentialNavActive) {
       const yesterdayHighlightsMode = extensionGamesSequentialNavScopeId === "games-yesterday-HIGHLIGHTS";
-      const yesterdayRecapsMode = extensionGamesSequentialNavScopeId === "games-yesterday-RECAPS";
+      const yesterdayRecapsMode = extensionCatchUpRecapsSequentialNavActive;
+      const todayCatchUpRecapsSlate = extensionGamesSequentialNavScopeId === "games-final" && yesterdayRecapsMode;
+      const catchUpSlates = todayCatchUpRecapsSlate ? filterExtensionTemporalLeagueSlates(catchUpLeagues) : filterExtensionTemporalLeagueSlates(yesterdayLeagues);
+      const catchUpLeagueOpen2 = todayCatchUpRecapsSlate ? temporalCatchUpLeagueOpen : temporalYesterdayLeagueOpen;
       setGrarfExtensionSidebarSequentialUpDownHandlerForScope(
         extensionGamesSequentialNavScopeId,
         {
           step: async (direction) => {
             await stepGrarfExtensionGamesYesterdayCatchUpSequentialNav({
               direction,
-              slates: yesterdayLeagues,
-              leagueOpen: resolvedYesterdayLeagueOpen,
+              slates: catchUpSlates,
+              leagueOpen: catchUpLeagueOpen2,
               yesterdayHighlightsMode,
               yesterdayRecapsMode,
               selectedGameId,
@@ -178749,7 +179040,10 @@ function SportsBrowserPrototypeLeftNav({
     extensionYesterdayRecapsNavActive,
     onGameSelect,
     onTemporalLeagueSelect,
-    resolvedYesterdayLeagueOpen,
+    catchUpLeagues,
+    filterExtensionTemporalLeagueSlates,
+    temporalCatchUpLeagueOpen,
+    temporalYesterdayLeagueOpen,
     selectedGameId,
     selectedLeagueKey,
     yesterdayLeagues
