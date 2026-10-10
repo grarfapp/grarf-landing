@@ -37271,7 +37271,7 @@ var CANONICAL_REGISTRY_ENTRIES = [
   league("Ligue 1", "LIGUE1", "ligue-1", ["french-ligue-1", "ligue1"]),
   league("Liga MX", "LIGAMX", "liga-mx", ["ligamx", "mexican-liga-mx"]),
   league("Eredivisie", "EREDIVISIE", "eredivisie", ["dutch-eredivisie"]),
-  league("Scottish Premiership", "SPFL", "scottish-premiership", ["spfl", "scottish-prem"]),
+  league("SPFL", "SPFL", "scottish-premiership", ["spfl", "scottish-prem"]),
   league("Saudi Pro League", "SAUDI", "saudi-pro-league", ["saudi", "rsl"]),
   league("S\xFCper Lig", "SUPERLIG", "super-lig", ["superlig", "turkish-super-lig"]),
   league("UEFA Women's Euro", "EURO", "euro", ["uefa-euro", "european-championship"]),
@@ -57892,6 +57892,25 @@ function resolveSportsBrowserPrototypeSidebarLeaguesActiveDisplayLabel(leagueKey
   return formatSportsBrowserPrototypeSidebarLeaguesDisplayLabel(entry3.label);
 }
 
+// ../grarf/shared/domain/league/grarfLeaguePresentationLabel.ts
+init_define_import_meta_env();
+var LEAGUE_PRESENTATION_LABEL_BY_KEY = {
+  SPFL: "SPFL",
+  UFC: "UFC"
+};
+function formatGrarfLeaguePresentationLabel(leagueKey, fallbackLabel) {
+  const key2 = leagueKey.trim();
+  const forced = LEAGUE_PRESENTATION_LABEL_BY_KEY[key2];
+  if (forced) return forced;
+  const fallback = fallbackLabel?.trim();
+  if (fallback) {
+    const forcedFromFallbackKey = LEAGUE_PRESENTATION_LABEL_BY_KEY[fallback.toUpperCase()];
+    if (forcedFromFallbackKey) return forcedFromFallbackKey;
+    return fallback;
+  }
+  return key2;
+}
+
 // ../grarf/desktop/src/lib/gamesSpine/gamesSpineLeagueDisplayLabel.ts
 var GAMES_SPINE_LEAGUE_DISPLAY_LABEL = {
   NCAABB: "MCWS",
@@ -57905,6 +57924,8 @@ var GAMES_SPINE_LEAGUE_DISPLAY_LABEL = {
   SAUDI: "Saudi Pro League",
   WOMENS_UCL: "Women's UCL",
   WORLDCUP: "World Cup",
+  SPFL: "SPFL",
+  UFC: "UFC",
   PLL: "PLL",
   WIMBLEDON_MEN: "Wimbledon (Men's)",
   WIMBLEDON_WOMEN: "Wimbledon (Women's)",
@@ -57927,19 +57948,21 @@ function resolveGamesSpineLeagueDisplayLabel(league2, games) {
   const manualName = resolveManualGamesSpineLeagueDisplayName2(games);
   if (manualName) return manualName;
   const spineOverride = GAMES_SPINE_LEAGUE_DISPLAY_LABEL[league2];
-  if (spineOverride) return spineOverride;
+  if (spineOverride) return formatGrarfLeaguePresentationLabel(league2, spineOverride);
   const sidebarPopulationLabel = resolveSportsBrowserPrototypeSidebarLeaguesActiveDisplayLabel(league2);
-  if (sidebarPopulationLabel) return sidebarPopulationLabel;
+  if (sidebarPopulationLabel) {
+    return formatGrarfLeaguePresentationLabel(league2, sidebarPopulationLabel);
+  }
   const columnLabel = GAMES_COLUMN_LEAGUE_LABEL[league2];
-  if (columnLabel) return columnLabel;
+  if (columnLabel) return formatGrarfLeaguePresentationLabel(league2, columnLabel);
   const espnLabel = resolveEspnOperationalLeagueLabel(league2);
   if (espnLabel && espnLabel !== league2) {
     if (league2 === "NCAAF") return "NCAAF";
-    return espnLabel;
+    return formatGrarfLeaguePresentationLabel(league2, espnLabel);
   }
   const slugLabel = resolveSlugStyleLeagueKeyDisplayLabel(league2);
-  if (slugLabel) return slugLabel;
-  return league2;
+  if (slugLabel) return formatGrarfLeaguePresentationLabel(league2, slugLabel);
+  return formatGrarfLeaguePresentationLabel(league2, league2);
 }
 var GAMES_SPINE_LEAGUE_SECTION_HEADER_LABEL = {
   ARG1: "LPF"
@@ -57947,7 +57970,8 @@ var GAMES_SPINE_LEAGUE_SECTION_HEADER_LABEL = {
 function resolveGamesSpineLeagueSectionHeaderLabel(league2, games) {
   const manualName = resolveManualGamesSpineLeagueDisplayName2(games);
   if (manualName) return manualName;
-  return GAMES_SPINE_LEAGUE_SECTION_HEADER_LABEL[league2] ?? resolveGamesSpineLeagueDisplayLabel(league2);
+  const label = GAMES_SPINE_LEAGUE_SECTION_HEADER_LABEL[league2] ?? resolveGamesSpineLeagueDisplayLabel(league2, games);
+  return formatGrarfLeaguePresentationLabel(league2, label);
 }
 
 // ../grarf/desktop/src/lib/gamesSpine/gamesSpineLeagueLogoUrls.ts
@@ -129186,12 +129210,12 @@ function useMlbLiveGameStoryAvailability(game) {
 
 // ../grarf/desktop/src/hooks/useMlbWorkspaceStoryPanel.ts
 function useMlbWorkspaceStoryPanel(game, fallbackStoryPanel) {
-  const isMlbGame3 = game?.league === "MLB";
-  const liveGameStoryAvailable = useMlbLiveGameStoryAvailability(isMlbGame3 ? game : null);
+  const isMlbGame4 = game?.league === "MLB";
+  const liveGameStoryAvailable = useMlbLiveGameStoryAvailability(isMlbGame4 ? game : null);
   return (0, import_react177.useMemo)(() => {
-    if (!isMlbGame3 || !game) return fallbackStoryPanel;
+    if (!isMlbGame4 || !game) return fallbackStoryPanel;
     return resolveMlbWorkspaceStoryPanel(game, { liveGameStoryAvailable }) ?? fallbackStoryPanel ?? null;
-  }, [game, isMlbGame3, fallbackStoryPanel, liveGameStoryAvailable]);
+  }, [game, isMlbGame4, fallbackStoryPanel, liveGameStoryAvailable]);
 }
 
 // ../grarf/desktop/src/hooks/useGameCorrelatedNewsArticles.ts
@@ -155472,6 +155496,230 @@ async function resolveNflGametimeChatUrlForGame(game) {
   return resolveXGameSearchUrlFromGame(game);
 }
 
+// ../grarf/shared/domain/watch/resolveWatchLiveDestinationUrl.ts
+init_define_import_meta_env();
+
+// ../grarf/shared/domain/watch/buildMlbTvLaunchUrl.ts
+init_define_import_meta_env();
+var MLB_RAYS_RED_SOX_JUL_17_2026_STREAM_URL = "https://www.mlb.com/tv/g824766/v9eb4aa92-d640-40eb-8489-07698e36a8df?affiliateId=SCORES#game=824766,tfs=20260509_201000,game_state=live";
+var OVERRIDE_SCHEDULED_DATE_KEY2 = "2026-07-17";
+function normalizeTeamName3(name) {
+  return name?.trim().toLowerCase() ?? "";
+}
+function resolveScheduledDateKey3(game) {
+  const fromPayload = game.scheduledDateKey?.trim();
+  if (fromPayload) return fromPayload;
+  if (typeof game.startTimeMs !== "number" || !Number.isFinite(game.startTimeMs)) {
+    return null;
+  }
+  return new Date(game.startTimeMs).toISOString().slice(0, 10);
+}
+function isRaysRedSoxJul172026WorkspaceOverrideGame2(game) {
+  if (game.league !== "MLB" && !/^espn-MLB-/i.test(game.id)) return false;
+  if (resolveScheduledDateKey3(game) !== OVERRIDE_SCHEDULED_DATE_KEY2) return false;
+  const away = normalizeTeamName3(game.awayTeam);
+  const home = normalizeTeamName3(game.homeTeam);
+  return away.includes("rays") && home.includes("red sox") || away.includes("red sox") && home.includes("rays");
+}
+function buildMlbTvLaunchUrl2(game) {
+  if (isRaysRedSoxJul172026WorkspaceOverrideGame2(game)) {
+    return MLB_RAYS_RED_SOX_JUL_17_2026_STREAM_URL;
+  }
+  const pk = game.externalIds?.mlb?.trim();
+  if (pk && /^\d+$/.test(pk)) {
+    return `https://www.mlb.com/tv/g${pk}`;
+  }
+  return "https://www.mlb.com/tv";
+}
+
+// ../grarf/shared/domain/watch/espnPlusStream.ts
+init_define_import_meta_env();
+var PLAY_LOCATION3 = "where-to-watch%3Aguide";
+function resolveEspnWatchLeagueKey2(game) {
+  if (game.league) return game.league;
+  if (game.id.startsWith("espn-NHL-")) return "NHL";
+  if (game.id.startsWith("espn-NCAABB-")) return "NCAABB";
+  if (game.id.startsWith("espn-ATP-")) return "ATP";
+  if (game.id.startsWith("espn-WTA-")) return "WTA";
+  return void 0;
+}
+function gameHasEspnWatchBroadcast3(game) {
+  const hints = [...game.broadcasts ?? [], ...game.channels ?? []];
+  return gameHasEspnWatchBroadcast(hints, resolveEspnWatchLeagueKey2(game));
+}
+function buildEspnPlusPlayerUrlByUuid2(playerId) {
+  const id = playerId.trim();
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)) return null;
+  return `https://www.espn.com/watch/player/_/id/${id}?playLocation=${PLAY_LOCATION3}`;
+}
+function buildEspnPlusWatchUrl2(eventCalendarId) {
+  const id = eventCalendarId.trim();
+  if (!/^\d+$/.test(id)) return null;
+  return `https://www.espn.com/watch/player/_/eventCalendarId/${id}?playLocation=${PLAY_LOCATION3}`;
+}
+function espnPlusWatchLink2(game) {
+  const links = game.content?.watchLinks;
+  if (!Array.isArray(links)) return void 0;
+  return links.find(
+    (l2) => typeof l2 === "object" && l2 !== null && l2.provider === "ESPN+"
+  );
+}
+function espnPlusPlayerIdFromGame2(game) {
+  const direct = game.espnPlusPlayerId?.trim();
+  if (direct && buildEspnPlusPlayerUrlByUuid2(direct)) return direct;
+  const linkId = espnPlusWatchLink2(game)?.playerId?.trim();
+  if (linkId && buildEspnPlusPlayerUrlByUuid2(linkId)) return linkId;
+  return null;
+}
+function espnWatchEventIdFromGame2(game) {
+  const watchId = game.espnWatchEventId?.trim();
+  if (watchId && /^\d+$/.test(watchId)) return watchId;
+  const linkCal = espnPlusWatchLink2(game)?.eventCalendarId?.trim();
+  if (linkCal && /^\d+$/.test(linkCal)) return linkCal;
+  return null;
+}
+var ESPN_GAME_ID_RE2 = /^espn-([A-Z0-9]+)-(\d+)$/i;
+function parseEspnEventIdFromGame2(game) {
+  const ext = game.externalIds?.espn?.trim();
+  if (ext && /^\d+$/.test(ext)) return ext;
+  if (game.espnEventId?.trim() && /^\d+$/.test(game.espnEventId)) return game.espnEventId.trim();
+  const match = game.id.trim().match(ESPN_GAME_ID_RE2);
+  return match?.[2] ?? null;
+}
+
+// ../grarf/shared/domain/watch/resolveLiveGameWatchTarget.ts
+init_define_import_meta_env();
+
+// ../grarf/shared/domain/watch/watchStreamUrl.ts
+init_define_import_meta_env();
+var ESPN_GAMECAST_PATH2 = /espn\.com\/(?:[a-z]+\/)?game(?:cast)?\/|espn\.com\/soccer\/match\//i;
+var ESPN_WATCH_PLAYER_PATH2 = /espn\.com\/watch\/player(?:\/|\?)/i;
+function isEspnGamecastOrStatsUrl2(url) {
+  const trimmed = url.trim();
+  if (!trimmed) return false;
+  if (ESPN_WATCH_PLAYER_PATH2.test(trimmed)) return false;
+  return ESPN_GAMECAST_PATH2.test(trimmed);
+}
+function isWatchStreamUrl2(url) {
+  const trimmed = url.trim();
+  if (!trimmed) return false;
+  if (isEspnGamecastOrStatsUrl2(trimmed)) return false;
+  try {
+    const host = new URL(trimmed).hostname.toLowerCase().replace(/^www\./, "");
+    if (host === "espn.com" && !ESPN_WATCH_PLAYER_PATH2.test(trimmed)) return false;
+    if (host === "amazon.com" || host.endsWith(".amazon.com")) return true;
+    if (host === "wnba.com" || host.endsWith(".wnba.com")) return true;
+  } catch {
+    return false;
+  }
+  return true;
+}
+
+// ../grarf/shared/domain/watch/resolveLiveGameWatchTarget.ts
+function resolveLiveGameWatchTarget2(game) {
+  const streamUrl = game.streamUrl?.trim();
+  if (!streamUrl || !isWatchStreamUrl2(streamUrl)) return null;
+  if (game.streamProvider) {
+    return { streamUrl, streamProvider: game.streamProvider };
+  }
+  const derived = deriveChannelLabelFromStreamUrl2(streamUrl);
+  if (derived === "ESPN+") {
+    return { streamUrl, streamProvider: "ESPN+" };
+  }
+  return { streamUrl };
+}
+
+// ../grarf/shared/domain/watch/resolveWatchLiveDestinationUrl.ts
+var AFL_FS2_LIVE_URL2 = "https://www.foxsports.com/live/fs2";
+var USA_NETWORK_LIVE_URL2 = "https://www.usanetwork.com/live";
+var USA_NETWORK_WNBA_STREAM_URL2 = "https://www.usanetwork.com/sports";
+var PEACOCK_SPORTS_HUB_URL = "https://www.peacocktv.com/sports";
+var PEACOCK_LABEL2 = /\bpeacock\b/i;
+function isMlbGame3(game) {
+  return game.league === "MLB" || /^espn-MLB-/i.test(game.id);
+}
+function gameHasPeacockBroadcast2(game) {
+  const hints = [...game.broadcasts ?? [], ...game.channels ?? []];
+  return hints.some((h2) => PEACOCK_LABEL2.test(h2));
+}
+function gameHasUsaNetworkBroadcast2(game) {
+  const hints = [...game.broadcasts ?? [], ...game.channels ?? []];
+  return hints.some((label) => {
+    const t2 = String(label || "").trim();
+    if (!t2) return false;
+    if (/^usa\s*network$/i.test(t2)) return true;
+    if (/^usa\s*net$/i.test(t2)) return true;
+    if (/^usa$/i.test(t2)) return true;
+    if (/\busa\s*network\b/i.test(t2)) return true;
+    if (/\busa\s*net\b/i.test(t2)) return true;
+    return false;
+  });
+}
+function resolveManualGamesSpineWatchStreamUrl2(game) {
+  const manual = game.metadata?.manualGamesSpine;
+  if (!manual) return null;
+  return manual.channelUrl?.trim() || game.streamUrl?.trim() || null;
+}
+function resolveUsaNetworkStreamUrl2(game) {
+  if (game.league === "WNBA") return USA_NETWORK_WNBA_STREAM_URL2;
+  return USA_NETWORK_LIVE_URL2;
+}
+function resolveWatchLiveDestinationUrl(game) {
+  const manualGamesSpineUrl = resolveManualGamesSpineWatchStreamUrl2(game);
+  if (manualGamesSpineUrl) return manualGamesSpineUrl;
+  if (game.id === MANUAL_LE_MANS_2026_GAME_ID) {
+    const leMansUrl = game.streamUrl?.trim();
+    if (leMansUrl) return leMansUrl;
+  }
+  if (isPgaTourUsOpenEvent(game.league, game.awayTeam) && game.launchMode === "external") {
+    const golfUrl = game.streamUrl?.trim();
+    if (golfUrl) return golfUrl;
+  }
+  if (game.league === "AFL") {
+    const aflUrl = game.streamUrl?.trim();
+    if (aflUrl && game.streamProvider === "FOX Sports") return aflUrl;
+    return AFL_FS2_LIVE_URL2;
+  }
+  if (game.streamProvider === "USA" || gameHasUsaNetworkBroadcast2(game)) {
+    return game.streamUrl?.trim() || resolveUsaNetworkStreamUrl2(game) || USA_NETWORK_LIVE_URL2;
+  }
+  if (game.league === "NBASUMMER") {
+    const nbaSummerUrl = game.streamUrl?.trim();
+    if (nbaSummerUrl && isWatchStreamUrl2(nbaSummerUrl)) return nbaSummerUrl;
+  }
+  const enrichedTarget = resolveLiveGameWatchTarget2(game);
+  if (enrichedTarget) return enrichedTarget.streamUrl;
+  if (game.league === "WNBA") {
+    const wnbaUrl = game.streamUrl?.trim();
+    if (wnbaUrl && isWatchStreamUrl2(wnbaUrl)) return wnbaUrl;
+  }
+  if (isMlbGame3(game)) {
+    return buildMlbTvLaunchUrl2(game);
+  }
+  const playerId = espnPlusPlayerIdFromGame2(game);
+  if (playerId) {
+    const playerUrl = buildEspnPlusPlayerUrlByUuid2(playerId);
+    if (playerUrl) return playerUrl;
+  }
+  if (gameHasEspnWatchBroadcast3(game)) {
+    const watchEventId = espnWatchEventIdFromGame2(game) ?? parseEspnEventIdFromGame2(game);
+    if (watchEventId) {
+      const espnUrl2 = buildEspnPlusWatchUrl2(watchEventId);
+      if (espnUrl2) return espnUrl2;
+    }
+  }
+  const peacockUrl = game.streamUrl?.trim();
+  if (peacockUrl && (game.streamProvider === "Peacock" || gameHasPeacockBroadcast2(game))) {
+    return peacockUrl;
+  }
+  if (gameHasPeacockBroadcast2(game)) {
+    return PEACOCK_SPORTS_HUB_URL;
+  }
+  const fallbackUrl = game.streamUrl?.trim();
+  if (fallbackUrl && isWatchStreamUrl2(fallbackUrl)) return fallbackUrl;
+  return null;
+}
+
 // ../grarf/desktop/src/extensionHost/grarfExtensionNhlRecapNavigationUrl.ts
 init_define_import_meta_env();
 
@@ -155851,8 +156099,8 @@ function firstResolvedWebsiteUrl(websites) {
   return null;
 }
 function resolveGrarfExtensionCommandCenterScorecardWatchUrl(game) {
-  const enriched = resolveLiveGameWatchTarget(game)?.streamUrl?.trim();
-  if (enriched) return enriched;
+  const resolved = resolveWatchLiveDestinationUrl(game)?.trim();
+  if (resolved) return resolved;
   return resolveMlbLiveGameWorkspaceWatchUrl(game);
 }
 function resolveGrarfExtensionCommandCenterScorecardPreviewUrl(game) {
@@ -157205,6 +157453,7 @@ function TeamSegment({
   game,
   side,
   name,
+  pollRank,
   score: score2,
   showScore
 }) {
@@ -157223,7 +157472,13 @@ function TeamSegment({
         decoding: "async"
       }
     ) : null,
-    /* @__PURE__ */ (0, import_jsx_runtime245.jsx)("span", { className: "grarf-extension-yesterday-highlights-minimized-team-name", children: name }),
+    /* @__PURE__ */ (0, import_jsx_runtime245.jsx)("span", { className: "grarf-extension-yesterday-highlights-minimized-team-name", children: pollRank != null ? /* @__PURE__ */ (0, import_jsx_runtime245.jsxs)(import_jsx_runtime245.Fragment, { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime245.jsx)("span", { className: "tabular-nums text-muted-foreground", children: pollRank }),
+      /* @__PURE__ */ (0, import_jsx_runtime245.jsxs)("span", { children: [
+        " ",
+        name
+      ] })
+    ] }) : name }),
     showScore ? /* @__PURE__ */ (0, import_jsx_runtime245.jsx)("span", { className: "grarf-extension-yesterday-highlights-minimized-team-score tabular-nums", children: score2 ?? "\u2013" }) : null
   ] });
 }
@@ -157268,28 +157523,40 @@ function GrarfExtensionYesterdayHighlightsMinimizedGameCard({
       disabled,
       onClick: handleClick,
       children: [
-        /* @__PURE__ */ (0, import_jsx_runtime245.jsx)("span", { className: "grarf-extension-yesterday-highlights-minimized-matchup", children: model.kind === "event" ? /* @__PURE__ */ (0, import_jsx_runtime245.jsx)("span", { className: "grarf-extension-yesterday-highlights-minimized-event-line", children: game.league?.trim().toUpperCase() === "F1" ? resolveGrarfExtensionF1YesterdayHighlightsEventDisplayLine(game) : resolveGamesSpineCompactEventDisplayLine(model.event) }) : /* @__PURE__ */ (0, import_jsx_runtime245.jsxs)(import_jsx_runtime245.Fragment, { children: [
-          /* @__PURE__ */ (0, import_jsx_runtime245.jsx)(
-            TeamSegment,
-            {
-              game,
-              side: model.left.side,
-              name: resolveSportsBrowserLeftNavTeamNamePresentation(game, model.left).teamName,
-              score: model.left.score,
-              showScore: model.showScores
-            }
-          ),
-          /* @__PURE__ */ (0, import_jsx_runtime245.jsx)(
-            TeamSegment,
-            {
-              game,
-              side: model.right.side,
-              name: resolveSportsBrowserLeftNavTeamNamePresentation(game, model.right).teamName,
-              score: model.right.score,
-              showScore: model.showScores
-            }
-          )
-        ] }) }),
+        /* @__PURE__ */ (0, import_jsx_runtime245.jsx)("span", { className: "grarf-extension-yesterday-highlights-minimized-matchup", children: model.kind === "event" ? /* @__PURE__ */ (0, import_jsx_runtime245.jsx)("span", { className: "grarf-extension-yesterday-highlights-minimized-event-line", children: game.league?.trim().toUpperCase() === "F1" ? resolveGrarfExtensionF1YesterdayHighlightsEventDisplayLine(game) : resolveGamesSpineCompactEventDisplayLine(model.event) }) : /* @__PURE__ */ (0, import_jsx_runtime245.jsx)(import_jsx_runtime245.Fragment, { children: (() => {
+          const leftPresentation = resolveSportsBrowserLeftNavTeamNamePresentation(
+            game,
+            model.left
+          );
+          const rightPresentation = resolveSportsBrowserLeftNavTeamNamePresentation(
+            game,
+            model.right
+          );
+          return /* @__PURE__ */ (0, import_jsx_runtime245.jsxs)(import_jsx_runtime245.Fragment, { children: [
+            /* @__PURE__ */ (0, import_jsx_runtime245.jsx)(
+              TeamSegment,
+              {
+                game,
+                side: model.left.side,
+                name: leftPresentation.teamName,
+                pollRank: leftPresentation.pollRank,
+                score: model.left.score,
+                showScore: model.showScores
+              }
+            ),
+            /* @__PURE__ */ (0, import_jsx_runtime245.jsx)(
+              TeamSegment,
+              {
+                game,
+                side: model.right.side,
+                name: rightPresentation.teamName,
+                pollRank: rightPresentation.pollRank,
+                score: model.right.score,
+                showScore: model.showScores
+              }
+            )
+          ] });
+        })() }) }),
         /* @__PURE__ */ (0, import_jsx_runtime245.jsx)("span", { className: "grarf-extension-yesterday-highlights-minimized-divider", "aria-hidden": true }),
         /* @__PURE__ */ (0, import_jsx_runtime245.jsx)(GrarfExtensionCommandCenterStatusPill, { state: state3, finalLabel: "F" })
       ]
@@ -158983,6 +159250,7 @@ var GRARF_EXTENSION_COMMAND_CENTER_TEAM_ROW_CLASS = "flex min-w-0 items-center g
 var GRARF_EXTENSION_COMMAND_CENTER_TEAM_LOGO_SLOT_CLASS = "inline-flex h-8 w-8 shrink-0 items-center justify-center";
 var GRARF_EXTENSION_COMMAND_CENTER_TEAM_LOGO_CLASS = "h-7 w-7 max-h-7 max-w-7 shrink-0 object-contain object-center";
 var GRARF_EXTENSION_COMMAND_CENTER_TEAM_NAME_CLASS = "block min-w-0 flex-1 truncate text-[13px] font-semibold leading-tight normal-case text-foreground";
+var GRARF_EXTENSION_COMMAND_CENTER_NCAAF_POLL_RANK_TEXT_CLASS = "shrink-0 tabular-nums text-muted-foreground";
 var GRARF_EXTENSION_COMMAND_CENTER_SCORE_CLASS = "w-9 shrink-0 text-right text-[15px] font-bold leading-none tabular-nums text-foreground";
 function GrarfExtensionCommandCenterTeamIdentity({
   game,
@@ -159036,7 +159304,8 @@ function GrarfExtensionCommandCenterTeamIdentity({
             pollRank,
             context: competitorContext,
             nameClassName: GRARF_EXTENSION_COMMAND_CENTER_TEAM_NAME_CLASS,
-            winnerBoldClass
+            winnerBoldClass,
+            pollRankClassName: isGrarfExtensionRenderer() ? GRARF_EXTENSION_COMMAND_CENTER_NCAAF_POLL_RANK_TEXT_CLASS : LEFT_NAV_NCAAF_POLL_RANK_TEXT_CLASS
           }
         )
       ]
@@ -171780,7 +172049,7 @@ function gameHaystack3(game) {
   ].filter(Boolean).join(" ").toLowerCase();
 }
 function resolveLeagueDisplayLabel(leagueKey, fallbackLabel) {
-  return fallbackLabel.trim() || leagueKey;
+  return formatGrarfLeaguePresentationLabel(leagueKey, fallbackLabel.trim() || leagueKey);
 }
 function searchGrarfExtensionAiSearchEntities(input) {
   const query = normalizeEntityQuery(input.query);

@@ -15178,6 +15178,25 @@ function resolveSportsBrowserPrototypeSidebarLeaguesActiveDisplayLabel(leagueKey
   return formatSportsBrowserPrototypeSidebarLeaguesDisplayLabel(entry2.label);
 }
 
+// ../grarf/shared/domain/league/grarfLeaguePresentationLabel.ts
+init_define_import_meta_env();
+var LEAGUE_PRESENTATION_LABEL_BY_KEY = {
+  SPFL: "SPFL",
+  UFC: "UFC"
+};
+function formatGrarfLeaguePresentationLabel(leagueKey, fallbackLabel) {
+  const key = leagueKey.trim();
+  const forced = LEAGUE_PRESENTATION_LABEL_BY_KEY[key];
+  if (forced) return forced;
+  const fallback = fallbackLabel?.trim();
+  if (fallback) {
+    const forcedFromFallbackKey = LEAGUE_PRESENTATION_LABEL_BY_KEY[fallback.toUpperCase()];
+    if (forcedFromFallbackKey) return forcedFromFallbackKey;
+    return fallback;
+  }
+  return key;
+}
+
 // ../grarf/desktop/src/lib/gamesSpine/gamesSpineLeagueDisplayLabel.ts
 var GAMES_SPINE_LEAGUE_DISPLAY_LABEL = {
   NCAABB: "MCWS",
@@ -15191,6 +15210,8 @@ var GAMES_SPINE_LEAGUE_DISPLAY_LABEL = {
   SAUDI: "Saudi Pro League",
   WOMENS_UCL: "Women's UCL",
   WORLDCUP: "World Cup",
+  SPFL: "SPFL",
+  UFC: "UFC",
   PLL: "PLL",
   WIMBLEDON_MEN: "Wimbledon (Men's)",
   WIMBLEDON_WOMEN: "Wimbledon (Women's)",
@@ -15213,19 +15234,21 @@ function resolveGamesSpineLeagueDisplayLabel(league2, games) {
   const manualName = resolveManualGamesSpineLeagueDisplayName(games);
   if (manualName) return manualName;
   const spineOverride = GAMES_SPINE_LEAGUE_DISPLAY_LABEL[league2];
-  if (spineOverride) return spineOverride;
+  if (spineOverride) return formatGrarfLeaguePresentationLabel(league2, spineOverride);
   const sidebarPopulationLabel = resolveSportsBrowserPrototypeSidebarLeaguesActiveDisplayLabel(league2);
-  if (sidebarPopulationLabel) return sidebarPopulationLabel;
+  if (sidebarPopulationLabel) {
+    return formatGrarfLeaguePresentationLabel(league2, sidebarPopulationLabel);
+  }
   const columnLabel = GAMES_COLUMN_LEAGUE_LABEL[league2];
-  if (columnLabel) return columnLabel;
+  if (columnLabel) return formatGrarfLeaguePresentationLabel(league2, columnLabel);
   const espnLabel = resolveEspnOperationalLeagueLabel(league2);
   if (espnLabel && espnLabel !== league2) {
     if (league2 === "NCAAF") return "NCAAF";
-    return espnLabel;
+    return formatGrarfLeaguePresentationLabel(league2, espnLabel);
   }
   const slugLabel = resolveSlugStyleLeagueKeyDisplayLabel(league2);
-  if (slugLabel) return slugLabel;
-  return league2;
+  if (slugLabel) return formatGrarfLeaguePresentationLabel(league2, slugLabel);
+  return formatGrarfLeaguePresentationLabel(league2, league2);
 }
 
 // ../grarf/desktop/src/lib/gamesSpine/manual/convertManualGamesSpineDocument.ts
@@ -26059,7 +26082,7 @@ var CANONICAL_REGISTRY_ENTRIES = [
   league("Ligue 1", "LIGUE1", "ligue-1", ["french-ligue-1", "ligue1"]),
   league("Liga MX", "LIGAMX", "liga-mx", ["ligamx", "mexican-liga-mx"]),
   league("Eredivisie", "EREDIVISIE", "eredivisie", ["dutch-eredivisie"]),
-  league("Scottish Premiership", "SPFL", "scottish-premiership", ["spfl", "scottish-prem"]),
+  league("SPFL", "SPFL", "scottish-premiership", ["spfl", "scottish-prem"]),
   league("Saudi Pro League", "SAUDI", "saudi-pro-league", ["saudi", "rsl"]),
   league("S\xFCper Lig", "SUPERLIG", "super-lig", ["superlig", "turkish-super-lig"]),
   league("UEFA Women's Euro", "EURO", "euro", ["uefa-euro", "european-championship"]),
