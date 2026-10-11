@@ -161,5 +161,9 @@ console.log("[build-home] stamped admin.html asset URLs:", buildStamp);
 
 console.log("[build-home] done:", outJs, outCss);
 
-console.log("[build-home] building Mobile Web bundle …");
-execSync("node build-mobile.mjs", { stdio: "inherit", cwd: __dirname });
+if (process.env.GRARF_SKIP_MOBILE_WEB === "1") {
+  console.log("[build-home] skip mobile web (GRARF_SKIP_MOBILE_WEB=1)");
+} else {
+  console.log("[build-home] building Mobile Web bundle …");
+  execSync("node build-mobile.mjs", { stdio: "inherit", cwd: __dirname });
+}
