@@ -156569,6 +156569,9 @@ function subscribeGrarfExtensionNhlRecapsSource(listener) {
 // ../grarf/desktop/src/extensionHost/grarfExtensionNcaafRecapHeadlineContext.ts
 init_define_import_meta_env();
 
+// ../grarf/desktop/src/extensionHost/grarfExtensionCatchUpRecapHeadlineContext.ts
+init_define_import_meta_env();
+
 // ../grarf/desktop/src/extensionHost/grarfExtensionGamesYesterdayHighlightsNavSnapshot.ts
 init_define_import_meta_env();
 var snapshot = {
@@ -156622,23 +156625,28 @@ function isGrarfExtensionGamesYesterdayHighlightsNavSnapshotActive() {
   return snapshot.gamesSelector2Label === "YESTERDAY" && snapshot.gamesYesterdaySelector3Label === "HIGHLIGHTS";
 }
 
-// ../grarf/desktop/src/extensionHost/grarfExtensionNcaafRecapHeadlineContext.ts
-function isGrarfExtensionNcaafRecapGame(game) {
-  return game.league === "NCAAF" || game.id.startsWith("espn-NCAAF-");
-}
-function isNcaafFinalGame(game) {
+// ../grarf/desktop/src/extensionHost/grarfExtensionCatchUpRecapHeadlineContext.ts
+function isCatchUpRecapFinalGame(game) {
   return game.status === "final" || isSpineFinalizedGame(game);
 }
-function shouldFetchGrarfExtensionNcaafEspnRecapHeadline(game) {
-  if (!isGrarfExtensionNcaafRecapGame(game)) return false;
+function shouldFetchGrarfExtensionCatchUpRecapHeadline(game) {
   if (isGrarfExtensionGamesCatchUpRecapsNavSnapshotActive()) {
     return true;
   }
   const snapshot2 = getGrarfExtensionGamesYesterdayHighlightsNavSnapshot();
-  if (snapshot2.temporaryNavTopLevel === "GAMES" && snapshot2.gamesCompactTemporalView === "final" && isNcaafFinalGame(game)) {
+  if (snapshot2.temporaryNavTopLevel === "GAMES" && snapshot2.gamesCompactTemporalView === "final" && isCatchUpRecapFinalGame(game)) {
     return true;
   }
   return false;
+}
+
+// ../grarf/desktop/src/extensionHost/grarfExtensionNcaafRecapHeadlineContext.ts
+function isGrarfExtensionNcaafRecapGame(game) {
+  return game.league === "NCAAF" || game.id.startsWith("espn-NCAAF-");
+}
+function shouldFetchGrarfExtensionNcaafEspnRecapHeadline(game) {
+  if (!isGrarfExtensionNcaafRecapGame(game)) return false;
+  return shouldFetchGrarfExtensionCatchUpRecapHeadline(game);
 }
 
 // ../grarf/desktop/src/extensionHost/grarfExtensionGameTeamNamesSearchFallbackUrls.ts
@@ -159005,19 +159013,9 @@ var import_react274 = __toESM(require_react(), 1);
 
 // ../grarf/desktop/src/extensionHost/grarfExtensionEplBbcRecapHeadlineContext.ts
 init_define_import_meta_env();
-function isEplFinalGame(game) {
-  return game.status === "final" || isSpineFinalizedGame(game);
-}
 function shouldFetchGrarfExtensionEplBbcRecapHeadline(game) {
   if (!grarfExtensionLeagueUsesBbcSportEplRecaps(game.league ?? "")) return false;
-  if (isGrarfExtensionGamesCatchUpRecapsNavSnapshotActive()) {
-    return true;
-  }
-  const snapshot2 = getGrarfExtensionGamesYesterdayHighlightsNavSnapshot();
-  if (snapshot2.temporaryNavTopLevel === "GAMES" && snapshot2.gamesCompactTemporalView === "final" && isEplFinalGame(game)) {
-    return true;
-  }
-  return false;
+  return shouldFetchGrarfExtensionCatchUpRecapHeadline(game);
 }
 
 // ../grarf/desktop/src/extensionHost/grarfExtensionEplBbcRecapHeadlineStore.ts
@@ -159289,9 +159287,211 @@ function useGrarfExtensionEplBbcRecapHeadline(game) {
   };
 }
 
-// ../grarf/desktop/src/extensionHost/useGrarfExtensionNcaafRecapHeadline.ts
+// ../grarf/desktop/src/extensionHost/useGrarfExtensionEspnRecapHeadline.ts
 init_define_import_meta_env();
 var import_react275 = __toESM(require_react(), 1);
+
+// ../grarf/desktop/src/extensionHost/grarfExtensionEspnRecapHeadlineContext.ts
+init_define_import_meta_env();
+var DEDICATED_RECAP_HEADLINE_LEAGUE_KEYS = /* @__PURE__ */ new Set(["NCAAF"]);
+var ESPN_RECAP_HEADLINE_SPORTS = /* @__PURE__ */ new Set([
+  "australian-football",
+  "baseball",
+  "basketball",
+  "field-hockey",
+  "football",
+  "hockey",
+  "lacrosse",
+  "rugby",
+  "soccer",
+  "volleyball",
+  "water-polo"
+]);
+function resolveGrarfExtensionEspnRecapHeadlineSummaryRoute(game) {
+  const leagueKey = game.league;
+  if (!leagueKey) return null;
+  const cfg = ESPN_OPERATIONAL_LEAGUES[leagueKey];
+  if (!cfg || !ESPN_RECAP_HEADLINE_SPORTS.has(cfg.sport)) return null;
+  return { sport: cfg.sport, espnLeague: cfg.league };
+}
+function isGrarfExtensionEspnRecapHeadlineGame(game) {
+  if (grarfExtensionLeagueUsesBbcSportEplRecaps(game.league ?? "")) return false;
+  if (game.league && DEDICATED_RECAP_HEADLINE_LEAGUE_KEYS.has(game.league)) return false;
+  if (game.id.startsWith("espn-NCAAF-")) return false;
+  if (!resolveGrarfExtensionEspnRecapHeadlineSummaryRoute(game)) return false;
+  const eventId = parseEspnEventIdFromGame2(game);
+  return eventId != null && isEspnSummaryEventIdEligible(eventId);
+}
+function shouldFetchGrarfExtensionEspnRecapHeadline(game) {
+  if (!isGrarfExtensionEspnRecapHeadlineGame(game)) return false;
+  return shouldFetchGrarfExtensionCatchUpRecapHeadline(game);
+}
+
+// ../grarf/desktop/src/extensionHost/grarfExtensionEspnRecapHeadlineStore.ts
+init_define_import_meta_env();
+
+// ../grarf/desktop/src/extensionHost/grarfExtensionEspnRecapHeadline.ts
+init_define_import_meta_env();
+
+// ../grarf/shared/domain/espn/resolveEspnSummaryRecapArticleHeadline.ts
+init_define_import_meta_env();
+function resolveEspnSummaryRecapArticleHeadlineFromSummary(summary) {
+  const article = summary.article;
+  if (!article || typeof article !== "object") return null;
+  const headline = article.headline;
+  if (typeof headline !== "string") return null;
+  const trimmed = headline.trim();
+  return trimmed.length > 0 ? trimmed : null;
+}
+
+// ../grarf/desktop/src/extensionHost/grarfExtensionEspnRecapHeadline.ts
+var RECAP_HEADLINE_CACHE_TTL_MS = 30 * 60 * 1e3;
+var headlineCache2 = /* @__PURE__ */ new Map();
+var inflightByCacheKey = /* @__PURE__ */ new Map();
+function recapHeadlineCacheKey(sport, espnLeague, eventId) {
+  return `${sport}/${espnLeague}/${eventId}`;
+}
+async function fetchEspnRecapHeadlineForSummaryRoute(sport, espnLeague, eventId) {
+  const cacheKey3 = recapHeadlineCacheKey(sport, espnLeague, eventId);
+  const cached = headlineCache2.get(cacheKey3);
+  if (cached && Date.now() - cached.at < RECAP_HEADLINE_CACHE_TTL_MS) {
+    return cached.headline;
+  }
+  const inflight = inflightByCacheKey.get(cacheKey3);
+  if (inflight) return inflight;
+  const promise = (async () => {
+    try {
+      const url = resolveProxiedEspnSummaryFetchUrl(sport, espnLeague, eventId);
+      const res = await fetch(url, {
+        headers: { Accept: "application/json" },
+        cache: "no-store",
+        credentials: "omit"
+      });
+      if (!res.ok) return null;
+      const summary = await res.json();
+      const headline = resolveEspnSummaryRecapArticleHeadlineFromSummary(summary);
+      if (headline) {
+        headlineCache2.set(cacheKey3, { at: Date.now(), headline });
+      }
+      return headline;
+    } catch {
+      return null;
+    } finally {
+      inflightByCacheKey.delete(cacheKey3);
+    }
+  })();
+  inflightByCacheKey.set(cacheKey3, promise);
+  return promise;
+}
+async function resolveGrarfExtensionEspnRecapHeadlineForGame(game) {
+  if (!isGrarfExtensionEspnRecapHeadlineGame(game)) return null;
+  const route = resolveGrarfExtensionEspnRecapHeadlineSummaryRoute(game);
+  const eventId = parseEspnEventIdFromGame2(game);
+  if (!route || !eventId) return null;
+  return fetchEspnRecapHeadlineForSummaryRoute(route.sport, route.espnLeague, eventId);
+}
+
+// ../grarf/desktop/src/extensionHost/grarfExtensionEspnRecapHeadlineStore.ts
+var GRARF_EXTENSION_ESPN_RECAP_HEADLINE_IDLE_ENTRY = { status: "idle" };
+var entriesByGameId2 = /* @__PURE__ */ new Map();
+var listenersByGameId2 = /* @__PURE__ */ new Map();
+var inflightByGameId2 = /* @__PURE__ */ new Set();
+function notify6(gameId) {
+  const listeners9 = listenersByGameId2.get(gameId);
+  if (!listeners9) return;
+  for (const listener of listeners9) {
+    listener();
+  }
+}
+function setEntry2(gameId, entry3) {
+  entriesByGameId2.set(gameId, entry3);
+  notify6(gameId);
+}
+function subscribeGrarfExtensionEspnRecapHeadline(gameId, listener) {
+  const trimmed = gameId.trim();
+  if (!trimmed) return () => {
+  };
+  let listeners9 = listenersByGameId2.get(trimmed);
+  if (!listeners9) {
+    listeners9 = /* @__PURE__ */ new Set();
+    listenersByGameId2.set(trimmed, listeners9);
+  }
+  listeners9.add(listener);
+  return () => {
+    listeners9?.delete(listener);
+    if (listeners9 && listeners9.size === 0) {
+      listenersByGameId2.delete(trimmed);
+    }
+  };
+}
+function getGrarfExtensionEspnRecapHeadlineEntry(gameId) {
+  return entriesByGameId2.get(gameId.trim()) ?? GRARF_EXTENSION_ESPN_RECAP_HEADLINE_IDLE_ENTRY;
+}
+function ensureGrarfExtensionEspnRecapHeadlineLoaded(game) {
+  const gameId = game.id.trim();
+  if (!gameId || !shouldFetchGrarfExtensionEspnRecapHeadline(game)) return;
+  const current = getGrarfExtensionEspnRecapHeadlineEntry(gameId);
+  if (current.status === "loading" || current.status === "ready") return;
+  if (current.status === "empty") return;
+  if (inflightByGameId2.has(gameId)) return;
+  setEntry2(gameId, { status: "loading" });
+  inflightByGameId2.add(gameId);
+  void resolveGrarfExtensionEspnRecapHeadlineForGame(game).then((headline) => {
+    inflightByGameId2.delete(gameId);
+    const trimmed = headline?.trim() ?? "";
+    if (trimmed) {
+      setEntry2(gameId, { status: "ready", headline: trimmed });
+    } else {
+      setEntry2(gameId, { status: "empty" });
+    }
+  });
+}
+function retryGrarfExtensionEspnRecapHeadlineAfterEmpty(game) {
+  const gameId = game.id.trim();
+  if (!gameId) return () => {
+  };
+  const timeoutId = window.setTimeout(() => {
+    if (getGrarfExtensionEspnRecapHeadlineEntry(gameId).status !== "empty") return;
+    entriesByGameId2.delete(gameId);
+    ensureGrarfExtensionEspnRecapHeadlineLoaded(game);
+  }, 1500);
+  return () => {
+    window.clearTimeout(timeoutId);
+  };
+}
+
+// ../grarf/desktop/src/extensionHost/useGrarfExtensionEspnRecapHeadline.ts
+function useGrarfExtensionEspnRecapHeadline(game) {
+  const gameId = game.id.trim();
+  const shouldFetch = (0, import_react275.useMemo)(
+    () => shouldFetchGrarfExtensionEspnRecapHeadline(game),
+    [game]
+  );
+  const entry3 = (0, import_react275.useSyncExternalStore)(
+    (listener) => subscribeGrarfExtensionEspnRecapHeadline(gameId, listener),
+    () => getGrarfExtensionEspnRecapHeadlineEntry(gameId),
+    () => GRARF_EXTENSION_ESPN_RECAP_HEADLINE_IDLE_ENTRY
+  );
+  (0, import_react275.useEffect)(() => {
+    if (!shouldFetch) return;
+    ensureGrarfExtensionEspnRecapHeadlineLoaded(game);
+  }, [game, shouldFetch]);
+  (0, import_react275.useEffect)(() => {
+    if (!shouldFetch || entry3.status !== "empty") return;
+    return retryGrarfExtensionEspnRecapHeadlineAfterEmpty(game);
+  }, [game, entry3.status, shouldFetch]);
+  if (!shouldFetch) {
+    return { headline: null, showHeadlineUi: false };
+  }
+  if (entry3.status === "ready") {
+    return { headline: entry3.headline, showHeadlineUi: true };
+  }
+  return { headline: null, showHeadlineUi: true };
+}
+
+// ../grarf/desktop/src/extensionHost/useGrarfExtensionNcaafRecapHeadline.ts
+init_define_import_meta_env();
+var import_react276 = __toESM(require_react(), 1);
 
 // ../grarf/desktop/src/extensionHost/grarfExtensionNcaafRecapHeadlineStore.ts
 init_define_import_meta_env();
@@ -159343,26 +159543,15 @@ function resolveCbsSportsNcaafRecapHeadlineFromPageHtml(html) {
   return headline.length >= 12 ? headline : null;
 }
 
-// ../grarf/shared/domain/espn/resolveEspnSummaryRecapArticleHeadline.ts
-init_define_import_meta_env();
-function resolveEspnSummaryRecapArticleHeadlineFromSummary(summary) {
-  const article = summary.article;
-  if (!article || typeof article !== "object") return null;
-  const headline = article.headline;
-  if (typeof headline !== "string") return null;
-  const trimmed = headline.trim();
-  return trimmed.length > 0 ? trimmed : null;
-}
-
 // ../grarf/desktop/src/extensionHost/grarfExtensionNcaafEspnRecapHeadline.ts
-var RECAP_HEADLINE_CACHE_TTL_MS = 30 * 60 * 1e3;
+var RECAP_HEADLINE_CACHE_TTL_MS2 = 30 * 60 * 1e3;
 var espnHeadlineCache = /* @__PURE__ */ new Map();
 var inflightEspnByEventId = /* @__PURE__ */ new Map();
 var cbsHeadlineCache = /* @__PURE__ */ new Map();
 var inflightCbsByRecapUrl = /* @__PURE__ */ new Map();
 async function fetchNcaafEspnRecapHeadlineForEventId(eventId) {
   const cached = espnHeadlineCache.get(eventId);
-  if (cached && Date.now() - cached.at < RECAP_HEADLINE_CACHE_TTL_MS) {
+  if (cached && Date.now() - cached.at < RECAP_HEADLINE_CACHE_TTL_MS2) {
     return cached.headline;
   }
   const inflight = inflightEspnByEventId.get(eventId);
@@ -159393,7 +159582,7 @@ async function fetchNcaafEspnRecapHeadlineForEventId(eventId) {
 }
 async function fetchNcaafCbsRecapHeadlineForRecapUrl(recapUrl) {
   const cached = cbsHeadlineCache.get(recapUrl);
-  if (cached && Date.now() - cached.at < RECAP_HEADLINE_CACHE_TTL_MS) {
+  if (cached && Date.now() - cached.at < RECAP_HEADLINE_CACHE_TTL_MS2) {
     return cached.headline;
   }
   const inflight = inflightCbsByRecapUrl.get(recapUrl);
@@ -159448,184 +159637,6 @@ async function resolveGrarfExtensionNcaafRecapHeadlineForGame(game) {
 
 // ../grarf/desktop/src/extensionHost/grarfExtensionNcaafRecapHeadlineStore.ts
 var GRARF_EXTENSION_NCAAF_RECAP_HEADLINE_IDLE_ENTRY = { status: "idle" };
-var entriesByGameId2 = /* @__PURE__ */ new Map();
-var listenersByGameId2 = /* @__PURE__ */ new Map();
-var inflightByGameId2 = /* @__PURE__ */ new Set();
-function notify6(gameId) {
-  const listeners9 = listenersByGameId2.get(gameId);
-  if (!listeners9) return;
-  for (const listener of listeners9) {
-    listener();
-  }
-}
-function setEntry2(gameId, entry3) {
-  entriesByGameId2.set(gameId, entry3);
-  notify6(gameId);
-}
-function subscribeGrarfExtensionNcaafRecapHeadline(gameId, listener) {
-  const trimmed = gameId.trim();
-  if (!trimmed) return () => {
-  };
-  let listeners9 = listenersByGameId2.get(trimmed);
-  if (!listeners9) {
-    listeners9 = /* @__PURE__ */ new Set();
-    listenersByGameId2.set(trimmed, listeners9);
-  }
-  listeners9.add(listener);
-  return () => {
-    listeners9?.delete(listener);
-    if (listeners9 && listeners9.size === 0) {
-      listenersByGameId2.delete(trimmed);
-    }
-  };
-}
-function getGrarfExtensionNcaafRecapHeadlineEntry(gameId) {
-  return entriesByGameId2.get(gameId.trim()) ?? GRARF_EXTENSION_NCAAF_RECAP_HEADLINE_IDLE_ENTRY;
-}
-function ensureGrarfExtensionNcaafRecapHeadlineLoaded(game) {
-  const gameId = game.id.trim();
-  if (!gameId || !shouldFetchGrarfExtensionNcaafEspnRecapHeadline(game)) return;
-  const current = getGrarfExtensionNcaafRecapHeadlineEntry(gameId);
-  if (current.status === "loading" || current.status === "ready") return;
-  if (current.status === "empty") return;
-  if (inflightByGameId2.has(gameId)) return;
-  setEntry2(gameId, { status: "loading" });
-  inflightByGameId2.add(gameId);
-  void resolveGrarfExtensionNcaafRecapHeadlineForGame(game).then((headline) => {
-    inflightByGameId2.delete(gameId);
-    const trimmed = headline?.trim() ?? "";
-    if (trimmed) {
-      setEntry2(gameId, { status: "ready", headline: trimmed });
-    } else {
-      setEntry2(gameId, { status: "empty" });
-    }
-  });
-}
-function retryGrarfExtensionNcaafRecapHeadlineAfterEmpty(game) {
-  const gameId = game.id.trim();
-  if (!gameId) return () => {
-  };
-  const timeoutId = window.setTimeout(() => {
-    if (getGrarfExtensionNcaafRecapHeadlineEntry(gameId).status !== "empty") return;
-    entriesByGameId2.delete(gameId);
-    ensureGrarfExtensionNcaafRecapHeadlineLoaded(game);
-  }, 1500);
-  return () => {
-    window.clearTimeout(timeoutId);
-  };
-}
-
-// ../grarf/desktop/src/extensionHost/useGrarfExtensionNcaafRecapHeadline.ts
-function useGrarfExtensionNcaafRecapHeadline(game) {
-  const gameId = game.id.trim();
-  const contextActive = (0, import_react275.useSyncExternalStore)(
-    subscribeGrarfExtensionGamesYesterdayHighlightsNavSnapshot,
-    () => shouldFetchGrarfExtensionNcaafEspnRecapHeadline(game),
-    () => false
-  );
-  const entry3 = (0, import_react275.useSyncExternalStore)(
-    (listener) => subscribeGrarfExtensionNcaafRecapHeadline(gameId, listener),
-    () => getGrarfExtensionNcaafRecapHeadlineEntry(gameId),
-    () => GRARF_EXTENSION_NCAAF_RECAP_HEADLINE_IDLE_ENTRY
-  );
-  (0, import_react275.useEffect)(() => {
-    if (!contextActive) return;
-    ensureGrarfExtensionNcaafRecapHeadlineLoaded(game);
-  }, [
-    contextActive,
-    game.id,
-    game.status,
-    game.homeScore,
-    game.awayScore,
-    game.homeTeam,
-    game.awayTeam,
-    game.scheduledDateKey
-  ]);
-  (0, import_react275.useEffect)(() => {
-    if (!contextActive || entry3.status !== "empty") return;
-    return retryGrarfExtensionNcaafRecapHeadlineAfterEmpty(game);
-  }, [contextActive, entry3.status, game.id]);
-  const headline = entry3.status === "ready" ? entry3.headline : null;
-  return {
-    headline,
-    showHeadlineUi: contextActive && headline != null
-  };
-}
-
-// ../grarf/desktop/src/extensionHost/useGrarfExtensionNhlRecapHeadline.ts
-init_define_import_meta_env();
-var import_react276 = __toESM(require_react(), 1);
-
-// ../grarf/desktop/src/extensionHost/grarfExtensionNhlRecapHeadlineContext.ts
-init_define_import_meta_env();
-function isGrarfExtensionNhlRecapGame(game) {
-  return game.league === "NHL" || game.id.startsWith("espn-NHL-");
-}
-function isNhlFinalGame(game) {
-  return game.status === "final" || isSpineFinalizedGame(game);
-}
-function shouldFetchGrarfExtensionNhlEspnRecapHeadline(game) {
-  if (!isGrarfExtensionNhlRecapGame(game)) return false;
-  if (isGrarfExtensionGamesCatchUpRecapsNavSnapshotActive()) {
-    return true;
-  }
-  const snapshot2 = getGrarfExtensionGamesYesterdayHighlightsNavSnapshot();
-  if (snapshot2.temporaryNavTopLevel === "GAMES" && snapshot2.gamesCompactTemporalView === "final" && isNhlFinalGame(game)) {
-    return true;
-  }
-  return false;
-}
-
-// ../grarf/desktop/src/extensionHost/grarfExtensionNhlRecapHeadlineStore.ts
-init_define_import_meta_env();
-
-// ../grarf/desktop/src/extensionHost/grarfExtensionNhlEspnRecapHeadline.ts
-init_define_import_meta_env();
-var RECAP_HEADLINE_CACHE_TTL_MS2 = 30 * 60 * 1e3;
-var headlineCache2 = /* @__PURE__ */ new Map();
-var inflightByEventId = /* @__PURE__ */ new Map();
-async function fetchNhlEspnRecapHeadlineForEventId(eventId) {
-  const cached = headlineCache2.get(eventId);
-  if (cached && Date.now() - cached.at < RECAP_HEADLINE_CACHE_TTL_MS2) {
-    return cached.headline;
-  }
-  const inflight = inflightByEventId.get(eventId);
-  if (inflight) return inflight;
-  const promise = (async () => {
-    try {
-      const url = resolveProxiedEspnSummaryFetchUrl("hockey", "nhl", eventId);
-      const res = await fetch(url, {
-        headers: { Accept: "application/json" },
-        cache: "no-store",
-        credentials: "omit"
-      });
-      if (!res.ok) return null;
-      const summary = await res.json();
-      const headline = resolveEspnSummaryRecapArticleHeadlineFromSummary(summary);
-      if (headline) {
-        headlineCache2.set(eventId, { at: Date.now(), headline });
-      }
-      return headline;
-    } catch {
-      return null;
-    } finally {
-      inflightByEventId.delete(eventId);
-    }
-  })();
-  inflightByEventId.set(eventId, promise);
-  return promise;
-}
-async function resolveGrarfExtensionNhlEspnRecapHeadlineForGame(game) {
-  if (!isGrarfExtensionNhlRecapGame(game)) return null;
-  const eventId = parseEspnNhlEventIdFromGame(game);
-  if (!eventId) return null;
-  return fetchNhlEspnRecapHeadlineForEventId(eventId);
-}
-
-// ../grarf/desktop/src/extensionHost/grarfExtensionNhlRecapHeadlineStore.ts
-var GRARF_EXTENSION_NHL_RECAP_HEADLINE_IDLE_ENTRY = {
-  status: "idle"
-};
 var entriesByGameId3 = /* @__PURE__ */ new Map();
 var listenersByGameId3 = /* @__PURE__ */ new Map();
 var inflightByGameId3 = /* @__PURE__ */ new Set();
@@ -159640,7 +159651,7 @@ function setEntry3(gameId, entry3) {
   entriesByGameId3.set(gameId, entry3);
   notify7(gameId);
 }
-function subscribeGrarfExtensionNhlRecapHeadline(gameId, listener) {
+function subscribeGrarfExtensionNcaafRecapHeadline(gameId, listener) {
   const trimmed = gameId.trim();
   if (!trimmed) return () => {
   };
@@ -159657,19 +159668,19 @@ function subscribeGrarfExtensionNhlRecapHeadline(gameId, listener) {
     }
   };
 }
-function getGrarfExtensionNhlRecapHeadlineEntry(gameId) {
-  return entriesByGameId3.get(gameId.trim()) ?? GRARF_EXTENSION_NHL_RECAP_HEADLINE_IDLE_ENTRY;
+function getGrarfExtensionNcaafRecapHeadlineEntry(gameId) {
+  return entriesByGameId3.get(gameId.trim()) ?? GRARF_EXTENSION_NCAAF_RECAP_HEADLINE_IDLE_ENTRY;
 }
-function ensureGrarfExtensionNhlRecapHeadlineLoaded(game) {
+function ensureGrarfExtensionNcaafRecapHeadlineLoaded(game) {
   const gameId = game.id.trim();
-  if (!gameId || !shouldFetchGrarfExtensionNhlEspnRecapHeadline(game)) return;
-  const current = getGrarfExtensionNhlRecapHeadlineEntry(gameId);
+  if (!gameId || !shouldFetchGrarfExtensionNcaafEspnRecapHeadline(game)) return;
+  const current = getGrarfExtensionNcaafRecapHeadlineEntry(gameId);
   if (current.status === "loading" || current.status === "ready") return;
   if (current.status === "empty") return;
   if (inflightByGameId3.has(gameId)) return;
   setEntry3(gameId, { status: "loading" });
   inflightByGameId3.add(gameId);
-  void resolveGrarfExtensionNhlEspnRecapHeadlineForGame(game).then((headline) => {
+  void resolveGrarfExtensionNcaafRecapHeadlineForGame(game).then((headline) => {
     inflightByGameId3.delete(gameId);
     const trimmed = headline?.trim() ?? "";
     if (trimmed) {
@@ -159679,36 +159690,36 @@ function ensureGrarfExtensionNhlRecapHeadlineLoaded(game) {
     }
   });
 }
-function retryGrarfExtensionNhlRecapHeadlineAfterEmpty(game) {
+function retryGrarfExtensionNcaafRecapHeadlineAfterEmpty(game) {
   const gameId = game.id.trim();
   if (!gameId) return () => {
   };
   const timeoutId = window.setTimeout(() => {
-    if (getGrarfExtensionNhlRecapHeadlineEntry(gameId).status !== "empty") return;
+    if (getGrarfExtensionNcaafRecapHeadlineEntry(gameId).status !== "empty") return;
     entriesByGameId3.delete(gameId);
-    ensureGrarfExtensionNhlRecapHeadlineLoaded(game);
+    ensureGrarfExtensionNcaafRecapHeadlineLoaded(game);
   }, 1500);
   return () => {
     window.clearTimeout(timeoutId);
   };
 }
 
-// ../grarf/desktop/src/extensionHost/useGrarfExtensionNhlRecapHeadline.ts
-function useGrarfExtensionNhlRecapHeadline(game) {
+// ../grarf/desktop/src/extensionHost/useGrarfExtensionNcaafRecapHeadline.ts
+function useGrarfExtensionNcaafRecapHeadline(game) {
   const gameId = game.id.trim();
   const contextActive = (0, import_react276.useSyncExternalStore)(
     subscribeGrarfExtensionGamesYesterdayHighlightsNavSnapshot,
-    () => shouldFetchGrarfExtensionNhlEspnRecapHeadline(game),
+    () => shouldFetchGrarfExtensionNcaafEspnRecapHeadline(game),
     () => false
   );
   const entry3 = (0, import_react276.useSyncExternalStore)(
-    (listener) => subscribeGrarfExtensionNhlRecapHeadline(gameId, listener),
-    () => getGrarfExtensionNhlRecapHeadlineEntry(gameId),
-    () => GRARF_EXTENSION_NHL_RECAP_HEADLINE_IDLE_ENTRY
+    (listener) => subscribeGrarfExtensionNcaafRecapHeadline(gameId, listener),
+    () => getGrarfExtensionNcaafRecapHeadlineEntry(gameId),
+    () => GRARF_EXTENSION_NCAAF_RECAP_HEADLINE_IDLE_ENTRY
   );
   (0, import_react276.useEffect)(() => {
     if (!contextActive) return;
-    ensureGrarfExtensionNhlRecapHeadlineLoaded(game);
+    ensureGrarfExtensionNcaafRecapHeadlineLoaded(game);
   }, [
     contextActive,
     game.id,
@@ -159721,7 +159732,7 @@ function useGrarfExtensionNhlRecapHeadline(game) {
   ]);
   (0, import_react276.useEffect)(() => {
     if (!contextActive || entry3.status !== "empty") return;
-    return retryGrarfExtensionNhlRecapHeadlineAfterEmpty(game);
+    return retryGrarfExtensionNcaafRecapHeadlineAfterEmpty(game);
   }, [contextActive, entry3.status, game.id]);
   const headline = entry3.status === "ready" ? entry3.headline : null;
   return {
@@ -159733,7 +159744,7 @@ function useGrarfExtensionNhlRecapHeadline(game) {
 // ../grarf/desktop/src/extensionHost/useGrarfExtensionCatchUpRecapHeadline.ts
 function useGrarfExtensionCatchUpRecapHeadline(game) {
   const epl = useGrarfExtensionEplBbcRecapHeadline(game);
-  const nhl = useGrarfExtensionNhlRecapHeadline(game);
+  const espn = useGrarfExtensionEspnRecapHeadline(game);
   const ncaaf = useGrarfExtensionNcaafRecapHeadline(game);
   const openEplRecap = (0, import_react277.useCallback)(() => {
     void navigateGrarfExtensionBbcSportEplRecapFromGame(game);
@@ -159748,9 +159759,9 @@ function useGrarfExtensionCatchUpRecapHeadline(game) {
       onRecapHeadlineClick: openEplRecap
     };
   }
-  if (nhl.showHeadlineUi && nhl.headline) {
+  if (espn.showHeadlineUi && espn.headline) {
     return {
-      headline: nhl.headline,
+      headline: espn.headline,
       showHeadlineUi: true,
       onRecapHeadlineClick: openCatchUpRecap
     };
@@ -174231,15 +174242,28 @@ init_isGrarfWebRenderer();
 init_define_import_meta_env();
 var GRARF_EXTENSION_SIDEBAR_SCROLLPORT_HEIGHT_VAR = "--grarf-extension-sidebar-scrollport-height";
 var GRARF_EXTENSION_TEMPORAL_NAV_CHROME_HEIGHT_VAR = "--grarf-extension-temporal-nav-chrome-height";
+var GRARF_EXTENSION_TEMPORAL_LEAGUE_HEADER_HEIGHT_VAR = "--grarf-extension-temporal-league-header-height";
 function syncGrarfExtensionTemporalNavChromeMetrics(scrollRoot) {
   const chrome = scrollRoot.querySelector("[data-grarf-extension-temporal-nav-chrome]");
   if (!chrome) {
     scrollRoot.style.removeProperty(GRARF_EXTENSION_TEMPORAL_NAV_CHROME_HEIGHT_VAR);
+  } else {
+    scrollRoot.style.setProperty(
+      GRARF_EXTENSION_TEMPORAL_NAV_CHROME_HEIGHT_VAR,
+      `${chrome.offsetHeight}px`
+    );
+  }
+  const expanded = scrollRoot.querySelector(EXPANDED_NESTED_LEAGUE_SELECTOR);
+  const leagueRow = expanded?.querySelector(
+    ":scope > [data-sports-browser-prototype-sidebar-league-row]"
+  );
+  if (!leagueRow) {
+    scrollRoot.style.removeProperty(GRARF_EXTENSION_TEMPORAL_LEAGUE_HEADER_HEIGHT_VAR);
     return;
   }
   scrollRoot.style.setProperty(
-    GRARF_EXTENSION_TEMPORAL_NAV_CHROME_HEIGHT_VAR,
-    `${chrome.offsetHeight}px`
+    GRARF_EXTENSION_TEMPORAL_LEAGUE_HEADER_HEIGHT_VAR,
+    `${leagueRow.offsetHeight}px`
   );
 }
 function applyGrarfExtensionSidebarScrollportHeight(scrollRoot) {
@@ -174277,6 +174301,7 @@ function observeGrarfExtensionSidebarScrollportHeight(scrollRoot) {
     window.removeEventListener("resize", syncScrollport);
     clearGrarfExtensionSidebarScrollportHeight(scrollRoot);
     scrollRoot.style.removeProperty(GRARF_EXTENSION_TEMPORAL_NAV_CHROME_HEIGHT_VAR);
+    scrollRoot.style.removeProperty(GRARF_EXTENSION_TEMPORAL_LEAGUE_HEADER_HEIGHT_VAR);
     disconnectGrarfExtensionExpandedLeagueHeaderStickyObserver();
   };
 }
