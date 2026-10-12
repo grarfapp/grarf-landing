@@ -30021,6 +30021,7 @@ var SOCCERWAY_SOCCER_LEAGUE_REGISTRY = {
   BUNDESLIGA: { catalogPageUrls: soccerwayCatalogPages("germany/bundesliga") },
   EPL: { catalogPageUrls: soccerwayCatalogPages("england/premier-league") },
   LALIGA: { catalogPageUrls: soccerwayCatalogPages("spain/laliga") },
+  MLS: { catalogPageUrls: soccerwayCatalogPages("usa/mls") },
   LIGUE1: { catalogPageUrls: soccerwayCatalogPages("france/ligue-1") },
   NATIONS: { catalogPageUrls: soccerwayCatalogPages("europe/uefa-nations-league") },
   SERIEA: { catalogPageUrls: soccerwayCatalogPages("italy/serie-a") },
