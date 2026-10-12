@@ -110042,6 +110042,359 @@ function resolveGrarfExtensionMlbRecapUrlFromOperationalGame(game) {
   return null;
 }
 
+// ../grarf/desktop/src/extensionHost/grarfExtensionMlssoccerRecapHeadlineContext.ts
+init_define_import_meta_env();
+
+// ../grarf/shared/domain/mls/resolveMlssoccerMatchSummaryFromRecapPageHtml.ts
+init_define_import_meta_env();
+function normalizeSummaryText(text2) {
+  return text2.trim().replace(/\s+/g, " ").replace(/\s+\*$/, "").trim();
+}
+function resolveMlssoccerMatchSummaryFromRecapPageHtml(recapPageHtml) {
+  const sectionMatch = recapPageHtml.match(
+    /Match Summary<\/h2>\s*<div[^>]*class="[^"]*mls-c-ai-match-summary__content[^"]*"[^>]*>\s*<p>([\s\S]*?)<\/p>/i
+  );
+  if (sectionMatch?.[1]) {
+    const text2 = normalizeSummaryText(sectionMatch[1].replace(/<[^>]+>/g, ""));
+    if (text2.length >= 24) return text2;
+  }
+  const fallback = recapPageHtml.match(
+    /mls-c-ai-match-summary__content[\s\S]*?<p>([\s\S]*?)<\/p>/i
+  );
+  if (fallback?.[1]) {
+    const text2 = normalizeSummaryText(fallback[1].replace(/<[^>]+>/g, ""));
+    if (text2.length >= 24) return text2;
+  }
+  return null;
+}
+
+// ../grarf/desktop/src/extensionHost/grarfExtensionMlssoccerRecapUrl.ts
+init_define_import_meta_env();
+
+// ../grarf/shared/domain/mls/buildMlssoccerMatchRecapUrl.ts
+init_define_import_meta_env();
+var MLS_MATCH_SLUG_ABBREV_BY_CANONICAL = {
+  "LA Galaxy": "sla",
+  "Los Angeles FC": "lafc"
+};
+function resolveTeamLabelCandidates(game, side) {
+  const seen = /* @__PURE__ */ new Set();
+  const out = [];
+  const push2 = (raw) => {
+    const trimmed = raw?.trim() ?? "";
+    if (!trimmed) return;
+    const key2 = trimmed.toLowerCase();
+    if (seen.has(key2)) return;
+    seen.add(key2);
+    out.push(trimmed);
+  };
+  if (side === "home") {
+    push2(game.metadata?.officialHomeName);
+    push2(game.homeTeam);
+    push2(game.homeCity);
+  } else {
+    push2(game.metadata?.officialAwayName);
+    push2(game.awayTeam);
+    push2(game.awayCity);
+  }
+  return out;
+}
+function resolveSlugAbbrev(game, side) {
+  const candidates = resolveTeamLabelCandidates(game, side);
+  for (const label of candidates) {
+    const canonical = normalizeSoccerTeamName({
+      league: "MLS",
+      provider: "espn",
+      teamName: label
+    });
+    const fromCanonical = MLS_MATCH_SLUG_ABBREV_BY_CANONICAL[canonical];
+    if (fromCanonical) return fromCanonical;
+    const fromLabel = MLS_MATCH_SLUG_ABBREV_BY_CANONICAL[label];
+    if (fromLabel) return fromLabel;
+  }
+  const abbrev = (side === "home" ? game.homeTeamAbbrev : game.awayTeamAbbrev)?.trim() ?? "";
+  if (!abbrev) return null;
+  const canonicalFromAbbrev = candidates[0] ? normalizeSoccerTeamName({
+    league: "MLS",
+    provider: "espn",
+    teamName: candidates[0]
+  }) : "";
+  if (canonicalFromAbbrev === "LA Galaxy" && abbrev.toUpperCase() === "LA") {
+    return "sla";
+  }
+  return abbrev.toLowerCase();
+}
+function resolveMatchSlugDateParts(game) {
+  const key2 = game.scheduledDateKey?.trim();
+  if (key2 && /^\d{4}-\d{2}-\d{2}$/.test(key2)) {
+    const [year, month2, day2] = key2.split("-");
+    return { seasonYear: year, month: month2, day: day2 };
+  }
+  const ms2 = game.startTimeMs ?? NaN;
+  if (!Number.isFinite(ms2)) return null;
+  const dt2 = new Date(ms2);
+  const month = String(dt2.getUTCMonth() + 1).padStart(2, "0");
+  const day = String(dt2.getUTCDate()).padStart(2, "0");
+  const seasonYear = String(dt2.getUTCFullYear());
+  return { seasonYear, month, day };
+}
+function buildMlssoccerMatchRecapUrl(game) {
+  if (game.league?.trim().toUpperCase() !== "MLS") return null;
+  const homeAbbrev = resolveSlugAbbrev(game, "home");
+  const awayAbbrev = resolveSlugAbbrev(game, "away");
+  const dateParts = resolveMatchSlugDateParts(game);
+  if (!homeAbbrev || !awayAbbrev || !dateParts) return null;
+  const slug = `${homeAbbrev}v${awayAbbrev}-${dateParts.month}-${dateParts.day}-${dateParts.seasonYear}`;
+  return `https://www.mlssoccer.com/competitions/mls-regular-season/${dateParts.seasonYear}/matches/${slug}/`;
+}
+
+// ../grarf/desktop/src/extensionHost/grarfExtensionFieldLevelMediaMlsRecapUrl.ts
+init_define_import_meta_env();
+
+// ../grarf/shared/domain/mls/fieldLevelMediaMlsConstants.ts
+init_define_import_meta_env();
+var FIELD_LEVEL_MEDIA_MLS_RECAP_INDEX_URL = "https://fieldlevelmedia.com/soccer/mls/";
+var FIELD_LEVEL_MEDIA_MLS_RECAP_ARTICLE_URL_PATTERN = /^https:\/\/fieldlevelmedia\.com\/mls\/[a-z0-9-]+\/?$/i;
+
+// ../grarf/shared/domain/mls/matchFieldLevelMediaMlsRecapArticleForGame.ts
+init_define_import_meta_env();
+
+// ../grarf/shared/domain/mls/fieldLevelMediaMlsTeamSearchTerms.ts
+init_define_import_meta_env();
+var FIELD_LEVEL_MEDIA_MLS_TEAM_EXTRA_TERMS = {
+  "St. Louis City SC": ["st-louis", "st louis", "louis"],
+  "LA Galaxy": ["galaxy"],
+  "Los Angeles FC": ["lafc"],
+  "Vancouver Whitecaps FC": ["whitecaps", "vancouver"],
+  "Colorado Rapids": ["rapids", "colorado"],
+  "San Jose Earthquakes": ["earthquakes", "san-jose"],
+  "Houston Dynamo FC": ["houston", "dynamo"],
+  "Minnesota United FC": ["minnesota", "united"],
+  "Sporting Kansas City": ["sporting", "kansas"],
+  "Portland Timbers": ["timbers", "portland"],
+  "Seattle Sounders FC": ["sounders", "seattle"],
+  "Real Salt Lake": ["rsl", "salt-lake", "salt lake"],
+  "Philadelphia Union": ["union", "philadelphia"],
+  "Nashville SC": ["nashville"],
+  "Austin FC": ["austin"],
+  "FC Dallas": ["dallas", "fc-dallas"],
+  "Orlando City SC": ["orlando"],
+  "Inter Miami CF": ["miami", "inter-miami"],
+  "Atlanta United FC": ["atlanta", "united"],
+  "Charlotte FC": ["charlotte"],
+  "New York City FC": ["nycfc", "new-york-city"],
+  "New York Red Bulls": ["red-bulls", "red bulls", "ny-red-bulls"],
+  "New England Revolution": ["revolution", "new-england"],
+  "Chicago Fire FC": ["chicago", "fire"],
+  "D.C. United": ["dc-united", "dc united"],
+  "Columbus Crew": ["columbus", "crew"],
+  "FC Cincinnati": ["cincinnati"],
+  "Toronto FC": ["toronto"],
+  "CF Montr\xE9al": ["montreal", "cf-montreal"],
+  "San Diego FC": ["san-diego"]
+};
+function slugifySearchTerm(value) {
+  return value.trim().toLowerCase().normalize("NFD").replace(/\p{M}/gu, "").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+}
+function resolveTeamLabelCandidates2(game, side) {
+  const seen = /* @__PURE__ */ new Set();
+  const out = [];
+  const push2 = (raw) => {
+    const trimmed = raw?.trim() ?? "";
+    if (!trimmed) return;
+    const key2 = trimmed.toLowerCase();
+    if (seen.has(key2)) return;
+    seen.add(key2);
+    out.push(trimmed);
+  };
+  if (side === "home") {
+    push2(game.metadata?.officialHomeName);
+    push2(game.homeTeam);
+    push2(game.homeCity);
+  } else {
+    push2(game.metadata?.officialAwayName);
+    push2(game.awayTeam);
+    push2(game.awayCity);
+  }
+  return out;
+}
+function resolveFieldLevelMediaMlsTeamSearchTerms(game, side) {
+  const terms = /* @__PURE__ */ new Set();
+  const candidates = resolveTeamLabelCandidates2(game, side);
+  for (const label of candidates) {
+    const slug = slugifySearchTerm(label);
+    if (slug.length >= 2) terms.add(slug);
+    const canonical = normalizeSoccerTeamName({
+      league: "MLS",
+      provider: "espn",
+      teamName: label
+    });
+    if (canonical) {
+      const canonicalSlug = slugifySearchTerm(canonical);
+      if (canonicalSlug.length >= 2) terms.add(canonicalSlug);
+      for (const extra of FIELD_LEVEL_MEDIA_MLS_TEAM_EXTRA_TERMS[canonical] ?? []) {
+        const extraSlug = slugifySearchTerm(extra);
+        if (extraSlug.length >= 2) terms.add(extraSlug);
+      }
+    }
+    const parts = label.split(/\s+/).filter(Boolean);
+    const nickname = parts[parts.length - 1];
+    if (nickname && nickname.length >= 4) {
+      const nickSlug = slugifySearchTerm(nickname);
+      if (nickSlug.length >= 4) terms.add(nickSlug);
+    }
+  }
+  return [...terms];
+}
+
+// ../grarf/shared/domain/mls/matchFieldLevelMediaMlsRecapArticleForGame.ts
+function slugContainsAnyTerm(slug, terms) {
+  const normalized = slug.toLowerCase();
+  for (const term of terms) {
+    const trimmed = term.trim().toLowerCase();
+    if (!trimmed) continue;
+    if (trimmed.includes("-")) {
+      if (normalized.includes(trimmed)) return true;
+      continue;
+    }
+    if (normalized.includes(trimmed)) return true;
+  }
+  return false;
+}
+function scoreFieldLevelMediaMlsRecapArticleForGame(game, article) {
+  const homeTerms = resolveFieldLevelMediaMlsTeamSearchTerms(game, "home");
+  const awayTerms = resolveFieldLevelMediaMlsTeamSearchTerms(game, "away");
+  if (homeTerms.length === 0 || awayTerms.length === 0) return 0;
+  const homeHit = slugContainsAnyTerm(article.slug, homeTerms);
+  const awayHit = slugContainsAnyTerm(article.slug, awayTerms);
+  if (!homeHit || !awayHit) return 0;
+  let score2 = 1;
+  const longerHits = homeTerms.filter((t2) => article.slug.includes(t2)).length + awayTerms.filter((t2) => article.slug.includes(t2)).length;
+  score2 += longerHits * 0.05;
+  return score2;
+}
+function matchFieldLevelMediaMlsRecapArticleForGame(game, articles) {
+  let best = null;
+  let bestScore = 0;
+  let bestIndex = Number.MAX_SAFE_INTEGER;
+  articles.forEach((article, index2) => {
+    const score2 = scoreFieldLevelMediaMlsRecapArticleForGame(game, article);
+    if (score2 > bestScore || score2 === bestScore && score2 > 0 && index2 < bestIndex) {
+      bestScore = score2;
+      best = article;
+      bestIndex = index2;
+    }
+  });
+  return bestScore > 0 ? best : null;
+}
+
+// ../grarf/shared/domain/mls/parseFieldLevelMediaMlsRecapArticlesFromIndexHtml.ts
+init_define_import_meta_env();
+var HREF_PATTERN = /href="(https:\/\/fieldlevelmedia\.com\/mls\/[a-z0-9-]+\/?)"/gi;
+function parseFieldLevelMediaMlsRecapArticlesFromIndexHtml(indexHtml) {
+  const seen = /* @__PURE__ */ new Set();
+  const articles = [];
+  for (const match of indexHtml.matchAll(HREF_PATTERN)) {
+    const raw = match[1]?.trim();
+    if (!raw) continue;
+    const url = raw.endsWith("/") ? raw : `${raw}/`;
+    if (!FIELD_LEVEL_MEDIA_MLS_RECAP_ARTICLE_URL_PATTERN.test(url)) continue;
+    if (seen.has(url)) continue;
+    seen.add(url);
+    const slug = url.replace(/^https:\/\/fieldlevelmedia\.com\/mls\//i, "").replace(/\/$/, "");
+    articles.push({ url, slug });
+  }
+  return articles;
+}
+
+// ../grarf/desktop/src/extensionHost/grarfExtensionFieldLevelMediaMlsRecapUrl.ts
+var MLS_RECAP_PAGE_UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36";
+var INDEX_CACHE_TTL_MS = 5 * 60 * 1e3;
+var cachedIndexHtml = null;
+var inflightIndexFetch = null;
+async function fetchFieldLevelMediaMlsRecapIndexHtml() {
+  if (cachedIndexHtml && Date.now() - cachedIndexHtml.at < INDEX_CACHE_TTL_MS) {
+    return cachedIndexHtml.html;
+  }
+  if (inflightIndexFetch) return inflightIndexFetch;
+  inflightIndexFetch = (async () => {
+    try {
+      const res = await fetch(FIELD_LEVEL_MEDIA_MLS_RECAP_INDEX_URL, {
+        headers: {
+          Accept: "text/html,application/xhtml+xml",
+          "Accept-Language": "en-US,en;q=0.9",
+          "User-Agent": MLS_RECAP_PAGE_UA
+        },
+        cache: "no-store",
+        credentials: "omit"
+      });
+      if (!res.ok) return null;
+      const html = await res.text();
+      cachedIndexHtml = { at: Date.now(), html };
+      return html;
+    } catch {
+      return null;
+    } finally {
+      inflightIndexFetch = null;
+    }
+  })();
+  return inflightIndexFetch;
+}
+async function resolveGrarfExtensionFieldLevelMediaMlsRecapUrlFromGame(game) {
+  if (game.league?.trim().toUpperCase() !== "MLS") return null;
+  const indexHtml = await fetchFieldLevelMediaMlsRecapIndexHtml();
+  if (!indexHtml) return null;
+  const articles = parseFieldLevelMediaMlsRecapArticlesFromIndexHtml(indexHtml);
+  const match = matchFieldLevelMediaMlsRecapArticleForGame(game, articles);
+  return match?.url ?? null;
+}
+
+// ../grarf/desktop/src/extensionHost/grarfExtensionMlssoccerRecapUrl.ts
+function buildGrarfExtensionMlssoccerComMatchUrlFromGame(game) {
+  if (game.league?.trim().toUpperCase() !== "MLS") return null;
+  return buildMlssoccerMatchRecapUrl(game);
+}
+async function resolveGrarfExtensionMlssoccerRecapNavigationUrlFromGame(game) {
+  return resolveGrarfExtensionFieldLevelMediaMlsRecapUrlFromGame(game);
+}
+
+// ../grarf/desktop/src/extensionHost/grarfExtensionMlssoccerRecapHeadlineContext.ts
+var MLS_RECAP_PAGE_UA2 = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36";
+function grarfExtensionLeagueUsesMlssoccerRecaps(leagueKey) {
+  return leagueKey.trim().toUpperCase() === "MLS";
+}
+function isGrarfExtensionMlssoccerRecapHeadlineGame(game) {
+  return grarfExtensionLeagueUsesMlssoccerRecaps(game.league ?? "");
+}
+function shouldFetchGrarfExtensionMlssoccerRecapHeadline(game) {
+  if (!isGrarfExtensionMlssoccerRecapHeadlineGame(game)) return false;
+  return shouldFetchGrarfExtensionCatchUpRecapHeadline(game);
+}
+async function resolveGrarfExtensionMlssoccerRecapHeadlineForRecapUrl(recapUrl) {
+  try {
+    const res = await fetch(recapUrl, {
+      headers: {
+        Accept: "text/html,application/xhtml+xml",
+        "Accept-Language": "en-US,en;q=0.9",
+        "User-Agent": MLS_RECAP_PAGE_UA2
+      },
+      cache: "no-store",
+      credentials: "omit"
+    });
+    if (!res.ok) return null;
+    const html = await res.text();
+    return resolveMlssoccerMatchSummaryFromRecapPageHtml(html);
+  } catch {
+    return null;
+  }
+}
+function resolveGrarfExtensionMlssoccerComRecapPageUrlForHeadline(game) {
+  return buildGrarfExtensionMlssoccerComMatchUrlFromGame(game);
+}
+function resolveGrarfExtensionMlssoccerRecapUrlForGame(game) {
+  return resolveGrarfExtensionMlssoccerComRecapPageUrlForHeadline(game);
+}
+
 // ../grarf/desktop/src/extensionHost/resolveGrarfExtensionHostContextMenuUrl.ts
 var CONTEXT_MENU_URL_ATTR = "data-grarf-extension-host-context-menu-url";
 function resolveGrarfExtensionHostContextMenuUrlForLeague(leagueKey) {
@@ -110052,12 +110405,16 @@ function resolveGrarfExtensionHostContextMenuUrlForLeague(leagueKey) {
   };
   return resolveGrarfExtensionHostExternalDestinationUrl(pane);
 }
-function resolveGrarfExtensionHostContextMenuUrlForGameCard(game) {
+async function resolveGrarfExtensionHostContextMenuUrlForGameCardAsync(game) {
   const context2 = resolveGameBrowserContext(game);
   if (isGrarfExtensionGamesYesterdayRecapsNavSnapshotActive()) {
     if (isGrarfExtensionMlbRecapGame(game)) {
       const mlbRecapUrl = resolveGrarfExtensionMlbRecapUrlFromOperationalGame(game);
       if (mlbRecapUrl) return mlbRecapUrl;
+    }
+    if (grarfExtensionLeagueUsesMlssoccerRecaps(game.league ?? "")) {
+      const flmRecapUrl = await resolveGrarfExtensionMlssoccerRecapNavigationUrlFromGame(game);
+      if (flmRecapUrl) return flmRecapUrl;
     }
     const recapPane = applySportsBrowserPrototypeGameContextSectionToPane(
       applySportsBrowserPrototypeGameToPane(game),
@@ -153076,7 +153433,7 @@ function GrarfExtensionCommandCenterFollowLiveExpandedPanel({
 
 // ../grarf/desktop/src/extensionHost/GrarfExtensionCommandCenterScorecard.tsx
 init_define_import_meta_env();
-var import_react275 = __toESM(require_react(), 1);
+var import_react276 = __toESM(require_react(), 1);
 
 // ../grarf/desktop/src/components/homeMvp/NewsSportsBrowserChannelLogo.tsx
 init_define_import_meta_env();
@@ -158260,6 +158617,51 @@ async function fetchFotmobMatchHighlightYoutubeUrl(matchId) {
 }
 
 // ../grarf/desktop/src/lib/fotmob/resolveFotmobHighlightYoutubeUrl.ts
+var CATALOG_CACHE_TTL_MS8 = 5 * 60 * 1e3;
+var catalogCache3 = /* @__PURE__ */ new Map();
+function resolveFotmobDateKeysForGame2(game) {
+  const keys = /* @__PURE__ */ new Set();
+  const fromOperational = resolveGameOperationalDateKey(game);
+  if (fromOperational) {
+    const fromScheduled = fotmobDateKeyFromScheduledDateKey2(fromOperational);
+    if (fromScheduled) keys.add(fromScheduled);
+  }
+  const fromMs = game.startTimeMs != null ? fotmobDateKeyFromMs2(game.startTimeMs) : null;
+  if (fromMs) keys.add(fromMs);
+  const scheduled = fotmobDateKeyFromScheduledDateKey2(game.scheduledDateKey);
+  if (scheduled) keys.add(scheduled);
+  return [...keys];
+}
+async function fetchFotmobCatalogForGame(game, leagueKey) {
+  const dateKeys = resolveFotmobDateKeysForGame2(game);
+  const cacheKey3 = `${leagueKey}|${dateKeys.join("|") || "none"}`;
+  const cached = catalogCache3.get(cacheKey3);
+  if (cached && Date.now() - cached.at < CATALOG_CACHE_TTL_MS8) {
+    return cached.matches;
+  }
+  for (const dateKey of dateKeys) {
+    const matches = await fetchFotmobLeagueMatchesByDate(leagueKey, dateKey);
+    if (matches.length > 0) {
+      catalogCache3.set(cacheKey3, { at: Date.now(), matches });
+      return matches;
+    }
+  }
+  catalogCache3.set(cacheKey3, { at: Date.now(), matches: [] });
+  return [];
+}
+async function resolveFotmobMatchIdForHighlightGame(game) {
+  const fromExternal = game.externalIds?.fotmob?.trim();
+  if (fromExternal) return fromExternal;
+  const leagueKey = game.league?.trim().toUpperCase();
+  if (!leagueKey || !getFotmobLeagueRegistryEntry(leagueKey)) return null;
+  try {
+    const catalog = await fetchFotmobCatalogForGame(game, leagueKey);
+    const match = matchFotmobRecapForMlbGame(game, catalog);
+    return match ? String(match.id) : null;
+  } catch {
+    return null;
+  }
+}
 function resolveFotmobHighlightYoutubeUrlFromGameMetadata(game) {
   const fromMetadata = game.metadata?.fotmobHighlightYoutubeUrl?.trim();
   if (fromMetadata) return fromMetadata;
@@ -158268,9 +158670,9 @@ function resolveFotmobHighlightYoutubeUrlFromGameMetadata(game) {
 async function resolveFotmobHighlightYoutubeUrl(game) {
   const fromMetadata = resolveFotmobHighlightYoutubeUrlFromGameMetadata(game);
   if (fromMetadata) return fromMetadata;
-  const fotmobId = game.externalIds?.fotmob?.trim();
-  if (!fotmobId) return null;
-  return fetchFotmobMatchHighlightYoutubeUrl(fotmobId);
+  const matchId = await resolveFotmobMatchIdForHighlightGame(game);
+  if (!matchId) return null;
+  return fetchFotmobMatchHighlightYoutubeUrl(matchId);
 }
 
 // ../grarf/desktop/src/extensionHost/grarfExtensionGameFotmobYoutubeHighlightsUrl.ts
@@ -158389,6 +158791,24 @@ async function resolveGrarfExtensionSoccerwayYoutubeHighlightWatchUrl(game) {
   const videoPageUrl = await resolveSoccerwayVideoPageUrlFromGame(game);
   if (!videoPageUrl) return null;
   return fetchSoccerwayMatchVideoYoutubeUrl(videoPageUrl);
+}
+async function resolveGrarfExtensionBigFiveSoccerYoutubeHighlightWatchUrl(game) {
+  const leagueKey = game.league?.trim().toUpperCase() ?? "";
+  if (!grarfExtensionLeagueUsesGamesYesterdaySoccerwayYoutubeHighlights(leagueKey)) {
+    return null;
+  }
+  try {
+    const soccerwayUrl = await resolveGrarfExtensionSoccerwayYoutubeHighlightWatchUrl(game);
+    if (soccerwayUrl?.trim()) return soccerwayUrl.trim();
+  } catch {
+  }
+  try {
+    const fotmobUrl = await resolveGrarfExtensionFotmobYoutubeHighlightWatchUrl(game);
+    if (fotmobUrl?.trim()) return fotmobUrl.trim();
+  } catch {
+    return null;
+  }
+  return null;
 }
 
 // ../grarf/desktop/src/extensionHost/grarfExtensionF1YoutubeHighlightsResolver.ts
@@ -158980,12 +159400,12 @@ function resolveUefaNationsLeagueHighlightGameAnchorMs(game) {
 }
 
 // ../grarf/desktop/src/extensionHost/grarfExtensionUefaNationsLeagueHighlightsResolver.ts
-var INDEX_CACHE_TTL_MS = 5 * 60 * 1e3;
+var INDEX_CACHE_TTL_MS2 = 5 * 60 * 1e3;
 var HIGHLIGHT_INDEX_PATH = "/clips/uefa-nations-league-highlights";
 var MAX_PUBLISH_DELTA_MS = 14 * 24 * 60 * 60 * 1e3;
 var indexCache = null;
 async function fetchUefaNationsLeagueHighlightIndex() {
-  if (indexCache && Date.now() - indexCache.at < INDEX_CACHE_TTL_MS) {
+  if (indexCache && Date.now() - indexCache.at < INDEX_CACHE_TTL_MS2) {
     return indexCache.items;
   }
   const cloudBase = getOperationalIngestConfig().cloudBaseUrl?.replace(/\/$/, "");
@@ -159214,12 +159634,11 @@ async function resolveGrarfExtensionCatchUpHighlightsUrlForGame(game) {
   }
   if (grarfExtensionLeagueUsesGamesYesterdaySoccerwayYoutubeHighlights(leagueKey)) {
     try {
-      const soccerwayHighlightUrl = await resolveGrarfExtensionSoccerwayYoutubeHighlightWatchUrl(game);
-      if (soccerwayHighlightUrl?.trim()) return soccerwayHighlightUrl.trim();
+      const bigFiveUrl = await resolveGrarfExtensionBigFiveSoccerYoutubeHighlightWatchUrl(game);
+      if (bigFiveUrl?.trim()) return bigFiveUrl.trim();
     } catch {
     }
-  }
-  if (grarfExtensionLeagueUsesGamesYesterdayFotmobYoutubeHighlights(leagueKey)) {
+  } else if (grarfExtensionLeagueUsesGamesYesterdayFotmobYoutubeHighlights(leagueKey)) {
     try {
       const fotmobHighlightUrl = await resolveGrarfExtensionFotmobYoutubeHighlightWatchUrl(game);
       if (fotmobHighlightUrl?.trim()) return fotmobHighlightUrl.trim();
@@ -159483,6 +159902,9 @@ function resolveGrarfExtensionCommandCenterScorecardMediaActionEnabled(game, med
   if (mediaAction.kind === "highlights" && isGrarfExtensionRenderer() && isGrarfExtensionCommandCenterCatchUpRecapsRailContext() && resolveGrarfExtensionCommandCenterScorecardState(game) === "final") {
     return true;
   }
+  if (mediaAction.kind === "recap" && isGrarfExtensionRenderer() && grarfExtensionLeagueUsesMlssoccerRecaps(game.league ?? "") && resolveGrarfExtensionCommandCenterScorecardState(game) === "final") {
+    return true;
+  }
   if (mediaAction.kind === "recap" && isGrarfExtensionRenderer() && grarfExtensionLeagueUsesBbcSportEplRecaps(game.league ?? "") && resolveGrarfExtensionCommandCenterScorecardState(game) === "final") {
     const source = getGrarfExtensionEplRecapsSource();
     if (source === "soccerway") {
@@ -159531,6 +159953,8 @@ function resolveGrarfExtensionCommandCenterScorecardGamecenterUrl(game) {
   if (isGrarfExtensionRenderer()) {
     const mlbGamedayUrl = resolveGrarfExtensionMlbComGamedayUrlForGame(game);
     if (mlbGamedayUrl) return mlbGamedayUrl;
+    const mlsMatchUrl = buildGrarfExtensionMlssoccerComMatchUrlFromGame(game);
+    if (mlsMatchUrl) return mlsMatchUrl;
   }
   const { gameCenter } = resolveGameBrowserContext(game);
   if (gameCenter.length === 0) return null;
@@ -159555,6 +159979,13 @@ async function openGrarfExtensionCommandCenterScorecardMediaActionUrl(game, medi
     }
   }
   if (mediaAction.kind === "recap") {
+    if (grarfExtensionLeagueUsesMlssoccerRecaps(game.league ?? "")) {
+      const flmRecapUrl = await resolveGrarfExtensionMlssoccerRecapNavigationUrlFromGame(game);
+      if (flmRecapUrl) {
+        openGrarfExtensionCommandCenterScorecardExternalUrl(flmRecapUrl);
+        return;
+      }
+    }
     if (grarfExtensionLeagueUsesBbcSportEplRecaps(game.league ?? "")) {
       const eplRecapUrl = await resolveGrarfExtensionEplRecapNavigationUrlFromGame(
         game,
@@ -159631,6 +160062,24 @@ function GrarfExtensionEplBbcRecapHeadlineStrip({ headline, className, onClick }
       ] })
     }
   );
+}
+
+// ../grarf/desktop/src/extensionHost/useGrarfExtensionHostContextMenuUrlForGame.ts
+init_define_import_meta_env();
+var import_react275 = __toESM(require_react(), 1);
+function useGrarfExtensionHostContextMenuUrlForGame(game) {
+  const [url, setUrl] = (0, import_react275.useState)(null);
+  (0, import_react275.useEffect)(() => {
+    let cancelled = false;
+    setUrl(null);
+    void resolveGrarfExtensionHostContextMenuUrlForGameCardAsync(game).then((resolved) => {
+      if (!cancelled) setUrl(resolved);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [game]);
+  return url;
 }
 
 // ../grarf/desktop/src/extensionHost/GrarfExtensionCommandCenterScorecard.tsx
@@ -159725,7 +160174,7 @@ function mapMediaActionKindToInlineActionId(kind) {
 }
 function GrarfExtensionCommandCenterScorecardInlineActionBar({ game }) {
   const gameId = game.id.trim();
-  const activeAction = (0, import_react275.useSyncExternalStore)(
+  const activeAction = (0, import_react276.useSyncExternalStore)(
     subscribeGrarfExtensionCommandCenterScorecardInlineActionActive,
     () => getGrarfExtensionCommandCenterScorecardInlineActionActive(gameId),
     () => null
@@ -159872,10 +160321,7 @@ function GrarfExtensionCommandCenterScorecardShell({
   onRecapHeadlineClick
 }) {
   const state3 = resolveGrarfExtensionCommandCenterScorecardState(game);
-  const contextMenuUrl = (0, import_react275.useMemo)(
-    () => resolveGrarfExtensionHostContextMenuUrlForGameCard(game),
-    [game]
-  );
+  const contextMenuUrl = useGrarfExtensionHostContextMenuUrlForGame(game);
   return /* @__PURE__ */ (0, import_jsx_runtime246.jsxs)(
     "div",
     {
@@ -159885,6 +160331,7 @@ function GrarfExtensionCommandCenterScorecardShell({
       ),
       ...grarfExtensionHostContextMenuUrlDataAttributes(contextMenuUrl),
       "data-sports-browser-prototype-command-center-game-card": "",
+      "data-game-id": game.id,
       "data-grarf-extension-command-center-four-line-scorecard": "",
       "data-grarf-extension-command-center-scorecard-v2": "",
       "data-grarf-extension-command-center-scorecard-minimal-vertical": "",
@@ -159944,7 +160391,6 @@ function GrarfExtensionCommandCenterScorecardShell({
 
 // ../grarf/desktop/src/extensionHost/GrarfExtensionYesterdayHighlightsMinimizedGameCard.tsx
 init_define_import_meta_env();
-var import_react282 = __toESM(require_react(), 1);
 
 // ../grarf/desktop/src/extensionHost/grarfExtensionGameYesterdayHighlightsNavigation.ts
 init_define_import_meta_env();
@@ -159962,12 +160408,11 @@ async function navigateGrarfExtensionGameYesterdayHighlights(game, context2) {
   };
   if (grarfExtensionLeagueUsesGamesYesterdaySoccerwayYoutubeHighlights(leagueKey)) {
     try {
-      const soccerwayHighlightUrl = await resolveGrarfExtensionSoccerwayYoutubeHighlightWatchUrl(game);
-      if (openHighlightsUrl(soccerwayHighlightUrl)) return true;
+      const bigFiveUrl = await resolveGrarfExtensionBigFiveSoccerYoutubeHighlightWatchUrl(game);
+      if (openHighlightsUrl(bigFiveUrl)) return true;
     } catch {
     }
-  }
-  if (grarfExtensionLeagueUsesGamesYesterdayFotmobYoutubeHighlights(leagueKey)) {
+  } else if (grarfExtensionLeagueUsesGamesYesterdayFotmobYoutubeHighlights(leagueKey)) {
     try {
       const fotmobHighlightUrl = await resolveGrarfExtensionFotmobYoutubeHighlightWatchUrl(game);
       if (openHighlightsUrl(fotmobHighlightUrl)) return true;
@@ -160015,146 +160460,6 @@ function buildGrarfExtensionGameGoogleRecapsSearchUrl(game) {
   return buildGrarfExtensionGameTeamNamesGoogleSearchUrl(game);
 }
 
-// ../grarf/desktop/src/extensionHost/grarfExtensionMlssoccerRecapUrl.ts
-init_define_import_meta_env();
-
-// ../grarf/shared/domain/mls/buildMlssoccerMatchRecapUrl.ts
-init_define_import_meta_env();
-var MLS_MATCH_SLUG_ABBREV_BY_CANONICAL = {
-  "LA Galaxy": "sla",
-  "Los Angeles FC": "lafc"
-};
-function resolveTeamLabelCandidates(game, side) {
-  const seen = /* @__PURE__ */ new Set();
-  const out = [];
-  const push2 = (raw) => {
-    const trimmed = raw?.trim() ?? "";
-    if (!trimmed) return;
-    const key2 = trimmed.toLowerCase();
-    if (seen.has(key2)) return;
-    seen.add(key2);
-    out.push(trimmed);
-  };
-  if (side === "home") {
-    push2(game.metadata?.officialHomeName);
-    push2(game.homeTeam);
-    push2(game.homeCity);
-  } else {
-    push2(game.metadata?.officialAwayName);
-    push2(game.awayTeam);
-    push2(game.awayCity);
-  }
-  return out;
-}
-function resolveSlugAbbrev(game, side) {
-  const candidates = resolveTeamLabelCandidates(game, side);
-  for (const label of candidates) {
-    const canonical = normalizeSoccerTeamName({
-      league: "MLS",
-      provider: "espn",
-      teamName: label
-    });
-    const fromCanonical = MLS_MATCH_SLUG_ABBREV_BY_CANONICAL[canonical];
-    if (fromCanonical) return fromCanonical;
-    const fromLabel = MLS_MATCH_SLUG_ABBREV_BY_CANONICAL[label];
-    if (fromLabel) return fromLabel;
-  }
-  const abbrev = (side === "home" ? game.homeTeamAbbrev : game.awayTeamAbbrev)?.trim() ?? "";
-  if (!abbrev) return null;
-  const canonicalFromAbbrev = candidates[0] ? normalizeSoccerTeamName({
-    league: "MLS",
-    provider: "espn",
-    teamName: candidates[0]
-  }) : "";
-  if (canonicalFromAbbrev === "LA Galaxy" && abbrev.toUpperCase() === "LA") {
-    return "sla";
-  }
-  return abbrev.toLowerCase();
-}
-function resolveMatchSlugDateParts(game) {
-  const key2 = game.scheduledDateKey?.trim();
-  if (key2 && /^\d{4}-\d{2}-\d{2}$/.test(key2)) {
-    const [year, month2, day2] = key2.split("-");
-    return { seasonYear: year, month: month2, day: day2 };
-  }
-  const ms2 = game.startTimeMs ?? NaN;
-  if (!Number.isFinite(ms2)) return null;
-  const dt2 = new Date(ms2);
-  const month = String(dt2.getUTCMonth() + 1).padStart(2, "0");
-  const day = String(dt2.getUTCDate()).padStart(2, "0");
-  const seasonYear = String(dt2.getUTCFullYear());
-  return { seasonYear, month, day };
-}
-function buildMlssoccerMatchRecapUrl(game) {
-  if (game.league?.trim().toUpperCase() !== "MLS") return null;
-  const homeAbbrev = resolveSlugAbbrev(game, "home");
-  const awayAbbrev = resolveSlugAbbrev(game, "away");
-  const dateParts = resolveMatchSlugDateParts(game);
-  if (!homeAbbrev || !awayAbbrev || !dateParts) return null;
-  const slug = `${homeAbbrev}v${awayAbbrev}-${dateParts.month}-${dateParts.day}-${dateParts.seasonYear}`;
-  return `https://www.mlssoccer.com/competitions/mls-regular-season/${dateParts.seasonYear}/matches/${slug}/`;
-}
-
-// ../grarf/desktop/src/extensionHost/grarfExtensionMlssoccerRecapHeadlineContext.ts
-init_define_import_meta_env();
-
-// ../grarf/shared/domain/mls/resolveMlssoccerMatchSummaryFromRecapPageHtml.ts
-init_define_import_meta_env();
-function normalizeSummaryText(text2) {
-  return text2.trim().replace(/\s+/g, " ").replace(/\s+\*$/, "").trim();
-}
-function resolveMlssoccerMatchSummaryFromRecapPageHtml(recapPageHtml) {
-  const sectionMatch = recapPageHtml.match(
-    /Match Summary<\/h2>\s*<div[^>]*class="[^"]*mls-c-ai-match-summary__content[^"]*"[^>]*>\s*<p>([\s\S]*?)<\/p>/i
-  );
-  if (sectionMatch?.[1]) {
-    const text2 = normalizeSummaryText(sectionMatch[1].replace(/<[^>]+>/g, ""));
-    if (text2.length >= 24) return text2;
-  }
-  const fallback = recapPageHtml.match(
-    /mls-c-ai-match-summary__content[\s\S]*?<p>([\s\S]*?)<\/p>/i
-  );
-  if (fallback?.[1]) {
-    const text2 = normalizeSummaryText(fallback[1].replace(/<[^>]+>/g, ""));
-    if (text2.length >= 24) return text2;
-  }
-  return null;
-}
-
-// ../grarf/desktop/src/extensionHost/grarfExtensionMlssoccerRecapHeadlineContext.ts
-var MLS_RECAP_PAGE_UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36";
-function grarfExtensionLeagueUsesMlssoccerRecaps(leagueKey) {
-  return leagueKey.trim().toUpperCase() === "MLS";
-}
-function isGrarfExtensionMlssoccerRecapHeadlineGame(game) {
-  return grarfExtensionLeagueUsesMlssoccerRecaps(game.league ?? "");
-}
-function shouldFetchGrarfExtensionMlssoccerRecapHeadline(game) {
-  if (!isGrarfExtensionMlssoccerRecapHeadlineGame(game)) return false;
-  return shouldFetchGrarfExtensionCatchUpRecapHeadline(game);
-}
-async function resolveGrarfExtensionMlssoccerRecapHeadlineForRecapUrl(recapUrl) {
-  try {
-    const res = await fetch(recapUrl, {
-      headers: {
-        Accept: "text/html,application/xhtml+xml",
-        "Accept-Language": "en-US,en;q=0.9",
-        "User-Agent": MLS_RECAP_PAGE_UA
-      },
-      cache: "no-store",
-      credentials: "omit"
-    });
-    if (!res.ok) return null;
-    const html = await res.text();
-    return resolveMlssoccerMatchSummaryFromRecapPageHtml(html);
-  } catch {
-    return null;
-  }
-}
-function resolveGrarfExtensionMlssoccerRecapUrlForGame(game) {
-  return buildMlssoccerMatchRecapUrl(game);
-}
-
 // ../grarf/desktop/src/extensionHost/grarfExtensionMlbRecapHeadline.ts
 init_define_import_meta_env();
 async function resolveGrarfExtensionMlbRecapNavigationUrlForGame(game) {
@@ -160197,7 +160502,7 @@ async function navigateGrarfExtensionGameYesterdayRecap(game) {
   }
   const leagueKey = game.league?.trim().toUpperCase() ?? "";
   if (grarfExtensionLeagueUsesMlssoccerRecaps(leagueKey)) {
-    const mlsRecapUrl = buildMlssoccerMatchRecapUrl(game);
+    const mlsRecapUrl = await resolveGrarfExtensionMlssoccerRecapNavigationUrlFromGame(game);
     if (mlsRecapUrl) {
       navigateGrarfExtensionHostExternalUrl(mlsRecapUrl);
       setGrarfExtensionGamesYesterdayHighlightsActiveGameId(game.id);
@@ -160293,11 +160598,11 @@ init_isGrarfWebRenderer();
 
 // ../grarf/desktop/src/extensionHost/useGrarfExtensionCatchUpRecapHeadline.ts
 init_define_import_meta_env();
-var import_react281 = __toESM(require_react(), 1);
+var import_react282 = __toESM(require_react(), 1);
 
 // ../grarf/desktop/src/extensionHost/useGrarfExtensionEplBbcRecapHeadline.ts
 init_define_import_meta_env();
-var import_react276 = __toESM(require_react(), 1);
+var import_react277 = __toESM(require_react(), 1);
 
 // ../grarf/desktop/src/extensionHost/grarfExtensionEplBbcRecapHeadlineContext.ts
 init_define_import_meta_env();
@@ -160535,7 +160840,7 @@ function retryGrarfExtensionEplBbcRecapHeadlineAfterEmpty(game) {
 // ../grarf/desktop/src/extensionHost/useGrarfExtensionEplBbcRecapHeadline.ts
 function useGrarfExtensionEplBbcRecapHeadline(game) {
   const gameId = game.id.trim();
-  const contextActive = (0, import_react276.useSyncExternalStore)(
+  const contextActive = (0, import_react277.useSyncExternalStore)(
     (listener) => {
       const unsubscribeNav = subscribeGrarfExtensionGamesYesterdayHighlightsNavSnapshot(listener);
       const unsubscribeSource = subscribeGrarfExtensionEplRecapsSource(listener);
@@ -160547,12 +160852,12 @@ function useGrarfExtensionEplBbcRecapHeadline(game) {
     () => shouldFetchGrarfExtensionEplBbcRecapHeadline(game),
     () => false
   );
-  const entry3 = (0, import_react276.useSyncExternalStore)(
+  const entry3 = (0, import_react277.useSyncExternalStore)(
     (listener) => subscribeGrarfExtensionEplBbcRecapHeadline(gameId, listener),
     () => getGrarfExtensionEplBbcRecapHeadlineEntry(gameId),
     () => GRARF_EXTENSION_EPL_BBC_RECAP_HEADLINE_IDLE_ENTRY
   );
-  (0, import_react276.useEffect)(() => {
+  (0, import_react277.useEffect)(() => {
     if (!contextActive) return;
     ensureGrarfExtensionEplBbcRecapHeadlineLoaded(game);
   }, [
@@ -160565,7 +160870,7 @@ function useGrarfExtensionEplBbcRecapHeadline(game) {
     game.awayTeam,
     game.scheduledDateKey
   ]);
-  (0, import_react276.useEffect)(() => {
+  (0, import_react277.useEffect)(() => {
     if (!contextActive || entry3.status !== "empty") return;
     return retryGrarfExtensionEplBbcRecapHeadlineAfterEmpty(game);
   }, [contextActive, entry3.status, game.id]);
@@ -160578,7 +160883,7 @@ function useGrarfExtensionEplBbcRecapHeadline(game) {
 
 // ../grarf/desktop/src/extensionHost/useGrarfExtensionEspnRecapHeadline.ts
 init_define_import_meta_env();
-var import_react277 = __toESM(require_react(), 1);
+var import_react278 = __toESM(require_react(), 1);
 
 // ../grarf/desktop/src/extensionHost/grarfExtensionEspnRecapHeadlineContext.ts
 init_define_import_meta_env();
@@ -160761,20 +161066,20 @@ function retryGrarfExtensionEspnRecapHeadlineAfterEmpty(game) {
 // ../grarf/desktop/src/extensionHost/useGrarfExtensionEspnRecapHeadline.ts
 function useGrarfExtensionEspnRecapHeadline(game) {
   const gameId = game.id.trim();
-  const shouldFetch = (0, import_react277.useMemo)(
+  const shouldFetch = (0, import_react278.useMemo)(
     () => shouldFetchGrarfExtensionEspnRecapHeadline(game),
     [game]
   );
-  const entry3 = (0, import_react277.useSyncExternalStore)(
+  const entry3 = (0, import_react278.useSyncExternalStore)(
     (listener) => subscribeGrarfExtensionEspnRecapHeadline(gameId, listener),
     () => getGrarfExtensionEspnRecapHeadlineEntry(gameId),
     () => GRARF_EXTENSION_ESPN_RECAP_HEADLINE_IDLE_ENTRY
   );
-  (0, import_react277.useEffect)(() => {
+  (0, import_react278.useEffect)(() => {
     if (!shouldFetch) return;
     ensureGrarfExtensionEspnRecapHeadlineLoaded(game);
   }, [game, shouldFetch]);
-  (0, import_react277.useEffect)(() => {
+  (0, import_react278.useEffect)(() => {
     if (!shouldFetch || entry3.status !== "empty") return;
     return retryGrarfExtensionEspnRecapHeadlineAfterEmpty(game);
   }, [game, entry3.status, shouldFetch]);
@@ -160789,7 +161094,7 @@ function useGrarfExtensionEspnRecapHeadline(game) {
 
 // ../grarf/desktop/src/extensionHost/useGrarfExtensionNcaafRecapHeadline.ts
 init_define_import_meta_env();
-var import_react278 = __toESM(require_react(), 1);
+var import_react279 = __toESM(require_react(), 1);
 
 // ../grarf/desktop/src/extensionHost/grarfExtensionNcaafRecapHeadlineStore.ts
 init_define_import_meta_env();
@@ -161005,17 +161310,17 @@ function retryGrarfExtensionNcaafRecapHeadlineAfterEmpty(game) {
 // ../grarf/desktop/src/extensionHost/useGrarfExtensionNcaafRecapHeadline.ts
 function useGrarfExtensionNcaafRecapHeadline(game) {
   const gameId = game.id.trim();
-  const contextActive = (0, import_react278.useSyncExternalStore)(
+  const contextActive = (0, import_react279.useSyncExternalStore)(
     subscribeGrarfExtensionGamesYesterdayHighlightsNavSnapshot,
     () => shouldFetchGrarfExtensionNcaafEspnRecapHeadline(game),
     () => false
   );
-  const entry3 = (0, import_react278.useSyncExternalStore)(
+  const entry3 = (0, import_react279.useSyncExternalStore)(
     (listener) => subscribeGrarfExtensionNcaafRecapHeadline(gameId, listener),
     () => getGrarfExtensionNcaafRecapHeadlineEntry(gameId),
     () => GRARF_EXTENSION_NCAAF_RECAP_HEADLINE_IDLE_ENTRY
   );
-  (0, import_react278.useEffect)(() => {
+  (0, import_react279.useEffect)(() => {
     if (!contextActive) return;
     ensureGrarfExtensionNcaafRecapHeadlineLoaded(game);
   }, [
@@ -161028,7 +161333,7 @@ function useGrarfExtensionNcaafRecapHeadline(game) {
     game.awayTeam,
     game.scheduledDateKey
   ]);
-  (0, import_react278.useEffect)(() => {
+  (0, import_react279.useEffect)(() => {
     if (!contextActive || entry3.status !== "empty") return;
     return retryGrarfExtensionNcaafRecapHeadlineAfterEmpty(game);
   }, [contextActive, entry3.status, game.id]);
@@ -161041,7 +161346,7 @@ function useGrarfExtensionNcaafRecapHeadline(game) {
 
 // ../grarf/desktop/src/extensionHost/useGrarfExtensionMlssoccerRecapHeadline.ts
 init_define_import_meta_env();
-var import_react279 = __toESM(require_react(), 1);
+var import_react280 = __toESM(require_react(), 1);
 
 // ../grarf/desktop/src/extensionHost/grarfExtensionMlssoccerRecapHeadlineStore.ts
 init_define_import_meta_env();
@@ -161153,21 +161458,21 @@ function retryGrarfExtensionMlssoccerRecapHeadlineAfterEmpty(game) {
 // ../grarf/desktop/src/extensionHost/useGrarfExtensionMlssoccerRecapHeadline.ts
 function useGrarfExtensionMlssoccerRecapHeadline(game) {
   const gameId = game.id.trim();
-  const shouldFetch = (0, import_react279.useSyncExternalStore)(
+  const shouldFetch = (0, import_react280.useSyncExternalStore)(
     (listener) => subscribeGrarfExtensionGamesYesterdayHighlightsNavSnapshot(listener),
     () => shouldFetchGrarfExtensionMlssoccerRecapHeadline(game),
     () => false
   );
-  const entry3 = (0, import_react279.useSyncExternalStore)(
+  const entry3 = (0, import_react280.useSyncExternalStore)(
     (listener) => subscribeGrarfExtensionMlssoccerRecapHeadline(gameId, listener),
     () => getGrarfExtensionMlssoccerRecapHeadlineEntry(gameId),
     () => GRARF_EXTENSION_MLSSOCCER_RECAP_HEADLINE_IDLE_ENTRY
   );
-  (0, import_react279.useEffect)(() => {
+  (0, import_react280.useEffect)(() => {
     if (!shouldFetch) return;
     ensureGrarfExtensionMlssoccerRecapHeadlineLoaded(game);
   }, [game, shouldFetch]);
-  (0, import_react279.useEffect)(() => {
+  (0, import_react280.useEffect)(() => {
     if (!shouldFetch || entry3.status !== "empty") return;
     return retryGrarfExtensionMlssoccerRecapHeadlineAfterEmpty(game);
   }, [game, entry3.status, shouldFetch]);
@@ -161182,7 +161487,7 @@ function useGrarfExtensionMlssoccerRecapHeadline(game) {
 
 // ../grarf/desktop/src/extensionHost/useGrarfExtensionSoccerwayRecapHeadline.ts
 init_define_import_meta_env();
-var import_react280 = __toESM(require_react(), 1);
+var import_react281 = __toESM(require_react(), 1);
 
 // ../grarf/desktop/src/extensionHost/grarfExtensionSoccerwayRecapHeadlineContext.ts
 init_define_import_meta_env();
@@ -161425,7 +161730,7 @@ function retryGrarfExtensionSoccerwayRecapHeadlineAfterEmpty(game) {
 // ../grarf/desktop/src/extensionHost/useGrarfExtensionSoccerwayRecapHeadline.ts
 function useGrarfExtensionSoccerwayRecapHeadline(game) {
   const gameId = game.id.trim();
-  const shouldFetch = (0, import_react280.useSyncExternalStore)(
+  const shouldFetch = (0, import_react281.useSyncExternalStore)(
     (listener) => {
       const unsubscribeNav = subscribeGrarfExtensionGamesYesterdayHighlightsNavSnapshot(listener);
       const unsubscribeSource = subscribeGrarfExtensionEplRecapsSource(listener);
@@ -161437,16 +161742,16 @@ function useGrarfExtensionSoccerwayRecapHeadline(game) {
     () => shouldFetchGrarfExtensionSoccerwayRecapHeadline(game),
     () => false
   );
-  const entry3 = (0, import_react280.useSyncExternalStore)(
+  const entry3 = (0, import_react281.useSyncExternalStore)(
     (listener) => subscribeGrarfExtensionSoccerwayRecapHeadline(gameId, listener),
     () => getGrarfExtensionSoccerwayRecapHeadlineEntry(gameId),
     () => GRARF_EXTENSION_SOCCERWAY_RECAP_HEADLINE_IDLE_ENTRY
   );
-  (0, import_react280.useEffect)(() => {
+  (0, import_react281.useEffect)(() => {
     if (!shouldFetch) return;
     ensureGrarfExtensionSoccerwayRecapHeadlineLoaded(game);
   }, [game, shouldFetch]);
-  (0, import_react280.useEffect)(() => {
+  (0, import_react281.useEffect)(() => {
     if (!shouldFetch || entry3.status !== "empty") return;
     return retryGrarfExtensionSoccerwayRecapHeadlineAfterEmpty(game);
   }, [game, entry3.status, shouldFetch]);
@@ -161466,10 +161771,10 @@ function useGrarfExtensionCatchUpRecapHeadline(game) {
   const soccerway = useGrarfExtensionSoccerwayRecapHeadline(game);
   const espn = useGrarfExtensionEspnRecapHeadline(game);
   const ncaaf = useGrarfExtensionNcaafRecapHeadline(game);
-  const openEplRecap = (0, import_react281.useCallback)(() => {
+  const openEplRecap = (0, import_react282.useCallback)(() => {
     void navigateGrarfExtensionBbcSportEplRecapFromGame(game);
   }, [game]);
-  const openCatchUpRecap = (0, import_react281.useCallback)(() => {
+  const openCatchUpRecap = (0, import_react282.useCallback)(() => {
     void navigateGrarfExtensionGameYesterdayRecap(game);
   }, [game]);
   if (epl.showHeadlineUi && epl.headline) {
@@ -161559,10 +161864,7 @@ function GrarfExtensionYesterdayHighlightsMinimizedGameCard({
     showHeadlineUi: showCatchUpRecapHeadline
   } = useGrarfExtensionCatchUpRecapHeadline(game);
   const showCatchUpRecapsInlineActionBar = isGrarfExtensionRenderer() && isGrarfExtensionGamesYesterdayRecapsNavSnapshotActive();
-  const contextMenuUrl = (0, import_react282.useMemo)(
-    () => resolveGrarfExtensionHostContextMenuUrlForGameCard(game),
-    [game]
-  );
+  const contextMenuUrl = useGrarfExtensionHostContextMenuUrlForGame(game);
   const handleClick = () => {
     if (disabled) return;
     if (!bypassYesterdayHighlightsNavigation && isGrarfExtensionRenderer() && isGrarfExtensionGamesYesterdayRecapsNavSnapshotActive()) {
@@ -161587,6 +161889,7 @@ function GrarfExtensionYesterdayHighlightsMinimizedGameCard({
         showCatchUpRecapHeadline && catchUpRecapHeadline && "grarf-extension-yesterday-highlights-minimized-game-card--with-recap-headline"
       ),
       "data-grarf-extension-yesterday-highlights-minimized-game-card": "",
+      "data-game-id": game.id,
       "data-grarf-extension-yesterday-highlights-unsupported": disabled ? "" : void 0,
       "data-grarf-extension-windframe-list-game-state": state3,
       ...!disabled && !showCatchUpRecapsInlineActionBar ? {
