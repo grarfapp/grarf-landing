@@ -19677,6 +19677,9 @@ init_define_import_meta_env();
 // ../grarf/desktop/src/lib/broadcast/resolveChannelLogoUrl.ts
 init_define_import_meta_env();
 
+// ../grarf/desktop/src/lib/branding/grarfExtensionCbsBrandLogo.ts
+init_define_import_meta_env();
+
 // ../grarf/desktop/src/lib/branding/grarfExtensionFoxBrandLogo.ts
 init_define_import_meta_env();
 

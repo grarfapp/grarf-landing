@@ -19135,6 +19135,29 @@ function formatBroadcastsSubtitle(game, max2 = 6, sep = " \u2022 ") {
 // ../grarf/desktop/src/lib/broadcast/resolveChannelLogoUrl.ts
 init_define_import_meta_env();
 
+// ../grarf/desktop/src/lib/branding/grarfExtensionCbsBrandLogo.ts
+init_define_import_meta_env();
+init_isGrarfWebRenderer();
+var GRARF_EXTENSION_CBS_BRAND_LOGO_URL = "/league-logos/channel-cbs-blue.png";
+function normalizeCbsBrandKey(value) {
+  return value.trim().replace(/\s+/g, " ").toUpperCase();
+}
+function isGrarfExtensionCbsFamilyBroadcastLabel(label) {
+  const key2 = normalizeCbsBrandKey(label);
+  if (!key2) return false;
+  if (key2 === "CBSSN" || key2 === "CBS SPORTS NETWORK" || key2 === "CBS SPORTS NET" || key2 === "CBS" || key2 === "CBS SPORTS") {
+    return true;
+  }
+  return /\bCBS\b/.test(key2);
+}
+function resolveGrarfExtensionCbsBrandLogoUrl(options) {
+  if (!isGrarfExtensionRenderer()) return void 0;
+  if (options.label && isGrarfExtensionCbsFamilyBroadcastLabel(options.label)) {
+    return GRARF_EXTENSION_CBS_BRAND_LOGO_URL;
+  }
+  return void 0;
+}
+
 // ../grarf/desktop/src/lib/branding/grarfExtensionFoxBrandLogo.ts
 init_define_import_meta_env();
 init_isGrarfWebRenderer();
@@ -19246,6 +19269,8 @@ function isEspnFamilyBroadcastLabel(channelLabel) {
 function resolveChannelLogoUrl(channelLabel) {
   const extensionFox = resolveGrarfExtensionFoxBrandLogoUrl({ label: channelLabel });
   if (extensionFox) return extensionFox;
+  const extensionCbs = resolveGrarfExtensionCbsBrandLogoUrl({ label: channelLabel });
+  if (extensionCbs) return extensionCbs;
   const key2 = normalizeChannelLogoKey(channelLabel);
   if (!key2) return null;
   if (isEspnFamilyBroadcastLabel(key2)) return ESPN_CHANNEL_LOGO_URL;
