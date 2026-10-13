@@ -70,6 +70,15 @@ var init_isGrarfWebRenderer = __esm({
   }
 });
 
+// ../grarf/shared/config/operationalSnapshotRefreshMs.ts
+var OPERATIONAL_SNAPSHOT_REFRESH_MS;
+var init_operationalSnapshotRefreshMs = __esm({
+  "../grarf/shared/config/operationalSnapshotRefreshMs.ts"() {
+    init_define_import_meta_env();
+    OPERATIONAL_SNAPSHOT_REFRESH_MS = 6e4;
+  }
+});
+
 // ../grarf/desktop/src/config/operationalIngestConfig.ts
 function resolveWebOperationalIngestUrl() {
   if (typeof window === "undefined") return null;
@@ -92,7 +101,7 @@ function getOperationalIngestConfig() {
   }
   const pollRaw = define_import_meta_env_default.VITE_OPERATIONAL_INGEST_POLL_MS ?? (typeof window !== "undefined" ? String(window.GRARF_WEB_CONFIG?.operationalPollIntervalMs ?? "") : "");
   const pollParsed = pollRaw != null ? Number(pollRaw) : NaN;
-  const pollIntervalMs = Number.isFinite(pollParsed) && pollParsed >= 15e3 ? pollParsed : 6e4;
+  const pollIntervalMs = Number.isFinite(pollParsed) && pollParsed >= OPERATIONAL_SNAPSHOT_REFRESH_MS ? pollParsed : OPERATIONAL_SNAPSHOT_REFRESH_MS;
   return {
     provider,
     cloudBaseUrl,
@@ -106,6 +115,7 @@ function usesLocalRetainedFinalsFallback() {
 var init_operationalIngestConfig = __esm({
   "../grarf/desktop/src/config/operationalIngestConfig.ts"() {
     init_define_import_meta_env();
+    init_operationalSnapshotRefreshMs();
     init_isGrarfWebRenderer();
   }
 });
@@ -27192,7 +27202,8 @@ async function fetchViaGrarfCloudService(options) {
     throw new Error("[OperationalIngest] grarf_cloud provider requires VITE_GRARF_OPERATIONAL_INGEST_URL");
   }
   const urlBase = resolveGrarfCloudOperationalSnapshotUrl(cloudBaseUrl);
-  const url = `${urlBase}${urlBase.includes("?") ? "&" : "?"}clientMs=${Date.now()}`;
+  const bypassHttpCache = options?.webBootstrap === true || options?.traceFetchKind === "prefetch";
+  const url = bypassHttpCache ? `${urlBase}${urlBase.includes("?") ? "&" : "?"}clientMs=${Date.now()}` : urlBase;
   const maxAttempts = options?.webBootstrap ? 1 : CLOUD_FETCH_MAX_ATTEMPTS;
   let lastError;
   for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
@@ -27209,7 +27220,7 @@ async function fetchViaGrarfCloudService(options) {
       }
       const res = await fetch(url, {
         headers: { Accept: "application/json" },
-        cache: "no-store",
+        cache: bypassHttpCache ? "no-store" : "default",
         signal: AbortSignal.timeout(
           options?.webBootstrap ? WEB_CLOUD_BOOTSTRAP_TIMEOUT_MS : CLOUD_FETCH_TIMEOUT_MS
         )
@@ -27260,10 +27271,7 @@ async function fetchViaWebOperationalIngest() {
   let cloud = null;
   let cloudError = null;
   try {
-    cloud = await prefetchWebOperationalCloudSnapshot();
-    if (!cloud || countOperationalGames(cloud) === 0) {
-      cloud = await fetchViaGrarfCloudService();
-    }
+    cloud = await fetchGrarfCloudOperationalSnapshot();
   } catch (e2) {
     cloudError = e2 instanceof Error ? e2.message : String(e2);
     if (define_import_meta_env_default.DEV) {
@@ -27385,8 +27393,9 @@ function resolveOperationalStartupGateState(input) {
 // ../grarf/desktop/src/services/operationalIngest/startOperationalSnapshotPolling.ts
 init_define_import_meta_env();
 init_operationalIngestConfig();
+init_operationalSnapshotRefreshMs();
 var LOG8 = "[OperationalIngest]";
-var DEFAULT_POLL_INTERVAL_MS = 6e4;
+var DEFAULT_POLL_INTERVAL_MS = OPERATIONAL_SNAPSHOT_REFRESH_MS;
 var RETRY_MS = 5e3;
 function startOperationalSnapshotPolling(onTransport, options) {
   const config = getOperationalIngestConfig();
@@ -68483,6 +68492,58 @@ function resolveSoccerBundledTeamLogoUrl(teamId, teamName) {
   return void 0;
 }
 
+// ../grarf/desktop/src/lib/gamesSpine/leaguesTabProTeamLogoUrl.ts
+init_define_import_meta_env();
+var SOCCER_LEAGUES_TAB_LEAGUES = /* @__PURE__ */ new Set([
+  "MLS",
+  "EPL",
+  "LALIGA",
+  "BUNDESLIGA",
+  "SERIEA",
+  "LIGUE1"
+]);
+var NHL_ESPN_SCOREBOARD_SLUG = {
+  LAK: "la",
+  NJD: "nj",
+  SJS: "sj",
+  TBL: "tb"
+};
+function buildLeaguesTabMlsTeamLogoUrl(teamEspnId) {
+  const id = teamEspnId?.trim();
+  if (!id) return void 0;
+  return `https://a.espncdn.com/i/teamlogos/soccer/500/${id}.png`;
+}
+function buildLeaguesTabProTeamLogoUrl(league2, teamAbbrev2) {
+  const normalized = teamAbbrev2?.trim().toUpperCase();
+  if (!normalized) return void 0;
+  if (league2 === "WNBA") {
+    return buildWnbaEspnLogoUrl(teamAbbrev2);
+  }
+  if (league2 === "NBA") {
+    return `https://a.espncdn.com/i/teamlogos/nba/500/scoreboard/${normalized.toLowerCase()}.png`;
+  }
+  if (league2 === "NFL") {
+    return `https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/${normalized.toLowerCase()}.png`;
+  }
+  const slug = NHL_ESPN_SCOREBOARD_SLUG[normalized] ?? normalized.toLowerCase();
+  return `https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/${slug}.png`;
+}
+function resolveSportsBrowserPrototypeLeaguesTabTeamLogoUrl(input) {
+  const leagueKey = input.leagueKey.trim().toUpperCase();
+  if (SOCCER_LEAGUES_TAB_LEAGUES.has(leagueKey)) {
+    const bundled = resolveSoccerBundledTeamLogoUrl(input.teamEspnId, input.teamDisplayName);
+    if (bundled) return bundled.startsWith("http") ? bundled : bundled;
+    return buildLeaguesTabMlsTeamLogoUrl(input.teamEspnId);
+  }
+  if (leagueKey === "MLB") {
+    return buildMlbEspnScoreboardLogoUrl(input.teamAbbrev);
+  }
+  if (leagueKey === "NFL" || leagueKey === "NBA" || leagueKey === "NHL" || leagueKey === "WNBA") {
+    return buildLeaguesTabProTeamLogoUrl(leagueKey, input.teamAbbrev);
+  }
+  return void 0;
+}
+
 // ../grarf/desktop/src/lib/gamesSpine/resolveTeamLogoUrl.ts
 function resolveGrarfLogoSrc(logoUrl) {
   const trimmed = logoUrl?.trim();
@@ -68554,6 +68615,9 @@ function espnCdnLogo(league2, abbrev, teamId, game) {
   }
   if (league2 === "NBA" && abbr) {
     return `https://a.espncdn.com/i/teamlogos/nba/500/scoreboard/${abbr}.png`;
+  }
+  if (league2 === "NFL" && abbrev?.trim()) {
+    return buildLeaguesTabProTeamLogoUrl("NFL", abbrev);
   }
   if (league2 === "WNBA" && abbr) {
     return buildWnbaEspnLogoUrl(abbr);
@@ -69951,7 +70015,8 @@ init_define_import_meta_env();
 
 // ../grarf/desktop/src/lib/updateEngine/updateEngineCadences.ts
 init_define_import_meta_env();
-var WEB_UPDATE_ENGINE_LIVE_GAMES_POLL_MS = 15e3;
+init_operationalSnapshotRefreshMs();
+var WEB_UPDATE_ENGINE_LIVE_GAMES_POLL_MS = OPERATIONAL_SNAPSHOT_REFRESH_MS;
 var WEB_UPDATE_ENGINE_SIGNALS_POLL_MS = 3e4;
 var WEB_UPDATE_ENGINE_BROWSER_POLL_MS = 2 * 6e4;
 var WEB_UPDATE_ENGINE_HIGHLIGHTS_TV_POLL_MS = 5 * 6e4;
@@ -70482,7 +70547,8 @@ init_operationalIngestConfig();
 
 // ../grarf/desktop/src/extensionHost/grarfExtensionOperationalIngestCadence.ts
 init_define_import_meta_env();
-var GRARF_EXTENSION_OPERATIONAL_SNAPSHOT_POLL_MS = 1e4;
+init_operationalSnapshotRefreshMs();
+var GRARF_EXTENSION_OPERATIONAL_SNAPSHOT_POLL_MS = OPERATIONAL_SNAPSHOT_REFRESH_MS;
 
 // ../grarf/desktop/src/components/LiveGamesBridge.tsx
 function resolveTransportCompleteness(transport) {
@@ -110048,6 +110114,24 @@ function shouldFetchGrarfExtensionCatchUpRecapHeadline(game) {
 // ../grarf/desktop/src/extensionHost/grarfExtensionMlbRecapHeadlineContext.ts
 function isGrarfExtensionMlbRecapGame(game) {
   return game.league === "MLB" || game.id.startsWith("espn-MLB-");
+}
+function isPlaceholderMlbStoryTitle(title) {
+  const normalized = title.trim().toLowerCase();
+  return normalized === "official game story" || normalized.startsWith("game ");
+}
+function resolveGrarfExtensionMlbRecapHeadlineFromOperationalGame(game) {
+  const story = game.content?.stories?.[0];
+  const storyTitle = story?.title?.trim();
+  if (storyTitle && !isPlaceholderMlbStoryTitle(storyTitle)) {
+    return storyTitle;
+  }
+  const storySummary = story?.summary?.trim();
+  if (storySummary) return storySummary;
+  const recapBlurb = game.content?.recap?.blurb?.trim();
+  if (recapBlurb) return recapBlurb;
+  const recapSummary = game.content?.recap?.summary?.trim();
+  if (recapSummary) return recapSummary;
+  return null;
 }
 function resolveGrarfExtensionMlbRecapUrlFromOperationalGame(game) {
   const story = game.content?.stories?.[0];
@@ -157981,12 +158065,6 @@ async function resolveGrarfExtensionBbcSportEplRecapUrlFromGame(game) {
     return null;
   }
 }
-async function navigateGrarfExtensionBbcSportEplRecapFromGame(game) {
-  const recapUrl = await resolveGrarfExtensionBbcSportEplRecapUrlFromGame(game);
-  if (!recapUrl) return false;
-  navigateGrarfExtensionHostExternalUrl(recapUrl);
-  return true;
-}
 
 // ../grarf/desktop/src/extensionHost/grarfExtensionEplRecapsSourceStore.ts
 init_define_import_meta_env();
@@ -160500,6 +160578,78 @@ function buildGrarfExtensionGameGoogleRecapsSearchUrl(game) {
 
 // ../grarf/desktop/src/extensionHost/grarfExtensionMlbRecapHeadline.ts
 init_define_import_meta_env();
+
+// ../grarf/shared/domain/mlb/resolveMlbComRecapFromStatsApiGameContent.ts
+init_define_import_meta_env();
+function mlbOfficialGameStoryUrl2(gamePk) {
+  return `https://www.mlb.com/stories/game/${gamePk}?storylocal=web-scores-game-embed`;
+}
+function resolveMlbRecapPublicArticleUrl2(recapArticle, gamePk) {
+  const slug = typeof recapArticle.slug === "string" ? recapArticle.slug.trim() : "";
+  if (slug) return buildMlbComNewsRecapUrl(slug, gamePk);
+  const rawUrl = typeof recapArticle.url === "string" ? recapArticle.url.trim() : "";
+  if (rawUrl && /^https?:\/\/www\.mlb\.com\//i.test(rawUrl)) {
+    if (rawUrl.includes("game_pk=")) return rawUrl;
+    const separator = rawUrl.includes("?") ? "&" : "?";
+    return `${rawUrl}${separator}game_pk=${gamePk}`;
+  }
+  return mlbOfficialGameStoryUrl2(gamePk);
+}
+function resolveMlbComRecapFromStatsApiGameContent(content, gamePk) {
+  if (!content || typeof content !== "object" || !Number.isFinite(gamePk) || gamePk <= 0) {
+    return { headline: "", recapUrl: "", recapAvailable: false };
+  }
+  const editorial = content.editorial;
+  const recapArticle = editorial?.recap?.mlb;
+  if (!recapArticle || typeof recapArticle !== "object") {
+    return { headline: "", recapUrl: "", recapAvailable: false };
+  }
+  const headline = typeof recapArticle.headline === "string" ? recapArticle.headline.trim() : "";
+  const bodyHtml = typeof recapArticle.body === "string" ? recapArticle.body.trim() : "";
+  const blurb = typeof recapArticle.blurb === "string" ? recapArticle.blurb.trim() : "";
+  const body = bodyHtml || blurb;
+  const state3 = typeof recapArticle.state === "string" ? recapArticle.state : "";
+  const slug = typeof recapArticle.slug === "string" ? recapArticle.slug.trim() : "";
+  const hasPublicUrl = Boolean(slug) || typeof recapArticle.url === "string" && /^https?:\/\/www\.mlb\.com\//i.test(recapArticle.url.trim());
+  const recapAvailable = Boolean(headline) || Boolean(body) && (state3 === "A" || state3 === "") || hasPublicUrl;
+  const recapUrl = recapAvailable ? resolveMlbRecapPublicArticleUrl2(recapArticle, gamePk) : "";
+  return {
+    headline,
+    recapUrl,
+    recapAvailable
+  };
+}
+
+// ../grarf/desktop/src/extensionHost/grarfExtensionMlbRecapHeadline.ts
+var MLB_STATS_API_CONTENT = "https://statsapi.mlb.com/api/v1";
+async function fetchMlbStatsApiGameContent(gamePk) {
+  try {
+    const res = await fetch(`${MLB_STATS_API_CONTENT}/game/${gamePk}/content`, {
+      headers: { Accept: "application/json" },
+      cache: "default",
+      credentials: "omit"
+    });
+    if (!res.ok) return null;
+    return res.json();
+  } catch {
+    return null;
+  }
+}
+async function resolveGrarfExtensionMlbRecapHeadlineFromStatsApiForGame(game) {
+  if (!isGrarfExtensionMlbRecapGame(game)) return null;
+  const gamePk = resolveMlbStatsApiGamePk2(game);
+  if (gamePk == null) return null;
+  const content = await fetchMlbStatsApiGameContent(gamePk);
+  if (!content) return null;
+  const resolved = resolveMlbComRecapFromStatsApiGameContent(content, gamePk);
+  const headline = resolved.headline?.trim();
+  return headline || null;
+}
+async function resolveGrarfExtensionMlbRecapHeadlineForGame(game) {
+  const operational = resolveGrarfExtensionMlbRecapHeadlineFromOperationalGame(game);
+  if (operational) return operational;
+  return resolveGrarfExtensionMlbRecapHeadlineFromStatsApiForGame(game);
+}
 async function resolveGrarfExtensionMlbRecapNavigationUrlForGame(game) {
   return resolveGrarfExtensionMlbRecapUrlFromOperationalGame(game);
 }
@@ -160651,7 +160801,6 @@ var import_react277 = __toESM(require_react(), 1);
 init_define_import_meta_env();
 function shouldFetchGrarfExtensionEplBbcRecapHeadline(game) {
   if (!grarfExtensionLeagueUsesBbcSportEplRecaps(game.league ?? "")) return false;
-  if (getGrarfExtensionEplRecapsSource() !== "bbc") return false;
   return shouldFetchGrarfExtensionCatchUpRecapHeadline(game);
 }
 
@@ -160758,10 +160907,6 @@ function resolveBbcSportFootballRecapArticleHeadlineFromRecapPageHtml(recapPageH
 var RECAP_PAGE_CACHE_TTL_MS = 30 * 60 * 1e3;
 var recapPageCache = /* @__PURE__ */ new Map();
 var inflightByRecapUrl = /* @__PURE__ */ new Map();
-function resetGrarfExtensionBbcSportEplRecapHeadlineCache() {
-  recapPageCache.clear();
-  inflightByRecapUrl.clear();
-}
 async function fetchBbcSportRecapHeadlineForUrl(recapUrl) {
   const cached = recapPageCache.get(recapUrl);
   if (cached && Date.now() - cached.at < RECAP_PAGE_CACHE_TTL_MS) {
@@ -160858,14 +161003,6 @@ function ensureGrarfExtensionEplBbcRecapHeadlineLoaded(game) {
     }
   });
 }
-function invalidateGrarfExtensionEplBbcRecapHeadlines() {
-  entriesByGameId.clear();
-  inflightByGameId.clear();
-  resetGrarfExtensionBbcSportEplRecapHeadlineCache();
-  for (const gameId of listenersByGameId.keys()) {
-    notify7(gameId);
-  }
-}
 function retryGrarfExtensionEplBbcRecapHeadlineAfterEmpty(game) {
   const gameId = game.id.trim();
   if (!gameId) return () => {
@@ -160884,14 +161021,7 @@ function retryGrarfExtensionEplBbcRecapHeadlineAfterEmpty(game) {
 function useGrarfExtensionEplBbcRecapHeadline(game) {
   const gameId = game.id.trim();
   const contextActive = (0, import_react277.useSyncExternalStore)(
-    (listener) => {
-      const unsubscribeNav = subscribeGrarfExtensionGamesYesterdayHighlightsNavSnapshot(listener);
-      const unsubscribeSource = subscribeGrarfExtensionEplRecapsSource(listener);
-      return () => {
-        unsubscribeNav();
-        unsubscribeSource();
-      };
-    },
+    subscribeGrarfExtensionGamesYesterdayHighlightsNavSnapshot,
     () => shouldFetchGrarfExtensionEplBbcRecapHeadline(game),
     () => false
   );
@@ -160920,7 +161050,7 @@ function useGrarfExtensionEplBbcRecapHeadline(game) {
   const headline = entry3.status === "ready" ? entry3.headline : null;
   return {
     headline,
-    showHeadlineUi: contextActive && headline != null
+    showHeadlineUi: contextActive && (headline != null || entry3.status === "loading" || entry3.status === "ready")
   };
 }
 
@@ -161034,7 +161164,16 @@ async function resolveGrarfExtensionEspnRecapHeadlineForGame(game) {
   const route = resolveGrarfExtensionEspnRecapHeadlineSummaryRoute(game);
   const eventId = parseEspnEventIdFromGame2(game);
   if (!route || !eventId) return null;
-  return fetchEspnRecapHeadlineForSummaryRoute(route.sport, route.espnLeague, eventId);
+  const espnHeadline = await fetchEspnRecapHeadlineForSummaryRoute(
+    route.sport,
+    route.espnLeague,
+    eventId
+  );
+  if (espnHeadline?.trim()) return espnHeadline;
+  if (isGrarfExtensionMlbRecapGame(game)) {
+    return resolveGrarfExtensionMlbRecapHeadlineForGame(game);
+  }
+  return null;
 }
 
 // ../grarf/desktop/src/extensionHost/grarfExtensionEspnRecapHeadlineStore.ts
@@ -161607,7 +161746,7 @@ function isGrarfExtensionSoccerwayRecapHeadlineGame(game) {
   if (!grarfExtensionLeagueUsesGamesYesterdaySoccerwayRecaps(leagueKey)) {
     return false;
   }
-  if (leagueKey === "EPL" && getGrarfExtensionEplRecapsSource() !== "soccerway") {
+  if (leagueKey === "EPL") {
     return false;
   }
   return true;
@@ -161659,10 +161798,6 @@ init_define_import_meta_env();
 var RECAP_HEADLINE_CACHE_TTL_MS4 = 30 * 60 * 1e3;
 var headlineCache4 = /* @__PURE__ */ new Map();
 var inflightByReportUrl = /* @__PURE__ */ new Map();
-function resetGrarfExtensionSoccerwayRecapHeadlineCache() {
-  headlineCache4.clear();
-  inflightByReportUrl.clear();
-}
 async function fetchSoccerwayRecapHeadlineForUrl(reportUrl) {
   const cached = headlineCache4.get(reportUrl);
   if (cached && Date.now() - cached.at < RECAP_HEADLINE_CACHE_TTL_MS4) {
@@ -161748,14 +161883,6 @@ function ensureGrarfExtensionSoccerwayRecapHeadlineLoaded(game) {
     }
   });
 }
-function invalidateGrarfExtensionSoccerwayRecapHeadlines() {
-  entriesByGameId5.clear();
-  inflightByGameId5.clear();
-  resetGrarfExtensionSoccerwayRecapHeadlineCache();
-  for (const gameId of listenersByGameId5.keys()) {
-    notify11(gameId);
-  }
-}
 function retryGrarfExtensionSoccerwayRecapHeadlineAfterEmpty(game) {
   const gameId = game.id.trim();
   if (!gameId) return () => {
@@ -161774,14 +161901,7 @@ function retryGrarfExtensionSoccerwayRecapHeadlineAfterEmpty(game) {
 function useGrarfExtensionSoccerwayRecapHeadline(game) {
   const gameId = game.id.trim();
   const shouldFetch = (0, import_react281.useSyncExternalStore)(
-    (listener) => {
-      const unsubscribeNav = subscribeGrarfExtensionGamesYesterdayHighlightsNavSnapshot(listener);
-      const unsubscribeSource = subscribeGrarfExtensionEplRecapsSource(listener);
-      return () => {
-        unsubscribeNav();
-        unsubscribeSource();
-      };
-    },
+    subscribeGrarfExtensionGamesYesterdayHighlightsNavSnapshot,
     () => shouldFetchGrarfExtensionSoccerwayRecapHeadline(game),
     () => false
   );
@@ -161814,9 +161934,6 @@ function useGrarfExtensionCatchUpRecapHeadline(game) {
   const soccerway = useGrarfExtensionSoccerwayRecapHeadline(game);
   const espn = useGrarfExtensionEspnRecapHeadline(game);
   const ncaaf = useGrarfExtensionNcaafRecapHeadline(game);
-  const openEplRecap = (0, import_react282.useCallback)(() => {
-    void navigateGrarfExtensionBbcSportEplRecapFromGame(game);
-  }, [game]);
   const openCatchUpRecap = (0, import_react282.useCallback)(() => {
     void navigateGrarfExtensionGameYesterdayRecap(game);
   }, [game]);
@@ -161824,7 +161941,7 @@ function useGrarfExtensionCatchUpRecapHeadline(game) {
     return {
       headline: epl.headline,
       showHeadlineUi: true,
-      onRecapHeadlineClick: openEplRecap
+      onRecapHeadlineClick: openCatchUpRecap
     };
   }
   if (mls.showHeadlineUi && mls.headline) {
@@ -162030,24 +162147,6 @@ function GrarfExtensionYesterdayHighlightsMinimizedGameCard({
 // ../grarf/desktop/src/extensionHost/GrarfExtensionCommandCenterTransientAlert.tsx
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/extensionHost/grarfExtensionCommandCenterTransientAlertChannel.ts
-init_define_import_meta_env();
-function shouldShowGrarfExtensionCommandCenterTransientAlertChannelLogo(game, alertType) {
-  const { logoUrl } = resolveNewsSportsBrowserChannelPresentation(game);
-  if (!logoUrl) return false;
-  if (game.status === "postponed") return false;
-  if (alertType === "starts-soon") {
-    return game.status === "scheduled" || isGameCompetitionPaused(game);
-  }
-  if (game.status === "live" || isGameCompetitionPaused(game)) {
-    return true;
-  }
-  if (alertType === "game-update" && (game.status === "final" || isSpineFinalizedGame(game))) {
-    return true;
-  }
-  return game.status === "scheduled";
-}
-
 // ../grarf/desktop/src/extensionHost/grarfExtensionCommandCenterTransientAlertPresentation.ts
 init_define_import_meta_env();
 var GRARF_EXTENSION_COMMAND_CENTER_TRANSIENT_ALERT_ENTRANCE_MS = 1400;
@@ -162068,16 +162167,6 @@ function resolveGrarfExtensionCommandCenterTransientAlertHeaderLabel(alertType, 
     return "SCORE UPDATE";
   }
   return resolveGamesSpineTransientAlertHeaderLabel(alertType);
-}
-function resolveGrarfExtensionCommandCenterTransientAlertStatusLabel(game, alertType) {
-  if (alertType === "starts-soon") {
-    const formatted = formatGameDisplayTimeLocal(game);
-    return formatted ? formatted : resolveNewsSportsBrowserCompactStatusLabel(game);
-  }
-  if (alertType === "game-update" && (game.status === "final" || isSpineFinalizedGame(game))) {
-    return "Final";
-  }
-  return resolveNewsSportsBrowserCompactStatusLabel(game);
 }
 
 // ../grarf/desktop/src/extensionHost/GrarfExtensionCommandCenterTransientAlert.tsx
@@ -162106,68 +162195,20 @@ function resolveAlertHeaderIconForGame(alertType, game) {
   }
   return resolveAlertHeaderIcon(alertType);
 }
-function TeamRow({
-  game,
-  side,
-  name,
-  score: score2,
-  showScore,
-  scoreFlash
-}) {
-  const logoUrl = resolveNewsSportsBrowserTeamLogoUrl(game, side);
-  return /* @__PURE__ */ (0, import_jsx_runtime248.jsxs)("div", { className: "grarf-extension-command-center-transient-alert__team-row", children: [
-    logoUrl ? /* @__PURE__ */ (0, import_jsx_runtime248.jsx)(
-      "img",
-      {
-        src: logoUrl,
-        alt: "",
-        className: cn2(
-          "grarf-extension-command-center-transient-alert__team-logo",
-          resolveGamesSpineLeagueLogoImgClassName(game.league, logoUrl)
-        ),
-        loading: "lazy",
-        decoding: "async"
-      }
-    ) : null,
-    /* @__PURE__ */ (0, import_jsx_runtime248.jsx)("span", { className: "grarf-extension-command-center-transient-alert__team-name", children: name }),
-    showScore ? /* @__PURE__ */ (0, import_jsx_runtime248.jsx)(
-      "span",
-      {
-        className: cn2(
-          "grarf-extension-command-center-transient-alert__team-score tabular-nums",
-          scoreFlash && "grarf-extension-command-center-transient-alert__flash"
-        ),
-        children: score2 ?? "\u2013"
-      }
-    ) : null
-  ] });
-}
 function GrarfExtensionCommandCenterTransientAlert({
   game,
   alertType,
   phase,
   cardVisible,
-  flashSpec,
-  onGameSelect
+  children
 }) {
   const accent = resolveGrarfExtensionCommandCenterTransientAlertAccent(alertType, game);
   const headerLabel = resolveGrarfExtensionCommandCenterTransientAlertHeaderLabel(alertType, game);
-  const leagueLabel = resolveCommandCenterGameCardLeagueLabel(game);
-  const statusLabel = resolveGrarfExtensionCommandCenterTransientAlertStatusLabel(game, alertType);
-  const channel = resolveNewsSportsBrowserChannelPresentation(game);
-  const showChannelLogo = shouldShowGrarfExtensionCommandCenterTransientAlertChannelLogo(
-    game,
-    alertType
-  );
-  const model = resolveGamesSpineCompactMatchupModel(game);
   const HeaderIcon = resolveAlertHeaderIconForGame(alertType, game);
-  const handleActivate = () => {
-    onGameSelect?.(game);
-  };
   return /* @__PURE__ */ (0, import_jsx_runtime248.jsxs)(
     "div",
     {
-      className: "grarf-extension-command-center-transient-alert",
+      className: "grarf-extension-command-center-transient-alert grarf-extension-command-center-transient-alert--scorecard",
       "data-grarf-extension-command-center-transient-alert": "",
       "data-grarf-extension-command-center-alert-type": alertType,
       "data-grarf-extension-command-center-alert-accent": accent,
@@ -162175,94 +162216,45 @@ function GrarfExtensionCommandCenterTransientAlert({
       "data-grarf-extension-command-center-alert-visible": cardVisible ? "true" : "false",
       "data-sports-browser-prototype-command-center-alert-row": "",
       children: [
-        /* @__PURE__ */ (0, import_jsx_runtime248.jsxs)("header", { className: "grarf-extension-command-center-transient-alert__header", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime248.jsxs)(
-            "div",
-            {
-              className: cn2(
-                "grarf-extension-command-center-transient-alert__heading",
-                `grarf-extension-command-center-transient-alert__heading--${accent}`
-              ),
-              children: [
-                /* @__PURE__ */ (0, import_jsx_runtime248.jsx)(HeaderIcon, { className: "grarf-extension-command-center-transient-alert__heading-icon", "aria-hidden": true }),
-                /* @__PURE__ */ (0, import_jsx_runtime248.jsx)("span", { children: headerLabel })
-              ]
-            }
-          ),
-          /* @__PURE__ */ (0, import_jsx_runtime248.jsx)("span", { className: "grarf-extension-command-center-transient-alert__league", children: leagueLabel })
-        ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime248.jsxs)(
-          "button",
+        /* @__PURE__ */ (0, import_jsx_runtime248.jsx)("header", { className: "grarf-extension-command-center-transient-alert__header", children: /* @__PURE__ */ (0, import_jsx_runtime248.jsxs)(
+          "div",
           {
-            type: "button",
-            className: "grarf-extension-command-center-transient-alert__body",
-            onClick: handleActivate,
-            disabled: !onGameSelect,
+            className: cn2(
+              "grarf-extension-command-center-transient-alert__heading",
+              `grarf-extension-command-center-transient-alert__heading--${accent}`
+            ),
             children: [
-              /* @__PURE__ */ (0, import_jsx_runtime248.jsx)("div", { className: "grarf-extension-command-center-transient-alert__matchup", children: model.kind === "event" ? /* @__PURE__ */ (0, import_jsx_runtime248.jsx)("span", { className: "grarf-extension-command-center-transient-alert__event-line", children: resolveGamesSpineCompactEventDisplayLine(model.event) }) : /* @__PURE__ */ (0, import_jsx_runtime248.jsxs)(import_jsx_runtime248.Fragment, { children: [
-                /* @__PURE__ */ (0, import_jsx_runtime248.jsx)(
-                  TeamRow,
-                  {
-                    game,
-                    side: model.left.side,
-                    name: resolveSportsBrowserLeftNavTeamNamePresentation(game, model.left).teamName,
-                    score: model.left.score,
-                    showScore: model.showScores,
-                    scoreFlash: flashSpec?.leftScore
-                  }
-                ),
-                /* @__PURE__ */ (0, import_jsx_runtime248.jsx)(
-                  TeamRow,
-                  {
-                    game,
-                    side: model.right.side,
-                    name: resolveSportsBrowserLeftNavTeamNamePresentation(game, model.right).teamName,
-                    score: model.right.score,
-                    showScore: model.showScores,
-                    scoreFlash: flashSpec?.rightScore
-                  }
-                )
-              ] }) }),
-              /* @__PURE__ */ (0, import_jsx_runtime248.jsxs)("div", { className: "grarf-extension-command-center-transient-alert__meta", children: [
-                statusLabel ? /* @__PURE__ */ (0, import_jsx_runtime248.jsx)(
-                  "span",
-                  {
-                    className: cn2(
-                      "grarf-extension-command-center-transient-alert__status",
-                      `grarf-extension-command-center-transient-alert__status--${accent}`,
-                      flashSpec?.statusTime && "grarf-extension-command-center-transient-alert__flash"
-                    ),
-                    children: statusLabel
-                  }
-                ) : null,
-                showChannelLogo && channel.logoUrl ? /* @__PURE__ */ (0, import_jsx_runtime248.jsx)("span", { className: "grarf-extension-command-center-transient-alert__channel", children: /* @__PURE__ */ (0, import_jsx_runtime248.jsx)(
-                  NewsSportsBrowserChannelLogo,
-                  {
-                    logoUrl: channel.logoUrl,
-                    label: channel.label,
-                    slotAlign: "center",
-                    slotClassName: GAMES_SPINE_COMPACT_CHANNEL_LOGO_SLOT_CLASS,
-                    imageClassName: gamesSpineCompactChannelLogoImageClass("right", {
-                      logoUrl: channel.logoUrl,
-                      label: channel.label
-                    })
-                  }
-                ) }) : null,
-                /* @__PURE__ */ (0, import_jsx_runtime248.jsx)(
-                  ChevronRight,
-                  {
-                    className: "grarf-extension-command-center-transient-alert__chevron",
-                    strokeWidth: 2,
-                    "aria-hidden": true
-                  }
-                )
-              ] })
+              /* @__PURE__ */ (0, import_jsx_runtime248.jsx)(HeaderIcon, { className: "grarf-extension-command-center-transient-alert__heading-icon", "aria-hidden": true }),
+              /* @__PURE__ */ (0, import_jsx_runtime248.jsx)("span", { children: headerLabel })
             ]
           }
-        )
+        ) }),
+        /* @__PURE__ */ (0, import_jsx_runtime248.jsx)("div", { className: "grarf-extension-command-center-transient-alert__scorecard-slot", children })
       ]
     }
   );
+}
+
+// ../grarf/desktop/src/extensionHost/grarfExtensionCommandCenterTransientAlertLifecycle.ts
+init_define_import_meta_env();
+var LIVE_PHASE_ALERT_TYPES = /* @__PURE__ */ new Set([
+  "close-game",
+  "final-minutes",
+  "overtime",
+  "walk-off-threat"
+]);
+function isEffectivelyLiveForTransientAlert(game) {
+  if (game.status === "final" || isSpineFinalizedGame(game)) return false;
+  if (game.status !== "live") return false;
+  const line = game.statusLine?.trim() ?? "";
+  if (/^(final|ft|full\s*time|aet|after\s+extra\s+time|pen|penalties)$/i.test(line)) {
+    return false;
+  }
+  return true;
+}
+function shouldDismissGrarfExtensionCommandCenterLiveTransientAlert(alertType, game) {
+  if (!LIVE_PHASE_ALERT_TYPES.has(alertType)) return false;
+  return !isEffectivelyLiveForTransientAlert(game);
 }
 
 // ../grarf/desktop/src/extensionHost/GrarfExtensionGameExplorePanelActions.tsx
@@ -165206,6 +165198,16 @@ function SportsBrowserPrototypeBottomRailGames({
     if (!lifecycleAlert || !resolvedAlertGame) return;
     rememberFlashSpec(lifecycleAlert, resolvedAlertGame);
   }, [lifecycleAlert, resolvedAlertGame, rememberFlashSpec]);
+  (0, import_react284.useEffect)(() => {
+    if (!isGrarfExtensionRenderer() || !lifecycleAlert || !resolvedAlertGame) return;
+    if (!shouldDismissGrarfExtensionCommandCenterLiveTransientAlert(
+      lifecycleAlert.type,
+      resolvedAlertGame
+    )) {
+      return;
+    }
+    completeActive();
+  }, [lifecycleAlert, resolvedAlertGame, completeActive]);
   const presentPlacement = resolveTopRailAlertPlacement2(
     presentAlert && resolvedAlertGame ? presentAlert.gameId : null,
     bestGame,
@@ -165270,6 +165272,16 @@ function SportsBrowserPrototypeBottomRailGames({
     bestGame,
     resolvedAlertGame
   ]);
+  const commandCenterAlertDisplayGame = (0, import_react284.useMemo)(() => {
+    if (!resolvedAlertGame) return void 0;
+    if (!isSidebarCommandCenter || !isGrarfExtensionRenderer() || !lifecycleAlert) {
+      return resolvedAlertGame;
+    }
+    const fromStrip = displayGames.find(
+      (game) => isSameTopRailGame2(game, lifecycleAlert.gameId)
+    );
+    return fromStrip ?? resolvedAlertGame;
+  }, [resolvedAlertGame, isSidebarCommandCenter, lifecycleAlert, displayGames]);
   const displayOrderKey = [
     slotPlacement === "transient" && lifecycleAlert ? lifecycleAlert.instanceId : "",
     displayGames.map((game) => game.id).join("|")
@@ -165338,10 +165350,13 @@ function SportsBrowserPrototypeBottomRailGames({
             className: "flex w-full flex-col gap-[10px]",
             "data-bottom-rail-games-strip": true,
             children: [
-              showCommandCenterSidebarAlertRow && lifecycleAlert && resolvedAlertGame ? /* @__PURE__ */ (0, import_jsx_runtime252.jsx)(
+              showCommandCenterSidebarAlertRow && lifecycleAlert && commandCenterAlertDisplayGame ? /* @__PURE__ */ (0, import_jsx_runtime252.jsx)(
                 "div",
                 {
-                  className: "w-full shrink-0 overflow-hidden",
+                  className: cn2(
+                    "w-full shrink-0",
+                    extensionCommandCenter ? "overflow-visible" : "overflow-hidden"
+                  ),
                   "data-bottom-rail-update-slot": true,
                   "data-grarf-extension-command-center-alert-slot": extensionCommandCenter ? "" : void 0,
                   style: extensionCommandCenter ? void 0 : {
@@ -165351,12 +165366,39 @@ function SportsBrowserPrototypeBottomRailGames({
                   children: extensionCommandCenter ? /* @__PURE__ */ (0, import_jsx_runtime252.jsx)(
                     GrarfExtensionCommandCenterTransientAlert,
                     {
-                      game: resolvedAlertGame,
+                      game: commandCenterAlertDisplayGame,
                       alertType: lifecycleAlert.type,
                       phase,
                       cardVisible,
-                      flashSpec: activeFlashSpec,
-                      onGameSelect
+                      children: /* @__PURE__ */ (0, import_jsx_runtime252.jsx)(
+                        "div",
+                        {
+                          "data-top-rail-game-id": commandCenterAlertDisplayGame.id,
+                          "data-bottom-rail-game-card": true,
+                          "data-grarf-extension-windframe-card-state": resolveExtensionWindframeFeaturedCardState(
+                            commandCenterAlertDisplayGame
+                          ),
+                          className: "flex h-auto min-h-0 w-full max-w-none shrink-0 min-w-0 overflow-visible",
+                          children: /* @__PURE__ */ (0, import_jsx_runtime252.jsx)(
+                            BottomRailGameCard,
+                            {
+                              game: commandCenterAlertDisplayGame,
+                              flashSpec: activeFlashSpec,
+                              onWatchLive,
+                              canShowWatchLive,
+                              onGameSelect,
+                              onGameTeamSelect,
+                              onSocialLive,
+                              presentation: "commandCenter",
+                              ...commandCenterCardContext,
+                              commandCenterExploreExpanded: commandCenterExploreExpandedGameIds.has(
+                                commandCenterAlertDisplayGame.id
+                              ),
+                              onCommandCenterGameExploreToggle: toggleCommandCenterGameExplore
+                            }
+                          )
+                        }
+                      )
                     }
                   ) : /* @__PURE__ */ (0, import_jsx_runtime252.jsx)(
                     "div",
@@ -177195,60 +177237,6 @@ function resolveGrarfExtensionAiSearchEntitySuggestionAvailability(entity, tempo
 // ../grarf/desktop/src/extensionHost/grarfExtensionAiSearchEntityLogo.tsx
 init_define_import_meta_env();
 var import_react301 = __toESM(require_react(), 1);
-
-// ../grarf/desktop/src/lib/gamesSpine/leaguesTabProTeamLogoUrl.ts
-init_define_import_meta_env();
-var SOCCER_LEAGUES_TAB_LEAGUES = /* @__PURE__ */ new Set([
-  "MLS",
-  "EPL",
-  "LALIGA",
-  "BUNDESLIGA",
-  "SERIEA",
-  "LIGUE1"
-]);
-var NHL_ESPN_SCOREBOARD_SLUG = {
-  LAK: "la",
-  NJD: "nj",
-  SJS: "sj",
-  TBL: "tb"
-};
-function buildLeaguesTabMlsTeamLogoUrl(teamEspnId) {
-  const id = teamEspnId?.trim();
-  if (!id) return void 0;
-  return `https://a.espncdn.com/i/teamlogos/soccer/500/${id}.png`;
-}
-function buildLeaguesTabProTeamLogoUrl(league2, teamAbbrev2) {
-  const normalized = teamAbbrev2?.trim().toUpperCase();
-  if (!normalized) return void 0;
-  if (league2 === "WNBA") {
-    return buildWnbaEspnLogoUrl(teamAbbrev2);
-  }
-  if (league2 === "NBA") {
-    return `https://a.espncdn.com/i/teamlogos/nba/500/scoreboard/${normalized.toLowerCase()}.png`;
-  }
-  if (league2 === "NFL") {
-    return `https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/${normalized.toLowerCase()}.png`;
-  }
-  const slug = NHL_ESPN_SCOREBOARD_SLUG[normalized] ?? normalized.toLowerCase();
-  return `https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/${slug}.png`;
-}
-function resolveSportsBrowserPrototypeLeaguesTabTeamLogoUrl(input) {
-  const leagueKey = input.leagueKey.trim().toUpperCase();
-  if (SOCCER_LEAGUES_TAB_LEAGUES.has(leagueKey)) {
-    const bundled = resolveSoccerBundledTeamLogoUrl(input.teamEspnId, input.teamDisplayName);
-    if (bundled) return bundled.startsWith("http") ? bundled : bundled;
-    return buildLeaguesTabMlsTeamLogoUrl(input.teamEspnId);
-  }
-  if (leagueKey === "MLB") {
-    return buildMlbEspnScoreboardLogoUrl(input.teamAbbrev);
-  }
-  if (leagueKey === "NFL" || leagueKey === "NBA" || leagueKey === "NHL" || leagueKey === "WNBA") {
-    return buildLeaguesTabProTeamLogoUrl(leagueKey, input.teamAbbrev);
-  }
-  return void 0;
-}
-
-// ../grarf/desktop/src/extensionHost/grarfExtensionAiSearchEntityLogo.tsx
 var import_jsx_runtime285 = __toESM(require_jsx_runtime(), 1);
 function resolveTeamSideForLogo(game, teamAbbrev2) {
   const abbr = teamAbbrev2?.trim().toUpperCase();
@@ -178292,8 +178280,6 @@ function GrarfExtensionEplRecapsSourcePills({ className, onSourceChange }) {
   const fotmobLogo = resolveWebsiteFaviconUrl("https://www.fotmob.com/");
   const onSelect = (source) => {
     setGrarfExtensionEplRecapsSource(source);
-    invalidateGrarfExtensionEplBbcRecapHeadlines();
-    invalidateGrarfExtensionSoccerwayRecapHeadlines();
     onSourceChange?.(source);
   };
   return /* @__PURE__ */ (0, import_jsx_runtime290.jsxs)("span", { className: cn2("grarf-extension-nhl-recaps-source-pills", className), children: [

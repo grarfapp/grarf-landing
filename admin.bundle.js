@@ -19325,6 +19325,12 @@ init_define_import_meta_env();
 
 // ../grarf/desktop/src/config/operationalIngestConfig.ts
 init_define_import_meta_env();
+
+// ../grarf/shared/config/operationalSnapshotRefreshMs.ts
+init_define_import_meta_env();
+var OPERATIONAL_SNAPSHOT_REFRESH_MS = 6e4;
+
+// ../grarf/desktop/src/config/operationalIngestConfig.ts
 function resolveWebOperationalIngestUrl() {
   if (typeof window === "undefined") return null;
   return window.GRARF_WEB_CONFIG?.operationalIngestUrl?.trim() || null;
@@ -19346,7 +19352,7 @@ function getOperationalIngestConfig() {
   }
   const pollRaw = define_import_meta_env_default.VITE_OPERATIONAL_INGEST_POLL_MS ?? (typeof window !== "undefined" ? String(window.GRARF_WEB_CONFIG?.operationalPollIntervalMs ?? "") : "");
   const pollParsed = pollRaw != null ? Number(pollRaw) : NaN;
-  const pollIntervalMs = Number.isFinite(pollParsed) && pollParsed >= 15e3 ? pollParsed : 6e4;
+  const pollIntervalMs = Number.isFinite(pollParsed) && pollParsed >= OPERATIONAL_SNAPSHOT_REFRESH_MS ? pollParsed : OPERATIONAL_SNAPSHOT_REFRESH_MS;
   return {
     provider,
     cloudBaseUrl,
@@ -24036,27 +24042,7 @@ var CLOUD_FETCH_TIMEOUT_MS = 2e4;
 var WEB_CLOUD_BOOTSTRAP_TIMEOUT_MS = 2500;
 var CLOUD_FETCH_MAX_ATTEMPTS = 3;
 var CLOUD_FETCH_RETRY_MS = 1500;
-var webCloudSnapshotPrefetch = null;
 var grarfCloudSnapshotFetchInFlight = null;
-function shouldUseWebBootstrapCloudPrefetch() {
-  return isGrarfWebRenderer() && !hasElectronGamesIpc();
-}
-function prefetchWebOperationalCloudSnapshot() {
-  const config = getOperationalIngestConfig();
-  if (!config.cloudBaseUrl) return Promise.resolve(null);
-  if (!isGrarfWebRenderer() && config.provider !== "grarf_cloud") {
-    return Promise.resolve(null);
-  }
-  if (!webCloudSnapshotPrefetch) {
-    webCloudSnapshotPrefetch = fetchViaGrarfCloudService(
-      shouldUseWebBootstrapCloudPrefetch() ? { webBootstrap: true, traceFetchKind: "prefetch" } : { traceFetchKind: "prefetch" }
-    ).then((snap) => countOperationalGames(snap) > 0 ? snap : null).catch((e) => {
-      console.warn(`${LOG8} web cloud prefetch failed`, e);
-      return null;
-    });
-  }
-  return webCloudSnapshotPrefetch;
-}
 async function fetchGrarfCloudOperationalSnapshot() {
   const joinedExistingInFlight = Boolean(grarfCloudSnapshotFetchInFlight);
   if (!grarfCloudSnapshotFetchInFlight) {
@@ -24247,7 +24233,8 @@ async function fetchViaGrarfCloudService(options) {
     throw new Error("[OperationalIngest] grarf_cloud provider requires VITE_GRARF_OPERATIONAL_INGEST_URL");
   }
   const urlBase = resolveGrarfCloudOperationalSnapshotUrl(cloudBaseUrl);
-  const url = `${urlBase}${urlBase.includes("?") ? "&" : "?"}clientMs=${Date.now()}`;
+  const bypassHttpCache = options?.webBootstrap === true || options?.traceFetchKind === "prefetch";
+  const url = bypassHttpCache ? `${urlBase}${urlBase.includes("?") ? "&" : "?"}clientMs=${Date.now()}` : urlBase;
   const maxAttempts = options?.webBootstrap ? 1 : CLOUD_FETCH_MAX_ATTEMPTS;
   let lastError;
   for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
@@ -24264,7 +24251,7 @@ async function fetchViaGrarfCloudService(options) {
       }
       const res = await fetch(url, {
         headers: { Accept: "application/json" },
-        cache: "no-store",
+        cache: bypassHttpCache ? "no-store" : "default",
         signal: AbortSignal.timeout(
           options?.webBootstrap ? WEB_CLOUD_BOOTSTRAP_TIMEOUT_MS : CLOUD_FETCH_TIMEOUT_MS
         )
@@ -24315,10 +24302,7 @@ async function fetchViaWebOperationalIngest() {
   let cloud = null;
   let cloudError = null;
   try {
-    cloud = await prefetchWebOperationalCloudSnapshot();
-    if (!cloud || countOperationalGames(cloud) === 0) {
-      cloud = await fetchViaGrarfCloudService();
-    }
+    cloud = await fetchGrarfCloudOperationalSnapshot();
   } catch (e) {
     cloudError = e instanceof Error ? e.message : String(e);
     if (define_import_meta_env_default.DEV) {
