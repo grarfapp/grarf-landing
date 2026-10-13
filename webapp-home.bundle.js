@@ -75,7 +75,7 @@ var OPERATIONAL_SNAPSHOT_REFRESH_MS;
 var init_operationalSnapshotRefreshMs = __esm({
   "../grarf/shared/config/operationalSnapshotRefreshMs.ts"() {
     init_define_import_meta_env();
-    OPERATIONAL_SNAPSHOT_REFRESH_MS = 6e4;
+    OPERATIONAL_SNAPSHOT_REFRESH_MS = 15e3;
   }
 });
 
@@ -27227,8 +27227,7 @@ async function fetchViaGrarfCloudService(options) {
     throw new Error("[OperationalIngest] grarf_cloud provider requires VITE_GRARF_OPERATIONAL_INGEST_URL");
   }
   const urlBase = resolveGrarfCloudOperationalSnapshotUrl(cloudBaseUrl);
-  const bypassHttpCache = options?.webBootstrap === true || options?.traceFetchKind === "prefetch";
-  const url = bypassHttpCache ? `${urlBase}${urlBase.includes("?") ? "&" : "?"}clientMs=${Date.now()}` : urlBase;
+  const url = `${urlBase}${urlBase.includes("?") ? "&" : "?"}clientMs=${Date.now()}`;
   const maxAttempts = options?.webBootstrap ? 1 : CLOUD_FETCH_MAX_ATTEMPTS;
   let lastError;
   for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
@@ -27245,7 +27244,7 @@ async function fetchViaGrarfCloudService(options) {
       }
       const res = await fetch(url, {
         headers: { Accept: "application/json" },
-        cache: bypassHttpCache ? "no-store" : "default",
+        cache: "no-store",
         signal: AbortSignal.timeout(
           options?.webBootstrap ? WEB_CLOUD_BOOTSTRAP_TIMEOUT_MS : CLOUD_FETCH_TIMEOUT_MS
         )
@@ -70689,7 +70688,8 @@ function LiveGamesBridge() {
       if (!hasElectronGamesIpc() && !isCanonicalWebBrowserRenderer()) {
         void (async () => {
           try {
-            const transport = await fetchOperationalSnapshot();
+            const prefetched = await prefetchWebOperationalCloudSnapshot();
+            const transport = prefetched && countOperationalGamesInTransport(prefetched.leagues) > 0 ? prefetched : await fetchOperationalSnapshot();
             if (countOperationalGamesInTransport(transport.leagues) > 0) {
               await onCloudTransport(transport);
             }
@@ -155729,6 +155729,105 @@ function resolveNcaaCollegeTeamBrandAccentHexForDisplayName(teamDisplayName2) {
   );
 }
 
+// ../grarf/desktop/src/data/uclTeamBrandAccentHex.ts
+init_define_import_meta_env();
+var UCL_TEAM_BRAND_ACCENT_HEX_BY_ABBREV = {
+  AEK: "FFD700",
+  ARS: "EF0107",
+  AVL: "670E36",
+  ATM: "CB3524",
+  ATL: "CB3524",
+  BAR: "004D98",
+  BAY: "DC052D",
+  BMU: "DC052D",
+  BOD: "FFDD00",
+  DOR: "FDE100",
+  BRU: "0055A4",
+  COM: "003DA5",
+  FEN: "002D72",
+  FEY: "E30613",
+  GAL: "A90432",
+  INT: "0068A8",
+  LASK: "000000",
+  RBL: "DD0741",
+  LEN: "DA291C",
+  LILL: "E31E24",
+  LIV: "C8102E",
+  MCI: "6CABDD",
+  MAN: "DA291C",
+  MUN: "DA291C",
+  NAP: "00A6D6",
+  PSG: "004170",
+  POR: "003399",
+  PSV: "ED1C24",
+  BET: "00954C",
+  RMA: "FFFFFF",
+  MAD: "FFFFFF",
+  ROM: "8E1B2F",
+  ROMA: "8E1B2F",
+  SAB: "0066B3",
+  SHA: "F36F21",
+  SHD: "F36F21",
+  SLA: "D7141A",
+  SLO: "00529B",
+  SCP: "008B45",
+  SPO: "008B45",
+  STU: "FFFFFF",
+  VFB: "FFFFFF",
+  VIK: "00205B",
+  VIL: "FFE500"
+};
+var UCL_TEAM_BRAND_ACCENT_HEX_BY_DISPLAY_NAME = {
+  "aek athens": "FFD700",
+  arsenal: "EF0107",
+  "aston villa": "670E36",
+  "atletico madrid": "CB3524",
+  barcelona: "004D98",
+  "bayern munich": "DC052D",
+  "bodo/glimt": "FFDD00",
+  "bod\xF8/glimt": "FFDD00",
+  "borussia dortmund": "FDE100",
+  "club brugge": "0055A4",
+  como: "003DA5",
+  fenerbahce: "002D72",
+  fenerbah\u00E7e: "002D72",
+  feyenoord: "E30613",
+  galatasaray: "A90432",
+  "inter milan": "0068A8",
+  inter: "0068A8",
+  lask: "000000",
+  "rb leipzig": "DD0741",
+  leipzig: "DD0741",
+  lens: "DA291C",
+  lille: "E31E24",
+  liverpool: "C8102E",
+  "manchester city": "6CABDD",
+  "man city": "6CABDD",
+  "manchester united": "DA291C",
+  "man united": "DA291C",
+  "man. united": "DA291C",
+  napoli: "00A6D6",
+  "paris saint-germain": "004170",
+  psg: "004170",
+  porto: "003399",
+  "psv eindhoven": "ED1C24",
+  psv: "ED1C24",
+  "real betis": "00954C",
+  "real madrid": "FFFFFF",
+  roma: "8E1B2F",
+  sabah: "0066B3",
+  "shakhtar donetsk": "F36F21",
+  shakhtar: "F36F21",
+  "slavia prague": "D7141A",
+  "slovan bratislava": "00529B",
+  "sporting cp": "008B45",
+  sporting: "008B45",
+  "vfb stuttgart": "FFFFFF",
+  stuttgart: "FFFFFF",
+  "viking fk": "00205B",
+  villarreal: "FFE500"
+};
+
 // ../grarf/desktop/src/lib/branding/grarfTeamBrandAccentHex.ts
 function normalizeBrandAccentHex2(hex) {
   const trimmed = hex.trim();
@@ -156209,7 +156308,8 @@ var GRARF_TEAM_BRAND_ACCENT_HEX_BY_LEAGUE = {
   RUGBYPREM,
   SERIEA,
   BUNDESLIGA,
-  LIGUE1
+  LIGUE1,
+  UCL: abbrevHexMap(UCL_TEAM_BRAND_ACCENT_HEX_BY_ABBREV)
 };
 var GRARF_TEAM_BRAND_ACCENT_LEAGUE_ALIASES = {
   NBASUMMER: "NBA"
@@ -156363,6 +156463,10 @@ function resolveGrarfTeamBrandAccentHexForGame(game, side, teamDisplayName2) {
   for (const abbrev of abbrevCandidates) {
     const hex = resolveGrarfTeamBrandAccentHex(league2, abbrev);
     if (hex) return hex;
+  }
+  if (league2 === "UCL") {
+    const nameHex = UCL_TEAM_BRAND_ACCENT_HEX_BY_DISPLAY_NAME[normalizeTeamDisplayNameKey(canonicalName)] ?? UCL_TEAM_BRAND_ACCENT_HEX_BY_DISPLAY_NAME[normalizeTeamDisplayNameKey(ingestTeamName)];
+    if (nameHex) return normalizeBrandAccentHex2(nameHex);
   }
   const flagHex = resolveGrarfFlagCompetitorBrandAccentHexForGame(
     game,
@@ -157013,6 +157117,134 @@ async function fetchGrarfExtensionEspnWatchHomeListings() {
   } catch {
     return cache3?.listings ?? [];
   }
+}
+
+// ../grarf/desktop/src/extensionHost/grarfExtensionParamountPlusWatchResolver.ts
+init_define_import_meta_env();
+init_operationalIngestConfig();
+
+// ../grarf/grarf-operational-service/src/watch/paramount/matchCbsListing.mjs
+init_define_import_meta_env();
+
+// ../grarf/grarf-operational-service/src/watch/paramount/teamMatch.mjs
+init_define_import_meta_env();
+function normalizeTeamToken3(name) {
+  if (!name || typeof name !== "string") return "";
+  let s2 = name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\b(fc|cf|sc|ac|afc|city|united|town)\b/g, " ").replace(/[^a-z0-9]/g, "").trim();
+  const aliases = {
+    internazionale: "inter",
+    intermilan: "inter",
+    hellasverona: "verona",
+    heartofmidlothian: "hearts",
+    midlothian: "hearts"
+  };
+  return aliases[s2] ?? s2;
+}
+function tokenOverlapScore2(a2, b2) {
+  const ta2 = normalizeTeamToken3(a2);
+  const tb = normalizeTeamToken3(b2);
+  if (!ta2 || !tb) return 0;
+  if (ta2 === tb) return 1;
+  if (ta2.includes(tb) || tb.includes(ta2)) return 0.85;
+  if (ta2.length >= 4 && tb.length >= 4 && ta2.slice(0, 4) === tb.slice(0, 4)) return 0.6;
+  return 0;
+}
+function gameCompetitorLabel(game, side) {
+  const official = side === "away" ? game.metadata?.officialAwayName : game.metadata?.officialHomeName;
+  if (typeof official === "string" && official.trim()) return official.trim();
+  if (side === "away") return game.awayCity || game.awayTeam;
+  return game.homeCity || game.homeTeam;
+}
+function listingCompetitorLabels(listing) {
+  const fromTitle = parseMatchupFromTitle(String(listing.displayTitle || ""));
+  if (fromTitle?.homeName && fromTitle?.awayName) {
+    return { homeName: fromTitle.homeName, awayName: fromTitle.awayName };
+  }
+  return { homeName: listing.homeName, awayName: listing.awayName };
+}
+function scoreListingMatch2(listing, game) {
+  const gameHome = gameCompetitorLabel(game, "home");
+  const gameAway = gameCompetitorLabel(game, "away");
+  const { homeName: listingHome, awayName: listingAway } = listingCompetitorLabels(listing);
+  const direct = tokenOverlapScore2(listingHome, gameHome) + tokenOverlapScore2(listingAway, gameAway);
+  const swap = tokenOverlapScore2(listingHome, gameAway) + tokenOverlapScore2(listingAway, gameHome);
+  return Math.max(direct, swap);
+}
+function parseMatchupFromTitle(title) {
+  if (!title || typeof title !== "string") return null;
+  const idx = title.toLowerCase().indexOf(" vs");
+  if (idx < 0) return null;
+  const homeName = title.slice(0, idx).replace(/^90 in 60:\s*/i, "").replace(/^.*-\s*/, "").trim();
+  const awayName = title.slice(idx + 4).replace(/^\.?\s*/, "").replace(/\s*[:|\-–—].*$/, "").trim();
+  if (!homeName || !awayName) return null;
+  return { homeName, awayName };
+}
+
+// ../grarf/grarf-operational-service/src/watch/paramount/matchCbsListing.mjs
+var TIME_WINDOW_MS2 = 4 * 60 * 60 * 1e3;
+var MIN_MATCH_SCORE = 1.4;
+function matchGameToCbsListing(game, listings) {
+  if (!listings.length) return null;
+  let best = null;
+  let bestScore = 0;
+  for (const listing of listings) {
+    const teamScore3 = scoreListingMatch2(listing, game);
+    if (teamScore3 < MIN_MATCH_SCORE) continue;
+    let score2 = teamScore3;
+    if (game.startTimeMs && listing.startMs) {
+      const delta = Math.abs(game.startTimeMs - listing.startMs);
+      if (delta > TIME_WINDOW_MS2) continue;
+      score2 += 0.25;
+    }
+    if (score2 > bestScore) {
+      bestScore = score2;
+      best = listing;
+    }
+  }
+  return best;
+}
+
+// ../grarf/desktop/src/extensionHost/grarfExtensionParamountPlusWatchResolver.ts
+var LISTINGS_CACHE_TTL_MS = 6e4;
+var uclListingsCache = null;
+function grarfExtensionLeagueUsesParamountPlusWatchResolver(leagueKey) {
+  return leagueKey.trim().toUpperCase() === "UCL";
+}
+async function fetchGrarfExtensionParamountPlusUclWatchListings() {
+  const now = Date.now();
+  if (uclListingsCache && now - uclListingsCache.at < LISTINGS_CACHE_TTL_MS) {
+    return uclListingsCache.items;
+  }
+  const cloudBase = getOperationalIngestConfig().cloudBaseUrl?.replace(/\/$/, "");
+  if (!cloudBase) {
+    return uclListingsCache?.items ?? [];
+  }
+  try {
+    const res = await fetch(`${cloudBase}/watch/paramount-plus-listings/UCL`, {
+      headers: { Accept: "application/json" },
+      cache: "no-store"
+    });
+    if (!res.ok) {
+      return uclListingsCache?.items ?? [];
+    }
+    const data2 = await res.json();
+    const items = Array.isArray(data2.items) ? data2.items : [];
+    uclListingsCache = { at: now, items };
+    return items;
+  } catch {
+    return uclListingsCache?.items ?? [];
+  }
+}
+async function resolveGrarfExtensionParamountPlusWatchUrlForGame(game) {
+  const leagueKey = game.league?.trim().toUpperCase() ?? "";
+  if (!grarfExtensionLeagueUsesParamountPlusWatchResolver(leagueKey)) {
+    return null;
+  }
+  const listings = await fetchGrarfExtensionParamountPlusUclWatchListings();
+  if (!listings.length) return null;
+  const listing = matchGameToCbsListing(game, listings);
+  const url = listing?.streamUrl?.trim();
+  return url || null;
 }
 
 // ../grarf/desktop/src/extensionHost/grarfExtensionCommandCenterScorecardExternalActions.ts
@@ -160442,6 +160674,8 @@ async function resolveGrarfExtensionCommandCenterScorecardWatchUrlAsync(game) {
   const sync = resolveGrarfExtensionCommandCenterScorecardWatchUrl(game);
   if (sync) return sync;
   if (!isGrarfExtensionRenderer()) return null;
+  const paramountUrl = await resolveGrarfExtensionParamountPlusWatchUrlForGame(game);
+  if (paramountUrl) return paramountUrl;
   const listings = await fetchGrarfExtensionEspnWatchHomeListings();
   return resolveEspnWatchLiveDestinationUrlWithWatchHomeCatalog(game, listings);
 }
@@ -160515,6 +160749,9 @@ function resolveGrarfExtensionCommandCenterScorecardMediaActionEnabled(game, med
   }
   if (mediaAction.kind !== "watch" && mediaAction.kind !== "highlights") return false;
   if (!isGrarfExtensionRenderer()) return false;
+  if (mediaAction.kind === "watch" && grarfExtensionLeagueUsesParamountPlusWatchResolver(game.league ?? "")) {
+    return true;
+  }
   return Boolean(parseEspnEventIdFromGame2(game) && gameHasEspnFamilyBroadcast(game));
 }
 function resolveGrarfExtensionCommandCenterScorecardMediaAction(game) {
@@ -190661,13 +190898,13 @@ var import_react331 = __toESM(require_react(), 1);
 
 // ../grarf/desktop/src/lib/leagueOverview/lookupMlbTeamPulseMark.ts
 init_define_import_meta_env();
-function normalizeTeamToken3(value) {
+function normalizeTeamToken4(value) {
   return value.trim().toLowerCase().replace(/[^a-z0-9]+/g, "");
 }
 function teamSideMatch(game, side, target) {
   const team = side === "away" ? game.awayTeam : game.homeTeam;
-  const teamNorm = normalizeTeamToken3(team);
-  const targetNorm = normalizeTeamToken3(target);
+  const teamNorm = normalizeTeamToken4(team);
+  const targetNorm = normalizeTeamToken4(target);
   return teamNorm === targetNorm || teamNorm.includes(targetNorm) || targetNorm.includes(teamNorm);
 }
 function lookupMlbTeamPulseMark(games, teamName) {

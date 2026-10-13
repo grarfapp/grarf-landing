@@ -19328,7 +19328,7 @@ init_define_import_meta_env();
 
 // ../grarf/shared/config/operationalSnapshotRefreshMs.ts
 init_define_import_meta_env();
-var OPERATIONAL_SNAPSHOT_REFRESH_MS = 6e4;
+var OPERATIONAL_SNAPSHOT_REFRESH_MS = 15e3;
 
 // ../grarf/desktop/src/config/operationalIngestConfig.ts
 function resolveWebOperationalIngestUrl() {
@@ -24236,8 +24236,7 @@ async function fetchViaGrarfCloudService(options) {
     throw new Error("[OperationalIngest] grarf_cloud provider requires VITE_GRARF_OPERATIONAL_INGEST_URL");
   }
   const urlBase = resolveGrarfCloudOperationalSnapshotUrl(cloudBaseUrl);
-  const bypassHttpCache = options?.webBootstrap === true || options?.traceFetchKind === "prefetch";
-  const url = bypassHttpCache ? `${urlBase}${urlBase.includes("?") ? "&" : "?"}clientMs=${Date.now()}` : urlBase;
+  const url = `${urlBase}${urlBase.includes("?") ? "&" : "?"}clientMs=${Date.now()}`;
   const maxAttempts = options?.webBootstrap ? 1 : CLOUD_FETCH_MAX_ATTEMPTS;
   let lastError;
   for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
@@ -24254,7 +24253,7 @@ async function fetchViaGrarfCloudService(options) {
       }
       const res = await fetch(url, {
         headers: { Accept: "application/json" },
-        cache: bypassHttpCache ? "no-store" : "default",
+        cache: "no-store",
         signal: AbortSignal.timeout(
           options?.webBootstrap ? WEB_CLOUD_BOOTSTRAP_TIMEOUT_MS : CLOUD_FETCH_TIMEOUT_MS
         )
