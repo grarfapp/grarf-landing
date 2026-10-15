@@ -21495,7 +21495,8 @@ var STREAM_URL_CHANNEL_MAPPINGS2 = [
   { domains: ["plus.espn.com"], label: "ESPN+" },
   { domains: ["espn.com"], label: "ESPN+", pathPattern: /\/watch\/player(?:\/|\?)/i },
   { domains: ["tv.apple.com"], label: "Apple TV" },
-  { domains: ["usanetwork.com"], label: "USA Network" }
+  { domains: ["usanetwork.com"], label: "USA Network" },
+  { domains: ["tntdrama.com"], label: "TNT" }
 ];
 function normalizeStreamHostname2(streamUrl) {
   try {
