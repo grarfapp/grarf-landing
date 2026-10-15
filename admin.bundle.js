@@ -12963,6 +12963,9 @@ init_define_import_meta_env();
 
 // ../grarf/desktop/src/lib/platform/isGrarfWebRenderer.ts
 init_define_import_meta_env();
+function isGrarfExtensionRenderer() {
+  return typeof window !== "undefined" && window.GRARF_EXTENSION === true;
+}
 function isGrarfWebRenderer() {
   return typeof window !== "undefined" && window.GRARF_WEB_CONFIG != null;
 }
@@ -19338,7 +19341,7 @@ function resolveWebOperationalIngestUrl() {
 function getOperationalIngestConfig() {
   const isWeb = isGrarfWebRenderer();
   const envProvider = define_import_meta_env_default.VITE_OPERATIONAL_INGEST_PROVIDER;
-  const cloudBaseUrl = define_import_meta_env_default.VITE_GRARF_OPERATIONAL_INGEST_URL?.trim() || resolveWebOperationalIngestUrl() || null;
+  const cloudBaseUrl = define_import_meta_env_default.VITE_GRARF_OPERATIONAL_INGEST_URL?.trim() || resolveWebOperationalIngestUrl() || (typeof window !== "undefined" && window.GRARF_EXTENSION ? "https://grarf-operational-service.grarf.workers.dev" : null);
   let provider;
   if (envProvider === "grarf_cloud" || envProvider === "espn_local_ipc") {
     provider = envProvider;
@@ -25382,6 +25385,10 @@ var useLiveGamesStore = create((set, get) => ({
     const traceLiveStoreReject = (rejectReason) => {
       traceGrarfLiveGameLiveStoreHydrateRejected(rejectReason, effectiveSnap.leagues);
     };
+    if (isGrarfExtensionRenderer() && getOperationalIngestConfig().provider === "grarf_cloud" && ingestSource !== "grarf_cloud") {
+      traceLiveStoreReject("extension_rejects_non_grarf_cloud_hydrate");
+      return;
+    }
     if (hasElectronGamesIpc() && getOperationalIngestConfig().provider === "grarf_cloud" && (ingestSource === "espn_local_adapter" || ingestSource === "espn_scoreboard_ipc") && countOperationalGames2(prevCanonical.leagues) > 0 && useGamesSpineRenderStore.getState().lastTransportSource === "grarf_cloud") {
       traceLiveStoreReject("rejected_ipc_overwrite_after_cloud_authority");
       return;
@@ -25468,57 +25475,62 @@ var useLiveGamesStore = create((set, get) => ({
       return;
     }
     const transportGeneratedAt = completeness?.transportGeneratedAt?.trim();
+    const extensionAuthoritativeCloudPoll = isGrarfExtensionRenderer() && ingestSource === "grarf_cloud" && countOperationalGames2(effectiveSnap.leagues) > 0;
     if (transportGeneratedAt) {
-      const acceptByFreshness = shouldAcceptOperationalTransportHydrate(
-        transportGeneratedAt,
-        ingestSource
-      );
-      const materiallyDiffers = !gamesSnapshotMateriallyMatchesCanonical(effectiveSnap, {
-        ingestSource,
-        providerPoll: completeness?.providerPoll
-      });
-      if (!acceptByFreshness) {
-        if (!materiallyDiffers) {
-          logOperationalHydrateDecision({
-            stage: "hydrate_exit",
-            outcome: "rejected_stale_transport",
-            source: ingestSource,
-            transportGeneratedAt,
-            snapshotUpdatedAt: effectiveSnap.updatedAt ?? null,
-            gameCount: Object.values(effectiveSnap.leagues ?? {}).reduce(
-              (count, rows) => count + (Array.isArray(rows) ? rows.length : 0),
-              0
-            ),
-            liveGames: summarizeLiveGamesForDiagnostic(effectiveSnap.leagues)
-          });
-          if (define_import_meta_env_default.DEV) {
-            broadcastDebug(
-              `[CanonicalLive] Skip stale operational hydrate ${transportGeneratedAt}`
-            );
-          }
-          traceLiveStoreReject("rejected_stale_transport_no_material_diff");
-          return;
-        }
-        const incomingMs = parseOperationalTransportGeneratedAtMs(transportGeneratedAt);
-        const lastAppliedMs = resolveLastAppliedOperationalTransportMs(ingestSource);
-        if (incomingMs < lastAppliedMs) {
-          logOperationalHydrateDecision({
-            stage: "hydrate_exit",
-            outcome: "rejected_stale_transport",
-            source: ingestSource,
-            transportGeneratedAt,
-            snapshotUpdatedAt: effectiveSnap.updatedAt ?? null,
-            gameCount: Object.values(effectiveSnap.leagues ?? {}).reduce(
-              (count, rows) => count + (Array.isArray(rows) ? rows.length : 0),
-              0
-            ),
-            liveGames: summarizeLiveGamesForDiagnostic(effectiveSnap.leagues)
-          });
-          traceLiveStoreReject("rejected_stale_transport_incoming_older_than_last_applied");
-          return;
-        }
-      } else {
+      if (extensionAuthoritativeCloudPoll) {
         recordAppliedOperationalTransportGeneratedAt(transportGeneratedAt, ingestSource);
+      } else {
+        const acceptByFreshness = shouldAcceptOperationalTransportHydrate(
+          transportGeneratedAt,
+          ingestSource
+        );
+        const materiallyDiffers = !gamesSnapshotMateriallyMatchesCanonical(effectiveSnap, {
+          ingestSource,
+          providerPoll: completeness?.providerPoll
+        });
+        if (!acceptByFreshness) {
+          if (!materiallyDiffers) {
+            logOperationalHydrateDecision({
+              stage: "hydrate_exit",
+              outcome: "rejected_stale_transport",
+              source: ingestSource,
+              transportGeneratedAt,
+              snapshotUpdatedAt: effectiveSnap.updatedAt ?? null,
+              gameCount: Object.values(effectiveSnap.leagues ?? {}).reduce(
+                (count, rows) => count + (Array.isArray(rows) ? rows.length : 0),
+                0
+              ),
+              liveGames: summarizeLiveGamesForDiagnostic(effectiveSnap.leagues)
+            });
+            if (define_import_meta_env_default.DEV) {
+              broadcastDebug(
+                `[CanonicalLive] Skip stale operational hydrate ${transportGeneratedAt}`
+              );
+            }
+            traceLiveStoreReject("rejected_stale_transport_no_material_diff");
+            return;
+          }
+          const incomingMs = parseOperationalTransportGeneratedAtMs(transportGeneratedAt);
+          const lastAppliedMs = resolveLastAppliedOperationalTransportMs(ingestSource);
+          if (incomingMs < lastAppliedMs) {
+            logOperationalHydrateDecision({
+              stage: "hydrate_exit",
+              outcome: "rejected_stale_transport",
+              source: ingestSource,
+              transportGeneratedAt,
+              snapshotUpdatedAt: effectiveSnap.updatedAt ?? null,
+              gameCount: Object.values(effectiveSnap.leagues ?? {}).reduce(
+                (count, rows) => count + (Array.isArray(rows) ? rows.length : 0),
+                0
+              ),
+              liveGames: summarizeLiveGamesForDiagnostic(effectiveSnap.leagues)
+            });
+            traceLiveStoreReject("rejected_stale_transport_incoming_older_than_last_applied");
+            return;
+          }
+        } else {
+          recordAppliedOperationalTransportGeneratedAt(transportGeneratedAt, ingestSource);
+        }
       }
     }
     if (gamesSnapshotMateriallyMatchesCanonical(effectiveSnap, {
@@ -25590,7 +25602,7 @@ var useLiveGamesStore = create((set, get) => ({
     const nextIngestCycle = prevCanonical.ingestSequence + 1;
     const prevTransportSource = useGamesSpineRenderStore.getState().lastTransportSource;
     const cloudSupersedesIpcFallback = ingestSource === "grarf_cloud" && (prevTransportSource === "espn_scoreboard_ipc" || prevTransportSource === "espn_local_adapter");
-    const withStableLeagues = applyOperationalIngestRetention(effectiveSnap, {
+    const withStableLeagues = extensionAuthoritativeCloudPoll ? effectiveSnap : applyOperationalIngestRetention(effectiveSnap, {
       ingestSource,
       previousGames,
       previousLeagues,
@@ -25602,11 +25614,13 @@ var useLiveGamesStore = create((set, get) => ({
       previousGames,
       incomingLeagues: withStableLeagues.leagues
     });
-    retention.harvestOnIngestTransition({
-      previousGames,
-      incomingLeagues: withStableLeagues.leagues,
-      ingestCycle: nextIngestCycle
-    });
+    if (!extensionAuthoritativeCloudPoll) {
+      retention.harvestOnIngestTransition({
+        previousGames,
+        incomingLeagues: withStableLeagues.leagues,
+        ingestCycle: nextIngestCycle
+      });
+    }
     const withMlbStandings = syncMlbTeamStandingsFromCacheOnSnapshot(
       preserveMlbTeamStandingsOnGamesSnapshot(withStableLeagues, previousGames)
     );
@@ -25628,8 +25642,9 @@ var useLiveGamesStore = create((set, get) => ({
       },
       ingestMeta
     );
+    const renderIngestSource = extensionAuthoritativeCloudPoll ? "grarf_cloud" : completeness?.source ?? "espn_scoreboard_ipc";
     useGamesSpineRenderStore.getState().markOperationalIngest(withReconciledEspnState.leagues, {
-      source: completeness?.source ?? "espn_scoreboard_ipc",
+      source: renderIngestSource,
       requestedLeagueCount: completeness?.requestedLeagueCount,
       transportGeneratedAt: completeness?.transportGeneratedAt ?? effectiveSnap.updatedAt ?? void 0,
       providerPoll: completeness?.providerPoll,
@@ -27187,12 +27202,17 @@ function readJsonLdAuthor(node) {
   }
   return null;
 }
+function readUtagArticleTitle(html) {
+  const match = html.match(/"articleTitle":"([^"\\]+)"/);
+  if (!match?.[1]) return null;
+  return normalizeMetadataText(decodeHtmlEntities(match[1]));
+}
 function extractCbsPreviewArticleMetadata(html) {
   const articleNodes = findArticleJsonLdNodes(parseJsonLdBlocks(html));
   const articleNode = articleNodes[0];
   const headline = normalizeMetadataText(
     typeof articleNode?.headline === "string" ? articleNode.headline : void 0
-  ) ?? readMetaContent(html, ["headline"], "itemprop") ?? readFirstTagText(html, /<h1[^>]*class=["'][^"']*gametracker-article__title-text[^"']*["'][^>]*>([\s\S]*?)<\/h1>/i) ?? readFirstTagText(html, /<h1[^>]*class=["'][^"']*Article-headline[^"']*["'][^>]*>([\s\S]*?)<\/h1>/i);
+  ) ?? readMetaContent(html, ["headline"], "itemprop") ?? readFirstTagText(html, /<h1[^>]*class=["'][^"']*gametracker-article__title-text[^"']*["'][^>]*>([\s\S]*?)<\/h1>/i) ?? readFirstTagText(html, /<h1[^>]*class=["'][^"']*Article-headline[^"']*["'][^>]*>([\s\S]*?)<\/h1>/i) ?? readFirstTagText(html, /<h1[^>]*class=["'][^"']*article-headline[^"']*["'][^>]*>([\s\S]*?)<\/h1>/i) ?? readUtagArticleTitle(html);
   const subheadline = normalizeMetadataText(
     typeof articleNode?.alternativeHeadline === "string" ? articleNode.alternativeHeadline : void 0
   ) ?? readFirstTagText(
@@ -27304,6 +27324,464 @@ async function enrichOperationalSnapshotCbsMlbPreviewUrls(transport) {
     leagues: {
       ...transport.leagues,
       MLB: enriched
+    }
+  };
+}
+
+// ../grarf/desktop/src/lib/cbs/enrichOperationalSnapshotCbsNflPreviewUrls.ts
+init_define_import_meta_env();
+
+// ../grarf/shared/domain/cbs/enrichNflGamesWithCbsSportsPreviewUrls.ts
+init_define_import_meta_env();
+
+// ../grarf/shared/domain/cbs/buildCbsNflPreviewUrl.ts
+init_define_import_meta_env();
+var CBS_NFL_PREVIEW_BASE_URL = "https://www.cbssports.com/nfl/gametracker/preview";
+var ESPN_TO_CBS_NFL_TEAM_ABBREV = {
+  WSH: "WAS"
+};
+function resolveScheduledDateYmd2(game) {
+  const fromKey = game.scheduledDateKey?.trim();
+  if (fromKey && /^\d{4}-\d{2}-\d{2}$/.test(fromKey)) {
+    return fromKey.replace(/-/g, "");
+  }
+  if (typeof game.startTimeMs === "number" && Number.isFinite(game.startTimeMs)) {
+    return new Date(game.startTimeMs).toISOString().slice(0, 10).replace(/-/g, "");
+  }
+  throw new Error("buildCbsNflPreviewUrl: missing scheduledDateKey or startTimeMs");
+}
+function toCbsNflTeamAbbrev(abbrev, side) {
+  const normalized = abbrev?.trim().toUpperCase() ?? "";
+  if (!normalized) {
+    throw new Error(`buildCbsNflPreviewUrl: missing ${side} team abbreviation`);
+  }
+  return ESPN_TO_CBS_NFL_TEAM_ABBREV[normalized] ?? normalized;
+}
+function buildCbsNflPreviewUrl(game) {
+  const dateYmd = resolveScheduledDateYmd2(game);
+  const awayAbbrev = toCbsNflTeamAbbrev(game.awayTeamAbbrev, "away");
+  const homeAbbrev = toCbsNflTeamAbbrev(game.homeTeamAbbrev, "home");
+  return `${CBS_NFL_PREVIEW_BASE_URL}/NFL_${dateYmd}_${awayAbbrev}@${homeAbbrev}/`;
+}
+
+// ../grarf/shared/domain/cbs/enrichNflGamesWithCbsSportsPreviewUrls.ts
+function isNflGameRow(game) {
+  return game.league === "NFL" || game.id.startsWith("espn-NFL-");
+}
+async function enrichNflGameRow(game, probeReady) {
+  if (!isNflGameRow(game)) return game;
+  const existing = game.metadata?.cbsSportsPreviewUrl?.trim();
+  if (existing) return game;
+  let candidateUrl;
+  try {
+    candidateUrl = buildCbsNflPreviewUrl(game);
+  } catch {
+    return game;
+  }
+  if (!await probeReady(candidateUrl)) return game;
+  return {
+    ...game,
+    metadata: {
+      ...game.metadata,
+      cbsSportsPreviewUrl: candidateUrl
+    }
+  };
+}
+async function enrichNflGamesWithCbsSportsPreviewUrls(games, options) {
+  if (!Array.isArray(games) || games.length === 0) return games;
+  const probeReady = options?.probeReady ?? probeCbsMlbPreviewReady;
+  return Promise.all(games.map((game) => enrichNflGameRow(game, probeReady)));
+}
+
+// ../grarf/desktop/src/lib/cbs/enrichOperationalSnapshotCbsNflPreviewUrls.ts
+async function enrichOperationalSnapshotCbsNflPreviewUrls(transport) {
+  const rows = transport.leagues?.NFL;
+  if (!Array.isArray(rows) || rows.length === 0) return transport;
+  const enriched = await enrichNflGamesWithCbsSportsPreviewUrls(rows);
+  if (!enriched.some((row, index) => row !== rows[index])) {
+    return transport;
+  }
+  return {
+    ...transport,
+    leagues: {
+      ...transport.leagues,
+      NFL: enriched
+    }
+  };
+}
+
+// ../grarf/desktop/src/lib/soccer/enrichOperationalSnapshotUelYahooSportsPreviewArticleUrls.ts
+init_define_import_meta_env();
+
+// ../grarf/shared/domain/soccer/enrichUelGamesWithYahooSportsPreviewArticleUrls.ts
+init_define_import_meta_env();
+
+// ../grarf/shared/domain/soccer/discoverUelPreviewArticleUrlFromGame.ts
+init_define_import_meta_env();
+
+// ../grarf/shared/domain/soccer/fetchUelPreviewArticleUrlIndexes.ts
+init_define_import_meta_env();
+
+// ../grarf/shared/domain/soccer/parseSportsMoleUelPreviewArticleUrlsFromHtml.ts
+init_define_import_meta_env();
+
+// ../grarf/shared/domain/soccer/sportsMoleUelPreviewArticle.ts
+init_define_import_meta_env();
+
+// ../grarf/shared/domain/soccer/uelGameRow.ts
+init_define_import_meta_env();
+function isUelGameRow(game) {
+  return game.league === "UEL" || game.id.startsWith("espn-UEL-");
+}
+
+// ../grarf/shared/domain/soccer/sportsMoleUelPreviewArticle.ts
+var SPORTS_MOLE_UEL_PREVIEW_PATH = "/europa-league/preview/";
+function isSportsMoleUelPreviewArticleUrl(url) {
+  try {
+    const parsed = new URL(url.trim());
+    return parsed.protocol === "https:" && parsed.hostname === "www.sportsmole.co.uk" && parsed.pathname.includes(SPORTS_MOLE_UEL_PREVIEW_PATH) && parsed.pathname.endsWith(".html");
+  } catch {
+    return false;
+  }
+}
+function resolveSportsMoleUelPreviewArticleUrlFromGame(game) {
+  if (!isUelGameRow(game)) return null;
+  const fromMetadata = game.metadata?.sportsMolePreviewArticleUrl?.trim();
+  if (!fromMetadata) return null;
+  return isSportsMoleUelPreviewArticleUrl(fromMetadata) ? fromMetadata : null;
+}
+
+// ../grarf/shared/domain/soccer/parseSportsMoleUelPreviewArticleUrlsFromHtml.ts
+var ABSOLUTE_SPORTS_MOLE_UEL_PREVIEW_RE = /https:\/\/www\.sportsmole\.co\.uk\/football\/[^"'\s]+\/europa-league\/preview\/[^"'\s]+\.html/gi;
+var RELATIVE_SPORTS_MOLE_UEL_PREVIEW_RE = /\/football\/[^"'\s]+\/europa-league\/preview\/[^"'\s]+\.html/gi;
+function parseSportsMoleUelPreviewArticleUrlsFromHtml(html) {
+  const seen = /* @__PURE__ */ new Set();
+  const urls = [];
+  for (const match of html.matchAll(ABSOLUTE_SPORTS_MOLE_UEL_PREVIEW_RE)) {
+    const url = match[0]?.trim();
+    if (!url || seen.has(url)) continue;
+    if (!isSportsMoleUelPreviewArticleUrl(url)) continue;
+    seen.add(url);
+    urls.push(url);
+  }
+  for (const match of html.matchAll(RELATIVE_SPORTS_MOLE_UEL_PREVIEW_RE)) {
+    const path = match[0]?.trim();
+    if (!path) continue;
+    const url = `https://www.sportsmole.co.uk${path}`;
+    if (seen.has(url)) continue;
+    if (!isSportsMoleUelPreviewArticleUrl(url)) continue;
+    seen.add(url);
+    urls.push(url);
+  }
+  return urls;
+}
+
+// ../grarf/shared/domain/soccer/parseYahooSportsSoccerPreviewArticleUrlsFromHtml.ts
+init_define_import_meta_env();
+
+// ../grarf/shared/domain/soccer/yahooSportsSoccerPreviewArticle.ts
+init_define_import_meta_env();
+var YAHOO_SPORTS_ARTICLES_PATH_PREFIX = "/articles/";
+function isYahooSportsUelPreviewArticleUrl(url) {
+  try {
+    const parsed = new URL(url.trim());
+    if (parsed.protocol !== "https:" || parsed.hostname !== "sports.yahoo.com" || !parsed.pathname.startsWith(YAHOO_SPORTS_ARTICLES_PATH_PREFIX) || !parsed.pathname.endsWith(".html")) {
+      return false;
+    }
+    const slug = parsed.pathname.slice(YAHOO_SPORTS_ARTICLES_PATH_PREFIX.length, -".html".length);
+    if (slug.startsWith("preview-")) return true;
+    if (/-europa-\d+$/i.test(slug)) return true;
+    if (slug.includes("-vs-") && slug.includes("-europa-")) return true;
+    return false;
+  } catch {
+    return false;
+  }
+}
+function isYahooSportsSoccerPreviewArticleUrl(url) {
+  return isYahooSportsUelPreviewArticleUrl(url);
+}
+function resolveYahooSportsUelPreviewArticleUrlFromGame(game) {
+  if (!isUelGameRow(game)) return null;
+  const fromMetadata = game.metadata?.yahooSportsPreviewArticleUrl?.trim();
+  if (!fromMetadata) return null;
+  return isYahooSportsUelPreviewArticleUrl(fromMetadata) ? fromMetadata : null;
+}
+
+// ../grarf/shared/domain/soccer/parseYahooSportsSoccerPreviewArticleUrlsFromHtml.ts
+var ABSOLUTE_YAHOO_ARTICLE_RE = /https:\/\/sports\.yahoo\.com\/articles\/[a-z0-9-]+\.html/gi;
+var RELATIVE_YAHOO_ARTICLE_RE = /\/articles\/[a-z0-9-]+\.html/gi;
+function parseYahooSportsSoccerPreviewArticleUrlsFromHtml(html) {
+  const seen = /* @__PURE__ */ new Set();
+  const urls = [];
+  for (const match of html.matchAll(ABSOLUTE_YAHOO_ARTICLE_RE)) {
+    const url = match[0]?.trim();
+    if (!url || seen.has(url)) continue;
+    if (!isYahooSportsUelPreviewArticleUrl(url)) continue;
+    seen.add(url);
+    urls.push(url);
+  }
+  for (const match of html.matchAll(RELATIVE_YAHOO_ARTICLE_RE)) {
+    const path = match[0]?.trim();
+    if (!path) continue;
+    const url = `https://sports.yahoo.com${path}`;
+    if (seen.has(url)) continue;
+    if (!isYahooSportsUelPreviewArticleUrl(url)) continue;
+    seen.add(url);
+    urls.push(url);
+  }
+  return urls;
+}
+
+// ../grarf/shared/domain/soccer/fetchUelPreviewArticleUrlIndexes.ts
+var SPORTS_MOLE_UEL_HUB_URL = "https://www.sportsmole.co.uk/football/europa-league/";
+var YAHOO_SOCCER_RSS_URL = "https://sports.yahoo.com/soccer/rss.xml";
+var INDEX_CACHE_TTL_MS = 5 * 60 * 1e3;
+var FETCH_UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
+var FETCH_HEADERS = {
+  "User-Agent": FETCH_UA,
+  Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+  "Accept-Language": "en-US,en;q=0.9",
+  "Cache-Control": "no-cache"
+};
+var indexCache = null;
+function fetchInit(overrides) {
+  return {
+    redirect: "follow",
+    ...overrides,
+    headers: {
+      ...FETCH_HEADERS,
+      ...overrides?.headers ?? {}
+    }
+  };
+}
+function dedupeUrls(urls) {
+  const seen = /* @__PURE__ */ new Set();
+  const out = [];
+  for (const url of urls) {
+    const trimmed = url?.trim();
+    if (!trimmed || seen.has(trimmed)) continue;
+    seen.add(trimmed);
+    out.push(trimmed);
+  }
+  return out;
+}
+async function fetchText(url, fetchImpl) {
+  try {
+    const res = await fetchImpl(url, fetchInit());
+    if (!res.ok) return null;
+    return await res.text();
+  } catch {
+    return null;
+  }
+}
+async function fetchUelPreviewArticleUrlIndexes(fetchImpl = fetch) {
+  if (indexCache && Date.now() - indexCache.at < INDEX_CACHE_TTL_MS) {
+    return indexCache.indexes;
+  }
+  const [yahooRssHtml, sportsMoleHubHtml] = await Promise.all([
+    fetchText(YAHOO_SOCCER_RSS_URL, fetchImpl),
+    fetchText(SPORTS_MOLE_UEL_HUB_URL, fetchImpl)
+  ]);
+  const indexes = {
+    yahooUrls: dedupeUrls(
+      yahooRssHtml ? parseYahooSportsSoccerPreviewArticleUrlsFromHtml(yahooRssHtml) : []
+    ),
+    sportsMoleUrls: dedupeUrls(
+      sportsMoleHubHtml ? parseSportsMoleUelPreviewArticleUrlsFromHtml(sportsMoleHubHtml) : []
+    )
+  };
+  indexCache = { at: Date.now(), indexes };
+  return indexes;
+}
+
+// ../grarf/shared/domain/soccer/matchSportsMoleUelPreviewArticleUrlToGame.ts
+init_define_import_meta_env();
+
+// ../grarf/shared/domain/soccer/matchYahooSportsSoccerPreviewArticleUrlToGame.ts
+init_define_import_meta_env();
+
+// ../grarf/shared/domain/soccer/slugifyYahooSportsSoccerTeamToken.ts
+init_define_import_meta_env();
+function slugifyYahooSportsSoccerTeamToken(teamName) {
+  const slug = String(teamName ?? "").trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/&/g, "").replace(/['’]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/-+/g, "-").replace(/^-|-$/g, "");
+  return slug || null;
+}
+
+// ../grarf/shared/domain/soccer/matchYahooSportsSoccerPreviewArticleUrlToGame.ts
+var YAHOO_SOCCER_TEAM_SLUG_ALIASES = {
+  "az alkmaar": ["az"],
+  "hapoel beer sheva": ["hapoel", "beer-sheva"],
+  "hapoel be'er sheva": ["hapoel", "beer-sheva"],
+  "nec": ["nijmegen"],
+  "nijmegen": ["nec"],
+  "levski sofia": ["levski"],
+  "olympiacos": ["olympiakos"],
+  "olympiakos": ["olympiacos"],
+  "lillestrom": ["lillestroem"],
+  "union gilloise": ["union-saint-gilloise", "union-sg"]
+};
+function slugTokensForOperationalTeam(teamName) {
+  const trimmed = String(teamName ?? "").trim();
+  if (!trimmed) return [];
+  const base = slugifyYahooSportsSoccerTeamToken(trimmed);
+  const aliasKey = trimmed.toLowerCase();
+  const aliases = YAHOO_SOCCER_TEAM_SLUG_ALIASES[aliasKey] ?? [];
+  const tokens = /* @__PURE__ */ new Set();
+  if (base) tokens.add(base);
+  for (const alias of aliases) {
+    const slug = slugifyYahooSportsSoccerTeamToken(alias);
+    if (slug) tokens.add(slug);
+  }
+  return [...tokens];
+}
+function slugContainsAnyTeamToken(slug, tokens) {
+  if (tokens.length === 0) return false;
+  return tokens.some((token) => token.length >= 3 && slug.includes(token));
+}
+function matchYahooSportsSoccerPreviewArticleUrlToGame(previewUrl, game) {
+  if (!isYahooSportsSoccerPreviewArticleUrl(previewUrl)) return false;
+  let pathname = "";
+  try {
+    pathname = new URL(previewUrl.trim()).pathname;
+  } catch {
+    return false;
+  }
+  const slug = pathname.replace(/^\/articles\/preview-/, "").replace(/\.html$/i, "").toLowerCase();
+  const awayTokens = slugTokensForOperationalTeam(game.awayTeam);
+  const homeTokens = slugTokensForOperationalTeam(game.homeTeam);
+  return slugContainsAnyTeamToken(slug, awayTokens) && slugContainsAnyTeamToken(slug, homeTokens);
+}
+
+// ../grarf/shared/domain/soccer/matchSportsMoleUelPreviewArticleUrlToGame.ts
+function matchSportsMoleUelPreviewArticleUrlToGame(previewUrl, game) {
+  if (!isSportsMoleUelPreviewArticleUrl(previewUrl)) return false;
+  let pathname = "";
+  try {
+    pathname = new URL(previewUrl.trim()).pathname;
+  } catch {
+    return false;
+  }
+  const slugMatch = pathname.match(/\/preview\/([^/]+?)(?:-prediction|_)/i);
+  const slugPart3 = slugMatch?.[1]?.trim().toLowerCase();
+  if (!slugPart3) return false;
+  const pseudoYahooUrl = `https://sports.yahoo.com/articles/preview-${slugPart3}.html`;
+  return matchYahooSportsSoccerPreviewArticleUrlToGame(pseudoYahooUrl, game);
+}
+
+// ../grarf/shared/domain/soccer/discoverUelPreviewArticleUrlFromGame.ts
+function pickFirstMatchingUrl(urls, game, match) {
+  for (const url of urls) {
+    if (match(url, game)) return url;
+  }
+  return null;
+}
+async function discoverUelPreviewArticleUrlFromGame(game, options) {
+  if (!isUelGameRow(game)) return null;
+  const fetchImpl = options?.fetchImpl ?? fetch;
+  const indexes = await fetchUelPreviewArticleUrlIndexes(fetchImpl);
+  const yahooUrl = pickFirstMatchingUrl(
+    indexes.yahooUrls,
+    game,
+    (url, row) => isYahooSportsUelPreviewArticleUrl(url) && matchYahooSportsSoccerPreviewArticleUrlToGame(url, row)
+  );
+  if (yahooUrl) return yahooUrl;
+  const sportsMoleUrl = pickFirstMatchingUrl(
+    indexes.sportsMoleUrls,
+    game,
+    (url, row) => isSportsMoleUelPreviewArticleUrl(url) && matchSportsMoleUelPreviewArticleUrlToGame(url, row)
+  );
+  if (sportsMoleUrl) return sportsMoleUrl;
+  return null;
+}
+
+// ../grarf/shared/domain/soccer/uelPreviewArticle.ts
+init_define_import_meta_env();
+function resolveUelPreviewArticleUrlFromGame(game) {
+  if (!isUelGameRow(game)) return null;
+  return resolveYahooSportsUelPreviewArticleUrlFromGame(game) ?? resolveSportsMoleUelPreviewArticleUrlFromGame(game);
+}
+
+// ../grarf/shared/domain/soccer/probeYahooSportsSoccerPreviewArticleReadyFromUrl.ts
+init_define_import_meta_env();
+
+// ../grarf/shared/domain/soccer/probeYahooSportsSoccerPreviewArticleReady.ts
+init_define_import_meta_env();
+var OG_TITLE_RE = /<meta[^>]+property=["']og:title["'][^>]+content=["']([^"']+)["']/i;
+var OG_TITLE_ALT_RE = /<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:title["']/i;
+function readOgTitle(html) {
+  const match = html.match(OG_TITLE_RE) ?? html.match(OG_TITLE_ALT_RE);
+  const title = match?.[1]?.replace(/\s+/g, " ").trim();
+  return title || null;
+}
+function probeYahooSportsSoccerPreviewArticleReady(html) {
+  const title = readOgTitle(html);
+  return Boolean(title && title.length > 0);
+}
+
+// ../grarf/shared/domain/soccer/probeYahooSportsSoccerPreviewArticleReadyFromUrl.ts
+async function probeYahooSportsSoccerPreviewArticleReadyFromUrl(previewUrl) {
+  const url = previewUrl.trim();
+  if (!url) return false;
+  try {
+    const response = await fetchHtmlWithResponse(url);
+    return probeYahooSportsSoccerPreviewArticleReady(response.html);
+  } catch {
+    return false;
+  }
+}
+
+// ../grarf/shared/domain/soccer/enrichUelGamesWithYahooSportsPreviewArticleUrls.ts
+async function enrichUelGameRow(game, options) {
+  if (!isUelGameRow(game)) return game;
+  if (resolveUelPreviewArticleUrlFromGame(game)) return game;
+  const resolvedUrl = await options.resolvePreviewUrl(game);
+  if (!resolvedUrl) return game;
+  if (!await options.probeReady(resolvedUrl)) return game;
+  if (isYahooSportsUelPreviewArticleUrl(resolvedUrl)) {
+    return {
+      ...game,
+      metadata: {
+        ...game.metadata,
+        yahooSportsPreviewArticleUrl: resolvedUrl
+      }
+    };
+  }
+  if (isSportsMoleUelPreviewArticleUrl(resolvedUrl)) {
+    return {
+      ...game,
+      metadata: {
+        ...game.metadata,
+        sportsMolePreviewArticleUrl: resolvedUrl
+      }
+    };
+  }
+  return game;
+}
+async function defaultResolvePreviewUrl(game) {
+  return discoverUelPreviewArticleUrlFromGame(game);
+}
+async function enrichUelGamesWithYahooSportsPreviewArticleUrls(games, options) {
+  if (!Array.isArray(games) || games.length === 0) return games;
+  const resolvePreviewUrl = options?.resolvePreviewUrl ?? defaultResolvePreviewUrl;
+  const probeReady = options?.probeReady ?? probeYahooSportsSoccerPreviewArticleReadyFromUrl;
+  return Promise.all(
+    games.map((game) => enrichUelGameRow(game, { resolvePreviewUrl, probeReady }))
+  );
+}
+
+// ../grarf/desktop/src/lib/soccer/enrichOperationalSnapshotUelYahooSportsPreviewArticleUrls.ts
+async function enrichOperationalSnapshotUelYahooSportsPreviewArticleUrls(transport) {
+  const rows = transport.leagues?.UEL;
+  if (!Array.isArray(rows) || rows.length === 0) return transport;
+  const enriched = await enrichUelGamesWithYahooSportsPreviewArticleUrls(rows);
+  if (!enriched.some((row, index) => row !== rows[index])) {
+    return transport;
+  }
+  return {
+    ...transport,
+    leagues: {
+      ...transport.leagues,
+      UEL: enriched
     }
   };
 }
@@ -33659,6 +34137,16 @@ async function enrichOperationalTransport(rawTransport) {
     transport = await enrichOperationalSnapshotCbsMlbPreviewUrls(transport);
   } catch (e) {
     console.warn(`${LOG19} CBS MLB preview URL enrich failed`, e);
+  }
+  try {
+    transport = await enrichOperationalSnapshotCbsNflPreviewUrls(transport);
+  } catch (e) {
+    console.warn(`${LOG19} CBS NFL preview URL enrich failed`, e);
+  }
+  try {
+    transport = await enrichOperationalSnapshotUelYahooSportsPreviewArticleUrls(transport);
+  } catch (e) {
+    console.warn(`${LOG19} UEL Yahoo Sports preview article enrich failed`, e);
   }
   try {
     transport = await enrichOperationalSnapshotCoversMlbPicksUrls(transport);
