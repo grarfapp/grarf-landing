@@ -111419,6 +111419,9 @@ function shouldFetchGrarfExtensionCatchUpRecapHeadline(game) {
   if (isGrarfExtensionGamesCatchUpRecapsNavSnapshotActive()) {
     return true;
   }
+  if (useGrarfExtensionSidePanelSectionStore.getState().activeSection === "home") {
+    return isCatchUpRecapFinalGame(game);
+  }
   const snapshot2 = getGrarfExtensionGamesYesterdayHighlightsNavSnapshot();
   if (snapshot2.temporaryNavTopLevel === "GAMES" && snapshot2.gamesCompactTemporalView === "final" && isCatchUpRecapFinalGame(game)) {
     return true;
@@ -153781,6 +153784,11 @@ function resolveNewsSportsBrowserGameCardCompetitorContext(game, side, pill, opt
     record = normalizeSideStatValue(resolveGamesSpineSideStat(game, side));
     const rawStandingsLine = side === "away" ? game.awayStandingsLine : game.homeStandingsLine;
     standingsLine = rawStandingsLine?.trim() || null;
+  } else if (isGrarfExtensionRenderer() && game.league === "NFL") {
+    const rawRecord = side === "away" ? game.awayRecord : game.homeRecord;
+    record = normalizeSideStatValue(rawRecord);
+    const rawStandingsLine = side === "away" ? game.awayStandingsLine : game.homeStandingsLine;
+    standingsLine = rawStandingsLine?.trim() || null;
   }
   const presentation = resolveTennisMatchPresentation(game);
   const isTennisServer = presentation?.serverSide === side;
@@ -153794,6 +153802,14 @@ function resolveNewsSportsBrowserGameCardCompetitorContext(game, side, pill, opt
   };
 }
 function formatNewsSportsBrowserGameCardCompetitorSubLine(context2) {
+  if (isGrarfExtensionRenderer()) {
+    if (context2.league === "MLB") {
+      return null;
+    }
+    if (context2.league === "NFL") {
+      return formatMlbWnbaStandingsSubLine(context2);
+    }
+  }
   if (context2.league === "MLB" || context2.league === "WNBA") {
     return formatMlbWnbaStandingsSubLine(context2);
   }
@@ -180500,55 +180516,337 @@ function GrarfExtensionAiSearchEntityLogoMark({
 init_define_import_meta_env();
 var import_react307 = __toESM(require_react(), 1);
 
-// ../grarf/desktop/src/extensionHost/grarfExtensionHomePartTwoGameCardsPrototypeData.ts
+// ../grarf/desktop/src/lib/editorial/resolveGrarfExtensionHomeFeaturedPriorityGames.ts
 init_define_import_meta_env();
-var GRARF_EXTENSION_HOME_PART_TWO_GAME_CARD_PROTOTYPES = [
-  {
-    id: "home-part-two-nfl-sea-den",
-    recapHeadline: "Struggling QBs, top defenses collide in primetime rematch",
-    game: {
-      id: "prototype-home-part-two-nfl-sea-den",
-      league: "NFL",
-      awayTeam: "Seahawks",
-      homeTeam: "Broncos",
-      awayTeamAbbrev: "SEA",
-      homeTeamAbbrev: "DEN",
-      awayScore: 24,
-      homeScore: 17,
-      status: "final"
-    }
-  },
-  {
-    id: "home-part-two-nba-lal-bos",
-    recapHeadline: "Lakers edge Celtics in overtime thriller at TD Garden",
-    game: {
-      id: "prototype-home-part-two-nba-lal-bos",
-      league: "NBA",
-      awayTeam: "Lakers",
-      homeTeam: "Celtics",
-      awayTeamAbbrev: "LAL",
-      homeTeamAbbrev: "BOS",
-      awayScore: 112,
-      homeScore: 109,
-      status: "final"
-    }
-  },
-  {
-    id: "home-part-two-mlb-lad-sf",
-    recapHeadline: "Dodgers rally late as bullpen shuts down Giants",
-    game: {
-      id: "prototype-home-part-two-mlb-lad-sf",
-      league: "MLB",
-      awayTeam: "Dodgers",
-      homeTeam: "Giants",
-      awayTeamAbbrev: "LAD",
-      homeTeamAbbrev: "SF",
-      awayScore: 5,
-      homeScore: 3,
-      status: "final"
+
+// ../grarf/desktop/src/lib/editorial/homeCommandCenterDailyPrioritiesStore.ts
+init_define_import_meta_env();
+
+// ../grarf/desktop/editorial/homeCommandCenterDailyPriorities.json
+var homeCommandCenterDailyPriorities_default = {
+  version: 1,
+  bySportsDay: {
+    "2026-10-14": {
+      updatedAt: "2026-10-14T12:26:56.947Z",
+      entries: [
+        {
+          kind: "matchup",
+          leagueLabel: "MLB",
+          leagueKey: "MLB",
+          awayTeamLabel: "Brewers",
+          homeTeamLabel: "Dodgers",
+          line: "MLB \u2014 Brewers vs. Dodgers"
+        },
+        {
+          kind: "league",
+          leagueLabel: "UEFA Champions League",
+          leagueKey: "UCL",
+          line: "UEFA Champions League"
+        },
+        {
+          kind: "matchup",
+          leagueLabel: "MLS",
+          leagueKey: "MLS",
+          awayTeamLabel: "Inter Miami",
+          homeTeamLabel: "NYCFC",
+          line: "MLS \u2014 Inter Miami vs. NYCFC"
+        }
+      ]
+    },
+    "2026-10-15": {
+      updatedAt: "2026-10-15T13:54:21.813Z",
+      entries: [
+        {
+          kind: "matchup",
+          leagueLabel: "MLB",
+          leagueKey: "MLB",
+          awayTeamLabel: "Rays",
+          homeTeamLabel: "Guardians",
+          line: "MLB - Rays vs. Guardians"
+        },
+        {
+          kind: "matchup",
+          leagueLabel: "MLB",
+          leagueKey: "MLB",
+          awayTeamLabel: "Brewers",
+          homeTeamLabel: "Dodgers",
+          line: "MLB - Brewers vs. Dodgers"
+        },
+        {
+          kind: "matchup",
+          leagueLabel: "NFL",
+          leagueKey: "NFL",
+          awayTeamLabel: "Seahawks",
+          homeTeamLabel: "Broncos",
+          line: "NFL - Seahawks vs. Broncos"
+        }
+      ]
+    },
+    "2026-10-16": {
+      updatedAt: "2026-10-16T13:55:00.000Z",
+      entries: [
+        {
+          kind: "matchup",
+          leagueLabel: "MLB",
+          leagueKey: "MLB",
+          awayTeamLabel: "Rays",
+          homeTeamLabel: "Guardians",
+          line: "MLB - Rays vs Guardians"
+        },
+        {
+          kind: "matchup",
+          leagueLabel: "NCAAF",
+          leagueKey: "NCAAF",
+          awayTeamLabel: "Washington",
+          homeTeamLabel: "Purdue",
+          line: "NCAAF - Washington vs. Purdue"
+        },
+        {
+          kind: "matchup",
+          leagueLabel: "NHL",
+          leagueKey: "NHL",
+          awayTeamLabel: "Penguins",
+          homeTeamLabel: "Avalanche",
+          line: "NHL - Penguins vs. Avalanche"
+        }
+      ]
     }
   }
-];
+};
+
+// ../grarf/desktop/src/lib/editorial/homeCommandCenterDailyPrioritiesStore.ts
+function asDocument(raw) {
+  const candidate = raw;
+  if (!candidate || candidate.version !== 1 || typeof candidate.bySportsDay !== "object") {
+    return { version: 1, bySportsDay: {} };
+  }
+  return candidate;
+}
+var loadedDocument = asDocument(homeCommandCenterDailyPriorities_default);
+function getHomeCommandCenterDailyPriorityEntriesForSportsDay(sportsDayKey) {
+  const day = loadedDocument.bySportsDay[sportsDayKey.trim()];
+  return day?.entries ?? [];
+}
+
+// ../grarf/desktop/src/lib/editorial/matchHomeCommandCenterDailyPrioritiesGame.ts
+init_define_import_meta_env();
+
+// ../grarf/desktop/src/lib/editorial/resolveHomeCommandCenterDailyPrioritiesLeagueKey.ts
+init_define_import_meta_env();
+var EDITORIAL_LEAGUE_ALIASES = {
+  "UEFA CHAMPIONS LEAGUE": "UCL",
+  "CHAMPIONS LEAGUE": "UCL",
+  "UEFA CHAMPIONS LEAGUE QUALIFYING": "UCLQ",
+  "UEFA EUROPA LEAGUE": "UEL",
+  "UEFA EUROPA CONFERENCE LEAGUE": "UECL",
+  "MAJOR LEAGUE BASEBALL": "MLB",
+  "MAJOR LEAGUE SOCCER": "MLS",
+  "PREMIER LEAGUE": "EPL",
+  "ENGLISH PREMIER LEAGUE": "EPL",
+  "LA LIGA": "LALIGA",
+  "SERIE A": "SERIEA",
+  "LIGUE 1": "LIGUE1",
+  "BUNDESLIGA": "BUNDESLIGA",
+  "NFL": "NFL",
+  "NBA": "NBA",
+  "NHL": "NHL",
+  "NCAAF": "NCAAF",
+  "FORMULA 1": "F1",
+  "FORMULA ONE": "F1"
+};
+function normalizeEditorialLeagueLabel(value) {
+  return value.trim().toUpperCase().replace(/['']/g, "'").replace(/\s+/g, " ");
+}
+function resolveByDisplayLabelScan(normalized) {
+  for (const key2 of getGamesColumnLeagueOrder()) {
+    const label = GAMES_COLUMN_LEAGUE_LABEL[key2] ?? resolveGamesSpineLeagueDisplayLabel(key2);
+    const normalizedLabel = normalizeEditorialLeagueLabel(label);
+    if (normalized === normalizedLabel) return key2;
+    if (normalized.includes(normalizedLabel) || normalizedLabel.includes(normalized)) {
+      return key2;
+    }
+  }
+  return null;
+}
+function resolveHomeCommandCenterDailyPrioritiesLeagueKey(leagueLabel) {
+  const normalized = normalizeEditorialLeagueLabel(leagueLabel);
+  if (!normalized) return null;
+  const canonical = resolveCanonicalLeagueImportanceKey(normalized);
+  if (canonical) return canonical;
+  const priorityAlias = LEAGUE_PRIORITY_ALIASES[normalized];
+  if (priorityAlias) return priorityAlias;
+  const editorialAlias = EDITORIAL_LEAGUE_ALIASES[normalized];
+  if (editorialAlias) return editorialAlias;
+  return resolveByDisplayLabelScan(normalized);
+}
+function gameMatchesHomeCommandCenterDailyPriorityLeague(gameLeagueKey, entryLeagueKey, entryLeagueLabel) {
+  const gameKey = gameLeagueKey?.trim().toUpperCase() ?? "";
+  if (entryLeagueKey && gameKey === entryLeagueKey.trim().toUpperCase()) {
+    return true;
+  }
+  const resolvedFromGame = resolveHomeCommandCenterDailyPrioritiesLeagueKey(gameKey);
+  const resolvedFromEntry = resolveHomeCommandCenterDailyPrioritiesLeagueKey(entryLeagueLabel);
+  if (resolvedFromGame && resolvedFromEntry) {
+    return resolvedFromGame === resolvedFromEntry;
+  }
+  return normalizeEditorialLeagueLabel(entryLeagueLabel) === normalizeEditorialLeagueLabel(gameKey);
+}
+
+// ../grarf/desktop/src/lib/editorial/matchHomeCommandCenterDailyPrioritiesGame.ts
+function normalizeTeamHint(value) {
+  return value.trim().toLowerCase().normalize("NFD").replace(/\p{M}/gu, "").replace(/\b(fc|sc|cf|afc|the)\b/g, "").replace(/[^a-z0-9]+/g, " ").replace(/\s+/g, " ").trim();
+}
+function teamHintMatchesGameName(hint, gameTeamName) {
+  const normalizedHint = normalizeTeamHint(hint);
+  const normalizedGame = normalizeTeamHint(gameTeamName);
+  if (!normalizedHint || !normalizedGame) return false;
+  if (normalizedGame.includes(normalizedHint) || normalizedHint.includes(normalizedGame)) {
+    return true;
+  }
+  const hintTokens = normalizedHint.split(" ").filter(Boolean);
+  const gameTokens = new Set(normalizedGame.split(" ").filter(Boolean));
+  if (hintTokens.length === 0) return false;
+  const matched = hintTokens.filter((token) => gameTokens.has(token)).length;
+  return matched >= Math.min(hintTokens.length, 2) || matched === hintTokens.length;
+}
+function matchupTeamsMatchGame(game, awayLabel, homeLabel) {
+  const away = game.awayTeam?.trim() ?? "";
+  const home = game.homeTeam?.trim() ?? "";
+  if (!away || !home) return false;
+  const forward = teamHintMatchesGameName(awayLabel, away) && teamHintMatchesGameName(homeLabel, home);
+  const reverse = teamHintMatchesGameName(awayLabel, home) && teamHintMatchesGameName(homeLabel, away);
+  return forward || reverse;
+}
+function resolveHomeCommandCenterDailyPriorityMatch(game, entries) {
+  let best = null;
+  for (let index2 = 0; index2 < entries.length; index2 += 1) {
+    const entry3 = entries[index2];
+    const leagueKey = entry3.leagueKey ?? resolveHomeCommandCenterDailyPrioritiesLeagueKey(entry3.leagueLabel);
+    const inLeague = gameMatchesHomeCommandCenterDailyPriorityLeague(
+      game.league,
+      leagueKey,
+      entry3.leagueLabel
+    );
+    if (!inLeague) continue;
+    if (entry3.kind === "matchup") {
+      if (!matchupTeamsMatchGame(game, entry3.awayTeamLabel, entry3.homeTeamLabel)) continue;
+      const rank2 = index2 * 2;
+      if (!best || rank2 < best.rank) best = { kind: "matchup", entryIndex: index2, rank: rank2 };
+      continue;
+    }
+    const rank = index2 * 2 + 1;
+    if (!best || rank < best.rank) best = { kind: "league", entryIndex: index2, rank };
+  }
+  if (!best) return { kind: "none" };
+  return { kind: best.kind, entryIndex: best.entryIndex };
+}
+function homeCommandCenterDailyPrioritySortBoost(match, entryCount) {
+  if (match.kind === "none" || entryCount <= 0) return 0;
+  const positionBoost = (entryCount - match.entryIndex) * 2500;
+  const kindBoost = match.kind === "matchup" ? 12e3 : 6e3;
+  return kindBoost + positionBoost;
+}
+
+// ../grarf/desktop/src/lib/editorial/sortGamesWithHomeCommandCenterDailyPriorities.ts
+init_define_import_meta_env();
+function resolveEditorialSportsDayKeyForGame(game, now) {
+  const fromGame = resolveGameOperationalDateKey(game);
+  if (fromGame?.trim()) return fromGame.trim();
+  return getOperationalSportsDayDateKey(now);
+}
+function compareGamesWithHomeCommandCenterDailyPriorities(a2, b2, mode, bundle, now, resolveEntries = getHomeCommandCenterDailyPriorityEntriesForSportsDay) {
+  const dateKey = getOperationalSportsDayDateKey(now);
+  const aDay = resolveEditorialSportsDayKeyForGame(a2, now);
+  const bDay = resolveEditorialSportsDayKeyForGame(b2, now);
+  const aEntries = resolveEntries(aDay);
+  const bEntries = resolveEntries(bDay);
+  const aMatch = resolveHomeCommandCenterDailyPriorityMatch(a2, aEntries);
+  const bMatch = resolveHomeCommandCenterDailyPriorityMatch(b2, bEntries);
+  const aBoost = homeCommandCenterDailyPrioritySortBoost(aMatch, aEntries.length);
+  const bBoost = homeCommandCenterDailyPrioritySortBoost(bMatch, bEntries.length);
+  const aScore = homeOperationalGameSortScore(a2, bundle, dateKey, mode) + aBoost;
+  const bScore = homeOperationalGameSortScore(b2, bundle, dateKey, mode) + bBoost;
+  return bScore - aScore;
+}
+function sortGamesWithHomeCommandCenterDailyPriorities(games, mode, bundle, now = /* @__PURE__ */ new Date(), resolveEntries = getHomeCommandCenterDailyPriorityEntriesForSportsDay) {
+  if (games.length <= 1) return [...games];
+  const dateKey = getOperationalSportsDayDateKey(now);
+  const hasAnyEditorial = games.some((game) => {
+    const dayKey = resolveEditorialSportsDayKeyForGame(game, now);
+    return resolveEntries(dayKey).length > 0;
+  });
+  if (!hasAnyEditorial) {
+    return sortHomeOperationalGames([...games], bundle, dateKey, mode);
+  }
+  return [...games].sort(
+    (a2, b2) => compareGamesWithHomeCommandCenterDailyPriorities(a2, b2, mode, bundle, now, resolveEntries)
+  );
+}
+
+// ../grarf/desktop/src/lib/editorial/resolveGrarfExtensionHomeFeaturedPriorityGames.ts
+function dedupeGamesById(games) {
+  const seen = /* @__PURE__ */ new Set();
+  const out = [];
+  for (const game of games) {
+    if (!game.id || seen.has(game.id)) continue;
+    seen.add(game.id);
+    out.push(game);
+  }
+  return out;
+}
+function resolveFeaturedGamePool(dayFilter, context2) {
+  if (dayFilter === "yesterday") {
+    return dedupeGamesById(context2.yesterdayGames);
+  }
+  return dedupeGamesById([
+    ...context2.liveGames,
+    ...context2.upcomingTodayGames,
+    ...context2.catchUpTodayGames
+  ]);
+}
+function resolveFeaturedSortMode(pool) {
+  if (pool.some((game) => game.status === "live")) return "LIVE";
+  if (pool.some((game) => game.status === "scheduled")) return "PREPARE";
+  return "CATCH_UP";
+}
+function resolveGrarfExtensionHomeFeaturedPriorityGames(input) {
+  const now = input.now ?? /* @__PURE__ */ new Date();
+  const limit = input.limit ?? 3;
+  const sportsDayKey = input.dayFilter === "yesterday" ? getOperationalSportsDayYesterdayDateKey(now) : getOperationalSportsDayDateKey(now);
+  const entries = getHomeCommandCenterDailyPriorityEntriesForSportsDay(sportsDayKey);
+  const pool = resolveFeaturedGamePool(input.dayFilter, input.temporalGameContext);
+  if (entries.length === 0 || pool.length === 0) return [];
+  const mode = resolveFeaturedSortMode(pool);
+  const sortedPool = sortGamesWithHomeCommandCenterDailyPriorities(
+    pool,
+    mode,
+    input.editorialBundle,
+    now
+  );
+  const picked = [];
+  const usedIds = /* @__PURE__ */ new Set();
+  for (let entryIndex = 0; entryIndex < entries.length; entryIndex += 1) {
+    const entry3 = entries[entryIndex];
+    const candidate = sortedPool.find((game) => {
+      if (usedIds.has(game.id)) return false;
+      if (entry3.kind === "matchup") {
+        const match = resolveHomeCommandCenterDailyPriorityMatch(game, entries);
+        return match.kind === "matchup" && match.entryIndex === entryIndex;
+      }
+      const leagueKey = entry3.leagueKey ?? resolveHomeCommandCenterDailyPrioritiesLeagueKey(entry3.leagueLabel);
+      return gameMatchesHomeCommandCenterDailyPriorityLeague(
+        game.league,
+        leagueKey,
+        entry3.leagueLabel
+      );
+    });
+    if (!candidate) continue;
+    picked.push(candidate);
+    usedIds.add(candidate.id);
+    if (picked.length >= limit) break;
+  }
+  return picked;
+}
 
 // ../grarf/desktop/src/extensionHost/GrarfExtensionHomePartTwoGameCards.tsx
 var import_jsx_runtime290 = __toESM(require_jsx_runtime(), 1);
@@ -180556,25 +180854,67 @@ var HOME_PART_TWO_DAY_LABELS = [
   { label: "yesterday", day: "yesterday" },
   { label: "today", day: "today" }
 ];
-function resolveHomePartTwoTeamAbbrev(game, side) {
-  const abbrev = side === "away" ? game.awayTeamAbbrev : game.homeTeamAbbrev;
-  if (abbrev?.trim()) return abbrev.trim();
+function resolveHomePartTwoTeamName(game, side) {
   const name = side === "away" ? game.awayTeam : game.homeTeam;
-  return name?.trim().slice(0, 3).toUpperCase() || "\u2013";
+  if (name?.trim()) return name.trim();
+  const abbrev = side === "away" ? game.awayTeamAbbrev : game.homeTeamAbbrev;
+  return abbrev?.trim() || "\u2013";
 }
-function TeamSegment2({ game, side }) {
+function shouldShowHomePartTwoUpcomingChannelLogo(game) {
+  if (game.status === "final" || isSpineFinalizedGame(game) || game.status === "postponed") {
+    return false;
+  }
+  if (game.status === "live") return true;
+  return game.status === "scheduled" || isGameCompetitionPaused(game);
+}
+function HomePartTwoUpcomingStartChannel({ game }) {
+  const state3 = resolveGrarfExtensionCommandCenterScorecardState(game);
+  const timingLabel = resolveCommandCenterTopRowTimingLabel(game);
+  const timingParts = resolveGrarfExtensionCommandCenterMetaTimingParts(game, state3, timingLabel);
+  const channel = resolveNewsSportsBrowserChannelPresentation(game);
+  const showChannelLogo = shouldShowHomePartTwoUpcomingChannelLogo(game);
+  return /* @__PURE__ */ (0, import_jsx_runtime290.jsxs)(
+    "div",
+    {
+      className: "grarf-extension-home-part-two-game-card__upcoming-meta grarf-extension-home-part-two-game-card__upcoming-meta-pill",
+      "data-grarf-extension-home-part-two-upcoming-meta": "",
+      children: [
+        /* @__PURE__ */ (0, import_jsx_runtime290.jsx)("span", { className: "grarf-extension-home-part-two-game-card__upcoming-time tabular-nums", children: timingParts.line }),
+        showChannelLogo && channel.logoUrl ? /* @__PURE__ */ (0, import_jsx_runtime290.jsxs)(import_jsx_runtime290.Fragment, { children: [
+          /* @__PURE__ */ (0, import_jsx_runtime290.jsx)(
+            "span",
+            {
+              className: "grarf-extension-home-part-two-game-card__upcoming-meta-sep",
+              "aria-hidden": true,
+              children: "|"
+            }
+          ),
+          /* @__PURE__ */ (0, import_jsx_runtime290.jsx)("span", { className: "grarf-extension-home-part-two-game-card__upcoming-channel", children: /* @__PURE__ */ (0, import_jsx_runtime290.jsx)(
+            NewsSportsBrowserChannelLogo,
+            {
+              logoUrl: channel.logoUrl,
+              label: channel.label,
+              slotAlign: "center"
+            }
+          ) })
+        ] }) : null
+      ]
+    }
+  );
+}
+function TeamRow({ game, side, showScore }) {
   const logoUrl = resolveNewsSportsBrowserTeamLogoUrl(game, side);
-  const abbrev = resolveHomePartTwoTeamAbbrev(game, side);
+  const teamName = resolveHomePartTwoTeamName(game, side);
   const score2 = side === "away" ? game.awayScore : game.homeScore;
   const accentStyle = resolveGrarfExtensionCommandCenterTeamAccentCssProperties(game, side);
   return /* @__PURE__ */ (0, import_jsx_runtime290.jsxs)(
     "div",
     {
-      className: "grarf-extension-home-part-two-game-card__team-segment",
+      className: "grarf-extension-home-part-two-game-card__team-row",
       style: accentStyle,
       "data-grarf-extension-home-part-two-team-accent": "",
       children: [
-        logoUrl ? /* @__PURE__ */ (0, import_jsx_runtime290.jsx)(
+        /* @__PURE__ */ (0, import_jsx_runtime290.jsx)("span", { className: "grarf-extension-home-part-two-game-card__team-logo-slot", children: logoUrl ? /* @__PURE__ */ (0, import_jsx_runtime290.jsx)(
           "img",
           {
             src: logoUrl,
@@ -180586,67 +180926,157 @@ function TeamSegment2({ game, side }) {
             loading: "lazy",
             decoding: "async"
           }
-        ) : /* @__PURE__ */ (0, import_jsx_runtime290.jsx)("span", { className: "grarf-extension-home-part-two-game-card__team-logo-fallback", "aria-hidden": true }),
-        /* @__PURE__ */ (0, import_jsx_runtime290.jsx)("span", { className: "grarf-extension-home-part-two-game-card__team-abbrev", children: abbrev }),
-        /* @__PURE__ */ (0, import_jsx_runtime290.jsx)("span", { className: "grarf-extension-home-part-two-game-card__team-score tabular-nums", children: score2 ?? "\u2013" })
+        ) : /* @__PURE__ */ (0, import_jsx_runtime290.jsx)("span", { className: "grarf-extension-home-part-two-game-card__team-logo-fallback", "aria-hidden": true }) }),
+        /* @__PURE__ */ (0, import_jsx_runtime290.jsxs)("span", { className: "grarf-extension-home-part-two-game-card__team-name-score", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime290.jsx)("span", { className: "grarf-extension-home-part-two-game-card__team-name", children: teamName }),
+          showScore ? /* @__PURE__ */ (0, import_jsx_runtime290.jsx)("span", { className: "grarf-extension-home-part-two-game-card__team-score tabular-nums", children: score2 ?? "\u2013" }) : null
+        ] })
       ]
     }
   );
 }
-function HomePartTwoGameCard({ entry: entry3 }) {
-  const { game, recapHeadline } = entry3;
+function HomePartTwoGameCardTopLine({ game }) {
   const state3 = resolveGrarfExtensionCommandCenterScorecardState(game);
+  const isUpcoming = state3 === "upcoming";
   const leagueLabel = resolveCommandCenterGameCardLeagueLabel(game);
-  return /* @__PURE__ */ (0, import_jsx_runtime290.jsx)(
-    "article",
-    {
-      className: "grarf-extension-home-part-two-game-card",
-      "data-grarf-extension-home-part-two-game-card": "",
-      "data-game-id": game.id,
-      children: /* @__PURE__ */ (0, import_jsx_runtime290.jsxs)("div", { className: "grarf-extension-home-part-two-game-card__content-row", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime290.jsxs)("div", { className: "grarf-extension-home-part-two-game-card__main", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime290.jsxs)("div", { className: "grarf-extension-home-part-two-game-card__top-line", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime290.jsx)("span", { className: "grarf-extension-home-part-two-game-card__league", children: leagueLabel }),
-            /* @__PURE__ */ (0, import_jsx_runtime290.jsxs)("div", { className: "grarf-extension-home-part-two-game-card__matchup-spread", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime290.jsx)(TeamSegment2, { game, side: "away" }),
-              /* @__PURE__ */ (0, import_jsx_runtime290.jsx)(TeamSegment2, { game, side: "home" })
+  const leagueLogoUrl = game.league ? resolveGamesSpineLeagueLogoUrl(game.league, { game }) : void 0;
+  if (isUpcoming) {
+    return /* @__PURE__ */ (0, import_jsx_runtime290.jsxs)(
+      "div",
+      {
+        className: cn2(
+          "grarf-extension-home-part-two-game-card__top-line",
+          "grarf-extension-home-part-two-game-card__top-line--upcoming"
+        ),
+        children: [
+          /* @__PURE__ */ (0, import_jsx_runtime290.jsxs)("div", { className: "grarf-extension-home-part-two-game-card__upcoming-header", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime290.jsxs)("div", { className: "grarf-extension-home-part-two-game-card__league-identity", children: [
+              leagueLogoUrl ? /* @__PURE__ */ (0, import_jsx_runtime290.jsx)(
+                "img",
+                {
+                  src: leagueLogoUrl,
+                  alt: "",
+                  className: cn2(
+                    "grarf-extension-home-part-two-game-card__league-logo",
+                    resolveGamesSpineLeagueLogoImgClassName(game.league, leagueLogoUrl)
+                  ),
+                  loading: "lazy",
+                  decoding: "async"
+                }
+              ) : null,
+              /* @__PURE__ */ (0, import_jsx_runtime290.jsx)("span", { className: "grarf-extension-home-part-two-game-card__league", children: leagueLabel })
             ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime290.jsx)(GrarfExtensionCommandCenterStatusPill, { state: state3, finalLabel: "F" })
+            /* @__PURE__ */ (0, import_jsx_runtime290.jsx)(HomePartTwoUpcomingStartChannel, { game })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime290.jsxs)("button", { type: "button", className: "grarf-extension-home-part-two-game-card__recap", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime290.jsx)("span", { className: "grarf-extension-home-part-two-game-card__recap-text", children: recapHeadline }),
-            /* @__PURE__ */ (0, import_jsx_runtime290.jsx)(
-              ChevronRight,
-              {
-                className: "grarf-extension-home-part-two-game-card__recap-chevron",
-                size: 14,
-                strokeWidth: 2,
-                "aria-hidden": true
-              }
-            )
-          ] })
-        ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime290.jsxs)("div", { className: "grarf-extension-home-part-two-game-card__actions", "aria-label": "Game actions", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime290.jsxs)("button", { type: "button", className: "grarf-extension-home-part-two-game-card__action", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime290.jsx)(SlidersHorizontal, { size: 12, strokeWidth: 2, "aria-hidden": true }),
-            /* @__PURE__ */ (0, import_jsx_runtime290.jsx)("span", { children: "Gamecenter" })
-          ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime290.jsxs)("button", { type: "button", className: "grarf-extension-home-part-two-game-card__action", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime290.jsx)(Users, { size: 12, strokeWidth: 2, "aria-hidden": true }),
-            /* @__PURE__ */ (0, import_jsx_runtime290.jsx)("span", { children: "Social" })
-          ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime290.jsxs)("button", { type: "button", className: "grarf-extension-home-part-two-game-card__action", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime290.jsx)(Film, { size: 12, strokeWidth: 2, "aria-hidden": true }),
-            /* @__PURE__ */ (0, import_jsx_runtime290.jsx)("span", { children: "Highlights" })
-          ] })
-        ] })
+          /* @__PURE__ */ (0, import_jsx_runtime290.jsxs)(
+            "div",
+            {
+              className: "grarf-extension-home-part-two-game-card__matchup-inline grarf-extension-home-part-two-game-card__matchup-inline--accent-rows",
+              "data-grarf-extension-home-part-two-matchup-inline": "",
+              children: [
+                /* @__PURE__ */ (0, import_jsx_runtime290.jsx)(TeamRow, { game, side: "away", showScore: false }),
+                /* @__PURE__ */ (0, import_jsx_runtime290.jsx)(TeamRow, { game, side: "home", showScore: false })
+              ]
+            }
+          )
+        ]
+      }
+    );
+  }
+  return /* @__PURE__ */ (0, import_jsx_runtime290.jsxs)("div", { className: "grarf-extension-home-part-two-game-card__top-line", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime290.jsxs)("div", { className: "grarf-extension-home-part-two-game-card__top-line-main", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime290.jsxs)("div", { className: "grarf-extension-home-part-two-game-card__league-identity", children: [
+        leagueLogoUrl ? /* @__PURE__ */ (0, import_jsx_runtime290.jsx)(
+          "img",
+          {
+            src: leagueLogoUrl,
+            alt: "",
+            className: cn2(
+              "grarf-extension-home-part-two-game-card__league-logo",
+              resolveGamesSpineLeagueLogoImgClassName(game.league, leagueLogoUrl)
+            ),
+            loading: "lazy",
+            decoding: "async"
+          }
+        ) : null,
+        /* @__PURE__ */ (0, import_jsx_runtime290.jsx)("span", { className: "grarf-extension-home-part-two-game-card__league", children: leagueLabel })
+      ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime290.jsxs)("div", { className: "grarf-extension-home-part-two-game-card__matchup-grid", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime290.jsx)(TeamRow, { game, side: "away", showScore: true }),
+        /* @__PURE__ */ (0, import_jsx_runtime290.jsx)(TeamRow, { game, side: "home", showScore: true })
       ] })
+    ] }),
+    /* @__PURE__ */ (0, import_jsx_runtime290.jsx)(GrarfExtensionCommandCenterStatusPill, { state: state3, finalLabel: "F" })
+  ] });
+}
+function HomePartTwoYesterdayRecapGameCard({ game }) {
+  return /* @__PURE__ */ (0, import_jsx_runtime290.jsx)(
+    "div",
+    {
+      className: "min-w-0 w-full border-0 bg-transparent p-0 shadow-none hover:bg-transparent",
+      "data-grarf-extension-sidebar-temporal-scorecard-row": "",
+      "data-grarf-extension-home-part-two-yesterday-recap-game-card": "",
+      children: /* @__PURE__ */ (0, import_jsx_runtime290.jsx)(GrarfExtensionSidebarTemporalCollapsedGameCard, { game })
     }
   );
 }
-function GrarfExtensionHomePartTwoGameCards() {
+function HomePartTwoGameCard({ game }) {
+  const {
+    headline: catchUpRecapHeadline,
+    showHeadlineUi: showCatchUpRecapHeadline,
+    onRecapHeadlineClick
+  } = useGrarfExtensionCatchUpRecapHeadline(game);
+  const {
+    headline: catchUpPreviewHeadline,
+    showHeadlineUi: showCatchUpPreviewHeadline,
+    onPreviewHeadlineClick
+  } = useGrarfExtensionCatchUpPreviewHeadline(game);
+  const cardEditorialHeadline = showCatchUpRecapHeadline && catchUpRecapHeadline ? catchUpRecapHeadline : showCatchUpPreviewHeadline && catchUpPreviewHeadline ? catchUpPreviewHeadline : null;
+  const onCardEditorialHeadlineClick = showCatchUpRecapHeadline && catchUpRecapHeadline ? onRecapHeadlineClick : showCatchUpPreviewHeadline && catchUpPreviewHeadline ? onPreviewHeadlineClick : void 0;
+  return /* @__PURE__ */ (0, import_jsx_runtime290.jsx)(
+    "div",
+    {
+      "data-bottom-rail-game-card": "",
+      className: "flex h-auto min-h-0 w-full max-w-none shrink-0 min-w-0 overflow-visible",
+      children: /* @__PURE__ */ (0, import_jsx_runtime290.jsxs)(
+        "article",
+        {
+          className: cn2(
+            "grarf-extension-home-part-two-game-card",
+            "grarf-extension-command-center-scorecard-root"
+          ),
+          "data-grarf-extension-home-part-two-game-card": "",
+          "data-grarf-extension-command-center-scorecard-v2": "",
+          ...resolveGrarfExtensionCommandCenterScorecardState(game) === "upcoming" ? { "data-grarf-extension-home-part-two-upcoming": "" } : {},
+          "data-game-id": game.id,
+          children: [
+            /* @__PURE__ */ (0, import_jsx_runtime290.jsx)(HomePartTwoGameCardTopLine, { game }),
+            cardEditorialHeadline ? /* @__PURE__ */ (0, import_jsx_runtime290.jsx)(
+              GrarfExtensionEplBbcRecapHeadlineStrip,
+              {
+                headline: cardEditorialHeadline,
+                onClick: onCardEditorialHeadlineClick
+              }
+            ) : null,
+            /* @__PURE__ */ (0, import_jsx_runtime290.jsx)(GrarfExtensionCommandCenterScorecardInlineActionBar, { game })
+          ]
+        }
+      )
+    }
+  );
+}
+function GrarfExtensionHomePartTwoGameCards({ temporalGameContext }) {
+  const editorialBundle = useEditorialStore((state3) => state3.bundle);
   const [dayFilter, setDayFilter] = (0, import_react307.useState)("today");
   const dayLabel = HOME_PART_TWO_DAY_LABELS.find((option) => option.day === dayFilter)?.label ?? "today";
+  const featuredGames = (0, import_react307.useMemo)(
+    () => resolveGrarfExtensionHomeFeaturedPriorityGames({
+      dayFilter,
+      temporalGameContext,
+      editorialBundle
+    }),
+    [dayFilter, editorialBundle, temporalGameContext]
+  );
   return /* @__PURE__ */ (0, import_jsx_runtime290.jsxs)(
     "li",
     {
@@ -180699,7 +181129,9 @@ function GrarfExtensionHomePartTwoGameCards() {
                   }
                 )
               ] }),
-              /* @__PURE__ */ (0, import_jsx_runtime290.jsx)("div", { className: "grarf-extension-home-part-two__expanded-games", children: GRARF_EXTENSION_HOME_PART_TWO_GAME_CARD_PROTOTYPES.map((entry3) => /* @__PURE__ */ (0, import_jsx_runtime290.jsx)(HomePartTwoGameCard, { entry: entry3 }, entry3.id)) })
+              /* @__PURE__ */ (0, import_jsx_runtime290.jsx)("div", { className: "grarf-extension-home-part-two__expanded-games", children: featuredGames.map(
+                (game) => dayFilter === "yesterday" ? /* @__PURE__ */ (0, import_jsx_runtime290.jsx)(HomePartTwoYesterdayRecapGameCard, { game }, game.id) : /* @__PURE__ */ (0, import_jsx_runtime290.jsx)(HomePartTwoGameCard, { game }, game.id)
+              ) })
             ]
           }
         )
@@ -181026,7 +181458,7 @@ function GrarfExtensionAiSearchHomeSection({
                   onExploreActivate: () => onExecuteAction(exploreContentAction)
                 }
               ),
-              /* @__PURE__ */ (0, import_jsx_runtime291.jsx)(GrarfExtensionHomePartTwoGameCards, {})
+              /* @__PURE__ */ (0, import_jsx_runtime291.jsx)(GrarfExtensionHomePartTwoGameCards, { temporalGameContext })
             ]
           }
         ) : null
@@ -181440,250 +181872,11 @@ var import_react314 = __toESM(require_react(), 1);
 
 // ../grarf/desktop/src/lib/homeMvp/resolveGrarfExtensionHomeCommandCenterPreview.ts
 init_define_import_meta_env();
-
-// ../grarf/desktop/src/lib/editorial/sortGamesWithHomeCommandCenterDailyPriorities.ts
-init_define_import_meta_env();
-
-// ../grarf/desktop/src/lib/editorial/matchHomeCommandCenterDailyPrioritiesGame.ts
-init_define_import_meta_env();
-
-// ../grarf/desktop/src/lib/editorial/resolveHomeCommandCenterDailyPrioritiesLeagueKey.ts
-init_define_import_meta_env();
-var EDITORIAL_LEAGUE_ALIASES = {
-  "UEFA CHAMPIONS LEAGUE": "UCL",
-  "CHAMPIONS LEAGUE": "UCL",
-  "UEFA CHAMPIONS LEAGUE QUALIFYING": "UCLQ",
-  "UEFA EUROPA LEAGUE": "UEL",
-  "UEFA EUROPA CONFERENCE LEAGUE": "UECL",
-  "MAJOR LEAGUE BASEBALL": "MLB",
-  "MAJOR LEAGUE SOCCER": "MLS",
-  "PREMIER LEAGUE": "EPL",
-  "ENGLISH PREMIER LEAGUE": "EPL",
-  "LA LIGA": "LALIGA",
-  "SERIE A": "SERIEA",
-  "LIGUE 1": "LIGUE1",
-  "BUNDESLIGA": "BUNDESLIGA",
-  "NFL": "NFL",
-  "NBA": "NBA",
-  "NHL": "NHL",
-  "NCAAF": "NCAAF",
-  "FORMULA 1": "F1",
-  "FORMULA ONE": "F1"
-};
-function normalizeEditorialLeagueLabel(value) {
-  return value.trim().toUpperCase().replace(/['']/g, "'").replace(/\s+/g, " ");
-}
-function resolveByDisplayLabelScan(normalized) {
-  for (const key2 of getGamesColumnLeagueOrder()) {
-    const label = GAMES_COLUMN_LEAGUE_LABEL[key2] ?? resolveGamesSpineLeagueDisplayLabel(key2);
-    const normalizedLabel = normalizeEditorialLeagueLabel(label);
-    if (normalized === normalizedLabel) return key2;
-    if (normalized.includes(normalizedLabel) || normalizedLabel.includes(normalized)) {
-      return key2;
-    }
-  }
-  return null;
-}
-function resolveHomeCommandCenterDailyPrioritiesLeagueKey(leagueLabel) {
-  const normalized = normalizeEditorialLeagueLabel(leagueLabel);
-  if (!normalized) return null;
-  const canonical = resolveCanonicalLeagueImportanceKey(normalized);
-  if (canonical) return canonical;
-  const priorityAlias = LEAGUE_PRIORITY_ALIASES[normalized];
-  if (priorityAlias) return priorityAlias;
-  const editorialAlias = EDITORIAL_LEAGUE_ALIASES[normalized];
-  if (editorialAlias) return editorialAlias;
-  return resolveByDisplayLabelScan(normalized);
-}
-function gameMatchesHomeCommandCenterDailyPriorityLeague(gameLeagueKey, entryLeagueKey, entryLeagueLabel) {
-  const gameKey = gameLeagueKey?.trim().toUpperCase() ?? "";
-  if (entryLeagueKey && gameKey === entryLeagueKey.trim().toUpperCase()) {
-    return true;
-  }
-  const resolvedFromGame = resolveHomeCommandCenterDailyPrioritiesLeagueKey(gameKey);
-  const resolvedFromEntry = resolveHomeCommandCenterDailyPrioritiesLeagueKey(entryLeagueLabel);
-  if (resolvedFromGame && resolvedFromEntry) {
-    return resolvedFromGame === resolvedFromEntry;
-  }
-  return normalizeEditorialLeagueLabel(entryLeagueLabel) === normalizeEditorialLeagueLabel(gameKey);
-}
-
-// ../grarf/desktop/src/lib/editorial/matchHomeCommandCenterDailyPrioritiesGame.ts
-function normalizeTeamHint(value) {
-  return value.trim().toLowerCase().normalize("NFD").replace(/\p{M}/gu, "").replace(/\b(fc|sc|cf|afc|the)\b/g, "").replace(/[^a-z0-9]+/g, " ").replace(/\s+/g, " ").trim();
-}
-function teamHintMatchesGameName(hint, gameTeamName) {
-  const normalizedHint = normalizeTeamHint(hint);
-  const normalizedGame = normalizeTeamHint(gameTeamName);
-  if (!normalizedHint || !normalizedGame) return false;
-  if (normalizedGame.includes(normalizedHint) || normalizedHint.includes(normalizedGame)) {
-    return true;
-  }
-  const hintTokens = normalizedHint.split(" ").filter(Boolean);
-  const gameTokens = new Set(normalizedGame.split(" ").filter(Boolean));
-  if (hintTokens.length === 0) return false;
-  const matched = hintTokens.filter((token) => gameTokens.has(token)).length;
-  return matched >= Math.min(hintTokens.length, 2) || matched === hintTokens.length;
-}
-function matchupTeamsMatchGame(game, awayLabel, homeLabel) {
-  const away = game.awayTeam?.trim() ?? "";
-  const home = game.homeTeam?.trim() ?? "";
-  if (!away || !home) return false;
-  const forward = teamHintMatchesGameName(awayLabel, away) && teamHintMatchesGameName(homeLabel, home);
-  const reverse = teamHintMatchesGameName(awayLabel, home) && teamHintMatchesGameName(homeLabel, away);
-  return forward || reverse;
-}
-function resolveHomeCommandCenterDailyPriorityMatch(game, entries) {
-  let best = null;
-  for (let index2 = 0; index2 < entries.length; index2 += 1) {
-    const entry3 = entries[index2];
-    const leagueKey = entry3.leagueKey ?? resolveHomeCommandCenterDailyPrioritiesLeagueKey(entry3.leagueLabel);
-    const inLeague = gameMatchesHomeCommandCenterDailyPriorityLeague(
-      game.league,
-      leagueKey,
-      entry3.leagueLabel
-    );
-    if (!inLeague) continue;
-    if (entry3.kind === "matchup") {
-      if (!matchupTeamsMatchGame(game, entry3.awayTeamLabel, entry3.homeTeamLabel)) continue;
-      const rank2 = index2 * 2;
-      if (!best || rank2 < best.rank) best = { kind: "matchup", entryIndex: index2, rank: rank2 };
-      continue;
-    }
-    const rank = index2 * 2 + 1;
-    if (!best || rank < best.rank) best = { kind: "league", entryIndex: index2, rank };
-  }
-  if (!best) return { kind: "none" };
-  return { kind: best.kind, entryIndex: best.entryIndex };
-}
-function homeCommandCenterDailyPrioritySortBoost(match, entryCount) {
-  if (match.kind === "none" || entryCount <= 0) return 0;
-  const positionBoost = (entryCount - match.entryIndex) * 2500;
-  const kindBoost = match.kind === "matchup" ? 12e3 : 6e3;
-  return kindBoost + positionBoost;
-}
-
-// ../grarf/desktop/src/lib/editorial/homeCommandCenterDailyPrioritiesStore.ts
-init_define_import_meta_env();
-
-// ../grarf/desktop/editorial/homeCommandCenterDailyPriorities.json
-var homeCommandCenterDailyPriorities_default = {
-  version: 1,
-  bySportsDay: {
-    "2026-10-14": {
-      updatedAt: "2026-10-14T12:26:56.947Z",
-      entries: [
-        {
-          kind: "matchup",
-          leagueLabel: "MLB",
-          leagueKey: "MLB",
-          awayTeamLabel: "Brewers",
-          homeTeamLabel: "Dodgers",
-          line: "MLB \u2014 Brewers vs. Dodgers"
-        },
-        {
-          kind: "league",
-          leagueLabel: "UEFA Champions League",
-          leagueKey: "UCL",
-          line: "UEFA Champions League"
-        },
-        {
-          kind: "matchup",
-          leagueLabel: "MLS",
-          leagueKey: "MLS",
-          awayTeamLabel: "Inter Miami",
-          homeTeamLabel: "NYCFC",
-          line: "MLS \u2014 Inter Miami vs. NYCFC"
-        }
-      ]
-    },
-    "2026-10-15": {
-      updatedAt: "2026-10-15T13:54:21.813Z",
-      entries: [
-        {
-          kind: "matchup",
-          leagueLabel: "MLB",
-          leagueKey: "MLB",
-          awayTeamLabel: "Rays",
-          homeTeamLabel: "Guardians",
-          line: "MLB - Rays vs. Guardians"
-        },
-        {
-          kind: "matchup",
-          leagueLabel: "MLB",
-          leagueKey: "MLB",
-          awayTeamLabel: "Brewers",
-          homeTeamLabel: "Dodgers",
-          line: "MLB - Brewers vs. Dodgers"
-        },
-        {
-          kind: "matchup",
-          leagueLabel: "NFL",
-          leagueKey: "NFL",
-          awayTeamLabel: "Seahawks",
-          homeTeamLabel: "Broncos",
-          line: "NFL - Seahawks vs. Broncos"
-        }
-      ]
-    }
-  }
-};
-
-// ../grarf/desktop/src/lib/editorial/homeCommandCenterDailyPrioritiesStore.ts
-function asDocument(raw) {
-  const candidate = raw;
-  if (!candidate || candidate.version !== 1 || typeof candidate.bySportsDay !== "object") {
-    return { version: 1, bySportsDay: {} };
-  }
-  return candidate;
-}
-var loadedDocument = asDocument(homeCommandCenterDailyPriorities_default);
-function getHomeCommandCenterDailyPriorityEntriesForSportsDay(sportsDayKey) {
-  const day = loadedDocument.bySportsDay[sportsDayKey.trim()];
-  return day?.entries ?? [];
-}
-
-// ../grarf/desktop/src/lib/editorial/sortGamesWithHomeCommandCenterDailyPriorities.ts
-function resolveEditorialSportsDayKeyForGame(game, now) {
-  const fromGame = resolveGameOperationalDateKey(game);
-  if (fromGame?.trim()) return fromGame.trim();
-  return getOperationalSportsDayDateKey(now);
-}
-function compareGamesWithHomeCommandCenterDailyPriorities(a2, b2, mode, bundle, now, resolveEntries = getHomeCommandCenterDailyPriorityEntriesForSportsDay) {
-  const dateKey = getOperationalSportsDayDateKey(now);
-  const aDay = resolveEditorialSportsDayKeyForGame(a2, now);
-  const bDay = resolveEditorialSportsDayKeyForGame(b2, now);
-  const aEntries = resolveEntries(aDay);
-  const bEntries = resolveEntries(bDay);
-  const aMatch = resolveHomeCommandCenterDailyPriorityMatch(a2, aEntries);
-  const bMatch = resolveHomeCommandCenterDailyPriorityMatch(b2, bEntries);
-  const aBoost = homeCommandCenterDailyPrioritySortBoost(aMatch, aEntries.length);
-  const bBoost = homeCommandCenterDailyPrioritySortBoost(bMatch, bEntries.length);
-  const aScore = homeOperationalGameSortScore(a2, bundle, dateKey, mode) + aBoost;
-  const bScore = homeOperationalGameSortScore(b2, bundle, dateKey, mode) + bBoost;
-  return bScore - aScore;
-}
-function sortGamesWithHomeCommandCenterDailyPriorities(games, mode, bundle, now = /* @__PURE__ */ new Date(), resolveEntries = getHomeCommandCenterDailyPriorityEntriesForSportsDay) {
-  if (games.length <= 1) return [...games];
-  const dateKey = getOperationalSportsDayDateKey(now);
-  const hasAnyEditorial = games.some((game) => {
-    const dayKey = resolveEditorialSportsDayKeyForGame(game, now);
-    return resolveEntries(dayKey).length > 0;
-  });
-  if (!hasAnyEditorial) {
-    return sortHomeOperationalGames([...games], bundle, dateKey, mode);
-  }
-  return [...games].sort(
-    (a2, b2) => compareGamesWithHomeCommandCenterDailyPriorities(a2, b2, mode, bundle, now, resolveEntries)
-  );
-}
-
-// ../grarf/desktop/src/lib/homeMvp/resolveGrarfExtensionHomeCommandCenterPreview.ts
 var PROMINENT_SECTION_GAME_LIMIT = 4;
 var DEFAULT_SECTION_GAME_LIMIT = 2;
 var UPCOMING_SOON_MS = 4 * 60 * 60 * 1e3;
 var MAJOR_UPCOMING_SOON_MS = 3 * 60 * 60 * 1e3;
-function dedupeGamesById(games) {
+function dedupeGamesById2(games) {
   const seen = /* @__PURE__ */ new Set();
   const out = [];
   for (const game of games) {
@@ -181751,13 +181944,13 @@ function resolveSectionOrder(prominence) {
   return [prominence, ...rest];
 }
 function buildCatchUpPool(context2) {
-  return dedupeGamesById([...context2.catchUpTodayGames, ...context2.yesterdayGames]);
+  return dedupeGamesById2([...context2.catchUpTodayGames, ...context2.yesterdayGames]);
 }
 function buildLivePool(context2) {
-  return dedupeGamesById(context2.liveGames);
+  return dedupeGamesById2(context2.liveGames);
 }
 function buildComingUpPool(context2, liveIds) {
-  return dedupeGamesById(context2.upcomingTodayGames).filter((game) => !liveIds.has(game.id));
+  return dedupeGamesById2(context2.upcomingTodayGames).filter((game) => !liveIds.has(game.id));
 }
 function sortComingUpGames(games, nowMs3) {
   return [...games].sort((a2, b2) => {
@@ -182064,7 +182257,7 @@ function buildGrarfExtensionCommandHomeMockupAlertGameRows(games, alertGame, ale
 // ../grarf/desktop/src/extensionHost/GrarfExtensionCommandHomeMockupMinimizedGameCard.tsx
 init_define_import_meta_env();
 var import_jsx_runtime295 = __toESM(require_jsx_runtime(), 1);
-function TeamRow({
+function TeamRow2({
   game,
   side,
   name,
@@ -182131,7 +182324,7 @@ function GrarfExtensionCommandHomeMockupMinimizedGameCard({
             );
             return /* @__PURE__ */ (0, import_jsx_runtime295.jsxs)(import_jsx_runtime295.Fragment, { children: [
               /* @__PURE__ */ (0, import_jsx_runtime295.jsx)(
-                TeamRow,
+                TeamRow2,
                 {
                   game,
                   side: model.left.side,
@@ -182142,7 +182335,7 @@ function GrarfExtensionCommandHomeMockupMinimizedGameCard({
                 }
               ),
               /* @__PURE__ */ (0, import_jsx_runtime295.jsx)(
-                TeamRow,
+                TeamRow2,
                 {
                   game,
                   side: model.right.side,
