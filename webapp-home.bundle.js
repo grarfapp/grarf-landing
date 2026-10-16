@@ -106845,6 +106845,97 @@ function resolveCbsNflPreviewUrlCandidateFromGame(game) {
   }
 }
 
+// ../grarf/shared/domain/cbs/resolveCbsNhlPreviewUrlFromGame.ts
+init_define_import_meta_env();
+
+// ../grarf/shared/domain/cbs/buildCbsNhlPreviewUrl.ts
+init_define_import_meta_env();
+
+// ../grarf/shared/domain/cbs/toCbsNhlTeamAbbrev.ts
+init_define_import_meta_env();
+var ESPN_OR_OPERATIONAL_TO_CBS_NHL_TEAM_ABBREV = {
+  NJ: "NJ",
+  NJD: "NJ",
+  SJ: "SJ",
+  SJS: "SJ",
+  TB: "TB",
+  TBL: "TB",
+  VGK: "LV",
+  LV: "LV",
+  LA: "LA",
+  LAK: "LA",
+  UTAH: "UTA"
+};
+function toCbsNhlTeamAbbrevFromOperational(abbrev) {
+  const upper = abbrev.trim().toUpperCase();
+  if (!upper) return "";
+  return ESPN_OR_OPERATIONAL_TO_CBS_NHL_TEAM_ABBREV[upper] ?? upper;
+}
+function resolveCbsNhlTeamAbbrevFromGame(game, side) {
+  const abbrevRaw = side === "away" ? game.awayTeamAbbrev : game.homeTeamAbbrev;
+  if (abbrevRaw?.trim()) {
+    const fromAbbrev = toCbsNhlTeamAbbrevFromOperational(abbrevRaw);
+    if (fromAbbrev) return fromAbbrev;
+  }
+  const teamLabel = side === "away" ? game.awayTeam : game.homeTeam;
+  const fromName = resolveNhlOperationalTeamAbbrevFromLabel(teamLabel);
+  if (fromName) {
+    const cbs = toCbsNhlTeamAbbrevFromOperational(fromName);
+    if (cbs) return cbs;
+  }
+  throw new Error(`resolveCbsNhlTeamAbbrevFromGame: missing ${side} team abbreviation`);
+}
+
+// ../grarf/shared/domain/cbs/buildCbsNhlPreviewUrl.ts
+var CBS_NHL_PREVIEW_BASE_URL = "https://www.cbssports.com/nhl/gametracker/preview";
+function resolveScheduledDateYmd3(game) {
+  const fromKey = game.scheduledDateKey?.trim();
+  if (fromKey && /^\d{4}-\d{2}-\d{2}$/.test(fromKey)) {
+    return fromKey.replace(/-/g, "");
+  }
+  if (typeof game.startTimeMs === "number" && Number.isFinite(game.startTimeMs)) {
+    return new Date(game.startTimeMs).toISOString().slice(0, 10).replace(/-/g, "");
+  }
+  throw new Error("buildCbsNhlPreviewUrl: missing scheduledDateKey or startTimeMs");
+}
+function buildCbsNhlPreviewUrl(game) {
+  const dateYmd = resolveScheduledDateYmd3(game);
+  const awayAbbrev = resolveCbsNhlTeamAbbrevFromGame(game, "away");
+  const homeAbbrev = resolveCbsNhlTeamAbbrevFromGame(game, "home");
+  return `${CBS_NHL_PREVIEW_BASE_URL}/NHL_${dateYmd}_${awayAbbrev}@${homeAbbrev}/`;
+}
+
+// ../grarf/shared/domain/cbs/resolveCbsNhlPreviewUrlFromGame.ts
+var CBS_NHL_PREVIEW_PATH_PREFIX = "/nhl/gametracker/preview/";
+function isNhlGameRow(game) {
+  return game.league === "NHL" || game.id.startsWith("espn-NHL-");
+}
+function isValidCbsNhlPreviewUrl(url) {
+  try {
+    const parsed = new URL(url);
+    return parsed.protocol === "https:" && parsed.hostname === "www.cbssports.com" && parsed.pathname.startsWith(CBS_NHL_PREVIEW_PATH_PREFIX) && parsed.pathname.length > CBS_NHL_PREVIEW_PATH_PREFIX.length;
+  } catch {
+    return false;
+  }
+}
+function resolveCbsNhlPreviewUrlFromGame(game) {
+  if (!isNhlGameRow(game)) return null;
+  const fromMetadata = game.metadata?.cbsSportsPreviewUrl?.trim();
+  if (!fromMetadata) return null;
+  return isValidCbsNhlPreviewUrl(fromMetadata) ? fromMetadata : null;
+}
+function resolveCbsNhlPreviewUrlCandidateFromGame(game) {
+  const fromMetadata = resolveCbsNhlPreviewUrlFromGame(game);
+  if (fromMetadata) return fromMetadata;
+  if (!isNhlGameRow(game)) return null;
+  try {
+    const built = buildCbsNhlPreviewUrl(game);
+    return isValidCbsNhlPreviewUrl(built) ? built : null;
+  } catch {
+    return null;
+  }
+}
+
 // ../grarf/desktop/src/lib/gamesSpine/resolveSportsBrowserPrototypeGameContextContentSources.ts
 var SPORTS_BROWSER_PROTOTYPE_GAME_CONTENT_SOURCE_IDS = ["espn", "yahoo"];
 var GAME_CONTENT_SOURCE_LABELS = {
@@ -106866,6 +106957,9 @@ function isMlbUpcomingGameWorkspacePreview(game, nowMs3 = Date.now()) {
 }
 function isNflUpcomingGameWorkspacePreview(game, nowMs3 = Date.now()) {
   return (game.league === "NFL" || game.id.startsWith("espn-NFL-")) && !isOperationalGameNow(game, nowMs3) && !isOperationalGameCompleted(game, nowMs3);
+}
+function isNhlUpcomingGameWorkspacePreview(game, nowMs3 = Date.now()) {
+  return (game.league === "NHL" || game.id.startsWith("espn-NHL-")) && !isOperationalGameNow(game, nowMs3) && !isOperationalGameCompleted(game, nowMs3);
 }
 function isUelUpcomingGameWorkspacePreview(game, nowMs3 = Date.now()) {
   return (game.league === "UEL" || game.id.startsWith("espn-UEL-")) && !isOperationalGameNow(game, nowMs3) && !isOperationalGameCompleted(game, nowMs3);
@@ -106893,6 +106987,13 @@ function resolveNflUpcomingPreviewDestinationWebsites(game, context2) {
     game,
     context2,
     resolveCbsNflPreviewUrlCandidateFromGame
+  );
+}
+function resolveNhlUpcomingPreviewDestinationWebsites(game, context2) {
+  return resolveCbsUpcomingPreviewDestinationWebsites(
+    game,
+    context2,
+    resolveCbsNhlPreviewUrlCandidateFromGame
   );
 }
 function resolveUelUpcomingPreviewDestinationWebsites(game, context2) {
@@ -106953,6 +107054,9 @@ function resolveSportsBrowserPrototypeGameContextContentSourceWebsites(game, con
   }
   if (section === "preview" && isNflUpcomingGameWorkspacePreview(game)) {
     return resolveNflUpcomingPreviewDestinationWebsites(game, context2);
+  }
+  if (section === "preview" && isNhlUpcomingGameWorkspacePreview(game)) {
+    return resolveNhlUpcomingPreviewDestinationWebsites(game, context2);
   }
   if (section === "preview" && isUelUpcomingGameWorkspacePreview(game)) {
     return resolveUelUpcomingPreviewDestinationWebsites(game, context2);
@@ -109688,7 +109792,17 @@ function navigateActiveChromeBrowserTabDirect(url) {
     });
   }
 }
+function resolveExtensionWebPreviewExternalOpener() {
+  if (typeof window === "undefined") return void 0;
+  const opener = window.__GRARF_EXTENSION_WEB_PREVIEW_OPEN_EXTERNAL__;
+  return typeof opener === "function" ? opener : void 0;
+}
 function navigateActiveChromeBrowserTab(url) {
+  const webPreviewOpen = resolveExtensionWebPreviewExternalOpener();
+  if (webPreviewOpen) {
+    webPreviewOpen(url);
+    return;
+  }
   const chromeRuntime = globalThis.chrome?.runtime;
   if (chromeRuntime?.sendMessage) {
     void chromeRuntime.sendMessage({ type: GRARF_NAVIGATE_HOST_TAB_MESSAGE, url }).then((response) => {
@@ -163612,7 +163726,7 @@ var ESPN_TO_CBS_NCAAF_TEAM_ABBREV = {
   NCSU: "NCST",
   NCSTATE: "NCST"
 };
-function resolveScheduledDateYmd3(game) {
+function resolveScheduledDateYmd4(game) {
   const fromKey = game.scheduledDateKey?.trim();
   if (fromKey && /^\d{4}-\d{2}-\d{2}$/.test(fromKey)) {
     return fromKey.replace(/-/g, "");
@@ -163630,7 +163744,7 @@ function toCbsNcaafTeamAbbrev(abbrev, side) {
   return ESPN_TO_CBS_NCAAF_TEAM_ABBREV[normalized] ?? normalized;
 }
 function buildCbsNcaafRecapUrl(game) {
-  const dateYmd = resolveScheduledDateYmd3(game);
+  const dateYmd = resolveScheduledDateYmd4(game);
   const awayAbbrev = toCbsNcaafTeamAbbrev(game.awayTeamAbbrev, "away");
   const homeAbbrev = toCbsNcaafTeamAbbrev(game.homeTeamAbbrev, "home");
   return `${CBS_NCAAF_RECAP_BASE_URL}/NCAAF_${dateYmd}_${awayAbbrev}@${homeAbbrev}/`;
@@ -178713,7 +178827,7 @@ function readDocumentTitle(html) {
 }
 function resolveGrarfExtensionPreviewArticleHeadlineFromPageHtml(html, pageUrl) {
   const url = pageUrl?.trim() ?? "";
-  const isCbsGametrackerPreview = /cbssports\.com\/(?:nfl|mlb)\/gametracker\/preview\//i.test(url);
+  const isCbsGametrackerPreview = /cbssports\.com\/(?:nfl|mlb|nhl)\/gametracker\/preview\//i.test(url);
   if (isCbsGametrackerPreview) {
     const cbsHeadline = extractCbsPreviewArticleHeadlineFromHtml(html)?.trim();
     return cbsHeadline || null;
@@ -178742,6 +178856,9 @@ function isPlaceholderMlbStoryTitle2(title) {
 }
 function isNflGameRow3(game) {
   return game.league === "NFL" || game.id.startsWith("espn-NFL-");
+}
+function isNhlGameRow2(game) {
+  return game.league === "NHL" || game.id.startsWith("espn-NHL-");
 }
 function resolveGrarfExtensionMlbPreviewHeadlineFromOperationalGame(game) {
   if (!isGrarfExtensionMlbRecapGame(game)) return null;
@@ -178810,8 +178927,14 @@ async function resolvePreviewHeadlineFromResolvedPreviewUrl(game) {
     if (cbsHeadline?.trim()) return cbsHeadline.trim();
     return null;
   }
+  const cbsNhlPreviewUrl = resolveCbsNhlPreviewUrlCandidateFromGame(game);
+  if (cbsNhlPreviewUrl) {
+    const cbsHeadline = await fetchPreviewHeadlineForArticleUrl(cbsNhlPreviewUrl);
+    if (cbsHeadline?.trim()) return cbsHeadline.trim();
+    return null;
+  }
   const syncPreviewUrl = resolveGrarfExtensionCommandCenterScorecardPreviewUrl(game);
-  if (syncPreviewUrl?.trim() && !isGrarfExtensionGenericPreviewSearchUrl(game, syncPreviewUrl) && syncPreviewUrl !== cbsMlbPreviewUrl && syncPreviewUrl !== cbsNflPreviewUrl) {
+  if (syncPreviewUrl?.trim() && !isGrarfExtensionGenericPreviewSearchUrl(game, syncPreviewUrl) && syncPreviewUrl !== cbsMlbPreviewUrl && syncPreviewUrl !== cbsNflPreviewUrl && syncPreviewUrl !== cbsNhlPreviewUrl) {
     const syncHeadline = await fetchPreviewHeadlineForArticleUrl(syncPreviewUrl);
     if (syncHeadline?.trim()) return syncHeadline.trim();
   }
@@ -178828,6 +178951,9 @@ async function resolveGrarfExtensionCatchUpPreviewHeadlineForGame(game) {
   const previewArticleHeadline = await resolvePreviewHeadlineFromResolvedPreviewUrl(game);
   if (previewArticleHeadline?.trim()) return previewArticleHeadline.trim();
   if (isNflGameRow3(game) && resolveCbsNflPreviewUrlCandidateFromGame(game)) {
+    return null;
+  }
+  if (isNhlGameRow2(game) && resolveCbsNhlPreviewUrlCandidateFromGame(game)) {
     return null;
   }
   if (isGrarfExtensionEspnRecapHeadlineGame(game)) {
