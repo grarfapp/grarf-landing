@@ -15099,12 +15099,14 @@ var SPORTS_BROWSER_PROTOTYPE_SIDEBAR_LEAGUES_ACTIVE_POPULATION = [
 ];
 var SIDEBAR_LEAGUES_LABEL_BY_KEY = new Map(SPORTS_BROWSER_PROTOTYPE_SIDEBAR_LEAGUES_ACTIVE_POPULATION.map((entry2) => [entry2.key, entry2.label]));
 var SIDEBAR_LEAGUES_KEY_DISPLAY_OVERRIDES = {
+  LIGAMX: "Liga MX",
   SAUDI: "Saudi Pro League",
   NASCAR: "NASCAR Cup Series",
   NASCAR_XFINITY: "NASCAR Xfinity Series",
   NASCAR_TRUCK: "NASCAR Trucks"
 };
 var SIDEBAR_LEAGUES_DISPLAY_LABEL_OVERRIDES = {
+  "LIGA MX": "Liga MX",
   EUROLEAGUE: "EuroLeague",
   "CAF CHAMPIONS LEAGUE": "CAF Champions League",
   "FA CUP": "FA Cup",
@@ -15184,6 +15186,7 @@ function resolveSportsBrowserPrototypeSidebarLeaguesActiveDisplayLabel(leagueKey
 // ../grarf/shared/domain/league/grarfLeaguePresentationLabel.ts
 init_define_import_meta_env();
 var LEAGUE_PRESENTATION_LABEL_BY_KEY = {
+  LIGAMX: "Liga MX",
   SPFL: "SPFL",
   UFC: "UFC"
 };

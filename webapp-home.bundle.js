@@ -59699,12 +59699,14 @@ function collectSportsBrowserPrototypeSidebarLeaguesPopulationKeys() {
   return SPORTS_BROWSER_PROTOTYPE_SIDEBAR_LEAGUES_ACTIVE_POPULATION.map((entry4) => entry4.key);
 }
 var SIDEBAR_LEAGUES_KEY_DISPLAY_OVERRIDES = {
+  LIGAMX: "Liga MX",
   SAUDI: "Saudi Pro League",
   NASCAR: "NASCAR Cup Series",
   NASCAR_XFINITY: "NASCAR Xfinity Series",
   NASCAR_TRUCK: "NASCAR Trucks"
 };
 var SIDEBAR_LEAGUES_DISPLAY_LABEL_OVERRIDES = {
+  "LIGA MX": "Liga MX",
   EUROLEAGUE: "EuroLeague",
   "CAF CHAMPIONS LEAGUE": "CAF Champions League",
   "FA CUP": "FA Cup",
@@ -59784,6 +59786,7 @@ function resolveSportsBrowserPrototypeSidebarLeaguesActiveDisplayLabel(leagueKey
 // ../grarf/shared/domain/league/grarfLeaguePresentationLabel.ts
 init_define_import_meta_env();
 var LEAGUE_PRESENTATION_LABEL_BY_KEY = {
+  LIGAMX: "Liga MX",
   SPFL: "SPFL",
   UFC: "UFC"
 };
@@ -111436,6 +111439,14 @@ init_define_import_meta_env();
 function isCatchUpRecapFinalGame(game) {
   return game.status === "final" || isSpineFinalizedGame(game);
 }
+function isGamesTodayFinalGameRecapHeadlineContext(game) {
+  if (!isCatchUpRecapFinalGame(game)) return false;
+  const snapshot2 = getGrarfExtensionGamesYesterdayHighlightsNavSnapshot();
+  if (snapshot2.temporaryNavTopLevel !== "GAMES") return false;
+  if (snapshot2.gamesSelector2Label !== "TODAY") return false;
+  const view = snapshot2.gamesCompactTemporalView;
+  return view === "final" || view === "today";
+}
 function shouldFetchGrarfExtensionCatchUpRecapHeadline(game) {
   if (isGrarfExtensionGamesCatchUpRecapsNavSnapshotActive()) {
     return true;
@@ -111443,8 +111454,7 @@ function shouldFetchGrarfExtensionCatchUpRecapHeadline(game) {
   if (useGrarfExtensionSidePanelSectionStore.getState().activeSection === "home") {
     return isCatchUpRecapFinalGame(game);
   }
-  const snapshot2 = getGrarfExtensionGamesYesterdayHighlightsNavSnapshot();
-  if (snapshot2.temporaryNavTopLevel === "GAMES" && snapshot2.gamesCompactTemporalView === "final" && isCatchUpRecapFinalGame(game)) {
+  if (isGamesTodayFinalGameRecapHeadlineContext(game)) {
     return true;
   }
   return false;
@@ -161954,6 +161964,23 @@ async function resolveGrarfExtensionNflComHighlightsUrlForGame(game) {
   return promise;
 }
 
+// ../grarf/desktop/src/extensionHost/grarfExtensionGamesTodayAllFinalHighlightsInlineRailContext.ts
+init_define_import_meta_env();
+init_isGrarfWebRenderer();
+function isGamesTodayTemporalFinalGameCardContext(gamesCompactTemporalView) {
+  return gamesCompactTemporalView === "today" || gamesCompactTemporalView === "final";
+}
+function isGrarfExtensionGamesTodayFinalSidebarFinalGameCardContext() {
+  if (!isGrarfExtensionRenderer()) return false;
+  const snapshot2 = getGrarfExtensionGamesYesterdayHighlightsNavSnapshot();
+  return snapshot2.temporaryNavTopLevel === "GAMES" && snapshot2.gamesSelector2Label === "TODAY" && isGamesTodayTemporalFinalGameCardContext(snapshot2.gamesCompactTemporalView);
+}
+function isGrarfExtensionGamesTodayAllFinalHighlightsInlineRailContext() {
+  if (!isGrarfExtensionRenderer()) return false;
+  const snapshot2 = getGrarfExtensionGamesYesterdayHighlightsNavSnapshot();
+  return snapshot2.temporaryNavTopLevel === "GAMES" && snapshot2.gamesSelector2Label === "TODAY" && snapshot2.gamesCompactTemporalView === "today";
+}
+
 // ../grarf/desktop/src/extensionHost/grarfExtensionCatchUpHighlightsUrl.ts
 async function resolveGrarfExtensionCatchUpHighlightsUrlForGame(game) {
   const leagueKey = game.league?.trim().toUpperCase() ?? "";
@@ -162005,17 +162032,21 @@ async function resolveGrarfExtensionCatchUpHighlightsUrlForGame(game) {
   return buildGrarfExtensionGameYoutubeHighlightsSearchUrl(game);
 }
 async function navigateGrarfExtensionCatchUpHighlightsForGame(game) {
-  if (!isGrarfExtensionGamesCatchUpRecapsNavSnapshotActive()) {
+  const catchUpRecapsNav = isGrarfExtensionGamesCatchUpRecapsNavSnapshotActive();
+  const gamesTodayFinalCard = isGrarfExtensionGamesTodayFinalSidebarFinalGameCardContext();
+  if (!catchUpRecapsNav && !gamesTodayFinalCard) {
     return false;
   }
   const highlightsUrl = await resolveGrarfExtensionCatchUpHighlightsUrlForGame(game);
   const trimmed = highlightsUrl?.trim();
   if (!trimmed) return false;
   navigateGrarfExtensionHostExternalUrl(trimmed);
-  markGrarfExtensionCatchUpHostNavigationCommitted();
-  setGrarfExtensionGamesYesterdayHighlightsActiveGameId(game.id);
-  setGrarfExtensionCatchUpRecapsHighlightsSequentialNavActive(true);
   setGrarfExtensionCommandCenterScorecardInlineActionActive(game.id, "highlights");
+  if (catchUpRecapsNav) {
+    markGrarfExtensionCatchUpHostNavigationCommitted();
+    setGrarfExtensionGamesYesterdayHighlightsActiveGameId(game.id);
+    setGrarfExtensionCatchUpRecapsHighlightsSequentialNavActive(true);
+  }
   return true;
 }
 async function navigateGrarfExtensionHomeFeaturedYesterdayHighlightsForGame(game) {
@@ -162292,7 +162323,7 @@ function resolveGrarfExtensionCommandCenterScorecardRecapUrl(game) {
 }
 function resolveGrarfExtensionCommandCenterScorecardMediaActionEnabled(game, mediaAction) {
   if (mediaAction.url) return true;
-  if (mediaAction.kind === "highlights" && isGrarfExtensionRenderer() && isGrarfExtensionCommandCenterCatchUpRecapsRailContext() && resolveGrarfExtensionCommandCenterScorecardState(game) === "final") {
+  if (mediaAction.kind === "highlights" && isGrarfExtensionRenderer() && resolveGrarfExtensionCommandCenterScorecardState(game) === "final" && (isGrarfExtensionCommandCenterCatchUpRecapsRailContext() || isGrarfExtensionGamesTodayAllFinalHighlightsInlineRailContext())) {
     return true;
   }
   if (mediaAction.kind === "recap" && isGrarfExtensionRenderer() && grarfExtensionLeagueUsesMlssoccerRecaps(game.league ?? "") && resolveGrarfExtensionCommandCenterScorecardState(game) === "final") {
@@ -162323,7 +162354,7 @@ function resolveGrarfExtensionCommandCenterScorecardMediaAction(game) {
     };
   }
   if (state3 === "final") {
-    if (isGrarfExtensionCommandCenterCatchUpRecapsRailContext()) {
+    if (isGrarfExtensionGamesTodayAllFinalHighlightsInlineRailContext() || isGrarfExtensionCommandCenterCatchUpRecapsRailContext()) {
       return {
         kind: "highlights",
         label: "Highlights",
@@ -163011,10 +163042,12 @@ function completeCatchUpRecapNavigation(game) {
 }
 async function navigateGrarfExtensionGameYesterdayRecap(game, options) {
   const homeFeaturedYesterday = options?.homeFeaturedYesterday === true;
-  if (!homeFeaturedYesterday && !isGrarfExtensionGamesCatchUpRecapsNavSnapshotActive()) {
+  const gamesTodayFinalCard = isGrarfExtensionGamesTodayFinalSidebarFinalGameCardContext();
+  const catchUpRecapsNav = isGrarfExtensionGamesCatchUpRecapsNavSnapshotActive();
+  if (!homeFeaturedYesterday && !gamesTodayFinalCard && !catchUpRecapsNav) {
     return false;
   }
-  if (!homeFeaturedYesterday) {
+  if (!homeFeaturedYesterday && !gamesTodayFinalCard) {
     setGrarfExtensionCatchUpRecapsSequentialInlineAction("recap");
   }
   if (isGrarfExtensionMlbRecapGame(game)) {
@@ -174965,16 +174998,25 @@ var temporalNewsCol1LeaguesActive = false;
 function setGrarfExtensionTemporalNewsCol1LeaguesActive(active2) {
   temporalNewsCol1LeaguesActive = active2;
 }
+function resolveTemporalNewsCol1LeaguesActive(activeOverride) {
+  if (activeOverride !== void 0) return activeOverride;
+  return temporalNewsCol1LeaguesActive;
+}
 function normalizeLeagueLookupKey(leagueKey) {
   return leagueKey.trim().toLowerCase();
 }
 var TEMPORAL_NEWS_COL1_LEAGUE_DISPLAY_LABEL = {
-  "afc-elite": "AFC Champions Elite"
+  "afc-elite": "AFC Champions Elite",
+  arg1: "Argentine Primera Divisi\xF3n"
 };
 var TEMPORAL_NEWS_COL1_NEWS_WEBSITES = {
   "afc-elite": [
     { label: "FotMob", url: "https://www.fotmob.com/leagues/525/news/afc-champions-league-elite" },
-    { label: "AFC", url: "https://www.the-afc.com/en/club/afc_champions_league_elite/home.html" }
+    { label: "AFC", url: "https://www.the-afc.com/en/club/afc_champions_league_elite/home.html" },
+    {
+      label: "Google",
+      url: "https://news.google.com/search?q=AFC%20Champions%20elite&hl=en-US&gl=US&ceid=US%3Aen"
+    }
   ],
   afl: [
     { label: "AFL", url: "https://www.afl.com.au/news" },
@@ -174997,24 +175039,238 @@ var TEMPORAL_NEWS_COL1_NEWS_WEBSITES = {
     {
       label: "NewsNow",
       url: "https://www.newsnow.com/us/?search=ahl&lang=en&searchheadlines=1"
+    },
+    {
+      label: "Google",
+      url: "https://news.google.com/search?q=AHL&hl=en-US&gl=US&ceid=US%3Aen"
     }
+  ],
+  arg1: [
+    { label: "LPF", url: "https://www.ligaprofesional.ar/" },
+    { label: "TyC Sports", url: "https://www.tycsports.com/" },
+    { label: "Ol\xE9", url: "https://www.ole.com.ar/" },
+    { label: "TNT Sports Argentina", url: "https://www.tntsports.com.ar/" },
+    { label: "La Naci\xF3n", url: "https://www.lanacion.com.ar/deportes/futbol/" },
+    {
+      label: "NewsNow",
+      url: "https://www.newsnow.co.uk/h/Sport/Football/World+Football/Argentina"
+    }
+  ],
+  atp: [
+    { label: "ATP", url: "https://www.atptour.com/en/news" },
+    { label: "Tennis Now", url: "https://tennisnow.com/" },
+    { label: "Tennis365", url: "https://www.tennis365.com/" },
+    { label: "Tennishead", url: "https://tennishead.net/" },
+    { label: "ESPN", url: "https://www.espn.com/tennis/" },
+    { label: "BBC Sport", url: "https://www.bbc.com/sport/tennis" },
+    { label: "TNT Sports", url: "https://www.tntsports.co.uk/tennis/" },
+    {
+      label: "NewsNow",
+      url: "https://www.newsnow.com/us/?search=%22ATP%20Tour%22"
+    },
+    {
+      label: "Google",
+      url: "https://news.google.com/search?q=atp%20tour&hl=en-US&gl=US&ceid=US%3Aen"
+    },
+    { label: "r/tennis", url: "https://www.reddit.com/r/tennis/" }
   ]
 };
-function resolveGrarfExtensionTemporalNewsCol1LeagueDisplayLabel(leagueKey, defaultLabel) {
-  if (!temporalNewsCol1LeaguesActive) return defaultLabel;
+function resolveGrarfExtensionTemporalNewsCol1LeagueDisplayLabel(leagueKey, defaultLabel, options) {
+  if (!resolveTemporalNewsCol1LeaguesActive(options?.active)) return defaultLabel;
   return TEMPORAL_NEWS_COL1_LEAGUE_DISPLAY_LABEL[normalizeLeagueLookupKey(leagueKey)] ?? defaultLabel;
 }
-function resolveGrarfExtensionTemporalNewsCol1NewsWebsitesForLeagueKey(leagueKey) {
-  if (!temporalNewsCol1LeaguesActive) return null;
+function resolveGrarfExtensionTemporalNewsCol1NewsWebsitesForLeagueKey(leagueKey, options) {
+  if (!resolveTemporalNewsCol1LeaguesActive(options?.active)) return null;
   const websites = TEMPORAL_NEWS_COL1_NEWS_WEBSITES[normalizeLeagueLookupKey(leagueKey)];
   return websites ?? null;
 }
 
+// ../grarf/desktop/src/extensionHost/grarfExtensionTemporalNewsCol1LeagueXSocialSources.ts
+init_define_import_meta_env();
+function normalizeLeagueLookupKey2(leagueKey) {
+  return leagueKey.trim().toLowerCase();
+}
+function xProfileUrl(handle) {
+  const trimmed = handle.replace(/^@/, "").trim();
+  return `https://x.com/${trimmed}`;
+}
+function xHashtagSearchUrl(hashtag) {
+  const tag = hashtag.replace(/^#/, "").trim();
+  return `https://x.com/search?q=%23${encodeURIComponent(tag)}&src=typed_query`;
+}
+var TEMPORAL_NEWS_COL1_LEAGUE_X_SOCIAL = {
+  "a-league": { handle: "aleaguemen", hashtag: "ALeague" },
+  "afc-elite": {
+    handle: "TheAFCCL",
+    hashtag: "AFCElite",
+    hashtagUrl: "https://x.com/search?q=%23ACLElite&src=hashtag_click"
+  },
+  afl: {
+    handle: "AFL",
+    hashtag: "AFL",
+    hashtagUrl: "https://x.com/search?q=%23AFL&src=typed_query&f=top"
+  },
+  ahl: { handle: "TheAHL", hashtag: "AHL" },
+  atp: { handle: "atptour", hashtag: "ATPTour" },
+  avp: { handle: "AVPBeach", hashtag: "AVP" },
+  bel1: { handle: "ProLeagueBE", hashtag: "JPL" },
+  big3: { handle: "thebig3", hashtag: "BIG3" },
+  boxing: { hashtag: "Boxing" },
+  bra1: { handle: "Brasileirao", hashtag: "\xC9oBrasileiro" },
+  bundesliga: { handle: "Bundesliga_EN", hashtag: "Bundesliga" },
+  "caf-champions": { handle: "CAFCLCC", hashtag: "TotalEnergiesCAFCL" },
+  carabao_cup: { handle: "Carabao_Cup", hashtag: "CarabaoCup" },
+  cfl: { handle: "CFL", hashtag: "CFL" },
+  championship: { handle: "EFL", hashtag: "EFLChampionship" },
+  clubwc: { handle: "FIFACWC", hashtag: "FIFACWC" },
+  concacaf_cl: { handle: "TheChampions", hashtag: "CCC" },
+  concacaf_ng: { handle: "CNationsLeague", hashtag: "CONCACAFNationsLeague" },
+  copa: { handle: "CopaAmerica", hashtag: "CopaAmerica" },
+  libertadores: { handle: "Libertadores", hashtag: "Libertadores" },
+  sudamericana: { handle: "Sudamericana", hashtag: "Sudamericana" },
+  coppaitalia: { handle: "SerieA", hashtag: "CoppaItalia" },
+  dp_world: { handle: "DPWorldTour", hashtag: "DPWorldTour" },
+  eredivisie: { handle: "eredivisie", hashtag: "Eredivisie" },
+  euroleague: { handle: "EuroLeague", hashtag: "EuroLeague" },
+  "fa-cup": { handle: "EmiratesFACup", hashtag: "FACup" },
+  f2: { handle: "Formula2", hashtag: "F2" },
+  f3: { handle: "Formula3", hashtag: "F3" },
+  formula_e: { handle: "FIAFormulaE", hashtag: "FormulaE" },
+  "french-open": { handle: "rolandgarros", hashtag: "RolandGarros" },
+  gt_world_challenge: { handle: "GTWorldChEu", hashtag: "GTWorldChallenge" },
+  goldcup: { handle: "GoldCup", hashtag: "GoldCup" },
+  "horse-racing": { hashtag: "HorseRacing" },
+  cricket_icc: { handle: "ICC", hashtag: "Cricket" },
+  imsa: { handle: "IMSA", hashtag: "IMSA" },
+  ipl: { handle: "IPL", hashtag: "IPL" },
+  indycar: { handle: "IndyCar", hashtag: "INDYCAR" },
+  j1: { handle: "J_League", hashtag: "JLEAGUE" },
+  kbo: { handle: "KBOleague", hashtag: "KBO" },
+  khl: { handle: "khl", hashtag: "KHL" },
+  kornferry: { handle: "KornFerryTour", hashtag: "KornFerryTour" },
+  liv: { handle: "livgolf_league", hashtag: "LIVGolf" },
+  lovb: { handle: "LOVB", hashtag: "LOVB" },
+  lpga: { handle: "LPGA", hashtag: "LPGA" },
+  laliga: { handle: "LaLiga", hashtag: "LaLiga" },
+  lacrosse: { hashtag: "Lacrosse" },
+  leagues_cup: { handle: "LeaguesCup", hashtag: "LeaguesCup" },
+  ligamx: { handle: "LigaBBVAMX", hashtag: "LigaMX" },
+  ligue1: { handle: "Ligue1", hashtag: "Ligue1" },
+  llbws: { handle: "LittleLeague", hashtag: "LLWS" },
+  mlb: { handle: "MLB", hashtag: "MLB" },
+  mls: { handle: "MLS", hashtag: "MLS" },
+  milb: { handle: "MiLB", hashtag: "MiLB" },
+  motogp: { handle: "MotoGP", hashtag: "MotoGP" },
+  moto2: { handle: "MotoGP", hashtag: "Moto2" },
+  moto3: { handle: "MotoGP", hashtag: "Moto3" },
+  nascar_truck: { handle: "NASCAR_Trucks", hashtag: "TruckSeries" },
+  nascar: { handle: "NASCAR", hashtag: "NASCAR" },
+  nascar_xfinity: {
+    handle: "NASCAROReillyAP",
+    handleUrl: "https://x.com/NASCAROReillyAP?lang=en",
+    hashtag: "NASCAR"
+  },
+  nba: { handle: "NBA", hashtag: "NBA" },
+  ncaabb: { hashtag: "NCAABaseball" },
+  ncaafh: { hashtag: "NCAAFH" },
+  ncaaf: { hashtag: "NCAAFB" },
+  mncaab: { hashtag: "MarchMadness" },
+  ncaalax: { hashtag: "NCAAMLAX" },
+  ncaamsoc: { hashtag: "NCAAMSoccer" },
+  ncaavb_m: { hashtag: "NCAAMVB" },
+  ncaasb: { hashtag: "NCAASoftball" },
+  wncaab: { hashtag: "NCAAWBB" },
+  ncaawsoc: { hashtag: "NCAAWSoccer" },
+  ncaavb: { hashtag: "NCAAWVB" },
+  nfl: { handle: "NFL", hashtag: "NFL" },
+  nhra: { handle: "NHRA", hashtag: "NHRA" },
+  nhl: { handle: "NHL", hashtag: "NHL" },
+  npb: { hashtag: "NPB" },
+  nwsl: { handle: "NWSL", hashtag: "NWSL" },
+  odi: { handle: "ICC", hashtag: "ODICricket" },
+  pfl: { handle: "PFLMMA", hashtag: "PFL" },
+  pga: { handle: "PGATOUR", hashtag: "PGATOUR" },
+  pwhl: { handle: "thepwhlofficial", hashtag: "PWHL" },
+  pll: { handle: "PremierLacrosse", hashtag: "PLL" },
+  epl: { handle: "premierleague", hashtag: "PremierLeague" },
+  por1: { handle: "ligaportugal", hashtag: "LigaPortugal" },
+  "rugby-union": { hashtag: "Rugby" },
+  rugbywc: { handle: "rugbyworldcup", hashtag: "RWC" },
+  saudi: { handle: "SPL_EN", hashtag: "SaudiProLeague" },
+  scottish_league_cup: { handle: "ScottishLeague", hashtag: "ScottishLeagueCup" },
+  spfl: { handle: "spfl", hashtag: "SPFL" },
+  seriea: { handle: "SerieA_EN", hashtag: "SerieA" },
+  swimming: { hashtag: "Swimming" },
+  rugbytop14: { handle: "top14rugby", hashtag: "TOP14" },
+  superlig: { handle: "TFF_Org", hashtag: "S\xFCperLig" },
+  us_open_cup: { handle: "opencup", hashtag: "USOC" },
+  ucl: { handle: "ChampionsLeague", hashtag: "UCL" },
+  uecl: { handle: "Conf_League", hashtag: "UECL" },
+  uel: { handle: "EuropaLeague", hashtag: "UEL" },
+  nations: { handle: "UEFA", hashtag: "NationsLeague" },
+  ufc: { handle: "UFC", hashtag: "UFC" },
+  usatf: { handle: "WorldAthletics", hashtag: "WorldAthletics" },
+  uslc: { handle: "USLChampionship", hashtag: "USL" },
+  usl1: { handle: "USLLeagueOne", hashtag: "USL1" },
+  rugbyulster: { handle: "UlsterRugby", hashtag: "SUAF" },
+  wnba: { handle: "WNBA", hashtag: "WNBA" },
+  wta: { handle: "WTA", hashtag: "WTA" },
+  "winter-sports": { hashtag: "WinterSports" },
+  womens_ucl: { handle: "UWCL", hashtag: "UWCL" },
+  wec: { handle: "FIAWEC", hashtag: "WEC" },
+  "world-rally": { handle: "OfficialWRC", hashtag: "WRC" },
+  xfl: { handle: "TheUFL", hashtag: "UFL" },
+  arg1: { handle: "LigaAFA", hashtag: "LigaProfesional" },
+  cricket_bbl: { handle: "BBL", hashtag: "BBL" },
+  "giro-d-italia": { handle: "giroditalia", hashtag: "Giro" }
+};
+function resolveGrarfExtensionTemporalNewsCol1LeagueXSocialSource(leagueKey) {
+  return TEMPORAL_NEWS_COL1_LEAGUE_X_SOCIAL[normalizeLeagueLookupKey2(leagueKey)] ?? null;
+}
+function buildXSocialWebsiteRows(source) {
+  const rows = [];
+  if (source.handle) {
+    const label = `@${source.handle.replace(/^@/, "")}`;
+    rows.push({
+      label,
+      url: source.handleUrl ?? xProfileUrl(source.handle)
+    });
+  }
+  const hashtagLabel = `#${source.hashtag.replace(/^#/, "")}`;
+  rows.push({
+    label: hashtagLabel,
+    url: source.hashtagUrl ?? xHashtagSearchUrl(source.hashtag)
+  });
+  return rows;
+}
+function stripTrailingXSocialWebsiteRows(websites) {
+  const out = [...websites];
+  while (out.length > 0) {
+    const last = out[out.length - 1];
+    if (last.url.trim() && isGrarfXComHost(last.url)) {
+      out.pop();
+      continue;
+    }
+    break;
+  }
+  return out;
+}
+function appendGrarfExtensionTemporalNewsCol1XSocialWebsites(leagueKey, websites) {
+  const source = resolveGrarfExtensionTemporalNewsCol1LeagueXSocialSource(leagueKey);
+  if (!source) return websites;
+  const base = stripTrailingXSocialWebsiteRows(websites);
+  return [...base, ...buildXSocialWebsiteRows(source)];
+}
+
 // ../grarf/desktop/src/extensionHost/grarfExtensionNewsLeaguesWebsites.ts
-function resolveGrarfExtensionNewsWebsitesForLeagueKey(leagueKey) {
-  const temporalCol1Websites = resolveGrarfExtensionTemporalNewsCol1NewsWebsitesForLeagueKey(leagueKey);
+function resolveGrarfExtensionNewsWebsitesForLeagueKey(leagueKey, options) {
+  const temporalCol1Active = Boolean(options?.temporalNewsCol1Active);
+  const temporalCol1Websites = resolveGrarfExtensionTemporalNewsCol1NewsWebsitesForLeagueKey(
+    leagueKey,
+    { active: temporalCol1Active }
+  );
   if (temporalCol1Websites) {
-    return temporalCol1Websites;
+    return temporalCol1Active ? appendGrarfExtensionTemporalNewsCol1XSocialWebsites(leagueKey, temporalCol1Websites) : temporalCol1Websites;
   }
   const normalized = leagueKey.trim().toUpperCase();
   if (normalized === GRARF_EXTENSION_NEWS_LEAGUES_ALL_SPORTS_LEAGUE_KEY) {
@@ -175028,13 +175284,8 @@ function resolveGrarfExtensionNewsWebsitesForLeagueKey(leagueKey) {
     showWebsiteTabs: true
   };
   const sectionWebsites = resolveSportsBrowserPrototypeLeagueContextSectionWebsites(pane, "news");
-  if (sectionWebsites.length > 0) {
-    return sectionWebsites;
-  }
-  if (!configuredLeagueWebsites || configuredLeagueWebsites.length === 0) {
-    return getSportsBrowserPrototypeGlobalWebsites();
-  }
-  return sectionWebsites;
+  const resolved = sectionWebsites.length > 0 ? sectionWebsites : !configuredLeagueWebsites || configuredLeagueWebsites.length === 0 ? getSportsBrowserPrototypeGlobalWebsites() : sectionWebsites;
+  return temporalCol1Active ? appendGrarfExtensionTemporalNewsCol1XSocialWebsites(leagueKey, resolved) : resolved;
 }
 
 // ../grarf/desktop/src/extensionHost/grarfExtensionNewsLeaguesSequentialNav.ts
@@ -176887,6 +177138,17 @@ function GrarfExtensionNewsLeaguesLeagueHeader({
 
 // ../grarf/desktop/src/extensionHost/GrarfExtensionNewsLeaguesSourceCard.tsx
 init_define_import_meta_env();
+
+// ../grarf/desktop/src/extensionHost/resolveGrarfExtensionNewsLeaguesSourceCardLogoUrl.ts
+init_define_import_meta_env();
+function resolveGrarfExtensionNewsLeaguesSourceCardLogoUrl(url) {
+  if (isGrarfXComHost(url)) {
+    return resolveWebsiteFaviconUrl("https://x.com/");
+  }
+  return resolveWebsiteFaviconUrl(url);
+}
+
+// ../grarf/desktop/src/extensionHost/GrarfExtensionNewsLeaguesSourceCard.tsx
 var import_jsx_runtime278 = __toESM(require_jsx_runtime(), 1);
 function GrarfExtensionNewsLeaguesSourceCard({
   label,
@@ -176894,7 +177156,7 @@ function GrarfExtensionNewsLeaguesSourceCard({
   isSelected = false,
   onClick
 }) {
-  const faviconUrl = resolveWebsiteFaviconUrl(url);
+  const faviconUrl = resolveGrarfExtensionNewsLeaguesSourceCardLogoUrl(url);
   return /* @__PURE__ */ (0, import_jsx_runtime278.jsx)(
     "button",
     {
@@ -177329,7 +177591,7 @@ function resolveInlineIndentClass3(depth) {
   if (depth === 2) return "pl-10 pr-3";
   return "pl-14 pr-3";
 }
-function resolveLeagueInlineSectionWebsites(leagueKey, section) {
+function resolveLeagueInlineSectionWebsites(leagueKey, section, temporalNewsCol1Active = false) {
   if (!leagueKey) {
     const pane2 = {
       ...createDefaultSportsBrowserPrototypePaneState(),
@@ -177345,15 +177607,12 @@ function resolveLeagueInlineSectionWebsites(leagueKey, section) {
     leagueContextSection: section,
     showWebsiteTabs: true
   };
-  const sectionWebsites = resolveSportsBrowserPrototypeLeagueContextSectionWebsites(pane, section);
-  if (section === "news" && isGrarfExtensionRenderer()) {
-    const temporalCol1Websites = resolveGrarfExtensionTemporalNewsCol1NewsWebsitesForLeagueKey(
-      leagueKey
-    );
-    if (temporalCol1Websites) {
-      return temporalCol1Websites;
-    }
+  if (section === "news" && temporalNewsCol1Active) {
+    return resolveGrarfExtensionNewsWebsitesForLeagueKey(leagueKey, {
+      temporalNewsCol1Active: true
+    });
   }
+  const sectionWebsites = resolveSportsBrowserPrototypeLeagueContextSectionWebsites(pane, section);
   if (sectionWebsites.length > 0) {
     return sectionWebsites;
   }
@@ -177460,6 +177719,9 @@ function SportsBrowserPrototypeTemporaryNavLeaguesInlineTree({
     return SPORTS_BROWSER_PROTOTYPE_LEAGUE_CONTEXT_SECTIONS;
   }, [leaguesLensSection]);
   const extensionNewsLeaguesExpandUi = isGrarfExtensionRenderer() && (leaguesLensSection === "news" || extensionTemporalLeaguesTopLevel && leaguesLensSection == null);
+  const extensionTemporalNewsCol1Active = Boolean(
+    isGrarfExtensionRenderer() && extensionTemporalNewsCol1TopLevel && (leaguesLensSection === "news" || extensionTemporalLeaguesTopLevel && leaguesLensSection == null)
+  );
   const extensionTemporalLeagueCardListUi = isGrarfExtensionRenderer() && leaguesLensSection != null && (leaguesLensSection === "social" || leaguesLensSection === "highlights" || leaguesLensSection === "fantasy" || leaguesLensSection === "betting" || leaguesLensSection === "podcasts");
   const extensionLeagueExpandedContextCardUi = extensionNewsLeaguesExpandUi || extensionTemporalLeagueCardListUi;
   const resolvedLeagueCardContextSection = leaguesLensSection ?? "news";
@@ -177472,13 +177734,11 @@ function SportsBrowserPrototypeTemporaryNavLeaguesInlineTree({
   );
   const allSportsLeagueExpanded = extensionExclusiveLeagueAccordion && isGrarfExtensionSidebarExclusiveLeagueExpanded(GRARF_EXTENSION_NEWS_LEAGUES_ALL_SPORTS_LEAGUE_KEY);
   (0, import_react298.useEffect)(() => {
-    setGrarfExtensionTemporalNewsCol1LeaguesActive(
-      Boolean(extensionTemporalNewsCol1TopLevel && extensionNewsLeaguesExpandUi)
-    );
+    setGrarfExtensionTemporalNewsCol1LeaguesActive(extensionTemporalNewsCol1Active);
     return () => {
       setGrarfExtensionTemporalNewsCol1LeaguesActive(false);
     };
-  }, [extensionTemporalNewsCol1TopLevel, extensionNewsLeaguesExpandUi]);
+  }, [extensionTemporalNewsCol1Active]);
   (0, import_react298.useEffect)(() => {
     if (!extensionNewsLeaguesExpandUi) {
       return;
@@ -177563,7 +177823,11 @@ function SportsBrowserPrototypeTemporaryNavLeaguesInlineTree({
     const sectionKey = `${scopeKeyPrefix}:${section}`;
     const sectionExpanded = expandedSectionKeys.has(sectionKey);
     const sectionLabel = SPORTS_BROWSER_PROTOTYPE_LEAGUE_CONTEXT_SECTION_LABELS[section];
-    const websites = resolveLeagueInlineSectionWebsites(leagueKey, section);
+    const websites = resolveLeagueInlineSectionWebsites(
+      leagueKey,
+      section,
+      extensionTemporalNewsCol1Active
+    );
     const sectionWebsiteActive = (websiteIndex) => destinationSelection != null && (leagueKey ? isSportsBrowserPrototypeTemporaryNavLeagueWebsiteActive(
       destinationSelection,
       leagueKey,
@@ -177732,11 +177996,20 @@ function SportsBrowserPrototypeTemporaryNavLeaguesInlineTree({
               ) ?? group.sectionId : null;
               const displayLabel = resolveGrarfExtensionTemporalNewsCol1LeagueDisplayLabel(
                 leagueKey,
-                group.sportLevelOnly && group.title ? group.title : label
+                group.sportLevelOnly && group.title ? group.title : label,
+                { active: extensionTemporalNewsCol1Active }
               );
               const leagueExpanded = extensionExclusiveLeagueAccordion ? isGrarfExtensionSidebarExclusiveLeagueExpanded(leagueKey) : expandedLeagueKeys.has(leagueKey);
               const leagueSelected = selectedLeagueKey === leagueKey;
-              const newsWebsitesForLeague = extensionLeagueExpandedContextCardUi ? resolveLeagueInlineSectionWebsites(leagueKey, resolvedLeagueCardContextSection) : extensionNewsLeaguesExpandUi ? resolveLeagueInlineSectionWebsites(leagueKey, "news") : null;
+              const newsWebsitesForLeague = extensionLeagueExpandedContextCardUi ? resolveLeagueInlineSectionWebsites(
+                leagueKey,
+                resolvedLeagueCardContextSection,
+                extensionTemporalNewsCol1Active
+              ) : extensionNewsLeaguesExpandUi ? resolveLeagueInlineSectionWebsites(
+                leagueKey,
+                "news",
+                extensionTemporalNewsCol1Active
+              ) : null;
               const leagueActive = extensionNewsLeaguesExpandUi ? false : leagueSelected || leagueExpanded;
               const leagueGamesForLogo = todayCompleteLeagues.find((slate) => slate.key === leagueKey)?.games ?? [];
               const showPopulatedTeamList = LEAGUES_INLINE_POPULATED_TEAM_LIST_LEAGUE_KEYS.has(leagueKey) && renderTeamListPanel != null && (onLeaguesTabTeamSelect != null || onTeamContentDestinationSelect != null);
@@ -181911,6 +182184,43 @@ var homeCommandCenterDailyPriorities_default = {
           line: "NHL - Penguins vs. Avalanche"
         }
       ]
+    },
+    "2026-10-17": {
+      updatedAt: "2026-10-17T15:38:39.151Z",
+      entries: [
+        {
+          kind: "matchup",
+          leagueLabel: "MLB",
+          leagueKey: "MLB",
+          awayTeamLabel: "Rays",
+          homeTeamLabel: "Guardians",
+          line: "MLB \u2014 Rays vs. Guardians"
+        },
+        {
+          kind: "matchup",
+          leagueLabel: "NCAAF",
+          leagueKey: "NCAAF",
+          awayTeamLabel: "Ohio St",
+          homeTeamLabel: "Indiana",
+          line: "NCAAF \u2014 Ohio St vs Indiana"
+        },
+        {
+          kind: "matchup",
+          leagueLabel: "NCAAF",
+          leagueKey: "NCAAF",
+          awayTeamLabel: "Notre Dame",
+          homeTeamLabel: "BYU",
+          line: "NCAAF \u2014 Notre Dame vs BYU"
+        },
+        {
+          kind: "matchup",
+          leagueLabel: "WNBA",
+          leagueKey: "WNBA",
+          awayTeamLabel: "Dream",
+          homeTeamLabel: "Valkyries",
+          line: "WNBA \u2014 Dream vs Valkyries"
+        }
+      ]
     }
   }
 };
@@ -182112,11 +182422,11 @@ function resolveFeaturedSortMode(pool) {
 }
 function resolveGrarfExtensionHomeFeaturedPriorityGames(input) {
   const now = input.now ?? /* @__PURE__ */ new Date();
-  const limit = input.limit ?? 3;
   const sportsDayKey = input.dayFilter === "yesterday" ? getOperationalSportsDayYesterdayDateKey(now) : getOperationalSportsDayDateKey(now);
   const entries = getHomeCommandCenterDailyPriorityEntriesForSportsDay(sportsDayKey);
   const pool = resolveFeaturedGamePool(input.dayFilter, input.temporalGameContext);
   if (entries.length === 0 || pool.length === 0) return [];
+  const limit = input.limit ?? entries.length;
   const mode = resolveFeaturedSortMode(pool);
   const sortedPool = sortGamesWithHomeCommandCenterDailyPriorities(
     pool,
@@ -182205,7 +182515,11 @@ function HomePartTwoUpcomingStartChannel({ game }) {
 }
 function TeamRow({ game, side, showScore }) {
   const logoUrl = resolveNewsSportsBrowserTeamLogoUrl(game, side);
-  const teamName = resolveHomePartTwoTeamName(game, side);
+  const model = resolveGamesSpineCompactMatchupModel(game);
+  const pill = side === "away" ? model.left : model.right;
+  const presentation = resolveSportsBrowserLeftNavTeamNamePresentation(game, pill);
+  const teamName = presentation.teamName || resolveHomePartTwoTeamName(game, side);
+  const pollRank = presentation.pollRank;
   const score2 = side === "away" ? game.awayScore : game.homeScore;
   const accentStyle = resolveGrarfExtensionCommandCenterTeamAccentCssProperties(game, side);
   return /* @__PURE__ */ (0, import_jsx_runtime293.jsxs)(
@@ -182229,7 +182543,13 @@ function TeamRow({ game, side, showScore }) {
           }
         ) : /* @__PURE__ */ (0, import_jsx_runtime293.jsx)("span", { className: "grarf-extension-home-part-two-game-card__team-logo-fallback", "aria-hidden": true }) }),
         /* @__PURE__ */ (0, import_jsx_runtime293.jsxs)("span", { className: "grarf-extension-home-part-two-game-card__team-name-score", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime293.jsx)("span", { className: "grarf-extension-home-part-two-game-card__team-name", children: teamName }),
+          /* @__PURE__ */ (0, import_jsx_runtime293.jsx)("span", { className: "grarf-extension-home-part-two-game-card__team-name", children: pollRank != null ? /* @__PURE__ */ (0, import_jsx_runtime293.jsxs)(import_jsx_runtime293.Fragment, { children: [
+            /* @__PURE__ */ (0, import_jsx_runtime293.jsx)("span", { className: cn2("tabular-nums", LEFT_NAV_NCAAF_POLL_RANK_TEXT_CLASS), children: pollRank }),
+            /* @__PURE__ */ (0, import_jsx_runtime293.jsxs)("span", { children: [
+              " ",
+              teamName
+            ] })
+          ] }) : teamName }),
           showScore ? /* @__PURE__ */ (0, import_jsx_runtime293.jsx)("span", { className: "grarf-extension-home-part-two-game-card__team-score tabular-nums", children: score2 ?? "\u2013" }) : null
         ] })
       ]
