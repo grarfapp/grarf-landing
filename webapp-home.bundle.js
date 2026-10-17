@@ -92097,6 +92097,103 @@ function resolveSportscapeHeadlinesSourceLogoUrl(sourceId) {
 init_define_import_meta_env();
 init_isGrarfWebRenderer();
 
+// ../grarf/desktop/src/extensionHost/grarfExtensionSidebarActiveSelectionVisible.ts
+init_define_import_meta_env();
+
+// ../grarf/desktop/src/extensionHost/grarfExtensionSidebarActiveScrollRoot.ts
+init_define_import_meta_env();
+var LEFT_NAV_SCROLL_SELECTOR = "[data-sports-browser-prototype-left-nav-scroll]";
+var TEMPORAL_NAV_SELECTOR = "[data-sports-browser-prototype-temporary-nav-prototype]";
+var TEMPORAL_CONTENT_SELECTOR = "[data-sports-browser-prototype-sidebar-temporal-content], [data-sports-browser-prototype-temporary-nav-prototype-inline-tree]";
+function resolveScrollOffsetWithinContainer(element, scrollContainer) {
+  const containerRect = scrollContainer.getBoundingClientRect();
+  const elementRect = element.getBoundingClientRect();
+  return elementRect.top - containerRect.top + scrollContainer.scrollTop;
+}
+function resolveGrarfExtensionSidebarActiveScrollRoot() {
+  if (typeof document === "undefined") return null;
+  const candidates = document.querySelectorAll(LEFT_NAV_SCROLL_SELECTOR);
+  for (const candidate of candidates) {
+    if (candidate.closest("[hidden]") != null) continue;
+    return candidate;
+  }
+  return candidates[0] ?? null;
+}
+function scrollGrarfExtensionSidebarTemporalListToTop(scrollRoot, options = {}) {
+  const container = scrollRoot ?? resolveGrarfExtensionSidebarActiveScrollRoot();
+  if (!container) return;
+  const behavior = options.behavior ?? "auto";
+  if (container.getAttribute("data-grarf-extension-side-panel-page") === "browse") {
+    container.scrollTo({ top: 0, behavior });
+    return;
+  }
+  const temporalContent = container.querySelector(TEMPORAL_CONTENT_SELECTOR);
+  if (temporalContent) {
+    const contentTop = resolveScrollOffsetWithinContainer(temporalContent, container);
+    container.scrollTo({ top: Math.max(0, contentTop), behavior });
+    return;
+  }
+  const temporalNav = container.querySelector(TEMPORAL_NAV_SELECTOR);
+  if (temporalNav) {
+    const navTop = resolveScrollOffsetWithinContainer(temporalNav, container);
+    container.scrollTo({ top: Math.max(0, navTop), behavior });
+    return;
+  }
+  container.scrollTo({ top: 0, behavior });
+}
+
+// ../grarf/desktop/src/extensionHost/grarfExtensionSidebarActiveSelectionVisible.ts
+var TEMPORAL_NAV_SELECTOR2 = "[data-sports-browser-prototype-temporary-nav-prototype]";
+var ACTIVE_SELECTION_QUERY = [
+  "[data-grarf-extension-news-leagues-source-selected]",
+  "[data-grarf-extension-sequential-nav-current]",
+  "[data-grarf-extension-news-outlet-selected]",
+  "[data-grarf-extension-standings-league-selected]",
+  "[data-grarf-extension-command-center-team-selected]",
+  "[data-sports-browser-prototype-sidebar-league-row-selected]"
+].join(", ");
+function resolveGrarfExtensionSidebarScrollViewportTop(scrollRoot) {
+  const rootRect = scrollRoot.getBoundingClientRect();
+  const temporalNav = scrollRoot.querySelector(TEMPORAL_NAV_SELECTOR2);
+  if (!temporalNav) return rootRect.top;
+  const navRect = temporalNav.getBoundingClientRect();
+  return Math.max(rootRect.top, navRect.bottom);
+}
+function resolveGrarfExtensionSidebarActiveSelectionElement(scrollRoot) {
+  const selected = scrollRoot.querySelector(ACTIVE_SELECTION_QUERY);
+  return selected ?? null;
+}
+function ensureGrarfExtensionSidebarElementVisibleInScrollport(element, scrollRoot, options = {}) {
+  const padding = options.paddingPx ?? 8;
+  const visibleTop = resolveGrarfExtensionSidebarScrollViewportTop(scrollRoot) + padding;
+  const visibleBottom = scrollRoot.getBoundingClientRect().bottom - padding;
+  const rect = element.getBoundingClientRect();
+  if (rect.top < visibleTop) {
+    scrollRoot.scrollTop += rect.top - visibleTop;
+    return;
+  }
+  if (rect.bottom > visibleBottom) {
+    scrollRoot.scrollTop += rect.bottom - visibleBottom;
+  }
+}
+function ensureGrarfExtensionSidebarActiveSelectionVisible() {
+  if (typeof document === "undefined") return false;
+  const scrollRoot = resolveGrarfExtensionSidebarActiveScrollRoot();
+  if (!scrollRoot) return false;
+  const element = resolveGrarfExtensionSidebarActiveSelectionElement(scrollRoot);
+  if (!element) return false;
+  ensureGrarfExtensionSidebarElementVisibleInScrollport(element, scrollRoot);
+  return true;
+}
+function scheduleGrarfExtensionSidebarActiveSelectionVisible() {
+  if (typeof document === "undefined") return;
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      ensureGrarfExtensionSidebarActiveSelectionVisible();
+    });
+  });
+}
+
 // ../grarf/desktop/src/extensionHost/resolveGrarfExtensionHostExternalDestinationUrl.ts
 init_define_import_meta_env();
 
@@ -109847,6 +109944,9 @@ function navigateGrarfExtensionHostExternalUrl(url) {
   const trimmed = url?.trim();
   if (!trimmed) return;
   navigateActiveChromeBrowserTab(trimmed);
+  if (isGrarfExtensionRenderer()) {
+    scheduleGrarfExtensionSidebarActiveSelectionVisible();
+  }
 }
 function maybeDelegateGrarfExtensionHostExternalDestination(url) {
   const trimmed = url?.trim();
@@ -111069,50 +111169,6 @@ function subscribeGrarfExtensionCommandCenterScorecardInlineActionActive(listene
 
 // ../grarf/desktop/src/extensionHost/grarfExtensionSidebarExclusiveLeagueExpansion.ts
 init_define_import_meta_env();
-
-// ../grarf/desktop/src/extensionHost/grarfExtensionSidebarActiveScrollRoot.ts
-init_define_import_meta_env();
-var LEFT_NAV_SCROLL_SELECTOR = "[data-sports-browser-prototype-left-nav-scroll]";
-var TEMPORAL_NAV_SELECTOR = "[data-sports-browser-prototype-temporary-nav-prototype]";
-var TEMPORAL_CONTENT_SELECTOR = "[data-sports-browser-prototype-sidebar-temporal-content], [data-sports-browser-prototype-temporary-nav-prototype-inline-tree]";
-function resolveScrollOffsetWithinContainer(element, scrollContainer) {
-  const containerRect = scrollContainer.getBoundingClientRect();
-  const elementRect = element.getBoundingClientRect();
-  return elementRect.top - containerRect.top + scrollContainer.scrollTop;
-}
-function resolveGrarfExtensionSidebarActiveScrollRoot() {
-  if (typeof document === "undefined") return null;
-  const candidates = document.querySelectorAll(LEFT_NAV_SCROLL_SELECTOR);
-  for (const candidate of candidates) {
-    if (candidate.closest("[hidden]") != null) continue;
-    return candidate;
-  }
-  return candidates[0] ?? null;
-}
-function scrollGrarfExtensionSidebarTemporalListToTop(scrollRoot, options = {}) {
-  const container = scrollRoot ?? resolveGrarfExtensionSidebarActiveScrollRoot();
-  if (!container) return;
-  const behavior = options.behavior ?? "auto";
-  if (container.getAttribute("data-grarf-extension-side-panel-page") === "browse") {
-    container.scrollTo({ top: 0, behavior });
-    return;
-  }
-  const temporalContent = container.querySelector(TEMPORAL_CONTENT_SELECTOR);
-  if (temporalContent) {
-    const contentTop = resolveScrollOffsetWithinContainer(temporalContent, container);
-    container.scrollTo({ top: Math.max(0, contentTop), behavior });
-    return;
-  }
-  const temporalNav = container.querySelector(TEMPORAL_NAV_SELECTOR);
-  if (temporalNav) {
-    const navTop = resolveScrollOffsetWithinContainer(temporalNav, container);
-    container.scrollTo({ top: Math.max(0, navTop), behavior });
-    return;
-  }
-  container.scrollTo({ top: 0, behavior });
-}
-
-// ../grarf/desktop/src/extensionHost/grarfExtensionSidebarExclusiveLeagueExpansion.ts
 var exclusiveExpandedLeagueKey = null;
 var listeners4 = /* @__PURE__ */ new Set();
 function normalizeLeagueKey2(leagueKey) {
@@ -111191,7 +111247,7 @@ function resolveGrarfExtensionExpandedLeagueContentListStart(contentContainer) {
   ) ?? contentContainer.querySelector("[data-sports-browser-prototype-games-box]") ?? contentContainer.querySelector("[data-grarf-extension-sequential-nav-target]") ?? contentContainer;
 }
 var EXPLORE_LEAGUE_HEADER_SCROLL_GAP_PX = 8;
-var TEMPORAL_NAV_SELECTOR2 = "[data-sports-browser-prototype-temporary-nav-prototype]";
+var TEMPORAL_NAV_SELECTOR3 = "[data-sports-browser-prototype-temporary-nav-prototype]";
 function scrollGrarfExtensionSidebarLeagueHeaderIntoView(leagueKey, options = {}) {
   if (typeof document === "undefined") return false;
   const scrollRoot = resolveGrarfExtensionSidebarActiveScrollRoot();
@@ -111201,7 +111257,7 @@ function scrollGrarfExtensionSidebarLeagueHeaderIntoView(leagueKey, options = {}
   const behavior = options.behavior ?? "auto";
   const headerTop = resolveScrollOffsetWithinContainer(header, scrollRoot);
   let targetScrollTop = Math.max(0, headerTop - EXPLORE_LEAGUE_HEADER_SCROLL_GAP_PX);
-  const temporalNav = scrollRoot.querySelector(TEMPORAL_NAV_SELECTOR2);
+  const temporalNav = scrollRoot.querySelector(TEMPORAL_NAV_SELECTOR3);
   if (temporalNav) {
     const navTop = resolveScrollOffsetWithinContainer(temporalNav, scrollRoot);
     const navBottom = navTop + temporalNav.offsetHeight;
@@ -153599,7 +153655,7 @@ init_define_import_meta_env();
 // ../grarf/desktop/src/extensionHost/scrollGrarfExtensionSidePanelToSection.ts
 init_define_import_meta_env();
 var COMMAND_CENTER_SELECTOR = "[data-grarf-extension-shadcn-featured]";
-var TEMPORAL_NAV_SELECTOR3 = "[data-sports-browser-prototype-temporary-nav-prototype]";
+var TEMPORAL_NAV_SELECTOR4 = "[data-sports-browser-prototype-temporary-nav-prototype]";
 var TIMELINE_SECTION_SELECTOR = "[data-grarf-extension-sidebar-timeline-section]";
 function resolveScrollOffsetWithinContainer2(element, scrollContainer) {
   const containerRect = scrollContainer.getBoundingClientRect();
@@ -153615,7 +153671,7 @@ function scrollGrarfExtensionSidePanelToSection(scrollContainer, section, option
   }
   const commandCenter = scrollContainer.querySelector(COMMAND_CENTER_SELECTOR);
   if (section === "browse") {
-    const temporalNav = scrollContainer.querySelector(TEMPORAL_NAV_SELECTOR3);
+    const temporalNav = scrollContainer.querySelector(TEMPORAL_NAV_SELECTOR4);
     if (temporalNav) {
       if (!pinCommandCenterAtTop) {
         const temporalTop = resolveScrollOffsetWithinContainer2(temporalNav, scrollContainer);
@@ -153662,7 +153718,7 @@ function resolveGrarfExtensionSidePanelSectionFromScroll(scrollContainer) {
   const scrollTop = scrollContainer.scrollTop;
   const edgeEpsilon = 4;
   const activationScrollTop = scrollTop + scrollContainer.clientHeight * 0.4;
-  const temporalNav = scrollContainer.querySelector(TEMPORAL_NAV_SELECTOR3);
+  const temporalNav = scrollContainer.querySelector(TEMPORAL_NAV_SELECTOR4);
   const timelineSection = scrollContainer.querySelector(TIMELINE_SECTION_SELECTOR);
   const temporalTop = temporalNav ? resolveScrollOffsetWithinContainer2(temporalNav, scrollContainer) : Number.POSITIVE_INFINITY;
   const timelineTop = timelineSection ? resolveScrollOffsetWithinContainer2(timelineSection, scrollContainer) : Number.POSITIVE_INFINITY;
@@ -188851,10 +188907,10 @@ function SportsBrowserPrototypeLeftNav({
   );
   const onExtensionLeaguesNavDestinationSelect = (0, import_react324.useCallback)(
     (...args) => {
-      scrollExtensionBrowseTemporalListToTop();
       onLeaguesNavDestinationSelect?.(...args);
+      scheduleGrarfExtensionSidebarActiveSelectionVisible();
     },
-    [onLeaguesNavDestinationSelect, scrollExtensionBrowseTemporalListToTop]
+    [onLeaguesNavDestinationSelect]
   );
   const onExtensionLeagueCardLeaguesLensSectionChange = (0, import_react324.useCallback)(
     (section) => {
@@ -188874,10 +188930,10 @@ function SportsBrowserPrototypeLeftNav({
   );
   const onExtensionTemporaryNavContentGameDestinationSelect = (0, import_react324.useCallback)(
     (...args) => {
-      scrollExtensionBrowseTemporalListToTop();
       onTemporaryNavContentGameDestinationSelect?.(...args);
+      scheduleGrarfExtensionSidebarActiveSelectionVisible();
     },
-    [onTemporaryNavContentGameDestinationSelect, scrollExtensionBrowseTemporalListToTop]
+    [onTemporaryNavContentGameDestinationSelect]
   );
   const onCompactTemporalSelect = (0, import_react324.useCallback)((view) => {
     hasUserSelectedTemporalView.current = true;
