@@ -30701,6 +30701,9 @@ function resolveSportsBrowserPrototypeSidebarGameVariant(game) {
   if (game.status === "final" || isSpineFinalizedGame(game)) return "catchUp";
   return "upcoming";
 }
+function sortSidebarTodayGamesStatusBucket(games) {
+  return [...games].sort(compareGamesSpineChronologically);
+}
 function groupSportsBrowserPrototypeSidebarTodayGamesByStatus(games) {
   const live = [];
   const upcoming = [];
@@ -30711,7 +30714,11 @@ function groupSportsBrowserPrototypeSidebarTodayGamesByStatus(games) {
     else if (variant === "catchUp") final.push(game);
     else upcoming.push(game);
   }
-  return { live, upcoming, final };
+  return {
+    live: sortSidebarTodayGamesStatusBucket(live),
+    upcoming: sortSidebarTodayGamesStatusBucket(upcoming),
+    final: sortSidebarTodayGamesStatusBucket(final)
+  };
 }
 function orderTodayLeagueGames(games) {
   const { live, upcoming, final } = groupSportsBrowserPrototypeSidebarTodayGamesByStatus(games);
@@ -182423,6 +182430,10 @@ function resolveFeaturedSortMode(pool) {
   if (pool.some((game) => game.status === "scheduled")) return "PREPARE";
   return "CATCH_UP";
 }
+function orderGrarfExtensionHomeFeaturedTodayGames(games) {
+  const { live, upcoming, final } = groupSportsBrowserPrototypeSidebarTodayGamesByStatus(games);
+  return [...live, ...upcoming, ...final];
+}
 function resolveGrarfExtensionHomeFeaturedPriorityGames(input) {
   const now = input.now ?? /* @__PURE__ */ new Date();
   const sportsDayKey = input.dayFilter === "yesterday" ? getOperationalSportsDayYesterdayDateKey(now) : getOperationalSportsDayDateKey(now);
@@ -182458,6 +182469,9 @@ function resolveGrarfExtensionHomeFeaturedPriorityGames(input) {
     picked.push(candidate);
     usedIds.add(candidate.id);
     if (picked.length >= limit) break;
+  }
+  if (input.dayFilter === "today") {
+    return orderGrarfExtensionHomeFeaturedTodayGames(picked);
   }
   return picked;
 }
