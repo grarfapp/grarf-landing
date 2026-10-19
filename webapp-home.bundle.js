@@ -158379,6 +158379,7 @@ function isWatchStreamUrl2(url) {
     if (host === "espn.com" && !ESPN_WATCH_PLAYER_PATH2.test(trimmed)) return false;
     if (host === "amazon.com" || host.endsWith(".amazon.com")) return true;
     if (host === "wnba.com" || host.endsWith(".wnba.com")) return true;
+    if (host === "watch.beinsports-apps.com") return true;
   } catch {
     return false;
   }
@@ -158500,6 +158501,104 @@ function buildMlbTvLaunchUrl2(game) {
   return "https://www.mlb.com/tv";
 }
 
+// ../grarf/shared/domain/soccer/beinSportsSuperlig/beinSportsSuperligWatchUrl.ts
+init_define_import_meta_env();
+
+// ../grarf/shared/domain/soccer/beinSportsSuperlig/beinSportsSuperligTeamSlug.ts
+init_define_import_meta_env();
+var BEIN_SUPERLIG_TEAM_SLUG_BY_NORMALIZED_LABEL = /* @__PURE__ */ new Map();
+function normalizeLabelKey(label) {
+  return label.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+}
+function slugifyGenericBeinSuperligTeamName(teamName) {
+  return teamName.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/&/g, "").replace(/['’]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/-+/g, "-").replace(/^-|-$/g, "");
+}
+function registerBeinSuperligTeamSlug(slug, ...labels) {
+  const trimmedSlug = slug.trim().toLowerCase();
+  if (!trimmedSlug) return;
+  for (const label of labels) {
+    const key2 = normalizeLabelKey(label);
+    if (key2) BEIN_SUPERLIG_TEAM_SLUG_BY_NORMALIZED_LABEL.set(key2, trimmedSlug);
+    const generic = slugifyGenericBeinSuperligTeamName(label);
+    if (generic) BEIN_SUPERLIG_TEAM_SLUG_BY_NORMALIZED_LABEL.set(generic, trimmedSlug);
+  }
+}
+var BEIN_SUPERLIG_TEAM_SLUG_ENTRIES = [
+  { slug: "amedspor", labels: ["Amed SFK", "Amedspor"] },
+  { slug: "alanyaspor", labels: ["Alanyaspor"] },
+  { slug: "besiktas", labels: ["Besiktas", "Be\u015Fikta\u015F", "Besiktas JK"] },
+  { slug: "rizespor", labels: ["Caykur Rizespor", "\xC7aykur Rizespor", "Rizespor"] },
+  { slug: "eyupspor", labels: ["Eyupspor", "Ey\xFCpspor"] },
+  { slug: "fenerbahce", labels: ["Fenerbahce", "Fenerbah\xE7e"] },
+  { slug: "galatasaray", labels: ["Galatasaray"] },
+  { slug: "gaziantep", labels: ["Gaziantep FK", "Gaziantep"] },
+  { slug: "genclerbirligi", labels: ["Genclerbirligi", "Gen\xE7lerbirli\u011Fi"] },
+  { slug: "goztepe", labels: ["Goztepe", "G\xF6ztepe"] },
+  { slug: "basaksehir", labels: ["Istanbul Basaksehir", "\u0130stanbul Ba\u015Fak\u015Fehir", "Basaksehir"] },
+  { slug: "kasimpasa", labels: ["Kasimpasa", "Kas\u0131mpa\u015Fa"] },
+  { slug: "kocaelispor", labels: ["Kocaelispor"] },
+  { slug: "konyaspor", labels: ["Konyaspor"] },
+  { slug: "samsunspor", labels: ["Samsunspor"] },
+  { slug: "trabzonspor", labels: ["Trabzonspor"] }
+];
+for (const entry4 of BEIN_SUPERLIG_TEAM_SLUG_ENTRIES) {
+  registerBeinSuperligTeamSlug(entry4.slug, ...entry4.labels);
+}
+function resolveBeinSportsSuperligTeamSlug(teamName) {
+  const trimmed = teamName?.trim() ?? "";
+  if (!trimmed) return null;
+  const mapped = BEIN_SUPERLIG_TEAM_SLUG_BY_NORMALIZED_LABEL.get(normalizeLabelKey(trimmed));
+  if (mapped) return mapped;
+  const slug = slugifyGenericBeinSuperligTeamName(trimmed);
+  return slug || null;
+}
+
+// ../grarf/shared/domain/soccer/beinSportsSuperlig/beinSportsSuperligWatchUrl.ts
+var BEIN_SPORTS_SUPERLIG_WATCH_ORIGIN = "https://watch.beinsports-apps.com";
+var BEIN_SUPERLIG_EVENT_PATH_RE = /\/upcoming-events\/events\/([a-z0-9]+)-vs-([a-z0-9]+)-superlig-turkish-lig-matchday-(\d+)(?:-\d+)?/i;
+function isBeinSportsSuperligWatchUrl(url) {
+  const trimmed = url.trim();
+  if (!trimmed) return false;
+  try {
+    const parsed = new URL(trimmed);
+    const host = parsed.hostname.toLowerCase().replace(/^www\./, "");
+    if (host !== "watch.beinsports-apps.com") return false;
+    return BEIN_SUPERLIG_EVENT_PATH_RE.test(parsed.pathname);
+  } catch {
+    return false;
+  }
+}
+function buildBeinSportsSuperligWatchUrl(params) {
+  const homeSlug = params.homeSlug.trim().toLowerCase();
+  const awaySlug = params.awaySlug.trim().toLowerCase();
+  const matchday = Math.trunc(params.matchday);
+  const eventPath = `/upcoming-events/events/${homeSlug}-vs-${awaySlug}-superlig-turkish-lig-matchday-${matchday}`;
+  return `${BEIN_SPORTS_SUPERLIG_WATCH_ORIGIN}${eventPath}`;
+}
+function matchBeinSportsSuperligWatchEntryForGame(game, entries) {
+  if (game.league !== "SUPERLIG") return null;
+  const homeSlug = resolveBeinSportsSuperligTeamSlug(game.homeTeam);
+  const awaySlug = resolveBeinSportsSuperligTeamSlug(game.awayTeam);
+  if (!homeSlug || !awaySlug) return null;
+  return entries.find((entry4) => entry4.homeSlug === homeSlug && entry4.awaySlug === awaySlug) ?? null;
+}
+function resolveBeinSportsSuperligWatchUrlFromGame(game) {
+  if (game.league !== "SUPERLIG") return null;
+  const metadataUrl = game.metadata?.beinSportsSuperligWatchUrl?.trim();
+  if (metadataUrl && isBeinSportsSuperligWatchUrl(metadataUrl)) return metadataUrl;
+  const streamUrl = game.streamUrl?.trim();
+  if (streamUrl && isBeinSportsSuperligWatchUrl(streamUrl)) return streamUrl;
+  const matchday = game.metadata?.beinSportsSuperligMatchday;
+  if (typeof matchday === "number" && matchday > 0) {
+    const homeSlug = resolveBeinSportsSuperligTeamSlug(game.homeTeam);
+    const awaySlug = resolveBeinSportsSuperligTeamSlug(game.awayTeam);
+    if (homeSlug && awaySlug) {
+      return buildBeinSportsSuperligWatchUrl({ homeSlug, awaySlug, matchday });
+    }
+  }
+  return null;
+}
+
 // ../grarf/shared/domain/watch/resolveWatchLiveDestinationUrl.ts
 var AFL_FS2_LIVE_URL2 = "https://www.foxsports.com/live/fs2";
 var USA_NETWORK_LIVE_URL2 = "https://www.usanetwork.com/live";
@@ -158606,6 +158705,10 @@ function resolveWatchLiveDestinationUrl(game) {
     const nbaSummerUrl = game.streamUrl?.trim();
     if (nbaSummerUrl && isWatchStreamUrl2(nbaSummerUrl)) return nbaSummerUrl;
   }
+  if (game.league === "SUPERLIG") {
+    const beinSuperligUrl = resolveBeinSportsSuperligWatchUrlFromGame(game);
+    if (beinSuperligUrl) return beinSuperligUrl;
+  }
   const enrichedTarget = resolveLiveGameWatchTarget2(game);
   if (enrichedTarget) return enrichedTarget.streamUrl;
   if (game.league === "WNBA") {
@@ -158655,6 +158758,138 @@ async function fetchGrarfExtensionEspnWatchHomeListings() {
   } catch {
     return cache3?.listings ?? [];
   }
+}
+
+// ../grarf/desktop/src/extensionHost/grarfExtensionBeinSportsSuperligWatchResolver.ts
+init_define_import_meta_env();
+init_operationalIngestConfig();
+var LISTINGS_CACHE_TTL_MS = 5 * 60 * 1e3;
+var superligWatchCache = null;
+function grarfExtensionLeagueUsesBeinSportsSuperligWatchResolver(leagueKey) {
+  return leagueKey.trim().toUpperCase() === "SUPERLIG";
+}
+async function fetchGrarfExtensionBeinSportsSuperligWatchEntries() {
+  const now = Date.now();
+  if (superligWatchCache && now - superligWatchCache.at < LISTINGS_CACHE_TTL_MS) {
+    return superligWatchCache.items;
+  }
+  const cloudBase = getOperationalIngestConfig().cloudBaseUrl?.replace(/\/$/, "");
+  if (!cloudBase) {
+    return superligWatchCache?.items ?? [];
+  }
+  try {
+    const res = await fetch(`${cloudBase}/watch/bein-sports-superlig-events`, {
+      headers: { Accept: "application/json" },
+      cache: "no-store"
+    });
+    if (!res.ok) {
+      return superligWatchCache?.items ?? [];
+    }
+    const data2 = await res.json();
+    const items = Array.isArray(data2.items) ? data2.items : [];
+    superligWatchCache = { at: now, items };
+    return items;
+  } catch {
+    return superligWatchCache?.items ?? [];
+  }
+}
+async function resolveGrarfExtensionBeinSportsSuperligWatchUrlForGame(game) {
+  const leagueKey = game.league?.trim().toUpperCase() ?? "";
+  if (!grarfExtensionLeagueUsesBeinSportsSuperligWatchResolver(leagueKey)) {
+    return null;
+  }
+  const fromRow = resolveBeinSportsSuperligWatchUrlFromGame(game)?.trim();
+  if (fromRow) return fromRow;
+  const entries = await fetchGrarfExtensionBeinSportsSuperligWatchEntries();
+  if (!entries.length) return null;
+  const matched = matchBeinSportsSuperligWatchEntryForGame(game, entries);
+  return matched?.watchUrl?.trim() || null;
+}
+
+// ../grarf/desktop/src/extensionHost/grarfExtensionNcaaCollegeMediaOnlyScorecardRail.ts
+init_define_import_meta_env();
+var NCAA_COLLEGE_MEDIA_ONLY_RAIL_LEAGUE_LABELS = {
+  NCAAFH: "NCAA Field Hockey",
+  NCAAMSOC: "NCAA Men's Soccer",
+  NCAAWSOC: "NCAA Women's Soccer"
+};
+function grarfExtensionLeagueUsesNcaaCollegeMediaOnlyRail(leagueKey) {
+  return Boolean(NCAA_COLLEGE_MEDIA_ONLY_RAIL_LEAGUE_LABELS[leagueKey.trim().toUpperCase()]);
+}
+function resolveNcaaCollegeMediaOnlyRailLeagueLabel(leagueKey) {
+  return NCAA_COLLEGE_MEDIA_ONLY_RAIL_LEAGUE_LABELS[leagueKey.trim().toUpperCase()] ?? null;
+}
+function formatNcaaCollegeGoogleSearchGameDateLabel(game) {
+  if (typeof game.startTimeMs === "number" && Number.isFinite(game.startTimeMs)) {
+    return new Intl.DateTimeFormat("en-US", { month: "long", day: "numeric" }).format(
+      new Date(game.startTimeMs)
+    );
+  }
+  const dateKey = game.scheduledDateKey?.trim();
+  if (!dateKey) return null;
+  const parsed = Date.parse(`${dateKey}T12:00:00`);
+  if (!Number.isFinite(parsed)) return null;
+  return new Intl.DateTimeFormat("en-US", { month: "long", day: "numeric" }).format(
+    new Date(parsed)
+  );
+}
+function buildNcaaCollegeGoogleSearchQuery(game, kind) {
+  const leagueKey = game.league?.trim().toUpperCase() ?? "";
+  const leagueLabel = resolveNcaaCollegeMediaOnlyRailLeagueLabel(leagueKey);
+  if (!leagueLabel) return null;
+  const awayTeam = game.awayTeam?.trim();
+  const homeTeam = game.homeTeam?.trim();
+  const dateLabel = formatNcaaCollegeGoogleSearchGameDateLabel(game);
+  if (!awayTeam || !homeTeam || !dateLabel) return null;
+  return `${awayTeam} ${homeTeam} ${leagueLabel} ${dateLabel} ${kind}`;
+}
+function buildNcaaCollegeGoogleSearchUrl(query) {
+  const searchQuery = encodeURIComponent(query).replace(/%20/g, "+");
+  return `https://www.google.com/search?q=${searchQuery}`;
+}
+function buildGrarfExtensionNcaaCollegeGoogleRecapSearchUrl(game) {
+  const query = buildNcaaCollegeGoogleSearchQuery(game, "recap");
+  if (!query) return null;
+  return buildNcaaCollegeGoogleSearchUrl(query);
+}
+function buildGrarfExtensionNcaaCollegeGooglePreviewSearchUrl(game) {
+  const query = buildNcaaCollegeGoogleSearchQuery(game, "preview");
+  if (!query) return null;
+  return buildNcaaCollegeGoogleSearchUrl(query);
+}
+function resolveGrarfExtensionNcaaCollegeScorecardMediaAction(game) {
+  if (!grarfExtensionLeagueUsesNcaaCollegeMediaOnlyRail(game.league ?? "")) {
+    return null;
+  }
+  const state3 = resolveGrarfExtensionCommandCenterScorecardState(game);
+  if (state3 === "final") {
+    const url = buildGrarfExtensionNcaaCollegeGoogleRecapSearchUrl(game);
+    if (!url) return null;
+    return {
+      kind: "recap",
+      label: "Recap",
+      url,
+      ariaLabel: "Open game recap search in browser"
+    };
+  }
+  if (state3 === "upcoming") {
+    const url = buildGrarfExtensionNcaaCollegeGooglePreviewSearchUrl(game);
+    if (!url) return null;
+    return {
+      kind: "preview",
+      label: "Preview",
+      url,
+      ariaLabel: "Open game preview search in browser"
+    };
+  }
+  const watchUrl = resolveWatchLiveDestinationUrl(game)?.trim();
+  if (!watchUrl) return null;
+  return {
+    kind: "watch",
+    label: "Watch",
+    url: watchUrl,
+    ariaLabel: "Open live stream in browser"
+  };
 }
 
 // ../grarf/desktop/src/extensionHost/grarfExtensionParamountPlusWatchResolver.ts
@@ -158743,14 +158978,14 @@ function matchGameToCbsListing(game, listings) {
 }
 
 // ../grarf/desktop/src/extensionHost/grarfExtensionParamountPlusWatchResolver.ts
-var LISTINGS_CACHE_TTL_MS = 6e4;
+var LISTINGS_CACHE_TTL_MS2 = 6e4;
 var uclListingsCache = null;
 function grarfExtensionLeagueUsesParamountPlusWatchResolver(leagueKey) {
   return leagueKey.trim().toUpperCase() === "UCL";
 }
 async function fetchGrarfExtensionParamountPlusUclWatchListings() {
   const now = Date.now();
-  if (uclListingsCache && now - uclListingsCache.at < LISTINGS_CACHE_TTL_MS) {
+  if (uclListingsCache && now - uclListingsCache.at < LISTINGS_CACHE_TTL_MS2) {
     return uclListingsCache.items;
   }
   const cloudBase = getOperationalIngestConfig().cloudBaseUrl?.replace(/\/$/, "");
@@ -162374,6 +162609,8 @@ async function resolveGrarfExtensionCommandCenterScorecardWatchUrlAsync(game) {
   if (!isGrarfExtensionRenderer()) return null;
   const paramountUrl = await resolveGrarfExtensionParamountPlusWatchUrlForGame(game);
   if (paramountUrl) return paramountUrl;
+  const beinSuperligUrl = await resolveGrarfExtensionBeinSportsSuperligWatchUrlForGame(game);
+  if (beinSuperligUrl) return beinSuperligUrl;
   const listings = await fetchGrarfExtensionEspnWatchHomeListings();
   return resolveEspnWatchLiveDestinationUrlWithWatchHomeCatalog(game, listings);
 }
@@ -162448,6 +162685,9 @@ function resolveGrarfExtensionCommandCenterScorecardRecapUrl(game) {
   return buildGrarfExtensionGameTeamNamesGoogleSearchUrl(game);
 }
 function resolveGrarfExtensionCommandCenterScorecardMediaActionEnabled(game, mediaAction) {
+  if (grarfExtensionLeagueUsesNcaaCollegeMediaOnlyRail(game.league ?? "")) {
+    return Boolean(mediaAction.url?.trim());
+  }
   if (mediaAction.url) return true;
   if (mediaAction.kind === "highlights" && isGrarfExtensionRenderer() && resolveGrarfExtensionCommandCenterScorecardState(game) === "final" && (isGrarfExtensionCommandCenterCatchUpRecapsRailContext() || isGrarfExtensionGamesTodayAllFinalHighlightsInlineRailContext())) {
     return true;
@@ -162467,9 +162707,22 @@ function resolveGrarfExtensionCommandCenterScorecardMediaActionEnabled(game, med
   if (mediaAction.kind === "watch" && grarfExtensionLeagueUsesParamountPlusWatchResolver(game.league ?? "")) {
     return true;
   }
+  if (mediaAction.kind === "watch" && grarfExtensionLeagueUsesBeinSportsSuperligWatchResolver(game.league ?? "")) {
+    return true;
+  }
   return Boolean(parseEspnEventIdFromGame2(game) && gameHasEspnFamilyBroadcast(game));
 }
 function resolveGrarfExtensionCommandCenterScorecardMediaAction(game) {
+  if (grarfExtensionLeagueUsesNcaaCollegeMediaOnlyRail(game.league ?? "")) {
+    const ncaaAction = resolveGrarfExtensionNcaaCollegeScorecardMediaAction(game);
+    if (ncaaAction) return ncaaAction;
+    return {
+      kind: "watch",
+      label: "Watch",
+      url: null,
+      ariaLabel: "Open live stream in browser"
+    };
+  }
   const state3 = resolveGrarfExtensionCommandCenterScorecardState(game);
   if (state3 === "upcoming") {
     return {
@@ -162799,7 +163052,61 @@ function GrarfExtensionCommandCenterScorecardMetaColumn({
 function mapMediaActionKindToInlineActionId(kind) {
   return kind;
 }
+function GrarfExtensionNcaaCollegeMediaOnlyInlineActionBar({
+  game
+}) {
+  const gameId = game.id.trim();
+  const mediaAction = resolveGrarfExtensionNcaaCollegeScorecardMediaAction(game);
+  if (!mediaAction?.url?.trim()) return null;
+  const activeAction = (0, import_react277.useSyncExternalStore)(
+    subscribeGrarfExtensionCommandCenterScorecardInlineActionActive,
+    () => getGrarfExtensionCommandCenterScorecardInlineActionActive(gameId),
+    () => null
+  );
+  const actionId = mapMediaActionKindToInlineActionId(mediaAction.kind);
+  const MediaIcon = mediaAction.kind === "preview" ? Eye : mediaAction.kind === "recap" ? Newspaper : Play;
+  return /* @__PURE__ */ (0, import_jsx_runtime247.jsx)(
+    "div",
+    {
+      className: "grarf-extension-command-center-inline-action-bar grarf-extension-command-center-inline-action-bar--ncaa-media-only",
+      "data-grarf-extension-command-center-inline-action-bar": "",
+      "data-grarf-extension-command-center-inline-action-bar-ncaa-media-only": "",
+      children: /* @__PURE__ */ (0, import_jsx_runtime247.jsxs)(
+        "button",
+        {
+          type: "button",
+          className: cn2(
+            "grarf-extension-command-center-inline-action-bar-segment grarf-extension-command-center-inline-action-bar-action",
+            activeAction === actionId && "grarf-extension-command-center-inline-action-bar-action-active"
+          ),
+          "data-grarf-extension-command-center-inline-action-watch": mediaAction.kind === "watch" ? "" : void 0,
+          "data-grarf-extension-command-center-inline-action-preview": mediaAction.kind === "preview" ? "" : void 0,
+          "data-grarf-extension-command-center-inline-action-recap": mediaAction.kind === "recap" ? "" : void 0,
+          ...activeAction === actionId ? { "data-grarf-extension-command-center-inline-action-active": "" } : {},
+          "aria-label": mediaAction.ariaLabel,
+          "aria-pressed": activeAction === actionId ? true : void 0,
+          onClick: (event) => {
+            event.stopPropagation();
+            setGrarfExtensionCommandCenterScorecardInlineActionActive(gameId, actionId);
+            if (mediaAction.kind === "watch") {
+              void openGrarfExtensionCommandCenterScorecardMediaActionUrl(game, mediaAction);
+              return;
+            }
+            openGrarfExtensionCommandCenterScorecardExternalUrl(mediaAction.url);
+          },
+          children: [
+            /* @__PURE__ */ (0, import_jsx_runtime247.jsx)(MediaIcon, { size: 12, strokeWidth: 2, "aria-hidden": true }),
+            /* @__PURE__ */ (0, import_jsx_runtime247.jsx)("span", { children: mediaAction.label })
+          ]
+        }
+      )
+    }
+  );
+}
 function GrarfExtensionCommandCenterScorecardInlineActionBar({ game }) {
+  if (grarfExtensionLeagueUsesNcaaCollegeMediaOnlyRail(game.league ?? "")) {
+    return /* @__PURE__ */ (0, import_jsx_runtime247.jsx)(GrarfExtensionNcaaCollegeMediaOnlyInlineActionBar, { game });
+  }
   const homeFeaturedDay = useGrarfExtensionHomeFeaturedGameCardDay();
   const scorecardState = resolveGrarfExtensionCommandCenterScorecardState(game);
   const homeFeaturedFinalHighlights = homeFeaturedDay != null && scorecardState === "final";
