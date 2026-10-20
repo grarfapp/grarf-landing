@@ -19741,6 +19741,9 @@ function isWatchStreamUrl(url) {
     if (host === "espn.com" && !ESPN_WATCH_PLAYER_PATH.test(trimmed)) return false;
     if (host === "amazon.com" || host.endsWith(".amazon.com")) return true;
     if (host === "wnba.com" || host.endsWith(".wnba.com")) return true;
+    if (host === "watch.fanatiz.com") return true;
+    if (host === "watch.beinsports-apps.com") return true;
+    if (host === "fubo.tv" || host.endsWith(".fubo.tv")) return true;
   } catch {
     return false;
   }
@@ -32102,6 +32105,14 @@ function gameHasEspnFamilyBroadcast(game) {
   });
 }
 
+// ../grarf/shared/domain/watch/espnWatchHomeLeagues.ts
+init_define_import_meta_env();
+var ESPN_WATCH_HOME_BY_EVENT_ID_LEAGUES = /* @__PURE__ */ new Set(["NCAAMSOC", "NCAAWSOC"]);
+function gameUsesEspnWatchHomeByEventId(game) {
+  const leagueKey = game.league?.trim().toUpperCase() ?? "";
+  return ESPN_WATCH_HOME_BY_EVENT_ID_LEAGUES.has(leagueKey);
+}
+
 // ../grarf/shared/domain/watch/enrichGamesWithEspnWatchHomeStreams.ts
 function broadcastHints(game) {
   return [...game.broadcasts ?? [], ...game.channels ?? []];
@@ -32122,7 +32133,7 @@ function enrichGamesWithEspnWatchHomeStreams(games, listings) {
   let enrichedCount = 0;
   for (const game of games) {
     if (gameHasPublishedEspnWatchPlayerUrl(game)) continue;
-    if (!gameHasEspnFamilyBroadcast(game)) continue;
+    if (!gameHasEspnFamilyBroadcast(game) && !gameUsesEspnWatchHomeByEventId(game)) continue;
     const eventId = parseEspnEventIdFromGame2(game);
     if (!eventId) continue;
     const listing = listingsByEventId.get(eventId);
