@@ -29928,6 +29928,7 @@ var FOTMOB_SOCCER_LEAGUE_REGISTRY = {
   CARABAO_CUP: { fotmobPrimaryLeagueIds: [133], fotmobCountryCode: "ENG" },
   CLUBWC: { fotmobPrimaryLeagueIds: [78] },
   CLUBFRIENDLY: { fotmobPrimaryLeagueIds: [489] },
+  CONCACAF_CAC: { fotmobPrimaryLeagueIds: [9682] },
   CONCACAF_CL: { fotmobPrimaryLeagueIds: [297] },
   CONCACAF_NG: { fotmobPrimaryLeagueIds: [9821] },
   CONCACAF_WC: { fotmobPrimaryLeagueIds: [10198] },

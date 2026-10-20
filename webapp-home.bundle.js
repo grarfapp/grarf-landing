@@ -34656,6 +34656,7 @@ var FOTMOB_SOCCER_LEAGUE_REGISTRY = {
   CARABAO_CUP: { fotmobPrimaryLeagueIds: [133], fotmobCountryCode: "ENG" },
   CLUBWC: { fotmobPrimaryLeagueIds: [78] },
   CLUBFRIENDLY: { fotmobPrimaryLeagueIds: [489] },
+  CONCACAF_CAC: { fotmobPrimaryLeagueIds: [9682] },
   CONCACAF_CL: { fotmobPrimaryLeagueIds: [297] },
   CONCACAF_NG: { fotmobPrimaryLeagueIds: [9821] },
   CONCACAF_WC: { fotmobPrimaryLeagueIds: [10198] },
@@ -159924,6 +159925,70 @@ function shouldFetchGrarfExtensionNcaafEspnRecapHeadline(game) {
 
 // ../grarf/desktop/src/extensionHost/grarfExtensionGooglePreviewSearchUrl.ts
 init_define_import_meta_env();
+
+// ../grarf/desktop/src/extensionHost/grarfExtensionCommandCenterGoogleSearchUrls.ts
+init_define_import_meta_env();
+function buildGrarfExtensionGoogleSearchUrl(query) {
+  const searchQuery = encodeURIComponent(query.trim()).replace(/%20/g, "+");
+  return `https://www.google.com/search?q=${searchQuery}`;
+}
+function resolveGrarfLeagueKey(game) {
+  const fromRow = game.league?.trim();
+  if (fromRow) return fromRow;
+  const match = /^espn-([^-]+)-/i.exec(game.id.trim());
+  return match?.[1]?.trim() ?? "";
+}
+function resolveGrarfExtensionGameSearchLeagueLabel(game) {
+  const leagueKey = resolveGrarfLeagueKey(game);
+  if (!leagueKey) return "Sports";
+  const registryLabel = CANONICAL_REGISTRY_ENTRIES.find(
+    (entry4) => entry4.leagueKey === leagueKey || entry4.id === leagueKey
+  )?.displayName;
+  return formatGrarfLeaguePresentationLabel(leagueKey, registryLabel ?? leagueKey);
+}
+function readTeamLabel(game, side) {
+  return (side === "away" ? game.awayTeam : game.homeTeam)?.trim() ?? "";
+}
+function readMatchupTeamLabels(game) {
+  const away = readTeamLabel(game, "away");
+  const home = readTeamLabel(game, "home");
+  if (!away || !home) return null;
+  return { away, home };
+}
+function buildGrarfExtensionGameLeagueMatchupPhrase(game) {
+  const teams = readMatchupTeamLabels(game);
+  if (!teams) return null;
+  const league2 = resolveGrarfExtensionGameSearchLeagueLabel(game);
+  return `${league2} ${teams.away} ${teams.home}`;
+}
+function buildGrarfExtensionGameLeagueVersusMatchupPhrase(game) {
+  const teams = readMatchupTeamLabels(game);
+  if (!teams) return null;
+  const league2 = resolveGrarfExtensionGameSearchLeagueLabel(game);
+  return `${league2} ${teams.away} vs ${teams.home}`;
+}
+function buildGrarfExtensionGameBettingPicksGoogleSearchUrl(game) {
+  const phrase = buildGrarfExtensionGameLeagueVersusMatchupPhrase(game);
+  return phrase ? buildGrarfExtensionGoogleSearchUrl(`${phrase} betting picks`) : null;
+}
+function buildGrarfExtensionGameBettingOddsGoogleSearchUrl(game) {
+  const phrase = buildGrarfExtensionGameLeagueVersusMatchupPhrase(game);
+  return phrase ? buildGrarfExtensionGoogleSearchUrl(`${phrase} betting odds`) : null;
+}
+function buildGrarfExtensionGamePolymarketGoogleSearchUrl(game) {
+  const phrase = buildGrarfExtensionGameLeagueVersusMatchupPhrase(game);
+  return phrase ? buildGrarfExtensionGoogleSearchUrl(`polymarket.us ${phrase}`) : null;
+}
+function buildGrarfExtensionGameGamecenterGoogleSearchUrl(game) {
+  const phrase = buildGrarfExtensionGameLeagueMatchupPhrase(game);
+  return phrase ? buildGrarfExtensionGoogleSearchUrl(`${phrase} gamecenter`) : null;
+}
+function buildGrarfExtensionGameLeagueTeamsGoogleSearchUrl(game) {
+  const phrase = buildGrarfExtensionGameLeagueMatchupPhrase(game);
+  return phrase ? buildGrarfExtensionGoogleSearchUrl(phrase) : null;
+}
+
+// ../grarf/desktop/src/extensionHost/grarfExtensionGooglePreviewSearchUrl.ts
 function resolveGrarfExtensionPreviewSearchTeamLabel(game, side) {
   const leagueKey = game.league?.trim().toUpperCase() ?? "";
   if (leagueKey === "NWSL") {
@@ -159932,6 +159997,8 @@ function resolveGrarfExtensionPreviewSearchTeamLabel(game, side) {
   return (side === "away" ? game.awayTeam : game.homeTeam)?.trim() ?? "";
 }
 function buildGrarfExtensionGameGooglePreviewSearchQuery(game) {
+  const withLeague = buildGrarfExtensionGameLeagueMatchupPhrase(game);
+  if (withLeague) return `${withLeague} preview`;
   const awayTeam = resolveGrarfExtensionPreviewSearchTeamLabel(game, "away");
   const homeTeam = resolveGrarfExtensionPreviewSearchTeamLabel(game, "home");
   if (!awayTeam || !homeTeam) {
@@ -159942,8 +160009,7 @@ function buildGrarfExtensionGameGooglePreviewSearchQuery(game) {
 function buildGrarfExtensionGameGooglePreviewSearchUrl(game) {
   const query = buildGrarfExtensionGameGooglePreviewSearchQuery(game);
   if (!query) return null;
-  const searchQuery = encodeURIComponent(query).replace(/%20/g, "+");
-  return `https://www.google.com/search?q=${searchQuery}`;
+  return buildGrarfExtensionGoogleSearchUrl(query);
 }
 function isGrarfExtensionGenericPreviewSearchUrl(game, url) {
   const trimmed = url?.trim() ?? "";
@@ -163667,13 +163733,20 @@ function resolveGrarfExtensionCommandCenterScorecardGamecenterUrl(game) {
     const mlsMatchUrl = buildGrarfExtensionMlssoccerComMatchUrlFromGame(game);
     if (mlsMatchUrl) return mlsMatchUrl;
   }
+  const fotmobMatchUrl = resolveFotmobMatchUrl(game);
+  if (fotmobMatchUrl) return fotmobMatchUrl;
   const { gameCenter } = resolveGameBrowserContext(game);
   if (gameCenter.length > 0) {
     const preferred = gameCenter.find((website4) => website4.label === "MLB.com" || website4.label === "MLB Gameday") ?? gameCenter[0];
     const url = preferred?.url?.trim();
     if (url) return url;
   }
-  return buildGrarfExtensionTennisGoogleMatchcenterSearchUrl(game);
+  const tennisGoogle = buildGrarfExtensionTennisGoogleMatchcenterSearchUrl(game);
+  if (tennisGoogle) return tennisGoogle;
+  if (isGrarfExtensionRenderer()) {
+    return buildGrarfExtensionGameGamecenterGoogleSearchUrl(game);
+  }
+  return null;
 }
 function resolveGrarfExtensionCommandCenterScorecardSocialUrl(game) {
   return resolveGameSocialUrlFromGame(game);
@@ -163766,56 +163839,76 @@ init_define_import_meta_env();
 // ../grarf/desktop/src/extensionHost/grarfExtensionCommandCenterSecondaryBettingRailUrls.ts
 init_define_import_meta_env();
 
-// ../grarf/shared/domain/polymarket/buildPolymarketUsSportsGameMarketUrl.ts
+// ../grarf/shared/domain/matchupOdds/buildGrarfMatchupOddsUrlFromGame.ts
 init_define_import_meta_env();
 
-// ../grarf/shared/domain/polymarket/toPolymarketUsSportsTeamSlug.ts
+// ../grarf/shared/domain/oddschecker/buildOddscheckerMatchupOddsUrl.ts
 init_define_import_meta_env();
-function toPolymarketNbaTeamSlugFromGrarfAbbrev(abbrev) {
-  const normalized = abbrev?.trim().toUpperCase() ?? "";
-  if (!normalized) return null;
-  const cbsAligned = toCbsNbaTeamAbbrevFromOperational(normalized);
-  return cbsAligned.toLowerCase();
-}
-function toPolymarketNhlTeamSlugFromGrarfAbbrev(abbrev) {
-  const normalized = abbrev?.trim().toLowerCase() ?? "";
-  return normalized || null;
-}
-function toPolymarketUclTeamSlugFromGrarfAbbrev(abbrev) {
-  const normalized = abbrev?.trim().toLowerCase() ?? "";
-  return normalized || null;
-}
-function toPolymarketUsSportsTeamSlugFromGrarfAbbrev(league2, abbrev) {
-  switch (league2) {
-    case "nba":
-      return toPolymarketNbaTeamSlugFromGrarfAbbrev(abbrev);
-    case "nhl":
-      return toPolymarketNhlTeamSlugFromGrarfAbbrev(abbrev);
-    case "ucl":
-      return toPolymarketUclTeamSlugFromGrarfAbbrev(abbrev);
-    default:
-      return null;
-  }
+
+// ../grarf/shared/domain/matchupOdds/hyphenatedMatchupPathSlug.ts
+init_define_import_meta_env();
+function hyphenatedMatchupPathSlug(label) {
+  const normalized = label.trim().toLowerCase().normalize("NFD").replace(/\p{M}/gu, "").replace(/&/g, " and ").replace(/[^a-z0-9\s-]+/g, " ").replace(/\s+/g, " ").trim();
+  if (!normalized) return "";
+  return normalized.replace(/\s+/g, "-").replace(/-+/g, "-").replace(/^-|-$/g, "");
 }
 
-// ../grarf/shared/domain/polymarket/buildPolymarketUsSportsGameMarketUrl.ts
-function resolvePolymarketLeagueKey(game) {
-  const league2 = game.league?.trim();
-  if (league2 === "NBA" || game.id.startsWith("espn-NBA-")) return "nba";
-  if (league2 === "NHL" || game.id.startsWith("espn-NHL-")) return "nhl";
-  if (league2 === "UCL" || game.id.startsWith("espn-UCL-")) return "ucl";
-  return null;
+// ../grarf/shared/domain/oddschecker/buildOddscheckerMatchupOddsUrl.ts
+var GRARF_LEAGUE_TO_ODDSCHECKER_SOCCER_PATH = {
+  EPL: "premier-league",
+  LALIGA: "la-liga-primera",
+  UEL: "uefa-europa-league",
+  UECL: "uefa-conference-league",
+  MLS: "mls",
+  BUNDESLIGA: "bundesliga",
+  SERIEA: "serie-a",
+  LIGUE1: "ligue-1"
+};
+function resolveGrarfLeagueKey2(game) {
+  const fromRow = game.league?.trim();
+  if (fromRow) return fromRow;
+  const match = /^espn-([^-]+)-/i.exec(game.id.trim());
+  return match?.[1]?.trim() || null;
 }
-function buildPolymarketUsSportsGameMarketUrlFromGame(game) {
-  const leagueKey = resolvePolymarketLeagueKey(game);
+function readSoccerTeamLabel(game, side) {
+  const official = side === "away" ? game.metadata?.officialAwayName?.trim() : game.metadata?.officialHomeName?.trim();
+  if (official) return official;
+  return (side === "away" ? game.awayTeam : game.homeTeam)?.trim() ?? "";
+}
+function readFighterLabel(game, side) {
+  return (side === "away" ? game.awayTeam : game.homeTeam)?.trim() ?? "";
+}
+function resolveOddscheckerSoccerLeaguePath(game) {
+  const leagueKey = resolveGrarfLeagueKey2(game);
   if (!leagueKey) return null;
-  const scheduledDateKey = game.scheduledDateKey?.trim();
-  if (!scheduledDateKey || !/^\d{4}-\d{2}-\d{2}$/.test(scheduledDateKey)) return null;
-  const awaySlug = toPolymarketUsSportsTeamSlugFromGrarfAbbrev(leagueKey, game.awayTeamAbbrev);
-  const homeSlug = toPolymarketUsSportsTeamSlugFromGrarfAbbrev(leagueKey, game.homeTeamAbbrev);
+  return GRARF_LEAGUE_TO_ODDSCHECKER_SOCCER_PATH[leagueKey] ?? null;
+}
+function buildOddscheckerSoccerMatchupOddsUrl(game) {
+  const leaguePath = resolveOddscheckerSoccerLeaguePath(game);
+  if (!leaguePath) return null;
+  const awaySlug = hyphenatedMatchupPathSlug(readSoccerTeamLabel(game, "away"));
+  const homeSlug = hyphenatedMatchupPathSlug(readSoccerTeamLabel(game, "home"));
   if (!awaySlug || !homeSlug) return null;
-  const eventSlug = `${leagueKey}-${awaySlug}-${homeSlug}-${scheduledDateKey}`;
-  return `https://polymarket.us/sports/${leagueKey}/${eventSlug}`;
+  return `https://www.oddschecker.com/us/soccer/${leaguePath}/${awaySlug}-v-${homeSlug}`;
+}
+function buildOddscheckerUfcMatchupOddsUrl(game) {
+  const leagueKey = resolveGrarfLeagueKey2(game);
+  if (leagueKey !== "UFC") return null;
+  const awaySlug = hyphenatedMatchupPathSlug(readFighterLabel(game, "away"));
+  const homeSlug = hyphenatedMatchupPathSlug(readFighterLabel(game, "home"));
+  if (!awaySlug || !homeSlug) return null;
+  return `https://www.oddschecker.com/us/boxing-mma/ufc-mma/${awaySlug}-v-${homeSlug}/moneyline`;
+}
+function buildOddscheckerMatchupOddsUrlFromGame(game) {
+  const leagueKey = resolveGrarfLeagueKey2(game);
+  if (!leagueKey) return null;
+  if (leagueKey === "UFC") {
+    return buildOddscheckerUfcMatchupOddsUrl(game);
+  }
+  if (GRARF_LEAGUE_TO_ODDSCHECKER_SOCCER_PATH[leagueKey]) {
+    return buildOddscheckerSoccerMatchupOddsUrl(game);
+  }
+  return null;
 }
 
 // ../grarf/shared/domain/vegasinsider/buildVegasInsiderMatchupOddsUrl.ts
@@ -163884,12 +163977,54 @@ function resolveVegasInsiderNhlTeamNicknameSlug(input) {
   return null;
 }
 
+// ../grarf/shared/domain/vegasinsider/vegasInsiderCollegeTeamSlugFromGame.ts
+init_define_import_meta_env();
+function readCollegeSchoolLabel(game, side) {
+  const city = (side === "away" ? game.awayCity : game.homeCity)?.trim();
+  if (city) return city;
+  const display = (side === "away" ? game.awayTeam : game.homeTeam)?.trim() ?? "";
+  if (!display) return "";
+  const official = side === "away" ? game.metadata?.officialAwayName?.trim() : game.metadata?.officialHomeName?.trim();
+  if (official && official.length < display.length) {
+    return official;
+  }
+  return display;
+}
+function vegasInsiderCollegeTeamSlugFromGame(game, side) {
+  const label = readCollegeSchoolLabel(game, side);
+  if (!label) return null;
+  const slug = hyphenatedMatchupPathSlug(label);
+  return slug || null;
+}
+
 // ../grarf/shared/domain/vegasinsider/buildVegasInsiderMatchupOddsUrl.ts
+function resolveGrarfLeagueKey3(game) {
+  const fromRow = game.league?.trim();
+  if (fromRow) return fromRow;
+  const match = /^espn-([^-]+)-/i.exec(game.id.trim());
+  return match?.[1]?.trim() || null;
+}
 function resolveVegasInsiderLeagueKey(game) {
-  const league2 = game.league?.trim();
-  if (league2 === "NBA" || game.id.startsWith("espn-NBA-")) return "nba";
-  if (league2 === "NHL" || game.id.startsWith("espn-NHL-")) return "nhl";
-  return null;
+  const leagueKey = resolveGrarfLeagueKey3(game);
+  if (!leagueKey) return null;
+  switch (leagueKey) {
+    case "NBA":
+      return "nba";
+    case "NHL":
+      return "nhl";
+    case "MLB":
+      return "mlb";
+    case "NFL":
+      return "nfl";
+    case "WNBA":
+      return "wnba";
+    case "NCAAF":
+      return "college-football";
+    case "MNCAAB":
+      return "college-basketball";
+    default:
+      return null;
+  }
 }
 function vegasInsiderTeamNicknameSlug(teamDisplayName2) {
   const trimmed = teamDisplayName2.trim();
@@ -163905,6 +164040,9 @@ function readTeamAbbrev2(game, side) {
   return (side === "away" ? game.awayTeamAbbrev : game.homeTeamAbbrev)?.trim() ?? "";
 }
 function resolveVegasInsiderTeamSlug(game, side, leagueKey) {
+  if (leagueKey === "college-football" || leagueKey === "college-basketball") {
+    return vegasInsiderCollegeTeamSlugFromGame(game, side);
+  }
   if (leagueKey === "nhl") {
     return resolveVegasInsiderNhlTeamNicknameSlug({
       teamDisplayName: readTeamDisplayName(game, side),
@@ -163923,15 +164061,81 @@ function buildVegasInsiderMatchupOddsUrlFromGame(game) {
   return `https://www.vegasinsider.com/${leagueKey}/matchups/${awaySlug}-vs-${homeSlug}/`;
 }
 
+// ../grarf/shared/domain/matchupOdds/buildGrarfMatchupOddsUrlFromGame.ts
+function buildGrarfMatchupOddsUrlFromGame(game) {
+  const oddschecker = buildOddscheckerMatchupOddsUrlFromGame(game);
+  if (oddschecker) return oddschecker;
+  return buildVegasInsiderMatchupOddsUrlFromGame(game);
+}
+
+// ../grarf/shared/domain/polymarket/buildPolymarketUsSportsGameMarketUrl.ts
+init_define_import_meta_env();
+
+// ../grarf/shared/domain/polymarket/toPolymarketUsSportsTeamSlug.ts
+init_define_import_meta_env();
+function toPolymarketCfbTeamSlugFromGrarfAbbrev(abbrev) {
+  const normalized = abbrev?.trim().toLowerCase() ?? "";
+  return normalized || null;
+}
+function toPolymarketNbaTeamSlugFromGrarfAbbrev(abbrev) {
+  const normalized = abbrev?.trim().toUpperCase() ?? "";
+  if (!normalized) return null;
+  const cbsAligned = toCbsNbaTeamAbbrevFromOperational(normalized);
+  return cbsAligned.toLowerCase();
+}
+function toPolymarketNhlTeamSlugFromGrarfAbbrev(abbrev) {
+  const normalized = abbrev?.trim().toLowerCase() ?? "";
+  return normalized || null;
+}
+function toPolymarketUclTeamSlugFromGrarfAbbrev(abbrev) {
+  const normalized = abbrev?.trim().toLowerCase() ?? "";
+  return normalized || null;
+}
+function toPolymarketUsSportsTeamSlugFromGrarfAbbrev(league2, abbrev) {
+  switch (league2) {
+    case "nba":
+      return toPolymarketNbaTeamSlugFromGrarfAbbrev(abbrev);
+    case "nhl":
+      return toPolymarketNhlTeamSlugFromGrarfAbbrev(abbrev);
+    case "ucl":
+      return toPolymarketUclTeamSlugFromGrarfAbbrev(abbrev);
+    case "cfb":
+      return toPolymarketCfbTeamSlugFromGrarfAbbrev(abbrev);
+    default:
+      return null;
+  }
+}
+
+// ../grarf/shared/domain/polymarket/buildPolymarketUsSportsGameMarketUrl.ts
+function resolvePolymarketLeagueKey(game) {
+  const league2 = game.league?.trim();
+  if (league2 === "NBA" || game.id.startsWith("espn-NBA-")) return "nba";
+  if (league2 === "NHL" || game.id.startsWith("espn-NHL-")) return "nhl";
+  if (league2 === "UCL" || game.id.startsWith("espn-UCL-")) return "ucl";
+  if (league2 === "NCAAF" || game.id.startsWith("espn-NCAAF-")) return "cfb";
+  return null;
+}
+function buildPolymarketUsSportsGameMarketUrlFromGame(game) {
+  const leagueKey = resolvePolymarketLeagueKey(game);
+  if (!leagueKey) return null;
+  const scheduledDateKey = game.scheduledDateKey?.trim();
+  if (!scheduledDateKey || !/^\d{4}-\d{2}-\d{2}$/.test(scheduledDateKey)) return null;
+  const awaySlug = toPolymarketUsSportsTeamSlugFromGrarfAbbrev(leagueKey, game.awayTeamAbbrev);
+  const homeSlug = toPolymarketUsSportsTeamSlugFromGrarfAbbrev(leagueKey, game.homeTeamAbbrev);
+  if (!awaySlug || !homeSlug) return null;
+  const eventSlug = `${leagueKey}-${awaySlug}-${homeSlug}-${scheduledDateKey}`;
+  return `https://polymarket.us/sports/${leagueKey}/${eventSlug}`;
+}
+
 // ../grarf/desktop/src/extensionHost/grarfExtensionCommandCenterSecondaryBettingRailLeagues.ts
 init_define_import_meta_env();
+function gameHasSecondaryBettingRailTeams(game) {
+  const away = game.awayTeam?.trim();
+  const home = game.homeTeam?.trim();
+  return Boolean(away && home);
+}
 function grarfExtensionCommandCenterShowsSecondaryBettingRail(game) {
-  const league2 = game.league?.trim();
-  if (league2 === "NBA" || league2 === "NHL" || league2 === "UCL") return true;
-  if (game.id.startsWith("espn-NBA-")) return true;
-  if (game.id.startsWith("espn-NHL-")) return true;
-  if (game.id.startsWith("espn-UCL-")) return true;
-  return false;
+  return gameHasSecondaryBettingRailTeams(game);
 }
 
 // ../grarf/desktop/src/extensionHost/grarfExtensionCoversProLeaguePicksIndexCache.ts
@@ -163941,7 +164145,8 @@ init_define_import_meta_env();
 init_define_import_meta_env();
 var COVERS_PRO_LEAGUE_SPORT_PATH = {
   nba: "basketball/nba",
-  nhl: "hockey/nhl"
+  nhl: "hockey/nhl",
+  nfl: "football/nfl"
 };
 function buildCoversProLeaguePicksUrl(league2, matchupId) {
   const id = String(matchupId).trim();
@@ -163956,7 +164161,8 @@ function buildCoversProLeaguePicksUrl(league2, matchupId) {
 init_define_import_meta_env();
 var COVERS_PRO_LEAGUE_MATCHUPS_URL = {
   nba: "https://www.covers.com/sports/nba/matchups",
-  nhl: "https://www.covers.com/sports/nhl/matchups"
+  nhl: "https://www.covers.com/sports/nhl/matchups",
+  nfl: "https://www.covers.com/sports/nfl/matchups"
 };
 async function fetchCoversProLeagueMatchupsHtml(league2, fetchImpl = fetch) {
   const url = COVERS_PRO_LEAGUE_MATCHUPS_URL[league2];
@@ -163981,6 +164187,7 @@ function coversProLeagueFromGame(game) {
   const league2 = game.league?.trim();
   if (league2 === "NBA" || game.id.startsWith("espn-NBA-")) return "nba";
   if (league2 === "NHL" || game.id.startsWith("espn-NHL-")) return "nhl";
+  if (league2 === "NFL" || game.id.startsWith("espn-NFL-")) return "nfl";
   return null;
 }
 function toCoversTeamShortname(game, side) {
@@ -164001,7 +164208,7 @@ function matchCoversProLeagueMatchupIdForGame(game, index2) {
 
 // ../grarf/shared/domain/covers/parseCoversProLeagueMatchupsIndex.ts
 init_define_import_meta_env();
-var COVERS_PRO_GAMEBOX_ARTICLE_RE = /<article\s+id="(nba|nhl)-(\d+)"([^>]*)>/gi;
+var COVERS_PRO_GAMEBOX_ARTICLE_RE = /<article\s+id="(nba|nhl|nfl)-(\d+)"([^>]*)>/gi;
 function readCoversTeamShortnameAttr2(attrs, side) {
   const match = attrs.match(new RegExp(`data-${side}-team-shortname=([^\\s>]+)`, "i"));
   const value = match?.[1]?.trim().toLowerCase();
@@ -164033,6 +164240,7 @@ function coversLeagueFromGame(game) {
   const league2 = game.league?.trim();
   if (league2 === "NBA" || game.id.startsWith("espn-NBA-")) return "nba";
   if (league2 === "NHL" || game.id.startsWith("espn-NHL-")) return "nhl";
+  if (league2 === "NFL" || game.id.startsWith("espn-NFL-")) return "nfl";
   return null;
 }
 async function loadCoversProLeagueIndex(league2) {
@@ -164060,10 +164268,6 @@ async function resolveGrarfExtensionCoversProLeaguePicksUrlForGame(game) {
 }
 
 // ../grarf/desktop/src/extensionHost/grarfExtensionCommandCenterSecondaryBettingRailUrls.ts
-function buildGoogleSearchUrl(query) {
-  const searchQuery = encodeURIComponent(query).replace(/%20/g, "+");
-  return `https://www.google.com/search?q=${searchQuery}`;
-}
 function readTeamDisplayName2(game, side) {
   return (side === "away" ? game.awayTeam : game.homeTeam)?.trim() ?? "";
 }
@@ -164073,7 +164277,7 @@ function readTeamNicknameLabel(game, side) {
   if (!slug) return "";
   return slug.charAt(0).toUpperCase() + slug.slice(1);
 }
-function resolveSecondaryRailLeagueSearchPrefix(game) {
+function resolveDedicatedSecondaryRailLeagueSearchPrefix(game) {
   const league2 = game.league?.trim();
   if (league2 === "NBA" || game.id.startsWith("espn-NBA-")) return "NBA";
   if (league2 === "NHL" || game.id.startsWith("espn-NHL-")) return "NHL";
@@ -164092,8 +164296,14 @@ function buildUclGoogleOddsSearchQuery(game) {
   if (!away || !home) return null;
   return `UEFA Champions League ${away} ${home} odds`;
 }
+function buildUclPolymarketGoogleSearchQuery(game) {
+  const away = readTeamNicknameLabel(game, "away");
+  const home = readTeamNicknameLabel(game, "home");
+  if (!away || !home) return null;
+  return `polymarket.us uefa champions league ${away} vs ${home}`;
+}
 function buildLeagueTeamVsTeamSearchQuery(game) {
-  const leaguePrefix = resolveSecondaryRailLeagueSearchPrefix(game);
+  const leaguePrefix = resolveDedicatedSecondaryRailLeagueSearchPrefix(game);
   const away = readTeamNicknameLabel(game, "away");
   const home = readTeamNicknameLabel(game, "home");
   if (!leaguePrefix || !away || !home) return null;
@@ -164101,30 +164311,41 @@ function buildLeagueTeamVsTeamSearchQuery(game) {
 }
 function resolveGrarfExtensionSecondaryBettingRailSearchUrl(game) {
   if (!grarfExtensionCommandCenterShowsSecondaryBettingRail(game)) return null;
-  const query = buildLeagueTeamVsTeamSearchQuery(game);
-  return query ? buildGoogleSearchUrl(query) : null;
+  const dedicated = buildLeagueTeamVsTeamSearchQuery(game);
+  if (dedicated) return buildGrarfExtensionGoogleSearchUrl(dedicated);
+  return buildGrarfExtensionGameLeagueTeamsGoogleSearchUrl(game);
 }
 function resolveGrarfExtensionSecondaryBettingRailMarketUrl(game) {
   if (!grarfExtensionCommandCenterShowsSecondaryBettingRail(game)) return null;
-  return buildPolymarketUsSportsGameMarketUrlFromGame(game);
+  const league2 = game.league?.trim();
+  if (league2 === "UCL" || game.id.startsWith("espn-UCL-")) {
+    const query = buildUclPolymarketGoogleSearchQuery(game);
+    if (query) return buildGrarfExtensionGoogleSearchUrl(query);
+    return null;
+  }
+  const polymarket = buildPolymarketUsSportsGameMarketUrlFromGame(game);
+  if (polymarket) return polymarket;
+  return buildGrarfExtensionGamePolymarketGoogleSearchUrl(game);
 }
 function resolveGrarfExtensionSecondaryBettingRailOddsUrl(game) {
   if (!grarfExtensionCommandCenterShowsSecondaryBettingRail(game)) return null;
   const league2 = game.league?.trim();
   if (league2 === "UCL" || game.id.startsWith("espn-UCL-")) {
     const query = buildUclGoogleOddsSearchQuery(game);
-    return query ? buildGoogleSearchUrl(query) : null;
+    if (query) return buildGrarfExtensionGoogleSearchUrl(query);
   }
-  return buildVegasInsiderMatchupOddsUrlFromGame(game);
+  const dedicated = buildGrarfMatchupOddsUrlFromGame(game);
+  if (dedicated) return dedicated;
+  return buildGrarfExtensionGameBettingOddsGoogleSearchUrl(game);
 }
 function resolveGrarfExtensionSecondaryBettingRailPicksUrl(game) {
   if (!grarfExtensionCommandCenterShowsSecondaryBettingRail(game)) return null;
   const league2 = game.league?.trim();
   if (league2 === "UCL" || game.id.startsWith("espn-UCL-")) {
     const query = buildUclGooglePicksSearchQuery(game);
-    return query ? buildGoogleSearchUrl(query) : null;
+    if (query) return buildGrarfExtensionGoogleSearchUrl(query);
   }
-  return null;
+  return buildGrarfExtensionGameBettingPicksGoogleSearchUrl(game);
 }
 async function resolveGrarfExtensionSecondaryBettingRailUrlAsync(game, kind) {
   switch (kind) {
@@ -164135,9 +164356,9 @@ async function resolveGrarfExtensionSecondaryBettingRailUrlAsync(game, kind) {
     case "odds":
       return resolveGrarfExtensionSecondaryBettingRailOddsUrl(game);
     case "picks": {
-      const sync = resolveGrarfExtensionSecondaryBettingRailPicksUrl(game);
-      if (sync) return sync;
-      return resolveGrarfExtensionCoversProLeaguePicksUrlForGame(game);
+      const covers = await resolveGrarfExtensionCoversProLeaguePicksUrlForGame(game);
+      if (covers) return covers;
+      return resolveGrarfExtensionSecondaryBettingRailPicksUrl(game);
     }
     default:
       return null;
@@ -164160,7 +164381,7 @@ function resolveGrarfExtensionSecondaryBettingRailUrl(game, kind) {
 function grarfExtensionSecondaryBettingRailActionMayResolveAsync(game, kind) {
   if (kind !== "picks") return false;
   const league2 = game.league?.trim();
-  return league2 === "NBA" || league2 === "NHL" || game.id.startsWith("espn-NBA-") || game.id.startsWith("espn-NHL-");
+  return league2 === "NBA" || league2 === "NHL" || league2 === "NFL" || game.id.startsWith("espn-NBA-") || game.id.startsWith("espn-NHL-") || game.id.startsWith("espn-NFL-");
 }
 function grarfExtensionSecondaryBettingRailActionEnabled(game, kind) {
   if (!grarfExtensionCommandCenterShowsSecondaryBettingRail(game)) return false;
