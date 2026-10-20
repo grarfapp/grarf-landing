@@ -167,3 +167,20 @@ if (process.env.GRARF_SKIP_MOBILE_WEB === "1") {
   console.log("[build-home] building Mobile Web bundle …");
   execSync("node build-mobile.mjs", { stdio: "inherit", cwd: __dirname });
 }
+
+if (process.env.GRARF_SKIP_EXTENSION_WEB_PREVIEW === "1") {
+  console.log("[build-home] skip extension web preview (GRARF_SKIP_EXTENSION_WEB_PREVIEW=1)");
+} else {
+  const desktopRoot = path.resolve(__dirname, "../grarf/desktop");
+  const buildExtensionWeb = path.join(desktopRoot, "package.json");
+  if (!fs.existsSync(buildExtensionWeb)) {
+    console.warn("[build-home] skip extension web preview — desktop not found at", desktopRoot);
+  } else {
+    console.log("[build-home] building extension web preview (grarf.com/extension) …");
+    execSync("npm run build:extension-web", {
+      stdio: "inherit",
+      cwd: desktopRoot,
+      env: { ...process.env, GRARF_LANDING_ROOT: __dirname },
+    });
+  }
+}
