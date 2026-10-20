@@ -19096,6 +19096,9 @@ async function enrichPllGameCardRouting(games) {
 // ../grarf/desktop/src/lib/tennis/resolveTennisGameCardEmbedUrl.ts
 init_define_import_meta_env();
 
+// ../grarf/shared/domain/tennis/resolveTennisComMatchUrlFromGame.ts
+init_define_import_meta_env();
+
 // ../grarf/desktop/src/lib/gameCardNavigation/gameCardNavigation.ts
 init_define_import_meta_env();
 
@@ -21505,7 +21508,8 @@ var STREAM_URL_CHANNEL_MAPPINGS2 = [
   { domains: ["espn.com"], label: "ESPN+", pathPattern: /\/watch\/player(?:\/|\?)/i },
   { domains: ["tv.apple.com"], label: "Apple TV" },
   { domains: ["usanetwork.com"], label: "USA Network" },
-  { domains: ["tntdrama.com"], label: "TNT" }
+  { domains: ["tntdrama.com"], label: "TNT" },
+  { domains: ["tbs.com"], label: "TBS" }
 ];
 function normalizeStreamHostname2(streamUrl) {
   try {
