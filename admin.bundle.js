@@ -29926,6 +29926,7 @@ var FOTMOB_SOCCER_LEAGUE_REGISTRY = {
   BRA1: { fotmobPrimaryLeagueIds: [268], fotmobCountryCode: "BRA" },
   BUNDESLIGA: { fotmobPrimaryLeagueIds: [54], fotmobCountryCode: "GER" },
   CARABAO_CUP: { fotmobPrimaryLeagueIds: [133], fotmobCountryCode: "ENG" },
+  CHAMPIONSHIP: { fotmobPrimaryLeagueIds: [48], fotmobCountryCode: "ENG" },
   CLUBWC: { fotmobPrimaryLeagueIds: [78] },
   CLUBFRIENDLY: { fotmobPrimaryLeagueIds: [489] },
   CONCACAF_CAC: { fotmobPrimaryLeagueIds: [9682] },
