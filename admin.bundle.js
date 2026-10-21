@@ -15078,7 +15078,7 @@ var SPORTS_BROWSER_PROTOTYPE_SIDEBAR_LEAGUES_ACTIVE_POPULATION = [
   { key: "SUPERLIG", label: "S\xDCPER LIG" },
   { key: "swimming", label: "Swimming" },
   { key: "USATF", label: "Track & Field" },
-  { key: "US_OPEN_CUP", label: "U.S. OPEN CUP" },
+  { key: "US_OPEN_CUP", label: "U.S. Open Cup" },
   { key: "UCL", label: "UEFA CHAMPIONS LEAGUE" },
   { key: "UECL", label: "UEFA CONFERENCE LEAGUE" },
   { key: "EURO", label: "UEFA EURO" },
@@ -15103,9 +15103,11 @@ var SIDEBAR_LEAGUES_KEY_DISPLAY_OVERRIDES = {
   SAUDI: "Saudi Pro League",
   NASCAR: "NASCAR Cup Series",
   NASCAR_XFINITY: "NASCAR Xfinity Series",
-  NASCAR_TRUCK: "NASCAR Trucks"
+  NASCAR_TRUCK: "NASCAR Trucks",
+  US_OPEN_CUP: "U.S. Open Cup"
 };
 var SIDEBAR_LEAGUES_DISPLAY_LABEL_OVERRIDES = {
+  "U.S. OPEN CUP": "U.S. Open Cup",
   "LIGA MX": "Liga MX",
   EUROLEAGUE: "EuroLeague",
   "CAF CHAMPIONS LEAGUE": "CAF Champions League",
@@ -15222,6 +15224,7 @@ var GAMES_SPINE_LEAGUE_DISPLAY_LABEL = {
   WIMBLEDON_MEN: "Wimbledon (Men's)",
   WIMBLEDON_WOMEN: "Wimbledon (Women's)",
   US_OPEN_TENNIS: "U.S. Open",
+  US_OPEN_CUP: "U.S. Open Cup",
   USATF: "Track & Field"
 };
 function resolveManualGamesSpineLeagueDisplayName(games) {
@@ -19683,6 +19686,12 @@ init_define_import_meta_env();
 // ../grarf/desktop/src/lib/broadcast/gameBroadcastDisplay.ts
 init_define_import_meta_env();
 
+// ../grarf/desktop/src/lib/broadcast/selectNbaDisplayBroadcastLabel.ts
+init_define_import_meta_env();
+
+// ../grarf/shared/domain/broadcast/nbaLeaguePassBroadcast.ts
+init_define_import_meta_env();
+
 // ../grarf/desktop/src/lib/broadcast/resolveChannelLogoUrl.ts
 init_define_import_meta_env();
 
@@ -21452,6 +21461,7 @@ var CHANNEL_LOGO_BY_LABEL = {
   "TENNIS CHANNEL+": "/league-logos/channel-tennis-channel.png",
   "PRIME VIDEO": "/league-logos/channel-prime-video.png",
   PRIME: "/league-logos/channel-prime-video.png",
+  "NBA LEAGUE PASS": "/league-logos/channel-nba-league-pass.png",
   "WNBA LEAGUE PASS": "/league-logos/channel-wnba-league-pass.png",
   "GOLF CHANNEL": "/league-logos/channel-golf-channel.png",
   "GOLF CHNL": "/league-logos/channel-golf-channel.png",
@@ -21485,7 +21495,10 @@ function resolveChannelLogoUrl2(channelLabel) {
   if (key === "PRIME") return CHANNEL_LOGO_BY_LABEL.PRIME ?? null;
   if (/^USA(\s+NET(WORK)?)?$/.test(key)) return CHANNEL_LOGO_BY_LABEL.USA ?? null;
   if (isNbaTvBroadcastLabel2(key)) return CHANNEL_LOGO_BY_LABEL["NBA TV"] ?? null;
-  if (/\bWNBA\s+LEAGUE\s+PASS\b/.test(key) || key === "LEAGUE PASS") {
+  if (/\bNBA\s+LEAGUE\s+PASS\b/.test(key) || key === "NBA LEAGUE PASS") {
+    return CHANNEL_LOGO_BY_LABEL["NBA LEAGUE PASS"] ?? null;
+  }
+  if (/\bWNBA\s+LEAGUE\s+PASS\b/.test(key)) {
     return CHANNEL_LOGO_BY_LABEL["WNBA LEAGUE PASS"] ?? null;
   }
   if (/\bNFL\s+NETWORK\b/.test(key) || key === "NFLN") {
@@ -27607,6 +27620,9 @@ async function fetchUelPreviewArticleUrlIndexes(fetchImpl = fetch) {
 // ../grarf/shared/domain/soccer/matchSportsMoleUelPreviewArticleUrlToGame.ts
 init_define_import_meta_env();
 
+// ../grarf/shared/domain/soccer/matchSportsMolePreviewArticleUrlToGame.ts
+init_define_import_meta_env();
+
 // ../grarf/shared/domain/soccer/matchYahooSportsSoccerPreviewArticleUrlToGame.ts
 init_define_import_meta_env();
 
@@ -27628,7 +27644,15 @@ var YAHOO_SOCCER_TEAM_SLUG_ALIASES = {
   "olympiacos": ["olympiakos"],
   "olympiakos": ["olympiacos"],
   "lillestrom": ["lillestroem"],
-  "union gilloise": ["union-saint-gilloise", "union-sg"]
+  "union gilloise": ["union-saint-gilloise", "union-sg"],
+  "athletic club": ["athletic-bilbao", "athletic"],
+  "athletic bilbao": ["athletic"],
+  "club brugge": ["brugge"],
+  "club brugge kv": ["brugge"],
+  "rc lens": ["lens"],
+  "sporting cp": ["sporting-lisbon", "sporting"],
+  "sporting lisbon": ["sporting-lisbon", "sporting"],
+  "lask linz": ["lask"]
 };
 function slugTokensForOperationalTeam(teamName) {
   const trimmed = String(teamName ?? "").trim();
@@ -27637,7 +27661,12 @@ function slugTokensForOperationalTeam(teamName) {
   const aliasKey = trimmed.toLowerCase();
   const aliases = YAHOO_SOCCER_TEAM_SLUG_ALIASES[aliasKey] ?? [];
   const tokens = /* @__PURE__ */ new Set();
-  if (base) tokens.add(base);
+  if (base) {
+    tokens.add(base);
+    for (const part of base.split("-")) {
+      if (part.length >= 4) tokens.add(part);
+    }
+  }
   for (const alias of aliases) {
     const slug = slugifyYahooSportsSoccerTeamToken(alias);
     if (slug) tokens.add(slug);
@@ -27662,20 +27691,30 @@ function matchYahooSportsSoccerPreviewArticleUrlToGame(previewUrl, game) {
   return slugContainsAnyTeamToken(slug, awayTokens) && slugContainsAnyTeamToken(slug, homeTokens);
 }
 
-// ../grarf/shared/domain/soccer/matchSportsMoleUelPreviewArticleUrlToGame.ts
-function matchSportsMoleUelPreviewArticleUrlToGame(previewUrl, game) {
-  if (!isSportsMoleUelPreviewArticleUrl(previewUrl)) return false;
+// ../grarf/shared/domain/soccer/matchSportsMolePreviewArticleUrlToGame.ts
+function matchSportsMolePreviewArticleUrlToGame(previewUrl, game) {
   let pathname = "";
   try {
-    pathname = new URL(previewUrl.trim()).pathname;
+    const parsed = new URL(previewUrl.trim());
+    if (parsed.protocol !== "https:" || parsed.hostname !== "www.sportsmole.co.uk") {
+      return false;
+    }
+    pathname = parsed.pathname;
   } catch {
     return false;
   }
+  if (!pathname.includes("/preview/") || !pathname.endsWith(".html")) return false;
   const slugMatch = pathname.match(/\/preview\/([^/]+?)(?:-prediction|_)/i);
   const slugPart3 = slugMatch?.[1]?.trim().toLowerCase();
   if (!slugPart3) return false;
   const pseudoYahooUrl = `https://sports.yahoo.com/articles/preview-${slugPart3}.html`;
   return matchYahooSportsSoccerPreviewArticleUrlToGame(pseudoYahooUrl, game);
+}
+
+// ../grarf/shared/domain/soccer/matchSportsMoleUelPreviewArticleUrlToGame.ts
+function matchSportsMoleUelPreviewArticleUrlToGame(previewUrl, game) {
+  if (!isSportsMoleUelPreviewArticleUrl(previewUrl)) return false;
+  return matchSportsMolePreviewArticleUrlToGame(previewUrl, game);
 }
 
 // ../grarf/shared/domain/soccer/discoverUelPreviewArticleUrlFromGame.ts
