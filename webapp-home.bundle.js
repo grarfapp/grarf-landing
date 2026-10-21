@@ -67625,7 +67625,9 @@ function buildTeamAliasTerms(game, side) {
     }
   }
   if (terms.has("athletics")) terms.add("a s");
-  return expandHighlightTitleAliasTerms([...terms]);
+  const leagueKey = String(game.league ?? "").trim().toUpperCase();
+  const aliasGroups = leagueKey === "NCAAF" ? [...HIGHLIGHT_TITLE_TEAM_ALIAS_GROUPS, ...NCAAF_HIGHLIGHT_TITLE_TEAM_ALIAS_GROUPS] : HIGHLIGHT_TITLE_TEAM_ALIAS_GROUPS;
+  return expandHighlightTitleAliasTerms([...terms], aliasGroups);
 }
 var HIGHLIGHT_TITLE_TEAM_ALIAS_GROUPS = [
   ["vienna", "austria wien"],
@@ -67648,10 +67650,14 @@ var HIGHLIGHT_TITLE_TEAM_ALIAS_GROUPS = [
   ["dominican rep", "dominican republic"],
   ["usa", "united states"]
 ];
-function expandHighlightTitleAliasTerms(terms) {
+var NCAAF_HIGHLIGHT_TITLE_TEAM_ALIAS_GROUPS = [
+  ["middle tennessee", "middle tennessee state", "middle tennessee st", "mtsu"],
+  ["fiu", "florida international", "florida international university"]
+];
+function expandHighlightTitleAliasTerms(terms, aliasGroups = HIGHLIGHT_TITLE_TEAM_ALIAS_GROUPS) {
   const expanded = new Set(terms);
   for (const term of terms) {
-    for (const group of HIGHLIGHT_TITLE_TEAM_ALIAS_GROUPS) {
+    for (const group of aliasGroups) {
       const normalizedGroup = group.map((entry4) => normalizeTeamToken(entry4)).filter((entry4) => entry4.length >= 3);
       const termMatchesGroup = normalizedGroup.some(
         (alias) => alias === term || term.includes(alias) || alias.includes(term)
@@ -161952,131 +161958,6 @@ async function resolveGrarfExtensionF1YoutubeHighlightWatchUrl(game) {
 // ../grarf/desktop/src/extensionHost/grarfExtensionNcaafYoutubeHighlightsResolver.ts
 init_define_import_meta_env();
 init_operationalIngestConfig();
-var PLAYLIST_CACHE_TTL_MS2 = 5 * 60 * 1e3;
-var PLAYLIST_DATA_PATH2 = "/clips/youtube-playlist-data";
-var MIN_DATE_PROXIMITY_SCORE = 6;
-var GRARF_EXTENSION_NCAAF_HIGHLIGHTS_PLAYLIST_SOURCES = [
-  {
-    playlistId: "PLPydJJjt7Pb4",
-    titleMustInclude: "full game highlights",
-    titlePatterns: ["full game highlights"]
-  },
-  {
-    playlistId: "PLP0Fz1N6G1_Q",
-    titlePatterns: ["highlight", "highlights"]
-  },
-  {
-    playlistId: "PLPXoZtP3i9_M",
-    titlePatterns: ["highlight", "highlights"]
-  },
-  {
-    playlistId: "PLJ75dwhkx9mQ",
-    titleMustInclude: "game highlights",
-    titlePatterns: ["game highlights"]
-  },
-  {
-    playlistId: "PLtKVUJ3gZpTu0ApQHGUVeZa-tez87ucO6",
-    titleMustInclude: "extended highlights",
-    titlePatterns: ["extended highlights"]
-  },
-  {
-    playlistId: "PLJK_pu_CGLbs",
-    titleMustInclude: "full game highlights",
-    titlePatterns: ["full game highlights"]
-  },
-  {
-    playlistId: "PLAmCPDg0M6go",
-    titlePatterns: ["highlight", "highlights"]
-  }
-];
-var playlistItemsCache = /* @__PURE__ */ new Map();
-function grarfExtensionLeagueUsesNcaafYoutubePlaylistHighlights(leagueKey) {
-  return leagueKey.trim().toUpperCase() === "NCAAF";
-}
-function resolveNcaafHighlightResolverGame(game) {
-  const payload = resolveLeagueHighlightGamePayload(game);
-  const operationalDateKey = resolveGameOperationalDateKey(game);
-  return operationalDateKey ? { ...payload, scheduledDateKey: operationalDateKey } : payload;
-}
-function titleMatchesGameDay(title, game) {
-  const gameDayKey = resolveGameDayKey(game);
-  if (!gameDayKey) return true;
-  const parsed = parseMlbGameHighlightTitleDate(title, gameDayKey);
-  if (parsed != null && parsed === gameDayKey) return true;
-  return false;
-}
-async function fetchPlaylistItems(playlistId) {
-  const cached = playlistItemsCache.get(playlistId);
-  if (cached && Date.now() - cached.at < PLAYLIST_CACHE_TTL_MS2) {
-    return cached.items;
-  }
-  const cloudBase = getOperationalIngestConfig().cloudBaseUrl?.replace(/\/$/, "");
-  if (!cloudBase) {
-    throw new Error("operational_ingest_url_unconfigured");
-  }
-  const url = `${cloudBase}${PLAYLIST_DATA_PATH2}/${encodeURIComponent(playlistId)}`;
-  const res = await fetch(url, {
-    headers: { Accept: "application/json" },
-    cache: "no-store"
-  });
-  if (!res.ok) {
-    throw new Error(`youtube_playlist_data_${res.status || "fetch_failed"}`);
-  }
-  const data2 = await res.json();
-  const items = (data2.items ?? []).filter((item) => {
-    return typeof item.videoId === "string" && item.videoId.length > 0;
-  }).map((item) => ({
-    videoId: item.videoId,
-    title: typeof item.title === "string" ? item.title : "",
-    publishedAt: typeof item.publishedAt === "string" ? item.publishedAt : ""
-  }));
-  playlistItemsCache.set(playlistId, { at: Date.now(), items });
-  return items;
-}
-function resolveBestWatchUrlInPlaylist(game, items, source) {
-  const mustInclude = source.titleMustInclude?.toLowerCase();
-  let best = null;
-  for (const item of items) {
-    const title = item.title.trim();
-    if (!title) continue;
-    if (mustInclude && !title.toLowerCase().includes(mustInclude)) {
-      continue;
-    }
-    const titleScore = scoreTitleAgainstGame(title, game, [...source.titlePatterns]);
-    if (!titleScore.teamMatch || !titleScore.highlightKeyword) {
-      continue;
-    }
-    const proximity = scoreDateProximity(game, item.publishedAt);
-    if (!titleMatchesGameDay(title, game) && proximity.score < MIN_DATE_PROXIMITY_SCORE) {
-      continue;
-    }
-    const publishedMs = Date.parse(item.publishedAt || "");
-    if (!Number.isFinite(publishedMs) || publishedMs <= 0) {
-      continue;
-    }
-    const rawScore = MIN_STRONG_MATCH_SCORE + 2 + proximity.score;
-    const url = `https://www.youtube.com/watch?v=${encodeURIComponent(item.videoId)}`;
-    if (!best || publishedMs > best.publishedMs || publishedMs === best.publishedMs && rawScore > best.rawScore) {
-      best = { url, publishedMs, rawScore };
-    }
-  }
-  return best?.url ?? null;
-}
-async function resolveGrarfExtensionNcaafYoutubeHighlightWatchUrl(game) {
-  const leagueKey = game.league?.trim().toUpperCase() ?? "";
-  if (leagueKey !== "NCAAF") {
-    return null;
-  }
-  const resolverGame = resolveNcaafHighlightResolverGame(game);
-  for (const source of GRARF_EXTENSION_NCAAF_HIGHLIGHTS_PLAYLIST_SOURCES) {
-    const items = await fetchPlaylistItems(source.playlistId);
-    const watchUrl = resolveBestWatchUrlInPlaylist(resolverGame, items, source);
-    if (watchUrl) {
-      return watchUrl;
-    }
-  }
-  return null;
-}
 
 // ../grarf/desktop/src/extensionHost/grarfExtensionPlaylistYoutubeHighlightsResolver.ts
 init_define_import_meta_env();
@@ -162431,8 +162312,8 @@ function matchGrarfExtensionOfficialYoutubeHighlightForGame(entries, game, leagu
 }
 
 // ../grarf/desktop/src/extensionHost/grarfExtensionPlaylistYoutubeHighlightsResolver.ts
-var PLAYLIST_CACHE_TTL_MS3 = 5 * 60 * 1e3;
-var PLAYLIST_DATA_PATH3 = "/clips/youtube-playlist-data";
+var PLAYLIST_CACHE_TTL_MS2 = 5 * 60 * 1e3;
+var PLAYLIST_DATA_PATH2 = "/clips/youtube-playlist-data";
 var GRARF_EXTENSION_YOUTUBE_HIGHLIGHTS_PLAYLIST_BY_LEAGUE = {
   MLB: MLB_HIGHLIGHTS_PLAYLIST_ID,
   NHL: "PLXgxFhEvLHE0",
@@ -162445,7 +162326,6 @@ var GRARF_EXTENSION_YOUTUBE_HIGHLIGHTS_PLAYLIST_BY_LEAGUE = {
   UEL: "PLJrSgXxwLS0s",
   "FA-CUP": "PLdBljId7entg",
   CARABAO_CUP: "PLJupd9Dz01NM",
-  CHAMPIONSHIP: "PLfsa9MRGOEDM",
   SPFL: "PLdGKoQKwJWZQ",
   RUGBYPREM: "UULbW1klIl3T1XCp8hHYZGMw",
   WNBA: "PLIHqPSYoErfw",
@@ -162456,7 +162336,11 @@ var GRARF_EXTENSION_YOUTUBE_HIGHLIGHTS_CHANNEL_ID_BY_LEAGUE = {
   ARG1: "UCJmCVoUfCBQb9lcfXIS8nXQ",
   SUPERLIG: "UCNopxUNUMinlK3ybMGlpbGQ",
   /** https://www.youtube.com/@NBA/videos */
-  NBA: "UCWJ2lWNubArHWmf3FIHbfcQ"
+  NBA: "UCWJ2lWNubArHWmf3FIHbfcQ",
+  /** https://www.youtube.com/@theEFL/videos */
+  CHAMPIONSHIP: "UCCmo_NIuQR5eU4AvBa6sEQQ",
+  /** https://www.youtube.com/@ligabbvamx/videos */
+  LIGAMX: "UCq8BPLXtFeiSFOvmJrknWGg"
 };
 var GRARF_EXTENSION_NWSL_YOUTUBE_CHANNEL_ID = "UCL4xu08EDu0ZFZsBJUB0chw";
 function resolveGrarfExtensionYoutubeChannelUploadsPlaylistId(channelId) {
@@ -162478,7 +162362,8 @@ var EXTENSION_PLAYLIST_HIGHLIGHT_TITLE_PATTERNS_BY_LEAGUE = {
   BRA1: ["highlight", "highlights", "melhores momentos", "melhores"],
   POR1: ["resumo", "highlight", "highlights"],
   ARG1: ["resumen", "highlight", "highlights"],
-  SUPERLIG: ["ozet", "\xF6zeti", "mac ozeti", "highlight", "highlights"]
+  SUPERLIG: ["ozet", "\xF6zeti", "mac ozeti", "highlight", "highlights"],
+  LIGAMX: ["resumen", "highlight", "highlights", "goles"]
 };
 function resolveExtensionPlaylistHighlightTitlePatterns(leagueKey) {
   const patterns = EXTENSION_PLAYLIST_HIGHLIGHT_TITLE_PATTERNS_BY_LEAGUE[leagueKey];
@@ -162489,14 +162374,14 @@ var playlistEntitiesCache = /* @__PURE__ */ new Map();
 async function fetchHighlightPlaylistEntities(leagueKey, playlistId) {
   const cacheKey3 = `${leagueKey}:${playlistId}`;
   const cached = playlistEntitiesCache.get(cacheKey3);
-  if (cached && Date.now() - cached.at < PLAYLIST_CACHE_TTL_MS3) {
+  if (cached && Date.now() - cached.at < PLAYLIST_CACHE_TTL_MS2) {
     return cached.entities;
   }
   const cloudBase = getOperationalIngestConfig().cloudBaseUrl?.replace(/\/$/, "");
   if (!cloudBase) {
     throw new Error("operational_ingest_url_unconfigured");
   }
-  const url = `${cloudBase}${PLAYLIST_DATA_PATH3}/${encodeURIComponent(playlistId)}`;
+  const url = `${cloudBase}${PLAYLIST_DATA_PATH2}/${encodeURIComponent(playlistId)}`;
   const res = await fetch(url, {
     headers: { Accept: "application/json" },
     cache: "no-store"
@@ -162521,7 +162406,7 @@ function resolveExtensionHighlightResolverGame(game) {
   const operationalDateKey = resolveGameOperationalDateKey(game);
   return operationalDateKey ? { ...payload, scheduledDateKey: operationalDateKey } : payload;
 }
-function titleMatchesGameDay2(leagueKey, title, game) {
+function titleMatchesGameDay(leagueKey, title, game) {
   if (leagueKey === "MLB") {
     return mlbGameHighlightTitleMatchesGameDay(title, game);
   }
@@ -162665,11 +162550,11 @@ function resolvePlaylistYoutubeHighlightsForGame(leagueKey, game, entities) {
     if (!extensionPlaylistTitleMatchesGame(leagueKey, title, game, titlePatterns)) {
       continue;
     }
-    if (leagueKey === "MLB" && !titleMatchesGameDay2(leagueKey, title, game)) {
+    if (leagueKey === "MLB" && !titleMatchesGameDay(leagueKey, title, game)) {
       continue;
     }
     const proximity = scoreDateProximity(game, entity.publishedAt);
-    if (!titleMatchesGameDay2(leagueKey, title, game) && proximity.score < minDateProximityScore) {
+    if (!titleMatchesGameDay(leagueKey, title, game) && proximity.score < minDateProximityScore) {
       continue;
     }
     const publishedMs = Date.parse(entity.publishedAt || "");
@@ -162704,6 +162589,140 @@ async function resolveGrarfExtensionPlaylistYoutubeHighlightWatchUrl(game) {
   }
   const resolverGame = resolveExtensionHighlightResolverGame(game);
   return resolvePlaylistYoutubeHighlightsForGame(leagueKey, resolverGame, entities);
+}
+
+// ../grarf/desktop/src/extensionHost/grarfExtensionNcaafYoutubeHighlightsResolver.ts
+var PLAYLIST_CACHE_TTL_MS3 = 5 * 60 * 1e3;
+var PLAYLIST_DATA_PATH3 = "/clips/youtube-playlist-data";
+var MIN_DATE_PROXIMITY_SCORE = 6;
+var GRARF_EXTENSION_NCAAF_CBS_SPORTS_CFB_YOUTUBE_CHANNEL_ID = "UCLzocFrP98gfI5W2LD7Ux-w";
+var GRARF_EXTENSION_NCAAF_HIGHLIGHTS_PLAYLIST_SOURCES = [
+  {
+    playlistId: "PLPydJJjt7Pb4",
+    titleMustInclude: "full game highlights",
+    titlePatterns: ["full game highlights"]
+  },
+  {
+    playlistId: "PLP0Fz1N6G1_Q",
+    titlePatterns: ["highlight", "highlights"]
+  },
+  {
+    playlistId: "PLPXoZtP3i9_M",
+    titlePatterns: ["highlight", "highlights"]
+  },
+  {
+    playlistId: "PLJ75dwhkx9mQ",
+    titleMustInclude: "game highlights",
+    titlePatterns: ["game highlights"]
+  },
+  {
+    playlistId: "PLtKVUJ3gZpTu0ApQHGUVeZa-tez87ucO6",
+    titleMustInclude: "extended highlights",
+    titlePatterns: ["extended highlights"]
+  },
+  {
+    playlistId: "PLJK_pu_CGLbs",
+    titleMustInclude: "full game highlights",
+    titlePatterns: ["full game highlights"]
+  },
+  {
+    playlistId: "PLAmCPDg0M6go",
+    titlePatterns: ["highlight", "highlights"]
+  },
+  {
+    playlistId: resolveGrarfExtensionYoutubeChannelUploadsPlaylistId(
+      GRARF_EXTENSION_NCAAF_CBS_SPORTS_CFB_YOUTUBE_CHANNEL_ID
+    ),
+    titlePatterns: ["highlight", "highlights"]
+  }
+];
+var playlistItemsCache = /* @__PURE__ */ new Map();
+function grarfExtensionLeagueUsesNcaafYoutubePlaylistHighlights(leagueKey) {
+  return leagueKey.trim().toUpperCase() === "NCAAF";
+}
+function resolveNcaafHighlightResolverGame(game) {
+  const payload = resolveLeagueHighlightGamePayload(game);
+  const operationalDateKey = resolveGameOperationalDateKey(game);
+  return operationalDateKey ? { ...payload, scheduledDateKey: operationalDateKey } : payload;
+}
+function titleMatchesGameDay2(title, game) {
+  const gameDayKey = resolveGameDayKey(game);
+  if (!gameDayKey) return true;
+  const parsed = parseMlbGameHighlightTitleDate(title, gameDayKey);
+  if (parsed != null && parsed === gameDayKey) return true;
+  return false;
+}
+async function fetchPlaylistItems(playlistId) {
+  const cached = playlistItemsCache.get(playlistId);
+  if (cached && Date.now() - cached.at < PLAYLIST_CACHE_TTL_MS3) {
+    return cached.items;
+  }
+  const cloudBase = getOperationalIngestConfig().cloudBaseUrl?.replace(/\/$/, "");
+  if (!cloudBase) {
+    throw new Error("operational_ingest_url_unconfigured");
+  }
+  const url = `${cloudBase}${PLAYLIST_DATA_PATH3}/${encodeURIComponent(playlistId)}`;
+  const res = await fetch(url, {
+    headers: { Accept: "application/json" },
+    cache: "no-store"
+  });
+  if (!res.ok) {
+    throw new Error(`youtube_playlist_data_${res.status || "fetch_failed"}`);
+  }
+  const data2 = await res.json();
+  const items = (data2.items ?? []).filter((item) => {
+    return typeof item.videoId === "string" && item.videoId.length > 0;
+  }).map((item) => ({
+    videoId: item.videoId,
+    title: typeof item.title === "string" ? item.title : "",
+    publishedAt: typeof item.publishedAt === "string" ? item.publishedAt : ""
+  }));
+  playlistItemsCache.set(playlistId, { at: Date.now(), items });
+  return items;
+}
+function resolveBestWatchUrlInPlaylist(game, items, source) {
+  const mustInclude = source.titleMustInclude?.toLowerCase();
+  let best = null;
+  for (const item of items) {
+    const title = item.title.trim();
+    if (!title) continue;
+    if (mustInclude && !title.toLowerCase().includes(mustInclude)) {
+      continue;
+    }
+    const titleScore = scoreTitleAgainstGame(title, game, [...source.titlePatterns]);
+    if (!titleScore.teamMatch || !titleScore.highlightKeyword) {
+      continue;
+    }
+    const proximity = scoreDateProximity(game, item.publishedAt);
+    if (!titleMatchesGameDay2(title, game) && proximity.score < MIN_DATE_PROXIMITY_SCORE) {
+      continue;
+    }
+    const publishedMs = Date.parse(item.publishedAt || "");
+    if (!Number.isFinite(publishedMs) || publishedMs <= 0) {
+      continue;
+    }
+    const rawScore = MIN_STRONG_MATCH_SCORE + 2 + proximity.score;
+    const url = `https://www.youtube.com/watch?v=${encodeURIComponent(item.videoId)}`;
+    if (!best || publishedMs > best.publishedMs || publishedMs === best.publishedMs && rawScore > best.rawScore) {
+      best = { url, publishedMs, rawScore };
+    }
+  }
+  return best?.url ?? null;
+}
+async function resolveGrarfExtensionNcaafYoutubeHighlightWatchUrl(game) {
+  const leagueKey = game.league?.trim().toUpperCase() ?? "";
+  if (leagueKey !== "NCAAF") {
+    return null;
+  }
+  const resolverGame = resolveNcaafHighlightResolverGame(game);
+  for (const source of GRARF_EXTENSION_NCAAF_HIGHLIGHTS_PLAYLIST_SOURCES) {
+    const items = await fetchPlaylistItems(source.playlistId);
+    const watchUrl = resolveBestWatchUrlInPlaylist(resolverGame, items, source);
+    if (watchUrl) {
+      return watchUrl;
+    }
+  }
+  return null;
 }
 
 // ../grarf/desktop/src/extensionHost/grarfExtensionUefaNationsLeagueHighlightsResolver.ts
@@ -186512,7 +186531,11 @@ function GrarfExtensionAiSearchHomeSection({
   return /* @__PURE__ */ (0, import_jsx_runtime297.jsxs)(
     "section",
     {
-      className: cn2("grarf-extension-ai-search-home flex min-h-0 flex-1 flex-col", className),
+      className: cn2(
+        "grarf-extension-ai-search-home flex flex-col",
+        inlineSearchResultActive ? "shrink-0" : "min-h-0 flex-1",
+        className
+      ),
       "data-grarf-extension-ai-search-home": "",
       "data-grarf-extension-ai-search-home-inline-result-active": inlineSearchResultActive ? "" : void 0,
       "aria-label": "AI Search",
@@ -192503,6 +192526,16 @@ function SportsBrowserPrototypeLeftNav({
   const [aiSearchTemporaryNavRequest, setAiSearchTemporaryNavRequest] = (0, import_react326.useState)(null);
   const sidebarScrollContainerRef = (0, import_react326.useRef)(null);
   const extensionHomeScrollRef = (0, import_react326.useRef)(null);
+  (0, import_react326.useEffect)(() => {
+    if (!isGrarfExtensionRenderer() || !aiSearchInlineSearchResultActive) return;
+    const homePage = extensionHomeScrollRef.current;
+    if (!homePage) return;
+    homePage.scrollTop = 0;
+  }, [
+    aiSearchInlineLeagueExploreFocus,
+    aiSearchInlineSearchResultActive,
+    aiSearchInlineTemporalFocus
+  ]);
   const extensionBrowseScrollRef = (0, import_react326.useRef)(null);
   const extensionTimelinePageRef = (0, import_react326.useRef)(null);
   const extensionSidePanelPageNavigation = isGrarfExtensionSidePanelPageNavigation();
@@ -192862,6 +192895,8 @@ function SportsBrowserPrototypeLeftNav({
                           "flex min-h-0 flex-1 flex-col overflow-hidden",
                           aiSearchInlineSearchResultActive && "overflow-hidden"
                         ),
+                        "data-grarf-extension-ai-search-home-page": "",
+                        "data-grarf-extension-ai-search-home-inline-result-active": aiSearchInlineSearchResultActive ? "" : void 0,
                         children: [
                           /* @__PURE__ */ (0, import_jsx_runtime313.jsx)(
                             GrarfExtensionAiSearchHomeSection,
