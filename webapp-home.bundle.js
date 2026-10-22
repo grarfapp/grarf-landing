@@ -188295,6 +188295,16 @@ function listGrarfExtensionLeagueCatchUpSectionNavModeOptions(snapshot2 = getGra
   }
   return ["TODAY", "NOW", "NEXT", "RECAPS"];
 }
+function resolveGrarfExtensionLeagueCatchUpSectionNavActiveLabel(snapshot2, temporalMode) {
+  const section = snapshot2.leaguesLensSection?.trim().toLowerCase() ?? null;
+  const leaguesLensActive = snapshot2.temporaryNavTopLevel.trim().toUpperCase() === "LEAGUES" || section != null;
+  if (leaguesLensActive) {
+    if (section === "news") return "NEWS";
+    if (section === "standings") return "STANDINGS";
+    if (section === "stats") return "STATS";
+  }
+  return temporalMode;
+}
 function resolveGrarfExtensionLeagueCatchUpSectionNavMode(snapshot2 = getGrarfExtensionGamesYesterdayHighlightsNavSnapshot()) {
   if (snapshot2.temporaryNavTopLevel === "GAMES" && snapshot2.gamesSelector2Label.trim().toUpperCase() === "YESTERDAY") {
     return "RECAPS";
@@ -188529,7 +188539,10 @@ var GRARF_EXTENSION_NCAAF_LEAGUE_CATCH_UP_SECTION_NAV_PREVIEW_ITEMS = [
 
 // ../grarf/desktop/src/extensionHost/GrarfExtensionNcaafLeagueCatchUpSectionNavPreview.tsx
 var import_jsx_runtime307 = __toESM(require_jsx_runtime(), 1);
-function GrarfExtensionNcaafLeagueCatchUpSectionNavPreview({ leagueKey }) {
+function GrarfExtensionNcaafLeagueCatchUpSectionNavPreview({
+  leagueKey,
+  activeNavLabel
+}) {
   const subheaderActions = useGrarfExtensionTemporalLeagueSubheaderActions();
   return /* @__PURE__ */ (0, import_jsx_runtime307.jsx)(import_jsx_runtime307.Fragment, { children: GRARF_EXTENSION_NCAAF_LEAGUE_CATCH_UP_SECTION_NAV_PREVIEW_ITEMS.map((label) => /* @__PURE__ */ (0, import_jsx_runtime307.jsx)(
     "div",
@@ -188540,7 +188553,10 @@ function GrarfExtensionNcaafLeagueCatchUpSectionNavPreview({ leagueKey }) {
         "button",
         {
           type: "button",
-          className: "grarf-extension-ncaaf-league-catch-up-section-nav-preview-item",
+          className: cn2(
+            "grarf-extension-ncaaf-league-catch-up-section-nav-preview-item",
+            activeNavLabel === label && "grarf-extension-league-catch-up-section-nav-item-active"
+          ),
           "data-grarf-extension-ncaaf-league-catch-up-section-nav-preview-item": "",
           onClick: (event) => {
             event.stopPropagation();
@@ -188814,6 +188830,9 @@ function GrarfExtensionTemporalLeagueCatchUpContentRow({
   const showEplRecapsSourcePills = showRecapsSourcePills && normalizedLeagueKey === "EPL";
   const showNcaafRecapsSourcePills = showRecapsSourcePills && normalizedLeagueKey === "NCAAF";
   const showUclRecapsSourcePills = showRecapsSourcePills && normalizedLeagueKey === "UCL";
+  const hasRecapSourcePills = showNhlRecapsSourcePills || showEplRecapsSourcePills || showNcaafRecapsSourcePills || showUclRecapsSourcePills;
+  const activeNavLabel = resolveGrarfExtensionLeagueCatchUpSectionNavActiveLabel(snapshot2, activeMode);
+  const temporalModeTriggerActive = activeNavLabel === activeMode;
   const showLeagueCatchUpSectionNav = isGrarfExtensionLeagueCatchUpSectionNavPreviewActive(leagueKey);
   const onModeSelect = (next) => {
     if (!isGrarfExtensionLeagueCatchUpSectionNavMode(next)) return;
@@ -188831,7 +188850,10 @@ function GrarfExtensionTemporalLeagueCatchUpContentRow({
       "button",
       {
         type: "button",
-        className: "grarf-extension-temporal-league-content-type-trigger",
+        className: cn2(
+          "grarf-extension-temporal-league-content-type-trigger",
+          temporalModeTriggerActive && "grarf-extension-league-catch-up-section-nav-item-active"
+        ),
         "aria-label": "Temporal mode",
         onClick: (event) => event.stopPropagation(),
         onPointerDown: (event) => event.stopPropagation(),
@@ -188859,7 +188881,8 @@ function GrarfExtensionTemporalLeagueCatchUpContentRow({
     {
       className: cn2(
         "grarf-extension-yesterday-highlights-league-section-label",
-        "grarf-extension-ncaaf-catch-up-section-nav-row"
+        "grarf-extension-ncaaf-catch-up-section-nav-row",
+        hasRecapSourcePills && "grarf-extension-ncaaf-catch-up-section-nav-row--with-recap-source-pills"
       ),
       "data-grarf-extension-yesterday-highlights-section-label": "",
       "data-grarf-extension-temporal-league-catch-up-content-row": "",
@@ -188878,7 +188901,13 @@ function GrarfExtensionTemporalLeagueCatchUpContentRow({
             ] })
           }
         ),
-        /* @__PURE__ */ (0, import_jsx_runtime311.jsx)(GrarfExtensionNcaafLeagueCatchUpSectionNavPreview, { leagueKey })
+        /* @__PURE__ */ (0, import_jsx_runtime311.jsx)(
+          GrarfExtensionNcaafLeagueCatchUpSectionNavPreview,
+          {
+            leagueKey,
+            activeNavLabel
+          }
+        )
       ]
     }
   );
