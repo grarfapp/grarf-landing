@@ -14280,7 +14280,7 @@ var GAMES_COLUMN_LEAGUE_LABEL = {
   UFC: "UFC",
   BOXING: "Boxing",
   USATF: "Track & Field",
-  XFL: "United Football League",
+  XFL: "UFL",
   CRICKET_BBL: "Big Bash League",
   NCAAVB: "NCAA Women's Volleyball",
   NCAAVB_M: "NCAA Men's Volleyball",
@@ -15042,7 +15042,7 @@ var SPORTS_BROWSER_PROTOTYPE_SIDEBAR_LEAGUES_ACTIVE_POPULATION = [
   { key: "MLB", label: "MLB" },
   { key: "RUGB_289262", label: "MAJOR LEAGUE RUGBY" },
   { key: "MLS", label: "MLS" },
-  { key: "MOTOGP", label: "MOTOGP" },
+  { key: "MOTOGP", label: "MotoGP" },
   // { key: "MOTO2", label: "MOTO2" },
   // { key: "MOTO3", label: "MOTO3" },
   { key: "NASCAR", label: "NASCAR CUP SERIES" },
@@ -15102,7 +15102,10 @@ var SIDEBAR_LEAGUES_KEY_DISPLAY_OVERRIDES = {
   LIGAMX: "Liga MX",
   SAUDI: "Saudi Pro League",
   NASCAR: "NASCAR Cup Series",
-  NASCAR_XFINITY: "NASCAR Xfinity Series",
+  NASCAR_XFINITY: "NASCAR O'Reilly Auto Parts Series",
+  MOTOGP: "MotoGP",
+  COPA_BRASIL: "Copa do Brasil",
+  GT_WORLD_CHALLENGE: "GT World Challenge",
   NASCAR_TRUCK: "NASCAR Trucks",
   US_OPEN_CUP: "U.S. Open Cup"
 };
@@ -15127,7 +15130,9 @@ function formatSportsBrowserPrototypeSidebarLeaguesDisplayLabel(rawLabel) {
     "AVP",
     "CAF",
     "CFL",
+    "CONCACAF",
     "DP",
+    "GT",
     "EFL",
     "FA",
     "FIFA",
@@ -15147,7 +15152,10 @@ function formatSportsBrowserPrototypeSidebarLeaguesDisplayLabel(rawLabel) {
     "NCAAF",
     "NFL",
     "NHL",
+    "NHRA",
+    "NPB",
     "NASCAR",
+    "PFL",
     "NWSL",
     "PGA",
     "PLL",
@@ -15159,6 +15167,7 @@ function formatSportsBrowserPrototypeSidebarLeaguesDisplayLabel(rawLabel) {
     "WNBA",
     "WTA",
     "ATP",
+    "UFL",
     "XFL"
   ]);
   return trimmed.split(/\s+/).map((word) => {
@@ -15190,7 +15199,18 @@ init_define_import_meta_env();
 var LEAGUE_PRESENTATION_LABEL_BY_KEY = {
   LIGAMX: "Liga MX",
   SPFL: "SPFL",
-  UFC: "UFC"
+  UFC: "UFC",
+  NASCAR_XFINITY: "NASCAR O'Reilly Auto Parts Series",
+  MOTOGP: "MotoGP",
+  XFL: "UFL",
+  GT_WORLD_CHALLENGE: "GT World Challenge",
+  COPA_BRASIL: "Copa do Brasil",
+  nhra: "NHRA",
+  npb: "NPB",
+  pfl: "PFL",
+  CONCACAF_CL: "CONCACAF Champions Cup",
+  CONCACAF_NG: "CONCACAF Nations League",
+  CONCACAF_CAC: "CONCACAF Central American Cup"
 };
 function formatGrarfLeaguePresentationLabel(leagueKey, fallbackLabel) {
   const key = leagueKey.trim();
@@ -15212,7 +15232,7 @@ var GAMES_SPINE_LEAGUE_DISPLAY_LABEL = {
   MNCAAB: "NCAA Men's Basketball",
   WNCAAB: "NCAA Women's Basketball",
   NASCAR: "NASCAR Cup Series",
-  NASCAR_XFINITY: "NASCAR Xfinity Series",
+  NASCAR_XFINITY: "NASCAR O'Reilly Auto Parts Series",
   NASCAR_TRUCK: "NASCAR Trucks",
   PGA: "PGA Tour",
   SAUDI: "Saudi Pro League",
