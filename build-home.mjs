@@ -116,6 +116,16 @@ const desktopMobileGateGif = path.join(
 );
 const landingMobileGateGif = path.join(__dirname, mobileGateGifName);
 
+const privacySrc = path.resolve(__dirname, "../grarf/site/privacy.html");
+const privacyDest = path.join(__dirname, "privacy.html");
+const privacyIndexDest = path.join(__dirname, "privacy", "index.html");
+if (fs.existsSync(privacySrc)) {
+  fs.copyFileSync(privacySrc, privacyDest);
+  fs.mkdirSync(path.dirname(privacyIndexDest), { recursive: true });
+  fs.copyFileSync(privacySrc, privacyIndexDest);
+  console.log("[build-home] synced privacy.html (and /privacy/index.html)");
+}
+
 if (fs.existsSync(desktopMobileGateGif)) {
   fs.copyFileSync(desktopMobileGateGif, landingMobileGateGif);
   console.log("[build-home] synced", mobileGateGifName, "from desktop/public");
