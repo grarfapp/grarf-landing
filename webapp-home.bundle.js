@@ -19220,6 +19220,7 @@ function resolveGrarfExtensionCbsBrandLogoUrl(options) {
 init_define_import_meta_env();
 init_isGrarfWebRenderer();
 var GRARF_EXTENSION_FOX_BRAND_LOGO_URL = "/league-logos/source-fox-wordmark.png";
+var GRARF_EXTENSION_FOX_SPORTS_BRAND_LOGO_URL = "/league-logos/source-fox-sports.png";
 function normalizeFoxBrandKey(value) {
   return value.trim().replace(/\s+/g, " ").toUpperCase();
 }
@@ -19233,10 +19234,14 @@ function isGrarfExtensionFoxSportsPublisherUrl(url) {
     return false;
   }
 }
+function isGrarfExtensionFoxSportsBrandLabel(label) {
+  const key2 = normalizeFoxBrandKey(label);
+  return key2 === "FOX SPORTS" || key2 === "FOXSPORTS";
+}
 function isGrarfExtensionFoxOrFoxSportsBrandLabel(label) {
   const key2 = normalizeFoxBrandKey(label);
   if (!key2) return false;
-  if (key2 === "FOX" || key2 === "FOX SPORTS") return true;
+  if (key2 === "FOX" || isGrarfExtensionFoxSportsBrandLabel(label)) return true;
   if (/\bFS1\b/.test(key2) || /\bFS2\b/.test(key2)) return false;
   return /\bFOX\b/.test(key2);
 }
@@ -19245,7 +19250,10 @@ function resolveGrarfExtensionFoxBrandLogoUrl(options) {
   const sourceId = options.sourceId?.trim().toLowerCase();
   if (sourceId === "fox") return GRARF_EXTENSION_FOX_BRAND_LOGO_URL;
   if (options.url && isGrarfExtensionFoxSportsPublisherUrl(options.url)) {
-    return GRARF_EXTENSION_FOX_BRAND_LOGO_URL;
+    return GRARF_EXTENSION_FOX_SPORTS_BRAND_LOGO_URL;
+  }
+  if (options.label && isGrarfExtensionFoxSportsBrandLabel(options.label)) {
+    return GRARF_EXTENSION_FOX_SPORTS_BRAND_LOGO_URL;
   }
   if (options.label && isGrarfExtensionFoxOrFoxSportsBrandLabel(options.label)) {
     return GRARF_EXTENSION_FOX_BRAND_LOGO_URL;
@@ -30667,7 +30675,7 @@ function orderSportsBrowserPrototypeNewsSidebarLeagueSlates(slates) {
 // ../grarf/desktop/src/lib/gamesSpine/groupSportsBrowserPrototypeSidebarLeagueSlatesBySoccer.ts
 var SOCCER_SIDEBAR_ARCH_LEAGUE_KEY = "SOCCER";
 var SOCCER_SIDEBAR_ARCH_LEAGUE_LABEL = "SOCCER";
-var SOCCER_SIDEBAR_ARCH_LEAGUE_LOGO_URL = "/league-logos/ball.png";
+var SOCCER_SIDEBAR_ARCH_LEAGUE_LOGO_URL = "/league-logos/soccer-league-ball.png";
 function resolveLeaguePriorityIndex(leagueKey) {
   const index2 = getLeaguePriorityOrder().indexOf(leagueKey);
   return index2 >= 0 ? index2 : Number.MAX_SAFE_INTEGER;
@@ -61927,9 +61935,38 @@ function buildHomeLeagueWorkspaceFantasyCategory(sources) {
 
 // ../grarf/desktop/src/lib/home/websitePaneBranding.ts
 init_define_import_meta_env();
+
+// ../grarf/desktop/src/lib/branding/grarfExtensionTheAthleticBrandLogo.ts
+init_define_import_meta_env();
+init_isGrarfWebRenderer();
+var GRARF_EXTENSION_THE_ATHLETIC_BRAND_LOGO_URL = "/league-logos/partner-the-athletic.png";
+function isTheAthleticPublisherUrl(url) {
+  const trimmed = url.trim();
+  if (!trimmed) return false;
+  try {
+    const parsed = new URL(trimmed);
+    const host = parsed.hostname.toLowerCase();
+    if (host === "theathletic.com" || host.endsWith(".theathletic.com")) return true;
+    if (host === "nytimes.com" || host.endsWith(".nytimes.com")) {
+      return parsed.pathname.toLowerCase().includes("/athletic");
+    }
+    return false;
+  } catch {
+    return false;
+  }
+}
+function resolveGrarfExtensionTheAthleticBrandLogoUrl(url) {
+  if (!isGrarfExtensionRenderer()) return void 0;
+  if (!isTheAthleticPublisherUrl(url)) return void 0;
+  return GRARF_EXTENSION_THE_ATHLETIC_BRAND_LOGO_URL;
+}
+
+// ../grarf/desktop/src/lib/home/websitePaneBranding.ts
 function resolveWebsitePaneSiteIconUrl(url) {
   const extensionFox = resolveGrarfExtensionFoxBrandLogoUrl({ url });
   if (extensionFox) return extensionFox;
+  const athletic = resolveGrarfExtensionTheAthleticBrandLogoUrl(url);
+  if (athletic) return athletic;
   return resolveWebsiteFaviconUrl(url);
 }
 function resolveWebsiteFaviconUrl(url) {
@@ -181335,12 +181372,6 @@ function SportsBrowserPrototypeTemporaryNavTeamContentInlineRows({
 
 // ../grarf/desktop/src/extensionHost/GrarfExtensionNewsLeaguesAllSportsLeagueHeader.tsx
 init_define_import_meta_env();
-
-// ../grarf/desktop/src/lib/branding/allSportsSoccerBallLogoUrl.ts
-init_define_import_meta_env();
-var ALL_SPORTS_SOCCER_BALL_LOGO_URL = "/league-logos/all-sports-soccer-ball.png";
-
-// ../grarf/desktop/src/extensionHost/GrarfExtensionNewsLeaguesAllSportsLeagueHeader.tsx
 var import_jsx_runtime279 = __toESM(require_jsx_runtime(), 1);
 function resolveAllSportsPreviewOutletLogoUrls() {
   return [
@@ -181351,18 +181382,8 @@ function resolveAllSportsPreviewOutletLogoUrls() {
     resolveWebsiteFaviconUrl("https://bleacherreport.com/")
   ].filter((url) => Boolean(url));
 }
-function AllSportsLeagueLogoMark() {
-  return /* @__PURE__ */ (0, import_jsx_runtime279.jsx)(
-    "img",
-    {
-      src: publicAssetUrl(ALL_SPORTS_SOCCER_BALL_LOGO_URL),
-      alt: "",
-      className: "inline-block h-[12px] w-[12px] shrink-0 rounded-[2px] object-contain",
-      "aria-hidden": true,
-      loading: "lazy",
-      decoding: "async"
-    }
-  );
+function AllSportsGlobeLogoMark() {
+  return /* @__PURE__ */ (0, import_jsx_runtime279.jsx)("span", { className: "inline-flex h-[1lh] w-[12px] shrink-0 items-center justify-center", "aria-hidden": true, children: /* @__PURE__ */ (0, import_jsx_runtime279.jsx)(Globe, { size: 10, strokeWidth: 2, className: "shrink-0 text-white" }) });
 }
 function AllSportsPreviewOutletLogos() {
   const logos = resolveAllSportsPreviewOutletLogoUrls();
@@ -181414,7 +181435,7 @@ function GrarfExtensionNewsLeaguesAllSportsLeagueHeader({
       },
       children: [
         /* @__PURE__ */ (0, import_jsx_runtime279.jsxs)("span", { className: "flex min-w-0 flex-1 items-start gap-1", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime279.jsx)(AllSportsLeagueLogoMark, {}),
+          /* @__PURE__ */ (0, import_jsx_runtime279.jsx)(AllSportsGlobeLogoMark, {}),
           /* @__PURE__ */ (0, import_jsx_runtime279.jsx)("span", { className: "min-w-0 flex-1 break-words whitespace-normal", children: "All Sports" })
         ] }),
         /* @__PURE__ */ (0, import_jsx_runtime279.jsxs)("span", { className: "inline-flex h-[1lh] shrink-0 items-center gap-1.5", children: [
@@ -181569,6 +181590,10 @@ function resolveGrarfExtensionNewsLeaguesSourceCardLogoUrl(url) {
   if (isStatMuseHostUrl(url)) {
     return publicAssetUrl(STATMUSE_PARTNER_LOGO_URL);
   }
+  const paneIcon = resolveWebsitePaneSiteIconUrl(url);
+  if (paneIcon) {
+    return paneIcon.startsWith("http") ? paneIcon : publicAssetUrl(paneIcon);
+  }
   return resolveWebsiteFaviconUrl(url);
 }
 
@@ -181601,7 +181626,7 @@ function GrarfExtensionNewsLeaguesSourceCard({
             alt: "",
             className: cn2(
               "grarf-extension-news-leagues-source-card-logo",
-              isStatMuseHostUrl(url) && "rounded-[2px]"
+              (isStatMuseHostUrl(url) || isGrarfExtensionFoxSportsPublisherUrl(url)) && "rounded-[2px]"
             ),
             loading: "lazy",
             decoding: "async"
