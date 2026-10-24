@@ -96520,2533 +96520,3481 @@ init_define_import_meta_env();
 var MLB_TEAM_NEWS_SOURCES_BY_ABBREV = {
   "ARI": [
     {
-      "id": "mlb-ari-az-snake-pit",
-      "name": "AZ Snake Pit",
-      "browserUrl": "https://www.azsnakepit.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-ari-arizona-sports",
-      "name": "Arizona Sports",
-      "browserUrl": "https://arizonasports.com/mlb/arizona-diamondbacks/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-ari-venom-strikes",
-      "name": "Venom Strikes",
-      "browserUrl": "https://venomstrikes.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-ari-the-arizona-republic",
-      "name": "The Arizona Republic",
-      "browserUrl": "https://www.azcentral.com/sports/diamondbacks/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-ari-arizona-s-family",
-      "name": "Arizona's Family",
-      "browserUrl": "https://www.azfamily.com/sports/mlb/diamondbacks/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-ari-12news",
-      "name": "12News",
-      "browserUrl": "https://www.12news.com/diamondbacks/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-ari-arizona-daily-star-d-backs",
-      "name": "Arizona Daily Star D-Backs",
-      "browserUrl": "https://tucson.com/sports/professional/mlb/d-backs/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-ari-phoenix-new-times",
-      "name": "Phoenix New Times",
-      "browserUrl": "https://www.phoenixnewtimes.com/topic/diamondbacks-6498450",
-      "category": "news"
-    },
-    {
-      "id": "mlb-ari-mlb-d-backs",
-      "name": "MLB D-backs",
+      "id": "mlb-ari-mlb-com",
+      "name": "MLB.com",
       "browserUrl": "https://www.mlb.com/dbacks",
       "category": "news"
     },
     {
-      "id": "mlb-ari-espn-d-backs",
-      "name": "ESPN D-backs",
+      "id": "mlb-ari-espn",
+      "name": "ESPN",
       "browserUrl": "https://www.espn.com/mlb/team/_/name/ari/arizona-diamondbacks",
       "category": "news"
     },
     {
-      "id": "mlb-ari-cbs-sports-d-backs",
-      "name": "CBS Sports D-backs",
+      "id": "mlb-ari-cbs-sports",
+      "name": "CBS Sports",
       "browserUrl": "https://www.cbssports.com/mlb/teams/ARI/arizona-diamondbacks/",
       "category": "news"
     },
     {
-      "id": "mlb-ari-fox-sports-d-backs",
-      "name": "FOX Sports D-backs",
+      "id": "mlb-ari-fox-sports",
+      "name": "FOX Sports",
       "browserUrl": "https://www.foxsports.com/mlb/arizona-diamondbacks-team",
       "category": "news"
     },
     {
-      "id": "mlb-ari-yardbarker-d-backs",
-      "name": "Yardbarker D-backs",
-      "browserUrl": "https://www.yardbarker.com/mlb/teams/arizona_diamondbacks/28",
+      "id": "mlb-ari-yahoo-sports",
+      "name": "Yahoo! Sports",
+      "browserUrl": "https://sports.yahoo.com/mlb/teams/arizona-diamondbacks/",
       "category": "news"
     },
     {
-      "id": "mlb-ari-bleacher-report",
-      "name": "Bleacher Report",
-      "browserUrl": "https://bleacherreport.com/arizona-diamondbacks",
+      "id": "mlb-ari-the-athletic",
+      "name": "The Athletic",
+      "browserUrl": "https://www.nytimes.com/athletic/search/?query=Arizona%20Diamondbacks",
+      "category": "news"
+    },
+    {
+      "id": "mlb-ari-b-r",
+      "name": "B/R",
+      "browserUrl": "https://bleacherreport.com/search?q=Arizona%20Diamondbacks",
+      "category": "news"
+    },
+    {
+      "id": "mlb-ari-nbc-sports",
+      "name": "NBC Sports",
+      "browserUrl": "https://www.nbcsports.com/search?search=Arizona%20Diamondbacks",
+      "category": "news"
+    },
+    {
+      "id": "mlb-ari-si",
+      "name": "SI",
+      "browserUrl": "https://www.si.com/mlb/diamondbacks",
+      "category": "news"
+    },
+    {
+      "id": "mlb-ari-usa-today",
+      "name": "USA Today",
+      "browserUrl": "https://sportsdata.usatoday.com/baseball/mlb/teams/arizona-diamondbacks/253/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-ari-athlon-sports",
+      "name": "Athlon Sports",
+      "browserUrl": "https://athlonsports.com/mlb/arizona-diamondbacks",
+      "category": "news"
+    },
+    {
+      "id": "mlb-ari-yardbarker",
+      "name": "Yardbarker",
+      "browserUrl": "https://www.yardbarker.com/mlb/teams/arizona_diamondbacks/1",
+      "category": "news"
+    },
+    {
+      "id": "mlb-ari-spotrac",
+      "name": "Spotrac",
+      "browserUrl": "https://www.spotrac.com/search/?q=Arizona%20Diamondbacks",
+      "category": "news"
+    },
+    {
+      "id": "mlb-ari-statmuse",
+      "name": "StatMuse",
+      "browserUrl": "https://www.statmuse.com/mlb/ask/arizona-diamondbacks",
+      "category": "news"
+    },
+    {
+      "id": "mlb-ari-newsnow",
+      "name": "NewsNow",
+      "browserUrl": "https://www.newsnow.com/us/Sports/MLB/NL%2BWest/Arizona%2BDiamondbacks",
+      "category": "news"
+    },
+    {
+      "id": "mlb-ari-sportspyder",
+      "name": "SportSpyder",
+      "browserUrl": "https://sportspyder.com/search?q=Arizona%20Diamondbacks",
+      "category": "news"
+    },
+    {
+      "id": "mlb-ari-reddit",
+      "name": "Reddit",
+      "browserUrl": "https://www.reddit.com/r/AZDiamondbacks/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-ari-dbacks",
+      "name": "@dbacks",
+      "browserUrl": "https://x.com/dbacks",
+      "category": "news"
+    },
+    {
+      "id": "mlb-ari-arizona-diamondbacks",
+      "name": "#Arizona Diamondbacks",
+      "browserUrl": "https://x.com/search?q=arizona%20diamondbacks&src=typed_query",
       "category": "news"
     }
   ],
   "ATH": [
     {
-      "id": "mlb-ath-athletics-nation",
-      "name": "Athletics Nation",
-      "browserUrl": "https://www.athleticsnation.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-ath-a-s-farm",
-      "name": "A's Farm",
-      "browserUrl": "https://www.athleticsfarm.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-ath-the-athletic-athletics",
-      "name": "The Athletic Athletics",
-      "browserUrl": "https://www.nytimes.com/athletic/mlb/team/athletics/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-ath-mlb-athletics",
-      "name": "MLB Athletics",
+      "id": "mlb-ath-mlb-com",
+      "name": "MLB.com",
       "browserUrl": "https://www.mlb.com/athletics",
-      "category": "news"
-    },
-    {
-      "id": "mlb-ath-nbc-sports-bay-area-athletics",
-      "name": "NBC Sports Bay Area Athletics",
-      "browserUrl": "https://www.nbcsportsbayarea.com/mlb/athletics/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-ath-san-francisco-chronicle-athletics",
-      "name": "San Francisco Chronicle Athletics",
-      "browserUrl": "https://www.sfchronicle.com/sports/athletics/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-ath-espn-athletics",
-      "name": "ESPN Athletics",
-      "browserUrl": "https://www.espn.com/mlb/team/_/name/ath/oakland-athletics",
-      "category": "news"
-    },
-    {
-      "id": "mlb-ath-cbs-sports-athletics",
-      "name": "CBS Sports Athletics",
-      "browserUrl": "https://www.cbssports.com/mlb/teams/OAK/oakland-athletics/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-ath-fox-sports-athletics",
-      "name": "FOX Sports Athletics",
-      "browserUrl": "https://www.foxsports.com/mlb/athletics-team",
-      "category": "news"
-    },
-    {
-      "id": "mlb-ath-yardbarker-athletics",
-      "name": "Yardbarker Athletics",
-      "browserUrl": "https://www.yardbarker.com/mlb/teams/oakland_athletics/16",
-      "category": "news"
-    },
-    {
-      "id": "mlb-ath-bleacher-report",
-      "name": "Bleacher Report",
-      "browserUrl": "https://bleacherreport.com/oakland-athletics",
       "category": "news"
     },
     {
       "id": "mlb-ath-espn",
       "name": "ESPN",
-      "browserUrl": "https://www.espn.com/mlb/team/_/name/oak/oakland-athletics",
+      "browserUrl": "https://www.espn.com/mlb/team/_/name/ath/athletics",
+      "category": "news"
+    },
+    {
+      "id": "mlb-ath-cbs-sports",
+      "name": "CBS Sports",
+      "browserUrl": "https://www.cbssports.com/mlb/teams/ATH/athletics/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-ath-fox-sports",
+      "name": "FOX Sports",
+      "browserUrl": "https://www.foxsports.com/mlb/athletics-team",
+      "category": "news"
+    },
+    {
+      "id": "mlb-ath-yahoo-sports",
+      "name": "Yahoo! Sports",
+      "browserUrl": "https://sports.yahoo.com/mlb/teams/athletics/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-ath-the-athletic",
+      "name": "The Athletic",
+      "browserUrl": "https://www.nytimes.com/athletic/search/?query=Athletics",
+      "category": "news"
+    },
+    {
+      "id": "mlb-ath-b-r",
+      "name": "B/R",
+      "browserUrl": "https://bleacherreport.com/search?q=Athletics",
+      "category": "news"
+    },
+    {
+      "id": "mlb-ath-nbc-sports",
+      "name": "NBC Sports",
+      "browserUrl": "https://www.nbcsports.com/search?search=Athletics",
+      "category": "news"
+    },
+    {
+      "id": "mlb-ath-si",
+      "name": "SI",
+      "browserUrl": "https://www.si.com/mlb/athletics",
+      "category": "news"
+    },
+    {
+      "id": "mlb-ath-usa-today",
+      "name": "USA Today",
+      "browserUrl": "https://sportsdata.usatoday.com/baseball/mlb/teams/athletics/235/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-ath-athlon-sports",
+      "name": "Athlon Sports",
+      "browserUrl": "https://athlonsports.com/mlb/athletics",
+      "category": "news"
+    },
+    {
+      "id": "mlb-ath-yardbarker",
+      "name": "Yardbarker",
+      "browserUrl": "https://www.yardbarker.com/mlb/teams/athletics/20",
+      "category": "news"
+    },
+    {
+      "id": "mlb-ath-spotrac",
+      "name": "Spotrac",
+      "browserUrl": "https://www.spotrac.com/search/?q=Athletics",
+      "category": "news"
+    },
+    {
+      "id": "mlb-ath-statmuse",
+      "name": "StatMuse",
+      "browserUrl": "https://www.statmuse.com/mlb/ask/athletics",
+      "category": "news"
+    },
+    {
+      "id": "mlb-ath-newsnow",
+      "name": "NewsNow",
+      "browserUrl": "https://www.newsnow.com/us/Sports/MLB/AL%2BWest/Athletics",
+      "category": "news"
+    },
+    {
+      "id": "mlb-ath-sportspyder",
+      "name": "SportSpyder",
+      "browserUrl": "https://sportspyder.com/search?q=Athletics",
+      "category": "news"
+    },
+    {
+      "id": "mlb-ath-reddit",
+      "name": "Reddit",
+      "browserUrl": "https://www.reddit.com/r/OaklandAthletics/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-ath-athletics",
+      "name": "@Athletics",
+      "browserUrl": "https://x.com/Athletics",
+      "category": "news"
+    },
+    {
+      "id": "mlb-ath-athletics-2",
+      "name": "#Athletics",
+      "browserUrl": "https://x.com/search?q=athletics&src=typed_query",
       "category": "news"
     }
   ],
   "ATL": [
     {
-      "id": "mlb-atl-battery-power",
-      "name": "Battery Power",
-      "browserUrl": "https://www.batterypower.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-atl-tomahawk-take",
-      "name": "Tomahawk Take",
-      "browserUrl": "https://tomahawktake.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-atl-mlb-braves",
-      "name": "MLB Braves",
+      "id": "mlb-atl-mlb-com",
+      "name": "MLB.com",
       "browserUrl": "https://www.mlb.com/braves",
       "category": "news"
     },
     {
-      "id": "mlb-atl-outfield-fly-rule",
-      "name": "Outfield Fly Rule",
-      "browserUrl": "https://www.outfieldflyrule.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-atl-braves-journal",
-      "name": "Braves Journal",
-      "browserUrl": "https://bravesjournal.us/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-atl-atl-all-day",
-      "name": "ATL All Day",
-      "browserUrl": "https://atlallday.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-atl-atlanta-journal-constitution-braves",
-      "name": "Atlanta Journal-Constitution Braves",
-      "browserUrl": "https://www.ajc.com/sports/atlanta-braves/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-atl-mlb-trade-rumors-braves",
-      "name": "MLB Trade Rumors Braves",
-      "browserUrl": "https://www.mlbtraderumors.com/atlanta-braves",
-      "category": "news"
-    },
-    {
-      "id": "mlb-atl-espn-braves",
-      "name": "ESPN Braves",
+      "id": "mlb-atl-espn",
+      "name": "ESPN",
       "browserUrl": "https://www.espn.com/mlb/team/_/name/atl/atlanta-braves",
       "category": "news"
     },
     {
-      "id": "mlb-atl-cbs-sports-braves",
-      "name": "CBS Sports Braves",
+      "id": "mlb-atl-cbs-sports",
+      "name": "CBS Sports",
       "browserUrl": "https://www.cbssports.com/mlb/teams/ATL/atlanta-braves/",
       "category": "news"
     },
     {
-      "id": "mlb-atl-fox-sports-braves",
-      "name": "FOX Sports Braves",
+      "id": "mlb-atl-fox-sports",
+      "name": "FOX Sports",
       "browserUrl": "https://www.foxsports.com/mlb/atlanta-braves-team",
       "category": "news"
     },
     {
-      "id": "mlb-atl-yardbarker-braves",
-      "name": "Yardbarker Braves",
-      "browserUrl": "https://www.yardbarker.com/mlb/teams/atlanta_braves/19",
+      "id": "mlb-atl-yahoo-sports",
+      "name": "Yahoo! Sports",
+      "browserUrl": "https://sports.yahoo.com/mlb/teams/atlanta-braves/",
       "category": "news"
     },
     {
-      "id": "mlb-atl-bleacher-report",
-      "name": "Bleacher Report",
-      "browserUrl": "https://bleacherreport.com/atlanta-braves",
+      "id": "mlb-atl-the-athletic",
+      "name": "The Athletic",
+      "browserUrl": "https://www.nytimes.com/athletic/search/?query=Atlanta%20Braves",
+      "category": "news"
+    },
+    {
+      "id": "mlb-atl-b-r",
+      "name": "B/R",
+      "browserUrl": "https://bleacherreport.com/search?q=Atlanta%20Braves",
+      "category": "news"
+    },
+    {
+      "id": "mlb-atl-nbc-sports",
+      "name": "NBC Sports",
+      "browserUrl": "https://www.nbcsports.com/search?search=Atlanta%20Braves",
+      "category": "news"
+    },
+    {
+      "id": "mlb-atl-si",
+      "name": "SI",
+      "browserUrl": "https://www.si.com/mlb/braves",
+      "category": "news"
+    },
+    {
+      "id": "mlb-atl-usa-today",
+      "name": "USA Today",
+      "browserUrl": "https://sportsdata.usatoday.com/baseball/mlb/teams/atlanta-braves/239/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-atl-athlon-sports",
+      "name": "Athlon Sports",
+      "browserUrl": "https://athlonsports.com/mlb/atlanta-braves",
+      "category": "news"
+    },
+    {
+      "id": "mlb-atl-yardbarker",
+      "name": "Yardbarker",
+      "browserUrl": "https://www.yardbarker.com/mlb/teams/atlanta_braves/2",
+      "category": "news"
+    },
+    {
+      "id": "mlb-atl-spotrac",
+      "name": "Spotrac",
+      "browserUrl": "https://www.spotrac.com/search/?q=Atlanta%20Braves",
+      "category": "news"
+    },
+    {
+      "id": "mlb-atl-statmuse",
+      "name": "StatMuse",
+      "browserUrl": "https://www.statmuse.com/mlb/ask/atlanta-braves",
+      "category": "news"
+    },
+    {
+      "id": "mlb-atl-newsnow",
+      "name": "NewsNow",
+      "browserUrl": "https://www.newsnow.com/us/Sports/MLB/NL%2BEast/Atlanta%2BBraves",
+      "category": "news"
+    },
+    {
+      "id": "mlb-atl-sportspyder",
+      "name": "SportSpyder",
+      "browserUrl": "https://sportspyder.com/search?q=Atlanta%20Braves",
+      "category": "news"
+    },
+    {
+      "id": "mlb-atl-reddit",
+      "name": "Reddit",
+      "browserUrl": "https://www.reddit.com/r/Braves/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-atl-braves",
+      "name": "@Braves",
+      "browserUrl": "https://x.com/Braves",
+      "category": "news"
+    },
+    {
+      "id": "mlb-atl-atlanta-braves",
+      "name": "#Atlanta Braves",
+      "browserUrl": "https://x.com/search?q=atlanta%20braves&src=typed_query",
       "category": "news"
     }
   ],
   "BAL": [
     {
-      "id": "mlb-bal-camden-chat",
-      "name": "Camden Chat",
-      "browserUrl": "https://www.camdenchat.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-bal-birds-watcher",
-      "name": "Birds Watcher",
-      "browserUrl": "https://birdswatcher.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-bal-baltimorebaseball-com",
-      "name": "BaltimoreBaseball.com",
-      "browserUrl": "https://www.baltimorebaseball.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-bal-eutaw-street-report",
-      "name": "Eutaw Street Report",
-      "browserUrl": "https://eutawstreetreport.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-bal-baltimore-sports-life",
-      "name": "Baltimore Sports & Life",
-      "browserUrl": "https://baltimoresportsandlife.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-bal-masn",
-      "name": "MASN",
-      "browserUrl": "https://www.masnsports.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-bal-mlb-orioles",
-      "name": "MLB Orioles",
+      "id": "mlb-bal-mlb-com",
+      "name": "MLB.com",
       "browserUrl": "https://www.mlb.com/orioles",
       "category": "news"
     },
     {
-      "id": "mlb-bal-espn-orioles",
-      "name": "ESPN Orioles",
+      "id": "mlb-bal-espn",
+      "name": "ESPN",
       "browserUrl": "https://www.espn.com/mlb/team/_/name/bal/baltimore-orioles",
       "category": "news"
     },
     {
-      "id": "mlb-bal-cbs-sports-orioles",
-      "name": "CBS Sports Orioles",
+      "id": "mlb-bal-cbs-sports",
+      "name": "CBS Sports",
       "browserUrl": "https://www.cbssports.com/mlb/teams/BAL/baltimore-orioles/",
       "category": "news"
     },
     {
-      "id": "mlb-bal-yahoo-sports-orioles",
-      "name": "Yahoo Sports Orioles",
-      "browserUrl": "https://sports.yahoo.com/mlb/teams/baltimore/",
+      "id": "mlb-bal-fox-sports",
+      "name": "FOX Sports",
+      "browserUrl": "https://www.foxsports.com/mlb/baltimore-orioles-team",
       "category": "news"
     },
     {
-      "id": "mlb-bal-yardbarker-orioles",
-      "name": "Yardbarker Orioles",
+      "id": "mlb-bal-yahoo-sports",
+      "name": "Yahoo! Sports",
+      "browserUrl": "https://sports.yahoo.com/mlb/teams/baltimore-orioles/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-bal-the-athletic",
+      "name": "The Athletic",
+      "browserUrl": "https://www.nytimes.com/athletic/search/?query=Baltimore%20Orioles",
+      "category": "news"
+    },
+    {
+      "id": "mlb-bal-b-r",
+      "name": "B/R",
+      "browserUrl": "https://bleacherreport.com/search?q=Baltimore%20Orioles",
+      "category": "news"
+    },
+    {
+      "id": "mlb-bal-nbc-sports",
+      "name": "NBC Sports",
+      "browserUrl": "https://www.nbcsports.com/search?search=Baltimore%20Orioles",
+      "category": "news"
+    },
+    {
+      "id": "mlb-bal-si",
+      "name": "SI",
+      "browserUrl": "https://www.si.com/mlb/orioles",
+      "category": "news"
+    },
+    {
+      "id": "mlb-bal-usa-today",
+      "name": "USA Today",
+      "browserUrl": "https://sportsdata.usatoday.com/baseball/mlb/teams/baltimore-orioles/225/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-bal-athlon-sports",
+      "name": "Athlon Sports",
+      "browserUrl": "https://athlonsports.com/mlb/baltimore-orioles",
+      "category": "news"
+    },
+    {
+      "id": "mlb-bal-yardbarker",
+      "name": "Yardbarker",
       "browserUrl": "https://www.yardbarker.com/mlb/teams/baltimore_orioles/3",
       "category": "news"
     },
     {
-      "id": "mlb-bal-orioles-hangout",
-      "name": "Orioles Hangout",
-      "browserUrl": "https://orioleshangout.com/",
+      "id": "mlb-bal-spotrac",
+      "name": "Spotrac",
+      "browserUrl": "https://www.spotrac.com/search/?q=Baltimore%20Orioles",
       "category": "news"
     },
     {
-      "id": "mlb-bal-bleacher-report",
-      "name": "Bleacher Report",
-      "browserUrl": "https://bleacherreport.com/baltimore-orioles",
+      "id": "mlb-bal-statmuse",
+      "name": "StatMuse",
+      "browserUrl": "https://www.statmuse.com/mlb/ask/baltimore-orioles",
+      "category": "news"
+    },
+    {
+      "id": "mlb-bal-newsnow",
+      "name": "NewsNow",
+      "browserUrl": "https://www.newsnow.com/us/Sports/MLB/AL%2BEast/Baltimore%2BOrioles",
+      "category": "news"
+    },
+    {
+      "id": "mlb-bal-sportspyder",
+      "name": "SportSpyder",
+      "browserUrl": "https://sportspyder.com/search?q=Baltimore%20Orioles",
+      "category": "news"
+    },
+    {
+      "id": "mlb-bal-reddit",
+      "name": "Reddit",
+      "browserUrl": "https://www.reddit.com/r/Orioles/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-bal-orioles",
+      "name": "@Orioles",
+      "browserUrl": "https://x.com/Orioles",
+      "category": "news"
+    },
+    {
+      "id": "mlb-bal-baltimore-orioles",
+      "name": "#Baltimore Orioles",
+      "browserUrl": "https://x.com/search?q=baltimore%20orioles&src=typed_query",
       "category": "news"
     }
   ],
   "BOS": [
     {
-      "id": "mlb-bos-over-the-monster",
-      "name": "Over the Monster",
-      "browserUrl": "https://www.overthemonster.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-bos-bosox-injection",
-      "name": "BoSox Injection",
-      "browserUrl": "https://bosoxinjection.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-bos-talk-sox",
-      "name": "Talk Sox",
-      "browserUrl": "https://talksox.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-bos-nesn",
-      "name": "NESN",
-      "browserUrl": "https://nesn.com/teams/mlb/boston-red-sox/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-bos-nbc-sports-boston",
-      "name": "NBC Sports Boston",
-      "browserUrl": "https://www.nbcsportsboston.com/mlb/boston-red-sox/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-bos-boston-herald",
-      "name": "Boston Herald",
-      "browserUrl": "https://www.bostonherald.com/sports/mlb/boston-red-sox/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-bos-weei",
-      "name": "WEEI",
-      "browserUrl": "https://www.audacy.com/weei/sports/red-sox",
-      "category": "news"
-    },
-    {
-      "id": "mlb-bos-the-boston-globe",
-      "name": "The Boston Globe",
-      "browserUrl": "https://www.bostonglobe.com/sports/redsox/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-bos-masslive",
-      "name": "MassLive",
-      "browserUrl": "https://www.masslive.com/redsox/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-bos-soxprospects",
-      "name": "SoxProspects",
-      "browserUrl": "https://www.soxprospects.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-bos-mlb-red-sox",
-      "name": "MLB Red Sox",
+      "id": "mlb-bos-mlb-com",
+      "name": "MLB.com",
       "browserUrl": "https://www.mlb.com/redsox",
       "category": "news"
     },
     {
-      "id": "mlb-bos-espn-red-sox",
-      "name": "ESPN Red Sox",
+      "id": "mlb-bos-espn",
+      "name": "ESPN",
       "browserUrl": "https://www.espn.com/mlb/team/_/name/bos/boston-red-sox",
       "category": "news"
     },
     {
-      "id": "mlb-bos-cbs-sports-red-sox",
-      "name": "CBS Sports Red Sox",
+      "id": "mlb-bos-cbs-sports",
+      "name": "CBS Sports",
       "browserUrl": "https://www.cbssports.com/mlb/teams/BOS/boston-red-sox/",
       "category": "news"
     },
     {
-      "id": "mlb-bos-fox-sports-red-sox",
-      "name": "FOX Sports Red Sox",
+      "id": "mlb-bos-fox-sports",
+      "name": "FOX Sports",
       "browserUrl": "https://www.foxsports.com/mlb/boston-red-sox-team",
       "category": "news"
     },
     {
-      "id": "mlb-bos-yardbarker-red-sox",
-      "name": "Yardbarker Red Sox",
+      "id": "mlb-bos-yahoo-sports",
+      "name": "Yahoo! Sports",
+      "browserUrl": "https://sports.yahoo.com/mlb/teams/boston-red-sox/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-bos-the-athletic",
+      "name": "The Athletic",
+      "browserUrl": "https://www.nytimes.com/athletic/search/?query=Boston%20Red%20Sox",
+      "category": "news"
+    },
+    {
+      "id": "mlb-bos-b-r",
+      "name": "B/R",
+      "browserUrl": "https://bleacherreport.com/search?q=Boston%20Red%20Sox",
+      "category": "news"
+    },
+    {
+      "id": "mlb-bos-nbc-sports",
+      "name": "NBC Sports",
+      "browserUrl": "https://www.nbcsports.com/search?search=Boston%20Red%20Sox",
+      "category": "news"
+    },
+    {
+      "id": "mlb-bos-si",
+      "name": "SI",
+      "browserUrl": "https://www.si.com/mlb/red-sox",
+      "category": "news"
+    },
+    {
+      "id": "mlb-bos-usa-today",
+      "name": "USA Today",
+      "browserUrl": "https://sportsdata.usatoday.com/baseball/mlb/teams/boston-red-sox/226/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-bos-athlon-sports",
+      "name": "Athlon Sports",
+      "browserUrl": "https://athlonsports.com/mlb/boston-red-sox",
+      "category": "news"
+    },
+    {
+      "id": "mlb-bos-yardbarker",
+      "name": "Yardbarker",
       "browserUrl": "https://www.yardbarker.com/mlb/teams/boston_red_sox/4",
       "category": "news"
     },
     {
-      "id": "mlb-bos-bleacher-report",
-      "name": "Bleacher Report",
-      "browserUrl": "https://bleacherreport.com/boston-red-sox",
+      "id": "mlb-bos-spotrac",
+      "name": "Spotrac",
+      "browserUrl": "https://www.spotrac.com/search/?q=Boston%20Red%20Sox",
+      "category": "news"
+    },
+    {
+      "id": "mlb-bos-statmuse",
+      "name": "StatMuse",
+      "browserUrl": "https://www.statmuse.com/mlb/ask/boston-red-sox",
+      "category": "news"
+    },
+    {
+      "id": "mlb-bos-newsnow",
+      "name": "NewsNow",
+      "browserUrl": "https://www.newsnow.com/us/Sports/MLB/AL%2BEast/Boston%2BRed%2BSox",
+      "category": "news"
+    },
+    {
+      "id": "mlb-bos-sportspyder",
+      "name": "SportSpyder",
+      "browserUrl": "https://sportspyder.com/search?q=Boston%20Red%20Sox",
+      "category": "news"
+    },
+    {
+      "id": "mlb-bos-reddit",
+      "name": "Reddit",
+      "browserUrl": "https://www.reddit.com/r/RedSox/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-bos-redsox",
+      "name": "@RedSox",
+      "browserUrl": "https://x.com/RedSox",
+      "category": "news"
+    },
+    {
+      "id": "mlb-bos-boston-red-sox",
+      "name": "#Boston Red Sox",
+      "browserUrl": "https://x.com/search?q=boston%20red%20sox&src=typed_query",
       "category": "news"
     }
   ],
   "CHC": [
     {
-      "id": "mlb-chc-bleed-cubbie-blue",
-      "name": "Bleed Cubbie Blue",
-      "browserUrl": "https://www.bleedcubbieblue.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-chc-cubbies-crib",
-      "name": "Cubbies Crib",
-      "browserUrl": "https://cubbiescrib.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-chc-cubs-insider",
-      "name": "Cubs Insider",
-      "browserUrl": "https://www.cubsinsider.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-chc-north-side-baseball",
-      "name": "North Side Baseball",
-      "browserUrl": "https://northsidebaseball.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-chc-chicago-sun-times-cubs",
-      "name": "Chicago Sun-Times Cubs",
-      "browserUrl": "https://chicago.suntimes.com/cubs",
-      "category": "news"
-    },
-    {
-      "id": "mlb-chc-sports-mockery-cubs",
-      "name": "Sports Mockery Cubs",
-      "browserUrl": "https://sportsmockery.com/chicago-cubs/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-chc-the-cub-reporter",
-      "name": "The Cub Reporter",
-      "browserUrl": "https://www.thecubreporter.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-chc-cubshq",
-      "name": "CubsHQ",
-      "browserUrl": "https://www.cubshq.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-chc-wrigleyville-nation",
-      "name": "Wrigleyville Nation",
-      "browserUrl": "https://www.wrigleyvillenation.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-chc-mlb-cubs",
-      "name": "MLB Cubs",
+      "id": "mlb-chc-mlb-com",
+      "name": "MLB.com",
       "browserUrl": "https://www.mlb.com/cubs",
       "category": "news"
     },
     {
-      "id": "mlb-chc-espn-cubs",
-      "name": "ESPN Cubs",
+      "id": "mlb-chc-espn",
+      "name": "ESPN",
       "browserUrl": "https://www.espn.com/mlb/team/_/name/chc/chicago-cubs",
       "category": "news"
     },
     {
-      "id": "mlb-chc-cbs-sports-cubs",
-      "name": "CBS Sports Cubs",
+      "id": "mlb-chc-cbs-sports",
+      "name": "CBS Sports",
       "browserUrl": "https://www.cbssports.com/mlb/teams/CHC/chicago-cubs/",
       "category": "news"
     },
     {
-      "id": "mlb-chc-yardbarker-cubs",
-      "name": "Yardbarker Cubs",
+      "id": "mlb-chc-fox-sports",
+      "name": "FOX Sports",
+      "browserUrl": "https://www.foxsports.com/mlb/chicago-cubs-team",
+      "category": "news"
+    },
+    {
+      "id": "mlb-chc-yahoo-sports",
+      "name": "Yahoo! Sports",
+      "browserUrl": "https://sports.yahoo.com/mlb/teams/chicago-cubs/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-chc-the-athletic",
+      "name": "The Athletic",
+      "browserUrl": "https://www.nytimes.com/athletic/search/?query=Chicago%20Cubs",
+      "category": "news"
+    },
+    {
+      "id": "mlb-chc-b-r",
+      "name": "B/R",
+      "browserUrl": "https://bleacherreport.com/search?q=Chicago%20Cubs",
+      "category": "news"
+    },
+    {
+      "id": "mlb-chc-nbc-sports",
+      "name": "NBC Sports",
+      "browserUrl": "https://www.nbcsports.com/search?search=Chicago%20Cubs",
+      "category": "news"
+    },
+    {
+      "id": "mlb-chc-si",
+      "name": "SI",
+      "browserUrl": "https://www.si.com/mlb/cubs",
+      "category": "news"
+    },
+    {
+      "id": "mlb-chc-usa-today",
+      "name": "USA Today",
+      "browserUrl": "https://sportsdata.usatoday.com/baseball/mlb/teams/chicago-cubs/240/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-chc-athlon-sports",
+      "name": "Athlon Sports",
+      "browserUrl": "https://athlonsports.com/mlb/chicago-cubs",
+      "category": "news"
+    },
+    {
+      "id": "mlb-chc-yardbarker",
+      "name": "Yardbarker",
       "browserUrl": "https://www.yardbarker.com/mlb/teams/chicago_cubs/6",
       "category": "news"
     },
     {
-      "id": "mlb-chc-bleacher-report",
-      "name": "Bleacher Report",
-      "browserUrl": "https://bleacherreport.com/chicago-cubs",
+      "id": "mlb-chc-spotrac",
+      "name": "Spotrac",
+      "browserUrl": "https://www.spotrac.com/search/?q=Chicago%20Cubs",
+      "category": "news"
+    },
+    {
+      "id": "mlb-chc-statmuse",
+      "name": "StatMuse",
+      "browserUrl": "https://www.statmuse.com/mlb/ask/chicago-cubs",
+      "category": "news"
+    },
+    {
+      "id": "mlb-chc-newsnow",
+      "name": "NewsNow",
+      "browserUrl": "https://www.newsnow.com/us/Sports/MLB/NL%2BCentral/Chicago%2BCubs",
+      "category": "news"
+    },
+    {
+      "id": "mlb-chc-sportspyder",
+      "name": "SportSpyder",
+      "browserUrl": "https://sportspyder.com/search?q=Chicago%20Cubs",
+      "category": "news"
+    },
+    {
+      "id": "mlb-chc-reddit",
+      "name": "Reddit",
+      "browserUrl": "https://www.reddit.com/r/ChiCubs/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-chc-cubs",
+      "name": "@Cubs",
+      "browserUrl": "https://x.com/Cubs",
+      "category": "news"
+    },
+    {
+      "id": "mlb-chc-chicago-cubs",
+      "name": "#Chicago Cubs",
+      "browserUrl": "https://x.com/search?q=chicago%20cubs&src=typed_query",
       "category": "news"
     }
   ],
   "CWS": [
     {
-      "id": "mlb-cws-south-side-sox",
-      "name": "South Side Sox",
-      "browserUrl": "https://www.southsidesox.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-cws-southside-showdown",
-      "name": "Southside Showdown",
-      "browserUrl": "https://southsideshowdown.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-cws-sox-on-35th",
-      "name": "Sox On 35th",
-      "browserUrl": "https://www.soxon35th.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-cws-chicago-sun-times-white-sox",
-      "name": "Chicago Sun-Times White Sox",
-      "browserUrl": "https://chicago.suntimes.com/white-sox",
-      "category": "news"
-    },
-    {
-      "id": "mlb-cws-wgn-white-sox",
-      "name": "WGN White Sox",
-      "browserUrl": "https://wgntv.com/sports/white-sox/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-cws-da-windy-city-white-sox",
-      "name": "Da Windy City White Sox",
-      "browserUrl": "https://dawindycity.com/chicago-white-sox/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-cws-mlb-white-sox",
-      "name": "MLB White Sox",
+      "id": "mlb-cws-mlb-com",
+      "name": "MLB.com",
       "browserUrl": "https://www.mlb.com/whitesox",
       "category": "news"
     },
     {
-      "id": "mlb-cws-espn-white-sox",
-      "name": "ESPN White Sox",
-      "browserUrl": "https://www.espn.com/mlb/team/_/name/chw/chicago-white-sox",
+      "id": "mlb-cws-espn",
+      "name": "ESPN",
+      "browserUrl": "https://www.espn.com/mlb/team/_/name/cws/chicago-white-sox",
       "category": "news"
     },
     {
-      "id": "mlb-cws-cbs-sports-white-sox",
-      "name": "CBS Sports White Sox",
-      "browserUrl": "https://www.cbssports.com/mlb/teams/CHW/chicago-white-sox/",
+      "id": "mlb-cws-cbs-sports",
+      "name": "CBS Sports",
+      "browserUrl": "https://www.cbssports.com/mlb/teams/CWS/chicago-white-sox/",
       "category": "news"
     },
     {
-      "id": "mlb-cws-fox-sports-white-sox",
-      "name": "FOX Sports White Sox",
+      "id": "mlb-cws-fox-sports",
+      "name": "FOX Sports",
       "browserUrl": "https://www.foxsports.com/mlb/chicago-white-sox-team",
       "category": "news"
     },
     {
-      "id": "mlb-cws-yardbarker-white-sox",
-      "name": "Yardbarker White Sox",
-      "browserUrl": "https://www.yardbarker.com/mlb/teams/chicago_white_sox/9",
+      "id": "mlb-cws-yahoo-sports",
+      "name": "Yahoo! Sports",
+      "browserUrl": "https://sports.yahoo.com/mlb/teams/chicago-white-sox/",
       "category": "news"
     },
     {
-      "id": "mlb-cws-bleacher-report",
-      "name": "Bleacher Report",
-      "browserUrl": "https://bleacherreport.com/chicago-white-sox",
+      "id": "mlb-cws-the-athletic",
+      "name": "The Athletic",
+      "browserUrl": "https://www.nytimes.com/athletic/search/?query=Chicago%20White%20Sox",
+      "category": "news"
+    },
+    {
+      "id": "mlb-cws-b-r",
+      "name": "B/R",
+      "browserUrl": "https://bleacherreport.com/search?q=Chicago%20White%20Sox",
+      "category": "news"
+    },
+    {
+      "id": "mlb-cws-nbc-sports",
+      "name": "NBC Sports",
+      "browserUrl": "https://www.nbcsports.com/search?search=Chicago%20White%20Sox",
+      "category": "news"
+    },
+    {
+      "id": "mlb-cws-si",
+      "name": "SI",
+      "browserUrl": "https://www.si.com/mlb/white-sox",
+      "category": "news"
+    },
+    {
+      "id": "mlb-cws-usa-today",
+      "name": "USA Today",
+      "browserUrl": "https://sportsdata.usatoday.com/baseball/mlb/teams/chicago-white-sox/228/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-cws-athlon-sports",
+      "name": "Athlon Sports",
+      "browserUrl": "https://athlonsports.com/mlb/chicago-white-sox",
+      "category": "news"
+    },
+    {
+      "id": "mlb-cws-yardbarker",
+      "name": "Yardbarker",
+      "browserUrl": "https://www.yardbarker.com/mlb/teams/chicago_white_sox/5",
+      "category": "news"
+    },
+    {
+      "id": "mlb-cws-spotrac",
+      "name": "Spotrac",
+      "browserUrl": "https://www.spotrac.com/search/?q=Chicago%20White%20Sox",
+      "category": "news"
+    },
+    {
+      "id": "mlb-cws-statmuse",
+      "name": "StatMuse",
+      "browserUrl": "https://www.statmuse.com/mlb/ask/chicago-white-sox",
+      "category": "news"
+    },
+    {
+      "id": "mlb-cws-newsnow",
+      "name": "NewsNow",
+      "browserUrl": "https://www.newsnow.com/us/Sports/MLB/AL%2BCentral/Chicago%2BWhite%2BSox",
+      "category": "news"
+    },
+    {
+      "id": "mlb-cws-sportspyder",
+      "name": "SportSpyder",
+      "browserUrl": "https://sportspyder.com/search?q=Chicago%20White%20Sox",
+      "category": "news"
+    },
+    {
+      "id": "mlb-cws-reddit",
+      "name": "Reddit",
+      "browserUrl": "https://www.reddit.com/r/WhiteSox/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-cws-whitesox",
+      "name": "@whitesox",
+      "browserUrl": "https://x.com/whitesox",
+      "category": "news"
+    },
+    {
+      "id": "mlb-cws-chicago-white-sox",
+      "name": "#Chicago White Sox",
+      "browserUrl": "https://x.com/search?q=chicago%20white%20sox&src=typed_query",
       "category": "news"
     }
   ],
   "CIN": [
     {
-      "id": "mlb-cin-blog-red-machine",
-      "name": "Blog Red Machine",
-      "browserUrl": "https://blogredmachine.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-cin-red-reporter",
-      "name": "Red Reporter",
-      "browserUrl": "https://www.redreporter.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-cin-redleg-nation",
-      "name": "Redleg Nation",
-      "browserUrl": "https://www.redlegnation.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-cin-cincinnati-com-reds",
-      "name": "Cincinnati.com Reds",
-      "browserUrl": "https://www.cincinnati.com/sports/reds/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-cin-reds-minor-leagues",
-      "name": "Reds Minor Leagues",
-      "browserUrl": "https://www.redsminorleagues.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-cin-reds-content-plus",
-      "name": "Reds Content Plus",
-      "browserUrl": "https://www.redscontentplus.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-cin-wlwt-reds",
-      "name": "WLWT Reds",
-      "browserUrl": "https://www.wlwt.com/reds",
-      "category": "news"
-    },
-    {
-      "id": "mlb-cin-wcpo-reds",
-      "name": "WCPO Reds",
-      "browserUrl": "https://www.wcpo.com/sports/baseball/reds",
-      "category": "news"
-    },
-    {
-      "id": "mlb-cin-mlb-reds",
-      "name": "MLB Reds",
+      "id": "mlb-cin-mlb-com",
+      "name": "MLB.com",
       "browserUrl": "https://www.mlb.com/reds",
       "category": "news"
     },
     {
-      "id": "mlb-cin-espn-reds",
-      "name": "ESPN Reds",
+      "id": "mlb-cin-espn",
+      "name": "ESPN",
       "browserUrl": "https://www.espn.com/mlb/team/_/name/cin/cincinnati-reds",
       "category": "news"
     },
     {
-      "id": "mlb-cin-cbs-sports-reds",
-      "name": "CBS Sports Reds",
+      "id": "mlb-cin-cbs-sports",
+      "name": "CBS Sports",
       "browserUrl": "https://www.cbssports.com/mlb/teams/CIN/cincinnati-reds/",
       "category": "news"
     },
     {
-      "id": "mlb-cin-fox-sports-reds",
-      "name": "FOX Sports Reds",
+      "id": "mlb-cin-fox-sports",
+      "name": "FOX Sports",
       "browserUrl": "https://www.foxsports.com/mlb/cincinnati-reds-team",
       "category": "news"
     },
     {
-      "id": "mlb-cin-yardbarker-reds",
-      "name": "Yardbarker Reds",
-      "browserUrl": "https://www.yardbarker.com/mlb/teams/cincinnati_reds/24",
+      "id": "mlb-cin-yahoo-sports",
+      "name": "Yahoo! Sports",
+      "browserUrl": "https://sports.yahoo.com/mlb/teams/cincinnati-reds/",
       "category": "news"
     },
     {
-      "id": "mlb-cin-bleacher-report",
-      "name": "Bleacher Report",
-      "browserUrl": "https://bleacherreport.com/cincinnati-reds",
+      "id": "mlb-cin-the-athletic",
+      "name": "The Athletic",
+      "browserUrl": "https://www.nytimes.com/athletic/search/?query=Cincinnati%20Reds",
+      "category": "news"
+    },
+    {
+      "id": "mlb-cin-b-r",
+      "name": "B/R",
+      "browserUrl": "https://bleacherreport.com/search?q=Cincinnati%20Reds",
+      "category": "news"
+    },
+    {
+      "id": "mlb-cin-nbc-sports",
+      "name": "NBC Sports",
+      "browserUrl": "https://www.nbcsports.com/search?search=Cincinnati%20Reds",
+      "category": "news"
+    },
+    {
+      "id": "mlb-cin-si",
+      "name": "SI",
+      "browserUrl": "https://www.si.com/mlb/reds",
+      "category": "news"
+    },
+    {
+      "id": "mlb-cin-usa-today",
+      "name": "USA Today",
+      "browserUrl": "https://sportsdata.usatoday.com/baseball/mlb/teams/cincinnati-reds/241/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-cin-athlon-sports",
+      "name": "Athlon Sports",
+      "browserUrl": "https://athlonsports.com/mlb/cincinnati-reds",
+      "category": "news"
+    },
+    {
+      "id": "mlb-cin-yardbarker",
+      "name": "Yardbarker",
+      "browserUrl": "https://www.yardbarker.com/mlb/teams/cincinnati_reds/7",
+      "category": "news"
+    },
+    {
+      "id": "mlb-cin-spotrac",
+      "name": "Spotrac",
+      "browserUrl": "https://www.spotrac.com/search/?q=Cincinnati%20Reds",
+      "category": "news"
+    },
+    {
+      "id": "mlb-cin-statmuse",
+      "name": "StatMuse",
+      "browserUrl": "https://www.statmuse.com/mlb/ask/cincinnati-reds",
+      "category": "news"
+    },
+    {
+      "id": "mlb-cin-newsnow",
+      "name": "NewsNow",
+      "browserUrl": "https://www.newsnow.com/us/Sports/MLB/NL%2BCentral/Cincinnati%2BReds",
+      "category": "news"
+    },
+    {
+      "id": "mlb-cin-sportspyder",
+      "name": "SportSpyder",
+      "browserUrl": "https://sportspyder.com/search?q=Cincinnati%20Reds",
+      "category": "news"
+    },
+    {
+      "id": "mlb-cin-reddit",
+      "name": "Reddit",
+      "browserUrl": "https://www.reddit.com/r/Reds/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-cin-reds",
+      "name": "@Reds",
+      "browserUrl": "https://x.com/Reds",
+      "category": "news"
+    },
+    {
+      "id": "mlb-cin-cincinnati-reds",
+      "name": "#Cincinnati Reds",
+      "browserUrl": "https://x.com/search?q=cincinnati%20reds&src=typed_query",
       "category": "news"
     }
   ],
   "CLE": [
     {
-      "id": "mlb-cle-covering-the-corner",
-      "name": "Covering the Corner",
-      "browserUrl": "https://www.coveringthecorner.com/",
+      "id": "mlb-cle-mlb-com",
+      "name": "MLB.com",
+      "browserUrl": "https://www.mlb.com/cleguardians",
       "category": "news"
     },
     {
-      "id": "mlb-cle-away-back-gone",
-      "name": "Away Back Gone",
-      "browserUrl": "https://awaybackgone.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-cle-cleveland-com-guardians",
-      "name": "Cleveland.com Guardians",
-      "browserUrl": "https://www.cleveland.com/guardians/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-cle-akron-beacon-journal-guardians",
-      "name": "Akron Beacon Journal Guardians",
-      "browserUrl": "https://www.beaconjournal.com/sports/guardians",
-      "category": "news"
-    },
-    {
-      "id": "mlb-cle-wkyc-guardians",
-      "name": "WKYC Guardians",
-      "browserUrl": "https://www.wkyc.com/guardians",
-      "category": "news"
-    },
-    {
-      "id": "mlb-cle-news-5-cleveland-guardians",
-      "name": "News 5 Cleveland Guardians",
-      "browserUrl": "https://www.news5cleveland.com/sports/cleveland-guardians",
-      "category": "news"
-    },
-    {
-      "id": "mlb-cle-cleveland-19-guardians",
-      "name": "Cleveland 19 Guardians",
-      "browserUrl": "https://www.cleveland19.com/sports/guardians/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-cle-guardians-nation",
-      "name": "Guardians Nation",
-      "browserUrl": "https://www.guardiannation.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-cle-mlb-guardians",
-      "name": "MLB Guardians",
-      "browserUrl": "https://www.mlb.com/guardians",
-      "category": "news"
-    },
-    {
-      "id": "mlb-cle-espn-guardians",
-      "name": "ESPN Guardians",
+      "id": "mlb-cle-espn",
+      "name": "ESPN",
       "browserUrl": "https://www.espn.com/mlb/team/_/name/cle/cleveland-guardians",
       "category": "news"
     },
     {
-      "id": "mlb-cle-cbs-sports-guardians",
-      "name": "CBS Sports Guardians",
+      "id": "mlb-cle-cbs-sports",
+      "name": "CBS Sports",
       "browserUrl": "https://www.cbssports.com/mlb/teams/CLE/cleveland-guardians/",
       "category": "news"
     },
     {
-      "id": "mlb-cle-fox-sports-guardians",
-      "name": "FOX Sports Guardians",
+      "id": "mlb-cle-fox-sports",
+      "name": "FOX Sports",
       "browserUrl": "https://www.foxsports.com/mlb/cleveland-guardians-team",
       "category": "news"
     },
     {
-      "id": "mlb-cle-yardbarker-guardians",
-      "name": "Yardbarker Guardians",
-      "browserUrl": "https://www.yardbarker.com/mlb/teams/cleveland_guardians/10",
+      "id": "mlb-cle-yahoo-sports",
+      "name": "Yahoo! Sports",
+      "browserUrl": "https://sports.yahoo.com/mlb/teams/cleveland-guardians/",
       "category": "news"
     },
     {
-      "id": "mlb-cle-bleacher-report",
-      "name": "Bleacher Report",
-      "browserUrl": "https://bleacherreport.com/cleveland-guardians",
+      "id": "mlb-cle-the-athletic",
+      "name": "The Athletic",
+      "browserUrl": "https://www.nytimes.com/athletic/search/?query=Cleveland%20Guardians",
+      "category": "news"
+    },
+    {
+      "id": "mlb-cle-b-r",
+      "name": "B/R",
+      "browserUrl": "https://bleacherreport.com/search?q=Cleveland%20Guardians",
+      "category": "news"
+    },
+    {
+      "id": "mlb-cle-nbc-sports",
+      "name": "NBC Sports",
+      "browserUrl": "https://www.nbcsports.com/search?search=Cleveland%20Guardians",
+      "category": "news"
+    },
+    {
+      "id": "mlb-cle-si",
+      "name": "SI",
+      "browserUrl": "https://www.si.com/mlb/guardians",
+      "category": "news"
+    },
+    {
+      "id": "mlb-cle-usa-today",
+      "name": "USA Today",
+      "browserUrl": "https://sportsdata.usatoday.com/baseball/mlb/teams/cleveland-guardians/229/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-cle-athlon-sports",
+      "name": "Athlon Sports",
+      "browserUrl": "https://athlonsports.com/mlb/cleveland-guardians",
+      "category": "news"
+    },
+    {
+      "id": "mlb-cle-yardbarker",
+      "name": "Yardbarker",
+      "browserUrl": "https://www.yardbarker.com/mlb/teams/cleveland_guardians/8",
+      "category": "news"
+    },
+    {
+      "id": "mlb-cle-spotrac",
+      "name": "Spotrac",
+      "browserUrl": "https://www.spotrac.com/search/?q=Cleveland%20Guardians",
+      "category": "news"
+    },
+    {
+      "id": "mlb-cle-statmuse",
+      "name": "StatMuse",
+      "browserUrl": "https://www.statmuse.com/mlb/ask/cleveland-guardians",
+      "category": "news"
+    },
+    {
+      "id": "mlb-cle-newsnow",
+      "name": "NewsNow",
+      "browserUrl": "https://www.newsnow.com/us/Sports/MLB/AL%2BCentral/Cleveland%2BGuardians",
+      "category": "news"
+    },
+    {
+      "id": "mlb-cle-sportspyder",
+      "name": "SportSpyder",
+      "browserUrl": "https://sportspyder.com/search?q=Cleveland%20Guardians",
+      "category": "news"
+    },
+    {
+      "id": "mlb-cle-reddit",
+      "name": "Reddit",
+      "browserUrl": "https://www.reddit.com/r/ClevelandGuardians/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-cle-cleguardians",
+      "name": "@CLEGuardians",
+      "browserUrl": "https://x.com/CLEGuardians",
+      "category": "news"
+    },
+    {
+      "id": "mlb-cle-cleveland-guardians",
+      "name": "#Cleveland Guardians",
+      "browserUrl": "https://x.com/search?q=cleveland%20guardians&src=typed_query",
       "category": "news"
     }
   ],
   "COL": [
     {
-      "id": "mlb-col-purple-row",
-      "name": "Purple Row",
-      "browserUrl": "https://www.purplerow.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-col-rockies-blog",
-      "name": "Rockies Blog",
-      "browserUrl": "https://rockies.mlblogs.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-col-denver-post-rockies",
-      "name": "Denver Post Rockies",
-      "browserUrl": "https://www.denverpost.com/sports/mlb/colorado-rockies/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-col-denver7-rockies",
-      "name": "Denver7 Rockies",
-      "browserUrl": "https://www.thedenverchannel.com/sports/rockies",
-      "category": "news"
-    },
-    {
-      "id": "mlb-col-mile-high-sports-rockies",
-      "name": "Mile High Sports Rockies",
-      "browserUrl": "https://milehighsports.com/rockies/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-col-rox-pile",
-      "name": "Rox Pile",
-      "browserUrl": "https://roxpile.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-col-mlb-rockies",
-      "name": "MLB Rockies",
+      "id": "mlb-col-mlb-com",
+      "name": "MLB.com",
       "browserUrl": "https://www.mlb.com/rockies",
       "category": "news"
     },
     {
-      "id": "mlb-col-espn-rockies",
-      "name": "ESPN Rockies",
+      "id": "mlb-col-espn",
+      "name": "ESPN",
       "browserUrl": "https://www.espn.com/mlb/team/_/name/col/colorado-rockies",
       "category": "news"
     },
     {
-      "id": "mlb-col-cbs-sports-rockies",
-      "name": "CBS Sports Rockies",
+      "id": "mlb-col-cbs-sports",
+      "name": "CBS Sports",
       "browserUrl": "https://www.cbssports.com/mlb/teams/COL/colorado-rockies/",
       "category": "news"
     },
     {
-      "id": "mlb-col-fox-sports-rockies",
-      "name": "FOX Sports Rockies",
+      "id": "mlb-col-fox-sports",
+      "name": "FOX Sports",
       "browserUrl": "https://www.foxsports.com/mlb/colorado-rockies-team",
       "category": "news"
     },
     {
-      "id": "mlb-col-nbc-sports-rockies",
-      "name": "NBC Sports Rockies",
-      "browserUrl": "https://www.nbcsports.com/mlb/colorado-rockies",
+      "id": "mlb-col-yahoo-sports",
+      "name": "Yahoo! Sports",
+      "browserUrl": "https://sports.yahoo.com/mlb/teams/colorado-rockies/",
       "category": "news"
     },
     {
-      "id": "mlb-col-yardbarker-rockies",
-      "name": "Yardbarker Rockies",
-      "browserUrl": "https://www.yardbarker.com/mlb/teams/colorado_rockies/29",
+      "id": "mlb-col-the-athletic",
+      "name": "The Athletic",
+      "browserUrl": "https://www.nytimes.com/athletic/search/?query=Colorado%20Rockies",
       "category": "news"
     },
     {
-      "id": "mlb-col-bleacher-report",
-      "name": "Bleacher Report",
-      "browserUrl": "https://bleacherreport.com/colorado-rockies",
+      "id": "mlb-col-b-r",
+      "name": "B/R",
+      "browserUrl": "https://bleacherreport.com/search?q=Colorado%20Rockies",
+      "category": "news"
+    },
+    {
+      "id": "mlb-col-nbc-sports",
+      "name": "NBC Sports",
+      "browserUrl": "https://www.nbcsports.com/search?search=Colorado%20Rockies",
+      "category": "news"
+    },
+    {
+      "id": "mlb-col-si",
+      "name": "SI",
+      "browserUrl": "https://www.si.com/mlb/rockies",
+      "category": "news"
+    },
+    {
+      "id": "mlb-col-usa-today",
+      "name": "USA Today",
+      "browserUrl": "https://sportsdata.usatoday.com/baseball/mlb/teams/colorado-rockies/251/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-col-athlon-sports",
+      "name": "Athlon Sports",
+      "browserUrl": "https://athlonsports.com/mlb/colorado-rockies",
+      "category": "news"
+    },
+    {
+      "id": "mlb-col-yardbarker",
+      "name": "Yardbarker",
+      "browserUrl": "https://www.yardbarker.com/mlb/teams/colorado_rockies/9",
+      "category": "news"
+    },
+    {
+      "id": "mlb-col-spotrac",
+      "name": "Spotrac",
+      "browserUrl": "https://www.spotrac.com/search/?q=Colorado%20Rockies",
+      "category": "news"
+    },
+    {
+      "id": "mlb-col-statmuse",
+      "name": "StatMuse",
+      "browserUrl": "https://www.statmuse.com/mlb/ask/colorado-rockies",
+      "category": "news"
+    },
+    {
+      "id": "mlb-col-newsnow",
+      "name": "NewsNow",
+      "browserUrl": "https://www.newsnow.com/us/Sports/MLB/NL%2BWest/Colorado%2BRockies",
+      "category": "news"
+    },
+    {
+      "id": "mlb-col-sportspyder",
+      "name": "SportSpyder",
+      "browserUrl": "https://sportspyder.com/search?q=Colorado%20Rockies",
+      "category": "news"
+    },
+    {
+      "id": "mlb-col-reddit",
+      "name": "Reddit",
+      "browserUrl": "https://www.reddit.com/r/ColoradoRockies/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-col-rockies",
+      "name": "@Rockies",
+      "browserUrl": "https://x.com/Rockies",
+      "category": "news"
+    },
+    {
+      "id": "mlb-col-colorado-rockies",
+      "name": "#Colorado Rockies",
+      "browserUrl": "https://x.com/search?q=colorado%20rockies&src=typed_query",
       "category": "news"
     }
   ],
   "DET": [
     {
-      "id": "mlb-det-bless-you-boys",
-      "name": "Bless You Boys",
-      "browserUrl": "https://www.blessyouboys.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-det-motor-city-bengals",
-      "name": "Motor City Bengals",
-      "browserUrl": "https://motorcitybengals.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-det-totally-tigers",
-      "name": "Totally Tigers",
-      "browserUrl": "https://www.totallytigers.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-det-detroit-free-press-tigers",
-      "name": "Detroit Free Press Tigers",
-      "browserUrl": "https://www.freep.com/sports/tigers/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-det-mlive-tigers",
-      "name": "MLive Tigers",
-      "browserUrl": "https://www.mlive.com/tigers/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-det-wxyz-tigers",
-      "name": "WXYZ Tigers",
-      "browserUrl": "https://www.wxyz.com/sports/tigers",
-      "category": "news"
-    },
-    {
-      "id": "mlb-det-tiger-tales",
-      "name": "Tiger Tales",
-      "browserUrl": "https://www.detroitnews.com/sports/tigers/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-det-tigers-minor-league-report",
-      "name": "Tigers Minor League Report",
-      "browserUrl": "https://tigersminors.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-det-mlb-tigers",
-      "name": "MLB Tigers",
+      "id": "mlb-det-mlb-com",
+      "name": "MLB.com",
       "browserUrl": "https://www.mlb.com/tigers",
       "category": "news"
     },
     {
-      "id": "mlb-det-espn-tigers",
-      "name": "ESPN Tigers",
+      "id": "mlb-det-espn",
+      "name": "ESPN",
       "browserUrl": "https://www.espn.com/mlb/team/_/name/det/detroit-tigers",
       "category": "news"
     },
     {
-      "id": "mlb-det-cbs-sports-tigers",
-      "name": "CBS Sports Tigers",
+      "id": "mlb-det-cbs-sports",
+      "name": "CBS Sports",
       "browserUrl": "https://www.cbssports.com/mlb/teams/DET/detroit-tigers/",
       "category": "news"
     },
     {
-      "id": "mlb-det-fox-sports-tigers",
-      "name": "FOX Sports Tigers",
+      "id": "mlb-det-fox-sports",
+      "name": "FOX Sports",
       "browserUrl": "https://www.foxsports.com/mlb/detroit-tigers-team",
       "category": "news"
     },
     {
-      "id": "mlb-det-yardbarker-tigers",
-      "name": "Yardbarker Tigers",
-      "browserUrl": "https://www.yardbarker.com/mlb/teams/detroit_tigers/11",
+      "id": "mlb-det-yahoo-sports",
+      "name": "Yahoo! Sports",
+      "browserUrl": "https://sports.yahoo.com/mlb/teams/detroit-tigers/",
       "category": "news"
     },
     {
-      "id": "mlb-det-bleacher-report",
-      "name": "Bleacher Report",
-      "browserUrl": "https://bleacherreport.com/detroit-tigers",
+      "id": "mlb-det-the-athletic",
+      "name": "The Athletic",
+      "browserUrl": "https://www.nytimes.com/athletic/search/?query=Detroit%20Tigers",
+      "category": "news"
+    },
+    {
+      "id": "mlb-det-b-r",
+      "name": "B/R",
+      "browserUrl": "https://bleacherreport.com/search?q=Detroit%20Tigers",
+      "category": "news"
+    },
+    {
+      "id": "mlb-det-nbc-sports",
+      "name": "NBC Sports",
+      "browserUrl": "https://www.nbcsports.com/search?search=Detroit%20Tigers",
+      "category": "news"
+    },
+    {
+      "id": "mlb-det-si",
+      "name": "SI",
+      "browserUrl": "https://www.si.com/mlb/tigers",
+      "category": "news"
+    },
+    {
+      "id": "mlb-det-usa-today",
+      "name": "USA Today",
+      "browserUrl": "https://sportsdata.usatoday.com/baseball/mlb/teams/detroit-tigers/230/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-det-athlon-sports",
+      "name": "Athlon Sports",
+      "browserUrl": "https://athlonsports.com/mlb/detroit-tigers",
+      "category": "news"
+    },
+    {
+      "id": "mlb-det-yardbarker",
+      "name": "Yardbarker",
+      "browserUrl": "https://www.yardbarker.com/mlb/teams/detroit_tigers/10",
+      "category": "news"
+    },
+    {
+      "id": "mlb-det-spotrac",
+      "name": "Spotrac",
+      "browserUrl": "https://www.spotrac.com/search/?q=Detroit%20Tigers",
+      "category": "news"
+    },
+    {
+      "id": "mlb-det-statmuse",
+      "name": "StatMuse",
+      "browserUrl": "https://www.statmuse.com/mlb/ask/detroit-tigers",
+      "category": "news"
+    },
+    {
+      "id": "mlb-det-newsnow",
+      "name": "NewsNow",
+      "browserUrl": "https://www.newsnow.com/us/Sports/MLB/AL%2BCentral/Detroit%2BTigers",
+      "category": "news"
+    },
+    {
+      "id": "mlb-det-sportspyder",
+      "name": "SportSpyder",
+      "browserUrl": "https://sportspyder.com/search?q=Detroit%20Tigers",
+      "category": "news"
+    },
+    {
+      "id": "mlb-det-reddit",
+      "name": "Reddit",
+      "browserUrl": "https://www.reddit.com/r/MotorCityKitties/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-det-tigers",
+      "name": "@tigers",
+      "browserUrl": "https://x.com/tigers",
+      "category": "news"
+    },
+    {
+      "id": "mlb-det-detroit-tigers",
+      "name": "#Detroit Tigers",
+      "browserUrl": "https://x.com/search?q=detroit%20tigers&src=typed_query",
       "category": "news"
     }
   ],
   "HOU": [
     {
-      "id": "mlb-hou-the-crawfish-boxes",
-      "name": "The Crawfish Boxes",
-      "browserUrl": "https://www.crawfishboxes.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-hou-climbing-tal-s-hill",
-      "name": "Climbing Tal's Hill",
-      "browserUrl": "https://climbingtalshill.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-hou-chron-com-astros",
-      "name": "Chron.com Astros",
-      "browserUrl": "https://www.chron.com/sports/astros/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-hou-astros-future",
-      "name": "Astros Future",
-      "browserUrl": "https://www.astrosfuture.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-hou-astros-county",
-      "name": "Astros County",
-      "browserUrl": "https://www.astroscounty.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-hou-astros-mission-control",
-      "name": "Astros Mission Control",
-      "browserUrl": "https://astrosmissioncontrol.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-hou-103-7-the-game",
-      "name": "103.7 The Game",
-      "browserUrl": "https://1037thegame.iheart.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-hou-mlb-astros",
-      "name": "MLB Astros",
+      "id": "mlb-hou-mlb-com",
+      "name": "MLB.com",
       "browserUrl": "https://www.mlb.com/astros",
       "category": "news"
     },
     {
-      "id": "mlb-hou-espn-astros",
-      "name": "ESPN Astros",
+      "id": "mlb-hou-espn",
+      "name": "ESPN",
       "browserUrl": "https://www.espn.com/mlb/team/_/name/hou/houston-astros",
       "category": "news"
     },
     {
-      "id": "mlb-hou-cbs-sports-astros",
-      "name": "CBS Sports Astros",
+      "id": "mlb-hou-cbs-sports",
+      "name": "CBS Sports",
       "browserUrl": "https://www.cbssports.com/mlb/teams/HOU/houston-astros/",
       "category": "news"
     },
     {
-      "id": "mlb-hou-fox-sports-astros",
-      "name": "FOX Sports Astros",
+      "id": "mlb-hou-fox-sports",
+      "name": "FOX Sports",
       "browserUrl": "https://www.foxsports.com/mlb/houston-astros-team",
       "category": "news"
     },
     {
-      "id": "mlb-hou-yardbarker-astros",
-      "name": "Yardbarker Astros",
-      "browserUrl": "https://www.yardbarker.com/mlb/teams/houston_astros/14",
+      "id": "mlb-hou-yahoo-sports",
+      "name": "Yahoo! Sports",
+      "browserUrl": "https://sports.yahoo.com/mlb/teams/houston-astros/",
       "category": "news"
     },
     {
-      "id": "mlb-hou-bleacher-report",
-      "name": "Bleacher Report",
-      "browserUrl": "https://bleacherreport.com/houston-astros",
+      "id": "mlb-hou-the-athletic",
+      "name": "The Athletic",
+      "browserUrl": "https://www.nytimes.com/athletic/search/?query=Houston%20Astros",
+      "category": "news"
+    },
+    {
+      "id": "mlb-hou-b-r",
+      "name": "B/R",
+      "browserUrl": "https://bleacherreport.com/search?q=Houston%20Astros",
+      "category": "news"
+    },
+    {
+      "id": "mlb-hou-nbc-sports",
+      "name": "NBC Sports",
+      "browserUrl": "https://www.nbcsports.com/search?search=Houston%20Astros",
+      "category": "news"
+    },
+    {
+      "id": "mlb-hou-si",
+      "name": "SI",
+      "browserUrl": "https://www.si.com/mlb/astros",
+      "category": "news"
+    },
+    {
+      "id": "mlb-hou-usa-today",
+      "name": "USA Today",
+      "browserUrl": "https://sportsdata.usatoday.com/baseball/mlb/teams/houston-astros/242/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-hou-athlon-sports",
+      "name": "Athlon Sports",
+      "browserUrl": "https://athlonsports.com/mlb/houston-astros",
+      "category": "news"
+    },
+    {
+      "id": "mlb-hou-yardbarker",
+      "name": "Yardbarker",
+      "browserUrl": "https://www.yardbarker.com/mlb/teams/houston_astros/12",
+      "category": "news"
+    },
+    {
+      "id": "mlb-hou-spotrac",
+      "name": "Spotrac",
+      "browserUrl": "https://www.spotrac.com/search/?q=Houston%20Astros",
+      "category": "news"
+    },
+    {
+      "id": "mlb-hou-statmuse",
+      "name": "StatMuse",
+      "browserUrl": "https://www.statmuse.com/mlb/ask/houston-astros",
+      "category": "news"
+    },
+    {
+      "id": "mlb-hou-newsnow",
+      "name": "NewsNow",
+      "browserUrl": "https://www.newsnow.com/us/Sports/MLB/AL%2BWest/Houston%2BAstros",
+      "category": "news"
+    },
+    {
+      "id": "mlb-hou-sportspyder",
+      "name": "SportSpyder",
+      "browserUrl": "https://sportspyder.com/search?q=Houston%20Astros",
+      "category": "news"
+    },
+    {
+      "id": "mlb-hou-reddit",
+      "name": "Reddit",
+      "browserUrl": "https://www.reddit.com/r/Astros/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-hou-astros",
+      "name": "@astros",
+      "browserUrl": "https://x.com/astros",
+      "category": "news"
+    },
+    {
+      "id": "mlb-hou-houston-astros",
+      "name": "#Houston Astros",
+      "browserUrl": "https://x.com/search?q=houston%20astros&src=typed_query",
       "category": "news"
     }
   ],
   "KC": [
     {
-      "id": "mlb-kc-royals-review",
-      "name": "Royals Review",
-      "browserUrl": "https://www.royalsreview.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-kc-kings-of-kauffman",
-      "name": "Kings of Kauffman",
-      "browserUrl": "https://kingsofkauffman.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-kc-royals-farm-report",
-      "name": "Royals Farm Report",
-      "browserUrl": "https://royalsfarmreport.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-kc-kctv5-royals",
-      "name": "KCTV5 Royals",
-      "browserUrl": "https://www.kctv5.com/sports/mlb/royals/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-kc-fox4kc-royals",
-      "name": "FOX4KC Royals",
-      "browserUrl": "https://fox4kc.com/sports/royals/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-kc-kc-kingdom",
-      "name": "KC Kingdom",
-      "browserUrl": "https://kckingdom.com/kansas-city-royals/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-kc-royals-reporter",
-      "name": "Royals Reporter",
-      "browserUrl": "https://www.royalsreporter.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-kc-royals-blue",
-      "name": "Royals Blue",
-      "browserUrl": "https://www.royalsblue.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-kc-mlb-royals",
-      "name": "MLB Royals",
+      "id": "mlb-kc-mlb-com",
+      "name": "MLB.com",
       "browserUrl": "https://www.mlb.com/royals",
       "category": "news"
     },
     {
-      "id": "mlb-kc-espn-royals",
-      "name": "ESPN Royals",
+      "id": "mlb-kc-espn",
+      "name": "ESPN",
       "browserUrl": "https://www.espn.com/mlb/team/_/name/kc/kansas-city-royals",
       "category": "news"
     },
     {
-      "id": "mlb-kc-cbs-sports-royals",
-      "name": "CBS Sports Royals",
+      "id": "mlb-kc-cbs-sports",
+      "name": "CBS Sports",
       "browserUrl": "https://www.cbssports.com/mlb/teams/KC/kansas-city-royals/",
       "category": "news"
     },
     {
-      "id": "mlb-kc-fox-sports-royals",
-      "name": "FOX Sports Royals",
+      "id": "mlb-kc-fox-sports",
+      "name": "FOX Sports",
       "browserUrl": "https://www.foxsports.com/mlb/kansas-city-royals-team",
       "category": "news"
     },
     {
-      "id": "mlb-kc-yardbarker-royals",
-      "name": "Yardbarker Royals",
-      "browserUrl": "https://www.yardbarker.com/mlb/teams/kansas_city_royals/12",
+      "id": "mlb-kc-yahoo-sports",
+      "name": "Yahoo! Sports",
+      "browserUrl": "https://sports.yahoo.com/mlb/teams/kansas-city-royals/",
       "category": "news"
     },
     {
-      "id": "mlb-kc-bleacher-report",
-      "name": "Bleacher Report",
-      "browserUrl": "https://bleacherreport.com/kansas-city-royals",
+      "id": "mlb-kc-the-athletic",
+      "name": "The Athletic",
+      "browserUrl": "https://www.nytimes.com/athletic/search/?query=Kansas%20City%20Royals",
+      "category": "news"
+    },
+    {
+      "id": "mlb-kc-b-r",
+      "name": "B/R",
+      "browserUrl": "https://bleacherreport.com/search?q=Kansas%20City%20Royals",
+      "category": "news"
+    },
+    {
+      "id": "mlb-kc-nbc-sports",
+      "name": "NBC Sports",
+      "browserUrl": "https://www.nbcsports.com/search?search=Kansas%20City%20Royals",
+      "category": "news"
+    },
+    {
+      "id": "mlb-kc-si",
+      "name": "SI",
+      "browserUrl": "https://www.si.com/mlb/royals",
+      "category": "news"
+    },
+    {
+      "id": "mlb-kc-usa-today",
+      "name": "USA Today",
+      "browserUrl": "https://sportsdata.usatoday.com/baseball/mlb/teams/kansas-city-royals/231/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-kc-athlon-sports",
+      "name": "Athlon Sports",
+      "browserUrl": "https://athlonsports.com/mlb/kansas-city-royals",
+      "category": "news"
+    },
+    {
+      "id": "mlb-kc-yardbarker",
+      "name": "Yardbarker",
+      "browserUrl": "https://www.yardbarker.com/mlb/teams/kansas_city_royals/13",
+      "category": "news"
+    },
+    {
+      "id": "mlb-kc-spotrac",
+      "name": "Spotrac",
+      "browserUrl": "https://www.spotrac.com/search/?q=Kansas%20City%20Royals",
+      "category": "news"
+    },
+    {
+      "id": "mlb-kc-statmuse",
+      "name": "StatMuse",
+      "browserUrl": "https://www.statmuse.com/mlb/ask/kansas-city-royals",
+      "category": "news"
+    },
+    {
+      "id": "mlb-kc-newsnow",
+      "name": "NewsNow",
+      "browserUrl": "https://www.newsnow.com/us/Sports/MLB/AL%2BCentral/Kansas%2BCity%2BRoyals",
+      "category": "news"
+    },
+    {
+      "id": "mlb-kc-sportspyder",
+      "name": "SportSpyder",
+      "browserUrl": "https://sportspyder.com/search?q=Kansas%20City%20Royals",
+      "category": "news"
+    },
+    {
+      "id": "mlb-kc-reddit",
+      "name": "Reddit",
+      "browserUrl": "https://www.reddit.com/r/KCRoyals/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-kc-royals",
+      "name": "@Royals",
+      "browserUrl": "https://x.com/Royals",
+      "category": "news"
+    },
+    {
+      "id": "mlb-kc-kansas-city-royals",
+      "name": "#Kansas City Royals",
+      "browserUrl": "https://x.com/search?q=kansas%20city%20royals&src=typed_query",
       "category": "news"
     }
   ],
   "LAA": [
     {
-      "id": "mlb-laa-the-halo-way",
-      "name": "The Halo Way",
-      "browserUrl": "https://haloway.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-laa-halos-heaven",
-      "name": "Halos Heaven",
-      "browserUrl": "https://www.halosheaven.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-laa-halo-hangout",
-      "name": "Halo Hangout",
-      "browserUrl": "https://halohangout.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-laa-los-angeles-times-angels",
-      "name": "Los Angeles Times Angels",
-      "browserUrl": "https://www.latimes.com/sports/angels",
-      "category": "news"
-    },
-    {
-      "id": "mlb-laa-orange-county-register-angels",
-      "name": "Orange County Register Angels",
-      "browserUrl": "https://www.ocregister.com/sports/angels/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-laa-mlb-angels",
-      "name": "MLB Angels",
+      "id": "mlb-laa-mlb-com",
+      "name": "MLB.com",
       "browserUrl": "https://www.mlb.com/angels",
       "category": "news"
     },
     {
-      "id": "mlb-laa-espn-angels",
-      "name": "ESPN Angels",
+      "id": "mlb-laa-espn",
+      "name": "ESPN",
       "browserUrl": "https://www.espn.com/mlb/team/_/name/laa/los-angeles-angels",
       "category": "news"
     },
     {
-      "id": "mlb-laa-cbs-sports-angels",
-      "name": "CBS Sports Angels",
+      "id": "mlb-laa-cbs-sports",
+      "name": "CBS Sports",
       "browserUrl": "https://www.cbssports.com/mlb/teams/LAA/los-angeles-angels/",
       "category": "news"
     },
     {
-      "id": "mlb-laa-fox-sports-angels",
-      "name": "FOX Sports Angels",
+      "id": "mlb-laa-fox-sports",
+      "name": "FOX Sports",
       "browserUrl": "https://www.foxsports.com/mlb/los-angeles-angels-team",
       "category": "news"
     },
     {
-      "id": "mlb-laa-yardbarker-angels",
-      "name": "Yardbarker Angels",
-      "browserUrl": "https://www.yardbarker.com/mlb/teams/los_angeles_angels/15",
+      "id": "mlb-laa-yahoo-sports",
+      "name": "Yahoo! Sports",
+      "browserUrl": "https://sports.yahoo.com/mlb/teams/los-angeles-angels/",
       "category": "news"
     },
     {
-      "id": "mlb-laa-bleacher-report",
-      "name": "Bleacher Report",
-      "browserUrl": "https://bleacherreport.com/los-angeles-angels",
+      "id": "mlb-laa-the-athletic",
+      "name": "The Athletic",
+      "browserUrl": "https://www.nytimes.com/athletic/search/?query=Los%20Angeles%20Angels",
+      "category": "news"
+    },
+    {
+      "id": "mlb-laa-b-r",
+      "name": "B/R",
+      "browserUrl": "https://bleacherreport.com/search?q=Los%20Angeles%20Angels",
+      "category": "news"
+    },
+    {
+      "id": "mlb-laa-nbc-sports",
+      "name": "NBC Sports",
+      "browserUrl": "https://www.nbcsports.com/search?search=Los%20Angeles%20Angels",
+      "category": "news"
+    },
+    {
+      "id": "mlb-laa-si",
+      "name": "SI",
+      "browserUrl": "https://www.si.com/mlb/angels",
+      "category": "news"
+    },
+    {
+      "id": "mlb-laa-usa-today",
+      "name": "USA Today",
+      "browserUrl": "https://sportsdata.usatoday.com/baseball/mlb/teams/los-angeles-angels/227/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-laa-athlon-sports",
+      "name": "Athlon Sports",
+      "browserUrl": "https://athlonsports.com/mlb/los-angeles-angels",
+      "category": "news"
+    },
+    {
+      "id": "mlb-laa-yardbarker",
+      "name": "Yardbarker",
+      "browserUrl": "https://www.yardbarker.com/mlb/teams/los_angeles_angels/14",
+      "category": "news"
+    },
+    {
+      "id": "mlb-laa-spotrac",
+      "name": "Spotrac",
+      "browserUrl": "https://www.spotrac.com/search/?q=Los%20Angeles%20Angels",
+      "category": "news"
+    },
+    {
+      "id": "mlb-laa-statmuse",
+      "name": "StatMuse",
+      "browserUrl": "https://www.statmuse.com/mlb/ask/los-angeles-angels",
+      "category": "news"
+    },
+    {
+      "id": "mlb-laa-newsnow",
+      "name": "NewsNow",
+      "browserUrl": "https://www.newsnow.com/us/Sports/MLB/AL%2BWest/Los%2BAngeles%2BAngels",
+      "category": "news"
+    },
+    {
+      "id": "mlb-laa-sportspyder",
+      "name": "SportSpyder",
+      "browserUrl": "https://sportspyder.com/search?q=Los%20Angeles%20Angels",
+      "category": "news"
+    },
+    {
+      "id": "mlb-laa-reddit",
+      "name": "Reddit",
+      "browserUrl": "https://www.reddit.com/r/Angels/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-laa-angels",
+      "name": "@Angels",
+      "browserUrl": "https://x.com/Angels",
+      "category": "news"
+    },
+    {
+      "id": "mlb-laa-los-angeles-angels",
+      "name": "#Los Angeles Angels",
+      "browserUrl": "https://x.com/search?q=los%20angeles%20angels&src=typed_query",
       "category": "news"
     }
   ],
   "LAD": [
     {
-      "id": "mlb-lad-true-blue-la",
-      "name": "True Blue LA",
-      "browserUrl": "https://www.truebluela.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-lad-dodgers-nation",
-      "name": "Dodgers Nation",
-      "browserUrl": "https://dodgersnation.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-lad-dodgers-digest",
-      "name": "Dodgers Digest",
-      "browserUrl": "https://dodgersdigest.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-lad-dodgers-way",
-      "name": "Dodgers Way",
-      "browserUrl": "https://dodgersway.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-lad-la-times-dodgers",
-      "name": "LA Times Dodgers",
-      "browserUrl": "https://www.latimes.com/sports/dodgers",
-      "category": "news"
-    },
-    {
-      "id": "mlb-lad-dodger-insider",
-      "name": "Dodger Insider",
-      "browserUrl": "https://dodgers.mlblogs.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-lad-dodger-blue",
-      "name": "Dodger Blue",
-      "browserUrl": "https://dodgerblue.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-lad-dodgersbeat",
-      "name": "DodgersBeat",
-      "browserUrl": "https://dodgersbeat.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-lad-la-sports-nation-dodgers",
-      "name": "LA Sports Nation Dodgers",
-      "browserUrl": "https://lasportsnation.com/los-angeles-dodgers/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-lad-mlb-dodgers",
-      "name": "MLB Dodgers",
+      "id": "mlb-lad-mlb-com",
+      "name": "MLB.com",
       "browserUrl": "https://www.mlb.com/dodgers",
       "category": "news"
     },
     {
-      "id": "mlb-lad-espn-dodgers",
-      "name": "ESPN Dodgers",
+      "id": "mlb-lad-espn",
+      "name": "ESPN",
       "browserUrl": "https://www.espn.com/mlb/team/_/name/lad/los-angeles-dodgers",
       "category": "news"
     },
     {
-      "id": "mlb-lad-cbs-sports-dodgers",
-      "name": "CBS Sports Dodgers",
+      "id": "mlb-lad-cbs-sports",
+      "name": "CBS Sports",
       "browserUrl": "https://www.cbssports.com/mlb/teams/LAD/los-angeles-dodgers/",
       "category": "news"
     },
     {
-      "id": "mlb-lad-fox-sports-dodgers",
-      "name": "FOX Sports Dodgers",
+      "id": "mlb-lad-fox-sports",
+      "name": "FOX Sports",
       "browserUrl": "https://www.foxsports.com/mlb/los-angeles-dodgers-team",
       "category": "news"
     },
     {
-      "id": "mlb-lad-yardbarker-dodgers",
-      "name": "Yardbarker Dodgers",
-      "browserUrl": "https://www.yardbarker.com/mlb/teams/los_angeles_dodgers/30",
+      "id": "mlb-lad-yahoo-sports",
+      "name": "Yahoo! Sports",
+      "browserUrl": "https://sports.yahoo.com/mlb/teams/los-angeles-dodgers/",
       "category": "news"
     },
     {
-      "id": "mlb-lad-bleacher-report",
-      "name": "Bleacher Report",
-      "browserUrl": "https://bleacherreport.com/los-angeles-dodgers",
+      "id": "mlb-lad-the-athletic",
+      "name": "The Athletic",
+      "browserUrl": "https://www.nytimes.com/athletic/search/?query=Los%20Angeles%20Dodgers",
+      "category": "news"
+    },
+    {
+      "id": "mlb-lad-b-r",
+      "name": "B/R",
+      "browserUrl": "https://bleacherreport.com/search?q=Los%20Angeles%20Dodgers",
+      "category": "news"
+    },
+    {
+      "id": "mlb-lad-nbc-sports",
+      "name": "NBC Sports",
+      "browserUrl": "https://www.nbcsports.com/search?search=Los%20Angeles%20Dodgers",
+      "category": "news"
+    },
+    {
+      "id": "mlb-lad-si",
+      "name": "SI",
+      "browserUrl": "https://www.si.com/mlb/dodgers",
+      "category": "news"
+    },
+    {
+      "id": "mlb-lad-usa-today",
+      "name": "USA Today",
+      "browserUrl": "https://sportsdata.usatoday.com/baseball/mlb/teams/los-angeles-dodgers/243/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-lad-athlon-sports",
+      "name": "Athlon Sports",
+      "browserUrl": "https://athlonsports.com/mlb/los-angeles-dodgers",
+      "category": "news"
+    },
+    {
+      "id": "mlb-lad-yardbarker",
+      "name": "Yardbarker",
+      "browserUrl": "https://www.yardbarker.com/mlb/teams/los_angeles_dodgers/15",
+      "category": "news"
+    },
+    {
+      "id": "mlb-lad-spotrac",
+      "name": "Spotrac",
+      "browserUrl": "https://www.spotrac.com/search/?q=Los%20Angeles%20Dodgers",
+      "category": "news"
+    },
+    {
+      "id": "mlb-lad-statmuse",
+      "name": "StatMuse",
+      "browserUrl": "https://www.statmuse.com/mlb/ask/los-angeles-dodgers",
+      "category": "news"
+    },
+    {
+      "id": "mlb-lad-newsnow",
+      "name": "NewsNow",
+      "browserUrl": "https://www.newsnow.com/us/Sports/MLB/NL%2BWest/Los%2BAngeles%2BDodgers",
+      "category": "news"
+    },
+    {
+      "id": "mlb-lad-sportspyder",
+      "name": "SportSpyder",
+      "browserUrl": "https://sportspyder.com/search?q=Los%20Angeles%20Dodgers",
+      "category": "news"
+    },
+    {
+      "id": "mlb-lad-reddit",
+      "name": "Reddit",
+      "browserUrl": "https://www.reddit.com/r/Dodgers/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-lad-dodgers",
+      "name": "@Dodgers",
+      "browserUrl": "https://x.com/Dodgers",
+      "category": "news"
+    },
+    {
+      "id": "mlb-lad-los-angeles-dodgers",
+      "name": "#Los Angeles Dodgers",
+      "browserUrl": "https://x.com/search?q=los%20angeles%20dodgers&src=typed_query",
       "category": "news"
     }
   ],
   "MIA": [
     {
-      "id": "mlb-mia-fish-on-first",
-      "name": "Fish On First",
-      "browserUrl": "https://fishonfirst.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-mia-marlin-maniac",
-      "name": "Marlin Maniac",
-      "browserUrl": "https://marlinmaniac.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-mia-fish-stripes",
-      "name": "Fish Stripes",
-      "browserUrl": "https://www.fishstripes.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-mia-beyond-the-bases",
-      "name": "Beyond The Bases",
-      "browserUrl": "https://beyondthebases.mlblogs.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-mia-sun-sentinel-marlins",
-      "name": "Sun Sentinel Marlins",
-      "browserUrl": "https://www.sun-sentinel.com/sports/mlb/miami-marlins/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-mia-miami-herald-marlins",
-      "name": "Miami Herald Marlins",
-      "browserUrl": "https://www.miamiherald.com/sports/mlb/miami-marlins/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-mia-mlb-marlins",
-      "name": "MLB Marlins",
+      "id": "mlb-mia-mlb-com",
+      "name": "MLB.com",
       "browserUrl": "https://www.mlb.com/marlins",
       "category": "news"
     },
     {
-      "id": "mlb-mia-espn-marlins",
-      "name": "ESPN Marlins",
+      "id": "mlb-mia-espn",
+      "name": "ESPN",
       "browserUrl": "https://www.espn.com/mlb/team/_/name/mia/miami-marlins",
       "category": "news"
     },
     {
-      "id": "mlb-mia-cbs-sports-marlins",
-      "name": "CBS Sports Marlins",
+      "id": "mlb-mia-cbs-sports",
+      "name": "CBS Sports",
       "browserUrl": "https://www.cbssports.com/mlb/teams/MIA/miami-marlins/",
       "category": "news"
     },
     {
-      "id": "mlb-mia-fox-sports-marlins",
-      "name": "FOX Sports Marlins",
+      "id": "mlb-mia-fox-sports",
+      "name": "FOX Sports",
       "browserUrl": "https://www.foxsports.com/mlb/miami-marlins-team",
       "category": "news"
     },
     {
-      "id": "mlb-mia-yardbarker-marlins",
-      "name": "Yardbarker Marlins",
-      "browserUrl": "https://www.yardbarker.com/mlb/teams/miami_marlins/20",
+      "id": "mlb-mia-yahoo-sports",
+      "name": "Yahoo! Sports",
+      "browserUrl": "https://sports.yahoo.com/mlb/teams/miami-marlins/",
       "category": "news"
     },
     {
-      "id": "mlb-mia-bleacher-report",
-      "name": "Bleacher Report",
-      "browserUrl": "https://bleacherreport.com/miami-marlins",
+      "id": "mlb-mia-the-athletic",
+      "name": "The Athletic",
+      "browserUrl": "https://www.nytimes.com/athletic/search/?query=Miami%20Marlins",
+      "category": "news"
+    },
+    {
+      "id": "mlb-mia-b-r",
+      "name": "B/R",
+      "browserUrl": "https://bleacherreport.com/search?q=Miami%20Marlins",
+      "category": "news"
+    },
+    {
+      "id": "mlb-mia-nbc-sports",
+      "name": "NBC Sports",
+      "browserUrl": "https://www.nbcsports.com/search?search=Miami%20Marlins",
+      "category": "news"
+    },
+    {
+      "id": "mlb-mia-si",
+      "name": "SI",
+      "browserUrl": "https://www.si.com/mlb/marlins",
+      "category": "news"
+    },
+    {
+      "id": "mlb-mia-usa-today",
+      "name": "USA Today",
+      "browserUrl": "https://sportsdata.usatoday.com/baseball/mlb/teams/miami-marlins/252/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-mia-athlon-sports",
+      "name": "Athlon Sports",
+      "browserUrl": "https://athlonsports.com/mlb/miami-marlins",
+      "category": "news"
+    },
+    {
+      "id": "mlb-mia-yardbarker",
+      "name": "Yardbarker",
+      "browserUrl": "https://www.yardbarker.com/mlb/teams/miami_marlins/11",
+      "category": "news"
+    },
+    {
+      "id": "mlb-mia-spotrac",
+      "name": "Spotrac",
+      "browserUrl": "https://www.spotrac.com/search/?q=Miami%20Marlins",
+      "category": "news"
+    },
+    {
+      "id": "mlb-mia-statmuse",
+      "name": "StatMuse",
+      "browserUrl": "https://www.statmuse.com/mlb/ask/miami-marlins",
+      "category": "news"
+    },
+    {
+      "id": "mlb-mia-newsnow",
+      "name": "NewsNow",
+      "browserUrl": "https://www.newsnow.com/us/Sports/MLB/NL%2BEast/Miami%2BMarlins",
+      "category": "news"
+    },
+    {
+      "id": "mlb-mia-sportspyder",
+      "name": "SportSpyder",
+      "browserUrl": "https://sportspyder.com/search?q=Miami%20Marlins",
+      "category": "news"
+    },
+    {
+      "id": "mlb-mia-reddit",
+      "name": "Reddit",
+      "browserUrl": "https://www.reddit.com/r/LetsGoFish/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-mia-marlins",
+      "name": "@Marlins",
+      "browserUrl": "https://x.com/Marlins",
+      "category": "news"
+    },
+    {
+      "id": "mlb-mia-miami-marlins",
+      "name": "#Miami Marlins",
+      "browserUrl": "https://x.com/search?q=miami%20marlins&src=typed_query",
       "category": "news"
     }
   ],
   "MIL": [
     {
-      "id": "mlb-mil-brew-crew-ball",
-      "name": "Brew Crew Ball",
-      "browserUrl": "https://www.brewcrewball.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-mil-on-tap-sports-net-brewers",
-      "name": "On Tap Sports Net Brewers",
-      "browserUrl": "https://ontapsportsnet.com/brewers",
-      "category": "news"
-    },
-    {
-      "id": "mlb-mil-brew-crew-ball-sb-nation",
-      "name": "Brew Crew Ball / SB Nation",
-      "browserUrl": "https://www.brewcrewball.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-mil-milwaukee-journal-sentinel-brewers",
-      "name": "Milwaukee Journal Sentinel Brewers",
-      "browserUrl": "https://www.jsonline.com/sports/brewers/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-mil-brew-crew-nation",
-      "name": "Brew Crew Nation",
-      "browserUrl": "https://brewerfanatic.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-mil-brewerfanatic",
-      "name": "Brewerfanatic",
-      "browserUrl": "https://brewerfanatic.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-mil-mlb-brewers",
-      "name": "MLB Brewers",
+      "id": "mlb-mil-mlb-com",
+      "name": "MLB.com",
       "browserUrl": "https://www.mlb.com/brewers",
       "category": "news"
     },
     {
-      "id": "mlb-mil-espn-brewers",
-      "name": "ESPN Brewers",
+      "id": "mlb-mil-espn",
+      "name": "ESPN",
       "browserUrl": "https://www.espn.com/mlb/team/_/name/mil/milwaukee-brewers",
       "category": "news"
     },
     {
-      "id": "mlb-mil-cbs-sports-brewers",
-      "name": "CBS Sports Brewers",
+      "id": "mlb-mil-cbs-sports",
+      "name": "CBS Sports",
       "browserUrl": "https://www.cbssports.com/mlb/teams/MIL/milwaukee-brewers/",
       "category": "news"
     },
     {
-      "id": "mlb-mil-fox-sports-brewers",
-      "name": "FOX Sports Brewers",
+      "id": "mlb-mil-fox-sports",
+      "name": "FOX Sports",
       "browserUrl": "https://www.foxsports.com/mlb/milwaukee-brewers-team",
       "category": "news"
     },
     {
-      "id": "mlb-mil-yardbarker-brewers",
-      "name": "Yardbarker Brewers",
-      "browserUrl": "https://www.yardbarker.com/mlb/teams/milwaukee_brewers/25",
+      "id": "mlb-mil-yahoo-sports",
+      "name": "Yahoo! Sports",
+      "browserUrl": "https://sports.yahoo.com/mlb/teams/milwaukee-brewers/",
       "category": "news"
     },
     {
-      "id": "mlb-mil-bleacher-report",
-      "name": "Bleacher Report",
-      "browserUrl": "https://bleacherreport.com/milwaukee-brewers",
+      "id": "mlb-mil-the-athletic",
+      "name": "The Athletic",
+      "browserUrl": "https://www.nytimes.com/athletic/search/?query=Milwaukee%20Brewers",
+      "category": "news"
+    },
+    {
+      "id": "mlb-mil-b-r",
+      "name": "B/R",
+      "browserUrl": "https://bleacherreport.com/search?q=Milwaukee%20Brewers",
+      "category": "news"
+    },
+    {
+      "id": "mlb-mil-nbc-sports",
+      "name": "NBC Sports",
+      "browserUrl": "https://www.nbcsports.com/search?search=Milwaukee%20Brewers",
+      "category": "news"
+    },
+    {
+      "id": "mlb-mil-si",
+      "name": "SI",
+      "browserUrl": "https://www.si.com/mlb/brewers",
+      "category": "news"
+    },
+    {
+      "id": "mlb-mil-usa-today",
+      "name": "USA Today",
+      "browserUrl": "https://sportsdata.usatoday.com/baseball/mlb/teams/milwaukee-brewers/232/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-mil-athlon-sports",
+      "name": "Athlon Sports",
+      "browserUrl": "https://athlonsports.com/mlb/milwaukee-brewers",
+      "category": "news"
+    },
+    {
+      "id": "mlb-mil-yardbarker",
+      "name": "Yardbarker",
+      "browserUrl": "https://www.yardbarker.com/mlb/teams/milwaukee_brewers/16",
+      "category": "news"
+    },
+    {
+      "id": "mlb-mil-spotrac",
+      "name": "Spotrac",
+      "browserUrl": "https://www.spotrac.com/search/?q=Milwaukee%20Brewers",
+      "category": "news"
+    },
+    {
+      "id": "mlb-mil-statmuse",
+      "name": "StatMuse",
+      "browserUrl": "https://www.statmuse.com/mlb/ask/milwaukee-brewers",
+      "category": "news"
+    },
+    {
+      "id": "mlb-mil-newsnow",
+      "name": "NewsNow",
+      "browserUrl": "https://www.newsnow.com/us/Sports/MLB/NL%2BCentral/Milwaukee%2BBrewers",
+      "category": "news"
+    },
+    {
+      "id": "mlb-mil-sportspyder",
+      "name": "SportSpyder",
+      "browserUrl": "https://sportspyder.com/search?q=Milwaukee%20Brewers",
+      "category": "news"
+    },
+    {
+      "id": "mlb-mil-reddit",
+      "name": "Reddit",
+      "browserUrl": "https://www.reddit.com/r/Brewers/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-mil-brewers",
+      "name": "@Brewers",
+      "browserUrl": "https://x.com/Brewers",
+      "category": "news"
+    },
+    {
+      "id": "mlb-mil-milwaukee-brewers",
+      "name": "#Milwaukee Brewers",
+      "browserUrl": "https://x.com/search?q=milwaukee%20brewers&src=typed_query",
       "category": "news"
     }
   ],
   "MIN": [
     {
-      "id": "mlb-min-twinkie-town",
-      "name": "Twinkie Town",
-      "browserUrl": "https://www.twinkietown.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-min-twins-daily",
-      "name": "Twins Daily",
-      "browserUrl": "https://twinsdaily.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-min-puckett-s-pond",
-      "name": "Puckett's Pond",
-      "browserUrl": "https://puckettspond.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-min-star-tribune-twins",
-      "name": "Star Tribune Twins",
-      "browserUrl": "https://www.startribune.com/sports/twins/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-min-pioneer-press-twins",
-      "name": "Pioneer Press Twins",
-      "browserUrl": "https://www.twincities.com/sports/twins/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-min-zone-coverage-twins",
-      "name": "Zone Coverage Twins",
-      "browserUrl": "https://zonecoverage.com/category/twins/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-min-off-the-baggy",
-      "name": "Off The Baggy",
-      "browserUrl": "https://offthebaggy.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-min-mlb-twins",
-      "name": "MLB Twins",
+      "id": "mlb-min-mlb-com",
+      "name": "MLB.com",
       "browserUrl": "https://www.mlb.com/twins",
       "category": "news"
     },
     {
-      "id": "mlb-min-espn-twins",
-      "name": "ESPN Twins",
+      "id": "mlb-min-espn",
+      "name": "ESPN",
       "browserUrl": "https://www.espn.com/mlb/team/_/name/min/minnesota-twins",
       "category": "news"
     },
     {
-      "id": "mlb-min-cbs-sports-twins",
-      "name": "CBS Sports Twins",
+      "id": "mlb-min-cbs-sports",
+      "name": "CBS Sports",
       "browserUrl": "https://www.cbssports.com/mlb/teams/MIN/minnesota-twins/",
       "category": "news"
     },
     {
-      "id": "mlb-min-fox-sports-twins",
-      "name": "FOX Sports Twins",
+      "id": "mlb-min-fox-sports",
+      "name": "FOX Sports",
       "browserUrl": "https://www.foxsports.com/mlb/minnesota-twins-team",
       "category": "news"
     },
     {
-      "id": "mlb-min-yardbarker-twins",
-      "name": "Yardbarker Twins",
-      "browserUrl": "https://www.yardbarker.com/mlb/teams/minnesota_twins/13",
+      "id": "mlb-min-yahoo-sports",
+      "name": "Yahoo! Sports",
+      "browserUrl": "https://sports.yahoo.com/mlb/teams/minnesota-twins/",
       "category": "news"
     },
     {
-      "id": "mlb-min-bleacher-report",
-      "name": "Bleacher Report",
-      "browserUrl": "https://bleacherreport.com/minnesota-twins",
+      "id": "mlb-min-the-athletic",
+      "name": "The Athletic",
+      "browserUrl": "https://www.nytimes.com/athletic/search/?query=Minnesota%20Twins",
+      "category": "news"
+    },
+    {
+      "id": "mlb-min-b-r",
+      "name": "B/R",
+      "browserUrl": "https://bleacherreport.com/search?q=Minnesota%20Twins",
+      "category": "news"
+    },
+    {
+      "id": "mlb-min-nbc-sports",
+      "name": "NBC Sports",
+      "browserUrl": "https://www.nbcsports.com/search?search=Minnesota%20Twins",
+      "category": "news"
+    },
+    {
+      "id": "mlb-min-si",
+      "name": "SI",
+      "browserUrl": "https://www.si.com/mlb/twins",
+      "category": "news"
+    },
+    {
+      "id": "mlb-min-usa-today",
+      "name": "USA Today",
+      "browserUrl": "https://sportsdata.usatoday.com/baseball/mlb/teams/minnesota-twins/233/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-min-athlon-sports",
+      "name": "Athlon Sports",
+      "browserUrl": "https://athlonsports.com/mlb/minnesota-twins",
+      "category": "news"
+    },
+    {
+      "id": "mlb-min-yardbarker",
+      "name": "Yardbarker",
+      "browserUrl": "https://www.yardbarker.com/mlb/teams/minnesota_twins/17",
+      "category": "news"
+    },
+    {
+      "id": "mlb-min-spotrac",
+      "name": "Spotrac",
+      "browserUrl": "https://www.spotrac.com/search/?q=Minnesota%20Twins",
+      "category": "news"
+    },
+    {
+      "id": "mlb-min-statmuse",
+      "name": "StatMuse",
+      "browserUrl": "https://www.statmuse.com/mlb/ask/minnesota-twins",
+      "category": "news"
+    },
+    {
+      "id": "mlb-min-newsnow",
+      "name": "NewsNow",
+      "browserUrl": "https://www.newsnow.com/us/Sports/MLB/AL%2BCentral/Minnesota%2BTwins",
+      "category": "news"
+    },
+    {
+      "id": "mlb-min-sportspyder",
+      "name": "SportSpyder",
+      "browserUrl": "https://sportspyder.com/search?q=Minnesota%20Twins",
+      "category": "news"
+    },
+    {
+      "id": "mlb-min-reddit",
+      "name": "Reddit",
+      "browserUrl": "https://www.reddit.com/r/MinnesotaTwins/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-min-twins",
+      "name": "@Twins",
+      "browserUrl": "https://x.com/Twins",
+      "category": "news"
+    },
+    {
+      "id": "mlb-min-minnesota-twins",
+      "name": "#Minnesota Twins",
+      "browserUrl": "https://x.com/search?q=minnesota%20twins&src=typed_query",
       "category": "news"
     }
   ],
   "NYM": [
     {
-      "id": "mlb-nym-amazin-avenue",
-      "name": "Amazin' Avenue",
-      "browserUrl": "https://www.amazinavenue.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-nym-metsmerized-online",
-      "name": "MetsMerized Online",
-      "browserUrl": "https://metsmerizedonline.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-nym-rising-apple",
-      "name": "Rising Apple",
-      "browserUrl": "https://risingapple.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-nym-mets-minors",
-      "name": "Mets Minors",
-      "browserUrl": "https://metsminors.net/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-nym-faith-and-fear-in-flushing",
-      "name": "Faith and Fear in Flushing",
-      "browserUrl": "https://www.faithandfearinflushing.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-nym-mack-s-mets",
-      "name": "Mack's Mets",
-      "browserUrl": "http://macksmets.blogspot.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-nym-mets-police",
-      "name": "Mets Police",
-      "browserUrl": "https://metspolice.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-nym-mike-s-mets",
-      "name": "Mike's Mets",
-      "browserUrl": "https://www.mikesmets.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-nym-sny-mets",
-      "name": "SNY Mets",
-      "browserUrl": "https://sny.tv/teams/new-york-mets",
-      "category": "news"
-    },
-    {
-      "id": "mlb-nym-new-york-post-mets",
-      "name": "New York Post Mets",
-      "browserUrl": "https://nypost.com/tag/mets/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-nym-mlb-mets",
-      "name": "MLB Mets",
+      "id": "mlb-nym-mlb-com",
+      "name": "MLB.com",
       "browserUrl": "https://www.mlb.com/mets",
       "category": "news"
     },
     {
-      "id": "mlb-nym-espn-mets",
-      "name": "ESPN Mets",
+      "id": "mlb-nym-espn",
+      "name": "ESPN",
       "browserUrl": "https://www.espn.com/mlb/team/_/name/nym/new-york-mets",
       "category": "news"
     },
     {
-      "id": "mlb-nym-cbs-sports-mets",
-      "name": "CBS Sports Mets",
+      "id": "mlb-nym-cbs-sports",
+      "name": "CBS Sports",
       "browserUrl": "https://www.cbssports.com/mlb/teams/NYM/new-york-mets/",
       "category": "news"
     },
     {
-      "id": "mlb-nym-yardbarker-mets",
-      "name": "Yardbarker Mets",
-      "browserUrl": "https://www.yardbarker.com/mlb/teams/new_york_mets/21",
+      "id": "mlb-nym-fox-sports",
+      "name": "FOX Sports",
+      "browserUrl": "https://www.foxsports.com/mlb/new-york-mets-team",
       "category": "news"
     },
     {
-      "id": "mlb-nym-bleacher-report",
-      "name": "Bleacher Report",
-      "browserUrl": "https://bleacherreport.com/new-york-mets",
+      "id": "mlb-nym-yahoo-sports",
+      "name": "Yahoo! Sports",
+      "browserUrl": "https://sports.yahoo.com/mlb/teams/new-york-mets/",
       "category": "news"
     },
     {
-      "id": "mlb-nym-new-york-post-mets-2",
-      "name": "New York Post Mets",
-      "browserUrl": "https://nypost.com/new-york-mets/",
+      "id": "mlb-nym-the-athletic",
+      "name": "The Athletic",
+      "browserUrl": "https://www.nytimes.com/athletic/search/?query=New%20York%20Mets",
+      "category": "news"
+    },
+    {
+      "id": "mlb-nym-b-r",
+      "name": "B/R",
+      "browserUrl": "https://bleacherreport.com/search?q=New%20York%20Mets",
+      "category": "news"
+    },
+    {
+      "id": "mlb-nym-nbc-sports",
+      "name": "NBC Sports",
+      "browserUrl": "https://www.nbcsports.com/search?search=New%20York%20Mets",
+      "category": "news"
+    },
+    {
+      "id": "mlb-nym-si",
+      "name": "SI",
+      "browserUrl": "https://www.si.com/mlb/mets",
+      "category": "news"
+    },
+    {
+      "id": "mlb-nym-usa-today",
+      "name": "USA Today",
+      "browserUrl": "https://sportsdata.usatoday.com/baseball/mlb/teams/new-york-mets/245/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-nym-athlon-sports",
+      "name": "Athlon Sports",
+      "browserUrl": "https://athlonsports.com/mlb/new-york-mets",
+      "category": "news"
+    },
+    {
+      "id": "mlb-nym-yardbarker",
+      "name": "Yardbarker",
+      "browserUrl": "https://www.yardbarker.com/mlb/teams/new_york_mets/19",
+      "category": "news"
+    },
+    {
+      "id": "mlb-nym-spotrac",
+      "name": "Spotrac",
+      "browserUrl": "https://www.spotrac.com/search/?q=New%20York%20Mets",
+      "category": "news"
+    },
+    {
+      "id": "mlb-nym-statmuse",
+      "name": "StatMuse",
+      "browserUrl": "https://www.statmuse.com/mlb/ask/new-york-mets",
+      "category": "news"
+    },
+    {
+      "id": "mlb-nym-newsnow",
+      "name": "NewsNow",
+      "browserUrl": "https://www.newsnow.com/us/Sports/MLB/NL%2BEast/New%2BYork%2BMets",
+      "category": "news"
+    },
+    {
+      "id": "mlb-nym-sportspyder",
+      "name": "SportSpyder",
+      "browserUrl": "https://sportspyder.com/search?q=New%20York%20Mets",
+      "category": "news"
+    },
+    {
+      "id": "mlb-nym-reddit",
+      "name": "Reddit",
+      "browserUrl": "https://www.reddit.com/r/Mets/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-nym-mets",
+      "name": "@Mets",
+      "browserUrl": "https://x.com/Mets",
+      "category": "news"
+    },
+    {
+      "id": "mlb-nym-new-york-mets",
+      "name": "#New York Mets",
+      "browserUrl": "https://x.com/search?q=new%20york%20mets&src=typed_query",
       "category": "news"
     }
   ],
   "NYY": [
     {
-      "id": "mlb-nyy-pinstripe-alley",
-      "name": "Pinstripe Alley",
-      "browserUrl": "https://www.pinstripealley.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-nyy-yanks-go-yard",
-      "name": "Yanks Go Yard",
-      "browserUrl": "https://yanksgoyard.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-nyy-start-spreading-the-news",
-      "name": "Start Spreading the News",
-      "browserUrl": "https://www.startspreadingthenews.blog/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-nyy-yes-network-yankees",
-      "name": "YES Network Yankees",
-      "browserUrl": "https://www.yesnetwork.com/yankees",
-      "category": "news"
-    },
-    {
-      "id": "mlb-nyy-newsday-yankees",
-      "name": "Newsday Yankees",
-      "browserUrl": "https://www.newsday.com/sports/baseball/yankees",
-      "category": "news"
-    },
-    {
-      "id": "mlb-nyy-new-york-post-yankees",
-      "name": "New York Post Yankees",
-      "browserUrl": "https://nypost.com/tag/yankees/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-nyy-sny-yankees",
-      "name": "SNY Yankees",
-      "browserUrl": "https://sny.tv/teams/new-york-yankees",
-      "category": "news"
-    },
-    {
-      "id": "mlb-nyy-daily-news-yankees",
-      "name": "Daily News Yankees",
-      "browserUrl": "https://www.nydailynews.com/sports/baseball/yankees/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-nyy-river-avenue-blues",
-      "name": "River Avenue Blues",
-      "browserUrl": "https://www.riveraveblues.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-nyy-yankees-com-mlb",
-      "name": "Yankees.com / MLB",
+      "id": "mlb-nyy-mlb-com",
+      "name": "MLB.com",
       "browserUrl": "https://www.mlb.com/yankees",
       "category": "news"
     },
     {
-      "id": "mlb-nyy-espn-yankees",
-      "name": "ESPN Yankees",
+      "id": "mlb-nyy-espn",
+      "name": "ESPN",
       "browserUrl": "https://www.espn.com/mlb/team/_/name/nyy/new-york-yankees",
       "category": "news"
     },
     {
-      "id": "mlb-nyy-cbs-sports-yankees",
-      "name": "CBS Sports Yankees",
+      "id": "mlb-nyy-cbs-sports",
+      "name": "CBS Sports",
       "browserUrl": "https://www.cbssports.com/mlb/teams/NYY/new-york-yankees/",
       "category": "news"
     },
     {
-      "id": "mlb-nyy-fox-sports-yankees",
-      "name": "FOX Sports Yankees",
+      "id": "mlb-nyy-fox-sports",
+      "name": "FOX Sports",
       "browserUrl": "https://www.foxsports.com/mlb/new-york-yankees-team",
       "category": "news"
     },
     {
-      "id": "mlb-nyy-yardbarker-yankees",
-      "name": "Yardbarker Yankees",
-      "browserUrl": "https://www.yardbarker.com/mlb/teams/new_york_yankees/6",
+      "id": "mlb-nyy-yahoo-sports",
+      "name": "Yahoo! Sports",
+      "browserUrl": "https://sports.yahoo.com/mlb/teams/new-york-yankees/",
       "category": "news"
     },
     {
-      "id": "mlb-nyy-bleacher-report",
-      "name": "Bleacher Report",
-      "browserUrl": "https://bleacherreport.com/new-york-yankees",
+      "id": "mlb-nyy-the-athletic",
+      "name": "The Athletic",
+      "browserUrl": "https://www.nytimes.com/athletic/search/?query=New%20York%20Yankees",
       "category": "news"
     },
     {
-      "id": "mlb-nyy-yankee-blue",
-      "name": "Yankee Blue",
-      "browserUrl": "https://www.yankee.blue/",
+      "id": "mlb-nyy-b-r",
+      "name": "B/R",
+      "browserUrl": "https://bleacherreport.com/search?q=New%20York%20Yankees",
       "category": "news"
     },
     {
-      "id": "mlb-nyy-new-york-post-yankees-2",
-      "name": "New York Post Yankees",
-      "browserUrl": "https://nypost.com/new-york-yankees/",
+      "id": "mlb-nyy-nbc-sports",
+      "name": "NBC Sports",
+      "browserUrl": "https://www.nbcsports.com/search?search=New%20York%20Yankees",
       "category": "news"
     },
     {
-      "id": "mlb-nyy-john-sterling-blog",
-      "name": "John Sterling Blog",
-      "browserUrl": "https://johnsterling.blogspot.com/",
+      "id": "mlb-nyy-si",
+      "name": "SI",
+      "browserUrl": "https://www.si.com/mlb/yankees",
       "category": "news"
     },
     {
-      "id": "mlb-nyy-empire-sports-media-yankees",
-      "name": "Empire Sports Media \u2014 Yankees",
-      "browserUrl": "https://empiresportsmedia.com/category/new-york-yankees/",
+      "id": "mlb-nyy-usa-today",
+      "name": "USA Today",
+      "browserUrl": "https://sportsdata.usatoday.com/baseball/mlb/teams/new-york-yankees/234/",
       "category": "news"
     },
     {
-      "id": "mlb-nyy-start-spreading-the-news-all-news",
-      "name": "Start Spreading the News \u2014 All News",
-      "browserUrl": "https://www.startspreadingthenews.blog/all-news",
+      "id": "mlb-nyy-athlon-sports",
+      "name": "Athlon Sports",
+      "browserUrl": "https://athlonsports.com/mlb/new-york-yankees",
       "category": "news"
     },
     {
-      "id": "mlb-nyy-yardbarker-yankees-2",
-      "name": "Yardbarker Yankees",
+      "id": "mlb-nyy-yardbarker",
+      "name": "Yardbarker",
       "browserUrl": "https://www.yardbarker.com/mlb/teams/new_york_yankees/18",
       "category": "news"
     },
     {
-      "id": "mlb-nyy-bleeding-yankee-blue",
-      "name": "Bleeding Yankee Blue",
-      "browserUrl": "https://bleedingyankeeblue.blogspot.com/",
+      "id": "mlb-nyy-spotrac",
+      "name": "Spotrac",
+      "browserUrl": "https://www.spotrac.com/search/?q=New%20York%20Yankees",
+      "category": "news"
+    },
+    {
+      "id": "mlb-nyy-statmuse",
+      "name": "StatMuse",
+      "browserUrl": "https://www.statmuse.com/mlb/ask/new-york-yankees",
+      "category": "news"
+    },
+    {
+      "id": "mlb-nyy-newsnow",
+      "name": "NewsNow",
+      "browserUrl": "https://www.newsnow.com/us/Sports/MLB/AL%2BEast/New%2BYork%2BYankees",
+      "category": "news"
+    },
+    {
+      "id": "mlb-nyy-sportspyder",
+      "name": "SportSpyder",
+      "browserUrl": "https://sportspyder.com/search?q=New%20York%20Yankees",
+      "category": "news"
+    },
+    {
+      "id": "mlb-nyy-reddit",
+      "name": "Reddit",
+      "browserUrl": "https://www.reddit.com/r/NYYankees/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-nyy-yankees",
+      "name": "@Yankees",
+      "browserUrl": "https://x.com/Yankees",
+      "category": "news"
+    },
+    {
+      "id": "mlb-nyy-new-york-yankees",
+      "name": "#New York Yankees",
+      "browserUrl": "https://x.com/search?q=new%20york%20yankees&src=typed_query",
       "category": "news"
     }
   ],
   "PHI": [
     {
-      "id": "mlb-phi-the-good-phight",
-      "name": "The Good Phight",
-      "browserUrl": "https://www.thegoodphight.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-phi-phillies-nation",
-      "name": "Phillies Nation",
-      "browserUrl": "https://www.philliesnation.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-phi-that-balls-outta-here",
-      "name": "That Balls Outta Here",
-      "browserUrl": "https://thatballsouttahere.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-phi-phuture-phillies",
-      "name": "Phuture Phillies",
-      "browserUrl": "https://www.phuturephillies.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-phi-phillies-baseball-fan",
-      "name": "Phillies Baseball Fan",
-      "browserUrl": "https://www.philliesbaseballfan.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-phi-liberty-ballers-phillies",
-      "name": "Liberty Ballers Phillies",
-      "browserUrl": "https://www.thegoodphight.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-phi-philadelphia-inquirer-phillies",
-      "name": "Philadelphia Inquirer Phillies",
-      "browserUrl": "https://www.inquirer.com/phillies/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-phi-nbc-sports-philadelphia-phillies",
-      "name": "NBC Sports Philadelphia Phillies",
-      "browserUrl": "https://www.nbcsportsphiladelphia.com/mlb/philadelphia-phillies/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-phi-mlb-phillies",
-      "name": "MLB Phillies",
+      "id": "mlb-phi-mlb-com",
+      "name": "MLB.com",
       "browserUrl": "https://www.mlb.com/phillies",
       "category": "news"
     },
     {
-      "id": "mlb-phi-espn-phillies",
-      "name": "ESPN Phillies",
+      "id": "mlb-phi-espn",
+      "name": "ESPN",
       "browserUrl": "https://www.espn.com/mlb/team/_/name/phi/philadelphia-phillies",
       "category": "news"
     },
     {
-      "id": "mlb-phi-cbs-sports-phillies",
-      "name": "CBS Sports Phillies",
+      "id": "mlb-phi-cbs-sports",
+      "name": "CBS Sports",
       "browserUrl": "https://www.cbssports.com/mlb/teams/PHI/philadelphia-phillies/",
       "category": "news"
     },
     {
-      "id": "mlb-phi-fox-sports-phillies",
-      "name": "FOX Sports Phillies",
+      "id": "mlb-phi-fox-sports",
+      "name": "FOX Sports",
       "browserUrl": "https://www.foxsports.com/mlb/philadelphia-phillies-team",
       "category": "news"
     },
     {
-      "id": "mlb-phi-yardbarker-phillies",
-      "name": "Yardbarker Phillies",
-      "browserUrl": "https://www.yardbarker.com/mlb/teams/philadelphia_phillies/22",
+      "id": "mlb-phi-yahoo-sports",
+      "name": "Yahoo! Sports",
+      "browserUrl": "https://sports.yahoo.com/mlb/teams/philadelphia-phillies/",
       "category": "news"
     },
     {
-      "id": "mlb-phi-bleacher-report",
-      "name": "Bleacher Report",
-      "browserUrl": "https://bleacherreport.com/philadelphia-phillies",
+      "id": "mlb-phi-the-athletic",
+      "name": "The Athletic",
+      "browserUrl": "https://www.nytimes.com/athletic/search/?query=Philadelphia%20Phillies",
+      "category": "news"
+    },
+    {
+      "id": "mlb-phi-b-r",
+      "name": "B/R",
+      "browserUrl": "https://bleacherreport.com/search?q=Philadelphia%20Phillies",
+      "category": "news"
+    },
+    {
+      "id": "mlb-phi-nbc-sports",
+      "name": "NBC Sports",
+      "browserUrl": "https://www.nbcsports.com/search?search=Philadelphia%20Phillies",
+      "category": "news"
+    },
+    {
+      "id": "mlb-phi-si",
+      "name": "SI",
+      "browserUrl": "https://www.si.com/mlb/phillies",
+      "category": "news"
+    },
+    {
+      "id": "mlb-phi-usa-today",
+      "name": "USA Today",
+      "browserUrl": "https://sportsdata.usatoday.com/baseball/mlb/teams/philadelphia-phillies/246/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-phi-athlon-sports",
+      "name": "Athlon Sports",
+      "browserUrl": "https://athlonsports.com/mlb/philadelphia-phillies",
+      "category": "news"
+    },
+    {
+      "id": "mlb-phi-yardbarker",
+      "name": "Yardbarker",
+      "browserUrl": "https://www.yardbarker.com/mlb/teams/philadelphia_phillies/21",
+      "category": "news"
+    },
+    {
+      "id": "mlb-phi-spotrac",
+      "name": "Spotrac",
+      "browserUrl": "https://www.spotrac.com/search/?q=Philadelphia%20Phillies",
+      "category": "news"
+    },
+    {
+      "id": "mlb-phi-statmuse",
+      "name": "StatMuse",
+      "browserUrl": "https://www.statmuse.com/mlb/ask/philadelphia-phillies",
+      "category": "news"
+    },
+    {
+      "id": "mlb-phi-newsnow",
+      "name": "NewsNow",
+      "browserUrl": "https://www.newsnow.com/us/Sports/MLB/NL%2BEast/Philadelphia%2BPhillies",
+      "category": "news"
+    },
+    {
+      "id": "mlb-phi-sportspyder",
+      "name": "SportSpyder",
+      "browserUrl": "https://sportspyder.com/search?q=Philadelphia%20Phillies",
+      "category": "news"
+    },
+    {
+      "id": "mlb-phi-reddit",
+      "name": "Reddit",
+      "browserUrl": "https://www.reddit.com/r/Phillies/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-phi-phillies",
+      "name": "@Phillies",
+      "browserUrl": "https://x.com/Phillies",
+      "category": "news"
+    },
+    {
+      "id": "mlb-phi-philadelphia-phillies",
+      "name": "#Philadelphia Phillies",
+      "browserUrl": "https://x.com/search?q=philadelphia%20phillies&src=typed_query",
       "category": "news"
     }
   ],
   "PIT": [
     {
-      "id": "mlb-pit-bucs-dugout",
-      "name": "Bucs Dugout",
-      "browserUrl": "https://www.bucsdugout.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-pit-bucco-ball",
-      "name": "Bucco Ball",
-      "browserUrl": "https://buccoball.wordpress.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-pit-rumbunter",
-      "name": "Rumbunter",
-      "browserUrl": "https://rumbunter.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-pit-pittsburgh-baseball-now",
-      "name": "Pittsburgh Baseball Now",
-      "browserUrl": "https://pittsburghbaseballnow.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-pit-pirates-prospects",
-      "name": "Pirates Prospects",
-      "browserUrl": "https://piratesprospects.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-pit-triblive-pirates",
-      "name": "TribLIVE Pirates",
-      "browserUrl": "https://triblive.com/sports/pirates/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-pit-cbs-pittsburgh-pirates",
-      "name": "CBS Pittsburgh Pirates",
-      "browserUrl": "https://www.cbsnews.com/pittsburgh/sports/pirates/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-pit-wtae-pirates",
-      "name": "WTAE Pirates",
-      "browserUrl": "https://www.wtae.com/mlb-pirates",
-      "category": "news"
-    },
-    {
-      "id": "mlb-pit-mlb-pirates",
-      "name": "MLB Pirates",
+      "id": "mlb-pit-mlb-com",
+      "name": "MLB.com",
       "browserUrl": "https://www.mlb.com/pirates",
       "category": "news"
     },
     {
-      "id": "mlb-pit-espn-pirates",
-      "name": "ESPN Pirates",
+      "id": "mlb-pit-espn",
+      "name": "ESPN",
       "browserUrl": "https://www.espn.com/mlb/team/_/name/pit/pittsburgh-pirates",
       "category": "news"
     },
     {
-      "id": "mlb-pit-cbs-sports-pirates",
-      "name": "CBS Sports Pirates",
+      "id": "mlb-pit-cbs-sports",
+      "name": "CBS Sports",
       "browserUrl": "https://www.cbssports.com/mlb/teams/PIT/pittsburgh-pirates/",
       "category": "news"
     },
     {
-      "id": "mlb-pit-fox-sports-pirates",
-      "name": "FOX Sports Pirates",
+      "id": "mlb-pit-fox-sports",
+      "name": "FOX Sports",
       "browserUrl": "https://www.foxsports.com/mlb/pittsburgh-pirates-team",
       "category": "news"
     },
     {
-      "id": "mlb-pit-yardbarker-pirates",
-      "name": "Yardbarker Pirates",
-      "browserUrl": "https://www.yardbarker.com/mlb/teams/pittsburgh_pirates/26",
+      "id": "mlb-pit-yahoo-sports",
+      "name": "Yahoo! Sports",
+      "browserUrl": "https://sports.yahoo.com/mlb/teams/pittsburgh-pirates/",
       "category": "news"
     },
     {
-      "id": "mlb-pit-bleacher-report",
-      "name": "Bleacher Report",
-      "browserUrl": "https://bleacherreport.com/pittsburgh-pirates",
+      "id": "mlb-pit-the-athletic",
+      "name": "The Athletic",
+      "browserUrl": "https://www.nytimes.com/athletic/search/?query=Pittsburgh%20Pirates",
+      "category": "news"
+    },
+    {
+      "id": "mlb-pit-b-r",
+      "name": "B/R",
+      "browserUrl": "https://bleacherreport.com/search?q=Pittsburgh%20Pirates",
+      "category": "news"
+    },
+    {
+      "id": "mlb-pit-nbc-sports",
+      "name": "NBC Sports",
+      "browserUrl": "https://www.nbcsports.com/search?search=Pittsburgh%20Pirates",
+      "category": "news"
+    },
+    {
+      "id": "mlb-pit-si",
+      "name": "SI",
+      "browserUrl": "https://www.si.com/mlb/pirates",
+      "category": "news"
+    },
+    {
+      "id": "mlb-pit-usa-today",
+      "name": "USA Today",
+      "browserUrl": "https://sportsdata.usatoday.com/baseball/mlb/teams/pittsburgh-pirates/247/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-pit-athlon-sports",
+      "name": "Athlon Sports",
+      "browserUrl": "https://athlonsports.com/mlb/pittsburgh-pirates",
+      "category": "news"
+    },
+    {
+      "id": "mlb-pit-yardbarker",
+      "name": "Yardbarker",
+      "browserUrl": "https://www.yardbarker.com/mlb/teams/pittsburgh_pirates/22",
+      "category": "news"
+    },
+    {
+      "id": "mlb-pit-spotrac",
+      "name": "Spotrac",
+      "browserUrl": "https://www.spotrac.com/search/?q=Pittsburgh%20Pirates",
+      "category": "news"
+    },
+    {
+      "id": "mlb-pit-statmuse",
+      "name": "StatMuse",
+      "browserUrl": "https://www.statmuse.com/mlb/ask/pittsburgh-pirates",
+      "category": "news"
+    },
+    {
+      "id": "mlb-pit-newsnow",
+      "name": "NewsNow",
+      "browserUrl": "https://www.newsnow.com/us/Sports/MLB/NL%2BCentral/Pittsburgh%2BPirates",
+      "category": "news"
+    },
+    {
+      "id": "mlb-pit-sportspyder",
+      "name": "SportSpyder",
+      "browserUrl": "https://sportspyder.com/search?q=Pittsburgh%20Pirates",
+      "category": "news"
+    },
+    {
+      "id": "mlb-pit-reddit",
+      "name": "Reddit",
+      "browserUrl": "https://www.reddit.com/r/Buccos/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-pit-pirates",
+      "name": "@Pirates",
+      "browserUrl": "https://x.com/Pirates",
+      "category": "news"
+    },
+    {
+      "id": "mlb-pit-pittsburgh-pirates",
+      "name": "#Pittsburgh Pirates",
+      "browserUrl": "https://x.com/search?q=pittsburgh%20pirates&src=typed_query",
       "category": "news"
     }
   ],
   "SD": [
     {
-      "id": "mlb-sd-gaslamp-ball",
-      "name": "Gaslamp Ball",
-      "browserUrl": "https://www.gaslampball.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-sd-friars-on-base",
-      "name": "Friars on Base",
-      "browserUrl": "https://friarsonbase.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-sd-friarwire",
-      "name": "FriarWire",
-      "browserUrl": "https://padres.mlblogs.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-sd-east-village-times",
-      "name": "East Village Times",
-      "browserUrl": "https://www.eastvillagetimes.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-sd-madfriars",
-      "name": "MadFriars",
-      "browserUrl": "https://madfriars.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-sd-san-diego-union-tribune-padres",
-      "name": "San Diego Union-Tribune Padres",
-      "browserUrl": "https://www.sandiegouniontribune.com/sports/padres/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-sd-abc-10news-padres",
-      "name": "ABC 10News Padres",
-      "browserUrl": "https://www.10news.com/sports/padres",
-      "category": "news"
-    },
-    {
-      "id": "mlb-sd-cbs-8-padres",
-      "name": "CBS 8 Padres",
-      "browserUrl": "https://www.cbs8.com/padres",
-      "category": "news"
-    },
-    {
-      "id": "mlb-sd-fox-5-san-diego-padres",
-      "name": "FOX 5 San Diego Padres",
-      "browserUrl": "https://fox5sandiego.com/sports/padres/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-sd-mlb-padres",
-      "name": "MLB Padres",
+      "id": "mlb-sd-mlb-com",
+      "name": "MLB.com",
       "browserUrl": "https://www.mlb.com/padres",
       "category": "news"
     },
     {
-      "id": "mlb-sd-espn-padres",
-      "name": "ESPN Padres",
+      "id": "mlb-sd-espn",
+      "name": "ESPN",
       "browserUrl": "https://www.espn.com/mlb/team/_/name/sd/san-diego-padres",
       "category": "news"
     },
     {
-      "id": "mlb-sd-cbs-sports-padres",
-      "name": "CBS Sports Padres",
+      "id": "mlb-sd-cbs-sports",
+      "name": "CBS Sports",
       "browserUrl": "https://www.cbssports.com/mlb/teams/SD/san-diego-padres/",
       "category": "news"
     },
     {
-      "id": "mlb-sd-fox-sports-padres",
-      "name": "FOX Sports Padres",
+      "id": "mlb-sd-fox-sports",
+      "name": "FOX Sports",
       "browserUrl": "https://www.foxsports.com/mlb/san-diego-padres-team",
       "category": "news"
     },
     {
-      "id": "mlb-sd-yardbarker-padres",
-      "name": "Yardbarker Padres",
-      "browserUrl": "https://www.yardbarker.com/mlb/teams/san_diego_padres/31",
+      "id": "mlb-sd-yahoo-sports",
+      "name": "Yahoo! Sports",
+      "browserUrl": "https://sports.yahoo.com/mlb/teams/san-diego-padres/",
       "category": "news"
     },
     {
-      "id": "mlb-sd-bleacher-report",
-      "name": "Bleacher Report",
-      "browserUrl": "https://bleacherreport.com/san-diego-padres",
+      "id": "mlb-sd-the-athletic",
+      "name": "The Athletic",
+      "browserUrl": "https://www.nytimes.com/athletic/search/?query=San%20Diego%20Padres",
+      "category": "news"
+    },
+    {
+      "id": "mlb-sd-b-r",
+      "name": "B/R",
+      "browserUrl": "https://bleacherreport.com/search?q=San%20Diego%20Padres",
+      "category": "news"
+    },
+    {
+      "id": "mlb-sd-nbc-sports",
+      "name": "NBC Sports",
+      "browserUrl": "https://www.nbcsports.com/search?search=San%20Diego%20Padres",
+      "category": "news"
+    },
+    {
+      "id": "mlb-sd-si",
+      "name": "SI",
+      "browserUrl": "https://www.si.com/mlb/padres",
+      "category": "news"
+    },
+    {
+      "id": "mlb-sd-usa-today",
+      "name": "USA Today",
+      "browserUrl": "https://sportsdata.usatoday.com/baseball/mlb/teams/san-diego-padres/249/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-sd-athlon-sports",
+      "name": "Athlon Sports",
+      "browserUrl": "https://athlonsports.com/mlb/san-diego-padres",
+      "category": "news"
+    },
+    {
+      "id": "mlb-sd-yardbarker",
+      "name": "Yardbarker",
+      "browserUrl": "https://www.yardbarker.com/mlb/teams/san_diego_padres/23",
+      "category": "news"
+    },
+    {
+      "id": "mlb-sd-spotrac",
+      "name": "Spotrac",
+      "browserUrl": "https://www.spotrac.com/search/?q=San%20Diego%20Padres",
+      "category": "news"
+    },
+    {
+      "id": "mlb-sd-statmuse",
+      "name": "StatMuse",
+      "browserUrl": "https://www.statmuse.com/mlb/ask/san-diego-padres",
+      "category": "news"
+    },
+    {
+      "id": "mlb-sd-newsnow",
+      "name": "NewsNow",
+      "browserUrl": "https://www.newsnow.com/us/Sports/MLB/NL%2BWest/San%2BDiego%2BPadres",
+      "category": "news"
+    },
+    {
+      "id": "mlb-sd-sportspyder",
+      "name": "SportSpyder",
+      "browserUrl": "https://sportspyder.com/search?q=San%20Diego%20Padres",
+      "category": "news"
+    },
+    {
+      "id": "mlb-sd-reddit",
+      "name": "Reddit",
+      "browserUrl": "https://www.reddit.com/r/Padres/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-sd-padres",
+      "name": "@Padres",
+      "browserUrl": "https://x.com/Padres",
+      "category": "news"
+    },
+    {
+      "id": "mlb-sd-san-diego-padres",
+      "name": "#San Diego Padres",
+      "browserUrl": "https://x.com/search?q=san%20diego%20padres&src=typed_query",
       "category": "news"
     }
   ],
   "SF": [
     {
-      "id": "mlb-sf-mccovey-chronicles",
-      "name": "McCovey Chronicles",
-      "browserUrl": "https://www.mccoveychronicles.com/",
+      "id": "mlb-sf-mlb-com",
+      "name": "MLB.com",
+      "browserUrl": "https://www.mlb.com/sfgiants",
       "category": "news"
     },
     {
-      "id": "mlb-sf-around-the-foghorn",
-      "name": "Around the Foghorn",
-      "browserUrl": "https://aroundthefoghorn.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-sf-together-we-re-giants",
-      "name": "Together We're Giants",
-      "browserUrl": "https://togetherweregiants.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-sf-giants365",
-      "name": "Giants365",
-      "browserUrl": "https://giants365.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-sf-splash-hits-blog",
-      "name": "Splash Hits Blog",
-      "browserUrl": "https://splashhits.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-sf-golden-gate-sports-giants",
-      "name": "Golden Gate Sports Giants",
-      "browserUrl": "https://goldengatesports.com/san-francisco-giants/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-sf-the-willits-news-giants",
-      "name": "The Willits News Giants",
-      "browserUrl": "https://www.willitsnews.com/sports/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-sf-mlb-giants",
-      "name": "MLB Giants",
-      "browserUrl": "https://www.mlb.com/giants",
-      "category": "news"
-    },
-    {
-      "id": "mlb-sf-espn-giants",
-      "name": "ESPN Giants",
+      "id": "mlb-sf-espn",
+      "name": "ESPN",
       "browserUrl": "https://www.espn.com/mlb/team/_/name/sf/san-francisco-giants",
       "category": "news"
     },
     {
-      "id": "mlb-sf-yahoo-sports-giants",
-      "name": "Yahoo Sports Giants",
-      "browserUrl": "https://sports.yahoo.com/mlb/teams/san-francisco/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-sf-cbs-sports-giants",
-      "name": "CBS Sports Giants",
+      "id": "mlb-sf-cbs-sports",
+      "name": "CBS Sports",
       "browserUrl": "https://www.cbssports.com/mlb/teams/SF/san-francisco-giants/",
       "category": "news"
     },
     {
-      "id": "mlb-sf-fox-sports-giants",
-      "name": "FOX Sports Giants",
+      "id": "mlb-sf-fox-sports",
+      "name": "FOX Sports",
       "browserUrl": "https://www.foxsports.com/mlb/san-francisco-giants-team",
       "category": "news"
     },
     {
-      "id": "mlb-sf-yardbarker-giants",
-      "name": "Yardbarker Giants",
-      "browserUrl": "https://www.yardbarker.com/mlb/teams/san_francisco_giants/32",
+      "id": "mlb-sf-yahoo-sports",
+      "name": "Yahoo! Sports",
+      "browserUrl": "https://sports.yahoo.com/mlb/teams/san-francisco-giants/",
       "category": "news"
     },
     {
-      "id": "mlb-sf-bleacher-report",
-      "name": "Bleacher Report",
-      "browserUrl": "https://bleacherreport.com/san-francisco-giants",
+      "id": "mlb-sf-the-athletic",
+      "name": "The Athletic",
+      "browserUrl": "https://www.nytimes.com/athletic/search/?query=San%20Francisco%20Giants",
+      "category": "news"
+    },
+    {
+      "id": "mlb-sf-b-r",
+      "name": "B/R",
+      "browserUrl": "https://bleacherreport.com/search?q=San%20Francisco%20Giants",
+      "category": "news"
+    },
+    {
+      "id": "mlb-sf-nbc-sports",
+      "name": "NBC Sports",
+      "browserUrl": "https://www.nbcsports.com/search?search=San%20Francisco%20Giants",
+      "category": "news"
+    },
+    {
+      "id": "mlb-sf-si",
+      "name": "SI",
+      "browserUrl": "https://www.si.com/mlb/giants",
+      "category": "news"
+    },
+    {
+      "id": "mlb-sf-usa-today",
+      "name": "USA Today",
+      "browserUrl": "https://sportsdata.usatoday.com/baseball/mlb/teams/san-francisco-giants/250/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-sf-athlon-sports",
+      "name": "Athlon Sports",
+      "browserUrl": "https://athlonsports.com/mlb/san-francisco-giants",
+      "category": "news"
+    },
+    {
+      "id": "mlb-sf-yardbarker",
+      "name": "Yardbarker",
+      "browserUrl": "https://www.yardbarker.com/mlb/teams/san_francisco_giants/24",
+      "category": "news"
+    },
+    {
+      "id": "mlb-sf-spotrac",
+      "name": "Spotrac",
+      "browserUrl": "https://www.spotrac.com/search/?q=San%20Francisco%20Giants",
+      "category": "news"
+    },
+    {
+      "id": "mlb-sf-statmuse",
+      "name": "StatMuse",
+      "browserUrl": "https://www.statmuse.com/mlb/ask/san-francisco-giants",
+      "category": "news"
+    },
+    {
+      "id": "mlb-sf-newsnow",
+      "name": "NewsNow",
+      "browserUrl": "https://www.newsnow.com/us/Sports/MLB/NL%2BWest/San%2BFrancisco%2BGiants",
+      "category": "news"
+    },
+    {
+      "id": "mlb-sf-sportspyder",
+      "name": "SportSpyder",
+      "browserUrl": "https://sportspyder.com/search?q=San%20Francisco%20Giants",
+      "category": "news"
+    },
+    {
+      "id": "mlb-sf-reddit",
+      "name": "Reddit",
+      "browserUrl": "https://www.reddit.com/r/SFGiants/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-sf-sfgiants",
+      "name": "@SFGiants",
+      "browserUrl": "https://x.com/SFGiants",
+      "category": "news"
+    },
+    {
+      "id": "mlb-sf-san-francisco-giants",
+      "name": "#San Francisco Giants",
+      "browserUrl": "https://x.com/search?q=san%20francisco%20giants&src=typed_query",
       "category": "news"
     }
   ],
   "SEA": [
     {
-      "id": "mlb-sea-lookout-landing",
-      "name": "Lookout Landing",
-      "browserUrl": "https://www.lookoutlanding.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-sea-sodo-mojo",
-      "name": "SoDo Mojo",
-      "browserUrl": "https://sodomojo.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-sea-seattle-times-mariners",
-      "name": "Seattle Times Mariners",
-      "browserUrl": "https://www.seattletimes.com/sports/mariners/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-sea-from-the-corner-of-edgar-dave",
-      "name": "From the Corner of Edgar & Dave",
-      "browserUrl": "https://mariners.mlblogs.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-sea-seattle-sports-mariners",
-      "name": "Seattle Sports Mariners",
-      "browserUrl": "https://sports.mynorthwest.com/mlb/seattle-mariners/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-sea-u-s-s-mariner",
-      "name": "U.S.S. Mariner",
-      "browserUrl": "https://www.ussmariner.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-sea-komo-news-mariners",
-      "name": "KOMO News Mariners",
-      "browserUrl": "https://komonews.com/sports/mariners",
-      "category": "news"
-    },
-    {
-      "id": "mlb-sea-mlb-mariners",
-      "name": "MLB Mariners",
+      "id": "mlb-sea-mlb-com",
+      "name": "MLB.com",
       "browserUrl": "https://www.mlb.com/mariners",
       "category": "news"
     },
     {
-      "id": "mlb-sea-espn-mariners",
-      "name": "ESPN Mariners",
+      "id": "mlb-sea-espn",
+      "name": "ESPN",
       "browserUrl": "https://www.espn.com/mlb/team/_/name/sea/seattle-mariners",
       "category": "news"
     },
     {
-      "id": "mlb-sea-cbs-sports-mariners",
-      "name": "CBS Sports Mariners",
+      "id": "mlb-sea-cbs-sports",
+      "name": "CBS Sports",
       "browserUrl": "https://www.cbssports.com/mlb/teams/SEA/seattle-mariners/",
       "category": "news"
     },
     {
-      "id": "mlb-sea-fox-sports-mariners",
-      "name": "FOX Sports Mariners",
+      "id": "mlb-sea-fox-sports",
+      "name": "FOX Sports",
       "browserUrl": "https://www.foxsports.com/mlb/seattle-mariners-team",
       "category": "news"
     },
     {
-      "id": "mlb-sea-yardbarker-mariners",
-      "name": "Yardbarker Mariners",
-      "browserUrl": "https://www.yardbarker.com/mlb/teams/seattle_mariners/17",
+      "id": "mlb-sea-yahoo-sports",
+      "name": "Yahoo! Sports",
+      "browserUrl": "https://sports.yahoo.com/mlb/teams/seattle-mariners/",
       "category": "news"
     },
     {
-      "id": "mlb-sea-bleacher-report",
-      "name": "Bleacher Report",
-      "browserUrl": "https://bleacherreport.com/seattle-mariners",
+      "id": "mlb-sea-the-athletic",
+      "name": "The Athletic",
+      "browserUrl": "https://www.nytimes.com/athletic/search/?query=Seattle%20Mariners",
+      "category": "news"
+    },
+    {
+      "id": "mlb-sea-b-r",
+      "name": "B/R",
+      "browserUrl": "https://bleacherreport.com/search?q=Seattle%20Mariners",
+      "category": "news"
+    },
+    {
+      "id": "mlb-sea-nbc-sports",
+      "name": "NBC Sports",
+      "browserUrl": "https://www.nbcsports.com/search?search=Seattle%20Mariners",
+      "category": "news"
+    },
+    {
+      "id": "mlb-sea-si",
+      "name": "SI",
+      "browserUrl": "https://www.si.com/mlb/mariners",
+      "category": "news"
+    },
+    {
+      "id": "mlb-sea-usa-today",
+      "name": "USA Today",
+      "browserUrl": "https://sportsdata.usatoday.com/baseball/mlb/teams/seattle-mariners/236/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-sea-athlon-sports",
+      "name": "Athlon Sports",
+      "browserUrl": "https://athlonsports.com/mlb/seattle-mariners",
+      "category": "news"
+    },
+    {
+      "id": "mlb-sea-yardbarker",
+      "name": "Yardbarker",
+      "browserUrl": "https://www.yardbarker.com/mlb/teams/seattle_mariners/25",
+      "category": "news"
+    },
+    {
+      "id": "mlb-sea-spotrac",
+      "name": "Spotrac",
+      "browserUrl": "https://www.spotrac.com/search/?q=Seattle%20Mariners",
+      "category": "news"
+    },
+    {
+      "id": "mlb-sea-statmuse",
+      "name": "StatMuse",
+      "browserUrl": "https://www.statmuse.com/mlb/ask/seattle-mariners",
+      "category": "news"
+    },
+    {
+      "id": "mlb-sea-newsnow",
+      "name": "NewsNow",
+      "browserUrl": "https://www.newsnow.com/us/Sports/MLB/AL%2BWest/Seattle%2BMariners",
+      "category": "news"
+    },
+    {
+      "id": "mlb-sea-sportspyder",
+      "name": "SportSpyder",
+      "browserUrl": "https://sportspyder.com/search?q=Seattle%20Mariners",
+      "category": "news"
+    },
+    {
+      "id": "mlb-sea-reddit",
+      "name": "Reddit",
+      "browserUrl": "https://www.reddit.com/r/Mariners/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-sea-mariners",
+      "name": "@Mariners",
+      "browserUrl": "https://x.com/Mariners",
+      "category": "news"
+    },
+    {
+      "id": "mlb-sea-seattle-mariners",
+      "name": "#Seattle Mariners",
+      "browserUrl": "https://x.com/search?q=seattle%20mariners&src=typed_query",
       "category": "news"
     }
   ],
   "STL": [
     {
-      "id": "mlb-stl-viva-el-birdos",
-      "name": "Viva El Birdos",
-      "browserUrl": "https://www.vivaelbirdos.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-stl-redbird-rants",
-      "name": "Redbird Rants",
-      "browserUrl": "https://redbirdrants.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-stl-the-cardinal-nation",
-      "name": "The Cardinal Nation",
-      "browserUrl": "https://thecardinalnation.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-stl-cardinals-best-news-links",
-      "name": "Cardinals Best News Links",
-      "browserUrl": "https://cardinalsbestnews.blogspot.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-stl-st-louis-post-dispatch-cardinals",
-      "name": "St. Louis Post-Dispatch Cardinals",
-      "browserUrl": "https://www.stltoday.com/sports/professional/mlb/cardinals/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-stl-mlb-cardinals",
-      "name": "MLB Cardinals",
+      "id": "mlb-stl-mlb-com",
+      "name": "MLB.com",
       "browserUrl": "https://www.mlb.com/cardinals",
       "category": "news"
     },
     {
-      "id": "mlb-stl-espn-cardinals",
-      "name": "ESPN Cardinals",
+      "id": "mlb-stl-espn",
+      "name": "ESPN",
       "browserUrl": "https://www.espn.com/mlb/team/_/name/stl/st-louis-cardinals",
       "category": "news"
     },
     {
-      "id": "mlb-stl-cbs-sports-cardinals",
-      "name": "CBS Sports Cardinals",
+      "id": "mlb-stl-cbs-sports",
+      "name": "CBS Sports",
       "browserUrl": "https://www.cbssports.com/mlb/teams/STL/st-louis-cardinals/",
       "category": "news"
     },
     {
-      "id": "mlb-stl-fox-sports-cardinals",
-      "name": "FOX Sports Cardinals",
+      "id": "mlb-stl-fox-sports",
+      "name": "FOX Sports",
       "browserUrl": "https://www.foxsports.com/mlb/st-louis-cardinals-team",
       "category": "news"
     },
     {
-      "id": "mlb-stl-yardbarker-cardinals",
-      "name": "Yardbarker Cardinals",
-      "browserUrl": "https://www.yardbarker.com/mlb/teams/st_louis_cardinals/27",
+      "id": "mlb-stl-yahoo-sports",
+      "name": "Yahoo! Sports",
+      "browserUrl": "https://sports.yahoo.com/mlb/teams/st-louis-cardinals/",
       "category": "news"
     },
     {
-      "id": "mlb-stl-the-cold-wire-cardinals",
-      "name": "The Cold Wire Cardinals",
-      "browserUrl": "https://thecoldwire.com/sports/mlb/st-louis-cardinals/",
+      "id": "mlb-stl-the-athletic",
+      "name": "The Athletic",
+      "browserUrl": "https://www.nytimes.com/athletic/search/?query=St.%20Louis%20Cardinals",
       "category": "news"
     },
     {
-      "id": "mlb-stl-bleacher-report",
-      "name": "Bleacher Report",
-      "browserUrl": "https://bleacherreport.com/st-louis-cardinals",
+      "id": "mlb-stl-b-r",
+      "name": "B/R",
+      "browserUrl": "https://bleacherreport.com/search?q=St.%20Louis%20Cardinals",
+      "category": "news"
+    },
+    {
+      "id": "mlb-stl-nbc-sports",
+      "name": "NBC Sports",
+      "browserUrl": "https://www.nbcsports.com/search?search=St.%20Louis%20Cardinals",
+      "category": "news"
+    },
+    {
+      "id": "mlb-stl-si",
+      "name": "SI",
+      "browserUrl": "https://www.si.com/mlb/cardinals",
+      "category": "news"
+    },
+    {
+      "id": "mlb-stl-usa-today",
+      "name": "USA Today",
+      "browserUrl": "https://sportsdata.usatoday.com/baseball/mlb/teams/st-louis-cardinals/248/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-stl-athlon-sports",
+      "name": "Athlon Sports",
+      "browserUrl": "https://athlonsports.com/mlb/st-louis-cardinals",
+      "category": "news"
+    },
+    {
+      "id": "mlb-stl-yardbarker",
+      "name": "Yardbarker",
+      "browserUrl": "https://www.yardbarker.com/mlb/teams/st_louis_cardinals/26",
+      "category": "news"
+    },
+    {
+      "id": "mlb-stl-spotrac",
+      "name": "Spotrac",
+      "browserUrl": "https://www.spotrac.com/search/?q=St.%20Louis%20Cardinals",
+      "category": "news"
+    },
+    {
+      "id": "mlb-stl-statmuse",
+      "name": "StatMuse",
+      "browserUrl": "https://www.statmuse.com/mlb/ask/st.-louis-cardinals",
+      "category": "news"
+    },
+    {
+      "id": "mlb-stl-newsnow",
+      "name": "NewsNow",
+      "browserUrl": "https://www.newsnow.com/us/Sports/MLB/NL%2BCentral/St.%2BLouis%2BCardinals",
+      "category": "news"
+    },
+    {
+      "id": "mlb-stl-sportspyder",
+      "name": "SportSpyder",
+      "browserUrl": "https://sportspyder.com/search?q=St.%20Louis%20Cardinals",
+      "category": "news"
+    },
+    {
+      "id": "mlb-stl-reddit",
+      "name": "Reddit",
+      "browserUrl": "https://www.reddit.com/r/Cardinals/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-stl-cardinals",
+      "name": "@Cardinals",
+      "browserUrl": "https://x.com/Cardinals",
+      "category": "news"
+    },
+    {
+      "id": "mlb-stl-st-louis-cardinals",
+      "name": "#St. Louis Cardinals",
+      "browserUrl": "https://x.com/search?q=st.%20louis%20cardinals&src=typed_query",
       "category": "news"
     }
   ],
   "TB": [
     {
-      "id": "mlb-tb-draysbay",
-      "name": "DRaysBay",
-      "browserUrl": "https://www.draysbay.com/",
+      "id": "mlb-tb-mlb-com",
+      "name": "MLB.com",
+      "browserUrl": "https://www.mlb.com/raysbaseball",
       "category": "news"
     },
     {
-      "id": "mlb-tb-rays-colored-glasses",
-      "name": "Rays Colored Glasses",
-      "browserUrl": "https://rayscoloredglasses.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-tb-tampa-bay-rays",
-      "name": "Tampa Bay Rays",
-      "browserUrl": "https://www.mlb.com/rays",
-      "category": "news"
-    },
-    {
-      "id": "mlb-tb-tampa-bay-times-rays",
-      "name": "Tampa Bay Times Rays",
-      "browserUrl": "https://www.tampabay.com/sports/rays/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-tb-spectrum-bay-news-9-rays",
-      "name": "Spectrum Bay News 9 Rays",
-      "browserUrl": "https://baynews9.com/fl/tampa/sports/rays",
-      "category": "news"
-    },
-    {
-      "id": "mlb-tb-wtsp-rays",
-      "name": "WTSP Rays",
-      "browserUrl": "https://www.wtsp.com/rays",
-      "category": "news"
-    },
-    {
-      "id": "mlb-tb-rays-radio",
-      "name": "Rays Radio",
-      "browserUrl": "https://www.mlb.com/rays/fans/radio",
-      "category": "news"
-    },
-    {
-      "id": "mlb-tb-espn-rays",
-      "name": "ESPN Rays",
+      "id": "mlb-tb-espn",
+      "name": "ESPN",
       "browserUrl": "https://www.espn.com/mlb/team/_/name/tb/tampa-bay-rays",
       "category": "news"
     },
     {
-      "id": "mlb-tb-cbs-sports-rays",
-      "name": "CBS Sports Rays",
+      "id": "mlb-tb-cbs-sports",
+      "name": "CBS Sports",
       "browserUrl": "https://www.cbssports.com/mlb/teams/TB/tampa-bay-rays/",
       "category": "news"
     },
     {
-      "id": "mlb-tb-fox-sports-rays",
-      "name": "FOX Sports Rays",
+      "id": "mlb-tb-fox-sports",
+      "name": "FOX Sports",
       "browserUrl": "https://www.foxsports.com/mlb/tampa-bay-rays-team",
       "category": "news"
     },
     {
-      "id": "mlb-tb-yardbarker-rays",
-      "name": "Yardbarker Rays",
-      "browserUrl": "https://www.yardbarker.com/mlb/teams/tampa_bay_rays/7",
+      "id": "mlb-tb-yahoo-sports",
+      "name": "Yahoo! Sports",
+      "browserUrl": "https://sports.yahoo.com/mlb/teams/tampa-bay-rays/",
       "category": "news"
     },
     {
-      "id": "mlb-tb-bleacher-report",
-      "name": "Bleacher Report",
-      "browserUrl": "https://bleacherreport.com/tampa-bay-rays",
+      "id": "mlb-tb-the-athletic",
+      "name": "The Athletic",
+      "browserUrl": "https://www.nytimes.com/athletic/search/?query=Tampa%20Bay%20Rays",
+      "category": "news"
+    },
+    {
+      "id": "mlb-tb-b-r",
+      "name": "B/R",
+      "browserUrl": "https://bleacherreport.com/search?q=Tampa%20Bay%20Rays",
+      "category": "news"
+    },
+    {
+      "id": "mlb-tb-nbc-sports",
+      "name": "NBC Sports",
+      "browserUrl": "https://www.nbcsports.com/search?search=Tampa%20Bay%20Rays",
+      "category": "news"
+    },
+    {
+      "id": "mlb-tb-si",
+      "name": "SI",
+      "browserUrl": "https://www.si.com/mlb/rays",
+      "category": "news"
+    },
+    {
+      "id": "mlb-tb-usa-today",
+      "name": "USA Today",
+      "browserUrl": "https://sportsdata.usatoday.com/baseball/mlb/teams/tampa-bay-rays/254/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-tb-athlon-sports",
+      "name": "Athlon Sports",
+      "browserUrl": "https://athlonsports.com/mlb/tampa-bay-rays",
+      "category": "news"
+    },
+    {
+      "id": "mlb-tb-yardbarker",
+      "name": "Yardbarker",
+      "browserUrl": "https://www.yardbarker.com/mlb/teams/tampa_bay_rays/27",
+      "category": "news"
+    },
+    {
+      "id": "mlb-tb-spotrac",
+      "name": "Spotrac",
+      "browserUrl": "https://www.spotrac.com/search/?q=Tampa%20Bay%20Rays",
+      "category": "news"
+    },
+    {
+      "id": "mlb-tb-statmuse",
+      "name": "StatMuse",
+      "browserUrl": "https://www.statmuse.com/mlb/ask/tampa-bay-rays",
+      "category": "news"
+    },
+    {
+      "id": "mlb-tb-newsnow",
+      "name": "NewsNow",
+      "browserUrl": "https://www.newsnow.com/us/Sports/MLB/AL%2BEast/Tampa%2BBay%2BRays",
+      "category": "news"
+    },
+    {
+      "id": "mlb-tb-sportspyder",
+      "name": "SportSpyder",
+      "browserUrl": "https://sportspyder.com/search?q=Tampa%20Bay%20Rays",
+      "category": "news"
+    },
+    {
+      "id": "mlb-tb-reddit",
+      "name": "Reddit",
+      "browserUrl": "https://www.reddit.com/r/TampaBayRays/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-tb-raysbaseball",
+      "name": "@RaysBaseball",
+      "browserUrl": "https://x.com/RaysBaseball",
+      "category": "news"
+    },
+    {
+      "id": "mlb-tb-tampa-bay-rays",
+      "name": "#Tampa Bay Rays",
+      "browserUrl": "https://x.com/search?q=tampa%20bay%20rays&src=typed_query",
       "category": "news"
     }
   ],
   "TEX": [
     {
-      "id": "mlb-tex-lone-star-ball",
-      "name": "Lone Star Ball",
-      "browserUrl": "https://www.lonestarball.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-tex-nolan-writin",
-      "name": "Nolan Writin",
-      "browserUrl": "https://nolanwritin.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-tex-rangers-rounding-3rd",
-      "name": "Rangers Rounding 3rd",
-      "browserUrl": "https://rangersrounding3rd.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-tex-rangerfans",
-      "name": "RangerFans",
-      "browserUrl": "https://www.rangerfans.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-tex-105-3-the-fan-rangers",
-      "name": "105.3 The Fan Rangers",
-      "browserUrl": "https://www.audacy.com/1053thefan/sports/texas-rangers",
-      "category": "news"
-    },
-    {
-      "id": "mlb-tex-cbs-dfw-rangers",
-      "name": "CBS DFW Rangers",
-      "browserUrl": "https://www.cbsnews.com/texas/tag/texas-rangers/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-tex-kera-rangers",
-      "name": "KERA Rangers",
-      "browserUrl": "https://www.keranews.org/sports",
-      "category": "news"
-    },
-    {
-      "id": "mlb-tex-dallas-morning-news-rangers",
-      "name": "Dallas Morning News Rangers",
-      "browserUrl": "https://www.dallasnews.com/sports/rangers/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-tex-mlb-rangers",
-      "name": "MLB Rangers",
+      "id": "mlb-tex-mlb-com",
+      "name": "MLB.com",
       "browserUrl": "https://www.mlb.com/rangers",
       "category": "news"
     },
     {
-      "id": "mlb-tex-espn-rangers",
-      "name": "ESPN Rangers",
+      "id": "mlb-tex-espn",
+      "name": "ESPN",
       "browserUrl": "https://www.espn.com/mlb/team/_/name/tex/texas-rangers",
       "category": "news"
     },
     {
-      "id": "mlb-tex-cbs-sports-rangers",
-      "name": "CBS Sports Rangers",
+      "id": "mlb-tex-cbs-sports",
+      "name": "CBS Sports",
       "browserUrl": "https://www.cbssports.com/mlb/teams/TEX/texas-rangers/",
       "category": "news"
     },
     {
-      "id": "mlb-tex-fox-sports-rangers",
-      "name": "FOX Sports Rangers",
+      "id": "mlb-tex-fox-sports",
+      "name": "FOX Sports",
       "browserUrl": "https://www.foxsports.com/mlb/texas-rangers-team",
       "category": "news"
     },
     {
-      "id": "mlb-tex-yardbarker-rangers",
-      "name": "Yardbarker Rangers",
-      "browserUrl": "https://www.yardbarker.com/mlb/teams/texas_rangers/18",
+      "id": "mlb-tex-yahoo-sports",
+      "name": "Yahoo! Sports",
+      "browserUrl": "https://sports.yahoo.com/mlb/teams/texas-rangers/",
       "category": "news"
     },
     {
-      "id": "mlb-tex-bleacher-report",
-      "name": "Bleacher Report",
-      "browserUrl": "https://bleacherreport.com/texas-rangers",
+      "id": "mlb-tex-the-athletic",
+      "name": "The Athletic",
+      "browserUrl": "https://www.nytimes.com/athletic/search/?query=Texas%20Rangers",
+      "category": "news"
+    },
+    {
+      "id": "mlb-tex-b-r",
+      "name": "B/R",
+      "browserUrl": "https://bleacherreport.com/search?q=Texas%20Rangers",
+      "category": "news"
+    },
+    {
+      "id": "mlb-tex-nbc-sports",
+      "name": "NBC Sports",
+      "browserUrl": "https://www.nbcsports.com/search?search=Texas%20Rangers",
+      "category": "news"
+    },
+    {
+      "id": "mlb-tex-si",
+      "name": "SI",
+      "browserUrl": "https://www.si.com/mlb/rangers",
+      "category": "news"
+    },
+    {
+      "id": "mlb-tex-usa-today",
+      "name": "USA Today",
+      "browserUrl": "https://sportsdata.usatoday.com/baseball/mlb/teams/texas-rangers/237/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-tex-athlon-sports",
+      "name": "Athlon Sports",
+      "browserUrl": "https://athlonsports.com/mlb/texas-rangers",
+      "category": "news"
+    },
+    {
+      "id": "mlb-tex-yardbarker",
+      "name": "Yardbarker",
+      "browserUrl": "https://www.yardbarker.com/mlb/teams/texas_rangers/28",
+      "category": "news"
+    },
+    {
+      "id": "mlb-tex-spotrac",
+      "name": "Spotrac",
+      "browserUrl": "https://www.spotrac.com/search/?q=Texas%20Rangers",
+      "category": "news"
+    },
+    {
+      "id": "mlb-tex-statmuse",
+      "name": "StatMuse",
+      "browserUrl": "https://www.statmuse.com/mlb/ask/texas-rangers",
+      "category": "news"
+    },
+    {
+      "id": "mlb-tex-newsnow",
+      "name": "NewsNow",
+      "browserUrl": "https://www.newsnow.com/us/Sports/MLB/AL%2BWest/Texas%2BRangers",
+      "category": "news"
+    },
+    {
+      "id": "mlb-tex-sportspyder",
+      "name": "SportSpyder",
+      "browserUrl": "https://sportspyder.com/search?q=Texas%20Rangers",
+      "category": "news"
+    },
+    {
+      "id": "mlb-tex-reddit",
+      "name": "Reddit",
+      "browserUrl": "https://www.reddit.com/r/TexasRangers/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-tex-rangers",
+      "name": "@Rangers",
+      "browserUrl": "https://x.com/Rangers",
+      "category": "news"
+    },
+    {
+      "id": "mlb-tex-texas-rangers",
+      "name": "#Texas Rangers",
+      "browserUrl": "https://x.com/search?q=texas%20rangers&src=typed_query",
       "category": "news"
     }
   ],
   "TOR": [
     {
-      "id": "mlb-tor-bluebird-banter",
-      "name": "Bluebird Banter",
-      "browserUrl": "https://www.bluebirdbanter.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-tor-jays-journal",
-      "name": "Jays Journal",
-      "browserUrl": "https://jaysjournal.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-tor-bluejaysnation",
-      "name": "BlueJaysNation",
-      "browserUrl": "https://bluejaysnation.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-tor-blue-jays-from-away",
-      "name": "Blue Jays from Away",
-      "browserUrl": "https://bluejaysfromaway.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-tor-jays-from-the-couch",
-      "name": "Jays from the Couch",
-      "browserUrl": "https://jaysfromthecouch.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-tor-toronto-sun-blue-jays",
-      "name": "Toronto Sun Blue Jays",
-      "browserUrl": "https://torontosun.com/sports/baseball/toronto-blue-jays",
-      "category": "news"
-    },
-    {
-      "id": "mlb-tor-tsn-blue-jays",
-      "name": "TSN Blue Jays",
-      "browserUrl": "https://www.tsn.ca/mlb/team/toronto-blue-jays",
-      "category": "news"
-    },
-    {
-      "id": "mlb-tor-mlb-blue-jays",
-      "name": "MLB Blue Jays",
+      "id": "mlb-tor-mlb-com",
+      "name": "MLB.com",
       "browserUrl": "https://www.mlb.com/bluejays",
       "category": "news"
     },
     {
-      "id": "mlb-tor-espn-blue-jays",
-      "name": "ESPN Blue Jays",
+      "id": "mlb-tor-espn",
+      "name": "ESPN",
       "browserUrl": "https://www.espn.com/mlb/team/_/name/tor/toronto-blue-jays",
       "category": "news"
     },
     {
-      "id": "mlb-tor-cbs-sports-blue-jays",
-      "name": "CBS Sports Blue Jays",
+      "id": "mlb-tor-cbs-sports",
+      "name": "CBS Sports",
       "browserUrl": "https://www.cbssports.com/mlb/teams/TOR/toronto-blue-jays/",
       "category": "news"
     },
     {
-      "id": "mlb-tor-fox-sports-blue-jays",
-      "name": "FOX Sports Blue Jays",
+      "id": "mlb-tor-fox-sports",
+      "name": "FOX Sports",
       "browserUrl": "https://www.foxsports.com/mlb/toronto-blue-jays-team",
       "category": "news"
     },
     {
-      "id": "mlb-tor-yardbarker-blue-jays",
-      "name": "Yardbarker Blue Jays",
-      "browserUrl": "https://www.yardbarker.com/mlb/teams/toronto_blue_jays/8",
+      "id": "mlb-tor-yahoo-sports",
+      "name": "Yahoo! Sports",
+      "browserUrl": "https://sports.yahoo.com/mlb/teams/toronto-blue-jays/",
       "category": "news"
     },
     {
-      "id": "mlb-tor-bleacher-report",
-      "name": "Bleacher Report",
-      "browserUrl": "https://bleacherreport.com/toronto-blue-jays",
+      "id": "mlb-tor-the-athletic",
+      "name": "The Athletic",
+      "browserUrl": "https://www.nytimes.com/athletic/search/?query=Toronto%20Blue%20Jays",
+      "category": "news"
+    },
+    {
+      "id": "mlb-tor-b-r",
+      "name": "B/R",
+      "browserUrl": "https://bleacherreport.com/search?q=Toronto%20Blue%20Jays",
+      "category": "news"
+    },
+    {
+      "id": "mlb-tor-nbc-sports",
+      "name": "NBC Sports",
+      "browserUrl": "https://www.nbcsports.com/search?search=Toronto%20Blue%20Jays",
+      "category": "news"
+    },
+    {
+      "id": "mlb-tor-si",
+      "name": "SI",
+      "browserUrl": "https://www.si.com/mlb/blue-jays",
+      "category": "news"
+    },
+    {
+      "id": "mlb-tor-usa-today",
+      "name": "USA Today",
+      "browserUrl": "https://sportsdata.usatoday.com/baseball/mlb/teams/toronto-blue-jays/238/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-tor-athlon-sports",
+      "name": "Athlon Sports",
+      "browserUrl": "https://athlonsports.com/mlb/toronto-blue-jays",
+      "category": "news"
+    },
+    {
+      "id": "mlb-tor-yardbarker",
+      "name": "Yardbarker",
+      "browserUrl": "https://www.yardbarker.com/mlb/teams/toronto_blue_jays/29",
+      "category": "news"
+    },
+    {
+      "id": "mlb-tor-spotrac",
+      "name": "Spotrac",
+      "browserUrl": "https://www.spotrac.com/search/?q=Toronto%20Blue%20Jays",
+      "category": "news"
+    },
+    {
+      "id": "mlb-tor-statmuse",
+      "name": "StatMuse",
+      "browserUrl": "https://www.statmuse.com/mlb/ask/toronto-blue-jays",
+      "category": "news"
+    },
+    {
+      "id": "mlb-tor-newsnow",
+      "name": "NewsNow",
+      "browserUrl": "https://www.newsnow.com/us/Sports/MLB/AL%2BEast/Toronto%2BBlue%2BJays",
+      "category": "news"
+    },
+    {
+      "id": "mlb-tor-sportspyder",
+      "name": "SportSpyder",
+      "browserUrl": "https://sportspyder.com/search?q=Toronto%20Blue%20Jays",
+      "category": "news"
+    },
+    {
+      "id": "mlb-tor-reddit",
+      "name": "Reddit",
+      "browserUrl": "https://www.reddit.com/r/TorontoBlueJays/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-tor-bluejays",
+      "name": "@BlueJays",
+      "browserUrl": "https://x.com/BlueJays",
+      "category": "news"
+    },
+    {
+      "id": "mlb-tor-toronto-blue-jays",
+      "name": "#Toronto Blue Jays",
+      "browserUrl": "https://x.com/search?q=toronto%20blue%20jays&src=typed_query",
       "category": "news"
     }
   ],
   "WSH": [
     {
-      "id": "mlb-wsh-federal-baseball",
-      "name": "Federal Baseball",
-      "browserUrl": "https://www.federalbaseball.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-wsh-district-on-deck",
-      "name": "District on Deck",
-      "browserUrl": "https://districtondeck.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-wsh-talk-nats",
-      "name": "Talk Nats",
-      "browserUrl": "https://www.talknats.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-wsh-nationals-arm-race",
-      "name": "Nationals Arm Race",
-      "browserUrl": "https://www.nationalsarmrace.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-wsh-nationals-prospects",
-      "name": "Nationals Prospects",
-      "browserUrl": "https://www.nationalsprospects.com/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-wsh-masn-nationals",
-      "name": "MASN Nationals",
-      "browserUrl": "https://www.masnsports.com/blogs/washington-nationals",
-      "category": "news"
-    },
-    {
-      "id": "mlb-wsh-wtop-nationals",
-      "name": "WTOP Nationals",
-      "browserUrl": "https://wtop.com/sports/washington-nationals/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-wsh-washington-post-nationals",
-      "name": "Washington Post Nationals",
-      "browserUrl": "https://www.washingtonpost.com/sports/nationals/",
-      "category": "news"
-    },
-    {
-      "id": "mlb-wsh-mlb-nationals",
-      "name": "MLB Nationals",
+      "id": "mlb-wsh-mlb-com",
+      "name": "MLB.com",
       "browserUrl": "https://www.mlb.com/nationals",
       "category": "news"
     },
     {
-      "id": "mlb-wsh-espn-nationals",
-      "name": "ESPN Nationals",
+      "id": "mlb-wsh-espn",
+      "name": "ESPN",
       "browserUrl": "https://www.espn.com/mlb/team/_/name/wsh/washington-nationals",
       "category": "news"
     },
     {
-      "id": "mlb-wsh-cbs-sports-nationals",
-      "name": "CBS Sports Nationals",
-      "browserUrl": "https://www.cbssports.com/mlb/teams/WAS/washington-nationals/",
+      "id": "mlb-wsh-cbs-sports",
+      "name": "CBS Sports",
+      "browserUrl": "https://www.cbssports.com/mlb/teams/WSH/washington-nationals/",
       "category": "news"
     },
     {
-      "id": "mlb-wsh-fox-sports-nationals",
-      "name": "FOX Sports Nationals",
+      "id": "mlb-wsh-fox-sports",
+      "name": "FOX Sports",
       "browserUrl": "https://www.foxsports.com/mlb/washington-nationals-team",
       "category": "news"
     },
     {
-      "id": "mlb-wsh-yardbarker-nationals",
-      "name": "Yardbarker Nationals",
-      "browserUrl": "https://www.yardbarker.com/mlb/teams/washington_nationals/23",
+      "id": "mlb-wsh-yahoo-sports",
+      "name": "Yahoo! Sports",
+      "browserUrl": "https://sports.yahoo.com/mlb/teams/washington-nationals/",
       "category": "news"
     },
     {
-      "id": "mlb-wsh-bleacher-report",
-      "name": "Bleacher Report",
-      "browserUrl": "https://bleacherreport.com/washington-nationals",
+      "id": "mlb-wsh-the-athletic",
+      "name": "The Athletic",
+      "browserUrl": "https://www.nytimes.com/athletic/search/?query=Washington%20Nationals",
+      "category": "news"
+    },
+    {
+      "id": "mlb-wsh-b-r",
+      "name": "B/R",
+      "browserUrl": "https://bleacherreport.com/search?q=Washington%20Nationals",
+      "category": "news"
+    },
+    {
+      "id": "mlb-wsh-nbc-sports",
+      "name": "NBC Sports",
+      "browserUrl": "https://www.nbcsports.com/search?search=Washington%20Nationals",
+      "category": "news"
+    },
+    {
+      "id": "mlb-wsh-si",
+      "name": "SI",
+      "browserUrl": "https://www.si.com/mlb/nationals",
+      "category": "news"
+    },
+    {
+      "id": "mlb-wsh-usa-today",
+      "name": "USA Today",
+      "browserUrl": "https://sportsdata.usatoday.com/baseball/mlb/teams/washington-nationals/244/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-wsh-athlon-sports",
+      "name": "Athlon Sports",
+      "browserUrl": "https://athlonsports.com/mlb/washington-nationals",
+      "category": "news"
+    },
+    {
+      "id": "mlb-wsh-yardbarker",
+      "name": "Yardbarker",
+      "browserUrl": "https://www.yardbarker.com/mlb/teams/washington_nationals/30",
+      "category": "news"
+    },
+    {
+      "id": "mlb-wsh-spotrac",
+      "name": "Spotrac",
+      "browserUrl": "https://www.spotrac.com/search/?q=Washington%20Nationals",
+      "category": "news"
+    },
+    {
+      "id": "mlb-wsh-statmuse",
+      "name": "StatMuse",
+      "browserUrl": "https://www.statmuse.com/mlb/ask/washington-nationals",
+      "category": "news"
+    },
+    {
+      "id": "mlb-wsh-newsnow",
+      "name": "NewsNow",
+      "browserUrl": "https://www.newsnow.com/us/Sports/MLB/NL%2BEast/Washington%2BNationals",
+      "category": "news"
+    },
+    {
+      "id": "mlb-wsh-sportspyder",
+      "name": "SportSpyder",
+      "browserUrl": "https://sportspyder.com/search?q=Washington%20Nationals",
+      "category": "news"
+    },
+    {
+      "id": "mlb-wsh-reddit",
+      "name": "Reddit",
+      "browserUrl": "https://www.reddit.com/r/Nationals/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-wsh-nationals",
+      "name": "@Nationals",
+      "browserUrl": "https://x.com/Nationals",
+      "category": "news"
+    },
+    {
+      "id": "mlb-wsh-washington-nationals",
+      "name": "#Washington Nationals",
+      "browserUrl": "https://x.com/search?q=washington%20nationals&src=typed_query",
       "category": "news"
     }
   ]
@@ -100620,83 +101568,127 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
     ]
   },
   "NHL": {
+    "ANA": [
+      {
+        "id": "nhl-ana-nhl-com",
+        "name": "NHL.com",
+        "browserUrl": "https://www.nhl.com/ducks/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-ana-espn",
+        "name": "ESPN",
+        "browserUrl": "https://www.espn.com/nhl/team/_/name/ana/anaheim-ducks",
+        "category": "news"
+      },
+      {
+        "id": "nhl-ana-cbs-sports",
+        "name": "CBS Sports",
+        "browserUrl": "https://www.cbssports.com/nhl/teams/ANA/anaheim-ducks/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-ana-fox-sports",
+        "name": "FOX Sports",
+        "browserUrl": "https://www.foxsports.com/nhl/anaheim-ducks-team",
+        "category": "news"
+      },
+      {
+        "id": "nhl-ana-yahoo-sports",
+        "name": "Yahoo! Sports",
+        "browserUrl": "https://sports.yahoo.com/nhl/teams/anaheim/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-ana-the-athletic",
+        "name": "The Athletic",
+        "browserUrl": "https://www.nytimes.com/athletic/nhl/team/ducks/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-ana-b-r",
+        "name": "B/R",
+        "browserUrl": "https://bleacherreport.com/anaheim-ducks",
+        "category": "news"
+      },
+      {
+        "id": "nhl-ana-nbc-sports",
+        "name": "NBC Sports",
+        "browserUrl": "https://www.nbcsports.com/nhl/anaheim-ducks",
+        "category": "news"
+      },
+      {
+        "id": "nhl-ana-si",
+        "name": "SI",
+        "browserUrl": "https://www.si.com/nhl/ducks",
+        "category": "news"
+      },
+      {
+        "id": "nhl-ana-usa-today",
+        "name": "USA Today",
+        "browserUrl": "https://sportsdata.usatoday.com/hockey/nhl/teams/anaheim-ducks/4978",
+        "category": "news"
+      },
+      {
+        "id": "nhl-ana-athlon-sports",
+        "name": "Athlon Sports",
+        "browserUrl": "https://athlonsports.com/nhl/anaheim-ducks",
+        "category": "news"
+      },
+      {
+        "id": "nhl-ana-yardbarker",
+        "name": "Yardbarker",
+        "browserUrl": "https://www.yardbarker.com/nhl/teams/anaheim_ducks/117",
+        "category": "news"
+      },
+      {
+        "id": "nhl-ana-spotrac",
+        "name": "Spotrac",
+        "browserUrl": "https://www.spotrac.com/nhl/anaheim-ducks/overview",
+        "category": "news"
+      },
+      {
+        "id": "nhl-ana-statmuse",
+        "name": "StatMuse",
+        "browserUrl": "https://www.statmuse.com/nhl/ask/anaheim-ducks-stats",
+        "category": "news"
+      },
+      {
+        "id": "nhl-ana-newsnow",
+        "name": "NewsNow",
+        "browserUrl": "https://www.newsnow.co.uk/h/Sport/US+Sports/NHL/Anaheim+Ducks",
+        "category": "news"
+      },
+      {
+        "id": "nhl-ana-sportspyder",
+        "name": "SportSpyder",
+        "browserUrl": "https://sportspyder.com/nhl/anaheim-ducks/news",
+        "category": "news"
+      },
+      {
+        "id": "nhl-ana-reddit",
+        "name": "Reddit",
+        "browserUrl": "https://www.reddit.com/r/AnaheimDucks/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-ana-anaheimducks",
+        "name": "@AnaheimDucks",
+        "browserUrl": "https://x.com/AnaheimDucks",
+        "category": "news"
+      },
+      {
+        "id": "nhl-ana-anaheim-ducks",
+        "name": "#Anaheim Ducks",
+        "browserUrl": "https://x.com/search?q=anaheim%20ducks&src=typed_query",
+        "category": "news"
+      }
+    ],
     "BOS": [
       {
-        "id": "nhl-bos-stanley-cup-of-chowder",
-        "name": "Stanley Cup of Chowder",
-        "browserUrl": "https://www.stanleycupofchowder.com/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-bos-boston-hockey-now",
-        "name": "Boston Hockey Now",
-        "browserUrl": "https://bostonhockeynow.com",
-        "category": "news"
-      },
-      {
-        "id": "nhl-bos-boston-com",
-        "name": "Boston.com",
-        "browserUrl": "https://www.boston.com/tag/boston-bruins/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-bos-sportspyder",
-        "name": "SportSpyder",
-        "browserUrl": "https://sportspyder.com/nhl/boston-bruins/news",
-        "category": "news"
-      },
-      {
-        "id": "nhl-bos-bruins-daily",
-        "name": "Bruins Daily",
-        "browserUrl": "https://www.bruinsdaily.com/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-bos-the-new-york-times",
-        "name": "The New York Times",
-        "browserUrl": "https://www.nytimes.com/topic/organization/boston-bruins",
-        "category": "news"
-      },
-      {
-        "id": "nhl-bos-causeway-crowd",
-        "name": "Causeway Crowd",
-        "browserUrl": "https://causewaycrowd.com",
-        "category": "news"
-      },
-      {
-        "id": "nhl-bos-nesn",
-        "name": "NESN",
-        "browserUrl": "https://nesn.com/boston-bruins",
-        "category": "news"
-      },
-      {
-        "id": "nhl-bos-boston-herald",
-        "name": "Boston Herald",
-        "browserUrl": "https://www.bostonherald.com/sports/nhl/boston-bruins/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-bos-yahoo-sports",
-        "name": "Yahoo Sports",
-        "browserUrl": "https://sports.yahoo.com/nhl/teams/boston/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-bos-wbz",
-        "name": "WBZ",
-        "browserUrl": "https://www.cbsnews.com/boston/sports/bruins/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-bos-the-athletic",
-        "name": "The Athletic",
-        "browserUrl": "https://www.nytimes.com/athletic/nhl/team/bruins/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-bos-nhl-official",
-        "name": "NHL Official",
-        "browserUrl": "https://www.nhl.com/bruins",
+        "id": "nhl-bos-nhl-com",
+        "name": "NHL.com",
+        "browserUrl": "https://www.nhl.com/bruins/",
         "category": "news"
       },
       {
@@ -100712,101 +101704,107 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
         "category": "news"
       },
       {
-        "id": "nhl-bos-pro-hockey-rumors",
-        "name": "Pro Hockey Rumors",
-        "browserUrl": "https://www.prohockeyrumors.com/boston-bruins",
+        "id": "nhl-bos-fox-sports",
+        "name": "FOX Sports",
+        "browserUrl": "https://www.foxsports.com/nhl/boston-bruins-team",
         "category": "news"
       },
       {
-        "id": "nhl-bos-the-hockey-writers",
-        "name": "The Hockey Writers",
-        "browserUrl": "https://thehockeywriters.com/boston-bruins/",
+        "id": "nhl-bos-yahoo-sports",
+        "name": "Yahoo! Sports",
+        "browserUrl": "https://sports.yahoo.com/nhl/teams/boston/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-bos-the-athletic",
+        "name": "The Athletic",
+        "browserUrl": "https://www.nytimes.com/athletic/nhl/team/bruins/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-bos-b-r",
+        "name": "B/R",
+        "browserUrl": "https://bleacherreport.com/boston-bruins",
+        "category": "news"
+      },
+      {
+        "id": "nhl-bos-nbc-sports",
+        "name": "NBC Sports",
+        "browserUrl": "https://www.nbcsports.com/nhl/boston-bruins",
+        "category": "news"
+      },
+      {
+        "id": "nhl-bos-si",
+        "name": "SI",
+        "browserUrl": "https://www.si.com/nhl/bruins",
+        "category": "news"
+      },
+      {
+        "id": "nhl-bos-usa-today",
+        "name": "USA Today",
+        "browserUrl": "https://sportsdata.usatoday.com/hockey/nhl/teams/boston-bruins/4954",
+        "category": "news"
+      },
+      {
+        "id": "nhl-bos-athlon-sports",
+        "name": "Athlon Sports",
+        "browserUrl": "https://athlonsports.com/nhl/boston-bruins",
+        "category": "news"
+      },
+      {
+        "id": "nhl-bos-yardbarker",
+        "name": "Yardbarker",
+        "browserUrl": "https://www.yardbarker.com/nhl/teams/boston_bruins/97",
+        "category": "news"
+      },
+      {
+        "id": "nhl-bos-spotrac",
+        "name": "Spotrac",
+        "browserUrl": "https://www.spotrac.com/nhl/boston-bruins/overview",
+        "category": "news"
+      },
+      {
+        "id": "nhl-bos-statmuse",
+        "name": "StatMuse",
+        "browserUrl": "https://www.statmuse.com/nhl/ask/boston-bruins-stats",
+        "category": "news"
+      },
+      {
+        "id": "nhl-bos-newsnow",
+        "name": "NewsNow",
+        "browserUrl": "https://www.newsnow.co.uk/h/Sport/US+Sports/NHL/Boston+Bruins",
+        "category": "news"
+      },
+      {
+        "id": "nhl-bos-sportspyder",
+        "name": "SportSpyder",
+        "browserUrl": "https://sportspyder.com/nhl/boston-bruins/news",
+        "category": "news"
+      },
+      {
+        "id": "nhl-bos-reddit",
+        "name": "Reddit",
+        "browserUrl": "https://www.reddit.com/r/BostonBruins/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-bos-nhlbruins",
+        "name": "@NHLBruins",
+        "browserUrl": "https://x.com/NHLBruins",
+        "category": "news"
+      },
+      {
+        "id": "nhl-bos-boston-bruins",
+        "name": "#Boston Bruins",
+        "browserUrl": "https://x.com/search?q=boston%20bruins&src=typed_query",
         "category": "news"
       }
     ],
     "BUF": [
       {
-        "id": "nhl-buf-die-by-the-blade",
-        "name": "Die By The Blade",
-        "browserUrl": "https://www.diebytheblade.com",
-        "category": "news"
-      },
-      {
-        "id": "nhl-buf-buffalo-hockey-beat",
-        "name": "Buffalo Hockey Beat",
-        "browserUrl": "https://www.buffalohockeybeat.com",
-        "category": "news"
-      },
-      {
-        "id": "nhl-buf-sabrespace",
-        "name": "SabreSpace",
-        "browserUrl": "https://www.sabrespace.com",
-        "category": "news"
-      },
-      {
-        "id": "nhl-buf-the-buffalo-news",
-        "name": "The Buffalo News",
-        "browserUrl": "https://buffalonews.com/sports/sabres",
-        "category": "news"
-      },
-      {
-        "id": "nhl-buf-the-hockey-writers",
-        "name": "The Hockey Writers",
-        "browserUrl": "https://thehockeywriters.com/buffalo-sabres/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-buf-wkbw",
-        "name": "WKBW",
-        "browserUrl": "https://www.wkbw.com/sports/sabres",
-        "category": "news"
-      },
-      {
-        "id": "nhl-buf-pro-hockey-rumors",
-        "name": "Pro Hockey Rumors",
-        "browserUrl": "https://www.prohockeyrumors.com/buffalo-sabres",
-        "category": "news"
-      },
-      {
-        "id": "nhl-buf-two-in-the-box",
-        "name": "Two in the Box",
-        "browserUrl": "https://twointhebox.com/category/buffalo-sabres/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-buf-the-hockey-news",
-        "name": "The Hockey News",
-        "browserUrl": "https://thehockeynews.com/nhl/buffalo-sabres",
-        "category": "news"
-      },
-      {
-        "id": "nhl-buf-expected-buffalo",
-        "name": "Expected Buffalo",
-        "browserUrl": "https://www.expectedbuffalo.com",
-        "category": "news"
-      },
-      {
-        "id": "nhl-buf-msg-networks",
-        "name": "MSG Networks",
-        "browserUrl": "https://www.msgnetworks.com/teams/sabres/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-buf-buffalo-sabres-now",
-        "name": "Buffalo Sabres Now",
-        "browserUrl": "https://buffalosabresnow.blogspot.com",
-        "category": "news"
-      },
-      {
-        "id": "nhl-buf-sabre-noise",
-        "name": "Sabre Noise",
-        "browserUrl": "https://sabrenoise.com",
-        "category": "news"
-      },
-      {
-        "id": "nhl-buf-buffalo-sabres-digital-press-box",
-        "name": "Buffalo Sabres Digital Press Box",
-        "browserUrl": "https://sabresdigitalpressbox.com",
+        "id": "nhl-buf-nhl-com",
+        "name": "NHL.com",
+        "browserUrl": "https://www.nhl.com/sabres/",
         "category": "news"
       },
       {
@@ -100816,39 +101814,81 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
         "category": "news"
       },
       {
-        "id": "nhl-buf-fox-sports",
-        "name": "FOX Sports",
-        "browserUrl": "https://www.foxsports.com/nhl/buffalo-sabres-team",
-        "category": "news"
-      },
-      {
-        "id": "nhl-buf-fansided",
-        "name": "FanSided",
-        "browserUrl": "https://fansided.com/nhl/buffalo-sabres",
-        "category": "news"
-      },
-      {
-        "id": "nhl-buf-tip-of-the-tower",
-        "name": "Tip of the Tower",
-        "browserUrl": "https://tipofthetower.com/buffalo-sabres/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-buf-nhl-official",
-        "name": "NHL Official",
-        "browserUrl": "https://www.nhl.com/sabres",
-        "category": "news"
-      },
-      {
         "id": "nhl-buf-cbs-sports",
         "name": "CBS Sports",
         "browserUrl": "https://www.cbssports.com/nhl/teams/BUF/buffalo-sabres/",
         "category": "news"
       },
       {
+        "id": "nhl-buf-fox-sports",
+        "name": "FOX Sports",
+        "browserUrl": "https://www.foxsports.com/nhl/buffalo-sabres-team",
+        "category": "news"
+      },
+      {
         "id": "nhl-buf-yahoo-sports",
-        "name": "Yahoo Sports",
+        "name": "Yahoo! Sports",
         "browserUrl": "https://sports.yahoo.com/nhl/teams/buffalo/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-buf-the-athletic",
+        "name": "The Athletic",
+        "browserUrl": "https://www.nytimes.com/athletic/nhl/team/sabres/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-buf-b-r",
+        "name": "B/R",
+        "browserUrl": "https://bleacherreport.com/buffalo-sabres",
+        "category": "news"
+      },
+      {
+        "id": "nhl-buf-nbc-sports",
+        "name": "NBC Sports",
+        "browserUrl": "https://www.nbcsports.com/nhl/buffalo-sabres",
+        "category": "news"
+      },
+      {
+        "id": "nhl-buf-si",
+        "name": "SI",
+        "browserUrl": "https://www.si.com/nhl/sabres",
+        "category": "news"
+      },
+      {
+        "id": "nhl-buf-usa-today",
+        "name": "USA Today",
+        "browserUrl": "https://sportsdata.usatoday.com/hockey/nhl/teams/buffalo-sabres/4955",
+        "category": "news"
+      },
+      {
+        "id": "nhl-buf-athlon-sports",
+        "name": "Athlon Sports",
+        "browserUrl": "https://athlonsports.com/nhl/buffalo-sabres",
+        "category": "news"
+      },
+      {
+        "id": "nhl-buf-yardbarker",
+        "name": "Yardbarker",
+        "browserUrl": "https://www.yardbarker.com/nhl/teams/buffalo_sabres/98",
+        "category": "news"
+      },
+      {
+        "id": "nhl-buf-spotrac",
+        "name": "Spotrac",
+        "browserUrl": "https://www.spotrac.com/nhl/buffalo-sabres/overview",
+        "category": "news"
+      },
+      {
+        "id": "nhl-buf-statmuse",
+        "name": "StatMuse",
+        "browserUrl": "https://www.statmuse.com/nhl/ask/buffalo-sabres-stats",
+        "category": "news"
+      },
+      {
+        "id": "nhl-buf-newsnow",
+        "name": "NewsNow",
+        "browserUrl": "https://www.newsnow.co.uk/h/Sport/US+Sports/NHL/Buffalo+Sabres",
         "category": "news"
       },
       {
@@ -100856,61 +101896,147 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
         "name": "SportSpyder",
         "browserUrl": "https://sportspyder.com/nhl/buffalo-sabres/news",
         "category": "news"
+      },
+      {
+        "id": "nhl-buf-reddit",
+        "name": "Reddit",
+        "browserUrl": "https://www.reddit.com/r/sabres/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-buf-buffalosabres",
+        "name": "@BuffaloSabres",
+        "browserUrl": "https://x.com/BuffaloSabres",
+        "category": "news"
+      },
+      {
+        "id": "nhl-buf-buffalo-sabres",
+        "name": "#Buffalo Sabres",
+        "browserUrl": "https://x.com/search?q=buffalo%20sabres&src=typed_query",
+        "category": "news"
+      }
+    ],
+    "CGY": [
+      {
+        "id": "nhl-cgy-nhl-com",
+        "name": "NHL.com",
+        "browserUrl": "https://www.nhl.com/flames/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-cgy-espn",
+        "name": "ESPN",
+        "browserUrl": "https://www.espn.com/nhl/team/_/name/cgy/calgary-flames",
+        "category": "news"
+      },
+      {
+        "id": "nhl-cgy-cbs-sports",
+        "name": "CBS Sports",
+        "browserUrl": "https://www.cbssports.com/nhl/teams/CGY/calgary-flames/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-cgy-fox-sports",
+        "name": "FOX Sports",
+        "browserUrl": "https://www.foxsports.com/nhl/calgary-flames-team",
+        "category": "news"
+      },
+      {
+        "id": "nhl-cgy-yahoo-sports",
+        "name": "Yahoo! Sports",
+        "browserUrl": "https://sports.yahoo.com/nhl/teams/calgary/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-cgy-the-athletic",
+        "name": "The Athletic",
+        "browserUrl": "https://www.nytimes.com/athletic/nhl/team/flames/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-cgy-b-r",
+        "name": "B/R",
+        "browserUrl": "https://bleacherreport.com/calgary-flames",
+        "category": "news"
+      },
+      {
+        "id": "nhl-cgy-nbc-sports",
+        "name": "NBC Sports",
+        "browserUrl": "https://www.nbcsports.com/nhl/calgary-flames",
+        "category": "news"
+      },
+      {
+        "id": "nhl-cgy-si",
+        "name": "SI",
+        "browserUrl": "https://www.si.com/nhl/flames",
+        "category": "news"
+      },
+      {
+        "id": "nhl-cgy-usa-today",
+        "name": "USA Today",
+        "browserUrl": "https://sportsdata.usatoday.com/hockey/nhl/teams/calgary-flames/4956",
+        "category": "news"
+      },
+      {
+        "id": "nhl-cgy-athlon-sports",
+        "name": "Athlon Sports",
+        "browserUrl": "https://athlonsports.com/nhl/calgary-flames",
+        "category": "news"
+      },
+      {
+        "id": "nhl-cgy-yardbarker",
+        "name": "Yardbarker",
+        "browserUrl": "https://www.yardbarker.com/nhl/teams/calgary_flames/112",
+        "category": "news"
+      },
+      {
+        "id": "nhl-cgy-spotrac",
+        "name": "Spotrac",
+        "browserUrl": "https://www.spotrac.com/nhl/calgary-flames/overview",
+        "category": "news"
+      },
+      {
+        "id": "nhl-cgy-statmuse",
+        "name": "StatMuse",
+        "browserUrl": "https://www.statmuse.com/nhl/ask/calgary-flames-stats",
+        "category": "news"
+      },
+      {
+        "id": "nhl-cgy-newsnow",
+        "name": "NewsNow",
+        "browserUrl": "https://www.newsnow.co.uk/h/Sport/US+Sports/NHL/Calgary+Flames",
+        "category": "news"
+      },
+      {
+        "id": "nhl-cgy-sportspyder",
+        "name": "SportSpyder",
+        "browserUrl": "https://sportspyder.com/nhl/calgary-flames/news",
+        "category": "news"
+      },
+      {
+        "id": "nhl-cgy-reddit",
+        "name": "Reddit",
+        "browserUrl": "https://www.reddit.com/r/CalgaryFlames/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-cgy-nhlflames",
+        "name": "@NHLFlames",
+        "browserUrl": "https://x.com/NHLFlames",
+        "category": "news"
+      },
+      {
+        "id": "nhl-cgy-calgary-flames",
+        "name": "#Calgary Flames",
+        "browserUrl": "https://x.com/search?q=calgary%20flames&src=typed_query",
+        "category": "news"
       }
     ],
     "CAR": [
       {
-        "id": "nhl-car-canespr-com",
-        "name": "CanesPR.com",
-        "browserUrl": "https://canespr.com",
-        "category": "news"
-      },
-      {
-        "id": "nhl-car-pro-hockey-rumors",
-        "name": "Pro Hockey Rumors",
-        "browserUrl": "https://www.prohockeyrumors.com/carolina-hurricanes",
-        "category": "news"
-      },
-      {
-        "id": "nhl-car-nhl-rumors",
-        "name": "NHL Rumors",
-        "browserUrl": "https://nhlrumors.com/tag/carolina-hurricanes/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-car-nhl-trade-talk",
-        "name": "NHL Trade Talk",
-        "browserUrl": "https://nhltradetalk.com/category/nhl/carolina-hurricanes/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-car-carolina-hurricanes",
-        "name": "Carolina Hurricanes",
-        "browserUrl": "https://www.nhl.com/hurricanes",
-        "category": "news"
-      },
-      {
-        "id": "nhl-car-canes-country",
-        "name": "Canes Country",
-        "browserUrl": "https://www.canescountry.com",
-        "category": "news"
-      },
-      {
-        "id": "nhl-car-cardiac-cane",
-        "name": "Cardiac Cane",
-        "browserUrl": "https://cardiaccane.com",
-        "category": "news"
-      },
-      {
-        "id": "nhl-car-canes-coffee",
-        "name": "Canes & Coffee",
-        "browserUrl": "https://www.canescountry.com",
-        "category": "news"
-      },
-      {
-        "id": "nhl-car-the-athletic",
-        "name": "The Athletic",
-        "browserUrl": "https://www.nytimes.com/athletic/nhl/team/hurricanes/",
+        "id": "nhl-car-nhl-com",
+        "name": "NHL.com",
+        "browserUrl": "https://www.nhl.com/hurricanes/",
         "category": "news"
       },
       {
@@ -100920,39 +102046,81 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
         "category": "news"
       },
       {
-        "id": "nhl-car-sportsnet",
-        "name": "Sportsnet",
-        "browserUrl": "https://www.sportsnet.ca/nhl/teams/carolina-hurricanes/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-car-the-hockey-writers",
-        "name": "The Hockey Writers",
-        "browserUrl": "https://thehockeywriters.com/carolina-hurricanes/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-car-fansided",
-        "name": "FanSided",
-        "browserUrl": "https://fansided.com/nhl/carolina-hurricanes",
-        "category": "news"
-      },
-      {
-        "id": "nhl-car-nhl-official",
-        "name": "NHL Official",
-        "browserUrl": "https://www.nhl.com/hurricanes",
-        "category": "news"
-      },
-      {
         "id": "nhl-car-cbs-sports",
         "name": "CBS Sports",
         "browserUrl": "https://www.cbssports.com/nhl/teams/CAR/carolina-hurricanes/",
         "category": "news"
       },
       {
+        "id": "nhl-car-fox-sports",
+        "name": "FOX Sports",
+        "browserUrl": "https://www.foxsports.com/nhl/carolina-hurricanes-team",
+        "category": "news"
+      },
+      {
         "id": "nhl-car-yahoo-sports",
-        "name": "Yahoo Sports",
+        "name": "Yahoo! Sports",
         "browserUrl": "https://sports.yahoo.com/nhl/teams/carolina/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-car-the-athletic",
+        "name": "The Athletic",
+        "browserUrl": "https://www.nytimes.com/athletic/nhl/team/hurricanes/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-car-b-r",
+        "name": "B/R",
+        "browserUrl": "https://bleacherreport.com/carolina-hurricanes",
+        "category": "news"
+      },
+      {
+        "id": "nhl-car-nbc-sports",
+        "name": "NBC Sports",
+        "browserUrl": "https://www.nbcsports.com/nhl/carolina-hurricanes",
+        "category": "news"
+      },
+      {
+        "id": "nhl-car-si",
+        "name": "SI",
+        "browserUrl": "https://www.si.com/nhl/hurricanes",
+        "category": "news"
+      },
+      {
+        "id": "nhl-car-usa-today",
+        "name": "USA Today",
+        "browserUrl": "https://sportsdata.usatoday.com/hockey/nhl/teams/carolina-hurricanes/4960",
+        "category": "news"
+      },
+      {
+        "id": "nhl-car-athlon-sports",
+        "name": "Athlon Sports",
+        "browserUrl": "https://athlonsports.com/nhl/carolina-hurricanes",
+        "category": "news"
+      },
+      {
+        "id": "nhl-car-yardbarker",
+        "name": "Yardbarker",
+        "browserUrl": "https://www.yardbarker.com/nhl/teams/carolina_hurricanes/103",
+        "category": "news"
+      },
+      {
+        "id": "nhl-car-spotrac",
+        "name": "Spotrac",
+        "browserUrl": "https://www.spotrac.com/nhl/carolina-hurricanes/overview",
+        "category": "news"
+      },
+      {
+        "id": "nhl-car-statmuse",
+        "name": "StatMuse",
+        "browserUrl": "https://www.statmuse.com/nhl/ask/carolina-hurricanes-stats",
+        "category": "news"
+      },
+      {
+        "id": "nhl-car-newsnow",
+        "name": "NewsNow",
+        "browserUrl": "https://www.newsnow.co.uk/h/Sport/US+Sports/NHL/Carolina+Hurricanes",
         "category": "news"
       },
       {
@@ -100962,553 +102130,29 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
         "category": "news"
       },
       {
-        "id": "nhl-car-canes-and-coffee",
-        "name": "Canes and Coffee",
-        "browserUrl": "https://www.canescountry.com",
+        "id": "nhl-car-reddit",
+        "name": "Reddit",
+        "browserUrl": "https://www.reddit.com/r/canes/",
         "category": "news"
-      }
-    ],
-    "DET": [
-      {
-        "id": "nhl-det-winging-it-in-motown",
-        "name": "Winging It In Motown",
-        "browserUrl": "https://www.wingingitinmotown.com",
-        "category": "news"
-      },
-      {
-        "id": "nhl-det-the-malik-report",
-        "name": "The Malik Report",
-        "browserUrl": "https://themalikreport.com",
-        "category": "news"
-      },
-      {
-        "id": "nhl-det-sportspyder",
-        "name": "SportSpyder",
-        "browserUrl": "https://sportspyder.com/nhl/detroit-red-wings/news",
-        "category": "news"
-      },
-      {
-        "id": "nhl-det-nhl-rumors",
-        "name": "NHL Rumors",
-        "browserUrl": "https://nhlrumors.com/tag/detroit-red-wings/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-det-pro-hockey-rumors",
-        "name": "Pro Hockey Rumors",
-        "browserUrl": "https://www.prohockeyrumors.com/detroit-red-wings",
-        "category": "news"
-      },
-      {
-        "id": "nhl-det-detroit-hockey-now",
-        "name": "Detroit Hockey Now",
-        "browserUrl": "https://detroithockeynow.com",
-        "category": "news"
-      },
-      {
-        "id": "nhl-det-wingsnation",
-        "name": "Wingsnation",
-        "browserUrl": "https://wingsnation.com",
-        "category": "news"
-      },
-      {
-        "id": "nhl-det-the-left-wing-lock",
-        "name": "The Left Wing Lock",
-        "browserUrl": "https://www.theleftwinglock.com/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-det-detroit-red-wings",
-        "name": "Detroit Red Wings",
-        "browserUrl": "https://www.nhl.com/redwings",
-        "category": "news"
-      },
-      {
-        "id": "nhl-det-detroithockey-net",
-        "name": "DetroitHockey.Net",
-        "browserUrl": "https://detroithockey.net",
-        "category": "news"
-      },
-      {
-        "id": "nhl-det-cbs-sports",
-        "name": "CBS Sports",
-        "browserUrl": "https://www.cbssports.com/nhl/teams/DET/detroit-red-wings/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-det-wxyz-detroit",
-        "name": "WXYZ Detroit",
-        "browserUrl": "https://www.wxyz.com/sports/hockey/red-wings",
-        "category": "news"
-      },
-      {
-        "id": "nhl-det-octopus-thrower",
-        "name": "Octopus Thrower",
-        "browserUrl": "https://octopusthrower.com",
-        "category": "news"
-      },
-      {
-        "id": "nhl-det-kukla-s-korner",
-        "name": "Kukla's Korner",
-        "browserUrl": "https://kuklaskorner.com",
-        "category": "news"
-      },
-      {
-        "id": "nhl-det-espn",
-        "name": "ESPN",
-        "browserUrl": "https://www.espn.com/nhl/team/_/name/det/detroit-red-wings",
-        "category": "news"
-      },
-      {
-        "id": "nhl-det-fox-sports",
-        "name": "FOX Sports",
-        "browserUrl": "https://www.foxsports.com/nhl/detroit-red-wings-team",
-        "category": "news"
-      },
-      {
-        "id": "nhl-det-detroit-free-press",
-        "name": "Detroit Free Press",
-        "browserUrl": "https://www.freep.com/sports/red-wings/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-det-the-detroit-news",
-        "name": "The Detroit News",
-        "browserUrl": "https://www.detroitnews.com/sports/red-wings/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-det-the-hockey-writers",
-        "name": "The Hockey Writers",
-        "browserUrl": "https://thehockeywriters.com/detroit-red-wings/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-det-detroit-sports-nation",
-        "name": "Detroit Sports Nation",
-        "browserUrl": "https://detroitsportsnation.com/category/detroit-red-wings/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-det-detroit-jock-city",
-        "name": "Detroit Jock City",
-        "browserUrl": "https://detroitjockcity.com/detroit-red-wings/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-det-nhl-official",
-        "name": "NHL Official",
-        "browserUrl": "https://www.nhl.com/redwings",
-        "category": "news"
-      },
-      {
-        "id": "nhl-det-yahoo-sports",
-        "name": "Yahoo Sports",
-        "browserUrl": "https://sports.yahoo.com/nhl/teams/detroit/",
-        "category": "news"
-      }
-    ],
-    "FLA": [
-      {
-        "id": "nhl-fla-litter-box-cats",
-        "name": "Litter Box Cats",
-        "browserUrl": "https://www.litterboxcats.com/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-fla-pro-hockey-rumors",
-        "name": "Pro Hockey Rumors",
-        "browserUrl": "https://www.prohockeyrumors.com/florida-panthers",
-        "category": "news"
-      },
-      {
-        "id": "nhl-fla-florida-hockey-now",
-        "name": "Florida Hockey Now",
-        "browserUrl": "https://floridahockeynow.com",
-        "category": "news"
-      },
-      {
-        "id": "nhl-fla-nbc-6-south-florida",
-        "name": "NBC 6 South Florida",
-        "browserUrl": "https://www.nbcmiami.com/tag/florida-panthers/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-fla-wsvn-7-news",
-        "name": "WSVN 7 News",
-        "browserUrl": "https://wsvn.com/sports/florida-panthers/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-fla-sportspyder",
-        "name": "SportSpyder",
-        "browserUrl": "https://sportspyder.com/nhl/florida-panthers/news",
-        "category": "news"
-      },
-      {
-        "id": "nhl-fla-nhl-rumors",
-        "name": "NHL Rumors",
-        "browserUrl": "https://nhlrumors.com/tag/florida-panthers/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-fla-the-new-york-times",
-        "name": "The New York Times",
-        "browserUrl": "https://www.nytimes.com/topic/organization/florida-panthers",
-        "category": "news"
-      },
-      {
-        "id": "nhl-fla-the-rat-trick",
-        "name": "The Rat Trick",
-        "browserUrl": "https://therattrick.com",
-        "category": "news"
-      },
-      {
-        "id": "nhl-fla-elite-prospects",
-        "name": "Elite Prospects",
-        "browserUrl": "https://www.eliteprospects.com/team/62/florida-panthers",
-        "category": "news"
-      },
-      {
-        "id": "nhl-fla-the-athletic",
-        "name": "The Athletic",
-        "browserUrl": "https://www.nytimes.com/athletic/nfl/team/panthers/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-fla-puck-prose",
-        "name": "Puck Prose",
-        "browserUrl": "https://puckprose.com/nhl-atlantic-division/florida-panthers/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-fla-yahoo-sports",
-        "name": "Yahoo Sports",
-        "browserUrl": "https://sports.yahoo.com/nhl/teams/florida/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-fla-panther-parkway",
-        "name": "Panther Parkway",
-        "browserUrl": "https://pantherparkway.com",
-        "category": "news"
-      },
-      {
-        "id": "nhl-fla-nbc-sports",
-        "name": "NBC Sports",
-        "browserUrl": "https://www.nbcsports.com/nhl/florida-panthers",
-        "category": "news"
-      },
-      {
-        "id": "nhl-fla-nhl-official",
-        "name": "NHL Official",
-        "browserUrl": "https://www.nhl.com/panthers",
-        "category": "news"
-      },
-      {
-        "id": "nhl-fla-espn",
-        "name": "ESPN",
-        "browserUrl": "https://www.espn.com/nhl/team/_/name/fla/florida-panthers",
-        "category": "news"
-      },
-      {
-        "id": "nhl-fla-cbs-sports",
-        "name": "CBS Sports",
-        "browserUrl": "https://www.cbssports.com/nhl/teams/FLA/florida-panthers/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-fla-the-hockey-writers",
-        "name": "The Hockey Writers",
-        "browserUrl": "https://thehockeywriters.com/florida-panthers/",
-        "category": "news"
-      }
-    ],
-    "MTL": [
-      {
-        "id": "nhl-mtl-eyes-on-the-prize",
-        "name": "Eyes On The Prize",
-        "browserUrl": "https://www.habseyesontheprize.com",
-        "category": "news"
-      },
-      {
-        "id": "nhl-mtl-habsworld-net",
-        "name": "HabsWorld.net",
-        "browserUrl": "https://www.habsworld.net/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-mtl-gohabs-co",
-        "name": "GOHABS.co",
-        "browserUrl": "https://www.gohabs.com/blog/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-mtl-sportspyder",
-        "name": "SportSpyder",
-        "browserUrl": "https://sportspyder.com/nhl/montreal-canadiens/news",
-        "category": "news"
-      },
-      {
-        "id": "nhl-mtl-pro-hockey-rumors",
-        "name": "Pro Hockey Rumors",
-        "browserUrl": "https://www.prohockeyrumors.com/montreal-canadiens",
-        "category": "news"
-      },
-      {
-        "id": "nhl-mtl-a-winning-habit",
-        "name": "A Winning Habit",
-        "browserUrl": "https://awinninghabit.com",
-        "category": "news"
-      },
-      {
-        "id": "nhl-mtl-toronto-sun",
-        "name": "Toronto Sun",
-        "browserUrl": "https://torontosun.com/tag/montreal-canadiens",
-        "category": "news"
-      },
-      {
-        "id": "nhl-mtl-all-habs",
-        "name": "All Habs",
-        "browserUrl": "https://allhabs.net",
-        "category": "news"
-      },
-      {
-        "id": "nhl-mtl-yahoo-sports",
-        "name": "Yahoo Sports",
-        "browserUrl": "https://sports.yahoo.com/nhl/teams/montreal/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-mtl-the-athletic",
-        "name": "The Athletic",
-        "browserUrl": "https://www.nytimes.com/athletic/nhl/team/canadiens/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-mtl-montreal-canadiens",
-        "name": "Montreal Canadiens",
-        "browserUrl": "https://www.nhl.com/canadiens",
-        "category": "news"
-      },
-      {
-        "id": "nhl-mtl-the-hockey-news",
-        "name": "The Hockey News",
-        "browserUrl": "https://thehockeynews.com/nhl/montreal-canadiens",
-        "category": "news"
-      },
-      {
-        "id": "nhl-mtl-sportsnet",
-        "name": "Sportsnet",
-        "browserUrl": "https://www.sportsnet.ca/nhl/teams/montreal-canadiens/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-mtl-nhl-official",
-        "name": "NHL Official",
-        "browserUrl": "https://www.nhl.com/canadiens",
-        "category": "news"
-      },
-      {
-        "id": "nhl-mtl-espn",
-        "name": "ESPN",
-        "browserUrl": "https://www.espn.com/nhl/team/_/name/mtl/montreal-canadiens",
-        "category": "news"
-      },
-      {
-        "id": "nhl-mtl-the-hockey-writers",
-        "name": "The Hockey Writers",
-        "browserUrl": "https://thehockeywriters.com/montreal-canadiens/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-mtl-habs-eyes-on-the-prize",
-        "name": "Habs Eyes On The Prize",
-        "browserUrl": "https://www.habseyesontheprize.com",
-        "category": "news"
-      },
-      {
-        "id": "nhl-mtl-montreal-hockey-now",
-        "name": "Montreal Hockey Now",
-        "browserUrl": "https://sportsnaut.com/nhl/montreal-canadiens",
-        "category": "news"
-      },
-      {
-        "id": "nhl-mtl-habs-fanatics",
-        "name": "Habs Fanatics",
-        "browserUrl": "https://www.montrealhockeyfanatics.com/",
-        "category": "news"
-      }
-    ],
-    "TOR": [
-      {
-        "id": "nhl-tor-theleafsnation",
-        "name": "TheLeafsNation",
-        "browserUrl": "https://theleafsnation.com",
-        "category": "news"
-      },
-      {
-        "id": "nhl-tor-maple-leafs-hotstove",
-        "name": "Maple Leafs Hotstove",
-        "browserUrl": "https://mapleleafshotstove.com",
-        "category": "news"
-      },
-      {
-        "id": "nhl-tor-boston-hockey-now",
-        "name": "Boston Hockey Now",
-        "browserUrl": "https://bostonhockeynow.com/tag/toronto-maple-leafs/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-tor-global-news",
-        "name": "Global News",
-        "browserUrl": "https://globalnews.ca/tag/toronto-maple-leafs/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-tor-sportspyder",
-        "name": "SportSpyder",
-        "browserUrl": "https://sportspyder.com/nhl/toronto-maple-leafs/news",
-        "category": "news"
-      },
-      {
-        "id": "nhl-tor-bench-life-sports",
-        "name": "Bench Life Sports",
-        "browserUrl": "https://benchlifesports.com/category/toronto-maple-leafs/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-tor-pension-plan-puppets",
-        "name": "Pension Plan Puppets",
-        "browserUrl": "https://www.pensionplanpuppets.com",
-        "category": "news"
-      },
-      {
-        "id": "nhl-tor-editor-in-leaf",
-        "name": "Editor In Leaf",
-        "browserUrl": "https://editorinleaf.com",
-        "category": "news"
-      },
-      {
-        "id": "nhl-tor-the-star",
-        "name": "The Star",
-        "browserUrl": "https://www.thestar.com/sports/leafs/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-tor-yahoo-sports",
-        "name": "Yahoo Sports",
-        "browserUrl": "https://sports.yahoo.com/nhl/teams/toronto/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-tor-toronto-maple-leafs",
-        "name": "Toronto Maple Leafs",
-        "browserUrl": "https://www.nhl.com/mapleleafs",
-        "category": "news"
-      },
-      {
-        "id": "nhl-tor-sportsnet",
-        "name": "Sportsnet",
-        "browserUrl": "https://www.sportsnet.ca/nhl/teams/toronto-maple-leafs/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-tor-the-hockey-news",
-        "name": "The Hockey News",
-        "browserUrl": "https://thehockeynews.com/nhl/toronto-maple-leafs",
-        "category": "news"
-      },
-      {
-        "id": "nhl-tor-nhl-official",
-        "name": "NHL Official",
-        "browserUrl": "https://www.nhl.com/mapleleafs",
-        "category": "news"
-      },
-      {
-        "id": "nhl-tor-espn",
-        "name": "ESPN",
-        "browserUrl": "https://www.espn.com/nhl/team/_/name/tor/toronto-maple-leafs",
-        "category": "news"
-      },
-      {
-        "id": "nhl-tor-cbs-sports",
-        "name": "CBS Sports",
-        "browserUrl": "https://www.cbssports.com/nhl/teams/TOR/toronto-maple-leafs/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-tor-pro-hockey-rumors",
-        "name": "Pro Hockey Rumors",
-        "browserUrl": "https://www.prohockeyrumors.com/2021/02/toronto-maple-leafs-acquire-alex-galchenyuk.html",
-        "category": "news"
       },
       {
-        "id": "nhl-tor-the-hockey-writers",
-        "name": "The Hockey Writers",
-        "browserUrl": "https://thehockeywriters.com/toronto-maple-leafs/",
+        "id": "nhl-car-canes",
+        "name": "@Canes",
+        "browserUrl": "https://x.com/Canes",
         "category": "news"
       },
       {
-        "id": "nhl-tor-the-leafs-nation",
-        "name": "The Leafs Nation",
-        "browserUrl": "https://theleafsnation.com",
+        "id": "nhl-car-carolina-hurricanes",
+        "name": "#Carolina Hurricanes",
+        "browserUrl": "https://x.com/search?q=carolina%20hurricanes&src=typed_query",
         "category": "news"
       }
     ],
     "CHI": [
       {
-        "id": "nhl-chi-second-city-hockey",
-        "name": "Second City Hockey",
-        "browserUrl": "https://www.secondcityhockey.com",
-        "category": "news"
-      },
-      {
-        "id": "nhl-chi-the-athletic",
-        "name": "The Athletic",
-        "browserUrl": "https://www.nytimes.com/athletic/nhl/team/blackhawks/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-chi-sportspyder",
-        "name": "SportSpyder",
-        "browserUrl": "https://sportspyder.com/nhl/chicago-blackhawks/news",
-        "category": "news"
-      },
-      {
-        "id": "nhl-chi-pro-hockey-rumors",
-        "name": "Pro Hockey Rumors",
-        "browserUrl": "https://www.prohockeyrumors.com/chicago-blackhawks",
-        "category": "news"
-      },
-      {
-        "id": "nhl-chi-the-hockey-writers",
-        "name": "The Hockey Writers",
-        "browserUrl": "https://thehockeywriters.com/chicago-blackhawks/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-chi-blackhawk-up",
-        "name": "Blackhawk Up",
-        "browserUrl": "https://blackhawkup.com",
-        "category": "news"
-      },
-      {
-        "id": "nhl-chi-blackhawks-talk",
-        "name": "Blackhawks Talk",
-        "browserUrl": "https://www.nhl.com/blackhawks/errors/not-found",
-        "category": "news"
-      },
-      {
-        "id": "nhl-chi-chicago-sun-times",
-        "name": "Chicago Sun-Times",
-        "browserUrl": "https://chicago.suntimes.com/blackhawks",
-        "category": "news"
-      },
-      {
-        "id": "nhl-chi-chicago-tribune",
-        "name": "Chicago Tribune",
-        "browserUrl": "https://www.chicagotribune.com/sports/nhl/chicago-blackhawks/",
+        "id": "nhl-chi-nhl-com",
+        "name": "NHL.com",
+        "browserUrl": "https://www.nhl.com/blackhawks/",
         "category": "news"
       },
       {
@@ -101524,71 +102168,107 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
         "category": "news"
       },
       {
-        "id": "nhl-chi-nbc-sports-chicago",
-        "name": "NBC Sports Chicago",
-        "browserUrl": "https://www.chsn.com/info",
+        "id": "nhl-chi-fox-sports",
+        "name": "FOX Sports",
+        "browserUrl": "https://www.foxsports.com/nhl/chicago-blackhawks-team",
         "category": "news"
       },
       {
-        "id": "nhl-chi-fansided",
-        "name": "FanSided",
-        "browserUrl": "https://fansided.com/nhl/chicago-blackhawks",
+        "id": "nhl-chi-yahoo-sports",
+        "name": "Yahoo! Sports",
+        "browserUrl": "https://sports.yahoo.com/nhl/teams/chicago/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-chi-the-athletic",
+        "name": "The Athletic",
+        "browserUrl": "https://www.nytimes.com/athletic/nhl/team/blackhawks/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-chi-b-r",
+        "name": "B/R",
+        "browserUrl": "https://bleacherreport.com/chicago-blackhawks",
+        "category": "news"
+      },
+      {
+        "id": "nhl-chi-nbc-sports",
+        "name": "NBC Sports",
+        "browserUrl": "https://www.nbcsports.com/nhl/chicago-blackhawks",
+        "category": "news"
+      },
+      {
+        "id": "nhl-chi-si",
+        "name": "SI",
+        "browserUrl": "https://www.si.com/nhl/blackhawks",
+        "category": "news"
+      },
+      {
+        "id": "nhl-chi-usa-today",
+        "name": "USA Today",
+        "browserUrl": "https://sportsdata.usatoday.com/hockey/nhl/teams/chicago-blackhawks/4957",
+        "category": "news"
+      },
+      {
+        "id": "nhl-chi-athlon-sports",
+        "name": "Athlon Sports",
+        "browserUrl": "https://athlonsports.com/nhl/chicago-blackhawks",
+        "category": "news"
+      },
+      {
+        "id": "nhl-chi-yardbarker",
+        "name": "Yardbarker",
+        "browserUrl": "https://www.yardbarker.com/nhl/teams/chicago_blackhawks/107",
+        "category": "news"
+      },
+      {
+        "id": "nhl-chi-spotrac",
+        "name": "Spotrac",
+        "browserUrl": "https://www.spotrac.com/nhl/chicago-blackhawks/overview",
+        "category": "news"
+      },
+      {
+        "id": "nhl-chi-statmuse",
+        "name": "StatMuse",
+        "browserUrl": "https://www.statmuse.com/nhl/ask/chicago-blackhawks-stats",
+        "category": "news"
+      },
+      {
+        "id": "nhl-chi-newsnow",
+        "name": "NewsNow",
+        "browserUrl": "https://www.newsnow.co.uk/h/Sport/US+Sports/NHL/Chicago+Blackhawks",
+        "category": "news"
+      },
+      {
+        "id": "nhl-chi-sportspyder",
+        "name": "SportSpyder",
+        "browserUrl": "https://sportspyder.com/nhl/chicago-blackhawks/news",
+        "category": "news"
+      },
+      {
+        "id": "nhl-chi-reddit",
+        "name": "Reddit",
+        "browserUrl": "https://www.reddit.com/r/hawks/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-chi-nhlblackhawks",
+        "name": "@NHLBlackhawks",
+        "browserUrl": "https://x.com/NHLBlackhawks",
+        "category": "news"
+      },
+      {
+        "id": "nhl-chi-chicago-blackhawks",
+        "name": "#Chicago Blackhawks",
+        "browserUrl": "https://x.com/search?q=chicago%20blackhawks&src=typed_query",
         "category": "news"
       }
     ],
     "COL": [
       {
-        "id": "nhl-col-mile-high-hockey",
-        "name": "Mile High Hockey",
-        "browserUrl": "https://www.milehighhockey.com",
-        "category": "news"
-      },
-      {
-        "id": "nhl-col-the-denver-post",
-        "name": "The Denver Post",
-        "browserUrl": "https://www.denverpost.com/2018/01/22/avalanche-10-game-winning-streak/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-col-colorado-hockey-now",
-        "name": "Colorado Hockey Now",
-        "browserUrl": "https://coloradohockeynow.com",
-        "category": "news"
-      },
-      {
-        "id": "nhl-col-the-athletic",
-        "name": "The Athletic",
-        "browserUrl": "https://www.nytimes.com/athletic/nhl/team/avalanche/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-col-sportspyder",
-        "name": "SportSpyder",
-        "browserUrl": "https://sportspyder.com/nhl/colorado-avalanche/news",
-        "category": "news"
-      },
-      {
-        "id": "nhl-col-pro-hockey-rumors",
-        "name": "Pro Hockey Rumors",
-        "browserUrl": "https://www.prohockeyrumors.com/colorado-avalanche",
-        "category": "news"
-      },
-      {
-        "id": "nhl-col-the-hockey-writers",
-        "name": "The Hockey Writers",
-        "browserUrl": "https://thehockeywriters.com/colorado-avalanche/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-col-dnvr",
-        "name": "DNVR",
-        "browserUrl": "https://thednvr.com/avalanche",
-        "category": "news"
-      },
-      {
-        "id": "nhl-col-colorado-avalanche",
-        "name": "Colorado Avalanche",
-        "browserUrl": "https://www.nhl.com/avalanche",
+        "id": "nhl-col-nhl-com",
+        "name": "NHL.com",
+        "browserUrl": "https://www.nhl.com/avalanche/",
         "category": "news"
       },
       {
@@ -101604,77 +102284,223 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
         "category": "news"
       },
       {
-        "id": "nhl-col-altitude-sports",
-        "name": "Altitude Sports",
-        "browserUrl": "https://www.altitudesports.com/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-col-fansided",
-        "name": "FanSided",
-        "browserUrl": "https://fansided.com/nhl/colorado-avalanche",
-        "category": "news"
-      },
-      {
-        "id": "nhl-col-nhl-official",
-        "name": "NHL Official",
-        "browserUrl": "https://www.nhl.com/avalanche",
+        "id": "nhl-col-fox-sports",
+        "name": "FOX Sports",
+        "browserUrl": "https://www.foxsports.com/nhl/colorado-avalanche-team",
         "category": "news"
       },
       {
         "id": "nhl-col-yahoo-sports",
-        "name": "Yahoo Sports",
+        "name": "Yahoo! Sports",
         "browserUrl": "https://sports.yahoo.com/nhl/teams/colorado/",
         "category": "news"
       },
       {
-        "id": "nhl-col-evolving-hockey",
-        "name": "Evolving Hockey",
-        "browserUrl": "https://evolving-hockey.com",
+        "id": "nhl-col-the-athletic",
+        "name": "The Athletic",
+        "browserUrl": "https://www.nytimes.com/athletic/nhl/team/avalanche/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-col-b-r",
+        "name": "B/R",
+        "browserUrl": "https://bleacherreport.com/colorado-avalanche",
+        "category": "news"
+      },
+      {
+        "id": "nhl-col-nbc-sports",
+        "name": "NBC Sports",
+        "browserUrl": "https://www.nbcsports.com/nhl/colorado-avalanche",
+        "category": "news"
+      },
+      {
+        "id": "nhl-col-si",
+        "name": "SI",
+        "browserUrl": "https://www.si.com/nhl/avalanche",
+        "category": "news"
+      },
+      {
+        "id": "nhl-col-usa-today",
+        "name": "USA Today",
+        "browserUrl": "https://sportsdata.usatoday.com/hockey/nhl/teams/colorado-avalanche/4970",
+        "category": "news"
+      },
+      {
+        "id": "nhl-col-athlon-sports",
+        "name": "Athlon Sports",
+        "browserUrl": "https://athlonsports.com/nhl/colorado-avalanche",
+        "category": "news"
+      },
+      {
+        "id": "nhl-col-yardbarker",
+        "name": "Yardbarker",
+        "browserUrl": "https://www.yardbarker.com/nhl/teams/colorado_avalanche/113",
+        "category": "news"
+      },
+      {
+        "id": "nhl-col-spotrac",
+        "name": "Spotrac",
+        "browserUrl": "https://www.spotrac.com/nhl/colorado-avalanche/overview",
+        "category": "news"
+      },
+      {
+        "id": "nhl-col-statmuse",
+        "name": "StatMuse",
+        "browserUrl": "https://www.statmuse.com/nhl/ask/colorado-avalanche-stats",
+        "category": "news"
+      },
+      {
+        "id": "nhl-col-newsnow",
+        "name": "NewsNow",
+        "browserUrl": "https://www.newsnow.co.uk/h/Sport/US+Sports/NHL/Colorado+Avalanche",
+        "category": "news"
+      },
+      {
+        "id": "nhl-col-sportspyder",
+        "name": "SportSpyder",
+        "browserUrl": "https://sportspyder.com/nhl/colorado-avalanche/news",
+        "category": "news"
+      },
+      {
+        "id": "nhl-col-reddit",
+        "name": "Reddit",
+        "browserUrl": "https://www.reddit.com/r/ColoradoAvalanche/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-col-avalanche",
+        "name": "@Avalanche",
+        "browserUrl": "https://x.com/Avalanche",
+        "category": "news"
+      },
+      {
+        "id": "nhl-col-colorado-avalanche",
+        "name": "#Colorado Avalanche",
+        "browserUrl": "https://x.com/search?q=colorado%20avalanche&src=typed_query",
+        "category": "news"
+      }
+    ],
+    "CBJ": [
+      {
+        "id": "nhl-cbj-nhl-com",
+        "name": "NHL.com",
+        "browserUrl": "https://www.nhl.com/bluejackets/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-cbj-espn",
+        "name": "ESPN",
+        "browserUrl": "https://www.espn.com/nhl/team/_/name/cbj/columbus-blue-jackets",
+        "category": "news"
+      },
+      {
+        "id": "nhl-cbj-cbs-sports",
+        "name": "CBS Sports",
+        "browserUrl": "https://www.cbssports.com/nhl/teams/CBJ/columbus-blue-jackets/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-cbj-fox-sports",
+        "name": "FOX Sports",
+        "browserUrl": "https://www.foxsports.com/nhl/columbus-blue-jackets-team",
+        "category": "news"
+      },
+      {
+        "id": "nhl-cbj-yahoo-sports",
+        "name": "Yahoo! Sports",
+        "browserUrl": "https://sports.yahoo.com/nhl/teams/columbus/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-cbj-the-athletic",
+        "name": "The Athletic",
+        "browserUrl": "https://www.nytimes.com/athletic/nhl/team/blue-jackets/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-cbj-b-r",
+        "name": "B/R",
+        "browserUrl": "https://bleacherreport.com/columbus-blue-jackets",
+        "category": "news"
+      },
+      {
+        "id": "nhl-cbj-nbc-sports",
+        "name": "NBC Sports",
+        "browserUrl": "https://www.nbcsports.com/nhl/columbus-blue-jackets",
+        "category": "news"
+      },
+      {
+        "id": "nhl-cbj-si",
+        "name": "SI",
+        "browserUrl": "https://www.si.com/nhl/bluejackets",
+        "category": "news"
+      },
+      {
+        "id": "nhl-cbj-usa-today",
+        "name": "USA Today",
+        "browserUrl": "https://sportsdata.usatoday.com/hockey/nhl/teams/columbus-blue-jackets/4982",
+        "category": "news"
+      },
+      {
+        "id": "nhl-cbj-athlon-sports",
+        "name": "Athlon Sports",
+        "browserUrl": "https://athlonsports.com/nhl/columbus-blue-jackets",
+        "category": "news"
+      },
+      {
+        "id": "nhl-cbj-yardbarker",
+        "name": "Yardbarker",
+        "browserUrl": "https://www.yardbarker.com/nhl/teams/columbus_blue_jackets/108",
+        "category": "news"
+      },
+      {
+        "id": "nhl-cbj-spotrac",
+        "name": "Spotrac",
+        "browserUrl": "https://www.spotrac.com/nhl/columbus-blue-jackets/overview",
+        "category": "news"
+      },
+      {
+        "id": "nhl-cbj-statmuse",
+        "name": "StatMuse",
+        "browserUrl": "https://www.statmuse.com/nhl/ask/columbus-blue-jackets-stats",
+        "category": "news"
+      },
+      {
+        "id": "nhl-cbj-newsnow",
+        "name": "NewsNow",
+        "browserUrl": "https://www.newsnow.co.uk/h/Sport/US+Sports/NHL/Columbus+Blue+Jackets",
+        "category": "news"
+      },
+      {
+        "id": "nhl-cbj-sportspyder",
+        "name": "SportSpyder",
+        "browserUrl": "https://sportspyder.com/nhl/columbus-blue-jackets/news",
+        "category": "news"
+      },
+      {
+        "id": "nhl-cbj-reddit",
+        "name": "Reddit",
+        "browserUrl": "https://www.reddit.com/r/BlueJackets/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-cbj-bluejacketsnhl",
+        "name": "@BlueJacketsNHL",
+        "browserUrl": "https://x.com/BlueJacketsNHL",
+        "category": "news"
+      },
+      {
+        "id": "nhl-cbj-columbus-blue-jackets",
+        "name": "#Columbus Blue Jackets",
+        "browserUrl": "https://x.com/search?q=columbus%20blue%20jackets&src=typed_query",
         "category": "news"
       }
     ],
     "DAL": [
       {
-        "id": "nhl-dal-defending-big-d",
-        "name": "Defending Big D",
-        "browserUrl": "https://www.defendingbigd.com",
-        "category": "news"
-      },
-      {
-        "id": "nhl-dal-dallas-stars",
-        "name": "Dallas Stars",
-        "browserUrl": "https://www.nhl.com/stars",
-        "category": "news"
-      },
-      {
-        "id": "nhl-dal-dallas-morning-news",
-        "name": "Dallas Morning News",
-        "browserUrl": "https://www.dallasnews.com/sports/stars/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-dal-the-athletic",
-        "name": "The Athletic",
-        "browserUrl": "https://www.nytimes.com/athletic/nhl/team/stars/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-dal-sportspyder",
-        "name": "SportSpyder",
-        "browserUrl": "https://sportspyder.com/nhl/dallas-stars/news",
-        "category": "news"
-      },
-      {
-        "id": "nhl-dal-pro-hockey-rumors",
-        "name": "Pro Hockey Rumors",
-        "browserUrl": "https://www.prohockeyrumors.com/dallas-stars",
-        "category": "news"
-      },
-      {
-        "id": "nhl-dal-the-hockey-writers",
-        "name": "The Hockey Writers",
-        "browserUrl": "https://thehockeywriters.com/dallas-stars/",
+        "id": "nhl-dal-nhl-com",
+        "name": "NHL.com",
+        "browserUrl": "https://www.nhl.com/stars/",
         "category": "news"
       },
       {
@@ -101696,77 +102522,217 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
         "category": "news"
       },
       {
-        "id": "nhl-dal-fansided",
-        "name": "FanSided",
-        "browserUrl": "https://fansided.com/nhl/dallas-stars",
-        "category": "news"
-      },
-      {
-        "id": "nhl-dal-nhl-official",
-        "name": "NHL Official",
-        "browserUrl": "https://www.nhl.com/stars",
-        "category": "news"
-      },
-      {
         "id": "nhl-dal-yahoo-sports",
-        "name": "Yahoo Sports",
+        "name": "Yahoo! Sports",
         "browserUrl": "https://sports.yahoo.com/nhl/teams/dallas/",
         "category": "news"
       },
       {
-        "id": "nhl-dal-blackout-dallas",
-        "name": "Blackout Dallas",
-        "browserUrl": "https://blackoutdallas.com",
+        "id": "nhl-dal-the-athletic",
+        "name": "The Athletic",
+        "browserUrl": "https://www.nytimes.com/athletic/nhl/team/stars/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-dal-b-r",
+        "name": "B/R",
+        "browserUrl": "https://bleacherreport.com/dallas-stars",
+        "category": "news"
+      },
+      {
+        "id": "nhl-dal-nbc-sports",
+        "name": "NBC Sports",
+        "browserUrl": "https://www.nbcsports.com/nhl/dallas-stars",
+        "category": "news"
+      },
+      {
+        "id": "nhl-dal-si",
+        "name": "SI",
+        "browserUrl": "https://www.si.com/nhl/stars",
+        "category": "news"
+      },
+      {
+        "id": "nhl-dal-usa-today",
+        "name": "USA Today",
+        "browserUrl": "https://sportsdata.usatoday.com/hockey/nhl/teams/dallas-stars/4962",
+        "category": "news"
+      },
+      {
+        "id": "nhl-dal-athlon-sports",
+        "name": "Athlon Sports",
+        "browserUrl": "https://athlonsports.com/nhl/dallas-stars",
+        "category": "news"
+      },
+      {
+        "id": "nhl-dal-yardbarker",
+        "name": "Yardbarker",
+        "browserUrl": "https://www.yardbarker.com/nhl/teams/dallas_stars/118",
+        "category": "news"
+      },
+      {
+        "id": "nhl-dal-spotrac",
+        "name": "Spotrac",
+        "browserUrl": "https://www.spotrac.com/nhl/dallas-stars/overview",
+        "category": "news"
+      },
+      {
+        "id": "nhl-dal-statmuse",
+        "name": "StatMuse",
+        "browserUrl": "https://www.statmuse.com/nhl/ask/dallas-stars-stats",
+        "category": "news"
+      },
+      {
+        "id": "nhl-dal-newsnow",
+        "name": "NewsNow",
+        "browserUrl": "https://www.newsnow.co.uk/h/Sport/US+Sports/NHL/Dallas+Stars",
+        "category": "news"
+      },
+      {
+        "id": "nhl-dal-sportspyder",
+        "name": "SportSpyder",
+        "browserUrl": "https://sportspyder.com/nhl/dallas-stars/news",
+        "category": "news"
+      },
+      {
+        "id": "nhl-dal-reddit",
+        "name": "Reddit",
+        "browserUrl": "https://www.reddit.com/r/DallasStars/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-dal-dallasstars",
+        "name": "@DallasStars",
+        "browserUrl": "https://x.com/DallasStars",
+        "category": "news"
+      },
+      {
+        "id": "nhl-dal-dallas-stars",
+        "name": "#Dallas Stars",
+        "browserUrl": "https://x.com/search?q=dallas%20stars&src=typed_query",
+        "category": "news"
+      }
+    ],
+    "DET": [
+      {
+        "id": "nhl-det-nhl-com",
+        "name": "NHL.com",
+        "browserUrl": "https://www.nhl.com/redwings/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-det-espn",
+        "name": "ESPN",
+        "browserUrl": "https://www.espn.com/nhl/team/_/name/det/detroit-red-wings",
+        "category": "news"
+      },
+      {
+        "id": "nhl-det-cbs-sports",
+        "name": "CBS Sports",
+        "browserUrl": "https://www.cbssports.com/nhl/teams/DET/detroit-red-wings/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-det-fox-sports",
+        "name": "FOX Sports",
+        "browserUrl": "https://www.foxsports.com/nhl/detroit-red-wings-team",
+        "category": "news"
+      },
+      {
+        "id": "nhl-det-yahoo-sports",
+        "name": "Yahoo! Sports",
+        "browserUrl": "https://sports.yahoo.com/nhl/teams/detroit/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-det-the-athletic",
+        "name": "The Athletic",
+        "browserUrl": "https://www.nytimes.com/athletic/nhl/team/red-wings/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-det-b-r",
+        "name": "B/R",
+        "browserUrl": "https://bleacherreport.com/detroit-red-wings",
+        "category": "news"
+      },
+      {
+        "id": "nhl-det-nbc-sports",
+        "name": "NBC Sports",
+        "browserUrl": "https://www.nbcsports.com/nhl/detroit-red-wings",
+        "category": "news"
+      },
+      {
+        "id": "nhl-det-si",
+        "name": "SI",
+        "browserUrl": "https://www.si.com/nhl/redwings",
+        "category": "news"
+      },
+      {
+        "id": "nhl-det-usa-today",
+        "name": "USA Today",
+        "browserUrl": "https://sportsdata.usatoday.com/hockey/nhl/teams/detroit-red-wings/4958",
+        "category": "news"
+      },
+      {
+        "id": "nhl-det-athlon-sports",
+        "name": "Athlon Sports",
+        "browserUrl": "https://athlonsports.com/nhl/detroit-red-wings",
+        "category": "news"
+      },
+      {
+        "id": "nhl-det-yardbarker",
+        "name": "Yardbarker",
+        "browserUrl": "https://www.yardbarker.com/nhl/teams/detroit_red_wings/109",
+        "category": "news"
+      },
+      {
+        "id": "nhl-det-spotrac",
+        "name": "Spotrac",
+        "browserUrl": "https://www.spotrac.com/nhl/detroit-red-wings/overview",
+        "category": "news"
+      },
+      {
+        "id": "nhl-det-statmuse",
+        "name": "StatMuse",
+        "browserUrl": "https://www.statmuse.com/nhl/ask/detroit-red-wings-stats",
+        "category": "news"
+      },
+      {
+        "id": "nhl-det-newsnow",
+        "name": "NewsNow",
+        "browserUrl": "https://www.newsnow.co.uk/h/Sport/US+Sports/NHL/Detroit+Red+Wings",
+        "category": "news"
+      },
+      {
+        "id": "nhl-det-sportspyder",
+        "name": "SportSpyder",
+        "browserUrl": "https://sportspyder.com/nhl/detroit-red-wings/news",
+        "category": "news"
+      },
+      {
+        "id": "nhl-det-reddit",
+        "name": "Reddit",
+        "browserUrl": "https://www.reddit.com/r/DetroitRedWings/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-det-detroitredwings",
+        "name": "@DetroitRedWings",
+        "browserUrl": "https://x.com/DetroitRedWings",
+        "category": "news"
+      },
+      {
+        "id": "nhl-det-detroit-red-wings",
+        "name": "#Detroit Red Wings",
+        "browserUrl": "https://x.com/search?q=detroit%20red%20wings&src=typed_query",
         "category": "news"
       }
     ],
     "EDM": [
       {
-        "id": "nhl-edm-oilers-nation",
-        "name": "Oilers Nation",
-        "browserUrl": "https://oilersnation.com",
-        "category": "news"
-      },
-      {
-        "id": "nhl-edm-the-athletic",
-        "name": "The Athletic",
-        "browserUrl": "https://www.nytimes.com/athletic/nhl/team/oilers/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-edm-sportspyder",
-        "name": "SportSpyder",
-        "browserUrl": "https://sportspyder.com/nhl/edmonton-oilers/news",
-        "category": "news"
-      },
-      {
-        "id": "nhl-edm-pro-hockey-rumors",
-        "name": "Pro Hockey Rumors",
-        "browserUrl": "https://www.prohockeyrumors.com/edmonton-oilers",
-        "category": "news"
-      },
-      {
-        "id": "nhl-edm-the-hockey-writers",
-        "name": "The Hockey Writers",
-        "browserUrl": "https://thehockeywriters.com/edmonton-oilers/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-edm-edmonton-journal",
-        "name": "Edmonton Journal",
-        "browserUrl": "https://edmontonjournal.com/category/sports/hockey/nhl/edmonton-oilers/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-edm-edmonton-sun",
-        "name": "Edmonton Sun",
-        "browserUrl": "https://edmontonsun.com/category/sports/hockey/nhl/edmonton-oilers",
-        "category": "news"
-      },
-      {
-        "id": "nhl-edm-oil-on-whyte",
-        "name": "Oil On Whyte",
-        "browserUrl": "https://oilonwhyte.com",
+        "id": "nhl-edm-nhl-com",
+        "name": "NHL.com",
+        "browserUrl": "https://www.nhl.com/oilers/",
         "category": "news"
       },
       {
@@ -101776,65 +102742,229 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
         "category": "news"
       },
       {
-        "id": "nhl-edm-sportsnet",
-        "name": "Sportsnet",
-        "browserUrl": "https://www.sportsnet.ca/nhl/teams/edmonton-oilers/",
+        "id": "nhl-edm-cbs-sports",
+        "name": "CBS Sports",
+        "browserUrl": "https://www.cbssports.com/nhl/teams/EDM/edmonton-oilers/",
         "category": "news"
       },
       {
-        "id": "nhl-edm-oilers",
-        "name": "Oilers",
-        "browserUrl": "https://www.nhl.com/oilers",
+        "id": "nhl-edm-fox-sports",
+        "name": "FOX Sports",
+        "browserUrl": "https://www.foxsports.com/nhl/edmonton-oilers-team",
         "category": "news"
       },
       {
-        "id": "nhl-edm-fansided",
-        "name": "FanSided",
-        "browserUrl": "https://fansided.com/nhl/edmonton-oilers",
+        "id": "nhl-edm-yahoo-sports",
+        "name": "Yahoo! Sports",
+        "browserUrl": "https://sports.yahoo.com/nhl/teams/edmonton/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-edm-the-athletic",
+        "name": "The Athletic",
+        "browserUrl": "https://www.nytimes.com/athletic/nhl/team/oilers/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-edm-b-r",
+        "name": "B/R",
+        "browserUrl": "https://bleacherreport.com/edmonton-oilers",
+        "category": "news"
+      },
+      {
+        "id": "nhl-edm-nbc-sports",
+        "name": "NBC Sports",
+        "browserUrl": "https://www.nbcsports.com/nhl/edmonton-oilers",
+        "category": "news"
+      },
+      {
+        "id": "nhl-edm-si",
+        "name": "SI",
+        "browserUrl": "https://www.si.com/nhl/oilers",
+        "category": "news"
+      },
+      {
+        "id": "nhl-edm-usa-today",
+        "name": "USA Today",
+        "browserUrl": "https://sportsdata.usatoday.com/hockey/nhl/teams/edmonton-oilers/4959",
+        "category": "news"
+      },
+      {
+        "id": "nhl-edm-athlon-sports",
+        "name": "Athlon Sports",
+        "browserUrl": "https://athlonsports.com/nhl/edmonton-oilers",
+        "category": "news"
+      },
+      {
+        "id": "nhl-edm-yardbarker",
+        "name": "Yardbarker",
+        "browserUrl": "https://www.yardbarker.com/nhl/teams/edmonton_oilers/114",
+        "category": "news"
+      },
+      {
+        "id": "nhl-edm-spotrac",
+        "name": "Spotrac",
+        "browserUrl": "https://www.spotrac.com/nhl/edmonton-oilers/overview",
+        "category": "news"
+      },
+      {
+        "id": "nhl-edm-statmuse",
+        "name": "StatMuse",
+        "browserUrl": "https://www.statmuse.com/nhl/ask/edmonton-oilers-stats",
+        "category": "news"
+      },
+      {
+        "id": "nhl-edm-newsnow",
+        "name": "NewsNow",
+        "browserUrl": "https://www.newsnow.co.uk/h/Sport/US+Sports/NHL/Edmonton+Oilers",
+        "category": "news"
+      },
+      {
+        "id": "nhl-edm-sportspyder",
+        "name": "SportSpyder",
+        "browserUrl": "https://sportspyder.com/nhl/edmonton-oilers/news",
+        "category": "news"
+      },
+      {
+        "id": "nhl-edm-reddit",
+        "name": "Reddit",
+        "browserUrl": "https://www.reddit.com/r/EdmontonOilers/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-edm-edmontonoilers",
+        "name": "@EdmontonOilers",
+        "browserUrl": "https://x.com/EdmontonOilers",
+        "category": "news"
+      },
+      {
+        "id": "nhl-edm-edmonton-oilers",
+        "name": "#Edmonton Oilers",
+        "browserUrl": "https://x.com/search?q=edmonton%20oilers&src=typed_query",
+        "category": "news"
+      }
+    ],
+    "FLA": [
+      {
+        "id": "nhl-fla-nhl-com",
+        "name": "NHL.com",
+        "browserUrl": "https://www.nhl.com/panthers/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-fla-espn",
+        "name": "ESPN",
+        "browserUrl": "https://www.espn.com/nhl/team/_/name/fla/florida-panthers",
+        "category": "news"
+      },
+      {
+        "id": "nhl-fla-cbs-sports",
+        "name": "CBS Sports",
+        "browserUrl": "https://www.cbssports.com/nhl/teams/FLA/florida-panthers/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-fla-fox-sports",
+        "name": "FOX Sports",
+        "browserUrl": "https://www.foxsports.com/nhl/florida-panthers-team",
+        "category": "news"
+      },
+      {
+        "id": "nhl-fla-yahoo-sports",
+        "name": "Yahoo! Sports",
+        "browserUrl": "https://sports.yahoo.com/nhl/teams/florida/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-fla-the-athletic",
+        "name": "The Athletic",
+        "browserUrl": "https://www.nytimes.com/athletic/nhl/team/panthers/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-fla-b-r",
+        "name": "B/R",
+        "browserUrl": "https://bleacherreport.com/florida-panthers",
+        "category": "news"
+      },
+      {
+        "id": "nhl-fla-nbc-sports",
+        "name": "NBC Sports",
+        "browserUrl": "https://www.nbcsports.com/nhl/florida-panthers",
+        "category": "news"
+      },
+      {
+        "id": "nhl-fla-si",
+        "name": "SI",
+        "browserUrl": "https://www.si.com/nhl/panthers",
+        "category": "news"
+      },
+      {
+        "id": "nhl-fla-usa-today",
+        "name": "USA Today",
+        "browserUrl": "https://sportsdata.usatoday.com/hockey/nhl/teams/florida-panthers/4979",
+        "category": "news"
+      },
+      {
+        "id": "nhl-fla-athlon-sports",
+        "name": "Athlon Sports",
+        "browserUrl": "https://athlonsports.com/nhl/florida-panthers",
+        "category": "news"
+      },
+      {
+        "id": "nhl-fla-yardbarker",
+        "name": "Yardbarker",
+        "browserUrl": "https://www.yardbarker.com/nhl/teams/florida_panthers/104",
+        "category": "news"
+      },
+      {
+        "id": "nhl-fla-spotrac",
+        "name": "Spotrac",
+        "browserUrl": "https://www.spotrac.com/nhl/florida-panthers/overview",
+        "category": "news"
+      },
+      {
+        "id": "nhl-fla-statmuse",
+        "name": "StatMuse",
+        "browserUrl": "https://www.statmuse.com/nhl/ask/florida-panthers-stats",
+        "category": "news"
+      },
+      {
+        "id": "nhl-fla-newsnow",
+        "name": "NewsNow",
+        "browserUrl": "https://www.newsnow.co.uk/h/Sport/US+Sports/NHL/Florida+Panthers",
+        "category": "news"
+      },
+      {
+        "id": "nhl-fla-sportspyder",
+        "name": "SportSpyder",
+        "browserUrl": "https://sportspyder.com/nhl/florida-panthers/news",
+        "category": "news"
+      },
+      {
+        "id": "nhl-fla-reddit",
+        "name": "Reddit",
+        "browserUrl": "https://www.reddit.com/r/FloridaPanthers/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-fla-flapanthers",
+        "name": "@FlaPanthers",
+        "browserUrl": "https://x.com/FlaPanthers",
+        "category": "news"
+      },
+      {
+        "id": "nhl-fla-florida-panthers",
+        "name": "#Florida Panthers",
+        "browserUrl": "https://x.com/search?q=florida%20panthers&src=typed_query",
         "category": "news"
       }
     ],
     "LAK": [
       {
-        "id": "nhl-lak-jewels-from-the-crown",
-        "name": "Jewels From The Crown",
-        "browserUrl": "https://www.jewelsfromthecrown.com",
-        "category": "news"
-      },
-      {
-        "id": "nhl-lak-la-kings-insider",
-        "name": "LA Kings Insider",
-        "browserUrl": "https://lakingsinsider.com",
-        "category": "news"
-      },
-      {
-        "id": "nhl-lak-the-athletic",
-        "name": "The Athletic",
-        "browserUrl": "https://www.nytimes.com/athletic/nhl/team/kings/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-lak-sportspyder",
-        "name": "SportSpyder",
-        "browserUrl": "https://sportspyder.com/nhl/los-angeles-kings/news",
-        "category": "news"
-      },
-      {
-        "id": "nhl-lak-pro-hockey-rumors",
-        "name": "Pro Hockey Rumors",
-        "browserUrl": "https://www.prohockeyrumors.com/los-angeles-kings",
-        "category": "news"
-      },
-      {
-        "id": "nhl-lak-the-hockey-writers",
-        "name": "The Hockey Writers",
-        "browserUrl": "https://thehockeywriters.com/los-angeles-kings/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-lak-los-angeles-kings",
-        "name": "Los Angeles Kings",
-        "browserUrl": "https://www.nhl.com/kings",
+        "id": "nhl-lak-nhl-com",
+        "name": "NHL.com",
+        "browserUrl": "https://www.nhl.com/kings/",
         "category": "news"
       },
       {
@@ -101844,71 +102974,461 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
         "category": "news"
       },
       {
+        "id": "nhl-lak-cbs-sports",
+        "name": "CBS Sports",
+        "browserUrl": "https://www.cbssports.com/nhl/teams/LA/los-angeles-kings/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-lak-fox-sports",
+        "name": "FOX Sports",
+        "browserUrl": "https://www.foxsports.com/nhl/los-angeles-kings-team",
+        "category": "news"
+      },
+      {
         "id": "nhl-lak-yahoo-sports",
-        "name": "Yahoo Sports",
+        "name": "Yahoo! Sports",
         "browserUrl": "https://sports.yahoo.com/nhl/teams/los-angeles/",
         "category": "news"
       },
       {
-        "id": "nhl-lak-la-times",
-        "name": "LA Times",
-        "browserUrl": "https://www.latimes.com/sports/hockey/kings",
+        "id": "nhl-lak-the-athletic",
+        "name": "The Athletic",
+        "browserUrl": "https://www.nytimes.com/athletic/nhl/team/kings/",
         "category": "news"
       },
       {
-        "id": "nhl-lak-la-daily-news",
-        "name": "LA Daily News",
-        "browserUrl": "https://www.dailynews.com/2013/06/02/kings-1-blackhawks-4-end-of-second-period/",
+        "id": "nhl-lak-b-r",
+        "name": "B/R",
+        "browserUrl": "https://bleacherreport.com/los-angeles-kings",
         "category": "news"
       },
       {
-        "id": "nhl-lak-fansided",
-        "name": "FanSided",
-        "browserUrl": "https://fansided.com/nhl/los-angeles-kings",
+        "id": "nhl-lak-nbc-sports",
+        "name": "NBC Sports",
+        "browserUrl": "https://www.nbcsports.com/nhl/los-angeles-kings",
+        "category": "news"
+      },
+      {
+        "id": "nhl-lak-si",
+        "name": "SI",
+        "browserUrl": "https://www.si.com/nhl/kings",
+        "category": "news"
+      },
+      {
+        "id": "nhl-lak-usa-today",
+        "name": "USA Today",
+        "browserUrl": "https://sportsdata.usatoday.com/hockey/nhl/teams/los-angeles-kings/4961",
+        "category": "news"
+      },
+      {
+        "id": "nhl-lak-athlon-sports",
+        "name": "Athlon Sports",
+        "browserUrl": "https://athlonsports.com/nhl/los-angeles-kings",
+        "category": "news"
+      },
+      {
+        "id": "nhl-lak-yardbarker",
+        "name": "Yardbarker",
+        "browserUrl": "https://www.yardbarker.com/nhl/teams/los_angeles_kings/119",
+        "category": "news"
+      },
+      {
+        "id": "nhl-lak-spotrac",
+        "name": "Spotrac",
+        "browserUrl": "https://www.spotrac.com/nhl/los-angeles-kings/overview",
+        "category": "news"
+      },
+      {
+        "id": "nhl-lak-statmuse",
+        "name": "StatMuse",
+        "browserUrl": "https://www.statmuse.com/nhl/ask/los-angeles-kings-stats",
+        "category": "news"
+      },
+      {
+        "id": "nhl-lak-newsnow",
+        "name": "NewsNow",
+        "browserUrl": "https://www.newsnow.co.uk/h/Sport/US+Sports/NHL/Los+Angeles+Kings",
+        "category": "news"
+      },
+      {
+        "id": "nhl-lak-sportspyder",
+        "name": "SportSpyder",
+        "browserUrl": "https://sportspyder.com/nhl/los-angeles-kings/news",
+        "category": "news"
+      },
+      {
+        "id": "nhl-lak-reddit",
+        "name": "Reddit",
+        "browserUrl": "https://www.reddit.com/r/losangeleskings/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-lak-lakings",
+        "name": "@LAKings",
+        "browserUrl": "https://x.com/LAKings",
+        "category": "news"
+      },
+      {
+        "id": "nhl-lak-los-angeles-kings",
+        "name": "#Los Angeles Kings",
+        "browserUrl": "https://x.com/search?q=los%20angeles%20kings&src=typed_query",
+        "category": "news"
+      }
+    ],
+    "MIN": [
+      {
+        "id": "nhl-min-nhl-com",
+        "name": "NHL.com",
+        "browserUrl": "https://www.nhl.com/wild/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-min-espn",
+        "name": "ESPN",
+        "browserUrl": "https://www.espn.com/nhl/team/_/name/min/minnesota-wild",
+        "category": "news"
+      },
+      {
+        "id": "nhl-min-cbs-sports",
+        "name": "CBS Sports",
+        "browserUrl": "https://www.cbssports.com/nhl/teams/MIN/minnesota-wild/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-min-fox-sports",
+        "name": "FOX Sports",
+        "browserUrl": "https://www.foxsports.com/nhl/minnesota-wild-team",
+        "category": "news"
+      },
+      {
+        "id": "nhl-min-yahoo-sports",
+        "name": "Yahoo! Sports",
+        "browserUrl": "https://sports.yahoo.com/nhl/teams/minnesota/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-min-the-athletic",
+        "name": "The Athletic",
+        "browserUrl": "https://www.nytimes.com/athletic/nhl/team/wild/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-min-b-r",
+        "name": "B/R",
+        "browserUrl": "https://bleacherreport.com/minnesota-wild",
+        "category": "news"
+      },
+      {
+        "id": "nhl-min-nbc-sports",
+        "name": "NBC Sports",
+        "browserUrl": "https://www.nbcsports.com/nhl/minnesota-wild",
+        "category": "news"
+      },
+      {
+        "id": "nhl-min-si",
+        "name": "SI",
+        "browserUrl": "https://www.si.com/nhl/wild",
+        "category": "news"
+      },
+      {
+        "id": "nhl-min-usa-today",
+        "name": "USA Today",
+        "browserUrl": "https://sportsdata.usatoday.com/hockey/nhl/teams/minnesota-wild/4983",
+        "category": "news"
+      },
+      {
+        "id": "nhl-min-athlon-sports",
+        "name": "Athlon Sports",
+        "browserUrl": "https://athlonsports.com/nhl/minnesota-wild",
+        "category": "news"
+      },
+      {
+        "id": "nhl-min-yardbarker",
+        "name": "Yardbarker",
+        "browserUrl": "https://www.yardbarker.com/nhl/teams/minnesota_wild/115",
+        "category": "news"
+      },
+      {
+        "id": "nhl-min-spotrac",
+        "name": "Spotrac",
+        "browserUrl": "https://www.spotrac.com/nhl/minnesota-wild/overview",
+        "category": "news"
+      },
+      {
+        "id": "nhl-min-statmuse",
+        "name": "StatMuse",
+        "browserUrl": "https://www.statmuse.com/nhl/ask/minnesota-wild-stats",
+        "category": "news"
+      },
+      {
+        "id": "nhl-min-newsnow",
+        "name": "NewsNow",
+        "browserUrl": "https://www.newsnow.co.uk/h/Sport/US+Sports/NHL/Minnesota+Wild",
+        "category": "news"
+      },
+      {
+        "id": "nhl-min-sportspyder",
+        "name": "SportSpyder",
+        "browserUrl": "https://sportspyder.com/nhl/minnesota-wild/news",
+        "category": "news"
+      },
+      {
+        "id": "nhl-min-reddit",
+        "name": "Reddit",
+        "browserUrl": "https://www.reddit.com/r/wildhockey/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-min-mnwild",
+        "name": "@mnwild",
+        "browserUrl": "https://x.com/mnwild",
+        "category": "news"
+      },
+      {
+        "id": "nhl-min-minnesota-wild",
+        "name": "#Minnesota Wild",
+        "browserUrl": "https://x.com/search?q=minnesota%20wild&src=typed_query",
+        "category": "news"
+      }
+    ],
+    "MTL": [
+      {
+        "id": "nhl-mtl-nhl-com",
+        "name": "NHL.com",
+        "browserUrl": "https://www.nhl.com/canadiens/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-mtl-espn",
+        "name": "ESPN",
+        "browserUrl": "https://www.espn.com/nhl/team/_/name/mtl/montreal-canadiens",
+        "category": "news"
+      },
+      {
+        "id": "nhl-mtl-cbs-sports",
+        "name": "CBS Sports",
+        "browserUrl": "https://www.cbssports.com/nhl/teams/MTL/montreal-canadiens/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-mtl-fox-sports",
+        "name": "FOX Sports",
+        "browserUrl": "https://www.foxsports.com/nhl/montreal-canadiens-team",
+        "category": "news"
+      },
+      {
+        "id": "nhl-mtl-yahoo-sports",
+        "name": "Yahoo! Sports",
+        "browserUrl": "https://sports.yahoo.com/nhl/teams/montreal/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-mtl-the-athletic",
+        "name": "The Athletic",
+        "browserUrl": "https://www.nytimes.com/athletic/nhl/team/canadiens/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-mtl-b-r",
+        "name": "B/R",
+        "browserUrl": "https://bleacherreport.com/montreal-canadiens",
+        "category": "news"
+      },
+      {
+        "id": "nhl-mtl-nbc-sports",
+        "name": "NBC Sports",
+        "browserUrl": "https://www.nbcsports.com/nhl/montreal-canadiens",
+        "category": "news"
+      },
+      {
+        "id": "nhl-mtl-si",
+        "name": "SI",
+        "browserUrl": "https://www.si.com/nhl/canadiens",
+        "category": "news"
+      },
+      {
+        "id": "nhl-mtl-usa-today",
+        "name": "USA Today",
+        "browserUrl": "https://sportsdata.usatoday.com/hockey/nhl/teams/montreal-canadiens/4963",
+        "category": "news"
+      },
+      {
+        "id": "nhl-mtl-athlon-sports",
+        "name": "Athlon Sports",
+        "browserUrl": "https://athlonsports.com/nhl/montreal-canadiens",
+        "category": "news"
+      },
+      {
+        "id": "nhl-mtl-yardbarker",
+        "name": "Yardbarker",
+        "browserUrl": "https://www.yardbarker.com/nhl/teams/montreal_canadiens/100",
+        "category": "news"
+      },
+      {
+        "id": "nhl-mtl-spotrac",
+        "name": "Spotrac",
+        "browserUrl": "https://www.spotrac.com/nhl/montreal-canadiens/overview",
+        "category": "news"
+      },
+      {
+        "id": "nhl-mtl-statmuse",
+        "name": "StatMuse",
+        "browserUrl": "https://www.statmuse.com/nhl/ask/montreal-canadiens-stats",
+        "category": "news"
+      },
+      {
+        "id": "nhl-mtl-newsnow",
+        "name": "NewsNow",
+        "browserUrl": "https://www.newsnow.co.uk/h/Sport/US+Sports/NHL/Montreal+Canadiens",
+        "category": "news"
+      },
+      {
+        "id": "nhl-mtl-sportspyder",
+        "name": "SportSpyder",
+        "browserUrl": "https://sportspyder.com/nhl/montreal-canadiens/news",
+        "category": "news"
+      },
+      {
+        "id": "nhl-mtl-reddit",
+        "name": "Reddit",
+        "browserUrl": "https://www.reddit.com/r/Habs/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-mtl-canadiensmtl",
+        "name": "@CanadiensMTL",
+        "browserUrl": "https://x.com/CanadiensMTL",
+        "category": "news"
+      },
+      {
+        "id": "nhl-mtl-montr-al-canadiens",
+        "name": "#Montr\xE9al Canadiens",
+        "browserUrl": "https://x.com/search?q=montreal%20canadiens&src=typed_query",
+        "category": "news"
+      }
+    ],
+    "NSH": [
+      {
+        "id": "nhl-nsh-nhl-com",
+        "name": "NHL.com",
+        "browserUrl": "https://www.nhl.com/predators/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-nsh-espn",
+        "name": "ESPN",
+        "browserUrl": "https://www.espn.com/nhl/team/_/name/nsh/nashville-predators",
+        "category": "news"
+      },
+      {
+        "id": "nhl-nsh-cbs-sports",
+        "name": "CBS Sports",
+        "browserUrl": "https://www.cbssports.com/nhl/teams/NSH/nashville-predators/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-nsh-fox-sports",
+        "name": "FOX Sports",
+        "browserUrl": "https://www.foxsports.com/nhl/nashville-predators-team",
+        "category": "news"
+      },
+      {
+        "id": "nhl-nsh-yahoo-sports",
+        "name": "Yahoo! Sports",
+        "browserUrl": "https://sports.yahoo.com/nhl/teams/nashville/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-nsh-the-athletic",
+        "name": "The Athletic",
+        "browserUrl": "https://www.nytimes.com/athletic/nhl/team/predators/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-nsh-b-r",
+        "name": "B/R",
+        "browserUrl": "https://bleacherreport.com/nashville-predators",
+        "category": "news"
+      },
+      {
+        "id": "nhl-nsh-nbc-sports",
+        "name": "NBC Sports",
+        "browserUrl": "https://www.nbcsports.com/nhl/nashville-predators",
+        "category": "news"
+      },
+      {
+        "id": "nhl-nsh-si",
+        "name": "SI",
+        "browserUrl": "https://www.si.com/nhl/predators",
+        "category": "news"
+      },
+      {
+        "id": "nhl-nsh-usa-today",
+        "name": "USA Today",
+        "browserUrl": "https://sportsdata.usatoday.com/hockey/nhl/teams/nashville-predators/4980",
+        "category": "news"
+      },
+      {
+        "id": "nhl-nsh-athlon-sports",
+        "name": "Athlon Sports",
+        "browserUrl": "https://athlonsports.com/nhl/nashville-predators",
+        "category": "news"
+      },
+      {
+        "id": "nhl-nsh-yardbarker",
+        "name": "Yardbarker",
+        "browserUrl": "https://www.yardbarker.com/nhl/teams/nashville_predators/110",
+        "category": "news"
+      },
+      {
+        "id": "nhl-nsh-spotrac",
+        "name": "Spotrac",
+        "browserUrl": "https://www.spotrac.com/nhl/nashville-predators/overview",
+        "category": "news"
+      },
+      {
+        "id": "nhl-nsh-statmuse",
+        "name": "StatMuse",
+        "browserUrl": "https://www.statmuse.com/nhl/ask/nashville-predators-stats",
+        "category": "news"
+      },
+      {
+        "id": "nhl-nsh-newsnow",
+        "name": "NewsNow",
+        "browserUrl": "https://www.newsnow.co.uk/h/Sport/US+Sports/NHL/Nashville+Predators",
+        "category": "news"
+      },
+      {
+        "id": "nhl-nsh-sportspyder",
+        "name": "SportSpyder",
+        "browserUrl": "https://sportspyder.com/nhl/nashville-predators/news",
+        "category": "news"
+      },
+      {
+        "id": "nhl-nsh-reddit",
+        "name": "Reddit",
+        "browserUrl": "https://www.reddit.com/r/Predators/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-nsh-predsnhl",
+        "name": "@PredsNHL",
+        "browserUrl": "https://x.com/PredsNHL",
+        "category": "news"
+      },
+      {
+        "id": "nhl-nsh-nashville-predators",
+        "name": "#Nashville Predators",
+        "browserUrl": "https://x.com/search?q=nashville%20predators&src=typed_query",
         "category": "news"
       }
     ],
     "NJD": [
       {
-        "id": "nhl-njd-all-about-the-jersey",
-        "name": "All About The Jersey",
-        "browserUrl": "https://www.allaboutthejersey.com",
-        "category": "news"
-      },
-      {
-        "id": "nhl-njd-new-jersey-devils",
-        "name": "New Jersey Devils",
-        "browserUrl": "https://www.nhl.com/devils",
-        "category": "news"
-      },
-      {
-        "id": "nhl-njd-the-athletic",
-        "name": "The Athletic",
-        "browserUrl": "https://www.nytimes.com/athletic/nhl/team/devils/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-njd-sportspyder",
-        "name": "SportSpyder",
-        "browserUrl": "https://sportspyder.com/nhl/new-jersey-devils/news",
-        "category": "news"
-      },
-      {
-        "id": "nhl-njd-pro-hockey-rumors",
-        "name": "Pro Hockey Rumors",
-        "browserUrl": "https://www.prohockeyrumors.com/new-jersey-devils",
-        "category": "news"
-      },
-      {
-        "id": "nhl-njd-new-jersey-hockey-now",
-        "name": "New Jersey Hockey Now",
-        "browserUrl": "https://sportsnaut.com/nhl/new-jersey-devils",
-        "category": "news"
-      },
-      {
-        "id": "nhl-njd-pucks-and-pitchforks",
-        "name": "Pucks and Pitchforks",
-        "browserUrl": "https://pucksandpitchforks.com",
+        "id": "nhl-njd-nhl-com",
+        "name": "NHL.com",
+        "browserUrl": "https://www.nhl.com/devils/",
         "category": "news"
       },
       {
@@ -101918,311 +103438,137 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
         "category": "news"
       },
       {
-        "id": "nhl-njd-new-york-post",
-        "name": "New York Post",
-        "browserUrl": "https://nypost.com/new-jersey-devils/",
+        "id": "nhl-njd-cbs-sports",
+        "name": "CBS Sports",
+        "browserUrl": "https://www.cbssports.com/nhl/teams/NJ/new-jersey-devils/",
         "category": "news"
       },
       {
-        "id": "nhl-njd-the-hockey-writers",
-        "name": "The Hockey Writers",
-        "browserUrl": "https://thehockeywriters.com/new-jersey-devils/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-njd-fansided",
-        "name": "FanSided",
-        "browserUrl": "https://fansided.com/nhl/new-jersey-devils",
-        "category": "news"
-      },
-      {
-        "id": "nhl-njd-nhl-official",
-        "name": "NHL Official",
-        "browserUrl": "https://www.nhl.com/devils",
+        "id": "nhl-njd-fox-sports",
+        "name": "FOX Sports",
+        "browserUrl": "https://www.foxsports.com/nhl/new-jersey-devils-team",
         "category": "news"
       },
       {
         "id": "nhl-njd-yahoo-sports",
-        "name": "Yahoo Sports",
+        "name": "Yahoo! Sports",
         "browserUrl": "https://sports.yahoo.com/nhl/teams/new-jersey/",
         "category": "news"
       },
       {
-        "id": "nhl-njd-devils-army-network",
-        "name": "Devils Army Network",
-        "browserUrl": "https://www.hugedomains.com/domain_profile.cfm?d=devilsarmy.com",
-        "category": "news"
-      }
-    ],
-    "NYR": [
-      {
-        "id": "nhl-nyr-blueshirt-banter",
-        "name": "Blueshirt Banter",
-        "browserUrl": "https://www.blueshirtbanter.com",
-        "category": "news"
-      },
-      {
-        "id": "nhl-nyr-forever-blueshirts",
-        "name": "Forever Blueshirts",
-        "browserUrl": "https://www.foreverblueshirts.com/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-nyr-ny-rangers-blog",
-        "name": "NY Rangers Blog",
-        "browserUrl": "https://nyrangersblog.com",
-        "category": "news"
-      },
-      {
-        "id": "nhl-nyr-the-athletic",
+        "id": "nhl-njd-the-athletic",
         "name": "The Athletic",
-        "browserUrl": "https://www.nytimes.com/athletic/nhl/team/rangers/",
+        "browserUrl": "https://www.nytimes.com/athletic/nhl/team/devils/",
         "category": "news"
       },
       {
-        "id": "nhl-nyr-sportspyder",
+        "id": "nhl-njd-b-r",
+        "name": "B/R",
+        "browserUrl": "https://bleacherreport.com/new-jersey-devils",
+        "category": "news"
+      },
+      {
+        "id": "nhl-njd-nbc-sports",
+        "name": "NBC Sports",
+        "browserUrl": "https://www.nbcsports.com/nhl/new-jersey-devils",
+        "category": "news"
+      },
+      {
+        "id": "nhl-njd-si",
+        "name": "SI",
+        "browserUrl": "https://www.si.com/nhl/devils",
+        "category": "news"
+      },
+      {
+        "id": "nhl-njd-usa-today",
+        "name": "USA Today",
+        "browserUrl": "https://sportsdata.usatoday.com/hockey/nhl/teams/new-jersey-devils/4964",
+        "category": "news"
+      },
+      {
+        "id": "nhl-njd-athlon-sports",
+        "name": "Athlon Sports",
+        "browserUrl": "https://athlonsports.com/nhl/new-jersey-devils",
+        "category": "news"
+      },
+      {
+        "id": "nhl-njd-yardbarker",
+        "name": "Yardbarker",
+        "browserUrl": "https://www.yardbarker.com/nhl/teams/new_jersey_devils/92",
+        "category": "news"
+      },
+      {
+        "id": "nhl-njd-spotrac",
+        "name": "Spotrac",
+        "browserUrl": "https://www.spotrac.com/nhl/new-jersey-devils/overview",
+        "category": "news"
+      },
+      {
+        "id": "nhl-njd-statmuse",
+        "name": "StatMuse",
+        "browserUrl": "https://www.statmuse.com/nhl/ask/new-jersey-devils-stats",
+        "category": "news"
+      },
+      {
+        "id": "nhl-njd-newsnow",
+        "name": "NewsNow",
+        "browserUrl": "https://www.newsnow.co.uk/h/Sport/US+Sports/NHL/New+Jersey+Devils",
+        "category": "news"
+      },
+      {
+        "id": "nhl-njd-sportspyder",
         "name": "SportSpyder",
-        "browserUrl": "https://sportspyder.com/nhl/new-york-rangers/news",
+        "browserUrl": "https://sportspyder.com/nhl/new-jersey-devils/news",
         "category": "news"
       },
       {
-        "id": "nhl-nyr-pro-hockey-rumors",
-        "name": "Pro Hockey Rumors",
-        "browserUrl": "https://www.prohockeyrumors.com/new-york-rangers",
+        "id": "nhl-njd-reddit",
+        "name": "Reddit",
+        "browserUrl": "https://www.reddit.com/r/devils/",
         "category": "news"
       },
       {
-        "id": "nhl-nyr-the-hockey-writers",
-        "name": "The Hockey Writers",
-        "browserUrl": "https://thehockeywriters.com/new-york-rangers/",
+        "id": "nhl-njd-njdevils",
+        "name": "@NJDevils",
+        "browserUrl": "https://x.com/NJDevils",
         "category": "news"
       },
       {
-        "id": "nhl-nyr-new-york-rangers",
-        "name": "New York Rangers",
-        "browserUrl": "https://www.nhl.com/rangers",
-        "category": "news"
-      },
-      {
-        "id": "nhl-nyr-espn",
-        "name": "ESPN",
-        "browserUrl": "https://www.espn.com/nhl/team/_/name/nyr/new-york-rangers",
-        "category": "news"
-      },
-      {
-        "id": "nhl-nyr-new-york-post",
-        "name": "New York Post",
-        "browserUrl": "https://nypost.com/new-york-rangers/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-nyr-ny-daily-news",
-        "name": "NY Daily News",
-        "browserUrl": "https://www.nydailynews.com/sports/nhl/new-york-rangers/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-nyr-fansided",
-        "name": "FanSided",
-        "browserUrl": "https://fansided.com/nhl/new-york-rangers",
-        "category": "news"
-      },
-      {
-        "id": "nhl-nyr-nhl-official",
-        "name": "NHL Official",
-        "browserUrl": "https://www.nhl.com/rangers",
-        "category": "news"
-      },
-      {
-        "id": "nhl-nyr-cbs-sports",
-        "name": "CBS Sports",
-        "browserUrl": "https://www.cbssports.com/nhl/teams/NYR/new-york-rangers/",
-        "category": "news"
-      }
-    ],
-    "PIT": [
-      {
-        "id": "nhl-pit-pensburgh",
-        "name": "PensBurgh",
-        "browserUrl": "https://www.pensburgh.com",
-        "category": "news"
-      },
-      {
-        "id": "nhl-pit-pens-labyrinth",
-        "name": "Pens Labyrinth",
-        "browserUrl": "https://penslabyrinth.com",
-        "category": "news"
-      },
-      {
-        "id": "nhl-pit-the-athletic",
-        "name": "The Athletic",
-        "browserUrl": "https://www.nytimes.com/athletic/nhl/team/penguins/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-pit-sportspyder",
-        "name": "SportSpyder",
-        "browserUrl": "https://sportspyder.com/nhl/pittsburgh-penguins/news",
-        "category": "news"
-      },
-      {
-        "id": "nhl-pit-pro-hockey-rumors",
-        "name": "Pro Hockey Rumors",
-        "browserUrl": "https://www.prohockeyrumors.com/pittsburgh-penguins",
-        "category": "news"
-      },
-      {
-        "id": "nhl-pit-the-hockey-writers",
-        "name": "The Hockey Writers",
-        "browserUrl": "https://thehockeywriters.com/pittsburgh-penguins/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-pit-pittsburgh-hockey-now",
-        "name": "Pittsburgh Hockey Now",
-        "browserUrl": "https://pittsburghhockeynow.com",
-        "category": "news"
-      },
-      {
-        "id": "nhl-pit-penguins",
-        "name": "Penguins",
-        "browserUrl": "https://www.nhl.com/penguins",
-        "category": "news"
-      },
-      {
-        "id": "nhl-pit-espn",
-        "name": "ESPN",
-        "browserUrl": "https://www.espn.com/nhl/team/_/name/pit/pittsburgh-penguins",
-        "category": "news"
-      },
-      {
-        "id": "nhl-pit-triblive",
-        "name": "TribLIVE",
-        "browserUrl": "https://triblive.com/privacy/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-pit-pittsburgh-post-gazette",
-        "name": "Pittsburgh Post-Gazette",
-        "browserUrl": "https://www.post-gazette.com/sports/penguins",
-        "category": "news"
-      },
-      {
-        "id": "nhl-pit-dk-pittsburgh-sports",
-        "name": "DK Pittsburgh Sports",
-        "browserUrl": "https://www.dkpittsburghsports.com/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-pit-fansided",
-        "name": "FanSided",
-        "browserUrl": "https://fansided.com/nhl/pittsburgh-penguins",
-        "category": "news"
-      },
-      {
-        "id": "nhl-pit-nhl-official",
-        "name": "NHL Official",
-        "browserUrl": "https://www.nhl.com/penguins",
-        "category": "news"
-      },
-      {
-        "id": "nhl-pit-cbs-sports",
-        "name": "CBS Sports",
-        "browserUrl": "https://www.cbssports.com/nhl/teams/PIT/pittsburgh-penguins/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-pit-yahoo-sports",
-        "name": "Yahoo Sports",
-        "browserUrl": "https://sports.yahoo.com/nhl/teams/pittsburgh/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-pit-pensburgh-2",
-        "name": "Pensburgh",
-        "browserUrl": "https://www.pensburgh.com",
-        "category": "news"
-      }
-    ],
-    "CBJ": [
-      {
-        "id": "nhl-cbj-the-cannon",
-        "name": "The Cannon",
-        "browserUrl": "https://www.jacketscannon.com",
-        "category": "news"
-      },
-      {
-        "id": "nhl-cbj-1st-ohio-battery",
-        "name": "1st Ohio Battery",
-        "browserUrl": "https://www.1stohiobattery.com/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-cbj-mega-sports-news",
-        "name": "Mega Sports News",
-        "browserUrl": "https://megasportsnews.com",
-        "category": "news"
-      },
-      {
-        "id": "nhl-cbj-union-and-blue",
-        "name": "Union and Blue",
-        "browserUrl": "https://unionandblue.com",
-        "category": "news"
-      },
-      {
-        "id": "nhl-cbj-columbus-blue-jackets",
-        "name": "Columbus Blue Jackets",
-        "browserUrl": "https://www.nhl.com/bluejackets",
-        "category": "news"
-      },
-      {
-        "id": "nhl-cbj-the-hockey-writers",
-        "name": "The Hockey Writers",
-        "browserUrl": "https://thehockeywriters.com/columbus-blue-jackets/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-cbj-the-athletic",
-        "name": "The Athletic",
-        "browserUrl": "https://www.nytimes.com/athletic/nhl/team/blue-jackets/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-cbj-espn",
-        "name": "ESPN",
-        "browserUrl": "https://www.espn.com/nhl/team/_/name/cbj/columbus-blue-jackets",
+        "id": "nhl-njd-new-jersey-devils",
+        "name": "#New Jersey Devils",
+        "browserUrl": "https://x.com/search?q=new%20jersey%20devils&src=typed_query",
         "category": "news"
       }
     ],
     "NYI": [
       {
-        "id": "nhl-nyi-new-york-post",
-        "name": "New York Post",
-        "browserUrl": "https://nypost.com/new-york-islanders/",
+        "id": "nhl-nyi-nhl-com",
+        "name": "NHL.com",
+        "browserUrl": "https://www.nhl.com/islanders/",
         "category": "news"
       },
       {
-        "id": "nhl-nyi-sportspyder",
-        "name": "SportSpyder",
-        "browserUrl": "https://sportspyder.com/nhl/new-york-islanders/news",
+        "id": "nhl-nyi-espn",
+        "name": "ESPN",
+        "browserUrl": "https://www.espn.com/nhl/team/_/name/nyi/new-york-islanders",
         "category": "news"
       },
       {
-        "id": "nhl-nyi-pro-hockey-rumors",
-        "name": "Pro Hockey Rumors",
-        "browserUrl": "https://www.prohockeyrumors.com/new-york-islanders",
+        "id": "nhl-nyi-cbs-sports",
+        "name": "CBS Sports",
+        "browserUrl": "https://www.cbssports.com/nhl/teams/NYI/new-york-islanders/",
         "category": "news"
       },
       {
-        "id": "nhl-nyi-nhl-rumors",
-        "name": "NHL Rumors",
-        "browserUrl": "https://nhlrumors.com/tag/new-york-islanders/",
+        "id": "nhl-nyi-fox-sports",
+        "name": "FOX Sports",
+        "browserUrl": "https://www.foxsports.com/nhl/new-york-islanders-team",
         "category": "news"
       },
       {
-        "id": "nhl-nyi-the-hockey-news",
-        "name": "The Hockey News",
-        "browserUrl": "https://thehockeynews.com/nhl/new-york-islanders",
+        "id": "nhl-nyi-yahoo-sports",
+        "name": "Yahoo! Sports",
+        "browserUrl": "https://sports.yahoo.com/nhl/teams/ny-islanders/",
         "category": "news"
       },
       {
@@ -102232,23 +103578,289 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
         "category": "news"
       },
       {
-        "id": "nhl-nyi-esny",
-        "name": "ESNY",
-        "browserUrl": "https://elitesportsny.com/teams/islanders/",
+        "id": "nhl-nyi-b-r",
+        "name": "B/R",
+        "browserUrl": "https://bleacherreport.com/new-york-islanders",
+        "category": "news"
+      },
+      {
+        "id": "nhl-nyi-nbc-sports",
+        "name": "NBC Sports",
+        "browserUrl": "https://www.nbcsports.com/nhl/new-york-islanders",
+        "category": "news"
+      },
+      {
+        "id": "nhl-nyi-si",
+        "name": "SI",
+        "browserUrl": "https://www.si.com/nhl/islanders",
+        "category": "news"
+      },
+      {
+        "id": "nhl-nyi-usa-today",
+        "name": "USA Today",
+        "browserUrl": "https://sportsdata.usatoday.com/hockey/nhl/teams/new-york-islanders/4965",
+        "category": "news"
+      },
+      {
+        "id": "nhl-nyi-athlon-sports",
+        "name": "Athlon Sports",
+        "browserUrl": "https://athlonsports.com/nhl/new-york-islanders",
+        "category": "news"
+      },
+      {
+        "id": "nhl-nyi-yardbarker",
+        "name": "Yardbarker",
+        "browserUrl": "https://www.yardbarker.com/nhl/teams/new_york_islanders/93",
+        "category": "news"
+      },
+      {
+        "id": "nhl-nyi-spotrac",
+        "name": "Spotrac",
+        "browserUrl": "https://www.spotrac.com/nhl/new-york-islanders/overview",
+        "category": "news"
+      },
+      {
+        "id": "nhl-nyi-statmuse",
+        "name": "StatMuse",
+        "browserUrl": "https://www.statmuse.com/nhl/ask/new-york-islanders-stats",
+        "category": "news"
+      },
+      {
+        "id": "nhl-nyi-newsnow",
+        "name": "NewsNow",
+        "browserUrl": "https://www.newsnow.co.uk/h/Sport/US+Sports/NHL/New+York+Islanders",
+        "category": "news"
+      },
+      {
+        "id": "nhl-nyi-sportspyder",
+        "name": "SportSpyder",
+        "browserUrl": "https://sportspyder.com/nhl/new-york-islanders/news",
+        "category": "news"
+      },
+      {
+        "id": "nhl-nyi-reddit",
+        "name": "Reddit",
+        "browserUrl": "https://www.reddit.com/r/NewYorkIslanders/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-nyi-nyislanders",
+        "name": "@NYIslanders",
+        "browserUrl": "https://x.com/NYIslanders",
+        "category": "news"
+      },
+      {
+        "id": "nhl-nyi-new-york-islanders",
+        "name": "#New York Islanders",
+        "browserUrl": "https://x.com/search?q=new%20york%20islanders&src=typed_query",
+        "category": "news"
+      }
+    ],
+    "NYR": [
+      {
+        "id": "nhl-nyr-nhl-com",
+        "name": "NHL.com",
+        "browserUrl": "https://www.nhl.com/rangers/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-nyr-espn",
+        "name": "ESPN",
+        "browserUrl": "https://www.espn.com/nhl/team/_/name/nyr/new-york-rangers",
+        "category": "news"
+      },
+      {
+        "id": "nhl-nyr-cbs-sports",
+        "name": "CBS Sports",
+        "browserUrl": "https://www.cbssports.com/nhl/teams/NYR/new-york-rangers/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-nyr-fox-sports",
+        "name": "FOX Sports",
+        "browserUrl": "https://www.foxsports.com/nhl/new-york-rangers-team",
+        "category": "news"
+      },
+      {
+        "id": "nhl-nyr-yahoo-sports",
+        "name": "Yahoo! Sports",
+        "browserUrl": "https://sports.yahoo.com/nhl/teams/ny-rangers/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-nyr-the-athletic",
+        "name": "The Athletic",
+        "browserUrl": "https://www.nytimes.com/athletic/nhl/team/rangers/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-nyr-b-r",
+        "name": "B/R",
+        "browserUrl": "https://bleacherreport.com/new-york-rangers",
+        "category": "news"
+      },
+      {
+        "id": "nhl-nyr-nbc-sports",
+        "name": "NBC Sports",
+        "browserUrl": "https://www.nbcsports.com/nhl/new-york-rangers",
+        "category": "news"
+      },
+      {
+        "id": "nhl-nyr-si",
+        "name": "SI",
+        "browserUrl": "https://www.si.com/nhl/rangers",
+        "category": "news"
+      },
+      {
+        "id": "nhl-nyr-usa-today",
+        "name": "USA Today",
+        "browserUrl": "https://sportsdata.usatoday.com/hockey/nhl/teams/new-york-rangers/4966",
+        "category": "news"
+      },
+      {
+        "id": "nhl-nyr-athlon-sports",
+        "name": "Athlon Sports",
+        "browserUrl": "https://athlonsports.com/nhl/new-york-rangers",
+        "category": "news"
+      },
+      {
+        "id": "nhl-nyr-yardbarker",
+        "name": "Yardbarker",
+        "browserUrl": "https://www.yardbarker.com/nhl/teams/new_york_rangers/94",
+        "category": "news"
+      },
+      {
+        "id": "nhl-nyr-spotrac",
+        "name": "Spotrac",
+        "browserUrl": "https://www.spotrac.com/nhl/new-york-rangers/overview",
+        "category": "news"
+      },
+      {
+        "id": "nhl-nyr-statmuse",
+        "name": "StatMuse",
+        "browserUrl": "https://www.statmuse.com/nhl/ask/new-york-rangers-stats",
+        "category": "news"
+      },
+      {
+        "id": "nhl-nyr-newsnow",
+        "name": "NewsNow",
+        "browserUrl": "https://www.newsnow.co.uk/h/Sport/US+Sports/NHL/New+York+Rangers",
+        "category": "news"
+      },
+      {
+        "id": "nhl-nyr-sportspyder",
+        "name": "SportSpyder",
+        "browserUrl": "https://sportspyder.com/nhl/new-york-rangers/news",
+        "category": "news"
+      },
+      {
+        "id": "nhl-nyr-reddit",
+        "name": "Reddit",
+        "browserUrl": "https://www.reddit.com/r/rangers/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-nyr-nyrangers",
+        "name": "@NYRangers",
+        "browserUrl": "https://x.com/NYRangers",
+        "category": "news"
+      },
+      {
+        "id": "nhl-nyr-new-york-rangers",
+        "name": "#New York Rangers",
+        "browserUrl": "https://x.com/search?q=new%20york%20rangers&src=typed_query",
         "category": "news"
       }
     ],
     "OTT": [
       {
-        "id": "nhl-ott-senschirp",
-        "name": "SensChirp",
-        "browserUrl": "https://senschirp.ca",
+        "id": "nhl-ott-nhl-com",
+        "name": "NHL.com",
+        "browserUrl": "https://www.nhl.com/senators/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-ott-espn",
+        "name": "ESPN",
+        "browserUrl": "https://www.espn.com/nhl/team/_/name/ott/ottawa-senators",
+        "category": "news"
+      },
+      {
+        "id": "nhl-ott-cbs-sports",
+        "name": "CBS Sports",
+        "browserUrl": "https://www.cbssports.com/nhl/teams/OTT/ottawa-senators/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-ott-fox-sports",
+        "name": "FOX Sports",
+        "browserUrl": "https://www.foxsports.com/nhl/ottawa-senators-team",
         "category": "news"
       },
       {
         "id": "nhl-ott-yahoo-sports",
-        "name": "Yahoo Sports",
+        "name": "Yahoo! Sports",
         "browserUrl": "https://sports.yahoo.com/nhl/teams/ottawa/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-ott-the-athletic",
+        "name": "The Athletic",
+        "browserUrl": "https://www.nytimes.com/athletic/nhl/team/senators/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-ott-b-r",
+        "name": "B/R",
+        "browserUrl": "https://bleacherreport.com/ottawa-senators",
+        "category": "news"
+      },
+      {
+        "id": "nhl-ott-nbc-sports",
+        "name": "NBC Sports",
+        "browserUrl": "https://www.nbcsports.com/nhl/ottawa-senators",
+        "category": "news"
+      },
+      {
+        "id": "nhl-ott-si",
+        "name": "SI",
+        "browserUrl": "https://www.si.com/nhl/senators",
+        "category": "news"
+      },
+      {
+        "id": "nhl-ott-usa-today",
+        "name": "USA Today",
+        "browserUrl": "https://sportsdata.usatoday.com/hockey/nhl/teams/ottawa-senators/4967",
+        "category": "news"
+      },
+      {
+        "id": "nhl-ott-athlon-sports",
+        "name": "Athlon Sports",
+        "browserUrl": "https://athlonsports.com/nhl/ottawa-senators",
+        "category": "news"
+      },
+      {
+        "id": "nhl-ott-yardbarker",
+        "name": "Yardbarker",
+        "browserUrl": "https://www.yardbarker.com/nhl/teams/ottawa_senators/99",
+        "category": "news"
+      },
+      {
+        "id": "nhl-ott-spotrac",
+        "name": "Spotrac",
+        "browserUrl": "https://www.spotrac.com/nhl/ottawa-senators/overview",
+        "category": "news"
+      },
+      {
+        "id": "nhl-ott-statmuse",
+        "name": "StatMuse",
+        "browserUrl": "https://www.statmuse.com/nhl/ask/ottawa-senators-stats",
+        "category": "news"
+      },
+      {
+        "id": "nhl-ott-newsnow",
+        "name": "NewsNow",
+        "browserUrl": "https://www.newsnow.co.uk/h/Sport/US+Sports/NHL/Ottawa+Senators",
         "category": "news"
       },
       {
@@ -102258,101 +103870,53 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
         "category": "news"
       },
       {
-        "id": "nhl-ott-nhl-rumors",
-        "name": "NHL Rumors",
-        "browserUrl": "https://nhlrumors.com/tag/ottawa-senators/",
+        "id": "nhl-ott-reddit",
+        "name": "Reddit",
+        "browserUrl": "https://www.reddit.com/r/OttawaSenators/",
         "category": "news"
       },
       {
-        "id": "nhl-ott-pro-hockey-rumors",
-        "name": "Pro Hockey Rumors",
-        "browserUrl": "https://www.prohockeyrumors.com/ottawa-senators",
-        "category": "news"
-      },
-      {
-        "id": "nhl-ott-nhl-trade-talk",
-        "name": "NHL Trade Talk",
-        "browserUrl": "https://nhltradetalk.com/category/nhl/ottawa-senators/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-ott-toronto-sun",
-        "name": "Toronto Sun",
-        "browserUrl": "https://torontosun.com/tag/ottawa-senators",
-        "category": "news"
-      },
-      {
-        "id": "nhl-ott-silver-seven",
-        "name": "Silver Seven",
-        "browserUrl": "https://www.silversevensens.com",
+        "id": "nhl-ott-senators",
+        "name": "@Senators",
+        "browserUrl": "https://x.com/Senators",
         "category": "news"
       },
       {
         "id": "nhl-ott-ottawa-senators",
-        "name": "Ottawa Senators",
-        "browserUrl": "https://www.nhl.com/senators",
-        "category": "news"
-      },
-      {
-        "id": "nhl-ott-senshot",
-        "name": "SenShot",
-        "browserUrl": "https://senshot.com",
-        "category": "news"
-      },
-      {
-        "id": "nhl-ott-the-athletic",
-        "name": "The Athletic",
-        "browserUrl": "https://www.nytimes.com/athletic/nhl/team/senators/",
+        "name": "#Ottawa Senators",
+        "browserUrl": "https://x.com/search?q=ottawa%20senators&src=typed_query",
         "category": "news"
       }
     ],
     "PHI": [
       {
-        "id": "nhl-phi-broad-street-hockey",
-        "name": "Broad Street Hockey",
-        "browserUrl": "https://www.broadstreethockey.com",
+        "id": "nhl-phi-nhl-com",
+        "name": "NHL.com",
+        "browserUrl": "https://www.nhl.com/flyers/",
         "category": "news"
       },
       {
-        "id": "nhl-phi-phillyvoice",
-        "name": "PhillyVoice",
-        "browserUrl": "https://www.phillyvoice.com/tags/flyers/",
+        "id": "nhl-phi-espn",
+        "name": "ESPN",
+        "browserUrl": "https://www.espn.com/nhl/team/_/name/phi/philadelphia-flyers",
         "category": "news"
       },
       {
-        "id": "nhl-phi-sportspyder",
-        "name": "SportSpyder",
-        "browserUrl": "https://sportspyder.com/nhl/philadelphia-flyers/news",
+        "id": "nhl-phi-cbs-sports",
+        "name": "CBS Sports",
+        "browserUrl": "https://www.cbssports.com/nhl/teams/PHI/philadelphia-flyers/",
         "category": "news"
       },
       {
-        "id": "nhl-phi-nhl-rumors",
-        "name": "NHL Rumors",
-        "browserUrl": "https://nhlrumors.com/tag/philadelphia-flyers/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-phi-pro-hockey-rumors",
-        "name": "Pro Hockey Rumors",
-        "browserUrl": "https://www.prohockeyrumors.com/philadelphia-flyers",
+        "id": "nhl-phi-fox-sports",
+        "name": "FOX Sports",
+        "browserUrl": "https://www.foxsports.com/nhl/philadelphia-flyers-team",
         "category": "news"
       },
       {
         "id": "nhl-phi-yahoo-sports",
-        "name": "Yahoo Sports",
+        "name": "Yahoo! Sports",
         "browserUrl": "https://sports.yahoo.com/nhl/teams/philadelphia/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-phi-the-new-york-times",
-        "name": "The New York Times",
-        "browserUrl": "https://www.nytimes.com/topic/organization/philadelphia-flyers",
-        "category": "news"
-      },
-      {
-        "id": "nhl-phi-broad-street-buzz",
-        "name": "Broad Street Buzz",
-        "browserUrl": "https://broadstreetbuzz.com",
         "category": "news"
       },
       {
@@ -102362,29 +103926,637 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
         "category": "news"
       },
       {
+        "id": "nhl-phi-b-r",
+        "name": "B/R",
+        "browserUrl": "https://bleacherreport.com/philadelphia-flyers",
+        "category": "news"
+      },
+      {
+        "id": "nhl-phi-nbc-sports",
+        "name": "NBC Sports",
+        "browserUrl": "https://www.nbcsports.com/nhl/philadelphia-flyers",
+        "category": "news"
+      },
+      {
+        "id": "nhl-phi-si",
+        "name": "SI",
+        "browserUrl": "https://www.si.com/nhl/flyers",
+        "category": "news"
+      },
+      {
+        "id": "nhl-phi-usa-today",
+        "name": "USA Today",
+        "browserUrl": "https://sportsdata.usatoday.com/hockey/nhl/teams/philadelphia-flyers/4968",
+        "category": "news"
+      },
+      {
+        "id": "nhl-phi-athlon-sports",
+        "name": "Athlon Sports",
+        "browserUrl": "https://athlonsports.com/nhl/philadelphia-flyers",
+        "category": "news"
+      },
+      {
+        "id": "nhl-phi-yardbarker",
+        "name": "Yardbarker",
+        "browserUrl": "https://www.yardbarker.com/nhl/teams/philadelphia_flyers/95",
+        "category": "news"
+      },
+      {
+        "id": "nhl-phi-spotrac",
+        "name": "Spotrac",
+        "browserUrl": "https://www.spotrac.com/nhl/philadelphia-flyers/overview",
+        "category": "news"
+      },
+      {
+        "id": "nhl-phi-statmuse",
+        "name": "StatMuse",
+        "browserUrl": "https://www.statmuse.com/nhl/ask/philadelphia-flyers-stats",
+        "category": "news"
+      },
+      {
+        "id": "nhl-phi-newsnow",
+        "name": "NewsNow",
+        "browserUrl": "https://www.newsnow.co.uk/h/Sport/US+Sports/NHL/Philadelphia+Flyers",
+        "category": "news"
+      },
+      {
+        "id": "nhl-phi-sportspyder",
+        "name": "SportSpyder",
+        "browserUrl": "https://sportspyder.com/nhl/philadelphia-flyers/news",
+        "category": "news"
+      },
+      {
+        "id": "nhl-phi-reddit",
+        "name": "Reddit",
+        "browserUrl": "https://www.reddit.com/r/Flyers/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-phi-nhlflyers",
+        "name": "@NHLFlyers",
+        "browserUrl": "https://x.com/NHLFlyers",
+        "category": "news"
+      },
+      {
         "id": "nhl-phi-philadelphia-flyers",
-        "name": "Philadelphia Flyers",
-        "browserUrl": "https://www.nhl.com/flyers",
+        "name": "#Philadelphia Flyers",
+        "browserUrl": "https://x.com/search?q=philadelphia%20flyers&src=typed_query",
+        "category": "news"
+      }
+    ],
+    "PIT": [
+      {
+        "id": "nhl-pit-nhl-com",
+        "name": "NHL.com",
+        "browserUrl": "https://www.nhl.com/penguins/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-pit-espn",
+        "name": "ESPN",
+        "browserUrl": "https://www.espn.com/nhl/team/_/name/pit/pittsburgh-penguins",
+        "category": "news"
+      },
+      {
+        "id": "nhl-pit-cbs-sports",
+        "name": "CBS Sports",
+        "browserUrl": "https://www.cbssports.com/nhl/teams/PIT/pittsburgh-penguins/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-pit-fox-sports",
+        "name": "FOX Sports",
+        "browserUrl": "https://www.foxsports.com/nhl/pittsburgh-penguins-team",
+        "category": "news"
+      },
+      {
+        "id": "nhl-pit-yahoo-sports",
+        "name": "Yahoo! Sports",
+        "browserUrl": "https://sports.yahoo.com/nhl/teams/pittsburgh/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-pit-the-athletic",
+        "name": "The Athletic",
+        "browserUrl": "https://www.nytimes.com/athletic/nhl/team/penguins/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-pit-b-r",
+        "name": "B/R",
+        "browserUrl": "https://bleacherreport.com/pittsburgh-penguins",
+        "category": "news"
+      },
+      {
+        "id": "nhl-pit-nbc-sports",
+        "name": "NBC Sports",
+        "browserUrl": "https://www.nbcsports.com/nhl/pittsburgh-penguins",
+        "category": "news"
+      },
+      {
+        "id": "nhl-pit-si",
+        "name": "SI",
+        "browserUrl": "https://www.si.com/nhl/penguins",
+        "category": "news"
+      },
+      {
+        "id": "nhl-pit-usa-today",
+        "name": "USA Today",
+        "browserUrl": "https://sportsdata.usatoday.com/hockey/nhl/teams/pittsburgh-penguins/4969",
+        "category": "news"
+      },
+      {
+        "id": "nhl-pit-athlon-sports",
+        "name": "Athlon Sports",
+        "browserUrl": "https://athlonsports.com/nhl/pittsburgh-penguins",
+        "category": "news"
+      },
+      {
+        "id": "nhl-pit-yardbarker",
+        "name": "Yardbarker",
+        "browserUrl": "https://www.yardbarker.com/nhl/teams/pittsburgh_penguins/96",
+        "category": "news"
+      },
+      {
+        "id": "nhl-pit-spotrac",
+        "name": "Spotrac",
+        "browserUrl": "https://www.spotrac.com/nhl/pittsburgh-penguins/overview",
+        "category": "news"
+      },
+      {
+        "id": "nhl-pit-statmuse",
+        "name": "StatMuse",
+        "browserUrl": "https://www.statmuse.com/nhl/ask/pittsburgh-penguins-stats",
+        "category": "news"
+      },
+      {
+        "id": "nhl-pit-newsnow",
+        "name": "NewsNow",
+        "browserUrl": "https://www.newsnow.co.uk/h/Sport/US+Sports/NHL/Pittsburgh+Penguins",
+        "category": "news"
+      },
+      {
+        "id": "nhl-pit-sportspyder",
+        "name": "SportSpyder",
+        "browserUrl": "https://sportspyder.com/nhl/pittsburgh-penguins/news",
+        "category": "news"
+      },
+      {
+        "id": "nhl-pit-reddit",
+        "name": "Reddit",
+        "browserUrl": "https://www.reddit.com/r/penguins/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-pit-penguins",
+        "name": "@penguins",
+        "browserUrl": "https://x.com/penguins",
+        "category": "news"
+      },
+      {
+        "id": "nhl-pit-pittsburgh-penguins",
+        "name": "#Pittsburgh Penguins",
+        "browserUrl": "https://x.com/search?q=pittsburgh%20penguins&src=typed_query",
+        "category": "news"
+      }
+    ],
+    "SJS": [
+      {
+        "id": "nhl-sjs-nhl-com",
+        "name": "NHL.com",
+        "browserUrl": "https://www.nhl.com/sharks/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-sjs-espn",
+        "name": "ESPN",
+        "browserUrl": "https://www.espn.com/nhl/team/_/name/sj/san-jose-sharks",
+        "category": "news"
+      },
+      {
+        "id": "nhl-sjs-cbs-sports",
+        "name": "CBS Sports",
+        "browserUrl": "https://www.cbssports.com/nhl/teams/SJ/san-jose-sharks/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-sjs-fox-sports",
+        "name": "FOX Sports",
+        "browserUrl": "https://www.foxsports.com/nhl/san-jose-sharks-team",
+        "category": "news"
+      },
+      {
+        "id": "nhl-sjs-yahoo-sports",
+        "name": "Yahoo! Sports",
+        "browserUrl": "https://sports.yahoo.com/nhl/teams/san-jose/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-sjs-the-athletic",
+        "name": "The Athletic",
+        "browserUrl": "https://www.nytimes.com/athletic/nhl/team/sharks/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-sjs-b-r",
+        "name": "B/R",
+        "browserUrl": "https://bleacherreport.com/san-jose-sharks",
+        "category": "news"
+      },
+      {
+        "id": "nhl-sjs-nbc-sports",
+        "name": "NBC Sports",
+        "browserUrl": "https://www.nbcsports.com/nhl/san-jose-sharks",
+        "category": "news"
+      },
+      {
+        "id": "nhl-sjs-si",
+        "name": "SI",
+        "browserUrl": "https://www.si.com/nhl/sharks",
+        "category": "news"
+      },
+      {
+        "id": "nhl-sjs-usa-today",
+        "name": "USA Today",
+        "browserUrl": "https://sportsdata.usatoday.com/hockey/nhl/teams/san-jose-sharks/4971",
+        "category": "news"
+      },
+      {
+        "id": "nhl-sjs-athlon-sports",
+        "name": "Athlon Sports",
+        "browserUrl": "https://athlonsports.com/nhl/san-jose-sharks",
+        "category": "news"
+      },
+      {
+        "id": "nhl-sjs-yardbarker",
+        "name": "Yardbarker",
+        "browserUrl": "https://www.yardbarker.com/nhl/teams/san_jose_sharks/121",
+        "category": "news"
+      },
+      {
+        "id": "nhl-sjs-spotrac",
+        "name": "Spotrac",
+        "browserUrl": "https://www.spotrac.com/nhl/san-jose-sharks/overview",
+        "category": "news"
+      },
+      {
+        "id": "nhl-sjs-statmuse",
+        "name": "StatMuse",
+        "browserUrl": "https://www.statmuse.com/nhl/ask/san-jose-sharks-stats",
+        "category": "news"
+      },
+      {
+        "id": "nhl-sjs-newsnow",
+        "name": "NewsNow",
+        "browserUrl": "https://www.newsnow.co.uk/h/Sport/US+Sports/NHL/San+Jose+Sharks",
+        "category": "news"
+      },
+      {
+        "id": "nhl-sjs-sportspyder",
+        "name": "SportSpyder",
+        "browserUrl": "https://sportspyder.com/nhl/san-jose-sharks/news",
+        "category": "news"
+      },
+      {
+        "id": "nhl-sjs-reddit",
+        "name": "Reddit",
+        "browserUrl": "https://www.reddit.com/r/SanJoseSharks/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-sjs-sanjosesharks",
+        "name": "@SanJoseSharks",
+        "browserUrl": "https://x.com/SanJoseSharks",
+        "category": "news"
+      },
+      {
+        "id": "nhl-sjs-san-jose-sharks",
+        "name": "#San Jose Sharks",
+        "browserUrl": "https://x.com/search?q=san%20jose%20sharks&src=typed_query",
+        "category": "news"
+      }
+    ],
+    "SEA": [
+      {
+        "id": "nhl-sea-nhl-com",
+        "name": "NHL.com",
+        "browserUrl": "https://www.nhl.com/kraken/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-sea-espn",
+        "name": "ESPN",
+        "browserUrl": "https://www.espn.com/nhl/team/_/name/sea/seattle-kraken",
+        "category": "news"
+      },
+      {
+        "id": "nhl-sea-cbs-sports",
+        "name": "CBS Sports",
+        "browserUrl": "https://www.cbssports.com/nhl/teams/SEA/seattle-kraken/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-sea-fox-sports",
+        "name": "FOX Sports",
+        "browserUrl": "https://www.foxsports.com/nhl/seattle-kraken-team",
+        "category": "news"
+      },
+      {
+        "id": "nhl-sea-yahoo-sports",
+        "name": "Yahoo! Sports",
+        "browserUrl": "https://sports.yahoo.com/nhl/teams/seattle/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-sea-the-athletic",
+        "name": "The Athletic",
+        "browserUrl": "https://www.nytimes.com/athletic/nhl/team/kraken/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-sea-b-r",
+        "name": "B/R",
+        "browserUrl": "https://bleacherreport.com/seattle-kraken",
+        "category": "news"
+      },
+      {
+        "id": "nhl-sea-nbc-sports",
+        "name": "NBC Sports",
+        "browserUrl": "https://www.nbcsports.com/nhl/seattle-kraken",
+        "category": "news"
+      },
+      {
+        "id": "nhl-sea-si",
+        "name": "SI",
+        "browserUrl": "https://www.si.com/nhl/kraken",
+        "category": "news"
+      },
+      {
+        "id": "nhl-sea-usa-today",
+        "name": "USA Today",
+        "browserUrl": "https://sportsdata.usatoday.com/hockey/nhl/teams/seattle-kraken/41971",
+        "category": "news"
+      },
+      {
+        "id": "nhl-sea-athlon-sports",
+        "name": "Athlon Sports",
+        "browserUrl": "https://athlonsports.com/nhl/seattle-kraken",
+        "category": "news"
+      },
+      {
+        "id": "nhl-sea-yardbarker",
+        "name": "Yardbarker",
+        "browserUrl": "https://www.yardbarker.com/nhl/teams/seattle_kraken/17492",
+        "category": "news"
+      },
+      {
+        "id": "nhl-sea-spotrac",
+        "name": "Spotrac",
+        "browserUrl": "https://www.spotrac.com/nhl/seattle-kraken/overview",
+        "category": "news"
+      },
+      {
+        "id": "nhl-sea-statmuse",
+        "name": "StatMuse",
+        "browserUrl": "https://www.statmuse.com/nhl/ask/seattle-kraken-stats",
+        "category": "news"
+      },
+      {
+        "id": "nhl-sea-newsnow",
+        "name": "NewsNow",
+        "browserUrl": "https://www.newsnow.co.uk/h/Sport/US+Sports/NHL/Seattle+Kraken",
+        "category": "news"
+      },
+      {
+        "id": "nhl-sea-sportspyder",
+        "name": "SportSpyder",
+        "browserUrl": "https://sportspyder.com/nhl/seattle-kraken/news",
+        "category": "news"
+      },
+      {
+        "id": "nhl-sea-reddit",
+        "name": "Reddit",
+        "browserUrl": "https://www.reddit.com/r/SeattleKraken/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-sea-seattlekraken",
+        "name": "@SeattleKraken",
+        "browserUrl": "https://x.com/SeattleKraken",
+        "category": "news"
+      },
+      {
+        "id": "nhl-sea-seattle-kraken",
+        "name": "#Seattle Kraken",
+        "browserUrl": "https://x.com/search?q=seattle%20kraken&src=typed_query",
+        "category": "news"
+      }
+    ],
+    "STL": [
+      {
+        "id": "nhl-stl-nhl-com",
+        "name": "NHL.com",
+        "browserUrl": "https://www.nhl.com/blues/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-stl-espn",
+        "name": "ESPN",
+        "browserUrl": "https://www.espn.com/nhl/team/_/name/stl/st-louis-blues",
+        "category": "news"
+      },
+      {
+        "id": "nhl-stl-cbs-sports",
+        "name": "CBS Sports",
+        "browserUrl": "https://www.cbssports.com/nhl/teams/STL/st-louis-blues/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-stl-fox-sports",
+        "name": "FOX Sports",
+        "browserUrl": "https://www.foxsports.com/nhl/st-louis-blues-team",
+        "category": "news"
+      },
+      {
+        "id": "nhl-stl-yahoo-sports",
+        "name": "Yahoo! Sports",
+        "browserUrl": "https://sports.yahoo.com/nhl/teams/st-louis/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-stl-the-athletic",
+        "name": "The Athletic",
+        "browserUrl": "https://www.nytimes.com/athletic/nhl/team/blues/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-stl-b-r",
+        "name": "B/R",
+        "browserUrl": "https://bleacherreport.com/st-louis-blues",
+        "category": "news"
+      },
+      {
+        "id": "nhl-stl-nbc-sports",
+        "name": "NBC Sports",
+        "browserUrl": "https://www.nbcsports.com/nhl/st-louis-blues",
+        "category": "news"
+      },
+      {
+        "id": "nhl-stl-si",
+        "name": "SI",
+        "browserUrl": "https://www.si.com/nhl/blues",
+        "category": "news"
+      },
+      {
+        "id": "nhl-stl-usa-today",
+        "name": "USA Today",
+        "browserUrl": "https://sportsdata.usatoday.com/hockey/nhl/teams/st-louis-blues/4972",
+        "category": "news"
+      },
+      {
+        "id": "nhl-stl-athlon-sports",
+        "name": "Athlon Sports",
+        "browserUrl": "https://athlonsports.com/nhl/st-louis-blues",
+        "category": "news"
+      },
+      {
+        "id": "nhl-stl-yardbarker",
+        "name": "Yardbarker",
+        "browserUrl": "https://www.yardbarker.com/nhl/teams/st_louis_blues/111",
+        "category": "news"
+      },
+      {
+        "id": "nhl-stl-spotrac",
+        "name": "Spotrac",
+        "browserUrl": "https://www.spotrac.com/nhl/st-louis-blues/overview",
+        "category": "news"
+      },
+      {
+        "id": "nhl-stl-statmuse",
+        "name": "StatMuse",
+        "browserUrl": "https://www.statmuse.com/nhl/ask/st-louis-blues-stats",
+        "category": "news"
+      },
+      {
+        "id": "nhl-stl-newsnow",
+        "name": "NewsNow",
+        "browserUrl": "https://www.newsnow.co.uk/h/Sport/US+Sports/NHL/St+Louis+Blues",
+        "category": "news"
+      },
+      {
+        "id": "nhl-stl-sportspyder",
+        "name": "SportSpyder",
+        "browserUrl": "https://sportspyder.com/nhl/st-louis-blues/news",
+        "category": "news"
+      },
+      {
+        "id": "nhl-stl-reddit",
+        "name": "Reddit",
+        "browserUrl": "https://www.reddit.com/r/stlouisblues/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-stl-stlouisblues",
+        "name": "@StLouisBlues",
+        "browserUrl": "https://x.com/StLouisBlues",
+        "category": "news"
+      },
+      {
+        "id": "nhl-stl-st-louis-blues",
+        "name": "#St. Louis Blues",
+        "browserUrl": "https://x.com/search?q=st%20louis%20blues&src=typed_query",
         "category": "news"
       }
     ],
     "TBL": [
       {
-        "id": "nhl-tbl-raw-charge",
-        "name": "Raw Charge",
-        "browserUrl": "https://www.rawcharge.com",
+        "id": "nhl-tbl-nhl-com",
+        "name": "NHL.com",
+        "browserUrl": "https://www.nhl.com/lightning/",
         "category": "news"
       },
       {
-        "id": "nhl-tbl-nhl-rumors",
-        "name": "NHL Rumors",
-        "browserUrl": "https://nhlrumors.com/tag/tampa-bay-lightning/",
+        "id": "nhl-tbl-espn",
+        "name": "ESPN",
+        "browserUrl": "https://www.espn.com/nhl/team/_/name/tb/tampa-bay-lightning",
         "category": "news"
       },
       {
-        "id": "nhl-tbl-pro-hockey-rumors",
-        "name": "Pro Hockey Rumors",
-        "browserUrl": "https://www.prohockeyrumors.com/tampa-bay-lightning",
+        "id": "nhl-tbl-cbs-sports",
+        "name": "CBS Sports",
+        "browserUrl": "https://www.cbssports.com/nhl/teams/TB/tampa-bay-lightning/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-tbl-fox-sports",
+        "name": "FOX Sports",
+        "browserUrl": "https://www.foxsports.com/nhl/tampa-bay-lightning-team",
+        "category": "news"
+      },
+      {
+        "id": "nhl-tbl-yahoo-sports",
+        "name": "Yahoo! Sports",
+        "browserUrl": "https://sports.yahoo.com/nhl/teams/tampa-bay/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-tbl-the-athletic",
+        "name": "The Athletic",
+        "browserUrl": "https://www.nytimes.com/athletic/nhl/team/lightning/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-tbl-b-r",
+        "name": "B/R",
+        "browserUrl": "https://bleacherreport.com/tampa-bay-lightning",
+        "category": "news"
+      },
+      {
+        "id": "nhl-tbl-nbc-sports",
+        "name": "NBC Sports",
+        "browserUrl": "https://www.nbcsports.com/nhl/tampa-bay-lightning",
+        "category": "news"
+      },
+      {
+        "id": "nhl-tbl-si",
+        "name": "SI",
+        "browserUrl": "https://www.si.com/nhl/lightning",
+        "category": "news"
+      },
+      {
+        "id": "nhl-tbl-usa-today",
+        "name": "USA Today",
+        "browserUrl": "https://sportsdata.usatoday.com/hockey/nhl/teams/tampa-bay-lightning/4973",
+        "category": "news"
+      },
+      {
+        "id": "nhl-tbl-athlon-sports",
+        "name": "Athlon Sports",
+        "browserUrl": "https://athlonsports.com/nhl/tampa-bay-lightning",
+        "category": "news"
+      },
+      {
+        "id": "nhl-tbl-yardbarker",
+        "name": "Yardbarker",
+        "browserUrl": "https://www.yardbarker.com/nhl/teams/tampa_bay_lightning/105",
+        "category": "news"
+      },
+      {
+        "id": "nhl-tbl-spotrac",
+        "name": "Spotrac",
+        "browserUrl": "https://www.spotrac.com/nhl/tampa-bay-lightning/overview",
+        "category": "news"
+      },
+      {
+        "id": "nhl-tbl-statmuse",
+        "name": "StatMuse",
+        "browserUrl": "https://www.statmuse.com/nhl/ask/tampa-bay-lightning-stats",
+        "category": "news"
+      },
+      {
+        "id": "nhl-tbl-newsnow",
+        "name": "NewsNow",
+        "browserUrl": "https://www.newsnow.co.uk/h/Sport/US+Sports/NHL/Tampa+Bay+Lightning",
         "category": "news"
       },
       {
@@ -102394,131 +104566,261 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
         "category": "news"
       },
       {
-        "id": "nhl-tbl-lightning-insider",
-        "name": "Lightning Insider",
-        "browserUrl": "https://lightninginsider.com",
+        "id": "nhl-tbl-reddit",
+        "name": "Reddit",
+        "browserUrl": "https://www.reddit.com/r/TampaBayLightning/",
         "category": "news"
       },
       {
-        "id": "nhl-tbl-bolts-by-the-bay",
-        "name": "Bolts by the Bay",
-        "browserUrl": "https://boltsbythebay.com",
-        "category": "news"
-      },
-      {
-        "id": "nhl-tbl-the-hockey-writers",
-        "name": "The Hockey Writers",
-        "browserUrl": "https://thehockeywriters.com/tampa-bay-lightning/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-tbl-nbc-sports-pro-hockey-talk",
-        "name": "NBC Sports Pro Hockey Talk",
-        "browserUrl": "https://www.nbcsports.com/nhl",
-        "category": "news"
-      },
-      {
-        "id": "nhl-tbl-puck-prose",
-        "name": "Puck Prose",
-        "browserUrl": "https://puckprose.com/nhl-atlantic-division/tampa-bay-lightning/",
+        "id": "nhl-tbl-tblightning",
+        "name": "@TBLightning",
+        "browserUrl": "https://x.com/TBLightning",
         "category": "news"
       },
       {
         "id": "nhl-tbl-tampa-bay-lightning",
-        "name": "Tampa Bay Lightning",
-        "browserUrl": "https://www.nhl.com/lightning",
+        "name": "#Tampa Bay Lightning",
+        "browserUrl": "https://x.com/search?q=tampa%20bay%20lightning&src=typed_query",
+        "category": "news"
+      }
+    ],
+    "TOR": [
+      {
+        "id": "nhl-tor-nhl-com",
+        "name": "NHL.com",
+        "browserUrl": "https://www.nhl.com/mapleleafs/",
         "category": "news"
       },
       {
-        "id": "nhl-tbl-the-athletic",
+        "id": "nhl-tor-espn",
+        "name": "ESPN",
+        "browserUrl": "https://www.espn.com/nhl/team/_/name/tor/toronto-maple-leafs",
+        "category": "news"
+      },
+      {
+        "id": "nhl-tor-cbs-sports",
+        "name": "CBS Sports",
+        "browserUrl": "https://www.cbssports.com/nhl/teams/TOR/toronto-maple-leafs/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-tor-fox-sports",
+        "name": "FOX Sports",
+        "browserUrl": "https://www.foxsports.com/nhl/toronto-maple-leafs-team",
+        "category": "news"
+      },
+      {
+        "id": "nhl-tor-yahoo-sports",
+        "name": "Yahoo! Sports",
+        "browserUrl": "https://sports.yahoo.com/nhl/teams/toronto/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-tor-the-athletic",
         "name": "The Athletic",
-        "browserUrl": "https://www.nytimes.com/athletic/nhl/team/lightning/",
+        "browserUrl": "https://www.nytimes.com/athletic/nhl/team/maple-leafs/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-tor-b-r",
+        "name": "B/R",
+        "browserUrl": "https://bleacherreport.com/toronto-maple-leafs",
+        "category": "news"
+      },
+      {
+        "id": "nhl-tor-nbc-sports",
+        "name": "NBC Sports",
+        "browserUrl": "https://www.nbcsports.com/nhl/toronto-maple-leafs",
+        "category": "news"
+      },
+      {
+        "id": "nhl-tor-si",
+        "name": "SI",
+        "browserUrl": "https://www.si.com/nhl/maple-leafs",
+        "category": "news"
+      },
+      {
+        "id": "nhl-tor-usa-today",
+        "name": "USA Today",
+        "browserUrl": "https://sportsdata.usatoday.com/hockey/nhl/teams/toronto-maple-leafs/4974",
+        "category": "news"
+      },
+      {
+        "id": "nhl-tor-athlon-sports",
+        "name": "Athlon Sports",
+        "browserUrl": "https://athlonsports.com/nhl/toronto-maple-leafs",
+        "category": "news"
+      },
+      {
+        "id": "nhl-tor-yardbarker",
+        "name": "Yardbarker",
+        "browserUrl": "https://www.yardbarker.com/nhl/teams/toronto_maple_leafs/101",
+        "category": "news"
+      },
+      {
+        "id": "nhl-tor-spotrac",
+        "name": "Spotrac",
+        "browserUrl": "https://www.spotrac.com/nhl/toronto-maple-leafs/overview",
+        "category": "news"
+      },
+      {
+        "id": "nhl-tor-statmuse",
+        "name": "StatMuse",
+        "browserUrl": "https://www.statmuse.com/nhl/ask/toronto-maple-leafs-stats",
+        "category": "news"
+      },
+      {
+        "id": "nhl-tor-newsnow",
+        "name": "NewsNow",
+        "browserUrl": "https://www.newsnow.co.uk/h/Sport/US+Sports/NHL/Toronto+Maple+Leafs",
+        "category": "news"
+      },
+      {
+        "id": "nhl-tor-sportspyder",
+        "name": "SportSpyder",
+        "browserUrl": "https://sportspyder.com/nhl/toronto-maple-leafs/news",
+        "category": "news"
+      },
+      {
+        "id": "nhl-tor-reddit",
+        "name": "Reddit",
+        "browserUrl": "https://www.reddit.com/r/leafs/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-tor-mapleleafs",
+        "name": "@MapleLeafs",
+        "browserUrl": "https://x.com/MapleLeafs",
+        "category": "news"
+      },
+      {
+        "id": "nhl-tor-toronto-maple-leafs",
+        "name": "#Toronto Maple Leafs",
+        "browserUrl": "https://x.com/search?q=toronto%20maple%20leafs&src=typed_query",
+        "category": "news"
+      }
+    ],
+    "UTA": [
+      {
+        "id": "nhl-uta-nhl-com",
+        "name": "NHL.com",
+        "browserUrl": "https://www.nhl.com/utah/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-uta-espn",
+        "name": "ESPN",
+        "browserUrl": "https://www.espn.com/nhl/team/_/name/utah/utah-mammoth",
+        "category": "news"
+      },
+      {
+        "id": "nhl-uta-cbs-sports",
+        "name": "CBS Sports",
+        "browserUrl": "https://www.cbssports.com/nhl/teams/UTA/utah-mammoth/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-uta-fox-sports",
+        "name": "FOX Sports",
+        "browserUrl": "https://www.foxsports.com/nhl/utah-mammoth-team",
+        "category": "news"
+      },
+      {
+        "id": "nhl-uta-yahoo-sports",
+        "name": "Yahoo! Sports",
+        "browserUrl": "https://sports.yahoo.com/nhl/teams/utah/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-uta-the-athletic",
+        "name": "The Athletic",
+        "browserUrl": "https://www.nytimes.com/athletic/nhl/team/utah-mammoth/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-uta-b-r",
+        "name": "B/R",
+        "browserUrl": "https://bleacherreport.com/utah-mammoth",
+        "category": "news"
+      },
+      {
+        "id": "nhl-uta-nbc-sports",
+        "name": "NBC Sports",
+        "browserUrl": "https://www.nbcsports.com/nhl/utah-mammoth",
+        "category": "news"
+      },
+      {
+        "id": "nhl-uta-si",
+        "name": "SI",
+        "browserUrl": "https://www.si.com/nhl/utah-mammoth",
+        "category": "news"
+      },
+      {
+        "id": "nhl-uta-usa-today",
+        "name": "USA Today",
+        "browserUrl": "https://sportsdata.usatoday.com/hockey/nhl/teams/utah-mammoth/44105",
+        "category": "news"
+      },
+      {
+        "id": "nhl-uta-athlon-sports",
+        "name": "Athlon Sports",
+        "browserUrl": "https://athlonsports.com/nhl/utah-mammoth",
+        "category": "news"
+      },
+      {
+        "id": "nhl-uta-yardbarker",
+        "name": "Yardbarker",
+        "browserUrl": "https://www.yardbarker.com/nhl/teams/utah_mammoth/120",
+        "category": "news"
+      },
+      {
+        "id": "nhl-uta-spotrac",
+        "name": "Spotrac",
+        "browserUrl": "https://www.spotrac.com/nhl/utah-mammoth/overview",
+        "category": "news"
+      },
+      {
+        "id": "nhl-uta-statmuse",
+        "name": "StatMuse",
+        "browserUrl": "https://www.statmuse.com/nhl/ask/utah-mammoth-stats",
+        "category": "news"
+      },
+      {
+        "id": "nhl-uta-newsnow",
+        "name": "NewsNow",
+        "browserUrl": "https://www.newsnow.co.uk/h/Sport/US+Sports/NHL/Utah+Mammoth",
+        "category": "news"
+      },
+      {
+        "id": "nhl-uta-sportspyder",
+        "name": "SportSpyder",
+        "browserUrl": "https://sportspyder.com/nhl/utah-mammoth/news",
+        "category": "news"
+      },
+      {
+        "id": "nhl-uta-reddit",
+        "name": "Reddit",
+        "browserUrl": "https://www.reddit.com/r/UtahMammoth/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-uta-utahmammoth",
+        "name": "@utahmammoth",
+        "browserUrl": "https://x.com/utahmammoth",
+        "category": "news"
+      },
+      {
+        "id": "nhl-uta-utah-mammoth",
+        "name": "#Utah Mammoth",
+        "browserUrl": "https://x.com/search?q=utah%20mammoth&src=typed_query",
         "category": "news"
       }
     ],
     "VAN": [
       {
-        "id": "nhl-van-canucks-army",
-        "name": "Canucks Army",
-        "browserUrl": "https://canucksarmy.com",
-        "category": "news"
-      },
-      {
-        "id": "nhl-van-canucksbanter",
-        "name": "CanucksBanter",
-        "browserUrl": "https://canucksbanter.ca",
-        "category": "news"
-      },
-      {
-        "id": "nhl-van-global-news",
-        "name": "Global News",
-        "browserUrl": "https://globalnews.ca/tag/vancouver-canucks/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-van-the-vancouver-sun",
-        "name": "The Vancouver Sun",
-        "browserUrl": "https://vancouversun.com/category/sports/hockey/nhl/vancouver-canucks/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-van-the-hockey-writers",
-        "name": "The Hockey Writers",
-        "browserUrl": "https://thehockeywriters.com/vancouver-canucks/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-van-the-province",
-        "name": "The Province",
-        "browserUrl": "https://theprovince.com/category/sports/hockey/nhl/vancouver-canucks/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-van-the-hockey-news",
-        "name": "The Hockey News",
-        "browserUrl": "https://thehockeynews.com/nhl/vancouver-canucks",
-        "category": "news"
-      },
-      {
-        "id": "nhl-van-nucksaid",
-        "name": "Nucksaid",
-        "browserUrl": "https://nucksaid.com",
-        "category": "news"
-      },
-      {
-        "id": "nhl-van-hockey-world-blog",
-        "name": "Hockey World Blog",
-        "browserUrl": "https://hockeyworldblog.com",
-        "category": "news"
-      },
-      {
-        "id": "nhl-van-vancouver-canucks",
-        "name": "Vancouver Canucks",
-        "browserUrl": "https://www.nhl.com/canucks",
-        "category": "news"
-      },
-      {
-        "id": "nhl-van-the-canuck-way",
-        "name": "The Canuck Way",
-        "browserUrl": "https://thecanuckway.com",
-        "category": "news"
-      },
-      {
-        "id": "nhl-van-cbssports",
-        "name": "CBSSports",
-        "browserUrl": "https://www.cbssports.com/nhl/teams/VAN/vancouver-canucks/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-van-sportsnet",
-        "name": "Sportsnet",
-        "browserUrl": "https://www.sportsnet.ca/nhl/teams/vancouver-canucks/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-van-nhl-official",
-        "name": "NHL Official",
-        "browserUrl": "https://www.nhl.com/canucks",
+        "id": "nhl-van-nhl-com",
+        "name": "NHL.com",
+        "browserUrl": "https://www.nhl.com/canucks/",
         "category": "news"
       },
       {
@@ -102534,9 +104836,75 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
         "category": "news"
       },
       {
+        "id": "nhl-van-fox-sports",
+        "name": "FOX Sports",
+        "browserUrl": "https://www.foxsports.com/nhl/vancouver-canucks-team",
+        "category": "news"
+      },
+      {
         "id": "nhl-van-yahoo-sports",
-        "name": "Yahoo Sports",
+        "name": "Yahoo! Sports",
         "browserUrl": "https://sports.yahoo.com/nhl/teams/vancouver/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-van-the-athletic",
+        "name": "The Athletic",
+        "browserUrl": "https://www.nytimes.com/athletic/nhl/team/canucks/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-van-b-r",
+        "name": "B/R",
+        "browserUrl": "https://bleacherreport.com/vancouver-canucks",
+        "category": "news"
+      },
+      {
+        "id": "nhl-van-nbc-sports",
+        "name": "NBC Sports",
+        "browserUrl": "https://www.nbcsports.com/nhl/vancouver-canucks",
+        "category": "news"
+      },
+      {
+        "id": "nhl-van-si",
+        "name": "SI",
+        "browserUrl": "https://www.si.com/nhl/canucks",
+        "category": "news"
+      },
+      {
+        "id": "nhl-van-usa-today",
+        "name": "USA Today",
+        "browserUrl": "https://sportsdata.usatoday.com/hockey/nhl/teams/vancouver-canucks/4975",
+        "category": "news"
+      },
+      {
+        "id": "nhl-van-athlon-sports",
+        "name": "Athlon Sports",
+        "browserUrl": "https://athlonsports.com/nhl/vancouver-canucks",
+        "category": "news"
+      },
+      {
+        "id": "nhl-van-yardbarker",
+        "name": "Yardbarker",
+        "browserUrl": "https://www.yardbarker.com/nhl/teams/vancouver_canucks/116",
+        "category": "news"
+      },
+      {
+        "id": "nhl-van-spotrac",
+        "name": "Spotrac",
+        "browserUrl": "https://www.spotrac.com/nhl/vancouver-canucks/overview",
+        "category": "news"
+      },
+      {
+        "id": "nhl-van-statmuse",
+        "name": "StatMuse",
+        "browserUrl": "https://www.statmuse.com/nhl/ask/vancouver-canucks-stats",
+        "category": "news"
+      },
+      {
+        "id": "nhl-van-newsnow",
+        "name": "NewsNow",
+        "browserUrl": "https://www.newsnow.co.uk/h/Sport/US+Sports/NHL/Vancouver+Canucks",
         "category": "news"
       },
       {
@@ -102546,29 +104914,113 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
         "category": "news"
       },
       {
-        "id": "nhl-van-pro-hockey-rumors",
-        "name": "Pro Hockey Rumors",
-        "browserUrl": "https://www.prohockeyrumors.com/vancouver-canucks",
+        "id": "nhl-van-reddit",
+        "name": "Reddit",
+        "browserUrl": "https://www.reddit.com/r/canucks/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-van-canucks",
+        "name": "@Canucks",
+        "browserUrl": "https://x.com/Canucks",
+        "category": "news"
+      },
+      {
+        "id": "nhl-van-vancouver-canucks",
+        "name": "#Vancouver Canucks",
+        "browserUrl": "https://x.com/search?q=vancouver%20canucks&src=typed_query",
         "category": "news"
       }
     ],
     "VGK": [
       {
-        "id": "nhl-vgk-knights-on-ice",
-        "name": "Knights On Ice",
-        "browserUrl": "https://www.knightsonice.com/",
+        "id": "nhl-vgk-nhl-com",
+        "name": "NHL.com",
+        "browserUrl": "https://www.nhl.com/goldenknights/",
         "category": "news"
       },
       {
-        "id": "nhl-vgk-sinbin-vegas",
-        "name": "SinBin.vegas",
-        "browserUrl": "https://sinbin.vegas",
+        "id": "nhl-vgk-espn",
+        "name": "ESPN",
+        "browserUrl": "https://www.espn.com/nhl/team/_/name/vgk/vegas-golden-knights",
         "category": "news"
       },
       {
-        "id": "nhl-vgk-las-vegas-review-journal",
-        "name": "Las Vegas Review-Journal",
-        "browserUrl": "https://www.reviewjournal.com/sports/goldenknights/",
+        "id": "nhl-vgk-cbs-sports",
+        "name": "CBS Sports",
+        "browserUrl": "https://www.cbssports.com/nhl/teams/VGK/vegas-golden-knights/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-vgk-fox-sports",
+        "name": "FOX Sports",
+        "browserUrl": "https://www.foxsports.com/nhl/vegas-golden-knights-team",
+        "category": "news"
+      },
+      {
+        "id": "nhl-vgk-yahoo-sports",
+        "name": "Yahoo! Sports",
+        "browserUrl": "https://sports.yahoo.com/nhl/teams/vegas/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-vgk-the-athletic",
+        "name": "The Athletic",
+        "browserUrl": "https://www.nytimes.com/athletic/nhl/team/golden-knights/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-vgk-b-r",
+        "name": "B/R",
+        "browserUrl": "https://bleacherreport.com/vegas-golden-knights",
+        "category": "news"
+      },
+      {
+        "id": "nhl-vgk-nbc-sports",
+        "name": "NBC Sports",
+        "browserUrl": "https://www.nbcsports.com/nhl/vegas-golden-knights",
+        "category": "news"
+      },
+      {
+        "id": "nhl-vgk-si",
+        "name": "SI",
+        "browserUrl": "https://www.si.com/nhl/golden-knights",
+        "category": "news"
+      },
+      {
+        "id": "nhl-vgk-usa-today",
+        "name": "USA Today",
+        "browserUrl": "https://sportsdata.usatoday.com/hockey/nhl/teams/vegas-golden-knights/33447",
+        "category": "news"
+      },
+      {
+        "id": "nhl-vgk-athlon-sports",
+        "name": "Athlon Sports",
+        "browserUrl": "https://athlonsports.com/nhl/vegas-golden-knights",
+        "category": "news"
+      },
+      {
+        "id": "nhl-vgk-yardbarker",
+        "name": "Yardbarker",
+        "browserUrl": "https://www.yardbarker.com/nhl/teams/vegas_golden_knights/17347",
+        "category": "news"
+      },
+      {
+        "id": "nhl-vgk-spotrac",
+        "name": "Spotrac",
+        "browserUrl": "https://www.spotrac.com/nhl/vegas-golden-knights/overview",
+        "category": "news"
+      },
+      {
+        "id": "nhl-vgk-statmuse",
+        "name": "StatMuse",
+        "browserUrl": "https://www.statmuse.com/nhl/ask/vegas-golden-knights-stats",
+        "category": "news"
+      },
+      {
+        "id": "nhl-vgk-newsnow",
+        "name": "NewsNow",
+        "browserUrl": "https://www.newsnow.co.uk/h/Sport/US+Sports/NHL/Vegas+Golden+Knights",
         "category": "news"
       },
       {
@@ -102578,515 +105030,29 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
         "category": "news"
       },
       {
-        "id": "nhl-vgk-nhl-rumors",
-        "name": "NHL Rumors",
-        "browserUrl": "https://nhlrumors.com/tag/vegas-golden-knights/",
+        "id": "nhl-vgk-reddit",
+        "name": "Reddit",
+        "browserUrl": "https://www.reddit.com/r/goldenknights/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-vgk-goldenknights",
+        "name": "@GoldenKnights",
+        "browserUrl": "https://x.com/GoldenKnights",
         "category": "news"
       },
       {
         "id": "nhl-vgk-vegas-golden-knights",
-        "name": "Vegas Golden Knights",
-        "browserUrl": "https://www.nhl.com/goldenknights",
-        "category": "news"
-      },
-      {
-        "id": "nhl-vgk-vegas-hockey-knight",
-        "name": "Vegas Hockey Knight",
-        "browserUrl": "https://vegashockeyknight.com",
-        "category": "news"
-      },
-      {
-        "id": "nhl-vgk-the-hockey-news",
-        "name": "The Hockey News",
-        "browserUrl": "https://thehockeynews.com/nhl/vegas-golden-knights",
-        "category": "news"
-      },
-      {
-        "id": "nhl-vgk-the-athletic",
-        "name": "The Athletic",
-        "browserUrl": "https://www.nytimes.com/athletic/nhl/team/golden-knights/",
-        "category": "news"
-      }
-    ],
-    "WPG": [
-      {
-        "id": "nhl-wpg-arctic-ice-hockey",
-        "name": "Arctic Ice Hockey",
-        "browserUrl": "https://www.arcticicehockey.com/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-wpg-illegal-curve",
-        "name": "Illegal Curve",
-        "browserUrl": "https://illegalcurve.com",
-        "category": "news"
-      },
-      {
-        "id": "nhl-wpg-jets-nation",
-        "name": "Jets Nation",
-        "browserUrl": "https://jetsnation.ca",
-        "category": "news"
-      },
-      {
-        "id": "nhl-wpg-winnipeg-hockey-talk",
-        "name": "Winnipeg Hockey Talk",
-        "browserUrl": "https://winnipeghockeytalk.com",
-        "category": "news"
-      },
-      {
-        "id": "nhl-wpg-pro-hockey-rumors",
-        "name": "Pro Hockey Rumors",
-        "browserUrl": "https://www.prohockeyrumors.com/winnipeg-jets",
-        "category": "news"
-      },
-      {
-        "id": "nhl-wpg-winnipeg-sun",
-        "name": "Winnipeg Sun",
-        "browserUrl": "https://www.winnipegsun.com/sports/winnipeg_jets/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-wpg-jets-white-out",
-        "name": "Jets White Out",
-        "browserUrl": "https://jetswhiteout.com",
-        "category": "news"
-      },
-      {
-        "id": "nhl-wpg-winnipeg-jets",
-        "name": "Winnipeg Jets",
-        "browserUrl": "https://www.nhl.com/jets",
-        "category": "news"
-      },
-      {
-        "id": "nhl-wpg-espn",
-        "name": "ESPN",
-        "browserUrl": "https://www.espn.com/nhl/team/_/name/wpg/winnipeg-jets",
-        "category": "news"
-      },
-      {
-        "id": "nhl-wpg-the-hockey-writers",
-        "name": "The Hockey Writers",
-        "browserUrl": "https://thehockeywriters.com/winnipeg-jets/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-wpg-the-hockey-news",
-        "name": "The Hockey News",
-        "browserUrl": "https://thehockeynews.com/nhl/winnipeg-jets",
-        "category": "news"
-      },
-      {
-        "id": "nhl-wpg-nhl-rumors",
-        "name": "NHL Rumors",
-        "browserUrl": "https://nhlrumors.com/tag/winnipeg-jets-rumors/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-wpg-puck-prose",
-        "name": "Puck Prose",
-        "browserUrl": "https://puckprose.com/nhl-central-division/winnipeg-jets/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-wpg-hockeybuzz",
-        "name": "HockeyBuzz",
-        "browserUrl": "https://www.hockeybuzz.com/team/Winnipeg-Jets/feed?page=0",
-        "category": "news"
-      },
-      {
-        "id": "nhl-wpg-kukla-s-korner",
-        "name": "Kukla's Korner",
-        "browserUrl": "https://kuklaskorner.com",
-        "category": "news"
-      }
-    ],
-    "ANA": [
-      {
-        "id": "nhl-ana-anaheim-calling",
-        "name": "Anaheim Calling",
-        "browserUrl": "https://www.anaheimcalling.com",
-        "category": "news"
-      },
-      {
-        "id": "nhl-ana-the-hockey-writers",
-        "name": "The Hockey Writers",
-        "browserUrl": "https://thehockeywriters.com/anaheim-ducks/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-ana-pro-hockey-rumors",
-        "name": "Pro Hockey Rumors",
-        "browserUrl": "https://www.prohockeyrumors.com/anaheim-ducks",
-        "category": "news"
-      },
-      {
-        "id": "nhl-ana-sportspyder",
-        "name": "SportSpyder",
-        "browserUrl": "https://sportspyder.com/nhl/anaheim-ducks/news",
-        "category": "news"
-      },
-      {
-        "id": "nhl-ana-nhl-rumors",
-        "name": "NHL Rumors",
-        "browserUrl": "https://nhlrumors.com/tag/anaheim-ducks/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-ana-anaheim-ducks",
-        "name": "Anaheim Ducks",
-        "browserUrl": "https://www.nhl.com/ducks",
-        "category": "news"
-      },
-      {
-        "id": "nhl-ana-the-athletic",
-        "name": "The Athletic",
-        "browserUrl": "https://www.nytimes.com/athletic/nhl/team/ducks/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-ana-orange-county-register",
-        "name": "Orange County Register",
-        "browserUrl": "https://www.ocregister.com/2017/10/03/anaheim-ducks-2017-18-schedule/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-ana-los-angeles-times",
-        "name": "Los Angeles Times",
-        "browserUrl": "https://www.latimes.com/sports/hockey/ducks",
-        "category": "news"
-      },
-      {
-        "id": "nhl-ana-fansided",
-        "name": "FanSided",
-        "browserUrl": "https://fansided.com/nhl/anaheim-ducks",
-        "category": "news"
-      }
-    ],
-    "CGY": [
-      {
-        "id": "nhl-cgy-flames-nation",
-        "name": "Flames Nation",
-        "browserUrl": "https://flamesnation.ca",
-        "category": "news"
-      },
-      {
-        "id": "nhl-cgy-calgary-flames",
-        "name": "Calgary Flames",
-        "browserUrl": "https://www.nhl.com/flames",
-        "category": "news"
-      },
-      {
-        "id": "nhl-cgy-the-athletic",
-        "name": "The Athletic",
-        "browserUrl": "https://www.nytimes.com/athletic/nhl/team/flames/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-cgy-sportspyder",
-        "name": "SportSpyder",
-        "browserUrl": "https://sportspyder.com/nhl/calgary-flames/news",
-        "category": "news"
-      },
-      {
-        "id": "nhl-cgy-pro-hockey-rumors",
-        "name": "Pro Hockey Rumors",
-        "browserUrl": "https://www.prohockeyrumors.com/calgary-flames",
-        "category": "news"
-      },
-      {
-        "id": "nhl-cgy-nhl-rumors",
-        "name": "NHL Rumors",
-        "browserUrl": "https://nhlrumors.com/tag/calgary-flames/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-cgy-the-hockey-writers",
-        "name": "The Hockey Writers",
-        "browserUrl": "https://thehockeywriters.com/calgary-flames/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-cgy-calgary-sun",
-        "name": "Calgary Sun",
-        "browserUrl": "https://calgarysun.com/category/sports/hockey/nhl/calgary-flames",
-        "category": "news"
-      },
-      {
-        "id": "nhl-cgy-calgary-herald",
-        "name": "Calgary Herald",
-        "browserUrl": "https://calgaryherald.com/category/sports/hockey/nhl/calgary-flames",
-        "category": "news"
-      },
-      {
-        "id": "nhl-cgy-espn",
-        "name": "ESPN",
-        "browserUrl": "https://www.espn.com/nhl/team/_/name/cgy/calgary-flames",
-        "category": "news"
-      },
-      {
-        "id": "nhl-cgy-sportsnet",
-        "name": "Sportsnet",
-        "browserUrl": "https://www.sportsnet.ca/nhl/teams/calgary-flames/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-cgy-fansided",
-        "name": "FanSided",
-        "browserUrl": "https://fansided.com/nhl/calgary-flames",
-        "category": "news"
-      }
-    ],
-    "SJS": [
-      {
-        "id": "nhl-sjs-fear-the-fin",
-        "name": "Fear The Fin",
-        "browserUrl": "https://www.fearthefin.com",
-        "category": "news"
-      },
-      {
-        "id": "nhl-sjs-san-jose-hockey-now",
-        "name": "San Jose Hockey Now",
-        "browserUrl": "https://sanjosehockeynow.com",
-        "category": "news"
-      },
-      {
-        "id": "nhl-sjs-the-hockey-writers",
-        "name": "The Hockey Writers",
-        "browserUrl": "https://thehockeywriters.com/san-jose-sharks/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-sjs-pro-hockey-rumors",
-        "name": "Pro Hockey Rumors",
-        "browserUrl": "https://www.prohockeyrumors.com/san-jose-sharks",
-        "category": "news"
-      },
-      {
-        "id": "nhl-sjs-sportspyder",
-        "name": "SportSpyder",
-        "browserUrl": "https://sportspyder.com/nhl/san-jose-sharks/news",
-        "category": "news"
-      },
-      {
-        "id": "nhl-sjs-nhl-rumors",
-        "name": "NHL Rumors",
-        "browserUrl": "https://nhlrumors.com/tag/san-jose-sharks/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-sjs-san-jose-sharks",
-        "name": "San Jose Sharks",
-        "browserUrl": "https://www.nhl.com/sharks",
-        "category": "news"
-      },
-      {
-        "id": "nhl-sjs-the-athletic",
-        "name": "The Athletic",
-        "browserUrl": "https://www.nytimes.com/athletic/nhl/team/sharks/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-sjs-san-jose-mercury-news",
-        "name": "San Jose Mercury News",
-        "browserUrl": "https://www.mercurynews.com/2016/01/08/san-jose-sharks-10-worst-starts-in-franchise-history-after-17-games-at-home/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-sjs-san-jose-chronicle",
-        "name": "San Jose Chronicle",
-        "browserUrl": "https://www.sfchronicle.com/sports/sharks/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-sjs-nbc-sports-bay-area",
-        "name": "NBC Sports Bay Area",
-        "browserUrl": "https://www.nbcsportsbayarea.com/nhl/san-jose-sharks/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-sjs-espn",
-        "name": "ESPN",
-        "browserUrl": "https://www.espn.com/nhl/team/_/name/sj/san-jose-sharks",
-        "category": "news"
-      }
-    ],
-    "SEA": [
-      {
-        "id": "nhl-sea-emerald-city-hockey",
-        "name": "Emerald City Hockey",
-        "browserUrl": "https://emeraldcityhockey.com/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-sea-sound-of-hockey",
-        "name": "Sound Of Hockey",
-        "browserUrl": "https://soundofhockey.com",
-        "category": "news"
-      },
-      {
-        "id": "nhl-sea-seattle-kraken",
-        "name": "Seattle Kraken",
-        "browserUrl": "https://www.nhl.com/kraken",
-        "category": "news"
-      },
-      {
-        "id": "nhl-sea-the-athletic",
-        "name": "The Athletic",
-        "browserUrl": "https://www.nytimes.com/athletic/nhl/team/kraken/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-sea-sportspyder",
-        "name": "SportSpyder",
-        "browserUrl": "https://sportspyder.com/nhl/seattle-kraken/news",
-        "category": "news"
-      },
-      {
-        "id": "nhl-sea-pro-hockey-rumors",
-        "name": "Pro Hockey Rumors",
-        "browserUrl": "https://www.prohockeyrumors.com/seattle-kraken",
-        "category": "news"
-      },
-      {
-        "id": "nhl-sea-nhl-rumors",
-        "name": "NHL Rumors",
-        "browserUrl": "https://nhlrumors.com/tag/seattle-kraken/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-sea-the-hockey-writers",
-        "name": "The Hockey Writers",
-        "browserUrl": "https://thehockeywriters.com/seattle-kraken/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-sea-seattle-times",
-        "name": "Seattle Times",
-        "browserUrl": "https://www.seattletimes.com/sports/kraken/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-sea-seattle-sports",
-        "name": "Seattle Sports",
-        "browserUrl": "https://sports.mynorthwest.com/nhl/seattle-kraken",
-        "category": "news"
-      },
-      {
-        "id": "nhl-sea-espn",
-        "name": "ESPN",
-        "browserUrl": "https://www.espn.com/nhl/team/_/name/sea/seattle-kraken",
-        "category": "news"
-      }
-    ],
-    "STL": [
-      {
-        "id": "nhl-stl-st-louis-blues",
-        "name": "St. Louis Blues",
-        "browserUrl": "https://www.nhl.com/blues",
-        "category": "news"
-      },
-      {
-        "id": "nhl-stl-the-athletic",
-        "name": "The Athletic",
-        "browserUrl": "https://www.nytimes.com/athletic/nhl/team/blues/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-stl-sportspyder",
-        "name": "SportSpyder",
-        "browserUrl": "https://sportspyder.com/nhl/st-louis-blues/news",
-        "category": "news"
-      },
-      {
-        "id": "nhl-stl-pro-hockey-rumors",
-        "name": "Pro Hockey Rumors",
-        "browserUrl": "https://www.prohockeyrumors.com/st-louis-blues",
-        "category": "news"
-      },
-      {
-        "id": "nhl-stl-nhl-rumors",
-        "name": "NHL Rumors",
-        "browserUrl": "https://nhlrumors.com/tag/st-louis-blues/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-stl-the-hockey-writers",
-        "name": "The Hockey Writers",
-        "browserUrl": "https://thehockeywriters.com/st-louis-blues/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-stl-st-louis-post-dispatch",
-        "name": "St. Louis Post-Dispatch",
-        "browserUrl": "https://www.stltoday.com/sports/professional/nhl/blues/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-stl-espn",
-        "name": "ESPN",
-        "browserUrl": "https://www.espn.com/nhl/team/_/name/stl/st-louis-blues",
-        "category": "news"
-      },
-      {
-        "id": "nhl-stl-fansided",
-        "name": "FanSided",
-        "browserUrl": "https://fansided.com/nhl/st-louis-blues",
+        "name": "#Vegas Golden Knights",
+        "browserUrl": "https://x.com/search?q=vegas%20golden%20knights&src=typed_query",
         "category": "news"
       }
     ],
     "WSH": [
       {
-        "id": "nhl-wsh-japers-rink",
-        "name": "Japers' Rink",
-        "browserUrl": "https://www.japersrink.com",
-        "category": "news"
-      },
-      {
-        "id": "nhl-wsh-russian-machine-never-breaks",
-        "name": "Russian Machine Never Breaks",
-        "browserUrl": "https://russianmachineneverbreaks.com",
-        "category": "news"
-      },
-      {
-        "id": "nhl-wsh-washington-capitals",
-        "name": "Washington Capitals",
-        "browserUrl": "https://www.nhl.com/capitals",
-        "category": "news"
-      },
-      {
-        "id": "nhl-wsh-the-athletic",
-        "name": "The Athletic",
-        "browserUrl": "https://www.nytimes.com/athletic/nhl/team/capitals/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-wsh-sportspyder",
-        "name": "SportSpyder",
-        "browserUrl": "https://sportspyder.com/nhl/washington-capitals/news",
-        "category": "news"
-      },
-      {
-        "id": "nhl-wsh-pro-hockey-rumors",
-        "name": "Pro Hockey Rumors",
-        "browserUrl": "https://www.prohockeyrumors.com/washington-capitals",
-        "category": "news"
-      },
-      {
-        "id": "nhl-wsh-nhl-rumors",
-        "name": "NHL Rumors",
-        "browserUrl": "https://nhlrumors.com/tag/washington-capitals/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-wsh-the-hockey-writers",
-        "name": "The Hockey Writers",
-        "browserUrl": "https://thehockeywriters.com/washington-capitals/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-wsh-monumental-sports-network",
-        "name": "Monumental Sports Network",
-        "browserUrl": "https://www.monumentalsportsnetwork.com/capitals",
+        "id": "nhl-wsh-nhl-com",
+        "name": "NHL.com",
+        "browserUrl": "https://www.nhl.com/capitals/",
         "category": "news"
       },
       {
@@ -103096,189 +105062,221 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
         "category": "news"
       },
       {
-        "id": "nhl-wsh-fansided",
-        "name": "FanSided",
-        "browserUrl": "https://fansided.com/nhl/washington-capitals",
-        "category": "news"
-      }
-    ],
-    "MIN": [
-      {
-        "id": "nhl-min-hockey-wilderness",
-        "name": "Hockey Wilderness",
-        "browserUrl": "https://hockeywilderness.com/",
+        "id": "nhl-wsh-cbs-sports",
+        "name": "CBS Sports",
+        "browserUrl": "https://www.cbssports.com/nhl/teams/WSH/washington-capitals/",
         "category": "news"
       },
       {
-        "id": "nhl-min-the-athletic",
+        "id": "nhl-wsh-fox-sports",
+        "name": "FOX Sports",
+        "browserUrl": "https://www.foxsports.com/nhl/washington-capitals-team",
+        "category": "news"
+      },
+      {
+        "id": "nhl-wsh-yahoo-sports",
+        "name": "Yahoo! Sports",
+        "browserUrl": "https://sports.yahoo.com/nhl/teams/washington/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-wsh-the-athletic",
         "name": "The Athletic",
-        "browserUrl": "https://www.nytimes.com/athletic/nhl/team/wild/",
+        "browserUrl": "https://www.nytimes.com/athletic/nhl/team/capitals/",
         "category": "news"
       },
       {
-        "id": "nhl-min-sportspyder",
+        "id": "nhl-wsh-b-r",
+        "name": "B/R",
+        "browserUrl": "https://bleacherreport.com/washington-capitals",
+        "category": "news"
+      },
+      {
+        "id": "nhl-wsh-nbc-sports",
+        "name": "NBC Sports",
+        "browserUrl": "https://www.nbcsports.com/nhl/washington-capitals",
+        "category": "news"
+      },
+      {
+        "id": "nhl-wsh-si",
+        "name": "SI",
+        "browserUrl": "https://www.si.com/nhl/capitals",
+        "category": "news"
+      },
+      {
+        "id": "nhl-wsh-usa-today",
+        "name": "USA Today",
+        "browserUrl": "https://sportsdata.usatoday.com/hockey/nhl/teams/washington-capitals/4976",
+        "category": "news"
+      },
+      {
+        "id": "nhl-wsh-athlon-sports",
+        "name": "Athlon Sports",
+        "browserUrl": "https://athlonsports.com/nhl/washington-capitals",
+        "category": "news"
+      },
+      {
+        "id": "nhl-wsh-yardbarker",
+        "name": "Yardbarker",
+        "browserUrl": "https://www.yardbarker.com/nhl/teams/washington_capitals/106",
+        "category": "news"
+      },
+      {
+        "id": "nhl-wsh-spotrac",
+        "name": "Spotrac",
+        "browserUrl": "https://www.spotrac.com/nhl/washington-capitals/overview",
+        "category": "news"
+      },
+      {
+        "id": "nhl-wsh-statmuse",
+        "name": "StatMuse",
+        "browserUrl": "https://www.statmuse.com/nhl/ask/washington-capitals-stats",
+        "category": "news"
+      },
+      {
+        "id": "nhl-wsh-newsnow",
+        "name": "NewsNow",
+        "browserUrl": "https://www.newsnow.co.uk/h/Sport/US+Sports/NHL/Washington+Capitals",
+        "category": "news"
+      },
+      {
+        "id": "nhl-wsh-sportspyder",
         "name": "SportSpyder",
-        "browserUrl": "https://sportspyder.com/nhl/minnesota-wild/news",
+        "browserUrl": "https://sportspyder.com/nhl/washington-capitals/news",
         "category": "news"
       },
       {
-        "id": "nhl-min-pro-hockey-rumors",
-        "name": "Pro Hockey Rumors",
-        "browserUrl": "https://www.prohockeyrumors.com/minnesota-wild",
+        "id": "nhl-wsh-reddit",
+        "name": "Reddit",
+        "browserUrl": "https://www.reddit.com/r/caps/",
         "category": "news"
       },
       {
-        "id": "nhl-min-the-hockey-writers",
-        "name": "The Hockey Writers",
-        "browserUrl": "https://thehockeywriters.com/minnesota-wild/",
+        "id": "nhl-wsh-capitals",
+        "name": "@Capitals",
+        "browserUrl": "https://x.com/Capitals",
         "category": "news"
       },
       {
-        "id": "nhl-min-minnesota-wild",
-        "name": "Minnesota Wild",
-        "browserUrl": "https://www.nhl.com/wild",
-        "category": "news"
-      },
-      {
-        "id": "nhl-min-pioneer-press",
-        "name": "Pioneer Press",
-        "browserUrl": "https://www.twincities.com/2016/11/29/wild/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-min-espn",
-        "name": "ESPN",
-        "browserUrl": "https://www.espn.com/nhl/team/_/name/min/minnesota-wild",
+        "id": "nhl-wsh-washington-capitals",
+        "name": "#Washington Capitals",
+        "browserUrl": "https://x.com/search?q=washington%20capitals&src=typed_query",
         "category": "news"
       }
     ],
-    "NSH": [
+    "WPG": [
       {
-        "id": "nhl-nsh-on-the-forecheck",
-        "name": "On the Forecheck",
-        "browserUrl": "https://www.ontheforecheck.com",
+        "id": "nhl-wpg-nhl-com",
+        "name": "NHL.com",
+        "browserUrl": "https://www.nhl.com/jets/",
         "category": "news"
       },
       {
-        "id": "nhl-nsh-a-to-z-sports-nashville",
-        "name": "A to Z Sports Nashville",
-        "browserUrl": "https://atozsports.com/predators/",
+        "id": "nhl-wpg-espn",
+        "name": "ESPN",
+        "browserUrl": "https://www.espn.com/nhl/team/_/name/wpg/winnipeg-jets",
         "category": "news"
       },
       {
-        "id": "nhl-nsh-the-tennessean",
-        "name": "The Tennessean",
-        "browserUrl": "https://www.tennessean.com/sports/predators/",
+        "id": "nhl-wpg-cbs-sports",
+        "name": "CBS Sports",
+        "browserUrl": "https://www.cbssports.com/nhl/teams/WPG/winnipeg-jets/",
         "category": "news"
       },
       {
-        "id": "nhl-nsh-the-athletic",
+        "id": "nhl-wpg-fox-sports",
+        "name": "FOX Sports",
+        "browserUrl": "https://www.foxsports.com/nhl/winnipeg-jets-team",
+        "category": "news"
+      },
+      {
+        "id": "nhl-wpg-yahoo-sports",
+        "name": "Yahoo! Sports",
+        "browserUrl": "https://sports.yahoo.com/nhl/teams/winnipeg/",
+        "category": "news"
+      },
+      {
+        "id": "nhl-wpg-the-athletic",
         "name": "The Athletic",
-        "browserUrl": "https://www.nytimes.com/athletic/nhl/team/predators/",
+        "browserUrl": "https://www.nytimes.com/athletic/nhl/team/jets/",
         "category": "news"
       },
       {
-        "id": "nhl-nsh-sportspyder",
+        "id": "nhl-wpg-b-r",
+        "name": "B/R",
+        "browserUrl": "https://bleacherreport.com/winnipeg-jets",
+        "category": "news"
+      },
+      {
+        "id": "nhl-wpg-nbc-sports",
+        "name": "NBC Sports",
+        "browserUrl": "https://www.nbcsports.com/nhl/winnipeg-jets",
+        "category": "news"
+      },
+      {
+        "id": "nhl-wpg-si",
+        "name": "SI",
+        "browserUrl": "https://www.si.com/nhl/jets",
+        "category": "news"
+      },
+      {
+        "id": "nhl-wpg-usa-today",
+        "name": "USA Today",
+        "browserUrl": "https://sportsdata.usatoday.com/hockey/nhl/teams/winnipeg-jets/4981",
+        "category": "news"
+      },
+      {
+        "id": "nhl-wpg-athlon-sports",
+        "name": "Athlon Sports",
+        "browserUrl": "https://athlonsports.com/nhl/winnipeg-jets",
+        "category": "news"
+      },
+      {
+        "id": "nhl-wpg-yardbarker",
+        "name": "Yardbarker",
+        "browserUrl": "https://www.yardbarker.com/nhl/teams/winnipeg_jets/102",
+        "category": "news"
+      },
+      {
+        "id": "nhl-wpg-spotrac",
+        "name": "Spotrac",
+        "browserUrl": "https://www.spotrac.com/nhl/winnipeg-jets/overview",
+        "category": "news"
+      },
+      {
+        "id": "nhl-wpg-statmuse",
+        "name": "StatMuse",
+        "browserUrl": "https://www.statmuse.com/nhl/ask/winnipeg-jets-stats",
+        "category": "news"
+      },
+      {
+        "id": "nhl-wpg-newsnow",
+        "name": "NewsNow",
+        "browserUrl": "https://www.newsnow.co.uk/h/Sport/US+Sports/NHL/Winnipeg+Jets",
+        "category": "news"
+      },
+      {
+        "id": "nhl-wpg-sportspyder",
         "name": "SportSpyder",
-        "browserUrl": "https://sportspyder.com/nhl/nashville-predators/news",
+        "browserUrl": "https://sportspyder.com/nhl/winnipeg-jets/news",
         "category": "news"
       },
       {
-        "id": "nhl-nsh-pro-hockey-rumors",
-        "name": "Pro Hockey Rumors",
-        "browserUrl": "https://www.prohockeyrumors.com/nashville-predators",
+        "id": "nhl-wpg-reddit",
+        "name": "Reddit",
+        "browserUrl": "https://www.reddit.com/r/winnipegjets/",
         "category": "news"
       },
       {
-        "id": "nhl-nsh-nhl-rumors",
-        "name": "NHL Rumors",
-        "browserUrl": "https://nhlrumors.com/tag/nashville-predators/",
+        "id": "nhl-wpg-nhljets",
+        "name": "@NHLJets",
+        "browserUrl": "https://x.com/NHLJets",
         "category": "news"
       },
       {
-        "id": "nhl-nsh-nashville-predators",
-        "name": "Nashville Predators",
-        "browserUrl": "https://www.nhl.com/predators",
-        "category": "news"
-      },
-      {
-        "id": "nhl-nsh-the-hockey-writers",
-        "name": "The Hockey Writers",
-        "browserUrl": "https://thehockeywriters.com/nashville-predators/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-nsh-espn",
-        "name": "ESPN",
-        "browserUrl": "https://www.espn.com/nhl/team/_/name/nsh/nashville-predators",
-        "category": "news"
-      },
-      {
-        "id": "nhl-nsh-fansided",
-        "name": "FanSided",
-        "browserUrl": "https://fansided.com/nhl/nashville-predators",
-        "category": "news"
-      }
-    ],
-    "UTA": [
-      {
-        "id": "nhl-uta-utah-hockey-club",
-        "name": "Utah Hockey Club",
-        "browserUrl": "https://www.nhl.com/utah",
-        "category": "news"
-      },
-      {
-        "id": "nhl-uta-utah-hockey-now",
-        "name": "Utah Hockey Now",
-        "browserUrl": "https://sportsnaut.com/tag/utah-mammoth",
-        "category": "news"
-      },
-      {
-        "id": "nhl-uta-the-salt-lake-tribune",
-        "name": "The Salt Lake Tribune",
-        "browserUrl": "https://www.sltrib.com/sports/utah-hockey-club/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-uta-deseret-news",
-        "name": "Deseret News",
-        "browserUrl": "https://www.deseret.com/sports/utah-hockey/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-uta-sportspyder",
-        "name": "SportSpyder",
-        "browserUrl": "https://sportspyder.com/nhl/utah-mammoth/news",
-        "category": "news"
-      },
-      {
-        "id": "nhl-uta-pro-hockey-rumors",
-        "name": "Pro Hockey Rumors",
-        "browserUrl": "https://www.prohockeyrumors.com/utah-mammoth",
-        "category": "news"
-      },
-      {
-        "id": "nhl-uta-nhl-rumors",
-        "name": "NHL Rumors",
-        "browserUrl": "https://nhlrumors.com/tag/utah-mammoth/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-uta-the-hockey-writers",
-        "name": "The Hockey Writers",
-        "browserUrl": "https://thehockeywriters.com/docs/utah-hockey-club/",
-        "category": "news"
-      },
-      {
-        "id": "nhl-uta-espn",
-        "name": "ESPN",
-        "browserUrl": "https://www.espn.com/nhl/team/_/name/utah/utah-mammoth",
-        "category": "news"
-      },
-      {
-        "id": "nhl-uta-sportsnet",
-        "name": "Sportsnet",
-        "browserUrl": "https://www.sportsnet.ca/nhl/teams/utah-mammoth/",
+        "id": "nhl-wpg-winnipeg-jets",
+        "name": "#Winnipeg Jets",
+        "browserUrl": "https://x.com/search?q=winnipeg%20jets&src=typed_query",
         "category": "news"
       }
     ]
@@ -103286,9 +105284,93 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
   "NBA": {
     "ATL": [
       {
-        "id": "nba-atl-hoops-rumors",
-        "name": "Hoops Rumors",
-        "browserUrl": "https://www.hoopsrumors.com/atlanta-hawks",
+        "id": "nba-atl-nba-com",
+        "name": "NBA.com",
+        "browserUrl": "https://www.nba.com/hawks/",
+        "category": "news"
+      },
+      {
+        "id": "nba-atl-espn",
+        "name": "ESPN",
+        "browserUrl": "https://www.espn.com/nba/team/_/name/atl/atlanta-hawks",
+        "category": "news"
+      },
+      {
+        "id": "nba-atl-cbs-sports",
+        "name": "CBS Sports",
+        "browserUrl": "https://www.cbssports.com/nba/teams/ATL/atlanta-hawks/",
+        "category": "news"
+      },
+      {
+        "id": "nba-atl-fox-sports",
+        "name": "FOX Sports",
+        "browserUrl": "https://www.foxsports.com/nba/atlanta-hawks-team",
+        "category": "news"
+      },
+      {
+        "id": "nba-atl-yahoo-sports",
+        "name": "Yahoo! Sports",
+        "browserUrl": "https://sports.yahoo.com/nba/teams/atlanta/",
+        "category": "news"
+      },
+      {
+        "id": "nba-atl-the-athletic",
+        "name": "The Athletic",
+        "browserUrl": "https://www.nytimes.com/athletic/nba/team/hawks/",
+        "category": "news"
+      },
+      {
+        "id": "nba-atl-b-r",
+        "name": "B/R",
+        "browserUrl": "https://bleacherreport.com/atlanta-hawks",
+        "category": "news"
+      },
+      {
+        "id": "nba-atl-nbc-sports",
+        "name": "NBC Sports",
+        "browserUrl": "https://www.nbcsports.com/nba/atlanta-hawks",
+        "category": "news"
+      },
+      {
+        "id": "nba-atl-si",
+        "name": "SI",
+        "browserUrl": "https://www.si.com/nba/hawks",
+        "category": "news"
+      },
+      {
+        "id": "nba-atl-usa-today",
+        "name": "USA Today",
+        "browserUrl": "https://sportsdata.usatoday.com/basketball/nba/teams/atlanta-hawks/1/",
+        "category": "news"
+      },
+      {
+        "id": "nba-atl-athlon-sports",
+        "name": "Athlon Sports",
+        "browserUrl": "https://athlonsports.com/nba/atlanta-hawks",
+        "category": "news"
+      },
+      {
+        "id": "nba-atl-yardbarker",
+        "name": "Yardbarker",
+        "browserUrl": "https://www.yardbarker.com/nba/teams/atlanta_hawks/73",
+        "category": "news"
+      },
+      {
+        "id": "nba-atl-spotrac",
+        "name": "Spotrac",
+        "browserUrl": "https://www.spotrac.com/nba/atlanta-hawks/overview",
+        "category": "news"
+      },
+      {
+        "id": "nba-atl-statmuse",
+        "name": "StatMuse",
+        "browserUrl": "https://www.statmuse.com/nba/ask/atlanta-hawks-stats",
+        "category": "news"
+      },
+      {
+        "id": "nba-atl-newsnow",
+        "name": "NewsNow",
+        "browserUrl": "https://www.newsnow.co.uk/h/Sport/US+Sports/NBA/Atlanta+Hawks",
         "category": "news"
       },
       {
@@ -103298,179 +105380,29 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
         "category": "news"
       },
       {
-        "id": "nba-atl-the-cold-wire",
-        "name": "The Cold Wire",
-        "browserUrl": "https://www.thecoldwire.com/sports/nba/atlanta-hawks/",
+        "id": "nba-atl-reddit",
+        "name": "Reddit",
+        "browserUrl": "https://www.reddit.com/r/AtlantaHawks/",
+        "category": "news"
+      },
+      {
+        "id": "nba-atl-atlhawks",
+        "name": "@ATLHawks",
+        "browserUrl": "https://x.com/ATLHawks",
         "category": "news"
       },
       {
         "id": "nba-atl-atlanta-hawks",
-        "name": "Atlanta Hawks",
-        "browserUrl": "https://www.nba.com/hawks",
-        "category": "news"
-      },
-      {
-        "id": "nba-atl-peachtree-hoops",
-        "name": "Peachtree Hoops",
-        "browserUrl": "https://www.peachtreehoops.com/",
-        "category": "news"
-      },
-      {
-        "id": "nba-atl-soaring-down-south",
-        "name": "Soaring Down South",
-        "browserUrl": "https://soaringdownsouth.com",
-        "category": "news"
-      },
-      {
-        "id": "nba-atl-sportstalkatl-com",
-        "name": "SportsTalkATL.com",
-        "browserUrl": "https://sportstalkatl.com/category/hawks/",
-        "category": "news"
-      },
-      {
-        "id": "nba-atl-hoopshype",
-        "name": "HoopsHype",
-        "browserUrl": "https://www.hoopshype.com/rumors/?topic=6d961911-3a35-4c3b-8eee-3aaa21d0ddac",
-        "category": "news"
-      },
-      {
-        "id": "nba-atl-cbssports",
-        "name": "CBSSports",
-        "browserUrl": "https://www.cbssports.com/nba/teams/ATL/atlanta-hawks/",
-        "category": "news"
-      },
-      {
-        "id": "nba-atl-sports-illustrated",
-        "name": "Sports Illustrated",
-        "browserUrl": "https://www.si.com/nba/hawks",
-        "category": "news"
-      },
-      {
-        "id": "nba-atl-hoops-habit",
-        "name": "Hoops Habit",
-        "browserUrl": "https://hoopshabit.com",
-        "category": "news"
-      },
-      {
-        "id": "nba-atl-sportstalkatl",
-        "name": "SportsTalkATL",
-        "browserUrl": "https://sportstalkatl.com/category/hawks/",
-        "category": "news"
-      },
-      {
-        "id": "nba-atl-cbs-sports",
-        "name": "CBS Sports",
-        "browserUrl": "https://www.cbssports.com/nba/teams/ATL/atlanta-hawks/",
+        "name": "#Atlanta Hawks",
+        "browserUrl": "https://x.com/search?q=atlanta%20hawks&src=typed_query",
         "category": "news"
       }
     ],
     "BOS": [
       {
-        "id": "nba-bos-celtics-life",
-        "name": "Celtics Life",
-        "browserUrl": "https://www.celticslife.com/",
-        "category": "news"
-      },
-      {
-        "id": "nba-bos-sportspyder",
-        "name": "SportSpyder",
-        "browserUrl": "https://sportspyder.com/nba/boston-celtics/news",
-        "category": "news"
-      },
-      {
-        "id": "nba-bos-marca",
-        "name": "Marca",
-        "browserUrl": "https://www.marca.com/en/basketball/nba/boston-celtics.html",
-        "category": "news"
-      },
-      {
-        "id": "nba-bos-the-athletic",
-        "name": "The Athletic",
-        "browserUrl": "https://www.nytimes.com/athletic/nba/team/celtics/",
-        "category": "news"
-      },
-      {
-        "id": "nba-bos-boston-com",
-        "name": "Boston.com",
-        "browserUrl": "https://www.boston.com/tag/boston-celtics/",
-        "category": "news"
-      },
-      {
-        "id": "nba-bos-hoops-rumors",
-        "name": "Hoops Rumors",
-        "browserUrl": "https://www.hoopsrumors.com/boston-celtics",
-        "category": "news"
-      },
-      {
-        "id": "nba-bos-the-celtics-chronicle",
-        "name": "The Celtics Chronicle",
-        "browserUrl": "https://www.celticschronicle.com/",
-        "category": "news"
-      },
-      {
-        "id": "nba-bos-the-cold-wire",
-        "name": "The Cold Wire",
-        "browserUrl": "https://www.thecoldwire.com/sports/nba/boston-celtics/",
-        "category": "news"
-      },
-      {
-        "id": "nba-bos-celticsblog",
-        "name": "CelticsBlog",
-        "browserUrl": "https://www.celticsblog.com/",
-        "category": "news"
-      },
-      {
-        "id": "nba-bos-hardwood-houdini",
-        "name": "Hardwood Houdini",
-        "browserUrl": "https://hardwoodhoudini.com",
-        "category": "news"
-      },
-      {
-        "id": "nba-bos-nesn",
-        "name": "NESN",
-        "browserUrl": "https://nesn.com/boston-celtics",
-        "category": "news"
-      },
-      {
-        "id": "nba-bos-the-boston-globe",
-        "name": "The Boston Globe",
-        "browserUrl": "https://www.bostonglobe.com/sports/basketball/celtics/",
-        "category": "news"
-      },
-      {
-        "id": "nba-bos-boston-herald",
-        "name": "Boston Herald",
-        "browserUrl": "https://www.bostonherald.com/sports/nba/boston-celtics/",
-        "category": "news"
-      },
-      {
-        "id": "nba-bos-boston-celtics",
-        "name": "Boston Celtics",
-        "browserUrl": "https://www.nba.com/celtics",
-        "category": "news"
-      },
-      {
-        "id": "nba-bos-celtics-wire",
-        "name": "Celtics Wire",
-        "browserUrl": "https://celticswire.usatoday.com",
-        "category": "news"
-      },
-      {
-        "id": "nba-bos-chowder-and-champions",
-        "name": "Chowder and Champions",
-        "browserUrl": "https://chowderandchampions.com/boston-celtics/",
-        "category": "news"
-      },
-      {
-        "id": "nba-bos-cbs-boston",
-        "name": "CBS Boston",
-        "browserUrl": "https://www.cbsnews.com/boston/",
-        "category": "news"
-      },
-      {
-        "id": "nba-bos-nbc-sports-boston",
-        "name": "NBC Sports Boston",
-        "browserUrl": "https://www.nbcsportsboston.com/nba/boston-celtics/",
+        "id": "nba-bos-nba-com",
+        "name": "NBA.com",
+        "browserUrl": "https://www.nba.com/celtics/",
         "category": "news"
       },
       {
@@ -103480,101 +105412,113 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
         "category": "news"
       },
       {
-        "id": "nba-bos-hoops-habit",
-        "name": "Hoops Habit",
-        "browserUrl": "https://hoopshabit.com",
+        "id": "nba-bos-cbs-sports",
+        "name": "CBS Sports",
+        "browserUrl": "https://www.cbssports.com/nba/teams/BOS/boston-celtics/",
         "category": "news"
       },
       {
-        "id": "nba-bos-sports-illustrated",
-        "name": "Sports Illustrated",
+        "id": "nba-bos-fox-sports",
+        "name": "FOX Sports",
+        "browserUrl": "https://www.foxsports.com/nba/boston-celtics-team",
+        "category": "news"
+      },
+      {
+        "id": "nba-bos-yahoo-sports",
+        "name": "Yahoo! Sports",
+        "browserUrl": "https://sports.yahoo.com/nba/teams/boston/",
+        "category": "news"
+      },
+      {
+        "id": "nba-bos-the-athletic",
+        "name": "The Athletic",
+        "browserUrl": "https://www.nytimes.com/athletic/nba/team/celtics/",
+        "category": "news"
+      },
+      {
+        "id": "nba-bos-b-r",
+        "name": "B/R",
+        "browserUrl": "https://bleacherreport.com/boston-celtics",
+        "category": "news"
+      },
+      {
+        "id": "nba-bos-nbc-sports",
+        "name": "NBC Sports",
+        "browserUrl": "https://www.nbcsports.com/nba/boston-celtics",
+        "category": "news"
+      },
+      {
+        "id": "nba-bos-si",
+        "name": "SI",
         "browserUrl": "https://www.si.com/nba/celtics",
         "category": "news"
       },
       {
-        "id": "nba-bos-marca-2",
-        "name": "MARCA",
-        "browserUrl": "https://www.marca.com/en/basketball/nba/boston-celtics.html",
+        "id": "nba-bos-usa-today",
+        "name": "USA Today",
+        "browserUrl": "https://sportsdata.usatoday.com/basketball/nba/teams/boston-celtics/2/",
+        "category": "news"
+      },
+      {
+        "id": "nba-bos-athlon-sports",
+        "name": "Athlon Sports",
+        "browserUrl": "https://athlonsports.com/nba/boston-celtics",
+        "category": "news"
+      },
+      {
+        "id": "nba-bos-yardbarker",
+        "name": "Yardbarker",
+        "browserUrl": "https://www.yardbarker.com/nba/teams/boston_celtics/63",
+        "category": "news"
+      },
+      {
+        "id": "nba-bos-spotrac",
+        "name": "Spotrac",
+        "browserUrl": "https://www.spotrac.com/nba/boston-celtics/overview",
+        "category": "news"
+      },
+      {
+        "id": "nba-bos-statmuse",
+        "name": "StatMuse",
+        "browserUrl": "https://www.statmuse.com/nba/ask/boston-celtics-stats",
+        "category": "news"
+      },
+      {
+        "id": "nba-bos-newsnow",
+        "name": "NewsNow",
+        "browserUrl": "https://www.newsnow.co.uk/h/Sport/US+Sports/NBA/Boston+Celtics",
+        "category": "news"
+      },
+      {
+        "id": "nba-bos-sportspyder",
+        "name": "SportSpyder",
+        "browserUrl": "https://sportspyder.com/nba/boston-celtics/news",
+        "category": "news"
+      },
+      {
+        "id": "nba-bos-reddit",
+        "name": "Reddit",
+        "browserUrl": "https://www.reddit.com/r/bostonceltics/",
         "category": "news"
       },
       {
         "id": "nba-bos-celtics",
-        "name": "Celtics",
-        "browserUrl": "https://www.nba.com/celtics",
+        "name": "@celtics",
+        "browserUrl": "https://x.com/celtics",
         "category": "news"
       },
       {
-        "id": "nba-bos-hoopshype",
-        "name": "HoopsHype",
-        "browserUrl": "https://www.hoopshype.com/rumors/?topic=593bbaa3-06f5-4574-8d4d-eda805c7dc23",
+        "id": "nba-bos-boston-celtics",
+        "name": "#Boston Celtics",
+        "browserUrl": "https://x.com/search?q=boston%20celtics&src=typed_query",
         "category": "news"
       }
     ],
     "BKN": [
       {
-        "id": "nba-bkn-nets-insider",
-        "name": "Nets Insider",
-        "browserUrl": "https://www.netsinsider.com/",
-        "category": "news"
-      },
-      {
-        "id": "nba-bkn-new-york-post",
-        "name": "New York Post",
-        "browserUrl": "https://nypost.com/brooklyn-nets/",
-        "category": "news"
-      },
-      {
-        "id": "nba-bkn-the-athletic",
-        "name": "The Athletic",
-        "browserUrl": "https://www.nytimes.com/athletic/nba/team/nets/",
-        "category": "news"
-      },
-      {
-        "id": "nba-bkn-netsrepublic",
-        "name": "NetsRepublic",
-        "browserUrl": "https://netsrepublic.com/category/brooklyn-nets/",
-        "category": "news"
-      },
-      {
-        "id": "nba-bkn-the-cold-wire",
-        "name": "The Cold Wire",
-        "browserUrl": "https://www.thecoldwire.com/sports/nba/brooklyn-nets/",
-        "category": "news"
-      },
-      {
-        "id": "nba-bkn-brooklyn-nets",
-        "name": "Brooklyn Nets",
-        "browserUrl": "https://www.nba.com/nets",
-        "category": "news"
-      },
-      {
-        "id": "nba-bkn-netsdaily",
-        "name": "NetsDaily",
-        "browserUrl": "https://www.netsdaily.com",
-        "category": "news"
-      },
-      {
-        "id": "nba-bkn-nets-wire",
-        "name": "Nets Wire",
-        "browserUrl": "https://netswire.usatoday.com",
-        "category": "news"
-      },
-      {
-        "id": "nba-bkn-nothin-but-nets",
-        "name": "Nothin But Nets",
-        "browserUrl": "https://nothinbutnets.com",
-        "category": "news"
-      },
-      {
-        "id": "nba-bkn-the-brooklyn-game",
-        "name": "The Brooklyn Game",
-        "browserUrl": "https://thebrooklyngame.com",
-        "category": "news"
-      },
-      {
-        "id": "nba-bkn-yahoo-sports",
-        "name": "Yahoo Sports",
-        "browserUrl": "https://sports.yahoo.com/nba/teams/brooklyn/",
+        "id": "nba-bkn-nba-com",
+        "name": "NBA.com",
+        "browserUrl": "https://www.nba.com/nets/",
         "category": "news"
       },
       {
@@ -103584,83 +105528,113 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
         "category": "news"
       },
       {
-        "id": "nba-bkn-barstool-sports",
-        "name": "Barstool Sports",
-        "browserUrl": "https://www.barstoolsports.com",
+        "id": "nba-bkn-cbs-sports",
+        "name": "CBS Sports",
+        "browserUrl": "https://www.cbssports.com/nba/teams/BKN/brooklyn-nets/",
         "category": "news"
       },
       {
-        "id": "nba-bkn-newsday",
-        "name": "Newsday",
-        "browserUrl": "https://www.newsday.com/sports/basketball/nets",
+        "id": "nba-bkn-fox-sports",
+        "name": "FOX Sports",
+        "browserUrl": "https://www.foxsports.com/nba/brooklyn-nets-team",
         "category": "news"
       },
       {
-        "id": "nba-bkn-hoopshype",
-        "name": "HoopsHype",
-        "browserUrl": "https://www.hoopshype.com/rumors/?topic=02f2623f-cb52-4847-8284-ff461d726c25",
+        "id": "nba-bkn-yahoo-sports",
+        "name": "Yahoo! Sports",
+        "browserUrl": "https://sports.yahoo.com/nba/teams/brooklyn/",
         "category": "news"
       },
       {
-        "id": "nba-bkn-brooklyn-nets-news",
-        "name": "Brooklyn Nets News",
-        "browserUrl": "https://www.nba.com/nets/news",
+        "id": "nba-bkn-the-athletic",
+        "name": "The Athletic",
+        "browserUrl": "https://www.nytimes.com/athletic/nba/team/nets/",
+        "category": "news"
+      },
+      {
+        "id": "nba-bkn-b-r",
+        "name": "B/R",
+        "browserUrl": "https://bleacherreport.com/brooklyn-nets",
+        "category": "news"
+      },
+      {
+        "id": "nba-bkn-nbc-sports",
+        "name": "NBC Sports",
+        "browserUrl": "https://www.nbcsports.com/nba/brooklyn-nets",
+        "category": "news"
+      },
+      {
+        "id": "nba-bkn-si",
+        "name": "SI",
+        "browserUrl": "https://www.si.com/nba/nets",
+        "category": "news"
+      },
+      {
+        "id": "nba-bkn-usa-today",
+        "name": "USA Today",
+        "browserUrl": "https://sportsdata.usatoday.com/basketball/nba/teams/brooklyn-nets/17/",
+        "category": "news"
+      },
+      {
+        "id": "nba-bkn-athlon-sports",
+        "name": "Athlon Sports",
+        "browserUrl": "https://athlonsports.com/nba/brooklyn-nets",
+        "category": "news"
+      },
+      {
+        "id": "nba-bkn-yardbarker",
+        "name": "Yardbarker",
+        "browserUrl": "https://www.yardbarker.com/nba/teams/brooklyn_nets/64",
+        "category": "news"
+      },
+      {
+        "id": "nba-bkn-spotrac",
+        "name": "Spotrac",
+        "browserUrl": "https://www.spotrac.com/nba/brooklyn-nets/overview",
+        "category": "news"
+      },
+      {
+        "id": "nba-bkn-statmuse",
+        "name": "StatMuse",
+        "browserUrl": "https://www.statmuse.com/nba/ask/brooklyn-nets-stats",
+        "category": "news"
+      },
+      {
+        "id": "nba-bkn-newsnow",
+        "name": "NewsNow",
+        "browserUrl": "https://www.newsnow.co.uk/h/Sport/US+Sports/NBA/Brooklyn+Nets",
+        "category": "news"
+      },
+      {
+        "id": "nba-bkn-sportspyder",
+        "name": "SportSpyder",
+        "browserUrl": "https://sportspyder.com/nba/brooklyn-nets/news",
+        "category": "news"
+      },
+      {
+        "id": "nba-bkn-reddit",
+        "name": "Reddit",
+        "browserUrl": "https://www.reddit.com/r/GoNets/",
+        "category": "news"
+      },
+      {
+        "id": "nba-bkn-brooklynnets",
+        "name": "@BrooklynNets",
+        "browserUrl": "https://x.com/BrooklynNets",
+        "category": "news"
+      },
+      {
+        "id": "nba-bkn-brooklyn-nets",
+        "name": "#Brooklyn Nets",
+        "browserUrl": "https://x.com/search?q=brooklyn%20nets&src=typed_query",
         "category": "news"
       }
     ],
     "CHA": [
       {
-        "id": "nba-cha-bring-back-the-buzz",
-        "name": "Bring Back the Buzz",
-        "browserUrl": "https://bringbackthebuzz.net",
-        "category": "news"
-      },
-      {
-        "id": "nba-cha-realgm",
-        "name": "RealGM",
-        "browserUrl": "https://basketball.realgm.com/nba/teams/Charlotte-Hornets/3",
-        "category": "news"
-      },
-      {
-        "id": "nba-cha-sportspyder",
-        "name": "SportSpyder",
-        "browserUrl": "https://sportspyder.com/nba/charlotte-hornets/news",
-        "category": "news"
-      },
-      {
-        "id": "nba-cha-hoops-rumors",
-        "name": "Hoops Rumors",
-        "browserUrl": "https://www.hoopsrumors.com/charlotte-hornets",
-        "category": "news"
-      },
-      {
-        "id": "nba-cha-the-cold-wire",
-        "name": "The Cold Wire",
-        "browserUrl": "https://www.thecoldwire.com/sports/nba/charlotte-hornets/",
-        "category": "news"
-      },
-      {
-        "id": "nba-cha-charlotte-hornets",
-        "name": "Charlotte Hornets",
-        "browserUrl": "https://www.nba.com/hornets",
-        "category": "news"
-      },
-      {
-        "id": "nba-cha-swarm-and-sting",
-        "name": "Swarm and Sting",
-        "browserUrl": "https://swarmandsting.com",
-        "category": "news"
-      },
-      {
-        "id": "nba-cha-cbssports",
-        "name": "CBSSports",
-        "browserUrl": "https://www.cbssports.com/nba/teams/CHA/charlotte-hornets/",
-        "category": "news"
-      },
-      {
-        "id": "nba-cha-at-the-hive",
-        "name": "At The Hive",
-        "browserUrl": "https://atthehive.com/",
+        "id": "nba-cha-nba-com",
+        "name": "NBA.com",
+        "browserUrl": "https://www.nba.com/hornets/",
         "category": "news"
       },
       {
@@ -103670,15 +105644,9 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
         "category": "news"
       },
       {
-        "id": "nba-cha-barstool-sports",
-        "name": "Barstool Sports",
-        "browserUrl": "https://www.barstoolsports.com",
-        "category": "news"
-      },
-      {
-        "id": "nba-cha-marca",
-        "name": "Marca",
-        "browserUrl": "https://www.marca.com/en/basketball/nba/charlotte-hornets.html",
+        "id": "nba-cha-cbs-sports",
+        "name": "CBS Sports",
+        "browserUrl": "https://www.cbssports.com/nba/teams/CHA/charlotte-hornets/",
         "category": "news"
       },
       {
@@ -103688,119 +105656,101 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
         "category": "news"
       },
       {
-        "id": "nba-cha-tsn",
-        "name": "TSN",
-        "browserUrl": "https://www.tsn.ca/nba",
-        "category": "news"
-      },
-      {
-        "id": "nba-cha-fansided",
-        "name": "FanSided",
-        "browserUrl": "https://fansided.com/nba/charlotte-hornets/",
-        "category": "news"
-      },
-      {
-        "id": "nba-cha-hoopshype",
-        "name": "HoopsHype",
-        "browserUrl": "https://www.hoopshype.com/rumors/?topic=e256e96c-b58f-4300-a36c-9b2c6d336797",
-        "category": "news"
-      },
-      {
-        "id": "nba-cha-nesn-com",
-        "name": "NESN.com",
-        "browserUrl": "https://nesn.com",
-        "category": "news"
-      },
-      {
-        "id": "nba-cha-hoops-habit",
-        "name": "Hoops Habit",
-        "browserUrl": "https://hoopshabit.com",
-        "category": "news"
-      },
-      {
-        "id": "nba-cha-cbs-sports",
-        "name": "CBS Sports",
-        "browserUrl": "https://www.cbssports.com/nba/teams/CHA/charlotte-hornets/",
-        "category": "news"
-      },
-      {
         "id": "nba-cha-yahoo-sports",
-        "name": "Yahoo Sports",
+        "name": "Yahoo! Sports",
         "browserUrl": "https://sports.yahoo.com/nba/teams/charlotte/",
         "category": "news"
       },
       {
-        "id": "nba-cha-marca-2",
-        "name": "MARCA",
-        "browserUrl": "https://www.marca.com/en/basketball/nba/charlotte-hornets.html",
+        "id": "nba-cha-the-athletic",
+        "name": "The Athletic",
+        "browserUrl": "https://www.nytimes.com/athletic/nba/team/hornets/",
+        "category": "news"
+      },
+      {
+        "id": "nba-cha-b-r",
+        "name": "B/R",
+        "browserUrl": "https://bleacherreport.com/charlotte-hornets",
+        "category": "news"
+      },
+      {
+        "id": "nba-cha-nbc-sports",
+        "name": "NBC Sports",
+        "browserUrl": "https://www.nbcsports.com/nba/charlotte-hornets",
+        "category": "news"
+      },
+      {
+        "id": "nba-cha-si",
+        "name": "SI",
+        "browserUrl": "https://www.si.com/nba/hornets",
+        "category": "news"
+      },
+      {
+        "id": "nba-cha-usa-today",
+        "name": "USA Today",
+        "browserUrl": "https://sportsdata.usatoday.com/basketball/nba/teams/charlotte-hornets/5312/",
+        "category": "news"
+      },
+      {
+        "id": "nba-cha-athlon-sports",
+        "name": "Athlon Sports",
+        "browserUrl": "https://athlonsports.com/nba/charlotte-hornets",
+        "category": "news"
+      },
+      {
+        "id": "nba-cha-yardbarker",
+        "name": "Yardbarker",
+        "browserUrl": "https://www.yardbarker.com/nba/teams/charlotte_hornets/74",
+        "category": "news"
+      },
+      {
+        "id": "nba-cha-spotrac",
+        "name": "Spotrac",
+        "browserUrl": "https://www.spotrac.com/nba/charlotte-hornets/overview",
+        "category": "news"
+      },
+      {
+        "id": "nba-cha-statmuse",
+        "name": "StatMuse",
+        "browserUrl": "https://www.statmuse.com/nba/ask/charlotte-hornets-stats",
+        "category": "news"
+      },
+      {
+        "id": "nba-cha-newsnow",
+        "name": "NewsNow",
+        "browserUrl": "https://www.newsnow.co.uk/h/Sport/US+Sports/NBA/Charlotte+Hornets",
+        "category": "news"
+      },
+      {
+        "id": "nba-cha-sportspyder",
+        "name": "SportSpyder",
+        "browserUrl": "https://sportspyder.com/nba/charlotte-hornets/news",
+        "category": "news"
+      },
+      {
+        "id": "nba-cha-reddit",
+        "name": "Reddit",
+        "browserUrl": "https://www.reddit.com/r/CharlotteHornets/",
+        "category": "news"
+      },
+      {
+        "id": "nba-cha-hornets",
+        "name": "@Hornets",
+        "browserUrl": "https://x.com/Hornets",
+        "category": "news"
+      },
+      {
+        "id": "nba-cha-charlotte-hornets",
+        "name": "#Charlotte Hornets",
+        "browserUrl": "https://x.com/search?q=charlotte%20hornets&src=typed_query",
         "category": "news"
       }
     ],
     "CHI": [
       {
-        "id": "nba-chi-marca",
-        "name": "Marca",
-        "browserUrl": "https://www.marca.com/en/basketball/nba/chicago-bulls.html",
-        "category": "news"
-      },
-      {
-        "id": "nba-chi-the-athletic",
-        "name": "The Athletic",
-        "browserUrl": "https://www.nytimes.com/athletic/nba/team/bulls/",
-        "category": "news"
-      },
-      {
-        "id": "nba-chi-the-cold-wire",
-        "name": "The Cold Wire",
-        "browserUrl": "https://www.thecoldwire.com/sports/nba/chicago-bulls/",
-        "category": "news"
-      },
-      {
-        "id": "nba-chi-chicago-sun-times",
-        "name": "Chicago Sun-Times",
-        "browserUrl": "https://chicago.suntimes.com/bulls",
-        "category": "news"
-      },
-      {
-        "id": "nba-chi-hoops-rumors",
-        "name": "Hoops Rumors",
-        "browserUrl": "https://www.hoopsrumors.com/chicago-bulls",
-        "category": "news"
-      },
-      {
-        "id": "nba-chi-bleacher-nation",
-        "name": "Bleacher Nation",
-        "browserUrl": "https://www.bleachernation.com/bulls/",
-        "category": "news"
-      },
-      {
-        "id": "nba-chi-sports-mockery",
-        "name": "Sports Mockery",
-        "browserUrl": "https://www.sportsmockery.com/chicago-bulls/",
-        "category": "news"
-      },
-      {
-        "id": "nba-chi-sportspyder",
-        "name": "SportSpyder",
-        "browserUrl": "https://sportspyder.com/nba/chicago-bulls/news",
-        "category": "news"
-      },
-      {
-        "id": "nba-chi-blogabull",
-        "name": "BlogABull",
-        "browserUrl": "https://www.blogabull.com",
-        "category": "news"
-      },
-      {
-        "id": "nba-chi-pippen-ain-t-easy",
-        "name": "Pippen Ain't Easy",
-        "browserUrl": "https://pippenainteasy.com",
-        "category": "news"
-      },
-      {
-        "id": "nba-chi-chicago-bulls",
-        "name": "Chicago Bulls",
-        "browserUrl": "https://www.nba.com/bulls",
+        "id": "nba-chi-nba-com",
+        "name": "NBA.com",
+        "browserUrl": "https://www.nba.com/bulls/",
         "category": "news"
       },
       {
@@ -103810,203 +105760,113 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
         "category": "news"
       },
       {
-        "id": "nba-chi-da-windy-city",
-        "name": "Da Windy City",
-        "browserUrl": "https://dawindycity.com/chicago-bulls/",
+        "id": "nba-chi-cbs-sports",
+        "name": "CBS Sports",
+        "browserUrl": "https://www.cbssports.com/nba/teams/CHI/chicago-bulls/",
         "category": "news"
       },
       {
-        "id": "nba-chi-chicity-sports",
-        "name": "ChiCity Sports",
-        "browserUrl": "https://www.chicitysports.com/wp-content/uploads/2021/08/Chicago-bulls.png",
+        "id": "nba-chi-fox-sports",
+        "name": "FOX Sports",
+        "browserUrl": "https://www.foxsports.com/nba/chicago-bulls-team",
         "category": "news"
       },
       {
-        "id": "nba-chi-chicago-tribune",
-        "name": "Chicago Tribune",
-        "browserUrl": "https://www.chicagotribune.com/sports/nba/chicago-bulls/",
+        "id": "nba-chi-yahoo-sports",
+        "name": "Yahoo! Sports",
+        "browserUrl": "https://sports.yahoo.com/nba/teams/chicago/",
         "category": "news"
       },
       {
-        "id": "nba-chi-the-associated-press",
-        "name": "The Associated Press",
-        "browserUrl": "https://apnews.com/hub/chicago-bulls",
+        "id": "nba-chi-the-athletic",
+        "name": "The Athletic",
+        "browserUrl": "https://www.nytimes.com/athletic/nba/team/bulls/",
         "category": "news"
       },
       {
-        "id": "nba-chi-hoopshype",
-        "name": "HoopsHype",
-        "browserUrl": "https://www.hoopshype.com/rumors/?topic=405d8bcc-fb36-48bb-8870-95d5603bd7ae",
+        "id": "nba-chi-b-r",
+        "name": "B/R",
+        "browserUrl": "https://bleacherreport.com/chicago-bulls",
         "category": "news"
       },
       {
-        "id": "nba-chi-nesn-com",
-        "name": "NESN.com",
-        "browserUrl": "https://nesn.com",
+        "id": "nba-chi-nbc-sports",
+        "name": "NBC Sports",
+        "browserUrl": "https://www.nbcsports.com/nba/chicago-bulls",
         "category": "news"
       },
       {
-        "id": "nba-chi-marca-2",
-        "name": "MARCA",
-        "browserUrl": "https://www.marca.com/en/basketball/nba/chicago-bulls.html",
+        "id": "nba-chi-si",
+        "name": "SI",
+        "browserUrl": "https://www.si.com/nba/bulls",
         "category": "news"
       },
       {
-        "id": "nba-chi-associated-press",
-        "name": "Associated Press",
-        "browserUrl": "https://apnews.com/hub/chicago-bulls",
+        "id": "nba-chi-usa-today",
+        "name": "USA Today",
+        "browserUrl": "https://sportsdata.usatoday.com/basketball/nba/teams/chicago-bulls/4/",
+        "category": "news"
+      },
+      {
+        "id": "nba-chi-athlon-sports",
+        "name": "Athlon Sports",
+        "browserUrl": "https://athlonsports.com/nba/chicago-bulls",
+        "category": "news"
+      },
+      {
+        "id": "nba-chi-yardbarker",
+        "name": "Yardbarker",
+        "browserUrl": "https://www.yardbarker.com/nba/teams/chicago_bulls/68",
+        "category": "news"
+      },
+      {
+        "id": "nba-chi-spotrac",
+        "name": "Spotrac",
+        "browserUrl": "https://www.spotrac.com/nba/chicago-bulls/overview",
+        "category": "news"
+      },
+      {
+        "id": "nba-chi-statmuse",
+        "name": "StatMuse",
+        "browserUrl": "https://www.statmuse.com/nba/ask/chicago-bulls-stats",
+        "category": "news"
+      },
+      {
+        "id": "nba-chi-newsnow",
+        "name": "NewsNow",
+        "browserUrl": "https://www.newsnow.co.uk/h/Sport/US+Sports/NBA/Chicago+Bulls",
+        "category": "news"
+      },
+      {
+        "id": "nba-chi-sportspyder",
+        "name": "SportSpyder",
+        "browserUrl": "https://sportspyder.com/nba/chicago-bulls/news",
+        "category": "news"
+      },
+      {
+        "id": "nba-chi-reddit",
+        "name": "Reddit",
+        "browserUrl": "https://www.reddit.com/r/chicagobulls/",
+        "category": "news"
+      },
+      {
+        "id": "nba-chi-chicagobulls",
+        "name": "@chicagobulls",
+        "browserUrl": "https://x.com/chicagobulls",
+        "category": "news"
+      },
+      {
+        "id": "nba-chi-chicago-bulls",
+        "name": "#Chicago Bulls",
+        "browserUrl": "https://x.com/search?q=chicago%20bulls&src=typed_query",
         "category": "news"
       }
     ],
     "CLE": [
       {
-        "id": "nba-cle-cavaliers-nation",
-        "name": "Cavaliers Nation",
-        "browserUrl": "https://cavaliersnation.com",
-        "category": "news"
-      },
-      {
-        "id": "nba-cle-cavs-theblog",
-        "name": "Cavs:TheBlog",
-        "browserUrl": "https://cavstheblog.com",
-        "category": "news"
-      },
-      {
-        "id": "nba-cle-the-cold-wire",
-        "name": "The Cold Wire",
-        "browserUrl": "https://www.thecoldwire.com/sports/nba/cleveland-cavaliers/",
-        "category": "news"
-      },
-      {
-        "id": "nba-cle-new-york-times",
-        "name": "New York Times",
-        "browserUrl": "https://www.nytimes.com/topic/organization/cleveland-cavaliers",
-        "category": "news"
-      },
-      {
-        "id": "nba-cle-the-athletic",
-        "name": "The Athletic",
-        "browserUrl": "https://www.nytimes.com/athletic/nba/team/cavaliers/",
-        "category": "news"
-      },
-      {
-        "id": "nba-cle-andscape",
-        "name": "Andscape",
-        "browserUrl": "https://andscape.com",
-        "category": "news"
-      },
-      {
-        "id": "nba-cle-hoops-rumors",
-        "name": "Hoops Rumors",
-        "browserUrl": "https://www.hoopsrumors.com/cleveland-cavaliers",
-        "category": "news"
-      },
-      {
-        "id": "nba-cle-sportspyder",
-        "name": "SportSpyder",
-        "browserUrl": "https://sportspyder.com/nba/cleveland-cavaliers/news",
-        "category": "news"
-      },
-      {
-        "id": "nba-cle-cleveland-cavaliers",
-        "name": "Cleveland Cavaliers",
-        "browserUrl": "https://www.nba.com/cavaliers",
-        "category": "news"
-      },
-      {
-        "id": "nba-cle-fear-the-sword",
-        "name": "Fear The Sword",
-        "browserUrl": "https://www.fearthesword.com",
-        "category": "news"
-      },
-      {
-        "id": "nba-cle-king-james-gospel",
-        "name": "King James Gospel",
-        "browserUrl": "https://kingjamesgospel.com",
-        "category": "news"
-      },
-      {
-        "id": "nba-cle-espn-blog",
-        "name": "ESPN Blog",
-        "browserUrl": "https://www.espn.com/blog/cleveland-cavaliers",
-        "category": "news"
-      },
-      {
-        "id": "nba-cle-cbssports",
-        "name": "CBSSports",
-        "browserUrl": "https://www.cbssports.com/nba/teams/CLE/cleveland-cavaliers/",
-        "category": "news"
-      },
-      {
-        "id": "nba-cle-fansided",
-        "name": "FanSided",
-        "browserUrl": "https://fansided.com/nba/cleveland-cavaliers/",
-        "category": "news"
-      },
-      {
-        "id": "nba-cle-yahoo-sports",
-        "name": "Yahoo Sports",
-        "browserUrl": "https://sports.yahoo.com/nba/teams/cleveland/",
-        "category": "news"
-      },
-      {
-        "id": "nba-cle-marca",
-        "name": "Marca",
-        "browserUrl": "https://www.marca.com/en/basketball/nba/cleveland-cavaliers.html",
-        "category": "news"
-      },
-      {
-        "id": "nba-cle-247sports",
-        "name": "247Sports",
-        "browserUrl": "https://247sports.com",
-        "category": "news"
-      },
-      {
-        "id": "nba-cle-fox-sports",
-        "name": "FOX Sports",
-        "browserUrl": "https://www.foxsports.com/nba/cleveland-cavaliers-team",
-        "category": "news"
-      },
-      {
-        "id": "nba-cle-audacy",
-        "name": "Audacy",
-        "browserUrl": "https://www.audacy.com",
-        "category": "news"
-      },
-      {
-        "id": "nba-cle-hoopshype",
-        "name": "HoopsHype",
-        "browserUrl": "https://www.hoopshype.com/rumors/?topic=90b53492-af62-4517-8ec8-642f11795510",
-        "category": "news"
-      },
-      {
-        "id": "nba-cle-nesn",
-        "name": "NESN",
-        "browserUrl": "https://nesn.com",
-        "category": "news"
-      },
-      {
-        "id": "nba-cle-cleveland19",
-        "name": "Cleveland19",
-        "browserUrl": "https://www.cleveland19.com",
-        "category": "news"
-      },
-      {
-        "id": "nba-cle-news-herald",
-        "name": "News-Herald",
-        "browserUrl": "https://www.news-herald.com/sports/",
-        "category": "news"
-      },
-      {
-        "id": "nba-cle-factory-of-sadness",
-        "name": "Factory of Sadness",
-        "browserUrl": "https://factoryofsadness.co",
-        "category": "news"
-      },
-      {
-        "id": "nba-cle-ny-times",
-        "name": "NY Times",
-        "browserUrl": "https://www.nytimes.com/topic/organization/cleveland-cavaliers",
+        "id": "nba-cle-nba-com",
+        "name": "NBA.com",
+        "browserUrl": "https://www.nba.com/cavaliers/",
         "category": "news"
       },
       {
@@ -104022,59 +105882,131 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
         "category": "news"
       },
       {
-        "id": "nba-cle-marca-2",
-        "name": "MARCA",
-        "browserUrl": "https://www.marca.com/en/basketball/nba/cleveland-cavaliers.html",
+        "id": "nba-cle-fox-sports",
+        "name": "FOX Sports",
+        "browserUrl": "https://www.foxsports.com/nba/cleveland-cavaliers-team",
+        "category": "news"
+      },
+      {
+        "id": "nba-cle-yahoo-sports",
+        "name": "Yahoo! Sports",
+        "browserUrl": "https://sports.yahoo.com/nba/teams/cleveland/",
+        "category": "news"
+      },
+      {
+        "id": "nba-cle-the-athletic",
+        "name": "The Athletic",
+        "browserUrl": "https://www.nytimes.com/athletic/nba/team/cavaliers/",
+        "category": "news"
+      },
+      {
+        "id": "nba-cle-b-r",
+        "name": "B/R",
+        "browserUrl": "https://bleacherreport.com/cleveland-cavaliers",
+        "category": "news"
+      },
+      {
+        "id": "nba-cle-nbc-sports",
+        "name": "NBC Sports",
+        "browserUrl": "https://www.nbcsports.com/nba/cleveland-cavaliers",
+        "category": "news"
+      },
+      {
+        "id": "nba-cle-si",
+        "name": "SI",
+        "browserUrl": "https://www.si.com/nba/cavaliers",
+        "category": "news"
+      },
+      {
+        "id": "nba-cle-usa-today",
+        "name": "USA Today",
+        "browserUrl": "https://sportsdata.usatoday.com/basketball/nba/teams/cleveland-cavaliers/5/",
+        "category": "news"
+      },
+      {
+        "id": "nba-cle-athlon-sports",
+        "name": "Athlon Sports",
+        "browserUrl": "https://athlonsports.com/nba/cleveland-cavaliers",
+        "category": "news"
+      },
+      {
+        "id": "nba-cle-yardbarker",
+        "name": "Yardbarker",
+        "browserUrl": "https://www.yardbarker.com/nba/teams/cleveland_cavaliers/69",
+        "category": "news"
+      },
+      {
+        "id": "nba-cle-spotrac",
+        "name": "Spotrac",
+        "browserUrl": "https://www.spotrac.com/nba/cleveland-cavaliers/overview",
+        "category": "news"
+      },
+      {
+        "id": "nba-cle-statmuse",
+        "name": "StatMuse",
+        "browserUrl": "https://www.statmuse.com/nba/ask/cleveland-cavaliers-stats",
+        "category": "news"
+      },
+      {
+        "id": "nba-cle-newsnow",
+        "name": "NewsNow",
+        "browserUrl": "https://www.newsnow.co.uk/h/Sport/US+Sports/NBA/Cleveland+Cavaliers",
+        "category": "news"
+      },
+      {
+        "id": "nba-cle-sportspyder",
+        "name": "SportSpyder",
+        "browserUrl": "https://sportspyder.com/nba/cleveland-cavaliers/news",
+        "category": "news"
+      },
+      {
+        "id": "nba-cle-reddit",
+        "name": "Reddit",
+        "browserUrl": "https://www.reddit.com/r/clevelandcavs/",
+        "category": "news"
+      },
+      {
+        "id": "nba-cle-cavs",
+        "name": "@cavs",
+        "browserUrl": "https://x.com/cavs",
+        "category": "news"
+      },
+      {
+        "id": "nba-cle-cleveland-cavaliers",
+        "name": "#Cleveland Cavaliers",
+        "browserUrl": "https://x.com/search?q=cleveland%20cavaliers&src=typed_query",
         "category": "news"
       }
     ],
     "DAL": [
       {
-        "id": "nba-dal-mavs-com",
-        "name": "Mavs.com",
-        "browserUrl": "https://www.nba.com/mavs/",
+        "id": "nba-dal-nba-com",
+        "name": "NBA.com",
+        "browserUrl": "https://www.nba.com/mavericks/",
+        "category": "news"
+      },
+      {
+        "id": "nba-dal-espn",
+        "name": "ESPN",
+        "browserUrl": "https://www.espn.com/nba/team/_/name/dal/dallas-mavericks",
+        "category": "news"
+      },
+      {
+        "id": "nba-dal-cbs-sports",
+        "name": "CBS Sports",
+        "browserUrl": "https://www.cbssports.com/nba/teams/DAL/dallas-mavericks/",
+        "category": "news"
+      },
+      {
+        "id": "nba-dal-fox-sports",
+        "name": "FOX Sports",
+        "browserUrl": "https://www.foxsports.com/nba/dallas-mavericks-team",
         "category": "news"
       },
       {
         "id": "nba-dal-yahoo-sports",
-        "name": "Yahoo Sports",
+        "name": "Yahoo! Sports",
         "browserUrl": "https://sports.yahoo.com/nba/teams/dallas/",
-        "category": "news"
-      },
-      {
-        "id": "nba-dal-sportspyder",
-        "name": "SportSpyder",
-        "browserUrl": "https://sportspyder.com/nba/dallas-mavericks/news",
-        "category": "news"
-      },
-      {
-        "id": "nba-dal-hoopshype",
-        "name": "HoopsHype",
-        "browserUrl": "https://www.hoopshype.com/rumors/?topic=e6751d65-4a81-4131-973c-176d23467b30",
-        "category": "news"
-      },
-      {
-        "id": "nba-dal-mavs-fans-for-life",
-        "name": "Mavs Fans For Life",
-        "browserUrl": "https://mavsfansforlife.com",
-        "category": "news"
-      },
-      {
-        "id": "nba-dal-the-cold-wire",
-        "name": "The Cold Wire",
-        "browserUrl": "https://www.thecoldwire.com/sports/nba/dallas-mavericks/",
-        "category": "news"
-      },
-      {
-        "id": "nba-dal-mavs-moneyball",
-        "name": "Mavs Moneyball",
-        "browserUrl": "https://www.mavsmoneyball.com",
-        "category": "news"
-      },
-      {
-        "id": "nba-dal-the-smoking-cuban",
-        "name": "The Smoking Cuban",
-        "browserUrl": "https://thesmokingcuban.com",
         "category": "news"
       },
       {
@@ -104084,89 +106016,89 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
         "category": "news"
       },
       {
-        "id": "nba-dal-sports-illustrated",
-        "name": "Sports Illustrated",
+        "id": "nba-dal-b-r",
+        "name": "B/R",
+        "browserUrl": "https://bleacherreport.com/dallas-mavericks",
+        "category": "news"
+      },
+      {
+        "id": "nba-dal-nbc-sports",
+        "name": "NBC Sports",
+        "browserUrl": "https://www.nbcsports.com/nba/dallas-mavericks",
+        "category": "news"
+      },
+      {
+        "id": "nba-dal-si",
+        "name": "SI",
         "browserUrl": "https://www.si.com/nba/mavericks",
         "category": "news"
       },
       {
-        "id": "nba-dal-nba",
-        "name": "NBA",
-        "browserUrl": "https://www.nba.com/mavs/",
+        "id": "nba-dal-usa-today",
+        "name": "USA Today",
+        "browserUrl": "https://sportsdata.usatoday.com/basketball/nba/teams/dallas-mavericks/6/",
         "category": "news"
       },
       {
-        "id": "nba-dal-espn",
-        "name": "ESPN",
-        "browserUrl": "https://www.espn.com/nba/team/_/name/dal/dallas-mavericks",
+        "id": "nba-dal-athlon-sports",
+        "name": "Athlon Sports",
+        "browserUrl": "https://athlonsports.com/nba/dallas-mavericks",
+        "category": "news"
+      },
+      {
+        "id": "nba-dal-yardbarker",
+        "name": "Yardbarker",
+        "browserUrl": "https://www.yardbarker.com/nba/teams/dallas_mavericks/77",
+        "category": "news"
+      },
+      {
+        "id": "nba-dal-spotrac",
+        "name": "Spotrac",
+        "browserUrl": "https://www.spotrac.com/nba/dallas-mavericks/overview",
+        "category": "news"
+      },
+      {
+        "id": "nba-dal-statmuse",
+        "name": "StatMuse",
+        "browserUrl": "https://www.statmuse.com/nba/ask/dallas-mavericks-stats",
+        "category": "news"
+      },
+      {
+        "id": "nba-dal-newsnow",
+        "name": "NewsNow",
+        "browserUrl": "https://www.newsnow.co.uk/h/Sport/US+Sports/NBA/Dallas+Mavericks",
+        "category": "news"
+      },
+      {
+        "id": "nba-dal-sportspyder",
+        "name": "SportSpyder",
+        "browserUrl": "https://sportspyder.com/nba/dallas-mavericks/news",
+        "category": "news"
+      },
+      {
+        "id": "nba-dal-reddit",
+        "name": "Reddit",
+        "browserUrl": "https://www.reddit.com/r/Mavericks/",
+        "category": "news"
+      },
+      {
+        "id": "nba-dal-dallasmavs",
+        "name": "@dallasmavs",
+        "browserUrl": "https://x.com/dallasmavs",
+        "category": "news"
+      },
+      {
+        "id": "nba-dal-dallas-mavericks",
+        "name": "#Dallas Mavericks",
+        "browserUrl": "https://x.com/search?q=dallas%20mavericks&src=typed_query",
         "category": "news"
       }
     ],
     "DEN": [
       {
-        "id": "nba-den-hoops-rumors",
-        "name": "Hoops Rumors",
-        "browserUrl": "https://www.hoopsrumors.com/denver-nuggets",
-        "category": "news"
-      },
-      {
-        "id": "nba-den-the-denver-post",
-        "name": "The Denver Post",
-        "browserUrl": "https://www.denverpost.com/sports/nba/denver-nuggets/",
-        "category": "news"
-      },
-      {
-        "id": "nba-den-yahoo-sports",
-        "name": "Yahoo Sports",
-        "browserUrl": "https://sports.yahoo.com/nba/teams/denver/",
-        "category": "news"
-      },
-      {
-        "id": "nba-den-sportspyder",
-        "name": "SportSpyder",
-        "browserUrl": "https://sportspyder.com/nba/denver-nuggets/news",
-        "category": "news"
-      },
-      {
-        "id": "nba-den-the-cold-wire",
-        "name": "The Cold Wire",
-        "browserUrl": "https://www.thecoldwire.com/sports/nba/denver-nuggets/",
-        "category": "news"
-      },
-      {
-        "id": "nba-den-hoopshype",
-        "name": "HoopsHype",
-        "browserUrl": "https://www.hoopshype.com/rumors/?topic=81d09f83-fd88-4a89-842b-d31778fd3b3c",
-        "category": "news"
-      },
-      {
-        "id": "nba-den-denver-stiffs",
-        "name": "Denver Stiffs",
-        "browserUrl": "https://www.denverstiffs.com",
-        "category": "news"
-      },
-      {
-        "id": "nba-den-nugg-love",
-        "name": "Nugg Love",
-        "browserUrl": "https://nugglove.com",
-        "category": "news"
-      },
-      {
-        "id": "nba-den-hoops-habit",
-        "name": "Hoops Habit",
-        "browserUrl": "https://hoopshabit.com/northwest-division/denver-nuggets/",
-        "category": "news"
-      },
-      {
-        "id": "nba-den-dnvr",
-        "name": "DNVR",
-        "browserUrl": "https://thednvr.com/nuggets",
-        "category": "news"
-      },
-      {
-        "id": "nba-den-the-athletic",
-        "name": "The Athletic",
-        "browserUrl": "https://www.nytimes.com/athletic/nba/team/nuggets/",
+        "id": "nba-den-nba-com",
+        "name": "NBA.com",
+        "browserUrl": "https://www.nba.com/nuggets/",
         "category": "news"
       },
       {
@@ -104180,79 +106112,109 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
         "name": "CBS Sports",
         "browserUrl": "https://www.cbssports.com/nba/teams/DEN/denver-nuggets/",
         "category": "news"
+      },
+      {
+        "id": "nba-den-fox-sports",
+        "name": "FOX Sports",
+        "browserUrl": "https://www.foxsports.com/nba/denver-nuggets-team",
+        "category": "news"
+      },
+      {
+        "id": "nba-den-yahoo-sports",
+        "name": "Yahoo! Sports",
+        "browserUrl": "https://sports.yahoo.com/nba/teams/denver/",
+        "category": "news"
+      },
+      {
+        "id": "nba-den-the-athletic",
+        "name": "The Athletic",
+        "browserUrl": "https://www.nytimes.com/athletic/nba/team/nuggets/",
+        "category": "news"
+      },
+      {
+        "id": "nba-den-b-r",
+        "name": "B/R",
+        "browserUrl": "https://bleacherreport.com/denver-nuggets",
+        "category": "news"
+      },
+      {
+        "id": "nba-den-nbc-sports",
+        "name": "NBC Sports",
+        "browserUrl": "https://www.nbcsports.com/nba/denver-nuggets",
+        "category": "news"
+      },
+      {
+        "id": "nba-den-si",
+        "name": "SI",
+        "browserUrl": "https://www.si.com/nba/nuggets",
+        "category": "news"
+      },
+      {
+        "id": "nba-den-usa-today",
+        "name": "USA Today",
+        "browserUrl": "https://sportsdata.usatoday.com/basketball/nba/teams/denver-nuggets/7",
+        "category": "news"
+      },
+      {
+        "id": "nba-den-athlon-sports",
+        "name": "Athlon Sports",
+        "browserUrl": "https://athlonsports.com/nba/denver-nuggets",
+        "category": "news"
+      },
+      {
+        "id": "nba-den-yardbarker",
+        "name": "Yardbarker",
+        "browserUrl": "https://www.yardbarker.com/nba/teams/denver_nuggets/82",
+        "category": "news"
+      },
+      {
+        "id": "nba-den-spotrac",
+        "name": "Spotrac",
+        "browserUrl": "https://www.spotrac.com/nba/denver-nuggets/overview",
+        "category": "news"
+      },
+      {
+        "id": "nba-den-statmuse",
+        "name": "StatMuse",
+        "browserUrl": "https://www.statmuse.com/nba/ask/denver-nuggets-stats",
+        "category": "news"
+      },
+      {
+        "id": "nba-den-newsnow",
+        "name": "NewsNow",
+        "browserUrl": "https://www.newsnow.co.uk/h/Sport/US+Sports/NBA/Denver+Nuggets",
+        "category": "news"
+      },
+      {
+        "id": "nba-den-sportspyder",
+        "name": "SportSpyder",
+        "browserUrl": "https://sportspyder.com/nba/denver-nuggets/news",
+        "category": "news"
+      },
+      {
+        "id": "nba-den-reddit",
+        "name": "Reddit",
+        "browserUrl": "https://www.reddit.com/r/denvernuggets/",
+        "category": "news"
+      },
+      {
+        "id": "nba-den-nuggets",
+        "name": "@nuggets",
+        "browserUrl": "https://x.com/nuggets",
+        "category": "news"
+      },
+      {
+        "id": "nba-den-denver-nuggets",
+        "name": "#Denver Nuggets",
+        "browserUrl": "https://x.com/search?q=denver%20nuggets&src=typed_query",
+        "category": "news"
       }
     ],
     "DET": [
       {
-        "id": "nba-det-wxyz-detroit",
-        "name": "WXYZ Detroit",
-        "browserUrl": "https://www.wxyz.com/sports/basketball/pistons",
-        "category": "news"
-      },
-      {
-        "id": "nba-det-hoops-rumors",
-        "name": "Hoops Rumors",
-        "browserUrl": "https://www.hoopsrumors.com/detroit-pistons",
-        "category": "news"
-      },
-      {
-        "id": "nba-det-the-athletic",
-        "name": "The Athletic",
-        "browserUrl": "https://www.nytimes.com/athletic/nba/team/pistons/",
-        "category": "news"
-      },
-      {
-        "id": "nba-det-the-cold-wire",
-        "name": "The Cold Wire",
-        "browserUrl": "https://www.thecoldwire.com/sports/nba/detroit-pistons/",
-        "category": "news"
-      },
-      {
-        "id": "nba-det-detroit-bad-boys",
-        "name": "Detroit Bad Boys",
-        "browserUrl": "https://www.detroitbadboys.com",
-        "category": "news"
-      },
-      {
-        "id": "nba-det-pistonpowered",
-        "name": "PistonPowered",
-        "browserUrl": "https://pistonpowered.com",
-        "category": "news"
-      },
-      {
-        "id": "nba-det-palace-of-pistons",
-        "name": "Palace of Pistons",
-        "browserUrl": "https://www.palaceofpistons.com",
-        "category": "news"
-      },
-      {
-        "id": "nba-det-detroit-free-press",
-        "name": "Detroit Free Press",
-        "browserUrl": "https://www.freep.com/sports/pistons/",
-        "category": "news"
-      },
-      {
-        "id": "nba-det-the-detroit-news",
-        "name": "The Detroit News",
-        "browserUrl": "https://www.detroitnews.com/sports/pistons/",
-        "category": "news"
-      },
-      {
-        "id": "nba-det-yahoo-sports",
-        "name": "Yahoo Sports",
-        "browserUrl": "https://sports.yahoo.com/nba/teams/detroit/",
-        "category": "news"
-      },
-      {
-        "id": "nba-det-hoopshype",
-        "name": "HoopsHype",
-        "browserUrl": "https://www.hoopshype.com/rumors/?topic=3cf4207f-5b2d-4335-b9df-baab70e08bac",
-        "category": "news"
-      },
-      {
-        "id": "nba-det-detroit-jock-city",
-        "name": "Detroit Jock City",
-        "browserUrl": "https://detroitjockcity.com/detroit-pistons/",
+        "id": "nba-det-nba-com",
+        "name": "NBA.com",
+        "browserUrl": "https://www.nba.com/pistons/",
         "category": "news"
       },
       {
@@ -104268,101 +106230,223 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
         "category": "news"
       },
       {
+        "id": "nba-det-fox-sports",
+        "name": "FOX Sports",
+        "browserUrl": "https://www.foxsports.com/nba/detroit-pistons-team",
+        "category": "news"
+      },
+      {
+        "id": "nba-det-yahoo-sports",
+        "name": "Yahoo! Sports",
+        "browserUrl": "https://sports.yahoo.com/nba/teams/detroit/",
+        "category": "news"
+      },
+      {
+        "id": "nba-det-the-athletic",
+        "name": "The Athletic",
+        "browserUrl": "https://www.nytimes.com/athletic/nba/team/pistons/",
+        "category": "news"
+      },
+      {
+        "id": "nba-det-b-r",
+        "name": "B/R",
+        "browserUrl": "https://bleacherreport.com/detroit-pistons",
+        "category": "news"
+      },
+      {
+        "id": "nba-det-nbc-sports",
+        "name": "NBC Sports",
+        "browserUrl": "https://www.nbcsports.com/nba/detroit-pistons",
+        "category": "news"
+      },
+      {
+        "id": "nba-det-si",
+        "name": "SI",
+        "browserUrl": "https://www.si.com/nba/pistons",
+        "category": "news"
+      },
+      {
+        "id": "nba-det-usa-today",
+        "name": "USA Today",
+        "browserUrl": "https://sportsdata.usatoday.com/basketball/nba/teams/detroit-pistons/8/",
+        "category": "news"
+      },
+      {
+        "id": "nba-det-athlon-sports",
+        "name": "Athlon Sports",
+        "browserUrl": "https://athlonsports.com/nba/detroit-pistons",
+        "category": "news"
+      },
+      {
+        "id": "nba-det-yardbarker",
+        "name": "Yardbarker",
+        "browserUrl": "https://www.yardbarker.com/nba/teams/detroit_pistons/70",
+        "category": "news"
+      },
+      {
+        "id": "nba-det-spotrac",
+        "name": "Spotrac",
+        "browserUrl": "https://www.spotrac.com/nba/detroit-pistons/overview",
+        "category": "news"
+      },
+      {
+        "id": "nba-det-statmuse",
+        "name": "StatMuse",
+        "browserUrl": "https://www.statmuse.com/nba/ask/detroit-pistons-stats",
+        "category": "news"
+      },
+      {
+        "id": "nba-det-newsnow",
+        "name": "NewsNow",
+        "browserUrl": "https://www.newsnow.co.uk/h/Sport/US+Sports/NBA/Detroit+Pistons",
+        "category": "news"
+      },
+      {
         "id": "nba-det-sportspyder",
         "name": "SportSpyder",
         "browserUrl": "https://sportspyder.com/nba/detroit-pistons/news",
+        "category": "news"
+      },
+      {
+        "id": "nba-det-reddit",
+        "name": "Reddit",
+        "browserUrl": "https://www.reddit.com/r/DetroitPistons/",
+        "category": "news"
+      },
+      {
+        "id": "nba-det-detroitpistons",
+        "name": "@DetroitPistons",
+        "browserUrl": "https://x.com/DetroitPistons",
+        "category": "news"
+      },
+      {
+        "id": "nba-det-detroit-pistons",
+        "name": "#Detroit Pistons",
+        "browserUrl": "https://x.com/search?q=detroit%20pistons&src=typed_query",
+        "category": "news"
+      }
+    ],
+    "GSW": [
+      {
+        "id": "nba-gsw-nba-com",
+        "name": "NBA.com",
+        "browserUrl": "https://www.nba.com/warriors/",
+        "category": "news"
+      },
+      {
+        "id": "nba-gsw-espn",
+        "name": "ESPN",
+        "browserUrl": "https://www.espn.com/nba/team/_/name/gs/golden-state-warriors",
+        "category": "news"
+      },
+      {
+        "id": "nba-gsw-cbs-sports",
+        "name": "CBS Sports",
+        "browserUrl": "https://www.cbssports.com/nba/teams/GS/golden-state-warriors/",
+        "category": "news"
+      },
+      {
+        "id": "nba-gsw-fox-sports",
+        "name": "FOX Sports",
+        "browserUrl": "https://www.foxsports.com/nba/golden-state-warriors-team",
+        "category": "news"
+      },
+      {
+        "id": "nba-gsw-yahoo-sports",
+        "name": "Yahoo! Sports",
+        "browserUrl": "https://sports.yahoo.com/nba/teams/golden-state/",
+        "category": "news"
+      },
+      {
+        "id": "nba-gsw-the-athletic",
+        "name": "The Athletic",
+        "browserUrl": "https://www.nytimes.com/athletic/nba/team/warriors/",
+        "category": "news"
+      },
+      {
+        "id": "nba-gsw-b-r",
+        "name": "B/R",
+        "browserUrl": "https://bleacherreport.com/golden-state-warriors",
+        "category": "news"
+      },
+      {
+        "id": "nba-gsw-nbc-sports",
+        "name": "NBC Sports",
+        "browserUrl": "https://www.nbcsports.com/nba/golden-state-warriors",
+        "category": "news"
+      },
+      {
+        "id": "nba-gsw-si",
+        "name": "SI",
+        "browserUrl": "https://www.si.com/nba/warriors",
+        "category": "news"
+      },
+      {
+        "id": "nba-gsw-usa-today",
+        "name": "USA Today",
+        "browserUrl": "https://sportsdata.usatoday.com/basketball/nba/teams/golden-state-warriors/9/",
+        "category": "news"
+      },
+      {
+        "id": "nba-gsw-athlon-sports",
+        "name": "Athlon Sports",
+        "browserUrl": "https://athlonsports.com/nba/golden-state-warriors",
+        "category": "news"
+      },
+      {
+        "id": "nba-gsw-yardbarker",
+        "name": "Yardbarker",
+        "browserUrl": "https://www.yardbarker.com/nba/teams/golden_state_warriors/87",
+        "category": "news"
+      },
+      {
+        "id": "nba-gsw-spotrac",
+        "name": "Spotrac",
+        "browserUrl": "https://www.spotrac.com/nba/golden-state-warriors/overview",
+        "category": "news"
+      },
+      {
+        "id": "nba-gsw-statmuse",
+        "name": "StatMuse",
+        "browserUrl": "https://www.statmuse.com/nba/ask/golden-state-warriors-stats",
+        "category": "news"
+      },
+      {
+        "id": "nba-gsw-newsnow",
+        "name": "NewsNow",
+        "browserUrl": "https://www.newsnow.co.uk/h/Sport/US+Sports/NBA/Golden+State+Warriors",
+        "category": "news"
+      },
+      {
+        "id": "nba-gsw-sportspyder",
+        "name": "SportSpyder",
+        "browserUrl": "https://sportspyder.com/nba/golden-state-warriors/news",
+        "category": "news"
+      },
+      {
+        "id": "nba-gsw-reddit",
+        "name": "Reddit",
+        "browserUrl": "https://www.reddit.com/r/warriors/",
+        "category": "news"
+      },
+      {
+        "id": "nba-gsw-warriors",
+        "name": "@warriors",
+        "browserUrl": "https://x.com/warriors",
+        "category": "news"
+      },
+      {
+        "id": "nba-gsw-golden-state-warriors",
+        "name": "#Golden State Warriors",
+        "browserUrl": "https://x.com/search?q=golden%20state%20warriors&src=typed_query",
         "category": "news"
       }
     ],
     "HOU": [
       {
-        "id": "nba-hou-the-athletic",
-        "name": "The Athletic",
-        "browserUrl": "https://www.nytimes.com/athletic/nba/team/rockets/",
-        "category": "news"
-      },
-      {
-        "id": "nba-hou-realgm",
-        "name": "RealGM",
-        "browserUrl": "https://basketball.realgm.com/nba/teams/Houston-Rockets/10",
-        "category": "news"
-      },
-      {
-        "id": "nba-hou-sportspyder",
-        "name": "SportSpyder",
-        "browserUrl": "https://sportspyder.com/nba/houston-rockets/news",
-        "category": "news"
-      },
-      {
-        "id": "nba-hou-hoops-rumors",
-        "name": "Hoops Rumors",
-        "browserUrl": "https://www.hoopsrumors.com/houston-rockets",
-        "category": "news"
-      },
-      {
-        "id": "nba-hou-the-cold-wire",
-        "name": "The Cold Wire",
-        "browserUrl": "https://www.thecoldwire.com/sports/nba/houston-rockets/",
-        "category": "news"
-      },
-      {
-        "id": "nba-hou-the-rockets-wire",
-        "name": "The Rockets Wire",
-        "browserUrl": "https://rocketswire.usatoday.com",
-        "category": "news"
-      },
-      {
-        "id": "nba-hou-the-dream-shake",
-        "name": "The Dream Shake",
-        "browserUrl": "https://www.thedreamshake.com",
-        "category": "news"
-      },
-      {
-        "id": "nba-hou-yahoo-sports",
-        "name": "Yahoo Sports",
-        "browserUrl": "https://sports.yahoo.com/nba/teams/houston/",
-        "category": "news"
-      },
-      {
-        "id": "nba-hou-hoopshype",
-        "name": "HoopsHype",
-        "browserUrl": "https://www.hoopshype.com/rumors/?topic=13a51ca7-e216-40c0-a272-58d18f5541d7",
-        "category": "news"
-      },
-      {
-        "id": "nba-hou-slam",
-        "name": "SLAM",
-        "browserUrl": "https://slamonline.com/tag/houston-rockets/",
-        "category": "news"
-      },
-      {
-        "id": "nba-hou-space-city-scoop",
-        "name": "Space City Scoop",
-        "browserUrl": "https://spacecityscoop.com",
-        "category": "news"
-      },
-      {
-        "id": "nba-hou-clutchfans",
-        "name": "ClutchFans",
-        "browserUrl": "https://www.clutchfans.net/",
-        "category": "news"
-      },
-      {
-        "id": "nba-hou-houston-chronicle",
-        "name": "Houston Chronicle",
-        "browserUrl": "https://www.houstonchronicle.com/sports",
-        "category": "news"
-      },
-      {
-        "id": "nba-hou-click2houston",
-        "name": "Click2Houston",
-        "browserUrl": "https://www.click2houston.com/sports/",
-        "category": "news"
-      },
-      {
-        "id": "nba-hou-chron",
-        "name": "Chron",
-        "browserUrl": "https://www.chron.com/sports/",
+        "id": "nba-hou-nba-com",
+        "name": "NBA.com",
+        "browserUrl": "https://www.nba.com/rockets/",
         "category": "news"
       },
       {
@@ -104376,73 +106460,109 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
         "name": "CBS Sports",
         "browserUrl": "https://www.cbssports.com/nba/teams/HOU/houston-rockets/",
         "category": "news"
+      },
+      {
+        "id": "nba-hou-fox-sports",
+        "name": "FOX Sports",
+        "browserUrl": "https://www.foxsports.com/nba/houston-rockets-team",
+        "category": "news"
+      },
+      {
+        "id": "nba-hou-yahoo-sports",
+        "name": "Yahoo! Sports",
+        "browserUrl": "https://sports.yahoo.com/nba/teams/houston/",
+        "category": "news"
+      },
+      {
+        "id": "nba-hou-the-athletic",
+        "name": "The Athletic",
+        "browserUrl": "https://www.nytimes.com/athletic/nba/team/rockets/",
+        "category": "news"
+      },
+      {
+        "id": "nba-hou-b-r",
+        "name": "B/R",
+        "browserUrl": "https://bleacherreport.com/houston-rockets",
+        "category": "news"
+      },
+      {
+        "id": "nba-hou-nbc-sports",
+        "name": "NBC Sports",
+        "browserUrl": "https://www.nbcsports.com/nba/houston-rockets",
+        "category": "news"
+      },
+      {
+        "id": "nba-hou-si",
+        "name": "SI",
+        "browserUrl": "https://www.si.com/nba/rockets",
+        "category": "news"
+      },
+      {
+        "id": "nba-hou-usa-today",
+        "name": "USA Today",
+        "browserUrl": "https://sportsdata.usatoday.com/basketball/nba/teams/houston-rockets/10/",
+        "category": "news"
+      },
+      {
+        "id": "nba-hou-athlon-sports",
+        "name": "Athlon Sports",
+        "browserUrl": "https://athlonsports.com/nba/houston-rockets",
+        "category": "news"
+      },
+      {
+        "id": "nba-hou-yardbarker",
+        "name": "Yardbarker",
+        "browserUrl": "https://www.yardbarker.com/nba/teams/houston_rockets/78",
+        "category": "news"
+      },
+      {
+        "id": "nba-hou-spotrac",
+        "name": "Spotrac",
+        "browserUrl": "https://www.spotrac.com/nba/houston-rockets/overview",
+        "category": "news"
+      },
+      {
+        "id": "nba-hou-statmuse",
+        "name": "StatMuse",
+        "browserUrl": "https://www.statmuse.com/nba/ask/houston-rockets-stats",
+        "category": "news"
+      },
+      {
+        "id": "nba-hou-newsnow",
+        "name": "NewsNow",
+        "browserUrl": "https://www.newsnow.co.uk/h/Sport/US+Sports/NBA/Houston+Rockets",
+        "category": "news"
+      },
+      {
+        "id": "nba-hou-sportspyder",
+        "name": "SportSpyder",
+        "browserUrl": "https://sportspyder.com/nba/houston-rockets/news",
+        "category": "news"
+      },
+      {
+        "id": "nba-hou-reddit",
+        "name": "Reddit",
+        "browserUrl": "https://www.reddit.com/r/rockets/",
+        "category": "news"
+      },
+      {
+        "id": "nba-hou-houstonrockets",
+        "name": "@HoustonRockets",
+        "browserUrl": "https://x.com/HoustonRockets",
+        "category": "news"
+      },
+      {
+        "id": "nba-hou-houston-rockets",
+        "name": "#Houston Rockets",
+        "browserUrl": "https://x.com/search?q=houston%20rockets&src=typed_query",
+        "category": "news"
       }
     ],
     "IND": [
       {
-        "id": "nba-ind-indiana-pacers",
-        "name": "Indiana Pacers",
-        "browserUrl": "https://www.nba.com/pacers",
-        "category": "news"
-      },
-      {
-        "id": "nba-ind-wthr",
-        "name": "WTHR",
-        "browserUrl": "https://www.wthr.com/pacers",
-        "category": "news"
-      },
-      {
-        "id": "nba-ind-indystar",
-        "name": "IndyStar",
-        "browserUrl": "https://www.indystar.com/sports/pacers/",
-        "category": "news"
-      },
-      {
-        "id": "nba-ind-the-athletic",
-        "name": "The Athletic",
-        "browserUrl": "https://www.nytimes.com/athletic/nba/team/pacers/",
-        "category": "news"
-      },
-      {
-        "id": "nba-ind-sportspyder",
-        "name": "SportSpyder",
-        "browserUrl": "https://sportspyder.com/nba/indiana-pacers/news",
-        "category": "news"
-      },
-      {
-        "id": "nba-ind-hoops-rumors",
-        "name": "Hoops Rumors",
-        "browserUrl": "https://www.hoopsrumors.com/indiana-pacers",
-        "category": "news"
-      },
-      {
-        "id": "nba-ind-pacers-digest",
-        "name": "Pacers Digest",
-        "browserUrl": "https://www.pacersdigest.com",
-        "category": "news"
-      },
-      {
-        "id": "nba-ind-8-points-9-seconds",
-        "name": "8 Points, 9 Seconds",
-        "browserUrl": "https://8points9seconds.com",
-        "category": "news"
-      },
-      {
-        "id": "nba-ind-indy-cornrows",
-        "name": "Indy Cornrows",
-        "browserUrl": "https://www.indycornrows.com",
-        "category": "news"
-      },
-      {
-        "id": "nba-ind-the-cold-wire",
-        "name": "The Cold Wire",
-        "browserUrl": "https://www.thecoldwire.com/sports/nba/indiana-pacers/",
-        "category": "news"
-      },
-      {
-        "id": "nba-ind-hoopshype",
-        "name": "HoopsHype",
-        "browserUrl": "https://www.hoopshype.com/rumors/?topic=9c580fdc-190c-4799-8818-97e0f670368a",
+        "id": "nba-ind-nba-com",
+        "name": "NBA.com",
+        "browserUrl": "https://www.nba.com/pacers/",
         "category": "news"
       },
       {
@@ -104458,169 +106578,107 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
         "category": "news"
       },
       {
+        "id": "nba-ind-fox-sports",
+        "name": "FOX Sports",
+        "browserUrl": "https://www.foxsports.com/nba/indiana-pacers-team",
+        "category": "news"
+      },
+      {
         "id": "nba-ind-yahoo-sports",
-        "name": "Yahoo Sports",
+        "name": "Yahoo! Sports",
         "browserUrl": "https://sports.yahoo.com/nba/teams/indiana/",
         "category": "news"
-      }
-    ],
-    "GSW": [
-      {
-        "id": "nba-gsw-golden-state-of-mind",
-        "name": "Golden State of Mind",
-        "browserUrl": "https://www.goldenstateofmind.com",
-        "category": "news"
       },
       {
-        "id": "nba-gsw-warriors-wire",
-        "name": "Warriors Wire",
-        "browserUrl": "https://warriorswire.usatoday.com",
-        "category": "news"
-      },
-      {
-        "id": "nba-gsw-the-athletic",
+        "id": "nba-ind-the-athletic",
         "name": "The Athletic",
-        "browserUrl": "https://www.nytimes.com/athletic/nba/team/warriors/",
+        "browserUrl": "https://www.nytimes.com/athletic/nba/team/pacers/",
         "category": "news"
       },
       {
-        "id": "nba-gsw-nbc-sports-bay-area",
-        "name": "NBC Sports Bay Area",
-        "browserUrl": "https://www.nbcsportsbayarea.com/nba/golden-state-warriors/",
+        "id": "nba-ind-b-r",
+        "name": "B/R",
+        "browserUrl": "https://bleacherreport.com/indiana-pacers",
         "category": "news"
       },
       {
-        "id": "nba-gsw-san-francisco-chronicle",
-        "name": "San Francisco Chronicle",
-        "browserUrl": "https://www.sfchronicle.com/sports/warriors/",
+        "id": "nba-ind-nbc-sports",
+        "name": "NBC Sports",
+        "browserUrl": "https://www.nbcsports.com/nba/indiana-pacers",
         "category": "news"
       },
       {
-        "id": "nba-gsw-mercury-news",
-        "name": "Mercury News",
-        "browserUrl": "https://www.mercurynews.com/2010/08/10/golden-state-warriors-2010-schedule-released/",
+        "id": "nba-ind-si",
+        "name": "SI",
+        "browserUrl": "https://www.si.com/nba/pacers",
         "category": "news"
       },
       {
-        "id": "nba-gsw-sportspyder",
+        "id": "nba-ind-usa-today",
+        "name": "USA Today",
+        "browserUrl": "https://sportsdata.usatoday.com/basketball/nba/teams/indiana-pacers/11/",
+        "category": "news"
+      },
+      {
+        "id": "nba-ind-athlon-sports",
+        "name": "Athlon Sports",
+        "browserUrl": "https://athlonsports.com/nba/indiana-pacers",
+        "category": "news"
+      },
+      {
+        "id": "nba-ind-yardbarker",
+        "name": "Yardbarker",
+        "browserUrl": "https://www.yardbarker.com/nba/teams/indiana_pacers/71",
+        "category": "news"
+      },
+      {
+        "id": "nba-ind-spotrac",
+        "name": "Spotrac",
+        "browserUrl": "https://www.spotrac.com/nba/indiana-pacers/overview",
+        "category": "news"
+      },
+      {
+        "id": "nba-ind-statmuse",
+        "name": "StatMuse",
+        "browserUrl": "https://www.statmuse.com/nba/ask/indiana-pacers-stats",
+        "category": "news"
+      },
+      {
+        "id": "nba-ind-newsnow",
+        "name": "NewsNow",
+        "browserUrl": "https://www.newsnow.co.uk/h/Sport/US+Sports/NBA/Indiana+Pacers",
+        "category": "news"
+      },
+      {
+        "id": "nba-ind-sportspyder",
         "name": "SportSpyder",
-        "browserUrl": "https://sportspyder.com/nba/golden-state-warriors/news",
+        "browserUrl": "https://sportspyder.com/nba/indiana-pacers/news",
         "category": "news"
       },
       {
-        "id": "nba-gsw-hoops-rumors",
-        "name": "Hoops Rumors",
-        "browserUrl": "https://www.hoopsrumors.com/golden-state-warriors",
+        "id": "nba-ind-reddit",
+        "name": "Reddit",
+        "browserUrl": "https://www.reddit.com/r/pacers/",
         "category": "news"
       },
       {
-        "id": "nba-gsw-hoopshype",
-        "name": "HoopsHype",
-        "browserUrl": "https://www.hoopshype.com/rumors/?topic=b851f12c-2556-43d0-b31a-c0eca28025da",
+        "id": "nba-ind-pacers",
+        "name": "@Pacers",
+        "browserUrl": "https://x.com/Pacers",
         "category": "news"
       },
       {
-        "id": "nba-gsw-the-cold-wire",
-        "name": "The Cold Wire",
-        "browserUrl": "https://www.thecoldwire.com/sports/nba/golden-state-warriors/",
-        "category": "news"
-      },
-      {
-        "id": "nba-gsw-golden-state-warriors",
-        "name": "Golden State Warriors",
-        "browserUrl": "https://www.nba.com/warriors",
-        "category": "news"
-      },
-      {
-        "id": "nba-gsw-espn",
-        "name": "ESPN",
-        "browserUrl": "https://www.espn.com/nba/team/_/name/gs/golden-state-warriors",
-        "category": "news"
-      },
-      {
-        "id": "nba-gsw-yahoo-sports",
-        "name": "Yahoo Sports",
-        "browserUrl": "https://sports.yahoo.com/nba/teams/golden-state/",
-        "category": "news"
-      },
-      {
-        "id": "nba-gsw-bleacher-report",
-        "name": "Bleacher Report",
-        "browserUrl": "https://bleacherreport.com/golden-state-warriors",
-        "category": "news"
-      },
-      {
-        "id": "nba-gsw-sfgate",
-        "name": "SFGATE",
-        "browserUrl": "https://www.sfgate.com/warriors",
-        "category": "news"
-      },
-      {
-        "id": "nba-gsw-golden-state-of-mind-2",
-        "name": "Golden State Of Mind",
-        "browserUrl": "https://www.goldenstateofmind.com",
-        "category": "news"
-      },
-      {
-        "id": "nba-gsw-the-reporter",
-        "name": "The Reporter",
-        "browserUrl": "https://www.thereporter.com/sports/nba/golden-state-warriors/",
-        "category": "news"
-      },
-      {
-        "id": "nba-gsw-east-bay-times",
-        "name": "East Bay Times",
-        "browserUrl": "https://www.eastbaytimes.com/sports/nba/golden-state-warriors/",
-        "category": "news"
-      },
-      {
-        "id": "nba-gsw-cbs-sports",
-        "name": "CBS Sports",
-        "browserUrl": "https://www.cbssports.com/nba/teams/GS/golden-state-warriors/",
-        "category": "news"
-      },
-      {
-        "id": "nba-gsw-golden-state-warriors-news",
-        "name": "Golden State Warriors News",
-        "browserUrl": "https://www.nba.com/warriors/news",
+        "id": "nba-ind-indiana-pacers",
+        "name": "#Indiana Pacers",
+        "browserUrl": "https://x.com/search?q=indiana%20pacers&src=typed_query",
         "category": "news"
       }
     ],
     "LAC": [
       {
-        "id": "nba-lac-clips-nation",
-        "name": "Clips Nation",
-        "browserUrl": "https://www.clipsnation.com",
-        "category": "news"
-      },
-      {
-        "id": "nba-lac-the-athletic",
-        "name": "The Athletic",
-        "browserUrl": "https://www.nytimes.com/athletic/nba/team/clippers/",
-        "category": "news"
-      },
-      {
-        "id": "nba-lac-sportspyder",
-        "name": "SportSpyder",
-        "browserUrl": "https://sportspyder.com/nba/los-angeles-clippers/news",
-        "category": "news"
-      },
-      {
-        "id": "nba-lac-hoops-rumors",
-        "name": "Hoops Rumors",
-        "browserUrl": "https://www.hoopsrumors.com/los-angeles-clippers",
-        "category": "news"
-      },
-      {
-        "id": "nba-lac-the-cold-wire",
-        "name": "The Cold Wire",
-        "browserUrl": "https://www.thecoldwire.com/sports/nba/los-angeles-clippers/",
-        "category": "news"
-      },
-      {
-        "id": "nba-lac-clippers-com",
-        "name": "Clippers.com",
-        "browserUrl": "https://www.nba.com/clippers",
+        "id": "nba-lac-nba-com",
+        "name": "NBA.com",
+        "browserUrl": "https://www.nba.com/clippers/",
         "category": "news"
       },
       {
@@ -104630,107 +106688,119 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
         "category": "news"
       },
       {
+        "id": "nba-lac-cbs-sports",
+        "name": "CBS Sports",
+        "browserUrl": "https://www.cbssports.com/nba/teams/LAC/los-angeles-clippers/",
+        "category": "news"
+      },
+      {
+        "id": "nba-lac-fox-sports",
+        "name": "FOX Sports",
+        "browserUrl": "https://www.foxsports.com/nba/la-clippers-team",
+        "category": "news"
+      },
+      {
         "id": "nba-lac-yahoo-sports",
-        "name": "Yahoo Sports",
+        "name": "Yahoo! Sports",
         "browserUrl": "https://sports.yahoo.com/nba/teams/la-clippers/",
         "category": "news"
       },
       {
-        "id": "nba-lac-sports-illustrated",
-        "name": "Sports Illustrated",
+        "id": "nba-lac-the-athletic",
+        "name": "The Athletic",
+        "browserUrl": "https://www.nytimes.com/athletic/nba/team/clippers/",
+        "category": "news"
+      },
+      {
+        "id": "nba-lac-b-r",
+        "name": "B/R",
+        "browserUrl": "https://bleacherreport.com/la-clippers",
+        "category": "news"
+      },
+      {
+        "id": "nba-lac-nbc-sports",
+        "name": "NBC Sports",
+        "browserUrl": "https://www.nbcsports.com/nba/la-clippers",
+        "category": "news"
+      },
+      {
+        "id": "nba-lac-si",
+        "name": "SI",
         "browserUrl": "https://www.si.com/nba/clippers",
         "category": "news"
       },
       {
-        "id": "nba-lac-fansided",
-        "name": "FanSided",
-        "browserUrl": "https://fansided.com/nba/los-angeles-clippers/",
+        "id": "nba-lac-usa-today",
+        "name": "USA Today",
+        "browserUrl": "https://sportsdata.usatoday.com/basketball/nba/teams/los-angeles-clippers/12",
         "category": "news"
       },
       {
-        "id": "nba-lac-nba-official",
-        "name": "NBA Official",
-        "browserUrl": "https://www.nba.com/clippers",
+        "id": "nba-lac-athlon-sports",
+        "name": "Athlon Sports",
+        "browserUrl": "https://athlonsports.com/nba/la-clippers",
         "category": "news"
       },
       {
-        "id": "nba-lac-cbs-sports",
-        "name": "CBS Sports",
-        "browserUrl": "https://www.cbssports.com/nba/teams/LAC/los-angeles-clippers/",
+        "id": "nba-lac-yardbarker",
+        "name": "Yardbarker",
+        "browserUrl": "https://www.yardbarker.com/nba/teams/los_angeles_clippers/88",
+        "category": "news"
+      },
+      {
+        "id": "nba-lac-spotrac",
+        "name": "Spotrac",
+        "browserUrl": "https://www.spotrac.com/nba/los-angeles-clippers/overview",
+        "category": "news"
+      },
+      {
+        "id": "nba-lac-statmuse",
+        "name": "StatMuse",
+        "browserUrl": "https://www.statmuse.com/nba/ask/la-clippers-stats",
+        "category": "news"
+      },
+      {
+        "id": "nba-lac-newsnow",
+        "name": "NewsNow",
+        "browserUrl": "https://www.newsnow.co.uk/h/Sport/US+Sports/NBA/LA+Clippers",
+        "category": "news"
+      },
+      {
+        "id": "nba-lac-sportspyder",
+        "name": "SportSpyder",
+        "browserUrl": "https://sportspyder.com/nba/los-angeles-clippers/news",
+        "category": "news"
+      },
+      {
+        "id": "nba-lac-reddit",
+        "name": "Reddit",
+        "browserUrl": "https://www.reddit.com/r/LAClippers/",
+        "category": "news"
+      },
+      {
+        "id": "nba-lac-laclippers",
+        "name": "@LAClippers",
+        "browserUrl": "https://x.com/LAClippers",
+        "category": "news"
+      },
+      {
+        "id": "nba-lac-los-angeles-clippers",
+        "name": "#Los Angeles Clippers",
+        "browserUrl": "https://x.com/search?q=la%20clippers&src=typed_query",
         "category": "news"
       }
     ],
     "LAL": [
       {
-        "id": "nba-lal-silver-screen-and-roll",
-        "name": "Silver Screen and Roll",
-        "browserUrl": "https://www.silverscreenandroll.com",
-        "category": "news"
-      },
-      {
-        "id": "nba-lal-lakers-nation",
-        "name": "Lakers Nation",
-        "browserUrl": "https://lakersnation.com",
-        "category": "news"
-      },
-      {
-        "id": "nba-lal-lakers-daily",
-        "name": "Lakers Daily",
-        "browserUrl": "https://lakersdaily.com",
-        "category": "news"
-      },
-      {
-        "id": "nba-lal-the-athletic",
-        "name": "The Athletic",
-        "browserUrl": "https://www.nytimes.com/athletic/nba/team/lakers/",
-        "category": "news"
-      },
-      {
-        "id": "nba-lal-sportspyder",
-        "name": "SportSpyder",
-        "browserUrl": "https://sportspyder.com/nba/los-angeles-lakers/news",
-        "category": "news"
-      },
-      {
-        "id": "nba-lal-hoops-rumors",
-        "name": "Hoops Rumors",
-        "browserUrl": "https://www.hoopsrumors.com/los-angeles-lakers",
-        "category": "news"
-      },
-      {
-        "id": "nba-lal-the-cold-wire",
-        "name": "The Cold Wire",
-        "browserUrl": "https://www.thecoldwire.com/sports/nba/los-angeles-lakers/",
-        "category": "news"
-      },
-      {
-        "id": "nba-lal-los-angeles-lakers",
-        "name": "Los Angeles Lakers",
-        "browserUrl": "https://www.nba.com/lakers",
-        "category": "news"
-      },
-      {
-        "id": "nba-lal-hoopshype",
-        "name": "HoopsHype",
-        "browserUrl": "https://www.hoopshype.com/rumors/?topic=4d34a300-3059-4ec4-a4d3-4d636ac95816",
+        "id": "nba-lal-nba-com",
+        "name": "NBA.com",
+        "browserUrl": "https://www.nba.com/lakers/",
         "category": "news"
       },
       {
         "id": "nba-lal-espn",
         "name": "ESPN",
         "browserUrl": "https://www.espn.com/nba/team/_/name/lal/los-angeles-lakers",
-        "category": "news"
-      },
-      {
-        "id": "nba-lal-la-times",
-        "name": "LA Times",
-        "browserUrl": "https://www.latimes.com/sports/lakers",
-        "category": "news"
-      },
-      {
-        "id": "nba-lal-abc7-los-angeles",
-        "name": "ABC7 Los Angeles",
-        "browserUrl": "https://abc7.com/tag/los-angeles-lakers/",
         "category": "news"
       },
       {
@@ -104746,53 +106816,101 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
         "category": "news"
       },
       {
-        "id": "nba-lal-bleacher-report",
-        "name": "Bleacher Report",
+        "id": "nba-lal-yahoo-sports",
+        "name": "Yahoo! Sports",
+        "browserUrl": "https://sports.yahoo.com/nba/teams/los-angeles/",
+        "category": "news"
+      },
+      {
+        "id": "nba-lal-the-athletic",
+        "name": "The Athletic",
+        "browserUrl": "https://www.nytimes.com/athletic/nba/team/lakers/",
+        "category": "news"
+      },
+      {
+        "id": "nba-lal-b-r",
+        "name": "B/R",
         "browserUrl": "https://bleacherreport.com/los-angeles-lakers",
         "category": "news"
       },
       {
-        "id": "nba-lal-nba-official",
-        "name": "NBA Official",
-        "browserUrl": "https://www.nba.com/lakers",
+        "id": "nba-lal-nbc-sports",
+        "name": "NBC Sports",
+        "browserUrl": "https://www.nbcsports.com/nba/los-angeles-lakers",
+        "category": "news"
+      },
+      {
+        "id": "nba-lal-si",
+        "name": "SI",
+        "browserUrl": "https://www.si.com/nba/lakers",
+        "category": "news"
+      },
+      {
+        "id": "nba-lal-usa-today",
+        "name": "USA Today",
+        "browserUrl": "https://sportsdata.usatoday.com/basketball/nba/teams/los-angeles-lakers/13/",
+        "category": "news"
+      },
+      {
+        "id": "nba-lal-athlon-sports",
+        "name": "Athlon Sports",
+        "browserUrl": "https://athlonsports.com/nba/los-angeles-lakers",
+        "category": "news"
+      },
+      {
+        "id": "nba-lal-yardbarker",
+        "name": "Yardbarker",
+        "browserUrl": "https://www.yardbarker.com/nba/teams/los_angeles_lakers/89",
+        "category": "news"
+      },
+      {
+        "id": "nba-lal-spotrac",
+        "name": "Spotrac",
+        "browserUrl": "https://www.spotrac.com/nba/los-angeles-lakers/overview",
+        "category": "news"
+      },
+      {
+        "id": "nba-lal-statmuse",
+        "name": "StatMuse",
+        "browserUrl": "https://www.statmuse.com/nba/ask/los-angeles-lakers-stats",
+        "category": "news"
+      },
+      {
+        "id": "nba-lal-newsnow",
+        "name": "NewsNow",
+        "browserUrl": "https://www.newsnow.co.uk/h/Sport/US+Sports/NBA/Los+Angeles+Lakers",
+        "category": "news"
+      },
+      {
+        "id": "nba-lal-sportspyder",
+        "name": "SportSpyder",
+        "browserUrl": "https://sportspyder.com/nba/los-angeles-lakers/news",
+        "category": "news"
+      },
+      {
+        "id": "nba-lal-reddit",
+        "name": "Reddit",
+        "browserUrl": "https://www.reddit.com/r/lakers/",
+        "category": "news"
+      },
+      {
+        "id": "nba-lal-lakers",
+        "name": "@Lakers",
+        "browserUrl": "https://x.com/Lakers",
+        "category": "news"
+      },
+      {
+        "id": "nba-lal-los-angeles-lakers",
+        "name": "#Los Angeles Lakers",
+        "browserUrl": "https://x.com/search?q=los%20angeles%20lakers&src=typed_query",
         "category": "news"
       }
     ],
     "MEM": [
       {
-        "id": "nba-mem-the-athletic",
-        "name": "The Athletic",
-        "browserUrl": "https://www.nytimes.com/athletic/nba/team/grizzlies/",
-        "category": "news"
-      },
-      {
-        "id": "nba-mem-sportspyder",
-        "name": "SportSpyder",
-        "browserUrl": "https://sportspyder.com/nba/memphis-grizzlies/news",
-        "category": "news"
-      },
-      {
-        "id": "nba-mem-hoops-rumors",
-        "name": "Hoops Rumors",
-        "browserUrl": "https://www.hoopsrumors.com/memphis-grizzlies",
-        "category": "news"
-      },
-      {
-        "id": "nba-mem-the-cold-wire",
-        "name": "The Cold Wire",
-        "browserUrl": "https://www.thecoldwire.com/sports/nba/memphis-grizzlies/",
-        "category": "news"
-      },
-      {
-        "id": "nba-mem-grizzlies-com",
-        "name": "Grizzlies.com",
-        "browserUrl": "https://www.nba.com/grizzlies",
-        "category": "news"
-      },
-      {
-        "id": "nba-mem-hoopshype",
-        "name": "HoopsHype",
-        "browserUrl": "https://www.hoopshype.com/rumors/?topic=14fae80b-1f91-422e-983f-9b615a7fd757",
+        "id": "nba-mem-nba-com",
+        "name": "NBA.com",
+        "browserUrl": "https://www.nba.com/grizzlies/",
         "category": "news"
       },
       {
@@ -104802,89 +106920,113 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
         "category": "news"
       },
       {
+        "id": "nba-mem-cbs-sports",
+        "name": "CBS Sports",
+        "browserUrl": "https://www.cbssports.com/nba/teams/MEM/memphis-grizzlies/",
+        "category": "news"
+      },
+      {
+        "id": "nba-mem-fox-sports",
+        "name": "FOX Sports",
+        "browserUrl": "https://www.foxsports.com/nba/memphis-grizzlies-team",
+        "category": "news"
+      },
+      {
         "id": "nba-mem-yahoo-sports",
-        "name": "Yahoo Sports",
+        "name": "Yahoo! Sports",
         "browserUrl": "https://sports.yahoo.com/nba/teams/memphis/",
         "category": "news"
       },
       {
-        "id": "nba-mem-commercial-appeal",
-        "name": "Commercial Appeal",
-        "browserUrl": "https://www.commercialappeal.com/sports/grizzlies/",
+        "id": "nba-mem-the-athletic",
+        "name": "The Athletic",
+        "browserUrl": "https://www.nytimes.com/athletic/nba/team/grizzlies/",
         "category": "news"
       },
       {
-        "id": "nba-mem-si-com",
-        "name": "SI.com",
+        "id": "nba-mem-b-r",
+        "name": "B/R",
+        "browserUrl": "https://bleacherreport.com/memphis-grizzlies",
+        "category": "news"
+      },
+      {
+        "id": "nba-mem-nbc-sports",
+        "name": "NBC Sports",
+        "browserUrl": "https://www.nbcsports.com/nba/memphis-grizzlies",
+        "category": "news"
+      },
+      {
+        "id": "nba-mem-si",
+        "name": "SI",
         "browserUrl": "https://www.si.com/nba/grizzlies",
         "category": "news"
       },
       {
-        "id": "nba-mem-fansided",
-        "name": "FanSided",
-        "browserUrl": "https://fansided.com/nba/memphis-grizzlies/",
+        "id": "nba-mem-usa-today",
+        "name": "USA Today",
+        "browserUrl": "https://sportsdata.usatoday.com/basketball/nba/teams/memphis-grizzlies/29/",
         "category": "news"
       },
       {
-        "id": "nba-mem-cbs-sports",
-        "name": "CBS Sports",
-        "browserUrl": "https://www.cbssports.com/nba/teams/MEM/memphis-grizzlies/",
+        "id": "nba-mem-athlon-sports",
+        "name": "Athlon Sports",
+        "browserUrl": "https://athlonsports.com/nba/memphis-grizzlies",
+        "category": "news"
+      },
+      {
+        "id": "nba-mem-yardbarker",
+        "name": "Yardbarker",
+        "browserUrl": "https://www.yardbarker.com/nba/teams/memphis_grizzlies/79",
+        "category": "news"
+      },
+      {
+        "id": "nba-mem-spotrac",
+        "name": "Spotrac",
+        "browserUrl": "https://www.spotrac.com/nba/memphis-grizzlies/overview",
+        "category": "news"
+      },
+      {
+        "id": "nba-mem-statmuse",
+        "name": "StatMuse",
+        "browserUrl": "https://www.statmuse.com/nba/ask/memphis-grizzlies-stats",
+        "category": "news"
+      },
+      {
+        "id": "nba-mem-newsnow",
+        "name": "NewsNow",
+        "browserUrl": "https://www.newsnow.co.uk/h/Sport/US+Sports/NBA/Memphis+Grizzlies",
+        "category": "news"
+      },
+      {
+        "id": "nba-mem-sportspyder",
+        "name": "SportSpyder",
+        "browserUrl": "https://sportspyder.com/nba/memphis-grizzlies/news",
+        "category": "news"
+      },
+      {
+        "id": "nba-mem-reddit",
+        "name": "Reddit",
+        "browserUrl": "https://www.reddit.com/r/memphisgrizzlies/",
+        "category": "news"
+      },
+      {
+        "id": "nba-mem-memgrizz",
+        "name": "@memgrizz",
+        "browserUrl": "https://x.com/memgrizz",
+        "category": "news"
+      },
+      {
+        "id": "nba-mem-memphis-grizzlies",
+        "name": "#Memphis Grizzlies",
+        "browserUrl": "https://x.com/search?q=memphis%20grizzlies&src=typed_query",
         "category": "news"
       }
     ],
     "MIA": [
       {
-        "id": "nba-mia-hot-hot-hoops",
-        "name": "Hot Hot Hoops",
-        "browserUrl": "https://hothothoops.com/",
-        "category": "news"
-      },
-      {
-        "id": "nba-mia-the-athletic",
-        "name": "The Athletic",
-        "browserUrl": "https://www.nytimes.com/athletic/nba/team/heat/",
-        "category": "news"
-      },
-      {
-        "id": "nba-mia-sportspyder",
-        "name": "SportSpyder",
-        "browserUrl": "https://sportspyder.com/nba/miami-heat/news",
-        "category": "news"
-      },
-      {
-        "id": "nba-mia-hoops-rumors",
-        "name": "Hoops Rumors",
-        "browserUrl": "https://www.hoopsrumors.com/miami-heat",
-        "category": "news"
-      },
-      {
-        "id": "nba-mia-the-cold-wire",
-        "name": "The Cold Wire",
-        "browserUrl": "https://www.thecoldwire.com/sports/nba/miami-heat/",
-        "category": "news"
-      },
-      {
-        "id": "nba-mia-miami-heat",
-        "name": "Miami Heat",
-        "browserUrl": "https://www.nba.com/heat",
-        "category": "news"
-      },
-      {
-        "id": "nba-mia-heat-nation",
-        "name": "Heat Nation",
-        "browserUrl": "https://heatnation.com",
-        "category": "news"
-      },
-      {
-        "id": "nba-mia-all-u-can-heat",
-        "name": "All U Can Heat",
-        "browserUrl": "https://allucanheat.com",
-        "category": "news"
-      },
-      {
-        "id": "nba-mia-hoopshype",
-        "name": "HoopsHype",
-        "browserUrl": "https://www.hoopshype.com/rumors/?topic=2fc7081f-f0b3-4b1d-b589-781c9028a4e7",
+        "id": "nba-mia-nba-com",
+        "name": "NBA.com",
+        "browserUrl": "https://www.nba.com/heat/",
         "category": "news"
       },
       {
@@ -104894,71 +107036,113 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
         "category": "news"
       },
       {
+        "id": "nba-mia-cbs-sports",
+        "name": "CBS Sports",
+        "browserUrl": "https://www.cbssports.com/nba/teams/MIA/miami-heat/",
+        "category": "news"
+      },
+      {
+        "id": "nba-mia-fox-sports",
+        "name": "FOX Sports",
+        "browserUrl": "https://www.foxsports.com/nba/miami-heat-team",
+        "category": "news"
+      },
+      {
         "id": "nba-mia-yahoo-sports",
-        "name": "Yahoo Sports",
+        "name": "Yahoo! Sports",
         "browserUrl": "https://sports.yahoo.com/nba/teams/miami/",
         "category": "news"
       },
       {
-        "id": "nba-mia-south-florida-sun-sentinel",
-        "name": "South Florida Sun Sentinel",
-        "browserUrl": "https://www.sun-sentinel.com/sports/nba/miami-heat/",
+        "id": "nba-mia-the-athletic",
+        "name": "The Athletic",
+        "browserUrl": "https://www.nytimes.com/athletic/nba/team/heat/",
         "category": "news"
       },
       {
-        "id": "nba-mia-cbs-sports",
-        "name": "CBS Sports",
-        "browserUrl": "https://www.cbssports.com/nba/teams/MIA/miami-heat/",
+        "id": "nba-mia-b-r",
+        "name": "B/R",
+        "browserUrl": "https://bleacherreport.com/miami-heat",
+        "category": "news"
+      },
+      {
+        "id": "nba-mia-nbc-sports",
+        "name": "NBC Sports",
+        "browserUrl": "https://www.nbcsports.com/nba/miami-heat",
+        "category": "news"
+      },
+      {
+        "id": "nba-mia-si",
+        "name": "SI",
+        "browserUrl": "https://www.si.com/nba/heat",
+        "category": "news"
+      },
+      {
+        "id": "nba-mia-usa-today",
+        "name": "USA Today",
+        "browserUrl": "https://sportsdata.usatoday.com/basketball/nba/teams/miami-heat/14/",
+        "category": "news"
+      },
+      {
+        "id": "nba-mia-athlon-sports",
+        "name": "Athlon Sports",
+        "browserUrl": "https://athlonsports.com/nba/miami-heat",
+        "category": "news"
+      },
+      {
+        "id": "nba-mia-yardbarker",
+        "name": "Yardbarker",
+        "browserUrl": "https://www.yardbarker.com/nba/teams/miami_heat/75",
+        "category": "news"
+      },
+      {
+        "id": "nba-mia-spotrac",
+        "name": "Spotrac",
+        "browserUrl": "https://www.spotrac.com/nba/miami-heat/overview",
+        "category": "news"
+      },
+      {
+        "id": "nba-mia-statmuse",
+        "name": "StatMuse",
+        "browserUrl": "https://www.statmuse.com/nba/ask/miami-heat-stats",
+        "category": "news"
+      },
+      {
+        "id": "nba-mia-newsnow",
+        "name": "NewsNow",
+        "browserUrl": "https://www.newsnow.co.uk/h/Sport/US+Sports/NBA/Miami+Heat",
+        "category": "news"
+      },
+      {
+        "id": "nba-mia-sportspyder",
+        "name": "SportSpyder",
+        "browserUrl": "https://sportspyder.com/nba/miami-heat/news",
+        "category": "news"
+      },
+      {
+        "id": "nba-mia-reddit",
+        "name": "Reddit",
+        "browserUrl": "https://www.reddit.com/r/heat/",
+        "category": "news"
+      },
+      {
+        "id": "nba-mia-miamiheat",
+        "name": "@MiamiHEAT",
+        "browserUrl": "https://x.com/MiamiHEAT",
+        "category": "news"
+      },
+      {
+        "id": "nba-mia-miami-heat",
+        "name": "#Miami Heat",
+        "browserUrl": "https://x.com/search?q=miami%20heat&src=typed_query",
         "category": "news"
       }
     ],
     "MIL": [
       {
-        "id": "nba-mil-brew-hoop",
-        "name": "Brew Hoop",
-        "browserUrl": "https://www.brewhoop.com",
-        "category": "news"
-      },
-      {
-        "id": "nba-mil-the-athletic",
-        "name": "The Athletic",
-        "browserUrl": "https://www.nytimes.com/athletic/nba/team/bucks/",
-        "category": "news"
-      },
-      {
-        "id": "nba-mil-sportspyder",
-        "name": "SportSpyder",
-        "browserUrl": "https://sportspyder.com/nba/milwaukee-bucks/news",
-        "category": "news"
-      },
-      {
-        "id": "nba-mil-hoops-rumors",
-        "name": "Hoops Rumors",
-        "browserUrl": "https://www.hoopsrumors.com/milwaukee-bucks",
-        "category": "news"
-      },
-      {
-        "id": "nba-mil-the-cold-wire",
-        "name": "The Cold Wire",
-        "browserUrl": "https://www.thecoldwire.com/sports/nba/milwaukee-bucks/",
-        "category": "news"
-      },
-      {
-        "id": "nba-mil-milwaukee-bucks",
-        "name": "Milwaukee Bucks",
-        "browserUrl": "https://www.nba.com/bucks",
-        "category": "news"
-      },
-      {
-        "id": "nba-mil-behind-the-buck-pass",
-        "name": "Behind the Buck Pass",
-        "browserUrl": "https://behindthebuckpass.com",
-        "category": "news"
-      },
-      {
-        "id": "nba-mil-hoopshype",
-        "name": "HoopsHype",
-        "browserUrl": "https://www.hoopshype.com/rumors/?topic=095a6c49-6910-41a9-b78d-8bbd1d214447",
+        "id": "nba-mil-nba-com",
+        "name": "NBA.com",
+        "browserUrl": "https://www.nba.com/bucks/",
         "category": "news"
       },
       {
@@ -104968,83 +107152,113 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
         "category": "news"
       },
       {
+        "id": "nba-mil-cbs-sports",
+        "name": "CBS Sports",
+        "browserUrl": "https://www.cbssports.com/nba/teams/MIL/milwaukee-bucks/",
+        "category": "news"
+      },
+      {
+        "id": "nba-mil-fox-sports",
+        "name": "FOX Sports",
+        "browserUrl": "https://www.foxsports.com/nba/milwaukee-bucks-team",
+        "category": "news"
+      },
+      {
         "id": "nba-mil-yahoo-sports",
-        "name": "Yahoo Sports",
+        "name": "Yahoo! Sports",
         "browserUrl": "https://sports.yahoo.com/nba/teams/milwaukee/",
         "category": "news"
       },
       {
-        "id": "nba-mil-milwaukee-journal-sentinel",
-        "name": "Milwaukee Journal Sentinel",
-        "browserUrl": "https://www.jsonline.com/sports/bucks/",
+        "id": "nba-mil-the-athletic",
+        "name": "The Athletic",
+        "browserUrl": "https://www.nytimes.com/athletic/nba/team/bucks/",
         "category": "news"
       },
       {
-        "id": "nba-mil-fansided",
-        "name": "FanSided",
-        "browserUrl": "https://fansided.com/nba/milwaukee-bucks/",
+        "id": "nba-mil-b-r",
+        "name": "B/R",
+        "browserUrl": "https://bleacherreport.com/milwaukee-bucks",
         "category": "news"
       },
       {
-        "id": "nba-mil-cbs-sports",
-        "name": "CBS Sports",
-        "browserUrl": "https://www.cbssports.com/nba/teams/MIL/milwaukee-bucks/",
+        "id": "nba-mil-nbc-sports",
+        "name": "NBC Sports",
+        "browserUrl": "https://www.nbcsports.com/nba/milwaukee-bucks",
+        "category": "news"
+      },
+      {
+        "id": "nba-mil-si",
+        "name": "SI",
+        "browserUrl": "https://www.si.com/nba/bucks",
+        "category": "news"
+      },
+      {
+        "id": "nba-mil-usa-today",
+        "name": "USA Today",
+        "browserUrl": "https://sportsdata.usatoday.com/basketball/nba/teams/milwaukee-bucks/15/",
+        "category": "news"
+      },
+      {
+        "id": "nba-mil-athlon-sports",
+        "name": "Athlon Sports",
+        "browserUrl": "https://athlonsports.com/nba/milwaukee-bucks",
+        "category": "news"
+      },
+      {
+        "id": "nba-mil-yardbarker",
+        "name": "Yardbarker",
+        "browserUrl": "https://www.yardbarker.com/nba/teams/milwaukee_bucks/72",
+        "category": "news"
+      },
+      {
+        "id": "nba-mil-spotrac",
+        "name": "Spotrac",
+        "browserUrl": "https://www.spotrac.com/nba/milwaukee-bucks/overview",
+        "category": "news"
+      },
+      {
+        "id": "nba-mil-statmuse",
+        "name": "StatMuse",
+        "browserUrl": "https://www.statmuse.com/nba/ask/milwaukee-bucks-stats",
+        "category": "news"
+      },
+      {
+        "id": "nba-mil-newsnow",
+        "name": "NewsNow",
+        "browserUrl": "https://www.newsnow.co.uk/h/Sport/US+Sports/NBA/Milwaukee+Bucks",
+        "category": "news"
+      },
+      {
+        "id": "nba-mil-sportspyder",
+        "name": "SportSpyder",
+        "browserUrl": "https://sportspyder.com/nba/milwaukee-bucks/news",
+        "category": "news"
+      },
+      {
+        "id": "nba-mil-reddit",
+        "name": "Reddit",
+        "browserUrl": "https://www.reddit.com/r/MkeBucks/",
+        "category": "news"
+      },
+      {
+        "id": "nba-mil-bucks",
+        "name": "@Bucks",
+        "browserUrl": "https://x.com/Bucks",
+        "category": "news"
+      },
+      {
+        "id": "nba-mil-milwaukee-bucks",
+        "name": "#Milwaukee Bucks",
+        "browserUrl": "https://x.com/search?q=milwaukee%20bucks&src=typed_query",
         "category": "news"
       }
     ],
     "MIN": [
       {
-        "id": "nba-min-canis-hoopus",
-        "name": "Canis Hoopus",
-        "browserUrl": "https://www.canishoopus.com",
-        "category": "news"
-      },
-      {
-        "id": "nba-min-the-athletic",
-        "name": "The Athletic",
-        "browserUrl": "https://www.nytimes.com/athletic/nba/team/timberwolves/",
-        "category": "news"
-      },
-      {
-        "id": "nba-min-sportspyder",
-        "name": "SportSpyder",
-        "browserUrl": "https://sportspyder.com/nba/minnesota-timberwolves/news",
-        "category": "news"
-      },
-      {
-        "id": "nba-min-hoops-rumors",
-        "name": "Hoops Rumors",
-        "browserUrl": "https://www.hoopsrumors.com/minnesota-timberwolves",
-        "category": "news"
-      },
-      {
-        "id": "nba-min-the-cold-wire",
-        "name": "The Cold Wire",
-        "browserUrl": "https://www.thecoldwire.com/sports/nba/minnesota-timberwolves/",
-        "category": "news"
-      },
-      {
-        "id": "nba-min-minnesota-timberwolves",
-        "name": "Minnesota Timberwolves",
-        "browserUrl": "https://www.nba.com/timberwolves",
-        "category": "news"
-      },
-      {
-        "id": "nba-min-wolves-wire",
-        "name": "Wolves Wire",
-        "browserUrl": "https://www.usatoday.com/",
-        "category": "news"
-      },
-      {
-        "id": "nba-min-zone-coverage",
-        "name": "Zone Coverage",
-        "browserUrl": "https://zonecoverage.com/timberwolves/",
-        "category": "news"
-      },
-      {
-        "id": "nba-min-hoopshype",
-        "name": "HoopsHype",
-        "browserUrl": "https://www.hoopshype.com/rumors/?topic=ac5e47f0-6bd5-488e-9fd0-a3a235704d6f",
+        "id": "nba-min-nba-com",
+        "name": "NBA.com",
+        "browserUrl": "https://www.nba.com/timberwolves/",
         "category": "news"
       },
       {
@@ -105054,83 +107268,113 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
         "category": "news"
       },
       {
+        "id": "nba-min-cbs-sports",
+        "name": "CBS Sports",
+        "browserUrl": "https://www.cbssports.com/nba/teams/MIN/minnesota-timberwolves/",
+        "category": "news"
+      },
+      {
+        "id": "nba-min-fox-sports",
+        "name": "FOX Sports",
+        "browserUrl": "https://www.foxsports.com/nba/minnesota-timberwolves-team",
+        "category": "news"
+      },
+      {
         "id": "nba-min-yahoo-sports",
-        "name": "Yahoo Sports",
+        "name": "Yahoo! Sports",
         "browserUrl": "https://sports.yahoo.com/nba/teams/minnesota/",
         "category": "news"
       },
       {
-        "id": "nba-min-kstp",
-        "name": "KSTP",
-        "browserUrl": "https://kstp.com/tag/minnesota-timberwolves/",
+        "id": "nba-min-the-athletic",
+        "name": "The Athletic",
+        "browserUrl": "https://www.nytimes.com/athletic/nba/team/timberwolves/",
         "category": "news"
       },
       {
-        "id": "nba-min-pioneer-press",
-        "name": "Pioneer Press",
-        "browserUrl": "https://www.twincities.com/2011/01/15/timberwolves/",
+        "id": "nba-min-b-r",
+        "name": "B/R",
+        "browserUrl": "https://bleacherreport.com/minnesota-timberwolves",
         "category": "news"
       },
       {
-        "id": "nba-min-fansided",
-        "name": "FanSided",
-        "browserUrl": "https://fansided.com/nba/minnesota-timberwolves/",
+        "id": "nba-min-nbc-sports",
+        "name": "NBC Sports",
+        "browserUrl": "https://www.nbcsports.com/nba/minnesota-timberwolves",
         "category": "news"
       },
       {
-        "id": "nba-min-cbs-sports",
-        "name": "CBS Sports",
-        "browserUrl": "https://www.cbssports.com/nba/teams/MIN/minnesota-timberwolves/",
+        "id": "nba-min-si",
+        "name": "SI",
+        "browserUrl": "https://www.si.com/nba/timberwolves",
+        "category": "news"
+      },
+      {
+        "id": "nba-min-usa-today",
+        "name": "USA Today",
+        "browserUrl": "https://sportsdata.usatoday.com/basketball/nba/teams/minnesota-timberwolves/16/",
+        "category": "news"
+      },
+      {
+        "id": "nba-min-athlon-sports",
+        "name": "Athlon Sports",
+        "browserUrl": "https://athlonsports.com/nba/minnesota-timberwolves",
+        "category": "news"
+      },
+      {
+        "id": "nba-min-yardbarker",
+        "name": "Yardbarker",
+        "browserUrl": "https://www.yardbarker.com/nba/teams/minnesota_timberwolves/83",
+        "category": "news"
+      },
+      {
+        "id": "nba-min-spotrac",
+        "name": "Spotrac",
+        "browserUrl": "https://www.spotrac.com/nba/minnesota-timberwolves/overview",
+        "category": "news"
+      },
+      {
+        "id": "nba-min-statmuse",
+        "name": "StatMuse",
+        "browserUrl": "https://www.statmuse.com/nba/ask/minnesota-timberwolves-stats",
+        "category": "news"
+      },
+      {
+        "id": "nba-min-newsnow",
+        "name": "NewsNow",
+        "browserUrl": "https://www.newsnow.co.uk/h/Sport/US+Sports/NBA/Minnesota+Timberwolves",
+        "category": "news"
+      },
+      {
+        "id": "nba-min-sportspyder",
+        "name": "SportSpyder",
+        "browserUrl": "https://sportspyder.com/nba/minnesota-timberwolves/news",
+        "category": "news"
+      },
+      {
+        "id": "nba-min-reddit",
+        "name": "Reddit",
+        "browserUrl": "https://www.reddit.com/r/timberwolves/",
+        "category": "news"
+      },
+      {
+        "id": "nba-min-timberwolves",
+        "name": "@Timberwolves",
+        "browserUrl": "https://x.com/Timberwolves",
+        "category": "news"
+      },
+      {
+        "id": "nba-min-minnesota-timberwolves",
+        "name": "#Minnesota Timberwolves",
+        "browserUrl": "https://x.com/search?q=minnesota%20timberwolves&src=typed_query",
         "category": "news"
       }
     ],
     "NOP": [
       {
-        "id": "nba-nop-the-bird-writes",
-        "name": "The Bird Writes",
-        "browserUrl": "https://thebirdwrites.com/",
-        "category": "news"
-      },
-      {
-        "id": "nba-nop-the-athletic",
-        "name": "The Athletic",
-        "browserUrl": "https://www.nytimes.com/athletic/nba/team/pelicans/",
-        "category": "news"
-      },
-      {
-        "id": "nba-nop-sportspyder",
-        "name": "SportSpyder",
-        "browserUrl": "https://sportspyder.com/nba/new-orleans-pelicans/news",
-        "category": "news"
-      },
-      {
-        "id": "nba-nop-hoops-rumors",
-        "name": "Hoops Rumors",
-        "browserUrl": "https://www.hoopsrumors.com/new-orleans-pelicans",
-        "category": "news"
-      },
-      {
-        "id": "nba-nop-the-cold-wire",
-        "name": "The Cold Wire",
-        "browserUrl": "https://www.thecoldwire.com/sports/nba/new-orleans-pelicans/",
-        "category": "news"
-      },
-      {
-        "id": "nba-nop-new-orleans-pelicans",
-        "name": "New Orleans Pelicans",
-        "browserUrl": "https://www.nba.com/pelicans",
-        "category": "news"
-      },
-      {
-        "id": "nba-nop-pelican-debrief",
-        "name": "Pelican Debrief",
-        "browserUrl": "https://pelicandebrief.com",
-        "category": "news"
-      },
-      {
-        "id": "nba-nop-hoopshype",
-        "name": "HoopsHype",
-        "browserUrl": "https://www.hoopshype.com/rumors/?topic=15f75db4-5544-4c0a-8f70-617b4b13163c",
+        "id": "nba-nop-nba-com",
+        "name": "NBA.com",
+        "browserUrl": "https://www.nba.com/pelicans/",
         "category": "news"
       },
       {
@@ -105140,101 +107384,113 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
         "category": "news"
       },
       {
+        "id": "nba-nop-cbs-sports",
+        "name": "CBS Sports",
+        "browserUrl": "https://www.cbssports.com/nba/teams/NO/new-orleans-pelicans/",
+        "category": "news"
+      },
+      {
+        "id": "nba-nop-fox-sports",
+        "name": "FOX Sports",
+        "browserUrl": "https://www.foxsports.com/nba/new-orleans-pelicans-team",
+        "category": "news"
+      },
+      {
         "id": "nba-nop-yahoo-sports",
-        "name": "Yahoo Sports",
+        "name": "Yahoo! Sports",
         "browserUrl": "https://sports.yahoo.com/nba/teams/new-orleans/",
         "category": "news"
       },
       {
-        "id": "nba-nop-nola-com",
-        "name": "NOLA.com",
-        "browserUrl": "https://www.nola.com/sports/pelicans/",
+        "id": "nba-nop-the-athletic",
+        "name": "The Athletic",
+        "browserUrl": "https://www.nytimes.com/athletic/nba/team/pelicans/",
         "category": "news"
       },
       {
-        "id": "nba-nop-new-orleans-times-picayune",
-        "name": "New Orleans Times-Picayune",
-        "browserUrl": "https://www.nola.com",
+        "id": "nba-nop-b-r",
+        "name": "B/R",
+        "browserUrl": "https://bleacherreport.com/new-orleans-pelicans",
         "category": "news"
       },
       {
-        "id": "nba-nop-fansided",
-        "name": "FanSided",
-        "browserUrl": "https://fansided.com/nba/new-orleans-pelicans/",
+        "id": "nba-nop-nbc-sports",
+        "name": "NBC Sports",
+        "browserUrl": "https://www.nbcsports.com/nba/new-orleans-pelicans",
         "category": "news"
       },
       {
-        "id": "nba-nop-sports-illustrated",
-        "name": "Sports Illustrated",
+        "id": "nba-nop-si",
+        "name": "SI",
         "browserUrl": "https://www.si.com/nba/pelicans",
         "category": "news"
       },
       {
-        "id": "nba-nop-nba-official",
-        "name": "NBA Official",
-        "browserUrl": "https://www.nba.com/pelicans",
+        "id": "nba-nop-usa-today",
+        "name": "USA Today",
+        "browserUrl": "https://sportsdata.usatoday.com/basketball/nba/teams/new-orleans-pelicans/3/",
+        "category": "news"
+      },
+      {
+        "id": "nba-nop-athlon-sports",
+        "name": "Athlon Sports",
+        "browserUrl": "https://athlonsports.com/nba/new-orleans-pelicans",
+        "category": "news"
+      },
+      {
+        "id": "nba-nop-yardbarker",
+        "name": "Yardbarker",
+        "browserUrl": "https://www.yardbarker.com/nba/teams/new_orleans_pelicans/80",
+        "category": "news"
+      },
+      {
+        "id": "nba-nop-spotrac",
+        "name": "Spotrac",
+        "browserUrl": "https://www.spotrac.com/nba/new-orleans-pelicans/overview",
+        "category": "news"
+      },
+      {
+        "id": "nba-nop-statmuse",
+        "name": "StatMuse",
+        "browserUrl": "https://www.statmuse.com/nba/ask/new-orleans-pelicans-stats",
+        "category": "news"
+      },
+      {
+        "id": "nba-nop-newsnow",
+        "name": "NewsNow",
+        "browserUrl": "https://www.newsnow.co.uk/h/Sport/US+Sports/NBA/New+Orleans+Pelicans",
+        "category": "news"
+      },
+      {
+        "id": "nba-nop-sportspyder",
+        "name": "SportSpyder",
+        "browserUrl": "https://sportspyder.com/nba/new-orleans-pelicans/news",
+        "category": "news"
+      },
+      {
+        "id": "nba-nop-reddit",
+        "name": "Reddit",
+        "browserUrl": "https://www.reddit.com/r/NOLAPelicans/",
+        "category": "news"
+      },
+      {
+        "id": "nba-nop-pelicansnba",
+        "name": "@PelicansNBA",
+        "browserUrl": "https://x.com/PelicansNBA",
+        "category": "news"
+      },
+      {
+        "id": "nba-nop-new-orleans-pelicans",
+        "name": "#New Orleans Pelicans",
+        "browserUrl": "https://x.com/search?q=new%20orleans%20pelicans&src=typed_query",
         "category": "news"
       }
     ],
     "NYK": [
       {
-        "id": "nba-nyk-posting-and-toasting",
-        "name": "Posting and Toasting",
-        "browserUrl": "https://www.postingandtoasting.com",
-        "category": "news"
-      },
-      {
-        "id": "nba-nyk-the-athletic",
-        "name": "The Athletic",
-        "browserUrl": "https://www.nytimes.com/athletic/nba/team/knicks/",
-        "category": "news"
-      },
-      {
-        "id": "nba-nyk-sportspyder",
-        "name": "SportSpyder",
-        "browserUrl": "https://sportspyder.com/nba/new-york-knicks/news",
-        "category": "news"
-      },
-      {
-        "id": "nba-nyk-hoops-rumors",
-        "name": "Hoops Rumors",
-        "browserUrl": "https://www.hoopsrumors.com/new-york-knicks",
-        "category": "news"
-      },
-      {
-        "id": "nba-nyk-the-cold-wire",
-        "name": "The Cold Wire",
-        "browserUrl": "https://www.thecoldwire.com/sports/nba/new-york-knicks/",
-        "category": "news"
-      },
-      {
-        "id": "nba-nyk-new-york-knicks",
-        "name": "New York Knicks",
-        "browserUrl": "https://www.nba.com/knicks",
-        "category": "news"
-      },
-      {
-        "id": "nba-nyk-ny-daily-news",
-        "name": "NY Daily News",
-        "browserUrl": "https://www.nydailynews.com/sports/nba/new-york-knicks/",
-        "category": "news"
-      },
-      {
-        "id": "nba-nyk-new-york-post",
-        "name": "New York Post",
-        "browserUrl": "https://nypost.com/new-york-knicks/",
-        "category": "news"
-      },
-      {
-        "id": "nba-nyk-knicks-film-school",
-        "name": "Knicks Film School",
-        "browserUrl": "https://knicksfilmschool.com",
-        "category": "news"
-      },
-      {
-        "id": "nba-nyk-hoopshype",
-        "name": "HoopsHype",
-        "browserUrl": "https://www.hoopshype.com/rumors/?topic=8b753024-9401-4cc8-9e23-5a6cdca0282d",
+        "id": "nba-nyk-nba-com",
+        "name": "NBA.com",
+        "browserUrl": "https://www.nba.com/knicks/",
         "category": "news"
       },
       {
@@ -105244,83 +107500,113 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
         "category": "news"
       },
       {
-        "id": "nba-nyk-yahoo-sports",
-        "name": "Yahoo Sports",
-        "browserUrl": "https://sports.yahoo.com/nba/teams/new-york/",
-        "category": "news"
-      },
-      {
         "id": "nba-nyk-cbs-sports",
         "name": "CBS Sports",
         "browserUrl": "https://www.cbssports.com/nba/teams/NY/new-york-knicks/",
         "category": "news"
       },
       {
-        "id": "nba-nyk-bleacher-report",
-        "name": "Bleacher Report",
+        "id": "nba-nyk-fox-sports",
+        "name": "FOX Sports",
+        "browserUrl": "https://www.foxsports.com/nba/new-york-knicks-team",
+        "category": "news"
+      },
+      {
+        "id": "nba-nyk-yahoo-sports",
+        "name": "Yahoo! Sports",
+        "browserUrl": "https://sports.yahoo.com/nba/teams/new-york/",
+        "category": "news"
+      },
+      {
+        "id": "nba-nyk-the-athletic",
+        "name": "The Athletic",
+        "browserUrl": "https://www.nytimes.com/athletic/nba/team/knicks/",
+        "category": "news"
+      },
+      {
+        "id": "nba-nyk-b-r",
+        "name": "B/R",
         "browserUrl": "https://bleacherreport.com/new-york-knicks",
         "category": "news"
       },
       {
-        "id": "nba-nyk-fansided",
-        "name": "FanSided",
-        "browserUrl": "https://fansided.com/nba/new-york-knicks/",
+        "id": "nba-nyk-nbc-sports",
+        "name": "NBC Sports",
+        "browserUrl": "https://www.nbcsports.com/nba/new-york-knicks",
         "category": "news"
       },
       {
-        "id": "nba-nyk-nba-official",
-        "name": "NBA Official",
-        "browserUrl": "https://www.nba.com/knicks",
+        "id": "nba-nyk-si",
+        "name": "SI",
+        "browserUrl": "https://www.si.com/nba/knicks",
+        "category": "news"
+      },
+      {
+        "id": "nba-nyk-usa-today",
+        "name": "USA Today",
+        "browserUrl": "https://sportsdata.usatoday.com/basketball/nba/teams/new-york-knicks/18/",
+        "category": "news"
+      },
+      {
+        "id": "nba-nyk-athlon-sports",
+        "name": "Athlon Sports",
+        "browserUrl": "https://athlonsports.com/nba/new-york-knicks",
+        "category": "news"
+      },
+      {
+        "id": "nba-nyk-yardbarker",
+        "name": "Yardbarker",
+        "browserUrl": "https://www.yardbarker.com/nba/teams/new_york_knicks/65",
+        "category": "news"
+      },
+      {
+        "id": "nba-nyk-spotrac",
+        "name": "Spotrac",
+        "browserUrl": "https://www.spotrac.com/nba/new-york-knicks/overview",
+        "category": "news"
+      },
+      {
+        "id": "nba-nyk-statmuse",
+        "name": "StatMuse",
+        "browserUrl": "https://www.statmuse.com/nba/ask/new-york-knicks-stats",
+        "category": "news"
+      },
+      {
+        "id": "nba-nyk-newsnow",
+        "name": "NewsNow",
+        "browserUrl": "https://www.newsnow.co.uk/h/Sport/US+Sports/NBA/New+York+Knicks",
+        "category": "news"
+      },
+      {
+        "id": "nba-nyk-sportspyder",
+        "name": "SportSpyder",
+        "browserUrl": "https://sportspyder.com/nba/new-york-knicks/news",
+        "category": "news"
+      },
+      {
+        "id": "nba-nyk-reddit",
+        "name": "Reddit",
+        "browserUrl": "https://www.reddit.com/r/NYKnicks/",
+        "category": "news"
+      },
+      {
+        "id": "nba-nyk-nyknicks",
+        "name": "@nyknicks",
+        "browserUrl": "https://x.com/nyknicks",
+        "category": "news"
+      },
+      {
+        "id": "nba-nyk-new-york-knicks",
+        "name": "#New York Knicks",
+        "browserUrl": "https://x.com/search?q=new%20york%20knicks&src=typed_query",
         "category": "news"
       }
     ],
     "OKC": [
       {
-        "id": "nba-okc-the-oklahoman",
-        "name": "The Oklahoman",
-        "browserUrl": "https://www.oklahoman.com/sports/thunder/",
-        "category": "news"
-      },
-      {
-        "id": "nba-okc-the-athletic",
-        "name": "The Athletic",
-        "browserUrl": "https://www.nytimes.com/athletic/nba/team/thunder/",
-        "category": "news"
-      },
-      {
-        "id": "nba-okc-sportspyder",
-        "name": "SportSpyder",
-        "browserUrl": "https://sportspyder.com/nba/oklahoma-city-thunder/news",
-        "category": "news"
-      },
-      {
-        "id": "nba-okc-hoops-rumors",
-        "name": "Hoops Rumors",
-        "browserUrl": "https://www.hoopsrumors.com/oklahoma-city-thunder",
-        "category": "news"
-      },
-      {
-        "id": "nba-okc-the-cold-wire",
-        "name": "The Cold Wire",
-        "browserUrl": "https://www.thecoldwire.com/sports/nba/oklahoma-city-thunder/",
-        "category": "news"
-      },
-      {
-        "id": "nba-okc-oklahoma-city-thunder",
-        "name": "Oklahoma City Thunder",
-        "browserUrl": "https://www.nba.com/thunder",
-        "category": "news"
-      },
-      {
-        "id": "nba-okc-thunderous-intentions",
-        "name": "Thunderous Intentions",
-        "browserUrl": "https://thunderousintentions.com",
-        "category": "news"
-      },
-      {
-        "id": "nba-okc-hoopshype",
-        "name": "HoopsHype",
-        "browserUrl": "https://www.hoopshype.com/rumors/?topic=cd165858-eeda-4db8-a84a-db7a782e61e3",
+        "id": "nba-okc-nba-com",
+        "name": "NBA.com",
+        "browserUrl": "https://www.nba.com/thunder/",
         "category": "news"
       },
       {
@@ -105330,77 +107616,113 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
         "category": "news"
       },
       {
+        "id": "nba-okc-cbs-sports",
+        "name": "CBS Sports",
+        "browserUrl": "https://www.cbssports.com/nba/teams/OKC/oklahoma-city-thunder/",
+        "category": "news"
+      },
+      {
+        "id": "nba-okc-fox-sports",
+        "name": "FOX Sports",
+        "browserUrl": "https://www.foxsports.com/nba/oklahoma-city-thunder-team",
+        "category": "news"
+      },
+      {
         "id": "nba-okc-yahoo-sports",
-        "name": "Yahoo Sports",
+        "name": "Yahoo! Sports",
         "browserUrl": "https://sports.yahoo.com/nba/teams/oklahoma-city/",
         "category": "news"
       },
       {
-        "id": "nba-okc-fansided",
-        "name": "FanSided",
-        "browserUrl": "https://fansided.com/nba/oklahoma-city-thunder/",
+        "id": "nba-okc-the-athletic",
+        "name": "The Athletic",
+        "browserUrl": "https://www.nytimes.com/athletic/nba/team/thunder/",
         "category": "news"
       },
       {
-        "id": "nba-okc-sports-illustrated",
-        "name": "Sports Illustrated",
+        "id": "nba-okc-b-r",
+        "name": "B/R",
+        "browserUrl": "https://bleacherreport.com/oklahoma-city-thunder",
+        "category": "news"
+      },
+      {
+        "id": "nba-okc-nbc-sports",
+        "name": "NBC Sports",
+        "browserUrl": "https://www.nbcsports.com/nba/oklahoma-city-thunder",
+        "category": "news"
+      },
+      {
+        "id": "nba-okc-si",
+        "name": "SI",
         "browserUrl": "https://www.si.com/nba/thunder",
         "category": "news"
       },
       {
-        "id": "nba-okc-nba-official",
-        "name": "NBA Official",
-        "browserUrl": "https://www.nba.com/thunder",
+        "id": "nba-okc-usa-today",
+        "name": "USA Today",
+        "browserUrl": "https://sportsdata.usatoday.com/basketball/nba/teams/oklahoma-city-thunder/25/",
         "category": "news"
       },
       {
-        "id": "nba-okc-cbs-sports",
-        "name": "CBS Sports",
-        "browserUrl": "https://www.cbssports.com/nba/teams/OKC/oklahoma-city-thunder/",
+        "id": "nba-okc-athlon-sports",
+        "name": "Athlon Sports",
+        "browserUrl": "https://athlonsports.com/nba/oklahoma-city-thunder",
+        "category": "news"
+      },
+      {
+        "id": "nba-okc-yardbarker",
+        "name": "Yardbarker",
+        "browserUrl": "https://www.yardbarker.com/nba/teams/oklahoma_city_thunder/85",
+        "category": "news"
+      },
+      {
+        "id": "nba-okc-spotrac",
+        "name": "Spotrac",
+        "browserUrl": "https://www.spotrac.com/nba/oklahoma-city-thunder/overview",
+        "category": "news"
+      },
+      {
+        "id": "nba-okc-statmuse",
+        "name": "StatMuse",
+        "browserUrl": "https://www.statmuse.com/nba/ask/oklahoma-city-thunder-stats",
+        "category": "news"
+      },
+      {
+        "id": "nba-okc-newsnow",
+        "name": "NewsNow",
+        "browserUrl": "https://www.newsnow.co.uk/h/Sport/US+Sports/NBA/Oklahoma+City+Thunder",
+        "category": "news"
+      },
+      {
+        "id": "nba-okc-sportspyder",
+        "name": "SportSpyder",
+        "browserUrl": "https://sportspyder.com/nba/oklahoma-city-thunder/news",
+        "category": "news"
+      },
+      {
+        "id": "nba-okc-reddit",
+        "name": "Reddit",
+        "browserUrl": "https://www.reddit.com/r/Thunder/",
+        "category": "news"
+      },
+      {
+        "id": "nba-okc-okcthunder",
+        "name": "@okcthunder",
+        "browserUrl": "https://x.com/okcthunder",
+        "category": "news"
+      },
+      {
+        "id": "nba-okc-oklahoma-city-thunder",
+        "name": "#Oklahoma City Thunder",
+        "browserUrl": "https://x.com/search?q=oklahoma%20city%20thunder&src=typed_query",
         "category": "news"
       }
     ],
     "ORL": [
       {
-        "id": "nba-orl-the-athletic",
-        "name": "The Athletic",
-        "browserUrl": "https://www.nytimes.com/athletic/nba/team/magic/",
-        "category": "news"
-      },
-      {
-        "id": "nba-orl-sportspyder",
-        "name": "SportSpyder",
-        "browserUrl": "https://sportspyder.com/nba/orlando-magic/news",
-        "category": "news"
-      },
-      {
-        "id": "nba-orl-hoops-rumors",
-        "name": "Hoops Rumors",
-        "browserUrl": "https://www.hoopsrumors.com/orlando-magic",
-        "category": "news"
-      },
-      {
-        "id": "nba-orl-the-cold-wire",
-        "name": "The Cold Wire",
-        "browserUrl": "https://www.thecoldwire.com/sports/nba/orlando-magic/",
-        "category": "news"
-      },
-      {
-        "id": "nba-orl-orlando-magic",
-        "name": "Orlando Magic",
-        "browserUrl": "https://www.nba.com/magic",
-        "category": "news"
-      },
-      {
-        "id": "nba-orl-magicbasketballonline",
-        "name": "MagicBasketballOnline",
-        "browserUrl": "https://beyoutifullyyoucreations.com/",
-        "category": "news"
-      },
-      {
-        "id": "nba-orl-hoopshype",
-        "name": "HoopsHype",
-        "browserUrl": "https://www.hoopshype.com/rumors/?topic=0beff9dc-ada3-4e62-b859-030ef8c2c69f",
+        "id": "nba-orl-nba-com",
+        "name": "NBA.com",
+        "browserUrl": "https://www.nba.com/magic/",
         "category": "news"
       },
       {
@@ -105410,95 +107732,113 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
         "category": "news"
       },
       {
-        "id": "nba-orl-yahoo-sports",
-        "name": "Yahoo Sports",
-        "browserUrl": "https://sports.yahoo.com/nba/teams/orlando/",
-        "category": "news"
-      },
-      {
-        "id": "nba-orl-orlando-sentinel",
-        "name": "Orlando Sentinel",
-        "browserUrl": "https://www.orlandosentinel.com/sports/nba/orlando-magic/",
-        "category": "news"
-      },
-      {
-        "id": "nba-orl-fansided",
-        "name": "FanSided",
-        "browserUrl": "https://fansided.com/nba/orlando-magic/",
-        "category": "news"
-      },
-      {
-        "id": "nba-orl-sports-illustrated",
-        "name": "Sports Illustrated",
-        "browserUrl": "https://www.si.com/nba/magic",
-        "category": "news"
-      },
-      {
         "id": "nba-orl-cbs-sports",
         "name": "CBS Sports",
         "browserUrl": "https://www.cbssports.com/nba/teams/ORL/orlando-magic/",
         "category": "news"
       },
       {
-        "id": "nba-orl-nba-official",
-        "name": "NBA Official",
-        "browserUrl": "https://www.nba.com/magic",
+        "id": "nba-orl-fox-sports",
+        "name": "FOX Sports",
+        "browserUrl": "https://www.foxsports.com/nba/orlando-magic-team",
+        "category": "news"
+      },
+      {
+        "id": "nba-orl-yahoo-sports",
+        "name": "Yahoo! Sports",
+        "browserUrl": "https://sports.yahoo.com/nba/teams/orlando/",
+        "category": "news"
+      },
+      {
+        "id": "nba-orl-the-athletic",
+        "name": "The Athletic",
+        "browserUrl": "https://www.nytimes.com/athletic/nba/team/magic/",
+        "category": "news"
+      },
+      {
+        "id": "nba-orl-b-r",
+        "name": "B/R",
+        "browserUrl": "https://bleacherreport.com/orlando-magic",
+        "category": "news"
+      },
+      {
+        "id": "nba-orl-nbc-sports",
+        "name": "NBC Sports",
+        "browserUrl": "https://www.nbcsports.com/nba/orlando-magic",
+        "category": "news"
+      },
+      {
+        "id": "nba-orl-si",
+        "name": "SI",
+        "browserUrl": "https://www.si.com/nba/magic",
+        "category": "news"
+      },
+      {
+        "id": "nba-orl-usa-today",
+        "name": "USA Today",
+        "browserUrl": "https://sportsdata.usatoday.com/basketball/nba/teams/orlando-magic/19/",
+        "category": "news"
+      },
+      {
+        "id": "nba-orl-athlon-sports",
+        "name": "Athlon Sports",
+        "browserUrl": "https://athlonsports.com/nba/orlando-magic",
+        "category": "news"
+      },
+      {
+        "id": "nba-orl-yardbarker",
+        "name": "Yardbarker",
+        "browserUrl": "https://www.yardbarker.com/nba/teams/orlando_magic/122",
+        "category": "news"
+      },
+      {
+        "id": "nba-orl-spotrac",
+        "name": "Spotrac",
+        "browserUrl": "https://www.spotrac.com/nba/orlando-magic/overview",
+        "category": "news"
+      },
+      {
+        "id": "nba-orl-statmuse",
+        "name": "StatMuse",
+        "browserUrl": "https://www.statmuse.com/nba/ask/orlando-magic-stats",
+        "category": "news"
+      },
+      {
+        "id": "nba-orl-newsnow",
+        "name": "NewsNow",
+        "browserUrl": "https://www.newsnow.co.uk/h/Sport/US+Sports/NBA/Orlando+Magic",
+        "category": "news"
+      },
+      {
+        "id": "nba-orl-sportspyder",
+        "name": "SportSpyder",
+        "browserUrl": "https://sportspyder.com/nba/orlando-magic/news",
+        "category": "news"
+      },
+      {
+        "id": "nba-orl-reddit",
+        "name": "Reddit",
+        "browserUrl": "https://www.reddit.com/r/OrlandoMagic/",
+        "category": "news"
+      },
+      {
+        "id": "nba-orl-orlandomagic",
+        "name": "@OrlandoMagic",
+        "browserUrl": "https://x.com/OrlandoMagic",
+        "category": "news"
+      },
+      {
+        "id": "nba-orl-orlando-magic",
+        "name": "#Orlando Magic",
+        "browserUrl": "https://x.com/search?q=orlando%20magic&src=typed_query",
         "category": "news"
       }
     ],
     "PHI": [
       {
-        "id": "nba-phi-liberty-ballers",
-        "name": "Liberty Ballers",
-        "browserUrl": "https://www.libertyballers.com",
-        "category": "news"
-      },
-      {
-        "id": "nba-phi-the-athletic",
-        "name": "The Athletic",
-        "browserUrl": "https://www.nytimes.com/athletic/nba/team/sixers/",
-        "category": "news"
-      },
-      {
-        "id": "nba-phi-sportspyder",
-        "name": "SportSpyder",
-        "browserUrl": "https://sportspyder.com/nba/philadelphia-76ers/news",
-        "category": "news"
-      },
-      {
-        "id": "nba-phi-hoops-rumors",
-        "name": "Hoops Rumors",
-        "browserUrl": "https://www.hoopsrumors.com/philadelphia-76ers",
-        "category": "news"
-      },
-      {
-        "id": "nba-phi-the-cold-wire",
-        "name": "The Cold Wire",
-        "browserUrl": "https://www.thecoldwire.com/sports/nba/philadelphia-76ers/",
-        "category": "news"
-      },
-      {
-        "id": "nba-phi-philadelphia-76ers",
-        "name": "Philadelphia 76ers",
-        "browserUrl": "https://www.nba.com/sixers",
-        "category": "news"
-      },
-      {
-        "id": "nba-phi-nbc-sports-philadelphia",
-        "name": "NBC Sports Philadelphia",
-        "browserUrl": "https://www.nbcsportsphiladelphia.com/nba/philadelphia-76ers/",
-        "category": "news"
-      },
-      {
-        "id": "nba-phi-philadelphia-inquirer",
-        "name": "Philadelphia Inquirer",
-        "browserUrl": "https://www.inquirer.com/sixers/",
-        "category": "news"
-      },
-      {
-        "id": "nba-phi-hoopshype",
-        "name": "HoopsHype",
-        "browserUrl": "https://www.hoopshype.com/rumors/?topic=b3f2a355-8d98-44c0-a603-3f9a2d8bc375",
+        "id": "nba-phi-nba-com",
+        "name": "NBA.com",
+        "browserUrl": "https://www.nba.com/sixers/",
         "category": "news"
       },
       {
@@ -105508,95 +107848,113 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
         "category": "news"
       },
       {
-        "id": "nba-phi-yahoo-sports",
-        "name": "Yahoo Sports",
-        "browserUrl": "https://sports.yahoo.com/nba/teams/philadelphia/",
-        "category": "news"
-      },
-      {
         "id": "nba-phi-cbs-sports",
         "name": "CBS Sports",
         "browserUrl": "https://www.cbssports.com/nba/teams/PHI/philadelphia-76ers/",
         "category": "news"
       },
       {
-        "id": "nba-phi-bleacher-report",
-        "name": "Bleacher Report",
+        "id": "nba-phi-fox-sports",
+        "name": "FOX Sports",
+        "browserUrl": "https://www.foxsports.com/nba/philadelphia-76ers-team",
+        "category": "news"
+      },
+      {
+        "id": "nba-phi-yahoo-sports",
+        "name": "Yahoo! Sports",
+        "browserUrl": "https://sports.yahoo.com/nba/teams/philadelphia/",
+        "category": "news"
+      },
+      {
+        "id": "nba-phi-the-athletic",
+        "name": "The Athletic",
+        "browserUrl": "https://www.nytimes.com/athletic/nba/team/76ers/",
+        "category": "news"
+      },
+      {
+        "id": "nba-phi-b-r",
+        "name": "B/R",
         "browserUrl": "https://bleacherreport.com/philadelphia-76ers",
         "category": "news"
       },
       {
-        "id": "nba-phi-fansided",
-        "name": "FanSided",
-        "browserUrl": "https://fansided.com/nba/philadelphia-76ers/",
+        "id": "nba-phi-nbc-sports",
+        "name": "NBC Sports",
+        "browserUrl": "https://www.nbcsports.com/nba/philadelphia-76ers",
         "category": "news"
       },
       {
-        "id": "nba-phi-sports-illustrated",
-        "name": "Sports Illustrated",
+        "id": "nba-phi-si",
+        "name": "SI",
         "browserUrl": "https://www.si.com/nba/76ers",
         "category": "news"
       },
       {
-        "id": "nba-phi-nba-official",
-        "name": "NBA Official",
-        "browserUrl": "https://www.nba.com/sixers",
+        "id": "nba-phi-usa-today",
+        "name": "USA Today",
+        "browserUrl": "https://sportsdata.usatoday.com/basketball/nba/teams/philadelphia-76ers/20/",
+        "category": "news"
+      },
+      {
+        "id": "nba-phi-athlon-sports",
+        "name": "Athlon Sports",
+        "browserUrl": "https://athlonsports.com/nba/philadelphia-76ers",
+        "category": "news"
+      },
+      {
+        "id": "nba-phi-yardbarker",
+        "name": "Yardbarker",
+        "browserUrl": "https://www.yardbarker.com/nba/teams/philadelphia_76ers/66",
+        "category": "news"
+      },
+      {
+        "id": "nba-phi-spotrac",
+        "name": "Spotrac",
+        "browserUrl": "https://www.spotrac.com/nba/philadelphia-76ers/overview",
+        "category": "news"
+      },
+      {
+        "id": "nba-phi-statmuse",
+        "name": "StatMuse",
+        "browserUrl": "https://www.statmuse.com/nba/ask/philadelphia-76ers-stats",
+        "category": "news"
+      },
+      {
+        "id": "nba-phi-newsnow",
+        "name": "NewsNow",
+        "browserUrl": "https://www.newsnow.co.uk/h/Sport/US+Sports/NBA/Philadelphia+76ers",
+        "category": "news"
+      },
+      {
+        "id": "nba-phi-sportspyder",
+        "name": "SportSpyder",
+        "browserUrl": "https://sportspyder.com/nba/philadelphia-76ers/news",
+        "category": "news"
+      },
+      {
+        "id": "nba-phi-reddit",
+        "name": "Reddit",
+        "browserUrl": "https://www.reddit.com/r/sixers/",
+        "category": "news"
+      },
+      {
+        "id": "nba-phi-sixers",
+        "name": "@sixers",
+        "browserUrl": "https://x.com/sixers",
+        "category": "news"
+      },
+      {
+        "id": "nba-phi-philadelphia-76ers",
+        "name": "#Philadelphia 76ers",
+        "browserUrl": "https://x.com/search?q=philadelphia%2076ers&src=typed_query",
         "category": "news"
       }
     ],
     "PHX": [
       {
-        "id": "nba-phx-bright-side-of-the-sun",
-        "name": "Bright Side of the Sun",
-        "browserUrl": "https://www.brightsideofthesun.com",
-        "category": "news"
-      },
-      {
-        "id": "nba-phx-the-athletic",
-        "name": "The Athletic",
-        "browserUrl": "https://www.nytimes.com/athletic/nba/team/suns/",
-        "category": "news"
-      },
-      {
-        "id": "nba-phx-sportspyder",
-        "name": "SportSpyder",
-        "browserUrl": "https://sportspyder.com/nba/phoenix-suns/news",
-        "category": "news"
-      },
-      {
-        "id": "nba-phx-hoops-rumors",
-        "name": "Hoops Rumors",
-        "browserUrl": "https://www.hoopsrumors.com/phoenix-suns",
-        "category": "news"
-      },
-      {
-        "id": "nba-phx-the-cold-wire",
-        "name": "The Cold Wire",
-        "browserUrl": "https://www.thecoldwire.com/sports/nba/phoenix-suns/",
-        "category": "news"
-      },
-      {
-        "id": "nba-phx-phoenix-suns",
-        "name": "Phoenix Suns",
-        "browserUrl": "https://www.nba.com/suns",
-        "category": "news"
-      },
-      {
-        "id": "nba-phx-arizona-sports",
-        "name": "Arizona Sports",
-        "browserUrl": "https://arizonasports.com/phoenix-suns",
-        "category": "news"
-      },
-      {
-        "id": "nba-phx-fansided",
-        "name": "FanSided",
-        "browserUrl": "https://fansided.com/nba/phoenix-suns/",
-        "category": "news"
-      },
-      {
-        "id": "nba-phx-hoopshype",
-        "name": "HoopsHype",
-        "browserUrl": "https://www.hoopshype.com/rumors/?topic=5b1d8499-f4c6-4857-a8e9-6d2e8a35bac3",
+        "id": "nba-phx-nba-com",
+        "name": "NBA.com",
+        "browserUrl": "https://www.nba.com/suns/",
         "category": "news"
       },
       {
@@ -105606,77 +107964,113 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
         "category": "news"
       },
       {
+        "id": "nba-phx-cbs-sports",
+        "name": "CBS Sports",
+        "browserUrl": "https://www.cbssports.com/nba/teams/PHO/phoenix-suns/",
+        "category": "news"
+      },
+      {
+        "id": "nba-phx-fox-sports",
+        "name": "FOX Sports",
+        "browserUrl": "https://www.foxsports.com/nba/phoenix-suns-team",
+        "category": "news"
+      },
+      {
         "id": "nba-phx-yahoo-sports",
-        "name": "Yahoo Sports",
+        "name": "Yahoo! Sports",
         "browserUrl": "https://sports.yahoo.com/nba/teams/phoenix/",
         "category": "news"
       },
       {
-        "id": "nba-phx-bleacher-report",
-        "name": "Bleacher Report",
+        "id": "nba-phx-the-athletic",
+        "name": "The Athletic",
+        "browserUrl": "https://www.nytimes.com/athletic/nba/team/suns/",
+        "category": "news"
+      },
+      {
+        "id": "nba-phx-b-r",
+        "name": "B/R",
         "browserUrl": "https://bleacherreport.com/phoenix-suns",
         "category": "news"
       },
       {
-        "id": "nba-phx-sports-illustrated",
-        "name": "Sports Illustrated",
+        "id": "nba-phx-nbc-sports",
+        "name": "NBC Sports",
+        "browserUrl": "https://www.nbcsports.com/nba/phoenix-suns",
+        "category": "news"
+      },
+      {
+        "id": "nba-phx-si",
+        "name": "SI",
         "browserUrl": "https://www.si.com/nba/suns",
         "category": "news"
       },
       {
-        "id": "nba-phx-nba-official",
-        "name": "NBA Official",
-        "browserUrl": "https://www.nba.com/suns",
+        "id": "nba-phx-usa-today",
+        "name": "USA Today",
+        "browserUrl": "https://sportsdata.usatoday.com/basketball/nba/teams/phoenix-suns/21/",
+        "category": "news"
+      },
+      {
+        "id": "nba-phx-athlon-sports",
+        "name": "Athlon Sports",
+        "browserUrl": "https://athlonsports.com/nba/phoenix-suns",
+        "category": "news"
+      },
+      {
+        "id": "nba-phx-yardbarker",
+        "name": "Yardbarker",
+        "browserUrl": "https://www.yardbarker.com/nba/teams/phoenix_suns/90",
+        "category": "news"
+      },
+      {
+        "id": "nba-phx-spotrac",
+        "name": "Spotrac",
+        "browserUrl": "https://www.spotrac.com/nba/phoenix-suns/overview",
+        "category": "news"
+      },
+      {
+        "id": "nba-phx-statmuse",
+        "name": "StatMuse",
+        "browserUrl": "https://www.statmuse.com/nba/ask/phoenix-suns-stats",
+        "category": "news"
+      },
+      {
+        "id": "nba-phx-newsnow",
+        "name": "NewsNow",
+        "browserUrl": "https://www.newsnow.co.uk/h/Sport/US+Sports/NBA/Phoenix+Suns",
+        "category": "news"
+      },
+      {
+        "id": "nba-phx-sportspyder",
+        "name": "SportSpyder",
+        "browserUrl": "https://sportspyder.com/nba/phoenix-suns/news",
+        "category": "news"
+      },
+      {
+        "id": "nba-phx-reddit",
+        "name": "Reddit",
+        "browserUrl": "https://www.reddit.com/r/suns/",
+        "category": "news"
+      },
+      {
+        "id": "nba-phx-suns",
+        "name": "@Suns",
+        "browserUrl": "https://x.com/Suns",
+        "category": "news"
+      },
+      {
+        "id": "nba-phx-phoenix-suns",
+        "name": "#Phoenix Suns",
+        "browserUrl": "https://x.com/search?q=phoenix%20suns&src=typed_query",
         "category": "news"
       }
     ],
     "POR": [
       {
-        "id": "nba-por-blazer-s-edge",
-        "name": "Blazer's Edge",
-        "browserUrl": "https://www.blazersedge.com",
-        "category": "news"
-      },
-      {
-        "id": "nba-por-sportspyder",
-        "name": "SportSpyder",
-        "browserUrl": "https://sportspyder.com/nba/portland-trail-blazers/news",
-        "category": "news"
-      },
-      {
-        "id": "nba-por-hoops-rumors",
-        "name": "Hoops Rumors",
-        "browserUrl": "https://www.hoopsrumors.com/portland-trail-blazers",
-        "category": "news"
-      },
-      {
-        "id": "nba-por-the-cold-wire",
-        "name": "The Cold Wire",
-        "browserUrl": "https://www.thecoldwire.com/sports/nba/portland-trail-blazers/",
-        "category": "news"
-      },
-      {
-        "id": "nba-por-portland-trail-blazers",
-        "name": "Portland Trail Blazers",
-        "browserUrl": "https://www.nba.com/blazers",
-        "category": "news"
-      },
-      {
-        "id": "nba-por-rip-city-project",
-        "name": "Rip City Project",
-        "browserUrl": "https://ripcityproject.com",
-        "category": "news"
-      },
-      {
-        "id": "nba-por-blazersedge",
-        "name": "Blazersedge",
-        "browserUrl": "https://www.blazersedge.com",
-        "category": "news"
-      },
-      {
-        "id": "nba-por-hoopshype",
-        "name": "HoopsHype",
-        "browserUrl": "https://www.hoopshype.com/rumors/?topic=ebbd75c8-2661-4cdf-9293-f30f46f12e95",
+        "id": "nba-por-nba-com",
+        "name": "NBA.com",
+        "browserUrl": "https://www.nba.com/blazers/",
         "category": "news"
       },
       {
@@ -105686,77 +108080,113 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
         "category": "news"
       },
       {
+        "id": "nba-por-cbs-sports",
+        "name": "CBS Sports",
+        "browserUrl": "https://www.cbssports.com/nba/teams/POR/portland-trail-blazers/",
+        "category": "news"
+      },
+      {
+        "id": "nba-por-fox-sports",
+        "name": "FOX Sports",
+        "browserUrl": "https://www.foxsports.com/nba/portland-trail-blazers-team",
+        "category": "news"
+      },
+      {
         "id": "nba-por-yahoo-sports",
-        "name": "Yahoo Sports",
+        "name": "Yahoo! Sports",
         "browserUrl": "https://sports.yahoo.com/nba/teams/portland/",
         "category": "news"
       },
       {
-        "id": "nba-por-kgw",
-        "name": "KGW",
-        "browserUrl": "https://www.kgw.com/sports",
+        "id": "nba-por-the-athletic",
+        "name": "The Athletic",
+        "browserUrl": "https://www.nytimes.com/athletic/nba/team/trail-blazers/",
         "category": "news"
       },
       {
-        "id": "nba-por-fansided",
-        "name": "FanSided",
-        "browserUrl": "https://fansided.com/nba/portland-trail-blazers/",
+        "id": "nba-por-b-r",
+        "name": "B/R",
+        "browserUrl": "https://bleacherreport.com/portland-trail-blazers",
         "category": "news"
       },
       {
-        "id": "nba-por-sports-illustrated",
-        "name": "Sports Illustrated",
-        "browserUrl": "https://www.si.com/nba/trailblazers",
+        "id": "nba-por-nbc-sports",
+        "name": "NBC Sports",
+        "browserUrl": "https://www.nbcsports.com/nba/portland-trail-blazers",
         "category": "news"
       },
       {
-        "id": "nba-por-cbs-sports",
-        "name": "CBS Sports",
-        "browserUrl": "https://www.cbssports.com/nba/teams/POR/portland-trail-blazers/",
+        "id": "nba-por-si",
+        "name": "SI",
+        "browserUrl": "https://www.si.com/nba/trail-blazers",
+        "category": "news"
+      },
+      {
+        "id": "nba-por-usa-today",
+        "name": "USA Today",
+        "browserUrl": "https://sportsdata.usatoday.com/basketball/nba/teams/portland-trail-blazers/22/",
+        "category": "news"
+      },
+      {
+        "id": "nba-por-athlon-sports",
+        "name": "Athlon Sports",
+        "browserUrl": "https://athlonsports.com/nba/portland-trail-blazers",
+        "category": "news"
+      },
+      {
+        "id": "nba-por-yardbarker",
+        "name": "Yardbarker",
+        "browserUrl": "https://www.yardbarker.com/nba/teams/portland_trail_blazers/84",
+        "category": "news"
+      },
+      {
+        "id": "nba-por-spotrac",
+        "name": "Spotrac",
+        "browserUrl": "https://www.spotrac.com/nba/portland-trail-blazers/overview",
+        "category": "news"
+      },
+      {
+        "id": "nba-por-statmuse",
+        "name": "StatMuse",
+        "browserUrl": "https://www.statmuse.com/nba/ask/portland-trail-blazers-stats",
+        "category": "news"
+      },
+      {
+        "id": "nba-por-newsnow",
+        "name": "NewsNow",
+        "browserUrl": "https://www.newsnow.co.uk/h/Sport/US+Sports/NBA/Portland+Trail+Blazers",
+        "category": "news"
+      },
+      {
+        "id": "nba-por-sportspyder",
+        "name": "SportSpyder",
+        "browserUrl": "https://sportspyder.com/nba/portland-trail-blazers/news",
+        "category": "news"
+      },
+      {
+        "id": "nba-por-reddit",
+        "name": "Reddit",
+        "browserUrl": "https://www.reddit.com/r/ripcity/",
+        "category": "news"
+      },
+      {
+        "id": "nba-por-trailblazers",
+        "name": "@trailblazers",
+        "browserUrl": "https://x.com/trailblazers",
+        "category": "news"
+      },
+      {
+        "id": "nba-por-portland-trail-blazers",
+        "name": "#Portland Trail Blazers",
+        "browserUrl": "https://x.com/search?q=portland%20trail%20blazers&src=typed_query",
         "category": "news"
       }
     ],
     "SAC": [
       {
-        "id": "nba-sac-the-athletic",
-        "name": "The Athletic",
-        "browserUrl": "https://www.nytimes.com/athletic/nhl/team/kings/",
-        "category": "news"
-      },
-      {
-        "id": "nba-sac-sportspyder",
-        "name": "SportSpyder",
-        "browserUrl": "https://sportspyder.com/nba/sacramento-kings/news",
-        "category": "news"
-      },
-      {
-        "id": "nba-sac-hoops-rumors",
-        "name": "Hoops Rumors",
-        "browserUrl": "https://www.hoopsrumors.com/sacramento-kings",
-        "category": "news"
-      },
-      {
-        "id": "nba-sac-the-cold-wire",
-        "name": "The Cold Wire",
-        "browserUrl": "https://www.thecoldwire.com/sports/nba/sacramento-kings/",
-        "category": "news"
-      },
-      {
-        "id": "nba-sac-sacramento-kings",
-        "name": "Sacramento Kings",
-        "browserUrl": "https://www.nba.com/kings",
-        "category": "news"
-      },
-      {
-        "id": "nba-sac-a-royal-pain",
-        "name": "A Royal Pain",
-        "browserUrl": "https://aroyalpain.com",
-        "category": "news"
-      },
-      {
-        "id": "nba-sac-hoopshype",
-        "name": "HoopsHype",
-        "browserUrl": "https://www.hoopshype.com/rumors/?topic=3167e433-c189-4ca5-b7ab-4c9e41dbb11b",
+        "id": "nba-sac-nba-com",
+        "name": "NBA.com",
+        "browserUrl": "https://www.nba.com/kings/",
         "category": "news"
       },
       {
@@ -105766,47 +108196,137 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
         "category": "news"
       },
       {
+        "id": "nba-sac-cbs-sports",
+        "name": "CBS Sports",
+        "browserUrl": "https://www.cbssports.com/nba/teams/SAC/sacramento-kings/",
+        "category": "news"
+      },
+      {
+        "id": "nba-sac-fox-sports",
+        "name": "FOX Sports",
+        "browserUrl": "https://www.foxsports.com/nba/sacramento-kings-team",
+        "category": "news"
+      },
+      {
         "id": "nba-sac-yahoo-sports",
-        "name": "Yahoo Sports",
+        "name": "Yahoo! Sports",
         "browserUrl": "https://sports.yahoo.com/nba/teams/sacramento/",
         "category": "news"
       },
       {
-        "id": "nba-sac-nbc-sports-california",
-        "name": "NBC Sports California",
-        "browserUrl": "https://www.nbcsportsbayarea.com/nba/sacramento-kings/",
+        "id": "nba-sac-the-athletic",
+        "name": "The Athletic",
+        "browserUrl": "https://www.nytimes.com/athletic/nba/team/kings/",
         "category": "news"
       },
       {
-        "id": "nba-sac-fansided",
-        "name": "FanSided",
-        "browserUrl": "https://fansided.com/nba/sacramento-kings/",
+        "id": "nba-sac-b-r",
+        "name": "B/R",
+        "browserUrl": "https://bleacherreport.com/sacramento-kings",
         "category": "news"
       },
       {
-        "id": "nba-sac-sports-illustrated",
-        "name": "Sports Illustrated",
+        "id": "nba-sac-nbc-sports",
+        "name": "NBC Sports",
+        "browserUrl": "https://www.nbcsports.com/nba/sacramento-kings",
+        "category": "news"
+      },
+      {
+        "id": "nba-sac-si",
+        "name": "SI",
         "browserUrl": "https://www.si.com/nba/kings",
         "category": "news"
       },
       {
-        "id": "nba-sac-nba-official",
-        "name": "NBA Official",
-        "browserUrl": "https://www.nba.com/kings",
+        "id": "nba-sac-usa-today",
+        "name": "USA Today",
+        "browserUrl": "https://sportsdata.usatoday.com/basketball/nba/teams/sacramento-kings/23/",
         "category": "news"
       },
       {
-        "id": "nba-sac-cbs-sports",
-        "name": "CBS Sports",
-        "browserUrl": "https://www.cbssports.com/nba/teams/SAC/sacramento-kings/",
+        "id": "nba-sac-athlon-sports",
+        "name": "Athlon Sports",
+        "browserUrl": "https://athlonsports.com/nba/sacramento-kings",
+        "category": "news"
+      },
+      {
+        "id": "nba-sac-yardbarker",
+        "name": "Yardbarker",
+        "browserUrl": "https://www.yardbarker.com/nba/teams/sacramento_kings/91",
+        "category": "news"
+      },
+      {
+        "id": "nba-sac-spotrac",
+        "name": "Spotrac",
+        "browserUrl": "https://www.spotrac.com/nba/sacramento-kings/overview",
+        "category": "news"
+      },
+      {
+        "id": "nba-sac-statmuse",
+        "name": "StatMuse",
+        "browserUrl": "https://www.statmuse.com/nba/ask/sacramento-kings-stats",
+        "category": "news"
+      },
+      {
+        "id": "nba-sac-newsnow",
+        "name": "NewsNow",
+        "browserUrl": "https://www.newsnow.co.uk/h/Sport/US+Sports/NBA/Sacramento+Kings",
+        "category": "news"
+      },
+      {
+        "id": "nba-sac-sportspyder",
+        "name": "SportSpyder",
+        "browserUrl": "https://sportspyder.com/nba/sacramento-kings/news",
+        "category": "news"
+      },
+      {
+        "id": "nba-sac-reddit",
+        "name": "Reddit",
+        "browserUrl": "https://www.reddit.com/r/kings/",
+        "category": "news"
+      },
+      {
+        "id": "nba-sac-sacramentokings",
+        "name": "@SacramentoKings",
+        "browserUrl": "https://x.com/SacramentoKings",
+        "category": "news"
+      },
+      {
+        "id": "nba-sac-sacramento-kings",
+        "name": "#Sacramento Kings",
+        "browserUrl": "https://x.com/search?q=sacramento%20kings&src=typed_query",
         "category": "news"
       }
     ],
     "SAS": [
       {
-        "id": "nba-sas-pounding-the-rock",
-        "name": "Pounding The Rock",
-        "browserUrl": "https://www.poundingtherock.com",
+        "id": "nba-sas-nba-com",
+        "name": "NBA.com",
+        "browserUrl": "https://www.nba.com/spurs/",
+        "category": "news"
+      },
+      {
+        "id": "nba-sas-espn",
+        "name": "ESPN",
+        "browserUrl": "https://www.espn.com/nba/team/_/name/sa/san-antonio-spurs",
+        "category": "news"
+      },
+      {
+        "id": "nba-sas-cbs-sports",
+        "name": "CBS Sports",
+        "browserUrl": "https://www.cbssports.com/nba/teams/SA/san-antonio-spurs/",
+        "category": "news"
+      },
+      {
+        "id": "nba-sas-fox-sports",
+        "name": "FOX Sports",
+        "browserUrl": "https://www.foxsports.com/nba/san-antonio-spurs-team",
+        "category": "news"
+      },
+      {
+        "id": "nba-sas-yahoo-sports",
+        "name": "Yahoo! Sports",
+        "browserUrl": "https://sports.yahoo.com/nba/teams/san-antonio/",
         "category": "news"
       },
       {
@@ -105816,137 +108336,89 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
         "category": "news"
       },
       {
+        "id": "nba-sas-b-r",
+        "name": "B/R",
+        "browserUrl": "https://bleacherreport.com/san-antonio-spurs",
+        "category": "news"
+      },
+      {
+        "id": "nba-sas-nbc-sports",
+        "name": "NBC Sports",
+        "browserUrl": "https://www.nbcsports.com/nba/san-antonio-spurs",
+        "category": "news"
+      },
+      {
+        "id": "nba-sas-si",
+        "name": "SI",
+        "browserUrl": "https://www.si.com/nba/spurs",
+        "category": "news"
+      },
+      {
+        "id": "nba-sas-usa-today",
+        "name": "USA Today",
+        "browserUrl": "https://sportsdata.usatoday.com/basketball/nba/teams/san-antonio-spurs/24/",
+        "category": "news"
+      },
+      {
+        "id": "nba-sas-athlon-sports",
+        "name": "Athlon Sports",
+        "browserUrl": "https://athlonsports.com/nba/san-antonio-spurs",
+        "category": "news"
+      },
+      {
+        "id": "nba-sas-yardbarker",
+        "name": "Yardbarker",
+        "browserUrl": "https://www.yardbarker.com/nba/teams/san_antonio_spurs/81",
+        "category": "news"
+      },
+      {
+        "id": "nba-sas-spotrac",
+        "name": "Spotrac",
+        "browserUrl": "https://www.spotrac.com/nba/san-antonio-spurs/overview",
+        "category": "news"
+      },
+      {
+        "id": "nba-sas-statmuse",
+        "name": "StatMuse",
+        "browserUrl": "https://www.statmuse.com/nba/ask/san-antonio-spurs-stats",
+        "category": "news"
+      },
+      {
+        "id": "nba-sas-newsnow",
+        "name": "NewsNow",
+        "browserUrl": "https://www.newsnow.co.uk/h/Sport/US+Sports/NBA/San+Antonio+Spurs",
+        "category": "news"
+      },
+      {
         "id": "nba-sas-sportspyder",
         "name": "SportSpyder",
         "browserUrl": "https://sportspyder.com/nba/san-antonio-spurs/news",
         "category": "news"
       },
       {
-        "id": "nba-sas-hoops-rumors",
-        "name": "Hoops Rumors",
-        "browserUrl": "https://www.hoopsrumors.com/san-antonio-spurs",
+        "id": "nba-sas-reddit",
+        "name": "Reddit",
+        "browserUrl": "https://www.reddit.com/r/NBASpurs/",
         "category": "news"
       },
       {
-        "id": "nba-sas-the-cold-wire",
-        "name": "The Cold Wire",
-        "browserUrl": "https://www.thecoldwire.com/sports/nba/san-antonio-spurs/",
+        "id": "nba-sas-spurs",
+        "name": "@spurs",
+        "browserUrl": "https://x.com/spurs",
         "category": "news"
       },
       {
         "id": "nba-sas-san-antonio-spurs",
-        "name": "San Antonio Spurs",
-        "browserUrl": "https://www.nba.com/spurs",
-        "category": "news"
-      },
-      {
-        "id": "nba-sas-air-alamo",
-        "name": "Air Alamo",
-        "browserUrl": "https://airalamo.com",
-        "category": "news"
-      },
-      {
-        "id": "nba-sas-hoopshype",
-        "name": "HoopsHype",
-        "browserUrl": "https://www.hoopshype.com/rumors/?topic=13196729-d867-4914-8227-582a16eadb0b",
-        "category": "news"
-      },
-      {
-        "id": "nba-sas-espn",
-        "name": "ESPN",
-        "browserUrl": "https://www.espn.com/nba/team/_/name/sas/san-antonio-spurs",
-        "category": "news"
-      },
-      {
-        "id": "nba-sas-yahoo-sports",
-        "name": "Yahoo Sports",
-        "browserUrl": "https://sports.yahoo.com/nba/teams/san-antonio/",
-        "category": "news"
-      },
-      {
-        "id": "nba-sas-san-antonio-express-news",
-        "name": "San Antonio Express-News",
-        "browserUrl": "https://www.expressnews.com/sports/spurs/",
-        "category": "news"
-      },
-      {
-        "id": "nba-sas-ksat",
-        "name": "KSAT",
-        "browserUrl": "https://www.ksat.com/sports/",
-        "category": "news"
-      },
-      {
-        "id": "nba-sas-fansided",
-        "name": "FanSided",
-        "browserUrl": "https://fansided.com/nba/san-antonio-spurs/",
-        "category": "news"
-      },
-      {
-        "id": "nba-sas-sports-illustrated",
-        "name": "Sports Illustrated",
-        "browserUrl": "https://www.si.com/nba/spurs",
-        "category": "news"
-      },
-      {
-        "id": "nba-sas-nba-official",
-        "name": "NBA Official",
-        "browserUrl": "https://www.nba.com/spurs",
+        "name": "#San Antonio Spurs",
+        "browserUrl": "https://x.com/search?q=san%20antonio%20spurs&src=typed_query",
         "category": "news"
       }
     ],
     "TOR": [
       {
-        "id": "nba-tor-raptors-hq",
-        "name": "Raptors HQ",
-        "browserUrl": "https://www.raptorshq.com",
-        "category": "news"
-      },
-      {
-        "id": "nba-tor-the-athletic",
-        "name": "The Athletic",
-        "browserUrl": "https://www.nytimes.com/athletic/nba/team/raptors/",
-        "category": "news"
-      },
-      {
-        "id": "nba-tor-sportspyder",
-        "name": "SportSpyder",
-        "browserUrl": "https://sportspyder.com/nba/toronto-raptors/news",
-        "category": "news"
-      },
-      {
-        "id": "nba-tor-hoops-rumors",
-        "name": "Hoops Rumors",
-        "browserUrl": "https://www.hoopsrumors.com/toronto-raptors",
-        "category": "news"
-      },
-      {
-        "id": "nba-tor-the-cold-wire",
-        "name": "The Cold Wire",
-        "browserUrl": "https://www.thecoldwire.com/sports/nba/toronto-raptors/",
-        "category": "news"
-      },
-      {
-        "id": "nba-tor-toronto-raptors",
-        "name": "Toronto Raptors",
-        "browserUrl": "https://www.nba.com/raptors",
-        "category": "news"
-      },
-      {
-        "id": "nba-tor-raptors-republic",
-        "name": "Raptors Republic",
-        "browserUrl": "https://raptorsrepublic.com/",
-        "category": "news"
-      },
-      {
-        "id": "nba-tor-raptors-rapture",
-        "name": "Raptors Rapture",
-        "browserUrl": "https://raptorsrapture.com",
-        "category": "news"
-      },
-      {
-        "id": "nba-tor-hoopshype",
-        "name": "HoopsHype",
-        "browserUrl": "https://www.hoopshype.com/rumors/?topic=c42c0dfa-381f-4c0e-89cb-1ca38431f316",
+        "id": "nba-tor-nba-com",
+        "name": "NBA.com",
+        "browserUrl": "https://www.nba.com/raptors/",
         "category": "news"
       },
       {
@@ -105956,95 +108428,113 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
         "category": "news"
       },
       {
+        "id": "nba-tor-cbs-sports",
+        "name": "CBS Sports",
+        "browserUrl": "https://www.cbssports.com/nba/teams/TOR/toronto-raptors/",
+        "category": "news"
+      },
+      {
+        "id": "nba-tor-fox-sports",
+        "name": "FOX Sports",
+        "browserUrl": "https://www.foxsports.com/nba/toronto-raptors-team",
+        "category": "news"
+      },
+      {
         "id": "nba-tor-yahoo-sports",
-        "name": "Yahoo Sports",
+        "name": "Yahoo! Sports",
         "browserUrl": "https://sports.yahoo.com/nba/teams/toronto/",
         "category": "news"
       },
       {
-        "id": "nba-tor-sportsnet",
-        "name": "Sportsnet",
-        "browserUrl": "https://www.sportsnet.ca/basketball/nba/toronto-raptors-13-2-start-bodes-well-for-post-season/",
+        "id": "nba-tor-the-athletic",
+        "name": "The Athletic",
+        "browserUrl": "https://www.nytimes.com/athletic/nba/team/raptors/",
         "category": "news"
       },
       {
-        "id": "nba-tor-tsn",
-        "name": "TSN",
-        "browserUrl": "https://www.tsn.ca/nba/team-page/toronto-raptors/254/",
+        "id": "nba-tor-b-r",
+        "name": "B/R",
+        "browserUrl": "https://bleacherreport.com/toronto-raptors",
         "category": "news"
       },
       {
-        "id": "nba-tor-fansided",
-        "name": "FanSided",
-        "browserUrl": "https://fansided.com/nba/toronto-raptors/",
+        "id": "nba-tor-nbc-sports",
+        "name": "NBC Sports",
+        "browserUrl": "https://www.nbcsports.com/nba/toronto-raptors",
         "category": "news"
       },
       {
-        "id": "nba-tor-sports-illustrated",
-        "name": "Sports Illustrated",
+        "id": "nba-tor-si",
+        "name": "SI",
         "browserUrl": "https://www.si.com/nba/raptors",
         "category": "news"
       },
       {
-        "id": "nba-tor-cbs-sports",
-        "name": "CBS Sports",
-        "browserUrl": "https://www.cbssports.com/nba/teams/TOR/toronto-raptors/",
+        "id": "nba-tor-usa-today",
+        "name": "USA Today",
+        "browserUrl": "https://sportsdata.usatoday.com/basketball/nba/teams/toronto-raptors/28/",
+        "category": "news"
+      },
+      {
+        "id": "nba-tor-athlon-sports",
+        "name": "Athlon Sports",
+        "browserUrl": "https://athlonsports.com/nba/toronto-raptors",
+        "category": "news"
+      },
+      {
+        "id": "nba-tor-yardbarker",
+        "name": "Yardbarker",
+        "browserUrl": "https://www.yardbarker.com/nba/teams/toronto_raptors/67",
+        "category": "news"
+      },
+      {
+        "id": "nba-tor-spotrac",
+        "name": "Spotrac",
+        "browserUrl": "https://www.spotrac.com/nba/toronto-raptors/overview",
+        "category": "news"
+      },
+      {
+        "id": "nba-tor-statmuse",
+        "name": "StatMuse",
+        "browserUrl": "https://www.statmuse.com/nba/ask/toronto-raptors-stats",
+        "category": "news"
+      },
+      {
+        "id": "nba-tor-newsnow",
+        "name": "NewsNow",
+        "browserUrl": "https://www.newsnow.co.uk/h/Sport/US+Sports/NBA/Toronto+Raptors",
+        "category": "news"
+      },
+      {
+        "id": "nba-tor-sportspyder",
+        "name": "SportSpyder",
+        "browserUrl": "https://sportspyder.com/nba/toronto-raptors/news",
+        "category": "news"
+      },
+      {
+        "id": "nba-tor-reddit",
+        "name": "Reddit",
+        "browserUrl": "https://www.reddit.com/r/torontoraptors/",
+        "category": "news"
+      },
+      {
+        "id": "nba-tor-raptors",
+        "name": "@Raptors",
+        "browserUrl": "https://x.com/Raptors",
+        "category": "news"
+      },
+      {
+        "id": "nba-tor-toronto-raptors",
+        "name": "#Toronto Raptors",
+        "browserUrl": "https://x.com/search?q=toronto%20raptors&src=typed_query",
         "category": "news"
       }
     ],
     "UTA": [
       {
-        "id": "nba-uta-slc-dunk",
-        "name": "SLC Dunk",
-        "browserUrl": "https://www.slcdunk.com",
-        "category": "news"
-      },
-      {
-        "id": "nba-uta-the-athletic",
-        "name": "The Athletic",
-        "browserUrl": "https://www.nytimes.com/athletic/nba/team/jazz/",
-        "category": "news"
-      },
-      {
-        "id": "nba-uta-sportspyder",
-        "name": "SportSpyder",
-        "browserUrl": "https://sportspyder.com/nba/utah-jazz/news",
-        "category": "news"
-      },
-      {
-        "id": "nba-uta-hoops-rumors",
-        "name": "Hoops Rumors",
-        "browserUrl": "https://www.hoopsrumors.com/utah-jazz",
-        "category": "news"
-      },
-      {
-        "id": "nba-uta-the-cold-wire",
-        "name": "The Cold Wire",
-        "browserUrl": "https://www.thecoldwire.com/sports/nba/utah-jazz/",
-        "category": "news"
-      },
-      {
-        "id": "nba-uta-utah-jazz",
-        "name": "Utah Jazz",
-        "browserUrl": "https://www.nba.com/jazz",
-        "category": "news"
-      },
-      {
-        "id": "nba-uta-deseret-news",
-        "name": "Deseret News",
-        "browserUrl": "https://www.deseret.com/sports/utah-jazz/",
-        "category": "news"
-      },
-      {
-        "id": "nba-uta-salt-lake-tribune",
-        "name": "Salt Lake Tribune",
-        "browserUrl": "https://www.sltrib.com/sports/jazz/",
-        "category": "news"
-      },
-      {
-        "id": "nba-uta-hoopshype",
-        "name": "HoopsHype",
-        "browserUrl": "https://www.hoopshype.com/rumors/?topic=b47c1f60-983a-4f05-b662-93d89a8ac7dc",
+        "id": "nba-uta-nba-com",
+        "name": "NBA.com",
+        "browserUrl": "https://www.nba.com/jazz/",
         "category": "news"
       },
       {
@@ -106054,89 +108544,113 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
         "category": "news"
       },
       {
+        "id": "nba-uta-cbs-sports",
+        "name": "CBS Sports",
+        "browserUrl": "https://www.cbssports.com/nba/teams/UTA/utah-jazz/",
+        "category": "news"
+      },
+      {
+        "id": "nba-uta-fox-sports",
+        "name": "FOX Sports",
+        "browserUrl": "https://www.foxsports.com/nba/utah-jazz-team",
+        "category": "news"
+      },
+      {
         "id": "nba-uta-yahoo-sports",
-        "name": "Yahoo Sports",
+        "name": "Yahoo! Sports",
         "browserUrl": "https://sports.yahoo.com/nba/teams/utah/",
         "category": "news"
       },
       {
-        "id": "nba-uta-fansided",
-        "name": "FanSided",
-        "browserUrl": "https://fansided.com/nba/utah-jazz/",
+        "id": "nba-uta-the-athletic",
+        "name": "The Athletic",
+        "browserUrl": "https://www.nytimes.com/athletic/nba/team/jazz/",
         "category": "news"
       },
       {
-        "id": "nba-uta-sports-illustrated",
-        "name": "Sports Illustrated",
+        "id": "nba-uta-b-r",
+        "name": "B/R",
+        "browserUrl": "https://bleacherreport.com/utah-jazz",
+        "category": "news"
+      },
+      {
+        "id": "nba-uta-nbc-sports",
+        "name": "NBC Sports",
+        "browserUrl": "https://www.nbcsports.com/nba/utah-jazz",
+        "category": "news"
+      },
+      {
+        "id": "nba-uta-si",
+        "name": "SI",
         "browserUrl": "https://www.si.com/nba/jazz",
         "category": "news"
       },
       {
-        "id": "nba-uta-nba-official",
-        "name": "NBA Official",
-        "browserUrl": "https://www.nba.com/jazz",
+        "id": "nba-uta-usa-today",
+        "name": "USA Today",
+        "browserUrl": "https://sportsdata.usatoday.com/basketball/nba/teams/utah-jazz/26/",
         "category": "news"
       },
       {
-        "id": "nba-uta-cbs-sports",
-        "name": "CBS Sports",
-        "browserUrl": "https://www.cbssports.com/nba/teams/UTA/utah-jazz/",
+        "id": "nba-uta-athlon-sports",
+        "name": "Athlon Sports",
+        "browserUrl": "https://athlonsports.com/nba/utah-jazz",
+        "category": "news"
+      },
+      {
+        "id": "nba-uta-yardbarker",
+        "name": "Yardbarker",
+        "browserUrl": "https://www.yardbarker.com/nba/teams/utah_jazz/86",
+        "category": "news"
+      },
+      {
+        "id": "nba-uta-spotrac",
+        "name": "Spotrac",
+        "browserUrl": "https://www.spotrac.com/nba/utah-jazz/overview",
+        "category": "news"
+      },
+      {
+        "id": "nba-uta-statmuse",
+        "name": "StatMuse",
+        "browserUrl": "https://www.statmuse.com/nba/ask/utah-jazz-stats",
+        "category": "news"
+      },
+      {
+        "id": "nba-uta-newsnow",
+        "name": "NewsNow",
+        "browserUrl": "https://www.newsnow.co.uk/h/Sport/US+Sports/NBA/Utah+Jazz",
+        "category": "news"
+      },
+      {
+        "id": "nba-uta-sportspyder",
+        "name": "SportSpyder",
+        "browserUrl": "https://sportspyder.com/nba/utah-jazz/news",
+        "category": "news"
+      },
+      {
+        "id": "nba-uta-reddit",
+        "name": "Reddit",
+        "browserUrl": "https://www.reddit.com/r/UtahJazz/",
+        "category": "news"
+      },
+      {
+        "id": "nba-uta-utahjazz",
+        "name": "@utahjazz",
+        "browserUrl": "https://x.com/utahjazz",
+        "category": "news"
+      },
+      {
+        "id": "nba-uta-utah-jazz",
+        "name": "#Utah Jazz",
+        "browserUrl": "https://x.com/search?q=utah%20jazz&src=typed_query",
         "category": "news"
       }
     ],
     "WSH": [
       {
-        "id": "nba-wsh-bullets-forever",
-        "name": "Bullets Forever",
-        "browserUrl": "https://www.bulletsforever.com",
-        "category": "news"
-      },
-      {
-        "id": "nba-wsh-the-athletic",
-        "name": "The Athletic",
-        "browserUrl": "https://www.nytimes.com/athletic/nba/team/wizards/",
-        "category": "news"
-      },
-      {
-        "id": "nba-wsh-sportspyder",
-        "name": "SportSpyder",
-        "browserUrl": "https://sportspyder.com/nba/washington-wizards/news",
-        "category": "news"
-      },
-      {
-        "id": "nba-wsh-hoops-rumors",
-        "name": "Hoops Rumors",
-        "browserUrl": "https://www.hoopsrumors.com/washington-wizards",
-        "category": "news"
-      },
-      {
-        "id": "nba-wsh-the-cold-wire",
-        "name": "The Cold Wire",
-        "browserUrl": "https://www.thecoldwire.com/sports/nba/washington-wizards/",
-        "category": "news"
-      },
-      {
-        "id": "nba-wsh-washington-wizards",
-        "name": "Washington Wizards",
-        "browserUrl": "https://www.nba.com/wizards",
-        "category": "news"
-      },
-      {
-        "id": "nba-wsh-monumental-sports-network",
-        "name": "Monumental Sports Network",
-        "browserUrl": "https://www.monumentalsportsnetwork.com/wizards",
-        "category": "news"
-      },
-      {
-        "id": "nba-wsh-nbc-sports-washington",
-        "name": "NBC Sports Washington",
-        "browserUrl": "https://www.monumentalsportsnetwork.com/washington/wizards",
-        "category": "news"
-      },
-      {
-        "id": "nba-wsh-hoopshype",
-        "name": "HoopsHype",
-        "browserUrl": "https://www.hoopshype.com/rumors/?topic=cced51c5-8f98-4cfd-8934-9759cefdcdd0",
+        "id": "nba-wsh-nba-com",
+        "name": "NBA.com",
+        "browserUrl": "https://www.nba.com/wizards/",
         "category": "news"
       },
       {
@@ -106146,35 +108660,105 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
         "category": "news"
       },
       {
+        "id": "nba-wsh-cbs-sports",
+        "name": "CBS Sports",
+        "browserUrl": "https://www.cbssports.com/nba/teams/WSH/washington-wizards/",
+        "category": "news"
+      },
+      {
+        "id": "nba-wsh-fox-sports",
+        "name": "FOX Sports",
+        "browserUrl": "https://www.foxsports.com/nba/washington-wizards-team",
+        "category": "news"
+      },
+      {
         "id": "nba-wsh-yahoo-sports",
-        "name": "Yahoo Sports",
+        "name": "Yahoo! Sports",
         "browserUrl": "https://sports.yahoo.com/nba/teams/washington/",
         "category": "news"
       },
       {
-        "id": "nba-wsh-fansided",
-        "name": "FanSided",
-        "browserUrl": "https://fansided.com/nba/washington-wizards/",
+        "id": "nba-wsh-the-athletic",
+        "name": "The Athletic",
+        "browserUrl": "https://www.nytimes.com/athletic/nba/team/wizards/",
         "category": "news"
       },
       {
-        "id": "nba-wsh-sports-illustrated",
-        "name": "Sports Illustrated",
+        "id": "nba-wsh-b-r",
+        "name": "B/R",
+        "browserUrl": "https://bleacherreport.com/washington-wizards",
+        "category": "news"
+      },
+      {
+        "id": "nba-wsh-nbc-sports",
+        "name": "NBC Sports",
+        "browserUrl": "https://www.nbcsports.com/nba/washington-wizards",
+        "category": "news"
+      },
+      {
+        "id": "nba-wsh-si",
+        "name": "SI",
         "browserUrl": "https://www.si.com/nba/wizards",
         "category": "news"
-      }
-    ],
-    "WAS": [
+      },
       {
-        "id": "nba-was-nba-official",
-        "name": "NBA Official",
-        "browserUrl": "https://www.nba.com/wizards",
+        "id": "nba-wsh-usa-today",
+        "name": "USA Today",
+        "browserUrl": "https://sportsdata.usatoday.com/basketball/nba/teams/washington-wizards/27/",
         "category": "news"
       },
       {
-        "id": "nba-was-cbs-sports",
-        "name": "CBS Sports",
-        "browserUrl": "https://www.cbssports.com/nba/teams/WAS/washington-wizards/",
+        "id": "nba-wsh-athlon-sports",
+        "name": "Athlon Sports",
+        "browserUrl": "https://athlonsports.com/nba/washington-wizards",
+        "category": "news"
+      },
+      {
+        "id": "nba-wsh-yardbarker",
+        "name": "Yardbarker",
+        "browserUrl": "https://www.yardbarker.com/nba/teams/washington_wizards/76",
+        "category": "news"
+      },
+      {
+        "id": "nba-wsh-spotrac",
+        "name": "Spotrac",
+        "browserUrl": "https://www.spotrac.com/nba/washington-wizards/overview",
+        "category": "news"
+      },
+      {
+        "id": "nba-wsh-statmuse",
+        "name": "StatMuse",
+        "browserUrl": "https://www.statmuse.com/nba/ask/washington-wizards-stats",
+        "category": "news"
+      },
+      {
+        "id": "nba-wsh-newsnow",
+        "name": "NewsNow",
+        "browserUrl": "https://www.newsnow.co.uk/h/Sport/US+Sports/NBA/Washington+Wizards",
+        "category": "news"
+      },
+      {
+        "id": "nba-wsh-sportspyder",
+        "name": "SportSpyder",
+        "browserUrl": "https://sportspyder.com/nba/washington-wizards/news",
+        "category": "news"
+      },
+      {
+        "id": "nba-wsh-reddit",
+        "name": "Reddit",
+        "browserUrl": "https://www.reddit.com/r/washingtonwizards/",
+        "category": "news"
+      },
+      {
+        "id": "nba-wsh-washwizards",
+        "name": "@WashWizards",
+        "browserUrl": "https://x.com/WashWizards",
+        "category": "news"
+      },
+      {
+        "id": "nba-wsh-washington-wizards",
+        "name": "#Washington Wizards",
+        "browserUrl": "https://x.com/search?q=washington%20wizards&src=typed_query",
         "category": "news"
       }
     ]
@@ -154533,7 +157117,7 @@ function isGrarfExtensionSidePanelPageNavigation() {
 // ../grarf/desktop/src/extensionHost/grarfExtensionGameCardTeamExploreExpansion.ts
 init_define_import_meta_env();
 var import_react273 = __toESM(require_react(), 1);
-var activeTeamSideByGameId = /* @__PURE__ */ new Map();
+var activeTeamExplore = null;
 var activeSourceUrlByGameId = /* @__PURE__ */ new Map();
 var listeners6 = /* @__PURE__ */ new Set();
 var sourceListeners = /* @__PURE__ */ new Set();
@@ -154542,15 +157126,39 @@ function notify4() {
     listener();
   }
 }
-function getGrarfExtensionGameCardTeamExploreActiveSide(gameId) {
-  return activeTeamSideByGameId.get(gameId.trim()) ?? null;
-}
-function setGrarfExtensionGameCardTeamExploreActiveSide(gameId, side) {
+function isGrarfExtensionGameCardTeamExploreExpanded(gameId) {
   const trimmed = gameId.trim();
-  if (!trimmed) return;
-  if (activeTeamSideByGameId.get(trimmed) === side) return;
-  activeTeamSideByGameId.set(trimmed, side);
+  if (!trimmed) return false;
+  return activeTeamExplore?.gameId === trimmed;
+}
+function getGrarfExtensionGameCardTeamExploreActiveSide(gameId) {
+  const trimmed = gameId.trim();
+  if (!trimmed || activeTeamExplore?.gameId !== trimmed) return null;
+  return activeTeamExplore.side;
+}
+function toggleGrarfExtensionGameCardTeamExplore(gameId, side) {
+  const trimmed = gameId.trim();
+  if (!trimmed) return false;
+  if (activeTeamExplore?.gameId === trimmed && activeTeamExplore.side === side) {
+    activeTeamExplore = null;
+    activeSourceUrlByGameId.delete(trimmed);
+    notify4();
+    return false;
+  }
+  const previousGameId = activeTeamExplore?.gameId;
+  activeTeamExplore = { gameId: trimmed, side };
+  if (previousGameId && previousGameId !== trimmed) {
+    activeSourceUrlByGameId.delete(previousGameId);
+  }
   notify4();
+  return true;
+}
+function syncGrarfExtensionGameCardTeamExploreExpandedGameIds(gameId) {
+  return isGrarfExtensionGameCardTeamExploreExpanded(gameId) ? /* @__PURE__ */ new Set([gameId.trim()]) : /* @__PURE__ */ new Set();
+}
+function resolveGrarfExtensionGameCardTeamExploreExpandedGameIdsAfterToggle(gameId, side) {
+  toggleGrarfExtensionGameCardTeamExplore(gameId, side);
+  return syncGrarfExtensionGameCardTeamExploreExpandedGameIds(gameId);
 }
 function subscribeGrarfExtensionGameCardTeamExploreActiveSide(listener) {
   listeners6.add(listener);
@@ -154577,31 +157185,26 @@ function subscribeGrarfExtensionGameCardTeamExploreActiveSourceUrl(listener) {
     sourceListeners.delete(listener);
   };
 }
-function ensureGrarfExtensionGameCardTeamExploreExpandedGameId(expandedGameIds, gameId) {
-  const trimmed = gameId.trim();
-  if (!trimmed || expandedGameIds.has(trimmed)) {
-    return expandedGameIds;
-  }
-  const next = new Set(expandedGameIds);
-  next.add(trimmed);
-  return next;
-}
 function useGrarfExtensionGameCardTeamExploreForCard({
+  gameId,
   exploreExpanded = false,
   onTeamExploreToggle
 }) {
-  const [localExpanded, setLocalExpanded] = (0, import_react273.useState)(false);
+  const globalExpanded = (0, import_react273.useSyncExternalStore)(
+    subscribeGrarfExtensionGameCardTeamExploreActiveSide,
+    () => isGrarfExtensionGameCardTeamExploreExpanded(gameId),
+    () => isGrarfExtensionGameCardTeamExploreExpanded(gameId)
+  );
   const onTeamExploreOpen = (0, import_react273.useCallback)(
     (game, side) => {
-      setGrarfExtensionGameCardTeamExploreActiveSide(game.id, side);
-      setLocalExpanded(true);
+      toggleGrarfExtensionGameCardTeamExplore(game.id, side);
       onTeamExploreToggle?.(game, side);
       scheduleGrarfExtensionSidebarActiveSelectionVisible();
     },
     [onTeamExploreToggle]
   );
   return {
-    exploreExpanded: localExpanded || exploreExpanded,
+    exploreExpanded: exploreExpanded || globalExpanded,
     onTeamExploreOpen
   };
 }
@@ -168929,6 +171532,9 @@ function GrarfExtensionNewsLeaguesSourceCard({
   );
 }
 
+// ../grarf/desktop/src/extensionHost/resolveGrarfExtensionTeamExploreSources.ts
+init_define_import_meta_env();
+
 // ../grarf/desktop/src/extensionHost/resolveGrarfExtensionNflTeamExploreSources.ts
 init_define_import_meta_env();
 
@@ -171664,6 +174270,97 @@ function resolveGrarfExtensionNflTeamExploreSourcesForGameSide(game, side) {
   return resolveGrarfExtensionNflTeamExploreSourcesForAbbrev(abbrev);
 }
 
+// ../grarf/desktop/src/extensionHost/resolveGrarfExtensionTeamExploreSources.ts
+var ESPN_MLB_ABBREV_TO_CANONICAL = {
+  CHW: "CWS",
+  OAK: "ATH",
+  AZ: "ARI",
+  WAS: "WSH"
+};
+function normalizeGrarfExtensionMlbTeamExploreAbbrev(abbrev) {
+  const trimmed = abbrev?.trim().toUpperCase();
+  if (!trimmed) return null;
+  return ESPN_MLB_ABBREV_TO_CANONICAL[trimmed] ?? trimmed;
+}
+var ESPN_NBA_ABBREV_TO_CANONICAL = {
+  GS: "GSW",
+  NY: "NYK",
+  SA: "SAS",
+  NO: "NOP",
+  PHO: "PHX",
+  UTAH: "UTA",
+  WAS: "WSH"
+};
+function isGrarfExtensionMlbTeamExploreGame(game) {
+  return game.league === "MLB" || game.id.startsWith("espn-MLB-");
+}
+function isGrarfExtensionNbaTeamExploreGame(game) {
+  return game.league === "NBA" || game.id.startsWith("espn-NBA-");
+}
+function isGrarfExtensionNhlTeamExploreGame(game) {
+  return game.league === "NHL" || game.id.startsWith("espn-NHL-");
+}
+var ESPN_NHL_ABBREV_TO_CANONICAL = {
+  NJ: "NJD",
+  LA: "LAK",
+  TB: "TBL",
+  SJ: "SJS",
+  WSH: "WSH",
+  UTAH: "UTA"
+};
+function normalizeGrarfExtensionNhlTeamExploreAbbrev(abbrev) {
+  const trimmed = abbrev?.trim().toUpperCase();
+  if (!trimmed) return null;
+  return ESPN_NHL_ABBREV_TO_CANONICAL[trimmed] ?? trimmed;
+}
+function normalizeGrarfExtensionNbaTeamExploreAbbrev(abbrev) {
+  const trimmed = abbrev?.trim().toUpperCase();
+  if (!trimmed) return null;
+  return ESPN_NBA_ABBREV_TO_CANONICAL[trimmed] ?? trimmed;
+}
+function mapRegistrySourcesToTeamExplore(sources) {
+  return sources.map((source) => ({
+    label: source.name,
+    url: source.browserUrl
+  }));
+}
+function resolveGrarfExtensionMlbTeamExploreSourcesForGameSide(game, side) {
+  if (!isGrarfExtensionMlbTeamExploreGame(game)) return null;
+  const abbrevRaw = side === "away" ? game.awayTeamAbbrev : game.homeTeamAbbrev;
+  const abbrev = normalizeGrarfExtensionMlbTeamExploreAbbrev(abbrevRaw);
+  if (!abbrev) return null;
+  const sources = resolveMlbTeamNewsSourcesForTeamAbbrev(abbrev);
+  if (!sources.length) return null;
+  return mapRegistrySourcesToTeamExplore(sources);
+}
+function resolveGrarfExtensionNbaTeamExploreSourcesForGameSide(game, side) {
+  if (!isGrarfExtensionNbaTeamExploreGame(game)) return null;
+  const abbrevRaw = side === "away" ? game.awayTeamAbbrev : game.homeTeamAbbrev;
+  const abbrev = normalizeGrarfExtensionNbaTeamExploreAbbrev(abbrevRaw);
+  if (!abbrev) return null;
+  const sources = resolveNonMlbTeamNewsSourcesForTeamAbbrev("NBA", abbrev);
+  if (!sources.length) return null;
+  return mapRegistrySourcesToTeamExplore(sources);
+}
+function resolveGrarfExtensionNhlTeamExploreSourcesForGameSide(game, side) {
+  if (!isGrarfExtensionNhlTeamExploreGame(game)) return null;
+  const abbrevRaw = side === "away" ? game.awayTeamAbbrev : game.homeTeamAbbrev;
+  const abbrev = normalizeGrarfExtensionNhlTeamExploreAbbrev(abbrevRaw);
+  if (!abbrev) return null;
+  const sources = resolveNonMlbTeamNewsSourcesForTeamAbbrev("NHL", abbrev);
+  if (!sources.length) return null;
+  return mapRegistrySourcesToTeamExplore(sources);
+}
+function resolveGrarfExtensionTeamExploreSourcesForGameSide(game, side) {
+  const nfl = resolveGrarfExtensionNflTeamExploreSourcesForGameSide(game, side);
+  if (nfl?.length) return nfl;
+  const mlb2 = resolveGrarfExtensionMlbTeamExploreSourcesForGameSide(game, side);
+  if (mlb2?.length) return mlb2;
+  const nba = resolveGrarfExtensionNbaTeamExploreSourcesForGameSide(game, side);
+  if (nba?.length) return nba;
+  return resolveGrarfExtensionNhlTeamExploreSourcesForGameSide(game, side);
+}
+
 // ../grarf/desktop/src/extensionHost/GrarfExtensionGameCardTeamExplorePanel.tsx
 var import_jsx_runtime255 = __toESM(require_jsx_runtime(), 1);
 function GrarfExtensionGameCardTeamExplorePanel({ game, side }) {
@@ -171672,7 +174369,7 @@ function GrarfExtensionGameCardTeamExplorePanel({ game, side }) {
     () => getGrarfExtensionGameCardTeamExploreActiveSourceUrl(game.id),
     () => getGrarfExtensionGameCardTeamExploreActiveSourceUrl(game.id)
   );
-  const sources = resolveGrarfExtensionNflTeamExploreSourcesForGameSide(game, side);
+  const sources = resolveGrarfExtensionTeamExploreSourcesForGameSide(game, side);
   if (!sources?.length) {
     return /* @__PURE__ */ (0, import_jsx_runtime255.jsx)(
       "div",
@@ -174577,9 +177274,8 @@ function SportsBrowserPrototypeBottomRailGames({
   }, []);
   const openCommandCenterGameTeamExplore = (0, import_react292.useCallback)(
     (game, side) => {
-      setGrarfExtensionGameCardTeamExploreActiveSide(game.id, side);
       setCommandCenterExploreExpandedGameIds(
-        (previous) => ensureGrarfExtensionGameCardTeamExploreExpandedGameId(previous, game.id)
+        () => resolveGrarfExtensionGameCardTeamExploreExpandedGameIdsAfterToggle(game.id, side)
       );
       scheduleGrarfExtensionSidebarActiveSelectionVisible();
     },
@@ -187998,6 +190694,7 @@ function GrarfExtensionSidebarTemporalCollapsedGameCard({
   const statusTimeLabel = resolveCommandCenterTopRowTimingLabel(game);
   const tennisMetaHeader = resolveSportsBrowserTennisGameCardMetaHeaderLabels(game);
   const teamExplore = useGrarfExtensionGameCardTeamExploreForCard({
+    gameId: game.id,
     exploreExpanded,
     onTeamExploreToggle
   });
@@ -189762,6 +192459,35 @@ var homeCommandCenterDailyPriorities_default = {
           awayTeamLabel: "Rockets",
           homeTeamLabel: "Spurs",
           line: "NBA - Rockets vs Spurs"
+        }
+      ]
+    },
+    "2026-10-24": {
+      updatedAt: "2026-10-24T15:50:28.049Z",
+      entries: [
+        {
+          kind: "matchup",
+          leagueLabel: "MLB",
+          leagueKey: "MLB",
+          awayTeamLabel: "Rays",
+          homeTeamLabel: "Brewers",
+          line: "MLB - Rays vs Brewers"
+        },
+        {
+          kind: "matchup",
+          leagueLabel: "WNBA",
+          leagueKey: "WNBA",
+          awayTeamLabel: "Valkyries",
+          homeTeamLabel: "Dream",
+          line: "WNBA - Valkyries vs Dream"
+        },
+        {
+          kind: "matchup",
+          leagueLabel: "NCAAF",
+          leagueKey: "NCAAF",
+          awayTeamLabel: "Ole Miss",
+          homeTeamLabel: "Texas",
+          line: "NCAAF - Ole Miss vs Texas"
         }
       ]
     }
@@ -195624,9 +198350,8 @@ function SidebarTemporalLeagueBlock({
     });
   }, []);
   const openGameTeamExplore = (0, import_react333.useCallback)((game, side) => {
-    setGrarfExtensionGameCardTeamExploreActiveSide(game.id, side);
     setGameExploreExpandedIds(
-      (previous) => ensureGrarfExtensionGameCardTeamExploreExpandedGameId(previous, game.id)
+      () => syncGrarfExtensionGameCardTeamExploreExpandedGameIds(game.id)
     );
     scheduleGrarfExtensionSidebarActiveSelectionVisible();
   }, []);
