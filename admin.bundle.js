@@ -16264,7 +16264,8 @@ function countGames(leagues) {
   }
   return count;
 }
-var ENABLED = define_import_meta_env_default.DEV || define_import_meta_env_default.VITE_TRACE_OPERATIONAL_INGEST_WRITES === "1";
+var ingestWriteDiagnosticEnv = define_import_meta_env_default;
+var ENABLED = Boolean(ingestWriteDiagnosticEnv?.DEV) || ingestWriteDiagnosticEnv?.VITE_TRACE_OPERATIONAL_INGEST_WRITES === "1";
 function logOperationalHydrateDecision(input) {
   if (!ENABLED) return;
   console.log("[OperationalIngestWrite]", {
@@ -21386,6 +21387,123 @@ var manualEvents_default = {
       streamUrl: "https://www.peacocktv.com/watch/asset/sports/usatf-outdoor-champs-day-3/7ea233f4-dba1-3918-8c1b-4afdd03bb75f",
       gameCardUrl: "https://results.usatf.org/2026outdoors",
       openBehavior: "Center Pane"
+    },
+    {
+      leagueId: "MOTOGP",
+      eventName: "Australian Motorcycle Grand Prix",
+      team1: null,
+      team2: null,
+      startTime: "2026-10-24T22:00:00",
+      endTime: "2026-10-25T00:15:00",
+      sourceTimezone: "CT",
+      broadcastName: "FS2",
+      streamUrl: "https://www.foxsports.com/live/fs2",
+      gameCardUrl: "https://www.motorsport.com/motogp/schedule/2026/",
+      openBehavior: "New Browser Tab"
+    },
+    {
+      leagueId: "MOTOGP",
+      eventName: "Grand Prix of Malaysia Sprint Race",
+      team1: null,
+      team2: null,
+      startTime: "2026-10-31T02:00:00",
+      endTime: "2026-10-31T04:15:00",
+      sourceTimezone: "CT",
+      broadcastName: "FS1",
+      streamUrl: "https://www.foxsports.com/live/fs1",
+      gameCardUrl: "https://www.motorsport.com/motogp/schedule/2026/",
+      openBehavior: "New Browser Tab"
+    },
+    {
+      leagueId: "MOTOGP",
+      eventName: "Grand Prix of Malaysia",
+      team1: null,
+      team2: null,
+      startTime: "2026-11-01T01:00:00",
+      endTime: "2026-11-01T03:15:00",
+      sourceTimezone: "CT",
+      broadcastName: "FS2",
+      streamUrl: "https://www.foxsports.com/live/fs2",
+      gameCardUrl: "https://www.motorsport.com/motogp/schedule/2026/",
+      openBehavior: "New Browser Tab"
+    },
+    {
+      leagueId: "MOTOGP",
+      eventName: "Grand Prix of Qatar Sprint Race",
+      team1: null,
+      team2: null,
+      startTime: "2026-11-07T11:00:00",
+      endTime: "2026-11-07T13:15:00",
+      sourceTimezone: "CT",
+      broadcastName: "FS1",
+      streamUrl: "https://www.foxsports.com/live/fs1",
+      gameCardUrl: "https://www.motorsport.com/motogp/schedule/2026/",
+      openBehavior: "New Browser Tab"
+    },
+    {
+      leagueId: "MOTOGP",
+      eventName: "Grand Prix of Qatar",
+      team1: null,
+      team2: null,
+      startTime: "2026-11-08T11:00:00",
+      endTime: "2026-11-08T13:15:00",
+      sourceTimezone: "CT",
+      broadcastName: "FS1",
+      streamUrl: "https://www.foxsports.com/live/fs1",
+      gameCardUrl: "https://www.motorsport.com/motogp/schedule/2026/",
+      openBehavior: "New Browser Tab"
+    },
+    {
+      leagueId: "MOTOGP",
+      eventName: "Grande Premio de Portugal Sprint Race",
+      team1: null,
+      team2: null,
+      startTime: "2026-11-21T09:00:00",
+      endTime: "2026-11-21T11:15:00",
+      sourceTimezone: "CT",
+      broadcastName: "FS2",
+      streamUrl: "https://www.foxsports.com/live/fs2",
+      gameCardUrl: "https://www.motorsport.com/motogp/schedule/2026/",
+      openBehavior: "New Browser Tab"
+    },
+    {
+      leagueId: "MOTOGP",
+      eventName: "Grande Premio de Portugal",
+      team1: null,
+      team2: null,
+      startTime: "2026-11-22T07:00:00",
+      endTime: "2026-11-22T09:15:00",
+      sourceTimezone: "CT",
+      broadcastName: "FS1",
+      streamUrl: "https://www.foxsports.com/live/fs1",
+      gameCardUrl: "https://www.motorsport.com/motogp/schedule/2026/",
+      openBehavior: "New Browser Tab"
+    },
+    {
+      leagueId: "MOTOGP",
+      eventName: "Gran Premio de la Comunitat Valenciana Sprint Race",
+      team1: null,
+      team2: null,
+      startTime: "2026-11-28T08:00:00",
+      endTime: "2026-11-28T10:15:00",
+      sourceTimezone: "CT",
+      broadcastName: "FS2",
+      streamUrl: "https://www.foxsports.com/live/fs2",
+      gameCardUrl: "https://www.motorsport.com/motogp/schedule/2026/",
+      openBehavior: "New Browser Tab"
+    },
+    {
+      leagueId: "MOTOGP",
+      eventName: "Gran Premio de la Comunitat Valenciana",
+      team1: null,
+      team2: null,
+      startTime: "2026-11-29T07:00:00",
+      endTime: "2026-11-29T09:15:00",
+      sourceTimezone: "CT",
+      broadcastName: "FS1",
+      streamUrl: "https://www.foxsports.com/live/fs1",
+      gameCardUrl: "https://www.motorsport.com/motogp/schedule/2026/",
+      openBehavior: "New Browser Tab"
     }
   ]
 };
@@ -21411,6 +21529,12 @@ var manualLeagues_default = {
       leagueId: "PLL",
       displayName: "Premier Lacrosse League",
       logo: "/league-logos/pll.png",
+      branding: null
+    },
+    {
+      leagueId: "MOTOGP",
+      displayName: "MotoGP",
+      logo: "/league-logos/motogp.png",
       branding: null
     }
   ]

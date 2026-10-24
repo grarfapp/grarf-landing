@@ -17275,6 +17275,123 @@ var manualEvents_default = {
       streamUrl: "https://www.peacocktv.com/watch/asset/sports/usatf-outdoor-champs-day-3/7ea233f4-dba1-3918-8c1b-4afdd03bb75f",
       gameCardUrl: "https://results.usatf.org/2026outdoors",
       openBehavior: "Center Pane"
+    },
+    {
+      leagueId: "MOTOGP",
+      eventName: "Australian Motorcycle Grand Prix",
+      team1: null,
+      team2: null,
+      startTime: "2026-10-24T22:00:00",
+      endTime: "2026-10-25T00:15:00",
+      sourceTimezone: "CT",
+      broadcastName: "FS2",
+      streamUrl: "https://www.foxsports.com/live/fs2",
+      gameCardUrl: "https://www.motorsport.com/motogp/schedule/2026/",
+      openBehavior: "New Browser Tab"
+    },
+    {
+      leagueId: "MOTOGP",
+      eventName: "Grand Prix of Malaysia Sprint Race",
+      team1: null,
+      team2: null,
+      startTime: "2026-10-31T02:00:00",
+      endTime: "2026-10-31T04:15:00",
+      sourceTimezone: "CT",
+      broadcastName: "FS1",
+      streamUrl: "https://www.foxsports.com/live/fs1",
+      gameCardUrl: "https://www.motorsport.com/motogp/schedule/2026/",
+      openBehavior: "New Browser Tab"
+    },
+    {
+      leagueId: "MOTOGP",
+      eventName: "Grand Prix of Malaysia",
+      team1: null,
+      team2: null,
+      startTime: "2026-11-01T01:00:00",
+      endTime: "2026-11-01T03:15:00",
+      sourceTimezone: "CT",
+      broadcastName: "FS2",
+      streamUrl: "https://www.foxsports.com/live/fs2",
+      gameCardUrl: "https://www.motorsport.com/motogp/schedule/2026/",
+      openBehavior: "New Browser Tab"
+    },
+    {
+      leagueId: "MOTOGP",
+      eventName: "Grand Prix of Qatar Sprint Race",
+      team1: null,
+      team2: null,
+      startTime: "2026-11-07T11:00:00",
+      endTime: "2026-11-07T13:15:00",
+      sourceTimezone: "CT",
+      broadcastName: "FS1",
+      streamUrl: "https://www.foxsports.com/live/fs1",
+      gameCardUrl: "https://www.motorsport.com/motogp/schedule/2026/",
+      openBehavior: "New Browser Tab"
+    },
+    {
+      leagueId: "MOTOGP",
+      eventName: "Grand Prix of Qatar",
+      team1: null,
+      team2: null,
+      startTime: "2026-11-08T11:00:00",
+      endTime: "2026-11-08T13:15:00",
+      sourceTimezone: "CT",
+      broadcastName: "FS1",
+      streamUrl: "https://www.foxsports.com/live/fs1",
+      gameCardUrl: "https://www.motorsport.com/motogp/schedule/2026/",
+      openBehavior: "New Browser Tab"
+    },
+    {
+      leagueId: "MOTOGP",
+      eventName: "Grande Premio de Portugal Sprint Race",
+      team1: null,
+      team2: null,
+      startTime: "2026-11-21T09:00:00",
+      endTime: "2026-11-21T11:15:00",
+      sourceTimezone: "CT",
+      broadcastName: "FS2",
+      streamUrl: "https://www.foxsports.com/live/fs2",
+      gameCardUrl: "https://www.motorsport.com/motogp/schedule/2026/",
+      openBehavior: "New Browser Tab"
+    },
+    {
+      leagueId: "MOTOGP",
+      eventName: "Grande Premio de Portugal",
+      team1: null,
+      team2: null,
+      startTime: "2026-11-22T07:00:00",
+      endTime: "2026-11-22T09:15:00",
+      sourceTimezone: "CT",
+      broadcastName: "FS1",
+      streamUrl: "https://www.foxsports.com/live/fs1",
+      gameCardUrl: "https://www.motorsport.com/motogp/schedule/2026/",
+      openBehavior: "New Browser Tab"
+    },
+    {
+      leagueId: "MOTOGP",
+      eventName: "Gran Premio de la Comunitat Valenciana Sprint Race",
+      team1: null,
+      team2: null,
+      startTime: "2026-11-28T08:00:00",
+      endTime: "2026-11-28T10:15:00",
+      sourceTimezone: "CT",
+      broadcastName: "FS2",
+      streamUrl: "https://www.foxsports.com/live/fs2",
+      gameCardUrl: "https://www.motorsport.com/motogp/schedule/2026/",
+      openBehavior: "New Browser Tab"
+    },
+    {
+      leagueId: "MOTOGP",
+      eventName: "Gran Premio de la Comunitat Valenciana",
+      team1: null,
+      team2: null,
+      startTime: "2026-11-29T07:00:00",
+      endTime: "2026-11-29T09:15:00",
+      sourceTimezone: "CT",
+      broadcastName: "FS1",
+      streamUrl: "https://www.foxsports.com/live/fs1",
+      gameCardUrl: "https://www.motorsport.com/motogp/schedule/2026/",
+      openBehavior: "New Browser Tab"
     }
   ]
 };
@@ -17300,6 +17417,12 @@ var manualLeagues_default = {
       leagueId: "PLL",
       displayName: "Premier Lacrosse League",
       logo: "/league-logos/pll.png",
+      branding: null
+    },
+    {
+      leagueId: "MOTOGP",
+      displayName: "MotoGP",
+      logo: "/league-logos/motogp.png",
       branding: null
     }
   ]
@@ -20086,7 +20209,8 @@ function countGames(leagues) {
   }
   return count3;
 }
-var ENABLED = define_import_meta_env_default.DEV || define_import_meta_env_default.VITE_TRACE_OPERATIONAL_INGEST_WRITES === "1";
+var ingestWriteDiagnosticEnv = define_import_meta_env_default;
+var ENABLED = Boolean(ingestWriteDiagnosticEnv?.DEV) || ingestWriteDiagnosticEnv?.VITE_TRACE_OPERATIONAL_INGEST_WRITES === "1";
 function logOperationalHydrateDecision(input) {
   if (!ENABLED) return;
   console.log("[OperationalIngestWrite]", {
@@ -42962,12 +43086,804 @@ init_isGrarfWebRenderer();
 
 // ../grarf/desktop/src/services/operationalIngest/extensionAuthoritativeGrarfCloudHydrate.ts
 init_define_import_meta_env();
+
+// ../grarf/desktop/src/lib/editorial/applyTemporaryEditorialGameScheduleOverrides.ts
+init_define_import_meta_env();
+init_isGrarfWebRenderer();
+
+// ../grarf/desktop/src/lib/editorial/resolveTemporaryEditorialOverrideNumberValue.ts
+init_define_import_meta_env();
+
+// ../grarf/desktop/src/lib/editorial/resolveTemporaryEditorialOverrides.ts
+init_define_import_meta_env();
+init_isGrarfWebRenderer();
+
+// ../grarf/desktop/src/lib/editorial/matchTemporaryEditorialOverrideGame.ts
+init_define_import_meta_env();
+
+// ../grarf/desktop/src/lib/editorial/editorialGameKey.ts
+init_define_import_meta_env();
+function editorialGameKey(game) {
+  const espn = game.espnEventId ?? game.externalIds?.espn;
+  if (espn != null && String(espn).trim()) return String(espn).trim();
+  const m2 = game.id.match(/espn-\w+-(\d+)/i);
+  if (m2?.[1]) return m2[1];
+  return game.id;
+}
+function normalizeEditorialLookupKey(key2) {
+  const base = key2.includes("::") ? key2.split("::")[0] : key2;
+  const fromEspnPath = base.match(/espn-\w+-(\d+)/i)?.[1];
+  return fromEspnPath ?? base;
+}
+function editorialKeysMatch(left, right) {
+  return normalizeEditorialLookupKey(left) === normalizeEditorialLookupKey(right);
+}
+function editorialLookupKeysForGame(game) {
+  const keys = /* @__PURE__ */ new Set();
+  keys.add(editorialGameKey(game));
+  if (game.id.trim()) keys.add(game.id.trim());
+  if (game.grarfGameId?.trim()) keys.add(game.grarfGameId.trim());
+  const espn = game.espnEventId ?? game.externalIds?.espn;
+  if (espn != null && String(espn).trim()) keys.add(String(espn).trim());
+  return [...keys];
+}
+function canonicalFeaturedPriorityKey(key2) {
+  return normalizeEditorialLookupKey(key2);
+}
+function resolveAdminFeaturedPriority(game, adminPriorities) {
+  const lookupKeys = editorialLookupKeysForGame(game);
+  for (const lookupKey of lookupKeys) {
+    const direct = adminPriorities[lookupKey];
+    if (direct !== void 0) return direct;
+  }
+  for (const [storageKey, priority] of Object.entries(adminPriorities)) {
+    if (lookupKeys.some((lookupKey) => editorialKeysMatch(lookupKey, storageKey))) {
+      return priority;
+    }
+  }
+  return void 0;
+}
+function normalizeFeaturedPriorityMap(priorities) {
+  const out = {};
+  for (const [key2, priority] of Object.entries(priorities)) {
+    out[canonicalFeaturedPriorityKey(key2)] = priority;
+  }
+  return out;
+}
+
+// ../grarf/desktop/src/lib/editorial/matchTemporaryEditorialOverrideGame.ts
+function normalizeTeamHint(value) {
+  return value.trim().toLowerCase().normalize("NFD").replace(/\p{M}/gu, "").replace(/\b(fc|sc|cf|afc|the)\b/g, "").replace(/[^a-z0-9]+/g, " ").replace(/\s+/g, " ").trim();
+}
+function teamHintMatchesGameName(hint, gameTeamName) {
+  const normalizedHint = normalizeTeamHint(hint);
+  const normalizedGame = normalizeTeamHint(gameTeamName);
+  if (!normalizedHint || !normalizedGame) return false;
+  if (normalizedGame.includes(normalizedHint) || normalizedHint.includes(normalizedGame)) {
+    return true;
+  }
+  const hintTokens = normalizedHint.split(" ").filter(Boolean);
+  const gameTokens = new Set(normalizedGame.split(" ").filter(Boolean));
+  if (hintTokens.length === 0) return false;
+  const matched = hintTokens.filter((token) => gameTokens.has(token)).length;
+  return matched >= Math.min(hintTokens.length, 2) || matched === hintTokens.length;
+}
+function matchupTeamsMatchGame(game, awayLabel, homeLabel) {
+  const away = game.awayTeam?.trim() ?? "";
+  const home = game.homeTeam?.trim() ?? "";
+  if (!away || !home) return false;
+  const forward = teamHintMatchesGameName(awayLabel, away) && teamHintMatchesGameName(homeLabel, home);
+  const reverse = teamHintMatchesGameName(awayLabel, home) && teamHintMatchesGameName(homeLabel, away);
+  return forward || reverse;
+}
+function temporaryEditorialOverrideEntityMatchesGame(entity, game) {
+  if (entity.entityType !== "game") return false;
+  if ("entityId" in entity) {
+    const entityId = entity.entityId.trim();
+    if (!entityId) return false;
+    if (game.id.trim() === entityId) return true;
+    if (editorialKeysMatch(editorialGameKey(game), entityId)) return true;
+    if (game.grarfGameId?.trim() && editorialKeysMatch(game.grarfGameId.trim(), entityId)) {
+      return true;
+    }
+    return false;
+  }
+  const leagueKey = entity.leagueKey.trim().toUpperCase();
+  const gameLeague = game.league?.trim().toUpperCase() ?? "";
+  if (!gameLeague || gameLeague !== leagueKey) return false;
+  return matchupTeamsMatchGame(game, entity.awayTeam, entity.homeTeam);
+}
+
+// ../grarf/desktop/src/lib/editorial/temporaryEditorialOverrideExpiration.ts
+init_define_import_meta_env();
+var EDITORIAL_PREVIEW_RECAP_OVERRIDE_TTL_MS = 72 * 60 * 60 * 1e3;
+var PREVIEW_ARTICLE_OVERRIDE_TARGETS = /* @__PURE__ */ new Set([
+  "previewUrl",
+  "previewHeadline"
+]);
+var RECAP_ARTICLE_OVERRIDE_TARGETS = /* @__PURE__ */ new Set([
+  "recapUrl",
+  "recapHeadline"
+]);
+function isPreviewArticleEditorialOverrideTarget(target) {
+  return PREVIEW_ARTICLE_OVERRIDE_TARGETS.has(target.trim());
+}
+function isRecapArticleEditorialOverrideTarget(target) {
+  return RECAP_ARTICLE_OVERRIDE_TARGETS.has(target.trim());
+}
+function parseTemporaryEditorialOverrideExpiresAtMs(expiresAt) {
+  const raw = expiresAt?.trim();
+  if (!raw) return null;
+  const ms2 = Date.parse(raw);
+  return Number.isFinite(ms2) ? ms2 : null;
+}
+function parseOverrideNumberValue(value) {
+  if (typeof value === "number" && Number.isFinite(value) && value > 0) return value;
+  if (typeof value !== "string") return null;
+  const trimmed = value.trim();
+  if (!trimmed) return null;
+  if (/^\d+$/.test(trimmed)) {
+    const ms2 = Number(trimmed);
+    return Number.isFinite(ms2) && ms2 > 0 ? ms2 : null;
+  }
+  const parsed = Date.parse(trimmed);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
+}
+function overrideAppliesOnSurface(entry4, surface) {
+  const surfaces = entry4.surfaces;
+  if (!surfaces || surfaces === "all") return true;
+  return surfaces.includes(surface);
+}
+function compareOverridePrecedence(a2, b2) {
+  const priorityA = a2.priority ?? 0;
+  const priorityB = b2.priority ?? 0;
+  if (priorityA !== priorityB) return priorityB - priorityA;
+  return a2.id.localeCompare(b2.id);
+}
+function isScheduleStreamOverrideEntryActive(entry4, input) {
+  if (!overrideAppliesOnSurface(entry4, input.surface)) return false;
+  if (!temporaryEditorialOverrideEntityMatchesGame(entry4.entity, input.game)) return false;
+  const expiresMs = parseTemporaryEditorialOverrideExpiresAtMs(entry4.expiresAt);
+  if (expiresMs != null && input.now.getTime() >= expiresMs) return false;
+  const sportsDayKey = entry4.sportsDayKey?.trim();
+  if (sportsDayKey) {
+    const gameDay = resolveGameOperationalDateKey(input.game);
+    if (!gameDay || gameDay !== sportsDayKey) return false;
+  }
+  return true;
+}
+function resolveActiveScheduleOverrideMs(game, target, document2, now, surface) {
+  if (!document2) return null;
+  const matches = document2.overrides.filter((entry4) => entry4.target.trim() === target && entry4.operation === "replace").filter(
+    (entry4) => isScheduleStreamOverrideEntryActive(entry4, { game, now, surface })
+  ).sort(compareOverridePrecedence);
+  const winner = matches[0];
+  if (!winner) return null;
+  return parseOverrideNumberValue(winner.value);
+}
+function resolveCanonicalScheduledStartMsForEditorialOverrideExpiration(game, options) {
+  const now = options?.now ?? /* @__PURE__ */ new Date();
+  const surface = options?.surface ?? "extension";
+  const fromOverride = resolveActiveScheduleOverrideMs(
+    game,
+    "startTimeMs",
+    options?.document,
+    now,
+    surface
+  );
+  if (fromOverride != null) return fromOverride;
+  const startTimeMs = game.startTimeMs;
+  if (startTimeMs != null && Number.isFinite(startTimeMs) && startTimeMs > 0) {
+    return startTimeMs;
+  }
+  return null;
+}
+function resolveCanonicalScheduledEndMsForEditorialOverrideExpiration(game, options) {
+  const now = options?.now ?? /* @__PURE__ */ new Date();
+  const surface = options?.surface ?? "extension";
+  const fromOverride = resolveActiveScheduleOverrideMs(
+    game,
+    "endTimeMs",
+    options?.document,
+    now,
+    surface
+  );
+  if (fromOverride != null) return fromOverride;
+  return resolveOperationalGameEventEndedAtMs(game);
+}
+function resolveTemporaryEditorialOverrideEffectiveExpiresAtMs(entry4, game, options) {
+  const explicit = parseTemporaryEditorialOverrideExpiresAtMs(entry4.expiresAt);
+  if (explicit != null) return explicit;
+  const target = entry4.target.trim();
+  const surface = options?.surface ?? "extension";
+  const now = /* @__PURE__ */ new Date();
+  if (isPreviewArticleEditorialOverrideTarget(target)) {
+    const startMs = resolveCanonicalScheduledStartMsForEditorialOverrideExpiration(game, {
+      document: options?.document,
+      now,
+      surface
+    });
+    if (startMs == null) return null;
+    return startMs + EDITORIAL_PREVIEW_RECAP_OVERRIDE_TTL_MS;
+  }
+  if (isRecapArticleEditorialOverrideTarget(target)) {
+    const endMs = resolveCanonicalScheduledEndMsForEditorialOverrideExpiration(game, {
+      document: options?.document,
+      now,
+      surface
+    });
+    if (endMs == null) return null;
+    return endMs + EDITORIAL_PREVIEW_RECAP_OVERRIDE_TTL_MS;
+  }
+  return null;
+}
+
+// ../grarf/desktop/src/lib/editorial/temporaryEditorialOverridesStore.ts
+init_define_import_meta_env();
+
+// ../grarf/desktop/editorial/temporaryEditorialOverrides.json
+var temporaryEditorialOverrides_default = {
+  version: 1,
+  overrides: [
+    {
+      id: "sheet-espn-WNBA-401918308-recapUrl",
+      entity: {
+        entityType: "game",
+        entityId: "espn-WNBA-401918308"
+      },
+      target: "recapUrl",
+      operation: "replace",
+      value: "https://www.usatoday.com/story/sports/wnba/2026/10/24/valkyries-dream-wnba-finals-game-4-score-highlights-time-tv--live/92386110007/",
+      sportsDayKey: "2026-10-24",
+      expiresAt: null,
+      surfaces: [
+        "extension"
+      ],
+      note: "Daily manual: WNBA Finals G4 \u2014 USA Today recap"
+    },
+    {
+      id: "sheet-espn-WNBA-401918308-recapHeadline",
+      entity: {
+        entityType: "game",
+        entityId: "espn-WNBA-401918308"
+      },
+      target: "recapHeadline",
+      operation: "replace",
+      value: "Valkyries get defensive, even WNBA Finals vs. Dream",
+      sportsDayKey: "2026-10-24",
+      expiresAt: null,
+      surfaces: [
+        "extension"
+      ],
+      note: "Daily manual: WNBA Finals G4 \u2014 USA Today recap headline"
+    },
+    {
+      id: "motogp-australian-motorcycle-grand-prix-watchStreamUrl",
+      entity: {
+        entityType: "game",
+        entityId: "manual-event-motogp-australian-motorcycle-grand-prix-2026-10-24"
+      },
+      operation: "replace",
+      sportsDayKey: "2026-10-24",
+      expiresAt: "2026-10-28T03:00:00.000Z",
+      note: "Daily manual: MotoGP \u2014 Australian Motorcycle Grand Prix (FS2)",
+      target: "watchStreamUrl",
+      value: "https://www.foxsports.com/live/fs2"
+    },
+    {
+      id: "motogp-australian-motorcycle-grand-prix-startTimeMs",
+      entity: {
+        entityType: "game",
+        entityId: "manual-event-motogp-australian-motorcycle-grand-prix-2026-10-24"
+      },
+      operation: "replace",
+      sportsDayKey: "2026-10-24",
+      expiresAt: "2026-10-28T03:00:00.000Z",
+      note: "Daily manual: MotoGP \u2014 Australian Motorcycle Grand Prix (FS2)",
+      target: "startTimeMs",
+      value: 17928972e5
+    },
+    {
+      id: "motogp-australian-motorcycle-grand-prix-endTimeMs",
+      entity: {
+        entityType: "game",
+        entityId: "manual-event-motogp-australian-motorcycle-grand-prix-2026-10-24"
+      },
+      operation: "replace",
+      sportsDayKey: "2026-10-24",
+      expiresAt: "2026-10-28T03:00:00.000Z",
+      note: "Daily manual: MotoGP \u2014 Australian Motorcycle Grand Prix (FS2)",
+      target: "endTimeMs",
+      value: 17929053e5
+    },
+    {
+      id: "motogp-grand-prix-of-malaysia-sprint-race-watchStreamUrl",
+      entity: {
+        entityType: "game",
+        entityId: "manual-event-motogp-grand-prix-of-malaysia-sprint-race-2026-10-31"
+      },
+      operation: "replace",
+      sportsDayKey: "2026-10-31",
+      expiresAt: "2026-11-03T07:00:00.000Z",
+      note: "Daily manual: MotoGP \u2014 Grand Prix of Malaysia Sprint Race (FS1)",
+      target: "watchStreamUrl",
+      value: "https://www.foxsports.com/live/fs1"
+    },
+    {
+      id: "motogp-grand-prix-of-malaysia-sprint-race-startTimeMs",
+      entity: {
+        entityType: "game",
+        entityId: "manual-event-motogp-grand-prix-of-malaysia-sprint-race-2026-10-31"
+      },
+      operation: "replace",
+      sportsDayKey: "2026-10-31",
+      expiresAt: "2026-11-03T07:00:00.000Z",
+      note: "Daily manual: MotoGP \u2014 Grand Prix of Malaysia Sprint Race (FS1)",
+      target: "startTimeMs",
+      value: 179343e7
+    },
+    {
+      id: "motogp-grand-prix-of-malaysia-sprint-race-endTimeMs",
+      entity: {
+        entityType: "game",
+        entityId: "manual-event-motogp-grand-prix-of-malaysia-sprint-race-2026-10-31"
+      },
+      operation: "replace",
+      sportsDayKey: "2026-10-31",
+      expiresAt: "2026-11-03T07:00:00.000Z",
+      note: "Daily manual: MotoGP \u2014 Grand Prix of Malaysia Sprint Race (FS1)",
+      target: "endTimeMs",
+      value: 17934381e5
+    },
+    {
+      id: "motogp-grand-prix-of-malaysia-watchStreamUrl",
+      entity: {
+        entityType: "game",
+        entityId: "manual-event-motogp-grand-prix-of-malaysia-2026-11-01"
+      },
+      operation: "replace",
+      sportsDayKey: "2026-11-01",
+      expiresAt: "2026-11-04T06:00:00.000Z",
+      note: "Daily manual: MotoGP \u2014 Grand Prix of Malaysia (FS2)",
+      target: "watchStreamUrl",
+      value: "https://www.foxsports.com/live/fs2"
+    },
+    {
+      id: "motogp-grand-prix-of-malaysia-startTimeMs",
+      entity: {
+        entityType: "game",
+        entityId: "manual-event-motogp-grand-prix-of-malaysia-2026-11-01"
+      },
+      operation: "replace",
+      sportsDayKey: "2026-11-01",
+      expiresAt: "2026-11-04T06:00:00.000Z",
+      note: "Daily manual: MotoGP \u2014 Grand Prix of Malaysia (FS2)",
+      target: "startTimeMs",
+      value: 17935128e5
+    },
+    {
+      id: "motogp-grand-prix-of-malaysia-endTimeMs",
+      entity: {
+        entityType: "game",
+        entityId: "manual-event-motogp-grand-prix-of-malaysia-2026-11-01"
+      },
+      operation: "replace",
+      sportsDayKey: "2026-11-01",
+      expiresAt: "2026-11-04T06:00:00.000Z",
+      note: "Daily manual: MotoGP \u2014 Grand Prix of Malaysia (FS2)",
+      target: "endTimeMs",
+      value: 17935209e5
+    },
+    {
+      id: "motogp-grand-prix-of-qatar-sprint-race-watchStreamUrl",
+      entity: {
+        entityType: "game",
+        entityId: "manual-event-motogp-grand-prix-of-qatar-sprint-race-2026-11-07"
+      },
+      operation: "replace",
+      sportsDayKey: "2026-11-07",
+      expiresAt: "2026-11-10T17:00:00.000Z",
+      note: "Daily manual: MotoGP \u2014 Grand Prix of Qatar Sprint Race (FS1)",
+      target: "watchStreamUrl",
+      value: "https://www.foxsports.com/live/fs1"
+    },
+    {
+      id: "motogp-grand-prix-of-qatar-sprint-race-startTimeMs",
+      entity: {
+        entityType: "game",
+        entityId: "manual-event-motogp-grand-prix-of-qatar-sprint-race-2026-11-07"
+      },
+      operation: "replace",
+      sportsDayKey: "2026-11-07",
+      expiresAt: "2026-11-10T17:00:00.000Z",
+      note: "Daily manual: MotoGP \u2014 Grand Prix of Qatar Sprint Race (FS1)",
+      target: "startTimeMs",
+      value: 17940708e5
+    },
+    {
+      id: "motogp-grand-prix-of-qatar-sprint-race-endTimeMs",
+      entity: {
+        entityType: "game",
+        entityId: "manual-event-motogp-grand-prix-of-qatar-sprint-race-2026-11-07"
+      },
+      operation: "replace",
+      sportsDayKey: "2026-11-07",
+      expiresAt: "2026-11-10T17:00:00.000Z",
+      note: "Daily manual: MotoGP \u2014 Grand Prix of Qatar Sprint Race (FS1)",
+      target: "endTimeMs",
+      value: 17940789e5
+    },
+    {
+      id: "motogp-grand-prix-of-qatar-watchStreamUrl",
+      entity: {
+        entityType: "game",
+        entityId: "manual-event-motogp-grand-prix-of-qatar-2026-11-08"
+      },
+      operation: "replace",
+      sportsDayKey: "2026-11-08",
+      expiresAt: "2026-11-11T17:00:00.000Z",
+      note: "Daily manual: MotoGP \u2014 Grand Prix of Qatar (FS1)",
+      target: "watchStreamUrl",
+      value: "https://www.foxsports.com/live/fs1"
+    },
+    {
+      id: "motogp-grand-prix-of-qatar-startTimeMs",
+      entity: {
+        entityType: "game",
+        entityId: "manual-event-motogp-grand-prix-of-qatar-2026-11-08"
+      },
+      operation: "replace",
+      sportsDayKey: "2026-11-08",
+      expiresAt: "2026-11-11T17:00:00.000Z",
+      note: "Daily manual: MotoGP \u2014 Grand Prix of Qatar (FS1)",
+      target: "startTimeMs",
+      value: 17941572e5
+    },
+    {
+      id: "motogp-grand-prix-of-qatar-endTimeMs",
+      entity: {
+        entityType: "game",
+        entityId: "manual-event-motogp-grand-prix-of-qatar-2026-11-08"
+      },
+      operation: "replace",
+      sportsDayKey: "2026-11-08",
+      expiresAt: "2026-11-11T17:00:00.000Z",
+      note: "Daily manual: MotoGP \u2014 Grand Prix of Qatar (FS1)",
+      target: "endTimeMs",
+      value: 17941653e5
+    },
+    {
+      id: "motogp-grande-premio-de-portugal-sprint-race-watchStreamUrl",
+      entity: {
+        entityType: "game",
+        entityId: "manual-event-motogp-grande-premio-de-portugal-sprint-race-2026-11-21"
+      },
+      operation: "replace",
+      sportsDayKey: "2026-11-21",
+      expiresAt: "2026-11-24T15:00:00.000Z",
+      note: "Daily manual: MotoGP \u2014 Grande Premio de Portugal Sprint Race (FS2)",
+      target: "watchStreamUrl",
+      value: "https://www.foxsports.com/live/fs2"
+    },
+    {
+      id: "motogp-grande-premio-de-portugal-sprint-race-startTimeMs",
+      entity: {
+        entityType: "game",
+        entityId: "manual-event-motogp-grande-premio-de-portugal-sprint-race-2026-11-21"
+      },
+      operation: "replace",
+      sportsDayKey: "2026-11-21",
+      expiresAt: "2026-11-24T15:00:00.000Z",
+      note: "Daily manual: MotoGP \u2014 Grande Premio de Portugal Sprint Race (FS2)",
+      target: "startTimeMs",
+      value: 17952732e5
+    },
+    {
+      id: "motogp-grande-premio-de-portugal-sprint-race-endTimeMs",
+      entity: {
+        entityType: "game",
+        entityId: "manual-event-motogp-grande-premio-de-portugal-sprint-race-2026-11-21"
+      },
+      operation: "replace",
+      sportsDayKey: "2026-11-21",
+      expiresAt: "2026-11-24T15:00:00.000Z",
+      note: "Daily manual: MotoGP \u2014 Grande Premio de Portugal Sprint Race (FS2)",
+      target: "endTimeMs",
+      value: 17952813e5
+    },
+    {
+      id: "motogp-grande-premio-de-portugal-watchStreamUrl",
+      entity: {
+        entityType: "game",
+        entityId: "manual-event-motogp-grande-premio-de-portugal-2026-11-22"
+      },
+      operation: "replace",
+      sportsDayKey: "2026-11-22",
+      expiresAt: "2026-11-25T13:00:00.000Z",
+      note: "Daily manual: MotoGP \u2014 Grande Premio de Portugal (FS1)",
+      target: "watchStreamUrl",
+      value: "https://www.foxsports.com/live/fs1"
+    },
+    {
+      id: "motogp-grande-premio-de-portugal-startTimeMs",
+      entity: {
+        entityType: "game",
+        entityId: "manual-event-motogp-grande-premio-de-portugal-2026-11-22"
+      },
+      operation: "replace",
+      sportsDayKey: "2026-11-22",
+      expiresAt: "2026-11-25T13:00:00.000Z",
+      note: "Daily manual: MotoGP \u2014 Grande Premio de Portugal (FS1)",
+      target: "startTimeMs",
+      value: 17953524e5
+    },
+    {
+      id: "motogp-grande-premio-de-portugal-endTimeMs",
+      entity: {
+        entityType: "game",
+        entityId: "manual-event-motogp-grande-premio-de-portugal-2026-11-22"
+      },
+      operation: "replace",
+      sportsDayKey: "2026-11-22",
+      expiresAt: "2026-11-25T13:00:00.000Z",
+      note: "Daily manual: MotoGP \u2014 Grande Premio de Portugal (FS1)",
+      target: "endTimeMs",
+      value: 17953605e5
+    },
+    {
+      id: "motogp-gran-premio-de-la-comunitat-valenciana-sprint-ra-watchStreamUrl",
+      entity: {
+        entityType: "game",
+        entityId: "manual-event-motogp-gran-premio-de-la-comunitat-valenciana-sprint-race-2026-11-28"
+      },
+      operation: "replace",
+      sportsDayKey: "2026-11-28",
+      expiresAt: "2026-12-01T14:00:00.000Z",
+      note: "Daily manual: MotoGP \u2014 Gran Premio de la Comunitat Valenciana Sprint Race (FS2)",
+      target: "watchStreamUrl",
+      value: "https://www.foxsports.com/live/fs2"
+    },
+    {
+      id: "motogp-gran-premio-de-la-comunitat-valenciana-sprint-ra-startTimeMs",
+      entity: {
+        entityType: "game",
+        entityId: "manual-event-motogp-gran-premio-de-la-comunitat-valenciana-sprint-race-2026-11-28"
+      },
+      operation: "replace",
+      sportsDayKey: "2026-11-28",
+      expiresAt: "2026-12-01T14:00:00.000Z",
+      note: "Daily manual: MotoGP \u2014 Gran Premio de la Comunitat Valenciana Sprint Race (FS2)",
+      target: "startTimeMs",
+      value: 17958744e5
+    },
+    {
+      id: "motogp-gran-premio-de-la-comunitat-valenciana-sprint-ra-endTimeMs",
+      entity: {
+        entityType: "game",
+        entityId: "manual-event-motogp-gran-premio-de-la-comunitat-valenciana-sprint-race-2026-11-28"
+      },
+      operation: "replace",
+      sportsDayKey: "2026-11-28",
+      expiresAt: "2026-12-01T14:00:00.000Z",
+      note: "Daily manual: MotoGP \u2014 Gran Premio de la Comunitat Valenciana Sprint Race (FS2)",
+      target: "endTimeMs",
+      value: 17958825e5
+    },
+    {
+      id: "motogp-gran-premio-de-la-comunitat-valenciana-watchStreamUrl",
+      entity: {
+        entityType: "game",
+        entityId: "manual-event-motogp-gran-premio-de-la-comunitat-valenciana-2026-11-29"
+      },
+      operation: "replace",
+      sportsDayKey: "2026-11-29",
+      expiresAt: "2026-12-02T13:00:00.000Z",
+      note: "Daily manual: MotoGP \u2014 Gran Premio de la Comunitat Valenciana (FS1)",
+      target: "watchStreamUrl",
+      value: "https://www.foxsports.com/live/fs1"
+    },
+    {
+      id: "motogp-gran-premio-de-la-comunitat-valenciana-startTimeMs",
+      entity: {
+        entityType: "game",
+        entityId: "manual-event-motogp-gran-premio-de-la-comunitat-valenciana-2026-11-29"
+      },
+      operation: "replace",
+      sportsDayKey: "2026-11-29",
+      expiresAt: "2026-12-02T13:00:00.000Z",
+      note: "Daily manual: MotoGP \u2014 Gran Premio de la Comunitat Valenciana (FS1)",
+      target: "startTimeMs",
+      value: 17959572e5
+    },
+    {
+      id: "motogp-gran-premio-de-la-comunitat-valenciana-endTimeMs",
+      entity: {
+        entityType: "game",
+        entityId: "manual-event-motogp-gran-premio-de-la-comunitat-valenciana-2026-11-29"
+      },
+      operation: "replace",
+      sportsDayKey: "2026-11-29",
+      expiresAt: "2026-12-02T13:00:00.000Z",
+      note: "Daily manual: MotoGP \u2014 Gran Premio de la Comunitat Valenciana (FS1)",
+      target: "endTimeMs",
+      value: 17959653e5
+    }
+  ]
+};
+
+// ../grarf/desktop/src/lib/editorial/temporaryEditorialOverridesRemoteStore.ts
+init_define_import_meta_env();
+var remoteDocument = null;
+var remoteEtag = null;
+var remoteFetchedAtMs = null;
+function getRemoteTemporaryEditorialOverridesDocument() {
+  return remoteDocument;
+}
+function getRemoteTemporaryEditorialOverridesEtag() {
+  return remoteEtag;
+}
+function setRemoteTemporaryEditorialOverridesDocument(document2, etag) {
+  remoteDocument = document2;
+  remoteEtag = etag?.trim() || null;
+  remoteFetchedAtMs = Date.now();
+}
+
+// ../grarf/desktop/src/lib/editorial/temporaryEditorialOverridesStore.ts
+function asDocument(raw) {
+  const candidate = raw;
+  if (!candidate || candidate.version !== 1 || !Array.isArray(candidate.overrides)) {
+    return { version: 1, overrides: [] };
+  }
+  return candidate;
+}
+var bundledDocument = asDocument(temporaryEditorialOverrides_default);
+function getTemporaryEditorialOverridesDocument() {
+  return getRemoteTemporaryEditorialOverridesDocument() ?? bundledDocument;
+}
+
+// ../grarf/desktop/src/lib/editorial/temporaryEditorialOverridesValidation.ts
+init_define_import_meta_env();
+
+// ../grarf/desktop/src/lib/editorial/resolveTemporaryEditorialOverrides.ts
+function resolveActiveHostSurface(explicit) {
+  if (explicit) return explicit;
+  if (isGrarfExtensionRenderer()) return "extension";
+  if (isGrarfElectronRenderer()) return "electron";
+  if (isGrarfWebRenderer2()) return "web";
+  return "electron";
+}
+function overrideAppliesOnSurface2(entry4, surface) {
+  const surfaces = entry4.surfaces;
+  if (!surfaces || surfaces === "all") return true;
+  return surfaces.includes(surface);
+}
+function isTemporaryEditorialOverrideEntryActive(entry4, input) {
+  if (!overrideAppliesOnSurface2(entry4, input.surface)) return false;
+  const document2 = input.document ?? getTemporaryEditorialOverridesDocument();
+  const effectiveExpiresMs = resolveTemporaryEditorialOverrideEffectiveExpiresAtMs(entry4, input.game, {
+    document: document2,
+    surface: input.surface
+  });
+  if (effectiveExpiresMs != null && input.now.getTime() >= effectiveExpiresMs) return false;
+  const sportsDayKey = entry4.sportsDayKey?.trim();
+  if (sportsDayKey) {
+    const gameDay = resolveGameOperationalDateKey(input.game);
+    if (!gameDay || gameDay !== sportsDayKey) return false;
+  }
+  return temporaryEditorialOverrideEntityMatchesGame(entry4.entity, input.game);
+}
+function compareOverridePrecedence2(a2, b2) {
+  const priorityA = a2.priority ?? 0;
+  const priorityB = b2.priority ?? 0;
+  if (priorityA !== priorityB) return priorityB - priorityA;
+  return a2.id.localeCompare(b2.id);
+}
+function listTemporaryEditorialOverrideEntriesForGameTarget(input) {
+  const now = input.now ?? /* @__PURE__ */ new Date();
+  const surface = resolveActiveHostSurface(input.surface);
+  const document2 = input.document ?? getTemporaryEditorialOverridesDocument();
+  const target = input.target.trim();
+  return document2.overrides.filter((entry4) => entry4.target.trim() === target).filter(
+    (entry4) => isTemporaryEditorialOverrideEntryActive(entry4, {
+      game: input.game,
+      now,
+      surface,
+      document: document2
+    })
+  ).sort(compareOverridePrecedence2);
+}
+function resolveTemporaryEditorialOverrideStringValue(input) {
+  const matches = listTemporaryEditorialOverrideEntriesForGameTarget(input);
+  const replace2 = matches.find((entry4) => entry4.operation === "replace");
+  if (!replace2) return null;
+  const value = replace2.value;
+  if (typeof value !== "string") return null;
+  const trimmed = value.trim();
+  return trimmed || null;
+}
+
+// ../grarf/desktop/src/lib/editorial/resolveTemporaryEditorialOverrideNumberValue.ts
+function parseOverrideNumber(value) {
+  if (typeof value === "number" && Number.isFinite(value)) return value;
+  if (typeof value !== "string") return null;
+  const trimmed = value.trim();
+  if (!trimmed) return null;
+  if (/^\d+$/.test(trimmed)) {
+    const ms2 = Number(trimmed);
+    return Number.isFinite(ms2) ? ms2 : null;
+  }
+  const parsed = Date.parse(trimmed);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+function resolveTemporaryEditorialOverrideNumberValue(game, target, options) {
+  const input = {
+    game,
+    target,
+    now: options?.now,
+    surface: options?.surface,
+    document: options?.document
+  };
+  const matches = listTemporaryEditorialOverrideEntriesForGameTarget(input);
+  const replace2 = matches.find((entry4) => entry4.operation === "replace");
+  if (!replace2) return null;
+  return parseOverrideNumber(replace2.value);
+}
+
+// ../grarf/desktop/src/lib/editorial/applyTemporaryEditorialGameScheduleOverrides.ts
+function applyTemporaryEditorialGameScheduleOverrides(game, options) {
+  const surface = options?.surface ?? (isGrarfExtensionRenderer() ? "extension" : "electron");
+  if (surface !== "extension") return game;
+  const startTimeMs = resolveTemporaryEditorialOverrideNumberValue(game, "startTimeMs", {
+    now: options?.now,
+    surface,
+    document: options?.document
+  });
+  const endTimeMs = resolveTemporaryEditorialOverrideNumberValue(game, "endTimeMs", {
+    now: options?.now,
+    surface,
+    document: options?.document
+  });
+  if (startTimeMs == null && endTimeMs == null) return game;
+  return {
+    ...game,
+    ...startTimeMs != null ? { startTimeMs } : null,
+    ...endTimeMs != null ? { eventEndedAtMs: endTimeMs } : null
+  };
+}
+function applyTemporaryEditorialGameScheduleOverridesToLeagueMap(leagues, options) {
+  if (!isGrarfExtensionRenderer()) return leagues;
+  const out = {};
+  for (const [leagueKey, rows] of Object.entries(leagues)) {
+    if (!Array.isArray(rows)) continue;
+    out[leagueKey] = rows.map(
+      (game) => applyTemporaryEditorialGameScheduleOverrides(game, {
+        now: options?.now,
+        document: options?.document,
+        surface: "extension"
+      })
+    );
+  }
+  return out;
+}
+
+// ../grarf/desktop/src/services/operationalIngest/extensionAuthoritativeGrarfCloudHydrate.ts
 function buildExtensionAuthoritativeGrarfCloudHydrateSnapshot(canonical) {
   const withStandings = carryForwardMlbTeamStandingsFromEnrichedRows(
     canonical,
     canonical.leagues?.MLB ?? []
   );
-  return prepareGamesSpineSnapshotForHydrate(withStandings);
+  const withManualEvents = {
+    ...withStandings,
+    leagues: mergeIngestedManualEventsIntoLeagueGames(withStandings.leagues ?? {}, {
+      source: loadManualEventsSourceBundle(),
+      now: /* @__PURE__ */ new Date()
+    })
+  };
+  const withScheduleOverrides = {
+    ...withManualEvents,
+    leagues: applyTemporaryEditorialGameScheduleOverridesToLeagueMap(withManualEvents.leagues ?? {})
+  };
+  return prepareGamesSpineSnapshotForHydrate(withScheduleOverrides);
 }
 
 // ../grarf/desktop/src/services/operationalIngest/hydrateOperationalSnapshotFromTransport.ts
@@ -66507,56 +67423,6 @@ function useManualGamesSpineLiveRefreshMs() {
 // ../grarf/desktop/src/lib/bestGameRightNow/resolveBestGameRightNowV1.ts
 init_define_import_meta_env();
 
-// ../grarf/desktop/src/lib/editorial/editorialGameKey.ts
-init_define_import_meta_env();
-function editorialGameKey(game) {
-  const espn = game.espnEventId ?? game.externalIds?.espn;
-  if (espn != null && String(espn).trim()) return String(espn).trim();
-  const m2 = game.id.match(/espn-\w+-(\d+)/i);
-  if (m2?.[1]) return m2[1];
-  return game.id;
-}
-function normalizeEditorialLookupKey(key2) {
-  const base = key2.includes("::") ? key2.split("::")[0] : key2;
-  const fromEspnPath = base.match(/espn-\w+-(\d+)/i)?.[1];
-  return fromEspnPath ?? base;
-}
-function editorialKeysMatch(left, right) {
-  return normalizeEditorialLookupKey(left) === normalizeEditorialLookupKey(right);
-}
-function editorialLookupKeysForGame(game) {
-  const keys = /* @__PURE__ */ new Set();
-  keys.add(editorialGameKey(game));
-  if (game.id.trim()) keys.add(game.id.trim());
-  if (game.grarfGameId?.trim()) keys.add(game.grarfGameId.trim());
-  const espn = game.espnEventId ?? game.externalIds?.espn;
-  if (espn != null && String(espn).trim()) keys.add(String(espn).trim());
-  return [...keys];
-}
-function canonicalFeaturedPriorityKey(key2) {
-  return normalizeEditorialLookupKey(key2);
-}
-function resolveAdminFeaturedPriority(game, adminPriorities) {
-  const lookupKeys = editorialLookupKeysForGame(game);
-  for (const lookupKey of lookupKeys) {
-    const direct = adminPriorities[lookupKey];
-    if (direct !== void 0) return direct;
-  }
-  for (const [storageKey, priority] of Object.entries(adminPriorities)) {
-    if (lookupKeys.some((lookupKey) => editorialKeysMatch(lookupKey, storageKey))) {
-      return priority;
-    }
-  }
-  return void 0;
-}
-function normalizeFeaturedPriorityMap(priorities) {
-  const out = {};
-  for (const [key2, priority] of Object.entries(priorities)) {
-    out[canonicalFeaturedPriorityKey(key2)] = priority;
-  }
-  return out;
-}
-
 // ../grarf/desktop/src/lib/editorial/resolveEditorialNarrative.ts
 init_define_import_meta_env();
 
@@ -72249,6 +73115,73 @@ function bindCanonicalNewsStoryEnrichmentSync() {
 init_define_import_meta_env();
 init_operationalIngestConfig();
 
+// ../grarf/desktop/src/services/editorial/startTemporaryEditorialOverridesPolling.ts
+init_define_import_meta_env();
+
+// ../grarf/shared/config/temporaryEditorialOverridesPublication.ts
+init_define_import_meta_env();
+var TEMPORARY_EDITORIAL_OVERRIDES_HTTP_PATH = "/operational/temporary-editorial-overrides";
+var TEMPORARY_EDITORIAL_OVERRIDES_CLIENT_REFRESH_MS = 5 * 60 * 1e3;
+
+// ../grarf/desktop/src/services/editorial/startTemporaryEditorialOverridesPolling.ts
+init_isGrarfWebRenderer();
+
+// ../grarf/desktop/src/services/editorial/fetchTemporaryEditorialOverridesDocument.ts
+init_define_import_meta_env();
+init_operationalIngestConfig();
+function asOverridesDocument(raw) {
+  const payload = raw;
+  if (payload && typeof payload === "object" && "document" in payload) {
+    const doc = payload.document;
+    if (doc?.version === 1 && Array.isArray(doc.overrides)) {
+      return doc;
+    }
+    return null;
+  }
+  if (payload?.version === 1 && Array.isArray(payload.overrides)) {
+    return payload;
+  }
+  return null;
+}
+async function fetchTemporaryEditorialOverridesDocument() {
+  const baseUrl = getOperationalIngestConfig().cloudBaseUrl?.replace(/\/$/, "");
+  if (!baseUrl) return { ok: false };
+  const url = `${baseUrl}${TEMPORARY_EDITORIAL_OVERRIDES_HTTP_PATH}`;
+  const headers = { Accept: "application/json" };
+  const etag = getRemoteTemporaryEditorialOverridesEtag();
+  if (etag) headers["If-None-Match"] = etag;
+  try {
+    const res = await fetch(url, { headers, signal: AbortSignal.timeout(12e3) });
+    if (res.status === 304) {
+      return { ok: true, notModified: true, etag };
+    }
+    if (!res.ok) return { ok: false };
+    const json = await res.json();
+    const document2 = asOverridesDocument(json);
+    if (!document2) return { ok: false };
+    const responseEtag = res.headers.get("etag");
+    setRemoteTemporaryEditorialOverridesDocument(document2, responseEtag);
+    return { ok: true, document: document2, etag: responseEtag };
+  } catch {
+    return { ok: false };
+  }
+}
+
+// ../grarf/desktop/src/services/editorial/startTemporaryEditorialOverridesPolling.ts
+var started = false;
+function startTemporaryEditorialOverridesPolling() {
+  if (started || !isGrarfExtensionRenderer()) return;
+  started = true;
+  const refresh = () => {
+    void fetchTemporaryEditorialOverridesDocument();
+  };
+  refresh();
+  window.setInterval(refresh, TEMPORARY_EDITORIAL_OVERRIDES_CLIENT_REFRESH_MS);
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible") refresh();
+  });
+}
+
 // ../grarf/desktop/src/components/LiveGamesBridge.tsx
 function resolveTransportCompleteness(transport) {
   const source = transport.source;
@@ -72304,6 +73237,9 @@ function LiveGamesBridge() {
   (0, import_react35.useLayoutEffect)(() => {
     logOperationalRuntimeStartupBanner();
     recordOperationalStartupTrace("live_games_bridge_mount");
+    if (isGrarfExtensionRenderer()) {
+      startTemporaryEditorialOverridesPolling();
+    }
     kickoffGrarfCloudOperationalIngestHydration();
     const stopIntelligenceRegistrySync = bindCanonicalIntelligenceRegistrySync();
     const stopNewsStoryEnrichmentSync = bindCanonicalNewsStoryEnrichmentSync();
@@ -112352,127 +113288,6 @@ init_define_import_meta_env();
 
 // ../grarf/desktop/src/lib/editorial/applyTemporaryEditorialGameFieldOverride.ts
 init_define_import_meta_env();
-
-// ../grarf/desktop/src/lib/editorial/resolveTemporaryEditorialOverrides.ts
-init_define_import_meta_env();
-init_isGrarfWebRenderer();
-
-// ../grarf/desktop/src/lib/editorial/matchTemporaryEditorialOverrideGame.ts
-init_define_import_meta_env();
-function normalizeTeamHint(value) {
-  return value.trim().toLowerCase().normalize("NFD").replace(/\p{M}/gu, "").replace(/\b(fc|sc|cf|afc|the)\b/g, "").replace(/[^a-z0-9]+/g, " ").replace(/\s+/g, " ").trim();
-}
-function teamHintMatchesGameName(hint, gameTeamName) {
-  const normalizedHint = normalizeTeamHint(hint);
-  const normalizedGame = normalizeTeamHint(gameTeamName);
-  if (!normalizedHint || !normalizedGame) return false;
-  if (normalizedGame.includes(normalizedHint) || normalizedHint.includes(normalizedGame)) {
-    return true;
-  }
-  const hintTokens = normalizedHint.split(" ").filter(Boolean);
-  const gameTokens = new Set(normalizedGame.split(" ").filter(Boolean));
-  if (hintTokens.length === 0) return false;
-  const matched = hintTokens.filter((token) => gameTokens.has(token)).length;
-  return matched >= Math.min(hintTokens.length, 2) || matched === hintTokens.length;
-}
-function matchupTeamsMatchGame(game, awayLabel, homeLabel) {
-  const away = game.awayTeam?.trim() ?? "";
-  const home = game.homeTeam?.trim() ?? "";
-  if (!away || !home) return false;
-  const forward = teamHintMatchesGameName(awayLabel, away) && teamHintMatchesGameName(homeLabel, home);
-  const reverse = teamHintMatchesGameName(awayLabel, home) && teamHintMatchesGameName(homeLabel, away);
-  return forward || reverse;
-}
-function temporaryEditorialOverrideEntityMatchesGame(entity, game) {
-  if (entity.entityType !== "game") return false;
-  if ("entityId" in entity) {
-    return game.id.trim() === entity.entityId.trim();
-  }
-  const leagueKey = entity.leagueKey.trim().toUpperCase();
-  const gameLeague = game.league?.trim().toUpperCase() ?? "";
-  if (!gameLeague || gameLeague !== leagueKey) return false;
-  return matchupTeamsMatchGame(game, entity.awayTeam, entity.homeTeam);
-}
-
-// ../grarf/desktop/src/lib/editorial/temporaryEditorialOverridesStore.ts
-init_define_import_meta_env();
-
-// ../grarf/desktop/editorial/temporaryEditorialOverrides.json
-var temporaryEditorialOverrides_default = {
-  version: 1,
-  overrides: []
-};
-
-// ../grarf/desktop/src/lib/editorial/temporaryEditorialOverridesStore.ts
-function asDocument(raw) {
-  const candidate = raw;
-  if (!candidate || candidate.version !== 1 || !Array.isArray(candidate.overrides)) {
-    return { version: 1, overrides: [] };
-  }
-  return candidate;
-}
-var loadedDocument = asDocument(temporaryEditorialOverrides_default);
-function getTemporaryEditorialOverridesDocument() {
-  return loadedDocument;
-}
-
-// ../grarf/desktop/src/lib/editorial/temporaryEditorialOverridesValidation.ts
-init_define_import_meta_env();
-
-// ../grarf/desktop/src/lib/editorial/resolveTemporaryEditorialOverrides.ts
-function resolveActiveHostSurface(explicit) {
-  if (explicit) return explicit;
-  if (isGrarfExtensionRenderer()) return "extension";
-  if (isGrarfElectronRenderer()) return "electron";
-  if (isGrarfWebRenderer2()) return "web";
-  return "electron";
-}
-function overrideAppliesOnSurface(entry4, surface) {
-  const surfaces = entry4.surfaces;
-  if (!surfaces || surfaces === "all") return true;
-  return surfaces.includes(surface);
-}
-function parseExpiresAtMs(expiresAt) {
-  const raw = expiresAt?.trim();
-  if (!raw) return null;
-  const ms2 = Date.parse(raw);
-  return Number.isFinite(ms2) ? ms2 : null;
-}
-function isTemporaryEditorialOverrideEntryActive(entry4, input) {
-  if (!overrideAppliesOnSurface(entry4, input.surface)) return false;
-  const expiresMs = parseExpiresAtMs(entry4.expiresAt);
-  if (expiresMs != null && input.now.getTime() >= expiresMs) return false;
-  const sportsDayKey = entry4.sportsDayKey?.trim();
-  if (sportsDayKey) {
-    const gameDay = resolveGameOperationalDateKey(input.game);
-    if (!gameDay || gameDay !== sportsDayKey) return false;
-  }
-  return temporaryEditorialOverrideEntityMatchesGame(entry4.entity, input.game);
-}
-function compareOverridePrecedence(a2, b2) {
-  const priorityA = a2.priority ?? 0;
-  const priorityB = b2.priority ?? 0;
-  if (priorityA !== priorityB) return priorityB - priorityA;
-  return a2.id.localeCompare(b2.id);
-}
-function listTemporaryEditorialOverrideEntriesForGameTarget(input) {
-  const now = input.now ?? /* @__PURE__ */ new Date();
-  const surface = resolveActiveHostSurface(input.surface);
-  const document2 = input.document ?? getTemporaryEditorialOverridesDocument();
-  const target = input.target.trim();
-  return document2.overrides.filter((entry4) => entry4.target.trim() === target).filter((entry4) => isTemporaryEditorialOverrideEntryActive(entry4, { game: input.game, now, surface })).sort(compareOverridePrecedence);
-}
-function resolveTemporaryEditorialOverrideStringValue(input) {
-  const matches = listTemporaryEditorialOverrideEntriesForGameTarget(input);
-  const replace2 = matches.find((entry4) => entry4.operation === "replace");
-  if (!replace2) return null;
-  const value = replace2.value;
-  if (typeof value !== "string") return null;
-  const trimmed = value.trim();
-  return trimmed || null;
-}
-
-// ../grarf/desktop/src/lib/editorial/applyTemporaryEditorialGameFieldOverride.ts
 function resolveTemporaryEditorialGameFieldOverride(game, target, options) {
   const input = {
     game,
@@ -166863,6 +167678,20 @@ async function resolveGrarfExtensionMlbRecapNavigationUrlForGame(game) {
   return resolveGrarfExtensionMlbRecapUrlFromOperationalGame(game);
 }
 
+// ../grarf/desktop/src/extensionHost/grarfExtensionCatchUpRecapHeadlineNavigation.ts
+init_define_import_meta_env();
+function resolveGrarfExtensionCatchUpRecapNavigationUrlForGame(game) {
+  return resolveTemporaryEditorialGameFieldOverride(game, "recapUrl", {
+    surface: "extension"
+  });
+}
+function tryNavigateGrarfExtensionEditorialRecapOverride(game) {
+  const url = resolveGrarfExtensionCatchUpRecapNavigationUrlForGame(game);
+  if (!url) return false;
+  navigateGrarfExtensionHostExternalUrl(url);
+  return true;
+}
+
 // ../grarf/desktop/src/extensionHost/grarfExtensionWnba2026FinalsRecapHeadline.ts
 init_define_import_meta_env();
 
@@ -167047,6 +167876,10 @@ async function navigateGrarfExtensionGameYesterdayRecap(game, options) {
   }
   if (!homeFeaturedYesterday && (catchUpRecapsNav || gamesTodayFinalCard)) {
     setGrarfExtensionCatchUpRecapsSequentialInlineAction("recap");
+  }
+  if (tryNavigateGrarfExtensionEditorialRecapOverride(game)) {
+    completeCatchUpRecapNavigation(game);
+    return true;
   }
   if (isGrarfExtensionMlbRecapGame(game)) {
     const mlbRecapUrl = await resolveGrarfExtensionMlbRecapNavigationUrlForGame(game);
@@ -171043,6 +171876,9 @@ function useGrarfExtensionCatchUpRecapHeadline(game) {
   const ncaaf = useGrarfExtensionNcaafRecapHeadline(game);
   const wnba2026Finals = useGrarfExtensionWnba2026FinalsRecapHeadline(game);
   const openCatchUpRecap = (0, import_react289.useCallback)(() => {
+    if (tryNavigateGrarfExtensionEditorialRecapOverride(game)) {
+      return;
+    }
     if (grarfExtensionLeagueUsesUclRecapResolver(game.league ?? "")) {
       void navigateGrarfExtensionUclRecapFromGame(game);
       return;
@@ -192506,9 +193342,9 @@ function asDocument2(raw) {
   }
   return candidate;
 }
-var loadedDocument2 = asDocument2(homeCommandCenterDailyPriorities_default);
+var loadedDocument = asDocument2(homeCommandCenterDailyPriorities_default);
 function getHomeCommandCenterDailyPriorityEntriesForSportsDay(sportsDayKey) {
-  const day = loadedDocument2.bySportsDay[sportsDayKey.trim()];
+  const day = loadedDocument.bySportsDay[sportsDayKey.trim()];
   return day?.entries ?? [];
 }
 
@@ -207390,7 +208226,7 @@ async function diagnoseRendererRssFetch(url) {
   const label = "renderer-fetch";
   console.group(`${LOG52}[${label}] ${url}`);
   try {
-    const started = performance.now();
+    const started2 = performance.now();
     const res = await fetch(url, {
       mode: "cors",
       headers: {
@@ -207410,7 +208246,7 @@ async function diagnoseRendererRssFetch(url) {
       contentLength: res.headers.get("content-length"),
       contentEncoding: res.headers.get("content-encoding"),
       headers: headersToRecord(res.headers),
-      elapsedMs: Math.round(performance.now() - started),
+      elapsedMs: Math.round(performance.now() - started2),
       ...classification
     });
     console.log(`${LOG52}[${label}] preview`, previewRssBody(body));
@@ -207429,9 +208265,9 @@ async function diagnoseElectronRssFetch(url) {
     console.groupEnd();
     return;
   }
-  const started = performance.now();
+  const started2 = performance.now();
   const result = await bridge5(url);
-  const elapsedMs = Math.round(performance.now() - started);
+  const elapsedMs = Math.round(performance.now() - started2);
   const xml = result && "ok" in result && result.ok === true && "xml" in result ? result.xml : "";
   const classification = classifyRssBody(xml);
   const debugAttempts = result && typeof result === "object" && "_rssDebug" in result ? result._rssDebug : void 0;
