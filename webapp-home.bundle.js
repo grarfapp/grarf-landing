@@ -43358,19 +43358,6 @@ var temporaryEditorialOverrides_default = {
       note: "Daily manual: WNBA Finals G4 \u2014 USA Today recap headline"
     },
     {
-      id: "motogp-australian-motorcycle-grand-prix-watchStreamUrl",
-      entity: {
-        entityType: "game",
-        entityId: "manual-event-motogp-australian-motorcycle-grand-prix-2026-10-24"
-      },
-      operation: "replace",
-      sportsDayKey: "2026-10-24",
-      expiresAt: "2026-10-28T03:00:00.000Z",
-      note: "Daily manual: MotoGP \u2014 Australian Motorcycle Grand Prix (FS2)",
-      target: "watchStreamUrl",
-      value: "https://www.foxsports.com/live/fs2"
-    },
-    {
       id: "motogp-australian-motorcycle-grand-prix-startTimeMs",
       entity: {
         entityType: "game",
@@ -43395,19 +43382,6 @@ var temporaryEditorialOverrides_default = {
       note: "Daily manual: MotoGP \u2014 Australian Motorcycle Grand Prix (FS2)",
       target: "endTimeMs",
       value: 17929053e5
-    },
-    {
-      id: "motogp-grand-prix-of-malaysia-sprint-race-watchStreamUrl",
-      entity: {
-        entityType: "game",
-        entityId: "manual-event-motogp-grand-prix-of-malaysia-sprint-race-2026-10-31"
-      },
-      operation: "replace",
-      sportsDayKey: "2026-10-31",
-      expiresAt: "2026-11-03T07:00:00.000Z",
-      note: "Daily manual: MotoGP \u2014 Grand Prix of Malaysia Sprint Race (FS1)",
-      target: "watchStreamUrl",
-      value: "https://www.foxsports.com/live/fs1"
     },
     {
       id: "motogp-grand-prix-of-malaysia-sprint-race-startTimeMs",
@@ -43436,19 +43410,6 @@ var temporaryEditorialOverrides_default = {
       value: 17934381e5
     },
     {
-      id: "motogp-grand-prix-of-malaysia-watchStreamUrl",
-      entity: {
-        entityType: "game",
-        entityId: "manual-event-motogp-grand-prix-of-malaysia-2026-11-01"
-      },
-      operation: "replace",
-      sportsDayKey: "2026-11-01",
-      expiresAt: "2026-11-04T06:00:00.000Z",
-      note: "Daily manual: MotoGP \u2014 Grand Prix of Malaysia (FS2)",
-      target: "watchStreamUrl",
-      value: "https://www.foxsports.com/live/fs2"
-    },
-    {
       id: "motogp-grand-prix-of-malaysia-startTimeMs",
       entity: {
         entityType: "game",
@@ -43473,19 +43434,6 @@ var temporaryEditorialOverrides_default = {
       note: "Daily manual: MotoGP \u2014 Grand Prix of Malaysia (FS2)",
       target: "endTimeMs",
       value: 17935209e5
-    },
-    {
-      id: "motogp-grand-prix-of-qatar-sprint-race-watchStreamUrl",
-      entity: {
-        entityType: "game",
-        entityId: "manual-event-motogp-grand-prix-of-qatar-sprint-race-2026-11-07"
-      },
-      operation: "replace",
-      sportsDayKey: "2026-11-07",
-      expiresAt: "2026-11-10T17:00:00.000Z",
-      note: "Daily manual: MotoGP \u2014 Grand Prix of Qatar Sprint Race (FS1)",
-      target: "watchStreamUrl",
-      value: "https://www.foxsports.com/live/fs1"
     },
     {
       id: "motogp-grand-prix-of-qatar-sprint-race-startTimeMs",
@@ -43514,19 +43462,6 @@ var temporaryEditorialOverrides_default = {
       value: 17940789e5
     },
     {
-      id: "motogp-grand-prix-of-qatar-watchStreamUrl",
-      entity: {
-        entityType: "game",
-        entityId: "manual-event-motogp-grand-prix-of-qatar-2026-11-08"
-      },
-      operation: "replace",
-      sportsDayKey: "2026-11-08",
-      expiresAt: "2026-11-11T17:00:00.000Z",
-      note: "Daily manual: MotoGP \u2014 Grand Prix of Qatar (FS1)",
-      target: "watchStreamUrl",
-      value: "https://www.foxsports.com/live/fs1"
-    },
-    {
       id: "motogp-grand-prix-of-qatar-startTimeMs",
       entity: {
         entityType: "game",
@@ -43551,19 +43486,6 @@ var temporaryEditorialOverrides_default = {
       note: "Daily manual: MotoGP \u2014 Grand Prix of Qatar (FS1)",
       target: "endTimeMs",
       value: 17941653e5
-    },
-    {
-      id: "motogp-grande-premio-de-portugal-sprint-race-watchStreamUrl",
-      entity: {
-        entityType: "game",
-        entityId: "manual-event-motogp-grande-premio-de-portugal-sprint-race-2026-11-21"
-      },
-      operation: "replace",
-      sportsDayKey: "2026-11-21",
-      expiresAt: "2026-11-24T15:00:00.000Z",
-      note: "Daily manual: MotoGP \u2014 Grande Premio de Portugal Sprint Race (FS2)",
-      target: "watchStreamUrl",
-      value: "https://www.foxsports.com/live/fs2"
     },
     {
       id: "motogp-grande-premio-de-portugal-sprint-race-startTimeMs",
@@ -43592,19 +43514,6 @@ var temporaryEditorialOverrides_default = {
       value: 17952813e5
     },
     {
-      id: "motogp-grande-premio-de-portugal-watchStreamUrl",
-      entity: {
-        entityType: "game",
-        entityId: "manual-event-motogp-grande-premio-de-portugal-2026-11-22"
-      },
-      operation: "replace",
-      sportsDayKey: "2026-11-22",
-      expiresAt: "2026-11-25T13:00:00.000Z",
-      note: "Daily manual: MotoGP \u2014 Grande Premio de Portugal (FS1)",
-      target: "watchStreamUrl",
-      value: "https://www.foxsports.com/live/fs1"
-    },
-    {
       id: "motogp-grande-premio-de-portugal-startTimeMs",
       entity: {
         entityType: "game",
@@ -43631,19 +43540,6 @@ var temporaryEditorialOverrides_default = {
       value: 17953605e5
     },
     {
-      id: "motogp-gran-premio-de-la-comunitat-valenciana-sprint-ra-watchStreamUrl",
-      entity: {
-        entityType: "game",
-        entityId: "manual-event-motogp-gran-premio-de-la-comunitat-valenciana-sprint-race-2026-11-28"
-      },
-      operation: "replace",
-      sportsDayKey: "2026-11-28",
-      expiresAt: "2026-12-01T14:00:00.000Z",
-      note: "Daily manual: MotoGP \u2014 Gran Premio de la Comunitat Valenciana Sprint Race (FS2)",
-      target: "watchStreamUrl",
-      value: "https://www.foxsports.com/live/fs2"
-    },
-    {
       id: "motogp-gran-premio-de-la-comunitat-valenciana-sprint-ra-startTimeMs",
       entity: {
         entityType: "game",
@@ -43668,19 +43564,6 @@ var temporaryEditorialOverrides_default = {
       note: "Daily manual: MotoGP \u2014 Gran Premio de la Comunitat Valenciana Sprint Race (FS2)",
       target: "endTimeMs",
       value: 17958825e5
-    },
-    {
-      id: "motogp-gran-premio-de-la-comunitat-valenciana-watchStreamUrl",
-      entity: {
-        entityType: "game",
-        entityId: "manual-event-motogp-gran-premio-de-la-comunitat-valenciana-2026-11-29"
-      },
-      operation: "replace",
-      sportsDayKey: "2026-11-29",
-      expiresAt: "2026-12-02T13:00:00.000Z",
-      note: "Daily manual: MotoGP \u2014 Gran Premio de la Comunitat Valenciana (FS1)",
-      target: "watchStreamUrl",
-      value: "https://www.foxsports.com/live/fs1"
     },
     {
       id: "motogp-gran-premio-de-la-comunitat-valenciana-startTimeMs",
@@ -162999,13 +162882,16 @@ function resolveFuboWatchUrlFromGame(game) {
 }
 
 // ../grarf/shared/domain/watch/resolveWatchLiveDestinationUrl.ts
-var AFL_FS2_LIVE_URL2 = "https://www.foxsports.com/live/fs2";
+var FOX_FS1_LIVE_URL = "https://www.foxsports.com/live/fs1";
+var FOX_FS2_LIVE_URL = "https://www.foxsports.com/live/fs2";
+var PARAMOUNT_PLUS_UFC_LIVE_URL = "https://www.paramountplus.com/live-tv/stream/ufc/";
 var USA_NETWORK_LIVE_URL2 = "https://www.usanetwork.com/live";
 var USA_NETWORK_WNBA_STREAM_URL2 = "https://www.usanetwork.com/sports";
 var PEACOCK_SPORTS_HUB_URL = "https://www.peacocktv.com/sports";
 var TNT_DRAMA_EAST_LIVE_URL = "https://www.tntdrama.com/watchtnt/east";
 var TBS_EAST_LIVE_URL = "https://www.tbs.com/watchtbs/east";
 var PEACOCK_LABEL2 = /\bpeacock\b/i;
+var PARAMOUNT_LABEL2 = /paramount\s*\+?/i;
 var NON_LINEAR_TURNER_STREAM_PROVIDER_LABELS = /* @__PURE__ */ new Set([
   "ESPN+",
   "Paramount+",
@@ -163025,6 +162911,34 @@ function isMlbGame3(game) {
 function gameHasPeacockBroadcast2(game) {
   const hints = [...game.broadcasts ?? [], ...game.channels ?? []];
   return hints.some((h2) => PEACOCK_LABEL2.test(h2));
+}
+function gameHasParamountBroadcast2(game) {
+  const hints = [...game.broadcasts ?? [], ...game.channels ?? []];
+  return hints.some((h2) => PARAMOUNT_LABEL2.test(String(h2)));
+}
+function gameHasFs1LinearBroadcast(game) {
+  const hints = [...game.broadcasts ?? [], ...game.channels ?? []];
+  return hints.some((h2) => /\bFS1\b/.test(String(h2)));
+}
+function gameHasFs2LinearBroadcast(game) {
+  const hints = [...game.broadcasts ?? [], ...game.channels ?? []];
+  return hints.some((h2) => /\bFS2\b/.test(String(h2)));
+}
+function resolveFoxFs1WatchLiveDestinationUrl(game) {
+  if (!gameHasFs1LinearBroadcast(game)) return null;
+  return FOX_FS1_LIVE_URL;
+}
+function resolveFoxFs2WatchLiveDestinationUrl(game) {
+  if (game.league === "AFL") return null;
+  if (!gameHasFs2LinearBroadcast(game)) return null;
+  return FOX_FS2_LIVE_URL;
+}
+function resolveUfcParamountPlusWatchLiveDestinationUrl(game) {
+  if (game.league !== "UFC") return null;
+  if (game.streamProvider === "Paramount+" || gameHasParamountBroadcast2(game)) {
+    return PARAMOUNT_PLUS_UFC_LIVE_URL;
+  }
+  return null;
 }
 function isTntLinearBroadcastLabel(label) {
   const t2 = String(label || "").trim();
@@ -163108,8 +163022,14 @@ function resolveWatchLiveDestinationUrl(game) {
   if (game.league === "AFL") {
     const aflUrl = game.streamUrl?.trim();
     if (aflUrl && game.streamProvider === "FOX Sports") return aflUrl;
-    return AFL_FS2_LIVE_URL2;
+    return FOX_FS2_LIVE_URL;
   }
+  const foxFs1Url = resolveFoxFs1WatchLiveDestinationUrl(game);
+  if (foxFs1Url) return foxFs1Url;
+  const foxFs2Url = resolveFoxFs2WatchLiveDestinationUrl(game);
+  if (foxFs2Url) return foxFs2Url;
+  const ufcParamountUrl = resolveUfcParamountPlusWatchLiveDestinationUrl(game);
+  if (ufcParamountUrl) return ufcParamountUrl;
   if (game.streamProvider === "USA" || gameHasUsaNetworkBroadcast2(game)) {
     return resolveUsaNetworkStreamUrl2(game);
   }
