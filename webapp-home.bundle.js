@@ -96546,7 +96546,7 @@ var MLB_TEAM_NEWS_SOURCES_BY_ABBREV = {
     {
       "id": "mlb-ari-yahoo-sports",
       "name": "Yahoo! Sports",
-      "browserUrl": "https://sports.yahoo.com/mlb/teams/arizona-diamondbacks/",
+      "browserUrl": "https://sports.yahoo.com/mlb/teams/arizona/",
       "category": "news"
     },
     {
@@ -96564,7 +96564,7 @@ var MLB_TEAM_NEWS_SOURCES_BY_ABBREV = {
     {
       "id": "mlb-ari-nbc-sports",
       "name": "NBC Sports",
-      "browserUrl": "https://www.nbcsports.com/search?search=Arizona%20Diamondbacks",
+      "browserUrl": "https://www.nbcsports.com/mlb/arizona-diamondbacks",
       "category": "news"
     },
     {
@@ -96680,7 +96680,7 @@ var MLB_TEAM_NEWS_SOURCES_BY_ABBREV = {
     {
       "id": "mlb-ath-nbc-sports",
       "name": "NBC Sports",
-      "browserUrl": "https://www.nbcsports.com/search?search=Athletics",
+      "browserUrl": "https://www.nbcsports.com/mlb/athletics",
       "category": "news"
     },
     {
@@ -96778,7 +96778,7 @@ var MLB_TEAM_NEWS_SOURCES_BY_ABBREV = {
     {
       "id": "mlb-atl-yahoo-sports",
       "name": "Yahoo! Sports",
-      "browserUrl": "https://sports.yahoo.com/mlb/teams/atlanta-braves/",
+      "browserUrl": "https://sports.yahoo.com/mlb/teams/atlanta/",
       "category": "news"
     },
     {
@@ -96796,7 +96796,7 @@ var MLB_TEAM_NEWS_SOURCES_BY_ABBREV = {
     {
       "id": "mlb-atl-nbc-sports",
       "name": "NBC Sports",
-      "browserUrl": "https://www.nbcsports.com/search?search=Atlanta%20Braves",
+      "browserUrl": "https://www.nbcsports.com/mlb/atlanta-braves",
       "category": "news"
     },
     {
@@ -96894,7 +96894,7 @@ var MLB_TEAM_NEWS_SOURCES_BY_ABBREV = {
     {
       "id": "mlb-bal-yahoo-sports",
       "name": "Yahoo! Sports",
-      "browserUrl": "https://sports.yahoo.com/mlb/teams/baltimore-orioles/",
+      "browserUrl": "https://sports.yahoo.com/mlb/teams/baltimore/",
       "category": "news"
     },
     {
@@ -96912,7 +96912,7 @@ var MLB_TEAM_NEWS_SOURCES_BY_ABBREV = {
     {
       "id": "mlb-bal-nbc-sports",
       "name": "NBC Sports",
-      "browserUrl": "https://www.nbcsports.com/search?search=Baltimore%20Orioles",
+      "browserUrl": "https://www.nbcsports.com/mlb/baltimore-orioles",
       "category": "news"
     },
     {
@@ -97010,7 +97010,7 @@ var MLB_TEAM_NEWS_SOURCES_BY_ABBREV = {
     {
       "id": "mlb-bos-yahoo-sports",
       "name": "Yahoo! Sports",
-      "browserUrl": "https://sports.yahoo.com/mlb/teams/boston-red-sox/",
+      "browserUrl": "https://sports.yahoo.com/mlb/teams/boston/",
       "category": "news"
     },
     {
@@ -97028,7 +97028,7 @@ var MLB_TEAM_NEWS_SOURCES_BY_ABBREV = {
     {
       "id": "mlb-bos-nbc-sports",
       "name": "NBC Sports",
-      "browserUrl": "https://www.nbcsports.com/search?search=Boston%20Red%20Sox",
+      "browserUrl": "https://www.nbcsports.com/mlb/boston-red-sox",
       "category": "news"
     },
     {
@@ -97144,7 +97144,7 @@ var MLB_TEAM_NEWS_SOURCES_BY_ABBREV = {
     {
       "id": "mlb-chc-nbc-sports",
       "name": "NBC Sports",
-      "browserUrl": "https://www.nbcsports.com/search?search=Chicago%20Cubs",
+      "browserUrl": "https://www.nbcsports.com/mlb/chicago-cubs",
       "category": "news"
     },
     {
@@ -97260,7 +97260,7 @@ var MLB_TEAM_NEWS_SOURCES_BY_ABBREV = {
     {
       "id": "mlb-cws-nbc-sports",
       "name": "NBC Sports",
-      "browserUrl": "https://www.nbcsports.com/search?search=Chicago%20White%20Sox",
+      "browserUrl": "https://www.nbcsports.com/mlb/chicago-white-sox",
       "category": "news"
     },
     {
@@ -97358,7 +97358,7 @@ var MLB_TEAM_NEWS_SOURCES_BY_ABBREV = {
     {
       "id": "mlb-cin-yahoo-sports",
       "name": "Yahoo! Sports",
-      "browserUrl": "https://sports.yahoo.com/mlb/teams/cincinnati-reds/",
+      "browserUrl": "https://sports.yahoo.com/mlb/teams/cincinnati/",
       "category": "news"
     },
     {
@@ -97376,7 +97376,7 @@ var MLB_TEAM_NEWS_SOURCES_BY_ABBREV = {
     {
       "id": "mlb-cin-nbc-sports",
       "name": "NBC Sports",
-      "browserUrl": "https://www.nbcsports.com/search?search=Cincinnati%20Reds",
+      "browserUrl": "https://www.nbcsports.com/mlb/cincinnati-reds",
       "category": "news"
     },
     {
@@ -97450,7 +97450,7 @@ var MLB_TEAM_NEWS_SOURCES_BY_ABBREV = {
     {
       "id": "mlb-cle-mlb-com",
       "name": "MLB.com",
-      "browserUrl": "https://www.mlb.com/cleguardians",
+      "browserUrl": "https://www.mlb.com/guardians",
       "category": "news"
     },
     {
@@ -97474,7 +97474,7 @@ var MLB_TEAM_NEWS_SOURCES_BY_ABBREV = {
     {
       "id": "mlb-cle-yahoo-sports",
       "name": "Yahoo! Sports",
-      "browserUrl": "https://sports.yahoo.com/mlb/teams/cleveland-guardians/",
+      "browserUrl": "https://sports.yahoo.com/mlb/teams/cleveland/",
       "category": "news"
     },
     {
@@ -97492,7 +97492,7 @@ var MLB_TEAM_NEWS_SOURCES_BY_ABBREV = {
     {
       "id": "mlb-cle-nbc-sports",
       "name": "NBC Sports",
-      "browserUrl": "https://www.nbcsports.com/search?search=Cleveland%20Guardians",
+      "browserUrl": "https://www.nbcsports.com/mlb/cleveland-guardians",
       "category": "news"
     },
     {
@@ -97590,7 +97590,7 @@ var MLB_TEAM_NEWS_SOURCES_BY_ABBREV = {
     {
       "id": "mlb-col-yahoo-sports",
       "name": "Yahoo! Sports",
-      "browserUrl": "https://sports.yahoo.com/mlb/teams/colorado-rockies/",
+      "browserUrl": "https://sports.yahoo.com/mlb/teams/colorado/",
       "category": "news"
     },
     {
@@ -97608,7 +97608,7 @@ var MLB_TEAM_NEWS_SOURCES_BY_ABBREV = {
     {
       "id": "mlb-col-nbc-sports",
       "name": "NBC Sports",
-      "browserUrl": "https://www.nbcsports.com/search?search=Colorado%20Rockies",
+      "browserUrl": "https://www.nbcsports.com/mlb/colorado-rockies",
       "category": "news"
     },
     {
@@ -97706,7 +97706,7 @@ var MLB_TEAM_NEWS_SOURCES_BY_ABBREV = {
     {
       "id": "mlb-det-yahoo-sports",
       "name": "Yahoo! Sports",
-      "browserUrl": "https://sports.yahoo.com/mlb/teams/detroit-tigers/",
+      "browserUrl": "https://sports.yahoo.com/mlb/teams/detroit/",
       "category": "news"
     },
     {
@@ -97724,7 +97724,7 @@ var MLB_TEAM_NEWS_SOURCES_BY_ABBREV = {
     {
       "id": "mlb-det-nbc-sports",
       "name": "NBC Sports",
-      "browserUrl": "https://www.nbcsports.com/search?search=Detroit%20Tigers",
+      "browserUrl": "https://www.nbcsports.com/mlb/detroit-tigers",
       "category": "news"
     },
     {
@@ -97822,7 +97822,7 @@ var MLB_TEAM_NEWS_SOURCES_BY_ABBREV = {
     {
       "id": "mlb-hou-yahoo-sports",
       "name": "Yahoo! Sports",
-      "browserUrl": "https://sports.yahoo.com/mlb/teams/houston-astros/",
+      "browserUrl": "https://sports.yahoo.com/mlb/teams/houston/",
       "category": "news"
     },
     {
@@ -97840,7 +97840,7 @@ var MLB_TEAM_NEWS_SOURCES_BY_ABBREV = {
     {
       "id": "mlb-hou-nbc-sports",
       "name": "NBC Sports",
-      "browserUrl": "https://www.nbcsports.com/search?search=Houston%20Astros",
+      "browserUrl": "https://www.nbcsports.com/mlb/houston-astros",
       "category": "news"
     },
     {
@@ -97938,7 +97938,7 @@ var MLB_TEAM_NEWS_SOURCES_BY_ABBREV = {
     {
       "id": "mlb-kc-yahoo-sports",
       "name": "Yahoo! Sports",
-      "browserUrl": "https://sports.yahoo.com/mlb/teams/kansas-city-royals/",
+      "browserUrl": "https://sports.yahoo.com/mlb/teams/kansas-city/",
       "category": "news"
     },
     {
@@ -97956,7 +97956,7 @@ var MLB_TEAM_NEWS_SOURCES_BY_ABBREV = {
     {
       "id": "mlb-kc-nbc-sports",
       "name": "NBC Sports",
-      "browserUrl": "https://www.nbcsports.com/search?search=Kansas%20City%20Royals",
+      "browserUrl": "https://www.nbcsports.com/mlb/kansas-city-royals",
       "category": "news"
     },
     {
@@ -98072,7 +98072,7 @@ var MLB_TEAM_NEWS_SOURCES_BY_ABBREV = {
     {
       "id": "mlb-laa-nbc-sports",
       "name": "NBC Sports",
-      "browserUrl": "https://www.nbcsports.com/search?search=Los%20Angeles%20Angels",
+      "browserUrl": "https://www.nbcsports.com/mlb/los-angeles-angels",
       "category": "news"
     },
     {
@@ -98188,7 +98188,7 @@ var MLB_TEAM_NEWS_SOURCES_BY_ABBREV = {
     {
       "id": "mlb-lad-nbc-sports",
       "name": "NBC Sports",
-      "browserUrl": "https://www.nbcsports.com/search?search=Los%20Angeles%20Dodgers",
+      "browserUrl": "https://www.nbcsports.com/mlb/los-angeles-dodgers",
       "category": "news"
     },
     {
@@ -98286,7 +98286,7 @@ var MLB_TEAM_NEWS_SOURCES_BY_ABBREV = {
     {
       "id": "mlb-mia-yahoo-sports",
       "name": "Yahoo! Sports",
-      "browserUrl": "https://sports.yahoo.com/mlb/teams/miami-marlins/",
+      "browserUrl": "https://sports.yahoo.com/mlb/teams/miami/",
       "category": "news"
     },
     {
@@ -98304,7 +98304,7 @@ var MLB_TEAM_NEWS_SOURCES_BY_ABBREV = {
     {
       "id": "mlb-mia-nbc-sports",
       "name": "NBC Sports",
-      "browserUrl": "https://www.nbcsports.com/search?search=Miami%20Marlins",
+      "browserUrl": "https://www.nbcsports.com/mlb/miami-marlins",
       "category": "news"
     },
     {
@@ -98402,7 +98402,7 @@ var MLB_TEAM_NEWS_SOURCES_BY_ABBREV = {
     {
       "id": "mlb-mil-yahoo-sports",
       "name": "Yahoo! Sports",
-      "browserUrl": "https://sports.yahoo.com/mlb/teams/milwaukee-brewers/",
+      "browserUrl": "https://sports.yahoo.com/mlb/teams/milwaukee/",
       "category": "news"
     },
     {
@@ -98420,7 +98420,7 @@ var MLB_TEAM_NEWS_SOURCES_BY_ABBREV = {
     {
       "id": "mlb-mil-nbc-sports",
       "name": "NBC Sports",
-      "browserUrl": "https://www.nbcsports.com/search?search=Milwaukee%20Brewers",
+      "browserUrl": "https://www.nbcsports.com/mlb/milwaukee-brewers",
       "category": "news"
     },
     {
@@ -98518,7 +98518,7 @@ var MLB_TEAM_NEWS_SOURCES_BY_ABBREV = {
     {
       "id": "mlb-min-yahoo-sports",
       "name": "Yahoo! Sports",
-      "browserUrl": "https://sports.yahoo.com/mlb/teams/minnesota-twins/",
+      "browserUrl": "https://sports.yahoo.com/mlb/teams/minnesota/",
       "category": "news"
     },
     {
@@ -98536,7 +98536,7 @@ var MLB_TEAM_NEWS_SOURCES_BY_ABBREV = {
     {
       "id": "mlb-min-nbc-sports",
       "name": "NBC Sports",
-      "browserUrl": "https://www.nbcsports.com/search?search=Minnesota%20Twins",
+      "browserUrl": "https://www.nbcsports.com/mlb/minnesota-twins",
       "category": "news"
     },
     {
@@ -98652,7 +98652,7 @@ var MLB_TEAM_NEWS_SOURCES_BY_ABBREV = {
     {
       "id": "mlb-nym-nbc-sports",
       "name": "NBC Sports",
-      "browserUrl": "https://www.nbcsports.com/search?search=New%20York%20Mets",
+      "browserUrl": "https://www.nbcsports.com/mlb/new-york-mets",
       "category": "news"
     },
     {
@@ -98768,7 +98768,7 @@ var MLB_TEAM_NEWS_SOURCES_BY_ABBREV = {
     {
       "id": "mlb-nyy-nbc-sports",
       "name": "NBC Sports",
-      "browserUrl": "https://www.nbcsports.com/search?search=New%20York%20Yankees",
+      "browserUrl": "https://www.nbcsports.com/mlb/new-york-yankees",
       "category": "news"
     },
     {
@@ -98866,7 +98866,7 @@ var MLB_TEAM_NEWS_SOURCES_BY_ABBREV = {
     {
       "id": "mlb-phi-yahoo-sports",
       "name": "Yahoo! Sports",
-      "browserUrl": "https://sports.yahoo.com/mlb/teams/philadelphia-phillies/",
+      "browserUrl": "https://sports.yahoo.com/mlb/teams/philadelphia/",
       "category": "news"
     },
     {
@@ -98884,7 +98884,7 @@ var MLB_TEAM_NEWS_SOURCES_BY_ABBREV = {
     {
       "id": "mlb-phi-nbc-sports",
       "name": "NBC Sports",
-      "browserUrl": "https://www.nbcsports.com/search?search=Philadelphia%20Phillies",
+      "browserUrl": "https://www.nbcsports.com/mlb/philadelphia-phillies",
       "category": "news"
     },
     {
@@ -98982,7 +98982,7 @@ var MLB_TEAM_NEWS_SOURCES_BY_ABBREV = {
     {
       "id": "mlb-pit-yahoo-sports",
       "name": "Yahoo! Sports",
-      "browserUrl": "https://sports.yahoo.com/mlb/teams/pittsburgh-pirates/",
+      "browserUrl": "https://sports.yahoo.com/mlb/teams/pittsburgh/",
       "category": "news"
     },
     {
@@ -99000,7 +99000,7 @@ var MLB_TEAM_NEWS_SOURCES_BY_ABBREV = {
     {
       "id": "mlb-pit-nbc-sports",
       "name": "NBC Sports",
-      "browserUrl": "https://www.nbcsports.com/search?search=Pittsburgh%20Pirates",
+      "browserUrl": "https://www.nbcsports.com/mlb/pittsburgh-pirates",
       "category": "news"
     },
     {
@@ -99098,7 +99098,7 @@ var MLB_TEAM_NEWS_SOURCES_BY_ABBREV = {
     {
       "id": "mlb-sd-yahoo-sports",
       "name": "Yahoo! Sports",
-      "browserUrl": "https://sports.yahoo.com/mlb/teams/san-diego-padres/",
+      "browserUrl": "https://sports.yahoo.com/mlb/teams/san-diego/",
       "category": "news"
     },
     {
@@ -99116,7 +99116,7 @@ var MLB_TEAM_NEWS_SOURCES_BY_ABBREV = {
     {
       "id": "mlb-sd-nbc-sports",
       "name": "NBC Sports",
-      "browserUrl": "https://www.nbcsports.com/search?search=San%20Diego%20Padres",
+      "browserUrl": "https://www.nbcsports.com/mlb/san-diego-padres",
       "category": "news"
     },
     {
@@ -99190,7 +99190,7 @@ var MLB_TEAM_NEWS_SOURCES_BY_ABBREV = {
     {
       "id": "mlb-sf-mlb-com",
       "name": "MLB.com",
-      "browserUrl": "https://www.mlb.com/sfgiants",
+      "browserUrl": "https://www.mlb.com/giants",
       "category": "news"
     },
     {
@@ -99214,7 +99214,7 @@ var MLB_TEAM_NEWS_SOURCES_BY_ABBREV = {
     {
       "id": "mlb-sf-yahoo-sports",
       "name": "Yahoo! Sports",
-      "browserUrl": "https://sports.yahoo.com/mlb/teams/san-francisco-giants/",
+      "browserUrl": "https://sports.yahoo.com/mlb/teams/san-francisco/",
       "category": "news"
     },
     {
@@ -99232,7 +99232,7 @@ var MLB_TEAM_NEWS_SOURCES_BY_ABBREV = {
     {
       "id": "mlb-sf-nbc-sports",
       "name": "NBC Sports",
-      "browserUrl": "https://www.nbcsports.com/search?search=San%20Francisco%20Giants",
+      "browserUrl": "https://www.nbcsports.com/mlb/san-francisco-giants",
       "category": "news"
     },
     {
@@ -99330,7 +99330,7 @@ var MLB_TEAM_NEWS_SOURCES_BY_ABBREV = {
     {
       "id": "mlb-sea-yahoo-sports",
       "name": "Yahoo! Sports",
-      "browserUrl": "https://sports.yahoo.com/mlb/teams/seattle-mariners/",
+      "browserUrl": "https://sports.yahoo.com/mlb/teams/seattle/",
       "category": "news"
     },
     {
@@ -99348,7 +99348,7 @@ var MLB_TEAM_NEWS_SOURCES_BY_ABBREV = {
     {
       "id": "mlb-sea-nbc-sports",
       "name": "NBC Sports",
-      "browserUrl": "https://www.nbcsports.com/search?search=Seattle%20Mariners",
+      "browserUrl": "https://www.nbcsports.com/mlb/seattle-mariners",
       "category": "news"
     },
     {
@@ -99446,7 +99446,7 @@ var MLB_TEAM_NEWS_SOURCES_BY_ABBREV = {
     {
       "id": "mlb-stl-yahoo-sports",
       "name": "Yahoo! Sports",
-      "browserUrl": "https://sports.yahoo.com/mlb/teams/st-louis-cardinals/",
+      "browserUrl": "https://sports.yahoo.com/mlb/teams/st-louis/",
       "category": "news"
     },
     {
@@ -99464,7 +99464,7 @@ var MLB_TEAM_NEWS_SOURCES_BY_ABBREV = {
     {
       "id": "mlb-stl-nbc-sports",
       "name": "NBC Sports",
-      "browserUrl": "https://www.nbcsports.com/search?search=St.%20Louis%20Cardinals",
+      "browserUrl": "https://www.nbcsports.com/mlb/st-louis-cardinals",
       "category": "news"
     },
     {
@@ -99538,7 +99538,7 @@ var MLB_TEAM_NEWS_SOURCES_BY_ABBREV = {
     {
       "id": "mlb-tb-mlb-com",
       "name": "MLB.com",
-      "browserUrl": "https://www.mlb.com/raysbaseball",
+      "browserUrl": "https://www.mlb.com/rays",
       "category": "news"
     },
     {
@@ -99562,7 +99562,7 @@ var MLB_TEAM_NEWS_SOURCES_BY_ABBREV = {
     {
       "id": "mlb-tb-yahoo-sports",
       "name": "Yahoo! Sports",
-      "browserUrl": "https://sports.yahoo.com/mlb/teams/tampa-bay-rays/",
+      "browserUrl": "https://sports.yahoo.com/mlb/teams/tampa-bay/",
       "category": "news"
     },
     {
@@ -99580,7 +99580,7 @@ var MLB_TEAM_NEWS_SOURCES_BY_ABBREV = {
     {
       "id": "mlb-tb-nbc-sports",
       "name": "NBC Sports",
-      "browserUrl": "https://www.nbcsports.com/search?search=Tampa%20Bay%20Rays",
+      "browserUrl": "https://www.nbcsports.com/mlb/tampa-bay-rays",
       "category": "news"
     },
     {
@@ -99678,7 +99678,7 @@ var MLB_TEAM_NEWS_SOURCES_BY_ABBREV = {
     {
       "id": "mlb-tex-yahoo-sports",
       "name": "Yahoo! Sports",
-      "browserUrl": "https://sports.yahoo.com/mlb/teams/texas-rangers/",
+      "browserUrl": "https://sports.yahoo.com/mlb/teams/texas/",
       "category": "news"
     },
     {
@@ -99696,7 +99696,7 @@ var MLB_TEAM_NEWS_SOURCES_BY_ABBREV = {
     {
       "id": "mlb-tex-nbc-sports",
       "name": "NBC Sports",
-      "browserUrl": "https://www.nbcsports.com/search?search=Texas%20Rangers",
+      "browserUrl": "https://www.nbcsports.com/mlb/texas-rangers",
       "category": "news"
     },
     {
@@ -99794,7 +99794,7 @@ var MLB_TEAM_NEWS_SOURCES_BY_ABBREV = {
     {
       "id": "mlb-tor-yahoo-sports",
       "name": "Yahoo! Sports",
-      "browserUrl": "https://sports.yahoo.com/mlb/teams/toronto-blue-jays/",
+      "browserUrl": "https://sports.yahoo.com/mlb/teams/toronto/",
       "category": "news"
     },
     {
@@ -99812,7 +99812,7 @@ var MLB_TEAM_NEWS_SOURCES_BY_ABBREV = {
     {
       "id": "mlb-tor-nbc-sports",
       "name": "NBC Sports",
-      "browserUrl": "https://www.nbcsports.com/search?search=Toronto%20Blue%20Jays",
+      "browserUrl": "https://www.nbcsports.com/mlb/toronto-blue-jays",
       "category": "news"
     },
     {
@@ -99910,7 +99910,7 @@ var MLB_TEAM_NEWS_SOURCES_BY_ABBREV = {
     {
       "id": "mlb-wsh-yahoo-sports",
       "name": "Yahoo! Sports",
-      "browserUrl": "https://sports.yahoo.com/mlb/teams/washington-nationals/",
+      "browserUrl": "https://sports.yahoo.com/mlb/teams/washington/",
       "category": "news"
     },
     {
@@ -99928,7 +99928,7 @@ var MLB_TEAM_NEWS_SOURCES_BY_ABBREV = {
     {
       "id": "mlb-wsh-nbc-sports",
       "name": "NBC Sports",
-      "browserUrl": "https://www.nbcsports.com/search?search=Washington%20Nationals",
+      "browserUrl": "https://www.nbcsports.com/mlb/washington-nationals",
       "category": "news"
     },
     {
