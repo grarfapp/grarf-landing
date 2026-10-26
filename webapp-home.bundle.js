@@ -43590,6 +43590,19 @@ var temporaryEditorialOverrides_default = {
       note: "Daily manual: MotoGP \u2014 Gran Premio de la Comunitat Valenciana (FS1)",
       target: "endTimeMs",
       value: 17959653e5
+    },
+    {
+      id: "watchstreamurl-espn-nba-401909876",
+      entity: {
+        entityType: "game",
+        entityId: "espn-NBA-401909876"
+      },
+      target: "watchStreamUrl",
+      operation: "replace",
+      value: "https://www.peacocktv.com/watch/asset/sports/warriors-vs.-nuggets/762d3492-c72b-3fc8-b778-2885f0a18090",
+      sportsDayKey: "2026-10-26",
+      expiresAt: null,
+      note: "Daily manual: Warriors @ Nuggets \u2014 Peacock stream"
     }
   ]
 };
@@ -95238,7 +95251,7 @@ var SPORTS_BROWSER_PROTOTYPE_LEAGUE_WEBSITES = {
     { label: "CBS Sports", url: "https://www.cbssports.com/mlb/" }
   ],
   ATP: [
-    { label: "ATP Tour", url: "https://www.atptour.com/en/news" },
+    { label: "ATP Tour", url: "https://www.atptour.com/en/" },
     { label: "ESPN", url: "https://www.espn.com/tennis/" },
     { label: "Tennis.com", url: "https://www.tennis.com/" },
     { label: "BBC Sport", url: "https://www.bbc.com/sport/tennis" },
@@ -193248,6 +193261,68 @@ var homeCommandCenterDailyPriorities_default = {
           awayTeamLabel: "Ole Miss",
           homeTeamLabel: "Texas",
           line: "NCAAF - Ole Miss vs Texas"
+        }
+      ]
+    },
+    "2026-10-25": {
+      updatedAt: "2026-10-25T19:56:32.913Z",
+      entries: [
+        {
+          kind: "matchup",
+          leagueLabel: "LaLiga",
+          leagueKey: "LALIGA",
+          awayTeamLabel: "Barcelona",
+          homeTeamLabel: "Real Madrid",
+          line: "LaLiga - Barcelona vs Real Madrid"
+        },
+        {
+          kind: "league",
+          leagueLabel: "Formula 1",
+          leagueKey: "F1",
+          line: "Formula 1 - SC Cruises United States GP \xB7 Race"
+        },
+        {
+          kind: "matchup",
+          leagueLabel: "NFL",
+          leagueKey: "NFL",
+          awayTeamLabel: "Chiefs",
+          homeTeamLabel: "Seahawks",
+          line: "NFL - Chiefs vs Seahawks"
+        },
+        {
+          kind: "league",
+          leagueLabel: "NASCAR Cup Series at Talladega",
+          leagueKey: "NASCAR",
+          line: "NASCAR Cup Series at Talladega"
+        }
+      ]
+    },
+    "2026-10-26": {
+      updatedAt: "2026-10-26T10:57:38.818Z",
+      entries: [
+        {
+          kind: "matchup",
+          leagueLabel: "MLB",
+          leagueKey: "MLB",
+          awayTeamLabel: "Brewers",
+          homeTeamLabel: "Rays",
+          line: "MLB - Brewers vs Rays"
+        },
+        {
+          kind: "matchup",
+          leagueLabel: "NFL",
+          leagueKey: "NFL",
+          awayTeamLabel: "Cowboys",
+          homeTeamLabel: "Eagles",
+          line: "NFL - Cowboys vs Eagles"
+        },
+        {
+          kind: "matchup",
+          leagueLabel: "WNBA",
+          leagueKey: "WNBA",
+          awayTeamLabel: "Dream",
+          homeTeamLabel: "Valkyries",
+          line: "WNBA - Dream vs Valkyries"
         }
       ]
     }
