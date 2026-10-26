@@ -188462,14 +188462,27 @@ function SportsBrowserPrototypeTemporaryNavLeaguesInlineTree({
     return filterSportsBrowserPrototypeSidebarLeaguesGroupedSections(sectionsBase, leaguesFilterQuery);
   }, [leaguesFilterQuery, leaguesSortMode, mergedOperationalLeagues, todayCompleteLeagues]);
   const extensionNewsEveryLeagueList = isGrarfExtensionRenderer() && (leaguesLensSection === "news" || extensionTemporalNewsCol1TopLevel) && !extensionTemporalLeaguesTopLevel;
+  const extensionNewsLeaguesSearchActive = leaguesFilterQuery.trim().length > 0;
   const leagueSectionsForDisplay = (0, import_react303.useMemo)(() => {
     if (!extensionNewsEveryLeagueList || singleLeagueFocusKey?.trim()) {
       return leagueSections;
     }
-    return applyGrarfExtensionNewsLeaguesDisplayedLeagueSections(leagueSections, leaguesSortMode);
+    const withNewsLeagueRows = applyGrarfExtensionNewsLeaguesDisplayedLeagueSections(
+      leagueSections,
+      leaguesSortMode
+    );
+    if (!extensionNewsLeaguesSearchActive) {
+      return withNewsLeagueRows;
+    }
+    return filterSportsBrowserPrototypeSidebarLeaguesGroupedSections(
+      withNewsLeagueRows,
+      leaguesFilterQuery
+    );
   }, [
     extensionNewsEveryLeagueList,
+    extensionNewsLeaguesSearchActive,
     leagueSections,
+    leaguesFilterQuery,
     leaguesSortMode,
     singleLeagueFocusKey
   ]);
@@ -188497,7 +188510,7 @@ function SportsBrowserPrototypeTemporaryNavLeaguesInlineTree({
   const extensionLeagueExpandedContextCardUi = extensionNewsLeaguesExpandUi || extensionTemporalLeagueCardListUi;
   const resolvedLeagueCardContextSection = leaguesLensSection ?? "news";
   const extensionTemporalLeagueSequentialNavScopeId = extensionNewsLeaguesExpandUi ? "leagues-news" : extensionTemporalLeagueCardListUi && leaguesLensSection ? `leagues-${leaguesLensSection}` : null;
-  const showTemporalNewsLeaguesAllSportsRow = extensionNewsLeaguesExpandUi && leaguesLensSection === "news" && !extensionTemporalLeaguesTopLevel && !suppressNewsLeaguesAllSportsRow;
+  const showTemporalNewsLeaguesAllSportsRow = extensionNewsLeaguesExpandUi && leaguesLensSection === "news" && !extensionTemporalLeaguesTopLevel && !suppressNewsLeaguesAllSportsRow && !extensionNewsLeaguesSearchActive;
   const extensionExclusiveLeagueAccordion = isGrarfExtensionRenderer();
   const allSportsNewsWebsites = (0, import_react303.useMemo)(
     () => showTemporalNewsLeaguesAllSportsRow ? getSportsBrowserPrototypeGlobalWebsites() : [],
