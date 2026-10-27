@@ -15107,7 +15107,8 @@ var SIDEBAR_LEAGUES_KEY_DISPLAY_OVERRIDES = {
   COPA_BRASIL: "Copa do Brasil",
   GT_WORLD_CHALLENGE: "GT World Challenge",
   NASCAR_TRUCK: "NASCAR Trucks",
-  US_OPEN_CUP: "U.S. Open Cup"
+  US_OPEN_CUP: "U.S. Open Cup",
+  MILB: "MiLB"
 };
 var SIDEBAR_LEAGUES_DISPLAY_LABEL_OVERRIDES = {
   "U.S. OPEN CUP": "U.S. Open Cup",
