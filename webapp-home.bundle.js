@@ -97806,6 +97806,66 @@ var MLB_TEAM_NEWS_SOURCES_BY_ABBREV = {
       "name": "#Arizona Diamondbacks",
       "browserUrl": "https://x.com/search?q=arizona%20diamondbacks&src=typed_query",
       "category": "news"
+    },
+    {
+      "id": "mlb-ari-az-snake-pit",
+      "name": "AZ Snake Pit",
+      "browserUrl": "https://www.azsnakepit.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-ari-arizona-sports",
+      "name": "Arizona Sports",
+      "browserUrl": "https://arizonasports.com/mlb/arizona-diamondbacks/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-ari-venom-strikes",
+      "name": "Venom Strikes",
+      "browserUrl": "https://venomstrikes.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-ari-the-arizona-republic",
+      "name": "The Arizona Republic",
+      "browserUrl": "https://www.azcentral.com/sports/diamondbacks/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-ari-arizona-s-family",
+      "name": "Arizona's Family",
+      "browserUrl": "https://www.azfamily.com/sports/mlb/diamondbacks/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-ari-12news",
+      "name": "12News",
+      "browserUrl": "https://www.12news.com/diamondbacks/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-ari-arizona-daily-star-d-backs",
+      "name": "Arizona Daily Star D-Backs",
+      "browserUrl": "https://tucson.com/sports/professional/mlb/d-backs/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-ari-phoenix-new-times",
+      "name": "Phoenix New Times",
+      "browserUrl": "https://www.phoenixnewtimes.com/topic/diamondbacks-6498450",
+      "category": "news"
+    },
+    {
+      "id": "mlb-ari-yardbarker-d-backs",
+      "name": "Yardbarker D-backs",
+      "browserUrl": "https://www.yardbarker.com/mlb/teams/arizona_diamondbacks/28",
+      "category": "news"
+    },
+    {
+      "id": "mlb-ari-bleacher-report",
+      "name": "Bleacher Report",
+      "browserUrl": "https://bleacherreport.com/arizona-diamondbacks",
+      "category": "news"
     }
   ],
   "ATH": [
@@ -97921,6 +97981,66 @@ var MLB_TEAM_NEWS_SOURCES_BY_ABBREV = {
       "id": "mlb-ath-athletics-2",
       "name": "#Athletics",
       "browserUrl": "https://x.com/search?q=athletics&src=typed_query",
+      "category": "news"
+    },
+    {
+      "id": "mlb-ath-athletics-nation",
+      "name": "Athletics Nation",
+      "browserUrl": "https://www.athleticsnation.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-ath-a-s-farm",
+      "name": "A's Farm",
+      "browserUrl": "https://www.athleticsfarm.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-ath-the-athletic-athletics",
+      "name": "The Athletic Athletics",
+      "browserUrl": "https://www.nytimes.com/athletic/mlb/team/athletics/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-ath-nbc-sports-bay-area-athletics",
+      "name": "NBC Sports Bay Area Athletics",
+      "browserUrl": "https://www.nbcsportsbayarea.com/mlb/athletics/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-ath-san-francisco-chronicle-athletics",
+      "name": "San Francisco Chronicle Athletics",
+      "browserUrl": "https://www.sfchronicle.com/sports/athletics/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-ath-espn-athletics",
+      "name": "ESPN Athletics",
+      "browserUrl": "https://www.espn.com/mlb/team/_/name/ath/oakland-athletics",
+      "category": "news"
+    },
+    {
+      "id": "mlb-ath-cbs-sports-athletics",
+      "name": "CBS Sports Athletics",
+      "browserUrl": "https://www.cbssports.com/mlb/teams/OAK/oakland-athletics/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-ath-yardbarker-athletics",
+      "name": "Yardbarker Athletics",
+      "browserUrl": "https://www.yardbarker.com/mlb/teams/oakland_athletics/16",
+      "category": "news"
+    },
+    {
+      "id": "mlb-ath-bleacher-report",
+      "name": "Bleacher Report",
+      "browserUrl": "https://bleacherreport.com/oakland-athletics",
+      "category": "news"
+    },
+    {
+      "id": "mlb-ath-espn-2",
+      "name": "ESPN",
+      "browserUrl": "https://www.espn.com/mlb/team/_/name/oak/oakland-athletics",
       "category": "news"
     }
   ],
@@ -98038,6 +98158,60 @@ var MLB_TEAM_NEWS_SOURCES_BY_ABBREV = {
       "name": "#Atlanta Braves",
       "browserUrl": "https://x.com/search?q=atlanta%20braves&src=typed_query",
       "category": "news"
+    },
+    {
+      "id": "mlb-atl-battery-power",
+      "name": "Battery Power",
+      "browserUrl": "https://www.batterypower.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-atl-tomahawk-take",
+      "name": "Tomahawk Take",
+      "browserUrl": "https://tomahawktake.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-atl-outfield-fly-rule",
+      "name": "Outfield Fly Rule",
+      "browserUrl": "https://www.outfieldflyrule.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-atl-braves-journal",
+      "name": "Braves Journal",
+      "browserUrl": "https://bravesjournal.us/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-atl-atl-all-day",
+      "name": "ATL All Day",
+      "browserUrl": "https://atlallday.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-atl-atlanta-journal-constitution-braves",
+      "name": "Atlanta Journal-Constitution Braves",
+      "browserUrl": "https://www.ajc.com/sports/atlanta-braves/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-atl-mlb-trade-rumors-braves",
+      "name": "MLB Trade Rumors Braves",
+      "browserUrl": "https://www.mlbtraderumors.com/atlanta-braves",
+      "category": "news"
+    },
+    {
+      "id": "mlb-atl-yardbarker-braves",
+      "name": "Yardbarker Braves",
+      "browserUrl": "https://www.yardbarker.com/mlb/teams/atlanta_braves/19",
+      "category": "news"
+    },
+    {
+      "id": "mlb-atl-bleacher-report",
+      "name": "Bleacher Report",
+      "browserUrl": "https://bleacherreport.com/atlanta-braves",
+      "category": "news"
     }
   ],
   "BAL": [
@@ -98153,6 +98327,54 @@ var MLB_TEAM_NEWS_SOURCES_BY_ABBREV = {
       "id": "mlb-bal-baltimore-orioles",
       "name": "#Baltimore Orioles",
       "browserUrl": "https://x.com/search?q=baltimore%20orioles&src=typed_query",
+      "category": "news"
+    },
+    {
+      "id": "mlb-bal-camden-chat",
+      "name": "Camden Chat",
+      "browserUrl": "https://www.camdenchat.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-bal-birds-watcher",
+      "name": "Birds Watcher",
+      "browserUrl": "https://birdswatcher.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-bal-baltimorebaseball-com",
+      "name": "BaltimoreBaseball.com",
+      "browserUrl": "https://www.baltimorebaseball.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-bal-eutaw-street-report",
+      "name": "Eutaw Street Report",
+      "browserUrl": "https://eutawstreetreport.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-bal-baltimore-sports-life",
+      "name": "Baltimore Sports & Life",
+      "browserUrl": "https://baltimoresportsandlife.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-bal-masn",
+      "name": "MASN",
+      "browserUrl": "https://www.masnsports.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-bal-orioles-hangout",
+      "name": "Orioles Hangout",
+      "browserUrl": "https://orioleshangout.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-bal-bleacher-report",
+      "name": "Bleacher Report",
+      "browserUrl": "https://bleacherreport.com/baltimore-orioles",
       "category": "news"
     }
   ],
@@ -98270,6 +98492,72 @@ var MLB_TEAM_NEWS_SOURCES_BY_ABBREV = {
       "name": "#Boston Red Sox",
       "browserUrl": "https://x.com/search?q=boston%20red%20sox&src=typed_query",
       "category": "news"
+    },
+    {
+      "id": "mlb-bos-over-the-monster",
+      "name": "Over the Monster",
+      "browserUrl": "https://www.overthemonster.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-bos-bosox-injection",
+      "name": "BoSox Injection",
+      "browserUrl": "https://bosoxinjection.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-bos-talk-sox",
+      "name": "Talk Sox",
+      "browserUrl": "https://talksox.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-bos-nesn",
+      "name": "NESN",
+      "browserUrl": "https://nesn.com/teams/mlb/boston-red-sox/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-bos-nbc-sports-boston",
+      "name": "NBC Sports Boston",
+      "browserUrl": "https://www.nbcsportsboston.com/mlb/boston-red-sox/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-bos-boston-herald",
+      "name": "Boston Herald",
+      "browserUrl": "https://www.bostonherald.com/sports/mlb/boston-red-sox/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-bos-weei",
+      "name": "WEEI",
+      "browserUrl": "https://www.audacy.com/weei/sports/red-sox",
+      "category": "news"
+    },
+    {
+      "id": "mlb-bos-the-boston-globe",
+      "name": "The Boston Globe",
+      "browserUrl": "https://www.bostonglobe.com/sports/redsox/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-bos-masslive",
+      "name": "MassLive",
+      "browserUrl": "https://www.masslive.com/redsox/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-bos-soxprospects",
+      "name": "SoxProspects",
+      "browserUrl": "https://www.soxprospects.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-bos-bleacher-report",
+      "name": "Bleacher Report",
+      "browserUrl": "https://bleacherreport.com/boston-red-sox",
+      "category": "news"
     }
   ],
   "CHC": [
@@ -98385,6 +98673,66 @@ var MLB_TEAM_NEWS_SOURCES_BY_ABBREV = {
       "id": "mlb-chc-chicago-cubs",
       "name": "#Chicago Cubs",
       "browserUrl": "https://x.com/search?q=chicago%20cubs&src=typed_query",
+      "category": "news"
+    },
+    {
+      "id": "mlb-chc-bleed-cubbie-blue",
+      "name": "Bleed Cubbie Blue",
+      "browserUrl": "https://www.bleedcubbieblue.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-chc-cubbies-crib",
+      "name": "Cubbies Crib",
+      "browserUrl": "https://cubbiescrib.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-chc-cubs-insider",
+      "name": "Cubs Insider",
+      "browserUrl": "https://www.cubsinsider.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-chc-north-side-baseball",
+      "name": "North Side Baseball",
+      "browserUrl": "https://northsidebaseball.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-chc-chicago-sun-times-cubs",
+      "name": "Chicago Sun-Times Cubs",
+      "browserUrl": "https://chicago.suntimes.com/cubs",
+      "category": "news"
+    },
+    {
+      "id": "mlb-chc-sports-mockery-cubs",
+      "name": "Sports Mockery Cubs",
+      "browserUrl": "https://sportsmockery.com/chicago-cubs/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-chc-the-cub-reporter",
+      "name": "The Cub Reporter",
+      "browserUrl": "https://www.thecubreporter.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-chc-cubshq",
+      "name": "CubsHQ",
+      "browserUrl": "https://www.cubshq.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-chc-wrigleyville-nation",
+      "name": "Wrigleyville Nation",
+      "browserUrl": "https://www.wrigleyvillenation.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-chc-bleacher-report",
+      "name": "Bleacher Report",
+      "browserUrl": "https://bleacherreport.com/chicago-cubs",
       "category": "news"
     }
   ],
@@ -98502,6 +98850,66 @@ var MLB_TEAM_NEWS_SOURCES_BY_ABBREV = {
       "name": "#Chicago White Sox",
       "browserUrl": "https://x.com/search?q=chicago%20white%20sox&src=typed_query",
       "category": "news"
+    },
+    {
+      "id": "mlb-cws-south-side-sox",
+      "name": "South Side Sox",
+      "browserUrl": "https://www.southsidesox.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-cws-southside-showdown",
+      "name": "Southside Showdown",
+      "browserUrl": "https://southsideshowdown.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-cws-sox-on-35th",
+      "name": "Sox On 35th",
+      "browserUrl": "https://www.soxon35th.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-cws-chicago-sun-times-white-sox",
+      "name": "Chicago Sun-Times White Sox",
+      "browserUrl": "https://chicago.suntimes.com/white-sox",
+      "category": "news"
+    },
+    {
+      "id": "mlb-cws-wgn-white-sox",
+      "name": "WGN White Sox",
+      "browserUrl": "https://wgntv.com/sports/white-sox/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-cws-da-windy-city-white-sox",
+      "name": "Da Windy City White Sox",
+      "browserUrl": "https://dawindycity.com/chicago-white-sox/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-cws-espn-white-sox",
+      "name": "ESPN White Sox",
+      "browserUrl": "https://www.espn.com/mlb/team/_/name/chw/chicago-white-sox",
+      "category": "news"
+    },
+    {
+      "id": "mlb-cws-cbs-sports-white-sox",
+      "name": "CBS Sports White Sox",
+      "browserUrl": "https://www.cbssports.com/mlb/teams/CHW/chicago-white-sox/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-cws-yardbarker-white-sox",
+      "name": "Yardbarker White Sox",
+      "browserUrl": "https://www.yardbarker.com/mlb/teams/chicago_white_sox/9",
+      "category": "news"
+    },
+    {
+      "id": "mlb-cws-bleacher-report",
+      "name": "Bleacher Report",
+      "browserUrl": "https://bleacherreport.com/chicago-white-sox",
+      "category": "news"
     }
   ],
   "CIN": [
@@ -98617,6 +99025,66 @@ var MLB_TEAM_NEWS_SOURCES_BY_ABBREV = {
       "id": "mlb-cin-cincinnati-reds",
       "name": "#Cincinnati Reds",
       "browserUrl": "https://x.com/search?q=cincinnati%20reds&src=typed_query",
+      "category": "news"
+    },
+    {
+      "id": "mlb-cin-blog-red-machine",
+      "name": "Blog Red Machine",
+      "browserUrl": "https://blogredmachine.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-cin-red-reporter",
+      "name": "Red Reporter",
+      "browserUrl": "https://www.redreporter.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-cin-redleg-nation",
+      "name": "Redleg Nation",
+      "browserUrl": "https://www.redlegnation.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-cin-cincinnati-com-reds",
+      "name": "Cincinnati.com Reds",
+      "browserUrl": "https://www.cincinnati.com/sports/reds/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-cin-reds-minor-leagues",
+      "name": "Reds Minor Leagues",
+      "browserUrl": "https://www.redsminorleagues.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-cin-reds-content-plus",
+      "name": "Reds Content Plus",
+      "browserUrl": "https://www.redscontentplus.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-cin-wlwt-reds",
+      "name": "WLWT Reds",
+      "browserUrl": "https://www.wlwt.com/reds",
+      "category": "news"
+    },
+    {
+      "id": "mlb-cin-wcpo-reds",
+      "name": "WCPO Reds",
+      "browserUrl": "https://www.wcpo.com/sports/baseball/reds",
+      "category": "news"
+    },
+    {
+      "id": "mlb-cin-yardbarker-reds",
+      "name": "Yardbarker Reds",
+      "browserUrl": "https://www.yardbarker.com/mlb/teams/cincinnati_reds/24",
+      "category": "news"
+    },
+    {
+      "id": "mlb-cin-bleacher-report",
+      "name": "Bleacher Report",
+      "browserUrl": "https://bleacherreport.com/cincinnati-reds",
       "category": "news"
     }
   ],
@@ -98734,6 +99202,66 @@ var MLB_TEAM_NEWS_SOURCES_BY_ABBREV = {
       "name": "#Cleveland Guardians",
       "browserUrl": "https://x.com/search?q=cleveland%20guardians&src=typed_query",
       "category": "news"
+    },
+    {
+      "id": "mlb-cle-covering-the-corner",
+      "name": "Covering the Corner",
+      "browserUrl": "https://www.coveringthecorner.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-cle-away-back-gone",
+      "name": "Away Back Gone",
+      "browserUrl": "https://awaybackgone.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-cle-cleveland-com-guardians",
+      "name": "Cleveland.com Guardians",
+      "browserUrl": "https://www.cleveland.com/guardians/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-cle-akron-beacon-journal-guardians",
+      "name": "Akron Beacon Journal Guardians",
+      "browserUrl": "https://www.beaconjournal.com/sports/guardians",
+      "category": "news"
+    },
+    {
+      "id": "mlb-cle-wkyc-guardians",
+      "name": "WKYC Guardians",
+      "browserUrl": "https://www.wkyc.com/guardians",
+      "category": "news"
+    },
+    {
+      "id": "mlb-cle-news-5-cleveland-guardians",
+      "name": "News 5 Cleveland Guardians",
+      "browserUrl": "https://www.news5cleveland.com/sports/cleveland-guardians",
+      "category": "news"
+    },
+    {
+      "id": "mlb-cle-cleveland-19-guardians",
+      "name": "Cleveland 19 Guardians",
+      "browserUrl": "https://www.cleveland19.com/sports/guardians/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-cle-guardians-nation",
+      "name": "Guardians Nation",
+      "browserUrl": "https://www.guardiannation.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-cle-yardbarker-guardians",
+      "name": "Yardbarker Guardians",
+      "browserUrl": "https://www.yardbarker.com/mlb/teams/cleveland_guardians/10",
+      "category": "news"
+    },
+    {
+      "id": "mlb-cle-bleacher-report",
+      "name": "Bleacher Report",
+      "browserUrl": "https://bleacherreport.com/cleveland-guardians",
+      "category": "news"
     }
   ],
   "COL": [
@@ -98849,6 +99377,54 @@ var MLB_TEAM_NEWS_SOURCES_BY_ABBREV = {
       "id": "mlb-col-colorado-rockies",
       "name": "#Colorado Rockies",
       "browserUrl": "https://x.com/search?q=colorado%20rockies&src=typed_query",
+      "category": "news"
+    },
+    {
+      "id": "mlb-col-purple-row",
+      "name": "Purple Row",
+      "browserUrl": "https://www.purplerow.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-col-rockies-blog",
+      "name": "Rockies Blog",
+      "browserUrl": "https://rockies.mlblogs.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-col-denver-post-rockies",
+      "name": "Denver Post Rockies",
+      "browserUrl": "https://www.denverpost.com/sports/mlb/colorado-rockies/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-col-denver7-rockies",
+      "name": "Denver7 Rockies",
+      "browserUrl": "https://www.thedenverchannel.com/sports/rockies",
+      "category": "news"
+    },
+    {
+      "id": "mlb-col-mile-high-sports-rockies",
+      "name": "Mile High Sports Rockies",
+      "browserUrl": "https://milehighsports.com/rockies/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-col-rox-pile",
+      "name": "Rox Pile",
+      "browserUrl": "https://roxpile.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-col-yardbarker-rockies",
+      "name": "Yardbarker Rockies",
+      "browserUrl": "https://www.yardbarker.com/mlb/teams/colorado_rockies/29",
+      "category": "news"
+    },
+    {
+      "id": "mlb-col-bleacher-report",
+      "name": "Bleacher Report",
+      "browserUrl": "https://bleacherreport.com/colorado-rockies",
       "category": "news"
     }
   ],
@@ -98966,6 +99542,66 @@ var MLB_TEAM_NEWS_SOURCES_BY_ABBREV = {
       "name": "#Detroit Tigers",
       "browserUrl": "https://x.com/search?q=detroit%20tigers&src=typed_query",
       "category": "news"
+    },
+    {
+      "id": "mlb-det-bless-you-boys",
+      "name": "Bless You Boys",
+      "browserUrl": "https://www.blessyouboys.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-det-motor-city-bengals",
+      "name": "Motor City Bengals",
+      "browserUrl": "https://motorcitybengals.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-det-totally-tigers",
+      "name": "Totally Tigers",
+      "browserUrl": "https://www.totallytigers.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-det-detroit-free-press-tigers",
+      "name": "Detroit Free Press Tigers",
+      "browserUrl": "https://www.freep.com/sports/tigers/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-det-mlive-tigers",
+      "name": "MLive Tigers",
+      "browserUrl": "https://www.mlive.com/tigers/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-det-wxyz-tigers",
+      "name": "WXYZ Tigers",
+      "browserUrl": "https://www.wxyz.com/sports/tigers",
+      "category": "news"
+    },
+    {
+      "id": "mlb-det-tiger-tales",
+      "name": "Tiger Tales",
+      "browserUrl": "https://www.detroitnews.com/sports/tigers/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-det-tigers-minor-league-report",
+      "name": "Tigers Minor League Report",
+      "browserUrl": "https://tigersminors.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-det-yardbarker-tigers",
+      "name": "Yardbarker Tigers",
+      "browserUrl": "https://www.yardbarker.com/mlb/teams/detroit_tigers/11",
+      "category": "news"
+    },
+    {
+      "id": "mlb-det-bleacher-report",
+      "name": "Bleacher Report",
+      "browserUrl": "https://bleacherreport.com/detroit-tigers",
+      "category": "news"
     }
   ],
   "HOU": [
@@ -99081,6 +99717,60 @@ var MLB_TEAM_NEWS_SOURCES_BY_ABBREV = {
       "id": "mlb-hou-houston-astros",
       "name": "#Houston Astros",
       "browserUrl": "https://x.com/search?q=houston%20astros&src=typed_query",
+      "category": "news"
+    },
+    {
+      "id": "mlb-hou-the-crawfish-boxes",
+      "name": "The Crawfish Boxes",
+      "browserUrl": "https://www.crawfishboxes.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-hou-climbing-tal-s-hill",
+      "name": "Climbing Tal's Hill",
+      "browserUrl": "https://climbingtalshill.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-hou-chron-com-astros",
+      "name": "Chron.com Astros",
+      "browserUrl": "https://www.chron.com/sports/astros/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-hou-astros-future",
+      "name": "Astros Future",
+      "browserUrl": "https://www.astrosfuture.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-hou-astros-county",
+      "name": "Astros County",
+      "browserUrl": "https://www.astroscounty.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-hou-astros-mission-control",
+      "name": "Astros Mission Control",
+      "browserUrl": "https://astrosmissioncontrol.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-hou-103-7-the-game",
+      "name": "103.7 The Game",
+      "browserUrl": "https://1037thegame.iheart.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-hou-yardbarker-astros",
+      "name": "Yardbarker Astros",
+      "browserUrl": "https://www.yardbarker.com/mlb/teams/houston_astros/14",
+      "category": "news"
+    },
+    {
+      "id": "mlb-hou-bleacher-report",
+      "name": "Bleacher Report",
+      "browserUrl": "https://bleacherreport.com/houston-astros",
       "category": "news"
     }
   ],
@@ -99198,6 +99888,66 @@ var MLB_TEAM_NEWS_SOURCES_BY_ABBREV = {
       "name": "#Kansas City Royals",
       "browserUrl": "https://x.com/search?q=kansas%20city%20royals&src=typed_query",
       "category": "news"
+    },
+    {
+      "id": "mlb-kc-royals-review",
+      "name": "Royals Review",
+      "browserUrl": "https://www.royalsreview.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-kc-kings-of-kauffman",
+      "name": "Kings of Kauffman",
+      "browserUrl": "https://kingsofkauffman.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-kc-royals-farm-report",
+      "name": "Royals Farm Report",
+      "browserUrl": "https://royalsfarmreport.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-kc-kctv5-royals",
+      "name": "KCTV5 Royals",
+      "browserUrl": "https://www.kctv5.com/sports/mlb/royals/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-kc-fox4kc-royals",
+      "name": "FOX4KC Royals",
+      "browserUrl": "https://fox4kc.com/sports/royals/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-kc-kc-kingdom",
+      "name": "KC Kingdom",
+      "browserUrl": "https://kckingdom.com/kansas-city-royals/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-kc-royals-reporter",
+      "name": "Royals Reporter",
+      "browserUrl": "https://www.royalsreporter.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-kc-royals-blue",
+      "name": "Royals Blue",
+      "browserUrl": "https://www.royalsblue.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-kc-yardbarker-royals",
+      "name": "Yardbarker Royals",
+      "browserUrl": "https://www.yardbarker.com/mlb/teams/kansas_city_royals/12",
+      "category": "news"
+    },
+    {
+      "id": "mlb-kc-bleacher-report",
+      "name": "Bleacher Report",
+      "browserUrl": "https://bleacherreport.com/kansas-city-royals",
+      "category": "news"
     }
   ],
   "LAA": [
@@ -99313,6 +100063,48 @@ var MLB_TEAM_NEWS_SOURCES_BY_ABBREV = {
       "id": "mlb-laa-los-angeles-angels",
       "name": "#Los Angeles Angels",
       "browserUrl": "https://x.com/search?q=los%20angeles%20angels&src=typed_query",
+      "category": "news"
+    },
+    {
+      "id": "mlb-laa-the-halo-way",
+      "name": "The Halo Way",
+      "browserUrl": "https://haloway.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-laa-halos-heaven",
+      "name": "Halos Heaven",
+      "browserUrl": "https://www.halosheaven.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-laa-halo-hangout",
+      "name": "Halo Hangout",
+      "browserUrl": "https://halohangout.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-laa-los-angeles-times-angels",
+      "name": "Los Angeles Times Angels",
+      "browserUrl": "https://www.latimes.com/sports/angels",
+      "category": "news"
+    },
+    {
+      "id": "mlb-laa-orange-county-register-angels",
+      "name": "Orange County Register Angels",
+      "browserUrl": "https://www.ocregister.com/sports/angels/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-laa-yardbarker-angels",
+      "name": "Yardbarker Angels",
+      "browserUrl": "https://www.yardbarker.com/mlb/teams/los_angeles_angels/15",
+      "category": "news"
+    },
+    {
+      "id": "mlb-laa-bleacher-report",
+      "name": "Bleacher Report",
+      "browserUrl": "https://bleacherreport.com/los-angeles-angels",
       "category": "news"
     }
   ],
@@ -99430,6 +100222,72 @@ var MLB_TEAM_NEWS_SOURCES_BY_ABBREV = {
       "name": "#Los Angeles Dodgers",
       "browserUrl": "https://x.com/search?q=los%20angeles%20dodgers&src=typed_query",
       "category": "news"
+    },
+    {
+      "id": "mlb-lad-true-blue-la",
+      "name": "True Blue LA",
+      "browserUrl": "https://www.truebluela.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-lad-dodgers-nation",
+      "name": "Dodgers Nation",
+      "browserUrl": "https://dodgersnation.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-lad-dodgers-digest",
+      "name": "Dodgers Digest",
+      "browserUrl": "https://dodgersdigest.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-lad-dodgers-way",
+      "name": "Dodgers Way",
+      "browserUrl": "https://dodgersway.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-lad-la-times-dodgers",
+      "name": "LA Times Dodgers",
+      "browserUrl": "https://www.latimes.com/sports/dodgers",
+      "category": "news"
+    },
+    {
+      "id": "mlb-lad-dodger-insider",
+      "name": "Dodger Insider",
+      "browserUrl": "https://dodgers.mlblogs.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-lad-dodger-blue",
+      "name": "Dodger Blue",
+      "browserUrl": "https://dodgerblue.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-lad-dodgersbeat",
+      "name": "DodgersBeat",
+      "browserUrl": "https://dodgersbeat.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-lad-la-sports-nation-dodgers",
+      "name": "LA Sports Nation Dodgers",
+      "browserUrl": "https://lasportsnation.com/los-angeles-dodgers/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-lad-yardbarker-dodgers",
+      "name": "Yardbarker Dodgers",
+      "browserUrl": "https://www.yardbarker.com/mlb/teams/los_angeles_dodgers/30",
+      "category": "news"
+    },
+    {
+      "id": "mlb-lad-bleacher-report",
+      "name": "Bleacher Report",
+      "browserUrl": "https://bleacherreport.com/los-angeles-dodgers",
+      "category": "news"
     }
   ],
   "MIA": [
@@ -99545,6 +100403,54 @@ var MLB_TEAM_NEWS_SOURCES_BY_ABBREV = {
       "id": "mlb-mia-miami-marlins",
       "name": "#Miami Marlins",
       "browserUrl": "https://x.com/search?q=miami%20marlins&src=typed_query",
+      "category": "news"
+    },
+    {
+      "id": "mlb-mia-fish-on-first",
+      "name": "Fish On First",
+      "browserUrl": "https://fishonfirst.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-mia-marlin-maniac",
+      "name": "Marlin Maniac",
+      "browserUrl": "https://marlinmaniac.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-mia-fish-stripes",
+      "name": "Fish Stripes",
+      "browserUrl": "https://www.fishstripes.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-mia-beyond-the-bases",
+      "name": "Beyond The Bases",
+      "browserUrl": "https://beyondthebases.mlblogs.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-mia-sun-sentinel-marlins",
+      "name": "Sun Sentinel Marlins",
+      "browserUrl": "https://www.sun-sentinel.com/sports/mlb/miami-marlins/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-mia-miami-herald-marlins",
+      "name": "Miami Herald Marlins",
+      "browserUrl": "https://www.miamiherald.com/sports/mlb/miami-marlins/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-mia-yardbarker-marlins",
+      "name": "Yardbarker Marlins",
+      "browserUrl": "https://www.yardbarker.com/mlb/teams/miami_marlins/20",
+      "category": "news"
+    },
+    {
+      "id": "mlb-mia-bleacher-report",
+      "name": "Bleacher Report",
+      "browserUrl": "https://bleacherreport.com/miami-marlins",
       "category": "news"
     }
   ],
@@ -99662,6 +100568,42 @@ var MLB_TEAM_NEWS_SOURCES_BY_ABBREV = {
       "name": "#Milwaukee Brewers",
       "browserUrl": "https://x.com/search?q=milwaukee%20brewers&src=typed_query",
       "category": "news"
+    },
+    {
+      "id": "mlb-mil-brew-crew-ball",
+      "name": "Brew Crew Ball",
+      "browserUrl": "https://www.brewcrewball.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-mil-on-tap-sports-net-brewers",
+      "name": "On Tap Sports Net Brewers",
+      "browserUrl": "https://ontapsportsnet.com/brewers",
+      "category": "news"
+    },
+    {
+      "id": "mlb-mil-milwaukee-journal-sentinel-brewers",
+      "name": "Milwaukee Journal Sentinel Brewers",
+      "browserUrl": "https://www.jsonline.com/sports/brewers/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-mil-brew-crew-nation",
+      "name": "Brew Crew Nation",
+      "browserUrl": "https://brewerfanatic.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-mil-yardbarker-brewers",
+      "name": "Yardbarker Brewers",
+      "browserUrl": "https://www.yardbarker.com/mlb/teams/milwaukee_brewers/25",
+      "category": "news"
+    },
+    {
+      "id": "mlb-mil-bleacher-report",
+      "name": "Bleacher Report",
+      "browserUrl": "https://bleacherreport.com/milwaukee-brewers",
+      "category": "news"
     }
   ],
   "MIN": [
@@ -99777,6 +100719,60 @@ var MLB_TEAM_NEWS_SOURCES_BY_ABBREV = {
       "id": "mlb-min-minnesota-twins",
       "name": "#Minnesota Twins",
       "browserUrl": "https://x.com/search?q=minnesota%20twins&src=typed_query",
+      "category": "news"
+    },
+    {
+      "id": "mlb-min-twinkie-town",
+      "name": "Twinkie Town",
+      "browserUrl": "https://www.twinkietown.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-min-twins-daily",
+      "name": "Twins Daily",
+      "browserUrl": "https://twinsdaily.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-min-puckett-s-pond",
+      "name": "Puckett's Pond",
+      "browserUrl": "https://puckettspond.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-min-star-tribune-twins",
+      "name": "Star Tribune Twins",
+      "browserUrl": "https://www.startribune.com/sports/twins/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-min-pioneer-press-twins",
+      "name": "Pioneer Press Twins",
+      "browserUrl": "https://www.twincities.com/sports/twins/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-min-zone-coverage-twins",
+      "name": "Zone Coverage Twins",
+      "browserUrl": "https://zonecoverage.com/category/twins/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-min-off-the-baggy",
+      "name": "Off The Baggy",
+      "browserUrl": "https://offthebaggy.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-min-yardbarker-twins",
+      "name": "Yardbarker Twins",
+      "browserUrl": "https://www.yardbarker.com/mlb/teams/minnesota_twins/13",
+      "category": "news"
+    },
+    {
+      "id": "mlb-min-bleacher-report",
+      "name": "Bleacher Report",
+      "browserUrl": "https://bleacherreport.com/minnesota-twins",
       "category": "news"
     }
   ],
@@ -99894,6 +100890,84 @@ var MLB_TEAM_NEWS_SOURCES_BY_ABBREV = {
       "name": "#New York Mets",
       "browserUrl": "https://x.com/search?q=new%20york%20mets&src=typed_query",
       "category": "news"
+    },
+    {
+      "id": "mlb-nym-amazin-avenue",
+      "name": "Amazin' Avenue",
+      "browserUrl": "https://www.amazinavenue.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-nym-metsmerized-online",
+      "name": "MetsMerized Online",
+      "browserUrl": "https://metsmerizedonline.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-nym-rising-apple",
+      "name": "Rising Apple",
+      "browserUrl": "https://risingapple.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-nym-mets-minors",
+      "name": "Mets Minors",
+      "browserUrl": "https://metsminors.net/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-nym-faith-and-fear-in-flushing",
+      "name": "Faith and Fear in Flushing",
+      "browserUrl": "https://www.faithandfearinflushing.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-nym-mack-s-mets",
+      "name": "Mack's Mets",
+      "browserUrl": "http://macksmets.blogspot.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-nym-mets-police",
+      "name": "Mets Police",
+      "browserUrl": "https://metspolice.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-nym-mike-s-mets",
+      "name": "Mike's Mets",
+      "browserUrl": "https://www.mikesmets.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-nym-sny-mets",
+      "name": "SNY Mets",
+      "browserUrl": "https://sny.tv/teams/new-york-mets",
+      "category": "news"
+    },
+    {
+      "id": "mlb-nym-new-york-post-mets",
+      "name": "New York Post Mets",
+      "browserUrl": "https://nypost.com/tag/mets/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-nym-yardbarker-mets",
+      "name": "Yardbarker Mets",
+      "browserUrl": "https://www.yardbarker.com/mlb/teams/new_york_mets/21",
+      "category": "news"
+    },
+    {
+      "id": "mlb-nym-bleacher-report",
+      "name": "Bleacher Report",
+      "browserUrl": "https://bleacherreport.com/new-york-mets",
+      "category": "news"
+    },
+    {
+      "id": "mlb-nym-new-york-post-mets-2",
+      "name": "New York Post Mets",
+      "browserUrl": "https://nypost.com/new-york-mets/",
+      "category": "news"
     }
   ],
   "NYY": [
@@ -100009,6 +101083,108 @@ var MLB_TEAM_NEWS_SOURCES_BY_ABBREV = {
       "id": "mlb-nyy-new-york-yankees",
       "name": "#New York Yankees",
       "browserUrl": "https://x.com/search?q=new%20york%20yankees&src=typed_query",
+      "category": "news"
+    },
+    {
+      "id": "mlb-nyy-pinstripe-alley",
+      "name": "Pinstripe Alley",
+      "browserUrl": "https://www.pinstripealley.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-nyy-yanks-go-yard",
+      "name": "Yanks Go Yard",
+      "browserUrl": "https://yanksgoyard.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-nyy-start-spreading-the-news",
+      "name": "Start Spreading the News",
+      "browserUrl": "https://www.startspreadingthenews.blog/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-nyy-yes-network-yankees",
+      "name": "YES Network Yankees",
+      "browserUrl": "https://www.yesnetwork.com/yankees",
+      "category": "news"
+    },
+    {
+      "id": "mlb-nyy-newsday-yankees",
+      "name": "Newsday Yankees",
+      "browserUrl": "https://www.newsday.com/sports/baseball/yankees",
+      "category": "news"
+    },
+    {
+      "id": "mlb-nyy-new-york-post-yankees",
+      "name": "New York Post Yankees",
+      "browserUrl": "https://nypost.com/tag/yankees/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-nyy-sny-yankees",
+      "name": "SNY Yankees",
+      "browserUrl": "https://sny.tv/teams/new-york-yankees",
+      "category": "news"
+    },
+    {
+      "id": "mlb-nyy-daily-news-yankees",
+      "name": "Daily News Yankees",
+      "browserUrl": "https://www.nydailynews.com/sports/baseball/yankees/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-nyy-river-avenue-blues",
+      "name": "River Avenue Blues",
+      "browserUrl": "https://www.riveraveblues.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-nyy-yardbarker-yankees",
+      "name": "Yardbarker Yankees",
+      "browserUrl": "https://www.yardbarker.com/mlb/teams/new_york_yankees/6",
+      "category": "news"
+    },
+    {
+      "id": "mlb-nyy-bleacher-report",
+      "name": "Bleacher Report",
+      "browserUrl": "https://bleacherreport.com/new-york-yankees",
+      "category": "news"
+    },
+    {
+      "id": "mlb-nyy-yankee-blue",
+      "name": "Yankee Blue",
+      "browserUrl": "https://www.yankee.blue/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-nyy-new-york-post-yankees-2",
+      "name": "New York Post Yankees",
+      "browserUrl": "https://nypost.com/new-york-yankees/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-nyy-john-sterling-blog",
+      "name": "John Sterling Blog",
+      "browserUrl": "https://johnsterling.blogspot.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-nyy-empire-sports-media-yankees",
+      "name": "Empire Sports Media \u2014 Yankees",
+      "browserUrl": "https://empiresportsmedia.com/category/new-york-yankees/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-nyy-start-spreading-the-news-all-news",
+      "name": "Start Spreading the News \u2014 All News",
+      "browserUrl": "https://www.startspreadingthenews.blog/all-news",
+      "category": "news"
+    },
+    {
+      "id": "mlb-nyy-bleeding-yankee-blue",
+      "name": "Bleeding Yankee Blue",
+      "browserUrl": "https://bleedingyankeeblue.blogspot.com/",
       "category": "news"
     }
   ],
@@ -100126,6 +101302,60 @@ var MLB_TEAM_NEWS_SOURCES_BY_ABBREV = {
       "name": "#Philadelphia Phillies",
       "browserUrl": "https://x.com/search?q=philadelphia%20phillies&src=typed_query",
       "category": "news"
+    },
+    {
+      "id": "mlb-phi-the-good-phight",
+      "name": "The Good Phight",
+      "browserUrl": "https://www.thegoodphight.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-phi-phillies-nation",
+      "name": "Phillies Nation",
+      "browserUrl": "https://www.philliesnation.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-phi-that-balls-outta-here",
+      "name": "That Balls Outta Here",
+      "browserUrl": "https://thatballsouttahere.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-phi-phuture-phillies",
+      "name": "Phuture Phillies",
+      "browserUrl": "https://www.phuturephillies.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-phi-phillies-baseball-fan",
+      "name": "Phillies Baseball Fan",
+      "browserUrl": "https://www.philliesbaseballfan.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-phi-philadelphia-inquirer-phillies",
+      "name": "Philadelphia Inquirer Phillies",
+      "browserUrl": "https://www.inquirer.com/phillies/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-phi-nbc-sports-philadelphia-phillies",
+      "name": "NBC Sports Philadelphia Phillies",
+      "browserUrl": "https://www.nbcsportsphiladelphia.com/mlb/philadelphia-phillies/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-phi-yardbarker-phillies",
+      "name": "Yardbarker Phillies",
+      "browserUrl": "https://www.yardbarker.com/mlb/teams/philadelphia_phillies/22",
+      "category": "news"
+    },
+    {
+      "id": "mlb-phi-bleacher-report",
+      "name": "Bleacher Report",
+      "browserUrl": "https://bleacherreport.com/philadelphia-phillies",
+      "category": "news"
     }
   ],
   "PIT": [
@@ -100241,6 +101471,66 @@ var MLB_TEAM_NEWS_SOURCES_BY_ABBREV = {
       "id": "mlb-pit-pittsburgh-pirates",
       "name": "#Pittsburgh Pirates",
       "browserUrl": "https://x.com/search?q=pittsburgh%20pirates&src=typed_query",
+      "category": "news"
+    },
+    {
+      "id": "mlb-pit-bucs-dugout",
+      "name": "Bucs Dugout",
+      "browserUrl": "https://www.bucsdugout.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-pit-bucco-ball",
+      "name": "Bucco Ball",
+      "browserUrl": "https://buccoball.wordpress.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-pit-rumbunter",
+      "name": "Rumbunter",
+      "browserUrl": "https://rumbunter.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-pit-pittsburgh-baseball-now",
+      "name": "Pittsburgh Baseball Now",
+      "browserUrl": "https://pittsburghbaseballnow.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-pit-pirates-prospects",
+      "name": "Pirates Prospects",
+      "browserUrl": "https://piratesprospects.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-pit-triblive-pirates",
+      "name": "TribLIVE Pirates",
+      "browserUrl": "https://triblive.com/sports/pirates/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-pit-cbs-pittsburgh-pirates",
+      "name": "CBS Pittsburgh Pirates",
+      "browserUrl": "https://www.cbsnews.com/pittsburgh/sports/pirates/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-pit-wtae-pirates",
+      "name": "WTAE Pirates",
+      "browserUrl": "https://www.wtae.com/mlb-pirates",
+      "category": "news"
+    },
+    {
+      "id": "mlb-pit-yardbarker-pirates",
+      "name": "Yardbarker Pirates",
+      "browserUrl": "https://www.yardbarker.com/mlb/teams/pittsburgh_pirates/26",
+      "category": "news"
+    },
+    {
+      "id": "mlb-pit-bleacher-report",
+      "name": "Bleacher Report",
+      "browserUrl": "https://bleacherreport.com/pittsburgh-pirates",
       "category": "news"
     }
   ],
@@ -100358,6 +101648,72 @@ var MLB_TEAM_NEWS_SOURCES_BY_ABBREV = {
       "name": "#San Diego Padres",
       "browserUrl": "https://x.com/search?q=san%20diego%20padres&src=typed_query",
       "category": "news"
+    },
+    {
+      "id": "mlb-sd-gaslamp-ball",
+      "name": "Gaslamp Ball",
+      "browserUrl": "https://www.gaslampball.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-sd-friars-on-base",
+      "name": "Friars on Base",
+      "browserUrl": "https://friarsonbase.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-sd-friarwire",
+      "name": "FriarWire",
+      "browserUrl": "https://padres.mlblogs.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-sd-east-village-times",
+      "name": "East Village Times",
+      "browserUrl": "https://www.eastvillagetimes.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-sd-madfriars",
+      "name": "MadFriars",
+      "browserUrl": "https://madfriars.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-sd-san-diego-union-tribune-padres",
+      "name": "San Diego Union-Tribune Padres",
+      "browserUrl": "https://www.sandiegouniontribune.com/sports/padres/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-sd-abc-10news-padres",
+      "name": "ABC 10News Padres",
+      "browserUrl": "https://www.10news.com/sports/padres",
+      "category": "news"
+    },
+    {
+      "id": "mlb-sd-cbs-8-padres",
+      "name": "CBS 8 Padres",
+      "browserUrl": "https://www.cbs8.com/padres",
+      "category": "news"
+    },
+    {
+      "id": "mlb-sd-fox-5-san-diego-padres",
+      "name": "FOX 5 San Diego Padres",
+      "browserUrl": "https://fox5sandiego.com/sports/padres/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-sd-yardbarker-padres",
+      "name": "Yardbarker Padres",
+      "browserUrl": "https://www.yardbarker.com/mlb/teams/san_diego_padres/31",
+      "category": "news"
+    },
+    {
+      "id": "mlb-sd-bleacher-report",
+      "name": "Bleacher Report",
+      "browserUrl": "https://bleacherreport.com/san-diego-padres",
+      "category": "news"
     }
   ],
   "SF": [
@@ -100473,6 +101829,60 @@ var MLB_TEAM_NEWS_SOURCES_BY_ABBREV = {
       "id": "mlb-sf-san-francisco-giants",
       "name": "#San Francisco Giants",
       "browserUrl": "https://x.com/search?q=san%20francisco%20giants&src=typed_query",
+      "category": "news"
+    },
+    {
+      "id": "mlb-sf-mccovey-chronicles",
+      "name": "McCovey Chronicles",
+      "browserUrl": "https://www.mccoveychronicles.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-sf-around-the-foghorn",
+      "name": "Around the Foghorn",
+      "browserUrl": "https://aroundthefoghorn.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-sf-together-we-re-giants",
+      "name": "Together We're Giants",
+      "browserUrl": "https://togetherweregiants.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-sf-giants365",
+      "name": "Giants365",
+      "browserUrl": "https://giants365.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-sf-splash-hits-blog",
+      "name": "Splash Hits Blog",
+      "browserUrl": "https://splashhits.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-sf-golden-gate-sports-giants",
+      "name": "Golden Gate Sports Giants",
+      "browserUrl": "https://goldengatesports.com/san-francisco-giants/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-sf-the-willits-news-giants",
+      "name": "The Willits News Giants",
+      "browserUrl": "https://www.willitsnews.com/sports/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-sf-yardbarker-giants",
+      "name": "Yardbarker Giants",
+      "browserUrl": "https://www.yardbarker.com/mlb/teams/san_francisco_giants/32",
+      "category": "news"
+    },
+    {
+      "id": "mlb-sf-bleacher-report",
+      "name": "Bleacher Report",
+      "browserUrl": "https://bleacherreport.com/san-francisco-giants",
       "category": "news"
     }
   ],
@@ -100590,6 +102000,60 @@ var MLB_TEAM_NEWS_SOURCES_BY_ABBREV = {
       "name": "#Seattle Mariners",
       "browserUrl": "https://x.com/search?q=seattle%20mariners&src=typed_query",
       "category": "news"
+    },
+    {
+      "id": "mlb-sea-lookout-landing",
+      "name": "Lookout Landing",
+      "browserUrl": "https://www.lookoutlanding.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-sea-sodo-mojo",
+      "name": "SoDo Mojo",
+      "browserUrl": "https://sodomojo.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-sea-seattle-times-mariners",
+      "name": "Seattle Times Mariners",
+      "browserUrl": "https://www.seattletimes.com/sports/mariners/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-sea-from-the-corner-of-edgar-dave",
+      "name": "From the Corner of Edgar & Dave",
+      "browserUrl": "https://mariners.mlblogs.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-sea-seattle-sports-mariners",
+      "name": "Seattle Sports Mariners",
+      "browserUrl": "https://sports.mynorthwest.com/mlb/seattle-mariners/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-sea-u-s-s-mariner",
+      "name": "U.S.S. Mariner",
+      "browserUrl": "https://www.ussmariner.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-sea-komo-news-mariners",
+      "name": "KOMO News Mariners",
+      "browserUrl": "https://komonews.com/sports/mariners",
+      "category": "news"
+    },
+    {
+      "id": "mlb-sea-yardbarker-mariners",
+      "name": "Yardbarker Mariners",
+      "browserUrl": "https://www.yardbarker.com/mlb/teams/seattle_mariners/17",
+      "category": "news"
+    },
+    {
+      "id": "mlb-sea-bleacher-report",
+      "name": "Bleacher Report",
+      "browserUrl": "https://bleacherreport.com/seattle-mariners",
+      "category": "news"
     }
   ],
   "STL": [
@@ -100705,6 +102169,54 @@ var MLB_TEAM_NEWS_SOURCES_BY_ABBREV = {
       "id": "mlb-stl-st-louis-cardinals",
       "name": "#St. Louis Cardinals",
       "browserUrl": "https://x.com/search?q=st.%20louis%20cardinals&src=typed_query",
+      "category": "news"
+    },
+    {
+      "id": "mlb-stl-viva-el-birdos",
+      "name": "Viva El Birdos",
+      "browserUrl": "https://www.vivaelbirdos.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-stl-redbird-rants",
+      "name": "Redbird Rants",
+      "browserUrl": "https://redbirdrants.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-stl-the-cardinal-nation",
+      "name": "The Cardinal Nation",
+      "browserUrl": "https://thecardinalnation.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-stl-cardinals-best-news-links",
+      "name": "Cardinals Best News Links",
+      "browserUrl": "https://cardinalsbestnews.blogspot.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-stl-st-louis-post-dispatch-cardinals",
+      "name": "St. Louis Post-Dispatch Cardinals",
+      "browserUrl": "https://www.stltoday.com/sports/professional/mlb/cardinals/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-stl-yardbarker-cardinals",
+      "name": "Yardbarker Cardinals",
+      "browserUrl": "https://www.yardbarker.com/mlb/teams/st_louis_cardinals/27",
+      "category": "news"
+    },
+    {
+      "id": "mlb-stl-the-cold-wire-cardinals",
+      "name": "The Cold Wire Cardinals",
+      "browserUrl": "https://thecoldwire.com/sports/mlb/st-louis-cardinals/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-stl-bleacher-report",
+      "name": "Bleacher Report",
+      "browserUrl": "https://bleacherreport.com/st-louis-cardinals",
       "category": "news"
     }
   ],
@@ -100822,6 +102334,54 @@ var MLB_TEAM_NEWS_SOURCES_BY_ABBREV = {
       "name": "#Tampa Bay Rays",
       "browserUrl": "https://x.com/search?q=tampa%20bay%20rays&src=typed_query",
       "category": "news"
+    },
+    {
+      "id": "mlb-tb-draysbay",
+      "name": "DRaysBay",
+      "browserUrl": "https://www.draysbay.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-tb-rays-colored-glasses",
+      "name": "Rays Colored Glasses",
+      "browserUrl": "https://rayscoloredglasses.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-tb-tampa-bay-times-rays",
+      "name": "Tampa Bay Times Rays",
+      "browserUrl": "https://www.tampabay.com/sports/rays/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-tb-spectrum-bay-news-9-rays",
+      "name": "Spectrum Bay News 9 Rays",
+      "browserUrl": "https://baynews9.com/fl/tampa/sports/rays",
+      "category": "news"
+    },
+    {
+      "id": "mlb-tb-wtsp-rays",
+      "name": "WTSP Rays",
+      "browserUrl": "https://www.wtsp.com/rays",
+      "category": "news"
+    },
+    {
+      "id": "mlb-tb-rays-radio",
+      "name": "Rays Radio",
+      "browserUrl": "https://www.mlb.com/rays/fans/radio",
+      "category": "news"
+    },
+    {
+      "id": "mlb-tb-yardbarker-rays",
+      "name": "Yardbarker Rays",
+      "browserUrl": "https://www.yardbarker.com/mlb/teams/tampa_bay_rays/7",
+      "category": "news"
+    },
+    {
+      "id": "mlb-tb-bleacher-report",
+      "name": "Bleacher Report",
+      "browserUrl": "https://bleacherreport.com/tampa-bay-rays",
+      "category": "news"
     }
   ],
   "TEX": [
@@ -100937,6 +102497,66 @@ var MLB_TEAM_NEWS_SOURCES_BY_ABBREV = {
       "id": "mlb-tex-texas-rangers",
       "name": "#Texas Rangers",
       "browserUrl": "https://x.com/search?q=texas%20rangers&src=typed_query",
+      "category": "news"
+    },
+    {
+      "id": "mlb-tex-lone-star-ball",
+      "name": "Lone Star Ball",
+      "browserUrl": "https://www.lonestarball.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-tex-nolan-writin",
+      "name": "Nolan Writin",
+      "browserUrl": "https://nolanwritin.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-tex-rangers-rounding-3rd",
+      "name": "Rangers Rounding 3rd",
+      "browserUrl": "https://rangersrounding3rd.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-tex-rangerfans",
+      "name": "RangerFans",
+      "browserUrl": "https://www.rangerfans.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-tex-105-3-the-fan-rangers",
+      "name": "105.3 The Fan Rangers",
+      "browserUrl": "https://www.audacy.com/1053thefan/sports/texas-rangers",
+      "category": "news"
+    },
+    {
+      "id": "mlb-tex-cbs-dfw-rangers",
+      "name": "CBS DFW Rangers",
+      "browserUrl": "https://www.cbsnews.com/texas/tag/texas-rangers/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-tex-kera-rangers",
+      "name": "KERA Rangers",
+      "browserUrl": "https://www.keranews.org/sports",
+      "category": "news"
+    },
+    {
+      "id": "mlb-tex-dallas-morning-news-rangers",
+      "name": "Dallas Morning News Rangers",
+      "browserUrl": "https://www.dallasnews.com/sports/rangers/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-tex-yardbarker-rangers",
+      "name": "Yardbarker Rangers",
+      "browserUrl": "https://www.yardbarker.com/mlb/teams/texas_rangers/18",
+      "category": "news"
+    },
+    {
+      "id": "mlb-tex-bleacher-report",
+      "name": "Bleacher Report",
+      "browserUrl": "https://bleacherreport.com/texas-rangers",
       "category": "news"
     }
   ],
@@ -101054,6 +102674,60 @@ var MLB_TEAM_NEWS_SOURCES_BY_ABBREV = {
       "name": "#Toronto Blue Jays",
       "browserUrl": "https://x.com/search?q=toronto%20blue%20jays&src=typed_query",
       "category": "news"
+    },
+    {
+      "id": "mlb-tor-bluebird-banter",
+      "name": "Bluebird Banter",
+      "browserUrl": "https://www.bluebirdbanter.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-tor-jays-journal",
+      "name": "Jays Journal",
+      "browserUrl": "https://jaysjournal.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-tor-bluejaysnation",
+      "name": "BlueJaysNation",
+      "browserUrl": "https://bluejaysnation.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-tor-blue-jays-from-away",
+      "name": "Blue Jays from Away",
+      "browserUrl": "https://bluejaysfromaway.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-tor-jays-from-the-couch",
+      "name": "Jays from the Couch",
+      "browserUrl": "https://jaysfromthecouch.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-tor-toronto-sun-blue-jays",
+      "name": "Toronto Sun Blue Jays",
+      "browserUrl": "https://torontosun.com/sports/baseball/toronto-blue-jays",
+      "category": "news"
+    },
+    {
+      "id": "mlb-tor-tsn-blue-jays",
+      "name": "TSN Blue Jays",
+      "browserUrl": "https://www.tsn.ca/mlb/team/toronto-blue-jays",
+      "category": "news"
+    },
+    {
+      "id": "mlb-tor-yardbarker-blue-jays",
+      "name": "Yardbarker Blue Jays",
+      "browserUrl": "https://www.yardbarker.com/mlb/teams/toronto_blue_jays/8",
+      "category": "news"
+    },
+    {
+      "id": "mlb-tor-bleacher-report",
+      "name": "Bleacher Report",
+      "browserUrl": "https://bleacherreport.com/toronto-blue-jays",
+      "category": "news"
     }
   ],
   "WSH": [
@@ -101170,6 +102844,72 @@ var MLB_TEAM_NEWS_SOURCES_BY_ABBREV = {
       "name": "#Washington Nationals",
       "browserUrl": "https://x.com/search?q=washington%20nationals&src=typed_query",
       "category": "news"
+    },
+    {
+      "id": "mlb-wsh-federal-baseball",
+      "name": "Federal Baseball",
+      "browserUrl": "https://www.federalbaseball.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-wsh-district-on-deck",
+      "name": "District on Deck",
+      "browserUrl": "https://districtondeck.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-wsh-talk-nats",
+      "name": "Talk Nats",
+      "browserUrl": "https://www.talknats.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-wsh-nationals-arm-race",
+      "name": "Nationals Arm Race",
+      "browserUrl": "https://www.nationalsarmrace.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-wsh-nationals-prospects",
+      "name": "Nationals Prospects",
+      "browserUrl": "https://www.nationalsprospects.com/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-wsh-masn-nationals",
+      "name": "MASN Nationals",
+      "browserUrl": "https://www.masnsports.com/blogs/washington-nationals",
+      "category": "news"
+    },
+    {
+      "id": "mlb-wsh-wtop-nationals",
+      "name": "WTOP Nationals",
+      "browserUrl": "https://wtop.com/sports/washington-nationals/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-wsh-washington-post-nationals",
+      "name": "Washington Post Nationals",
+      "browserUrl": "https://www.washingtonpost.com/sports/nationals/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-wsh-cbs-sports-nationals",
+      "name": "CBS Sports Nationals",
+      "browserUrl": "https://www.cbssports.com/mlb/teams/WAS/washington-nationals/",
+      "category": "news"
+    },
+    {
+      "id": "mlb-wsh-yardbarker-nationals",
+      "name": "Yardbarker Nationals",
+      "browserUrl": "https://www.yardbarker.com/mlb/teams/washington_nationals/23",
+      "category": "news"
+    },
+    {
+      "id": "mlb-wsh-bleacher-report",
+      "name": "Bleacher Report",
+      "browserUrl": "https://bleacherreport.com/washington-nationals",
+      "category": "news"
     }
   ]
 };
@@ -101208,21 +102948,129 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
   "NFL": {
     "ARI": [
       {
+        "id": "nfl-ari-nfl-com",
+        "name": "NFL.com",
+        "browserUrl": "https://www.nfl.com/teams/arizona-cardinals/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-ari-espn",
+        "name": "ESPN",
+        "browserUrl": "https://www.espn.com/nfl/team/_/name/ari/arizona-cardinals",
+        "category": "news"
+      },
+      {
         "id": "nfl-ari-cbs-sports",
         "name": "CBS Sports",
         "browserUrl": "https://www.cbssports.com/nfl/teams/ARI/arizona-cardinals/",
         "category": "news"
       },
       {
-        "id": "nfl-ari-azfamily",
-        "name": "AZFamily",
-        "browserUrl": "https://www.azfamily.com/sports/nfl/cardinals/",
+        "id": "nfl-ari-fox-sports",
+        "name": "FOX Sports",
+        "browserUrl": "https://www.foxsports.com/nfl/arizona-cardinals-team",
         "category": "news"
       },
       {
         "id": "nfl-ari-yahoo-sports",
-        "name": "Yahoo Sports",
+        "name": "Yahoo! Sports",
         "browserUrl": "https://sports.yahoo.com/nfl/teams/arizona/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-ari-the-athletic",
+        "name": "The Athletic",
+        "browserUrl": "https://www.nytimes.com/athletic/nfl/team/cardinals/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-ari-b-r",
+        "name": "B/R",
+        "browserUrl": "https://bleacherreport.com/arizona-cardinals",
+        "category": "news"
+      },
+      {
+        "id": "nfl-ari-nbc-sports",
+        "name": "NBC Sports",
+        "browserUrl": "https://www.nbcsports.com/nfl/arizona-cardinals",
+        "category": "news"
+      },
+      {
+        "id": "nfl-ari-si",
+        "name": "SI",
+        "browserUrl": "https://www.si.com/nfl/cardinals",
+        "category": "news"
+      },
+      {
+        "id": "nfl-ari-usa-today",
+        "name": "USA Today",
+        "browserUrl": "https://www.usatoday.com/sports/nfl/arizona-cardinals",
+        "category": "news"
+      },
+      {
+        "id": "nfl-ari-athlon-sports",
+        "name": "Athlon Sports",
+        "browserUrl": "https://athlonsports.com/nfl/arizona-cardinals",
+        "category": "news"
+      },
+      {
+        "id": "nfl-ari-yardbarker",
+        "name": "Yardbarker",
+        "browserUrl": "https://www.yardbarker.com/nfl/teams/arizona_cardinals/47",
+        "category": "news"
+      },
+      {
+        "id": "nfl-ari-spotrac",
+        "name": "Spotrac",
+        "browserUrl": "https://www.spotrac.com/nfl/arizona-cardinals/overview",
+        "category": "news"
+      },
+      {
+        "id": "nfl-ari-statmuse",
+        "name": "StatMuse",
+        "browserUrl": "https://www.statmuse.com/nfl/team/2026-arizona-cardinals-7/2026",
+        "category": "news"
+      },
+      {
+        "id": "nfl-ari-pro-football-rumors",
+        "name": "Pro Football Rumors",
+        "browserUrl": "https://www.profootballrumors.com/arizona-cardinals-news-rumors",
+        "category": "news"
+      },
+      {
+        "id": "nfl-ari-newsnow",
+        "name": "NewsNow",
+        "browserUrl": "https://www.newsnow.com/us/Sports/NFL/NFC+West/Arizona+Cardinals",
+        "category": "news"
+      },
+      {
+        "id": "nfl-ari-sportspyder",
+        "name": "SportSpyder",
+        "browserUrl": "https://sportspyder.com/nfl/arizona-cardinals/news",
+        "category": "news"
+      },
+      {
+        "id": "nfl-ari-r-azcardinals",
+        "name": "r/AZCardinals",
+        "browserUrl": "https://www.reddit.com/r/AZCardinals/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-ari-cardinals",
+        "name": "@Cardinals",
+        "browserUrl": "https://x.com/AZCardinals",
+        "category": "news"
+      },
+      {
+        "id": "nfl-ari-cardinals-2",
+        "name": "#Cardinals",
+        "browserUrl": "https://x.com/search?q=Cardinals&src=typed_query",
+        "category": "news"
+      },
+      {
+        "id": "nfl-ari-azfamily",
+        "name": "AZFamily",
+        "browserUrl": "https://www.azfamily.com/sports/nfl/cardinals/",
         "category": "news"
       },
       {
@@ -101240,6 +103088,126 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
     ],
     "ATL": [
       {
+        "id": "nfl-atl-nfl-com",
+        "name": "NFL.com",
+        "browserUrl": "https://www.nfl.com/teams/atlanta-falcons/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-atl-espn",
+        "name": "ESPN",
+        "browserUrl": "https://www.espn.com/nfl/team/_/name/atl/atlanta-falcons",
+        "category": "news"
+      },
+      {
+        "id": "nfl-atl-cbs-sports",
+        "name": "CBS Sports",
+        "browserUrl": "https://www.cbssports.com/nfl/teams/ATL/atlanta-falcons/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-atl-fox-sports",
+        "name": "FOX Sports",
+        "browserUrl": "https://www.foxsports.com/nfl/atlanta-falcons-team",
+        "category": "news"
+      },
+      {
+        "id": "nfl-atl-yahoo-sports",
+        "name": "Yahoo! Sports",
+        "browserUrl": "https://sports.yahoo.com/nfl/teams/atlanta/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-atl-the-athletic",
+        "name": "The Athletic",
+        "browserUrl": "https://www.nytimes.com/athletic/nfl/team/falcons/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-atl-b-r",
+        "name": "B/R",
+        "browserUrl": "https://bleacherreport.com/atlanta-falcons",
+        "category": "news"
+      },
+      {
+        "id": "nfl-atl-nbc-sports",
+        "name": "NBC Sports",
+        "browserUrl": "https://www.nbcsports.com/nfl/atlanta-falcons",
+        "category": "news"
+      },
+      {
+        "id": "nfl-atl-si",
+        "name": "SI",
+        "browserUrl": "https://www.si.com/nfl/falcons",
+        "category": "news"
+      },
+      {
+        "id": "nfl-atl-usa-today",
+        "name": "USA Today",
+        "browserUrl": "https://www.usatoday.com/sports/nfl/atlanta-falcons",
+        "category": "news"
+      },
+      {
+        "id": "nfl-atl-athlon-sports",
+        "name": "Athlon Sports",
+        "browserUrl": "https://athlonsports.com/nfl/atlanta-falcons",
+        "category": "news"
+      },
+      {
+        "id": "nfl-atl-yardbarker",
+        "name": "Yardbarker",
+        "browserUrl": "https://www.yardbarker.com/nfl/teams/atlanta_falcons/48",
+        "category": "news"
+      },
+      {
+        "id": "nfl-atl-spotrac",
+        "name": "Spotrac",
+        "browserUrl": "https://www.spotrac.com/nfl/atlanta-falcons/overview",
+        "category": "news"
+      },
+      {
+        "id": "nfl-atl-statmuse",
+        "name": "StatMuse",
+        "browserUrl": "https://www.statmuse.com/nfl/team/2026-atlanta-falcons-78/2026",
+        "category": "news"
+      },
+      {
+        "id": "nfl-atl-pro-football-rumors",
+        "name": "Pro Football Rumors",
+        "browserUrl": "https://www.profootballrumors.com/atlanta-falcons-news-rumors",
+        "category": "news"
+      },
+      {
+        "id": "nfl-atl-newsnow",
+        "name": "NewsNow",
+        "browserUrl": "https://www.newsnow.com/us/Sports/NFL/NFC+South/Atlanta+Falcons",
+        "category": "news"
+      },
+      {
+        "id": "nfl-atl-sportspyder",
+        "name": "SportSpyder",
+        "browserUrl": "https://sportspyder.com/nfl/atlanta-falcons/news",
+        "category": "news"
+      },
+      {
+        "id": "nfl-atl-r-falcons",
+        "name": "r/falcons",
+        "browserUrl": "https://www.reddit.com/r/falcons/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-atl-falcons",
+        "name": "@Falcons",
+        "browserUrl": "https://x.com/AtlantaFalcons",
+        "category": "news"
+      },
+      {
+        "id": "nfl-atl-falcons-2",
+        "name": "#Falcons",
+        "browserUrl": "https://x.com/search?q=Falcons&src=typed_query",
+        "category": "news"
+      },
+      {
         "id": "nfl-atl-atlanta-journal-constitution",
         "name": "Atlanta Journal-Constitution",
         "browserUrl": "https://www.ajc.com/sports/atlanta-falcons/",
@@ -101248,17 +103216,137 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
     ],
     "BAL": [
       {
-        "id": "nfl-bal-ravencountry",
-        "name": "RavenCountry",
+        "id": "nfl-bal-nfl-com",
+        "name": "NFL.com",
+        "browserUrl": "https://www.nfl.com/teams/baltimore-ravens/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-bal-espn",
+        "name": "ESPN",
+        "browserUrl": "https://www.espn.com/nfl/team/_/name/bal/baltimore-ravens",
+        "category": "news"
+      },
+      {
+        "id": "nfl-bal-cbs-sports",
+        "name": "CBS Sports",
+        "browserUrl": "https://www.cbssports.com/nfl/teams/BAL/baltimore-ravens/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-bal-fox-sports",
+        "name": "FOX Sports",
+        "browserUrl": "https://www.foxsports.com/nfl/baltimore-ravens-team",
+        "category": "news"
+      },
+      {
+        "id": "nfl-bal-yahoo-sports",
+        "name": "Yahoo! Sports",
+        "browserUrl": "https://sports.yahoo.com/nfl/teams/baltimore/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-bal-the-athletic",
+        "name": "The Athletic",
+        "browserUrl": "https://www.nytimes.com/athletic/nfl/team/ravens/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-bal-b-r",
+        "name": "B/R",
+        "browserUrl": "https://bleacherreport.com/baltimore-ravens",
+        "category": "news"
+      },
+      {
+        "id": "nfl-bal-nbc-sports",
+        "name": "NBC Sports",
+        "browserUrl": "https://www.nbcsports.com/nfl/baltimore-ravens",
+        "category": "news"
+      },
+      {
+        "id": "nfl-bal-si",
+        "name": "SI",
         "browserUrl": "https://www.si.com/nfl/ravens",
+        "category": "news"
+      },
+      {
+        "id": "nfl-bal-usa-today",
+        "name": "USA Today",
+        "browserUrl": "https://www.usatoday.com/sports/nfl/baltimore-ravens",
+        "category": "news"
+      },
+      {
+        "id": "nfl-bal-athlon-sports",
+        "name": "Athlon Sports",
+        "browserUrl": "https://athlonsports.com/nfl/baltimore-ravens",
+        "category": "news"
+      },
+      {
+        "id": "nfl-bal-yardbarker",
+        "name": "Yardbarker",
+        "browserUrl": "https://www.yardbarker.com/nfl/teams/baltimore_ravens/31",
+        "category": "news"
+      },
+      {
+        "id": "nfl-bal-spotrac",
+        "name": "Spotrac",
+        "browserUrl": "https://www.spotrac.com/nfl/baltimore-ravens/overview",
+        "category": "news"
+      },
+      {
+        "id": "nfl-bal-statmuse",
+        "name": "StatMuse",
+        "browserUrl": "https://www.statmuse.com/nfl/team/2026-baltimore-ravens-85/2026",
+        "category": "news"
+      },
+      {
+        "id": "nfl-bal-pro-football-rumors",
+        "name": "Pro Football Rumors",
+        "browserUrl": "https://www.profootballrumors.com/baltimore-ravens-news-rumors",
+        "category": "news"
+      },
+      {
+        "id": "nfl-bal-newsnow",
+        "name": "NewsNow",
+        "browserUrl": "https://www.newsnow.com/us/Sports/NFL/AFC+North/Baltimore+Ravens",
+        "category": "news"
+      },
+      {
+        "id": "nfl-bal-sportspyder",
+        "name": "SportSpyder",
+        "browserUrl": "https://sportspyder.com/nfl/baltimore-ravens/news",
+        "category": "news"
+      },
+      {
+        "id": "nfl-bal-r-ravens",
+        "name": "r/ravens",
+        "browserUrl": "https://www.reddit.com/r/ravens/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-bal-ravens",
+        "name": "@Ravens",
+        "browserUrl": "https://x.com/Ravens",
+        "category": "news"
+      },
+      {
+        "id": "nfl-bal-ravens-2",
+        "name": "#Ravens",
+        "browserUrl": "https://x.com/search?q=Ravens&src=typed_query",
         "category": "news"
       }
     ],
     "BUF": [
       {
-        "id": "nfl-buf-banged-up-bills",
-        "name": "Banged Up Bills",
-        "browserUrl": "https://bangedupbills.com",
+        "id": "nfl-buf-nfl-com",
+        "name": "NFL.com",
+        "browserUrl": "https://www.nfl.com/teams/buffalo-bills/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-buf-espn",
+        "name": "ESPN",
+        "browserUrl": "https://www.espn.com/nfl/team/_/name/buf/buffalo-bills",
         "category": "news"
       },
       {
@@ -101268,9 +103356,111 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
         "category": "news"
       },
       {
-        "id": "nfl-buf-sports-illustrated",
-        "name": "Sports Illustrated",
+        "id": "nfl-buf-fox-sports",
+        "name": "FOX Sports",
+        "browserUrl": "https://www.foxsports.com/nfl/buffalo-bills-team",
+        "category": "news"
+      },
+      {
+        "id": "nfl-buf-yahoo-sports",
+        "name": "Yahoo! Sports",
+        "browserUrl": "https://sports.yahoo.com/nfl/teams/buffalo/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-buf-the-athletic",
+        "name": "The Athletic",
+        "browserUrl": "https://www.nytimes.com/athletic/nfl/team/bills/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-buf-b-r",
+        "name": "B/R",
+        "browserUrl": "https://bleacherreport.com/buffalo-bills",
+        "category": "news"
+      },
+      {
+        "id": "nfl-buf-nbc-sports",
+        "name": "NBC Sports",
+        "browserUrl": "https://www.nbcsports.com/nfl/buffalo-bills",
+        "category": "news"
+      },
+      {
+        "id": "nfl-buf-si",
+        "name": "SI",
         "browserUrl": "https://www.si.com/nfl/bills",
+        "category": "news"
+      },
+      {
+        "id": "nfl-buf-usa-today",
+        "name": "USA Today",
+        "browserUrl": "https://www.usatoday.com/sports/nfl/buffalo-bills",
+        "category": "news"
+      },
+      {
+        "id": "nfl-buf-athlon-sports",
+        "name": "Athlon Sports",
+        "browserUrl": "https://athlonsports.com/nfl/buffalo-bills",
+        "category": "news"
+      },
+      {
+        "id": "nfl-buf-yardbarker",
+        "name": "Yardbarker",
+        "browserUrl": "https://www.yardbarker.com/nfl/teams/buffalo_bills/32",
+        "category": "news"
+      },
+      {
+        "id": "nfl-buf-spotrac",
+        "name": "Spotrac",
+        "browserUrl": "https://www.spotrac.com/nfl/buffalo-bills/overview",
+        "category": "news"
+      },
+      {
+        "id": "nfl-buf-statmuse",
+        "name": "StatMuse",
+        "browserUrl": "https://www.statmuse.com/nfl/team/2026-buffalo-bills-67/2026",
+        "category": "news"
+      },
+      {
+        "id": "nfl-buf-pro-football-rumors",
+        "name": "Pro Football Rumors",
+        "browserUrl": "https://www.profootballrumors.com/buffalo-bills-news-rumors",
+        "category": "news"
+      },
+      {
+        "id": "nfl-buf-newsnow",
+        "name": "NewsNow",
+        "browserUrl": "https://www.newsnow.com/us/Sports/NFL/AFC+East/Buffalo+Bills",
+        "category": "news"
+      },
+      {
+        "id": "nfl-buf-sportspyder",
+        "name": "SportSpyder",
+        "browserUrl": "https://sportspyder.com/nfl/buffalo-bills/news",
+        "category": "news"
+      },
+      {
+        "id": "nfl-buf-r-buffalobills",
+        "name": "r/buffalobills",
+        "browserUrl": "https://www.reddit.com/r/buffalobills/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-buf-bills",
+        "name": "@Bills",
+        "browserUrl": "https://x.com/BuffaloBills",
+        "category": "news"
+      },
+      {
+        "id": "nfl-buf-bills-2",
+        "name": "#Bills",
+        "browserUrl": "https://x.com/search?q=Bills&src=typed_query",
+        "category": "news"
+      },
+      {
+        "id": "nfl-buf-banged-up-bills",
+        "name": "Banged Up Bills",
+        "browserUrl": "https://bangedupbills.com",
         "category": "news"
       },
       {
@@ -101304,12 +103494,6 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
         "category": "news"
       },
       {
-        "id": "nfl-buf-fox-sports",
-        "name": "FOX Sports",
-        "browserUrl": "https://www.foxsports.com/nfl/buffalo-bills-team",
-        "category": "news"
-      },
-      {
         "id": "nfl-buf-barstool-sports",
         "name": "Barstool Sports",
         "browserUrl": "https://www.barstoolsports.com/topics/buffalo-bills",
@@ -101322,7 +103506,255 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
         "category": "news"
       }
     ],
+    "CAR": [
+      {
+        "id": "nfl-car-nfl-com",
+        "name": "NFL.com",
+        "browserUrl": "https://www.nfl.com/teams/carolina-panthers/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-car-espn",
+        "name": "ESPN",
+        "browserUrl": "https://www.espn.com/nfl/team/_/name/car/carolina-panthers",
+        "category": "news"
+      },
+      {
+        "id": "nfl-car-cbs-sports",
+        "name": "CBS Sports",
+        "browserUrl": "https://www.cbssports.com/nfl/teams/CAR/carolina-panthers/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-car-fox-sports",
+        "name": "FOX Sports",
+        "browserUrl": "https://www.foxsports.com/nfl/carolina-panthers-team",
+        "category": "news"
+      },
+      {
+        "id": "nfl-car-yahoo-sports",
+        "name": "Yahoo! Sports",
+        "browserUrl": "https://sports.yahoo.com/nfl/teams/carolina/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-car-the-athletic",
+        "name": "The Athletic",
+        "browserUrl": "https://www.nytimes.com/athletic/nfl/team/panthers/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-car-b-r",
+        "name": "B/R",
+        "browserUrl": "https://bleacherreport.com/carolina-panthers",
+        "category": "news"
+      },
+      {
+        "id": "nfl-car-nbc-sports",
+        "name": "NBC Sports",
+        "browserUrl": "https://www.nbcsports.com/nfl/carolina-panthers",
+        "category": "news"
+      },
+      {
+        "id": "nfl-car-si",
+        "name": "SI",
+        "browserUrl": "https://www.si.com/nfl/panthers",
+        "category": "news"
+      },
+      {
+        "id": "nfl-car-usa-today",
+        "name": "USA Today",
+        "browserUrl": "https://www.usatoday.com/sports/nfl/carolina-panthers",
+        "category": "news"
+      },
+      {
+        "id": "nfl-car-athlon-sports",
+        "name": "Athlon Sports",
+        "browserUrl": "https://athlonsports.com/nfl/carolina-panthers",
+        "category": "news"
+      },
+      {
+        "id": "nfl-car-yardbarker",
+        "name": "Yardbarker",
+        "browserUrl": "https://www.yardbarker.com/nfl/teams/carolina_panthers/49",
+        "category": "news"
+      },
+      {
+        "id": "nfl-car-spotrac",
+        "name": "Spotrac",
+        "browserUrl": "https://www.spotrac.com/nfl/carolina-panthers/overview",
+        "category": "news"
+      },
+      {
+        "id": "nfl-car-statmuse",
+        "name": "StatMuse",
+        "browserUrl": "https://www.statmuse.com/nfl/team/2026-carolina-panthers-83/2026",
+        "category": "news"
+      },
+      {
+        "id": "nfl-car-pro-football-rumors",
+        "name": "Pro Football Rumors",
+        "browserUrl": "https://www.profootballrumors.com/carolina-panthers-news-rumors",
+        "category": "news"
+      },
+      {
+        "id": "nfl-car-newsnow",
+        "name": "NewsNow",
+        "browserUrl": "https://www.newsnow.com/us/Sports/NFL/NFC+South/Carolina+Panthers",
+        "category": "news"
+      },
+      {
+        "id": "nfl-car-sportspyder",
+        "name": "SportSpyder",
+        "browserUrl": "https://sportspyder.com/nfl/carolina-panthers/news",
+        "category": "news"
+      },
+      {
+        "id": "nfl-car-r-panthers",
+        "name": "r/panthers",
+        "browserUrl": "https://www.reddit.com/r/panthers/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-car-panthers",
+        "name": "@Panthers",
+        "browserUrl": "https://x.com/Panthers",
+        "category": "news"
+      },
+      {
+        "id": "nfl-car-panthers-2",
+        "name": "#Panthers",
+        "browserUrl": "https://x.com/search?q=Panthers&src=typed_query",
+        "category": "news"
+      },
+      {
+        "id": "nfl-car-black-and-teal",
+        "name": "Black and Teal",
+        "browserUrl": "https://blackandteal.com",
+        "category": "news"
+      }
+    ],
     "CHI": [
+      {
+        "id": "nfl-chi-nfl-com",
+        "name": "NFL.com",
+        "browserUrl": "https://www.nfl.com/teams/chicago-bears/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-chi-espn",
+        "name": "ESPN",
+        "browserUrl": "https://www.espn.com/nfl/team/_/name/chi/chicago-bears",
+        "category": "news"
+      },
+      {
+        "id": "nfl-chi-cbs-sports",
+        "name": "CBS Sports",
+        "browserUrl": "https://www.cbssports.com/nfl/teams/CHI/chicago-bears/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-chi-fox-sports",
+        "name": "FOX Sports",
+        "browserUrl": "https://www.foxsports.com/nfl/chicago-bears-team",
+        "category": "news"
+      },
+      {
+        "id": "nfl-chi-yahoo-sports",
+        "name": "Yahoo! Sports",
+        "browserUrl": "https://sports.yahoo.com/nfl/teams/chicago/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-chi-the-athletic",
+        "name": "The Athletic",
+        "browserUrl": "https://www.nytimes.com/athletic/nfl/team/bears/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-chi-b-r",
+        "name": "B/R",
+        "browserUrl": "https://bleacherreport.com/chicago-bears",
+        "category": "news"
+      },
+      {
+        "id": "nfl-chi-nbc-sports",
+        "name": "NBC Sports",
+        "browserUrl": "https://www.nbcsports.com/nfl/chicago-bears",
+        "category": "news"
+      },
+      {
+        "id": "nfl-chi-si",
+        "name": "SI",
+        "browserUrl": "https://www.si.com/nfl/bears",
+        "category": "news"
+      },
+      {
+        "id": "nfl-chi-usa-today",
+        "name": "USA Today",
+        "browserUrl": "https://www.usatoday.com/sports/nfl/chicago-bears",
+        "category": "news"
+      },
+      {
+        "id": "nfl-chi-athlon-sports",
+        "name": "Athlon Sports",
+        "browserUrl": "https://athlonsports.com/nfl/chicago-bears",
+        "category": "news"
+      },
+      {
+        "id": "nfl-chi-yardbarker",
+        "name": "Yardbarker",
+        "browserUrl": "https://www.yardbarker.com/nfl/teams/chicago_bears/50",
+        "category": "news"
+      },
+      {
+        "id": "nfl-chi-spotrac",
+        "name": "Spotrac",
+        "browserUrl": "https://www.spotrac.com/nfl/chicago-bears/overview",
+        "category": "news"
+      },
+      {
+        "id": "nfl-chi-statmuse",
+        "name": "StatMuse",
+        "browserUrl": "https://www.statmuse.com/nfl/team/2026-chicago-bears-chi/2026",
+        "category": "news"
+      },
+      {
+        "id": "nfl-chi-pro-football-rumors",
+        "name": "Pro Football Rumors",
+        "browserUrl": "https://www.profootballrumors.com/chicago-bears-news-rumors",
+        "category": "news"
+      },
+      {
+        "id": "nfl-chi-newsnow",
+        "name": "NewsNow",
+        "browserUrl": "https://www.newsnow.com/us/Sports/NFL/NFC+North/Chicago+Bears",
+        "category": "news"
+      },
+      {
+        "id": "nfl-chi-sportspyder",
+        "name": "SportSpyder",
+        "browserUrl": "https://sportspyder.com/nfl/chicago-bears/news",
+        "category": "news"
+      },
+      {
+        "id": "nfl-chi-r-chibears",
+        "name": "r/CHIBears",
+        "browserUrl": "https://www.reddit.com/r/CHIBears/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-chi-bears",
+        "name": "@Bears",
+        "browserUrl": "https://x.com/ChicagoBears",
+        "category": "news"
+      },
+      {
+        "id": "nfl-chi-bears-2",
+        "name": "#Bears",
+        "browserUrl": "https://x.com/search?q=Bears&src=typed_query",
+        "category": "news"
+      },
       {
         "id": "nfl-chi-sports-mockery",
         "name": "Sports Mockery",
@@ -101342,21 +103774,9 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
         "category": "news"
       },
       {
-        "id": "nfl-chi-sports-illustrated",
-        "name": "Sports Illustrated",
-        "browserUrl": "https://www.si.com/nfl/bears",
-        "category": "news"
-      },
-      {
         "id": "nfl-chi-espn-blog",
         "name": "ESPN Blog",
         "browserUrl": "https://www.espn.com/blog/chicago-bears",
-        "category": "news"
-      },
-      {
-        "id": "nfl-chi-cbs-sports",
-        "name": "CBS Sports",
-        "browserUrl": "https://www.cbssports.com/nfl/teams/CHI/chicago-bears/",
         "category": "news"
       },
       {
@@ -101404,19 +103824,253 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
     ],
     "CIN": [
       {
+        "id": "nfl-cin-nfl-com",
+        "name": "NFL.com",
+        "browserUrl": "https://www.nfl.com/teams/cincinnati-bengals/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-cin-espn",
+        "name": "ESPN",
+        "browserUrl": "https://www.espn.com/nfl/team/_/name/cin/cincinnati-bengals",
+        "category": "news"
+      },
+      {
+        "id": "nfl-cin-cbs-sports",
+        "name": "CBS Sports",
+        "browserUrl": "https://www.cbssports.com/nfl/teams/CIN/cincinnati-bengals/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-cin-fox-sports",
+        "name": "FOX Sports",
+        "browserUrl": "https://www.foxsports.com/nfl/cincinnati-bengals-team",
+        "category": "news"
+      },
+      {
+        "id": "nfl-cin-yahoo-sports",
+        "name": "Yahoo! Sports",
+        "browserUrl": "https://sports.yahoo.com/nfl/teams/cincinnati/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-cin-the-athletic",
+        "name": "The Athletic",
+        "browserUrl": "https://www.nytimes.com/athletic/nfl/team/bengals/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-cin-b-r",
+        "name": "B/R",
+        "browserUrl": "https://bleacherreport.com/cincinnati-bengals",
+        "category": "news"
+      },
+      {
+        "id": "nfl-cin-nbc-sports",
+        "name": "NBC Sports",
+        "browserUrl": "https://www.nbcsports.com/nfl/cincinnati-bengals",
+        "category": "news"
+      },
+      {
+        "id": "nfl-cin-si",
+        "name": "SI",
+        "browserUrl": "https://www.si.com/nfl/bengals",
+        "category": "news"
+      },
+      {
+        "id": "nfl-cin-usa-today",
+        "name": "USA Today",
+        "browserUrl": "https://www.usatoday.com/sports/nfl/cincinnati-bengals",
+        "category": "news"
+      },
+      {
+        "id": "nfl-cin-athlon-sports",
+        "name": "Athlon Sports",
+        "browserUrl": "https://athlonsports.com/nfl/cincinnati-bengals",
+        "category": "news"
+      },
+      {
+        "id": "nfl-cin-yardbarker",
+        "name": "Yardbarker",
+        "browserUrl": "https://www.yardbarker.com/nfl/teams/cincinnati_bengals/33",
+        "category": "news"
+      },
+      {
+        "id": "nfl-cin-spotrac",
+        "name": "Spotrac",
+        "browserUrl": "https://www.spotrac.com/nfl/cincinnati-bengals/overview",
+        "category": "news"
+      },
+      {
+        "id": "nfl-cin-statmuse",
+        "name": "StatMuse",
+        "browserUrl": "https://www.statmuse.com/nfl/team/2026-cincinnati-bengals-80/2026",
+        "category": "news"
+      },
+      {
+        "id": "nfl-cin-pro-football-rumors",
+        "name": "Pro Football Rumors",
+        "browserUrl": "https://www.profootballrumors.com/cincinnati-bengals-news-rumors",
+        "category": "news"
+      },
+      {
+        "id": "nfl-cin-newsnow",
+        "name": "NewsNow",
+        "browserUrl": "https://www.newsnow.com/us/Sports/NFL/AFC+North/Cincinnati+Bengals",
+        "category": "news"
+      },
+      {
+        "id": "nfl-cin-sportspyder",
+        "name": "SportSpyder",
+        "browserUrl": "https://sportspyder.com/nfl/cincinnati-bengals/news",
+        "category": "news"
+      },
+      {
+        "id": "nfl-cin-r-bengals",
+        "name": "r/bengals",
+        "browserUrl": "https://www.reddit.com/r/bengals/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-cin-bengals",
+        "name": "@Bengals",
+        "browserUrl": "https://x.com/Bengals",
+        "category": "news"
+      },
+      {
+        "id": "nfl-cin-bengals-2",
+        "name": "#Bengals",
+        "browserUrl": "https://x.com/search?q=Bengals&src=typed_query",
+        "category": "news"
+      },
+      {
         "id": "nfl-cin-cincinnati-bengals-news",
         "name": "Cincinnati Bengals News",
         "browserUrl": "https://www.bengals.com/news",
         "category": "news"
-      },
-      {
-        "id": "nfl-cin-allbengals",
-        "name": "AllBengals",
-        "browserUrl": "https://www.si.com/nfl/bengals",
-        "category": "news"
       }
     ],
     "CLE": [
+      {
+        "id": "nfl-cle-nfl-com",
+        "name": "NFL.com",
+        "browserUrl": "https://www.nfl.com/teams/cleveland-browns/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-cle-espn",
+        "name": "ESPN",
+        "browserUrl": "https://www.espn.com/nfl/team/_/name/cle/cleveland-browns",
+        "category": "news"
+      },
+      {
+        "id": "nfl-cle-cbs-sports",
+        "name": "CBS Sports",
+        "browserUrl": "https://www.cbssports.com/nfl/teams/CLE/cleveland-browns/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-cle-fox-sports",
+        "name": "FOX Sports",
+        "browserUrl": "https://www.foxsports.com/nfl/cleveland-browns-team",
+        "category": "news"
+      },
+      {
+        "id": "nfl-cle-yahoo-sports",
+        "name": "Yahoo! Sports",
+        "browserUrl": "https://sports.yahoo.com/nfl/teams/cleveland/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-cle-the-athletic",
+        "name": "The Athletic",
+        "browserUrl": "https://www.nytimes.com/athletic/nfl/team/browns/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-cle-b-r",
+        "name": "B/R",
+        "browserUrl": "https://bleacherreport.com/cleveland-browns",
+        "category": "news"
+      },
+      {
+        "id": "nfl-cle-nbc-sports",
+        "name": "NBC Sports",
+        "browserUrl": "https://www.nbcsports.com/nfl/cleveland-browns",
+        "category": "news"
+      },
+      {
+        "id": "nfl-cle-si",
+        "name": "SI",
+        "browserUrl": "https://www.si.com/nfl/browns",
+        "category": "news"
+      },
+      {
+        "id": "nfl-cle-usa-today",
+        "name": "USA Today",
+        "browserUrl": "https://www.usatoday.com/sports/nfl/cleveland-browns",
+        "category": "news"
+      },
+      {
+        "id": "nfl-cle-athlon-sports",
+        "name": "Athlon Sports",
+        "browserUrl": "https://athlonsports.com/nfl/cleveland-browns",
+        "category": "news"
+      },
+      {
+        "id": "nfl-cle-yardbarker",
+        "name": "Yardbarker",
+        "browserUrl": "https://www.yardbarker.com/nfl/teams/cleveland_browns/34",
+        "category": "news"
+      },
+      {
+        "id": "nfl-cle-spotrac",
+        "name": "Spotrac",
+        "browserUrl": "https://www.spotrac.com/nfl/cleveland-browns/overview",
+        "category": "news"
+      },
+      {
+        "id": "nfl-cle-statmuse",
+        "name": "StatMuse",
+        "browserUrl": "https://www.statmuse.com/nfl/team/2026-cleveland-browns-58/2026",
+        "category": "news"
+      },
+      {
+        "id": "nfl-cle-pro-football-rumors",
+        "name": "Pro Football Rumors",
+        "browserUrl": "https://www.profootballrumors.com/cleveland-browns-news-rumors",
+        "category": "news"
+      },
+      {
+        "id": "nfl-cle-newsnow",
+        "name": "NewsNow",
+        "browserUrl": "https://www.newsnow.com/us/Sports/NFL/AFC+North/Cleveland+Browns",
+        "category": "news"
+      },
+      {
+        "id": "nfl-cle-sportspyder",
+        "name": "SportSpyder",
+        "browserUrl": "https://sportspyder.com/nfl/cleveland-browns/news",
+        "category": "news"
+      },
+      {
+        "id": "nfl-cle-r-browns",
+        "name": "r/Browns",
+        "browserUrl": "https://www.reddit.com/r/Browns/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-cle-browns",
+        "name": "@Browns",
+        "browserUrl": "https://x.com/Browns",
+        "category": "news"
+      },
+      {
+        "id": "nfl-cle-browns-2",
+        "name": "#Browns",
+        "browserUrl": "https://x.com/search?q=Browns&src=typed_query",
+        "category": "news"
+      },
       {
         "id": "nfl-cle-cleveland-browns",
         "name": "Cleveland Browns",
@@ -101430,21 +104084,9 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
         "category": "news"
       },
       {
-        "id": "nfl-cle-nfl",
-        "name": "NFL",
-        "browserUrl": "https://www.nfl.com/teams/cleveland-browns/",
-        "category": "news"
-      },
-      {
         "id": "nfl-cle-fansided",
         "name": "FanSided",
         "browserUrl": "https://fansided.com/nfl/cleveland-browns",
-        "category": "news"
-      },
-      {
-        "id": "nfl-cle-espn",
-        "name": "ESPN",
-        "browserUrl": "https://www.espn.com/nfl/team/_/name/cle/cleveland-browns",
         "category": "news"
       },
       {
@@ -101457,24 +104099,6 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
         "id": "nfl-cle-browns-wire",
         "name": "Browns Wire",
         "browserUrl": "https://brownswire.usatoday.com",
-        "category": "news"
-      },
-      {
-        "id": "nfl-cle-nbc-sports",
-        "name": "NBC Sports",
-        "browserUrl": "https://www.nbcsports.com/nfl/cleveland-browns",
-        "category": "news"
-      },
-      {
-        "id": "nfl-cle-cbs-sports",
-        "name": "CBS Sports",
-        "browserUrl": "https://www.cbssports.com/nfl/teams/CLE/cleveland-browns/",
-        "category": "news"
-      },
-      {
-        "id": "nfl-cle-sports-illustrated",
-        "name": "Sports Illustrated",
-        "browserUrl": "https://www.si.com/nfl/browns",
         "category": "news"
       },
       {
@@ -101496,43 +104120,125 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
         "category": "news"
       }
     ],
-    "CAR": [
-      {
-        "id": "nfl-car-sportspyder",
-        "name": "SportSpyder",
-        "browserUrl": "https://sportspyder.com/nfl/carolina-panthers/news",
-        "category": "news"
-      },
-      {
-        "id": "nfl-car-cbs-sports",
-        "name": "CBS Sports",
-        "browserUrl": "https://www.cbssports.com/nfl/teams/CAR/carolina-panthers/",
-        "category": "news"
-      },
-      {
-        "id": "nfl-car-fox-sports",
-        "name": "FOX Sports",
-        "browserUrl": "https://www.foxsports.com/nfl/carolina-panthers-team",
-        "category": "news"
-      },
-      {
-        "id": "nfl-car-sports-illustrated",
-        "name": "Sports Illustrated",
-        "browserUrl": "https://www.si.com/nfl/panthers",
-        "category": "news"
-      },
-      {
-        "id": "nfl-car-black-and-teal",
-        "name": "Black and Teal",
-        "browserUrl": "https://blackandteal.com",
-        "category": "news"
-      }
-    ],
     "DAL": [
+      {
+        "id": "nfl-dal-nfl-com",
+        "name": "NFL.com",
+        "browserUrl": "https://www.nfl.com/teams/dallas-cowboys/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-dal-espn",
+        "name": "ESPN",
+        "browserUrl": "https://www.espn.com/nfl/team/_/name/dal/dallas-cowboys",
+        "category": "news"
+      },
       {
         "id": "nfl-dal-cbs-sports",
         "name": "CBS Sports",
         "browserUrl": "https://www.cbssports.com/nfl/teams/DAL/dallas-cowboys/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-dal-fox-sports",
+        "name": "FOX Sports",
+        "browserUrl": "https://www.foxsports.com/nfl/dallas-cowboys-team",
+        "category": "news"
+      },
+      {
+        "id": "nfl-dal-yahoo-sports",
+        "name": "Yahoo! Sports",
+        "browserUrl": "https://sports.yahoo.com/nfl/teams/dallas/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-dal-the-athletic",
+        "name": "The Athletic",
+        "browserUrl": "https://www.nytimes.com/athletic/nfl/team/cowboys/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-dal-b-r",
+        "name": "B/R",
+        "browserUrl": "https://bleacherreport.com/dallas-cowboys",
+        "category": "news"
+      },
+      {
+        "id": "nfl-dal-nbc-sports",
+        "name": "NBC Sports",
+        "browserUrl": "https://www.nbcsports.com/nfl/dallas-cowboys",
+        "category": "news"
+      },
+      {
+        "id": "nfl-dal-si",
+        "name": "SI",
+        "browserUrl": "https://www.si.com/nfl/cowboys",
+        "category": "news"
+      },
+      {
+        "id": "nfl-dal-usa-today",
+        "name": "USA Today",
+        "browserUrl": "https://www.usatoday.com/sports/nfl/dallas-cowboys",
+        "category": "news"
+      },
+      {
+        "id": "nfl-dal-athlon-sports",
+        "name": "Athlon Sports",
+        "browserUrl": "https://athlonsports.com/nfl/dallas-cowboys",
+        "category": "news"
+      },
+      {
+        "id": "nfl-dal-yardbarker",
+        "name": "Yardbarker",
+        "browserUrl": "https://www.yardbarker.com/nfl/teams/dallas_cowboys/51",
+        "category": "news"
+      },
+      {
+        "id": "nfl-dal-spotrac",
+        "name": "Spotrac",
+        "browserUrl": "https://www.spotrac.com/nfl/dallas-cowboys/overview",
+        "category": "news"
+      },
+      {
+        "id": "nfl-dal-statmuse",
+        "name": "StatMuse",
+        "browserUrl": "https://www.statmuse.com/nfl/team/2026-dallas-cowboys-75/2026",
+        "category": "news"
+      },
+      {
+        "id": "nfl-dal-pro-football-rumors",
+        "name": "Pro Football Rumors",
+        "browserUrl": "https://www.profootballrumors.com/dallas-cowboys-news-rumors",
+        "category": "news"
+      },
+      {
+        "id": "nfl-dal-newsnow",
+        "name": "NewsNow",
+        "browserUrl": "https://www.newsnow.com/us/Sports/NFL/NFC+East/Dallas+Cowboys",
+        "category": "news"
+      },
+      {
+        "id": "nfl-dal-sportspyder",
+        "name": "SportSpyder",
+        "browserUrl": "https://sportspyder.com/nfl/dallas-cowboys/news",
+        "category": "news"
+      },
+      {
+        "id": "nfl-dal-r-cowboys",
+        "name": "r/cowboys",
+        "browserUrl": "https://www.reddit.com/r/cowboys/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-dal-cowboys",
+        "name": "@Cowboys",
+        "browserUrl": "https://x.com/dallascowboys",
+        "category": "news"
+      },
+      {
+        "id": "nfl-dal-cowboys-2",
+        "name": "#Cowboys",
+        "browserUrl": "https://x.com/search?q=Cowboys&src=typed_query",
         "category": "news"
       },
       {
@@ -101544,15 +104250,129 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
     ],
     "DEN": [
       {
-        "id": "nfl-den-marca",
-        "name": "MARCA",
-        "browserUrl": "https://www.marca.com/en/nfl/denver-broncos.html",
+        "id": "nfl-den-nfl-com",
+        "name": "NFL.com",
+        "browserUrl": "https://www.nfl.com/teams/denver-broncos/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-den-espn",
+        "name": "ESPN",
+        "browserUrl": "https://www.espn.com/nfl/team/_/name/den/denver-broncos",
+        "category": "news"
+      },
+      {
+        "id": "nfl-den-cbs-sports",
+        "name": "CBS Sports",
+        "browserUrl": "https://www.cbssports.com/nfl/teams/DEN/denver-broncos/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-den-fox-sports",
+        "name": "FOX Sports",
+        "browserUrl": "https://www.foxsports.com/nfl/denver-broncos-team",
+        "category": "news"
+      },
+      {
+        "id": "nfl-den-yahoo-sports",
+        "name": "Yahoo! Sports",
+        "browserUrl": "https://sports.yahoo.com/nfl/teams/denver/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-den-the-athletic",
+        "name": "The Athletic",
+        "browserUrl": "https://www.nytimes.com/athletic/nfl/team/broncos/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-den-b-r",
+        "name": "B/R",
+        "browserUrl": "https://bleacherreport.com/denver-broncos",
+        "category": "news"
+      },
+      {
+        "id": "nfl-den-nbc-sports",
+        "name": "NBC Sports",
+        "browserUrl": "https://www.nbcsports.com/nfl/denver-broncos",
+        "category": "news"
+      },
+      {
+        "id": "nfl-den-si",
+        "name": "SI",
+        "browserUrl": "https://www.si.com/nfl/broncos",
+        "category": "news"
+      },
+      {
+        "id": "nfl-den-usa-today",
+        "name": "USA Today",
+        "browserUrl": "https://www.usatoday.com/sports/nfl/denver-broncos",
+        "category": "news"
+      },
+      {
+        "id": "nfl-den-athlon-sports",
+        "name": "Athlon Sports",
+        "browserUrl": "https://athlonsports.com/nfl/denver-broncos",
+        "category": "news"
+      },
+      {
+        "id": "nfl-den-yardbarker",
+        "name": "Yardbarker",
+        "browserUrl": "https://www.yardbarker.com/nfl/teams/denver_broncos/35",
+        "category": "news"
+      },
+      {
+        "id": "nfl-den-spotrac",
+        "name": "Spotrac",
+        "browserUrl": "https://www.spotrac.com/nfl/denver-broncos/overview",
+        "category": "news"
+      },
+      {
+        "id": "nfl-den-statmuse",
+        "name": "StatMuse",
+        "browserUrl": "https://www.statmuse.com/nfl/team/2026-denver-broncos-68/2026",
+        "category": "news"
+      },
+      {
+        "id": "nfl-den-pro-football-rumors",
+        "name": "Pro Football Rumors",
+        "browserUrl": "https://www.profootballrumors.com/denver-broncos-news-rumors",
+        "category": "news"
+      },
+      {
+        "id": "nfl-den-newsnow",
+        "name": "NewsNow",
+        "browserUrl": "https://www.newsnow.com/us/Sports/NFL/AFC+West/Denver+Broncos",
         "category": "news"
       },
       {
         "id": "nfl-den-sportspyder",
         "name": "SportSpyder",
         "browserUrl": "https://sportspyder.com/nfl/denver-broncos/news",
+        "category": "news"
+      },
+      {
+        "id": "nfl-den-r-denverbroncos",
+        "name": "r/DenverBroncos",
+        "browserUrl": "https://www.reddit.com/r/DenverBroncos/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-den-broncos",
+        "name": "@Broncos",
+        "browserUrl": "https://x.com/Broncos",
+        "category": "news"
+      },
+      {
+        "id": "nfl-den-broncos-2",
+        "name": "#Broncos",
+        "browserUrl": "https://x.com/search?q=Broncos&src=typed_query",
+        "category": "news"
+      },
+      {
+        "id": "nfl-den-marca",
+        "name": "MARCA",
+        "browserUrl": "https://www.marca.com/en/nfl/denver-broncos.html",
         "category": "news"
       },
       {
@@ -101568,33 +104388,9 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
         "category": "news"
       },
       {
-        "id": "nfl-den-nbc-sports",
-        "name": "NBC Sports",
-        "browserUrl": "https://www.nbcsports.com/nfl/denver-broncos",
-        "category": "news"
-      },
-      {
         "id": "nfl-den-the-sports-daily",
         "name": "The Sports Daily",
         "browserUrl": "https://thesportsdaily.org/",
-        "category": "news"
-      },
-      {
-        "id": "nfl-den-nfl",
-        "name": "NFL",
-        "browserUrl": "https://www.nfl.com/teams/denver-broncos/",
-        "category": "news"
-      },
-      {
-        "id": "nfl-den-cbs-sports",
-        "name": "CBS Sports",
-        "browserUrl": "https://www.cbssports.com/nfl/teams/DEN/denver-broncos/",
-        "category": "news"
-      },
-      {
-        "id": "nfl-den-espn",
-        "name": "ESPN",
-        "browserUrl": "https://www.espn.com/nfl/team/_/name/den/denver-broncos",
         "category": "news"
       },
       {
@@ -101616,12 +104412,6 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
         "category": "news"
       },
       {
-        "id": "nfl-den-fox-sports",
-        "name": "FOX Sports",
-        "browserUrl": "https://www.foxsports.com/nfl/denver-broncos-team",
-        "category": "news"
-      },
-      {
         "id": "nfl-den-barstool-sports",
         "name": "Barstool Sports",
         "browserUrl": "https://www.barstoolsports.com/topics/denver-broncos",
@@ -101629,6 +104419,126 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
       }
     ],
     "DET": [
+      {
+        "id": "nfl-det-nfl-com",
+        "name": "NFL.com",
+        "browserUrl": "https://www.nfl.com/teams/detroit-lions/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-det-espn",
+        "name": "ESPN",
+        "browserUrl": "https://www.espn.com/nfl/team/_/name/det/detroit-lions",
+        "category": "news"
+      },
+      {
+        "id": "nfl-det-cbs-sports",
+        "name": "CBS Sports",
+        "browserUrl": "https://www.cbssports.com/nfl/teams/DET/detroit-lions/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-det-fox-sports",
+        "name": "FOX Sports",
+        "browserUrl": "https://www.foxsports.com/nfl/detroit-lions-team",
+        "category": "news"
+      },
+      {
+        "id": "nfl-det-yahoo-sports",
+        "name": "Yahoo! Sports",
+        "browserUrl": "https://sports.yahoo.com/nfl/teams/detroit/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-det-the-athletic",
+        "name": "The Athletic",
+        "browserUrl": "https://www.nytimes.com/athletic/nfl/team/lions/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-det-b-r",
+        "name": "B/R",
+        "browserUrl": "https://bleacherreport.com/detroit-lions",
+        "category": "news"
+      },
+      {
+        "id": "nfl-det-nbc-sports",
+        "name": "NBC Sports",
+        "browserUrl": "https://www.nbcsports.com/nfl/detroit-lions",
+        "category": "news"
+      },
+      {
+        "id": "nfl-det-si",
+        "name": "SI",
+        "browserUrl": "https://www.si.com/nfl/lions",
+        "category": "news"
+      },
+      {
+        "id": "nfl-det-usa-today",
+        "name": "USA Today",
+        "browserUrl": "https://www.usatoday.com/sports/nfl/detroit-lions",
+        "category": "news"
+      },
+      {
+        "id": "nfl-det-athlon-sports",
+        "name": "Athlon Sports",
+        "browserUrl": "https://athlonsports.com/nfl/detroit-lions",
+        "category": "news"
+      },
+      {
+        "id": "nfl-det-yardbarker",
+        "name": "Yardbarker",
+        "browserUrl": "https://www.yardbarker.com/nfl/teams/detroit_lions/52",
+        "category": "news"
+      },
+      {
+        "id": "nfl-det-spotrac",
+        "name": "Spotrac",
+        "browserUrl": "https://www.spotrac.com/nfl/detroit-lions/overview",
+        "category": "news"
+      },
+      {
+        "id": "nfl-det-statmuse",
+        "name": "StatMuse",
+        "browserUrl": "https://www.statmuse.com/nfl/team/2026-detroit-lions-46/2026",
+        "category": "news"
+      },
+      {
+        "id": "nfl-det-pro-football-rumors",
+        "name": "Pro Football Rumors",
+        "browserUrl": "https://www.profootballrumors.com/detroit-lions-news-rumors",
+        "category": "news"
+      },
+      {
+        "id": "nfl-det-newsnow",
+        "name": "NewsNow",
+        "browserUrl": "https://www.newsnow.com/us/Sports/NFL/NFC+North/Detroit+Lions",
+        "category": "news"
+      },
+      {
+        "id": "nfl-det-sportspyder",
+        "name": "SportSpyder",
+        "browserUrl": "https://sportspyder.com/nfl/detroit-lions/news",
+        "category": "news"
+      },
+      {
+        "id": "nfl-det-r-detroitlions",
+        "name": "r/detroitlions",
+        "browserUrl": "https://www.reddit.com/r/detroitlions/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-det-lions",
+        "name": "@Lions",
+        "browserUrl": "https://x.com/Lions",
+        "category": "news"
+      },
+      {
+        "id": "nfl-det-lions-2",
+        "name": "#Lions",
+        "browserUrl": "https://x.com/search?q=Lions&src=typed_query",
+        "category": "news"
+      },
       {
         "id": "nfl-det-sidelion-report",
         "name": "SideLion Report",
@@ -101638,15 +104548,123 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
     ],
     "GB": [
       {
+        "id": "nfl-gb-nfl-com",
+        "name": "NFL.com",
+        "browserUrl": "https://www.nfl.com/teams/green-bay-packers/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-gb-espn",
+        "name": "ESPN",
+        "browserUrl": "https://www.espn.com/nfl/team/_/name/gb/green-bay-packers",
+        "category": "news"
+      },
+      {
         "id": "nfl-gb-cbs-sports",
         "name": "CBS Sports",
         "browserUrl": "https://www.cbssports.com/nfl/teams/GB/green-bay-packers/",
         "category": "news"
       },
       {
-        "id": "nfl-gb-sports-illustrated",
-        "name": "Sports Illustrated",
+        "id": "nfl-gb-fox-sports",
+        "name": "FOX Sports",
+        "browserUrl": "https://www.foxsports.com/nfl/green-bay-packers-team",
+        "category": "news"
+      },
+      {
+        "id": "nfl-gb-yahoo-sports",
+        "name": "Yahoo! Sports",
+        "browserUrl": "https://sports.yahoo.com/nfl/teams/green-bay/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-gb-the-athletic",
+        "name": "The Athletic",
+        "browserUrl": "https://www.nytimes.com/athletic/nfl/team/packers/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-gb-b-r",
+        "name": "B/R",
+        "browserUrl": "https://bleacherreport.com/green-bay-packers",
+        "category": "news"
+      },
+      {
+        "id": "nfl-gb-nbc-sports",
+        "name": "NBC Sports",
+        "browserUrl": "https://www.nbcsports.com/nfl/green-bay-packers",
+        "category": "news"
+      },
+      {
+        "id": "nfl-gb-si",
+        "name": "SI",
         "browserUrl": "https://www.si.com/nfl/packers",
+        "category": "news"
+      },
+      {
+        "id": "nfl-gb-usa-today",
+        "name": "USA Today",
+        "browserUrl": "https://www.usatoday.com/sports/nfl/green-bay-packers",
+        "category": "news"
+      },
+      {
+        "id": "nfl-gb-athlon-sports",
+        "name": "Athlon Sports",
+        "browserUrl": "https://athlonsports.com/nfl/green-bay-packers",
+        "category": "news"
+      },
+      {
+        "id": "nfl-gb-yardbarker",
+        "name": "Yardbarker",
+        "browserUrl": "https://www.yardbarker.com/nfl/teams/green_bay_packers/53",
+        "category": "news"
+      },
+      {
+        "id": "nfl-gb-spotrac",
+        "name": "Spotrac",
+        "browserUrl": "https://www.spotrac.com/nfl/green-bay-packers/overview",
+        "category": "news"
+      },
+      {
+        "id": "nfl-gb-statmuse",
+        "name": "StatMuse",
+        "browserUrl": "https://www.statmuse.com/nfl/team/2026-green-bay-packers-18/2026",
+        "category": "news"
+      },
+      {
+        "id": "nfl-gb-pro-football-rumors",
+        "name": "Pro Football Rumors",
+        "browserUrl": "https://www.profootballrumors.com/green-bay-packers-news-rumors",
+        "category": "news"
+      },
+      {
+        "id": "nfl-gb-newsnow",
+        "name": "NewsNow",
+        "browserUrl": "https://www.newsnow.com/us/Sports/NFL/NFC+North/Green+Bay+Packers",
+        "category": "news"
+      },
+      {
+        "id": "nfl-gb-sportspyder",
+        "name": "SportSpyder",
+        "browserUrl": "https://sportspyder.com/nfl/green-bay-packers/news",
+        "category": "news"
+      },
+      {
+        "id": "nfl-gb-r-greenbaypackers",
+        "name": "r/GreenBayPackers",
+        "browserUrl": "https://www.reddit.com/r/GreenBayPackers/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-gb-packers",
+        "name": "@Packers",
+        "browserUrl": "https://x.com/packers",
+        "category": "news"
+      },
+      {
+        "id": "nfl-gb-packers-2",
+        "name": "#Packers",
+        "browserUrl": "https://x.com/search?q=Packers&src=typed_query",
         "category": "news"
       },
       {
@@ -101658,9 +104676,123 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
     ],
     "HOU": [
       {
+        "id": "nfl-hou-nfl-com",
+        "name": "NFL.com",
+        "browserUrl": "https://www.nfl.com/teams/houston-texans/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-hou-espn",
+        "name": "ESPN",
+        "browserUrl": "https://www.espn.com/nfl/team/_/name/hou/houston-texans",
+        "category": "news"
+      },
+      {
+        "id": "nfl-hou-cbs-sports",
+        "name": "CBS Sports",
+        "browserUrl": "https://www.cbssports.com/nfl/teams/HOU/houston-texans/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-hou-fox-sports",
+        "name": "FOX Sports",
+        "browserUrl": "https://www.foxsports.com/nfl/houston-texans-team",
+        "category": "news"
+      },
+      {
+        "id": "nfl-hou-yahoo-sports",
+        "name": "Yahoo! Sports",
+        "browserUrl": "https://sports.yahoo.com/nfl/teams/houston/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-hou-the-athletic",
+        "name": "The Athletic",
+        "browserUrl": "https://www.nytimes.com/athletic/nfl/team/texans/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-hou-b-r",
+        "name": "B/R",
+        "browserUrl": "https://bleacherreport.com/houston-texans",
+        "category": "news"
+      },
+      {
+        "id": "nfl-hou-nbc-sports",
+        "name": "NBC Sports",
+        "browserUrl": "https://www.nbcsports.com/nfl/houston-texans",
+        "category": "news"
+      },
+      {
+        "id": "nfl-hou-si",
+        "name": "SI",
+        "browserUrl": "https://www.si.com/nfl/texans",
+        "category": "news"
+      },
+      {
+        "id": "nfl-hou-usa-today",
+        "name": "USA Today",
+        "browserUrl": "https://www.usatoday.com/sports/nfl/houston-texans",
+        "category": "news"
+      },
+      {
+        "id": "nfl-hou-athlon-sports",
+        "name": "Athlon Sports",
+        "browserUrl": "https://athlonsports.com/nfl/houston-texans",
+        "category": "news"
+      },
+      {
+        "id": "nfl-hou-yardbarker",
+        "name": "Yardbarker",
+        "browserUrl": "https://www.yardbarker.com/nfl/teams/houston_texans/36",
+        "category": "news"
+      },
+      {
+        "id": "nfl-hou-spotrac",
+        "name": "Spotrac",
+        "browserUrl": "https://www.spotrac.com/nfl/houston-texans/overview",
+        "category": "news"
+      },
+      {
+        "id": "nfl-hou-statmuse",
+        "name": "StatMuse",
+        "browserUrl": "https://www.statmuse.com/nfl/team/2026-houston-texans-86/2026",
+        "category": "news"
+      },
+      {
+        "id": "nfl-hou-pro-football-rumors",
+        "name": "Pro Football Rumors",
+        "browserUrl": "https://www.profootballrumors.com/houston-texans-news-rumors",
+        "category": "news"
+      },
+      {
+        "id": "nfl-hou-newsnow",
+        "name": "NewsNow",
+        "browserUrl": "https://www.newsnow.com/us/Sports/NFL/AFC+South/Houston+Texans",
+        "category": "news"
+      },
+      {
         "id": "nfl-hou-sportspyder",
         "name": "SportSpyder",
         "browserUrl": "https://sportspyder.com/nfl/houston-texans/news",
+        "category": "news"
+      },
+      {
+        "id": "nfl-hou-r-texans",
+        "name": "r/texans",
+        "browserUrl": "https://www.reddit.com/r/texans/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-hou-texans",
+        "name": "@Texans",
+        "browserUrl": "https://x.com/HoustonTexans",
+        "category": "news"
+      },
+      {
+        "id": "nfl-hou-texans-2",
+        "name": "#Texans",
+        "browserUrl": "https://x.com/search?q=Texans&src=typed_query",
         "category": "news"
       },
       {
@@ -101674,25 +104806,19 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
         "name": "247Sports",
         "browserUrl": "https://247sports.com/nfl/houston-texans/",
         "category": "news"
-      },
-      {
-        "id": "nfl-hou-si-com",
-        "name": "SI.com",
-        "browserUrl": "https://www.si.com/nfl/texans",
-        "category": "news"
       }
     ],
     "IND": [
       {
-        "id": "nfl-ind-sportspyder",
-        "name": "SportSpyder",
-        "browserUrl": "https://sportspyder.com/nfl/indianapolis-colts/news",
+        "id": "nfl-ind-nfl-com",
+        "name": "NFL.com",
+        "browserUrl": "https://www.nfl.com/teams/indianapolis-colts/",
         "category": "news"
       },
       {
-        "id": "nfl-ind-indianapolis-colts",
-        "name": "Indianapolis Colts",
-        "browserUrl": "https://www.colts.com/news",
+        "id": "nfl-ind-espn",
+        "name": "ESPN",
+        "browserUrl": "https://www.espn.com/nfl/team/_/name/ind/indianapolis-colts",
         "category": "news"
       },
       {
@@ -101702,21 +104828,357 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
         "category": "news"
       },
       {
-        "id": "nfl-ind-sports-illustrated",
-        "name": "Sports Illustrated",
+        "id": "nfl-ind-fox-sports",
+        "name": "FOX Sports",
+        "browserUrl": "https://www.foxsports.com/nfl/indianapolis-colts-team",
+        "category": "news"
+      },
+      {
+        "id": "nfl-ind-yahoo-sports",
+        "name": "Yahoo! Sports",
+        "browserUrl": "https://sports.yahoo.com/nfl/teams/indianapolis/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-ind-the-athletic",
+        "name": "The Athletic",
+        "browserUrl": "https://www.nytimes.com/athletic/nfl/team/colts/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-ind-b-r",
+        "name": "B/R",
+        "browserUrl": "https://bleacherreport.com/indianapolis-colts",
+        "category": "news"
+      },
+      {
+        "id": "nfl-ind-nbc-sports",
+        "name": "NBC Sports",
+        "browserUrl": "https://www.nbcsports.com/nfl/indianapolis-colts",
+        "category": "news"
+      },
+      {
+        "id": "nfl-ind-si",
+        "name": "SI",
         "browserUrl": "https://www.si.com/nfl/colts",
+        "category": "news"
+      },
+      {
+        "id": "nfl-ind-usa-today",
+        "name": "USA Today",
+        "browserUrl": "https://www.usatoday.com/sports/nfl/indianapolis-colts",
+        "category": "news"
+      },
+      {
+        "id": "nfl-ind-athlon-sports",
+        "name": "Athlon Sports",
+        "browserUrl": "https://athlonsports.com/nfl/indianapolis-colts",
+        "category": "news"
+      },
+      {
+        "id": "nfl-ind-yardbarker",
+        "name": "Yardbarker",
+        "browserUrl": "https://www.yardbarker.com/nfl/teams/indianapolis_colts/37",
+        "category": "news"
+      },
+      {
+        "id": "nfl-ind-spotrac",
+        "name": "Spotrac",
+        "browserUrl": "https://www.spotrac.com/nfl/indianapolis-colts/overview",
+        "category": "news"
+      },
+      {
+        "id": "nfl-ind-statmuse",
+        "name": "StatMuse",
+        "browserUrl": "https://www.statmuse.com/nfl/team/2026-indianapolis-colts-66/2026",
+        "category": "news"
+      },
+      {
+        "id": "nfl-ind-pro-football-rumors",
+        "name": "Pro Football Rumors",
+        "browserUrl": "https://www.profootballrumors.com/indianapolis-colts-news-rumors",
+        "category": "news"
+      },
+      {
+        "id": "nfl-ind-newsnow",
+        "name": "NewsNow",
+        "browserUrl": "https://www.newsnow.com/us/Sports/NFL/AFC+South/Indianapolis+Colts",
+        "category": "news"
+      },
+      {
+        "id": "nfl-ind-sportspyder",
+        "name": "SportSpyder",
+        "browserUrl": "https://sportspyder.com/nfl/indianapolis-colts/news",
+        "category": "news"
+      },
+      {
+        "id": "nfl-ind-r-colts",
+        "name": "r/Colts",
+        "browserUrl": "https://www.reddit.com/r/Colts/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-ind-colts",
+        "name": "@Colts",
+        "browserUrl": "https://x.com/Colts",
+        "category": "news"
+      },
+      {
+        "id": "nfl-ind-colts-2",
+        "name": "#Colts",
+        "browserUrl": "https://x.com/search?q=Colts&src=typed_query",
+        "category": "news"
+      },
+      {
+        "id": "nfl-ind-indianapolis-colts",
+        "name": "Indianapolis Colts",
+        "browserUrl": "https://www.colts.com/news",
         "category": "news"
       }
     ],
     "JAX": [
       {
+        "id": "nfl-jax-nfl-com",
+        "name": "NFL.com",
+        "browserUrl": "https://www.nfl.com/teams/jacksonville-jaguars/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-jax-espn",
+        "name": "ESPN",
+        "browserUrl": "https://www.espn.com/nfl/team/_/name/jax/jacksonville-jaguars",
+        "category": "news"
+      },
+      {
+        "id": "nfl-jax-cbs-sports",
+        "name": "CBS Sports",
+        "browserUrl": "https://www.cbssports.com/nfl/teams/JAX/jacksonville-jaguars/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-jax-fox-sports",
+        "name": "FOX Sports",
+        "browserUrl": "https://www.foxsports.com/nfl/jacksonville-jaguars-team",
+        "category": "news"
+      },
+      {
+        "id": "nfl-jax-yahoo-sports",
+        "name": "Yahoo! Sports",
+        "browserUrl": "https://sports.yahoo.com/nfl/teams/jacksonville/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-jax-the-athletic",
+        "name": "The Athletic",
+        "browserUrl": "https://www.nytimes.com/athletic/nfl/team/jaguars/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-jax-b-r",
+        "name": "B/R",
+        "browserUrl": "https://bleacherreport.com/jacksonville-jaguars",
+        "category": "news"
+      },
+      {
+        "id": "nfl-jax-nbc-sports",
+        "name": "NBC Sports",
+        "browserUrl": "https://www.nbcsports.com/nfl/jacksonville-jaguars",
+        "category": "news"
+      },
+      {
+        "id": "nfl-jax-si",
+        "name": "SI",
+        "browserUrl": "https://www.si.com/nfl/jaguars",
+        "category": "news"
+      },
+      {
+        "id": "nfl-jax-usa-today",
+        "name": "USA Today",
+        "browserUrl": "https://www.usatoday.com/sports/nfl/jacksonville-jaguars",
+        "category": "news"
+      },
+      {
+        "id": "nfl-jax-athlon-sports",
+        "name": "Athlon Sports",
+        "browserUrl": "https://athlonsports.com/nfl/jacksonville-jaguars",
+        "category": "news"
+      },
+      {
+        "id": "nfl-jax-yardbarker",
+        "name": "Yardbarker",
+        "browserUrl": "https://www.yardbarker.com/nfl/teams/jacksonville_jaguars/38",
+        "category": "news"
+      },
+      {
+        "id": "nfl-jax-spotrac",
+        "name": "Spotrac",
+        "browserUrl": "https://www.spotrac.com/nfl/jacksonville-jaguars/overview",
+        "category": "news"
+      },
+      {
+        "id": "nfl-jax-statmuse",
+        "name": "StatMuse",
+        "browserUrl": "https://www.statmuse.com/nfl/team/2026-jacksonville-jaguars-84/2026",
+        "category": "news"
+      },
+      {
+        "id": "nfl-jax-pro-football-rumors",
+        "name": "Pro Football Rumors",
+        "browserUrl": "https://www.profootballrumors.com/jacksonville-jaguars-news-rumors",
+        "category": "news"
+      },
+      {
+        "id": "nfl-jax-newsnow",
+        "name": "NewsNow",
+        "browserUrl": "https://www.newsnow.com/us/Sports/NFL/AFC+South/Jacksonville+Jaguars",
+        "category": "news"
+      },
+      {
         "id": "nfl-jax-sportspyder",
         "name": "SportSpyder",
         "browserUrl": "https://sportspyder.com/nfl/jacksonville-jaguars/news",
         "category": "news"
+      },
+      {
+        "id": "nfl-jax-r-jaguars",
+        "name": "r/Jaguars",
+        "browserUrl": "https://www.reddit.com/r/Jaguars/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-jax-jaguars",
+        "name": "@Jaguars",
+        "browserUrl": "https://x.com/Jaguars",
+        "category": "news"
+      },
+      {
+        "id": "nfl-jax-jaguars-2",
+        "name": "#Jaguars",
+        "browserUrl": "https://x.com/search?q=Jaguars&src=typed_query",
+        "category": "news"
       }
     ],
     "KC": [
+      {
+        "id": "nfl-kc-nfl-com",
+        "name": "NFL.com",
+        "browserUrl": "https://www.nfl.com/teams/kansas-city-chiefs/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-kc-espn",
+        "name": "ESPN",
+        "browserUrl": "https://www.espn.com/nfl/team/_/name/kc/kansas-city-chiefs",
+        "category": "news"
+      },
+      {
+        "id": "nfl-kc-cbs-sports",
+        "name": "CBS Sports",
+        "browserUrl": "https://www.cbssports.com/nfl/teams/KC/kansas-city-chiefs/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-kc-fox-sports",
+        "name": "FOX Sports",
+        "browserUrl": "https://www.foxsports.com/nfl/kansas-city-chiefs-team",
+        "category": "news"
+      },
+      {
+        "id": "nfl-kc-yahoo-sports",
+        "name": "Yahoo! Sports",
+        "browserUrl": "https://sports.yahoo.com/nfl/teams/kansas-city/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-kc-the-athletic",
+        "name": "The Athletic",
+        "browserUrl": "https://www.nytimes.com/athletic/nfl/team/chiefs/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-kc-b-r",
+        "name": "B/R",
+        "browserUrl": "https://bleacherreport.com/kansas-city-chiefs",
+        "category": "news"
+      },
+      {
+        "id": "nfl-kc-nbc-sports",
+        "name": "NBC Sports",
+        "browserUrl": "https://www.nbcsports.com/nfl/kansas-city-chiefs",
+        "category": "news"
+      },
+      {
+        "id": "nfl-kc-si",
+        "name": "SI",
+        "browserUrl": "https://www.si.com/nfl/chiefs",
+        "category": "news"
+      },
+      {
+        "id": "nfl-kc-usa-today",
+        "name": "USA Today",
+        "browserUrl": "https://www.usatoday.com/sports/nfl/kansas-city-chiefs",
+        "category": "news"
+      },
+      {
+        "id": "nfl-kc-athlon-sports",
+        "name": "Athlon Sports",
+        "browserUrl": "https://athlonsports.com/nfl/kansas-city-chiefs",
+        "category": "news"
+      },
+      {
+        "id": "nfl-kc-yardbarker",
+        "name": "Yardbarker",
+        "browserUrl": "https://www.yardbarker.com/nfl/teams/kansas_city_chiefs/39",
+        "category": "news"
+      },
+      {
+        "id": "nfl-kc-spotrac",
+        "name": "Spotrac",
+        "browserUrl": "https://www.spotrac.com/nfl/kansas-city-chiefs/overview",
+        "category": "news"
+      },
+      {
+        "id": "nfl-kc-statmuse",
+        "name": "StatMuse",
+        "browserUrl": "https://www.statmuse.com/nfl/team/2026-kansas-city-chiefs-69/2026",
+        "category": "news"
+      },
+      {
+        "id": "nfl-kc-pro-football-rumors",
+        "name": "Pro Football Rumors",
+        "browserUrl": "https://www.profootballrumors.com/kansas-city-chiefs-news-rumors",
+        "category": "news"
+      },
+      {
+        "id": "nfl-kc-newsnow",
+        "name": "NewsNow",
+        "browserUrl": "https://www.newsnow.com/us/Sports/NFL/AFC+West/Kansas+City+Chiefs",
+        "category": "news"
+      },
+      {
+        "id": "nfl-kc-sportspyder",
+        "name": "SportSpyder",
+        "browserUrl": "https://sportspyder.com/nfl/kansas-city-chiefs/news",
+        "category": "news"
+      },
+      {
+        "id": "nfl-kc-r-kansascitychiefs",
+        "name": "r/KansasCityChiefs",
+        "browserUrl": "https://www.reddit.com/r/KansasCityChiefs/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-kc-chiefs",
+        "name": "@Chiefs",
+        "browserUrl": "https://x.com/Chiefs",
+        "category": "news"
+      },
+      {
+        "id": "nfl-kc-chiefs-2",
+        "name": "#Chiefs",
+        "browserUrl": "https://x.com/search?q=Chiefs&src=typed_query",
+        "category": "news"
+      },
       {
         "id": "nfl-kc-marca",
         "name": "MARCA",
@@ -101739,12 +105201,6 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
         "id": "nfl-kc-chiefs-wire",
         "name": "Chiefs Wire",
         "browserUrl": "https://chiefswire.usatoday.com",
-        "category": "news"
-      },
-      {
-        "id": "nfl-kc-sports-illustrated",
-        "name": "Sports Illustrated",
-        "browserUrl": "https://www.si.com/nfl/chiefs",
         "category": "news"
       },
       {
@@ -101772,7 +105228,273 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
         "category": "news"
       }
     ],
+    "LV": [
+      {
+        "id": "nfl-lv-nfl-com",
+        "name": "NFL.com",
+        "browserUrl": "https://www.nfl.com/teams/las-vegas-raiders/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-lv-espn",
+        "name": "ESPN",
+        "browserUrl": "https://www.espn.com/nfl/team/_/name/lv/las-vegas-raiders",
+        "category": "news"
+      },
+      {
+        "id": "nfl-lv-cbs-sports",
+        "name": "CBS Sports",
+        "browserUrl": "https://www.cbssports.com/nfl/teams/LV/las-vegas-raiders/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-lv-fox-sports",
+        "name": "FOX Sports",
+        "browserUrl": "https://www.foxsports.com/nfl/las-vegas-raiders-team",
+        "category": "news"
+      },
+      {
+        "id": "nfl-lv-yahoo-sports",
+        "name": "Yahoo! Sports",
+        "browserUrl": "https://sports.yahoo.com/nfl/teams/las-vegas/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-lv-the-athletic",
+        "name": "The Athletic",
+        "browserUrl": "https://www.nytimes.com/athletic/nfl/team/raiders/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-lv-b-r",
+        "name": "B/R",
+        "browserUrl": "https://bleacherreport.com/las-vegas-raiders",
+        "category": "news"
+      },
+      {
+        "id": "nfl-lv-nbc-sports",
+        "name": "NBC Sports",
+        "browserUrl": "https://www.nbcsports.com/nfl/las-vegas-raiders",
+        "category": "news"
+      },
+      {
+        "id": "nfl-lv-si",
+        "name": "SI",
+        "browserUrl": "https://www.si.com/nfl/raiders",
+        "category": "news"
+      },
+      {
+        "id": "nfl-lv-usa-today",
+        "name": "USA Today",
+        "browserUrl": "https://www.usatoday.com/sports/nfl/las-vegas-raiders",
+        "category": "news"
+      },
+      {
+        "id": "nfl-lv-athlon-sports",
+        "name": "Athlon Sports",
+        "browserUrl": "https://athlonsports.com/nfl/las-vegas-raiders",
+        "category": "news"
+      },
+      {
+        "id": "nfl-lv-yardbarker",
+        "name": "Yardbarker",
+        "browserUrl": "https://www.yardbarker.com/nfl/teams/las_vegas_raiders/43",
+        "category": "news"
+      },
+      {
+        "id": "nfl-lv-spotrac",
+        "name": "Spotrac",
+        "browserUrl": "https://www.spotrac.com/nfl/las-vegas-raiders/overview",
+        "category": "news"
+      },
+      {
+        "id": "nfl-lv-statmuse",
+        "name": "StatMuse",
+        "browserUrl": "https://www.statmuse.com/nfl/team/2026-las-vegas-raiders-73/2026",
+        "category": "news"
+      },
+      {
+        "id": "nfl-lv-pro-football-rumors",
+        "name": "Pro Football Rumors",
+        "browserUrl": "https://www.profootballrumors.com/las-vegas-raiders-news-rumors",
+        "category": "news"
+      },
+      {
+        "id": "nfl-lv-newsnow",
+        "name": "NewsNow",
+        "browserUrl": "https://www.newsnow.com/us/Sports/NFL/AFC+West/Las+Vegas+Raiders",
+        "category": "news"
+      },
+      {
+        "id": "nfl-lv-sportspyder",
+        "name": "SportSpyder",
+        "browserUrl": "https://sportspyder.com/nfl/las-vegas-raiders/news",
+        "category": "news"
+      },
+      {
+        "id": "nfl-lv-r-raiders",
+        "name": "r/raiders",
+        "browserUrl": "https://www.reddit.com/r/raiders/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-lv-raiders",
+        "name": "@Raiders",
+        "browserUrl": "https://x.com/Raiders",
+        "category": "news"
+      },
+      {
+        "id": "nfl-lv-raiders-2",
+        "name": "#Raiders",
+        "browserUrl": "https://x.com/search?q=Raiders&src=typed_query",
+        "category": "news"
+      },
+      {
+        "id": "nfl-lv-pro-football-rumors-2",
+        "name": "Pro Football Rumors",
+        "browserUrl": "https://www.profootballrumors.com/2016/05/las-vegas-raiders-kawann-short",
+        "category": "news"
+      },
+      {
+        "id": "nfl-lv-fansided",
+        "name": "FanSided",
+        "browserUrl": "https://fansided.com/nfl/las-vegas-raiders",
+        "category": "news"
+      },
+      {
+        "id": "nfl-lv-raiders-beat",
+        "name": "Raiders Beat",
+        "browserUrl": "https://www.raidersbeat.com/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-lv-pro-football-network",
+        "name": "Pro Football Network",
+        "browserUrl": "https://www.profootballnetwork.com/las-vegas-raiders-offseason-preview-pending-free-agents-team-needs-draft-picks-2022/",
+        "category": "news"
+      }
+    ],
     "LAC": [
+      {
+        "id": "nfl-lac-nfl-com",
+        "name": "NFL.com",
+        "browserUrl": "https://www.nfl.com/teams/los-angeles-chargers/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-lac-espn",
+        "name": "ESPN",
+        "browserUrl": "https://www.espn.com/nfl/team/_/name/lac/los-angeles-chargers",
+        "category": "news"
+      },
+      {
+        "id": "nfl-lac-cbs-sports",
+        "name": "CBS Sports",
+        "browserUrl": "https://www.cbssports.com/nfl/teams/LAC/los-angeles-chargers/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-lac-fox-sports",
+        "name": "FOX Sports",
+        "browserUrl": "https://www.foxsports.com/nfl/los-angeles-chargers-team",
+        "category": "news"
+      },
+      {
+        "id": "nfl-lac-yahoo-sports",
+        "name": "Yahoo! Sports",
+        "browserUrl": "https://sports.yahoo.com/nfl/teams/la-chargers/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-lac-the-athletic",
+        "name": "The Athletic",
+        "browserUrl": "https://www.nytimes.com/athletic/nfl/team/chargers/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-lac-b-r",
+        "name": "B/R",
+        "browserUrl": "https://bleacherreport.com/los-angeles-chargers",
+        "category": "news"
+      },
+      {
+        "id": "nfl-lac-nbc-sports",
+        "name": "NBC Sports",
+        "browserUrl": "https://www.nbcsports.com/nfl/los-angeles-chargers",
+        "category": "news"
+      },
+      {
+        "id": "nfl-lac-si",
+        "name": "SI",
+        "browserUrl": "https://www.si.com/nfl/chargers",
+        "category": "news"
+      },
+      {
+        "id": "nfl-lac-usa-today",
+        "name": "USA Today",
+        "browserUrl": "https://www.usatoday.com/sports/nfl/los-angeles-chargers",
+        "category": "news"
+      },
+      {
+        "id": "nfl-lac-athlon-sports",
+        "name": "Athlon Sports",
+        "browserUrl": "https://athlonsports.com/nfl/los-angeles-chargers",
+        "category": "news"
+      },
+      {
+        "id": "nfl-lac-yardbarker",
+        "name": "Yardbarker",
+        "browserUrl": "https://www.yardbarker.com/nfl/teams/los_angeles_chargers/45",
+        "category": "news"
+      },
+      {
+        "id": "nfl-lac-spotrac",
+        "name": "Spotrac",
+        "browserUrl": "https://www.spotrac.com/nfl/los-angeles-chargers/overview",
+        "category": "news"
+      },
+      {
+        "id": "nfl-lac-statmuse",
+        "name": "StatMuse",
+        "browserUrl": "https://www.statmuse.com/nfl/team/2026-los-angeles-chargers-74/2026",
+        "category": "news"
+      },
+      {
+        "id": "nfl-lac-pro-football-rumors",
+        "name": "Pro Football Rumors",
+        "browserUrl": "https://www.profootballrumors.com/los-angeles-chargers-news-rumors",
+        "category": "news"
+      },
+      {
+        "id": "nfl-lac-newsnow",
+        "name": "NewsNow",
+        "browserUrl": "https://www.newsnow.com/us/Sports/NFL/AFC+West/Los+Angeles+Chargers",
+        "category": "news"
+      },
+      {
+        "id": "nfl-lac-sportspyder",
+        "name": "SportSpyder",
+        "browserUrl": "https://sportspyder.com/nfl/los-angeles-chargers/news",
+        "category": "news"
+      },
+      {
+        "id": "nfl-lac-r-chargers",
+        "name": "r/Chargers",
+        "browserUrl": "https://www.reddit.com/r/Chargers/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-lac-chargers",
+        "name": "@Chargers",
+        "browserUrl": "https://x.com/chargers",
+        "category": "news"
+      },
+      {
+        "id": "nfl-lac-chargers-2",
+        "name": "#Chargers",
+        "browserUrl": "https://x.com/search?q=Chargers&src=typed_query",
+        "category": "news"
+      },
       {
         "id": "nfl-lac-chargers-com",
         "name": "Chargers.com",
@@ -101783,42 +105505,6 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
         "id": "nfl-lac-chargers-wire",
         "name": "Chargers Wire",
         "browserUrl": "https://chargerswire.usatoday.com",
-        "category": "news"
-      },
-      {
-        "id": "nfl-lac-the-athletic",
-        "name": "The Athletic",
-        "browserUrl": "https://www.nytimes.com/athletic/nfl/team/chargers/",
-        "category": "news"
-      },
-      {
-        "id": "nfl-lac-sportspyder",
-        "name": "SportSpyder",
-        "browserUrl": "https://sportspyder.com/nfl/los-angeles-chargers/news",
-        "category": "news"
-      },
-      {
-        "id": "nfl-lac-cbs-sports",
-        "name": "CBS Sports",
-        "browserUrl": "https://www.cbssports.com/nfl/teams/LAC/los-angeles-chargers/",
-        "category": "news"
-      },
-      {
-        "id": "nfl-lac-espn",
-        "name": "ESPN",
-        "browserUrl": "https://www.espn.com/nfl/team/_/name/lac/los-angeles-chargers",
-        "category": "news"
-      },
-      {
-        "id": "nfl-lac-fox-sports",
-        "name": "FOX Sports",
-        "browserUrl": "https://www.foxsports.com/nfl/los-angeles-chargers-team",
-        "category": "news"
-      },
-      {
-        "id": "nfl-lac-sports-illustrated",
-        "name": "Sports Illustrated",
-        "browserUrl": "https://www.si.com/nfl/chargers",
         "category": "news"
       },
       {
@@ -101834,12 +105520,6 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
         "category": "news"
       },
       {
-        "id": "nfl-lac-nfl-com",
-        "name": "NFL.com",
-        "browserUrl": "https://www.nfl.com/teams/los-angeles-chargers/",
-        "category": "news"
-      },
-      {
         "id": "nfl-lac-pro-football-network",
         "name": "Pro Football Network",
         "browserUrl": "https://www.profootballnetwork.com",
@@ -101848,27 +105528,9 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
     ],
     "LAR": [
       {
-        "id": "nfl-lar-turfshowtimes",
-        "name": "TurfShowTimes",
-        "browserUrl": "https://www.turfshowtimes.com",
-        "category": "news"
-      },
-      {
-        "id": "nfl-lar-rams-news",
-        "name": "Rams News",
-        "browserUrl": "https://www.therams.com/news",
-        "category": "news"
-      },
-      {
-        "id": "nfl-lar-pro-football-rumors",
-        "name": "Pro Football Rumors",
-        "browserUrl": "https://www.profootballrumors.com/2016/01/los-angeles-rams-chargers-raiders-vote",
-        "category": "news"
-      },
-      {
-        "id": "nfl-lar-sportspyder",
-        "name": "SportSpyder",
-        "browserUrl": "https://sportspyder.com/nfl/los-angeles-rams/news",
+        "id": "nfl-lar-nfl-com",
+        "name": "NFL.com",
+        "browserUrl": "https://www.nfl.com/teams/los-angeles-rams/",
         "category": "news"
       },
       {
@@ -101890,9 +105552,117 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
         "category": "news"
       },
       {
-        "id": "nfl-lar-sports-illustrated",
-        "name": "Sports Illustrated",
+        "id": "nfl-lar-yahoo-sports",
+        "name": "Yahoo! Sports",
+        "browserUrl": "https://sports.yahoo.com/nfl/teams/la-rams/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-lar-the-athletic",
+        "name": "The Athletic",
+        "browserUrl": "https://www.nytimes.com/athletic/nfl/team/rams/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-lar-b-r",
+        "name": "B/R",
+        "browserUrl": "https://bleacherreport.com/los-angeles-rams",
+        "category": "news"
+      },
+      {
+        "id": "nfl-lar-nbc-sports",
+        "name": "NBC Sports",
+        "browserUrl": "https://www.nbcsports.com/nfl/los-angeles-rams",
+        "category": "news"
+      },
+      {
+        "id": "nfl-lar-si",
+        "name": "SI",
         "browserUrl": "https://www.si.com/nfl/rams",
+        "category": "news"
+      },
+      {
+        "id": "nfl-lar-usa-today",
+        "name": "USA Today",
+        "browserUrl": "https://www.usatoday.com/sports/nfl/los-angeles-rams",
+        "category": "news"
+      },
+      {
+        "id": "nfl-lar-athlon-sports",
+        "name": "Athlon Sports",
+        "browserUrl": "https://athlonsports.com/nfl/los-angeles-rams",
+        "category": "news"
+      },
+      {
+        "id": "nfl-lar-yardbarker",
+        "name": "Yardbarker",
+        "browserUrl": "https://www.yardbarker.com/nfl/teams/los_angeles_rams/60",
+        "category": "news"
+      },
+      {
+        "id": "nfl-lar-spotrac",
+        "name": "Spotrac",
+        "browserUrl": "https://www.spotrac.com/nfl/los-angeles-rams/overview",
+        "category": "news"
+      },
+      {
+        "id": "nfl-lar-statmuse",
+        "name": "StatMuse",
+        "browserUrl": "https://www.statmuse.com/nfl/team/2026-los-angeles-rams-53/2026",
+        "category": "news"
+      },
+      {
+        "id": "nfl-lar-pro-football-rumors",
+        "name": "Pro Football Rumors",
+        "browserUrl": "https://www.profootballrumors.com/los-angeles-rams-news-rumors",
+        "category": "news"
+      },
+      {
+        "id": "nfl-lar-newsnow",
+        "name": "NewsNow",
+        "browserUrl": "https://www.newsnow.com/us/Sports/NFL/NFC+West/Los+Angeles+Rams",
+        "category": "news"
+      },
+      {
+        "id": "nfl-lar-sportspyder",
+        "name": "SportSpyder",
+        "browserUrl": "https://sportspyder.com/nfl/los-angeles-rams/news",
+        "category": "news"
+      },
+      {
+        "id": "nfl-lar-r-losangelesrams",
+        "name": "r/LosAngelesRams",
+        "browserUrl": "https://www.reddit.com/r/LosAngelesRams/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-lar-rams",
+        "name": "@Rams",
+        "browserUrl": "https://x.com/RamsNFL",
+        "category": "news"
+      },
+      {
+        "id": "nfl-lar-rams-2",
+        "name": "#Rams",
+        "browserUrl": "https://x.com/search?q=Rams&src=typed_query",
+        "category": "news"
+      },
+      {
+        "id": "nfl-lar-turfshowtimes",
+        "name": "TurfShowTimes",
+        "browserUrl": "https://www.turfshowtimes.com",
+        "category": "news"
+      },
+      {
+        "id": "nfl-lar-rams-news",
+        "name": "Rams News",
+        "browserUrl": "https://www.therams.com/news",
+        "category": "news"
+      },
+      {
+        "id": "nfl-lar-pro-football-rumors-2",
+        "name": "Pro Football Rumors",
+        "browserUrl": "https://www.profootballrumors.com/2016/01/los-angeles-rams-chargers-raiders-vote",
         "category": "news"
       },
       {
@@ -101918,19 +105688,19 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
         "name": "Pro Football Network",
         "browserUrl": "https://www.profootballnetwork.com/los-angeles-rams-offseason-preview-pending-free-agents-team-needs-draft-picks-2022/",
         "category": "news"
-      },
-      {
-        "id": "nfl-lar-nfl-com",
-        "name": "NFL.com",
-        "browserUrl": "https://www.nfl.com/teams/los-angeles-rams/",
-        "category": "news"
       }
     ],
     "MIA": [
       {
-        "id": "nfl-mia-sportspyder",
-        "name": "SportSpyder",
-        "browserUrl": "https://sportspyder.com/nfl/miami-dolphins/news",
+        "id": "nfl-mia-nfl-com",
+        "name": "NFL.com",
+        "browserUrl": "https://www.nfl.com/teams/miami-dolphins/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-mia-espn",
+        "name": "ESPN",
+        "browserUrl": "https://www.espn.com/nfl/team/_/name/mia/miami-dolphins",
         "category": "news"
       },
       {
@@ -101940,21 +105710,111 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
         "category": "news"
       },
       {
-        "id": "nfl-mia-sports-illustrated",
-        "name": "Sports Illustrated",
+        "id": "nfl-mia-fox-sports",
+        "name": "FOX Sports",
+        "browserUrl": "https://www.foxsports.com/nfl/miami-dolphins-team",
+        "category": "news"
+      },
+      {
+        "id": "nfl-mia-yahoo-sports",
+        "name": "Yahoo! Sports",
+        "browserUrl": "https://sports.yahoo.com/nfl/teams/miami/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-mia-the-athletic",
+        "name": "The Athletic",
+        "browserUrl": "https://www.nytimes.com/athletic/nfl/team/dolphins/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-mia-b-r",
+        "name": "B/R",
+        "browserUrl": "https://bleacherreport.com/miami-dolphins",
+        "category": "news"
+      },
+      {
+        "id": "nfl-mia-nbc-sports",
+        "name": "NBC Sports",
+        "browserUrl": "https://www.nbcsports.com/nfl/miami-dolphins",
+        "category": "news"
+      },
+      {
+        "id": "nfl-mia-si",
+        "name": "SI",
         "browserUrl": "https://www.si.com/nfl/dolphins",
+        "category": "news"
+      },
+      {
+        "id": "nfl-mia-usa-today",
+        "name": "USA Today",
+        "browserUrl": "https://www.usatoday.com/sports/nfl/miami-dolphins",
+        "category": "news"
+      },
+      {
+        "id": "nfl-mia-athlon-sports",
+        "name": "Athlon Sports",
+        "browserUrl": "https://athlonsports.com/nfl/miami-dolphins",
+        "category": "news"
+      },
+      {
+        "id": "nfl-mia-yardbarker",
+        "name": "Yardbarker",
+        "browserUrl": "https://www.yardbarker.com/nfl/teams/miami_dolphins/40",
+        "category": "news"
+      },
+      {
+        "id": "nfl-mia-spotrac",
+        "name": "Spotrac",
+        "browserUrl": "https://www.spotrac.com/nfl/miami-dolphins/overview",
+        "category": "news"
+      },
+      {
+        "id": "nfl-mia-statmuse",
+        "name": "StatMuse",
+        "browserUrl": "https://www.statmuse.com/nfl/team/2026-miami-dolphins-77/2026",
+        "category": "news"
+      },
+      {
+        "id": "nfl-mia-pro-football-rumors",
+        "name": "Pro Football Rumors",
+        "browserUrl": "https://www.profootballrumors.com/miami-dolphins-news-rumors",
+        "category": "news"
+      },
+      {
+        "id": "nfl-mia-newsnow",
+        "name": "NewsNow",
+        "browserUrl": "https://www.newsnow.com/us/Sports/NFL/AFC+East/Miami+Dolphins",
+        "category": "news"
+      },
+      {
+        "id": "nfl-mia-sportspyder",
+        "name": "SportSpyder",
+        "browserUrl": "https://sportspyder.com/nfl/miami-dolphins/news",
+        "category": "news"
+      },
+      {
+        "id": "nfl-mia-r-miamidolphins",
+        "name": "r/miamidolphins",
+        "browserUrl": "https://www.reddit.com/r/miamidolphins/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-mia-dolphins",
+        "name": "@Dolphins",
+        "browserUrl": "https://x.com/MiamiDolphins",
+        "category": "news"
+      },
+      {
+        "id": "nfl-mia-dolphins-2",
+        "name": "#Dolphins",
+        "browserUrl": "https://x.com/search?q=Dolphins&src=typed_query",
         "category": "news"
       },
       {
         "id": "nfl-mia-pro-football-network",
         "name": "Pro Football Network",
         "browserUrl": "https://www.profootballnetwork.com/nfl-hq/teams/miami-dolphins",
-        "category": "news"
-      },
-      {
-        "id": "nfl-mia-nfl-com",
-        "name": "NFL.com",
-        "browserUrl": "https://www.nfl.com/teams/miami-dolphins/",
         "category": "news"
       },
       {
@@ -101966,21 +105826,9 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
     ],
     "MIN": [
       {
-        "id": "nfl-min-vikings-com",
-        "name": "Vikings.com",
-        "browserUrl": "https://www.vikings.com/news",
-        "category": "news"
-      },
-      {
-        "id": "nfl-min-the-athletic",
-        "name": "The Athletic",
-        "browserUrl": "https://www.nytimes.com/athletic/nfl/team/vikings/",
-        "category": "news"
-      },
-      {
-        "id": "nfl-min-sportspyder",
-        "name": "SportSpyder",
-        "browserUrl": "https://sportspyder.com/nfl/minnesota-vikings/news",
+        "id": "nfl-min-nfl-com",
+        "name": "NFL.com",
+        "browserUrl": "https://www.nfl.com/teams/minnesota-vikings/",
         "category": "news"
       },
       {
@@ -101996,9 +105844,111 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
         "category": "news"
       },
       {
-        "id": "nfl-min-sports-illustrated",
-        "name": "Sports Illustrated",
+        "id": "nfl-min-fox-sports",
+        "name": "FOX Sports",
+        "browserUrl": "https://www.foxsports.com/nfl/minnesota-vikings-team",
+        "category": "news"
+      },
+      {
+        "id": "nfl-min-yahoo-sports",
+        "name": "Yahoo! Sports",
+        "browserUrl": "https://sports.yahoo.com/nfl/teams/minnesota/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-min-the-athletic",
+        "name": "The Athletic",
+        "browserUrl": "https://www.nytimes.com/athletic/nfl/team/vikings/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-min-b-r",
+        "name": "B/R",
+        "browserUrl": "https://bleacherreport.com/minnesota-vikings",
+        "category": "news"
+      },
+      {
+        "id": "nfl-min-nbc-sports",
+        "name": "NBC Sports",
+        "browserUrl": "https://www.nbcsports.com/nfl/minnesota-vikings",
+        "category": "news"
+      },
+      {
+        "id": "nfl-min-si",
+        "name": "SI",
         "browserUrl": "https://www.si.com/nfl/vikings",
+        "category": "news"
+      },
+      {
+        "id": "nfl-min-usa-today",
+        "name": "USA Today",
+        "browserUrl": "https://www.usatoday.com/sports/nfl/minnesota-vikings",
+        "category": "news"
+      },
+      {
+        "id": "nfl-min-athlon-sports",
+        "name": "Athlon Sports",
+        "browserUrl": "https://athlonsports.com/nfl/minnesota-vikings",
+        "category": "news"
+      },
+      {
+        "id": "nfl-min-yardbarker",
+        "name": "Yardbarker",
+        "browserUrl": "https://www.yardbarker.com/nfl/teams/minnesota_vikings/54",
+        "category": "news"
+      },
+      {
+        "id": "nfl-min-spotrac",
+        "name": "Spotrac",
+        "browserUrl": "https://www.spotrac.com/nfl/minnesota-vikings/overview",
+        "category": "news"
+      },
+      {
+        "id": "nfl-min-statmuse",
+        "name": "StatMuse",
+        "browserUrl": "https://www.statmuse.com/nfl/team/2026-minnesota-vikings-76/2026",
+        "category": "news"
+      },
+      {
+        "id": "nfl-min-pro-football-rumors",
+        "name": "Pro Football Rumors",
+        "browserUrl": "https://www.profootballrumors.com/minnesota-vikings-news-rumors",
+        "category": "news"
+      },
+      {
+        "id": "nfl-min-newsnow",
+        "name": "NewsNow",
+        "browserUrl": "https://www.newsnow.com/us/Sports/NFL/NFC+North/Minnesota+Vikings",
+        "category": "news"
+      },
+      {
+        "id": "nfl-min-sportspyder",
+        "name": "SportSpyder",
+        "browserUrl": "https://sportspyder.com/nfl/minnesota-vikings/news",
+        "category": "news"
+      },
+      {
+        "id": "nfl-min-r-minnesotavikings",
+        "name": "r/minnesotavikings",
+        "browserUrl": "https://www.reddit.com/r/minnesotavikings/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-min-vikings",
+        "name": "@Vikings",
+        "browserUrl": "https://x.com/Vikings",
+        "category": "news"
+      },
+      {
+        "id": "nfl-min-vikings-2",
+        "name": "#Vikings",
+        "browserUrl": "https://x.com/search?q=Vikings&src=typed_query",
+        "category": "news"
+      },
+      {
+        "id": "nfl-min-vikings-com",
+        "name": "Vikings.com",
+        "browserUrl": "https://www.vikings.com/news",
         "category": "news"
       },
       {
@@ -102012,19 +105962,19 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
         "name": "Pro Football Network",
         "browserUrl": "https://www.profootballnetwork.com/minnesota-vikings-offseason-preview-pending-free-agents-team-needs-draft-picks-2022/",
         "category": "news"
-      },
-      {
-        "id": "nfl-min-nfl-com",
-        "name": "NFL.com",
-        "browserUrl": "https://www.nfl.com/teams/minnesota-vikings/",
-        "category": "news"
       }
     ],
     "NE": [
       {
-        "id": "nfl-ne-patriots-com",
-        "name": "Patriots.com",
-        "browserUrl": "https://www.patriots.com/news",
+        "id": "nfl-ne-nfl-com",
+        "name": "NFL.com",
+        "browserUrl": "https://www.nfl.com/teams/new-england-patriots/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-ne-espn",
+        "name": "ESPN",
+        "browserUrl": "https://www.espn.com/nfl/team/_/name/ne/new-england-patriots",
         "category": "news"
       },
       {
@@ -102034,41 +105984,125 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
         "category": "news"
       },
       {
-        "id": "nfl-ne-pro-football-network",
-        "name": "Pro Football Network",
-        "browserUrl": "https://www.profootballnetwork.com/new-england-patriots-offseason-preview-pending-free-agents-team-needs-draft-picks-2022/",
+        "id": "nfl-ne-fox-sports",
+        "name": "FOX Sports",
+        "browserUrl": "https://www.foxsports.com/nfl/new-england-patriots-team",
         "category": "news"
       },
       {
-        "id": "nfl-ne-nfl-com",
-        "name": "NFL.com",
-        "browserUrl": "https://www.nfl.com/teams/new-england-patriots/",
+        "id": "nfl-ne-yahoo-sports",
+        "name": "Yahoo! Sports",
+        "browserUrl": "https://sports.yahoo.com/nfl/teams/new-england/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-ne-the-athletic",
+        "name": "The Athletic",
+        "browserUrl": "https://www.nytimes.com/athletic/nfl/team/patriots/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-ne-b-r",
+        "name": "B/R",
+        "browserUrl": "https://bleacherreport.com/new-england-patriots",
+        "category": "news"
+      },
+      {
+        "id": "nfl-ne-nbc-sports",
+        "name": "NBC Sports",
+        "browserUrl": "https://www.nbcsports.com/nfl/new-england-patriots",
+        "category": "news"
+      },
+      {
+        "id": "nfl-ne-si",
+        "name": "SI",
+        "browserUrl": "https://www.si.com/nfl/patriots",
+        "category": "news"
+      },
+      {
+        "id": "nfl-ne-usa-today",
+        "name": "USA Today",
+        "browserUrl": "https://www.usatoday.com/sports/nfl/new-england-patriots",
+        "category": "news"
+      },
+      {
+        "id": "nfl-ne-athlon-sports",
+        "name": "Athlon Sports",
+        "browserUrl": "https://athlonsports.com/nfl/new-england-patriots",
+        "category": "news"
+      },
+      {
+        "id": "nfl-ne-yardbarker",
+        "name": "Yardbarker",
+        "browserUrl": "https://www.yardbarker.com/nfl/teams/new_england_patriots/41",
+        "category": "news"
+      },
+      {
+        "id": "nfl-ne-spotrac",
+        "name": "Spotrac",
+        "browserUrl": "https://www.spotrac.com/nfl/new-england-patriots/overview",
+        "category": "news"
+      },
+      {
+        "id": "nfl-ne-statmuse",
+        "name": "StatMuse",
+        "browserUrl": "https://www.statmuse.com/nfl/team/2026-new-england-patriots-70/2026",
+        "category": "news"
+      },
+      {
+        "id": "nfl-ne-pro-football-rumors",
+        "name": "Pro Football Rumors",
+        "browserUrl": "https://www.profootballrumors.com/new-england-patriots-news-rumors",
+        "category": "news"
+      },
+      {
+        "id": "nfl-ne-newsnow",
+        "name": "NewsNow",
+        "browserUrl": "https://www.newsnow.com/us/Sports/NFL/AFC+East/New+England+Patriots",
+        "category": "news"
+      },
+      {
+        "id": "nfl-ne-sportspyder",
+        "name": "SportSpyder",
+        "browserUrl": "https://sportspyder.com/nfl/new-england-patriots/news",
+        "category": "news"
+      },
+      {
+        "id": "nfl-ne-r-patriots",
+        "name": "r/Patriots",
+        "browserUrl": "https://www.reddit.com/r/Patriots/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-ne-patriots",
+        "name": "@Patriots",
+        "browserUrl": "https://x.com/Patriots",
+        "category": "news"
+      },
+      {
+        "id": "nfl-ne-patriots-2",
+        "name": "#Patriots",
+        "browserUrl": "https://x.com/search?q=Patriots&src=typed_query",
+        "category": "news"
+      },
+      {
+        "id": "nfl-ne-patriots-com",
+        "name": "Patriots.com",
+        "browserUrl": "https://www.patriots.com/news",
+        "category": "news"
+      },
+      {
+        "id": "nfl-ne-pro-football-network",
+        "name": "Pro Football Network",
+        "browserUrl": "https://www.profootballnetwork.com/new-england-patriots-offseason-preview-pending-free-agents-team-needs-draft-picks-2022/",
         "category": "news"
       }
     ],
     "NO": [
       {
-        "id": "nfl-no-the-athletic",
-        "name": "The Athletic",
-        "browserUrl": "https://www.nytimes.com/athletic/nfl/team/saints/",
-        "category": "news"
-      },
-      {
-        "id": "nfl-no-pro-football-rumors",
-        "name": "Pro Football Rumors",
-        "browserUrl": "https://www.profootballrumors.com/2016/02/new-orleans-saints-cameron-jordan-restructure",
-        "category": "news"
-      },
-      {
-        "id": "nfl-no-sportspyder",
-        "name": "SportSpyder",
-        "browserUrl": "https://sportspyder.com/nfl/new-orleans-saints/news",
-        "category": "news"
-      },
-      {
-        "id": "nfl-no-saints-wire",
-        "name": "Saints Wire",
-        "browserUrl": "https://saintswire.usatoday.com",
+        "id": "nfl-no-nfl-com",
+        "name": "NFL.com",
+        "browserUrl": "https://www.nfl.com/teams/new-orleans-saints/",
         "category": "news"
       },
       {
@@ -102090,9 +106124,111 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
         "category": "news"
       },
       {
-        "id": "nfl-no-sports-illustrated",
-        "name": "Sports Illustrated",
+        "id": "nfl-no-yahoo-sports",
+        "name": "Yahoo! Sports",
+        "browserUrl": "https://sports.yahoo.com/nfl/teams/new-orleans/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-no-the-athletic",
+        "name": "The Athletic",
+        "browserUrl": "https://www.nytimes.com/athletic/nfl/team/saints/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-no-b-r",
+        "name": "B/R",
+        "browserUrl": "https://bleacherreport.com/new-orleans-saints",
+        "category": "news"
+      },
+      {
+        "id": "nfl-no-nbc-sports",
+        "name": "NBC Sports",
+        "browserUrl": "https://www.nbcsports.com/nfl/new-orleans-saints",
+        "category": "news"
+      },
+      {
+        "id": "nfl-no-si",
+        "name": "SI",
         "browserUrl": "https://www.si.com/nfl/saints",
+        "category": "news"
+      },
+      {
+        "id": "nfl-no-usa-today",
+        "name": "USA Today",
+        "browserUrl": "https://www.usatoday.com/sports/nfl/new-orleans-saints",
+        "category": "news"
+      },
+      {
+        "id": "nfl-no-athlon-sports",
+        "name": "Athlon Sports",
+        "browserUrl": "https://athlonsports.com/nfl/new-orleans-saints",
+        "category": "news"
+      },
+      {
+        "id": "nfl-no-yardbarker",
+        "name": "Yardbarker",
+        "browserUrl": "https://www.yardbarker.com/nfl/teams/new_orleans_saints/55",
+        "category": "news"
+      },
+      {
+        "id": "nfl-no-spotrac",
+        "name": "Spotrac",
+        "browserUrl": "https://www.spotrac.com/nfl/new-orleans-saints/overview",
+        "category": "news"
+      },
+      {
+        "id": "nfl-no-statmuse",
+        "name": "StatMuse",
+        "browserUrl": "https://www.statmuse.com/nfl/team/2026-new-orleans-saints-79/2026",
+        "category": "news"
+      },
+      {
+        "id": "nfl-no-pro-football-rumors",
+        "name": "Pro Football Rumors",
+        "browserUrl": "https://www.profootballrumors.com/new-orleans-saints-news-rumors",
+        "category": "news"
+      },
+      {
+        "id": "nfl-no-newsnow",
+        "name": "NewsNow",
+        "browserUrl": "https://www.newsnow.com/us/Sports/NFL/NFC+South/New+Orleans+Saints",
+        "category": "news"
+      },
+      {
+        "id": "nfl-no-sportspyder",
+        "name": "SportSpyder",
+        "browserUrl": "https://sportspyder.com/nfl/new-orleans-saints/news",
+        "category": "news"
+      },
+      {
+        "id": "nfl-no-r-saints",
+        "name": "r/Saints",
+        "browserUrl": "https://www.reddit.com/r/Saints/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-no-saints",
+        "name": "@Saints",
+        "browserUrl": "https://x.com/Saints",
+        "category": "news"
+      },
+      {
+        "id": "nfl-no-saints-2",
+        "name": "#Saints",
+        "browserUrl": "https://x.com/search?q=Saints&src=typed_query",
+        "category": "news"
+      },
+      {
+        "id": "nfl-no-pro-football-rumors-2",
+        "name": "Pro Football Rumors",
+        "browserUrl": "https://www.profootballrumors.com/2016/02/new-orleans-saints-cameron-jordan-restructure",
+        "category": "news"
+      },
+      {
+        "id": "nfl-no-saints-wire",
+        "name": "Saints Wire",
+        "browserUrl": "https://saintswire.usatoday.com",
         "category": "news"
       },
       {
@@ -102124,15 +106260,39 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
         "name": "Pro Football Network",
         "browserUrl": "https://www.profootballnetwork.com/new-orleans-saints-offseason-preview-pending-free-agents-team-needs-draft-picks-2022/",
         "category": "news"
-      },
-      {
-        "id": "nfl-no-nfl-com",
-        "name": "NFL.com",
-        "browserUrl": "https://www.nfl.com/teams/new-orleans-saints/",
-        "category": "news"
       }
     ],
     "NYG": [
+      {
+        "id": "nfl-nyg-nfl-com",
+        "name": "NFL.com",
+        "browserUrl": "https://www.nfl.com/teams/new-york-giants/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-nyg-espn",
+        "name": "ESPN",
+        "browserUrl": "https://www.espn.com/nfl/team/_/name/nyg/new-york-giants",
+        "category": "news"
+      },
+      {
+        "id": "nfl-nyg-cbs-sports",
+        "name": "CBS Sports",
+        "browserUrl": "https://www.cbssports.com/nfl/teams/NYG/new-york-giants/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-nyg-fox-sports",
+        "name": "FOX Sports",
+        "browserUrl": "https://www.foxsports.com/nfl/new-york-giants-team",
+        "category": "news"
+      },
+      {
+        "id": "nfl-nyg-yahoo-sports",
+        "name": "Yahoo! Sports",
+        "browserUrl": "https://sports.yahoo.com/nfl/teams/ny-giants/",
+        "category": "news"
+      },
       {
         "id": "nfl-nyg-the-athletic",
         "name": "The Athletic",
@@ -102140,15 +106300,93 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
         "category": "news"
       },
       {
-        "id": "nfl-nyg-pro-football-rumors",
-        "name": "Pro Football Rumors",
-        "browserUrl": "https://www.profootballrumors.com/2017/03/new-york-giants-adrian-peterson",
+        "id": "nfl-nyg-b-r",
+        "name": "B/R",
+        "browserUrl": "https://bleacherreport.com/new-york-giants",
         "category": "news"
       },
       {
-        "id": "nfl-nyg-cbs-sports",
-        "name": "CBS Sports",
-        "browserUrl": "https://www.cbssports.com/nfl/teams/NYG/new-york-giants/",
+        "id": "nfl-nyg-nbc-sports",
+        "name": "NBC Sports",
+        "browserUrl": "https://www.nbcsports.com/nfl/new-york-giants",
+        "category": "news"
+      },
+      {
+        "id": "nfl-nyg-si",
+        "name": "SI",
+        "browserUrl": "https://www.si.com/nfl/giants",
+        "category": "news"
+      },
+      {
+        "id": "nfl-nyg-usa-today",
+        "name": "USA Today",
+        "browserUrl": "https://www.usatoday.com/sports/nfl/new-york-giants",
+        "category": "news"
+      },
+      {
+        "id": "nfl-nyg-athlon-sports",
+        "name": "Athlon Sports",
+        "browserUrl": "https://athlonsports.com/nfl/new-york-giants",
+        "category": "news"
+      },
+      {
+        "id": "nfl-nyg-yardbarker",
+        "name": "Yardbarker",
+        "browserUrl": "https://www.yardbarker.com/nfl/teams/new_york_giants/56",
+        "category": "news"
+      },
+      {
+        "id": "nfl-nyg-spotrac",
+        "name": "Spotrac",
+        "browserUrl": "https://www.spotrac.com/nfl/new-york-giants/overview",
+        "category": "news"
+      },
+      {
+        "id": "nfl-nyg-statmuse",
+        "name": "StatMuse",
+        "browserUrl": "https://www.statmuse.com/nfl/team/2026-new-york-giants-35/2026",
+        "category": "news"
+      },
+      {
+        "id": "nfl-nyg-pro-football-rumors",
+        "name": "Pro Football Rumors",
+        "browserUrl": "https://www.profootballrumors.com/new-york-giants-news-rumors",
+        "category": "news"
+      },
+      {
+        "id": "nfl-nyg-newsnow",
+        "name": "NewsNow",
+        "browserUrl": "https://www.newsnow.com/us/Sports/NFL/NFC+East/New+York+Giants",
+        "category": "news"
+      },
+      {
+        "id": "nfl-nyg-sportspyder",
+        "name": "SportSpyder",
+        "browserUrl": "https://sportspyder.com/nfl/new-york-giants/news",
+        "category": "news"
+      },
+      {
+        "id": "nfl-nyg-r-nygiants",
+        "name": "r/NYGiants",
+        "browserUrl": "https://www.reddit.com/r/NYGiants/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-nyg-giants",
+        "name": "@Giants",
+        "browserUrl": "https://x.com/Giants",
+        "category": "news"
+      },
+      {
+        "id": "nfl-nyg-giants-2",
+        "name": "#Giants",
+        "browserUrl": "https://x.com/search?q=Giants&src=typed_query",
+        "category": "news"
+      },
+      {
+        "id": "nfl-nyg-pro-football-rumors-2",
+        "name": "Pro Football Rumors",
+        "browserUrl": "https://www.profootballrumors.com/2017/03/new-york-giants-adrian-peterson",
         "category": "news"
       },
       {
@@ -102174,31 +106412,13 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
         "name": "Pro Football Network",
         "browserUrl": "https://www.profootballnetwork.com/new-york-giants-offseason-preview-pending-free-agents-team-needs-draft-picks-2022/",
         "category": "news"
-      },
-      {
-        "id": "nfl-nyg-nfl-com",
-        "name": "NFL.com",
-        "browserUrl": "https://www.nfl.com/teams/new-york-giants/",
-        "category": "news"
       }
     ],
     "NYJ": [
       {
-        "id": "nfl-nyj-the-athletic",
-        "name": "The Athletic",
-        "browserUrl": "https://www.nytimes.com/athletic/nfl/team/jets/",
-        "category": "news"
-      },
-      {
-        "id": "nfl-nyj-pro-football-rumors",
-        "name": "Pro Football Rumors",
-        "browserUrl": "https://www.profootballrumors.com/2016/03/new-york-jets-bilal-powell",
-        "category": "news"
-      },
-      {
-        "id": "nfl-nyj-sportspyder",
-        "name": "SportSpyder",
-        "browserUrl": "https://sportspyder.com/nfl/new-york-jets/news",
+        "id": "nfl-nyj-nfl-com",
+        "name": "NFL.com",
+        "browserUrl": "https://www.nfl.com/teams/new-york-jets/",
         "category": "news"
       },
       {
@@ -102220,6 +106440,108 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
         "category": "news"
       },
       {
+        "id": "nfl-nyj-yahoo-sports",
+        "name": "Yahoo! Sports",
+        "browserUrl": "https://sports.yahoo.com/nfl/teams/ny-jets/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-nyj-the-athletic",
+        "name": "The Athletic",
+        "browserUrl": "https://www.nytimes.com/athletic/nfl/team/jets/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-nyj-b-r",
+        "name": "B/R",
+        "browserUrl": "https://bleacherreport.com/new-york-jets",
+        "category": "news"
+      },
+      {
+        "id": "nfl-nyj-nbc-sports",
+        "name": "NBC Sports",
+        "browserUrl": "https://www.nbcsports.com/nfl/new-york-jets",
+        "category": "news"
+      },
+      {
+        "id": "nfl-nyj-si",
+        "name": "SI",
+        "browserUrl": "https://www.si.com/nfl/jets",
+        "category": "news"
+      },
+      {
+        "id": "nfl-nyj-usa-today",
+        "name": "USA Today",
+        "browserUrl": "https://www.usatoday.com/sports/nfl/new-york-jets",
+        "category": "news"
+      },
+      {
+        "id": "nfl-nyj-athlon-sports",
+        "name": "Athlon Sports",
+        "browserUrl": "https://athlonsports.com/nfl/new-york-jets",
+        "category": "news"
+      },
+      {
+        "id": "nfl-nyj-yardbarker",
+        "name": "Yardbarker",
+        "browserUrl": "https://www.yardbarker.com/nfl/teams/new_york_jets/42",
+        "category": "news"
+      },
+      {
+        "id": "nfl-nyj-spotrac",
+        "name": "Spotrac",
+        "browserUrl": "https://www.spotrac.com/nfl/new-york-jets/overview",
+        "category": "news"
+      },
+      {
+        "id": "nfl-nyj-statmuse",
+        "name": "StatMuse",
+        "browserUrl": "https://www.statmuse.com/nfl/team/2026-new-york-jets-71/2026",
+        "category": "news"
+      },
+      {
+        "id": "nfl-nyj-pro-football-rumors",
+        "name": "Pro Football Rumors",
+        "browserUrl": "https://www.profootballrumors.com/new-york-jets-news-rumors",
+        "category": "news"
+      },
+      {
+        "id": "nfl-nyj-newsnow",
+        "name": "NewsNow",
+        "browserUrl": "https://www.newsnow.com/us/Sports/NFL/AFC+East/New+York+Jets",
+        "category": "news"
+      },
+      {
+        "id": "nfl-nyj-sportspyder",
+        "name": "SportSpyder",
+        "browserUrl": "https://sportspyder.com/nfl/new-york-jets/news",
+        "category": "news"
+      },
+      {
+        "id": "nfl-nyj-r-nyjets",
+        "name": "r/nyjets",
+        "browserUrl": "https://www.reddit.com/r/nyjets/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-nyj-jets",
+        "name": "@Jets",
+        "browserUrl": "https://x.com/nyjets",
+        "category": "news"
+      },
+      {
+        "id": "nfl-nyj-jets-2",
+        "name": "#Jets",
+        "browserUrl": "https://x.com/search?q=Jets&src=typed_query",
+        "category": "news"
+      },
+      {
+        "id": "nfl-nyj-pro-football-rumors-2",
+        "name": "Pro Football Rumors",
+        "browserUrl": "https://www.profootballrumors.com/2016/03/new-york-jets-bilal-powell",
+        "category": "news"
+      },
+      {
         "id": "nfl-nyj-new-york-post-jets",
         "name": "New York Post Jets",
         "browserUrl": "https://nypost.com/new-york-jets/",
@@ -102236,93 +106558,13 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
         "name": "Pro Football Network",
         "browserUrl": "https://www.profootballnetwork.com/new-york-jets-offseason-preview-pending-free-agents-team-needs-draft-picks-2022/",
         "category": "news"
-      },
-      {
-        "id": "nfl-nyj-nfl-com",
-        "name": "NFL.com",
-        "browserUrl": "https://www.nfl.com/teams/new-york-jets/",
-        "category": "news"
-      }
-    ],
-    "LV": [
-      {
-        "id": "nfl-lv-pro-football-rumors",
-        "name": "Pro Football Rumors",
-        "browserUrl": "https://www.profootballrumors.com/2016/05/las-vegas-raiders-kawann-short",
-        "category": "news"
-      },
-      {
-        "id": "nfl-lv-espn",
-        "name": "ESPN",
-        "browserUrl": "https://www.espn.com/nfl/team/_/name/lv/las-vegas-raiders",
-        "category": "news"
-      },
-      {
-        "id": "nfl-lv-cbs-sports",
-        "name": "CBS Sports",
-        "browserUrl": "https://www.cbssports.com/nfl/teams/LV/las-vegas-raiders/",
-        "category": "news"
-      },
-      {
-        "id": "nfl-lv-fox-sports",
-        "name": "FOX Sports",
-        "browserUrl": "https://www.foxsports.com/nfl/las-vegas-raiders-team",
-        "category": "news"
-      },
-      {
-        "id": "nfl-lv-sports-illustrated",
-        "name": "Sports Illustrated",
-        "browserUrl": "https://www.si.com/nfl/raiders",
-        "category": "news"
-      },
-      {
-        "id": "nfl-lv-fansided",
-        "name": "FanSided",
-        "browserUrl": "https://fansided.com/nfl/las-vegas-raiders",
-        "category": "news"
-      },
-      {
-        "id": "nfl-lv-raiders-beat",
-        "name": "Raiders Beat",
-        "browserUrl": "https://www.raidersbeat.com/",
-        "category": "news"
-      },
-      {
-        "id": "nfl-lv-pro-football-network",
-        "name": "Pro Football Network",
-        "browserUrl": "https://www.profootballnetwork.com/las-vegas-raiders-offseason-preview-pending-free-agents-team-needs-draft-picks-2022/",
-        "category": "news"
-      },
-      {
-        "id": "nfl-lv-nfl-com",
-        "name": "NFL.com",
-        "browserUrl": "https://www.nfl.com/teams/las-vegas-raiders/",
-        "category": "news"
       }
     ],
     "PHI": [
       {
-        "id": "nfl-phi-eagles-com",
-        "name": "Eagles.com",
-        "browserUrl": "https://www.philadelphiaeagles.com/news",
-        "category": "news"
-      },
-      {
-        "id": "nfl-phi-the-athletic",
-        "name": "The Athletic",
-        "browserUrl": "https://www.nytimes.com/athletic/nfl/team/eagles/",
-        "category": "news"
-      },
-      {
-        "id": "nfl-phi-pro-football-rumors",
-        "name": "Pro Football Rumors",
-        "browserUrl": "https://www.profootballrumors.com/2016/06/philadelphia-eagles-dallas-cowboys",
-        "category": "news"
-      },
-      {
-        "id": "nfl-phi-sportspyder",
-        "name": "SportSpyder",
-        "browserUrl": "https://sportspyder.com/nfl/philadelphia-eagles/news",
+        "id": "nfl-phi-nfl-com",
+        "name": "NFL.com",
+        "browserUrl": "https://www.nfl.com/teams/philadelphia-eagles/",
         "category": "news"
       },
       {
@@ -102344,6 +106586,114 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
         "category": "news"
       },
       {
+        "id": "nfl-phi-yahoo-sports",
+        "name": "Yahoo! Sports",
+        "browserUrl": "https://sports.yahoo.com/nfl/teams/philadelphia/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-phi-the-athletic",
+        "name": "The Athletic",
+        "browserUrl": "https://www.nytimes.com/athletic/nfl/team/eagles/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-phi-b-r",
+        "name": "B/R",
+        "browserUrl": "https://bleacherreport.com/philadelphia-eagles",
+        "category": "news"
+      },
+      {
+        "id": "nfl-phi-nbc-sports",
+        "name": "NBC Sports",
+        "browserUrl": "https://www.nbcsports.com/nfl/philadelphia-eagles",
+        "category": "news"
+      },
+      {
+        "id": "nfl-phi-si",
+        "name": "SI",
+        "browserUrl": "https://www.si.com/nfl/eagles",
+        "category": "news"
+      },
+      {
+        "id": "nfl-phi-usa-today",
+        "name": "USA Today",
+        "browserUrl": "https://www.usatoday.com/sports/nfl/philadelphia-eagles",
+        "category": "news"
+      },
+      {
+        "id": "nfl-phi-athlon-sports",
+        "name": "Athlon Sports",
+        "browserUrl": "https://athlonsports.com/nfl/philadelphia-eagles",
+        "category": "news"
+      },
+      {
+        "id": "nfl-phi-yardbarker",
+        "name": "Yardbarker",
+        "browserUrl": "https://www.yardbarker.com/nfl/teams/philadelphia_eagles/57",
+        "category": "news"
+      },
+      {
+        "id": "nfl-phi-spotrac",
+        "name": "Spotrac",
+        "browserUrl": "https://www.spotrac.com/nfl/philadelphia-eagles/overview",
+        "category": "news"
+      },
+      {
+        "id": "nfl-phi-statmuse",
+        "name": "StatMuse",
+        "browserUrl": "https://www.statmuse.com/nfl/team/2026-philadelphia-eagles-49/2026",
+        "category": "news"
+      },
+      {
+        "id": "nfl-phi-pro-football-rumors",
+        "name": "Pro Football Rumors",
+        "browserUrl": "https://www.profootballrumors.com/philadelphia-eagles-news-rumors",
+        "category": "news"
+      },
+      {
+        "id": "nfl-phi-newsnow",
+        "name": "NewsNow",
+        "browserUrl": "https://www.newsnow.com/us/Sports/NFL/NFC+East/Philadelphia+Eagles",
+        "category": "news"
+      },
+      {
+        "id": "nfl-phi-sportspyder",
+        "name": "SportSpyder",
+        "browserUrl": "https://sportspyder.com/nfl/philadelphia-eagles/news",
+        "category": "news"
+      },
+      {
+        "id": "nfl-phi-r-eagles",
+        "name": "r/eagles",
+        "browserUrl": "https://www.reddit.com/r/eagles/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-phi-eagles",
+        "name": "@Eagles",
+        "browserUrl": "https://x.com/Eagles",
+        "category": "news"
+      },
+      {
+        "id": "nfl-phi-eagles-2",
+        "name": "#Eagles",
+        "browserUrl": "https://x.com/search?q=Eagles&src=typed_query",
+        "category": "news"
+      },
+      {
+        "id": "nfl-phi-eagles-com",
+        "name": "Eagles.com",
+        "browserUrl": "https://www.philadelphiaeagles.com/news",
+        "category": "news"
+      },
+      {
+        "id": "nfl-phi-pro-football-rumors-2",
+        "name": "Pro Football Rumors",
+        "browserUrl": "https://www.profootballrumors.com/2016/06/philadelphia-eagles-dallas-cowboys",
+        "category": "news"
+      },
+      {
         "id": "nfl-phi-fansided",
         "name": "FanSided",
         "browserUrl": "https://fansided.com/nfl/philadelphia-eagles",
@@ -102356,41 +106706,17 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
         "category": "news"
       },
       {
-        "id": "nfl-phi-bleacher-report",
-        "name": "Bleacher Report",
-        "browserUrl": "https://bleacherreport.com/philadelphia-eagles",
-        "category": "news"
-      },
-      {
         "id": "nfl-phi-pro-football-network",
         "name": "Pro Football Network",
         "browserUrl": "https://www.profootballnetwork.com/philadelphia-eagles-offseason-preview-pending-free-agents-team-needs-draft-picks-2022/",
-        "category": "news"
-      },
-      {
-        "id": "nfl-phi-nfl-com",
-        "name": "NFL.com",
-        "browserUrl": "https://www.nfl.com/teams/philadelphia-eagles/",
         "category": "news"
       }
     ],
     "PIT": [
       {
-        "id": "nfl-pit-behind-the-steel-curtain",
-        "name": "Behind The Steel Curtain",
-        "browserUrl": "https://www.behindthesteelcurtain.com",
-        "category": "news"
-      },
-      {
-        "id": "nfl-pit-steelers-com",
-        "name": "Steelers.com",
-        "browserUrl": "https://www.steelers.com/news",
-        "category": "news"
-      },
-      {
-        "id": "nfl-pit-steelers-wire",
-        "name": "Steelers Wire",
-        "browserUrl": "https://steelerswire.usatoday.com",
+        "id": "nfl-pit-nfl-com",
+        "name": "NFL.com",
+        "browserUrl": "https://www.nfl.com/teams/pittsburgh-steelers/",
         "category": "news"
       },
       {
@@ -102412,9 +106738,117 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
         "category": "news"
       },
       {
-        "id": "nfl-pit-sports-illustrated",
-        "name": "Sports Illustrated",
+        "id": "nfl-pit-yahoo-sports",
+        "name": "Yahoo! Sports",
+        "browserUrl": "https://sports.yahoo.com/nfl/teams/pittsburgh/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-pit-the-athletic",
+        "name": "The Athletic",
+        "browserUrl": "https://www.nytimes.com/athletic/nfl/team/steelers/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-pit-b-r",
+        "name": "B/R",
+        "browserUrl": "https://bleacherreport.com/pittsburgh-steelers",
+        "category": "news"
+      },
+      {
+        "id": "nfl-pit-nbc-sports",
+        "name": "NBC Sports",
+        "browserUrl": "https://www.nbcsports.com/nfl/pittsburgh-steelers",
+        "category": "news"
+      },
+      {
+        "id": "nfl-pit-si",
+        "name": "SI",
         "browserUrl": "https://www.si.com/nfl/steelers",
+        "category": "news"
+      },
+      {
+        "id": "nfl-pit-usa-today",
+        "name": "USA Today",
+        "browserUrl": "https://www.usatoday.com/sports/nfl/pittsburgh-steelers",
+        "category": "news"
+      },
+      {
+        "id": "nfl-pit-athlon-sports",
+        "name": "Athlon Sports",
+        "browserUrl": "https://athlonsports.com/nfl/pittsburgh-steelers",
+        "category": "news"
+      },
+      {
+        "id": "nfl-pit-yardbarker",
+        "name": "Yardbarker",
+        "browserUrl": "https://www.yardbarker.com/nfl/teams/pittsburgh_steelers/44",
+        "category": "news"
+      },
+      {
+        "id": "nfl-pit-spotrac",
+        "name": "Spotrac",
+        "browserUrl": "https://www.spotrac.com/nfl/pittsburgh-steelers/overview",
+        "category": "news"
+      },
+      {
+        "id": "nfl-pit-statmuse",
+        "name": "StatMuse",
+        "browserUrl": "https://www.statmuse.com/nfl/team/2026-pittsburgh-steelers-50/2026",
+        "category": "news"
+      },
+      {
+        "id": "nfl-pit-pro-football-rumors",
+        "name": "Pro Football Rumors",
+        "browserUrl": "https://www.profootballrumors.com/pittsburgh-steelers-news-rumors",
+        "category": "news"
+      },
+      {
+        "id": "nfl-pit-newsnow",
+        "name": "NewsNow",
+        "browserUrl": "https://www.newsnow.com/us/Sports/NFL/AFC+North/Pittsburgh+Steelers",
+        "category": "news"
+      },
+      {
+        "id": "nfl-pit-sportspyder",
+        "name": "SportSpyder",
+        "browserUrl": "https://sportspyder.com/nfl/pittsburgh-steelers/news",
+        "category": "news"
+      },
+      {
+        "id": "nfl-pit-r-steelers",
+        "name": "r/steelers",
+        "browserUrl": "https://www.reddit.com/r/steelers/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-pit-steelers",
+        "name": "@Steelers",
+        "browserUrl": "https://x.com/steelers",
+        "category": "news"
+      },
+      {
+        "id": "nfl-pit-steelers-2",
+        "name": "#Steelers",
+        "browserUrl": "https://x.com/search?q=Steelers&src=typed_query",
+        "category": "news"
+      },
+      {
+        "id": "nfl-pit-behind-the-steel-curtain",
+        "name": "Behind The Steel Curtain",
+        "browserUrl": "https://www.behindthesteelcurtain.com",
+        "category": "news"
+      },
+      {
+        "id": "nfl-pit-steelers-com",
+        "name": "Steelers.com",
+        "browserUrl": "https://www.steelers.com/news",
+        "category": "news"
+      },
+      {
+        "id": "nfl-pit-steelers-wire",
+        "name": "Steelers Wire",
+        "browserUrl": "https://steelerswire.usatoday.com",
         "category": "news"
       },
       {
@@ -102452,25 +106886,13 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
         "name": "Pro Football Network",
         "browserUrl": "https://www.profootballnetwork.com/pittsburgh-steelers-2020-season-win-total/",
         "category": "news"
-      },
-      {
-        "id": "nfl-pit-nfl-com",
-        "name": "NFL.com",
-        "browserUrl": "https://www.nfl.com/teams/pittsburgh-steelers/",
-        "category": "news"
       }
     ],
     "SF": [
       {
-        "id": "nfl-sf-49ers-com",
-        "name": "49ers.com",
-        "browserUrl": "https://www.49ers.com/news",
-        "category": "news"
-      },
-      {
-        "id": "nfl-sf-49ers-wire",
-        "name": "49ers Wire",
-        "browserUrl": "https://ninerswire.usatoday.com",
+        "id": "nfl-sf-nfl-com",
+        "name": "NFL.com",
+        "browserUrl": "https://www.nfl.com/teams/san-francisco-49ers/",
         "category": "news"
       },
       {
@@ -102492,9 +106914,111 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
         "category": "news"
       },
       {
-        "id": "nfl-sf-sports-illustrated",
-        "name": "Sports Illustrated",
+        "id": "nfl-sf-yahoo-sports",
+        "name": "Yahoo! Sports",
+        "browserUrl": "https://sports.yahoo.com/nfl/teams/san-francisco/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-sf-the-athletic",
+        "name": "The Athletic",
+        "browserUrl": "https://www.nytimes.com/athletic/nfl/team/49ers/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-sf-b-r",
+        "name": "B/R",
+        "browserUrl": "https://bleacherreport.com/san-francisco-49ers",
+        "category": "news"
+      },
+      {
+        "id": "nfl-sf-nbc-sports",
+        "name": "NBC Sports",
+        "browserUrl": "https://www.nbcsports.com/nfl/san-francisco-49ers",
+        "category": "news"
+      },
+      {
+        "id": "nfl-sf-si",
+        "name": "SI",
         "browserUrl": "https://www.si.com/nfl/49ers",
+        "category": "news"
+      },
+      {
+        "id": "nfl-sf-usa-today",
+        "name": "USA Today",
+        "browserUrl": "https://www.usatoday.com/sports/nfl/san-francisco-49ers",
+        "category": "news"
+      },
+      {
+        "id": "nfl-sf-athlon-sports",
+        "name": "Athlon Sports",
+        "browserUrl": "https://athlonsports.com/nfl/san-francisco-49ers",
+        "category": "news"
+      },
+      {
+        "id": "nfl-sf-yardbarker",
+        "name": "Yardbarker",
+        "browserUrl": "https://www.yardbarker.com/nfl/teams/san_francisco_49ers/58",
+        "category": "news"
+      },
+      {
+        "id": "nfl-sf-spotrac",
+        "name": "Spotrac",
+        "browserUrl": "https://www.spotrac.com/nfl/san-francisco-49ers/overview",
+        "category": "news"
+      },
+      {
+        "id": "nfl-sf-statmuse",
+        "name": "StatMuse",
+        "browserUrl": "https://www.statmuse.com/nfl/team/2026-san-francisco-49ers-63/2026",
+        "category": "news"
+      },
+      {
+        "id": "nfl-sf-pro-football-rumors",
+        "name": "Pro Football Rumors",
+        "browserUrl": "https://www.profootballrumors.com/san-francisco-49ers-news-rumors",
+        "category": "news"
+      },
+      {
+        "id": "nfl-sf-newsnow",
+        "name": "NewsNow",
+        "browserUrl": "https://www.newsnow.com/us/Sports/NFL/NFC+West/San+Francisco+49ers",
+        "category": "news"
+      },
+      {
+        "id": "nfl-sf-sportspyder",
+        "name": "SportSpyder",
+        "browserUrl": "https://sportspyder.com/nfl/san-francisco-49ers/news",
+        "category": "news"
+      },
+      {
+        "id": "nfl-sf-r-49ers",
+        "name": "r/49ers",
+        "browserUrl": "https://www.reddit.com/r/49ers/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-sf-49ers",
+        "name": "@49ers",
+        "browserUrl": "https://x.com/49ers",
+        "category": "news"
+      },
+      {
+        "id": "nfl-sf-49ers-2",
+        "name": "#49ers",
+        "browserUrl": "https://x.com/search?q=49ers&src=typed_query",
+        "category": "news"
+      },
+      {
+        "id": "nfl-sf-49ers-com",
+        "name": "49ers.com",
+        "browserUrl": "https://www.49ers.com/news",
+        "category": "news"
+      },
+      {
+        "id": "nfl-sf-49ers-wire",
+        "name": "49ers Wire",
+        "browserUrl": "https://ninerswire.usatoday.com",
         "category": "news"
       },
       {
@@ -102520,19 +107044,37 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
         "name": "Pro Football Network",
         "browserUrl": "https://www.profootballnetwork.com/nfl-hq/teams/san-francisco-49ers",
         "category": "news"
-      },
-      {
-        "id": "nfl-sf-nfl-com",
-        "name": "NFL.com",
-        "browserUrl": "https://www.nfl.com/teams/san-francisco-49ers/",
-        "category": "news"
       }
     ],
     "SEA": [
       {
-        "id": "nfl-sea-seahawks-com",
-        "name": "Seahawks.com",
-        "browserUrl": "https://www.seahawks.com/news",
+        "id": "nfl-sea-nfl-com",
+        "name": "NFL.com",
+        "browserUrl": "https://www.nfl.com/teams/seattle-seahawks/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-sea-espn",
+        "name": "ESPN",
+        "browserUrl": "https://www.espn.com/nfl/team/_/name/sea/seattle-seahawks",
+        "category": "news"
+      },
+      {
+        "id": "nfl-sea-cbs-sports",
+        "name": "CBS Sports",
+        "browserUrl": "https://www.cbssports.com/nfl/teams/SEA/seattle-seahawks/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-sea-fox-sports",
+        "name": "FOX Sports",
+        "browserUrl": "https://www.foxsports.com/nfl/seattle-seahawks-team",
+        "category": "news"
+      },
+      {
+        "id": "nfl-sea-yahoo-sports",
+        "name": "Yahoo! Sports",
+        "browserUrl": "https://sports.yahoo.com/nfl/teams/seattle/",
         "category": "news"
       },
       {
@@ -102542,9 +107084,63 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
         "category": "news"
       },
       {
+        "id": "nfl-sea-b-r",
+        "name": "B/R",
+        "browserUrl": "https://bleacherreport.com/seattle-seahawks",
+        "category": "news"
+      },
+      {
+        "id": "nfl-sea-nbc-sports",
+        "name": "NBC Sports",
+        "browserUrl": "https://www.nbcsports.com/nfl/seattle-seahawks",
+        "category": "news"
+      },
+      {
+        "id": "nfl-sea-si",
+        "name": "SI",
+        "browserUrl": "https://www.si.com/nfl/seahawks",
+        "category": "news"
+      },
+      {
+        "id": "nfl-sea-usa-today",
+        "name": "USA Today",
+        "browserUrl": "https://www.usatoday.com/sports/nfl/seattle-seahawks",
+        "category": "news"
+      },
+      {
+        "id": "nfl-sea-athlon-sports",
+        "name": "Athlon Sports",
+        "browserUrl": "https://athlonsports.com/nfl/seattle-seahawks",
+        "category": "news"
+      },
+      {
+        "id": "nfl-sea-yardbarker",
+        "name": "Yardbarker",
+        "browserUrl": "https://www.yardbarker.com/nfl/teams/seattle_seahawks/59",
+        "category": "news"
+      },
+      {
+        "id": "nfl-sea-spotrac",
+        "name": "Spotrac",
+        "browserUrl": "https://www.spotrac.com/nfl/seattle-seahawks/overview",
+        "category": "news"
+      },
+      {
+        "id": "nfl-sea-statmuse",
+        "name": "StatMuse",
+        "browserUrl": "https://www.statmuse.com/nfl/team/2026-seattle-seahawks-81/2026",
+        "category": "news"
+      },
+      {
         "id": "nfl-sea-pro-football-rumors",
         "name": "Pro Football Rumors",
-        "browserUrl": "https://www.profootballrumors.com/2017/03/seattle-seahawks-richard-sherman-trade",
+        "browserUrl": "https://www.profootballrumors.com/seattle-seahawks-news-rumors",
+        "category": "news"
+      },
+      {
+        "id": "nfl-sea-newsnow",
+        "name": "NewsNow",
+        "browserUrl": "https://www.newsnow.com/us/Sports/NFL/NFC+West/Seattle+Seahawks",
         "category": "news"
       },
       {
@@ -102554,9 +107150,33 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
         "category": "news"
       },
       {
-        "id": "nfl-sea-cbs-sports",
-        "name": "CBS Sports",
-        "browserUrl": "https://www.cbssports.com/nfl/teams/SEA/seattle-seahawks/",
+        "id": "nfl-sea-r-seahawks",
+        "name": "r/Seahawks",
+        "browserUrl": "https://www.reddit.com/r/Seahawks/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-sea-seahawks",
+        "name": "@Seahawks",
+        "browserUrl": "https://x.com/Seahawks",
+        "category": "news"
+      },
+      {
+        "id": "nfl-sea-seahawks-2",
+        "name": "#Seahawks",
+        "browserUrl": "https://x.com/search?q=Seahawks&src=typed_query",
+        "category": "news"
+      },
+      {
+        "id": "nfl-sea-seahawks-com",
+        "name": "Seahawks.com",
+        "browserUrl": "https://www.seahawks.com/news",
+        "category": "news"
+      },
+      {
+        "id": "nfl-sea-pro-football-rumors-2",
+        "name": "Pro Football Rumors",
+        "browserUrl": "https://www.profootballrumors.com/2017/03/seattle-seahawks-richard-sherman-trade",
         "category": "news"
       },
       {
@@ -102572,12 +107192,6 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
         "category": "news"
       },
       {
-        "id": "nfl-sea-nfl-com",
-        "name": "NFL.com",
-        "browserUrl": "https://www.nfl.com/teams/seattle-seahawks/",
-        "category": "news"
-      },
-      {
         "id": "nfl-sea-field-gulls-community",
         "name": "Field Gulls Community",
         "browserUrl": "https://www.fieldgulls.com",
@@ -102586,21 +107200,129 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
     ],
     "TB": [
       {
-        "id": "nfl-tb-the-athletic",
-        "name": "The Athletic",
-        "browserUrl": "https://www.nytimes.com/athletic/nfl/team/buccaneers/",
+        "id": "nfl-tb-nfl-com",
+        "name": "NFL.com",
+        "browserUrl": "https://www.nfl.com/teams/tampa-bay-buccaneers/",
         "category": "news"
       },
       {
-        "id": "nfl-tb-pro-football-rumors",
-        "name": "Pro Football Rumors",
-        "browserUrl": "https://www.profootballrumors.com/2016/01/tampa-bay-buccaneers-dirk-koetter-interview",
+        "id": "nfl-tb-espn",
+        "name": "ESPN",
+        "browserUrl": "https://www.espn.com/nfl/team/_/name/tb/tampa-bay-buccaneers",
+        "category": "news"
+      },
+      {
+        "id": "nfl-tb-cbs-sports",
+        "name": "CBS Sports",
+        "browserUrl": "https://www.cbssports.com/nfl/teams/TB/tampa-bay-buccaneers/",
         "category": "news"
       },
       {
         "id": "nfl-tb-fox-sports",
         "name": "FOX Sports",
         "browserUrl": "https://www.foxsports.com/nfl/tampa-bay-buccaneers-team",
+        "category": "news"
+      },
+      {
+        "id": "nfl-tb-yahoo-sports",
+        "name": "Yahoo! Sports",
+        "browserUrl": "https://sports.yahoo.com/nfl/teams/tampa-bay/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-tb-the-athletic",
+        "name": "The Athletic",
+        "browserUrl": "https://www.nytimes.com/athletic/nfl/team/buccaneers/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-tb-b-r",
+        "name": "B/R",
+        "browserUrl": "https://bleacherreport.com/tampa-bay-buccaneers",
+        "category": "news"
+      },
+      {
+        "id": "nfl-tb-nbc-sports",
+        "name": "NBC Sports",
+        "browserUrl": "https://www.nbcsports.com/nfl/tampa-bay-buccaneers",
+        "category": "news"
+      },
+      {
+        "id": "nfl-tb-si",
+        "name": "SI",
+        "browserUrl": "https://www.si.com/nfl/buccaneers",
+        "category": "news"
+      },
+      {
+        "id": "nfl-tb-usa-today",
+        "name": "USA Today",
+        "browserUrl": "https://www.usatoday.com/sports/nfl/tampa-bay-buccaneers",
+        "category": "news"
+      },
+      {
+        "id": "nfl-tb-athlon-sports",
+        "name": "Athlon Sports",
+        "browserUrl": "https://athlonsports.com/nfl/tampa-bay-buccaneers",
+        "category": "news"
+      },
+      {
+        "id": "nfl-tb-yardbarker",
+        "name": "Yardbarker",
+        "browserUrl": "https://www.yardbarker.com/nfl/teams/tampa_bay_buccaneers/61",
+        "category": "news"
+      },
+      {
+        "id": "nfl-tb-spotrac",
+        "name": "Spotrac",
+        "browserUrl": "https://www.spotrac.com/nfl/tampa-bay-buccaneers/overview",
+        "category": "news"
+      },
+      {
+        "id": "nfl-tb-statmuse",
+        "name": "StatMuse",
+        "browserUrl": "https://www.statmuse.com/nfl/team/2026-tampa-bay-buccaneers-82/2026",
+        "category": "news"
+      },
+      {
+        "id": "nfl-tb-pro-football-rumors",
+        "name": "Pro Football Rumors",
+        "browserUrl": "https://www.profootballrumors.com/tampa-bay-buccaneers-news-rumors",
+        "category": "news"
+      },
+      {
+        "id": "nfl-tb-newsnow",
+        "name": "NewsNow",
+        "browserUrl": "https://www.newsnow.com/us/Sports/NFL/NFC+South/Tampa+Bay+Buccaneers",
+        "category": "news"
+      },
+      {
+        "id": "nfl-tb-sportspyder",
+        "name": "SportSpyder",
+        "browserUrl": "https://sportspyder.com/nfl/tampa-bay-buccaneers/news",
+        "category": "news"
+      },
+      {
+        "id": "nfl-tb-r-buccaneers",
+        "name": "r/buccaneers",
+        "browserUrl": "https://www.reddit.com/r/buccaneers/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-tb-buccaneers",
+        "name": "@Buccaneers",
+        "browserUrl": "https://x.com/Buccaneers",
+        "category": "news"
+      },
+      {
+        "id": "nfl-tb-buccaneers-2",
+        "name": "#Buccaneers",
+        "browserUrl": "https://x.com/search?q=Buccaneers&src=typed_query",
+        "category": "news"
+      },
+      {
+        "id": "nfl-tb-pro-football-rumors-2",
+        "name": "Pro Football Rumors",
+        "browserUrl": "https://www.profootballrumors.com/2016/01/tampa-bay-buccaneers-dirk-koetter-interview",
         "category": "news"
       },
       {
@@ -102628,35 +107350,17 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
         "category": "news"
       },
       {
-        "id": "nfl-tb-bucs-gameday",
-        "name": "Bucs Gameday",
-        "browserUrl": "https://www.si.com/nfl/buccaneers",
-        "category": "news"
-      },
-      {
         "id": "nfl-tb-pro-football-network",
         "name": "Pro Football Network",
         "browserUrl": "https://www.profootballnetwork.com/tampa-bay-buccaneers-offseason-preview-pending-free-agents-team-needs-draft-picks-2022/",
-        "category": "news"
-      },
-      {
-        "id": "nfl-tb-nfl-com",
-        "name": "NFL.com",
-        "browserUrl": "https://www.nfl.com/teams/tampa-bay-buccaneers/",
         "category": "news"
       }
     ],
     "TEN": [
       {
-        "id": "nfl-ten-titans-com",
-        "name": "Titans.com",
-        "browserUrl": "https://www.tennesseetitans.com/news",
-        "category": "news"
-      },
-      {
-        "id": "nfl-ten-sportspyder",
-        "name": "SportSpyder",
-        "browserUrl": "https://sportspyder.com/nfl/tennessee-titans/news",
+        "id": "nfl-ten-nfl-com",
+        "name": "NFL.com",
+        "browserUrl": "https://www.nfl.com/teams/tennessee-titans/",
         "category": "news"
       },
       {
@@ -102675,6 +107379,108 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
         "id": "nfl-ten-fox-sports",
         "name": "FOX Sports",
         "browserUrl": "https://www.foxsports.com/nfl/tennessee-titans-team",
+        "category": "news"
+      },
+      {
+        "id": "nfl-ten-yahoo-sports",
+        "name": "Yahoo! Sports",
+        "browserUrl": "https://sports.yahoo.com/nfl/teams/tennessee/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-ten-the-athletic",
+        "name": "The Athletic",
+        "browserUrl": "https://www.nytimes.com/athletic/nfl/team/titans/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-ten-b-r",
+        "name": "B/R",
+        "browserUrl": "https://bleacherreport.com/tennessee-titans",
+        "category": "news"
+      },
+      {
+        "id": "nfl-ten-nbc-sports",
+        "name": "NBC Sports",
+        "browserUrl": "https://www.nbcsports.com/nfl/tennessee-titans",
+        "category": "news"
+      },
+      {
+        "id": "nfl-ten-si",
+        "name": "SI",
+        "browserUrl": "https://www.si.com/nfl/titans",
+        "category": "news"
+      },
+      {
+        "id": "nfl-ten-usa-today",
+        "name": "USA Today",
+        "browserUrl": "https://www.usatoday.com/sports/nfl/tennessee-titans",
+        "category": "news"
+      },
+      {
+        "id": "nfl-ten-athlon-sports",
+        "name": "Athlon Sports",
+        "browserUrl": "https://athlonsports.com/nfl/tennessee-titans",
+        "category": "news"
+      },
+      {
+        "id": "nfl-ten-yardbarker",
+        "name": "Yardbarker",
+        "browserUrl": "https://www.yardbarker.com/nfl/teams/tennessee_titans/46a",
+        "category": "news"
+      },
+      {
+        "id": "nfl-ten-spotrac",
+        "name": "Spotrac",
+        "browserUrl": "https://www.spotrac.com/nfl/tennessee-titans/overview",
+        "category": "news"
+      },
+      {
+        "id": "nfl-ten-statmuse",
+        "name": "StatMuse",
+        "browserUrl": "https://www.statmuse.com/nfl/team/2026-tennessee-titans-72/2026",
+        "category": "news"
+      },
+      {
+        "id": "nfl-ten-pro-football-rumors",
+        "name": "Pro Football Rumors",
+        "browserUrl": "https://www.profootballrumors.com/tennessee-titans-news-rumors",
+        "category": "news"
+      },
+      {
+        "id": "nfl-ten-newsnow",
+        "name": "NewsNow",
+        "browserUrl": "https://www.newsnow.com/us/Sports/NFL/AFC+South/Tennessee+Titans",
+        "category": "news"
+      },
+      {
+        "id": "nfl-ten-sportspyder",
+        "name": "SportSpyder",
+        "browserUrl": "https://sportspyder.com/nfl/tennessee-titans/news",
+        "category": "news"
+      },
+      {
+        "id": "nfl-ten-r-tennesseetitans",
+        "name": "r/Tennesseetitans",
+        "browserUrl": "https://www.reddit.com/r/Tennesseetitans/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-ten-titans",
+        "name": "@Titans",
+        "browserUrl": "https://x.com/Titans",
+        "category": "news"
+      },
+      {
+        "id": "nfl-ten-titans-2",
+        "name": "#Titans",
+        "browserUrl": "https://x.com/search?q=Titans&src=typed_query",
+        "category": "news"
+      },
+      {
+        "id": "nfl-ten-titans-com",
+        "name": "Titans.com",
+        "browserUrl": "https://www.tennesseetitans.com/news",
         "category": "news"
       },
       {
@@ -102702,12 +107508,6 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
         "category": "news"
       },
       {
-        "id": "nfl-ten-nfl-com",
-        "name": "NFL.com",
-        "browserUrl": "https://www.nfl.com/teams/tennessee-titans/",
-        "category": "news"
-      },
-      {
         "id": "nfl-ten-titans-talk",
         "name": "Titans Talk",
         "browserUrl": "https://titansized.com",
@@ -102716,15 +107516,129 @@ var NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV = {
     ],
     "WSH": [
       {
-        "id": "nfl-wsh-commanders-com",
-        "name": "Commanders.com",
-        "browserUrl": "https://www.commanders.com/news",
+        "id": "nfl-wsh-nfl-com",
+        "name": "NFL.com",
+        "browserUrl": "https://www.nfl.com/teams/washington-commanders/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-wsh-espn",
+        "name": "ESPN",
+        "browserUrl": "https://www.espn.com/nfl/team/_/name/wsh/washington-commanders",
+        "category": "news"
+      },
+      {
+        "id": "nfl-wsh-cbs-sports",
+        "name": "CBS Sports",
+        "browserUrl": "https://www.cbssports.com/nfl/teams/WAS/washington-commanders/",
         "category": "news"
       },
       {
         "id": "nfl-wsh-fox-sports",
         "name": "FOX Sports",
         "browserUrl": "https://www.foxsports.com/nfl/washington-commanders-team",
+        "category": "news"
+      },
+      {
+        "id": "nfl-wsh-yahoo-sports",
+        "name": "Yahoo! Sports",
+        "browserUrl": "https://sports.yahoo.com/nfl/teams/washington/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-wsh-the-athletic",
+        "name": "The Athletic",
+        "browserUrl": "https://www.nytimes.com/athletic/nfl/team/commanders/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-wsh-b-r",
+        "name": "B/R",
+        "browserUrl": "https://bleacherreport.com/washington-commanders",
+        "category": "news"
+      },
+      {
+        "id": "nfl-wsh-nbc-sports",
+        "name": "NBC Sports",
+        "browserUrl": "https://www.nbcsports.com/nfl/washington-commanders",
+        "category": "news"
+      },
+      {
+        "id": "nfl-wsh-si",
+        "name": "SI",
+        "browserUrl": "https://www.si.com/nfl/commanders",
+        "category": "news"
+      },
+      {
+        "id": "nfl-wsh-usa-today",
+        "name": "USA Today",
+        "browserUrl": "https://www.usatoday.com/sports/nfl/washington-commanders",
+        "category": "news"
+      },
+      {
+        "id": "nfl-wsh-athlon-sports",
+        "name": "Athlon Sports",
+        "browserUrl": "https://athlonsports.com/nfl/washington-commanders",
+        "category": "news"
+      },
+      {
+        "id": "nfl-wsh-yardbarker",
+        "name": "Yardbarker",
+        "browserUrl": "https://www.yardbarker.com/nfl/teams/washington_commanders/62",
+        "category": "news"
+      },
+      {
+        "id": "nfl-wsh-spotrac",
+        "name": "Spotrac",
+        "browserUrl": "https://www.spotrac.com/nfl/washington-commanders/overview",
+        "category": "news"
+      },
+      {
+        "id": "nfl-wsh-statmuse",
+        "name": "StatMuse",
+        "browserUrl": "https://www.statmuse.com/nfl/team/2026-washington-commanders-48/2026",
+        "category": "news"
+      },
+      {
+        "id": "nfl-wsh-pro-football-rumors",
+        "name": "Pro Football Rumors",
+        "browserUrl": "https://www.profootballrumors.com/washington-commanders-news-rumors",
+        "category": "news"
+      },
+      {
+        "id": "nfl-wsh-newsnow",
+        "name": "NewsNow",
+        "browserUrl": "https://www.newsnow.com/us/Sports/NFL/NFC+East/Washington+Commanders",
+        "category": "news"
+      },
+      {
+        "id": "nfl-wsh-sportspyder",
+        "name": "SportSpyder",
+        "browserUrl": "https://sportspyder.com/nfl/washington-commanders/news",
+        "category": "news"
+      },
+      {
+        "id": "nfl-wsh-r-commanders",
+        "name": "r/Commanders",
+        "browserUrl": "https://www.reddit.com/r/Commanders/",
+        "category": "news"
+      },
+      {
+        "id": "nfl-wsh-commanders",
+        "name": "@Commanders",
+        "browserUrl": "https://x.com/Commanders",
+        "category": "news"
+      },
+      {
+        "id": "nfl-wsh-commanders-2",
+        "name": "#Commanders",
+        "browserUrl": "https://x.com/search?q=Commanders&src=typed_query",
+        "category": "news"
+      },
+      {
+        "id": "nfl-wsh-commanders-com",
+        "name": "Commanders.com",
+        "browserUrl": "https://www.commanders.com/news",
         "category": "news"
       },
       {
@@ -110324,11 +115238,18 @@ var SPORT_KEY_TO_LEAGUE = {
 function normalizeTeamAbbrev2(teamAbbrev2) {
   return teamAbbrev2.trim().toUpperCase();
 }
+function normalizeTeamAbbrevForLeague(league2, teamAbbrev2) {
+  const normalized = normalizeTeamAbbrev2(teamAbbrev2);
+  if (league2 === "NFL" && normalized === "WAS") {
+    return "WSH";
+  }
+  return normalized;
+}
 function sportKeyToTeamHubLeague(sportKey) {
   return SPORT_KEY_TO_LEAGUE[sportKey.trim().toLowerCase()] ?? null;
 }
 function resolveNonMlbTeamNewsSourcesForTeamAbbrev(league2, teamAbbrev2) {
-  const normalized = normalizeTeamAbbrev2(teamAbbrev2);
+  const normalized = normalizeTeamAbbrevForLeague(league2, teamAbbrev2);
   return NON_MLB_TEAM_NEWS_SOURCES_BY_LEAGUE_ABBREV[league2]?.[normalized] ?? EMPTY_SOURCES2;
 }
 function resolveNonMlbTeamNewsSourcesForTeam(teamNameOrAbbrev, sportKey, teamAbbrevHint) {
@@ -110338,6 +115259,23 @@ function resolveNonMlbTeamNewsSourcesForTeam(teamNameOrAbbrev, sportKey, teamAbb
   const abbrev = meta?.abbrev ?? teamAbbrevHint?.trim().toUpperCase();
   if (!abbrev) return EMPTY_SOURCES2;
   return resolveNonMlbTeamNewsSourcesForTeamAbbrev(league2, abbrev);
+}
+
+// ../grarf/desktop/src/lib/teamNews/buildGoogleTeamNewsBrowserSource.ts
+init_define_import_meta_env();
+function buildGoogleTeamNewsSearchUrl(teamDisplayName2) {
+  const query = teamDisplayName2.trim();
+  return `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+}
+function buildGoogleTeamNewsBrowserSource(teamDisplayName2) {
+  const query = teamDisplayName2.trim();
+  const slug = query.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+  return {
+    id: `google-team-${slug || "unknown"}`,
+    name: "Google",
+    browserUrl: buildGoogleTeamNewsSearchUrl(query),
+    category: "news"
+  };
 }
 
 // ../grarf/desktop/src/lib/gamesSpine/openGameWorkspaceTab.ts
@@ -111058,29 +115996,43 @@ function resolveTeamWebsitesForSide(game, side) {
   const teamName = (side === "away" ? game.awayTeam : game.homeTeam).trim();
   const teamAbbrev2 = (side === "away" ? game.awayTeamAbbrev : game.homeTeamAbbrev)?.trim();
   if (!teamName && !teamAbbrev2) return [];
+  let websites = [];
   if (isMlbGameRow13(game)) {
-    const sources2 = teamAbbrev2 ? resolveMlbTeamNewsSourcesForTeamAbbrev(teamAbbrev2) : resolveMlbTeamNewsSourcesForTeam(teamName);
-    return dedupeGameBrowserWebsitesByUrl(
-      mapHomeSourcesToWebsites(mapMlbTeamNewsSourcesToHomeSourceConfig([...sources2]))
+    const sources = teamAbbrev2 ? resolveMlbTeamNewsSourcesForTeamAbbrev(teamAbbrev2) : resolveMlbTeamNewsSourcesForTeam(teamName);
+    websites = dedupeGameBrowserWebsitesByUrl(
+      mapHomeSourcesToWebsites(mapMlbTeamNewsSourcesToHomeSourceConfig([...sources]))
     );
-  }
-  const league2 = resolveTeamHubLeagueFromGame(game);
-  if (!league2) return [];
-  if (teamAbbrev2) {
-    const byAbbrev = resolveNonMlbTeamNewsSourcesForTeamAbbrev(league2, teamAbbrev2);
-    if (byAbbrev.length > 0) {
-      return dedupeGameBrowserWebsitesByUrl(
-        mapHomeSourcesToWebsites(mapNonMlbTeamNewsSourcesToHomeSourceConfig([...byAbbrev]))
-      );
+  } else {
+    const league2 = resolveTeamHubLeagueFromGame(game);
+    if (league2) {
+      if (teamAbbrev2) {
+        const byAbbrev = resolveNonMlbTeamNewsSourcesForTeamAbbrev(league2, teamAbbrev2);
+        if (byAbbrev.length > 0) {
+          websites = dedupeGameBrowserWebsitesByUrl(
+            mapHomeSourcesToWebsites(mapNonMlbTeamNewsSourcesToHomeSourceConfig([...byAbbrev]))
+          );
+        }
+      }
+      if (websites.length === 0) {
+        const sources = resolveNonMlbTeamNewsSourcesForTeam(
+          teamName,
+          league2.toLowerCase(),
+          teamAbbrev2 || void 0
+        );
+        websites = dedupeGameBrowserWebsitesByUrl(
+          mapHomeSourcesToWebsites(mapNonMlbTeamNewsSourcesToHomeSourceConfig([...sources]))
+        );
+      }
     }
   }
-  const sources = resolveNonMlbTeamNewsSourcesForTeam(
-    teamName,
-    league2.toLowerCase(),
-    teamAbbrev2 || void 0
-  );
+  if (websites.length > 0) {
+    return websites;
+  }
+  const label = resolveTeamLabel(game, side);
+  if (!label) return [];
+  const googleSource = buildGoogleTeamNewsBrowserSource(label);
   return dedupeGameBrowserWebsitesByUrl(
-    mapHomeSourcesToWebsites(mapNonMlbTeamNewsSourcesToHomeSourceConfig([...sources]))
+    mapHomeSourcesToWebsites(mapMlbTeamNewsSourcesToHomeSourceConfig([googleSource]))
   );
 }
 function resolveTeamLabel(game, side) {
@@ -172743,2719 +177695,6 @@ init_define_import_meta_env();
 
 // ../grarf/desktop/src/extensionHost/resolveGrarfExtensionNflTeamExploreSources.ts
 init_define_import_meta_env();
-
-// ../grarf/desktop/src/extensionHost/grarfExtensionNflTeamExploreSources.generated.ts
-init_define_import_meta_env();
-var GRARF_EXTENSION_NFL_TEAM_EXPLORE_SOURCES_BY_ABBREV = {
-  "ARI": [
-    {
-      "label": "NFL.com",
-      "url": "https://www.nfl.com/teams/arizona-cardinals/"
-    },
-    {
-      "label": "ESPN",
-      "url": "https://www.espn.com/nfl/team/_/name/ari/arizona-cardinals"
-    },
-    {
-      "label": "CBS Sports",
-      "url": "https://www.cbssports.com/nfl/teams/ARI/arizona-cardinals/"
-    },
-    {
-      "label": "FOX Sports",
-      "url": "https://www.foxsports.com/nfl/arizona-cardinals-team"
-    },
-    {
-      "label": "Yahoo! Sports",
-      "url": "https://sports.yahoo.com/nfl/teams/arizona/"
-    },
-    {
-      "label": "The Athletic",
-      "url": "https://www.nytimes.com/athletic/nfl/team/cardinals/"
-    },
-    {
-      "label": "B/R",
-      "url": "https://bleacherreport.com/arizona-cardinals"
-    },
-    {
-      "label": "NBC Sports",
-      "url": "https://www.nbcsports.com/nfl/arizona-cardinals"
-    },
-    {
-      "label": "SI",
-      "url": "https://www.si.com/nfl/cardinals"
-    },
-    {
-      "label": "USA Today",
-      "url": "https://www.usatoday.com/sports/nfl/arizona-cardinals"
-    },
-    {
-      "label": "Athlon Sports",
-      "url": "https://athlonsports.com/nfl/arizona-cardinals"
-    },
-    {
-      "label": "Yardbarker",
-      "url": "https://www.yardbarker.com/nfl/teams/arizona_cardinals/47"
-    },
-    {
-      "label": "Spotrac",
-      "url": "https://www.spotrac.com/nfl/arizona-cardinals/overview"
-    },
-    {
-      "label": "StatMuse",
-      "url": "https://www.statmuse.com/nfl/team/2026-arizona-cardinals-7/2026"
-    },
-    {
-      "label": "Pro Football Rumors",
-      "url": "https://www.profootballrumors.com/arizona-cardinals-news-rumors"
-    },
-    {
-      "label": "NewsNow",
-      "url": "https://www.newsnow.com/us/Sports/NFL/NFC+West/Arizona+Cardinals"
-    },
-    {
-      "label": "SportSpyder",
-      "url": "https://sportspyder.com/nfl/arizona-cardinals/news"
-    },
-    {
-      "label": "r/AZCardinals",
-      "url": "https://www.reddit.com/r/AZCardinals/"
-    },
-    {
-      "label": "@Cardinals",
-      "url": "https://x.com/AZCardinals"
-    },
-    {
-      "label": "#Cardinals",
-      "url": "https://x.com/search?q=Cardinals&src=typed_query"
-    }
-  ],
-  "ATL": [
-    {
-      "label": "NFL.com",
-      "url": "https://www.nfl.com/teams/atlanta-falcons/"
-    },
-    {
-      "label": "ESPN",
-      "url": "https://www.espn.com/nfl/team/_/name/atl/atlanta-falcons"
-    },
-    {
-      "label": "CBS Sports",
-      "url": "https://www.cbssports.com/nfl/teams/ATL/atlanta-falcons/"
-    },
-    {
-      "label": "FOX Sports",
-      "url": "https://www.foxsports.com/nfl/atlanta-falcons-team"
-    },
-    {
-      "label": "Yahoo! Sports",
-      "url": "https://sports.yahoo.com/nfl/teams/atlanta/"
-    },
-    {
-      "label": "The Athletic",
-      "url": "https://www.nytimes.com/athletic/nfl/team/falcons/"
-    },
-    {
-      "label": "B/R",
-      "url": "https://bleacherreport.com/atlanta-falcons"
-    },
-    {
-      "label": "NBC Sports",
-      "url": "https://www.nbcsports.com/nfl/atlanta-falcons"
-    },
-    {
-      "label": "SI",
-      "url": "https://www.si.com/nfl/falcons"
-    },
-    {
-      "label": "USA Today",
-      "url": "https://www.usatoday.com/sports/nfl/atlanta-falcons"
-    },
-    {
-      "label": "Athlon Sports",
-      "url": "https://athlonsports.com/nfl/atlanta-falcons"
-    },
-    {
-      "label": "Yardbarker",
-      "url": "https://www.yardbarker.com/nfl/teams/atlanta_falcons/48"
-    },
-    {
-      "label": "Spotrac",
-      "url": "https://www.spotrac.com/nfl/atlanta-falcons/overview"
-    },
-    {
-      "label": "StatMuse",
-      "url": "https://www.statmuse.com/nfl/team/2026-atlanta-falcons-78/2026"
-    },
-    {
-      "label": "Pro Football Rumors",
-      "url": "https://www.profootballrumors.com/atlanta-falcons-news-rumors"
-    },
-    {
-      "label": "NewsNow",
-      "url": "https://www.newsnow.com/us/Sports/NFL/NFC+South/Atlanta+Falcons"
-    },
-    {
-      "label": "SportSpyder",
-      "url": "https://sportspyder.com/nfl/atlanta-falcons/news"
-    },
-    {
-      "label": "r/falcons",
-      "url": "https://www.reddit.com/r/falcons/"
-    },
-    {
-      "label": "@Falcons",
-      "url": "https://x.com/AtlantaFalcons"
-    },
-    {
-      "label": "#Falcons",
-      "url": "https://x.com/search?q=Falcons&src=typed_query"
-    }
-  ],
-  "BAL": [
-    {
-      "label": "NFL.com",
-      "url": "https://www.nfl.com/teams/baltimore-ravens/"
-    },
-    {
-      "label": "ESPN",
-      "url": "https://www.espn.com/nfl/team/_/name/bal/baltimore-ravens"
-    },
-    {
-      "label": "CBS Sports",
-      "url": "https://www.cbssports.com/nfl/teams/BAL/baltimore-ravens/"
-    },
-    {
-      "label": "FOX Sports",
-      "url": "https://www.foxsports.com/nfl/baltimore-ravens-team"
-    },
-    {
-      "label": "Yahoo! Sports",
-      "url": "https://sports.yahoo.com/nfl/teams/baltimore/"
-    },
-    {
-      "label": "The Athletic",
-      "url": "https://www.nytimes.com/athletic/nfl/team/ravens/"
-    },
-    {
-      "label": "B/R",
-      "url": "https://bleacherreport.com/baltimore-ravens"
-    },
-    {
-      "label": "NBC Sports",
-      "url": "https://www.nbcsports.com/nfl/baltimore-ravens"
-    },
-    {
-      "label": "SI",
-      "url": "https://www.si.com/nfl/ravens"
-    },
-    {
-      "label": "USA Today",
-      "url": "https://www.usatoday.com/sports/nfl/baltimore-ravens"
-    },
-    {
-      "label": "Athlon Sports",
-      "url": "https://athlonsports.com/nfl/baltimore-ravens"
-    },
-    {
-      "label": "Yardbarker",
-      "url": "https://www.yardbarker.com/nfl/teams/baltimore_ravens/31"
-    },
-    {
-      "label": "Spotrac",
-      "url": "https://www.spotrac.com/nfl/baltimore-ravens/overview"
-    },
-    {
-      "label": "StatMuse",
-      "url": "https://www.statmuse.com/nfl/team/2026-baltimore-ravens-85/2026"
-    },
-    {
-      "label": "Pro Football Rumors",
-      "url": "https://www.profootballrumors.com/baltimore-ravens-news-rumors"
-    },
-    {
-      "label": "NewsNow",
-      "url": "https://www.newsnow.com/us/Sports/NFL/AFC+North/Baltimore+Ravens"
-    },
-    {
-      "label": "SportSpyder",
-      "url": "https://sportspyder.com/nfl/baltimore-ravens/news"
-    },
-    {
-      "label": "r/ravens",
-      "url": "https://www.reddit.com/r/ravens/"
-    },
-    {
-      "label": "@Ravens",
-      "url": "https://x.com/Ravens"
-    },
-    {
-      "label": "#Ravens",
-      "url": "https://x.com/search?q=Ravens&src=typed_query"
-    }
-  ],
-  "BUF": [
-    {
-      "label": "NFL.com",
-      "url": "https://www.nfl.com/teams/buffalo-bills/"
-    },
-    {
-      "label": "ESPN",
-      "url": "https://www.espn.com/nfl/team/_/name/buf/buffalo-bills"
-    },
-    {
-      "label": "CBS Sports",
-      "url": "https://www.cbssports.com/nfl/teams/BUF/buffalo-bills/"
-    },
-    {
-      "label": "FOX Sports",
-      "url": "https://www.foxsports.com/nfl/buffalo-bills-team"
-    },
-    {
-      "label": "Yahoo! Sports",
-      "url": "https://sports.yahoo.com/nfl/teams/buffalo/"
-    },
-    {
-      "label": "The Athletic",
-      "url": "https://www.nytimes.com/athletic/nfl/team/bills/"
-    },
-    {
-      "label": "B/R",
-      "url": "https://bleacherreport.com/buffalo-bills"
-    },
-    {
-      "label": "NBC Sports",
-      "url": "https://www.nbcsports.com/nfl/buffalo-bills"
-    },
-    {
-      "label": "SI",
-      "url": "https://www.si.com/nfl/bills"
-    },
-    {
-      "label": "USA Today",
-      "url": "https://www.usatoday.com/sports/nfl/buffalo-bills"
-    },
-    {
-      "label": "Athlon Sports",
-      "url": "https://athlonsports.com/nfl/buffalo-bills"
-    },
-    {
-      "label": "Yardbarker",
-      "url": "https://www.yardbarker.com/nfl/teams/buffalo_bills/32"
-    },
-    {
-      "label": "Spotrac",
-      "url": "https://www.spotrac.com/nfl/buffalo-bills/overview"
-    },
-    {
-      "label": "StatMuse",
-      "url": "https://www.statmuse.com/nfl/team/2026-buffalo-bills-67/2026"
-    },
-    {
-      "label": "Pro Football Rumors",
-      "url": "https://www.profootballrumors.com/buffalo-bills-news-rumors"
-    },
-    {
-      "label": "NewsNow",
-      "url": "https://www.newsnow.com/us/Sports/NFL/AFC+East/Buffalo+Bills"
-    },
-    {
-      "label": "SportSpyder",
-      "url": "https://sportspyder.com/nfl/buffalo-bills/news"
-    },
-    {
-      "label": "r/buffalobills",
-      "url": "https://www.reddit.com/r/buffalobills/"
-    },
-    {
-      "label": "@Bills",
-      "url": "https://x.com/BuffaloBills"
-    },
-    {
-      "label": "#Bills",
-      "url": "https://x.com/search?q=Bills&src=typed_query"
-    }
-  ],
-  "CAR": [
-    {
-      "label": "NFL.com",
-      "url": "https://www.nfl.com/teams/carolina-panthers/"
-    },
-    {
-      "label": "ESPN",
-      "url": "https://www.espn.com/nfl/team/_/name/car/carolina-panthers"
-    },
-    {
-      "label": "CBS Sports",
-      "url": "https://www.cbssports.com/nfl/teams/CAR/carolina-panthers/"
-    },
-    {
-      "label": "FOX Sports",
-      "url": "https://www.foxsports.com/nfl/carolina-panthers-team"
-    },
-    {
-      "label": "Yahoo! Sports",
-      "url": "https://sports.yahoo.com/nfl/teams/carolina/"
-    },
-    {
-      "label": "The Athletic",
-      "url": "https://www.nytimes.com/athletic/nfl/team/panthers/"
-    },
-    {
-      "label": "B/R",
-      "url": "https://bleacherreport.com/carolina-panthers"
-    },
-    {
-      "label": "NBC Sports",
-      "url": "https://www.nbcsports.com/nfl/carolina-panthers"
-    },
-    {
-      "label": "SI",
-      "url": "https://www.si.com/nfl/panthers"
-    },
-    {
-      "label": "USA Today",
-      "url": "https://www.usatoday.com/sports/nfl/carolina-panthers"
-    },
-    {
-      "label": "Athlon Sports",
-      "url": "https://athlonsports.com/nfl/carolina-panthers"
-    },
-    {
-      "label": "Yardbarker",
-      "url": "https://www.yardbarker.com/nfl/teams/carolina_panthers/49"
-    },
-    {
-      "label": "Spotrac",
-      "url": "https://www.spotrac.com/nfl/carolina-panthers/overview"
-    },
-    {
-      "label": "StatMuse",
-      "url": "https://www.statmuse.com/nfl/team/2026-carolina-panthers-83/2026"
-    },
-    {
-      "label": "Pro Football Rumors",
-      "url": "https://www.profootballrumors.com/carolina-panthers-news-rumors"
-    },
-    {
-      "label": "NewsNow",
-      "url": "https://www.newsnow.com/us/Sports/NFL/NFC+South/Carolina+Panthers"
-    },
-    {
-      "label": "SportSpyder",
-      "url": "https://sportspyder.com/nfl/carolina-panthers/news"
-    },
-    {
-      "label": "r/panthers",
-      "url": "https://www.reddit.com/r/panthers/"
-    },
-    {
-      "label": "@Panthers",
-      "url": "https://x.com/Panthers"
-    },
-    {
-      "label": "#Panthers",
-      "url": "https://x.com/search?q=Panthers&src=typed_query"
-    }
-  ],
-  "CHI": [
-    {
-      "label": "NFL.com",
-      "url": "https://www.nfl.com/teams/chicago-bears/"
-    },
-    {
-      "label": "ESPN",
-      "url": "https://www.espn.com/nfl/team/_/name/chi/chicago-bears"
-    },
-    {
-      "label": "CBS Sports",
-      "url": "https://www.cbssports.com/nfl/teams/CHI/chicago-bears/"
-    },
-    {
-      "label": "FOX Sports",
-      "url": "https://www.foxsports.com/nfl/chicago-bears-team"
-    },
-    {
-      "label": "Yahoo! Sports",
-      "url": "https://sports.yahoo.com/nfl/teams/chicago/"
-    },
-    {
-      "label": "The Athletic",
-      "url": "https://www.nytimes.com/athletic/nfl/team/bears/"
-    },
-    {
-      "label": "B/R",
-      "url": "https://bleacherreport.com/chicago-bears"
-    },
-    {
-      "label": "NBC Sports",
-      "url": "https://www.nbcsports.com/nfl/chicago-bears"
-    },
-    {
-      "label": "SI",
-      "url": "https://www.si.com/nfl/bears"
-    },
-    {
-      "label": "USA Today",
-      "url": "https://www.usatoday.com/sports/nfl/chicago-bears"
-    },
-    {
-      "label": "Athlon Sports",
-      "url": "https://athlonsports.com/nfl/chicago-bears"
-    },
-    {
-      "label": "Yardbarker",
-      "url": "https://www.yardbarker.com/nfl/teams/chicago_bears/50"
-    },
-    {
-      "label": "Spotrac",
-      "url": "https://www.spotrac.com/nfl/chicago-bears/overview"
-    },
-    {
-      "label": "StatMuse",
-      "url": "https://www.statmuse.com/nfl/team/2026-chicago-bears-chi/2026"
-    },
-    {
-      "label": "Pro Football Rumors",
-      "url": "https://www.profootballrumors.com/chicago-bears-news-rumors"
-    },
-    {
-      "label": "NewsNow",
-      "url": "https://www.newsnow.com/us/Sports/NFL/NFC+North/Chicago+Bears"
-    },
-    {
-      "label": "SportSpyder",
-      "url": "https://sportspyder.com/nfl/chicago-bears/news"
-    },
-    {
-      "label": "r/CHIBears",
-      "url": "https://www.reddit.com/r/CHIBears/"
-    },
-    {
-      "label": "@Bears",
-      "url": "https://x.com/ChicagoBears"
-    },
-    {
-      "label": "#Bears",
-      "url": "https://x.com/search?q=Bears&src=typed_query"
-    }
-  ],
-  "CIN": [
-    {
-      "label": "NFL.com",
-      "url": "https://www.nfl.com/teams/cincinnati-bengals/"
-    },
-    {
-      "label": "ESPN",
-      "url": "https://www.espn.com/nfl/team/_/name/cin/cincinnati-bengals"
-    },
-    {
-      "label": "CBS Sports",
-      "url": "https://www.cbssports.com/nfl/teams/CIN/cincinnati-bengals/"
-    },
-    {
-      "label": "FOX Sports",
-      "url": "https://www.foxsports.com/nfl/cincinnati-bengals-team"
-    },
-    {
-      "label": "Yahoo! Sports",
-      "url": "https://sports.yahoo.com/nfl/teams/cincinnati/"
-    },
-    {
-      "label": "The Athletic",
-      "url": "https://www.nytimes.com/athletic/nfl/team/bengals/"
-    },
-    {
-      "label": "B/R",
-      "url": "https://bleacherreport.com/cincinnati-bengals"
-    },
-    {
-      "label": "NBC Sports",
-      "url": "https://www.nbcsports.com/nfl/cincinnati-bengals"
-    },
-    {
-      "label": "SI",
-      "url": "https://www.si.com/nfl/bengals"
-    },
-    {
-      "label": "USA Today",
-      "url": "https://www.usatoday.com/sports/nfl/cincinnati-bengals"
-    },
-    {
-      "label": "Athlon Sports",
-      "url": "https://athlonsports.com/nfl/cincinnati-bengals"
-    },
-    {
-      "label": "Yardbarker",
-      "url": "https://www.yardbarker.com/nfl/teams/cincinnati_bengals/33"
-    },
-    {
-      "label": "Spotrac",
-      "url": "https://www.spotrac.com/nfl/cincinnati-bengals/overview"
-    },
-    {
-      "label": "StatMuse",
-      "url": "https://www.statmuse.com/nfl/team/2026-cincinnati-bengals-80/2026"
-    },
-    {
-      "label": "Pro Football Rumors",
-      "url": "https://www.profootballrumors.com/cincinnati-bengals-news-rumors"
-    },
-    {
-      "label": "NewsNow",
-      "url": "https://www.newsnow.com/us/Sports/NFL/AFC+North/Cincinnati+Bengals"
-    },
-    {
-      "label": "SportSpyder",
-      "url": "https://sportspyder.com/nfl/cincinnati-bengals/news"
-    },
-    {
-      "label": "r/bengals",
-      "url": "https://www.reddit.com/r/bengals/"
-    },
-    {
-      "label": "@Bengals",
-      "url": "https://x.com/Bengals"
-    },
-    {
-      "label": "#Bengals",
-      "url": "https://x.com/search?q=Bengals&src=typed_query"
-    }
-  ],
-  "CLE": [
-    {
-      "label": "NFL.com",
-      "url": "https://www.nfl.com/teams/cleveland-browns/"
-    },
-    {
-      "label": "ESPN",
-      "url": "https://www.espn.com/nfl/team/_/name/cle/cleveland-browns"
-    },
-    {
-      "label": "CBS Sports",
-      "url": "https://www.cbssports.com/nfl/teams/CLE/cleveland-browns/"
-    },
-    {
-      "label": "FOX Sports",
-      "url": "https://www.foxsports.com/nfl/cleveland-browns-team"
-    },
-    {
-      "label": "Yahoo! Sports",
-      "url": "https://sports.yahoo.com/nfl/teams/cleveland/"
-    },
-    {
-      "label": "The Athletic",
-      "url": "https://www.nytimes.com/athletic/nfl/team/browns/"
-    },
-    {
-      "label": "B/R",
-      "url": "https://bleacherreport.com/cleveland-browns"
-    },
-    {
-      "label": "NBC Sports",
-      "url": "https://www.nbcsports.com/nfl/cleveland-browns"
-    },
-    {
-      "label": "SI",
-      "url": "https://www.si.com/nfl/browns"
-    },
-    {
-      "label": "USA Today",
-      "url": "https://www.usatoday.com/sports/nfl/cleveland-browns"
-    },
-    {
-      "label": "Athlon Sports",
-      "url": "https://athlonsports.com/nfl/cleveland-browns"
-    },
-    {
-      "label": "Yardbarker",
-      "url": "https://www.yardbarker.com/nfl/teams/cleveland_browns/34"
-    },
-    {
-      "label": "Spotrac",
-      "url": "https://www.spotrac.com/nfl/cleveland-browns/overview"
-    },
-    {
-      "label": "StatMuse",
-      "url": "https://www.statmuse.com/nfl/team/2026-cleveland-browns-58/2026"
-    },
-    {
-      "label": "Pro Football Rumors",
-      "url": "https://www.profootballrumors.com/cleveland-browns-news-rumors"
-    },
-    {
-      "label": "NewsNow",
-      "url": "https://www.newsnow.com/us/Sports/NFL/AFC+North/Cleveland+Browns"
-    },
-    {
-      "label": "SportSpyder",
-      "url": "https://sportspyder.com/nfl/cleveland-browns/news"
-    },
-    {
-      "label": "r/Browns",
-      "url": "https://www.reddit.com/r/Browns/"
-    },
-    {
-      "label": "@Browns",
-      "url": "https://x.com/Browns"
-    },
-    {
-      "label": "#Browns",
-      "url": "https://x.com/search?q=Browns&src=typed_query"
-    }
-  ],
-  "DAL": [
-    {
-      "label": "NFL.com",
-      "url": "https://www.nfl.com/teams/dallas-cowboys/"
-    },
-    {
-      "label": "ESPN",
-      "url": "https://www.espn.com/nfl/team/_/name/dal/dallas-cowboys"
-    },
-    {
-      "label": "CBS Sports",
-      "url": "https://www.cbssports.com/nfl/teams/DAL/dallas-cowboys/"
-    },
-    {
-      "label": "FOX Sports",
-      "url": "https://www.foxsports.com/nfl/dallas-cowboys-team"
-    },
-    {
-      "label": "Yahoo! Sports",
-      "url": "https://sports.yahoo.com/nfl/teams/dallas/"
-    },
-    {
-      "label": "The Athletic",
-      "url": "https://www.nytimes.com/athletic/nfl/team/cowboys/"
-    },
-    {
-      "label": "B/R",
-      "url": "https://bleacherreport.com/dallas-cowboys"
-    },
-    {
-      "label": "NBC Sports",
-      "url": "https://www.nbcsports.com/nfl/dallas-cowboys"
-    },
-    {
-      "label": "SI",
-      "url": "https://www.si.com/nfl/cowboys"
-    },
-    {
-      "label": "USA Today",
-      "url": "https://www.usatoday.com/sports/nfl/dallas-cowboys"
-    },
-    {
-      "label": "Athlon Sports",
-      "url": "https://athlonsports.com/nfl/dallas-cowboys"
-    },
-    {
-      "label": "Yardbarker",
-      "url": "https://www.yardbarker.com/nfl/teams/dallas_cowboys/51"
-    },
-    {
-      "label": "Spotrac",
-      "url": "https://www.spotrac.com/nfl/dallas-cowboys/overview"
-    },
-    {
-      "label": "StatMuse",
-      "url": "https://www.statmuse.com/nfl/team/2026-dallas-cowboys-75/2026"
-    },
-    {
-      "label": "Pro Football Rumors",
-      "url": "https://www.profootballrumors.com/dallas-cowboys-news-rumors"
-    },
-    {
-      "label": "NewsNow",
-      "url": "https://www.newsnow.com/us/Sports/NFL/NFC+East/Dallas+Cowboys"
-    },
-    {
-      "label": "SportSpyder",
-      "url": "https://sportspyder.com/nfl/dallas-cowboys/news"
-    },
-    {
-      "label": "r/cowboys",
-      "url": "https://www.reddit.com/r/cowboys/"
-    },
-    {
-      "label": "@Cowboys",
-      "url": "https://x.com/dallascowboys"
-    },
-    {
-      "label": "#Cowboys",
-      "url": "https://x.com/search?q=Cowboys&src=typed_query"
-    }
-  ],
-  "DEN": [
-    {
-      "label": "NFL.com",
-      "url": "https://www.nfl.com/teams/denver-broncos/"
-    },
-    {
-      "label": "ESPN",
-      "url": "https://www.espn.com/nfl/team/_/name/den/denver-broncos"
-    },
-    {
-      "label": "CBS Sports",
-      "url": "https://www.cbssports.com/nfl/teams/DEN/denver-broncos/"
-    },
-    {
-      "label": "FOX Sports",
-      "url": "https://www.foxsports.com/nfl/denver-broncos-team"
-    },
-    {
-      "label": "Yahoo! Sports",
-      "url": "https://sports.yahoo.com/nfl/teams/denver/"
-    },
-    {
-      "label": "The Athletic",
-      "url": "https://www.nytimes.com/athletic/nfl/team/broncos/"
-    },
-    {
-      "label": "B/R",
-      "url": "https://bleacherreport.com/denver-broncos"
-    },
-    {
-      "label": "NBC Sports",
-      "url": "https://www.nbcsports.com/nfl/denver-broncos"
-    },
-    {
-      "label": "SI",
-      "url": "https://www.si.com/nfl/broncos"
-    },
-    {
-      "label": "USA Today",
-      "url": "https://www.usatoday.com/sports/nfl/denver-broncos"
-    },
-    {
-      "label": "Athlon Sports",
-      "url": "https://athlonsports.com/nfl/denver-broncos"
-    },
-    {
-      "label": "Yardbarker",
-      "url": "https://www.yardbarker.com/nfl/teams/denver_broncos/35"
-    },
-    {
-      "label": "Spotrac",
-      "url": "https://www.spotrac.com/nfl/denver-broncos/overview"
-    },
-    {
-      "label": "StatMuse",
-      "url": "https://www.statmuse.com/nfl/team/2026-denver-broncos-68/2026"
-    },
-    {
-      "label": "Pro Football Rumors",
-      "url": "https://www.profootballrumors.com/denver-broncos-news-rumors"
-    },
-    {
-      "label": "NewsNow",
-      "url": "https://www.newsnow.com/us/Sports/NFL/AFC+West/Denver+Broncos"
-    },
-    {
-      "label": "SportSpyder",
-      "url": "https://sportspyder.com/nfl/denver-broncos/news"
-    },
-    {
-      "label": "r/DenverBroncos",
-      "url": "https://www.reddit.com/r/DenverBroncos/"
-    },
-    {
-      "label": "@Broncos",
-      "url": "https://x.com/Broncos"
-    },
-    {
-      "label": "#Broncos",
-      "url": "https://x.com/search?q=Broncos&src=typed_query"
-    }
-  ],
-  "DET": [
-    {
-      "label": "NFL.com",
-      "url": "https://www.nfl.com/teams/detroit-lions/"
-    },
-    {
-      "label": "ESPN",
-      "url": "https://www.espn.com/nfl/team/_/name/det/detroit-lions"
-    },
-    {
-      "label": "CBS Sports",
-      "url": "https://www.cbssports.com/nfl/teams/DET/detroit-lions/"
-    },
-    {
-      "label": "FOX Sports",
-      "url": "https://www.foxsports.com/nfl/detroit-lions-team"
-    },
-    {
-      "label": "Yahoo! Sports",
-      "url": "https://sports.yahoo.com/nfl/teams/detroit/"
-    },
-    {
-      "label": "The Athletic",
-      "url": "https://www.nytimes.com/athletic/nfl/team/lions/"
-    },
-    {
-      "label": "B/R",
-      "url": "https://bleacherreport.com/detroit-lions"
-    },
-    {
-      "label": "NBC Sports",
-      "url": "https://www.nbcsports.com/nfl/detroit-lions"
-    },
-    {
-      "label": "SI",
-      "url": "https://www.si.com/nfl/lions"
-    },
-    {
-      "label": "USA Today",
-      "url": "https://www.usatoday.com/sports/nfl/detroit-lions"
-    },
-    {
-      "label": "Athlon Sports",
-      "url": "https://athlonsports.com/nfl/detroit-lions"
-    },
-    {
-      "label": "Yardbarker",
-      "url": "https://www.yardbarker.com/nfl/teams/detroit_lions/52"
-    },
-    {
-      "label": "Spotrac",
-      "url": "https://www.spotrac.com/nfl/detroit-lions/overview"
-    },
-    {
-      "label": "StatMuse",
-      "url": "https://www.statmuse.com/nfl/team/2026-detroit-lions-46/2026"
-    },
-    {
-      "label": "Pro Football Rumors",
-      "url": "https://www.profootballrumors.com/detroit-lions-news-rumors"
-    },
-    {
-      "label": "NewsNow",
-      "url": "https://www.newsnow.com/us/Sports/NFL/NFC+North/Detroit+Lions"
-    },
-    {
-      "label": "SportSpyder",
-      "url": "https://sportspyder.com/nfl/detroit-lions/news"
-    },
-    {
-      "label": "r/detroitlions",
-      "url": "https://www.reddit.com/r/detroitlions/"
-    },
-    {
-      "label": "@Lions",
-      "url": "https://x.com/Lions"
-    },
-    {
-      "label": "#Lions",
-      "url": "https://x.com/search?q=Lions&src=typed_query"
-    }
-  ],
-  "GB": [
-    {
-      "label": "NFL.com",
-      "url": "https://www.nfl.com/teams/green-bay-packers/"
-    },
-    {
-      "label": "ESPN",
-      "url": "https://www.espn.com/nfl/team/_/name/gb/green-bay-packers"
-    },
-    {
-      "label": "CBS Sports",
-      "url": "https://www.cbssports.com/nfl/teams/GB/green-bay-packers/"
-    },
-    {
-      "label": "FOX Sports",
-      "url": "https://www.foxsports.com/nfl/green-bay-packers-team"
-    },
-    {
-      "label": "Yahoo! Sports",
-      "url": "https://sports.yahoo.com/nfl/teams/green-bay/"
-    },
-    {
-      "label": "The Athletic",
-      "url": "https://www.nytimes.com/athletic/nfl/team/packers/"
-    },
-    {
-      "label": "B/R",
-      "url": "https://bleacherreport.com/green-bay-packers"
-    },
-    {
-      "label": "NBC Sports",
-      "url": "https://www.nbcsports.com/nfl/green-bay-packers"
-    },
-    {
-      "label": "SI",
-      "url": "https://www.si.com/nfl/packers"
-    },
-    {
-      "label": "USA Today",
-      "url": "https://www.usatoday.com/sports/nfl/green-bay-packers"
-    },
-    {
-      "label": "Athlon Sports",
-      "url": "https://athlonsports.com/nfl/green-bay-packers"
-    },
-    {
-      "label": "Yardbarker",
-      "url": "https://www.yardbarker.com/nfl/teams/green_bay_packers/53"
-    },
-    {
-      "label": "Spotrac",
-      "url": "https://www.spotrac.com/nfl/green-bay-packers/overview"
-    },
-    {
-      "label": "StatMuse",
-      "url": "https://www.statmuse.com/nfl/team/2026-green-bay-packers-18/2026"
-    },
-    {
-      "label": "Pro Football Rumors",
-      "url": "https://www.profootballrumors.com/green-bay-packers-news-rumors"
-    },
-    {
-      "label": "NewsNow",
-      "url": "https://www.newsnow.com/us/Sports/NFL/NFC+North/Green+Bay+Packers"
-    },
-    {
-      "label": "SportSpyder",
-      "url": "https://sportspyder.com/nfl/green-bay-packers/news"
-    },
-    {
-      "label": "r/GreenBayPackers",
-      "url": "https://www.reddit.com/r/GreenBayPackers/"
-    },
-    {
-      "label": "@Packers",
-      "url": "https://x.com/packers"
-    },
-    {
-      "label": "#Packers",
-      "url": "https://x.com/search?q=Packers&src=typed_query"
-    }
-  ],
-  "HOU": [
-    {
-      "label": "NFL.com",
-      "url": "https://www.nfl.com/teams/houston-texans/"
-    },
-    {
-      "label": "ESPN",
-      "url": "https://www.espn.com/nfl/team/_/name/hou/houston-texans"
-    },
-    {
-      "label": "CBS Sports",
-      "url": "https://www.cbssports.com/nfl/teams/HOU/houston-texans/"
-    },
-    {
-      "label": "FOX Sports",
-      "url": "https://www.foxsports.com/nfl/houston-texans-team"
-    },
-    {
-      "label": "Yahoo! Sports",
-      "url": "https://sports.yahoo.com/nfl/teams/houston/"
-    },
-    {
-      "label": "The Athletic",
-      "url": "https://www.nytimes.com/athletic/nfl/team/texans/"
-    },
-    {
-      "label": "B/R",
-      "url": "https://bleacherreport.com/houston-texans"
-    },
-    {
-      "label": "NBC Sports",
-      "url": "https://www.nbcsports.com/nfl/houston-texans"
-    },
-    {
-      "label": "SI",
-      "url": "https://www.si.com/nfl/texans"
-    },
-    {
-      "label": "USA Today",
-      "url": "https://www.usatoday.com/sports/nfl/houston-texans"
-    },
-    {
-      "label": "Athlon Sports",
-      "url": "https://athlonsports.com/nfl/houston-texans"
-    },
-    {
-      "label": "Yardbarker",
-      "url": "https://www.yardbarker.com/nfl/teams/houston_texans/36"
-    },
-    {
-      "label": "Spotrac",
-      "url": "https://www.spotrac.com/nfl/houston-texans/overview"
-    },
-    {
-      "label": "StatMuse",
-      "url": "https://www.statmuse.com/nfl/team/2026-houston-texans-86/2026"
-    },
-    {
-      "label": "Pro Football Rumors",
-      "url": "https://www.profootballrumors.com/houston-texans-news-rumors"
-    },
-    {
-      "label": "NewsNow",
-      "url": "https://www.newsnow.com/us/Sports/NFL/AFC+South/Houston+Texans"
-    },
-    {
-      "label": "SportSpyder",
-      "url": "https://sportspyder.com/nfl/houston-texans/news"
-    },
-    {
-      "label": "r/texans",
-      "url": "https://www.reddit.com/r/texans/"
-    },
-    {
-      "label": "@Texans",
-      "url": "https://x.com/HoustonTexans"
-    },
-    {
-      "label": "#Texans",
-      "url": "https://x.com/search?q=Texans&src=typed_query"
-    }
-  ],
-  "IND": [
-    {
-      "label": "NFL.com",
-      "url": "https://www.nfl.com/teams/indianapolis-colts/"
-    },
-    {
-      "label": "ESPN",
-      "url": "https://www.espn.com/nfl/team/_/name/ind/indianapolis-colts"
-    },
-    {
-      "label": "CBS Sports",
-      "url": "https://www.cbssports.com/nfl/teams/IND/indianapolis-colts/"
-    },
-    {
-      "label": "FOX Sports",
-      "url": "https://www.foxsports.com/nfl/indianapolis-colts-team"
-    },
-    {
-      "label": "Yahoo! Sports",
-      "url": "https://sports.yahoo.com/nfl/teams/indianapolis/"
-    },
-    {
-      "label": "The Athletic",
-      "url": "https://www.nytimes.com/athletic/nfl/team/colts/"
-    },
-    {
-      "label": "B/R",
-      "url": "https://bleacherreport.com/indianapolis-colts"
-    },
-    {
-      "label": "NBC Sports",
-      "url": "https://www.nbcsports.com/nfl/indianapolis-colts"
-    },
-    {
-      "label": "SI",
-      "url": "https://www.si.com/nfl/colts"
-    },
-    {
-      "label": "USA Today",
-      "url": "https://www.usatoday.com/sports/nfl/indianapolis-colts"
-    },
-    {
-      "label": "Athlon Sports",
-      "url": "https://athlonsports.com/nfl/indianapolis-colts"
-    },
-    {
-      "label": "Yardbarker",
-      "url": "https://www.yardbarker.com/nfl/teams/indianapolis_colts/37"
-    },
-    {
-      "label": "Spotrac",
-      "url": "https://www.spotrac.com/nfl/indianapolis-colts/overview"
-    },
-    {
-      "label": "StatMuse",
-      "url": "https://www.statmuse.com/nfl/team/2026-indianapolis-colts-66/2026"
-    },
-    {
-      "label": "Pro Football Rumors",
-      "url": "https://www.profootballrumors.com/indianapolis-colts-news-rumors"
-    },
-    {
-      "label": "NewsNow",
-      "url": "https://www.newsnow.com/us/Sports/NFL/AFC+South/Indianapolis+Colts"
-    },
-    {
-      "label": "SportSpyder",
-      "url": "https://sportspyder.com/nfl/indianapolis-colts/news"
-    },
-    {
-      "label": "r/Colts",
-      "url": "https://www.reddit.com/r/Colts/"
-    },
-    {
-      "label": "@Colts",
-      "url": "https://x.com/Colts"
-    },
-    {
-      "label": "#Colts",
-      "url": "https://x.com/search?q=Colts&src=typed_query"
-    }
-  ],
-  "JAX": [
-    {
-      "label": "NFL.com",
-      "url": "https://www.nfl.com/teams/jacksonville-jaguars/"
-    },
-    {
-      "label": "ESPN",
-      "url": "https://www.espn.com/nfl/team/_/name/jax/jacksonville-jaguars"
-    },
-    {
-      "label": "CBS Sports",
-      "url": "https://www.cbssports.com/nfl/teams/JAX/jacksonville-jaguars/"
-    },
-    {
-      "label": "FOX Sports",
-      "url": "https://www.foxsports.com/nfl/jacksonville-jaguars-team"
-    },
-    {
-      "label": "Yahoo! Sports",
-      "url": "https://sports.yahoo.com/nfl/teams/jacksonville/"
-    },
-    {
-      "label": "The Athletic",
-      "url": "https://www.nytimes.com/athletic/nfl/team/jaguars/"
-    },
-    {
-      "label": "B/R",
-      "url": "https://bleacherreport.com/jacksonville-jaguars"
-    },
-    {
-      "label": "NBC Sports",
-      "url": "https://www.nbcsports.com/nfl/jacksonville-jaguars"
-    },
-    {
-      "label": "SI",
-      "url": "https://www.si.com/nfl/jaguars"
-    },
-    {
-      "label": "USA Today",
-      "url": "https://www.usatoday.com/sports/nfl/jacksonville-jaguars"
-    },
-    {
-      "label": "Athlon Sports",
-      "url": "https://athlonsports.com/nfl/jacksonville-jaguars"
-    },
-    {
-      "label": "Yardbarker",
-      "url": "https://www.yardbarker.com/nfl/teams/jacksonville_jaguars/38"
-    },
-    {
-      "label": "Spotrac",
-      "url": "https://www.spotrac.com/nfl/jacksonville-jaguars/overview"
-    },
-    {
-      "label": "StatMuse",
-      "url": "https://www.statmuse.com/nfl/team/2026-jacksonville-jaguars-84/2026"
-    },
-    {
-      "label": "Pro Football Rumors",
-      "url": "https://www.profootballrumors.com/jacksonville-jaguars-news-rumors"
-    },
-    {
-      "label": "NewsNow",
-      "url": "https://www.newsnow.com/us/Sports/NFL/AFC+South/Jacksonville+Jaguars"
-    },
-    {
-      "label": "SportSpyder",
-      "url": "https://sportspyder.com/nfl/jacksonville-jaguars/news"
-    },
-    {
-      "label": "r/Jaguars",
-      "url": "https://www.reddit.com/r/Jaguars/"
-    },
-    {
-      "label": "@Jaguars",
-      "url": "https://x.com/Jaguars"
-    },
-    {
-      "label": "#Jaguars",
-      "url": "https://x.com/search?q=Jaguars&src=typed_query"
-    }
-  ],
-  "KC": [
-    {
-      "label": "NFL.com",
-      "url": "https://www.nfl.com/teams/kansas-city-chiefs/"
-    },
-    {
-      "label": "ESPN",
-      "url": "https://www.espn.com/nfl/team/_/name/kc/kansas-city-chiefs"
-    },
-    {
-      "label": "CBS Sports",
-      "url": "https://www.cbssports.com/nfl/teams/KC/kansas-city-chiefs/"
-    },
-    {
-      "label": "FOX Sports",
-      "url": "https://www.foxsports.com/nfl/kansas-city-chiefs-team"
-    },
-    {
-      "label": "Yahoo! Sports",
-      "url": "https://sports.yahoo.com/nfl/teams/kansas-city/"
-    },
-    {
-      "label": "The Athletic",
-      "url": "https://www.nytimes.com/athletic/nfl/team/chiefs/"
-    },
-    {
-      "label": "B/R",
-      "url": "https://bleacherreport.com/kansas-city-chiefs"
-    },
-    {
-      "label": "NBC Sports",
-      "url": "https://www.nbcsports.com/nfl/kansas-city-chiefs"
-    },
-    {
-      "label": "SI",
-      "url": "https://www.si.com/nfl/chiefs"
-    },
-    {
-      "label": "USA Today",
-      "url": "https://www.usatoday.com/sports/nfl/kansas-city-chiefs"
-    },
-    {
-      "label": "Athlon Sports",
-      "url": "https://athlonsports.com/nfl/kansas-city-chiefs"
-    },
-    {
-      "label": "Yardbarker",
-      "url": "https://www.yardbarker.com/nfl/teams/kansas_city_chiefs/39"
-    },
-    {
-      "label": "Spotrac",
-      "url": "https://www.spotrac.com/nfl/kansas-city-chiefs/overview"
-    },
-    {
-      "label": "StatMuse",
-      "url": "https://www.statmuse.com/nfl/team/2026-kansas-city-chiefs-69/2026"
-    },
-    {
-      "label": "Pro Football Rumors",
-      "url": "https://www.profootballrumors.com/kansas-city-chiefs-news-rumors"
-    },
-    {
-      "label": "NewsNow",
-      "url": "https://www.newsnow.com/us/Sports/NFL/AFC+West/Kansas+City+Chiefs"
-    },
-    {
-      "label": "SportSpyder",
-      "url": "https://sportspyder.com/nfl/kansas-city-chiefs/news"
-    },
-    {
-      "label": "r/KansasCityChiefs",
-      "url": "https://www.reddit.com/r/KansasCityChiefs/"
-    },
-    {
-      "label": "@Chiefs",
-      "url": "https://x.com/Chiefs"
-    },
-    {
-      "label": "#Chiefs",
-      "url": "https://x.com/search?q=Chiefs&src=typed_query"
-    }
-  ],
-  "LV": [
-    {
-      "label": "NFL.com",
-      "url": "https://www.nfl.com/teams/las-vegas-raiders/"
-    },
-    {
-      "label": "ESPN",
-      "url": "https://www.espn.com/nfl/team/_/name/lv/las-vegas-raiders"
-    },
-    {
-      "label": "CBS Sports",
-      "url": "https://www.cbssports.com/nfl/teams/LV/las-vegas-raiders/"
-    },
-    {
-      "label": "FOX Sports",
-      "url": "https://www.foxsports.com/nfl/las-vegas-raiders-team"
-    },
-    {
-      "label": "Yahoo! Sports",
-      "url": "https://sports.yahoo.com/nfl/teams/las-vegas/"
-    },
-    {
-      "label": "The Athletic",
-      "url": "https://www.nytimes.com/athletic/nfl/team/raiders/"
-    },
-    {
-      "label": "B/R",
-      "url": "https://bleacherreport.com/las-vegas-raiders"
-    },
-    {
-      "label": "NBC Sports",
-      "url": "https://www.nbcsports.com/nfl/las-vegas-raiders"
-    },
-    {
-      "label": "SI",
-      "url": "https://www.si.com/nfl/raiders"
-    },
-    {
-      "label": "USA Today",
-      "url": "https://www.usatoday.com/sports/nfl/las-vegas-raiders"
-    },
-    {
-      "label": "Athlon Sports",
-      "url": "https://athlonsports.com/nfl/las-vegas-raiders"
-    },
-    {
-      "label": "Yardbarker",
-      "url": "https://www.yardbarker.com/nfl/teams/las_vegas_raiders/43"
-    },
-    {
-      "label": "Spotrac",
-      "url": "https://www.spotrac.com/nfl/las-vegas-raiders/overview"
-    },
-    {
-      "label": "StatMuse",
-      "url": "https://www.statmuse.com/nfl/team/2026-las-vegas-raiders-73/2026"
-    },
-    {
-      "label": "Pro Football Rumors",
-      "url": "https://www.profootballrumors.com/las-vegas-raiders-news-rumors"
-    },
-    {
-      "label": "NewsNow",
-      "url": "https://www.newsnow.com/us/Sports/NFL/AFC+West/Las+Vegas+Raiders"
-    },
-    {
-      "label": "SportSpyder",
-      "url": "https://sportspyder.com/nfl/las-vegas-raiders/news"
-    },
-    {
-      "label": "r/raiders",
-      "url": "https://www.reddit.com/r/raiders/"
-    },
-    {
-      "label": "@Raiders",
-      "url": "https://x.com/Raiders"
-    },
-    {
-      "label": "#Raiders",
-      "url": "https://x.com/search?q=Raiders&src=typed_query"
-    }
-  ],
-  "LAC": [
-    {
-      "label": "NFL.com",
-      "url": "https://www.nfl.com/teams/los-angeles-chargers/"
-    },
-    {
-      "label": "ESPN",
-      "url": "https://www.espn.com/nfl/team/_/name/lac/los-angeles-chargers"
-    },
-    {
-      "label": "CBS Sports",
-      "url": "https://www.cbssports.com/nfl/teams/LAC/los-angeles-chargers/"
-    },
-    {
-      "label": "FOX Sports",
-      "url": "https://www.foxsports.com/nfl/los-angeles-chargers-team"
-    },
-    {
-      "label": "Yahoo! Sports",
-      "url": "https://sports.yahoo.com/nfl/teams/la-chargers/"
-    },
-    {
-      "label": "The Athletic",
-      "url": "https://www.nytimes.com/athletic/nfl/team/chargers/"
-    },
-    {
-      "label": "B/R",
-      "url": "https://bleacherreport.com/los-angeles-chargers"
-    },
-    {
-      "label": "NBC Sports",
-      "url": "https://www.nbcsports.com/nfl/los-angeles-chargers"
-    },
-    {
-      "label": "SI",
-      "url": "https://www.si.com/nfl/chargers"
-    },
-    {
-      "label": "USA Today",
-      "url": "https://www.usatoday.com/sports/nfl/los-angeles-chargers"
-    },
-    {
-      "label": "Athlon Sports",
-      "url": "https://athlonsports.com/nfl/los-angeles-chargers"
-    },
-    {
-      "label": "Yardbarker",
-      "url": "https://www.yardbarker.com/nfl/teams/los_angeles_chargers/45"
-    },
-    {
-      "label": "Spotrac",
-      "url": "https://www.spotrac.com/nfl/los-angeles-chargers/overview"
-    },
-    {
-      "label": "StatMuse",
-      "url": "https://www.statmuse.com/nfl/team/2026-los-angeles-chargers-74/2026"
-    },
-    {
-      "label": "Pro Football Rumors",
-      "url": "https://www.profootballrumors.com/los-angeles-chargers-news-rumors"
-    },
-    {
-      "label": "NewsNow",
-      "url": "https://www.newsnow.com/us/Sports/NFL/AFC+West/Los+Angeles+Chargers"
-    },
-    {
-      "label": "SportSpyder",
-      "url": "https://sportspyder.com/nfl/los-angeles-chargers/news"
-    },
-    {
-      "label": "r/Chargers",
-      "url": "https://www.reddit.com/r/Chargers/"
-    },
-    {
-      "label": "@Chargers",
-      "url": "https://x.com/chargers"
-    },
-    {
-      "label": "#Chargers",
-      "url": "https://x.com/search?q=Chargers&src=typed_query"
-    }
-  ],
-  "LAR": [
-    {
-      "label": "NFL.com",
-      "url": "https://www.nfl.com/teams/los-angeles-rams/"
-    },
-    {
-      "label": "ESPN",
-      "url": "https://www.espn.com/nfl/team/_/name/lar/los-angeles-rams"
-    },
-    {
-      "label": "CBS Sports",
-      "url": "https://www.cbssports.com/nfl/teams/LAR/los-angeles-rams/"
-    },
-    {
-      "label": "FOX Sports",
-      "url": "https://www.foxsports.com/nfl/los-angeles-rams-team"
-    },
-    {
-      "label": "Yahoo! Sports",
-      "url": "https://sports.yahoo.com/nfl/teams/la-rams/"
-    },
-    {
-      "label": "The Athletic",
-      "url": "https://www.nytimes.com/athletic/nfl/team/rams/"
-    },
-    {
-      "label": "B/R",
-      "url": "https://bleacherreport.com/los-angeles-rams"
-    },
-    {
-      "label": "NBC Sports",
-      "url": "https://www.nbcsports.com/nfl/los-angeles-rams"
-    },
-    {
-      "label": "SI",
-      "url": "https://www.si.com/nfl/rams"
-    },
-    {
-      "label": "USA Today",
-      "url": "https://www.usatoday.com/sports/nfl/los-angeles-rams"
-    },
-    {
-      "label": "Athlon Sports",
-      "url": "https://athlonsports.com/nfl/los-angeles-rams"
-    },
-    {
-      "label": "Yardbarker",
-      "url": "https://www.yardbarker.com/nfl/teams/los_angeles_rams/60"
-    },
-    {
-      "label": "Spotrac",
-      "url": "https://www.spotrac.com/nfl/los-angeles-rams/overview"
-    },
-    {
-      "label": "StatMuse",
-      "url": "https://www.statmuse.com/nfl/team/2026-los-angeles-rams-53/2026"
-    },
-    {
-      "label": "Pro Football Rumors",
-      "url": "https://www.profootballrumors.com/los-angeles-rams-news-rumors"
-    },
-    {
-      "label": "NewsNow",
-      "url": "https://www.newsnow.com/us/Sports/NFL/NFC+West/Los+Angeles+Rams"
-    },
-    {
-      "label": "SportSpyder",
-      "url": "https://sportspyder.com/nfl/los-angeles-rams/news"
-    },
-    {
-      "label": "r/LosAngelesRams",
-      "url": "https://www.reddit.com/r/LosAngelesRams/"
-    },
-    {
-      "label": "@Rams",
-      "url": "https://x.com/RamsNFL"
-    },
-    {
-      "label": "#Rams",
-      "url": "https://x.com/search?q=Rams&src=typed_query"
-    }
-  ],
-  "MIA": [
-    {
-      "label": "NFL.com",
-      "url": "https://www.nfl.com/teams/miami-dolphins/"
-    },
-    {
-      "label": "ESPN",
-      "url": "https://www.espn.com/nfl/team/_/name/mia/miami-dolphins"
-    },
-    {
-      "label": "CBS Sports",
-      "url": "https://www.cbssports.com/nfl/teams/MIA/miami-dolphins/"
-    },
-    {
-      "label": "FOX Sports",
-      "url": "https://www.foxsports.com/nfl/miami-dolphins-team"
-    },
-    {
-      "label": "Yahoo! Sports",
-      "url": "https://sports.yahoo.com/nfl/teams/miami/"
-    },
-    {
-      "label": "The Athletic",
-      "url": "https://www.nytimes.com/athletic/nfl/team/dolphins/"
-    },
-    {
-      "label": "B/R",
-      "url": "https://bleacherreport.com/miami-dolphins"
-    },
-    {
-      "label": "NBC Sports",
-      "url": "https://www.nbcsports.com/nfl/miami-dolphins"
-    },
-    {
-      "label": "SI",
-      "url": "https://www.si.com/nfl/dolphins"
-    },
-    {
-      "label": "USA Today",
-      "url": "https://www.usatoday.com/sports/nfl/miami-dolphins"
-    },
-    {
-      "label": "Athlon Sports",
-      "url": "https://athlonsports.com/nfl/miami-dolphins"
-    },
-    {
-      "label": "Yardbarker",
-      "url": "https://www.yardbarker.com/nfl/teams/miami_dolphins/40"
-    },
-    {
-      "label": "Spotrac",
-      "url": "https://www.spotrac.com/nfl/miami-dolphins/overview"
-    },
-    {
-      "label": "StatMuse",
-      "url": "https://www.statmuse.com/nfl/team/2026-miami-dolphins-77/2026"
-    },
-    {
-      "label": "Pro Football Rumors",
-      "url": "https://www.profootballrumors.com/miami-dolphins-news-rumors"
-    },
-    {
-      "label": "NewsNow",
-      "url": "https://www.newsnow.com/us/Sports/NFL/AFC+East/Miami+Dolphins"
-    },
-    {
-      "label": "SportSpyder",
-      "url": "https://sportspyder.com/nfl/miami-dolphins/news"
-    },
-    {
-      "label": "r/miamidolphins",
-      "url": "https://www.reddit.com/r/miamidolphins/"
-    },
-    {
-      "label": "@Dolphins",
-      "url": "https://x.com/MiamiDolphins"
-    },
-    {
-      "label": "#Dolphins",
-      "url": "https://x.com/search?q=Dolphins&src=typed_query"
-    }
-  ],
-  "MIN": [
-    {
-      "label": "NFL.com",
-      "url": "https://www.nfl.com/teams/minnesota-vikings/"
-    },
-    {
-      "label": "ESPN",
-      "url": "https://www.espn.com/nfl/team/_/name/min/minnesota-vikings"
-    },
-    {
-      "label": "CBS Sports",
-      "url": "https://www.cbssports.com/nfl/teams/MIN/minnesota-vikings/"
-    },
-    {
-      "label": "FOX Sports",
-      "url": "https://www.foxsports.com/nfl/minnesota-vikings-team"
-    },
-    {
-      "label": "Yahoo! Sports",
-      "url": "https://sports.yahoo.com/nfl/teams/minnesota/"
-    },
-    {
-      "label": "The Athletic",
-      "url": "https://www.nytimes.com/athletic/nfl/team/vikings/"
-    },
-    {
-      "label": "B/R",
-      "url": "https://bleacherreport.com/minnesota-vikings"
-    },
-    {
-      "label": "NBC Sports",
-      "url": "https://www.nbcsports.com/nfl/minnesota-vikings"
-    },
-    {
-      "label": "SI",
-      "url": "https://www.si.com/nfl/vikings"
-    },
-    {
-      "label": "USA Today",
-      "url": "https://www.usatoday.com/sports/nfl/minnesota-vikings"
-    },
-    {
-      "label": "Athlon Sports",
-      "url": "https://athlonsports.com/nfl/minnesota-vikings"
-    },
-    {
-      "label": "Yardbarker",
-      "url": "https://www.yardbarker.com/nfl/teams/minnesota_vikings/54"
-    },
-    {
-      "label": "Spotrac",
-      "url": "https://www.spotrac.com/nfl/minnesota-vikings/overview"
-    },
-    {
-      "label": "StatMuse",
-      "url": "https://www.statmuse.com/nfl/team/2026-minnesota-vikings-76/2026"
-    },
-    {
-      "label": "Pro Football Rumors",
-      "url": "https://www.profootballrumors.com/minnesota-vikings-news-rumors"
-    },
-    {
-      "label": "NewsNow",
-      "url": "https://www.newsnow.com/us/Sports/NFL/NFC+North/Minnesota+Vikings"
-    },
-    {
-      "label": "SportSpyder",
-      "url": "https://sportspyder.com/nfl/minnesota-vikings/news"
-    },
-    {
-      "label": "r/minnesotavikings",
-      "url": "https://www.reddit.com/r/minnesotavikings/"
-    },
-    {
-      "label": "@Vikings",
-      "url": "https://x.com/Vikings"
-    },
-    {
-      "label": "#Vikings",
-      "url": "https://x.com/search?q=Vikings&src=typed_query"
-    }
-  ],
-  "NE": [
-    {
-      "label": "NFL.com",
-      "url": "https://www.nfl.com/teams/new-england-patriots/"
-    },
-    {
-      "label": "ESPN",
-      "url": "https://www.espn.com/nfl/team/_/name/ne/new-england-patriots"
-    },
-    {
-      "label": "CBS Sports",
-      "url": "https://www.cbssports.com/nfl/teams/NE/new-england-patriots/"
-    },
-    {
-      "label": "FOX Sports",
-      "url": "https://www.foxsports.com/nfl/new-england-patriots-team"
-    },
-    {
-      "label": "Yahoo! Sports",
-      "url": "https://sports.yahoo.com/nfl/teams/new-england/"
-    },
-    {
-      "label": "The Athletic",
-      "url": "https://www.nytimes.com/athletic/nfl/team/patriots/"
-    },
-    {
-      "label": "B/R",
-      "url": "https://bleacherreport.com/new-england-patriots"
-    },
-    {
-      "label": "NBC Sports",
-      "url": "https://www.nbcsports.com/nfl/new-england-patriots"
-    },
-    {
-      "label": "SI",
-      "url": "https://www.si.com/nfl/patriots"
-    },
-    {
-      "label": "USA Today",
-      "url": "https://www.usatoday.com/sports/nfl/new-england-patriots"
-    },
-    {
-      "label": "Athlon Sports",
-      "url": "https://athlonsports.com/nfl/new-england-patriots"
-    },
-    {
-      "label": "Yardbarker",
-      "url": "https://www.yardbarker.com/nfl/teams/new_england_patriots/41"
-    },
-    {
-      "label": "Spotrac",
-      "url": "https://www.spotrac.com/nfl/new-england-patriots/overview"
-    },
-    {
-      "label": "StatMuse",
-      "url": "https://www.statmuse.com/nfl/team/2026-new-england-patriots-70/2026"
-    },
-    {
-      "label": "Pro Football Rumors",
-      "url": "https://www.profootballrumors.com/new-england-patriots-news-rumors"
-    },
-    {
-      "label": "NewsNow",
-      "url": "https://www.newsnow.com/us/Sports/NFL/AFC+East/New+England+Patriots"
-    },
-    {
-      "label": "SportSpyder",
-      "url": "https://sportspyder.com/nfl/new-england-patriots/news"
-    },
-    {
-      "label": "r/Patriots",
-      "url": "https://www.reddit.com/r/Patriots/"
-    },
-    {
-      "label": "@Patriots",
-      "url": "https://x.com/Patriots"
-    },
-    {
-      "label": "#Patriots",
-      "url": "https://x.com/search?q=Patriots&src=typed_query"
-    }
-  ],
-  "NO": [
-    {
-      "label": "NFL.com",
-      "url": "https://www.nfl.com/teams/new-orleans-saints/"
-    },
-    {
-      "label": "ESPN",
-      "url": "https://www.espn.com/nfl/team/_/name/no/new-orleans-saints"
-    },
-    {
-      "label": "CBS Sports",
-      "url": "https://www.cbssports.com/nfl/teams/NO/new-orleans-saints/"
-    },
-    {
-      "label": "FOX Sports",
-      "url": "https://www.foxsports.com/nfl/new-orleans-saints-team"
-    },
-    {
-      "label": "Yahoo! Sports",
-      "url": "https://sports.yahoo.com/nfl/teams/new-orleans/"
-    },
-    {
-      "label": "The Athletic",
-      "url": "https://www.nytimes.com/athletic/nfl/team/saints/"
-    },
-    {
-      "label": "B/R",
-      "url": "https://bleacherreport.com/new-orleans-saints"
-    },
-    {
-      "label": "NBC Sports",
-      "url": "https://www.nbcsports.com/nfl/new-orleans-saints"
-    },
-    {
-      "label": "SI",
-      "url": "https://www.si.com/nfl/saints"
-    },
-    {
-      "label": "USA Today",
-      "url": "https://www.usatoday.com/sports/nfl/new-orleans-saints"
-    },
-    {
-      "label": "Athlon Sports",
-      "url": "https://athlonsports.com/nfl/new-orleans-saints"
-    },
-    {
-      "label": "Yardbarker",
-      "url": "https://www.yardbarker.com/nfl/teams/new_orleans_saints/55"
-    },
-    {
-      "label": "Spotrac",
-      "url": "https://www.spotrac.com/nfl/new-orleans-saints/overview"
-    },
-    {
-      "label": "StatMuse",
-      "url": "https://www.statmuse.com/nfl/team/2026-new-orleans-saints-79/2026"
-    },
-    {
-      "label": "Pro Football Rumors",
-      "url": "https://www.profootballrumors.com/new-orleans-saints-news-rumors"
-    },
-    {
-      "label": "NewsNow",
-      "url": "https://www.newsnow.com/us/Sports/NFL/NFC+South/New+Orleans+Saints"
-    },
-    {
-      "label": "SportSpyder",
-      "url": "https://sportspyder.com/nfl/new-orleans-saints/news"
-    },
-    {
-      "label": "r/Saints",
-      "url": "https://www.reddit.com/r/Saints/"
-    },
-    {
-      "label": "@Saints",
-      "url": "https://x.com/Saints"
-    },
-    {
-      "label": "#Saints",
-      "url": "https://x.com/search?q=Saints&src=typed_query"
-    }
-  ],
-  "NYG": [
-    {
-      "label": "NFL.com",
-      "url": "https://www.nfl.com/teams/new-york-giants/"
-    },
-    {
-      "label": "ESPN",
-      "url": "https://www.espn.com/nfl/team/_/name/nyg/new-york-giants"
-    },
-    {
-      "label": "CBS Sports",
-      "url": "https://www.cbssports.com/nfl/teams/NYG/new-york-giants/"
-    },
-    {
-      "label": "FOX Sports",
-      "url": "https://www.foxsports.com/nfl/new-york-giants-team"
-    },
-    {
-      "label": "Yahoo! Sports",
-      "url": "https://sports.yahoo.com/nfl/teams/ny-giants/"
-    },
-    {
-      "label": "The Athletic",
-      "url": "https://www.nytimes.com/athletic/nfl/team/giants/"
-    },
-    {
-      "label": "B/R",
-      "url": "https://bleacherreport.com/new-york-giants"
-    },
-    {
-      "label": "NBC Sports",
-      "url": "https://www.nbcsports.com/nfl/new-york-giants"
-    },
-    {
-      "label": "SI",
-      "url": "https://www.si.com/nfl/giants"
-    },
-    {
-      "label": "USA Today",
-      "url": "https://www.usatoday.com/sports/nfl/new-york-giants"
-    },
-    {
-      "label": "Athlon Sports",
-      "url": "https://athlonsports.com/nfl/new-york-giants"
-    },
-    {
-      "label": "Yardbarker",
-      "url": "https://www.yardbarker.com/nfl/teams/new_york_giants/56"
-    },
-    {
-      "label": "Spotrac",
-      "url": "https://www.spotrac.com/nfl/new-york-giants/overview"
-    },
-    {
-      "label": "StatMuse",
-      "url": "https://www.statmuse.com/nfl/team/2026-new-york-giants-35/2026"
-    },
-    {
-      "label": "Pro Football Rumors",
-      "url": "https://www.profootballrumors.com/new-york-giants-news-rumors"
-    },
-    {
-      "label": "NewsNow",
-      "url": "https://www.newsnow.com/us/Sports/NFL/NFC+East/New+York+Giants"
-    },
-    {
-      "label": "SportSpyder",
-      "url": "https://sportspyder.com/nfl/new-york-giants/news"
-    },
-    {
-      "label": "r/NYGiants",
-      "url": "https://www.reddit.com/r/NYGiants/"
-    },
-    {
-      "label": "@Giants",
-      "url": "https://x.com/Giants"
-    },
-    {
-      "label": "#Giants",
-      "url": "https://x.com/search?q=Giants&src=typed_query"
-    }
-  ],
-  "NYJ": [
-    {
-      "label": "NFL.com",
-      "url": "https://www.nfl.com/teams/new-york-jets/"
-    },
-    {
-      "label": "ESPN",
-      "url": "https://www.espn.com/nfl/team/_/name/nyj/new-york-jets"
-    },
-    {
-      "label": "CBS Sports",
-      "url": "https://www.cbssports.com/nfl/teams/NYJ/new-york-jets/"
-    },
-    {
-      "label": "FOX Sports",
-      "url": "https://www.foxsports.com/nfl/new-york-jets-team"
-    },
-    {
-      "label": "Yahoo! Sports",
-      "url": "https://sports.yahoo.com/nfl/teams/ny-jets/"
-    },
-    {
-      "label": "The Athletic",
-      "url": "https://www.nytimes.com/athletic/nfl/team/jets/"
-    },
-    {
-      "label": "B/R",
-      "url": "https://bleacherreport.com/new-york-jets"
-    },
-    {
-      "label": "NBC Sports",
-      "url": "https://www.nbcsports.com/nfl/new-york-jets"
-    },
-    {
-      "label": "SI",
-      "url": "https://www.si.com/nfl/jets"
-    },
-    {
-      "label": "USA Today",
-      "url": "https://www.usatoday.com/sports/nfl/new-york-jets"
-    },
-    {
-      "label": "Athlon Sports",
-      "url": "https://athlonsports.com/nfl/new-york-jets"
-    },
-    {
-      "label": "Yardbarker",
-      "url": "https://www.yardbarker.com/nfl/teams/new_york_jets/42"
-    },
-    {
-      "label": "Spotrac",
-      "url": "https://www.spotrac.com/nfl/new-york-jets/overview"
-    },
-    {
-      "label": "StatMuse",
-      "url": "https://www.statmuse.com/nfl/team/2026-new-york-jets-71/2026"
-    },
-    {
-      "label": "Pro Football Rumors",
-      "url": "https://www.profootballrumors.com/new-york-jets-news-rumors"
-    },
-    {
-      "label": "NewsNow",
-      "url": "https://www.newsnow.com/us/Sports/NFL/AFC+East/New+York+Jets"
-    },
-    {
-      "label": "SportSpyder",
-      "url": "https://sportspyder.com/nfl/new-york-jets/news"
-    },
-    {
-      "label": "r/nyjets",
-      "url": "https://www.reddit.com/r/nyjets/"
-    },
-    {
-      "label": "@Jets",
-      "url": "https://x.com/nyjets"
-    },
-    {
-      "label": "#Jets",
-      "url": "https://x.com/search?q=Jets&src=typed_query"
-    }
-  ],
-  "PHI": [
-    {
-      "label": "NFL.com",
-      "url": "https://www.nfl.com/teams/philadelphia-eagles/"
-    },
-    {
-      "label": "ESPN",
-      "url": "https://www.espn.com/nfl/team/_/name/phi/philadelphia-eagles"
-    },
-    {
-      "label": "CBS Sports",
-      "url": "https://www.cbssports.com/nfl/teams/PHI/philadelphia-eagles/"
-    },
-    {
-      "label": "FOX Sports",
-      "url": "https://www.foxsports.com/nfl/philadelphia-eagles-team"
-    },
-    {
-      "label": "Yahoo! Sports",
-      "url": "https://sports.yahoo.com/nfl/teams/philadelphia/"
-    },
-    {
-      "label": "The Athletic",
-      "url": "https://www.nytimes.com/athletic/nfl/team/eagles/"
-    },
-    {
-      "label": "B/R",
-      "url": "https://bleacherreport.com/philadelphia-eagles"
-    },
-    {
-      "label": "NBC Sports",
-      "url": "https://www.nbcsports.com/nfl/philadelphia-eagles"
-    },
-    {
-      "label": "SI",
-      "url": "https://www.si.com/nfl/eagles"
-    },
-    {
-      "label": "USA Today",
-      "url": "https://www.usatoday.com/sports/nfl/philadelphia-eagles"
-    },
-    {
-      "label": "Athlon Sports",
-      "url": "https://athlonsports.com/nfl/philadelphia-eagles"
-    },
-    {
-      "label": "Yardbarker",
-      "url": "https://www.yardbarker.com/nfl/teams/philadelphia_eagles/57"
-    },
-    {
-      "label": "Spotrac",
-      "url": "https://www.spotrac.com/nfl/philadelphia-eagles/overview"
-    },
-    {
-      "label": "StatMuse",
-      "url": "https://www.statmuse.com/nfl/team/2026-philadelphia-eagles-49/2026"
-    },
-    {
-      "label": "Pro Football Rumors",
-      "url": "https://www.profootballrumors.com/philadelphia-eagles-news-rumors"
-    },
-    {
-      "label": "NewsNow",
-      "url": "https://www.newsnow.com/us/Sports/NFL/NFC+East/Philadelphia+Eagles"
-    },
-    {
-      "label": "SportSpyder",
-      "url": "https://sportspyder.com/nfl/philadelphia-eagles/news"
-    },
-    {
-      "label": "r/eagles",
-      "url": "https://www.reddit.com/r/eagles/"
-    },
-    {
-      "label": "@Eagles",
-      "url": "https://x.com/Eagles"
-    },
-    {
-      "label": "#Eagles",
-      "url": "https://x.com/search?q=Eagles&src=typed_query"
-    }
-  ],
-  "PIT": [
-    {
-      "label": "NFL.com",
-      "url": "https://www.nfl.com/teams/pittsburgh-steelers/"
-    },
-    {
-      "label": "ESPN",
-      "url": "https://www.espn.com/nfl/team/_/name/pit/pittsburgh-steelers"
-    },
-    {
-      "label": "CBS Sports",
-      "url": "https://www.cbssports.com/nfl/teams/PIT/pittsburgh-steelers/"
-    },
-    {
-      "label": "FOX Sports",
-      "url": "https://www.foxsports.com/nfl/pittsburgh-steelers-team"
-    },
-    {
-      "label": "Yahoo! Sports",
-      "url": "https://sports.yahoo.com/nfl/teams/pittsburgh/"
-    },
-    {
-      "label": "The Athletic",
-      "url": "https://www.nytimes.com/athletic/nfl/team/steelers/"
-    },
-    {
-      "label": "B/R",
-      "url": "https://bleacherreport.com/pittsburgh-steelers"
-    },
-    {
-      "label": "NBC Sports",
-      "url": "https://www.nbcsports.com/nfl/pittsburgh-steelers"
-    },
-    {
-      "label": "SI",
-      "url": "https://www.si.com/nfl/steelers"
-    },
-    {
-      "label": "USA Today",
-      "url": "https://www.usatoday.com/sports/nfl/pittsburgh-steelers"
-    },
-    {
-      "label": "Athlon Sports",
-      "url": "https://athlonsports.com/nfl/pittsburgh-steelers"
-    },
-    {
-      "label": "Yardbarker",
-      "url": "https://www.yardbarker.com/nfl/teams/pittsburgh_steelers/44"
-    },
-    {
-      "label": "Spotrac",
-      "url": "https://www.spotrac.com/nfl/pittsburgh-steelers/overview"
-    },
-    {
-      "label": "StatMuse",
-      "url": "https://www.statmuse.com/nfl/team/2026-pittsburgh-steelers-50/2026"
-    },
-    {
-      "label": "Pro Football Rumors",
-      "url": "https://www.profootballrumors.com/pittsburgh-steelers-news-rumors"
-    },
-    {
-      "label": "NewsNow",
-      "url": "https://www.newsnow.com/us/Sports/NFL/AFC+North/Pittsburgh+Steelers"
-    },
-    {
-      "label": "SportSpyder",
-      "url": "https://sportspyder.com/nfl/pittsburgh-steelers/news"
-    },
-    {
-      "label": "r/steelers",
-      "url": "https://www.reddit.com/r/steelers/"
-    },
-    {
-      "label": "@Steelers",
-      "url": "https://x.com/steelers"
-    },
-    {
-      "label": "#Steelers",
-      "url": "https://x.com/search?q=Steelers&src=typed_query"
-    }
-  ],
-  "SF": [
-    {
-      "label": "NFL.com",
-      "url": "https://www.nfl.com/teams/san-francisco-49ers/"
-    },
-    {
-      "label": "ESPN",
-      "url": "https://www.espn.com/nfl/team/_/name/sf/san-francisco-49ers"
-    },
-    {
-      "label": "CBS Sports",
-      "url": "https://www.cbssports.com/nfl/teams/SF/san-francisco-49ers/"
-    },
-    {
-      "label": "FOX Sports",
-      "url": "https://www.foxsports.com/nfl/san-francisco-49ers-team"
-    },
-    {
-      "label": "Yahoo! Sports",
-      "url": "https://sports.yahoo.com/nfl/teams/san-francisco/"
-    },
-    {
-      "label": "The Athletic",
-      "url": "https://www.nytimes.com/athletic/nfl/team/49ers/"
-    },
-    {
-      "label": "B/R",
-      "url": "https://bleacherreport.com/san-francisco-49ers"
-    },
-    {
-      "label": "NBC Sports",
-      "url": "https://www.nbcsports.com/nfl/san-francisco-49ers"
-    },
-    {
-      "label": "SI",
-      "url": "https://www.si.com/nfl/49ers"
-    },
-    {
-      "label": "USA Today",
-      "url": "https://www.usatoday.com/sports/nfl/san-francisco-49ers"
-    },
-    {
-      "label": "Athlon Sports",
-      "url": "https://athlonsports.com/nfl/san-francisco-49ers"
-    },
-    {
-      "label": "Yardbarker",
-      "url": "https://www.yardbarker.com/nfl/teams/san_francisco_49ers/58"
-    },
-    {
-      "label": "Spotrac",
-      "url": "https://www.spotrac.com/nfl/san-francisco-49ers/overview"
-    },
-    {
-      "label": "StatMuse",
-      "url": "https://www.statmuse.com/nfl/team/2026-san-francisco-49ers-63/2026"
-    },
-    {
-      "label": "Pro Football Rumors",
-      "url": "https://www.profootballrumors.com/san-francisco-49ers-news-rumors"
-    },
-    {
-      "label": "NewsNow",
-      "url": "https://www.newsnow.com/us/Sports/NFL/NFC+West/San+Francisco+49ers"
-    },
-    {
-      "label": "SportSpyder",
-      "url": "https://sportspyder.com/nfl/san-francisco-49ers/news"
-    },
-    {
-      "label": "r/49ers",
-      "url": "https://www.reddit.com/r/49ers/"
-    },
-    {
-      "label": "@49ers",
-      "url": "https://x.com/49ers"
-    },
-    {
-      "label": "#49ers",
-      "url": "https://x.com/search?q=49ers&src=typed_query"
-    }
-  ],
-  "SEA": [
-    {
-      "label": "NFL.com",
-      "url": "https://www.nfl.com/teams/seattle-seahawks/"
-    },
-    {
-      "label": "ESPN",
-      "url": "https://www.espn.com/nfl/team/_/name/sea/seattle-seahawks"
-    },
-    {
-      "label": "CBS Sports",
-      "url": "https://www.cbssports.com/nfl/teams/SEA/seattle-seahawks/"
-    },
-    {
-      "label": "FOX Sports",
-      "url": "https://www.foxsports.com/nfl/seattle-seahawks-team"
-    },
-    {
-      "label": "Yahoo! Sports",
-      "url": "https://sports.yahoo.com/nfl/teams/seattle/"
-    },
-    {
-      "label": "The Athletic",
-      "url": "https://www.nytimes.com/athletic/nfl/team/seahawks/"
-    },
-    {
-      "label": "B/R",
-      "url": "https://bleacherreport.com/seattle-seahawks"
-    },
-    {
-      "label": "NBC Sports",
-      "url": "https://www.nbcsports.com/nfl/seattle-seahawks"
-    },
-    {
-      "label": "SI",
-      "url": "https://www.si.com/nfl/seahawks"
-    },
-    {
-      "label": "USA Today",
-      "url": "https://www.usatoday.com/sports/nfl/seattle-seahawks"
-    },
-    {
-      "label": "Athlon Sports",
-      "url": "https://athlonsports.com/nfl/seattle-seahawks"
-    },
-    {
-      "label": "Yardbarker",
-      "url": "https://www.yardbarker.com/nfl/teams/seattle_seahawks/59"
-    },
-    {
-      "label": "Spotrac",
-      "url": "https://www.spotrac.com/nfl/seattle-seahawks/overview"
-    },
-    {
-      "label": "StatMuse",
-      "url": "https://www.statmuse.com/nfl/team/2026-seattle-seahawks-81/2026"
-    },
-    {
-      "label": "Pro Football Rumors",
-      "url": "https://www.profootballrumors.com/seattle-seahawks-news-rumors"
-    },
-    {
-      "label": "NewsNow",
-      "url": "https://www.newsnow.com/us/Sports/NFL/NFC+West/Seattle+Seahawks"
-    },
-    {
-      "label": "SportSpyder",
-      "url": "https://sportspyder.com/nfl/seattle-seahawks/news"
-    },
-    {
-      "label": "r/Seahawks",
-      "url": "https://www.reddit.com/r/Seahawks/"
-    },
-    {
-      "label": "@Seahawks",
-      "url": "https://x.com/Seahawks"
-    },
-    {
-      "label": "#Seahawks",
-      "url": "https://x.com/search?q=Seahawks&src=typed_query"
-    }
-  ],
-  "TB": [
-    {
-      "label": "NFL.com",
-      "url": "https://www.nfl.com/teams/tampa-bay-buccaneers/"
-    },
-    {
-      "label": "ESPN",
-      "url": "https://www.espn.com/nfl/team/_/name/tb/tampa-bay-buccaneers"
-    },
-    {
-      "label": "CBS Sports",
-      "url": "https://www.cbssports.com/nfl/teams/TB/tampa-bay-buccaneers/"
-    },
-    {
-      "label": "FOX Sports",
-      "url": "https://www.foxsports.com/nfl/tampa-bay-buccaneers-team"
-    },
-    {
-      "label": "Yahoo! Sports",
-      "url": "https://sports.yahoo.com/nfl/teams/tampa-bay/"
-    },
-    {
-      "label": "The Athletic",
-      "url": "https://www.nytimes.com/athletic/nfl/team/buccaneers/"
-    },
-    {
-      "label": "B/R",
-      "url": "https://bleacherreport.com/tampa-bay-buccaneers"
-    },
-    {
-      "label": "NBC Sports",
-      "url": "https://www.nbcsports.com/nfl/tampa-bay-buccaneers"
-    },
-    {
-      "label": "SI",
-      "url": "https://www.si.com/nfl/buccaneers"
-    },
-    {
-      "label": "USA Today",
-      "url": "https://www.usatoday.com/sports/nfl/tampa-bay-buccaneers"
-    },
-    {
-      "label": "Athlon Sports",
-      "url": "https://athlonsports.com/nfl/tampa-bay-buccaneers"
-    },
-    {
-      "label": "Yardbarker",
-      "url": "https://www.yardbarker.com/nfl/teams/tampa_bay_buccaneers/61"
-    },
-    {
-      "label": "Spotrac",
-      "url": "https://www.spotrac.com/nfl/tampa-bay-buccaneers/overview"
-    },
-    {
-      "label": "StatMuse",
-      "url": "https://www.statmuse.com/nfl/team/2026-tampa-bay-buccaneers-82/2026"
-    },
-    {
-      "label": "Pro Football Rumors",
-      "url": "https://www.profootballrumors.com/tampa-bay-buccaneers-news-rumors"
-    },
-    {
-      "label": "NewsNow",
-      "url": "https://www.newsnow.com/us/Sports/NFL/NFC+South/Tampa+Bay+Buccaneers"
-    },
-    {
-      "label": "SportSpyder",
-      "url": "https://sportspyder.com/nfl/tampa-bay-buccaneers/news"
-    },
-    {
-      "label": "r/buccaneers",
-      "url": "https://www.reddit.com/r/buccaneers/"
-    },
-    {
-      "label": "@Buccaneers",
-      "url": "https://x.com/Buccaneers"
-    },
-    {
-      "label": "#Buccaneers",
-      "url": "https://x.com/search?q=Buccaneers&src=typed_query"
-    }
-  ],
-  "TEN": [
-    {
-      "label": "NFL.com",
-      "url": "https://www.nfl.com/teams/tennessee-titans/"
-    },
-    {
-      "label": "ESPN",
-      "url": "https://www.espn.com/nfl/team/_/name/ten/tennessee-titans"
-    },
-    {
-      "label": "CBS Sports",
-      "url": "https://www.cbssports.com/nfl/teams/TEN/tennessee-titans/"
-    },
-    {
-      "label": "FOX Sports",
-      "url": "https://www.foxsports.com/nfl/tennessee-titans-team"
-    },
-    {
-      "label": "Yahoo! Sports",
-      "url": "https://sports.yahoo.com/nfl/teams/tennessee/"
-    },
-    {
-      "label": "The Athletic",
-      "url": "https://www.nytimes.com/athletic/nfl/team/titans/"
-    },
-    {
-      "label": "B/R",
-      "url": "https://bleacherreport.com/tennessee-titans"
-    },
-    {
-      "label": "NBC Sports",
-      "url": "https://www.nbcsports.com/nfl/tennessee-titans"
-    },
-    {
-      "label": "SI",
-      "url": "https://www.si.com/nfl/titans"
-    },
-    {
-      "label": "USA Today",
-      "url": "https://www.usatoday.com/sports/nfl/tennessee-titans"
-    },
-    {
-      "label": "Athlon Sports",
-      "url": "https://athlonsports.com/nfl/tennessee-titans"
-    },
-    {
-      "label": "Yardbarker",
-      "url": "https://www.yardbarker.com/nfl/teams/tennessee_titans/46a"
-    },
-    {
-      "label": "Spotrac",
-      "url": "https://www.spotrac.com/nfl/tennessee-titans/overview"
-    },
-    {
-      "label": "StatMuse",
-      "url": "https://www.statmuse.com/nfl/team/2026-tennessee-titans-72/2026"
-    },
-    {
-      "label": "Pro Football Rumors",
-      "url": "https://www.profootballrumors.com/tennessee-titans-news-rumors"
-    },
-    {
-      "label": "NewsNow",
-      "url": "https://www.newsnow.com/us/Sports/NFL/AFC+South/Tennessee+Titans"
-    },
-    {
-      "label": "SportSpyder",
-      "url": "https://sportspyder.com/nfl/tennessee-titans/news"
-    },
-    {
-      "label": "r/Tennesseetitans",
-      "url": "https://www.reddit.com/r/Tennesseetitans/"
-    },
-    {
-      "label": "@Titans",
-      "url": "https://x.com/Titans"
-    },
-    {
-      "label": "#Titans",
-      "url": "https://x.com/search?q=Titans&src=typed_query"
-    }
-  ],
-  "WSH": [
-    {
-      "label": "NFL.com",
-      "url": "https://www.nfl.com/teams/washington-commanders/"
-    },
-    {
-      "label": "ESPN",
-      "url": "https://www.espn.com/nfl/team/_/name/wsh/washington-commanders"
-    },
-    {
-      "label": "CBS Sports",
-      "url": "https://www.cbssports.com/nfl/teams/WAS/washington-commanders/"
-    },
-    {
-      "label": "FOX Sports",
-      "url": "https://www.foxsports.com/nfl/washington-commanders-team"
-    },
-    {
-      "label": "Yahoo! Sports",
-      "url": "https://sports.yahoo.com/nfl/teams/washington/"
-    },
-    {
-      "label": "The Athletic",
-      "url": "https://www.nytimes.com/athletic/nfl/team/commanders/"
-    },
-    {
-      "label": "B/R",
-      "url": "https://bleacherreport.com/washington-commanders"
-    },
-    {
-      "label": "NBC Sports",
-      "url": "https://www.nbcsports.com/nfl/washington-commanders"
-    },
-    {
-      "label": "SI",
-      "url": "https://www.si.com/nfl/commanders"
-    },
-    {
-      "label": "USA Today",
-      "url": "https://www.usatoday.com/sports/nfl/washington-commanders"
-    },
-    {
-      "label": "Athlon Sports",
-      "url": "https://athlonsports.com/nfl/washington-commanders"
-    },
-    {
-      "label": "Yardbarker",
-      "url": "https://www.yardbarker.com/nfl/teams/washington_commanders/62"
-    },
-    {
-      "label": "Spotrac",
-      "url": "https://www.spotrac.com/nfl/washington-commanders/overview"
-    },
-    {
-      "label": "StatMuse",
-      "url": "https://www.statmuse.com/nfl/team/2026-washington-commanders-48/2026"
-    },
-    {
-      "label": "Pro Football Rumors",
-      "url": "https://www.profootballrumors.com/washington-commanders-news-rumors"
-    },
-    {
-      "label": "NewsNow",
-      "url": "https://www.newsnow.com/us/Sports/NFL/NFC+East/Washington+Commanders"
-    },
-    {
-      "label": "SportSpyder",
-      "url": "https://sportspyder.com/nfl/washington-commanders/news"
-    },
-    {
-      "label": "r/Commanders",
-      "url": "https://www.reddit.com/r/Commanders/"
-    },
-    {
-      "label": "@Commanders",
-      "url": "https://x.com/Commanders"
-    },
-    {
-      "label": "#Commanders",
-      "url": "https://x.com/search?q=Commanders&src=typed_query"
-    }
-  ],
-  "WAS": [
-    {
-      "label": "NFL.com",
-      "url": "https://www.nfl.com/teams/washington-commanders/"
-    },
-    {
-      "label": "ESPN",
-      "url": "https://www.espn.com/nfl/team/_/name/wsh/washington-commanders"
-    },
-    {
-      "label": "CBS Sports",
-      "url": "https://www.cbssports.com/nfl/teams/WAS/washington-commanders/"
-    },
-    {
-      "label": "FOX Sports",
-      "url": "https://www.foxsports.com/nfl/washington-commanders-team"
-    },
-    {
-      "label": "Yahoo! Sports",
-      "url": "https://sports.yahoo.com/nfl/teams/washington/"
-    },
-    {
-      "label": "The Athletic",
-      "url": "https://www.nytimes.com/athletic/nfl/team/commanders/"
-    },
-    {
-      "label": "B/R",
-      "url": "https://bleacherreport.com/washington-commanders"
-    },
-    {
-      "label": "NBC Sports",
-      "url": "https://www.nbcsports.com/nfl/washington-commanders"
-    },
-    {
-      "label": "SI",
-      "url": "https://www.si.com/nfl/commanders"
-    },
-    {
-      "label": "USA Today",
-      "url": "https://www.usatoday.com/sports/nfl/washington-commanders"
-    },
-    {
-      "label": "Athlon Sports",
-      "url": "https://athlonsports.com/nfl/washington-commanders"
-    },
-    {
-      "label": "Yardbarker",
-      "url": "https://www.yardbarker.com/nfl/teams/washington_commanders/62"
-    },
-    {
-      "label": "Spotrac",
-      "url": "https://www.spotrac.com/nfl/washington-commanders/overview"
-    },
-    {
-      "label": "StatMuse",
-      "url": "https://www.statmuse.com/nfl/team/2026-washington-commanders-48/2026"
-    },
-    {
-      "label": "Pro Football Rumors",
-      "url": "https://www.profootballrumors.com/washington-commanders-news-rumors"
-    },
-    {
-      "label": "NewsNow",
-      "url": "https://www.newsnow.com/us/Sports/NFL/NFC+East/Washington+Commanders"
-    },
-    {
-      "label": "SportSpyder",
-      "url": "https://sportspyder.com/nfl/washington-commanders/news"
-    },
-    {
-      "label": "r/Commanders",
-      "url": "https://www.reddit.com/r/Commanders/"
-    },
-    {
-      "label": "@Commanders",
-      "url": "https://x.com/Commanders"
-    },
-    {
-      "label": "#Commanders",
-      "url": "https://x.com/search?q=Commanders&src=typed_query"
-    }
-  ]
-};
-
-// ../grarf/desktop/src/extensionHost/resolveGrarfExtensionNflTeamExploreSources.ts
 function normalizeGrarfExtensionNflTeamExploreAbbrev(abbrev) {
   const trimmed = abbrev?.trim().toUpperCase();
   if (!trimmed) return null;
@@ -175465,7 +177704,12 @@ function normalizeGrarfExtensionNflTeamExploreAbbrev(abbrev) {
 function resolveGrarfExtensionNflTeamExploreSourcesForAbbrev(abbrev) {
   const key2 = normalizeGrarfExtensionNflTeamExploreAbbrev(abbrev);
   if (!key2) return null;
-  return GRARF_EXTENSION_NFL_TEAM_EXPLORE_SOURCES_BY_ABBREV[key2] ?? null;
+  const sources = resolveNonMlbTeamNewsSourcesForTeamAbbrev("NFL", key2);
+  if (!sources.length) return null;
+  return sources.map((source) => ({
+    label: source.name,
+    url: source.browserUrl
+  }));
 }
 function isGrarfExtensionNflTeamExploreGame(game) {
   return game.league === "NFL" || game.id.startsWith("espn-NFL-");
@@ -175558,13 +177802,23 @@ function resolveGrarfExtensionNhlTeamExploreSourcesForGameSide(game, side) {
   return mapRegistrySourcesToTeamExplore(sources);
 }
 function resolveGrarfExtensionTeamExploreSourcesForGameSide(game, side) {
-  const nfl = resolveGrarfExtensionNflTeamExploreSourcesForGameSide(game, side);
-  if (nfl?.length) return nfl;
+  if (isGrarfExtensionNflTeamExploreGame(game)) {
+    const nfl = resolveGrarfExtensionNflTeamExploreSourcesForGameSide(game, side);
+    if (nfl?.length) return nfl;
+  }
   const mlb2 = resolveGrarfExtensionMlbTeamExploreSourcesForGameSide(game, side);
   if (mlb2?.length) return mlb2;
   const nba = resolveGrarfExtensionNbaTeamExploreSourcesForGameSide(game, side);
   if (nba?.length) return nba;
-  return resolveGrarfExtensionNhlTeamExploreSourcesForGameSide(game, side);
+  const nhl = resolveGrarfExtensionNhlTeamExploreSourcesForGameSide(game, side);
+  if (nhl?.length) return nhl;
+  const context2 = resolveGameBrowserContext(game);
+  const team = side === "away" ? context2.awayTeam : context2.homeTeam;
+  if (!team.websites.length) return null;
+  return team.websites.map((website4) => ({
+    label: website4.label,
+    url: website4.url
+  }));
 }
 
 // ../grarf/desktop/src/extensionHost/GrarfExtensionGameCardTeamExplorePanel.tsx
