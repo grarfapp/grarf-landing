@@ -95661,7 +95661,7 @@ var SPORTS_BROWSER_PROTOTYPE_LEAGUE_WEBSITES = {
     { label: "EuroLeague", url: "https://www.euroleaguebasketball.net/euroleague/" },
     { label: "ESPN", url: "https://www.espn.com/euroleague/" },
     { label: "Eurohoops", url: "https://www.eurohoops.net/" },
-    { label: "BasketNews", url: "https://basketnews.com/" },
+    { label: "BasketNews", url: "https://basketnews.com/leagues/25-euroleague.html" },
     { label: "Basketball Sphere", url: "https://basketballsphere.com/" }
   ],
   POR1: [
@@ -186256,11 +186256,325 @@ function resolveGrarfExtensionExplorerSoccerLeagueNewsWebsites(leagueKey) {
   return websites ?? null;
 }
 
+// ../grarf/desktop/src/extensionHost/grarfExtensionExplorerUsProLeagueNewsSources.ts
+init_define_import_meta_env();
+function normalizeExplorerUsProLeagueKey(leagueKey) {
+  return leagueKey.trim().toUpperCase();
+}
+var GRARF_EXTENSION_EXPLORER_US_PRO_LEAGUE_NEWS_SOURCES = {
+  NFL: [
+    { label: "NFL.com", url: "https://www.nfl.com/" },
+    { label: "ESPN", url: "https://www.espn.com/nfl/" },
+    { label: "CBS Sports", url: "https://www.cbssports.com/nfl/" },
+    { label: "Yahoo! Sports", url: "https://sports.yahoo.com/nfl/" },
+    { label: "The Athletic", url: "https://www.nytimes.com/athletic/nfl/" },
+    { label: "The Score", url: "https://www.thescore.com/nfl" },
+    { label: "SI", url: "https://www.si.com/nfl" },
+    { label: "NBC Sports", url: "https://www.nbcsports.com/nfl" },
+    { label: "Bleacher Report", url: "https://bleacherreport.com/nfl" },
+    { label: "USA Today", url: "https://www.usatoday.com/sports/nfl" },
+    { label: "The Sporting News", url: "https://www.sportingnews.com/us/nfl" },
+    { label: "Yardbarker", url: "https://www.yardbarker.com/nfl" },
+    { label: "FOX Sports", url: "https://www.foxsports.com/nfl" },
+    { label: "Athlon Sports", url: "https://athlonsports.com/nfl" },
+    { label: "Pro Football Rumors", url: "https://www.profootballrumors.com/" },
+    { label: "AOL", url: "https://www.aol.com/news/sports/nfl/" },
+    { label: "MSN", url: "https://www.msn.com/en-us/sports/nfl" },
+    { label: "StatMuse", url: "https://www.statmuse.com/nfl/news" },
+    { label: "The Ringer", url: "https://www.theringer.com/topic/nfl" },
+    { label: "Spotrac", url: "https://www.spotrac.com/nfl/" },
+    { label: "SportSpyder", url: "https://sportspyder.com/sports/nfl/news" },
+    { label: "NewsNow", url: "https://www.newsnow.com/us/Sports/NFL" },
+    { label: "r/NFL", url: "https://www.reddit.com/r/nfl/" },
+    { label: "@NFL", url: "https://x.com/NFL" },
+    {
+      label: "#NFL",
+      url: "https://x.com/search?q=%23NFL&src=typed_query"
+    }
+  ],
+  NBA: [
+    { label: "NBA.com", url: "https://www.nba.com/" },
+    { label: "ESPN", url: "https://www.espn.com/nba/" },
+    { label: "Yahoo! Sports", url: "https://sports.yahoo.com/nba/" },
+    { label: "The Athletic", url: "https://www.nytimes.com/athletic/nba/" },
+    { label: "The Score", url: "https://www.thescore.com/nba" },
+    { label: "Bleacher Report", url: "https://bleacherreport.com/nba" },
+    { label: "CBS Sports", url: "https://www.cbssports.com/nba/" },
+    { label: "StatMuse", url: "https://www.statmuse.com/nba/news" },
+    { label: "USA Today", url: "https://www.usatoday.com/sports/nba/" },
+    { label: "HoopsHype", url: "https://www.hoopshype.com/" },
+    { label: "The Sporting News", url: "https://www.sportingnews.com/us/nba" },
+    { label: "Yardbarker", url: "https://www.yardbarker.com/nba" },
+    { label: "NBC Sports", url: "https://www.nbcsports.com/nba" },
+    { label: "AOL", url: "https://www.aol.com/news/sports/nba/" },
+    { label: "MSN", url: "https://www.msn.com/en-us/sports/nba" },
+    { label: "Basket News", url: "https://basketnews.com/us" },
+    { label: "Hoops Rumors", url: "https://www.hoopsrumors.com/" },
+    { label: "Athlon Sports", url: "https://athlonsports.com/nba" },
+    { label: "SB Nation", url: "https://www.sbnation.com/nba" },
+    { label: "BasketballNews", url: "https://www.basketballnews.com/" },
+    { label: "Spotrac", url: "https://www.spotrac.com/nba" },
+    { label: "SportSpyder", url: "https://sportspyder.com/sports/nba/news" },
+    { label: "NewsNow", url: "https://www.newsnow.com/us/Sports/NBA" },
+    { label: "r/NBA", url: "https://www.reddit.com/r/nba/" },
+    { label: "@NBA", url: "https://x.com/NBA" },
+    {
+      label: "#NBA",
+      url: "https://x.com/search?q=%23NBA&src=typed_query"
+    }
+  ],
+  MLB: [
+    { label: "MLB.com", url: "https://www.mlb.com/" },
+    { label: "ESPN", url: "https://www.espn.com/mlb/" },
+    { label: "Yahoo! Sports", url: "https://sports.yahoo.com/mlb/" },
+    { label: "CBS Sports", url: "https://www.cbssports.com/mlb/" },
+    { label: "The Athletic", url: "https://www.nytimes.com/athletic/mlb/" },
+    { label: "FOX Sports", url: "https://www.foxsports.com/mlb" },
+    { label: "SI", url: "https://www.si.com/mlb" },
+    { label: "The Score", url: "https://www.thescore.com/mlb" },
+    { label: "Bleacher Report", url: "https://bleacherreport.com/mlb" },
+    { label: "USA Today", url: "https://www.usatoday.com/sports/mlb/" },
+    { label: "Yardbarker", url: "https://www.yardbarker.com/mlb" },
+    { label: "Baseball Savant", url: "https://baseballsavant.mlb.com/" },
+    { label: "FanGraphs", url: "https://www.fangraphs.com/" },
+    { label: "Baseball Prospectus", url: "https://www.baseballprospectus.com/" },
+    { label: "StatMuse", url: "https://www.statmuse.com/mlb/news" },
+    { label: "The Sporting News", url: "https://www.sportingnews.com/us/mlb" },
+    { label: "AOL", url: "https://www.aol.com/news/sports/mlb/" },
+    { label: "MSN", url: "https://www.msn.com/en-us/sports/mlb" },
+    { label: "NBC Sports", url: "https://www.nbcsports.com/mlb" },
+    { label: "Baseball Reference", url: "https://www.baseball-reference.com/" },
+    { label: "Spotrac", url: "https://www.spotrac.com/mlb" },
+    { label: "SportSpyder", url: "https://sportspyder.com/sports/mlb/news" },
+    { label: "NewsNow", url: "https://www.newsnow.com/us/Sports/MLB" },
+    { label: "r/MLB", url: "https://www.reddit.com/r/mlb/" },
+    { label: "@MLB", url: "https://x.com/MLB" },
+    {
+      label: "#MLB",
+      url: "https://x.com/search?q=%23MLB&src=typed_query"
+    }
+  ],
+  F1: [
+    { label: "Formula 1", url: "https://www.formula1.com/" },
+    { label: "Motorsport.com", url: "https://www.motorsport.com/f1/" },
+    { label: "Autosport", url: "https://www.autosport.com/f1/" },
+    { label: "RacingNews365", url: "https://racingnews365.com/" },
+    { label: "PlanetF1", url: "https://www.planetf1.com/" },
+    { label: "The Race", url: "https://www.the-race.com/formula-1/" },
+    { label: "GPblog", url: "https://www.gpblog.com/" },
+    { label: "GPFans", url: "https://www.gpfans.com/" },
+    { label: "Crash.net", url: "https://www.crash.net/f1" },
+    { label: "Grandprix.com", url: "https://www.grandprix.com/" },
+    { label: "RACER", url: "https://racer.com/f1" },
+    { label: "F1 Chronicle", url: "https://f1chronicle.com/" },
+    { label: "Motorsport Magazine", url: "https://www.motorsportmagazine.com/" },
+    { label: "GPtoday", url: "https://www.gptoday.com/" },
+    { label: "ESPN", url: "https://www.espn.com/f1/" },
+    { label: "NewsNow", url: "https://www.newsnow.com/us/Sports/Motorsport/Formula+1" },
+    { label: "r/Formula1", url: "https://www.reddit.com/r/formula1/" },
+    { label: "@F1", url: "https://x.com/F1" },
+    {
+      label: "#Formula 1",
+      url: "https://x.com/search?q=%23Formula%201&src=typed_query"
+    }
+  ],
+  UFC: [
+    { label: "UFC", url: "https://www.ufc.com/news" },
+    { label: "MMA Fighting", url: "https://www.mmafighting.com/latest-news" },
+    { label: "MMA Junkie", url: "https://mmajunkie.usatoday.com/" },
+    { label: "ESPN MMA", url: "https://www.espn.com/mma/" },
+    { label: "Sherdog", url: "https://www.sherdog.com/" },
+    { label: "MMA Mania", url: "https://www.mmamania.com/" },
+    { label: "Bloody Elbow", url: "https://bloodyelbow.com/" },
+    { label: "MMAWeekly", url: "https://www.mmaweekly.com/" },
+    { label: "MMA News", url: "https://www.mmanews.com/" },
+    { label: "LowKick MMA", url: "https://www.lowkickmma.com/" },
+    { label: "BJPenn", url: "https://www.bjpenn.com/mma-news/" },
+    { label: "Cageside Press", url: "https://cagesidepress.com/" },
+    { label: "CBS Sports MMA", url: "https://www.cbssports.com/mma/" },
+    { label: "Fightful MMA", url: "https://www.fightful.com/mma" },
+    { label: "SportSpyder", url: "https://www.sportspyder.com/sports/ufc" },
+    { label: "NewsNow", url: "https://www.newsnow.com/us/Sports/MMA/UFC" },
+    { label: "r/UFC", url: "https://www.reddit.com/r/ufc" },
+    { label: "@UFC", url: "https://x.com/UFC" },
+    {
+      label: "#UFC",
+      url: "https://x.com/search?q=%23UFC&src=typed_query"
+    }
+  ],
+  NCAAF: [
+    { label: "ESPN", url: "https://www.espn.com/college-football/" },
+    { label: "Yahoo!", url: "https://sports.yahoo.com/college-football/" },
+    { label: "CBS Sports", url: "https://www.cbssports.com/college-football/" },
+    { label: "FOX Sports", url: "https://www.foxsports.com/college-football" },
+    { label: "SI", url: "https://www.si.com/college/college-football" },
+    { label: "Bleacher Report", url: "https://bleacherreport.com/college-football" },
+    { label: "NBC Sports", url: "https://www.nbcsports.com/college-football" },
+    { label: "247Sports", url: "https://247sports.com/" },
+    { label: "The Athletic", url: "https://www.nytimes.com/athletic/college-football/" },
+    { label: "USA Today", url: "https://www.usatoday.com/sports/ncaaf/" },
+    { label: "On3", url: "https://www.on3.com/" },
+    {
+      label: "The Sporting News",
+      url: "https://www.sportingnews.com/us/ncaa-football/news"
+    },
+    { label: "Yardbarker", url: "https://www.yardbarker.com/college_football" },
+    { label: "FanSided", url: "https://fansided.com/college-football/" },
+    { label: "MSN", url: "https://www.msn.com/en-us/sports/ncaafb" },
+    { label: "AOL", url: "https://www.aol.com/news/sports/college-football/" },
+    { label: "The Score", url: "https://www.thescore.com/ncaaf/news" },
+    { label: "StatMuse", url: "https://www.statmuse.com/cfb/news" },
+    { label: "SportSpyder", url: "https://sportspyder.com/sports/cf/news" },
+    { label: "NewsNow", url: "https://www.newsnow.com/us/Sports/NCAA+Football" },
+    { label: "r/CFB", url: "https://www.reddit.com/r/CFB/" },
+    { label: "#CFB", url: "https://x.com/i/lists/1907790163838701677" }
+  ],
+  NHL: [
+    { label: "NHL.com", url: "https://www.nhl.com/news" },
+    { label: "ESPN", url: "https://www.espn.com/nhl/" },
+    { label: "CBS Sports", url: "https://www.cbssports.com/nhl/" },
+    { label: "Sportsnet", url: "https://www.sportsnet.ca/nhl/" },
+    { label: "TSN", url: "https://www.tsn.ca/nhl" },
+    { label: "The Athletic", url: "https://www.nytimes.com/athletic/nhl/" },
+    { label: "Bleacher Report", url: "https://bleacherreport.com/nhl" },
+    { label: "The Score", url: "https://www.thescore.com/nhl" },
+    { label: "The Hockey News", url: "https://thehockeynews.com/" },
+    {
+      label: "The Hockey Writers",
+      url: "https://thehockeywriters.com/category/nhl-news/"
+    },
+    { label: "Yahoo Sports", url: "https://sports.yahoo.com/nhl/" },
+    { label: "NHL Rumors", url: "https://nhlrumors.com/" },
+    { label: "Daily Faceoff", url: "https://www.dailyfaceoff.com/" },
+    { label: "Hockey Reference", url: "https://www.hockey-reference.com/" },
+    { label: "StatMuse", url: "https://www.statmuse.com/nhl/news" },
+    { label: "USA Today", url: "https://www.usatoday.com/sports/nhl/" },
+    { label: "FOX Sports", url: "https://www.foxsports.com/nhl" },
+    {
+      label: "The Hockey Writers",
+      url: "https://thehockeywriters.com/category/nhl-news/"
+    },
+    { label: "SportSpyder", url: "https://www.sportspyder.com/sports/nhl/news" },
+    { label: "NewsNow", url: "https://www.newsnow.com/us/Sports/NHL" },
+    { label: "r/NHL", url: "https://www.reddit.com/r/nhl/" },
+    { label: "@NHL", url: "https://x.com/NHL" },
+    {
+      label: "#NHL",
+      url: "https://x.com/search?q=%23NHL&src=typed_query"
+    }
+  ],
+  WTA: [
+    { label: "ESPN", url: "https://www.espn.com/tennis/" },
+    { label: "BBC Sport", url: "https://www.bbc.com/sport/tennis" },
+    { label: "WTA", url: "https://www.wtatennis.com/news" },
+    { label: "Tennis.com", url: "https://www.tennis.com/" },
+    { label: "Eurosport", url: "https://www.eurosport.com/tennis/" },
+    { label: "Tennis365", url: "https://www.tennis365.com/" },
+    { label: "SportSpyder", url: "https://www.sportspyder.com/sports/tennis/news" },
+    { label: "NewsNow", url: "https://www.newsnow.com/us/Sports/Tennis/WTA" },
+    { label: "r/tennis", url: "https://www.reddit.com/r/tennis/" },
+    { label: "@WTA", url: "https://x.com/WTA" },
+    {
+      label: "#WTA",
+      url: "https://x.com/search?q=%23WTA&src=typed_query"
+    }
+  ],
+  LIBERTADORES: [
+    {
+      label: "ESPN",
+      url: "https://www.espn.com/soccer/league/_/name/conmebol.libertadores"
+    },
+    { label: "Globo", url: "https://ge.globo.com/futebol/libertadores/" },
+    { label: "CONMEBOL", url: "https://www.conmebol.com/libertadores/" },
+    { label: "CBS Sports", url: "https://www.cbssports.com/soccer/copa-libertadores/" },
+    {
+      label: "beIN SPORTS",
+      url: "https://www.beinsports.com/en-us/soccer/copa-libertadores"
+    },
+    {
+      label: "The Guardian",
+      url: "https://www.theguardian.com/football/copa-libertadores"
+    },
+    { label: "SportSpyder", url: "https://www.sportspyder.com/sports/soccer/news" },
+    {
+      label: "NewsNow",
+      url: "https://www.newsnow.com/us/Sports/Football/South+American/Copa+Libertadores"
+    },
+    { label: "r/soccer", url: "https://www.reddit.com/r/soccer/" },
+    { label: "@Libertadores", url: "https://x.com/Libertadores" },
+    {
+      label: "#Libertadores",
+      url: "https://x.com/search?q=%23Libertadores&src=typed_query"
+    }
+  ],
+  MNCAAB: [
+    { label: "ESPN", url: "https://www.espn.com/mens-college-basketball/" },
+    { label: "CBS Sports", url: "https://www.cbssports.com/college-basketball/" },
+    { label: "Yahoo Sports", url: "https://sports.yahoo.com/college-basketball/" },
+    { label: "NCAA", url: "https://www.ncaa.com/sports/basketball-men/d1" },
+    { label: "Bleacher Report", url: "https://bleacherreport.com/college-basketball" },
+    { label: "247Sports", url: "https://247sports.com/college-basketball/" },
+    { label: "On3", url: "https://www.on3.com/college-basketball/" },
+    { label: "SportSpyder", url: "https://www.sportspyder.com/sports/ncaab/news" },
+    { label: "NewsNow", url: "https://www.newsnow.com/us/Sports/NCAA+Basketball" },
+    { label: "r/CollegeBasketball", url: "https://www.reddit.com/r/CollegeBasketball/" },
+    { label: "@MarchMadnessMBB", url: "https://x.com/MarchMadnessMBB" },
+    {
+      label: "#MarchMadness",
+      url: "https://x.com/search?q=%23MarchMadness&src=typed_query"
+    }
+  ],
+  PGA: [
+    { label: "PGA Tour", url: "https://www.pgatour.com/" },
+    { label: "ESPN", url: "https://www.espn.com/golf/" },
+    { label: "CBS Sports", url: "https://www.cbssports.com/golf/" },
+    { label: "Sky Sports Golf", url: "https://www.skysports.com/golf" },
+    { label: "Golf Channel", url: "https://www.golfchannel.com/" },
+    { label: "Golf Digest", url: "https://www.golfdigest.com/golf" },
+    { label: "Golfweek", url: "https://golfweek.usatoday.com/" },
+    { label: "Golf Monthly", url: "https://www.golfmonthly.com/" },
+    { label: "SportSpyder", url: "https://www.sportspyder.com/sports/golf/news" },
+    { label: "NewsNow", url: "https://www.newsnow.com/us/Sports/Golf/PGA" },
+    { label: "r/golf", url: "https://www.reddit.com/r/golf/" },
+    { label: "@PGATOUR", url: "https://x.com/PGATOUR" },
+    {
+      label: "#PGATOUR",
+      url: "https://x.com/search?q=%23PGATOUR&src=typed_query"
+    }
+  ],
+  WNBA: [
+    { label: "ESPN", url: "https://www.espn.com/wnba/" },
+    { label: "WNBA", url: "https://www.wnba.com/news" },
+    { label: "CBS Sports", url: "https://www.cbssports.com/wnba/" },
+    { label: "Yahoo Sports", url: "https://sports.yahoo.com/wnba/" },
+    { label: "The Athletic", url: "https://www.nytimes.com/athletic/wnba/" },
+    { label: "Bleacher Report", url: "https://bleacherreport.com/wnba" },
+    { label: "The Sporting News", url: "https://www.sportingnews.com/us/wnba" },
+    { label: "High Post Hoops", url: "https://highposthoops.com/" },
+    { label: "StatMuse", url: "https://www.statmuse.com/wnba/news" },
+    { label: "Swish Appeal", url: "https://www.swishappeal.com/" },
+    { label: "SportSpyder", url: "https://www.sportspyder.com/sports/wnba/news" },
+    { label: "NewsNow", url: "https://www.newsnow.com/us/Sports/Basketball/WNBA" },
+    { label: "r/wnba", url: "https://www.reddit.com/r/wnba/" },
+    { label: "@WNBA", url: "https://x.com/WNBA" },
+    {
+      label: "#WNBA",
+      url: "https://x.com/search?q=%23WNBA&src=typed_query"
+    }
+  ]
+};
+function resolveGrarfExtensionExplorerUsProLeagueNewsWebsites(leagueKey) {
+  const websites = GRARF_EXTENSION_EXPLORER_US_PRO_LEAGUE_NEWS_SOURCES[normalizeExplorerUsProLeagueKey(leagueKey)];
+  return websites ?? null;
+}
+
 // ../grarf/desktop/src/extensionHost/grarfExtensionNewsLeaguesWebsites.ts
 function withGrarfExtensionNewsStatMuseForLeague(leagueKey, websites) {
   return insertGrarfExtensionNewsStatMuseWebsite(websites, leagueKey);
 }
 function resolveGrarfExtensionNewsWebsitesForLeagueKey(leagueKey, options) {
+  const explorerUsProNews = resolveGrarfExtensionExplorerUsProLeagueNewsWebsites(leagueKey);
+  if (explorerUsProNews) return explorerUsProNews;
   const explorerSoccerNews = resolveGrarfExtensionExplorerSoccerLeagueNewsWebsites(leagueKey);
   if (explorerSoccerNews) return explorerSoccerNews;
   const temporalCol1Active = Boolean(options?.temporalNewsCol1Active);
