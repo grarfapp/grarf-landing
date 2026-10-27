@@ -59659,6 +59659,10 @@ init_define_import_meta_env();
 init_define_import_meta_env();
 var LIGUE1_LEAGUE_LOGO_URL = "/league-logos/ligue-1-official.png";
 
+// ../grarf/desktop/src/lib/gamesSpine/superLigLeagueLogoUrl.ts
+init_define_import_meta_env();
+var SUPER_LIG_LEAGUE_LOGO_URL = "/league-logos/super-lig.png";
+
 // ../grarf/desktop/src/lib/navigation/leagueRoutePaths.ts
 init_define_import_meta_env();
 var GRARF_LEAGUE_ROUTE_PATHS = {
@@ -59780,6 +59784,7 @@ var GRARF_LEAGUE_KEY_NAV_ITEM_ID = {
   CARABAO_CUP: "carabao-cup",
   SCOTTISH_LEAGUE_CUP: "scottish-league-cup",
   CHAMPIONSHIP: "efl-championship",
+  SUPERLIG: "super-lig",
   COPPAITALIA: "coppa-italia",
   GER_SUPER_CUP: "german-supercup",
   LEAGUES_CUP: "leagues-cup",
@@ -59817,6 +59822,9 @@ function resolveLeagueDirectoryItemByHubId(hubId) {
 function resolveCanonicalLeagueLogoUrl(options) {
   if (options.grarfLeagueKey === "LIGUE1") {
     return LIGUE1_LEAGUE_LOGO_URL;
+  }
+  if (options.grarfLeagueKey === "SUPERLIG") {
+    return SUPER_LIG_LEAGUE_LOGO_URL;
   }
   if (options.grarfLeagueKey) {
     const item = resolveLeagueDirectoryItemByGrarfLeagueKey(options.grarfLeagueKey);
@@ -61116,6 +61124,17 @@ function isDpWorldTourLeagueLogo(options) {
   const label = options?.label?.trim().toUpperCase();
   return label === "DP_WORLD" || label === "DP WORLD TOUR";
 }
+function logoUrlIsSuperLigLeagueAsset(logoUrl) {
+  const lower = logoUrl.trim().toLowerCase();
+  return lower.includes("super-lig.png") || lower.includes("/nav/super-lig");
+}
+function isSuperLigLeagueLogo(options) {
+  const logoUrl = options?.logoUrl?.trim();
+  if (logoUrl && logoUrlIsSuperLigLeagueAsset(logoUrl)) return true;
+  if (logoUrl === SUPER_LIG_LEAGUE_LOGO_URL) return true;
+  const label = options?.label?.trim().toUpperCase();
+  return label === "SUPERLIG" || label === "S\xDCPER LIG" || label === "SUPER LIG";
+}
 function isMotogpLeagueLogo(options) {
   const logoUrl = options?.logoUrl?.trim();
   if (logoUrl && logoUrlIsMotogpLeagueAsset(logoUrl)) return true;
@@ -61200,7 +61219,7 @@ function grarfLogoImgBorderRadiusClass(options) {
   if (isMotogpLeagueLogo(options)) {
     return "rounded-md";
   }
-  if (isWrcLeagueLogo(options) || isLovbLeagueLogo(options) || isDpWorldTourLeagueLogo(options)) {
+  if (isWrcLeagueLogo(options) || isLovbLeagueLogo(options) || isDpWorldTourLeagueLogo(options) || isSuperLigLeagueLogo(options)) {
     return "rounded-[2px]";
   }
   if (isNbaLeaguePassLogo(options)) {
@@ -61247,7 +61266,7 @@ var GAMES_SPINE_LEAGUE_LOGO_URL = {
   EREDIVISIE: "https://a.espncdn.com/i/leaguelogos/soccer/500/11.png",
   SPFL: "https://a.espncdn.com/i/leaguelogos/soccer/500/45.png",
   SAUDI: "https://a.espncdn.com/i/leaguelogos/soccer/500/2488.png",
-  SUPERLIG: "https://a.espncdn.com/i/leaguelogos/soccer/500/18.png",
+  SUPERLIG: SUPER_LIG_LEAGUE_LOGO_URL,
   USL1: "/league-logos/usl-league-one.png",
   USLC: "/league-logos/usl-championship.png",
   BUNDESLIGA: "https://a.espncdn.com/i/leaguelogos/soccer/500/10.png",
@@ -157717,6 +157736,10 @@ function applyGrarfExtensionAiSearchNavigationScope(input) {
   }
 }
 
+// ../grarf/desktop/src/extensionHost/grarfExtensionNewsLeaguesAllSportsLeagueKey.ts
+init_define_import_meta_env();
+var GRARF_EXTENSION_NEWS_LEAGUES_ALL_SPORTS_LEAGUE_KEY = "__GRARF_ALL_SPORTS__";
+
 // ../grarf/desktop/src/extensionHost/grarfExtensionTemporalNavStandingsTopLevel.ts
 init_define_import_meta_env();
 init_isGrarfWebRenderer();
@@ -172250,7 +172273,14 @@ function isStatMuseHostUrl(url) {
 
 // ../grarf/desktop/src/extensionHost/resolveGrarfExtensionNewsLeaguesSourceCardLogoUrl.ts
 init_define_import_meta_env();
-function resolveGrarfExtensionNewsLeaguesSourceCardLogoUrl(url) {
+function resolveGrarfExtensionNewsLeaguesSourceCardLogoUrl(url, label) {
+  const normalizedLabel = label?.trim();
+  if (normalizedLabel === "Liga MX") {
+    const leagueLogo = GAMES_SPINE_LEAGUE_LOGO_URL.LIGAMX;
+    if (leagueLogo) {
+      return leagueLogo.startsWith("http") ? leagueLogo : publicAssetUrl(leagueLogo);
+    }
+  }
   if (isGrarfXComHost(url)) {
     return resolveWebsiteFaviconUrl("https://x.com/");
   }
@@ -172272,7 +172302,7 @@ function GrarfExtensionNewsLeaguesSourceCard({
   isSelected = false,
   onClick
 }) {
-  const faviconUrl = resolveGrarfExtensionNewsLeaguesSourceCardLogoUrl(url);
+  const faviconUrl = resolveGrarfExtensionNewsLeaguesSourceCardLogoUrl(url, label);
   return /* @__PURE__ */ (0, import_jsx_runtime254.jsx)(
     "button",
     {
@@ -185141,12 +185171,19 @@ DropdownMenuShortcut.displayName = "DropdownMenuShortcut";
 
 // ../grarf/desktop/src/extensionHost/GrarfExtensionShadcnSelectorColumn.tsx
 var import_jsx_runtime273 = __toESM(require_jsx_runtime(), 1);
-function GrarfExtensionShadcnSelectorColumn({ columnId, valueLabel, options, onSelect }) {
+function GrarfExtensionShadcnSelectorColumn({
+  columnId,
+  valueLabel,
+  options,
+  onSelect,
+  selectorGroupLabel
+}) {
   return /* @__PURE__ */ (0, import_jsx_runtime273.jsx)(DropdownMenu2, { children: /* @__PURE__ */ (0, import_jsx_runtime273.jsxs)(
     "div",
     {
       className: "min-w-0 flex-1",
       "data-sports-browser-prototype-temporary-nav-selector": columnId,
+      ...selectorGroupLabel ? { "data-grarf-extension-temporal-nav-selector-group-label": "" } : {},
       children: [
         /* @__PURE__ */ (0, import_jsx_runtime273.jsx)(DropdownMenuTrigger3, { asChild: true, children: /* @__PURE__ */ (0, import_jsx_runtime273.jsxs)(
           Button,
@@ -185155,10 +185192,21 @@ function GrarfExtensionShadcnSelectorColumn({ columnId, valueLabel, options, onS
             variant: "ghost",
             className: cn2(
               "h-9 w-full justify-between gap-2 px-4 text-xs font-medium uppercase tracking-wide",
-              "rounded-none border-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0"
+              "rounded-none border-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0",
+              selectorGroupLabel && "items-center"
             ),
             children: [
-              /* @__PURE__ */ (0, import_jsx_runtime273.jsx)("span", { className: "min-w-0 truncate", children: valueLabel }),
+              selectorGroupLabel ? /* @__PURE__ */ (0, import_jsx_runtime273.jsxs)("span", { className: "flex min-w-0 flex-1 flex-col items-start gap-0.5 text-left normal-case", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime273.jsx)(
+                  "span",
+                  {
+                    className: "w-full truncate text-[9px] font-medium uppercase tracking-[0.1em] text-muted-foreground leading-none",
+                    "data-grarf-extension-temporal-nav-selector-group-caption": "",
+                    children: selectorGroupLabel
+                  }
+                ),
+                /* @__PURE__ */ (0, import_jsx_runtime273.jsx)("span", { className: "min-w-0 w-full truncate uppercase tracking-[0.06em]", children: valueLabel })
+              ] }) : /* @__PURE__ */ (0, import_jsx_runtime273.jsx)("span", { className: "min-w-0 truncate", children: valueLabel }),
               /* @__PURE__ */ (0, import_jsx_runtime273.jsx)(ChevronDown, { className: "size-3.5 shrink-0", strokeWidth: 1.75, "aria-hidden": true })
             ]
           }
@@ -185261,49 +185309,50 @@ var TEMPORARY_NAV_LEAGUES_LENS_OPTIONS = [
 ];
 var TEMPORARY_NAV_LEAGUES_SORT_LABEL_BY_MODE = {
   "on-today": "ON TODAY",
-  group: "GROUP",
+  group: "BY SPORT",
   rank: "123",
   alpha: "A-Z"
 };
 var TEMPORARY_NAV_NEWS_LEAGUES_SORT_OPTIONS = [
   "LEAGUES ON TODAY",
+  "LEAGUES BY SPORT",
   "LEAGUES 123",
-  "LEAGUES A-Z",
-  "LEAGUES GROUPED"
+  "LEAGUES A-Z"
 ];
 var TEMPORARY_NAV_NEWS_LEAGUES_SORT_LABEL_TO_MODE = {
   "LEAGUES ON TODAY": "on-today",
+  "LEAGUES BY SPORT": "group",
   "LEAGUES 123": "rank",
-  "LEAGUES A-Z": "alpha",
-  "LEAGUES GROUPED": "group"
+  "LEAGUES A-Z": "alpha"
 };
 var TEMPORARY_NAV_NEWS_LEAGUES_SORT_MODE_TO_LABEL = {
   "on-today": "LEAGUES ON TODAY",
+  group: "LEAGUES BY SPORT",
   rank: "LEAGUES 123",
-  alpha: "LEAGUES A-Z",
-  group: "LEAGUES GROUPED"
+  alpha: "LEAGUES A-Z"
 };
 var TEMPORARY_NAV_TEAMS_BY_LEAGUES_SORT_OPTIONS = [
   "BY LEAGUES ON TODAY",
+  "BY LEAGUES BY SPORT",
   "BY LEAGUES A-Z",
-  "BY LEAGUES GROUPED",
   "BY LEAGUES 123"
 ];
 var TEMPORARY_NAV_TEAMS_BY_LEAGUES_SORT_LABEL_TO_MODE = {
   "BY LEAGUES ON TODAY": "on-today",
+  "BY LEAGUES BY SPORT": "group",
   "BY LEAGUES A-Z": "alpha",
-  "BY LEAGUES GROUPED": "group",
   "BY LEAGUES 123": "rank"
 };
 var TEMPORARY_NAV_TEAMS_BY_LEAGUES_SORT_MODE_TO_LABEL = {
   "on-today": "BY LEAGUES ON TODAY",
+  group: "BY LEAGUES BY SPORT",
   alpha: "BY LEAGUES A-Z",
-  group: "BY LEAGUES GROUPED",
   rank: "BY LEAGUES 123"
 };
 var SPORTS_BROWSER_PROTOTYPE_TEMPORARY_NAV_LEAGUES_BROWSE_SECTIONS = ["news", "social", "highlights", "fantasy", "betting", "podcasts"];
 var TEMPORARY_NAV_LEAGUES_SORT_LABEL_TO_MODE = {
   "ON TODAY": "on-today",
+  "BY SPORT": "group",
   GROUP: "group",
   "123": "rank",
   "A-Z": "alpha"
@@ -185375,10 +185424,6 @@ init_define_import_meta_env();
 
 // ../grarf/desktop/src/extensionHost/grarfExtensionNewsLeaguesWebsites.ts
 init_define_import_meta_env();
-
-// ../grarf/desktop/src/extensionHost/grarfExtensionNewsLeaguesAllSportsLeagueKey.ts
-init_define_import_meta_env();
-var GRARF_EXTENSION_NEWS_LEAGUES_ALL_SPORTS_LEAGUE_KEY = "__GRARF_ALL_SPORTS__";
 
 // ../grarf/desktop/src/extensionHost/grarfExtensionNewsLeaguesSoccerArchLeague.ts
 init_define_import_meta_env();
@@ -185781,11 +185826,359 @@ function insertGrarfExtensionNewsStatMuseWebsite(websites, leagueKey) {
   return next;
 }
 
+// ../grarf/desktop/src/extensionHost/grarfExtensionExplorerSoccerLeagueNewsSources.ts
+init_define_import_meta_env();
+function normalizeExplorerSoccerLeagueKey(leagueKey) {
+  const normalized = leagueKey.trim().toLowerCase();
+  if (normalized === "womens_ucl") return "womens-ucl";
+  return normalized;
+}
+var GRARF_EXTENSION_EXPLORER_SOCCER_LEAGUE_NEWS_SOURCES = {
+  ucl: [
+    { label: "FotMob", url: "https://www.fotmob.com/leagues/42/news/champions-league" },
+    { label: "Soccerway", url: "https://www.soccerway.com/news/champions-league" },
+    { label: "Yahoo! Sports", url: "https://sports.yahoo.com/soccer/champions-league/" },
+    { label: "UEFA", url: "https://www.uefa.com/uefachampionsleague/" },
+    { label: "ESPN", url: "https://www.espn.com/soccer/league/_/name/uefa.champions" },
+    {
+      label: "The Athletic",
+      url: "https://www.nytimes.com/athletic/football/champions-league/"
+    },
+    { label: "SI", url: "https://www.si.com/soccer/champions-league" },
+    { label: "OneFootball", url: "https://onefootball.com/en/competition/uefa-champions-league-5" },
+    {
+      label: "365Scores",
+      url: "https://www.365scores.com/en-us/football/league/uefa-champions-league-572/news"
+    },
+    { label: "TNT Sports", url: "https://www.tntsports.co.uk/football/champions-league/" },
+    { label: "BBC Sport", url: "https://www.bbc.com/sport/football/champions-league" },
+    { label: "Sky Sports", url: "https://www.skysports.com/champions-league" },
+    { label: "The Guardian", url: "https://www.theguardian.com/football/championsleague" },
+    { label: "BeSoccer", url: "https://www.besoccer.com/news/competition/champions_league" },
+    { label: "CBS Sports", url: "https://www.cbssports.com/soccer/champions-league/" },
+    {
+      label: "Transfermarkt",
+      url: "https://www.transfermarkt.com/uefa-champions-league/news/pokalwettbewerb/CL"
+    },
+    { label: "MSN", url: "https://www.msn.com/en-us/sports/soccer/uefa_champions_league" },
+    {
+      label: "NewsNow",
+      url: "https://www.newsnow.co.uk/h/Sport/Football/UEFA+Champions+League"
+    },
+    { label: "r/ChampionsLeague", url: "https://www.reddit.com/r/championsleague/" },
+    { label: "@ChampionsLeague", url: "https://x.com/ChampionsLeague" },
+    {
+      label: "#UCL",
+      url: "https://x.com/search?q=UEFA%20Champions%20League&src=typed_query&f=top"
+    }
+  ],
+  epl: [
+    { label: "FotMob", url: "https://www.fotmob.com/leagues/47/news/premier-league" },
+    { label: "Soccerway", url: "https://www.soccerway.com/news/premier-league/" },
+    { label: "ESPN", url: "https://www.espn.com/soccer/league/_/name/eng.1" },
+    { label: "OneFootball", url: "https://onefootball.com/en/competition/premier-league-9" },
+    { label: "Yahoo! Sports", url: "https://sports.yahoo.com/soccer/premier-league/" },
+    {
+      label: "365 Scores",
+      url: "https://www.365scores.com/en-us/football/league/premier-league-7/news"
+    },
+    { label: "NBC Sports", url: "https://www.nbcsports.com/soccer/premier-league" },
+    {
+      label: "Goal",
+      url: "https://www.goal.com/en-us/competition/premier-league/2kwbbcootiqqgmrzs6o5inle5"
+    },
+    { label: "BeSoccer", url: "https://www.besoccer.com/news/competition/premier_league" },
+    { label: "Football 365", url: "https://www.football365.com/" },
+    { label: "SI", url: "https://www.si.com/soccer/premier-league" },
+    {
+      label: "The Athletic",
+      url: "https://www.nytimes.com/athletic/football/premier-league/"
+    },
+    { label: "BBC Sport", url: "https://www.bbc.com/sport/football/premier-league" },
+    { label: "Sky Sports", url: "https://www.skysports.com/premier-league" },
+    { label: "The Guardian", url: "https://www.theguardian.com/football/premierleague" },
+    {
+      label: "Transfermarkt",
+      url: "https://www.transfermarkt.us/premier-league/startseite/wettbewerb/GB1"
+    },
+    { label: "TNT Sports", url: "https://www.tntsports.co.uk/football/premier-league/" },
+    { label: "Premier League", url: "https://www.premierleague.com/" },
+    { label: "Yardbarker", url: "https://www.yardbarker.com/soccer/leagues/premier_league" },
+    { label: "MSN", url: "https://www.msn.com/en-us/sports/soccer/premier_league" },
+    {
+      label: "NewsNow",
+      url: "https://www.newsnow.com/us/Sports/Soccer/Premier+League"
+    },
+    { label: "Sportspyder", url: "https://sportspyder.com/sports/premier-league/news" },
+    { label: "r/PremierLeague", url: "https://www.reddit.com/r/PremierLeague/" },
+    { label: "@PremierLeague", url: "https://x.com/premierleague" },
+    {
+      label: "#PremierLeague",
+      url: "https://x.com/search?q=%23PremierLeague&src=typed_query"
+    }
+  ],
+  laliga: [
+    { label: "FotMob", url: "https://www.fotmob.com/leagues/87/news/laliga" },
+    { label: "AS", url: "https://en.as.com/news/liga-espanola-de-futbol/" },
+    { label: "Yahoo! Sports", url: "https://sports.yahoo.com/soccer/la-liga/" },
+    { label: "Soccerway", url: "https://www.soccerway.com/news/laliga" },
+    {
+      label: "Goal",
+      url: "https://www.goal.com/en-us/competition/laliga/34pl8szyvrbwcmfkuocjm3r6t"
+    },
+    { label: "SI", url: "https://www.si.com/soccer/la-liga" },
+    { label: "ESPN", url: "https://www.espn.com/soccer/league/_/name/esp.1" },
+    { label: "BeSoccer", url: "https://www.besoccer.com/news/competition/primera_division" },
+    { label: "LaLiga", url: "https://www.laliga.com/en-US/news" },
+    { label: "The Analyst", url: "https://theanalyst.com/competition/la-liga/articles" },
+    { label: "TNT Sports", url: "https://www.tntsports.co.uk/football/liga/" },
+    { label: "The Guardian", url: "https://www.theguardian.com/football/laligafootball" },
+    {
+      label: "Transfermarkt",
+      url: "https://www.transfermarkt.com/laliga/startseite/wettbewerb/ES1"
+    },
+    { label: "NewsNow", url: "https://www.newsnow.com/us/Sports/Soccer/La+Liga" },
+    { label: "r/LaLiga", url: "https://www.reddit.com/r/LaLiga/" },
+    { label: "@LaLiga", url: "https://x.com/LaLiga" },
+    { label: "#LaLiga", url: "https://x.com/search?q=%23LaLiga&src=typed_query" }
+  ],
+  seriea: [
+    { label: "FotMob", url: "https://www.fotmob.com/leagues/55/news/serie-a" },
+    { label: "Football Italia", url: "https://football-italia.net/" },
+    { label: "Soccerway", url: "https://www.soccerway.com/news/serie-a/" },
+    { label: "Yahoo! Sports", url: "https://sports.yahoo.com/soccer/serie-a/" },
+    { label: "BeSoccer", url: "https://www.besoccer.com/competition/serie_a" },
+    { label: "Serie A", url: "https://www.legaseriea.it/en" },
+    { label: "ESPN", url: "https://www.espn.com/soccer/league/_/name/ita.1" },
+    { label: "TNT Sports", url: "https://www.tntsports.co.uk/football/serie-a/" },
+    { label: "Sky Sports", url: "https://www.skysports.com/serie-a" },
+    { label: "CBS Sports", url: "https://www.cbssports.com/soccer/serie-a/" },
+    {
+      label: "Transfermarkt",
+      url: "https://www.transfermarkt.com/serie-a/startseite/wettbewerb/IT1"
+    },
+    { label: "NewsNow", url: "https://www.newsnow.com/us/Sports/Soccer/Serie+A" },
+    { label: "r/SerieA", url: "https://www.reddit.com/r/seriea/" },
+    { label: "@SerieA", url: "https://x.com/SerieA_EN" },
+    { label: "#SerieA", url: "https://x.com/search?q=%23SerieA&src=typed_query" }
+  ],
+  bundesliga: [
+    { label: "FotMob", url: "https://www.fotmob.com/leagues/54/news/bundesliga" },
+    { label: "Bulinews", url: "https://bulinews.com/" },
+    {
+      label: "Soccerway",
+      url: "https://www.soccerway.com/news/bundesliga/W6BOzpK2CdnS0XT8/"
+    },
+    { label: "Bundesliga", url: "https://www.bundesliga.com/en/bundesliga/news" },
+    { label: "Kicker", url: "https://www.kicker.de/" },
+    { label: "Yahoo! Sports", url: "https://sports.yahoo.com/soccer/bundesliga/" },
+    { label: "BeSoccer", url: "https://www.besoccer.com/news/competition/bundesliga" },
+    { label: "ESPN", url: "https://www.espn.com/soccer/league/_/name/ger.1" },
+    { label: "TNT Sports", url: "https://www.tntsports.co.uk/football/bundesliga/" },
+    { label: "DW", url: "https://www.dw.com/en/bundesliga/t-17282633" },
+    {
+      label: "Transfermarkt",
+      url: "https://www.transfermarkt.com/bundesliga/startseite/wettbewerb/L1"
+    },
+    { label: "NewsNow", url: "https://www.newsnow.com/us/Sports/Soccer/Bundesliga" },
+    { label: "r/Bundesliga", url: "https://www.reddit.com/r/Bundesliga/" },
+    { label: "@Bundesliga", url: "https://x.com/Bundesliga_EN" },
+    { label: "#Bundesliga", url: "https://x.com/search?q=%23Bundesliga&src=typed_query" }
+  ],
+  ligue1: [
+    { label: "Get French Football News", url: "https://www.getfootballnewsfrance.com/" },
+    {
+      label: "Soccerway",
+      url: "https://www.soccerway.com/news/ligue-1/KIShoMk3CdnS0XT8/"
+    },
+    { label: "FotMob", url: "https://www.fotmob.com/leagues/53/news/ligue-1" },
+    { label: "Yahoo! Sports", url: "https://sports.yahoo.com/soccer/ligue-1/" },
+    { label: "BeSoccer", url: "https://www.besoccer.com/news/competition/ligue_1" },
+    { label: "Ligue 1", url: "https://www.ligue1.com/" },
+    { label: "ESPN", url: "https://www.espn.com/soccer/league/_/name/fra.1" },
+    {
+      label: "Transfermarkt",
+      url: "https://www.transfermarkt.com/ligue-1/startseite/wettbewerb/FR1"
+    },
+    { label: "NewsNow", url: "https://www.newsnow.com/us/Sports/Soccer/Ligue+1" },
+    { label: "r/Ligue1", url: "https://www.reddit.com/r/Ligue1/?tl=en" },
+    { label: "@Ligue1", url: "https://x.com/Ligue1" },
+    { label: "#Ligue1", url: "https://x.com/search?q=%23Ligue1&src=typed_query" }
+  ],
+  uel: [
+    { label: "UEFA", url: "https://www.uefa.com/uefaeuropaleague/" },
+    { label: "FotMob", url: "https://www.fotmob.com/leagues/73/news/europa-league" },
+    { label: "Soccerway", url: "https://www.soccerway.com/news/europa-league" },
+    { label: "ESPN", url: "https://www.espn.com/soccer/league/_/name/uefa.europa" },
+    { label: "Sky Sports", url: "https://www.skysports.com/europa-league" },
+    { label: "BBC Sport", url: "https://www.bbc.com/sport/football/europa-league" },
+    {
+      label: "Transfermarkt",
+      url: "https://www.transfermarkt.com/europa-league/startseite/pokalwettbewerb/EL"
+    },
+    {
+      label: "NewsNow",
+      url: "https://www.newsnow.co.uk/h/Sport/Football/UEFA+Europa+League"
+    },
+    { label: "r/EuropaLeague", url: "https://www.reddit.com/r/EuropaLeague/" },
+    { label: "@EuropaLeague", url: "https://x.com/EuropaLeague" },
+    { label: "#UEL", url: "https://x.com/search?q=%23UEL&src=typed_query" }
+  ],
+  mls: [
+    { label: "FotMob", url: "https://www.fotmob.com/leagues/130/news/mls" },
+    { label: "MLS", url: "https://www.mlssoccer.com/news" },
+    { label: "FOX Sports", url: "https://www.foxsports.com/soccer/mls" },
+    { label: "Yahoo! Sports", url: "https://sports.yahoo.com/soccer/mls/" },
+    { label: "ESPN", url: "https://www.espn.com/soccer/league/_/name/usa.1" },
+    { label: "The Athletic", url: "https://www.nytimes.com/athletic/football/mls/" },
+    { label: "Soccer America", url: "https://www.socceramerica.com/" },
+    {
+      label: "Transfermarkt",
+      url: "https://www.transfermarkt.com/major-league-soccer/startseite/wettbewerb/MLS1"
+    },
+    { label: "Sportspyder", url: "https://sportspyder.com/sports/mls" },
+    { label: "NewsNow", url: "https://www.newsnow.com/us/Sports/MLS" },
+    { label: "r/MLS", url: "https://www.reddit.com/r/MLS/" },
+    { label: "@MLS", url: "https://x.com/MLS" },
+    { label: "#MLS", url: "https://x.com/search?q=%23MLS&src=typed_query" }
+  ],
+  ligamx: [
+    { label: "FotMob", url: "https://www.fotmob.com/leagues/230/news/liga-mx" },
+    { label: "Liga MX", url: "https://www.ligamx.net/" },
+    { label: "AS", url: "https://en.as.com/news/liga-mexicana/" },
+    { label: "OneFootball", url: "https://onefootball.com/en/competition/liga-bbva-mx-89" },
+    { label: "ESPN", url: "https://www.espn.com/soccer/league/_/name/mex.1" },
+    {
+      label: "Transfermarkt",
+      url: "https://www.transfermarkt.com/liga-mx-apertura/startseite/wettbewerb/MEX1"
+    },
+    { label: "Marca", url: "https://www.marca.com/en/football/liga-mx.html" },
+    { label: "NewsNow", url: "https://www.newsnow.com/us/Sports/Soccer/Liga+MX" },
+    { label: "r/LigaMX", url: "https://www.reddit.com/r/LigaMX/" },
+    { label: "@LigaBBVAMX", url: "https://x.com/LigaBBVAMX" },
+    { label: "#LigaMX", url: "https://x.com/search?q=%23LigaMX&src=typed_query" }
+  ],
+  championship: [
+    { label: "FotMob", url: "https://www.fotmob.com/leagues/48/news/championship" },
+    { label: "BBC Sport", url: "https://www.bbc.com/sport/football/championship" },
+    { label: "Sky Sports", url: "https://www.skysports.com/championship" },
+    { label: "EFL", url: "https://www.efl.com/news/" },
+    { label: "The Guardian", url: "https://www.theguardian.com/football/championship" },
+    {
+      label: "Transfermarkt",
+      url: "https://www.transfermarkt.com/championship/startseite/wettbewerb/GB2"
+    },
+    {
+      label: "NewsNow",
+      url: "https://www.newsnow.com/us/Sports/Soccer/EFL+Championship"
+    },
+    { label: "r/Championship", url: "https://www.reddit.com/r/Championship/" },
+    { label: "@EFL", url: "https://x.com/EFL" },
+    {
+      label: "#EFLChampionship",
+      url: "https://x.com/search?q=%23EFLChampionship&src=typed_query"
+    }
+  ],
+  "womens-ucl": [
+    { label: "UEFA", url: "https://www.uefa.com/womenschampionsleague/" },
+    {
+      label: "FotMob",
+      url: "https://www.fotmob.com/leagues/9375/news/womens-champions-league"
+    },
+    { label: "Sky Sports", url: "https://www.skysports.com/womens-champions-league" },
+    {
+      label: "NewsNow",
+      url: "https://www.newsnow.co.uk/h/Sport/Football/UEFA+Women%27s+Champions+League"
+    },
+    {
+      label: "Google",
+      url: "https://www.google.com/search?q=uefa+women%27s+champions+league&tbm=nws"
+    },
+    { label: "@UWCL", url: "https://x.com/UWCL" },
+    { label: "#UWCL", url: "https://x.com/search?q=%23UWCL&src=typed_query" }
+  ],
+  nwsl: [
+    { label: "FotMob", url: "https://www.fotmob.com/leagues/9134/news/nwsl" },
+    { label: "NWSL", url: "https://www.nwslsoccer.com/news" },
+    { label: "ESPN", url: "https://www.espn.com/soccer/league/_/name/usa.nwsl" },
+    { label: "CBS Sports", url: "https://www.cbssports.com/soccer/nwsl/" },
+    { label: "The Athletic", url: "https://www.nytimes.com/athletic/football/nwsl/" },
+    { label: "Yahoo! Sports", url: "https://sports.yahoo.com/soccer/nwsl/" },
+    { label: "NewsNow", url: "https://www.newsnow.com/us/Sports/Soccer/NWSL" },
+    {
+      label: "Google",
+      url: "https://news.google.com/search?q=NWSL&hl=en-US&gl=US&ceid=US%3Aen"
+    },
+    { label: "r/NWSL", url: "https://www.reddit.com/r/NWSL/" },
+    { label: "@NWSL", url: "https://x.com/NWSL" },
+    { label: "#NWSL", url: "https://x.com/search?q=%23NWSL&src=typed_query" }
+  ],
+  spfl: [
+    { label: "FotMob", url: "https://www.fotmob.com/leagues/64/news/premiership" },
+    { label: "BBC Sport", url: "https://www.bbc.com/sport/football/scottish-premiership" },
+    { label: "SPFL", url: "https://spfl.co.uk/news" },
+    { label: "Sky Sports", url: "https://www.skysports.com/scottish-premiership" },
+    { label: "The Guardian", url: "https://www.theguardian.com/football/scottish-premiership" },
+    { label: "NewsNow", url: "https://www.newsnow.co.uk/h/Sport/Football/SPFL" },
+    { label: "r/ScottishFootball", url: "https://www.reddit.com/r/ScottishFootball/" },
+    { label: "@SPFL", url: "https://x.com/spfl" },
+    { label: "#SPFL", url: "https://x.com/search?q=%23SPFL&src=typed_query" }
+  ],
+  superlig: [
+    { label: "FotMob", url: "https://www.fotmob.com/leagues/71/news/super-lig" },
+    {
+      label: "beIN Sports",
+      url: "https://www.beinsports.com/en-us/soccer/super-lig#news"
+    },
+    {
+      label: "Transfermarkt",
+      url: "https://www.transfermarkt.com/super-lig/startseite/wettbewerb/TR1"
+    },
+    {
+      label: "NewsNow",
+      url: "https://www.newsnow.co.uk/h/Sport/Football/Europe/Turkey"
+    },
+    { label: "r/SuperLig", url: "https://www.reddit.com/r/superlig/" },
+    { label: "@SuperLig", url: "https://x.com/superlig" },
+    {
+      label: "#S\xFCperLig",
+      url: "https://x.com/search?q=%23S%C3%BCperLig&src=typed_query"
+    }
+  ],
+  uecl: [
+    {
+      label: "FotMob",
+      url: "https://www.fotmob.com/leagues/10216/news/conference-league"
+    },
+    { label: "UEFA", url: "https://www.uefa.com/uefaconferenceleague/" },
+    {
+      label: "Soccerway",
+      url: "https://www.soccerway.com/news/conference-league/GfRbsVWMCdnS0XT8/"
+    },
+    {
+      label: "BeSoccer",
+      url: "https://www.besoccer.com/news/competition/conference-league"
+    },
+    {
+      label: "NewsNow",
+      url: "https://www.newsnow.co.uk/h/Sport/Football/UEFA+Conference+League"
+    },
+    { label: "@Conf_League", url: "https://x.com/Conf_League" },
+    { label: "#UECL", url: "https://x.com/search?q=%23UECL&src=typed_query" }
+  ]
+};
+function resolveGrarfExtensionExplorerSoccerLeagueNewsWebsites(leagueKey) {
+  const websites = GRARF_EXTENSION_EXPLORER_SOCCER_LEAGUE_NEWS_SOURCES[normalizeExplorerSoccerLeagueKey(leagueKey)];
+  return websites ?? null;
+}
+
 // ../grarf/desktop/src/extensionHost/grarfExtensionNewsLeaguesWebsites.ts
 function withGrarfExtensionNewsStatMuseForLeague(leagueKey, websites) {
   return insertGrarfExtensionNewsStatMuseWebsite(websites, leagueKey);
 }
 function resolveGrarfExtensionNewsWebsitesForLeagueKey(leagueKey, options) {
+  const explorerSoccerNews = resolveGrarfExtensionExplorerSoccerLeagueNewsWebsites(leagueKey);
+  if (explorerSoccerNews) return explorerSoccerNews;
   const temporalCol1Active = Boolean(options?.temporalNewsCol1Active);
   const temporalCol1Websites = resolveGrarfExtensionTemporalNewsCol1NewsWebsitesForLeagueKey(
     leagueKey,
@@ -187255,21 +187648,9 @@ function GrarfExtensionStandingsLeaguesPanel({
 
 // ../grarf/desktop/src/extensionHost/grarfExtensionTemporalNewsNavSelectors.ts
 init_define_import_meta_env();
-var GRARF_EXTENSION_TEMPORAL_NEWS_SCOPE_SELECTOR_2_OPTIONS = [
-  "ALL SPORTS",
-  "EVERY LEAGUE"
-];
-function resolveGrarfExtensionTemporalNewsScopeLabelFromContentScope(scope) {
-  return scope === "outlets" ? "ALL SPORTS" : "EVERY LEAGUE";
-}
-function resolveGrarfExtensionTemporalNewsContentScopeFromSelector2Label(label) {
-  const normalized = label.trim().toUpperCase();
-  if (normalized === "ALL SPORTS") return "outlets";
-  if (normalized === "EVERY LEAGUE") return "leagues";
-  return null;
-}
-function shouldShowGrarfExtensionTemporalNewsSelector3(selector2Label) {
-  return selector2Label.trim().toUpperCase() === "EVERY LEAGUE";
+var GRARF_EXTENSION_TEMPORAL_NEWS_LEAGUES_SORT_MENU_GROUP_LABEL = "LEAGUES";
+function isGrarfExtensionTemporalNewsLeaguesSortNav(extensionTemporalNavChrome, topLevel) {
+  return extensionTemporalNavChrome && topLevel === "NEWS";
 }
 
 // ../grarf/desktop/src/components/homeMvp/SportsBrowserPrototypeLeaguesFilterField.tsx
@@ -187595,10 +187976,21 @@ function resolveSportsBrowserPrototypeSidebarLeaguesImportanceSections(mergedLea
     }
   ];
 }
+function normalizeSportsBrowserPrototypeLeagueSearchText(value) {
+  return value.normalize("NFD").replace(/\p{M}/gu, "").toLowerCase().replace(/\s+/g, " ").trim();
+}
+function compactSportsBrowserPrototypeLeagueSearchText(value) {
+  return normalizeSportsBrowserPrototypeLeagueSearchText(value).replace(/\s+/g, "");
+}
 function sportsBrowserPrototypeSidebarLeagueRowMatchesSearch(label, searchQuery) {
   const query = searchQuery.trim();
   if (!query) return true;
-  return label.toLowerCase().includes(query.toLowerCase());
+  const normalizedLabel = normalizeSportsBrowserPrototypeLeagueSearchText(label);
+  const normalizedQuery = normalizeSportsBrowserPrototypeLeagueSearchText(query);
+  if (normalizedLabel.includes(normalizedQuery)) return true;
+  return compactSportsBrowserPrototypeLeagueSearchText(label).includes(
+    compactSportsBrowserPrototypeLeagueSearchText(query)
+  );
 }
 function resolveSportsBrowserPrototypeSidebarLeaguesSectionsWhenSearching(sortMode, mergedOperationalLeagues) {
   switch (sortMode) {
@@ -189976,11 +190368,7 @@ function resolveTemporaryNavDefaultContentScope(topLevel) {
 function resolveTemporaryNavContentScopeOptions(topLevel) {
   switch (topLevel) {
     case "NEWS":
-      return [
-        "leagues",
-        // "teams", // Temporarily hidden from col-2 selector.
-        "outlets"
-      ];
+      return ["leagues"];
     case "SOCIAL":
     case "PODCASTS":
       return [
@@ -190023,7 +190411,7 @@ var TOP_LEVEL_OPTIONS = [
   // "TEAMS", // Temporarily hidden from col-1 selector; re-enable when TEAMS top-level ships.
 ];
 var RECAPS_SELECTOR_2 = ["TODAY", "YESTERDAY"];
-var LEAGUES_SORT_OPTIONS = ["ON TODAY", "GROUP", "123", "A-Z"];
+var LEAGUES_SORT_OPTIONS = ["ON TODAY", "BY SPORT", "123", "A-Z"];
 var LEAGUES_LENS_OPTIONS = TEMPORARY_NAV_LEAGUES_LENS_OPTIONS;
 var GAMES_SELECTOR_2 = ["TODAY", "YESTERDAY"];
 var GAMES_TODAY_SELECTOR_3 = ["ALL", "NOW", "NEXT", "FINAL"];
@@ -190148,7 +190536,8 @@ function PrototypeSelectorColumn({
   options,
   openColumnId,
   onOpenColumnIdChange,
-  onSelect
+  onSelect,
+  selectorGroupLabel
 }) {
   const open = openColumnId === columnId;
   if (isGrarfExtensionRenderer()) {
@@ -190158,7 +190547,8 @@ function PrototypeSelectorColumn({
         columnId,
         valueLabel,
         options,
-        onSelect
+        onSelect,
+        selectorGroupLabel
       }
     );
   }
@@ -190252,8 +190642,14 @@ function SportsBrowserPrototypeTemporaryNavPrototype({
   const contentSelectorsWired = contentTopLevel != null && contentNavSection != null && onContentNavChange != null && leaguesSortMode != null && (leaguesOnlyContentTopLevel || contentNavScope != null);
   const effectiveContentNavScope = leaguesOnlyContentTopLevel ? "leagues" : contentNavScope;
   const extensionTemporalNavChrome = isGrarfExtensionRenderer() && onLeaguesSearchQueryChange != null && leaguesSortMode != null;
-  const extensionTemporalNewsScopeSelectors = extensionTemporalNavChrome && topLevel === "NEWS";
+  const extensionTemporalNewsLeaguesSortNav = isGrarfExtensionTemporalNewsLeaguesSortNav(
+    extensionTemporalNavChrome,
+    topLevel
+  );
   const effectiveSelector2Label = (0, import_react307.useMemo)(() => {
+    if (extensionTemporalNewsLeaguesSortNav && leaguesSortMode) {
+      return resolveTemporaryNavLeaguesSortLabelFromMode(leaguesSortMode);
+    }
     if (gamesSelectorsWired && gamesCompactTemporalView) {
       return resolveTemporaryNavGamesSelector2FromCompactTemporalView(gamesCompactTemporalView);
     }
@@ -190266,9 +190662,6 @@ function SportsBrowserPrototypeTemporaryNavPrototype({
     if (standingsSelectorsWired && leaguesSortMode) {
       return resolveTemporaryNavNewsLeaguesSortLabelFromMode(leaguesSortMode);
     }
-    if (extensionTemporalNewsScopeSelectors && contentSelectorsWired && effectiveContentNavScope) {
-      return resolveGrarfExtensionTemporalNewsScopeLabelFromContentScope(effectiveContentNavScope);
-    }
     if (contentSelectorsWired && isTemporaryNavLeaguesSortContentTopLevel(contentTopLevel) && leaguesSortMode) {
       return resolveTemporaryNavNewsLeaguesSortLabelFromMode(leaguesSortMode);
     }
@@ -190280,7 +190673,7 @@ function SportsBrowserPrototypeTemporaryNavPrototype({
     contentSelectorsWired,
     contentTopLevel,
     effectiveContentNavScope,
-    extensionTemporalNewsScopeSelectors,
+    extensionTemporalNewsLeaguesSortNav,
     gamesCompactTemporalView,
     gamesSelectorsWired,
     leaguesLensSection,
@@ -190297,13 +190690,10 @@ function SportsBrowserPrototypeTemporaryNavPrototype({
     if (leaguesSelectorsWired && leaguesSortMode) {
       return resolveTemporaryNavLeaguesSortLabelFromMode(leaguesSortMode);
     }
-    if (extensionTemporalNewsScopeSelectors && shouldShowGrarfExtensionTemporalNewsSelector3(effectiveSelector2Label) && leaguesSortMode) {
-      return resolveTemporaryNavLeaguesSortLabelFromMode(leaguesSortMode);
-    }
     return selector3Label;
   }, [
     effectiveSelector2Label,
-    extensionTemporalNewsScopeSelectors,
+    extensionTemporalNewsLeaguesSortNav,
     gamesCompactTemporalView,
     gamesSelectorsWired,
     leaguesSelectorsWired,
@@ -190392,23 +190782,17 @@ function SportsBrowserPrototypeTemporaryNavPrototype({
     topLevel
   ]);
   const selector2Options = (0, import_react307.useMemo)(() => {
-    if (extensionTemporalNewsScopeSelectors) {
-      return GRARF_EXTENSION_TEMPORAL_NEWS_SCOPE_SELECTOR_2_OPTIONS;
-    }
-    return resolveTemporaryNavSelector2Options(topLevel);
-  }, [extensionTemporalNewsScopeSelectors, topLevel]);
-  const showsSelector3 = (0, import_react307.useMemo)(() => {
-    if (extensionTemporalNewsScopeSelectors) {
-      return shouldShowGrarfExtensionTemporalNewsSelector3(effectiveSelector2Label);
-    }
-    return resolveTemporaryNavShowsSelector3(topLevel, effectiveSelector2Label);
-  }, [effectiveSelector2Label, extensionTemporalNewsScopeSelectors, topLevel]);
-  const selector3Options = (0, import_react307.useMemo)(() => {
-    if (extensionTemporalNewsScopeSelectors && shouldShowGrarfExtensionTemporalNewsSelector3(effectiveSelector2Label)) {
+    if (extensionTemporalNewsLeaguesSortNav) {
       return LEAGUES_SORT_OPTIONS;
     }
+    return resolveTemporaryNavSelector2Options(topLevel);
+  }, [extensionTemporalNewsLeaguesSortNav, topLevel]);
+  const showsSelector3 = (0, import_react307.useMemo)(() => {
+    return resolveTemporaryNavShowsSelector3(topLevel, effectiveSelector2Label);
+  }, [effectiveSelector2Label, topLevel]);
+  const selector3Options = (0, import_react307.useMemo)(() => {
     return resolveTemporaryNavSelector3Options(topLevel, effectiveSelector2Label);
-  }, [effectiveSelector2Label, extensionTemporalNewsScopeSelectors, topLevel]);
+  }, [effectiveSelector2Label, topLevel]);
   const handleTopLevelSelect = (0, import_react307.useCallback)(
     (label) => {
       const col1Options = isGrarfExtensionRenderer() && onLeaguesSearchQueryChange != null && leaguesSortMode != null ? resolveGrarfExtensionTemporalNavCol1Options(TOP_LEVEL_OPTIONS) : TOP_LEVEL_OPTIONS;
@@ -190464,11 +190848,12 @@ function SportsBrowserPrototypeTemporaryNavPrototype({
         const scope = resolveTemporaryNavDefaultContentScope(next);
         setTopLevel(next);
         if (extensionTemporalNavChrome && next === "NEWS") {
-          const scopeLabel = resolveGrarfExtensionTemporalNewsScopeLabelFromContentScope(scope);
-          setSelector2Label(scopeLabel);
-          setSelector3Label(
-            scope === "leagues" && leaguesSortMode != null ? resolveTemporaryNavLeaguesSortLabelFromMode(leaguesSortMode) : null
+          setSelector2Label(
+            leaguesSortMode != null ? resolveTemporaryNavLeaguesSortLabelFromMode(leaguesSortMode) : LEAGUES_SORT_OPTIONS[0]
           );
+          setSelector3Label(null);
+          onContentNavChange(section, "leagues");
+          return;
         } else {
           setSelector2Label(
             isTemporaryNavLeaguesSortContentTopLevel(next) && leaguesSortMode != null ? resolveTemporaryNavNewsLeaguesSortLabelFromMode(leaguesSortMode) : isTemporaryNavLeaguesSortContentTopLevel(next) ? resolveTemporaryNavDefaultSelector2(next) : resolveTemporaryNavContentScopeLabel(scope)
@@ -190546,16 +190931,14 @@ function SportsBrowserPrototypeTemporaryNavPrototype({
         setSelector3Label(null);
         return;
       }
-      if (extensionTemporalNewsScopeSelectors && contentNavSection && onContentNavChange) {
-        const scope = resolveGrarfExtensionTemporalNewsContentScopeFromSelector2Label(label);
-        if (scope) {
-          onContentNavChange(contentNavSection, scope);
-          setSelector2Label(label);
-          setSelector3Label(
-            scope === "leagues" && leaguesSortMode != null ? resolveTemporaryNavLeaguesSortLabelFromMode(leaguesSortMode) : null
-          );
-          return;
+      if (extensionTemporalNewsLeaguesSortNav && onLeaguesSortModeChange) {
+        const mode = resolveLeaguesSortModeFromTemporaryNavLabel(label);
+        if (mode) {
+          onLeaguesSortModeChange(mode);
+          onContentNavChange?.("news", "leagues");
         }
+        setSelector2Label(label);
+        return;
       }
       if (isTemporaryNavLeaguesSortContentTopLevel(contentTopLevel) && onLeaguesSortModeChange) {
         const mode = resolveLeaguesSortModeFromTemporaryNavNewsLeaguesLabel(label);
@@ -190577,7 +190960,7 @@ function SportsBrowserPrototypeTemporaryNavPrototype({
     [
       contentNavSection,
       contentTopLevel,
-      extensionTemporalNewsScopeSelectors,
+      extensionTemporalNewsLeaguesSortNav,
       leaguesSortMode,
       onContentNavChange,
       onGamesCompactTemporalSelect,
@@ -190588,14 +190971,6 @@ function SportsBrowserPrototypeTemporaryNavPrototype({
   );
   const handleSelector3Select = (0, import_react307.useCallback)(
     (label) => {
-      if (extensionTemporalNewsScopeSelectors && shouldShowGrarfExtensionTemporalNewsSelector3(effectiveSelector2Label) && onLeaguesSortModeChange) {
-        const mode = resolveLeaguesSortModeFromTemporaryNavLabel(label);
-        if (mode) {
-          onLeaguesSortModeChange(mode);
-        }
-        setSelector3Label(label);
-        return;
-      }
       if (topLevel === "GAMES" && onGamesCompactTemporalSelect) {
         if (effectiveSelector2Label === "YESTERDAY") {
           setSelector3Label(label);
@@ -190633,7 +191008,6 @@ function SportsBrowserPrototypeTemporaryNavPrototype({
     },
     [
       effectiveSelector2Label,
-      extensionTemporalNewsScopeSelectors,
       onGamesCompactTemporalSelect,
       onLeaguesSortModeChange,
       topLevel
@@ -190684,11 +191058,13 @@ function SportsBrowserPrototypeTemporaryNavPrototype({
       setTopLevel(request.topLevel);
       if (extensionTemporalNavChrome && request.topLevel === "NEWS") {
         setSelector2Label(
-          resolveGrarfExtensionTemporalNewsScopeLabelFromContentScope(request.contentScope)
+          leaguesSortMode != null ? resolveTemporaryNavLeaguesSortLabelFromMode(leaguesSortMode) : LEAGUES_SORT_OPTIONS[0]
         );
-        setSelector3Label(
-          request.contentScope === "leagues" && leaguesSortMode != null ? resolveTemporaryNavLeaguesSortLabelFromMode(leaguesSortMode) : null
-        );
+        setSelector3Label(null);
+        if (!request.skipPaneSync) {
+          onContentNavChange?.(request.contentSection, "leagues");
+        }
+        return;
       } else {
         setSelector2Label(
           isTemporaryNavLeaguesSortContentTopLevel(request.topLevel) && leaguesSortMode != null ? resolveTemporaryNavNewsLeaguesSortLabelFromMode(leaguesSortMode) : isTemporaryNavLeaguesSortContentTopLevel(request.topLevel) ? resolveTemporaryNavDefaultSelector2(request.topLevel) : resolveTemporaryNavContentScopeLabel(request.contentScope)
@@ -190811,7 +191187,8 @@ function SportsBrowserPrototypeTemporaryNavPrototype({
             options: selector2Options,
             openColumnId,
             onOpenColumnIdChange: setOpenColumnId,
-            onSelect: handleSelector2Select
+            onSelect: handleSelector2Select,
+            selectorGroupLabel: extensionTemporalNewsLeaguesSortNav ? GRARF_EXTENSION_TEMPORAL_NEWS_LEAGUES_SORT_MENU_GROUP_LABEL : void 0
           }
         ) : extensionTemporalNavChrome ? /* @__PURE__ */ (0, import_jsx_runtime290.jsx)(
           "div",
@@ -192151,8 +192528,9 @@ function resolveGrarfExtensionAiSearchNewsAllSportsAction() {
     kind: "content",
     temporaryNavTopLevel: "NEWS",
     section: "news",
-    scope: "outlets",
-    syncMainPane: false
+    scope: "leagues",
+    syncMainPane: false,
+    expandNewsAllSports: true
   };
 }
 function resolveGrarfExtensionAiSearchExploreContentAction(kind, scope, options) {
@@ -192237,7 +192615,8 @@ var SEARCH_PHRASE_ACTIONS = [
       kind: "content",
       temporaryNavTopLevel: "NEWS",
       section: "news",
-      scope: "outlets"
+      scope: "leagues",
+      expandNewsAllSports: true
     }
   },
   {
@@ -193336,6 +193715,43 @@ var homeCommandCenterDailyPriorities_default = {
           awayTeamLabel: "Dream",
           homeTeamLabel: "Valkyries",
           line: "WNBA - Dream vs Valkyries"
+        }
+      ]
+    },
+    "2026-10-27": {
+      updatedAt: "2026-10-27T14:31:09.397Z",
+      entries: [
+        {
+          kind: "matchup",
+          leagueLabel: "MLB",
+          leagueKey: "MLB",
+          awayTeamLabel: "Brewers",
+          homeTeamLabel: "Rays",
+          line: "MLB - Brewers vs Rays"
+        },
+        {
+          kind: "matchup",
+          leagueLabel: "NHL",
+          leagueKey: "NHL",
+          awayTeamLabel: "Devils",
+          homeTeamLabel: "Stars",
+          line: "NHL - Devils vs Stars"
+        },
+        {
+          kind: "matchup",
+          leagueLabel: "NBA",
+          leagueKey: "NBA",
+          awayTeamLabel: "Pistons",
+          homeTeamLabel: "Knicks",
+          line: "NBA - Pistons vs Knicks"
+        },
+        {
+          kind: "matchup",
+          leagueLabel: "NBA",
+          leagueKey: "NBA",
+          awayTeamLabel: "Trail Blazers",
+          homeTeamLabel: "Lakers",
+          line: "NBA - Trail Blazers vs Lakers"
         }
       ]
     }
@@ -201497,7 +201913,12 @@ function SportsBrowserPrototypeLeftNav({
           }
           setTemporaryNavContentSection(action.section);
           setTemporaryNavContentScope(action.scope);
-          if (action.syncMainPane !== false || action.scope === "outlets") {
+          if (action.expandNewsAllSports && isGrarfExtensionRenderer()) {
+            setGrarfExtensionSidebarExclusiveExpandedLeagueKey(
+              GRARF_EXTENSION_NEWS_LEAGUES_ALL_SPORTS_LEAGUE_KEY
+            );
+          }
+          if (action.syncMainPane !== false) {
             onTemporaryNavContentNavChange?.(action.section, action.scope);
           }
           if (action.globalWebsiteIndex != null) {
