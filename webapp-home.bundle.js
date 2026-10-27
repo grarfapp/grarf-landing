@@ -94856,8 +94856,17 @@ var SPORTS_BROWSER_PROTOTYPE_TEMPORAL_HORSE_RACING_WEBSITES = {
   now: [{ label: "FanDuel Racing", url: "https://racing.fanduel.com/" }],
   next: [{ label: "FanDuel Racing Tracks", url: "https://racing.fanduel.com/tracks" }]
 };
+function normalizeSportsBrowserPrototypeSidebarHorseRacingTemporalView(temporalView) {
+  if (!temporalView) return void 0;
+  if (temporalView === "byTime") return "today";
+  return temporalView;
+}
 function resolveSportsBrowserPrototypeTemporalHorseRacingWebsites(temporalView) {
-  return SPORTS_BROWSER_PROTOTYPE_TEMPORAL_HORSE_RACING_WEBSITES[temporalView];
+  const resolved = normalizeSportsBrowserPrototypeSidebarHorseRacingTemporalView(temporalView);
+  if (!resolved) {
+    return [];
+  }
+  return SPORTS_BROWSER_PROTOTYPE_TEMPORAL_HORSE_RACING_WEBSITES[resolved];
 }
 function isSportsBrowserPrototypeTemporalHorseRacingLeagueKey(leagueKey) {
   return leagueKey === SPORTS_BROWSER_PROTOTYPE_TEMPORAL_HORSE_RACING_LEAGUE_KEY;
@@ -187724,8 +187733,10 @@ function GrarfExtensionStandingsLeaguesPanel({
 // ../grarf/desktop/src/extensionHost/grarfExtensionTemporalNewsNavSelectors.ts
 init_define_import_meta_env();
 var GRARF_EXTENSION_TEMPORAL_NEWS_LEAGUES_SORT_MENU_GROUP_LABEL = "LEAGUES";
-function isGrarfExtensionTemporalNewsLeaguesSortNav(extensionTemporalNavChrome, topLevel) {
-  return extensionTemporalNavChrome && topLevel === "NEWS";
+function isGrarfExtensionTemporalExplorerLeaguesSortNav(extensionTemporalNavChrome, topLevel) {
+  if (!extensionTemporalNavChrome) return false;
+  if (topLevel === "NEWS") return true;
+  return isGrarfExtensionTemporalNavStandingsBrowseTopLevel(topLevel);
 }
 
 // ../grarf/desktop/src/components/homeMvp/SportsBrowserPrototypeLeaguesFilterField.tsx
@@ -190509,7 +190520,7 @@ var PODCASTS_SELECTOR_2 = [
 ];
 function resolveTemporaryNavSelector2Options(topLevel) {
   if (isGrarfExtensionTemporalNavStandingsBrowseTopLevel(topLevel)) {
-    return TEMPORARY_NAV_NEWS_LEAGUES_SORT_OPTIONS;
+    return LEAGUES_SORT_OPTIONS;
   }
   switch (topLevel) {
     case "GAMES":
@@ -190719,12 +190730,12 @@ function SportsBrowserPrototypeTemporaryNavPrototype({
   const contentSelectorsWired = contentTopLevel != null && contentNavSection != null && onContentNavChange != null && leaguesSortMode != null && (leaguesOnlyContentTopLevel || contentNavScope != null);
   const effectiveContentNavScope = leaguesOnlyContentTopLevel ? "leagues" : contentNavScope;
   const extensionTemporalNavChrome = isGrarfExtensionRenderer() && onLeaguesSearchQueryChange != null && leaguesSortMode != null;
-  const extensionTemporalNewsLeaguesSortNav = isGrarfExtensionTemporalNewsLeaguesSortNav(
+  const extensionTemporalExplorerLeaguesSortNav = isGrarfExtensionTemporalExplorerLeaguesSortNav(
     extensionTemporalNavChrome,
     topLevel
   );
   const effectiveSelector2Label = (0, import_react307.useMemo)(() => {
-    if (extensionTemporalNewsLeaguesSortNav && leaguesSortMode) {
+    if (extensionTemporalExplorerLeaguesSortNav && leaguesSortMode) {
       return resolveTemporaryNavLeaguesSortLabelFromMode(leaguesSortMode);
     }
     if (gamesSelectorsWired && gamesCompactTemporalView) {
@@ -190735,9 +190746,6 @@ function SportsBrowserPrototypeTemporaryNavPrototype({
     }
     if (teamsSelectorsWired && leaguesSortMode) {
       return resolveTemporaryNavTeamsByLeaguesSortLabelFromMode(leaguesSortMode);
-    }
-    if (standingsSelectorsWired && leaguesSortMode) {
-      return resolveTemporaryNavNewsLeaguesSortLabelFromMode(leaguesSortMode);
     }
     if (contentSelectorsWired && isTemporaryNavLeaguesSortContentTopLevel(contentTopLevel) && leaguesSortMode) {
       return resolveTemporaryNavNewsLeaguesSortLabelFromMode(leaguesSortMode);
@@ -190750,7 +190758,7 @@ function SportsBrowserPrototypeTemporaryNavPrototype({
     contentSelectorsWired,
     contentTopLevel,
     effectiveContentNavScope,
-    extensionTemporalNewsLeaguesSortNav,
+    extensionTemporalExplorerLeaguesSortNav,
     gamesCompactTemporalView,
     gamesSelectorsWired,
     leaguesLensSection,
@@ -190770,7 +190778,7 @@ function SportsBrowserPrototypeTemporaryNavPrototype({
     return selector3Label;
   }, [
     effectiveSelector2Label,
-    extensionTemporalNewsLeaguesSortNav,
+    extensionTemporalExplorerLeaguesSortNav,
     gamesCompactTemporalView,
     gamesSelectorsWired,
     leaguesSelectorsWired,
@@ -190859,11 +190867,11 @@ function SportsBrowserPrototypeTemporaryNavPrototype({
     topLevel
   ]);
   const selector2Options = (0, import_react307.useMemo)(() => {
-    if (extensionTemporalNewsLeaguesSortNav) {
+    if (extensionTemporalExplorerLeaguesSortNav) {
       return LEAGUES_SORT_OPTIONS;
     }
     return resolveTemporaryNavSelector2Options(topLevel);
-  }, [extensionTemporalNewsLeaguesSortNav, topLevel]);
+  }, [extensionTemporalExplorerLeaguesSortNav, topLevel]);
   const showsSelector3 = (0, import_react307.useMemo)(() => {
     return resolveTemporaryNavShowsSelector3(topLevel, effectiveSelector2Label);
   }, [effectiveSelector2Label, topLevel]);
@@ -190900,7 +190908,7 @@ function SportsBrowserPrototypeTemporaryNavPrototype({
       if (isGrarfExtensionTemporalNavStandingsTopLevel(next) || isGrarfExtensionTemporalNavStatsTopLevel(next)) {
         setTopLevel(next);
         setSelector2Label(
-          leaguesSortMode != null ? resolveTemporaryNavNewsLeaguesSortLabelFromMode(leaguesSortMode) : resolveTemporaryNavDefaultSelector2("NEWS")
+          leaguesSortMode != null ? resolveTemporaryNavLeaguesSortLabelFromMode(leaguesSortMode) : LEAGUES_SORT_OPTIONS[0]
         );
         setSelector3Label(null);
         return;
@@ -190981,14 +190989,6 @@ function SportsBrowserPrototypeTemporaryNavPrototype({
   );
   const handleSelector2Select = (0, import_react307.useCallback)(
     (label) => {
-      if (isGrarfExtensionTemporalNavStandingsBrowseTopLevel(topLevel) && onLeaguesSortModeChange) {
-        const mode = resolveLeaguesSortModeFromTemporaryNavNewsLeaguesLabel(label);
-        if (mode) {
-          onLeaguesSortModeChange(mode);
-        }
-        setSelector2Label(label);
-        return;
-      }
       if (topLevel === "RECAPS" && onGamesCompactTemporalSelect) {
         setSelector2Label(label);
         setSelector3Label(null);
@@ -191030,11 +191030,13 @@ function SportsBrowserPrototypeTemporaryNavPrototype({
         setSelector3Label(null);
         return;
       }
-      if (extensionTemporalNewsLeaguesSortNav && onLeaguesSortModeChange) {
+      if (extensionTemporalExplorerLeaguesSortNav && onLeaguesSortModeChange) {
         const mode = resolveLeaguesSortModeFromTemporaryNavLabel(label);
         if (mode) {
           onLeaguesSortModeChange(mode);
-          onContentNavChange?.("news", "leagues");
+          if (topLevel === "NEWS") {
+            onContentNavChange?.("news", "leagues");
+          }
         }
         setSelector2Label(label);
         return;
@@ -191059,7 +191061,7 @@ function SportsBrowserPrototypeTemporaryNavPrototype({
     [
       contentNavSection,
       contentTopLevel,
-      extensionTemporalNewsLeaguesSortNav,
+      extensionTemporalExplorerLeaguesSortNav,
       leaguesSortMode,
       onContentNavChange,
       onGamesCompactTemporalSelect,
@@ -191288,7 +191290,7 @@ function SportsBrowserPrototypeTemporaryNavPrototype({
             openColumnId,
             onOpenColumnIdChange: setOpenColumnId,
             onSelect: handleSelector2Select,
-            selectorGroupLabel: extensionTemporalNewsLeaguesSortNav ? GRARF_EXTENSION_TEMPORAL_NEWS_LEAGUES_SORT_MENU_GROUP_LABEL : void 0
+            selectorGroupLabel: extensionTemporalExplorerLeaguesSortNav ? GRARF_EXTENSION_TEMPORAL_NEWS_LEAGUES_SORT_MENU_GROUP_LABEL : void 0
           }
         ) : extensionTemporalNavChrome ? /* @__PURE__ */ (0, import_jsx_runtime290.jsx)(
           "div",
@@ -199904,6 +199906,7 @@ function SidebarTemporalLeagueBlock({
   onCommandCenterFollowLiveToggle,
   extensionGamesYesterdayHighlightsNavigation = null,
   temporalSectionPrefix,
+  horseRacingSidebarTemporalView,
   onLeagueSelect
 }) {
   const teamScopeInput = (0, import_react334.useMemo)(
@@ -200124,7 +200127,7 @@ function SidebarTemporalLeagueBlock({
             leagueKey: slate.key,
             leagueGames: scopedGames,
             onClick: extensionGamesYesterdayHighlightsUnsupported ? void 0 : extensionGamesYesterdayDirectLeagueRowRecaps ? () => navigateGrarfExtensionGamesYesterdayDirectLeagueRowRecaps(slate.key) : extensionGamesYesterdayDirectLeagueRowHighlights ? () => navigateGrarfExtensionGamesYesterdayDirectLeagueRowHighlights(slate.key) : isSportsBrowserPrototypeTemporalHorseRacingLeagueKey(slate.key) ? () => onLeagueSelect?.(slate.key, {
-              temporalView: resolveSportsBrowserPrototypeSidebarTemporalViewFromSectionPrefix(
+              temporalView: horseRacingSidebarTemporalView ?? resolveSportsBrowserPrototypeSidebarTemporalViewFromSectionPrefix(
                 temporalSectionPrefix
               )
             }) : onToggle,
@@ -200218,7 +200221,8 @@ function SidebarGroupedTemporalLeagueEntries({
   onLeagueSelect,
   onTennisTournamentExpansionToggle,
   suppressSoccerArchSectionLabel = false,
-  leagueExpansionScopeId
+  leagueExpansionScopeId,
+  horseRacingSidebarTemporalView
 }) {
   const extensionGamesYesterdayHighlightsNavActive = (0, import_react334.useSyncExternalStore)(
     subscribeGrarfExtensionGamesYesterdayHighlightsNavSnapshot,
@@ -200346,6 +200350,7 @@ function SidebarGroupedTemporalLeagueEntries({
             onGameInlineNavigate,
             onCommandCenterFollowLiveToggle,
             temporalSectionPrefix: sectionPrefix,
+            horseRacingSidebarTemporalView,
             onLeagueSelect
           },
           `${sectionPrefix}-${slate.key}`
@@ -200378,6 +200383,7 @@ function SidebarGroupedTemporalLeagueEntries({
         onGameInlineNavigate,
         onCommandCenterFollowLiveToggle,
         temporalSectionPrefix: sectionPrefix,
+        horseRacingSidebarTemporalView,
         onLeagueSelect
       },
       `${sectionPrefix}-${entry4.slate.key}`
@@ -200406,7 +200412,8 @@ function SidebarTemporalSectionLeagues({
   onGameInlineNavigate,
   onCommandCenterFollowLiveToggle,
   onTennisTournamentExpansionToggle,
-  leagueExpansionScopeId
+  leagueExpansionScopeId,
+  horseRacingSidebarTemporalView
 }) {
   const groupedEntries = (0, import_react334.useMemo)(
     () => groupSportsBrowserPrototypeSidebarLeagueSlatesBySoccer(slates),
@@ -200526,7 +200533,8 @@ function SidebarTemporalSectionLeagues({
       onCommandCenterFollowLiveToggle,
       onLeagueSelect: onTemporalSectionLeagueSelect,
       onTennisTournamentExpansionToggle,
-      leagueExpansionScopeId
+      leagueExpansionScopeId,
+      horseRacingSidebarTemporalView
     }
   ) });
 }
@@ -202712,6 +202720,7 @@ function SportsBrowserPrototypeLeftNav({
                                       sectionId: "now",
                                       slates: filterExtensionTemporalLeagueSlates(nowLeagues),
                                       variant: "live",
+                                      horseRacingSidebarTemporalView: "today",
                                       leagueExpansionScopeId: GRARF_EXTENSION_GAMES_TODAY_BY_TIME_LIVE_SCOPE_ID,
                                       leagueOpen: temporalSectionLeagueOpen,
                                       onLeagueOpenChange: extensionSidebarExclusiveLeagueExpansion ? onExtensionExclusiveLeagueOpenChange : setSectionLeagueOpen,
@@ -202746,6 +202755,7 @@ function SportsBrowserPrototypeLeftNav({
                                         sectionId: "today",
                                         slates: slot.slates,
                                         resolveVariant: resolveSidebarGameVariant,
+                                        horseRacingSidebarTemporalView: "today",
                                         leagueExpansionScopeId: resolveGrarfExtensionGamesTodayByTimeSlotScopeId(
                                           slot.sortKey
                                         ),
@@ -205483,7 +205493,10 @@ function HomePage() {
   }, []);
   const onSportsBrowserLeagueSelect = (0, import_react338.useCallback)(
     (leagueKey, context2) => {
-      const temporalHorseRacingWebsites = isSportsBrowserPrototypeTemporalHorseRacingLeagueKey(leagueKey) && context2?.temporalView ? resolveSportsBrowserPrototypeTemporalHorseRacingWebsites(context2.temporalView) : null;
+      const horseRacingTemporalView = normalizeSportsBrowserPrototypeSidebarHorseRacingTemporalView(
+        context2?.temporalView
+      );
+      const temporalHorseRacingWebsites = isSportsBrowserPrototypeTemporalHorseRacingLeagueKey(leagueKey) && horseRacingTemporalView ? resolveSportsBrowserPrototypeTemporalHorseRacingWebsites(horseRacingTemporalView) : null;
       const websites = temporalHorseRacingWebsites ?? getSportsBrowserPrototypeLeagueWebsites(leagueKey);
       updateSportsBrowserTabForSidebarSelection((tab) => {
         const next = tab.paneStates.slice();
@@ -205517,7 +205530,7 @@ function HomePage() {
           gameContextSection: null,
           leagueContextSection: "news",
           showWebsiteTabs: true,
-          sportsBrowserPrototypeSidebarTemporalView: temporalHorseRacingWebsites ? context2?.temporalView ?? null : null
+          sportsBrowserPrototypeSidebarTemporalView: temporalHorseRacingWebsites ? horseRacingTemporalView ?? null : null
         };
         return collapseSportsBrowserLiveGameXSearchSplit(
           { ...tab, paneStates: next, activePaneIndex: paneIndex },
