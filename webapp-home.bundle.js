@@ -19434,6 +19434,7 @@ var CHANNEL_LOGO_BY_LABEL = {
   "NWSL PLUS": NWSL_PLUS_CHANNEL_LOGO_URL,
   "APPLE TV MLB": "/league-logos/channel-apple-tv.png",
   "APPLE TV": "/league-logos/channel-apple-tv.png",
+  "APPLE TV+": "/league-logos/channel-apple-tv.png",
   "TENNIS CHANNEL": "/league-logos/channel-tennis-channel.png",
   "TENNIS CHANNEL+": "/league-logos/channel-tennis-channel.png",
   "PRIME VIDEO": "/league-logos/channel-prime-video.png",
@@ -19488,6 +19489,9 @@ function resolveChannelLogoUrl(channelLabel) {
     return PARAMOUNT_CHANNEL_LOGO_URL;
   }
   if (/\bCBS\b/.test(key2)) return CBS_CHANNEL_LOGO_URL;
+  if (/\bAPPLE\s*TV\b/.test(key2)) {
+    return CHANNEL_LOGO_BY_LABEL["APPLE TV"] ?? null;
+  }
   return null;
 }
 
@@ -24578,6 +24582,7 @@ var CHANNEL_LOGO_BY_LABEL2 = {
   "NWSL PLUS": "/league-logos/channel-nwsl-plus.png",
   "APPLE TV MLB": "/league-logos/channel-apple-tv.png",
   "APPLE TV": "/league-logos/channel-apple-tv.png",
+  "APPLE TV+": "/league-logos/channel-apple-tv.png",
   "TENNIS CHANNEL": "/league-logos/channel-tennis-channel.png",
   "TENNIS CHANNEL+": "/league-logos/channel-tennis-channel.png",
   "PRIME VIDEO": "/league-logos/channel-prime-video.png",
@@ -24626,6 +24631,9 @@ function resolveChannelLogoUrl2(channelLabel) {
     return CHANNEL_LOGO_BY_LABEL2["NFL NETWORK"] ?? null;
   }
   if (/\bCBS\b/.test(key2)) return CBS_CHANNEL_LOGO_URL2;
+  if (/\bAPPLE\s*TV\b/.test(key2)) {
+    return CHANNEL_LOGO_BY_LABEL2["APPLE TV"] ?? null;
+  }
   return null;
 }
 
@@ -199773,7 +199781,7 @@ function HomePartTwoGameCard({ game }) {
     {
       "data-bottom-rail-game-card": "",
       className: "flex h-auto min-h-0 w-full max-w-none shrink-0 min-w-0 overflow-visible",
-      children: /* @__PURE__ */ (0, import_jsx_runtime303.jsxs)(
+      children: /* @__PURE__ */ (0, import_jsx_runtime303.jsx)(
         "article",
         {
           className: cn2(
@@ -199784,26 +199792,23 @@ function HomePartTwoGameCard({ game }) {
           "data-grarf-extension-home-part-two-game-card": "",
           "data-grarf-extension-command-center-scorecard-v2": "",
           "data-game-id": game.id,
-          children: [
-            /* @__PURE__ */ (0, import_jsx_runtime303.jsx)(
-              "div",
-              {
-                className: "min-w-0 w-full border-0 bg-transparent p-0 shadow-none hover:bg-transparent",
-                "data-grarf-extension-sidebar-temporal-scorecard-row": "",
-                "data-grarf-extension-home-part-two-today-featured-game-card": "",
-                children: /* @__PURE__ */ (0, import_jsx_runtime303.jsx)(
-                  GrarfExtensionSidebarTemporalCollapsedGameCard,
-                  {
-                    game,
-                    featuredEditorialHeadline: cardEditorialHeadline,
-                    featuredEditorialHeadlineKind: cardEditorialHeadlineKind,
-                    onFeaturedEditorialHeadlineClick: onCardEditorialHeadlineClick
-                  }
-                )
-              }
-            ),
-            /* @__PURE__ */ (0, import_jsx_runtime303.jsx)(GrarfExtensionCommandCenterScorecardInlineActionBar, { game })
-          ]
+          children: /* @__PURE__ */ (0, import_jsx_runtime303.jsx)(
+            "div",
+            {
+              className: "min-w-0 w-full border-0 bg-transparent p-0 shadow-none hover:bg-transparent",
+              "data-grarf-extension-sidebar-temporal-scorecard-row": "",
+              "data-grarf-extension-home-part-two-today-featured-game-card": "",
+              children: /* @__PURE__ */ (0, import_jsx_runtime303.jsx)(
+                GrarfExtensionSidebarTemporalCollapsedGameCard,
+                {
+                  game,
+                  featuredEditorialHeadline: cardEditorialHeadline,
+                  featuredEditorialHeadlineKind: cardEditorialHeadlineKind,
+                  onFeaturedEditorialHeadlineClick: onCardEditorialHeadlineClick
+                }
+              )
+            }
+          )
         }
       )
     }

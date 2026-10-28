@@ -21612,6 +21612,7 @@ var CHANNEL_LOGO_BY_LABEL = {
   "NWSL PLUS": "/league-logos/channel-nwsl-plus.png",
   "APPLE TV MLB": "/league-logos/channel-apple-tv.png",
   "APPLE TV": "/league-logos/channel-apple-tv.png",
+  "APPLE TV+": "/league-logos/channel-apple-tv.png",
   "TENNIS CHANNEL": "/league-logos/channel-tennis-channel.png",
   "TENNIS CHANNEL+": "/league-logos/channel-tennis-channel.png",
   "PRIME VIDEO": "/league-logos/channel-prime-video.png",
@@ -21660,6 +21661,9 @@ function resolveChannelLogoUrl2(channelLabel) {
     return CHANNEL_LOGO_BY_LABEL["NFL NETWORK"] ?? null;
   }
   if (/\bCBS\b/.test(key)) return CBS_CHANNEL_LOGO_URL;
+  if (/\bAPPLE\s*TV\b/.test(key)) {
+    return CHANNEL_LOGO_BY_LABEL["APPLE TV"] ?? null;
+  }
   return null;
 }
 
