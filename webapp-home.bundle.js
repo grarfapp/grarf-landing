@@ -16115,7 +16115,7 @@ async function fetchViaDataApi(channelId, apiKey, needle, allowNewestFallback, t
   url.searchParams.set("type", "video");
   url.searchParams.set("key", apiKey);
   const res = await fetch(url.toString(), {
-    headers: { "User-Agent": CHROME_UA3, Accept: "application/json" }
+    headers: { "User-Agent": CHROME_UA4, Accept: "application/json" }
   });
   const text2 = await res.text();
   if (!res.ok) {
@@ -16161,7 +16161,7 @@ async function fetchViaChannelRss(channelId, needle, allowNewestFallback, target
   const url = typeof resolveRssUrl === "function" ? resolveRssUrl(channelId) : `https://www.youtube.com/feeds/videos.xml?channel_id=${encodeURIComponent(channelId)}`;
   const res = await fetch(url, {
     headers: {
-      "User-Agent": CHROME_UA3,
+      "User-Agent": CHROME_UA4,
       Accept: "application/atom+xml, text/xml, */*",
       "Accept-Language": "en-US,en;q=0.9"
     }
@@ -16241,14 +16241,14 @@ async function resolveAllGamesHighlight(payload, options = {}) {
     return { ok: false, error: msg };
   }
 }
-var DEFAULT_MLB_CHANNEL_ID, CHROME_UA3, MLB_CATCHUP_DAILY_HIGHLIGHT_TITLE_PATTERNS2;
+var DEFAULT_MLB_CHANNEL_ID, CHROME_UA4, MLB_CATCHUP_DAILY_HIGHLIGHT_TITLE_PATTERNS2;
 var init_youtubeAllGamesHighlightFetch = __esm({
   "../grarf/shared/media/youtubeAllGamesHighlightFetch.js"() {
     init_define_import_meta_env();
     init_mlbAllGamesHighlightDate();
     init_mlbAllGamesHighlightSelection();
     DEFAULT_MLB_CHANNEL_ID = "UCoLrcjPV5PbUrUyXq5mjc_A";
-    CHROME_UA3 = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36";
+    CHROME_UA4 = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36";
     MLB_CATCHUP_DAILY_HIGHLIGHT_TITLE_PATTERNS2 = [
       "highlights from all games",
       "mlb daily recap",
@@ -19600,7 +19600,8 @@ var STREAM_URL_CHANNEL_MAPPINGS = [
   { domains: ["plus.espn.com"], label: "ESPN+" },
   { domains: ["espn.com"], label: "ESPN+", pathPattern: /\/watch\/player(?:\/|\?)/i },
   { domains: ["tv.apple.com"], label: "Apple TV" },
-  { domains: ["usanetwork.com"], label: "USA Network" }
+  { domains: ["usanetwork.com"], label: "USA Network" },
+  { domains: ["nba.com"], label: "NBA League Pass", pathPattern: /^\/game\//i }
 ];
 function normalizeStreamHostname(streamUrl) {
   try {
@@ -19676,6 +19677,7 @@ function isWatchStreamUrl(url) {
     if (host === "espn.com" && !ESPN_WATCH_PLAYER_PATH.test(trimmed)) return false;
     if (host === "amazon.com" || host.endsWith(".amazon.com")) return true;
     if (host === "wnba.com" || host.endsWith(".wnba.com")) return true;
+    if (host === "nba.com" || host.endsWith(".nba.com")) return true;
     if (host === "watch.fanatiz.com") return true;
     if (host === "watch.beinsports-apps.com") return true;
     if (host === "fubo.tv" || host.endsWith(".fubo.tv")) return true;
@@ -36943,6 +36945,320 @@ async function enrichOperationalSnapshotWnbaStreams(transport) {
   };
 }
 
+// ../grarf/desktop/src/lib/nba/enrichOperationalSnapshotNbaStreams.ts
+init_define_import_meta_env();
+
+// ../grarf/desktop/src/lib/nba/enrichNbaGamesWithLeaguePassStreams.ts
+init_define_import_meta_env();
+
+// ../grarf/shared/domain/nba/enrichGamesWithNbaLeaguePassStreams.ts
+init_define_import_meta_env();
+
+// ../grarf/shared/domain/nba/gameHasNbaLeaguePassBroadcast.ts
+init_define_import_meta_env();
+function collectBroadcastLabels6(game) {
+  return [...game.broadcasts ?? [], ...game.channels ?? []].map(
+    (label) => String(label ?? "").trim()
+  );
+}
+function gameHasNbaLeaguePassBroadcast(game) {
+  for (const label of collectBroadcastLabels6(game)) {
+    if (!label) continue;
+    if (isNbaLeaguePassBroadcastLabel(label)) return true;
+    const parts = label.split(/[/|,]/).map((part) => part.trim());
+    if (parts.some((part) => isNbaLeaguePassBroadcastLabel(part))) return true;
+  }
+  return false;
+}
+
+// ../grarf/shared/domain/nba/nbaLeaguePassWatchUrl.ts
+init_define_import_meta_env();
+var NBA_GAME_CENTER_URL_PREFIX = "https://www.nba.com/game/";
+function nbaTricodeToGameCenterSlug(tricode) {
+  const normalized = tricode.trim().toUpperCase();
+  if (!normalized) return "";
+  const slugOverrides = {
+    GSW: "gs"
+  };
+  return (slugOverrides[normalized] ?? normalized).toLowerCase();
+}
+function buildNbaGameCenterSlug(awayTricode, homeTricode, nbaGameId) {
+  const away = nbaTricodeToGameCenterSlug(awayTricode);
+  const home = nbaTricodeToGameCenterSlug(homeTricode);
+  const gameId = nbaGameId.trim();
+  if (!away || !home || !gameId) return "";
+  return `${away}-vs-${home}-${gameId}`;
+}
+function buildNbaLeaguePassWatchUrl(awayTricode, homeTricode, nbaGameId, options) {
+  const slug = buildNbaGameCenterSlug(awayTricode, homeTricode, nbaGameId);
+  if (!slug) return null;
+  const base = `${NBA_GAME_CENTER_URL_PREFIX}${slug}`;
+  if (options?.watchLive) return `${base}?watchLive`;
+  return base;
+}
+
+// ../grarf/shared/domain/nba/matchOperationalGameToNbaScoreboardRow.ts
+init_define_import_meta_env();
+
+// ../grarf/shared/domain/nba/espnAbbrevToNbaTricode.ts
+init_define_import_meta_env();
+var ESPN_ABBREV_TO_NBA_TRICODE = {
+  GS: "GSW",
+  NY: "NYK",
+  NO: "NOP",
+  SA: "SAS",
+  PHO: "PHX",
+  UTAH: "UTA",
+  WSH: "WAS"
+};
+function espnAbbrevToNbaTricode(espnAbbrev) {
+  const raw = String(espnAbbrev ?? "").trim().toUpperCase();
+  if (!raw) return void 0;
+  return ESPN_ABBREV_TO_NBA_TRICODE[raw] ?? raw;
+}
+
+// ../grarf/shared/domain/nba/matchOperationalGameToNbaScoreboardRow.ts
+var TIME_WINDOW_MS2 = 3 * 60 * 60 * 1e3;
+function teamsMatch2(game, row) {
+  const away = espnAbbrevToNbaTricode(game.awayTeamAbbrev);
+  const home = espnAbbrevToNbaTricode(game.homeTeamAbbrev);
+  if (away && home) {
+    return away === row.awayTricode && home === row.homeTricode;
+  }
+  return false;
+}
+function matchOperationalGameToNbaScoreboardRow(game, scoreboardRows) {
+  if (game.league !== "NBA") return null;
+  const gameStart = typeof game.startTimeMs === "number" ? game.startTimeMs : 0;
+  if (!gameStart) return null;
+  const candidates = scoreboardRows.filter((row) => {
+    if (!row.startMs) return teamsMatch2(game, row);
+    if (Math.abs(row.startMs - gameStart) > TIME_WINDOW_MS2) return false;
+    return teamsMatch2(game, row);
+  });
+  if (candidates.length === 0) return null;
+  if (candidates.length === 1) return candidates[0];
+  candidates.sort(
+    (a2, b2) => Math.abs(a2.startMs - gameStart) - Math.abs(b2.startMs - gameStart)
+  );
+  return candidates[0];
+}
+
+// ../grarf/shared/domain/nba/enrichGamesWithNbaLeaguePassStreams.ts
+var NBA_LEAGUE_PASS_STREAM_PROVIDER = "NBA League Pass";
+var LOCKED_STREAM_PROVIDERS3 = /* @__PURE__ */ new Set([
+  "Peacock",
+  "ESPN+",
+  "Paramount+",
+  "Apple TV",
+  "Prime Video"
+]);
+function isGameLive(status) {
+  const normalized = String(status ?? "").trim().toLowerCase();
+  return normalized === "live" || normalized === "in";
+}
+function mergeWatchLinks(game, link) {
+  const existing = Array.isArray(game.content?.watchLinks) ? game.content.watchLinks : [];
+  return {
+    ...game.content,
+    watchLinks: [...existing, link]
+  };
+}
+function enrichGameWithNbaLeaguePassStream(game, scoreboardRows) {
+  if (game.league !== "NBA") return game;
+  if (!gameHasNbaLeaguePassBroadcast(game)) return game;
+  if (game.streamUrl?.trim() && game.streamProvider && LOCKED_STREAM_PROVIDERS3.has(game.streamProvider)) {
+    return game;
+  }
+  const scoreboardRow = matchOperationalGameToNbaScoreboardRow(game, scoreboardRows);
+  if (!scoreboardRow) return game;
+  const streamUrl = buildNbaLeaguePassWatchUrl(
+    scoreboardRow.awayTricode,
+    scoreboardRow.homeTricode,
+    scoreboardRow.gameId,
+    { watchLive: isGameLive(game.status) }
+  );
+  if (!streamUrl) return game;
+  return {
+    ...game,
+    nbaGameId: scoreboardRow.gameId,
+    streamUrl,
+    streamProvider: NBA_LEAGUE_PASS_STREAM_PROVIDER,
+    launchMode: "external",
+    content: mergeWatchLinks(game, {
+      provider: NBA_LEAGUE_PASS_BROADCAST_LABEL,
+      url: streamUrl,
+      nbaGameId: scoreboardRow.gameId
+    })
+  };
+}
+function enrichGamesWithNbaLeaguePassStreams(games, scoreboardRows) {
+  if (!games.length || !scoreboardRows.length) return games;
+  if (!games.some((game) => game.league === "NBA" && gameHasNbaLeaguePassBroadcast(game))) {
+    return games;
+  }
+  return games.map((game) => enrichGameWithNbaLeaguePassStream(game, scoreboardRows));
+}
+
+// ../grarf/shared/domain/nba/fetchNbaCdnScoreboard.ts
+init_define_import_meta_env();
+
+// ../grarf/shared/domain/nba/parseNbaCdnScoreboard.ts
+init_define_import_meta_env();
+function parseStartMs(game) {
+  const candidates = [
+    game.gameDateTimeUTC,
+    game.gameDateTimeEt,
+    game.gameEt,
+    game.gameTimeUTC
+  ];
+  for (const raw of candidates) {
+    const ms2 = Date.parse(String(raw ?? ""));
+    if (Number.isFinite(ms2)) return ms2;
+  }
+  return 0;
+}
+function teamTricode(team) {
+  const row = team;
+  return String(row?.teamTricode ?? "").trim().toUpperCase();
+}
+function parseNbaCdnScoreboardGames(scoreboardJson) {
+  const games = scoreboardJson?.scoreboard?.games ?? scoreboardJson?.games;
+  if (!Array.isArray(games)) return [];
+  const rows = [];
+  for (const game of games) {
+    const row = game;
+    const gameId = String(row.gameId ?? "").trim();
+    if (!gameId) continue;
+    const awayTricode = teamTricode(row.awayTeam);
+    const homeTricode = teamTricode(row.homeTeam);
+    if (!awayTricode || !homeTricode) continue;
+    rows.push({
+      gameId,
+      awayTricode,
+      homeTricode,
+      startMs: parseStartMs(row)
+    });
+  }
+  return rows;
+}
+
+// ../grarf/shared/domain/nba/fetchNbaCdnScoreboard.ts
+var CHROME_UA3 = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
+var NBA_CDN_TODAYS_SCOREBOARD_URL = "https://cdn.nba.com/static/json/liveData/scoreboard/todaysScoreboard_00.json";
+var NBA_CDN_DATE_SCOREBOARD_URL = "https://cdn.nba.com/static/json/liveData/scoreboard/scoreboard_{YYYYMMDD}.json";
+var SCOREBOARD_CACHE_TTL_MS = 15 * 60 * 1e3;
+var cacheByKey = /* @__PURE__ */ new Map();
+var inFlightByKey = /* @__PURE__ */ new Map();
+function formatNbaCdnScoreboardDateKey(date) {
+  const y2 = date.getUTCFullYear();
+  const m2 = String(date.getUTCMonth() + 1).padStart(2, "0");
+  const d2 = String(date.getUTCDate()).padStart(2, "0");
+  return `${y2}${m2}${d2}`;
+}
+function scoreboardUrlForDateKey(yyyymmdd) {
+  if (yyyymmdd === "today") return NBA_CDN_TODAYS_SCOREBOARD_URL;
+  return NBA_CDN_DATE_SCOREBOARD_URL.replace("{YYYYMMDD}", yyyymmdd);
+}
+async function fetchNbaCdnScoreboardFromApi(cacheKey3, url, options) {
+  const fetchImpl = options?.fetchImpl ?? fetch;
+  const res = await fetchImpl(url, {
+    headers: {
+      "User-Agent": CHROME_UA3,
+      Accept: "application/json",
+      Referer: "https://www.nba.com/games",
+      Origin: "https://www.nba.com",
+      ...options?.headers
+    }
+  });
+  if (!res.ok) {
+    throw new Error(`NBA CDN scoreboard ${res.status} ${url}`);
+  }
+  const json = await res.json();
+  const rows = parseNbaCdnScoreboardGames(json);
+  cacheByKey.set(cacheKey3, { rows, fetchedAtMs: Date.now() });
+  return rows;
+}
+async function fetchNbaCdnScoreboardGamesForDateKey(dateKey, options) {
+  const key2 = dateKey.trim();
+  if (!key2) return [];
+  const cached = cacheByKey.get(key2);
+  if (cached && Date.now() - cached.fetchedAtMs < SCOREBOARD_CACHE_TTL_MS) {
+    return cached.rows;
+  }
+  const inFlight6 = inFlightByKey.get(key2);
+  if (inFlight6) return inFlight6;
+  const url = scoreboardUrlForDateKey(key2);
+  const promise = fetchNbaCdnScoreboardFromApi(key2, url, options).finally(() => {
+    inFlightByKey.delete(key2);
+  });
+  inFlightByKey.set(key2, promise);
+  return promise;
+}
+async function fetchNbaCdnScoreboardGamesForDates(dateKeys, options) {
+  const unique = [...new Set(dateKeys.map((k2) => k2.trim()).filter(Boolean))];
+  if (unique.length === 0) return [];
+  const batches = await Promise.all(
+    unique.map((key2) => fetchNbaCdnScoreboardGamesForDateKey(key2, options))
+  );
+  const seen = /* @__PURE__ */ new Set();
+  const merged = [];
+  for (const rows of batches) {
+    for (const row of rows) {
+      if (seen.has(row.gameId)) continue;
+      seen.add(row.gameId);
+      merged.push(row);
+    }
+  }
+  return merged;
+}
+
+// ../grarf/desktop/src/lib/nba/enrichNbaGamesWithLeaguePassStreams.ts
+function collectScoreboardDateKeys(games) {
+  const keys = /* @__PURE__ */ new Set(["today"]);
+  for (const game of games) {
+    if (game.league !== "NBA" || !gameHasNbaLeaguePassBroadcast(game)) continue;
+    const scheduled = game.scheduledDateKey?.trim();
+    if (scheduled) {
+      const compact = scheduled.replace(/-/g, "");
+      if (/^\d{8}$/.test(compact)) keys.add(compact);
+      continue;
+    }
+    if (typeof game.startTimeMs === "number" && game.startTimeMs > 0) {
+      keys.add(formatNbaCdnScoreboardDateKey(new Date(game.startTimeMs)));
+    }
+  }
+  return [...keys];
+}
+async function enrichNbaGamesWithLeaguePassStreams(games) {
+  if (!games.length) return games;
+  if (!games.some((game) => game.league === "NBA" && gameHasNbaLeaguePassBroadcast(game))) {
+    return games;
+  }
+  let scoreboardRows;
+  try {
+    scoreboardRows = await fetchNbaCdnScoreboardGamesForDates(collectScoreboardDateKeys(games));
+  } catch {
+    return games;
+  }
+  return enrichGamesWithNbaLeaguePassStreams(games, scoreboardRows);
+}
+
+// ../grarf/desktop/src/lib/nba/enrichOperationalSnapshotNbaStreams.ts
+async function enrichOperationalSnapshotNbaStreams(transport) {
+  const rows = transport.leagues.NBA;
+  if (!Array.isArray(rows) || rows.length === 0) return transport;
+  const enriched = await enrichNbaGamesWithLeaguePassStreams(rows);
+  if (!enriched.some((row, index2) => row !== rows[index2])) return transport;
+  return {
+    ...transport,
+    leagues: {
+      ...transport.leagues,
+      NBA: enriched
+    }
+  };
+}
+
 // ../grarf/desktop/src/lib/watch/enrichOperationalSnapshotEspnWatchStreams.ts
 init_define_import_meta_env();
 
@@ -42883,6 +43199,11 @@ async function enrichOperationalSnapshotWatchStreamsLocal(transport) {
     next = await enrichOperationalSnapshotWnbaStreams(next);
   } catch (e2) {
     console.warn(`${LOG22} WNBA Prime Video enrich failed`, e2);
+  }
+  try {
+    next = await enrichOperationalSnapshotNbaStreams(next);
+  } catch (e2) {
+    console.warn(`${LOG22} NBA League Pass enrich failed`, e2);
   }
   try {
     next = await enrichOperationalSnapshotNflStreams(next);
@@ -61096,7 +61417,7 @@ var LEAGUE_PRESENTATION_LABEL_BY_KEY = {
   pfl: "PFL",
   CONCACAF_CL: "CONCACAF Champions Cup",
   CONCACAF_NG: "CONCACAF Nations League",
-  CONCACAF_CAC: "CONCACAF Central American Cup"
+  CONCACAF_CAC: "Central American Cup"
 };
 function formatGrarfLeaguePresentationLabel(leagueKey, fallbackLabel) {
   const key2 = leagueKey.trim();
@@ -91861,11 +92182,11 @@ init_define_import_meta_env();
 
 // ../grarf/desktop/src/lib/fotmob/fotmobRequest.ts
 init_define_import_meta_env();
-var CHROME_UA4 = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36";
+var CHROME_UA5 = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36";
 var FOTMOB_API_BASE = "https://www.fotmob.com/api/data";
 function fotmobFetchHeaders() {
   return {
-    "User-Agent": CHROME_UA4,
+    "User-Agent": CHROME_UA5,
     Accept: "application/json",
     Referer: "https://www.fotmob.com/"
   };
@@ -92103,8 +92424,8 @@ function parseEplYoutubeHighlightTitle(title) {
   if (!/PREMIER LEAGUE HIGHLIGHTS/i.test(trimmed)) return null;
   const segments = trimmed.split("|").map((segment) => segment.trim());
   if (segments.length < 3) return null;
-  const teamsMatch2 = segments[0]?.match(/^(.+?)\s+v\.\s+(.+)$/i);
-  if (!teamsMatch2) return null;
+  const teamsMatch3 = segments[0]?.match(/^(.+?)\s+v\.\s+(.+)$/i);
+  if (!teamsMatch3) return null;
   const dateMatch = segments[2]?.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
   if (!dateMatch) return null;
   const gameDateYmd = toGameDateYmd(
@@ -92113,8 +92434,8 @@ function parseEplYoutubeHighlightTitle(title) {
     Number.parseInt(dateMatch[3] ?? "", 10)
   );
   if (!gameDateYmd) return null;
-  const teamA = teamsMatch2[1]?.trim() ?? "";
-  const teamB = teamsMatch2[2]?.trim() ?? "";
+  const teamA = teamsMatch3[1]?.trim() ?? "";
+  const teamB = teamsMatch3[2]?.trim() ?? "";
   if (!teamA || !teamB) return null;
   return { teamA, teamB, gameDateYmd };
 }
@@ -120974,7 +121295,8 @@ function buildMlssoccerMatchRecapUrl(game) {
   const awayAbbrev = resolveSlugAbbrev(game, "away");
   const dateParts = resolveMatchSlugDateParts(game);
   if (!homeAbbrev || !awayAbbrev || !dateParts) return null;
-  const slug = `${homeAbbrev}v${awayAbbrev}-${dateParts.month}-${dateParts.day}-${dateParts.seasonYear}`;
+  const teamSeparator = awayAbbrev.startsWith("c") ? "vs" : "v";
+  const slug = `${homeAbbrev}${teamSeparator}${awayAbbrev}-${dateParts.month}-${dateParts.day}-${dateParts.seasonYear}`;
   return `https://www.mlssoccer.com/competitions/mls-regular-season/${dateParts.seasonYear}/matches/${slug}/`;
 }
 
@@ -167768,6 +168090,7 @@ function isWatchStreamUrl2(url) {
     if (host === "espn.com" && !ESPN_WATCH_PLAYER_PATH2.test(trimmed)) return false;
     if (host === "amazon.com" || host.endsWith(".amazon.com")) return true;
     if (host === "wnba.com" || host.endsWith(".wnba.com")) return true;
+    if (host === "nba.com" || host.endsWith(".nba.com")) return true;
     if (host === "watch.beinsports-apps.com") return true;
     if (host === "watch.fanatiz.com") return true;
     if (host === "fubo.tv" || host.endsWith(".fubo.tv")) return true;
@@ -168717,7 +169040,7 @@ function parseMatchupFromTitle(title) {
 }
 
 // ../grarf/grarf-operational-service/src/watch/paramount/matchCbsListing.mjs
-var TIME_WINDOW_MS2 = 4 * 60 * 60 * 1e3;
+var TIME_WINDOW_MS3 = 4 * 60 * 60 * 1e3;
 var MIN_MATCH_SCORE = 1.4;
 function matchGameToCbsListing(game, listings) {
   if (!listings.length) return null;
@@ -168729,7 +169052,7 @@ function matchGameToCbsListing(game, listings) {
     let score2 = teamScore3;
     if (game.startTimeMs && listing.startMs) {
       const delta = Math.abs(game.startTimeMs - listing.startMs);
-      if (delta > TIME_WINDOW_MS2) continue;
+      if (delta > TIME_WINDOW_MS3) continue;
       score2 += 0.25;
     }
     if (score2 > bestScore) {
