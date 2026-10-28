@@ -19374,6 +19374,7 @@ function getOperationalIngestConfig() {
   const isWeb = isGrarfWebRenderer();
   const envProvider = define_import_meta_env_default.VITE_OPERATIONAL_INGEST_PROVIDER;
   const cloudBaseUrl = define_import_meta_env_default.VITE_GRARF_OPERATIONAL_INGEST_URL?.trim() || resolveWebOperationalIngestUrl() || (typeof window !== "undefined" && window.GRARF_EXTENSION ? "https://grarf-operational-service.grarf.workers.dev" : null);
+  const publishedFeedUrl = define_import_meta_env_default.VITE_GRARF_OPERATIONAL_PUBLISHED_FEED_URL?.trim() || null;
   let provider;
   if (envProvider === "grarf_cloud" || envProvider === "espn_local_ipc") {
     provider = envProvider;
@@ -19391,6 +19392,7 @@ function getOperationalIngestConfig() {
   return {
     provider,
     cloudBaseUrl,
+    publishedFeedUrl,
     pollIntervalMs,
     defaultSource: "espn_local_adapter"
   };
@@ -20134,6 +20136,34 @@ function pickPlayerLogoUrl(athlete) {
   const href = flag?.href;
   return typeof href === "string" && href.startsWith("http") ? href.trim() : void 0;
 }
+function pickDoublesRosterAthletes(competitor) {
+  if (!competitor) return [];
+  const roster = competitor.roster;
+  if (!roster || typeof roster !== "object") return [];
+  const athletes = roster.athletes;
+  if (!Array.isArray(athletes)) return [];
+  return athletes.filter((row) => row && typeof row === "object");
+}
+function pickDoublesTeamDisplayName(competitor) {
+  const athletes = pickDoublesRosterAthletes(competitor);
+  if (athletes.length < 2) return null;
+  const names = athletes.map((athlete) => pickPlayerName(athlete)).filter((name) => name && name !== "TBD");
+  if (names.length < 2) return null;
+  return `${names[0]} / ${names[1]}`;
+}
+function pickDoublesTeamFlagLogoUrls(competitor) {
+  const athletes = pickDoublesRosterAthletes(competitor);
+  if (athletes.length < 2) return [];
+  const urls = [];
+  for (const athlete of athletes) {
+    const url = pickPlayerLogoUrl(athlete);
+    if (url) urls.push(url);
+  }
+  return urls;
+}
+function pickCompetitorTeamDisplayName(competitor) {
+  return pickDoublesTeamDisplayName(competitor) ?? pickPlayerName(pickCompetitorAthlete(competitor));
+}
 function countSetsWon(competitor) {
   const lines = competitor.linescores;
   if (!Array.isArray(lines)) return null;
@@ -20298,10 +20328,12 @@ function normalizeTennisCompetition(competition, tournament, groupingLabel, grou
   const live = cardStatus === "live";
   const final = cardStatus === "final";
   const scheduled = cardStatus === "scheduled";
-  const awayTeam = pickPlayerName(awayAthlete);
-  const homeTeam = pickPlayerName(homeAthlete);
-  const awayLogoUrl = pickPlayerLogoUrl(awayAthlete);
-  const homeLogoUrl = pickPlayerLogoUrl(homeAthlete);
+  const awayTeam = pickCompetitorTeamDisplayName(away);
+  const homeTeam = pickCompetitorTeamDisplayName(home);
+  const awayDoublesFlagUrls = pickDoublesTeamFlagLogoUrls(away);
+  const homeDoublesFlagUrls = pickDoublesTeamFlagLogoUrls(home);
+  const awayLogoUrl = awayDoublesFlagUrls[0] ?? pickPlayerLogoUrl(awayAthlete);
+  const homeLogoUrl = homeDoublesFlagUrls[0] ?? pickPlayerLogoUrl(homeAthlete);
   const awayScore = countSetsWon(away);
   const homeScore = countSetsWon(home);
   const tournamentName = safe(tournament.shortName) || safe(tournament.name) || "";
@@ -20392,7 +20424,9 @@ function normalizeTennisCompetition(competition, tournament, groupingLabel, grou
         homeSeed: pickAthleteSeed(homeAthlete),
         awayWorldRank: pickCompetitorCuratedRank(away),
         homeWorldRank: pickCompetitorCuratedRank(home),
-        serverSide: resolveServerSide(away, home)
+        serverSide: resolveServerSide(away, home),
+        ...awayDoublesFlagUrls.length > 0 ? { awayFlagLogoUrls: awayDoublesFlagUrls } : {},
+        ...homeDoublesFlagUrls.length > 0 ? { homeFlagLogoUrls: homeDoublesFlagUrls } : {}
       }
     },
     period: cardStatus === "final" ? null : period,
@@ -24225,6 +24259,65 @@ async function fetchWebEspnOperationalSnapshot(leagueKeys = filterEspnOperationa
   return supplementOperationalSnapshotWithTennis(transport);
 }
 
+// ../grarf/desktop/src/services/operationalIngest/resolveOperationalCloudSnapshotFetch.ts
+init_define_import_meta_env();
+
+// ../grarf/shared/config/operationalPublishedFeed.ts
+init_define_import_meta_env();
+
+// ../grarf/desktop/src/services/operationalIngest/resolveOperationalCloudSnapshotFetch.ts
+function isLocalWebappOperationalSnapshotProxyOrigin() {
+  if (typeof window === "undefined") return false;
+  try {
+    const { hostname, protocol } = window.location;
+    if (protocol !== "http:" && protocol !== "https:") return false;
+    return hostname === "127.0.0.1" || hostname === "localhost";
+  } catch {
+    return false;
+  }
+}
+function resolveGrarfCloudOperationalSnapshotUrl(cloudBaseUrl) {
+  if (isLocalWebappOperationalSnapshotProxyOrigin()) {
+    return `${window.location.origin}/operational/snapshot`;
+  }
+  return `${cloudBaseUrl.replace(/\/$/, "")}/operational/snapshot`;
+}
+function appendOperationalSnapshotClientMs(url) {
+  return `${url}${url.includes("?") ? "&" : "?"}clientMs=${Date.now()}`;
+}
+function resolveOperationalCloudSnapshotFetchTarget() {
+  const { cloudBaseUrl, publishedFeedUrl } = getOperationalIngestConfig();
+  const published = publishedFeedUrl?.trim();
+  if (isGrarfExtensionRenderer() && published) {
+    return {
+      url: published,
+      // Stable URL for shared CDN/browser cache; freshness from R2 Cache-Control (max-age=10, SWR=30)
+      // plus 15s client poll (poll interval exceeds CDN max-age → revalidation, not stale reuse).
+      cache: "default",
+      transport: "published_feed"
+    };
+  }
+  if (!cloudBaseUrl) {
+    throw new Error("[OperationalIngest] grarf_cloud provider requires VITE_GRARF_OPERATIONAL_INGEST_URL");
+  }
+  const urlBase = resolveGrarfCloudOperationalSnapshotUrl(cloudBaseUrl);
+  return {
+    url: appendOperationalSnapshotClientMs(urlBase),
+    cache: "no-store",
+    transport: "worker_snapshot"
+  };
+}
+function resolveOperationalWorkerSnapshotFetchTarget() {
+  const { cloudBaseUrl } = getOperationalIngestConfig();
+  if (!cloudBaseUrl?.trim()) return null;
+  const urlBase = resolveGrarfCloudOperationalSnapshotUrl(cloudBaseUrl);
+  return {
+    url: appendOperationalSnapshotClientMs(urlBase),
+    cache: "no-store",
+    transport: "worker_snapshot"
+  };
+}
+
 // ../grarf/desktop/src/services/operationalIngest/fetchOperationalSnapshot.ts
 var LOG8 = "[OperationalIngest]";
 var CLOUD_FETCH_TIMEOUT_MS = 2e4;
@@ -24368,22 +24461,6 @@ function mergeEspnOperationalFieldsFromSupplement(cloud, espn) {
 function hasElectronGamesIpc() {
   return Boolean(typeof window !== "undefined" && window.grarf?.gamesGetSnapshot);
 }
-function isLocalWebappOperationalSnapshotProxyOrigin() {
-  if (typeof window === "undefined") return false;
-  try {
-    const { hostname, protocol } = window.location;
-    if (protocol !== "http:" && protocol !== "https:") return false;
-    return hostname === "127.0.0.1" || hostname === "localhost";
-  } catch {
-    return false;
-  }
-}
-function resolveGrarfCloudOperationalSnapshotUrl(cloudBaseUrl) {
-  if (isLocalWebappOperationalSnapshotProxyOrigin()) {
-    return `${window.location.origin}/operational/snapshot`;
-  }
-  return `${cloudBaseUrl.replace(/\/$/, "")}/operational/snapshot`;
-}
 function emptyOperationalSnapshot() {
   return {
     generatedAt: (/* @__PURE__ */ new Date()).toISOString(),
@@ -24416,13 +24493,7 @@ async function fetchViaEspnLocalIpcAdapter() {
   const snap = await api();
   return ipcSnapshotToOperationalResponse(snap);
 }
-async function fetchViaGrarfCloudService(options) {
-  const { cloudBaseUrl } = getOperationalIngestConfig();
-  if (!cloudBaseUrl) {
-    throw new Error("[OperationalIngest] grarf_cloud provider requires VITE_GRARF_OPERATIONAL_INGEST_URL");
-  }
-  const urlBase = resolveGrarfCloudOperationalSnapshotUrl(cloudBaseUrl);
-  const url = `${urlBase}${urlBase.includes("?") ? "&" : "?"}clientMs=${Date.now()}`;
+async function fetchOperationalSnapshotFromCloudTarget(target, options) {
   const maxAttempts = options?.webBootstrap ? 1 : CLOUD_FETCH_MAX_ATTEMPTS;
   let lastError;
   for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
@@ -24432,14 +24503,15 @@ async function fetchViaGrarfCloudService(options) {
         logGrarfLiveGameTrace("CLOUD_FETCH", {
           subphase: "request",
           requestAt,
-          url,
+          url: target.url,
           attempt,
-          transportKind: options?.traceFetchKind ?? "network"
+          transportKind: options?.traceFetchKind ?? "network",
+          cloudTransport: target.transport
         });
       }
-      const res = await fetch(url, {
+      const res = await fetch(target.url, {
         headers: { Accept: "application/json" },
-        cache: "no-store",
+        cache: target.cache,
         signal: AbortSignal.timeout(
           options?.webBootstrap ? WEB_CLOUD_BOOTSTRAP_TIMEOUT_MS : CLOUD_FETCH_TIMEOUT_MS
         )
@@ -24469,8 +24541,9 @@ async function fetchViaGrarfCloudService(options) {
           responseAt: (/* @__PURE__ */ new Date()).toISOString(),
           requestAt,
           httpStatus: res.status,
-          url,
+          url: target.url,
           transportKind: options?.traceFetchKind ?? "network",
+          cloudTransport: target.transport,
           cachedResponse: false
         });
       }
@@ -24485,6 +24558,24 @@ async function fetchViaGrarfCloudService(options) {
     }
   }
   throw new Error(lastError ?? "[OperationalIngest] grarf_cloud fetch failed");
+}
+async function fetchViaGrarfCloudService(options) {
+  const primaryTarget = resolveOperationalCloudSnapshotFetchTarget();
+  try {
+    return await fetchOperationalSnapshotFromCloudTarget(primaryTarget, options);
+  } catch (primaryError) {
+    if (primaryTarget.transport !== "published_feed") {
+      throw primaryError;
+    }
+    const fallbackTarget = resolveOperationalWorkerSnapshotFetchTarget();
+    if (!fallbackTarget) {
+      throw primaryError;
+    }
+    if (define_import_meta_env_default.DEV) {
+      console.warn(`${LOG8} published feed unavailable \u2014 falling back to Worker snapshot`, primaryError);
+    }
+    return fetchOperationalSnapshotFromCloudTarget(fallbackTarget, options);
+  }
 }
 async function fetchViaWebOperationalIngest() {
   let cloud = null;
@@ -29957,6 +30048,7 @@ function resolveOperationalEnrichmentDateKeyTtlMs(dateKey, now = /* @__PURE__ */
 
 // ../grarf/grarf-operational-service/src/cache/withOperationalEnrichmentProviderCache.ts
 init_define_import_meta_env();
+var inFlightByCacheKey = /* @__PURE__ */ new Map();
 async function withOperationalEnrichmentProviderCache(input) {
   const cacheKey2 = buildOperationalEnrichmentProviderCacheKey(
     input.provider,
@@ -29968,9 +30060,19 @@ async function withOperationalEnrichmentProviderCache(input) {
     input.ttlMs
   );
   if (cached != null) return cached;
-  const value = await input.fetch();
-  await writeOperationalEnrichmentProviderCache(cacheKey2, value, input.ttlMs);
-  return value;
+  const inFlight5 = inFlightByCacheKey.get(cacheKey2);
+  if (inFlight5) return inFlight5;
+  const promise = (async () => {
+    try {
+      const value = await input.fetch();
+      await writeOperationalEnrichmentProviderCache(cacheKey2, value, input.ttlMs);
+      return value;
+    } finally {
+      inFlightByCacheKey.delete(cacheKey2);
+    }
+  })();
+  inFlightByCacheKey.set(cacheKey2, promise);
+  return promise;
 }
 
 // ../grarf/grarf-operational-service/src/instrumentation/operationalSubrequestTrace.ts
@@ -34876,6 +34978,9 @@ async function enrichOperationalSnapshotWatchStreamsLocal(transport) {
   return next;
 }
 async function enrichOperationalTransport(rawTransport) {
+  if (rawTransport.source === "grarf_operational_service" && isGrarfExtensionRenderer()) {
+    return rawTransport;
+  }
   let transport = rawTransport;
   try {
     transport = await enrichOperationalSnapshotCbsMlbPreviewUrls(transport);
