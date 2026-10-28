@@ -121295,8 +121295,7 @@ function buildMlssoccerMatchRecapUrl(game) {
   const awayAbbrev = resolveSlugAbbrev(game, "away");
   const dateParts = resolveMatchSlugDateParts(game);
   if (!homeAbbrev || !awayAbbrev || !dateParts) return null;
-  const teamSeparator = awayAbbrev.startsWith("c") ? "vs" : "v";
-  const slug = `${homeAbbrev}${teamSeparator}${awayAbbrev}-${dateParts.month}-${dateParts.day}-${dateParts.seasonYear}`;
+  const slug = `${homeAbbrev}vs${awayAbbrev}-${dateParts.month}-${dateParts.day}-${dateParts.seasonYear}`;
   return `https://www.mlssoccer.com/competitions/mls-regular-season/${dateParts.seasonYear}/matches/${slug}/`;
 }
 
@@ -199395,6 +199394,51 @@ var homeCommandCenterDailyPriorities_default = {
           awayTeamLabel: "Trail Blazers",
           homeTeamLabel: "Lakers",
           line: "NBA - Trail Blazers vs Lakers"
+        }
+      ]
+    },
+    "2026-10-28": {
+      updatedAt: "2026-10-28T11:28:05.354Z",
+      entries: [
+        {
+          kind: "matchup",
+          leagueLabel: "MLB",
+          leagueKey: "MLB",
+          awayTeamLabel: "Brewers",
+          homeTeamLabel: "Rays",
+          line: "MLB - Brewers vs Rays"
+        },
+        {
+          kind: "matchup",
+          leagueLabel: "NBA",
+          leagueKey: "NBA",
+          awayTeamLabel: "Thunder",
+          homeTeamLabel: "Mavericks",
+          line: "NBA - Thunder vs Mavericks"
+        },
+        {
+          kind: "matchup",
+          leagueLabel: "NBA",
+          leagueKey: "NBA",
+          awayTeamLabel: "76ers",
+          homeTeamLabel: "Pacers",
+          line: "NBA - 76ers vs Pacers"
+        },
+        {
+          kind: "matchup",
+          leagueLabel: "MLS",
+          leagueKey: "MLS",
+          awayTeamLabel: "Miami",
+          homeTeamLabel: "Cincinnati",
+          line: "MLS - Miami vs Cincinnati"
+        },
+        {
+          kind: "matchup",
+          leagueLabel: "Carabao Cup",
+          leagueKey: "CARABAO_CUP",
+          awayTeamLabel: "Liverpool",
+          homeTeamLabel: "Chelsea",
+          line: "Carabao Cup - Liverpool vs Chelsea"
         }
       ]
     }
