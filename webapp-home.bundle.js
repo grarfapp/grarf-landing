@@ -175431,6 +175431,7 @@ function GrarfExtensionCommandCenterScorecardMetaColumn({
     }
   ) }) : null;
   const tennisChannelPill = tennisMetaTopChannelRow && showChannelLogo && channel.logoUrl ? renderChannelLogo("grarf-extension-command-center-meta-channel-pill") : null;
+  const hideLiveTennisMetaTimingStack = isTennisGame(game) && state3 === "live";
   if (layoutVariant === "feedStrip") {
     const primaryTiming = state3 === "final" ? timingParts.clock : timingParts.clock || timingParts.line;
     const secondaryTiming = state3 === "live" ? timingParts.period?.trim() || null : dayLabel;
@@ -175484,6 +175485,7 @@ function GrarfExtensionCommandCenterScorecardMetaColumn({
       "data-grarf-extension-command-center-meta": "",
       "data-grarf-extension-command-center-meta-state": state3,
       ...tennisMetaTopChannelRow ? { "data-grarf-extension-command-center-tennis-meta": "" } : {},
+      ...hideLiveTennisMetaTimingStack ? { "data-grarf-extension-command-center-tennis-meta-live": "" } : {},
       children: [
         showStatusPill ? tennisChannelPill ? /* @__PURE__ */ (0, import_jsx_runtime249.jsxs)(
           "div",
@@ -175496,7 +175498,7 @@ function GrarfExtensionCommandCenterScorecardMetaColumn({
             ]
           }
         ) : /* @__PURE__ */ (0, import_jsx_runtime249.jsx)(GrarfExtensionCommandCenterStatusPill, { state: state3 }) : null,
-        state3 === "live" || state3 === "upcoming" ? /* @__PURE__ */ (0, import_jsx_runtime249.jsxs)(
+        !hideLiveTennisMetaTimingStack && (state3 === "live" || state3 === "upcoming") ? /* @__PURE__ */ (0, import_jsx_runtime249.jsxs)(
           "div",
           {
             className: "grarf-extension-command-center-meta-timing-channel-stack",
@@ -175507,7 +175509,7 @@ function GrarfExtensionCommandCenterScorecardMetaColumn({
               channelLogo
             ]
           }
-        ) : /* @__PURE__ */ (0, import_jsx_runtime249.jsxs)(import_jsx_runtime249.Fragment, { children: [
+        ) : hideLiveTennisMetaTimingStack ? null : /* @__PURE__ */ (0, import_jsx_runtime249.jsxs)(import_jsx_runtime249.Fragment, { children: [
           timingLine,
           dayLabel ? /* @__PURE__ */ (0, import_jsx_runtime249.jsx)("span", { className: "grarf-extension-command-center-meta-day", children: dayLabel }) : null,
           channelLogo
@@ -175812,6 +175814,7 @@ function GrarfExtensionCommandCenterScorecardShell({
   teamExploreBelowMatchup
 }) {
   const state3 = resolveGrarfExtensionCommandCenterScorecardState(game);
+  const tennisLiveScorecardLayout = isTennisGame(game) && state3 === "live" && layoutVariant === "default";
   const contextMenuUrl = useGrarfExtensionHostContextMenuUrlForGame(game);
   const feedStripLayout = layoutVariant === "feedStrip";
   return /* @__PURE__ */ (0, import_jsx_runtime249.jsxs)(
@@ -175830,6 +175833,7 @@ function GrarfExtensionCommandCenterScorecardShell({
       "data-grarf-extension-command-center-scorecard-minimal-vertical": "",
       ...feedStripLayout ? { "data-grarf-extension-command-center-scorecard-feed-strip": "" } : {},
       "data-grarf-extension-command-center-card-state": state3,
+      ...tennisLiveScorecardLayout ? { "data-grarf-extension-command-center-tennis-live-card": "" } : {},
       ...tableScorecardAttrs ? { "data-grarf-extension-command-center-table-scorecard": "" } : {},
       "aria-expanded": onExploreToggle ? exploreExpanded : void 0,
       onClick: onExploreToggle ? (event) => {
