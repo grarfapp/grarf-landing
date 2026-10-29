@@ -192,16 +192,16 @@ function calendarPartsInTimeZone(ms2, timeZone) {
 function resolveOperationalSlateTimeZone() {
   return GRARF_OPERATIONAL_SLATE_TIMEZONE;
 }
-function readOperationalCalendarDateKeyCache(now2, timeZone) {
-  const bucketMs = Math.floor(now2.getTime() / 6e4);
+function readOperationalCalendarDateKeyCache(now, timeZone) {
+  const bucketMs = Math.floor(now.getTime() / 6e4);
   if (operationalCalendarDateKeyCache.timeZone === timeZone && operationalCalendarDateKeyCache.bucketMs === bucketMs) {
     return operationalCalendarDateKeyCache.key;
   }
   return null;
 }
-function writeOperationalCalendarDateKeyCache(now2, timeZone, key2) {
+function writeOperationalCalendarDateKeyCache(now, timeZone, key2) {
   operationalCalendarDateKeyCache.timeZone = timeZone;
-  operationalCalendarDateKeyCache.bucketMs = Math.floor(now2.getTime() / 6e4);
+  operationalCalendarDateKeyCache.bucketMs = Math.floor(now.getTime() / 6e4);
   operationalCalendarDateKeyCache.key = key2;
 }
 function formatOperationalDateKeyFromMs(ms2, timeZone = GRARF_OPERATIONAL_SLATE_TIMEZONE) {
@@ -210,60 +210,60 @@ function formatOperationalDateKeyFromMs(ms2, timeZone = GRARF_OPERATIONAL_SLATE_
   if (!year || !month || !day) return void 0;
   return `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
 }
-function writeOperationalSportsDayKeyCache(now2, timeZone, key2) {
+function writeOperationalSportsDayKeyCache(now, timeZone, key2) {
   operationalSportsDayKeyCache.timeZone = timeZone;
-  operationalSportsDayKeyCache.bucketMs = Math.floor(now2.getTime() / 6e4);
+  operationalSportsDayKeyCache.bucketMs = Math.floor(now.getTime() / 6e4);
   operationalSportsDayKeyCache.key = key2;
 }
-function readOperationalSportsDayKeyCache(now2, timeZone) {
-  const bucketMs = Math.floor(now2.getTime() / 6e4);
+function readOperationalSportsDayKeyCache(now, timeZone) {
+  const bucketMs = Math.floor(now.getTime() / 6e4);
   if (operationalSportsDayKeyCache.timeZone === timeZone && operationalSportsDayKeyCache.bucketMs === bucketMs) {
     return operationalSportsDayKeyCache.key;
   }
   return null;
 }
-function getOperationalCalendarDateKey(now2 = /* @__PURE__ */ new Date(), timeZone = resolveOperationalSlateTimeZone()) {
-  const cached = readOperationalCalendarDateKeyCache(now2, timeZone);
+function getOperationalCalendarDateKey(now = /* @__PURE__ */ new Date(), timeZone = resolveOperationalSlateTimeZone()) {
+  const cached = readOperationalCalendarDateKeyCache(now, timeZone);
   if (cached) return cached;
-  const key2 = formatOperationalDateKeyFromMs(now2.getTime(), timeZone) ?? "1970-01-01";
-  writeOperationalCalendarDateKeyCache(now2, timeZone, key2);
+  const key2 = formatOperationalDateKeyFromMs(now.getTime(), timeZone) ?? "1970-01-01";
+  writeOperationalCalendarDateKeyCache(now, timeZone, key2);
   return key2;
 }
-function getOperationalSportsDayDateKey(now2 = /* @__PURE__ */ new Date(), timeZone = resolveOperationalSlateTimeZone()) {
-  const cached = readOperationalSportsDayKeyCache(now2, timeZone);
+function getOperationalSportsDayDateKey(now = /* @__PURE__ */ new Date(), timeZone = resolveOperationalSlateTimeZone()) {
+  const cached = readOperationalSportsDayKeyCache(now, timeZone);
   if (cached) return cached;
-  let key2 = getOperationalCalendarDateKey(now2, timeZone);
-  const { hour } = calendarPartsInTimeZone(now2.getTime(), timeZone);
+  let key2 = getOperationalCalendarDateKey(now, timeZone);
+  const { hour } = calendarPartsInTimeZone(now.getTime(), timeZone);
   if (hour < OPERATIONAL_SPORTS_DAY_ROLLOVER_HOUR) {
     key2 = offsetOperationalDateKey(key2, -1, timeZone);
   }
-  writeOperationalSportsDayKeyCache(now2, timeZone, key2);
+  writeOperationalSportsDayKeyCache(now, timeZone, key2);
   return key2;
 }
-function getOperationalSportsDayYesterdayDateKey(now2 = /* @__PURE__ */ new Date(), timeZone = resolveOperationalSlateTimeZone()) {
-  return offsetOperationalDateKey(getOperationalSportsDayDateKey(now2, timeZone), -1, timeZone);
+function getOperationalSportsDayYesterdayDateKey(now = /* @__PURE__ */ new Date(), timeZone = resolveOperationalSlateTimeZone()) {
+  return offsetOperationalDateKey(getOperationalSportsDayDateKey(now, timeZone), -1, timeZone);
 }
-function getOperationalSportsDayTomorrowDateKey(now2 = /* @__PURE__ */ new Date(), timeZone = resolveOperationalSlateTimeZone()) {
-  return offsetOperationalDateKey(getOperationalSportsDayDateKey(now2, timeZone), 1, timeZone);
+function getOperationalSportsDayTomorrowDateKey(now = /* @__PURE__ */ new Date(), timeZone = resolveOperationalSlateTimeZone()) {
+  return offsetOperationalDateKey(getOperationalSportsDayDateKey(now, timeZone), 1, timeZone);
 }
-function formatEspnScoreboardDatesParamForOperationalSportsDay(now2 = /* @__PURE__ */ new Date(), timeZone = resolveOperationalSlateTimeZone()) {
-  const key2 = getOperationalSportsDayDateKey(now2, timeZone);
+function formatEspnScoreboardDatesParamForOperationalSportsDay(now = /* @__PURE__ */ new Date(), timeZone = resolveOperationalSlateTimeZone()) {
+  const key2 = getOperationalSportsDayDateKey(now, timeZone);
   return key2.replace(/-/g, "");
 }
-function formatEspnScoreboardDatesParamForOperationalSportsDayUpcoming(now2 = /* @__PURE__ */ new Date(), timeZone = resolveOperationalSlateTimeZone()) {
-  const key2 = getOperationalSportsDayTomorrowDateKey(now2, timeZone);
+function formatEspnScoreboardDatesParamForOperationalSportsDayUpcoming(now = /* @__PURE__ */ new Date(), timeZone = resolveOperationalSlateTimeZone()) {
+  const key2 = getOperationalSportsDayTomorrowDateKey(now, timeZone);
   return key2.replace(/-/g, "");
 }
-function getOperationalYesterdayDateKey(now2 = /* @__PURE__ */ new Date(), timeZone = GRARF_OPERATIONAL_SLATE_TIMEZONE) {
-  return offsetOperationalDateKey(getOperationalCalendarDateKey(now2, timeZone), -1, timeZone);
+function getOperationalYesterdayDateKey(now = /* @__PURE__ */ new Date(), timeZone = GRARF_OPERATIONAL_SLATE_TIMEZONE) {
+  return offsetOperationalDateKey(getOperationalCalendarDateKey(now, timeZone), -1, timeZone);
 }
 function offsetOperationalDateKey(dateKey, dayOffset, timeZone = GRARF_OPERATIONAL_SLATE_TIMEZONE) {
   const [y2, m2, d2] = dateKey.split("-").map(Number);
   const anchor = Date.UTC(y2, (m2 ?? 1) - 1, (d2 ?? 1) + dayOffset, 12, 0, 0);
   return formatOperationalDateKeyFromMs(anchor, timeZone) ?? dateKey;
 }
-function formatEspnScoreboardDatesParam(now2 = /* @__PURE__ */ new Date(), timeZone = GRARF_OPERATIONAL_SLATE_TIMEZONE) {
-  return getOperationalCalendarDateKey(now2, timeZone).replace(/-/g, "");
+function formatEspnScoreboardDatesParam(now = /* @__PURE__ */ new Date(), timeZone = GRARF_OPERATIONAL_SLATE_TIMEZONE) {
+  return getOperationalCalendarDateKey(now, timeZone).replace(/-/g, "");
 }
 function resolveScheduledDateKey(isoStart, slateDateKey, timeZone = GRARF_OPERATIONAL_SLATE_TIMEZONE) {
   const fromStart = formatOperationalDateKeyFromMs(Date.parse(isoStart || ""), timeZone);
@@ -291,7 +291,7 @@ function getNextDayCutoffMs(operationalDateKey, cutoffHour, timeZone) {
   nextDayCutoffMsCache.set(cacheKey3, fallback);
   return fallback;
 }
-function isScheduledOnOperationalEveningSlate(game, operationalDateKey, now2 = /* @__PURE__ */ new Date(), timeZone = GRARF_OPERATIONAL_SLATE_TIMEZONE) {
+function isScheduledOnOperationalEveningSlate(game, operationalDateKey, now = /* @__PURE__ */ new Date(), timeZone = GRARF_OPERATIONAL_SLATE_TIMEZONE) {
   const startKey = formatOperationalDateKeyFromMs(game.startTimeMs, timeZone);
   if (startKey === operationalDateKey) return true;
   const tomorrowKey = offsetOperationalDateKey(operationalDateKey, 1, timeZone);
@@ -324,7 +324,7 @@ function resolveGameOperationalSlateDateKey(game, timeZone = GRARF_OPERATIONAL_S
   }
   return formatOperationalDateKeyFromMs(game?.startTimeMs, timeZone) || scheduledKey || void 0;
 }
-function filterGamesForOperationalDateKey(games, operationalDateKey, now2 = /* @__PURE__ */ new Date(), timeZone = GRARF_OPERATIONAL_SLATE_TIMEZONE) {
+function filterGamesForOperationalDateKey(games, operationalDateKey, now = /* @__PURE__ */ new Date(), timeZone = GRARF_OPERATIONAL_SLATE_TIMEZONE) {
   return games.filter((g2) => {
     if (g2?.status === "live") return true;
     if (g2?.status === "scheduled") {
@@ -332,9 +332,9 @@ function filterGamesForOperationalDateKey(games, operationalDateKey, now2 = /* @
         const key3 = typeof g2?.scheduledDateKey === "string" ? g2.scheduledDateKey.trim() : "";
         return key3 ? key3 === operationalDateKey : false;
       }
-      return isScheduledOnOperationalEveningSlate(g2, operationalDateKey, now2, timeZone);
+      return isScheduledOnOperationalEveningSlate(g2, operationalDateKey, now, timeZone);
     }
-    if (isScheduledOnOperationalEveningSlate(g2, operationalDateKey, now2, timeZone)) {
+    if (isScheduledOnOperationalEveningSlate(g2, operationalDateKey, now, timeZone)) {
       return true;
     }
     const key2 = resolveGameOperationalSlateDateKey(g2, timeZone);
@@ -347,22 +347,22 @@ function filterGamesForOperationalDateKey(games, operationalDateKey, now2 = /* @
     return false;
   });
 }
-function shouldKeepGameOnOperationalFallbackIngest(game, now2 = /* @__PURE__ */ new Date(), timeZone = GRARF_OPERATIONAL_SLATE_TIMEZONE) {
+function shouldKeepGameOnOperationalFallbackIngest(game, now = /* @__PURE__ */ new Date(), timeZone = GRARF_OPERATIONAL_SLATE_TIMEZONE) {
   if (game?.status === "live") return true;
-  const activeSlateDayKey = getOperationalSportsDayDateKey(now2, timeZone);
-  if (filterGamesForOperationalDateKey([game], activeSlateDayKey, now2, timeZone).length > 0) {
+  const activeSlateDayKey = getOperationalSportsDayDateKey(now, timeZone);
+  if (filterGamesForOperationalDateKey([game], activeSlateDayKey, now, timeZone).length > 0) {
     return true;
   }
   if (game?.status === "final") {
-    const precedingDayKey = getOperationalSportsDayYesterdayDateKey(now2, timeZone);
-    if (filterGamesForOperationalDateKey([game], precedingDayKey, now2, timeZone).length > 0) {
+    const precedingDayKey = getOperationalSportsDayYesterdayDateKey(now, timeZone);
+    if (filterGamesForOperationalDateKey([game], precedingDayKey, now, timeZone).length > 0) {
       return true;
     }
   }
   return false;
 }
-function filterGamesForOperationalFallbackIngest(games, now2 = /* @__PURE__ */ new Date(), timeZone = GRARF_OPERATIONAL_SLATE_TIMEZONE) {
-  return games.filter((g2) => shouldKeepGameOnOperationalFallbackIngest(g2, now2, timeZone));
+function filterGamesForOperationalFallbackIngest(games, now = /* @__PURE__ */ new Date(), timeZone = GRARF_OPERATIONAL_SLATE_TIMEZONE) {
+  return games.filter((g2) => shouldKeepGameOnOperationalFallbackIngest(g2, now, timeZone));
 }
 var GRARF_OPERATIONAL_SLATE_TIMEZONE, OPERATIONAL_SLATE_NEXT_DAY_CUTOFF_HOUR, OPERATIONAL_SPORTS_DAY_ROLLOVER_HOUR, calendarFormatterCache, operationalCalendarDateKeyCache, operationalSportsDayKeyCache, nextDayCutoffMsCache;
 var init_operationalSlateDate = __esm({
@@ -937,9 +937,9 @@ __export(xGametimeSportsCatalog_exports, {
   fetchNflXGametimeSportsCatalog: () => fetchNflXGametimeSportsCatalog,
   parseNflXGametimeScheduleGraphql: () => parseNflXGametimeScheduleGraphql
 });
-function resolveNflScheduleSeasonYear(now2 = /* @__PURE__ */ new Date()) {
-  const month = now2.getUTCMonth();
-  const year = now2.getUTCFullYear();
+function resolveNflScheduleSeasonYear(now = /* @__PURE__ */ new Date()) {
+  const month = now.getUTCMonth();
+  const year = now.getUTCFullYear();
   return month < 6 ? year - 1 : year;
 }
 async function bootstrapXGuestSession() {
@@ -1011,8 +1011,8 @@ async function fetchNflXGametimeScheduleGraphql(seasonYear) {
   return parseNflXGametimeScheduleGraphql(json);
 }
 async function fetchNflXGametimeSportsCatalog() {
-  const now2 = Date.now();
-  if (cachedEvents && now2 - cachedAtMs2 < NFL_SCHEDULE_CACHE_TTL_MS) {
+  const now = Date.now();
+  if (cachedEvents && now - cachedAtMs2 < NFL_SCHEDULE_CACHE_TTL_MS) {
     return cachedEvents;
   }
   if (inFlight) return inFlight;
@@ -2055,7 +2055,7 @@ var require_react_dom_client_production = __commonJS({
     var cancelCallback$1 = Scheduler.unstable_cancelCallback;
     var shouldYield = Scheduler.unstable_shouldYield;
     var requestPaint = Scheduler.unstable_requestPaint;
-    var now2 = Scheduler.unstable_now;
+    var now = Scheduler.unstable_now;
     var getCurrentPriorityLevel = Scheduler.unstable_getCurrentPriorityLevel;
     var ImmediatePriority = Scheduler.unstable_ImmediatePriority;
     var UserBlockingPriority = Scheduler.unstable_UserBlockingPriority;
@@ -4041,7 +4041,7 @@ var require_react_dom_client_production = __commonJS({
     }
     var prevOnStartTransitionFinish = ReactSharedInternals.S;
     ReactSharedInternals.S = function(transition, returnValue) {
-      globalMostRecentTransitionTime = now2();
+      globalMostRecentTransitionTime = now();
       "object" === typeof returnValue && null !== returnValue && "function" === typeof returnValue.then && entangleAsyncAction(transition, returnValue);
       null !== prevOnStartTransitionFinish && prevOnStartTransitionFinish(transition, returnValue);
     };
@@ -7715,7 +7715,7 @@ var require_react_dom_client_production = __commonJS({
                   }
                   current = current.sibling;
                 }
-              null !== newProps.tail && now2() > workInProgressRootRenderTargetTime && (workInProgress2.flags |= 128, type = true, cutOffTailIfNeeded(newProps, false), workInProgress2.lanes = 4194304);
+              null !== newProps.tail && now() > workInProgressRootRenderTargetTime && (workInProgress2.flags |= 128, type = true, cutOffTailIfNeeded(newProps, false), workInProgress2.lanes = 4194304);
             }
           else {
             if (!type)
@@ -7723,11 +7723,11 @@ var require_react_dom_client_production = __commonJS({
                 if (workInProgress2.flags |= 128, type = true, current = current.updateQueue, workInProgress2.updateQueue = current, scheduleRetryEffect(workInProgress2, current), cutOffTailIfNeeded(newProps, true), null === newProps.tail && "hidden" === newProps.tailMode && !nextResource.alternate && !isHydrating)
                   return bubbleProperties(workInProgress2), null;
               } else
-                2 * now2() - newProps.renderingStartTime > workInProgressRootRenderTargetTime && 536870912 !== renderLanes2 && (workInProgress2.flags |= 128, type = true, cutOffTailIfNeeded(newProps, false), workInProgress2.lanes = 4194304);
+                2 * now() - newProps.renderingStartTime > workInProgressRootRenderTargetTime && 536870912 !== renderLanes2 && (workInProgress2.flags |= 128, type = true, cutOffTailIfNeeded(newProps, false), workInProgress2.lanes = 4194304);
             newProps.isBackwards ? (nextResource.sibling = workInProgress2.child, workInProgress2.child = nextResource) : (current = newProps.last, null !== current ? current.sibling = nextResource : workInProgress2.child = nextResource, newProps.last = nextResource);
           }
           if (null !== newProps.tail)
-            return current = newProps.tail, newProps.rendering = current, newProps.tail = current.sibling, newProps.renderingStartTime = now2(), current.sibling = null, renderLanes2 = suspenseStackCursor.current, push2(
+            return current = newProps.tail, newProps.rendering = current, newProps.tail = current.sibling, newProps.renderingStartTime = now(), current.sibling = null, renderLanes2 = suspenseStackCursor.current, push2(
               suspenseStackCursor,
               type ? renderLanes2 & 1 | 2 : renderLanes2 & 1
             ), isHydrating && pushTreeFork(workInProgress2, newProps.treeForkCount), current;
@@ -8685,7 +8685,7 @@ var require_react_dom_client_production = __commonJS({
         case 13:
           recursivelyTraverseMutationEffects(root2, finishedWork);
           commitReconciliationEffects(finishedWork);
-          finishedWork.child.flags & 8192 && null !== finishedWork.memoizedState !== (null !== current && null !== current.memoizedState) && (globalMostRecentFallbackTime = now2());
+          finishedWork.child.flags & 8192 && null !== finishedWork.memoizedState !== (null !== current && null !== current.memoizedState) && (globalMostRecentFallbackTime = now());
           flags & 4 && (flags = finishedWork.updateQueue, null !== flags && (finishedWork.updateQueue = null, attachSuspenseRetryListeners(finishedWork, flags)));
           break;
         case 22:
@@ -9527,7 +9527,7 @@ var require_react_dom_client_production = __commonJS({
               default:
                 throw Error(formatProdErrorMessage(329));
             }
-            if ((lanes & 62914560) === lanes && (exitStatus = globalMostRecentFallbackTime + 300 - now2(), 10 < exitStatus)) {
+            if ((lanes & 62914560) === lanes && (exitStatus = globalMostRecentFallbackTime + 300 - now(), 10 < exitStatus)) {
               markRootSuspended(
                 shouldTimeSlice,
                 lanes,
@@ -9599,7 +9599,7 @@ var require_react_dom_client_production = __commonJS({
           lanes,
           suspendedCommitReason
         );
-        var timeoutOffset = (lanes & 62914560) === lanes ? globalMostRecentFallbackTime - now2() : (lanes & 4194048) === lanes ? globalMostRecentTransitionTime - now2() : 0;
+        var timeoutOffset = (lanes & 62914560) === lanes ? globalMostRecentFallbackTime - now() : (lanes & 4194048) === lanes ? globalMostRecentTransitionTime - now() : 0;
         timeoutOffset = waitForCommitToBeReady(
           suspendedCommitReason,
           timeoutOffset
@@ -9818,7 +9818,7 @@ var require_react_dom_client_production = __commonJS({
       var prevExecutionContext = executionContext;
       executionContext |= 2;
       var prevDispatcher = pushDispatcher(), prevAsyncDispatcher = pushAsyncDispatcher();
-      workInProgressRoot !== root2 || workInProgressRootRenderLanes !== lanes ? (workInProgressTransitions = null, workInProgressRootRenderTargetTime = now2() + 500, prepareFreshStack(root2, lanes)) : workInProgressRootIsPrerendering = checkIfRootIsPrerendering(
+      workInProgressRoot !== root2 || workInProgressRootRenderLanes !== lanes ? (workInProgressTransitions = null, workInProgressRootRenderTargetTime = now() + 500, prepareFreshStack(root2, lanes)) : workInProgressRootIsPrerendering = checkIfRootIsPrerendering(
         root2,
         lanes
       );
@@ -10319,7 +10319,7 @@ var require_react_dom_client_production = __commonJS({
       null !== pingCache && pingCache.delete(wakeable);
       root2.pingedLanes |= root2.suspendedLanes & pingedLanes;
       root2.warmLanes &= ~pingedLanes;
-      workInProgressRoot === root2 && (workInProgressRootRenderLanes & pingedLanes) === pingedLanes && (4 === workInProgressRootExitStatus || 3 === workInProgressRootExitStatus && (workInProgressRootRenderLanes & 62914560) === workInProgressRootRenderLanes && 300 > now2() - globalMostRecentFallbackTime ? 0 === (executionContext & 2) && prepareFreshStack(root2, 0) : workInProgressRootPingedLanes |= pingedLanes, workInProgressSuspendedRetryLanes === workInProgressRootRenderLanes && (workInProgressSuspendedRetryLanes = 0));
+      workInProgressRoot === root2 && (workInProgressRootRenderLanes & pingedLanes) === pingedLanes && (4 === workInProgressRootExitStatus || 3 === workInProgressRootExitStatus && (workInProgressRootRenderLanes & 62914560) === workInProgressRootRenderLanes && 300 > now() - globalMostRecentFallbackTime ? 0 === (executionContext & 2) && prepareFreshStack(root2, 0) : workInProgressRootPingedLanes |= pingedLanes, workInProgressSuspendedRetryLanes === workInProgressRootRenderLanes && (workInProgressSuspendedRetryLanes = 0));
       ensureRootIsScheduled(root2);
     }
     function retryTimedOutBoundary(boundaryFiber, retryLane) {
@@ -10403,7 +10403,7 @@ var require_react_dom_client_production = __commonJS({
       mightHavePendingSyncWork = didScheduleMicrotask = false;
       var syncTransitionLanes = 0;
       0 !== currentEventTransitionLane && shouldAttemptEagerTransition() && (syncTransitionLanes = currentEventTransitionLane);
-      for (var currentTime = now2(), prev = null, root2 = firstScheduledRoot; null !== root2; ) {
+      for (var currentTime = now(), prev = null, root2 = firstScheduledRoot; null !== root2; ) {
         var next = root2.next, nextLanes = scheduleTaskForRootDuringMicrotask(root2, currentTime);
         if (0 === nextLanes)
           root2.next = null, null === prev ? firstScheduledRoot = next : prev.next = next, null === next && (lastScheduledRoot = prev);
@@ -10476,7 +10476,7 @@ var require_react_dom_client_production = __commonJS({
       );
       if (0 === workInProgressRootRenderLanes$jscomp$0) return null;
       performWorkOnRoot(root2, workInProgressRootRenderLanes$jscomp$0, didTimeout);
-      scheduleTaskForRootDuringMicrotask(root2, now2());
+      scheduleTaskForRootDuringMicrotask(root2, now());
       return null != root2.callbackNode && root2.callbackNode === originalCallbackNode ? performWorkOnRootViaSchedulerTask.bind(null, root2) : null;
     }
     function performSyncWorkOnRoot(root2, lanes) {
@@ -12830,7 +12830,7 @@ var require_react_dom_client_production = __commonJS({
                         lanes &= ~lane;
                       }
                       ensureRootIsScheduled(fiber);
-                      0 === (executionContext & 6) && (workInProgressRootRenderTargetTime = now2() + 500, flushSyncWorkAcrossRoots_impl(0, false));
+                      0 === (executionContext & 6) && (workInProgressRootRenderTargetTime = now() + 500, flushSyncWorkAcrossRoots_impl(0, false));
                     }
                   }
                   break;
@@ -15800,8 +15800,8 @@ var require_gamesSpineLeagueHeaderTypography = __commonJS({
 });
 
 // ../grarf/shared/media/mlbAllGamesHighlightDate.js
-function getMlbAllGamesHighlightTargetSlateDate(now2 = /* @__PURE__ */ new Date()) {
-  return getOperationalYesterdayDateKey(now2, GRARF_OPERATIONAL_SLATE_TIMEZONE);
+function getMlbAllGamesHighlightTargetSlateDate(now = /* @__PURE__ */ new Date()) {
+  return getOperationalYesterdayDateKey(now, GRARF_OPERATIONAL_SLATE_TIMEZONE);
 }
 function dateYmdToEpochDay(dateYmd) {
   const [y2, m2, d2] = String(dateYmd).split("-").map(Number);
@@ -15921,9 +15921,9 @@ function isMlbAllGamesHighlightCandidate(title) {
   if (!lower) return false;
   return MLB_CATCHUP_DAILY_HIGHLIGHT_TITLE_PATTERNS.some((pattern) => lower.includes(pattern));
 }
-function selectMlbAllGamesHighlightForSlateDate(entries, targetSlateDateYmd, now2 = /* @__PURE__ */ new Date()) {
-  const operationalCalendarDateKey = getOperationalCalendarDateKey(now2, GRARF_OPERATIONAL_SLATE_TIMEZONE);
-  const targetSlateDate = targetSlateDateYmd ?? getMlbAllGamesHighlightTargetSlateDate(now2);
+function selectMlbAllGamesHighlightForSlateDate(entries, targetSlateDateYmd, now = /* @__PURE__ */ new Date()) {
+  const operationalCalendarDateKey = getOperationalCalendarDateKey(now, GRARF_OPERATIONAL_SLATE_TIMEZONE);
+  const targetSlateDate = targetSlateDateYmd ?? getMlbAllGamesHighlightTargetSlateDate(now);
   const candidates = [];
   const rejected = [];
   for (const entry4 of entries) {
@@ -18704,6 +18704,18 @@ init_define_import_meta_env();
 // ../grarf/shared/domain/standings/enrichMlbGamesWithStandings.ts
 init_define_import_meta_env();
 
+// ../grarf/shared/domain/standings/formatTeamStandingsSubLineForUi.ts
+init_define_import_meta_env();
+function formatTeamStandingsSubLineForUi(standings) {
+  if (!standings?.divisionRank || standings.divisionRank <= 0) return null;
+  const record = standings.recordSummary?.trim();
+  const label = standings.displayLabel?.trim().replace(/\s•\s/g, " ");
+  if (label && record) return `${label} (${record})`;
+  if (label) return label;
+  if (record) return `(${record})`;
+  return null;
+}
+
 // ../grarf/shared/domain/standings/grarfMlbTeamAbbrev.ts
 init_define_import_meta_env();
 function mlbStatsApiAbbrevFromGrarf(teamAbbrev2) {
@@ -18756,8 +18768,14 @@ function attachStandingsToGame(game, index2) {
   if (!awayTeamStandings && !homeTeamStandings) return game;
   return {
     ...game,
-    ...awayTeamStandings ? { awayTeamStandings } : {},
-    ...homeTeamStandings ? { homeTeamStandings } : {}
+    ...awayTeamStandings ? {
+      awayTeamStandings,
+      awayStandingsLine: formatTeamStandingsSubLineForUi(awayTeamStandings) ?? void 0
+    } : {},
+    ...homeTeamStandings ? {
+      homeTeamStandings,
+      homeStandingsLine: formatTeamStandingsSubLineForUi(homeTeamStandings) ?? void 0
+    } : {}
   };
 }
 async function enrichMlbGamesWithStandings(games, index2) {
@@ -19173,10 +19191,10 @@ function broadcastLabelScore(label, league2) {
   if (/BALLY/.test(u2)) return 82;
   return 50;
 }
-function rankBroadcastLabels(labels, league2, max2 = 6) {
+function rankBroadcastLabels(labels2, league2, max2 = 6) {
   const seen = /* @__PURE__ */ new Set();
   const unique = [];
-  for (const raw of labels) {
+  for (const raw of labels2) {
     const t2 = canonicalizeNbaTvBroadcastLabel(raw.trim());
     if (!t2 || t2 === "TV TBD") continue;
     const k2 = nbaTvBroadcastDedupeKey(t2);
@@ -19216,11 +19234,11 @@ init_define_import_meta_env();
 
 // ../grarf/desktop/src/lib/broadcast/broadcastLabelRank.ts
 var WNBA_REAL_BROADCASTER = /prime|nba\s*tv|peacock|usa|ion|cnbc|paramount|cbs|abc|cw\b|league\s*pass|wwor|kfaa|vegas/i;
-function filterWnbaMisattributedEspn(labels, league2) {
-  if (league2 !== "WNBA") return [...labels];
-  const hasRealBroadcaster = labels.some((label) => WNBA_REAL_BROADCASTER.test(label));
-  if (!hasRealBroadcaster) return [...labels];
-  return labels.filter((label) => {
+function filterWnbaMisattributedEspn(labels2, league2) {
+  if (league2 !== "WNBA") return [...labels2];
+  const hasRealBroadcaster = labels2.some((label) => WNBA_REAL_BROADCASTER.test(label));
+  if (!hasRealBroadcaster) return [...labels2];
+  return labels2.filter((label) => {
     if (isEspnPlusBroadcastLabel(label)) return true;
     if (!isEspnLinearBroadcastLabel(label) && !/^\s*espn\s*$/i.test(label.trim())) return true;
     return false;
@@ -19249,10 +19267,10 @@ function isNbaLeaguePassBroadcastLabel(label) {
 }
 
 // ../grarf/desktop/src/lib/broadcast/selectNbaDisplayBroadcastLabel.ts
-function uniqueBroadcastLabels(labels) {
+function uniqueBroadcastLabels(labels2) {
   const seen = /* @__PURE__ */ new Set();
   const out = [];
-  for (const raw of labels) {
+  for (const raw of labels2) {
     const trimmed = raw.trim();
     if (!trimmed || trimmed === "TV TBD") continue;
     const key2 = trimmed.toLowerCase();
@@ -19265,8 +19283,8 @@ function uniqueBroadcastLabels(labels) {
 function isNbaGameRow(game) {
   return game.league === "NBA" || game.id.startsWith("espn-NBA-");
 }
-function selectNbaDisplayBroadcastLabel(labels) {
-  const unique = uniqueBroadcastLabels(labels);
+function selectNbaDisplayBroadcastLabel(labels2) {
+  const unique = uniqueBroadcastLabels(labels2);
   if (unique.length === 0) return null;
   for (const label of unique) {
     if (isNbaLeaguePassBroadcastLabel(label)) {
@@ -19310,8 +19328,8 @@ function broadcastLabelsForGameCard(game, max2 = 6) {
   return rankBroadcastLabelsForGame(game, max2);
 }
 function formatBroadcastsSubtitle(game, max2 = 6, sep = " \u2022 ") {
-  const labels = broadcastLabelsForGameCard(game, max2);
-  if (labels.length > 0) return labels.join(sep);
+  const labels2 = broadcastLabelsForGameCard(game, max2);
+  if (labels2.length > 0) return labels2.join(sep);
   return resolvePrimaryChannelLabel(game);
 }
 
@@ -19552,10 +19570,10 @@ var WNBA_DISPLAY_BROADCAST_TIERS = [
     }
   }
 ];
-function uniqueBroadcastLabels2(labels) {
+function uniqueBroadcastLabels2(labels2) {
   const seen = /* @__PURE__ */ new Set();
   const out = [];
-  for (const raw of labels) {
+  for (const raw of labels2) {
     const trimmed = raw.trim();
     if (!trimmed || trimmed === "TV TBD") continue;
     const key2 = trimmed.toLowerCase();
@@ -19575,8 +19593,8 @@ function matchWnbaDisplayBroadcastTier(label) {
   }
   return null;
 }
-function selectWnbaDisplayBroadcastLabel(labels) {
-  const unique = uniqueBroadcastLabels2(labels);
+function selectWnbaDisplayBroadcastLabel(labels2) {
+  const unique = uniqueBroadcastLabels2(labels2);
   if (unique.length === 0) return null;
   let best = null;
   for (const label of unique) {
@@ -19644,8 +19662,8 @@ var USA_NETWORK_WNBA_STREAM_URL = "https://www.usanetwork.com/sports";
 function broadcastLabelsForGame(game) {
   return [...game.broadcasts ?? [], ...game.channels ?? []];
 }
-function gameHasUsaNetworkBroadcast(labels) {
-  return labels.some((label) => {
+function gameHasUsaNetworkBroadcast(labels2) {
+  return labels2.some((label) => {
     const t2 = String(label || "").trim();
     if (!t2) return false;
     if (/^usa\s*network$/i.test(t2)) return true;
@@ -20584,9 +20602,9 @@ var useCanonicalLiveGameStore = (0, import_zustand.create)((set, get) => ({
   ingestSequence: 0,
   sourceProvider: "espn_scoreboard_ipc",
   ingestSnapshot: (snap, meta) => {
-    const now2 = Date.now();
+    const now = Date.now();
     const sourceProvider = snap.sourceProvider ?? "espn_scoreboard_ipc";
-    const updatedAt = snap.updatedAt ?? new Date(now2).toISOString();
+    const updatedAt = snap.updatedAt ?? new Date(now).toISOString();
     const prev = get();
     const rejection = shouldRejectIncomingCanonicalSnapshot(snap, prev, meta);
     if (rejection) {
@@ -20616,7 +20634,7 @@ var useCanonicalLiveGameStore = (0, import_zustand.create)((set, get) => ({
           sourceProvider,
           normalizedVersion,
           ingestSequence,
-          lastPropagationAt: now2
+          lastPropagationAt: now
         });
         gamesById[record.meta.gameId] = record;
       }
@@ -21092,11 +21110,11 @@ function resolveFinalizedRetentionExpiry(game, retainedAt) {
   const anchor = Number.isFinite(finalizedMs) && finalizedMs > 0 ? Math.min(finalizedMs, retainedAt) : retainedAt;
   return anchor + FINALIZED_RETENTION_TTL_MS;
 }
-function pruneRetainedFinals(byId, now2 = Date.now()) {
+function pruneRetainedFinals(byId, now = Date.now()) {
   const next = {};
   for (const [id, entry4] of Object.entries(byId)) {
     if (!entry4?.game || entry4.game.status !== "final") continue;
-    if (typeof entry4.expiresAt !== "number" || entry4.expiresAt <= now2) continue;
+    if (typeof entry4.expiresAt !== "number" || entry4.expiresAt <= now) continue;
     next[id] = entry4;
   }
   return next;
@@ -21189,31 +21207,31 @@ function collectFinalizedHarvestFromIngestTransition(input) {
 
 // ../grarf/desktop/src/lib/finalizedGameRetention/liveRecency.ts
 init_define_import_meta_env();
-function recordLiveObservations(byId, games, ingestCycle, now2 = Date.now()) {
+function recordLiveObservations(byId, games, ingestCycle, now = Date.now()) {
   const next = { ...byId };
   for (const raw of games) {
     if (raw.status !== "live") continue;
     next[raw.id] = {
       game: copyFinalizedGame(raw),
       lastLiveIngestCycle: ingestCycle,
-      lastLiveAtMs: now2
+      lastLiveAtMs: now
     };
   }
   return next;
 }
-function pruneLiveRecency(byId, ingestCycle, now2 = Date.now()) {
+function pruneLiveRecency(byId, ingestCycle, now = Date.now()) {
   const next = {};
   for (const [id, entry4] of Object.entries(byId)) {
     if (ingestCycle - entry4.lastLiveIngestCycle > LIVE_RECENCY_MAX_INGEST_CYCLES) continue;
-    if (now2 - entry4.lastLiveAtMs > LIVE_RECENCY_MAX_MS) continue;
+    if (now - entry4.lastLiveAtMs > LIVE_RECENCY_MAX_MS) continue;
     next[id] = entry4;
   }
   return next;
 }
-function isRecentlyLive(entry4, ingestCycle, now2 = Date.now()) {
+function isRecentlyLive(entry4, ingestCycle, now = Date.now()) {
   if (!entry4) return false;
   if (ingestCycle - entry4.lastLiveIngestCycle > LIVE_RECENCY_MAX_INGEST_CYCLES) return false;
-  if (now2 - entry4.lastLiveAtMs > LIVE_RECENCY_MAX_MS) return false;
+  if (now - entry4.lastLiveAtMs > LIVE_RECENCY_MAX_MS) return false;
   return true;
 }
 
@@ -21225,7 +21243,7 @@ function mergeFinalizedAtMsOntoGame(game, existing) {
   if (game.finalizedAtMs === finalizedAtMs) return game;
   return { ...game, finalizedAtMs };
 }
-function upsertFinals(byId, games, now2) {
+function upsertFinals(byId, games, now) {
   const next = { ...byId };
   for (const raw of games) {
     if (raw.status !== "final") continue;
@@ -21235,7 +21253,7 @@ function upsertFinals(byId, games, now2) {
       next[raw.id] = { ...existing, game };
       continue;
     }
-    const retainedAt = now2;
+    const retainedAt = now;
     next[game.id] = {
       game,
       retainedAt,
@@ -21262,17 +21280,17 @@ function persistById(byId) {
   } catch {
   }
 }
-function commitById(byId, now2 = Date.now()) {
-  const pruned = pruneRetainedFinals(byId, now2);
+function commitById(byId, now = Date.now()) {
+  const pruned = pruneRetainedFinals(byId, now);
   persistById(pruned);
   return pruned;
 }
 var useRecentFinalizedGamesStore = (0, import_zustand2.create)((set, get) => ({
   byId: readPersistedById(),
   liveRecencyById: {},
-  mergeFinalizedGames: (games, now2 = Date.now()) => {
-    const merged = upsertFinals(get().byId, games, now2);
-    const byId = commitById(merged, now2);
+  mergeFinalizedGames: (games, now = Date.now()) => {
+    const merged = upsertFinals(get().byId, games, now);
+    const byId = commitById(merged, now);
     set({ byId });
   },
   harvestOnIngestTransition: (input) => {
@@ -21300,21 +21318,21 @@ var useRecentFinalizedGamesStore = (0, import_zustand2.create)((set, get) => ({
     get().mergeFinalizedGames(collectFinalGamesFromLeagues(leagues));
   },
   getRetainedForLeague: (league2) => {
-    const now2 = Date.now();
+    const now = Date.now();
     const out = [];
     for (const entry4 of Object.values(get().byId)) {
-      if (entry4.expiresAt <= now2 || entry4.game.status !== "final") continue;
+      if (entry4.expiresAt <= now || entry4.game.status !== "final") continue;
       if ((entry4.game.league ?? "MLB") !== league2) continue;
       out.push(entry4.game);
     }
     return out;
   },
   getAllRetained: () => {
-    const now2 = Date.now();
-    return Object.values(get().byId).filter((e2) => e2.expiresAt > now2 && e2.game.status === "final").map((e2) => e2.game);
+    const now = Date.now();
+    return Object.values(get().byId).filter((e2) => e2.expiresAt > now && e2.game.status === "final").map((e2) => e2.game);
   },
-  pruneExpired: (now2 = Date.now()) => {
-    const pruned = commitById(get().byId, now2);
+  pruneExpired: (now = Date.now()) => {
+    const pruned = commitById(get().byId, now);
     if (pruned !== get().byId) set({ byId: pruned });
   }
 }));
@@ -22052,11 +22070,11 @@ function formatManualGamesSpineDisplayTime2(startTimeMs) {
     timeZoneName: "short"
   });
 }
-function refreshManualScheduledGameIfNeeded(game, now2, startTime, endTime, sourceTimeZone) {
+function refreshManualScheduledGameIfNeeded(game, now, startTime, endTime, sourceTimeZone) {
   const startTimeMs = game.startTimeMs ?? parseManualGamesSpineEventTimeMs2(startTime, sourceTimeZone);
   const endTimeMs = parseManualGamesSpineEventTimeMs2(endTime, sourceTimeZone);
   if (!Number.isFinite(startTimeMs) || !Number.isFinite(endTimeMs)) return game;
-  const nowMs3 = now2.getTime();
+  const nowMs3 = now.getTime();
   const status = resolveManualGamesSpineStatus2(nowMs3, startTimeMs, endTimeMs);
   const statusLine = formatManualGamesSpineStatusLine2(status, startTimeMs, endTimeMs, nowMs3);
   if (game.status === status && game.statusLine === statusLine) return game;
@@ -22078,12 +22096,12 @@ function resolveManualGameSourceTimeZone(sourceTimeZoneIana, sourceTimeZone) {
   }
   return sourceTimeZone?.trim() || void 0;
 }
-function refreshManualGamesSpineGameIfNeeded(game, now2) {
+function refreshManualGamesSpineGameIfNeeded(game, now) {
   const manualGamesSpine = game.metadata?.manualGamesSpine;
   if (manualGamesSpine) {
     return refreshManualScheduledGameIfNeeded(
       game,
-      now2,
+      now,
       manualGamesSpine.startTimeIso,
       manualGamesSpine.endTimeIso,
       resolveManualGameSourceTimeZone(void 0, manualGamesSpine.sourceTimeZone)
@@ -22093,7 +22111,7 @@ function refreshManualGamesSpineGameIfNeeded(game, now2) {
   if (manualEvent) {
     return refreshManualScheduledGameIfNeeded(
       game,
-      now2,
+      now,
       manualEvent.startTime,
       manualEvent.endTime,
       resolveManualGameSourceTimeZone(manualEvent.sourceTimezoneIana, manualEvent.sourceTimezone)
@@ -22101,7 +22119,7 @@ function refreshManualGamesSpineGameIfNeeded(game, now2) {
   }
   return game;
 }
-function refreshManualGamesSpineGamesInLeagues(leagues, now2 = /* @__PURE__ */ new Date()) {
+function refreshManualGamesSpineGamesInLeagues(leagues, now = /* @__PURE__ */ new Date()) {
   let changed = false;
   const next = {};
   for (const [key2, rows] of Object.entries(leagues)) {
@@ -22110,7 +22128,7 @@ function refreshManualGamesSpineGamesInLeagues(leagues, now2 = /* @__PURE__ */ n
       next[leagueKey] = rows;
       continue;
     }
-    const refreshedRows = rows.map((game) => refreshManualGamesSpineGameIfNeeded(game, now2));
+    const refreshedRows = rows.map((game) => refreshManualGamesSpineGameIfNeeded(game, now));
     if (!changed && refreshedRows.some((game, index2) => game !== rows[index2])) {
       changed = true;
     }
@@ -22603,6 +22621,7 @@ function preserveMlbTeamStandingsOnGamesSnapshot(incoming, previousGames) {
 
 // ../grarf/desktop/src/lib/mlb/joinMlbProviderIdsClient.ts
 init_define_import_meta_env();
+init_isGrarfWebRenderer();
 var scheduleCache = /* @__PURE__ */ new Map();
 function hasMlbGamePk(game) {
   if (typeof game.gamePk === "number" && Number.isFinite(game.gamePk) && game.gamePk > 0) {
@@ -22645,6 +22664,7 @@ function isMlbBucketRow(game) {
   return game.league === "MLB" || game.id.startsWith("espn-MLB-");
 }
 async function joinMlbProviderIdsOnGames(games) {
+  if (isGrarfExtensionRenderer()) return games;
   const needJoin = games.filter((g2) => isMlbBucketRow(g2) && !hasMlbGamePk(g2));
   if (needJoin.length === 0) return games;
   const dates = [
@@ -23842,8 +23862,8 @@ var US_OPEN_TENNIS_SINGLES_DRAW_TYPE_SLUGS = {
   mens: "mens-singles",
   womens: "womens-singles"
 };
-function resolveUsOpenEspnSeasonYear(now2 = /* @__PURE__ */ new Date()) {
-  return now2.getUTCFullYear();
+function resolveUsOpenEspnSeasonYear(now = /* @__PURE__ */ new Date()) {
+  return now.getUTCFullYear();
 }
 function buildUsOpenEspnTournamentScoreboardUrl(draw, seasonYear = resolveUsOpenEspnSeasonYear()) {
   const base = `${US_OPEN_ESPN_WEB_API_BASE}/${draw === "mens" ? "atp" : "wta"}/scoreboard`;
@@ -23865,10 +23885,10 @@ var US_OPEN_TOURNAMENT_DRAWS = [
   { draw: "mens", pollLeagueKey: "ATP", allowedDrawTypeSlugs: US_OPEN_MENS_SINGLES_DRAW },
   { draw: "womens", pollLeagueKey: "WTA", allowedDrawTypeSlugs: US_OPEN_WOMENS_SINGLES_DRAW }
 ];
-async function fetchUsOpenTennisOperationalGames(fetchScoreboardJson2, now2 = /* @__PURE__ */ new Date()) {
+async function fetchUsOpenTennisOperationalGames(fetchScoreboardJson2, now = /* @__PURE__ */ new Date()) {
   const results = await Promise.all(
     US_OPEN_TOURNAMENT_DRAWS.map(async ({ draw, pollLeagueKey, allowedDrawTypeSlugs }) => {
-      const url = buildUsOpenEspnTournamentScoreboardUrl(draw, now2.getUTCFullYear());
+      const url = buildUsOpenEspnTournamentScoreboardUrl(draw, now.getUTCFullYear());
       const json = await fetchScoreboardJson2(url);
       return normalizeTennisScoreboard(json, pollLeagueKey, false, {
         forcedEventLeagueKey: US_OPEN_FORCED_LEAGUE_KEY,
@@ -23919,8 +23939,8 @@ function countLiveTennisCompetitions(json) {
   }
   return n2;
 }
-async function fetchOperationalTennisScoreboardJson(endpoint, now2 = /* @__PURE__ */ new Date()) {
-  const datesParam = formatEspnScoreboardDatesParam(now2);
+async function fetchOperationalTennisScoreboardJson(endpoint, now = /* @__PURE__ */ new Date()) {
+  const datesParam = formatEspnScoreboardDatesParam(now);
   const datedUrl = `${endpoint}${endpoint.includes("?") ? "&" : "?"}dates=${datesParam}`;
   const datedJson = await fetchScoreboardJson(datedUrl);
   const datedEvents = Array.isArray(datedJson?.events) ? datedJson.events : [];
@@ -24624,6 +24644,7 @@ var CHANNEL_LOGO_BY_LABEL2 = {
   USA: USA_CHANNEL_LOGO_URL2,
   "USA NETWORK": USA_CHANNEL_LOGO_URL2,
   "USA NET": USA_CHANNEL_LOGO_URL2,
+  "USA Net": USA_CHANNEL_LOGO_URL2,
   ION: "/league-logos/channel-ion.png",
   "NBA TV": "/league-logos/channel-nba-tv.png",
   NBATV: "/league-logos/channel-nba-tv.png",
@@ -24692,7 +24713,7 @@ function resolveChannelLogoUrl2(channelLabel) {
   if (/\bPEACOCK\b/.test(key2)) return PEACOCK_CHANNEL_LOGO_URL2;
   if (/\bPRIME\s*VIDEO\b/.test(key2)) return CHANNEL_LOGO_BY_LABEL2["PRIME VIDEO"] ?? null;
   if (key2 === "PRIME") return CHANNEL_LOGO_BY_LABEL2.PRIME ?? null;
-  if (/^USA(\s+NET(WORK)?)?$/.test(key2)) return CHANNEL_LOGO_BY_LABEL2.USA ?? null;
+  if (/^usa(\s+net(work)?)?$/i.test(key2)) return USA_CHANNEL_LOGO_URL2;
   if (isNbaTvBroadcastLabel2(key2)) return CHANNEL_LOGO_BY_LABEL2["NBA TV"] ?? null;
   if (/\bNBA\s+LEAGUE\s+PASS\b/.test(key2) || key2 === "NBA LEAGUE PASS") {
     return CHANNEL_LOGO_BY_LABEL2["NBA LEAGUE PASS"] ?? null;
@@ -24865,14 +24886,14 @@ function resolveManualEventStreamProvider(broadcastName, streamUrl) {
   const urlLabel = deriveChannelLabelFromStreamUrl2(streamUrl);
   return resolveStreamProviderFromChannelLabel2(urlLabel) ?? resolveStreamProviderFromChannelLabel2(broadcastName);
 }
-function normalizeManualEventDefinition(event, league2, broadcaster = resolveFallbackManualBroadcasterDefinition(event), now2 = /* @__PURE__ */ new Date()) {
+function normalizeManualEventDefinition(event, league2, broadcaster = resolveFallbackManualBroadcasterDefinition(event), now = /* @__PURE__ */ new Date()) {
   const sourceTimezoneIana = resolveManualEventSourceTimezoneIana(event.sourceTimezone);
   const startTimeMs = parseManualGamesSpineEventTimeMs(event.startTime, sourceTimezoneIana);
   const endTimeMs = parseManualGamesSpineEventTimeMs(event.endTime, sourceTimezoneIana);
   if (startTimeMs == null || endTimeMs == null || endTimeMs <= startTimeMs) {
     return null;
   }
-  const nowMs3 = now2.getTime();
+  const nowMs3 = now.getTime();
   const status = resolveManualGamesSpineStatus(nowMs3, startTimeMs, endTimeMs);
   const scheduledDateKey = resolveScheduledDateKey(new Date(startTimeMs).toISOString(), void 0) ?? new Date(startTimeMs).toISOString().slice(0, 10);
   const layout = resolveLayout(event);
@@ -24954,7 +24975,7 @@ function normalizeManualEventDefinition(event, league2, broadcaster = resolveFal
     streamProvider,
     gameCardUrl: event.gameCardUrl.trim(),
     gameCardNavigationMode: resolveGameCardNavigationMode(openBehavior),
-    lastUpdated: now2.toISOString(),
+    lastUpdated: now.toISOString(),
     metadata: {
       manualEvent: {
         sourceTimezone: event.sourceTimezone,
@@ -25130,7 +25151,7 @@ function shouldIngestEvent(event, includePlaceholders) {
 }
 function ingestManualEventsFromSource(source, options = {}) {
   const includePlaceholders = options.includePlaceholders ?? false;
-  const now2 = options.now ?? /* @__PURE__ */ new Date();
+  const now = options.now ?? /* @__PURE__ */ new Date();
   const leagueIndex = buildManualLeaguesIndex(source.leagues.leagues ?? []);
   const errors = [];
   const events2 = [];
@@ -25156,7 +25177,7 @@ function ingestManualEventsFromSource(source, options = {}) {
       return;
     }
     const broadcaster = resolveManualBroadcasterDefinitionForEvent(source, event);
-    const normalized = normalizeManualEventDefinition(event, league2, broadcaster, now2);
+    const normalized = normalizeManualEventDefinition(event, league2, broadcaster, now);
     if (!normalized) {
       errors.push({
         index: index2,
@@ -26829,10 +26850,10 @@ function broadcastDebug(message, extra) {
     console.log(`[Broadcasts] ${message}`);
   }
 }
-function dropRedundantAggregateBroadcastLabels(labels) {
-  if (labels.length < 2) return labels;
-  const individualKeys = new Set(labels.map((l2) => l2.toLowerCase()));
-  return labels.filter((label) => {
+function dropRedundantAggregateBroadcastLabels(labels2) {
+  if (labels2.length < 2) return labels2;
+  const individualKeys = new Set(labels2.map((l2) => l2.toLowerCase()));
+  return labels2.filter((label) => {
     if (!label.includes("/")) return true;
     const parts = label.split("/").map((p2) => p2.trim()).filter(Boolean);
     if (parts.length < 2) return true;
@@ -27876,19 +27897,19 @@ function buildOperationalSlateDateDiagnostics(game) {
 function formatLocalDateKeyFromMs2(ms2) {
   return formatOperationalDateKeyFromMs(ms2 ?? void 0, gamesSpineOperationalTimeZone()) ?? null;
 }
-function isScheduledOnOperationalEveningSlate2(game, operationalDateKey, now2 = /* @__PURE__ */ new Date()) {
+function isScheduledOnOperationalEveningSlate2(game, operationalDateKey, now = /* @__PURE__ */ new Date()) {
   return isScheduledOnOperationalEveningSlate(
     game,
     operationalDateKey,
-    now2,
+    now,
     gamesSpineOperationalTimeZone()
   );
 }
-function buildGamesSpineOperationalDateContext(operationalDateKey, now2) {
+function buildGamesSpineOperationalDateContext(operationalDateKey, now) {
   return {
     operationalDateKey,
-    sportsDayKey: getOperationalSportsDayDateKey(now2),
-    yesterdayKey: getOperationalSportsDayYesterdayDateKey(now2)
+    sportsDayKey: getOperationalSportsDayDateKey(now),
+    yesterdayKey: getOperationalSportsDayYesterdayDateKey(now)
   };
 }
 function usesAuthoritativeScheduledDateKeyForSpineFilter(game) {
@@ -27897,7 +27918,7 @@ function usesAuthoritativeScheduledDateKeyForSpineFilter(game) {
   if (isMotorsportSessionLeagueKey(game.league)) return true;
   return false;
 }
-function isGameOnGamesSpineOperationalDateWithContext(game, ctx, now2 = /* @__PURE__ */ new Date()) {
+function isGameOnGamesSpineOperationalDateWithContext(game, ctx, now = /* @__PURE__ */ new Date()) {
   const payloadKey = game.scheduledDateKey?.trim();
   const startKey = formatOperationalDateKeyFromMs(
     game.startTimeMs,
@@ -27915,7 +27936,7 @@ function isGameOnGamesSpineOperationalDateWithContext(game, ctx, now2 = /* @__PU
     return isScheduledOnOperationalEveningSlate2(
       game,
       ctx.operationalDateKey,
-      now2,
+      now,
       gamesSpineOperationalTimeZone()
     );
   }
@@ -27928,7 +27949,7 @@ function isGameOnGamesSpineOperationalDateWithContext(game, ctx, now2 = /* @__PU
       return false;
     }
   }
-  if (isScheduledOnOperationalEveningSlate2(game, ctx.operationalDateKey, now2)) {
+  if (isScheduledOnOperationalEveningSlate2(game, ctx.operationalDateKey, now)) {
     return true;
   }
   if (startKey === ctx.operationalDateKey) {
@@ -27942,10 +27963,10 @@ function isGameOnGamesSpineOperationalDateWithContext(game, ctx, now2 = /* @__PU
   }
   return false;
 }
-function resolveActiveGolfTournamentOperationalSportsDayKey(game, now2 = /* @__PURE__ */ new Date()) {
+function resolveActiveGolfTournamentOperationalSportsDayKey(game, now = /* @__PURE__ */ new Date()) {
   const endKey = game.metadata?.tournamentEndDateKey?.trim();
   if (!endKey) return null;
-  const today = getOperationalSportsDayDateKey(now2);
+  const today = getOperationalSportsDayDateKey(now);
   if (endKey < today) return null;
   const startTimeKey = game.startTimeMs != null && game.startTimeMs > 0 ? formatOperationalDateKeyFromMs(game.startTimeMs, gamesSpineOperationalTimeZone()) ?? null : null;
   if (startTimeKey && startTimeKey <= today) return today;
@@ -27989,24 +28010,24 @@ function resolveGameOperationalDateKey(game) {
   }
   return null;
 }
-function isGamesSpineYesterdayFinalGame(game, now2 = /* @__PURE__ */ new Date()) {
+function isGamesSpineYesterdayFinalGame(game, now = /* @__PURE__ */ new Date()) {
   if (game.status !== "final") return false;
   const gameDateKey = resolveGameOperationalDateKey(game);
   if (!gameDateKey) return false;
-  return gameDateKey === getOperationalSportsDayYesterdayDateKey(now2);
+  return gameDateKey === getOperationalSportsDayYesterdayDateKey(now);
 }
-function isCatchUpSpineFinalGame(game, now2 = /* @__PURE__ */ new Date()) {
+function isCatchUpSpineFinalGame(game, now = /* @__PURE__ */ new Date()) {
   if (game.status !== "final") return false;
-  const sportsDayKey = getOperationalSportsDayDateKey(now2);
-  const yesterdayKey2 = getOperationalSportsDayYesterdayDateKey(now2);
+  const sportsDayKey = getOperationalSportsDayDateKey(now);
+  const yesterdayKey2 = getOperationalSportsDayYesterdayDateKey(now);
   const gameDateKey = resolveGameOperationalDateKey(game);
   if (!gameDateKey) return false;
   if (gameDateKey === sportsDayKey) return false;
   if (gameDateKey === yesterdayKey2) return true;
   return gameDateKey < sportsDayKey;
 }
-function explainOperationalDateRemoval(game, operationalDateKey = getOperationalSportsDayDateKey(), now2 = /* @__PURE__ */ new Date()) {
-  if (isGameOnGamesSpineOperationalDate(game, operationalDateKey, now2)) {
+function explainOperationalDateRemoval(game, operationalDateKey = getOperationalSportsDayDateKey(), now = /* @__PURE__ */ new Date()) {
+  if (isGameOnGamesSpineOperationalDate(game, operationalDateKey, now)) {
     return "kept";
   }
   const diag = buildOperationalSlateDateDiagnostics(game);
@@ -28026,31 +28047,31 @@ function explainOperationalDateRemoval(game, operationalDateKey = getOperational
   }
   return "operational_date_mismatch";
 }
-function isGameOnGamesSpineOperationalDate(game, operationalDateKey = getOperationalSportsDayDateKey(), now2 = /* @__PURE__ */ new Date()) {
+function isGameOnGamesSpineOperationalDate(game, operationalDateKey = getOperationalSportsDayDateKey(), now = /* @__PURE__ */ new Date()) {
   return isGameOnGamesSpineOperationalDateWithContext(
     game,
-    buildGamesSpineOperationalDateContext(operationalDateKey, now2),
-    now2
+    buildGamesSpineOperationalDateContext(operationalDateKey, now),
+    now
   );
 }
-function filterGamesSpineSlateForOperationalDate(games, operationalDateKey = getOperationalSportsDayDateKey(), now2 = /* @__PURE__ */ new Date()) {
+function filterGamesSpineSlateForOperationalDate(games, operationalDateKey = getOperationalSportsDayDateKey(), now = /* @__PURE__ */ new Date()) {
   if (games.length === 0) return games;
-  const ctx = buildGamesSpineOperationalDateContext(operationalDateKey, now2);
-  return games.filter((g2) => isGameOnGamesSpineOperationalDateWithContext(g2, ctx, now2));
+  const ctx = buildGamesSpineOperationalDateContext(operationalDateKey, now);
+  return games.filter((g2) => isGameOnGamesSpineOperationalDateWithContext(g2, ctx, now));
 }
-function filterGamesSpineSlateForOperationalSportsDay(games, now2 = /* @__PURE__ */ new Date()) {
-  return filterGamesSpineSlateForOperationalDate(games, getOperationalSportsDayDateKey(now2), now2);
+function filterGamesSpineSlateForOperationalSportsDay(games, now = /* @__PURE__ */ new Date()) {
+  return filterGamesSpineSlateForOperationalDate(games, getOperationalSportsDayDateKey(now), now);
 }
-function filterGamesSpineSlateForTodayUpcoming(games, now2 = /* @__PURE__ */ new Date()) {
+function filterGamesSpineSlateForTodayUpcoming(games, now = /* @__PURE__ */ new Date()) {
   if (games.length === 0) return [];
-  const todayKey = getOperationalSportsDayDateKey(now2);
+  const todayKey = getOperationalSportsDayDateKey(now);
   return games.filter(
-    (g2) => isOperationalGameUpcoming(g2, now2.getTime()) && isGameOnGamesSpineOperationalDate(g2, todayKey, now2)
+    (g2) => isOperationalGameUpcoming(g2, now.getTime()) && isGameOnGamesSpineOperationalDate(g2, todayKey, now)
   );
 }
-function filterGamesSpineSlateForUpcoming(games, now2 = /* @__PURE__ */ new Date()) {
+function filterGamesSpineSlateForUpcoming(games, now = /* @__PURE__ */ new Date()) {
   if (!isGrarfWebRenderer2()) return [];
-  return filterGamesSpineSlateForTodayUpcoming(games, now2);
+  return filterGamesSpineSlateForTodayUpcoming(games, now);
 }
 
 // ../grarf/desktop/src/lib/finalizedGameRetention/buildOperationalSpineSlate.ts
@@ -28070,18 +28091,18 @@ function mergeRetainedFinalsIntoSpineSlate(slate, leagueGames, retainedFinals) {
   if (merged.length === slate.length) return slate;
   return merged;
 }
-function buildCatchUpFinalSlate(leagueGames, retainedFinals, now2) {
+function buildCatchUpFinalSlate(leagueGames, retainedFinals, now) {
   const byId = /* @__PURE__ */ new Map();
   const consider = (game) => {
-    if (!isCatchUpSpineFinalGame(game, now2)) return;
+    if (!isCatchUpSpineFinalGame(game, now)) return;
     byId.set(game.id, game);
   };
   for (const game of leagueGames) consider(game);
   for (const game of retainedFinals) consider(game);
   return [...byId.values()];
 }
-function buildGamesSpineOperationalSlate(leagueGames, retainedFinals, operationalMode, now2) {
-  const nowDate = now2 ?? /* @__PURE__ */ new Date();
+function buildGamesSpineOperationalSlate(leagueGames, retainedFinals, operationalMode, now) {
+  const nowDate = now ?? /* @__PURE__ */ new Date();
   if (operationalMode !== "CATCH_UP") {
     const slate = filterGamesSpineSlateForOperationalSportsDay(leagueGames, nowDate);
     if (retainedFinals.length === 0) return slate;
@@ -28133,14 +28154,14 @@ function matchHomeGamesStatusFilter(game, filter) {
   if (filter === "final") return game.status === "final";
   return true;
 }
-function matchGamesSpineFinalStatusFilter(game, now2 = /* @__PURE__ */ new Date()) {
+function matchGamesSpineFinalStatusFilter(game, now = /* @__PURE__ */ new Date()) {
   if (isManuallyEnteredGame(game) && game.status === "final") {
-    return isGameOnGamesSpineOperationalDate(game, getOperationalSportsDayDateKey(now2), now2);
+    return isGameOnGamesSpineOperationalDate(game, getOperationalSportsDayDateKey(now), now);
   }
-  return isGamesSpineYesterdayFinalGame(game, now2);
+  return isGamesSpineYesterdayFinalGame(game, now);
 }
-function matchHomeGamesSpineStatusFilter(game, filter, now2 = /* @__PURE__ */ new Date()) {
-  if (filter === "final") return matchGamesSpineFinalStatusFilter(game, now2);
+function matchHomeGamesSpineStatusFilter(game, filter, now = /* @__PURE__ */ new Date()) {
+  if (filter === "final") return matchGamesSpineFinalStatusFilter(game, now);
   return matchHomeGamesStatusFilter(game, filter);
 }
 function homeGamesFilterEmptyLabel(filter) {
@@ -28236,8 +28257,8 @@ function compareGamesSpineChronologically(a2, b2) {
 function sortGamesSpineChronologically2(games) {
   return [...games].sort(compareGamesSpineChronologically);
 }
-function sortGamesSpineUpcomingByOperationalDay(games, now2 = /* @__PURE__ */ new Date()) {
-  const todayKey = getOperationalSportsDayDateKey(now2);
+function sortGamesSpineUpcomingByOperationalDay(games, now = /* @__PURE__ */ new Date()) {
+  const todayKey = getOperationalSportsDayDateKey(now);
   return [...games].sort((a2, b2) => {
     const aKey = resolveGameOperationalDateKey(a2) ?? "";
     const bKey = resolveGameOperationalDateKey(b2) ?? "";
@@ -28609,37 +28630,37 @@ function shouldPreserveMissingOperationalLiveGame(game, ingestCycle, liveRecency
   if (!isOperationalLiveRowAuthoritativelyFresh(game)) return false;
   return isRecentlyLive(liveRecencyById[game.id], ingestCycle);
 }
-function isOperationalSpineContinuityCandidate(game, ingestCycle, liveRecencyById, now2 = /* @__PURE__ */ new Date()) {
+function isOperationalSpineContinuityCandidate(game, ingestCycle, liveRecencyById, now = /* @__PURE__ */ new Date()) {
   if (game.status === "postponed") return true;
   if (game.status === "final") return false;
   if (game.status === "live") {
     return shouldPreserveMissingOperationalLiveGame(game, ingestCycle, liveRecencyById);
   }
   if (game.status === "scheduled") {
-    return !isOperationalScheduledGameOverdue(game, now2.getTime());
+    return !isOperationalScheduledGameOverdue(game, now.getTime());
   }
   return true;
 }
 
 // ../grarf/desktop/src/lib/gamesSpine/preserveMissingOperationalLeagueSections.ts
 var LOG10 = "[GamesSpine]";
-function countLeaguesWithTodaySlate(leagues, now2 = /* @__PURE__ */ new Date()) {
+function countLeaguesWithTodaySlate(leagues, now = /* @__PURE__ */ new Date()) {
   let count3 = 0;
   for (const key2 of getGamesColumnLeagueOrder()) {
-    if (filterGamesSpineSlateForOperationalSportsDay(leagues[key2] ?? [], now2).length > 0) count3 += 1;
+    if (filterGamesSpineSlateForOperationalSportsDay(leagues[key2] ?? [], now).length > 0) count3 += 1;
   }
   return count3;
 }
-function countOperationalSportsDayGames(leagues, now2 = /* @__PURE__ */ new Date()) {
+function countOperationalSportsDayGames(leagues, now = /* @__PURE__ */ new Date()) {
   let count3 = 0;
   for (const key2 of getGamesColumnLeagueOrder()) {
-    count3 += filterGamesSpineSlateForOperationalSportsDay(leagues[key2] ?? [], now2).length;
+    count3 += filterGamesSpineSlateForOperationalSportsDay(leagues[key2] ?? [], now).length;
   }
   return count3;
 }
-function validateOperationalSlateReplacement(incoming, previousLeagues, now2 = /* @__PURE__ */ new Date()) {
-  const previousLeagueCount = countLeaguesWithTodaySlate(previousLeagues, now2);
-  const incomingLeagueCount = countLeaguesWithTodaySlate(incoming.leagues ?? {}, now2);
+function validateOperationalSlateReplacement(incoming, previousLeagues, now = /* @__PURE__ */ new Date()) {
+  const previousLeagueCount = countLeaguesWithTodaySlate(previousLeagues, now);
+  const incomingLeagueCount = countLeaguesWithTodaySlate(incoming.leagues ?? {}, now);
   if (previousLeagueCount === 0) {
     return { accepted: true };
   }
@@ -28652,29 +28673,29 @@ function validateOperationalSlateReplacement(incoming, previousLeagues, now2 = /
   if (previousLeagueCount >= 3 && incomingLeagueCount <= 1) {
     return { accepted: false, reason: "incoming_near_single_league_slate" };
   }
-  const previousGameCount = countOperationalSportsDayGames(previousLeagues, now2);
-  const incomingGameCount = countOperationalSportsDayGames(incoming.leagues ?? {}, now2);
+  const previousGameCount = countOperationalSportsDayGames(previousLeagues, now);
+  const incomingGameCount = countOperationalSportsDayGames(incoming.leagues ?? {}, now);
   if (previousGameCount >= 6 && incomingGameCount < Math.ceil(previousGameCount * 0.4)) {
     return { accepted: false, reason: "incoming_game_count_regression" };
   }
   return { accepted: true };
 }
-function filterOperationalSpineContinuityCandidates(games, now2) {
+function filterOperationalSpineContinuityCandidates(games, now) {
   const ingestCycle = useCanonicalLiveGameStore.getState().ingestSequence;
   const liveRecencyById = useRecentFinalizedGamesStore.getState().liveRecencyById;
   return games.filter(
-    (game) => isOperationalSpineContinuityCandidate(game, ingestCycle, liveRecencyById, now2)
+    (game) => isOperationalSpineContinuityCandidate(game, ingestCycle, liveRecencyById, now)
   );
 }
-function mergeLeagueSlateContinuity(previousGames, incomingGames, now2) {
-  const prevToday = filterGamesSpineSlateForOperationalSportsDay(previousGames, now2);
-  const incomingToday = filterGamesSpineSlateForOperationalSportsDay(incomingGames, now2);
+function mergeLeagueSlateContinuity(previousGames, incomingGames, now) {
+  const prevToday = filterGamesSpineSlateForOperationalSportsDay(previousGames, now);
+  const incomingToday = filterGamesSpineSlateForOperationalSportsDay(incomingGames, now);
   if (prevToday.length === 0) return [...incomingGames];
   if (incomingToday.length === 0) return [...incomingGames];
   const incomingIds = new Set(incomingToday.map((game) => game.id));
   const missingFromIncoming = filterOperationalSpineContinuityCandidates(
     prevToday.filter((game) => !incomingIds.has(game.id)),
-    now2
+    now
   );
   if (missingFromIncoming.length === 0) return [...incomingGames];
   const merged = [...incomingGames];
@@ -28686,26 +28707,26 @@ function mergeLeagueSlateContinuity(previousGames, incomingGames, now2) {
   }
   return merged;
 }
-function preserveMissingOperationalLeagueSections(incoming, previousLeagues, now2 = /* @__PURE__ */ new Date()) {
+function preserveMissingOperationalLeagueSections(incoming, previousLeagues, now = /* @__PURE__ */ new Date()) {
   const leagues = { ...incoming.leagues };
   let changed = false;
   for (const key2 of getGamesColumnLeagueOrder()) {
     const previousRows = previousLeagues[key2] ?? [];
-    const prevTodayCount = filterGamesSpineSlateForOperationalSportsDay(previousRows, now2).length;
+    const prevTodayCount = filterGamesSpineSlateForOperationalSportsDay(previousRows, now).length;
     const incomingRows = leagues[key2] ?? [];
-    const incomingTodayCount = filterGamesSpineSlateForOperationalSportsDay(incomingRows, now2).length;
+    const incomingTodayCount = filterGamesSpineSlateForOperationalSportsDay(incomingRows, now).length;
     if (prevTodayCount === 0) {
       continue;
     }
     if (incomingTodayCount > 0) {
-      const mergedRows = mergeLeagueSlateContinuity(previousRows, incomingRows, now2);
+      const mergedRows = mergeLeagueSlateContinuity(previousRows, incomingRows, now);
       if (mergedRows.length !== incomingRows.length) {
         leagues[key2] = mergedRows;
         changed = true;
       }
       continue;
     }
-    const continuityRows = filterOperationalSpineContinuityCandidates(previousRows, now2);
+    const continuityRows = filterOperationalSpineContinuityCandidates(previousRows, now);
     if (continuityRows.length === 0) continue;
     leagues[key2] = continuityRows.map((game) => ({ ...game }));
     changed = true;
@@ -28713,16 +28734,16 @@ function preserveMissingOperationalLeagueSections(incoming, previousLeagues, now
   if (!changed) return incoming;
   return { ...incoming, leagues };
 }
-function rejectInvalidOperationalSlateReplacement(incoming, previousLeagues, now2 = /* @__PURE__ */ new Date()) {
-  const validation = validateOperationalSlateReplacement(incoming, previousLeagues, now2);
+function rejectInvalidOperationalSlateReplacement(incoming, previousLeagues, now = /* @__PURE__ */ new Date()) {
+  const validation = validateOperationalSlateReplacement(incoming, previousLeagues, now);
   if (validation.accepted) return null;
   if (define_import_meta_env_default.DEV) {
     console.warn(`${LOG10} Rejected invalid operational slate replacement`, {
       reason: validation.reason,
-      previousLeagues: countLeaguesWithTodaySlate(previousLeagues, now2),
-      incomingLeagues: countLeaguesWithTodaySlate(incoming.leagues ?? {}, now2),
-      previousGames: countOperationalSportsDayGames(previousLeagues, now2),
-      incomingGames: countOperationalSportsDayGames(incoming.leagues ?? {}, now2)
+      previousLeagues: countLeaguesWithTodaySlate(previousLeagues, now),
+      incomingLeagues: countLeaguesWithTodaySlate(incoming.leagues ?? {}, now),
+      previousGames: countOperationalSportsDayGames(previousLeagues, now),
+      incomingGames: countOperationalSportsDayGames(incoming.leagues ?? {}, now)
     });
   }
   return {
@@ -28730,10 +28751,10 @@ function rejectInvalidOperationalSlateReplacement(incoming, previousLeagues, now
     leagues: { ...previousLeagues }
   };
 }
-function applyGamesSpineSnapshotStability(incoming, previousLeagues, now2 = /* @__PURE__ */ new Date()) {
-  const rejected = rejectInvalidOperationalSlateReplacement(incoming, previousLeagues, now2);
+function applyGamesSpineSnapshotStability(incoming, previousLeagues, now = /* @__PURE__ */ new Date()) {
+  const rejected = rejectInvalidOperationalSlateReplacement(incoming, previousLeagues, now);
   if (rejected) return rejected;
-  return preserveMissingOperationalLeagueSections(incoming, previousLeagues, now2);
+  return preserveMissingOperationalLeagueSections(incoming, previousLeagues, now);
 }
 
 // ../grarf/desktop/src/lib/gamesSpine/preserveLiveStatusOnIngest.ts
@@ -29085,7 +29106,7 @@ function recordTransitionCoverageCycle(input) {
   });
   const harvestedById = new Map(candidates.map((c2) => [c2.game.id, c2.reason]));
   const allIds = /* @__PURE__ */ new Set([...prevById.keys(), ...incomingById.keys()]);
-  const now2 = (/* @__PURE__ */ new Date()).toISOString();
+  const now = (/* @__PURE__ */ new Date()).toISOString();
   lastIngestCycle = input.ingestCycle;
   for (const id of allIds) {
     const prev = prevById.get(id);
@@ -29136,7 +29157,7 @@ function recordTransitionCoverageCycle(input) {
     }
     const cycleEvent = {
       ingestCycle: input.ingestCycle,
-      timestamp: now2,
+      timestamp: now,
       previousStatus: prev?.status ?? null,
       incomingStatus: incoming?.status ?? null,
       inPrevious,
@@ -29894,11 +29915,11 @@ useCanonicalLiveGameStore.subscribe((canonical, previousCanonical) => {
 init_define_import_meta_env();
 var import_zustand6 = __toESM(require_zustand(), 1);
 function initialState() {
-  const now2 = Date.now();
+  const now = Date.now();
   return {
     mode: "CATCH_UP",
     source: "automatic",
-    changedAt: now2,
+    changedAt: now,
     manuallyOverridden: false
   };
 }
@@ -29949,8 +29970,8 @@ var import_zustand7 = __toESM(require_zustand(), 1);
 init_define_import_meta_env();
 var LOG11 = "[CommandBriefing]";
 var DAY_MS = 24 * 60 * 60 * 1e3;
-function getBriefingOperationalTodayKey(now2 = /* @__PURE__ */ new Date()) {
-  return getOperationalSportsDayDateKey(now2, GRARF_OPERATIONAL_SLATE_TIMEZONE);
+function getBriefingOperationalTodayKey(now = /* @__PURE__ */ new Date()) {
+  return getOperationalSportsDayDateKey(now, GRARF_OPERATIONAL_SLATE_TIMEZONE);
 }
 function formatBriefingDateKey(date = /* @__PURE__ */ new Date()) {
   return getBriefingOperationalTodayKey(date);
@@ -29965,8 +29986,8 @@ function weekdayLabelForOperationalDateKey(key2) {
     timeZone: GRARF_OPERATIONAL_SLATE_TIMEZONE
   }).toUpperCase();
 }
-function getBriefingDateOptions(now2 = /* @__PURE__ */ new Date()) {
-  const todayKey = getBriefingOperationalTodayKey(now2);
+function getBriefingDateOptions(now = /* @__PURE__ */ new Date()) {
+  const todayKey = getBriefingOperationalTodayKey(now);
   const options = [];
   for (let i2 = 0; i2 < 7; i2++) {
     const key2 = offsetOperationalDateKey(todayKey, i2, GRARF_OPERATIONAL_SLATE_TIMEZONE);
@@ -29981,16 +30002,16 @@ function getBriefingDateOptions(now2 = /* @__PURE__ */ new Date()) {
   }
   return options;
 }
-function legacyBrowserLocalTodayKey(now2 = /* @__PURE__ */ new Date()) {
-  const y2 = now2.getFullYear();
-  const m2 = String(now2.getMonth() + 1).padStart(2, "0");
-  const d2 = String(now2.getDate()).padStart(2, "0");
+function legacyBrowserLocalTodayKey(now = /* @__PURE__ */ new Date()) {
+  const y2 = now.getFullYear();
+  const m2 = String(now.getMonth() + 1).padStart(2, "0");
+  const d2 = String(now.getDate()).padStart(2, "0");
   return `${y2}-${m2}-${d2}`;
 }
-function resolveActiveBriefingDateKey(selectedKey, now2 = /* @__PURE__ */ new Date()) {
-  const sportsDayKey = getBriefingOperationalTodayKey(now2);
+function resolveActiveBriefingDateKey(selectedKey, now = /* @__PURE__ */ new Date()) {
+  const sportsDayKey = getBriefingOperationalTodayKey(now);
   if (selectedKey === sportsDayKey) return sportsDayKey;
-  const calendarTodayCentral = getOperationalCalendarDateKey(now2, GRARF_OPERATIONAL_SLATE_TIMEZONE);
+  const calendarTodayCentral = getOperationalCalendarDateKey(now, GRARF_OPERATIONAL_SLATE_TIMEZONE);
   if (selectedKey === calendarTodayCentral && calendarTodayCentral !== sportsDayKey) {
     if (define_import_meta_env_default.DEV) {
       console.log(`${LOG11} Mapped calendar today to operational sports day`, {
@@ -30000,7 +30021,7 @@ function resolveActiveBriefingDateKey(selectedKey, now2 = /* @__PURE__ */ new Da
     }
     return sportsDayKey;
   }
-  if (selectedKey === legacyBrowserLocalTodayKey(now2) && selectedKey !== sportsDayKey) {
+  if (selectedKey === legacyBrowserLocalTodayKey(now) && selectedKey !== sportsDayKey) {
     if (define_import_meta_env_default.DEV) {
       console.log(`${LOG11} Migrated legacy local today to operational sports day`, {
         was: selectedKey,
@@ -30027,8 +30048,8 @@ function resolveActiveBriefingDateKey(selectedKey, now2 = /* @__PURE__ */ new Da
   }
   return selectedKey;
 }
-function daysUntilBriefingDate(key2, now2 = /* @__PURE__ */ new Date()) {
-  const todayKey = getBriefingOperationalTodayKey(now2);
+function daysUntilBriefingDate(key2, now = /* @__PURE__ */ new Date()) {
+  const todayKey = getBriefingOperationalTodayKey(now);
   const todayStart = parseBriefingDateKey(todayKey).getTime();
   const target = parseBriefingDateKey(key2).getTime();
   return Math.round((target - todayStart) / DAY_MS);
@@ -30899,41 +30920,41 @@ function resolveGrarfCompetitionActiveCalendarWindow(leagueKey, leagueGames = []
   }
   return merged;
 }
-function leagueHasOperationalActivityOnCalendarDate(leagueGames, calendarDateKey, now2) {
-  const yesterdayKey2 = getOperationalSportsDayYesterdayDateKey(now2);
+function leagueHasOperationalActivityOnCalendarDate(leagueGames, calendarDateKey, now) {
+  const yesterdayKey2 = getOperationalSportsDayYesterdayDateKey(now);
   for (const game of leagueGames) {
     if (game.status === "live") return true;
-    if (game.status === "final" && (isGameOnGamesSpineOperationalDate(game, calendarDateKey, now2) || isGameOnGamesSpineOperationalDate(game, yesterdayKey2, now2))) {
+    if (game.status === "final" && (isGameOnGamesSpineOperationalDate(game, calendarDateKey, now) || isGameOnGamesSpineOperationalDate(game, yesterdayKey2, now))) {
       return true;
     }
-    if (game.status === "scheduled" && isGameOnGamesSpineOperationalDate(game, calendarDateKey, now2)) {
+    if (game.status === "scheduled" && isGameOnGamesSpineOperationalDate(game, calendarDateKey, now)) {
       return true;
     }
   }
   return false;
 }
-function isGrarfCompetitionActiveOnCalendarDate(leagueKey, leagueGames, calendarDateKey = getOperationalCalendarDateKey(), now2 = /* @__PURE__ */ new Date()) {
+function isGrarfCompetitionActiveOnCalendarDate(leagueKey, leagueGames, calendarDateKey = getOperationalCalendarDateKey(), now = /* @__PURE__ */ new Date()) {
   const window2 = resolveGrarfCompetitionActiveCalendarWindow(leagueKey, leagueGames);
   if (window2) {
     return isDateKeyInWindow(calendarDateKey, window2);
   }
-  return leagueHasOperationalActivityOnCalendarDate(leagueGames, getOperationalSportsDayDateKey(now2), now2);
+  return leagueHasOperationalActivityOnCalendarDate(leagueGames, getOperationalSportsDayDateKey(now), now);
 }
-function isGrarfGameCompetitionActiveOnCalendarDate(game, calendarDateKey = getOperationalCalendarDateKey(), now2 = /* @__PURE__ */ new Date()) {
+function isGrarfGameCompetitionActiveOnCalendarDate(game, calendarDateKey = getOperationalCalendarDateKey(), now = /* @__PURE__ */ new Date()) {
   const leagueKey = game.league ?? "MLB";
   const gameWindow = resolveWindowFromManualGameMetadata(game) ?? resolveWindowFromGolfGame(game);
   if (gameWindow) {
     return isDateKeyInWindow(calendarDateKey, gameWindow);
   }
-  return isGrarfCompetitionActiveOnCalendarDate(leagueKey, [game], calendarDateKey, now2);
+  return isGrarfCompetitionActiveOnCalendarDate(leagueKey, [game], calendarDateKey, now);
 }
 
 // ../grarf/desktop/src/lib/gamesSpine/filterGamesSpineSlateForObjectsSpineComingUp.ts
-function filterGamesSpineSlateForObjectsSpineComingUp(games, now2 = /* @__PURE__ */ new Date()) {
+function filterGamesSpineSlateForObjectsSpineComingUp(games, now = /* @__PURE__ */ new Date()) {
   if (games.length === 0) return [];
-  const calendarDateKey = getOperationalCalendarDateKey(now2);
-  return filterGamesSpineSlateForTodayUpcoming(games, now2).filter(
-    (game) => isGrarfGameCompetitionActiveOnCalendarDate(game, calendarDateKey, now2)
+  const calendarDateKey = getOperationalCalendarDateKey(now);
+  return filterGamesSpineSlateForTodayUpcoming(games, now).filter(
+    (game) => isGrarfGameCompetitionActiveOnCalendarDate(game, calendarDateKey, now)
   );
 }
 
@@ -31265,31 +31286,31 @@ function isManualLeMans2026VisibleOnOperationalDate(operationalDateKey = getOper
   const wec = resolveLeMansEventOverride(operationalDateKey);
   return wec?.operationalDateKeys.includes(operationalDateKey) ?? false;
 }
-function resolveManualLeMans2026Status(now2 = /* @__PURE__ */ new Date()) {
-  const operationalDateKey = getOperationalSportsDayDateKey(now2);
+function resolveManualLeMans2026Status(now = /* @__PURE__ */ new Date()) {
+  const operationalDateKey = getOperationalSportsDayDateKey(now);
   const event = resolveLeMansEventOverride(operationalDateKey);
   if (!event) return "final";
   const startTimeMs = parseManualGamesSpineEventTimeMs(event.startTime, event.timeZone);
   const endTimeMs = parseManualGamesSpineEventTimeMs(event.endTime, event.timeZone);
-  return resolveManualGamesSpineStatus(now2.getTime(), startTimeMs, endTimeMs);
+  return resolveManualGamesSpineStatus(now.getTime(), startTimeMs, endTimeMs);
 }
-function formatManualLeMans2026TimeRemaining(now2 = /* @__PURE__ */ new Date()) {
-  const operationalDateKey = getOperationalSportsDayDateKey(now2);
+function formatManualLeMans2026TimeRemaining(now = /* @__PURE__ */ new Date()) {
+  const operationalDateKey = getOperationalSportsDayDateKey(now);
   const event = resolveLeMansEventOverride(operationalDateKey);
   if (!event) return "Time Remaining: 0h 0m";
   const endTimeMs = parseManualGamesSpineEventTimeMs(event.endTime, event.timeZone);
-  const remainingMs = Math.max(0, endTimeMs - now2.getTime());
+  const remainingMs = Math.max(0, endTimeMs - now.getTime());
   const totalMinutes = Math.floor(remainingMs / 6e4);
   const hours = Math.floor(totalMinutes / 60);
   const minutes = totalMinutes % 60;
   return `Time Remaining: ${hours}h ${minutes}m`;
 }
-function resolveManualLeMans2026SpineGame(now2 = /* @__PURE__ */ new Date()) {
-  const operationalDateKey = getOperationalSportsDayDateKey(now2);
+function resolveManualLeMans2026SpineGame(now = /* @__PURE__ */ new Date()) {
+  const operationalDateKey = getOperationalSportsDayDateKey(now);
   const event = resolveLeMansEventOverride(operationalDateKey);
   const startTimeMs = resolveLeMansStartTimeMs(operationalDateKey);
-  const status = resolveManualLeMans2026Status(now2);
-  const statusLine = status === "live" ? formatManualLeMans2026TimeRemaining(now2) : status === "final" ? "Completed" : void 0;
+  const status = resolveManualLeMans2026Status(now);
+  const statusLine = status === "live" ? formatManualLeMans2026TimeRemaining(now) : status === "final" ? "Completed" : void 0;
   return {
     id: event.gameId,
     grarfGameId: event.gameId,
@@ -31318,24 +31339,24 @@ function resolveManualLeMans2026SpineGame(now2 = /* @__PURE__ */ new Date()) {
     startTimeMs,
     scheduledDateKey: event.scheduledDateKey,
     league: "WEC",
-    lastUpdated: now2.toISOString()
+    lastUpdated: now.toISOString()
   };
 }
-function resolveWecOperationalLeagueGames(now2 = /* @__PURE__ */ new Date()) {
-  const operationalDateKey = getOperationalSportsDayDateKey(now2);
+function resolveWecOperationalLeagueGames(now = /* @__PURE__ */ new Date()) {
+  const operationalDateKey = getOperationalSportsDayDateKey(now);
   if (!isManualLeMans2026VisibleOnOperationalDate(operationalDateKey)) {
     return [];
   }
-  return [resolveManualLeMans2026SpineGame(now2)];
+  return [resolveManualLeMans2026SpineGame(now)];
 }
-function refreshManualLeMans2026SpineGameIfNeeded(game, now2 = /* @__PURE__ */ new Date()) {
+function refreshManualLeMans2026SpineGameIfNeeded(game, now = /* @__PURE__ */ new Date()) {
   if (!isManualLeMans2026GameId(game.id)) return game;
-  return resolveManualLeMans2026SpineGame(now2);
+  return resolveManualLeMans2026SpineGame(now);
 }
-function anyManualLeMans2026Live(now2 = /* @__PURE__ */ new Date()) {
-  const operationalDateKey = getOperationalSportsDayDateKey(now2);
+function anyManualLeMans2026Live(now = /* @__PURE__ */ new Date()) {
+  const operationalDateKey = getOperationalSportsDayDateKey(now);
   if (!isManualLeMans2026VisibleOnOperationalDate(operationalDateKey)) return false;
-  return resolveManualLeMans2026Status(now2) === "live";
+  return resolveManualLeMans2026Status(now) === "live";
 }
 
 // ../grarf/shared/domain/gamesSpine/manualTourDeFranceSpine.ts
@@ -31353,8 +31374,8 @@ function resolveTourDeFranceStageStatus(nowMs3, startTimeMs, endTimeMs) {
 function isTourDeFranceSpineGameId(gameId) {
   return gameId.startsWith(TOUR_DE_FRANCE_GAME_ID_PREFIX);
 }
-function resolveTourDeFranceSpineGame(stage2, now2) {
-  const nowMs3 = now2.getTime();
+function resolveTourDeFranceSpineGame(stage2, now) {
+  const nowMs3 = now.getTime();
   const status = resolveTourDeFranceStageStatus(nowMs3, stage2.startTimeMs, stage2.endTimeMs);
   const broadcasts = [...stage2.broadcast];
   const eventName = `Stage ${stage2.stage}`;
@@ -31379,29 +31400,29 @@ function resolveTourDeFranceSpineGame(stage2, now2) {
     startTimeMs: stage2.startTimeMs,
     scheduledDateKey: stage2.date,
     league: "TDF",
-    lastUpdated: now2.toISOString()
+    lastUpdated: now.toISOString()
   };
 }
-function anyTourDeFranceStageLive(now2 = /* @__PURE__ */ new Date()) {
-  const nowMs3 = now2.getTime();
+function anyTourDeFranceStageLive(now = /* @__PURE__ */ new Date()) {
+  const nowMs3 = now.getTime();
   return resolveTourDeFranceStages().some(
     (stage2) => resolveTourDeFranceStageStatus(nowMs3, stage2.startTimeMs, stage2.endTimeMs) === "live"
   );
 }
-function resolveTdfOperationalLeagueGames(now2 = /* @__PURE__ */ new Date()) {
-  const operationalDateKey = getOperationalSportsDayDateKey(now2);
-  return resolveTourDeFranceStages().filter((stage2) => stage2.date === operationalDateKey).map((stage2) => resolveTourDeFranceSpineGame(stage2, now2));
+function resolveTdfOperationalLeagueGames(now = /* @__PURE__ */ new Date()) {
+  const operationalDateKey = getOperationalSportsDayDateKey(now);
+  return resolveTourDeFranceStages().filter((stage2) => stage2.date === operationalDateKey).map((stage2) => resolveTourDeFranceSpineGame(stage2, now));
 }
-function resolveTourDeFranceSpineGameById(gameId, now2 = /* @__PURE__ */ new Date()) {
+function resolveTourDeFranceSpineGameById(gameId, now = /* @__PURE__ */ new Date()) {
   if (!isTourDeFranceSpineGameId(gameId)) return void 0;
   const stageNumber = Number.parseInt(gameId.match(/manual-tdf-stage-(\d+)-/)?.[1] ?? "", 10);
   const stage2 = resolveTourDeFranceStages().find((entry4) => entry4.stage === stageNumber);
   if (!stage2) return void 0;
-  return resolveTourDeFranceSpineGame(stage2, now2);
+  return resolveTourDeFranceSpineGame(stage2, now);
 }
-function refreshManualTourDeFranceSpineGameIfNeeded(game, now2 = /* @__PURE__ */ new Date()) {
+function refreshManualTourDeFranceSpineGameIfNeeded(game, now = /* @__PURE__ */ new Date()) {
   if (!isTourDeFranceSpineGameId(game.id)) return game;
-  const resolved = resolveTourDeFranceSpineGameById(game.id, now2);
+  const resolved = resolveTourDeFranceSpineGameById(game.id, now);
   return resolved ?? game;
 }
 
@@ -31420,29 +31441,29 @@ var mergeOperationalCache = {
   nowBucket: -1,
   result: {}
 };
-function operationalNowBucket(now2) {
-  return Math.floor(now2.getTime() / 6e4);
+function operationalNowBucket(now) {
+  return Math.floor(now.getTime() / 6e4);
 }
-function resolveManualOperationalLeagueGames(now2 = /* @__PURE__ */ new Date()) {
-  const nowBucket = operationalNowBucket(now2);
+function resolveManualOperationalLeagueGames(now = /* @__PURE__ */ new Date()) {
+  const nowBucket = operationalNowBucket(now);
   if (manualOperationalCache.nowBucket === nowBucket) {
     return manualOperationalCache.result;
   }
   const out = {};
   for (const [key2, resolve] of Object.entries(MANUAL_OPERATIONAL_LEAGUE_RESOLVERS)) {
     if (!resolve) continue;
-    const rows = resolve(now2);
+    const rows = resolve(now);
     if (rows.length > 0) out[key2] = rows;
   }
   manualOperationalCache = { nowBucket, result: out };
   return out;
 }
-function mergeOperationalLeagueGames(leagues, now2 = /* @__PURE__ */ new Date()) {
-  const nowBucket = operationalNowBucket(now2);
+function mergeOperationalLeagueGames(leagues, now = /* @__PURE__ */ new Date()) {
+  const nowBucket = operationalNowBucket(now);
   if (mergeOperationalCache.leagues === leagues && mergeOperationalCache.nowBucket === nowBucket) {
     return mergeOperationalCache.result;
   }
-  const manual = resolveManualOperationalLeagueGames(now2);
+  const manual = resolveManualOperationalLeagueGames(now);
   if (Object.keys(manual).length === 0) {
     mergeOperationalCache = { leagues, nowBucket, result: leagues };
     return leagues;
@@ -31780,7 +31801,7 @@ function recordExtensionOperationalPollFailure(error) {
     );
   }
 }
-function buildExtensionOperationalIngestHealth(now2 = /* @__PURE__ */ new Date()) {
+function buildExtensionOperationalIngestHealth(now = /* @__PURE__ */ new Date()) {
   const host = isGrarfExtensionRenderer() ? "extension" : "other";
   const config = getOperationalIngestConfig();
   const ingestMeta = getLastTransportIngest();
@@ -31799,11 +31820,11 @@ function buildExtensionOperationalIngestHealth(now2 = /* @__PURE__ */ new Date()
       degradedReason = "no_successful_hydrate_after_polls";
     } else {
       const staleThresholdMs = config.pollIntervalMs * 2;
-      const pollRecentlySucceeded = lastPollSuccessAtMs != null && now2.getTime() - lastPollSuccessAtMs <= staleThresholdMs;
+      const pollRecentlySucceeded = lastPollSuccessAtMs != null && now.getTime() - lastPollSuccessAtMs <= staleThresholdMs;
       if (!pollRecentlySucceeded) {
         const generatedAt = lastHydratedTransportGeneratedAt ?? ingestMeta?.generatedAt ?? null;
         if (generatedAt) {
-          const ageMs = now2.getTime() - Date.parse(generatedAt);
+          const ageMs = now.getTime() - Date.parse(generatedAt);
           if (Number.isFinite(ageMs) && ageMs > staleThresholdMs) {
             isDegraded = true;
             degradedReason = `transport_stale_age_ms_${ageMs}`;
@@ -34896,12 +34917,12 @@ function resolveOperationalEnrichmentScheduledCatalogTtlMs() {
 function resolveOperationalEnrichmentHistoricalCatalogTtlMs() {
   return 24 * 60 * 60 * 1e3;
 }
-function resolveOperationalEnrichmentDateKeyTtlMs(dateKey, now2 = /* @__PURE__ */ new Date()) {
+function resolveOperationalEnrichmentDateKeyTtlMs(dateKey, now = /* @__PURE__ */ new Date()) {
   const normalized = dateKey.trim();
   if (!/^\d{8}$/.test(normalized)) return resolveOperationalEnrichmentLiveCatalogTtlMs();
-  const y2 = now2.getUTCFullYear();
-  const m2 = String(now2.getUTCMonth() + 1).padStart(2, "0");
-  const d2 = String(now2.getUTCDate()).padStart(2, "0");
+  const y2 = now.getUTCFullYear();
+  const m2 = String(now.getUTCMonth() + 1).padStart(2, "0");
+  const d2 = String(now.getUTCDate()).padStart(2, "0");
   const todayKey = `${y2}${m2}${d2}`;
   if (normalized === todayKey) return resolveOperationalEnrichmentLiveCatalogTtlMs();
   if (normalized < todayKey) return resolveOperationalEnrichmentHistoricalCatalogTtlMs();
@@ -36389,8 +36410,8 @@ async function fetchFoxHtml2(url) {
   if (!res.ok) throw new Error(`FOX page fetch failed: ${res.status} ${url}`);
   return res.text();
 }
-async function fetchFoxWorldCupEventCatalog(now2 = Date.now(), forceRefresh = false) {
-  if (!forceRefresh && cachedCatalog && now2 - cachedAtMs < CACHE_TTL_MS) {
+async function fetchFoxWorldCupEventCatalog(now = Date.now(), forceRefresh = false) {
+  if (!forceRefresh && cachedCatalog && now - cachedAtMs < CACHE_TTL_MS) {
     return cachedCatalog;
   }
   const rows = [];
@@ -36417,7 +36438,7 @@ async function fetchFoxWorldCupEventCatalog(now2 = Date.now(), forceRefresh = fa
     }
   }
   cachedCatalog = mergeCatalogRows(rows);
-  cachedAtMs = now2;
+  cachedAtMs = now;
   return cachedCatalog;
 }
 
@@ -36699,8 +36720,8 @@ async function fetchCatalogFromUrl(url) {
   return Array.isArray(json.events) ? json.events : [];
 }
 async function fetchNflXGametimeCatalog() {
-  const now2 = Date.now();
-  if (cachedCatalog2 && now2 - cachedAtMs3 < CATALOG_CACHE_TTL_MS) {
+  const now = Date.now();
+  if (cachedCatalog2 && now - cachedAtMs3 < CATALOG_CACHE_TTL_MS) {
     return cachedCatalog2;
   }
   if (inFlight2) return inFlight2;
@@ -36808,16 +36829,16 @@ function getCachedStreamUrl(provider, gameId) {
   return row.streamUrl;
 }
 function setCachedStreamUrl(provider, gameId, streamUrl, ttlMs = DEFAULT_TTL_MS2) {
-  const now2 = Date.now();
+  const now = Date.now();
   const entries = read();
   entries[cacheKey(provider, gameId)] = {
     provider,
     gameId,
     streamUrl,
     streamProvider: provider,
-    resolvedAt: new Date(now2).toISOString(),
-    expiresAt: new Date(now2 + ttlMs).toISOString(),
-    fetchedAt: now2
+    resolvedAt: new Date(now).toISOString(),
+    expiresAt: new Date(now + ttlMs).toISOString(),
+    fetchedAt: now
   };
   write(entries);
 }
@@ -36856,8 +36877,8 @@ var cachedCatalog3 = null;
 var cachedAtMs4 = 0;
 var inFlight3 = null;
 async function fetchNflPrimeVideoCatalog() {
-  const now2 = Date.now();
-  if (cachedCatalog3 && now2 - cachedAtMs4 < CATALOG_CACHE_TTL_MS2) {
+  const now = Date.now();
+  if (cachedCatalog3 && now - cachedAtMs4 < CATALOG_CACHE_TTL_MS2) {
     return cachedCatalog3;
   }
   if (inFlight3) return inFlight3;
@@ -37129,8 +37150,8 @@ var cachedCatalog4 = null;
 var cachedAtMs5 = 0;
 var inFlight4 = null;
 async function fetchWnbaPrimeVideoLeaguePassCatalog() {
-  const now2 = Date.now();
-  if (cachedCatalog4 && now2 - cachedAtMs5 < CATALOG_CACHE_TTL_MS3) {
+  const now = Date.now();
+  if (cachedCatalog4 && now - cachedAtMs5 < CATALOG_CACHE_TTL_MS3) {
     return cachedCatalog4;
   }
   if (inFlight4) return inFlight4;
@@ -37879,47 +37900,47 @@ function isImportantLeagueLiveGame(game, spineBucketKey) {
   if (!isGameActivelyLive(game)) return false;
   return isImportantLeagueGame(game, spineBucketKey);
 }
-function isImportantLeagueUpcomingGame(game, spineBucketKey, now2 = /* @__PURE__ */ new Date()) {
+function isImportantLeagueUpcomingGame(game, spineBucketKey, now = /* @__PURE__ */ new Date()) {
   if (game.status !== "scheduled") return false;
-  const todayKey = getOperationalSportsDayDateKey(now2);
-  if (!isGameOnGamesSpineOperationalDate(game, todayKey, now2)) return false;
+  const todayKey = getOperationalSportsDayDateKey(now);
+  if (!isGameOnGamesSpineOperationalDate(game, todayKey, now)) return false;
   return isImportantLeagueGame(game, spineBucketKey);
 }
-function isAtLeastOneImportantLeagueLive(leagues, now2 = /* @__PURE__ */ new Date()) {
-  const todayKey = getOperationalSportsDayDateKey(now2);
+function isAtLeastOneImportantLeagueLive(leagues, now = /* @__PURE__ */ new Date()) {
+  const todayKey = getOperationalSportsDayDateKey(now);
   for (const [bucketKey, games] of Object.entries(leagues)) {
     if (!games?.length) continue;
     for (const game of games) {
-      if (!isGameOnGamesSpineOperationalDate(game, todayKey, now2)) continue;
+      if (!isGameOnGamesSpineOperationalDate(game, todayKey, now)) continue;
       if (isImportantLeagueLiveGame(game, bucketKey)) return true;
     }
   }
   return false;
 }
-function isAtLeastOneImportantLeagueUpcoming(leagues, now2 = /* @__PURE__ */ new Date()) {
+function isAtLeastOneImportantLeagueUpcoming(leagues, now = /* @__PURE__ */ new Date()) {
   for (const [bucketKey, games] of Object.entries(leagues)) {
     if (!games?.length) continue;
     for (const game of games) {
-      if (isImportantLeagueUpcomingGame(game, bucketKey, now2)) return true;
+      if (isImportantLeagueUpcomingGame(game, bucketKey, now)) return true;
     }
   }
   return false;
 }
 
 // ../grarf/desktop/src/lib/home/deriveCenterPaneApplicationMode.ts
-function deriveInitialCenterPaneApplicationModeFromGamesSpine(leagues, now2 = /* @__PURE__ */ new Date()) {
+function deriveInitialCenterPaneApplicationModeFromGamesSpine(leagues, now = /* @__PURE__ */ new Date()) {
   if (isGrarfWebRenderer2()) return "livetracker";
   for (const games of Object.values(leagues)) {
     if (!games?.length) continue;
-    for (const game of filterGamesSpineSlateForOperationalSportsDay(games, now2)) {
+    for (const game of filterGamesSpineSlateForOperationalSportsDay(games, now)) {
       if (isGameActivelyLive(game)) return "livetracker";
     }
   }
   return "sportscape";
 }
-function deriveCenterPaneApplicationModeFromImportantLeagues(leagues, now2 = /* @__PURE__ */ new Date()) {
-  if (isAtLeastOneImportantLeagueLive(leagues, now2)) return "livetracker";
-  if (isAtLeastOneImportantLeagueUpcoming(leagues, now2)) return "sportscape";
+function deriveCenterPaneApplicationModeFromImportantLeagues(leagues, now = /* @__PURE__ */ new Date()) {
+  if (isAtLeastOneImportantLeagueLive(leagues, now)) return "livetracker";
+  if (isAtLeastOneImportantLeagueUpcoming(leagues, now)) return "sportscape";
   return "browser";
 }
 
@@ -38912,11 +38933,11 @@ function resolveManualGamesSpineLeagueDisplayName(league2) {
 }
 
 // ../grarf/desktop/src/lib/gamesSpine/manual/convertManualGamesSpineDocument.ts
-function convertEventToMlbGame(league2, event, now2, operationalDateKey) {
+function convertEventToMlbGame(league2, event, now, operationalDateKey) {
   const startTimeMs = parseManualGamesSpineEventTimeMs2(event.startTime, league2.sourceTimeZone);
   const endTimeMs = parseManualGamesSpineEventTimeMs2(event.endTime, league2.sourceTimeZone);
   if (!Number.isFinite(startTimeMs) || !Number.isFinite(endTimeMs)) return null;
-  const nowMs3 = now2.getTime();
+  const nowMs3 = now.getTime();
   const status = resolveManualGamesSpineStatus2(nowMs3, startTimeMs, endTimeMs);
   const gameId = manualGamesSpineEventId(league2.league, event.eventName, event.date);
   const watchOverride = resolveOperationsDateEntry(operationalDateKey).manualGameOverrides[gameId];
@@ -38970,7 +38991,7 @@ function convertEventToMlbGame(league2, event, now2, operationalDateKey) {
     }
   };
 }
-function convertManualGamesSpineDocument(document2, now2 = /* @__PURE__ */ new Date(), operationalDateKey = getOperationalSportsDayDateKey(now2)) {
+function convertManualGamesSpineDocument(document2, now = /* @__PURE__ */ new Date(), operationalDateKey = getOperationalSportsDayDateKey(now)) {
   const merged = mergeBundledGamesSpineManualDocument(document2 ?? { leagues: [] }, operationalDateKey);
   if (!merged.leagues.length) return [];
   const sections = [];
@@ -38978,7 +38999,7 @@ function convertManualGamesSpineDocument(document2, now2 = /* @__PURE__ */ new D
     const games = [];
     for (const event of league2.games) {
       if (event.date !== operationalDateKey) continue;
-      const row = convertEventToMlbGame(league2, event, now2, operationalDateKey);
+      const row = convertEventToMlbGame(league2, event, now, operationalDateKey);
       if (row) games.push(row);
     }
     if (games.length === 0) continue;
@@ -39113,10 +39134,10 @@ function findGamesSpineGameById(gameId, consumerId = "find_games_spine_game") {
   const operational = findLiveGameById(gameId, consumerId);
   if (operational) return operational;
   const document2 = useGamesSpineManualStore.getState().document;
-  const now2 = /* @__PURE__ */ new Date();
+  const now = /* @__PURE__ */ new Date();
   const manualGames = flattenManualGamesSpineGames(
-    convertManualGamesSpineDocument(document2, now2)
-  ).map((game) => refreshManualGamesSpineGameIfNeeded(game, now2));
+    convertManualGamesSpineDocument(document2, now)
+  ).map((game) => refreshManualGamesSpineGameIfNeeded(game, now));
   return manualGames.find((game) => game.id === gameId || game.grarfGameId === gameId);
 }
 function mergeFotmobOperationalGameFields(primary, fallback) {
@@ -40452,12 +40473,12 @@ async function fetchPllSeasonScheduleUncached(seasonYear) {
 }
 async function fetchPllSeasonSchedule(seasonYear) {
   const cached = scheduleCacheBySeason.get(seasonYear);
-  const now2 = Date.now();
-  if (cached && now2 - cached.fetchedAt < SCHEDULE_CACHE_TTL_MS2) {
+  const now = Date.now();
+  if (cached && now - cached.fetchedAt < SCHEDULE_CACHE_TTL_MS2) {
     return cached.games;
   }
   const games = await fetchPllSeasonScheduleUncached(seasonYear);
-  scheduleCacheBySeason.set(seasonYear, { fetchedAt: now2, games });
+  scheduleCacheBySeason.set(seasonYear, { fetchedAt: now, games });
   return games;
 }
 
@@ -40702,7 +40723,8 @@ var SOCCER_LEAGUE_KEYS3 = /* @__PURE__ */ new Set([
   "SAUDI",
   "SUPERLIG",
   "USLCUP",
-  "WORLDCUP"
+  "WORLDCUP",
+  "BRA1"
 ]);
 var VALID_LEAGUE_KEYS = new Set(getGamesColumnLeagueOrder());
 function parseEspnGameIdFromRowId(gameId) {
@@ -41291,8 +41313,8 @@ var ESPN_FETCH_UA2 = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKi
 var watchHomeCache = null;
 var WATCH_HOME_CACHE_TTL_MS = 3e4;
 async function fetchEspnWatchHomeListings() {
-  const now2 = Date.now();
-  if (watchHomeCache && now2 - watchHomeCache.fetchedAt < WATCH_HOME_CACHE_TTL_MS) {
+  const now = Date.now();
+  if (watchHomeCache && now - watchHomeCache.fetchedAt < WATCH_HOME_CACHE_TTL_MS) {
     return watchHomeCache.listings;
   }
   try {
@@ -41303,7 +41325,7 @@ async function fetchEspnWatchHomeListings() {
     if (!res.ok) return watchHomeCache?.listings ?? [];
     const json = await res.json();
     const listings = parseEspnWatchHomeListings(json);
-    watchHomeCache = { fetchedAt: now2, listings };
+    watchHomeCache = { fetchedAt: now, listings };
     return listings;
   } catch {
     return watchHomeCache?.listings ?? [];
@@ -41421,8 +41443,8 @@ function parseWimbledonCatalogListings(json) {
   return listings;
 }
 async function fetchWimbledonEspnWatchCatalog() {
-  const now2 = Date.now();
-  if (catalogCache && now2 - catalogCache.fetchedAt < CATALOG_CACHE_TTL_MS4) {
+  const now = Date.now();
+  if (catalogCache && now - catalogCache.fetchedAt < CATALOG_CACHE_TTL_MS4) {
     return catalogCache.listings;
   }
   try {
@@ -41432,7 +41454,7 @@ async function fetchWimbledonEspnWatchCatalog() {
     if (!res.ok) return catalogCache?.listings ?? [];
     const json = await res.json();
     const listings = parseWimbledonCatalogListings(json);
-    catalogCache = { fetchedAt: now2, listings };
+    catalogCache = { fetchedAt: now, listings };
     return listings;
   } catch {
     return catalogCache?.listings ?? [];
@@ -41567,8 +41589,8 @@ function wimbledonFeedMatchInTournamentYear(match, tournamentYear) {
 async function fetchWimbledonDraw(year, drawCode) {
   const cacheKey3 = invalidDrawCacheKey(year, drawCode);
   const invalidCached = invalidDrawCache.get(cacheKey3);
-  const now2 = Date.now();
-  if (invalidCached && now2 - invalidCached.fetchedAt < INVALID_DRAW_CACHE_TTL_MS) {
+  const now = Date.now();
+  if (invalidCached && now - invalidCached.fetchedAt < INVALID_DRAW_CACHE_TTL_MS) {
     return [];
   }
   try {
@@ -41582,28 +41604,28 @@ async function fetchWimbledonDraw(year, drawCode) {
       }
     });
     if (!res.ok || /robots\.txt$/i.test(res.url)) {
-      invalidDrawCache.set(cacheKey3, { fetchedAt: now2 });
+      invalidDrawCache.set(cacheKey3, { fetchedAt: now });
       return [];
     }
     const text2 = await res.text();
     if (!text2.trim().startsWith("{")) {
-      invalidDrawCache.set(cacheKey3, { fetchedAt: now2 });
+      invalidDrawCache.set(cacheKey3, { fetchedAt: now });
       return [];
     }
     let json;
     try {
       json = JSON.parse(text2);
     } catch {
-      invalidDrawCache.set(cacheKey3, { fetchedAt: now2 });
+      invalidDrawCache.set(cacheKey3, { fetchedAt: now });
       return [];
     }
     if (!isValidWimbledonDrawPayload(json)) {
-      invalidDrawCache.set(cacheKey3, { fetchedAt: now2 });
+      invalidDrawCache.set(cacheKey3, { fetchedAt: now });
       return [];
     }
     return parseWimbledonDrawMatches(drawCode, json);
   } catch {
-    invalidDrawCache.set(cacheKey3, { fetchedAt: now2 });
+    invalidDrawCache.set(cacheKey3, { fetchedAt: now });
     return [];
   }
 }
@@ -41653,16 +41675,16 @@ async function fetchWimbledonDrawCatalogForTournament(tournamentYear) {
   return mergeCatalogMatches2([singles, otherBatches]);
 }
 async function fetchWimbledonDrawCatalog(year) {
-  const now2 = Date.now();
+  const now = Date.now();
   const cached = catalogCacheByYear.get(year);
-  if (cached && now2 - cached.fetchedAt < CATALOG_CACHE_TTL_MS5) {
+  if (cached && now - cached.fetchedAt < CATALOG_CACHE_TTL_MS5) {
     return cached.matches;
   }
   const batches = await Promise.all(
     WIMBLEDON_DRAW_CODES.map((drawCode) => fetchWimbledonDraw(year, drawCode))
   );
   const matches = batches.flat();
-  catalogCacheByYear.set(year, { fetchedAt: now2, matches });
+  catalogCacheByYear.set(year, { fetchedAt: now, matches });
   return matches;
 }
 
@@ -41711,8 +41733,8 @@ function resolveWimbledonTournamentYear(game) {
 function gamePlayerLabelVariants(game, side) {
   const primary = side === "away" ? game.awayTeam : game.homeTeam;
   const official = side === "away" ? game.metadata?.officialAwayName : game.metadata?.officialHomeName;
-  const labels = [primary, official].map((value) => value?.trim()).filter(Boolean);
-  return [...new Set(labels)];
+  const labels2 = [primary, official].map((value) => value?.trim()).filter(Boolean);
+  return [...new Set(labels2)];
 }
 function extractRoundFromGame(game) {
   const context2 = game.metadata?.tennis?.contextLine?.trim() ?? "";
@@ -42097,8 +42119,8 @@ var FETCH_TIMEOUT_MS6 = 12e3;
 var cachedCatalog5 = null;
 var cachedAtMs6 = 0;
 var CACHE_TTL_MS2 = 6e4;
-async function fetchTennisChannelPlusLiveCatalog(now2 = Date.now(), forceRefresh = false) {
-  if (!forceRefresh && cachedCatalog5 && now2 - cachedAtMs6 < CACHE_TTL_MS2) {
+async function fetchTennisChannelPlusLiveCatalog(now = Date.now(), forceRefresh = false) {
+  if (!forceRefresh && cachedCatalog5 && now - cachedAtMs6 < CACHE_TTL_MS2) {
     return cachedCatalog5;
   }
   const res = await fetch(TENNIS_CHANNEL_EVENTS_URL, {
@@ -42111,7 +42133,7 @@ async function fetchTennisChannelPlusLiveCatalog(now2 = Date.now(), forceRefresh
   const json = await res.json();
   const parsed = (json.data ?? []).map((row) => parseTennisChannelPlusEvent(row)).filter((row) => row != null);
   cachedCatalog5 = parsed;
-  cachedAtMs6 = now2;
+  cachedAtMs6 = now;
   return parsed;
 }
 
@@ -42309,8 +42331,8 @@ init_define_import_meta_env();
 function gamePlayerLabelVariants2(game, side) {
   const primary = side === "away" ? game.awayTeam : game.homeTeam;
   const official = side === "away" ? game.metadata?.officialAwayName : game.metadata?.officialHomeName;
-  const labels = [primary, official].map((value) => value?.trim()).filter((value) => Boolean(value));
-  return [...new Set(labels)];
+  const labels2 = [primary, official].map((value) => value?.trim()).filter((value) => Boolean(value));
+  return [...new Set(labels2)];
 }
 function resolveWimbledonFeedSeedsForGame(game, match) {
   const awayVariants = gamePlayerLabelVariants2(game, "away");
@@ -42673,11 +42695,11 @@ async function hydrateWnbaStandingsAbbrevs(entries, season) {
     };
   });
 }
-function resolveWnbaSeasonYear(now2 = /* @__PURE__ */ new Date()) {
-  return now2.getFullYear();
+function resolveWnbaSeasonYear(now = /* @__PURE__ */ new Date()) {
+  return now.getFullYear();
 }
-async function buildWnbaEspnStandingsIndex(now2 = /* @__PURE__ */ new Date()) {
-  const season = resolveWnbaSeasonYear(now2);
+async function buildWnbaEspnStandingsIndex(now = /* @__PURE__ */ new Date()) {
+  const season = resolveWnbaSeasonYear(now);
   const index2 = {
     byEspnTeamId: /* @__PURE__ */ new Map(),
     byAbbrev: /* @__PURE__ */ new Map(),
@@ -42906,17 +42928,17 @@ async function buildEntriesForSeason(config, season) {
   }
   return entries;
 }
-function defaultResolveSeasonYear(now2) {
-  return now2.getFullYear();
+function defaultResolveSeasonYear(now) {
+  return now.getFullYear();
 }
-async function buildEspnCoreDivisionStandingsIndex(config, now2 = /* @__PURE__ */ new Date()) {
+async function buildEspnCoreDivisionStandingsIndex(config, now = /* @__PURE__ */ new Date()) {
   const resolveSeason = config.resolveSeasonYear ?? defaultResolveSeasonYear;
   const index2 = {
     byEspnTeamId: /* @__PURE__ */ new Map(),
     byAbbrev: /* @__PURE__ */ new Map(),
     byDisplayName: /* @__PURE__ */ new Map()
   };
-  const primarySeason = resolveSeason(now2);
+  const primarySeason = resolveSeason(now);
   let entries = await buildEntriesForSeason(config, primarySeason);
   if (entries.length === 0 && primarySeason > 2e3) {
     entries = await buildEntriesForSeason(config, primarySeason - 1);
@@ -42943,14 +42965,14 @@ var NHL_ESPN_CORE_DIVISION_STANDINGS_CONFIG = {
 };
 
 // ../grarf/desktop/src/lib/standings/usPro/buildUsProEspnDivisionStandingsIndex.ts
-async function buildNbaEspnStandingsIndex(now2) {
-  return buildEspnCoreDivisionStandingsIndex(NBA_ESPN_CORE_DIVISION_STANDINGS_CONFIG, now2);
+async function buildNbaEspnStandingsIndex(now) {
+  return buildEspnCoreDivisionStandingsIndex(NBA_ESPN_CORE_DIVISION_STANDINGS_CONFIG, now);
 }
-async function buildNflEspnStandingsIndex(now2) {
-  return buildEspnCoreDivisionStandingsIndex(NFL_ESPN_CORE_DIVISION_STANDINGS_CONFIG, now2);
+async function buildNflEspnStandingsIndex(now) {
+  return buildEspnCoreDivisionStandingsIndex(NFL_ESPN_CORE_DIVISION_STANDINGS_CONFIG, now);
 }
-async function buildNhlEspnStandingsIndex(now2) {
-  return buildEspnCoreDivisionStandingsIndex(NHL_ESPN_CORE_DIVISION_STANDINGS_CONFIG, now2);
+async function buildNhlEspnStandingsIndex(now) {
+  return buildEspnCoreDivisionStandingsIndex(NHL_ESPN_CORE_DIVISION_STANDINGS_CONFIG, now);
 }
 
 // ../grarf/desktop/src/lib/standings/usPro/enrichUsProGamesWithStandings.ts
@@ -43389,8 +43411,1010 @@ async function supplementOperationalSnapshotFromLocalIpc(transport) {
   return changed ? { ...transport, leagues: mergedLeagues } : transport;
 }
 
-// ../grarf/desktop/src/services/operationalIngest/enrichOperationalTransport.ts
+// ../grarf/desktop/src/services/operationalIngest/supplementOperationalSnapshotAllSportsApiEspnEnrichment.ts
+init_define_import_meta_env();
+
+// ../grarf/shared/config/allsportsapiLeagueAssignments.ts
+init_define_import_meta_env();
+var ALLSPORTSAPI_LEAGUE_ASSIGNMENTS = [
+  {
+    leagueKey: "ARG1",
+    sport: "football",
+    scheduleIngestMode: "tournament",
+    tournamentId: 155,
+    categoryId: 48
+  },
+  {
+    leagueKey: "ATP",
+    sport: "tennis",
+    scheduleIngestMode: "category",
+    categoryId: 3
+  },
+  {
+    leagueKey: "BRA1",
+    sport: "football",
+    scheduleIngestMode: "tournament",
+    tournamentId: 325,
+    categoryId: 13
+  },
+  {
+    leagueKey: "BUNDESLIGA",
+    sport: "football",
+    scheduleIngestMode: "tournament",
+    tournamentId: 35,
+    categoryId: 30
+  },
+  {
+    leagueKey: "CARABAO_CUP",
+    sport: "football",
+    scheduleIngestMode: "tournament",
+    tournamentId: 21,
+    categoryId: 1
+  },
+  {
+    leagueKey: "CHAMPIONSHIP",
+    sport: "football",
+    scheduleIngestMode: "tournament",
+    tournamentId: 18,
+    categoryId: 1
+  },
+  {
+    leagueKey: "CLUBFRIENDLY",
+    sport: "football",
+    scheduleIngestMode: "tournament",
+    tournamentId: 853,
+    categoryId: 1468
+  },
+  {
+    leagueKey: "CLUBWC",
+    sport: "football",
+    scheduleIngestMode: "tournament",
+    tournamentId: 357,
+    categoryId: 1468
+  },
+  {
+    leagueKey: "CONCACAF_CAC",
+    sport: "football",
+    scheduleIngestMode: "tournament",
+    tournamentId: 20695,
+    categoryId: 1469
+  },
+  {
+    leagueKey: "CONCACAF_CL",
+    sport: "football",
+    scheduleIngestMode: "tournament",
+    tournamentId: 498,
+    categoryId: 1469
+  },
+  {
+    leagueKey: "CONCACAF_NG",
+    sport: "football",
+    scheduleIngestMode: "tournament",
+    tournamentId: 14100,
+    categoryId: 1469
+  },
+  {
+    leagueKey: "COPA",
+    sport: "football",
+    scheduleIngestMode: "tournament",
+    tournamentId: 133,
+    categoryId: 1470
+  },
+  {
+    leagueKey: "COPA_BRASIL",
+    sport: "football",
+    scheduleIngestMode: "tournament",
+    tournamentId: 373,
+    categoryId: 13
+  },
+  {
+    leagueKey: "COPPAITALIA",
+    sport: "football",
+    scheduleIngestMode: "tournament",
+    tournamentId: 328,
+    categoryId: 31
+  },
+  {
+    leagueKey: "CRICKET_BBL",
+    sport: "cricket",
+    scheduleIngestMode: "tournament",
+    tournamentId: 11162,
+    categoryId: 1347
+  },
+  {
+    leagueKey: "EPL",
+    sport: "football",
+    scheduleIngestMode: "tournament",
+    tournamentId: 17,
+    categoryId: 1
+  },
+  {
+    leagueKey: "EREDIVISIE",
+    sport: "football",
+    scheduleIngestMode: "tournament",
+    tournamentId: 37,
+    categoryId: 35
+  },
+  {
+    leagueKey: "EURO",
+    sport: "football",
+    scheduleIngestMode: "tournament",
+    tournamentId: 1,
+    categoryId: 1465
+  },
+  {
+    leagueKey: "GOLDCUP",
+    sport: "football",
+    scheduleIngestMode: "tournament",
+    tournamentId: 140,
+    categoryId: 1469
+  },
+  {
+    leagueKey: "LALIGA",
+    sport: "football",
+    scheduleIngestMode: "tournament",
+    tournamentId: 8,
+    categoryId: 32
+  },
+  {
+    leagueKey: "LEAGUES_CUP",
+    sport: "football",
+    scheduleIngestMode: "tournament",
+    tournamentId: 13783,
+    categoryId: 1469
+  },
+  {
+    leagueKey: "LIBERTADORES",
+    sport: "football",
+    scheduleIngestMode: "tournament",
+    tournamentId: 384,
+    categoryId: 1470
+  },
+  {
+    leagueKey: "LIGAMX",
+    sport: "football",
+    scheduleIngestMode: "tournament",
+    tournamentId: 11621,
+    categoryId: 12
+  },
+  {
+    leagueKey: "LIGUE1",
+    sport: "football",
+    scheduleIngestMode: "tournament",
+    tournamentId: 34,
+    categoryId: 7
+  },
+  {
+    leagueKey: "MLS",
+    sport: "football",
+    scheduleIngestMode: "tournament",
+    tournamentId: 242,
+    categoryId: 26
+  },
+  {
+    leagueKey: "NATIONS",
+    sport: "football",
+    scheduleIngestMode: "tournament",
+    tournamentId: 10783,
+    categoryId: 1465
+  },
+  {
+    leagueKey: "NBA",
+    sport: "basketball",
+    scheduleIngestMode: "tournament",
+    tournamentId: 132,
+    categoryId: 15
+  },
+  {
+    leagueKey: "NBA2K",
+    sport: "basketball",
+    scheduleIngestMode: "tournament",
+    tournamentId: 1580,
+    categoryId: 15
+  },
+  {
+    leagueKey: "NBASUMMER",
+    sport: "basketball",
+    scheduleIngestMode: "tournament",
+    tournamentId: 10415,
+    categoryId: 15
+  },
+  {
+    leagueKey: "NHL",
+    sport: "ice-hockey",
+    scheduleIngestMode: "tournament",
+    tournamentId: 234,
+    categoryId: 1171
+  },
+  {
+    leagueKey: "NWSL",
+    sport: "football",
+    scheduleIngestMode: "tournament",
+    tournamentId: 1690,
+    categoryId: 26
+  },
+  {
+    leagueKey: "POR1",
+    sport: "football",
+    scheduleIngestMode: "tournament",
+    tournamentId: 238,
+    categoryId: 44
+  },
+  {
+    leagueKey: "RUGBYTOP14",
+    sport: "rugby",
+    scheduleIngestMode: "tournament",
+    tournamentId: 420,
+    categoryId: 82
+  },
+  {
+    leagueKey: "RUGBYULSTER",
+    sport: "rugby",
+    scheduleIngestMode: "tournament",
+    tournamentId: 419,
+    categoryId: 82
+  },
+  {
+    leagueKey: "SAUDI",
+    sport: "football",
+    scheduleIngestMode: "tournament",
+    tournamentId: 955,
+    categoryId: 310
+  },
+  {
+    leagueKey: "SCOTTISH_LEAGUE_CUP",
+    sport: "football",
+    scheduleIngestMode: "tournament",
+    tournamentId: 332,
+    categoryId: 22
+  },
+  {
+    leagueKey: "SERIEA",
+    sport: "football",
+    scheduleIngestMode: "tournament",
+    tournamentId: 23,
+    categoryId: 31
+  },
+  {
+    leagueKey: "SPFL",
+    sport: "football",
+    scheduleIngestMode: "tournament",
+    tournamentId: 36,
+    categoryId: 22
+  },
+  {
+    leagueKey: "SUDAMERICANA",
+    sport: "football",
+    scheduleIngestMode: "tournament",
+    tournamentId: 480,
+    categoryId: 1470
+  },
+  {
+    leagueKey: "SUPERLIG",
+    sport: "football",
+    scheduleIngestMode: "tournament",
+    tournamentId: 52,
+    categoryId: 46
+  },
+  {
+    leagueKey: "UCL",
+    sport: "football",
+    scheduleIngestMode: "tournament",
+    tournamentId: 7,
+    categoryId: 1465
+  },
+  {
+    leagueKey: "UECL",
+    sport: "football",
+    scheduleIngestMode: "tournament",
+    tournamentId: 17015,
+    categoryId: 1465
+  },
+  {
+    leagueKey: "UEL",
+    sport: "football",
+    scheduleIngestMode: "tournament",
+    tournamentId: 679,
+    categoryId: 1465
+  },
+  {
+    leagueKey: "US_OPEN_CUP",
+    sport: "football",
+    scheduleIngestMode: "tournament",
+    tournamentId: 495,
+    categoryId: 26
+  },
+  {
+    leagueKey: "USL1",
+    sport: "football",
+    scheduleIngestMode: "tournament",
+    tournamentId: 13362,
+    categoryId: 26
+  },
+  {
+    leagueKey: "USLC",
+    sport: "football",
+    scheduleIngestMode: "tournament",
+    tournamentId: 13363,
+    categoryId: 26
+  },
+  {
+    leagueKey: "WNBA",
+    sport: "basketball",
+    scheduleIngestMode: "tournament",
+    tournamentId: 486,
+    categoryId: 15
+  },
+  {
+    leagueKey: "WORLDCUP",
+    sport: "football",
+    scheduleIngestMode: "tournament",
+    tournamentId: 16,
+    categoryId: 1468
+  },
+  {
+    leagueKey: "WTA",
+    sport: "tennis",
+    scheduleIngestMode: "category",
+    categoryId: 6
+  },
+  {
+    leagueKey: "WWC",
+    sport: "football",
+    scheduleIngestMode: "tournament",
+    tournamentId: 290,
+    categoryId: 1468
+  }
+];
+
+// ../grarf/shared/domain/operational/operationalLeagueIdentity.ts
+init_define_import_meta_env();
+var TOURNAMENT_AUTHORITATIVE_LEAGUES2 = /* @__PURE__ */ new Set([
+  "US_OPEN_TENNIS",
+  "WIMBLEDON_MEN",
+  "WIMBLEDON_WOMEN"
+]);
+function readOperationalLeagueIdentitySource2(game) {
+  const fromMeta = game.metadata?.operational?.leagueIdentitySource;
+  if (fromMeta) return fromMeta;
+  const league2 = game.league ?? "";
+  if (TOURNAMENT_AUTHORITATIVE_LEAGUES2.has(league2)) {
+    return "espn_tournament_endpoint";
+  }
+  if (league2 === "ATP" || league2 === "WTA") {
+    return "espn_tour_scoreboard";
+  }
+  return "espn_scoreboard";
+}
+
+// ../grarf/shared/domain/operational/matchOperationalTeamSportGameRowByTeamsAndStartTime.ts
+init_define_import_meta_env();
+var TIME_WINDOW_MS3 = 3 * 60 * 60 * 1e3;
+function normalizeTeamToken(value) {
+  return value?.trim().toLowerCase().replace(/[^a-z0-9]+/g, "") ?? "";
+}
+function abbrevsMatch(left, right) {
+  const a2 = left?.trim().toUpperCase();
+  const b2 = right?.trim().toUpperCase();
+  if (!a2 || !b2) return false;
+  return a2 === b2;
+}
+function teamNamesMatch(left, right) {
+  const a2 = normalizeTeamToken(left);
+  const b2 = normalizeTeamToken(right);
+  if (!a2 || !b2) return false;
+  return a2 === b2 || a2.includes(b2) || b2.includes(a2);
+}
+function teamsMatch3(left, right) {
+  const awayByAbbrev = abbrevsMatch(left.awayTeamAbbrev, right.awayTeamAbbrev);
+  const homeByAbbrev = abbrevsMatch(left.homeTeamAbbrev, right.homeTeamAbbrev);
+  if (awayByAbbrev && homeByAbbrev) return true;
+  const awayByName = teamNamesMatch(left.awayTeam, right.awayTeam);
+  const homeByName = teamNamesMatch(left.homeTeam, right.homeTeam);
+  return awayByName && homeByName;
+}
+function matchOperationalTeamSportGameRowByTeamsAndStartTime(game, peers, leagueKey) {
+  if ((game.league ?? "").trim().toUpperCase() !== leagueKey.trim().toUpperCase()) return null;
+  const gameStart = typeof game.startTimeMs === "number" ? game.startTimeMs : 0;
+  if (!gameStart) return null;
+  const candidates = peers.filter((peer) => {
+    if ((peer.league ?? "").trim().toUpperCase() !== leagueKey.trim().toUpperCase()) return false;
+    const peerStart = typeof peer.startTimeMs === "number" ? peer.startTimeMs : 0;
+    if (peerStart && Math.abs(peerStart - gameStart) > TIME_WINDOW_MS3) return false;
+    return teamsMatch3(game, peer);
+  });
+  if (candidates.length === 0) return null;
+  if (candidates.length === 1) return candidates[0];
+  candidates.sort((a2, b2) => {
+    const aStart = typeof a2.startTimeMs === "number" ? a2.startTimeMs : 0;
+    const bStart = typeof b2.startTimeMs === "number" ? b2.startTimeMs : 0;
+    return Math.abs(aStart - gameStart) - Math.abs(bStart - gameStart);
+  });
+  return candidates[0];
+}
+
+// ../grarf/shared/domain/nba/mergeEspnBroadcastSupplementOntoAllSportsApiNbaGame.ts
+init_define_import_meta_env();
+
+// ../grarf/shared/domain/operational/pickMergedTeamSportLiveStatusLine.ts
+init_define_import_meta_env();
+function normalizeLine(value) {
+  return String(value ?? "").trim();
+}
+function isGenericPeriodOnlyStatusLine(line) {
+  if (!line) return true;
+  if (/^live$/i.test(line)) return true;
+  if (/^(1st|2nd|3rd|4th)\s+quarter$/i.test(line)) return true;
+  if (/^(1st|2nd|3rd)\s+period$/i.test(line)) return true;
+  if (/^overtime$/i.test(line)) return true;
+  return false;
+}
+function hasPreciseClockPresentation(line) {
+  if (!line) return false;
+  if (/\|/.test(line)) return true;
+  if (/\d{1,2}:\d{2}/.test(line)) return true;
+  if (/^\d+(\+\d+)?'$/.test(line)) return true;
+  if (/^Q\d\b/i.test(line)) return true;
+  if (/^OT\b/i.test(line)) return true;
+  return false;
+}
+function pickMergedTeamSportLiveStatusLine(input) {
+  const status = normalizeLine(input.cardStatus).toLowerCase();
+  const asa = normalizeLine(input.allSportsApiStatusLine);
+  const espn = normalizeLine(input.espnStatusLine);
+  const clock = normalizeLine(input.espnDisplayClock);
+  if (status !== "live") {
+    return asa || espn || clock;
+  }
+  if (espn && (isGenericPeriodOnlyStatusLine(asa) || hasPreciseClockPresentation(espn))) {
+    return espn;
+  }
+  if (clock && isGenericPeriodOnlyStatusLine(asa)) {
+    if (asa && !hasPreciseClockPresentation(asa)) {
+      return `${asa} | ${clock}`;
+    }
+    return clock;
+  }
+  return asa || espn || clock;
+}
+
+// ../grarf/shared/domain/nba/mergeEspnBroadcastSupplementOntoAllSportsApiNbaGame.ts
+function hasBroadcastLabels(game) {
+  const channels = game.channels ?? [];
+  const broadcasts = game.broadcasts ?? [];
+  return channels.some((label) => String(label ?? "").trim()) || broadcasts.some((label) => String(label ?? "").trim());
+}
+var ALLSPORTSAPI_ESPN_SUPPLEMENT_LEAGUES = /* @__PURE__ */ new Set(["NBA", "NHL", "WNBA"]);
+function mergeEspnBroadcastSupplementOntoAllSportsApiTeamSportGame(game, espnPeer) {
+  const league2 = String(game.league ?? "").trim().toUpperCase();
+  if (!ALLSPORTSAPI_ESPN_SUPPLEMENT_LEAGUES.has(league2)) return game;
+  if (readOperationalLeagueIdentitySource2(game) !== "allsportsapi_events") return game;
+  const espnEventId = String(game.espnEventId ?? "").trim() || String(game.externalIds?.espn ?? "").trim() || String(espnPeer.espnEventId ?? "").trim() || String(espnPeer.externalIds?.espn ?? "").trim();
+  const next = { ...game };
+  if (!hasBroadcastLabels(game)) {
+    const channels = espnPeer.channels ?? espnPeer.broadcasts;
+    const broadcasts = espnPeer.broadcasts ?? espnPeer.channels;
+    if (Array.isArray(channels) && channels.length) next.channels = [...channels];
+    if (Array.isArray(broadcasts) && broadcasts.length) next.broadcasts = [...broadcasts];
+  }
+  if (espnEventId) {
+    next.espnEventId = espnEventId;
+    next.externalIds = {
+      ...game.externalIds,
+      espn: espnEventId,
+      allSportsApi: game.externalIds?.allSportsApi
+    };
+  }
+  if (!String(game.gameCardUrl ?? "").trim() && String(espnPeer.gameCardUrl ?? "").trim()) {
+    next.gameCardUrl = espnPeer.gameCardUrl;
+  }
+  const peerEspnCenter = String(espnPeer.metadata?.espnGameCenterUrl ?? "").trim();
+  if (peerEspnCenter && !String(game.metadata?.espnGameCenterUrl ?? "").trim()) {
+    next.metadata = { ...game.metadata, espnGameCenterUrl: peerEspnCenter };
+  }
+  if (!String(game.awayLogoUrl ?? "").trim() && String(espnPeer.awayLogoUrl ?? "").trim()) {
+    next.awayLogoUrl = espnPeer.awayLogoUrl;
+  }
+  if (!String(game.homeLogoUrl ?? "").trim() && String(espnPeer.homeLogoUrl ?? "").trim()) {
+    next.homeLogoUrl = espnPeer.homeLogoUrl;
+  }
+  if (game.status === "live" || espnPeer.status === "live") {
+    const mergedStatusLine = pickMergedTeamSportLiveStatusLine({
+      cardStatus: game.status ?? espnPeer.status,
+      allSportsApiStatusLine: game.statusLine,
+      espnStatusLine: espnPeer.statusLine,
+      espnDisplayClock: espnPeer.displayClock
+    });
+    if (mergedStatusLine) {
+      next.statusLine = mergedStatusLine;
+    }
+    const espnClock = String(espnPeer.displayClock ?? "").trim();
+    if (espnClock && !String(game.displayClock ?? "").trim()) {
+      next.displayClock = espnClock;
+    }
+  }
+  return next;
+}
+
+// ../grarf/shared/domain/nba/matchOperationalNbaGameRowByTeamsAndStartTime.ts
+init_define_import_meta_env();
+var TIME_WINDOW_MS4 = 3 * 60 * 60 * 1e3;
+function teamsMatch4(left, right) {
+  const awayLeft = espnAbbrevToNbaTricode(left.awayTeamAbbrev);
+  const homeLeft = espnAbbrevToNbaTricode(left.homeTeamAbbrev);
+  const awayRight = espnAbbrevToNbaTricode(right.awayTeamAbbrev);
+  const homeRight = espnAbbrevToNbaTricode(right.homeTeamAbbrev);
+  if (!awayLeft || !homeLeft || !awayRight || !homeRight) return false;
+  return awayLeft === awayRight && homeLeft === homeRight;
+}
+function matchOperationalNbaGameRowByTeamsAndStartTime(game, peers) {
+  if (game.league !== "NBA") return null;
+  const gameStart = typeof game.startTimeMs === "number" ? game.startTimeMs : 0;
+  if (!gameStart) return null;
+  const candidates = peers.filter((peer) => {
+    if (peer.league !== "NBA") return false;
+    const peerStart = typeof peer.startTimeMs === "number" ? peer.startTimeMs : 0;
+    if (peerStart && Math.abs(peerStart - gameStart) > TIME_WINDOW_MS4) return false;
+    return teamsMatch4(game, peer);
+  });
+  if (candidates.length === 0) return null;
+  if (candidates.length === 1) return candidates[0];
+  candidates.sort((a2, b2) => {
+    const aStart = typeof a2.startTimeMs === "number" ? a2.startTimeMs : 0;
+    const bStart = typeof b2.startTimeMs === "number" ? b2.startTimeMs : 0;
+    return Math.abs(aStart - gameStart) - Math.abs(bStart - gameStart);
+  });
+  return candidates[0];
+}
+
+// ../grarf/shared/domain/soccer/matchOperationalEnglishSoccerGameRowByTeamsAndStartTime.ts
+init_define_import_meta_env();
+
+// ../grarf/shared/domain/soccer/eplRecapTeamMatching.ts
+init_define_import_meta_env();
+var EPL_RECAP_TEAM_ALIAS_GROUPS = [
+  ["Arsenal"],
+  ["Aston Villa"],
+  ["AFC Bournemouth", "Bournemouth"],
+  ["Brentford"],
+  ["Brighton & Hove Albion", "Brighton and Hove Albion", "Brighton", "Brighton Hove Albion"],
+  ["Chelsea"],
+  ["Crystal Palace", "C Palace"],
+  ["Everton"],
+  ["Fulham"],
+  ["Ipswich Town", "Ipswich"],
+  ["Leeds United", "Leeds"],
+  ["Liverpool"],
+  ["Manchester City", "Man City"],
+  ["Manchester United", "Man United", "Man Utd", "Manchester Utd"],
+  ["Newcastle United", "Newcastle"],
+  ["Nottingham Forest", "Nottm Forest", "Nottingham"],
+  ["Sunderland", "AFC Sunderland"],
+  ["Tottenham Hotspur", "Tottenham", "Spurs"],
+  ["West Ham United", "West Ham"],
+  ["Wolverhampton Wanderers", "Wolves", "Wolverhampton"]
+];
+var EPL_RECAP_ALIAS_LOOKUP = /* @__PURE__ */ new Map();
+function normalizeEplRecapAliasKey(label) {
+  return label.trim().toLowerCase().normalize("NFD").replace(/\p{M}/gu, "").replace(/&/g, " and ").replace(/\bfc\b/g, "").replace(/[^a-z0-9]+/g, " ").replace(/\s+/g, " ").trim();
+}
+function registerEplRecapAliasGroup(aliases) {
+  const tokenUnion = /* @__PURE__ */ new Set();
+  for (const alias of aliases) {
+    for (const token of tokenSetFromLabel(alias)) {
+      tokenUnion.add(token);
+    }
+  }
+  for (const alias of aliases) {
+    const key2 = normalizeEplRecapAliasKey(alias);
+    if (!key2) continue;
+    const existing = EPL_RECAP_ALIAS_LOOKUP.get(key2) ?? /* @__PURE__ */ new Set();
+    for (const token of tokenUnion) {
+      existing.add(token);
+    }
+    EPL_RECAP_ALIAS_LOOKUP.set(key2, existing);
+  }
+}
+for (const group of EPL_RECAP_TEAM_ALIAS_GROUPS) {
+  registerEplRecapAliasGroup(group);
+}
+function buildEplRecapTeamTokenSet(teamName) {
+  const trimmed = teamName.trim();
+  if (!trimmed) return /* @__PURE__ */ new Set();
+  const tokens = new Set(tokenSetFromLabel(trimmed));
+  const aliasTokens = EPL_RECAP_ALIAS_LOOKUP.get(normalizeEplRecapAliasKey(trimmed));
+  if (aliasTokens) {
+    for (const token of aliasTokens) {
+      tokens.add(token);
+    }
+  }
+  return tokens;
+}
+var EPL_RECAP_MIN_TEAM_PAIR_SCORE = 0.55;
+function scoreEplRecapTeamPair(homeA, awayA, homeB, awayB) {
+  const homeSetA = buildEplRecapTeamTokenSet(homeA);
+  const awaySetA = buildEplRecapTeamTokenSet(awayA);
+  const homeSetB = buildEplRecapTeamTokenSet(homeB);
+  const awaySetB = buildEplRecapTeamTokenSet(awayB);
+  if (homeSetA.size === 0 || awaySetA.size === 0 || homeSetB.size === 0 || awaySetB.size === 0) {
+    return 0;
+  }
+  const direct = (tokenOverlapScore(homeSetA, homeSetB) + tokenOverlapScore(awaySetA, awaySetB)) / 2;
+  const swapped = (tokenOverlapScore(homeSetA, awaySetB) + tokenOverlapScore(awaySetA, homeSetB)) / 2;
+  return Math.max(direct, swapped);
+}
+function eplRecapTeamsMatch(homeA, awayA, homeB, awayB, minScore = EPL_RECAP_MIN_TEAM_PAIR_SCORE) {
+  return scoreEplRecapTeamPair(homeA, awayA, homeB, awayB) >= minScore;
+}
+
+// ../grarf/shared/domain/soccer/matchOperationalEnglishSoccerGameRowByTeamsAndStartTime.ts
+var DEFAULT_MIN_PAIR_SCORE = 0.55;
+var DEFAULT_START_WINDOW_MS = 3 * 60 * 60 * 1e3;
+function labels(game) {
+  return {
+    home: game.metadata?.officialHomeName?.trim() || game.homeCity?.trim() || game.homeTeam?.trim() || "",
+    away: game.metadata?.officialAwayName?.trim() || game.awayCity?.trim() || game.awayTeam?.trim() || ""
+  };
+}
+function matchOperationalEnglishSoccerGameRowByTeamsAndStartTime(candidate, peers) {
+  const { home, away } = labels(candidate);
+  if (!home || !away) return null;
+  const start = candidate.startTimeMs ?? 0;
+  let best = null;
+  let bestScore = 0;
+  for (const peer of peers) {
+    const peerLabels = labels(peer);
+    if (!peerLabels.home || !peerLabels.away) continue;
+    const pairScore = scoreEplRecapTeamPair(home, away, peerLabels.home, peerLabels.away);
+    if (pairScore < DEFAULT_MIN_PAIR_SCORE) continue;
+    const peerStart = peer.startTimeMs ?? 0;
+    if (start && peerStart && Math.abs(start - peerStart) > DEFAULT_START_WINDOW_MS) continue;
+    if (pairScore > bestScore) {
+      bestScore = pairScore;
+      best = peer;
+    }
+  }
+  return best;
+}
+
+// ../grarf/desktop/src/services/operationalIngest/web/fetchWebEspnOperationalSnapshot.js
+init_define_import_meta_env();
 var LOG22 = "[OperationalIngest]";
+var ESPN_FETCH_TIMEOUT_MS5 = 12e3;
+async function fetchEspnScoreboardJson2(url) {
+  const res = await fetch(url, {
+    headers: { Accept: "application/json" },
+    signal: AbortSignal.timeout(ESPN_FETCH_TIMEOUT_MS5)
+  });
+  if (!res.ok) {
+    throw new Error(`ESPN ${res.status}`);
+  }
+  return res.json();
+}
+function countLiveScoreboardEvents2(json) {
+  const events2 = Array.isArray(json?.events) ? json.events : [];
+  let live = 0;
+  for (const ev of events2) {
+    const comp = ev?.competitions?.[0];
+    const statusType = comp?.status?.type;
+    if (!statusType)
+      continue;
+    if (statusType.completed)
+      continue;
+    if (String(statusType.state ?? "").toLowerCase() === "in")
+      live += 1;
+  }
+  return live;
+}
+function scoreboardEventId2(ev) {
+  if (!ev || typeof ev !== "object")
+    return null;
+  const id = ev.id;
+  return id != null ? String(id) : null;
+}
+function countLiveAcrossScoreboards2(...jsons) {
+  let live = 0;
+  for (const json of jsons) {
+    live += countLiveScoreboardEvents2(json);
+  }
+  return live;
+}
+function countUniqueScoreboardEvents2(...jsons) {
+  const ids = /* @__PURE__ */ new Set();
+  let count3 = 0;
+  for (const json of jsons) {
+    const events2 = Array.isArray(json?.events) ? json.events : [];
+    for (const ev of events2) {
+      const id = scoreboardEventId2(ev);
+      if (id && ids.has(id))
+        continue;
+      if (id)
+        ids.add(id);
+      count3 += 1;
+    }
+  }
+  return count3;
+}
+async function fetchDatedScoreboardPair2(endpoint) {
+  const datedUrl = `${endpoint}${endpoint.includes("?") ? "&" : "?"}dates=${formatEspnScoreboardDatesParamForOperationalSportsDay()}`;
+  const tomorrowUrl = `${endpoint}${endpoint.includes("?") ? "&" : "?"}dates=${formatEspnScoreboardDatesParamForOperationalSportsDayUpcoming()}`;
+  const [todayJson, tomorrowJson] = await Promise.all([
+    fetchEspnScoreboardJson2(datedUrl),
+    fetchEspnScoreboardJson2(tomorrowUrl).catch(() => ({ events: [] }))
+  ]);
+  return { todayJson, tomorrowJson };
+}
+async function fetchOperationalScoreboardJsonWeb2(endpoint) {
+  const { todayJson, tomorrowJson } = await fetchDatedScoreboardPair2(endpoint);
+  const datedEventCount = countUniqueScoreboardEvents2(todayJson, tomorrowJson);
+  const datedLive = countLiveAcrossScoreboards2(todayJson, tomorrowJson);
+  if (datedEventCount > 0 && datedLive > 0) {
+    return { todayJson, tomorrowJson, usedFallback: false };
+  }
+  const defaultJson = await fetchEspnScoreboardJson2(endpoint);
+  const defaultLive = countLiveScoreboardEvents2(defaultJson);
+  if (datedEventCount > 0 && datedLive === 0 && defaultLive > 0) {
+    return { todayJson: defaultJson, tomorrowJson: null, usedFallback: false };
+  }
+  if (datedEventCount > 0) {
+    return { todayJson, tomorrowJson, usedFallback: false };
+  }
+  return { todayJson: defaultJson, tomorrowJson: null, usedFallback: true };
+}
+async function fetchLeagueGames2(key2) {
+  const endpoint = ESPN_OPERATIONAL_LEAGUE_ENDPOINTS[key2];
+  if (!endpoint)
+    return [];
+  try {
+    const { todayJson, tomorrowJson, usedFallback } = await fetchOperationalScoreboardJsonWeb2(endpoint);
+    let games = tomorrowJson ? normalizeDatedOperationalScoreboardPair(todayJson, tomorrowJson, key2) : normalizeScoreboard(todayJson, key2);
+    if (usedFallback) {
+      games = filterGamesForOperationalFallbackIngest(games);
+    }
+    return games;
+  } catch (e2) {
+    if (define_import_meta_env_default.DEV) {
+      console.warn(`${LOG22} web ESPN fetch failed`, key2, e2);
+    }
+    return [];
+  }
+}
+async function fetchEspnOperationalLeagueGamesForEnrichment(key2) {
+  return fetchLeagueGames2(key2);
+}
+
+// ../grarf/desktop/src/services/operationalIngest/supplementOperationalSnapshotAllSportsApiEspnEnrichment.ts
+var LOG23 = "[OperationalIngest]";
+var TEAM_SPORT_LEAGUES = /* @__PURE__ */ new Set(["NBA", "NHL", "WNBA"]);
+var ASA_LEAGUE_KEYS = new Set(
+  ALLSPORTSAPI_LEAGUE_ASSIGNMENTS.map((row) => row.leagueKey)
+);
+function readEspnEventIdFromRow(row) {
+  const ext = String(row.externalIds?.espn ?? row.espnEventId ?? "").trim();
+  if (ext && /^\d+$/.test(ext)) return ext;
+  const m2 = /^espn-[A-Z0-9]+-(\d+)$/i.exec(String(row.id ?? "").trim());
+  return m2?.[1] ?? null;
+}
+function findEspnPeerByEventId(espnRows, eventId) {
+  return espnRows.find((peer) => readEspnEventIdFromRow(peer) === eventId);
+}
+function matchTeamSportEspnPeer(row, espnRows, leagueKey) {
+  if (leagueKey === "NBA") {
+    return matchOperationalNbaGameRowByTeamsAndStartTime(row, espnRows);
+  }
+  return matchOperationalTeamSportGameRowByTeamsAndStartTime(row, espnRows, leagueKey);
+}
+function mergeSoccerEspnPresentationOntoRow(row, peer) {
+  const next = { ...row };
+  if (!(next.channels ?? []).some((l2) => String(l2 ?? "").trim())) {
+    const channels = peer.channels ?? [];
+    if (channels.length) next.channels = [...channels];
+    else {
+      const broadcasts = (next.broadcasts ?? peer.broadcasts ?? []).filter(
+        (l2) => String(l2 ?? "").trim()
+      );
+      if (broadcasts.length) next.channels = [...broadcasts];
+    }
+  }
+  if (!(next.broadcasts ?? []).some((l2) => String(l2 ?? "").trim())) {
+    const broadcasts = peer.broadcasts ?? [];
+    if (broadcasts.length) next.broadcasts = [...broadcasts];
+  }
+  if (!next.awayLogoUrl?.trim() && peer.awayLogoUrl?.trim()) {
+    next.awayLogoUrl = peer.awayLogoUrl;
+  }
+  if (!next.homeLogoUrl?.trim() && peer.homeLogoUrl?.trim()) {
+    next.homeLogoUrl = peer.homeLogoUrl;
+  }
+  const copyEspnTeamAbbrev = (side) => {
+    const key2 = side === "away" ? "awayTeamAbbrev" : "homeTeamAbbrev";
+    const current = String(next[key2] ?? "").trim();
+    const peerVal = String(peer[key2] ?? "").trim();
+    if (/^\d+$/.test(peerVal) && !/^\d+$/.test(current)) {
+      next[key2] = peerVal;
+    }
+  };
+  copyEspnTeamAbbrev("away");
+  copyEspnTeamAbbrev("home");
+  if (!next.metadata?.espnGameCenterUrl?.trim() && peer.metadata?.espnGameCenterUrl?.trim()) {
+    next.metadata = { ...next.metadata, espnGameCenterUrl: peer.metadata.espnGameCenterUrl };
+  }
+  if (!String(next.gameCardUrl ?? "").trim() && peer.gameCardUrl?.trim()) {
+    next.gameCardUrl = peer.gameCardUrl;
+  }
+  const espnId = readEspnEventIdFromRow(peer);
+  if (espnId) {
+    next.espnEventId = next.espnEventId ?? espnId;
+    next.externalIds = { ...next.externalIds, espn: next.externalIds?.espn ?? espnId };
+  }
+  return next;
+}
+async function enrichLeagueRowsFromEspnScoreboard(leagueKey, rows) {
+  let espnRows;
+  try {
+    espnRows = await fetchEspnOperationalLeagueGamesForEnrichment(leagueKey);
+  } catch (e2) {
+    console.warn(`${LOG23} ESPN enrichment fetch failed`, leagueKey, e2);
+    return rows;
+  }
+  if (!espnRows.length) return rows;
+  const assignment = ALLSPORTSAPI_LEAGUE_ASSIGNMENTS.find((a2) => a2.leagueKey === leagueKey);
+  const isTeamSport = TEAM_SPORT_LEAGUES.has(leagueKey);
+  let next = filterEspnScoreboardRowsForAllSportsApiTeamSportLeagues(rows);
+  next = next.map((row) => {
+    if (isTeamSport) {
+      if (readOperationalLeagueIdentitySource2(row) !== "allsportsapi_events") {
+        return row;
+      }
+      const peer = matchTeamSportEspnPeer(row, espnRows, leagueKey);
+      if (!peer) return row;
+      return mergeEspnBroadcastSupplementOntoAllSportsApiTeamSportGame(row, peer);
+    }
+    if (assignment?.sport === "football") {
+      const byId = readEspnEventIdFromRow(row);
+      const peer = (byId ? findEspnPeerByEventId(espnRows, byId) : null) ?? matchOperationalEnglishSoccerGameRowByTeamsAndStartTime(row, espnRows);
+      if (!peer) return row;
+      return mergeSoccerEspnPresentationOntoRow(row, peer);
+    }
+    return row;
+  });
+  return next;
+}
+async function supplementOperationalSnapshotAllSportsApiEspnEnrichment(transport) {
+  if (transport.source !== "grarf_operational_service") return transport;
+  const leagues = { ...transport.leagues };
+  let changed = false;
+  for (const assignment of ALLSPORTSAPI_LEAGUE_ASSIGNMENTS) {
+    const leagueKey = assignment.leagueKey;
+    const rows = leagues[leagueKey];
+    if (!Array.isArray(rows) || rows.length === 0) continue;
+    if (!ASA_LEAGUE_KEYS.has(leagueKey)) continue;
+    const enriched = await enrichLeagueRowsFromEspnScoreboard(leagueKey, rows);
+    if (enriched !== rows) {
+      leagues[leagueKey] = enriched;
+      changed = true;
+      continue;
+    }
+    if (enriched.some((row, index2) => row !== rows[index2])) {
+      leagues[leagueKey] = enriched;
+      changed = true;
+    }
+  }
+  if (!changed) return transport;
+  return { ...transport, leagues };
+}
+
+// ../grarf/desktop/src/services/operationalIngest/sanitizeOperationalSnapshotIngestLogoUrls.ts
+init_define_import_meta_env();
+
+// ../grarf/shared/domain/wnba/resolveWnbaEspnLogoSlug.ts
+init_define_import_meta_env();
+var WNBA_ESPN_LOGO_SLUG_BY_TRICODE = {
+  gs: "gsv",
+  gsv: "gsv",
+  wsh: "was",
+  was: "was",
+  por: "por",
+  pdx: "por",
+  ny: "ny",
+  nyl: "ny",
+  lv: "lv",
+  la: "la"
+};
+function resolveWnbaEspnLogoSlug(abbrev) {
+  const key2 = abbrev?.trim().toLowerCase();
+  if (!key2) return void 0;
+  return WNBA_ESPN_LOGO_SLUG_BY_TRICODE[key2] ?? key2;
+}
+function normalizeWnbaOperationalTeamAbbrev(abbrev) {
+  const raw = abbrev?.trim().toUpperCase();
+  if (!raw) return void 0;
+  if (raw === "GSV") return "GS";
+  if (raw === "WAS") return "WSH";
+  if (raw === "PDX") return "POR";
+  if (raw === "LVA") return "LV";
+  if (raw === "LAS") return "LA";
+  if (raw === "NYL") return "NY";
+  return raw;
+}
+function wnbaOperationalTeamAbbrevsEquivalent(left, right) {
+  const a2 = normalizeWnbaOperationalTeamAbbrev(left);
+  const b2 = normalizeWnbaOperationalTeamAbbrev(right);
+  if (!a2 || !b2) return false;
+  return a2 === b2;
+}
+
+// ../grarf/shared/domain/nba/nbaEspnLogoSlug.ts
+init_define_import_meta_env();
+var NBA_ESPN_SCOREBOARD_SLUG = {
+  nop: "no",
+  uta: "utah"
+};
+function resolveNbaEspnScoreboardLogoSlug(abbrev) {
+  const trimmed = abbrev?.trim();
+  if (!trimmed) return void 0;
+  const key2 = trimmed.toLowerCase();
+  return NBA_ESPN_SCOREBOARD_SLUG[key2] ?? key2;
+}
+
+// ../grarf/desktop/src/services/operationalIngest/sanitizeOperationalSnapshotIngestLogoUrls.ts
+function fixWnbaLogoUrl(logoUrl) {
+  const scoreboardMatch = logoUrl.match(/teamlogos\/wnba\/500\/scoreboard\/([^.]+)\.png/i);
+  if (scoreboardMatch) {
+    const slug = resolveWnbaEspnLogoSlug(scoreboardMatch[1]) ?? scoreboardMatch[1].toLowerCase();
+    return `https://a.espncdn.com/i/teamlogos/wnba/500/${slug}.png`;
+  }
+  const directMatch = logoUrl.match(/teamlogos\/wnba\/500\/([^.]+)\.png/i);
+  if (directMatch) {
+    const raw = directMatch[1].toLowerCase();
+    if (raw === "scoreboard") return logoUrl;
+    const slug = resolveWnbaEspnLogoSlug(raw) ?? raw;
+    if (slug !== raw) {
+      return `https://a.espncdn.com/i/teamlogos/wnba/500/${slug}.png`;
+    }
+  }
+  return logoUrl;
+}
+function fixNbaLogoUrl(logoUrl) {
+  if (/teamlogos\/nba\/500\/(?:scoreboard\/)?nop\.png/i.test(logoUrl)) {
+    return "https://a.espncdn.com/i/teamlogos/nba/500/scoreboard/no.png";
+  }
+  const scoreboardMatch = logoUrl.match(/teamlogos\/nba\/500\/scoreboard\/([^.]+)\.png/i);
+  if (scoreboardMatch) {
+    const slug = resolveNbaEspnScoreboardLogoSlug(scoreboardMatch[1]) ?? scoreboardMatch[1].toLowerCase();
+    return `https://a.espncdn.com/i/teamlogos/nba/500/scoreboard/${slug}.png`;
+  }
+  return logoUrl;
+}
+function fixSideLogoUrl(logoUrl, league2) {
+  const trimmed = logoUrl?.trim();
+  if (!trimmed || !/^https?:\/\//i.test(trimmed)) return trimmed;
+  if (league2 === "WNBA") return fixWnbaLogoUrl(trimmed);
+  if (league2 === "NBA" || league2 === "NBASUMMER") return fixNbaLogoUrl(trimmed);
+  return trimmed;
+}
+function sanitizeGameRowLogos(game) {
+  const awayLogoUrl = fixSideLogoUrl(game.awayLogoUrl, game.league);
+  const homeLogoUrl = fixSideLogoUrl(game.homeLogoUrl, game.league);
+  if (awayLogoUrl === game.awayLogoUrl && homeLogoUrl === game.homeLogoUrl) return game;
+  return { ...game, awayLogoUrl, homeLogoUrl };
+}
+function sanitizeOperationalSnapshotIngestLogoUrls(transport) {
+  const leagues = { ...transport.leagues };
+  let changed = false;
+  for (const [key2, rows] of Object.entries(leagues)) {
+    if (!Array.isArray(rows) || rows.length === 0) continue;
+    const next = rows.map((row) => sanitizeGameRowLogos(row));
+    if (next.some((row, index2) => row !== rows[index2])) {
+      leagues[key2] = next;
+      changed = true;
+    }
+  }
+  return changed ? { ...transport, leagues } : transport;
+}
+
+// ../grarf/desktop/src/services/operationalIngest/enrichOperationalTransport.ts
+var LOG24 = "[OperationalIngest]";
 function cloudRowMissingMlbPk2(row) {
   if (typeof row.gamePk === "number" && row.gamePk > 0) return false;
   const mlb2 = row.externalIds?.mlb?.trim();
@@ -43419,7 +44443,7 @@ async function supplementOperationalSnapshotNflXGametimeChat(transport) {
   try {
     enriched = await enrichNflGamesWithXNflGametimeChat(rows);
   } catch (e2) {
-    console.warn(`${LOG22} NFL X Gametime chat supplement failed`, e2);
+    console.warn(`${LOG24} NFL X Gametime chat supplement failed`, e2);
     return transport;
   }
   if (!enriched.some((row, index2) => row !== rows[index2])) return transport;
@@ -43436,7 +44460,7 @@ async function enrichOperationalSnapshotWatchStreamsLocal(transport) {
   try {
     next = enrichOperationalSnapshotEspnWatchStreams(next);
   } catch (e2) {
-    console.warn(`${LOG22} ESPN Watch stream enrich failed`, e2);
+    console.warn(`${LOG24} ESPN Watch stream enrich failed`, e2);
   }
   try {
     for (const key2 of ["ATP", "WTA"]) {
@@ -43445,61 +44469,110 @@ async function enrichOperationalSnapshotWatchStreamsLocal(transport) {
       await enrichWimbledonEspnWatchStreams(rows);
     }
   } catch (e2) {
-    console.warn(`${LOG22} Wimbledon ESPN Watch enrich failed`, e2);
+    console.warn(`${LOG24} Wimbledon ESPN Watch enrich failed`, e2);
   }
   try {
     next = await enrichOperationalSnapshotWimbledonSlamTracker(next);
   } catch (e2) {
-    console.warn(`${LOG22} Wimbledon SlamTracker enrich failed`, e2);
+    console.warn(`${LOG24} Wimbledon SlamTracker enrich failed`, e2);
   }
   try {
     next = await enrichOperationalSnapshotEspnWatchPickerStreams(next);
   } catch (e2) {
-    console.warn(`${LOG22} ESPN Watch picker enrich failed`, e2);
+    console.warn(`${LOG24} ESPN Watch picker enrich failed`, e2);
   }
   try {
     next = enrichOperationalSnapshotUsaNetworkStreams(next);
   } catch (e2) {
-    console.warn(`${LOG22} USA Network stream enrich failed`, e2);
+    console.warn(`${LOG24} USA Network stream enrich failed`, e2);
   }
   try {
     next = await enrichOperationalSnapshotTennisChannel(next);
   } catch (e2) {
-    console.warn(`${LOG22} Tennis Channel Plus enrich failed`, e2);
+    console.warn(`${LOG24} Tennis Channel Plus enrich failed`, e2);
   }
   try {
     next = await enrichOperationalSnapshotFoxWorldCup(next);
   } catch (e2) {
-    console.warn(`${LOG22} FOX World Cup enrich failed`, e2);
+    console.warn(`${LOG24} FOX World Cup enrich failed`, e2);
   }
   try {
     next = await enrichOperationalSnapshotWnbaStreams(next);
   } catch (e2) {
-    console.warn(`${LOG22} WNBA Prime Video enrich failed`, e2);
+    console.warn(`${LOG24} WNBA Prime Video enrich failed`, e2);
   }
   try {
     next = await enrichOperationalSnapshotNbaStreams(next);
   } catch (e2) {
-    console.warn(`${LOG22} NBA League Pass enrich failed`, e2);
+    console.warn(`${LOG24} NBA League Pass enrich failed`, e2);
   }
   try {
     next = await enrichOperationalSnapshotNflStreams(next);
   } catch (e2) {
-    console.warn(`${LOG22} NFL Prime Video enrich failed`, e2);
+    console.warn(`${LOG24} NFL Prime Video enrich failed`, e2);
   }
   try {
     next = await enrichOperationalSnapshotFotmob(next);
   } catch (e2) {
-    console.warn(`${LOG22} FotMob World Cup enrich failed`, e2);
+    console.warn(`${LOG24} FotMob World Cup enrich failed`, e2);
   }
   try {
     next = await enrichOperationalSnapshotSoccerway(next);
   } catch (e2) {
-    console.warn(`${LOG22} Soccerway soccer enrich failed`, e2);
+    console.warn(`${LOG24} Soccerway soccer enrich failed`, e2);
+  }
+  return next;
+}
+async function enrichCloudOperationalTransport(transport) {
+  let next = transport;
+  try {
+    next = await supplementOperationalSnapshotAllSportsApiEspnEnrichment(next);
+  } catch (e2) {
+    console.warn(`${LOG24} AllSportsAPI ESPN enrichment supplement failed`, e2);
+  }
+  try {
+    next = sanitizeOperationalSnapshotIngestLogoUrls(next);
+  } catch (e2) {
+    console.warn(`${LOG24} ingest logo sanitize failed`, e2);
+  }
+  try {
+    next = await enrichOperationalSnapshotNhlGamecenterUrls(next);
+  } catch (e2) {
+    console.warn(`${LOG24} NHL gamecenter URL supplement failed`, e2);
+  }
+  if (isGrarfExtensionRenderer() || isGrarfWebRenderer2()) {
+    try {
+      next = enrichOperationalSnapshotEspnWatchStreams(next);
+    } catch (e2) {
+      console.warn(`${LOG24} ESPN Watch stream enrich failed`, e2);
+    }
+  }
+  return next;
+}
+async function enrichExtensionCloudOperationalTransport(transport) {
+  let next = transport;
+  try {
+    next = sanitizeOperationalSnapshotIngestLogoUrls(next);
+  } catch (e2) {
+    console.warn(`${LOG24} ingest logo sanitize failed`, e2);
+  }
+  try {
+    next = enrichOperationalSnapshotEspnWatchStreams(next);
+  } catch (e2) {
+    console.warn(`${LOG24} ESPN Watch stream enrich failed`, e2);
   }
   return next;
 }
 async function enrichOperationalTransport(rawTransport) {
+  if (isGrarfExtensionRenderer() && rawTransport.source === "grarf_operational_service") {
+    let transport2 = rawTransport;
+    try {
+      transport2 = await enrichExtensionCloudOperationalTransport(transport2);
+    } catch (e2) {
+      console.warn(`${LOG24} extension cloud enrich failed`, e2);
+    }
+    return transport2;
+  }
   if (isGrarfExtensionRenderer()) {
     return rawTransport;
   }
@@ -43507,64 +44580,59 @@ async function enrichOperationalTransport(rawTransport) {
   try {
     transport = await enrichOperationalSnapshotCbsMlbPreviewUrls(transport);
   } catch (e2) {
-    console.warn(`${LOG22} CBS MLB preview URL enrich failed`, e2);
+    console.warn(`${LOG24} CBS MLB preview URL enrich failed`, e2);
   }
   try {
     transport = await enrichOperationalSnapshotCbsNflPreviewUrls(transport);
   } catch (e2) {
-    console.warn(`${LOG22} CBS NFL preview URL enrich failed`, e2);
+    console.warn(`${LOG24} CBS NFL preview URL enrich failed`, e2);
   }
   try {
     transport = await enrichOperationalSnapshotUelYahooSportsPreviewArticleUrls(transport);
   } catch (e2) {
-    console.warn(`${LOG22} UEL Yahoo Sports preview article enrich failed`, e2);
+    console.warn(`${LOG24} UEL Yahoo Sports preview article enrich failed`, e2);
   }
   try {
     transport = await enrichOperationalSnapshotCoversMlbPicksUrls(transport);
   } catch (e2) {
-    console.warn(`${LOG22} Covers MLB picks URL enrich failed`, e2);
+    console.warn(`${LOG24} Covers MLB picks URL enrich failed`, e2);
   }
   try {
     transport = await enrichOperationalSnapshotKalshiMlbMarketUrls(transport);
   } catch (e2) {
-    console.warn(`${LOG22} Kalshi MLB market URL enrich failed`, e2);
+    console.warn(`${LOG24} Kalshi MLB market URL enrich failed`, e2);
   }
   try {
     transport = await enrichOperationalSnapshotPolymarketMlbMarketUrls(transport);
   } catch (e2) {
-    console.warn(`${LOG22} Polymarket MLB market URL enrich failed`, e2);
+    console.warn(`${LOG24} Polymarket MLB market URL enrich failed`, e2);
   }
   try {
     transport = await enrichOperationalSnapshotNovigMlbMarketUrls(transport);
   } catch (e2) {
-    console.warn(`${LOG22} Novig MLB event-market URL enrich failed`, e2);
+    console.warn(`${LOG24} Novig MLB event-market URL enrich failed`, e2);
   }
   try {
     transport = await supplementOperationalSnapshotNflXGametimeChat(transport);
   } catch (e2) {
-    console.warn(`${LOG22} NFL X Gametime chat supplement failed`, e2);
+    console.warn(`${LOG24} NFL X Gametime chat supplement failed`, e2);
   }
   if (rawTransport.source === "grarf_operational_service") {
     try {
-      transport = await enrichOperationalSnapshotNhlGamecenterUrls(transport);
+      transport = await enrichCloudOperationalTransport(transport);
     } catch (e2) {
-      console.warn(`${LOG22} NHL gamecenter URL supplement failed`, e2);
+      console.warn(`${LOG24} cloud operational enrich failed`, e2);
     }
     if (isGrarfWebRenderer2()) {
       try {
-        transport = enrichOperationalSnapshotEspnWatchStreams(transport);
-      } catch (e2) {
-        console.warn(`${LOG22} ESPN Watch stream enrich failed (web)`, e2);
-      }
-      try {
         transport = await enrichOperationalSnapshotEspnWatchHomeStreams(transport);
       } catch (e2) {
-        console.warn(`${LOG22} ESPN Watch Home enrich failed (web)`, e2);
+        console.warn(`${LOG24} ESPN Watch Home enrich failed (web)`, e2);
       }
       try {
         transport = await enrichOperationalSnapshotEspnWatchPickerStreams(transport);
       } catch (e2) {
-        console.warn(`${LOG22} ESPN Watch picker enrich failed (web)`, e2);
+        console.warn(`${LOG24} ESPN Watch picker enrich failed (web)`, e2);
       }
     }
     return transport;
@@ -43572,29 +44640,29 @@ async function enrichOperationalTransport(rawTransport) {
   try {
     transport = await supplementOperationalSnapshotFromLocalIpc(transport);
   } catch (e2) {
-    console.warn(`${LOG22} local IPC supplement failed`, e2);
+    console.warn(`${LOG24} local IPC supplement failed`, e2);
   }
   try {
     transport = await enrichOperationalSnapshotPllGameCardRouting(transport);
   } catch (e2) {
-    console.warn(`${LOG22} PLL game card enrich failed`, e2);
+    console.warn(`${LOG24} PLL game card enrich failed`, e2);
   }
   try {
     transport = sanitizeOperationalSnapshotWatchStreams(transport);
   } catch (e2) {
-    console.warn(`${LOG22} watch stream sanitize failed`, e2);
+    console.warn(`${LOG24} watch stream sanitize failed`, e2);
   }
   try {
     transport = enrichOperationalSnapshotManualGameOverrides(transport);
   } catch (e2) {
-    console.warn(`${LOG22} manual game override enrich failed`, e2);
+    console.warn(`${LOG24} manual game override enrich failed`, e2);
   }
   try {
     if (!isGrarfWebRenderer2()) {
       transport = await enrichOperationalSnapshotTeamStandings(transport, { leagueKeys: ["MLB"] });
     }
   } catch (e2) {
-    console.warn(`${LOG22} MLB team standings enrich failed`, e2);
+    console.warn(`${LOG24} MLB team standings enrich failed`, e2);
   }
   if (isGrarfWebRenderer2()) {
     try {
@@ -43602,24 +44670,24 @@ async function enrichOperationalTransport(rawTransport) {
         leagueKeys: ["WNBA", "NBA", "NFL", "NHL"]
       });
     } catch (e2) {
-      console.warn(`${LOG22} WNBA team standings enrich failed`, e2);
+      console.warn(`${LOG24} WNBA team standings enrich failed`, e2);
     }
     try {
       transport = await enrichOperationalSnapshotPlayerRanks(transport);
     } catch (e2) {
-      console.warn(`${LOG22} player rank enrich failed`, e2);
+      console.warn(`${LOG24} player rank enrich failed`, e2);
     }
   }
   if (!isGrarfWebRenderer2()) {
     try {
       transport = await enrichOperationalSnapshotWatchStreamsLocal(transport);
     } catch (e2) {
-      console.warn(`${LOG22} watch/stream enrich failed`, e2);
+      console.warn(`${LOG24} watch/stream enrich failed`, e2);
     }
     try {
       transport = await joinMissingMlbProviderIds(transport);
     } catch (e2) {
-      console.warn(`${LOG22} MLB provider join failed`, e2);
+      console.warn(`${LOG24} MLB provider join failed`, e2);
     }
   }
   return transport;
@@ -44090,23 +45158,23 @@ function isScheduleStreamOverrideEntryActive(entry4, input) {
   }
   return true;
 }
-function resolveActiveScheduleOverrideMs(game, target, document2, now2, surface) {
+function resolveActiveScheduleOverrideMs(game, target, document2, now, surface) {
   if (!document2) return null;
   const matches = document2.overrides.filter((entry4) => entry4.target.trim() === target && entry4.operation === "replace").filter(
-    (entry4) => isScheduleStreamOverrideEntryActive(entry4, { game, now: now2, surface })
+    (entry4) => isScheduleStreamOverrideEntryActive(entry4, { game, now, surface })
   ).sort(compareOverridePrecedence);
   const winner = matches[0];
   if (!winner) return null;
   return parseOverrideNumberValue(winner.value);
 }
 function resolveCanonicalScheduledStartMsForEditorialOverrideExpiration(game, options) {
-  const now2 = options?.now ?? /* @__PURE__ */ new Date();
+  const now = options?.now ?? /* @__PURE__ */ new Date();
   const surface = options?.surface ?? "extension";
   const fromOverride = resolveActiveScheduleOverrideMs(
     game,
     "startTimeMs",
     options?.document,
-    now2,
+    now,
     surface
   );
   if (fromOverride != null) return fromOverride;
@@ -44117,13 +45185,13 @@ function resolveCanonicalScheduledStartMsForEditorialOverrideExpiration(game, op
   return null;
 }
 function resolveCanonicalScheduledEndMsForEditorialOverrideExpiration(game, options) {
-  const now2 = options?.now ?? /* @__PURE__ */ new Date();
+  const now = options?.now ?? /* @__PURE__ */ new Date();
   const surface = options?.surface ?? "extension";
   const fromOverride = resolveActiveScheduleOverrideMs(
     game,
     "endTimeMs",
     options?.document,
-    now2,
+    now,
     surface
   );
   if (fromOverride != null) return fromOverride;
@@ -44134,11 +45202,11 @@ function resolveTemporaryEditorialOverrideEffectiveExpiresAtMs(entry4, game, opt
   if (explicit != null) return explicit;
   const target = entry4.target.trim();
   const surface = options?.surface ?? "extension";
-  const now2 = /* @__PURE__ */ new Date();
+  const now = /* @__PURE__ */ new Date();
   if (isPreviewArticleEditorialOverrideTarget(target)) {
     const startMs = resolveCanonicalScheduledStartMsForEditorialOverrideExpiration(game, {
       document: options?.document,
-      now: now2,
+      now,
       surface
     });
     if (startMs == null) return null;
@@ -44147,7 +45215,7 @@ function resolveTemporaryEditorialOverrideEffectiveExpiresAtMs(entry4, game, opt
   if (isRecapArticleEditorialOverrideTarget(target)) {
     const endMs = resolveCanonicalScheduledEndMsForEditorialOverrideExpiration(game, {
       document: options?.document,
-      now: now2,
+      now,
       surface
     });
     if (endMs == null) return null;
@@ -44513,14 +45581,14 @@ function compareOverridePrecedence2(a2, b2) {
   return a2.id.localeCompare(b2.id);
 }
 function listTemporaryEditorialOverrideEntriesForGameTarget(input) {
-  const now2 = input.now ?? /* @__PURE__ */ new Date();
+  const now = input.now ?? /* @__PURE__ */ new Date();
   const surface = resolveActiveHostSurface(input.surface);
   const document2 = input.document ?? getTemporaryEditorialOverridesDocument();
   const target = input.target.trim();
   return document2.overrides.filter((entry4) => entry4.target.trim() === target).filter(
     (entry4) => isTemporaryEditorialOverrideEntryActive(entry4, {
       game: input.game,
-      now: now2,
+      now,
       surface,
       document: document2
     })
@@ -44655,7 +45723,7 @@ function writeExtensionOperationalSnapshotSessionCache(transport) {
 }
 
 // ../grarf/desktop/src/services/operationalIngest/hydrateOperationalSnapshotFromTransport.ts
-var LOG23 = "[OperationalIngest]";
+var LOG25 = "[OperationalIngest]";
 function extensionConsumesServerOperationalSnapshotOnly() {
   return isGrarfExtensionRenderer();
 }
@@ -44824,7 +45892,7 @@ async function runProgressiveGamesSpineEnrichment(rawTransport, hydrate, context
   try {
     transport = await enrichOperationalTransport(rawTransport);
   } catch (e2) {
-    console.warn(`${LOG23} transport enrich failed`, e2);
+    console.warn(`${LOG25} transport enrich failed`, e2);
   }
   if (!options.allowSameTransportPass && !shouldAcceptOperationalTransportHydrate(transportGeneratedAt, completeness.source)) {
     if (completeness.source !== "grarf_cloud" && currentStoreNeedsProgressiveMetadataHydrate()) {
@@ -44853,59 +45921,65 @@ async function hydrateOperationalSnapshotFromTransport(rawTransport, hydrate, co
     return;
   }
   let transportForHydrate = rawTransport;
-  if (!extensionConsumesServerOperationalSnapshotOnly()) {
+  if (isGrarfExtensionRenderer() && rawTransport.source === "grarf_operational_service") {
+    try {
+      transportForHydrate = await enrichOperationalTransport(rawTransport);
+    } catch (e2) {
+      console.warn(`${LOG25} extension cloud operational enrich failed`, e2);
+    }
+  } else if (!extensionConsumesServerOperationalSnapshotOnly()) {
     try {
       transportForHydrate = await enrichOperationalSnapshotNcaafYahooSports(transportForHydrate);
     } catch (e2) {
-      console.warn(`${LOG23} NCAAF Yahoo Sports enrich failed`, e2);
+      console.warn(`${LOG25} NCAAF Yahoo Sports enrich failed`, e2);
     }
     try {
       transportForHydrate = await enrichOperationalSnapshotCbsMlbPreviewUrls(transportForHydrate);
     } catch (e2) {
-      console.warn(`${LOG23} CBS MLB preview URL enrich failed`, e2);
+      console.warn(`${LOG25} CBS MLB preview URL enrich failed`, e2);
     }
     try {
       transportForHydrate = await enrichOperationalSnapshotCbsNflPreviewUrls(transportForHydrate);
     } catch (e2) {
-      console.warn(`${LOG23} CBS NFL preview URL enrich failed`, e2);
+      console.warn(`${LOG25} CBS NFL preview URL enrich failed`, e2);
     }
     try {
       transportForHydrate = await enrichOperationalSnapshotUelYahooSportsPreviewArticleUrls(
         transportForHydrate
       );
     } catch (e2) {
-      console.warn(`${LOG23} UEL Yahoo Sports preview article enrich failed`, e2);
+      console.warn(`${LOG25} UEL Yahoo Sports preview article enrich failed`, e2);
     }
     try {
       transportForHydrate = await enrichOperationalSnapshotCoversMlbPicksUrls(transportForHydrate);
     } catch (e2) {
-      console.warn(`${LOG23} Covers MLB picks URL enrich failed`, e2);
+      console.warn(`${LOG25} Covers MLB picks URL enrich failed`, e2);
     }
     try {
       transportForHydrate = await enrichOperationalSnapshotKalshiMlbMarketUrls(transportForHydrate);
     } catch (e2) {
-      console.warn(`${LOG23} Kalshi MLB market URL enrich failed`, e2);
+      console.warn(`${LOG25} Kalshi MLB market URL enrich failed`, e2);
     }
     try {
       transportForHydrate = await enrichOperationalSnapshotPolymarketMlbMarketUrls(transportForHydrate);
     } catch (e2) {
-      console.warn(`${LOG23} Polymarket MLB market URL enrich failed`, e2);
+      console.warn(`${LOG25} Polymarket MLB market URL enrich failed`, e2);
     }
     try {
       transportForHydrate = await enrichOperationalSnapshotNovigMlbMarketUrls(transportForHydrate);
     } catch (e2) {
-      console.warn(`${LOG23} Novig MLB event-market URL enrich failed`, e2);
+      console.warn(`${LOG25} Novig MLB event-market URL enrich failed`, e2);
     }
     if (!context2.startupSeed && !isCentralizedSnapshot && isElectronIpcAuthoritativeOperationalIngest(completeness.source)) {
       try {
         transportForHydrate = await enrichOperationalSnapshotFotmob(transportForHydrate);
       } catch (e2) {
-        console.warn(`${LOG23} FotMob soccer enrich failed`, e2);
+        console.warn(`${LOG25} FotMob soccer enrich failed`, e2);
       }
       try {
         transportForHydrate = await enrichOperationalSnapshotSoccerway(transportForHydrate);
       } catch (e2) {
-        console.warn(`${LOG23} Soccerway soccer enrich failed`, e2);
+        console.warn(`${LOG25} Soccerway soccer enrich failed`, e2);
       }
     }
   }
@@ -44968,7 +46042,7 @@ async function hydrateOperationalSnapshotFromTransport(rawTransport, hydrate, co
         source: completenessWithTransport.source
       });
       if (isGrarfExtensionRenderer() && isCentralizedSnapshot && !context2.startupSeed) {
-        writeExtensionOperationalSnapshotSessionCache(rawTransport);
+        writeExtensionOperationalSnapshotSessionCache(transportForHydrate);
       }
     }
   }
@@ -45009,9 +46083,9 @@ function collectAllOperationalGames() {
   return out;
 }
 function buildOperationalLiveClassificationAudit(nowMs3 = Date.now()) {
-  const now2 = new Date(nowMs3);
-  const sportsDayKey = getOperationalSportsDayDateKey(now2);
-  const yesterdayKey2 = getOperationalSportsDayYesterdayDateKey(now2);
+  const now = new Date(nowMs3);
+  const sportsDayKey = getOperationalSportsDayDateKey(now);
+  const yesterdayKey2 = getOperationalSportsDayYesterdayDateKey(now);
   const allGames2 = collectAllOperationalGames();
   const activelyLive = allGames2.filter((game) => isGameActivelyLive(game));
   const sortedByStart = [...activelyLive].sort(
@@ -45029,13 +46103,13 @@ function buildOperationalLiveClassificationAudit(nowMs3 = Date.now()) {
     activelyLiveByLeague[league2] = (activelyLiveByLeague[league2] ?? 0) + 1;
   }
   const mlbYesterdayFinals = allGames2.filter(
-    (game) => game.league === "MLB" && isGamesSpineYesterdayFinalGame(game, now2)
+    (game) => game.league === "MLB" && isGamesSpineYesterdayFinalGame(game, now)
   );
   const mlbYesterdayFinalStillLive = mlbYesterdayFinals.filter((game) => isGameActivelyLive(game));
   const ncaaWsocActivelyLive = activelyLive.filter((game) => game.league === "NCAAWSOC").map((game) => summarizeGame(game, nowMs3));
   const golfActivelyLive = activelyLive.filter((game) => isGolfLeagueKey(game.league)).map((game) => summarizeGame(game, nowMs3));
   return {
-    runtimeNowIso: now2.toISOString(),
+    runtimeNowIso: now.toISOString(),
     runtimeNowMs: nowMs3,
     sportsDayKey,
     yesterdayKey: yesterdayKey2,
@@ -45056,7 +46130,7 @@ function attachOperationalLiveClassificationAuditProbe() {
 }
 
 // ../grarf/desktop/src/services/operationalIngest/electronGrarfCloudOperationalStartup.ts
-var LOG24 = "[OperationalIngest]";
+var LOG26 = "[OperationalIngest]";
 var IPC_BRIDGE_WAIT_MS = 250;
 var operationalKickoffStarted = false;
 var ipcSeedSubscriptionStop;
@@ -45149,7 +46223,7 @@ async function seedRendererStoreFromLocalIpcIfEmpty() {
     const local = await readLocalIpcTransport() ?? await fetchLatestEspnLocalOperationalSnapshot();
     return hydrateLocalIpcTransport(local);
   } catch (error) {
-    console.warn(`${LOG24} Electron local IPC seed failed`, error);
+    console.warn(`${LOG26} Electron local IPC seed failed`, error);
     return false;
   }
 }
@@ -45159,7 +46233,7 @@ async function tryUpgradeRendererFromCloudOnce() {
     if (!cloud?.leagues) return false;
     return hydrateCloudTransport(cloud);
   } catch (error) {
-    console.warn(`${LOG24} Electron startup cloud upgrade failed`, error);
+    console.warn(`${LOG26} Electron startup cloud upgrade failed`, error);
     return false;
   }
 }
@@ -45437,7 +46511,7 @@ function bootstrapGamesSpineRuntime() {
     prefetchGamesSpineManualDocument();
     prefetchManualEventsSourceBundle();
   }
-  if (provider === "espn_local_ipc" || provider === "grarf_cloud") {
+  if ((provider === "espn_local_ipc" || provider === "grarf_cloud") && !isGrarfExtensionRenderer()) {
     prefetchMlbTeamStandingsIndex(refreshGamesSpineStoreFromStandingsCache);
   }
   useLiveGamesStore.subscribe((state3, previous) => {
@@ -46367,13 +47441,13 @@ function resolveLiveTrackEventTimeMs(event) {
   const parsed = Date.parse(event.timestamp);
   return Number.isFinite(parsed) ? parsed : 0;
 }
-function isLiveTrackEventWithinRetention(event, now2 = Date.now()) {
+function isLiveTrackEventWithinRetention(event, now = Date.now()) {
   const eventTime = resolveLiveTrackEventTimeMs(event);
   if (eventTime <= 0) return true;
-  return now2 - eventTime < LIVE_TRACK_TIMELINE_RETENTION_MS;
+  return now - eventTime < LIVE_TRACK_TIMELINE_RETENTION_MS;
 }
-function pruneLiveTrackTimeline(events2, now2 = Date.now()) {
-  return events2.filter((event) => isLiveTrackEventWithinRetention(event, now2));
+function pruneLiveTrackTimeline(events2, now = Date.now()) {
+  return events2.filter((event) => isLiveTrackEventWithinRetention(event, now));
 }
 
 // ../grarf/desktop/src/lib/livetrack/liveTrackTimelineStorage.ts
@@ -46392,7 +47466,7 @@ function sanitizeTimelineEvents(raw) {
   }
   return events2;
 }
-function readLiveTrackTimelineSync(now2 = Date.now()) {
+function readLiveTrackTimelineSync(now = Date.now()) {
   if (typeof localStorage === "undefined") return [];
   try {
     const raw = localStorage.getItem(LIVE_TRACK_TIMELINE_STORAGE_KEY);
@@ -46400,7 +47474,7 @@ function readLiveTrackTimelineSync(now2 = Date.now()) {
     const parsed = JSON.parse(raw);
     const eventsRaw = parsed.events ?? parsed.state?.events;
     const sanitized = sanitizeTimelineEvents(eventsRaw);
-    const pruned = pruneLiveTrackTimeline(sanitized, now2);
+    const pruned = pruneLiveTrackTimeline(sanitized, now);
     if (pruned.length < sanitized.length) {
       writeLiveTrackTimelineSync(pruned);
     }
@@ -46445,8 +47519,8 @@ function eventsByIdFromList(events2) {
 function persistTimeline(eventsById) {
   writeLiveTrackTimelineSync(sortLiveTrackEventsChronologically(Object.values(eventsById)));
 }
-function hydrateTimelineFromStorage(now2 = Date.now()) {
-  const pruned = readLiveTrackTimelineSync(now2);
+function hydrateTimelineFromStorage(now = Date.now()) {
+  const pruned = readLiveTrackTimelineSync(now);
   return eventsByIdFromList(pruned);
 }
 var initialEventsById = hydrateTimelineFromStorage();
@@ -46507,9 +47581,9 @@ var useLiveTrackTimelineStore = (0, import_zustand14.create)((set, get) => ({
     }));
     return true;
   },
-  pruneExpired: (now2 = Date.now()) => {
+  pruneExpired: (now = Date.now()) => {
     const current = get().eventsById;
-    const prunedList = pruneLiveTrackTimeline(Object.values(current), now2);
+    const prunedList = pruneLiveTrackTimeline(Object.values(current), now);
     const prunedById = eventsByIdFromList(prunedList);
     if (Object.keys(prunedById).length === Object.keys(current).length) return;
     persistTimeline(prunedById);
@@ -54768,11 +55842,11 @@ function startEngagementTracking(track) {
     return Date.now() - lastActivityAt < ACTIVITY_IDLE_MS;
   };
   const tick = () => {
-    const now2 = Date.now();
+    const now = Date.now();
     if (isEngaged() && lastTickAt > 0) {
-      accumulatedMs += now2 - lastTickAt;
+      accumulatedMs += now - lastTickAt;
     }
-    lastTickAt = now2;
+    lastTickAt = now;
   };
   const flush = () => {
     tick();
@@ -55031,13 +56105,13 @@ function allowSessionOnce(key2) {
   }
   return true;
 }
-function toQueued(line, now2) {
+function toQueued(line, now) {
   const displayDurationMs = line.displayDurationMs ?? defaultDisplayMsForType(line.tickerEventType);
   const tickerTargetType = line.tickerTargetType ?? "game";
   const articleUrl = tickerTargetType === "article" ? line.articleUrl ?? (line.nav.kind === "article" ? line.nav.url : void 0) : void 0;
   const articleId = tickerTargetType === "article" ? line.articleId ?? (line.nav.kind === "article" ? line.nav.articleId : void 0) : void 0;
   return {
-    id: `tk-${now2}-${Math.random().toString(36).slice(2, 10)}`,
+    id: `tk-${now}-${Math.random().toString(36).slice(2, 10)}`,
     tickerEventType: line.tickerEventType,
     tickerTargetType,
     articleUrl,
@@ -55048,7 +56122,7 @@ function toQueued(line, now2) {
     league: line.league,
     sport: line.sport,
     gameId: line.gameId,
-    timestamp: now2,
+    timestamp: now,
     priority: line.priority,
     mode: line.mode,
     nav: line.nav,
@@ -55058,11 +56132,11 @@ function toQueued(line, now2) {
 var useTickerEventQueue = (0, import_zustand16.create)((set, get) => ({
   events: [],
   enqueueInferred: (lines) => {
-    const now2 = Date.now();
+    const now = Date.now();
     const batch = [];
     for (const line of lines) {
       if (!allowSessionOnce(line.sessionOnceKey)) continue;
-      batch.push(toQueued(line, now2));
+      batch.push(toQueued(line, now));
     }
     if (batch.length === 0) return;
     set({ events: [...get().events, ...batch].slice(-80) });
@@ -55465,8 +56539,8 @@ function rssItemToInferredLine(item) {
   };
 }
 async function refreshTickerRssNews() {
-  const now2 = Date.now();
-  if (rssCache && now2 - rssCache.at < RSS_CACHE_TTL_MS) {
+  const now = Date.now();
+  if (rssCache && now - rssCache.at < RSS_CACHE_TTL_MS) {
     return rssCache.lines;
   }
   const merged = [];
@@ -55488,7 +56562,7 @@ async function refreshTickerRssNews() {
   merged.sort((a2, b2) => b2.publishedAt - a2.publishedAt);
   const cap = 16;
   const lines = merged.slice(0, cap).map(rssItemToInferredLine);
-  rssCache = { at: now2, lines };
+  rssCache = { at: now, lines };
   return lines;
 }
 
@@ -62393,11 +63467,11 @@ function clampDesktopLeagueNavExpandedWidthPx(measuredPx) {
 }
 var DESKTOP_MENU_PRIMARY_TAB_GAP_CLASS = "gap-[2px]";
 function collectDesktopLeagueNavMeasureLabels() {
-  const labels = resolveLeagueDirectoryNavSections({}).flatMap((section) => [
+  const labels2 = resolveLeagueDirectoryNavSections({}).flatMap((section) => [
     ...section.items.map((item) => resolveMainMenuLeagueDirectoryLabel(item)),
     ...(section.expansionItems ?? []).map((item) => resolveMainMenuLeagueDirectoryLabel(item))
   ]);
-  return [...labels, "FANTASY", "BETTING"];
+  return [...labels2, "FANTASY", "BETTING"];
 }
 function measureDesktopLeagueNavExpandedWidthReferencePx() {
   if (typeof document === "undefined") {
@@ -65623,8 +66697,8 @@ function normalizeOperationsLiveWorkspaceOpenMode(value) {
 init_define_import_meta_env();
 var UFC_JUL_25_2026_LIVE_BROWSER_OVERRIDE_DATE_KEY = "2026-07-25";
 var UFC_JUL_25_2026_LIVE_BROWSER_SHERDOG_URL = "https://www.sherdog.com/news/news/UFC-Abu-Dhabi-Ankalaev-vs-Guskov-playbyplay-results-round-scoring-202068";
-function isUfcJul252026LiveBrowserOverrideActive(now2 = /* @__PURE__ */ new Date()) {
-  return getOperationalSportsDayDateKey(now2) === UFC_JUL_25_2026_LIVE_BROWSER_OVERRIDE_DATE_KEY;
+function isUfcJul252026LiveBrowserOverrideActive(now = /* @__PURE__ */ new Date()) {
+  return getOperationalSportsDayDateKey(now) === UFC_JUL_25_2026_LIVE_BROWSER_OVERRIDE_DATE_KEY;
 }
 function resolveUfcJul252026LiveBrowserOverrideSources() {
   if (!isUfcJul252026LiveBrowserOverrideActive()) return null;
@@ -66841,15 +67915,15 @@ async function fetchRssXml() {
   }
 }
 async function fetchGlobalHeaderTickerRssItems() {
-  const now2 = Date.now();
-  if (cache2 && now2 - cache2.at < GLOBAL_HEADER_TICKER_RSS_POLL_INTERVAL_MS) {
+  const now = Date.now();
+  if (cache2 && now - cache2.at < GLOBAL_HEADER_TICKER_RSS_POLL_INTERVAL_MS) {
     return cache2.items;
   }
   const xml = await fetchRssXml();
   if (!xml) return cache2?.items ?? [];
   const items = filterTickerItemsForRenderer(parseGlobalHeaderTickerRss(xml));
   if (items.length > 0) {
-    cache2 = { at: now2, items };
+    cache2 = { at: now, items };
     return items;
   }
   return cache2?.items ?? [];
@@ -68066,7 +69140,7 @@ var useCenterPaneFeedAlignmentStore = (0, import_zustand26.create)((set) => ({
 init_define_import_meta_env();
 var import_react26 = __toESM(require_react(), 1);
 function useLiveDateTime() {
-  const [now2, setNow] = (0, import_react26.useState)(() => /* @__PURE__ */ new Date());
+  const [now, setNow] = (0, import_react26.useState)(() => /* @__PURE__ */ new Date());
   (0, import_react26.useEffect)(() => {
     const id = setInterval(() => setNow(/* @__PURE__ */ new Date()), 1e3);
     return () => clearInterval(id);
@@ -68074,11 +69148,11 @@ function useLiveDateTime() {
   const pad = (n2) => String(n2).padStart(2, "0");
   const days = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
   const months = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
-  const day = days[now2.getDay()];
-  const month = months[now2.getMonth()];
-  const date = now2.getDate();
-  const h24 = now2.getHours();
-  const min2 = pad(now2.getMinutes());
+  const day = days[now.getDay()];
+  const month = months[now.getMonth()];
+  const date = now.getDate();
+  const h24 = now.getHours();
+  const min2 = pad(now.getMinutes());
   const ampm = h24 >= 12 ? "PM" : "AM";
   const h12 = h24 % 12 || 12;
   return `${day} ${month} ${date} \xB7 ${h12}:${min2} ${ampm}`;
@@ -68859,18 +69933,18 @@ function parseGameLastUpdatedMs(lastUpdated) {
   const ms2 = Date.parse(lastUpdated);
   return Number.isFinite(ms2) ? ms2 : null;
 }
-function isGenuinelyActiveLiveForBestEvent(game, now2 = /* @__PURE__ */ new Date()) {
+function isGenuinelyActiveLiveForBestEvent(game, now = /* @__PURE__ */ new Date()) {
   if (game.status !== "live") return true;
-  const sportsDayKey = getOperationalSportsDayDateKey(now2);
-  const yesterdayKey2 = getOperationalSportsDayYesterdayDateKey(now2);
+  const sportsDayKey = getOperationalSportsDayDateKey(now);
+  const yesterdayKey2 = getOperationalSportsDayYesterdayDateKey(now);
   const gameDateKey = resolveGameOperationalDateKey(game);
   if (!gameDateKey || gameDateKey === sportsDayKey) {
-    return isGameActivelyLive(game, now2.getTime());
+    return isGameActivelyLive(game, now.getTime());
   }
   if (gameDateKey < sportsDayKey && gameDateKey !== yesterdayKey2) return false;
   const lastUpdatedMs = parseGameLastUpdatedMs(game.lastUpdated);
   if (lastUpdatedMs == null) return false;
-  return now2.getTime() - lastUpdatedMs <= BEST_EVENT_MAX_STALE_LIVE_UPDATE_MS;
+  return now.getTime() - lastUpdatedMs <= BEST_EVENT_MAX_STALE_LIVE_UPDATE_MS;
 }
 function isBestGameRightNowEligible(game) {
   if (isSpineFinalizedGame(game)) return false;
@@ -69030,10 +70104,10 @@ function resolveBestGameRightNowV1(mergedLeagues, manualGames = [], options) {
   if (games.length === 0) return null;
   const featuredGames = resolveFeaturedGamesForBestGame();
   const liveGames = games.filter((g2) => isGameActivelyLive(g2));
-  const now2 = Date.now();
+  const now = Date.now();
   const upcomingGames = games.filter((g2) => {
     if (g2.status !== "scheduled") return false;
-    if (g2.startTimeMs != null && Number.isFinite(g2.startTimeMs) && g2.startTimeMs < now2) {
+    if (g2.startTimeMs != null && Number.isFinite(g2.startTimeMs) && g2.startTimeMs < now) {
       return false;
     }
     return true;
@@ -69169,10 +70243,10 @@ var useAdminFeaturedPriorityStore = (0, import_zustand27.create)((set, get) => (
 }));
 
 // ../grarf/desktop/src/hooks/useTopRailRankedGames.ts
-function refreshTopRailSlateGame(game, now2, adjunctNow) {
+function refreshTopRailSlateGame(game, now, adjunctNow) {
   return refreshManualTourDeFranceSpineGameIfNeeded(
     refreshManualLeMans2026SpineGameIfNeeded(
-      refreshManualGamesSpineGameIfNeeded(game, now2),
+      refreshManualGamesSpineGameIfNeeded(game, now),
       adjunctNow
     ),
     adjunctNow
@@ -69203,12 +70277,12 @@ function useTopRailRankedGames(importantGameCount) {
   const operationsFieldsByGameId = useAdminOperationsCardStore((s2) => s2.fieldsByGameId);
   return (0, import_react29.useMemo)(() => {
     const mergedLeagues = omitHiddenGamesSpineLeagueGames(mergeOperationalLeagueGames(leagues));
-    const now2 = new Date(manualGamesSpineRefreshMs);
+    const now = new Date(manualGamesSpineRefreshMs);
     const adjunctNow = new Date(Math.max(manualLeMansRefreshMs, manualTourDeFranceRefreshMs));
-    const refreshedLeagues = refreshManualGamesSpineGamesInLeagues(mergedLeagues, now2);
+    const refreshedLeagues = refreshManualGamesSpineGamesInLeagues(mergedLeagues, now);
     const manualGames = flattenManualGamesSpineGames(
-      convertManualGamesSpineDocument(manualDocument, now2)
-    ).map((game) => refreshManualGamesSpineGameIfNeeded(game, now2));
+      convertManualGamesSpineDocument(manualDocument, now)
+    ).map((game) => refreshManualGamesSpineGameIfNeeded(game, now));
     let enrichedLeagues = applyOperationalEnrichmentToLeagues(
       refreshedLeagues,
       operationsFieldsByGameId
@@ -69224,7 +70298,7 @@ function useTopRailRankedGames(importantGameCount) {
         adminFeaturedPriorities
       });
       if (!result) break;
-      const game = refreshTopRailSlateGame(result.game, now2, adjunctNow);
+      const game = refreshTopRailSlateGame(result.game, now, adjunctNow);
       if (index2 === 0 && game.league && isGamesSpineLeagueTemporarilyHidden(game.league)) {
         break;
       }
@@ -69524,7 +70598,7 @@ init_define_import_meta_env();
 
 // ../grarf/shared/media/services/mediaResolution/teamAliases.js
 init_define_import_meta_env();
-function normalizeTeamToken(s2) {
+function normalizeTeamToken2(s2) {
   return String(s2 || "").toLowerCase().replace(/\./g, "").replace(/[^a-z0-9\s]/g, " ").replace(/\s+/g, " ").trim();
 }
 function buildTeamAliasTerms(game, side) {
@@ -69533,7 +70607,7 @@ function buildTeamAliasTerms(game, side) {
   const city = side === "away" ? game.awayCity : game.homeCity;
   const official = side === "away" ? game.officialAwayName : game.officialHomeName;
   for (const raw of [team, city, official]) {
-    const n2 = normalizeTeamToken(raw);
+    const n2 = normalizeTeamToken2(raw);
     if (n2.length < 3) continue;
     terms.add(n2);
     const parts = n2.split(" ").filter(Boolean);
@@ -69576,7 +70650,7 @@ function expandHighlightTitleAliasTerms(terms, aliasGroups = HIGHLIGHT_TITLE_TEA
   const expanded = new Set(terms);
   for (const term of terms) {
     for (const group of aliasGroups) {
-      const normalizedGroup = group.map((entry4) => normalizeTeamToken(entry4)).filter((entry4) => entry4.length >= 3);
+      const normalizedGroup = group.map((entry4) => normalizeTeamToken2(entry4)).filter((entry4) => entry4.length >= 3);
       const termMatchesGroup = normalizedGroup.some(
         (alias) => alias === term || term.includes(alias) || alias.includes(term)
       );
@@ -69593,7 +70667,7 @@ function expandHighlightTitleAliasTerms(terms, aliasGroups = HIGHLIGHT_TITLE_TEA
 var MATCH_SCORE_CEILING = 12;
 var MIN_STRONG_MATCH_SCORE = 8;
 function fragmentMatchesTerms(fragment, terms) {
-  const f2 = normalizeTeamToken(fragment);
+  const f2 = normalizeTeamToken2(fragment);
   if (!f2) return false;
   return terms.some((t2) => t2.length >= 3 && (f2.includes(t2) || t2.includes(f2)));
 }
@@ -69614,8 +70688,8 @@ function scoreTitleAgainstGame(title, game, titlePatterns = ["highlight", "highl
     teamMatch = aLeft && hRight || hLeft && aRight;
     if (teamMatch) reasons.push("both_teams_in_title");
   } else {
-    const awayHit = awayTerms.some((term) => normalizeTeamToken(title).includes(term));
-    const homeHit = homeTerms.some((term) => normalizeTeamToken(title).includes(term));
+    const awayHit = awayTerms.some((term) => normalizeTeamToken2(title).includes(term));
+    const homeHit = homeTerms.some((term) => normalizeTeamToken2(title).includes(term));
     teamMatch = awayHit && homeHit;
     if (teamMatch) reasons.push("both_teams_in_title");
   }
@@ -69800,7 +70874,7 @@ function foldAccents(value) {
   return value.normalize("NFD").replace(/\p{M}/gu, "");
 }
 function normalizeF1TextToken(value) {
-  return normalizeTeamToken(foldAccents(value));
+  return normalizeTeamToken2(foldAccents(value));
 }
 var F1_SESSION_PATTERNS = [
   { key: "sprint_qualifying", pattern: /\bsprint\s+qualifying\b/i },
@@ -70007,7 +71081,7 @@ function resolveRequiredSoloEventIdentifierTerm(awayTeam) {
   return null;
 }
 function normalizedTitleIncludesWholeTerm(normalizedTitle, term) {
-  const normalizedTerm = normalizeTeamToken(term);
+  const normalizedTerm = normalizeTeamToken2(term);
   if (!normalizedTerm || normalizedTerm.length < 3) return false;
   let start = 0;
   while (start <= normalizedTitle.length) {
@@ -70026,7 +71100,7 @@ function normalizedTitleIncludesWholeTerm(normalizedTitle, term) {
 function appendSoloEventSearchTerms(terms, raw) {
   if (!raw?.trim()) return;
   for (const segment of raw.split(/[·–—|-]/)) {
-    const normalizedSegment = normalizeTeamToken(segment);
+    const normalizedSegment = normalizeTeamToken2(segment);
     if (normalizedSegment.length >= 3) terms.add(normalizedSegment);
     const parts = normalizedSegment.split(" ").filter(Boolean);
     if (parts.length > 1) {
@@ -70051,7 +71125,7 @@ function buildSoloCompetitionHighlightSearchTerms(game) {
   }
   const requiredIdentifier = resolveRequiredSoloEventIdentifierTerm(game.awayTeam ?? "");
   if (requiredIdentifier) {
-    terms.add(normalizeTeamToken(requiredIdentifier));
+    terms.add(normalizeTeamToken2(requiredIdentifier));
   }
   return terms;
 }
@@ -70060,7 +71134,7 @@ function soloCompetitionHighlightTitleMatchesGame(title, game) {
     return f1HighlightTitleMatchesGame(title, game);
   }
   if (!soloCompetitionHighlightRoundMatchesGame(title, game)) return false;
-  const normalizedTitle = normalizeTeamToken(title);
+  const normalizedTitle = normalizeTeamToken2(title);
   if (!normalizedTitle) return false;
   const requiredIdentifier = resolveRequiredSoloEventIdentifierTerm(game.awayTeam ?? "");
   if (requiredIdentifier) {
@@ -70115,10 +71189,10 @@ function scoreHighlightsTvClipAgainstSoloEventGame(clip, game) {
   if (rawScore < minScore) return null;
   return rawScore;
 }
-function resolveHighlightsTvAmbientEligibleSportsDayKeys(now2 = /* @__PURE__ */ new Date()) {
+function resolveHighlightsTvAmbientEligibleSportsDayKeys(now = /* @__PURE__ */ new Date()) {
   return {
-    sportsDayKey: getOperationalSportsDayDateKey(now2),
-    precedingSportsDayKey: getOperationalSportsDayYesterdayDateKey(now2)
+    sportsDayKey: getOperationalSportsDayDateKey(now),
+    precedingSportsDayKey: getOperationalSportsDayYesterdayDateKey(now)
   };
 }
 function resolveHighlightsTvClipPublicationSportsDayKey(clip) {
@@ -70128,15 +71202,15 @@ function resolveHighlightsTvClipPublicationSportsDayKey(clip) {
   if (!Number.isFinite(publishedMs) || publishedMs <= 0) return null;
   return getOperationalSportsDayDateKey(new Date(publishedMs));
 }
-function isHighlightsTvAmbientPublicationEligible(clip, now2 = /* @__PURE__ */ new Date()) {
+function isHighlightsTvAmbientPublicationEligible(clip, now = /* @__PURE__ */ new Date()) {
   const publicationSportsDayKey = resolveHighlightsTvClipPublicationSportsDayKey(clip);
   if (!publicationSportsDayKey) return false;
-  const { sportsDayKey, precedingSportsDayKey } = resolveHighlightsTvAmbientEligibleSportsDayKeys(now2);
+  const { sportsDayKey, precedingSportsDayKey } = resolveHighlightsTvAmbientEligibleSportsDayKeys(now);
   return publicationSportsDayKey === sportsDayKey || publicationSportsDayKey === precedingSportsDayKey;
 }
-function isHighlightsTvAmbientEligibleGame(game, now2 = /* @__PURE__ */ new Date()) {
-  const { sportsDayKey, precedingSportsDayKey } = resolveHighlightsTvAmbientEligibleSportsDayKeys(now2);
-  return isGameOnGamesSpineOperationalDate(game, sportsDayKey, now2) || isGameOnGamesSpineOperationalDate(game, precedingSportsDayKey, now2);
+function isHighlightsTvAmbientEligibleGame(game, now = /* @__PURE__ */ new Date()) {
+  const { sportsDayKey, precedingSportsDayKey } = resolveHighlightsTvAmbientEligibleSportsDayKeys(now);
+  return isGameOnGamesSpineOperationalDate(game, sportsDayKey, now) || isGameOnGamesSpineOperationalDate(game, precedingSportsDayKey, now);
 }
 function scoreHighlightsTvClipAgainstGame(clip, game) {
   const titleScore = scoreTitleAgainstGame(clip.title, game, HIGHLIGHT_TITLE_PATTERNS);
@@ -70167,10 +71241,10 @@ function scoreHighlightsTvClipAgainstResolverGame(clip, game) {
   }
   return scoreHighlightsTvClipAgainstGame(clip, game);
 }
-function resolveHighlightsTvGameHighlightClip(clips, game, now2 = /* @__PURE__ */ new Date()) {
+function resolveHighlightsTvGameHighlightClip(clips, game, now = /* @__PURE__ */ new Date()) {
   let best = null;
   for (const clip of clips) {
-    if (!isHighlightsTvAmbientPublicationEligible(clip, now2)) continue;
+    if (!isHighlightsTvAmbientPublicationEligible(clip, now)) continue;
     const score2 = scoreHighlightsTvClipAgainstResolverGame(clip, game);
     if (score2 == null) continue;
     if (!best || score2 > best.score) {
@@ -70193,13 +71267,13 @@ function clipMatchesGame(clip, game) {
   }
   return scoreHighlightsTvClipAgainstGame(clip, resolverGame) != null;
 }
-function filterHighlightsTvAmbientPublicationEligibleClips(clips, now2 = /* @__PURE__ */ new Date()) {
-  return clips.filter((clip) => isHighlightsTvAmbientPublicationEligible(clip, now2));
+function filterHighlightsTvAmbientPublicationEligibleClips(clips, now = /* @__PURE__ */ new Date()) {
+  return clips.filter((clip) => isHighlightsTvAmbientPublicationEligible(clip, now));
 }
-function filterHighlightsTvAmbientEligibleClips(clips, games, now2 = /* @__PURE__ */ new Date()) {
+function filterHighlightsTvAmbientEligibleClips(clips, games, now = /* @__PURE__ */ new Date()) {
   if (clips.length === 0 || games.length === 0) return [];
   return clips.filter(
-    (clip) => isHighlightsTvAmbientPublicationEligible(clip, now2) && games.some((game) => clipMatchesGame(clip, game))
+    (clip) => isHighlightsTvAmbientPublicationEligible(clip, now) && games.some((game) => clipMatchesGame(clip, game))
   );
 }
 
@@ -70986,7 +72060,7 @@ function resolveWorkspaceEmbedUrl(raw) {
 }
 
 // ../grarf/desktop/src/lib/highlightsTv/fetchHighlightsTvRssAppSourceVideos.ts
-var LOG25 = "[HighlightsTv][RssApp]";
+var LOG27 = "[HighlightsTv][RssApp]";
 function resolveYoutubeVideoIdFromRssItem(link, descriptionMarkup) {
   const fromLink = youtubeVideoIdFromUrl(link);
   if (fromLink) return fromLink;
@@ -71001,7 +72075,7 @@ async function fetchHighlightsTvRssAppSourceVideos(feedUrl, options) {
   if (!trimmedUrl) return [];
   const fetched = await fetchRssXml2(trimmedUrl);
   if (!fetched.ok || !fetched.xml) {
-    console.warn(LOG25, "fetch_failed", {
+    console.warn(LOG27, "fetch_failed", {
       feedUrl: trimmedUrl,
       error: fetched.error ?? `http_${fetched.status ?? "unknown"}`
     });
@@ -71023,11 +72097,11 @@ async function fetchHighlightsTvRssAppSourceVideos(feedUrl, options) {
       });
     }
     if (entries.length === 0) {
-      console.warn(LOG25, "no_youtube_videos_in_feed", { feedUrl: trimmedUrl });
+      console.warn(LOG27, "no_youtube_videos_in_feed", { feedUrl: trimmedUrl });
     }
     return options?.preservePlaylistOrder === true ? entries : [...entries].reverse();
   } catch (error) {
-    console.warn(LOG25, "parse_failed", {
+    console.warn(LOG27, "parse_failed", {
       feedUrl: trimmedUrl,
       error: error instanceof Error ? error.message : String(error)
     });
@@ -71729,63 +72803,24 @@ function buildMlbEspnScoreboardLogoUrl(abbrev) {
 
 // ../grarf/desktop/src/lib/gamesSpine/nbaEspnLogoSlug.ts
 init_define_import_meta_env();
-var NBA_ESPN_SCOREBOARD_SLUG = {
+var NBA_ESPN_SCOREBOARD_SLUG2 = {
   nop: "no",
   uta: "utah"
 };
-function resolveNbaEspnScoreboardLogoSlug(abbrev) {
+function resolveNbaEspnScoreboardLogoSlug2(abbrev) {
   const trimmed = abbrev?.trim();
   if (!trimmed) return void 0;
   const key2 = trimmed.toLowerCase();
-  return NBA_ESPN_SCOREBOARD_SLUG[key2] ?? key2;
+  return NBA_ESPN_SCOREBOARD_SLUG2[key2] ?? key2;
 }
 function buildNbaEspnScoreboardLogoUrl(abbrev) {
-  const slug = resolveNbaEspnScoreboardLogoSlug(abbrev);
+  const slug = resolveNbaEspnScoreboardLogoSlug2(abbrev);
   if (!slug) return void 0;
   return `https://a.espncdn.com/i/teamlogos/nba/500/scoreboard/${slug}.png`;
 }
 
 // ../grarf/desktop/src/lib/gamesSpine/wnbaEspnLogoUrl.ts
 init_define_import_meta_env();
-
-// ../grarf/shared/domain/wnba/resolveWnbaEspnLogoSlug.ts
-init_define_import_meta_env();
-var WNBA_ESPN_LOGO_SLUG_BY_TRICODE = {
-  gs: "gsv",
-  gsv: "gsv",
-  wsh: "was",
-  was: "was",
-  por: "por",
-  pdx: "por",
-  ny: "ny",
-  nyl: "ny",
-  lv: "lv",
-  la: "la"
-};
-function resolveWnbaEspnLogoSlug(abbrev) {
-  const key2 = abbrev?.trim().toLowerCase();
-  if (!key2) return void 0;
-  return WNBA_ESPN_LOGO_SLUG_BY_TRICODE[key2] ?? key2;
-}
-function normalizeWnbaOperationalTeamAbbrev(abbrev) {
-  const raw = abbrev?.trim().toUpperCase();
-  if (!raw) return void 0;
-  if (raw === "GSV") return "GS";
-  if (raw === "WAS") return "WSH";
-  if (raw === "PDX") return "POR";
-  if (raw === "LVA") return "LV";
-  if (raw === "LAS") return "LA";
-  if (raw === "NYL") return "NY";
-  return raw;
-}
-function wnbaOperationalTeamAbbrevsEquivalent(left, right) {
-  const a2 = normalizeWnbaOperationalTeamAbbrev(left);
-  const b2 = normalizeWnbaOperationalTeamAbbrev(right);
-  if (!a2 || !b2) return false;
-  return a2 === b2;
-}
-
-// ../grarf/desktop/src/lib/gamesSpine/wnbaEspnLogoUrl.ts
 var WNBA_LOCAL_TEAM_LOGO_BY_ABBREV = {
   coop: "/league-logos/wnba-team-coop.png",
   spo: "/league-logos/wnba-team-spoon.png"
@@ -71931,7 +72966,8 @@ var SOCCER_LEAGUES2 = /* @__PURE__ */ new Set([
   "SAUDI",
   "SUPERLIG",
   "USLCUP",
-  "WORLDCUP"
+  "WORLDCUP",
+  "BRA1"
 ]);
 function espnCdnLogo(league2, abbrev, teamId, game) {
   const abbr = abbrev?.trim().toLowerCase();
@@ -71999,7 +73035,9 @@ function resolveTeamLogoUrl(game, side) {
   }
   const direct = side === "away" ? game.awayLogoUrl : game.homeLogoUrl;
   if (direct?.trim()) {
-    const resolvedDirect = resolveNbaIngestLogoUrlIfNeeded(league2, abbrev, direct.trim());
+    let resolvedDirect = direct.trim();
+    if (league2 === "WNBA") resolvedDirect = fixWnbaIngestLogoUrl(resolvedDirect);
+    else resolvedDirect = resolveNbaIngestLogoUrlIfNeeded(league2, abbrev, resolvedDirect);
     return resolveGrarfLogoSrc(resolvedDirect);
   }
   const standings = side === "away" ? game.awayTeamStandings : game.homeTeamStandings;
@@ -72011,6 +73049,23 @@ function parseLeagueFromEspnId(id) {
   const key2 = m2?.[1]?.toUpperCase();
   if (!key2) return void 0;
   return key2;
+}
+function fixWnbaIngestLogoUrl(logoUrl) {
+  const scoreboardMatch = logoUrl.match(/teamlogos\/wnba\/500\/scoreboard\/([^.]+)\.png/i);
+  if (scoreboardMatch) {
+    const slug = resolveWnbaEspnLogoSlug(scoreboardMatch[1]) ?? scoreboardMatch[1].toLowerCase();
+    return `https://a.espncdn.com/i/teamlogos/wnba/500/${slug}.png`;
+  }
+  const directMatch = logoUrl.match(/teamlogos\/wnba\/500\/([^.]+)\.png/i);
+  if (directMatch) {
+    const raw = directMatch[1].toLowerCase();
+    if (raw === "scoreboard") return logoUrl;
+    const slug = resolveWnbaEspnLogoSlug(raw) ?? raw;
+    if (slug !== raw) {
+      return `https://a.espncdn.com/i/teamlogos/wnba/500/${slug}.png`;
+    }
+  }
+  return logoUrl;
 }
 function resolveNbaIngestLogoUrlIfNeeded(league2, abbrev, logoUrl) {
   if (league2 !== "NBA" && league2 !== "NBASUMMER") return logoUrl;
@@ -73151,9 +74206,9 @@ function resolveOperationalServiceBaseUrl() {
   const config = getOperationalIngestConfig();
   return config.cloudBaseUrl?.replace(/\/+$/, "") ?? null;
 }
-async function fetchYesterdayHistoricalSlateFromOperationalService(dateKey, now2 = /* @__PURE__ */ new Date()) {
+async function fetchYesterdayHistoricalSlateFromOperationalService(dateKey, now = /* @__PURE__ */ new Date()) {
   const baseUrl = resolveOperationalServiceBaseUrl();
-  const resolvedDateKey = dateKey?.trim() || getOperationalSportsDayYesterdayDateKey(now2);
+  const resolvedDateKey = dateKey?.trim() || getOperationalSportsDayYesterdayDateKey(now);
   if (!baseUrl) {
     return { ok: false, error: "operational_service_url_unconfigured" };
   }
@@ -73237,9 +74292,9 @@ var useScheduleCacheStore = (0, import_zustand31.create)((set) => ({
 }));
 
 // ../grarf/desktop/src/lib/home/fetchAndCacheYesterdayHistoricalSlate.ts
-async function fetchAndCacheYesterdayHistoricalSlate(dateKey, now2 = /* @__PURE__ */ new Date()) {
+async function fetchAndCacheYesterdayHistoricalSlate(dateKey, now = /* @__PURE__ */ new Date()) {
   const api = window.grarf?.gamesFetchHistoricalSlateForDate;
-  const resolvedDateKey = dateKey?.trim() || getOperationalSportsDayYesterdayDateKey(now2);
+  const resolvedDateKey = dateKey?.trim() || getOperationalSportsDayYesterdayDateKey(now);
   let result;
   if (api) {
     const ipcResult = await api(resolvedDateKey);
@@ -73254,7 +74309,7 @@ async function fetchAndCacheYesterdayHistoricalSlate(dateKey, now2 = /* @__PURE_
   } else if (isGrarfExtensionRenderer()) {
     const cloudResult = await fetchYesterdayHistoricalSlateFromOperationalService(
       resolvedDateKey,
-      now2
+      now
     );
     if (!cloudResult.ok) {
       return {
@@ -73620,9 +74675,9 @@ function sanitizeStories(raw) {
   }
   return stories;
 }
-function pruneStories(stories, now2 = Date.now()) {
+function pruneStories(stories, now = Date.now()) {
   return stories.filter((story) => {
-    const age = now2 - new Date(story.timestamp).getTime();
+    const age = now - new Date(story.timestamp).getTime();
     return Number.isFinite(age) && age >= 0 && age <= MAX_STORY_AGE_MS;
   });
 }
@@ -73630,7 +74685,7 @@ function capNewswireTimelineStories(stories, maxStories = NEWSWIRE_TIMELINE_MAX_
   if (stories.length <= maxStories) return [...stories];
   return [...stories].sort((a2, b2) => new Date(b2.timestamp).getTime() - new Date(a2.timestamp).getTime()).slice(0, maxStories);
 }
-function readNewswireTimelineSync(now2 = Date.now()) {
+function readNewswireTimelineSync(now = Date.now()) {
   if (typeof localStorage === "undefined") return [];
   try {
     const raw = localStorage.getItem(NEWSWIRE_TIMELINE_STORAGE_KEY);
@@ -73640,7 +74695,7 @@ function readNewswireTimelineSync(now2 = Date.now()) {
     if (version !== NEWSWIRE_TIMELINE_STORAGE_VERSION) return [];
     const storiesRaw = parsed.stories ?? parsed.events;
     const sanitized = sanitizeStories(storiesRaw);
-    const pruned = capNewswireTimelineStories(pruneStories(sanitized, now2));
+    const pruned = capNewswireTimelineStories(pruneStories(sanitized, now));
     if (pruned.length < sanitized.length) {
       writeNewswireTimelineSync(pruned);
     }
@@ -73682,8 +74737,8 @@ function persistTimeline2(storiesById) {
   writeNewswireTimelineSync(capped);
   return storiesByIdFromList(capped);
 }
-function hydrateTimelineFromStorage2(now2 = Date.now()) {
-  const pruned = readNewswireTimelineSync(now2);
+function hydrateTimelineFromStorage2(now = Date.now()) {
+  const pruned = readNewswireTimelineSync(now);
   return storiesByIdFromList(pruned);
 }
 var initialStoriesById = hydrateTimelineFromStorage2();
@@ -73731,8 +74786,8 @@ var useNewswireTimelineStore = (0, import_zustand33.create)((set, get) => ({
     }
     return appended.length;
   },
-  pruneExpired: (now2 = Date.now()) => {
-    const prunedList = readNewswireTimelineSync(now2);
+  pruneExpired: (now = Date.now()) => {
+    const prunedList = readNewswireTimelineSync(now);
     const current = get().storiesById;
     const cappedById = persistTimeline2(storiesByIdFromList(prunedList));
     if (Object.keys(cappedById).length === Object.keys(current).length) return;
@@ -74583,18 +75638,18 @@ function resolveManualLiveTrackerGrarfLeagueKey(manualLeagueKey) {
   return MANUAL_LIVE_TRACKER_LEAGUE_KEYS[manualLeagueKey.trim().toLowerCase()] ?? null;
 }
 function resolveManualLiveTrackerGamesByLeague(nowMs3 = Date.now(), documentOverride) {
-  const now2 = new Date(nowMs3);
+  const now = new Date(nowMs3);
   const document2 = documentOverride !== void 0 ? documentOverride : useGamesSpineManualStore.getState().document;
   const sections = convertManualGamesSpineDocument(
     document2,
-    now2,
-    getOperationalSportsDayDateKey(now2)
+    now,
+    getOperationalSportsDayDateKey(now)
   );
   const out = /* @__PURE__ */ new Map();
   for (const section of sections) {
     const grarfKey = resolveManualLiveTrackerGrarfLeagueKey(section.leagueKey);
     if (!grarfKey) continue;
-    const games = section.games.map((game) => refreshManualGamesSpineGameIfNeeded(game, now2)).map((game) => ({ ...game, league: grarfKey }));
+    const games = section.games.map((game) => refreshManualGamesSpineGameIfNeeded(game, now)).map((game) => ({ ...game, league: grarfKey }));
     if (games.length === 0) continue;
     const existing = out.get(grarfKey) ?? [];
     out.set(grarfKey, [...existing, ...games]);
@@ -76434,13 +77489,13 @@ var import_react39 = __toESM(require_react(), 1);
 init_define_import_meta_env();
 function applyManualEventsSourceToLiveGames(source) {
   const prev = useLiveGamesStore.getState();
-  const now2 = /* @__PURE__ */ new Date();
+  const now = /* @__PURE__ */ new Date();
   const mergedLeagues = refreshManualGamesSpineGamesInLeagues(
     mergeIngestedManualEventsIntoLeagueGames(prev.leagues, {
       source,
-      now: now2
+      now
     }),
-    now2
+    now
   );
   prev.hydrate({
     leagues: mergedLeagues,
@@ -76469,12 +77524,12 @@ function ManualGamesSpineStatusBridge() {
   (0, import_react40.useEffect)(() => {
     if (isGrarfExtensionRenderer()) return;
     const state3 = useLiveGamesStore.getState();
-    const now2 = new Date(refreshMs);
-    const leagues = refreshManualGamesSpineGamesInLeagues(state3.leagues, now2);
+    const now = new Date(refreshMs);
+    const leagues = refreshManualGamesSpineGamesInLeagues(state3.leagues, now);
     if (leagues === state3.leagues) return;
     state3.hydrate({
       leagues,
-      updatedAt: state3.updatedAt ?? now2.toISOString()
+      updatedAt: state3.updatedAt ?? now.toISOString()
     });
   }, [refreshMs]);
   return null;
@@ -76964,10 +78019,10 @@ init_define_import_meta_env();
 function allGames(leagues) {
   return Object.values(leagues).flat();
 }
-function resolveAutomaticOperationalMode(leagues, now2 = /* @__PURE__ */ new Date()) {
-  const todayKey = getOperationalSportsDayDateKey(now2);
+function resolveAutomaticOperationalMode(leagues, now = /* @__PURE__ */ new Date()) {
+  const todayKey = getOperationalSportsDayDateKey(now);
   const slate = allGames(leagues).filter(
-    (g2) => isGameOnGamesSpineOperationalDate(g2, todayKey, now2)
+    (g2) => isGameOnGamesSpineOperationalDate(g2, todayKey, now)
   );
   if (slate.some((g2) => isGameActivelyLive(g2))) return "LIVE";
   return "CATCH_UP";
@@ -77078,7 +78133,7 @@ init_define_import_meta_env();
 
 // ../grarf/desktop/src/lib/commandBriefing/briefingPersistence.ts
 init_define_import_meta_env();
-var LOG26 = "[CommandBriefing]";
+var LOG28 = "[CommandBriefing]";
 function snapshotFromGame2(game) {
   const league2 = game.league ?? "MLB";
   return {
@@ -77105,11 +78160,11 @@ function snapshotFromGame2(game) {
 }
 function logUsingLiveGame(game) {
   if (!define_import_meta_env_default.DEV) return;
-  console.log(`${LOG26} Using live operational game`, { gameId: game.id });
+  console.log(`${LOG28} Using live operational game`, { gameId: game.id });
 }
 function logPersistedFallbackSnapshot(gameId) {
   if (!define_import_meta_env_default.DEV) return;
-  console.log(`${LOG26} Persisted fallback snapshot`, { gameId });
+  console.log(`${LOG28} Persisted fallback snapshot`, { gameId });
 }
 function persistBriefingSnapshot(game) {
   const api = window.grarf?.commandBriefingSavePersistenceEntry;
@@ -77125,8 +78180,8 @@ function persistBriefingSnapshot(game) {
 
 // ../grarf/desktop/src/lib/finalizedGameRetention/analyzeLifecycle.ts
 init_define_import_meta_env();
-function yesterdayKey(now2) {
-  return getOperationalSportsDayYesterdayDateKey(now2);
+function yesterdayKey(now) {
+  return getOperationalSportsDayYesterdayDateKey(now);
 }
 function finalizedAtIso(game) {
   if (game.status !== "final") return null;
@@ -77205,9 +78260,9 @@ function summarizeLeague(league2, ingestRows, finals) {
   };
 }
 function collectFinalizedGameRetentionSnapshot(input) {
-  const now2 = input.now ?? /* @__PURE__ */ new Date();
-  const todayKey = getOperationalSportsDayDateKey(now2);
-  const yKey = yesterdayKey(now2);
+  const now = input.now ?? /* @__PURE__ */ new Date();
+  const todayKey = getOperationalSportsDayDateKey(now);
+  const yKey = yesterdayKey(now);
   const mode = input.operationalMode ?? "CATCH_UP";
   const retained = input.retainedFinals ?? [];
   const retainedIds = new Set(retained.map((g2) => g2.id));
@@ -77221,7 +78276,7 @@ function collectFinalizedGameRetentionSnapshot(input) {
     allIngest.push(...ingestRows);
     const retainedLeague = retained.filter((g2) => (g2.league ?? "MLB") === league2);
     if (mode === "CATCH_UP") {
-      const catchUpSlate = buildGamesSpineOperationalSlate(ingestRows, retainedLeague, "CATCH_UP", now2);
+      const catchUpSlate = buildGamesSpineOperationalSlate(ingestRows, retainedLeague, "CATCH_UP", now);
       catchUpVisibleFinalCount += catchUpSlate.filter((g2) => g2.status === "final").length;
     }
     const leagueFinals = [];
@@ -77300,7 +78355,7 @@ function collectFinalizedGameRetentionSnapshot(input) {
     }
   }
   return {
-    timestamp: now2.toISOString(),
+    timestamp: now.toISOString(),
     ingestCycle: input.ingestCycle,
     operationalTodayKey: todayKey,
     operationalYesterdayKey: yKey,
@@ -77402,7 +78457,7 @@ function FinalizedGameRetentionBridge() {
 // ../grarf/desktop/src/components/operational/YesterdayCatchUpSeedBridge.tsx
 init_define_import_meta_env();
 var import_react49 = __toESM(require_react(), 1);
-var LOG27 = "[CatchUpYesterday]";
+var LOG29 = "[CatchUpYesterday]";
 function groupFinalsByLeague(finals) {
   const leagues = {};
   for (const game of finals) {
@@ -77424,7 +78479,7 @@ function YesterdayCatchUpSeedBridge() {
         const finals = result?.finals ?? [];
         if (finals.length === 0) {
           if (define_import_meta_env_default.DEV) {
-            console.warn(`${LOG27} no yesterday finals returned`);
+            console.warn(`${LOG29} no yesterday finals returned`);
           }
           return;
         }
@@ -77432,11 +78487,11 @@ function YesterdayCatchUpSeedBridge() {
         useScheduleCacheStore.getState().setScheduleSlate(yesterdayKey2, groupFinalsByLeague(finals));
         useRecentFinalizedGamesStore.getState().mergeFinalizedGames(finals);
         if (define_import_meta_env_default.DEV) {
-          console.log(`${LOG27} seeded ${finals.length} yesterday finals for Catch Up`);
+          console.log(`${LOG29} seeded ${finals.length} yesterday finals for Catch Up`);
         }
       } catch (e2) {
         if (!cancelled && define_import_meta_env_default.DEV) {
-          console.warn(`${LOG27} seed failed`, e2);
+          console.warn(`${LOG29} seed failed`, e2);
         }
       }
     })();
@@ -77702,7 +78757,7 @@ function computeAttentionScore(input) {
 
 // ../grarf/desktop/src/lib/attentionRuntime/devLogging.ts
 init_define_import_meta_env();
-var LOG28 = "[AttentionRuntime]";
+var LOG30 = "[AttentionRuntime]";
 var lastRankingSignature = "";
 var lastRecomputeLogAt = 0;
 function rankingSignature(rankings) {
@@ -77710,15 +78765,15 @@ function rankingSignature(rankings) {
 }
 function logAttentionRecompute(input) {
   if (!define_import_meta_env_default.DEV) return;
-  const now2 = Date.now();
+  const now = Date.now();
   const signature = rankingSignature(input.rankings);
   const rankingChanged = signature !== lastRankingSignature;
   const majorTrigger = input.trigger === "initial" || input.trigger === "status_transition" || input.trigger === "overtime_detected" || input.trigger === "residual_decay";
   if (!rankingChanged && !majorTrigger) return;
-  if (!rankingChanged && now2 - lastRecomputeLogAt < 6e4) return;
+  if (!rankingChanged && now - lastRecomputeLogAt < 6e4) return;
   lastRankingSignature = signature;
-  lastRecomputeLogAt = now2;
-  console.log(`${LOG28} recompute`, {
+  lastRecomputeLogAt = now;
+  console.log(`${LOG30} recompute`, {
     trigger: input.trigger,
     gameCount: input.gameCount,
     top: input.rankings.slice(0, 5).map((r3) => ({
@@ -77730,13 +78785,13 @@ function logAttentionRecompute(input) {
 }
 function logResidualGravityStarted(input) {
   if (!define_import_meta_env_default.DEV) return;
-  console.log(`${LOG28} residual gravity started`, input);
+  console.log(`${LOG30} residual gravity started`, input);
 }
 function logResidualGravityDecay(states) {
   if (!define_import_meta_env_default.DEV || states.length === 0) return;
   const active2 = states.filter((s2) => s2.currentGravity > 0.5);
   if (active2.length === 0) return;
-  console.log(`${LOG28} residual gravity decay`, {
+  console.log(`${LOG30} residual gravity decay`, {
     active: active2.map((s2) => ({
       eventId: s2.eventId,
       gravity: s2.currentGravity,
@@ -77748,36 +78803,36 @@ function logResidualGravityDecay(states) {
 
 // ../grarf/desktop/src/lib/attentionRuntime/residualGravityState.ts
 init_define_import_meta_env();
-function computeCurrentGravity(entry4, now2) {
-  const elapsed = Math.max(0, now2 - entry4.startedAt);
+function computeCurrentGravity(entry4, now) {
+  const elapsed = Math.max(0, now - entry4.startedAt);
   const progress = Math.min(1, elapsed / entry4.decayDurationMs);
   const current = entry4.peakGravity * (1 - progress);
   return Math.max(0, Math.round(current * 10) / 10);
 }
-function materializeResidualState(entry4, now2) {
-  const elapsed = Math.max(0, now2 - entry4.startedAt);
+function materializeResidualState(entry4, now) {
+  const elapsed = Math.max(0, now - entry4.startedAt);
   const decayProgress = Math.min(1, elapsed / entry4.decayDurationMs);
   const currentGravity = computeCurrentGravity(
     { ...entry4, decayProgress, currentGravity: 0 },
-    now2
+    now
   );
   return { ...entry4, decayProgress, currentGravity };
 }
-function pruneExpiredResiduals(store, now2) {
+function pruneExpiredResiduals(store, now) {
   const out = {};
   for (const [id, entry4] of Object.entries(store)) {
     const current = computeCurrentGravity(
       { ...entry4, decayProgress: 0, currentGravity: 0 },
-      now2
+      now
     );
     if (current > 0.05) {
-      out[id] = materializeResidualState(entry4, now2);
+      out[id] = materializeResidualState(entry4, now);
     }
   }
   return out;
 }
 function maybeStartResidualGravity(input) {
-  const { game, previousStatus, now: now2 } = input;
+  const { game, previousStatus, now } = input;
   let store = input.store;
   if (game.status !== "final") {
     return { store, started: false, reason: null };
@@ -77796,11 +78851,11 @@ function maybeStartResidualGravity(input) {
       {
         eventId: game.id,
         peakGravity,
-        startedAt: now2,
+        startedAt: now,
         decayDurationMs: RESIDUAL_DECAY_DURATION_MS,
         reason
       },
-      now2
+      now
     )
   };
   return { store, started: true, reason };
@@ -77862,14 +78917,14 @@ function detectTrigger(games) {
   if (sawClock) return "clock_change";
   return "ingest_update";
 }
-function updateResidualGravity(games, now2) {
+function updateResidualGravity(games, now) {
   let startedAny = false;
   for (const game of games) {
     const result = maybeStartResidualGravity({
       game,
       previousStatus: state.previousStatus[game.id],
       store: state.residualById,
-      now: now2
+      now
     });
     state.residualById = result.store;
     if (result.started && result.reason) {
@@ -77881,7 +78936,7 @@ function updateResidualGravity(games, now2) {
       });
     }
   }
-  const pruned = pruneExpiredResiduals(state.residualById, now2);
+  const pruned = pruneExpiredResiduals(state.residualById, now);
   const decayed = Object.keys(pruned).length !== Object.keys(state.residualById).length;
   state.residualById = Object.fromEntries(
     Object.entries(pruned).map(([id, entry4]) => [
@@ -77908,10 +78963,10 @@ function buildRankings(scores) {
   });
 }
 function recomputeAttentionScores(trigger) {
-  const now2 = Date.now();
+  const now = Date.now();
   const games = collectOperationalGames();
   const effectiveTrigger = trigger === "ingest_update" && state.recomputeCount > 0 ? detectTrigger(games) : trigger;
-  updateResidualGravity(games, now2);
+  updateResidualGravity(games, now);
   const bundle = useEditorialStore.getState().bundle;
   const dateKey = useCommandBriefingStore.getState().selectedDate;
   const scores = [];
@@ -77934,7 +78989,7 @@ function recomputeAttentionScores(trigger) {
   state.rankings = rankings;
   state.recomputeCount += 1;
   state.lastRecomputeReason = effectiveTrigger;
-  state.lastRecomputedAt = now2;
+  state.lastRecomputedAt = now;
   syncTracking(games);
   logAttentionRecompute({
     trigger: effectiveTrigger,
@@ -77946,9 +79001,9 @@ function recomputeAttentionScores(trigger) {
   return snapshot2;
 }
 function tickAttentionResidualDecay() {
-  const now2 = Date.now();
+  const now = Date.now();
   const before = JSON.stringify(state.residualById);
-  state.residualById = pruneExpiredResiduals(state.residualById, now2);
+  state.residualById = pruneExpiredResiduals(state.residualById, now);
   const after = JSON.stringify(state.residualById);
   if (before === after) return null;
   const residualStates = Object.values(state.residualById);
@@ -77956,9 +79011,9 @@ function tickAttentionResidualDecay() {
   return recomputeAttentionScores("residual_decay");
 }
 function hasActiveAttentionResidualGravity() {
-  const now2 = Date.now();
+  const now = Date.now();
   return Object.values(state.residualById).some(
-    (entry4) => computeCurrentGravity(entry4, now2) > 0.5
+    (entry4) => computeCurrentGravity(entry4, now) > 0.5
   );
 }
 function buildDiagnosticsSnapshot() {
@@ -78182,7 +79237,7 @@ init_define_import_meta_env();
 
 // ../grarf/desktop/src/lib/recommendationRuntime/devLogging.ts
 init_define_import_meta_env();
-var LOG29 = "[RecommendationRuntime]";
+var LOG31 = "[RecommendationRuntime]";
 var lastPrimaryId = null;
 var lastRankingSignature2 = "";
 var lastLogAt = 0;
@@ -78191,25 +79246,25 @@ function rankingSignature2(diag) {
 }
 function logRecommendationUpdate(diag) {
   if (!define_import_meta_env_default.DEV) return;
-  const now2 = Date.now();
+  const now = Date.now();
   const signature = rankingSignature2(diag);
   const previousPrimary = lastPrimaryId;
   const primaryChanged = diag.primaryRecommendation !== previousPrimary;
   const rankingChanged = signature !== lastRankingSignature2;
   if (!primaryChanged && !rankingChanged) return;
-  if (!primaryChanged && now2 - lastLogAt < 6e4) return;
+  if (!primaryChanged && now - lastLogAt < 6e4) return;
   lastPrimaryId = diag.primaryRecommendation;
   lastRankingSignature2 = signature;
-  lastLogAt = now2;
+  lastLogAt = now;
   if (primaryChanged) {
-    console.log(`${LOG29} primary transition`, {
+    console.log(`${LOG31} primary transition`, {
       from: previousPrimary,
       to: diag.primaryRecommendation,
       reasoning: diag.primaryReasoning,
       mode: diag.operationalMode
     });
   }
-  console.log(`${LOG29} recommendations`, {
+  console.log(`${LOG31} recommendations`, {
     trigger: diag.lastRecomputeReason,
     primary: diag.primaryRecommendation,
     top: diag.rankedRecommendations.slice(0, 4).map((r3) => ({
@@ -78249,7 +79304,7 @@ var state2 = {
 function recomputeRecommendations(trigger = "attention_update") {
   const attention = trigger === "initial" ? inspectAttentionScores() : buildDiagnosticsSnapshot();
   const mode = useOperationalModeStore.getState().mode;
-  const now2 = Date.now();
+  const now = Date.now();
   const candidates = scoreRecommendationCandidates(attention, mode);
   const sorted = sortRecommendationCandidates(candidates);
   const primaryPick = selectPrimaryRecommendation({
@@ -78263,7 +79318,7 @@ function recomputeRecommendations(trigger = "attention_update") {
   state2.continuityHeld = primaryPick.continuityHeld;
   state2.recomputeCount += 1;
   state2.lastRecomputeReason = trigger;
-  state2.lastRecomputedAt = now2;
+  state2.lastRecomputedAt = now;
   const snapshot2 = buildRecommendationDiagnosticsSnapshot(attention);
   logRecommendationUpdate(snapshot2);
   notifyRecommendationUpdates();
@@ -78820,12 +79875,12 @@ function resolveLiveGameWatchTarget(game) {
 }
 
 // ../grarf/desktop/src/lib/watch/providers/espnResolver.ts
-var LOG30 = "[Resolver]";
+var LOG32 = "[Resolver]";
 function resolverDebug(message, extra) {
   if (extra && Object.keys(extra).length > 0) {
-    console.log(`${LOG30} ${message}`, extra);
+    console.log(`${LOG32} ${message}`, extra);
   } else {
-    console.log(`${LOG30} ${message}`);
+    console.log(`${LOG32} ${message}`);
   }
 }
 function parseEspnEventId(game) {
@@ -78839,7 +79894,7 @@ function hintsMentionEspn(game) {
   return hints.some((h2) => /espn/i.test(h2));
 }
 function resolveEspnWatchOption(game) {
-  const now2 = (/* @__PURE__ */ new Date()).toISOString();
+  const now = (/* @__PURE__ */ new Date()).toISOString();
   const league2 = resolveLeague(game);
   if (league2 === "NBASUMMER") {
     const published = resolveLiveGameWatchTarget(game);
@@ -78854,7 +79909,7 @@ function resolveEspnWatchOption(game) {
       confidence: 0.97,
       requiresAuth: true,
       tier: "event",
-      lastVerified: now2
+      lastVerified: now
     };
   }
   if (game.streamUrl && game.streamProvider === "ESPN+" && gameHasEspnWatchBroadcast2(game)) {
@@ -78872,7 +79927,7 @@ function resolveEspnWatchOption(game) {
       confidence: 0.97,
       requiresAuth: true,
       tier: "event",
-      lastVerified: now2
+      lastVerified: now
     };
   }
   if (isWimbledonTennisGame(game)) {
@@ -78894,7 +79949,7 @@ function resolveEspnWatchOption(game) {
       confidence: 0.94,
       requiresAuth: false,
       tier: "event",
-      lastVerified: now2
+      lastVerified: now
     };
   }
   if (gameHasEspnPlusBroadcast2(game)) {
@@ -78913,7 +79968,7 @@ function resolveEspnWatchOption(game) {
           confidence: 0.92,
           requiresAuth: true,
           tier: "event",
-          lastVerified: now2
+          lastVerified: now
         };
       }
     }
@@ -78936,7 +79991,7 @@ function resolveEspnWatchOption(game) {
           confidence: 0.85,
           requiresAuth: true,
           tier: "event",
-          lastVerified: now2
+          lastVerified: now
         };
       }
     }
@@ -78950,7 +80005,7 @@ function resolveEspnWatchOption(game) {
       confidence: 0.72,
       requiresAuth: true,
       tier: "sport",
-      lastVerified: now2
+      lastVerified: now
     };
   }
   resolverDebug("ESPN fallback watch home", { confidence: 0.35 });
@@ -78963,7 +80018,7 @@ function resolveEspnWatchOption(game) {
     confidence: 0.35,
     requiresAuth: true,
     tier: "home",
-    lastVerified: now2
+    lastVerified: now
   };
 }
 
@@ -78979,13 +80034,13 @@ function gameHasParamountBroadcast(game) {
 }
 
 // ../grarf/desktop/src/lib/watch/providers/paramountResolver.ts
-var LOG31 = "[Paramount]";
+var LOG33 = "[Paramount]";
 function resolveParamountWatchOption(game) {
   const cached = getCachedStreamUrl("Paramount+", game.id);
   const streamUrl = game.streamUrl?.trim() || cached;
   if (!streamUrl) return null;
   if (game.streamProvider !== "Paramount+" && !gameHasParamountBroadcast(game)) return null;
-  console.log(`${LOG31} Resolved stream URL for match`, {
+  console.log(`${LOG33} Resolved stream URL for match`, {
     gameId: game.id,
     league: game.league,
     streamUrl
@@ -79015,7 +80070,7 @@ function gameHasPeacockBroadcast(game) {
 }
 
 // ../grarf/desktop/src/lib/watch/providers/peacockResolver.ts
-var LOG32 = "[Peacock]";
+var LOG34 = "[Peacock]";
 function resolvePeacockWatchOption(game) {
   if (game.league === "WORLDCUP") return null;
   const cached = getCachedStreamUrl("Peacock", game.id);
@@ -79036,8 +80091,8 @@ function resolvePeacockWatchOption(game) {
     };
   }
   if (game.streamProvider !== "Peacock" && !gameHasPeacockBroadcast(game)) return null;
-  console.log(`${LOG32} Resolved playback URL`, streamUrl);
-  console.log(`${LOG32} Resolved stream URL for match`, {
+  console.log(`${LOG34} Resolved playback URL`, streamUrl);
+  console.log(`${LOG34} Resolved stream URL for match`, {
     gameId: game.id,
     league: game.league,
     streamUrl
@@ -79074,7 +80129,7 @@ function gameHasAppleTvResolvableStream(game) {
 }
 
 // ../grarf/desktop/src/lib/watch/providers/appleTvResolver.ts
-var LOG33 = "[AppleTV]";
+var LOG35 = "[AppleTV]";
 function resolveAppleTvWatchOption(game) {
   if (!gameHasAppleTvResolvableStream(game)) return null;
   const cached = getCachedStreamUrl("Apple TV", game.id);
@@ -79083,7 +80138,7 @@ function resolveAppleTvWatchOption(game) {
   if (game.streamProvider !== "Apple TV" && !gameHasAppleTvBroadcast(game) && game.league !== "F1") {
     return null;
   }
-  console.log(`${LOG33} Resolved stream URL for match`, {
+  console.log(`${LOG35} Resolved stream URL for match`, {
     gameId: game.id,
     league: game.league,
     streamUrl
@@ -79168,12 +80223,12 @@ init_isGrarfWebRenderer();
 
 // ../grarf/desktop/src/lib/watch/watchDebug.ts
 init_define_import_meta_env();
-var LOG34 = "[Watch]";
+var LOG36 = "[Watch]";
 function watchDebug(message, extra) {
   if (extra && Object.keys(extra).length > 0) {
-    console.log(`${LOG34} ${message}`, extra);
+    console.log(`${LOG36} ${message}`, extra);
   } else {
-    console.log(`${LOG34} ${message}`);
+    console.log(`${LOG36} ${message}`);
   }
 }
 
@@ -79205,12 +80260,12 @@ function launchLegacyMlbWatch(game, dispatch) {
 
 // ../grarf/desktop/src/lib/watch/peacockExternalLaunch.ts
 init_define_import_meta_env();
-var LOG35 = "[Peacock]";
+var LOG37 = "[Peacock]";
 var WATCH_LOG2 = "[Watch]";
 function openPeacockPlaybackExternally(url) {
   const href = url.trim();
   if (!href) return;
-  console.log(`${LOG35} Resolved playback URL`, href);
+  console.log(`${LOG37} Resolved playback URL`, href);
   console.log(`${WATCH_LOG2} Provider launchMode: external`);
   console.log(`${WATCH_LOG2} Opening Peacock stream in system browser`);
   void navigateToDestinationAsync({
@@ -79402,21 +80457,21 @@ function tryLaunchDirectStreamWatch(game, dispatch) {
 
 // ../grarf/desktop/src/lib/watch/usaNetworkWatch.ts
 init_define_import_meta_env();
-var LOG36 = "[Watch]";
+var LOG38 = "[Watch]";
 function tryLaunchUsaNetworkWatch(game) {
   const hasUsa = game.streamProvider === "USA" || gameRowHasUsaNetworkBroadcast(game);
   if (!hasUsa) return false;
   const url = game.streamUrl?.trim() || resolveUsaNetworkStreamUrl(game) || USA_NETWORK_LIVE_URL;
-  console.log(`${LOG36} Launching USA stream externally`);
-  console.log(`${LOG36} streamProvider=USA streamUrl=${url} launchMode=external`);
-  console.log(`${LOG36} Executing external launch: ${url}`);
+  console.log(`${LOG38} Launching USA stream externally`);
+  console.log(`${LOG38} streamProvider=USA streamUrl=${url} launchMode=external`);
+  console.log(`${LOG38} Executing external launch: ${url}`);
   openWatchStreamExternally(url, "USA Network");
   return true;
 }
 
 // ../grarf/desktop/src/lib/watch/wnbaWatchLive.ts
 init_define_import_meta_env();
-var LOG37 = "[WNBA]";
+var LOG39 = "[WNBA]";
 var PRIME_VIDEO_PROVIDER = "Prime Video";
 function resolveWnbaWatchStreamUrl(game) {
   const direct = game.streamUrl?.trim();
@@ -79471,13 +80526,13 @@ function gameHasResolvableWnbaWatchLive(game) {
   return resolveWnbaWatchStreamUrl(game) != null;
 }
 function logWnbaWatchLiveRendered(game) {
-  console.log(`${LOG37} WATCH LIVE rendered`, {
+  console.log(`${LOG39} WATCH LIVE rendered`, {
     gameId: game.id,
     streamProvider: game.streamProvider ?? null
   });
 }
 function logWnbaWatchLiveClicked(game) {
-  console.log(`${LOG37} WATCH LIVE clicked`, {
+  console.log(`${LOG39} WATCH LIVE clicked`, {
     gameId: game.id,
     streamProvider: game.streamProvider ?? null,
     streamUrl: resolveWnbaWatchStreamUrl(game)
@@ -79572,7 +80627,7 @@ function handleWatchLiveClick(game, dispatch) {
 
 // ../grarf/desktop/src/lib/watch/operationalWatchLive.ts
 init_define_import_meta_env();
-var LOG38 = "[WatchLive]";
+var LOG40 = "[WatchLive]";
 function gameHasOperationalWatchLive(game) {
   if (aflGameHasResolvableWatchStream(game)) return true;
   const url = game.streamUrl?.trim();
@@ -79585,9 +80640,9 @@ function logWatchLiveOperationalAlert(_game) {
 function logWatchLiveLaunch(game) {
   if (!define_import_meta_env_default.DEV) return;
   if (game.streamProvider) {
-    console.log(`${LOG38} Launching provider: ${game.streamProvider}`);
+    console.log(`${LOG40} Launching provider: ${game.streamProvider}`);
     if (game.streamProvider === "Peacock" || game.streamProvider === "USA" || game.streamProvider === "Tennis Channel+" || game.streamProvider === "FOX Sports") {
-      console.log(`${LOG38} Opening external browser`);
+      console.log(`${LOG40} Opening external browser`);
     }
   }
 }
@@ -79689,16 +80744,16 @@ function allowSessionOnce2(key2) {
   }
   return true;
 }
-function toVisible(item, now2) {
+function toVisible(item, now) {
   const primaryAction = item.primaryAction ?? defaultOperationalAlertWatchLiveAction(item.gameId);
   return {
-    id: `ops-${now2}-${Math.random().toString(36).slice(2, 9)}`,
+    id: `ops-${now}-${Math.random().toString(36).slice(2, 9)}`,
     kind: item.kind,
     title: item.title,
     body: item.body,
     gameId: item.gameId,
     league: item.league,
-    createdAt: now2,
+    createdAt: now,
     primaryAction
   };
 }
@@ -79731,7 +80786,7 @@ var useOperationalAlertStore = (0, import_zustand45.create)((set, get) => ({
   visible: [],
   queue: [],
   enqueueInferred: (items) => {
-    const now2 = Date.now();
+    const now = Date.now();
     const batch = [];
     const spineBatch = [];
     for (const item of items) {
@@ -79740,7 +80795,7 @@ var useOperationalAlertStore = (0, import_zustand45.create)((set, get) => ({
         spineBatch.push(item);
         continue;
       }
-      batch.push(toVisible(item, now2));
+      batch.push(toVisible(item, now));
     }
     if (spineBatch.length > 0) {
       useGamesSpineCloseGameAlertStore.getState().enqueue(spineBatch);
@@ -80139,7 +81194,7 @@ init_isGrarfWebRenderer();
 
 // ../grarf/desktop/src/lib/workspace/paneContainment.ts
 init_define_import_meta_env();
-var LOG39 = "[PaneLayout]";
+var LOG41 = "[PaneLayout]";
 var PANE_LAYOUT_RESIZE_EVENT = "grarf:pane-resize";
 function dispatchPaneLayoutResize() {
   if (typeof window === "undefined") return;
@@ -80153,19 +81208,19 @@ var PANE_WEB_SURFACE_CLASS = "bg-white";
 var PANE_EMBED_ABSOLUTE_FILL = "absolute inset-0 min-h-0 min-w-0 max-h-full max-w-full overflow-hidden";
 function logPaneContainmentApplied(surface) {
   if (!define_import_meta_env_default.DEV) return;
-  console.log(`${LOG39} Applied overflow containment`, { surface });
+  console.log(`${LOG41} Applied overflow containment`, { surface });
 }
 function logPaneEmbedResized(slot, width, height) {
   if (!define_import_meta_env_default.DEV) return;
-  console.log(`${LOG39} Resized embedded content pane`, { slot, width: Math.round(width), height: Math.round(height) });
+  console.log(`${LOG41} Resized embedded content pane`, { slot, width: Math.round(width), height: Math.round(height) });
 }
 function logPaneBrowserViewConstrained(slot) {
   if (!define_import_meta_env_default.DEV) return;
-  console.log(`${LOG39} BrowserView constrained to parent bounds`, { slot });
+  console.log(`${LOG41} BrowserView constrained to parent bounds`, { slot });
 }
 function logPaneOverflowPrevented(slot) {
   if (!define_import_meta_env_default.DEV) return;
-  console.log(`${LOG39} Prevented pane overflow`, { slot });
+  console.log(`${LOG41} Prevented pane overflow`, { slot });
 }
 
 // ../grarf/desktop/src/components/operationalAlerts/OperationalAlertCard.tsx
@@ -87784,12 +88839,12 @@ var Virtualizer = class {
     this.scrollToOffset = (toOffset, { align = "start", behavior = "auto" } = {}) => {
       this._iosDeferredAdjustment = 0;
       const offset4 = this.getOffsetForAlignment(toOffset, align);
-      const now2 = this.now();
+      const now = this.now();
       this.scrollState = {
         index: null,
         align,
         behavior,
-        startedAt: now2,
+        startedAt: now,
         lastTargetOffset: offset4,
         stableFrames: 0
       };
@@ -87807,12 +88862,12 @@ var Virtualizer = class {
         return;
       }
       const [offset4, align] = offsetInfo;
-      const now2 = this.now();
+      const now = this.now();
       this.scrollState = {
         index: index2,
         align,
         behavior,
-        startedAt: now2,
+        startedAt: now,
         lastTargetOffset: offset4,
         stableFrames: 0
       };
@@ -87821,12 +88876,12 @@ var Virtualizer = class {
     };
     this.scrollBy = (delta, { behavior = "auto" } = {}) => {
       const offset4 = this.getScrollOffset() + delta;
-      const now2 = this.now();
+      const now = this.now();
       this.scrollState = {
         index: null,
         align: "start",
         behavior,
-        startedAt: now2,
+        startedAt: now,
         lastTargetOffset: offset4,
         stableFrames: 0
       };
@@ -88499,21 +89554,169 @@ var import_react74 = __toESM(require_react(), 1);
 
 // ../grarf/desktop/src/lib/mlbCatchUp/getYesterdayDateString.ts
 init_define_import_meta_env();
-function getYesterdayDateString(now2 = /* @__PURE__ */ new Date()) {
-  const yesterday = new Date(now2);
+function getYesterdayDateString(now = /* @__PURE__ */ new Date()) {
+  const yesterday = new Date(now);
   yesterday.setDate(yesterday.getDate() - 1);
   const year = yesterday.getFullYear();
   const month = String(yesterday.getMonth() + 1).padStart(2, "0");
   const day = String(yesterday.getDate()).padStart(2, "0");
   return `${year}-${month}-${day}`;
 }
-function formatSportscapeCatchupBriefingTitle(now2 = /* @__PURE__ */ new Date()) {
-  const [year, month, day] = getYesterdayDateString(now2).split("-").map(Number);
+function formatSportscapeCatchupBriefingTitle(now = /* @__PURE__ */ new Date()) {
+  const [year, month, day] = getYesterdayDateString(now).split("-").map(Number);
   const monthDay = new Date(year, month - 1, day).toLocaleDateString("en-US", {
     month: "long",
     day: "numeric"
   });
   return `${monthDay} Briefing`;
+}
+
+// ../grarf/desktop/src/hooks/useMlbCatchupGameHighlightsMap.ts
+init_isGrarfWebRenderer();
+
+// ../grarf/desktop/src/lib/sportscape/mlb/buildMlbCatchupHighlightsByGamePkFromSpine.ts
+init_define_import_meta_env();
+
+// ../grarf/desktop/src/lib/sportscape/mlb/collectMlbSpineGames.ts
+init_define_import_meta_env();
+
+// ../grarf/desktop/src/lib/gamesSpine/resolveViewLeagueGames.ts
+init_define_import_meta_env();
+init_isGrarfWebRenderer();
+function mergeGamesSpineLeagueGameRow(existing, incoming) {
+  const awayTeamStandings = incoming.awayTeamStandings ?? existing.awayTeamStandings;
+  const homeTeamStandings = incoming.homeTeamStandings ?? existing.homeTeamStandings;
+  if (awayTeamStandings === incoming.awayTeamStandings && homeTeamStandings === incoming.homeTeamStandings) {
+    return incoming;
+  }
+  return {
+    ...incoming,
+    ...awayTeamStandings ? { awayTeamStandings } : {},
+    ...homeTeamStandings ? { homeTeamStandings } : {}
+  };
+}
+function mergeGamesSpineLeagueGamesById(...groups) {
+  const byId = /* @__PURE__ */ new Map();
+  for (const group of groups) {
+    for (const game of group) {
+      const existing = byId.get(game.id);
+      byId.set(game.id, existing ? mergeGamesSpineLeagueGameRow(existing, game) : game);
+    }
+  }
+  return [...byId.values()];
+}
+function resolveGamesSpineSelectedDateKey(selectedDate, now = /* @__PURE__ */ new Date()) {
+  const operationalSportsDayKey = getOperationalSportsDayDateKey(now);
+  if (selectedDate === operationalSportsDayKey) return operationalSportsDayKey;
+  const calendarTodayCentral = getOperationalCalendarDateKey(
+    now,
+    resolveOperationalSlateTimeZone()
+  );
+  if (selectedDate === calendarTodayCentral) return operationalSportsDayKey;
+  if (!isGrarfWebRenderer2()) return selectedDate;
+  return selectedDate;
+}
+function isSelectedDateOperationalSportsDay(selectedDate, now = /* @__PURE__ */ new Date()) {
+  return resolveGamesSpineSelectedDateKey(selectedDate, now) === getOperationalSportsDayDateKey(now);
+}
+function resolveViewOperationalMode(selectedDate, operationalMode) {
+  if (isSelectedDateOperationalSportsDay(selectedDate)) return operationalMode;
+  return "PREPARE";
+}
+function collectCanonicalLeagueOperationalGames(league2, canonicalLeagues, scheduleByDate, dateKey) {
+  if (isSelectedDateOperationalSportsDay(dateKey)) {
+    const liveGames = canonicalLeagues[league2] ?? [];
+    if (league2 === "MLB") {
+      return resolveMlbGamesSpineViewRows(liveGames);
+    }
+    const now = /* @__PURE__ */ new Date();
+    const operationalSportsDayKey = getOperationalSportsDayDateKey(now);
+    const operationalSportsDayUpcomingKey = getOperationalSportsDayTomorrowDateKey(now);
+    return reconcileCanonicalLeagueOperationalGames(
+      league2,
+      scheduleByDate[operationalSportsDayKey]?.[league2] ?? [],
+      scheduleByDate[operationalSportsDayUpcomingKey]?.[league2] ?? [],
+      liveGames
+    );
+  }
+  return reconcileCanonicalLeagueOperationalGames(
+    league2,
+    scheduleByDate[dateKey]?.[league2] ?? []
+  );
+}
+function resolveViewLeagueGames(league2, selectedDate, liveLeagues, scheduleByDate) {
+  const canonicalLeagues = resolveCanonicalOperationalMergedLeagues(liveLeagues);
+  const dateKey = resolveGamesSpineSelectedDateKey(selectedDate);
+  return collectCanonicalLeagueOperationalGames(league2, canonicalLeagues, scheduleByDate, dateKey);
+}
+
+// ../grarf/desktop/src/lib/sportscape/mlb/collectMlbSpineGames.ts
+function mlbSpineGamePkFromRow(game) {
+  if (typeof game.gamePk === "number" && Number.isFinite(game.gamePk) && game.gamePk > 0) {
+    return game.gamePk;
+  }
+  const mlbId = game.externalIds?.mlb?.trim();
+  if (!mlbId || !/^\d+$/.test(mlbId)) return null;
+  return Number(mlbId);
+}
+function gameRowScore(game) {
+  let score2 = 0;
+  if (mlbSpineGamePkFromRow(game) != null) score2 += 4;
+  if (game.status === "final") score2 += 2;
+  if (typeof game.awayScore === "number" && typeof game.homeScore === "number") score2 += 2;
+  if (game.awayLogoUrl || game.homeLogoUrl) score2 += 1;
+  return score2;
+}
+function collectMlbSpineGames(input) {
+  const scheduled = resolveViewLeagueGames(
+    "MLB",
+    input.catchupDate,
+    { MLB: [...input.liveMlb] },
+    input.scheduleByDate
+  );
+  const merged = /* @__PURE__ */ new Map();
+  const upsert = (game) => {
+    const pk = mlbSpineGamePkFromRow(game);
+    const key2 = pk != null ? `pk:${pk}` : `id:${game.id}`;
+    const existing = merged.get(key2);
+    if (!existing || gameRowScore(game) > gameRowScore(existing)) {
+      merged.set(key2, game);
+    }
+  };
+  for (const game of input.retainedMlb) upsert(game);
+  for (const game of scheduled) upsert(game);
+  for (const game of input.liveMlb) upsert(game);
+  return [...merged.values()];
+}
+function mlbSpineGameHasFinalScore(game) {
+  return game.status === "final" && typeof game.awayScore === "number" && Number.isFinite(game.awayScore) && typeof game.homeScore === "number" && Number.isFinite(game.homeScore);
+}
+function mlbSpineGamesMatchGamePk(game, gamePk) {
+  const pk = mlbSpineGamePkFromRow(game);
+  return pk != null && pk === gamePk;
+}
+function findMlbSpineGameByGamePk(games, gamePk) {
+  return games.find((game) => mlbSpineGamesMatchGamePk(game, gamePk));
+}
+
+// ../grarf/desktop/src/lib/sportscape/mlb/buildMlbCatchupHighlightsByGamePkFromSpine.ts
+function buildMlbCatchupHighlightsByGamePkFromSpine(spineGames) {
+  const out = {};
+  for (const game of spineGames) {
+    const gamePk = mlbSpineGamePkFromRow(game);
+    if (gamePk == null) continue;
+    const rows = game.content?.highlights;
+    if (!Array.isArray(rows) || rows.length === 0) continue;
+    const mapped = [];
+    for (const row of rows) {
+      if (!row || typeof row !== "object") continue;
+      const highlight = row;
+      if (!highlight.videoUrl?.trim() && !highlight.title?.trim()) continue;
+      mapped.push(highlight);
+    }
+    if (mapped.length > 0) out[gamePk] = mapped;
+  }
+  return out;
 }
 
 // ../grarf/desktop/src/services/mlbRecaps/mlbCatchupHighlightsFeedGenerator.js
@@ -88662,8 +89865,42 @@ gameMaps=${gameCount}`);
 }
 
 // ../grarf/desktop/src/hooks/useMlbCatchupGameHighlightsMap.ts
+var EMPTY_MLB_GAMES = [];
+function populateExtensionHighlightsFromSpine() {
+  const catchupDate = getYesterdayDateString();
+  const liveMlb = useLiveGamesStore.getState().leagues.MLB ?? EMPTY_MLB_GAMES;
+  const retainedMlb = Object.values(useRecentFinalizedGamesStore.getState().byId).filter((entry4) => entry4.expiresAt > Date.now() && entry4.game.status === "final").map((entry4) => entry4.game).filter((game) => (game.league ?? "MLB") === "MLB");
+  const scheduleByDate = useScheduleCacheStore.getState().byDate;
+  const spineGames = collectMlbSpineGames({
+    catchupDate,
+    liveMlb,
+    scheduleByDate,
+    retainedMlb
+  });
+  useMlbCatchupHighlightsStore.getState().setFeed({
+    date: catchupDate,
+    highlightsByGamePk: buildMlbCatchupHighlightsByGamePkFromSpine(spineGames)
+  });
+}
 function useMlbCatchupGameHighlightsMap() {
   (0, import_react74.useEffect)(() => {
+    if (isGrarfExtensionRenderer()) {
+      populateExtensionHighlightsFromSpine();
+      const unsubLive = useLiveGamesStore.subscribe(() => {
+        populateExtensionHighlightsFromSpine();
+      });
+      const unsubSchedule = useScheduleCacheStore.subscribe(() => {
+        populateExtensionHighlightsFromSpine();
+      });
+      const unsubFinals = useRecentFinalizedGamesStore.subscribe(() => {
+        populateExtensionHighlightsFromSpine();
+      });
+      return () => {
+        unsubLive();
+        unsubSchedule();
+        unsubFinals();
+      };
+    }
     let cancelled = false;
     const catchupDate = getYesterdayDateString();
     void (async () => {
@@ -88689,6 +89926,7 @@ function useMlbCatchupGameHighlightsMap() {
 // ../grarf/desktop/src/hooks/useMcwsSportscapeArticles.ts
 init_define_import_meta_env();
 var import_react75 = __toESM(require_react(), 1);
+init_isGrarfWebRenderer();
 
 // ../grarf/desktop/src/lib/sportscape/mcws/mcwsEspnCatchupFeedGenerator.ts
 init_define_import_meta_env();
@@ -90285,6 +91523,7 @@ function mapMcwsRecapToArticle(recap) {
 function useMcwsSportscapeArticles() {
   const [articles, setArticles] = (0, import_react75.useState)([]);
   (0, import_react75.useEffect)(() => {
+    if (isGrarfExtensionRenderer()) return void 0;
     let cancelled = false;
     void (async () => {
       try {
@@ -90318,6 +91557,7 @@ espnHighlightsLoaded=${feed.espnHighlightsLoaded}`
 // ../grarf/desktop/src/hooks/useMcwsSportscapeGameScores.ts
 init_define_import_meta_env();
 var import_react76 = __toESM(require_react(), 1);
+init_isGrarfWebRenderer();
 
 // ../grarf/desktop/src/lib/sportscape/mcws/fetchMcwsScoreboardGameScoresByEventId.ts
 init_define_import_meta_env();
@@ -90355,6 +91595,7 @@ async function fetchMcwsScoreboardGameScoresByEventId(dateYmd = getYesterdayDate
 function useMcwsSportscapeGameScores() {
   const [scoresByEventId, setScoresByEventId] = (0, import_react76.useState)(() => /* @__PURE__ */ new Map());
   (0, import_react76.useEffect)(() => {
+    if (isGrarfExtensionRenderer()) return void 0;
     let cancelled = false;
     void (async () => {
       try {
@@ -90381,10 +91622,10 @@ eventIds=${[...next.keys()].join(", ") || "(none)"}`
 // ../grarf/desktop/src/hooks/useMlbSportscapeArticles.ts
 init_define_import_meta_env();
 var import_react78 = __toESM(require_react(), 1);
+init_isGrarfWebRenderer();
 
-// ../grarf/desktop/src/hooks/useMlbCatchupHeadlines.ts
+// ../grarf/desktop/src/lib/sportscape/mlb/buildMlbCatchupSportscapeArticlesFromSpine.ts
 init_define_import_meta_env();
-var import_react77 = __toESM(require_react(), 1);
 
 // ../grarf/desktop/src/lib/sportscape/mlb/buildMlbArticleScoreLines.ts
 init_define_import_meta_env();
@@ -90407,6 +91648,86 @@ function buildMlbArticleScoreLines(article) {
     homeScore: article.homeScore
   });
 }
+
+// ../grarf/desktop/src/lib/sportscape/mlb/mlbGameToSportscapeScoreLines.ts
+init_define_import_meta_env();
+function mlbGameToSportscapeScoreLines(game) {
+  const awayScore = typeof game.awayScore === "number" && Number.isFinite(game.awayScore) ? String(game.awayScore) : "";
+  const homeScore = typeof game.homeScore === "number" && Number.isFinite(game.homeScore) ? String(game.homeScore) : "";
+  return buildSportscapeMatchupScoreLines({
+    sport: "mlb",
+    league: game.league ?? "MLB",
+    awayTeam: game.awayTeam,
+    homeTeam: game.homeTeam,
+    awayScore,
+    homeScore,
+    awayAbbrev: game.awayTeamAbbrev,
+    homeAbbrev: game.homeTeamAbbrev,
+    awayLogoUrl: game.awayLogoUrl,
+    homeLogoUrl: game.homeLogoUrl
+  });
+}
+
+// ../grarf/desktop/src/lib/sportscape/mlb/buildMlbCatchupSportscapeArticlesFromSpine.ts
+function isPlaceholderMlbStoryTitle(title) {
+  const normalized = title.trim().toLowerCase();
+  return normalized === "official game story" || normalized.startsWith("game ");
+}
+function resolveOperationalRecapHeadline(game) {
+  const espn = game.metadata?.espnRecapHeadline?.trim();
+  if (espn) return espn;
+  const story = game.content?.stories?.[0];
+  const storyTitle = story?.title?.trim();
+  if (storyTitle && !isPlaceholderMlbStoryTitle(storyTitle)) return storyTitle;
+  const storySummary = story?.summary?.trim();
+  if (storySummary) return storySummary;
+  const recapBlurb = game.content?.recap?.blurb?.trim();
+  if (recapBlurb) return recapBlurb;
+  const recapSummary = game.content?.recap?.summary?.trim();
+  if (recapSummary) return recapSummary;
+  return null;
+}
+function resolveOperationalRecapUrl(game, gamePk) {
+  const story = game.content?.stories?.[0];
+  const storyUrl = story?.storyUrl?.trim();
+  if (storyUrl && /\/news\//i.test(storyUrl)) return storyUrl;
+  const sourceUrl = game.content?.recap?.sourceUrl?.trim();
+  if (sourceUrl) return sourceUrl;
+  if (storyUrl) return storyUrl;
+  if (gamePk > 0) {
+    return `https://www.mlb.com/stories/game/${gamePk}?storylocal=web-scores-game-embed`;
+  }
+  return void 0;
+}
+function buildMlbCatchupSportscapeArticlesFromSpine(spineGames) {
+  const articles = [];
+  for (const game of spineGames) {
+    if (!mlbSpineGameHasFinalScore(game)) continue;
+    const gamePk = mlbSpineGamePkFromRow(game);
+    if (gamePk == null) continue;
+    const headline = resolveOperationalRecapHeadline(game);
+    if (!headline) continue;
+    const mapped = {
+      headline,
+      url: resolveOperationalRecapUrl(game, gamePk),
+      gamePk,
+      homeTeam: game.homeTeam,
+      awayTeam: game.awayTeam,
+      homeScore: game.homeScore,
+      awayScore: game.awayScore,
+      publishedAt: game.content?.recap?.publishedAt?.trim() || void 0
+    };
+    const scoreLines = mlbGameToSportscapeScoreLines(game) ?? buildMlbArticleScoreLines(mapped) ?? void 0;
+    articles.push(scoreLines ? { ...mapped, scoreLines } : mapped);
+  }
+  articles.sort((a2, b2) => (b2.gamePk ?? 0) - (a2.gamePk ?? 0));
+  return articles;
+}
+
+// ../grarf/desktop/src/hooks/useMlbCatchupHeadlines.ts
+init_define_import_meta_env();
+var import_react77 = __toESM(require_react(), 1);
+init_isGrarfWebRenderer();
 
 // ../grarf/desktop/src/services/mlbRecaps/mlbCatchupFeedGenerator.js
 init_define_import_meta_env();
@@ -90893,6 +92214,7 @@ function mapCatchupFeedArticle(article) {
 function useMlbCatchupHeadlines() {
   const [articles, setArticles] = (0, import_react77.useState)([]);
   (0, import_react77.useEffect)(() => {
+    if (isGrarfExtensionRenderer()) return void 0;
     let cancelled = false;
     const catchupDate = getYesterdayDateString();
     void (async () => {
@@ -90926,146 +92248,8 @@ headlinesLoaded=${feed.headlinesLoaded}`
   return articles;
 }
 
-// ../grarf/desktop/src/lib/sportscape/mlb/collectMlbSpineGames.ts
-init_define_import_meta_env();
-
-// ../grarf/desktop/src/lib/gamesSpine/resolveViewLeagueGames.ts
-init_define_import_meta_env();
-init_isGrarfWebRenderer();
-function mergeGamesSpineLeagueGameRow(existing, incoming) {
-  const awayTeamStandings = incoming.awayTeamStandings ?? existing.awayTeamStandings;
-  const homeTeamStandings = incoming.homeTeamStandings ?? existing.homeTeamStandings;
-  if (awayTeamStandings === incoming.awayTeamStandings && homeTeamStandings === incoming.homeTeamStandings) {
-    return incoming;
-  }
-  return {
-    ...incoming,
-    ...awayTeamStandings ? { awayTeamStandings } : {},
-    ...homeTeamStandings ? { homeTeamStandings } : {}
-  };
-}
-function mergeGamesSpineLeagueGamesById(...groups) {
-  const byId = /* @__PURE__ */ new Map();
-  for (const group of groups) {
-    for (const game of group) {
-      const existing = byId.get(game.id);
-      byId.set(game.id, existing ? mergeGamesSpineLeagueGameRow(existing, game) : game);
-    }
-  }
-  return [...byId.values()];
-}
-function resolveGamesSpineSelectedDateKey(selectedDate, now2 = /* @__PURE__ */ new Date()) {
-  const operationalSportsDayKey = getOperationalSportsDayDateKey(now2);
-  if (selectedDate === operationalSportsDayKey) return operationalSportsDayKey;
-  const calendarTodayCentral = getOperationalCalendarDateKey(
-    now2,
-    resolveOperationalSlateTimeZone()
-  );
-  if (selectedDate === calendarTodayCentral) return operationalSportsDayKey;
-  if (!isGrarfWebRenderer2()) return selectedDate;
-  return selectedDate;
-}
-function isSelectedDateOperationalSportsDay(selectedDate, now2 = /* @__PURE__ */ new Date()) {
-  return resolveGamesSpineSelectedDateKey(selectedDate, now2) === getOperationalSportsDayDateKey(now2);
-}
-function resolveViewOperationalMode(selectedDate, operationalMode) {
-  if (isSelectedDateOperationalSportsDay(selectedDate)) return operationalMode;
-  return "PREPARE";
-}
-function collectCanonicalLeagueOperationalGames(league2, canonicalLeagues, scheduleByDate, dateKey) {
-  if (isSelectedDateOperationalSportsDay(dateKey)) {
-    const liveGames = canonicalLeagues[league2] ?? [];
-    if (league2 === "MLB") {
-      return resolveMlbGamesSpineViewRows(liveGames);
-    }
-    const now2 = /* @__PURE__ */ new Date();
-    const operationalSportsDayKey = getOperationalSportsDayDateKey(now2);
-    const operationalSportsDayUpcomingKey = getOperationalSportsDayTomorrowDateKey(now2);
-    return reconcileCanonicalLeagueOperationalGames(
-      league2,
-      scheduleByDate[operationalSportsDayKey]?.[league2] ?? [],
-      scheduleByDate[operationalSportsDayUpcomingKey]?.[league2] ?? [],
-      liveGames
-    );
-  }
-  return reconcileCanonicalLeagueOperationalGames(
-    league2,
-    scheduleByDate[dateKey]?.[league2] ?? []
-  );
-}
-function resolveViewLeagueGames(league2, selectedDate, liveLeagues, scheduleByDate) {
-  const canonicalLeagues = resolveCanonicalOperationalMergedLeagues(liveLeagues);
-  const dateKey = resolveGamesSpineSelectedDateKey(selectedDate);
-  return collectCanonicalLeagueOperationalGames(league2, canonicalLeagues, scheduleByDate, dateKey);
-}
-
-// ../grarf/desktop/src/lib/sportscape/mlb/collectMlbSpineGames.ts
-function mlbSpineGamePkFromRow(game) {
-  if (typeof game.gamePk === "number" && Number.isFinite(game.gamePk) && game.gamePk > 0) {
-    return game.gamePk;
-  }
-  const mlbId = game.externalIds?.mlb?.trim();
-  if (!mlbId || !/^\d+$/.test(mlbId)) return null;
-  return Number(mlbId);
-}
-function gameRowScore(game) {
-  let score2 = 0;
-  if (mlbSpineGamePkFromRow(game) != null) score2 += 4;
-  if (game.status === "final") score2 += 2;
-  if (typeof game.awayScore === "number" && typeof game.homeScore === "number") score2 += 2;
-  if (game.awayLogoUrl || game.homeLogoUrl) score2 += 1;
-  return score2;
-}
-function collectMlbSpineGames(input) {
-  const scheduled = resolveViewLeagueGames(
-    "MLB",
-    input.catchupDate,
-    { MLB: [...input.liveMlb] },
-    input.scheduleByDate
-  );
-  const merged = /* @__PURE__ */ new Map();
-  const upsert = (game) => {
-    const pk = mlbSpineGamePkFromRow(game);
-    const key2 = pk != null ? `pk:${pk}` : `id:${game.id}`;
-    const existing = merged.get(key2);
-    if (!existing || gameRowScore(game) > gameRowScore(existing)) {
-      merged.set(key2, game);
-    }
-  };
-  for (const game of input.retainedMlb) upsert(game);
-  for (const game of scheduled) upsert(game);
-  for (const game of input.liveMlb) upsert(game);
-  return [...merged.values()];
-}
-function mlbSpineGamesMatchGamePk(game, gamePk) {
-  const pk = mlbSpineGamePkFromRow(game);
-  return pk != null && pk === gamePk;
-}
-function findMlbSpineGameByGamePk(games, gamePk) {
-  return games.find((game) => mlbSpineGamesMatchGamePk(game, gamePk));
-}
-
-// ../grarf/desktop/src/lib/sportscape/mlb/mlbGameToSportscapeScoreLines.ts
-init_define_import_meta_env();
-function mlbGameToSportscapeScoreLines(game) {
-  const awayScore = typeof game.awayScore === "number" && Number.isFinite(game.awayScore) ? String(game.awayScore) : "";
-  const homeScore = typeof game.homeScore === "number" && Number.isFinite(game.homeScore) ? String(game.homeScore) : "";
-  return buildSportscapeMatchupScoreLines({
-    sport: "mlb",
-    league: game.league ?? "MLB",
-    awayTeam: game.awayTeam,
-    homeTeam: game.homeTeam,
-    awayScore,
-    homeScore,
-    awayAbbrev: game.awayTeamAbbrev,
-    homeAbbrev: game.homeTeamAbbrev,
-    awayLogoUrl: game.awayLogoUrl,
-    homeLogoUrl: game.homeLogoUrl
-  });
-}
-
 // ../grarf/desktop/src/hooks/useMlbSportscapeArticles.ts
-var EMPTY_MLB_GAMES = [];
+var EMPTY_MLB_GAMES2 = [];
 function attachSpineScoreIfNeeded(article, spineGames) {
   if (article.scoreLines?.length || article.gamePk == null) return article;
   const spineGame = findMlbSpineGameByGamePk(spineGames, article.gamePk);
@@ -91079,8 +92263,9 @@ function attachSpineScoreIfNeeded(article, spineGames) {
   };
 }
 function useMlbSportscapeArticles() {
+  const extensionHost = isGrarfExtensionRenderer();
   const catchupArticles = useMlbCatchupHeadlines();
-  const liveMlb = useLiveGamesStore((state3) => state3.leagues.MLB ?? EMPTY_MLB_GAMES);
+  const liveMlb = useLiveGamesStore((state3) => state3.leagues.MLB ?? EMPTY_MLB_GAMES2);
   const retainedById = useRecentFinalizedGamesStore((state3) => state3.byId);
   const scheduleByDate = useScheduleCacheStore((state3) => state3.byDate);
   return (0, import_react78.useMemo)(() => {
@@ -91092,18 +92277,22 @@ function useMlbSportscapeArticles() {
       scheduleByDate,
       retainedMlb
     });
+    if (extensionHost) {
+      return buildMlbCatchupSportscapeArticlesFromSpine(spineGames);
+    }
     return catchupArticles.filter((article) => article.gamePk != null).map((article) => {
       const withSpine = attachSpineScoreIfNeeded(article, spineGames);
       if (withSpine.scoreLines?.length) return withSpine;
       const scoreLines = buildMlbArticleScoreLines(withSpine);
       return scoreLines ? { ...withSpine, scoreLines } : withSpine;
     });
-  }, [catchupArticles, liveMlb, retainedById, scheduleByDate]);
+  }, [catchupArticles, extensionHost, liveMlb, retainedById, scheduleByDate]);
 }
 
 // ../grarf/desktop/src/hooks/useNhlSportscapeArticles.ts
 init_define_import_meta_env();
 var import_react79 = __toESM(require_react(), 1);
+init_isGrarfWebRenderer();
 
 // ../grarf/desktop/src/lib/sportscape/nhl/nhlEspnCatchupFeedGenerator.ts
 init_define_import_meta_env();
@@ -91278,6 +92467,7 @@ function mapNhlRecapToArticle(recap) {
 function useNhlSportscapeArticles() {
   const [articles, setArticles] = (0, import_react79.useState)([]);
   (0, import_react79.useEffect)(() => {
+    if (isGrarfExtensionRenderer()) return void 0;
     let cancelled = false;
     void (async () => {
       try {
@@ -91359,8 +92549,8 @@ init_define_import_meta_env();
 
 // ../grarf/desktop/src/lib/sportscape/wnba/wnbaCatchupOperationalDate.ts
 init_define_import_meta_env();
-function resolveWnbaCatchupOperationalDateKey(now2 = /* @__PURE__ */ new Date()) {
-  return getOperationalSportsDayYesterdayDateKey(now2);
+function resolveWnbaCatchupOperationalDateKey(now = /* @__PURE__ */ new Date()) {
+  return getOperationalSportsDayYesterdayDateKey(now);
 }
 
 // ../grarf/desktop/src/lib/sportscape/catchup/persistWnbaCatchupSportscapeSnapshot.ts
@@ -91371,9 +92561,9 @@ function isValidSnapshot(value) {
   const row = value;
   return typeof row.catchupDate === "string" && Array.isArray(row.articles) && Array.isArray(row.games) && row.articles.length > 0;
 }
-function restrictSnapshotToCatchupDate(snapshot2, catchupDate, now2) {
+function restrictSnapshotToCatchupDate(snapshot2, catchupDate, now) {
   const games = snapshot2.games.filter(
-    (game) => game.status === "final" && isGameOnGamesSpineOperationalDate(game, catchupDate, now2)
+    (game) => game.status === "final" && isGameOnGamesSpineOperationalDate(game, catchupDate, now)
   );
   if (games.length === 0) return null;
   const eventIds = /* @__PURE__ */ new Set();
@@ -91397,14 +92587,14 @@ function readRawSnapshot(storageKey) {
     return null;
   }
 }
-function readWnbaCatchupSportscapeSnapshot(expectedCatchupDate = resolveWnbaCatchupOperationalDateKey(), now2 = /* @__PURE__ */ new Date()) {
+function readWnbaCatchupSportscapeSnapshot(expectedCatchupDate = resolveWnbaCatchupOperationalDateKey(), now = /* @__PURE__ */ new Date()) {
   const current = readRawSnapshot(STORAGE_KEY5);
   if (current?.catchupDate === expectedCatchupDate) {
-    return restrictSnapshotToCatchupDate(current, expectedCatchupDate, now2);
+    return restrictSnapshotToCatchupDate(current, expectedCatchupDate, now);
   }
   const legacy = readRawSnapshot(LEGACY_STORAGE_KEY);
   if (legacy?.catchupDate !== expectedCatchupDate) return null;
-  const verified = restrictSnapshotToCatchupDate(legacy, expectedCatchupDate, now2);
+  const verified = restrictSnapshotToCatchupDate(legacy, expectedCatchupDate, now);
   if (verified) writeWnbaCatchupSportscapeSnapshot(verified);
   return verified;
 }
@@ -91852,17 +93042,17 @@ var import_react80 = __toESM(require_react(), 1);
 
 // ../grarf/desktop/src/lib/home/objectsSpineCatchUpDayOptions.ts
 init_define_import_meta_env();
-function getObjectsSpineCatchUpDayOptions(now2 = /* @__PURE__ */ new Date()) {
+function getObjectsSpineCatchUpDayOptions(now = /* @__PURE__ */ new Date()) {
   return [
-    { key: getOperationalSportsDayDateKey(now2), label: "TODAY" },
-    { key: getOperationalSportsDayYesterdayDateKey(now2), label: "YESTERDAY" }
+    { key: getOperationalSportsDayDateKey(now), label: "TODAY" },
+    { key: getOperationalSportsDayYesterdayDateKey(now), label: "YESTERDAY" }
   ];
 }
-function isObjectsSpineCatchUpTodaySelected(selectedOperationalDateKey, now2 = /* @__PURE__ */ new Date()) {
-  return selectedOperationalDateKey === getOperationalSportsDayDateKey(now2);
+function isObjectsSpineCatchUpTodaySelected(selectedOperationalDateKey, now = /* @__PURE__ */ new Date()) {
+  return selectedOperationalDateKey === getOperationalSportsDayDateKey(now);
 }
-function resolveObjectsSpineCatchUpDayLabel(selectedOperationalDateKey, now2 = /* @__PURE__ */ new Date()) {
-  return getObjectsSpineCatchUpDayOptions(now2).find((option) => option.key === selectedOperationalDateKey)?.label ?? "TODAY";
+function resolveObjectsSpineCatchUpDayLabel(selectedOperationalDateKey, now = /* @__PURE__ */ new Date()) {
+  return getObjectsSpineCatchUpDayOptions(now).find((option) => option.key === selectedOperationalDateKey)?.label ?? "TODAY";
 }
 
 // ../grarf/desktop/src/hooks/useSportscapeCatchUpScheduleWarmup.ts
@@ -92064,6 +93254,7 @@ function useWnbaCatchupGames() {
 // ../grarf/desktop/src/hooks/useWorldCupSportscapeArticles.ts
 init_define_import_meta_env();
 var import_react82 = __toESM(require_react(), 1);
+init_isGrarfWebRenderer();
 
 // ../grarf/desktop/src/lib/sportscape/worldCup/worldCupEspnCatchupFeedGenerator.ts
 init_define_import_meta_env();
@@ -92271,6 +93462,7 @@ function mapWorldCupRecapToArticle(recap) {
 function useWorldCupSportscapeArticles() {
   const [articles, setArticles] = (0, import_react82.useState)([]);
   (0, import_react82.useEffect)(() => {
+    if (isGrarfExtensionRenderer()) return void 0;
     let cancelled = false;
     void (async () => {
       try {
@@ -92304,6 +93496,7 @@ espnHighlightsLoaded=${feed.espnHighlightsLoaded}`
 // ../grarf/desktop/src/hooks/useWorldCupSportscapeGameScores.ts
 init_define_import_meta_env();
 var import_react83 = __toESM(require_react(), 1);
+init_isGrarfWebRenderer();
 
 // ../grarf/desktop/src/lib/sportscape/worldCup/fetchWorldCupScoreboardGameScoresByEventId.ts
 init_define_import_meta_env();
@@ -92356,10 +93549,10 @@ function formatLocalDateYmd(date) {
   const day = String(date.getDate()).padStart(2, "0");
   return `${year}-${month}-${day}`;
 }
-function buildWorldCupScoreboardScoreDates(now2 = /* @__PURE__ */ new Date()) {
+function buildWorldCupScoreboardScoreDates(now = /* @__PURE__ */ new Date()) {
   const dates = [];
   for (let offset4 = 0; offset4 <= 3; offset4 += 1) {
-    const day = new Date(now2);
+    const day = new Date(now);
     day.setDate(day.getDate() - offset4);
     dates.push(formatLocalDateYmd(day));
   }
@@ -92565,6 +93758,7 @@ function mergeWorldCupScoreSnapshots(scoreboard, liveLeagues) {
 function useWorldCupSportscapeGameScores(liveLeagues) {
   const [scoreboardScoresByEventId, setScoreboardScoresByEventId] = (0, import_react83.useState)(() => /* @__PURE__ */ new Map());
   (0, import_react83.useEffect)(() => {
+    if (isGrarfExtensionRenderer()) return void 0;
     let cancelled = false;
     void (async () => {
       try {
@@ -92634,7 +93828,7 @@ function fotmobFetchHeaders() {
 }
 
 // ../grarf/desktop/src/lib/fotmob/fetchFotmobLeagueMatchesByDate.ts
-var LOG40 = "[FotMob]";
+var LOG42 = "[FotMob]";
 function isValidFotmobMatch(match) {
   return typeof match?.id === "number" && Boolean(match.home?.name && match.away?.name);
 }
@@ -92651,7 +93845,7 @@ async function fetchFotmobLeagueBucketsByDate2(dateKey) {
     return payload.leagues ?? [];
   } catch (error) {
     if (define_import_meta_env_default.DEV) {
-      console.warn(`${LOG40} league buckets fetch failed for ${normalized}`, error);
+      console.warn(`${LOG42} league buckets fetch failed for ${normalized}`, error);
     }
     return [];
   }
@@ -92770,7 +93964,7 @@ function buildFotmobNewsUrl(input) {
 }
 
 // ../grarf/desktop/src/lib/fotmob/fetchFotmobMatchRecapDetails.ts
-var LOG41 = "[FotMob]";
+var LOG43 = "[FotMob]";
 function pickEnglishPostReview(articles) {
   if (!articles?.length) return null;
   const english = articles.find((row) => row.lang?.trim().toLowerCase() === "en");
@@ -92827,7 +94021,7 @@ async function fetchFotmobMatchRecapDetails(matchId) {
     };
   } catch (error) {
     if (define_import_meta_env_default.DEV) {
-      console.warn(`${LOG41} match details fetch failed for ${matchId}`, error);
+      console.warn(`${LOG43} match details fetch failed for ${matchId}`, error);
     }
     return null;
   }
@@ -92865,8 +94059,8 @@ function parseEplYoutubeHighlightTitle(title) {
   if (!/PREMIER LEAGUE HIGHLIGHTS/i.test(trimmed)) return null;
   const segments = trimmed.split("|").map((segment) => segment.trim());
   if (segments.length < 3) return null;
-  const teamsMatch3 = segments[0]?.match(/^(.+?)\s+v\.\s+(.+)$/i);
-  if (!teamsMatch3) return null;
+  const teamsMatch5 = segments[0]?.match(/^(.+?)\s+v\.\s+(.+)$/i);
+  if (!teamsMatch5) return null;
   const dateMatch = segments[2]?.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
   if (!dateMatch) return null;
   const gameDateYmd = toGameDateYmd(
@@ -92875,38 +94069,38 @@ function parseEplYoutubeHighlightTitle(title) {
     Number.parseInt(dateMatch[3] ?? "", 10)
   );
   if (!gameDateYmd) return null;
-  const teamA = teamsMatch3[1]?.trim() ?? "";
-  const teamB = teamsMatch3[2]?.trim() ?? "";
+  const teamA = teamsMatch5[1]?.trim() ?? "";
+  const teamB = teamsMatch5[2]?.trim() ?? "";
   if (!teamA || !teamB) return null;
   return { teamA, teamB, gameDateYmd };
 }
 
 // ../grarf/desktop/src/lib/sportscape/epl/matchEplYoutubePlaylistHighlight.ts
-function normalizeTeamToken2(value) {
+function normalizeTeamToken3(value) {
   return value.toLowerCase().replace(/[^a-z0-9]/g, "");
 }
 function buildEplTeamTokens(teamName) {
   const tokens = /* @__PURE__ */ new Set();
   const trimmed = teamName.trim();
   if (trimmed) {
-    tokens.add(normalizeTeamToken2(trimmed));
+    tokens.add(normalizeTeamToken3(trimmed));
     const parts = trimmed.split(/\s+/);
     const nickname = parts[parts.length - 1];
     if (nickname && nickname.length >= 3) {
-      tokens.add(normalizeTeamToken2(nickname));
+      tokens.add(normalizeTeamToken3(nickname));
     }
   }
   const meta = resolveLiveTrackTeamMetaForSport(trimmed, "soccer");
   if (meta) {
     for (const alias of meta.names) {
-      const token = normalizeTeamToken2(alias);
+      const token = normalizeTeamToken3(alias);
       if (token.length >= 3) tokens.add(token);
     }
   }
   return [...tokens];
 }
 function fragmentMatchesTeam(fragment, teamName) {
-  const normalizedFragment = normalizeTeamToken2(fragment);
+  const normalizedFragment = normalizeTeamToken3(fragment);
   if (!normalizedFragment) return false;
   return buildEplTeamTokens(teamName).some((token) => {
     if (token.length < 3) return false;
@@ -121566,14 +122760,14 @@ function shouldFetchGrarfExtensionCatchUpRecapHeadline(game) {
 function isGrarfExtensionMlbRecapGame(game) {
   return game.league === "MLB" || game.id.startsWith("espn-MLB-");
 }
-function isPlaceholderMlbStoryTitle(title) {
+function isPlaceholderMlbStoryTitle2(title) {
   const normalized = title.trim().toLowerCase();
   return normalized === "official game story" || normalized.startsWith("game ");
 }
 function resolveGrarfExtensionMlbRecapHeadlineFromOperationalGame(game) {
   const story = game.content?.stories?.[0];
   const storyTitle = story?.title?.trim();
-  if (storyTitle && !isPlaceholderMlbStoryTitle(storyTitle)) {
+  if (storyTitle && !isPlaceholderMlbStoryTitle2(storyTitle)) {
     return storyTitle;
   }
   const storySummary = story?.summary?.trim();
@@ -122042,14 +123236,14 @@ function parseNwslFullHighlightsMatchupTitle(title) {
   return { left, right };
 }
 function resolveNwslYoutubeTeamKey(rawTeamName) {
-  const normalized = normalizeTeamToken(rawTeamName);
+  const normalized = normalizeTeamToken2(rawTeamName);
   if (!normalized) return null;
   let best = null;
   for (const group of NWSL_YOUTUBE_TEAM_ALIAS_GROUPS) {
-    const canonicalKey = normalizeTeamToken(group[0] ?? "");
+    const canonicalKey = normalizeTeamToken2(group[0] ?? "");
     if (!canonicalKey) continue;
     for (const alias of group) {
-      const aliasKey = normalizeTeamToken(alias);
+      const aliasKey = normalizeTeamToken2(alias);
       if (aliasKey.length < 3) continue;
       const matches = normalized === aliasKey || normalized.length >= aliasKey.length && normalized.includes(aliasKey) || aliasKey.length >= normalized.length && aliasKey.includes(normalized);
       if (!matches) continue;
@@ -123095,28 +124289,28 @@ async function openExternalUrl2(url) {
 
 // ../grarf/desktop/src/components/homeMvp/HomeCenterPaneTimelineArticleExpansionPane.tsx
 var import_jsx_runtime48 = __toESM(require_jsx_runtime(), 1);
-var LOG42 = "[TimelineWebpane]";
+var LOG44 = "[TimelineWebpane]";
 var WEBVIEW_WEB_PREFS = "contextIsolation=yes,nodeIntegration=no,javascript=yes";
 var TIMELINE_ARTICLE_WEBVIEW_HEIGHT_PX = 590;
 function hasWebviewTag() {
   return typeof customElements !== "undefined" && !!customElements.get("webview");
 }
 function navigateWebview(wv, url) {
-  console.log(`${LOG42} navigateWebview`, { url });
+  console.log(`${LOG44} navigateWebview`, { url });
   try {
     if (typeof wv.loadURL === "function") {
       wv.loadURL(url);
-      console.log(`${LOG42} navigateWebview via loadURL succeeded`);
+      console.log(`${LOG44} navigateWebview via loadURL succeeded`);
       return;
     }
   } catch (err) {
-    console.warn(`${LOG42} loadURL failed, trying src`, err);
+    console.warn(`${LOG44} loadURL failed, trying src`, err);
   }
   try {
     wv.src = url;
-    console.log(`${LOG42} navigateWebview via src succeeded`);
+    console.log(`${LOG44} navigateWebview via src succeeded`);
   } catch (err) {
-    console.error(`${LOG42} navigateWebview failed entirely`, err);
+    console.error(`${LOG44} navigateWebview failed entirely`, err);
   }
 }
 function applyTimelineWebviewSize(wv, heightPx) {
@@ -123212,15 +124406,15 @@ function HomeCenterPaneTimelineArticleExpansionPane({
     const unsubscribe = window.grarf?.webviewNavigateInPaneSubscribe?.((payload) => {
       const wv = wvRef.current;
       if (!wv) {
-        console.warn(`${LOG42} webview-navigate-in-pane: no webview ref`);
+        console.warn(`${LOG44} webview-navigate-in-pane: no webview ref`);
         return;
       }
       const nextUrl = payload.url?.trim();
       if (!nextUrl) {
-        console.warn(`${LOG42} webview-navigate-in-pane: empty url`);
+        console.warn(`${LOG44} webview-navigate-in-pane: empty url`);
         return;
       }
-      console.log(`${LOG42} webview-navigate-in-pane: navigating to`, nextUrl);
+      console.log(`${LOG44} webview-navigate-in-pane: navigating to`, nextUrl);
       setShowLoadingHint(true);
       setLoadFailed(false);
       navigateWebview(wv, nextUrl);
@@ -123248,7 +124442,7 @@ function HomeCenterPaneTimelineArticleExpansionPane({
       const e2 = event;
       if (e2.isMainFrame === false) return;
       if (e2.errorCode === -3) return;
-      console.error(`${LOG42} did-fail-load`, {
+      console.error(`${LOG44} did-fail-load`, {
         errorCode: e2.errorCode,
         errorDescription: e2.errorDescription,
         validatedURL: e2.validatedURL
@@ -123261,7 +124455,7 @@ function HomeCenterPaneTimelineArticleExpansionPane({
       if (e2.isMainFrame === false) return;
       const nextUrl = e2.url?.trim() ?? "";
       if (!nextUrl) return;
-      console.log(`${LOG42} will-navigate`, { url: nextUrl });
+      console.log(`${LOG44} will-navigate`, { url: nextUrl });
       setShowLoadingHint(true);
       setLoadFailed(false);
     };
@@ -123269,20 +124463,20 @@ function HomeCenterPaneTimelineArticleExpansionPane({
       const e2 = event;
       if (e2.isMainFrame === false) return;
       const currentUrl = e2.url?.trim() ?? wv.getURL?.() ?? "";
-      console.log(`${LOG42} did-navigate`, { url: currentUrl });
+      console.log(`${LOG44} did-navigate`, { url: currentUrl });
       setShowLoadingHint(false);
     };
     const onDidNavigateInPage = (event) => {
       const e2 = event;
       if (e2.isMainFrame === false) return;
       const currentUrl = e2.url?.trim() ?? wv.getURL?.() ?? "";
-      console.log(`${LOG42} did-navigate-in-page`, { url: currentUrl });
+      console.log(`${LOG44} did-navigate-in-page`, { url: currentUrl });
     };
     const onDidStartNavigation = (event) => {
       const e2 = event;
       if (e2.isMainFrame === false) return;
       const nextUrl = e2.url?.trim() ?? "";
-      console.log(`${LOG42} did-start-navigation`, { url: nextUrl });
+      console.log(`${LOG44} did-start-navigation`, { url: nextUrl });
       if (nextUrl) {
         setShowLoadingHint(true);
         setLoadFailed(false);
@@ -123292,7 +124486,7 @@ function HomeCenterPaneTimelineArticleExpansionPane({
       const e2 = event;
       const level = e2.level ?? 0;
       if (level >= 2) {
-        console.warn(`${LOG42} webview-console`, {
+        console.warn(`${LOG44} webview-console`, {
           level,
           message: e2.message,
           line: e2.line,
@@ -123308,17 +124502,17 @@ function HomeCenterPaneTimelineArticleExpansionPane({
       const disposition = e2.disposition ?? "";
       const isSpecialProtocol = nextUrl.startsWith("mailto:") || nextUrl.startsWith("tel:") || nextUrl.startsWith("sms:") || nextUrl.startsWith("file:");
       if (isSpecialProtocol) {
-        console.log(`${LOG42} new-window \u2192 open external (special protocol)`, { url: nextUrl, disposition });
+        console.log(`${LOG44} new-window \u2192 open external (special protocol)`, { url: nextUrl, disposition });
         void openExternalUrl2(nextUrl);
         return;
       }
-      console.log(`${LOG42} new-window \u2192 navigate in-pane`, { url: nextUrl, disposition });
+      console.log(`${LOG44} new-window \u2192 navigate in-pane`, { url: nextUrl, disposition });
       setShowLoadingHint(true);
       setLoadFailed(false);
       navigateWebview(wv, nextUrl);
     };
     applyCurrentWebviewSize();
-    console.log(`${LOG42} Attaching webview event listeners to:`, wv.tagName, wv.src);
+    console.log(`${LOG44} Attaching webview event listeners to:`, wv.tagName, wv.src);
     wv.addEventListener("dom-ready", onDomReady);
     wv.addEventListener("did-finish-load", onFinishLoad);
     wv.addEventListener("did-fail-load", onFailLoad);
@@ -123329,7 +124523,7 @@ function HomeCenterPaneTimelineArticleExpansionPane({
     wv.addEventListener("new-window", onNewWindow);
     wv.addEventListener("console-message", onConsoleMessage);
     wv.addEventListener("ipc-message", (e2) => {
-      console.log(`${LOG42} ipc-message from webview`, e2);
+      console.log(`${LOG44} ipc-message from webview`, e2);
     });
     return () => {
       wv.removeEventListener("dom-ready", onDomReady);
@@ -126919,7 +128113,7 @@ function InlineEditableText({
 
 // ../grarf/desktop/src/components/gamesSpine/GameNarrativeCapsule.tsx
 var import_jsx_runtime76 = __toESM(require_jsx_runtime(), 1);
-var LOG43 = "[GamesSpine]";
+var LOG45 = "[GamesSpine]";
 function GameNarrativeCapsule({
   game,
   defaultCollapsed = false,
@@ -126942,9 +128136,9 @@ function GameNarrativeCapsule({
   (0, import_react124.useEffect)(() => {
     if (!text2.trim() && !editMode) return;
     if (define_import_meta_env_default.DEV) {
-      console.log(`${LOG43} Narrative capsule attached to game:`, gameKey);
+      console.log(`${LOG45} Narrative capsule attached to game:`, gameKey);
       if (text2.trim()) {
-        console.log(`${LOG43} Rendering narrative capsule: "${text2.trim()}"`);
+        console.log(`${LOG45} Rendering narrative capsule: "${text2.trim()}"`);
       }
     }
   }, [gameKey, text2, editMode]);
@@ -127018,7 +128212,7 @@ function GameNarrativeCapsule({
 // ../grarf/desktop/src/components/editorial/BriefingPriorityField.tsx
 init_define_import_meta_env();
 var import_jsx_runtime77 = __toESM(require_jsx_runtime(), 1);
-var LOG44 = "[Editorial]";
+var LOG46 = "[Editorial]";
 function BriefingPriorityField({ priority, editMode, onChange }) {
   if (!editMode) return null;
   return /* @__PURE__ */ (0, import_jsx_runtime77.jsxs)(
@@ -127052,7 +128246,7 @@ function BriefingPriorityField({ priority, editMode, onChange }) {
                 return;
               }
               const clamped = Math.min(10, Math.max(1, Math.round(n2)));
-              console.log(`${LOG44} Priority updated: ${clamped}`);
+              console.log(`${LOG46} Priority updated: ${clamped}`);
               onChange(clamped);
             },
             onKeyDown: (e2) => e2.stopPropagation(),
@@ -127824,8 +129018,8 @@ function RecordCell({
 }) {
   if (!record && !standingsLine) return /* @__PURE__ */ (0, import_jsx_runtime84.jsx)("span", {});
   return /* @__PURE__ */ (0, import_jsx_runtime84.jsxs)("div", { className: "flex min-w-0 flex-col items-end justify-self-end", children: [
-    record ? /* @__PURE__ */ (0, import_jsx_runtime84.jsx)("span", { className: GAMES_SPINE_RECORD_CELL, children: record }) : null,
-    standingsLine ? /* @__PURE__ */ (0, import_jsx_runtime84.jsx)("span", { className: "whitespace-nowrap text-[13px] leading-tight text-textdim/55 tabular-nums", children: standingsLine }) : null
+    standingsLine ? /* @__PURE__ */ (0, import_jsx_runtime84.jsx)("span", { className: "whitespace-nowrap text-[13px] leading-tight text-textdim/55 tabular-nums", children: standingsLine }) : null,
+    record ? /* @__PURE__ */ (0, import_jsx_runtime84.jsx)("span", { className: GAMES_SPINE_RECORD_CELL, children: record }) : null
   ] });
 }
 function metaScoreClass(scoreClassName) {
@@ -128386,10 +129580,10 @@ function escapeRegExp(value) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 function collectLeagueLabelCandidates(league2, primaryLabel) {
-  const labels = /* @__PURE__ */ new Set();
+  const labels2 = /* @__PURE__ */ new Set();
   const add = (value) => {
     const trimmed = value?.trim();
-    if (trimmed) labels.add(trimmed);
+    if (trimmed) labels2.add(trimmed);
   };
   add(primaryLabel);
   if (league2) {
@@ -128400,7 +129594,7 @@ function collectLeagueLabelCandidates(league2, primaryLabel) {
       add(alias);
     }
   }
-  return [...labels].sort((a2, b2) => b2.length - a2.length);
+  return [...labels2].sort((a2, b2) => b2.length - a2.length);
 }
 function stripDuplicateLeaguePrefixFromEventTitle(eventTitle, league2, leagueLabel) {
   const trimmed = eventTitle.trim();
@@ -130831,14 +132025,14 @@ var HomeLeagueSpineSection = (0, import_react137.memo)(function HomeLeagueSpineS
   const games = (0, import_react137.useMemo)(() => {
     const viewDate = briefingScrollContext === "home" && statusFilter === "live" ? getOperationalSportsDayDateKey() : selectedDate;
     const rows = resolveViewLeagueGames(league2, viewDate, liveLeagues, scheduleByDate);
-    const now2 = new Date(Math.max(manualLeMansRefreshMs, manualTourDeFranceRefreshMs, manualRefreshMs));
+    const now = new Date(Math.max(manualLeMansRefreshMs, manualTourDeFranceRefreshMs, manualRefreshMs));
     return rows.map(
       (game) => refreshManualGamesSpineGameIfNeeded(
         refreshManualTourDeFranceSpineGameIfNeeded(
-          refreshManualLeMans2026SpineGameIfNeeded(game, now2),
-          now2
+          refreshManualLeMans2026SpineGameIfNeeded(game, now),
+          now
         ),
-        now2
+        now
       )
     );
   }, [
@@ -131348,8 +132542,8 @@ var HomeManualGamesSpineSection = (0, import_react138.memo)(function HomeManualG
   const cardListClass = resolveGamesSpineCardListLayoutClass(gamesMode);
   const refreshedGames = (0, import_react138.useMemo)(() => {
     if (selectedDate !== todayKey) return [];
-    const now2 = new Date(manualRefreshMs);
-    return section.games.map((game) => refreshManualGamesSpineGameIfNeeded(game, now2));
+    const now = new Date(manualRefreshMs);
+    return section.games.map((game) => refreshManualGamesSpineGameIfNeeded(game, now));
   }, [section.games, selectedDate, todayKey, manualRefreshMs]);
   const refreshedGamesWithStatusOverrides = useGamesWithCanonicalStatusOverrides(refreshedGames);
   const visibleGames = (0, import_react138.useMemo)(
@@ -132001,12 +133195,12 @@ var import_react140 = __toESM(require_react(), 1);
 
 // ../grarf/desktop/src/lib/editorial/selectFeaturedGames.ts
 init_define_import_meta_env();
-function matchFeaturedGamesSpineStatusFilter(game, statusFilter, selectedDate, now2 = /* @__PURE__ */ new Date()) {
+function matchFeaturedGamesSpineStatusFilter(game, statusFilter, selectedDate, now = /* @__PURE__ */ new Date()) {
   if (statusFilter === "final") {
-    return matchGamesSpineFinalStatusFilter(game, now2);
+    return matchGamesSpineFinalStatusFilter(game, now);
   }
-  const operationalDateKey = isSelectedDateOperationalSportsDay(selectedDate) ? getOperationalSportsDayDateKey(now2) : selectedDate;
-  if (!isGameOnGamesSpineOperationalDate(game, operationalDateKey, now2)) {
+  const operationalDateKey = isSelectedDateOperationalSportsDay(selectedDate) ? getOperationalSportsDayDateKey(now) : selectedDate;
+  if (!isGameOnGamesSpineOperationalDate(game, operationalDateKey, now)) {
     return false;
   }
   return matchHomeGamesStatusFilter(game, statusFilter);
@@ -132785,7 +133979,7 @@ init_define_import_meta_env();
 var import_react144 = __toESM(require_react(), 1);
 init_isGrarfWebRenderer();
 var STORAGE_KEY6 = "grarf-games-spine-collapse-v2";
-var LOG45 = "[GamesSpine]";
+var LOG47 = "[GamesSpine]";
 function collapseStorageKey(statusFilter, leagueKey) {
   return `${statusFilter}:${leagueKey}`;
 }
@@ -132853,7 +134047,7 @@ function useGamesSpineCollapse(statusFilter) {
         if (isDesktopGamesSpine() && wasCollapsed && !next) {
           useGamesSpineDisplayStore.getState().setLeagueGamesMode(leagueKey, "full");
         }
-        console.log(`${LOG45} League ${next ? "collapsed" : "expanded"}:`, leagueKey);
+        console.log(`${LOG47} League ${next ? "collapsed" : "expanded"}:`, leagueKey);
         return { ...prev, [storageKey]: next };
       });
     },
@@ -132906,11 +134100,11 @@ function useHomeBestGameRightNowResult() {
   return (0, import_react145.useMemo)(() => {
     if (!isGrarfWebRenderer2()) return null;
     const mergedLeagues = omitHiddenGamesSpineLeagueGames(mergeOperationalLeagueGames(leagues));
-    const now2 = new Date(manualGamesSpineRefreshMs);
-    const refreshedLeagues = refreshManualGamesSpineGamesInLeagues(mergedLeagues, now2);
+    const now = new Date(manualGamesSpineRefreshMs);
+    const refreshedLeagues = refreshManualGamesSpineGamesInLeagues(mergedLeagues, now);
     const manualGames = flattenManualGamesSpineGames(
-      convertManualGamesSpineDocument(manualDocument, now2)
-    ).map((game2) => refreshManualGamesSpineGameIfNeeded(game2, now2));
+      convertManualGamesSpineDocument(manualDocument, now)
+    ).map((game2) => refreshManualGamesSpineGameIfNeeded(game2, now));
     const enrichedLeagues = applyOperationalEnrichmentToLeagues(
       refreshedLeagues,
       operationsFieldsByGameId
@@ -132927,7 +134121,7 @@ function useHomeBestGameRightNowResult() {
     const adjunctNow = new Date(Math.max(manualLeMansRefreshMs, manualTourDeFranceRefreshMs));
     const game = refreshManualTourDeFranceSpineGameIfNeeded(
       refreshManualLeMans2026SpineGameIfNeeded(
-        refreshManualGamesSpineGameIfNeeded(result.game, now2),
+        refreshManualGamesSpineGameIfNeeded(result.game, now),
         adjunctNow
       ),
       adjunctNow
@@ -134759,11 +135953,11 @@ function useElectronWhipAroundSpineFocalGameId() {
   return (0, import_react149.useMemo)(() => {
     if (!isGrarfElectronRenderer() || centerPaneMode !== "whiparound") return null;
     const mergedLeagues = omitHiddenGamesSpineLeagueGames(mergeOperationalLeagueGames(leagues));
-    const now2 = new Date(manualGamesSpineRefreshMs);
-    const refreshedLeagues = refreshManualGamesSpineGamesInLeagues(mergedLeagues, now2);
+    const now = new Date(manualGamesSpineRefreshMs);
+    const refreshedLeagues = refreshManualGamesSpineGamesInLeagues(mergedLeagues, now);
     const manualGames = flattenManualGamesSpineGames(
-      convertManualGamesSpineDocument(manualDocument, now2)
-    ).map((game2) => refreshManualGamesSpineGameIfNeeded(game2, now2));
+      convertManualGamesSpineDocument(manualDocument, now)
+    ).map((game2) => refreshManualGamesSpineGameIfNeeded(game2, now));
     const enrichedLeagues = applyOperationalEnrichmentToLeagues(
       refreshedLeagues,
       operationsFieldsByGameId
@@ -134780,7 +135974,7 @@ function useElectronWhipAroundSpineFocalGameId() {
     const adjunctNow = new Date(Math.max(manualLeMansRefreshMs, manualTourDeFranceRefreshMs));
     const game = refreshManualTourDeFranceSpineGameIfNeeded(
       refreshManualLeMans2026SpineGameIfNeeded(
-        refreshManualGamesSpineGameIfNeeded(result.game, now2),
+        refreshManualGamesSpineGameIfNeeded(result.game, now),
         adjunctNow
       ),
       adjunctNow
@@ -134978,11 +136172,11 @@ function HomeGamesToday({
     return selectFeaturedGames(pool, bundle, spineStatusFilter, selectedDate).length;
   }, [leagues, scheduleByDate, selectedDate, bundle, spineStatusFilter, retainedById]);
   const manualFilteredCount = (0, import_react149.useMemo)(() => {
-    const now2 = new Date(manualRefreshMs);
+    const now = new Date(manualRefreshMs);
     let count3 = 0;
     for (const section of manualSections) {
       for (const game of section.games) {
-        const refreshed = refreshManualGamesSpineGameIfNeeded(game, now2);
+        const refreshed = refreshManualGamesSpineGameIfNeeded(game, now);
         if (matchHomeGamesSpineStatusFilter(refreshed, spineStatusFilter)) count3 += 1;
       }
     }
@@ -135891,8 +137085,8 @@ var import_react153 = __toESM(require_react(), 1);
 // ../grarf/desktop/src/lib/home/buildObjectsSpineCatchUpGamesByEventId.ts
 init_define_import_meta_env();
 function buildObjectsSpineCatchUpGamesByEventId(input) {
-  const now2 = input.now ?? /* @__PURE__ */ new Date();
-  if (isObjectsSpineCatchUpTodaySelected(input.operationalDateKey, now2)) {
+  const now = input.now ?? /* @__PURE__ */ new Date();
+  if (isObjectsSpineCatchUpTodaySelected(input.operationalDateKey, now)) {
     return buildEventIdGameIndex(input.liveLeagues);
   }
   const mergedLeagues = {};
@@ -135915,14 +137109,14 @@ function buildObjectsSpineCatchUpGamesByEventId(input) {
 
 // ../grarf/desktop/src/lib/sportscape/filterSportscapeCatchUpSectionsForOperationalDate.ts
 init_define_import_meta_env();
-function filterSportscapeCatchUpSectionsForOperationalDate(sections, operationalDateKey, now2 = /* @__PURE__ */ new Date()) {
-  if (isObjectsSpineCatchUpTodaySelected(operationalDateKey, now2)) {
+function filterSportscapeCatchUpSectionsForOperationalDate(sections, operationalDateKey, now = /* @__PURE__ */ new Date()) {
+  if (isObjectsSpineCatchUpTodaySelected(operationalDateKey, now)) {
     return [...sections];
   }
   const filtered = [];
   for (const section of sections) {
     const rows = section.rows.filter(
-      (row) => isGameOnGamesSpineOperationalDate(row.game, operationalDateKey, now2)
+      (row) => isGameOnGamesSpineOperationalDate(row.game, operationalDateKey, now)
     );
     if (rows.length === 0) continue;
     filtered.push({ ...section, rows });
@@ -137011,12 +138205,12 @@ function measureRowWidth(label) {
   document.body.removeChild(container);
   return width;
 }
-function measureObjectsSpineLeagueIndexColumnWidthPx(labels) {
-  if (typeof document === "undefined" || labels.length === 0) {
+function measureObjectsSpineLeagueIndexColumnWidthPx(labels2) {
+  if (typeof document === "undefined" || labels2.length === 0) {
     return OBJECTS_SPINE_DUAL_COLUMN_LEAGUE_COLUMN_WIDTH_PX2;
   }
   let maxWidth = 0;
-  for (const label of labels) {
+  for (const label of labels2) {
     maxWidth = Math.max(maxWidth, measureRowWidth(label));
   }
   return Math.max(1, Math.ceil(maxWidth));
@@ -137036,11 +138230,11 @@ function HomeDesktopObjectsSpineCatchUpLeagueIndexColumn({ feedCards }) {
     [feedCards]
   );
   const leagueIndexLabels = (0, import_react161.useMemo)(() => {
-    const labels = [];
+    const labels2 = [];
     for (const section of leagueNavSections) {
       for (const item of section.items) {
         if (!item.grarfLeagueKey) continue;
-        labels.push(
+        labels2.push(
           resolveGamesSpineLeagueSectionHeaderLabel(
             item.grarfLeagueKey,
             mergedOperationalLeagues[item.grarfLeagueKey]
@@ -137048,7 +138242,7 @@ function HomeDesktopObjectsSpineCatchUpLeagueIndexColumn({ feedCards }) {
         );
       }
     }
-    return labels;
+    return labels2;
   }, [leagueNavSections, mergedOperationalLeagues]);
   const [leagueColumnWidthPx, setLeagueColumnWidthPx] = (0, import_react161.useState)(
     OBJECTS_SPINE_DUAL_COLUMN_LEAGUE_COLUMN_WIDTH_PX2
@@ -138992,7 +140186,7 @@ function clearPodcastCache() {
 // ../grarf/desktop/src/components/media/PodcastRailPanel.tsx
 init_isGrarfWebRenderer();
 var import_jsx_runtime127 = __toESM(require_jsx_runtime(), 1);
-var LOG46 = "[Podcasts]";
+var LOG48 = "[Podcasts]";
 function formatDur(sec) {
   if (sec == null || !Number.isFinite(sec)) return "\u2014";
   const m2 = Math.floor(sec / 60);
@@ -139040,7 +140234,7 @@ function PodcastRailPanel({
       setLoading(true);
       setErr(null);
       setFeedErrors(0);
-      console.log(`${LOG46} Loaded ${orderedFeeds.length} feeds`);
+      console.log(`${LOG48} Loaded ${orderedFeeds.length} feeds`);
       const all = [];
       let fromCache = 0;
       let fetched = 0;
@@ -139078,7 +140272,7 @@ function PodcastRailPanel({
       const ranked = sortPodcastEpisodesForContext(all, PODCAST_FEEDS, podcastRoutingOpts);
       setEpisodes(ranked.slice(0, 48));
       setFeedErrors(failed);
-      console.log(`${LOG46} Fetched ${all.length} episodes`);
+      console.log(`${LOG48} Fetched ${all.length} episodes`);
       if (all.length === 0) {
         setErr(
           failed >= orderedFeeds.length ? "No episodes available \u2014 RSS unreachable or feeds changed. Try REFRESH or check network." : "No playable episodes in feeds yet. Try REFRESH."
@@ -142213,6 +143407,7 @@ var import_react178 = __toESM(require_react(), 1);
 // ../grarf/desktop/src/hooks/useMlbLiveGameStoryAvailability.ts
 init_define_import_meta_env();
 var import_react177 = __toESM(require_react(), 1);
+init_isGrarfWebRenderer();
 var MLB_CONTENT_POLL_MS = 6e4;
 function isMlbRecapStoryAvailable(recapArticle) {
   if (!recapArticle || typeof recapArticle !== "object") return false;
@@ -142246,11 +143441,21 @@ async function fetchMlbLiveGameStoryAvailable(game) {
   }
   return fetchMlbGameStoryDapiAvailable(gamePk);
 }
+function mlbLiveGameStoryAvailableFromOperationalGame(game) {
+  if (isMlbRecapStoryAvailable(game.content?.recap)) return true;
+  const story = game.content?.stories?.[0];
+  const title = typeof story?.title === "string" ? story.title.trim() : "";
+  return title.length > 0 && !title.toLowerCase().startsWith("game ");
+}
 function useMlbLiveGameStoryAvailability(game) {
   const [liveGameStoryAvailable, setLiveGameStoryAvailable] = (0, import_react177.useState)(false);
   (0, import_react177.useEffect)(() => {
     if (!game || game.status !== "live" && game.status !== "final") {
       setLiveGameStoryAvailable(false);
+      return;
+    }
+    if (isGrarfExtensionRenderer()) {
+      setLiveGameStoryAvailable(mlbLiveGameStoryAvailableFromOperationalGame(game));
       return;
     }
     let cancelled = false;
@@ -143074,7 +144279,7 @@ async function runCbsHeadlinesVideoProbe(executeJavaScript, options) {
 // ../grarf/desktop/src/components/homeMvp/HomeHeadlinesCbsPanel.tsx
 var import_jsx_runtime143 = __toESM(require_jsx_runtime(), 1);
 var CBS_SPORTS_HQ_LIVE_URL = "https://www.cbssports.com/watch/live";
-var LOG47 = "[HomeHeadlinesCbs]";
+var LOG49 = "[HomeHeadlinesCbs]";
 var BROWSER_SURFACE_TYPE = "Electron webview (guest WebContents)";
 var HEADLINES_CONTENT_HEIGHT = "h-[19.5rem]";
 var CBS_WEB_PREFS = "contextIsolation=yes,nodeIntegration=no,sandbox=no,javascript=yes,autoplayPolicy=no-user-gesture-required";
@@ -143096,21 +144301,21 @@ function HomeHeadlinesCbsPanel({ embedsEnabled = true, videoUrl }) {
   const showSurface = embedsEnabled && hasWebviewTag3();
   (0, import_react183.useLayoutEffect)(() => {
     if (!showSurface) {
-      console.warn(`${LOG47} webview unavailable \u2014 embedsEnabled=${embedsEnabled}`);
+      console.warn(`${LOG49} webview unavailable \u2014 embedsEnabled=${embedsEnabled}`);
       return;
     }
     const wv = wvRef.current;
     if (!wv) return;
-    console.log(`${LOG47} browser surface type:`, BROWSER_SURFACE_TYPE);
-    console.log(`${LOG47} navigation URL:`, navigationUrl);
+    console.log(`${LOG49} browser surface type:`, BROWSER_SURFACE_TYPE);
+    console.log(`${LOG49} navigation URL:`, navigationUrl);
     const onStartLoading = () => {
-      console.log(`${LOG47} did-start-loading`, { url: navigationUrl });
+      console.log(`${LOG49} did-start-loading`, { url: navigationUrl });
     };
     const onNavigate = (event) => {
       const e2 = event;
       if (e2.isMainFrame === false) return;
       finalUrlRef.current = e2.url ?? finalUrlRef.current;
-      console.log(`${LOG47} did-navigate (redirect)`, {
+      console.log(`${LOG49} did-navigate (redirect)`, {
         url: e2.url,
         finalUrl: finalUrlRef.current
       });
@@ -143120,7 +144325,7 @@ function HomeHeadlinesCbsPanel({ embedsEnabled = true, videoUrl }) {
       if (e2.isMainFrame === false) return;
       if (e2.errorCode === -3) return;
       const message = formatLoadError(e2);
-      console.error(`${LOG47} did-fail-load`, {
+      console.error(`${LOG49} did-fail-load`, {
         errorCode: e2.errorCode,
         errorDescription: e2.errorDescription,
         validatedURL: e2.validatedURL
@@ -143131,12 +144336,12 @@ function HomeHeadlinesCbsPanel({ embedsEnabled = true, videoUrl }) {
       const e2 = event;
       if (e2.isMainFrame === false) return;
       const status = e2.httpResponseCode ?? e2.statusCode;
-      console.log(`${LOG47} did-get-response-details`, {
+      console.log(`${LOG49} did-get-response-details`, {
         status,
         url: e2.url
       });
       if (status != null && status >= 400) {
-        console.error(`${LOG47} HTTP error`, { status, url: e2.url });
+        console.error(`${LOG49} HTTP error`, { status, url: e2.url });
       }
       if (status != null && status >= 500) {
         setLoadError(`HTTP ${status} \u2014 ${e2.url ?? navigationUrl}`);
@@ -143149,7 +144354,7 @@ function HomeHeadlinesCbsPanel({ embedsEnabled = true, videoUrl }) {
       } catch {
       }
       finalUrlRef.current = resolvedUrl;
-      console.log(`${LOG47} did-finish-load`, {
+      console.log(`${LOG49} did-finish-load`, {
         result: "ok",
         finalUrl: resolvedUrl
       });
@@ -143160,10 +144365,10 @@ function HomeHeadlinesCbsPanel({ embedsEnabled = true, videoUrl }) {
       void wv.executeJavaScript("window.location.href").then((href) => {
         if (typeof href === "string" && href) {
           finalUrlRef.current = href;
-          console.log(`${LOG47} final navigation URL after redirects:`, href);
+          console.log(`${LOG49} final navigation URL after redirects:`, href);
         }
       }).catch((err) => {
-        console.warn(`${LOG47} final URL probe failed`, err);
+        console.warn(`${LOG49} final URL probe failed`, err);
       });
     };
     const onConsoleMessage = (event) => {
@@ -143174,28 +144379,28 @@ function HomeHeadlinesCbsPanel({ embedsEnabled = true, videoUrl }) {
       const isCert = lower.includes("certificate") || lower.includes("ssl") || lower.includes("net::err_cert");
       const isAutoplay = lower.includes("autoplay") || lower.includes("play() request") || lower.includes("notallowederror");
       if (isCsp) {
-        console.error(`${LOG47} CSP console error`, {
+        console.error(`${LOG49} CSP console error`, {
           level: e2.level,
           message,
           sourceId: e2.sourceId,
           line: e2.line
         });
       } else if (isCert) {
-        console.error(`${LOG47} certificate console error`, {
+        console.error(`${LOG49} certificate console error`, {
           level: e2.level,
           message,
           sourceId: e2.sourceId,
           line: e2.line
         });
       } else if (isAutoplay) {
-        console.warn(`${LOG47} media autoplay console message`, {
+        console.warn(`${LOG49} media autoplay console message`, {
           level: e2.level,
           message,
           sourceId: e2.sourceId,
           line: e2.line
         });
       } else if (e2.level === 3) {
-        console.error(`${LOG47} console error`, {
+        console.error(`${LOG49} console error`, {
           message,
           sourceId: e2.sourceId,
           line: e2.line
@@ -145738,8 +146943,8 @@ function animateScrollTop(viewportEl, targetTop, durationMs = HOME_LEAGUE_STACK_
     }
     const startTime = performance.now();
     const easeOut = (t2) => t2 * (2 - t2);
-    const step = (now2) => {
-      const progress = Math.min(1, (now2 - startTime) / durationMs);
+    const step = (now) => {
+      const progress = Math.min(1, (now - startTime) / durationMs);
       viewportEl.scrollTop = startTop + delta * easeOut(progress);
       if (progress < 1) requestAnimationFrame(step);
       else resolve();
@@ -149767,8 +150972,8 @@ function SportscapeMlbCompactHeaderActions({
 
 // ../grarf/desktop/src/lib/mlbCatchUpWeekendLayout.ts
 init_define_import_meta_env();
-function isMlbCatchUpWeekend(now2 = /* @__PURE__ */ new Date()) {
-  const day = now2.getDay();
+function isMlbCatchUpWeekend(now = /* @__PURE__ */ new Date()) {
+  const day = now.getDay();
   return day === 0 || day === 6;
 }
 
@@ -158648,10 +159853,10 @@ function resolveWhipAroundEspnInGrarfUrl(game) {
 
 // ../grarf/desktop/src/components/homeMvp/HomeWhipAroundElectronPane.tsx
 var import_jsx_runtime222 = __toESM(require_jsx_runtime(), 1);
-function refreshWhipAroundSlateGame(game, now2, adjunctNow) {
+function refreshWhipAroundSlateGame(game, now, adjunctNow) {
   return refreshManualTourDeFranceSpineGameIfNeeded(
     refreshManualLeMans2026SpineGameIfNeeded(
-      refreshManualGamesSpineGameIfNeeded(game, now2),
+      refreshManualGamesSpineGameIfNeeded(game, now),
       adjunctNow
     ),
     adjunctNow
@@ -158667,11 +159872,11 @@ function useDesktopWhipAroundFocalResult() {
   const operationsFieldsByGameId = useAdminOperationsCardStore((s2) => s2.fieldsByGameId);
   return (0, import_react255.useMemo)(() => {
     const mergedLeagues = omitHiddenGamesSpineLeagueGames(mergeOperationalLeagueGames(leagues));
-    const now2 = new Date(manualGamesSpineRefreshMs);
-    const refreshedLeagues = refreshManualGamesSpineGamesInLeagues(mergedLeagues, now2);
+    const now = new Date(manualGamesSpineRefreshMs);
+    const refreshedLeagues = refreshManualGamesSpineGamesInLeagues(mergedLeagues, now);
     const manualGames = flattenManualGamesSpineGames(
-      convertManualGamesSpineDocument(manualDocument, now2)
-    ).map((game2) => refreshManualGamesSpineGameIfNeeded(game2, now2));
+      convertManualGamesSpineDocument(manualDocument, now)
+    ).map((game2) => refreshManualGamesSpineGameIfNeeded(game2, now));
     const enrichedLeagues = applyOperationalEnrichmentToLeagues(
       refreshedLeagues,
       operationsFieldsByGameId
@@ -158686,7 +159891,7 @@ function useDesktopWhipAroundFocalResult() {
     if (!result) return null;
     if (result.game.league && isGamesSpineLeagueTemporarilyHidden(result.game.league)) return null;
     const adjunctNow = new Date(Math.max(manualLeMansRefreshMs, manualTourDeFranceRefreshMs));
-    const game = refreshWhipAroundSlateGame(result.game, now2, adjunctNow);
+    const game = refreshWhipAroundSlateGame(result.game, now, adjunctNow);
     if (game === result.game) return result;
     return { ...result, game };
   }, [
@@ -159438,13 +160643,13 @@ var import_react258 = __toESM(require_react(), 1);
 init_define_import_meta_env();
 function collectHighlightsTvAmbientSpineGames(channelLeagueKey) {
   const spineLeagues = resolveHighlightsTvAmbientSpineLeagueKeys(channelLeagueKey);
-  const now2 = /* @__PURE__ */ new Date();
-  const { sportsDayKey, precedingSportsDayKey } = resolveHighlightsTvAmbientEligibleSportsDayKeys(now2);
+  const now = /* @__PURE__ */ new Date();
+  const { sportsDayKey, precedingSportsDayKey } = resolveHighlightsTvAmbientEligibleSportsDayKeys(now);
   const seen = /* @__PURE__ */ new Set();
   const out = [];
   const push2 = (game) => {
     if (seen.has(game.id)) return;
-    if (!isHighlightsTvAmbientEligibleGame(game, now2)) return;
+    if (!isHighlightsTvAmbientEligibleGame(game, now)) return;
     seen.add(game.id);
     out.push(game);
   };
@@ -159492,16 +160697,16 @@ init_define_import_meta_env();
 var HIGHLIGHTS_TV_CHANNEL_REFRESH_MS = 15 * 60 * 1e3;
 var HIGHLIGHTS_TV_AMBIENT_INGESTION_REFRESH_MS_ACTIVE = 45 * 60 * 1e3;
 var HIGHLIGHTS_TV_AMBIENT_INGESTION_REFRESH_MS_OVERNIGHT = 90 * 60 * 1e3;
-function getEasternHour(now2) {
+function getEasternHour(now) {
   const hourPart = new Intl.DateTimeFormat("en-US", {
     timeZone: "America/New_York",
     hour: "numeric",
     hourCycle: "h23"
-  }).formatToParts(now2).find((part) => part.type === "hour");
+  }).formatToParts(now).find((part) => part.type === "hour");
   return Number(hourPart?.value ?? 0);
 }
-function resolveHighlightsTvAmbientIngestionRefreshMs(now2 = /* @__PURE__ */ new Date()) {
-  const hour = getEasternHour(now2);
+function resolveHighlightsTvAmbientIngestionRefreshMs(now = /* @__PURE__ */ new Date()) {
+  const hour = getEasternHour(now);
   if (hour >= 1 && hour <= 3) {
     return HIGHLIGHTS_TV_AMBIENT_INGESTION_REFRESH_MS_OVERNIGHT;
   }
@@ -163054,15 +164259,15 @@ function SportsBrowserPrototypeGameContextInlineTabs({
   const measureRef = (0, import_react269.useRef)(null);
   const [parentTabWidthPx, setParentTabWidthPx] = (0, import_react269.useState)(null);
   const parentMeasureLabels = (0, import_react269.useMemo)(() => {
-    const labels = sections.map((section) => section.label);
+    const labels2 = sections.map((section) => section.label);
     if (showTeamDestinationTabs) {
-      labels.push(
+      labels2.push(
         ...SPORTS_BROWSER_PROTOTYPE_LEAGUE_CONTEXT_SECTIONS.map(
           (section) => SPORTS_BROWSER_PROTOTYPE_LEAGUE_CONTEXT_SECTION_LABELS[section]
         )
       );
     }
-    return labels;
+    return labels2;
   }, [sections, showTeamDestinationTabs]);
   const parentMeasureKey = (0, import_react269.useMemo)(() => parentMeasureLabels.join("\0"), [parentMeasureLabels]);
   (0, import_react269.useLayoutEffect)(() => {
@@ -164228,8 +165433,12 @@ function abbreviateNewsSportsBrowserStandingsGroup(group, league2) {
   return trimmed;
 }
 function formatMlbWnbaStandingsSubLine(context2) {
+  const enrichedLine = context2.standingsLine?.trim();
+  if (enrichedLine && /\(\d/.test(enrichedLine)) {
+    return enrichedLine;
+  }
   const record = context2.record;
-  const standings = context2.standingsLabel || context2.standingsLine;
+  const standings = context2.standingsLabel || enrichedLine;
   if (!standings && !record) return null;
   const parsed = standings ? parseStandingsPlacementAndGroup(standings) : null;
   if (parsed) {
@@ -164285,10 +165494,10 @@ function resolveNewsSportsBrowserGameCardCompetitorContext(game, side, pill, opt
   };
 }
 function formatNewsSportsBrowserGameCardCompetitorSubLine(context2) {
-  if (isGrarfExtensionRenderer() && context2.league === "MLB") {
-    return null;
-  }
-  return formatMlbWnbaStandingsSubLine(context2);
+  const standingsLine = formatMlbWnbaStandingsSubLine(context2);
+  if (standingsLine) return standingsLine;
+  if (context2.record) return `(${context2.record})`;
+  return null;
 }
 function newsSportsBrowserGameCardHasCompetitorSubLines(context2) {
   return formatNewsSportsBrowserGameCardCompetitorSubLine(context2) != null;
@@ -168819,10 +170028,10 @@ function normalizeLabelKey(label) {
 function slugifyGenericBeinSuperligTeamName(teamName) {
   return teamName.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/&/g, "").replace(/['’]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/-+/g, "-").replace(/^-|-$/g, "");
 }
-function registerBeinSuperligTeamSlug(slug, ...labels) {
+function registerBeinSuperligTeamSlug(slug, ...labels2) {
   const trimmedSlug = slug.trim().toLowerCase();
   if (!trimmedSlug) return;
-  for (const label of labels) {
+  for (const label of labels2) {
     const key2 = normalizeLabelKey(label);
     if (key2) BEIN_SUPERLIG_TEAM_SLUG_BY_NORMALIZED_LABEL.set(key2, trimmedSlug);
     const generic = slugifyGenericBeinSuperligTeamName(label);
@@ -169065,12 +170274,12 @@ function buildFuboMatchWatchUrl(programId) {
   if (!/^EP[0-9]+$/i.test(id)) return "";
   return `${FUBO_WATCH_ORIGIN}/welcome/matches/${encodeURIComponent(id)}`;
 }
-function normalizeTeamToken3(name) {
+function normalizeTeamToken4(name) {
   return name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]/g, "").trim();
 }
 function tokenOverlapScore3(a2, b2) {
-  const ta2 = normalizeTeamToken3(a2);
-  const tb = normalizeTeamToken3(b2);
+  const ta2 = normalizeTeamToken4(a2);
+  const tb = normalizeTeamToken4(b2);
   if (!ta2 || !tb) return 0;
   if (ta2 === tb) return 1;
   if (ta2.includes(tb) || tb.includes(ta2)) return 0.85;
@@ -169323,8 +170532,6 @@ function resolveWatchLiveDestinationUrl(game) {
 // ../grarf/desktop/src/extensionHost/grarfExtensionEspnWatchHomeCatalog.ts
 init_define_import_meta_env();
 init_operationalIngestConfig();
-var ESPN_WATCH_HOME_URL2 = "https://watch.product.api.espn.com/api/product/v3/watchespn/web/home?tz=America%2FChicago&lang=en&countryCode=US&deviceType=desktop";
-var ESPN_FETCH_UA4 = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36";
 var CACHE_TTL_MS4 = 6 * 60 * 60 * 1e3;
 var cache3 = null;
 async function fetchEspnWatchHomeListingsFromWorker() {
@@ -169337,36 +170544,24 @@ async function fetchEspnWatchHomeListingsFromWorker() {
   if (!res.ok) return null;
   const json = await res.json();
   if (Array.isArray(json.listings)) {
-    cache3 = { fetchedAt: now, listings: json.listings };
     return json.listings;
   }
+  return null;
 }
 async function fetchGrarfExtensionEspnWatchHomeListings() {
-  const now2 = Date.now();
-  if (cache3 && now2 - cache3.fetchedAt < CACHE_TTL_MS4) {
+  const now = Date.now();
+  if (cache3 && now - cache3.fetchedAt < CACHE_TTL_MS4) {
     return cache3.listings;
   }
   try {
     const fromWorker = await fetchEspnWatchHomeListingsFromWorker();
     if (fromWorker) {
-      cache3 = { fetchedAt: now2, listings: fromWorker };
+      cache3 = { fetchedAt: now, listings: fromWorker };
       return fromWorker;
     }
   } catch {
   }
-  try {
-    const res = await fetch(ESPN_WATCH_HOME_URL2, {
-      headers: { "User-Agent": ESPN_FETCH_UA4, Accept: "application/json" },
-      cache: "no-store"
-    });
-    if (!res.ok) return cache3?.listings ?? [];
-    const json = await res.json();
-    const listings = parseEspnWatchHomeListings(json);
-    cache3 = { fetchedAt: now2, listings };
-    return listings;
-  } catch {
-    return cache3?.listings ?? [];
-  }
+  return cache3?.listings ?? [];
 }
 
 // ../grarf/desktop/src/extensionHost/grarfExtensionBeinSportsSuperligWatchResolver.ts
@@ -169378,8 +170573,8 @@ function grarfExtensionLeagueUsesBeinSportsSuperligWatchResolver(leagueKey) {
   return leagueKey.trim().toUpperCase() === "SUPERLIG";
 }
 async function fetchGrarfExtensionBeinSportsSuperligWatchEntries() {
-  const now2 = Date.now();
-  if (superligWatchCache && now2 - superligWatchCache.at < LISTINGS_CACHE_TTL_MS) {
+  const now = Date.now();
+  if (superligWatchCache && now - superligWatchCache.at < LISTINGS_CACHE_TTL_MS) {
     return superligWatchCache.items;
   }
   const cloudBase = getOperationalIngestConfig().cloudBaseUrl?.replace(/\/$/, "");
@@ -169396,7 +170591,7 @@ async function fetchGrarfExtensionBeinSportsSuperligWatchEntries() {
     }
     const data2 = await res.json();
     const items = Array.isArray(data2.items) ? data2.items : [];
-    superligWatchCache = { at: now2, items };
+    superligWatchCache = { at: now, items };
     return items;
   } catch {
     return superligWatchCache?.items ?? [];
@@ -169424,8 +170619,8 @@ function grarfExtensionLeagueUsesFanatizWatchResolver(leagueKey) {
   return isFanatizWatchLeagueKey(leagueKey);
 }
 async function fetchGrarfExtensionFanatizWatchEntries() {
-  const now2 = Date.now();
-  if (fanatizWatchCache && now2 - fanatizWatchCache.at < LISTINGS_CACHE_TTL_MS2) {
+  const now = Date.now();
+  if (fanatizWatchCache && now - fanatizWatchCache.at < LISTINGS_CACHE_TTL_MS2) {
     return fanatizWatchCache.items;
   }
   const cloudBase = getOperationalIngestConfig().cloudBaseUrl?.replace(/\/$/, "");
@@ -169442,7 +170637,7 @@ async function fetchGrarfExtensionFanatizWatchEntries() {
     }
     const data2 = await res.json();
     const items = Array.isArray(data2.items) ? data2.items : [];
-    fanatizWatchCache = { at: now2, items };
+    fanatizWatchCache = { at: now, items };
     return items;
   } catch {
     return fanatizWatchCache?.items ?? [];
@@ -169470,8 +170665,8 @@ function grarfExtensionLeagueUsesFuboWatchResolver(leagueKey) {
   return isFuboWatchLeagueKey(leagueKey);
 }
 async function fetchGrarfExtensionFuboWatchEntries() {
-  const now2 = Date.now();
-  if (fuboWatchCache && now2 - fuboWatchCache.at < LISTINGS_CACHE_TTL_MS3) {
+  const now = Date.now();
+  if (fuboWatchCache && now - fuboWatchCache.at < LISTINGS_CACHE_TTL_MS3) {
     return fuboWatchCache.items;
   }
   const cloudBase = getOperationalIngestConfig().cloudBaseUrl?.replace(/\/$/, "");
@@ -169488,7 +170683,7 @@ async function fetchGrarfExtensionFuboWatchEntries() {
     }
     const data2 = await res.json();
     const items = Array.isArray(data2.items) ? data2.items : [];
-    fuboWatchCache = { at: now2, items };
+    fuboWatchCache = { at: now, items };
     return items;
   } catch {
     return fuboWatchCache?.items ?? [];
@@ -169602,7 +170797,7 @@ init_define_import_meta_env();
 
 // ../grarf/grarf-operational-service/src/watch/paramount/teamMatch.mjs
 init_define_import_meta_env();
-function normalizeTeamToken4(name) {
+function normalizeTeamToken5(name) {
   if (!name || typeof name !== "string") return "";
   let s2 = name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\b(fc|cf|sc|ac|afc|city|united|town)\b/g, " ").replace(/[^a-z0-9]/g, "").trim();
   const aliases = {
@@ -169615,8 +170810,8 @@ function normalizeTeamToken4(name) {
   return aliases[s2] ?? s2;
 }
 function tokenOverlapScore4(a2, b2) {
-  const ta2 = normalizeTeamToken4(a2);
-  const tb = normalizeTeamToken4(b2);
+  const ta2 = normalizeTeamToken5(a2);
+  const tb = normalizeTeamToken5(b2);
   if (!ta2 || !tb) return 0;
   if (ta2 === tb) return 1;
   if (ta2.includes(tb) || tb.includes(ta2)) return 0.85;
@@ -169655,7 +170850,7 @@ function parseMatchupFromTitle(title) {
 }
 
 // ../grarf/grarf-operational-service/src/watch/paramount/matchCbsListing.mjs
-var TIME_WINDOW_MS3 = 4 * 60 * 60 * 1e3;
+var TIME_WINDOW_MS5 = 4 * 60 * 60 * 1e3;
 var MIN_MATCH_SCORE = 1.4;
 function matchGameToCbsListing(game, listings) {
   if (!listings.length) return null;
@@ -169667,7 +170862,7 @@ function matchGameToCbsListing(game, listings) {
     let score2 = teamScore3;
     if (game.startTimeMs && listing.startMs) {
       const delta = Math.abs(game.startTimeMs - listing.startMs);
-      if (delta > TIME_WINDOW_MS3) continue;
+      if (delta > TIME_WINDOW_MS5) continue;
       score2 += 0.25;
     }
     if (score2 > bestScore) {
@@ -169685,8 +170880,8 @@ function grarfExtensionLeagueUsesParamountPlusWatchResolver(leagueKey) {
   return leagueKey.trim().toUpperCase() === "UCL";
 }
 async function fetchGrarfExtensionParamountPlusUclWatchListings() {
-  const now2 = Date.now();
-  if (uclListingsCache && now2 - uclListingsCache.at < LISTINGS_CACHE_TTL_MS4) {
+  const now = Date.now();
+  if (uclListingsCache && now - uclListingsCache.at < LISTINGS_CACHE_TTL_MS4) {
     return uclListingsCache.items;
   }
   const cloudBase = getOperationalIngestConfig().cloudBaseUrl?.replace(/\/$/, "");
@@ -169703,7 +170898,7 @@ async function fetchGrarfExtensionParamountPlusUclWatchListings() {
     }
     const data2 = await res.json();
     const items = Array.isArray(data2.items) ? data2.items : [];
-    uclListingsCache = { at: now2, items };
+    uclListingsCache = { at: now, items };
     return items;
   } catch {
     return uclListingsCache?.items ?? [];
@@ -170378,85 +171573,6 @@ init_define_import_meta_env();
 
 // ../grarf/shared/domain/soccer/matchBbcSportFootballPremierLeagueRecapForGame.ts
 init_define_import_meta_env();
-
-// ../grarf/shared/domain/soccer/eplRecapTeamMatching.ts
-init_define_import_meta_env();
-var EPL_RECAP_TEAM_ALIAS_GROUPS = [
-  ["Arsenal"],
-  ["Aston Villa"],
-  ["AFC Bournemouth", "Bournemouth"],
-  ["Brentford"],
-  ["Brighton & Hove Albion", "Brighton and Hove Albion", "Brighton", "Brighton Hove Albion"],
-  ["Chelsea"],
-  ["Crystal Palace", "C Palace"],
-  ["Everton"],
-  ["Fulham"],
-  ["Ipswich Town", "Ipswich"],
-  ["Leeds United", "Leeds"],
-  ["Liverpool"],
-  ["Manchester City", "Man City"],
-  ["Manchester United", "Man United", "Man Utd", "Manchester Utd"],
-  ["Newcastle United", "Newcastle"],
-  ["Nottingham Forest", "Nottm Forest", "Nottingham"],
-  ["Sunderland", "AFC Sunderland"],
-  ["Tottenham Hotspur", "Tottenham", "Spurs"],
-  ["West Ham United", "West Ham"],
-  ["Wolverhampton Wanderers", "Wolves", "Wolverhampton"]
-];
-var EPL_RECAP_ALIAS_LOOKUP = /* @__PURE__ */ new Map();
-function normalizeEplRecapAliasKey(label) {
-  return label.trim().toLowerCase().normalize("NFD").replace(/\p{M}/gu, "").replace(/&/g, " and ").replace(/\bfc\b/g, "").replace(/[^a-z0-9]+/g, " ").replace(/\s+/g, " ").trim();
-}
-function registerEplRecapAliasGroup(aliases) {
-  const tokenUnion = /* @__PURE__ */ new Set();
-  for (const alias of aliases) {
-    for (const token of tokenSetFromLabel(alias)) {
-      tokenUnion.add(token);
-    }
-  }
-  for (const alias of aliases) {
-    const key2 = normalizeEplRecapAliasKey(alias);
-    if (!key2) continue;
-    const existing = EPL_RECAP_ALIAS_LOOKUP.get(key2) ?? /* @__PURE__ */ new Set();
-    for (const token of tokenUnion) {
-      existing.add(token);
-    }
-    EPL_RECAP_ALIAS_LOOKUP.set(key2, existing);
-  }
-}
-for (const group of EPL_RECAP_TEAM_ALIAS_GROUPS) {
-  registerEplRecapAliasGroup(group);
-}
-function buildEplRecapTeamTokenSet(teamName) {
-  const trimmed = teamName.trim();
-  if (!trimmed) return /* @__PURE__ */ new Set();
-  const tokens = new Set(tokenSetFromLabel(trimmed));
-  const aliasTokens = EPL_RECAP_ALIAS_LOOKUP.get(normalizeEplRecapAliasKey(trimmed));
-  if (aliasTokens) {
-    for (const token of aliasTokens) {
-      tokens.add(token);
-    }
-  }
-  return tokens;
-}
-var EPL_RECAP_MIN_TEAM_PAIR_SCORE = 0.55;
-function scoreEplRecapTeamPair(homeA, awayA, homeB, awayB) {
-  const homeSetA = buildEplRecapTeamTokenSet(homeA);
-  const awaySetA = buildEplRecapTeamTokenSet(awayA);
-  const homeSetB = buildEplRecapTeamTokenSet(homeB);
-  const awaySetB = buildEplRecapTeamTokenSet(awayB);
-  if (homeSetA.size === 0 || awaySetA.size === 0 || homeSetB.size === 0 || awaySetB.size === 0) {
-    return 0;
-  }
-  const direct = (tokenOverlapScore(homeSetA, homeSetB) + tokenOverlapScore(awaySetA, awaySetB)) / 2;
-  const swapped = (tokenOverlapScore(homeSetA, awaySetB) + tokenOverlapScore(awaySetA, homeSetB)) / 2;
-  return Math.max(direct, swapped);
-}
-function eplRecapTeamsMatch(homeA, awayA, homeB, awayB, minScore = EPL_RECAP_MIN_TEAM_PAIR_SCORE) {
-  return scoreEplRecapTeamPair(homeA, awayA, homeB, awayB) >= minScore;
-}
-
-// ../grarf/shared/domain/soccer/matchBbcSportFootballPremierLeagueRecapForGame.ts
 var BBC_SPORT_PREMIER_LEAGUE_TOURNAMENT_URN = "urn:bbc:sportsdata:football:tournament:premier-league";
 function teamsAlign(catalogHome, catalogAway, homeTeam, awayTeam) {
   return eplRecapTeamsMatch(catalogHome, catalogAway, homeTeam, awayTeam);
@@ -170647,10 +171763,10 @@ function parseBbcSportFootballScoresFixturesHtml(html) {
 
 // ../grarf/desktop/src/lib/epl/resolveEplRecapTeamLabelFromGame.ts
 init_define_import_meta_env();
-function uniqueNonEmptyLabels(labels) {
+function uniqueNonEmptyLabels(labels2) {
   const seen = /* @__PURE__ */ new Set();
   const out = [];
-  for (const raw of labels) {
+  for (const raw of labels2) {
     const trimmed = raw?.trim() ?? "";
     if (!trimmed) continue;
     const key2 = trimmed.toLowerCase();
@@ -171151,10 +172267,10 @@ function matchBbcSportFootballChampionsLeagueRecapForGame(catalog, input) {
 
 // ../grarf/desktop/src/lib/soccerway/resolveSoccerwayRecapTeamLabelCandidatesFromGame.ts
 init_define_import_meta_env();
-function uniqueNonEmpty(labels) {
+function uniqueNonEmpty(labels2) {
   const seen = /* @__PURE__ */ new Set();
   const out = [];
-  for (const raw of labels) {
+  for (const raw of labels2) {
     const trimmed = raw?.trim() ?? "";
     if (!trimmed) continue;
     const key2 = trimmed.toLowerCase();
@@ -171510,14 +172626,14 @@ function buildGenericSoccerRecapTeamTokenSet(league2, provider, teamName) {
   const trimmed = teamName.trim();
   if (!trimmed) return /* @__PURE__ */ new Set();
   const tokens = /* @__PURE__ */ new Set();
-  const labels = [trimmed];
+  const labels2 = [trimmed];
   if (league2) {
     const normalized = normalizeSoccerTeamName({ league: league2, provider, teamName: trimmed });
     if (normalized && normalized !== trimmed) {
-      labels.push(normalized);
+      labels2.push(normalized);
     }
   }
-  for (const label of labels) {
+  for (const label of labels2) {
     for (const token of tokenSetFromLabel(label)) {
       tokens.add(token);
     }
@@ -172818,17 +173934,17 @@ var UEFA_NATIONS_TEAM_SLUG_ALIAS_GROUPS = [
   ["wales"]
 ];
 function slugifyUefaTeamLabel(label) {
-  return normalizeTeamToken(label).replace(/\s+/g, "-");
+  return normalizeTeamToken2(label).replace(/\s+/g, "-");
 }
 function resolveUefaNationsTeamSlugKey(raw) {
-  const normalized = normalizeTeamToken(raw);
+  const normalized = normalizeTeamToken2(raw);
   if (!normalized) return null;
   let best = null;
   for (const group of UEFA_NATIONS_TEAM_SLUG_ALIAS_GROUPS) {
     const canonicalSlug = slugifyUefaTeamLabel(group[0] ?? "");
     if (!canonicalSlug) continue;
     for (const alias of group) {
-      const aliasNorm = normalizeTeamToken(alias);
+      const aliasNorm = normalizeTeamToken2(alias);
       const aliasSlug = slugifyUefaTeamLabel(alias);
       if (!aliasNorm || aliasNorm.length < 3) continue;
       const matches = normalized === aliasNorm || slugifyUefaTeamLabel(raw) === aliasSlug || normalized.includes(aliasNorm) || aliasNorm.includes(normalized);
@@ -173280,7 +174396,7 @@ init_define_import_meta_env();
 
 // ../grarf/desktop/src/lib/fotmob/fetchFotmobMatchPreviewDetails.ts
 init_define_import_meta_env();
-var LOG48 = "[FotMob]";
+var LOG50 = "[FotMob]";
 function pickEnglishPreReview(articles) {
   if (!articles?.length) return null;
   const english = articles.find((row) => row.lang?.trim().toLowerCase() === "en");
@@ -173313,7 +174429,7 @@ async function fetchFotmobMatchPreviewDetails(matchId) {
     return preReview ? preReviewToPreviewArticle(preReview) : null;
   } catch (error) {
     if (define_import_meta_env_default.DEV) {
-      console.warn(`${LOG48} match preview fetch failed for ${matchId}`, error);
+      console.warn(`${LOG50} match preview fetch failed for ${matchId}`, error);
     }
     return null;
   }
@@ -173793,77 +174909,9 @@ init_define_import_meta_env();
 
 // ../grarf/desktop/src/extensionHost/grarfExtensionMlbRecapHeadline.ts
 init_define_import_meta_env();
-
-// ../grarf/shared/domain/mlb/resolveMlbComRecapFromStatsApiGameContent.ts
-init_define_import_meta_env();
-function mlbOfficialGameStoryUrl2(gamePk) {
-  return `https://www.mlb.com/stories/game/${gamePk}?storylocal=web-scores-game-embed`;
-}
-function resolveMlbRecapPublicArticleUrl2(recapArticle, gamePk) {
-  const slug = typeof recapArticle.slug === "string" ? recapArticle.slug.trim() : "";
-  if (slug) return buildMlbComNewsRecapUrl(slug, gamePk);
-  const rawUrl = typeof recapArticle.url === "string" ? recapArticle.url.trim() : "";
-  if (rawUrl && /^https?:\/\/www\.mlb\.com\//i.test(rawUrl)) {
-    if (rawUrl.includes("game_pk=")) return rawUrl;
-    const separator = rawUrl.includes("?") ? "&" : "?";
-    return `${rawUrl}${separator}game_pk=${gamePk}`;
-  }
-  return mlbOfficialGameStoryUrl2(gamePk);
-}
-function resolveMlbComRecapFromStatsApiGameContent(content, gamePk) {
-  if (!content || typeof content !== "object" || !Number.isFinite(gamePk) || gamePk <= 0) {
-    return { headline: "", recapUrl: "", recapAvailable: false };
-  }
-  const editorial = content.editorial;
-  const recapArticle = editorial?.recap?.mlb;
-  if (!recapArticle || typeof recapArticle !== "object") {
-    return { headline: "", recapUrl: "", recapAvailable: false };
-  }
-  const headline = typeof recapArticle.headline === "string" ? recapArticle.headline.trim() : "";
-  const bodyHtml = typeof recapArticle.body === "string" ? recapArticle.body.trim() : "";
-  const blurb = typeof recapArticle.blurb === "string" ? recapArticle.blurb.trim() : "";
-  const body = bodyHtml || blurb;
-  const state3 = typeof recapArticle.state === "string" ? recapArticle.state : "";
-  const slug = typeof recapArticle.slug === "string" ? recapArticle.slug.trim() : "";
-  const hasPublicUrl = Boolean(slug) || typeof recapArticle.url === "string" && /^https?:\/\/www\.mlb\.com\//i.test(recapArticle.url.trim());
-  const recapAvailable = Boolean(headline) || Boolean(body) && (state3 === "A" || state3 === "") || hasPublicUrl;
-  const recapUrl = recapAvailable ? resolveMlbRecapPublicArticleUrl2(recapArticle, gamePk) : "";
-  return {
-    headline,
-    recapUrl,
-    recapAvailable
-  };
-}
-
-// ../grarf/desktop/src/extensionHost/grarfExtensionMlbRecapHeadline.ts
-var MLB_STATS_API_CONTENT = "https://statsapi.mlb.com/api/v1";
-async function fetchMlbStatsApiGameContent(gamePk) {
-  try {
-    const res = await fetch(`${MLB_STATS_API_CONTENT}/game/${gamePk}/content`, {
-      headers: { Accept: "application/json" },
-      cache: "default",
-      credentials: "omit"
-    });
-    if (!res.ok) return null;
-    return res.json();
-  } catch {
-    return null;
-  }
-}
-async function resolveGrarfExtensionMlbRecapHeadlineFromStatsApiForGame(game) {
-  if (!isGrarfExtensionMlbRecapGame(game)) return null;
-  const gamePk = resolveMlbStatsApiGamePk2(game);
-  if (gamePk == null) return null;
-  const content = await fetchMlbStatsApiGameContent(gamePk);
-  if (!content) return null;
-  const resolved = resolveMlbComRecapFromStatsApiGameContent(content, gamePk);
-  const headline = resolved.headline?.trim();
-  return headline || null;
-}
 async function resolveGrarfExtensionMlbRecapHeadlineForGame(game) {
-  const operational = resolveGrarfExtensionMlbRecapHeadlineFromOperationalGame(game);
-  if (operational) return operational;
-  return resolveGrarfExtensionMlbRecapHeadlineFromStatsApiForGame(game);
+  if (!isGrarfExtensionMlbRecapGame(game)) return null;
+  return resolveGrarfExtensionMlbRecapHeadlineFromOperationalGame(game);
 }
 async function resolveGrarfExtensionMlbRecapNavigationUrlForGame(game) {
   return resolveGrarfExtensionMlbRecapUrlFromOperationalGame(game);
@@ -174508,6 +175556,14 @@ function resolveGrarfExtensionCommandCenterScorecardGamecenterUrl(game) {
     if (mlbGamedayUrl) return mlbGamedayUrl;
     const mlsMatchUrl = buildGrarfExtensionMlssoccerComMatchUrlFromGame(game);
     if (mlsMatchUrl) return mlsMatchUrl;
+  }
+  const spineEmbed = resolveSpineRowWorkspaceEmbedUrl(game);
+  if (spineEmbed && !/\/scoreboard\/?(\?|$)/i.test(spineEmbed)) {
+    return spineEmbed;
+  }
+  const espnCenter = resolveEspnGameCenterUrlForGame(game);
+  if (espnCenter && !/\/scoreboard\/?(\?|$)/i.test(espnCenter)) {
+    return espnCenter;
   }
   const fotmobMatchUrl = resolveFotmobMatchUrl(game);
   if (fotmobMatchUrl) return fotmobMatchUrl;
@@ -175203,14 +176259,14 @@ function coversLeagueFromGame(game) {
   return null;
 }
 async function loadCoversProLeagueIndex(league2) {
-  const now2 = Date.now();
+  const now = Date.now();
   const cached = indexByLeague.get(league2);
-  if (cached && now2 - cached.fetchedAt < CACHE_TTL_MS6) {
+  if (cached && now - cached.fetchedAt < CACHE_TTL_MS6) {
     return cached.entries;
   }
   const html = await fetchCoversProLeagueMatchupsHtml(league2);
   const entries = parseCoversProLeagueMatchupsIndex(html, league2);
-  indexByLeague.set(league2, { fetchedAt: now2, entries });
+  indexByLeague.set(league2, { fetchedAt: now, entries });
   return entries;
 }
 async function resolveGrarfExtensionCoversProLeaguePicksUrlForGame(game) {
@@ -179520,7 +180576,7 @@ init_define_import_meta_env();
 var import_jsx_runtime257 = __toESM(require_jsx_runtime(), 1);
 var META_RULE = "border-[#d5d0c6]";
 function SportsBrowserTennisGameCardMetaHeader({
-  labels,
+  labels: labels2,
   textClassName = "text-[8px] leading-none tracking-[0.04em] text-[#1a1a1a]",
   dividerClassName = "h-[0.7rem]",
   className
@@ -179531,12 +180587,12 @@ function SportsBrowserTennisGameCardMetaHeader({
       "data-grarf-tennis-game-card-meta-header": "",
       className: cn2("flex min-w-0 items-center gap-1", className),
       children: [
-        /* @__PURE__ */ (0, import_jsx_runtime257.jsx)("span", { className: cn2("shrink-0 font-semibold uppercase", textClassName), children: labels.leagueLabel }),
+        /* @__PURE__ */ (0, import_jsx_runtime257.jsx)("span", { className: cn2("shrink-0 font-semibold uppercase", textClassName), children: labels2.leagueLabel }),
         /* @__PURE__ */ (0, import_jsx_runtime257.jsx)("span", { className: cn2("mx-px shrink-0 border-l", META_RULE, dividerClassName), "aria-hidden": true }),
-        /* @__PURE__ */ (0, import_jsx_runtime257.jsx)("span", { className: cn2("min-w-0 truncate font-normal normal-case", textClassName), children: labels.tournamentName }),
-        labels.roundLabel ? /* @__PURE__ */ (0, import_jsx_runtime257.jsxs)(import_jsx_runtime257.Fragment, { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime257.jsx)("span", { className: cn2("min-w-0 truncate font-normal normal-case", textClassName), children: labels2.tournamentName }),
+        labels2.roundLabel ? /* @__PURE__ */ (0, import_jsx_runtime257.jsxs)(import_jsx_runtime257.Fragment, { children: [
           /* @__PURE__ */ (0, import_jsx_runtime257.jsx)("span", { className: cn2("mx-px shrink-0 border-l", META_RULE, dividerClassName), "aria-hidden": true }),
-          /* @__PURE__ */ (0, import_jsx_runtime257.jsx)("span", { className: cn2("min-w-0 truncate font-normal normal-case", textClassName), children: labels.roundLabel })
+          /* @__PURE__ */ (0, import_jsx_runtime257.jsx)("span", { className: cn2("min-w-0 truncate font-normal normal-case", textClassName), children: labels2.roundLabel })
         ] }) : null
       ]
     }
@@ -197988,7 +199044,7 @@ var PREVIEW_PAGE_FETCH_UA2 = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) Ap
 var headlineCacheByUrl2 = /* @__PURE__ */ new Map();
 var inflightByUrl2 = /* @__PURE__ */ new Map();
 var PREVIEW_HEADLINE_CACHE_TTL_MS = 30 * 60 * 1e3;
-function isPlaceholderMlbStoryTitle2(title) {
+function isPlaceholderMlbStoryTitle3(title) {
   const normalized = title.trim().toLowerCase();
   return normalized === "official game story" || normalized.startsWith("game ");
 }
@@ -198006,7 +199062,7 @@ function resolveGrarfExtensionMlbPreviewHeadlineFromOperationalGame(game) {
   const operationalRecap = resolveGrarfExtensionMlbRecapHeadlineFromOperationalGame(game);
   if (operationalRecap) return operationalRecap;
   const storyTitle = game.content?.stories?.[0]?.title?.trim();
-  if (storyTitle && !isPlaceholderMlbStoryTitle2(storyTitle)) {
+  if (storyTitle && !isPlaceholderMlbStoryTitle3(storyTitle)) {
     return storyTitle;
   }
   return null;
@@ -200449,15 +201505,15 @@ function homeCommandCenterDailyPrioritySortBoost(match, entryCount) {
 
 // ../grarf/desktop/src/lib/editorial/sortGamesWithHomeCommandCenterDailyPriorities.ts
 init_define_import_meta_env();
-function resolveEditorialSportsDayKeyForGame(game, now2) {
+function resolveEditorialSportsDayKeyForGame(game, now) {
   const fromGame = resolveGameOperationalDateKey(game);
   if (fromGame?.trim()) return fromGame.trim();
-  return getOperationalSportsDayDateKey(now2);
+  return getOperationalSportsDayDateKey(now);
 }
-function compareGamesWithHomeCommandCenterDailyPriorities(a2, b2, mode, bundle, now2, resolveEntries = getHomeCommandCenterDailyPriorityEntriesForSportsDay) {
-  const dateKey = getOperationalSportsDayDateKey(now2);
-  const aDay = resolveEditorialSportsDayKeyForGame(a2, now2);
-  const bDay = resolveEditorialSportsDayKeyForGame(b2, now2);
+function compareGamesWithHomeCommandCenterDailyPriorities(a2, b2, mode, bundle, now, resolveEntries = getHomeCommandCenterDailyPriorityEntriesForSportsDay) {
+  const dateKey = getOperationalSportsDayDateKey(now);
+  const aDay = resolveEditorialSportsDayKeyForGame(a2, now);
+  const bDay = resolveEditorialSportsDayKeyForGame(b2, now);
   const aEntries = resolveEntries(aDay);
   const bEntries = resolveEntries(bDay);
   const aMatch = resolveHomeCommandCenterDailyPriorityMatch(a2, aEntries);
@@ -200481,10 +201537,10 @@ function compareGamesWithHomeCommandCenterDailyPriorities(a2, b2, mode, bundle, 
   }
   return homeOperationalGameSortScore(b2, bundle, dateKey, mode) - homeOperationalGameSortScore(a2, bundle, dateKey, mode);
 }
-function sortGamesWithHomeCommandCenterDailyPriorities(games, mode, bundle, now2 = /* @__PURE__ */ new Date(), resolveEntries = getHomeCommandCenterDailyPriorityEntriesForSportsDay) {
+function sortGamesWithHomeCommandCenterDailyPriorities(games, mode, bundle, now = /* @__PURE__ */ new Date(), resolveEntries = getHomeCommandCenterDailyPriorityEntriesForSportsDay) {
   if (games.length <= 1) return [...games];
   return [...games].sort(
-    (a2, b2) => compareGamesWithHomeCommandCenterDailyPriorities(a2, b2, mode, bundle, now2, resolveEntries)
+    (a2, b2) => compareGamesWithHomeCommandCenterDailyPriorities(a2, b2, mode, bundle, now, resolveEntries)
   );
 }
 
@@ -200519,8 +201575,8 @@ function orderGrarfExtensionHomeFeaturedTodayGames(games) {
   return [...live, ...upcoming, ...final];
 }
 function resolveGrarfExtensionHomeFeaturedPriorityGames(input) {
-  const now2 = input.now ?? /* @__PURE__ */ new Date();
-  const sportsDayKey = input.dayFilter === "yesterday" ? getOperationalSportsDayYesterdayDateKey(now2) : getOperationalSportsDayDateKey(now2);
+  const now = input.now ?? /* @__PURE__ */ new Date();
+  const sportsDayKey = input.dayFilter === "yesterday" ? getOperationalSportsDayYesterdayDateKey(now) : getOperationalSportsDayDateKey(now);
   const entries = getHomeCommandCenterDailyPriorityEntriesForSportsDay(sportsDayKey);
   let pool = resolveFeaturedGamePool(input.dayFilter, input.temporalGameContext);
   if (input.scopeEntity) {
@@ -200533,7 +201589,7 @@ function resolveGrarfExtensionHomeFeaturedPriorityGames(input) {
     pool,
     mode,
     input.editorialBundle,
-    now2
+    now
   );
   const picked = [];
   const usedIds = /* @__PURE__ */ new Set();
@@ -201635,23 +202691,23 @@ function isUpcomingWithinMs(game, nowMs3, withinMs) {
   const delta = startMs - nowMs3;
   return delta >= 0 && delta <= withinMs;
 }
-function rankSectionGames(games, mode, bundle, now2) {
-  return sortGamesWithHomeCommandCenterDailyPriorities(games, mode, bundle, now2);
+function rankSectionGames(games, mode, bundle, now) {
+  return sortGamesWithHomeCommandCenterDailyPriorities(games, mode, bundle, now);
 }
 function limitSectionGames(games, prominent) {
   const limit = prominent ? PROMINENT_SECTION_GAME_LIMIT : DEFAULT_SECTION_GAME_LIMIT;
   return games.slice(0, limit);
 }
 function resolveGrarfExtensionHomeCommandCenterPreviewProminence(input) {
-  const now2 = input.now ?? /* @__PURE__ */ new Date();
-  const nowMs3 = now2.getTime();
+  const now = input.now ?? /* @__PURE__ */ new Date();
+  const nowMs3 = now.getTime();
   const liveCount = input.liveGames.length;
   const majorLiveCount = input.liveGames.filter((game) => isImportantLeagueLiveGame(game)).length;
   const upcomingSoonCount = input.upcomingGames.filter(
     (game) => isUpcomingWithinMs(game, nowMs3, UPCOMING_SOON_MS)
   ).length;
   const majorUpcomingSoonCount = input.upcomingGames.filter(
-    (game) => isImportantLeagueUpcomingGame(game, void 0, now2) && isUpcomingWithinMs(game, nowMs3, MAJOR_UPCOMING_SOON_MS)
+    (game) => isImportantLeagueUpcomingGame(game, void 0, now) && isUpcomingWithinMs(game, nowMs3, MAJOR_UPCOMING_SOON_MS)
   ).length;
   if (majorLiveCount >= 2 || liveCount >= 4) return "liveNow";
   if (majorLiveCount >= 1 && liveCount >= 2) return "liveNow";
@@ -201698,7 +202754,7 @@ function sortComingUpGames(games, nowMs3) {
   });
 }
 function buildGrarfExtensionHomeCommandCenterPreviewModel(input) {
-  const now2 = input.now ?? /* @__PURE__ */ new Date();
+  const now = input.now ?? /* @__PURE__ */ new Date();
   const bundle = input.editorialBundle;
   const livePool = buildLivePool(input.temporalGameContext);
   const liveIds = new Set(livePool.map((game) => game.id));
@@ -201710,13 +202766,13 @@ function buildGrarfExtensionHomeCommandCenterPreviewModel(input) {
     liveGames: livePool,
     upcomingGames: comingUpPool,
     catchUpGames: catchUpPool,
-    now: now2
+    now
   });
-  const rankedCatchUp = rankSectionGames(catchUpPool, "CATCH_UP", bundle, now2);
-  const rankedLive = rankSectionGames(livePool, "LIVE", bundle, now2);
+  const rankedCatchUp = rankSectionGames(catchUpPool, "CATCH_UP", bundle, now);
+  const rankedLive = rankSectionGames(livePool, "LIVE", bundle, now);
   const rankedComingUp = sortComingUpGames(
-    rankSectionGames(comingUpPool, "PREPARE", bundle, now2),
-    now2.getTime()
+    rankSectionGames(comingUpPool, "PREPARE", bundle, now),
+    now.getTime()
   );
   const sectionOrder = resolveSectionOrder(prominence);
   const sections = [];
@@ -202908,8 +203964,8 @@ var CACHE_TTL_MS7 = 5 * 60 * 1e3;
 var playlistCache = /* @__PURE__ */ new Map();
 var watchUrlCache = /* @__PURE__ */ new Map();
 var inflightByDateKey = /* @__PURE__ */ new Map();
-function resolveGrarfExtensionNbaNightlyRecapTargetDateKey(now2 = /* @__PURE__ */ new Date()) {
-  return getOperationalSportsDayYesterdayDateKey(now2);
+function resolveGrarfExtensionNbaNightlyRecapTargetDateKey(now = /* @__PURE__ */ new Date()) {
+  return getOperationalSportsDayYesterdayDateKey(now);
 }
 function resolveNbaChannelUploadsPlaylistId() {
   const channelId = GRARF_EXTENSION_YOUTUBE_HIGHLIGHTS_CHANNEL_ID_BY_LEAGUE.NBA;
@@ -204209,10 +205265,10 @@ var import_react332 = __toESM(require_react(), 1);
 
 // ../grarf/desktop/src/lib/home/buildSportsBrowserPrototypeYesterdayTemporalLeagueSlates.ts
 init_define_import_meta_env();
-function filterYesterdayFinalGames(games, now2) {
+function filterYesterdayFinalGames(games, now) {
   return sortGamesSpineChronologically2(
     dedupeSportsBrowserPrototypeNewsSidebarGames(
-      games.filter((game) => isGamesSpineYesterdayFinalGame(game, now2))
+      games.filter((game) => isGamesSpineYesterdayFinalGame(game, now))
     )
   );
 }
@@ -204253,8 +205309,8 @@ function buildYesterdayOperationalLeagueSlate(league2, input) {
   };
 }
 function buildSportsBrowserPrototypeYesterdayTemporalLeagueSlates(input) {
-  const now2 = input.now ?? /* @__PURE__ */ new Date();
-  const yesterdayKey2 = getOperationalSportsDayYesterdayDateKey(now2);
+  const now = input.now ?? /* @__PURE__ */ new Date();
+  const yesterdayKey2 = getOperationalSportsDayYesterdayDateKey(now);
   const operationalSlates = orderSportsBrowserPrototypeNewsSidebarLeagueSlates(
     resolveYesterdayOperationalLeagueKeys({
       spineSections: input.spineSections,
@@ -204267,7 +205323,7 @@ function buildSportsBrowserPrototypeYesterdayTemporalLeagueSlates(input) {
         scheduleByDate: input.scheduleByDate,
         retainedFinalsByLeague: input.retainedFinalsByLeague,
         yesterdayKey: yesterdayKey2,
-        now: now2
+        now
       });
       return slate ? [slate] : [];
     })
@@ -204275,7 +205331,7 @@ function buildSportsBrowserPrototypeYesterdayTemporalLeagueSlates(input) {
   const manualSlates = [];
   for (const section of input.spineSections) {
     if (section.kind !== "manual") continue;
-    const games = filterYesterdayFinalGames(section.section.games, now2);
+    const games = filterYesterdayFinalGames(section.section.games, now);
     if (games.length === 0) continue;
     manualSlates.push({
       key: gamesSpineManualCollapseKey(section.slug),
@@ -204304,16 +205360,16 @@ function filterManualVisibleGames2(games, statusFilter) {
     games.filter((game) => matchHomeGamesSpineStatusFilter(game, statusFilter))
   );
 }
-function isTodayOperationalFinalGame(game, now2 = /* @__PURE__ */ new Date()) {
+function isTodayOperationalFinalGame(game, now = /* @__PURE__ */ new Date()) {
   if (game.status !== "final" && !isSpineFinalizedGame(game)) return false;
   return isGameOnGamesSpineOperationalDate(
     game,
-    getOperationalSportsDayDateKey(now2),
-    now2
+    getOperationalSportsDayDateKey(now),
+    now
   );
 }
-function filterTodayOperationalFinalGames(games, now2 = /* @__PURE__ */ new Date()) {
-  return sortGamesSpineChronologically2(games.filter((game) => isTodayOperationalFinalGame(game, now2)));
+function filterTodayOperationalFinalGames(games, now = /* @__PURE__ */ new Date()) {
+  return sortGamesSpineChronologically2(games.filter((game) => isTodayOperationalFinalGame(game, now)));
 }
 function sectionPassesTemporalFilter(section, mergedLeagues, temporalMode, liveLeagueKeys) {
   if (section.kind === "operational") {
@@ -204343,17 +205399,17 @@ function resolveOperationalLeagueVisibleGames(league2, statusFilter, useGamesSpi
   const viewDate = statusFilter === "live" ? getOperationalSportsDayDateKey() : input.selectedDate;
   const mergedRows = input.mergedLeagues[league2];
   const rows = mergedRows ?? resolveViewLeagueGames(league2, viewDate, input.liveLeagues, input.scheduleByDate);
-  const now2 = new Date(
+  const now = new Date(
     Math.max(input.manualLeMansRefreshMs, input.manualTourDeFranceRefreshMs, input.manualRefreshMs)
   );
   const gamesWithStatusOverrides = rows.map(
     (game) => applyCanonicalGameEnrichment(
       refreshManualGamesSpineGameIfNeeded(
         refreshManualTourDeFranceSpineGameIfNeeded(
-          refreshManualLeMans2026SpineGameIfNeeded(game, now2),
-          now2
+          refreshManualLeMans2026SpineGameIfNeeded(game, now),
+          now
         ),
-        now2
+        now
       ),
       input.operationsFieldsByGameId
     )
@@ -204381,25 +205437,25 @@ function resolveOperationalLeagueVisibleGames(league2, statusFilter, useGamesSpi
   );
 }
 function resolveManualSectionVisibleGames(section, statusFilter, manualRefreshMs, operationsFieldsByGameId) {
-  const now2 = new Date(manualRefreshMs);
+  const now = new Date(manualRefreshMs);
   const refreshed = section.section.games.map(
-    (game) => applyCanonicalGameEnrichment(refreshManualGamesSpineGameIfNeeded(game, now2), operationsFieldsByGameId)
+    (game) => applyCanonicalGameEnrichment(refreshManualGamesSpineGameIfNeeded(game, now), operationsFieldsByGameId)
   );
   return filterManualVisibleGames2(refreshed, statusFilter);
 }
 function resolveOperationalLeagueCatchUpVisibleGames(league2, input) {
   const rows = input.mergedLeagues[league2] ?? resolveViewLeagueGames(league2, input.selectedDate, input.liveLeagues, input.scheduleByDate);
-  const now2 = new Date(
+  const now = new Date(
     Math.max(input.manualLeMansRefreshMs, input.manualTourDeFranceRefreshMs, input.manualRefreshMs)
   );
   const gamesWithStatusOverrides = rows.map(
     (game) => applyCanonicalGameEnrichment(
       refreshManualGamesSpineGameIfNeeded(
         refreshManualTourDeFranceSpineGameIfNeeded(
-          refreshManualLeMans2026SpineGameIfNeeded(game, now2),
-          now2
+          refreshManualLeMans2026SpineGameIfNeeded(game, now),
+          now
         ),
-        now2
+        now
       ),
       input.operationsFieldsByGameId
     )
@@ -204425,14 +205481,14 @@ function resolveOperationalLeagueCatchUpVisibleGames(league2, input) {
     ),
     league2
   );
-  return filterTodayOperationalFinalGames(todaySlate, now2);
+  return filterTodayOperationalFinalGames(todaySlate, now);
 }
 function resolveManualSectionCatchUpVisibleGames(section, manualRefreshMs, operationsFieldsByGameId) {
-  const now2 = new Date(manualRefreshMs);
+  const now = new Date(manualRefreshMs);
   const refreshed = section.section.games.map(
-    (game) => applyCanonicalGameEnrichment(refreshManualGamesSpineGameIfNeeded(game, now2), operationsFieldsByGameId)
+    (game) => applyCanonicalGameEnrichment(refreshManualGamesSpineGameIfNeeded(game, now), operationsFieldsByGameId)
   );
-  return filterTodayOperationalFinalGames(refreshed, now2);
+  return filterTodayOperationalFinalGames(refreshed, now);
 }
 function buildSportsBrowserPrototypeTodayTemporalLeagueSlates(spineSections, mergedLeagues, temporalMode, liveLeagueKeys, resolveVisibleGames) {
   const slates = [];
@@ -205108,12 +206164,12 @@ function SidebarGameRowBroadcast({ game, colStart = 4 }) {
   ) : /* @__PURE__ */ (0, import_jsx_runtime324.jsx)("span", { "aria-hidden": true, className: "block w-full" }) });
 }
 function SidebarTemporalGameRowTennisMetaHeader({ game }) {
-  const labels = resolveSportsBrowserTennisGameCardMetaHeaderLabels(game);
-  if (!labels) return null;
+  const labels2 = resolveSportsBrowserTennisGameCardMetaHeaderLabels(game);
+  if (!labels2) return null;
   return /* @__PURE__ */ (0, import_jsx_runtime324.jsx)(
     SportsBrowserTennisGameCardMetaHeader,
     {
-      labels,
+      labels: labels2,
       textClassName: "text-[13px] leading-none tracking-[0.04em] text-[#1a1a1a]",
       dividerClassName: "h-[0.75rem]",
       className: "mb-0.5"
@@ -209599,11 +210655,11 @@ var import_react336 = __toESM(require_react(), 1);
 init_define_import_meta_env();
 function buildCommandCenterBestGameRankingInput(leagues, manualDocument, operationsFieldsByGameId, manualGamesSpineRefreshMs, adminFeaturedPriorities) {
   const mergedLeagues = omitHiddenGamesSpineLeagueGames(mergeOperationalLeagueGames(leagues));
-  const now2 = new Date(manualGamesSpineRefreshMs);
-  const refreshedLeagues = refreshManualGamesSpineGamesInLeagues(mergedLeagues, now2);
+  const now = new Date(manualGamesSpineRefreshMs);
+  const refreshedLeagues = refreshManualGamesSpineGamesInLeagues(mergedLeagues, now);
   const manualGames = flattenManualGamesSpineGames(
-    convertManualGamesSpineDocument(manualDocument, now2)
-  ).map((game) => refreshManualGamesSpineGameIfNeeded(game, now2));
+    convertManualGamesSpineDocument(manualDocument, now)
+  ).map((game) => refreshManualGamesSpineGameIfNeeded(game, now));
   const enrichedLeagues = applyOperationalEnrichmentToLeagues(
     refreshedLeagues,
     operationsFieldsByGameId
@@ -213111,7 +214167,7 @@ function buildCommandBriefingGamePool(input) {
 
 // ../grarf/desktop/src/lib/commandBriefing/selectBriefingGames.ts
 init_define_import_meta_env();
-var LOG49 = "[CommandBriefing]";
+var LOG51 = "[CommandBriefing]";
 function defaultBriefingNarrative(game) {
   const away = game.awayTeam?.trim();
   const home = game.homeTeam?.trim();
@@ -213154,13 +214210,13 @@ function selectBriefingGames(games, bundle, dateKey, _fallbacks = {}, leagueScop
     const narrative = resolveEditorialGameNarrative(game, bundle, dateKey)?.text?.trim() ?? defaultBriefingNarrative(game);
     seen.add(editorialKey);
     if (define_import_meta_env_default.DEV) {
-      console.log(`${LOG49} Included game: ${game.awayTeam} vs ${game.homeTeam}`);
+      console.log(`${LOG51} Included game: ${game.awayTeam} vs ${game.homeTeam}`);
     }
     out.push({ game, priority, narrative });
   }
   const ranked = sortBriefingRankedForDisplay(out);
   if (define_import_meta_env_default.DEV && ranked.length > 0) {
-    console.log(`${LOG49} Generated from ranked games: ${ranked.length} items`);
+    console.log(`${LOG51} Generated from ranked games: ${ranked.length} items`);
   }
   return ranked;
 }
@@ -213227,7 +214283,7 @@ init_define_import_meta_env();
 var MCWS_DISPLAY_LABEL = "MCWS";
 
 // ../grarf/desktop/src/lib/commandBriefing/commandBriefingLeagueLabel.ts
-var LOG50 = "[CommandBriefing]";
+var LOG52 = "[CommandBriefing]";
 var BRIEFING_LEAGUE_LABELS = {
   MLB: "MLB",
   NCAABB: "NCAA BASEBALL",
@@ -213303,11 +214359,11 @@ function resolveCommandBriefingLeagueLabel(game) {
 }
 function logCommandBriefingLeagueLabel(label) {
   if (!define_import_meta_env_default.DEV) return;
-  console.log(`${LOG50} Rendering league label:`, label);
+  console.log(`${LOG52} Rendering league label:`, label);
 }
 function logCommandBriefingMetadataStyling() {
   if (!define_import_meta_env_default.DEV) return;
-  console.log(`${LOG50} Applied operational metadata styling`);
+  console.log(`${LOG52} Applied operational metadata styling`);
 }
 
 // ../grarf/desktop/src/components/commandBriefing/CommandBriefingCompactItemRow.tsx
@@ -214470,7 +215526,7 @@ function LeagueHomeWebPane({
 init_define_import_meta_env();
 var import_react349 = __toESM(require_react(), 1);
 var import_jsx_runtime345 = __toESM(require_jsx_runtime(), 1);
-var LOG51 = "[MlbCatchUpStandings]";
+var LOG53 = "[MlbCatchUpStandings]";
 var MLB_CATCH_UP_PRIMARY_STANDINGS_URL = "https://mlb.theohtani.com/standings/2026";
 var MLB_CATCH_UP_FALLBACK_STANDINGS_URL = "https://www.fangraphs.com/standings/playoff-odds";
 var LOAD_TIMEOUT_MS = 3e4;
@@ -214512,13 +215568,13 @@ function MlbCatchUpStandingsPane({ paneId, className }) {
       if (!isPrimarySrc(activeSrcRef.current)) return;
       fallbackUsedRef.current = true;
       clearLoadTimeout();
-      console.log(`${LOG51} Primary standings load failed (${reason})`);
-      console.log(`${LOG51} FanGraphs fallback activated`);
+      console.log(`${LOG53} Primary standings load failed (${reason})`);
+      console.log(`${LOG53} FanGraphs fallback activated`);
       setActiveSrc(MLB_CATCH_UP_FALLBACK_STANDINGS_URL);
     };
     const onStartLoading = () => {
       if (isPrimarySrc(activeSrcRef.current) && !fallbackUsedRef.current) {
-        console.log(`${LOG51} Primary standings load started`);
+        console.log(`${LOG53} Primary standings load started`);
         clearLoadTimeout();
         loadTimeout = setTimeout(() => activateFallback("timeout"), LOAD_TIMEOUT_MS);
       }
@@ -214547,7 +215603,7 @@ function MlbCatchUpStandingsPane({ paneId, className }) {
     const onFinishLoad = () => {
       clearLoadTimeout();
       if (isFallbackSrc(activeSrcRef.current)) {
-        console.log(`${LOG51} FanGraphs fallback loaded successfully`);
+        console.log(`${LOG53} FanGraphs fallback loaded successfully`);
         return;
       }
       if (!isPrimarySrc(activeSrcRef.current) || fallbackUsedRef.current) return;
@@ -214641,7 +215697,7 @@ function sortBriefingPriorityGames(games, bundle, dateKey) {
 
 // ../grarf/desktop/src/lib/rss/rssFetchDiagnostics.ts
 init_define_import_meta_env();
-var LOG52 = "[RSS DEBUG]";
+var LOG54 = "[RSS DEBUG]";
 function classifyRssBody(body) {
   const text2 = typeof body === "string" ? body : "";
   const trimmed = text2.trimStart();
@@ -214673,7 +215729,7 @@ function headersToRecord(headers) {
 }
 async function diagnoseRendererRssFetch(url) {
   const label = "renderer-fetch";
-  console.group(`${LOG52}[${label}] ${url}`);
+  console.group(`${LOG54}[${label}] ${url}`);
   try {
     const started2 = performance.now();
     const res = await fetch(url, {
@@ -214685,7 +215741,7 @@ async function diagnoseRendererRssFetch(url) {
     });
     const body = await res.text();
     const classification = classifyRssBody(body);
-    console.log(`${LOG52}[${label}] metadata`, {
+    console.log(`${LOG54}[${label}] metadata`, {
       finalUrl: res.url,
       status: res.status,
       statusText: res.statusText,
@@ -214698,19 +215754,19 @@ async function diagnoseRendererRssFetch(url) {
       elapsedMs: Math.round(performance.now() - started2),
       ...classification
     });
-    console.log(`${LOG52}[${label}] preview`, previewRssBody(body));
+    console.log(`${LOG54}[${label}] preview`, previewRssBody(body));
   } catch (e2) {
-    console.error(`${LOG52}[${label}] threw`, e2);
+    console.error(`${LOG54}[${label}] threw`, e2);
   } finally {
     console.groupEnd();
   }
 }
 async function diagnoseElectronRssFetch(url) {
   const label = "electron-helper";
-  console.group(`${LOG52}[${label}] ${url}`);
+  console.group(`${LOG54}[${label}] ${url}`);
   const bridge5 = typeof window !== "undefined" ? window.grarf?.tickerRssFetch : void 0;
   if (!bridge5) {
-    console.warn(`${LOG52}[${label}] window.grarf.tickerRssFetch unavailable (not in Electron?)`);
+    console.warn(`${LOG54}[${label}] window.grarf.tickerRssFetch unavailable (not in Electron?)`);
     console.groupEnd();
     return;
   }
@@ -214720,7 +215776,7 @@ async function diagnoseElectronRssFetch(url) {
   const xml = result && "ok" in result && result.ok === true && "xml" in result ? result.xml : "";
   const classification = classifyRssBody(xml);
   const debugAttempts = result && typeof result === "object" && "_rssDebug" in result ? result._rssDebug : void 0;
-  console.log(`${LOG52}[${label}] bridge summary`, {
+  console.log(`${LOG54}[${label}] bridge summary`, {
     ok: result && "ok" in result ? result.ok : void 0,
     status: result && "status" in result ? result.status : void 0,
     statusText: result && "statusText" in result ? result.statusText : void 0,
@@ -214729,23 +215785,23 @@ async function diagnoseElectronRssFetch(url) {
     ...classification
   });
   if (debugAttempts) {
-    console.log(`${LOG52}[${label}] per-attempt (main process)`, debugAttempts);
+    console.log(`${LOG54}[${label}] per-attempt (main process)`, debugAttempts);
   }
-  console.log(`${LOG52}[${label}] preview`, previewRssBody(xml));
+  console.log(`${LOG54}[${label}] preview`, previewRssBody(xml));
   console.groupEnd();
 }
 function logRssPreParseInput(label, xml) {
   const classification = classifyRssBody(xml);
-  console.log(`${LOG52}[${label}] pre-parse`, {
+  console.log(`${LOG54}[${label}] pre-parse`, {
     ...classification,
     preview: previewRssBody(xml)
   });
 }
 async function runEspnMlbRssFetchDiagnostics(url = "https://www.espn.com/espn/rss/mlb/news") {
-  console.log(`${LOG52} === ESPN MLB RSS fetch diagnosis start ===`, url);
+  console.log(`${LOG54} === ESPN MLB RSS fetch diagnosis start ===`, url);
   await diagnoseElectronRssFetch(url);
   await diagnoseRendererRssFetch(url);
-  console.log(`${LOG52} === ESPN MLB RSS fetch diagnosis end ===`);
+  console.log(`${LOG54} === ESPN MLB RSS fetch diagnosis end ===`);
 }
 
 // ../grarf/desktop/src/components/mlb/MlbHeadlinesFeedPane.tsx
@@ -214829,8 +215885,8 @@ function parseEspnMlbRssItems(xml, maxItems = 40) {
 function formatWireTime(pubDateMs) {
   const published = new Date(pubDateMs);
   if (Number.isNaN(published.getTime())) return "\u2014";
-  const now2 = /* @__PURE__ */ new Date();
-  const sameDay = published.getFullYear() === now2.getFullYear() && published.getMonth() === now2.getMonth() && published.getDate() === now2.getDate();
+  const now = /* @__PURE__ */ new Date();
+  const sameDay = published.getFullYear() === now.getFullYear() && published.getMonth() === now.getMonth() && published.getDate() === now.getDate();
   const clock = published.toLocaleTimeString(void 0, {
     hour: "numeric",
     minute: "2-digit",
@@ -215068,13 +216124,13 @@ var import_react352 = __toESM(require_react(), 1);
 
 // ../grarf/desktop/src/lib/leagueOverview/lookupMlbTeamPulseMark.ts
 init_define_import_meta_env();
-function normalizeTeamToken5(value) {
+function normalizeTeamToken6(value) {
   return value.trim().toLowerCase().replace(/[^a-z0-9]+/g, "");
 }
 function teamSideMatch(game, side, target) {
   const team = side === "away" ? game.awayTeam : game.homeTeam;
-  const teamNorm = normalizeTeamToken5(team);
-  const targetNorm = normalizeTeamToken5(target);
+  const teamNorm = normalizeTeamToken6(team);
+  const targetNorm = normalizeTeamToken6(target);
   return teamNorm === targetNorm || teamNorm.includes(targetNorm) || targetNorm.includes(teamNorm);
 }
 function lookupMlbTeamPulseMark(games, teamName) {
@@ -218912,10 +219968,10 @@ var import_react361 = __toESM(require_react(), 1);
 // ../grarf/desktop/src/lib/sportscape/editorial/generateManualEditorialEventId.ts
 init_define_import_meta_env();
 var MANUAL_EDITORIAL_EVENT_ID_PREFIX = "editorial-";
-function formatLocalCalendarDateKey(now2 = /* @__PURE__ */ new Date()) {
-  const year = now2.getFullYear();
-  const month = String(now2.getMonth() + 1).padStart(2, "0");
-  const day = String(now2.getDate()).padStart(2, "0");
+function formatLocalCalendarDateKey(now = /* @__PURE__ */ new Date()) {
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const day = String(now.getDate()).padStart(2, "0");
   return `${year}-${month}-${day}`;
 }
 function leagueSlugForManualEventId(league2) {
@@ -218923,8 +219979,8 @@ function leagueSlugForManualEventId(league2) {
   if (slug) return slug.slice(0, 64);
   return "manual";
 }
-function generateManualEditorialEventId(league2, existingEventIds, now2 = /* @__PURE__ */ new Date()) {
-  const dateKey = formatLocalCalendarDateKey(now2);
+function generateManualEditorialEventId(league2, existingEventIds, now = /* @__PURE__ */ new Date()) {
+  const dateKey = formatLocalCalendarDateKey(now);
   const prefix = `${MANUAL_EDITORIAL_EVENT_ID_PREFIX}${leagueSlugForManualEventId(league2)}-${dateKey}-`;
   const taken = new Set(
     [...existingEventIds].map((id) => id.trim()).filter(Boolean)
