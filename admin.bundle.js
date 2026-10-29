@@ -17219,9 +17219,31 @@ function incomingHasAuthoritativeLiveForEspnEvent(incomingGames, eventId) {
   return false;
 }
 
+// ../grarf/shared/domain/operational/filterEspnScoreboardRowsForAllSportsApiTeamSportLeagues.ts
+init_define_import_meta_env();
+var ALLSPORTSAPI_TEAM_SPORT_SCOREBOARD_LEAGUES = /* @__PURE__ */ new Set([
+  "NBA",
+  "NHL",
+  "WNBA"
+]);
+function isAllSportsApiTeamSportScoreboardLeague(league2) {
+  const key = String(league2 ?? "").trim().toUpperCase();
+  return ALLSPORTSAPI_TEAM_SPORT_SCOREBOARD_LEAGUES.has(key);
+}
+function filterEspnScoreboardRowsForAllSportsApiTeamSportLeagues(games) {
+  return games.filter((game) => {
+    const league2 = String(game.league ?? "").trim().toUpperCase();
+    if (!isAllSportsApiTeamSportScoreboardLeague(league2)) return true;
+    const id = String(game.id ?? "").trim();
+    if (!id) return true;
+    return !id.startsWith(`espn-${league2}-`);
+  });
+}
+
 // ../grarf/desktop/src/lib/gamesSpine/reconcileOperationalGamesByEspnEventId.ts
 function reconcileOperationalGamesByEspnEventId2(games) {
-  return reconcileOperationalGamesByEspnEventId(games);
+  const filtered = filterEspnScoreboardRowsForAllSportsApiTeamSportLeagues([...games]);
+  return reconcileOperationalGamesByEspnEventId(filtered);
 }
 function collectSnapshotGames(snap) {
   const out = [];
@@ -21657,7 +21679,14 @@ var CHANNEL_LOGO_BY_LABEL = {
   "GOLF CHANNEL": "/league-logos/channel-golf-channel.png",
   "GOLF CHNL": "/league-logos/channel-golf-channel.png",
   "NFL NETWORK": "/league-logos/channel-nfl-network.png",
-  NFLN: "/league-logos/channel-nfl-network.png"
+  NFLN: "/league-logos/channel-nfl-network.png",
+  "NHL NETWORK": "/league-logos/channel-nfl-network.png",
+  NHLN: "/league-logos/channel-nfl-network.png",
+  "NBC SPORTS": NBC_CHANNEL_LOGO_URL,
+  "NBC SPORTS NETWORK": NBC_CHANNEL_LOGO_URL,
+  NBCSN: NBC_CHANNEL_LOGO_URL,
+  MAX: "/league-logos/channel-paramount-plus.png",
+  "HBO MAX": "/league-logos/channel-paramount-plus.png"
 };
 function normalizeChannelLogoKey(label) {
   return label.trim().replace(/\s+/g, " ").toUpperCase();
@@ -21694,6 +21723,15 @@ function resolveChannelLogoUrl2(channelLabel) {
   }
   if (/\bNFL\s+NETWORK\b/.test(key) || key === "NFLN") {
     return CHANNEL_LOGO_BY_LABEL["NFL NETWORK"] ?? null;
+  }
+  if (/\bNHL\s+NETWORK\b/.test(key) || key === "NHLN") {
+    return CHANNEL_LOGO_BY_LABEL["NHL NETWORK"] ?? null;
+  }
+  if (/\bNBC\s+SPORTS\b/.test(key) || key === "NBCSN") {
+    return NBC_CHANNEL_LOGO_URL;
+  }
+  if (/\bHBO\s*MAX\b/.test(key) || key === "MAX") {
+    return CHANNEL_LOGO_BY_LABEL.MAX ?? null;
   }
   if (/\bCBS\b/.test(key)) return CBS_CHANNEL_LOGO_URL;
   if (/\bAPPLE\s*TV\b/.test(key)) {
