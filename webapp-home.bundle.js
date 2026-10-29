@@ -944,7 +944,7 @@ function resolveNflScheduleSeasonYear(now2 = /* @__PURE__ */ new Date()) {
 }
 async function bootstrapXGuestSession() {
   const home = await fetch("https://x.com/", {
-    headers: { "User-Agent": CHROME_UA2 }
+    headers: { "User-Agent": CHROME_UA3 }
   });
   const cookies = (home.headers.getSetCookie?.() ?? []).map((c2) => c2.split(";")[0]).join("; ");
   const gt2 = cookies.match(/gt=(\d+)/)?.[1] ?? "";
@@ -998,7 +998,7 @@ async function fetchNflXGametimeScheduleGraphql(seasonYear) {
       Authorization: `Bearer ${BEARER_TOKEN}`,
       "x-guest-token": gt2,
       Cookie: cookies,
-      "User-Agent": CHROME_UA2,
+      "User-Agent": CHROME_UA3,
       "x-twitter-active-user": "yes",
       "x-twitter-client-language": "en",
       Accept: "application/json"
@@ -1029,7 +1029,7 @@ async function fetchNflXGametimeSportsCatalog() {
     inFlight = null;
   }
 }
-var BEARER_TOKEN, X_NFL_SCHEDULE_GRAPHQL_QUERY_ID, X_NFL_SCHEDULE_GRAPHQL_OPERATION, X_NFL_GAMETIME_CATALOG_PROXY_PATH, CHROME_UA2, NFL_SCHEDULE_CACHE_TTL_MS, cachedEvents, cachedAtMs2, inFlight;
+var BEARER_TOKEN, X_NFL_SCHEDULE_GRAPHQL_QUERY_ID, X_NFL_SCHEDULE_GRAPHQL_OPERATION, X_NFL_GAMETIME_CATALOG_PROXY_PATH, CHROME_UA3, NFL_SCHEDULE_CACHE_TTL_MS, cachedEvents, cachedAtMs2, inFlight;
 var init_xGametimeSportsCatalog = __esm({
   "../grarf/desktop/shared/nfl/xGametimeSportsCatalog.mjs"() {
     init_define_import_meta_env();
@@ -1037,7 +1037,7 @@ var init_xGametimeSportsCatalog = __esm({
     X_NFL_SCHEDULE_GRAPHQL_QUERY_ID = "I0s-QbdS2Bq_PRCSTCoz8g";
     X_NFL_SCHEDULE_GRAPHQL_OPERATION = "NFLSchedule";
     X_NFL_GAMETIME_CATALOG_PROXY_PATH = "/nfl/x-gametime-catalog";
-    CHROME_UA2 = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36";
+    CHROME_UA3 = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36";
     NFL_SCHEDULE_CACHE_TTL_MS = 10 * 60 * 1e3;
     cachedEvents = null;
     cachedAtMs2 = 0;
@@ -16117,7 +16117,7 @@ async function fetchViaDataApi(channelId, apiKey, needle, allowNewestFallback, t
   url.searchParams.set("type", "video");
   url.searchParams.set("key", apiKey);
   const res = await fetch(url.toString(), {
-    headers: { "User-Agent": CHROME_UA4, Accept: "application/json" }
+    headers: { "User-Agent": CHROME_UA5, Accept: "application/json" }
   });
   const text2 = await res.text();
   if (!res.ok) {
@@ -16163,7 +16163,7 @@ async function fetchViaChannelRss(channelId, needle, allowNewestFallback, target
   const url = typeof resolveRssUrl === "function" ? resolveRssUrl(channelId) : `https://www.youtube.com/feeds/videos.xml?channel_id=${encodeURIComponent(channelId)}`;
   const res = await fetch(url, {
     headers: {
-      "User-Agent": CHROME_UA4,
+      "User-Agent": CHROME_UA5,
       Accept: "application/atom+xml, text/xml, */*",
       "Accept-Language": "en-US,en;q=0.9"
     }
@@ -16243,14 +16243,14 @@ async function resolveAllGamesHighlight(payload, options = {}) {
     return { ok: false, error: msg };
   }
 }
-var DEFAULT_MLB_CHANNEL_ID, CHROME_UA4, MLB_CATCHUP_DAILY_HIGHLIGHT_TITLE_PATTERNS2;
+var DEFAULT_MLB_CHANNEL_ID, CHROME_UA5, MLB_CATCHUP_DAILY_HIGHLIGHT_TITLE_PATTERNS2;
 var init_youtubeAllGamesHighlightFetch = __esm({
   "../grarf/shared/media/youtubeAllGamesHighlightFetch.js"() {
     init_define_import_meta_env();
     init_mlbAllGamesHighlightDate();
     init_mlbAllGamesHighlightSelection();
     DEFAULT_MLB_CHANNEL_ID = "UCoLrcjPV5PbUrUyXq5mjc_A";
-    CHROME_UA4 = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36";
+    CHROME_UA5 = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36";
     MLB_CATCHUP_DAILY_HIGHLIGHT_TITLE_PATTERNS2 = [
       "highlights from all games",
       "mlb daily recap",
@@ -22125,7 +22125,8 @@ var SOCCER_LEAGUES = /* @__PURE__ */ new Set([
   "SAUDI",
   "SUPERLIG",
   "USLCUP",
-  "WORLDCUP"
+  "WORLDCUP",
+  "CARABAO_CUP"
 ]);
 function isSoccerLeague(league2) {
   return league2 != null && SOCCER_LEAGUES.has(league2);
@@ -22269,10 +22270,14 @@ function resolveGamesSpineCardTimingLabel(game, scheduleLabel) {
       return mlbLiveStatePrimary(game) ?? game.statusLine?.trim() ?? stripLivePrefix(scheduleLabel);
     }
     if (isSoccerLeague(game.league)) {
-      const clock2 = game.displayClock?.trim();
-      if (clock2) return clock2;
-      const statusLine2 = game.statusLine?.trim();
+      const statusLine2 = game.statusLine?.trim() ?? "";
+      const clock2 = game.displayClock?.trim() ?? "";
+      const isHalftimeLabel = (value) => /^Half$/i.test(value) || /^HT$/i.test(value) || /\bhalftime\b/i.test(value);
+      if (isHalftimeLabel(statusLine2) || isHalftimeLabel(clock2)) return "Half";
+      if (/^\d+(\+\d+)?'$/.test(statusLine2)) return statusLine2;
+      if (/^\d+(\+\d+)?'$/.test(clock2) && clock2 !== "0'") return clock2;
       if (statusLine2) return statusLine2;
+      if (clock2) return clock2;
       return stripLivePrefix(scheduleLabel);
     }
     if (isNbaFamilyBasketballLeague(game.league) && isGrarfWebRenderer2()) {
@@ -27352,6 +27357,22 @@ function resolveOperationalWorkerSnapshotFetchTarget() {
   };
 }
 
+// ../grarf/desktop/src/services/operationalIngest/extensionOperationalCloudSnapshotFetchDiagnostic.ts
+init_define_import_meta_env();
+init_isGrarfWebRenderer();
+var lastSuccessfulFetch = null;
+function recordExtensionOperationalCloudSnapshotFetch(input) {
+  if (!isGrarfExtensionRenderer()) return;
+  lastSuccessfulFetch = {
+    transport: input.transport,
+    url: input.url,
+    recordedAtMs: Date.now()
+  };
+}
+function readExtensionOperationalCloudSnapshotFetchDiagnostic() {
+  return lastSuccessfulFetch;
+}
+
 // ../grarf/desktop/src/services/operationalIngest/fetchOperationalSnapshot.ts
 var LOG7 = "[OperationalIngest]";
 var CLOUD_FETCH_TIMEOUT_MS = 2e4;
@@ -27592,6 +27613,10 @@ async function fetchOperationalSnapshotFromCloudTarget(target, options) {
         providerPoll: json.providerPoll,
         initialIngestComplete: json.initialIngestComplete
       };
+      recordExtensionOperationalCloudSnapshotFetch({
+        transport: target.transport,
+        url: target.url
+      });
       if (isGrarfLiveGameTraceEnabled()) {
         logGrarfLiveGameTraceFromTransport("CLOUD_FETCH", transport, {
           subphase: "response",
@@ -31825,7 +31850,8 @@ function inspectExtensionOperationalIngestProbe() {
       lastTransportGameCount: render.lastTransportGameCount,
       operationalIngestComplete: render.operationalIngestComplete
     },
-    sampleLiveGame: findSampleLiveGame(live.leagues)
+    sampleLiveGame: findSampleLiveGame(live.leagues),
+    cloudSnapshotFetch: readExtensionOperationalCloudSnapshotFetchDiagnostic()
   };
 }
 function inspectExtensionOperationalGameById(gameId) {
@@ -35023,7 +35049,11 @@ var FOTMOB_SOCCER_LEAGUE_REGISTRY = {
   BEL1: { fotmobPrimaryLeagueIds: [40], fotmobCountryCode: "BEL" },
   BRA1: { fotmobPrimaryLeagueIds: [268], fotmobCountryCode: "BRA" },
   BUNDESLIGA: { fotmobPrimaryLeagueIds: [54], fotmobCountryCode: "GER" },
-  CARABAO_CUP: { fotmobPrimaryLeagueIds: [133], fotmobCountryCode: "ENG" },
+  CARABAO_CUP: {
+    fotmobPrimaryLeagueIds: [133],
+    fotmobCountryCode: "ENG",
+    fixturesPageUrl: "https://www.fotmob.com/leagues/133/fixtures/efl-cup?group=by-date"
+  },
   CHAMPIONSHIP: { fotmobPrimaryLeagueIds: [48], fotmobCountryCode: "ENG" },
   CLUBWC: { fotmobPrimaryLeagueIds: [78] },
   CLUBFRIENDLY: { fotmobPrimaryLeagueIds: [489] },
@@ -35064,6 +35094,81 @@ function getFotmobLeagueRegistryEntry(leagueKey) {
   return FOTMOB_SOCCER_LEAGUE_REGISTRY[leagueKey] ?? null;
 }
 
+// ../grarf/grarf-operational-service/src/watch/fotmob/fetchFotmobLeagueFixturesCatalog.ts
+init_define_import_meta_env();
+
+// ../grarf/grarf-operational-service/src/watch/fotmob/parseFotmobFixturesPageHtml.ts
+init_define_import_meta_env();
+var FIXTURES_MATCH_RE = /\/matches\/([a-z0-9-]+)\/([a-z0-9]+)#(\d+)/g;
+function titleCaseSlugPart(part) {
+  return part.split("-").filter(Boolean).map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(" ");
+}
+function teamNamesFromMatchSlug(slug) {
+  const parts = slug.split("-vs-");
+  if (parts.length !== 2) return null;
+  const home = titleCaseSlugPart(parts[0] ?? "");
+  const away = titleCaseSlugPart(parts[1] ?? "");
+  if (!home || !away) return null;
+  return { home, away };
+}
+function parseFotmobFixturesPageHtml(html) {
+  const byId = /* @__PURE__ */ new Map();
+  for (const match of html.matchAll(FIXTURES_MATCH_RE)) {
+    const slug = match[1]?.trim();
+    const shortId = match[2]?.trim();
+    const numericId = Number(match[3]);
+    if (!slug || !shortId || !Number.isFinite(numericId)) continue;
+    const teams = teamNamesFromMatchSlug(slug);
+    if (!teams) continue;
+    byId.set(numericId, {
+      id: numericId,
+      home: { id: 0, name: teams.home },
+      away: { id: 0, name: teams.away },
+      pageUrl: `https://www.fotmob.com/matches/${slug}/${shortId}#${numericId}`
+    });
+  }
+  return [...byId.values()];
+}
+
+// ../grarf/grarf-operational-service/src/watch/fotmob/fetchFotmobLeagueFixturesCatalog.ts
+var CHROME_UA2 = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36";
+function isNonEmptyFotmobMatchArray(value) {
+  return Array.isArray(value) && value.length > 0;
+}
+async function fetchFixturesPageUncached(fixturesPageUrl) {
+  const res = await traceOperationalFetch(
+    fixturesPageUrl,
+    { headers: { "User-Agent": CHROME_UA2, Accept: "text/html" } },
+    { functionName: "fetchFotmobLeagueFixturesPage", provider: "fotmob" }
+  );
+  if (!res.ok) return [];
+  const html = await res.text();
+  return parseFotmobFixturesPageHtml(html);
+}
+async function fetchFotmobLeagueFixturesCatalog(leagueKey) {
+  const entry4 = getFotmobLeagueRegistryEntry(leagueKey);
+  const fixturesPageUrl = entry4?.fixturesPageUrl?.trim();
+  if (!fixturesPageUrl) return [];
+  const provider = `fotmob-fixtures-v2-${leagueKey.toLowerCase()}`;
+  try {
+    return await withOperationalEnrichmentProviderCache({
+      provider,
+      requestIdentity: "current",
+      ttlMs: 15 * 60 * 1e3,
+      validate: isNonEmptyFotmobMatchArray,
+      fetch: async () => {
+        const matches = await fetchFixturesPageUncached(fixturesPageUrl);
+        if (matches.length === 0) {
+          throw new Error(`FotMob fixtures catalog empty for ${leagueKey}`);
+        }
+        return matches;
+      }
+    });
+  } catch {
+    return [];
+  }
+}
+
 // ../grarf/grarf-operational-service/src/watch/fotmob/fetchFotmobSoccerCatalog.ts
 function dateKeysForGame(game) {
   const keys = /* @__PURE__ */ new Set();
@@ -35095,24 +35200,34 @@ function extractMatchesForLeague(buckets, leagueKey) {
   return [...byId.values()];
 }
 async function fetchFotmobSoccerCatalogForLeague(games, leagueKey) {
-  if (!getFotmobLeagueRegistryEntry(leagueKey)) return [];
+  const entry4 = getFotmobLeagueRegistryEntry(leagueKey);
+  if (!entry4) return [];
+  const leagueGames = games.filter((game) => game.league === leagueKey);
+  if (leagueGames.length === 0) return [];
   const dateKeys = /* @__PURE__ */ new Set();
-  for (const game of games) {
-    if (game.league !== leagueKey) continue;
+  for (const game of leagueGames) {
     for (const key2 of dateKeysForGame(game)) {
       dateKeys.add(key2);
     }
   }
-  if (dateKeys.size === 0) return [];
   const byId = /* @__PURE__ */ new Map();
-  await Promise.all(
-    [...dateKeys].map(async (dateKey) => {
-      const buckets = await fetchFotmobLeagueBucketsByDate(dateKey);
-      for (const match of extractMatchesForLeague(buckets, leagueKey)) {
-        byId.set(match.id, match);
-      }
-    })
-  );
+  if (dateKeys.size > 0) {
+    await Promise.all(
+      [...dateKeys].map(async (dateKey) => {
+        const buckets = await fetchFotmobLeagueBucketsByDate(dateKey);
+        for (const match of extractMatchesForLeague(buckets, leagueKey)) {
+          byId.set(match.id, match);
+        }
+      })
+    );
+  }
+  if (entry4.fixturesPageUrl) {
+    const fixturesCatalog = await fetchFotmobLeagueFixturesCatalog(leagueKey);
+    for (const match of fixturesCatalog) {
+      const existing = byId.get(match.id);
+      byId.set(match.id, existing ? { ...existing, pageUrl: match.pageUrl ?? existing.pageUrl } : match);
+    }
+  }
   return [...byId.values()];
 }
 async function fetchFotmobSoccerCatalogsByLeague(games) {
@@ -35501,7 +35616,9 @@ function hasFotmobRoutingMetadata(game) {
   if (game.metadata?.fotmobMatchUrl?.trim()) return true;
   return Boolean(game.externalIds?.fotmob?.trim());
 }
-function attachFotmobMatch(game, matchId) {
+function attachFotmobMatch(game, match) {
+  const matchId = String(match.id);
+  const fotmobMatchUrl = match.pageUrl?.trim() || buildFotmobMatchUrl(matchId);
   return {
     ...game,
     externalIds: {
@@ -35510,7 +35627,7 @@ function attachFotmobMatch(game, matchId) {
     },
     metadata: {
       ...game.metadata,
-      fotmobMatchUrl: buildFotmobMatchUrl(matchId)
+      fotmobMatchUrl
     }
   };
 }
@@ -35531,7 +35648,7 @@ async function enrichSoccerGamesWithFotmobUrls(games) {
     if (!catalog?.length) return game;
     const fotmobMatch = matchFotmobSoccerMatch(game, catalog);
     if (!fotmobMatch) return game;
-    return attachFotmobMatch(game, String(fotmobMatch.id));
+    return attachFotmobMatch(game, fotmobMatch);
   });
 }
 
@@ -37261,7 +37378,7 @@ function parseNbaCdnScoreboardGames(scoreboardJson) {
 }
 
 // ../grarf/shared/domain/nba/fetchNbaCdnScoreboard.ts
-var CHROME_UA3 = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
+var CHROME_UA4 = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
 var NBA_CDN_TODAYS_SCOREBOARD_URL = "https://cdn.nba.com/static/json/liveData/scoreboard/todaysScoreboard_00.json";
 var NBA_CDN_DATE_SCOREBOARD_URL = "https://cdn.nba.com/static/json/liveData/scoreboard/scoreboard_{YYYYMMDD}.json";
 var SCOREBOARD_CACHE_TTL_MS = 15 * 60 * 1e3;
@@ -37281,7 +37398,7 @@ async function fetchNbaCdnScoreboardFromApi(cacheKey3, url, options) {
   const fetchImpl = options?.fetchImpl ?? fetch;
   const res = await fetchImpl(url, {
     headers: {
-      "User-Agent": CHROME_UA3,
+      "User-Agent": CHROME_UA4,
       Accept: "application/json",
       Referer: "https://www.nba.com/games",
       Origin: "https://www.nba.com",
@@ -43341,7 +43458,7 @@ async function enrichOperationalSnapshotWatchStreamsLocal(transport) {
   return next;
 }
 async function enrichOperationalTransport(rawTransport) {
-  if (rawTransport.source === "grarf_operational_service" && isGrarfExtensionRenderer()) {
+  if (isGrarfExtensionRenderer()) {
     return rawTransport;
   }
   let transport = rawTransport;
@@ -44460,6 +44577,9 @@ function buildExtensionAuthoritativeGrarfCloudHydrateSnapshot(canonical) {
 
 // ../grarf/desktop/src/services/operationalIngest/hydrateOperationalSnapshotFromTransport.ts
 var LOG23 = "[OperationalIngest]";
+function extensionConsumesServerOperationalSnapshotOnly() {
+  return isGrarfExtensionRenderer();
+}
 function supplementOperationalSnapshotLeagues(primary, supplement) {
   const merged = { ...primary };
   let changed = false;
@@ -44619,6 +44739,7 @@ async function applyProgressiveMetadataEnrichmentToCurrentStore(hydrate) {
   );
 }
 async function runProgressiveGamesSpineEnrichment(rawTransport, hydrate, context2, completeness, options = {}) {
+  if (extensionConsumesServerOperationalSnapshotOnly()) return;
   const transportGeneratedAt = completeness.transportGeneratedAt ?? rawTransport.generatedAt;
   let transport = rawTransport;
   try {
@@ -44653,58 +44774,60 @@ async function hydrateOperationalSnapshotFromTransport(rawTransport, hydrate, co
     return;
   }
   let transportForHydrate = rawTransport;
-  try {
-    transportForHydrate = await enrichOperationalSnapshotNcaafYahooSports(transportForHydrate);
-  } catch (e2) {
-    console.warn(`${LOG23} NCAAF Yahoo Sports enrich failed`, e2);
-  }
-  try {
-    transportForHydrate = await enrichOperationalSnapshotCbsMlbPreviewUrls(transportForHydrate);
-  } catch (e2) {
-    console.warn(`${LOG23} CBS MLB preview URL enrich failed`, e2);
-  }
-  try {
-    transportForHydrate = await enrichOperationalSnapshotCbsNflPreviewUrls(transportForHydrate);
-  } catch (e2) {
-    console.warn(`${LOG23} CBS NFL preview URL enrich failed`, e2);
-  }
-  try {
-    transportForHydrate = await enrichOperationalSnapshotUelYahooSportsPreviewArticleUrls(
-      transportForHydrate
-    );
-  } catch (e2) {
-    console.warn(`${LOG23} UEL Yahoo Sports preview article enrich failed`, e2);
-  }
-  try {
-    transportForHydrate = await enrichOperationalSnapshotCoversMlbPicksUrls(transportForHydrate);
-  } catch (e2) {
-    console.warn(`${LOG23} Covers MLB picks URL enrich failed`, e2);
-  }
-  try {
-    transportForHydrate = await enrichOperationalSnapshotKalshiMlbMarketUrls(transportForHydrate);
-  } catch (e2) {
-    console.warn(`${LOG23} Kalshi MLB market URL enrich failed`, e2);
-  }
-  try {
-    transportForHydrate = await enrichOperationalSnapshotPolymarketMlbMarketUrls(transportForHydrate);
-  } catch (e2) {
-    console.warn(`${LOG23} Polymarket MLB market URL enrich failed`, e2);
-  }
-  try {
-    transportForHydrate = await enrichOperationalSnapshotNovigMlbMarketUrls(transportForHydrate);
-  } catch (e2) {
-    console.warn(`${LOG23} Novig MLB event-market URL enrich failed`, e2);
-  }
-  if (!context2.startupSeed && !isCentralizedSnapshot && isElectronIpcAuthoritativeOperationalIngest(completeness.source)) {
+  if (!extensionConsumesServerOperationalSnapshotOnly()) {
     try {
-      transportForHydrate = await enrichOperationalSnapshotFotmob(transportForHydrate);
+      transportForHydrate = await enrichOperationalSnapshotNcaafYahooSports(transportForHydrate);
     } catch (e2) {
-      console.warn(`${LOG23} FotMob soccer enrich failed`, e2);
+      console.warn(`${LOG23} NCAAF Yahoo Sports enrich failed`, e2);
     }
     try {
-      transportForHydrate = await enrichOperationalSnapshotSoccerway(transportForHydrate);
+      transportForHydrate = await enrichOperationalSnapshotCbsMlbPreviewUrls(transportForHydrate);
     } catch (e2) {
-      console.warn(`${LOG23} Soccerway soccer enrich failed`, e2);
+      console.warn(`${LOG23} CBS MLB preview URL enrich failed`, e2);
+    }
+    try {
+      transportForHydrate = await enrichOperationalSnapshotCbsNflPreviewUrls(transportForHydrate);
+    } catch (e2) {
+      console.warn(`${LOG23} CBS NFL preview URL enrich failed`, e2);
+    }
+    try {
+      transportForHydrate = await enrichOperationalSnapshotUelYahooSportsPreviewArticleUrls(
+        transportForHydrate
+      );
+    } catch (e2) {
+      console.warn(`${LOG23} UEL Yahoo Sports preview article enrich failed`, e2);
+    }
+    try {
+      transportForHydrate = await enrichOperationalSnapshotCoversMlbPicksUrls(transportForHydrate);
+    } catch (e2) {
+      console.warn(`${LOG23} Covers MLB picks URL enrich failed`, e2);
+    }
+    try {
+      transportForHydrate = await enrichOperationalSnapshotKalshiMlbMarketUrls(transportForHydrate);
+    } catch (e2) {
+      console.warn(`${LOG23} Kalshi MLB market URL enrich failed`, e2);
+    }
+    try {
+      transportForHydrate = await enrichOperationalSnapshotPolymarketMlbMarketUrls(transportForHydrate);
+    } catch (e2) {
+      console.warn(`${LOG23} Polymarket MLB market URL enrich failed`, e2);
+    }
+    try {
+      transportForHydrate = await enrichOperationalSnapshotNovigMlbMarketUrls(transportForHydrate);
+    } catch (e2) {
+      console.warn(`${LOG23} Novig MLB event-market URL enrich failed`, e2);
+    }
+    if (!context2.startupSeed && !isCentralizedSnapshot && isElectronIpcAuthoritativeOperationalIngest(completeness.source)) {
+      try {
+        transportForHydrate = await enrichOperationalSnapshotFotmob(transportForHydrate);
+      } catch (e2) {
+        console.warn(`${LOG23} FotMob soccer enrich failed`, e2);
+      }
+      try {
+        transportForHydrate = await enrichOperationalSnapshotSoccerway(transportForHydrate);
+      } catch (e2) {
+        console.warn(`${LOG23} Soccerway soccer enrich failed`, e2);
+      }
     }
   }
   const completenessWithTransport = {
@@ -61533,6 +61656,7 @@ var LEAGUE_PRESENTATION_LABEL_BY_KEY = {
   XFL: "UFL",
   GT_WORLD_CHALLENGE: "GT World Challenge",
   COPA_BRASIL: "Copa do Brasil",
+  CARABAO_CUP: "Carabao Cup",
   nhra: "NHRA",
   npb: "NPB",
   pfl: "PFL",
@@ -71484,6 +71608,24 @@ function buildMlbEspnScoreboardLogoUrl(abbrev) {
   return `https://a.espncdn.com/i/teamlogos/mlb/500/scoreboard/${slug}.png`;
 }
 
+// ../grarf/desktop/src/lib/gamesSpine/nbaEspnLogoSlug.ts
+init_define_import_meta_env();
+var NBA_ESPN_SCOREBOARD_SLUG = {
+  nop: "no",
+  uta: "utah"
+};
+function resolveNbaEspnScoreboardLogoSlug(abbrev) {
+  const trimmed = abbrev?.trim();
+  if (!trimmed) return void 0;
+  const key2 = trimmed.toLowerCase();
+  return NBA_ESPN_SCOREBOARD_SLUG[key2] ?? key2;
+}
+function buildNbaEspnScoreboardLogoUrl(abbrev) {
+  const slug = resolveNbaEspnScoreboardLogoSlug(abbrev);
+  if (!slug) return void 0;
+  return `https://a.espncdn.com/i/teamlogos/nba/500/scoreboard/${slug}.png`;
+}
+
 // ../grarf/desktop/src/lib/gamesSpine/wnbaEspnLogoUrl.ts
 init_define_import_meta_env();
 var WNBA_LOCAL_TEAM_LOGO_BY_ABBREV = {
@@ -71555,7 +71697,7 @@ function buildLeaguesTabProTeamLogoUrl(league2, teamAbbrev2) {
     return buildWnbaEspnLogoUrl(teamAbbrev2);
   }
   if (league2 === "NBA") {
-    return `https://a.espncdn.com/i/teamlogos/nba/500/scoreboard/${normalized.toLowerCase()}.png`;
+    return buildNbaEspnScoreboardLogoUrl(teamAbbrev2);
   }
   if (league2 === "NFL") {
     return `https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/${normalized.toLowerCase()}.png`;
@@ -71649,7 +71791,7 @@ function espnCdnLogo(league2, abbrev, teamId, game) {
     return buildMlbEspnScoreboardLogoUrl(abbr);
   }
   if (league2 === "NBA" && abbr) {
-    return `https://a.espncdn.com/i/teamlogos/nba/500/scoreboard/${abbr}.png`;
+    return buildNbaEspnScoreboardLogoUrl(abbr);
   }
   if (league2 === "NFL" && abbrev?.trim()) {
     return buildLeaguesTabProTeamLogoUrl("NFL", abbrev);
@@ -92309,11 +92451,11 @@ init_define_import_meta_env();
 
 // ../grarf/desktop/src/lib/fotmob/fotmobRequest.ts
 init_define_import_meta_env();
-var CHROME_UA5 = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36";
+var CHROME_UA6 = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36";
 var FOTMOB_API_BASE = "https://www.fotmob.com/api/data";
 function fotmobFetchHeaders() {
   return {
-    "User-Agent": CHROME_UA5,
+    "User-Agent": CHROME_UA6,
     Accept: "application/json",
     Referer: "https://www.fotmob.com/"
   };
@@ -116664,6 +116806,8 @@ var ESPN_OR_OPERATIONAL_TO_CBS_NHL_TEAM_ABBREV = {
   LA: "LA",
   LAK: "LA",
   UTAH: "UTA",
+  WSH: "WAS",
+  WAS: "WAS",
   CBJ: "CLB",
   CLB: "CLB",
   MTL: "MON"
@@ -168038,7 +168182,8 @@ var COMMAND_CENTER_SOCCER_LEAGUES = /* @__PURE__ */ new Set([
   "SAUDI",
   "SUPERLIG",
   "USLCUP",
-  "WORLDCUP"
+  "WORLDCUP",
+  "CARABAO_CUP"
 ]);
 function isCommandCenterMlbFamilyGame(game) {
   const league2 = game.league;
@@ -168097,8 +168242,8 @@ function resolveCommandCenterSoccerMetaTimingParts(game, timingLabel) {
   if (game.status !== "live" || !isCommandCenterSoccerGame(game)) return null;
   const label = timingLabel.trim() || game.displayClock?.trim() || resolveGamesSpineCardTimingLabel(game)?.trim() || game.statusLine?.trim() || "";
   if (!label) return null;
-  if (/^HT$/i.test(label) || /\bhalftime\b/i.test(label)) {
-    return { period: "HT", clock: "\u2014" };
+  if (/^Half$/i.test(label) || /^HT$/i.test(label) || /\bhalftime\b/i.test(label)) {
+    return { period: null, clock: "Half" };
   }
   return { period: null, clock: label };
 }
@@ -173784,6 +173929,14 @@ async function navigateGrarfExtensionGameYesterdayRecap(game, options) {
     }
   }
   const leagueKey = game.league?.trim().toUpperCase() ?? "";
+  if (leagueKey === "CARABAO_CUP") {
+    const fotmobRecapUrl = resolveFotmobMatchUrl(game);
+    if (fotmobRecapUrl) {
+      navigateGrarfExtensionHostExternalUrl(fotmobRecapUrl);
+      completeCatchUpRecapNavigation(game);
+      return true;
+    }
+  }
   if (grarfExtensionLeagueUsesMlssoccerRecaps(leagueKey)) {
     const mlsRecapUrl = await resolveGrarfExtensionMlssoccerRecapNavigationUrlFromGame(game);
     if (mlsRecapUrl) {
@@ -199881,6 +200034,35 @@ var homeCommandCenterDailyPriorities_default = {
           awayTeamLabel: "Liverpool",
           homeTeamLabel: "Chelsea",
           line: "Carabao Cup - Liverpool vs Chelsea"
+        }
+      ]
+    },
+    "2026-10-29": {
+      updatedAt: "2026-10-29T11:17:34.394Z",
+      entries: [
+        {
+          kind: "matchup",
+          leagueLabel: "WNBA",
+          leagueKey: "WNBA",
+          awayTeamLabel: "Valkyries",
+          homeTeamLabel: "Dream",
+          line: "WNBA - Valkyries vs Dream"
+        },
+        {
+          kind: "matchup",
+          leagueLabel: "NFL",
+          leagueKey: "NFL",
+          awayTeamLabel: "Panthers",
+          homeTeamLabel: "Packers",
+          line: "NFL - Panthers vs Packers"
+        },
+        {
+          kind: "matchup",
+          leagueLabel: "Carabao Cup",
+          leagueKey: "CARABAO_CUP",
+          awayTeamLabel: "Everton",
+          homeTeamLabel: "Newcastle",
+          line: "Carabao Cup - Everton vs Newcastle"
         }
       ]
     }

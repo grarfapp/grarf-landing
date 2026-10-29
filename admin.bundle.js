@@ -12793,7 +12793,7 @@ function resolveNflScheduleSeasonYear(now = /* @__PURE__ */ new Date()) {
 }
 async function bootstrapXGuestSession() {
   const home = await fetch("https://x.com/", {
-    headers: { "User-Agent": CHROME_UA2 }
+    headers: { "User-Agent": CHROME_UA3 }
   });
   const cookies = (home.headers.getSetCookie?.() ?? []).map((c) => c.split(";")[0]).join("; ");
   const gt = cookies.match(/gt=(\d+)/)?.[1] ?? "";
@@ -12847,7 +12847,7 @@ async function fetchNflXGametimeScheduleGraphql(seasonYear) {
       Authorization: `Bearer ${BEARER_TOKEN}`,
       "x-guest-token": gt,
       Cookie: cookies,
-      "User-Agent": CHROME_UA2,
+      "User-Agent": CHROME_UA3,
       "x-twitter-active-user": "yes",
       "x-twitter-client-language": "en",
       Accept: "application/json"
@@ -12878,7 +12878,7 @@ async function fetchNflXGametimeSportsCatalog() {
     inFlight = null;
   }
 }
-var BEARER_TOKEN, X_NFL_SCHEDULE_GRAPHQL_QUERY_ID, X_NFL_SCHEDULE_GRAPHQL_OPERATION, X_NFL_GAMETIME_CATALOG_PROXY_PATH, CHROME_UA2, NFL_SCHEDULE_CACHE_TTL_MS, cachedEvents, cachedAtMs2, inFlight;
+var BEARER_TOKEN, X_NFL_SCHEDULE_GRAPHQL_QUERY_ID, X_NFL_SCHEDULE_GRAPHQL_OPERATION, X_NFL_GAMETIME_CATALOG_PROXY_PATH, CHROME_UA3, NFL_SCHEDULE_CACHE_TTL_MS, cachedEvents, cachedAtMs2, inFlight;
 var init_xGametimeSportsCatalog = __esm({
   "../grarf/desktop/shared/nfl/xGametimeSportsCatalog.mjs"() {
     init_define_import_meta_env();
@@ -12886,7 +12886,7 @@ var init_xGametimeSportsCatalog = __esm({
     X_NFL_SCHEDULE_GRAPHQL_QUERY_ID = "I0s-QbdS2Bq_PRCSTCoz8g";
     X_NFL_SCHEDULE_GRAPHQL_OPERATION = "NFLSchedule";
     X_NFL_GAMETIME_CATALOG_PROXY_PATH = "/nfl/x-gametime-catalog";
-    CHROME_UA2 = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36";
+    CHROME_UA3 = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36";
     NFL_SCHEDULE_CACHE_TTL_MS = 10 * 60 * 1e3;
     cachedEvents = null;
     cachedAtMs2 = 0;
@@ -15206,6 +15206,7 @@ var LEAGUE_PRESENTATION_LABEL_BY_KEY = {
   XFL: "UFL",
   GT_WORLD_CHALLENGE: "GT World Challenge",
   COPA_BRASIL: "Copa do Brasil",
+  CARABAO_CUP: "Carabao Cup",
   nhra: "NHRA",
   npb: "NPB",
   pfl: "PFL",
@@ -24318,6 +24319,18 @@ function resolveOperationalWorkerSnapshotFetchTarget() {
   };
 }
 
+// ../grarf/desktop/src/services/operationalIngest/extensionOperationalCloudSnapshotFetchDiagnostic.ts
+init_define_import_meta_env();
+var lastSuccessfulFetch = null;
+function recordExtensionOperationalCloudSnapshotFetch(input) {
+  if (!isGrarfExtensionRenderer()) return;
+  lastSuccessfulFetch = {
+    transport: input.transport,
+    url: input.url,
+    recordedAtMs: Date.now()
+  };
+}
+
 // ../grarf/desktop/src/services/operationalIngest/fetchOperationalSnapshot.ts
 var LOG8 = "[OperationalIngest]";
 var CLOUD_FETCH_TIMEOUT_MS = 2e4;
@@ -24535,6 +24548,10 @@ async function fetchOperationalSnapshotFromCloudTarget(target, options) {
         providerPoll: json.providerPoll,
         initialIngestComplete: json.initialIngestComplete
       };
+      recordExtensionOperationalCloudSnapshotFetch({
+        transport: target.transport,
+        url: target.url
+      });
       if (isGrarfLiveGameTraceEnabled()) {
         logGrarfLiveGameTraceFromTransport("CLOUD_FETCH", transport, {
           subphase: "response",
@@ -30225,7 +30242,11 @@ var FOTMOB_SOCCER_LEAGUE_REGISTRY = {
   BEL1: { fotmobPrimaryLeagueIds: [40], fotmobCountryCode: "BEL" },
   BRA1: { fotmobPrimaryLeagueIds: [268], fotmobCountryCode: "BRA" },
   BUNDESLIGA: { fotmobPrimaryLeagueIds: [54], fotmobCountryCode: "GER" },
-  CARABAO_CUP: { fotmobPrimaryLeagueIds: [133], fotmobCountryCode: "ENG" },
+  CARABAO_CUP: {
+    fotmobPrimaryLeagueIds: [133],
+    fotmobCountryCode: "ENG",
+    fixturesPageUrl: "https://www.fotmob.com/leagues/133/fixtures/efl-cup?group=by-date"
+  },
   CHAMPIONSHIP: { fotmobPrimaryLeagueIds: [48], fotmobCountryCode: "ENG" },
   CLUBWC: { fotmobPrimaryLeagueIds: [78] },
   CLUBFRIENDLY: { fotmobPrimaryLeagueIds: [489] },
@@ -30266,6 +30287,81 @@ function getFotmobLeagueRegistryEntry(leagueKey) {
   return FOTMOB_SOCCER_LEAGUE_REGISTRY[leagueKey] ?? null;
 }
 
+// ../grarf/grarf-operational-service/src/watch/fotmob/fetchFotmobLeagueFixturesCatalog.ts
+init_define_import_meta_env();
+
+// ../grarf/grarf-operational-service/src/watch/fotmob/parseFotmobFixturesPageHtml.ts
+init_define_import_meta_env();
+var FIXTURES_MATCH_RE = /\/matches\/([a-z0-9-]+)\/([a-z0-9]+)#(\d+)/g;
+function titleCaseSlugPart(part) {
+  return part.split("-").filter(Boolean).map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(" ");
+}
+function teamNamesFromMatchSlug(slug) {
+  const parts = slug.split("-vs-");
+  if (parts.length !== 2) return null;
+  const home = titleCaseSlugPart(parts[0] ?? "");
+  const away = titleCaseSlugPart(parts[1] ?? "");
+  if (!home || !away) return null;
+  return { home, away };
+}
+function parseFotmobFixturesPageHtml(html) {
+  const byId = /* @__PURE__ */ new Map();
+  for (const match of html.matchAll(FIXTURES_MATCH_RE)) {
+    const slug = match[1]?.trim();
+    const shortId = match[2]?.trim();
+    const numericId = Number(match[3]);
+    if (!slug || !shortId || !Number.isFinite(numericId)) continue;
+    const teams = teamNamesFromMatchSlug(slug);
+    if (!teams) continue;
+    byId.set(numericId, {
+      id: numericId,
+      home: { id: 0, name: teams.home },
+      away: { id: 0, name: teams.away },
+      pageUrl: `https://www.fotmob.com/matches/${slug}/${shortId}#${numericId}`
+    });
+  }
+  return [...byId.values()];
+}
+
+// ../grarf/grarf-operational-service/src/watch/fotmob/fetchFotmobLeagueFixturesCatalog.ts
+var CHROME_UA2 = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36";
+function isNonEmptyFotmobMatchArray(value) {
+  return Array.isArray(value) && value.length > 0;
+}
+async function fetchFixturesPageUncached(fixturesPageUrl) {
+  const res = await traceOperationalFetch(
+    fixturesPageUrl,
+    { headers: { "User-Agent": CHROME_UA2, Accept: "text/html" } },
+    { functionName: "fetchFotmobLeagueFixturesPage", provider: "fotmob" }
+  );
+  if (!res.ok) return [];
+  const html = await res.text();
+  return parseFotmobFixturesPageHtml(html);
+}
+async function fetchFotmobLeagueFixturesCatalog(leagueKey) {
+  const entry2 = getFotmobLeagueRegistryEntry(leagueKey);
+  const fixturesPageUrl = entry2?.fixturesPageUrl?.trim();
+  if (!fixturesPageUrl) return [];
+  const provider = `fotmob-fixtures-v2-${leagueKey.toLowerCase()}`;
+  try {
+    return await withOperationalEnrichmentProviderCache({
+      provider,
+      requestIdentity: "current",
+      ttlMs: 15 * 60 * 1e3,
+      validate: isNonEmptyFotmobMatchArray,
+      fetch: async () => {
+        const matches = await fetchFixturesPageUncached(fixturesPageUrl);
+        if (matches.length === 0) {
+          throw new Error(`FotMob fixtures catalog empty for ${leagueKey}`);
+        }
+        return matches;
+      }
+    });
+  } catch {
+    return [];
+  }
+}
+
 // ../grarf/grarf-operational-service/src/watch/fotmob/fetchFotmobSoccerCatalog.ts
 function dateKeysForGame(game) {
   const keys = /* @__PURE__ */ new Set();
@@ -30297,24 +30393,34 @@ function extractMatchesForLeague(buckets, leagueKey) {
   return [...byId.values()];
 }
 async function fetchFotmobSoccerCatalogForLeague(games, leagueKey) {
-  if (!getFotmobLeagueRegistryEntry(leagueKey)) return [];
+  const entry2 = getFotmobLeagueRegistryEntry(leagueKey);
+  if (!entry2) return [];
+  const leagueGames = games.filter((game) => game.league === leagueKey);
+  if (leagueGames.length === 0) return [];
   const dateKeys = /* @__PURE__ */ new Set();
-  for (const game of games) {
-    if (game.league !== leagueKey) continue;
+  for (const game of leagueGames) {
     for (const key of dateKeysForGame(game)) {
       dateKeys.add(key);
     }
   }
-  if (dateKeys.size === 0) return [];
   const byId = /* @__PURE__ */ new Map();
-  await Promise.all(
-    [...dateKeys].map(async (dateKey) => {
-      const buckets = await fetchFotmobLeagueBucketsByDate(dateKey);
-      for (const match of extractMatchesForLeague(buckets, leagueKey)) {
-        byId.set(match.id, match);
-      }
-    })
-  );
+  if (dateKeys.size > 0) {
+    await Promise.all(
+      [...dateKeys].map(async (dateKey) => {
+        const buckets = await fetchFotmobLeagueBucketsByDate(dateKey);
+        for (const match of extractMatchesForLeague(buckets, leagueKey)) {
+          byId.set(match.id, match);
+        }
+      })
+    );
+  }
+  if (entry2.fixturesPageUrl) {
+    const fixturesCatalog = await fetchFotmobLeagueFixturesCatalog(leagueKey);
+    for (const match of fixturesCatalog) {
+      const existing = byId.get(match.id);
+      byId.set(match.id, existing ? { ...existing, pageUrl: match.pageUrl ?? existing.pageUrl } : match);
+    }
+  }
   return [...byId.values()];
 }
 async function fetchFotmobSoccerCatalogsByLeague(games) {
@@ -30626,7 +30732,9 @@ function hasFotmobRoutingMetadata(game) {
   if (game.metadata?.fotmobMatchUrl?.trim()) return true;
   return Boolean(game.externalIds?.fotmob?.trim());
 }
-function attachFotmobMatch(game, matchId) {
+function attachFotmobMatch(game, match) {
+  const matchId = String(match.id);
+  const fotmobMatchUrl = match.pageUrl?.trim() || buildFotmobMatchUrl(matchId);
   return {
     ...game,
     externalIds: {
@@ -30635,7 +30743,7 @@ function attachFotmobMatch(game, matchId) {
     },
     metadata: {
       ...game.metadata,
-      fotmobMatchUrl: buildFotmobMatchUrl(matchId)
+      fotmobMatchUrl
     }
   };
 }
@@ -30656,7 +30764,7 @@ async function enrichSoccerGamesWithFotmobUrls(games) {
     if (!catalog?.length) return game;
     const fotmobMatch = matchFotmobSoccerMatch(game, catalog);
     if (!fotmobMatch) return game;
-    return attachFotmobMatch(game, String(fotmobMatch.id));
+    return attachFotmobMatch(game, fotmobMatch);
   });
 }
 
@@ -32282,7 +32390,7 @@ function parseNbaCdnScoreboardGames(scoreboardJson) {
 }
 
 // ../grarf/shared/domain/nba/fetchNbaCdnScoreboard.ts
-var CHROME_UA3 = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
+var CHROME_UA4 = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
 var NBA_CDN_TODAYS_SCOREBOARD_URL = "https://cdn.nba.com/static/json/liveData/scoreboard/todaysScoreboard_00.json";
 var NBA_CDN_DATE_SCOREBOARD_URL = "https://cdn.nba.com/static/json/liveData/scoreboard/scoreboard_{YYYYMMDD}.json";
 var SCOREBOARD_CACHE_TTL_MS = 15 * 60 * 1e3;
@@ -32302,7 +32410,7 @@ async function fetchNbaCdnScoreboardFromApi(cacheKey2, url, options) {
   const fetchImpl = options?.fetchImpl ?? fetch;
   const res = await fetchImpl(url, {
     headers: {
-      "User-Agent": CHROME_UA3,
+      "User-Agent": CHROME_UA4,
       Accept: "application/json",
       Referer: "https://www.nba.com/games",
       Origin: "https://www.nba.com",
@@ -34978,7 +35086,7 @@ async function enrichOperationalSnapshotWatchStreamsLocal(transport) {
   return next;
 }
 async function enrichOperationalTransport(rawTransport) {
-  if (rawTransport.source === "grarf_operational_service" && isGrarfExtensionRenderer()) {
+  if (isGrarfExtensionRenderer()) {
     return rawTransport;
   }
   let transport = rawTransport;
