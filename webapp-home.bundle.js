@@ -38093,16 +38093,28 @@ init_define_import_meta_env();
 
 // ../grarf/desktop/src/lib/fotmob/buildFotmobMatchUrl.ts
 init_define_import_meta_env();
+
+// ../grarf/shared/domain/fotmob/resolveFotmobMatchUrlFromGame.ts
+init_define_import_meta_env();
+function buildFotmobMatchUrlFromId(matchId) {
+  const id = String(matchId).trim();
+  return `https://www.fotmob.com/match/${encodeURIComponent(id)}`;
+}
+function resolveFotmobMatchUrlFromGame(game) {
+  const fromMetadata = game.metadata?.fotmobMatchUrl?.trim();
+  if (fromMetadata) return fromMetadata;
+  const fotmobId = game.externalIds?.fotmob?.trim();
+  if (fotmobId) return buildFotmobMatchUrlFromId(fotmobId);
+  return null;
+}
+
+// ../grarf/desktop/src/lib/fotmob/buildFotmobMatchUrl.ts
 function buildFotmobMatchUrl2(matchId) {
   const id = String(matchId).trim();
   return `https://www.fotmob.com/match/${encodeURIComponent(id)}`;
 }
 function resolveFotmobMatchUrl(game) {
-  const fromMetadata = game.metadata?.fotmobMatchUrl?.trim();
-  if (fromMetadata) return fromMetadata;
-  const fotmobId = game.externalIds?.fotmob?.trim();
-  if (fotmobId) return buildFotmobMatchUrl2(fotmobId);
-  return null;
+  return resolveFotmobMatchUrlFromGame(game);
 }
 
 // ../grarf/desktop/src/lib/navigation/canonical/index.ts
@@ -41332,6 +41344,55 @@ function resolveWomensUclUefaGameCenterUrlFromGame(game) {
   return buildWomensUclUefaGameCenterUrl({ matchId, slugSegment: slug });
 }
 
+// ../grarf/shared/domain/fotmob/leagueUsesFotmobOperationalRouting.ts
+init_define_import_meta_env();
+var FOTMOB_OPERATIONAL_ROUTING_LEAGUE_KEYS = /* @__PURE__ */ new Set([
+  "ARG1",
+  "BEL1",
+  "BRA1",
+  "BUNDESLIGA",
+  "CARABAO_CUP",
+  "CHAMPIONSHIP",
+  "CLUBWC",
+  "CLUBFRIENDLY",
+  "CONCACAF_CAC",
+  "CONCACAF_CL",
+  "CONCACAF_NG",
+  "CONCACAF_WC",
+  "COPA",
+  "EPL",
+  "EREDIVISIE",
+  "EURO",
+  "GOLDCUP",
+  "INTFRIENDLY",
+  "LALIGA",
+  "LIBERTADORES",
+  "LIGAMX",
+  "LIGUE1",
+  "MLS",
+  "NATIONS",
+  "NWSL",
+  "POR1",
+  "SAUDI",
+  "SERIEA",
+  "SPFL",
+  "SUDAMERICANA",
+  "SUPERLIG",
+  "UCL",
+  "UECL",
+  "UEL",
+  "USL1",
+  "USLC",
+  "USLCUP",
+  "UWCQ",
+  "WORLDCUP",
+  "WWC"
+]);
+function leagueUsesFotmobOperationalRouting(leagueKey) {
+  if (!leagueKey) return false;
+  return FOTMOB_OPERATIONAL_ROUTING_LEAGUE_KEYS.has(leagueKey);
+}
+
 // ../grarf/desktop/src/lib/espn/espnGameUrls.ts
 var ESPN_GAME_ID_RE = /^espn-([A-Z0-9]+)-(\d+)$/i;
 var SOCCER_LEAGUE_KEYS3 = /* @__PURE__ */ new Set([
@@ -41433,6 +41494,10 @@ function resolveEspnRecapUrlForGame(game) {
 function resolveEspnGameCenterUrlForGame(game) {
   const womensUclUrl = resolveWomensUclUefaGameCenterUrlFromGame(game);
   if (womensUclUrl) return womensUclUrl;
+  if (leagueUsesFotmobOperationalRouting(game.league)) {
+    const fotmobMatchUrl = resolveFotmobMatchUrlFromGame(game);
+    if (fotmobMatchUrl) return fotmobMatchUrl;
+  }
   const fromMetadata = game.metadata?.espnGameCenterUrl?.trim();
   if (fromMetadata) return fromMetadata;
   const fromGameCard = game.gameCardUrl?.trim();
@@ -44468,11 +44533,28 @@ function mergeSoccerEspnPresentationOntoRow(row, peer) {
   };
   copyEspnTeamAbbrev("away");
   copyEspnTeamAbbrev("home");
-  if (!next.metadata?.espnGameCenterUrl?.trim() && peer.metadata?.espnGameCenterUrl?.trim()) {
-    next.metadata = { ...next.metadata, espnGameCenterUrl: peer.metadata.espnGameCenterUrl };
-  }
-  if (!String(next.gameCardUrl ?? "").trim() && peer.gameCardUrl?.trim()) {
-    next.gameCardUrl = peer.gameCardUrl;
+  const leagueKey = next.league ?? peer.league;
+  const prefersFotmobRouting = leagueUsesFotmobOperationalRouting(leagueKey);
+  if (prefersFotmobRouting) {
+    if (!next.metadata?.fotmobMatchUrl?.trim() && peer.metadata?.fotmobMatchUrl?.trim()) {
+      next.metadata = { ...next.metadata, fotmobMatchUrl: peer.metadata.fotmobMatchUrl };
+    }
+    if (!next.metadata?.fotmobRecapArticleUrl?.trim() && peer.metadata?.fotmobRecapArticleUrl?.trim()) {
+      next.metadata = {
+        ...next.metadata,
+        fotmobRecapArticleUrl: peer.metadata.fotmobRecapArticleUrl
+      };
+    }
+    if (!next.externalIds?.fotmob?.trim() && peer.externalIds?.fotmob?.trim()) {
+      next.externalIds = { ...next.externalIds, fotmob: peer.externalIds.fotmob };
+    }
+  } else {
+    if (!next.metadata?.espnGameCenterUrl?.trim() && peer.metadata?.espnGameCenterUrl?.trim()) {
+      next.metadata = { ...next.metadata, espnGameCenterUrl: peer.metadata.espnGameCenterUrl };
+    }
+    if (!String(next.gameCardUrl ?? "").trim() && peer.gameCardUrl?.trim()) {
+      next.gameCardUrl = peer.gameCardUrl;
+    }
   }
   const espnId = readEspnEventIdFromRow(peer);
   if (espnId) {
@@ -44758,6 +44840,14 @@ function mergeOperationalGameEditorialMetadata(prior, current) {
   const priorPreview = trimOrNull(prior?.catchUpPreviewHeadline);
   const currentPreview = trimOrNull(current?.catchUpPreviewHeadline);
   if (priorPreview && !currentPreview) merged.catchUpPreviewHeadline = priorPreview;
+  const priorFotmobMatch = trimOrNull(prior?.fotmobMatchUrl);
+  const currentFotmobMatch = trimOrNull(current?.fotmobMatchUrl);
+  if (priorFotmobMatch && !currentFotmobMatch) merged.fotmobMatchUrl = priorFotmobMatch;
+  const priorFotmobRecapArticle = trimOrNull(prior?.fotmobRecapArticleUrl);
+  const currentFotmobRecapArticle = trimOrNull(current?.fotmobRecapArticleUrl);
+  if (priorFotmobRecapArticle && !currentFotmobRecapArticle) {
+    merged.fotmobRecapArticleUrl = priorFotmobRecapArticle;
+  }
   return merged;
 }
 function mergeOperationalGameEditorialContent(prior, current) {
@@ -44969,9 +45059,23 @@ function findPriorCanonicalGame(game) {
   if (byId) return byId;
   const grarfId = game.grarfGameId?.trim();
   if (grarfId && grarfId !== game.id) {
-    return useCanonicalLiveGameStore.getState().gamesById[grarfId]?.game;
+    const fromGrarfId = useCanonicalLiveGameStore.getState().gamesById[grarfId]?.game;
+    if (fromGrarfId) return fromGrarfId;
+  }
+  const espnId = readEspnEventIdFromRow2(game);
+  if (!espnId) return void 0;
+  for (const row of Object.values(useCanonicalLiveGameStore.getState().gamesById)) {
+    const candidate = row.game;
+    if (candidate.league !== game.league) continue;
+    if (readEspnEventIdFromRow2(candidate) === espnId) return candidate;
   }
   return void 0;
+}
+function readEspnEventIdFromRow2(row) {
+  const ext = String(row.externalIds?.espn ?? row.espnEventId ?? "").trim();
+  if (ext && /^\d+$/.test(ext)) return ext;
+  const m2 = /^espn-[A-Z0-9]+-(\d+)$/i.exec(String(row.id ?? "").trim());
+  return m2?.[1] ?? null;
 }
 function sanitizeOperationalSnapshotPresentation(transport) {
   const leagues = { ...transport.leagues };
@@ -44993,6 +45097,11 @@ function sanitizeOperationalSnapshotPresentation(transport) {
 }
 async function enrichExtensionCloudOperationalTransport(transport) {
   let next = transport;
+  try {
+    next = await enrichOperationalSnapshotFotmob(next);
+  } catch (e2) {
+    console.warn(`${LOG24} FotMob enrich failed (extension cloud)`, e2);
+  }
   try {
     next = sanitizeOperationalSnapshotIngestLogoUrls(next);
   } catch (e2) {
@@ -175039,6 +175148,19 @@ function isGrarfExtensionCommandCenterCatchUpRecapsRailContext() {
   return false;
 }
 
+// ../grarf/shared/domain/fotmob/resolveFotmobRecapNavigationUrlFromGame.ts
+init_define_import_meta_env();
+function isFotmobNewsArticleUrl(url) {
+  return /^https:\/\/www\.fotmob\.com\/(?:news|topnews)\//i.test(url.trim());
+}
+function resolveFotmobRecapNavigationUrlFromGame(game) {
+  const fromMetadata = game.metadata?.fotmobRecapArticleUrl?.trim();
+  if (fromMetadata && isFotmobNewsArticleUrl(fromMetadata)) return fromMetadata;
+  const recapSource = game.content?.recap?.sourceUrl?.trim();
+  if (recapSource && isFotmobNewsArticleUrl(recapSource)) return recapSource;
+  return resolveFotmobMatchUrlFromGame(game);
+}
+
 // ../grarf/desktop/src/lib/fotmob/resolveFotmobMatchPreviewForGame.ts
 init_define_import_meta_env();
 
@@ -176045,8 +176167,8 @@ function resolveGrarfExtensionCommandCenterScorecardRecapUrl(game) {
   });
   if (recapOverride) return recapOverride;
   const leagueKey = game.league?.trim().toUpperCase() ?? "";
-  if (leagueKey === "CARABAO_CUP") {
-    const fotmobRecapUrl = resolveFotmobMatchUrl(game) ?? game.content?.recap?.sourceUrl?.trim() ?? null;
+  if (leagueUsesFotmobOperationalRouting(leagueKey)) {
+    const fotmobRecapUrl = resolveFotmobRecapNavigationUrlFromGame(game);
     if (fotmobRecapUrl) return fotmobRecapUrl;
   }
   if (isGrarfExtensionNcaafRecapGame(game)) {
@@ -176208,6 +176330,10 @@ function resolveGrarfExtensionCommandCenterScorecardMediaAction(game) {
 function resolveGrarfExtensionCommandCenterScorecardGamecenterUrl(game) {
   const womensUclUrl = resolveWomensUclUefaGameCenterUrlFromGame(game);
   if (womensUclUrl) return womensUclUrl;
+  if (leagueUsesFotmobOperationalRouting(game.league)) {
+    const fotmobGamecenter = resolveFotmobMatchUrl(game);
+    if (fotmobGamecenter) return fotmobGamecenter;
+  }
   if (isGrarfExtensionRenderer()) {
     const mlbGamedayUrl = resolveGrarfExtensionMlbComGamedayUrlForGame(game);
     if (mlbGamedayUrl) return mlbGamedayUrl;
@@ -179094,6 +179220,47 @@ init_define_import_meta_env();
 // ../grarf/desktop/src/extensionHost/grarfExtensionNcaafEspnRecapHeadline.ts
 init_define_import_meta_env();
 
+// ../grarf/shared/domain/espn/resolveEspnRecapPageHeadlineFromHtml.ts
+init_define_import_meta_env();
+function decodeHtmlEntities4(text2) {
+  return text2.replace(/&amp;/g, "&").replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&apos;/g, "'").replace(/&lt;/g, "<").replace(/&gt;/g, ">");
+}
+function cleanEspnTitle(title) {
+  return String(title ?? "").replace(/\s*[-|]\s*ESPN\s*$/i, "").trim();
+}
+function isUsableHeadline(value) {
+  const headline = String(value ?? "").trim();
+  if (!headline) return false;
+  if (/javascript is disabled/i.test(headline)) return false;
+  return headline.length >= 8;
+}
+function resolveEspnRecapPageHeadlineFromHtml(html) {
+  const ogMatch = html.match(
+    /<meta\s+property=["']og:title["']\s+content=["']([^"']+)["']/i
+  );
+  if (ogMatch?.[1] && isUsableHeadline(ogMatch[1])) {
+    return cleanEspnTitle(decodeHtmlEntities4(ogMatch[1]));
+  }
+  const twitterMatch = html.match(
+    /<meta\s+name=["']twitter:title["']\s+content=["']([^"']+)["']/i
+  );
+  if (twitterMatch?.[1] && isUsableHeadline(twitterMatch[1])) {
+    return cleanEspnTitle(decodeHtmlEntities4(twitterMatch[1]));
+  }
+  const jsonLdHeadline = html.match(/"headline"\s*:\s*"([^"\\]+)"/i);
+  if (jsonLdHeadline?.[1] && isUsableHeadline(jsonLdHeadline[1])) {
+    return cleanEspnTitle(decodeHtmlEntities4(jsonLdHeadline[1]));
+  }
+  const h1Match = html.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i);
+  if (h1Match?.[1]) {
+    const stripped = h1Match[1].replace(/<[^>]+>/g, "").trim();
+    if (isUsableHeadline(stripped)) {
+      return cleanEspnTitle(decodeHtmlEntities4(stripped));
+    }
+  }
+  return null;
+}
+
 // ../grarf/shared/domain/cbs/buildCbsNcaafRecapUrl.ts
 init_define_import_meta_env();
 var CBS_NCAAF_RECAP_BASE_URL = "https://www.cbssports.com/college-football/gametracker/recap";
@@ -179127,14 +179294,14 @@ function buildCbsNcaafRecapUrl(game) {
 
 // ../grarf/shared/domain/cbs/resolveCbsSportsNcaafRecapHeadlineFromPageHtml.ts
 init_define_import_meta_env();
-function decodeHtmlEntities4(text2) {
+function decodeHtmlEntities5(text2) {
   return text2.replace(/&amp;/g, "&").replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&apos;/g, "'").replace(/&lt;/g, "<").replace(/&gt;/g, ">");
 }
 function resolveCbsSportsNcaafRecapHeadlineFromPageHtml(html) {
   const match = html.match(/<h1\s+class="article-headline"[^>]*>([\s\S]*?)<\/h1>/i);
   if (!match?.[1]) return null;
   const stripped = match[1].replace(/<[^>]+>/g, "").trim();
-  const headline = decodeHtmlEntities4(stripped).replace(/\s+/g, " ");
+  const headline = decodeHtmlEntities5(stripped).replace(/\s+/g, " ");
   return headline.length >= 12 ? headline : null;
 }
 
@@ -179144,6 +179311,8 @@ var espnHeadlineCache = /* @__PURE__ */ new Map();
 var inflightEspnByEventId = /* @__PURE__ */ new Map();
 var cbsHeadlineCache = /* @__PURE__ */ new Map();
 var inflightCbsByRecapUrl = /* @__PURE__ */ new Map();
+var espnRecapPageHeadlineCache = /* @__PURE__ */ new Map();
+var inflightEspnRecapPageByUrl = /* @__PURE__ */ new Map();
 async function fetchNcaafEspnRecapHeadlineForEventId(eventId) {
   const cached = espnHeadlineCache.get(eventId);
   if (cached && Date.now() - cached.at < RECAP_HEADLINE_CACHE_TTL_MS3) {
@@ -179173,6 +179342,39 @@ async function fetchNcaafEspnRecapHeadlineForEventId(eventId) {
     }
   })();
   inflightEspnByEventId.set(eventId, promise);
+  return promise;
+}
+async function fetchNcaafEspnRecapPageHeadlineForRecapUrl(recapUrl) {
+  const cached = espnRecapPageHeadlineCache.get(recapUrl);
+  if (cached && Date.now() - cached.at < RECAP_HEADLINE_CACHE_TTL_MS3) {
+    return cached.headline;
+  }
+  const inflight = inflightEspnRecapPageByUrl.get(recapUrl);
+  if (inflight) return inflight;
+  const promise = (async () => {
+    try {
+      const res = await fetch(recapUrl, {
+        headers: {
+          Accept: "text/html,application/xhtml+xml",
+          "Accept-Language": "en-US,en;q=0.9"
+        },
+        cache: "no-store",
+        credentials: "omit"
+      });
+      if (!res.ok) return null;
+      const html = await res.text();
+      const headline = resolveEspnRecapPageHeadlineFromHtml(html);
+      if (headline) {
+        espnRecapPageHeadlineCache.set(recapUrl, { at: Date.now(), headline });
+      }
+      return headline;
+    } catch {
+      return null;
+    } finally {
+      inflightEspnRecapPageByUrl.delete(recapUrl);
+    }
+  })();
+  inflightEspnRecapPageByUrl.set(recapUrl, promise);
   return promise;
 }
 async function fetchNcaafCbsRecapHeadlineForRecapUrl(recapUrl) {
@@ -179232,6 +179434,11 @@ async function resolveGrarfExtensionNcaafRecapHeadlineForGame(game) {
   if (eventId) {
     const espnHeadline = await fetchNcaafEspnRecapHeadlineForEventId(eventId);
     if (espnHeadline) return espnHeadline;
+    const espnRecapUrl = resolveEspnNcaafRecapUrlFromGame(game);
+    if (espnRecapUrl) {
+      const fromRecapPage = await fetchNcaafEspnRecapPageHeadlineForRecapUrl(espnRecapUrl);
+      if (fromRecapPage) return fromRecapPage;
+    }
   }
   return fetchNcaafCbsRecapHeadlineForGame(game);
 }
