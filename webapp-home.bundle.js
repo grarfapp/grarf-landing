@@ -41223,6 +41223,115 @@ function tennisGameHasEffectiveGameCardUrl(game) {
   return Boolean(resolveEffectiveTennisGameCardUrl(game));
 }
 
+// ../grarf/shared/domain/soccer/buildWomensUclUefaGameCenterUrl.ts
+init_define_import_meta_env();
+var WOMENS_UCL_UEFA_MATCH_PATH = /\/womenschampionsleague\/match\/(\d+)--([a-z0-9-]+)/i;
+function normalizeUefaSlugToken(value) {
+  return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").replace(/-+/g, "-");
+}
+function uefaTeamSlug(name) {
+  const base = normalizeUefaSlugToken(name);
+  if (base.includes("hacken")) return "hacken";
+  if (base.includes("hb-koge") || base.includes("koge")) return "hb-koge";
+  if (base.includes("austria") && base.includes("wien")) return "austria-wien";
+  if (base.includes("man-city") || base.includes("manchester-city")) return "man-city";
+  if (base === "psg" || base.includes("paris-sg")) return "paris-sg";
+  if (base.includes("barcelona")) return "barcelona";
+  if (base.includes("juventus")) return "juventus";
+  if (base.includes("paris") && base.includes("fc")) return "paris";
+  return base.replace(/\b(bk|fc|sc|cd)-/g, "");
+}
+function buildWomensUclUefaMatchSlugSegment(input) {
+  const awayRaw = input.awayCity?.trim() || input.awayTeam?.trim() || "";
+  const homeRaw = input.homeCity?.trim() || input.homeTeam?.trim() || "";
+  if (!awayRaw || !homeRaw) return null;
+  return `${uefaTeamSlug(awayRaw)}-vs-${uefaTeamSlug(homeRaw)}`;
+}
+function parseWomensUclUefaGameCenterUrl(url) {
+  const trimmed = String(url ?? "").trim();
+  if (!trimmed) return null;
+  const match = WOMENS_UCL_UEFA_MATCH_PATH.exec(trimmed);
+  if (!match) return null;
+  return { matchId: match[1], slug: match[2] };
+}
+function buildWomensUclUefaGameCenterUrl(input) {
+  const matchId = String(input.matchId).trim();
+  const slug = normalizeUefaSlugToken(input.slugSegment);
+  return `https://www.uefa.com/womenschampionsleague/match/${matchId}--${slug}/`;
+}
+function teamBlobMatchesTokens(blob, tokens) {
+  return tokens.every((token) => blob.includes(token));
+}
+var WOMENS_UCL_UEFA_MATCH_ID_BY_TEAMS = [
+  { awayTokens: ["paris"], homeTokens: ["hacken"], matchId: "2050546" },
+  { awayTokens: ["koge"], homeTokens: ["barcelona"], matchId: "2050544" },
+  { awayTokens: ["austria"], homeTokens: ["juventus"], matchId: "2050545" },
+  { awayTokens: ["vienna"], homeTokens: ["juventus"], matchId: "2050545" },
+  { awayTokens: ["juventus"], homeTokens: ["austria"], matchId: "2050545" },
+  { awayTokens: ["juventus"], homeTokens: ["vienna"], matchId: "2050545" },
+  { awayTokens: ["man", "city"], homeTokens: ["psg"], matchId: "2050543" },
+  { awayTokens: ["man", "city"], homeTokens: ["paris", "sg"], matchId: "2050543" }
+];
+var WOMENS_UCL_ESPN_EVENT_TO_UEFA_MATCH_ID = {
+  "401916992": "2050543",
+  "401916993": "2050544",
+  "401916994": "2050546",
+  "401916995": "2050545"
+};
+function resolveWomensUclUefaMatchIdFromEspnEventId(game) {
+  const eventId = String(game.externalIds?.espn ?? game.espnEventId ?? "").trim();
+  if (eventId && WOMENS_UCL_ESPN_EVENT_TO_UEFA_MATCH_ID[eventId]) {
+    return WOMENS_UCL_ESPN_EVENT_TO_UEFA_MATCH_ID[eventId];
+  }
+  const parsed = /^espn-WOMENS_UCL-(\d+)$/i.exec(String(game.id ?? "").trim());
+  if (parsed?.[1] && WOMENS_UCL_ESPN_EVENT_TO_UEFA_MATCH_ID[parsed[1]]) {
+    return WOMENS_UCL_ESPN_EVENT_TO_UEFA_MATCH_ID[parsed[1]];
+  }
+  return null;
+}
+function resolveWomensUclUefaMatchIdFromGameTeams(game) {
+  const blob = [
+    game.awayTeam,
+    game.homeTeam,
+    game.awayCity,
+    game.homeCity,
+    game.awayTeamAbbrev,
+    game.homeTeamAbbrev
+  ].filter(Boolean).join(" ").toLowerCase();
+  for (const row of WOMENS_UCL_UEFA_MATCH_ID_BY_TEAMS) {
+    const awayFirst = teamBlobMatchesTokens(blob, row.awayTokens) && teamBlobMatchesTokens(blob, row.homeTokens);
+    const homeFirst = teamBlobMatchesTokens(blob, row.homeTokens) && teamBlobMatchesTokens(blob, row.awayTokens);
+    if (awayFirst || homeFirst) return row.matchId;
+  }
+  return null;
+}
+function resolveWomensUclUefaGameCenterUrlFromGame(game) {
+  if (game.league !== "WOMENS_UCL" && !game.id.startsWith("espn-WOMENS_UCL-")) {
+    return null;
+  }
+  const candidates = [
+    game.metadata?.espnGameCenterUrl,
+    game.gameCardUrl,
+    game.content?.recap?.sourceUrl
+  ];
+  for (const candidate of candidates) {
+    const parsed = parseWomensUclUefaGameCenterUrl(candidate);
+    if (parsed) {
+      return buildWomensUclUefaGameCenterUrl({
+        matchId: parsed.matchId,
+        slugSegment: parsed.slug
+      });
+    }
+  }
+  const matchId = String(
+    game.metadata?.uefaMatchId ?? resolveWomensUclUefaMatchIdFromEspnEventId(game) ?? resolveWomensUclUefaMatchIdFromGameTeams(game) ?? ""
+  ).trim();
+  if (!matchId) return null;
+  const slug = buildWomensUclUefaMatchSlugSegment(game);
+  if (!slug) return null;
+  return buildWomensUclUefaGameCenterUrl({ matchId, slugSegment: slug });
+}
+
 // ../grarf/desktop/src/lib/espn/espnGameUrls.ts
 var ESPN_GAME_ID_RE = /^espn-([A-Z0-9]+)-(\d+)$/i;
 var SOCCER_LEAGUE_KEYS3 = /* @__PURE__ */ new Set([
@@ -41322,6 +41431,8 @@ function resolveEspnRecapUrlForGame(game) {
   return buildEspnRecapUrl(league2, eventId);
 }
 function resolveEspnGameCenterUrlForGame(game) {
+  const womensUclUrl = resolveWomensUclUefaGameCenterUrlFromGame(game);
+  if (womensUclUrl) return womensUclUrl;
   const fromMetadata = game.metadata?.espnGameCenterUrl?.trim();
   if (fromMetadata) return fromMetadata;
   const fromGameCard = game.gameCardUrl?.trim();
@@ -41360,6 +41471,10 @@ function resolveGameWorkspaceEmbedUrl(game, gameId) {
     }
     if (resolveGolfPollLeagueKeyFromGame(game)) {
       return resolveGolfLeaderboardUrlForGame(game);
+    }
+    if (game.league === "WOMENS_UCL" || game.id.startsWith("espn-WOMENS_UCL-")) {
+      const uefaUrl = resolveWomensUclUefaGameCenterUrlFromGame(game);
+      if (uefaUrl) return uefaUrl;
     }
     const fotmobUrl = isWorldCupGameRow(game) ? resolveWorldCupWorkspaceEmbedUrl(game) : resolveFotmobMatchUrl(game);
     if (fotmobUrl) return fotmobUrl;
@@ -46284,7 +46399,7 @@ async function hydrateOperationalSnapshotFromTransport(rawTransport, hydrate, co
     return;
   }
   let transportForHydrate = rawTransport;
-  if (isGrarfExtensionRenderer() && rawTransport.source === "grarf_operational_service") {
+  if (isGrarfExtensionRenderer() && rawTransport.source === "grarf_operational_service" && !context2.skipClientOperationalEnrich) {
     try {
       transportForHydrate = await enrichOperationalTransport(rawTransport);
     } catch (e2) {
@@ -46739,29 +46854,98 @@ function attachTemporalNavStartupDiagnostic() {
 // ../grarf/desktop/src/extensionHost/kickoffExtensionOperationalSnapshotBootstrap.ts
 init_define_import_meta_env();
 init_isGrarfWebRenderer();
-function kickoffExtensionOperationalCachedSnapshotHydrate() {
-  if (!isGrarfExtensionRenderer()) return;
-  const cached = readExtensionOperationalSnapshotSessionCache();
-  if (!cached) {
-    recordOperationalStartupTrace("extension_session_cache_miss");
-    return;
+
+// ../grarf/desktop/src/extensionHost/fetchBundledExtensionOperationalSnapshot.ts
+init_define_import_meta_env();
+function resolveBundledOperationalSnapshotFetchUrl() {
+  if (typeof chrome !== "undefined" && chrome.runtime?.getURL) {
+    return chrome.runtime.getURL("bundled/operational-snapshot.json");
   }
-  recordOperationalStartupTrace("extension_session_cache_hit", {
-    games: countOperationalGames2(cached.leagues),
-    generatedAt: cached.generatedAt
+  if (typeof window !== "undefined" && window.location?.href) {
+    return new URL("../bundled/operational-snapshot.json", window.location.href).href;
+  }
+  return "/bundled/operational-snapshot.json";
+}
+function countGames3(leagues) {
+  return Object.values(leagues ?? {}).reduce(
+    (total, rows) => total + (Array.isArray(rows) ? rows.length : 0),
+    0
+  );
+}
+var bundledFetch = null;
+function fetchBundledExtensionOperationalSnapshot() {
+  if (!bundledFetch) {
+    bundledFetch = (async () => {
+      try {
+        const res = await fetch(resolveBundledOperationalSnapshotFetchUrl(), {
+          cache: "force-cache"
+        });
+        if (!res.ok) return null;
+        const json = await res.json();
+        if (!json || countGames3(json.leagues) === 0) return null;
+        return {
+          generatedAt: json.generatedAt ?? (/* @__PURE__ */ new Date(0)).toISOString(),
+          source: json.source ?? "grarf_operational_service",
+          leagues: json.leagues ?? {},
+          providerPoll: json.providerPoll,
+          initialIngestComplete: json.initialIngestComplete ?? true
+        };
+      } catch {
+        return null;
+      }
+    })();
+  }
+  return bundledFetch;
+}
+
+// ../grarf/desktop/src/extensionHost/kickoffExtensionOperationalSnapshotBootstrap.ts
+function parseGeneratedAtMs(generatedAt) {
+  const ms2 = Date.parse(String(generatedAt ?? ""));
+  return Number.isFinite(ms2) ? ms2 : 0;
+}
+function pickNewerSnapshot(a2, b2) {
+  if (!a2) return b2;
+  if (!b2) return a2;
+  return parseGeneratedAtMs(b2.generatedAt) > parseGeneratedAtMs(a2.generatedAt) ? b2 : a2;
+}
+function hydrateExtensionStartupSnapshot(transport, traceKey) {
+  recordOperationalStartupTrace(traceKey, {
+    games: countOperationalGames2(transport.leagues),
+    generatedAt: transport.generatedAt
   });
   void hydrateOperationalSnapshotFromTransport(
-    cached,
+    transport,
     useLiveGamesStore.getState().hydrate,
     {
       completeness: {
         source: "grarf_cloud",
-        transportGeneratedAt: cached.generatedAt,
-        providerPoll: cached.providerPoll
+        transportGeneratedAt: transport.generatedAt,
+        providerPoll: transport.providerPoll,
+        initialIngestComplete: transport.initialIngestComplete ?? true
       },
-      startupSeed: true
+      startupSeed: true,
+      skipClientOperationalEnrich: true
     }
   );
+}
+function kickoffExtensionOperationalCachedSnapshotHydrate() {
+  if (!isGrarfExtensionRenderer()) return;
+  const cached = readExtensionOperationalSnapshotSessionCache();
+  if (cached) {
+    hydrateExtensionStartupSnapshot(cached, "extension_session_cache_hit");
+  }
+  void fetchBundledExtensionOperationalSnapshot().then((bundled) => {
+    if (!bundled) {
+      if (!cached) {
+        recordOperationalStartupTrace("extension_startup_snapshot_miss");
+      }
+      return;
+    }
+    const seed = pickNewerSnapshot(cached, bundled);
+    if (!seed) return;
+    if (cached && seed === cached) return;
+    hydrateExtensionStartupSnapshot(seed, "extension_bundled_snapshot_hit");
+  });
 }
 
 // ../grarf/desktop/src/lib/gamesSpine/gamesSpineBootstrap.ts
@@ -117802,94 +117986,6 @@ function leagueWebWorkspaceStatusLabel(slug, nav, overlay) {
   return CATEGORY_LABEL[nav.categoryId];
 }
 
-// ../grarf/shared/domain/soccer/buildWomensUclUefaGameCenterUrl.ts
-init_define_import_meta_env();
-var WOMENS_UCL_UEFA_MATCH_PATH = /\/womenschampionsleague\/match\/(\d+)--([a-z0-9-]+)/i;
-function normalizeUefaSlugToken(value) {
-  return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").replace(/-+/g, "-");
-}
-function uefaTeamSlug(name) {
-  const base = normalizeUefaSlugToken(name);
-  if (base.includes("hacken")) return "hacken";
-  if (base.includes("hb-koge") || base.includes("koge")) return "hb-koge";
-  if (base.includes("austria") && base.includes("wien")) return "austria-wien";
-  if (base.includes("man-city") || base.includes("manchester-city")) return "man-city";
-  if (base === "psg" || base.includes("paris-sg")) return "paris-sg";
-  if (base.includes("barcelona")) return "barcelona";
-  if (base.includes("juventus")) return "juventus";
-  if (base.includes("paris") && base.includes("fc")) return "paris";
-  return base.replace(/\b(bk|fc|sc|cd)-/g, "");
-}
-function buildWomensUclUefaMatchSlugSegment(input) {
-  const awayRaw = input.awayCity?.trim() || input.awayTeam?.trim() || "";
-  const homeRaw = input.homeCity?.trim() || input.homeTeam?.trim() || "";
-  if (!awayRaw || !homeRaw) return null;
-  return `${uefaTeamSlug(awayRaw)}-vs-${uefaTeamSlug(homeRaw)}`;
-}
-function parseWomensUclUefaGameCenterUrl(url) {
-  const trimmed = String(url ?? "").trim();
-  if (!trimmed) return null;
-  const match = WOMENS_UCL_UEFA_MATCH_PATH.exec(trimmed);
-  if (!match) return null;
-  return { matchId: match[1], slug: match[2] };
-}
-function buildWomensUclUefaGameCenterUrl(input) {
-  const matchId = String(input.matchId).trim();
-  const slug = normalizeUefaSlugToken(input.slugSegment);
-  return `https://www.uefa.com/womenschampionsleague/match/${matchId}--${slug}/`;
-}
-function teamBlobMatchesTokens(blob, tokens) {
-  return tokens.every((token) => blob.includes(token));
-}
-var WOMENS_UCL_UEFA_MATCH_ID_BY_TEAMS = [
-  { awayTokens: ["paris"], homeTokens: ["hacken"], matchId: "2050546" },
-  { awayTokens: ["koge"], homeTokens: ["barcelona"], matchId: "2050544" },
-  { awayTokens: ["austria", "wien"], homeTokens: ["juventus"], matchId: "2050545" },
-  { awayTokens: ["man", "city"], homeTokens: ["psg", "paris"], matchId: "2050543" }
-];
-function resolveWomensUclUefaMatchIdFromGameTeams(game) {
-  const blob = [
-    game.awayTeam,
-    game.homeTeam,
-    game.awayCity,
-    game.homeCity,
-    game.awayTeamAbbrev,
-    game.homeTeamAbbrev
-  ].filter(Boolean).join(" ").toLowerCase();
-  for (const row of WOMENS_UCL_UEFA_MATCH_ID_BY_TEAMS) {
-    const awayFirst = teamBlobMatchesTokens(blob, row.awayTokens) && teamBlobMatchesTokens(blob, row.homeTokens);
-    const homeFirst = teamBlobMatchesTokens(blob, row.homeTokens) && teamBlobMatchesTokens(blob, row.awayTokens);
-    if (awayFirst || homeFirst) return row.matchId;
-  }
-  return null;
-}
-function resolveWomensUclUefaGameCenterUrlFromGame(game) {
-  if (game.league !== "WOMENS_UCL" && !game.id.startsWith("espn-WOMENS_UCL-")) {
-    return null;
-  }
-  const candidates = [
-    game.metadata?.espnGameCenterUrl,
-    game.gameCardUrl,
-    game.content?.recap?.sourceUrl
-  ];
-  for (const candidate of candidates) {
-    const parsed = parseWomensUclUefaGameCenterUrl(candidate);
-    if (parsed) {
-      return buildWomensUclUefaGameCenterUrl({
-        matchId: parsed.matchId,
-        slugSegment: parsed.slug
-      });
-    }
-  }
-  const matchId = String(
-    game.metadata?.uefaMatchId ?? resolveWomensUclUefaMatchIdFromGameTeams(game) ?? ""
-  ).trim();
-  if (!matchId) return null;
-  const slug = buildWomensUclUefaMatchSlugSegment(game);
-  if (!slug) return null;
-  return buildWomensUclUefaGameCenterUrl({ matchId, slugSegment: slug });
-}
-
 // ../grarf/desktop/src/lib/gamesSpine/resolveWimbledonWorkspaceEmbedUrl.ts
 init_define_import_meta_env();
 init_isGrarfWebRenderer();
@@ -175948,6 +176044,18 @@ function resolveGrarfExtensionCommandCenterScorecardRecapUrl(game) {
     surface: "extension"
   });
   if (recapOverride) return recapOverride;
+  const leagueKey = game.league?.trim().toUpperCase() ?? "";
+  if (leagueKey === "CARABAO_CUP") {
+    const fotmobRecapUrl = resolveFotmobMatchUrl(game) ?? game.content?.recap?.sourceUrl?.trim() ?? null;
+    if (fotmobRecapUrl) return fotmobRecapUrl;
+  }
+  if (isGrarfExtensionNcaafRecapGame(game)) {
+    const ncaafRecapUrl = resolveGrarfExtensionNcaafRecapNavigationUrl(
+      game,
+      getGrarfExtensionNcaafRecapsSource()
+    );
+    if (ncaafRecapUrl) return ncaafRecapUrl;
+  }
   const espnRecapUrl = resolveEspnRecapUrlForGame(game);
   if (espnRecapUrl) return espnRecapUrl;
   const context2 = resolveGameBrowserContext(game);
@@ -175964,13 +176072,6 @@ function resolveGrarfExtensionCommandCenterScorecardRecapUrl(game) {
       getGrarfExtensionNhlRecapsSource()
     );
     if (nhlRecapUrl) return nhlRecapUrl;
-  }
-  if (isGrarfExtensionNcaafRecapGame(game)) {
-    const ncaafRecapUrl = resolveGrarfExtensionNcaafRecapNavigationUrl(
-      game,
-      getGrarfExtensionNcaafRecapsSource()
-    );
-    if (ncaafRecapUrl) return ncaafRecapUrl;
   }
   if (grarfExtensionLeagueUsesBbcSportEplRecaps(game.league ?? "")) {
     const eplRecapUrl = resolveGrarfExtensionEplRecapNavigationUrl(
@@ -176105,9 +176206,9 @@ function resolveGrarfExtensionCommandCenterScorecardMediaAction(game) {
   };
 }
 function resolveGrarfExtensionCommandCenterScorecardGamecenterUrl(game) {
+  const womensUclUrl = resolveWomensUclUefaGameCenterUrlFromGame(game);
+  if (womensUclUrl) return womensUclUrl;
   if (isGrarfExtensionRenderer()) {
-    const womensUclUrl = resolveWomensUclUefaGameCenterUrlFromGame(game);
-    if (womensUclUrl) return womensUclUrl;
     const mlbGamedayUrl = resolveGrarfExtensionMlbComGamedayUrlForGame(game);
     if (mlbGamedayUrl) return mlbGamedayUrl;
     const mlsMatchUrl = buildGrarfExtensionMlssoccerComMatchUrlFromGame(game);
@@ -178282,6 +178383,12 @@ function resolveGrarfExtensionCatchUpRecapHeadlinePresentation(game, slices) {
   if (overrideHeadline) {
     return { headline: overrideHeadline, showHeadlineUi: true };
   }
+  if (shouldFetchGrarfExtensionCatchUpRecapHeadline(game)) {
+    const centralRecapHeadline = game.metadata?.espnRecapHeadline?.trim() || game.content?.recap?.summary?.trim() || game.content?.recap?.blurb?.trim() || null;
+    if (centralRecapHeadline) {
+      return { headline: centralRecapHeadline, showHeadlineUi: true };
+    }
+  }
   const ordered = [
     { eligible: shouldFetchGrarfExtensionEplBbcRecapHeadline(game), slice: slices.epl },
     { eligible: shouldFetchGrarfExtensionUclBbcRecapHeadline(game), slice: slices.uclBbc },
@@ -178912,6 +179019,11 @@ function ensureGrarfExtensionEspnRecapHeadlineLoaded(game) {
   if (current.status === "loading" || current.status === "ready") return;
   if (current.status === "empty") return;
   if (inflightByGameId5.has(gameId)) return;
+  const snapshotHeadline = game.metadata?.espnRecapHeadline?.trim();
+  if (snapshotHeadline) {
+    setEntry3(gameId, { status: "ready", headline: snapshotHeadline });
+    return;
+  }
   setEntry3(gameId, { status: "loading" });
   inflightByGameId5.add(gameId);
   void resolveGrarfExtensionEspnRecapHeadlineForGame(game).then((headline) => {
@@ -178961,6 +179073,10 @@ function useGrarfExtensionEspnRecapHeadline(game) {
   }, [game, entry4.status, shouldFetch]);
   if (!shouldFetch) {
     return { headline: null, showHeadlineUi: false };
+  }
+  const snapshotHeadline = game.metadata?.espnRecapHeadline?.trim();
+  if (snapshotHeadline) {
+    return { headline: snapshotHeadline, showHeadlineUi: true };
   }
   if (entry4.status === "ready") {
     return { headline: entry4.headline, showHeadlineUi: true };
@@ -200052,12 +200168,12 @@ var GRARF_EXTENSION_TEMPORAL_LEAGUE_HEADER_HEIGHT_VAR = "--grarf-extension-tempo
 var GRARF_EXTENSION_EXPLORER_EXPANDED_LEAGUE_HEADER_TOP_VAR = "--grarf-extension-explorer-expanded-league-header-top";
 var INLINE_NEWS_LEAGUES_BROWSE_BY_SELECTOR = "[data-grarf-extension-news-leagues-browse-by]";
 function syncGrarfExtensionTemporalNavChromeMetrics(scrollRoot) {
-  const chrome = scrollRoot.querySelector("[data-grarf-extension-temporal-nav-chrome]");
+  const chrome2 = scrollRoot.querySelector("[data-grarf-extension-temporal-nav-chrome]");
   let chromeHeightPx = 0;
-  if (!chrome) {
+  if (!chrome2) {
     scrollRoot.style.removeProperty(GRARF_EXTENSION_TEMPORAL_NAV_CHROME_HEIGHT_VAR);
   } else {
-    chromeHeightPx = chrome.offsetHeight;
+    chromeHeightPx = chrome2.offsetHeight;
     scrollRoot.style.setProperty(
       GRARF_EXTENSION_TEMPORAL_NAV_CHROME_HEIGHT_VAR,
       `${chromeHeightPx}px`
@@ -200067,7 +200183,7 @@ function syncGrarfExtensionTemporalNavChromeMetrics(scrollRoot) {
   for (const browseBy of scrollRoot.querySelectorAll(
     INLINE_NEWS_LEAGUES_BROWSE_BY_SELECTOR
   )) {
-    if (chrome?.contains(browseBy)) continue;
+    if (chrome2?.contains(browseBy)) continue;
     leagueHeaderTopPx += browseBy.offsetHeight;
     break;
   }
@@ -202401,9 +202517,6 @@ function GrarfExtensionHomePartTwoGameCards({
   scopeEntity = null
 }) {
   const editorialBundle = useEditorialStore((state3) => state3.bundle);
-  const operationalIngestComplete = useGamesSpineRenderStore(
-    (state3) => state3.operationalIngestComplete
-  );
   const operationalGameCount = useLiveGamesStore(
     (state3) => countOperationalGames2(state3.leagues)
   );
@@ -202425,7 +202538,7 @@ function GrarfExtensionHomePartTwoGameCards({
   if (scopeEntity && featuredGames.length === 0) {
     return null;
   }
-  const showTodayFeaturedLoading = dayFilter === "today" && !scopeEntity && featuredGames.length === 0 && (!operationalIngestComplete || operationalGameCount === 0);
+  const showTodayFeaturedLoading = dayFilter === "today" && !scopeEntity && featuredGames.length === 0 && operationalGameCount === 0;
   return /* @__PURE__ */ (0, import_jsx_runtime304.jsxs)(
     "li",
     {
