@@ -35506,7 +35506,7 @@ function hasBroadcastLabels(game) {
   const broadcasts = game.broadcasts ?? [];
   return channels.some((label) => String(label ?? "").trim()) || broadcasts.some((label) => String(label ?? "").trim());
 }
-var ALLSPORTSAPI_ESPN_SUPPLEMENT_LEAGUES = /* @__PURE__ */ new Set(["NBA", "NHL", "WNBA"]);
+var ALLSPORTSAPI_ESPN_SUPPLEMENT_LEAGUES = /* @__PURE__ */ new Set(["NBA", "NHL", "WNBA", "NFL"]);
 function mergeEspnBroadcastSupplementOntoAllSportsApiTeamSportGame(game, espnPeer) {
   const league2 = String(game.league ?? "").trim().toUpperCase();
   if (!ALLSPORTSAPI_ESPN_SUPPLEMENT_LEAGUES.has(league2)) return game;
@@ -35551,7 +35551,7 @@ function mergeEspnBroadcastSupplementOntoAllSportsApiTeamSportGame(game, espnPee
       next.statusLine = mergedStatusLine;
     }
     const espnClock = String(espnPeer.displayClock ?? "").trim();
-    if (espnClock && !String(game.displayClock ?? "").trim()) {
+    if (espnClock) {
       next.displayClock = espnClock;
     }
   }

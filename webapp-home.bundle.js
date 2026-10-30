@@ -43884,7 +43884,7 @@ function hasBroadcastLabels(game) {
   const broadcasts = game.broadcasts ?? [];
   return channels.some((label) => String(label ?? "").trim()) || broadcasts.some((label) => String(label ?? "").trim());
 }
-var ALLSPORTSAPI_ESPN_SUPPLEMENT_LEAGUES = /* @__PURE__ */ new Set(["NBA", "NHL", "WNBA"]);
+var ALLSPORTSAPI_ESPN_SUPPLEMENT_LEAGUES = /* @__PURE__ */ new Set(["NBA", "NHL", "WNBA", "NFL"]);
 function mergeEspnBroadcastSupplementOntoAllSportsApiTeamSportGame(game, espnPeer) {
   const league2 = String(game.league ?? "").trim().toUpperCase();
   if (!ALLSPORTSAPI_ESPN_SUPPLEMENT_LEAGUES.has(league2)) return game;
@@ -43929,7 +43929,7 @@ function mergeEspnBroadcastSupplementOntoAllSportsApiTeamSportGame(game, espnPee
       next.statusLine = mergedStatusLine;
     }
     const espnClock = String(espnPeer.displayClock ?? "").trim();
-    if (espnClock && !String(game.displayClock ?? "").trim()) {
+    if (espnClock) {
       next.displayClock = espnClock;
     }
   }
@@ -72755,8 +72755,9 @@ var NBA = {
   // Nets    — black wordmark
   mem: darkCdn("nba", "mem"),
   // Grizzlies — dark navy
-  nop: darkCdn("nba", "nop")
-  // Pelicans  — navy mark
+  nop: darkCdn("nba", "no"),
+  // Pelicans  — CDN slug `no`
+  no: darkCdn("nba", "no")
 };
 var NHL = {
   pit: darkCdn("nhl", "pit"),
@@ -72767,8 +72768,8 @@ var NHL = {
   // Ducks    — black/orange
 };
 var WNBA = {
-  gs: darkCdn("wnba", "gsv"),
-  gsv: darkCdn("wnba", "gsv")
+  gs: "https://a.espncdn.com/i/teamlogos/wnba/500/gsv.png",
+  gsv: "https://a.espncdn.com/i/teamlogos/wnba/500/gsv.png"
 };
 var OVERRIDES = { MLB, NBA, NHL, WNBA };
 function getDarkThemeLogoUrl(league2, abbrev) {
@@ -72921,6 +72922,22 @@ function resolveGrarfLogoSrc(logoUrl) {
   if (/^(https?:|data:)/i.test(trimmed)) return trimmed;
   return publicAssetUrl(trimmed);
 }
+var HARDCODED_TEAM_LOGO_BY_LEAGUE_ABBREV = {
+  WNBA: {
+    gs: "https://a.espncdn.com/i/teamlogos/wnba/500/gsv.png",
+    gsv: "https://a.espncdn.com/i/teamlogos/wnba/500/gsv.png"
+  },
+  NBA: {
+    nop: "https://a.espncdn.com/i/teamlogos/nba/500/scoreboard/no.png",
+    no: "https://a.espncdn.com/i/teamlogos/nba/500/scoreboard/no.png"
+  }
+};
+function resolveHardcodedTeamLogoUrl(league2, abbrev) {
+  if (!league2 || !abbrev?.trim()) return void 0;
+  const map = HARDCODED_TEAM_LOGO_BY_LEAGUE_ABBREV[league2];
+  const url = map?.[abbrev.trim().toLowerCase()];
+  return url ? resolveGrarfLogoSrc(url) : void 0;
+}
 function resolveGamesSpineStoredImageUrl(imageUrl) {
   const trimmed = imageUrl?.trim();
   if (!trimmed) return void 0;
@@ -73009,6 +73026,8 @@ function resolveDarkThemeLogoUrl(game, side) {
   if (participantImage) return participantImage;
   const abbrev = side === "away" ? game.awayTeamAbbrev : game.homeTeamAbbrev;
   const league2 = game.league ?? (game.id.startsWith("espn-") ? parseLeagueFromEspnId(game.id) : void 0);
+  const hardcoded = resolveHardcodedTeamLogoUrl(league2, abbrev);
+  if (hardcoded) return hardcoded;
   const override = getDarkThemeLogoUrl(league2, abbrev);
   if (override) return override;
   return resolveTeamLogoUrl(game, side);
@@ -73025,6 +73044,8 @@ function resolveTeamLogoUrl(game, side) {
   if (participantImage) return participantImage;
   const abbrev = side === "away" ? game.awayTeamAbbrev : game.homeTeamAbbrev;
   const league2 = game.league ?? (game.id.startsWith("espn-") ? parseLeagueFromEspnId(game.id) : void 0);
+  const hardcoded = resolveHardcodedTeamLogoUrl(league2, abbrev);
+  if (hardcoded) return hardcoded;
   if (league2 === "WNBA" && isWnbaBundledTeamLogoAbbrev(abbrev)) {
     return resolveGrarfLogoSrc(buildWnbaEspnLogoUrl(abbrev));
   }
