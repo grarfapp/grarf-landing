@@ -36202,6 +36202,110 @@ function sanitizeOperationalSnapshotIngestLogoUrls(transport) {
   return changed ? { ...transport, leagues } : transport;
 }
 
+// ../grarf/shared/domain/operational/sanitizeOperationalGamePresentationFields.ts
+init_define_import_meta_env();
+var TEAM_SPORT_CLOCK_LEAGUES = new Set(
+  listAllSportsApiTeamSportLivePresentationLeagueKeys()
+);
+function isStaleEspnSoccerMinuteLabel(line, cardStatus) {
+  const trimmed = String(line ?? "").trim();
+  if (!trimmed) return false;
+  if (trimmed === "0'") return true;
+  if (cardStatus === "scheduled" && /^\d+(\+\d+)?'$/.test(trimmed)) return true;
+  if (cardStatus === "final" && /^\d+(\+\d+)?'$/.test(trimmed)) return true;
+  return false;
+}
+function sanitizeOperationalGamePresentationFields(game) {
+  const status = game.status ?? "scheduled";
+  let next = { ...game };
+  if (status === "final") {
+    if (next.displayClock != null) {
+      next = { ...next, displayClock: void 0 };
+    }
+    const line = String(next.statusLine ?? "").trim();
+    if (isStaleEspnSoccerMinuteLabel(line, status)) {
+      next = { ...next, statusLine: /^ft/i.test(line) ? line : "FT" };
+    } else if (!line || isStaleEspnSoccerMinuteLabel(line, status)) {
+      next = { ...next, statusLine: line || "FT" };
+    }
+    return next;
+  }
+  if (status === "scheduled" || status === "postponed") {
+    if (isStaleEspnSoccerMinuteLabel(next.displayClock, status)) {
+      next = { ...next, displayClock: void 0 };
+    }
+    if (isStaleEspnSoccerMinuteLabel(next.statusLine, status)) {
+      next = { ...next, statusLine: "" };
+    }
+    return next;
+  }
+  if (status === "live" && next.league && TEAM_SPORT_CLOCK_LEAGUES.has(next.league)) {
+    const formatted = formatLiveTeamSportPeriodClockLabel({
+      league: next.league,
+      statusLine: next.statusLine,
+      displayClock: next.displayClock,
+      period: next.period
+    });
+    if (formatted) {
+      next = { ...next, statusLine: formatted };
+    }
+  }
+  return next;
+}
+
+// ../grarf/shared/domain/operational/mergeOperationalGameEditorialFields.ts
+init_define_import_meta_env();
+function trimOrNull(value) {
+  const trimmed = String(value ?? "").trim();
+  return trimmed.length > 0 ? trimmed : null;
+}
+function mergeOperationalGameEditorialMetadata(prior, current) {
+  if (!prior && !current) return void 0;
+  const merged = { ...prior ?? {}, ...current ?? {} };
+  const priorRecap = trimOrNull(prior?.espnRecapHeadline);
+  const currentRecap = trimOrNull(current?.espnRecapHeadline);
+  if (priorRecap && !currentRecap) merged.espnRecapHeadline = priorRecap;
+  const priorPreview = trimOrNull(prior?.catchUpPreviewHeadline);
+  const currentPreview = trimOrNull(current?.catchUpPreviewHeadline);
+  if (priorPreview && !currentPreview) merged.catchUpPreviewHeadline = priorPreview;
+  return merged;
+}
+function mergeOperationalGameEditorialContent(prior, current) {
+  if (!prior && !current) return void 0;
+  const merged = {
+    ...prior ?? {},
+    ...current ?? {},
+    stories: current?.stories ?? prior?.stories ?? [],
+    clips: current?.clips ?? prior?.clips ?? [],
+    highlights: current?.highlights ?? prior?.highlights ?? [],
+    social: current?.social ?? prior?.social ?? [],
+    watchLinks: (current?.watchLinks?.length ?? 0) > 0 ? current.watchLinks : prior?.watchLinks ?? current?.watchLinks ?? []
+  };
+  const priorRecap = prior?.recap;
+  const currentRecap = current?.recap;
+  if (priorRecap && !currentRecap) {
+    merged.recap = priorRecap;
+  } else if (priorRecap && currentRecap) {
+    merged.recap = {
+      ...priorRecap,
+      ...currentRecap,
+      summary: trimOrNull(currentRecap.summary) ?? priorRecap.summary,
+      blurb: trimOrNull(currentRecap.blurb) ?? priorRecap.blurb,
+      sourceUrl: trimOrNull(currentRecap.sourceUrl) ?? priorRecap.sourceUrl
+    };
+  }
+  return merged;
+}
+function preserveOperationalGameEditorialFields(game, prior) {
+  const metadata = mergeOperationalGameEditorialMetadata(prior.metadata, game.metadata);
+  const content = mergeOperationalGameEditorialContent(prior.content, game.content);
+  return {
+    ...game,
+    ...metadata ? { metadata } : {},
+    ...content ? { content } : {}
+  };
+}
+
 // ../grarf/desktop/src/services/operationalIngest/polishOperationalSnapshotLiveTeamSportPresentation.ts
 init_define_import_meta_env();
 var LIVE_TEAM_SPORT_LEAGUES = new Set(
@@ -36370,12 +36474,44 @@ async function enrichCloudOperationalTransport(transport) {
   }
   return next;
 }
+function findPriorCanonicalGame(game) {
+  const byId = useCanonicalLiveGameStore.getState().gamesById[game.id]?.game;
+  if (byId) return byId;
+  const grarfId = game.grarfGameId?.trim();
+  if (grarfId && grarfId !== game.id) {
+    return useCanonicalLiveGameStore.getState().gamesById[grarfId]?.game;
+  }
+  return void 0;
+}
+function sanitizeOperationalSnapshotPresentation(transport) {
+  const leagues = { ...transport.leagues };
+  let changed = false;
+  for (const [key, rows] of Object.entries(leagues)) {
+    if (!Array.isArray(rows) || rows.length === 0) continue;
+    const next = rows.map((row) => {
+      const game = row;
+      const prior = findPriorCanonicalGame(game);
+      const withPrior = prior ? preserveOperationalGameEditorialFields(game, prior) : game;
+      return sanitizeOperationalGamePresentationFields(withPrior);
+    });
+    if (next.some((row, index) => row !== rows[index])) {
+      leagues[key] = next;
+      changed = true;
+    }
+  }
+  return changed ? { ...transport, leagues } : transport;
+}
 async function enrichExtensionCloudOperationalTransport(transport) {
   let next = transport;
   try {
     next = sanitizeOperationalSnapshotIngestLogoUrls(next);
   } catch (e) {
     console.warn(`${LOG21} ingest logo sanitize failed`, e);
+  }
+  try {
+    next = sanitizeOperationalSnapshotPresentation(next);
+  } catch (e) {
+    console.warn(`${LOG21} presentation sanitize failed`, e);
   }
   try {
     next = polishOperationalSnapshotLiveTeamSportPresentation(next);
