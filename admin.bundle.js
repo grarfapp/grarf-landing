@@ -17018,6 +17018,130 @@ init_define_import_meta_env();
 // ../grarf/shared/domain/operational/reconcileOperationalGamesByEspnEventId.ts
 init_define_import_meta_env();
 
+// ../grarf/shared/domain/fotmob/leagueUsesFotmobOperationalRouting.ts
+init_define_import_meta_env();
+var FOTMOB_OPERATIONAL_ROUTING_LEAGUE_KEYS = /* @__PURE__ */ new Set([
+  "ARG1",
+  "BEL1",
+  "BRA1",
+  "BUNDESLIGA",
+  "CARABAO_CUP",
+  "CHAMPIONSHIP",
+  "CLUBWC",
+  "CLUBFRIENDLY",
+  "CONCACAF_CAC",
+  "CONCACAF_CL",
+  "CONCACAF_NG",
+  "CONCACAF_WC",
+  "COPA",
+  "EPL",
+  "EREDIVISIE",
+  "EURO",
+  "GOLDCUP",
+  "INTFRIENDLY",
+  "LALIGA",
+  "LIBERTADORES",
+  "LIGAMX",
+  "LIGUE1",
+  "MLS",
+  "NATIONS",
+  "NWSL",
+  "POR1",
+  "SAUDI",
+  "SERIEA",
+  "SPFL",
+  "SUDAMERICANA",
+  "SUPERLIG",
+  "UCL",
+  "UECL",
+  "UEL",
+  "USL1",
+  "USLC",
+  "USLCUP",
+  "UWCQ",
+  "WORLDCUP",
+  "WWC"
+]);
+function leagueUsesFotmobOperationalRouting(leagueKey) {
+  if (!leagueKey) return false;
+  return FOTMOB_OPERATIONAL_ROUTING_LEAGUE_KEYS.has(leagueKey);
+}
+
+// ../grarf/shared/domain/fotmob/resolveFotmobMatchUrlFromGame.ts
+init_define_import_meta_env();
+function buildFotmobMatchUrlFromId(matchId) {
+  const id = String(matchId).trim();
+  return `https://www.fotmob.com/match/${encodeURIComponent(id)}`;
+}
+function resolveFotmobMatchUrlFromGame(game) {
+  const fromMetadata = game.metadata?.fotmobMatchUrl?.trim();
+  if (fromMetadata) return fromMetadata;
+  const fotmobId = game.externalIds?.fotmob?.trim();
+  if (fotmobId) return buildFotmobMatchUrlFromId(fotmobId);
+  return null;
+}
+
+// ../grarf/shared/domain/operational/mergeOperationalGameEditorialFields.ts
+init_define_import_meta_env();
+function trimOrNull(value) {
+  const trimmed = String(value ?? "").trim();
+  return trimmed.length > 0 ? trimmed : null;
+}
+function mergeOperationalGameEditorialMetadata(prior, current) {
+  if (!prior && !current) return void 0;
+  const merged = { ...prior ?? {}, ...current ?? {} };
+  const priorRecap = trimOrNull(prior?.espnRecapHeadline);
+  const currentRecap = trimOrNull(current?.espnRecapHeadline);
+  if (priorRecap && !currentRecap) merged.espnRecapHeadline = priorRecap;
+  const priorPreview = trimOrNull(prior?.catchUpPreviewHeadline);
+  const currentPreview = trimOrNull(current?.catchUpPreviewHeadline);
+  if (priorPreview && !currentPreview) merged.catchUpPreviewHeadline = priorPreview;
+  const priorFotmobMatch = trimOrNull(prior?.fotmobMatchUrl);
+  const currentFotmobMatch = trimOrNull(current?.fotmobMatchUrl);
+  if (priorFotmobMatch && !currentFotmobMatch) merged.fotmobMatchUrl = priorFotmobMatch;
+  const priorFotmobRecapArticle = trimOrNull(prior?.fotmobRecapArticleUrl);
+  const currentFotmobRecapArticle = trimOrNull(current?.fotmobRecapArticleUrl);
+  if (priorFotmobRecapArticle && !currentFotmobRecapArticle) {
+    merged.fotmobRecapArticleUrl = priorFotmobRecapArticle;
+  }
+  return merged;
+}
+function mergeOperationalGameEditorialContent(prior, current) {
+  if (!prior && !current) return void 0;
+  const merged = {
+    ...prior ?? {},
+    ...current ?? {},
+    stories: current?.stories ?? prior?.stories ?? [],
+    clips: current?.clips ?? prior?.clips ?? [],
+    highlights: current?.highlights ?? prior?.highlights ?? [],
+    social: current?.social ?? prior?.social ?? [],
+    watchLinks: (current?.watchLinks?.length ?? 0) > 0 ? current.watchLinks : prior?.watchLinks ?? current?.watchLinks ?? []
+  };
+  const priorRecap = prior?.recap;
+  const currentRecap = current?.recap;
+  if (priorRecap && !currentRecap) {
+    merged.recap = priorRecap;
+  } else if (priorRecap && currentRecap) {
+    merged.recap = {
+      ...priorRecap,
+      ...currentRecap,
+      summary: trimOrNull(currentRecap.summary) ?? priorRecap.summary,
+      blurb: trimOrNull(currentRecap.blurb) ?? priorRecap.blurb,
+      sourceUrl: trimOrNull(currentRecap.sourceUrl) ?? priorRecap.sourceUrl
+    };
+  }
+  return merged;
+}
+function preserveOperationalGameEditorialFields(game, prior) {
+  const metadata = mergeOperationalGameEditorialMetadata(prior.metadata, game.metadata);
+  const content = mergeOperationalGameEditorialContent(prior.content, game.content);
+  return {
+    ...game,
+    ...metadata ? { metadata } : {},
+    ...content ? { content } : {}
+  };
+}
+
 // ../grarf/shared/domain/operational/operationalLeagueIdentity.js
 init_define_import_meta_env();
 var TOURNAMENT_AUTHORITATIVE_LEAGUES = /* @__PURE__ */ new Set([
@@ -17150,11 +17274,44 @@ function preferFresherOperationalStatusRow(current, candidate) {
 }
 function mergeOperationalIdentityMetadata(identityRow, statusRow) {
   const identityOperational = identityRow.metadata?.operational;
-  if (!identityOperational) return statusRow.metadata ?? identityRow.metadata;
+  const mergedOnce = mergeOperationalGameEditorialMetadata(
+    identityRow.metadata,
+    statusRow.metadata
+  );
+  const mergedTwice = mergeOperationalGameEditorialMetadata(
+    statusRow.metadata,
+    mergedOnce
+  );
+  const base = mergedTwice ?? mergedOnce ?? statusRow.metadata ?? identityRow.metadata;
+  if (!identityOperational) return base;
   return {
-    ...statusRow.metadata ?? identityRow.metadata ?? {},
+    ...base ?? {},
     operational: identityOperational
   };
+}
+function mergeReconciledExternalIds(identityRow, statusRow) {
+  if (!identityRow.externalIds && !statusRow.externalIds) return void 0;
+  return {
+    ...identityRow.externalIds ?? {},
+    ...statusRow.externalIds ?? {}
+  };
+}
+function resolveReconciledGameCardUrl(identityRow, statusRow, mergedMetadata, mergedExternalIds) {
+  const leagueKey = identityRow.league ?? statusRow.league;
+  const candidate = {
+    league: leagueKey,
+    metadata: mergedMetadata,
+    externalIds: mergedExternalIds
+  };
+  if (leagueUsesFotmobOperationalRouting(leagueKey) && resolveFotmobMatchUrlFromGame(candidate)) {
+    for (const url of [statusRow.gameCardUrl, identityRow.gameCardUrl]) {
+      const trimmed = String(url ?? "").trim();
+      if (trimmed && /espn\.com/i.test(trimmed)) {
+        return void 0;
+      }
+    }
+  }
+  return statusRow.gameCardUrl ?? identityRow.gameCardUrl;
 }
 function resolveOperationalStatusRow(current, candidate, identityRow) {
   const identityLeague = identityRow.league ?? null;
@@ -17180,10 +17337,20 @@ function preferAuthoritativeOperationalGameRow(current, candidate) {
   }
   const statusRow = resolveOperationalStatusRow(current, candidate, identityRow);
   const eventId = readEspnCompetitionEventId(identityRow);
+  const metadata = mergeOperationalIdentityMetadata(identityRow, statusRow);
+  const externalIds = mergeReconciledExternalIds(identityRow, statusRow);
+  const gameCardUrl = resolveReconciledGameCardUrl(
+    identityRow,
+    statusRow,
+    metadata,
+    externalIds
+  );
   const merged = {
     ...statusRow,
     league: identityRow.league ?? statusRow.league,
-    metadata: mergeOperationalIdentityMetadata(identityRow, statusRow)
+    metadata,
+    externalIds,
+    gameCardUrl
   };
   return eventId ? normalizeReconciledOperationalGameRow(merged, eventId) : merged;
 }
@@ -19182,9 +19349,6 @@ init_define_import_meta_env();
 // ../grarf/desktop/src/lib/fotmob/buildFotmobMatchUrl.ts
 init_define_import_meta_env();
 
-// ../grarf/shared/domain/fotmob/resolveFotmobMatchUrlFromGame.ts
-init_define_import_meta_env();
-
 // ../grarf/desktop/src/lib/foxWorldCup/teamSlugUtils.ts
 init_define_import_meta_env();
 
@@ -19742,55 +19906,6 @@ function resolveGolfWatchStreamUrl(leagueKey, tournamentTitle) {
 
 // ../grarf/shared/domain/soccer/buildWomensUclUefaGameCenterUrl.ts
 init_define_import_meta_env();
-
-// ../grarf/shared/domain/fotmob/leagueUsesFotmobOperationalRouting.ts
-init_define_import_meta_env();
-var FOTMOB_OPERATIONAL_ROUTING_LEAGUE_KEYS = /* @__PURE__ */ new Set([
-  "ARG1",
-  "BEL1",
-  "BRA1",
-  "BUNDESLIGA",
-  "CARABAO_CUP",
-  "CHAMPIONSHIP",
-  "CLUBWC",
-  "CLUBFRIENDLY",
-  "CONCACAF_CAC",
-  "CONCACAF_CL",
-  "CONCACAF_NG",
-  "CONCACAF_WC",
-  "COPA",
-  "EPL",
-  "EREDIVISIE",
-  "EURO",
-  "GOLDCUP",
-  "INTFRIENDLY",
-  "LALIGA",
-  "LIBERTADORES",
-  "LIGAMX",
-  "LIGUE1",
-  "MLS",
-  "NATIONS",
-  "NWSL",
-  "POR1",
-  "SAUDI",
-  "SERIEA",
-  "SPFL",
-  "SUDAMERICANA",
-  "SUPERLIG",
-  "UCL",
-  "UECL",
-  "UEL",
-  "USL1",
-  "USLC",
-  "USLCUP",
-  "UWCQ",
-  "WORLDCUP",
-  "WWC"
-]);
-function leagueUsesFotmobOperationalRouting(leagueKey) {
-  if (!leagueKey) return false;
-  return FOTMOB_OPERATIONAL_ROUTING_LEAGUE_KEYS.has(leagueKey);
-}
 
 // ../grarf/desktop/src/lib/espn/espnGameUrls.ts
 var ESPN_GAME_ID_RE = /^espn-([A-Z0-9]+)-(\d+)$/i;
@@ -36323,67 +36438,6 @@ function sanitizeOperationalGamePresentationFields(game) {
     }
   }
   return next;
-}
-
-// ../grarf/shared/domain/operational/mergeOperationalGameEditorialFields.ts
-init_define_import_meta_env();
-function trimOrNull(value) {
-  const trimmed = String(value ?? "").trim();
-  return trimmed.length > 0 ? trimmed : null;
-}
-function mergeOperationalGameEditorialMetadata(prior, current) {
-  if (!prior && !current) return void 0;
-  const merged = { ...prior ?? {}, ...current ?? {} };
-  const priorRecap = trimOrNull(prior?.espnRecapHeadline);
-  const currentRecap = trimOrNull(current?.espnRecapHeadline);
-  if (priorRecap && !currentRecap) merged.espnRecapHeadline = priorRecap;
-  const priorPreview = trimOrNull(prior?.catchUpPreviewHeadline);
-  const currentPreview = trimOrNull(current?.catchUpPreviewHeadline);
-  if (priorPreview && !currentPreview) merged.catchUpPreviewHeadline = priorPreview;
-  const priorFotmobMatch = trimOrNull(prior?.fotmobMatchUrl);
-  const currentFotmobMatch = trimOrNull(current?.fotmobMatchUrl);
-  if (priorFotmobMatch && !currentFotmobMatch) merged.fotmobMatchUrl = priorFotmobMatch;
-  const priorFotmobRecapArticle = trimOrNull(prior?.fotmobRecapArticleUrl);
-  const currentFotmobRecapArticle = trimOrNull(current?.fotmobRecapArticleUrl);
-  if (priorFotmobRecapArticle && !currentFotmobRecapArticle) {
-    merged.fotmobRecapArticleUrl = priorFotmobRecapArticle;
-  }
-  return merged;
-}
-function mergeOperationalGameEditorialContent(prior, current) {
-  if (!prior && !current) return void 0;
-  const merged = {
-    ...prior ?? {},
-    ...current ?? {},
-    stories: current?.stories ?? prior?.stories ?? [],
-    clips: current?.clips ?? prior?.clips ?? [],
-    highlights: current?.highlights ?? prior?.highlights ?? [],
-    social: current?.social ?? prior?.social ?? [],
-    watchLinks: (current?.watchLinks?.length ?? 0) > 0 ? current.watchLinks : prior?.watchLinks ?? current?.watchLinks ?? []
-  };
-  const priorRecap = prior?.recap;
-  const currentRecap = current?.recap;
-  if (priorRecap && !currentRecap) {
-    merged.recap = priorRecap;
-  } else if (priorRecap && currentRecap) {
-    merged.recap = {
-      ...priorRecap,
-      ...currentRecap,
-      summary: trimOrNull(currentRecap.summary) ?? priorRecap.summary,
-      blurb: trimOrNull(currentRecap.blurb) ?? priorRecap.blurb,
-      sourceUrl: trimOrNull(currentRecap.sourceUrl) ?? priorRecap.sourceUrl
-    };
-  }
-  return merged;
-}
-function preserveOperationalGameEditorialFields(game, prior) {
-  const metadata = mergeOperationalGameEditorialMetadata(prior.metadata, game.metadata);
-  const content = mergeOperationalGameEditorialContent(prior.content, game.content);
-  return {
-    ...game,
-    ...metadata ? { metadata } : {},
-    ...content ? { content } : {}
-  };
 }
 
 // ../grarf/desktop/src/services/operationalIngest/polishOperationalSnapshotLiveTeamSportPresentation.ts
