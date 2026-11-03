@@ -35887,6 +35887,31 @@ function mergeEspnBroadcastSupplementOntoAllSportsApiTeamSportGame(game, espnPee
   return next;
 }
 
+// ../grarf/shared/domain/nba/copyMissingTeamSportRecordsFromEspnPeer.ts
+init_define_import_meta_env();
+function isBlankOperationalTeamRecord(value) {
+  const trimmed = String(value ?? "").trim();
+  return trimmed.length === 0 || trimmed === "\u2014" || trimmed === "\u2013" || trimmed === "-";
+}
+function copyMissingTeamSportRecordsFromEspnPeer(game, peer) {
+  const next = { ...game };
+  if (isBlankOperationalTeamRecord(next.awayRecord)) {
+    const away = String(peer.awayRecord ?? "").trim();
+    if (!isBlankOperationalTeamRecord(away)) next.awayRecord = away;
+  }
+  if (isBlankOperationalTeamRecord(next.homeRecord)) {
+    const home = String(peer.homeRecord ?? "").trim();
+    if (!isBlankOperationalTeamRecord(home)) next.homeRecord = home;
+  }
+  if (!String(next.awayStandingsLine ?? "").trim() && String(peer.awayStandingsLine ?? "").trim()) {
+    next.awayStandingsLine = peer.awayStandingsLine.trim();
+  }
+  if (!String(next.homeStandingsLine ?? "").trim() && String(peer.homeStandingsLine ?? "").trim()) {
+    next.homeStandingsLine = peer.homeStandingsLine.trim();
+  }
+  return next;
+}
+
 // ../grarf/shared/domain/nba/matchOperationalNbaGameRowByTeamsAndStartTime.ts
 init_define_import_meta_env();
 var TIME_WINDOW_MS4 = 3 * 60 * 60 * 1e3;
@@ -36232,7 +36257,10 @@ async function enrichLeagueRowsFromEspnScoreboard(leagueKey, rows) {
       }
       const peer = matchTeamSportEspnPeer(row, espnRows, leagueKey);
       if (!peer) return row;
-      return mergeEspnBroadcastSupplementOntoAllSportsApiTeamSportGame(row, peer);
+      return copyMissingTeamSportRecordsFromEspnPeer(
+        mergeEspnBroadcastSupplementOntoAllSportsApiTeamSportGame(row, peer),
+        peer
+      );
     }
     if (assignment?.sport === "football") {
       const byId = readEspnEventIdFromRow(row);
@@ -36669,6 +36697,11 @@ function sanitizeOperationalSnapshotPresentation(transport) {
 }
 async function enrichExtensionCloudOperationalTransport(transport) {
   let next = transport;
+  try {
+    next = await supplementOperationalSnapshotAllSportsApiEspnEnrichment(next);
+  } catch (e) {
+    console.warn(`${LOG21} AllSportsAPI ESPN enrichment supplement failed (extension cloud)`, e);
+  }
   try {
     next = await enrichOperationalSnapshotFotmob(next);
   } catch (e) {
