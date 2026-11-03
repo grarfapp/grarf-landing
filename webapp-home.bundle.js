@@ -202418,6 +202418,35 @@ var homeCommandCenterDailyPriorities_default = {
           line: "NHL - Devils vs Golden Knights"
         }
       ]
+    },
+    "2026-11-03": {
+      updatedAt: "2026-11-03T16:20:17.206Z",
+      entries: [
+        {
+          kind: "matchup",
+          leagueLabel: "UEFA Champions League",
+          leagueKey: "UCL",
+          awayTeamLabel: "Barcelona",
+          homeTeamLabel: "Aston Villa",
+          line: "UEFA Champions League - Barcelona vs Aston Villa"
+        },
+        {
+          kind: "matchup",
+          leagueLabel: "UEFA Champions League",
+          leagueKey: "UCL",
+          awayTeamLabel: "Man Utd",
+          homeTeamLabel: "AS Roma",
+          line: "UEFA Champions League - Man Utd vs AS Roma"
+        },
+        {
+          kind: "matchup",
+          leagueLabel: "NHL",
+          leagueKey: "NHL",
+          awayTeamLabel: "Oilers",
+          homeTeamLabel: "Devils",
+          line: "NHL - Oilers vs Devils"
+        }
+      ]
     }
   }
 };
