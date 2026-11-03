@@ -28618,7 +28618,12 @@ function mergeCatchUpSupplementalFinals(...groups) {
   for (const group of groups) {
     for (const game of group) {
       if (game.status !== "final") continue;
-      byId.set(game.id, game);
+      const existing = byId.get(game.id);
+      if (!existing) {
+        byId.set(game.id, game);
+        continue;
+      }
+      byId.set(game.id, preserveOperationalGameEditorialFields(game, existing));
     }
   }
   return [...byId.values()];
@@ -206676,6 +206681,25 @@ function filterYesterdayFinalGames(games, now) {
 function filterYesterdayScheduleCacheFinalGames(games) {
   return games.filter((game) => game.status === "final");
 }
+function overlayYesterdayFinalFromMergedOperationalLeagues(game, mergedLeagues) {
+  const leagueKey = game.league ?? "MLB";
+  const rows = mergedLeagues[leagueKey] ?? [];
+  const byId = rows.find((row) => row.id === game.id);
+  if (byId) {
+    return preserveOperationalGameEditorialFields(
+      preferAuthoritativeOperationalGameRow(game, byId),
+      byId
+    );
+  }
+  const espnId = readEspnCompetitionEventId(game);
+  if (!espnId) return game;
+  const byEspn = rows.find((row) => readEspnCompetitionEventId(row) === espnId);
+  if (!byEspn) return game;
+  return preserveOperationalGameEditorialFields(
+    preferAuthoritativeOperationalGameRow(game, byEspn),
+    byEspn
+  );
+}
 function resolveYesterdayOperationalLeagueKeys(input) {
   const keys = /* @__PURE__ */ new Set();
   for (const section of input.spineSections) {
@@ -206700,7 +206724,7 @@ function buildYesterdayOperationalLeagueSlate(league2, input) {
         filterYesterdayScheduleCacheFinalGames(scheduleGames),
         filterYesterdayFinalGames(retainedGames, input.now)
       )
-    )
+    ).map((game) => overlayYesterdayFinalFromMergedOperationalLeagues(game, input.mergedLeagues))
   );
   if (games.length === 0) return null;
   return {
