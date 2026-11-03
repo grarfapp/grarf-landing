@@ -206,9 +206,14 @@ function writeOperationalCalendarDateKeyCache(now, timeZone, key2) {
 }
 function formatOperationalDateKeyFromMs(ms2, timeZone = GRARF_OPERATIONAL_SLATE_TIMEZONE) {
   if (ms2 == null || !Number.isFinite(ms2) || ms2 <= 0) return void 0;
+  const cacheId = `${timeZone}\0${ms2}`;
+  const cached = operationalDateKeyByTimestamp.get(cacheId);
+  if (cached !== void 0) return cached;
   const { year, month, day } = calendarPartsInTimeZone(ms2, timeZone);
   if (!year || !month || !day) return void 0;
-  return `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+  const key2 = `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+  operationalDateKeyByTimestamp.set(cacheId, key2);
+  return key2;
 }
 function writeOperationalSportsDayKeyCache(now, timeZone, key2) {
   operationalSportsDayKeyCache.timeZone = timeZone;
@@ -364,7 +369,7 @@ function shouldKeepGameOnOperationalFallbackIngest(game, now = /* @__PURE__ */ n
 function filterGamesForOperationalFallbackIngest(games, now = /* @__PURE__ */ new Date(), timeZone = GRARF_OPERATIONAL_SLATE_TIMEZONE) {
   return games.filter((g2) => shouldKeepGameOnOperationalFallbackIngest(g2, now, timeZone));
 }
-var GRARF_OPERATIONAL_SLATE_TIMEZONE, OPERATIONAL_SLATE_NEXT_DAY_CUTOFF_HOUR, OPERATIONAL_SPORTS_DAY_ROLLOVER_HOUR, calendarFormatterCache, operationalCalendarDateKeyCache, operationalSportsDayKeyCache, nextDayCutoffMsCache;
+var GRARF_OPERATIONAL_SLATE_TIMEZONE, OPERATIONAL_SLATE_NEXT_DAY_CUTOFF_HOUR, OPERATIONAL_SPORTS_DAY_ROLLOVER_HOUR, calendarFormatterCache, operationalCalendarDateKeyCache, operationalSportsDayKeyCache, operationalDateKeyByTimestamp, nextDayCutoffMsCache;
 var init_operationalSlateDate = __esm({
   "../grarf/shared/utils/operationalSlateDate.js"() {
     init_define_import_meta_env();
@@ -383,6 +388,7 @@ var init_operationalSlateDate = __esm({
       bucketMs: 0,
       key: "1970-01-01"
     };
+    operationalDateKeyByTimestamp = /* @__PURE__ */ new Map();
     nextDayCutoffMsCache = /* @__PURE__ */ new Map();
   }
 });
@@ -20129,7 +20135,8 @@ var FINALIZED_AT_STORAGE_KEY = "grarf-game-finalization-timestamps-v1";
 var EVENT_ENDED_AT_STORAGE_KEY = "grarf-game-event-ended-at-ms-v1";
 var finalizedAtMemoryStore = {};
 var eventEndedAtMemoryStore = {};
-function readStorage(key2, memoryStore) {
+function readStorage(key2, memoryStoreRef) {
+  if (memoryStoreRef.loaded) return memoryStoreRef.current;
   if (typeof localStorage !== "undefined") {
     try {
       const raw = localStorage.getItem(key2);
@@ -20140,34 +20147,45 @@ function readStorage(key2, memoryStore) {
           if (typeof value !== "number" || !Number.isFinite(value) || value <= 0) continue;
           out[gameId] = value;
         }
-        return out;
+        memoryStoreRef.current = out;
+        memoryStoreRef.loaded = true;
+        return memoryStoreRef.current;
       }
     } catch {
+      return { ...memoryStoreRef.current };
     }
   }
-  return { ...memoryStore };
+  memoryStoreRef.loaded = true;
+  return memoryStoreRef.current;
 }
 function writeStorage(key2, byId, memoryStoreRef) {
   memoryStoreRef.current = { ...byId };
+  memoryStoreRef.loaded = true;
   if (typeof localStorage === "undefined") return;
   try {
     localStorage.setItem(key2, JSON.stringify(byId));
   } catch {
   }
 }
-var finalizedAtMemoryRef = { current: finalizedAtMemoryStore };
-var eventEndedAtMemoryRef = { current: eventEndedAtMemoryStore };
+var finalizedAtMemoryRef = {
+  current: finalizedAtMemoryStore,
+  loaded: false
+};
+var eventEndedAtMemoryRef = {
+  current: eventEndedAtMemoryStore,
+  loaded: false
+};
 function readPersistedFinalizedAtMs(gameId) {
   const trimmed = gameId.trim();
   if (!trimmed) return void 0;
-  const value = readStorage(FINALIZED_AT_STORAGE_KEY, finalizedAtMemoryRef.current)[trimmed];
+  const value = readStorage(FINALIZED_AT_STORAGE_KEY, finalizedAtMemoryRef)[trimmed];
   if (value == null || !Number.isFinite(value) || value <= 0) return void 0;
   return value;
 }
 function persistFinalizedAtMsIfAbsent(gameId, finalizedAtMs) {
   const trimmed = gameId.trim();
   if (!trimmed || !Number.isFinite(finalizedAtMs) || finalizedAtMs <= 0) return;
-  const byId = readStorage(FINALIZED_AT_STORAGE_KEY, finalizedAtMemoryRef.current);
+  const byId = readStorage(FINALIZED_AT_STORAGE_KEY, finalizedAtMemoryRef);
   if (byId[trimmed] != null) return;
   byId[trimmed] = finalizedAtMs;
   writeStorage(FINALIZED_AT_STORAGE_KEY, byId, finalizedAtMemoryRef);
@@ -20175,14 +20193,14 @@ function persistFinalizedAtMsIfAbsent(gameId, finalizedAtMs) {
 function readPersistedEventEndedAtMs(gameId) {
   const trimmed = gameId.trim();
   if (!trimmed) return void 0;
-  const value = readStorage(EVENT_ENDED_AT_STORAGE_KEY, eventEndedAtMemoryRef.current)[trimmed];
+  const value = readStorage(EVENT_ENDED_AT_STORAGE_KEY, eventEndedAtMemoryRef)[trimmed];
   if (value == null || !Number.isFinite(value) || value <= 0) return void 0;
   return value;
 }
 function persistEventEndedAtMsIfAbsent(gameId, eventEndedAtMs) {
   const trimmed = gameId.trim();
   if (!trimmed || !Number.isFinite(eventEndedAtMs) || eventEndedAtMs <= 0) return;
-  const byId = readStorage(EVENT_ENDED_AT_STORAGE_KEY, eventEndedAtMemoryRef.current);
+  const byId = readStorage(EVENT_ENDED_AT_STORAGE_KEY, eventEndedAtMemoryRef);
   if (byId[trimmed] != null) return;
   byId[trimmed] = eventEndedAtMs;
   writeStorage(EVENT_ENDED_AT_STORAGE_KEY, byId, eventEndedAtMemoryRef);

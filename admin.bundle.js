@@ -15382,11 +15382,17 @@ function writeOperationalCalendarDateKeyCache(now, timeZone, key) {
   operationalCalendarDateKeyCache.bucketMs = Math.floor(now.getTime() / 6e4);
   operationalCalendarDateKeyCache.key = key;
 }
+var operationalDateKeyByTimestamp = /* @__PURE__ */ new Map();
 function formatOperationalDateKeyFromMs(ms, timeZone = GRARF_OPERATIONAL_SLATE_TIMEZONE) {
   if (ms == null || !Number.isFinite(ms) || ms <= 0) return void 0;
+  const cacheId = `${timeZone}\0${ms}`;
+  const cached = operationalDateKeyByTimestamp.get(cacheId);
+  if (cached !== void 0) return cached;
   const { year, month, day } = calendarPartsInTimeZone(ms, timeZone);
   if (!year || !month || !day) return void 0;
-  return `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+  const key = `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+  operationalDateKeyByTimestamp.set(cacheId, key);
+  return key;
 }
 function writeOperationalSportsDayKeyCache(now, timeZone, key) {
   operationalSportsDayKeyCache.timeZone = timeZone;
@@ -15975,7 +15981,8 @@ var FINALIZED_AT_STORAGE_KEY = "grarf-game-finalization-timestamps-v1";
 var EVENT_ENDED_AT_STORAGE_KEY = "grarf-game-event-ended-at-ms-v1";
 var finalizedAtMemoryStore = {};
 var eventEndedAtMemoryStore = {};
-function readStorage(key, memoryStore) {
+function readStorage(key, memoryStoreRef) {
+  if (memoryStoreRef.loaded) return memoryStoreRef.current;
   if (typeof localStorage !== "undefined") {
     try {
       const raw = localStorage.getItem(key);
@@ -15986,34 +15993,45 @@ function readStorage(key, memoryStore) {
           if (typeof value !== "number" || !Number.isFinite(value) || value <= 0) continue;
           out[gameId] = value;
         }
-        return out;
+        memoryStoreRef.current = out;
+        memoryStoreRef.loaded = true;
+        return memoryStoreRef.current;
       }
     } catch {
+      return { ...memoryStoreRef.current };
     }
   }
-  return { ...memoryStore };
+  memoryStoreRef.loaded = true;
+  return memoryStoreRef.current;
 }
 function writeStorage(key, byId, memoryStoreRef) {
   memoryStoreRef.current = { ...byId };
+  memoryStoreRef.loaded = true;
   if (typeof localStorage === "undefined") return;
   try {
     localStorage.setItem(key, JSON.stringify(byId));
   } catch {
   }
 }
-var finalizedAtMemoryRef = { current: finalizedAtMemoryStore };
-var eventEndedAtMemoryRef = { current: eventEndedAtMemoryStore };
+var finalizedAtMemoryRef = {
+  current: finalizedAtMemoryStore,
+  loaded: false
+};
+var eventEndedAtMemoryRef = {
+  current: eventEndedAtMemoryStore,
+  loaded: false
+};
 function readPersistedFinalizedAtMs(gameId) {
   const trimmed = gameId.trim();
   if (!trimmed) return void 0;
-  const value = readStorage(FINALIZED_AT_STORAGE_KEY, finalizedAtMemoryRef.current)[trimmed];
+  const value = readStorage(FINALIZED_AT_STORAGE_KEY, finalizedAtMemoryRef)[trimmed];
   if (value == null || !Number.isFinite(value) || value <= 0) return void 0;
   return value;
 }
 function persistFinalizedAtMsIfAbsent(gameId, finalizedAtMs) {
   const trimmed = gameId.trim();
   if (!trimmed || !Number.isFinite(finalizedAtMs) || finalizedAtMs <= 0) return;
-  const byId = readStorage(FINALIZED_AT_STORAGE_KEY, finalizedAtMemoryRef.current);
+  const byId = readStorage(FINALIZED_AT_STORAGE_KEY, finalizedAtMemoryRef);
   if (byId[trimmed] != null) return;
   byId[trimmed] = finalizedAtMs;
   writeStorage(FINALIZED_AT_STORAGE_KEY, byId, finalizedAtMemoryRef);
@@ -16021,14 +16039,14 @@ function persistFinalizedAtMsIfAbsent(gameId, finalizedAtMs) {
 function readPersistedEventEndedAtMs(gameId) {
   const trimmed = gameId.trim();
   if (!trimmed) return void 0;
-  const value = readStorage(EVENT_ENDED_AT_STORAGE_KEY, eventEndedAtMemoryRef.current)[trimmed];
+  const value = readStorage(EVENT_ENDED_AT_STORAGE_KEY, eventEndedAtMemoryRef)[trimmed];
   if (value == null || !Number.isFinite(value) || value <= 0) return void 0;
   return value;
 }
 function persistEventEndedAtMsIfAbsent(gameId, eventEndedAtMs) {
   const trimmed = gameId.trim();
   if (!trimmed || !Number.isFinite(eventEndedAtMs) || eventEndedAtMs <= 0) return;
-  const byId = readStorage(EVENT_ENDED_AT_STORAGE_KEY, eventEndedAtMemoryRef.current);
+  const byId = readStorage(EVENT_ENDED_AT_STORAGE_KEY, eventEndedAtMemoryRef);
   if (byId[trimmed] != null) return;
   byId[trimmed] = eventEndedAtMs;
   writeStorage(EVENT_ENDED_AT_STORAGE_KEY, byId, eventEndedAtMemoryRef);
