@@ -172153,6 +172153,25 @@ init_define_import_meta_env();
 
 // ../grarf/shared/domain/nhl/resolveEspnNhlRecapUrlFromGame.ts
 init_define_import_meta_env();
+
+// ../grarf/shared/domain/espn/parseEspnNumericEventIdFromEspnWebUrl.ts
+init_define_import_meta_env();
+var ESPN_WEB_NUMERIC_EVENT_ID_PATTERNS = [
+  /\/gameId\/(\d+)(?:\/|[?#]|$)/i,
+  /[?&]gameId=(\d+)/i
+];
+function parseEspnNumericEventIdFromEspnWebUrl(url) {
+  const trimmed = url?.trim();
+  if (!trimmed || !/espn\.com/i.test(trimmed)) return null;
+  for (const pattern of ESPN_WEB_NUMERIC_EVENT_ID_PATTERNS) {
+    const match = pattern.exec(trimmed);
+    const id = match?.[1]?.trim();
+    if (id && /^\d+$/.test(id)) return id;
+  }
+  return null;
+}
+
+// ../grarf/shared/domain/nhl/resolveEspnNhlRecapUrlFromGame.ts
 function resolveEspnNhlRecapUrlFromGame(game) {
   if (game.league !== "NHL" && !game.id.startsWith("espn-NHL-")) return null;
   const eventId = parseEspnNhlEventIdFromGame(game);
@@ -172163,9 +172182,12 @@ function parseEspnNhlEventIdFromGame(game) {
   const fromExternal = game.externalIds?.espn?.trim();
   if (fromExternal && /^\d+$/.test(fromExternal)) return fromExternal;
   const fromField = game.espnEventId?.trim();
-  if (fromField) return fromField;
+  if (fromField && /^\d+$/.test(fromField)) return fromField;
   const match = /^espn-NHL-(\d+)/i.exec(game.id.trim());
-  return match?.[1] ?? null;
+  if (match?.[1]) return match[1];
+  const fromGameCard = parseEspnNumericEventIdFromEspnWebUrl(game.gameCardUrl);
+  if (fromGameCard) return fromGameCard;
+  return parseEspnNumericEventIdFromEspnWebUrl(game.metadata?.espnGameCenterUrl);
 }
 
 // ../grarf/shared/domain/nhl/resolveNhlComGamecenterRecapUrlFromGame.ts
@@ -180266,9 +180288,57 @@ init_define_import_meta_env();
 
 // ../grarf/desktop/src/extensionHost/grarfExtensionNhlEspnRecapHeadline.ts
 init_define_import_meta_env();
+
+// ../grarf/shared/domain/nhl/resolveEspnNhlEventIdFromEspnScoreboardPeer.ts
+init_define_import_meta_env();
+function isNhlGameRow2(game) {
+  return game.league === "NHL" || String(game.id ?? "").startsWith("espn-NHL-");
+}
+function resolveEspnNhlEventIdFromEspnScoreboardPeer(game, espnScoreboardRows) {
+  if (!isNhlGameRow2(game)) return null;
+  if (readOperationalLeagueIdentitySource2(game) !== "allsportsapi_events") return null;
+  if (parseEspnNhlEventIdFromGame(game)) return null;
+  const peer = matchOperationalTeamSportGameRowByTeamsAndStartTime(
+    game,
+    espnScoreboardRows,
+    "NHL"
+  );
+  if (!peer) return null;
+  return parseEspnNhlEventIdFromGame(peer);
+}
+
+// ../grarf/desktop/src/extensionHost/grarfExtensionNhlEspnRecapHeadline.ts
 var RECAP_HEADLINE_CACHE_TTL_MS6 = 30 * 60 * 1e3;
+var NHL_ESPN_SCOREBOARD_ENRICHMENT_TTL_MS = 6 * 60 * 60 * 1e3;
 var headlineCache5 = /* @__PURE__ */ new Map();
 var inflightByEventId2 = /* @__PURE__ */ new Map();
+var nhlEspnScoreboardRowsCache = null;
+var nhlEspnScoreboardRowsInflight = null;
+async function loadNhlEspnScoreboardRowsForEventIdResolution() {
+  const now = Date.now();
+  if (nhlEspnScoreboardRowsCache && now - nhlEspnScoreboardRowsCache.at < NHL_ESPN_SCOREBOARD_ENRICHMENT_TTL_MS) {
+    return nhlEspnScoreboardRowsCache.rows;
+  }
+  if (nhlEspnScoreboardRowsInflight) return nhlEspnScoreboardRowsInflight;
+  nhlEspnScoreboardRowsInflight = (async () => {
+    try {
+      const rows = await fetchEspnOperationalLeagueGamesForEnrichment("NHL");
+      nhlEspnScoreboardRowsCache = { at: Date.now(), rows };
+      return rows;
+    } catch {
+      return [];
+    } finally {
+      nhlEspnScoreboardRowsInflight = null;
+    }
+  })();
+  return nhlEspnScoreboardRowsInflight;
+}
+async function resolveNhlRecapEspnEventIdForGame(game) {
+  const direct = parseEspnNhlEventIdFromGame(game);
+  if (direct) return direct;
+  const rows = await loadNhlEspnScoreboardRowsForEventIdResolution();
+  return resolveEspnNhlEventIdFromEspnScoreboardPeer(game, rows);
+}
 async function fetchNhlEspnRecapHeadlineForEventId(eventId) {
   const cached = headlineCache5.get(eventId);
   if (cached && Date.now() - cached.at < RECAP_HEADLINE_CACHE_TTL_MS6) {
@@ -180304,7 +180374,7 @@ async function resolveGrarfExtensionNhlEspnRecapHeadlineForGame(game) {
   if (!isGrarfExtensionNhlRecapGame(game)) return null;
   const fromSnapshot = game.metadata?.espnRecapHeadline?.trim();
   if (fromSnapshot) return fromSnapshot;
-  const eventId = parseEspnNhlEventIdFromGame(game);
+  const eventId = await resolveNhlRecapEspnEventIdForGame(game);
   if (!eventId) return null;
   return fetchNhlEspnRecapHeadlineForEventId(eventId);
 }
@@ -200327,7 +200397,7 @@ function isPlaceholderMlbStoryTitle3(title) {
 function isNflGameRow3(game) {
   return game.league === "NFL" || game.id.startsWith("espn-NFL-");
 }
-function isNhlGameRow2(game) {
+function isNhlGameRow3(game) {
   return game.league === "NHL" || game.id.startsWith("espn-NHL-");
 }
 function isNbaGameRow3(game) {
@@ -200460,7 +200530,7 @@ async function resolveGrarfExtensionCatchUpPreviewHeadlineForGame(game) {
   if (isNflGameRow3(game) && resolveCbsNflPreviewUrlCandidateFromGame(game)) {
     return null;
   }
-  if (isNhlGameRow2(game) && resolveCbsNhlPreviewUrlCandidateFromGame(game)) {
+  if (isNhlGameRow3(game) && resolveCbsNhlPreviewUrlCandidateFromGame(game)) {
     return null;
   }
   if (isNbaGameRow3(game) && resolveCbsNbaPreviewUrlCandidateFromGame(game)) {
@@ -212270,8 +212340,7 @@ function resolveCardDestinations(candidates, primary) {
     cardDestinations[2] ?? null
   ];
 }
-function resolveCommandCenterLayout(input, selectedPrimaryId) {
-  const candidates = resolveCommandCenterCandidates(input);
+function resolveCommandCenterLayoutFromCandidates(candidates, selectedPrimaryId) {
   const primary = resolvePrimaryDestination(candidates, selectedPrimaryId);
   return {
     primary,
@@ -212319,8 +212388,8 @@ function useCommandCenterLayout() {
     setSelectedPrimaryId(null);
   }, [candidates, selectedPrimaryId]);
   const layout = (0, import_react337.useMemo)(
-    () => resolveCommandCenterLayout(rankingInput, selectedPrimaryId),
-    [rankingInput, selectedPrimaryId]
+    () => resolveCommandCenterLayoutFromCandidates(candidates, selectedPrimaryId),
+    [candidates, selectedPrimaryId]
   );
   const promoteDestination = (0, import_react337.useCallback)((destinationId) => {
     setSelectedPrimaryId(destinationId);
