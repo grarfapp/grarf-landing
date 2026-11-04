@@ -17833,16 +17833,30 @@ function listAllSportsApiTeamSportLivePresentationLeagueKeys() {
   ).map((row) => row.leagueKey);
 }
 
+// ../grarf/shared/domain/operational/reconcileOperationalGamesByEspnEventId.js
+init_define_import_meta_env();
+function readEspnCompetitionEventId2(game) {
+  const id = game.espnEventId ?? game.externalIds?.espn;
+  const trimmed = id != null ? String(id).trim() : "";
+  return trimmed || null;
+}
+
 // ../grarf/shared/domain/operational/filterEspnScoreboardRowsForAllSportsApiTeamSportLeagues.ts
 function filterEspnScoreboardRowsForAllSportsApiTeamSportLeagues(games) {
-  const authorityLeaguesWithAsaRows = /* @__PURE__ */ new Set();
+  const asaEspnIdsByLeague = /* @__PURE__ */ new Map();
   for (const game of games) {
     const league2 = String(game.league ?? "").trim().toUpperCase();
     const id = String(game.id ?? "").trim();
-    if (!isAllSportsApiScoreboardAuthorityLeague(league2)) continue;
-    if (id.startsWith("allsportsapi-")) {
-      authorityLeaguesWithAsaRows.add(league2);
+    if (!isAllSportsApiTeamSportScoreboardLeague(league2)) continue;
+    if (!id.startsWith("allsportsapi-")) continue;
+    const eventId = readEspnCompetitionEventId2(game);
+    if (!eventId) continue;
+    let bucket = asaEspnIdsByLeague.get(league2);
+    if (!bucket) {
+      bucket = /* @__PURE__ */ new Set();
+      asaEspnIdsByLeague.set(league2, bucket);
     }
+    bucket.add(eventId);
   }
   return games.filter((game) => {
     const league2 = String(game.league ?? "").trim().toUpperCase();
@@ -17850,7 +17864,9 @@ function filterEspnScoreboardRowsForAllSportsApiTeamSportLeagues(games) {
     const id = String(game.id ?? "").trim();
     if (!id) return true;
     if (!id.startsWith(`espn-${league2}-`)) return true;
-    return !authorityLeaguesWithAsaRows.has(league2);
+    const eventId = readEspnCompetitionEventId2(game);
+    if (!eventId) return true;
+    return !asaEspnIdsByLeague.get(league2)?.has(eventId);
   });
 }
 
@@ -30119,6 +30135,15 @@ function buildFotmobMatchUrl(matchId) {
 // ../grarf/grarf-operational-service/src/cache/operationalGameEnrichmentStore.ts
 init_define_import_meta_env();
 
+// ../grarf/shared/domain/soccer/bbcSportFootballRecapHeadlineQuality.ts
+init_define_import_meta_env();
+function isBbcSportFootballScoresFixturesAccessibleSummaryHeadline(headline) {
+  const trimmed = headline?.trim() ?? "";
+  if (!trimmed) return false;
+  if (/\bat Full time\b/i.test(trimmed)) return true;
+  return /,\s*.+\s+\d+\s+at Full time\s*$/i.test(trimmed);
+}
+
 // ../grarf/grarf-operational-service/src/cache/operationalEnrichmentProviderCache.ts
 init_define_import_meta_env();
 
@@ -31064,10 +31089,20 @@ function trimEnrichmentText(value) {
   const trimmed = String(value ?? "").trim();
   return trimmed.length > 0 ? trimmed : void 0;
 }
+function pickPreferredBbcRecapHeadline(base, patch) {
+  const baseText = trimEnrichmentText(base);
+  const patchText = trimEnrichmentText(patch);
+  if (!patchText) return baseText;
+  if (!baseText) return patchText;
+  if (isBbcSportFootballScoresFixturesAccessibleSummaryHeadline(baseText) && !isBbcSportFootballScoresFixturesAccessibleSummaryHeadline(patchText)) {
+    return patchText;
+  }
+  return patchText ?? baseText;
+}
 function mergeOperationalGameEnrichmentRecords(base, patch) {
   if (!patch) return base;
   if (!base) return patch;
-  return {
+  const merged = {
     acquiredAtMs: Math.max(base.acquiredAtMs, patch.acquiredAtMs),
     broadcasts: patch.broadcasts?.length ? patch.broadcasts : base.broadcasts,
     channels: patch.channels?.length ? patch.channels : base.channels,
@@ -31089,8 +31124,17 @@ function mergeOperationalGameEnrichmentRecords(base, patch) {
     fotmobMatchUrl: patch.fotmobMatchUrl ?? base.fotmobMatchUrl,
     content: mergeContentRecord(base.content, patch.content),
     espnRecapHeadline: trimEnrichmentText(patch.espnRecapHeadline) ?? trimEnrichmentText(base.espnRecapHeadline),
+    bbcRecapHeadline: pickPreferredBbcRecapHeadline(
+      trimEnrichmentText(base.bbcRecapHeadline),
+      trimEnrichmentText(patch.bbcRecapHeadline)
+    ),
+    bbcRecapUrl: trimEnrichmentText(patch.bbcRecapUrl) ?? trimEnrichmentText(base.bbcRecapUrl),
     catchUpPreviewHeadline: trimEnrichmentText(patch.catchUpPreviewHeadline) ?? trimEnrichmentText(base.catchUpPreviewHeadline)
   };
+  if (merged.bbcRecapHeadline?.trim() && merged.bbcRecapUrl?.trim()) {
+    delete merged.espnRecapHeadline;
+  }
+  return merged;
 }
 function extractOperationalGameEnrichmentRecord(game) {
   const broadcasts = [...game.broadcasts ?? []].filter((l) => String(l ?? "").trim());
@@ -31105,11 +31149,13 @@ function extractOperationalGameEnrichmentRecord(game) {
   const watchLinks = Array.isArray(game.content?.watchLinks) ? game.content.watchLinks : [];
   const recap = game.content?.recap;
   const espnRecapHeadline = game.metadata?.espnRecapHeadline?.trim();
+  const bbcRecapHeadline = game.metadata?.bbcRecapHeadline?.trim();
+  const bbcRecapUrl = game.metadata?.bbcRecapUrl?.trim();
   const catchUpPreviewHeadline = game.metadata?.catchUpPreviewHeadline?.trim();
   const fotmobMatchUrl = game.metadata?.fotmobMatchUrl?.trim();
   const fotmobId = game.externalIds?.fotmob?.trim();
   const paramountListingId = game.paramountListingId?.trim();
-  if (!broadcasts.length && !channels.length && !espnEventId && !streamUrl && !gameCardUrl && !nbaGameId && !espnWatchEventId && !espnPlusPlayerId && !paramountListingId && !fotmobMatchUrl && !fotmobId && !watchLinks.length && !recap && !espnRecapHeadline && !catchUpPreviewHeadline) {
+  if (!broadcasts.length && !channels.length && !espnEventId && !streamUrl && !gameCardUrl && !nbaGameId && !espnWatchEventId && !espnPlusPlayerId && !paramountListingId && !fotmobMatchUrl && !fotmobId && !watchLinks.length && !recap && !espnRecapHeadline && !bbcRecapHeadline && !bbcRecapUrl && !catchUpPreviewHeadline) {
     return null;
   }
   return {
@@ -31143,6 +31189,8 @@ function extractOperationalGameEnrichmentRecord(game) {
       }
     } : {},
     ...espnRecapHeadline ? { espnRecapHeadline } : {},
+    ...bbcRecapHeadline ? { bbcRecapHeadline } : {},
+    ...bbcRecapUrl ? { bbcRecapUrl } : {},
     ...catchUpPreviewHeadline ? { catchUpPreviewHeadline } : {}
   };
 }

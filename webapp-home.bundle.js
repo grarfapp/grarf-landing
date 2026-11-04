@@ -22373,16 +22373,31 @@ function listAllSportsApiTeamSportLivePresentationLeagueKeys() {
   ).map((row) => row.leagueKey);
 }
 
+// ../grarf/shared/domain/operational/reconcileOperationalGamesByEspnEventId.js
+init_define_import_meta_env();
+init_golfTournamentDate();
+function readEspnCompetitionEventId2(game) {
+  const id = game.espnEventId ?? game.externalIds?.espn;
+  const trimmed = id != null ? String(id).trim() : "";
+  return trimmed || null;
+}
+
 // ../grarf/shared/domain/operational/filterEspnScoreboardRowsForAllSportsApiTeamSportLeagues.ts
 function filterEspnScoreboardRowsForAllSportsApiTeamSportLeagues(games) {
-  const authorityLeaguesWithAsaRows = /* @__PURE__ */ new Set();
+  const asaEspnIdsByLeague = /* @__PURE__ */ new Map();
   for (const game of games) {
     const league2 = String(game.league ?? "").trim().toUpperCase();
     const id = String(game.id ?? "").trim();
-    if (!isAllSportsApiScoreboardAuthorityLeague(league2)) continue;
-    if (id.startsWith("allsportsapi-")) {
-      authorityLeaguesWithAsaRows.add(league2);
+    if (!isAllSportsApiTeamSportScoreboardLeague(league2)) continue;
+    if (!id.startsWith("allsportsapi-")) continue;
+    const eventId = readEspnCompetitionEventId2(game);
+    if (!eventId) continue;
+    let bucket = asaEspnIdsByLeague.get(league2);
+    if (!bucket) {
+      bucket = /* @__PURE__ */ new Set();
+      asaEspnIdsByLeague.set(league2, bucket);
     }
+    bucket.add(eventId);
   }
   return games.filter((game) => {
     const league2 = String(game.league ?? "").trim().toUpperCase();
@@ -22390,7 +22405,9 @@ function filterEspnScoreboardRowsForAllSportsApiTeamSportLeagues(games) {
     const id = String(game.id ?? "").trim();
     if (!id) return true;
     if (!id.startsWith(`espn-${league2}-`)) return true;
-    return !authorityLeaguesWithAsaRows.has(league2);
+    const eventId = readEspnCompetitionEventId2(game);
+    if (!eventId) return true;
+    return !asaEspnIdsByLeague.get(league2)?.has(eventId);
   });
 }
 
@@ -34982,6 +34999,15 @@ function buildFotmobMatchUrl(matchId) {
 // ../grarf/grarf-operational-service/src/cache/operationalGameEnrichmentStore.ts
 init_define_import_meta_env();
 
+// ../grarf/shared/domain/soccer/bbcSportFootballRecapHeadlineQuality.ts
+init_define_import_meta_env();
+function isBbcSportFootballScoresFixturesAccessibleSummaryHeadline(headline) {
+  const trimmed = headline?.trim() ?? "";
+  if (!trimmed) return false;
+  if (/\bat Full time\b/i.test(trimmed)) return true;
+  return /,\s*.+\s+\d+\s+at Full time\s*$/i.test(trimmed);
+}
+
 // ../grarf/grarf-operational-service/src/cache/operationalEnrichmentProviderCache.ts
 init_define_import_meta_env();
 
@@ -35927,10 +35953,20 @@ function trimEnrichmentText(value) {
   const trimmed = String(value ?? "").trim();
   return trimmed.length > 0 ? trimmed : void 0;
 }
+function pickPreferredBbcRecapHeadline(base, patch) {
+  const baseText = trimEnrichmentText(base);
+  const patchText = trimEnrichmentText(patch);
+  if (!patchText) return baseText;
+  if (!baseText) return patchText;
+  if (isBbcSportFootballScoresFixturesAccessibleSummaryHeadline(baseText) && !isBbcSportFootballScoresFixturesAccessibleSummaryHeadline(patchText)) {
+    return patchText;
+  }
+  return patchText ?? baseText;
+}
 function mergeOperationalGameEnrichmentRecords(base, patch) {
   if (!patch) return base;
   if (!base) return patch;
-  return {
+  const merged = {
     acquiredAtMs: Math.max(base.acquiredAtMs, patch.acquiredAtMs),
     broadcasts: patch.broadcasts?.length ? patch.broadcasts : base.broadcasts,
     channels: patch.channels?.length ? patch.channels : base.channels,
@@ -35952,8 +35988,17 @@ function mergeOperationalGameEnrichmentRecords(base, patch) {
     fotmobMatchUrl: patch.fotmobMatchUrl ?? base.fotmobMatchUrl,
     content: mergeContentRecord(base.content, patch.content),
     espnRecapHeadline: trimEnrichmentText(patch.espnRecapHeadline) ?? trimEnrichmentText(base.espnRecapHeadline),
+    bbcRecapHeadline: pickPreferredBbcRecapHeadline(
+      trimEnrichmentText(base.bbcRecapHeadline),
+      trimEnrichmentText(patch.bbcRecapHeadline)
+    ),
+    bbcRecapUrl: trimEnrichmentText(patch.bbcRecapUrl) ?? trimEnrichmentText(base.bbcRecapUrl),
     catchUpPreviewHeadline: trimEnrichmentText(patch.catchUpPreviewHeadline) ?? trimEnrichmentText(base.catchUpPreviewHeadline)
   };
+  if (merged.bbcRecapHeadline?.trim() && merged.bbcRecapUrl?.trim()) {
+    delete merged.espnRecapHeadline;
+  }
+  return merged;
 }
 function extractOperationalGameEnrichmentRecord(game) {
   const broadcasts = [...game.broadcasts ?? []].filter((l2) => String(l2 ?? "").trim());
@@ -35968,11 +36013,13 @@ function extractOperationalGameEnrichmentRecord(game) {
   const watchLinks = Array.isArray(game.content?.watchLinks) ? game.content.watchLinks : [];
   const recap = game.content?.recap;
   const espnRecapHeadline = game.metadata?.espnRecapHeadline?.trim();
+  const bbcRecapHeadline = game.metadata?.bbcRecapHeadline?.trim();
+  const bbcRecapUrl = game.metadata?.bbcRecapUrl?.trim();
   const catchUpPreviewHeadline = game.metadata?.catchUpPreviewHeadline?.trim();
   const fotmobMatchUrl = game.metadata?.fotmobMatchUrl?.trim();
   const fotmobId = game.externalIds?.fotmob?.trim();
   const paramountListingId = game.paramountListingId?.trim();
-  if (!broadcasts.length && !channels.length && !espnEventId && !streamUrl && !gameCardUrl && !nbaGameId && !espnWatchEventId && !espnPlusPlayerId && !paramountListingId && !fotmobMatchUrl && !fotmobId && !watchLinks.length && !recap && !espnRecapHeadline && !catchUpPreviewHeadline) {
+  if (!broadcasts.length && !channels.length && !espnEventId && !streamUrl && !gameCardUrl && !nbaGameId && !espnWatchEventId && !espnPlusPlayerId && !paramountListingId && !fotmobMatchUrl && !fotmobId && !watchLinks.length && !recap && !espnRecapHeadline && !bbcRecapHeadline && !bbcRecapUrl && !catchUpPreviewHeadline) {
     return null;
   }
   return {
@@ -36006,6 +36053,8 @@ function extractOperationalGameEnrichmentRecord(game) {
       }
     } : {},
     ...espnRecapHeadline ? { espnRecapHeadline } : {},
+    ...bbcRecapHeadline ? { bbcRecapHeadline } : {},
+    ...bbcRecapUrl ? { bbcRecapUrl } : {},
     ...catchUpPreviewHeadline ? { catchUpPreviewHeadline } : {}
   };
 }
@@ -174076,6 +174125,13 @@ async function resolveGrarfExtensionBbcSportUclRecapUrlFromGame(game) {
   if (!grarfExtensionLeagueUsesBbcSportUclRecaps(game.league ?? "")) {
     return null;
   }
+  const meta = game.metadata;
+  const cloudUrl = meta?.bbcRecapUrl?.trim();
+  if (cloudUrl) return cloudUrl;
+  const recapSource = game.content?.recap?.sourceUrl?.trim();
+  if (recapSource && (recapSource.includes("bbc.co.uk") || recapSource.includes("bbc.com"))) {
+    return recapSource;
+  }
   const dateCandidates = collectBbcSportUclRecapDateCandidates(game);
   if (dateCandidates.length === 0) return null;
   try {
@@ -179456,6 +179512,16 @@ function shouldFetchGrarfExtensionUclBbcRecapHeadline(game) {
 }
 
 // ../grarf/desktop/src/extensionHost/grarfExtensionCatchUpRecapHeadlineResolve.ts
+function isBbcRecapSourceUrl(url) {
+  const trimmed = url?.trim() ?? "";
+  if (!trimmed) return false;
+  try {
+    const host = new URL(trimmed).hostname.toLowerCase();
+    return host === "bbc.co.uk" || host.endsWith(".bbc.co.uk") || host === "bbc.com" || host.endsWith(".bbc.com");
+  } catch {
+    return trimmed.includes("bbc.co.uk") || trimmed.includes("bbc.com");
+  }
+}
 function trimCatchUpRecapHeadline(headline) {
   const trimmed = headline?.trim();
   return trimmed ? trimmed : null;
@@ -179468,10 +179534,18 @@ function resolveGrarfExtensionCatchUpRecapHeadlinePresentation(game, slices) {
     return { headline: overrideHeadline, showHeadlineUi: true };
   }
   if (shouldFetchGrarfExtensionCatchUpRecapHeadline(game)) {
-    const enriched = resolveGrarfExtensionOperationalNavigationGame(game);
-    const centralRecapHeadline = enriched.metadata?.espnRecapHeadline?.trim() || enriched.content?.recap?.summary?.trim() || enriched.content?.recap?.blurb?.trim() || game.metadata?.espnRecapHeadline?.trim() || game.content?.recap?.summary?.trim() || game.content?.recap?.blurb?.trim() || null;
-    if (centralRecapHeadline) {
-      return { headline: centralRecapHeadline, showHeadlineUi: true };
+    if (grarfExtensionLeagueUsesUclRecapResolver(game.league ?? "")) {
+      const meta = game.metadata;
+      const bbcHeadline = meta?.bbcRecapHeadline?.trim() || (isBbcRecapSourceUrl(game.content?.recap?.sourceUrl) ? game.content?.recap?.summary?.trim() || game.content?.recap?.blurb?.trim() : null) || null;
+      if (bbcHeadline) {
+        return { headline: bbcHeadline, showHeadlineUi: true };
+      }
+    } else {
+      const enriched = resolveGrarfExtensionOperationalNavigationGame(game);
+      const centralRecapHeadline = enriched.metadata?.espnRecapHeadline?.trim() || enriched.content?.recap?.summary?.trim() || enriched.content?.recap?.blurb?.trim() || game.metadata?.espnRecapHeadline?.trim() || game.content?.recap?.summary?.trim() || game.content?.recap?.blurb?.trim() || null;
+      if (centralRecapHeadline) {
+        return { headline: centralRecapHeadline, showHeadlineUi: true };
+      }
     }
   }
   const ordered = [
