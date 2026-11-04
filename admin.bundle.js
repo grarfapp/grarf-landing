@@ -17101,6 +17101,17 @@ function resolveFotmobMatchUrlFromGame(game) {
 
 // ../grarf/shared/domain/operational/mergeOperationalGameEditorialFields.ts
 init_define_import_meta_env();
+
+// ../grarf/shared/domain/soccer/bbcSportFootballRecapHeadlineQuality.ts
+init_define_import_meta_env();
+function isBbcSportFootballScoresFixturesAccessibleSummaryHeadline(headline) {
+  const trimmed = headline?.trim() ?? "";
+  if (!trimmed) return false;
+  if (/\bat Full time\b/i.test(trimmed)) return true;
+  return /,\s*.+\s+\d+\s+at Full time\s*$/i.test(trimmed);
+}
+
+// ../grarf/shared/domain/operational/mergeOperationalGameEditorialFields.ts
 function trimOrNull(value) {
   const trimmed = String(value ?? "").trim();
   return trimmed.length > 0 ? trimmed : null;
@@ -17122,6 +17133,16 @@ function mergeOperationalGameEditorialMetadata(prior, current) {
   if (priorFotmobRecapArticle && !currentFotmobRecapArticle) {
     merged.fotmobRecapArticleUrl = priorFotmobRecapArticle;
   }
+  const priorBbcHeadline = trimOrNull(prior?.bbcRecapHeadline);
+  const currentBbcHeadline = trimOrNull(current?.bbcRecapHeadline);
+  if (priorBbcHeadline && !currentBbcHeadline) {
+    merged.bbcRecapHeadline = priorBbcHeadline;
+  } else if (priorBbcHeadline && currentBbcHeadline && isBbcSportFootballScoresFixturesAccessibleSummaryHeadline(currentBbcHeadline) && !isBbcSportFootballScoresFixturesAccessibleSummaryHeadline(priorBbcHeadline)) {
+    merged.bbcRecapHeadline = priorBbcHeadline;
+  }
+  const priorBbcUrl = trimOrNull(prior?.bbcRecapUrl);
+  const currentBbcUrl = trimOrNull(current?.bbcRecapUrl);
+  if (priorBbcUrl && !currentBbcUrl) merged.bbcRecapUrl = priorBbcUrl;
   return merged;
 }
 function mergeOperationalGameEditorialContent(prior, current) {
@@ -17140,11 +17161,14 @@ function mergeOperationalGameEditorialContent(prior, current) {
   if (priorRecap && !currentRecap) {
     merged.recap = priorRecap;
   } else if (priorRecap && currentRecap) {
+    const priorSummary = trimOrNull(priorRecap.summary) ?? trimOrNull(priorRecap.blurb);
+    const currentSummary = trimOrNull(currentRecap.summary) ?? trimOrNull(currentRecap.blurb);
+    const keepPriorSummary = priorSummary && currentSummary && isBbcSportFootballScoresFixturesAccessibleSummaryHeadline(currentSummary) && !isBbcSportFootballScoresFixturesAccessibleSummaryHeadline(priorSummary);
     merged.recap = {
       ...priorRecap,
       ...currentRecap,
-      summary: trimOrNull(currentRecap.summary) ?? priorRecap.summary,
-      blurb: trimOrNull(currentRecap.blurb) ?? priorRecap.blurb,
+      summary: keepPriorSummary ? priorRecap.summary : trimOrNull(currentRecap.summary) ?? priorRecap.summary,
+      blurb: keepPriorSummary ? priorRecap.blurb : trimOrNull(currentRecap.blurb) ?? priorRecap.blurb,
       sourceUrl: trimOrNull(currentRecap.sourceUrl) ?? priorRecap.sourceUrl
     };
   }
@@ -30135,15 +30159,6 @@ function buildFotmobMatchUrl(matchId) {
 // ../grarf/grarf-operational-service/src/cache/operationalGameEnrichmentStore.ts
 init_define_import_meta_env();
 
-// ../grarf/shared/domain/soccer/bbcSportFootballRecapHeadlineQuality.ts
-init_define_import_meta_env();
-function isBbcSportFootballScoresFixturesAccessibleSummaryHeadline(headline) {
-  const trimmed = headline?.trim() ?? "";
-  if (!trimmed) return false;
-  if (/\bat Full time\b/i.test(trimmed)) return true;
-  return /,\s*.+\s+\d+\s+at Full time\s*$/i.test(trimmed);
-}
-
 // ../grarf/grarf-operational-service/src/cache/operationalEnrichmentProviderCache.ts
 init_define_import_meta_env();
 
@@ -36100,10 +36115,19 @@ function hasBroadcastLabels(game) {
   const broadcasts = game.broadcasts ?? [];
   return channels.some((label) => String(label ?? "").trim()) || broadcasts.some((label) => String(label ?? "").trim());
 }
+function isNbaBroadcastSupplementTarget(game) {
+  const league2 = String(game.league ?? "").trim().toUpperCase();
+  if (league2 !== "NBA") return false;
+  if (readOperationalLeagueIdentitySource2(game) === "allsportsapi_events") return true;
+  const espnId = String(game.espnEventId ?? game.externalIds?.espn ?? "").trim();
+  return Boolean(espnId) && String(game.id ?? "").startsWith("espn-NBA-");
+}
 function mergeEspnBroadcastSupplementOntoAllSportsApiTeamSportGame(game, espnPeer) {
   const league2 = String(game.league ?? "").trim().toUpperCase();
   if (!isAllSportsApiTeamSportScoreboardLeague(league2)) return game;
-  if (readOperationalLeagueIdentitySource2(game) !== "allsportsapi_events") return game;
+  if (!isNbaBroadcastSupplementTarget(game) && readOperationalLeagueIdentitySource2(game) !== "allsportsapi_events") {
+    return game;
+  }
   const espnEventId = String(game.espnEventId ?? "").trim() || String(game.externalIds?.espn ?? "").trim() || String(espnPeer.espnEventId ?? "").trim() || String(espnPeer.externalIds?.espn ?? "").trim();
   const next = { ...game };
   if (!hasBroadcastLabels(game)) {
