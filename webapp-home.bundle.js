@@ -173002,23 +173002,52 @@ function resolveNhlComGamecenterRecapUrlFromGame(game) {
 }
 
 // ../grarf/desktop/src/extensionHost/grarfExtensionNhlRecapNavigationUrl.ts
+var nhlComRecapUrlByGameId = /* @__PURE__ */ new Map();
+function listNhlRecapNavigationGameCandidates(game, alternateGame) {
+  const out = [game];
+  if (alternateGame && alternateGame.id !== game.id) {
+    out.push(alternateGame);
+  }
+  return out;
+}
 function resolveGrarfExtensionNhlRecapNavigationUrl(game, source) {
   if (source === "nhl") {
+    const cached = nhlComRecapUrlByGameId.get(game.id);
+    if (cached) return cached;
     return resolveNhlComGamecenterRecapUrlFromGame(game);
   }
   return resolveEspnNhlRecapUrlFromGame(game);
 }
-async function resolveGrarfExtensionNhlRecapNavigationUrlFromGame(game, source) {
-  const immediate = resolveGrarfExtensionNhlRecapNavigationUrl(game, source);
-  if (immediate || source !== "nhl") {
-    return immediate;
+async function resolveGrarfExtensionNhlRecapNavigationUrlFromGame(game, source, alternateGame) {
+  const candidates = listNhlRecapNavigationGameCandidates(game, alternateGame);
+  for (const candidate of candidates) {
+    if (source === "nhl") {
+      const cached = nhlComRecapUrlByGameId.get(candidate.id);
+      if (cached) return cached;
+    }
+    const immediate = resolveGrarfExtensionNhlRecapNavigationUrl(candidate, source);
+    if (immediate) {
+      if (source === "nhl") {
+        nhlComRecapUrlByGameId.set(candidate.id, immediate);
+      }
+      return immediate;
+    }
   }
-  try {
-    const [enriched] = await enrichNhlGamesWithNhlComGamecenterLinks([game]);
-    return resolveNhlComGamecenterRecapUrlFromGame(enriched ?? game);
-  } catch {
-    return null;
+  if (source !== "nhl") {
+    return resolveGrarfExtensionNhlRecapNavigationUrl(game, source);
   }
+  for (const candidate of candidates) {
+    try {
+      const [enriched] = await enrichNhlGamesWithNhlComGamecenterLinks([candidate]);
+      const url = resolveNhlComGamecenterRecapUrlFromGame(enriched ?? candidate);
+      if (url) {
+        nhlComRecapUrlByGameId.set(candidate.id, url);
+        return url;
+      }
+    } catch {
+    }
+  }
+  return null;
 }
 
 // ../grarf/desktop/src/extensionHost/grarfExtensionNhlRecapsSourceStore.ts
@@ -176978,15 +177007,20 @@ async function navigateGrarfExtensionGameYesterdayRecap(game, options) {
     setGrarfExtensionGamesYesterdayHighlightsActiveGameId(game.id);
     return true;
   }
-  if (isNhlRecapGame(game)) {
+  if (isNhlRecapGame(navigationRow) || isNhlRecapGame(game)) {
+    const nhlRecapSource = getGrarfExtensionNhlRecapsSource();
     const nhlRecapUrl = await resolveGrarfExtensionNhlRecapNavigationUrlFromGame(
-      game,
-      getGrarfExtensionNhlRecapsSource()
+      navigationRow,
+      nhlRecapSource,
+      game
     );
     if (nhlRecapUrl) {
       navigateGrarfExtensionHostExternalUrl(nhlRecapUrl);
       completeCatchUpRecapNavigation(game);
       return true;
+    }
+    if (nhlRecapSource === "nhl") {
+      return false;
     }
   }
   const wnbaFinalsRecapUrl = resolveGrarfExtensionWnba2026FinalsRecapNavigationUrlFromGame(game);
@@ -177209,6 +177243,15 @@ function resolveGrarfExtensionCommandCenterScorecardRecapUrl(game) {
     );
     if (ncaafRecapUrl) return ncaafRecapUrl;
   }
+  const isNhlRecapGameRow = row.league === "NHL" || row.id.startsWith("espn-NHL-") || game.league === "NHL" || game.id.startsWith("espn-NHL-");
+  if (isNhlRecapGameRow) {
+    const nhlRecapSource = getGrarfExtensionNhlRecapsSource();
+    const nhlRecapUrl = resolveGrarfExtensionNhlRecapNavigationUrl(row, nhlRecapSource);
+    if (nhlRecapUrl) return nhlRecapUrl;
+    if (nhlRecapSource === "nhl") {
+      return null;
+    }
+  }
   const espnRecapUrl = resolveEspnRecapUrlForGame(game);
   if (espnRecapUrl) return espnRecapUrl;
   const context2 = resolveGameBrowserContext(game);
@@ -177219,13 +177262,6 @@ function resolveGrarfExtensionCommandCenterScorecardRecapUrl(game) {
   );
   const fromContentSources = firstResolvedWebsiteUrl(websites);
   if (fromContentSources) return fromContentSources;
-  if (game.league === "NHL" || game.id.startsWith("espn-NHL-")) {
-    const nhlRecapUrl = resolveGrarfExtensionNhlRecapNavigationUrl(
-      game,
-      getGrarfExtensionNhlRecapsSource()
-    );
-    if (nhlRecapUrl) return nhlRecapUrl;
-  }
   if (grarfExtensionLeagueUsesBbcSportEplRecaps(game.league ?? "")) {
     const eplRecapUrl = resolveGrarfExtensionEplRecapNavigationUrl(
       game,
@@ -177451,6 +177487,17 @@ async function openGrarfExtensionCommandCenterScorecardMediaActionUrl(game, medi
     if (oneFootballRecapUrl) {
       openGrarfExtensionCommandCenterScorecardExternalUrl(oneFootballRecapUrl);
       return;
+    }
+    if (game.league === "NHL" || game.id.startsWith("espn-NHL-")) {
+      const nhlRecapUrl = await resolveGrarfExtensionNhlRecapNavigationUrlFromGame(
+        resolveGrarfExtensionOperationalNavigationGame(game),
+        getGrarfExtensionNhlRecapsSource(),
+        game
+      );
+      if (nhlRecapUrl) {
+        openGrarfExtensionCommandCenterScorecardExternalUrl(nhlRecapUrl);
+        return;
+      }
     }
   }
   if (mediaAction.kind === "preview") {
