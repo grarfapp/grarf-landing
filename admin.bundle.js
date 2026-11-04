@@ -19765,6 +19765,9 @@ init_define_import_meta_env();
 // ../grarf/shared/domain/tennis/formatTennisComMatchSlug.ts
 init_define_import_meta_env();
 
+// ../grarf/shared/domain/tennis/resolveTennisComTournamentSlug.ts
+init_define_import_meta_env();
+
 // ../grarf/shared/domain/tennis/resolveTennisComMatchUrlFromGame.ts
 init_define_import_meta_env();
 

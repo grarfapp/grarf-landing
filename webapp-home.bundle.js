@@ -28570,7 +28570,6 @@ function resolveOperationalStartupGateState(input) {
 // ../grarf/desktop/src/services/operationalIngest/startOperationalSnapshotPolling.ts
 init_define_import_meta_env();
 init_operationalIngestConfig();
-init_isGrarfWebRenderer();
 init_operationalSnapshotRefreshMs();
 
 // ../grarf/desktop/src/services/operationalIngest/extensionOperationalIngestHealth.ts
@@ -32675,20 +32674,6 @@ function scheduleExtensionOperationalCloudHydrate(transport, runHydrate) {
       skippedStaleHydrateCount += 1;
       return void 0;
     }
-    await new Promise((resolve) => {
-      if (typeof requestAnimationFrame === "function") {
-        requestAnimationFrame(() => resolve());
-      } else {
-        setTimeout(resolve, 0);
-      }
-    });
-    await new Promise((resolve) => {
-      if (typeof requestIdleCallback === "function") {
-        requestIdleCallback(() => resolve(), { timeout: 2e3 });
-      } else {
-        setTimeout(resolve, 16);
-      }
-    });
     return runHydrate();
   });
   hydrateChain = scheduled.then(
@@ -32981,21 +32966,7 @@ function startOperationalSnapshotPolling(onTransport, options) {
     });
     await pollInFlight;
   };
-  function scheduleExtensionDeferredPoll() {
-    const kick = () => {
-      if (!stopped) void runPoll();
-    };
-    if (typeof requestIdleCallback === "function") {
-      requestIdleCallback(kick, { timeout: 4e3 });
-    } else {
-      setTimeout(kick, 750);
-    }
-  }
-  if (isGrarfExtensionRenderer()) {
-    scheduleExtensionDeferredPoll();
-  } else {
-    void runPoll();
-  }
+  void runPoll();
   intervalId = setInterval(() => {
     void runPoll();
   }, intervalMs2);
@@ -41721,6 +41692,13 @@ function parseTennisComPlayerName(raw) {
     if (!lastName2 || !firstInitials) return null;
     return { lastName: lastName2, firstInitials };
   }
+  const lastnameAbbrev = /^(.+?)\s+([A-Za-z]{2,3})$/.exec(trimmed);
+  if (lastnameAbbrev) {
+    const lastName2 = slugifyTennisComNameSegment(lastnameAbbrev[1] ?? "");
+    const firstInitials = (lastnameAbbrev[2] ?? "").toLowerCase();
+    if (!lastName2 || !firstInitials) return null;
+    return { lastName: lastName2, firstInitials };
+  }
   const shortEspn = /^(.+?)\s+([A-Za-z])$/.exec(trimmed);
   if (shortEspn) {
     const lastName2 = slugifyTennisComNameSegment(shortEspn[1] ?? "");
@@ -41766,11 +41744,50 @@ function buildTennisComMatchSlugSegment(input) {
   const home = formatTennisComSideSlug(input.homeSideLabel);
   const away = formatTennisComSideSlug(input.awaySideLabel);
   if (!home || !away) return null;
-  const doubles = isDoublesSideLabel(input.homeSideLabel) || isDoublesSideLabel(input.awaySideLabel);
-  return doubles ? `${home}-vs-${away}` : `${away}-vs-${home}`;
+  return `${home}-vs-${away}`;
 }
 function slugifyTennisComTournamentName(tournamentName) {
   return slugifyTennisComNameSegment(tournamentName);
+}
+
+// ../grarf/shared/domain/tennis/resolveTennisComTournamentSlug.ts
+init_define_import_meta_env();
+var TOURNAMENT_SLUG_ALIASES = {
+  paris: "rolex-paris-masters",
+  "paris-doubles": "rolex-paris-masters"
+};
+function normalizeTennisComTournamentSlug(slug) {
+  const key2 = slug.trim().toLowerCase();
+  return TOURNAMENT_SLUG_ALIASES[key2] ?? slug;
+}
+function resolveTennisComTournamentNameFromContextLine(contextLine) {
+  const raw = contextLine.split(" \xB7 ")[0]?.trim() ?? "";
+  const withoutDoublesSuffix = raw.replace(/,\s*doubles\s*$/i, "").trim();
+  return withoutDoublesSuffix || null;
+}
+function resolveTennisComTournamentSlugFromContextLine(contextLine) {
+  const tournamentName = resolveTennisComTournamentNameFromContextLine(contextLine);
+  if (!tournamentName) return null;
+  const slug = slugifyTennisComTournamentName(tournamentName);
+  if (!slug) return null;
+  return normalizeTennisComTournamentSlug(slug);
+}
+function normalizeTennisComMatchPageUrl(url) {
+  const trimmed = url.trim();
+  if (!trimmed) return trimmed;
+  try {
+    const parsed = new URL(trimmed);
+    const host = parsed.hostname.toLowerCase();
+    if (host !== "www.tennis.com" && host !== "tennis.com") return trimmed;
+    const match = /^\/tournaments\/([^/]+)\/matches\/(.+)$/i.exec(parsed.pathname);
+    if (!match) return trimmed;
+    const normalizedSlug = normalizeTennisComTournamentSlug(match[1] ?? "");
+    if (normalizedSlug === match[1]) return trimmed;
+    parsed.pathname = `/tournaments/${normalizedSlug}/matches/${match[2]}`;
+    return parsed.toString();
+  } catch {
+    return trimmed;
+  }
 }
 
 // ../grarf/shared/domain/tennis/buildTennisComMatchUrlFromGame.ts
@@ -41786,11 +41803,32 @@ function resolveTennisTourLeagueKeyFromGame(game) {
 function gameSupportsTennisComMatchUrl(game) {
   return resolveTennisTourLeagueKeyFromGame(game) != null;
 }
+function splitDoublesSidePlayers(sideLabel) {
+  return sideLabel.split("/").map((player) => player.trim()).filter(Boolean);
+}
+function readTennisDoublesSideLabel(teamSide, officialSide) {
+  const teamPlayers = splitDoublesSidePlayers(teamSide);
+  const officialPlayers = splitDoublesSidePlayers(officialSide);
+  if (teamPlayers.length < 2 || officialPlayers.length < 2) return teamSide;
+  return teamPlayers.map((teamPlayer, index2) => {
+    const officialPlayer = officialPlayers[index2]?.trim() ?? "";
+    if (officialPlayer && !officialPlayer.includes(",") && /^.+\s[A-Za-z]{2,3}$/.test(officialPlayer)) {
+      return officialPlayer;
+    }
+    return teamPlayer;
+  }).join(" / ");
+}
 function readTennisSideLabel(game, side) {
-  const official = side === "away" ? game.metadata?.officialAwayName : game.metadata?.officialHomeName;
-  const officialTrimmed = official?.trim();
-  if (officialTrimmed) return officialTrimmed;
-  return (side === "away" ? game.awayTeam : game.homeTeam)?.trim() ?? "";
+  const team = (side === "away" ? game.awayTeam : game.homeTeam)?.trim() ?? "";
+  const official = (side === "away" ? game.metadata?.officialAwayName : game.metadata?.officialHomeName)?.trim() ?? "";
+  if (team.includes("/")) {
+    if (official.includes("/") && !official.includes(",")) {
+      return readTennisDoublesSideLabel(team, official);
+    }
+    return team;
+  }
+  if (official) return official;
+  return team;
 }
 function resolveTennisComMatchDateKey(game) {
   const scheduled = game.scheduledDateKey?.trim() ?? "";
@@ -41807,12 +41845,10 @@ function resolveTennisComMatchDateKey(game) {
 }
 function resolveTennisComTournamentSlug(game) {
   const override = game.metadata?.tennisComTournamentSlug?.trim();
-  if (override) return override;
+  if (override) return normalizeTennisComTournamentSlug(override);
   const contextLine = game.metadata?.tennis?.contextLine?.trim() ?? "";
-  const tournamentName = contextLine.split(" \xB7 ")[0]?.trim() ?? "";
-  if (!tournamentName) return null;
-  const slug = slugifyTennisComTournamentName(tournamentName);
-  return slug || null;
+  if (!contextLine) return null;
+  return resolveTennisComTournamentSlugFromContextLine(contextLine);
 }
 function buildTennisComMatchUrlFromGame(game) {
   if (!gameSupportsTennisComMatchUrl(game)) return null;
@@ -41843,7 +41879,9 @@ function isTennisComMatchUrl(url) {
 }
 function resolveTennisComMatchUrlFromGame(game) {
   const gameCardUrl = game.gameCardUrl?.trim();
-  if (gameCardUrl && isTennisComMatchUrl(gameCardUrl)) return gameCardUrl;
+  if (gameCardUrl && isTennisComMatchUrl(gameCardUrl)) {
+    return normalizeTennisComMatchPageUrl(gameCardUrl);
+  }
   return buildTennisComMatchUrlFromGame(game);
 }
 
@@ -47206,7 +47244,8 @@ async function hydrateOperationalSnapshotFromTransport(rawTransport, hydrate, co
     return;
   }
   let transportForHydrate = rawTransport;
-  if (isGrarfExtensionRenderer() && isCentralizedSnapshot && !context2.skipClientOperationalEnrich) {
+  if (isGrarfExtensionRenderer() && isCentralizedSnapshot) {
+  } else if (isGrarfExtensionRenderer() && isCentralizedSnapshot && !context2.skipClientOperationalEnrich) {
     try {
       transportForHydrate = await enrichOperationalTransport(rawTransport);
     } catch (e2) {
@@ -47322,15 +47361,6 @@ async function hydrateOperationalSnapshotFromTransport(rawTransport, hydrate, co
         });
       }
     } else {
-      if (isGrarfExtensionRenderer() && isCentralizedSnapshot && !context2.startupSeed) {
-        await new Promise((resolve) => {
-          if (typeof requestAnimationFrame === "function") {
-            requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
-          } else {
-            setTimeout(resolve, 0);
-          }
-        });
-      }
       await Promise.resolve(hydrate(coreSnap, completenessWithTransport));
       recordOperationalStartupTrace("hydrate_complete", {
         source: completenessWithTransport.source
@@ -75960,7 +75990,7 @@ function resolveGrarfCloudOperationalIngestBinding(input) {
   let runImmediateCloudHydrate = false;
   if (extensionGrarfCloudHost) {
     pollingStrategy = "extension_direct";
-    runImmediateCloudHydrate = false;
+    runImmediateCloudHydrate = true;
   } else if (input.hasElectronGamesIpc) {
     pollingStrategy = "electron_cloud";
   } else if (input.isCanonicalWebBrowserRenderer) {
