@@ -178985,14 +178985,14 @@ function resolveGrarfExtensionCatchUpRecapHeadlinePresentation(game, slices) {
     { eligible: shouldFetchGrarfExtensionEspnRecapHeadline(game), slice: slices.espn }
   ];
   for (const provider of ordered) {
-    if (!provider.eligible) continue;
+    if (!provider.eligible || !provider.slice) continue;
     const headline = trimCatchUpRecapHeadline(provider.slice.headline);
     if (headline) {
       return { headline, showHeadlineUi: true };
     }
   }
   for (const provider of ordered) {
-    if (!provider.eligible) continue;
+    if (!provider.eligible || !provider.slice) continue;
     if (provider.slice.showHeadlineUi) {
       return { headline: null, showHeadlineUi: true };
     }
@@ -201047,6 +201047,7 @@ var EMPTY_CATCH_UP_RECAP_HEADLINE_SLICES = {
   mlb: EMPTY_CATCH_UP_RECAP_HEADLINE_SLICE,
   espn: EMPTY_CATCH_UP_RECAP_HEADLINE_SLICE,
   ncaaf: EMPTY_CATCH_UP_RECAP_HEADLINE_SLICE,
+  nhl: EMPTY_CATCH_UP_RECAP_HEADLINE_SLICE,
   wnba2026Finals: EMPTY_CATCH_UP_RECAP_HEADLINE_SLICE
 };
 function useGrarfExtensionCatchUpRecapHeadlineOperational(game) {
