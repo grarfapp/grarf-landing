@@ -25091,10 +25091,9 @@ function resolveOperationalCloudSnapshotFetchTarget() {
   const published = publishedFeedUrl?.trim();
   if (isGrarfExtensionRenderer() && published) {
     return {
-      url: published,
-      // Stable URL for shared CDN/browser cache; freshness from R2 Cache-Control (max-age=10, SWR=30)
-      // plus 15s client poll (poll interval exceeds CDN max-age → revalidation, not stale reuse).
-      cache: "default",
+      url: appendOperationalSnapshotClientMs(published),
+      // Side panel must not reuse a cached feed body — generatedAt can advance without ESPN rows.
+      cache: "no-store",
       transport: "published_feed"
     };
   }
@@ -36695,17 +36694,19 @@ function sanitizeOperationalSnapshotPresentation(transport) {
   }
   return changed ? { ...transport, leagues } : transport;
 }
-async function enrichExtensionCloudOperationalTransport(transport) {
+async function enrichExtensionCloudOperationalTransport(transport, options) {
   let next = transport;
   try {
     next = await supplementOperationalSnapshotAllSportsApiEspnEnrichment(next);
   } catch (e) {
     console.warn(`${LOG21} AllSportsAPI ESPN enrichment supplement failed (extension cloud)`, e);
   }
-  try {
-    next = await enrichOperationalSnapshotFotmob(next);
-  } catch (e) {
-    console.warn(`${LOG21} FotMob enrich failed (extension cloud)`, e);
+  if (!options?.skipFotmobMatchEnrich) {
+    try {
+      next = await enrichOperationalSnapshotFotmob(next);
+    } catch (e) {
+      console.warn(`${LOG21} FotMob enrich failed (extension cloud)`, e);
+    }
   }
   try {
     next = sanitizeOperationalSnapshotIngestLogoUrls(next);
@@ -36733,7 +36734,9 @@ async function enrichOperationalTransport(rawTransport) {
   if (isGrarfExtensionRenderer() && rawTransport.source === "grarf_operational_service") {
     let transport2 = rawTransport;
     try {
-      transport2 = await enrichExtensionCloudOperationalTransport(transport2);
+      transport2 = await enrichExtensionCloudOperationalTransport(transport2, {
+        skipFotmobMatchEnrich: true
+      });
     } catch (e) {
       console.warn(`${LOG21} extension cloud enrich failed`, e);
     }
