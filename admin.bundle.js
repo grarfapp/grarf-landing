@@ -17309,10 +17309,15 @@ function mergeOperationalIdentityMetadata(identityRow, statusRow) {
 }
 function mergeReconciledExternalIds(identityRow, statusRow) {
   if (!identityRow.externalIds && !statusRow.externalIds) return void 0;
-  return {
+  const merged = {
     ...identityRow.externalIds ?? {},
     ...statusRow.externalIds ?? {}
   };
+  const preservedFotmob = statusRow.externalIds?.fotmob?.trim() || identityRow.externalIds?.fotmob?.trim();
+  if (preservedFotmob && !merged?.fotmob?.trim()) {
+    return { ...merged, fotmob: preservedFotmob };
+  }
+  return merged;
 }
 function resolveReconciledGameCardUrl(identityRow, statusRow, mergedMetadata, mergedExternalIds) {
   const leagueKey = identityRow.league ?? statusRow.league;
@@ -19752,6 +19757,12 @@ async function enrichPllGameCardRouting(games) {
 }
 
 // ../grarf/desktop/src/lib/tennis/resolveTennisGameCardEmbedUrl.ts
+init_define_import_meta_env();
+
+// ../grarf/shared/domain/tennis/buildTennisComMatchUrlFromGame.ts
+init_define_import_meta_env();
+
+// ../grarf/shared/domain/tennis/formatTennisComMatchSlug.ts
 init_define_import_meta_env();
 
 // ../grarf/shared/domain/tennis/resolveTennisComMatchUrlFromGame.ts
@@ -30102,10 +30113,10 @@ function buildFotmobMatchUrl(matchId) {
   return `https://www.fotmob.com/match/${encodeURIComponent(id)}`;
 }
 
-// ../grarf/grarf-operational-service/src/watch/fotmob/fetchFotmobSoccerCatalog.ts
+// ../grarf/grarf-operational-service/src/cache/operationalGameEnrichmentStore.ts
 init_define_import_meta_env();
 
-// ../grarf/grarf-operational-service/src/watch/fotmob/fetchFotmobMatchesByDate.ts
+// ../grarf/grarf-operational-service/src/cache/operationalEnrichmentProviderCache.ts
 init_define_import_meta_env();
 
 // ../grarf/grarf-operational-service/src/config/operationalConfig.ts
@@ -30879,9 +30890,6 @@ var ESPN_LEAGUES = ESPN_OPERATIONAL_INGEST_LEAGUES2.map((l) => ({
 var ESPN_LEAGUE_KEYS = ESPN_LEAGUES.map((l) => l.key);
 var CHROME_UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36";
 
-// ../grarf/grarf-operational-service/src/cache/operationalEnrichmentProviderCache.ts
-init_define_import_meta_env();
-
 // ../grarf/grarf-operational-service/src/instrumentation/operationalCycleMetrics.ts
 init_define_import_meta_env();
 var activeCycle = null;
@@ -30902,6 +30910,9 @@ var CACHE_NAME = "grarf-operational-enrichment-v1";
 var configuredPollIntervalMs = 6e4;
 var durableCache;
 var cycleStats = emptyStats();
+function getOperationalEnrichmentDurableKv() {
+  return durableCache;
+}
 function emptyStats() {
   return {
     hits: 0,
@@ -31013,6 +31024,169 @@ function resolveOperationalEnrichmentDateKeyTtlMs(dateKey, now = /* @__PURE__ */
   if (normalized < todayKey) return resolveOperationalEnrichmentHistoricalCatalogTtlMs();
   return resolveOperationalEnrichmentScheduledCatalogTtlMs();
 }
+
+// ../grarf/grarf-operational-service/src/cache/operationalGameEnrichmentStore.ts
+function buildOperationalGameEnrichmentKvKey(leagueKey, storageIdentity) {
+  return `operational-game-enrichment:v1:${leagueKey}:${storageIdentity}`;
+}
+function buildOperationalGameEnrichmentStorageIdentities(game) {
+  const identities = /* @__PURE__ */ new Set();
+  const id = game.id?.trim();
+  if (id) identities.add(id);
+  const asa = String(
+    game.externalIds?.allSportsApi ?? game.metadata?.operational?.allSportsApiEventId ?? ""
+  ).trim();
+  if (asa) identities.add(`allsportsapi:${asa}`);
+  const espn = String(game.externalIds?.espn ?? game.espnEventId ?? "").trim();
+  if (espn) {
+    identities.add(`espn:${espn}`);
+    const leagueKey = String(game.league ?? "").trim();
+    if (leagueKey) {
+      identities.add(`espn-${leagueKey}-${espn}`);
+    }
+  }
+  return [...identities];
+}
+function mergeContentRecord(base, patch) {
+  if (!base && !patch) return void 0;
+  const watchLinks = (patch?.watchLinks?.length ?? 0) > 0 ? patch.watchLinks : base?.watchLinks;
+  const recap = patch?.recap ?? base?.recap;
+  if (!watchLinks?.length && !recap) return void 0;
+  return {
+    ...watchLinks?.length ? { watchLinks } : {},
+    ...recap ? { recap } : {}
+  };
+}
+function trimEnrichmentText(value) {
+  const trimmed = String(value ?? "").trim();
+  return trimmed.length > 0 ? trimmed : void 0;
+}
+function mergeOperationalGameEnrichmentRecords(base, patch) {
+  if (!patch) return base;
+  if (!base) return patch;
+  return {
+    acquiredAtMs: Math.max(base.acquiredAtMs, patch.acquiredAtMs),
+    broadcasts: patch.broadcasts?.length ? patch.broadcasts : base.broadcasts,
+    channels: patch.channels?.length ? patch.channels : base.channels,
+    espnEventId: patch.espnEventId ?? base.espnEventId,
+    externalIds: {
+      espn: patch.externalIds?.espn ?? base.externalIds?.espn,
+      allSportsApi: patch.externalIds?.allSportsApi ?? base.externalIds?.allSportsApi,
+      fotmob: patch.externalIds?.fotmob ?? base.externalIds?.fotmob
+    },
+    gameCardUrl: patch.gameCardUrl ?? base.gameCardUrl,
+    gameCardNavigationMode: patch.gameCardNavigationMode ?? base.gameCardNavigationMode,
+    streamUrl: patch.streamUrl ?? base.streamUrl,
+    streamProvider: patch.streamProvider ?? base.streamProvider,
+    nbaGameId: patch.nbaGameId ?? base.nbaGameId,
+    launchMode: patch.launchMode ?? base.launchMode,
+    espnWatchEventId: patch.espnWatchEventId ?? base.espnWatchEventId,
+    espnPlusPlayerId: patch.espnPlusPlayerId ?? base.espnPlusPlayerId,
+    paramountListingId: patch.paramountListingId ?? base.paramountListingId,
+    fotmobMatchUrl: patch.fotmobMatchUrl ?? base.fotmobMatchUrl,
+    content: mergeContentRecord(base.content, patch.content),
+    espnRecapHeadline: trimEnrichmentText(patch.espnRecapHeadline) ?? trimEnrichmentText(base.espnRecapHeadline),
+    catchUpPreviewHeadline: trimEnrichmentText(patch.catchUpPreviewHeadline) ?? trimEnrichmentText(base.catchUpPreviewHeadline)
+  };
+}
+function extractOperationalGameEnrichmentRecord(game) {
+  const broadcasts = [...game.broadcasts ?? []].filter((l) => String(l ?? "").trim());
+  const channels = [...game.channels ?? []].filter((l) => String(l ?? "").trim());
+  const espnEventId = String(game.espnEventId ?? game.externalIds?.espn ?? "").trim();
+  const streamUrl = String(game.streamUrl ?? "").trim();
+  const gameCardUrl = String(game.gameCardUrl ?? "").trim();
+  const nbaGameId = String(game.nbaGameId ?? "").trim();
+  const espnWatchEventId = String(game.espnWatchEventId ?? "").trim();
+  const espnPlusPlayerId = String(game.espnPlusPlayerId ?? "").trim();
+  const gameCardNavigationMode = String(game.gameCardNavigationMode ?? "").trim();
+  const watchLinks = Array.isArray(game.content?.watchLinks) ? game.content.watchLinks : [];
+  const recap = game.content?.recap;
+  const espnRecapHeadline = game.metadata?.espnRecapHeadline?.trim();
+  const catchUpPreviewHeadline = game.metadata?.catchUpPreviewHeadline?.trim();
+  const fotmobMatchUrl = game.metadata?.fotmobMatchUrl?.trim();
+  const fotmobId = game.externalIds?.fotmob?.trim();
+  const paramountListingId = game.paramountListingId?.trim();
+  if (!broadcasts.length && !channels.length && !espnEventId && !streamUrl && !gameCardUrl && !nbaGameId && !espnWatchEventId && !espnPlusPlayerId && !paramountListingId && !fotmobMatchUrl && !fotmobId && !watchLinks.length && !recap && !espnRecapHeadline && !catchUpPreviewHeadline) {
+    return null;
+  }
+  return {
+    acquiredAtMs: Date.now(),
+    ...broadcasts.length ? { broadcasts } : {},
+    ...channels.length ? { channels } : {},
+    ...espnEventId ? {
+      espnEventId,
+      externalIds: {
+        espn: espnEventId,
+        allSportsApi: game.externalIds?.allSportsApi ?? void 0,
+        fotmob: fotmobId || void 0
+      }
+    } : fotmobId ? { externalIds: { fotmob: fotmobId } } : {},
+    ...gameCardUrl ? { gameCardUrl } : {},
+    ...gameCardNavigationMode ? { gameCardNavigationMode } : {},
+    ...streamUrl ? {
+      streamUrl,
+      streamProvider: game.streamProvider ?? void 0,
+      launchMode: game.launchMode ?? void 0
+    } : {},
+    ...nbaGameId ? { nbaGameId } : {},
+    ...espnWatchEventId ? { espnWatchEventId } : {},
+    ...espnPlusPlayerId ? { espnPlusPlayerId } : {},
+    ...paramountListingId ? { paramountListingId } : {},
+    ...fotmobMatchUrl ? { fotmobMatchUrl } : {},
+    ...watchLinks.length || recap ? {
+      content: {
+        ...watchLinks.length ? { watchLinks: [...watchLinks] } : {},
+        ...recap ? { recap } : {}
+      }
+    } : {},
+    ...espnRecapHeadline ? { espnRecapHeadline } : {},
+    ...catchUpPreviewHeadline ? { catchUpPreviewHeadline } : {}
+  };
+}
+async function readStoredRecord(leagueKey, storageIdentity) {
+  const kv = getOperationalEnrichmentDurableKv();
+  if (!kv) return null;
+  const key = buildOperationalGameEnrichmentKvKey(leagueKey, storageIdentity);
+  try {
+    const row = await kv.get(key, "json");
+    if (!row?.value || typeof row.value.acquiredAtMs !== "number") return null;
+    return row.value;
+  } catch {
+    return null;
+  }
+}
+async function writeStoredRecord(leagueKey, storageIdentity, record) {
+  const kv = getOperationalEnrichmentDurableKv();
+  if (!kv) return;
+  const key = buildOperationalGameEnrichmentKvKey(leagueKey, storageIdentity);
+  try {
+    await kv.put(key, JSON.stringify({ value: record }));
+  } catch {
+  }
+}
+async function mergePersistOperationalGameEnrichmentFromRow(game) {
+  const league2 = game.league;
+  if (!league2) return;
+  const patch = extractOperationalGameEnrichmentRecord(game);
+  if (!patch) return;
+  const identities = buildOperationalGameEnrichmentStorageIdentities(game);
+  if (!identities.length) return;
+  let merged = null;
+  for (const identity2 of identities) {
+    merged = mergeOperationalGameEnrichmentRecords(merged, await readStoredRecord(league2, identity2));
+  }
+  merged = mergeOperationalGameEnrichmentRecords(merged, patch);
+  if (!merged) return;
+  await Promise.all(
+    identities.map((identity2) => writeStoredRecord(league2, identity2, merged))
+  );
+}
+
+// ../grarf/grarf-operational-service/src/watch/fotmob/fetchFotmobSoccerCatalog.ts
+init_define_import_meta_env();
+
+// ../grarf/grarf-operational-service/src/watch/fotmob/fetchFotmobMatchesByDate.ts
+init_define_import_meta_env();
 
 // ../grarf/grarf-operational-service/src/cache/withOperationalEnrichmentProviderCache.ts
 init_define_import_meta_env();
@@ -31128,7 +31302,7 @@ function fotmobBucketMatchesRegistryEntry(bucket, entry2) {
 var FOTMOB_MATCHES_API = "https://www.fotmob.com/api/data/matches";
 var fotmobInFlightByDateKey = /* @__PURE__ */ new Map();
 function isValidFotmobLeagueBuckets(value) {
-  return Array.isArray(value);
+  return Array.isArray(value) && value.length > 0;
 }
 async function fetchFotmobLeagueBucketsByDateUncached(dateKey) {
   try {
@@ -31593,10 +31767,22 @@ var normalizeMlsSoccerTeamName = createProviderAliasNormalizer({
   }
 });
 
+// ../grarf/shared/domain/soccer/teamNormalization/leagues/uel.ts
+init_define_import_meta_env();
+var normalizeUelSoccerTeamName = createProviderAliasNormalizer({
+  espn: {
+    "Stade Rennais": "Rennes"
+  },
+  fotmob: {
+    Rennes: "Rennes"
+  }
+});
+
 // ../grarf/shared/domain/soccer/teamNormalization/registry.ts
 var SOCCER_TEAM_NORMALIZATION_REGISTRY = {
   BRA1: normalizeBra1SoccerTeamName,
-  MLS: normalizeMlsSoccerTeamName
+  MLS: normalizeMlsSoccerTeamName,
+  UEL: normalizeUelSoccerTeamName
 };
 function getSoccerTeamNameNormalizer(league2) {
   return SOCCER_TEAM_NORMALIZATION_REGISTRY[league2] ?? null;
@@ -31703,20 +31889,30 @@ async function enrichSoccerGamesWithFotmobUrls(games) {
     (game) => isSoccerRow(game) && getFotmobLeagueRegistryEntry(game.league) && !hasFotmobRoutingMetadata(game)
   );
   if (pending.length === 0) return games;
+  const catalogSeedGames = games.filter(
+    (game) => isSoccerRow(game) && getFotmobLeagueRegistryEntry(game.league)
+  );
   let catalogs;
   try {
-    catalogs = await fetchFotmobSoccerCatalogsByLeague(pending);
+    catalogs = await fetchFotmobSoccerCatalogsByLeague(catalogSeedGames);
   } catch {
     return games;
   }
-  return games.map((game) => {
+  const persistTasks = [];
+  const enriched = games.map((game) => {
     if (!isSoccerRow(game) || hasFotmobRoutingMetadata(game)) return game;
     const catalog = catalogs[game.league];
     if (!catalog?.length) return game;
     const fotmobMatch = matchFotmobSoccerMatch(game, catalog);
     if (!fotmobMatch) return game;
-    return attachFotmobMatch(game, fotmobMatch);
+    const attached = attachFotmobMatch(game, fotmobMatch);
+    persistTasks.push(mergePersistOperationalGameEnrichmentFromRow(attached));
+    return attached;
   });
+  if (persistTasks.length > 0) {
+    await Promise.all(persistTasks);
+  }
+  return enriched;
 }
 
 // ../grarf/grarf-operational-service/src/watch/fotmob/enrichOperationalSnapshotFotmob.ts
