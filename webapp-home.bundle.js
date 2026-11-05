@@ -41871,6 +41871,7 @@ function splitDoublesSidePlayers(sideLabel) {
   return sideLabel.split("/").map((player) => player.trim()).filter(Boolean);
 }
 function readTennisDoublesSideLabel(teamSide, officialSide) {
+  if (officialSide.includes(",")) return officialSide;
   const teamPlayers = splitDoublesSidePlayers(teamSide);
   const officialPlayers = splitDoublesSidePlayers(officialSide);
   if (teamPlayers.length < 2 || officialPlayers.length < 2) return teamSide;
@@ -41886,7 +41887,7 @@ function readTennisSideLabel(game, side) {
   const team = (side === "away" ? game.awayTeam : game.homeTeam)?.trim() ?? "";
   const official = (side === "away" ? game.metadata?.officialAwayName : game.metadata?.officialHomeName)?.trim() ?? "";
   if (team.includes("/")) {
-    if (official.includes("/") && !official.includes(",")) {
+    if (official.includes("/")) {
       return readTennisDoublesSideLabel(team, official);
     }
     return team;
@@ -76124,6 +76125,227 @@ function startTemporaryEditorialOverridesPolling() {
   });
 }
 
+// ../grarf/desktop/src/services/editorial/startDailyEditorialPackagePolling.ts
+init_define_import_meta_env();
+
+// ../grarf/shared/config/dailyEditorialPackage.ts
+init_define_import_meta_env();
+var DAILY_EDITORIAL_PACKAGE_SCHEMA_VERSION = 1;
+var DAILY_EDITORIAL_PACKAGE_HTTP_PATH = "/operational/daily-editorial";
+var DAILY_EDITORIAL_PACKAGE_CLIENT_REFRESH_MS = 5 * 60 * 1e3;
+
+// ../grarf/desktop/src/services/editorial/startDailyEditorialPackagePolling.ts
+init_isGrarfWebRenderer();
+
+// ../grarf/desktop/src/services/editorial/fetchDailyEditorialPackage.ts
+init_define_import_meta_env();
+
+// ../grarf/shared/domain/editorial/validateDailyEditorialPackage.ts
+init_define_import_meta_env();
+
+// ../grarf/shared/domain/editorial/dailyEditorialPackageContentHash.ts
+init_define_import_meta_env();
+async function sha256HexUtf8(text2) {
+  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text2));
+  return Array.from(new Uint8Array(digest)).map((byte) => byte.toString(16).padStart(2, "0")).join("");
+}
+function canonicalizeDailyEditorialGamesForHash(games) {
+  const sortedKeys = Object.keys(games).sort();
+  const canonical = {};
+  for (const key2 of sortedKeys) {
+    canonical[key2] = games[key2];
+  }
+  return canonical;
+}
+function serializeDailyEditorialPackageForHash(pkg) {
+  return JSON.stringify({
+    version: pkg.version,
+    sportsDayKey: pkg.sportsDayKey,
+    games: canonicalizeDailyEditorialGamesForHash(pkg.games)
+  });
+}
+async function computeDailyEditorialPackageContentHash(pkg) {
+  return sha256HexUtf8(serializeDailyEditorialPackageForHash(pkg));
+}
+
+// ../grarf/shared/domain/editorial/validateDailyEditorialPackage.ts
+var SPORTS_DAY_KEY_RE = /^\d{4}-\d{2}-\d{2}$/;
+function isNonEmptyString2(value) {
+  return typeof value === "string" && value.trim().length > 0;
+}
+async function validateDailyEditorialPackage(candidate) {
+  const errors = [];
+  if (!candidate || typeof candidate !== "object") {
+    return { valid: false, errors: ["package_not_object"] };
+  }
+  const pkg = candidate;
+  if (pkg.version !== DAILY_EDITORIAL_PACKAGE_SCHEMA_VERSION) {
+    errors.push("invalid_version");
+  }
+  if (!isNonEmptyString2(pkg.sportsDayKey) || !SPORTS_DAY_KEY_RE.test(pkg.sportsDayKey.trim())) {
+    errors.push("invalid_sportsDayKey");
+  }
+  if (!isNonEmptyString2(pkg.generatedAt) || Number.isNaN(Date.parse(pkg.generatedAt))) {
+    errors.push("invalid_generatedAt");
+  }
+  if (!isNonEmptyString2(pkg.sourceSnapshotGeneratedAt) || Number.isNaN(Date.parse(pkg.sourceSnapshotGeneratedAt))) {
+    errors.push("invalid_sourceSnapshotGeneratedAt");
+  }
+  if (!isNonEmptyString2(pkg.contentHash)) {
+    errors.push("missing_contentHash");
+  }
+  if (!pkg.games || typeof pkg.games !== "object" || Array.isArray(pkg.games)) {
+    errors.push("invalid_games");
+    return { valid: false, errors };
+  }
+  const seenGameIds = /* @__PURE__ */ new Set();
+  for (const [key2, entry4] of Object.entries(pkg.games)) {
+    if (!isNonEmptyString2(key2)) {
+      errors.push("invalid_game_map_key");
+      continue;
+    }
+    if (seenGameIds.has(key2)) {
+      errors.push(`duplicate_game_key:${key2}`);
+    }
+    seenGameIds.add(key2);
+    if (!entry4 || typeof entry4 !== "object") {
+      errors.push(`invalid_game_entry:${key2}`);
+      continue;
+    }
+    if (entry4.gameId !== key2) {
+      errors.push(`gameId_key_mismatch:${key2}`);
+    }
+    if (!isNonEmptyString2(entry4.gameId)) {
+      errors.push(`missing_gameId:${key2}`);
+    }
+    if (!isNonEmptyString2(entry4.league)) {
+      errors.push(`missing_league:${key2}`);
+    }
+  }
+  if (errors.length > 0) {
+    return { valid: false, errors };
+  }
+  const { contentHash, ...rest } = pkg;
+  const expected = await computeDailyEditorialPackageContentHash(rest);
+  if (contentHash !== expected) {
+    return { valid: false, errors: ["contentHash_mismatch"] };
+  }
+  return { valid: true };
+}
+
+// ../grarf/desktop/src/services/editorial/fetchDailyEditorialPackage.ts
+init_operationalIngestConfig();
+
+// ../grarf/desktop/src/lib/editorial/dailyEditorialPackageRemoteStore.ts
+init_define_import_meta_env();
+
+// ../grarf/desktop/src/extensionHost/extensionDailyEditorialPackageSessionCache.ts
+init_define_import_meta_env();
+var CACHE_KEY2 = "grarf.extension.dailyEditorialPackage.v1";
+var MAX_AGE_MS2 = 24 * 60 * 60 * 1e3;
+function readExtensionDailyEditorialPackageSessionCache() {
+  if (typeof localStorage === "undefined") return null;
+  try {
+    const raw = localStorage.getItem(CACHE_KEY2);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    const savedAtMs = parsed.savedAtMs ?? 0;
+    const pkg = parsed.package;
+    if (!pkg || pkg.version !== 1 || !pkg.games || typeof pkg.games !== "object") return null;
+    if (Date.now() - savedAtMs > MAX_AGE_MS2) return null;
+    return pkg;
+  } catch {
+    return null;
+  }
+}
+function readExtensionDailyEditorialPackageSessionCacheEtag() {
+  if (typeof localStorage === "undefined") return null;
+  try {
+    const raw = localStorage.getItem(CACHE_KEY2);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    return parsed.etag?.trim() || null;
+  } catch {
+    return null;
+  }
+}
+function writeExtensionDailyEditorialPackageSessionCache(pkg, etag) {
+  if (typeof localStorage === "undefined") return;
+  try {
+    localStorage.setItem(
+      CACHE_KEY2,
+      JSON.stringify({ savedAtMs: Date.now(), etag: etag?.trim() || null, package: pkg })
+    );
+  } catch {
+  }
+}
+
+// ../grarf/desktop/src/lib/editorial/dailyEditorialPackageRemoteStore.ts
+var remotePackage = readExtensionDailyEditorialPackageSessionCache();
+var remoteEtag2 = readExtensionDailyEditorialPackageSessionCacheEtag();
+var remoteFetchedAtMs2 = remotePackage ? Date.now() : null;
+function getRemoteDailyEditorialPackage() {
+  return remotePackage;
+}
+function getRemoteDailyEditorialPackageEtag() {
+  return remoteEtag2;
+}
+function setRemoteDailyEditorialPackage(pkg, etag) {
+  remotePackage = pkg;
+  remoteEtag2 = etag?.trim() || null;
+  remoteFetchedAtMs2 = Date.now();
+  writeExtensionDailyEditorialPackageSessionCache(pkg, remoteEtag2);
+}
+
+// ../grarf/desktop/src/services/editorial/fetchDailyEditorialPackage.ts
+async function fetchDailyEditorialPackage() {
+  const baseUrl = getOperationalIngestConfig().cloudBaseUrl?.replace(/\/$/, "");
+  if (!baseUrl) return { ok: false };
+  const url = `${baseUrl}${DAILY_EDITORIAL_PACKAGE_HTTP_PATH}`;
+  const headers = { Accept: "application/json" };
+  const etag = getRemoteDailyEditorialPackageEtag() ?? readExtensionDailyEditorialPackageSessionCacheEtag();
+  if (etag) headers["If-None-Match"] = etag.startsWith('"') ? etag : `"${etag}"`;
+  try {
+    const res = await fetch(url, { headers, signal: AbortSignal.timeout(12e3) });
+    if (res.status === 304) {
+      return {
+        ok: true,
+        notModified: true,
+        package: getRemoteDailyEditorialPackage() ?? void 0,
+        etag
+      };
+    }
+    if (res.status === 404) {
+      return { ok: false, notFound: true };
+    }
+    if (!res.ok) return { ok: false };
+    const json = await res.json();
+    const validation = await validateDailyEditorialPackage(json);
+    if (!validation.valid) return { ok: false };
+    const pkg = json;
+    const responseEtag = res.headers.get("etag");
+    setRemoteDailyEditorialPackage(pkg, responseEtag);
+    return { ok: true, package: pkg, etag: responseEtag };
+  } catch {
+    return { ok: false };
+  }
+}
+
+// ../grarf/desktop/src/services/editorial/startDailyEditorialPackagePolling.ts
+var started2 = false;
+function startDailyEditorialPackagePolling() {
+  if (started2 || !isGrarfExtensionRenderer()) return;
+  started2 = true;
+  const refresh = () => {
+    void fetchDailyEditorialPackage();
+  };
+  refresh();
+  window.setInterval(refresh, DAILY_EDITORIAL_PACKAGE_CLIENT_REFRESH_MS);
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible") refresh();
+  });
+}
+
 // ../grarf/desktop/src/components/LiveGamesBridge.tsx
 function resolveTransportCompleteness(transport) {
   const source = transport.source;
@@ -76184,6 +76406,7 @@ function LiveGamesBridge() {
     recordOperationalStartupTrace("live_games_bridge_mount");
     if (isGrarfExtensionRenderer()) {
       startTemporaryEditorialOverridesPolling();
+      startDailyEditorialPackagePolling();
     }
     kickoffGrarfCloudOperationalIngestHydration();
     const stopIntelligenceRegistrySync = bindCanonicalIntelligenceRegistrySync();
@@ -170912,6 +171135,51 @@ function resolveGrarfExtensionCommandCenterTeamAccentCssProperties(game, side, t
 // ../grarf/desktop/src/extensionHost/grarfExtensionCommandCenterScorecardExternalActions.ts
 init_define_import_meta_env();
 
+// ../grarf/desktop/src/lib/editorial/grarfExtensionDailyEditorialPackageDestinations.ts
+init_define_import_meta_env();
+init_isGrarfWebRenderer();
+
+// ../grarf/desktop/src/lib/editorial/resolveDailyEditorialPackageGameEntry.ts
+init_define_import_meta_env();
+function resolveDailyEditorialPackageGameEntry(game) {
+  const gameId = game.id?.trim();
+  if (!gameId) return null;
+  const pkg = getRemoteDailyEditorialPackage();
+  if (!pkg?.games) return null;
+  const entry4 = pkg.games[gameId];
+  if (!entry4 || entry4.gameId !== gameId) return null;
+  return entry4;
+}
+
+// ../grarf/desktop/src/lib/editorial/grarfExtensionDailyEditorialPackageDestinations.ts
+function trimUrl(value) {
+  const trimmed = value?.trim();
+  return trimmed ? trimmed : null;
+}
+function resolveGrarfExtensionDailyEditorialPackageUrl(game, slot) {
+  if (!isGrarfExtensionRenderer()) return null;
+  const entry4 = resolveDailyEditorialPackageGameEntry(game);
+  if (!entry4) return null;
+  switch (slot) {
+    case "preview":
+      return trimUrl(entry4.preview?.url);
+    case "recap":
+      return trimUrl(entry4.recap?.url);
+    case "highlights":
+      return trimUrl(entry4.highlights?.url);
+    case "gameCenter":
+      return trimUrl(entry4.gameCenter?.url);
+    case "watch":
+      return trimUrl(entry4.watch?.url);
+    case "stats":
+      return trimUrl(entry4.stats?.url);
+    case "boxScore":
+      return trimUrl(entry4.boxScore?.url);
+    default:
+      return null;
+  }
+}
+
 // ../grarf/desktop/src/lib/nfl/resolveNflGametimeChatUrlForGame.ts
 init_define_import_meta_env();
 var catalogPromise = null;
@@ -175473,6 +175741,8 @@ async function resolveGrarfExtensionCatchUpHighlightsUrlForGame(game) {
     surface: "extension"
   });
   if (highlightsOverride) return highlightsOverride;
+  const editorialHighlights = resolveGrarfExtensionDailyEditorialPackageUrl(game, "highlights");
+  if (editorialHighlights) return editorialHighlights;
   if (leagueKey === "NFL" || game.id.startsWith("espn-NFL-")) {
     const nflUrl = await resolveGrarfExtensionNflComHighlightsUrlForGame(game);
     if (nflUrl) return nflUrl;
@@ -176837,6 +177107,8 @@ function resolveGrarfExtensionCommandCenterScorecardWatchUrl(game) {
     surface: "extension"
   });
   if (watchOverride) return watchOverride;
+  const editorialWatch = resolveGrarfExtensionDailyEditorialPackageUrl(game, "watch");
+  if (editorialWatch) return editorialWatch;
   const resolved = resolveWatchLiveDestinationUrl(game)?.trim();
   if (resolved) return resolved;
   return resolveMlbLiveGameWorkspaceWatchUrl(game);
@@ -176863,6 +177135,8 @@ function resolveGrarfExtensionCommandCenterScorecardPreviewUrl(game) {
     surface: "extension"
   });
   if (previewOverride) return previewOverride;
+  const editorialPreview = resolveGrarfExtensionDailyEditorialPackageUrl(game, "preview");
+  if (editorialPreview) return editorialPreview;
   const context2 = resolveGameBrowserContext(game);
   const websites = resolveSportsBrowserPrototypeGameContextContentSourceWebsites(
     game,
@@ -176908,6 +177182,8 @@ function resolveGrarfExtensionCommandCenterScorecardRecapUrl(game) {
     surface: "extension"
   });
   if (recapOverride) return recapOverride;
+  const editorialRecap = resolveGrarfExtensionDailyEditorialPackageUrl(game, "recap");
+  if (editorialRecap) return editorialRecap;
   const row = resolveGrarfExtensionOperationalNavigationGame(game);
   const leagueKey = row.league?.trim().toUpperCase() ?? "";
   if (leagueUsesFotmobOperationalRouting(row.league)) {
@@ -177076,6 +177352,8 @@ function resolveGrarfExtensionCommandCenterScorecardMediaAction(game) {
   };
 }
 function resolveGrarfExtensionCommandCenterScorecardGamecenterUrl(game) {
+  const editorialGameCenter = resolveGrarfExtensionDailyEditorialPackageUrl(game, "gameCenter");
+  if (editorialGameCenter) return editorialGameCenter;
   if (grarfExtensionLeagueUsesOperationalFotmobGamecenterOnly(game)) {
     return resolveGrarfExtensionOperationalFotmobGamecenterUrl(game);
   }
@@ -218356,7 +218634,7 @@ async function diagnoseRendererRssFetch(url) {
   const label = "renderer-fetch";
   console.group(`${LOG53}[${label}] ${url}`);
   try {
-    const started2 = performance.now();
+    const started3 = performance.now();
     const res = await fetch(url, {
       mode: "cors",
       headers: {
@@ -218376,7 +218654,7 @@ async function diagnoseRendererRssFetch(url) {
       contentLength: res.headers.get("content-length"),
       contentEncoding: res.headers.get("content-encoding"),
       headers: headersToRecord(res.headers),
-      elapsedMs: Math.round(performance.now() - started2),
+      elapsedMs: Math.round(performance.now() - started3),
       ...classification
     });
     console.log(`${LOG53}[${label}] preview`, previewRssBody(body));
@@ -218395,9 +218673,9 @@ async function diagnoseElectronRssFetch(url) {
     console.groupEnd();
     return;
   }
-  const started2 = performance.now();
+  const started3 = performance.now();
   const result = await bridge5(url);
-  const elapsedMs = Math.round(performance.now() - started2);
+  const elapsedMs = Math.round(performance.now() - started3);
   const xml = result && "ok" in result && result.ok === true && "xml" in result ? result.xml : "";
   const classification = classifyRssBody(xml);
   const debugAttempts = result && typeof result === "object" && "_rssDebug" in result ? result._rssDebug : void 0;
@@ -221461,7 +221739,7 @@ function normalizeCanonicalManualImportEditorPayload(raw) {
 }
 
 // ../grarf/desktop/src/lib/gamesSpine/manual/validateGamesSpineManualDocument.ts
-function isNonEmptyString2(value) {
+function isNonEmptyString3(value) {
   return typeof value === "string" && value.trim().length > 0;
 }
 function parsePriority(value) {
@@ -221505,10 +221783,10 @@ function validateEvent(raw, index2, sourceTimeZone) {
     return `games[${index2}] must be an object`;
   }
   const row = raw;
-  if (!isNonEmptyString2(row.date)) return `games[${index2}].date is required`;
-  if (!isNonEmptyString2(row.eventName)) return `games[${index2}].eventName is required`;
-  if (!isNonEmptyString2(row.startTime)) return `games[${index2}].startTime is required`;
-  if (!isNonEmptyString2(row.endTime)) return `games[${index2}].endTime is required`;
+  if (!isNonEmptyString3(row.date)) return `games[${index2}].date is required`;
+  if (!isNonEmptyString3(row.eventName)) return `games[${index2}].eventName is required`;
+  if (!isNonEmptyString3(row.startTime)) return `games[${index2}].startTime is required`;
+  if (!isNonEmptyString3(row.endTime)) return `games[${index2}].endTime is required`;
   const startTimeMs = parseManualGamesSpineEventTimeMs2(String(row.startTime), sourceTimeZone);
   if (startTimeMs == null) {
     return sourceTimeZone ? `games[${index2}].startTime must be a valid datetime in ${sourceTimeZone}` : `games[${index2}].startTime must be a valid ISO datetime`;
@@ -221547,7 +221825,7 @@ function validateLeague(raw) {
     return "document must be a league object or { leagues: [...] }";
   }
   const row = raw;
-  if (!isNonEmptyString2(row.league)) return "league is required";
+  if (!isNonEmptyString3(row.league)) return "league is required";
   const leaguePriority = parsePriority(row.leaguePriority);
   if (row.leaguePriority != null && row.leaguePriority !== "" && leaguePriority == null) {
     return "leaguePriority must be a number when provided";
