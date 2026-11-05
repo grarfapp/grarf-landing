@@ -28479,7 +28479,9 @@ init_define_import_meta_env();
 init_define_import_meta_env();
 var CBS_NFL_PREVIEW_BASE_URL = "https://www.cbssports.com/nfl/gametracker/preview";
 var ESPN_TO_CBS_NFL_TEAM_ABBREV = {
-  WSH: "WAS"
+  WSH: "WAS",
+  /** ESPN uses JAX; CBS gametracker slugs use JAC for Jacksonville Jaguars. */
+  JAX: "JAC"
 };
 function resolveScheduledDateYmd2(game) {
   const fromKey = game.scheduledDateKey?.trim();
