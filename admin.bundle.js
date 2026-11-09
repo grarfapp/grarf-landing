@@ -17143,6 +17143,14 @@ function mergeOperationalGameEditorialMetadata(prior, current) {
   const priorBbcUrl = trimOrNull(prior?.bbcRecapUrl);
   const currentBbcUrl = trimOrNull(current?.bbcRecapUrl);
   if (priorBbcUrl && !currentBbcUrl) merged.bbcRecapUrl = priorBbcUrl;
+  const priorEditorialPreview = trimOrNull(prior?.grarfEditorialPreviewUrl);
+  const currentEditorialPreview = trimOrNull(current?.grarfEditorialPreviewUrl);
+  if (priorEditorialPreview && !currentEditorialPreview) {
+    merged.grarfEditorialPreviewUrl = priorEditorialPreview;
+  }
+  const priorEditorialRecap = trimOrNull(prior?.grarfEditorialRecapUrl);
+  const currentEditorialRecap = trimOrNull(current?.grarfEditorialRecapUrl);
+  if (priorEditorialRecap && !currentEditorialRecap) merged.grarfEditorialRecapUrl = priorEditorialRecap;
   return merged;
 }
 
@@ -30007,6 +30015,21 @@ function buildFotmobMatchUrl(matchId) {
 // ../grarf/grarf-operational-service/src/cache/operationalGameEnrichmentStore.ts
 init_define_import_meta_env();
 
+// ../grarf/shared/domain/operational/grarfStableGameId.ts
+init_define_import_meta_env();
+var STABLE_ID_PATTERN = /^grarf-[A-Z0-9_]+-[0-9a-f]{32}$/i;
+function isGrarfStableGameId(id) {
+  const trimmed = String(id ?? "").trim();
+  return trimmed.length > 0 && STABLE_ID_PATTERN.test(trimmed);
+}
+function readGrarfStableGameId(game) {
+  const grarfGameId = String(game.grarfGameId ?? "").trim();
+  if (isGrarfStableGameId(grarfGameId)) return grarfGameId;
+  const id = String(game.id ?? "").trim();
+  if (isGrarfStableGameId(id)) return id;
+  return null;
+}
+
 // ../grarf/grarf-operational-service/src/cache/operationalEnrichmentProviderCache.ts
 init_define_import_meta_env();
 
@@ -30784,12 +30807,56 @@ var CHROME_UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537
 // ../grarf/grarf-operational-service/src/instrumentation/operationalCycleMetrics.ts
 init_define_import_meta_env();
 var activeCycle = null;
-function recordOperationalNetworkRequest(provider) {
+function endpointShape(url) {
+  try {
+    const parsed = new URL(url);
+    const path = parsed.pathname.split("/").map((segment) => /\d/.test(segment) ? ":id" : segment).join("/");
+    const params = [.../* @__PURE__ */ new Set([...parsed.searchParams.keys()])].sort().join("&");
+    return `${parsed.hostname}${path}${params ? `?${params}` : ""}`;
+  } catch {
+    return "unparsed";
+  }
+}
+function recordOperationalNetworkRequest(provider, url) {
   if (!activeCycle) return;
   activeCycle.providerCounts.set(
     provider,
     (activeCycle.providerCounts.get(provider) ?? 0) + 1
   );
+  if (url) {
+    const key = `${provider} ${endpointShape(url)}`;
+    activeCycle.endpointShapes.set(key, (activeCycle.endpointShapes.get(key) ?? 0) + 1);
+  }
+}
+function recordOperationalNetworkHostStatus(url, status) {
+  if (!activeCycle) return;
+  let host = "unparsed";
+  try {
+    host = new URL(url).hostname;
+  } catch {
+  }
+  const key = `${host} ${status ?? "network_error"}`;
+  activeCycle.hostStatus.set(key, (activeCycle.hostStatus.get(key) ?? 0) + 1);
+}
+var providerLedger = /* @__PURE__ */ new Map();
+var providerLedgerStartedAt = null;
+function recordOperationalProviderLedgerOutcome(provider, status) {
+  providerLedgerStartedAt ?? (providerLedgerStartedAt = (/* @__PURE__ */ new Date()).toISOString());
+  const row = providerLedger.get(provider) ?? {
+    requests: 0,
+    ok: 0,
+    http4xx: 0,
+    http429: 0,
+    http5xx: 0,
+    networkErrors: 0
+  };
+  row.requests += 1;
+  if (status == null) row.networkErrors += 1;
+  else if (status === 429) row.http429 += 1;
+  else if (status >= 500) row.http5xx += 1;
+  else if (status >= 400) row.http4xx += 1;
+  else row.ok += 1;
+  providerLedger.set(provider, row);
 }
 function recordOperationalCacheOperation(storage, operation) {
   if (!activeCycle) return;
@@ -30922,6 +30989,8 @@ function buildOperationalGameEnrichmentKvKey(leagueKey, storageIdentity) {
 }
 function buildOperationalGameEnrichmentStorageIdentities(game) {
   const identities = /* @__PURE__ */ new Set();
+  const stableId = readGrarfStableGameId(game);
+  if (stableId) identities.add(stableId);
   const id = game.id?.trim();
   if (id) identities.add(id);
   const asa = String(
@@ -31155,10 +31224,20 @@ function recordSubrequest(record) {
 }
 async function traceOperationalFetch(url, init, meta) {
   if (meta?.provider) {
-    recordOperationalNetworkRequest(meta.provider);
+    recordOperationalNetworkRequest(meta.provider, url);
   }
   if (!traceEnabled || !cycleActive) {
-    return fetch(url, init);
+    if (!meta?.provider) return fetch(url, init);
+    try {
+      const res = await fetch(url, init);
+      recordOperationalProviderLedgerOutcome(meta.provider, res.status);
+      recordOperationalNetworkHostStatus(url, res.status);
+      return res;
+    } catch (e) {
+      recordOperationalProviderLedgerOutcome(meta.provider, null);
+      recordOperationalNetworkHostStatus(url, null);
+      throw e;
+    }
   }
   const stage = meta?.stage ?? currentStage;
   const league2 = meta?.league ?? currentLeague;
@@ -31166,6 +31245,10 @@ async function traceOperationalFetch(url, init, meta) {
   const startedAtMs = Date.now();
   try {
     const res = await fetch(url, init);
+    if (meta?.provider) {
+      recordOperationalProviderLedgerOutcome(meta.provider, res.status);
+      recordOperationalNetworkHostStatus(url, res.status);
+    }
     recordSubrequest({
       url,
       normalizedUrl: normalizeUrlForDedup(url),
@@ -31178,6 +31261,10 @@ async function traceOperationalFetch(url, init, meta) {
     });
     return res;
   } catch (e) {
+    if (meta?.provider) {
+      recordOperationalProviderLedgerOutcome(meta.provider, null);
+      recordOperationalNetworkHostStatus(url, null);
+    }
     recordSubrequest({
       url,
       normalizedUrl: normalizeUrlForDedup(url),
@@ -31280,7 +31367,11 @@ var FOTMOB_SOCCER_LEAGUE_REGISTRY = {
   ARG1: { fotmobPrimaryLeagueIds: [112], fotmobCountryCode: "ARG" },
   BEL1: { fotmobPrimaryLeagueIds: [40], fotmobCountryCode: "BEL" },
   BRA1: { fotmobPrimaryLeagueIds: [268], fotmobCountryCode: "BRA" },
-  BUNDESLIGA: { fotmobPrimaryLeagueIds: [54], fotmobCountryCode: "GER" },
+  BUNDESLIGA: {
+    fotmobPrimaryLeagueIds: [54],
+    fotmobCountryCode: "GER",
+    fixturesPageUrl: "https://www.fotmob.com/leagues/54/fixtures/bundesliga"
+  },
   CARABAO_CUP: {
     fotmobPrimaryLeagueIds: [133],
     fotmobCountryCode: "ENG",
@@ -31294,21 +31385,38 @@ var FOTMOB_SOCCER_LEAGUE_REGISTRY = {
   CONCACAF_NG: { fotmobPrimaryLeagueIds: [9821] },
   CONCACAF_WC: { fotmobPrimaryLeagueIds: [10198] },
   COPA: { fotmobPrimaryLeagueIds: [44] },
-  EPL: { fotmobPrimaryLeagueIds: [47], fotmobCountryCode: "ENG" },
-  EREDIVISIE: { fotmobPrimaryLeagueIds: [57], fotmobCountryCode: "NED" },
+  EPL: {
+    fotmobPrimaryLeagueIds: [47],
+    fotmobCountryCode: "ENG",
+    fixturesPageUrl: "https://www.fotmob.com/leagues/47/fixtures/premier-league"
+  },
+  EREDIVISIE: {
+    fotmobPrimaryLeagueIds: [57],
+    fotmobCountryCode: "NED",
+    fixturesPageUrl: "https://www.fotmob.com/leagues/57/fixtures/eredivisie"
+  },
   EURO: { fotmobPrimaryLeagueIds: [50] },
   GOLDCUP: { fotmobPrimaryLeagueIds: [298] },
   INTFRIENDLY: { fotmobPrimaryLeagueIds: [114] },
   LALIGA: { fotmobPrimaryLeagueIds: [87], fotmobCountryCode: "ESP" },
   LIBERTADORES: { fotmobPrimaryLeagueIds: [45] },
   LIGAMX: { fotmobPrimaryLeagueIds: [230], fotmobCountryCode: "MEX" },
-  LIGUE1: { fotmobPrimaryLeagueIds: [53], fotmobCountryCode: "FRA" },
+  LIGUE1: {
+    fotmobPrimaryLeagueIds: [53],
+    fotmobCountryCode: "FRA",
+    fixturesPageUrl: "https://www.fotmob.com/leagues/53/fixtures/ligue-1"
+  },
   MLS: { fotmobPrimaryLeagueIds: [130], fotmobCountryCode: "USA" },
   NATIONS: { fotmobPrimaryLeagueIds: [9806, 9807, 9808, 9809] },
   NWSL: { fotmobPrimaryLeagueIds: [9134], fotmobCountryCode: "USA" },
   POR1: { fotmobPrimaryLeagueIds: [61], fotmobCountryCode: "POR" },
   SAUDI: { fotmobPrimaryLeagueIds: [536], fotmobCountryCode: "KSA" },
-  SERIEA: { fotmobPrimaryLeagueIds: [55], fotmobCountryCode: "ITA" },
+  SERIEA: {
+    fotmobPrimaryLeagueIds: [55],
+    fotmobCountryCode: "ITA",
+    /** FotMob 308-redirects `/serie-a` → `/serie` — canonical URL avoids cache misses. */
+    fixturesPageUrl: "https://www.fotmob.com/leagues/55/fixtures/serie"
+  },
   SPFL: { fotmobPrimaryLeagueIds: [64], fotmobCountryCode: "SCO" },
   SUDAMERICANA: { fotmobPrimaryLeagueIds: [299] },
   SUPERLIG: { fotmobPrimaryLeagueIds: [71], fotmobCountryCode: "TUR" },
@@ -31370,7 +31478,12 @@ function isNonEmptyFotmobMatchArray(value) {
 async function fetchFixturesPageUncached(fixturesPageUrl) {
   const res = await traceOperationalFetch(
     fixturesPageUrl,
-    { headers: { "User-Agent": CHROME_UA2, Accept: "text/html" } },
+    {
+      headers: { "User-Agent": CHROME_UA2, Accept: "text/html" },
+      /** Serie A et al. use 308 canonical slugs; follow to the HTML with match anchors. */
+      redirect: "follow",
+      signal: AbortSignal.timeout(2e4)
+    },
     { functionName: "fetchFotmobLeagueFixturesPage", provider: "fotmob" }
   );
   if (!res.ok) return [];
