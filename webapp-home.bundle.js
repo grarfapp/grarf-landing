@@ -207,8 +207,8 @@ function writeOperationalCalendarDateKeyCache(now, timeZone, key2) {
 function formatOperationalDateKeyFromMs(ms2, timeZone = GRARF_OPERATIONAL_SLATE_TIMEZONE) {
   if (ms2 == null || !Number.isFinite(ms2) || ms2 <= 0) return void 0;
   const cacheId = `${timeZone}\0${ms2}`;
-  const cached2 = operationalDateKeyByTimestamp.get(cacheId);
-  if (cached2 !== void 0) return cached2;
+  const cached = operationalDateKeyByTimestamp.get(cacheId);
+  if (cached !== void 0) return cached;
   const { year, month, day } = calendarPartsInTimeZone(ms2, timeZone);
   if (!year || !month || !day) return void 0;
   const key2 = `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
@@ -228,15 +228,15 @@ function readOperationalSportsDayKeyCache(now, timeZone) {
   return null;
 }
 function getOperationalCalendarDateKey(now = /* @__PURE__ */ new Date(), timeZone = resolveOperationalSlateTimeZone()) {
-  const cached2 = readOperationalCalendarDateKeyCache(now, timeZone);
-  if (cached2) return cached2;
+  const cached = readOperationalCalendarDateKeyCache(now, timeZone);
+  if (cached) return cached;
   const key2 = formatOperationalDateKeyFromMs(now.getTime(), timeZone) ?? "1970-01-01";
   writeOperationalCalendarDateKeyCache(now, timeZone, key2);
   return key2;
 }
 function getOperationalSportsDayDateKey(now = /* @__PURE__ */ new Date(), timeZone = resolveOperationalSlateTimeZone()) {
-  const cached2 = readOperationalSportsDayKeyCache(now, timeZone);
-  if (cached2) return cached2;
+  const cached = readOperationalSportsDayKeyCache(now, timeZone);
+  if (cached) return cached;
   let key2 = getOperationalCalendarDateKey(now, timeZone);
   const { hour } = calendarPartsInTimeZone(now.getTime(), timeZone);
   if (hour < OPERATIONAL_SPORTS_DAY_ROLLOVER_HOUR) {
@@ -278,8 +278,8 @@ function resolveScheduledDateKey(isoStart, slateDateKey, timeZone = GRARF_OPERAT
 }
 function getNextDayCutoffMs(operationalDateKey, cutoffHour, timeZone) {
   const cacheKey3 = `${operationalDateKey}|${cutoffHour}|${timeZone}`;
-  const cached2 = nextDayCutoffMsCache.get(cacheKey3);
-  if (cached2 != null) return cached2;
+  const cached = nextDayCutoffMsCache.get(cacheKey3);
+  if (cached != null) return cached;
   const tomorrowKey = offsetOperationalDateKey(operationalDateKey, 1, timeZone);
   const [y2, m2, d2] = tomorrowKey.split("-").map(Number);
   let probe = Date.UTC(y2, (m2 ?? 1) - 1, d2 ?? 1, 12, 0, 0);
@@ -23397,8 +23397,8 @@ function hasMlbGamePk(game) {
   return !!mlb2 && /^\d+$/.test(mlb2);
 }
 async function fetchMlbSchedulePkMap(dateYmd) {
-  const cached2 = scheduleCache.get(dateYmd);
-  if (cached2) return cached2;
+  const cached = scheduleCache.get(dateYmd);
+  if (cached) return cached;
   const url = `https://statsapi.mlb.com/api/v1/schedule?sportId=1&date=${encodeURIComponent(dateYmd)}`;
   const res = await fetch(url, { headers: { Accept: "application/json" } });
   if (!res.ok) {
@@ -28157,26 +28157,37 @@ function resolveGrarfCloudOperationalSnapshotUrl(cloudBaseUrl) {
 function appendOperationalSnapshotClientMs(url) {
   return `${url}${url.includes("?") ? "&" : "?"}clientMs=${Date.now()}`;
 }
-function resolveOperationalCloudSnapshotFetchTarget() {
+function resolveOperationalCloudSnapshotFetchTarget(purpose = "live") {
   const { cloudBaseUrl, publishedFeedUrl } = getOperationalIngestConfig();
   const published = publishedFeedUrl?.trim();
-  if (isGrarfExtensionRenderer() && published) {
+  const workerTarget = () => {
+    if (!cloudBaseUrl) {
+      throw new Error("[OperationalIngest] grarf_cloud provider requires VITE_GRARF_OPERATIONAL_INGEST_URL");
+    }
+    const urlBase = resolveGrarfCloudOperationalSnapshotUrl(cloudBaseUrl);
     return {
-      url: appendOperationalSnapshotClientMs(published),
-      // Side panel must not reuse a cached feed body — generatedAt can advance without ESPN rows.
+      url: appendOperationalSnapshotClientMs(urlBase),
       cache: "no-store",
-      transport: "published_feed"
+      transport: "worker_snapshot"
     };
+  };
+  if (isGrarfExtensionRenderer()) {
+    if (purpose === "live" && cloudBaseUrl?.trim()) {
+      return workerTarget();
+    }
+    if (published) {
+      return {
+        url: appendOperationalSnapshotClientMs(published),
+        cache: "no-store",
+        transport: "published_feed"
+      };
+    }
+    return workerTarget();
   }
   if (!cloudBaseUrl) {
     throw new Error("[OperationalIngest] grarf_cloud provider requires VITE_GRARF_OPERATIONAL_INGEST_URL");
   }
-  const urlBase = resolveGrarfCloudOperationalSnapshotUrl(cloudBaseUrl);
-  return {
-    url: appendOperationalSnapshotClientMs(urlBase),
-    cache: "no-store",
-    transport: "worker_snapshot"
-  };
+  return workerTarget();
 }
 function resolveOperationalWorkerSnapshotFetchTarget() {
   const { cloudBaseUrl } = getOperationalIngestConfig();
@@ -28186,6 +28197,60 @@ function resolveOperationalWorkerSnapshotFetchTarget() {
     url: appendOperationalSnapshotClientMs(urlBase),
     cache: "no-store",
     transport: "worker_snapshot"
+  };
+}
+
+// ../grarf/shared/config/operationalSnapshotFreshnessSla.ts
+init_define_import_meta_env();
+var OPERATIONAL_PROVIDER_POLL_MAX_STALE_MS = 6e4;
+var OPERATIONAL_SNAPSHOT_GENERATED_AT_LEAD_SLACK_MS = 5e3;
+function parseOperationalIsoMs(iso) {
+  if (!iso?.trim()) return Number.NEGATIVE_INFINITY;
+  const ms2 = Date.parse(iso);
+  return Number.isFinite(ms2) ? ms2 : Number.NEGATIVE_INFINITY;
+}
+function resolveOperationalProviderPollCompletedAtAgeMs(snapshot2, nowMs3 = Date.now()) {
+  const completedAt = snapshot2?.providerPoll?.providerPollCompletedAt?.trim();
+  if (!completedAt) return null;
+  const completedMs = parseOperationalIsoMs(completedAt);
+  if (completedMs === Number.NEGATIVE_INFINITY) return null;
+  return nowMs3 - completedMs;
+}
+function isOperationalSnapshotMisleadingFreshness(snapshot2, leadSlackMs = OPERATIONAL_SNAPSHOT_GENERATED_AT_LEAD_SLACK_MS) {
+  if (!snapshot2?.providerPoll?.providerPollCompletedAt?.trim()) return false;
+  const generatedMs = parseOperationalIsoMs(snapshot2.generatedAt);
+  const pollMs = parseOperationalIsoMs(snapshot2.providerPoll.providerPollCompletedAt);
+  if (generatedMs === Number.NEGATIVE_INFINITY || pollMs === Number.NEGATIVE_INFINITY) {
+    return false;
+  }
+  return generatedMs > pollMs + leadSlackMs;
+}
+function evaluateOperationalSnapshotFreshnessSla(snapshot2, options) {
+  const nowMs3 = options?.nowMs ?? Date.now();
+  const maxProviderPollAgeMs = options?.maxProviderPollAgeMs ?? OPERATIONAL_PROVIDER_POLL_MAX_STALE_MS;
+  const maxGeneratedAtAgeMs = options?.maxGeneratedAtAgeMs ?? maxProviderPollAgeMs;
+  const leadSlackMs = options?.leadSlackMs ?? OPERATIONAL_SNAPSHOT_GENERATED_AT_LEAD_SLACK_MS;
+  const reasons = [];
+  if (!snapshot2) {
+    return { stale: true, reasons: ["missing_snapshot"], providerPollAgeMs: null, generatedAtAgeMs: null };
+  }
+  const providerPollAgeMs = resolveOperationalProviderPollCompletedAtAgeMs(snapshot2, nowMs3);
+  const generatedMs = parseOperationalIsoMs(snapshot2.generatedAt);
+  const generatedAtAgeMs = generatedMs === Number.NEGATIVE_INFINITY ? null : nowMs3 - generatedMs;
+  if (providerPollAgeMs != null && providerPollAgeMs > maxProviderPollAgeMs) {
+    reasons.push(`provider_poll_stale_age_ms_${providerPollAgeMs}`);
+  }
+  if (generatedAtAgeMs != null && generatedAtAgeMs > maxGeneratedAtAgeMs) {
+    reasons.push(`generated_at_stale_age_ms_${generatedAtAgeMs}`);
+  }
+  if (isOperationalSnapshotMisleadingFreshness(snapshot2, leadSlackMs)) {
+    reasons.push("misleading_generated_at_ahead_of_provider_poll");
+  }
+  return {
+    stale: reasons.length > 0,
+    reasons,
+    providerPollAgeMs,
+    generatedAtAgeMs
   };
 }
 
@@ -28473,10 +28538,27 @@ async function fetchOperationalSnapshotFromCloudTarget(target, options) {
   }
   throw new Error(lastError ?? "[OperationalIngest] grarf_cloud fetch failed");
 }
+function resolveCloudSnapshotFetchPurpose(traceFetchKind) {
+  if (traceFetchKind === "prefetch" && !isGrarfExtensionRenderer()) {
+    return "bootstrap";
+  }
+  return "live";
+}
+function parseTransportFreshnessRank(transport) {
+  const pollMs = Date.parse(String(transport.providerPoll?.providerPollCompletedAt ?? ""));
+  if (Number.isFinite(pollMs)) return pollMs;
+  const generatedMs = Date.parse(String(transport.generatedAt ?? ""));
+  return Number.isFinite(generatedMs) ? generatedMs : Number.NEGATIVE_INFINITY;
+}
+function pickFresherOperationalTransport(a2, b2) {
+  return parseTransportFreshnessRank(b2) > parseTransportFreshnessRank(a2) ? b2 : a2;
+}
 async function fetchViaGrarfCloudService(options) {
-  const primaryTarget = resolveOperationalCloudSnapshotFetchTarget();
+  const purpose = resolveCloudSnapshotFetchPurpose(options?.traceFetchKind);
+  const primaryTarget = resolveOperationalCloudSnapshotFetchTarget(purpose);
+  let transport;
   try {
-    return await fetchOperationalSnapshotFromCloudTarget(primaryTarget, options);
+    transport = await fetchOperationalSnapshotFromCloudTarget(primaryTarget, options);
   } catch (primaryError) {
     if (primaryTarget.transport !== "published_feed") {
       throw primaryError;
@@ -28488,8 +28570,35 @@ async function fetchViaGrarfCloudService(options) {
     if (define_import_meta_env_default.DEV) {
       console.warn(`${LOG7} published feed unavailable \u2014 falling back to Worker snapshot`, primaryError);
     }
-    return fetchOperationalSnapshotFromCloudTarget(fallbackTarget, options);
+    transport = await fetchOperationalSnapshotFromCloudTarget(fallbackTarget, options);
+    return transport;
   }
+  if (primaryTarget.transport === "published_feed") {
+    const verdict = evaluateOperationalSnapshotFreshnessSla(transport);
+    if (verdict.stale) {
+      const fallbackTarget = resolveOperationalWorkerSnapshotFetchTarget();
+      if (fallbackTarget) {
+        try {
+          const workerTransport = await fetchOperationalSnapshotFromCloudTarget(
+            fallbackTarget,
+            options
+          );
+          const fresher = pickFresherOperationalTransport(transport, workerTransport);
+          if (fresher !== transport && define_import_meta_env_default.DEV) {
+            console.warn(
+              `${LOG7} published feed SLA stale (${verdict.reasons.join(",")}) \u2014 using Worker snapshot`
+            );
+          }
+          transport = fresher;
+        } catch (fallbackError) {
+          if (define_import_meta_env_default.DEV) {
+            console.warn(`${LOG7} Worker fallback after stale published feed failed`, fallbackError);
+          }
+        }
+      }
+    }
+  }
+  return transport;
 }
 async function fetchViaWebOperationalIngest() {
   let cloud = null;
@@ -31752,10 +31861,6 @@ if (typeof window !== "undefined") {
   w2.__grarfResetCatchUpDiagnostics = resetCatchUpDiagnostics;
   w2.__grarfCentralizedRetentionTrace = inspectCentralizedRetentionTrace;
 }
-
-// ../grarf/shared/config/operationalSnapshotFreshnessSla.ts
-init_define_import_meta_env();
-var OPERATIONAL_PROVIDER_POLL_MAX_STALE_MS = 6e4;
 
 // ../grarf/desktop/src/services/operationalIngest/extensionOperationalSnapshotHydrateQueue.ts
 init_define_import_meta_env();
@@ -36197,12 +36302,12 @@ async function withOperationalEnrichmentProviderCache(input) {
     input.provider,
     input.requestIdentity
   );
-  const cached2 = await readOperationalEnrichmentProviderCache(
+  const cached = await readOperationalEnrichmentProviderCache(
     cacheKey3,
     input.validate,
     input.ttlMs
   );
-  if (cached2 != null) return cached2;
+  if (cached != null) return cached;
   const inFlight6 = inFlightByCacheKey.get(cacheKey3);
   if (inFlight6) return inFlight6;
   const promise = (async () => {
@@ -38266,11 +38371,11 @@ function enrichGameRow2(game, catalog) {
   if (game.streamProvider && LOCKED_STREAM_PROVIDERS2.has(game.streamProvider)) return game;
   const existingUrl = game.streamUrl?.trim();
   if (existingUrl && isAmazonPrimeVideoDetailUrl(existingUrl)) return game;
-  const cached2 = getCachedStreamUrl(CACHE_PROVIDER, game.id);
-  if (cached2 && isAmazonPrimeVideoDetailUrl(cached2)) {
+  const cached = getCachedStreamUrl(CACHE_PROVIDER, game.id);
+  if (cached && isAmazonPrimeVideoDetailUrl(cached)) {
     return {
       ...game,
-      streamUrl: cached2,
+      streamUrl: cached,
       streamProvider: CACHE_PROVIDER,
       launchMode: "external"
     };
@@ -38351,9 +38456,9 @@ var SCHEDULE_CACHE_TTL_MS = 60 * 60 * 1e3;
 var cacheBySeason = /* @__PURE__ */ new Map();
 var inFlightBySeason = /* @__PURE__ */ new Map();
 async function fetchWnbaScheduleRows(seasonYear = resolveWnbaScheduleSeasonYear()) {
-  const cached2 = cacheBySeason.get(seasonYear);
-  if (cached2 && Date.now() - cached2.fetchedAtMs < SCHEDULE_CACHE_TTL_MS) {
-    return cached2.rows;
+  const cached = cacheBySeason.get(seasonYear);
+  if (cached && Date.now() - cached.fetchedAtMs < SCHEDULE_CACHE_TTL_MS) {
+    return cached.rows;
   }
   const inFlight6 = inFlightBySeason.get(seasonYear);
   if (inFlight6) return inFlight6;
@@ -38509,11 +38614,11 @@ function enrichGameRow3(game, catalog) {
   if (game.streamProvider && LOCKED_STREAM_PROVIDERS3.has(game.streamProvider)) return game;
   const existingUrl = game.streamUrl?.trim();
   if (existingUrl && isAmazonPrimeVideoDetailUrl(existingUrl)) return game;
-  const cached2 = getCachedStreamUrl(CACHE_PROVIDER2, game.id);
-  if (cached2 && isAmazonPrimeVideoDetailUrl(cached2)) {
+  const cached = getCachedStreamUrl(CACHE_PROVIDER2, game.id);
+  if (cached && isAmazonPrimeVideoDetailUrl(cached)) {
     return {
       ...game,
-      streamUrl: cached2,
+      streamUrl: cached,
       streamProvider: CACHE_PROVIDER2,
       launchMode: "external"
     };
@@ -38652,9 +38757,9 @@ async function fetchNbaCdnScoreboardFromApi(cacheKey3, url, options) {
 async function fetchNbaCdnScoreboardGamesForDateKey(dateKey, options) {
   const key2 = dateKey.trim();
   if (!key2) return [];
-  const cached2 = cacheByKey.get(key2);
-  if (cached2 && Date.now() - cached2.fetchedAtMs < SCOREBOARD_CACHE_TTL_MS) {
-    return cached2.rows;
+  const cached = cacheByKey.get(key2);
+  if (cached && Date.now() - cached.fetchedAtMs < SCOREBOARD_CACHE_TTL_MS) {
+    return cached.rows;
   }
   const inFlight6 = inFlightByKey.get(key2);
   if (inFlight6) return inFlight6;
@@ -41698,10 +41803,10 @@ async function fetchPllSeasonScheduleUncached(seasonYear) {
   }
 }
 async function fetchPllSeasonSchedule(seasonYear) {
-  const cached2 = scheduleCacheBySeason.get(seasonYear);
+  const cached = scheduleCacheBySeason.get(seasonYear);
   const now = Date.now();
-  if (cached2 && now - cached2.fetchedAt < SCHEDULE_CACHE_TTL_MS2) {
-    return cached2.games;
+  if (cached && now - cached.fetchedAt < SCHEDULE_CACHE_TTL_MS2) {
+    return cached.games;
   }
   const games = await fetchPllSeasonScheduleUncached(seasonYear);
   scheduleCacheBySeason.set(seasonYear, { fetchedAt: now, games });
@@ -43254,9 +43359,9 @@ async function fetchWimbledonDrawCatalogForTournament(tournamentYear) {
 }
 async function fetchWimbledonDrawCatalog(year) {
   const now = Date.now();
-  const cached2 = catalogCacheByYear.get(year);
-  if (cached2 && now - cached2.fetchedAt < CATALOG_CACHE_TTL_MS5) {
-    return cached2.matches;
+  const cached = catalogCacheByYear.get(year);
+  if (cached && now - cached.fetchedAt < CATALOG_CACHE_TTL_MS5) {
+    return cached.matches;
   }
   const batches = await Promise.all(
     WIMBLEDON_DRAW_CODES.map((drawCode) => fetchWimbledonDraw(year, drawCode))
@@ -43516,11 +43621,11 @@ function enrichGameRow5(game) {
   if (game.streamUrl?.trim() && game.streamProvider && game.streamProvider !== CACHE_PROVIDER3) {
     return game;
   }
-  const cached2 = getCachedStreamUrl(CACHE_PROVIDER3, game.id);
-  if (cached2) {
+  const cached = getCachedStreamUrl(CACHE_PROVIDER3, game.id);
+  if (cached) {
     return {
       ...game,
-      streamUrl: cached2,
+      streamUrl: cached,
       streamProvider: CACHE_PROVIDER3,
       launchMode: "external"
     };
@@ -48446,21 +48551,22 @@ function scheduleExtensionStartupSnapshotHydrate(run) {
 function kickoffExtensionOperationalCachedSnapshotHydrate() {
   if (!isGrarfExtensionRenderer()) return;
   scheduleExtensionStartupSnapshotHydrate(() => {
-    const cached2 = readExtensionOperationalSnapshotSessionCache();
-    if (cached2) {
-      hydrateExtensionStartupSnapshot(cached2, "extension_session_cache_hit");
+    const cached = readExtensionOperationalSnapshotSessionCache();
+    if (cached) {
+      hydrateExtensionStartupSnapshot(cached, "extension_session_cache_hit");
     }
   });
   void fetchBundledExtensionOperationalSnapshot().then((bundled) => {
+    const cachedForBundled = readExtensionOperationalSnapshotSessionCache() ?? null;
     if (!bundled) {
-      if (!cached) {
+      if (!cachedForBundled) {
         recordOperationalStartupTrace("extension_startup_snapshot_miss");
       }
       return;
     }
-    const seed = pickNewerSnapshot(cached, bundled);
+    const seed = pickNewerSnapshot(cachedForBundled, bundled);
     if (!seed) return;
-    if (cached && seed === cached) return;
+    if (cachedForBundled && seed === cachedForBundled) return;
     scheduleExtensionStartupSnapshotHydrate(
       () => hydrateExtensionStartupSnapshot(seed, "extension_bundled_snapshot_hit")
     );
@@ -74277,9 +74383,9 @@ function resolveHighlightsTvChannelLabel(htvLeagueKey) {
   return HIGHLIGHTS_TV_CHANNEL_ORDER.find((channel) => channel.leagueKey === htvLeagueKey)?.label ?? htvLeagueKey;
 }
 async function loadHighlightsTvClipsForIngestionLeagueKey(htvLeagueKey) {
-  const cached2 = clipsCacheByIngestionLeagueKey.get(htvLeagueKey);
-  if (cached2 && Date.now() - cached2.at < CLIPS_CACHE_TTL_MS) {
-    return cached2.clips;
+  const cached = clipsCacheByIngestionLeagueKey.get(htvLeagueKey);
+  if (cached && Date.now() - cached.at < CLIPS_CACHE_TTL_MS) {
+    return cached.clips;
   }
   const clips = await ingestHighlightsTvChannelClips(
     htvLeagueKey,
@@ -78573,30 +78679,30 @@ var SYNDICATION_CACHE_TTL_MS = 60 * 60 * 1e3;
 var SYNDICATION_FETCH_CONCURRENCY = 4;
 var syndicationCache = /* @__PURE__ */ new Map();
 function readCachedMedia(statusId) {
-  const cached2 = syndicationCache.get(statusId);
-  if (!cached2) return null;
-  if (Date.now() - cached2.fetchedAtMs > SYNDICATION_CACHE_TTL_MS) {
+  const cached = syndicationCache.get(statusId);
+  if (!cached) return null;
+  if (Date.now() - cached.fetchedAtMs > SYNDICATION_CACHE_TTL_MS) {
     syndicationCache.delete(statusId);
     return null;
   }
-  return cached2;
+  return cached;
 }
 function writeCachedMedia(statusId, media) {
-  const cached2 = {
+  const cached = {
     imageUrl: media.imageUrl,
     videoUrl: media.videoUrl,
     fetchedAtMs: Date.now()
   };
-  syndicationCache.set(statusId, cached2);
-  return cached2;
+  syndicationCache.set(statusId, cached);
+  return cached;
 }
 function needsTwitterSyndicationEnrichment(entry4) {
   if (entry4.imageUrl?.trim()) return null;
   return resolveTwitterStatusIdFromPostUrl(entry4.url);
 }
 async function resolveSyndicationMedia(statusId) {
-  const cached2 = readCachedMedia(statusId);
-  if (cached2) return cached2;
+  const cached = readCachedMedia(statusId);
+  if (cached) return cached;
   const media = await fetchTwitterSyndicationMedia(statusId);
   if (!media?.imageUrl && !media?.videoUrl) {
     writeCachedMedia(statusId, {});
@@ -81408,8 +81514,8 @@ function gameHasParamountBroadcast(game) {
 // ../grarf/desktop/src/lib/watch/providers/paramountResolver.ts
 var LOG31 = "[Paramount]";
 function resolveParamountWatchOption(game) {
-  const cached2 = getCachedStreamUrl("Paramount+", game.id);
-  const streamUrl = game.streamUrl?.trim() || cached2;
+  const cached = getCachedStreamUrl("Paramount+", game.id);
+  const streamUrl = game.streamUrl?.trim() || cached;
   if (!streamUrl) return null;
   if (game.streamProvider !== "Paramount+" && !gameHasParamountBroadcast(game)) return null;
   console.log(`${LOG31} Resolved stream URL for match`, {
@@ -81445,8 +81551,8 @@ function gameHasPeacockBroadcast(game) {
 var LOG32 = "[Peacock]";
 function resolvePeacockWatchOption(game) {
   if (game.league === "WORLDCUP") return null;
-  const cached2 = getCachedStreamUrl("Peacock", game.id);
-  const streamUrl = game.streamUrl?.trim() || cached2;
+  const cached = getCachedStreamUrl("Peacock", game.id);
+  const streamUrl = game.streamUrl?.trim() || cached;
   if (!streamUrl) {
     if (!gameHasPeacockBroadcast(game)) return null;
     return {
@@ -81504,8 +81610,8 @@ function gameHasAppleTvResolvableStream(game) {
 var LOG33 = "[AppleTV]";
 function resolveAppleTvWatchOption(game) {
   if (!gameHasAppleTvResolvableStream(game)) return null;
-  const cached2 = getCachedStreamUrl("Apple TV", game.id);
-  const streamUrl = game.streamUrl?.trim() || cached2;
+  const cached = getCachedStreamUrl("Apple TV", game.id);
+  const streamUrl = game.streamUrl?.trim() || cached;
   if (!streamUrl) return null;
   if (game.streamProvider !== "Apple TV" && !gameHasAppleTvBroadcast(game) && game.league !== "F1") {
     return null;
@@ -81557,8 +81663,8 @@ var registry = {
   MLBTV: (game) => mlbTvLegacyWatchOption(game),
   ESPN: (game) => {
     if (!watchConfig.espnResolverEnabled) return null;
-    const cached2 = getCachedEspnOption(game.id);
-    if (cached2) return cached2;
+    const cached = getCachedEspnOption(game.id);
+    if (cached) return cached;
     const resolved = resolveEspnWatchOption(game);
     if (resolved) setCachedEspnOption(game.id, resolved);
     return resolved;
@@ -81849,8 +81955,8 @@ function resolveWnbaWatchStreamUrl(game) {
   const direct = game.streamUrl?.trim();
   if (direct && isWatchStreamUrl(direct)) return direct;
   for (const provider of ["Prime Video", "Peacock", "USA", "WNBA"]) {
-    const cached2 = getCachedStreamUrl(provider, game.id);
-    if (cached2 && isWatchStreamUrl(cached2)) return cached2;
+    const cached = getCachedStreamUrl(provider, game.id);
+    if (cached && isWatchStreamUrl(cached)) return cached;
   }
   return null;
 }
@@ -87638,8 +87744,8 @@ function summaryFetchKey(leagueKey, eventId) {
 async function fetchSummaryEventEndedAtMs(leagueKey, eventId) {
   if (!isEspnSummaryEventIdEligible(eventId)) return null;
   const cacheKey3 = summaryFetchKey(leagueKey, eventId);
-  const cached2 = endedAtCache.get(eventId);
-  if (cached2 != null) return cached2;
+  const cached = endedAtCache.get(eventId);
+  if (cached != null) return cached;
   if (enrichmentInFlightByEventId.has(eventId)) return null;
   if (failedSummaryFetchKeys.has(cacheKey3)) return null;
   const cfg = ESPN_OPERATIONAL_LEAGUES[leagueKey];
@@ -88319,7 +88425,7 @@ function resolveGrarfCloudOperationalIngestBinding(input) {
   let runImmediateCloudHydrate = false;
   if (extensionGrarfCloudHost) {
     pollingStrategy = "extension_direct";
-    runImmediateCloudHydrate = false;
+    runImmediateCloudHydrate = true;
   } else if (input.hasElectronGamesIpc) {
     pollingStrategy = "electron_cloud";
   } else if (input.isCanonicalWebBrowserRenderer) {
@@ -89049,11 +89155,7 @@ function grarfExtensionStartNetworkIngestAfterInteractive(start) {
     start();
   };
   return subscribeGrarfExtensionSidePanelInteractive(() => {
-    if (typeof requestIdleCallback === "function") {
-      requestIdleCallback(run, { timeout: 1500 });
-    } else {
-      window.setTimeout(run, 0);
-    }
+    queueMicrotask(run);
   });
 }
 
@@ -89095,13 +89197,7 @@ function liveGamesStoreHasOperationalGames() {
 function runImmediateGrarfCloudOperationalHydrate(onCloudTransport) {
   void (async () => {
     try {
-      const transport = await (async () => {
-        const prefetched = await prefetchWebOperationalCloudSnapshot();
-        if (prefetched && countOperationalGamesInTransport(prefetched.leagues) > 0) {
-          return prefetched;
-        }
-        return fetchOperationalSnapshot();
-      })();
+      const transport = await fetchOperationalSnapshot();
       if (countOperationalGamesInTransport(transport.leagues) > 0) {
         await onCloudTransport(transport);
       }
@@ -89177,24 +89273,19 @@ function LiveGamesBridge() {
         }
       });
       let cloudIngest = null;
-      let stopNetworkIngest = () => {
+      let stopEditorialNetwork = () => {
       };
       if (isGrarfExtensionRenderer()) {
-        const deliverDeferredCloudTransport = (transport) => scheduleExtensionOperationalCloudHydrate(
-          transport,
-          () => Promise.resolve(onCloudTransport(transport))
-        );
-        stopNetworkIngest = grarfExtensionStartNetworkIngestAfterInteractive(() => {
+        cloudIngest = attachCloudIngest();
+        stopEditorialNetwork = grarfExtensionStartNetworkIngestAfterInteractive(() => {
           startTemporaryEditorialOverridesPolling();
           startDailyEditorialPackagePolling();
-          runImmediateGrarfCloudOperationalHydrate(deliverDeferredCloudTransport);
-          cloudIngest = attachCloudIngest();
         });
       } else {
         cloudIngest = attachCloudIngest();
       }
       return () => {
-        stopNetworkIngest();
+        stopEditorialNetwork();
         cloudIngest?.stop();
         stopElectronLocalSeed?.();
         stopIntelligenceRegistrySync();
@@ -90954,8 +91045,8 @@ var Virtualizer = class {
         } else {
           this.targetWindow = ((_a3 = this.scrollElement) == null ? void 0 : _a3.window) ?? null;
         }
-        this.elementsCache.forEach((cached2) => {
-          this.observer.observe(cached2);
+        this.elementsCache.forEach((cached) => {
+          this.observer.observe(cached);
         });
         this.unsubs.push(
           this.options.observeElementRect(this, (rect) => {
@@ -91358,9 +91449,9 @@ var Virtualizer = class {
     };
     this.measureElement = (node) => {
       if (!node) {
-        this.elementsCache.forEach((cached2, key22) => {
-          if (!cached2.isConnected) {
-            this.observer.unobserve(cached2);
+        this.elementsCache.forEach((cached, key22) => {
+          if (!cached.isConnected) {
+            this.observer.unobserve(cached);
             this.elementsCache.delete(key22);
           }
         });
@@ -95363,8 +95454,8 @@ async function fetchWnbaSummaryHeadlineInRenderer(eventId) {
 async function fetchWnbaEspnRecapArticleHeadline(eventId) {
   const id = String(eventId ?? "").trim();
   if (!id) return null;
-  const cached2 = headlineCache.get(id);
-  if (cached2) return cached2;
+  const cached = headlineCache.get(id);
+  if (cached) return cached;
   const ipc = window.grarf?.gamesFetchWnbaRecapHeadline;
   if (ipc) {
     const result = await ipc(id);
@@ -141598,19 +141689,19 @@ var useIntelligenceStore = (0, import_zustand66.create)((set, get) => ({
   hydrate: async () => {
     if (get().hydrated) return;
     const status = await getIntelligenceStatus();
-    const cached2 = await getCachedIntelligenceFeed();
-    if (cached2.ok) {
+    const cached = await getCachedIntelligenceFeed();
+    if (cached.ok) {
       set({
-        items: cached2.items,
+        items: cached.items,
         error: null,
         hydrated: true,
         configured: status.configured,
         lastSyncAt: status.lastSyncAt,
-        cacheCount: status.cacheCount ?? cached2.items.length
+        cacheCount: status.cacheCount ?? cached.items.length
       });
     } else {
       set({
-        error: cached2.error,
+        error: cached.error,
         hydrated: true,
         configured: status.configured,
         lastSyncAt: status.lastSyncAt
@@ -142945,17 +143036,17 @@ function PodcastRailPanel({
       let fetched = 0;
       let failed = 0;
       for (const feed of orderedFeeds) {
-        const cached2 = getCachedPodcastEpisodes(feed.id);
-        if (!force && !cached2.stale && cached2.episodes.length > 0) {
-          all.push(...cached2.episodes);
+        const cached = getCachedPodcastEpisodes(feed.id);
+        if (!force && !cached.stale && cached.episodes.length > 0) {
+          all.push(...cached.episodes);
           fromCache += 1;
           continue;
         }
         const res = await fetchPodcastFeedXml(feed.rss);
         if (!res.ok) {
           failed += 1;
-          if (cached2.episodes.length > 0) {
-            all.push(...cached2.episodes);
+          if (cached.episodes.length > 0) {
+            all.push(...cached.episodes);
             fromCache += 1;
           }
           continue;
@@ -142965,8 +143056,8 @@ function PodcastRailPanel({
           sourceFeed: feed.rss,
           feedId: feed.id
         });
-        if (eps.length === 0 && cached2.episodes.length > 0) {
-          all.push(...cached2.episodes);
+        if (eps.length === 0 && cached.episodes.length > 0) {
+          all.push(...cached.episodes);
           fromCache += 1;
           continue;
         }
@@ -143532,8 +143623,8 @@ async function fetchYoutubeOembedMeta(pageUrl) {
 }
 function primeCuratedLiveChannelArt(ch) {
   if (!ch.thumbnail?.trim()) return;
-  const cached2 = getCachedLiveChannelMeta(ch.id, CURATED_ART_TTL_MS);
-  if (!cached2.stale && cached2.meta?.artworkSource === "curated" && cached2.meta.thumbnailUrl === ch.thumbnail) {
+  const cached = getCachedLiveChannelMeta(ch.id, CURATED_ART_TTL_MS);
+  if (!cached.stale && cached.meta?.artworkSource === "curated" && cached.meta.thumbnailUrl === ch.thumbnail) {
     return;
   }
   setCachedLiveChannelMeta({
@@ -143545,10 +143636,10 @@ function primeCuratedLiveChannelArt(ch) {
     artworkSource: "curated"
   });
 }
-function resolveLiveChannelThumbnailUrl(ch, cached2) {
+function resolveLiveChannelThumbnailUrl(ch, cached) {
   const t2 = ch.thumbnail?.trim();
   if (t2) return t2;
-  const u2 = cached2?.thumbnailUrl?.trim();
+  const u2 = cached?.thumbnailUrl?.trim();
   return u2 || null;
 }
 async function ensureLiveChannelEnrichment(ch) {
@@ -143557,8 +143648,8 @@ async function ensureLiveChannelEnrichment(ch) {
     return getCachedLiveChannelMeta(ch.id, CURATED_ART_TTL_MS).meta;
   }
   if (!ch.enrichFromYoutubeOembed) return null;
-  const cached2 = getCachedLiveChannelMeta(ch.id);
-  if (!cached2.stale && cached2.meta) return cached2.meta;
+  const cached = getCachedLiveChannelMeta(ch.id);
+  if (!cached.stale && cached.meta) return cached.meta;
   const o2 = await fetchYoutubeOembedMeta(ch.embedUrl);
   const meta = {
     channelId: ch.id,
@@ -151520,12 +151611,12 @@ function buildIntelligenceContext(entities, liveGames) {
 // ../grarf/desktop/src/lib/intelligence/mergeContext.ts
 function mergeIntelligenceContext(briefing, liveGames) {
   const live = buildIntelligenceContext(briefing.entities, liveGames);
-  const cached2 = briefing.contextBundle;
-  if (!cached2) return live;
+  const cached = briefing.contextBundle;
+  if (!cached) return live;
   return {
-    signalLines: cached2.signalLines?.length ? cached2.signalLines : live.signalLines,
-    trendingTags: cached2.trendingTags?.length ? cached2.trendingTags : live.trendingTags,
-    relatedHeadlines: cached2.relatedHeadlines?.length ? cached2.relatedHeadlines : live.relatedHeadlines,
+    signalLines: cached.signalLines?.length ? cached.signalLines : live.signalLines,
+    trendingTags: cached.trendingTags?.length ? cached.trendingTags : live.trendingTags,
+    relatedHeadlines: cached.relatedHeadlines?.length ? cached.relatedHeadlines : live.relatedHeadlines,
     relatedGames: live.relatedGames
   };
 }
@@ -153072,13 +153163,13 @@ function stickyDisplayHighlight(authoritative) {
 }
 var loadInFlight = null;
 var useMlbAllGamesHighlightStore = (0, import_zustand70.create)((set, get) => {
-  const cached2 = readCachedHighlight();
-  const initialDisplay = stickyDisplayHighlight(cached2);
-  if (cached2) {
+  const cached = readCachedHighlight();
+  const initialDisplay = stickyDisplayHighlight(cached);
+  if (cached) {
     console.log(
-      `[MLB ALL GAMES HIGHLIGHT] cache hit videoId=${cached2.videoId}
-title=${cached2.title}
-targetSlateDate=${cached2.targetSlateDateYmd}`
+      `[MLB ALL GAMES HIGHLIGHT] cache hit videoId=${cached.videoId}
+title=${cached.title}
+targetSlateDate=${cached.targetSlateDateYmd}`
     );
   }
   const loadHighlight = async () => {
@@ -153147,7 +153238,7 @@ title=${next.title}`
     set({ refreshTimerId: null, operatorUnsub: null });
   };
   return {
-    authoritativeHighlight: cached2,
+    authoritativeHighlight: cached,
     displayHighlight: initialDisplay,
     enabledSubscribers: 0,
     refreshTimerId: null,
@@ -153817,7 +153908,7 @@ function writeCachedHighlight2(item) {
 }
 var loadInFlight2 = null;
 var useMlbMorningLineupHighlightStore = (0, import_zustand71.create)((set, get) => {
-  const cached2 = readCachedHighlight2();
+  const cached = readCachedHighlight2();
   const loadHighlight = async () => {
     if (loadInFlight2) return loadInFlight2;
     loadInFlight2 = (async () => {
@@ -153861,8 +153952,8 @@ var useMlbMorningLineupHighlightStore = (0, import_zustand71.create)((set, get) 
     set({ refreshTimerId: null });
   };
   return {
-    authoritativeHighlight: cached2,
-    displayHighlight: cached2,
+    authoritativeHighlight: cached,
+    displayHighlight: cached,
     enabledSubscribers: 0,
     refreshTimerId: null,
     loadHighlight,
@@ -164050,11 +164141,11 @@ function useHighlightsTvChannelPlayback() {
     setLoading(true);
     setLoadError(null);
     try {
-      const cached2 = playlistCacheRef.current[leagueKey];
-      if (cached2) {
+      const cached = playlistCacheRef.current[leagueKey];
+      if (cached) {
         setActiveLeagueKey(leagueKey);
-        setClips(cached2);
-        setCurrentIndex(cached2.length > 0 ? Math.min(startIndex, cached2.length - 1) : 0);
+        setClips(cached);
+        setCurrentIndex(cached.length > 0 ? Math.min(startIndex, cached.length - 1) : 0);
         return;
       }
       const { clips: resolved, config } = await resolveLeagueClipsWithConfig(leagueKey, leagueLabel);
@@ -173770,13 +173861,13 @@ async function fetchGrarfExtensionParamountPlusWatchListingsForLeague(leagueKey)
     return [];
   }
   const now = Date.now();
-  const cached2 = listingsCacheByLeague.get(normalizedLeague);
-  if (cached2 && now - cached2.at < LISTINGS_CACHE_TTL_MS4) {
-    return cached2.items;
+  const cached = listingsCacheByLeague.get(normalizedLeague);
+  if (cached && now - cached.at < LISTINGS_CACHE_TTL_MS4) {
+    return cached.items;
   }
   const cloudBase = getOperationalIngestConfig().cloudBaseUrl?.replace(/\/$/, "");
   if (!cloudBase) {
-    return cached2?.items ?? [];
+    return cached?.items ?? [];
   }
   try {
     const res = await fetch(`${cloudBase}/watch/paramount-plus-listings/${normalizedLeague}`, {
@@ -173784,14 +173875,14 @@ async function fetchGrarfExtensionParamountPlusWatchListingsForLeague(leagueKey)
       cache: "no-store"
     });
     if (!res.ok) {
-      return cached2?.items ?? [];
+      return cached?.items ?? [];
     }
     const data2 = await res.json();
     const items = Array.isArray(data2.items) ? data2.items : [];
     listingsCacheByLeague.set(normalizedLeague, { at: now, items });
     return items;
   } catch {
-    return cached2?.items ?? [];
+    return cached?.items ?? [];
   }
 }
 async function resolveGrarfExtensionParamountPlusWatchUrlForGame(game) {
@@ -174158,8 +174249,8 @@ function listNhlRecapNavigationGameCandidates(game, alternateGame) {
 }
 function resolveGrarfExtensionNhlRecapNavigationUrl(game, source) {
   if (source === "nhl") {
-    const cached2 = nhlComRecapUrlByGameId.get(game.id);
-    if (cached2) return cached2;
+    const cached = nhlComRecapUrlByGameId.get(game.id);
+    if (cached) return cached;
     return resolveNhlComGamecenterRecapUrlFromGame(game);
   }
   return resolveEspnNhlRecapUrlFromGame(game);
@@ -174168,8 +174259,8 @@ async function resolveGrarfExtensionNhlRecapNavigationUrlFromGame(game, source, 
   const candidates = listNhlRecapNavigationGameCandidates(game, alternateGame);
   for (const candidate of candidates) {
     if (source === "nhl") {
-      const cached2 = nhlComRecapUrlByGameId.get(candidate.id);
-      if (cached2) return cached2;
+      const cached = nhlComRecapUrlByGameId.get(candidate.id);
+      if (cached) return cached;
     }
     const immediate = resolveGrarfExtensionNhlRecapNavigationUrl(candidate, source);
     if (immediate) {
@@ -174830,9 +174921,9 @@ function buildBbcSportScoresFixturesUrlForDate(dateIso) {
   return `${GRARF_EXTENSION_BBC_SPORT_EPL_SCORES_FIXTURES_BASE_URL}/${dateIso}`;
 }
 async function fetchBbcSportScoresFixturesHtmlForDate(dateIso) {
-  const cached2 = fixturesPageCache.get(dateIso);
-  if (cached2 && Date.now() - cached2.at < FIXTURES_PAGE_CACHE_TTL_MS) {
-    return cached2.html;
+  const cached = fixturesPageCache.get(dateIso);
+  if (cached && Date.now() - cached.at < FIXTURES_PAGE_CACHE_TTL_MS) {
+    return cached.html;
   }
   const res = await fetch(buildBbcSportScoresFixturesUrlForDate(dateIso), {
     headers: {
@@ -175347,9 +175438,9 @@ function buildBbcSportUclScoresFixturesPageUrls(dateIso) {
   return [...new Set(urls)];
 }
 async function fetchBbcSportUclScoresFixturesHtml(pageUrl) {
-  const cached2 = fixturesPageCache2.get(pageUrl);
-  if (cached2 && Date.now() - cached2.at < FIXTURES_PAGE_CACHE_TTL_MS2) {
-    return cached2.html;
+  const cached = fixturesPageCache2.get(pageUrl);
+  if (cached && Date.now() - cached.at < FIXTURES_PAGE_CACHE_TTL_MS2) {
+    return cached.html;
   }
   const res = await fetch(pageUrl, {
     headers: {
@@ -175592,9 +175683,9 @@ function resolveFotmobDateKeysForGame(game) {
 async function fetchEplFotmobCatalogForGame(game) {
   const dateKeys = resolveFotmobDateKeysForGame(game);
   const cacheKey3 = dateKeys.join("|") || "none";
-  const cached2 = catalogCache2.get(cacheKey3);
-  if (cached2 && Date.now() - cached2.at < CATALOG_CACHE_TTL_MS6) {
-    return cached2.matches;
+  const cached = catalogCache2.get(cacheKey3);
+  if (cached && Date.now() - cached.at < CATALOG_CACHE_TTL_MS6) {
+    return cached.matches;
   }
   for (const dateKey of dateKeys) {
     const matches = await fetchFotmobLeagueMatchesByDate("EPL", dateKey);
@@ -175757,9 +175848,9 @@ function matchSoccerwayRecapForMlbGame(game, catalog) {
 var CATALOG_CACHE_TTL_MS7 = 5 * 60 * 1e3;
 var catalogCacheByLeague = /* @__PURE__ */ new Map();
 async function fetchSoccerwayCatalogForLeague(leagueKey) {
-  const cached2 = catalogCacheByLeague.get(leagueKey);
-  if (cached2 && Date.now() - cached2.at < CATALOG_CACHE_TTL_MS7) {
-    return cached2.matches;
+  const cached = catalogCacheByLeague.get(leagueKey);
+  if (cached && Date.now() - cached.at < CATALOG_CACHE_TTL_MS7) {
+    return cached.matches;
   }
   const matches = await fetchSoccerwaySoccerCatalogForLeague(leagueKey);
   catalogCacheByLeague.set(leagueKey, { at: Date.now(), matches });
@@ -175906,9 +175997,9 @@ function resolveFotmobDateKeysForGame2(game) {
 async function fetchFotmobCatalogForGame(game, leagueKey) {
   const dateKeys = resolveFotmobDateKeysForGame2(game);
   const cacheKey3 = `${leagueKey}|${dateKeys.join("|") || "none"}`;
-  const cached2 = catalogCache3.get(cacheKey3);
-  if (cached2 && Date.now() - cached2.at < CATALOG_CACHE_TTL_MS8) {
-    return cached2.matches;
+  const cached = catalogCache3.get(cacheKey3);
+  if (cached && Date.now() - cached.at < CATALOG_CACHE_TTL_MS8) {
+    return cached.matches;
   }
   for (const dateKey of dateKeys) {
     const matches = await fetchFotmobLeagueMatchesByDate(leagueKey, dateKey);
@@ -176097,9 +176188,9 @@ function resolveGrarfExtensionF1YoutubeChannelUploadsPlaylistId(channelId = GRAR
 }
 async function fetchF1ChannelUploadItems() {
   const playlistId = resolveGrarfExtensionF1YoutubeChannelUploadsPlaylistId();
-  const cached2 = f1UploadsCache.get(playlistId);
-  if (cached2 && Date.now() - cached2.at < PLAYLIST_CACHE_TTL_MS) {
-    return cached2.items;
+  const cached = f1UploadsCache.get(playlistId);
+  if (cached && Date.now() - cached.at < PLAYLIST_CACHE_TTL_MS) {
+    return cached.items;
   }
   const cloudBase = getOperationalIngestConfig().cloudBaseUrl?.replace(/\/$/, "");
   if (!cloudBase) {
@@ -176594,9 +176685,9 @@ function resolveExtensionPlaylistHighlightTitlePatterns(leagueKey) {
 var playlistEntitiesCache = /* @__PURE__ */ new Map();
 async function fetchHighlightPlaylistEntities(leagueKey, playlistId) {
   const cacheKey3 = `${leagueKey}:${playlistId}`;
-  const cached2 = playlistEntitiesCache.get(cacheKey3);
-  if (cached2 && Date.now() - cached2.at < PLAYLIST_CACHE_TTL_MS2) {
-    return cached2.entities;
+  const cached = playlistEntitiesCache.get(cacheKey3);
+  if (cached && Date.now() - cached.at < PLAYLIST_CACHE_TTL_MS2) {
+    return cached.entities;
   }
   const cloudBase = getOperationalIngestConfig().cloudBaseUrl?.replace(/\/$/, "");
   if (!cloudBase) {
@@ -176874,9 +176965,9 @@ function titleMatchesGameDay2(title, game) {
   return false;
 }
 async function fetchPlaylistItems(playlistId) {
-  const cached2 = playlistItemsCache.get(playlistId);
-  if (cached2 && Date.now() - cached2.at < PLAYLIST_CACHE_TTL_MS3) {
-    return cached2.items;
+  const cached = playlistItemsCache.get(playlistId);
+  if (cached && Date.now() - cached.at < PLAYLIST_CACHE_TTL_MS3) {
+    return cached.items;
   }
   const cloudBase = getOperationalIngestConfig().cloudBaseUrl?.replace(/\/$/, "");
   if (!cloudBase) {
@@ -177233,9 +177324,9 @@ async function resolveGrarfExtensionNflComHighlightsUrlForGame(game) {
   if (game.league !== "NFL" && !game.id.startsWith("espn-NFL-")) return null;
   const eventId = parseEspnEventIdFromGame2(game);
   if (!eventId) return null;
-  const cached2 = urlCache.get(eventId);
-  if (cached2 && Date.now() - cached2.at < CACHE_TTL_MS5) {
-    return cached2.url;
+  const cached = urlCache.get(eventId);
+  if (cached && Date.now() - cached.at < CACHE_TTL_MS5) {
+    return cached.url;
   }
   const inflight = inflightByEventId.get(eventId);
   if (inflight) return inflight;
@@ -177356,9 +177447,9 @@ async function resolveGrarfExtensionUelYahooSportsPreviewArticleUrlAsync(game) {
   if (fromMetadata) return fromMetadata;
   const gameId = game.id?.trim();
   if (!gameId) return null;
-  const cached2 = resolveCacheByGameId.get(gameId);
-  if (cached2 && Date.now() - cached2.at < RESOLVE_CACHE_TTL_MS) {
-    return cached2.url;
+  const cached = resolveCacheByGameId.get(gameId);
+  if (cached && Date.now() - cached.at < RESOLVE_CACHE_TTL_MS) {
+    return cached.url;
   }
   const inflight = inflightByGameId.get(gameId);
   if (inflight) return inflight;
@@ -177749,9 +177840,9 @@ async function resolveFotmobMatchPreviewForGame(game) {
   if (!isSoccerLeague2(game.league)) return null;
   const matchId = parseFotmobMatchIdFromGame(game);
   if (!matchId) return null;
-  const cached2 = previewByMatchId.get(matchId);
-  if (cached2 && Date.now() - cached2.at < PREVIEW_CACHE_TTL_MS) {
-    return cached2.preview;
+  const cached = previewByMatchId.get(matchId);
+  if (cached && Date.now() - cached.at < PREVIEW_CACHE_TTL_MS) {
+    return cached.preview;
   }
   const inflight = inflightByMatchId.get(matchId);
   if (inflight) return inflight;
@@ -178067,9 +178158,9 @@ async function resolveGrarfExtensionSportsMoleSoccerPreviewForGame(game) {
   if (!isLaligaGameRow(game) && !isUclGameRow(game)) return null;
   const gameId = game.id?.trim();
   if (!gameId) return null;
-  const cached2 = previewByGameId.get(gameId);
-  if (cached2 && Date.now() - cached2.at < RESOLVE_CACHE_TTL_MS2) {
-    return cached2.preview;
+  const cached = previewByGameId.get(gameId);
+  if (cached && Date.now() - cached.at < RESOLVE_CACHE_TTL_MS2) {
+    return cached.preview;
   }
   const inflight = inflightByGameId2.get(gameId);
   if (inflight) return inflight;
@@ -178344,9 +178435,9 @@ var inflightByUrl = /* @__PURE__ */ new Map();
 async function fetchWnbaComRecapHeadlineForUrl(recapUrl) {
   const trimmedUrl = recapUrl.trim();
   if (!trimmedUrl) return null;
-  const cached2 = headlineCacheByUrl.get(trimmedUrl);
-  if (cached2 && Date.now() - cached2.at < RECAP_HEADLINE_CACHE_TTL_MS) {
-    return cached2.headline;
+  const cached = headlineCacheByUrl.get(trimmedUrl);
+  if (cached && Date.now() - cached.at < RECAP_HEADLINE_CACHE_TTL_MS) {
+    return cached.headline;
   }
   const inflight = inflightByUrl.get(trimmedUrl);
   if (inflight) return inflight;
@@ -179621,9 +179712,9 @@ function coversLeagueFromGame(game) {
 }
 async function loadCoversProLeagueIndex(league2) {
   const now = Date.now();
-  const cached2 = indexByLeague.get(league2);
-  if (cached2 && now - cached2.fetchedAt < CACHE_TTL_MS6) {
-    return cached2.entries;
+  const cached = indexByLeague.get(league2);
+  if (cached && now - cached.fetchedAt < CACHE_TTL_MS6) {
+    return cached.entries;
   }
   const html = await fetchCoversProLeagueMatchupsHtml(league2);
   const entries = parseCoversProLeagueMatchupsIndex(html, league2);
@@ -181396,9 +181487,9 @@ var RECAP_PAGE_CACHE_TTL_MS = 30 * 60 * 1e3;
 var recapPageCache = /* @__PURE__ */ new Map();
 var inflightByRecapUrl = /* @__PURE__ */ new Map();
 async function fetchGrarfExtensionBbcSportRecapHeadlineForUrl(recapUrl) {
-  const cached2 = recapPageCache.get(recapUrl);
-  if (cached2 && Date.now() - cached2.at < RECAP_PAGE_CACHE_TTL_MS) {
-    return cached2.headline;
+  const cached = recapPageCache.get(recapUrl);
+  if (cached && Date.now() - cached.at < RECAP_PAGE_CACHE_TTL_MS) {
+    return cached.headline;
   }
   const inflight = inflightByRecapUrl.get(recapUrl);
   if (inflight) return inflight;
@@ -181732,9 +181823,9 @@ function recapHeadlineCacheKey(sport, espnLeague, eventId) {
 }
 async function fetchEspnRecapHeadlineForSummaryRoute(sport, espnLeague, eventId) {
   const cacheKey3 = recapHeadlineCacheKey(sport, espnLeague, eventId);
-  const cached2 = headlineCache2.get(cacheKey3);
-  if (cached2 && Date.now() - cached2.at < RECAP_HEADLINE_CACHE_TTL_MS2) {
-    return cached2.headline;
+  const cached = headlineCache2.get(cacheKey3);
+  if (cached && Date.now() - cached.at < RECAP_HEADLINE_CACHE_TTL_MS2) {
+    return cached.headline;
   }
   const inflight = inflightByCacheKey.get(cacheKey3);
   if (inflight) return inflight;
@@ -181988,9 +182079,9 @@ var inflightCbsByRecapUrl = /* @__PURE__ */ new Map();
 var espnRecapPageHeadlineCache = /* @__PURE__ */ new Map();
 var inflightEspnRecapPageByUrl = /* @__PURE__ */ new Map();
 async function fetchNcaafEspnRecapHeadlineForEventId(eventId) {
-  const cached2 = espnHeadlineCache.get(eventId);
-  if (cached2 && Date.now() - cached2.at < RECAP_HEADLINE_CACHE_TTL_MS3) {
-    return cached2.headline;
+  const cached = espnHeadlineCache.get(eventId);
+  if (cached && Date.now() - cached.at < RECAP_HEADLINE_CACHE_TTL_MS3) {
+    return cached.headline;
   }
   const inflight = inflightEspnByEventId.get(eventId);
   if (inflight) return inflight;
@@ -182019,9 +182110,9 @@ async function fetchNcaafEspnRecapHeadlineForEventId(eventId) {
   return promise;
 }
 async function fetchNcaafEspnRecapPageHeadlineForRecapUrl(recapUrl) {
-  const cached2 = espnRecapPageHeadlineCache.get(recapUrl);
-  if (cached2 && Date.now() - cached2.at < RECAP_HEADLINE_CACHE_TTL_MS3) {
-    return cached2.headline;
+  const cached = espnRecapPageHeadlineCache.get(recapUrl);
+  if (cached && Date.now() - cached.at < RECAP_HEADLINE_CACHE_TTL_MS3) {
+    return cached.headline;
   }
   const inflight = inflightEspnRecapPageByUrl.get(recapUrl);
   if (inflight) return inflight;
@@ -182052,9 +182143,9 @@ async function fetchNcaafEspnRecapPageHeadlineForRecapUrl(recapUrl) {
   return promise;
 }
 async function fetchNcaafCbsRecapHeadlineForRecapUrl(recapUrl) {
-  const cached2 = cbsHeadlineCache.get(recapUrl);
-  if (cached2 && Date.now() - cached2.at < RECAP_HEADLINE_CACHE_TTL_MS3) {
-    return cached2.headline;
+  const cached = cbsHeadlineCache.get(recapUrl);
+  if (cached && Date.now() - cached.at < RECAP_HEADLINE_CACHE_TTL_MS3) {
+    return cached.headline;
   }
   const inflight = inflightCbsByRecapUrl.get(recapUrl);
   if (inflight) return inflight;
@@ -182253,9 +182344,9 @@ var RECAP_HEADLINE_CACHE_TTL_MS4 = 30 * 60 * 1e3;
 var headlineCache3 = /* @__PURE__ */ new Map();
 var inflightByRecapUrl2 = /* @__PURE__ */ new Map();
 async function fetchMlssoccerRecapHeadlineForUrl(recapUrl) {
-  const cached2 = headlineCache3.get(recapUrl);
-  if (cached2 && Date.now() - cached2.at < RECAP_HEADLINE_CACHE_TTL_MS4) {
-    return cached2.headline;
+  const cached = headlineCache3.get(recapUrl);
+  if (cached && Date.now() - cached.at < RECAP_HEADLINE_CACHE_TTL_MS4) {
+    return cached.headline;
   }
   const inflight = inflightByRecapUrl2.get(recapUrl);
   if (inflight) return inflight;
@@ -182483,9 +182574,9 @@ var RECAP_HEADLINE_CACHE_TTL_MS5 = 30 * 60 * 1e3;
 var headlineCache4 = /* @__PURE__ */ new Map();
 var inflightByReportUrl = /* @__PURE__ */ new Map();
 async function fetchSoccerwayRecapHeadlineForUrl(reportUrl) {
-  const cached2 = headlineCache4.get(reportUrl);
-  if (cached2 && Date.now() - cached2.at < RECAP_HEADLINE_CACHE_TTL_MS5) {
-    return cached2.headline;
+  const cached = headlineCache4.get(reportUrl);
+  if (cached && Date.now() - cached.at < RECAP_HEADLINE_CACHE_TTL_MS5) {
+    return cached.headline;
   }
   const inflight = inflightByReportUrl.get(reportUrl);
   if (inflight) return inflight;
@@ -182948,9 +183039,9 @@ async function resolveNhlRecapEspnEventIdForGame(game) {
   return resolveEspnNhlEventIdFromEspnScoreboardPeer(game, rows);
 }
 async function fetchNhlEspnRecapHeadlineForEventId(eventId) {
-  const cached2 = headlineCache5.get(eventId);
-  if (cached2 && Date.now() - cached2.at < RECAP_HEADLINE_CACHE_TTL_MS6) {
-    return cached2.headline;
+  const cached = headlineCache5.get(eventId);
+  if (cached && Date.now() - cached.at < RECAP_HEADLINE_CACHE_TTL_MS6) {
+    return cached.headline;
   }
   const inflight = inflightByEventId2.get(eventId);
   if (inflight) return inflight;
@@ -203181,9 +203272,9 @@ function resolveGrarfExtensionMlbPreviewHeadlineFromOperationalGame(game) {
 async function fetchPreviewHeadlineForArticleUrl(url) {
   const trimmedUrl = url.trim();
   if (!trimmedUrl) return null;
-  const cached2 = headlineCacheByUrl2.get(trimmedUrl);
-  if (cached2 && Date.now() - cached2.at < PREVIEW_HEADLINE_CACHE_TTL_MS) {
-    return cached2.headline;
+  const cached = headlineCacheByUrl2.get(trimmedUrl);
+  if (cached && Date.now() - cached.at < PREVIEW_HEADLINE_CACHE_TTL_MS) {
+    return cached.headline;
   }
   const inflight = inflightByUrl2.get(trimmedUrl);
   if (inflight) return inflight;
@@ -213244,9 +213335,9 @@ function resolveNbaChannelUploadsPlaylistId() {
 }
 async function fetchNbaChannelUploadPlaylistItems() {
   const playlistId = resolveNbaChannelUploadsPlaylistId();
-  const cached2 = playlistCache.get(playlistId);
-  if (cached2 && Date.now() - cached2.at < CACHE_TTL_MS7) {
-    return cached2.items;
+  const cached = playlistCache.get(playlistId);
+  if (cached && Date.now() - cached.at < CACHE_TTL_MS7) {
+    return cached.items;
   }
   const cloudBase = getOperationalIngestConfig().cloudBaseUrl?.replace(/\/$/, "");
   if (!cloudBase) {
@@ -213273,9 +213364,9 @@ async function fetchNbaChannelUploadPlaylistItems() {
 async function resolveGrarfExtensionNbaNightlyRecapVideoWatchUrl(targetDateKey = resolveGrarfExtensionNbaNightlyRecapTargetDateKey()) {
   const dateKey = targetDateKey.trim();
   if (!dateKey) return null;
-  const cached2 = watchUrlCache.get(dateKey);
-  if (cached2 && Date.now() - cached2.at < CACHE_TTL_MS7) {
-    return cached2.url;
+  const cached = watchUrlCache.get(dateKey);
+  if (cached && Date.now() - cached.at < CACHE_TTL_MS7) {
+    return cached.url;
   }
   const inflight = inflightByDateKey.get(dateKey);
   if (inflight) return inflight;

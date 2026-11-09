@@ -25146,26 +25146,37 @@ function resolveGrarfCloudOperationalSnapshotUrl(cloudBaseUrl) {
 function appendOperationalSnapshotClientMs(url) {
   return `${url}${url.includes("?") ? "&" : "?"}clientMs=${Date.now()}`;
 }
-function resolveOperationalCloudSnapshotFetchTarget() {
+function resolveOperationalCloudSnapshotFetchTarget(purpose = "live") {
   const { cloudBaseUrl, publishedFeedUrl } = getOperationalIngestConfig();
   const published = publishedFeedUrl?.trim();
-  if (isGrarfExtensionRenderer() && published) {
+  const workerTarget = () => {
+    if (!cloudBaseUrl) {
+      throw new Error("[OperationalIngest] grarf_cloud provider requires VITE_GRARF_OPERATIONAL_INGEST_URL");
+    }
+    const urlBase = resolveGrarfCloudOperationalSnapshotUrl(cloudBaseUrl);
     return {
-      url: appendOperationalSnapshotClientMs(published),
-      // Side panel must not reuse a cached feed body — generatedAt can advance without ESPN rows.
+      url: appendOperationalSnapshotClientMs(urlBase),
       cache: "no-store",
-      transport: "published_feed"
+      transport: "worker_snapshot"
     };
+  };
+  if (isGrarfExtensionRenderer()) {
+    if (purpose === "live" && cloudBaseUrl?.trim()) {
+      return workerTarget();
+    }
+    if (published) {
+      return {
+        url: appendOperationalSnapshotClientMs(published),
+        cache: "no-store",
+        transport: "published_feed"
+      };
+    }
+    return workerTarget();
   }
   if (!cloudBaseUrl) {
     throw new Error("[OperationalIngest] grarf_cloud provider requires VITE_GRARF_OPERATIONAL_INGEST_URL");
   }
-  const urlBase = resolveGrarfCloudOperationalSnapshotUrl(cloudBaseUrl);
-  return {
-    url: appendOperationalSnapshotClientMs(urlBase),
-    cache: "no-store",
-    transport: "worker_snapshot"
-  };
+  return workerTarget();
 }
 function resolveOperationalWorkerSnapshotFetchTarget() {
   const { cloudBaseUrl } = getOperationalIngestConfig();
@@ -25175,6 +25186,60 @@ function resolveOperationalWorkerSnapshotFetchTarget() {
     url: appendOperationalSnapshotClientMs(urlBase),
     cache: "no-store",
     transport: "worker_snapshot"
+  };
+}
+
+// ../grarf/shared/config/operationalSnapshotFreshnessSla.ts
+init_define_import_meta_env();
+var OPERATIONAL_PROVIDER_POLL_MAX_STALE_MS = 6e4;
+var OPERATIONAL_SNAPSHOT_GENERATED_AT_LEAD_SLACK_MS = 5e3;
+function parseOperationalIsoMs(iso) {
+  if (!iso?.trim()) return Number.NEGATIVE_INFINITY;
+  const ms = Date.parse(iso);
+  return Number.isFinite(ms) ? ms : Number.NEGATIVE_INFINITY;
+}
+function resolveOperationalProviderPollCompletedAtAgeMs(snapshot, nowMs = Date.now()) {
+  const completedAt = snapshot?.providerPoll?.providerPollCompletedAt?.trim();
+  if (!completedAt) return null;
+  const completedMs = parseOperationalIsoMs(completedAt);
+  if (completedMs === Number.NEGATIVE_INFINITY) return null;
+  return nowMs - completedMs;
+}
+function isOperationalSnapshotMisleadingFreshness(snapshot, leadSlackMs = OPERATIONAL_SNAPSHOT_GENERATED_AT_LEAD_SLACK_MS) {
+  if (!snapshot?.providerPoll?.providerPollCompletedAt?.trim()) return false;
+  const generatedMs = parseOperationalIsoMs(snapshot.generatedAt);
+  const pollMs = parseOperationalIsoMs(snapshot.providerPoll.providerPollCompletedAt);
+  if (generatedMs === Number.NEGATIVE_INFINITY || pollMs === Number.NEGATIVE_INFINITY) {
+    return false;
+  }
+  return generatedMs > pollMs + leadSlackMs;
+}
+function evaluateOperationalSnapshotFreshnessSla(snapshot, options) {
+  const nowMs = options?.nowMs ?? Date.now();
+  const maxProviderPollAgeMs = options?.maxProviderPollAgeMs ?? OPERATIONAL_PROVIDER_POLL_MAX_STALE_MS;
+  const maxGeneratedAtAgeMs = options?.maxGeneratedAtAgeMs ?? maxProviderPollAgeMs;
+  const leadSlackMs = options?.leadSlackMs ?? OPERATIONAL_SNAPSHOT_GENERATED_AT_LEAD_SLACK_MS;
+  const reasons = [];
+  if (!snapshot) {
+    return { stale: true, reasons: ["missing_snapshot"], providerPollAgeMs: null, generatedAtAgeMs: null };
+  }
+  const providerPollAgeMs = resolveOperationalProviderPollCompletedAtAgeMs(snapshot, nowMs);
+  const generatedMs = parseOperationalIsoMs(snapshot.generatedAt);
+  const generatedAtAgeMs = generatedMs === Number.NEGATIVE_INFINITY ? null : nowMs - generatedMs;
+  if (providerPollAgeMs != null && providerPollAgeMs > maxProviderPollAgeMs) {
+    reasons.push(`provider_poll_stale_age_ms_${providerPollAgeMs}`);
+  }
+  if (generatedAtAgeMs != null && generatedAtAgeMs > maxGeneratedAtAgeMs) {
+    reasons.push(`generated_at_stale_age_ms_${generatedAtAgeMs}`);
+  }
+  if (isOperationalSnapshotMisleadingFreshness(snapshot, leadSlackMs)) {
+    reasons.push("misleading_generated_at_ahead_of_provider_poll");
+  }
+  return {
+    stale: reasons.length > 0,
+    reasons,
+    providerPollAgeMs,
+    generatedAtAgeMs
   };
 }
 
@@ -25435,10 +25500,27 @@ async function fetchOperationalSnapshotFromCloudTarget(target, options) {
   }
   throw new Error(lastError ?? "[OperationalIngest] grarf_cloud fetch failed");
 }
+function resolveCloudSnapshotFetchPurpose(traceFetchKind) {
+  if (traceFetchKind === "prefetch" && !isGrarfExtensionRenderer()) {
+    return "bootstrap";
+  }
+  return "live";
+}
+function parseTransportFreshnessRank(transport) {
+  const pollMs = Date.parse(String(transport.providerPoll?.providerPollCompletedAt ?? ""));
+  if (Number.isFinite(pollMs)) return pollMs;
+  const generatedMs = Date.parse(String(transport.generatedAt ?? ""));
+  return Number.isFinite(generatedMs) ? generatedMs : Number.NEGATIVE_INFINITY;
+}
+function pickFresherOperationalTransport(a, b) {
+  return parseTransportFreshnessRank(b) > parseTransportFreshnessRank(a) ? b : a;
+}
 async function fetchViaGrarfCloudService(options) {
-  const primaryTarget = resolveOperationalCloudSnapshotFetchTarget();
+  const purpose = resolveCloudSnapshotFetchPurpose(options?.traceFetchKind);
+  const primaryTarget = resolveOperationalCloudSnapshotFetchTarget(purpose);
+  let transport;
   try {
-    return await fetchOperationalSnapshotFromCloudTarget(primaryTarget, options);
+    transport = await fetchOperationalSnapshotFromCloudTarget(primaryTarget, options);
   } catch (primaryError) {
     if (primaryTarget.transport !== "published_feed") {
       throw primaryError;
@@ -25450,8 +25532,35 @@ async function fetchViaGrarfCloudService(options) {
     if (define_import_meta_env_default.DEV) {
       console.warn(`${LOG8} published feed unavailable \u2014 falling back to Worker snapshot`, primaryError);
     }
-    return fetchOperationalSnapshotFromCloudTarget(fallbackTarget, options);
+    transport = await fetchOperationalSnapshotFromCloudTarget(fallbackTarget, options);
+    return transport;
   }
+  if (primaryTarget.transport === "published_feed") {
+    const verdict = evaluateOperationalSnapshotFreshnessSla(transport);
+    if (verdict.stale) {
+      const fallbackTarget = resolveOperationalWorkerSnapshotFetchTarget();
+      if (fallbackTarget) {
+        try {
+          const workerTransport = await fetchOperationalSnapshotFromCloudTarget(
+            fallbackTarget,
+            options
+          );
+          const fresher = pickFresherOperationalTransport(transport, workerTransport);
+          if (fresher !== transport && define_import_meta_env_default.DEV) {
+            console.warn(
+              `${LOG8} published feed SLA stale (${verdict.reasons.join(",")}) \u2014 using Worker snapshot`
+            );
+          }
+          transport = fresher;
+        } catch (fallbackError) {
+          if (define_import_meta_env_default.DEV) {
+            console.warn(`${LOG8} Worker fallback after stale published feed failed`, fallbackError);
+          }
+        }
+      }
+    }
+  }
+  return transport;
 }
 async function fetchViaWebOperationalIngest() {
   let cloud = null;
