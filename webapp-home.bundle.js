@@ -27809,8 +27809,9 @@ function normalizeEspnEvent(event, leagueKey, slateDateKey) {
   const homeRecord = pickRecord(home.records);
   const awayScore = parseScore(away.score);
   const homeScore = parseScore(home.score);
-  const awayPollRank = leagueKey === "NCAAF" ? pickEspnCuratedPollRank(away) : void 0;
-  const homePollRank = leagueKey === "NCAAF" ? pickEspnCuratedPollRank(home) : void 0;
+  const usesCuratedPollRank = leagueKey === "NCAAF" || leagueKey === "MNCAAB" || leagueKey === "WNCAAB";
+  const awayPollRank = usesCuratedPollRank ? pickEspnCuratedPollRank(away) : void 0;
+  const homePollRank = usesCuratedPollRank ? pickEspnCuratedPollRank(home) : void 0;
   const awayStandingsLine = safe8(away.standingsSummary) || void 0;
   const homeStandingsLine = safe8(home.standingsSummary) || void 0;
   const probables = comp.probables || [];
@@ -71474,11 +71475,32 @@ init_define_import_meta_env();
 
 // ../grarf/shared/domain/ncaaf/formatNcaafTeamMatchupDisplayName.ts
 init_define_import_meta_env();
+
+// ../grarf/shared/domain/operational/espnCuratedPollRank.ts
+init_define_import_meta_env();
+var ESPN_CURATED_POLL_RANK_LEAGUES = /* @__PURE__ */ new Set([
+  "NCAAF",
+  "MNCAAB",
+  "WNCAAB"
+]);
+var ESPN_CURATED_POLL_RANK_TOP_25_MAX = 25;
+function leagueUsesEspnCuratedPollRank(league2) {
+  return ESPN_CURATED_POLL_RANK_LEAGUES.has(league2);
+}
+function resolveEspnCuratedTop25PollRank(rawRank) {
+  if (rawRank == null || !Number.isFinite(rawRank)) return null;
+  const normalized = Math.trunc(rawRank);
+  if (normalized < 1 || normalized > ESPN_CURATED_POLL_RANK_TOP_25_MAX) return null;
+  return normalized;
+}
+
+// ../grarf/shared/domain/ncaaf/formatNcaafTeamMatchupDisplayName.ts
 function resolveNcaafTeamPollRank(game, side) {
-  if (game.league !== "NCAAF") return void 0;
+  const league2 = game.league?.trim();
+  if (!league2 || !leagueUsesEspnCuratedPollRank(league2)) return void 0;
   const rank = side === "away" ? game.awayPollRank : game.homePollRank;
-  if (rank == null || !Number.isFinite(rank) || rank <= 0) return void 0;
-  return Math.trunc(rank);
+  const top25 = resolveEspnCuratedTop25PollRank(rank);
+  return top25 ?? void 0;
 }
 function formatNcaafTeamMatchupDisplayName(game, side, teamName) {
   const trimmed = teamName.trim();
@@ -71874,14 +71896,11 @@ function resolveNonNcaafLeftNavTeamName(pill) {
   return { pollRank: null, teamName, displayText: teamName };
 }
 function resolveNcaafTop25PollRankForLeftNav(rank) {
-  if (rank == null || !Number.isFinite(rank)) return null;
-  const normalized = Math.trunc(rank);
-  if (normalized < 1 || normalized > LEFT_NAV_NCAAF_TOP_25_MAX_RANK) return null;
-  return normalized;
+  return resolveEspnCuratedTop25PollRank(rank);
 }
 function resolveSportsBrowserLeftNavTeamNamePresentation(game, pill) {
   const teamName = (pill.teamName || pill.abbrev).trim();
-  if (game.league !== "NCAAF") {
+  if (!leagueUsesEspnCuratedPollRank(game.league)) {
     return resolveNonNcaafLeftNavTeamName(pill);
   }
   const rawRank = pill.side === "away" ? game.awayPollRank : game.homePollRank;
@@ -72031,7 +72050,7 @@ function resolveNcaafRankingParticipant(rawRank) {
   return { isRanked: true, rank };
 }
 function resolveNcaafCombinedRankingSum(game) {
-  if (game.league !== "NCAAF") return null;
+  if (!leagueUsesEspnCuratedPollRank(game.league)) return null;
   const awayRank = resolveNcaafTop25PollRankOrNull(game.awayPollRank);
   const homeRank = resolveNcaafTop25PollRankOrNull(game.homePollRank);
   if (awayRank == null && homeRank == null) {
@@ -72040,7 +72059,7 @@ function resolveNcaafCombinedRankingSum(game) {
   return (awayRank ?? 0) + (homeRank ?? 0);
 }
 function resolveNcaafMatchupRankingInput(game) {
-  if (game.league !== "NCAAF") return null;
+  if (!leagueUsesEspnCuratedPollRank(game.league)) return null;
   const away = resolveNcaafRankingParticipant(game.awayPollRank);
   const home = resolveNcaafRankingParticipant(game.homePollRank);
   const combinedRankingSum = resolveNcaafCombinedRankingSum(game);
@@ -72074,11 +72093,11 @@ function toGameImportanceOperationalContextFromTicker(game) {
 }
 
 // ../grarf/desktop/src/lib/gameImportance/leagues/ncaaf/resolveNcaafGameImportanceScore.ts
-function isNcaafGame(game) {
-  return game.league === "NCAAF" || /^espn-NCAAF-/i.test(game.id);
+function isCuratedPollRankImportanceGame(game) {
+  return leagueUsesEspnCuratedPollRank(game.league) || /^espn-(NCAAF|MNCAAB|WNCAAB)-/i.test(game.id);
 }
 function resolveNcaafGameImportanceScoreBreakdown(game) {
-  if (!isNcaafGame(game)) return null;
+  if (!isCuratedPollRankImportanceGame(game)) return null;
   const rankingInput = resolveNcaafMatchupRankingInput(game);
   if (!rankingInput) return null;
   const matchupQuality = computeGameImportanceMatchupQuality(

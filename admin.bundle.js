@@ -24800,8 +24800,9 @@ function normalizeEspnEvent(event, leagueKey, slateDateKey) {
   const homeRecord = pickRecord(home.records);
   const awayScore = parseScore(away.score);
   const homeScore = parseScore(home.score);
-  const awayPollRank = leagueKey === "NCAAF" ? pickEspnCuratedPollRank(away) : void 0;
-  const homePollRank = leagueKey === "NCAAF" ? pickEspnCuratedPollRank(home) : void 0;
+  const usesCuratedPollRank = leagueKey === "NCAAF" || leagueKey === "MNCAAB" || leagueKey === "WNCAAB";
+  const awayPollRank = usesCuratedPollRank ? pickEspnCuratedPollRank(away) : void 0;
+  const homePollRank = usesCuratedPollRank ? pickEspnCuratedPollRank(home) : void 0;
   const awayStandingsLine = safe8(away.standingsSummary) || void 0;
   const homeStandingsLine = safe8(home.standingsSummary) || void 0;
   const probables = comp.probables || [];
