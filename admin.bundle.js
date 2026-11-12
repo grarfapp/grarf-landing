@@ -15212,7 +15212,8 @@ var LEAGUE_PRESENTATION_LABEL_BY_KEY = {
   pfl: "PFL",
   CONCACAF_CL: "CONCACAF Champions Cup",
   CONCACAF_NG: "CONCACAF Nations League",
-  CONCACAF_CAC: "Central American Cup"
+  CONCACAF_CAC: "Central American Cup",
+  WOMENS_UCL: "Women's UCL"
 };
 function formatGrarfLeaguePresentationLabel(leagueKey, fallbackLabel) {
   const key = leagueKey.trim();
@@ -19947,6 +19948,12 @@ function resolveGolfWatchStreamUrl(leagueKey, tournamentTitle) {
 }
 
 // ../grarf/shared/domain/soccer/buildWomensUclUefaGameCenterUrl.ts
+init_define_import_meta_env();
+
+// ../grarf/shared/domain/nba/parseEspnNbaEventIdFromGame.ts
+init_define_import_meta_env();
+
+// ../grarf/shared/domain/espn/parseEspnNumericEventIdFromEspnWebUrl.ts
 init_define_import_meta_env();
 
 // ../grarf/desktop/src/lib/espn/espnGameUrls.ts
@@ -31171,7 +31178,11 @@ function mergeOperationalGameEnrichmentRecords(base, patch) {
       trimEnrichmentText(patch.bbcRecapHeadline)
     ),
     bbcRecapUrl: trimEnrichmentText(patch.bbcRecapUrl) ?? trimEnrichmentText(base.bbcRecapUrl),
-    catchUpPreviewHeadline: trimEnrichmentText(patch.catchUpPreviewHeadline) ?? trimEnrichmentText(base.catchUpPreviewHeadline)
+    catchUpPreviewHeadline: trimEnrichmentText(patch.catchUpPreviewHeadline) ?? trimEnrichmentText(base.catchUpPreviewHeadline),
+    espnRecapHeadlineFetchAttemptedAtMs: Math.max(
+      base.espnRecapHeadlineFetchAttemptedAtMs ?? 0,
+      patch.espnRecapHeadlineFetchAttemptedAtMs ?? 0
+    ) || void 0
   };
   if (merged.bbcRecapHeadline?.trim() && merged.bbcRecapUrl?.trim()) {
     delete merged.espnRecapHeadline;
