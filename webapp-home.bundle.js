@@ -23780,7 +23780,7 @@ var ESPN_OPERATIONAL_INGEST_LEAGUES = [
     "sport": "basketball",
     "label": "NCAA Men's Basketball",
     "slug": "mens-college-basketball",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/basketball/mens-college-basketball/scoreboard"
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/basketball/mens-college-basketball/scoreboard?groups=50&limit=200"
   },
   {
     "key": "NASCAR",
@@ -24102,7 +24102,7 @@ var ESPN_OPERATIONAL_INGEST_LEAGUES = [
     "sport": "basketball",
     "label": "NCAA Women's Basketball",
     "slug": "womens-college-basketball",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/basketball/womens-college-basketball/scoreboard"
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/basketball/womens-college-basketball/scoreboard?groups=50&limit=200"
   },
   {
     "key": "WOMENS_UCL",
@@ -35501,7 +35501,7 @@ var ESPN_OPERATIONAL_INGEST_LEAGUES2 = [
   },
   {
     "key": "MNCAAB",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/basketball/mens-college-basketball/scoreboard",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/basketball/mens-college-basketball/scoreboard?groups=50&limit=200",
     "label": "NCAA Men's Basketball",
     "sport": "basketball",
     "slug": "mens-college-basketball",
@@ -35869,7 +35869,7 @@ var ESPN_OPERATIONAL_INGEST_LEAGUES2 = [
   },
   {
     "key": "WNCAAB",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/basketball/womens-college-basketball/scoreboard",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/basketball/womens-college-basketball/scoreboard?groups=50&limit=200",
     "label": "NCAA Women's Basketball",
     "sport": "basketball",
     "slug": "womens-college-basketball",
@@ -78584,6 +78584,25 @@ init_define_import_meta_env();
 // ../grarf/desktop/src/lib/livetrack/feed/mapFeedItemToLiveTrackEvent.ts
 init_define_import_meta_env();
 
+// ../grarf/shared/domain/livetrack/resolveLiveTrackPostKey.ts
+init_define_import_meta_env();
+function grarfStableStringHash(input) {
+  let h2 = 2166136261;
+  for (let i2 = 0; i2 < input.length; i2++) {
+    h2 ^= input.charCodeAt(i2);
+    h2 = Math.imul(h2, 16777619);
+  }
+  return (h2 >>> 0).toString(36);
+}
+function resolveLiveTrackPostKeyFromUrl(url, fallbackId) {
+  const key2 = url.trim() || fallbackId?.trim() || "";
+  if (!key2) return "livetrack-empty";
+  return `livetrack-${grarfStableStringHash(key2)}`;
+}
+function resolveLiveTrackEventIdFromFeedFields(input) {
+  return resolveLiveTrackPostKeyFromUrl(input.url, input.id);
+}
+
 // ../grarf/desktop/src/lib/livetrack/resolveLiveTrackFeedPostBody.ts
 init_define_import_meta_env();
 function normalizePostBodyForComparison(text2) {
@@ -78639,17 +78658,8 @@ function resolveSourceLabel(item) {
 function buildHeadline(item, titleWithoutSport) {
   return resolveLiveTrackFeedPostBody(titleWithoutSport, item.summary);
 }
-function stableHash2(input) {
-  let h2 = 2166136261;
-  for (let i2 = 0; i2 < input.length; i2++) {
-    h2 ^= input.charCodeAt(i2);
-    h2 = Math.imul(h2, 16777619);
-  }
-  return (h2 >>> 0).toString(36);
-}
 function resolveLiveTrackEventIdFromFeedItem(item) {
-  const key2 = item.url.trim() || item.id;
-  return `livetrack-${stableHash2(key2)}`;
+  return resolveLiveTrackEventIdFromFeedFields({ url: item.url, id: item.id });
 }
 function mapFeedItemToLiveTrackEvent(item, options = {}) {
   const sportFromTitle = parseSportFromTitle(item.title);
@@ -87653,7 +87663,7 @@ var ESPN_OPERATIONAL_LEAGUES = {
   LPGA: { sport: "golf", league: "lpga", endpoint: "https://site.api.espn.com/apis/site/v2/sports/golf/lpga/scoreboard", pollIntervalMs: 6e4, label: "LPGA Tour" },
   MLB: { sport: "baseball", league: "mlb", endpoint: "https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/scoreboard", pollIntervalMs: 6e4, label: "MLB" },
   MLS: { sport: "soccer", league: "usa.1", endpoint: "https://site.api.espn.com/apis/site/v2/sports/soccer/usa.1/scoreboard", pollIntervalMs: 6e4, label: "MLS" },
-  MNCAAB: { sport: "basketball", league: "mens-college-basketball", endpoint: "https://site.api.espn.com/apis/site/v2/sports/basketball/mens-college-basketball/scoreboard", pollIntervalMs: 6e4, label: "NCAA Men's Basketball" },
+  MNCAAB: { sport: "basketball", league: "mens-college-basketball", endpoint: "https://site.api.espn.com/apis/site/v2/sports/basketball/mens-college-basketball/scoreboard?groups=50&limit=200", pollIntervalMs: 6e4, label: "NCAA Men's Basketball" },
   NASCAR: { sport: "racing", league: "nascar-premier", endpoint: "https://site.api.espn.com/apis/site/v2/sports/racing/nascar-premier/scoreboard", pollIntervalMs: 6e4, label: "NASCAR Cup Series" },
   NASCAR_TRUCK: { sport: "racing", league: "nascar-truck", endpoint: "https://site.api.espn.com/apis/site/v2/sports/racing/nascar-truck/scoreboard", pollIntervalMs: 6e4, label: "NASCAR Truck Series" },
   NASCAR_XFINITY: { sport: "racing", league: "nascar-secondary", endpoint: "https://site.api.espn.com/apis/site/v2/sports/racing/nascar-secondary/scoreboard", pollIntervalMs: 6e4, label: "NASCAR O'Reilly Auto Parts" },
@@ -87699,7 +87709,7 @@ var ESPN_OPERATIONAL_LEAGUES = {
   USLCUP: { sport: "soccer", league: "usa.usl.l1.cup", endpoint: "https://site.api.espn.com/apis/site/v2/sports/soccer/usa.usl.l1.cup/scoreboard", pollIntervalMs: 6e4, label: "USL Championship Cup" },
   UWCQ: { sport: "soccer", league: "uefa.euroq", endpoint: "https://site.api.espn.com/apis/site/v2/sports/soccer/uefa.euroq/scoreboard", pollIntervalMs: 6e4, label: "UEFA Euro Qualifying" },
   WNBA: { sport: "basketball", league: "wnba", endpoint: "https://site.api.espn.com/apis/site/v2/sports/basketball/wnba/scoreboard", pollIntervalMs: 6e4, label: "WNBA" },
-  WNCAAB: { sport: "basketball", league: "womens-college-basketball", endpoint: "https://site.api.espn.com/apis/site/v2/sports/basketball/womens-college-basketball/scoreboard", pollIntervalMs: 6e4, label: "NCAA Women's Basketball" },
+  WNCAAB: { sport: "basketball", league: "womens-college-basketball", endpoint: "https://site.api.espn.com/apis/site/v2/sports/basketball/womens-college-basketball/scoreboard?groups=50&limit=200", pollIntervalMs: 6e4, label: "NCAA Women's Basketball" },
   WOMENS_UCL: { sport: "soccer", league: "uefa.wchampions", endpoint: "https://site.api.espn.com/apis/site/v2/sports/soccer/uefa.wchampions/scoreboard", pollIntervalMs: 6e4, label: "Women's UCL" },
   WORLDCUP: { sport: "soccer", league: "fifa.world", endpoint: "https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard", pollIntervalMs: 6e4, label: "FIFA World Cup" },
   WTA: { sport: "tennis", league: "wta", endpoint: "https://site.api.espn.com/apis/site/v2/sports/tennis/wta/scoreboard", pollIntervalMs: 6e4, label: "WTA Tour" },
@@ -88213,7 +88223,7 @@ function normalizeNewswireSource(url, author) {
 init_define_import_meta_env();
 
 // ../grarf/desktop/src/lib/newswire/mapFeedItemToNewswireStory.ts
-function stableHash3(input) {
+function stableHash2(input) {
   let h2 = 2166136261;
   for (let i2 = 0; i2 < input.length; i2++) {
     h2 ^= input.charCodeAt(i2);
@@ -88227,7 +88237,7 @@ function mapFeedItemToNewswireStory(item) {
   const source = normalizeNewswireSource(url, item.author);
   const key2 = url || item.id;
   return {
-    id: `newswire-${stableHash3(key2)}`,
+    id: `newswire-${stableHash2(key2)}`,
     source,
     headline,
     timestamp: item.publishedAt,
@@ -127356,6 +127366,7 @@ function GrarfExtensionTimelineCardShell({
   onOpen,
   sequentialNavCurrent = false,
   children,
+  trailing,
   className
 }) {
   const category = resolveExtensionTimelineCategoryLabel(sourceKind);
@@ -127428,6 +127439,7 @@ function GrarfExtensionTimelineCardShell({
             children
           }
         ),
+        trailing ? /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("div", { className: "grarf-extension-timeline-card__trailing", children: trailing }) : null,
         urlLabel || footerClock ? /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "grarf-extension-timeline-card__footer", children: [
           /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("div", { className: "grarf-extension-timeline-card__footer-link", children: urlLabel ? /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)(import_jsx_runtime41.Fragment, { children: [
             /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "grarf-extension-timeline-card__link-icon", "aria-hidden": true, children: "\u26D3" }),
@@ -208962,10 +208974,17 @@ function GrarfExtensionDailySummaryLeagueHeadlineRow({
   const summaryRevealed = bodyExpanded && Boolean(body);
   const showGamesControl = summaryRevealed || !body;
   return /* @__PURE__ */ (0, import_jsx_runtime316.jsxs)("div", { className: "grarf-extension-daily-summary-league__headline-row", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime316.jsxs)("div", { className: "grarf-extension-daily-summary-league__headline", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime316.jsx)("p", { className: "grarf-extension-daily-summary-league__headline-title", children: /* @__PURE__ */ (0, import_jsx_runtime316.jsx)(GrarfExtensionDailySummaryEditorialMarkdown, { text: title }) }),
-      summaryRevealed ? /* @__PURE__ */ (0, import_jsx_runtime316.jsx)("p", { className: "grarf-extension-daily-summary-league__headline-body", children: /* @__PURE__ */ (0, import_jsx_runtime316.jsx)(GrarfExtensionDailySummaryEditorialMarkdown, { text: body }) }) : null
-    ] }),
+    /* @__PURE__ */ (0, import_jsx_runtime316.jsxs)(
+      "div",
+      {
+        className: "grarf-extension-daily-summary-league__headline",
+        "data-grarf-daily-summary-league-body-expanded": bodyExpanded && body ? "" : void 0,
+        children: [
+          /* @__PURE__ */ (0, import_jsx_runtime316.jsx)("p", { className: "grarf-extension-daily-summary-league__headline-title", children: /* @__PURE__ */ (0, import_jsx_runtime316.jsx)(GrarfExtensionDailySummaryEditorialMarkdown, { text: title }) }),
+          summaryRevealed ? /* @__PURE__ */ (0, import_jsx_runtime316.jsx)("p", { className: "grarf-extension-daily-summary-league__headline-body", children: /* @__PURE__ */ (0, import_jsx_runtime316.jsx)(GrarfExtensionDailySummaryEditorialMarkdown, { text: body }) }) : null
+        ]
+      }
+    ),
     body ? /* @__PURE__ */ (0, import_jsx_runtime316.jsx)(
       "button",
       {

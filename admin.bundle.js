@@ -14606,7 +14606,7 @@ var ESPN_OPERATIONAL_INGEST_LEAGUES = [
     "sport": "basketball",
     "label": "NCAA Men's Basketball",
     "slug": "mens-college-basketball",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/basketball/mens-college-basketball/scoreboard"
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/basketball/mens-college-basketball/scoreboard?groups=50&limit=200"
   },
   {
     "key": "NASCAR",
@@ -14928,7 +14928,7 @@ var ESPN_OPERATIONAL_INGEST_LEAGUES = [
     "sport": "basketball",
     "label": "NCAA Women's Basketball",
     "slug": "womens-college-basketball",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/basketball/womens-college-basketball/scoreboard"
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/basketball/womens-college-basketball/scoreboard?groups=50&limit=200"
   },
   {
     "key": "WOMENS_UCL",
@@ -30494,7 +30494,7 @@ var ESPN_OPERATIONAL_INGEST_LEAGUES2 = [
   },
   {
     "key": "MNCAAB",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/basketball/mens-college-basketball/scoreboard",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/basketball/mens-college-basketball/scoreboard?groups=50&limit=200",
     "label": "NCAA Men's Basketball",
     "sport": "basketball",
     "slug": "mens-college-basketball",
@@ -30862,7 +30862,7 @@ var ESPN_OPERATIONAL_INGEST_LEAGUES2 = [
   },
   {
     "key": "WNCAAB",
-    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/basketball/womens-college-basketball/scoreboard",
+    "endpoint": "https://site.api.espn.com/apis/site/v2/sports/basketball/womens-college-basketball/scoreboard?groups=50&limit=200",
     "label": "NCAA Women's Basketball",
     "sport": "basketball",
     "slug": "womens-college-basketball",
