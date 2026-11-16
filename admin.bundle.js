@@ -27091,6 +27091,81 @@ var useGamesSpineManualStore = create((set) => ({
 init_define_import_meta_env();
 var import_react3 = __toESM(require_react(), 1);
 
+// ../grarf/desktop/src/extensionHost/grarfExtensionPresentationClient.ts
+init_define_import_meta_env();
+
+// ../grarf/desktop/src/store/extensionPresentationStore.ts
+init_define_import_meta_env();
+
+// ../grarf/desktop/node_modules/zustand/esm/middleware.mjs
+init_define_import_meta_env();
+var subscribeWithSelectorImpl = (fn) => (set, get, api) => {
+  const origSubscribe = api.subscribe;
+  api.subscribe = ((selector, optListener, options) => {
+    let listener = selector;
+    if (optListener) {
+      const equalityFn = (options == null ? void 0 : options.equalityFn) || Object.is;
+      let currentSlice = selector(api.getState());
+      listener = (state) => {
+        const nextSlice = selector(state);
+        if (!equalityFn(currentSlice, nextSlice)) {
+          const previousSlice = currentSlice;
+          optListener(currentSlice = nextSlice, previousSlice);
+        }
+      };
+      if (options == null ? void 0 : options.fireImmediately) {
+        optListener(currentSlice, currentSlice);
+      }
+    }
+    return origSubscribe(listener);
+  });
+  const initialState = fn(set, get, api);
+  return initialState;
+};
+var subscribeWithSelector = subscribeWithSelectorImpl;
+
+// ../grarf/desktop/src/store/extensionPresentationStore.ts
+var useExtensionPresentationStore = create(
+  subscribeWithSelector((set, get) => ({
+    etag: null,
+    lastFetchStatus: null,
+    operational: null,
+    setPublishedOperational: (transport, options) => {
+      const generatedAt = transport.generatedAt?.trim();
+      if (!generatedAt) return false;
+      const prev = get().operational;
+      if (prev?.generatedAt === generatedAt) {
+        if (options?.etag !== void 0) {
+          set({ etag: options.etag ?? null, lastFetchStatus: options?.httpStatus ?? null });
+        }
+        return false;
+      }
+      const leagues = {};
+      for (const [key, rows] of Object.entries(transport.leagues ?? {})) {
+        if (!Array.isArray(rows) || rows.length === 0) continue;
+        leagues[key] = rows;
+      }
+      set({
+        etag: options?.etag ?? get().etag,
+        lastFetchStatus: options?.httpStatus ?? null,
+        operational: {
+          generatedAt,
+          leagues,
+          source: transport.source ?? "grarf_operational_service",
+          providerPoll: transport.providerPoll
+        }
+      });
+      return true;
+    },
+    recordPublishedOperationalNotModified: (options) => {
+      set({
+        etag: options?.etag ?? get().etag,
+        lastFetchStatus: options?.httpStatus ?? 304
+      });
+    }
+  }))
+);
+
 // ../grarf/desktop/src/lib/workspaceIdentityDiagnostics/index.ts
 init_define_import_meta_env();
 
