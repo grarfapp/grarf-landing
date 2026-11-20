@@ -187367,10 +187367,10 @@ function GrarfExtensionSidebarTemporalCollapsedGameCard(props) {
 function GrarfExtensionSidebarTemporalCollapsedGameCardBody({
   game,
   onGameTeamSelect: _onGameTeamSelect,
-  onExploreToggle: _onExploreToggle,
+  onExploreToggle,
   onTeamExploreToggle,
   exploreExpanded = false,
-  hideExploreChevron: _hideExploreChevron = false,
+  hideExploreChevron = false,
   showWatchLive = false,
   onWatchLive,
   featuredEditorialHeadline,
@@ -187421,10 +187421,9 @@ function GrarfExtensionSidebarTemporalCollapsedGameCardBody({
     suppressExplorePanel: true,
     onGameTeamSelect: _onGameTeamSelect,
     onCommandCenterGameTeamExploreOpen: extensionTeamExploreActive ? teamExplore.onTeamExploreOpen : onTeamExploreToggle,
-    onCommandCenterGameExploreToggle: void 0,
-    commandCenterExploreExpanded: teamExplore.exploreExpanded,
-    // TEMP(extension): hide expand chevron — restore `!hideExploreChevron` later.
-    showExploreChevron: false,
+    onCommandCenterGameExploreToggle: onExploreToggle,
+    commandCenterExploreExpanded: exploreExpanded || teamExplore.exploreExpanded,
+    showExploreChevron: !hideExploreChevron && Boolean(onExploreToggle),
     recapHeadline: cardEditorialHeadline,
     onRecapHeadlineClick: onCardEditorialHeadlineClick,
     editorialHeadlineKind: cardEditorialHeadlineKind
@@ -187447,7 +187446,6 @@ function GrarfExtensionNcaaWvbTimeBlockCard({
   timeLabel,
   games,
   selectedGameId,
-  onGameSelect,
   gameExploreExpandedIds,
   onGameExploreToggle,
   onGameTeamSelect,
@@ -187485,7 +187483,7 @@ function GrarfExtensionNcaaWvbTimeBlockCard({
                 "data-grarf-extension-ncaawvb-game-divider": ""
               }
             ) : null,
-            /* @__PURE__ */ (0, import_jsx_runtime257.jsxs)(
+            /* @__PURE__ */ (0, import_jsx_runtime257.jsx)(
               "div",
               {
                 className: cn2(
@@ -187495,63 +187493,60 @@ function GrarfExtensionNcaaWvbTimeBlockCard({
                 ),
                 "data-grarf-extension-ncaawvb-grid-game-shell": "",
                 "data-game-id": game.id,
-                children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime257.jsxs)(
-                    "div",
-                    {
-                      className: "grarf-extension-ncaawvb-grid__game",
-                      "data-grarf-extension-ncaawvb-grid-game": "",
-                      children: [
-                        /* @__PURE__ */ (0, import_jsx_runtime257.jsx)(GrarfExtensionNcaaWvbCompactGameRow, { game }),
-                        /* @__PURE__ */ (0, import_jsx_runtime257.jsxs)(
-                          "span",
-                          {
-                            className: "grarf-extension-ncaawvb-grid__broadcast-cell",
-                            style: { gridColumn: 2, gridRow: "1 / 3" },
-                            "data-grarf-extension-ncaawvb-broadcast-cell": "",
-                            children: [
-                              channelLabel ? /* @__PURE__ */ (0, import_jsx_runtime257.jsx)("span", { className: "grarf-extension-ncaawvb-grid__channel-label", children: channelLabel }) : null,
-                              onGameExploreToggle ? /* @__PURE__ */ (0, import_jsx_runtime257.jsx)(
-                                "button",
-                                {
-                                  type: "button",
-                                  className: "grarf-extension-ncaawvb-grid__chevron-button",
-                                  "data-grarf-extension-ncaawvb-explore-chevron": "",
-                                  "aria-expanded": exploreExpanded,
-                                  "aria-label": exploreExpanded ? "Collapse game" : "Expand game",
-                                  onClick: (event) => {
-                                    event.stopPropagation();
-                                    onGameExploreToggle(game);
-                                  },
-                                  children: /* @__PURE__ */ (0, import_jsx_runtime257.jsx)(GrarfExtensionCommandCenterScorecardChevron, { expanded: exploreExpanded })
-                                }
-                              ) : null
-                            ]
-                          }
-                        )
-                      ]
-                    }
-                  ),
-                  exploreExpanded ? /* @__PURE__ */ (0, import_jsx_runtime257.jsx)(
-                    "div",
-                    {
-                      className: "grarf-extension-ncaawvb-grid__expanded-scorecard",
-                      "data-grarf-extension-ncaawvb-expanded-scorecard": "",
-                      children: /* @__PURE__ */ (0, import_jsx_runtime257.jsx)(
-                        GrarfExtensionSidebarTemporalCollapsedGameCard,
+                children: exploreExpanded ? /* @__PURE__ */ (0, import_jsx_runtime257.jsx)(
+                  "div",
+                  {
+                    className: "grarf-extension-ncaawvb-grid__expanded-scorecard",
+                    "data-grarf-extension-ncaawvb-expanded-scorecard": "",
+                    children: /* @__PURE__ */ (0, import_jsx_runtime257.jsx)(
+                      GrarfExtensionSidebarTemporalCollapsedGameCard,
+                      {
+                        game,
+                        exploreExpanded: true,
+                        onExploreToggle: onGameExploreToggle,
+                        onGameTeamSelect,
+                        onTeamExploreToggle,
+                        showWatchLive,
+                        onWatchLive
+                      }
+                    )
+                  }
+                ) : /* @__PURE__ */ (0, import_jsx_runtime257.jsxs)(
+                  "div",
+                  {
+                    className: "grarf-extension-ncaawvb-grid__game",
+                    "data-grarf-extension-ncaawvb-grid-game": "",
+                    children: [
+                      /* @__PURE__ */ (0, import_jsx_runtime257.jsx)(GrarfExtensionNcaaWvbCompactGameRow, { game }),
+                      /* @__PURE__ */ (0, import_jsx_runtime257.jsxs)(
+                        "span",
                         {
-                          game,
-                          exploreExpanded: true,
-                          onGameTeamSelect,
-                          onTeamExploreToggle,
-                          showWatchLive,
-                          onWatchLive,
-                          hideExploreChevron: true
+                          className: "grarf-extension-ncaawvb-grid__broadcast-cell",
+                          style: { gridColumn: 2, gridRow: "1 / 3" },
+                          "data-grarf-extension-ncaawvb-broadcast-cell": "",
+                          children: [
+                            channelLabel ? /* @__PURE__ */ (0, import_jsx_runtime257.jsx)("span", { className: "grarf-extension-ncaawvb-grid__channel-label", children: channelLabel }) : null,
+                            onGameExploreToggle ? /* @__PURE__ */ (0, import_jsx_runtime257.jsx)(
+                              "button",
+                              {
+                                type: "button",
+                                className: "grarf-extension-ncaawvb-grid__chevron-button",
+                                "data-grarf-extension-ncaawvb-explore-chevron": "",
+                                "aria-expanded": false,
+                                "aria-label": "Expand game",
+                                onClick: (event) => {
+                                  event.stopPropagation();
+                                  onGameExploreToggle(game);
+                                },
+                                children: /* @__PURE__ */ (0, import_jsx_runtime257.jsx)(GrarfExtensionCommandCenterScorecardChevron, { expanded: false })
+                              }
+                            ) : null
+                          ]
                         }
                       )
-                    }
-                  ) : null
-                ]
+                    ]
+                  }
+                )
               }
             )
           ] }, game.id);
@@ -189774,6 +189769,8 @@ function GrarfExtensionCommandCenterFourLineMatchupCard({
   const rightPresentation = resolveSportsBrowserLeftNavTeamNamePresentation(game, model.right);
   const finalWinnerSide = resolveGamesSpineCompactMatchupFinalWinnerSide(game, model.left, model.right);
   const extensionTeamTriggeredExploreOnly = isGrarfExtensionRenderer();
+  const extensionNcaaWvbGameLevelExplore = extensionTeamTriggeredExploreOnly && isGrarfExtensionNcaaWomensVolleyballGame(game) && Boolean(onCommandCenterGameExploreToggle);
+  const onGameExploreToggle = extensionTeamTriggeredExploreOnly && !extensionNcaaWvbGameLevelExplore ? void 0 : onCommandCenterGameExploreToggle;
   const teamExploreActiveSide = (0, import_react301.useSyncExternalStore)(
     subscribeGrarfExtensionGameCardTeamExploreActiveSide,
     () => getGrarfExtensionGameCardTeamExploreActiveSide(game.id),
@@ -189809,7 +189806,7 @@ function GrarfExtensionCommandCenterFourLineMatchupCard({
         {
           game,
           exploreExpanded: commandCenterExploreExpanded,
-          onExploreToggle: extensionTeamTriggeredExploreOnly ? void 0 : onCommandCenterGameExploreToggle
+          onExploreToggle: onGameExploreToggle
         }
       ),
       suppressExplorePanel ? null : /* @__PURE__ */ (0, import_jsx_runtime265.jsx)(
@@ -189833,7 +189830,7 @@ function GrarfExtensionCommandCenterFourLineMatchupCard({
         {
           game,
           isSelected: commandCenterExploreExpanded,
-          onClick: extensionTeamTriggeredExploreOnly ? void 0 : onCommandCenterGameExploreToggle,
+          onClick: onGameExploreToggle,
           bypassYesterdayHighlightsNavigation: true
         }
       ),
@@ -189889,7 +189886,7 @@ function GrarfExtensionCommandCenterFourLineMatchupCard({
         showChannelLogo,
         channel,
         exploreExpanded: commandCenterExploreExpanded,
-        onExploreToggle: extensionTeamTriggeredExploreOnly ? void 0 : onCommandCenterGameExploreToggle,
+        onExploreToggle: onGameExploreToggle,
         showExploreChevron: scorecardLayout === "feedStrip" ? false : showExploreChevron,
         layoutVariant: scorecardLayout,
         leagueHeader: tennisMetaHeader ? /* @__PURE__ */ (0, import_jsx_runtime265.jsx)(SportsBrowserTennisGameCardMetaHeader, { labels: tennisMetaHeader }) : void 0,
