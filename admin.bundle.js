@@ -12963,11 +12963,17 @@ init_define_import_meta_env();
 
 // ../grarf/desktop/src/lib/platform/isGrarfWebRenderer.ts
 init_define_import_meta_env();
+function isGrarfElectronRenderer() {
+  return typeof window !== "undefined" && window.GRARF_ELECTRON === true;
+}
 function isGrarfExtensionRenderer() {
   return typeof window !== "undefined" && window.GRARF_EXTENSION === true;
 }
 function isGrarfWebRenderer() {
   return typeof window !== "undefined" && window.GRARF_WEB_CONFIG != null;
+}
+function isCanonicalWebBrowserRenderer() {
+  return isGrarfWebRenderer() && !isGrarfElectronRenderer();
 }
 
 // ../grarf/desktop/src/config/sportscapeEditorialConfig.ts
@@ -13038,6 +13044,93 @@ function sportscapeEditorialApiUrl(path) {
   return sportscapeEditorialUrlForBase(getSportscapeEditorialApiBaseUrl(), path);
 }
 
+// ../grarf/desktop/src/lib/operationalCloud/sportscapeEditorialUrl.ts
+init_define_import_meta_env();
+
+// ../grarf/desktop/src/lib/operationalCloud/operationalCloudClientAuthorization.ts
+init_define_import_meta_env();
+
+// ../grarf/desktop/src/extensionHost/grarfExtensionPresentationClient.ts
+init_define_import_meta_env();
+function isGrarfExtensionPresentationClientEnabled() {
+  if (typeof window === "undefined") return false;
+  if (window.GRARF_EXTENSION !== true) return false;
+  return define_import_meta_env_default.VITE_GRARF_EXTENSION_PRESENTATION_CLIENT !== "0";
+}
+
+// ../grarf/desktop/src/lib/operationalCloud/operationalCloudClientAuthorization.ts
+var PRODUCTION_OPERATIONAL_SERVICE_HOST = "grarf-operational-service.grarf.workers.dev";
+var OperationalCloudClientAuthorizationError = class extends Error {
+  constructor(context) {
+    super(`[OperationalCloudAuth] ${context}`);
+    this.name = "OperationalCloudClientAuthorizationError";
+  }
+};
+function isProductionGrarfOperationalServiceUrl(url) {
+  try {
+    return new URL(url).hostname.toLowerCase() === PRODUCTION_OPERATIONAL_SERVICE_HOST;
+  } catch {
+    return url.includes(PRODUCTION_OPERATIONAL_SERVICE_HOST);
+  }
+}
+function isGrarfAuthorizedOperationalCloudConsumer() {
+  return isGrarfExtensionRenderer();
+}
+function isRetiredOperationalCloudClient() {
+  if (typeof window === "undefined") return false;
+  if (isGrarfExtensionRenderer()) return false;
+  return isGrarfElectronRenderer() || isCanonicalWebBrowserRenderer() || isGrarfWebRenderer();
+}
+function assertGrarfAuthorizedOperationalCloudConsumer(context) {
+  if (isGrarfAuthorizedOperationalCloudConsumer()) return;
+  throw new OperationalCloudClientAuthorizationError(context);
+}
+function guardProductionOperationalWorkerUrl(url, context) {
+  if (isGrarfAuthorizedOperationalCloudConsumer()) return url;
+  if (isProductionGrarfOperationalServiceUrl(url)) {
+    throw new OperationalCloudClientAuthorizationError(
+      `${context}: retired client cannot call production operational Worker`
+    );
+  }
+  return url;
+}
+function isOperationalWorkerSnapshotFallbackAllowed() {
+  if (isGrarfExtensionPresentationClientEnabled()) return false;
+  return isGrarfAuthorizedOperationalCloudConsumer();
+}
+
+// ../grarf/desktop/src/lib/operationalCloud/sportscapeEditorialUrl.ts
+var SPORTSCAPE_EDITORIAL_WORKER_HOST = "grarf-sportscape-editorial.grarf.workers.dev";
+function isProductionSportscapeEditorialUrl(url) {
+  try {
+    return new URL(url).hostname.toLowerCase() === SPORTSCAPE_EDITORIAL_WORKER_HOST;
+  } catch {
+    return url.includes(SPORTSCAPE_EDITORIAL_WORKER_HOST);
+  }
+}
+function assertSportscapeEditorialClientAllowed() {
+  if (isRetiredOperationalCloudClient()) {
+    throw new OperationalCloudClientAuthorizationError(
+      "retired client cannot call Sportscape editorial Worker"
+    );
+  }
+  if (!isGrarfAuthorizedOperationalCloudConsumer()) {
+    throw new OperationalCloudClientAuthorizationError(
+      "client not authorized for Sportscape editorial Worker"
+    );
+  }
+}
+function guardSportscapeEditorialFetchUrl(url) {
+  assertSportscapeEditorialClientAllowed();
+  if (isProductionSportscapeEditorialUrl(url)) {
+    return url;
+  }
+  if (isProductionGrarfOperationalServiceUrl(url)) {
+    return guardProductionOperationalWorkerUrl(url, "sportscape-editorial proxy");
+  }
+  return url;
+}
+
 // ../grarf/desktop/src/lib/sportscape/editorial/fetchSportscapeEditorialWithFailover.ts
 var FETCH_TIMEOUT_MS = 15e3;
 var LOG = "[Sportscape Editorial]";
@@ -13050,7 +13143,7 @@ function shouldFailoverOnStatus(status) {
   return status === 404 || status === 405 || status === 501 || status === 500 || status === 502 || status === 503 || status === 504;
 }
 async function fetchOne(baseUrl, path, init) {
-  const url = sportscapeEditorialUrlForBase(baseUrl, path);
+  const url = guardSportscapeEditorialFetchUrl(sportscapeEditorialUrlForBase(baseUrl, path));
   return fetch(url, {
     ...init,
     signal: AbortSignal.timeout(FETCH_TIMEOUT_MS)
@@ -20338,6 +20431,82 @@ async function buildMlbEspnStandingsIndex() {
 // ../grarf/desktop/src/lib/standings/mlb/fetchWebMlbTeamStandingsIndex.ts
 init_define_import_meta_env();
 
+// ../grarf/desktop/src/lib/operationalCloud/operationalWorkerUrl.ts
+init_define_import_meta_env();
+var OPERATIONAL_WORKER_ROUTE_PREFIXES = [
+  "/espn/summary",
+  "/operational/historical-slate",
+  "/operational/daily-editorial",
+  "/operational/temporary-editorial-overrides",
+  "/operational/snapshot",
+  "/mlb/team-standings-index",
+  "/nfl/x-gametime-catalog",
+  "/clips/youtube-rss",
+  "/clips/youtube-playlist-rss",
+  "/clips/youtube-playlist-data",
+  "/clips/youtube-canonical-thumbnails",
+  "/clips/youtube-canonical-thumbnail",
+  "/clips/uefa-nations-league-highlights",
+  "/livetrack/rss-app",
+  "/livetrack/rsshub",
+  "/watch/",
+  "/extension/youtube-embed",
+  "/sportscape-editorial"
+];
+function normalizeOperationalWorkerPath(pathAndQuery) {
+  const trimmed = pathAndQuery.trim();
+  if (!trimmed) return "/";
+  const withoutHost = trimmed.replace(/^https?:\/\/[^/]+/i, "");
+  const pathOnly = withoutHost.split("?")[0] ?? withoutHost;
+  return pathOnly.startsWith("/") ? pathOnly : `/${pathOnly}`;
+}
+function isOperationalWorkerRouteAllowlisted(pathAndQuery) {
+  const path = normalizeOperationalWorkerPath(pathAndQuery);
+  return OPERATIONAL_WORKER_ROUTE_PREFIXES.some(
+    (prefix) => path === prefix || path.startsWith(`${prefix}/`) || path.startsWith(prefix)
+  );
+}
+function assertRouteAllowedForClient(pathAndQuery) {
+  const path = normalizeOperationalWorkerPath(pathAndQuery);
+  if (!isOperationalWorkerRouteAllowlisted(pathAndQuery)) {
+    throw new OperationalCloudClientAuthorizationError(
+      `operational Worker route not allowlisted: ${path}`
+    );
+  }
+  if (path === "/operational/snapshot" || path.startsWith("/operational/snapshot")) {
+    if (isGrarfExtensionPresentationClientEnabled()) {
+      throw new OperationalCloudClientAuthorizationError(
+        "Mode A presentation client must not call /operational/snapshot"
+      );
+    }
+  }
+  if (isRetiredOperationalCloudClient()) {
+    throw new OperationalCloudClientAuthorizationError(
+      `retired client cannot call operational Worker route: ${path}`
+    );
+  }
+  if (!isGrarfAuthorizedOperationalCloudConsumer()) {
+    throw new OperationalCloudClientAuthorizationError(
+      `client not authorized for operational Worker route: ${path}`
+    );
+  }
+}
+function resolveOperationalWorkerBaseUrl() {
+  const base = getOperationalIngestConfig().cloudBaseUrl?.replace(/\/+$/, "");
+  if (!base) {
+    throw new OperationalCloudClientAuthorizationError(
+      "operational Worker base URL is not configured"
+    );
+  }
+  return base;
+}
+function buildOperationalWorkerUrl(pathAndQuery) {
+  assertRouteAllowedForClient(pathAndQuery);
+  const relative = pathAndQuery.startsWith("/") ? pathAndQuery : `/${pathAndQuery}`;
+  const url = `${resolveOperationalWorkerBaseUrl()}${relative}`;
+  return guardProductionOperationalWorkerUrl(url, normalizeOperationalWorkerPath(pathAndQuery));
+}
+
 // ../grarf/desktop/src/lib/standings/mlb/serializeMlbTeamStandingsIndex.ts
 init_define_import_meta_env();
 function deserializeMlbTeamStandingsIndex(payload) {
@@ -20356,11 +20525,7 @@ function deserializeMlbTeamStandingsIndex(payload) {
 // ../grarf/desktop/src/lib/standings/mlb/fetchWebMlbTeamStandingsIndex.ts
 var FETCH_TIMEOUT_MS2 = 15e3;
 async function fetchWebMlbTeamStandingsIndex() {
-  const { cloudBaseUrl } = getOperationalIngestConfig();
-  if (!cloudBaseUrl?.trim()) {
-    throw new Error("[StandingsEnrich:MLB] grarf_cloud base URL required for web standings index");
-  }
-  const url = `${cloudBaseUrl.replace(/\/$/, "")}/mlb/team-standings-index`;
+  const url = buildOperationalWorkerUrl("/mlb/team-standings-index");
   const res = await fetch(url, {
     headers: { Accept: "application/json" },
     signal: AbortSignal.timeout(FETCH_TIMEOUT_MS2)
@@ -25439,6 +25604,11 @@ async function fetchViaEspnLocalIpcAdapter() {
   return ipcSnapshotToOperationalResponse(snap);
 }
 async function fetchOperationalSnapshotFromCloudTarget(target, options) {
+  if (isRetiredOperationalCloudClient()) {
+    throw new OperationalCloudClientAuthorizationError(
+      `operational snapshot fetch (${target.transport})`
+    );
+  }
   const maxAttempts = options?.webBootstrap ? 1 : CLOUD_FETCH_MAX_ATTEMPTS;
   let lastError;
   for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
@@ -25534,7 +25704,7 @@ async function fetchViaGrarfCloudService(options) {
       throw primaryError;
     }
     const fallbackTarget = resolveOperationalWorkerSnapshotFetchTarget();
-    if (!fallbackTarget) {
+    if (!fallbackTarget || !isOperationalWorkerSnapshotFallbackAllowed()) {
       throw primaryError;
     }
     if (define_import_meta_env_default.DEV) {
@@ -25547,7 +25717,7 @@ async function fetchViaGrarfCloudService(options) {
     const verdict = evaluateOperationalSnapshotFreshnessSla(transport);
     if (verdict.stale) {
       const fallbackTarget = resolveOperationalWorkerSnapshotFetchTarget();
-      if (fallbackTarget) {
+      if (fallbackTarget && isOperationalWorkerSnapshotFallbackAllowed()) {
         try {
           const workerTransport = await fetchOperationalSnapshotFromCloudTarget(
             fallbackTarget,
@@ -25571,6 +25741,7 @@ async function fetchViaGrarfCloudService(options) {
   return transport;
 }
 async function fetchViaWebOperationalIngest() {
+  assertGrarfAuthorizedOperationalCloudConsumer("web operational ingest");
   let cloud = null;
   let cloudError = null;
   try {
@@ -27090,9 +27261,6 @@ var useGamesSpineManualStore = create((set) => ({
 // ../grarf/desktop/src/lib/gamesSpine/manualTourDeFranceSpineEntry.ts
 init_define_import_meta_env();
 var import_react3 = __toESM(require_react(), 1);
-
-// ../grarf/desktop/src/extensionHost/grarfExtensionPresentationClient.ts
-init_define_import_meta_env();
 
 // ../grarf/desktop/src/store/extensionPresentationStore.ts
 init_define_import_meta_env();
@@ -33026,12 +33194,11 @@ var cachedCatalog2 = null;
 var cachedAtMs3 = 0;
 var inFlight2 = null;
 function resolveCatalogFetchUrls() {
-  const urls = [];
-  const cloudBase = getOperationalIngestConfig().cloudBaseUrl?.replace(/\/$/, "");
-  if (cloudBase) {
-    urls.push(`${cloudBase}${X_NFL_GAMETIME_CATALOG_PROXY_PATH2}`);
+  const urls = [X_NFL_GAMETIME_CATALOG_PROXY_PATH2];
+  try {
+    urls.unshift(buildOperationalWorkerUrl(X_NFL_GAMETIME_CATALOG_PROXY_PATH2));
+  } catch {
   }
-  urls.push(X_NFL_GAMETIME_CATALOG_PROXY_PATH2);
   return urls;
 }
 async function fetchCatalogFromUrl(url) {
